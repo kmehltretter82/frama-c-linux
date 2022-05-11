@@ -46,7 +46,7 @@ module Aorai_state =
     let compare x y = Datatype.Int.compare x.nums y.nums
     let copy = Datatype.identity
     let pretty fmt x = Format.fprintf fmt "state_%d" x.nums
-    let varname _ = assert false
+
     let mem_project = Datatype.never_any_project
   end
   )
@@ -66,7 +66,7 @@ module Aorai_typed_trans =
     let compare x y = Datatype.Int.compare x.numt y.numt
     let copy = Datatype.identity
     let pretty = Promelaoutput.Typed.print_transition
-    let varname _ = assert false
+
     let mem_project = Datatype.never_any_project
   end)
 
@@ -1821,7 +1821,7 @@ module Range = Datatype.Make_with_collections
             Cil_datatype.Term.pretty c2
         | Unbounded c1 -> Format.fprintf fmt "[%d..]" c1
         | Unknown -> Format.fprintf fmt "[..]"
-      let varname _ = "r"
+
       let mem_project = Datatype.never_any_project
     end)
 

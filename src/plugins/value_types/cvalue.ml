@@ -857,7 +857,7 @@ module V_Or_Uninitialized = struct
          let copy = Datatype.undefined
          let rehash = Datatype.identity
          let pretty = pretty
-         let varname = Datatype.undefined
+
          let mem_project = Datatype.never_any_project
        end)
      : Datatype.S with type t := t)

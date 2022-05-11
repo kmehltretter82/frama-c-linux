@@ -64,7 +64,7 @@ include
       | SplitEqList l ->
         Format.fprintf fmt "Split on \\result == %a"
           (Pretty_utils.pp_list ~sep:",@ " Datatype.Integer.pretty) l
-    let varname _ = "v"
+
     let mem_project = Datatype.never_any_project
   end)
 

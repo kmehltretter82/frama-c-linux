@@ -67,7 +67,7 @@ include
       let hash x = Datatype.String.hash x.name
       let copy x = x (* The representation of the parameter is immutable *)
       let pretty fmt x = Format.pp_print_string fmt x.name
-      let varname _ = assert false
+
       let mem_project = Datatype.never_any_project
     end)
 

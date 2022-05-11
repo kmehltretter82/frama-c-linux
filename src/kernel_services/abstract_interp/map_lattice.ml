@@ -500,7 +500,7 @@ module Make_MapSet_Lattice
          let copy = Datatype.undefined
          let pretty = pretty
          let mem_project = Datatype.never_any_project
-         let varname = Datatype.undefined
+
        end): Datatype.S_with_collections with type t := t)
 
 

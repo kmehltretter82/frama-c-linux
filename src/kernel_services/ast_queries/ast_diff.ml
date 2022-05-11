@@ -62,9 +62,6 @@ struct
   let mk_pretty pp fmt = function
     | `Not_present -> Format.pp_print_string fmt "N/A"
     | `Same x -> Format.fprintf fmt " => %a" pp x
-  let mk_varname v = function
-    | `Not_present -> "x"
-    | `Same x -> v x ^ "_c"
   let mk_mem_project mem query = function
     | `Not_present -> false
     | `Same x -> mem query x
@@ -156,10 +153,6 @@ struct
     | `Partial(x,flags) ->
       Format.fprintf fmt "-> %a %a" pp x pretty_pc flags
     | #correspondance as x -> Correspondance_input.mk_pretty pp fmt x
-
-  let mk_varname f = function
-    | `Partial (x,_) -> f x ^ "_pc"
-    | #correspondance as x -> Correspondance_input.mk_varname f x
 
   let mk_mem_project f p = function
     | `Partial (x,_) -> f p x

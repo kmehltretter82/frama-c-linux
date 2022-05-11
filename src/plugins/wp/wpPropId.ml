@@ -262,7 +262,7 @@ module PropIdRaw =
     let rehash = Datatype.identity
     let pretty = Datatype.undefined
     let mem_project = Datatype.never_any_project
-    let varname = Datatype.undefined
+
   end)
 
 (* -------------------------------------------------------------------------- *)

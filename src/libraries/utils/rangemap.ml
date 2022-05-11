@@ -534,7 +534,7 @@ module Make(Ord: Datatype.S)(Value: Value) = struct
             in aux
 
         let pretty = Datatype.undefined
-        let varname = Datatype.undefined
+
         let mem_project =
           if Ord.mem_project == Datatype.never_any_project &&
              Value.mem_project == Datatype.never_any_project then

@@ -65,7 +65,7 @@ module Fct_user_crit =
       let reprs = [ SlicingInternals.dummy_fct_user_crit ]
       let name = "SlicingTypes.Fct_user_crit"
       let mem_project = Datatype.never_any_project
-      let varname _ = "user_criteria"
+
     end)
 
 (** Function slice *)
@@ -88,7 +88,6 @@ module Sl_project =
       type t = sl_project
       let reprs = [ SlicingInternals.dummy_project ]
       let name = "SlicingTypes.Sl_project"
-      let varname _s = "sl_project_"
       let mem_project = Datatype.never_any_project
     end)
 
@@ -102,7 +101,6 @@ module Sl_select =
           (fun v -> v, SlicingInternals.dummy_fct_user_crit)
           Cil_datatype.Varinfo.reprs
       let name = "SlicingTypes.Sl_select"
-      let varname _s = "sl_select"
       let mem_project = Datatype.never_any_project
     end)
 
@@ -175,7 +173,7 @@ module Sl_mark =
       let rehash = Datatype.undefined
       let pretty = pp_sl_mark
       let mem_project = Datatype.never_any_project
-      let varname = Datatype.undefined
+
     end)
 
 let dyn_sl_mark = Sl_mark.ty

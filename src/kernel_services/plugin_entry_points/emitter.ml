@@ -103,7 +103,7 @@ module D =
       let hash x = Datatype.String.hash x.name
       let copy x = x (* strings are immutable here *)
       let pretty fmt x = Format.pp_print_string fmt x.name
-      let varname _ = assert false
+
       let mem_project = Datatype.never_any_project
     end)
 
@@ -147,7 +147,7 @@ module Usable_emitter = struct
             Format.fprintf fmt "%s (v%d)" name x.version
           else
             Format.pp_print_string fmt name
-        let varname _ = assert false
+
         let mem_project = Datatype.never_any_project
       end)
 

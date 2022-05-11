@@ -37,7 +37,6 @@ type 'a t = private
     hash: 'a -> int;
     copy: 'a -> 'a;
     pretty: Format.formatter -> 'a -> unit;
-    varname: 'a -> string;
     mem_project: (Project_skeleton.t -> bool) -> 'a -> bool }
 
 (** A type with its type value. *)
@@ -75,10 +74,6 @@ module type S_no_copy = sig
   val pretty: Format.formatter -> t -> unit
   (** Pretty print each value in an user-friendly way. *)
 
-  val varname: t -> string
-  (** A good prefix name to use for an OCaml variable of this type. Only useful
-      for journalisation. *)
-
   val mem_project: (Project_skeleton.t -> bool) -> t -> bool
   (** [mem_project f x] must return [true] iff there is a value [p] of type
       [Project.t] in [x] such that [f p] returns [true]. *)
@@ -102,7 +97,6 @@ val compare: 'a Type.t -> 'a -> 'a -> int
 val hash: 'a Type.t -> 'a -> int
 val copy: 'a Type.t -> 'a -> 'a
 val pretty: 'a Type.t -> Format.formatter -> 'a -> unit
-val varname: 'a Type.t -> 'a -> string
 val mem_project: 'a Type.t -> (Project_skeleton.t -> bool) -> 'a -> bool
 
 (* ********************************************************************** *)
@@ -137,7 +131,6 @@ module type Undefined = sig
   val rehash: 'a -> 'a
   val copy: 'a -> 'a
   val pretty: Format.formatter -> 'a -> unit
-  val varname: 'a -> string
   val mem_project: (Project_skeleton.t -> bool) -> 'a -> bool
 end
 
@@ -193,7 +186,6 @@ module type Make_input = sig
   val hash: t -> int
   val copy: t -> t
   val pretty: Format.formatter -> t -> unit
-  val varname: t -> string
   val mem_project: (Project_skeleton.t -> bool) -> t -> bool
 
 end
@@ -352,7 +344,6 @@ module Polymorphic
        val map: ('a -> 'a) -> 'a t -> 'a t
        val mk_pretty:
          (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
-       val mk_varname: ('a -> string) -> 'a t -> string
        val mk_mem_project:
          ((Project_skeleton.t -> bool) -> 'a -> bool) ->
          (Project_skeleton.t -> bool) -> 'a t -> bool
@@ -380,7 +371,6 @@ module Polymorphic2
        val mk_pretty:
          (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'b -> unit) ->
          Format.formatter -> ('a, 'b) t -> unit
-       val mk_varname: ('a -> string) -> ('b -> string) -> ('a, 'b) t -> string
        val mk_mem_project:
          ((Project_skeleton.t -> bool) -> 'a -> bool) ->
          ((Project_skeleton.t -> bool) -> 'b -> bool) ->
@@ -417,9 +407,6 @@ module Polymorphic3
          (Format.formatter -> 'b -> unit) ->
          (Format.formatter -> 'c -> unit) ->
          Format.formatter -> ('a, 'b, 'c) t -> unit
-       val mk_varname:
-         ('a -> string) -> ('b -> string) -> ('c -> string) ->
-         ('a, 'b, 'c) t -> string
        val mk_mem_project:
          ((Project_skeleton.t -> bool) -> 'a -> bool) ->
          ((Project_skeleton.t -> bool) -> 'b -> bool) ->
@@ -463,9 +450,6 @@ module Polymorphic4
          (Format.formatter -> 'c -> unit) ->
          (Format.formatter -> 'd -> unit) ->
          Format.formatter -> ('a, 'b, 'c, 'd) t -> unit
-       val mk_varname:
-         ('a -> string) -> ('b -> string) -> ('c -> string) -> ('d -> string) ->
-         ('a, 'b, 'c, 'd) t -> string
        val mk_mem_project:
          ((Project_skeleton.t -> bool) -> 'a -> bool) ->
          ((Project_skeleton.t -> bool) -> 'b -> bool) ->

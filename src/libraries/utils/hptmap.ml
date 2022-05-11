@@ -681,7 +681,7 @@ struct
 
         let copy = Datatype.undefined
         let pretty = pretty
-        let varname = Datatype.undefined
+
         let mem_project = Datatype.never_any_project
       end)
   let () = Type.set_ml_name D.ty None

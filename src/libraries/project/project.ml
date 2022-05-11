@@ -52,7 +52,6 @@ module D =
       let rehash x = !rehash_ref x
       let copy = Datatype.undefined
       let pretty fmt p = Format.fprintf fmt "project %S" p.unique_name
-      let varname p = "p_" ^ p.name
       let mem_project f x = f x
     end)
 include (D: Datatype.S_no_copy with type t = Project_skeleton.t)

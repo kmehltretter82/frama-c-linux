@@ -105,7 +105,7 @@ include Datatype.Make_with_collections
       let copy = Datatype.undefined
       let rehash = Datatype.undefined
       let pretty fmt s = Format.fprintf fmt "state %S" s.unique_name
-      let varname = Datatype.undefined
+
       let mem_project = Datatype.never_any_project
     end)
 

@@ -85,7 +85,7 @@ include Datatype.Make_with_collections
       let hash (k:k) = Hashtbl.hash k
       let equal (k1:k) k2 = k1 = k2
       let compare (k1:k) k2 = Stdlib.compare k1 k2
-      let varname _ = "k"
+
       let copy = Datatype.identity
       let structural_descr = Structural_descr.t_abstract
       let rehash = Datatype.identity

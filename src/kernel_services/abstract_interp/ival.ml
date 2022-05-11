@@ -826,7 +826,7 @@ include (
       let rehash = rehash
       let mem_project = Datatype.never_any_project
       let copy = Datatype.undefined
-      let varname = Datatype.undefined
+
     end):
     Datatype.S_with_collections with type t := t)
 

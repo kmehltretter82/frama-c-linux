@@ -132,7 +132,7 @@ include Datatype.Make_with_collections
       let rehash x = x
       let mem_project = Datatype.never_any_project
       let copy = Datatype.undefined
-      let varname = Datatype.undefined
+
     end)
 
 (* ---------------------------------- Utils --------------------------------- *)

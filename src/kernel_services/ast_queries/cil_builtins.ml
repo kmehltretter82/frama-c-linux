@@ -168,7 +168,6 @@ module Builtin_template = struct
         let rehash = Datatype.identity
         let structural_descr = Structural_descr.t_abstract
         let mem_project = Datatype.never_any_project
-        let varname b = "_cb_" ^ b.name
       end)
 end
 module Builtin_templates =

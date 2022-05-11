@@ -80,7 +80,6 @@ module Emitter_with_properties =
 
       let copy = Datatype.undefined
       let pretty fmt e = Usable_emitter.pretty fmt e.emitter
-      let varname _ = assert false
       let mem_project = Datatype.never_any_project
     end)
 

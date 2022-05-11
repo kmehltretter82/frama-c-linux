@@ -682,7 +682,7 @@ struct
         let compare = Datatype.undefined
         let hash = Datatype.undefined
         let copy _old = QZERO.create ()
-        let varname = Datatype.undefined
+
         let pretty = Datatype.undefined
         let mem_project _ _ = false
       end)
