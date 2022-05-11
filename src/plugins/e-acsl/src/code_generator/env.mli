@@ -217,6 +217,7 @@ val get_kinstr: t -> kinstr
 
 val push_contract: t -> contract -> t
 (** Push a contract to the environment's stack *)
+
 val pop_and_get_contract: t -> contract * t
 (** Pop and return the top contract of the environment's stack *)
 

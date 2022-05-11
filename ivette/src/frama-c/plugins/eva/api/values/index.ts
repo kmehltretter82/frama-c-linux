@@ -121,7 +121,7 @@ export const getStmtInfo: Server.GetRequest<
 const getProbeInfo_internal: Server.GetRequest<
   marker,
   { condition: boolean, effects: boolean, rank: number,
-    stmt?: Json.key<'#stmt'>, code?: string }
+    stmt?: Json.key<'#stmt'>, code?: string, evaluable: boolean }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getProbeInfo',
@@ -132,6 +132,7 @@ const getProbeInfo_internal: Server.GetRequest<
             rank: Json.jFail(Json.jNumber,'Number expected'),
             stmt: Json.jKey<'#stmt'>('#stmt'),
             code: Json.jString,
+            evaluable: Json.jFail(Json.jBoolean,'Boolean expected'),
           }),
   signals: [],
 };
@@ -139,7 +140,7 @@ const getProbeInfo_internal: Server.GetRequest<
 export const getProbeInfo: Server.GetRequest<
   marker,
   { condition: boolean, effects: boolean, rank: number,
-    stmt?: Json.key<'#stmt'>, code?: string }
+    stmt?: Json.key<'#stmt'>, code?: string, evaluable: boolean }
   >= getProbeInfo_internal;
 
 /** Evaluation of an expression or lvalue */

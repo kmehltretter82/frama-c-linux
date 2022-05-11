@@ -26,7 +26,7 @@
 
 (** Abstractions do not represent the empty set. Instead, operations creating
     empty sets return `Bottom. *)
-open Bottom.Type
+open Lattice_bounds
 
 include Datatype.S_with_collections
 
@@ -43,8 +43,11 @@ val one: t
 val minus_one: t
 val zero_or_one: t
 
-val positive_integers: t (** All positive integers, including 0. *)
-val negative_integers: t (** All negative integers, including 0. *)
+val positive_integers: t
+(** All positive integers, including 0. *)
+
+val negative_integers: t
+(** All negative integers, including 0. *)
 
 (** {2 Building.} *)
 
@@ -117,8 +120,10 @@ val contains_non_zero: t -> bool
 
 val add: t -> t -> t
 (** Addition of two integer abstractions. *)
+
 val add_under: t -> t -> t or_bottom
 (** Under-approximation of the addition of two integer abstractions *)
+
 val add_singleton: Integer.t -> t -> t
 (** Addition of an integer abstraction with a singleton integer.
     Exact operation. *)
@@ -132,12 +137,15 @@ val abs: t -> t
 val scale: Integer.t -> t -> t
 (** [scale f v] returns an abstraction of the integers [f * x]
     for all [x] in [v]. This operation is exact. *)
+
 val scale_div: pos:bool -> Integer.t -> t -> t
 (** [scale_div f v] is an over-approximation of the elements [x / f] for all
     elements [x] in [v]. Uses the computer division (like in C99) if [pos] is
     false, and the euclidean division if [pos] is true. *)
+
 val scale_div_under: pos:bool -> Integer.t -> t -> t or_bottom
 (** Under-approximation of the division. *)
+
 val scale_rem: pos:bool -> Integer.t -> t -> t
 (** Over-approximation of the remainder of the division. Uses the computer
     division (like in C99) if [pos] is false, and the euclidean division if

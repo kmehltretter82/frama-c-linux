@@ -32,14 +32,14 @@ int main(void)
   int __retres;
   char *g;
   char *q;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
-  __e_acsl_store_block((void *)(& q),(size_t)8);
-  __e_acsl_store_block((void *)(& g),(size_t)8);
+  __e_acsl_store_block((void *)(& q),8UL);
+  __e_acsl_store_block((void *)(& g),8UL);
   char *f = (char *)__gen_e_acsl_literal_string;
   __e_acsl_temporal_store_nblock((void *)(& f),
                                  (void *)__gen_e_acsl_literal_string);
-  __e_acsl_store_block((void *)(& f),(size_t)8);
+  __e_acsl_store_block((void *)(& f),8UL);
   __e_acsl_full_init((void *)(& f));
   {
     int __gen_e_acsl_initialized;
@@ -180,7 +180,7 @@ int main(void)
   /*@ assert \valid_read(g) && !\valid(g); */ ;
   char *p = f;
   __e_acsl_temporal_store_nreferent((void *)(& p),(void *)(& f));
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   {
     int __gen_e_acsl_initialized_5;

@@ -225,24 +225,26 @@ let equal_ltype = Cil_datatype.Logic_type.equal
 
 (* Does the same kind of optimization than [Cil.mkCastT] for [Ctype]. *)
 let mk_cast ?loc ?(force=false) newt t =
-  let newt = Cil.type_remove_attributes_for_logic_type newt in
-  if equal_ltype (Ctype newt) t.term_type then t else
+  let newt' = Cil.type_remove_attributes_for_logic_type newt in
+  if equal_ltype (Ctype newt') t.term_type then t else
     let rec unroll_cast e = match e.term_node with
       | TCastE(oldt,e)
-        when (Cil.isPointerType newt && Cil.isPointerType oldt)
-          || equal_ltype (Ctype oldt) (Ctype newt)
+        when (Cil.isPointerType newt' && Cil.isPointerType oldt)
+          || equal_ltype
+               (Ctype (Cil.type_remove_attributes_for_logic_type oldt))
+               (Ctype newt')
         -> unroll_cast e
       | TLogic_coerce(Linteger,e)
-        when Cil.isArithmeticOrPointerType newt
+        when Cil.isArithmeticOrPointerType newt'
         -> unroll_cast e
       | TLogic_coerce(Lreal,e)
-        when Cil.isFloatingType newt
+        when Cil.isFloatingType newt'
         -> unroll_cast e
       | _ -> e
     in
     let tres = if force then t else unroll_cast t in
     let loc = match loc with None -> t.term_loc | Some loc -> loc in
-    Logic_const.term ~loc (TCastE (newt, tres)) (Ctype newt)
+    Logic_const.term ~loc (TCastE (newt, tres)) (Ctype newt')
 
 
 (* -------------------------------------------------------------------------- *)
@@ -2711,7 +2713,7 @@ let find_initial_value init loff =
 let eval_term_lval global_find_init (lhost, loff) =
   match lhost with
   | TVar lvi -> begin
-      (** See if we can evaluate the l-value using the initializer of lvi*)
+      (* See if we can evaluate the l-value using the initializer of lvi*)
       let off_type = Cil.typeTermOffset lvi.lv_type loff in
       if Logic_const.plain_or_set Cil.isLogicIntegralType off_type then
         match lvi.lv_origin with

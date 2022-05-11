@@ -29,14 +29,13 @@ open Analyses_datatype
 
 (** Type holding information about the C variable representing the assertion
     data. *)
-[@@@ warning "-69"]
 type data = {
-  (** Indicates if some data have been registered in the context or not. *)
   data_registered: bool;
-  (** [varinfo] representing the C variable for the assertion data. *)
+  (** Indicates if some data have been registered in the context or not. *)
   data_vi: varinfo;
-  (** [exp] representing a pointer to the C variable for the assertion data. *)
+  (** [varinfo] representing the C variable for the assertion data. *)
   data_ptr: exp;
+  (** [exp] representing a pointer to the C variable for the assertion data. *)
 }
 
 (** External type representing the assertion context. Either [Some data] if we

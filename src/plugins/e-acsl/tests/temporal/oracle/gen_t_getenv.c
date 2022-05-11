@@ -26,7 +26,7 @@ char *__gen_e_acsl_getenv(char const *name);
 char *__gen_e_acsl_getenv(char const *name)
 {
   char *__retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)8);
+  __e_acsl_store_block((void *)(& __retres),8UL);
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   __retres = getenv(name);
@@ -57,7 +57,7 @@ char *__gen_e_acsl_getenv(char const *name)
     __gen_e_acsl_assert_data_2.pred_txt = "\\result == \\null || \\valid(\\result)";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data_2.fct = "getenv";
-    __gen_e_acsl_assert_data_2.line = 488;
+    __gen_e_acsl_assert_data_2.line = 523;
     __gen_e_acsl_assert_data_2.name = "null_or_valid_result";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -87,11 +87,11 @@ void __e_acsl_globals_init(void)
 int main(int argc, char const **argv)
 {
   int __retres;
-  __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
+  __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
   __e_acsl_globals_init();
   char *g1 = (char *)0;
   __e_acsl_temporal_store_nblock((void *)(& g1),(void *)0);
-  __e_acsl_store_block((void *)(& g1),(size_t)8);
+  __e_acsl_store_block((void *)(& g1),8UL);
   __e_acsl_full_init((void *)(& g1));
   __e_acsl_full_init((void *)(& g1));
   __e_acsl_temporal_reset_parameters();
@@ -102,7 +102,7 @@ int main(int argc, char const **argv)
   __e_acsl_temporal_reset_return();
   char *g2 = __gen_e_acsl_getenv(__gen_e_acsl_literal_string_2);
   __e_acsl_temporal_pull_return((void *)(& g2));
-  __e_acsl_store_block((void *)(& g2),(size_t)8);
+  __e_acsl_store_block((void *)(& g2),8UL);
   __e_acsl_full_init((void *)(& g2));
   {
     int __gen_e_acsl_or;

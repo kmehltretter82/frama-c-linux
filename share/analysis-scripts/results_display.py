@@ -28,6 +28,7 @@ import curses
 
 sensitivity = 0.02
 
+
 class ResultsFormatter(string.Formatter):
     @staticmethod
     def format_memory(kilobytes):
@@ -37,14 +38,14 @@ class ResultsFormatter(string.Formatter):
         if megabytes < 4096:
             return str(megabytes) + " MiB"
         gigabytes = round(megabytes / 1024)
-        return str(gygabytes) + " GiB"
+        return str(gigabytes) + " GiB"
 
     @staticmethod
     def format_time(seconds):
         if seconds < 10:
-            return str(round(seconds,2)) + "s"
+            return str(round(seconds, 2)) + "s"
         if seconds < 100:
-            return str(round(seconds,1)) + "s"
+            return str(round(seconds, 1)) + "s"
         if seconds < 600:
             return str(round(seconds)) + "s"
         minutes = round(seconds / 60)
@@ -66,28 +67,30 @@ class ResultsFormatter(string.Formatter):
         try:
             return super().get_field(field_name, args, kwargs)
         except (KeyError, AttributeError):
-            return None,field_name
+            return None, field_name
 
     def format_field(self, value, format_spec):
-        if value == None:
+        if value is None:
             return ""
-        elif format_spec.startswith('+cmp:'):
+        elif format_spec.startswith("+cmp:"):
             remainder = format_spec.split("+cmp:",1)[1]
             return (self.attribute(value, False) +
                 self.format_field(value, remainder) + "@=")
-        elif format_spec.startswith('-cmp:'):
+        elif format_spec.startswith("-cmp:"):
             remainder = format_spec.split("-cmp:",1)[1]
             return (self.attribute(value, True) +
                 self.format_field(value, remainder) + "@=")
-        elif format_spec == 'time':
+        elif format_spec == "time":
             return self.format_time(value)
-        elif format_spec == 'memory':
+        elif format_spec == "memory":
             return self.format_memory(value)
         else:
             return super().format_field(value, format_spec)
 
-class UserExitRequest (Exception):
+
+class UserExitRequest(Exception):
     pass
+
 
 class PlainDisplay:
     NEGATIVE = 1
@@ -122,7 +125,7 @@ class PlainDisplay:
     def rich_write(self, text, override=None, size=0):
         attributes = 0
         n = 0
-        for s in re.split(r'(@.)', text):
+        for s in re.split(r"(@.)", text):
             if s == "@=":
                 attributes = 0
             elif s == "@+":
@@ -133,7 +136,7 @@ class PlainDisplay:
                 n += len(s)
                 self.write(s, attributes if override is None else override)
         if n < size:
-            self.write(' ' * (size - n), attributes if override is None else override)
+            self.write(" " * (size - n), attributes if override is None else override)
 
     fmt = ResultsFormatter()
 
@@ -143,12 +146,12 @@ class PlainDisplay:
     def print_table(self, results):
         self.write(" ", self.HEADER)
         for column in self.columns:
-            self.write(self.format('{caption:^{size}}', **column), self.HEADER)
+            self.write(self.format("{caption:^{size}}", **column), self.HEADER)
             self.write(" ", self.HEADER)
 
         self.write("\n-")
         for column in self.columns:
-            self.write(self.format('{:-^{size}}', "", **column))
+            self.write(self.format("{:-^{size}}", "", **column))
             self.write("-")
 
         self.write("\n")
@@ -162,7 +165,7 @@ class PlainDisplay:
                     attribute = self.OBSOLETE
                 else:
                     attribute = None
-                self.rich_write(s, attribute, size=column['size'])
+                self.rich_write(s, attribute, size=column["size"])
 
                 self.write(" ")
             self.write("\n")
@@ -177,9 +180,9 @@ class PlainDisplay:
 class CursesDisplay(PlainDisplay):
     def __init__(self, stdscr):
         self.stdscr = stdscr
-        #curses.mousemask(curses.ALL_MOUSE_EVENTS)
+        # curses.mousemask(curses.ALL_MOUSE_EVENTS)
         stdscr.nodelay(True)
-        stdscr.refresh() # Needs to be done once or nothing will be output
+        stdscr.refresh()  # Needs to be done once or nothing will be output
 
         self.window = curses.newpad(400, 160)
         curses.init_color(curses.COLOR_YELLOW, 300, 300, 300)
@@ -202,19 +205,18 @@ class CursesDisplay(PlainDisplay):
         PlainDisplay.print_table(self, results)
         height, width = self.stdscr.getmaxyx()
         try:
-            self.window.refresh(0, 0, 0, 0, 1, width-1)
-            self.window.refresh(self.scroll_y+2, 0, 2, 0, height-1, width-1)
+            self.window.refresh(0, 0, 0, 0, 1, width - 1)
+            self.window.refresh(self.scroll_y + 2, 0, 2, 0, height - 1, width - 1)
         except Exception:
             # getmaxyx may be out of date, especially when resizing down the
             # window ; just ignore errors
             pass
 
-
     def process_inputs(self):
         previous_y = self.scroll_y
         c = self.stdscr.getch()
         while c != -1:
-            if c == ord('q'):
+            if c == ord("q"):
                 raise UserExitRequest
             elif c == curses.KEY_UP:
                 self.scroll_y -= 1
@@ -225,7 +227,7 @@ class CursesDisplay(PlainDisplay):
             elif c == curses.KEY_PPAGE:
                 self.scroll_y -= 10
             elif c == curses.KEY_MOUSE:
-                id,x,y,z,bstate = curses.getmouse()
+                id, x, y, z, bstate = curses.getmouse()
                 if z > 0:
                     self.scroll_y += 1
                 elif z < 0:
@@ -237,19 +239,20 @@ class CursesDisplay(PlainDisplay):
 
 
 def wrapper(f, *args, **kwargs):
-    if 'curses' in kwargs:
-        use_curses = kwargs['curses']
-        del kwargs['curses']
+    if "curses" in kwargs:
+        use_curses = kwargs["curses"]
+        del kwargs["curses"]
     else:
         use_curses = False
 
     if use_curses:
+
         def g(stdscr):
             nonlocal f, args, kwargs
             display = CursesDisplay(stdscr)
             return f(display, *args, **kwargs)
+
         return curses.wrapper(g)
     else:
         display = PlainDisplay()
         return f(display, *args, **kwargs)
-

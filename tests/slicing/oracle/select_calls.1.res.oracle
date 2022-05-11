@@ -6,10 +6,10 @@
 [eva:initial-state] Values of globals at initialization
   c ∈ [--..--]
   d ∈ [--..--]
-[eva] computing for function nothing <- g.
-  Called from select_calls.i:42.
 [kernel:annot:missing-spec] select_calls.i:42: Warning: 
   Neither code nor specification for function nothing, generating default assigns from the prototype
+[eva] computing for function nothing <- g.
+  Called from select_calls.i:42.
 [eva] using specification for function nothing
 [eva] Done for function nothing
 [eva] Recording results for g

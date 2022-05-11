@@ -45,6 +45,8 @@ of each reply is a finel string identifying the reply:
 | `KILLED(id)` | 2 | `"KILLED"` | id | |
 | `REJECTED(id)` | 2 | `"REJECTED"` | id | |
 | `SIGNAL(id)`   | 2 | `"SIGNAL"` | id | |
+| `CMDLINEON` | 1 | `"CMDLINEON"` | | |
+| `CMDLINEOFF` | 1 | `"CMDLINEOFF"` | | |
 | (special) | 2 | `"WRONG"` | message | |
 | (special) | 1 | `"NONE"` | | |
 

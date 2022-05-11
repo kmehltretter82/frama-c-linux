@@ -31,9 +31,9 @@ int main(void)
   tint x = 0;
   tint y = 0;
   tint z = 0;
-  tuint ux = (unsigned int)0;
-  tuint uy = (unsigned int)0;
-  tuint uz = (unsigned int)0;
+  tuint ux = (tuint)0;
+  tuint uy = (tuint)0;
+  tuint uz = (tuint)0;
   /*@ assert
       rte: signed_overflow:
         (int)((int)(-2147483647) - 1) / (int)(-1) ≤ 2147483647;
@@ -41,16 +41,16 @@ int main(void)
   z = (-2147483647 - 1) / -1;
   z = (-2147483647 - 1) % -1;
   /*@ assert rte: division_by_zero: 0 ≢ 0; */
-  uz = (unsigned int)(1 / 0);
+  uz = (tuint)(1 / 0);
   /*@ assert rte: division_by_zero: (unsigned int)(0xffffffff + 1) ≢ 0; */
   uz = (unsigned int)1 / (0xffffffff + (unsigned int)1);
   ux = 0x80000000;
   uy = 0xffffffff;
   /*@ assert rte: signed_downcast: ux ≤ 2147483647; */
   /*@ assert rte: signed_downcast: uy ≤ 2147483647; */
-  /*@ assert rte: division_by_zero: (int)uy ≢ 0; */
-  /*@ assert rte: signed_overflow: (int)ux / (int)uy ≤ 2147483647; */
-  uz = (unsigned int)((int)ux / (int)uy);
+  /*@ assert rte: division_by_zero: (tint)uy ≢ 0; */
+  /*@ assert rte: signed_overflow: (tint)ux / (tint)uy ≤ 2147483647; */
+  uz = (tuint)((tint)ux / (tint)uy);
   /*@ assert rte: division_by_zero: uy ≢ 0; */
   uz = ux / uy;
   /*@ assert rte: division_by_zero: (unsigned int)(0xffffffff + 1) ≢ 0; */
@@ -59,10 +59,10 @@ int main(void)
       rte: signed_overflow:
         (int)((int)(-0x7fffffff) - 1) / (int)(-1) ≤ 2147483647;
   */
-  uz = (unsigned int)((-0x7fffffff - 1) / -1);
+  uz = (tuint)((-0x7fffffff - 1) / -1);
   uz = (unsigned int)(-0x7fffffff - 1) / 0xffffffff;
   uz = 0x80000000 / (unsigned int)(-1);
-  uz = (unsigned int)((int)(0x80000000 / 0xffffffff));
+  uz = (tuint)((tint)(0x80000000 / 0xffffffff));
   /*@ assert rte: signed_overflow: -2147483648 ≤ x + y; */
   /*@ assert rte: signed_overflow: x + y ≤ 2147483647; */
   /*@ assert rte: division_by_zero: (tint)(x + y) ≢ 0; */
@@ -76,9 +76,9 @@ int main(void)
         (long long)((long long)(-2147483648L) / (long long)((long)(-1L))) ≤
         2147483647;
   */
-  z = (int)(-2147483648L / (long long)(-1L));
-  z = (int)(0x80000000 / (unsigned int)(-1));
-  z = (int)(0x80000000 / 0xffffffff);
+  z = (tint)(-2147483648L / (long long)(-1L));
+  z = (tint)(0x80000000 / (unsigned int)(-1));
+  z = (tint)(0x80000000 / 0xffffffff);
   __retres = 0;
   return __retres;
 }

@@ -38,10 +38,10 @@
   Called from bts383.c:62.
 [eva:alarm] bts383.c:35: Warning: out of bounds read. assert \valid_read(value);
 [eva:alarm] bts383.c:36: Warning: out of bounds read. assert \valid_read(value);
-[eva] computing for function out_char <- out_string <- main.
-  Called from bts383.c:36.
 [kernel:annot:missing-spec] bts383.c:36: Warning: 
   Neither code nor specification for function out_char, generating default assigns from the prototype
+[eva] computing for function out_char <- out_string <- main.
+  Called from bts383.c:36.
 [eva] using specification for function out_char
 [eva] Done for function out_char
 [eva] bts383.c:35: starting to merge loop iterations

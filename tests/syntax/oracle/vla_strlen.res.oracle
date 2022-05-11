@@ -18,8 +18,7 @@ void f(char *s)
   size_t tmp;
   tmp = strlen((char const *)s);
   /*@
-  assert
-  alloca_bounds: 0 < sizeof(char) * (unsigned int)(tmp + 1) ≤ 4294967295;
+  assert alloca_bounds: 0 < sizeof(char) * (size_t)(tmp + 1) ≤ 4294967295;
    */
   ;
   __lengthof_t = tmp + (size_t)1;

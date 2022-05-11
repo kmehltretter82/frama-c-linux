@@ -58,7 +58,7 @@ module type LeafDomain = sig
     current_input:t -> previous_output:t -> t
 
   val show_expr: 'a -> t -> Format.formatter -> exp -> unit
-  val post_analysis: t Bottom.or_bottom -> unit
+  val post_analysis: t Lattice_bounds.or_bottom -> unit
 
   module Store: Domain_store.S with type t := t
 

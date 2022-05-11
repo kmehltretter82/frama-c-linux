@@ -142,7 +142,7 @@ with respect to several Frama-C versions and OCaml dependencies.
 Coding conventions
 ==================
 
-- Use [ocp-indent](https://github.com/OCamlPro/ocp-indent), v1.7.0
+- Use [ocp-indent](https://github.com/OCamlPro/ocp-indent), v1.8.1
   to indent OCaml source files;
 
 - Avoid trailing whitespaces;

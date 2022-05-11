@@ -13,11 +13,11 @@ int main(int argc, char **argv)
   int __retres;
   char *p;
   int *q;
-  __e_acsl_memory_init(& argc,& argv,(size_t)8);
-  __e_acsl_store_block((void *)(& q),(size_t)8);
-  __e_acsl_store_block((void *)(& p),(size_t)8);
-  uintptr_t addr = (unsigned long)(& argc);
-  __e_acsl_store_block((void *)(& addr),(size_t)8);
+  __e_acsl_memory_init(& argc,& argv,8UL);
+  __e_acsl_store_block((void *)(& q),8UL);
+  __e_acsl_store_block((void *)(& p),8UL);
+  uintptr_t addr = (uintptr_t)(& argc);
+  __e_acsl_store_block((void *)(& addr),8UL);
   __e_acsl_full_init((void *)(& addr));
   __e_acsl_full_init((void *)(& q));
   __e_acsl_temporal_store_nblock((void *)(& q),(void *)(& argc));

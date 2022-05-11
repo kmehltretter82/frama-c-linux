@@ -96,15 +96,15 @@ void __e_acsl_globals_init(void)
     __e_acsl_store_block((void *)__gen_e_acsl_literal_string_2,sizeof("bar"));
     __e_acsl_full_init((void *)__gen_e_acsl_literal_string_2);
     __e_acsl_mark_readonly((void *)__gen_e_acsl_literal_string_2);
-    __e_acsl_store_block((void *)(& l_str),(size_t)8);
+    __e_acsl_store_block((void *)(& l_str),8UL);
     __e_acsl_full_init((void *)(& l_str));
-    __e_acsl_store_block((void *)(& s_str),(size_t)8);
+    __e_acsl_store_block((void *)(& s_str),8UL);
     __e_acsl_full_init((void *)(& s_str));
-    __e_acsl_store_block((void *)(& S2),(size_t)8);
+    __e_acsl_store_block((void *)(& S2),8UL);
     __e_acsl_full_init((void *)(& S2));
-    __e_acsl_store_block((void *)(& S),(size_t)8);
+    __e_acsl_store_block((void *)(& S),8UL);
     __e_acsl_full_init((void *)(& S));
-    __e_acsl_store_block((void *)(& T),(size_t)8);
+    __e_acsl_store_block((void *)(& T),8UL);
     __e_acsl_full_init((void *)(& T));
   }
   return;
@@ -123,10 +123,10 @@ void __e_acsl_globals_clean(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   char *SS = (char *)__gen_e_acsl_literal_string;
-  __e_acsl_store_block((void *)(& SS),(size_t)8);
+  __e_acsl_store_block((void *)(& SS),8UL);
   __e_acsl_full_init((void *)(& SS));
   {
     int __gen_e_acsl_valid_read;

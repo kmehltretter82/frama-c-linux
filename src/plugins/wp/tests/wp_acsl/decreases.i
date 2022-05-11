@@ -111,3 +111,15 @@ void mw2(unsigned x){
 
   (void)fact(x); // no verification of decreases here
 }
+
+// Recursion with side-effect
+
+int x ;
+
+//@ decreases x ;
+void se(void){
+  if (x > 0){
+    x -- ;
+    se();
+  }
+}

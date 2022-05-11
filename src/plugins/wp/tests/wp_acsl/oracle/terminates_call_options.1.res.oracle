@@ -11,9 +11,9 @@
   Missing terminates clause for declaration, populates 'terminates \true'
 [wp] terminates_call_options.c:33: Warning: 
   Missing assigns clause (assigns 'everything' instead)
-[wp] FRAMAC_SHARE/libc/stdlib.h:475: Warning: 
+[wp] FRAMAC_SHARE/libc/stdlib.h:510: Warning: 
   Missing terminates clause for exit, populates 'terminates \true'
-[wp] FRAMAC_SHARE/libc/stdlib.h:606: Warning: 
+[wp] FRAMAC_SHARE/libc/stdlib.h:641: Warning: 
   Missing terminates clause for div, populates 'terminates \true'
 ------------------------------------------------------------
   Function call_declaration

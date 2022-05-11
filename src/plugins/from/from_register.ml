@@ -30,7 +30,7 @@ let display fmtopt =
   Option.iter (fun fmt -> Format.fprintf fmt "@[<v>") fmtopt;
   Callgraph.Uses.iter_in_rev_order
     (fun kf ->
-       if !Db.Value.is_called kf then
+       if Eva.Results.is_called kf then
          let header fmt =
            Format.fprintf fmt "Function %a:" Kernel_function.pretty kf
          in
@@ -98,16 +98,14 @@ let print_calldeps () =
   let treat_call s funtype =
     let caller = Kernel_function.find_englobing_kf s in
     let f, typ_f =
-      if !Db.Value.no_results (Kernel_function.get_definition caller)
+      if not (Eva.Analysis.save_results caller)
       then "<unknown>", funtype
       else
-        try
-          let set = Db.Value.call_to_kernel_function s in
-          let kf = Kernel_function.Hptset.choose set in
+        match Eva.Results.callee s with
+        | kf :: _ ->
           Pretty_utils.to_string Kernel_function.pretty kf,
           Kernel_function.get_type kf
-        with
-        | Not_found ->
+        | [] ->
           From_parameters.fatal
             ~source:(fst (Cil_datatype.Stmt.loc s))
             "Invalid call %a@." Printer.pp_stmt s

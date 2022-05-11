@@ -47,7 +47,7 @@ int main(void)
   n((int *(*)(int , fp1 **))0);
   o((char)0,(char)0);
   p(0);
-  q((int *)0);
+  q((iptr)0);
   r((int (*)(char ))0,(int (*)(char ))0);
   s((int *)0,(int *)0);
   __retres = 0;

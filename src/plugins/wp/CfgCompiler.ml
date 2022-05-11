@@ -473,13 +473,13 @@ struct
       | Binding (_,n2) -> add_edge n1 [`Label (escape "binding")] n2
     in
     Node.Map.iter add_edges env.succs;
-    (** assumes *)
+    (* assumes *)
     Bag.iter (fun (m,p) ->
         let n1 = V.Assume(count (), p) in
         let assume_label = [`Style `Dashed ] in
         Node.Map.iter (fun n2 _ -> G.add_edge_e g (n1,assume_label,V.Node n2)) m
       ) env.assumes;
-    (** checks *)
+    (* checks *)
     Bag.iter (fun (m,p) ->
         let n1 = V.Check(count (), p) in
         let label = [`Style `Dotted ] in
@@ -642,7 +642,7 @@ struct
               (Some (new_env edge))
               (walk acc node2)
           | Branch (pred, node2, node3) ->
-            (** it is important to visit all the childrens *)
+            (* it is important to visit all the childrens *)
             let f acc node =
               match option_bind ~f:(walk acc) node with
               | None -> None, acc
@@ -767,7 +767,7 @@ struct
       Node.Map.map (fun _ n' -> compress n') subst
     in
     let find n = find_def ~def:n n subst in
-    (** detect either that could be transformed in branch *)
+    (* detect either that could be transformed in branch *)
     let to_remove = Node.Hashtbl.create 10 in
     Node.Map.iter (fun _ e ->
         match (e:(_,without_bindings) edge) with
@@ -802,7 +802,7 @@ struct
         | Implies _
         | Havoc (_,_) -> ()
       ) env.succs;
-    (** substitute and remove *)
+    (* substitute and remove *)
     let succs = Node.Map.mapq (fun n e ->
         match (e:(_,without_bindings) edge) with
         | _ when Node.Hashtbl.mem to_remove n -> None
@@ -850,7 +850,7 @@ struct
       let subst = Node.Map.map (fun _ n' -> find_def ~def:n' n' subst') subst in
       Node.Map.merge (fun _ a b ->
           match a, b with
-          | Some _, Some _ -> assert false (** the elements are remove in the new env *)
+          | Some _, Some _ -> assert false (* the elements are remove in the new env *)
           | Some x, None | None, Some x -> Some x
           | None, None -> assert false
         ) subst subst', env
@@ -876,7 +876,7 @@ struct
         let ret =
           match Node.Map.find node env.succs with
           | exception Not_found ->
-            (** posts node *)
+            (* posts node *)
             let s1 = S.create () in
             allocate dom s1;
             s1
@@ -989,14 +989,14 @@ struct
       | l -> !. (Conditions.Either l)
     in
     let f = Conditions.empty in
-    (** The start state is accessible *)
+    (* The start state is accessible *)
     let pre = Conditions.Have (access pre) in
     let f = add_cond f pre in
-    (** The posts state are accessible *)
+    (* The posts state are accessible *)
     let f = Node.Set.fold
         (fun n f -> add_cond f (Conditions.Have (access n)))
         posts f in
-    (** The assumes are true if all their nodes are accessible *)
+    (* The assumes are true if all their nodes are accessible *)
     let f =
       Bag.fold_left (fun f p ->
           let nodes_are_accessible =
@@ -1006,7 +1006,7 @@ struct
           add_cond f (Conditions.Have f')
         ) f env.assumes in
 
-    (** compute predecessors *)
+    (* compute predecessors *)
     let to_sequence_basic_backward f =
       let predecessors = Node.Map.fold (fun n s acc ->
           let add acc n' p =
@@ -1052,7 +1052,7 @@ struct
         ) predecessors f
     in
 
-    (** The transitions *)
+    (* The transitions *)
     let to_sequence_basic_forward f =
       Node.Map.fold (fun n s f ->
           let node_is_accessible = access n in
@@ -1096,7 +1096,7 @@ struct
                                   (have_access n) ,
                                 Conditions.empty)
             | Binding (b,n') ->
-              (** For basic: all the variables are important *)
+              (* For basic: all the variables are important *)
               let b = !. (Conditions.Have(F.p_conj (Passive.conditions b (fun _ -> true)))) in
               Conditions.Branch(node_is_accessible,
                                 Conditions.append b (have_access n'),
@@ -1123,7 +1123,7 @@ struct
     f,Node.Hashtbl.fold Node.Map.add preds Node.Map.empty
 
   module To_tree = struct
-    (** Use a simplified version of "A New Elimination-Based Data Flow Analysis
+    (* Use a simplified version of "A New Elimination-Based Data Flow Analysis
         Framework Using Annotated Decomposition Trees" where there is no loop *)
 
 
@@ -1164,39 +1164,44 @@ struct
 
     type env_to_sequence_tree = {
       env: localised_env;
-      (** predecessors *)
-      pred: Node.t -> Node.t list;
-      (** topological order *)
-      topo_order : Node.t -> int;
-      (** Immediate dominator forward *)
-      get_idom_forward: Node.t -> Node.t;
-      (** Immediate dominator backward *)
-      get_idom_backward: int -> int;
 
-      (** For each node we are going to compute different formulas *)
-      (** Necessary conditions of the node from start *)
+      pred: Node.t -> Node.t list;
+      (** predecessors *)
+      topo_order : Node.t -> int;
+      (** topological order *)
+      get_idom_forward: Node.t -> Node.t;
+      (** Immediate dominator forward *)
+      get_idom_backward: int -> int;
+      (** Immediate dominator backward *)
+
       full_conds: Lang.F.pred Node.Hashtbl.t;
-      (** Necessary conditions from its forward idiom *)
+      (** For each node we are going to compute different formulas
+          Necessary conditions of the node from start *)
+
       conds: Lang.F.pred Node.Hashtbl.t;
-      (** To which subtree corresponds this node *)
+      (** Necessary conditions from its forward idiom *)
+
       subtrees: tree Node.Hashtbl.t;
-      (** Root the full tree *)
+      (** To which subtree corresponds this node *)
+
       root: tree;
-      (** Variable used for the non-deterministic choice of either *)
+      (** Root the full tree *)
+
       eithers: Lang.F.pred Node.Hashtbl.t Node.Hashtbl.t;
+      (** Variable used for the non-deterministic choice of either *)
     }
 
     let is_after n1 n2 = n1 > n2
     let is_before n1 n2 = n1 < n2
 
     let create_env_to_sequence_tree env =
-      (** Compute topological order for immediate dominator computation
+      (* Compute topological order for immediate dominator computation
           and the main iteration on nodes
       *)
       let node_int,int_node,ordered = topological env in
       let nb = Node.Hashtbl.length node_int in
 
-      (** We compute the forward immediate dominators (path that use succ)
+      (* We compute the forward immediate dominators (path that use succ)
           and the backward immediate dominators (path that use pred)
       *)
       let predecessors = compute_preds env in
@@ -1245,7 +1250,7 @@ struct
           let acc = F.p_and acc (Node.Hashtbl.find env.conds n') in
           get_cond acc (env.get_idom_forward n')
       in
-      (** find all the conditions that keep the path toward n, i.e.
+      (* find all the conditions that keep the path toward n, i.e.
           the condition of the nodes that are not dominated backwardly
           (for which not all the nodes goes to n)
       *)
@@ -1273,7 +1278,7 @@ struct
       let c, q =
         if Node.equal idom n
         then
-          (** it is the root *)
+          (* it is the root *)
           begin
             Node.Hashtbl.add env.full_conds n F.p_true;
             Node.Hashtbl.add env.conds n F.p_true;
@@ -1325,7 +1330,7 @@ struct
     let add_assumes_fact env = Bag.iter (fun p ->
         let nodes = P.nodes_list p in
         let nodes_are_accessible =
-          (** TODO: don't add the condition of access of the node that are dominators of latest *)
+          (* TODO: don't add the condition of access of the node that are dominators of latest *)
           List.fold_left (fun acc n -> F.p_and (access env n) acc) F.p_true nodes in
         let f' = F.p_imply nodes_are_accessible (P.get p) in
         let t = get_latest_node env nodes in
@@ -1347,16 +1352,16 @@ struct
 
     let to_sequence_tree _ posts env =
       let env,ordered = create_env_to_sequence_tree env in
-      (** Iterate in topo order the vertex.
+      (* Iterate in topo order the vertex.
           Except for root, the tree of the vertex is the one of its immediate dominator forward.
       *)
       List.iter (iter env) ordered;
       let f = Conditions.empty in
-      (** The posts state are accessible *)
+      (* The posts state are accessible *)
       let f = Node.Set.fold
           (fun n f -> add_cond f (Conditions.Have (access env n)))
           posts f in
-      (** For all either one of the condition is true *)
+      (* For all either one of the condition is true *)
       let f = Node.Hashtbl.fold (fun _ h f ->
           let p = Node.Hashtbl.fold (fun _ t p -> F.p_or p t) h F.p_false in
           add_cond f (Conditions.Have p)
@@ -1374,7 +1379,7 @@ struct
         Node.pp pre (Pretty_utils.pp_iter ~sep:"@ " Node.Set.iter Node.pp) posts;
     if Wp_parameters.has_dkey dkey then
       Format.printf "@[1) %a@]@." pretty_env env;
-    (** restrict environment to useful node and compute havoc effects *)
+    (* restrict environment to useful node and compute havoc effects *)
     let env = restrict env pre posts in
     if Wp_parameters.has_dkey dkey then
       Format.printf "@[2) %a@]@." pretty_env env;
@@ -1382,14 +1387,14 @@ struct
       Node.Map.empty,Node.Map.empty,
       Conditions.sequence [Conditions.step (Conditions.Have(F.p_false))]
     else
-      (** Simplify *)
+      (* Simplify *)
       let subst,env =
         if true
         then remove_dumb_gotos env
         else Node.Map.empty, env
       in
       let pre = find_def ~def:pre pre subst in
-      (** Substitute in user_reads *)
+      (* Substitute in user_reads *)
       let user_reads =
         Node.Map.fold
           (fun n n' acc ->
@@ -1404,14 +1409,14 @@ struct
                Node.Map.add n' domain' acc)
           subst user_reads
       in
-      (** For each node what must be read for assumes *)
+      (* For each node what must be read for assumes *)
       let reads =
         Bag.fold_left (fun acc e ->
             Node.Map.union
               (fun _ -> S.union) acc
               (P.reads e))
           user_reads env.assumes in
-      (** compute sigmas and relocate them *)
+      (* compute sigmas and relocate them *)
       let env, sigmas = domains env reads pre in
       if Wp_parameters.has_dkey dkey then
         Format.printf "@[3) %a@]@." pretty_env env;
@@ -1420,7 +1425,7 @@ struct
       let f, preds =
         match mode with
         | `Tree ->
-          (** Add a unique post node *)
+          (* Add a unique post node *)
           let final_node = node () in
           let env =
             Node.Set.fold (fun p cfg ->
@@ -1437,7 +1442,7 @@ struct
         Node.Map.merge
           (fun _ p s -> Some (Option.value ~default:F.p_false p, Option.value ~default:(S.create ()) s))
           preds sigmas in
-      (** readd simplified nodes *)
+      (* readd simplified nodes *)
       let predssigmas =
         Node.Map.fold (fun n n' acc -> Node.Map.add n (Node.Map.find n' predssigmas) acc )
           subst predssigmas

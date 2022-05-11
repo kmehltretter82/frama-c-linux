@@ -28,8 +28,11 @@
 
 type t
 
-val create : int -> t (** Create a vector of [n] bits, with all bits unset. *)
-val create_set : int -> t (** Create a vector of [n] bits, with all bits set.*)
+val create : int -> t
+(** Create a vector of [n] bits, with all bits unset. *)
+
+val create_set : int -> t
+(** Create a vector of [n] bits, with all bits set.*)
 
 val capacity : t -> int
 (** Maximum number of bits in the bitvector. *)
@@ -41,7 +44,9 @@ val resize : int -> t -> t
 val mem : t -> int -> bool
 val set : t -> int -> unit
 val clear : t -> int -> unit
-val once : t -> int -> bool (** return [true] if unset, then set the bit. *)
+val once : t -> int -> bool
+(** return [true] if unset, then set the bit. *)
+
 val set_range : t -> int -> int -> unit
 val is_empty : t -> bool
 

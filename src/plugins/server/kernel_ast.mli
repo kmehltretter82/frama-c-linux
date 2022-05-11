@@ -47,8 +47,11 @@ sig
   val jglobal : jtype
   val jproperty : jtype
 
-  val create : t -> string (** Memoized unique identifier. *)
-  val lookup : string -> t (** Get back the localizable, if any. *)
+  val create : t -> string
+  (** Memoized unique identifier. *)
+
+  val lookup : string -> t
+  (** Get back the localizable, if any. *)
 end
 
 module KfMarker : Data.S with type t = kernel_function * Printer_tag.localizable
@@ -60,28 +63,29 @@ module KfMarker : Data.S with type t = kernel_function * Printer_tag.localizable
 module Printer : Printer_tag.S_pp
 
 (* -------------------------------------------------------------------------- *)
-(** Ast Informations *)
+(** Ast Information *)
 (* -------------------------------------------------------------------------- *)
 
-module Informations :
+module Information :
 sig
   (**
      Registers a marker information printer.
      Identifier [id] shall be unique.
      Label [label] shall be very short.
-     Description shall succintly describe the kind of informations.
-     The printer is allowed to raise [Not_found] exception,
-     which is interpreted as there is no information of this kind for
-     the localizable.
+     Description shall succinctly describe the kind of information.
+     If the optional [enable] function is provided, the information printer is
+     only used when [enable ()] returns true.
+     The printer is allowed to raise [Not_found] exception when there is no
+     information for the localizable.
   *)
   val register :
-    id:string -> label:string -> title:string ->
+    id:string -> label:string -> title:string -> ?enable:(unit -> bool) ->
     (Format.formatter -> Printer_tag.localizable -> unit) -> unit
 
-  (** Updated informations signal *)
+  (** Updated information signal *)
   val signal : Request.signal
 
-  (** Emits a signal to server clients to reload AST marker informations. *)
+  (** Emits a signal to server clients to reload AST marker information. *)
   val update : unit -> unit
 end
 

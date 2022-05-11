@@ -25,24 +25,35 @@ APP=Ivette
 DOME=./src/dome
 DOME_ARGS=--command $$(dirname $$0)/../../bin/frama-c
 DOME_DEV=-server-debug 1
-DOME_CLI=./bin/frama-c-gui
+DOME_CLI=./bin/ivette
 DOME_API=./src/frama-c
 DOME_CUSTOM_ENTRIES= yes
 COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
-.PHONY: all app dev pkg doc serve dist lint fixlint
+.PHONY: all app dev pkg doc serve dist lint fixlint checkcase
 
 all: pkg lint app
 
 app: dome-app
 dev: dome-dev
-dist: dome-dist
+dist: dist-dir dome-dist
 
-lint: dome-pkg dome-templ
+lint: dome-pkg dome-templ checkcase
 	@echo "[Ivette] running typechecker & linter"
 	yarn run typecheck
 	yarn run lint
+
+# In case-insensitive filesystems (macOS/Windows), import statements and
+# filenames can have issues due to case differences
+checkcase:
+	@echo "[Ivette] check case issues in imported filenames"
+	@err=0 ; for f in `find src | sed -E 's/(.ts|.tsx|.js|.jsx|.css|.json)$$//' | sort -f | uniq -di` ;\
+	 do \
+		err=1; \
+		echo " - ambiguous $$f.*"; \
+	 done ;\
+	 exit $$err
 
 tsc: dome-pkg dome-templ
 	@echo "[Ivette] running typechecker & linter (with cache & fix mode)"
@@ -126,7 +137,9 @@ doc: $(NODEBIN)/typedoc icons
 	@rm -fr doc/html
 	@yarn run typedoc $(DOCFILES)
 	@echo "\n[Ivette] main page"
-	@echo "   file://$(PWD)/doc/html/index.html"
+	@echo ""
+	@echo "   file://$(PWD)/ivette/doc/html/index.html"
+	@echo ""
 
 $(NODEBIN)/%:
 	@echo "[Node] install package $*"
@@ -134,4 +147,66 @@ $(NODEBIN)/%:
 
 # --------------------------------------------------------------------------
 include $(DOME)/template/makefile
+# --------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------
+# --- Ivette Installation
+# --------------------------------------------------------------------------
+
+sinclude ../share/Makefile.config
+
+dist-dir:
+	@echo "Cleaning dist"
+	@rm -fr dist
+
+IVETTE_DIST=$(wildcard dist/linux-unpacked dist/mac dist/mac-arm64)
+
+ifdef LIBDIR
+ifdef BINDIR
+ifeq ($(IVETTE_DIST),dist/linux-unpacked)
+
+install:
+	@echo "Installing Ivette (Linux)"
+	@rm -fr $(LIBDIR)/ivette
+	@rm -f $(BINDIR)/ivette
+	@mv $(IVETTE_DIST) $(LIBDIR)/ivette
+	@ln -s $(LIBDIR)/ivette/ivette $(BINDIR)/ivette
+
+else ifeq ($(IVETTE_DIST:-arm64=),dist/mac)
+
+install:
+	@echo "Installing Ivette (macOS)"
+	@rm -fr /Applications/Ivette.app
+	@mv $(IVETTE_DIST)/Ivette.app /Applications/
+	@rm -fr $(IVETTE_DIST)
+	@install ivette-macos.sh $(BINDIR)/ivette
+
+else
+
+install:
+	@echo "No distribution to install"
+	@echo "use 'make dist' and retry"
+	@exit 1
+
+endif
+endif
+endif
+
+# --------------------------------------------------------------------------
+# --- Ivette Un-Installation
+# --------------------------------------------------------------------------
+
+ifdef LIBDIR
+ifdef BINDIR
+
+uninstall:
+	@echo "Uninstall Ivette"
+	@rm -fr dist
+	@rm -fr /Applications/Ivette.app
+	@rm -fr $(LIBDIR)/ivette
+	@rm -f $(BINDIR)/ivette
+
+endif
+endif
+
 # --------------------------------------------------------------------------

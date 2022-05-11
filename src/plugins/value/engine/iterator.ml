@@ -22,7 +22,8 @@
 
 open Cil_types
 open Interpreted_automata
-open Bottom.Type
+open Lattice_bounds
+open Bottom.Operators
 
 let check_signals, signal_abort =
   let signal_emitted = ref false in
@@ -666,7 +667,7 @@ module Make_Dataflow
     );
     states_after
 
-  let merge_results () =
+  let merge_results ~save_results =
     let get_merged_states =
       let merged_states = VertexTable.create control_point_count
       and get_smashed_store v =
@@ -699,7 +700,7 @@ module Make_Dataflow
     let merged_pre_cvalues = lazy (lift_to_cvalues merged_pre_states)
     and merged_post_cvalues = lazy (lift_to_cvalues merged_post_states) in
     let callstack = Eva_utils.call_stack () in
-    if Mark_noresults.should_memorize_function fundec then begin
+    if save_results then begin
       let register_pre = Domain.Store.register_state_before_stmt callstack
       and register_post = Domain.Store.register_state_after_stmt callstack in
       StmtTable.iter register_pre (Lazy.force merged_pre_states);
@@ -761,7 +762,7 @@ module Computer
      end)
 = struct
 
-  let compute kf call_kinstr state =
+  let compute ~save_results kf call_kinstr state =
     let module Dataflow =
       Make_Dataflow
         (Abstract) (States) (Transfer) (Init) (Logic) (Spec)
@@ -777,7 +778,7 @@ module Computer
       if Parameters.ValShowProgress.get () then
         Self.feedback "Recording results for %a"
           Kernel_function.pretty kf;
-      Dataflow.merge_results ();
+      Dataflow.merge_results ~save_results;
       let f = Kernel_function.get_definition kf in
       if Cil.hasAttribute "noreturn" f.svar.vattr && results <> [] then
         Eva_utils.warning_once_current
@@ -787,7 +788,7 @@ module Computer
     in
     let cleanup () =
       Dataflow.mark_degeneration ();
-      Dataflow.merge_results ()
+      Dataflow.merge_results ~save_results
     in
     Eva_utils.protect compute ~cleanup
 end

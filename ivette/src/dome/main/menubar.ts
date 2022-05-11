@@ -273,12 +273,15 @@ const windowMenuItemsMacos: MenuSpec = windowMenuItemsLinux.concat([
 // --- Help Menu Items
 // --------------------------------------------------------------------------
 
+let learnMoreLink = '';
+ipcMain.handle('dome.ipc.updateLearnMore', (_, link) => {
+  if (typeof link === 'string') learnMoreLink = link;
+});
+
 const helpMenuItems: MenuSpec = [
   {
     label: 'Learn More',
-    click() {
-      shell.openExternal('http://electron.atom.io');
-    },
+    click() { shell.openExternal(learnMoreLink); },
   },
 ];
 
@@ -404,7 +407,7 @@ export function setMenuItem({ id, ...options }: CustomMenuItem) {
   if (entry) {
     if (entry.spec) Object.assign(entry.spec, options);
     if (entry.item) Object.assign(entry.item, options);
-    if (options.label || options.type || options.click) requestUpdate();
+    requestUpdate ();
   } else
     console.warn(`[Dome] unknown menu item #${id}`);
 }

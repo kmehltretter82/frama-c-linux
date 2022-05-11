@@ -7,6 +7,17 @@ if ! type "opam" > /dev/null; then
     opam="NOT"
 else
     opam="$(opam --version)"
+    if [[ $opam =~ ^([0-9+]).([0-9+]) ]]; then
+        major="${BASH_REMATCH[1]}"
+        minor="${BASH_REMATCH[2]}"
+        if [[ "$major" -eq 2 && "$minor" -eq 0 ]]; then
+            echo "warning: opam > 2.1 expected, got $major.$minor."
+            echo "         Suggested commands may not work properly."
+        fi
+    else
+        echo "warning: unknown opam version."
+        echo "         Suggested commands may not work properly."
+    fi
 fi
 
 if ! type "ocaml" > /dev/null; then
@@ -63,7 +74,6 @@ echo "All packages checked."
 if [ $has_any_diffs -ne 0 ]; then
     echo "Useful commands:"
     echo "    opam switch create ${working_ocaml}"
-    echo "    opam install depext"
-    echo "    opam depext --install$all_packages"
+    echo "    opam install$all_packages"
     echo "    rm -f ~/.why3.conf && why3 config detect"
 fi

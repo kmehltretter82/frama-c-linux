@@ -18,6 +18,7 @@
   \return(calloc) == 0 (auto)
   \return(malloc) == 0 (auto)
   \return(realloc) == 0 (auto)
+  \return(reallocarray) == 0 (auto)
   \return(getenv) == 0 (auto)
   \return(bsearch) == 0 (auto)
   \return(memchr) == 0 (auto)
@@ -275,6 +276,7 @@
 [eva] Done for function strstr
 [eva] computing for function strndup <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:79.
+[eva:loop-unroll:auto] FRAMAC_SHARE/libc/string.c:333: Automatic loop unrolling.
 [eva] FRAMAC_SHARE/libc/string.c:336: Call to builtin malloc
 [eva] FRAMAC_SHARE/libc/string.c:336: allocating variable __malloc_strndup_l336
 [eva] FRAMAC_SHARE/libc/string.c:341: Call to builtin memcpy
@@ -294,6 +296,7 @@
 [eva] FRAMAC_SHARE/libc/argz.c:49: allocating variable __realloc_str_append_l49
 [eva] computing for function mempcpy <- str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:52.
+[eva:loop-unroll:auto] FRAMAC_SHARE/libc/string.c:54: Automatic loop unrolling.
 [eva] Recording results for mempcpy
 [eva] Done for function mempcpy
 [eva] FRAMAC_SHARE/libc/argz.c:56: Call to builtin free

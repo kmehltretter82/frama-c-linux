@@ -175,17 +175,17 @@ val exp    : ?prec:Precisions.t -> t -> t
 
 (** These functions perform backward propagation on intervals using the
     precision <prec> *)
-val backward_le : ?prec:Precisions.t -> t -> t -> t Bottom.or_bottom
-val backward_lt : ?prec:Precisions.t -> t -> t -> t Bottom.or_bottom
-val backward_ge : ?prec:Precisions.t -> t -> t -> t Bottom.or_bottom
-val backward_gt : ?prec:Precisions.t -> t -> t -> t Bottom.or_bottom
+val backward_le : ?prec:Precisions.t -> t -> t -> t Lattice_bounds.or_bottom
+val backward_lt : ?prec:Precisions.t -> t -> t -> t Lattice_bounds.or_bottom
+val backward_ge : ?prec:Precisions.t -> t -> t -> t Lattice_bounds.or_bottom
+val backward_gt : ?prec:Precisions.t -> t -> t -> t Lattice_bounds.or_bottom
 
 (** These functions perform backward propagation for arithmetic *)
 val backward_add : ?prec:Precisions.t -> left:t -> right:t ->
-  result:t -> unit -> (t * t) Bottom.or_bottom
+  result:t -> unit -> (t * t) Lattice_bounds.or_bottom
 val backward_sub : ?prec:Precisions.t -> left:t -> right:t ->
-  result:t -> unit -> (t * t) Bottom.or_bottom
+  result:t -> unit -> (t * t) Lattice_bounds.or_bottom
 val backward_mul : ?prec:Precisions.t -> left:t -> right:t ->
-  result:t -> unit -> (t * t) Bottom.or_bottom
+  result:t -> unit -> (t * t) Lattice_bounds.or_bottom
 val backward_div : ?prec:Precisions.t -> left:t -> right:t ->
-  result:t -> unit -> (t * t) Bottom.or_bottom
+  result:t -> unit -> (t * t) Lattice_bounds.or_bottom

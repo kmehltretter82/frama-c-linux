@@ -112,9 +112,14 @@ val register_kernel: unit -> unit
     @plugin development guide *)
 module Register
     (P: sig
-       val name: string (** Name of the module. Arbitrary non-empty string. *)
-       val shortname: string (** Prefix for plugin options. No space allowed. *)
-       val help: string (** description of the module. Free-form text. *)
+       val name: string
+       (** Name of the module. Arbitrary non-empty string. *)
+
+       val shortname: string
+       (** Prefix for plugin options. No space allowed. *)
+
+       val help: string
+       (** description of the module. Free-form text. *)
      end):
   General_services
 

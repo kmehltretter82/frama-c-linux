@@ -259,7 +259,7 @@ module V = struct
 
   (** Comparisons *)
 
-  open Bottom.Type
+  open Lattice_bounds.Bottom.Operators
 
   let backward_mult_int_left ~right ~result =
     try
@@ -951,7 +951,7 @@ module V_Offsetmap = struct
         let v = V_Or_Uninitialized.initialized (V.of_char s.[i]) in
         acc := f !acc v;
       done;
-      f !acc V_Or_Uninitialized.singleton_zero (** add null terminator *)
+      f !acc V_Or_Uninitialized.singleton_zero (* add null terminator *)
     in
     let size_char = Integer.of_int (Cil.bitsSizeOfInt IChar) in
     of_list fold_string s size_char

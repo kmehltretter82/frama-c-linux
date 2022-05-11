@@ -551,13 +551,13 @@ struct
 
     (* Filter out unreachable values. *)
     let transfer_stmt s d =
-      if Db.Value.is_reachable (To_Use.get_value_state s) &&
+      if Eva.Results.is_reachable s &&
          not (Function_Froms.Memory.is_bottom d.deps_table)
       then transfer_stmt s d
       else []
 
     let doEdge s succ d =
-      if Db.Value.is_reachable (To_Use.get_value_state succ)
+      if Eva.Results.is_reachable succ
       then
         let dt = d.deps_table in
         let opened = Kernel_function.blocks_opened_by_edge s succ in
@@ -604,7 +604,7 @@ struct
     match kf.fundec with
     | Declaration _ -> assert false
     | Definition (f,_) ->
-      if !Db.Value.no_results f then Function_Froms.top
+      if not (Eva.Analysis.save_results kf) then Function_Froms.top
       else
         try
           Stack.iter
@@ -647,7 +647,7 @@ struct
           let _poped = Stack.pop call_stack in
           let last_from =
             try
-              if Db.Value.is_reachable (To_Use.get_value_state ret_id)
+              if Eva.Results.is_reachable ret_id
               then
                 externalize
                   ret_id
@@ -689,7 +689,7 @@ struct
        !s);
     Db.yield ();
     let result =
-      if !Db.Value.use_spec_instead_of_definition kf
+      if Eva.Analysis.use_spec_instead_of_definition kf
       then compute_using_prototype kf
       else compute_using_cfg kf
     in

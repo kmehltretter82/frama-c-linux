@@ -416,9 +416,7 @@ module Computer(I: Init) = struct
       Data_for_aorai.pretty_state old Data_for_aorai.pretty_state cur;
     if Data_for_aorai.included_state cur old then begin
       Aorai_option.debug ~dkey:forward_dkey "Included";
-      if is_loop && Cil_datatype.Stmt.Set.mem stmt loops &&
-         Data_for_aorai.Aorai_state.Map.is_empty
-           (Data_for_aorai.get_loop_invariant_state stmt)
+      if is_loop && Cil_datatype.Stmt.Set.mem stmt loops
       then
         Data_for_aorai.set_loop_invariant_state stmt cur;
       None
@@ -860,42 +858,44 @@ let filter_possible_states kf states =
     treat_one_state post_state Data_for_aorai.Aorai_state.Map.empty
 
 let filter_return_states kf states =
-  let end_state = Return_state.find (Kernel_function.find_return kf) in
-  let auto = Data_for_aorai.getGraph () in
-  let is_possible_state start_state state _ =
-    try
-      let trans = Path_analysis.get_transitions_of_state state auto in
-      let return_states =
-        Data_for_aorai.Aorai_state.Map.find start_state states
-      in
-      let crossable tr =
-        Aorai_utils.isCrossable tr kf Promelaast.Return &&
-        Data_for_aorai.Aorai_state.Map.mem tr.stop return_states
-      in
-      List.exists crossable trans
-    with Not_found -> false
-  in
-  let filter_possible_states state map =
-    Data_for_aorai.Aorai_state.Map.filter (is_possible_state state) map
-  in
-  let treat_one_state state map acc =
-    let res = filter_possible_states state map in
-    if Data_for_aorai.Aorai_state.Map.is_empty res then acc
-    else Data_for_aorai.Aorai_state.Map.add state res acc
-  in
-  let res =
-    Data_for_aorai.Aorai_state.Map.fold
-      treat_one_state end_state Data_for_aorai.Aorai_state.Map.empty
-  in
-  if Data_for_aorai.Aorai_state.Map.is_empty res &&
-     not (Data_for_aorai.Aorai_state.Map.is_empty end_state) then
-    (* Do not emit warning if forward computation already decided that the
-       call was not conforming to the spec. *)
-    Aorai_option.warning ~current:true
-      "Call to %a not conforming to automaton (post-cond). \
-       Assuming it is on a dead path"
-      Kernel_function.pretty kf;
-  res
+  if Data_for_aorai.isObservableFunction kf then begin
+    let end_state = Return_state.find (Kernel_function.find_return kf) in
+    let auto = Data_for_aorai.getGraph () in
+    let is_possible_state start_state state _ =
+      try
+        let trans = Path_analysis.get_transitions_of_state state auto in
+        let return_states =
+          Data_for_aorai.Aorai_state.Map.find start_state states
+        in
+        let crossable tr =
+          Aorai_utils.isCrossable tr kf Promelaast.Return &&
+          Data_for_aorai.Aorai_state.Map.mem tr.stop return_states
+        in
+        List.exists crossable trans
+      with Not_found -> false
+    in
+    let filter_possible_states state map =
+      Data_for_aorai.Aorai_state.Map.filter (is_possible_state state) map
+    in
+    let treat_one_state state map acc =
+      let res = filter_possible_states state map in
+      if Data_for_aorai.Aorai_state.Map.is_empty res then acc
+      else Data_for_aorai.Aorai_state.Map.add state res acc
+    in
+    let res =
+      Data_for_aorai.Aorai_state.Map.fold
+        treat_one_state end_state Data_for_aorai.Aorai_state.Map.empty
+    in
+    if Data_for_aorai.Aorai_state.Map.is_empty res &&
+       not (Data_for_aorai.Aorai_state.Map.is_empty end_state) then
+      (* Do not emit warning if forward computation already decided that the
+         call was not conforming to the spec. *)
+      Aorai_option.warning ~current:true
+        "Call to %a not conforming to automaton (post-cond). \
+         Assuming it is on a dead path"
+        Kernel_function.pretty kf;
+    res
+  end else states
 
 let filter_loop_init_states old_map restrict_map =
   let treat_one_state state old_states acc =

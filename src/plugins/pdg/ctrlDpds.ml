@@ -25,9 +25,8 @@ let dkey = Pdg_parameters.register_category "ctrl-dpds"
 open Cil_types
 open Cil_datatype
 
-(*============================================================================*)
-(** Lexical successors *)
-(*============================================================================*)
+(** {2 Lexical successors} *)
+
 (** Compute a graph which provide the lexical successor of each statement s,
     ie. the statement which is the next one if 's' is replaced by Nop.
     Notice that if 's' is an If, Loop, ...
@@ -136,7 +135,7 @@ end = struct
   let compute kf =
     Pdg_parameters.debug ~dkey "computing for function %s@."
       (Kernel_function.get_name kf);
-    if !Db.Value.use_spec_instead_of_definition kf then Stmt.Hashtbl.create 0
+    if Eva.Analysis.use_spec_instead_of_definition kf then Stmt.Hashtbl.create 0
     else let graph = Stmt.Hashtbl.create 17 in
       let f = Kernel_function.get_definition kf in
       let _ = process_block graph  f.sbody in graph
@@ -151,9 +150,8 @@ end = struct
       raise Not_found
 end
 
-(*============================================================================*)
-(** Postdominators (with infinite path extension) *)
-(*============================================================================*)
+(** {2 Postdominators (with infinite path extension)} *)
+
 (** This backward dataflow implements a variant of postdominators that verify
     the property P enunciated in bts 963: a statement postdominates itself
     if and only it is within the main path of a syntactically infinite loop.
@@ -290,7 +288,7 @@ end = struct
     in
     let _ = add_postdom infos return (State.ToReturn (Stmt.Hptset.empty)) in
     let stmts =
-      if !Db.Value.use_spec_instead_of_definition kf then
+      if Eva.Analysis.use_spec_instead_of_definition kf then
         invalid_arg "[traces] cannot compute for a leaf function"
       else
         let f = Kernel_function.get_definition kf in f.sallstmts

@@ -123,7 +123,6 @@ PLUGIN_EXTRA_DIRS:=\
 	src/project_initializer \
 	src/code_generator
 PLUGIN_ENABLE:=@ENABLE_E_ACSL@
-PLUGIN_DYNAMIC:=@DYNAMIC_E_ACSL@
 PLUGIN_NAME:=E_ACSL
 PLUGIN_CMO:= src/local_config \
 	src/options \
@@ -370,8 +369,9 @@ EACSL_DISTRIB_TESTS = \
       $(dir)/test_config_dev \
       $(dir)/oracle/* \
       $(dir)/oracle_dev/* \
-  )
-
+  ) \
+  tests/builtin/utils \
+  tests/format/utils
 
 EACSL_RTL_FILES = $(EACSL_RTL_SRC)
 

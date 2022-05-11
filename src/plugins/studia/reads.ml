@@ -58,7 +58,7 @@ class find_read zlval = object
              let inout = !Db.Operational_inputs.get_internal_precise ~stmt kf in
              let inputs = inout.Inout_type.over_inputs in *)
           if Zone.intersects inputs zlval then
-            if !Db.Value.use_spec_instead_of_definition kf then
+            if Eva.Analysis.use_spec_instead_of_definition kf then
               (* Direst, as there is no body for this funtion. *)
               { effects with direct = true }
             else

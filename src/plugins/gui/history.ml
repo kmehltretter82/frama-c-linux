@@ -199,7 +199,7 @@ let translate_history_elt old_helt =
   let global old_g =
     let iter new_g =
       let open Cil_types in
-      (** In the same file, same constructor and same original name *)
+      (* In the same file, same constructor and same original name *)
       match old_g,
             new_g with
       | (GType(                      {torig_name = old_name},          old_loc),
@@ -239,8 +239,8 @@ let translate_history_elt old_helt =
       | GAnnot(Dinvariant _,_),    GAnnot(Dinvariant _,_)
       | GAnnot(Dtype_annot _,_),   GAnnot(Dtype_annot _,_)
       | GAnnot(Dmodel_annot _,_),  GAnnot(Dmodel_annot _,_)
-        -> (** they have no names *) ()
-      | _ -> (** different constructors *) ()
+        -> (* they have no names *) ()
+      | _ -> (* different constructors *) ()
     in
     try
       List.iter iter (Ast.get ()).globals;
@@ -259,10 +259,10 @@ let translate_history_elt old_helt =
                 | PTermLval(Some kf,_,_,_) as loc) ->
     begin match global (kf_to_global kf) with
       | None ->
-        (** The kernel function can't be found nothing to say *)
+        (* The kernel function can't be found nothing to say *)
         None
       | Some g ->
-        (** Try to stay at the same offset in the function *)
+        (* Try to stay at the same offset in the function *)
         let old_kf_loc = fst (Kernel_function.get_location kf) in
         let old_loc = match ki_of_localizable loc with
           | Kstmt s -> fst (Stmt.loc s)
@@ -276,23 +276,23 @@ let translate_history_elt old_helt =
                       }
         in
         match Printer_tag.loc_to_localizable new_loc with
-        | None -> (** the line is unknown *)
+        | None -> (* the line is unknown *)
           Some (Global g)
         | Some locali ->
           begin match kf_of_localizable locali with
-            | None -> (** not in a kf so return the start of the function *)
+            | None -> (* not in a kf so return the start of the function *)
               Some (Global g)
             | Some kf when not (Global.equal (kf_to_global kf) g) ->
-              (** Fall in the wrong global, so return the start of the function *)
+              (* Fall in the wrong global, so return the start of the function *)
               Some (Global g)
             | _ ->
-              (** Fall in the correct global *)
+              (* Fall in the correct global *)
               Some (Localizable locali)
           end
     end
   | Localizable (PLval(None,_,_) | PExp(None,_,_) | PTermLval(None,_,_,_)
-                | PVDecl(None,_,_)) -> (** no names useful? *) None
-  | Localizable (PIP _ ) -> (** no names available *) None
+                | PVDecl(None,_,_)) -> (* no names useful? *) None
+  | Localizable (PIP _ ) -> (* no names available *) None
 
 (*
 Local Variables:

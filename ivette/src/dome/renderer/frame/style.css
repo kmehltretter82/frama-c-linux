@@ -430,68 +430,99 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Styling ToolBar Search Field                                       --- */
+/* --- Styling ToolBar Action Field                                       --- */
 /* -------------------------------------------------------------------------- */
 
-.dome-xToolBar-control.dome-xToolBar-searchfield {
-    background-image: none ;
-    background-color: var(--background-alterning-odd);
-    padding-left: 20px ;
-    border-radius: 12px ;
-    border-color: var(--border);
-    color: var(--text);
-    width: 32px ;
-    transition: width 0.4s ease-in-out ;
+.dome-xToolBar-actionComponent {
+  overflow: visible;
 }
 
-.dome-xToolBar-searchfield:focus,
-.dome-xToolBar-searchfield:hover,
-.dome-xToolBar-searchicon:hover + .dome-xToolBar-searchfield
-{
-    width: 160px;
+.dome-xToolBar-actionField {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  margin: 2px 1px 2px 1px;
+  padding: 0;
+  overflow: hidden;
+  font-size: 13px;
+  width: 28px;
+  border-radius: 12px;
+  transition: width 0.4s ease-in-out;
+  z-Index: +1;
 }
 
-.dome-xToolBar-searchicon {
-    position: relative ;
-    overflow: visible ;
-    z-Index: +1;
-    height: 0px;
-    width: 0px;
-    top: -7px ;
-    left: 12px ;
+.dome-xToolBar-actionField:hover {
+  width: 228px;
 }
 
-.dome-xToolBar-searchmenu {
-    position: relative ;
-    width: 162px ;
-    max-height: 120px ;
-    overflow-x: hidden ;
-    overflow-y: auto ;
-    left: -7px ;
-    top: 4px ;
-    padding: 0px ;
-    border: 1pt solid var(--border) ;
-    background: var(--background-alterning-odd) ;
+.dome-xToolBar-actionField:focus-within {
+  width: 228px !important;
+  box-shadow: 0 0 2px var(--border-discrete);
+}
+
+.dome-xToolBar-actionField div.dome-xToolBar-modeSelection {
+  position: relative;
+  padding: 3px 8px 0px 8px;
+  cursor: pointer;
+}
+
+.dome-xToolBar-actionField SVG.dome-xToolBar-modeIcon {
+  position: relative;
+}
+
+/* Style the search box inside the navigation bar */
+.dome-xToolBar-actionField input[type=search] {
+  border: none;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  text-indent: 4px;
+  height: 21px;
+  width: 200px;
+  outline: none;
+  background: var(--background-softer);
+  color: var(--text);
+}
+
+.dome-xToolBar-actionComponent div.dome-xToolBar-suggestions {
+  position: absolute;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 120px;
+  z-index: +1;
+  width: 0px;
+  background: var(--background-alterning-odd);
+  border-radius: 12px;
+}
+
+.dome-xToolBar-actionComponent:focus-within div.dome-xToolBar-suggestions {
+  width: 230px;
 }
 
 .dome-xToolBar-searchitem {
-    color: var(--text);
-    display: block ;
-    width: 100% ;
-    margin-left: 0px ;
-    margin-right: 0px ;
-    padding-left: 4px ;
-    padding-right: 2px ;
+  display: block ;
+  width: 100% ;
+  margin-left: 0px ;
+  margin-right: 0px ;
+  padding-left: 4px ;
+  padding-right: 2px ;
 }
 
-.dome-xToolBar-searchitem:hover,
-.dome-xToolBar-searchindex
-{
-    background: var(--selected-element) !important;
+.dome-xToolBar-searchitem:hover, .dome-xToolBar-searchindex {
+  background: var(--selected-element) !important;
 }
 
 .dome-xToolBar-searchitem:nth-child(even) {
-    background: var(--background-alterning-even);
+  background: var(--background-alterning-even);
+}
+
+.dome-xToolBar-searchMode {
+  background: var(--primary-button-color);
+  fill: var(--text-discrete);
+}
+
+.dome-xToolBar-modeOfModes {
+  background: var(--background-profound);
+  fill: var(--text-discrete);
 }
 
 /* -------------------------------------------------------------------------- */

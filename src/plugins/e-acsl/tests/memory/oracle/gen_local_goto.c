@@ -42,7 +42,7 @@ void __e_acsl_globals_init(void)
 int main(int argc, char const **argv)
 {
   int __retres;
-  __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
+  __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
   __e_acsl_globals_init();
   int t = 0;
   UP: ;
@@ -54,7 +54,7 @@ int main(int argc, char const **argv)
   AGAIN:
   {
     int a;
-    __e_acsl_store_block((void *)(& a),(size_t)4);
+    __e_acsl_store_block((void *)(& a),4UL);
     __e_acsl_full_init((void *)(& a));
     a = 1;
     {
@@ -87,7 +87,7 @@ int main(int argc, char const **argv)
     }
     else t ++;
     int b = 15;
-    __e_acsl_store_block((void *)(& b),(size_t)4);
+    __e_acsl_store_block((void *)(& b),4UL);
     __e_acsl_full_init((void *)(& b));
     {
       int __gen_e_acsl_valid_2;

@@ -11,20 +11,20 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 int main(int argc, char const **argv)
 {
   int __retres;
-  __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
+  __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
   char a __attribute__((__aligned__(4))) = (char)'1';
-  __e_acsl_store_block((void *)(& a),(size_t)1);
+  __e_acsl_store_block((void *)(& a),1UL);
   __e_acsl_full_init((void *)(& a));
   char b __attribute__((__aligned__(4))) = (char)'2';
-  __e_acsl_store_block((void *)(& b),(size_t)1);
+  __e_acsl_store_block((void *)(& b),1UL);
   __e_acsl_full_init((void *)(& b));
   char *p = & a;
   __e_acsl_temporal_store_nblock((void *)(& p),(void *)(& a));
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
   char *q = & b;
   __e_acsl_temporal_store_nblock((void *)(& q),(void *)(& b));
-  __e_acsl_store_block((void *)(& q),(size_t)8);
+  __e_acsl_store_block((void *)(& q),8UL);
   __e_acsl_full_init((void *)(& q));
   __e_acsl_full_init((void *)(& p));
   __e_acsl_temporal_store_nreferent((void *)(& p),(void *)(& q));

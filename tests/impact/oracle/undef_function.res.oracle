@@ -5,10 +5,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   y ∈ {0}
-[eva] computing for function g <- main.
-  Called from undef_function.i:10.
 [kernel:annot:missing-spec] undef_function.i:10: Warning: 
   Neither code nor specification for function g, generating default assigns from the prototype
+[eva] computing for function g <- main.
+  Called from undef_function.i:10.
 [eva] using specification for function g
 [eva] Done for function g
 [eva] Recording results for main

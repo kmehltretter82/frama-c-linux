@@ -59,7 +59,7 @@ let datadir =
 let framac_libc = Filepath.Normalized.concat datadir "libc"
 let extra_datadir = try getenv_list "FRAMAC_EXTRA_SHARE" with Not_found -> []
 let () = add_symbolic_dir_list "FRAMAC_EXTRA_SHARE" extra_datadir
-(** After so that it has the priority for pretty printing *)
+(* After so that it has the priority for pretty printing *)
 let () = Filepath.add_symbolic_dir "FRAMAC_SHARE" datadir
 
 let datadirs = datadir::extra_datadir

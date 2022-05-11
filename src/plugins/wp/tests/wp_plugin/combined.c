@@ -1,15 +1,15 @@
-/* run.config_qualif                                                                  
-   DONTRUN: [PB] temporary removed since a difference has to be validated.
-*/
-
 /* run.config_qualif
-   EXECNOW: @PTEST_DIR@/@PTEST_NAME@.cmxs
-   OPT: -wp-par 1 -load-module @PTEST_DIR@/@PTEST_NAME@
+   OPT: -wp-par 1
 */
 
-/* ZD : this should not be here such as it cannot be tested by all frama-c
-        developer
- */
+
+
+
+
+
+
+
+
 
 /*@ axiomatic A {
   @ predicate P(int x);

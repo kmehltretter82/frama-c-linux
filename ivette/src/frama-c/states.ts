@@ -304,6 +304,7 @@ class SyncState<A> {
         `Fail to set value of SyncState '${this.handler.name}'.`,
         `${error}`,
       );
+      this.UPDATE.emit();
     }
   }
 
@@ -311,16 +312,18 @@ class SyncState<A> {
     try {
       this.upToDate = true;
       this.value = undefined;
+      this.UPDATE.emit();
       if (Server.isRunning()) {
         const v = await Server.send(this.handler.getter, null);
         this.value = v;
+        this.UPDATE.emit();
       }
-      this.UPDATE.emit();
     } catch (error) {
       D.error(
         `Fail to update SyncState '${this.handler.name}'.`,
         `${error}`,
       );
+      this.UPDATE.emit();
     }
   }
 }
@@ -484,6 +487,7 @@ export function useSyncArray<K, A>(
   const st = lookupSyncArray(arr);
   React.useEffect(() => st.update(), [st]);
   Server.useSignal(arr.signal, st.fetch);
+  st.update();
   useModel(st.model, sync);
   return st.model;
 }
@@ -785,7 +789,10 @@ export function setSelection(location: Location, meta = false) {
 /** Current selection. */
 export function useSelection(): [Selection, (a: SelectionActions) => void] {
   const [current, setCurrent] = useGlobalState(GlobalSelection);
-  return [current, (action) => setCurrent(reducer(current, action))];
+  const callback = React.useCallback((action) => {
+    setCurrent(reducer(current, action));
+  }, [ current, setCurrent ]);
+  return [current, callback];
 }
 
 /** Resets the selected locations. */

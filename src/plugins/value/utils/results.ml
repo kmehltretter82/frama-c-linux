@@ -20,14 +20,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Bottom.Type
+open Lattice_bounds
 
-type 'a or_top_bottom = 'a Bottom.Top.or_top_bottom
-
-let (>>>-:) t f = match t with
-  | `Top -> `Top
-  | `Bottom  -> `Bottom
-  | `Value t -> `Value (f t)
+let are_available kf =
+  Analysis.is_computed () &&
+  match Analysis.status kf with
+  | Analyzed (Complete | Partial) -> true
+  | SpecUsed | Builtin _ | Unreachable | Analyzed NoResults -> false
 
 module Callstack = Value_types.Callstack
 
@@ -109,43 +108,32 @@ struct
 
   (* Constructors *)
 
-  let consolidated =
+  let consolidated ~top =
     function
     | `Bottom -> Bottom
+    | `Top -> Consolidated top
     | `Value state -> Consolidated state
 
   let singleton cs =
     function
     | `Bottom -> Bottom
+    | `Top -> Top
     | `Value state -> ByCallstack [cs,state]
 
   let by_callstack : request ->
     [< `Bottom | `Top | `Value of 'a Value_types.Callstack.Hashtbl.t ] ->
     ('a, restricted_to_callstack) t =
-    fun req table ->
-    match table with
-    | `Top -> Top
-    | `Bottom -> Bottom
-    | `Value table ->
-      (* Filter *)
-      let add cs state acc =
-        if List.for_all (fun filter -> filter cs) req.filter
-        then (cs, state) :: acc
-        else acc
-      in
-      (* Selection *)
-      let l =
-        match req.selector with
-        | None -> Callstack.Hashtbl.fold add table []
-        | Some selector ->
-          let add acc cs =
-            match Callstack.Hashtbl.find_opt table cs with
-            | Some state -> add cs state acc
-            | None -> acc
-          in
-          List.fold_left add [] selector
-      in
-      ByCallstack l
+    fun req -> function
+      | `Top -> Top
+      | `Bottom -> Bottom
+      | `Value table ->
+        let add cs state acc =
+          if List.for_all (fun filter -> filter cs) req.filter
+          then (cs, state) :: acc
+          else acc
+        in
+        let list = Callstack.Hashtbl.fold add table [] in
+        ByCallstack list
 
   (* Accessors *)
 
@@ -187,13 +175,15 @@ struct
   let map_join : type c.
     ('a -> 'b) -> ('b -> 'b -> 'b) -> ('a, c) t -> 'b or_top_bottom =
     fun map join ->
-    let map' x = `Value (map x) in
-    map_reduce default map' (Bottom.Top.join join)
+    let map' x = `Value (map x)
+    and join' = TopBottom.join (fun x y -> `Value (join x y)) in
+    map_reduce default map' join'
 
-  let map_join' : type c. ('a -> 'b or_top_bottom) -> ('b -> 'b -> 'b) ->
+  let map_join' : type c. ('a -> [< 'b or_top_bottom]) -> ('b -> 'b -> 'b) ->
     ('a, c) t -> 'b or_top_bottom =
     fun map join ->
-    map_reduce default map (Bottom.Top.join join)
+    let join' = TopBottom.join (fun x y -> `Value (join x y)) in
+    map_reduce default map join'
 end
 
 
@@ -204,6 +194,8 @@ type address
 
 module Make () =
 struct
+  open TopBottom.Operators
+
   module A = (val Analysis.current_analyzer ())
 
   module EvalTypes =
@@ -223,15 +215,18 @@ struct
   let get_by_callstack (req : request) :
     (_, restricted_to_callstack) Response.t =
     let open Response in
+    let selection = req.selector in
     match req.control_point with
     | Before stmt ->
-      A.get_stmt_state_by_callstack ~after:false stmt |> by_callstack req
+      A.get_stmt_state_by_callstack ?selection ~after:false stmt
+      |> by_callstack req
     | After stmt ->
-      A.get_stmt_state_by_callstack ~after:true stmt |> by_callstack req
+      A.get_stmt_state_by_callstack ?selection ~after:true stmt
+      |> by_callstack req
     | Initial ->
       A.get_global_state () |> singleton []
     | Start kf ->
-      A.get_initial_state_by_callstack kf |> by_callstack req
+      A.get_initial_state_by_callstack ?selection kf |> by_callstack req
 
   let get (req : request) : (_, unrestricted_response) Response.t =
     if req.filter <> [] || Option.is_some req.selector then
@@ -245,7 +240,7 @@ struct
         | Start kf -> A.get_initial_state kf
         | Initial -> A.get_global_state ()
       in
-      consolidated state
+      consolidated ~top:A.Dom.top state
 
   let convert : 'a or_top_bottom -> 'a result = function
     | `Top -> Result.error Top
@@ -317,7 +312,7 @@ struct
     let join = (@)
     and extract state =
       let r,_alarms = A.Eval.eval_function_exp exp state in
-      r >>>-: List.map fst
+      r >>-: List.map fst
     in
     get req |> Response.map_join' extract join |> convert |>
     Result.map (List.sort_uniq Kernel_function.compare)
@@ -325,8 +320,32 @@ struct
 
   (* Conversion *)
 
+  let as_cvalue_or_uninitialized res =
+    match A.Val.get Main_values.CVal.key with
+    | None -> `Top
+    | Some get ->
+      let make_expr (x, _alarms) =
+        x >>-: fun (_valuation, v) ->
+        Cvalue.V_Or_Uninitialized.make ~initialized:true ~escaping:false (get v)
+      in
+      let make_lval (x, _alarms) =
+        let+ _valuation, v = x in
+        let Eval.{ v; initialized; escaping } = v in
+        let v =
+          match v with
+          | `Bottom -> Cvalue.V.bottom
+          | `Value v -> get v
+        in
+        Cvalue.V_Or_Uninitialized.make ~initialized ~escaping v
+      in
+      let join = Cvalue.V_Or_Uninitialized.join in
+      match res with
+      | LValue r -> Response.map_join' make_lval join r
+      | Value r -> Response.map_join' make_expr join r
+
   let extract_value :
     type c. (value, c) evaluation -> (A.Val.t or_bottom, c) Response.t =
+    let open Bottom.Operators in
     function
     | LValue r ->
       let extract (x, _alarms) = x >>- (fun (_valuation,fv) -> fv.Eval.v) in
@@ -342,7 +361,7 @@ struct
     | Some get ->
       let join = Main_values.CVal.join in
       let extract value =
-        value >>>-: get
+        value >>-: get
       in
       extract_value res |> Response.map_join' extract join |> convert
 
@@ -351,7 +370,10 @@ struct
     (A.Loc.location or_bottom, c) Response.t * Locations.access =
     function
     | Address (r, access) ->
-      let extract (x, _alarms) = x >>-: (fun (_valuation,loc,_typ) -> loc) in
+      let extract (x, _alarms) =
+        let open Bottom.Operators in
+        let+ _valuation,loc,_typ = x in loc
+      in
       Response.map extract r, access
 
   let as_location res =
@@ -366,7 +388,7 @@ struct
         assert (Int_Base.equal loc2.size size);
         make_loc loc size
       and extract loc =
-        loc >>>-: get >>>-: Precise_locs.imprecise_location
+        loc >>-: get >>-: Precise_locs.imprecise_location
       in
       extract_loc res |> fst |> Response.map_join' extract join |> convert
 
@@ -378,7 +400,8 @@ struct
       let response_loc, access = extract_loc res in
       let join = Locations.Zone.join
       and extract loc =
-        loc >>>-: get >>>-: Precise_locs.enumerate_valid_bits access
+        loc >>-: get >>-:
+        Precise_locs.enumerate_valid_bits access
       in
       response_loc |> Response.map_join' extract join |> convert
 
@@ -387,7 +410,7 @@ struct
     | LValue r ->
       let join = (&&)
       and extract (x, _alarms) =
-        x >>>-: (fun (_valuation,fv) -> fv.Eval.initialized)
+        x >>-: (fun (_valuation,fv) -> fv.Eval.initialized)
       in
       begin match Response.map_join' extract join r with
         | `Bottom | `Top -> false
@@ -549,6 +572,13 @@ let callee stmt =
 
 (* Value conversion *)
 
+let as_cvalue_or_uninitialized (Value evaluation) =
+  let module E = (val evaluation : Evaluation) in
+  match E.as_cvalue_or_uninitialized E.v with
+  | `Value v -> v
+  | `Bottom -> Cvalue.V_Or_Uninitialized.bottom
+  | `Top -> Cvalue.V_Or_Uninitialized.top
+
 let as_cvalue_result (Value evaluation) =
   let module E = (val evaluation : Evaluation) in
   E.as_cvalue E.v
@@ -609,6 +639,17 @@ let as_zone address =
 
 (* Evaluation properties *)
 
+let is_singleton: type a. a evaluation -> bool = function
+  | Value _ as evaluation ->
+    let cvalue = as_cvalue evaluation in
+    Cvalue.V.cardinal_zero_or_one cvalue && not (Cvalue.V.is_bottom cvalue)
+  | Address _ as lvaluation ->
+    let loc = as_location lvaluation in
+    let is_singleton loc =
+      Locations.cardinal_zero_or_one loc && not (Locations.is_bottom_loc loc)
+    in
+    Result.fold ~ok:is_singleton ~error:(fun _ -> false) loc
+
 let is_initialized (Value evaluation) =
   let module E = (val evaluation : Evaluation) in
   E.is_initialized E.v
@@ -637,10 +678,6 @@ let is_bottom : type a. a evaluation -> bool =
     let module L = (val lvaluation : Lvaluation) in
     L.is_bottom L.v
 
-let is_called kf =
-  let module M = Make () in
-  M.is_reachable (at_start_of kf)
-
 let is_reachable stmt =
   let module M = Make () in
   M.is_reachable (before stmt)
@@ -649,32 +686,13 @@ let is_reachable_kinstr kinstr =
   let module M = Make () in
   M.is_reachable (before_kinstr kinstr)
 
+let condition_truth_value = Db.Value.condition_truth_value
 
 (* Callers / callsites *)
 
-let callers kf =
-  let f = function
-    | [] | [_] -> None
-    | _ :: (caller,_) :: _-> Some caller
-  in
-  at_start_of kf |> callstacks |>
-  List.filter_map f |> List.sort_uniq Kernel_function.compare
-
-let uniq_sites = List.sort_uniq Cil_datatype.Stmt.compare
-
-let callsites kf =
-  let module Map = Kernel_function.Map in
-  let f acc = function
-    | [] | (_,Cil_types.Kglobal) :: _ -> acc
-    | [(_,Kstmt _)] -> assert false (* End of callstacks should have no callsite *)
-    | (_kf,Kstmt stmt) :: (caller,_) :: _ -> (* kf = _kf *)
-      Map.update caller
-        (fun old -> Some (stmt :: Option.value ~default:[] old)) acc
-  in
-  at_start_of kf |> callstacks |>
-  List.fold_left f Map.empty |> Map.to_seq |> List.of_seq |>
-  List.map (fun (kf,sites) -> kf, uniq_sites sites)
-
+let is_called = Function_calls.is_called
+let callers = Function_calls.callers
+let callsites = Function_calls.callsites
 
 (* Result conversion *)
 

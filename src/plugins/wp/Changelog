@@ -24,6 +24,7 @@
 Plugin WP <next-release>
 ########################
 
+- WP          [2022-05-06] Upgrade to Why3 1.5
 - WP          [2022-02-28] New option -wp-fct-timeout, used to customize the
                            provers timeout per function
 - WP          [2022-02-02] New option -wp-smoke-dead-local-init, smoke tests on

@@ -20,18 +20,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Bottom.Type
-
 module Make
     (Abstract : Abstractions.Eva)
     (Kf : sig val kf: Cil_types.kernel_function end) :
 sig
-  type state = Abstract.Dom.t     (** The states being partitioned *)
-  type store       (** The storage of all states ever met at a control point *)
-  type tank        (** The set of states that remains to propagate from a
-                       control point. *)
-  type flow        (** A set of states which are currently propagated *)
-  type widening    (** Widening information *)
+  (** The states being partitioned *)
+  type state = Abstract.Dom.t
+
+  (** The storage of all states ever met at a control point *)
+  type store
+
+  (** The set of states that remains to propagate from a control point. *)
+  type tank
+
+  (** A set of states which are currently propagated *)
+  type flow
+
+  (** Widening information *)
+  type widening
 
   (* --- Constructors --- *)
 
@@ -51,7 +57,7 @@ sig
   (* --- Accessors --- *)
 
   val expanded : store -> (Partition.key * state) list
-  val smashed : store -> state or_bottom
+  val smashed : store -> state Lattice_bounds.or_bottom
   val contents : flow -> state list
   val is_empty_store : store -> bool
   val is_empty_flow : flow -> bool

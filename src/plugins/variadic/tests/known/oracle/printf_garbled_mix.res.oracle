@@ -45,6 +45,7 @@
 #include "errno.h"
 #include "stdarg.h"
 #include "stddef.h"
+#include "stdint.h"
 #include "stdio.h"
 /*@ assigns \result;
     assigns \result \from \nothing; */
@@ -66,7 +67,7 @@ int printf_va_1(char const * restrict format, int param0);
 void main(void)
 {
   int a[2] = {1, 2};
-  int *b = (int *)((unsigned long)(a) * (unsigned long)2);
+  int *b = (int *)((uintptr_t)(a) * (uintptr_t)2);
   /*@ assert Eva: pointer_downcast: (unsigned long)b ≤ 2147483647; */
   int nb_printed = printf_va_1("%d",(int)b);
   Frama_C_show_each_nb_printed(nb_printed);

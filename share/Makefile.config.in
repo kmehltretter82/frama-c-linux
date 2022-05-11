@@ -189,6 +189,7 @@ ENABLE_METRICS	                  ?=@ENABLE_METRICS@
 ENABLE_OCCURRENCE                 ?=@ENABLE_OCCURRENCE@
 ENABLE_PDG	                  ?=@ENABLE_PDG@
 ENABLE_POSTDOMINATORS             ?=@ENABLE_POSTDOMINATORS@
+ENABLE_REDUC                      ?=@ENABLE_REDUC@
 ENABLE_RTEGEN                     ?=@ENABLE_RTEGEN@
 ENABLE_SCOPE	                  ?=@ENABLE_SCOPE@
 ENABLE_SLICING	                  ?=@ENABLE_SLICING@
@@ -198,7 +199,8 @@ ENABLE_EVA                      ?=@ENABLE_EVA@
 
 #bytes is part of the stdlib, but is used as a transitional package.
 LIBRARY_NAMES := \
-  findlib ocamlgraph unix str dynlink bytes zarith yojson bigarray
+  findlib ocamlgraph unix str dynlink bytes zarith yojson bigarray \
+  ppx_import ppx_deriving.eq
 
 ifeq ($(HAS_LANDMARKS),yes)
 LIBRARY_NAMES += landmarks landmarks-ppx

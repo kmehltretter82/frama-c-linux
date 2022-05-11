@@ -45,6 +45,7 @@
     --default-button-hover: #364355;
     --default-button-active: #303d4f;
 
+    --primary-button-color: #146bbf;
     --primary-button-img: linear-gradient(to bottom, #146bbf 0%, #1960b2 100%);
     --primary-button-hover: #0e65b9;
     --primary-button-active: #085fb3;
@@ -87,6 +88,7 @@
     --meter-subopti:  linear-gradient(to bottom, #770 0%, #cc0 20%, #770 100%);
     --meter-evenless: linear-gradient(to bottom, #710 0%, #c50 20%, #710 100%);
 
+    --eva-evaluation-mode: #714074;
     --eva-state-before: #082032;
     --eva-state-after: #321428;
     --eva-state-then: #98a02e;

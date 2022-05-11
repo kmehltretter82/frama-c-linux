@@ -35,13 +35,17 @@ type extension_preprocessor =
 (** Transformers from untyped to typed ACSL extension *)
 type extension_typer =
   typing_context -> location -> lexpr list -> acsl_extension_kind
+
 (** Visitor functions for ACSL extensions *)
 type extension_visitor =
   Cil.cilVisitor -> acsl_extension_kind -> acsl_extension_kind Cil.visitAction
+
 type extension_preprocessor_block =
   string * extended_decl list -> string * extended_decl list
+
 type extension_typer_block =
   typing_context -> location -> string * extended_decl list -> acsl_extension_kind
+
 (** Pretty printers for ACSL extensions *)
 type extension_printer =
   Printer_api.extensible_printer_type -> Format.formatter ->

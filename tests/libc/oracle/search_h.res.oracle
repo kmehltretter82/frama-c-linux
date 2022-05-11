@@ -35,10 +35,10 @@
 [eva] Done for function strcpy
 [eva:alarm] search_h.c:32: Warning: 
   out of bounds write. assert \valid(&elementptr->count);
-[eva] computing for function tsearch <- main.
-  Called from search_h.c:34.
 [kernel:annot:missing-spec] search_h.c:34: Warning: 
   Neither code nor specification for function tsearch, generating default assigns from the prototype
+[eva] computing for function tsearch <- main.
+  Called from search_h.c:34.
 [eva] using specification for function tsearch
 [eva:invalid-assigns] search_h.c:34: 
   Completely invalid destination for assigns clause *compar. Ignoring.
@@ -54,10 +54,10 @@
 [eva] Done for function exit
 [eva:alarm] search_h.c:40: Warning: 
   out of bounds read. assert \valid_read((struct element **)node);
-[eva] computing for function twalk <- main.
-  Called from search_h.c:46.
 [kernel:annot:missing-spec] search_h.c:46: Warning: 
   Neither code nor specification for function twalk, generating default assigns from the prototype
+[eva] computing for function twalk <- main.
+  Called from search_h.c:46.
 [eva] using specification for function twalk
 [eva:invalid-assigns] search_h.c:46: 
   Completely invalid destination for assigns clause *action. Ignoring.

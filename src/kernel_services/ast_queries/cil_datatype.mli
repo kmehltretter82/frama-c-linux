@@ -70,6 +70,7 @@ module Location: sig
   include S_with_collections_pretty with type t = location
   val unknown: t
   val pretty_long : t Pretty_utils.formatter
+
   (** Pretty the location under the form [file <f>, line <l>], without
       the full-path to the file. The default pretty-printer [pretty] echoes
       [<dir/f>:<l>] *)
@@ -355,6 +356,7 @@ module Toplevel_predicate: S_with_pretty with type t = toplevel_predicate
 module Identified_predicate:
   S_with_collections_pretty with type t = identified_predicate
 (** @since Neon-20140301 *)
+
 module PredicateStructEq: S_with_collections_pretty with type t = predicate
 (** @since 24.0-Chromium *)
 
@@ -373,6 +375,7 @@ module Lexpr: S with type t = Logic_ptree.lexpr
 
 (* Forward declarations from Cil et al. *)
 val drop_non_logic_attributes : (attributes -> attributes) ref
+val drop_fc_internal_attributes : (attributes -> attributes) ref
 val constfoldtoint : (exp -> Integer.t option) ref
 val punrollType: (typ -> typ) ref
 val punrollLogicType: (logic_type -> logic_type) ref

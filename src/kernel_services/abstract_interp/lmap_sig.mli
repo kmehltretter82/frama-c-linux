@@ -25,11 +25,17 @@
 
 open Locations
 
-type v (** type of the values associated to a location *)
-type offsetmap (** type of the maps associated to a base *)
-type widen_hint_base (** widening hints for each base *)
+(** type of the values associated to a location *)
+type v
 
-type map (** Maps from {!Base.t} to {!offsetmap} *)
+(** type of the maps associated to a base *)
+type offsetmap
+
+(** widening hints for each base *)
+type widen_hint_base
+
+(** Maps from {!Base.t} to {!offsetmap} *)
+type map
 type lmap = private Bottom | Top | Map of map
 
 include Datatype.S_with_collections with type t = lmap
@@ -39,6 +45,7 @@ val pretty_debug: Format.formatter -> t -> unit
 val pretty_filter: Format.formatter -> t -> Zone.t -> unit
 (** [pretty_filter m z] pretties only the part of [m] that correspond to
     the bases present in [z] *)
+
 val pretty_diff: Format.formatter -> t -> t -> unit
 
 (** {2 General shape} *)
@@ -52,6 +59,7 @@ val empty_map : t
 val is_empty_map : t -> bool
 
 val bottom : t
+
 (** Every location is associated to the value [bottom] of type [v] in this
     state. This state can be reached only in dead code. *)
 val is_reachable : t -> bool
@@ -86,7 +94,7 @@ val find: ?conflate_bottom:bool -> t -> location -> v
     is no Top value in the type {!v}. *)
 
 val copy_offsetmap :
-  Location_Bits.t -> Integer.t -> t -> offsetmap Bottom.or_bottom
+  Location_Bits.t -> Integer.t -> t -> offsetmap Lattice_bounds.or_bottom
 (** [copy_offsetmap alarms loc size m] returns the superposition of the
     ranges of [size] bits starting at [loc] within [m]. [size] must be
     strictly greater than zero. Return [None] if all pointed addresses are
@@ -95,10 +103,10 @@ val copy_offsetmap :
     @raise Error_Top when the location or the state are Top, and there
     is no Top value in the type {!v}. *)
 
-val find_base : Base.t -> t -> offsetmap Bottom.Top.or_top_bottom
+val find_base : Base.t -> t -> offsetmap Lattice_bounds.or_top_bottom
 (** @raise Not_found if the varid is not present in the map. *)
 
-val find_base_or_default : Base.t -> t -> offsetmap Bottom.Top.or_top_bottom
+val find_base_or_default : Base.t -> t -> offsetmap Lattice_bounds.or_top_bottom
 (** Same as [find_base], but return the default values for bases
     that are not currently present in the map. Prefer the use of this function
     to [find_base], unless you explicitly want to see if the base is bound. *)

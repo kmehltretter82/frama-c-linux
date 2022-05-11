@@ -109,13 +109,14 @@ type inconsistent = private
 (** Type of the local status of a property. *)
 type status = private
   | Never_tried (** Nobody tries to verify the property *)
-  | Best of
-      emitted_status (** The know more precise status *)
-      * emitter_with_properties list (** who attempt the verification
-                                         under which hypotheses *)
-  | Inconsistent of inconsistent (** someone locally says the property is valid
-                                     and someone else says it is invalid: only
-                                     the consolidated status may conclude. *)
+  | Best of emitted_status * emitter_with_properties list
+  (** [Best(s, l)]:
+      - [s]: The know more precise status
+      - [l]: who attempt the verification under which hypotheses *)
+  | Inconsistent of inconsistent
+  (** someone locally says the property is valid
+      and someone else says it is invalid: only
+      the consolidated status may conclude. *)
 
 include Datatype.S with type t = status
 

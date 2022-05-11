@@ -181,32 +181,6 @@ export function TitleBar(props: TitleBarProps) {
 }
 
 /* --------------------------------------------------------------------------*/
-/* --- Search Hints                                                       ---*/
-/* --------------------------------------------------------------------------*/
-
-export interface Hint {
-  id: string;
-  label: string | JSX.Element;
-  title?: string;
-  rank?: number;
-  onSelection: () => void;
-}
-
-/**
-   Register a hint search engine for the Ivette toolbar.
-*/
-export function registerHints(
-  id: string,
-  lookup: (pattern: string) => Promise<Hint[]>,
-) {
-  const adaptor = (h: Hint): Ext.SearchHint => (
-    { ...h, value: () => h.onSelection() }
-  );
-  const search = (p: string) => lookup(p).then((hs) => hs.map(adaptor));
-  Ext.registerHints({ id, search });
-}
-
-/* --------------------------------------------------------------------------*/
 /* --- Sidebar Panels                                                     ---*/
 /* --------------------------------------------------------------------------*/
 

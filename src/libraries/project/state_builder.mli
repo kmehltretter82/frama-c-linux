@@ -34,8 +34,11 @@
 
 (** Additional information required by {!State_builder.Register}. *)
 module type Info = sig
-  val name: string (** Name of the internal state. *)
-  val dependencies : State.t list (** Dependencies of this internal state. *)
+  val name: string
+  (** Name of the internal state. *)
+
+  val dependencies : State.t list
+  (** Dependencies of this internal state. *)
 end
 
 module type Info_with_size = sig
@@ -102,12 +105,16 @@ module Register
 (** Output signature of [Ref]. *)
 module type Ref = sig
   include S
-  type data
+
   (** Type of the referenced value. *)
+  type data
+
   val set: data -> unit
   (** Change the referenced value. *)
+
   val get: unit -> data
   (** Get the referenced value. *)
+
   val clear: unit -> unit
   (** Reset the reference to its default value. *)
 end
@@ -131,6 +138,7 @@ module type Option_ref = sig
   (** Memoization. Compute on need the stored value.
       If the data is already computed (i.e. is not [None]),
       it is possible to change with [change]. *)
+
   val map: (data -> data) -> data option
   val may: (data -> unit) -> unit
   val get_option : unit -> data option
@@ -146,7 +154,9 @@ module Option_ref(Data:Datatype.S)(Info: Info) :
 module type List_ref = sig
   type data_in_list
   include Ref
-  val add: data_in_list -> unit (** @since Nitrogen-20111001 *)
+  val add: data_in_list -> unit
+  (** @since Nitrogen-20111001 *)
+
   val iter: (data_in_list -> unit) -> unit
   val fold_left: ('a -> data_in_list -> 'a) -> 'a -> 'a
 end
@@ -263,12 +273,15 @@ module Caml_weak_hashtbl(Data: Datatype.S)(Info: Info_with_size) :
 module type Hashconsing_tbl =
   functor
     (Data: sig
-       include Datatype.S
        (** The hashconsed datatype *)
+       include Datatype.S
+
        val equal_internal: t -> t -> bool
        (** Equality on the datatype internally used by the built table. *)
+
        val hash_internal: t -> int
        (** Hash function for datatype internally used by the built table. *)
+
        val initial_values: t list
        (** Pre-existing values stored in the built table and shared by all
            existing projects. *)
@@ -313,12 +326,16 @@ module type Hashtbl = sig
   type data
   val replace: key -> data -> unit
   (** Add a new binding. The previous one is removed. *)
+
   val add: key -> data -> unit
   (** Add a new binding. The previous one is only hidden. *)
+
   val clear: unit -> unit
   (** Clear the table. *)
+
   val length: unit -> int
   (** Length of the table. *)
+
   val iter: (key -> data -> unit) -> unit
   val iter_sorted:
     ?cmp:(key -> key -> int) -> (key -> data -> unit) -> unit
@@ -330,19 +347,25 @@ module type Hashtbl = sig
       the given function.
       If the data is already computed, it is possible to change with
       [change]. *)
+
   val find: key -> data
   (** Return the current binding of the given key.
       @raise Not_found if the key is not in the table. *)
+
   val find_all: key -> data list
   (** Return the list of all data associated with the given key. *)
+
   val mem: key -> bool
   val remove: key -> unit
 end
 
-(** @plugin development guide *)
+(** @plugin development guide
+    - [H] is the hashtable implementation
+    - [Data] is the datatype for values stored in the table
+*)
 module Hashtbl
-    (H: Datatype.Hashtbl (** hashtable implementation *))
-    (Data: Datatype.S (** datatype for values stored in the table *))
+    (H: Datatype.Hashtbl)
+    (Data: Datatype.S)
     (Info: Info_with_size) :
   Hashtbl with type key = H.key and type data = Data.t
                                 and module Datatype = H.Make(Data)
@@ -359,7 +382,9 @@ module type Set_ref = sig
   include Ref
   type elt
   val add: elt -> unit
-  val remove: elt -> unit (** @since Neon-20140301 *)
+  val remove: elt -> unit
+  (** @since Neon-20140301 *)
+
   val is_empty: unit -> bool
   val mem: elt -> bool
   val fold: (elt -> 'a -> 'a) -> 'a -> 'a
@@ -476,11 +501,15 @@ module type Hashcons = sig
 
   include Datatype.S_with_collections (** hashconsed version of {!elt} *)
 
-  val hashcons: elt -> t (** Injection as an hashconsed value. *)
-  val get:      t -> elt (** Projection out of hashconsing. *)
+  val hashcons: elt -> t
+  (** Injection as an hashconsed value. *)
 
-  val id: t -> int (** Id of an hashconsed value. Unique:
-                       [id x = id y] is equivalent to equality on {!elt}. *)
+  val get:      t -> elt
+  (** Projection out of hashconsing. *)
+
+  val id: t -> int
+  (** Id of an hashconsed value. Unique:
+      [id x = id y] is equivalent to equality on {!elt}. *)
 
   val self: State.t
 end

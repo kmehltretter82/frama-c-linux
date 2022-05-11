@@ -84,13 +84,13 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     unsigned long __gen_e_acsl__7;
     unsigned long __gen_e_acsl_if_5;
     int __gen_e_acsl_separated;
-    __e_acsl_store_block((void *)(& src),(size_t)8);
-    __e_acsl_store_block((void *)(& dest),(size_t)8);
+    __e_acsl_store_block((void *)(& src),8UL);
+    __e_acsl_store_block((void *)(& dest),8UL);
     __gen_e_acsl_at = dest;
     __gmpz_init_set_ui(__gen_e_acsl_n,n);
     __gmpz_init_set(__gen_e_acsl_at_2,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_n));
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
+    __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"dest",
@@ -240,7 +240,7 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
                                      __gen_e_acsl_size_5);
       __gen_e_acsl_if_5 = __gen_e_acsl_size_5;
     }
-    __gen_e_acsl_separated = __e_acsl_separated((size_t)2,dest + 1 * 0,
+    __gen_e_acsl_separated = __e_acsl_separated(2UL,dest + 1 * 0,
                                                 __gen_e_acsl_if_4,
                                                 src + 1 * 0,
                                                 __gen_e_acsl_if_5);
@@ -371,14 +371,14 @@ int main(void)
 {
   int __retres;
   int i;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   char *srcbuf = (char *)__gen_e_acsl_literal_string;
-  __e_acsl_store_block((void *)(& srcbuf),(size_t)8);
+  __e_acsl_store_block((void *)(& srcbuf),8UL);
   __e_acsl_full_init((void *)(& srcbuf));
   int loc = 1;
   char *destbuf = malloc((unsigned long)10 * sizeof(char));
-  __e_acsl_store_block((void *)(& destbuf),(size_t)8);
+  __e_acsl_store_block((void *)(& destbuf),8UL);
   __e_acsl_full_init((void *)(& destbuf));
   char ch = (char)'o';
   if (destbuf != (char *)0) {
@@ -415,7 +415,7 @@ int main(void)
       i ++;
     }
     __gen_e_acsl_strncpy(destbuf + loc,(char const *)(srcbuf + loc),
-                         (unsigned long)1);
+                         (size_t)1);
     free((void *)destbuf);
   }
   __retres = 0;

@@ -76,8 +76,7 @@
 [eva] partitioning-annots.c:100: Frama_C_show_each_split_with_uninit: {2}, {2}
 [eva] partitioning-annots.c:100: Frama_C_show_each_split_with_uninit: {1}, {1}
 [eva] partitioning-annots.c:100: Frama_C_show_each_split_with_uninit: {0}, {0}
-[eva] partitioning-annots.c:100: 
-  Frama_C_show_each_split_with_uninit: Bottom, Bottom
+[eva] partitioning-annots.c:100: Frama_C_show_each_split_with_uninit: ⊥, ⊥
 [eva] partitioning-annots.c:102: Frama_C_show_each_no_split: {0}, {0; 1; 2}
 [eva] computing for function Frama_C_interval <- test_dynamic_split <- main.
   Called from partitioning-annots.c:103.

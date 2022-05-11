@@ -84,13 +84,6 @@ frama-clang:
   tags:
    - nix
 
-counter-examples:
-  stage: tests
-  script:
-   - nix/frama-ci.sh build -A counter-examples.tests
-  tags:
-   - nix
-
 acsl-importer:
   stage: tests
   script:

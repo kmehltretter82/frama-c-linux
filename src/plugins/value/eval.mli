@@ -31,13 +31,8 @@ open Cil_types
 (**                      {2 Lattice structure }                               *)
 (* -------------------------------------------------------------------------- *)
 
-include module type of Bottom.Type
-
-(** For some functions, the special value top (denoting no information)
-    is managed separately. *)
-type 'a or_top    = [ `Value of 'a | `Top ]
-
-type 'a or_top_or_bottom = [ `Value of 'a | `Top | `Bottom ]
+include module type of Lattice_bounds
+include module type of Bottom.Operators
 
 
 (* -------------------------------------------------------------------------- *)
@@ -148,9 +143,15 @@ type 'a record_loc = {
     map. *)
 module type Valuation = sig
   type t
-  type value  (** Abstract value. *)
-  type origin (** Origin of values. *)
-  type loc    (** Abstract memory location. *)
+
+  (** Abstract value. *)
+  type value
+
+  (** Origin of values. *)
+  type origin
+
+  (** Abstract memory location. *)
+  type loc
 
   val empty : t
   val find : t -> exp -> (value, origin) record_val or_top
@@ -271,6 +272,7 @@ type recursion = {
 }
 
 [@@@ api_start]
+
 (** Can the results of a function call be cached with memexec? *)
 type cacheable =
   | Cacheable      (** Functions whose result can be safely cached. *)

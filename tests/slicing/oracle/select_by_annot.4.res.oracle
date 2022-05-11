@@ -18,10 +18,10 @@
   signed overflow. assert S.a + a ≤ 2147483647;
 [eva] Recording results for modifS
 [eva] Done for function modifS
-[eva] computing for function new_int <- main.
-  Called from select_by_annot.i:140.
 [kernel:annot:missing-spec] select_by_annot.i:140: Warning: 
   Neither code nor specification for function new_int, generating default assigns from the prototype
+[eva] computing for function new_int <- main.
+  Called from select_by_annot.i:140.
 [eva] using specification for function new_int
 [eva] Done for function new_int
 [eva] computing for function f1 <- main.

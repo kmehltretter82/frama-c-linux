@@ -29,7 +29,7 @@ void __gen_e_acsl_g(long *ptr, size_t size);
 
 void g(long *ptr, size_t size)
 {
-  __e_acsl_store_block((void *)(& ptr),(size_t)8);
+  __e_acsl_store_block((void *)(& ptr),8UL);
   __e_acsl_delete_block((void *)(& ptr));
   return;
 }
@@ -45,14 +45,14 @@ int main(void)
   struct S s;
   int **multi_dynamic;
   int i;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_store_block((void *)(& multi_dynamic),(size_t)8);
-  __e_acsl_store_block((void *)(& s),(size_t)24);
-  __e_acsl_store_block((void *)(t4),(size_t)4000);
-  __e_acsl_store_block((void *)(t3),(size_t)224);
-  __e_acsl_store_block((void *)(t2),(size_t)32);
-  __e_acsl_store_block((void *)(& b),(size_t)8);
-  __e_acsl_store_block((void *)(& a),(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(& multi_dynamic),8UL);
+  __e_acsl_store_block((void *)(& s),24UL);
+  __e_acsl_store_block((void *)(t4),4000UL);
+  __e_acsl_store_block((void *)(t3),224UL);
+  __e_acsl_store_block((void *)(t2),32UL);
+  __e_acsl_store_block((void *)(& b),8UL);
+  __e_acsl_store_block((void *)(& a),8UL);
   __e_acsl_full_init((void *)(& a));
   a = (int *)malloc((unsigned long)10 * sizeof(int));
   {
@@ -240,7 +240,7 @@ int main(void)
   }
   /*@ assert !\valid(b + (10 .. 15)); */ ;
   long t[3] = {7l, 8l, 9l};
-  __e_acsl_store_block((void *)(t),(size_t)24);
+  __e_acsl_store_block((void *)(t),24UL);
   __e_acsl_full_init((void *)(& t));
   {
     int __gen_e_acsl_size_6;
@@ -316,7 +316,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
   }
   /*@ assert !\valid(&t[3 .. 5]); */ ;
-  __gen_e_acsl_g(t,(unsigned long)3);
+  __gen_e_acsl_g(t,(size_t)3);
   __e_acsl_initialize((void *)(t2),sizeof(double));
   t2[0] = 0.5;
   __e_acsl_initialize((void *)(& t2[1]),sizeof(double));
@@ -768,11 +768,11 @@ int main(void)
   }
   free((void *)multi_dynamic);
   char c = (char)'w';
-  __e_acsl_store_block((void *)(& c),(size_t)1);
+  __e_acsl_store_block((void *)(& c),1UL);
   __e_acsl_full_init((void *)(& c));
   __gen_e_acsl_f(& c,(long)5);
   char t5[4] = {(char)'a', (char)'b', (char)'c', (char)'d'};
-  __e_acsl_store_block((void *)(t5),(size_t)4);
+  __e_acsl_store_block((void *)(t5),4UL);
   __e_acsl_full_init((void *)(& t5));
   {
     int __gen_e_acsl_size_15;
@@ -850,7 +850,7 @@ void __gen_e_acsl_g(long *ptr, size_t size)
     int __gen_e_acsl_le_2;
     unsigned long __gen_e_acsl_size_4;
     int __gen_e_acsl_valid;
-    __e_acsl_store_block((void *)(& ptr),(size_t)8);
+    __e_acsl_store_block((void *)(& ptr),8UL);
     __gen_e_acsl_at = ptr;
     __gmpz_init_set_ui(__gen_e_acsl_size,size);
     __gmpz_init_set(__gen_e_acsl_at_2,
@@ -1089,7 +1089,7 @@ void __gen_e_acsl_f(char *s, long n)
     int __gen_e_acsl_le_2;
     unsigned long __gen_e_acsl_size_2;
     int __gen_e_acsl_valid;
-    __e_acsl_store_block((void *)(& s),(size_t)8);
+    __e_acsl_store_block((void *)(& s),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"s",(void *)s);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"sizeof(char)",0,

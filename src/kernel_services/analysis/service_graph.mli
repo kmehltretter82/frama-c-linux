@@ -70,6 +70,7 @@ module Make
          include Graph.Sig.COMPARABLE
          val id: t -> int
          (** assume [id >= 0] and unique for each vertices of the graph *)
+
          val name: t -> string
          val attributes: t -> Graph.Graphviz.DotAttributes.vertex list
          val entry_point: unit -> t option

@@ -24,7 +24,7 @@
   Called from fun_ptr.i:78.
 [eva:alarm] fun_ptr.i:28: Warning: 
   pointer to function with incompatible type.
-  assert \valid_function((int (*)(int ))t[nd]);
+  assert \valid_function((fptr1)t[nd]);
 [eva] computing for function f <- test1 <- main.
   Called from fun_ptr.i:28.
 [eva] Recording results for f
@@ -35,7 +35,7 @@
   Called from fun_ptr.i:79.
 [eva:alarm] fun_ptr.i:33: Warning: 
   pointer to function with incompatible type.
-  assert \valid_function((int (*)(int , int ))t[nd]);
+  assert \valid_function((fptr2)t[nd]);
 [eva] computing for function g <- test2 <- main.
   Called from fun_ptr.i:33.
 [eva] Recording results for g
@@ -47,7 +47,7 @@
   Called from fun_ptr.i:80.
 [eva:alarm] fun_ptr.i:38: Warning: 
   pointer to function with incompatible type.
-  assert \valid_function((double (*)(int ))t[nd]);
+  assert \valid_function((fptr3)t[nd]);
 [eva] Recording results for test3
 [eva] Done for function test3
 [eva:alarm] fun_ptr.i:83: Warning: 

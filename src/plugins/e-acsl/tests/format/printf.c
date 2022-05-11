@@ -1,9 +1,15 @@
 /* run.config
    COMMENT: Check detection of format-string vulnerabilities via printf
+   DEPS: @PTEST_DEPS@ utils/signalled.h
    STDOPT: +"-eva-precision=1"
 */
 /* run.config_dev
    MACRO: ROOT_EACSL_GCC_OPTS_EXT @ROOT_EACSL_GCC_OPTS_EXT@ -e "-Wno-maybe-uninitialized"
+   COMMENT: This part is blank on purpose (test stability + Dune)
+
+
+
+
 */
 
 #include "utils/signalled.h"

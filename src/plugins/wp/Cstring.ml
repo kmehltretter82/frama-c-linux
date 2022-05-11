@@ -86,7 +86,7 @@ module LIT = WpContext.Generator(STR)
       let compile s =
         let id = lookup (STR.hash s) in
         let lfun = Lang.generated_f ~result:(Array(Int,Int)) "Lit_%04X" id in
-        (** Since its a generated it is the unique name given ["Lit_%04X" id] *)
+        (* Since its a generated it is the unique name given ["Lit_%04X" id] *)
         let prefix = Lang.Fun.debug lfun in
         define_symbol {
           d_lfun = lfun ;

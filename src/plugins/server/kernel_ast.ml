@@ -29,6 +29,36 @@ open Cil_types
 let package = Pkg.package ~title:"Ast Services" ~name:"ast" ~readme:"ast.md" ()
 
 (* -------------------------------------------------------------------------- *)
+(* --- Marker Cache System                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+let logic_environment () =
+  let open Logic_typing in
+  Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
+
+module Key = Datatype.Pair(Cil_datatype.Stmt)(Cil_datatype.Term)
+module Cache = Hashtbl.Make(Key)
+
+let get_term kf term =
+  let env = logic_environment () in
+  try Some (!Db.Properties.Interp.term ~env kf term)
+  with Logic_interp.Error _ | Parsing.Parse_error -> None
+
+let key_of_localizable =
+  let open Printer_tag in
+  function
+  | PStmt _ | PStmtStart _ | PTermLval _ | PVDecl _ | PGlobal _ | PIP _ -> None
+  | PLval (_, Kglobal, _) | PExp (_, Kglobal, _) -> None
+  | PLval (kf, Kstmt stmt, lval) ->
+    let str = Format.asprintf "%a" Cil_datatype.Lval.pretty lval in
+    Option.(bind kf (fun kf -> get_term kf str) |> map (fun t -> (stmt, t)))
+  | PExp (kf, Kstmt stmt, exp) ->
+    let str = Format.asprintf "%a" Cil_datatype.Exp.pretty exp in
+    Option.(bind kf (fun kf -> get_term kf str) |> map (fun t -> (stmt, t)))
+
+let cache = Cache.create 10
+
+(* -------------------------------------------------------------------------- *)
 (* --- Compute Ast                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -260,7 +290,7 @@ struct
     States.register_array
       ~package
       ~name:"markerInfo"
-      ~descr:(Md.plain "Marker informations")
+      ~descr:(Md.plain "Marker information")
       ~key:snd ~keyType:Jstring
       ~iter ~add_reload_hook:ast_update_hook
       model
@@ -276,6 +306,8 @@ struct
     | PIP _ -> Printf.sprintf "#p%d" (incr kid ; !kid)
 
   let create loc =
+    let add_cache key = Cache.add cache key loc in
+    key_of_localizable loc |> Option.iter add_cache;
     let { tags ; locs } = STATE.get () in
     try Localizable.Hashtbl.find tags loc
     with Not_found ->
@@ -543,10 +575,10 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Marker Informations                                                --- *)
+(* --- Marker Information                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Informations =
+module Information =
 struct
 
   type info = {
@@ -554,6 +586,7 @@ struct
     rank: int;
     label: string;
     title: string;
+    enable: unit -> bool;
     pretty: Format.formatter -> Printer_tag.localizable -> unit
   }
 
@@ -568,7 +601,7 @@ struct
         "title", Jstring ;
         "descr", Jtext.jtype ;
       ])
-    let of_json _ = failwith "Informations.Info"
+    let of_json _ = failwith "Information.Info"
     let to_json (info,text) = `Assoc [
         "id", `String info.id ;
         "label", `String info.label ;
@@ -595,28 +628,29 @@ struct
   let rank ({rank},_) = rank
   let by_rank a b = Stdlib.compare (rank a) (rank b)
 
-  let get_informations tgt =
+  let get_information tgt =
     let infos = ref [] in
     Hashtbl.iter
       (fun _ info ->
-         match tgt with
-         | None -> infos := (info, `Null) :: !infos
-         | Some marker ->
-           let text = jtext info.pretty marker in
-           if not (Jbuffer.is_empty text) then
-             infos := (info, text) :: !infos
+         if info.enable () then
+           match tgt with
+           | None -> infos := (info, `Null) :: !infos
+           | Some marker ->
+             let text = jtext info.pretty marker in
+             if not (Jbuffer.is_empty text) then
+               infos := (info, text) :: !infos
       ) registry ;
     List.sort by_rank !infos
 
   let signal = Request.signal ~package
-      ~name:"getInformationsUpdate"
-      ~descr:(Md.plain "Updated AST informations")
+      ~name:"getInformationUpdate"
+      ~descr:(Md.plain "Updated AST information")
 
   let update () = Request.emit signal
 
-  let register ~id ~label ~title pretty =
+  let register ~id ~label ~title ?(enable = fun _ -> true) pretty =
     let rank = incr rankId ; !rankId in
-    let info = { id ; rank ; label ; title ; pretty } in
+    let info = { id ; rank ; label ; title ; enable ; pretty } in
     if Hashtbl.mem registry id then
       ( let msg = Format.sprintf
             "Server.Kernel_ast.register_info: duplicate %S" id in
@@ -626,24 +660,33 @@ struct
 end
 
 let () = Request.register ~package
-    ~kind:`GET ~name:"getInformations"
+    ~kind:`GET ~name:"getInformation"
     ~descr:(Md.plain
-              "Get available informations about markers. \
+              "Get available information about markers. \
                When no marker is given, returns all kinds \
-               of informations (with empty `descr` field).")
+               of information (with empty `descr` field).")
     ~input:(module Joption(Marker))
-    ~output:(module Jlist(Informations.S))
-    ~signals:[Informations.signal]
-    Informations.get_informations
+    ~output:(module Jlist(Information.S))
+    ~signals:[Information.signal]
+    Information.get_information
 
 (* -------------------------------------------------------------------------- *)
-(* --- Default Kernel Informations                                        --- *)
+(* --- Default Kernel Information                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let () = Informations.register
+let () = Information.register
+    ~id:"kernel.ast.location"
+    ~label:"Location"
+    ~title:"Source file location"
+    begin fun fmt loc ->
+      let location = Printer_tag.loc_of_localizable loc in
+      Filepath.pp_pos fmt (fst location)
+    end
+
+let () = Information.register
     ~id:"kernel.ast.varinfo"
     ~label:"Var"
-    ~title:"Variable Informations"
+    ~title:"Variable Information"
     begin fun fmt loc ->
       match loc with
       | PLval (_ , _, (Var x,NoOffset)) | PVDecl(_,_,x) ->
@@ -664,7 +707,7 @@ let () = Informations.register
       | _ -> raise Not_found
     end
 
-let () = Informations.register
+let () = Information.register
     ~id:"kernel.ast.typeinfo"
     ~label:"Type"
     ~title:"Type of C/ASCL expression"
@@ -674,6 +717,7 @@ let () = Informations.register
       | PExp (_, _, e) -> pp_typ fmt (Cil.typeOf e)
       | PLval (_, _, lval) -> pp_typ fmt (Cil.typeOfLval lval)
       | PTermLval(_,_,_,lv) -> pp_logic_type fmt (Cil.typeOfTermLval lv)
+      | PVDecl (_,_,vi) -> pp_typ fmt vi.vtype
       | _ -> raise Not_found
     end
 
@@ -734,3 +778,66 @@ let () =
     set_files
 
 (* -------------------------------------------------------------------------- *)
+(* ----- Build a marker from an ACSL term ----------------------------------- *)
+(* -------------------------------------------------------------------------- *)
+
+type marker_term_input = { atStmt : stmt ; term : string }
+
+module MarkerTermInput = struct
+  type record
+  let record : record Record.signature = Record.signature ()
+
+  let atStmt =
+    let descr = "The statement at which we will build the marker." in
+    Record.field record ~name:"atStmt" ~descr:(Markdown.plain descr)
+      (module Marker)
+
+  let term =
+    let descr = "The ACSL term." in
+    Record.field record ~name:"term" ~descr:(Markdown.plain descr)
+      (module Data.Jstring)
+
+  let data =
+    Record.publish record ~package ~name:"markerFromTermInput"
+      ~descr:(Markdown.plain "<markerFromTerm> input")
+
+  module R : Record.S with type r = record = (val data)
+  type t = marker_term_input option
+  let jtype = R.jtype
+
+  let of_json js =
+    let record = R.of_json js in
+    match R.get atStmt record with
+    | PStmt (_, s) | PStmtStart (_, s)
+    | PLval (_, Kstmt s, _) | PExp (_, Kstmt s, _)
+    | PTermLval (_, Kstmt s, _, _)
+    | PVDecl (_, Kstmt s, _) ->
+      let term = R.get term record in
+      Some { atStmt = s ; term }
+    | _ -> None
+
+end
+
+module MarkerTermOutput = Data.Joption (Marker)
+
+let build_marker =
+  Option.map @@ fun input ->
+  let env = logic_environment () in
+  let kf = Kernel_function.find_englobing_kf input.atStmt in
+  let term = !Db.Properties.Interp.term ~env kf input.term in
+  let key = (input.atStmt, term) in
+  match Cache.find_opt cache key with
+  | Some tag -> tag
+  | None ->
+    let exp = !Db.Properties.Interp.term_to_exp ~result:None term in
+    let tag = Printer_tag.PExp (Some kf, Kstmt input.atStmt, exp) in
+    Cache.add cache key tag ; tag
+
+let descr = "Build a marker from an ACSL term."
+
+let () = Request.register ~package
+    ~kind:`GET ~name:"markerFromTerm" ~descr:(Markdown.plain descr)
+    ~input:(module MarkerTermInput) ~output:(module MarkerTermOutput)
+    build_marker
+
+(**************************************************************************)

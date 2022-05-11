@@ -28,14 +28,16 @@ module type Results = sig
   type value
   type location
 
-  val get_global_state: unit -> state or_bottom
-  val get_stmt_state : after:bool -> stmt -> state or_bottom
+  val get_global_state: unit -> state or_top_bottom
+  val get_stmt_state : after:bool -> stmt -> state or_top_bottom
   val get_stmt_state_by_callstack:
-    after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
+    ?selection:callstack list ->
+    after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_bottom
   val get_initial_state:
-    kernel_function -> state or_bottom
+    kernel_function -> state or_top_bottom
   val get_initial_state_by_callstack:
-    kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_or_bottom
+    ?selection:callstack list ->
+    kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_bottom
 
   val eval_expr : state -> exp -> value evaluated
   val copy_lvalue: state -> lval -> value flagged_value evaluated
@@ -72,19 +74,6 @@ val register_hook: ((module S) -> unit) -> unit
     is changed. This happens when a new analysis is run with different
     abstractions than before, or when the current project is changed. *)
 
-type computation_state = NotComputed | Computing | Computed | Aborted
-(** Computation state of the analysis. *)
-
-val current_computation_state : unit -> computation_state
-(** Get the current computation state of the analysis, updated by
-    [force_compute] and states updates. *)
-
-val register_computation_hook: ?on:computation_state ->
-  (computation_state -> unit) -> unit
-(** Registers a hook that will be called each time the analysis starts or
-    finishes. If [on] is given, the hook will only be called when the
-    analysis switches to this specific state. *)
-
 val force_compute : unit -> unit
 (** Perform a full analysis, starting from the [main] function. *)
 
@@ -103,6 +92,62 @@ val is_computed : unit -> bool
 
 val self : State.t
 (** Internal state of Eva analysis from projects viewpoint. *)
+
+type computation_state = NotComputed | Computing | Computed | Aborted
+(** Computation state of the analysis. *)
+
+val current_computation_state : unit -> computation_state
+(** Get the current computation state of the analysis, updated by
+    [force_compute] and states updates. *)
+
+val register_computation_hook: ?on:computation_state ->
+  (computation_state -> unit) -> unit
+(** Registers a hook that will be called each time the analysis starts or
+    finishes. If [on] is given, the hook will only be called when the
+    analysis switches to this specific state. *)
+
+(** Kind of results for the analysis of a function body. *)
+type results =
+  | Complete
+  (** The results are complete: they cover all possible call contexts of the
+      given function. *)
+  | Partial
+  (** The results are partial, as the functions has not been analyzed in all
+      possible call contexts. This happens for recursive functions that are
+      not completely unrolled, or if the analysis has stopped unexpectedly. *)
+  | NoResults
+  (** No results were saved for the function, due to option -eva-no-results.
+      Any request at a statement of this function will lead to a Top result. *)
+
+(* Analysis status of a function. *)
+type status =
+  | Unreachable
+  (** The function has not been reached by the analysis. Any request in this
+      function will lead to a Bottom result. *)
+  | SpecUsed
+  (** The function specification has been used to interpret its calls:
+      its body has not been analyzed. Any request at a statement of this
+      function will lead to a Bottom result. *)
+  | Builtin of string
+  (** The builtin of the given name has been used to interpret the function:
+      its body has not been analyzed. Any request at a statement of this
+      function will lead to a Bottom result. *)
+  | Analyzed of results
+  (** The function body has been analyzed. *)
+
+(** Returns the analysis status of a given function. *)
+val status: Cil_types.kernel_function -> status
+
+(** Does the analysis ignores the body of a given function, and uses instead
+    its specification or a builtin to interpret it?
+    Please use {!Eva.Results.are_available} instead to known whether results
+    are available for a given function. *)
+val use_spec_instead_of_definition: Cil_types.kernel_function -> bool
+
+(** Returns [true] if the user has requested that no results should be recorded
+    for the given function. Please use {!Eva.Results.are_available} instead
+    to known whether results are available for a given function. *)
+val save_results: Cil_types.kernel_function -> bool
 [@@@ api_end]
 
 val cvalue_initial_state: unit -> Cvalue.Model.t

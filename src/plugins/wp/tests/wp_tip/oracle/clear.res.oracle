@@ -51,7 +51,7 @@
   typed_clear_in_step_check subgoal:
   
   Goal Wp.Tactical.typed_clear_in_step_check-0 (generated):
-  Assume { (* Filtered *) Have: P_Q /\ P_R. }
+  Assume { (* Filtered: 'P_P(...)' *) Have: P_Q /\ P_R. }
   Prove: P_S(42).
   
   ------------------------------------------------------------
@@ -77,7 +77,7 @@
   typed_clear_in_step_check subgoal:
   
   Goal Wp.Tactical.typed_clear_in_step_check-1 (generated):
-  Assume { (* Filtered *) Have: P_R. }
+  Assume { (* Filtered: 'P_Q(...)' *) Have: P_R. }
   Prove: P_S(42).
   
   ------------------------------------------------------------

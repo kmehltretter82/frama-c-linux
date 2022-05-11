@@ -12,14 +12,14 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   {
     int a;
     int b;
     int c;
-    __e_acsl_store_block((void *)(& c),(size_t)4);
-    __e_acsl_store_block((void *)(& b),(size_t)4);
-    __e_acsl_store_block((void *)(& a),(size_t)4);
+    __e_acsl_store_block((void *)(& c),4UL);
+    __e_acsl_store_block((void *)(& b),4UL);
+    __e_acsl_store_block((void *)(& a),4UL);
     __e_acsl_full_init((void *)(& c));
     c = 0;
     __e_acsl_full_init((void *)(& b));
@@ -27,7 +27,7 @@ int main(void)
     __e_acsl_full_init((void *)(& a));
     a = b;
     int *d = & a;
-    __e_acsl_store_block((void *)(& d),(size_t)8);
+    __e_acsl_store_block((void *)(& d),8UL);
     __e_acsl_full_init((void *)(& d));
     {
       int __gen_e_acsl_valid_read;
@@ -104,8 +104,8 @@ int main(void)
                                    (void *)(& c));
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(int)",0,sizeof(int));
-      __gen_e_acsl_separated = __e_acsl_separated((size_t)3,& a,sizeof(int),
-                                                  & b,sizeof(int),& c,
+      __gen_e_acsl_separated = __e_acsl_separated(3UL,& a,sizeof(int),& b,
+                                                  sizeof(int),& c,
                                                   sizeof(int));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                    "\\separated(&a, &b, &c)",0,
@@ -232,8 +232,7 @@ int main(void)
                                    (void *)d);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
                                      "sizeof(int)",0,sizeof(int));
-      __gen_e_acsl_separated_2 = __e_acsl_separated((size_t)4,& a,
-                                                    sizeof(int),& b,
+      __gen_e_acsl_separated_2 = __e_acsl_separated(4UL,& a,sizeof(int),& b,
                                                     sizeof(int),& c,
                                                     sizeof(int),d,
                                                     sizeof(int));
@@ -258,7 +257,7 @@ int main(void)
   }
   {
     double array[20] = {(double)0};
-    __e_acsl_store_block((void *)(array),(size_t)160);
+    __e_acsl_store_block((void *)(array),160UL);
     __e_acsl_full_init((void *)(& array));
     {
       int __gen_e_acsl_size;
@@ -368,7 +367,7 @@ int main(void)
                                      __gen_e_acsl_size_4);
         __gen_e_acsl_if_4 = __gen_e_acsl_size_4;
       }
-      __gen_e_acsl_separated_3 = __e_acsl_separated((size_t)2,
+      __gen_e_acsl_separated_3 = __e_acsl_separated(2UL,
                                                     (char *)(array) + 8 * 0,
                                                     __gen_e_acsl_if_3,
                                                     (char *)(array) + 8 * 10,
@@ -494,7 +493,7 @@ int main(void)
                                      __gen_e_acsl_size_8);
         __gen_e_acsl_if_8 = __gen_e_acsl_size_8;
       }
-      __gen_e_acsl_separated_4 = __e_acsl_separated((size_t)2,
+      __gen_e_acsl_separated_4 = __e_acsl_separated(2UL,
                                                     (char *)(array) + 8 * 0,
                                                     __gen_e_acsl_if_7,
                                                     (char *)(array) + 8 * 5,
@@ -621,7 +620,7 @@ int main(void)
                                      __gen_e_acsl_size_12);
         __gen_e_acsl_if_12 = __gen_e_acsl_size_12;
       }
-      __gen_e_acsl_separated_5 = __e_acsl_separated((size_t)2,
+      __gen_e_acsl_separated_5 = __e_acsl_separated(2UL,
                                                     (char *)(array) + 8 * 0,
                                                     __gen_e_acsl_if_11,
                                                     (char *)(array) + 8 * 5,
@@ -694,8 +693,7 @@ int main(void)
                                    (void *)(& array[1]));
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_19,
                                      "sizeof(double)",0,sizeof(double));
-      __gen_e_acsl_separated_6 = __e_acsl_separated((size_t)2,array,
-                                                    sizeof(double),
+      __gen_e_acsl_separated_6 = __e_acsl_separated(2UL,array,sizeof(double),
                                                     & array[1],
                                                     sizeof(double));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,
@@ -819,7 +817,7 @@ int main(void)
                                      __gen_e_acsl_size_16);
         __gen_e_acsl_if_16 = __gen_e_acsl_size_16;
       }
-      __gen_e_acsl_separated_7 = __e_acsl_separated((size_t)2,
+      __gen_e_acsl_separated_7 = __e_acsl_separated(2UL,
                                                     (char *)(array) + 8 * 0,
                                                     __gen_e_acsl_if_15,
                                                     (char *)(array) + 8 * 1,
@@ -946,7 +944,7 @@ int main(void)
                                      __gen_e_acsl_size_20);
         __gen_e_acsl_if_20 = __gen_e_acsl_size_20;
       }
-      __gen_e_acsl_separated_8 = __e_acsl_separated((size_t)2,
+      __gen_e_acsl_separated_8 = __e_acsl_separated(2UL,
                                                     (char *)(array) + 8 * 15,
                                                     __gen_e_acsl_if_19,
                                                     (char *)(array) + 8 * 0,
@@ -1072,7 +1070,7 @@ int main(void)
                                      __gen_e_acsl_size_24);
         __gen_e_acsl_if_24 = __gen_e_acsl_size_24;
       }
-      __gen_e_acsl_separated_9 = __e_acsl_separated((size_t)2,
+      __gen_e_acsl_separated_9 = __e_acsl_separated(2UL,
                                                     (char *)(array) + 8 * 0,
                                                     __gen_e_acsl_if_23,
                                                     (char *)(array) + 8 * 0,
@@ -1094,13 +1092,13 @@ int main(void)
   }
   {
     int *a_0 = malloc(sizeof(int));
-    __e_acsl_store_block((void *)(& a_0),(size_t)8);
+    __e_acsl_store_block((void *)(& a_0),8UL);
     __e_acsl_full_init((void *)(& a_0));
     int *b_0 = malloc(sizeof(int));
-    __e_acsl_store_block((void *)(& b_0),(size_t)8);
+    __e_acsl_store_block((void *)(& b_0),8UL);
     __e_acsl_full_init((void *)(& b_0));
     int *c_0 = a_0;
-    __e_acsl_store_block((void *)(& c_0),(size_t)8);
+    __e_acsl_store_block((void *)(& c_0),8UL);
     __e_acsl_full_init((void *)(& c_0));
     {
       int __gen_e_acsl_initialized_2;
@@ -1178,8 +1176,7 @@ int main(void)
                                    (void *)b_0);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_31,
                                      "sizeof(int)",0,sizeof(int));
-      __gen_e_acsl_separated_10 = __e_acsl_separated((size_t)2,a_0,
-                                                     sizeof(int),b_0,
+      __gen_e_acsl_separated_10 = __e_acsl_separated(2UL,a_0,sizeof(int),b_0,
                                                      sizeof(int));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_31,
                                    "\\separated(a_0, b_0)",0,
@@ -1307,8 +1304,7 @@ int main(void)
                                    (void *)c_0);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_34,
                                      "sizeof(int)",0,sizeof(int));
-      __gen_e_acsl_separated_11 = __e_acsl_separated((size_t)3,a_0,
-                                                     sizeof(int),b_0,
+      __gen_e_acsl_separated_11 = __e_acsl_separated(3UL,a_0,sizeof(int),b_0,
                                                      sizeof(int),c_0,
                                                      sizeof(int));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_34,
@@ -1333,7 +1329,7 @@ int main(void)
   }
   {
     double *array_0 = malloc(sizeof(double [20]));
-    __e_acsl_store_block((void *)(& array_0),(size_t)8);
+    __e_acsl_store_block((void *)(& array_0),8UL);
     __e_acsl_full_init((void *)(& array_0));
     {
       int __gen_e_acsl_size_25;
@@ -1443,7 +1439,7 @@ int main(void)
                                      __gen_e_acsl_size_28);
         __gen_e_acsl_if_28 = __gen_e_acsl_size_28;
       }
-      __gen_e_acsl_separated_12 = __e_acsl_separated((size_t)2,
+      __gen_e_acsl_separated_12 = __e_acsl_separated(2UL,
                                                      (char *)array_0 + 8 * 0,
                                                      __gen_e_acsl_if_27,
                                                      (char *)array_0 + 8 * 10,
@@ -1570,7 +1566,7 @@ int main(void)
                                      __gen_e_acsl_size_32);
         __gen_e_acsl_if_32 = __gen_e_acsl_size_32;
       }
-      __gen_e_acsl_separated_13 = __e_acsl_separated((size_t)2,
+      __gen_e_acsl_separated_13 = __e_acsl_separated(2UL,
                                                      (char *)array_0 + 8 * 0,
                                                      __gen_e_acsl_if_31,
                                                      (char *)array_0 + 8 * 5,
@@ -1697,7 +1693,7 @@ int main(void)
                                      __gen_e_acsl_size_36);
         __gen_e_acsl_if_36 = __gen_e_acsl_size_36;
       }
-      __gen_e_acsl_separated_14 = __e_acsl_separated((size_t)2,
+      __gen_e_acsl_separated_14 = __e_acsl_separated(2UL,
                                                      (char *)array_0 + 8 * 0,
                                                      __gen_e_acsl_if_35,
                                                      (char *)array_0 + 8 * 5,
@@ -1770,7 +1766,7 @@ int main(void)
                                    (void *)array_0);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_47,
                                      "sizeof(double)",0,sizeof(double));
-      __gen_e_acsl_separated_15 = __e_acsl_separated((size_t)2,array_0 + 0,
+      __gen_e_acsl_separated_15 = __e_acsl_separated(2UL,array_0 + 0,
                                                      sizeof(double),
                                                      array_0 + 1,
                                                      sizeof(double));
@@ -1896,7 +1892,7 @@ int main(void)
                                      __gen_e_acsl_size_40);
         __gen_e_acsl_if_40 = __gen_e_acsl_size_40;
       }
-      __gen_e_acsl_separated_16 = __e_acsl_separated((size_t)2,
+      __gen_e_acsl_separated_16 = __e_acsl_separated(2UL,
                                                      (char *)array_0 + 8 * 0,
                                                      __gen_e_acsl_if_39,
                                                      (char *)array_0 + 8 * 1,
@@ -2023,7 +2019,7 @@ int main(void)
                                      __gen_e_acsl_size_44);
         __gen_e_acsl_if_44 = __gen_e_acsl_size_44;
       }
-      __gen_e_acsl_separated_17 = __e_acsl_separated((size_t)2,
+      __gen_e_acsl_separated_17 = __e_acsl_separated(2UL,
                                                      (char *)array_0 + 8 * 15,
                                                      __gen_e_acsl_if_43,
                                                      (char *)array_0 + 8 * 0,
@@ -2150,7 +2146,7 @@ int main(void)
                                      __gen_e_acsl_size_48);
         __gen_e_acsl_if_48 = __gen_e_acsl_size_48;
       }
-      __gen_e_acsl_separated_18 = __e_acsl_separated((size_t)2,
+      __gen_e_acsl_separated_18 = __e_acsl_separated(2UL,
                                                      (char *)array_0 + 8 * 0,
                                                      __gen_e_acsl_if_47,
                                                      (char *)array_0 + 8 * 0,
@@ -2174,7 +2170,7 @@ int main(void)
   }
   {
     double array_1[10][10][10] = {{{(double)0}}};
-    __e_acsl_store_block((void *)(array_1),(size_t)8000);
+    __e_acsl_store_block((void *)(array_1),8000UL);
     __e_acsl_full_init((void *)(& array_1));
     {
       int __gen_e_acsl_forall;
@@ -2363,7 +2359,7 @@ int main(void)
                   __e_acsl_assert(__gen_e_acsl_valid_read_46,
                                   & __gen_e_acsl_assert_data_65);
                   __e_acsl_assert_clean(& __gen_e_acsl_assert_data_65);
-                  __gen_e_acsl_separated_19 = __e_acsl_separated((size_t)3,
+                  __gen_e_acsl_separated_19 = __e_acsl_separated(3UL,
                                                                  & array_1[0][__gen_e_acsl_range_6][0],
                                                                  sizeof(double),
                                                                  & array_1[0][__gen_e_acsl_range_5][0],
@@ -2606,7 +2602,7 @@ int main(void)
                   __e_acsl_assert(__gen_e_acsl_valid_read_52,
                                   & __gen_e_acsl_assert_data_72);
                   __e_acsl_assert_clean(& __gen_e_acsl_assert_data_72);
-                  __gen_e_acsl_separated_20 = __e_acsl_separated((size_t)3,
+                  __gen_e_acsl_separated_20 = __e_acsl_separated(3UL,
                                                                  & array_1[0][__gen_e_acsl_range_12][0],
                                                                  sizeof(double),
                                                                  & array_1[1][__gen_e_acsl_range_11][0],
@@ -2832,7 +2828,7 @@ int main(void)
                       __e_acsl_assert(__gen_e_acsl_valid_read_56,
                                       & __gen_e_acsl_assert_data_77);
                       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_77);
-                      __gen_e_acsl_separated_21 = __e_acsl_separated((size_t)2,
+                      __gen_e_acsl_separated_21 = __e_acsl_separated(2UL,
                                                                     & array_1[__gen_e_acsl_range_19][__gen_e_acsl_range_20][0],
                                                                     sizeof(double),
                                                                     & array_1[__gen_e_acsl_range_17][__gen_e_acsl_range_18][0],
@@ -3062,7 +3058,7 @@ int main(void)
                       __e_acsl_assert(__gen_e_acsl_valid_read_60,
                                       & __gen_e_acsl_assert_data_82);
                       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_82);
-                      __gen_e_acsl_separated_22 = __e_acsl_separated((size_t)2,
+                      __gen_e_acsl_separated_22 = __e_acsl_separated(2UL,
                                                                     & array_1[__gen_e_acsl_range_27][__gen_e_acsl_range_28][0],
                                                                     sizeof(double),
                                                                     & array_1[__gen_e_acsl_range_25][__gen_e_acsl_range_26][0],

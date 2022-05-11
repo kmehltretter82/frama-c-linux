@@ -56,24 +56,30 @@ val is_int: t -> bool
 
 val add_int : t -> t -> t
 (** Addition of two integer (ie. not [Float]) ivals. *)
+
 val add_int_under : t -> t -> t
 (** Underapproximation of the same operation *)
+
 val add_singleton_int: Integer.t -> t -> t
 (** Addition of an integer ival with an integer. Exact operation. *)
 
 val neg_int : t -> t
 (** Negation of an integer ival. Exact operation. *)
+
 val abs_int: t -> t
 (** Absolute value of an integer. *)
+
 val sub_int : t -> t -> t
 val sub_int_under: t -> t -> t
 
 val min_int : t -> Integer.t option
 (** A [None] result means the argument is unbounded.
     Raises [Error_Bottom] if the argument is bottom. *)
+
 val max_int : t -> Integer.t option
 (** A [None] result means the argument is unbounded.
     Raises [Error_Bottom] if the argument is bottom. *)
+
 val min_max_r_mod :
   t -> Integer.t option * Integer.t option * Integer.t * Integer.t
 
@@ -101,8 +107,10 @@ val bitwise_not: size:int -> signed:bool -> t -> t
 
 val zero : t
 (** The lattice element that contains only the integer 0. *)
+
 val one : t
 (** The lattice element that contains only the integer 1. *)
+
 val minus_one : t
 (** The lattice element that contains only the integer -1. *)
 
@@ -123,6 +131,7 @@ val is_one : t -> bool
 
 val contains_zero : t -> bool
 (** contains the zero value (including -0. for floating-point ranges) *)
+
 val contains_non_zero : t -> bool
 
 val top_float : t
@@ -240,6 +249,7 @@ val scale_div_under : pos:bool -> Integer.t -> t -> t
     set of elements [x e_div f] for [x] in [v]. *)
 
 val div : t -> t -> t (** Integer division *)
+
 val scale_rem : pos:bool -> Integer.t -> t -> t
 (** [scale_rem ~pos:false f v] is an over-approximation of the set of
     elements [x c_rem f] for [x] in [v].
@@ -262,7 +272,7 @@ val create_all_values: signed:bool -> size:int -> t
     representable in [size] bits. *)
 val all_values: size:Integer.t -> t -> bool
 
-val backward_mult_int_left: right:t -> result:t -> t option Bottom.or_bottom
+val backward_mult_int_left: right:t -> result:t -> t option Lattice_bounds.or_bottom
 
 val backward_comp_int_left : Comp.t -> t -> t -> t
 (** [backward_comp_int op l r] reduces [l] into [l'] so that
@@ -296,6 +306,7 @@ val cast_float_to_float : Fval.kind -> t -> t
 
 val cast_float_to_int_inverse:
   single_precision:bool -> t (** integer *) -> t (** floating-point *)
+
 val cast_int_to_float_inverse:
   single_precision:bool -> t (** floating-point *) -> t (** integer *)
 
@@ -308,7 +319,7 @@ val reinterpret_as_int: size:Integer.t -> signed:bool -> t -> t
 (** Bitwise reinterpretation of the given value, of size [size], as an integer
     of the given signedness (and size). *)
 
-val complement_int_under: size:int -> signed:bool -> t -> t Bottom.or_bottom
+val complement_int_under: size:int -> signed:bool -> t -> t Lattice_bounds.or_bottom
 (** Returns an under-approximation of the integers of the given size and
     signedness that are *not* represented by the given ival. *)
 

@@ -5,10 +5,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] computing for function scanf <- main.
-  Called from unravel-variance.i:31.
 [kernel:annot:missing-spec] unravel-variance.i:31: Warning: 
   Neither code nor specification for function scanf, generating default assigns from the prototype
+[eva] computing for function scanf <- main.
+  Called from unravel-variance.i:31.
 [eva] using specification for function scanf
 [eva] Done for function scanf
 [eva:alarm] unravel-variance.i:32: Warning: 
@@ -122,10 +122,10 @@
 [eva:alarm] unravel-variance.i:52: Warning: 
   overflow in conversion from floating-point to integer.
   assert var2 < 2147483648;
-[eva] computing for function printf1 <- main.
-  Called from unravel-variance.i:52.
 [kernel:annot:missing-spec] unravel-variance.i:52: Warning: 
   Neither code nor specification for function printf1, generating default assigns from the prototype
+[eva] computing for function printf1 <- main.
+  Called from unravel-variance.i:52.
 [eva] using specification for function printf1
 [eva] Done for function printf1
 [eva:alarm] unravel-variance.i:53: Warning: 
@@ -134,10 +134,10 @@
 [eva:alarm] unravel-variance.i:53: Warning: 
   overflow in conversion from floating-point to integer.
   assert var3 < 2147483648;
-[eva] computing for function printf2 <- main.
-  Called from unravel-variance.i:53.
 [kernel:annot:missing-spec] unravel-variance.i:53: Warning: 
   Neither code nor specification for function printf2, generating default assigns from the prototype
+[eva] computing for function printf2 <- main.
+  Called from unravel-variance.i:53.
 [eva] using specification for function printf2
 [eva] Done for function printf2
 [eva:alarm] unravel-variance.i:54: Warning: 
@@ -146,10 +146,10 @@
 [eva:alarm] unravel-variance.i:54: Warning: 
   overflow in conversion from floating-point to integer.
   assert var4 < 2147483648;
-[eva] computing for function printf3 <- main.
-  Called from unravel-variance.i:54.
 [kernel:annot:missing-spec] unravel-variance.i:54: Warning: 
   Neither code nor specification for function printf3, generating default assigns from the prototype
+[eva] computing for function printf3 <- main.
+  Called from unravel-variance.i:54.
 [eva] using specification for function printf3
 [eva] Done for function printf3
 [eva:alarm] unravel-variance.i:55: Warning: 
@@ -158,10 +158,10 @@
 [eva:alarm] unravel-variance.i:55: Warning: 
   overflow in conversion from floating-point to integer.
   assert var5 < 2147483648;
-[eva] computing for function printf4 <- main.
-  Called from unravel-variance.i:55.
 [kernel:annot:missing-spec] unravel-variance.i:55: Warning: 
   Neither code nor specification for function printf4, generating default assigns from the prototype
+[eva] computing for function printf4 <- main.
+  Called from unravel-variance.i:55.
 [eva] using specification for function printf4
 [eva] Done for function printf4
 [eva:alarm] unravel-variance.i:56: Warning: 
@@ -170,10 +170,10 @@
 [eva:alarm] unravel-variance.i:56: Warning: 
   overflow in conversion from floating-point to integer.
   assert var1 < 2147483648;
-[eva] computing for function printf5 <- main.
-  Called from unravel-variance.i:56.
 [kernel:annot:missing-spec] unravel-variance.i:56: Warning: 
   Neither code nor specification for function printf5, generating default assigns from the prototype
+[eva] computing for function printf5 <- main.
+  Called from unravel-variance.i:56.
 [eva] using specification for function printf5
 [eva] Done for function printf5
 [eva] Recording results for main

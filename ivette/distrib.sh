@@ -46,10 +46,23 @@ Distribute() {
     fi
 }
 
+## Distribute Core Ivette Files
+
 Distribute .
+
+## Distribute Ivette Plugins Files
+
 rm -f Makefile.plugins
 for rgit in $(find src -type d -name ".git")
 do
     Distribute $(dirname $rgit)
 done
-chmod -f a-w Makefile.plugins
+if [ -f Makefile.plugins ]
+then
+    chmod a-w Makefile.plugins
+fi
+
+## Terminated.
+exit 0
+
+# --------------------------------------------------------------------------

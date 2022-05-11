@@ -151,8 +151,8 @@ void g(int *p, int *q)
   int __gen_e_acsl_at_3;
   int __gen_e_acsl_at_2;
   int __gen_e_acsl_at;
-  __e_acsl_store_block((void *)(& q),(size_t)8);
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& q),8UL);
+  __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_initialize((void *)p,sizeof(int));
   *p = 0;
   __e_acsl_initialize((void *)(p + 1),sizeof(int));
@@ -310,7 +310,7 @@ int __gen_e_acsl_h(int x);
 
 int h(int x)
 {
-  __e_acsl_store_block((void *)(& x),(size_t)4);
+  __e_acsl_store_block((void *)(& x),4UL);
   __e_acsl_delete_block((void *)(& x));
   return x;
 }
@@ -367,9 +367,9 @@ int main(void)
   int __retres;
   int x;
   int t[2];
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
-  __e_acsl_store_block((void *)(t),(size_t)8);
-  __e_acsl_store_block((void *)(& x),(size_t)4);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(t),8UL);
+  __e_acsl_store_block((void *)(& x),4UL);
   __e_acsl_full_init((void *)(& x));
   x = __gen_e_acsl_h(0);
   L:
@@ -453,8 +453,8 @@ int __gen_e_acsl_h(int x)
 {
   int __gen_e_acsl_at;
   int __retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)4);
-  __e_acsl_store_block((void *)(& x),(size_t)4);
+  __e_acsl_store_block((void *)(& __retres),4UL);
+  __e_acsl_store_block((void *)(& x),4UL);
   __gen_e_acsl_at = x;
   __retres = h(x);
   {

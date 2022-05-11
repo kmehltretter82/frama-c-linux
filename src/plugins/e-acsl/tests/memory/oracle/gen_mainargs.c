@@ -27,7 +27,7 @@ int __gen_e_acsl_main(int argc, char **argv)
   {
     int __gen_e_acsl_forall;
     long __gen_e_acsl_k;
-    __e_acsl_store_block((void *)(& argv),(size_t)8);
+    __e_acsl_store_block((void *)(& argv),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_forall = 1;
     __gen_e_acsl_k = 0;
@@ -339,7 +339,7 @@ int __gen_e_acsl_main(int argc, char **argv)
 int main(int argc, char **argv)
 {
   int __retres;
-  __e_acsl_memory_init(& argc,& argv,(size_t)8);
+  __e_acsl_memory_init(& argc,& argv,8UL);
   {
     int __gen_e_acsl_valid;
     int __gen_e_acsl_valid_2;
@@ -393,7 +393,7 @@ int main(int argc, char **argv)
 size_t __gen_e_acsl_strlen(char const *s)
 {
   size_t __retres;
-  __e_acsl_store_block((void *)(& s),(size_t)8);
+  __e_acsl_store_block((void *)(& s),8UL);
   __retres = strlen(s);
   __e_acsl_delete_block((void *)(& s));
   return __retres;

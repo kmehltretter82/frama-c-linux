@@ -89,13 +89,17 @@ module type Lattice = sig
 
   val top: state
   (** Greatest element. *)
+
   val is_included: state -> state -> bool
   (** Inclusion test. *)
+
   val join: state -> state -> state
   (** Semi-lattice structure. *)
+
   val widen: kernel_function -> stmt -> state -> state -> state
   (** [widen h t1 t2] is an over-approximation of [join t1 t2].
       Assumes [is_included t1 t2] *)
+
   val narrow: state -> state -> state or_bottom
   (** Over-approximation of the intersection of two abstract states (called meet
       in the literature). Used only to gain some precision when interpreting the
@@ -120,9 +124,14 @@ type evaluation_context = {
     Used in the evaluation of expressions and lvalues. *)
 module type Queries = sig
 
-  type state     (** Domain state. *)
-  type value     (** Numerical values to which the expressions are evaluated. *)
-  type location  (** Abstract memory locations associated to left values. *)
+  (** Domain state. *)
+  type state
+
+  (** Numerical values to which the expressions are evaluated. *)
+  type value
+
+  (** Abstract memory locations associated to left values. *)
+  type location
 
   (** The [origin] is used by the domain combiners to track the origin
        of a value. An abstract domain can always use a dummy type unit for
@@ -293,12 +302,12 @@ end
 
 (** Environment for the logical evaluation of predicates. *)
 type 'state logic_environment = {
+  states: logic_label -> 'state;
   (** The logic can refer to the states at other points of the program using
       labels. [states] associates a state (which can be top) to each label. *)
-  states: logic_label -> 'state;
+  result: varinfo option;
   (** [result] contains the variable corresponding to \result. It is None when
       \result is meaningless. *)
-  result: varinfo option;
 }
 
 type variable_kind =

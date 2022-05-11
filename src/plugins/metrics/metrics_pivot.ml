@@ -29,7 +29,7 @@ module PivotSourceState =
     (Datatype.List(Datatype.String))
     (struct
       let name = "PivotSourceState"
-      let dependencies = [ Ast.self; Db.Value.self; Property_status.self;
+      let dependencies = [ Ast.self; Eva.Analysis.self; Property_status.self;
                            Messages.self ]
     end)
 
@@ -314,17 +314,17 @@ class full_visitor = object(self)
   method add_annot ?names node =
     self#add ~node ?names (Syntax Annotation)
 
-  method! vvrbl (_v:varinfo) = DoChildren
-  method! vvdec (_v:varinfo) = DoChildren
-  method! vexpr (_e:exp) = DoChildren
-  method! vlval (_l:lval) = DoChildren
-  method! voffs (_o:offset) = DoChildren
-  method! vinitoffs (_o:offset) = DoChildren
+  method! vvrbl (_v:varinfo) = Cil.DoChildren
+  method! vvdec (_v:varinfo) = Cil.DoChildren
+  method! vexpr (_e:exp) = Cil.DoChildren
+  method! vlval (_l:lval) = Cil.DoChildren
+  method! voffs (_o:offset) = Cil.DoChildren
+  method! vinitoffs (_o:offset) = Cil.DoChildren
 
   method! vinst (i:instr) =
     let node = node_of_instr i in
     self#add_code node;
-    DoChildren
+    Cil.DoChildren
 
   method! vstmt (s:stmt) =
     begin
@@ -332,7 +332,7 @@ class full_visitor = object(self)
       | None -> ()
       | Some node -> self#add_code node
     end;
-    DoChildren
+    Cil.DoChildren
 
   method! vfunc (f:fundec) =
     cur_func <- Some f.svar.vname;
@@ -349,52 +349,52 @@ class full_visitor = object(self)
       self#add_decl ~func ~names node
     else
       self#add_code ~func ~names node;
-    DoChildren
+    Cil.DoChildren
 
-  method! vblock _ = DoChildren
-  method! vinit _ _ _ = DoChildren
-  method! vlocal_init _ _ = DoChildren
-  method! vtype _ = DoChildren
-  method! vcompinfo _ = DoChildren
-  method! venuminfo _ = DoChildren
-  method! vfieldinfo _ = DoChildren
-  method! venumitem _ = DoChildren
-  method! vattr _ = DoChildren
-  method! vattrparam _ = DoChildren
-  method! vmodel_info _ = DoChildren
-  method! vlogic_type _ = DoChildren
-  method! videntified_term _ = DoChildren
-  method! vterm _ = DoChildren
-  method! vterm_node _ = DoChildren
-  method! vterm_lval _ = DoChildren
-  method! vterm_lhost _ = DoChildren
-  method! vterm_offset _ = DoChildren
-  method! vlogic_label _ = DoChildren
-  method! vlogic_info_decl _ = DoChildren
-  method! vlogic_info_use _ = DoChildren
-  method! vlogic_type_info_decl _ = DoChildren
-  method! vlogic_type_info_use _ = DoChildren
-  method! vlogic_type_def _ = DoChildren
-  method! vlogic_ctor_info_decl _ = DoChildren
-  method! vlogic_ctor_info_use _ = DoChildren
-  method! vlogic_var_use _ = DoChildren
-  method! vlogic_var_decl _ = DoChildren
-  method! vquantifiers _ = DoChildren
+  method! vblock _ = Cil.DoChildren
+  method! vinit _ _ _ = Cil.DoChildren
+  method! vlocal_init _ _ = Cil.DoChildren
+  method! vtype _ = Cil.DoChildren
+  method! vcompinfo _ = Cil.DoChildren
+  method! venuminfo _ = Cil.DoChildren
+  method! vfieldinfo _ = Cil.DoChildren
+  method! venumitem _ = Cil.DoChildren
+  method! vattr _ = Cil.DoChildren
+  method! vattrparam _ = Cil.DoChildren
+  method! vmodel_info _ = Cil.DoChildren
+  method! vlogic_type _ = Cil.DoChildren
+  method! videntified_term _ = Cil.DoChildren
+  method! vterm _ = Cil.DoChildren
+  method! vterm_node _ = Cil.DoChildren
+  method! vterm_lval _ = Cil.DoChildren
+  method! vterm_lhost _ = Cil.DoChildren
+  method! vterm_offset _ = Cil.DoChildren
+  method! vlogic_label _ = Cil.DoChildren
+  method! vlogic_info_decl _ = Cil.DoChildren
+  method! vlogic_info_use _ = Cil.DoChildren
+  method! vlogic_type_info_decl _ = Cil.DoChildren
+  method! vlogic_type_info_use _ = Cil.DoChildren
+  method! vlogic_type_def _ = Cil.DoChildren
+  method! vlogic_ctor_info_decl _ = Cil.DoChildren
+  method! vlogic_ctor_info_use _ = Cil.DoChildren
+  method! vlogic_var_use _ = Cil.DoChildren
+  method! vlogic_var_decl _ = Cil.DoChildren
+  method! vquantifiers _ = Cil.DoChildren
   method! videntified_predicate _ =
     (* should be done by the annotations visitor *)
     assert false
-  method! vpredicate_node _ = DoChildren
-  method! vpredicate _ = DoChildren
-  method! vbehavior _ = DoChildren
-  method! vassigns _ = DoChildren
-  method! vfrees _ = DoChildren
-  method! vallocates _ = DoChildren
-  method! vallocation _ = DoChildren
-  method! vloop_pragma _ = DoChildren
-  method! vslice_pragma _ = DoChildren
-  method! vimpact_pragma _ = DoChildren
-  method! vdeps _ = DoChildren
-  method! vfrom _ = DoChildren
+  method! vpredicate_node _ = Cil.DoChildren
+  method! vpredicate _ = Cil.DoChildren
+  method! vbehavior _ = Cil.DoChildren
+  method! vassigns _ = Cil.DoChildren
+  method! vfrees _ = Cil.DoChildren
+  method! vallocates _ = Cil.DoChildren
+  method! vallocation _ = Cil.DoChildren
+  method! vloop_pragma _ = Cil.DoChildren
+  method! vslice_pragma _ = Cil.DoChildren
+  method! vimpact_pragma _ = Cil.DoChildren
+  method! vdeps _ = Cil.DoChildren
+  method! vfrom _ = Cil.DoChildren
   method! vcode_annot _ =
     (* should be done by the annotations visitor *)
     assert false
@@ -402,7 +402,7 @@ class full_visitor = object(self)
     let node = node_of_global_annotation ga in
     let names = Option.to_list (name_of_global_annotation ga) in
     self#add_annot ~names node;
-    DoChildren
+    Cil.DoChildren
 end
 
 let ca_visitor_cur_func : string option ref = ref None
@@ -420,18 +420,18 @@ class code_annot_visitor = object(self)
   method! videntified_predicate {ip_content = {tp_kind}} =
     let node = node_of_predicate_kind tp_kind in
     self#add_annot node;
-    DoChildren
+    Cil.DoChildren
 
   method! vcode_annot ca =
     let content = ca.annot_content in
     self#add_annot (node_of_code_annotation_node content);
-    DoChildren
+    Cil.DoChildren
 
   method! vannotation ga =
     let node = node_of_global_annotation ga in
     let names = Option.to_list (name_of_global_annotation ga) in
     self#add_annot ~names node;
-    DoChildren
+    Cil.DoChildren
 end
 
 let visit_annots () =

@@ -19,10 +19,10 @@
   function f: precondition 'i' got status invalid.
 [eva] Recording results for f
 [eva] Done for function f
-[eva] computing for function g <- main.
-  Called from precond2.c:24.
 [kernel] precond2.c:24: Warning: 
   No code nor implicit assigns clause for function g, generating default assigns from the prototype
+[eva] computing for function g <- main.
+  Called from precond2.c:24.
 [eva] using specification for function g
 [eva] precond2.c:24: function g: precondition got status valid.
 [eva] Done for function g

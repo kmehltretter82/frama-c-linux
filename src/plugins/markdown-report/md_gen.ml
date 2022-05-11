@@ -615,7 +615,9 @@ let gen_report ~draft:is_draft () =
   else
     try
       Command.print_file (file:>string)
-        (fun fmt -> Markdown.pp_pandoc fmt doc) ;
+        (fun fmt ->
+           Markdown.pp_pandoc fmt doc;
+           Format.pp_print_newline fmt ()) ;
       Mdr_params.result "Report %a generated" Filepath.Normalized.pretty file
     with Sys_error s ->
       Mdr_params.warning

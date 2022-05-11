@@ -91,6 +91,7 @@ module type CONSULTABLE_WORKLIST = sig
 end
 
 (** {2 Examples of use} *)
+
 [@@@ warning "-60"]
 
 (* Worklist for a "rapid" framework. Just iterate over all statements

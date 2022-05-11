@@ -24,87 +24,19 @@
 // --- Eva Values
 // --------------------------------------------------------------------------
 
-// React & Dome
-import React from 'react';
-import * as Dome from 'dome';
 import * as Ivette from 'ivette';
-import * as Server from 'frama-c/server';
-import { GlobalState, useGlobalState } from 'dome/data/states';
-import { Vfill } from 'dome/layout/boxes';
-import { IconButton } from 'dome/controls/buttons';
-import { AutoSizer } from 'react-virtualized';
-import { Model } from './model';
-
-// Locals
-import { ProbeInfos } from './probeinfos';
-import { Dimension, ValuesPanel } from './valuetable';
-import { AlarmsInfos, StackInfos } from './valueinfos';
+import { } from 'frama-c/plugins/eva/valuetable';
 import { } from './Summary';
 import { } from './Coverage';
 import './style.css';
 
 // --------------------------------------------------------------------------
-// --- Values Component
-// --------------------------------------------------------------------------
-
-const globalModelState = new GlobalState(new Model());
-
-function ValuesComponent(): JSX.Element {
-  const [model] = useGlobalState(globalModelState);
-  model.mount();
-  Dome.useUpdate(model.changed, model.laidout);
-  Server.onShutdown(() => model.unmount());
-  const [zoom, setZoom] = Dome.useNumberSettings('eva-zoom-factor', 0);
-  return (
-    <>
-      <Ivette.TitleBar>
-        <IconButton
-          enabled={zoom > 0}
-          icon="ZOOM.OUT"
-          onClick={() => setZoom(zoom - 1)}
-        />
-        <IconButton
-          enabled={zoom < 20}
-          icon="ZOOM.IN"
-          onClick={() => setZoom(zoom + 1)}
-        />
-      </Ivette.TitleBar>
-      <Vfill>
-        <ProbeInfos model={model} />
-        <Vfill>
-          <AutoSizer>
-            {(dim: Dimension) => (
-              <ValuesPanel
-                zoom={zoom}
-                model={model}
-                {...dim}
-              />
-            )}
-          </AutoSizer>
-        </Vfill>
-        <AlarmsInfos model={model} />
-        <StackInfos model={model} />
-      </Vfill>
-    </>
-  );
-}
-
-// --------------------------------------------------------------------------
 // --- Export Component
 // --------------------------------------------------------------------------
 
-Ivette.registerComponent({
-  id: 'frama-c.plugins.values',
-  group: 'frama-c.plugins',
-  rank: 1,
-  label: 'Eva Values',
-  title: 'Values inferred by the Eva analysis',
-  children: <ValuesComponent />,
-});
-
 Ivette.registerView({
   id: 'summary',
-  rank: 1,
+  rank: 3,
   label: 'Eva Summary',
   layout: [
     ['frama-c.plugins.eva_summary', 'frama-c.plugins.eva_coverage'],
@@ -114,11 +46,11 @@ Ivette.registerView({
 
 Ivette.registerView({
   id: 'values',
-  rank: 1,
+  rank: 4,
   label: 'Eva Values',
   layout: [
-    ['frama-c.astview', 'frama-c.plugins.values'],
-    'frama-c.properties',
+    ['frama-c.astview', 'frama-c.astinfo'],
+    'frama-c.plugins.values',
   ],
 });
 

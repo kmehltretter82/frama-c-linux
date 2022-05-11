@@ -30,7 +30,7 @@
     Sets are always non-empty. The functions reducing the sets returns a
     [set or_bottom] type: either the result is non-empty, or it is `Bottom. *)
 
-open Bottom.Type
+open Lattice_bounds
 
 (** Returns the limit above which integer sets are converted into intervals. *)
 val get_small_cardinal: unit -> int
@@ -70,6 +70,7 @@ val minus_one: t
 val zero_or_one: t
 
 val min: t -> Integer.t (** Returns the smallest integer of a set. *)
+
 val max: t -> Integer.t (** Returns the highest integer of a set. *)
 
 (** Returns the number of integers in a set. *)

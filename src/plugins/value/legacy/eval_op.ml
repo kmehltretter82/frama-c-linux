@@ -24,6 +24,7 @@ open Cvalue
 
 open Cil_types
 open Abstract_interp
+open Lattice_bounds
 
 let offsetmap_of_v ~typ v =
   let size = Int.of_int (Cil.bitsSizeOf typ) in

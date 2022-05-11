@@ -57,8 +57,8 @@ Ivette.registerGroup({
   Ivette.registerStatusbar({ id: 'frama-c.message', children: <Status /> });
   Ivette.registerComponent({
     id: 'frama-c.astinfo',
-    label: 'Informations',
-    title: 'Contextual informations on current selection',
+    label: 'Inspector',
+    title: 'Contextual information on selected AST elements',
     children: <ASTinfo />
   });
   Ivette.registerComponent({
@@ -116,15 +116,26 @@ Ivette.registerView({
   id: 'source',
   rank: 1,
   label: 'Source Code',
+  defaultView: true,
   layout: [
     ['frama-c.astview', 'frama-c.sourcecode'],
-    ['frama-c.messages'],
+    'frama-c.astinfo',
+  ],
+});
+
+Ivette.registerView({
+  id: 'properties',
+  rank: 2,
+  label: 'Properties',
+  layout: [
+    ['frama-c.astview', 'frama-c.sourcecode'],
+    'frama-c.properties',
   ],
 });
 
 Ivette.registerView({
   id: 'pivot-table',
-  rank: 2,
+  rank: 6,
   label: 'Pivot Table',
   layout: [
     ['frama-c.pivottable'],

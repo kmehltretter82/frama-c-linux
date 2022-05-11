@@ -86,7 +86,6 @@ PLUGIN_BIN_DOC_LIST:=
 PLUGIN_DIST_EXTERNAL_LIST:=
 PLUGIN_DIST_TESTS_LIST:=
 PLUGIN_DISTRIBUTED_NAME_LIST:=
-MERLIN_PACKAGES:=
 
 PLUGIN_HEADER_SPEC_LIST :=
 PLUGIN_HEADER_DIRS_LIST :=
@@ -280,6 +279,7 @@ DISTRIB_FILES:=\
       share/analysis-scripts/parse-coverage.sh                          \
       share/analysis-scripts/print_callgraph.py                         \
       share/analysis-scripts/prologue.mk                                \
+      share/analysis-scripts/pyproject.toml                             \
       share/analysis-scripts/README.md                                  \
       share/analysis-scripts/results_display.py                         \
       share/analysis-scripts/script_for_creduce_fatal.sh                \
@@ -562,6 +562,7 @@ KERNEL_CMO=\
 	src/kernel_services/ast_data/annotations.cmo                    \
 	src/kernel_services/ast_printing/printer.cmo                    \
 	src/kernel_internals/typing/logic_builtin.cmo                 \
+	src/kernel_services/ast_queries/ast_diff.cmo                  \
 	src/kernel_services/ast_printing/cabs_debug.cmo                 \
 	src/kernel_internals/parsing/lexerhack.cmo                     \
 	src/kernel_internals/parsing/clexer.cmo                        \
@@ -585,7 +586,7 @@ KERNEL_CMO=\
 	src/kernel_services/ast_printing/description.cmo                \
 	src/kernel_services/abstract_interp/lattice_messages.cmo        \
 	src/kernel_services/abstract_interp/abstract_interp.cmo         \
-	src/kernel_services/abstract_interp/bottom.cmo                  \
+	src/kernel_services/abstract_interp/lattice_bounds.cmo          \
 	src/kernel_services/abstract_interp/int_Base.cmo                \
 	src/kernel_services/analysis/bit_utils.cmo                      \
 	src/kernel_services/abstract_interp/fc_float.cmo                \
@@ -604,9 +605,6 @@ KERNEL_CMO=\
 	src/kernel_services/abstract_interp/locations.cmo               \
 	src/kernel_services/abstract_interp/lmap.cmo                    \
 	src/kernel_services/abstract_interp/lmap_bitwise.cmo            \
-	src/kernel_services/abstract_interp/multidim.cmo                \
-	src/kernel_services/abstract_interp/abstract_offset.cmo         \
-	src/kernel_services/abstract_interp/abstract_memory.cmo         \
 	src/kernel_services/visitors/visitor.cmo                        \
 	src/kernel_services/ast_data/statuses_by_call.cmo               \
 	src/kernel_services/ast_printing/printer_tag.cmo                \
@@ -674,12 +672,6 @@ check-logic-parser-wildcard:
 	cd src/kernel_internals/parsing && ocaml check_logic_parser.ml
 
 NON_OPAQUE_DEPS+= src/kernel_services/plugin_entry_points/dynamic
-
-# abstract_memory.cmi must _not_ inherit the '-rectypes' flag, so we
-# eagerly assign it _before_ adding -rectypes to the .cmo/.cmx files
-src/kernel_services/abstract_interp/abstract_memory.cmi: BFLAGS := $(BFLAGS)
-src/kernel_services/abstract_interp/abstract_memory.cmo: BFLAGS += -rectypes
-src/kernel_services/abstract_interp/abstract_memory.cmx: OFLAGS += -rectypes
 
 # C Bindings
 ############
@@ -827,7 +819,7 @@ PLUGIN_NAME:=Eva
 PLUGIN_DIR:=src/plugins/value
 PLUGIN_EXTRA_DIRS:=engine values domains api domains/cvalue domains/apron \
 	domains/gauges domains/equality legacy partitioning utils gui_files \
-	api values/numerors domains/numerors
+	api values/numerors domains/numerors domains/multidim
 PLUGIN_TESTS_DIRS+=value/traces
 PLUGIN_GENERATED:=$(PLUGIN_DIR)/Eva.mli
 PLUGIN_DISTRIB_EXTERNAL+=gen-api.sh
@@ -864,7 +856,7 @@ endif
 PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	utils/eva_audit utils/eva_perf utils/eva_annotations \
 	utils/eva_dynamic utils/eva_utils utils/red_statuses \
-	utils/mark_noresults \
+	utils/active_behaviors \
 	utils/widen_hints_ext utils/widen \
 	partitioning/split_return \
 	partitioning/per_stmt_slevel \
@@ -886,7 +878,6 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	domains/hcexprs \
 	domains/equality/equality domains/equality/equality_domain \
 	domains/offsm_domain \
-	domains/multidim_domain \
 	domains/symbolic_locs \
 	domains/sign_domain \
 	domains/cvalue/warn domains/cvalue/locals_scoping \
@@ -898,23 +889,32 @@ PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	domains/cvalue/builtins_watchpoint \
 	domains/cvalue/builtins_float domains/cvalue/builtins_split \
 	domains/inout_domain \
-	legacy/eval_terms legacy/eval_annots \
-	domains/powerset engine/transfer_logic \
+	legacy/eval_terms \
 	domains/cvalue/cvalue_transfer domains/cvalue/cvalue_init \
 	domains/cvalue/cvalue_specification \
 	domains/cvalue/cvalue_domain \
-	utils/eva_results \
+	domains/powerset \
 	partitioning/auto_loop_unroll \
 	partitioning/partition partitioning/partitioning_parameters \
 	partitioning/partitioning_index partitioning/trace_partitioning \
+	engine/recursion engine/function_calls legacy/eval_annots \
 	engine/subdivided_evaluation engine/evaluation engine/abstractions \
-	engine/recursion engine/transfer_stmt engine/transfer_specification \
+	engine/transfer_logic engine/transfer_stmt engine/transfer_specification \
 	engine/mem_exec engine/iterator engine/initialization \
 	engine/compute_functions engine/analysis register \
+	domains/multidim/multidim \
+	domains/multidim/abstract_offset \
+	domains/multidim/abstract_memory \
+	domains/multidim/pretty_memory \
+	domains/multidim/abstract_structure \
+	domains/multidim/segmentation \
+	domains/multidim/typed_memory \
+	domains/multidim/multidim_domain \
 	domains/taint_domain \
 	$(APRON_CMO) $(NUMERORS_CMO) \
-	api/general_requests api/values_request \
-	utils/unit_tests utils/results
+	utils/eva_results \
+	utils/results api/general_requests api/values_request \
+	utils/unit_tests
 PLUGIN_CMI:= values/abstract_value values/abstract_location \
 	domains/abstract_domain domains/simpler_domains
 PLUGIN_DEPENDENCIES:=Server
@@ -957,7 +957,6 @@ $(eval $(call include_generic_plugin_Makefile,$(PLUGIN_NAME)))
 # Reduc #
 #########
 PLUGIN_ENABLE:=$(ENABLE_REDUC)
-PLUGIN_DYNAMIC:=$(DYNAMIC_REDUC)
 PLUGIN_NAME:=Reduc
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_DIR:=src/plugins/reduc
@@ -1827,14 +1826,11 @@ lint:: $(LINT_TARGET)
 
 check-ocp-indent-version:
 	if command -v ocp-indent >/dev/null; then \
-		if [ -z "$(shell ocp-indent --version)" ]; then echo "warning: ocp-indent returned an empty string, assuming it is the correct version"; \
-		else \
-			$(eval ocp_version_major := $(shell ocp-indent --version | $(SED) -E "s/^([0-9]+)\.[0-9]+\..*/\1/")) \
-			$(eval ocp_version_minor := $(shell ocp-indent --version | $(SED) -E "s/^[0-9]+\.([0-9]+)\..*/\1/")) \
-			if [ "$(ocp_version_major)" -lt 1 -o "$(ocp_version_minor)" -lt 7 ]; then \
-				echo "error: ocp-indent 1.7.0 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
-			exit 1; \
-			fi; \
+		$(eval ocp_version_major := $(shell ocp-indent --version | $(SED) -E "s/^([0-9]+)\.[0-9]+\..*/\1/")) \
+		$(eval ocp_version_minor := $(shell ocp-indent --version | $(SED) -E "s/^[0-9]+\.([0-9]+)\..*/\1/")) \
+		if [ "$(ocp_version_major)" -lt 1 -o "$(ocp_version_minor)" -lt 8 ]; then \
+			echo "error: ocp-indent 1.8.1 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
+		exit 1; \
 		fi; \
 	else \
 		exit 1; \
@@ -1998,6 +1994,7 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/normalize_jcdb.py \
 	  share/analysis-scripts/parse-coverage.sh \
 	  share/analysis-scripts/prologue.mk \
+	  share/analysis-scripts/pyproject.toml \
 	  share/analysis-scripts/README.md \
 	  share/analysis-scripts/results_display.py \
 	  share/analysis-scripts/script_for_creduce_fatal.sh \

@@ -4,7 +4,7 @@ if [ -z ${TARGETS+x} ]; then
     TARGETS="float value idct builtins"
 fi
 if [ -z ${CONFIGS+x} ]; then
-    CONFIGS="apron equality bitwise symblocs gauges octagon"
+    CONFIGS="apron equality bitwise symblocs gauges octagon multidim"
 fi
 ARGS="${@-}"
 

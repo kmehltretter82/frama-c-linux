@@ -50,6 +50,14 @@ struct memory_location {
 };
 typedef struct memory_location memory_location;
 
+struct segment_boundaries {
+  uintptr_t start;
+  uintptr_t end;
+};
+typedef struct segment_boundaries segment_boundaries;
+
+struct segment_boundaries safe_locations_boundaries;
+
 /*! Initialize the array of safe locations */
 void collect_safe_locations();
 

@@ -43,6 +43,9 @@ module TracesUnifyLoop: Parameter_sig.Bool
 module TracesDot: Parameter_sig.Filepath
 module TracesProject: Parameter_sig.Bool
 
+module MultidimSegmentLimit: Parameter_sig.Int
+module MultidimDisjunctiveInvariants: Parameter_sig.Bool
+
 module AutomaticContextMaxDepth: Parameter_sig.Int
 module AutomaticContextMaxWidth: Parameter_sig.Int
 
@@ -155,6 +158,7 @@ val register_builtin: string -> unit
 val register_domain: name:string -> descr:string -> unit
 
 [@@@ api_start]
+
 (** Configuration of the analysis. *)
 
 (** Returns the list (name, descr) of currently enabled abstract domains. *)

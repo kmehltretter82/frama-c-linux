@@ -256,7 +256,7 @@ const markerInfo_internal: State.Array<string,markerInfoData> = {
   reload: reloadMarkerInfo,
   order: byMarkerInfoData,
 };
-/** Marker informations */
+/** Marker information */
 export const markerInfo: State.Array<string,markerInfoData> = markerInfo_internal;
 
 /** Localizable AST markers */
@@ -458,18 +458,18 @@ const functions_internal: State.Array<Json.key<'#functions'>,functionsData> = {
 /** AST Functions */
 export const functions: State.Array<Json.key<'#functions'>,functionsData> = functions_internal;
 
-/** Updated AST informations */
-export const getInformationsUpdate: Server.Signal = {
-  name: 'kernel.ast.getInformationsUpdate',
+/** Updated AST information */
+export const getInformationUpdate: Server.Signal = {
+  name: 'kernel.ast.getInformationUpdate',
 };
 
-const getInformations_internal: Server.GetRequest<
+const getInformation_internal: Server.GetRequest<
   marker |
   undefined,
   { id: string, label: string, title: string, descr: text }[]
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.getInformations',
+  name:   'kernel.ast.getInformation',
   input:  jMarker,
   output: Json.jList(
             Json.jObject({
@@ -478,14 +478,14 @@ const getInformations_internal: Server.GetRequest<
               title: Json.jFail(Json.jString,'String expected'),
               descr: jTextSafe,
             })),
-  signals: [ { name: 'kernel.ast.getInformationsUpdate' } ],
+  signals: [ { name: 'kernel.ast.getInformationUpdate' } ],
 };
-/** Get available informations about markers. When no marker is given, returns all kinds of informations (with empty `descr` field). */
-export const getInformations: Server.GetRequest<
+/** Get available information about markers. When no marker is given, returns all kinds of information (with empty `descr` field). */
+export const getInformation: Server.GetRequest<
   marker |
   undefined,
   { id: string, label: string, title: string, descr: text }[]
-  >= getInformations_internal;
+  >= getInformation_internal;
 
 const getMarkerAt_internal: Server.GetRequest<
   [ string, number, number ],
@@ -527,5 +527,50 @@ const setFiles_internal: Server.SetRequest<string[],null> = {
 };
 /** Set the source file names to analyze. */
 export const setFiles: Server.SetRequest<string[],null>= setFiles_internal;
+
+/** <markerFromTerm> input */
+export interface markerFromTermInput {
+  /** The statement at which we will build the marker. */
+  atStmt: marker;
+  /** The ACSL term. */
+  term: string;
+}
+
+/** Loose decoder for `markerFromTermInput` */
+export const jMarkerFromTermInput: Json.Loose<markerFromTermInput> =
+  Json.jObject({
+    atStmt: jMarkerSafe,
+    term: Json.jFail(Json.jString,'String expected'),
+  });
+
+/** Safe decoder for `markerFromTermInput` */
+export const jMarkerFromTermInputSafe: Json.Safe<markerFromTermInput> =
+  Json.jFail(jMarkerFromTermInput,'MarkerFromTermInput expected');
+
+/** Natural order for `markerFromTermInput` */
+export const byMarkerFromTermInput: Compare.Order<markerFromTermInput> =
+  Compare.byFields
+    <{ atStmt: marker, term: string }>({
+    atStmt: byMarker,
+    term: Compare.string,
+  });
+
+const markerFromTerm_internal: Server.GetRequest<
+  markerFromTermInput,
+  marker |
+  undefined
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.ast.markerFromTerm',
+  input:  jMarkerFromTermInput,
+  output: jMarker,
+  signals: [],
+};
+/** Build a marker from an ACSL term. */
+export const markerFromTerm: Server.GetRequest<
+  markerFromTermInput,
+  marker |
+  undefined
+  >= markerFromTerm_internal;
 
 /* ------------------------------------- */

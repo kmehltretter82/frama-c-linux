@@ -474,7 +474,7 @@ module STRING = WpContext.Generator(LITERAL)
         }
 
       let sconst prefix base cst =
-        (** describe the content of literal strings *)
+        (* describe the content of literal strings *)
         let name = prefix ^ "_literal" in
         let i = Lang.freshvar ~basename:"i" L.Int in
         let c = Cstring.char_at cst (e_var i) in
@@ -554,8 +554,8 @@ module BASE = WpContext.Generator(Varinfo)
         Warning.handle
           ~handler:(fun _ -> None)
           ~effect:(Printf.sprintf "No allocation size for variable '%s'" x.vname)
-          (fun obj -> Some (length_of_object obj))
-          (Ctypes.object_of x.vtype)
+          (fun t -> Some (length_of_object @@ Ctypes.object_of t))
+          x.vtype
 
       let linked prefix x base =
         let name = prefix ^ "_linked" in

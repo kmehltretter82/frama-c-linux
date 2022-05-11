@@ -14,10 +14,10 @@ void arrays(void)
 {
   int a[3] = {1, 2, 3};
   int b[3] = {4, 5, 6};
-  __e_acsl_store_block((void *)(b),(size_t)12);
+  __e_acsl_store_block((void *)(b),12UL);
   __e_acsl_full_init((void *)(& b));
   int c[3] = {1, 2, 3};
-  __e_acsl_store_block((void *)(c),(size_t)12);
+  __e_acsl_store_block((void *)(c),12UL);
   __e_acsl_full_init((void *)(& c));
   int d[6] = {1, 2, 3, 4, 5, 6};
   {
@@ -114,10 +114,10 @@ void arrays(void)
   /*@ assert a != d; */ ;
   int *e = a;
   int *f = b;
-  __e_acsl_store_block((void *)(& f),(size_t)8);
+  __e_acsl_store_block((void *)(& f),8UL);
   __e_acsl_full_init((void *)(& f));
   int *g = c;
-  __e_acsl_store_block((void *)(& g),(size_t)8);
+  __e_acsl_store_block((void *)(& g),8UL);
   __e_acsl_full_init((void *)(& g));
   int *h = a;
   {
@@ -476,13 +476,13 @@ void arrays(void)
   }
   /*@ assert a != *((int (*)[])f); */ ;
   int i[6] = {1, 2, 3, 4, 5, 6};
-  __e_acsl_store_block((void *)(i),(size_t)24);
+  __e_acsl_store_block((void *)(i),24UL);
   __e_acsl_full_init((void *)(& i));
   int j[6] = {4, 5, 6, 1, 2, 3};
-  __e_acsl_store_block((void *)(j),(size_t)24);
+  __e_acsl_store_block((void *)(j),24UL);
   __e_acsl_full_init((void *)(& j));
   int k[6] = {4, 5, 6, 4, 5, 6};
-  __e_acsl_store_block((void *)(k),(size_t)24);
+  __e_acsl_store_block((void *)(k),24UL);
   __e_acsl_full_init((void *)(& k));
   {
     int __gen_e_acsl_ne_5;
@@ -578,13 +578,13 @@ void arrays(void)
   }
   /*@ assert j != k; */ ;
   int *l = & i[3];
-  __e_acsl_store_block((void *)(& l),(size_t)8);
+  __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& l));
   int *m = & j[3];
-  __e_acsl_store_block((void *)(& m),(size_t)8);
+  __e_acsl_store_block((void *)(& m),8UL);
   __e_acsl_full_init((void *)(& m));
   int *n = & k[3];
-  __e_acsl_store_block((void *)(& n),(size_t)8);
+  __e_acsl_store_block((void *)(& n),8UL);
   __e_acsl_full_init((void *)(& n));
   {
     int __gen_e_acsl_ne_8;
@@ -1025,7 +1025,7 @@ void vlas(int n)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   {
     int i = 0;
     while (i < 3) {

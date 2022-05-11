@@ -21,7 +21,8 @@
 (**************************************************************************)
 
 open Abstract_interp
-open Bottom.Type
+open Lattice_bounds
+open Bottom.Operators
 
 let emitter = Lattice_messages.register "Ival"
 let log_imprecision s = Lattice_messages.emit_imprecision emitter s
@@ -881,9 +882,11 @@ let cast_float_to_int_non_nan ~signed ~size (min, max) =
     assert false (* impossible if min-max are correct *)
 
 let cast_float_to_int ~signed ~size iv =
-  match Fval.min_and_max (project_float iv) with
-  | Some (min, max), _nan -> cast_float_to_int_non_nan ~signed ~size (min, max)
-  | None, _ -> bottom (* means NaN *)
+  if equal top iv then top
+  else
+    match Fval.min_and_max (project_float iv) with
+    | Some (min, max), _nan -> cast_float_to_int_non_nan ~signed ~size (min, max)
+    | None, _ -> bottom (* means NaN *)
 
 
 (* These are the bounds of the range of integers that can be represented
@@ -1031,7 +1034,6 @@ let reinterpret_as_float kind i =
         then [`Value Fval.nan]
         else []
       in
-      let open Bottom in
       let range mn mx = Fval.inject kind (conv mn) (conv mx) in
       (* convert positive floats; increasing on positive range *)
       let pos = bounds_narrow f_pos >>-: (fun (b, e) -> range b e) in

@@ -106,8 +106,9 @@ module Api:sig
   (** Access to slicing results. *)
   module Mark : sig
 
-    type t
     (** Abstract data type for mark value. *)
+    type t
+
     val dyn_t : t Type.t
     (** For dynamic type checking and journalization. *)
 

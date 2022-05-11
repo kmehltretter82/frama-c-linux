@@ -163,25 +163,10 @@ manuals.
 %\texttt{doc/manuals} in order to update the manuals (required by the
 %\texttt{install} target below).
 
-Run the script \texttt{doc/build-manuals.sh} to compile and install all manuals,
-even for E-ACSL. Note that this script requires \texttt{GNU parallel}.
-
-Otherwise, if you want to do it \textbf{manually}, in each directory:
-\begin{shell}
-make
-make install
-\end{shell}
-
-The result is installed in \texttt{doc/manuals/}.
-
-For E-ACSL, the \textbf{manual} steps (ignore if you used the script)
-are slightly different: \texttt{make} and
-\texttt{make install} must be run in the following directories:
-
-\begin{itemize}
-\item \texttt{src/plugins/e-acsl/doc/refman}
-\item \texttt{src/plugins/e-acsl/doc/userman}
-\end{itemize}
+In the \texttt{doc} directory, just run \texttt{make} to compile
+and install all manuals, together with some final coherence checks with
+respect to the current Frama-C implementation (notably
+for the developer manual and ACSL implementation manual).
 
 % No longer use git annex (as recommended by VP)
 %\paragraph{Getting the manuals on the web (ultimately)}

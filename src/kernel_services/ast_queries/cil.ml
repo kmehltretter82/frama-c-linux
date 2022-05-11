@@ -392,6 +392,8 @@ let setTypeAttrs t a =
 
 let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
 
+let fc_internal_attributes = ["declspec"; "arraylen"; "fc_stdlib"]
+
 let filter_qualifier_attributes al =
   List.filter
     (fun a -> List.mem (attributeName a) qualifier_attributes) al
@@ -905,26 +907,25 @@ class type cilVisitor = object
   method vstmt: stmt -> stmt visitAction
   (** Control-flow statement. *)
 
-  method vblock: block -> block visitAction     (** Block. Replaced in
-                                                    place. *)
-  method vfunc: fundec -> fundec visitAction    (** Function definition.
-                                                    Replaced in place. *)
-  method vglob: global -> global list visitAction (** Global (vars, types,
-                                                      etc.)  *)
+  method vblock: block -> block visitAction
+  (** Block. Replaced in place. *)
+
+  method vfunc: fundec -> fundec visitAction
+  (** Function definition. Replaced in place. *)
+
+  method vglob: global -> global list visitAction
+  (** Global (vars, types, etc.)  *)
+
   method vinit: varinfo -> offset -> init -> init visitAction
-  (** Initializers for globals,
-   * pass the global where this
-   * occurs, and the offset *)
+  (** Initializers for globals, pass the global where this occurs, and the
+      offset *)
 
   method vlocal_init: varinfo -> local_init -> local_init visitAction
 
-  method vtype: typ -> typ visitAction          (** Use of some type. Note
-                                                 * that for structure/union
-                                                 * and enumeration types the
-                                                 * definition of the
-                                                 * composite type is not
-                                                 * visited. Use [vglob] to
-                                                 * visit it.  *)
+  method vtype: typ -> typ visitAction
+  (** Use of some type. Note that for structure/union and enumeration types the
+      definition of the composite type is not visited. Use [vglob] to visit it.
+  *)
 
   method vcompinfo: compinfo -> compinfo visitAction
 
@@ -936,6 +937,7 @@ class type cilVisitor = object
 
   method vattr: attribute -> attribute list visitAction
   (** Attribute. Each attribute can be replaced by a list *)
+
   method vattrparam: attrparam -> attrparam visitAction
   (** Attribute parameters. *)
 
@@ -4611,7 +4613,8 @@ and constFold (machdep: bool) (e: exp) : exp =
       Kernel.debug ~dkey "ConstFold CAST to %a@." !pp_typ_ref t ;
       let e = constFold machdep e in
       match e.enode, unrollType t with
-      | Const(CInt64(i,_k,_)),(TInt(nk,a)|TEnum({ekind = nk},a)) when a = [] ->
+      | Const(CInt64(i,_k,_)),(TInt(nk,a)|TEnum({ekind = nk},a))
+        when dropAttributes fc_internal_attributes a = [] ->
         begin
           (* If the cast has attributes, leave it alone. *)
           Kernel.debug ~dkey "ConstFold to %a : %a@."
@@ -4985,19 +4988,24 @@ let mk_behavior ?(name=default_behavior_name) ?(assumes=[]) ?(requires=[])
   }
 
 let spare_attributes_for_c_cast =
-  "declspec"::"arraylen"::"fc_stdlib"::qualifier_attributes
+  fc_internal_attributes @ qualifier_attributes
 
-let type_remove_attributes_for_c_cast =
-  typeRemoveAttributes spare_attributes_for_c_cast
+let type_remove_attributes_for_c_cast t =
+  let t = typeRemoveAttributesDeep fc_internal_attributes t in
+  typeRemoveAttributes spare_attributes_for_c_cast t
 
 let spare_attributes_for_logic_cast =
   spare_attributes_for_c_cast
 
-let type_remove_attributes_for_logic_type =
-  typeRemoveAttributes spare_attributes_for_logic_cast
+let type_remove_attributes_for_logic_type t =
+  let t = typeRemoveAttributesDeep fc_internal_attributes t in
+  typeRemoveAttributes spare_attributes_for_logic_cast t
 
 let () = Cil_datatype.drop_non_logic_attributes :=
     dropAttributes spare_attributes_for_logic_cast
+
+let () = Cil_datatype.drop_fc_internal_attributes :=
+    dropAttributes fc_internal_attributes
 
 let need_cast ?(force=false) oldt newt =
   let oldt = type_remove_attributes_for_c_cast (unrollType oldt) in
@@ -5836,16 +5844,12 @@ let mkCastT ?(force=false) ~(oldt: typ) ~(newt: typ) e =
       (match e.enode with | Const(CEnum _) -> false | _ -> true)
      in *)
   if need_cast ~force oldt newt then begin
-    let target_type =
-      match newt with
-      | TNamed _ -> newt
-      | _ -> type_remove_attributes_for_c_cast newt
-    in
     let mk_cast exp = (* to new type [newt] *)
-      new_exp ~loc (CastE(target_type,exp))
+      new_exp ~loc (CastE(type_remove_qualifier_attributes newt,exp))
     in
+    let normalized_type = type_remove_attributes_for_c_cast (unrollType newt) in
     (* Watch out for constants and cast of cast to pointer *)
-    match unrollType newt, e.enode with
+    match normalized_type, e.enode with
     (* In the case were we have a representation for the literal,
        explicitly add the cast. *)
     | TInt(newik, []), Const(CInt64(i, _, None)) ->
@@ -6466,7 +6470,7 @@ let pushGlobal (g: global)
           GType (_, l) | GCompTag (_, l) -> Some (getVarsInGlobal g, l)
         | GEnumTag (_, l) | GPragma (Attr("pack", _), l)
         | GCompTagDecl (_, l) | GEnumTagDecl (_, l) -> Some ([], l)
-        (** Move the warning pragmas early
+        (* Move the warning pragmas early
             | GPragma(Attr(s, _), l) when hasPrefix "warning" s -> Some ([], l)
         *)
         | _ -> None (* Does not go with the types *)
@@ -6911,7 +6915,7 @@ module Switch_cases =
 let () = dependency_on_ast Switch_cases.self
 let separate_switch_succs = Switch_cases.memo separate_switch_succs
 
-class dropAttributes ?select () = object
+class dropAttributes ?select () = object(self)
   inherit genericCilVisitor (Visitor_behavior.copy (Project.current ()))
   method! vattr a =
     match select with
@@ -6924,8 +6928,9 @@ class dropAttributes ?select () = object
     | TNamed (internal_ty, attrs) ->
       let tty = typeAddAttributes attrs internal_ty.ttype in
       (* keep the original type whenever possible *)
-      ChangeDoChildrenPost
-        (tty, fun x -> if x == internal_ty.ttype then ty else x)
+      ChangeToPost
+        (visitCilType (self:>cilVisitor) tty,
+         fun x -> if x == internal_ty.ttype then ty else x)
     | TVoid _ | TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _
     | TComp _ | TEnum _ | TBuiltin_va_list _ -> DoChildren
 end

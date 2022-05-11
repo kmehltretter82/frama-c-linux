@@ -105,9 +105,9 @@ class constGlobSubstVisitorClass : cilVisitor = object
     | _ ->
       DoChildren
 
-  method! vtype _ = SkipChildren
-  method! vspec _ = SkipChildren
-  method! vcode_annot _ = SkipChildren
+  method! vtype _ = Cil.SkipChildren
+  method! vspec _ = Cil.SkipChildren
+  method! vcode_annot _ = Cil.SkipChildren
 end
 
 let constGlobSubstVisitor = new constGlobSubstVisitorClass

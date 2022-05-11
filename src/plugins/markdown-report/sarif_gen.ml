@@ -255,15 +255,7 @@ let gen_run remarks =
         (key, (dir :> string))
       ) (Filepath.all_symbolic_dirs ())
   in
-  (* TODO: we currently use Sys.getenv "PWD" instead of Sys.getcwd ()
-     because OCaml has no function in its stdlib to resolve symbolic links
-     (e.g. realpath) for a given path.
-     'getcwd' always resolves them, but if the user supplies a path with
-     symbolic links, this may cause issues.
-     Instead of forcing the user to always provide resolved paths, we
-     currently choose to never resolve them.
-     We only resort to getcwd() to avoid issues when PWD does not exist. *)
-  let pwd = try Sys.getenv "PWD" with Not_found -> Sys.getcwd () in
+  let pwd = Filepath.pwd () in
   let uriBases = ("PWD", pwd) :: symbolicDirs in
   let uriBasesJson =
     List.fold_left (fun acc (name, dir) ->
@@ -291,7 +283,9 @@ let generate () =
     let file = Mdr_params.Output.get () in
     try
       Command.write_file (file:>string)
-        (fun out -> Yojson.Safe.pretty_to_channel ~std:true out json) ;
+        (fun out ->
+           Yojson.Safe.pretty_to_channel ~std:true out json;
+           output_char out '\n') ;
       Mdr_params.result "Report %a generated" Filepath.Normalized.pretty file
     with Sys_error s ->
       Mdr_params.abort "Unable to generate %a (%s)"

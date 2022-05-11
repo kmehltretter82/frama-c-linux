@@ -42,6 +42,14 @@ PLUGIN_DISTRIB_EXTERNAL:= Makefile.in configure.ac configure
 PLUGIN_DEPENDENCIES:=Eva
 #PLUGIN_NO_DEFAULT_TEST:=no
 PLUGIN_TESTS_DIRS:=nonterm
+PLUGIN_DISTRIB_TESTS := \
+  $(foreach dir, $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
+    $(dir)/oracle/* \
+    $(filter-out result oracle,$(dir)/*)) \
+  ) \
+  $(filter-out result oracle,tests/*)) \
+  $(foreach dir, tests $(addprefix tests/,$(PLUGIN_TESTS_DIRS)), \
+    $(dir)/test_config)
 
 ################
 # Generic part #

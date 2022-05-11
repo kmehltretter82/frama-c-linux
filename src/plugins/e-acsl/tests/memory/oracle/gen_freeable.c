@@ -15,7 +15,7 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(array),(size_t)1024);
+    __e_acsl_store_block((void *)(array),1024UL);
     __e_acsl_full_init((void *)(& array));
   }
   return;
@@ -31,9 +31,9 @@ int main(void)
 {
   int __retres;
   int *p;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
-  __e_acsl_store_block((void *)(& p),(size_t)8);
+  __e_acsl_store_block((void *)(& p),8UL);
   {
     int __gen_e_acsl_freeable;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};

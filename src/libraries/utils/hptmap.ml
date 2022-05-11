@@ -110,7 +110,7 @@ end
 type ('key, 'value) tree =
   | Empty
   | Leaf of 'key * 'value * tag
-  | Branch of int (** prefix *) *
+  | Branch of int (* prefix *) *
               Big_Endian.mask *
               ('key, 'value) tree *
               ('key, 'value) tree *
@@ -495,10 +495,10 @@ module Shape(Key: Id_Datatype) = struct
     if s == t || s == Empty then PTrue else PUnknown
 
   let make_binary_predicate cache_merge pt ~decide_fast ~decide_fst ~decide_snd ~decide_both =
-    (** We cannot use [&&] and [||] under another name, as functions are not
-        lazy in OCaml. Instead, we defer the evaluation of the right part by
-        calling a function. Due to typing issues, we must actually define
-        two functions... *)
+    (* We cannot use [&&] and [||] under another name, as functions are not
+       lazy in OCaml. Instead, we defer the evaluation of the right part by
+       calling a function. Due to typing issues, we must actually define
+       two functions... *)
     let comb1, comb2 =
       match pt with
       | UniversalPredicate ->   let f b f v1 v2 = b && f v1 v2 in f, f

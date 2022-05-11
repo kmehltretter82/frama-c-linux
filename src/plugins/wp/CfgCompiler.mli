@@ -137,6 +137,7 @@ sig
     val reads : t -> S.domain
     val writes : t -> S.domain
     (** as defined by S.writes *)
+
     val relocate : S.t sequence -> t -> t
   end
 

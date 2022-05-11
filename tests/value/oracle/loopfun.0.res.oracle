@@ -42,16 +42,12 @@
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
-[from] Computing for function main2
-[from] Done for function main2
 [from] Computing for function test
 [from] Done for function test
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
-[from] Function main2:
-  FROMTOP
 [from] Function test:
   FROMTOP
   \result FROM ANYTHING(origin:Unknown)
@@ -59,10 +55,6 @@
   FROMTOP
   \result FROM ANYTHING(origin:Unknown)
 [from] ====== END OF DEPENDENCIES ======
-[inout] Out (internal) for function main2:
-    \nothing
-[inout] Inputs for function main2:
-    v
 [inout] Out (internal) for function test:
     tmp; a
 [inout] Inputs for function test:

@@ -9,10 +9,10 @@
   var2 IN {0}
 [eva] computing for function inputsOf_testcase_func <- main.
   Called from bts709.c:47.
-[eva] computing for function nondet_int <- inputsOf_testcase_func <- main.
-  Called from bts709.c:55.
 [kernel:annot:missing-spec] bts709.c:55: Warning: 
   Neither code nor specification for function nondet_int, generating default assigns from the prototype
+[eva] computing for function nondet_int <- inputsOf_testcase_func <- main.
+  Called from bts709.c:55.
 [eva] using specification for function nondet_int
 [eva] Done for function nondet_int
 [eva] computing for function nondet_int <- inputsOf_testcase_func <- main.

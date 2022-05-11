@@ -22,15 +22,20 @@
 
 (** Signature for the floating-point interval semantics. *)
 
-open Bottom.Type
+open Lattice_bounds
 
 (** Precision of the intervals. *)
 type prec = Float_sig.prec
 
 module type S = sig
-  type float (** Type of the interval bounds. *)
-  type widen_hints (** Type of the widen hints. *)
-  type t     (** Type of intervals. *)
+  (** Type of the interval bounds. *)
+  type float
+
+  (** Type of the widen hints. *)
+  type widen_hints
+
+  (** Type of intervals. *)
+  type t
 
   val packed_descr : Structural_descr.pack
 
@@ -111,7 +116,7 @@ module type S = sig
       [f1] into [f1'] so that the relation [f1' op f2] holds.
       [prec] is the precision of [f1] and [f1'], but not necessarily of [f2]. *)
   val backward_comp_left_true:
-    Abstract_interp.Comp.t -> prec -> t -> t -> t Bottom.or_bottom
+    Abstract_interp.Comp.t -> prec -> t -> t -> t or_bottom
 
   (** [backward_comp_left_false op prec f1 f2] attempts to reduce
       [f1] into [f1'] so that the relation [f1' op f2] doesn't holds.

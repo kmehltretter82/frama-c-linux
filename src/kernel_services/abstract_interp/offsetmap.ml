@@ -56,33 +56,36 @@ type 'a offsetmap =
 
   | Node of
       Integer.t *
-      (** Relative, upper index of the interval. Thus the interval has length
-          [max+1]. The relative lower index of the interval is always zero by
-          definition. *)
       Integer.t * 'a offsetmap *
-      (** subtree on the left: the offset [offl] of its root (relative to 0),
-          and the tree [subl]. If [subl] is not empty, it maps at least one
-          interval, and [offl] is strictly negative. If [subl] is empty,
-          then [offl] is zero. *)
-      Integer.t * 'a offsetmap
-  (** subtree on the right: the offset [offr] of its root (relative to 0),
-      and the tree [subr]. [offr] is greater than [max+1] by definition,
-      and equal to it if [subr] is empty. ([offr] may also be equal to
-      [max+1] with a non-empty [subr],  when the interval at the root of
-      [subr] starts exactly at [max+1].) *) *
-      Rel.t * Integer.t * 'a
-  (** rem * size * value, ie. the value, its size [size] and its alignment
-      [rem] relative to the start of the interval. [size] can be:
-      - strictly more than [max+1], in which case the value is truncated
-      - equal to [max+1]:
-        * if [rem] is zero, the value is stored exactly once in the interval
-        * otherwise, two truncated instances of the value are stored
-          consecutively.
-      - strictly less than [max+1]: the value is stored more than once,
-        and implicitly repeats itself to fill the entire interval. *) *
+      Integer.t * 'a offsetmap *
+      Rel.t * Integer.t * 'a *
       int
-  (** tag: hash-consing id of the node, plus an additional boolean.
-      Not related to the contents of the tree. *)
+  (** [Node(i, offl, subl, offr, subr, rem, size, value, id)]
+      - [i]: Relative, upper index of the interval. Thus the interval has length
+        [max+1]. The relative lower index of the interval is always zero by
+        definition
+      - [offl, subl]: subtree on the left: the offset [offl] of its root
+        (relative to 0), and the tree [subl]. If [subl] is not empty, it maps at
+        least one interval, and [offl] is strictly negative. If [subl] is empty,
+        then [offl] is zero
+      - [offr, subr]: subtree on the right: the offset [offr] of its root
+        (relative to 0), and the tree [subr]. [offr] is greater than [max+1] by
+        definition, and equal to it if [subr] is empty. ([offr] may also be
+        equal to [max+1] with a non-empty [subr],  when the interval at the root
+        of [subr] starts exactly at [max+1]
+      - [rem, size, value]: the value, its size [size] and its alignment
+        [rem] relative to the start of the interval. [size] can be:
+          * strictly more than [max+1], in which case the value is truncated
+          * equal to [max+1]:
+              + if [rem] is zero, the value is stored exactly once in the
+                interval
+              + otherwise, two truncated instances of the value are stored
+                consecutively.
+          * strictly less than [max+1]: the value is stored more than once,
+            and implicitly repeats itself to fill the entire interval.
+      - [id]: tag: hash-consing id of the node, plus an additional boolean.
+        Not related to the contents of the tree.
+  *)
 
 
 (* In a node, the alignment of the value is relative to the start of the
@@ -381,11 +384,11 @@ module Make (V : module type of Offsetmap_lattice_with_isotropy) = struct
       signature_interval min1 max1 >~ signature_interval min2 max2
 
 
+  (** Zippers : Offset of a node * Node * continuation of the zipper *)
   type zipper =
     | End
     | Right of Integer.t * t * zipper
     | Left of Integer.t * t * zipper;;
-  (** Zippers : Offset of a node * Node * continuation of the zipper *)
 
   exception End_reached;;
   exception Empty_tree;;

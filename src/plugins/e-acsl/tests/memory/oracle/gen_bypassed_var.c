@@ -11,13 +11,13 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 int main(int argc, char const **argv)
 {
   int __retres;
-  __e_acsl_memory_init(& argc,(char ***)(& argv),(size_t)8);
+  __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
   goto L;
   {
     int *p;
-    __e_acsl_store_block((void *)(& p),(size_t)8);
+    __e_acsl_store_block((void *)(& p),8UL);
     L:
-    __e_acsl_store_block_duplicate((void *)(& p),(size_t)8);
+    __e_acsl_store_block_duplicate((void *)(& p),8UL);
     __e_acsl_full_init((void *)(& p));
     p = & argc;
     {

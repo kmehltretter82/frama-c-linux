@@ -39,13 +39,19 @@ let option_qual =
 let why3_failure msg =
   Pretty_utils.ksfprintf failwith msg
 
-module Env = WpContext.Index(struct
+type why3_conf = {
+  env : Why3.Env.env ;
+  libdir : string ;
+  datadir : string ;
+}
+
+module Conf = WpContext.Index(struct
     include Datatype.Unit
     type key = unit
-    type data = Why3.Env.env
+    type data = why3_conf
   end)
 
-let get_why3_env = Env.memoize
+let get_why3_conf = Conf.memoize
     begin fun () ->
       let config = Why3Provers.config () in
       let main = Why3.Whyconf.get_main config in
@@ -53,12 +59,14 @@ let get_why3_env = Env.memoize
         (WpContext.directory () :> string)::
         ((Wp_parameters.Share.get_dir ~mode:`Must_exist "why3") :> string)::
         (Why3.Whyconf.loadpath main) in
-      Why3.Env.create_env ld
+      let libdir = Why3.Whyconf.libdir main in
+      let datadir = Why3.Whyconf.datadir main in
+      { env = Why3.Env.create_env ld ; libdir ; datadir }
     end
 
 type context = {
   mutable th : Why3.Theory.theory_uc;
-  env: Why3.Env.env;
+  conf: why3_conf;
 }
 
 type convert = {
@@ -114,20 +122,20 @@ let t_app' ~cnv ~f ~l ~p tl ty =
 
 (** fold map list of at least one element *)
 let fold_map map fold = function
-  | [] -> assert false (** absurd: forbidden by qed  *)
+  | [] -> assert false (* absurd: forbidden by qed  *)
   | a::tl ->
     List.fold_left (fun acc a -> fold acc (map a)) (map a) tl
 
 let empty_context name : context = {
   th = Why3.Theory.create_theory (Why3.Ident.id_fresh name);
-  env = get_why3_env ();
+  conf = get_why3_conf ();
 }
 
 let empty_cnv ?(polarity=`NoPolarity) (ctx:context) : convert = {
   th = ctx.th;
   subst = Lang.F.Tmap.empty;
   pool = Lang.F.pool ();
-  env = ctx.env;
+  env = ctx.conf.env;
   polarity;
   incomplete_symbols = Hashtbl.create 3;
   incomplete_types = Hashtbl.create 3;
@@ -317,7 +325,7 @@ let rec full_triggers = function
 
 let rec of_trigger ~cnv t =
   match t with
-  | Qed.Engine.TgAny -> assert false (** absurd: filter by full_triggers *)
+  | Qed.Engine.TgAny -> assert false (* absurd: filter by full_triggers *)
   | Qed.Engine.TgVar v -> begin
       try Lang.F.Tmap.find (Lang.F.e_var v) cnv.subst
       with Not_found -> why3_failure "Unbound variable %a" Lang.F.pp_var v
@@ -486,7 +494,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         let mtau = Lang.F.typeof m in
         let ksort = match mtau with
           | Array(ksort,_) -> ksort
-          | _ -> assert false (** absurd: by qed typing *)in
+          | _ -> assert false (* absurd: by qed typing *)in
         t_app ~cnv ~f:["map"] ~l:"Map" ~p:["get"] [of_term ~cnv mtau m;of_term ~cnv ksort k]
       end
     | Aset(m,k,v), Array(ksort,vsort), _ ->
@@ -603,7 +611,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
     | (False, _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
     | (True, _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
     | (Acst (_, _), (Prop|Bool|Int|Real|Tvar _|Record _|Data (_, _)), _)
-      -> assert false (** absurd: by typing *)
+      -> assert false (* absurd: by typing *)
     | (Bind (Lambda, _, _), _, _)
     | Apply _ , _, _
     | Rdef _, Record _, _ ->
@@ -672,7 +680,7 @@ and int_or_real ~cnv ~fint ~lint ~pint ~freal ~lreal ~preal a b =
   | _ -> assert false
 
 let convert cnv expected t =
-  (** rewrite terms which normal form inside qed are different from the one of the provers *)
+  (* rewrite terms which normal form inside qed are different from the one of the provers *)
   let t, convert_for_export = Lang.For_export.rebuild ~cache:cnv.convert_for_export t in
   cnv.convert_for_export <- convert_for_export;
   Lang.For_export.in_state (share cnv expected) t
@@ -779,7 +787,7 @@ class visitor (ctx:context) c =
         (if import then "import" else "")
         Why3.Pp.(print_list (Why3.Pp.constant_string ".") string) file
         thy name ;
-      let thy = Why3.Env.read_theory ctx.env file thy in
+      let thy = Why3.Env.read_theory ctx.conf.env file thy in
       let th = ctx.th in
       let th = Why3.Theory.open_scope th name in
       let th = Why3.Theory.use_export th thy in
@@ -1153,7 +1161,7 @@ type prover_call = {
   mutable killed : bool ;
 }
 
-let ping_prover_call p =
+let ping_prover_call ~libdir p =
   match Why3.Call_provers.query_call p.call with
   | NoUpdates
   | ProverStarted ->
@@ -1170,7 +1178,7 @@ let ping_prover_call p =
               Wp_parameters.debug ~dkey
                 "Hard Kill (late why3server timeout)" ;
               p.interrupted <- true ;
-              Why3.Call_provers.interrupt_call p.call ;
+              Why3.Call_provers.interrupt_call ~libdir p.call ;
             end
     in Task.Wait 100
   | InternalFailure exn ->
@@ -1205,7 +1213,8 @@ let ping_prover_call p =
       VCS.pp_result r;
     Task.Return (Task.Result r)
 
-let call_prover_task ~timeout ~steps prover call =
+let call_prover_task ~timeout ~steps ~conf prover call =
+  let libdir = conf.libdir in
   Wp_parameters.debug ~dkey "Why3 run prover %a with timeout %d, steps %d@."
     Why3.Whyconf.print_prover prover
     (Why3.Opt.get_def (-1) timeout)
@@ -1220,9 +1229,9 @@ let call_prover_task ~timeout ~steps prover call =
   let ping = function
     | Task.Kill ->
       pcall.killed <- true ;
-      Why3.Call_provers.interrupt_call call ;
+      Why3.Call_provers.interrupt_call ~libdir call ;
       Task.Yield
-    | Task.Coin -> ping_prover_call pcall
+    | Task.Coin -> ping_prover_call ~libdir pcall
   in
   Task.async ping
 
@@ -1243,7 +1252,7 @@ let digest wpo drv prover task =
       end
   in Digest.file file |> Digest.to_hex
 
-let batch pconf driver ?script ~timeout ~steplimit prover task =
+let batch pconf driver ~conf ?script ~timeout ~steplimit prover task =
   let steps = match steplimit with Some 0 -> None | _ -> steplimit in
   let limit =
     let memlimit = Why3.Whyconf.memlimit (Why3.Whyconf.get_main (Why3Provers.config ())) in
@@ -1261,8 +1270,8 @@ let batch pconf driver ?script ~timeout ~steplimit prover task =
   let command = Why3.Whyconf.get_complete_command pconf ~with_steps in
   let inplace = if script <> None then Some true else None in
   let call = Why3.Driver.prove_task_prepared ?old:script ?inplace
-      ~command ~limit driver task in
-  call_prover_task ~timeout ~steps prover call
+      ~command ~limit ~libdir:conf.libdir ~datadir:conf.datadir driver task in
+  call_prover_task ~conf ~timeout ~steps prover call
 
 (* -------------------------------------------------------------------------- *)
 (* --- Interactive Prover (Coq)                                           --- *)
@@ -1295,20 +1304,23 @@ let updatescript ~script driver task =
   let d_new = Digest.file script in
   if String.equal d_new d_old then Extlib.safe_remove backup
 
-let editor ~script ~merge wpo pconf driver prover task =
+let editor ~script ~merge ~conf wpo pconf driver prover task =
   Task.sync editor_mutex
     begin fun () ->
       Wp_parameters.feedback ~ontty:`Transient "Editing %S..." script ;
       Cache.clear_result ~digest:(digest wpo driver) prover task ;
       if merge then updatescript ~script driver task ;
       let command = editor_command pconf in
-      let call = Why3.Call_provers.call_editor ~command script in
-      call_prover_task ~timeout:None ~steps:None pconf.prover call
+      let call =
+        Why3.Call_provers.call_editor
+          ~command ~datadir:conf.datadir ~libdir:conf.libdir script
+      in
+      call_prover_task ~conf ~timeout:None ~steps:None pconf.prover call
     end
 
-let compile ~script ~timeout wpo pconf driver prover task =
+let compile ~script ~timeout ~conf wpo pconf driver prover task =
   let digest = digest wpo driver in
-  let runner = batch pconf driver ~script in
+  let runner = batch ~conf pconf driver ~script in
   Cache.get_result ~digest ~runner ~timeout ~steplimit:None prover task
 
 let prepare ~mode wpo driver task =
@@ -1329,33 +1341,34 @@ let prepare ~mode wpo driver task =
 let interactive ~mode wpo pconf driver prover task =
   let time = Wp_parameters.InteractiveTimeout.get () in
   let timeout = if time <= 0 then None else Some time in
+  let conf = get_why3_conf () in
   match prepare ~mode wpo driver task with
   | None -> Task.return VCS.unknown
   | Some (script, merge) ->
     match mode with
     | VCS.Batch ->
-      compile ~script ~timeout wpo pconf driver prover task
+      compile ~script ~timeout ~conf wpo pconf driver prover task
     | VCS.Update ->
       if merge then updatescript ~script driver task ;
-      compile ~script ~timeout wpo pconf driver prover task
+      compile ~script ~timeout ~conf wpo pconf driver prover task
     | VCS.Edit ->
       let open Task in
-      editor ~script ~merge wpo pconf driver prover task >>= fun _ ->
-      compile ~script ~timeout wpo pconf driver prover task
+      editor ~script ~merge ~conf wpo pconf driver prover task >>= fun _ ->
+      compile ~script ~timeout ~conf wpo pconf driver prover task
     | VCS.Fix ->
       let open Task in
-      compile ~script ~timeout wpo pconf driver prover task >>= fun r ->
+      compile ~script ~timeout ~conf wpo pconf driver prover task >>= fun r ->
       if VCS.is_valid r then return r else
-        editor ~script ~merge wpo pconf driver prover task >>= fun _ ->
-        compile ~script ~timeout wpo pconf driver prover task
+        editor ~script ~merge ~conf wpo pconf driver prover task >>= fun _ ->
+        compile ~script ~timeout ~conf wpo pconf driver prover task
     | VCS.FixUpdate ->
       let open Task in
       if merge then updatescript ~script driver task ;
-      compile ~script ~timeout wpo pconf driver prover task >>= fun r ->
+      compile ~script ~timeout ~conf wpo pconf driver prover task >>= fun r ->
       if VCS.is_valid r then return r else
         let merge = false in
-        editor ~script ~merge wpo pconf driver prover task >>= fun _ ->
-        compile ~script ~timeout wpo pconf driver prover task
+        editor ~script ~merge ~conf wpo pconf driver prover task >>= fun _ ->
+        compile ~script ~timeout ~conf wpo pconf driver prover task
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prove WPO                                                          --- *)
@@ -1373,8 +1386,8 @@ let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ~prover wpo () =
     if Wp_parameters.Generate.get ()
     then Task.return VCS.no_result (* Only generate *)
     else
-      let env = WpContext.on_context context get_why3_env () in
-      let drv , pconf , task = prover_task env prover task in
+      let conf = WpContext.on_context context get_why3_conf () in
+      let drv , pconf , task = prover_task conf.env prover task in
       if is_trivial task then
         Task.return VCS.valid
       else
@@ -1383,7 +1396,7 @@ let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ~prover wpo () =
       else
         Cache.get_result
           ~digest:(digest wpo drv)
-          ~runner:(batch pconf drv ?script:None)
+          ~runner:(batch ~conf pconf drv ?script:None)
           ~timeout ~steplimit prover task
   with exn ->
     if Wp_parameters.has_dkey dkey_api then

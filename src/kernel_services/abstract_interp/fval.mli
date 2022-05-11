@@ -36,7 +36,9 @@ module F : sig
   type t
   val packed_descr : Structural_descr.pack
 
-  val of_float : float -> t (** fails on NaNs, but allows infinities. *)
+  val of_float : float -> t
+  (** fails on NaNs, but allows infinities. *)
+
   val to_float : t -> float
 
   val compare : t -> t -> int
@@ -82,11 +84,12 @@ val minus_zero : t
 val zeros: t (** Both positive and negative zero *)
 
 val pi: t (** Real representation of \pi. *)
+
 val e: t  (** Real representation of \e. *)
 
 val contains_plus_zero : t -> bool
 
-val meet: t -> t -> t Bottom.or_bottom
+val meet: t -> t -> t Lattice_bounds.or_bottom
 
 val is_singleton : t -> bool
 (** Returns [true] on NaN. We expect this function to be e.g. to perform
@@ -131,7 +134,7 @@ val ceil: kind -> t -> t
 val trunc: kind -> t -> t
 val fround: kind -> t -> t
 
-val backward_cast_float_to_double: t -> t Bottom.or_bottom
+val backward_cast_float_to_double: t -> t Lattice_bounds.or_bottom
 (** [backward_cast_float_to_double d] return all possible float32 [f] such that
     [(double)f = d]. The double of [d] that have no float32 equivalent are
     discarded. *)

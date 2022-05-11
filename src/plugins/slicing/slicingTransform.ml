@@ -50,7 +50,7 @@ module Visibility (SliceName : sig
 
   let keep_body kf =
     Kernel_function.is_definition kf &&
-    not (!Db.Value.use_spec_instead_of_definition kf)
+    not (Eva.Analysis.use_spec_instead_of_definition kf)
 
   (* _project is left to comply with a module signature defined outside
      the slicing module (in filter) *)
@@ -449,7 +449,7 @@ module Visibility (SliceName : sig
     info
 
   let cond_edge_visible _ff_opt s =
-    Db.Value.condition_truth_value s
+    Eva.Results.condition_truth_value s
 
 end
 

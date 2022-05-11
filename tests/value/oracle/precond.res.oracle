@@ -17,19 +17,19 @@
 [eva] precond.c:32: function f: precondition 'i' got status valid.
 [eva] Recording results for f
 [eva] Done for function f
-[eva] computing for function g <- main.
-  Called from precond.c:34.
 [kernel] precond.c:34: Warning: 
   No code nor implicit assigns clause for function g, generating default assigns from the prototype
+[eva] computing for function g <- main.
+  Called from precond.c:34.
 [eva] using specification for function g
 [eva:alarm] precond.c:34: Warning: function g: precondition got status unknown.
 [eva] Done for function g
 [eva] computing for function aux <- main.
   Called from precond.c:36.
-[eva] computing for function f2 <- aux <- main.
-  Called from precond.c:21.
 [kernel] precond.c:21: Warning: 
   No code nor implicit assigns clause for function f2, generating default assigns from the prototype
+[eva] computing for function f2 <- aux <- main.
+  Called from precond.c:21.
 [eva] using specification for function f2
 [eva] precond.c:21: function f2: precondition got status valid.
 [eva] Done for function f2

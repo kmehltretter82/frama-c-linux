@@ -23,5 +23,18 @@ int main() {
   int r2 = lstat("/tmp/bla", &st);
   int r3 = mkfifo("/tmp/fifo", 0644);
   int r4 = mknod("/tmp/fifo2", 0644, 42);
+
+  int r5 = chmod("/tmp/bla", 0700);
+
+  int r6 = fchmod(fd, 0700);
+
+  int r7 = fchmodat(AT_FDCWD, "bla", 0700, AT_SYMLINK_NOFOLLOW);
+
+  struct stat buf;
+
+  int r8 = fstat(fd, &buf);
+
+  int r9 = fstatat(AT_FDCWD, "bla", &buf, AT_SYMLINK_NOFOLLOW);
+
   return 0;
 }

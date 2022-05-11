@@ -113,14 +113,29 @@ let unfolds_from_list phis es =
 let unfolds_from_smap phis m =
   Smap.map (fun _s es -> unfolds_from_list phis es) m
 
+module Unfoldedset = Qed.Listset.Make(Lang.Fun)
+
 let tactical_inside step unfolds sequent =
   if Lang.F.Tmap.is_empty unfolds
   then raise Not_found
   else match step.condition with
     | Type p | Have p | When p | Core p | Init p ->
-      let subst t = Lang.F.Tmap.find t unfolds in
+      let unfolded = ref Unfoldedset.empty in
+      let subst t =
+        let result = Lang.F.Tmap.find t unfolds in
+        begin match F.repr t with
+          | Qed.Logic.Fun(f,_) -> unfolded := Unfoldedset.add f !unfolded
+          | _ -> ()
+        end ;
+        result
+      in
       let p = condition step @@ Lang.p_subst subst p in
-      snd @@ Tactical.replace_single ~at:step.id ("Unfolded", p) sequent
+      let feedback =
+        let pp fmt f = Format.fprintf fmt "'%a'" Lang.Fun.pretty f in
+        Format.asprintf "Unfold %a"
+          (Pretty_utils.pp_list ~sep:", " pp) !unfolded
+      in
+      !unfolded, snd @@ Tactical.replace_single ~at:step.id (feedback, p) sequent
     | _ -> raise Not_found
 
 let tactical_goal unfolds (seq, g) =
@@ -131,12 +146,21 @@ let tactical_goal unfolds (seq, g) =
     seq, Lang.p_subst subst g
 
 let fold_selection goal_unfolds step_unfolds sequent =
-  "Unfolded multiple selection",
+  let tactical s l (acc_unfolded, seq) =
+    let unfolded, seq = tactical_inside s l seq in
+    Unfoldedset.union unfolded acc_unfolded, seq
+  in
+  let unfolded, seq = Smap.fold tactical step_unfolds ([], sequent) in
+  let feedback =
+    let pp fmt f = Format.fprintf fmt "'%a'" Lang.Fun.pretty f in
+    Format.asprintf "Unfold %a"
+      (Pretty_utils.pp_list ~sep:", " pp) unfolded
+  in
   let add_goal = match goal_unfolds with
     | None -> Extlib.id
     | Some goal_unfolds -> tactical_goal goal_unfolds
   in
-  add_goal @@ Smap.fold tactical_inside step_unfolds sequent
+  feedback, add_goal seq
 
 let process (f: sequent -> string * sequent) s = [ f s ]
 

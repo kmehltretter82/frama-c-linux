@@ -24,14 +24,14 @@ val check_call : Cil_types.stmt -> bool -> Cil_types.stmt
 
 val print_select :
   Format.formatter ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit -> unit
+  SlicingTypes.sl_select -> unit
 
 val get_select_kf : Cil_types.varinfo * 'a -> Cil_types.kernel_function
 
 val check_db_select :
   Cil_datatype.Varinfo.t ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select ->
+  SlicingTypes.sl_select
 
 val empty_db_select :
   Kernel_function.t -> Cil_types.varinfo * SlicingInternals.fct_user_crit
@@ -43,30 +43,30 @@ val top_db_select :
 
 val check_kf_db_select :
   Kernel_function.t ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select ->
+  SlicingTypes.sl_select
 
 val check_ff_db_select :
   SlicingInternals.fct_slice ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
+  SlicingTypes.sl_select ->
 
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select
 val bottom_msg : Kernel_function.t -> unit
 
 val basic_add_select :
   Kernel_function.t ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
+  SlicingTypes.sl_select ->
   PdgTypes.Node.t list ->
   ?undef:Locations.Zone.t option * SlicingTypes.sl_mark ->
   SlicingActions.n_or_d_marks ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select
 
 val select_pdg_nodes :
   Kernel_function.t ->
-  ?select:Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
+  ?select:SlicingTypes.sl_select ->
   PdgTypes.Node.t list ->
   SlicingTypes.sl_mark ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select
 
 val mk_select :
   Db.Pdg.t ->
@@ -77,12 +77,12 @@ val mk_select :
 
 val select_stmt_zone :
   Kernel_function.t ->
-  ?select:Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
+  ?select:SlicingTypes.sl_select ->
   Cil_types.stmt ->
   before:bool ->
   Locations.Zone.t ->
   SlicingTypes.sl_mark ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select
 
 (** this one is similar to [select_stmt_zone] with the return statement
  * when the function is defined, but it can also be used for undefined functions. *)
@@ -90,91 +90,91 @@ val select_in_out_zone :
   at_end:bool ->
   use_undef:bool ->
   Kernel_function.t ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
+  SlicingTypes.sl_select ->
   Locations.Zone.t ->
   SlicingTypes.sl_mark ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select
 
 val select_zone_at_end :
   Kernel_function.t ->
-  ?select:Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
+  ?select:SlicingTypes.sl_select ->
   Locations.Zone.t ->
   SlicingTypes.sl_mark ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select
 
 val select_modified_output_zone :
   Kernel_function.t ->
-  ?select:Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
+  ?select:SlicingTypes.sl_select ->
   Locations.Zone.t ->
   SlicingTypes.sl_mark ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select
 
 val select_zone_at_entry :
   Kernel_function.t ->
-  ?select:Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
+  ?select:SlicingTypes.sl_select ->
   Locations.Zone.t ->
   SlicingTypes.sl_mark ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select
 
 val stmt_nodes_to_select :
   Db.Pdg.t -> Cil_types.stmt -> PdgTypes.Node.t list
 
 val select_stmt_computation :
   Kernel_function.t ->
-  ?select:Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
+  ?select:SlicingTypes.sl_select ->
   Cil_types.stmt ->
   SlicingTypes.sl_mark ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select
 
 val select_label :
   Kernel_function.t ->
-  ?select:Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
+  ?select:SlicingTypes.sl_select ->
   Cil_types.logic_label ->
   SlicingTypes.sl_mark ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select
 
 (** marking a call node means that a [choose_call] will have to decide that to
  * call according to the slicing-level, but anyway, the call will be visible.
 *)
 val select_minimal_call :
   Kernel_function.t ->
-  ?select:Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
+  ?select:SlicingTypes.sl_select ->
   Cil_types.stmt ->
   SlicingTypes.sl_mark ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select
 
 val select_stmt_ctrl :
   Kernel_function.t ->
-  ?select:Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
-  Cil_types.stmt -> Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  ?select:SlicingTypes.sl_select ->
+  Cil_types.stmt -> SlicingTypes.sl_select
 
 val select_entry_point :
   Kernel_function.t ->
-  ?select:Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
+  ?select:SlicingTypes.sl_select ->
   SlicingTypes.sl_mark ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select
 
 val select_return :
   Kernel_function.t ->
-  ?select:Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
+  ?select:SlicingTypes.sl_select ->
   SlicingTypes.sl_mark ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select
 
 val select_decl_var :
   Kernel_function.t ->
-  ?select:Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
+  ?select:SlicingTypes.sl_select ->
   Cil_types.varinfo ->
   SlicingTypes.sl_mark ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select
 
 val merge_select :
   SlicingInternals.fct_user_crit ->
   SlicingInternals.fct_user_crit -> SlicingInternals.fct_user_crit
 
 val merge_db_select :
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit
+  SlicingTypes.sl_select ->
+  SlicingTypes.sl_select ->
+  SlicingTypes.sl_select
 
 module Selections : sig
 
@@ -214,13 +214,13 @@ val call_min_f_in_caller :
 
 val is_already_selected :
   SlicingInternals.fct_slice ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit -> bool
+  SlicingTypes.sl_select -> bool
 
 val add_ff_selection :
   SlicingInternals.fct_slice ->
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit -> unit
+  SlicingTypes.sl_select -> unit
 
 (** add a persistent selection to the function.
  * This might change its slicing level in order to call slices later on. *)
 val add_fi_selection :
-  Cil_datatype.Varinfo.t * SlicingInternals.fct_user_crit -> unit
+  SlicingTypes.sl_select -> unit

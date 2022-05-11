@@ -325,8 +325,7 @@ void main(void)
       loop invariant Aorai: 0 ≡ aorai_intermediate_state_0;
       loop invariant Aorai: 0 ≡ init;
       loop invariant Aorai: 1 ≡ S ∨ 1 ≡ T;
-      loop invariant
-        Aorai: aorai_Loop_Init_4 ≢ 0 ⇒ \at(1 ≡ init,Pre) ⇒ 0 ≡ T;
+      loop invariant Aorai: aorai_Loop_Init_4 ≢ 0 ⇒ 0 ≡ T;
       loop assigns i, aorai_Loop_Init_4, aorai_CurOpStatus,
                    aorai_CurOperation, S, T, aorai_intermediate_state,
                    aorai_intermediate_state_0, init;

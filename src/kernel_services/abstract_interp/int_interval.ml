@@ -699,7 +699,7 @@ let div x y =
         `Value (div_range x min gneg)
       else `Bottom
     in
-    Bottom.join join result_neg result_pos
+    Lattice_bounds.Bottom.join join result_neg result_pos
 
 (* ----------------------------------- Misc --------------------------------- *)
 

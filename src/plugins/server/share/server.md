@@ -38,7 +38,7 @@ asynchronous entry points, requests are classified into three kinds:
 - `EXEC` to starts a resource intensive analysis in Frama-C
 
 During an `EXEC` requests, the implementation of the all resource demanding
-computations shall repeatedly call the yielding routine `!Db.progress()` of the
+computations shall repeatedly call the yielding routine `Db.yield()` of the
 Frama-C kernel to ensures a smooth asynchronous behavior of the Server. During a
 _yield_ call, the Server would be allowed to handle few `GET` pending requests,
 since they shall be fast without any modification. When the server is idled, any
@@ -59,18 +59,24 @@ to the client. However, since a lot of signals might be emitted, the server
 must be aware of which signals the client is listening to.
 Signal are identified by unique strings.
 
-The server and client can exchange two special commands to manage signals:
+The server and client can exchange other special commands to manage signals:
 
 | Command | Issued by | Effect                      |
 |:--------|:---------:|:----------------------------|
 | `SIGON s` | client | start listening to signal `<s>` |
 | `SIGOFF s` | client | stop listening to signal `<s>` |
 | `SIGNAL s` | server | signal `<s>` has been emitted  |
+| `CMDLINEON` | server | execution of the Frama-C command line |
+| `CMDLINEOFF` | server | termination of the Frama-C command line |
 
 When one or many requests emit some signal `<s>` several times,
 the client would be notified only once per cycle of data exchange.
 Signals will be notified in addition to responses or logical requests
 or server polling.
+
+During the execution of the Frama-C command line, the server behaves just like
+during an `EXEC` request: only `GET` requests are processed at `Db.yield()` calls
+until the (normal) termination of the command line.
 
 ## Transport Messages
 
@@ -89,7 +95,7 @@ paired _intput messages_ and _output messages_. Each single input message consis
 a list of _commands_:
 
 | Commands | Parameters | Description |
-|:--------:|:----------:|:------------|
+|:---------|:-----------|:------------|
 | `POLL` | - | Ask for pending responses and signals, if any |
 | `GET` | `id,request,data` | En-queue the given GET request |
 | `SET` | `id,request,data` | En-queue the given SET request |
@@ -103,12 +109,14 @@ Similarly, a single output message consists of a list
 of _replies_, listed in table below:
 
 | Replies  | Parameters | Description |
-|:--------:|:----------:|:------------|
+|:---------|:-----------|:------------|
 | `DATA` | `id,data` | Response data from the identified request |
 | `ERROR` | `id,message` | Error message from the identified request |
 | `SIGNAL` | `id` | The identified signal has been emitted since last exchange |
 | `KILLED` | `id` | The identified request has been killed or interrupted |
 | `REJECTED` | `id` | The identified request was not registered on the Server |
+| `CMDLINEON` | - | The command line has started |
+| `CMDLINEOFF` | - | The command line is terminated |
 
 The logic layer makes no usage of _identifiers_ and simply pass them unchanged into
 output messages in response to received requests.
@@ -131,9 +139,21 @@ function that possibly returns a list of commands, associated with a
 callback for emitting the paired list of replies. The Server main
 loop is guaranteed to invoke the callback exactly once.
 
-The Server plug-in implements two entry-points, however, other Frama-C plugins might
-implement their own entry-points and call the `Server.Main.run ~fetch ()` function
-to make the server starting and exchanging messages with the external world.
+To integrate your own server into the Frama-C command-line framework, you need to
+provide an implementation of the non-blocking `fetch` function and create a server
+with `Server.create`. Then, you shall:
+
+- Schedule `Server.start myServer` during the main plug-in extension phase _via_
+  `Db.Main.extend`;
+
+- Schedule `Server.run myServer` at normal command line termination phase _via_
+  `Cmdline.at_normal_exit`;
+
+- Schedule `Server.stop myServer` with other cleaning operations at exit phase
+  _via_ `Extlib.at_exit_safe`.
+
+This way, your server will integrate well with the command line execution of
+Frama-C and the other plug-ins.
 
 ## Request Implementations
 

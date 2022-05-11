@@ -81,7 +81,10 @@ module Jint : S with type t = int
 module Jfloat : S with type t = float
 module Jstring : S with type t = string
 module Jalpha : S with type t = string
-module Jtext : S with type t = json (** Rich text encoding, see [Jbuffer]. *)
+
+(** Rich text encoding, see [Jbuffer]. *)
+module Jtext : S with type t = json
+
 module Jmarkdown : S with type t = Markdown.text
 
 (** All-in-one formatter. Return the JSON encoding of formatted text. *)
@@ -168,9 +171,14 @@ val declare :
 module Record :
 sig
 
-  type 'a record (** Records of type ['a]. *)
-  type 'a signature  (** Opened signature for record of type ['a]. *)
-  type ('a,'b) field (** Field of type ['b] for a record of type ['a]. *)
+  (** Records of type ['a]. *)
+  type 'a record
+
+  (** Opened signature for record of type ['a]. *)
+  type 'a signature
+
+  (** Field of type ['b] for a record of type ['a]. *)
+  type ('a,'b) field
 
   (** Data with [type t = r record].
       Also contains getters and setters for fields. *)
@@ -348,7 +356,9 @@ module type Index =
 sig
   include S
   val get : t -> int
-  val find : int -> t (** @raise Not_found if not registered. *)
+  val find : int -> t
+  (** @raise Not_found if not registered. *)
+
   val clear : unit -> unit
   (** Clear index tables. Use with extreme care. *)
 end

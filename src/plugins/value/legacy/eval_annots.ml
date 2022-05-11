@@ -22,6 +22,7 @@
 
 open Cil_types
 open Eval_terms
+open Lattice_bounds
 
 let has_requires spec =
   let behav_has_requires b = b.b_requires <> [] in
@@ -96,19 +97,19 @@ let mark_unreachable () =
       end;
       Cil.DoChildren
 
-    method! vinst _ = SkipChildren
-    method! vexpr _ = SkipChildren
-    method! vlval _ = SkipChildren
-    method! vtype _ = SkipChildren
-    method! vspec _ = SkipChildren
-    method! vcode_annot _ = SkipChildren
+    method! vinst _ = Cil.SkipChildren
+    method! vexpr _ = Cil.SkipChildren
+    method! vlval _ = Cil.SkipChildren
+    method! vtype _ = Cil.SkipChildren
+    method! vspec _ = Cil.SkipChildren
+    method! vcode_annot _ = Cil.SkipChildren
   end
   in
   Annotations.iter_all_code_annot do_code_annot;
   Visitor.visitFramacFileFunctions unreach (Ast.get ())
 
 let c_labels kf cs =
-  if !Db.Value.use_spec_instead_of_definition kf then
+  if Function_calls.use_spec_instead_of_definition kf then
     Cil_datatype.Logic_label.Map.empty
   else
     let fdec = Kernel_function.get_definition kf in

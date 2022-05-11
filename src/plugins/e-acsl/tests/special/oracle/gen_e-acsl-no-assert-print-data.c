@@ -11,9 +11,9 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int value = 2147483647;
-  __e_acsl_store_block((void *)(& value),(size_t)4);
+  __e_acsl_store_block((void *)(& value),4UL);
   __e_acsl_full_init((void *)(& value));
   {
     int __gen_e_acsl_x;

@@ -38,9 +38,9 @@
     "warning-categories": {
       "enabled": [
         "*", "alarm", "builtins", "builtins:missing-spec",
-        "builtins:override", "experimental", "libc", "libc:unsupported-spec",
-        "locals-escaping", "loop-unroll", "malloc", "malloc:imprecise",
-        "signed-overflow", "taint", "unknown-size"
+        "builtins:override", "ensures-false", "experimental", "libc",
+        "libc:unsupported-spec", "locals-escaping", "loop-unroll", "malloc",
+        "malloc:imprecise", "signed-overflow", "taint", "unknown-size"
       ],
       "disabled": [
         "garbled-mix", "invalid-assigns", "loop-unroll:auto",

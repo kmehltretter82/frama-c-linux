@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- Server Controller
 // --------------------------------------------------------------------------
@@ -30,13 +28,15 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
-
+import * as Preferences from 'ivette/prefs';
 import * as Toolbars from 'dome/frame/toolbars';
 import { IconButton } from 'dome/controls/buttons';
 import { LED, LEDstatus } from 'dome/controls/displays';
 import { Label, Code } from 'dome/controls/labels';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
+import { resolve } from 'dome/system';
+
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 
@@ -45,16 +45,17 @@ import * as Server from 'frama-c/server';
 // --------------------------------------------------------------------------
 
 const quoteRe = new RegExp('^[-_./:a-zA-Z0-9]+$');
-const quote = (s: string) => (quoteRe.test(s) ? s : `"${s}"`);
+const quote = (s: string): string =>
+  (quoteRe.test(s) ? s : `"${s}"`);
 
 const unquoteRe = new RegExp('^".*"$');
-const unquote = (s: string) =>
+const unquote = (s: string): string =>
   (unquoteRe.test(s) ? s.substring(1, s.length - 1) : s);
 
 function dumpServerConfig(sc: Server.Configuration): string {
   let buffer = '';
-  const { cwd, command, sockaddr, params } = sc;
-  if (cwd) buffer += `--cwd ${quote(cwd)}\n`;
+  const { working, command, sockaddr, params } = sc;
+  if (working) buffer += `--working ${quote(working)}\n`;
   if (command) buffer += `--command ${quote(command)}\n`;
   if (sockaddr) buffer += `--socket ${sockaddr}\n`;
   if (params) {
@@ -72,22 +73,26 @@ function dumpServerConfig(sc: Server.Configuration): string {
   return buffer;
 }
 
-function buildServerConfig(argv: string[], cwd?: string) {
+function buildServerConfig(argv: string[], cwd?: string): Server.Configuration {
   const params = [];
   let command;
   let sockaddr;
-  let cwdir = cwd ? unquote(cwd) : undefined;
+  let working = cwd ? unquote(cwd) : undefined;
   for (let k = 0; k < (argv ? argv.length : 0); k++) {
     const v = argv[k];
     switch (v) {
-      case '--cwd':
+      case '-C':
+      case '--working':
+      case '--cwd': // Deprecated
         k += 1;
-        cwdir = unquote(argv[k]);
+        working = resolve(unquote(argv[k]));
         break;
+      case '-B':
       case '--command':
         k += 1;
-        command = unquote(argv[k]);
+        command = resolve(unquote(argv[k]));
         break;
+      case '-U':
       case '--socket':
         k += 1;
         sockaddr = argv[k];
@@ -97,18 +102,37 @@ function buildServerConfig(argv: string[], cwd?: string) {
     }
   }
   return {
-    cwd: cwdir,
+    working,
     command,
     sockaddr,
     params,
   };
 }
 
-function buildServerCommand(cmd: string) {
+function buildServerCommand(cmd: string): Server.Configuration {
   return buildServerConfig(cmd.trim().split(/[ \t\n]+/));
 }
 
-function insertConfig(hs: string[], cfg: Server.Configuration) {
+/* -------------------------------------------------------------------------- */
+/* --- History Management                                                 --- */
+/* -------------------------------------------------------------------------- */
+
+const historySetting = 'Controller.history';
+const historyDecoder = Json.jList(Json.jString);
+
+function getHistory(): string[] {
+  return Settings.getLocalStorage(historySetting, historyDecoder, []);
+}
+
+function setHistory(hs: string[]): void {
+  Settings.setLocalStorage(historySetting, hs);
+}
+
+function useHistory(): [string[], ((hs: string[]) => void)] {
+  return Settings.useLocalStorage(historySetting, historyDecoder, []);
+}
+
+function insertConfig(hs: string[], cfg: Server.Configuration): string[] {
   const cmd = dumpServerConfig(cfg).trim();
   const newhs =
     hs.map((h) => h.trim())
@@ -125,9 +149,7 @@ function insertConfig(hs: string[], cfg: Server.Configuration) {
 let reloadCommand: string | undefined;
 
 Dome.reload.on(() => {
-  const [lastCmd] = Settings.getLocalStorage(
-    'Controller.history', Json.jList(Json.jString), [],
-  );
+  const [lastCmd] = getHistory();
   reloadCommand = lastCmd;
 });
 
@@ -136,7 +158,13 @@ Dome.onCommand((argv: string[], cwd: string) => {
   if (reloadCommand) {
     cfg = buildServerCommand(reloadCommand);
   } else {
-    cfg = buildServerConfig(argv, cwd);
+    const hs = getHistory();
+    if (argv.find((v) => v === '--reload' || v === '-R')) {
+      cfg = buildServerCommand(hs[0]);
+    } else {
+      cfg = buildServerConfig(argv, cwd);
+      setHistory(insertConfig(hs, cfg));
+    }
   }
   Server.setConfig(cfg);
   Server.start();
@@ -146,7 +174,7 @@ Dome.onCommand((argv: string[], cwd: string) => {
 // --- Server Control
 // --------------------------------------------------------------------------
 
-export const Control = () => {
+export const Control = (): JSX.Element => {
   const status = Server.useStatus();
 
   let play = { enabled: false, onClick: () => { /* do nothing */ } };
@@ -158,6 +186,7 @@ export const Control = () => {
       play = { enabled: true, onClick: Server.start };
       break;
     case Server.Status.ON:
+    case Server.Status.CMD:
     case Server.Status.FAILURE:
       stop = { enabled: true, onClick: Server.stop };
       reload = { enabled: true, onClick: Server.restart };
@@ -196,17 +225,15 @@ export const Control = () => {
 
 const editor = new RichTextBuffer();
 
-const RenderConsole = () => {
+const RenderConsole = (): JSX.Element => {
   const scratch = React.useRef([] as string[]);
   const [cursor, setCursor] = React.useState(-1);
   const [isEmpty, setEmpty] = React.useState(true);
   const [noTrash, setNoTrash] = React.useState(true);
-  const [history, setHistory] = Settings.useLocalStorage(
-    'Controller.history', Json.jList(Json.jString), [],
-  );
+  const [history, setHistory] = useHistory();
 
   React.useEffect(() => {
-    const callback = () => {
+    const callback = (): void => {
       const cmd = editor.getValue().trim();
       setEmpty(cmd === '');
       setNoTrash(noTrash && cmd === history[0]);
@@ -215,7 +242,12 @@ const RenderConsole = () => {
     return () => { editor.off('change', callback); };
   });
 
-  const doReload = () => {
+  const [maxLines] = Settings.useGlobalSettings(Preferences.ConsoleScrollback);
+  React.useEffect(() => {
+    Server.buffer.setMaxlines(maxLines);
+  });
+
+  const doReload = (): void => {
     const cfg = Server.getConfig();
     const hst = insertConfig(history, cfg);
     const cmd = hst[0];
@@ -226,7 +258,7 @@ const RenderConsole = () => {
     setCursor(0);
   };
 
-  const doSwitch = () => {
+  const doSwitch = (): void => {
     if (cursor < 0) doReload();
     else {
       editor.clear();
@@ -235,7 +267,7 @@ const RenderConsole = () => {
     }
   };
 
-  const doExec = () => {
+  const doExec = (): void => {
     const cfg = buildServerCommand(editor.getValue());
     const hst = insertConfig(history, cfg);
     setHistory(hst);
@@ -245,9 +277,9 @@ const RenderConsole = () => {
     Server.restart();
   };
 
-  const doMove = (target: number) => {
+  const doMove = (target: number): (undefined | (() => void)) => {
     if (0 <= target && target < history.length && target !== cursor)
-      return () => {
+      return (): void => {
         const cmd = editor.getValue();
         const pad = scratch.current;
         pad[cursor] = cmd;
@@ -259,7 +291,7 @@ const RenderConsole = () => {
     return undefined;
   };
 
-  const doRemove = () => {
+  const doRemove = (): void => {
     const n = history.length;
     if (n <= 1) doReload();
     else {
@@ -353,7 +385,6 @@ Ivette.registerView({
   id: 'console',
   rank: -1,
   label: 'Console',
-  defaultView: true,
   layout: 'frama-c.console',
 });
 
@@ -361,40 +392,54 @@ Ivette.registerView({
 // --- Status
 // --------------------------------------------------------------------------
 
-export const Status = () => {
+export const Status = (): JSX.Element => {
   const status = Server.useStatus();
   const pending = Server.getPending();
   let led: LEDstatus = 'inactive';
+  let title = undefined;
   let icon = undefined;
   let running = 'OFF';
   let blink = false;
 
   switch (status) {
     case Server.Status.OFF:
+      title = 'Server is off';
       break;
     case Server.Status.STARTING:
       led = 'active';
       blink = true;
       running = 'BOOT';
+      title = 'Server is starting';
       break;
     case Server.Status.ON:
-      led = pending > 0 ? 'positive' : 'active';
+      led = 'active';
+      blink = pending > 0;
       running = 'ON';
+      title = 'Server is running';
+      break;
+    case Server.Status.CMD:
+      led = 'positive';
+      blink = true;
+      running = 'CMD';
+      title = 'Command-line processing';
       break;
     case Server.Status.HALTING:
       led = 'negative';
       blink = true;
       running = 'HALT';
+      title = 'Server is halting';
       break;
     case Server.Status.RESTARTING:
       led = 'warning';
       blink = true;
       running = 'REBOOT';
+      title = 'Server is restarting';
       break;
     case Server.Status.FAILURE:
       led = 'negative';
       blink = true;
       running = 'ERR';
+      title = 'Server halted because of failure';
       icon = 'WARNING';
       break;
   }
@@ -402,7 +447,7 @@ export const Status = () => {
   return (
     <>
       <LED status={led} blink={blink} />
-      <Code icon={icon} label={running} />
+      <Code icon={icon} label={running} title={title} />
       <Toolbars.Separator />
     </>
   );
@@ -412,7 +457,7 @@ export const Status = () => {
 // --- Server Stats
 // --------------------------------------------------------------------------
 
-export const Stats = () => {
+export const Stats = (): (null | JSX.Element) => {
   Server.useStatus();
   const pending = Server.getPending();
   return pending > 0 ? <Code>{pending} rq.</Code> : null;

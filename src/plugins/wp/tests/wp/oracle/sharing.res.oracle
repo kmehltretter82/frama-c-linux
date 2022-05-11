@@ -57,7 +57,7 @@ end
        let m3 = set m2 (shift_sint32 a 3) (get m2 a2) in
        0 <= i1 ->
        0 <= i ->
-       region (base a) <= 0 ->
+       region (a.base) <= 0 ->
        i1 <= 9 ->
        i <= 9 ->
        linked t ->

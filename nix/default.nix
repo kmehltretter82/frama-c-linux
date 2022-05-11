@@ -9,10 +9,11 @@ let mydir = builtins.getEnv("PWD");
     };
      opamPackages =
       [ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
-        "ppx_deriving" "ppx_deriving_yojson"
+        "ppx_import" "ppx_deriving" "ppx_deriving_yojson"
         "coq=8.13.0" "alt-ergo=2.2.0"
-        "why3=1.4.0" "why3-coq=1.4.0"
+        "why3=1.5.0" "why3-coq=1.5.0"
         "menhir=20211012"
+        "easy-format=1.3.2"
       ];
     # only pure nix packages. See mk_deriv below for adding opam2nix packages
     mk_buildInputs = { nixPackages ? [] } :
@@ -92,7 +93,7 @@ pkgs.lib.makeExtensible
   lint = mk_deriv {
         name = "frama-c-lint";
         src = self.src;
-        opamPackages = [ "ocp-indent=1.7.0" "headache=1.05"];
+        opamPackages = [ "ocp-indent=1.8.1" "headache=1.05"];
         buildInputs =
           self.mk_buildInputs { nixPackages = [ pkgs.bc pkgs.clang_10 ]; };
         outputs = [ "out" ];
@@ -318,7 +319,6 @@ pkgs.lib.makeExtensible
                 [ pkgs.getopt pkgs.libxslt pkgs.libxml2 pkgs.autoPatchelfHook
                   pkgs.swiProlog stdenv.cc.cc.lib ];
             };
-        counter_examples_src = plugins.counter-examples.src;
         genassigns_src = plugins.genassigns.src;
         frama_clang_src = plugins.frama-clang.src;
         pathcrawler_src = plugins.pathcrawler.src;
@@ -333,8 +333,6 @@ pkgs.lib.makeExtensible
                patchShebangs .
         '';
         postUnpack = ''
-           cp -r --preserve=mode "$counter_examples_src" "$sourceRoot/src/plugins/counter-examples"
-           chmod -R u+w -- "$sourceRoot/src/plugins/counter-examples"
            cp -r --preserve=mode "$genassigns_src" "$sourceRoot/src/plugins/genassigns"
            chmod -R u+w -- "$sourceRoot/src/plugins/genassigns"
            # cp -r --preserve=mode "$frama_clang_src" "$sourceRoot/src/plugins/frama-clang"

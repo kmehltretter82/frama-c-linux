@@ -57,17 +57,10 @@ let _computation_signal =
     ~add_hook:Analysis.register_computation_hook
     ()
 
-let is_computed kf =
-  Analysis.is_computed () &&
-  match kf with
-  | { fundec = Definition (fundec, _) } ->
-    Mark_noresults.should_memorize_function fundec
-  | { fundec = Declaration _ } -> false
-
 module CallSite = Data.Jpair (Kernel_ast.Kf) (Kernel_ast.Stmt)
 
 let callers kf =
-  let list = Eva_results.callers kf in
+  let list = Results.callsites kf in
   List.concat (List.map (fun (kf, l) -> List.map (fun s -> kf, s) l) list)
 
 let () = Request.register ~package
@@ -75,6 +68,12 @@ let () = Request.register ~package
     ~descr:(Markdown.plain "Get the list of call site of a function")
     ~input:(module Kernel_ast.Kf) ~output:(module Data.Jlist (CallSite))
     callers
+
+(* ----- Functions ---------------------------------------------------------- *)
+
+let () =
+  Analysis.register_computation_hook
+    (fun _ -> States.reload Kernel_ast.Functions.array)
 
 
 (* ----- Dead code: unreachable and non-terminating statements -------------- *)
@@ -115,20 +114,22 @@ end
 
 let dead_code kf =
   let empty = { kf; unreachable = []; non_terminating = [] } in
-  if is_computed kf then
-    let module Results = (val Analysis.current_analyzer ()) in
-    let is_unreachable ~after stmt =
-      Results.get_stmt_state ~after stmt = `Bottom
-    in
-    let classify acc stmt =
-      if is_unreachable ~after:false stmt
-      then { acc with unreachable = stmt :: acc.unreachable }
-      else if is_unreachable ~after:true stmt
-      then { acc with non_terminating = stmt :: acc.non_terminating }
-      else acc
-    in
+  if Analysis.is_computed ()
+  then
     let fundec = Kernel_function.get_definition kf in
-    List.fold_left classify empty fundec.sallstmts
+    match Analysis.status kf with
+    | Unreachable | SpecUsed | Builtin _ ->
+      { kf; unreachable = fundec.sallstmts; non_terminating = [] }
+    | Analyzed NoResults -> empty
+    | Analyzed (Partial | Complete) ->
+      let classify acc stmt =
+        if Results.(before stmt |> is_empty)
+        then { acc with unreachable = stmt :: acc.unreachable }
+        else if Results.(after stmt |> is_empty)
+        then { acc with non_terminating = stmt :: acc.non_terminating }
+        else acc
+      in
+      List.fold_left classify empty fundec.sallstmts
   else empty
 
 let () = Request.register ~package
@@ -139,9 +140,40 @@ let () = Request.register ~package
     ~output:(module DeadCode)
     dead_code
 
+(* ----- Register Eva information ------------------------------------------- *)
+
+let print_value fmt loc =
+  let stmt, eval =
+    match loc with
+    | Printer_tag.PLval (_kf, Kstmt stmt, lval)
+      when Cil.isScalarType (Cil.typeOfLval lval) ->
+      stmt, Results.eval_lval lval
+    | Printer_tag.PExp (_kf, Kstmt stmt, expr)
+      when Cil.isScalarType (Cil.typeOf expr) ->
+      stmt, Results.eval_exp expr
+    | _ -> raise Not_found
+  in
+  let eval_cvalue at = Results.(at stmt |> eval |> as_cvalue_or_uninitialized) in
+  let before = eval_cvalue Results.before in
+  let after = eval_cvalue Results.after in
+  let pretty = Cvalue.V_Or_Uninitialized.pretty in
+  if Cvalue.V_Or_Uninitialized.equal before after
+  then pretty fmt before
+  else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
+
+let () =
+  Server.Kernel_ast.Information.register
+    ~id:"eva.value"
+    ~label:"Value"
+    ~title:"Possible values inferred by Eva"
+    ~enable:Analysis.is_computed
+    print_value
+
+let () =
+  Analysis.register_computation_hook
+    (fun _ -> Server.Kernel_ast.Information.update ())
 
 (* ----- Red and tainted alarms --------------------------------------------- *)
-
 
 module Taint = struct
   open Server.Data

@@ -34,7 +34,7 @@ int __gen_e_acsl_p4(int i, int j, int k);
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   {
     int __gen_e_acsl_forall;
     int __gen_e_acsl_x;
@@ -338,7 +338,7 @@ int main(void)
   ;
   {
     int buf[10];
-    __e_acsl_store_block((void *)(buf),(size_t)40);
+    __e_acsl_store_block((void *)(buf),40UL);
     unsigned long len = (unsigned long)9;
     {
       int __gen_e_acsl_forall_9;

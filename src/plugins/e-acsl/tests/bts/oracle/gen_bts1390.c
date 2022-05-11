@@ -30,10 +30,10 @@ void *memchr(void const *buf, int c, size_t n)
 {
   void *__retres;
   int i;
-  __e_acsl_store_block((void *)(& __retres),(size_t)8);
-  __e_acsl_store_block((void *)(& buf),(size_t)8);
+  __e_acsl_store_block((void *)(& __retres),8UL);
+  __e_acsl_store_block((void *)(& buf),8UL);
   char *s = (char *)buf;
-  __e_acsl_store_block((void *)(& s),(size_t)8);
+  __e_acsl_store_block((void *)(& s),8UL);
   __e_acsl_full_init((void *)(& s));
   i = 0;
   while ((size_t)i < n) {
@@ -74,16 +74,16 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
   int __gen_e_acsl_at_2;
   void const *__gen_e_acsl_at;
   void *__retres;
-  __e_acsl_store_block((void *)(& __retres),(size_t)8);
+  __e_acsl_store_block((void *)(& __retres),8UL);
   {
     int __gen_e_acsl_exists;
     unsigned int __gen_e_acsl_i;
     int __gen_e_acsl_forall;
     unsigned int __gen_e_acsl_k;
-    __e_acsl_store_block((void *)(& buf),(size_t)8);
+    __e_acsl_store_block((void *)(& buf),8UL);
     __gen_e_acsl_at = buf;
     __gen_e_acsl_at_2 = c;
-    __gen_e_acsl_contract = __e_acsl_contract_init((size_t)2);
+    __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __gen_e_acsl_exists = 0;
     __gen_e_acsl_i = 0U;
     while (1) {
@@ -121,7 +121,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
       __gen_e_acsl_i ++;
     }
     e_acsl_end_loop1: ;
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)0,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,
                                            __gen_e_acsl_exists);
     __gen_e_acsl_forall = 1;
     __gen_e_acsl_k = 0U;
@@ -161,14 +161,14 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
       __gen_e_acsl_k ++;
     }
     e_acsl_end_loop2: ;
-    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,(size_t)1,
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,
                                            __gen_e_acsl_forall);
   }
   __retres = memchr(buf,c,n);
   {
     int __gen_e_acsl_assumes_value;
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)0);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
     if (__gen_e_acsl_assumes_value) {
       int __gen_e_acsl_forall_2;
       unsigned int __gen_e_acsl_j;
@@ -233,7 +233,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     }
     __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
-    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,(size_t)1);
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
     if (__gen_e_acsl_assumes_value) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
         {.values = (void *)0};
@@ -277,12 +277,12 @@ void __e_acsl_globals_init(void)
 int main(void)
 {
   int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,(size_t)8);
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __e_acsl_globals_init();
   __gen_e_acsl_memchr((void const *)__gen_e_acsl_literal_string,'o',
-                      (unsigned long)4);
+                      (size_t)4);
   __gen_e_acsl_memchr((void const *)__gen_e_acsl_literal_string_2,'o',
-                      (unsigned long)4);
+                      (size_t)4);
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;

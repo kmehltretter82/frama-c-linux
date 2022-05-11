@@ -336,6 +336,26 @@ module TracesProject = Bool
       let default = false
     end)
 
+let () = Parameter_customize.set_group domains
+module MultidimSegmentLimit = Int
+    (struct
+      let option_name = "-eva-multidim-segment-limit"
+      let arg_name = "N"
+      let help = "Limit the number of segments in the abstraction of arrays."
+      let default = 8
+    end)
+let () = MultidimSegmentLimit.set_range ~min:3 ~max:max_int
+let () = add_precision_dep MultidimSegmentLimit.parameter
+
+let () = Parameter_customize.set_group domains
+module MultidimDisjunctiveInvariants = False
+    (struct
+      let option_name = "-eva-multidim-disjunctive-invariants"
+      let help = "Try to infer structures disjunctive invariants."
+    end)
+let () = add_precision_dep MultidimDisjunctiveInvariants.parameter
+
+
 (* -------------------------------------------------------------------------- *)
 (* --- Performance options                                                --- *)
 (* -------------------------------------------------------------------------- *)

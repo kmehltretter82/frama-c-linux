@@ -947,7 +947,21 @@ extern char        *getwd(char *);
 extern int          isatty(int fd);
 
 extern int          lchown(const char *, uid_t, gid_t);
-extern int          link(const char *, const char *);
+
+/*@ //missing: may assign to errno: EACCES, EEXIST, ELOOP, EMLINK, ENAMETOOLONG,
+    //                              ENOENT, ENOSPC, ENOTDIR, EPERM, EROFS,
+    //                              EXDEV, EBADF, ENOTDIR, EINVAL;
+    // missing: assigns 'filesystem' \from path1[0..strlen(path1)],
+    //                                     path2[0..strlen(path2)];
+    // missing: assigns \result \from 'paths in filesystem'
+  requires valid_path: valid_read_string(path1);
+  requires valid_path: valid_read_string(path2);
+  assigns \result \from indirect:path1[0 .. strlen(path1)],
+                        indirect:path2[0 .. strlen(path2)];
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+ */
+extern int          link(const char *path1, const char *path2);
+
 extern int          lockf(int, int, off_t);
 
 /*@ //missing: may assign to errno: EBADF, EINVAL, EOVERFLOW, ESPIPE, ENXIO (Linux);
@@ -995,8 +1009,20 @@ extern ssize_t      pwrite(int, const void *, size_t, off_t);
   assigns __fc_fds[fd] \from __fc_fds[fd];
   assigns \result, *((char *)buf+(0..count-1))
           \from indirect:__fc_fds[fd], indirect:count;
-  ensures  result_error_or_read_length: 0 <= \result <= count || \result == -1;
-  ensures  initialization:buf: \initialized(((char*)buf)+(0..\result-1));
+  behavior full_read:
+    assumes nondet_small_count: Frama_C_entropy_source && count <= SSIZE_MAX;
+    ensures res_full: \result == count;
+    ensures res_init:initialization: \initialized(((char*)buf)+(0..count-1));
+  behavior large_read_implementation_defined:
+    assumes nondet_large_count: Frama_C_entropy_source && count > SSIZE_MAX;
+    ensures res_init:initialization: \initialized(((char*)buf)+(0..count-1));
+  behavior partial_or_error:
+    assumes nondet: !Frama_C_entropy_source;
+    ensures result_error_or_read_length: -1 <= \result < count;
+    ensures initialization:buf: \initialized(((char*)buf)+(0..\result-1));
+            //note: for \result == -1, the above range is empty, as intended
+  disjoint behaviors;
+  complete behaviors;
 */
 extern ssize_t      read(int fd, void *buf, size_t count);
 
@@ -1108,7 +1134,7 @@ extern useconds_t   ualarm(useconds_t, useconds_t);
   // missing: assigns 'filesystem' \from path[0..];
   // missing: assigns \result \from 'filesystem';
   requires valid_string_path: valid_read_string(path);
-  assigns \result \from path[0..];
+  assigns \result \from indirect:path[0..strlen(path)];
   ensures result_ok_or_error: \result == 0 || \result == -1;
  */
 extern int          unlink(const char *path);

@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 [@@@ api_start]
+
 (** Eva's result API is a work-in-progress interface to allow accessing the
     analysis results once its completed. It is experimental and is very likely
     to change in the future. It aims at replacing [Db.Value] but does not
@@ -53,6 +54,16 @@
       default O (as_int (eval_var vi (in_callstack cs (before stmt))))
 *)
 
+(** Are results available for a given function? True if the function body has
+    been has been analyzed and the results have been saved.
+    False if:
+    - the function has not been reached by the analysis: all requests in the
+      function will lead to a Bottom error.
+    - a specification or a builtin has been used instead of analyzing the
+      function body: all requests in the function will lead to a Bottom error.
+    - results have not been saved, due to the [-eva-no-results] parameter:
+      all requests in the function will lead to a Top error. *)
+val are_available: Cil_types.kernel_function -> bool
 
 type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
 
@@ -224,6 +235,10 @@ val as_cvalue : value evaluation -> Cvalue.V.t
 (** Converts the value into a Cvalue abstraction. *)
 val as_cvalue_result : value evaluation -> Cvalue.V.t result
 
+(** Converts the value into a Cvalue abstraction with 'undefined' and 'escaping
+    addresses' flags. *)
+val as_cvalue_or_uninitialized : value evaluation -> Cvalue.V_Or_Uninitialized.t
+
 
 (** Converts into a C location abstraction. *)
 val as_location : address evaluation -> Locations.location result
@@ -237,6 +252,11 @@ val as_zone_result : address evaluation -> Locations.Zone.t result
 
 
 (** Evaluation properties *)
+
+
+(** Does the evaluated abstraction represents only one possible C value or
+    memory location? *)
+val is_singleton : 'a evaluation -> bool
 
 (** Returns whether the evaluated value is initialized or not. If the value have
     been evaluated from a Cil expression, it is always initialized. *)
@@ -265,6 +285,10 @@ val is_reachable : Cil_types.stmt -> bool
     the main function has been analyzed for [Kglobal]. *)
 val is_reachable_kinstr : Cil_types.kinstr -> bool
 
+val condition_truth_value: Cil_types.stmt -> bool * bool
+(** Provided [stmt] is an 'if' construct, [fst (condition_truth_value stmt)]
+    (resp. snd) is true if and only if the condition of the 'if' has been
+    evaluated to true (resp. false) at least once during the analysis. *)
 
 (*** Callers / Callees / Callsites *)
 

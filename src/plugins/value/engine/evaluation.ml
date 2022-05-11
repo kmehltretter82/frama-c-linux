@@ -1623,7 +1623,7 @@ module Make
       Self.abort ~current:true
         "Calls through function pointers are not supported without the cvalue \
          domain.";
-    if Mark_noresults.no_memoization_enabled () then
+    if Function_calls.partial_results () then
       Self.abort ~current:true
         "Function pointer evaluates to anything. Try deactivating \
          option(s) -eva-no-results and -eva-no-results-function."

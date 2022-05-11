@@ -84,7 +84,7 @@ type pdg_build = {
 (** create an empty build pdg for the function*)
 let create_pdg_build kf =
   let nb_stmts =
-    if !Db.Value.use_spec_instead_of_definition kf then 17
+    if Eva.Analysis.use_spec_instead_of_definition kf then 17
     else List.length (Kernel_function.get_definition kf).sallstmts
   in
   let index = FctIndex.create nb_stmts in
@@ -233,7 +233,7 @@ let add_ctrl_dpds pdg =
 
 
 let process_declarations pdg ~formals ~locals =
-  (** 2 new nodes for each formal parameters :
+  (* 2 new nodes for each formal parameters :
       one for its declaration, and one for its values.
       This is because it might be the case that we only need the declaration
       whatever the value is.
@@ -465,12 +465,20 @@ let create_fun_output_node pdg state dpds =
   | Some state -> add_dpds pdg new_node Dpd.Data state dpds
   | None -> (* return is unreachable *) ()
 
+let find_return_lval kf =
+  let stmt = Kernel_function.find_return kf in
+  match stmt with
+  | { skind = Return (Some {enode = Lval lval}, _) } -> stmt, lval
+  | _ -> assert false
+
 (** add a node corresponding to the returned value. *)
 let add_retres pdg state ret_stmt retres_loc_dpds retres_decls =
   let key_return = Key.stmt_key ret_stmt in
   let return_node = add_elem pdg key_return in
-  let retres_loc = Db.Value.find_return_loc pdg.fct in
-  let retres = Locations.(enumerate_valid_bits Read retres_loc) in
+  let retres =
+    let stmt, lval = find_return_lval pdg.fct in
+    Eva.Results.(before stmt |> eval_address ~for_writing:false lval |> as_zone)
+  in
   add_dpds pdg return_node  Dpd.Data state retres_loc_dpds;
   add_decl_dpds pdg return_node Dpd.Data retres_decls;
   let new_state = Pdg_state.add_loc_node state ~exact:true retres return_node in
@@ -600,11 +608,11 @@ let finalize_pdg pdg from_opt =
     = location + exact + dependencies + declarations *)
 let get_lval_infos lval stmt =
   let decl = Cil.extract_varinfos_from_lval lval in
-  let state = Db.Value.get_stmt_state stmt in
-  let dpds, z_loc, exact =
-    !Db.Value.lval_to_zone_with_deps_state
-      state ~deps:(Some Locations.Zone.bottom) ~for_writing:true lval
-  in
+  let request = Eva.Results.before stmt in
+  let address = Eva.Results.eval_address ~for_writing:true lval request in
+  let z_loc = Eva.Results.as_zone address in
+  let exact = Eva.Results.is_singleton address in
+  let dpds = Eva.Results.address_deps lval request in
   (z_loc, exact, dpds, decl)
 
 (** process assignment {v lval = exp; v}
@@ -695,20 +703,22 @@ let call_outputs  pdg state_before_call state_with_inputs stmt
 *)
 let process_call pdg state stmt lvaloption funcexp argl _loc =
   let state_before_call = state in
-  (** add a simple node for each call in order to have something in the PDG
-      for this statement even if there are no input/output *)
+  (* add a simple node for each call in order to have something in the PDG
+     for this statement even if there are no input/output *)
   ignore (add_elem pdg (Key.call_ctrl_key stmt));
   let arg_nodes = process_args pdg state_before_call stmt argl in
   let state_with_args = state in
-  let funcexp_dpds, called_functions =
-    !Db.Value.expr_to_kernel_function
-      (Kstmt stmt) ~deps:(Some Locations.Zone.bottom) funcexp
+  let called_functions = Eva.Results.callee stmt in
+  let funcexp_dpds =
+    match funcexp.enode with
+    | Lval lval -> Eva.Results.(before stmt |> address_deps lval)
+    | _ -> assert false
   in
   let mixed_froms =
     try let froms = !Db.From.Callwise.find (Kstmt stmt) in Some froms
     with Not_found -> None (* don't have callwise analysis (-calldeps option) *)
   in
-  let process_simple_call called_kf acc =
+  let process_simple_call acc called_kf =
     let state_with_inputs =
       process_call_params pdg state_with_args stmt called_kf arg_nodes
     in
@@ -724,7 +734,7 @@ let process_call pdg state stmt lvaloption funcexp argl _loc =
     in r :: acc
   in
   let state_for_each_call =
-    Kernel_function.Hptset.fold process_simple_call called_functions []
+    List.fold_left process_simple_call [] called_functions
   in
   let new_state =
     match state_for_each_call with
@@ -755,7 +765,7 @@ let process_condition ctrl_dpds_infos pdg state stmt condition =
   let decls_cond = Cil.extract_varinfos_from_exp condition in
 
   let controlled_stmts = CtrlDpds.get_if_controlled_stmts ctrl_dpds_infos stmt in
-  let go_then, go_else = Db.Value.condition_truth_value stmt in
+  let go_then, go_else = Eva.Results.condition_truth_value stmt in
   let real = go_then && go_else (* real dpd if we can go in both branches *) in
   if not real then
     debug
@@ -773,7 +783,7 @@ let process_jump_stmt pdg ctrl_dpds_infos jump =
   let controlled_stmts =
     CtrlDpds.get_jump_controlled_stmts ctrl_dpds_infos jump
   in
-  let real = Db.Value.is_reachable_stmt jump in
+  let real = Eva.Results.is_reachable jump in
   if not real then
     debug "[process_jump_stmt] stmt %d is not a real jump@." jump.sid;
   process_jump pdg jump (real, controlled_stmts)
@@ -791,7 +801,7 @@ let process_loop_stmt pdg ctrl_dpds_infos loop =
   let controlled_stmts =
     CtrlDpds.get_loop_controlled_stmts ctrl_dpds_infos loop
   in
-  let real_loop = List.exists (Db.Value.is_reachable_stmt) back_edges in
+  let real_loop = List.exists Eva.Results.is_reachable back_edges in
   if not real_loop then
     debug "[process_loop_stmt] stmt %d is not a real loop@." loop.sid;
   process_jump pdg loop (real_loop, controlled_stmts)
@@ -812,11 +822,11 @@ let process_return _current_function pdg state stmt ret_exp =
       add_retres pdg state stmt loc_exp decls_exp
     | None ->
       let controlled_stmt = Cil_datatype.Stmt.Hptset.empty in
-      let real = Db.Value.is_reachable_stmt stmt in
+      let real = Eva.Results.is_reachable stmt in
       process_jump pdg stmt (real, controlled_stmt);
       state
   in
-  if Db.Value.is_reachable_stmt stmt then
+  if Eva.Results.is_reachable stmt then
     Pdg_state.store_last_state pdg.states last_state
 
 module Computer
@@ -866,7 +876,7 @@ module Computer
     Db.yield ();
     pdg_debug "doInstr sid:%d : %a" stmt.sid Printer.pp_instr instr;
     match instr with
-    | _ when not (Db.Value.is_reachable_stmt stmt) ->
+    | _ when not (Eva.Results.is_reachable stmt) ->
       pdg_debug "stmt sid:%d is unreachable : skip.@." stmt.sid ;
       Pdg_state.bottom
     | Local_init (v, AssignInit i, _) ->
@@ -936,13 +946,12 @@ exception Value_State_Top
 let compute_pdg_for_f kf =
   let pdg = create_pdg_build kf in
   let f_locals, f_stmts =
-    if !Db.Value.use_spec_instead_of_definition kf then [], []
-    else
+    if Eva.Analysis.use_spec_instead_of_definition kf then [], []
+    else if Eva.Analysis.save_results kf
+    then
       let f = Kernel_function.get_definition kf in
-      if !Db.Value.no_results f then
-        raise Value_State_Top
-      else
-        f.slocals, f.sbody.bstmts
+      f.slocals, f.sbody.bstmts
+    else raise Value_State_Top
   in
   let init_state =
     process_entry_point pdg f_stmts;
@@ -977,7 +986,7 @@ let compute_pdg_for_f kf =
           let ctrl_dpds_infos = ctrl_dpds_infos
         end)
       in
-      if Db.Value.is_reachable_stmt start then
+      if Eva.Results.is_reachable start then
         begin
           let module Compute = Dataflows.Simple_forward(Fenv)(Computer) in
           Array.iteri (fun ord value ->

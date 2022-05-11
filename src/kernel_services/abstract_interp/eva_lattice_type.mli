@@ -25,7 +25,7 @@
     when needed. Except that, they are identical to the module signatures in
     {!Lattice_type}. *)
 
-open Bottom.Type
+open Lattice_bounds
 
 module type Join_Semi_Lattice = Lattice_type.Join_Semi_Lattice
 module type With_Top = Lattice_type.With_Top
@@ -41,8 +41,12 @@ end
 
 module type With_Under_Approximation = sig
   type t
-  val link: t -> t -> t (** under-approximation of union *)
-  val meet: t -> t -> t or_bottom (** under-approximation of intersection *)
+
+  val link: t -> t -> t
+  (** under-approximation of union *)
+
+  val meet: t -> t -> t or_bottom
+  (** under-approximation of intersection *)
 end
 
 module type With_Diff = sig

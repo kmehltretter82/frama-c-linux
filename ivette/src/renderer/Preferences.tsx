@@ -100,6 +100,17 @@ function EditorFields() {
 }
 
 // --------------------------------------------------------------------------
+// --- Console Scrollback Forms
+// --------------------------------------------------------------------------
+function ConsoleScrollbackFields(props: IvettePrefs.ConsoleScrollbackProps) {
+  const scrollback = Forms.useDefined(Forms.useValid(
+    Settings.useGlobalSettings(props.scrollback),
+  ));
+  const title = 'Maximum number of lines in the console window';
+  return (<Forms.NumberField state={scrollback} label="Lines" title={title} />);
+}
+
+// --------------------------------------------------------------------------
 // --- Export Components
 // --------------------------------------------------------------------------
 
@@ -111,6 +122,9 @@ export default function Preferences() {
       </Forms.Section>
       <Forms.Section label="Editors" unfold>
         <EditorFields />
+      </Forms.Section>
+      <Forms.Section label="Console Scrollback" unfold>
+        <ConsoleScrollbackFields scrollback={IvettePrefs.ConsoleScrollback} />
       </Forms.Section>
     </Forms.Page>
   );
