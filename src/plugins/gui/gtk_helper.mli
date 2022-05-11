@@ -98,7 +98,7 @@ module Configuration: sig
   (** Sets a ConfigInt *)
 
   val find_bool : ?default:bool -> string -> bool
-  (** Same as {find_int}. *)
+  (** Same as {! find_int}. *)
 
   val use_bool: string -> (bool -> unit) -> unit
   (** Same as {!use_int}. *)

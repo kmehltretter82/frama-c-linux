@@ -61,9 +61,9 @@ type ('a,'b) pretty_aborter =
   ?current:bool -> ?source:Filepath.position -> ?echo:bool ->
   ?append:(Format.formatter -> unit) ->
   ('a,formatter,unit,'b) format4 -> 'a
-(** @since Beryllium-20090601-beta1
-    Same as {!Log.pretty_printer} except that channels having this type
+(** Same as {!Log.pretty_printer} except that channels having this type
     denote a fatal error aborting Frama-C.
+    @since Beryllium-20090601-beta1
 *)
 
 (* -------------------------------------------------------------------------- *)
@@ -480,7 +480,7 @@ val print_delayed : (Format.formatter -> unit) -> unit
 val set_current_source : (unit -> Filepath.position) -> unit
 (* Forward reference to the function returning the current location,
     used when [~current:true] is set on printers. Currently set
-    in {Cil}. Not for the casual user. *)
+    in {!Cil}. Not for the casual user. *)
 
 val check_not_yet: (event -> bool) ref
 (* Checks whether a message been emitted already, in which case it is

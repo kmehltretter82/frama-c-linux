@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Access to other plugins API via {Dynamic.get}. *)
+(** Access to other plugins API via {!Dynamic.get}. *)
 
 module Callgraph: sig
   (** Iterates over all functions in the callgraph in reverse order, i.e. from

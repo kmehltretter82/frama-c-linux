@@ -41,14 +41,15 @@
     entry point to [s]. It also depends on an explicit set of hypotheses [H]
     indicating when emitting the property (see function {!emit}). *)
 type emitted_status =
-  | True (** for each execution path [ep] from the program entry point to [s],
-             the formula (/\_{h in H} h) ==> P(ep) is true *)
-  | False_if_reachable (** for each execution path [ep] from the program entry
-                           point to [s], the formula (/\_{h in H} h) ==> P(ep)
-                           is false *)
-  | False_and_reachable (** it exists an execution path [ep] from the program
-                            entry point to [s] such that the formula (/\_{h in
-                            H} h) ==> P(ep) is false *)
+  | True
+  (** for each execution path [ep] from the program entry point to [s],
+      the formula [(/\_{h in H} h) ==> P(ep)] is true *)
+  | False_if_reachable
+  (** for each execution path [ep] from the program entry point to [s],
+      the formula [(/\_{h in H} h) ==> P(ep)] is false *)
+  | False_and_reachable
+  (** it exists an execution path [ep] from the program entry point to [s]
+      such that the formula [(/\_{h in H} h) ==> P(ep)] is false *)
   | Dont_know (** any other case *)
 
 module Emitted_status: Datatype.S with type t = emitted_status

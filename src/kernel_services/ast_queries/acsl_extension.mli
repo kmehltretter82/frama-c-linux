@@ -93,7 +93,6 @@ type extension_printer =
              p)])
       | [] -> let id = !count in incr count; Ext_id id
       | _ -> typing_context.error loc "expecting a predicate after keyword FOO"
-
     let () = Acsl_extension.register_behavior "FOO" foo_typer false
     ]
     @plugin development guide

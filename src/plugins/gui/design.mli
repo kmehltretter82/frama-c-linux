@@ -190,11 +190,12 @@ class type main_window_extension_points = object
       updated. *)
 
   method redisplay : unit -> unit
-  (** @since Nitrogen-20111001
-      Force to redisplay the current displayed buffer.
+  (** Force to redisplay the current displayed buffer.
       Plugins should call this method whenever they have changed the globals.
       For example whenever a plugin adds an annotation, the buffers need
-      to be redisplayed. *)
+      to be redisplayed.
+      @since Nitrogen-20111001
+  *)
 
   method protect :
     cancelable:bool -> ?parent:GWindow.window_skel -> (unit -> unit) -> unit

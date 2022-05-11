@@ -25,9 +25,9 @@
 (** {2 Registration of abstractions.} *)
 
 (** Dynamic registration of the abstractions to be used in an Eva analysis:
-    - value abstractions, detailed in the {Abstract_value} signature;
-    - location abstractions, detailed in the {Abstract_location} signature;
-    - state abstractions, or abstract domains, detailed in {Abstract_domain}.
+    - value abstractions, detailed in the {!Abstract_value} signature;
+    - location abstractions, detailed in the {!Abstract_location} signature;
+    - state abstractions, or abstract domains, detailed in {!Abstract_domain}.
 *)
 
 (** Module types of value abstractions: either a single leaf module, or

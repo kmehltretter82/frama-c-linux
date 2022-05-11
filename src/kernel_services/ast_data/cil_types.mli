@@ -340,9 +340,7 @@ and attrparam =
     one and use {!Cil.copyCompInfo} to copy one (this ensures that a new key is
     assigned and that the fields have the right pointers to parents.).
     @plugin development guide
-
-    @since 23.0-Vanadium [cfields] is an option, [None] is used for incomplete
-    types (in replacement of removed field [cdefined]) *)
+*)
 and compinfo = {
   mutable cstruct: bool;
   (** [true] if struct, [false] if union *)
@@ -365,7 +363,10 @@ and compinfo = {
       back to the host compinfo. This means that you should not share
       fieldinfo's between two compinfo's.
 
-      None value means that the type is incomplete. *)
+      None value means that the type is incomplete.
+
+      @before 23.0-Vanadium this field was not optional
+  *)
 
   mutable cattr:   attributes;
   (** The attributes that are defined at the same time as the composite
@@ -1392,7 +1393,7 @@ and term_node =
   | Tinter of term list (** intersection of terms. *)
   | Tcomprehension of
       term * quantifiers * predicate option
-  (** set defined in comprehension ({t \{ t[i] | integer i; 0 <= i < 5\}}) *)
+  (** set defined in comprehension ([{ t[i] | integer i; 0 <= i < 5}]) *)
   | Trange of term option * term option (** range of integers. *)
   | Tlet of logic_info * term (** local binding *)
 

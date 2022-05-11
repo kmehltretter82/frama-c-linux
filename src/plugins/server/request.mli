@@ -170,25 +170,21 @@ val register_sig :
 
     For named input parameters:
     [
-
         API:                    Input JSON   OCaml Getter
         -----------------------------------------------------------------------
         Request.param            { f: a  }    'a (* might raise an exception *)
         Request.param ~default   { f: a? }    'a (* defined by default *)
         Request.param_opt        { f: a? }    'a option
-
     ]
 
 
     For named output parameters:
     [
-
         API:                    Input JSON   OCaml Setter
         ----------------------------------------------------------------------
         Request.result           { f: a  }    'a (* shall be set by process *)
         Request.result ~default  { f: a  }    'a (* defined by default *)
         Request.result_opt       { f: a? }    'a option
-
     ]
 
 *)
