@@ -29,8 +29,6 @@ let ksfprintf f fmt =
   let return fmt = Format.pp_print_flush fmt (); f (Buffer.contents b) in
   Format.kfprintf return (Format.formatter_of_buffer b) fmt
 
-let sfprintf = Format.asprintf
-
 let to_string ?margin pp x =
   let b = Buffer.create 20 in
   let f = Format.formatter_of_buffer b in

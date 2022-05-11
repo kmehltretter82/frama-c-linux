@@ -377,7 +377,6 @@ type code_annot =
   | AExtended of string list * bool * extension
   (** extension in a code or loop (when boolean flag is true) annotation.
       @since Silicon-20161101
-      @modify 18.0-Argon
   *)
 
 (** all kind of annotations*)

@@ -910,23 +910,6 @@ struct
   let insert _ = assert false (* [insert] should not be used afterwards *)
   [@@@ warning "+32"]
 
-  let rec subterm e = function
-      [] -> e
-    | n :: l ->
-      let children = match e.repr with
-        | True | False | Kint _ | Kreal _ | Bvar _ | Fvar _ -> []
-        | Times (n,e) -> [ e_zint n; e]
-        | Add l | Mul l | And l | Or l | Fun (_,l) -> l
-        | Div (e1,e2) | Mod (e1,e2) | Eq(e1,e2) | Neq(e1,e2)
-        | Leq (e1,e2) | Lt(e1,e2) | Aget(e1,e2) -> [e1;e2]
-        | Not e | Bind(_,_,e) | Acst(_,e) -> [e]
-        | Imply(l,e) -> l @ [e]
-        | If(e1,e2,e3) | Aset(e1,e2,e3) -> [e1;e2;e3]
-        | Rget(e,_) -> [e]
-        | Rdef fxs -> List.map snd fxs
-        | Apply(e,es) -> e::es
-      in subterm (List.nth children n) l
-
   let is_primitive e =
     match e.repr with
     | True | False | Kint _ | Kreal _ -> true
@@ -2585,89 +2568,6 @@ struct
     | _ -> repr_iter f e.repr
 
   let e_fun ?result f xs = e_fungen f xs result
-
-  (* -------------------------------------------------------------------------- *)
-  (* --- Sub-terms                                                          --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  let change_subterm e pos child =
-    let bad_position () = failwith "cannot replace subterm at given position" in
-    let rec change_in_list children cur_pos rest =
-      match children, cur_pos with
-      | [], _ -> bad_position ()
-      | e::l, 0 -> (aux e rest) :: l
-      | e::l, n -> e :: (change_in_list l (n-1) rest)
-    (* since all repr might be shared, better work on an immutable copy than
-       on the original array.
-    *)
-    and aux e pos =
-      match pos with
-        [] -> child
-      | i::l -> begin
-          match e.repr with
-          | True | False | Kint _ | Kreal _ | Fvar _ | Bvar _ ->
-            bad_position ()
-          | Times (_,e) when i = 0 && l = [] ->
-            begin
-              match child.repr with
-                Kint n -> times n e
-              | _ -> e_mul child e
-            end
-          | Times(n,e) when i = 1 -> times n (aux e l)
-          | Times _ -> bad_position ()
-          | Add ops -> e_sum (change_in_list ops i l)
-          | Mul ops -> e_prod (change_in_list ops i l)
-          | Div (e1,e2) when i = 0 -> e_div (aux e1 l) e2
-          | Div (e1,e2) when i = 1 -> e_div e1 (aux e2 l)
-          | Div _ -> bad_position ()
-          | Mod (e1,e2) when i = 0 -> e_mod (aux e1 l) e2
-          | Mod (e1,e2) when i = 1 -> e_mod e1 (aux e2 l)
-          | Mod  _ -> bad_position ()
-          | Eq (e1,e2) when i = 0 -> e_eq (aux e1 l) e2
-          | Eq (e1,e2) when i = 1 -> e_eq e1 (aux e2 l)
-          | Eq _ -> bad_position ()
-          | Neq (e1,e2) when i = 0 -> e_neq (aux e1 l) e2
-          | Neq (e1,e2) when i = 1 -> e_neq e1 (aux e2 l)
-          | Neq _ -> bad_position ()
-          | Leq (e1,e2) when i = 0 -> e_leq (aux e1 l) e2
-          | Leq (e1,e2) when i = 1 -> e_leq e1 (aux e2 l)
-          | Leq _ -> bad_position ()
-          | Lt (e1,e2) when i = 0 -> e_lt (aux e1 l) e2
-          | Lt (e1,e2) when i = 1 -> e_lt e1 (aux e2 l)
-          | Lt _ -> bad_position ()
-          | Acst (k,v) when i = 0 -> e_const k v
-          | Acst _ -> bad_position ()
-          | Aget (e1,e2) when i = 0 -> e_get (aux e1 l) e2
-          | Aget (e1,e2) when i = 1 -> e_get e1 (aux e2 l)
-          | Aget _ -> bad_position ()
-          | And ops -> e_and (change_in_list ops i l)
-          | Or ops -> e_or (change_in_list ops i l)
-          | Not e when i = 0 -> e_not (aux e l)
-          | Not _ -> bad_position ()
-          | Imply(ops,e) ->
-            let nb = List.length ops in
-            if i < nb then e_imply (change_in_list ops i l) e
-            else if i = nb then e_imply ops (aux e l)
-            else bad_position ()
-          | If(e1,e2,e3) when i = 0 -> e_if (aux e1 l) e2 e3
-          | If(e1,e2,e3) when i = 1 -> e_if e1 (aux e2 l) e3
-          | If(e1,e2,e3) when i = 2 -> e_if e1 e2 (aux e3 l)
-          | If _ -> bad_position ()
-          | Aset(e1,e2,e3) when i = 0 -> e_set (aux e1 l) e2 e3
-          | Aset(e1,e2,e3) when i = 1 -> e_set e1 (aux e2 l) e3
-          | Aset(e1,e2,e3) when i = 2 -> e_set e1 e2 (aux e3 l)
-          | Aset _ -> bad_position ()
-          | Rdef _ | Rget _ ->
-            failwith "change in place for records not yet implemented"
-          | Fun (f,ops) -> e_fungen f (change_in_list ops i l) e.tau
-          | Bind(q,x,t) when i = 0 -> c_bind q x (aux t l)
-          | Bind _ -> bad_position ()
-          | Apply(f,args) when i = 0 ->
-            e_apply (aux f l) args
-          | Apply (f,args) ->
-            e_apply f (change_in_list args i l)
-        end
-    in aux e pos
 
   let () = pretty_debug := debug
 

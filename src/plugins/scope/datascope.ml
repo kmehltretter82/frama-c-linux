@@ -25,9 +25,6 @@
 
 open Cil_types
 
-let cat_rm_asserts_name = "rm_asserts"
-let () = Plugin.default_msg_keys [cat_rm_asserts_name]
-
 let name = "scope"
 
 module R =
@@ -38,7 +35,8 @@ module R =
       let help = "data dependencies higher level functions"
     end)
 
-let cat_rm_asserts = R.register_category cat_rm_asserts_name
+let cat_rm_asserts = R.register_category "rm_asserts"
+let () = R.add_debug_keys cat_rm_asserts
 
 (** {2 Computing a mapping between zones and modifying statements}
     We first go through all the function statements in other to build

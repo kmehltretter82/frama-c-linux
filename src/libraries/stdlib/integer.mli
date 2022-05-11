@@ -214,10 +214,15 @@ val to_string : t -> string
 val of_string : string -> t
 (** @raise Invalid_argument when the string cannot be parsed. *)
 
-(** @modify Frama-C+dev remove optional `hexa` argument *)
+(** Prints the integer in decimal format. See also {!pretty_hex}.
+
+    @before Frama-C+dev there was an optional [hexa] argument. *)
 val pretty : t formatter
 
-(** @since Frama-C+dev *)
+(** Prints the integer in hexadecimal format (replaces [hexa] optional
+    argument of {!pretty} from older versions).
+
+    @since Frama-C+dev *)
 val pretty_hex : t formatter
 
 val pp_bin : ?nbits:int -> ?sep:string -> t formatter

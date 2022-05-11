@@ -31,7 +31,6 @@ val check_ast: ?is_normalized:bool -> ?ast:Cil_types.file -> string -> unit
 
     Note that the check is only partial.
     @since Aluminium-20160501
-    @modify Silicon-20161101 adds optional ast argument
 *)
 
 module type Extensible_checker =

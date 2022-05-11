@@ -38,9 +38,6 @@ module type S_no_log = sig
       [memo] defaults to [false]
       @since Beryllium-20090901 *)
 
-  module Help: Parameter_sig.Bool
-  (** @deprecated since Oxygen-20120901 *)
-
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
 
@@ -71,13 +68,12 @@ module type S_no_log = sig
         [add_plugin_output_aliases [alias]] adds the aliases -alias-help,
         -alias-verbose, etc.
         @since 18.0-Argon
-        @modify 22.0-Titanium add [visible] and [deprecated] arguments. *)
+        @before 22.0-Titanium no [visible] and [deprecated] arguments.
+    *)
 end
 
 (** Provided plug-general services for plug-ins.
     @since Beryllium-20090601-beta1
-    @modify Chlorine-20180501 removed programmatic access to [Debug_category]:
-    managing categories is now entirely done by Log.Messages
     @plugin development guide *)
 module type S = sig
   include Log.Messages
@@ -90,8 +86,8 @@ type plugin = private
     p_help: string;
     p_parameters: (string, Typed_parameter.t list) Hashtbl.t }
 (** @since Beryllium-20090901
-    @modify 22.0-Titanium previously only "iterable" parameters were included,
-                        now all parameters are.
+    @before 22.0-Titanium only "iterable" parameters were included;
+            now all parameters are.
 *)
 
 module type General_services = sig
@@ -144,14 +140,6 @@ val plugin_subpath: string -> unit
     directories [Share], [Session] and [Config] above.
     @since Neon-20140301 *)
 
-val default_msg_keys: string list -> unit
-(** Debug message keys set by default for the plugin.
-    @since Silicon-20161101
-    @deprecated since Chlorine-20180501 use directly functions from Log
-     (add_debug_keys and del_debug_keys) to manage the default status of each
-     category
-*)
-
 (* ************************************************************************* *)
 (** {2 Handling plugins} *)
 (* ************************************************************************* *)
@@ -168,11 +156,6 @@ val is_present: string -> bool
 (** Whether a plug-in already exists.
     Plugins are identified by their short name.
     @since Magnesium-20151001 *)
-
-val get: string -> plugin
-[@@ deprecated "Use Plugin.get_from_name"]
-(** Get a plug-in from its name.
-    @deprecated since Oxygen-20120901 *)
 
 val iter_on_plugins: (plugin -> unit) -> unit
 (** Iterate on each registered plug-in.

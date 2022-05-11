@@ -54,13 +54,6 @@ let do_not_projectify () =
 
 let empty_format = ("": (unit, Format.formatter, unit) format)
 let optional_help_ref = ref empty_format
-let set_optional_help fmt = optional_help_ref := fmt
-let set_optional_help fmt =
-  Cmdline.Kernel_log.deprecated
-    "Plugin.set_optional_help"
-    ~now:"<none>"
-    set_optional_help
-    fmt
 
 let module_name_ref = ref empty_string
 let set_module_name s = module_name_ref := s

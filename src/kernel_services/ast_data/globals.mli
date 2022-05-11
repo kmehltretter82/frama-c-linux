@@ -185,12 +185,6 @@ module FileIndex : sig
   (** All global C symbols of the given module.
       @since Boron-20100401 *)
 
-  val find : Datatype.Filepath.t -> Datatype.Filepath.t * global list
-  [@@deprecated "Use FileIndex.get_symbols instead."]
-  (** [find path] returns all global C symbols associated with [path],
-      plus [path] itself. The returned [global] list is reversed.
-      @deprecated 18.0-Argon use [get_symbols] instead. *)
-
   val get_files: unit -> Datatype.Filepath.t list
   (** Get the files list containing all [global] C symbols. *)
 

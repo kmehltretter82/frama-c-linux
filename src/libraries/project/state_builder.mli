@@ -291,8 +291,7 @@ module type Hashconsing_tbl =
 
 (** Weak hashtbl dedicated to hashconsing.
     Note that the resulting table is not saved on disk.
-    @since Boron-20100401
-    @modify Aluminium-20160501, renamed *)
+    @since Boron-20100401 *)
 module Hashconsing_tbl_weak: Hashconsing_tbl
 
 (** Hash table for hashconsing, but the internal table is _not_ weak

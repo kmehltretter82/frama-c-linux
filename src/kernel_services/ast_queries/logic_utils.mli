@@ -41,12 +41,6 @@ val add_logic_function : logic_info -> unit
 
 (** {2 Types} *)
 
-(** instantiate type variables in a logic type. *)
-val instantiate :
-  (string * logic_type) list ->
-  logic_type -> logic_type
-[@@deprecated "Use Logic_const.instantiate instead."]
-
 (** [is_instance_of poly t1 t2] returns [true] if [t1] can be derived from [t2]
     by instantiating some of the type variable in [poly].
 
@@ -67,7 +61,6 @@ val isLogicType : (typ -> bool) -> logic_type -> bool
 (** {3 Predefined tests over types} *)
 val isLogicArrayType : logic_type -> bool
 
-(** @modify Chlorine-20180501 old behavior renamed as [isLogicAnyCharType] *)
 val isLogicCharType : logic_type -> bool
 
 (** @since Chlorine-20180501 *)
@@ -91,10 +84,6 @@ val array_to_ptr : logic_type -> logic_type
 val coerce_type : typ -> logic_type
 
 (** {2 Predicates} *)
-
-(** @deprecated use Logic_const.pred_of_id_pred instead *)
-val predicate_of_identified_predicate: identified_predicate -> predicate
-[@@ deprecated "Use Logic_const.pred_of_id_pred instead"]
 
 (** transforms \old and \at(,Old) into \at(,L) for L a label pointing
     to the given statement, creating one if needed. *)
@@ -123,8 +112,7 @@ val mk_logic_pointer_or_StartOf : term -> term
     performed automatically. If [force] is [true], the cast will always
     be inserted. Otherwise (which is the default), [mk_cast typ t] will return
     [t] if it is already of type [typ]
-
-    @modify Aluminium-20160501 added [force] optional argument *)
+*)
 val mk_cast: ?loc:location -> ?force:bool -> typ -> term -> term
 
 
@@ -146,7 +134,7 @@ val remove_logic_coerce: term -> term
     set type.
 
     @since Magnesium-20151001
-    @modify 21.0-Scandium
+    @before 21.0-Scandium was ambiguous (coercion vs. conversion).
 *)
 val numeric_coerce: logic_type -> term -> term
 
@@ -179,7 +167,7 @@ val expr_to_term : ?coerce:bool -> exp -> term
     To obtain a boolean or predicate, use [expr_to_boolean] or
     [expr_to_predicate] instead.
 
-    @modify 21.0-Scandium
+    @before 21.0-Scandium was unsound in many cases.
 *)
 
 val expr_to_predicate: exp -> predicate
@@ -192,7 +180,7 @@ val expr_to_predicate: exp -> predicate
     @raise Fatal error if the expression is not a comparison and cannot be
            compared to zero.
     @since Sulfur-20171101
-    @modify 21.0-Scandium
+    @before 21.0-Scandium was unsound in many cases.
 *)
 
 val expr_to_ipredicate: exp -> identified_predicate
@@ -204,7 +192,7 @@ val expr_to_ipredicate: exp -> identified_predicate
     @raise Fatal error if the expression is not a comparison and cannot be
            compared to zero.
     @since Sulfur-20171101
-    @modify 21.0-Scandium
+    @before 21.0-Scandium was unsound in many cases.
 *)
 
 val expr_to_boolean: exp -> term
@@ -217,7 +205,7 @@ val expr_to_boolean: exp -> term
     @raise Fatal error if the expression is not a comparison and cannot be
            compared to zero.
     @since Sulfur-20171101
-    @modify 21.0-Scandium
+    @before 21.0-Scandium was unsound in many cases.
 *)
 
 val is_zero_comparable: term -> bool
@@ -347,8 +335,6 @@ val is_same_builtin_profile :
 val is_same_logic_ctor_info :
   logic_ctor_info -> logic_ctor_info -> bool
 
-(** @deprecated Nitrogen-20111001 use {!Cil.compareConstant} instead. *)
-val is_same_constant : constant -> constant -> bool
 val is_same_term : term -> term -> bool
 val is_same_logic_info : logic_info -> logic_info -> bool
 val is_same_logic_body : logic_body -> logic_body -> bool
@@ -434,7 +420,6 @@ val merge_behaviors :
 (** [merge_funspec ?oldloc oldspec newspec] merges [newspec] into [oldspec].
     If the funspec belongs to a kernel function, do not forget to call
     {!Kernel_function.set_spec} after merging.
-    @modify 20.0-Calcium add optional parameter [oldloc].
 *)
 val merge_funspec :
   ?oldloc:location -> ?silent_about_merging_behav:bool ->

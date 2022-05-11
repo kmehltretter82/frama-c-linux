@@ -190,7 +190,7 @@ module type S_no_parameter = sig
       If [visible] is set to false, the aliases do not appear in help messages.
       If [deprecated] is set to true, the use of the aliases emits a warning.
       @raise Invalid_argument if one of the strings is empty
-      @modify 22.0-Titanium add [visible] and [deprecated] arguments. *)
+      @before 22.0-Titanium no [visible] and [deprecated] arguments. *)
 
   (**/**)
   val is_set: unit -> bool
@@ -431,7 +431,6 @@ module type Set = sig
 
 end
 
-(** @modify Sodium-20150201 *)
 module type String_set =
   Set with type elt = string and type t = Datatype.String.Set.t
 
@@ -467,7 +466,6 @@ module type List =  sig
 
 end
 
-(** @modify Sodium-20150201 *)
 module type String_list = List with type elt = string and type t = string list
 
 module type Filepath_list =

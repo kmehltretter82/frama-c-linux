@@ -65,7 +65,8 @@ let pinitialized_len ?loc alloc_type num size =
   let result = tresult ?loc (ptr_of alloc_type) in
   let initialized ?loc t =
     let t = match t.term_node, Logic_utils.unroll_type t.term_type with
-      | TLval (lv), Ctype t -> taddrof ?loc lv (Ctype (ptr_of t))
+      | TLval (lv), (Ctype _ as t) ->
+        Logic_utils.mk_logic_AddrOf ?loc lv t
       | _ -> unexpected "non lvalue or non c-type during initialized generation"
     in
     pinitialized ?loc (here_label, t)

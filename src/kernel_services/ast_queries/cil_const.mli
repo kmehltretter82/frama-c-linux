@@ -59,7 +59,6 @@ val set_vid: varinfo -> unit
 (** returns a copy of the varinfo with a fresh vid.
     If the varinfo has an associated logic var, a copy of the logic var
     is made as well.
-    @modify Oxygen-20120901 take logic var into account
 *)
 val copy_with_new_vid: varinfo -> varinfo
 
@@ -108,12 +107,6 @@ val copyCompInfo: ?fresh:bool -> compinfo -> string -> compinfo
     @since Fluorine-20130401
 *)
 val make_logic_var_kind : string -> logic_var_kind -> logic_type -> logic_var
-
-(** Create a fresh logical variable giving its name and type.
-    @deprecated Fluorine-20130401 You should use a specific
-    make_logic_var_[kind] function below, or {! Cil.cvar_to_lvar}
-*)
-val make_logic_var : string -> logic_type -> logic_var
 
 (** Create a new global logic variable
     @since Fluorine-20130401 *)

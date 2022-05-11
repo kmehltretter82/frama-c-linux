@@ -56,7 +56,7 @@ let rec applicable ?at e f es = function
     begin
       try
         let v = phi f es in
-        let d = Pretty_utils.sfprintf "Unfold '%a'" Lang.Fun.pretty f in
+        let d = Format.asprintf "Unfold '%a'" Lang.Fun.pretty f in
         Applicable (Tactical.rewrite ?at [d,F.p_true,e,v])
       with Not_found | Invalid_argument _ ->
         applicable ?at e f es others

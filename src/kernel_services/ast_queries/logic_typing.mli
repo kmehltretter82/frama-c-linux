@@ -60,11 +60,6 @@ val type_of_set_elem: logic_type -> logic_type
 val ctype_of_pointed: logic_type -> typ
 val ctype_of_array_elem: logic_type -> typ
 
-(**
-   @deprecated Neon-20130301 use Logic_const.addTermOffsetLval instead
-*)
-val add_offset_lval: term_offset -> term_lval -> term_lval
-
 val arithmetic_conversion:
   Cil_types.logic_type -> Cil_types.logic_type -> Cil_types.logic_type
 
@@ -147,7 +142,7 @@ type typing_context = {
       a text message indicating the issue) and the exception will be re-raised.
 
       @since Chlorine-20180501
-      @modify Frama-C+dev rollback takes as argument the error
+      @before Frama-C+dev [rollback] didn't take [loc] and [cause] as argument
   *)
 }
 
@@ -207,7 +202,6 @@ sig
      @param explicit true if the cast is present in original source.
             defaults to false
      @since Nitrogen-20111001
-     @modify 19.0-Potassium introduces explicit param
   *)
   val mk_cast:
     ?explicit:bool -> Cil_types.term -> Cil_types.logic_type -> Cil_types.term

@@ -59,8 +59,6 @@ val new_machdep: string -> Cil_types.mach -> unit
     [Cmdline.run_after_loading_stage
       (fun () -> File.new_machdep "my_machdep" my_machdep_implem)]
     @since Nitrogen-20111001
-    @modify Fluorine-20130401 Receives the machdep (as a module) as argument
-    @modify Sodium-20150201 Receives directly the machdep as argument
     @raise Invalid_argument if the given name already exists
     @plugin development guide *)
 
@@ -148,7 +146,7 @@ val get_name: t -> string
 
 val get_preprocessor_command: unit -> string
 (** Return the preprocessor command to use.
-    @modify 23.0-Vanadium return type now contains only the command
+    @before 23.0-Vanadium return type also contained cpp_opt_kind.
 *)
 
 val pre_register: t -> unit
@@ -192,7 +190,6 @@ val init_project_from_visitor:
     if [reorder] is [true] (default is [false]) the new AST in [prj]
     will be reordered.
     @since Oxygen-20120901
-    @modify Fluorine-20130401 added reorder optional argument
     @plugin development guide
 *)
 
@@ -210,8 +207,6 @@ val create_project_from_visitor:
     file (i.e. it should use {!Cil.copy_visit} at some point).
     @raise File_types.Bad_Initialization if called more than once.
     @since Beryllium-20090601-beta1
-    @modify Fluorine-20130401 added [reorder] optional argument
-    @modify Sodium-20150201 added [last] optional argument
     @plugin development guide *)
 
 val create_rebuilt_project_from_visitor:
@@ -228,7 +223,6 @@ val create_rebuilt_project_from_visitor:
 
     @raise File_types.Bad_Initialization if called more than once.
     @since Nitrogen-20111001
-    @modify Fluorine-20130401 added reorder optional argument
 *)
 
 val prepare_cil_file: Cil_types.file -> unit

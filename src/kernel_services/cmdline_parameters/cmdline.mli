@@ -118,8 +118,7 @@ val at_error_exit: (exn -> unit) -> unit
     code is greater than 0). The argument of the hook is the exception at the
     origin of the error.
     @since Boron-20100401
-    @modify Neon-20130301 add the exception as argument of the
-    hook. *)
+*)
 
 (** Group of command line options.
     @since Beryllium-20090901 *)
@@ -175,11 +174,6 @@ val catch_toplevel_run:
   unit
 (** Run [f]. When done, either call [at_normal_exit] if running [f] was ok;
     or call [on_error] (and exits) in other cases.
-    @modify Boron-20100401  additional arguments. They are now
-    labelled
-    @modify Neon-20140301 add the exception as argument of
-    [on_error].
-    @modify Magnesium-20151001 Removed argument [~quit]
 *)
 
 val run_normal_exit_hook: unit -> unit
@@ -189,14 +183,13 @@ val run_normal_exit_hook: unit -> unit
 val run_error_exit_hook: exn -> unit
 (** Run all the hooks registered by {!at_normal_exit}.
     @since Boron-20100401
-    @modify Neon-20130301 add the exception as argument. *)
+*)
 
 val error_occurred: exn -> unit
 (** Remember that an error occurred.
     So {!run_error_exit_hook} will be called when Frama-C will exit.
     @since Boron-20100401
-    @modify Neon-20130301 add the exception as argument,
-    fix spelling. *)
+*)
 
 val bail_out: unit -> 'a
 (** Stop Frama-C with exit 0.
@@ -220,11 +213,7 @@ val parse_and_boot:
     toplevel provided by [get_toplevel]. [on_from_name] is [Project.on] on the
     project corresponding to the given (unique) name.
     @since Beryllium-20090901
-    @modify Carbon-20101201
-    @modify Sodium-20150201 the first argument of the first functional is no
-    more a string option, just a string
-    @modify Aluminium-20160501 add labels and generalize the type of
-    [on_from_name] *)
+*)
 
 val nb_given_options: unit -> int
 (** Number of options provided by the user on the command line.
@@ -290,8 +279,7 @@ val add_option:
     registered option. If [help] is [None], then the option is not shown
     in the help.
     @since Beryllium-20090601-beta1
-    @modify Carbon-20101201
-    @modify Oxygen-20120901 change type of ~help and add ~visible. *)
+*)
 
 val add_option_without_action:
   string ->
@@ -323,7 +311,7 @@ val add_aliases:
     If [deprecated] is set to true, the use of the aliases emits a warning.
     @Invalid_argument if an alias name is the empty string
     @since Carbon-20110201
-    @modify 22.0-Titanium add [visible] and [deprecated] arguments. *)
+    @before 22.0-Titanium no [visible] and [deprecated] arguments. *)
 
 val replace_option_setting:
   string -> plugin:string -> group:Group.t -> option_setting -> unit

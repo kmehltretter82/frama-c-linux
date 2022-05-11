@@ -169,21 +169,12 @@ let opt_of_list =
   | [a] -> Some a
   | _ -> raise (Invalid_argument "Extlib.opt_of_list")
 
-let rec find_opt f = function
-  | [] -> raise Not_found
-  | e :: q ->
-    match f e with
-    | None -> find_opt f q
-    | Some v -> v
-
 let iteri f l = let i = ref 0 in List.iter (fun x -> f !i x; incr i) l
 
 let mapi f l =
   let res =
     snd (List.fold_left (fun (i,acc) x -> (i+1,f i x :: acc)) (0,[]) l)
   in List.rev res
-
-let sort_unique cmp l = List.sort_uniq cmp l
 
 let subsets k l =
   let rec aux k l len =

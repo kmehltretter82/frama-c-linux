@@ -548,10 +548,6 @@ module FileIndex = struct
     compute ();
     S.find path
 
-  let find path =
-    let l = get_symbols path in
-    path, List.rev l
-
   (** get all global variables as (varinfo, initinfo) list with only one
        occurrence of a varinfo *)
   let get_globals path =

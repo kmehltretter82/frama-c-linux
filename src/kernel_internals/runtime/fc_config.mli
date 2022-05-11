@@ -80,8 +80,7 @@ val libdir: Filepath.Normalized.t
     @since Beryllium-20090601-beta1 *)
 
 val plugin_dir: Filepath.Normalized.t list
-(** Directory where the Frama-C dynamic plug-ins are.
-    @modify Magnesium-20151001 *)
+(** Directory where the Frama-C dynamic plug-ins are. *)
 
 val plugin_path: string
 (** The colon-separated concatenation of [plugin_dir].

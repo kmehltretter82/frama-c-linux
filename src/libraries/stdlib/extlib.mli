@@ -148,15 +148,6 @@ val opt_of_list: 'a list -> 'a option
     @raise Invalid_argument on lists with more than one argument
     @since Oxygen-20120901 *)
 
-val find_opt : ('a -> 'b option) -> 'a list -> 'b
-[@@deprecated "Use List.find_opt instead."]
-(** [find_option p l] returns the value [p e], [e] being the first
-    element of [l] such that [p e] is not [None]. Raise [Not_found] if there
-    is no such value the list l.
-
-    @since Nitrogen-20111001
-    @deprecated 18.0-Argon use [List.find_opt] instead *)
-
 val iteri: (int -> 'a -> unit) -> 'a list -> unit
 (** Same as iter, but the function to be applied take also as argument the
     index of the element (starting from 0). Tail-recursive
@@ -166,11 +157,6 @@ val mapi: (int -> 'a -> 'b) -> 'a list -> 'b list
 (** Same as map, but the function to be applied take also as argument the
     index of the element (starting from 0). Tail-recursive
     @since Oxygen-20120901 *)
-
-val sort_unique: ('a -> 'a -> int) -> 'a list -> 'a list
-(**  Same as List.sort , but also remove duplicates.
-     @deprecated use List.sort_uniq instead
-*)
 
 val subsets: int -> 'a list -> 'a list list
 (** [subsets k l] computes the combinations of [k] elements from list [l].
@@ -222,9 +208,7 @@ val the: exn:exn -> 'a option -> 'a
 (** @raise Exn if the value is [None] and [exn] is specified.
     @raise Invalid_argument if the value is [None] and [exn] is not specified.
     @return v if the value is [Some v].
-    @modify Magnesium-20151001 add optional argument [exn]
-    @modify 23.0-Vanadium optional argument [exn] now mandatory; otherwise,
-            use [Option.get], which is equivalent.
+    @before 23.0-Vanadium [exn] was an optional argument.
     @plugin development guide *)
 
 val opt_hash: ('a -> int) -> 'a option -> int
@@ -345,14 +329,10 @@ val temp_file_cleanup_at_exit: ?debug:bool -> string -> string -> string
     to true, in which case a message with the name of the kept file will be
     printed.
     @raise Temp_file_error if the temp file cannot be created.
-    @modify Nitrogen-20111001 may now raise Temp_file_error
-    @modify Oxygen-20120901 optional debug argument
 *)
 
 val temp_dir_cleanup_at_exit: ?debug:bool -> string -> string
-(** @raise Temp_file_error if the temp dir cannot be created.
-    @modify Nitrogen-20111001 may now raise Temp_file_error
-    @modify Neon-20130301 add optional debug flag *)
+(** @raise Temp_file_error if the temp dir cannot be created. *)
 
 val safe_remove: string -> unit
 (** Tries to delete a file and never fails. *)

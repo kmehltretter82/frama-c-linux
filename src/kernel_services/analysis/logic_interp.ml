@@ -759,7 +759,7 @@ struct
 
       method! vpredicate_node p =
         let fail () =
-          raise (NYI (Pretty_utils.sfprintf
+          raise (NYI (Format.asprintf
                         "[logic_interp] %a" Printer.pp_predicate_node p))
         in
         match p with

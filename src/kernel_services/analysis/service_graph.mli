@@ -50,7 +50,7 @@ module type S = sig
   val entry_point: unit -> Service_graph.V.t option
   (** [compute] must be called before
       @since Carbon-20101201
-      @modify Nitrogen-20111001 return an option type *)
+  *)
 
   module TP: Graph.Graphviz.GraphWithDotAttrs
     with type t = Service_graph.t
@@ -66,7 +66,6 @@ module Make
     (G: sig
        type t
        module V: sig
-         (** @modify Oxygen-20120901 require [compare] *)
          include Graph.Sig.COMPARABLE
          val id: t -> int
          (** assume [id >= 0] and unique for each vertices of the graph *)
@@ -74,7 +73,6 @@ module Make
          val name: t -> string
          val attributes: t -> Graph.Graphviz.DotAttributes.vertex list
          val entry_point: unit -> t option
-         (** @modify Nitrogen-20111001 return an option*)
        end
        val iter_vertex : (V.t -> unit) -> t -> unit
        val iter_succ : (V.t -> unit) -> t -> V.t -> unit

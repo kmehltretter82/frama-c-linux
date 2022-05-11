@@ -275,8 +275,8 @@ let dump ~dir kf reached =
          match s.skind with
          | Instr _ | Return _ | Break _ | Continue _ | Goto _ ->
            Pu.to_string Pr.pp_stmt s
-         | If(e,_,_,_) -> Pu.sfprintf "@[<hov 2>if (%a)@]" Pr.pp_exp e
-         | Switch(e,_,_,_) -> Pu.sfprintf "@[<hov 2>switch (%a)@]" Pr.pp_exp e
+         | If(e,_,_,_) -> Format.asprintf "@[<hov 2>if (%a)@]" Pr.pp_exp e
+         | Switch(e,_,_,_) -> Format.asprintf "@[<hov 2>switch (%a)@]" Pr.pp_exp e
          | Loop _ -> Printf.sprintf "Loop s%d" s.sid
          | Block  _ -> Printf.sprintf "Block s%d" s.sid
          | UnspecifiedSequence  _ -> Printf.sprintf "Seq. s%d" s.sid
