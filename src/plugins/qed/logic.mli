@@ -451,7 +451,7 @@ sig
         The [force] parameters defaults to [false], when it is [true], if there
         exist another builtin, it is replaced with the new one. Use with care.
 
-        @modify 22.0-Titanium add optional [force] parameter
+        @before 22.0-Titanium the optional [force] parameter does not exist
   *)
 
   val set_builtin' :
@@ -467,7 +467,7 @@ sig
       The [force] parameters defaults to [false], when it is [true], if there
       exist another builtin, it is replaced with the new one. Use with care.
 
-      @modify 22.0-Titanium add optional [force] parameter
+      @before 22.0-Titanium the optional [force] parameter does not exist
   *)
 
   val set_builtin_get :
@@ -479,7 +479,7 @@ sig
       The [force] parameters defaults to [false], when it is [true], if there
       exist another builtin, it is replaced with the new one. Use with care.
 
-      @modify 22.0-Titanium add optional [force] parameter
+      @before 22.0-Titanium the optional [force] parameter does not exist
   *)
 
   val set_builtin_eq :
@@ -494,7 +494,7 @@ sig
         The [force] parameters defaults to [false], when it is [true], if there
         exist another builtin, it is replaced with the new one. Use with care.
 
-        @modify 22.0-Titanium add optional [force] parameter
+        @before 22.0-Titanium the optional [force] parameter does not exist
   *)
 
   val set_builtin_leq :
@@ -510,7 +510,7 @@ sig
         The [force] parameters defaults to [false], when it is [true], if there
         exist another builtin, it is replaced with the new one. Use with care.
 
-        @modify 22.0-Titanium add optional [force] parameter
+        @before 22.0-Titanium the optional [force] parameter does not exist
   *)
 
   (** {3 Specific Patterns} *)
