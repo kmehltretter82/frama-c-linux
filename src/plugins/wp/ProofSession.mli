@@ -25,6 +25,7 @@ type script =
   | Script of string
   | Deprecated of string
 
+val pp_file : Format.formatter -> string -> unit
 val pp_script_for : Format.formatter -> Wpo.t -> unit
 
 val get : Wpo.t -> script
@@ -32,5 +33,11 @@ val exists : Wpo.t -> bool
 val save : stdout:bool -> Wpo.t -> Json.t -> unit
 val load : Wpo.t -> Json.t
 val remove : Wpo.t -> unit
+
+val filename : force:bool -> Wpo.t -> string
+
+val mark : Wpo.t -> unit
+val reset_marks : unit -> unit
+val remove_unmarked_files : dry:bool -> unit
 
 (**************************************************************************)

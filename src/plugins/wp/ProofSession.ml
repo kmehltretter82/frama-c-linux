@@ -32,8 +32,11 @@ let files : (string,script) Hashtbl.t = Hashtbl.create 32
 let jsonfile (dir:Datatype.Filepath.t) =
   Format.sprintf "%s/%s.json" (dir :> string)
 
+let get_script_dir ~force =
+  Wp_parameters.get_session_dir ~force "script"
+
 let filename ~force wpo =
-  let dscript = Wp_parameters.get_session_dir ~force "script" in
+  let dscript = get_script_dir ~force in
   jsonfile dscript wpo.po_sid (* no model in name *)
 
 let legacies wpo =
@@ -120,4 +123,58 @@ let save ~stdout wpo js =
         let f = filename ~force:true wpo in
         Json.save_file f js ;
         Hashtbl.replace files f (Script f) ;
+      end
+
+let get_marks_dir ~force =
+  let scripts = Wp_parameters.get_session_dir ~force "script" in
+  let path = Datatype.Filepath.concat scripts ".marks" in
+  if force then Wp_parameters.make_output_dir (path :> string) ;
+  path
+
+let remove_marks ~dry =
+  let marks = get_marks_dir ~force:false in
+  let as_str = (marks :> string) in
+  if Sys.file_exists as_str && Sys.is_directory as_str then
+    if dry
+    then Wp_parameters.feedback "[dry] remove marks"
+    else Extlib.safe_remove_dir as_str
+
+let reset_marks () =
+  remove_marks ~dry:false ;
+  ignore @@ get_marks_dir ~force:true
+
+let mark goal =
+  let marks = get_marks_dir ~force:false in
+  let as_str = (marks :> string) in
+  if Sys.file_exists as_str && Sys.is_directory as_str then
+    let mark = Datatype.Filepath.concat marks (goal.po_sid ^ ".json") in
+    if Sys.file_exists (mark :> string) then ()
+    else close_out @@ open_out (mark :> string)
+
+module StringSet = Datatype.String.Set
+
+let remove_unmarked_files ~dry =
+  let dir = (get_script_dir ~force:false :> string) in
+  if Sys.file_exists dir && Sys.is_directory dir then
+    let marks = (get_marks_dir ~force:false :> string) in
+    if Sys.file_exists marks && Sys.is_directory marks then
+      begin
+        let files =
+          Array.fold_left
+            (fun s f -> StringSet.add f s) StringSet.empty (Sys.readdir dir)
+        in
+        let marks =
+          Array.fold_left
+            (fun s f -> StringSet.add f s) StringSet.empty (Sys.readdir marks)
+        in
+        let orphans = StringSet.diff files marks in
+        let orphans = StringSet.remove ".marks" orphans in
+        let remove file =
+          let path = dir ^ "/" ^ file in
+          if dry
+          then Wp_parameters.feedback "[dry] rm %s" path
+          else Sys.remove path
+        in
+        StringSet.iter remove orphans ;
+        remove_marks ~dry
       end
