@@ -5,7 +5,7 @@ This chapter presents some important services offered by the \FramaC platform.
 \section{Projects}\label{sec:project}\index{Project|bfit}
 
 A \FramaC project groups together one source code with the states (parameters,
-results, \etc) of the \FramaC kernel and analyzers. 
+results, \etc) of the \FramaC kernel and analyzers.
 
 In one \FramaC session, several projects may exist at the same time, while
 there is always one and only one so-called \emph{current} project in which
@@ -87,8 +87,8 @@ loading another project file.
 \paragraph{Special Cases}
 
 Options \optionuse{-}{help}, \optionuse{-}{verbose},
-\optionuse{-}{debug}\xspace(and 
-their corresponding plugin-specific counterpart) 
+\optionuse{-}{debug}\xspace(and
+their corresponding plugin-specific counterpart)
 as well as \optionuse{-}{explain}, \optionuse{-}{quiet}\xspace and
 \optionuse{-}{unicode}\xspace are not saved on disk.
 
@@ -137,53 +137,3 @@ analysis $A_2$. Whenever the results from $A_2$ change, \FramaC automatically di
 results from $A_1$. For instance, slicing results depend on value analysis
 results; thus the slicing results are discarded whenever the value analysis
 ones are.
-
-\section{Journalisation}\label{sec:journal}
-
-Journalisation logs each operation that modifies some parameters or results
-into a file called a \emph{journal}\index{Journal|bfit}. Observational
-operations like viewing the set of possibles values of a variable in the GUI
-are not logged.
-
-By default, the name of the journal is
-\texttt{SESSION\_DIR/frama\_c\_journal.ml} where \texttt{SESSION\_DIR} is the
-\FramaC session directory (see Section~\ref{sec:var-session}). It can be
-modified by using the option \optiondef{-}{journal-name}.
-
-A journal is a valid \FramaC dynamic plug-in. Thus it can be loaded by using
-the option \optionuse{-}{load-script} (see Section~\ref{sec:use-plugins}). The
-journal replays the very same results as the ones computed in the original
-session.
-
-Journals are commonly used for the three different purposes described
-thereafter.
-\begin{itemize}
-\item Easily replaying a given set of analysis operations in order to reach a
-  certain state. Once the final state is reached, further analyses can be
-  performed normally. Beware that journals may be source dependent and thus may
-  not necessarily be reused on different source codes to perform the same
-  analyses.
-%
-\item Acting as a macro language for plug-in developers. They can perform 
-  actions on the GUI to generate a journal and then adapt it to perform
-  a more general but similar task.
-%
-\item Debugging. In the GUI, a journal is always generated, even when an error
-  occurs. The output journal usually contains information about this
-  error. Thus it provides an easy way to reproduce the very same
-  error. Consequently, it is advised to attach the journal when reporting an
-  error in the \FramaC BTS (see Chapter~\ref{user-errors}).
-\end{itemize}
-
-By default, a journal is generated upon exit of the session only whenever
-\FramaC crashes in graphical mode. In all other cases, no journal is
-generated. This behavior may be customized by using the option
-\optiondef{-}{journal-enable} (resp. \optiondef{-}{journal-disable}) that
-generates (resp. does not generate) a journal upon exiting the session.
-
-\paragraph{Special Cases}
-
-Modifications of options \optionuse{-}{help}, \optionuse{-}{verbose},
-\optionuse{-}{debug}\xspace (and their corresponding counterpart) as well as
-\optionuse{-}{explain}, \optionuse{-}{quiet}\xspace and
-\optionuse{-}{unicode}\xspace are not written in the journal.
