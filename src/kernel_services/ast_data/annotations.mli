@@ -404,7 +404,7 @@ val add_allocates:
   keep_empty:bool -> allocation behavior_component_addition
 (** Add new allocates into the given behavior.
     See {!Annotations.add_assigns} for the signification of [keep_empty]
-    @modify 22.0-Titanium add keep_empty argument
+    @before 22.0-Titanium there is no [keep_empty] argument
 *)
 
 val add_extended: acsl_extension behavior_component_addition
