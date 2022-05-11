@@ -764,23 +764,25 @@ let () = Parameter_customize.set_group wp_prover
 module PrepareScripts = Action
     (struct
       let option_name = "-wp-prepare-scripts"
-      let help = "Initialize script tracking"
+      let help = "Initialize a script tracking directory in the session \
+                  directory."
     end)
 
 let () = Parameter_customize.set_group wp_prover
 module FinalizeScripts = Action
     (struct
       let option_name = "-wp-finalize-scripts"
-      let help = "Remove untracked scripts"
+      let help = "Remove untracked scripts according to the tracking directory \
+                  if it does exist (does not remove anything otherwise)."
     end)
 
 let () = Parameter_customize.set_group wp_prover
 module DryFinalizeScripts = False
     (struct
       let option_name = "-wp-dry-finalize-scripts"
-      let help =
-        "Scripts that might be removed by -wp-finalize-scripts are kept, a \
-         message is printed instead for each file."
+      let help = "Scripts that might be removed by -wp-finalize-scripts are \
+                  kept, a message is printed instead for each file. The marks \
+                  directory is kept."
     end)
 
 let () = Parameter_customize.set_group wp_prover

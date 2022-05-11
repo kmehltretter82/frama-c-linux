@@ -251,6 +251,27 @@ c. Consolidating the Bench.
 
 This mode replays the automated proofs and the interactive ones, re-running Alt-Ergo on every \textsf{WP} goals and every proof tactic sub-goals. The user scripts are never modified — this is a replay mode only.
 
+\subsection{Tracking Scripts}
+
+When working on large verification use-cases, it is common that some proof scripts
+become useless because the associated proof obligation does not exist anymore.
+
+WP can track the scripts that are used during verification. For this, one has to
+initialize a tracking directory. This is done using the option
+\verb+-wp-prepare-scripts+. This command creates a \verb+.marks+ directory in the
+proof session scripts directory (that can be configured using \verb+-wp-session+),
+if such a directory already exists it is removed and created again.
+
+Then, each time WP uses a proof script, it is marked as used in the \verb+.marks+
+directory. In particular, it enables with the possibility to start the plugin
+several times to verify different parts of the code, yet marking the scripts for
+all these different parts.
+
+Once one is certain that the entire verification of the use case has been replayed
+for marking, the option \verb+-wp-finalize-scripts+ can be used to remove all
+orphan scripts and the marking directory. The option \verb+-wp-dry-finalize-scripts+
+can be used to log the remove actions instead of actually doing them.
+
 \subsection{Strategies}
 
 Strategies are heuristics that generate a prioritized bunch of tactics to be tried on the current goal.
@@ -1326,6 +1347,13 @@ See \texttt{-wp-interactive <mode>} option for details.
   steps. This can be used as a machine-independent alternative to timeout.
 \item[\tt -wp-why3-opt='options,...'] provides additional options to the
   \verb+why3+ command.
+\item[\tt -wp-prepare-scripts] initialize a script tracking directory in the
+  session directory.
+\item[\tt -wp-finalize-scripts] remove untracked scripts according to the
+  tracking directory if it does exist (does not remove anything otherwise).
+\item[]\tt -wp-dry-finalize-scripts] scripts that might be removed by
+  \verb+-wp-finalize-scripts+ are kept, a message is printed instead for each
+  file. The marks directory is kept.
 \end{description}
 
 \paragraph{Example of using provers.}
