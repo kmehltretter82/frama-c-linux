@@ -22,6 +22,12 @@
 
 let dkey_main = Wp_parameters.register_category "main"
 let dkey_raised = Wp_parameters.register_category "raised"
+let dkey_script_removed =
+  Wp_parameters.register_category "script:show-removed"
+let dkey_script_updated =
+  Wp_parameters.register_category "script:show-updated"
+let dkey_script_incomplete =
+  Wp_parameters.register_category "script:show-incomplete"
 
 (* ------------------------------------------------------------------------ *)
 (* --- Memory Model Hypotheses                                          --- *)
@@ -585,60 +591,128 @@ let compute_auto ~script =
       if script.auto <> [] then script.tactical <- true ;
     end
 
-let do_update_session ~script goals =
-  if script.update then
-    begin
-      let removed = ref 0 in
-      let updated = ref 0 in
-      let invalid = ref 0 in
-      Bag.iter
-        begin fun goal ->
-          let results = Wpo.get_results goal in
-          let autoproof (p,r) =
-            (p=VCS.Qed) || (VCS.is_auto p && VCS.is_valid r && VCS.autofit r) in
-          if List.exists autoproof results then
+type session_scripts = {
+  updated: (Wpo.t * string * Json.t) list;
+  incomplete: (Wpo.t * string * Json.t) list;
+  removed: (Wpo.t * string) list;
+}
+
+let do_collect_session goals =
+  let updated = ref [] in
+  let incomplete = ref [] in
+  let removed = ref [] in
+  let file goal =
+    Format.asprintf "%a"
+      ProofSession.pp_file @@ ProofSession.filename ~force:false goal
+  in
+  Bag.iter
+    begin fun goal ->
+      let results = Wpo.get_results goal in
+      let autoproof (p,r) =
+        (p=VCS.Qed) || (VCS.is_auto p && VCS.is_valid r && VCS.autofit r) in
+      if List.exists autoproof results then
+        begin
+          if ProofSession.exists goal then
             begin
-              if ProofSession.exists goal then
-                (incr removed ; ProofSession.remove goal)
+              let file = file goal in
+              removed := (goal, file) :: !removed
             end
-          else
-            let scripts = ProofEngine.script (ProofEngine.proof ~main:goal) in
-            if scripts <> [] then
+        end
+      else
+        let scripts = ProofEngine.script (ProofEngine.proof ~main:goal) in
+        if scripts <> [] then
+          begin
+            let keep = function
+              | ProofScript.Prover(p,r) -> VCS.is_auto p && VCS.is_valid r
+              | ProofScript.Tactic(n,_,_) -> n=0
+              | ProofScript.Error _ -> false in
+            let strategy = List.filter keep scripts in
+            if strategy <> [] then
               begin
-                let keep = function
-                  | ProofScript.Prover(p,r) -> VCS.is_auto p && VCS.is_valid r
-                  | ProofScript.Tactic(n,_,_) -> n=0
-                  | ProofScript.Error _ -> false in
-                let strategy = List.filter keep scripts in
-                let stdout = script.on_stdout in
-                if strategy <> [] then
-                  begin
-                    incr updated ;
-                    ProofSession.save ~stdout goal (ProofScript.encode strategy)
-                  end
-                else
-                if not (ProofSession.exists goal) then
-                  begin
-                    incr invalid ;
-                    ProofSession.save ~stdout goal (ProofScript.encode scripts)
-                  end
+                let file = file goal in
+                let json = ProofScript.encode strategy in
+                updated := (goal, file, json) :: !updated
               end
-        end goals ;
-      let r = !removed in
-      let u = !updated in
-      let f = !invalid in
-      ( if r = 0 && u = 0 && f = 0 then
-          Wp_parameters.result "No updated script." ) ;
-      ( if r > 0 then
-          let s = if r > 1 then "s" else "" in
-          Wp_parameters.result "Updated session with %d new automated proof%s." r s );
-      ( if u > 0 then
-          let s = if u > 1 then "s" else "" in
-          Wp_parameters.result "Updated session with %d new valid script%s." u s ) ;
-      ( if f > 0 then
-          let s = if f > 1 then "s" else "" in
-          Wp_parameters.result "Updated session with %d new script%s to complete." f s );
+            else
+            if not (ProofSession.exists goal) then
+              begin
+                let file = file goal in
+                let json = ProofScript.encode scripts in
+                incomplete := (goal, file, json) :: !incomplete
+              end
+          end
+    end goals ;
+  { updated = !updated ;
+    incomplete = !incomplete ;
+    removed = !removed ; }
+
+let do_update_session script session =
+  let stdout = script.on_stdout in
+  List.iter
+    begin fun (g, _, s) ->
+      (* we always mark existing scripts *)
+      ProofSession.mark g ;
+      if script.update then ProofSession.save ~stdout g s
     end
+    session.updated ;
+  List.iter
+    begin fun (g, _, s) ->
+      (* we mark new incomplete scripts only if we save such files *)
+      if script.update then
+        (ProofSession.mark g ; ProofSession.save ~stdout g s)
+    end
+    session.incomplete ;
+  List.iter (fun (g, _) -> ProofSession.remove g) session.removed ;
+  ()
+
+let do_show_session updated_session session =
+  let show enabled kind dkey file =
+    if enabled then
+      Wp_parameters.result ~dkey "[%s] %a" kind ProofSession.pp_file file
+  in
+  (* Note: we display new (in)valid scripts only when updating *)
+  List.iter
+    (fun (_,f,_) -> show updated_session "UPDATED" dkey_script_updated f)
+    session.updated ;
+  List.iter
+    (fun (_,f,_) -> show updated_session "INCOMPLETE" dkey_script_incomplete f)
+    session.incomplete ;
+  let txt_removed = if updated_session then "REMOVED" else "UNUSED" in
+  List.iter
+    (fun (_,f) -> show true txt_removed dkey_script_removed f)
+    session.removed ;
+
+  let r = List.length session.removed in
+  let u = List.length session.updated in
+  let f = List.length session.incomplete in
+
+  (* Note: we display new (in)valid scripts only when updating *)
+  if (updated_session && (f > 0 || u > 0)) || r > 0 then
+    let updated_s =
+      let s = if u > 1 then "s" else "" in
+      if u = 0 || (not updated_session) then ""
+      else Format.asprintf "\n - %d new valid script%s" u s
+    in
+    let invalid_s =
+      let s = if f > 1 then "s" else "" in
+      if f = 0 || (not updated_session) then ""
+      else Format.asprintf "\n - %d new script%s to complete" f s
+    in
+    let removed_s =
+      let s = if r > 1 then "s" else "" in
+      let txt_removed = String.lowercase_ascii txt_removed in
+      if r = 0 then ""
+      else Format.asprintf "\n - %d script%s %s (now automated)" r s txt_removed
+    in
+    Wp_parameters.result
+      "%s%s%s%s"
+      (if updated_session then "Updated session" else "Session can be updated")
+      removed_s updated_s invalid_s
+
+let do_session ~script goals =
+  let session = do_collect_session goals in
+  do_update_session script session ;
+  do_show_session script.update session
 
 let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
   let script = default_script_mode () in
@@ -662,7 +736,7 @@ let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
     if spawned then
       begin
         do_list_scheduled_result () ;
-        do_update_session ~script goals ;
+        do_session ~script goals ;
       end
     else if not (Wp_parameters.Print.get ()) then
       Bag.iter do_wpo_display goals
@@ -816,6 +890,21 @@ let sequence jobs () =
   then List.iter (fun f -> f ()) jobs
   else try_sequence jobs ()
 
+let prepare_scripts () =
+  if Wp_parameters.PrepareScripts.get () then begin
+    Wp_parameters.feedback "Prepare" ;
+    ProofSession.reset_marks () ;
+    Wp_parameters.PrepareScripts.clear ()
+  end
+
+let finalize_scripts () =
+  if Wp_parameters.FinalizeScripts.get () then begin
+    Wp_parameters.feedback "Finalize" ;
+    ProofSession.remove_unmarked_files
+      ~dry:(Wp_parameters.DryFinalizeScripts.get()) ;
+    Wp_parameters.FinalizeScripts.clear ()
+  end
+
 let tracelog () =
   let active_keys = Wp_parameters.get_debug_keys () in
   if active_keys <> [] then begin
@@ -828,8 +917,10 @@ let tracelog () =
 let main = sequence [
     (fun () -> Wp_parameters.debug ~dkey:dkey_main "Start WP plugin...@.") ;
     do_prover_detect ;
+    prepare_scripts ;
     cmdline_run ;
     tracelog ;
+    finalize_scripts ;
     Wp_parameters.reset ;
     (fun () -> Wp_parameters.debug ~dkey:dkey_main "Stop WP plugin...@.") ;
   ]
