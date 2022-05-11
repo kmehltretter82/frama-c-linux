@@ -236,7 +236,7 @@ module type Weak_hashtbl = sig
 
   val find: data -> data
   (** [find x] returns an instance of [x] found in table.
-      @Raise Not_found if there is no such element.
+      @raise Not_found if there is no such element.
       @since Boron-20100401 *)
 
   val find_all: data -> data list
