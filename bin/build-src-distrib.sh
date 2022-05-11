@@ -728,7 +728,7 @@ case "${STEP}" in
         step 1 "COMPILING PDF MANUALS"
         run "rm -rf $MANUALS_DIR"
         run "mkdir -p $MANUALS_DIR"
-        run "$FILTER doc/build-manuals.sh"
+        run "$FILTER make -C doc all"
         run "rm -rf $OUT_DIR/manuals"
         run "mkdir -p $OUT_DIR/manuals"
         run "cp $MANUALS_DIR/* $OUT_DIR/manuals"
