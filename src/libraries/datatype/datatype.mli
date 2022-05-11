@@ -30,7 +30,10 @@
 (* ********************************************************************** *)
 
 (** Values associated to each datatype.
-    Some others are provided directly in module {!Type}. *)
+    Some others are provided directly in module {!Type}.
+    @before Frama-C+dev there was additional fields only used for Journalization
+            that has been removed.
+*)
 type 'a t = private
   { equal: 'a -> 'a -> bool;
     compare: 'a -> 'a -> int;
@@ -45,7 +48,10 @@ module type Ty = sig
   val ty: t Type.t
 end
 
-(** All values associated to a datatype, excepted [copy]. *)
+(** All values associated to a datatype, excepted [copy].
+    @before Frama-C+dev there was several additional values only used for
+            Journalization that has been removed.
+*)
 module type S_no_copy = sig
 
   include Ty
@@ -122,7 +128,11 @@ val never_any_project: (Project_skeleton.t -> bool) -> 'a -> bool
     @plugin development guide *)
 
 (** Sub-signature of {!S}.
-    @plugin development guide *)
+    @plugin development guide
+
+    @before Frama-C+dev there was several additional values only used for
+            Journalization that has been removed.
+*)
 module type Undefined = sig
   val structural_descr: Structural_descr.t
   val equal: 'a -> 'a -> bool
@@ -157,7 +167,11 @@ module Serializable_undefined: Undefined
 
 (** Input signature of {!Make} and {!Make_with_collections}.
     Values to implement in order to get a datatype.
-    Feel free to use easy builders (see above) for easy implementation. *)
+    Feel free to use easy builders (see above) for easy implementation.
+
+    @before Frama-C+dev there was several additional values only used for
+            Journalization that has been removed.
+*)
 module type Make_input = sig
 
   type t (** Type for this datatype *)
@@ -334,7 +348,11 @@ module type Polymorphic = sig
 end
 
 (** Functor for polymorphic types with only 1 type variable.
-    @plugin development guide *)
+    @plugin development guide
+
+    @before Frama-C+dev the functor had several additional values only used for
+            Journalization that has been removed.
+*)
 module Polymorphic
     (P: sig
        include Type.Polymorphic_input
@@ -357,7 +375,11 @@ module type Polymorphic2 = sig
 end
 
 (** Functor for polymorphic types with 2 type variables.
-    @plugin development guide *)
+    @plugin development guide
+
+    @before Frama-C+dev the functor had several additional values only used for
+            Journalization that has been removed.
+*)
 module Polymorphic2
     (P: sig
        include Type.Polymorphic2_input
@@ -387,7 +409,10 @@ end
 
 (** Functor for polymorphic types with 3 type variables.
     @since Oxygen-20120901
-    @plugin development guide *)
+    @plugin development guide
+    @before Frama-C+dev the functor had several additional values only used for
+            Journalization that has been removed.
+*)
 module Polymorphic3
     (P: sig
        include Type.Polymorphic3_input
@@ -425,7 +450,10 @@ end
 
 (** Functor for polymorphic types with 4 type variables.
     @since Oxygen-20120901
-    @plugin development guide *)
+    @plugin development guide
+    @before Frama-C+dev the functor had several additional values only used for
+            Journalization that has been removed.
+*)
 module Polymorphic4
     (P: sig
        include Type.Polymorphic4_input

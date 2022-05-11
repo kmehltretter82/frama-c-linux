@@ -63,6 +63,8 @@ val register_compute:
 val register_guarded_compute:
   (unit -> bool) ->
   (unit -> unit) ref -> (unit -> unit) -> unit
+(** @before Frama-C+dev there was a string parameter (first position) that was
+            only used for Journalization, that has been removed. *)
 
 (** Frama-C main interface.
     @since Lithium-20081201

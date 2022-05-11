@@ -268,7 +268,6 @@ module Varinfo: sig
     val self: State.t
   end
   val dummy: t
-  (**/**)
 end
 
 module Kf: sig
