@@ -671,7 +671,7 @@ struct
                let hash = hash
                let rehash = Datatype.identity
                let copy = Datatype.undefined
-                     let pretty = pretty
+               let pretty = pretty
                let mem_project = Datatype.never_any_project
              end) :
              Datatype.S with type t := t)
