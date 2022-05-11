@@ -377,11 +377,20 @@ module Location_Bytes = struct
     match mm1, mm2 with
     | Top _, _ | _, Top _ -> intersects mm1 mm2
     | Map m1, Map m2 ->
+      (* The two locations may overlap if there are two offsets i1 and i2 such
+         that |i1-i2| < size (and |i1-i2| > 0 when partial is true). *)
+      let pred_size = Int.pred size in
+      let min = if partial then Int.one else Int.zero in
+      let size_itv = Ival.inject_range (Some min) (Some pred_size) in
+      let decide_both _ x y =
+        let abs_diff = Ival.abs_int (Ival.sub_int x y) in
+        Ival.intersects abs_diff size_itv
+      in
       M.symmetric_binary_predicate
         Hptmap_sig.NoCache M.ExistentialPredicate
         ~decide_fast:(fun _ _ -> M.PUnknown)
         ~decide_one:(fun _ _ -> false)
-        ~decide_both:(fun _ x y -> Ival.overlaps ~partial ~size x y)
+        ~decide_both
         m1 m2
 
   type size_widen_hint = Ival.size_widen_hint
