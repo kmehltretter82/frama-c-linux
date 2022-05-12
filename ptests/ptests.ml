@@ -558,7 +558,7 @@ module Macros = struct
   let append_expand ~file name def macros =
     StringMap.add name (get name macros ^ expand ~file macros def) macros
 
-  let default_macros = add_list
+  let default_macros () = add_list
       [ "frama-c-exe", !macro_frama_c_exe;
         "frama-c-cmd", !macro_frama_c_cmd;
         "frama-c",     !macro_frama_c;
@@ -705,7 +705,7 @@ end = struct
   let default_config dir =
     { dc_subdir = dir;
       dc_test_regexp = test_file_regexp;
-      dc_macros = Macros.default_macros;
+      dc_macros = Macros.default_macros ();
       dc_execnow = [];
       dc_libs = None;
       dc_deps = None;
