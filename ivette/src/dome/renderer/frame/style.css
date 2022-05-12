@@ -6,11 +6,11 @@
 
 .dome-xTabsBar {
     flex: 0 1 auto ;
+    flex-flow: row wrap ;
     position: relative ;
     height: 20px ;
     width: calc( 100% + 1px ); /* hides last border */
     display: flex ;
-    flex: row wrap ;
     border-width: 1px ;
     border-bottom-style: solid ;
 }
@@ -25,59 +25,57 @@
 /* Tab Item */
 
 .dome-xTab {
-    flex: 1 1 150px ;
+    display: flex;
     position: relative ;
     font-size: 10px ;
     text-align: center ;
-    padding: 4px 20px 4px 20px ;
+    padding: 4px ;
     border-color: inherit ;
     border-width: 1px ;
     border-top-style: none ;
     border-bottom-style: none ;
     border-left-style: none ;
     border-right-style: solid ;
+    height: 100%;
 }
 
-.dome-xTab.dome-inactive:hover {
-    background: var(--background-disabled-hover) ;
+.dome-xTab.dome-active {
+    flex: 1 1 auto ;
+    background: var(--background-intense);
 }
 
 .dome-xTab.dome-inactive {
+    flex: 0 1 150px ;
     color: var(--text-discrete) ;
     border-color: var(--border) ;
-    background: var(--background-disabled) ;
+    background: var(--background-profound);
 }
 
-/* Closing Tab button */
+.dome-xTab.dome-inactive:hover {
+    background: var(--background-profound-hover);
+}
 
-.dome-xTab-closing {
-    display: inline ;
+.dome-xTab-icon {
+    flex: 0 0 12px;
     border-radius: 4px ;
-    position: absolute ;
-    width: 12px ;
-    height: 12px ;
-    padding: 2px ;
-    top: 2px ;
-    opacity: 0 ;
-    transition: opacity .1s linear 0.1s , background .1s linear 0.1s ;
 }
 
-.dome-platform-darwin .dome-xTab-closing {
-    right: initial ;
-    left: 5px ;
-}
-
-.dome-xTab-closing {
-    right: 5px ;
-    left: initial ;
-}
-
-.dome-xTab-closing:hover {
+.dome-xTab-icon:hover {
     background: var(--background-button-hover);
 }
 
-.dome-xTab:hover .dome-xTab-closing {
-    opacity: 1 ;
+.dome-xTab-icon.dome-inactive {
+    fill: var()
+}
+
+.dome-xTab-label {
+    flex: 0 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dome-xTab-filler {
+    flex: 1 1 0px;
 }
 
 /* -------------------------------------------------------------------------- */
