@@ -311,6 +311,8 @@ let rec argspec =
      " <value> Set the default value of the @frama-c-cmd@ macro (defaults to "^ !macro_frama_c_cmd ^")");
     ("-macro-frama-c", Arg.String (fun s -> macro_frama_c := s),
      " <value> Set the @frama-c@ macro (defaults to "^ !macro_frama_c ^")");
+    ("-macro-frama-c-share", Arg.String (fun s -> macro_frama_c_share := s),
+     " <value> Set the @FRAMAC_SHARE@ macro (defaults to "^ !macro_frama_c_share ^")");
 
     ("-dune-alias", Arg.String (fun s -> default_dune_alias := s),
      " <name> Use @<name> as dune alias to exectute tests (defaults to "^ !default_dune_alias ^")");
