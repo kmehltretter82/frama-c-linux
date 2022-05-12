@@ -20,15 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** External interface of an abstraction, built by {!Structure.Open}. *)
-module type Interface = sig
-  type t
-  type 'a key
-  val mem : 'a key -> bool
-  val get : 'a key -> (t -> 'a) option
-  val set : 'a key -> 'a -> t -> t
-end
-
 module Value = struct
 
   module V = struct
@@ -46,6 +37,7 @@ module Value = struct
     include Internal
     include Structure.External with type t := t
                                 and type 'a key := 'a key
+                                and type 'a data := 'a data
   end
 end
 
@@ -66,6 +58,7 @@ module Location = struct
     include Internal
     include Structure.External with type t := location
                                 and type 'a key := 'a key
+                                and type 'a data := 'a data
   end
 end
 
@@ -86,6 +79,7 @@ module Domain = struct
     include Internal
     include Structure.External with type t := t
                                 and type 'a key := 'a key
+                                and type 'a data := 'a data
 
     val get_cvalue: (t -> Cvalue.Model.t) option
     val get_cvalue_or_top: t -> Cvalue.Model.t

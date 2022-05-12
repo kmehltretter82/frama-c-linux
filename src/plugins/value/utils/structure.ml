@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
 type (_,_) eq = Eq : ('a,'a) eq
 
 module type Key = sig
@@ -36,22 +35,49 @@ module type Key = sig
   val tag: 'a key -> int
 end
 
+module Key = struct
+  type _ key = ..
+
+  module type Key = sig
+    type t
+    type _ key += Key : t key
+  end
+
+  type 'a k = (module Key with type t = 'a)
+
+  let create (type a) () =
+    let module M = struct
+      type t = a
+      type _ key += Key : t key
+    end in
+    (module M : Key with type t = a)
+
+  let eq_type (type a) (type b) (x : a k) (y : b k) : (a, b) eq option =
+    let module A = (val x : Key with type t = a) in
+    let module B = (val y : Key with type t = b) in
+    match A.Key with
+    | B.Key -> Some Eq
+    | _     -> None
+end
+
 module Make () = struct
 
-  type 'a key = { tag: int;
+  type 'a key = { key: 'a Key.k;
+                  tag: int;
                   name: string }
 
   let c = ref (-1)
   let id () = incr c; !c
 
-  let create_key name = { tag = id (); name }
+  let create_key name =
+    { key = Key.create ();
+      tag = id ();
+      name }
+
+  let eq_type : type a b. a key -> b key -> (a, b) eq option = fun x y ->
+    Key.eq_type x.key y.key
 
   let equal x y = x.tag = y.tag
-  let eq_type : type a b. a key -> b key -> (a,b) eq option = fun a b ->
-    if equal a b
-    then Some ((Obj.magic (Eq : (a,a) eq)) : (a,b) eq)
-    else None
-
   let compare x y = Stdlib.compare x.tag y.tag
   let hash x = x.tag
   let tag x = x.tag
@@ -117,9 +143,25 @@ end
 module type External = sig
   type t
   type 'a key
+  type 'a data
   val mem : 'a key -> bool
   val get : 'a key -> (t -> 'a) option
   val set : 'a key -> 'a -> t -> t
+
+  type polymorphic_iter_fun = {
+    iter: 'a. 'a key -> 'a data -> 'a -> unit;
+  }
+  val iter: polymorphic_iter_fun -> t -> unit
+
+  type 'b polymorphic_fold_fun = {
+    fold: 'a. 'a key -> 'a data -> 'a -> 'b -> 'b;
+  }
+  val fold: 'b polymorphic_fold_fun -> t -> 'b -> 'b
+
+  type polymorphic_map_fun = {
+    map: 'a. 'a key -> 'a data -> 'a -> 'a;
+  }
+  val map: polymorphic_map_fun -> t -> t
 end
 
 module Open
@@ -201,4 +243,61 @@ module Open
     | Some (Set (k, set)) -> match Shape.eq_type key k with
       | None -> fun _ t -> t
       | Some Eq -> set
+
+  type polymorphic_iter_fun = {
+    iter: 'a. 'a Shape.key -> 'a Shape.data -> 'a -> unit;
+  }
+
+  let rec iter: type a. a structure -> (polymorphic_iter_fun -> a -> unit) =
+    function
+    | Unit -> fun _ () -> ()
+    | Void -> fun _ _ -> ()
+    | Leaf (key, data) -> fun poly v -> poly.iter key data v
+    | Node (left, right) ->
+      let left = iter left
+      and right = iter right in
+      fun poly (a, b) -> left poly a; right poly b;
+    | Option (s, _) ->
+      let iter = iter s in
+      fun poly v -> Option.iter (iter poly) v
+
+  let iter = iter M.structure
+
+  type 'b polymorphic_fold_fun = {
+    fold: 'a. 'a Shape.key -> 'a Shape.data -> 'a -> 'b -> 'b;
+  }
+
+  let rec fold: type a. a structure -> ('b polymorphic_fold_fun -> a -> 'b -> 'b) =
+    function
+    | Unit -> fun _ () acc -> acc
+    | Void -> fun _ _ acc -> acc
+    | Leaf (key, data) -> fun poly v acc -> poly.fold key data v acc
+    | Node (left, right) ->
+      let left = fold left
+      and right = fold right in
+      fun poly (a, b) acc -> right poly b (left poly a acc)
+    | Option (s, _) ->
+      let fold = fold s in
+      fun poly v acc -> Option.fold ~none:acc ~some:(fun v -> fold poly v acc) v
+
+  let fold x = fold M.structure x
+
+  type polymorphic_map_fun = {
+    map: 'a. 'a Shape.key -> 'a Shape.data -> 'a -> 'a;
+  }
+
+  let rec map: type a. a structure -> (polymorphic_map_fun -> a -> a) =
+    function
+    | Unit -> fun _ () -> ()
+    | Void -> fun _ x -> x
+    | Leaf (key, data) -> fun poly v -> poly.map key data v
+    | Node (left, right) ->
+      let left = map left
+      and right = map right in
+      fun poly (a, b) -> (left poly a, right poly b)
+    | Option (s, _) ->
+      let map = map s in
+      fun poly v -> Option.map (map poly) v
+
+  let map = map M.structure
 end

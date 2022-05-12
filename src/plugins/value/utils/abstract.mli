@@ -33,28 +33,6 @@
     Note that their behavior is undefined if an abstraction contains
     several times the same leaf module. *)
 
-(** External interface of an abstraction, built by {!Structure.Open}. *)
-module type Interface = sig
-  type t
-  type 'a key
-
-  (** Tests whether a key belongs to the module. *)
-  val mem : 'a key -> bool
-
-  (** For a key of type [k key]:
-      - if the values of type [t] contain a subpart of type [k] from a module
-        identified by the key, then [get key] returns an accessor for it.
-      - otherwise, [get key] returns None. *)
-  val get : 'a key -> (t -> 'a) option
-
-  (** For a key of type [k key]:
-      - if the values of type [t] contain a subpart of type [k] from a module
-        identified by the key, then [set key v t] returns the value [t] in which
-        this subpart has been replaced by [v].
-      - otherwise, [set key _] is the identity function. *)
-  val set : 'a key -> 'a -> t -> t
-end
-
 (** Key and structure for abstract values.
     See {structure.mli} for more details. *)
 module Value : sig
@@ -69,8 +47,9 @@ module Value : sig
 
   module type External = sig
     include Internal
-    include Interface with type t := t
-                       and type 'a key := 'a key
+    include Structure.External with type t := t
+                                and type 'a key := 'a key
+                                and type 'a data := 'a data
   end
 end
 
@@ -88,8 +67,9 @@ module Location : sig
 
   module type External = sig
     include Internal
-    include Interface with type t := location
-                       and type 'a key := 'a key
+    include Structure.External with type t := location
+                                and type 'a key := 'a key
+                                and type 'a data := 'a data
   end
 end
 
@@ -107,8 +87,9 @@ module Domain : sig
 
   module type External = sig
     include Internal
-    include Interface with type t := t
-                       and type 'a key := 'a key
+    include Structure.External with type t := t
+                                and type 'a key := 'a key
+                                and type 'a data := 'a data
 
     (** Special accessors for the main cvalue domain. *)
     val get_cvalue: (t -> Cvalue.Model.t) option
