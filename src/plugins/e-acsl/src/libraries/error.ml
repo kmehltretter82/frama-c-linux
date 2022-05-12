@@ -136,14 +136,14 @@ module Make_with_opt(P: sig val phase:Options.category option end): S = struct
   let map2 f a b =
     match a,b with
     | Result.Ok a, Result.Ok b -> f a b
-    | Result.Ok _, Result.Error e -> raise e
+    | Result.Ok _, Result.Error e
     | Result.Error e, _ -> raise e
 
   let map3 f a b c =
     match a,b,c with
     | Result.Ok a, Result.Ok b, Result.Ok c -> f a b c
-    | Result.Ok _, Result.Ok _, Result.Error e -> raise e
-    | Result.Ok _, Result.Error e, _ -> raise e
+    | Result.Ok _, Result.Ok _, Result.Error e
+    | Result.Ok _, Result.Error e, _
     | Result.Error e, _, _ -> raise e
 
 end

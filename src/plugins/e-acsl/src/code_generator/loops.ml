@@ -289,7 +289,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     assert (rel1 == Rle && rel2 == Rlt);
     let ctx =
       Typing.number_ty_bound_variable
-        ~profile:(Interval.Logic_environment.get_profile (Env.Logic_env.get env))
+        ~profile:(Env.Logic_env.get_profile env)
         (t1, logic_x, t2)
     in
     let t_plus_one ~ty t =

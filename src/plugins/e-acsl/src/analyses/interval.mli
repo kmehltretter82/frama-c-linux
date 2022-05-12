@@ -89,39 +89,48 @@ val extended_interv_of_typ: Cil_types.typ -> t
     @raise Not_a_number if the given type does not represent any number. *)
 
 val plus_one : ival -> ival
+(** @return the result of adding one to an interval. This is because when we
+      have a condition [x<t], we need to generate [t+1] *)
 
 (* ************************************************************************** *)
 (** {3 Environment for interval computations} *)
 (* ************************************************************************** *)
 
+(** profile which maps logic variables that are function parameters to their
+    interval depending on the arguments at the callsite of the function *)
 module Profile:
   Datatype.S_with_collections with type t = ival list
 
-type profile = Profile.t
-
-module Logic_environment: sig
+(** logic environment which maps logic variables to their interval. It is
+    composed of:
+    - a profile for bindings of function arguments
+    - additional bindings for let and quantification binds *)
+module Logic_env: sig
   type t
-  val create: Cil_types.logic_var list -> ival list -> t
+  (* make a new environment with no bindings for let and quantifications, and
+     a profile, to be called at a function callsite. The two lists are assumed
+     to have the same length *)
+  val make: Cil_types.logic_var list -> ival list -> t
   val add_let_quantif_binding: t -> Cil_types.logic_var -> ival -> t
-  val get_profile: t -> profile
+  val get_profile: t -> Profile.t
 end
 
 (* ************************************************************************** *)
 (** {3 Inference system} *)
 (* ************************************************************************** *)
+(* The inference phase infers the smallest possible integer interval which the
+   values of the term can fit in. *)
 
-(* val infer: Logic_environment.t -> Cil_types.term -> t *)
-(* [infer t] infers the smallest possible integer interval which the values
-    of the term can fit in.
+val get_from_profile: profile:Profile.t -> Cil_types.term -> t
+(** @return the value computed by the interval inference phase
     @raise Is_a_real if the term is either a float or a real.
-    @raise Not_a_number if the term does not represent any number. *)
+    @raise Not_a_number if the term does not represent any
+    number.*)
 
-val get_p: profile:Profile.t -> Cil_types.term -> t
-(** @return the value computed by the interval inference phase *)
-
-val get: logic_env:Logic_environment.t -> Cil_types.term -> t
-(** @return the value computed by the interval inference phase, same as [get]
-    but with a full-fledged logic environment instead of a function profile *)
+val get: logic_env:Logic_env.t -> Cil_types.term -> t
+(** @return the value computed by the interval inference phase, same as
+      [get_from_profile] but with a full-fledged logic environment instead of a
+      function profile *)
 
 
 (*****************************************************************************)
@@ -133,17 +142,17 @@ val infer_program : Cil_types.file -> unit
     in a program *)
 
 val preprocess_predicate :
-  logic_env:Logic_environment.t -> Cil_types.predicate -> unit
+  logic_env:Logic_env.t -> Cil_types.predicate -> unit
 (** compute and store the type of all the terms in a code annotation *)
 
 val preprocess_code_annot :
-  logic_env:Logic_environment.t -> Cil_types.code_annotation -> unit
+  logic_env:Logic_env.t -> Cil_types.code_annotation -> unit
 (** compute and store the type of all the terms in a code annotation *)
 
 val preprocess_term :
-  logic_env:Logic_environment.t -> Cil_types.term -> unit
+  logic_env:Logic_env.t -> Cil_types.term -> unit
 
-val get_widened_profile : profile -> Cil_types.term -> profile
+val get_widened_profile : Profile.t -> Cil_types.term -> Profile.t
 
 val clear : unit -> unit
 

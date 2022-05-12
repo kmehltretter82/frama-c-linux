@@ -64,8 +64,8 @@ let rec has_empty_quantif_with_false_negative ~logic_env = function
 
 let () =
   Labels.has_empty_quantif_ref :=
-    has_empty_quantif_with_false_negative
-      ~logic_env:(Interval.Logic_environment.create [] [])
+    let logic_env = Interval.Logic_env.make [] [] in
+    has_empty_quantif_with_false_negative ~logic_env
 (* Since we do not support logic functions with labels, we do not need to
    pass an actual logic environment *)
 
@@ -81,11 +81,9 @@ let convert kf env loc ~is_forall quantif =
       quantif
       Printer.pp_predicate
   in
-  match (has_empty_quantif_with_false_negative
-           ~logic_env:(Env.Logic_env.get env)
-           bound_vars),
-        is_forall
-  with
+  let logic_env = Env.Logic_env.get env in
+  let empty = has_empty_quantif_with_false_negative ~logic_env bound_vars in
+  match empty, is_forall with
   | true, true ->
     Cil.one ~loc, env
   | true, false ->
@@ -107,8 +105,8 @@ let convert kf env loc ~is_forall quantif =
              let lvs = Lvs_quantif (t1, Rle, lv, Rlt, t2) in
              let env = Env.Logic_scope.extend env lvs in
              let logic_env = Env.Logic_env.get env in
-             let env = Env.Logic_env.add_let_quantif_binding env lv
-                 Interval.(join (get ~logic_env t1) (get ~logic_env t2)) in
+             let i = Interval.(join (get ~logic_env t1) (get ~logic_env t2)) in
+             let env = Env.Logic_env.add_let_quantif_binding env lv i in
              lvs :: lvs_guards, env)
           ([], env)
           bound_vars
@@ -165,8 +163,8 @@ let convert kf env loc ~is_forall quantif =
       end_loop.labels <- label :: end_loop.labels;
       end_loop_ref := end_loop;
       let env = Env.add_stmt env end_loop in
-      let
-        env = List.fold_left
+      let env =
+        List.fold_left
           (fun env _ -> Env.Logic_env.pop env)
           env
           lvs_guards

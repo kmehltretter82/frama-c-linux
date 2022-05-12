@@ -193,7 +193,7 @@ module Memo: sig
     (term -> computed_info) ->
     term ->
     computed_info Error.result
-  val get: profile:Interval.profile -> term -> computed_info Error.result
+  val get: profile:Interval.Profile.t -> term -> computed_info Error.result
   val clear: unit -> unit
 end = struct
 
@@ -277,6 +277,15 @@ end
 (** {2 Coercion rules} *)
 (******************************************************************************)
 
+let assert_nan = function
+  | Nan -> ()
+  | C_integer _
+  | C_float _
+  | Gmpz
+  | Rational
+  | Real -> Options.abort "got a number type where NaN was expected"
+
+
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
 let ty_of_interv ?ctx ?(use_gmp_opt = false) = function
@@ -332,7 +341,7 @@ let number_ty_of_typ ~post ty =
     | TVoid _ | TPtr _ | TArray _ | TFun _ | TComp _ | TBuiltin_va_list _ -> Nan
     | TNamed _ -> assert false
 
-let ty_of_logic_ty ?term ?profile lty =
+let ty_of_logic_ty ?term ~profile lty =
   let get_ty = function
     | Linteger -> Gmpz
     | Ctype ty -> number_ty_of_typ ~post:false ty
@@ -344,13 +353,9 @@ let ty_of_logic_ty ?term ?profile lty =
   match term with
   | None -> get_ty lty
   | Some t ->
-    let profile = match profile with
-      | None -> assert false
-      | Some profile -> profile
-    in
     if Options.Gmp_only.get () && lty = Linteger then Gmpz
     else
-      let i = Interval.get_p ~profile t in
+      let i = Interval.get_from_profile ~profile t in
       ty_of_interv i
 
 (******************************************************************************)
@@ -372,7 +377,7 @@ let mk_ctx ~use_gmp_opt = function
    In that case, it cannot be a GMP, so it must be coerced to an integral type
    in that case *)
 let type_offset ~profile t =
-  let i = Interval.get_p ~profile t in
+  let i = Interval.get_from_profile ~profile t in
   match ty_of_interv i with
   | Gmpz -> C_integer ILongLong (* largest possible type *)
   | ty -> ty
@@ -410,14 +415,14 @@ let rec type_term
     | TSizeOf _
     | TSizeOfStr _
     | TAlignOf _ ->
-      let i = Interval.get_p ~profile t in
+      let i = Interval.get_from_profile ~profile t in
       (* a constant or a left value directly under a lambda should be a gmp
          if the infered context for the lambda is gmp *)
       let ty = ty_of_interv ?ctx ~use_gmp_opt:under_lambda i in
       dup ty
 
     | TLval tlv ->
-      let i = Interval.get_p ~profile t in
+      let i = Interval.get_from_profile ~profile t in
       let ty =  ty_of_interv ?ctx ~use_gmp_opt:under_lambda i in
       type_term_lval ~profile tlv;
       (* Options.feedback "Type : %a" D.pretty ty; *)
@@ -427,14 +432,14 @@ let rec type_term
     | Tblock_length(_, t')
     | TSizeOfE t'
     | TAlignOfE t' ->
-      let i = Interval.get_p ~profile t in
+      let i = Interval.get_from_profile ~profile t in
       (* [t'] must be typed, but it is a pointer *)
       ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~profile t');
       let ty = ty_of_interv ?ctx i in
       dup ty
 
     | TBinOp (MinusPP, t1, t2) ->
-      let i = Interval.get_p ~profile t in
+      let i = Interval.get_from_profile ~profile t in
       (* [t1] and [t2] must be typed, but they are pointers *)
       ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~profile t1);
       ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~profile t2);
@@ -442,8 +447,8 @@ let rec type_term
       dup ty
 
     | TUnOp (unop, t') ->
-      let i = Interval.get_p ~profile t in
-      let i' = Interval.get_p ~profile t' in
+      let i = Interval.get_from_profile ~profile t in
+      let i' = Interval.get_from_profile ~profile t' in
       let ctx_res, ctx = compute_ctx ?ctx (Interval.join i i') in
       ignore (type_term ~use_gmp_opt:true ~arith_operand:true ~ctx ~profile t');
       (match unop with
@@ -453,9 +458,9 @@ let rec type_term
     | TBinOp ((PlusA | MinusA | Mult | Div | Mod | Shiftlt | Shiftrt | BAnd
               | BOr | BXor), t1, t2)
       ->
-      let i = Interval.get_p ~profile t in
-      let i1 = Interval.get_p ~profile t1 in
-      let i2 = Interval.get_p ~profile t2 in
+      let i = Interval.get_from_profile ~profile t in
+      let i1 = Interval.get_from_profile ~profile t1 in
+      let i2 = Interval.get_from_profile ~profile t2 in
       let ctx_res, ctx =
         compute_ctx ?ctx (Interval.join i (Interval.join i1 i2))
       in
@@ -476,8 +481,8 @@ let rec type_term
 
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
       assert (match ctx with None -> true | Some c -> D.compare c c_int >= 0);
-      let i1 = Interval.get_p ~profile t1 in
-      let i2 = Interval.get_p ~profile t2 in
+      let i1 = Interval.get_from_profile ~profile t1 in
+      let i2 = Interval.get_from_profile ~profile t2 in
       let ctx =
         mk_ctx ~use_gmp_opt:true (ty_of_interv ?ctx (Interval.join i1 i2))
       in
@@ -490,8 +495,8 @@ let rec type_term
       c_int, ty
 
     | TBinOp ((LAnd | LOr), t1, t2) ->
-      let i1 = Interval.get_p ~profile t1 in
-      let i2 = Interval.get_p ~profile t2 in
+      let i1 = Interval.get_from_profile ~profile t1 in
+      let i2 = Interval.get_from_profile ~profile t2 in
       let ty = ty_of_interv ?ctx (Interval.join i1 i2) in
       (* both operands fit in an int. *)
       ignore (type_term ~use_gmp_opt:true ~ctx:c_int ~profile t1);
@@ -500,7 +505,7 @@ let rec type_term
 
     | TCastE(_, t') ->
       (* compute the smallest interval from the whole term [t] *)
-      let i = Interval.get_p ~profile t in
+      let i = Interval.get_from_profile ~profile t in
       (* nothing more to do: [i] is already more precise than what we could
          infer from the arguments of the cast. *)
       let ctx = ty_of_interv ?ctx i in
@@ -512,9 +517,9 @@ let rec type_term
         mk_ctx ~use_gmp_opt:false c_int (* an int must be generated *)
       in
       ignore (type_term ~use_gmp_opt:false ~ctx:ctx1 ~profile t1);
-      let i = Interval.get_p ~profile t in
-      let i2 = Interval.get_p ~profile t2 in
-      let i3 = Interval.get_p ~profile t3 in
+      let i = Interval.get_from_profile ~profile t in
+      let i2 = Interval.get_from_profile ~profile t2 in
+      let i3 = Interval.get_from_profile ~profile t3 in
       let ctx = ty_of_interv ?ctx (Interval.join i (Interval.join i2 i3)) in
       let ctx = mk_ctx ~use_gmp_opt:true ctx in
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t2);
@@ -548,13 +553,13 @@ let rec type_term
         let typ_arg lvi arg =
           (* a built-in is a C function, so the context is necessarily a C
              type. *)
-          let ctx = ty_of_logic_ty lvi.lv_type in
+          let ctx = ty_of_logic_ty ~profile lvi.lv_type in
           ignore (type_term ~use_gmp_opt:false ~ctx ~profile arg)
         in
         List.iter2 typ_arg li.l_profile args;
         (* [li.l_type is [None] for predicate only: not possible here.
            Thus using [Option.get] is fine *)
-        dup (ty_of_logic_ty (Option.get li.l_type))
+        dup (ty_of_logic_ty ~profile (Option.get li.l_type))
       else begin
         (* TODO: what if the type of the parameter is smaller than the infered
            type of the argument? For now, it is silently ignored (both
@@ -586,7 +591,7 @@ let rec type_term
                     ?ctx
                     ~profile x))
             args;
-          let new_profile = List.map (Interval.get_p ~profile) args in
+          let new_profile = List.map (Interval.get_from_profile ~profile) args in
           Stack.push
             (fun () ->
                ignore (type_predicate ~profile:new_profile p))
@@ -615,7 +620,7 @@ let rec type_term
                     ?ctx
                     ~profile x))
             args;
-          let new_profile = List.map (Interval.get_p ~profile) args in
+          let new_profile = List.map (Interval.get_from_profile ~profile) args in
           let new_profile = Interval.get_widened_profile new_profile t_body in
           let gmp,ctx_body = match li.l_type with
             | Some (Ctype typ) ->
@@ -625,35 +630,33 @@ let rec type_term
           in
           Stack.push
             (fun () ->
-               ignore (type_term
-                         ~use_gmp_opt:false
-                         ~under_lambda:true
-                         ~arith_operand
-                         ?ctx:ctx_body
-                         ~profile:new_profile
-                         t_body))
+               ignore
+                 (type_term
+                    ~use_gmp_opt:false
+                    ~under_lambda:true
+                    ~arith_operand
+                    ?ctx:ctx_body
+                    ~profile:new_profile
+                    t_body))
             pending_typing;
           dup (ty_of_interv
                  ?ctx:ctx_body
                  ~use_gmp_opt:(gmp && use_gmp_opt)
-                 (Interval.get_p ~profile t))
+                 (Interval.get_from_profile ~profile t))
         | LBnone ->
           (match args with
            | [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ] ->
-             let ty_bound = Interval.(plus_one (get_p ~profile t2)) in
-             let ty_bound =
-               ty_of_interv (Interval.join ty_bound (Interval.get_p ~profile t1))
-             in
+             let range = Interval.(plus_one (get_from_profile ~profile t2)) in
+             let range = Interval.(join range (get_from_profile ~profile t1)) in
+             let range = ty_of_interv range in
              ignore
                (type_term
-                  ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound ~profile t1);
+                  ~use_gmp_opt:true ~arith_operand:true ~ctx:range ~profile t1);
              ignore
                (type_term
-                  ~use_gmp_opt:true ~arith_operand:true ~ctx:ty_bound ~profile t2);
-             let ty =
-               ty_of_interv (Interval.get_p ~profile t) ~use_gmp_opt:true ?ctx
-             in
-             (* Options.feedback "type of extended quantifier: %a" D.pretty ty; *)
+                  ~use_gmp_opt:true ~arith_operand:true ~ctx:range ~profile t2);
+             let ival = Interval.get_from_profile ~profile t in
+             let ty = ty_of_interv ival ~use_gmp_opt:true ?ctx in
              ignore (type_term ~use_gmp_opt:true ?ctx ~profile lambda);
              dup ty
            | [ ] | [ _ ] | [ _; _ ] | _ :: _ :: _ :: _ ->
@@ -678,7 +681,7 @@ let rec type_term
     | Trange(Some n1, Some n2) ->
       ignore (type_term ~use_gmp_opt ~profile n1);
       ignore (type_term ~use_gmp_opt ~profile n2);
-      let i = Interval.get_p ~profile t in
+      let i = Interval.get_from_profile ~profile t in
       let ty = ty_of_interv ?ctx i in
       dup ty
 
@@ -719,7 +722,8 @@ and type_term_lhost ~profile t  = match t with
   | TVar _
   | TResult _ -> ()
   | TMem t ->
-    ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~profile t)
+    let computed_ty = type_term ~use_gmp_opt:false ~ctx:Nan ~profile t
+    in assert_nan computed_ty.ty
 
 and type_term_offset ~profile t = match t with
   | TNoOffset -> ()
@@ -731,8 +735,8 @@ and type_term_offset ~profile t = match t with
     type_term_offset ~profile toff
 
 and number_ty_bound_variable ~profile (t1, lv, t2) =
-  let i1 = Interval.get_p ~profile t1 in
-  let i2 = Interval.get_p ~profile t2 in
+  let i1 = Interval.get_from_profile ~profile t1 in
+  let i2 = Interval.get_from_profile ~profile t2 in
   let i = Interval.(widen (join i1 i2)) in
   match lv.lv_type with
   | Linteger ->
@@ -752,7 +756,7 @@ and number_ty_bound_variable ~profile (t1, lv, t2) =
       Printer.pp_logic_var lv
 
 and type_bound_variables ~profile (t1, lv, t2) =
-  let ctx= number_ty_bound_variable ~profile (t1, lv, t2) in
+  let ctx = number_ty_bound_variable ~profile (t1, lv, t2) in
   (* forcing when typing bounds prevents to generate an extra useless
      GMP variable when --e-acsl-gmp-only *)
   ignore(type_term ~use_gmp_opt:false ~ctx ~profile t1);
@@ -770,10 +774,9 @@ and type_predicate ~profile p =
         match li.l_body with
         | LBpred p ->
           List.iter
-            (fun x -> ignore
-                (type_term ~use_gmp_opt: true ~profile x))
+            (fun x -> ignore (type_term ~use_gmp_opt: true ~profile x))
             args;
-          let new_profile = List.map (Interval.get_p ~profile) args in
+          let new_profile = List.map (Interval.get_from_profile ~profile) args in
           ignore (type_predicate ~profile:new_profile p);
         | LBnone -> ()
         | LBreads _ -> ()
@@ -785,8 +788,8 @@ and type_predicate ~profile p =
       c_int
     | Pdangling _ -> Error.not_yet "\\dangling"
     | Prel(_, t1, t2) ->
-      let i1 = Interval.get_p ~profile t1 in
-      let i2 = Interval.get_p ~profile t2 in
+      let i1 = Interval.get_from_profile ~profile t1 in
+      let i2 = Interval.get_from_profile ~profile t2 in
       let i = Interval.join i1 i2 in
       let ctx = mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:c_int i) in
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t1);
@@ -826,8 +829,7 @@ and type_predicate ~profile p =
             Printer.pp_predicate
         in
         List.iter
-          (fun (t1, x, t2) ->
-             type_bound_variables ~profile (t1, x, t2))
+          (fun (t1, x, t2) -> type_bound_variables ~profile (t1, x, t2))
           guards;
         (type_predicate ~profile goal).ty
       end
@@ -867,7 +869,7 @@ let type_named_predicate ~profile p =
   done
 
 let unsafe_set t ?ctx ~logic_env ty =
-  let profile = Interval.Logic_environment.get_profile logic_env in
+  let profile = Interval.Logic_env.get_profile logic_env in
   let ctx = match ctx with None -> ty | Some ctx -> ctx in
   let mk _ = coerce ~arith_operand:false ~ctx ~op:ty ty in
   ignore (Memo.memo mk ~profile t)
@@ -877,15 +879,15 @@ let unsafe_set t ?ctx ~logic_env ty =
 (******************************************************************************)
 
 let get_number_ty ~logic_env t =
-  let profile = Interval.Logic_environment.get_profile logic_env in
+  let profile = Interval.Logic_env.get_profile logic_env in
   (Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term).ty
 
 let get_integer_op ~logic_env t =
-  let profile = Interval.Logic_environment.get_profile logic_env in
+  let profile = Interval.Logic_env.get_profile logic_env in
   (Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term).op
 
 let get_integer_op_of_predicate ~logic_env p =
-  let profile = Interval.Logic_environment.get_profile logic_env in
+  let profile = Interval.Logic_env.get_profile logic_env in
   (type_predicate ~profile p).op
 
 (* {!typ_of_integer}, but handle the not-integer cases. *)
@@ -901,26 +903,26 @@ let extract_typ t ty =
   | Larrow _ -> Error.not_yet "unsupported logic type: type arrow"
 
 let get_typ ~logic_env t =
-  let profile = Interval.Logic_environment.get_profile logic_env in
+  let profile = Interval.Logic_env.get_profile logic_env in
   let info =
     Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term in
   extract_typ t info.ty
 
 let get_op ~logic_env t =
-  let profile = Interval.Logic_environment.get_profile logic_env in
+  let profile = Interval.Logic_env.get_profile logic_env in
   let info =
     Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term  in
   extract_typ t info.op
 
 let get_cast ~logic_env t =
-  let profile = Interval.Logic_environment.get_profile logic_env in
+  let profile = Interval.Logic_env.get_profile logic_env in
   let info =
     Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term in
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> None
 
 let get_cast_of_predicate ~logic_env p =
-  let profile = Interval.Logic_environment.get_profile logic_env in
+  let profile = Interval.Logic_env.get_profile logic_env in
   let info = type_predicate ~profile p in
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> assert false
@@ -955,7 +957,7 @@ let preprocess_predicate ~logic_env p =
   Logic_normalizer.preprocess_predicate p;
   Bound_variables.preprocess_predicate p;
   Interval.preprocess_predicate ~logic_env p;
-  let profile = Interval.Logic_environment.get_profile logic_env in
+  let profile = Interval.Logic_env.get_profile logic_env in
   let visitor = typing_visitor profile in
   ignore @@ visitor#visit_predicate p
 
@@ -963,12 +965,12 @@ let preprocess_rte ~logic_env rte =
   Logic_normalizer.preprocess_annot rte;
   Bound_variables.preprocess_annot rte;
   ignore (Interval.preprocess_code_annot ~logic_env rte);
-  let profile = Interval.Logic_environment.get_profile logic_env in
+  let profile = Interval.Logic_env.get_profile logic_env in
   type_code_annot profile rte
 
 let preprocess_term ~use_gmp_opt ?ctx ~logic_env t =
   ignore (Interval.preprocess_term ~logic_env t);
-  let profile = Interval.Logic_environment.get_profile logic_env in
+  let profile = Interval.Logic_env.get_profile logic_env in
   ignore (type_term ~use_gmp_opt ?ctx ~profile t);
 
 (*

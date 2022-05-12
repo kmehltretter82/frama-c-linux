@@ -869,7 +869,7 @@ and to_exp ~adata ?inplace kf env t =
   Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)in local \
                                    environment '%a'"
     Printer.pp_term t generate_rte Interval.Profile.pretty
-    (Interval.Logic_environment.get_profile (Env.Logic_env.get env));
+    (Env.Logic_env.get_profile env);
   let logic_env = Env.Logic_env.get env in
   let t = Logic_normalizer.get_term t in
   Extlib.flatten
@@ -922,7 +922,7 @@ let untyped_to_exp typ t =
       | _ -> Typing.nan
   in
   let ctx = Option.map ctx_of_typ typ in
-  let logic_env = Interval.Logic_environment.create [] [] in
+  let logic_env = Interval.Logic_env.make [] [] in
   Typing.preprocess_term ~use_gmp_opt:true ~logic_env ?ctx t;
   let env = Env.push Env.empty in
   let env = Env.set_rte env false in

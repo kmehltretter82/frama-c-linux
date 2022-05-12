@@ -493,7 +493,7 @@ module rec Transfer
              in
              if stmt.ghost then
                let rtes = Rte.stmt kf stmt in
-               let logic_env = Interval.Logic_environment.create [] [] in
+               let logic_env = Interval.Logic_env.make [] [] in
                List.iter (Typing.preprocess_rte ~logic_env) rtes;
                List.fold_left
                  (fun state a -> register_code_annot kf a state) state rtes

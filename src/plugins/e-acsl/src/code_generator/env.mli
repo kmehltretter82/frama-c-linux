@@ -179,7 +179,8 @@ val generate_rte: t -> bool
 module Logic_env: sig
   val push_new: t -> logic_var list -> Interval.ival list -> t
   val add_let_quantif_binding : t -> logic_var -> Interval.ival -> t
-  val get: t -> Interval.Logic_environment.t
+  val get: t -> Interval.Logic_env.t
+  val get_profile : t -> Interval.Profile.t
   val pop: t -> t
 end
 

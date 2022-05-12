@@ -458,14 +458,8 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
             List.fold_right2
               (fun targ earg (params_ty, params_ival ,args, adata, env) ->
                  let logic_env = Env.Logic_env.get env in
-                 let param_ty =
-                   Typing.get_number_ty
-                     ~logic_env
-                     targ
-                 in
-                 let param_ival =
-                   Interval.get ~logic_env targ
-                 in
+                 let param_ty = Typing.get_number_ty ~logic_env targ in
+                 let param_ival = Interval.get ~logic_env targ in
                  let e, env =
                    try
                      let ty = Typing.typ_of_number_ty param_ty in
