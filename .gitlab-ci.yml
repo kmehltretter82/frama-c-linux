@@ -76,13 +76,6 @@ cfp:
   tags:
     - nix
 
-genassigns:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh genassigns
-  tags:
-    - nix
-
 e-acsl-tests:
   stage: tests
   script:
@@ -101,6 +94,13 @@ frama-clang:
   stage: tests
   script:
     - ./nix/external-plugin-ci.sh frama-clang
+  tags:
+    - nix
+
+genassigns:
+  stage: tests
+  script:
+    - ./nix/external-plugin-ci.sh genassigns
   tags:
     - nix
 
