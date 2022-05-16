@@ -97,6 +97,13 @@ eva-tests:
   tags:
     - nix
 
+frama-clang:
+  stage: tests
+  script:
+    - ./nix/external-plugin-ci.sh frama-clang
+  tags:
+    - nix
+
 kernel-tests:
   stage: tests
   script:
