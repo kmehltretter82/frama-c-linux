@@ -70,8 +70,7 @@ val framac_libc: Filepath.Normalized.t
     @since 19.0-Potassium *)
 
 val plugin_dir: Filepath.Normalized.t list
-(** Directory where the Frama-C dynamic plug-ins are.
-    @modify Magnesium-20151001 *)
+(** Directory where the Frama-C dynamic plug-ins are. *)
 
 val preprocessor: string
 (** Name of the default command to call the preprocessor.

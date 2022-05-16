@@ -42,8 +42,7 @@ type callback_state =
   | Unit_callback of (unit -> unit)
   | Bool_callback of (bool -> unit) * (unit -> bool)
 
-(** @since Boron-20100401
-    @modify Nitrogen-20111001 *)
+(** @since Boron-20100401 *)
 type entry = private {
   e_where: where;
   e_callback: callback_state (** callback called when the button is clicked *);

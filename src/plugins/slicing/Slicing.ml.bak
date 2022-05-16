@@ -34,8 +34,7 @@ module Api:sig
   (** Sets slicing parameters related to command line options
       [-slicing-level], [-slice-callers], [-slice-undef-functions],
       [-slicing-keep-annotations].
-      @modify Sulfur-20171101 the optional argument and the related
-      deprecated option [-slice-print] have been removed. *)
+  *)
 
   (* ---------------------------------------------------------------------- *)
 
@@ -83,7 +82,7 @@ module Api:sig
           The entry point function is only exported once :
           it is VERY recommended to give to it its original name,
           even if it is sliced.
-          @modify Sulfur-20171101 argument order and arity. *)
+    *)
 
     (** {3 Not for casual users} *)
 
@@ -203,7 +202,7 @@ module Api:sig
         The selection preserves the [~rd] and ~[wr] accesses contained into
         the statement [ki].
         Note: add also a transparent selection on the whole statement.
-        @modify Magnesium-20151001 argument [~scope] removed. *)
+    *)
 
     val select_stmt_lval :
       (set -> Mark.t -> Datatype.String.Set.t -> before:bool -> stmt ->
@@ -216,7 +215,7 @@ module Api:sig
         The selection preserve the value of these lvalues before or
         after (c.f. boolean [~before]) the statement [ki].
         Note: add also a transparent selection on the whole statement.
-        @modify Magnesium-20151001 argument [~scope] removed.  *)
+    *)
 
     val select_stmt_annots :
       (set -> Mark.t -> spare:bool -> threat:bool -> user_assert:bool ->
@@ -236,7 +235,7 @@ module Api:sig
         done just before the execution of the statement [~eval].
         The selection preserve the value of these lvalues into the whole
         project.
-        @modify Magnesium-20151001 argument [~scope] removed. *)
+    *)
 
     val select_func_lval :
       (set -> Mark.t -> Datatype.String.Set.t -> kernel_function -> set)

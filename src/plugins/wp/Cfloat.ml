@@ -332,8 +332,8 @@ module Compute = WpContext.StaticGenerator
         let name = op_name op in
         let phi = match op with
           | LT | EQ | LE | NE ->
-            let prop = Pretty_utils.sfprintf "%s_%a" name pp_suffix ft in
-            let bool = Pretty_utils.sfprintf "%s_%ab" name pp_suffix ft in
+            let prop = Format.asprintf "%s_%a" name pp_suffix ft in
+            let bool = Format.asprintf "%s_%ab" name pp_suffix ft in
             extern_p ~library ~bool ~prop ()
           | _ ->
             let result = return_type ft op in

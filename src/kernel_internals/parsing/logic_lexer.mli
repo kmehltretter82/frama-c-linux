@@ -47,4 +47,4 @@ val ext_spec : Lexing.lexbuf -> Logic_ptree.ext_spec
 (** ACSL extension for parsing external spec file.
     Here, the tokens "/*" and "*/" are accepted by the lexer
     as unnested C comments into the external ACSL specifications.
-    @modify Sulfur-20171101 to accept /* */ as C comments. *)
+*)

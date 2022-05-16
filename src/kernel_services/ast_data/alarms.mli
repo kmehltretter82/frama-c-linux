@@ -20,8 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Alarms Database.
-    @modify Fluorine-20130401 fully re-implemented. *)
+(** Alarms Database. *)
 
 open Cil_types
 
@@ -33,7 +32,6 @@ type overflow_kind =
 type access_kind = For_reading | For_writing
 type bound_kind = Lower_bound | Upper_bound
 
-(** @modify Fluorine-20130401 full re-implementation *)
 type alarm =
   | Division_by_zero of exp
   | Memory_access of lval * access_kind
@@ -82,12 +80,7 @@ val register:
     @return true if the given alarm has never been emitted before on the
     same kinstr (without taking into consideration the status or
     the emitter).
-
-    @modify Oxygen-20120901 remove labeled argument ~deps
-    @modify Fluorine-20130401 add the optional arguments [kf], [loc] and
-    [save]; also returns the corresponding code_annotation
-    @modify Aluminium-20160501 removed argument save. Use
-    {!to_annot} instead. *)
+*)
 
 val to_annot: kinstr -> ?loc:location -> alarm -> code_annotation * bool
 (** Conversion of an alarm to a [code_annotation], without any registration.

@@ -584,14 +584,6 @@ module Unicode = struct
     r
 end
 
-module UseUnicode = struct
-  include Unicode
-  let set = deprecated "UseUnicode.set" ~now:"Unicode.set" set
-  let on = deprecated "UseUnicode.on" ~now:"Unicode.on" on
-  let off = deprecated "UseUnicode.off" ~now:"Unicode.off" off
-  let get = deprecated "UseUnicode.get" ~now:"Unicode.get" get
-end
-
 let () = Parameter_customize.set_group messages
 let () = Parameter_customize.do_not_projectify ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending

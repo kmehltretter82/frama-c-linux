@@ -34,9 +34,7 @@ type recursive
 
 type single_pack = private Unmarshal.t
 
-(** Structural descriptor used inside structures.
-    @modify Nitrogen-20111001 this type is now private. Use smart
-    constructors instead. *)
+(** Structural descriptor used inside structures. *)
 type pack = private
   | Nopack                 (** Was impossible to build a pack. *)
   | Pack of single_pack    (** A standard pack. *)

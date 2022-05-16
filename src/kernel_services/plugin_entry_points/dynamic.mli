@@ -35,8 +35,6 @@ val register:
     [name], the type [ty] and the plug-in [plugin].
     @raise Type.AlreadyExists if [name] already exists. In other words you
     cannot register a value with the same name twice.
-    @modify Boron-20100401 add the labeled argument "plugin"
-    @modify Oxygen-20120901 add the optional labeled argument "comment"
     @plugin development guide *)
 
 (* ************************************************************************* *)
@@ -157,8 +155,7 @@ end
 *)
 val load_packages: string list -> unit
 
-(** Load the module specification. See -load-module option.
-    @modify Magnesium-20151001 new API. *)
+(** Load the module specification. See -load-module option. *)
 val load_module: string -> unit
 
 val load_plugin: string -> unit
@@ -167,8 +164,7 @@ val load_plugin: string -> unit
 val load_plugin_path: unit -> unit
 (** Load all plugins in the path set with [set_module_load_path].
     Must be invoked only once from boot during extending stage.
-    @since Magnesium-20151001 new API.
-    @modify Phosphorus-20170501-beta1 changed signature. *)
+    @since Magnesium-20151001 new API. *)
 (**/**)
 
 (*

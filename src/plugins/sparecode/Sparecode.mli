@@ -37,7 +37,6 @@ module Register: sig
     * (the current one if no project given).
     * The source project is not modified.
     * The result is in the returned new project.
-    * @modify Carbon-20110201 optional argument [new_proj_name] added
     * *)
 
 end

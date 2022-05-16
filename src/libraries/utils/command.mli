@@ -42,7 +42,6 @@ val bincopy : bytes -> in_channel -> out_channel -> unit
     and copy it in [cout].
     [buffer] is a temporary string used during the copy.
     Recommended size is [2048].
-    @modify Silicon-20161101 [buffer] has now type [bytes] instead of [string]
 *)
 
 val copy : string -> string -> unit

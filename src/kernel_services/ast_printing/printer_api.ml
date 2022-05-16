@@ -108,16 +108,12 @@ class type extensible_printer_type = object
   method private require_braces: block_ctxt -> block -> bool
   (** @return [true] if the given block must be enclosed in a pair of braces,
       given the context in which it appears.
-      @modify Fluorine-20130401 optional arguments has been modified.
-      @modify Phosphorus-20170501-beta1 use proper context to determine result
   *)
 
   method private inline_block: block_ctxt -> block -> bool
   (** @return [true] if the given block may be inlined in a single line.
       [has_annot] indicates if the stmt corresponding to the block may have
       annotations (default is [true]).
-      @modify Fluorine-20130401 optional arguments has been modified.
-      @modify Phosphorus-20170501-beta1 use proper context to determine result
   *)
 
   method private get_instr_terminator: unit -> string
@@ -226,9 +222,7 @@ class type extensible_printer_type = object
   method next_stmt : stmt -> Format.formatter -> stmt -> unit
 
   method block: Format.formatter -> block -> unit
-  (** Prints a block.
-      @modify Fluorine-20130401 optional arguments has been modified.
-      @modify Phosphorus-20170501-beta1 no more options for pretty-printing *)
+  (** Prints a block. *)
 
   method exp:  Format.formatter -> exp -> unit
   (** Print expressions *)
@@ -280,8 +274,7 @@ class type extensible_printer_type = object
 
   method post_cond:
     Format.formatter -> (termination_kind * identified_predicate) -> unit
-  (** pretty prints a post condition according to the exit kind it represents
-      @modify Boron-20100401 replaces [pEnsures] *)
+  (** pretty prints a post condition according to the exit kind it represents *)
 
   method assumes: Format.formatter -> identified_predicate -> unit
 

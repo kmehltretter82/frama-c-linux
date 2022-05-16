@@ -613,18 +613,6 @@ let extract_bits ~start ~stop = function
       Lattice_messages.emit_imprecision emitter "Ival.extract_bits";
       top
 
-let overlaps ~partial ~size t1 t2 =
-  let diff = add t1 (neg t2) in
-  match diff with
-  | Set array ->
-    not (Int_set.for_all
-           (fun i -> Int.ge (Int.abs i) size || (partial && Int.is_zero i))
-           array)
-  | Itv i ->
-    let min, max = Int_interval.min_and_max i in
-    let pred_size = Int.pred size in
-    min_le_elt min pred_size && max_ge_elt max (Int.neg pred_size)
-
 let make = check_make
 
 (* ------------------------------------------------------------------------ *)

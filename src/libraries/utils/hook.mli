@@ -35,9 +35,7 @@ module type S = sig
   *)
 
   val extend: (param -> result) -> unit
-  (** Add a new function to the hook.
-      @modify Oxygen-20120901 no more [once] optional arg (see [extend_once])
-  *)
+  (** Add a new function to the hook. *)
 
   val extend_once: (param -> result) -> unit
   (** Same as [extend], but the hook is added only if it is not already

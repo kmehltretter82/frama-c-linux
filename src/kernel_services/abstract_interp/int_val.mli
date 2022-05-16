@@ -181,8 +181,6 @@ val create_all_values: signed:bool -> size:int -> t
     representable in [size] bits. *)
 val all_values: size:Integer.t -> t -> bool
 
-val overlaps: partial:bool -> size:Integer.t -> t -> t -> bool
-
 val complement_under: size:int -> signed:bool -> t -> t or_bottom
 (** Returns an under-approximation of the integers of the given size and
     signedness that are *not* represented by the given value. *)

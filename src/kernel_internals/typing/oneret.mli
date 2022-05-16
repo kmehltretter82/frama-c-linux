@@ -106,7 +106,7 @@ val encapsulate_local_vars: Cil_types.fundec -> unit
     Replace all the other returns with Goto. Make sure that there is a return
     if the function is supposed to return something, and it is not declared to
     not return.
-    @modify Sulfur-20171101 The [~callback], when provided,
-    is invoked with all the original returns clauses and their associated
-    annotation on inserted gotos. *)
+
+    The [~callback], when provided, is invoked with all the original returns
+    clauses and their associated annotation on inserted gotos. *)
 val oneret: ?callback:callback -> Cil_types.fundec -> unit

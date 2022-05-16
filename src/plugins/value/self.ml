@@ -28,8 +28,8 @@ include Plugin.Register
         "automatically computes variation domains for the variables of the program"
     end)
 
-let () = Help.add_aliases ~visible:false [ "-value-h"; "-val-h" ]
-let () = add_plugin_output_aliases ~visible:false ~deprecated:true [ "value" ]
+let () =
+  add_plugin_output_aliases ~visible:false ~deprecated:true [ "value" ; "val" ]
 
 (* Do not add dependencies to Kernel parameters here, but at the top of
    Parameters. *)

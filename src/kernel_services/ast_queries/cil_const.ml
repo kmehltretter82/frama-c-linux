@@ -152,12 +152,6 @@ let make_logic_var_formal x t = make_logic_var_kind x LVFormal t
 let make_logic_var_quant x t = make_logic_var_kind x LVQuant t
 let make_logic_var_local x t = make_logic_var_kind x LVLocal t
 
-let make_logic_var =
-  Kernel.deprecated "Cil_const.make_logic_var"
-    ~now:"Use one of Cil_const.make_logic_var_* to indicate \
-          the origin of the variable"
-    make_logic_var_quant
-
 let make_logic_info k x =
   { l_var_info = make_logic_var_kind x k (Ctype voidType);
     (* we should put the right type when fields

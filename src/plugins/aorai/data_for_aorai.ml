@@ -823,14 +823,14 @@ let type_expr metaenv env ?tr ?current e =
           "Invalid operand for bitwise not: unexpected %a" Printer.pp_term t
     | PUnop(Logic_ptree.Uamp,e) ->
       let env, t, cond = aux env cond e in
-      let ptr =
-        try Ctype (TPtr (Logic_utils.logicCType t.term_type,[]))
-        with Failure _ ->
-          Aorai_option.abort "Cannot take address: not a C type(%a): %a"
-            Printer.pp_logic_type t.term_type Printer.pp_term t
-      in
       (match t.term_node with
-       | TLval v | TStartOf v -> env, Logic_const.taddrof v ptr, cond
+       | TLval v | TStartOf v ->
+         begin try
+             env, Logic_utils.mk_logic_AddrOf v t.term_type, cond
+           with Failure _ ->
+             Aorai_option.abort "Cannot take address: not a C type(%a): %a"
+               Printer.pp_logic_type t.term_type Printer.pp_term t
+         end
        | _ ->
          Aorai_option.abort "Cannot take address: not an lvalue %a"
            Printer.pp_term t

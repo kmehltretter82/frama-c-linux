@@ -193,17 +193,6 @@ val find_field_offset:
 *)
 val logicConditionalConversion: Cil_types.typ -> Cil_types.typ -> Cil_types.typ
 
-(** returns the type of the result of an arithmetic operator applied to
-    values of the corresponding input types.
-    @deprecated Nitrogen-20111001 moved to Cil module
-*)
-val arithmeticConversion : Cil_types.typ -> Cil_types.typ -> Cil_types.typ
-
-(** performs the usual integral promotions mentioned in C reference manual.
-    @deprecated Nitrogen-20111001 moved to Cil module.
-*)
-val integralPromotion : Cil_types.typ -> Cil_types.typ
-
 (** local information needed to typecheck expressions and statements *)
 type local_env = private
   { authorized_reads: Cil_datatype.Lval.Set.t;
@@ -265,8 +254,6 @@ val areCompatibleTypes: Cil_types.typ -> Cil_types.typ -> bool
     compatible to avoid spurious casts.
 
     @since Neon-20140301
-    @modify Phosphorus-20170501-beta1
-    @modify Chlorine-20180501 refined notion
 *)
 
 val stmtFallsThrough: Cil_types.stmt -> bool

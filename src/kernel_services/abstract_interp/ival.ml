@@ -1056,11 +1056,6 @@ let reinterpret_as_float kind i =
       (* currently always imprecise *)
       top_float
 
-let overlaps ~partial ~size t1 t2 =
-  match t1, t2 with
-  | Int i1, Int i2 -> Int_val.overlaps ~partial ~size i1 i2
-  | _, _ -> assert false
-
 
 let bitwise_int f_int v1 v2 =
   match v1, v2 with

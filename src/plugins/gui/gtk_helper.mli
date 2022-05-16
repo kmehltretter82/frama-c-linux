@@ -221,8 +221,7 @@ val register_locking_machinery:
     unlocking actions. Default is [false]. At least one "lock_last" action is
     allowed.
     @since Beryllium-20090901
-    @modify Boron-20100401 new optional argument [lock_last] and new
-    argument [()] *)
+*)
 
 (* ************************************************************************** *)
 (** 2 Tooltips *)

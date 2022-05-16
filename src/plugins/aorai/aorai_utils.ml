@@ -753,13 +753,6 @@ let mk_gvar_enum ?init name name_enuminfo =
 (** Return an integer constant term from the given value. *)
 let mk_int_term value = Cil.lconstant (Integer.of_int value)
 
-(** Return an integer constant term with the 0 value.
-    @deprecated use directly Cil.lzero
-*)
-let zero_term() = Cil.lzero ()
-
-let one_term () = Cil.lconstant Integer.one
-
 (** Returns a term representing the variable associated to the given varinfo *)
 let mk_term_from_vi vi =
   Logic_const.term
@@ -819,7 +812,7 @@ let is_state_pred state =
     Logic_const.prel (Req,state_term(),int2enumstate state.nums)
   else
     Logic_const.prel
-      (Req,one_term(),
+      (Req,Cil.lone (),
        Logic_const.tvar (Data_for_aorai.get_state_logic_var state))
 
 let is_state_non_det_stmt (_,copy) loc =
@@ -847,7 +840,7 @@ let is_out_of_state_pred state =
     Logic_const.prel (Rneq,state_term(),int2enumstate state.nums)
   else
     Logic_const.prel
-      (Req,zero_term(),
+      (Req,Cil.lzero (),
        Logic_const.tvar (Data_for_aorai.get_state_logic_var state))
 
 (* In the deterministic case, we only assign the unique state variable

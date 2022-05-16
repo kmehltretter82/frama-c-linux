@@ -6933,19 +6933,6 @@ let typeDeepDropAllAttributes t =
   let vis = new dropAttributes () in
   visitCilType vis t
 
-(** {1 Deprecated} *)
-
-let typeDeepDropAttributes =
-  Kernel.deprecated "Cil.typeDeepDropAttributes"
-    ~now:"Cil.typeRemoveAttributesDeep"
-    (fun select t ->
-       let vis = new dropAttributes ~select () in visitCilType vis t)
-
-let typeHasAttributeDeep t =
-  Kernel.deprecated "Cil.typeHasAttributeDeep"
-    ~now:"Cil.typeHasAttributeMemoryBlock"
-    typeHasAttributeMemoryBlock t
-
 (*
 Local Variables:
 compile-command: "make -C ../../.."

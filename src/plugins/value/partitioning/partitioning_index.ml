@@ -20,17 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module type Domain = sig
-  include Abstract_domain.Lattice
-  include Datatype.S_with_collections with type t = state
-  include Abstract.Interface with type t := state
-                              and type 'a key := 'a Abstract_domain.key
-end
-
 (** Partition of the abstract states, computed for each node by the
     dataflow analysis. *)
-module Make
-    (Domain : Domain)
+module Make (Domain : Abstract.Domain.External)
 = struct
 
   module Index = Hashtbl.Make (Cvalue_domain.Subpart)

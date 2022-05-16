@@ -46,9 +46,7 @@ val stmt_is_in_cycle_filtered : (stmt -> bool) -> stmt -> bool
     on its input *)
 
 (** [reachable_stmts kf stmt] returns the transitive closure of the successors
-    of [stmt] in [kf]. The result is cached for later calls.
-
-    @modify Silicon-20161101 return type changed to hptset *)
+    of [stmt] in [kf]. The result is cached for later calls. *)
 val reachable_stmts: kernel_function -> stmt -> Stmt.Hptset.t
 
 (** Get the statements that compose [s]. For a simple statement (not containing

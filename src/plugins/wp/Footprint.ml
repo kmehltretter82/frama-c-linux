@@ -82,8 +82,8 @@ let head e =
   | Aget _ -> "[]"
   | Acst _ -> "[.]"
   | Aset _ -> "[=]"
-  | Rget(_,fd) -> Pretty_utils.sfprintf ".%a" Lang.Field.pretty fd
-  | Rdef fds -> Pretty_utils.sfprintf "{%s}" (head_fields fds)
+  | Rget(_,fd) -> Format.asprintf ".%a" Lang.Field.pretty fd
+  | Rdef fds -> Format.asprintf "{%s}" (head_fields fds)
   | Fun(f,_) -> Pretty_utils.to_string Lang.Fun.pretty f
   | Apply _ -> "()"
   | Bind(Forall,_,_) -> "\\F"

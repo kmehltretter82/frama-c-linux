@@ -256,7 +256,6 @@ val o_loc_of_stmt: kernel_function -> kinstr -> other_loc
 val ip_other: string -> other_loc -> identified_property
 (** Create a non-standard property.
     @since Nitrogen-20111001
-    @modify 18.0-Argon Refine localisation argument
 *)
 
 val ip_reachable_stmt: kernel_function -> stmt -> identified_property
@@ -295,7 +294,6 @@ val ip_of_ensures:
 
 (** Extended property.
     @since Chlorine-20180501
-    @modify 18.0-Argon refine localisation argument
 *)
 val ip_of_extended: extended_loc -> acsl_extension -> identified_property
 
@@ -314,7 +312,6 @@ val ip_of_allocation:
     behavior [bhv], in the spec in function [kf], at statement [ki], under
     active behaviors [active]
     @since Oxygen-20120901
-    @modify Aluminium-20160501 added active argument
 *)
 val ip_allocation_of_behavior:
   kernel_function -> kinstr -> active:string list ->
@@ -330,7 +327,6 @@ val ip_of_assigns:
     builds IPAssigns for a contract (if not WritesAny).
     See {!ip_allocation_of_behavior} for signification of [active].
     @since Carbon-20110201
-    @modify Aluminium-20160501 added active argument
 *)
 val ip_assigns_of_behavior:
   kernel_function -> kinstr -> active:string list ->
@@ -338,7 +334,7 @@ val ip_assigns_of_behavior:
 
 (** Builds the corresponding IPFrom (if not FromAny)
     @since Carbon-20110201
-    @modify Aluminium-20160501 returns an option. *)
+*)
 val ip_of_from:
   kernel_function -> kinstr ->
   behavior_or_loop -> from -> identified_property option
@@ -347,7 +343,6 @@ val ip_of_from:
     builds IPFrom for a behavior (if not ReadsAny).
     See {!ip_from_of_behavior} for signification of [active]
     @since Carbon-20110201
-    @modify Aluminium-20160501 added active argument
 *)
 val ip_from_of_behavior:
   kernel_function -> kinstr -> active:string list ->
@@ -368,7 +363,6 @@ val ip_from_of_code_annot:
     assigns and from). See {!ip_allocation_of_behavior} for the signification
     of the [active] argument.
     @since Carbon-20110201
-    @modify Aluminium-20160501 added active argument
 *)
 val ip_post_cond_of_behavior:
   kernel_function -> kinstr -> active:string list ->
@@ -378,7 +372,6 @@ val ip_post_cond_of_behavior:
     to the behavior itself.
     See {!ip_allocation_of_behavior} for signification of [active]
     @since Carbon-20110201
-    @modify Aluminium-20160501 added active argument
 *)
 val ip_of_behavior:
   kernel_function -> kinstr -> active:string list ->
@@ -387,7 +380,6 @@ val ip_of_behavior:
 (** [ip_all_of_behavior kf ki active bhv] builds all IP related to a behavior.
     See {!ip_allocation_of_behavior} for signification of [active]
     @since Carbon-20110201
-    @modify Aluminium-20160501 added active argument
 *)
 val ip_all_of_behavior:
   kernel_function -> kinstr -> active:string list ->
@@ -396,7 +388,6 @@ val ip_all_of_behavior:
 (** [ip_of_complete kf ki active complete] builds IPComplete.
     See {!ip_allocation_of_behavior} for signification of [active]
     @since Carbon-20110201
-    @modify Aluminium-20160501 added active argument
 *)
 val ip_of_complete:
   kernel_function -> kinstr -> active:string list ->
@@ -405,7 +396,6 @@ val ip_of_complete:
 (** [ip_complete_of_spec kf ki active spec] builds IPComplete of a given spec.
     See {!ip_allocation_of_behavior} for signification of [active]
     @since Carbon-20110201
-    @modify Aluminium-20160501 added active argument
 *)
 val ip_complete_of_spec:
   kernel_function -> kinstr -> active:string list ->
@@ -414,7 +404,6 @@ val ip_complete_of_spec:
 (** [ip_of_disjoint kf ki active disjoint] builds IPDisjoint.
     See {!ip_allocation_of_behavior} for signification of [active]
     @since Carbon-20110201
-    @modify Aluminium-20160501 added active argument
 *)
 val ip_of_disjoint:
   kernel_function -> kinstr -> active:string list ->
@@ -423,7 +412,6 @@ val ip_of_disjoint:
 (** [ip_disjoint_of_spec kf ki active spec] builds IPDisjoint of a given spec.
     See {!ip_allocation_of_behavior} for signification of [active]
     @since Carbon-20110201
-    @modify Aluminium-20160501 added active argument
 *)
 val ip_disjoint_of_spec:
   kernel_function -> kinstr -> active:string list ->
@@ -452,7 +440,6 @@ val ip_decreases_of_spec:
     builds all IP of post-conditions related to a spec.
     See {!ip_post_cond_of_behavior} for more information.
     @since Carbon-20110201
-    @modify Aluminium-20160501 added active argument
 *)
 val ip_post_cond_of_spec:
   kernel_function -> kinstr -> active:string list ->
@@ -461,7 +448,6 @@ val ip_post_cond_of_spec:
 (** [ip_of_spec kf ki active spec] builds all IP related to a spec.
     See {!ip_allocation_of_behavior} for signification of [active]
     @since Carbon-20110201
-    @modify Aluminium-20160501 added active argument
 *)
 val ip_of_spec:
   kernel_function -> kinstr -> active:string list ->
@@ -476,7 +462,6 @@ val ip_property_instance:
 
 (** Build an IPLemma.
     @since Nitrogen-20111001
-    @modify Oxygen-20120901 takes an identified_lemma instead of a string
 *)
 val ip_lemma: identified_lemma -> identified_property
 
@@ -553,13 +538,10 @@ sig
   val get_prop_name_id: identified_property -> string
   (** returns a unique name identifying the property.
       This name is built from the basename of the property.
-      @modify 19.0-Potassium new naming scheme, Cf. LegacyNames
   *)
 
   val get_prop_basename: ?truncate:int -> identified_property -> string
-  (** returns the basename of the property.
-      @modify 19.0-Potassium additional truncation parameter
-  *)
+  (** returns the basename of the property. *)
 
 end
 

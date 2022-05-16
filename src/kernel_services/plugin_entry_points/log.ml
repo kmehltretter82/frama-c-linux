@@ -847,8 +847,6 @@ sig
 
   val is_debug_key_enabled: category -> bool
 
-  val get_debug_keyset : unit -> category list
-
   val register_warn_category: string -> warn_category
 
   val is_warn_category: string -> bool
@@ -1221,11 +1219,6 @@ struct
       name now ;
     f x
 
-  let get_debug_keyset =
-    deprecated "Log.get_debug_key_set"
-      ~now:"Log.get_all_categories"
-      (fun () -> get_all_categories ())
-
   let noprint _fmt = ()
 
   let spynewline bol output buffer start length =
@@ -1274,11 +1267,6 @@ struct
       label Format.(pp_print_list ~pp_sep:pp_print_cut print_one_elt) l
 
 end
-
-(* Deprecated -- backward compatibity only. *)
-let null = Pretty_utils.null
-let with_null = Pretty_utils.with_null
-let nullprintf = Pretty_utils.nullprintf
 
 (*
 Local Variables:

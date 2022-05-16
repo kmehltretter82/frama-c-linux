@@ -79,12 +79,6 @@ val set_unset_option_help: string -> unit
     has not been called before. No default.
     @since Fluorine-20130401 *)
 
-val set_optional_help: (unit, Format.formatter, unit) format -> unit
-(** Concatenate an additional description just after the default one.
-    @since Beryllium-20090601-beta1
-    @deprecated since Oxygen-20120901: directly use the help string
-    instead. *)
-
 val set_group: Cmdline.Group.t -> unit
 (** Affect a group to the parameter.
       @since Beryllium-20090901 *)
@@ -93,7 +87,7 @@ val is_invisible: unit -> unit
 (** Prevent -help from listing the parameter.
     Also imply {!is_not_reconfigurable}.
     @since Carbon-20101201
-    @modify Nitrogen-20111001 does not appear in the help *)
+*)
 
 val argument_is_function_name: unit -> unit
 (** Indicate that the string argument of the parameter must be a valid function
@@ -101,8 +95,7 @@ val argument_is_function_name: unit -> unit
     analysed C program. Do nothing if the following applied functor has not type
     [String].
     @since Oxygen-20120901
-    @modify Sodium-20150201 do nothing when applied to [String_set] or
-    [String_list]. *)
+*)
 
 val argument_may_be_fundecl: unit -> unit
 (** Indicate that the argument of the parameter can match a valid function
@@ -129,7 +122,7 @@ val is_reconfigurable: unit -> unit
     only parameters corresponding to options registered at the
     {!Cmdline.Configuring} stage are reconfigurable.
     @since Nitrogen-20111001
-    @modify 22.0-Titanium [do_iterate] renamed to [is_reconfigurable]
+    @before 22.0-Titanium this function was called [do_iterate].
 *)
 
 val is_not_reconfigurable: unit -> unit
@@ -137,7 +130,7 @@ val is_not_reconfigurable: unit -> unit
     parameters corresponding to options registered at the
     {!Cmdline.Configuring} stage are reconfigurable.
     @since Nitrogen-20111001
-    @modify 22.0-Titanium [do_iterate] renamed to [is_reconfigurable]
+    @before 22.0-Titanium this function was called [do_not_iterate].
 *)
 
 val no_category: unit -> unit

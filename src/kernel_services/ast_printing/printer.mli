@@ -20,8 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** AST's pretty-printer.
-    @modify Fluorine-20130401 fully change this API *)
+(** AST's pretty-printer. *)
 
 include Printer_api.S
 

@@ -113,7 +113,7 @@ let get_compound_equality e =
 (* -------------------------------------------------------------------------- *)
 
 let field a b f =
-  Pretty_utils.sfprintf "Field %a" Lang.Field.pretty f ,
+  Format.asprintf "Field %a" Lang.Field.pretty f ,
   F.p_equal (F.e_getfield a f) (F.e_getfield b f)
 
 let index ~pool tau =

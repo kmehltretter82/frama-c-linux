@@ -1028,7 +1028,7 @@ class visit_adding_pre_post_from_buch treatloops =
           pimplies
             (prel(operator,
                   Aorai_utils.mk_term_from_vi vi_init,
-                  Aorai_utils.zero_term()),
+                  Cil.lzero()),
              predicate)
         in
         (* The loop invariant is :
