@@ -119,7 +119,7 @@ val visitFramacFileSameGlobals: frama_c_visitor -> file -> unit
     {!Visitor.visitFramacFile} or {!Visitor.visitFramacFileSameGlobals} if your
     visitor only needs function bodies to avoid visiting other globals,
     including libc functions and their specifications.
-    @since Frama-c+dev *)
+    @since 25.0-Manganese *)
 val visitFramacFileFunctions: frama_c_visitor -> file -> unit
 
 (** Visit a global.

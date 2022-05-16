@@ -293,7 +293,7 @@ val is_entry_point : ?when_lib_entry:bool -> kernel_function -> bool
     The optional parameter [when_lib_entry] overrides the result if we are
     in -lib-entry mode.
 
-    @since Frama-C+dev
+    @since 25.0-Manganese
 *)
 
 (* ************************************************************************* *)

@@ -347,6 +347,17 @@ else
    AC_MSG_RESULT(found $PPX_IMPORT)
 fi
 
+# ppx_deriving.eq
+############
+
+AC_MSG_CHECKING(for ppx_deriving.eq)
+PPX_DERIVING_EQ=$($OCAMLFIND query ppx_deriving.eq -format %v)
+if test -z "$PPX_DERIVING_EQ"; then
+   AC_MSG_ERROR(Cannot find ppx_deriving.eq via ocamlfind)
+else
+   AC_MSG_RESULT(found $PPX_DERIVING_EQ)
+fi
+
 #################################################
 # Check for other (optional) tools/libraries    #
 #################################################
