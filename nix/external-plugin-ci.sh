@@ -32,7 +32,7 @@ get_matching_branch () {
 }
 
 #         fc-dir     nix-dir
-curdir="$(dirname "$(dirname "$(readlink -f "$0")")")"
+fc_dir="$(dirname "$(dirname "$(readlink -f "$0")")")"
 
 git_current_branch="$(git branch --show-current)"
 : "${git_current_branch:=${CI_COMMIT_BRANCH:-}}"
@@ -48,7 +48,7 @@ cleanup () {
 
 trap cleanup EXIT
 
-OPTS="--arg frama-c-repo $curdir"
+OPTS="--arg frama-c-repo $fc_dir"
 
 plugin=$1
 
@@ -91,7 +91,7 @@ fi
 # run the build
 nix-build --no-out-link "./nix/pkgs.nix" $OPTS -A ocaml-ng.ocamlPackages_$OCAML."$plugin"
 
-cd "$curdir"
+cd "$fc_dir"
 
 for repo in ${!dirs[@]}; do
   if [[ -n ${dirs[$repo]} ]];

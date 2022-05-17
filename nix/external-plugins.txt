@@ -1,0 +1,8 @@
+acsl-importer git@git.frama-c.com:frama-c/acsl-importer.git
+caveat-importer git@git.frama-c.com:frama-c/caveat-importer.git
+context-from-precondition git@git.frama-c.com:frama-c/context-from-precondition.git
+genassigns git@git.frama-c.com:frama-c/genassigns.git
+meta git@git.frama-c.com:frama-c/meta.git
+mthread git@git.frama-c.com:frama-c/mthread.git
+security git@git.frama-c.com:frama-c/security.git
+volatile git@git.frama-c.com:frama-c/volatile.git
