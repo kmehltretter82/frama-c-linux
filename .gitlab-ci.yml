@@ -177,13 +177,16 @@ wp-tests:
 ################################################################################
 ### DISTRIB
 
-# api-doc:
-#   stage: tests
-#   script:
-#     -
-#   tags:
-#     - nix
-#   allow_failure: true
+api-doc:
+  stage: distrib_and_compatibility
+  script:
+    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.api-doc
+  tags:
+    - nix
+  when: manual
+  artifacts:
+    paths:
+      - result/frama-c-api.tar.gz
 
 .build_template: &frama-c-ocaml
   stage: distrib_and_compatibility

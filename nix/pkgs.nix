@@ -26,6 +26,7 @@ let
     # Internal tests
     internal-tests = oself.callPackage ./internal-tests.nix {};
     # Release
+    api-doc = oself.callPackage ./api-doc.nix {};
     manuals = oself.callPackage ./manuals.nix {};
   };
   overlay = self: super: {
