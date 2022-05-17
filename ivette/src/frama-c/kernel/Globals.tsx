@@ -218,6 +218,7 @@ export default function Globals(): JSX.Element {
       label="Functions"
       title={title}
       defaultUnfold
+      settings="frama-c.sidebar.globals"
       rightButtonProps={filterButtonProps}
       summary={[nFilter]}
       className='globals-function-section'
