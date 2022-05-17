@@ -399,8 +399,8 @@ fi;
 
 AC_MSG_CHECKING(for MPFR)
 
-MPFR_PATH=$($OCAMLFIND query gmp 2>/dev/null | tr -d '\r\n')
-if test -f "$MPFR_PATH/gmp.$DYN_SUFFIX" -a -f "$MPFR_PATH/mpfr.cmx" ; then
+MPFR_PATH=$($OCAMLFIND query mlmpfr 2>/dev/null | tr -d '\r\n')
+if test -f "$MPFR_PATH/mlmpfr.$DYN_SUFFIX"; then
   HAS_MPFR="yes";
   AC_MSG_RESULT(found)
 else
