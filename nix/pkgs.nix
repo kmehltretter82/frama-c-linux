@@ -5,7 +5,7 @@ let
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
     camlzip = oself.callPackage ./camlzip.nix {};
     headache = oself.callPackage ./headache.nix {};
-    mlgmpidl = oself.callPackage ./mlgmpidl.nix {};
+    mlmpfr = oself.callPackage ./mlmpfr.nix {};
     ocp-indent = oself.callPackage ./ocp-indent.nix {};
     psmt2-frontend = oself.callPackage ./psmt2-frontend.nix {};
     why3 = oself.callPackage ./why3.nix {};

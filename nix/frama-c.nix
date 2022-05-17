@@ -21,7 +21,7 @@
 , lablgtk3-sourceview3
 , ltl2ba
 , menhirLib
-, mlgmpidl
+, mlmpfr
 , ocaml
 , ocamlgraph
 , ppx_deriving
@@ -42,7 +42,10 @@
 # some files and prepare some information before starting dune.
 stdenvNoCC.mkDerivation rec {
   pname = "frama-c";
-  version = lib.strings.removeSuffix "\n" (builtins.readFile ../VERSION);
+  version =
+    lib.strings.replaceStrings ["~"] ["-"]
+      (lib.strings.removeSuffix "\n"
+        (builtins.readFile ../VERSION));
   slang = lib.strings.removeSuffix "\n" (builtins.readFile ../VERSION_CODENAME);
 
   src = gitignoreSource ./..;
@@ -65,7 +68,7 @@ stdenvNoCC.mkDerivation rec {
     lablgtk3-sourceview3
     ltl2ba
     menhirLib
-    mlgmpidl
+    mlmpfr
     ocaml
     ocamlgraph
     ppx_deriving

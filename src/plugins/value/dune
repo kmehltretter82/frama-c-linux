@@ -3,8 +3,8 @@
  (deps (universe))
  (action (progn
           (echo "EVA:" %{lib-available:frama-c-eva.core} "\n")
-          (echo "Numerors:" %{lib-available:frama-c-eva.numerors} "\n")
-          (echo " - MLGMPIDL (gmp):" %{lib-available:gmp} "\n")
+          (echo "Numerors:" %{lib-available:frama-c-eva.numerors.core} "\n")
+          (echo " - MLMPFR:" %{lib-available:mlmpfr} "\n")
           (echo "Apron domains:" %{lib-available:frama-c-eva.apron} "\n")
           (echo " - apron.octMPQ:" %{lib-available:apron.octMPQ} "\n")
           (echo " - apron.boxMPQ:" %{lib-available:apron.boxMPQ} "\n")
@@ -150,14 +150,14 @@
 
 ( library
   (name numerors)
-  (public_name frama-c-eva.numerors)
+  (public_name frama-c-eva.numerors.core)
   (flags -open Frama_c_kernel -open Eva.Private :standard)
   (modules numerors_domain numerors_utils numerors_float numerors_interval numerors_arithmetics numerors_value)
-  (libraries frama-c.kernel frama-c-eva.core gmp)
+  (libraries frama-c.kernel frama-c-eva.core mlmpfr)
   (optional)
 )
 
-;(plugin (optional) (name eva-numerors) (libraries frama-c-eva.numerors) (site (frama-c plugins)))
+;(plugin (optional) (name eva.numerors) (libraries frama-c-eva.numerors.core) (site (frama-c plugins)))
 
 ( library
   (name apron_domain)
