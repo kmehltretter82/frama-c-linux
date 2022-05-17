@@ -60,7 +60,7 @@ module Position: sig
   val to_lexing_pos : t -> Lexing.position
 
   (** Pretty-print file, line and character offset.
-      @since Frama-C+dev
+      @since 25.0-Manganese
   *)
   val pretty_debug: t Pretty_utils.formatter
 end

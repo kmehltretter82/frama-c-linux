@@ -27,7 +27,7 @@ val get_flags : Datatype.Filepath.t -> string list
 
 (** [get_dir f] returns the preprocessing directory associated to file [f]
     in the JSON compilation database.
-    @since Frama-C+dev
+    @since 25.0-Manganese
 *)
 val get_dir : Datatype.Filepath.t -> Datatype.Filepath.t option
 

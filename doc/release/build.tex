@@ -72,8 +72,8 @@ There are many administrative steps, coordinated by the release manager.
   Traditionally, an author is added if they have contributed 100+ LoC in
   the release, as counted by:
   \begin{verbatim}
-  git ls-files | \
-  xargs -n1 git blame --line-porcelain | \
+  git ls-files -z | \
+  parallel -0 -n1 git blame --line-porcelain | \
   sed -n 's/^author //p' | sort -f | uniq -ic | sort -nr
   \end{verbatim}
   (source for the command: \url{https://gist.github.com/amitchhajer/4461043})
@@ -85,7 +85,7 @@ There are many administrative steps, coordinated by the release manager.
   to use a tilde \textasciitilde{} between the version number and \texttt{beta},
   and not a dash \texttt{-}.
 \item Create the last commit
-\item Create the tag using \texttt{git tag \$(cat VERSION)} and push it (e.g. via \texttt{git push origin \$(cat VERSION)})
+\item Create the tag using \texttt{git tag \$(cat VERSION | sed -e "s/~/-/")} and push it (e.g. via \texttt{git push origin \$(cat VERSION | sed -e "s/~/-/")})
 \end{enumerate}
 
 \section{Update the Documentation}\label{update_doc}
@@ -163,7 +163,7 @@ manuals.
 %\texttt{doc/manuals} in order to update the manuals (required by the
 %\texttt{install} target below).
 
-In the \texttt{doc} directory, just run \texttt{make} to compile
+In the \texttt{doc} directory, just run \texttt{make all} to compile
 and install all manuals, together with some final coherence checks with
 respect to the current Frama-C implementation (notably
 for the developer manual and ACSL implementation manual).

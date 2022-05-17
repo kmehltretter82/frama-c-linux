@@ -219,7 +219,7 @@ val pp_pos : Format.formatter -> position -> unit
     Note that this function does not validate that PWD has not been tampered
     with.
 
-    @since Frama-C+dev
+    @since 25.0-Manganese
 *)
 val pwd : unit -> string
 

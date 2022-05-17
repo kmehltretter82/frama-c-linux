@@ -279,7 +279,7 @@ val fieldsToInit: Cil_types.compinfo -> string option -> Cil_types.offset list
    Note that the list is _not_ sorted, and must be further processed
    for efficient data retrieval.
 
-   @since Frama-C+dev
+   @since 25.0-Manganese
 *)
 val func_locs : unit -> (Filepath.position * Filepath.position * string) list
 
