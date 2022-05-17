@@ -21,12 +21,12 @@
 (**************************************************************************)
 
 (** Memory locations.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 open Cil_types
 
 (** Association between bases and offsets in byte.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Location_Bytes : sig
   (* TODOBY: write an mli for MapLattice, and name the result. Use it there,
      and simplify *)
@@ -231,12 +231,12 @@ module Location_Bytes : sig
 end
 
 (** Association between bases and offsets in bits.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Location_Bits : module type of Location_Bytes
 
 
 (** Association between bases and ranges of bits.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Zone : sig
 
   type map_t
@@ -319,13 +319,13 @@ end
 (** {2 Locations} *)
 
 (** A {!Location_Bits.t} and a size in bits.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 type location = private {
   loc : Location_Bits.t;
   size : Int_Base.t;
 }
 
-(** @plugin development guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Location: Datatype.S with type t = location
 
 val loc_bottom : location
@@ -392,7 +392,7 @@ val enumerate_bits : location -> Zone.t
 val enumerate_bits_under : location -> Zone.t
 
 val enumerate_valid_bits : access -> location -> Zone.t
-(** @plugin development guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val enumerate_valid_bits_under : access -> location -> Zone.t
 

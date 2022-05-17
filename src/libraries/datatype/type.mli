@@ -24,7 +24,7 @@
     type. This API is quite low level. Prefer to use module {!Datatype} instead
     whenever possible.
 
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (* ****************************************************************************)
 (** {2 Type declaration} *)
@@ -34,7 +34,7 @@ type 'a t
 (** Type of type values. For each monomorphic type [ty], a value of type [ty
     t] dynamically represents the type [ty]. Such a value is called a type
     value and should be unique for each static monomorphic type.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 type 'a ty = 'a t
 
@@ -45,8 +45,8 @@ type 'a ty = 'a t
 (** Precedences used for generating the minimal number of parenthesis in
     combination with function {!par} below. *)
 type precedence =
-  | Basic (** @plugin development guide *)
-  | Call (** @plugin development guide *)
+  | Basic (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  | Call (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
   | Tuple
   | List
   | NoPar
@@ -62,7 +62,7 @@ type precedence =
     let myself = Call in
     par p_caller myself fmt pp]
 
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 val par:
   precedence -> precedence -> Format.formatter -> (Format.formatter -> unit) ->
   unit
@@ -78,7 +78,7 @@ val par_ty_name: ('a t -> bool) -> 'a t -> string
 
 exception AlreadyExists of string
 (** May be raised by {!register}.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val register:
   ?closure:bool ->
@@ -103,14 +103,14 @@ exception No_abstract_type of string
 (** Apply this functor to access to the abstract type of the given name.
     @raise No_abstract_type if no such abstract type was registered.
     @since Nitrogen-20111001
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Abstract(T: sig val name: string end): sig
   type t
   val ty: t ty
 end
 
 val name: 'a t -> string
-(** @plugin development name *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val structural_descr: 'a t -> Structural_descr.t
 val reprs: 'a t -> 'a list

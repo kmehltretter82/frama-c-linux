@@ -22,7 +22,7 @@
 
 (** Annotations in the AST.
     The AST should be computed before calling functions of this module.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 open Cil_types
 
@@ -288,19 +288,19 @@ val add_assert:
   Emitter.t -> ?kf:kernel_function -> stmt -> predicate -> unit
 (** Add an assertion attached to the given statement. If [kf] is
     provided, the function runs faster.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val add_check:
   Emitter.t -> ?kf:kernel_function -> stmt -> predicate -> unit
 (** Add a checking assertion attached to the given statement. If [kf] is
     provided, the function runs faster.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val add_admit:
   Emitter.t -> ?kf:kernel_function -> stmt -> predicate -> unit
 (** Add an hypothesis assertion attached to the given statement. If [kf] is
     provided, the function runs faster.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val add_global: Emitter.t -> global_annotation -> unit
 (** Add a new global annotation into the program. *)

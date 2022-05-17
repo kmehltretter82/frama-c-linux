@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Functors for generic lattices implementations.
-    @plugin developer guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 exception Error_Top
 (** Raised by some functions when encountering a top value. *)

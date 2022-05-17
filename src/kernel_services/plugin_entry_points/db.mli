@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Database in which static plugins are registered.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (**
    Modules providing general services:
@@ -83,12 +83,12 @@ val register_guarded_compute:
 
 (** Frama-C main interface.
     @since Lithium-20081201
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Main: sig
 
   val extend : (unit -> unit) -> unit
   (** Register a function to be called by the Frama-C main entry point.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val play: (unit -> unit) ref
   (** Run all the Frama-C analyses. This function should be called only by
@@ -132,7 +132,7 @@ module Value : sig
 
   val self : State.t
   (** Internal state of the value analysis from projects viewpoint.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val mark_as_computed: unit -> unit
   (** Indicate that the value analysis has been done already. *)
@@ -144,11 +144,11 @@ module Value : sig
       @raise Db.Value.Incorrect_number_of_arguments if some arguments are
       specified for the entry point using {!Db.Value.fun_set_args}, and
       an incorrect number of them is given.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val is_computed: unit -> bool
   (** Return [true] iff the value analysis has been done.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   module Table_By_Callstack:
     State_builder.Hashtbl with type key = stmt
@@ -243,7 +243,7 @@ module Value : sig
 
   val get_stmt_state : ?after:bool -> stmt -> state
   (** [after] is false by default.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val fold_stmt_state_callstack :
     (state -> 'a -> 'a) -> 'a -> after:bool -> stmt -> 'a
@@ -308,7 +308,7 @@ module Value : sig
 
   val is_accessible : kinstr -> bool
   val is_reachable : state -> bool
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val is_reachable_stmt : stmt -> bool
 
@@ -580,7 +580,7 @@ end
 (* ************************************************************************* *)
 
 (** Dealing with logical properties.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Properties : sig
 
   (** Interpretation of logic terms. *)
@@ -1274,7 +1274,7 @@ module Derefs : INOUT with type t = Locations.Zone.t
 
 (** This function should be called from time to time by all analysers taking
     time. In GUI mode, this will make the interface reactive.
-    @plugin development guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
     @deprecated 21.0-Scandium *)
 val progress: (unit -> unit) ref
 [@@ deprecated "Use Db.yield instead."]

@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Frama-C Entry Point (last linked module).
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 let play_analysis () =
   if Kernel.TypeCheck.get () then begin

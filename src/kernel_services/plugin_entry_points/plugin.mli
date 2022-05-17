@@ -25,7 +25,7 @@
     an ad'hoc manner. Should not be of any use for a standard plug-in,
     who would rather rely on {!Plugin.S} below.
     @since Chlorine-20180501
-    @plugin development guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 module type S_no_log = sig
 
@@ -74,7 +74,7 @@ end
 
 (** Provided plug-general services for plug-ins.
     @since Beryllium-20090601-beta1
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module type S = sig
   include Log.Messages
   include S_no_log
@@ -105,7 +105,7 @@ val register_kernel: unit -> unit
 
 (** Functors for registering a new plug-in. It provides access to several
     services.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Register
     (P: sig
        val name: string

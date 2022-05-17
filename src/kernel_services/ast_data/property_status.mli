@@ -22,7 +22,7 @@
 
 (** Status of properties.
     @since Nitrogen-20111001
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (* ************************************************************************ *)
 (** {2 Local status}

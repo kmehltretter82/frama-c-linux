@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Datatypes of some useful CIL types.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (* This module should not be exported, but we need the alias and OCaml
    requires us to export it. *)
@@ -259,7 +259,7 @@ module Typeinfo: S_with_collections with type t = typeinfo
 
 module Varinfo_Id: Hptmap.Id_Datatype with type t = varinfo
 
-(** @plugin development guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Varinfo: sig
   include S_with_collections_pretty with type t = varinfo
   module Hptset: sig

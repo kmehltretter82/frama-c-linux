@@ -68,7 +68,7 @@ type ('a,'b) pretty_aborter =
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Exception Registry}
-    @plugin development guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
     @since Beryllium-20090601-beta1 *)
 (* -------------------------------------------------------------------------- *)
 
@@ -118,7 +118,7 @@ type warn_status =
   | Wabort (** emit a message and abort execution *)
 
 (** @since Beryllium-20090601-beta1
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module type Messages = sig
 
   type category
@@ -155,45 +155,45 @@ module type Messages = sig
   val result : ?level:int -> ?dkey:category -> 'a pretty_printer
   (** Results of analysis. Default level is 1.
       @since Beryllium-20090601-beta1
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val feedback : ?ontty:ontty -> ?level:int -> ?dkey:category -> 'a pretty_printer
   (** Progress and feedback. Level is tested against the verbosity level.
       @since Beryllium-20090601-beta1
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val debug   : ?level:int -> ?dkey:category -> 'a pretty_printer
   (** Debugging information dedicated to Plugin developers.
       Default level is 1. The debugging key is used in message headers.
       See also [set_debug_keys] and [set_debug_keyset].
       @since Beryllium-20090601-beta1
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val warning : ?wkey:warn_category -> 'a pretty_printer
   (** Hypothesis and restrictions.
       @since Beryllium-20090601-beta1
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val error   : 'a pretty_printer
   (** user error: syntax/typing error, bad expected input, etc.
       @since Beryllium-20090601-beta1
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val abort   : ('a,'b) pretty_aborter
   (** user error stopping the plugin.
       @raise AbortError with the channel name.
       @since Beryllium-20090601-beta1
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val failure : 'a pretty_printer
   (** internal error of the plug-in.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val fatal   : ('a,'b) pretty_aborter
   (** internal error of the plug-in.
       @raise AbortFatal with the channel name.
       @since Beryllium-20090601-beta1
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val verify : bool -> ('a,bool) pretty_aborter
   (** If the first argument is [true], return [true] and do nothing else,
@@ -202,7 +202,7 @@ module type Messages = sig
 
       The intended usage is: [assert (verify e "Bla...") ;].
       @since Beryllium-20090601-beta1
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val not_yet_implemented : ?current:bool -> ?source:Filepath.position ->
     ('a,formatter,unit,'b) format4 -> 'a
@@ -250,7 +250,7 @@ module type Messages = sig
       - [log ~verbose:n ~debug:m]: any debugging or verbosity level is
         sufficient.
         @since Beryllium-20090901
-        @plugin development guide *)
+        @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val logwith : (event option -> 'b) ->
     ?wkey:warn_category -> ?emitwith:(event -> unit) -> ?once:bool ->
@@ -388,7 +388,7 @@ val set_echo : ?plugin:string -> ?kind:kind list -> bool -> unit
 (** Turns echo on or off. Applies to all channel unless specified,
     and all kind of messages unless specified.
     @since Beryllium-20090601-beta1
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val add_listener : ?plugin:string -> ?kind:kind list -> (event -> unit) -> unit
 (** Register a hook that is called each time an event is
@@ -399,7 +399,7 @@ val add_listener : ?plugin:string -> ?kind:kind list -> (event -> unit) -> unit
     temporarily deactivated in order to avoid infinite recursion.
 
     @since Beryllium-20090601-beta1
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val echo : event -> unit
 (** Display an event of the terminal, unless echo has been turned off.
@@ -421,13 +421,13 @@ type channel
 
 val new_channel : string -> channel
 (** @since Beryllium-20090901
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val log_channel : channel ->
   ?kind:kind -> 'a pretty_printer
 (** logging function to user-created channel.
     @since Beryllium-20090901
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val kernel_channel_name: string
 (** the reserved channel name used by the Frama-C kernel.
@@ -454,7 +454,7 @@ val clean : unit -> unit
 val set_output : ?isatty:bool -> (string -> int -> int -> unit) -> (unit -> unit) -> unit
 (** This function has the same parameters as Format.make_formatter.
     @since Beryllium-20090901
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val print_on_output : (Format.formatter -> unit) -> unit
 (** Direct printing on output.
@@ -464,7 +464,7 @@ val print_on_output : (Format.formatter -> unit) -> unit
 
     Can not be recursively invoked.
     @since Beryllium-20090901
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val print_delayed : (Format.formatter -> unit) -> unit
 (** Direct printing on output.  Same as [print_on_output], except
@@ -474,7 +474,7 @@ val print_delayed : (Format.formatter -> unit) -> unit
 
     Can not be recursively invoked.
     @since Beryllium-20090901
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (**/**)
 val set_current_source : (unit -> Filepath.position) -> unit

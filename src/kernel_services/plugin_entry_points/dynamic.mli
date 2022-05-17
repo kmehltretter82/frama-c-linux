@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Value accesses through dynamic typing.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (* ************************************************************************* *)
 (** {2 Registration} *)
@@ -35,7 +35,7 @@ val register:
     [name], the type [ty] and the plug-in [plugin].
     @raise Type.AlreadyExists if [name] already exists. In other words you
     cannot register a value with the same name twice.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (* ************************************************************************* *)
 (** {2 Access} *)
@@ -58,7 +58,7 @@ val get: plugin:string -> string -> 'a Type.t -> 'a
     @raise Incompatible_type if the name is not registered
     with a compatible type
     @raise Failure _ in the -no-obj mode
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val iter: (string -> 'a Type.t -> 'a -> unit) -> unit
 val iter_comment : (string -> string -> unit) -> unit
@@ -70,7 +70,7 @@ val iter_comment : (string -> string -> unit) -> unit
 
 (** Module to use for accessing parameters of plug-ins.
     Assume that the plug-in is already loaded.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Parameter : sig
 
   (** Set of common operations on parameters. *)
@@ -98,7 +98,7 @@ module Parameter : sig
   (**/**)
 
   (** Boolean parameters.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
   module Bool: sig
     include Common with type t = bool
     val on: string -> unit -> unit

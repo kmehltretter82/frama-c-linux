@@ -125,7 +125,7 @@ type typing_context = {
       possible for the extension to change the type-checking functions for
       the sub-nodes of the parsed tree, and not only for the toplevel [lexpr].
 
-      @plugin development guide
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
   *)
   type_term:
     typing_context -> Lenv.t -> Logic_ptree.lexpr -> term;
