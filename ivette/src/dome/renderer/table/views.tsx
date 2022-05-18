@@ -20,7 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 // --------------------------------------------------------------------------
@@ -218,7 +217,7 @@ type Cprops = ColProps<any>;
 // --- Column Utilities
 // --------------------------------------------------------------------------
 
-const isVisible = (visible: Cmap<boolean>, col: Cprops) => {
+const isVisible = (visible: Cmap<boolean>, col: Cprops): boolean => {
   const defaultVisible = col.visible ?? true;
   switch (defaultVisible) {
     case 'never': return false;
@@ -228,12 +227,12 @@ const isVisible = (visible: Cmap<boolean>, col: Cprops) => {
   }
 };
 
-const defaultGetter = (row: any, dataKey: string) => {
+const defaultGetter = (row: any, dataKey: string): any => {
   if (typeof row === 'object') return row[dataKey];
   return undefined;
 };
 
-const defaultRenderer = (d: any) => (
+const defaultRenderer = (d: any): JSX.Element => (
   <div className="dome-xTable-renderer dome-text-label">
     {String(d)}
   </div>
@@ -271,7 +270,7 @@ function makeDataRenderer(
     try {
       const contents = cellData ? render(cellData) : null;
       if (onContextMenu) {
-        const callback = (evt: React.MouseEvent) => {
+        const callback = (evt: React.MouseEvent): void => {
           evt.stopPropagation();
           onContextMenu(props.rowData, props.rowIndex, props.dataKey);
         };
@@ -354,28 +353,28 @@ class TableState<Key, Row> {
 
   // --- Static Callbacks
 
-  unwind() {
+  unwind(): void {
     this.signal = undefined;
     this.onSelection = undefined;
     this.onContextMenu = undefined;
   }
 
-  forceUpdate() {
+  forceUpdate(): void {
     const s = this.signal;
     if (s) { this.signal = undefined; s(); }
   }
 
-  updateGrid() {
+  updateGrid(): void {
     this.tableRef.current?.forceUpdateGrid();
   }
 
-  fullReload() {
+  fullReload(): void {
     this.scrolledKey = undefined;
     this.forceUpdate();
     this.updateGrid();
   }
 
-  getRef(id: string) {
+  getRef(id: string): divRef {
     const href = this.headerRef.get(id);
     if (href) return href;
     const nref: divRef = React.createRef();
@@ -394,13 +393,13 @@ class TableState<Key, Row> {
     return cw;
   }
 
-  startResizing(idx: number) {
+  startResizing(idx: number): void {
     this.resizing = idx;
     this.offset = 0;
     this.forceUpdate();
   }
 
-  stopResizing() {
+  stopResizing(): void {
     this.resizing = undefined;
     this.offset = undefined;
     this.columnWith.clear();
@@ -408,7 +407,7 @@ class TableState<Key, Row> {
   }
 
   // Debounced
-  setResizeOffset(lcol: string, rcol: string, offset: number) {
+  setResizeOffset(lcol: string, rcol: string, offset: number): void {
     const colws = this.columnWith;
     const cwl = colws.get(lcol);
     const cwr = colws.get(rcol);
@@ -425,7 +424,7 @@ class TableState<Key, Row> {
 
   // --- Table settings
 
-  updateSettings() {
+  updateSettings(): void {
     const userSettings = this.settings;
     if (userSettings) {
       const cws: Json.dict<number> = {};
@@ -444,7 +443,7 @@ class TableState<Key, Row> {
     this.forceUpdate();
   }
 
-  importSettings(settings?: string) {
+  importSettings(settings?: string): void {
     if (settings !== this.settings) {
       this.settings = settings;
       const { resize } = this;
@@ -467,7 +466,7 @@ class TableState<Key, Row> {
 
   // --- User Table properties
 
-  setSorting(sorting?: Sorting) {
+  setSorting(sorting?: Sorting): void {
     const info = sorting?.getSorting();
     this.sortBy = info?.sortBy;
     this.sortDirection = info?.sortDirection;
@@ -477,7 +476,7 @@ class TableState<Key, Row> {
     }
   }
 
-  setModel(model?: Model<Key, Row>) {
+  setModel(model?: Model<Key, Row>): void {
     if (model !== this.model) {
       this.client?.unlink();
       this.model = model;
@@ -494,7 +493,7 @@ class TableState<Key, Row> {
     }
   }
 
-  setRendering(rendering?: RenderByFields<Row>) {
+  setRendering(rendering?: RenderByFields<Row>): void {
     if (rendering !== this.rendering) {
       this.rendering = rendering;
       this.render.clear();
@@ -506,7 +505,7 @@ class TableState<Key, Row> {
 
   onSelection?: (data: Row, key: Key, index: number) => void;
 
-  onRowClick(info: RowMouseEventHandlerParams) {
+  onRowClick(info: RowMouseEventHandlerParams): void {
     const { index } = info;
     const data = info.rowData as (Row | undefined);
     const { model } = this;
@@ -517,7 +516,7 @@ class TableState<Key, Row> {
       onSelection(data, key, index);
   }
 
-  onRowsRendered(info: IndexRange) {
+  onRowsRendered(info: IndexRange): void {
     this.range = info;
     this.client?.watch(info.startIndex, info.stopIndex);
   }
@@ -527,7 +526,7 @@ class TableState<Key, Row> {
     return (index & 1 ? 'dome-xTable-even' : 'dome-xTable-odd'); // eslint-disable-line no-bitwise
   }
 
-  keyStepper(index: number) {
+  keyStepper(index: number): void {
     const { onSelection } = this;
     const key = this.model?.getKeyAt(index);
     const data = this.model?.getRowAt(index);
@@ -546,7 +545,7 @@ class TableState<Key, Row> {
     return undefined;
   }
 
-  onSorting(ord?: SortingInfo) {
+  onSorting(ord?: SortingInfo): void {
     const { sorting } = this;
     if (sorting) {
       sorting.setSorting(ord);
@@ -558,7 +557,7 @@ class TableState<Key, Row> {
 
   // ---- Row Events
 
-  onRowRightClick({ event, rowData, index }: RowMouseEventHandlerParams) {
+  onRowRightClick({ event, rowData, index }: RowMouseEventHandlerParams): void {
     const callback = this.onContextMenu;
     if (callback) {
       event.stopPropagation();
@@ -566,7 +565,7 @@ class TableState<Key, Row> {
     }
   }
 
-  onKeyDown(evt: React.KeyboardEvent) {
+  onKeyDown(evt: React.KeyboardEvent): void {
     const index = this.selectedIndex;
     switch (evt.key) {
       case 'ArrowUp':
@@ -586,7 +585,7 @@ class TableState<Key, Row> {
 
   // ---- Header Context Menu
 
-  onHeaderMenu() {
+  onHeaderMenu(): void {
     let hasOrder = false;
     let hasResize = false;
     let hasVisible = false;
@@ -598,11 +597,11 @@ class TableState<Key, Row> {
       if (col.visible !== 'never' && col.visible !== 'always')
         hasVisible = true;
     });
-    const resetSizing = () => {
+    const resetSizing = (): void => {
       this.resize.clear();
       this.updateSettings();
     };
-    const resetColumns = () => {
+    const resetColumns = (): void => {
       this.visible.clear();
       this.resize.clear();
       this.updateSettings();
@@ -633,7 +632,7 @@ class TableState<Key, Row> {
         default: {
           const { id, label, title } = col;
           const checked = isVisible(visible, col);
-          const onClick = () => {
+          const onClick = (): void => {
             visible.set(id, !checked);
             this.updateSettings();
           };
@@ -646,7 +645,11 @@ class TableState<Key, Row> {
 
   // --- Getter & Setters
 
-  computeGetter(id: string, dataKey: string, props: Cprops) {
+  computeGetter(
+    id: string,
+    dataKey: string,
+    props: Cprops
+  ): TableCellDataGetter {
     const current = this.getter.get(id);
     if (current) return current;
     const dataGetter = makeDataGetter(dataKey, props.getter);
@@ -654,7 +657,11 @@ class TableState<Key, Row> {
     return dataGetter;
   }
 
-  computeRender(id: string, dataKey: string, props: Cprops) {
+  computeRender(
+    id: string,
+    dataKey: string,
+    props: Cprops
+  ): TableCellRenderer {
     const current = this.render.get(id);
     if (current) return current;
     let renderer = props.render;
@@ -671,7 +678,7 @@ class TableState<Key, Row> {
 
   private registry = new Map<string, null | ColProps<Row>>();
 
-  setRegistry(id: string, props: null | ColProps<Row>) {
+  setRegistry(id: string, props: null | ColProps<Row>): void {
     this.registry.set(id, props);
     this.rebuild();
   }
@@ -688,7 +695,7 @@ class TableState<Key, Row> {
     return () => this.setRegistry(id, null);
   }
 
-  rebuild() {
+  rebuild(): void {
     const current = this.columns;
     const cols: ColProps<Row>[] = [];
     this.registry.forEach((col) => col && cols.push(col));
@@ -715,10 +722,13 @@ const ColumnContext = React.createContext<undefined | ColumnIndex>(undefined);
 
 /**
    Table Column.
+
    @template Row - table row data of some table entries
    @template Cell - type of cell data to render in this column
  */
-export function Column<Row, Cell>(props: ColumnProps<Row, Cell>) {
+export function Column<Row, Cell>(
+  props: ColumnProps<Row, Cell>
+): JSX.Element | null {
   const context = React.useContext(ColumnContext);
   React.useEffect(() => {
     if (context) {
@@ -733,8 +743,8 @@ function spawnIndex(
   state: TableState<any, any>,
   path: number[],
   children: React.ReactElement | React.ReactElement[],
-) {
-  const indexChild = (elt: React.ReactElement, k: number) => (
+): JSX.Element {
+  const indexChild = (elt: React.ReactElement, k: number): JSX.Element => (
     <ColumnContext.Provider value={{ state, path, index: k }}>
       {elt}
     </ColumnContext.Provider>
@@ -790,7 +800,7 @@ export interface ColumnGroupProps {
    this implicit root column group, just pack your columns inside a classical
    React fragment: `<Table … ><>{children}</></Table>`.
  */
-export function ColumnGroup(props: ColumnGroupProps) {
+export function ColumnGroup(props: ColumnGroupProps): JSX.Element | null {
   const context = React.useContext(ColumnContext);
   if (!context) return null;
   const { state, path, index: defaultIndex } = context;
@@ -807,7 +817,7 @@ function makeColumn<Key, Row>(
   state: TableState<Key, Row>,
   props: ColProps<Row>,
   fill: boolean,
-) {
+): JSX.Element {
   const { id } = props;
   const align = { textAlign: props.align };
   const dataKey = props.dataKey ?? id;
@@ -842,7 +852,7 @@ function makeColumn<Key, Row>(
   );
 }
 
-const byIndex = (a: Cprops, b: Cprops) => {
+const byIndex = (a: Cprops, b: Cprops): number => {
   const ak = a.index ?? 0;
   const bk = b.index ?? 0;
   if (ak < bk) return -1;
@@ -850,7 +860,7 @@ const byIndex = (a: Cprops, b: Cprops) => {
   return 0;
 };
 
-function makeCprops<Key, Row>(state: TableState<Key, Row>) {
+function makeCprops<Key, Row>(state: TableState<Key, Row>): Cprops[] {
   const cols: Cprops[] = [];
   state.columns.forEach((col) => {
     if (col && isVisible(state.visible, col)) {
@@ -861,7 +871,10 @@ function makeCprops<Key, Row>(state: TableState<Key, Row>) {
   return cols;
 }
 
-function makeColumns<Key, Row>(state: TableState<Key, Row>, cols: Cprops[]) {
+function makeColumns<Key, Row>(
+  state: TableState<Key, Row>,
+  cols: Cprops[]
+): JSX.Element[] {
   let fill: undefined | Cprops;
   let lastExt: undefined | Cprops;
   cols.forEach((col) => {
@@ -877,25 +890,25 @@ function makeColumns<Key, Row>(state: TableState<Key, Row>, cols: Cprops[]) {
 // --- Table Utility Renderers
 // --------------------------------------------------------------------------
 
-const headerIcon = (icon?: string) => (
-  icon &&
-  (
-    <div className="dome-xTable-header-icon">
-      <SVG id={icon} />
-    </div>
-  )
+const headerIcon = (icon?: string): JSX.Element | null => (
+  icon ?
+    (
+      <div className="dome-xTable-header-icon">
+        <SVG id={icon} />
+      </div>
+    ) : null
 );
 
-const headerLabel = (label?: string) => (
-  label &&
-  (
-    <label className="dome-xTable-header-label dome-text-label">
-      {label}
-    </label>
-  )
+const headerLabel = (label?: string): JSX.Element | null => (
+  label ?
+    (
+      <label className="dome-xTable-header-label dome-text-label">
+        {label}
+      </label>
+    ) : null
 );
 
-const makeSorter = (id: string) => (
+const makeSorter = (id: string): JSX.Element => (
   <div className="dome-xTable-header-sorter">
     <SVG id={id} size={8} />
   </div>
@@ -904,7 +917,7 @@ const makeSorter = (id: string) => (
 const sorterASC = makeSorter('ANGLE.UP');
 const sorterDESC = makeSorter('ANGLE.DOWN');
 
-function headerRowRenderer(props: TableHeaderRowProps) {
+function headerRowRenderer(props: TableHeaderRowProps): JSX.Element {
   return (
     <div
       role="row"
@@ -916,7 +929,7 @@ function headerRowRenderer(props: TableHeaderRowProps) {
   );
 }
 
-function headerRenderer(props: TableHeaderProps) {
+function headerRenderer(props: TableHeaderProps): JSX.Element {
   const data: ColumnData = props.columnData;
   const { sortBy, sortDirection, dataKey } = props;
   const { icon, label, title, headerRef, headerMenu } = data;
@@ -954,7 +967,7 @@ interface ResizerProps {
   onDrag: (offset: number) => void;
 }
 
-const Resizer = (props: ResizerProps) => (
+const Resizer = (props: ResizerProps): JSX.Element => (
   <DraggableCore
     onStart={props.onStart}
     onStop={props.onStop}
@@ -1003,9 +1016,10 @@ function makeResizers(
       const lcol = b.left;
       const offset = state.offset ?? 0;
       const dragging = state.resizing === index;
-      const onStart = () => state.startResizing(index);
-      const onStop = () => state.stopResizing();
-      const onDrag = (ofs: number) => state.setResizeOffset(lcol, rcol, ofs);
+      const onStart = (): void => state.startResizing(index);
+      const onStop = (): void => state.stopResizing();
+      const onDrag =
+        (ofs: number): void => state.setResizeOffset(lcol, rcol, ofs);
       const resizer = (
         <Resizer
           key={index}
@@ -1036,7 +1050,7 @@ function makeTable<Key, Row>(
   props: TableProps<Key, Row>,
   state: TableState<Key, Row>,
   size: Size,
-) {
+): JSX.Element {
 
   const { width, height } = size;
   const { model } = props;
@@ -1121,7 +1135,7 @@ function makeTable<Key, Row>(
    @template Row - data associated to each key in the table entries.
  */
 
-export function Table<Key, Row>(props: TableProps<Key, Row>) {
+export function Table<Key, Row>(props: TableProps<Key, Row>): JSX.Element {
 
   const state = React.useMemo(() => new TableState<Key, Row>(), []);
   const [age, setAge] = React.useState(0);
