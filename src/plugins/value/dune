@@ -157,7 +157,7 @@
   (optional)
 )
 
-;(plugin (optional) (name eva.numerors) (libraries frama-c-eva.numerors.core) (site (frama-c plugins)))
+(plugin (optional) (name eva.numerors) (libraries frama-c-eva.numerors.core) (site (frama-c plugins)))
 
 ( library
   (name apron_domain)
