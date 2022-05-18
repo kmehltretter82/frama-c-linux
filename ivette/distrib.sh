@@ -21,7 +21,7 @@ Distribute() {
     for f in $(git -C $repo ls-files .)
     do
         case $f in
-            Makefile.distrib | headers/* )
+            Makefile.distrib | headers/* | ivette.icns )
             ;;
             *)
                 echo "DISTRIB_FILES += $src/$f" >> $Distrib
