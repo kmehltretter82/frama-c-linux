@@ -116,20 +116,22 @@ let dead_code kf =
   let empty = { kf; unreachable = []; non_terminating = [] } in
   if Analysis.is_computed ()
   then
-    let fundec = Kernel_function.get_definition kf in
-    match Analysis.status kf with
-    | Unreachable | SpecUsed | Builtin _ ->
-      { kf; unreachable = fundec.sallstmts; non_terminating = [] }
-    | Analyzed NoResults -> empty
-    | Analyzed (Partial | Complete) ->
-      let classify acc stmt =
-        if Results.(before stmt |> is_empty)
-        then { acc with unreachable = stmt :: acc.unreachable }
-        else if Results.(after stmt |> is_empty)
-        then { acc with non_terminating = stmt :: acc.non_terminating }
-        else acc
-      in
-      List.fold_left classify empty fundec.sallstmts
+    try
+      let fundec = Kernel_function.get_definition kf in
+      match Analysis.status kf with
+      | Unreachable | SpecUsed | Builtin _ ->
+        { kf; unreachable = fundec.sallstmts; non_terminating = [] }
+      | Analyzed NoResults -> empty
+      | Analyzed (Partial | Complete) ->
+        let classify acc stmt =
+          if Results.(before stmt |> is_empty)
+          then { acc with unreachable = stmt :: acc.unreachable }
+          else if Results.(after stmt |> is_empty)
+          then { acc with non_terminating = stmt :: acc.non_terminating }
+          else acc
+        in
+        List.fold_left classify empty fundec.sallstmts
+    with Kernel_function.No_Definition -> empty
   else empty
 
 let () = Request.register ~package
