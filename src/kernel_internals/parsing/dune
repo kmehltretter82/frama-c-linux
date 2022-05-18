@@ -1,0 +1,5 @@
+(ocamllex clexer)
+(ocamllex logic_preprocess)
+(ocamllex logic_lexer)
+(ocamlyacc logic_parser)
+(ocamlyacc cparser)

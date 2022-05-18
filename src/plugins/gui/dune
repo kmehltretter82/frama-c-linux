@@ -12,6 +12,8 @@
   )
 )
 
+(include_subdirs no)
+
 ( library
   (name frama_c_gui)
   (public_name frama-c.gui)
