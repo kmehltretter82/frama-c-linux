@@ -31,6 +31,7 @@ import * as Ctrl from 'dome/controls/buttons';
 import * as Disp from 'dome/controls/displays';
 import * as Box from 'dome/layout/boxes';
 import { QSplit, QPane } from 'dome/layout/qsplit';
+import { registerSandbox } from 'ivette';
 
 function Quarter(props: {
   value?: string,
@@ -64,7 +65,7 @@ function Pane(props: { id: string, background: string }): JSX.Element {
 
 const round = (r: number): number => Math.round(r * 100) / 100;
 
-export default function Sandbox(): JSX.Element {
+function QSplitSandbox(): JSX.Element {
   const [H, setH] = React.useState(0.5);
   const [V, setV] = React.useState(0.5);
   const [A, setA] = React.useState<string | undefined>('A');
@@ -113,3 +114,15 @@ export default function Sandbox(): JSX.Element {
     </Box.Vfill >
   );
 }
+
+/* -------------------------------------------------------------------------- */
+/* --- Sandbox                                                            --- */
+/* -------------------------------------------------------------------------- */
+
+registerSandbox({
+  id: 'sandbox.qsplit',
+  label: 'Q-Splitters',
+  children: <QSplitSandbox />,
+});
+
+/* -------------------------------------------------------------------------- */

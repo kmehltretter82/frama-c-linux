@@ -37,6 +37,7 @@ import * as Extensions from './Extensions';
 import * as Laboratory from './Laboratory';
 import * as IvettePrefs from 'ivette/prefs';
 import './loader';
+import './sandbox';
 
 // --------------------------------------------------------------------------
 // --- Main View

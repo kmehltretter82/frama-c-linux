@@ -36,7 +36,6 @@ import { DefineElement } from 'dome/layout/dispatch';
 import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
 import * as Lab from 'ivette@lab';
 import * as Ext from 'ivette@ext';
-import Sandbox from './sandbox';
 
 /* --------------------------------------------------------------------------*/
 /* --- Items                                                              ---*/
@@ -205,12 +204,22 @@ export function registerStatusbar(status: ToolProps): void {
 /* --------------------------------------------------------------------------*/
 
 if (DEVEL) {
-  registerComponent({
-    id: 'ivette.sandbox',
+  registerGroup({
+    id: 'sandbox',
     label: 'Sandbox',
-    title: 'Ivette Sandbox Component (only in DEVEL mode)',
-    children: <Sandbox />,
+    title: 'Ivette Sandbox Components (only in DEVEL mode)',
   });
+  registerView({
+    id: 'sandbox',
+    rank: -2,
+    label: 'Sandbox',
+    title: 'Sandbox Playground (only in DEVEL mode)',
+    layout: [],
+  });
+}
+
+export function registerSandbox(props: ComponentProps): void {
+  if (DEVEL) registerComponent({ ...props, group: 'sandbox' });
 }
 
 // --------------------------------------------------------------------------
