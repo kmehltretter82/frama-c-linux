@@ -45,9 +45,9 @@ include Datatype.S_with_collections
 (** Creates the set containing only the given integer. *)
 val inject_singleton: Integer.t -> t
 
-(** Creates the set with integers [from + k*period] for [k] in {0 ... number-1}.
-    The resulting set contains [number] integers. There is no verification
-    about [number], but it should be stritly positive. *)
+(** Creates the set with integers [from + k*period] for [k] in
+    [{0 ... number-1}]. The resulting set contains [number] integers. There is
+    no verification about [number], but it should be stritly positive. *)
 val inject_periodic: from:Integer.t -> period:Integer.t -> number:Integer.t -> t
 
 (** Creates a set from an integer list. The list must not be empty, and the list

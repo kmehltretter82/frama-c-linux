@@ -41,7 +41,7 @@ module type S = sig
 
   (** Results of an evaluation: the results of all intermediate calculation (the
       value of each expression and the location of each lvalue) are cached here.
-      See {eval.mli} for more details. *)
+      See {!Eval} for more details. *)
   module Valuation : Valuation with type value = value
                                 and type origin = origin
                                 and type loc = loc

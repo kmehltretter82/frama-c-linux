@@ -25,7 +25,7 @@
 open Cvalue
 open Cil_types
 
-(** See !{abstract_value.mli} for details about backward operations. *)
+(** See {!Abstract_value} for details about backward operations. *)
 
 (** This function tries to reduce the argument values of a binary operation,
     given its result.

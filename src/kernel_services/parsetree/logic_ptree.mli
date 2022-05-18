@@ -97,8 +97,8 @@ and lexpr_node =
   | PLconstant of constant (** a constant. *)
   | PLunop of unop * lexpr (** unary operator. *)
   | PLbinop of lexpr * binop * lexpr (** binary operator. *)
-  | PLdot of lexpr * string (** field access ({t a.x}) *)
-  | PLarrow of lexpr * string (** field access ({t a->x})*)
+  | PLdot of lexpr * string (** field access ([a.x]) *)
+  | PLarrow of lexpr * string (** field access ([a->x])*)
   | PLarrget of lexpr * lexpr (** array access. *)
   | PLold of lexpr (** expression refers to pre-state of a function. *)
   | PLat of lexpr * string (** expression refers to a given program point. *)
@@ -148,7 +148,7 @@ and lexpr_node =
   (* tsets *)
   | PLcomprehension of lexpr * quantifiers * lexpr option
   (** set of expression defined in comprehension
-      ({t \{ e | integer i; P(i)\}})*)
+      ([{ e | integer i; P(i)}])*)
   | PLset of lexpr list
   (** sets of elements. *)
   | PLunion of lexpr list

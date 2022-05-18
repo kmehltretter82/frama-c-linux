@@ -74,15 +74,14 @@ val new_raw_id: unit -> int
     Must not be used for setting vid: use {!set_vid} instead. *)
 
 (** Creates a (potentially recursive) composite type. The arguments are:
- * (1) a boolean indicating whether it is a struct or a union, (2) the name
- * (always non-empty), (3) a function that when given a representation of the
- * structure type constructs the type of the fields recursive type (the first
- * argument is only useful when some fields need to refer to the type of the
- * structure itself), and (4) an optional list of attributes to be associated
- * with the composite type, "None" means that the struct is incomplete.
- *
- * @since 23.0-Vanadium the 4th parameter is a function that returns an option.
- **)
+    (1) a boolean indicating whether it is a struct or a union, (2) the name
+    (always non-empty), (3) a function that when given a representation of the
+    structure type constructs the type of the fields recursive type (the first
+    argument is only useful when some fields need to refer to the type of the
+    structure itself), and (4) an optional list of attributes to be associated
+    with the composite type, "None" means that the struct is incomplete.
+    @since 23.0-Vanadium the 4th parameter is a function that returns an option.
+*)
 val mkCompInfo: bool ->      (* whether it is a struct or a union *)
   string -> (* name of the composite type; cannot be empty *)
   ?norig:string -> (* original name of the composite type, empty when anonymous *)

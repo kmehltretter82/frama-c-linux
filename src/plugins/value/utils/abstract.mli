@@ -34,7 +34,7 @@
     several times the same leaf module. *)
 
 (** Key and structure for abstract values.
-    See {structure.mli} for more details. *)
+    See {!Structure} for more details. *)
 module Value : sig
   include Structure.Shape
     with type 'a key = 'a Structure.Key_Value.key
@@ -54,7 +54,7 @@ module Value : sig
 end
 
 (** Key and structure for abstract locations.
-    See {structure.mli} for more details. *)
+    See {!Structure} for more details. *)
 module Location : sig
   include Structure.Shape
     with type 'a key = 'a Structure.Key_Location.key
@@ -74,7 +74,7 @@ module Location : sig
 end
 
 (** Key and structure for abstract domains.
-    See {structure.mli} for more details. *)
+    See {!Structure} for more details. *)
 module Domain : sig
   include Structure.Shape
     with type 'a key = 'a Structure.Key_Domain.key

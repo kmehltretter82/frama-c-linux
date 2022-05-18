@@ -591,8 +591,8 @@ val isVariadicListType: typ -> bool
 val argsToList:
   (string * typ * attributes) list option -> (string * typ * attributes) list
 
-(** @since 20.0-Calcium
-    Obtain the argument lists (non-ghost, ghosts) ([], [] if None) *)
+(** Obtain the argument lists (non-ghost, ghosts) ([], [] if None)
+    @since 20.0-Calcium *)
 val argsToPairOfLists:
   (string * typ * attributes) list option ->
   (string * typ * attributes) list * (string * typ * attributes) list
@@ -1526,10 +1526,12 @@ val mk_behavior :
   ?extended:acsl_extension list ->
   unit ->
   Cil_types.behavior
-(** @since Carbon-20101201
-    returns a dummy behavior with the default name [Cil.default_behavior_name].
+(** returns a dummy behavior with the default name [Cil.default_behavior_name].
     invariant: [b_assumes] must always be
-    empty for behavior named [Cil.default_behavior_name] *)
+    empty for behavior named [Cil.default_behavior_name]
+
+    @since Carbon-20101201
+*)
 
 val default_behavior_name: string
 (** @since Carbon-20101201  *)
@@ -2041,7 +2043,9 @@ val is_empty_funspec: funspec -> bool
 val is_empty_behavior: funbehavior -> bool
 
 (* ************************************************************************* *)
-(** {2 ALPHA conversion} has been moved to the Alpha module. *)
+(** {2 Renaming} *)
+
+(** See also the {!Alpha} module for other renaming operations. *)
 (* ************************************************************************* *)
 
 (** Assign unique names to local variables. This might be necessary after you

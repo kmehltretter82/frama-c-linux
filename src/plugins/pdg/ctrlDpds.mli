@@ -35,7 +35,7 @@ val get_if_controlled_stmts : t -> Cil_types.stmt -> Cil_datatype.Stmt.Hptset.t
  * on the given jump statement. This statement can be a [goto] of course,
  * but also a [break], a [continue], or even a loop because CIL transformations
     make them of the form {v while(true) body; v} which is equivalent to
-    {v L : body ; goto L; v}
+    [L : body ; goto L;]
  * *)
 val get_jump_controlled_stmts : t -> Cil_types.stmt -> Cil_datatype.Stmt.Hptset.t
 val get_loop_controlled_stmts : t -> Cil_types.stmt -> Cil_datatype.Stmt.Hptset.t

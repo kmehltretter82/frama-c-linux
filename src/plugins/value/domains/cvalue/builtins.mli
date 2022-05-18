@@ -33,7 +33,7 @@ exception Outside_builtin_possibilities
 (* Signature of a builtin: type of the result, and type of the arguments. *)
 type builtin_type = unit -> typ * typ list
 
-(** Can the results of a builtin be cached? See {eval.mli} for more details.*)
+(** Can the results of a builtin be cached? See {!Eval} for more details.*)
 type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers
 
 type full_result = {

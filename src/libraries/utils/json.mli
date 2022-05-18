@@ -66,7 +66,9 @@ val of_list : t list -> t
 val of_array : t array -> t
 val of_fields : (string * t) list -> t
 
-(** {2 Parsers} Parsing raise [Error] in case of error. *)
+(** {2 Parsers} *)
+
+(** Parsing raise [Error] in case of error. *)
 
 val load_lexbuf : Lexing.lexbuf -> t
 (** Consumes the entire buffer. *)
@@ -80,7 +82,9 @@ val load_string : string -> t
 val load_file : string -> t
 (** May also raise system exception. *)
 
-(** {2 Printers} Printers use formatting unless [~pretty:false]. *)
+(** {2 Printers} *)
+
+(** Printers use formatting unless [~pretty:false]. *)
 
 val save_string : ?pretty:bool -> t -> string
 val save_buffer : ?pretty:bool -> Buffer.t -> t -> unit
@@ -88,9 +92,9 @@ val save_channel : ?pretty:bool -> out_channel -> t -> unit
 val save_formatter : ?pretty:bool -> Format.formatter -> t -> unit
 val save_file : ?pretty:bool -> string -> t -> unit
 
-(** {2 Accessors}
-    Accessors raise exception [Invalid_argument] in case of wrong
-    format. *)
+(** {2 Accessors} *)
+
+(** Accessors raise exception [Invalid_argument] in case of wrong format. *)
 
 val bool : t -> bool
 (** Extract [True] and [False] only.

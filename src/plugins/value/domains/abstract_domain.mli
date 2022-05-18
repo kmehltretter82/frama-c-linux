@@ -385,7 +385,7 @@ module type S = sig
   (** {3 Transfer Functions } *)
 
   (** Transfer functions from the result of evaluations.
-      See {eval.mli} for more details about valuation. *)
+      See {!Eval} for more details about valuation. *)
   include Transfer with type state := t
                     and type value := value
                     and type location := location

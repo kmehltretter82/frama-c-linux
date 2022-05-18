@@ -34,9 +34,9 @@ val is_src_fun_visible :
   Cil_types.kernel_function -> bool
 
 (**
- * @raise SlicingTypes.ExternalFunction if the function has no source code,
- *        because there cannot be any slice for it.
-   * @raise SlicingTypes.NoPdg when there is no PDG for the function.
+   @raise SlicingTypes.ExternalFunction if the function has no source code,
+        because there cannot be any slice for it.
+   @raise SlicingTypes.NoPdg when there is no PDG for the function.
 *)
 val make_new_ff : fct_info -> bool -> fct_slice * criterion list
 
