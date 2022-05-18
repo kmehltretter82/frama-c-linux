@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- Frama-C States
 // --------------------------------------------------------------------------
@@ -91,7 +89,7 @@ Server.onShutdown(() => {
  * Current Project (Custom React Hook).
  * @return The current project.
  */
-export function useProject() {
+export function useProject(): string | undefined {
   Dome.useUpdate(PROJECT);
   return currentProject;
 }
@@ -104,7 +102,7 @@ export function useProject() {
  * Emits `PROJECT`.
  * @param project The project identifier.
  */
-export async function setProject(project: string) {
+export async function setProject(project: string): Promise<void> {
   if (Server.isRunning()) {
     try {
       const sr: Server.SetRequest<string, null> = {
@@ -162,11 +160,11 @@ export function useRequest<In, Out>(
   const footprint =
     project ? JSON.stringify([project, rq.name, params]) : undefined;
 
-  const update = (opt: Out | undefined | null) => {
+  const update = (opt: Out | undefined | null): void => {
     if (opt !== null) setResponse(opt);
   };
 
-  async function trigger() {
+  async function trigger(): Promise<void> {
     if (project && rq && params !== undefined) {
       try {
         update(options.pending);
@@ -285,14 +283,14 @@ class SyncState<A> {
     PROJECT.on(this.update);
   }
 
-  getValue() {
+  getValue(): A | undefined {
     if (!this.upToDate && Server.isRunning()) {
       this.update();
     }
     return this.value;
   }
 
-  async setValue(v: A) {
+  async setValue(v: A): Promise<void> {
     try {
       this.upToDate = true;
       this.value = v;
@@ -308,7 +306,7 @@ class SyncState<A> {
     }
   }
 
-  async update() {
+  async update(): Promise<void> {
     try {
       this.upToDate = true;
       this.value = undefined;
@@ -390,11 +388,11 @@ class SyncArray<K, A> {
     this.update = this.update.bind(this);
   }
 
-  update() {
+  update(): void {
     if (!this.upToDate && Server.isRunning()) this.fetch();
   }
 
-  async fetch() {
+  async fetch(): Promise<void> {
     if (this.fetching || !Server.isRunning()) return;
     try {
       this.fetching = true;
@@ -423,7 +421,7 @@ class SyncArray<K, A> {
     }
   }
 
-  async reload() {
+  async reload(): Promise<void> {
     try {
       this.model.clear();
       this.upToDate = false;
@@ -466,7 +464,7 @@ Server.onShutdown(() => syncArrays.clear());
 // --------------------------------------------------------------------------
 
 /** Force a Synchronized Array to reload. */
-export function reloadArray<K, A>(arr: Array<K, A>) {
+export function reloadArray<K, A>(arr: Array<K, A>): void {
   lookupSyncArray(arr).reload();
 }
 
@@ -775,12 +773,12 @@ export const GlobalSelection = new GlobalState<Selection>(emptySelection);
 
 Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
 
-export function setHovered(h: Hovered) { GlobalHovered.setValue(h); }
+export function setHovered(h: Hovered): void { GlobalHovered.setValue(h); }
 export function useHovered(): [Hovered, (h: Hovered) => void] {
   return useGlobalState(GlobalHovered);
 }
 
-export function setSelection(location: Location, meta = false) {
+export function setSelection(location: Location, meta = false): void {
   const s = GlobalSelection.getValue();
   GlobalSelection.setValue(reducer(s, { location }));
   if (meta) MetaSelection.emit(location);
@@ -791,12 +789,12 @@ export function useSelection(): [Selection, (a: SelectionActions) => void] {
   const [current, setCurrent] = useGlobalState(GlobalSelection);
   const callback = React.useCallback((action) => {
     setCurrent(reducer(current, action));
-  }, [ current, setCurrent ]);
+  }, [current, setCurrent]);
   return [current, callback];
 }
 
 /** Resets the selected locations. */
-export async function resetSelection() {
+export async function resetSelection(): Promise<void> {
   GlobalSelection.setValue(emptySelection);
   if (Server.isRunning()) {
     try {

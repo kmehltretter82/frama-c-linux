@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- Dispatch Layout
 // --------------------------------------------------------------------------
@@ -97,7 +95,7 @@ export interface ElementProps {
    Multiple definitions of the same element might produce
    unpredictable results.
  */
-export function DefineElement(props: ElementProps) {
+export function DefineElement(props: ElementProps): JSX.Element | null {
   React.useEffect(() => {
     const item = getItem(props.id);
     item.update(props.children);
@@ -122,14 +120,14 @@ export interface RenderProps {
    of the item, or `undefined` if there is no identifier or no
    corresponding `<DefineElement />` currently mounted.
  */
-export function RenderElement(props: RenderProps) {
+export function RenderElement(props: RenderProps): JSX.Element {
   const [age, setAge] = React.useState(0);
   const { id, children } = props;
   const item = id ? getItem(id) : undefined;
   React.useEffect(() => {
     if (item) {
       const { event } = item;
-      const trigger = () => setAge(age + 1);
+      const trigger = (): void => setAge(age + 1);
       event.on(trigger);
       return () => event.off(trigger);
     }
@@ -137,9 +135,9 @@ export function RenderElement(props: RenderProps) {
   }, [age, item]);
   if (item) item.rendered = true;
   if (typeof (children) === 'function')
-    return children(item?.content);
-  const content = item?.content || children;
-  return content;
+    return <>{children(item?.content)}</>;
+  const content = item?.content || children || null;
+  return <>{content}</>;
 }
 
 // --------------------------------------------------------------------------

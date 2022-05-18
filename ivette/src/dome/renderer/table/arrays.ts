@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- Array Models
 // --------------------------------------------------------------------------
@@ -64,8 +62,8 @@ function orderBy<K, R>(
   const byData = columns[dataKey] ?? Compare.equal;
   const rv = ord.sortDirection === 'DESC';
   type D = PACK<K, R>;
-  const byEntry = (x: D, y: D) => byData(x.row, y.row);
-  const byIndex = (x: D, y: D) => (x.index ?? 0) - (y.index ?? 0);
+  const byEntry = (x: D, y: D): number => byData(x.row, y.row);
+  const byIndex = (x: D, y: D): number => (x.index ?? 0) - (y.index ?? 0);
   return Compare.direction(Compare.sequence(byEntry, byIndex), rv);
 }
 
@@ -165,20 +163,20 @@ export class ArrayModel<Key, Row>
   // --------------------------------------------------------------------------
 
   /** Non filtered. */
-  getTotalRowCount() { return this.getRowCount() + this.filtered; }
+  getTotalRowCount(): number { return this.getRowCount() + this.filtered; }
 
-  getRowCount() { return this.rebuild().length; }
+  getRowCount(): number { return this.rebuild().length; }
 
-  getRowAt(k: number) { return this.rebuild()[k]?.row; }
+  getRowAt(k: number): Row { return this.rebuild()[k]?.row; }
 
-  getKeyAt(k: number) {
+  getKeyAt(k: number): Key | undefined {
     const current = this.table;
     return current ? current[k]?.key : undefined;
   }
 
-  getKeyFor(k: number, _: Row) { return this.getKeyAt(k); }
+  getKeyFor(k: number, _: Row): Key | undefined { return this.getKeyAt(k); }
 
-  getIndexOf(key: Key) {
+  getIndexOf(key: Key): number | undefined {
     const pack = this.index.get(key);
     if (!pack) return undefined;
     const k = pack.index;
@@ -197,7 +195,7 @@ export class ArrayModel<Key, Row>
       [[setNaturalOrder]] in response to user column selection with
       [[setSorting]] provided you enable by-column sorting from the table view.
       Finally triggers a reload. */
-  setColumnOrder(columns?: ByColumns<Row>) {
+  setColumnOrder(columns?: ByColumns<Row>): void {
     this.columns = { ...this.columns, ...columns };
     this.reload();
   }
@@ -207,7 +205,7 @@ export class ArrayModel<Key, Row>
       primary ordering can be refined in response to user column selection with
       [[setSorting]] provided you enable by-column sorting from the table view.
       Finally triggers a reload. */
-  setNaturalOrder(order?: Order<Row>) {
+  setNaturalOrder(order?: Order<Row>): void {
     this.natural = order;
     this.reload();
   }
@@ -217,7 +215,7 @@ export class ArrayModel<Key, Row>
      orders by fields. This is a combination of [[setColumnOrder]] and
      [[setNaturalOrder]] with [[dome/data/compare.byFields]].
    */
-  setOrderingByFields(byfields: ByFields<Row>) {
+  setOrderingByFields(byfields: ByFields<Row>): void {
     this.natural = Compare.byFields(byfields);
     const columns = this.columns ?? {};
     const keys = Object.keys(byfields);
@@ -240,7 +238,7 @@ export class ArrayModel<Key, Row>
   /**
      Remove the sorting function for the provided column.
    */
-  deleteColumnOrder(dataKey: string) {
+  deleteColumnOrder(dataKey: string): void {
     const { columns } = this;
     if (columns) delete columns[dataKey];
     this.ring = this.ring.filter((ord) => ord.sortBy !== dataKey);
@@ -250,7 +248,7 @@ export class ArrayModel<Key, Row>
   /** Reorder rows with the provided column and direction.
       Previous ordering is kept and refined by the new one.
       Use `undefined` or `null` to reset the natural ordering. */
-  setSorting(ord?: undefined | null | SortingInfo) {
+  setSorting(ord?: undefined | null | SortingInfo): void {
     if (ord) {
       const { ring } = this;
       const cur = ring[0];
@@ -284,7 +282,7 @@ export class ArrayModel<Key, Row>
   // --- Filtering
   // --------------------------------------------------------------------------
 
-  setFilter(fn?: Filter<Key, Row>) {
+  setFilter(fn?: Filter<Key, Row>): void {
     const phi = this.filter;
     if (phi !== fn) {
       this.filter = fn;
@@ -297,7 +295,7 @@ export class ArrayModel<Key, Row>
   // --------------------------------------------------------------------------
 
   /** Trigger a complete reload of the table. */
-  reload() {
+  reload(): void {
     this.array = undefined;
     this.table = undefined;
     this.order = undefined;
@@ -305,7 +303,7 @@ export class ArrayModel<Key, Row>
   }
 
   /** Remove all data and reload. */
-  clear() {
+  clear(): void {
     this.index.clear();
     this.reload();
   }
@@ -370,7 +368,7 @@ export class ArrayModel<Key, Row>
      @param key - the entry identifier
      @param row - new value of `null` for removal
    */
-  update(key: Key, row?: undefined | null | Row) {
+  update(key: Key, row?: undefined | null | Row): void {
     if (row === undefined) return;
     const pack = this.index.get(key);
     let doReload = false;
@@ -406,7 +404,7 @@ export class ArrayModel<Key, Row>
      Modification will be only visible after a final [[reload]].
      Useful for a large number of batched updates.
   */
-  removeAllData() {
+  removeAllData(): void {
     this.index.clear();
   }
 
@@ -416,7 +414,7 @@ export class ArrayModel<Key, Row>
      Useful for a large number of batched updates.
      @param key - the removed entry.
    */
-  removeData(keys: Collection<Key>) {
+  removeData(keys: Collection<Key>): void {
     forEach(keys, (k) => this.index.delete(k));
   }
 
@@ -427,7 +425,7 @@ export class ArrayModel<Key, Row>
      @param key - the entry to update.
      @param row - the new row data or `null` for removal.
    */
-  setData(key: Key, row: null | Row) {
+  setData(key: Key, row: null | Row): void {
     if (row !== null) {
       this.index.set(key, { key, row, index: undefined });
     } else {
@@ -471,19 +469,21 @@ export class CompactModel<Key, Row> extends ArrayModel<Key, Row> {
   }
 
   /** Use the key getter directly. */
-  getKeyFor(_: number, data: Row) { return this.getkey(data); }
+  getKeyFor(_: number, data: Row): Key | undefined { return this.getkey(data); }
 
-  /** Silently add or update a collection of data.
-      Requires a final trigger to update views. */
-  updateData(data: Collection<Row>) {
+  /**
+     Silently add or update a collection of data.
+     Requires a final trigger to update views.
+  */
+  updateData(data: Collection<Row>): void {
     forEach(data, (row: Row) => this.setData(this.getkey(row), row));
   }
 
   /**
      Replace all previous data with the new ones.
      Finally triggers a reload.
-   */
-  replaceAllDataWith(data: Collection<Row>) {
+  */
+  replaceAllDataWith(data: Collection<Row>): void {
     this.removeAllData();
     this.updateData(data);
     this.reload();

@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 /* --------------------------------------------------------------------------*/
 /* --- Form Fields                                                        ---*/
 /* --------------------------------------------------------------------------*/
@@ -373,10 +371,12 @@ interface FormContext {
 const CONTEXT = React.createContext<FormContext | undefined>(undefined);
 
 const HIDDEN =
-  ({ hidden = false, visible = true }: FilterProps) => hidden || !visible;
+  ({ hidden = false, visible = true }: FilterProps): boolean =>
+    hidden || !visible;
 
 const DISABLED =
-  ({ disabled = false, enabled = true }: FilterProps) => disabled || !enabled;
+  ({ disabled = false, enabled = true }: FilterProps): boolean =>
+    disabled || !enabled;
 
 function useContext(props?: FilterProps): FormContext {
   const Parent = React.useContext(CONTEXT);
@@ -390,7 +390,7 @@ function useContext(props?: FilterProps): FormContext {
    Allow to locally disable or hide all its children fields.
    @category Form Containers
 */
-export function FormFilter(props: FilterProps & Children) {
+export function FormFilter(props: FilterProps & Children): JSX.Element | null {
   const context = useContext(props);
   if (context.hidden) return null;
   return (
@@ -416,7 +416,7 @@ export interface PageProps extends FilterProps, Children {
    Main Form Container.
    @category Form Containers
  */
-export function Page(props: PageProps) {
+export function Page(props: PageProps): JSX.Element | null {
   const { className, style, children, ...filter } = props;
   const { hidden, disabled } = useContext(filter);
   const css = Utils.classes(className ?? 'dome-xForm-grid');
@@ -444,7 +444,7 @@ export interface WarningProps {
 }
 
 /** Warning Badge. */
-export function Warning(props: WarningProps) {
+export function Warning(props: WarningProps): JSX.Element {
   const { warning, error, offset = 0 } = props;
   const DETAILS = typeof error === 'string' ? error : undefined;
   const WARNING = warning && (
@@ -472,7 +472,7 @@ export function Warning(props: WarningProps) {
    Layout its contents inside a full-width container.
    @category Form Containers
  */
-export function FormBlock(props: FilterProps & Children) {
+export function FormBlock(props: FilterProps & Children): JSX.Element {
   const { children, ...filter } = props;
   return (
     <FormFilter {...filter}>
@@ -504,7 +504,7 @@ export interface SectionProps extends FilterProps, Children {
 }
 
 /** @category Form Fields */
-export function Section(props: SectionProps) {
+export function Section(props: SectionProps): JSX.Element | null {
   const { label, title, children, warning, error, ...filter } = props;
   const { disabled, hidden } = useContext(filter);
   const [unfold, flip] = Dome.useFlipSettings(props.settings, props.unfold);
@@ -558,8 +558,8 @@ export interface GenericFieldProps extends FilterProps, Children {
 let FIELDID = 0;
 
 /** Generates a unique, stable identifier. */
-export function useHtmlFor() {
-  return React.useMemo(() => `dome-field ${FIELDID++}`, []);
+export function useHtmlFor(): string {
+  return React.useMemo(() => `dome-field-${FIELDID++}`, []);
 }
 
 /**
@@ -567,7 +567,7 @@ export function useHtmlFor() {
    Layout its content in a top-left aligned box on the right of the label.
    @category Form Fields
  */
-export function Field(props: GenericFieldProps) {
+export function Field(props: GenericFieldProps): JSX.Element | null {
   const { hidden, disabled } = useContext(props);
 
   if (hidden) return null;
@@ -630,7 +630,8 @@ export interface FieldProps<A> extends FilterProps {
 type InputEvent = { target: { value: string } };
 type InputState = [string, FieldError, (evt: InputEvent) => void];
 
-function useChangeEvent(setState: Callback<string>) {
+function useChangeEvent(setState: Callback<string>)
+  : ((evt: InputEvent) => void) {
   return React.useCallback(
     (evt: InputEvent) => { setState(evt.target.value, undefined); },
     [setState],
@@ -664,7 +665,7 @@ function useTextInputField(
    Text Field.
    @category Text Fields
  */
-export function TextField(props: TextFieldProps) {
+export function TextField(props: TextFieldProps): JSX.Element {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const css = Utils.classes('dome-xForm-text-field', props.className);
@@ -694,7 +695,7 @@ export function TextField(props: TextFieldProps) {
    Monospaced Text Field.
    @category Text Fields
  */
-export function TextCodeField(props: TextFieldProps) {
+export function TextCodeField(props: TextFieldProps): JSX.Element {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const [value, error, onChange] = useTextInputField(props, 600);
@@ -740,7 +741,7 @@ export interface TextFieldAreaProps extends TextFieldProps {
    Text Field Area.
    @category Text Fields
  */
-export function TextFieldArea(props: TextFieldAreaProps) {
+export function TextFieldArea(props: TextFieldAreaProps): JSX.Element {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const [value, error, onChange] = useTextInputField(props, 900);
@@ -778,7 +779,7 @@ export function TextFieldArea(props: TextFieldAreaProps) {
    Monospaced Text Field Area.
    @category Text Fields
  */
-export function TextCodeFieldArea(props: TextFieldAreaProps) {
+export function TextCodeFieldArea(props: TextFieldAreaProps): JSX.Element {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const [value, error, onChange] = useTextInputField(props, 900);
@@ -843,7 +844,7 @@ function NUMBER_OF_TEXT(s: string): number | undefined {
    Text Field for Numbers.
    @category Number Fields
  */
-export function NumberField(props: NumberFieldProps) {
+export function NumberField(props: NumberFieldProps): JSX.Element {
   const { units, latency = 600 } = props;
   const { disabled } = useContext(props);
   const id = useHtmlFor();
@@ -895,7 +896,7 @@ export interface SpinnerFieldProps extends NumberFieldProps {
    Spinner Field
    @category Number Fields
  */
-export function SpinnerField(props: SpinnerFieldProps) {
+export function SpinnerField(props: SpinnerFieldProps): JSX.Element {
   const { units, min, max, step = 1, latency = 600, checker } = props;
   const { disabled } = useContext(props);
   const id = useHtmlFor();
@@ -962,14 +963,15 @@ export interface SliderFieldProps extends FieldProps<number> {
   latency?: number;
 }
 
-const FORMAT_VALUE = (v: number) => Number(v).toString();
-const FORMAT_RANGE = (v: number) => (v > 0 ? `+${v}` : `-${-v}`);
-const FORMATING = (props: SliderFieldProps) => {
-  const { labelValue = true, min } = props;
-  if (labelValue === false) return undefined;
-  if (labelValue === true) return min < 0 ? FORMAT_RANGE : FORMAT_VALUE;
-  return labelValue;
-};
+const FORMAT_VALUE = (v: number): string => Number(v).toString();
+const FORMAT_RANGE = (v: number): string => (v > 0 ? `+${v}` : `-${-v}`);
+const FORMATING =
+  (props: SliderFieldProps): (undefined | ((v: number) => string)) => {
+    const { labelValue = true, min } = props;
+    if (labelValue === false) return undefined;
+    if (labelValue === true) return min < 0 ? FORMAT_RANGE : FORMAT_VALUE;
+    return labelValue;
+  };
 
 const CSS_SLIDER = 'dome-text-label dome-xForm-units dome-xForm-slider-value';
 const SHOW_SLIDER = `${CSS_SLIDER} dome-xForm-slider-show`;
@@ -979,7 +981,7 @@ const HIDE_SLIDER = `${CSS_SLIDER} dome-xForm-slider-hide`;
    Slider Field
    @category Number Fields
  */
-export function SliderField(props: SliderFieldProps) {
+export function SliderField(props: SliderFieldProps): JSX.Element {
   const { min, max, step = 1, latency = 600, onReset } = props;
   const { disabled } = useContext(props);
   const id = useHtmlFor();
@@ -1062,7 +1064,7 @@ export interface TimeOrDateFieldProps extends FieldProps<string | undefined> {
 
    @category Time and Date Fields
  */
-export function DateField(props: TimeOrDateFieldProps) {
+export function DateField(props: TimeOrDateFieldProps): JSX.Element {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const css = Utils.classes('dome-xForm-date-field', props.className);
@@ -1098,7 +1100,7 @@ export function DateField(props: TimeOrDateFieldProps) {
 
    @category Time and Date Fields
  */
-export function TimeField(props: TimeOrDateFieldProps) {
+export function TimeField(props: TimeOrDateFieldProps): JSX.Element {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const css = Utils.classes('dome-xForm-date-field', props.className);
@@ -1132,7 +1134,7 @@ export function TimeField(props: TimeOrDateFieldProps) {
 export type ColorFieldProps = FieldProps<string | undefined>;
 
 /** @category Form Fields */
-export function ColorField(props: ColorFieldProps) {
+export function ColorField(props: ColorFieldProps): JSX.Element {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const [value, error, onChange] = useTextInputField(props, 600);
@@ -1165,7 +1167,7 @@ export interface CheckboxFieldProps extends FieldProps<boolean> {
 }
 
 /** @category Form Fields */
-export function CheckboxField(props: CheckboxFieldProps) {
+export function CheckboxField(props: CheckboxFieldProps): JSX.Element | null {
   const { hidden, disabled } = useContext(props);
 
   if (hidden) return null;
@@ -1176,7 +1178,7 @@ export function CheckboxField(props: CheckboxFieldProps) {
     'dome-xForm-field dome-text-label',
     disabled && 'dome-disabled',
   );
-  const onChange = () => setState(!value, undefined);
+  const onChange = (): void => setState(!value, undefined);
   return (
     <Checkbox
       className={css}
@@ -1199,13 +1201,13 @@ export interface RadioFieldProps<A> extends FieldProps<A> {
 }
 
 /** @category Form Fields */
-export function RadioField<A>(props: RadioFieldProps<A>) {
+export function RadioField<A>(props: RadioFieldProps<A>): JSX.Element | null {
   const { hidden, disabled } = useContext(props);
 
   if (hidden) return null;
 
   const [selection, , setState] = props.state;
-  const onSelection = (value: A) => setState(value, undefined);
+  const onSelection = (value: A): void => setState(value, undefined);
   const { label, title, value } = props;
   const css = Utils.classes(
     'dome-xForm-field dome-text-label',
@@ -1240,11 +1242,12 @@ export interface SelectFieldProps extends FieldProps<string | undefined> {
 
    @category Form Fields
  */
-export function SelectField(props: SelectFieldProps) {
+export function SelectField(props: SelectFieldProps): JSX.Element {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const [value, error, setState] = useChecker(props.state, props.checker);
-  const onChange = (newValue?: string) => setState(newValue, undefined);
+  const onChange =
+    (newValue: string | undefined): void => setState(newValue, undefined);
   const { children, placeholder } = props;
   return (
     <Field

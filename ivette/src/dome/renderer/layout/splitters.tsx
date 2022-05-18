@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- Splitters
 // --------------------------------------------------------------------------
@@ -129,7 +127,7 @@ type CSS = {
   split: string;
 };
 
-const getFlexCSS = (hsplit: boolean, fold: boolean) => (
+const getFlexCSS = (hsplit: boolean, fold: boolean): string => (
   hsplit ? (fold ? HFOLD : HPANE) : (fold ? VFOLD : VPANE)
 );
 
@@ -189,7 +187,7 @@ function getSettingsFromPosition(L: Layout, P: number, D: number): number {
   return P / D;
 }
 
-const inRange = (M: number, D: number, P: number) => (
+const inRange = (M: number, D: number, P: number): number => (
   D < M ? D / 2 : Math.min(Math.max(P, M), D - M)
 );
 
@@ -200,7 +198,7 @@ const inRange = (M: number, D: number, P: number) => (
 interface SplitterLayoutProps extends SplitterFoldProps { layout: Layout }
 interface SplitterEngineProps extends SplitterLayoutProps { size: Size }
 
-function SplitterEngine(props: SplitterEngineProps) {
+function SplitterEngine(props: SplitterEngineProps): JSX.Element {
   const defaultPosition = props.defaultPosition ?? 0;
   const [settings, setSettings] =
     Dome.useNumberSettings(props.settings, defaultPosition);
@@ -300,7 +298,7 @@ function SplitterEngine(props: SplitterEngineProps) {
   );
 }
 
-const SplitterLayout = (props: SplitterLayoutProps) => (
+const SplitterLayout = (props: SplitterLayoutProps): JSX.Element => (
   <div className={CONTAINER}>
     <AutoSizer>
       {(size: Size) => (
@@ -335,39 +333,39 @@ const getLayout = (d: Direction): Layout => {
 /** Splitter with specified direction.
    @category Base Component
 */
-export function Splitter(props: SplitterDirProps) {
+export function Splitter(props: SplitterDirProps): JSX.Element {
   const { direction, ...others } = props;
   const layout = getLayout(direction);
   return <SplitterLayout layout={layout} {...others} />;
 }
 
 /** Horizontal Splitter. */
-export function HSplit(props: SplitterBaseProps) {
+export function HSplit(props: SplitterBaseProps): JSX.Element {
   return <SplitterLayout layout={HLayout} {...props} />;
 }
 
 /** Vertical Splitter. */
-export function VSplit(props: SplitterBaseProps) {
+export function VSplit(props: SplitterBaseProps): JSX.Element {
   return <SplitterLayout layout={VLayout} {...props} />;
 }
 
 /** Horizontal Splitter with stacked and foldable left element. */
-export function LSplit(props: SplitterFoldProps) {
+export function LSplit(props: SplitterFoldProps): JSX.Element {
   return <SplitterLayout layout={LLayout} {...props} />;
 }
 
 /** Horizontal Splitter with stacked and foldable right element. */
-export function RSplit(props: SplitterFoldProps) {
+export function RSplit(props: SplitterFoldProps): JSX.Element {
   return <SplitterLayout layout={RLayout} {...props} />;
 }
 
 /** Vertical Splitter with stacked and foldable top element. */
-export function TSplit(props: SplitterFoldProps) {
+export function TSplit(props: SplitterFoldProps): JSX.Element {
   return <SplitterLayout layout={TLayout} {...props} />;
 }
 
 /** Vertical Splitter with stacked and foldable bottom element. */
-export function BSplit(props: SplitterFoldProps) {
+export function BSplit(props: SplitterFoldProps): JSX.Element {
   return <SplitterLayout layout={BLayout} {...props} />;
 }
 
