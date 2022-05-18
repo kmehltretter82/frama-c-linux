@@ -2043,7 +2043,9 @@ val is_empty_funspec: funspec -> bool
 val is_empty_behavior: funbehavior -> bool
 
 (* ************************************************************************* *)
-(** {2 ALPHA conversion has been moved to the Alpha module} *)
+(** {2 Renaming} *)
+
+(** See also the {!Alpha} module for other renaming operations. *)
 (* ************************************************************************* *)
 
 (** Assign unique names to local variables. This might be necessary after you

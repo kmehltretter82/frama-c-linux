@@ -73,7 +73,7 @@ end
     Conversely, some functions, suffixed by [_under] assumes that their arguments
     are under-approximations, and returns a result that under-approximates the
     concrete operation. The functions [link] and [meet] in
-    {! With_Under_Approximation} are exceptions, that are not suffixed by [_under].
+    {!With_Under_Approximation} are exceptions, that are not suffixed by [_under].
 
     Finally, some functions are *exact*, in the sense that they preserve the
     concretization of the concrete function. Hence, they implement
