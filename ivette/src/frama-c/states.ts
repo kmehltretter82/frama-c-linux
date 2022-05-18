@@ -284,10 +284,11 @@ class SyncState<A> {
   }
 
   getValue(): A | undefined {
-    if (!this.upToDate && Server.isRunning()) {
+    const running = Server.isRunning();
+    if (!this.upToDate && running) {
       this.update();
     }
-    return this.value;
+    return running ? this.value : undefined;
   }
 
   async setValue(v: A): Promise<void> {
@@ -309,11 +310,12 @@ class SyncState<A> {
   async update(): Promise<void> {
     try {
       this.upToDate = true;
-      this.value = undefined;
-      this.UPDATE.emit();
       if (Server.isRunning()) {
         const v = await Server.send(this.handler.getter, null);
         this.value = v;
+        this.UPDATE.emit();
+      } else if (this.value !== undefined) {
+        this.value = undefined;
         this.UPDATE.emit();
       }
     } catch (error) {
@@ -321,6 +323,7 @@ class SyncState<A> {
         `Fail to update SyncState '${this.handler.name}'.`,
         `${error}`,
       );
+      this.value = undefined;
       this.UPDATE.emit();
     }
   }
