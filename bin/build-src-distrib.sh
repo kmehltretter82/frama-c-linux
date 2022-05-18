@@ -799,7 +799,7 @@ case "${STEP}" in
         echo >> "$OUT_DIR/opam"
         echo "url {" >> "$OUT_DIR/opam"
         echo "  src: \"https://git.frama-c.com/pub/frama-c/-/wikis/downloads/$TARGZ_FILENAME\"" >> "$OUT_DIR/opam"
-        echo "  checksum: \"md5=$(md5sum $OUT_DIR/$TARGZ_FILENAME | cut -d" " -f1)\"" >> "$OUT_DIR/opam"
+        echo "  checksum: \"sha256=$(sha256sum $OUT_DIR/$TARGZ_FILENAME | cut -d" " -f1)\"" >> "$OUT_DIR/opam"
         echo "}" >> "$OUT_DIR/opam"
         ;&
     10)
