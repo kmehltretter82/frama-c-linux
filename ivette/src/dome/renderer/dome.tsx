@@ -181,7 +181,7 @@ export function useEmitter(
   emitter: undefined | null | Emitter,
   event: undefined | null | string,
   callback: () => void,
-) {
+): void {
   return React.useEffect((): (undefined | (() => void)) => {
     if (emitter && event) {
       emitter.on(event, callback);
