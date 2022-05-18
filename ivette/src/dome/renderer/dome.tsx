@@ -42,6 +42,7 @@
  */
 
 import _ from 'lodash';
+import Emitter from 'events';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
@@ -176,6 +177,21 @@ export function useEvent<A>(
   }, [evt, callback]);
 }
 
+/** Custom React Hook on Node Emitters. */
+export function useEmitter(
+  emitter: undefined | null | Emitter,
+  event: undefined | null | string,
+  callback: () => void,
+) {
+  return React.useEffect((): (undefined | (() => void)) => {
+    if (emitter && event) {
+      emitter.on(event, callback);
+      return () => emitter.off(event, callback);
+    }
+    return undefined;
+  }, [emitter, event, callback]);
+}
+
 // --------------------------------------------------------------------------
 // --- Application Events
 // --------------------------------------------------------------------------
@@ -186,13 +202,13 @@ export function useEvent<A>(
    the window frame is resized.
    You can use it for your own components as an easy-to-use global
    re-render event.
-*/
+ */
 export const update = new Event('dome.update');
 
 /**
    Dome reload event.
    It is emitted when the entire window is reloaded.
-*/
+ */
 export const reload = new Event('dome.reload');
 ipcRenderer.on('dome.ipc.reload', () => reload.emit());
 
