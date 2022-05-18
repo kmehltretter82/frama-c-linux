@@ -26,7 +26,7 @@ Distribute() {
             *)
                 echo "DISTRIB_FILES += $src/$f" >> $Distrib
                 case $f in
-                    *.sh | *.json | */dome/doc/* | configure.js | .* | webpack*.js )
+                    *.sh | *.json | */dome/doc/* | configure.js | sandboxer.js | .* | webpack*.js )
                         echo "$f: .ignore" >> $Headers
                         ;;
                     *Make* | *.js* | *.ts* | *.ml*)
