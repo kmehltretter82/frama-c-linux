@@ -108,14 +108,7 @@ let describe s =
 let validity x =
   if RefUsage.is_nullable x then MemoryContext.Nullable else Valid
 
-module type Proxy = sig
-  val datatype : string
-  val param : Cil_types.varinfo -> MemoryContext.param
-  val iter : ?kf:Kernel_function.t -> init:bool ->
-    (Cil_types.varinfo -> unit) -> unit
-end
-
-module MakeVarUsage(V : Proxy) : MemVar.VarUsage =
+module MakeVarUsage(V : MemVar.VarUsage) : MemVar.VarUsage =
 struct
   let datatype = "VarUsage." ^ V.datatype
 
@@ -140,31 +133,6 @@ end
 (* -------------------------------------------------------------------------- *)
 (* --- Static Proxy (no preliminary analysis)                             --- *)
 (* -------------------------------------------------------------------------- *)
-
-module Raw : Proxy =
-struct
-  let datatype = "Raw"
-  let param _x = MemoryContext.ByValue
-  (* if x.vaddrof then Separation.InHeap else Separation.ByValue *)
-  let iter ?kf ~init f =
-    begin
-      ignore init ;
-      Globals.Vars.iter (fun x _initinfo -> f x) ;
-      match kf with
-      | None -> ()
-      | Some kf -> List.iter f (Kernel_function.get_formals kf) ;
-    end
-end
-
-module Static : Proxy =
-struct
-  let datatype = "Static"
-  let param x =
-    let open Cil_types in
-    if x.vaddrof || Cil.isArrayType x.vtype || Cil.isPointerType x.vtype
-    then MemoryContext.ByAddr else MemoryContext.ByValue
-  let iter = Raw.iter
-end
 
 (* -------------------------------------------------------------------------- *)
 (* --- RefUsage-based Proxies                                             --- *)
@@ -203,21 +171,21 @@ let refusage_param ~byref ~context x =
 
 let refusage_iter ?kf ~init f = RefUsage.iter ?kf ~init (fun x _usage -> f x)
 
-module Var : Proxy =
+module Var : MemVar.VarUsage =
 struct
   let datatype = "Var"
   let param = refusage_param ~byref:false ~context:false
   let iter = refusage_iter
 end
 
-module Ref : Proxy =
+module Ref : MemVar.VarUsage =
 struct
   let datatype = "Ref"
   let param = refusage_param ~byref:true ~context:false
   let iter = refusage_iter
 end
 
-module Caveat : Proxy =
+module Caveat : MemVar.VarUsage =
 struct
   let datatype = "Caveat"
   let param = refusage_param ~byref:true ~context:true
@@ -231,9 +199,10 @@ end
 (* Each model must be instanciated statically because of registered memory
    models identifiers and Frama-C states *)
 
-module Register(V : Proxy)(M : Sigs.Model) = MemVar.Make(MakeVarUsage(V))(M)
+module Register(V : MemVar.VarUsage)(M : Sigs.Model)
+  = MemVar.Make(MakeVarUsage(V))(M)
 
-module Model_Hoare_Raw = Register(Raw)(MemEmpty)
+module Model_Hoare_Raw = Register(MemVar.Raw)(MemEmpty)
 module Model_Hoare_Ref = Register(Ref)(MemEmpty)
 module Model_Typed_Var = Register(Var)(MemTyped)
 module Model_Typed_Ref = Register(Ref)(MemTyped)
@@ -241,14 +210,15 @@ module Model_Caveat = Register(Caveat)(MemTyped)
 
 module MemVal = MemVal.Make(MemVal.Eva)
 
-module MakeCompiler(M:Sigs.Model) = struct
+module MakeCompiler(M:Sigs.Model) =
+struct
   module M = M
   module C = CodeSemantics.Make(M)
   module L = LogicSemantics.Make(M)
   module A = LogicAssigns.Make(M)(L)
 end
 
-module Comp_Region = MakeCompiler(Register(Static)(MemRegion))
+module Comp_Region = MakeCompiler(Register(MemVar.Static)(MemRegion))
 module Comp_MemZeroAlias = MakeCompiler(MemZeroAlias)
 module Comp_Hoare_Raw = MakeCompiler(Model_Hoare_Raw)
 module Comp_Hoare_Ref = MakeCompiler(Model_Hoare_Ref)

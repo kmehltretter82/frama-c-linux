@@ -76,8 +76,9 @@ let pretty fmt = function
   | PExp  (_, _, expr) -> Printer.pp_exp fmt expr
   | PTermLval (_, _, _, lv) -> Printer.pp_term_lval fmt lv
   | PIP prop -> Description.pp_property fmt prop
-  | PStmt(_,stmt) | PStmtStart (_, stmt) -> Printer.pp_stmt fmt stmt
   | PGlobal g -> Printer.pp_global fmt (decl_of g)
+  | PStmt(_,stmt) | PStmtStart (_, stmt) ->
+    Printer.(without_annot pp_stmt) fmt stmt
 
 let pp_ki_loc fmt ki =
   match ki with
@@ -244,6 +245,23 @@ let loc_of_localizable = function
      | None -> Location.unknown
      | Some kf -> Kernel_function.get_location kf)
 
+
+(* -------------------------------------------------------------------------- *)
+(* --- Helper for Globals                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let localizable_of_kf kf =
+  let vi = Globals.Functions.get_vi kf in
+  PVDecl(Some kf,Kglobal,vi)
+
+let localizable_of_global g =
+  match g with
+  | GVarDecl(vi,_) | GVar(vi,_,_) when vi.vglob ->
+    PVDecl(None,Kglobal,vi)
+  | GFun({ svar = vi },_) | GFunDecl(_,vi,_) ->
+    (try PVDecl(Some (Globals.Functions.get vi) , Kglobal, vi)
+     with Not_found -> PGlobal g)
+  | _ -> PGlobal g
 
 (* -------------------------------------------------------------------------- *)
 (* --- Find localizable at a Filepath.position                            --- *)

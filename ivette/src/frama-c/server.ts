@@ -31,6 +31,7 @@
 */
 
 import { debounce } from 'lodash';
+import Path from 'path';
 import React from 'react';
 import * as Dome from 'dome';
 import * as System from 'dome/system';
@@ -414,6 +415,15 @@ export function setConfig(sc: Configuration): void {
  */
 export function getConfig(): Configuration {
   return config;
+}
+
+/**
+   Resolve the file-path with respect to current server config.
+ */
+
+export function getPath(path: string): string {
+  const cwd = config.working ?? System.getWorkingDir();
+  return Path.resolve(cwd, path);
 }
 
 // --------------------------------------------------------------------------

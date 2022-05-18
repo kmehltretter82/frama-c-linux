@@ -84,6 +84,9 @@ export interface TextProps extends CodeMirror.EditorConfiguration {
   /** Font Size. */
   fontSize?: number;
 
+  /** Display or hide the component (true by default). */
+  display?: boolean;
+
   /** Additional className for the text container. */
   className?: string;
 
@@ -545,8 +548,9 @@ export function Text(props: TextProps) {
   if (fontSize !== undefined && fontSize < 4) fontSize = 4;
   if (fontSize !== undefined && fontSize > 48) fontSize = 48;
   const theme = usrTheme ?? (appTheme === 'dark' ? 'dark-code' : 'default');
+  const display = props.display === false ? 'none' : undefined;
   return (
-    <Vfill className={className} style={{ ...style, fontSize }}>
+    <Vfill className={className} style={{ ...style, fontSize, display }}>
       <CodeMirrorWrapper fontSize={fontSize} theme={theme} {...cmprops} />
     </Vfill>
   );
