@@ -2198,7 +2198,7 @@ isutf8-clean:
 clean:: isutf8-clean
 
 BINARY_DISTRIB_FILES := \
-  $(sort $(wildcard ivette/src/dome/doc/template/static/fonts/*)) \
+  $(sort $(wildcard ivette/ivette.icns ivette/src/dome/doc/template/static/fonts/*)) \
   $(sort $(wildcard share/*.ico share/*.png share/theme/*/*.png)) \
 
 FILES_WITHOUT_NEWLINE := \
