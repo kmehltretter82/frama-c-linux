@@ -54,6 +54,10 @@ Useful extensions:
 - `ESlint` provides support for lint errors and warnings;
 - `ES7 React/Redux/GraphQL/React-Native snippets` provides boilerplate snippets;
 
+# Sandboxing
+
+It is possible to add visual tests and playgrounds inside `src/sandbox` directory.
+Please read the associated [src/sandbox/README.md](src/sandbox/README.md) instructions.
 
 # Coding rules
 
