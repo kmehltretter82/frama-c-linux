@@ -177,6 +177,8 @@ wp-tests:
 ################################################################################
 ### DISTRIB
 
+# API documentation
+
 .build_template: &api-doc
   stage: distrib_and_compatibility
   script:
@@ -207,22 +209,7 @@ api-doc-tagged: # Keep artifact forever for tagged branch (in particular stable)
   rules:
     - if: $CI_COMMIT_TAG
 
-.build_template: &frama-c-ocaml
-  stage: distrib_and_compatibility
-  script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.default-config-tests
-  tags:
-    - nix
-
-# frama-c-ocaml-4.11:
-#   variables:
-#     OCAML: "4_11"
-#   <<: *frama-c-ocaml
-
-# frama-c-ocaml-4.13:
-#   variables:
-#     OCAML: "4_13"
-#   <<: *frama-c-ocaml
+# Internalized plugins tests
 
 .build_template: &internal_template
   stage: distrib_and_compatibility
@@ -239,6 +226,8 @@ internal_nightly:
   <<: *internal_template
   only:
     - schedules
+
+# Manuals
 
 manuals: # TODO: restore doc companions
   stage: distrib_and_compatibility
@@ -262,6 +251,26 @@ manuals: # TODO: restore doc companions
       - result/rte-manual.pdf
       - result/user-manual.pdf
       - result/wp-manual.pdf
+
+# OCaml versions
+
+.build_template: &ocaml
+  stage: distrib_and_compatibility
+  script:
+    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.default-config-tests
+  tags:
+    - nix
+
+# ocaml-4.11:
+#   variables:
+#     OCAML: "4_11"
+#   <<: *ocaml
+
+# ocaml-4.13:
+#   variables:
+#     OCAML: "4_13"
+#   <<: *ocaml
+
 
 ################################################################################
 ### PUBLIC
