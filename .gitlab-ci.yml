@@ -182,32 +182,29 @@ wp-tests:
 .build_template: &api-doc
   stage: distrib_and_compatibility
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.api-doc
+    - nix-build -o api nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.api-doc
   tags:
     - nix
 
-api-doc-default: # Check that we successfully build but not artifact
+api-doc-default: # Check that we successfully build but no artifact
   <<: *api-doc
-  rules:
-    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_TAG == null
+
+api-doc-artifact: # Note: the Nix store avoids rebuilding
+  <<: *api-doc
+  artifacts:
+    paths:
+      - api/frama-c-api.tar.gz
+    expire_in: 7 days
+  when: manual
 
 api-doc-scheduled: # Keep artifact for master branch each night
   <<: *api-doc
   artifacts:
     paths:
-      - result/frama-c-api.tar.gz
+      - api/frama-c-api.tar.gz
     expire_in: 7 days # Note: the LAST artifact of the ref is always kept
   only:
     - schedules
-
-api-doc-tagged: # Keep artifact forever for tagged branch (in particular stable)
-  <<: *api-doc
-  artifacts:
-    paths:
-      - result/frama-c-api.tar.gz
-    expire_in: never
-  rules:
-    - if: $CI_COMMIT_TAG
 
 # Internalized plugins tests
 
@@ -232,7 +229,7 @@ internal_nightly:
 .build_template: &manuals
   stage: distrib_and_compatibility
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.manuals
+    - nix-build -o manuals nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.manuals
   tags:
     - nix
 
@@ -241,21 +238,9 @@ manuals-default:
   when: manual
   artifacts:
     paths:
-      - result/*.pdf
-      - result/*.tgz
+      - manuals/*.pdf
+      - manuals/*.tgz
     expire_in: 7 days # Note: the LAST artifact of the ref is always kept
-  rules:
-    - if: $CI_COMMIT_BRANCH && $CI_COMMIT_TAG == null
-
-manuals-tagged:
-  <<: *manuals
-  artifacts:
-    paths:
-      - result/*.pdf
-      - result/*.tgz
-    expire_in: never
-  rules:
-    - if: $CI_COMMIT_TAG
 
 # OCaml versions
 
