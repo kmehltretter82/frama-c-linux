@@ -1,4 +1,4 @@
-#! /usr/bin/bash
+#!/usr/bin/env bash
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -21,21 +21,28 @@
 #                                                                        #
 ##########################################################################
 
-if   [[ $# > 1 ]] ; then
-  echo "usage: $0 [ configuration_file ]"
-  exit 1
-elif [[ $# = 1 ]] ; then
-  source $1
+set -euxo pipefail
+
+if [ ! -f configure ] ; then
+  echo "No 'configure' file, you should first run 'autoconf'"
+  exit 2
 fi
 
-VERSION=${VERSION:-$(cat VERSION)}
-CODENAME=${CODENAME:-$(cat VERSION_CODENAME)}
+EXTERNAL_PLUGINS=$(find src/plugins -type d -name ".git" | sed "s/.git//")
 
-FRAMAC=frama-c-$VERSION-$CODENAME
+FRAMAC="frama-c.tar"
+git archive HEAD -o $FRAMAC --prefix "frama-c/"
 
-FPATH=$FRAMAC/
+ACC=$FRAMAC
 
-git archive --format=tar --prefix $FPATH HEAD > $FRAMAC.tar
+for plugin in $EXTERNAL_PLUGINS ; do
+   TAR="$(basename $plugin).tar"
+   git -C $plugin archive HEAD -o $TAR --prefix "frama-c/$plugin/"
+   ACC="$ACC $plugin$TAR"
+done
 
-TRANSFO="s,^,$FPATH,"
-tar rf $FRAMAC.tar configure --transform $TRANSFO
+tar --concatenate --file=$ACC
+tar rf $FRAMAC configure --transform 's,^,frama-c/,'
+gzip -9 < $FRAMAC > $FRAMAC.gz
+
+rm -f $ACC
