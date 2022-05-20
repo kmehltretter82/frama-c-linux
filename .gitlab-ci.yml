@@ -177,16 +177,35 @@ wp-tests:
 ################################################################################
 ### DISTRIB
 
-api-doc:
+.build_template: &api-doc
   stage: distrib_and_compatibility
   script:
     - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.api-doc
   tags:
     - nix
-  when: manual
+
+api-doc-default: # Check that we successfully build but not artifact
+  <<: *api-doc
+  rules:
+    - if: $CI_COMMIT_BRANCH
+
+api-doc-scheduled: # Keep artifact for master branch each night
+  <<: *api-doc
   artifacts:
     paths:
       - result/frama-c-api.tar.gz
+    expire_in: 14 days
+  only:
+    - schedules
+
+api-doc-tagged: # Keep artifact forever for tagged branch (in particular stable)
+  <<: *api-doc
+  artifacts:
+    paths:
+      - result/frama-c-api.tar.gz
+    expire_in: never
+  rules:
+    - if: $CI_COMMIT_TAG
 
 .build_template: &frama-c-ocaml
   stage: distrib_and_compatibility
