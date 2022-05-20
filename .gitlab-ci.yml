@@ -229,28 +229,33 @@ internal_nightly:
 
 # Manuals
 
-manuals: # TODO: restore doc companions
+.build_template: &manuals
   stage: distrib_and_compatibility
   script:
     - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.manuals
   tags:
     - nix
+
+manuals-default:
+  <<: *manuals
   when: manual
   artifacts:
     paths:
-      - result/acsl-implementation.pdf
-      - result/acsl.pdf
-      - result/aorai-example.tgz
-      - result/aorai-manual.pdf
-      - result/e-acsl-implementation.pdf
-      - result/e-acsl-manual.pdf
-      - result/e-acsl.pdf
-      - result/eva-manual.pdf
-      - result/metrics-manual.pdf
-      - result/plugin-development-guide.pdf
-      - result/rte-manual.pdf
-      - result/user-manual.pdf
-      - result/wp-manual.pdf
+      - result/*.pdf
+      - result/*.tgz
+    expire_in: 14 days
+  rules:
+    - if: $CI_COMMIT_BRANCH
+
+manuals-tagged:
+  <<: *manuals
+  artifacts:
+    paths:
+      - result/*.pdf
+      - result/*.tgz
+    expire_in: never
+  rules:
+    - if: $CI_COMMIT_TAG
 
 # OCaml versions
 
