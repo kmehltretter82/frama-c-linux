@@ -1,4 +1,4 @@
 /configure
 /Makefile
-/tests/**/dune
+/tests/*/oracle/dune
 /tests/*/result
