@@ -236,7 +236,7 @@ module type Weak_hashtbl = sig
 
   val find: data -> data
   (** [find x] returns an instance of [x] found in table.
-      @Raise Not_found if there is no such element.
+      @raise Not_found if there is no such element.
       @since Boron-20100401 *)
 
   val find_all: data -> data list
@@ -545,7 +545,9 @@ module States: sig
   (** iterates a function [f] over all registered states.  Arguments of [f] are
       its name, its type value, its value for the given project
       ([Project.current ()] by default) and a boolean which indicates if it is
-      already computed.  @since Fluorine-20130401 *)
+      already computed.
+      @since Fluorine-20130401
+  *)
 
   val fold:
     ?prj:Project.t ->

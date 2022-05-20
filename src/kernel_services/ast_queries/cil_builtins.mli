@@ -49,7 +49,7 @@ open Cil_types
 
 (** This module associates the name of a built-in function that might be used
     during elaboration with the corresponding varinfo.  This is done when
-    parsing ${FRAMAC_SHARE}/libc/__fc_builtins.h, which is always performed
+    parsing [${FRAMAC_SHARE}/libc/__fc_builtins.h], which is always performed
     before processing the actual list of files provided on the command line (see
     {!File.init_from_c_files}).  Actual list of such built-ins is managed in
     {!Cabs2cil}. *)

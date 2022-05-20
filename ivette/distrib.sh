@@ -21,12 +21,12 @@ Distribute() {
     for f in $(git -C $repo ls-files .)
     do
         case $f in
-            Makefile.distrib | headers/* )
+            Makefile.distrib | headers/* | ivette.icns )
             ;;
             *)
                 echo "DISTRIB_FILES += $src/$f" >> $Distrib
                 case $f in
-                    *.sh | *.json | */dome/doc/* | configure.js | .* | webpack*.js )
+                    *.sh | *.json | */dome/doc/* | configure.js | sandboxer.js | .* | webpack*.js )
                         echo "$f: .ignore" >> $Headers
                         ;;
                     *Make* | *.js* | *.ts* | *.ml*)

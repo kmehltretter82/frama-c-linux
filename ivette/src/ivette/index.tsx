@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 /* --------------------------------------------------------------------------*/
 /* --- Lab View Component                                                 ---*/
 /* --------------------------------------------------------------------------*/
@@ -38,7 +36,6 @@ import { DefineElement } from 'dome/layout/dispatch';
 import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
 import * as Lab from 'ivette@lab';
 import * as Ext from 'ivette@ext';
-import Sandbox from './sandbox';
 
 /* --------------------------------------------------------------------------*/
 /* --- Items                                                              ---*/
@@ -74,7 +71,7 @@ let GROUP: string | undefined;
    If provided, the group is used by default for all components registered
    during the continuation.
  */
-export function registerGroup(group: ItemProps, job?: () => void) {
+export function registerGroup(group: ItemProps, job?: () => void): void {
   Lab.addLibraryItem('groups', group);
   if (job) {
     const STACK = GROUP;
@@ -96,7 +93,7 @@ export function registerGroup(group: ItemProps, job?: () => void) {
  */
 export type Layout = string | Layout[];
 
-function makeLayout(ly: Layout, hsplit = false) {
+function makeLayout(ly: Layout, hsplit = false): JSX.Element | null {
   if (typeof (ly) === 'string') return <GridItem id={ly} />;
   if (!ly) return null;
   if (hsplit) {
@@ -122,7 +119,7 @@ export interface ViewLayoutProps extends ItemProps {
 }
 
 /** Register a new View. */
-export function registerView(view: ViewLayoutProps) {
+export function registerView(view: ViewLayoutProps): void {
   const { layout, ...viewprops } = view;
   Lab.addLibraryItem('views', {
     ...viewprops,
@@ -143,7 +140,7 @@ export interface ComponentProps extends ContentProps {
    Register the given Ivette Component.
    Components are sorted by rank and identifier among each group.
  */
-export function registerComponent(props: ComponentProps) {
+export function registerComponent(props: ComponentProps): void {
   Lab.addLibraryItem('components', { group: GROUP, ...props });
 }
 
@@ -163,7 +160,7 @@ export interface TitleBarProps {
    Defines an alternative component title bar in current context.
    Default values are taken from the associated component.
  */
-export function TitleBar(props: TitleBarProps) {
+export function TitleBar(props: TitleBarProps): JSX.Element | null {
   const { icon, label, title, children } = props;
   const context = Lab.useTitleContext();
   if (!context.id) return null;
@@ -190,15 +187,15 @@ export interface ToolProps {
   children?: React.ReactNode;
 }
 
-export function registerSidebar(panel: ToolProps) {
+export function registerSidebar(panel: ToolProps): void {
   Ext.SIDEBAR.register(panel);
 }
 
-export function registerToolbar(tools: ToolProps) {
+export function registerToolbar(tools: ToolProps): void {
   Ext.TOOLBAR.register(tools);
 }
 
-export function registerStatusbar(status: ToolProps) {
+export function registerStatusbar(status: ToolProps): void {
   Ext.STATUSBAR.register(status);
 }
 
@@ -207,12 +204,22 @@ export function registerStatusbar(status: ToolProps) {
 /* --------------------------------------------------------------------------*/
 
 if (DEVEL) {
-  registerComponent({
-    id: 'ivette.sandbox',
+  registerGroup({
+    id: 'sandbox',
     label: 'Sandbox',
-    title: 'Ivette Sandbox Component (only in DEVEL mode)',
-    children: <Sandbox />,
+    title: 'Ivette Sandbox Components (only in DEVEL mode)',
   });
+  registerView({
+    id: 'sandbox',
+    rank: -2,
+    label: 'Sandbox',
+    title: 'Sandbox Playground (only in DEVEL mode)',
+    layout: [],
+  });
+}
+
+export function registerSandbox(props: ComponentProps): void {
+  if (DEVEL) registerComponent({ ...props, group: 'sandbox' });
 }
 
 // --------------------------------------------------------------------------

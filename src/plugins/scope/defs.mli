@@ -33,5 +33,5 @@ val get_defs_with_type :
 val compute_with_def_type_zone:
   Cil_types.kernel_function -> Cil_types.stmt -> Locations.Zone.t ->
   ((bool * bool) Cil_datatype.Stmt.Map.t * Locations.Zone.t option) option
-(** This function is similar to {get_defs_with_type}, except
+(** This function is similar to {!get_defs_with_type}, except
     that it receives a zone as argument, instead of an l-value *)

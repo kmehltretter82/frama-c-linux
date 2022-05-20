@@ -519,16 +519,6 @@ val source: identified_property -> Filepath.position option
 (** {2 names} *)
 (**************************************************************************)
 
-
-(** @since 19.0-Potassium deprecated old naming scheme,
-    to be removed in future versions. *)
-module LegacyNames :
-sig
-  val self: State.t
-  val get_prop_basename: identified_property -> string
-  val get_prop_name_id: identified_property -> string
-end
-
 (** @since Oxygen-20120901 *)
 module Names :
 sig

@@ -23,7 +23,7 @@
 (** Builtins for standard floating-point functions.
 
     Nothing is exported, all the builtins are registered through
-    {Builtins.register_builtin} *)
+    {!Builtins.register_builtin} *)
 
 
 (*

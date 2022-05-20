@@ -86,7 +86,7 @@ val behavior_precondition : goal:bool -> funbehavior -> predicate
 val behavior_postcondition :
   goal:bool -> funbehavior -> termination_kind -> predicate
 (** Builds the postcondition from [b_assumes] and [b_post_cond] clauses.
-    For flag [~goal] see {Ast_info.precondition} above.
+    For flag [~goal] see {!Ast_info.precondition} above.
     @before 23.0-Vanadium no [goal] flag.
 *)
 

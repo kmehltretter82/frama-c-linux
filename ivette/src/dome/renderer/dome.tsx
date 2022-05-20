@@ -20,7 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
@@ -42,6 +41,7 @@
  */
 
 import _ from 'lodash';
+import Emitter from 'events';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
@@ -61,7 +61,7 @@ import { State } from './data/states';
 // main window focus
 let windowFocus = true;
 
-function setContextAppNode() {
+function setContextAppNode(): HTMLElement | null {
   const node = document.getElementById('app');
   if (node) {
     node.className =
@@ -99,25 +99,25 @@ function getPath(k: string): string {
 }
 
 /** Returns user's home directory. */
-export function getHome() { return getPath('home'); }
+export function getHome(): string { return getPath('home'); }
 
 /** Returns user's desktop directory. */
-export function getDesktop() { return getPath('desktop'); }
+export function getDesktop(): string { return getPath('desktop'); }
 
 /** Returns user's documents directory. */
-export function getDocuments() { return getPath('documents'); }
+export function getDocuments(): string { return getPath('documents'); }
 
 /** Returns user's downloads directory. */
-export function getDownloads() { return getPath('downloads'); }
+export function getDownloads(): string { return getPath('downloads'); }
 
 /** Returns temporary directory. */
-export function getTempDir() { return getPath('temp'); }
+export function getTempDir(): string { return getPath('temp'); }
 
 /** Working directory (Application Window). */
-export function getWorkingDir() { return System.getWorkingDir(); }
+export function getWorkingDir(): string { return System.getWorkingDir(); }
 
 /** Current process ID.. */
-export function getPID() { return System.getPID(); }
+export function getPID(): number { return System.getPID(); }
 
 // --------------------------------------------------------------------------
 // --- Application Emitter
@@ -136,11 +136,11 @@ export class Event<A = void> {
     this.emit = this.emit.bind(this);
   }
 
-  on(callback: (arg: A) => void) {
+  on(callback: (arg: A) => void): void {
     System.emitter.on(this.name, callback);
   }
 
-  off(callback: (arg: A) => void) {
+  off(callback: (arg: A) => void): void {
     System.emitter.off(this.name, callback);
   }
 
@@ -149,14 +149,14 @@ export class Event<A = void> {
      This methods is bound to the event, so you may use `myEvent.emit`
      as a callback function, instead of eg. `(arg) => myEvent.emit(arg)`.
   */
-  emit(arg: A) {
+  emit(arg: A): void {
     System.emitter.emit(this.name, arg);
   }
 
   /**
      Number of currenty registered listeners.
    */
-  listenerCount() {
+  listenerCount(): number {
     return System.emitter.listenerCount(this.name);
   }
 
@@ -166,14 +166,29 @@ export class Event<A = void> {
 export function useEvent<A>(
   evt: undefined | null | Event<A>,
   callback: (arg: A) => void,
-) {
-  return React.useEffect(() => {
+): void {
+  React.useEffect(() => {
     if (evt) {
       evt.on(callback);
       return () => evt.off(callback);
     }
     return undefined;
   }, [evt, callback]);
+}
+
+/** Custom React Hook on Node Emitters. */
+export function useEmitter(
+  emitter: undefined | null | Emitter,
+  event: undefined | null | string,
+  callback: () => void,
+): void {
+  return React.useEffect((): (undefined | (() => void)) => {
+    if (emitter && event) {
+      emitter.on(event, callback);
+      return () => emitter.off(event, callback);
+    }
+    return undefined;
+  }, [emitter, event, callback]);
 }
 
 // --------------------------------------------------------------------------
@@ -186,13 +201,13 @@ export function useEvent<A>(
    the window frame is resized.
    You can use it for your own components as an easy-to-use global
    re-render event.
-*/
+ */
 export const update = new Event('dome.update');
 
 /**
    Dome reload event.
    It is emitted when the entire window is reloaded.
-*/
+ */
 export const reload = new Event('dome.reload');
 ipcRenderer.on('dome.ipc.reload', () => reload.emit());
 
@@ -205,7 +220,7 @@ ipcRenderer.on('dome.ipc.find', () => find.emit());
 /** Command-line arguments event handler. */
 export function onCommand(
   job: (argv: string[], workingDir: string) => void,
-) {
+): void {
   System.emitter.on('dome.command', job);
 }
 
@@ -229,7 +244,7 @@ export const globalSettings = new Event(Settings.global);
 ipcRenderer.on('dome.ipc.closing', System.doExit);
 
 /** Register a callback to be executed when the window is closing. */
-export function atExit(callback: () => void) {
+export function atExit(callback: () => void): void {
   System.atExit(callback);
 }
 
@@ -241,7 +256,7 @@ export function atExit(callback: () => void) {
 export const focus = new Event<boolean>('dome.focus');
 
 /** Current focus state of the main window. See also [[useWindowFocus]]. */
-export function isFocused() { return windowFocus; }
+export function isFocused(): boolean { return windowFocus; }
 
 ipcRenderer.on('dome.ipc.focus', (_sender, value) => {
   windowFocus = value;
@@ -277,11 +292,11 @@ ipcRenderer.on(
 // --- Window Management
 // --------------------------------------------------------------------------
 
-export function isApplicationWindow() {
+export function isApplicationWindow(): boolean {
   return process.argv.includes(SYS.WINDOW_APPLICATION_ARGV);
 }
 
-export function isPreferencesWindow() {
+export function isPreferencesWindow(): boolean {
   return process.argv.includes(SYS.WINDOW_PREFERENCES_ARGV);
 }
 
@@ -291,12 +306,12 @@ export function isPreferencesWindow() {
 
 /** Sets the modified status of the window-frame flag.
     User feedback is platform dependent. */
-export function setModified(modified = false) {
+export function setModified(modified = false): void {
   ipcRenderer.send('dome.ipc.window.modified', modified);
 }
 
 /** Sets the window-frame title. */
-export function setTitle(title: string) {
+export function setTitle(title: string): void {
   ipcRenderer.send('dome.ipc.window.title', title);
 }
 
@@ -306,7 +321,7 @@ export function setTitle(title: string) {
 
 function setContainer(
   Component: React.FunctionComponent | React.ComponentClass,
-) {
+): void {
   Settings.synchronize();
   const appNode = setContextAppNode();
   const contents = <AppContainer><Component /></AppContainer>;
@@ -330,7 +345,7 @@ function setContainer(
 */
 export function setApplicationWindow(
   Component: React.FunctionComponent | React.ComponentClass,
-) {
+): void {
   if (isApplicationWindow()) setContainer(Component);
 }
 
@@ -350,7 +365,7 @@ export function setApplicationWindow(
 */
 export function setPreferencesWindow(
   Component: React.FunctionComponent | React.ComponentClass,
-) {
+): void {
   if (isPreferencesWindow()) setContainer(Component);
 }
 
@@ -373,7 +388,7 @@ const customItemCallbacks = new Map<string, callback>();
 
    @param label - the menu title (shall be unique)
  */
-export function addMenu(label: string) {
+export function addMenu(label: string): void {
   ipcRenderer.send('dome.ipc.menu.addmenu', label);
 }
 
@@ -418,7 +433,7 @@ export interface MenuItemProps {
    windows would be ignored. It is also possible to call this function from the
    main process.
  */
-export function addMenuItem(props: MenuItemProps) {
+export function addMenuItem(props: MenuItemProps): void {
   if (!props.id && props.type !== 'separator') {
     // eslint-disable-next-line no-console
     console.error('[Dome] Missing menu-item identifier', props);
@@ -447,7 +462,7 @@ export interface MenuItemOptions {
 
    It is also possible to call this function from the main process.
  */
-export function setMenuItem(options: MenuItemOptions) {
+export function setMenuItem(options: MenuItemOptions): void {
   const { onClick, ...updates } = options;
   if (onClick === null) {
     customItemCallbacks.delete(options.id);
@@ -506,7 +521,7 @@ export type PopupMenuItem = PopupMenuItemProps | 'separator';
 export function popupMenu(
   items: PopupMenuItem[],
   callback?: (item: string | undefined) => void,
-) {
+): void {
   const ipcItems = items.map((item) => {
     if (!item) return undefined;
     if (item === 'separator') return item;
@@ -538,7 +553,7 @@ export function popupMenu(
    Hook to re-render on demand (Custom React Hook).
    Returns a callback to trigger a render on demand.
 */
-export function useForceUpdate() {
+export function useForceUpdate(): () => void {
   const [tac, onTic] = React.useState(false);
   return () => onTic(!tac);
 }
@@ -547,13 +562,19 @@ export function useForceUpdate() {
    Hook to re-render on Dome events (Custom React Hook).
    @param events - event names, defaults to a single `'dome.update'`.
 */
-export function useUpdate(...events: Event<any>[]) {
+export function useUpdate(...events: Event<any>[]): void {
   const fn = useForceUpdate();
   React.useEffect(() => {
     const theEvents = events ? events.slice() : [update];
     theEvents.forEach((evt) => evt.on(fn));
     return () => theEvents.forEach((evt) => evt.off(fn));
   });
+}
+
+interface PromiseHook<A> {
+  result: A | undefined;
+  error: Error | undefined;
+  loading: boolean;
 }
 
 /**
@@ -564,15 +585,18 @@ export function useUpdate(...events: Event<any>[]) {
    - error: the promise error if it fails, undefined otherwise;
    - loading: the promise status, true if the promise is still running.
 */
-export function usePromise<T>(job: Promise<T>) {
-  const [result, setResult] = React.useState<T | undefined>();
+export function usePromise<A>(job: Promise<A>): PromiseHook<A> {
+  const [result, setResult] = React.useState<A | undefined>();
   const [error, setError] = React.useState<Error | undefined>();
   const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     let cancel = false;
-    const doCancel = () => { if (!cancel) setLoading(false); return cancel; };
-    const onResult = (x: T) => { if (!doCancel()) setResult(x); };
-    const onError = (e: Error) => { if (!doCancel()) setError(e); };
+    const doCancel = (): boolean => {
+      if (!cancel) setLoading(false);
+      return cancel;
+    };
+    const onResult = (x: A): void => { if (!doCancel()) setResult(x); };
+    const onError = (e: Error): void => { if (!doCancel()) setError(e); };
     job.then(onResult, onError);
     return () => { cancel = true; };
   }, [job]);
@@ -617,9 +641,9 @@ interface Clock {
 // Collection of clocks indexed by period
 const CLOCKS = new Map<number, Clock>();
 
-const CLOCKEVENT = (period: number) => `dome.clock.${period}`;
+const CLOCKEVENT = (period: number): string => `dome.clock.${period}`;
 
-const TIC_CLOCK = (clk: Clock) => () => {
+const TIC_CLOCK = (clk: Clock) => (): void => {
   if (0 < clk.pending) {
     clk.time += clk.period;
     System.emitter.emit(clk.event, clk.time);
@@ -629,7 +653,7 @@ const TIC_CLOCK = (clk: Clock) => () => {
   }
 };
 
-const INC_CLOCK = (period: number) => {
+const INC_CLOCK = (period: number): string => {
   let clk = CLOCKS.get(period);
   if (!clk) {
     const event = CLOCKEVENT(period);
@@ -642,7 +666,7 @@ const INC_CLOCK = (period: number) => {
   return clk.event;
 };
 
-const DEC_CLOCK = (period: number) => {
+const DEC_CLOCK = (period: number): void => {
   const clk = CLOCKS.get(period);
   if (clk) clk.pending--;
 };
@@ -684,7 +708,7 @@ export function useClock(period: number, initStart: boolean): Timer {
   React.useEffect(() => {
     if (running) {
       const event = INC_CLOCK(period);
-      const callback = (t: number) => {
+      const callback = (t: number): void => {
         if (!started.current) started.current = t;
         else setTime(t - started.current);
       };
@@ -708,7 +732,7 @@ export function useClock(period: number, initStart: boolean): Timer {
 export function useBoolSettings(
   key: string | undefined,
   defaultValue = false,
-) {
+): State<boolean> {
   return Settings.useWindowSettings(
     key, Json.jBoolean, defaultValue,
   );
@@ -738,14 +762,19 @@ export function useNumberSettings(
 }
 
 /** String window settings. Default is `''` unless specified). */
-export function useStringSettings(key: string | undefined, defaultValue = '') {
+export function useStringSettings(
+  key: string | undefined,
+  defaultValue = ''
+): State<string> {
   return Settings.useWindowSettings(
     key, Json.jString, defaultValue,
   );
 }
 
 /** Optional string window settings. Default is `undefined`. */
-export function useStringOptSettings(key: string | undefined) {
+export function useStringOptSettings(
+  key: string | undefined
+): State<string | undefined> {
   return Settings.useWindowSettings(
     key, Json.jString, undefined,
   );
@@ -762,7 +791,7 @@ export function useGlobalSettings<A extends Json.json>(
   globalKey: string,
   decoder: Json.Loose<A>,
   defaultValue: A,
-) {
+): State<A> {
   // Object creation is cheaper than useMemo...
   const G = new Settings.GlobalSettings(
     globalKey, decoder, Json.identity, defaultValue,
@@ -782,19 +811,19 @@ export class Debug {
 
   /* eslint-disable no-console */
 
-  log(...args: any) {
+  log(...args: any): void {
     if (DEVEL) console.log(`[${this.moduleName}]`, ...args);
   }
 
-  warn(...args: any) {
+  warn(...args: any): void {
     if (DEVEL) console.warn(`[${this.moduleName}]`, ...args);
   }
 
-  error(...args: any) {
+  error(...args: any): void {
     if (DEVEL) console.error(`[${this.moduleName}]`, ...args);
   }
 
-  /* eslint-enable */
+  /* eslint-enable no-console */
 }
 
 // --------------------------------------------------------------------------

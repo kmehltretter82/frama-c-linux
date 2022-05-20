@@ -20,24 +20,24 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- AST Source Code
 // --------------------------------------------------------------------------
 
 import React from 'react';
 import _ from 'lodash';
+
+import * as Dome from 'dome';
+import * as Settings from 'dome/data/settings';
+import type { key } from 'dome/data/json';
+import { RichTextBuffer } from 'dome/text/buffers';
+import { Text } from 'dome/text/editors';
+
+import * as Preferences from 'ivette/prefs';
+
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as RichText from 'frama-c/richtext';
-
-import * as Dome from 'dome';
-import { RichTextBuffer } from 'dome/text/buffers';
-import { Text } from 'dome/text/editors';
-import * as Preferences from 'ivette/prefs';
-import * as Settings from 'dome/data/settings';
-
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Properties from 'frama-c/kernel/api/properties';
 import { getCallers, getDeadCode } from 'frama-c/plugins/eva/api/general';
@@ -55,7 +55,7 @@ const D = new Dome.Debug('AST View');
 
 async function loadAST(
   buffer: RichTextBuffer, theFunction?: string, theMarker?: string,
-) {
+): Promise<void> {
   buffer.clear();
   if (theFunction) {
     buffer.log('// Loading', theFunction, '…');
@@ -83,7 +83,9 @@ async function loadAST(
 /* --- Function Callers                                                   ---*/
 /* --------------------------------------------------------------------------*/
 
-async function functionCallers(functionName: string) {
+type Caller = { fct: key<'#fct'>, marker: key<'#stmt'> };
+
+async function functionCallers(functionName: string): Promise<Caller[]> {
   try {
     const data = await Server.send(getCallers, functionName);
     const locations = data.map(([fct, marker]) => ({ fct, marker }));
@@ -99,12 +101,18 @@ async function functionCallers(functionName: string) {
 /* --------------------------------------------------------------------------*/
 
 type access = 'Reads' | 'Writes';
+interface StudiaInfos {
+  name: string,
+  title: string,
+  locations: { fct: key<'#fct'>, marker: Ast.marker }[],
+  index: number,
+}
 
 async function studia(
   marker: string,
   info: Ast.markerInfoData,
   kind: access,
-) {
+): Promise<StudiaInfos> {
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
   const data = await Server.send(request, marker);
   const locations = data.direct.map(([f, m]) => ({ fct: f, marker: m }));
@@ -124,7 +132,7 @@ async function studia(
 /* --- Property Bullets                                                   ---*/
 /* --------------------------------------------------------------------------*/
 
-function getBulletColor(status: States.Tag) {
+function getBulletColor(status: States.Tag): string {
   switch (status.name) {
     case 'unknown': return '#FF8300';
     case 'invalid':
@@ -141,7 +149,7 @@ function getBulletColor(status: States.Tag) {
   }
 }
 
-function makeBullet(status: States.Tag) {
+function makeBullet(status: States.Tag): HTMLDivElement {
   const marker = document.createElement('div');
   marker.style.color = getBulletColor(status);
   if (status.descr)
@@ -155,7 +163,7 @@ function makeBullet(status: States.Tag) {
 // --- AST Printer
 // --------------------------------------------------------------------------
 
-export default function ASTview() {
+export default function ASTview(): JSX.Element {
 
   // Hooks
   const buffer = React.useMemo(() => new RichTextBuffer(), []);
@@ -200,7 +208,7 @@ export default function ASTview() {
     return () => { buffer.off('change', setBullets); };
   }, [buffer, setBullets]);
 
-  async function reload() {
+  async function reload(): Promise<void> {
     printed.current = theFunction;
     loadAST(buffer, theFunction, theMarker);
   }
@@ -215,7 +223,7 @@ export default function ASTview() {
   Server.onSignal(Ast.changed, reload);
 
   React.useEffect(() => {
-    const decorator = (marker: string) => {
+    const decorator = (marker: string): string | undefined => {
       if (multipleSelections?.some((location) => location?.marker === marker))
         return 'highlighted-marker';
       if (deadCode?.unreachable?.some((m) => m === marker))
@@ -234,20 +242,20 @@ export default function ASTview() {
     if (theMarker) buffer.scroll(theMarker);
   }, [buffer, theMarker]);
 
-  function onHover(markerId?: string) {
+  function onHover(markerId?: string): void {
     const marker = Ast.jMarker(markerId);
     const fct = selection?.current?.fct;
     States.setHovered(marker ? { fct, marker } : undefined);
   }
 
-  function onSelection(markerId: string, meta = false) {
+  function onSelection(markerId: string, meta = false): void {
     const fct = selection?.current?.fct;
     const location = { fct, marker: Ast.jMarker(markerId) };
     updateSelection({ location });
     if (meta) States.MetaSelection.emit(location);
   }
 
-  async function onContextMenu(markerId: string) {
+  async function onContextMenu(markerId: string): Promise<void> {
     const items = [];
     const selectedMarkerInfo = markersInfo.getData(markerId);
     if (selectedMarkerInfo?.var === 'function') {
@@ -283,7 +291,7 @@ export default function ASTview() {
     }
     const enabled = selectedMarkerInfo?.kind === 'lvalue'
       || selectedMarkerInfo?.var === 'variable';
-    function onClick(kind: access) {
+    function onClick(kind: access): void {
       if (selectedMarkerInfo)
         studia(
           markerId,

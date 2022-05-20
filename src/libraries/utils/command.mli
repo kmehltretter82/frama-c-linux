@@ -80,7 +80,7 @@ val full_command :
   -> stdout:Unix.file_descr
   -> stderr:Unix.file_descr
   -> Unix.process_status
-(** Same arguments as {Unix.create_process} but returns only when
+(** Same arguments as {!Unix.create_process} but returns only when
     execution is complete.
     @raise Sys_error when a system error occurs *)
 
@@ -96,7 +96,7 @@ val full_command_async :
   -> stdout:Unix.file_descr
   -> stderr:Unix.file_descr
   -> (unit -> process_result)
-(** Same arguments as {Unix.create_process}.
+(** Same arguments as {!Unix.create_process}.
     @return a function to call to check if the process execution
     is complete.
     You must call this function until it returns a Result
@@ -108,7 +108,7 @@ val command_async :
   ?stderr:Buffer.t ->
   string -> string array
   -> (unit -> process_result)
-(** Same arguments as {Unix.create_process}.
+(** Same arguments as {!Unix.create_process}.
     @return a function to call to check if the process execution
     is complete.
     You must call this function until it returns a Result
@@ -123,7 +123,7 @@ val command :
   ?stderr:Buffer.t ->
   string -> string array
   -> Unix.process_status
-(** Same arguments as {Unix.create_process}.
+(** Same arguments as {!Unix.create_process}.
     When this function returns, the stdout and stderr of the child
     process will be filled into the arguments buffer.
     @raise Sys_error when a system error occurs

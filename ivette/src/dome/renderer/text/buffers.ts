@@ -20,7 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 // --------------------------------------------------------------------------
@@ -101,7 +100,7 @@ interface BufferedMarker extends MarkerOptions {
 
 type BufferedTag = BufferedMarker | undefined;
 
-function rankTag(lmin: number, lmax: number, tg: BufferedTag) {
+function rankTag(lmin: number, lmax: number, tg: BufferedTag): number {
   if (tg && (lmin <= tg.stopIndex || tg.startIndex <= lmax)) {
     const size = tg.stopIndex - tg.startIndex;
     return size < BATCH_RMAX ? size : BATCH_RMAX;
@@ -109,11 +108,11 @@ function rankTag(lmin: number, lmax: number, tg: BufferedTag) {
   return BATCH_RMAX;
 }
 
-function byVisibleTag(lmin: number, lmax: number) {
-  return (a: BufferedTag, b: BufferedTag) => (
-    rankTag(lmin, lmax, a) - rankTag(lmin, lmax, b)
-  );
-}
+const byVisibleTag =
+  (lmin: number, lmax: number) =>
+    (a: BufferedTag, b: BufferedTag): number => (
+      rankTag(lmin, lmax, a) - rankTag(lmin, lmax, b)
+    );
 
 // --------------------------------------------------------------------------
 // --- Buffer
@@ -230,14 +229,14 @@ export class RichTextBuffer extends Emitter {
   // --------------------------------------------------------------------------
 
   /** Clear buffer contents and resets _edited_ state. */
-  clear() { this.setValue(''); }
+  clear(): void { this.setValue(''); }
 
   /**
      Writes in the buffer. All parameters are converted to string and joined
      with spaces.  The generated change event has origin `'buffer'` and it does
      not modifies the _edited_ internal state.
   */
-  append(...values: any[]) {
+  append(...values: any[]): void {
     if (values.length > 0) {
       const text = values.join(' ');
       this.bufferedText += text;
@@ -249,7 +248,7 @@ export class RichTextBuffer extends Emitter {
      Starts a new line in the buffer. If the current buffer content does not
      finish at the beginning of a fresh line, inserts a newline character.
   */
-  flushline() {
+  flushline(): void {
     const doc = this.document;
     const buf = this.bufferedText;
     if (buf === '') {
@@ -263,7 +262,7 @@ export class RichTextBuffer extends Emitter {
      Appends with newline and auto-scrolling. This is a short-cut to
      `flushline()` followed by `append(...value,'\n')` and `scroll()`.
    */
-  log(...values: any[]) {
+  log(...values: any[]): void {
     this.flushline();
     this.append(...values, '\n');
     this.scroll();
@@ -273,7 +272,7 @@ export class RichTextBuffer extends Emitter {
      Replace all textual content with the given string.
      Also remove all markers.
    */
-  setValue(txt = '') {
+  setValue(txt = ''): void {
     this.document.setValue(txt);
     this.cssmarkers.clear();
     this.textmarkers.clear();
@@ -287,7 +286,7 @@ export class RichTextBuffer extends Emitter {
   }
 
   /** Return the textual contents of the buffer. */
-  getValue() { return this.document.getValue(); }
+  getValue(): string { return this.document.getValue(); }
 
   // --------------------------------------------------------------------------
   // ---  Text Markers
@@ -309,7 +308,7 @@ export class RichTextBuffer extends Emitter {
      Hence, you can safely invoke these methods on either the _proxy_ or the
      _final_ text marker at your convenience.
   */
-  openTextMarker(props: MarkerProps) {
+  openTextMarker(props: MarkerProps): void {
     const { id, hover, className, ...options } = props;
     const startIndex = this.getLastIndex() + this.bufferedText.length;
     this.stacked.push({ startIndex, id, hover, className, options });
@@ -317,14 +316,8 @@ export class RichTextBuffer extends Emitter {
 
   /**
      Closes the last opened marker.
-
-     Returns the (actual) [text marker]
-     (https://codemirror.net/doc/manual.html#api_marker) ; the proxy
-     returned by the corresponding call to [[openTextMarker]] is automatically
-     bound to the actual one.
-
   */
-  closeTextMarker() {
+  closeTextMarker(): void {
     const tag = this.stacked.pop();
     if (tag) {
       const stopIndex = this.getLastIndex() + this.bufferedText.length;
@@ -361,7 +354,7 @@ export class RichTextBuffer extends Emitter {
      @param fn - highlighter, `fn(id)` shall return a className to apply
      on text markers with the provided identifier.
   */
-  setDecorator(fn: Decorator) {
+  setDecorator(fn: Decorator): void {
     this.decorator = fn;
     this.emit('decorated');
   }
@@ -369,7 +362,7 @@ export class RichTextBuffer extends Emitter {
   /**
      Current highlighter.
    */
-  getDecorator() { return this.decorator; }
+  getDecorator(): Decorator | undefined { return this.decorator; }
 
   /**
      Rehighlight document.
@@ -382,7 +375,7 @@ export class RichTextBuffer extends Emitter {
 
      The method is bound to `this`.
   */
-  updateDecorations() { this.emit('decorated'); }
+  updateDecorations(): void { this.emit('decorated'); }
 
   // --------------------------------------------------------------------------
   // --- Edited State
@@ -401,7 +394,7 @@ export class RichTextBuffer extends Emitter {
 
      @param state - the new edited state (defaults to `true`).
   */
-  setEdited(state = true) {
+  setEdited(state = true): void {
     if (state !== this.edited) {
       this.edited = state;
       this.emit('edited', state);
@@ -425,7 +418,7 @@ export class RichTextBuffer extends Emitter {
 
      @param focus - the new focused state (defaults to `true`).
   */
-  setFocused(state = true) {
+  setFocused(state = true): void {
     if (state !== this.focused) {
       this.focused = state;
       this.emit('focused', state);
@@ -434,10 +427,10 @@ export class RichTextBuffer extends Emitter {
   }
 
   /** Returns the current _edited_ state. */
-  isEdited() { return this.edited; }
+  isEdited(): boolean { return this.edited; }
 
   /** Returns the current _focused_ state. */
-  isFocused() { return this.focused; }
+  isFocused(): boolean { return this.focused; }
 
   // --------------------------------------------------------------------------
   // --- Document Scrolling
@@ -453,7 +446,7 @@ export class RichTextBuffer extends Emitter {
      Although CodeMirror is powerfull enough to manage huge buffers, you should
      turn this limit _off_ with care.
   */
-  setMaxlines(maxlines = 10000) {
+  setMaxlines(maxlines = 10000): void {
     this.maxlines = maxlines > 0 ? 1 + maxlines : 0;
     this.doShrink();
   }
@@ -508,7 +501,7 @@ export class RichTextBuffer extends Emitter {
   private onChange(
     _editor: CodeMirror.Editor,
     change: CodeMirror.EditorChange,
-  ) {
+  ): void {
     if (change.origin !== 'buffer') {
       this.setEdited(true);
       this.cacheIndex = -1;
@@ -524,7 +517,7 @@ export class RichTextBuffer extends Emitter {
 
      @param cm - code mirror instance to link this document in.
   */
-  link(cm: CodeMirror.Editor) {
+  link(cm: CodeMirror.Editor): void {
     const newDoc = this.document.linkedDoc(
       { sharedHist: true, mode: undefined },
     );
@@ -537,7 +530,7 @@ export class RichTextBuffer extends Emitter {
      Release a linked CodeMirror document previously linked with [[link]].
      @param cm - the code mirror instance to unlink
   */
-  unlink(cm: CodeMirror.Editor) {
+  unlink(cm: CodeMirror.Editor): void {
     const oldDoc = cm.getDoc();
     this.document.unlinkDoc(oldDoc);
     this.editors = this.editors.filter((cm0) => {
@@ -557,7 +550,7 @@ export class RichTextBuffer extends Emitter {
 
      Exceptions raised by `fn` are catched and dumped in the console.
    */
-  forEach(fn: (editor: CodeMirror.Editor) => void) {
+  forEach(fn: (editor: CodeMirror.Editor) => void): void {
     this.editors.forEach((cm) => {
       try { fn(cm); } catch (e) { D.error(e); }
     });
@@ -568,7 +561,7 @@ export class RichTextBuffer extends Emitter {
   // --------------------------------------------------------------------------
 
   /* Append Operation */
-  private doFlushText() {
+  private doFlushText(): void {
     const text = this.bufferedText;
     if (text.length > 0) {
       this.bufferedText = '';
@@ -581,7 +574,7 @@ export class RichTextBuffer extends Emitter {
   }
 
   /* Shrink Operation */
-  private doShrink() {
+  private doShrink(): void {
     const lines = this.document.lineCount();
     if (lines > this.maxlines) {
       const p = this.document.firstLine();
@@ -597,7 +590,7 @@ export class RichTextBuffer extends Emitter {
   }
 
   /* Close Operation */
-  private doMark(tag: BufferedMarker) {
+  private doMark(tag: BufferedMarker): void {
     const { id, hover, className, startIndex, stopIndex } = tag;
     let markerId;
     if (id || hover) {
@@ -635,7 +628,7 @@ export class RichTextBuffer extends Emitter {
     }
   }
 
-  private doFilterTags() {
+  private doFilterTags(): BufferedTag[] {
     const tgs = this.bufferedTags;
     if (tgs.length > 0 && this.editors.length > 0) {
       let lmin = Infinity;
@@ -650,7 +643,7 @@ export class RichTextBuffer extends Emitter {
     return tgs.splice(0, BATCH_OPS);
   }
 
-  private getLastIndex() {
+  private getLastIndex(): number {
     if (this.cacheIndex < 0) {
       const doc = this.document;
       const line = doc.lastLine() + 1;
@@ -663,7 +656,7 @@ export class RichTextBuffer extends Emitter {
   // --- Batched Operations
   // --------------------------------------------------------------------------
 
-  private armBatch() {
+  private armBatch(): void {
     if (!this.batched) {
       this.batched = true;
       setTimeout(this.doBatch, BATCH_DELAY);
@@ -671,7 +664,7 @@ export class RichTextBuffer extends Emitter {
   }
 
   /* Batch Operation */
-  private doBatch() {
+  private doBatch(): void {
     this.batched = false;
     if (!this.bufferedText.length && !this.bufferedTags.length) return;
     try {

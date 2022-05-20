@@ -31,7 +31,7 @@ open Qed.Logic
 
 type library = string
 
-(** {2 Naming} Unique identifiers. *)
+(** {2 Naming - Unique identifiers} *)
 
 val comp_id  : compinfo -> string
 val comp_init_id  : compinfo -> string
@@ -558,7 +558,7 @@ end
 
 
 module N: sig
-  (** simpler notation for writing {!F.term} and {F.pred} *)
+  (** simpler notation for writing {!F.term} and {!F.pred} *)
 
   val ( + ): F.binop
   (** {! F.p_add } *)

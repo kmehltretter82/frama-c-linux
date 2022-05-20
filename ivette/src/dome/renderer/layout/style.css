@@ -177,6 +177,17 @@
     cursor: row-resize ;
 }
 
+.dome-xSplitter-hvgrab {
+    position: relative;
+    z-index: 2 ;
+    top: -4px ;
+    left: -4px ;
+    height: 9px;
+    width: 9px;
+    border-radius: 4px;
+    cursor: move;
+}
+
 .dome-xSplitter-hpos-A { position: absolute; left: 0px; height: 100% }
 .dome-xSplitter-hpos-R { position: absolute; width: 1px; height: 100% }
 .dome-xSplitter-hpos-B { position: absolute; right: 0px; height: 100% }
@@ -184,11 +195,18 @@
 .dome-xSplitter-vpos-A { position: absolute; top: 0px; width: 100% }
 .dome-xSplitter-vpos-R { position: absolute; height: 1px; width: 100% }
 .dome-xSplitter-vpos-B { position: absolute; bottom: 0px; width: 100% }
+.dome-xSplitter-hvpos { position: absolute; width: 1px; height: 1px }
 
 .dome-xSplitter-hline,
 .dome-xSplitter-vline
 {
     background: var(--splitter) ;
+}
+
+.dome-xSplitter-pane
+{
+    position: absolute;
+    overflow: hidden;
 }
 
 /* -------------------------------------------------------------------------- */

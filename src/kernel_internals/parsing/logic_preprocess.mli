@@ -33,9 +33,6 @@
     (gcc pre-processing differs between .c and .cxx files)
 
     @raises Sys_error if the file cannot be opened.
-
-    @modifies Oxygen-20120901: added suffix argument
-
 *)
 
 val file: string -> (string -> string -> string) -> string ->

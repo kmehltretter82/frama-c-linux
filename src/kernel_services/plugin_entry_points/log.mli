@@ -61,9 +61,9 @@ type ('a,'b) pretty_aborter =
   ?current:bool -> ?source:Filepath.position -> ?echo:bool ->
   ?append:(Format.formatter -> unit) ->
   ('a,formatter,unit,'b) format4 -> 'a
-(** @since Beryllium-20090601-beta1
-    Same as {!Log.pretty_printer} except that channels having this type
+(** Same as {!Log.pretty_printer} except that channels having this type
     denote a fatal error aborting Frama-C.
+    @since Beryllium-20090601-beta1
 *)
 
 (* -------------------------------------------------------------------------- *)
@@ -87,7 +87,7 @@ exception FeatureRequest of Filepath.position option * string * string
     You may catch [FeatureRequest(s,p,r)] to support degenerated behavior.
     The (optional) source location is s, the responsible plugin is 'p'
     and the feature request is 'r'.
-    @modified 23.0-Vanadium added source location.
+    @before 23.0-Vanadium there was no source location
 *)
 
 (* -------------------------------------------------------------------------- *)
@@ -210,7 +210,7 @@ module type Messages = sig
       If the exception is not caught, Frama-C displays a feature-request
       message to the user.
       @since Beryllium-20090901
-      @modified 23.0-Vanadium added current and source arguments.
+      @before 23.0-Vanadium there was no [current] and [source] arguments.
   *)
 
   val deprecated: string -> now:string -> ('a -> 'b) -> ('a -> 'b)
@@ -223,22 +223,22 @@ module type Messages = sig
   val with_result  : (event option -> 'b) -> ('a,'b) pretty_aborter
   (** [with_result f fmt] calls [f] in the same condition as [logwith].
       @since Beryllium-20090601-beta1
-      @modified 18.0-Argon the argument of the continuation is optionnal *)
+  *)
 
   val with_warning : (event option -> 'b) -> ('a,'b) pretty_aborter
   (** [with_warning f fmt] calls [f] in the same condition as [logwith].
       @since Beryllium-20090601-beta1
-      @modified 18.0-Argon the argument of the continuation is optionnal *)
+  *)
 
   val with_error   : (event option -> 'b) -> ('a,'b) pretty_aborter
   (** [with_error f fmt] calls [f] in the same condition as [logwith].
       @since Beryllium-20090601-beta1
-      @modified 18.0-Argon the argument of the continuation is optionnal *)
+  *)
 
   val with_failure : (event option -> 'b) -> ('a,'b) pretty_aborter
   (** [with_failure f fmt] calls [f] in the same condition as [logwith].
       @since Beryllium-20090601-beta1
-      @modified 18.0-Argon the argument of the continuation is optionnal *)
+  *)
 
   val log : ?kind:kind -> ?verbose:int -> ?debug:int -> 'a pretty_printer
   (** Generic log routine. The default kind is [Result]. Use cases (with
@@ -480,7 +480,7 @@ val print_delayed : (Format.formatter -> unit) -> unit
 val set_current_source : (unit -> Filepath.position) -> unit
 (* Forward reference to the function returning the current location,
     used when [~current:true] is set on printers. Currently set
-    in {Cil}. Not for the casual user. *)
+    in {!Cil}. Not for the casual user. *)
 
 val check_not_yet: (event -> bool) ref
 (* Checks whether a message been emitted already, in which case it is

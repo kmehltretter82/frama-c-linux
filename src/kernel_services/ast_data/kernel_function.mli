@@ -67,7 +67,7 @@ val find_all_labels: t -> Datatype.String.Set.t
 
 val clear_sid_info: unit -> unit
 (** removes any information related to statements in kernel functions.
-    ({i.e.} the table used by the function below).
+    (i.e. the table used by the function below).
     - Must be called when the Ast has silently changed
       (e.g. with an in-place visitor) before calling one of
       the functions below

@@ -72,7 +72,7 @@ val gmpz: number_ty
 val rational: number_ty
 val nan: number_ty
 
-(** {3 Useful operations over {!number_ty}} *)
+(** {3 Useful operations over [number_ty]} *)
 
 exception Not_a_number
 val typ_of_number_ty: number_ty -> typ

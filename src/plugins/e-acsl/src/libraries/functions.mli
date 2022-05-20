@@ -34,7 +34,7 @@ val instrument: kernel_function -> bool
 (** @return [true] iff the given function must be instrumented. *)
 
 (* ************************************************************************** *)
-(** {2 RTL} Operations on function belonging to the runtime library of E-ACSL *)
+(** {2 RTL Operations on function belonging to the runtime library of E-ACSL} *)
 (* ************************************************************************** *)
 
 module RTL: sig
@@ -67,7 +67,7 @@ module RTL: sig
 end (* Rtl *)
 
 (* ************************************************************************** *)
-(** {2 Libc} Operations on functions belonging to standard library *)
+(** {2 Libc Operations on functions belonging to standard library} *)
 (* ************************************************************************** *)
 
 module Libc: sig
@@ -133,7 +133,7 @@ module Libc: sig
 end (* Libc *)
 
 (* ************************************************************************** *)
-(** {2 Concurrency} Operations concerning the support of concurrency *)
+(** {2 Concurrency Operations concerning the support of concurrency} *)
 (* ************************************************************************** *)
 
 module Concurrency: sig

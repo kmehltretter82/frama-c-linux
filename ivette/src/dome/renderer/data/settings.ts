@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- States
 // --------------------------------------------------------------------------
@@ -207,7 +205,7 @@ class Driver {
 
   // --- Initial Data
 
-  sync(data: store) {
+  sync(data: store): void {
     this.commit.cancel();
     this.store.clear();
     this.diffs.clear();
@@ -224,7 +222,7 @@ class Driver {
 
   // --- Save Data
 
-  save(key: string | undefined, data: JSON.json) {
+  save(key: string | undefined, data: JSON.json): void {
     if (key === undefined) return;
     if (data === undefined) {
       this.store.delete(key);
@@ -255,7 +253,7 @@ function useSettings<A>(
   // Foreign Settings Update
   React.useEffect(() => {
     const event = D.evt;
-    const onUpdate = () => {
+    const onUpdate = (): void => {
       const fromSettings = JSON.jCatch(S.decoder, undefined)(D.load(K));
       if (fromSettings !== undefined)
         setValue(fromSettings);
@@ -307,7 +305,7 @@ export function getWindowSettings<A>(
 export function setWindowSettings(
   key: string | undefined,
   value: JSON.json,
-) {
+): void {
   if (key) WindowSettingsDriver.save(key, value);
 }
 
@@ -320,7 +318,7 @@ export function useWindowSettings<A>(
   key: string | undefined,
   decoder: JSON.Loose<A & JSON.json>,
   defaultValue: A & JSON.json,
-) {
+): State<A & JSON.json> {
   return useSettings({
     decoder,
     encoder: JSON.identity,
@@ -334,7 +332,7 @@ export function useWindowSettingsData<A>(
   decoder: JSON.Loose<A>,
   encoder: JSON.Encoder<A>,
   defaultValue: A,
-) {
+): State<A> {
   return useSettings({
     decoder,
     encoder,
@@ -343,7 +341,7 @@ export function useWindowSettingsData<A>(
 }
 
 /** Call the callback function on window settings events. */
-export function useWindowSettingsEvent(callback: () => void) {
+export function useWindowSettingsEvent(callback: () => void): void {
   React.useEffect(() => {
     const { evt } = WindowSettingsDriver;
     SysEmitter.on(evt, callback);
@@ -352,13 +350,13 @@ export function useWindowSettingsEvent(callback: () => void) {
 }
 
 /** @ignore DEPRECATED */
-export function onWindowSettings(callback: () => void) {
+export function onWindowSettings(callback: () => void): void {
   const { evt } = WindowSettingsDriver;
   SysEmitter.on(evt, callback);
 }
 
 /** @ignore DEPRECATED */
-export function offWindowSettings(callback: () => void) {
+export function offWindowSettings(callback: () => void): void {
   const { evt } = WindowSettingsDriver;
   SysEmitter.off(evt, callback);
 }
@@ -396,7 +394,7 @@ export function getLocalStorage<A>(
 export function setLocalStorage(
   key: string | undefined,
   value: JSON.json,
-) {
+): void {
   if (key) LocalStorageDriver.save(key, value);
 }
 
@@ -404,7 +402,7 @@ export function useLocalStorage<A>(
   key: string | undefined,
   decoder: JSON.Loose<A & JSON.json>,
   defaultValue: A & JSON.json,
-) {
+): State<A & JSON.json> {
   return useSettings<A & JSON.json>({
     decoder,
     encoder: JSON.identity,
@@ -418,7 +416,7 @@ export function useLocalStorageData<A>(
   decoder: JSON.Loose<A>,
   encoder: JSON.Encoder<A>,
   defaultValue: A,
-) {
+): State<A> {
   return useSettings({
     decoder,
     encoder,
@@ -427,7 +425,7 @@ export function useLocalStorageData<A>(
 }
 
 /** Call the callback function on window settings events. */
-export function useLocalStorageEvent(callback: () => void) {
+export function useLocalStorageEvent(callback: () => void): void {
   React.useEffect(() => {
     const { evt } = LocalStorageDriver;
     SysEmitter.on(evt, callback);
@@ -451,12 +449,12 @@ const GlobalSettingsDriver = new Driver({
    back in the global user settings. The global user settings file is located in
    the usual place for the application with respect to the underlying system.
  */
-export function useGlobalSettings<A>(S: GlobalSettings<A>) {
+export function useGlobalSettings<A>(S: GlobalSettings<A>): State<A> {
   return useSettings(S, GlobalSettingsDriver, S.name);
 }
 
 /** Call the callback function on global settings events. */
-export function useGlobalSettingsEvent(callback: () => void) {
+export function useGlobalSettingsEvent(callback: () => void): void {
   React.useEffect(() => {
     const { evt } = GlobalSettingsDriver;
     SysEmitter.on(evt, callback);
@@ -475,7 +473,7 @@ export const window = WindowSettingsDriver.evt;
 export const global = GlobalSettingsDriver.evt;
 
 /* @ internal */
-export function synchronize() {
+export function synchronize(): void {
   const data = ipcRenderer.sendSync('dome.ipc.settings.sync');
   const storage: store = data.storage ?? {};
   const globals: store = data.globals ?? {};

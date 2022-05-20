@@ -13,8 +13,11 @@ distrib.sh: .ignore
 doc/pandoc/href.lua: .ignore
 doc/pandoc/index.json: .ignore
 doc/pandoc/template.html: .ignore
+electron-builder.json: .ignore
 electron-webpack.json: .ignore
+ivette-macos.sh: .ignore
 package.json: .ignore
+sandboxer.js: .ignore
 src/dome/.gitignore: .ignore
 src/dome/CONTRIBUTING.md: .ignore
 src/dome/CONTRIBUTORS.md: .ignore
@@ -109,6 +112,7 @@ src/dome/renderer/layout/boxes.tsx: CEA_LGPL
 src/dome/renderer/layout/dispatch.tsx: CEA_LGPL
 src/dome/renderer/layout/forms.tsx: CEA_LGPL
 src/dome/renderer/layout/grids.js: CEA_LGPL
+src/dome/renderer/layout/qsplit.tsx: CEA_LGPL
 src/dome/renderer/layout/splitters.tsx: CEA_LGPL
 src/dome/renderer/layout/style.css: .ignore
 src/dome/renderer/light.css: .ignore
@@ -191,7 +195,6 @@ src/frama-c/server.ts: CEA_LGPL
 src/frama-c/states.ts: CEA_LGPL
 src/ivette/index.tsx: CEA_LGPL
 src/ivette/prefs.tsx: CEA_LGPL
-src/ivette/sandbox.tsx: CEA_LGPL
 src/main/index.js: CEA_LGPL
 src/renderer/Application.tsx: CEA_LGPL
 src/renderer/Controller.tsx: CEA_LGPL
@@ -200,6 +203,8 @@ src/renderer/Laboratory.tsx: CEA_LGPL
 src/renderer/Preferences.tsx: CEA_LGPL
 src/renderer/index.js: CEA_LGPL
 src/renderer/style.css: .ignore
+src/sandbox/README.md: .ignore
+src/sandbox/qsplit.tsx: CEA_LGPL
 tests/eva-1.i: .ignore
 tests/eva-2.i: .ignore
 tsconfig.json: .ignore

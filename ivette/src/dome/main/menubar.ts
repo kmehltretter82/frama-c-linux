@@ -20,7 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable no-console */
 
 // --------------------------------------------------------------------------
@@ -42,7 +41,7 @@ import * as System from 'dome/system';
 // --- Special Callbacks
 // --------------------------------------------------------------------------
 
-function reloadWindow() {
+function reloadWindow(): void {
   reset(); // declared below
   BrowserWindow.getAllWindows().forEach((win) => {
     if (win) {
@@ -60,7 +59,7 @@ function toggleFullScreen(
   _item: MenuItem,
   focusedWindow: BrowserWindow | undefined,
   _evt: KeyboardEvent,
-) {
+): void {
   if (focusedWindow)
     focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
 }
@@ -69,7 +68,7 @@ function toggleDevTools(
   _item: MenuItem,
   focusedWindow: BrowserWindow | undefined,
   _evt: KeyboardEvent,
-) {
+): void {
   if (focusedWindow)
     focusedWindow.webContents.toggleDevTools();
 }
@@ -78,7 +77,7 @@ function userFindInfo(
   _item: MenuItem,
   focusedWindow: BrowserWindow | undefined,
   _evt: KeyboardEvent,
-) {
+): void {
   if (focusedWindow)
     focusedWindow.webContents.send('dome.ipc.find');
 }
@@ -292,7 +291,7 @@ const helpMenuItems: MenuSpec = [
 let updateRequired = false;
 let updateTriggered = false;
 
-function requestUpdate() {
+function requestUpdate(): void {
   if (updateRequired && !updateTriggered) {
     updateTriggered = true;
     setImmediate(install);
@@ -326,7 +325,7 @@ function findMenu(label: string): MenuSpec | undefined {
   }
 }
 
-export function addMenu(label: string) {
+export function addMenu(label: string): void {
   if (findMenu(label)) {
     console.warn(`Already defined menu '${label}'`);
   } else {
@@ -348,7 +347,7 @@ export interface SeparatorItem {
 
 export type CustomMenuItemSpec = SeparatorItem | CustomMenuItem;
 
-export function addMenuItem(custom: CustomMenuItemSpec) {
+export function addMenuItem(custom: CustomMenuItemSpec): void {
   const menuSpec = findMenu(custom.menu);
   if (!menuSpec) {
     console.error('[Dome] Unknown menu', custom);
@@ -402,12 +401,12 @@ export function addMenuItem(custom: CustomMenuItemSpec) {
   requestUpdate();
 }
 
-export function setMenuItem({ id, ...options }: CustomMenuItem) {
+export function setMenuItem({ id, ...options }: CustomMenuItem): void {
   const entry = customItems.get(id);
   if (entry) {
     if (entry.spec) Object.assign(entry.spec, options);
     if (entry.item) Object.assign(entry.item, options);
-    requestUpdate ();
+    requestUpdate();
   } else
     console.warn(`[Dome] unknown menu item #${id}`);
 }
@@ -482,7 +481,7 @@ function template(): CustomMenu[] {
 
 let menubar: Menu;
 
-function registerCustomItems(menu: Menu) {
+function registerCustomItems(menu: Menu): void {
   menu.items.forEach((item: MenuItem) => {
     const entry = customItems.get(item.id);
     if (entry) entry.item = item;
@@ -491,7 +490,7 @@ function registerCustomItems(menu: Menu) {
 }
 
 // Initialize the menubar machinery
-export function install() {
+export function install(): void {
   updateRequired = true;
   updateTriggered = false;
   menubar = Menu.buildFromTemplate(template());
@@ -500,7 +499,7 @@ export function install() {
 }
 
 // Called by reload above
-function reset() {
+function reset(): void {
   fileMenuItemsCustom.length = 0;
   editMenuItemsCustom.length = 0;
   viewMenuItemsCustom.length = 0;
@@ -540,7 +539,7 @@ function handlePopupMenu(_: Event, items: PopupMenuItem[]): Promise<number> {
         const { display = true, enabled, checked } = item;
         if (display) {
           const label = item.label || `#${++kid}`;
-          const click = () => { selected = index; };
+          const click = (): void => { selected = index; };
           const type = checked !== undefined ? 'checkbox' : 'normal';
           menu.append(new MenuItem({ label, enabled, type, checked, click }));
         }

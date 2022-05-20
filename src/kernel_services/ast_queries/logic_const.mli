@@ -252,7 +252,7 @@ val is_set_type: logic_type -> bool
 
 (** [set_conversion ty1 ty2] returns a set type as soon as [ty1] and/or [ty2]
     is a set. Elements have type [ty1], or the type of the elements of [ty1] if
-    it is itself a set-type ({i.e.} we do not build set of sets that way).
+    it is itself a set-type (i.e. we do not build set of sets that way).
 *)
 val set_conversion: logic_type -> logic_type -> logic_type
 

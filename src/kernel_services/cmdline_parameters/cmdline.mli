@@ -309,7 +309,7 @@ val add_aliases:
     option name [orig].
     If [visible] is set to false, the aliases do not appear in help messages.
     If [deprecated] is set to true, the use of the aliases emits a warning.
-    @Invalid_argument if an alias name is the empty string
+    @raise Invalid_argument if an alias name is the empty string
     @since Carbon-20110201
     @before 22.0-Titanium no [visible] and [deprecated] arguments. *)
 

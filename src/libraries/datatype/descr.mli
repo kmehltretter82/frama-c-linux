@@ -107,7 +107,7 @@ val of_structural: 'a Type.t -> Structural_descr.t -> 'a t
     ensures safety.
     @since Carbon-20101201 *)
 
-(** {3 Builders mapping {!Unmarshal}'s transformers} *)
+(** {3 Builders mapping [Unmarshal]'s transformers} *)
 
 val dependent_pair: 'a t -> ('a -> 'b t) -> ('a * 'b) t
 (** Similar to {!Unmarshal.Dependent_pair}, but safe.

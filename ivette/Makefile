@@ -65,19 +65,29 @@ tsc: dome-pkg dome-templ
 # --------------------------------------------------------------------------
 
 LOADER=src/renderer/loader.ts
+SANDBOX=src/renderer/sandbox.ts
 PACKAGES=$(shell find src -name "pkg.json")
+SANDBOXES=$(shell find src/sandbox -name "*.tsx")
 
 lint: pkg
 dome-pkg: pkg
 dome-app: pkg
 dome-dev: pkg
 dome-dist: pkg
-pkg: $(LOADER)
+
+pkg: $(LOADER) $(SANDBOX)
+
 $(LOADER): $(PACKAGES) ./configure.js ./Makefile
-	@rm -f $(LOADER)
+	@rm -f $@
 	@echo "[Ivette] configure packages"
-	@node ./configure.js $(LOADER) $(PACKAGES)
-	@chmod -f a-w $(LOADER)
+	@node ./configure.js $@ $(PACKAGES)
+	@chmod -f a-w $@
+
+$(SANDBOX): $(SANDBOXES) ./sandboxer.js ./Makefile
+	@rm -f $@
+	@echo "[Ivette] configure sandboxes"
+	@node ./sandboxer.js $@ $(SANDBOXES)
+	@chmod -f a-w $@
 
 # --------------------------------------------------------------------------
 # --- Frama-C Source Distrib

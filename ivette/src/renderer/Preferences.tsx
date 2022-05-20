@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- Main React Component rendered by './index.js'
 // --------------------------------------------------------------------------
@@ -69,7 +67,7 @@ function ThemeFields(): JSX.Element {
 // --- Editor Fields
 // --------------------------------------------------------------------------
 
-function EditorFields() {
+function EditorFields(): JSX.Element {
   const fontsize = Forms.useValid(
     Settings.useGlobalSettings(IvettePrefs.EditorFontSize)
   );
@@ -102,7 +100,10 @@ function EditorFields() {
 // --------------------------------------------------------------------------
 // --- Console Scrollback Forms
 // --------------------------------------------------------------------------
-function ConsoleScrollbackFields(props: IvettePrefs.ConsoleScrollbackProps) {
+
+function ConsoleScrollbackFields(
+  props: IvettePrefs.ConsoleScrollbackProps
+): JSX.Element {
   const scrollback = Forms.useDefined(Forms.useValid(
     Settings.useGlobalSettings(props.scrollback),
   ));
@@ -114,7 +115,7 @@ function ConsoleScrollbackFields(props: IvettePrefs.ConsoleScrollbackProps) {
 // --- Export Components
 // --------------------------------------------------------------------------
 
-export default function Preferences() {
+export default function Preferences(): JSX.Element {
   return (
     <Forms.Page>
       <Forms.Section label="Theme" unfold>

@@ -73,7 +73,7 @@ end
     Conversely, some functions, suffixed by [_under] assumes that their arguments
     are under-approximations, and returns a result that under-approximates the
     concrete operation. The functions [link] and [meet] in
-    {With_Under_Approximation} are exceptions, that are not suffixed by [_under].
+    {!With_Under_Approximation} are exceptions, that are not suffixed by [_under].
 
     Finally, some functions are *exact*, in the sense that they preserve the
     concretization of the concrete function. Hence, they implement
@@ -165,7 +165,7 @@ module type Full_AI_Lattice_with_cardinality = sig
 end
 
 
-(** {2 Results of generic functors, in module {!Abstract_interp}. } *)
+(** {2 Results of generic functors, in module [Abstract_interp]. } *)
 
 (** Generic signature for the base elements of a lattice *)
 module type Lattice_Value = Datatype.S_with_collections

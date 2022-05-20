@@ -20,11 +20,8 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 import * as React from 'react';
 import * as Dome from 'dome';
-import { TitleBar } from 'ivette';
 
 import { IconButton } from 'dome/controls/buttons';
 import { Label, Cell } from 'dome/controls/labels';
@@ -36,8 +33,9 @@ import * as Forms from 'dome/layout/forms';
 import * as Arrays from 'dome/table/arrays';
 import { Table, Column, Renderer } from 'dome/table/views';
 import * as Compare from 'dome/data/compare';
-
 import { State, GlobalState, useGlobalState } from 'dome/data/states';
+
+import { TitleBar } from 'ivette';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Kernel from 'frama-c/kernel/api/services';
@@ -114,11 +112,11 @@ const defaultFilter: Filter = {
   emitter: emitterFilter,
 };
 
-function filterKind(filter: KindFilter, msg: Message) {
+function filterKind(filter: KindFilter, msg: Message): boolean {
   return filter[msg.kind];
 }
 
-function filterEmitter(filter: EmitterFilter, msg: Message) {
+function filterEmitter(filter: EmitterFilter, msg: Message): boolean {
   if (msg.plugin === 'kernel')
     return filter.kernel;
   if (msg.plugin in filter.plugins)
@@ -126,7 +124,10 @@ function filterEmitter(filter: EmitterFilter, msg: Message) {
   return filter.others;
 }
 
-function searchCategory(search: string | undefined, msg: string | undefined) {
+function searchCategory(
+  search: string | undefined,
+  msg: string | undefined
+): boolean {
   if (!search || search.length < 2)
     return true;
   if (!msg)
@@ -151,7 +152,7 @@ function searchCategory(search: string | undefined, msg: string | undefined) {
   return (empty || show) && !hide;
 }
 
-function searchString(search: string | undefined, msg: string) {
+function searchString(search: string | undefined, msg: string): boolean {
   if (!search || search.length < 3)
     return true;
   if (search.charAt(0) === '"' && search.slice(-1) === '"') {
@@ -168,18 +169,26 @@ function searchString(search: string | undefined, msg: string) {
   return show;
 }
 
-function filterSearched(search: Search, msg: Message) {
+function filterSearched(search: Search, msg: Message): boolean {
   return (searchString(search.message, msg.message) &&
     searchCategory(search.category, msg.category));
 }
 
-function filterFunction(filter: Filter, kf: string | undefined, msg: Message) {
+function filterFunction(
+  filter: Filter,
+  kf: string | undefined,
+  msg: Message
+): boolean {
   if (filter.currentFct)
     return (kf === msg.fct);
   return true;
 }
 
-function filterMessage(filter: Filter, kf: string | undefined, msg: Message) {
+function filterMessage(
+  filter: Filter,
+  kf: string | undefined,
+  msg: Message
+): boolean {
   return (filterFunction(filter, kf, msg) &&
     filterSearched(filter.search, msg) &&
     filterKind(filter.kind, msg) &&
@@ -190,7 +199,7 @@ function filterMessage(filter: Filter, kf: string | undefined, msg: Message) {
 // --- Filters panel and ratio
 // --------------------------------------------------------------------------
 
-function Section(p: Forms.SectionProps) {
+function Section(p: Forms.SectionProps): JSX.Element {
   const settings = `ivette.messages.filter.${p.label}`;
   return (
     <Forms.Section label={p.label} unfold settings={settings}>
@@ -199,7 +208,7 @@ function Section(p: Forms.SectionProps) {
   );
 }
 
-function Checkbox(p: Forms.CheckboxFieldProps) {
+function Checkbox(p: Forms.CheckboxFieldProps): JSX.Element {
   const lbl = p.label.charAt(0).toUpperCase() + p.label.slice(1).toLowerCase();
   return <Forms.CheckboxField label={lbl} state={p.state} />;
 }
@@ -207,7 +216,7 @@ function Checkbox(p: Forms.CheckboxFieldProps) {
 function MessageKindCheckbox(props: {
   kind: logkind,
   kindState: Forms.FieldState<KindFilter>,
-}) {
+}): JSX.Element {
   const { kind, kindState } = props;
   const state = Forms.useProperty(kindState, kind);
   return <Checkbox label={kind} state={state} />;
@@ -216,12 +225,12 @@ function MessageKindCheckbox(props: {
 function PluginCheckbox(props: {
   plugin: string,
   pluginState: Forms.FieldState<PluginFilter>,
-}) {
+}): JSX.Element {
   const state = Forms.useProperty(props.pluginState, props.plugin);
   return <Checkbox label={props.plugin} state={state} />;
 }
 
-function MessageFilter(props: { filter: State<Filter> }) {
+function MessageFilter(props: { filter: State<Filter> }): JSX.Element {
   const state = Forms.useValid(props.filter);
   const search = Forms.useProperty(state, 'search');
   const categoryState = Forms.useProperty(search, 'category');
@@ -282,7 +291,9 @@ function MessageFilter(props: { filter: State<Filter> }) {
   );
 }
 
-function FilterRatio<K, R>({ model }: { model: Arrays.ArrayModel<K, R> }) {
+function FilterRatio<K, R>(
+  { model }: { model: Arrays.ArrayModel<K, R> }
+): JSX.Element {
   const [filtered, total] = [model.getRowCount(), model.getTotalRowCount()];
   const title = `${filtered} displayed messages / ${total} total messages`;
   return (
@@ -296,35 +307,38 @@ function FilterRatio<K, R>({ model }: { model: Arrays.ArrayModel<K, R> }) {
 // --- Messages Columns
 // --------------------------------------------------------------------------
 
-const renderKind: Renderer<logkind> = (kind: logkind) => {
-  const label = kind.toLocaleLowerCase();
-  let icon = '';
-  let color = 'black';
-  switch (kind) {
-    case 'RESULT': icon = 'ANGLE.RIGHT'; break;
-    case 'FEEDBACK': icon = 'CIRC.INFO'; break;
-    case 'DEBUG': icon = 'HELP'; break;
-    case 'WARNING': icon = 'ATTENTION'; color = '#C00000'; break;
-    case 'ERROR': case 'FAILURE': icon = 'WARNING'; color = '#C00000'; break;
-  }
-  return <Icon title={label} id={icon} fill={color} />;
-};
+const renderKind: Renderer<logkind> =
+  (kind: logkind): JSX.Element => {
+    const label = kind.toLocaleLowerCase();
+    let icon = '';
+    let color = 'black';
+    switch (kind) {
+      case 'RESULT': icon = 'ANGLE.RIGHT'; break;
+      case 'FEEDBACK': icon = 'CIRC.INFO'; break;
+      case 'DEBUG': icon = 'HELP'; break;
+      case 'WARNING': icon = 'ATTENTION'; color = '#C00000'; break;
+      case 'ERROR': case 'FAILURE': icon = 'WARNING'; color = '#C00000'; break;
+    }
+    return <Icon title={label} id={icon} fill={color} />;
+  };
 
 const renderCell: Renderer<string> =
-  (text: string) => (<Cell title={text}>{text}</Cell>);
+  (text: string): JSX.Element => (<Cell title={text}>{text}</Cell>);
 
 const renderMessage: Renderer<string> =
-  (text: string) => (<div title={text} className="message-cell"> {text} </div>);
+  (text: string): JSX.Element =>
+    (<div title={text} className="message-cell"> {text} </div>);
 
 const renderDir: Renderer<Ast.source> =
-  (loc: Ast.source) => (<Cell label={loc.dir} title={loc.file} />);
+  (loc: Ast.source): JSX.Element =>
+    (<Cell label={loc.dir} title={loc.file} />);
 
 const renderFile: Renderer<Ast.source> =
-  (loc: Ast.source) => (
+  (loc: Ast.source): JSX.Element => (
     <Cell label={`${loc.base}:${loc.line}`} title={loc.file} />
   );
 
-const MessageColumns = () => (
+const MessageColumns = (): JSX.Element => (
   <>
     <Column
       id="kind"
@@ -403,10 +417,10 @@ const byMessage: Compare.ByFields<Message> = {
 
 const globalFilterState = new GlobalState(defaultFilter);
 
-export default function RenderMessages() {
+export default function RenderMessages(): JSX.Element {
 
   const [model] = React.useState(() => {
-    const f = (msg: Message) => msg.key;
+    const f = (msg: Message): string => msg.key;
     const m = new Arrays.CompactModel<string, Message>(f);
     m.setOrderingByFields(byMessage);
     return m;

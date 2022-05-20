@@ -69,17 +69,17 @@ val get_stmt_last_stmts : termination_kind option -> stmt -> stmt list
 val get_block_last_stmts : termination_kind option -> block -> stmt list
 
 (** Find the entry edges that go inside [s] statements,
- * meaning that if the pair [(s1,s2)] is in the returned information,
- * [s2] is a successor of [s1] and [s2] is in [s] statements, but [s1] is not.
- * @since Nitrogen-20111001
- **)
+    meaning that if the pair [(s1,s2)] is in the returned information,
+    [s2] is a successor of [s1] and [s2] is in [s] statements, but [s1] is not.
+    @since Nitrogen-20111001
+*)
 val get_stmt_in_edges : stmt -> (stmt * stmt) list
 val get_block_in_edges : block -> (stmt * stmt) list
 
 (** Like [get_stmt_in_edges] but for edges going out of [s] statements.
- * Similar to [get_all_stmt_last_stmts] but gives the edge information
- * instead of just the first statement.
- * @since Nitrogen-20111001
+    Similar to [get_all_stmt_last_stmts] but gives the edge information
+    instead of just the first statement.
+    @since Nitrogen-20111001
 *)
 val get_all_stmt_out_edges : stmt -> (stmt * stmt) list
 val get_all_block_out_edges : block -> (stmt * stmt) list

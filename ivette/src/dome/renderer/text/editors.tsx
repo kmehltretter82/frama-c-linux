@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-
 // --------------------------------------------------------------------------
 // --- Text Documents
 // --------------------------------------------------------------------------
@@ -117,8 +115,13 @@ type CMoption = keyof EditorConfiguration;
 function forEachOption(
   config: EditorConfiguration,
   fn: (opt: CMoption) => void,
-) {
+): void {
   (Object.keys(config) as (keyof EditorConfiguration)[]).forEach(fn);
+}
+
+interface _Decoration {
+  classNameId: string;
+  decoration: string | undefined;
 }
 
 // --------------------------------------------------------------------------
@@ -161,7 +164,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
   // --- Mounting
   // --------------------------------------------------------------------------
 
-  mountPoint(elt: HTMLDivElement | null) {
+  mountPoint(elt: HTMLDivElement | null): void {
     this.rootElement = elt;
     if (elt !== null) {
       // Mounting...
@@ -207,7 +210,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
   // --- Auto Refresh
   // --------------------------------------------------------------------------
 
-  refresh() {
+  refresh(): void {
     const elt = this.rootElement;
     const cm = this.codeMirror;
     if (cm && elt) {
@@ -219,7 +222,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
   }
 
   // Polled every 250ms
-  autoRefresh() {
+  autoRefresh(): void {
     const elt = this.rootElement;
     const cm = this.codeMirror;
     if (cm && elt) {
@@ -259,7 +262,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
     classes: DOMTokenList,
     buffer: RichTextBuffer,
     decorator: Decorator,
-  ) {
+  ): _Decoration | undefined {
     let bestMarker: CSSMarker | undefined;
     let bestDecorated: CSSMarker | undefined;
     let bestDecoration: string | undefined;
@@ -286,7 +289,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
     } : undefined;
   }
 
-  _markElementsWith(classNameId: string, className: string) {
+  _markElementsWith(classNameId: string, className: string): void {
     const root = this.rootElement;
     const toMark = root && root.getElementsByClassName(classNameId);
     if (toMark) {
@@ -296,7 +299,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
     }
   }
 
-  _unmarkElementsWith(className: string) {
+  _unmarkElementsWith(className: string): void {
     const root = this.rootElement;
     const toUnmark = root && root.getElementsByClassName(className);
     if (toUnmark) {
@@ -308,7 +311,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
     }
   }
 
-  handleHover(target: Element) {
+  handleHover(target: Element): void {
     // Throttled (see constructor)
     const oldMarker = this.marker;
     const newMarker = this._findMarker(target);
@@ -322,7 +325,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
     }
   }
 
-  handleUpdate() {
+  handleUpdate(): void {
     const root = this.rootElement;
     const marked = root && root.getElementsByClassName('dome-xMarked');
     if (!marked) return;
@@ -357,13 +360,13 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
     this.decorations = newDecorations;
   }
 
-  onMouseMove(evt: MouseEvt) {
+  onMouseMove(evt: MouseEvt): void {
     // Not throttled (can not leak Synthetic Events)
     const tgt = evt.target;
     if (tgt instanceof Element) this.handleHover(tgt);
   }
 
-  onMouseClick(evt: MouseEvt, callback: MarkerCallback | undefined) {
+  onMouseClick(evt: MouseEvt, callback: MarkerCallback | undefined): void {
     // No need for throttling
     if (callback) {
       const { target } = evt;
@@ -375,11 +378,11 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
     this.props.buffer?.setFocused(true);
   }
 
-  onClick(evt: MouseEvt) {
+  onClick(evt: MouseEvt): void {
     this.onMouseClick(evt, this.props.onSelection);
   }
 
-  onContextMenu(evt: MouseEvt) {
+  onContextMenu(evt: MouseEvt): void {
     this.onMouseClick(evt, this.props.onContextMenu);
   }
 
@@ -387,7 +390,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
   // --- Scrolling
   // --------------------------------------------------------------------------
 
-  handleScrollTo(line: number) {
+  handleScrollTo(line: number): void {
     try {
       const cm = this.codeMirror;
       return cm && cm.scrollIntoView({ line, ch: 0 });
@@ -400,7 +403,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
   // --- Focus
   // --------------------------------------------------------------------------
 
-  handleKey(_cm: CodeMirror.Editor, key: string, _evt: Event) {
+  handleKey(_cm: CodeMirror.Editor, key: string, _evt: Event): void {
     switch (key) {
       case 'Esc':
         this.props.buffer?.setFocused(false);
@@ -411,9 +414,9 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
     }
   }
 
-  onFocus() { this.props.buffer?.setFocused(true); }
-  onBlur() { this.props.buffer?.setFocused(false); }
-  onScroll() {
+  onFocus(): void { this.props.buffer?.setFocused(true); }
+  onBlur(): void { this.props.buffer?.setFocused(false); }
+  onScroll(): void {
     const cm = this.codeMirror;
     const { buffer } = this.props;
     if (cm && buffer) {
@@ -427,7 +430,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
   // --- Rendering
   // --------------------------------------------------------------------------
 
-  shouldComponentUpdate(newProps: TextProps) {
+  shouldComponentUpdate(newProps: TextProps): boolean {
     const cm = this.codeMirror;
     if (cm) {
       // Swap documents if necessary
@@ -476,7 +479,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
     return false;
   }
 
-  render() {
+  render(): JSX.Element {
     return (
       <div
         className="dome-xText"
@@ -542,7 +545,7 @@ class CodeMirrorWrapper extends React.Component<TextProps> {
    `import CodeMirror from 'codemirror/lib/codemirror.js'` ; using `from
    'codemirror'` returns a different instance of `CodeMirror` class and will not
    work.  */
-export function Text(props: TextProps) {
+export function Text(props: TextProps): JSX.Element {
   const [appTheme] = Themes.useColorTheme();
   let { className, style, fontSize, theme: usrTheme, ...cmprops } = props;
   if (fontSize !== undefined && fontSize < 4) fontSize = 4;
