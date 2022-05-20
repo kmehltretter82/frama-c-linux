@@ -37,6 +37,7 @@
 , dos2unix
 , doxygen
 , python3
+, do_autoconf ? true
 }:
 
 # We do not use buildDunePackage because Frama-C still uses a Makefile to build
@@ -49,7 +50,10 @@ stdenvNoCC.mkDerivation rec {
         (builtins.readFile ../VERSION));
   slang = lib.strings.removeSuffix "\n" (builtins.readFile ../VERSION_CODENAME);
 
-  src = gitignoreSource ./..;
+  src =
+    if do_autoconf
+    then gitignoreSource ./..
+    else ./.. ;
 
   nativeBuildInputs = [
     autoconf
@@ -89,8 +93,7 @@ stdenvNoCC.mkDerivation rec {
 
   outputs = [ "out" "build_dir" ];
 
-  preConfigure = ''
-    autoconf
+  preConfigure = (if do_autoconf then "autoconf \n" else "") + ''
     patchShebangs src/plugins/value/gen-api.sh
     chmod +x src/plugins/value/gen-api.sh
   '';

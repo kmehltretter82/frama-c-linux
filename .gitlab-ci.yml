@@ -23,12 +23,16 @@ variables:
 ################################################################################
 ### BUILD
 
-# build-distrib-tarball:
-#   stage: build
-#   script:
-#     -
-#   tags:
-#     - nix
+build-distrib-tarball:
+  stage: build
+  script:
+    - nix-build -o distrib nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.src-distrib
+  tags:
+    - nix
+  artifacts:
+    paths:
+      - distrib/frama-c.tar.gz
+    expire_in: 1 week
 
 check-no-old-frama-c:
   stage: build
@@ -85,13 +89,6 @@ acsl-importer:
   stage: tests
   script:
     - ./nix/external-plugin-ci.sh ACSL-importer
-
-# build-from-distrib-tarball:
-#   stage: tests
-#   script:
-#     -
-#   tags:
-#     - nix
 
 caveat-importer:
   stage: tests
@@ -242,6 +239,14 @@ manuals:
 #     OCAML: "4_13"
 #   <<: *ocaml
 
+
+src-distrib-tests:
+    stage: distrib_and_compatibility
+    script:
+      - mkdir extracted && tar -xzf distrib/frama-c.tar.gz -C ./extracted
+      - nix-build extracted/frama-c/nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.src-distrib-tests
+    tags:
+      - nix
 
 ################################################################################
 ### PUBLIC
