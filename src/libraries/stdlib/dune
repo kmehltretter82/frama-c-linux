@@ -1,0 +1,5 @@
+(rule
+  (targets transitioning.ml)
+  (deps transitioning.ml.in ../../../config.sed)
+  (action (with-stdout-to transitioning.ml (run sed -f ../../../config.sed transitioning.ml.in)))
+)

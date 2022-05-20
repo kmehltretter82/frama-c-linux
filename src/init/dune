@@ -4,3 +4,5 @@
   (modules frama_c_init gui_init)
   (virtual_modules gui_init)
 )
+
+(include_subdirs no)

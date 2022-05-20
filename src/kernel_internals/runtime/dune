@@ -1,0 +1,5 @@
+(rule
+  (targets fc_config.ml)
+  (deps fc_config.ml.in ../../../config.sed)
+  (action (with-stdout-to fc_config.ml (run sed -f ../../../config.sed fc_config.ml.in)))
+)

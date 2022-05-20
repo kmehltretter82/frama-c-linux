@@ -1,17 +1,3 @@
-(library
- (name E_ACSL)
- (public_name frama-c-e-acsl.core)
- (flags -open Frama_c_kernel :standard -w -9)
- (libraries frama-c.kernel))
-
-(plugin (optional) (name e-acsl) (libraries frama-c-e-acsl.core) (site (frama-c plugins)))
-
-(copy_files# src/*.ml*)
-(copy_files# src/analyses/*.ml*)
-(copy_files# src/code_generator/*.ml*)
-(copy_files# src/libraries/*.ml*)
-(copy_files# src/project_initializer/*.ml*)
-
 ; BUILD LIBDLMALLOC
 (data_only_dirs contrib)
 

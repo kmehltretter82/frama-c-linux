@@ -142,8 +142,8 @@
   (targets Eva.ml Eva.mli)
   (deps
     gen-api.sh Eva.ml.in Eva.mli.in
-    analysis.mli results.mli parameters.mli eva_annotations.mli eval.mli
-    builtins.mli eval_terms.mli eva_results.mli unit_tests.mli
+    engine/analysis.mli utils/results.mli parameters.mli utils/eva_annotations.mli eval.mli
+    domains/cvalue/builtins.mli legacy/eval_terms.mli utils/eva_results.mli utils/unit_tests.mli
   )
   (action (run %{deps}))
 )
@@ -182,18 +182,4 @@
 
 (plugin (optional) (name eva-gui) (libraries frama-c-eva.gui) (site (frama-c plugins_gui)))
 
-(copy_files# domains/*)
-(copy_files# domains/equality/*)
-(copy_files# domains/cvalue/*)
-(copy_files# domains/gauges/*)
-(copy_files# domains/apron/*)
-(copy_files# domains/numerors/*)
-(copy_files# domains/multidim/*)
-(copy_files# engine/*)
-(copy_files# utils/*)
-(copy_files# legacy/*)
-(copy_files# values/*)
-(copy_files# values/numerors/*)
-(copy_files# gui_files/*)
-(copy_files# partitioning/*)
-(copy_files# api/*)
+(include_subdirs unqualified)
