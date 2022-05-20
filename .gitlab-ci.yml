@@ -196,7 +196,7 @@ api-doc-scheduled: # Keep artifact for master branch each night
   artifacts:
     paths:
       - result/frama-c-api.tar.gz
-    expire_in: 14 days
+    expire_in: 7 days # Note: the LAST artifact of the ref is always kept
   only:
     - schedules
 
@@ -243,7 +243,7 @@ manuals-default:
     paths:
       - result/*.pdf
       - result/*.tgz
-    expire_in: 14 days
+    expire_in: 7 days # Note: the LAST artifact of the ref is always kept
   rules:
     - if: $CI_COMMIT_BRANCH
 
