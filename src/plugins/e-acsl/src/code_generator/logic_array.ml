@@ -242,12 +242,8 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
       let p = { p with pred_name = "array_coercion" :: p.pred_name } in
       Typing.preprocess_predicate (Env.Local_vars.get env) p;
       let adata, env = Assert.empty ~loc kf env in
-      let adata, env =
-        Assert.register ~loc env "destination length" len adata
-      in
-      let adata, env =
-        Assert.register ~loc env "current length" len_orig adata
-      in
+      let adata = Assert.register ~loc "destination length" len adata in
+      let adata = Assert.register ~loc "current length" len_orig adata in
       let stmt, env =
         Assert.runtime_check ~adata ~pred_kind:Assert RTE kf env e p
       in

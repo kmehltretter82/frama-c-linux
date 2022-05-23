@@ -166,12 +166,9 @@ let add_pending_register_data ~loc { data_ptr } name e =
   let name = Cil.mkString ~loc name in
   let args = data_ptr :: name :: args in
   let stmt = Smart_stmt.rtl_call ~loc fct args in
-  let queue =
-    if Stack.is_empty pending_register_data
-    then Queue.create ()
-    else Stack.pop pending_register_data in
-  Queue.add stmt queue;
-  Stack.push queue pending_register_data
+  match Stack.top_opt pending_register_data with
+  | None -> Stack.push (Queue.create()) pending_register_data
+  | Some queue -> Queue.add stmt queue
 
 let do_pending_register_data env =
   if Stack.is_empty pending_register_data then env
@@ -182,9 +179,10 @@ let do_pending_register_data env =
       else
         let stmt = Queue.pop queue in
         do_queue (Env.add_stmt env stmt)
-    in do_queue env
+    in
+    do_queue env
 
-let register ~loc env ?(force=false) name e adata =
+let register ~loc ?(force=false) name e adata =
   if Options.Assert_print_data.get () then
     match adata, e.enode with
     | Some adata, Const _ when not force ->
@@ -195,31 +193,31 @@ let register ~loc env ?(force=false) name e adata =
          name "3" and value [3].
          The registration can be forced for expressions like [sizeof(int)] for
          instance that are [Const] values but not directly known. *)
-      Some adata, env
+      Some adata
     | Some adata, _ ->
       let adata = { adata with data_registered = true } in
       add_pending_register_data ~loc adata name e;
-      Some adata, env
-    | None, _ -> None, env
+      Some adata
+    | None, _ -> None
   else
-    adata, env
+    adata
 
-let register_term ~loc env ?force t e adata =
+let register_term ~loc ?force t e adata =
   let name = Format.asprintf "@[%a@]" Printer.pp_term t in
-  register ~loc env name ?force e adata
+  register ~loc name ?force e adata
 
 let register_pred ~loc env ?force p e adata =
   if Env.annotation_kind env == RTE then
     (* When translating RTE, we do not want to print the result of the predicate
        because they should be the only predicate in an assertion clause. *)
-    adata, env
+    adata
   else
     let name = Format.asprintf "@[%a@]" Printer.pp_predicate p in
-    register ~loc env name ?force e adata
+    register ~loc name ?force e adata
 
 let register_pred_or_term ~loc env ?force pot e adata =
   match pot with
-  | PoT_term t -> register_term ~loc env ?force t e adata
+  | PoT_term t -> register_term ~loc ?force t e adata
   | PoT_pred p -> register_pred ~loc env ?force p e adata
 
 let kind_to_string loc k =

@@ -68,8 +68,8 @@ let exp ?filter kf env e =
     | None -> l
   in
   List.iter (Typing.preprocess_rte ~lenv:(Env.Local_vars.get env)) l;
-  let env = rte_annots Printer.pp_exp e kf env l
-  in Assert.do_pending_register_data env
+  let env = rte_annots Printer.pp_exp e kf env l in
+  Assert.do_pending_register_data env
 
 let () =
   Translate_terms.translate_rte_exp_ref := exp;
