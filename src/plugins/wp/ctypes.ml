@@ -583,8 +583,6 @@ module C_object = Datatype.Make(struct
     let copy = Datatype.Undefined.copy
 
     let mem_project = Datatype.Undefined.mem_project
-
-
   end)
 
 let rec compare_ptr_conflated a b =

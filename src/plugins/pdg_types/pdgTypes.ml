@@ -80,7 +80,6 @@ end
          let pretty = print_id
          let rehash = Datatype.identity
          let copy = Datatype.undefined
-
          let mem_project = Datatype.never_any_project
        end)
      : Datatype.S_with_collections with type t := t)

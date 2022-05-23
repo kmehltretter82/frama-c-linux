@@ -136,7 +136,6 @@ include Datatype.Make
       let rehash = Datatype.undefined
       let copy = Datatype.undefined
       let pretty = pretty
-
       let mem_project = Datatype.never_any_project
     end)
 

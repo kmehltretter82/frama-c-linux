@@ -241,7 +241,6 @@ module D =
       let structural_descr = Structural_descr.t_abstract
       let rehash = Datatype.identity
 
-
       let pretty fmt = function
         | Division_by_zero e ->
           Format.fprintf fmt "Division_by_zero(@[%a@])" Printer.pp_exp e

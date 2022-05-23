@@ -194,7 +194,6 @@ module Position =  struct
         let copy = Datatype.identity
         let equal: t -> t -> bool = ( = )
         let pretty = Filepath.pp_pos
-
       end)
   let pp_with_col fmt pos =
     Format.fprintf fmt "%a char %d" pretty pos
@@ -218,7 +217,6 @@ module Location = struct
         let copy = Datatype.identity (* immutable strings *)
         let equal : t -> t -> bool = ( = )
         let pretty fmt loc = !pretty_ref fmt loc
-
       end)
 
   let pretty_long fmt loc =
@@ -267,7 +265,6 @@ module Instr = struct
         let name = "Instr"
         let reprs = List.map (fun l -> Skip l) Location.reprs
         let pretty fmt x = !pretty_ref fmt x
-
       end)
 
   let loc = function
@@ -291,7 +288,6 @@ module File =
             globinit = None;
             globinitcalled = false } ]
       include Datatype.Undefined
-
     end)
 
 module Stmt_Id = struct
@@ -313,7 +309,6 @@ module Stmt_Id = struct
         let equal t1 t2 = t1.sid = t2.sid
         let copy = Datatype.undefined
         let pretty fmt s = !pretty_ref fmt s
-
       end)
   let id stmt = stmt.sid
 end
@@ -366,7 +361,6 @@ module Kinstr = struct
           | Kglobal ->
             Format.fprintf fmt "Kglobal"
           | Kstmt s -> Stmt.pretty fmt s
-
       end)
 
   let loc = function
@@ -616,7 +610,6 @@ struct
         let equal = Datatype.from_compare
         let copy = Datatype.undefined
         let pretty fmt t = !pretty_typ_ref fmt t
-
       end)
 end
 
@@ -709,7 +702,6 @@ module Label = struct
         let reprs =
           [ Label("", Location.unknown, false); Default Location.unknown ]
         let pretty fmt l = !pretty_ref fmt l
-
         let hash = function
           | Default _ -> 7
           | Case (e, _) -> Exp.hash e
@@ -804,7 +796,6 @@ module Compinfo = struct
         let equal v1 v2 = v1.ckey = v2.ckey
         let copy = Datatype.undefined
         let pretty fmt f = !pretty_ref fmt f
-
       end)
 end
 
@@ -846,7 +837,6 @@ module Fieldinfo = struct
         let equal f1 f2 = (fid f1) = (fid f2)
         let copy = Datatype.undefined
         let pretty fmt f = !pretty_ref fmt f
-
       end)
 end
 
@@ -1122,7 +1112,6 @@ module Block = struct
           [{battrs=[]; blocals=Varinfo.reprs; bstatics = [];
             bstmts=Stmt.reprs; bscoping=true}]
         let pretty fmt b = !pretty_ref fmt b
-
       end)
   let equal b1 b2 = (b1 == b2)
 end
@@ -1190,7 +1179,6 @@ module Lval = struct
         let hash = hash_lval
         let copy = Datatype.undefined
         let pretty fmt x = !pretty_ref fmt x
-
       end)
 end
 
@@ -1205,7 +1193,6 @@ module LvalStructEq_input = struct
   let hash = StructEq.hash_lval 13598
   let copy = Datatype.undefined
   let pretty fmt x = !Lval.pretty_ref fmt x
-
 end
 
 module LvalStructEq = Make_compare_non_strict(LvalStructEq_input)
@@ -1224,7 +1211,6 @@ module Offset = struct
         let hash = hash_offset
         let copy = Datatype.undefined
         let pretty fmt x = !pretty_ref fmt x
-
       end)
 end
 
@@ -1239,7 +1225,6 @@ module OffsetStructEq_input = struct
   let hash = StructEq.hash_offset 75489
   let copy = Datatype.undefined
   let pretty fmt x = !Offset.pretty_ref fmt x
-
 end
 
 module OffsetStructEq = Make_compare_non_strict(OffsetStructEq_input)
@@ -1273,7 +1258,6 @@ module Logic_var = struct
         let equal v1 v2 = v1.lv_id = v2.lv_id
         let copy = Datatype.undefined
         let pretty fmt t = !pretty_ref fmt t
-
       end)
 end
 
@@ -1294,7 +1278,6 @@ module Builtin_logic_info = struct
         let equal i1 i2 = i1.bl_name = i2.bl_name
         let copy = Datatype.identity (* works only if an AST is never modified *)
         let pretty fmt li = !pretty_ref fmt li
-
       end)
 end
 
@@ -1311,7 +1294,6 @@ module Logic_type_info = struct
         let hash t = Hashtbl.hash t.lt_name
         let copy = Datatype.identity (* works only if an AST is never modified *)
         let pretty fmt lt = !pretty_ref fmt lt
-
       end)
 end
 
@@ -1330,7 +1312,6 @@ module Logic_ctor_info = struct
         let hash t = Hashtbl.hash t.ctor_name
         let copy = Datatype.identity (* works only if an AST is never modified *)
         let pretty fmt c = !pretty_ref fmt c
-
       end)
 end
 
@@ -1344,7 +1325,6 @@ module Initinfo = struct
           { init = None } ::
           List.map (fun t -> { init = Some (CompoundInit(t, [])) }) Typ.reprs
         let pretty fmt i = !pretty_ref fmt i
-
       end)
 end
 
@@ -1369,7 +1349,6 @@ module Logic_info = struct
         let hash i = Logic_var.hash i.l_var_info
         let copy = Datatype.undefined
         let pretty fmt li = !pretty_ref fmt li
-
       end)
 end
 
@@ -1453,7 +1432,6 @@ module Logic_info_structural = struct
         let hash i = Logic_var.hash i.l_var_info
         let copy = Datatype.undefined
         let pretty fmt li = !Logic_info.pretty_ref fmt li
-
       end)
 end
 
@@ -2062,7 +2040,6 @@ module Term = struct
         let copy = Datatype.undefined
         let hash = hash_fct hash_term
         let pretty fmt t = !pretty_ref fmt t
-
       end)
 end
 
@@ -2081,7 +2058,6 @@ module Identified_term = struct
           { it_id = x.it_id; it_content = Term.copy x.it_content }
         let hash x = x.it_id
         let pretty fmt t = !pretty_ref fmt t
-
       end)
 end
 
@@ -2105,7 +2081,6 @@ module Term_lhost = struct
         let hash = hash_fct hash_tlhost
         let copy = Datatype.undefined
         let pretty fmt h = !pretty_ref fmt h
-
       end)
 end
 
@@ -2121,7 +2096,6 @@ module Term_offset = struct
         let hash = hash_fct hash_toffset
         let copy = Datatype.undefined
         let pretty fmt t_o = !pretty_ref fmt t_o
-
       end)
 end
 
@@ -2148,7 +2122,6 @@ module Logic_label = struct
         let copy = Datatype.undefined
         let hash = hash_label
         let pretty fmt l = !pretty_ref fmt l
-
       end)
 end
 
@@ -2168,7 +2141,6 @@ module Logic_real = struct
         let equal r1 r2 = compare r1 r2 = 0
         let copy = Datatype.undefined
         let pretty fmt t = !pretty_ref fmt t
-
       end)
 end
 
@@ -2180,7 +2152,6 @@ module Global_annotation = struct
         let name = "Global_annotation"
         let reprs = List.map (fun l -> Daxiomatic ("", [],[], l)) Location.reprs
         let pretty fmt v = !pretty_ref fmt v
-
 
         let rec compare g1 g2 =
           match g1,g2 with
@@ -2270,7 +2241,6 @@ module Global = struct
         let name = "Global"
         let reprs = [ GText "" ]
         let pretty fmt v = !pretty_ref fmt v
-
 
         let compare g1 g2 =
           match g1, g2 with
@@ -2445,7 +2415,6 @@ module Code_annotation = struct
         let compare x y = Datatype.Int.compare x.annot_id y.annot_id
         let copy = Datatype.undefined
         let pretty fmt ca = !pretty_ref fmt ca
-
       end)
 
   let loc ca = match ca.annot_content with
@@ -2468,7 +2437,6 @@ module Predicate = struct
               pred_loc = Location.unknown;
               pred_content = Pfalse } ]
         let pretty fmt x = !pretty_ref fmt x
-
       end)
 end
 
@@ -2481,7 +2449,6 @@ module Toplevel_predicate = struct
         let reprs =
           [ { tp_statement = List.hd Predicate.reprs; tp_kind = Assert }]
         let pretty fmt x = !pretty_ref fmt x
-
       end)
 end
 
@@ -2498,7 +2465,6 @@ module Identified_predicate = struct
         let copy = Datatype.undefined
         let hash x = x.ip_id
         let pretty fmt x = !pretty_ref fmt x
-
       end)
 end
 
@@ -2517,7 +2483,6 @@ module PredicateStructEq = struct
         let copy = Datatype.undefined
         let hash = hash_fct hash_predicate
         let pretty fmt x = !pretty_ref fmt x
-
       end)
 end
 
@@ -2608,7 +2573,6 @@ module Lexpr = Make
       let name = "Lexpr"
       let reprs = [ { lexpr_node = PLvar ""; lexpr_loc = Location.unknown } ]
       let pretty = Datatype.undefined (* TODO *)
-
     end)
 
 (**************************************************************************)

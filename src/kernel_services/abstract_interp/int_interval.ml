@@ -96,7 +96,6 @@ include Datatype.Make_with_collections
       let rehash = Datatype.identity
       let mem_project = Datatype.never_any_project
       let copy = Datatype.undefined
-
     end)
 
 (* ------------------------------ Building ---------------------------------- *)

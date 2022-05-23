@@ -230,7 +230,6 @@ module Make (V : module type of Offsetmap_lattice_with_isotropy) = struct
             let rehash x = !rehash_ref x
             let copy = Datatype.undefined
             let pretty = pretty
-
             let mem_project = Datatype.never_any_project
           end)
       include D

@@ -240,7 +240,6 @@ struct
         let pretty = pretty
         let rehash = Datatype.identity
         let copy = Datatype.undefined
-
         let mem_project = Datatype.never_any_project
       end)
 

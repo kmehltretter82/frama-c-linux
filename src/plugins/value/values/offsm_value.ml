@@ -375,7 +375,6 @@ module Datatype_Offsm_or_top = Datatype.Make_with_collections(struct
     let pretty fmt = function
       | Top -> Format.pp_print_string fmt "TopO"
       | O o -> Format.fprintf fmt "O @[%a@]" V_Offsetmap.pretty o
-
     let mem_project = Datatype.never_any_project
   end)
 

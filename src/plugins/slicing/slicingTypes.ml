@@ -65,7 +65,6 @@ module Fct_user_crit =
       let reprs = [ SlicingInternals.dummy_fct_user_crit ]
       let name = "SlicingTypes.Fct_user_crit"
       let mem_project = Datatype.never_any_project
-
     end)
 
 (** Function slice *)
@@ -173,7 +172,6 @@ module Sl_mark =
       let rehash = Datatype.undefined
       let pretty = pp_sl_mark
       let mem_project = Datatype.never_any_project
-
     end)
 
 let dyn_sl_mark = Sl_mark.ty
