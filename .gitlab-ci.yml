@@ -233,7 +233,7 @@ internal_nightly:
   tags:
     - nix
 
-manuals-default:
+manuals:
   <<: *manuals
   when: manual
   artifacts:
