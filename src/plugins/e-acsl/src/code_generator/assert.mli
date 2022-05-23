@@ -58,9 +58,8 @@ val clean: loc:location -> Env.t -> t -> Env.t
     memory allocated in the C structure will not be freed. *)
 
 val push_pending_register_data: unit -> unit
-(** data registering must be delayed after RTE checks to avoid crashes.
-    [push_pending_register_data] adds a regisration in the pending ones that
-    will be generated after the RTE. *)
+(** [push_pending_register_data] adds a data registration to a stack of pending
+    data registration to be generated later *)
 
 val do_pending_register_data:
   Env.t -> Env.t
