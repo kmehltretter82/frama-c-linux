@@ -25,7 +25,7 @@
     functions (like iterators over kernel functions). This kind of operations is
     stored in module {!Globals.Functions}.
 
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 open Cil_types
 
@@ -209,7 +209,7 @@ val is_return_stmt: t -> stmt -> bool
 (* ************************************************************************* *)
 
 val dummy: unit -> t
-(** @plugin development guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val get_vi : t -> varinfo
 val get_id: t -> int
@@ -230,7 +230,7 @@ val get_statics : t -> varinfo list
 exception No_Definition
 val get_definition : t -> fundec
 (** @raise No_Definition if the given function is not a definition.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val has_definition : t -> bool
 (** @return [true] iff the given kernel function has a defintion.
@@ -269,7 +269,7 @@ val get_called : exp -> t option
 (* ************************************************************************* *)
 
 (** Hashtable indexed by kernel functions and dealing with project.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Make_Table(Data: Datatype.S)(Info: State_builder.Info_with_size):
   State_builder.Hashtbl with type key = t and type data = Data.t
 

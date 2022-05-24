@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Create a new window displaying a graph.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 val graph_window:
   parent: GWindow.window ->
   title:string ->

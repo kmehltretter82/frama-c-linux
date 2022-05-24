@@ -177,30 +177,36 @@ wp-tests:
 ################################################################################
 ### DISTRIB
 
-# api-doc:
-#   stage: tests
-#   script:
-#     -
-#   tags:
-#     - nix
-#   allow_failure: true
+# API documentation
 
-.build_template: &frama-c-ocaml
+.build_template: &api-doc
   stage: distrib_and_compatibility
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.default-config-tests
+    - nix-build -o api nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.api-doc
   tags:
     - nix
 
-# frama-c-ocaml-4.11:
-#   variables:
-#     OCAML: "4_11"
-#   <<: *frama-c-ocaml
+api-doc-default: # Check that we successfully build but no artifact
+  <<: *api-doc
 
-# frama-c-ocaml-4.13:
-#   variables:
-#     OCAML: "4_13"
-#   <<: *frama-c-ocaml
+api-doc-artifact: # Note: the Nix store avoids rebuilding
+  <<: *api-doc
+  artifacts:
+    paths:
+      - api/frama-c-api.tar.gz
+    expire_in: 7 days
+  when: manual
+
+api-doc-scheduled: # Keep artifact for master branch each night
+  <<: *api-doc
+  artifacts:
+    paths:
+      - api/frama-c-api.tar.gz
+    expire_in: 7 days # Note: the LAST artifact of the ref is always kept
+  only:
+    - schedules
+
+# Internalized plugins tests
 
 .build_template: &internal_template
   stage: distrib_and_compatibility
@@ -218,28 +224,43 @@ internal_nightly:
   only:
     - schedules
 
-manuals: # TODO: restore doc companions
+# Manuals
+
+.build_template: &manuals
   stage: distrib_and_compatibility
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.manuals
+    - nix-build -o manuals nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.manuals
   tags:
     - nix
+
+manuals:
+  <<: *manuals
   when: manual
   artifacts:
     paths:
-      - result/acsl-implementation.pdf
-      - result/acsl.pdf
-      - result/aorai-example.tgz
-      - result/aorai-manual.pdf
-      - result/e-acsl-implementation.pdf
-      - result/e-acsl-manual.pdf
-      - result/e-acsl.pdf
-      - result/eva-manual.pdf
-      - result/metrics-manual.pdf
-      - result/plugin-development-guide.pdf
-      - result/rte-manual.pdf
-      - result/user-manual.pdf
-      - result/wp-manual.pdf
+      - manuals/*.pdf
+      - manuals/*.tgz
+    expire_in: 7 days # Note: the LAST artifact of the ref is always kept
+
+# OCaml versions
+
+.build_template: &ocaml
+  stage: distrib_and_compatibility
+  script:
+    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.default-config-tests
+  tags:
+    - nix
+
+# ocaml-4.11:
+#   variables:
+#     OCAML: "4_11"
+#   <<: *ocaml
+
+# ocaml-4.13:
+#   variables:
+#     OCAML: "4_13"
+#   <<: *ocaml
+
 
 ################################################################################
 ### PUBLIC

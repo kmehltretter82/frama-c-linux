@@ -85,7 +85,7 @@ val compute : unit -> unit
     @raise Db.Value.Incorrect_number_of_arguments if some arguments are
     specified for the entry point using {!Db.Value.fun_set_args}, and
     an incorrect number of them is given.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val is_computed : unit -> bool
 (** Return [true] iff the Eva analysis has been done. *)

@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Lattice signatures.
-    @plugin developer guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 module type Join_Semi_Lattice = sig
   include Datatype.S (** datatype of element of the lattice *)

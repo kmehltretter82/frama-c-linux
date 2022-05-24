@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Value analysis alarms
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (* ************************************************************************* *)
 (* [JS 2011/03/11] All the below stuff manage warnings of the value analysis
