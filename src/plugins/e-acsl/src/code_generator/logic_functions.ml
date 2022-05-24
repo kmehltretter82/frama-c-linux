@@ -22,6 +22,7 @@
 
 open Cil_types
 open Cil_datatype
+open Analyses_datatype
 module Error = Translation_error
 
 (**************************************************************************)
@@ -196,7 +197,7 @@ let generate_kf ~loc fname env ret_ty params_ty params_ival li =
     let env = Env.push env in
     (* fill the typing environment with the function's parameters
        before generating the code (code generation invokes typing) *)
-    let env = Env.Logic_env.push_new env li.l_profile params_ival in
+    let env = Env.Logic_env.push_new env params_ival in
     let env =
       List.fold_left2 (Env.Logic_binding.add_binding) env li.l_profile params
     in
@@ -268,7 +269,7 @@ let generate_kf ~loc fname env ret_ty params_ty params_ival li =
 (* for each logic_info, associate its possible profiles, i.e. the types of its
    parameters + the generated varinfo for the function *)
 let memo_tbl:
-  kernel_function Interval.Profile.Hashtbl.t Logic_info.Hashtbl.t
+  kernel_function Profile.Hashtbl.t Logic_info.Hashtbl.t
   = Logic_info.Hashtbl.create 7
 
 let reset () = Logic_info.Hashtbl.clear memo_tbl
@@ -288,7 +289,7 @@ let add_generated_functions globals =
            :: acc
          in
          aux
-           (Interval.Profile.Hashtbl.fold_sorted
+           (Profile.Hashtbl.fold_sorted
               (fun _ -> add_fundecl)
               params
               acc)
@@ -309,7 +310,7 @@ let add_generated_functions globals =
   in
   let rev_globals =
     Logic_info.Hashtbl.fold_sorted
-      (fun _ -> Interval.Profile.Hashtbl.fold_sorted
+      (fun _ -> Profile.Hashtbl.fold_sorted
           (fun _ -> add_fundec))
       memo_tbl
       rev_globals
@@ -318,7 +319,7 @@ let add_generated_functions globals =
 
 (* Generate (and memoize) the function body and create the call to the
    generated function. *)
-let function_to_exp ~loc ?tapp fname env kf li params_ty params_ival args =
+let function_to_exp ~loc ?tapp fname env kf li params_ty profile args =
   let ret_ty =
     match tapp with
     | Some tapp ->
@@ -328,8 +329,8 @@ let function_to_exp ~loc ?tapp fname env kf li params_ty params_ival args =
   in
   let gen tbl =
     let vi, kf, gen_body =
-      generate_kf fname ~loc env ret_ty params_ty params_ival li in
-    Interval.Profile.Hashtbl.add tbl params_ival kf;
+      generate_kf fname ~loc env ret_ty params_ty profile li in
+    Profile.Hashtbl.add tbl profile kf;
     vi, gen_body
   in
   (* memoise the function's varinfo *)
@@ -337,12 +338,12 @@ let function_to_exp ~loc ?tapp fname env kf li params_ty params_ival args =
     try
       let h = Logic_info.Hashtbl.find memo_tbl li in
       try
-        let kf = Interval.Profile.Hashtbl.find h params_ival in
+        let kf = Profile.Hashtbl.find h profile in
         Kernel_function.get_vi kf,
         (fun () -> ()) (* body generation already planified *)
       with Not_found -> gen h
     with Not_found ->
-      let h = Interval.Profile.Hashtbl.create 7 in
+      let h = Profile.Hashtbl.create 7 in
       Logic_info.Hashtbl.add memo_tbl li h;
       gen h
   in
@@ -489,13 +490,10 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
         let gen_fname =
           Varname.get ~scope:Varname.Global (Functions.RTL.mk_gen_name fname)
         in
-        let params_ival = match li.l_body with
-          | LBterm t -> Interval.get_widened_profile params_ival t
-          | LBpred _ -> params_ival
-          | _ -> assert false
-        in
+        let profile = Profile.make li.l_profile params_ival in
+        let profile = Interval.get_widened_profile profile li in
         let vi, e, env =
-          function_to_exp ~loc ?tapp gen_fname env kf li params_ty params_ival args
+          function_to_exp ~loc ?tapp gen_fname env kf li params_ty profile args
         in
         vi, e, adata, env
       end

@@ -64,7 +64,7 @@ let rec has_empty_quantif_with_false_negative ~logic_env = function
 
 let () =
   Labels.has_empty_quantif_ref :=
-    let logic_env = Interval.Logic_env.make [] [] in
+    let logic_env = Analyses_datatype.Logic_env.empty in
     has_empty_quantif_with_false_negative ~logic_env
 (* Since we do not support logic functions with labels, we do not need to
    pass an actual logic environment *)
@@ -106,7 +106,7 @@ let convert kf env loc ~is_forall quantif =
              let env = Env.Logic_scope.extend env lvs in
              let logic_env = Env.Logic_env.get env in
              let i = Interval.(join (get ~logic_env t1) (get ~logic_env t2)) in
-             let env = Env.Logic_env.add_let_quantif_binding env lv i in
+             let env = Env.Logic_env.add env lv i in
              lvs :: lvs_guards, env)
           ([], env)
           bound_vars

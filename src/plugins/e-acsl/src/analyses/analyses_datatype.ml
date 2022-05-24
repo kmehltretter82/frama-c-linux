@@ -248,3 +248,185 @@ module At_data = struct
             Ext_logic_label.pretty elabel
       end)
 end
+
+module Ival_datatype =
+  Datatype.Make_with_collections
+    (struct
+      type t = ival
+      let name = "E_ACSL.Interval.t"
+      let reprs = [ Float (FFloat, Some 0.); Rational; Real; Nan ]
+      include Datatype.Undefined
+
+      let compare i1 i2 =
+        if i1 == i2 then 0
+        else
+          match i1, i2 with
+          | Ival i1, Ival i2 ->
+            Ival.compare i1 i2
+          | Float (k1, f1), Float (k2, f2) ->
+            (* faster to compare a kind than a float *)
+            let n = Stdlib.compare k1 k2 in
+            if n = 0 then Stdlib.compare f1 f2 else n
+          | Ival _, (Float _ | Rational | Real | Nan)
+          | Float _, (Rational | Real | Nan)
+          | Rational, (Real | Nan)
+          | Real, Nan ->
+            -1
+          | Nan, (Ival _ | Float _ | Rational | Real)
+          | Real, (Ival _ | Float _ | Rational)
+          | Rational, (Ival _ | Float _)
+          | Float _, Ival _ ->
+            1
+          | Rational, Rational | Real, Real | Nan, Nan ->
+            assert false
+
+      let equal = Datatype.from_compare
+
+      let hash = function
+        | Ival i -> 7 * Ival.hash i
+        | Float(k, f) -> 17 * Hashtbl.hash f + 97 * Hashtbl.hash k
+        | Rational -> 787
+        | Real -> 1011
+        | Nan -> 1277
+
+      let pretty fmt = function
+        | Ival i -> Ival.pretty fmt i
+        | Float(_, Some f) -> Format.pp_print_float fmt f
+        | Float(FFloat, None) -> Format.pp_print_string fmt "float"
+        | Float(FDouble, None) -> Format.pp_print_string fmt "double"
+        | Float(FLongDouble, None) -> Format.pp_print_string fmt "long double"
+        | Rational -> Format.pp_print_string fmt "Rational"
+        | Real -> Format.pp_print_string fmt "Real"
+        | Nan -> Format.pp_print_string fmt "NaN"
+
+    end)
+
+(* Profiles of functions are the interval ranges of their arguments. For
+   memoization purposes, we need need them as keys of hashtables, even though
+   they are implemented as maps. Functions typically do not have many arguments
+   so it is acceptable to do so.*)
+module Profile =
+struct
+  let rec make args ival =
+    match args,ival with
+    | [],[] -> Logic_var.Map.empty
+    | x::args, i::ival -> Logic_var.Map.add x i (make args ival)
+    | [], _::_ | _::_, [] -> assert false
+
+  include
+    Datatype.Make_with_collections
+      (struct
+        include (Logic_var.Map)
+        include Datatype.Undefined
+
+        type t = ival Logic_var.Map.t
+
+        let equal = Logic_var.Map.equal (Ival_datatype.equal)
+        let compare = Logic_var.Map.compare (Ival_datatype.compare)
+
+        let mem_project = Datatype.never_any_project
+        let copy m =  Logic_var.Map.fold Logic_var.Map.add m Logic_var.Map.empty
+        let hash m =
+          Logic_var.Map.fold
+            (fun v i h -> h + Logic_var.hash v + Ival_datatype.hash i)
+            m
+            0
+        let reprs =
+          let v = List.hd Logic_var.reprs in
+          let i = List.hd Ival_datatype.reprs in
+          [ Logic_var.Map.add v i Logic_var.Map.empty ]
+        let structural_descr = Structural_descr.t_abstract
+        let rehash = Datatype.identity
+        let name = "E-ACSL.Profile"
+      end)
+
+  let is_empty = Logic_var.Map.is_empty
+
+  let empty = Logic_var.Map.empty
+end
+
+module Id_term_in_profile =
+  Datatype.Pair_with_collections
+    (Misc.Id_term)
+    (Profile)
+    (struct let module_name = "E_ACSL.Analyse.Id_term_in_profile" end)
+
+(* Environment to handle recursive functions: this environment stores the logic
+   functions that we have already started inferring along with their
+   profiles. This is necessary for the fixpoint algorithm. *)
+module LFProf =
+  Datatype.Pair_with_collections (Cil_datatype.Logic_info) (Profile)
+    (struct
+      let module_name = "E_ACSL.Interval.LFProf"
+    end)
+
+module Logic_env
+= struct
+  type t = { profile : Profile.t;
+             let_quantif_bind : Profile.t}
+
+  let add env x i =
+    { env with let_quantif_bind = Logic_var.Map.add  x i env.let_quantif_bind}
+
+  let empty =
+    {profile = Logic_var.Map.empty;
+     let_quantif_bind = Logic_var.Map.empty}
+
+  let make profile =
+    { profile = profile;
+      let_quantif_bind = Logic_var.Map.empty }
+
+  let find env x =
+    try Logic_var.Map.find x env.let_quantif_bind
+    with Not_found ->
+      Logic_var.Map.find x env.profile
+
+  let get_profile env = env.profile
+
+end
+
+(* Imperative environment to perform fixpoint algorithm for recursive
+   functions *)
+module LF_env
+= struct
+
+  let tbl = LFProf.Hashtbl.create 17
+
+  let clear () = LFProf.Hashtbl.clear tbl
+
+  let find li profile = LFProf.Hashtbl.find tbl (li,profile)
+
+  exception Recursive
+
+  let contain li = object
+    inherit Visitor.frama_c_inplace
+
+    method! vpredicate p =
+      match p.pred_content with
+      | Papp (li_app,_,_) when Cil_datatype.Logic_info.equal li li_app ->
+        raise Recursive;
+      | _ -> Cil.DoChildren
+
+    method! vterm t =
+      match t.term_node with
+      | Tapp(li_app,_,_) when Cil_datatype.Logic_info.equal li li_app ->
+        raise Recursive
+      | _ -> Cil.DoChildren
+
+    method! vlogic_type _ = Cil.SkipChildren
+  end
+
+  let is_rec li =
+    match li.l_body with
+    | LBpred p ->
+      (try ignore (Visitor.visitFramacPredicate (contain li) p); false
+       with Recursive -> true)
+    | LBterm t ->
+      (try ignore (Visitor.visitFramacTerm (contain li) t); false
+       with Recursive -> true)
+    | LBreads _ | LBnone -> false
+    | LBinductive _ -> Error.not_yet "Inductive"
+
+  let replace li args_ival ival = LFProf.Hashtbl.replace tbl (li, args_ival) ival
+
+end

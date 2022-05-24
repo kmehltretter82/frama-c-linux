@@ -259,7 +259,7 @@ let translations: varinfo Error.result At_data.Hashtbl.t =
 let pretranslate_to_exp ~loc kf env pot =
   Options.debug ~level:4 "pre-translating %a in profile '%a'"
     Pred_or_term.pretty pot
-    Interval.Profile.pretty
+    Profile.pretty
     (Env.Logic_env.get_profile env);
   let e, env, t_opt =
     let adata = Assert.no_data in
@@ -299,7 +299,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
   Options.debug ~level:4
     "pre-translating %a in local environment '%a' with lscope '%a'"
     Pred_or_term.pretty pot
-    Interval.Profile.pretty
+    Profile.pretty
     (Env.Logic_env.get_profile env)
     Lscope.D.pretty lscope;
   let term_to_exp = !term_to_exp_ref in
@@ -315,7 +315,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
           (Interval.get ~logic_env t2)
       in
       add_lscope_to_logic_env
-        (Env.Logic_env.add_let_quantif_binding env x i)
+        (Env.Logic_env.add env x i)
         lscope
     | _::_ -> env
   in

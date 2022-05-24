@@ -24,6 +24,7 @@
 
 open Cil_types
 open Analyses_types
+open Analyses_datatype
 let dkey = Options.Dkey.translation
 
 (**************************************************************************)
@@ -868,7 +869,7 @@ and to_exp ~adata ?inplace kf env t =
   let generate_rte = Env.generate_rte env in
   Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)in local \
                                    environment '%a'"
-    Printer.pp_term t generate_rte Interval.Profile.pretty
+    Printer.pp_term t generate_rte Profile.pretty
     (Env.Logic_env.get_profile env);
   let logic_env = Env.Logic_env.get env in
   let t = Logic_normalizer.get_term t in
@@ -922,7 +923,7 @@ let untyped_to_exp typ t =
       | _ -> Typing.nan
   in
   let ctx = Option.map ctx_of_typ typ in
-  let logic_env = Interval.Logic_env.make [] [] in
+  let logic_env = Logic_env.empty in
   Typing.preprocess_term ~use_gmp_opt:true ~logic_env ?ctx t;
   let env = Env.push Env.empty in
   let env = Env.set_rte env false in

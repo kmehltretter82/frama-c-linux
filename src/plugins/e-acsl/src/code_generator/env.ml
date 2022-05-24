@@ -77,7 +77,7 @@ type t = {
   (* list of loop environment for each currently visited loops *)
   cpt: int;
   (* counter used when generating variables *)
-  logic_env_stack: Interval.Logic_env.t list;
+  logic_env_stack: Analyses_datatype.Logic_env.t list;
   (* type of variables used in calls to logic functions and predicates *)
   kinstr: kinstr;
   (* Current kinstr of the environment *)
@@ -112,7 +112,7 @@ let empty =
     var_mapping = Logic_var.Map.empty;
     loop_envs = [];
     cpt = 0;
-    logic_env_stack = [ Interval.Logic_env.make [] [] ];
+    logic_env_stack = [ Analyses_datatype.Logic_env.empty ];
     kinstr = Kglobal }
 
 let top env = match env.env_stack with
@@ -542,17 +542,17 @@ end
 
 module Logic_env = struct
 
-  let push_new env l_profile profile =
+  let push_new env profile =
     let logic_env_stack =
-      Interval.Logic_env.make l_profile profile :: env.logic_env_stack
+      Analyses_datatype.Logic_env.make profile :: env.logic_env_stack
     in
     {env with logic_env_stack = logic_env_stack}
 
-  let add_let_quantif_binding env x ival =
+  let add env x ival =
     match env.logic_env_stack with
     | curr::_ as logic_env ->
       let logic_env_stack =
-        Interval.Logic_env.add_let_quantif_binding curr x ival :: logic_env
+        Analyses_datatype.Logic_env.add curr x ival :: logic_env
       in
       {env with logic_env_stack = logic_env_stack}
     | [] -> Options.fatal "logic environment stack is empty"
@@ -563,7 +563,7 @@ module Logic_env = struct
     | [] -> Options.fatal "logic environment stack is empty"
 
   let get_profile env =
-    Interval.Logic_env.get_profile (get env)
+    Analyses_datatype.Logic_env.get_profile (get env)
 
   let pop env =
     match env.logic_env_stack with

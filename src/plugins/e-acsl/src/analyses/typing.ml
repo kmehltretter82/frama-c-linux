@@ -21,6 +21,8 @@
 (**************************************************************************)
 
 open Cil_types
+open Analyses_types
+open Analyses_datatype
 
 (* Implement Figure 4 of J. Signoles' JFLA'15 paper "Rester statique pour
    devenir plus rapide, plus précis et plus mince". *)
@@ -179,21 +181,17 @@ type computed_info =
                          must be casted to. If [None], no cast needed. *)
   }
 
-module Id_term_with_profile =
-  Datatype.Pair_with_collections
-    (Misc.Id_term)
-    (Interval.Profile)
-    (struct let module_name = "E_ACSL.Typing.Id_term_with_profile" end)
-
 (* Memoization module which retrieves the computed info of some terms. If the
    info is already computed for a term, it is never recomputed *)
 module Memo: sig
   val memo:
-    profile:Interval.Profile.t ->
+    profile: Profile.t ->
     (term -> computed_info) ->
     term ->
     computed_info Error.result
-  val get: profile:Interval.Profile.t -> term -> computed_info Error.result
+  val get: profile: Profile.t ->
+    term ->
+    computed_info Error.result
   val clear: unit -> unit
 end = struct
 
@@ -224,11 +222,11 @@ end = struct
      We distinguish the calls to the function by storing the type of the
      arguments corresponding to each call, and we weaken the typing so that it
      is invariant when the arguments have the same type. *)
-  let dep_tbl : computed_info Error.result Id_term_with_profile.Hashtbl.t
-    = Id_term_with_profile.Hashtbl.create 97
+  let dep_tbl : computed_info Error.result Id_term_in_profile.Hashtbl.t
+    = Id_term_in_profile.Hashtbl.create 97
 
   let get_dep profile t =
-    try Id_term_with_profile.Hashtbl.find dep_tbl (t,profile)
+    try Id_term_in_profile.Hashtbl.find dep_tbl (t,profile)
     with Not_found -> Error.not_memoized ()
 
   let get_nondep t =
@@ -236,9 +234,9 @@ end = struct
     with Not_found -> Error.not_memoized ()
 
   let get ~profile t =
-    match profile with
-    | [] -> get_nondep t
-    | _::_ -> get_dep profile t
+    if Profile.is_empty profile
+    then get_nondep t
+    else get_dep profile t
 
   let memo_nondep f t =
     try Misc.Id_term.Hashtbl.find tbl t
@@ -252,24 +250,24 @@ end = struct
 
   let memo_dep f t profile =
     try
-      Id_term_with_profile.Hashtbl.find dep_tbl (t, profile)
+      Id_term_in_profile.Hashtbl.find dep_tbl (t, profile)
     with Not_found ->
       let x =
         try Result.Ok (f t)
         with Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Error exn
       in
-      Id_term_with_profile.Hashtbl.add dep_tbl (t, profile) x;
+      Id_term_in_profile.Hashtbl.add dep_tbl (t, profile) x;
       x
 
   let memo ~profile f t =
-    match profile with
-    | [] -> memo_nondep f t
-    | _::_ -> memo_dep f t profile
+    if Profile.is_empty profile
+    then memo_nondep f t
+    else memo_dep f t profile
 
   let clear () =
     Options.feedback ~dkey ~level:4 "clearing the typing tables";
     Misc.Id_term.Hashtbl.clear tbl;
-    Id_term_with_profile.Hashtbl.clear dep_tbl
+    Id_term_in_profile.Hashtbl.clear dep_tbl
 
 end
 
@@ -289,11 +287,11 @@ let assert_nan = function
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
 let ty_of_interv ?ctx ?(use_gmp_opt = false) = function
-  | Interval.Float(fk, _) -> C_float fk
-  | Interval.Rational -> Rational
-  | Interval.Real -> Real
-  | Interval.Nan -> Nan
-  | Interval.Ival iv ->
+  | Float(fk, _) -> C_float fk
+  | Rational -> Rational
+  | Real -> Real
+  | Nan -> Nan
+  | Ival iv ->
     try
       let kind = Interval.ikind_of_ival iv in
       (match ctx with
@@ -591,7 +589,11 @@ let rec type_term
                     ?ctx
                     ~profile x))
             args;
-          let new_profile = List.map (Interval.get_from_profile ~profile) args in
+          let new_profile =
+            Profile.make
+              li.l_profile
+              (List.map (Interval.get_from_profile ~profile) args)
+          in
           Stack.push
             (fun () ->
                ignore (type_predicate ~profile:new_profile p))
@@ -620,8 +622,12 @@ let rec type_term
                     ?ctx
                     ~profile x))
             args;
-          let new_profile = List.map (Interval.get_from_profile ~profile) args in
-          let new_profile = Interval.get_widened_profile new_profile t_body in
+          let new_profile =
+            Profile.make
+              li.l_profile
+              (List.map (Interval.get_from_profile ~profile) args)
+          in
+          let new_profile = Interval.get_widened_profile new_profile li in
           let gmp,ctx_body = match li.l_type with
             | Some (Ctype typ) ->
               false, Some (number_ty_of_typ ~post:false typ)
@@ -776,7 +782,11 @@ and type_predicate ~profile p =
           List.iter
             (fun x -> ignore (type_term ~use_gmp_opt: true ~profile x))
             args;
-          let new_profile = List.map (Interval.get_from_profile ~profile) args in
+          let new_profile =
+            Profile.make
+              li.l_profile
+              (List.map (Interval.get_from_profile ~profile) args)
+          in
           ignore (type_predicate ~profile:new_profile p);
         | LBnone -> ()
         | LBreads _ -> ()
@@ -869,7 +879,7 @@ let type_named_predicate ~profile p =
   done
 
 let unsafe_set t ?ctx ~logic_env ty =
-  let profile = Interval.Logic_env.get_profile logic_env in
+  let profile = Logic_env.get_profile logic_env in
   let ctx = match ctx with None -> ty | Some ctx -> ctx in
   let mk _ = coerce ~arith_operand:false ~ctx ~op:ty ty in
   ignore (Memo.memo mk ~profile t)
@@ -879,15 +889,15 @@ let unsafe_set t ?ctx ~logic_env ty =
 (******************************************************************************)
 
 let get_number_ty ~logic_env t =
-  let profile = Interval.Logic_env.get_profile logic_env in
+  let profile = Logic_env.get_profile logic_env in
   (Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term).ty
 
 let get_integer_op ~logic_env t =
-  let profile = Interval.Logic_env.get_profile logic_env in
+  let profile = Logic_env.get_profile logic_env in
   (Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term).op
 
 let get_integer_op_of_predicate ~logic_env p =
-  let profile = Interval.Logic_env.get_profile logic_env in
+  let profile = Logic_env.get_profile logic_env in
   (type_predicate ~profile p).op
 
 (* {!typ_of_integer}, but handle the not-integer cases. *)
@@ -903,26 +913,26 @@ let extract_typ t ty =
   | Larrow _ -> Error.not_yet "unsupported logic type: type arrow"
 
 let get_typ ~logic_env t =
-  let profile = Interval.Logic_env.get_profile logic_env in
+  let profile = Logic_env.get_profile logic_env in
   let info =
     Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term in
   extract_typ t info.ty
 
 let get_op ~logic_env t =
-  let profile = Interval.Logic_env.get_profile logic_env in
+  let profile = Logic_env.get_profile logic_env in
   let info =
     Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term  in
   extract_typ t info.op
 
 let get_cast ~logic_env t =
-  let profile = Interval.Logic_env.get_profile logic_env in
+  let profile = Logic_env.get_profile logic_env in
   let info =
     Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term in
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> None
 
 let get_cast_of_predicate ~logic_env p =
-  let profile = Interval.Logic_env.get_profile logic_env in
+  let profile = Logic_env.get_profile logic_env in
   let info = type_predicate ~profile p in
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> assert false
@@ -946,7 +956,7 @@ let typing_visitor profile = object
 end
 
 let type_program ast =
-  let visitor = typing_visitor [] in
+  let visitor = typing_visitor Profile.empty in
   visitor#visit_file ast
 
 let type_code_annot lenv annot =
@@ -957,7 +967,7 @@ let preprocess_predicate ~logic_env p =
   Logic_normalizer.preprocess_predicate p;
   Bound_variables.preprocess_predicate p;
   Interval.preprocess_predicate ~logic_env p;
-  let profile = Interval.Logic_env.get_profile logic_env in
+  let profile = Logic_env.get_profile logic_env in
   let visitor = typing_visitor profile in
   ignore @@ visitor#visit_predicate p
 
@@ -965,12 +975,12 @@ let preprocess_rte ~logic_env rte =
   Logic_normalizer.preprocess_annot rte;
   Bound_variables.preprocess_annot rte;
   ignore (Interval.preprocess_code_annot ~logic_env rte);
-  let profile = Interval.Logic_env.get_profile logic_env in
+  let profile = Logic_env.get_profile logic_env in
   type_code_annot profile rte
 
 let preprocess_term ~use_gmp_opt ?ctx ~logic_env t =
   ignore (Interval.preprocess_term ~logic_env t);
-  let profile = Interval.Logic_env.get_profile logic_env in
+  let profile = Logic_env.get_profile logic_env in
   ignore (type_term ~use_gmp_opt ?ctx ~profile t);
 
 (*

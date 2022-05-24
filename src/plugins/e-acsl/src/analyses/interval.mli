@@ -47,17 +47,12 @@
     Note: this is a partial wrapper on top of [Ival.t], to which most
     functions are delegated. *)
 
+open Analyses_types
+open Analyses_datatype
+
 (* ************************************************************************** *)
 (** {3 Useful operations on intervals} *)
 (* ************************************************************************** *)
-
-type ival =
-  | Ival of Ival.t
-  | Float of Cil_types.fkind * float option
-  | Rational
-  | Real
-  | Nan
-
 type t = ival
 
 val is_included: t -> t -> bool
@@ -91,29 +86,6 @@ val extended_interv_of_typ: Cil_types.typ -> t
 val plus_one : ival -> ival
 (** @return the result of adding one to an interval. This is because when we
       have a condition [x<t], we need to generate [t+1] *)
-
-(* ************************************************************************** *)
-(** {3 Environment for interval computations} *)
-(* ************************************************************************** *)
-
-(** profile which maps logic variables that are function parameters to their
-    interval depending on the arguments at the callsite of the function *)
-module Profile:
-  Datatype.S_with_collections with type t = ival list
-
-(** logic environment which maps logic variables to their interval. It is
-    composed of:
-    - a profile for bindings of function arguments
-    - additional bindings for let and quantification binds *)
-module Logic_env: sig
-  type t
-  (* make a new environment with no bindings for let and quantifications, and
-     a profile, to be called at a function callsite. The two lists are assumed
-     to have the same length *)
-  val make: Cil_types.logic_var list -> ival list -> t
-  val add_let_quantif_binding: t -> Cil_types.logic_var -> ival -> t
-  val get_profile: t -> Profile.t
-end
 
 (* ************************************************************************** *)
 (** {3 Inference system} *)
@@ -152,7 +124,7 @@ val preprocess_code_annot :
 val preprocess_term :
   logic_env:Logic_env.t -> Cil_types.term -> unit
 
-val get_widened_profile : Profile.t -> Cil_types.term -> Profile.t
+val get_widened_profile : Profile.t -> Cil_types.logic_info -> Profile.t
 
 val clear : unit -> unit
 

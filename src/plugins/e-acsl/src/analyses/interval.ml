@@ -21,6 +21,9 @@
 (**************************************************************************)
 
 open Cil_types
+open Cil_datatype
+open Analyses_types
+open Analyses_datatype
 
 (* Implements Figure 3 of J. Signoles' JFLA'15 paper "Rester statique pour
    devenir plus rapide, plus précis et plus mince".
@@ -32,64 +35,6 @@ module Error = Error.Make(struct let phase = dkey end)
 (* Basic datatypes and operations *)
 (* ********************************************************************* *)
 
-type ival =
-  | Ival of Ival.t
-  | Float of fkind * float option (* a float constant, if any *)
-  | Rational
-  | Real
-  | Nan
-
-module D =
-  Datatype.Make_with_collections
-    (struct
-      type t = ival
-      let name = "E_ACSL.Interval.t"
-      let reprs = [ Float (FFloat, Some 0.); Rational; Real; Nan ]
-      include Datatype.Undefined
-
-      let compare i1 i2 =
-        if i1 == i2 then 0
-        else
-          match i1, i2 with
-          | Ival i1, Ival i2 ->
-            Ival.compare i1 i2
-          | Float (k1, f1), Float (k2, f2) ->
-            (* faster to compare a kind than a float *)
-            let n = Stdlib.compare k1 k2 in
-            if n = 0 then Stdlib.compare f1 f2 else n
-          | Ival _, (Float _ | Rational | Real | Nan)
-          | Float _, (Rational | Real | Nan)
-          | Rational, (Real | Nan)
-          | Real, Nan ->
-            -1
-          | Nan, (Ival _ | Float _ | Rational | Real)
-          | Real, (Ival _ | Float _ | Rational)
-          | Rational, (Ival _ | Float _)
-          | Float _, Ival _ ->
-            1
-          | Rational, Rational | Real, Real | Nan, Nan ->
-            assert false
-
-      let equal = Datatype.from_compare
-
-      let hash = function
-        | Ival i -> 7 * Ival.hash i
-        | Float(k, f) -> 17 * Hashtbl.hash f + 97 * Hashtbl.hash k
-        | Rational -> 787
-        | Real -> 1011
-        | Nan -> 1277
-
-      let pretty fmt = function
-        | Ival i -> Ival.pretty fmt i
-        | Float(_, Some f) -> Format.pp_print_float fmt f
-        | Float(FFloat, None) -> Format.pp_print_string fmt "float"
-        | Float(FDouble, None) -> Format.pp_print_string fmt "double"
-        | Float(FLongDouble, None) -> Format.pp_print_string fmt "long double"
-        | Rational -> Format.pp_print_string fmt "Rational"
-        | Real -> Format.pp_print_string fmt "Real"
-        | Nan -> Format.pp_print_string fmt "NaN"
-
-    end)
 
 let is_included i1 i2 = match i1, i2 with
   | Ival i1, Ival i2 -> Ival.is_included i1 i2
@@ -393,163 +338,35 @@ let ikind_of_ival iv =
       (* TODO: do not raise an exception, but returns a value instead *)
       raise Cil.Not_representable (* GMP *)
 
-(* function call profiles (intervals for their formal parameters) *)
-module Profile = struct
-  include Datatype.List_with_collections
-      (D)
-      (struct
-        let module_name = "E_ACSL.Interval.Logic_function_env.Profile"
-      end)
-end
 
-module Id_term_in_profile =
-  Datatype.Pair_with_collections
-    (Misc.Id_term)
-    (Profile)
-    (struct let module_name = "E_ACSL.Interval.Id_term_in_profile" end)
+let interv_of_typ_containing_interv = function
+  | Float _ | Rational | Real | Nan as x ->
+    x
+  | Ival i ->
+    try
+      let kind = ikind_of_ival i in
+      interv_of_typ (TInt(kind, []))
+    with Cil.Not_representable ->
+      top_ival
 
-(* logic environment: interval of all bound variables. It is built of two
-   components
-   - a profile for variables bound through functions arguments
-   - an association list for variables bound by a let or a quantification *)
-module Logic_env : sig
-  type t
-  (* add a new binding for a let or a quantification binder*)
-  val add_let_quantif_binding : t -> logic_var -> ival -> t
-  (* create a new environment from a profile, for function calls *)
-  val make : logic_var list -> ival list -> t
-  (* find a logic variable in the environment *)
-  val find : t -> logic_var -> ival
-  (* get the profile of the logic environment, i.e. bindings through function
-     arguments*)
-  val get_profile : t -> ival list
-end
-= struct
-  type t = { profile : logic_var list * Profile.t;
-             let_quantif_bind : (logic_var * ival) list}
+let widen_profile =
+  Cil_datatype.Logic_var.Map.map interv_of_typ_containing_interv
 
-  let add_let_quantif_binding env x i =
-    { env with let_quantif_bind = (x, i) :: env.let_quantif_bind }
-
-  let make args params_ival =
-    { profile = args , params_ival;
-      let_quantif_bind = [] }
-
-  let find env x =
-    (* Programs typically do not have many variables simulatneously bound, so a
-       linear search is fine here*)
-    try List.assoc x env.let_quantif_bind
-    with Not_found ->
-      let rec find = function
-        |(y::_), (i ::_) when Cil_datatype.Logic_var.equal x y -> i
-        | (_ :: l) , (_ :: l') -> find (l, l')
-        | [] , _ :: _
-        | _ :: _, [] -> Options.abort "inconsistent function profile"
-        |[], [] -> raise Not_found
-      in find env.profile
-
-  let get_profile env = snd env.profile
-
-end
-
-(* Imperative environment to perform fixpoint algorithm for recursive
-   functions *)
-module LF_env : sig
-  val find : logic_info -> Profile.t -> ival
-
-  val clear : unit -> unit
-
-  val interv_of_typ_containing_interv : ival -> ival
-
-  val is_rec : logic_info -> bool
-
-  val fixpoint :
-    infer : (
-      force:bool ->
-      logic_env: Logic_env.t ->
-      term ->
-      ival Error.result)  ->
-    logic_info ->
-    Profile.t ->
-    term ->
-    ival ->
+let rec fixpoint ~(infer : force:bool ->
+                   logic_env:Logic_env.t ->
+                   term ->
+                   ival Error.result)
+    li args_ival t' ival =
+  LF_env.replace li args_ival ival;
+  let get_res = Error.map (fun x -> x) in
+  let logic_env = Logic_env.make args_ival in
+  let inferred_ival = get_res (infer ~force:true ~logic_env t') in
+  if is_included inferred_ival ival
+  then
     ival
+  else
+    fixpoint ~infer li args_ival t' inferred_ival
 
-end
-= struct
-
-  (* Environment to handle recursive functions: this environment stores the
-     logic functions that we have already started inferring along with their
-     profiles. This is necessary for the fixpoint algorithm. *)
-  module LFProf =
-    Datatype.Pair_with_collections (Cil_datatype.Logic_info) (Profile)
-      (struct
-        let module_name = "E_ACSL.Interval.LF_env.LFProf"
-      end)
-
-  let tbl = LFProf.Hashtbl.create 17
-
-  let clear () = LFProf.Hashtbl.clear tbl
-
-  let find li profile = LFProf.Hashtbl.find tbl (li,profile)
-
-  exception Recursive
-
-  let contain li = object
-    inherit Visitor.frama_c_inplace
-
-    method! vpredicate p =
-      match p.pred_content with
-      | Papp (li_app,_,_) when Cil_datatype.Logic_info.equal li li_app ->
-        raise Recursive;
-      | _ -> Cil.DoChildren
-
-    method! vterm t =
-      match t.term_node with
-      | Tapp(li_app,_,_) when Cil_datatype.Logic_info.equal li li_app ->
-        raise Recursive
-      | _ -> Cil.DoChildren
-
-    method! vlogic_type _ = Cil.SkipChildren
-  end
-
-  let is_rec li =
-    match li.l_body with
-    | LBpred p ->
-      (try ignore (Visitor.visitFramacPredicate (contain li) p); false
-       with Recursive -> true)
-    | LBterm t ->
-      (try ignore (Visitor.visitFramacTerm (contain li) t); false
-       with Recursive -> true)
-    | LBreads _ | LBnone -> false
-    | LBinductive _ -> Error.not_yet "Inductive"
-
-  let interv_of_typ_containing_interv = function
-    | Float _ | Rational | Real | Nan as x ->
-      x
-    | Ival i ->
-      try
-        let kind = ikind_of_ival i in
-        interv_of_typ (TInt(kind, []))
-      with Cil.Not_representable ->
-        top_ival
-
-  let rec fixpoint ~(infer : force:bool ->
-                     logic_env:Logic_env.t ->
-                     term ->
-                     ival Error.result)
-      li args_ival t' ival =
-    LFProf.Hashtbl.replace tbl (li, args_ival) ival;
-    let get_res = Error.map (fun x -> x) in
-    let logic_env = Logic_env.make li.l_profile args_ival in
-    let inferred_ival = get_res (infer ~force:true ~logic_env t') in
-    if is_included inferred_ival ival
-    then
-      ival
-    else
-      fixpoint ~infer li args_ival t' inferred_ival
-
-end
 
 (* Memoization module which retrieves the computed info of some terms *)
 module Memo: sig
@@ -619,14 +436,14 @@ end = struct
   module Dep = Accesses (Id_term_in_profile) (struct let tbl = dep_tbl end)
 
   let get profile t =
-    match profile with
-    | [] -> Nondep.get t
-    | _ :: _ -> Dep.get (t,profile)
+    if Profile.is_empty profile
+    then Nondep.get t
+    else Dep.get (t,profile)
 
   let memo ~force_infer profile f t =
-    match profile with
-    | [] -> Nondep.memo ~force_infer f t t
-    | _::_ -> Dep.memo ~force_infer f t (t,profile)
+    if Profile.is_empty profile
+    then Nondep.memo ~force_infer f t t
+    else Dep.memo ~force_infer f t (t,profile)
 
   let clear () =
     Options.feedback ~level:4 "clearing the typing tables";
@@ -638,23 +455,23 @@ end
    the table (because of the fixpoint algorithm). This module associates to a
    term in a profile, the profile that should be used to query the table *)
 module Widened_profile: sig
-  val get: Profile.t -> term -> Profile.t
-  val add: Profile.t -> term -> Profile.t -> unit
+  val get: Profile.t -> logic_info -> Profile.t
+  val add: Profile.t -> logic_info -> Profile.t -> unit
   val clear: unit -> unit
 end = struct
 
-  let widened_profile_tbl : Profile.t Id_term_in_profile.Hashtbl.t
-    = Id_term_in_profile.Hashtbl.create 97
+  let widened_profile_tbl : Profile.t LFProf.Hashtbl.t
+    = LFProf.Hashtbl.create 97
 
-  let get profile t =
-    Id_term_in_profile.Hashtbl.find_def widened_profile_tbl (t, profile) profile
+  let get profile li =
+    LFProf.Hashtbl.find_def widened_profile_tbl (li, profile) profile
 
-  let add profile t args_ival =
-    Id_term_in_profile.Hashtbl.add widened_profile_tbl (t, profile) args_ival
+  let add profile i args_ival =
+    LFProf.Hashtbl.add widened_profile_tbl (i, profile) args_ival
 
   let clear () =
     Options.feedback ~level:4 "clearing the typing tables";
-    Id_term_in_profile.Hashtbl.clear widened_profile_tbl
+    LFProf.Hashtbl.clear widened_profile_tbl
 
 
 end
@@ -903,25 +720,25 @@ let rec infer ~force ~logic_env t =
       (match li.l_body with
        | LBpred _ | LBterm _ ->
          let profile =
-           List.map
-             (fun arg -> get_res (infer ~force ~logic_env arg))
-             args
+           Profile.make
+             li.l_profile
+             (List.map
+                (fun arg -> get_res (infer ~force ~logic_env arg))
+                args)
          in
          (match li.l_body with
           | LBpred p ->
-            let logic_env = Logic_env.make li.l_profile profile in
+            let logic_env = Logic_env.make profile in
             ignore (infer_predicate ~logic_env p);
             Ival Ival.zero_or_one
           | LBterm t' when LF_env.is_rec li ->
-            let
-              args_ival = List.map LF_env.interv_of_typ_containing_interv profile
-            in
-            Widened_profile.add profile t' args_ival;
-            (try LF_env.find li args_ival
+            let widened_profile = widen_profile profile in
+            Widened_profile.add profile li widened_profile;
+            (try LF_env.find li widened_profile
              with Not_found ->
-               LF_env.fixpoint ~infer li args_ival t' (Ival Ival.bottom))
+               fixpoint ~infer li widened_profile t' (Ival Ival.bottom))
           | LBterm t' ->
-            let logic_env = Logic_env.make li.l_profile profile in
+            let logic_env = Logic_env.make profile in
             get_res (infer ~force ~logic_env t')
           | _ -> assert false)
        | LBnone when li.l_var_info.lv_name = "\\sum" ||
@@ -932,7 +749,7 @@ let rec infer ~force ~logic_env t =
             let t2_iv = infer ~force ~logic_env t2 in
             let k_iv = Error.map2 join t1_iv t2_iv in
             let logic_env_with_k =
-              Logic_env.add_let_quantif_binding logic_env k k_iv
+              Logic_env.add logic_env k k_iv
             in
             let lambda_iv = infer ~force ~logic_env:logic_env_with_k lambda in
             Error.map3 (infer_sum_product li.l_var_info) lambda_iv t1_iv t2_iv
@@ -963,7 +780,7 @@ let rec infer ~force ~logic_env t =
       let li_v = li.l_var_info in
       let i1 = infer ~force ~logic_env li_t in
       let logic_env =
-        Error.map (Logic_env.add_let_quantif_binding logic_env li_v) i1
+        Error.map (Logic_env.add logic_env li_v) i1
       in
       get_res (infer ~force ~logic_env t)
     | TConst (LReal lr) ->
@@ -1108,7 +925,7 @@ and infer_bound_variable ~loc ~logic_env (t1, lv, t2) =
   in
   ignore (infer ~force:false ~logic_env t1);
   ignore (infer ~force:false ~logic_env t2);
-  Logic_env.add_let_quantif_binding logic_env lv i, (t1, lv, t2)
+  Logic_env.add logic_env lv i, (t1, lv, t2)
 
 and infer_predicate ~logic_env p =
   let get_res = Error.map (fun x -> x) in
@@ -1118,12 +935,14 @@ and infer_predicate ~logic_env p =
   | Papp(li, _, args) ->
     (match li.l_body with
      | LBpred p ->
-       let args_ival =
-         List.map
-           (fun arg -> get_res (infer ~force:false ~logic_env arg))
-           args
+       let profile =
+         Profile.make
+           li.l_profile
+           (List.map
+              (fun arg -> get_res (infer ~force:false ~logic_env arg))
+              args)
        in
-       let logic_env = Logic_env.make li.l_profile args_ival in
+       let logic_env = Logic_env.make profile in
        ignore (infer_predicate ~logic_env p)
      | LBnone -> ()
      | LBreads _ -> ()
@@ -1154,7 +973,7 @@ and infer_predicate ~logic_env p =
     let li_v = li.l_var_info in
     let i = infer ~force:false ~logic_env li_t in
     let logic_env =
-      Error.map (Logic_env.add_let_quantif_binding logic_env li_v) i
+      Error.map (Logic_env.add logic_env li_v) i
     in
     infer_predicate ~logic_env p
   | Pforall _
@@ -1198,7 +1017,7 @@ let infer t =
   let i = infer t in
   i
 
-include D
+include Ival_datatype
 
 let typer_visitor ~logic_env = object
   inherit E_acsl_visitor.visitor dkey
@@ -1216,7 +1035,7 @@ let typer_visitor ~logic_env = object
 end
 
 let infer_program ast =
-  let visitor = typer_visitor ~logic_env:(Logic_env.make [] []) in
+  let visitor = typer_visitor ~logic_env:Logic_env.empty in
   visitor#visit_file ast
 
 let preprocess_predicate ~logic_env p =

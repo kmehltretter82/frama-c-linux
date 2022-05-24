@@ -45,6 +45,7 @@
     safely be computed in [int]: its result belongs to [[-2;4]]. *)
 
 open Cil_types
+open Analyses_datatype
 
 (******************************************************************************)
 (** {2 Datatypes} *)
@@ -91,7 +92,7 @@ val join: number_ty -> number_ty -> number_ty
     the other argument is also {!Other}. In this case, the result is [Other]. *)
 
 val number_ty_bound_variable:
-  profile:Interval.Profile.t -> term * logic_var * term -> number_ty
+  profile:Profile.t -> term * logic_var * term -> number_ty
 (** return the type of a quantified logic variable *)
 
 (******************************************************************************)
@@ -106,36 +107,36 @@ val clear: unit -> unit
     {!type_named_predicate} has been previously computed for the given term or
     predicate. *)
 
-val get_number_ty: logic_env:Interval.Logic_env.t -> term -> number_ty
+val get_number_ty: logic_env:Logic_env.t -> term -> number_ty
 (** @return the infered type for the given term. *)
 
-val get_integer_op: logic_env:Interval.Logic_env.t -> term -> number_ty
+val get_integer_op: logic_env:Logic_env.t -> term -> number_ty
 (** @return the infered type for the top operation of the given term.
     It is meaningless to call this function over a non-arithmetical/logical
     operator. *)
 
 val get_integer_op_of_predicate:
-  logic_env:Interval.Logic_env.t -> predicate -> number_ty
+  logic_env:Logic_env.t -> predicate -> number_ty
 (** @return the infered type for the top operation of the given predicate. *)
 
-val get_typ: logic_env:Interval.Logic_env.t -> term -> typ
+val get_typ: logic_env:Logic_env.t -> term -> typ
 (** Get the type which the given term must be generated to. *)
 
-val get_op: logic_env:Interval.Logic_env.t -> term -> typ
+val get_op: logic_env:Logic_env.t -> term -> typ
 (** Get the type which the operation on top of the given term must be generated
     to. *)
 
-val get_cast: logic_env:Interval.Logic_env.t -> term -> typ option
+val get_cast: logic_env:Logic_env.t -> term -> typ option
 (** Get the type which the given term must be converted to (if any). *)
 
 val get_cast_of_predicate:
-  logic_env:Interval.Logic_env.t -> predicate -> typ option
+  logic_env:Logic_env.t -> predicate -> typ option
 (** Like {!get_cast}, but for predicates. *)
 
 val unsafe_set:
   term ->
   ?ctx:number_ty ->
-  logic_env:Interval.Logic_env.t ->
+  logic_env:Logic_env.t ->
   number_ty ->
   unit
 (** Register that the given term has the given type in the given context (if
@@ -157,13 +158,13 @@ val type_program : file -> unit
     in a program *)
 
 val preprocess_predicate :
-  logic_env:Interval.Logic_env.t ->
+  logic_env:Logic_env.t ->
   predicate ->
   unit
 (** compute and store the types of all the terms in a given predicate  *)
 
 val preprocess_rte :
-  logic_env:Interval.Logic_env.t ->
+  logic_env:Logic_env.t ->
   code_annotation ->
   unit
 (** compute and store the type of all the terms in a code annotation *)
@@ -171,7 +172,7 @@ val preprocess_rte :
 val preprocess_term:
   use_gmp_opt:bool ->
   ?ctx:number_ty ->
-  logic_env:Interval.Logic_env.t ->
+  logic_env:Logic_env.t ->
   term ->
   unit
 (** Compute the type of each subterm of the given term in the given context. If

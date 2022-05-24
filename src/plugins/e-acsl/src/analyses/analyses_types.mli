@@ -67,3 +67,11 @@ type annotation_kind =
   | Invariant
   | Variant
   | RTE
+
+
+type ival =
+  | Ival of Ival.t
+  | Float of fkind * float option (* a float constant, if any *)
+  | Rational
+  | Real
+  | Nan
