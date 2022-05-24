@@ -2162,7 +2162,8 @@ struct
 
   (* Alpha-convert free-variables in xs with the top-most bound variables *)
   (* Only activate flag subset if lc.vars is a subset of xs *)
-  let lc_close_xs ?(subset = false) ?(reversed = false) xs (lc : lc_term) : lc_term =
+  (* Warning: ~reversed:false needs to compute the length of xs *)
+  let lc_close_xs ?(subset = false) ~reversed xs (lc : lc_term) : lc_term =
     let mu = cache () in
     begin
       if reversed then
