@@ -739,28 +739,36 @@ let rec infer ~force ~logic_env t =
                 (fun arg -> get_res (infer ~force ~logic_env arg))
                 args)
          in
-         (match li.l_body with
-          | LBpred p ->
-            let logic_env = Logic_env.make profile in
-            ignore (infer_predicate ~logic_env p);
-            Ival Ival.zero_or_one
-          | LBterm t' when LF_env.is_rec li ->
-            let widened_profile = widen_profile profile in
-            Widened_profile.add profile li widened_profile;
-            (try LF_env.find li widened_profile
-             with Not_found ->
-               fixpoint ~infer li widened_profile t' (Ival Ival.bottom))
-          | LBterm t' ->
-            let logic_env = Logic_env.make profile in
-            (* If the logic function returns a C type, then its application
-               ranges inside this C type *)
-            (match li.l_type with
-             | Some (Ctype typ) ->
-               ignore ((infer ~force ~logic_env t'));
-               interv_of_typ typ;
-             | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
-               get_res (infer ~force ~logic_env t'))
-          | _ -> assert false)
+         if LF_env.is_rec li then
+           let widened_profile = widen_profile profile in
+           Widened_profile.add profile li widened_profile;
+           (match li.l_body with
+            | LBpred p ->
+              LF_env.add_pred li widened_profile;
+              infer_predicate
+                ~logic_env:(Logic_env.make widened_profile) p;
+              Ival Ival.zero_or_one
+            | LBterm t' ->
+              (try LF_env.find li widened_profile
+               with Not_found ->
+                 fixpoint ~infer li widened_profile t' (Ival Ival.bottom))
+            | _ -> assert false)
+         else
+           let logic_env = Logic_env.make profile in
+           (match li.l_body with
+            | LBpred p ->
+              ignore (infer_predicate ~logic_env p);
+              Ival Ival.zero_or_one
+            | LBterm t' ->
+              (* If the logic function returns a C type, then its application
+                 ranges inside this C type *)
+              (match li.l_type with
+               | Some (Ctype typ) ->
+                 ignore ((infer ~force ~logic_env t'));
+                 interv_of_typ typ;
+               | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
+                 get_res (infer ~force ~logic_env t'))
+            | _ -> assert false)
        | LBnone when li.l_var_info.lv_name = "\\sum" ||
                      li.l_var_info.lv_name = "\\product" ->
          (match args with
@@ -1011,15 +1019,22 @@ and infer_predicate ~logic_env p =
   match p.pred_content with
   | Pfalse | Ptrue -> ()
   | Papp(li, _, args) ->
+    let profile =
+      Profile.make
+        li.l_profile
+        (List.map
+           (fun arg -> get_res (infer ~force:false ~logic_env arg))
+           args)
+    in
     (match li.l_body with
+     | LBpred p when LF_env.is_rec li ->
+       let widened_profile = widen_profile profile in
+       Widened_profile.add profile li widened_profile;
+       (try ignore (LF_env.find li widened_profile)
+        with Not_found ->
+          LF_env.add_pred li widened_profile;
+          infer_predicate ~logic_env:(Logic_env.make widened_profile) p)
      | LBpred p ->
-       let profile =
-         Profile.make
-           li.l_profile
-           (List.map
-              (fun arg -> get_res (infer ~force:false ~logic_env arg))
-              args)
-       in
        let logic_env = Logic_env.make profile in
        ignore (infer_predicate ~logic_env p)
      | LBnone -> ()

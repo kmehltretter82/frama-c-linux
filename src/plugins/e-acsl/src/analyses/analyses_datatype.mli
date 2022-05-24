@@ -111,6 +111,8 @@ module LF_env : sig
 
   val add : logic_info -> Profile.t -> ival -> unit
 
+  val add_pred : logic_info -> Profile.t -> unit
+
   val is_rec : logic_info -> bool
 
   val replace : logic_info -> Profile.t -> ival -> unit
