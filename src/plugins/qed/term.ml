@@ -2143,6 +2143,38 @@ struct
     set mu (e_var x) (c_bvar k t) ;
     walk mu x lc
 
+  (* Alpha-convert free-variables in xs with the top-most bound variables *)
+  (* Only activate flag subset if lc.vars is a subset of xs *)
+  (* Warning: ~reversed:false needs to compute the length of xs *)
+  let lc_close_xs ?(subset = false) ~reversed xs (lc : lc_term) : lc_term =
+    let mu = cache () in
+    begin
+      if reversed then
+        let n = Bvars.order lc.bind in
+        List.iteri (fun i x ->
+            set mu (e_var x) (c_bvar (n+i) (tau_of_var x))
+          ) xs
+      else
+        let n = Bvars.order lc.bind + List.length xs -1 in
+        List.iteri (fun i x ->
+            set mu (e_var x) (c_bvar (n-i) (tau_of_var x))
+          ) xs
+    end;
+    (* if Vars.subset lc.vars xs then*)
+    if subset then
+      let rec walk mu lc =
+        if not (Vars.is_empty lc.vars) then
+          get mu (lc_alpha (walk mu)) lc
+        else lc in
+      walk mu lc
+    else
+      let xs = List.fold_left (fun xs x -> Vars.add x xs) Vars.empty xs in
+      let rec walk mu lc =
+        if Vars.intersect xs lc.vars then
+          get mu (lc_alpha (walk mu)) lc
+        else lc in
+      walk mu lc
+
   (* Alpha-convert top-most bound variable with free-variable x *)
   let lc_open x (lc : lc_term) : lc_term =
     let rec walk mu k lc =
@@ -2269,6 +2301,15 @@ struct
   let filter sigma e =
     Subst.filter sigma e || not (Bvars.is_empty e.bind)
 
+  let bind_qxs qxs e =
+    let qxs = List.filter (function
+        | Lambda, _ -> true
+        | Forall, x | Exists, x -> Vars.mem x e.vars
+      ) qxs in
+    let rxs = List.map (fun (_q, x) -> x) qxs in
+    let e = lc_close_xs ~reversed:true rxs e in
+    List.fold_left (fun e (q, x) -> c_bind q (tau_of_var x) e) e qxs
+
   let rec subst sigma alpha e =
     if filter sigma e then
       incache (Subst.cache sigma) sigma alpha e
@@ -2304,21 +2345,7 @@ struct
       let alpha = Intmap.add k (e_var x) alpha in
       let qs = (q,x) :: qs in
       bind sigma alpha qs a
-    | _ ->
-      (* HERE:
-         This final binding of variables could be parallelized
-         if Bvars is precise enough *)
-      List.fold_left
-        (fun e (q,x) ->
-           if Vars.mem x e.vars then
-             let t = tau_of_var x in
-             (* HERE:
-                possible to insert a recursive call to let-intro
-                it will use a new instance of e_subst_var that
-                will work on a different sigma *)
-             c_bind q t (lc_close x e)
-           else e
-        ) (subst sigma alpha e) qs
+    | _ -> bind_qxs qs (subst sigma alpha e)
 
   and apply sigma beta f vs =
     match f.repr, vs with
@@ -2504,12 +2531,46 @@ struct
 
   let e_close qs a = List.fold_left (fun b (q,x) -> e_bind q x b) a qs
 
-  let rec bind_xs q xs e =
-    match xs with [] -> e | x::xs -> e_bind q x (bind_xs q xs e)
+  let bind_xs q xs e =
+    let xs = match q with
+      | Lambda -> xs
+      | Forall | Exists -> List.filter (fun x -> Vars.mem x e.vars) xs
+    in (* let_intro_case have to be called sequentially because of cases like
+          '\forall x y, 42 = x + y -> P' where we detect two let-in variables in parralel
+          but we can only simplify one in practice.*)
+    let rec aux e xs =
+      let e, xs, changed = List.fold_right (fun x (e, xs', b) ->
+          match let_intro_case q x e with
+          | None -> e, x::xs', b
+          | Some v -> e_subst_var x v e, xs', true
+        ) xs (e, [], false) in
+      if changed then aux e xs else e, xs
+    in
+    let e, xs = aux e xs in
+    let e = lc_close_xs ~reversed:false xs e in
+    List.fold_right (fun x e -> c_bind q (tau_of_var x) e) xs e
 
   let e_forall = bind_xs Forall
   let e_exists = bind_xs Exists
   let e_lambda = bind_xs Lambda
+
+  let bind_all q e =
+    let rec aux e =
+      let e, changed = Vars.fold (fun x (e, b) ->
+          match let_intro_case q x e with
+          | None -> e, b
+          | Some v -> e_subst_var x v e, true
+        ) e.vars (e, false) in
+      if changed then aux e else e
+    in
+    let e = aux e in
+    let rxs = List.sort (fun x y -> POOL.compare y x) (Vars.elements e.vars) in
+    let e = lc_close_xs ~subset:true ~reversed:true rxs e in
+    List.fold_left (fun e x -> c_bind q (tau_of_var x) e) e rxs
+
+  let e_close_forall = bind_all Forall
+  let e_close_exists = bind_all Exists
+  let e_close_lambda = bind_all Lambda
 
   (* -------------------------------------------------------------------------- *)
   (* --- Iterators                                                          --- *)
