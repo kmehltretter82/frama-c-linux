@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# DEFAULT variable can be configured to indicate reference branch when the
+# current branch does not exist in a plugin.
+#
+# OCAML must be set to the right version of OCAML (format: N_MM)
+
 set -euxo pipefail
 
 if [ -z ${OCAML+x} ]; then

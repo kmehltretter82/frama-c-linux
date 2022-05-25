@@ -107,6 +107,8 @@ stdenvNoCC.mkDerivation rec {
   ];
 
   # Simpler for our test target
+  # We export the build directory to avoid rebuilding Frama-C without having to
+  # manage complex dependencies.
   postInstall = ''
     mkdir -p $build_dir
     tar -cf $build_dir/dir.tar .

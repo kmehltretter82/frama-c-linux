@@ -1,4 +1,43 @@
 # This template is meant to build external plugins
+#
+# Input variables:
+#
+# - plugin-name (mandatory):
+#   The name used for the derivation. It is also used for the name of the Opam
+#   file during the INSTALL phase. However, it is only necessary if the plugin
+#   is a dependency for another, so the installation of this file can be
+#   disabled with the 'install-opam' variable described below.
+#
+# - plugin-src (mandatory):
+#   The source files used for building, generally 'gitignoreSource ./..'. It
+#   must be provided in the plugin because from this './..' is the Frama-C
+#   directory
+#
+# - additional-build-inputs (optional, defaults to [])
+#   Additional Nix packages that are added to the 'buildInput' variable,
+#   originally it contains Frama-C + all its dependencies
+#
+# - additional-check-inputs (optional, defaults to [])
+#   Additional Nix packages that are added to the 'checkInput' variable,
+#   originally it contains 'time'
+#
+# - has-wp-proofs (optional, defaults to 'false')
+#   Indicates whether the plugin execute WP proofs during tests, if it the case
+#   the derivation receives an additional check-input 'alt-ergo'. Furthermore,
+#   it configures Why3 before check phase and export the WP global cache. Note
+#   however that this cache is used only if the tests use the option '-wp-cache-env'
+#
+# - install-opam (optional, default to 'true')
+#   Indicates whether the generated Opam file should be installed. Unless it is
+#   not possible:
+#   - if your plugin does not provide an Opam file or,
+#   - *if the derivation name does not correspond to the name of the plugin*
+#     (see for example the Frama-Clang plugin)
+#   There is no reason to disable this.
+#
+# The plugin must have:
+#   - a '@frama-c-configure' Dune rule
+#   - a LICENSE file
 
 { lib
 , stdenv
