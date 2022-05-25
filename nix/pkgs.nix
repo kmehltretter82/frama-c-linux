@@ -12,6 +12,7 @@ let
     why3 = oself.callPackage ./why3.nix {};
     # Helpers
     mk_tests = oself.callPackage ./mk_tests.nix {};
+    mk_plugin = oself.callPackage ./mk_plugin.nix {};
     # Builds
     frama-c = oself.callPackage ./frama-c.nix {};
     lint = oself.callPackage ./lint.nix {};

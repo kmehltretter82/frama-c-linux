@@ -1,3 +1,23 @@
+# This template is meant to execute Frama-C tests
+#
+# Input variables:
+#
+# - tests-name (mandatory):
+#   The name used for the derivation.
+#
+# - tests-command (mandatory):
+#   The tests command to execute, generally something like:
+#   ''
+#     dune exec -- frama-c-ptests tests src/plugins/e-acsl/tests
+#     dune build -j1 --display short @src/plugins/e-acsl/tests/ptests
+#   ''
+#
+# - has-wp-proofs (optional, defaults to 'false')
+#   Indicates whether the tests execute WP proofs, if it the case the derivation
+#   receives an additional build-input 'alt-ergo'. Furthermore, it configures
+#   Why3 before build phase and export the WP global cache. Note however that
+#   this cache is used only if the tests use the option '-wp-cache-env'
+
 { lib
 , alt-ergo
 , frama-c

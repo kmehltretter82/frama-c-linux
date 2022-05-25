@@ -1,3 +1,5 @@
+# Note: plugins are loaded from 'internal-tests.sh'
+
 # Nix
 { lib
 , stdenvNoCC # for E-ACSL
