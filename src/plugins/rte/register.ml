@@ -56,49 +56,40 @@ let compute () =
   Globals.Functions.iter
     (fun kf -> if include_function kf then !Db.RteGen.annotate_kf kf)
 
-
-(* journal utilities *)
-
-let journal_register ?comment is_dyn name ty_arg fctref fct =
-  let ty = Datatype.func ty_arg Datatype.unit in
-  Db.register fctref fct;
-  if is_dyn then
-    let _ignore =
-      Dynamic.register ?comment ~plugin:"RteGen" name ty fct
-    in
-    ()
-
-let nojournal_register fctref fct =
-  Db.register fctref (fun () -> fct)
-
 let () =
-  journal_register false
-    "annotate_kf" Kernel_function.ty Db.RteGen.annotate_kf Visit.annotate;
-  journal_register false "compute" Datatype.unit Db.RteGen.compute compute;
-  journal_register true
-    ~comment:"Generate all RTE annotations in the \
-              given function."
-    "do_all_rte" Kernel_function.ty Db.RteGen.do_all_rte do_all_rte;
-  journal_register false
-    ~comment:"Generate all RTE annotations except pre-conditions \
-              in the given function."
-    "do_rte" Kernel_function.ty Db.RteGen.do_rte do_rte;
+  Db.register Db.RteGen.annotate_kf Visit.annotate;
+  Db.register Db.RteGen.compute compute;
+  Db.register Db.RteGen.do_rte do_rte;
+
+  Db.register Db.RteGen.do_all_rte do_all_rte;
+  let _ignore =
+    Dynamic.register
+      ~comment:"Generate all RTE annotations in the given function."
+      ~plugin:"RteGen"
+      "do_all_rte"
+      (Datatype.func Kernel_function.ty Datatype.unit)
+      do_all_rte
+  in
+
   let open Generator in
   let open Db.RteGen in
-  nojournal_register get_signedOv_status Signed_overflow.accessor;
-  nojournal_register get_divMod_status Div_mod.accessor;
-  nojournal_register get_initialized_status Initialized.accessor;
-  nojournal_register get_signed_downCast_status Signed_downcast.accessor;
-  nojournal_register get_memAccess_status Mem_access.accessor;
-  nojournal_register get_pointerCall_status Pointer_call.accessor;
-  nojournal_register get_unsignedOv_status Unsigned_overflow.accessor;
-  nojournal_register get_unsignedDownCast_status Unsigned_downcast.accessor;
-  nojournal_register get_pointer_downcast_status Pointer_downcast.accessor;
-  nojournal_register get_float_to_int_status Float_to_int.accessor;
-  nojournal_register get_finite_float_status Finite_float.accessor;
-  nojournal_register get_pointer_value_status Pointer_value.accessor;
-  nojournal_register get_bool_value_status Bool_value.accessor ;
-  nojournal_register get_all_status all_statuses;
+  let register_getter fctref fct =
+    Db.register fctref (fun () -> fct)
+  in
+  register_getter get_signedOv_status Signed_overflow.accessor;
+  register_getter get_divMod_status Div_mod.accessor;
+  register_getter get_initialized_status Initialized.accessor;
+  register_getter get_signed_downCast_status Signed_downcast.accessor;
+  register_getter get_memAccess_status Mem_access.accessor;
+  register_getter get_pointerCall_status Pointer_call.accessor;
+  register_getter get_unsignedOv_status Unsigned_overflow.accessor;
+  register_getter get_unsignedDownCast_status Unsigned_downcast.accessor;
+  register_getter get_pointer_downcast_status Pointer_downcast.accessor;
+  register_getter get_float_to_int_status Float_to_int.accessor;
+  register_getter get_finite_float_status Finite_float.accessor;
+  register_getter get_pointer_value_status Pointer_value.accessor;
+  register_getter get_bool_value_status Bool_value.accessor ;
+  register_getter get_all_status all_statuses;
 ;;
 
 (* dynamic registration *)
