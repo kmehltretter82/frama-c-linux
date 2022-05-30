@@ -709,13 +709,11 @@ module Undo = struct
   let clear_breakpoint () = Extlib.safe_remove (!filename:>string)
 
   let restore () =
-    if Cmdline.use_obj then begin
-      try
-        clear_breakpoint ()
-      with IOError s ->
-        feedback ~dkey "cannot restore the last breakpoint: %S" s;
-        clear_breakpoint ()
-    end
+    try
+      clear_breakpoint ()
+    with IOError s ->
+      feedback ~dkey "cannot restore the last breakpoint: %S" s;
+      clear_breakpoint ()
 
   let breakpoint () =
     if Cmdline.use_obj then begin
