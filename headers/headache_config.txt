@@ -101,6 +101,12 @@
 #####################
 | ".*\.drv" -> frame open: "(*" line: "*" close: "*)"
 
+#########
+# LaTeX #
+#########
+| ".*\.tex" -> frame open: "%" line: "%" close: "%"
+| ".*\.sty" -> frame open: "%" line: "%" close: "%"
+
 ########
 # HTML #
 ########
