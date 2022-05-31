@@ -1,0 +1,9 @@
+( library
+  (name security_slicing_gui)
+  (public_name frama-c-security_slicing.gui)
+  (optional)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Security_slicing :standard  -w -9)
+  (libraries frama-c.kernel frama-c.gui frama-c-security_slicing.core)
+)
+
+(plugin (optional) (name security_slicing) (libraries frama-c-security_slicing.gui) (site (frama-c plugins_gui)))
