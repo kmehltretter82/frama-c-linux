@@ -192,7 +192,7 @@ class CursesDisplay(PlainDisplay):
         stdscr.nodelay(True)
         stdscr.refresh()  # Needs to be done once or nothing will be output
 
-        self.window = curses.newpad(400, 160)
+        self.window = curses.newpad(2000, 160)
         curses.init_color(curses.COLOR_YELLOW, 300, 300, 300)
         curses.init_pair(1, curses.COLOR_RED, 0)
         curses.init_pair(2, curses.COLOR_GREEN, 0)
