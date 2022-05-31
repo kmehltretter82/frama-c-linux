@@ -2,7 +2,6 @@
   (name metrics_gui)
   (public_name frama-c-metrics.gui)
   (optional)
-  (modules metrics_gui_panels register_gui)
   (flags -open Frama_c_kernel -open Frama_c_gui -open Metrics :standard -w -9)
   (libraries frama-c.kernel frama-c.gui frama-c-metrics.core)
 )

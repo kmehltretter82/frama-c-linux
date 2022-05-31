@@ -13,7 +13,6 @@
   (name scope_gui)
   (public_name frama-c-scope.gui)
   (optional)
-  (modules dpds_gui)
   (flags -open Frama_c_kernel -open Frama_c_gui -open Scope :standard  -w -9)
   (libraries frama-c.kernel frama-c.gui frama-c-scope.core)
 )
