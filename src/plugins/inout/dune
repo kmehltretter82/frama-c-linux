@@ -1,3 +1,15 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Inout:" %{lib-available:frama-c-inout.core} "\n")
+          (echo "  - Callgraph:" %{lib-available:frama-c-callgraph.core} "\n")
+          (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
+          (echo "  - From:" %{lib-available:frama-c-from.core} "\n")
+  )
+  )
+)
+
 ( library
   (name inout)
   (public_name frama-c-inout.core)

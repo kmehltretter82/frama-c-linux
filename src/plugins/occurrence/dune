@@ -1,3 +1,13 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Occurrence:" %{lib-available:frama-c-occurrence.core} "\n")
+          (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
+  )
+  )
+)
+
 ( library
   (name occurrence)
  (public_name frama-c-occurrence.core)

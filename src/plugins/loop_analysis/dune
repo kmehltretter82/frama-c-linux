@@ -1,3 +1,13 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Loop-Analysis:" %{lib-available:frama-c-loop-analysis.core} "\n")
+          (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
+  )
+  )
+)
+
 ( library
   (name LoopAnalysis)
   (public_name frama-c-loop-analysis.core)

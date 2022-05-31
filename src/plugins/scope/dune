@@ -1,3 +1,14 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Scope:" %{lib-available:frama-c-scope.core} "\n")
+          (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
+          (echo "  - Inout:" %{lib-available:frama-c-inout.core} "\n")
+  )
+  )
+)
+
 (library
   (name scope)
   (public_name frama-c-scope.core)

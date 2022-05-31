@@ -1,3 +1,14 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Metrics:" %{lib-available:frama-c-metrics.core} "\n")
+          (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
+          (echo "  - Server:" %{lib-available:frama-c-server.core} "\n")
+  )
+  )
+)
+
 ( library
   (name metrics)
   (public_name frama-c-metrics.core)

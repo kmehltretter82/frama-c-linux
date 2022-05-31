@@ -1,3 +1,12 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Report:" %{lib-available:frama-c-report.core} "\n")
+  )
+  )
+)
+
 ( library
   (name report)
   (public_name frama-c-report.core)

@@ -3,7 +3,11 @@
  (deps (universe))
  (action (progn
           (echo "WP:" %{lib-available:frama-c-wp.core} "\n")
-          (echo "  - why3:" %{lib-available:why3} "\n")
+          (echo "  - Ocamlgraph:" %{lib-available:ocamlgraph} "\n")
+          (echo "  - Qed:" %{lib-available:qed} "\n")
+          (echo "  - Rtegen:" %{lib-available:frama-c-rtegen.core} "\n")
+          (echo "  - Why3:" %{lib-available:why3} "\n")
+          (echo "  - Zarith:" %{lib-available:zarith} "\n")
   )
   )
 )

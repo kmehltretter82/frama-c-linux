@@ -1,3 +1,14 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Slicing:" %{lib-available:frama-c-slicing.core} "\n")
+          (echo "  - Pdg:" %{lib-available:frama-c-pdg.core} "\n")
+          (echo "  - Sparecode:" %{lib-available:frama-c-sparecode.core} "\n")
+  )
+  )
+)
+
 ( library
   (name slicing)
   (public_name frama-c-slicing.core)

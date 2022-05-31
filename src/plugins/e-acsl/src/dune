@@ -1,3 +1,12 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "E-ACSL:" %{lib-available:frama-c-e-acsl.core} "\n")
+  )
+  )
+)
+
 (library
  (name E_ACSL)
  (public_name frama-c-e-acsl.core)

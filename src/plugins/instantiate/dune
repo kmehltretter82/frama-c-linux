@@ -1,3 +1,12 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Instantiate:" %{lib-available:frama-c-instantiate.core} "\n")
+  )
+  )
+)
+
 ( library
   (name instantiate)
   (public_name frama-c-instantiate.core)

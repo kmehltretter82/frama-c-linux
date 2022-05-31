@@ -3,6 +3,8 @@
  (deps (universe))
  (action (progn
           (echo "Reduc:" %{lib-available:frama-c-reduc.core} "\n")
+          (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
+          (echo "  - Inout:" %{lib-available:frama-c-inout.core} "\n")
   )
   )
 )

@@ -1,3 +1,14 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Dive:" %{lib-available:frama-c-dive.core} "\n")
+          (echo "  - Studia:" %{lib-available:frama-c-studia.core} "\n")
+          (echo "  - Server:" %{lib-available:frama-c-server.core} "\n")
+  )
+  )
+)
+
 ( library
   (name dive)
   (public_name frama-c-dive.core)

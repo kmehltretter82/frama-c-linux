@@ -1,3 +1,16 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Impact:" %{lib-available:frama-c-impact.core} "\n")
+          (echo "  - Callgraph:" %{lib-available:frama-c-callgraph.core} "\n")
+          (echo "  - Slicing:" %{lib-available:frama-c-slicing.core} "\n")
+          (echo "  - Inout:" %{lib-available:frama-c-inout.core} "\n")
+  )
+  )
+)
+
+
 ( library
   (name impact)
   (public_name frama-c-impact.core)

@@ -1,3 +1,12 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Variadic:" %{lib-available:frama-c-variadic.core} "\n")
+  )
+  )
+)
+
 ( library
   (name variadic)
   (public_name frama-c-variadic.core)
