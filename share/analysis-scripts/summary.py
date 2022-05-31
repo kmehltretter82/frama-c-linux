@@ -30,6 +30,7 @@ import os
 import signal
 import argparse
 import uuid
+import csv
 from pathlib import Path
 
 import frama_c_results
@@ -145,6 +146,22 @@ def poll_results(targets, benchmark_tag):
     return results
 
 
+def dump_results_csv(results, path):
+    with open(path, 'w', newline='') as file:
+        fieldnames = [
+            "target_name", "timestamp",
+            "sem_reach_fun", "syn_reach_fun", "total_fun",
+            "sem_reach_stmt", "syn_reach_stmt",
+            "alarms", "warnings", "coverage",
+            "user_time", "memory"]
+        writer = csv.DictWriter(
+            file,
+            fieldnames=fieldnames,
+            extrasaction='ignore')
+        writer.writeheader()
+        writer.writerows(results)
+
+
 def run_analyses(display, database, framac, benchmark_tag):
     results = []
     targets = list_targets(".")
@@ -201,7 +218,9 @@ parser.add_argument("-c", "--comment",
 parser.add_argument("-p", "--repository-path",
     action="store", metavar="PATH",
     help="don't clone Frama-C, use this git repository instead")
-
+parser.add_argument("-o", "--output-csv",
+    action="store", metavar="PATH", type=Path,
+    help="output the results to the given CSV file")
 
 errors = b""
 
@@ -240,6 +259,9 @@ try:
 
     print("Results:\n")
     results_display.PlainDisplay().print_table(results)
+
+    if args.output_csv is not None:
+        dump_results_csv(results, args.output_csv)
 
 except OperationException as e:
     errors += bytearray(str(e), "ascii")
