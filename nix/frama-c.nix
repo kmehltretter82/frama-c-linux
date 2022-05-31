@@ -24,6 +24,7 @@
 , mlmpfr
 , ocaml
 , ocamlgraph
+, ocamlgraph_gtk
 , ppx_deriving
 , ppx_deriving_yojson
 , ppx_import
@@ -71,6 +72,7 @@ stdenvNoCC.mkDerivation rec {
     mlmpfr
     ocaml
     ocamlgraph
+    ocamlgraph_gtk
     ppx_deriving
     ppx_deriving_yojson
     ppx_import
