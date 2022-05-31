@@ -402,6 +402,7 @@ type callbacks = (unit -> unit) list
 
 type server = {
   queue : thread Queue.t array ;
+  mutable launched : bool ;
   mutable scheduled : int ;
   mutable terminated : int ;
   mutable running : thread list ;
@@ -419,6 +420,7 @@ let fire callbacks =
 let server ?(stages=1) ?(procs=4) () = {
   queue = Array.init stages (fun _ -> Queue.create ()) ;
   running = [] ;
+  launched = false ;
   procs = procs ;
   scheduled = 0 ; terminated = 0 ;
   activity = [] ; start = [] ; stop = [] ; wait = [] ;
@@ -487,20 +489,26 @@ let server_progress server () =
       begin
         if not server.waiting && is_empty server then
           begin
-            fire server.wait ;
             server.waiting <- true ;
+            fire server.wait ;
           end ;
         true
       end
     else
       begin
-        fire server.stop ;
+        server.launched <- false ;
         server.scheduled <- 0 ;
         server.terminated <- 0 ;
+        fire server.stop ;
         false
       end
   end
 
 let launch server =
-  if server.scheduled > server.terminated
-  then ( fire server.start ; !on_idle (server_progress server) )
+  if not server.launched && server.scheduled > server.terminated
+  then
+    begin
+      server.launched <- true ;
+      fire server.start ;
+      !on_idle (server_progress server) ;
+    end
