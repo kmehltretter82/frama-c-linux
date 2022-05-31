@@ -433,6 +433,7 @@ let foreground server =
     server.running <- Idle ;
     server.cmdline <- Some false ;
     emitter := do_signal server ;
+    Task.on_idle := Db.while_progress ~debounced:50 ;
     match server.daemon with
     | None -> ()
     | Some daemon ->
