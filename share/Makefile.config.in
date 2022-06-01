@@ -132,8 +132,8 @@ HAS_MPFR ?=@HAS_MPFR@
 # landmarks
 HAS_LANDMARKS	?=@HAS_LANDMARKS@
 
-# python 3.6
-HAS_PYTHON36 ?=@HAS_PYTHON36@
+# python 3.7
+HAS_PYTHON37 ?=@HAS_PYTHON37@
 
 ##########################
 # Miscellaneous commands #
@@ -166,7 +166,7 @@ TEST_DIRS_AS_PLUGIN:=\
   dynamic journal saveload spec misc syntax cil \
   pretty_printing builtins libc value
 
-ifeq ($(HAS_PYTHON36),yes)
+ifeq ($(HAS_PYTHON37),yes)
 TEST_DIRS_AS_PLUGIN+= compliance fc_script jcdb
 endif
 
