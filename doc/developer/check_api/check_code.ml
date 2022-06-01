@@ -223,22 +223,12 @@ module Generator (G : Odoc_html.Html_generator) = struct
       super#html_of_exception b e
 
     method private print_record b father l =
-        last_type <- last_type ^ "{";
         let print_one r =
-          if last_type <> "" &&
-               String.get last_type ((String.length last_type) -1) = '{'
-          then begin
-            if r.Type.rf_mutable then last_type <- last_type ^ "mutable "
-          end else begin
-            if r.Type.rf_mutable then last_type <- last_type ^ "; mutable "
-            else last_type <- last_type ^ "; "
-          end;
-          last_type <- last_type ^ r.Type.rf_name ;
-          self#html_of_type_expr_3 b father r.Type.rf_type;
+          last_name <- father ^ "." ^ r.Type.rf_name;
+          last_type <- father ^ " -> " ^ Odoc_info.string_of_type_expr r.Type.rf_type;
           self#html_of_info b r.Type.rf_text
         in
         print_concat b "\n" print_one l;
-        last_type <- last_type ^ "}"
 
     method html_of_type b t =
       Odoc_info.reset_type_names ();
