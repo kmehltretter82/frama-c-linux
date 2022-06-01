@@ -225,7 +225,7 @@ val the: exn:exn -> 'a option -> 'a
     @modify Magnesium-20151001 add optional argument [exn]
     @modify 23.0-Vanadium optional argument [exn] now mandatory; otherwise,
             use [Option.get], which is equivalent.
-    @plugin development guide *)
+*)
 
 val opt_hash: ('a -> int) -> 'a option -> int
 (** @since Sodium-20150201 *)

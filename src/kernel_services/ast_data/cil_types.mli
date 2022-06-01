@@ -1527,7 +1527,7 @@ and relation =
   | Rle
   | Rge
   | Req
-  | Rneq (** @plugin development guide *)
+  | Rneq (** Different @plugin development guide *)
 
 
 (** predicates *)

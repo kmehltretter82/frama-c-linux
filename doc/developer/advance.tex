@@ -2809,7 +2809,7 @@ a new one is loaded\index{Loading} from disk).
   \scodeidxdef{File}{init\_project\_from\_visitor};
   or write the following line of code (see Section~\ref{proj:selection}):
   \scodeidx{Project}{clear}
-  \sscodeidx{State\_selection}{S}{only\_dependencies}
+  \scodeidx{State\_selection}{only\_dependencies}
   \scodeidx{Ast}{self}
   \begin{alltt}
   let selection = State_selection.only_dependencies Ast.self in
@@ -2918,7 +2918,7 @@ consistently handle state dependencies\index{State!Dependency}.
   The following statement clears all the results of the value analysis and all
   its dependencies in the current project.\index{State!Cleaning}
   \scodeidx{Project}{clear}
-  \sscodeidx{State\_selection}{S}{with\_dependencies}
+  \scodeidx{State\_selection}{with\_dependencies}
   \sscodeidx{Db}{Value}{self}
 \begin{ocamlcode}
 let selection = State_selection.with_dependencies Db.Value.self in
@@ -3995,7 +3995,7 @@ stored in the \texttt{b\_extended}\scodeidx{Cil\_types}{behavior}{b\_extended} f
 \item A global extension will be found as a global ACSL annotation in the form of a
 \sscodeidx{Cil\_types}{global\_annotation}{Dextended}\texttt{Cil\_types.Dextended} constructor.
 \item A code annotation extension will be stored with the
-\sscodeidx{Cil\_types}{code\_annotation}{AExtended}\texttt{Cil\_types.AExtended}
+\sscodeidx{Cil\_types}{code\_annotation\_node}{AExtended}\texttt{Cil\_types.AExtended}
 constructor. Such an extension has itself
 different flavors, determined by the \scodeidx{Cil\_types}{ext\_code\_annot\_context} type:
 \begin{itemize}

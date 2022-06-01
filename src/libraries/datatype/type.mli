@@ -46,7 +46,7 @@ type 'a ty = 'a t
     combination with function {!par} below. *)
 type precedence =
   | Basic (** Normal precedence @plugin development guide *)
-  | Call (** @plugin development guide *)
+  | Call (** Instantiation of polymorphic type @plugin development guide *)
   | Tuple
   | List
   | NoPar
