@@ -48,8 +48,8 @@ let
       git = pkgs.git ;
     };
     src-distrib-tests = oself.callPackage ./src-distrib-tests.nix {
-      frama-c-no-configure = oself.frama-c.override {
-        do_autoconf = false ;
+      frama-c-release = oself.frama-c.override {
+        release_mode = true ;
       } ;
     };
   };

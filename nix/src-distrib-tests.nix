@@ -1,7 +1,7 @@
-{ mk_tests, frama-c-no-configure } :
+{ mk_tests, frama-c-release } :
 
 let mk_tests_distrib = mk_tests.override {
-  frama-c = frama-c-no-configure ;
+  frama-c = frama-c-release ;
 }; in
 mk_tests_distrib {
   tests-name = "src-distrib-tests";
