@@ -133,6 +133,14 @@ class PlainDisplay:
             elif s == "@-":
                 attributes = self.NEGATIVE
             else:
+                available = size - n
+                if len(s) > available:
+                    if available > 16:
+                        s = s[0:9] + '...' + s[13-available:]
+                    elif available > 6:
+                        s = s[0:available - 3] + '...'
+                    else:
+                        s = ''
                 n += len(s)
                 self.write(s, attributes if override is None else override)
         if n < size:
@@ -184,7 +192,7 @@ class CursesDisplay(PlainDisplay):
         stdscr.nodelay(True)
         stdscr.refresh()  # Needs to be done once or nothing will be output
 
-        self.window = curses.newpad(400, 160)
+        self.window = curses.newpad(2000, 160)
         curses.init_color(curses.COLOR_YELLOW, 300, 300, 300)
         curses.init_pair(1, curses.COLOR_RED, 0)
         curses.init_pair(2, curses.COLOR_GREEN, 0)
@@ -198,15 +206,22 @@ class CursesDisplay(PlainDisplay):
         self.scroll_y = 0
 
     def write(self, text, attributes=0):
-        self.window.addstr(text, attributes)
+        try:
+            self.window.addstr(text, attributes)
+        except curses.error: # don't exactly know why it happens, but it happens
+            pass
 
     def print_table(self, results):
         self.window.clear()
         PlainDisplay.print_table(self, results)
         height, width = self.stdscr.getmaxyx()
+        self.scroll_y = max(0, min(self.scroll_y, len(results)-height+2)) # relocate scroll if too far
         try:
-            self.window.refresh(0, 0, 0, 0, 1, width - 1)
-            self.window.refresh(self.scroll_y + 2, 0, 2, 0, height - 1, width - 1)
+            if len(results) + 2 > height:
+                self.window.refresh(0, 0, 0, 0, 1, width - 1)
+                self.window.refresh(self.scroll_y + 2, 0, 2, 0, height - 1, width - 1)
+            else:
+                self.window.refresh(0, 0, 0, 0, height - 1, width - 1)
         except Exception:
             # getmaxyx may be out of date, especially when resizing down the
             # window ; just ignore errors

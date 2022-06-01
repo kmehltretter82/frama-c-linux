@@ -30,6 +30,8 @@ import os
 import signal
 import argparse
 import uuid
+import csv
+from pathlib import Path
 
 import frama_c_results
 import results_display
@@ -76,15 +78,18 @@ def list_targets(dir):
 
 def clone_frama_c(clonedir, hash):
     print("Cloning Frama-C", hash, "...")
-    res = subprocess.run(
-        ["./scripts/clone.sh", "--clone-dir", clonedir, hash],
-        stdout=subprocess.PIPE,
-        encoding="ascii",
-    )
-    if res.returncode != 0:
-        raise OperationException("Cannot clone repository. Try to manually"
-            "remove the broken clone in " + clonedir)
-    return res.stdout.strip() + "/build"
+    try:
+        clone_cmd = Path(__file__).parent / "clone.sh"
+        res = subprocess.run(
+            [clone_cmd, "--clone-dir", clonedir, hash],
+            stdout=subprocess.PIPE,
+            encoding="ascii",
+            check=True)
+        return res.stdout.strip() + "/build"
+    except subprocess.CalledProcessError as e:
+        raise OperationException(
+            f"Cannot clone repository. Try to manually remove the broken clone"
+            f"in {clonedir}\n{e.output}") from e
 
 def run_make(framac, benchmark_tag=None):
     args = ["make", "--keep-going", "all"]
@@ -139,6 +144,22 @@ def poll_results(targets, benchmark_tag):
         result["up_to_date"] = benchmark_tag is None or benchmark_tag == result["benchmark_tag"]
         results.append(result)
     return results
+
+
+def dump_results_csv(results, path):
+    with open(path, 'w', newline='') as file:
+        fieldnames = [
+            "target_name", "timestamp",
+            "sem_reach_fun", "syn_reach_fun", "total_fun",
+            "sem_reach_stmt", "syn_reach_stmt",
+            "alarms", "warnings", "coverage",
+            "user_time", "memory"]
+        writer = csv.DictWriter(
+            file,
+            fieldnames=fieldnames,
+            extrasaction='ignore')
+        writer.writeheader()
+        writer.writerows(results)
 
 
 def run_analyses(display, database, framac, benchmark_tag):
@@ -197,7 +218,9 @@ parser.add_argument("-c", "--comment",
 parser.add_argument("-p", "--repository-path",
     action="store", metavar="PATH",
     help="don't clone Frama-C, use this git repository instead")
-
+parser.add_argument("-o", "--output-csv",
+    action="store", metavar="PATH", type=Path,
+    help="output the results to the given CSV file")
 
 errors = b""
 
@@ -236,6 +259,9 @@ try:
 
     print("Results:\n")
     results_display.PlainDisplay().print_table(results)
+
+    if args.output_csv is not None:
+        dump_results_csv(results, args.output_csv)
 
 except OperationException as e:
     errors += bytearray(str(e), "ascii")
