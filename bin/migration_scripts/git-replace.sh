@@ -1,4 +1,26 @@
 #!/bin/sh -u
+##########################################################################
+#                                                                        #
+#  This file is part of Frama-C.                                         #
+#                                                                        #
+#  Copyright (C) 2007-2022                                               #
+#    CEA (Commissariat à l'énergie atomique et aux énergies              #
+#         alternatives)                                                  #
+#                                                                        #
+#  you can redistribute it and/or modify it under the terms of the GNU   #
+#  Lesser General Public License as published by the Free Software       #
+#  Foundation, version 2.1.                                              #
+#                                                                        #
+#  It is distributed in the hope that it will be useful,                 #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
+#  GNU Lesser General Public License for more details.                   #
+#                                                                        #
+#  See the GNU Lesser General Public License version 2.1                 #
+#  for more details (enclosed in the file licenses/LGPLv2.1).            #
+#                                                                        #
+##########################################################################
+
 git replace fbe13264f29d59b5388096281f98f05116b17f76 8e6afe71d01b1bc4f4d778a5326d0a2e1f2998b3
 git replace cef5bf08946dccaf6b51e515eea76443976e6550 8bd30e2d47ffab72507d5ea291bdbd9f0fea0384
 git replace 32d8c505805a060e5112c104ea0ffe06c6df308d 3fb543f7adaac4c2942c45f0244f270c86c23605
