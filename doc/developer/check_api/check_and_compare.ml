@@ -15,7 +15,7 @@ let repair_word s = Str.global_replace (Str.regexp_string "\\") "" s
 
 let index_entry = Str.regexp {|^\\indexentry{\(.*\)}{[0-9]*}|}
 
-let index_subentry = Str.regexp {|^.*@\texttt *{\([A-Za-z0-9_]+\)}$|}
+let index_subentry = Str.regexp {|^.*@texttt *{\(fontsize  {8}{10}selectfont  \)?\([A-Za-z0-9_]+\)}$|}
 
 let all_caps = Str.regexp "^[A-Z0-9_]+$"
 
@@ -40,7 +40,7 @@ let inspect_subentry l =
   let check_one_entry e =
     let e = repair_word e in
     if Str.string_match index_subentry e 0 then begin
-      let word = Str.matched_group 1 e in
+      let word = Str.matched_group 2 e in
       if Str.string_match all_caps word 0 then raise Exit else word
     end else raise Exit
   in
