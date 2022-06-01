@@ -143,7 +143,9 @@ and global =
       entire program. Cannot have storage Extern or function type. *)
 
   | GFun of fundec * location
-  (** A function definition. *)
+  (** A function definition.
+      @plugin development guide
+  *)
 
   | GAsm of string * location
   (** Global asm statement. These ones can contain only a template *)
@@ -1694,6 +1696,8 @@ and ext_code_annot_context =
     @since Carbon-20101201 [b_requires] has been added.
     @modify Boron-20100401 [b_ensures] is replaced by [b_post_cond].
     Old [b_ensures] represent the [Normal] case of [b_post_cond].
+
+    @plugin development guide
 *)
 and behavior = {
   mutable b_name : string; (** name of the behavior. *)
@@ -1704,8 +1708,7 @@ and behavior = {
   mutable b_assigns : assigns; (** assignments. *)
   mutable b_allocation : allocation; (** frees, allocates. *)
   mutable b_extended : acsl_extension list
-  (** extensions
-      @plugin development guide *)
+  (** extensions  *)
 }
 
 (** kind of termination a post-condition applies to. See ACSL manual. *)
@@ -1769,7 +1772,10 @@ and code_annotation_node =
   | AExtended of string list * bool * acsl_extension
   (** extension in a code or loop annotation.
       Boolean flag is true for loop extensions and false for code extensions
-      @since Silicon-20161101 *)
+      @since Silicon-20161101
+
+      @plugin development guide
+  *)
 
 (** function contract. *)
 

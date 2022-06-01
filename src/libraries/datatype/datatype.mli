@@ -286,7 +286,10 @@ module type Hashtbl = sig
 end
 
 (** A datatype for a type [t] extended with predefined set, map and hashtbl
-    over [t]. *)
+    over [t].
+
+    @plugin development guide
+*)
 module type S_with_collections = sig
   include S
   module Set: Set with type elt = t

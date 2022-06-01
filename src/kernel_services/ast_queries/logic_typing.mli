@@ -91,7 +91,10 @@ type type_namespace = Typedef | Struct | Union | Enum
 
 module Type_namespace: Datatype.S with type t = type_namespace
 
-(** Functions that can be called when type-checking an extension of ACSL. *)
+(** Functions that can be called when type-checking an extension of ACSL.
+
+    @plugin development guide
+*)
 type typing_context = {
   is_loop: unit -> bool;
   anonCompFieldName : string;

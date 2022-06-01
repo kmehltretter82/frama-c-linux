@@ -19,6 +19,23 @@ let index_subentry = Str.regexp {|^.*@\texttt *{\([A-Za-z0-9_]+\)}$|}
 
 let all_caps = Str.regexp "^[A-Z0-9_]+$"
 
+let is_lower s = 'a' <= s.[0] && s.[0] <= 'z'
+let is_upper s = 'A' <= s.[0] && s.[0] <= 'Z'
+
+(* We have a prefix composed of module names, then maybe a lower case
+   symbol, possibly followed by a single symbol (in the case of a
+   type constructor or record field).
+*)
+let is_ocaml_symbol l =
+  let rec aux = function
+    | [] | [_] -> true
+    | [ t; _ ] when is_lower t -> true
+    | x :: l -> is_upper x && aux l
+  in
+  match l with
+  | [] -> false
+  | x :: l -> is_upper x && aux l
+
 let inspect_subentry l =
   let check_one_entry e =
     let e = repair_word e in
@@ -29,7 +46,9 @@ let inspect_subentry l =
   in
   try
     let l = List.map check_one_entry l in
-    (String.concat "." l)  ^ "\n"
+    if is_ocaml_symbol l then
+      (String.concat "." l)  ^ "\n"
+    else ""
   with Exit -> ""
 
 let inspect_entry line =
