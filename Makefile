@@ -33,6 +33,13 @@ $(error \
   "You should run ./configure first (or autoconf if there is no configure)")
 endif
 
+RELEASE?=no
+ifeq ($(RELEASE),yes)
+DUNE_BUILD_OPTS=--release
+else
+DUNE_BUILD_OPTS=
+endif
+
 ###################
 # Frama-C Version #
 ###################
@@ -43,7 +50,7 @@ VERSION_CODENAME:=$(shell $(CAT) VERSION_CODENAME)
 .PHONY: all
 
 all: config.sed
-	dune build @install
+	dune build $(DUNE_BUILD_OPTS) @install
 
 ifeq ($(HAS_DOT),yes)
 OPTDOT=Some \"$(DOT)\"
