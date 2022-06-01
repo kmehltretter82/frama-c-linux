@@ -1,0 +1,76 @@
+# -*- coding: utf-8 -*-
+##########################################################################
+#                                                                        #
+#  This file is part of Frama-C.                                         #
+#                                                                        #
+#  Copyright (C) 2007-2022                                               #
+#    CEA (Commissariat à l'énergie atomique et aux énergies              #
+#         alternatives)                                                  #
+#                                                                        #
+#  you can redistribute it and/or modify it under the terms of the GNU   #
+#  Lesser General Public License as published by the Free Software       #
+#  Foundation, version 2.1.                                              #
+#                                                                        #
+#  It is distributed in the hope that it will be useful,                 #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
+#  GNU Lesser General Public License for more details.                   #
+#                                                                        #
+#  See the GNU Lesser General Public License version 2.1                 #
+#  for more details (enclosed in the file licenses/LGPLv2.1).            #
+#                                                                        #
+##########################################################################
+
+"""This file provides utility functions to use external tools, either
+available in the PATH or via PyInstaller."""
+
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import typing
+
+# warnings about missing commands are disabled during testing
+emit_warns = os.getenv("PTESTS_TESTING") is None
+
+# Cache for get_command
+cached_commands: dict[str, typing.Union[Path, None]] = {}
+
+
+def resource_path(relative_path: str) -> str:
+    """Get absolute path to resource; only used by the pyinstaller standalone distribution"""
+    base_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
+
+
+def get_command(command: str, env_var_name: str) -> typing.Union[Path, None]:
+    """Returns a Path to the command; priority goes to the environment variable,
+    then in the PATH, then in the resource directory (for a pyinstaller binary)."""
+    if command in cached_commands:
+        return cached_commands[command]
+    p = Path(os.getenv(env_var_name) or shutil.which(command) or resource_path(command))
+    if p.exists():
+        cached_commands[command] = p
+        return p
+    else:
+        if emit_warns:
+            print(
+                f"info: optional external command '{command}' not found in PATH;",
+                f"consider installing it or setting environment variable {env_var_name}",
+            )
+        cached_commands[command] = None
+        return None
+
+
+def run_and_check(command_and_args: list[str], input_data: str):
+    try:
+        return subprocess.check_output(
+            command_and_args,
+            input=input_data,
+            stderr=None,
+            encoding="ascii",
+            errors="ignore",
+        )
+    except subprocess.CalledProcessError as e:
+        sys.exit(f"error running command: {command_and_args}\n{e}")
