@@ -34,7 +34,6 @@ import re
 import shutil
 import sys
 import subprocess
-import typing
 
 import function_finder
 import source_filter
@@ -49,13 +48,6 @@ for analysis with Frama-C. Tries to use a build_commands.json file if
 available."""
 )
 parser.add_argument(
-    "--base",
-    metavar="DIR",
-    default=".",
-    help="base directory used for pretty-printing relative paths (default: PWD)",
-    type=Path,
-)
-parser.add_argument(
     "--debug",
     metavar="FILE",
     help="enable debug mode and redirect output to the specified file",
@@ -66,7 +58,6 @@ parser.add_argument(
     metavar="FILE",
     default="build_commands.json",
     help="path to JBDB (default: build_commands.json)",
-    type=Path,
 )
 parser.add_argument(
     "--machdep", metavar="MACHDEP", help="analysis machdep (default: Frama-C's default)"
@@ -76,11 +67,6 @@ parser.add_argument(
     metavar="FUNCTION",
     default="main",
     help="name of the main function (default: main)",
-)
-parser.add_argument(
-    "--no-source-filter",
-    action="store_true",
-    help="disable source filters (less precise, but speeds up large projects)",
 )
 parser.add_argument(
     "--sources",
@@ -93,17 +79,15 @@ parser.add_argument(
     "--targets",
     metavar="FILE",
     nargs="+",
-    help="targets to build. When using --sources, only a single target is allowed.",
+    help="targets to build. When using --sources, " + "only a single target is allowed.",
     type=Path,
 )
 
 args = parser.parse_args()
-base = args.base
 force = args.force
 jbdb_path = args.jbdb
 machdep = args.machdep
 main = args.main
-no_source_filter = args.no_source_filter
 sources = args.sources
 targets = args.targets
 debug = args.debug
@@ -128,20 +112,21 @@ dot_framac_dir = Path(".frama-c")
 
 # Check required environment variables and commands in the PATH ###############
 
-framac_bin = Path(
-    os.getenv("FRAMAC_BIN")
-    or sys.exit("error: FRAMAC_BIN not in environment (set by frama-c-script)")
-)
+framac_bin = os.getenv("FRAMAC_BIN")
+if not framac_bin:
+    sys.exit("error: FRAMAC_BIN not in environment (set by frama-c-script)")
+framac_bin = Path(framac_bin)
 
 under_test = os.getenv("PTESTS_TESTING")
 
 # Prepare blug-related variables and functions ################################
 
-blug = Path(
-    os.getenv("BLUG")
-    or shutil.which("blug")
-    or sys.exit("error: path to 'blug' binary must be in PATH or variable BLUG")
-)
+blug = os.getenv("BLUG")
+if not blug:
+    blug = shutil.which("blug")
+    if not blug:
+        sys.exit("error: path to 'blug' binary must be in PATH or variable BLUG")
+blug = Path(blug)
 blug_dir = blug.resolve().parent
 # to import blug_jbdb
 sys.path.insert(0, blug_dir.as_posix())
@@ -204,18 +189,14 @@ def make_target_name(target):
     return prettify(target).replace("/", "_").replace(".", "_")
 
 
-def rel_path(path: Path, base: Path) -> str:
-    """Return a relative path to the .frama-c directory, if path is relative to base.
-    Otherwise, return an absolute path. Typically, base is the parent of the .frama-c directory."""
-    try:
-        path.resolve().relative_to(base.resolve())  # Fails if path is not inside base
-        return os.path.relpath(path, start=dot_framac_dir)
-    except ValueError:
-        return str(path.resolve())
+# sources are pretty-printed relatively to the .frama-c directory, where the
+# GNUmakefile will reside
+def rel_prefix(path):
+    return path if os.path.isabs(path) else os.path.relpath(path, start=dot_framac_dir)
 
 
-def pretty_sources(sources, base):
-    return [f"  {rel_path(source, base)} \\" for source in sorted(sources)]
+def pretty_sources(sources):
+    return [f"  {rel_prefix(source)} \\" for source in sources]
 
 
 def lines_of_file(path):
@@ -248,7 +229,7 @@ def copy_fc_stubs():
 # [funcname] in [filename].
 # [has_args] is used to distinguish between main(void) and main(int, char**).
 def find_definitions(funcname, filename):
-    file_content = source_filter.open_and_filter(filename, not under_test and not no_source_filter)
+    file_content = source_filter.open_and_filter(filename, not under_test)
     file_lines = file_content.splitlines(keepends=True)
     newlines = function_finder.compute_newline_offsets(file_lines)
     defs = function_finder.find_definitions_and_declarations(
@@ -274,7 +255,7 @@ def list_partition(f, l):
     l1 = []
     l2 = []
     for e in l:
-        if f(e):
+        if f(l):
             l1.append(e)
         else:
             l2.append(e)
@@ -359,7 +340,7 @@ if unknown_sources:
 # We also need to check if the main function uses a 'main(void)'-style
 # signature, to patch fc_stubs.c.
 
-main_definitions: dict[Path, list[typing.Tuple[Path, str, str]]] = {}
+main_definitions = {}
 for target, sources in sources_map.items():
     main_definitions[target] = []
     for source in sources:
@@ -424,18 +405,18 @@ if jbdb_path:
     insert_lines_after(
         template,
         "^FCFLAGS",
-        [f"  -json-compilation-database {rel_path(jbdb_path, base)} \\"],
+        [f"  -json-compilation-database {rel_prefix(jbdb_path)} \\"],
     )
 
-targets_eva = [f"  {make_target_name(target)}.eva \\" for target in sorted(targets)]
+targets_eva = [f"  {make_target_name(target)}.eva \\" for target in targets]
 replace_line(template, "^TARGETS = main.eva", "TARGETS = \\")
 insert_lines_after(template, r"^TARGETS = \\", targets_eva)
 
 delete_line(template, r"^main.parse: \\")
 delete_line(template, r"^  main.c \\")
-for target, sources in reversed(sorted(sources_map.items())):
+for target, sources in reversed(sources_map.items()):
     pp_target = make_target_name(target)
-    new_lines = [f"{pp_target}.parse: \\"] + pretty_sources(sources, base) + [""]
+    new_lines = [f"{pp_target}.parse: \\"] + pretty_sources(sources) + [""]
     if any(d[2] for d in main_definitions[target]):
         logging.debug(
             "target %s has main with args, adding -main eva_main to its FCFLAGS",

@@ -265,9 +265,7 @@ DISTRIB_FILES:=\
       share/analysis-scripts/detect_recursion.py                        \
       share/analysis-scripts/epilogue.mk                                \
       share/analysis-scripts/estimate_difficulty.py                     \
-      share/analysis-scripts/external_tool.py                           \
       share/analysis-scripts/fc_stubs.c                                 \
-      share/analysis-scripts/fclog.py                                   \
       share/analysis-scripts/find_fun.py                                \
       share/analysis-scripts/flamegraph.pl                              \
       share/analysis-scripts/frama_c_results.py                         \
@@ -1984,9 +1982,7 @@ install:: install-lib-$(OCAMLBEST)
 	  share/analysis-scripts/clone.sh \
 	  share/analysis-scripts/creduce.sh \
 	  share/analysis-scripts/epilogue.mk \
-	  share/analysis-scripts/external_tool.py \
 	  share/analysis-scripts/fc_stubs.c \
-	  share/analysis-scripts/fclog.py \
 	  share/analysis-scripts/find_fun.py \
 	  share/analysis-scripts/flamegraph.pl \
 	  share/analysis-scripts/frama_c_results.py \

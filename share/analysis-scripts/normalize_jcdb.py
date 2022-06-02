@@ -44,6 +44,7 @@ if not arg.exists():
 with open(arg) as data:
     jcdb_json = json.load(data)
 jcdb_dir = arg.parent
+out_json = {}
 
 replacements = set()
 
