@@ -26,14 +26,30 @@
 /* -------------------------------------------------------------------------- */
 
 import React from 'react';
+//import * as Dome from 'dome';
 //import * as Ctrl from 'dome/controls/buttons';
-//import * as Disp from 'dome/controls/displays';
-//import * as Box from 'dome/layout/boxes';
+import * as Disp from 'dome/controls/displays';
+import * as Box from 'dome/layout/boxes';
 import * as DnD from 'dome/newdnd';
 import { registerSandbox } from 'ivette';
 
 function UseDnD(): JSX.Element {
-  return <DnD.DragSource>Using Drag & Drop</DnD.DragSource>;
+  const [state, setState] = React.useState('--');
+  //const [blink, setBlink] = React.useState(false);
+  return (
+    <Box.Vfill>
+      <Box.Hbox>
+        <Disp.LCD label={state} />
+      </Box.Hbox>
+      <DnD.DragSource
+        onStart={() => setState('??')}
+        onDrag={(x, y) => setState(`${x}:${y}`)}
+        onStop={() => setState('--')}
+      >
+        Using Drag & Drop
+      </DnD.DragSource>
+    </Box.Vfill>
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -41,7 +57,7 @@ function UseDnD(): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 registerSandbox({
-  id: 'sandbox.qsplit',
+  id: 'sandbox.usednd',
   label: 'Drag & Drop',
   children: <UseDnD />,
 });

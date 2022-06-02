@@ -29,9 +29,8 @@
  */
 
 import React from 'react';
-import Draggable, {
-  DraggableEvent,
-  DraggableData,
+import {
+  DraggableCore,
   DraggableEventHandler
 } from 'react-draggable';
 
@@ -39,30 +38,51 @@ export interface DragSourceProps {
   disabled?: boolean;
   handle?: string;
   children?: React.ReactNode;
+  onStart?: () => void;
+  onDrag?: (deltaX: number, deltaY: number) => void;
+  onStop?: () => void;
 }
 
-/* eslint-disable no-console */
-function trace(ctxt: string): DraggableEventHandler {
-  return (e: DraggableEvent, d: DraggableData) => {
-    console.log(ctxt, e, d);
-  };
+interface Dragging {
+  rootX: number,
+  rootY: number,
+  dragX: number,
+  dragY: number,
 }
-/* eslint-enable no-console */
 
 export function DragSource(props: DragSourceProps): JSX.Element | null {
   const { disabled, handle, children } = props;
+  const [dragging, setDragging] = React.useState<Dragging | undefined>();
+  const onStart: DraggableEventHandler = (_, { x, y }) => {
+    setDragging({
+      rootX: x, rootY: y,
+      dragX: x, dragY: y
+    });
+    if (props.onStart) props.onStart();
+  };
+  const onDrag: DraggableEventHandler = (_, { x, y }) => {
+    if (dragging) {
+      setDragging({ ...dragging, dragX: x, dragY: y });
+      if (props.onDrag) {
+        const deltaX = x - dragging.rootX;
+        const deltaY = y - dragging.rootY;
+        props.onDrag(deltaX, deltaY);
+      }
+    }
+  };
+  const onStop: DraggableEventHandler = () => {
+    setDragging(undefined);
+    if (props.onStop) props.onStop();
+  };
   return (
-    <Draggable
+    <DraggableCore
       disabled={disabled}
       handle={handle}
-      defaultClassName=''
-      defaultClassNameDragged=''
-      defaultClassNameDragging='dome-dragging'
-      onStart={trace('onStart')}
-      onDrag={trace('onDrag')}
-      onStop={trace('onStop')}
+      onStart={onStart}
+      onDrag={onDrag}
+      onStop={onStop}
     >
-      {children}
-    </Draggable>
+      <div>{children}</div>
+    </DraggableCore>
   );
 }
