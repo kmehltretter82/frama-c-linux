@@ -672,14 +672,20 @@ const DEC_CLOCK = (period: number): void => {
 };
 
 export interface Timer {
-  /** Starts the timer, if not yet. */
+  /** Starts or re-start the timer. */
   start(): void;
   /** Stops the timer. Can be restarted after. */
   stop(): void;
-  /** Elapsed time (in milliseconds). */
-  time: number;
+  /** Stops and reset elapsed time. */
+  clear(): void;
   /** Running timer. */
   running: boolean;
+  /** Elapsed time (in milliseconds). */
+  time: number;
+  /** Number of periods (rounded). */
+  periods: number;
+  /** Blink state (odd number of periods). */
+  blink: boolean;
 }
 
 /**
@@ -695,16 +701,24 @@ export interface Timer {
    @param initStart - whether to initially start the timer (default is `false`)
 
  */
-export function useClock(period: number, initStart: boolean): Timer {
+export function useClock(period: number, initStart = false): Timer {
   const started = React.useRef(0);
   const [time, setTime] = React.useState(0);
   const [running, setRunning] = React.useState(initStart);
-  const start = React.useCallback(() => setRunning(false), []);
+  const start = React.useCallback(() => {
+    setRunning(true);
+    setTime(0);
+  }, []);
   const stop = React.useCallback(() => {
     setRunning(false);
     setTime(0);
     started.current = 0;
   }, []);
+  const clear = React.useCallback(() => {
+    setRunning(false);
+    started.current = time;
+    setTime(0);
+  }, [time]);
   React.useEffect(() => {
     if (running) {
       const event = INC_CLOCK(period);
@@ -719,7 +733,9 @@ export function useClock(period: number, initStart: boolean): Timer {
       };
     } return undefined;
   }, [period, running]);
-  return { time, running, start, stop };
+  const periods = Math.ceil(time / period);
+  const blink = !!(periods & 1);
+  return { running, time, periods, blink, start, stop, clear };
 }
 
 // --------------------------------------------------------------------------
