@@ -42,7 +42,10 @@ Make* header_spec=CEA_LGPL
 
 /bin/frama-c* header_spec=CEA_LGPL
 
+/devel_tools/git-hooks/pre-commit header_spec=CEA_LGPL
+
 /headers/headache_config.txt header_spec=CEA_LGPL
+
 /share/autocomplete_frama-c header_spec=CEA_LGPL
 /share/emacs/frama-c-*.el header_spec=CEA_LGPL
 /share/_frama-c header_spec=CEA_LGPL

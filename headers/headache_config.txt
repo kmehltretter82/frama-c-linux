@@ -87,6 +87,12 @@
 | "frama-c.debug" -> frame open:"#"  line:"#" close:"#"
 | ".*frama-c.debug" -> skip match:"#!.*"
 
+#############
+# Git hooks #
+#############
+| "pre-commit" -> frame open:"#"  line:"#" close:"#"
+| ".*pre-commit" -> skip multiline_match: "#!.*" multiline_match: "# -\*-.*"
+
 ###############
 # Zsh scripts #
 ###############
