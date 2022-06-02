@@ -42,7 +42,7 @@ if not arg.exists():
     sys.exit(f"error: file '{arg}' not found")
 
 # check if arg has a known extension
-def is_known_c_extension(ext: str) -> bool:
+def is_known_c_extension(ext):
     return ext in (".c", ".i", ".ci", ".h")
 
 
@@ -51,10 +51,11 @@ fcmake_pwd = Path(pwd) / ".frama-c"  # pwd as seen by the Frama-C makefile
 with open(arg) as data:
     jcdb = json.load(data)
 jcdb_dir = arg.parent
-includes: set[Path] = set()
-defines: set[Path] = set()
+includes = set()
+defines = set()
 files = set()  # set of pairs of (file, file_for_fcmake)
 for entry in jcdb:
+    arg_includes = []  # before normalization
     if not "file" in entry:
         # ignore entries without a filename
         continue
@@ -80,9 +81,9 @@ print("")
 
 files_defining_main = set()
 re_main = re.compile(r"(int|void)\s+main\s*\([^)]*\)\s*\{")
-for (f, file_for_fcmake) in files:
-    assert os.path.exists(f), "file does not exist: %s" % f
-    with open(f, "r") as content_file:
+for (filename, file_for_fcmake) in files:
+    assert os.path.exists(filename), "file does not exist: %s" % filename
+    with open(filename, "r") as content_file:
         content = content_file.read()
         res = re.search(re_main, content)
         if res is not None:
