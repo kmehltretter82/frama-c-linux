@@ -17,6 +17,9 @@ Make* header_spec=CEA_LGPL
 *.c header_spec=CEA_LGPL
 *.h header_spec=CEA_LGPL
 
+*.htm header_spec=CEA_LGPL
+*.html header_spec=CEA_LGPL
+
 *.js header_spec=CEA_LGPL
 
 *.ml header_spec=CEA_LGPL
@@ -40,18 +43,144 @@ Make* header_spec=CEA_LGPL
 *.ts header_spec=CEA_LGPL
 *.tsx header_spec=CEA_LGPL
 
-/bin/frama-c* header_spec=CEA_LGPL
+########################
+# HEADER_SPEC: .ignore #
+########################
 
-/devel_tools/git-hooks/pre-commit header_spec=CEA_LGPL
+.gitattributes header_spec=.ignore
+.gitignore header_spec=.ignore
+.gitkeep header_spec=.ignore
+.git-blame-ignore-revs header_spec=.ignore
 
-/headers/headache_config.txt header_spec=CEA_LGPL
+.merlin header_spec=.ignore
 
-/share/autocomplete_frama-c header_spec=CEA_LGPL
-/share/emacs/frama-c-*.el header_spec=CEA_LGPL
-/share/_frama-c header_spec=CEA_LGPL
+Changelog header_spec=.ignore
+opam header_spec=.ignore
 
-/src/kernel_internals/runtime/fc_config.ml.in header_spec=CEA_LGPL
-/src/libraries/stdlib/transitioning.ml.in header_spec=CEA_LGPL
+README* header_spec=.ignore
+*.README* header_spec=.ignore
+
+*.dot header_spec=.ignore
+*.fig header_spec=.ignore
+
+*.eps header_spec=.ignore
+*.ps header_spec=.ignore
+
+*.gif header_spec=.ignore
+*.ico header_spec=.ignore
+*.jpg header_spec=.ignore
+*.jpeg header_spec=.ignore
+*.png header_spec=.ignore
+*.svg header_spec=.ignore
+
+*.nix header_spec=.ignore
+*.md header_spec=.ignore
+*.opam header_spec=.ignore
+
+*.pdf header_spec=.ignore
+
+.tex header_spec=.ignore
+*.sty header_spec=.ignore
+*.bib header_spec=.ignore
+
+*.odoc header_spec=.ignore
+
+/.for_devel header_spec=.ignore
+/.force-reconfigure header_spec=.ignore
+/.gitlab-ci.yml header_spec=.ignore
+/.make-clean* header_spec=.ignore
+/.mailmap header_spec=.ignore
+/.ocp-indent header_spec=.ignore
+/ALL_VERSIONS header_spec=.ignore
+/LICENSE header_spec=.ignore
+/VERSION header_spec=.ignore
+/VERSION_CODENAME header_spec=.ignore
+
+/bin/sed_get_* header_spec=.ignore
+
+/devel_tools/docker/*.template header_spec=.ignore
+
+# TODO: header_spec=JCF_LGPL_2_only
+/devel_tools/size.mli header_spec=.ignore
+/devel_tools/size.ml header_spec=.ignore
+/devel_tools/size_states.ml header_spec=.ignore
+/devel_tools/size_states.mli header_spec=.ignore
+
+/doc/CC-BY-SA-4.0 header_spec=.ignore
+/doc/CHANGES.obfuscator header_spec=.ignore
+/doc/LICENSE header_spec=.ignore
+/doc/MakeLaTeXModern header_spec=.ignore
+/doc/acsl_tutorial_slides/script header_spec=.ignore
+/doc/developer/METADOC.txt header_spec=.ignore
+/doc/qualification/testing header_spec=.ignore
+/doc/release/periodic-elements.txt header_spec=.ignore
+/doc/value/watchpoints header_spec=.ignore
+/doc/scope/M.v header_spec=.ignore
+
+/doc/aorai/example/example* header_spec=.ignore
+/doc/frama-c-book.* header_spec=.ignore
+/doc/*.hva header_spec=.ignore
+
+/doc/training/**/* header_spec=.ignore
+/doc/value/examples/parametrizing/*.log header_spec=.ignore
+/doc/*/**/Make* header_spec=.ignore
+/doc/**/make* header_spec=.ignore
+/doc/**/TODO header_spec=.ignore
+/doc/**/*.bnf header_spec=.ignore
+/doc/**/*.c header_spec=.ignore
+/doc/**/*.graphml header_spec=.ignore
+/doc/**/*.h header_spec=.ignore
+/doc/**/*.html header_spec=.ignore
+/doc/**/*.lua header_spec=.ignore
+/doc/slicing/algo.ml header_spec=.ignore
+/doc/*/*/**/*.ml header_spec=.ignore
+/doc/**/*.mli header_spec=.ignore
+/doc/**/*.mll header_spec=.ignore
+/doc/**/*.oracle header_spec=.ignore
+/doc/**/*.tex header_spec=.ignore
+/doc/*/*/**/*.txt header_spec=.ignore
+/doc/**/*.sh header_spec=.ignore
+
+/headers/open-source/* header_spec=.ignore
+/headers/close-source/* header_spec=.ignore
+
+/ivette/configure.js header_spec=.ignore
+/ivette/sandboxer.js header_spec=.ignore
+/ivette/.babelrc header_spec=.ignore
+/ivette/.eslint* header_spec=.ignore
+/ivette/doc/**/*.js header_spec=.ignore
+/ivette/dome/doc/**/*.js header_spec=.ignore
+/ivette/src/dome/doc/template/static/fonts/*-webfont.* header_spec=.ignore
+/ivette/src/dome/template/git-ignore header_spec=.ignore
+/ivette/src/dome/doc/template/tmpl/*.tmpl header_spec=.ignore
+/ivette/src/dome/doc/**/*.js header_spec=.ignore
+/ivette/src/dome/doc/**/*.htm header_spec=.ignore
+/ivette/src/dome/doc/**/*.txt header_spec=.ignore
+/ivette/src/dome/**/*.el header_spec=.ignore
+/ivette/tests/*.i header_spec=.ignore
+/ivette/**/*.css header_spec=.ignore
+/ivette/**/*.html header_spec=.ignore
+/ivette/**/*.json header_spec=.ignore
+/ivette/**/*.lua header_spec=.ignore
+/ivette/*.icns header_spec=.ignore
+/ivette/*.lock header_spec=.ignore
+
+/licenses/* header_spec=.ignore
+
+/man/frama-c.1 header_spec=.ignore
+
+/nix/empty header_spec=.ignore
+/nix/frama-c-public/known_hosts header_spec=.ignore
+
+/share/framac.vim header_spec=.ignore
+/share/META.frama-c header_spec=.ignore
+/share/analysis-scripts/readme-graph.graphml header_spec=.ignore
+/share/analysis-scripts/pyproject.toml header_spec=.ignore
+/share/win32_installer.iss header_spec=.ignore
+/share/win32_manual_installation_step.txt header_spec=.ignore
+/share/compliance/*.json header_spec=.ignore
+
+/tests/**/* header_spec=.ignore
 
 #######################
 # HEADER_SPEC: others #
@@ -63,6 +192,8 @@ Make* header_spec=CEA_LGPL
 
 /share/analysis-scripts/flamegraph.pl header_spec=CDDL
 /share/emacs/acsl.el header_spec=CEA_PR_LGPL
+/share/libc/argz.h header_spec=CEA_FSF_LGPL
+/share/libc/argz.c header_spec=CEA_FSF_LGPL
 /share/machdep.c header_spec=CIL
 
 /src/kernel_internals/parsing/clexer.mli header_spec=CIL
@@ -145,141 +276,21 @@ Make* header_spec=CEA_LGPL
 /src/libraries/utils/utf8_logic.ml header_spec=CEA_INRIA_LGPL
 /src/libraries/utils/utf8_logic.mli header_spec=CEA_INRIA_LGPL
 
-########################
-# HEADER_SPEC: .ignore #
-########################
+#########################
+# HEADER_SPEC: CEA_LGPL #
+#########################
 
-.gitattributes header_spec=.ignore
-.gitignore header_spec=.ignore
-.gitkeep header_spec=.ignore
-.git-blame-ignore-revs header_spec=.ignore
+/bin/frama-c* header_spec=CEA_LGPL
 
-.merlin header_spec=.ignore
+/doc/code/*.txt header_spec=CEA_LGPL
+/devel_tools/git-hooks/pre-commit header_spec=CEA_LGPL
 
-Changelog header_spec=.ignore
-opam header_spec=.ignore
+/headers/headache_config.txt header_spec=CEA_LGPL
+/headers/*.sh header_spec=CEA_LGPL_OR_PROPRIETARY
 
-README* header_spec=.ignore
-*.README* header_spec=.ignore
+/share/autocomplete_frama-c header_spec=CEA_LGPL
+/share/emacs/frama-c-*.el header_spec=CEA_LGPL
+/share/_frama-c header_spec=CEA_LGPL
 
-*.dot header_spec=.ignore
-*.fig header_spec=.ignore
-
-*.eps header_spec=.ignore
-*.ps header_spec=.ignore
-
-*.gif header_spec=.ignore
-*.ico header_spec=.ignore
-*.jpg header_spec=.ignore
-*.jpeg header_spec=.ignore
-*.png header_spec=.ignore
-*.svg header_spec=.ignore
-
-*.nix header_spec=.ignore
-*.md header_spec=.ignore
-*.opam header_spec=.ignore
-
-*.pdf header_spec=.ignore
-
-.tex header_spec=.ignore
-*.sty header_spec=.ignore
-*.bib header_spec=.ignore
-
-*.odoc header_spec=.ignore
-
-/.for_devel header_spec=.ignore
-/.force-reconfigure header_spec=.ignore
-/.gitlab-ci.yml header_spec=.ignore
-/.make-clean* header_spec=.ignore
-/.mailmap header_spec=.ignore
-/.ocp-indent header_spec=.ignore
-/ALL_VERSIONS header_spec=.ignore
-/LICENSE header_spec=.ignore
-/VERSION header_spec=.ignore
-/VERSION_CODENAME header_spec=.ignore
-
-/bin/sed_get_* header_spec=.ignore
-
-/devel_tools/docker/*.template header_spec=.ignore
-
-# TODO: header_spec=JCF_LGPL_2_only
-/devel_tools/size.mli header_spec=.ignore
-/devel_tools/size.ml header_spec=.ignore
-/devel_tools/size_states.ml header_spec=.ignore
-/devel_tools/size_states.mli header_spec=.ignore
-
-/doc/CC-BY-SA-4.0 header_spec=.ignore
-/doc/CHANGES.obfuscator header_spec=.ignore
-/doc/LICENSE header_spec=.ignore
-/doc/MakeLaTeXModern header_spec=.ignore
-/doc/qualification/testing header_spec=.ignore
-/doc/value/watchpoints header_spec=.ignore
-/doc/scope/M.v header_spec=.ignore
-
-/doc/aorai/example/example* header_spec=.ignore
-/doc/frama-c-book.* header_spec=.ignore
-/doc/*.hva header_spec=.ignore
-
-/doc/acsl_tutorial_slides/script header_spec=.ignore
-/doc/training/**/* header_spec=.ignore
-/doc/value/examples/parametrizing/*.log header_spec=.ignore
-/doc/*/**/Make* header_spec=.ignore
-/doc/**/make* header_spec=.ignore
-/doc/**/TODO header_spec=.ignore
-/doc/**/*.bnf header_spec=.ignore
-/doc/**/*.c header_spec=.ignore
-/doc/**/*.graphml header_spec=.ignore
-/doc/**/*.h header_spec=.ignore
-/doc/**/*.htm header_spec=.ignore
-/doc/**/*.html header_spec=.ignore
-/doc/**/*.lua header_spec=.ignore
-/doc/**/*.ml header_spec=.ignore
-/doc/**/*.mli header_spec=.ignore
-/doc/**/*.mll header_spec=.ignore
-/doc/**/*.oracle header_spec=.ignore
-/doc/**/*.tex header_spec=.ignore
-/doc/**/*.txt header_spec=.ignore
-/doc/**/*.sh header_spec=.ignore
-
-/headers/open-source/* header_spec=.ignore
-/headers/close-source/* header_spec=.ignore
-
-/ivette/configure.js header_spec=.ignore
-/ivette/sandboxer.js header_spec=.ignore
-/ivette/.babelrc header_spec=.ignore
-/ivette/.eslint* header_spec=.ignore
-/ivette/doc/**/*.js header_spec=.ignore
-/ivette/dome/doc/**/*.js header_spec=.ignore
-/ivette/src/dome/doc/template/static/fonts/*-webfont.* header_spec=.ignore
-/ivette/src/dome/template/git-ignore header_spec=.ignore
-/ivette/src/dome/doc/template/tmpl/*.tmpl header_spec=.ignore
-/ivette/src/dome/doc/**/*.js header_spec=.ignore
-/ivette/src/dome/doc/**/*.htm header_spec=.ignore
-/ivette/src/dome/doc/**/*.txt header_spec=.ignore
-/ivette/src/dome/**/*.el header_spec=.ignore
-/ivette/tests/*.i header_spec=.ignore
-/ivette/**/*.css header_spec=.ignore
-/ivette/**/*.html header_spec=.ignore
-/ivette/**/*.json header_spec=.ignore
-/ivette/**/*.lua header_spec=.ignore
-/ivette/*.icns header_spec=.ignore
-/ivette/*.lock header_spec=.ignore
-
-/licenses/* header_spec=.ignore
-
-/man/frama-c.1 header_spec=.ignore
-
-/nix/empty header_spec=.ignore
-/nix/frama-c-public/known_hosts header_spec=.ignore
-
-/share/framac.vim header_spec=.ignore
-/share/META.frama-c header_spec=.ignore
-/share/libc/argz.h header_spec=.ignore
-/share/libc/argz.c header_spec=.ignore
-/share/analysis-scripts/readme-graph.graphml header_spec=.ignore
-/share/analysis-scripts/pyproject.toml header_spec=.ignore
-/share/win32_installer.iss header_spec=.ignore
-/share/win32_manual_installation_step.txt header_spec=.ignore
-/share/compliance/*.json header_spec=.ignore
-
-/tests/**/* header_spec=.ignore
+/src/kernel_internals/runtime/fc_config.ml.in header_spec=CEA_LGPL
+/src/libraries/stdlib/transitioning.ml.in header_spec=CEA_LGPL

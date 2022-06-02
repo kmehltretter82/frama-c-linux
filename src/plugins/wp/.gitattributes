@@ -18,6 +18,8 @@ Makefile.in header_spec=CEA_WP
 Makefile.resources header_spec=CEA_WP
 MakeDoc header_spec=CEA_WP
 
+/intro_wp.txt header_spec=CEA_WP
+
 #######################
 # HEADER_SPEC: others #
 #######################
@@ -50,8 +52,6 @@ MakeDoc header_spec=CEA_WP
 ########################
 # HEADER_SPEC: .ignore #
 ########################
-
-/intro_wp.txt header_spec=.ignore
 
 /doc/coqdoc/coq2tex/coq2html.js header_spec=.ignore
 /doc/coqdoc/coq2tex/*.css header_spec=.ignore

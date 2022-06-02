@@ -3,7 +3,3 @@
 ########################
 
 /META.in header_spec=.ignore
-
-/share/acsl.xml header_spec=.ignore
-
-/tests/**/* header_spec=.ignore
