@@ -26,28 +26,50 @@
 /* -------------------------------------------------------------------------- */
 
 import React from 'react';
-//import * as Dome from 'dome';
-//import * as Ctrl from 'dome/controls/buttons';
-import * as Disp from 'dome/controls/displays';
+import { LCD } from 'dome/controls/displays';
 import * as Box from 'dome/layout/boxes';
 import * as DnD from 'dome/newdnd';
 import { registerSandbox } from 'ivette';
+import './sandbox.css';
+
+const delta = (id: string, d: DnD.Dragging): string => {
+  const dx = d.dragX - d.rootX;
+  const dy = d.dragY - d.rootY;
+  return `${id} ${dx}:${dy}`
+};
+
+interface ItemProps {
+  id: string;
+  setState: (s: string) => void;
+}
+
+function Item(props: ItemProps): JSX.Element {
+  const { id, setState } = props;
+  return (
+    <DnD.DragSource
+      className='sandbox-item'
+      styleDragging={{ background: 'lightgreen' }}
+      onStart={() => setState(id)}
+      onDrag={(d) => setState(delta(id, d))}
+      onStop={() => setState('--')}
+    >
+      Item {id}
+    </DnD.DragSource>
+  );
+}
 
 function UseDnD(): JSX.Element {
   const [state, setState] = React.useState('--');
-  //const [blink, setBlink] = React.useState(false);
   return (
     <Box.Vfill>
       <Box.Hbox>
-        <Disp.LCD label={state} />
+        <LCD label={state} />
       </Box.Hbox>
-      <DnD.DragSource
-        onStart={() => setState('??')}
-        onDrag={(x, y) => setState(`${x}:${y}`)}
-        onStop={() => setState('--')}
-      >
-        Using Drag & Drop
-      </DnD.DragSource>
+      <Box.Vbox>
+        <Item id='A' setState={setState} />
+        <Item id='B' setState={setState} />
+        <Item id='C' setState={setState} />
+      </Box.Vbox>
     </Box.Vfill>
   );
 }
