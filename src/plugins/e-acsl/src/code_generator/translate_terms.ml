@@ -256,7 +256,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     let final_stmt  = (Cil.mkBlock [ init_k_stmt; for_stmt ]) in
     Env.Logic_binding.remove env k;
     let env = Env.add_stmt env (Smart_stmt.block_stmt final_stmt) in
-    let adata, env = Assert.register_term ~loc env t acc_as_exp adata in
+    let adata = Assert.register_term ~loc t acc_as_exp adata in
     acc_as_exp, adata, env, Typed_number.C_number, ""
   | _ ->
     assert false
@@ -271,29 +271,29 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
   | TLval lv ->
     let lv, env, name = tlval_to_lval kf env lv in
     let e = Smart_exp.lval ~loc lv in
-    let adata, env = Assert.register_term ~loc env t e adata in
+    let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Typed_number.C_number, name
   | TSizeOf ty ->
     let e = Cil.sizeOf ~loc ty in
-    let adata, env = Assert.register_term ~loc env ~force:true t e adata in
+    let adata = Assert.register_term ~loc ~force:true t e adata in
     e, adata, env, Typed_number.C_number, "sizeof"
   | TSizeOfE t' ->
     let e', _, env = to_exp ~adata:Assert.no_data kf env t' in
     let e = Cil.sizeOf ~loc (Cil.typeOf e') in
-    let adata, env = Assert.register_term ~loc env ~force:true t e adata in
+    let adata = Assert.register_term ~loc ~force:true t e adata in
     e, adata, env, Typed_number.C_number, "sizeof"
   | TSizeOfStr s ->
     let e = Cil.new_exp ~loc (SizeOfStr s) in
-    let adata, env = Assert.register_term ~loc env t e adata in
+    let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Typed_number.C_number, "sizeofstr"
   | TAlignOf ty ->
     let e = Cil.new_exp ~loc (AlignOf ty) in
-    let adata, env = Assert.register_term ~loc env t e adata in
+    let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Typed_number.C_number, "alignof"
   | TAlignOfE t' ->
     let e', _, env = to_exp ~adata:Assert.no_data kf env t' in
     let e = Cil.new_exp ~loc (AlignOfE e') in
-    let adata, env = Assert.register_term ~loc env t e adata in
+    let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Typed_number.C_number, "alignof"
   | TUnOp(Neg | BNot as op, t') ->
     let ty = Typing.get_typ ~lenv t in
@@ -746,12 +746,12 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
   | TAddrOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
     let e = Cil.mkAddrOf ~loc lv in
-    let adata, env = Assert.register_term ~loc env t e adata in
+    let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Typed_number.C_number, "addrof"
   | TStartOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
     let e = Cil.mkAddrOrStartOf ~loc lv in
-    let adata, env = Assert.register_term ~loc env t e adata in
+    let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Typed_number.C_number, "startof"
   | Tapp(li, _, [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ])
     when li.l_body = LBnone && (li.l_var_info.lv_name = "\\sum" ||
@@ -763,7 +763,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
   | Tapp(li, [], args) ->
     let e, adata, env =
       Logic_functions.app_to_exp ~adata ~loc ~tapp:t kf env li args in
-    let adata, env = Assert.register_term ~loc env t e adata in
+    let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Typed_number.C_number, "app"
   | Tapp(_, _ :: _, _) ->
     Env.not_yet env "logic functions with labels"
@@ -819,7 +819,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         env
         t'
     in
-    let adata, env = Assert.register_term ~loc env t e adata in
+    let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Typed_number.C_number, name
   | Tbase_addr _ -> Env.not_yet env "labeled \\base_addr"
   | Toffset(BuiltinLabel Here, t') ->
@@ -828,7 +828,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     let e, adata, env =
       Memory_translate.call ~adata ~loc kf name size_t env t'
     in
-    let adata, env = Assert.register_term ~loc env t e adata in
+    let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Typed_number.C_number, name
   | Toffset _ -> Env.not_yet env "labeled \\offset"
   | Tblock_length(BuiltinLabel Here, t') ->
@@ -837,7 +837,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     let e, adata, env =
       Memory_translate.call ~adata ~loc kf name size_t env t'
     in
-    let adata, env = Assert.register_term ~loc env t e adata in
+    let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Typed_number.C_number, name
   | Tblock_length _ -> Env.not_yet env "labeled \\block_length"
   | Tnull ->

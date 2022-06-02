@@ -19,11 +19,11 @@
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [eva:alarm] t_dpointer.c:15: Warning: 
-  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] t_dpointer.c:15: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
+[eva:alarm] t_dpointer.c:15: Warning: 
+  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
 [eva:alarm] t_dpointer.c:15: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
@@ -36,14 +36,14 @@
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [eva:alarm] t_dpointer.c:21: Warning: 
+  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
+                                                        \valid(data->values) got status unknown.
+[eva:alarm] t_dpointer.c:21: Warning: 
   accessing left-value that contains escaping addresses.
   assert !\dangling(p + 2);
 [eva:alarm] t_dpointer.c:21: Warning: 
   function __e_acsl_assert_register_ptr: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] t_dpointer.c:21: Warning: 
-  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
-                                                        \valid(data->values) got status unknown.
 [eva:alarm] t_dpointer.c:21: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.

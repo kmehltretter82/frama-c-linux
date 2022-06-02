@@ -12,21 +12,6 @@
   E-ACSL construct `decreases clause' is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] decrease.c:10: Warning: 
-  function __e_acsl_assert_copy_values: precondition src->values == \null ||
-                                                     \valid(src->values) got status unknown.
-[eva:alarm] decrease.c:10: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] decrease.c:21: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] decrease.c:33: Warning: 
-  function __e_acsl_assert_copy_values: precondition src->values == \null ||
-                                                     \valid(src->values) got status unknown.
-[eva:alarm] decrease.c:33: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
 [eva:alarm] decrease.c:44: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.

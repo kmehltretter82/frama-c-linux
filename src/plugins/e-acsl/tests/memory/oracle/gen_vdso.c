@@ -72,12 +72,12 @@ time_t __gen_e_acsl_time(time_t *timer)
       int __gen_e_acsl_valid;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data =
         {.values = (void *)0};
+      __gen_e_acsl_valid = __e_acsl_valid((void *)timer,sizeof(time_t),
+                                          (void *)timer,(void *)(& timer));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"timer",
                                    (void *)timer);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(time_t)",0,sizeof(time_t));
-      __gen_e_acsl_valid = __e_acsl_valid((void *)timer,sizeof(time_t),
-                                          (void *)timer,(void *)(& timer));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                    "\\valid(timer)",0,__gen_e_acsl_valid);
       __gen_e_acsl_assert_data.blocking = 1;
@@ -94,14 +94,8 @@ time_t __gen_e_acsl_time(time_t *timer)
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "number of active behaviors",0,
-                                 __gen_e_acsl_active_bhvrs);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                 "number of active behaviors",0,
-                                 __gen_e_acsl_active_bhvrs);
     if (__gen_e_acsl_active_bhvrs != 1) {
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "Precondition";
@@ -132,12 +126,12 @@ time_t __gen_e_acsl_time(time_t *timer)
       int __gen_e_acsl_initialized;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)__gen_e_acsl_at,
+                                                      sizeof(time_t));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
                                    "\\old(timer)",(void *)__gen_e_acsl_at);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                      "sizeof(time_t)",0,sizeof(time_t));
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)__gen_e_acsl_at,
-                                                      sizeof(time_t));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                    "not_null: initialization: timer: \\initialized(\\old(timer))",
                                    0,__gen_e_acsl_initialized);

@@ -29,14 +29,14 @@ int __gen_e_acsl_atoi(char const *nptr)
     int __gen_e_acsl_valid_read;
     __e_acsl_store_block((void *)(& nptr),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"nptr",
-                                 (void *)nptr);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
-                                   "sizeof(char const)",0,sizeof(char const));
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)nptr,
                                                   sizeof(char const),
                                                   (void *)nptr,
                                                   (void *)(& nptr));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"nptr",
+                                 (void *)nptr);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
+                                   "sizeof(char const)",0,sizeof(char const));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "\\valid_read(nptr)",0,
                                  __gen_e_acsl_valid_read);

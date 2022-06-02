@@ -233,9 +233,6 @@ int main(void)
     int __gen_e_acsl_ne_3;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
-    __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_9,"sum",sum);
-    __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_9,"x",x);
-    __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_9,"y",y);
     __gmpq_init(__gen_e_acsl_y);
     __gmpq_set_d(__gen_e_acsl_y,(double)y);
     __gmpq_init(__gen_e_acsl__20);
@@ -248,6 +245,9 @@ int main(void)
     __gmpq_set_d(__gen_e_acsl__21,(double)sum);
     __gen_e_acsl_ne_3 = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl__21),
                                    (__e_acsl_mpq_struct const *)(__gen_e_acsl_mul));
+    __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_9,"sum",sum);
+    __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_9,"x",x);
+    __e_acsl_assert_register_float(& __gen_e_acsl_assert_data_9,"y",y);
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
     __gen_e_acsl_assert_data_9.pred_txt = "sum != x * y";
@@ -309,8 +309,6 @@ int main(void)
     int __gen_e_acsl_gt;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
       {.values = (void *)0};
-    __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_11,"a",0,a);
-    __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_11,"b",0,b);
     __gmpq_init(__gen_e_acsl__25);
     __gmpq_set_si(__gen_e_acsl__25,(long)a,1UL);
     __gmpq_init(__gen_e_acsl__26);
@@ -329,6 +327,8 @@ int main(void)
                (__e_acsl_mpq_struct const *)(__gen_e_acsl__28));
     __gen_e_acsl_gt = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl_add_5),
                                  (__e_acsl_mpq_struct const *)(__gen_e_acsl_sub_2));
+    __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_11,"a",0,a);
+    __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_11,"b",0,b);
     __gen_e_acsl_assert_data_11.blocking = 1;
     __gen_e_acsl_assert_data_11.kind = "Assertion";
     __gen_e_acsl_assert_data_11.pred_txt = "a + b > 2. - 1.";
@@ -383,10 +383,6 @@ double __gen_e_acsl_avg(double a, double b)
     int __gen_e_acsl_and;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_delta = 1;
-    __e_acsl_assert_register_mpq(& __gen_e_acsl_assert_data,"\\old(a)",
-                                 (__e_acsl_mpq_struct const *)(__gen_e_acsl_at));
-    __e_acsl_assert_register_double(& __gen_e_acsl_assert_data,"\\old(b)",
-                                    __gen_e_acsl_at_2);
     __gmpq_init(__gen_e_acsl_);
     __gmpq_set_d(__gen_e_acsl_,__gen_e_acsl_at_2);
     __gmpq_init(__gen_e_acsl_add);
@@ -402,33 +398,27 @@ double __gen_e_acsl_avg(double a, double b)
     __gmpq_init(__gen_e_acsl_avg_real);
     __gmpq_set(__gen_e_acsl_avg_real,
                (__e_acsl_mpq_struct const *)(__gen_e_acsl_div));
-    __e_acsl_assert_register_mpq(& __gen_e_acsl_assert_data,"avg_real",
-                                 (__e_acsl_mpq_struct const *)(__gen_e_acsl_avg_real));
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"delta",0,
-                                 __gen_e_acsl_delta);
     __gmpq_init(__gen_e_acsl_delta_2);
     __gmpq_set_si(__gen_e_acsl_delta_2,(long)__gen_e_acsl_delta,1UL);
     __gmpq_init(__gen_e_acsl_sub);
     __gmpq_sub(__gen_e_acsl_sub,
                (__e_acsl_mpq_struct const *)(__gen_e_acsl_avg_real),
                (__e_acsl_mpq_struct const *)(__gen_e_acsl_delta_2));
-    __e_acsl_assert_register_double(& __gen_e_acsl_assert_data,"\\result",
-                                    __retres);
     __gmpq_init(__gen_e_acsl__3);
     __gmpq_set_d(__gen_e_acsl__3,__retres);
     __gen_e_acsl_lt = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl_sub),
                                  (__e_acsl_mpq_struct const *)(__gen_e_acsl__3));
+    __e_acsl_assert_register_mpq(& __gen_e_acsl_assert_data,"avg_real",
+                                 (__e_acsl_mpq_struct const *)(__gen_e_acsl_avg_real));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"delta",0,
+                                 __gen_e_acsl_delta);
+    __e_acsl_assert_register_double(& __gen_e_acsl_assert_data,"\\result",
+                                    __retres);
     if (__gen_e_acsl_lt < 0) {
       __e_acsl_mpq_t __gen_e_acsl_delta_3;
       __e_acsl_mpq_t __gen_e_acsl_add_2;
       __e_acsl_mpq_t __gen_e_acsl__4;
       int __gen_e_acsl_lt_2;
-      __e_acsl_assert_register_double(& __gen_e_acsl_assert_data,"\\result",
-                                      __retres);
-      __e_acsl_assert_register_mpq(& __gen_e_acsl_assert_data,"avg_real",
-                                   (__e_acsl_mpq_struct const *)(__gen_e_acsl_avg_real));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"delta",0,
-                                   __gen_e_acsl_delta);
       __gmpq_init(__gen_e_acsl_delta_3);
       __gmpq_set_si(__gen_e_acsl_delta_3,(long)__gen_e_acsl_delta,1UL);
       __gmpq_init(__gen_e_acsl_add_2);
@@ -439,12 +429,22 @@ double __gen_e_acsl_avg(double a, double b)
       __gmpq_set_d(__gen_e_acsl__4,__retres);
       __gen_e_acsl_lt_2 = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl__4),
                                      (__e_acsl_mpq_struct const *)(__gen_e_acsl_add_2));
+      __e_acsl_assert_register_double(& __gen_e_acsl_assert_data,"\\result",
+                                      __retres);
+      __e_acsl_assert_register_mpq(& __gen_e_acsl_assert_data,"avg_real",
+                                   (__e_acsl_mpq_struct const *)(__gen_e_acsl_avg_real));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"delta",0,
+                                   __gen_e_acsl_delta);
       __gen_e_acsl_and = __gen_e_acsl_lt_2 < 0;
       __gmpq_clear(__gen_e_acsl_delta_3);
       __gmpq_clear(__gen_e_acsl_add_2);
       __gmpq_clear(__gen_e_acsl__4);
     }
     else __gen_e_acsl_and = 0;
+    __e_acsl_assert_register_mpq(& __gen_e_acsl_assert_data,"\\old(a)",
+                                 (__e_acsl_mpq_struct const *)(__gen_e_acsl_at));
+    __e_acsl_assert_register_double(& __gen_e_acsl_assert_data,"\\old(b)",
+                                    __gen_e_acsl_at_2);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
     __gen_e_acsl_assert_data.pred_txt = "\\let delta = 1;\n\\let avg_real = (\\old(a) + \\old(b)) / 2;\n  avg_real - delta < \\result < avg_real + delta";

@@ -507,10 +507,9 @@ let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf env contract 
       (* Create assertions for complete and disjoint behaviors checks *)
       let create_assert_stmt env bop msg =
         let adata, env = Assert.empty ~loc kf env in
-        let adata, env =
+        let adata =
           Assert.register
             ~loc
-            env
             "number of active behaviors"
             active_bhvrs_e
             adata

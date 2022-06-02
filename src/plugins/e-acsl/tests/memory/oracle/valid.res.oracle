@@ -187,9 +187,6 @@
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [eva:alarm] valid.c:40: Warning: 
-  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] valid.c:40: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
 [eva:alarm] valid.c:40: Warning: 
@@ -198,6 +195,9 @@
 [eva:alarm] valid.c:40: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
+[eva:alarm] valid.c:40: Warning: 
+  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
 [eva:alarm] valid.c:41: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
@@ -211,8 +211,8 @@
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [eva:alarm] valid.c:41: Warning: 
-  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
+  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
+                                                        \valid(data->values) got status unknown.
 [eva:alarm] valid.c:41: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
@@ -220,8 +220,8 @@
   function __e_acsl_assert_register_ptr: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [eva:alarm] valid.c:41: Warning: 
-  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
-                                                        \valid(data->values) got status unknown.
+  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
 [eva:alarm] valid.c:43: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.

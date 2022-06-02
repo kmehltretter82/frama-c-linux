@@ -23,6 +23,8 @@
 [eva:alarm] file.c:12: Warning: 
   function __gen_e_acsl_fread: precondition 'valid_stream' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:351: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/stdio.h:351: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:351: Warning: 
@@ -34,8 +36,6 @@
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:351: Warning: 
   function __e_acsl_assert_register_mpz: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/stdio.h:351: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:352: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
@@ -53,6 +53,8 @@
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:357: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/stdio.h:357: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:357: Warning: 
@@ -64,8 +66,6 @@
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:357: Warning: 
   function __e_acsl_assert_register_mpz: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/stdio.h:357: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/stdio.h:357: Warning: 
   function __gen_e_acsl_fread: postcondition 'initialization' got status unknown.
 [eva:alarm] file.c:13: Warning: 
