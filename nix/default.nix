@@ -329,6 +329,7 @@ pkgs.lib.makeExtensible
         security_src = plugins.security.src;
         context_from_precondition_src = plugins.context-from-precondition.src;
         metacsl_src = plugins.meta.src;
+        linea_cabs_src = plugins.linea-cabs.src;
         postPatch = ''
                patchShebangs .
         '';
@@ -350,6 +351,8 @@ pkgs.lib.makeExtensible
            echo IN_FRAMA_CI=yes > "$sourceRoot/in_frama_ci"
            cp -r --preserve=mode "$context_from_precondition_src" "$sourceRoot/src/plugins/context-from-precondition"
            chmod -R u+w -- "$sourceRoot/src/plugins/context-from-precondition"
+           cp -r --preserve=mode "$linea_cabs_src" "$sourceRoot/src/plugins/linea-cabs"
+           chmod -R u+w -- "$sourceRoot/src/plugins/linea-cabs"
            cp -r --preserve=mode "$security_src" "$sourceRoot/src/plugins/security"
            chmod -R u+w -- "$sourceRoot/src/plugins/security"
            '';

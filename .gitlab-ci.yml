@@ -119,6 +119,13 @@ CFP:
   tags:
    - nix
 
+Linea-Cabs:
+  stage: tests
+  script:
+   - nix/frama-ci.sh build -A linea-cabs.tests
+  tags:
+   - nix
+
 eva-tests:
   stage: tests
   script:
