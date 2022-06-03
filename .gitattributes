@@ -4,6 +4,13 @@
 
 Changelog merge=union
 
+###############
+# BINARY: set #
+###############
+# built-in macro that also unsets the "text" and "diff" attributes
+
+*.pdf binary
+
 #########################
 # HEADER_SPEC: CEA_LGPL #
 #########################
