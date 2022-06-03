@@ -144,27 +144,6 @@ README* header_spec=.ignore
 /headers/open-source/* header_spec=.ignore
 /headers/close-source/* header_spec=.ignore
 
-/ivette/configure.js header_spec=.ignore
-/ivette/sandboxer.js header_spec=.ignore
-/ivette/.babelrc header_spec=.ignore
-/ivette/.eslint* header_spec=.ignore
-/ivette/doc/**/*.js header_spec=.ignore
-/ivette/dome/doc/**/*.js header_spec=.ignore
-/ivette/src/dome/doc/template/static/fonts/*-webfont.* header_spec=.ignore
-/ivette/src/dome/template/git-ignore header_spec=.ignore
-/ivette/src/dome/doc/template/tmpl/*.tmpl header_spec=.ignore
-/ivette/src/dome/doc/**/*.js header_spec=.ignore
-/ivette/src/dome/doc/**/*.htm header_spec=.ignore
-/ivette/src/dome/doc/**/*.txt header_spec=.ignore
-/ivette/src/dome/**/*.el header_spec=.ignore
-/ivette/tests/*.i header_spec=.ignore
-/ivette/**/*.css header_spec=.ignore
-/ivette/**/*.html header_spec=.ignore
-/ivette/**/*.json header_spec=.ignore
-/ivette/**/*.lua header_spec=.ignore
-/ivette/*.icns header_spec=.ignore
-/ivette/*.lock header_spec=.ignore
-
 /licenses/* header_spec=.ignore
 
 /man/frama-c.1 header_spec=.ignore
