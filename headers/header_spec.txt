@@ -66,7 +66,6 @@ doc/code/intro_sparecode.txt: CEA_LGPL
 doc/code/style.css: CEA_LGPL
 doc/code/toc_head.htm: CEA_LGPL
 doc/code/toc_tail.htm: CEA_LGPL
-headers/check-headers.sh: CEA_LGPL_OR_PROPRIETARY
 headers/close-source/AORAI_LGPL: .ignore
 headers/close-source/CEA_INRIA_LGPL: .ignore
 headers/close-source/CEA_LGPL: .ignore
@@ -83,7 +82,6 @@ headers/close-source/MODIFIED_OCAMLGRAPH: .ignore
 headers/close-source/MODIFIED_WHY3: .ignore
 headers/close-source/OCAML_STDLIB: .ignore
 headers/close-source/UNMODIFIED_WHY3: .ignore
-headers/headache.sh: CEA_LGPL_OR_PROPRIETARY
 headers/headache_config.txt: CEA_LGPL
 headers/header_spec.txt: .ignore
 headers/open-source/AORAI_LGPL: .ignore
@@ -102,7 +100,6 @@ headers/open-source/MODIFIED_OCAMLGRAPH: .ignore
 headers/open-source/MODIFIED_WHY3: .ignore
 headers/open-source/OCAML_STDLIB: .ignore
 headers/open-source/UNMODIFIED_WHY3: .ignore
-headers/updates-headers.sh: CEA_LGPL_OR_PROPRIETARY
 lib/plugins/PLUGINS.README: .ignore
 licenses/CDDL-1.0: .ignore
 licenses/LGPLv2: .ignore
