@@ -374,35 +374,6 @@ export function DragSource(props: DragSourceProps): JSX.Element {
 /* --- Ordering                                                           --- */
 /* -------------------------------------------------------------------------- */
 
-const Ordering = React.createContext(new Map<string, number>());
-
-export interface ItemProps {
-  items?: string[];
-  children?: React.ReactNode;
-}
-
-export function Items(props: ItemProps): JSX.Element {
-  const { items = [], children } = props;
-  const values = React.useMemo(() => {
-    const m = new Map<string, number>();
-    items.forEach((id, k) => m.set(id, k));
-    return m;
-  }, [items]);
-  return (
-    <Ordering.Provider value={values}>
-      {children}
-    </Ordering.Provider>
-  );
-}
-
-export function useItem(id: string | undefined): number {
-  const m = React.useContext(Ordering);
-  if (id === undefined) return -1;
-  const k = m.get(id);
-  if (k === undefined) return -1;
-  return k;
-}
-
 export function swap(items: string[], i: number, j: number): string[] {
   if (0 <= i && i < j) {
     const a = items[i];
@@ -425,6 +396,99 @@ export function removeAt(items: string[], k: number): string[] {
 
 export function insertAt(items: string[], id: string, k: number): string[] {
   return items.slice(0, k).concat(id, items.slice(k));
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- List Container                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+interface ListContext {
+  dnd?: DnD,
+  ordered?: string[],
+  setSource?: (src: number) => void;
+  setTarget?: (tgt: number) => void;
+  setItems?: (items: string[]) => void;
+}
+
+const CurrentList = React.createContext<ListContext>({});
+
+function getItem(ordered: string[] | undefined, id: string): number {
+  if (ordered === undefined) return -1;
+  const k = ordered.indexOf(id);
+  return 0 <= k ? k : ordered.push(id);
+}
+
+export interface ItemProps {
+  id: string;
+  className?: string;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+}
+
+export function Item(props: ItemProps): JSX.Element {
+  //--- Ordering
+  const { dnd, ordered, setSource, setTarget, setItems } =
+    React.useContext(CurrentList);
+  const { id, className, children } = props;
+  const order = getItem(ordered, id);
+  //--- D&D Events
+  const onStart = React.useCallback(() => {
+    if (setSource) setSource(order);
+  }, [setSource, order]);
+  const onStop = React.useCallback(() => {
+    if (setSource) setSource(-1);
+  }, [setSource]);
+  const onDropIn = React.useCallback(() => {
+    if (setTarget) setTarget(order);
+  }, [setTarget, order]);
+  const onDropOut = React.useCallback(() => {
+    if (setTarget) setTarget(-1);
+  }, [setTarget]);
+  const onDrop = React.useCallback(() => {
+    if (ordered && setItems) setItems(ordered);
+  }, [ordered, setItems]);
+  //--- Styling
+  const style = styles(
+    props.style,
+    order < 0 && { display: 'none' },
+    0 <= order && { order },
+  );
+  //--- Rendering
+  return (
+    <DragSource
+      className={className}
+      style={style}
+      dnd={dnd}
+      onStart={onStart}
+      onStop={onStop}
+      onDropIn={onDropIn}
+      onDropOut={onDropOut}
+      onDrop={onDrop}
+    >
+      {children}
+    </DragSource>
+  );
+}
+
+export interface ListProps {
+  items?: string[];
+  setItems?: (items: string[]) => void;
+  children?: React.ReactNode;
+}
+
+export function List(props: ListProps): JSX.Element {
+  const dnd = useDnD();
+  const [source, setSource] = React.useState(-1);
+  const [target, setTarget] = React.useState(-1);
+  const [locals, setLocals] = React.useState<string[]>([]);
+  const ordered = swap(props.items ?? locals, source, target);
+  const setItems = props.setItems ?? setLocals;
+  const context: ListContext = { dnd, ordered, setSource, setTarget, setItems };
+  return (
+    <CurrentList.Provider value={context}>
+      {props.children}
+    </CurrentList.Provider>
+  );
 }
 
 /* -------------------------------------------------------------------------- */
