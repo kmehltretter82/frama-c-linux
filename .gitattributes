@@ -123,7 +123,6 @@ README* header_spec=.ignore
 
 /doc/training/**/* header_spec=.ignore
 /doc/value/examples/parametrizing/*.log header_spec=.ignore
-/doc/*/**/Make* header_spec=.ignore
 /doc/**/make* header_spec=.ignore
 /doc/**/TODO header_spec=.ignore
 /doc/**/*.bnf header_spec=.ignore
