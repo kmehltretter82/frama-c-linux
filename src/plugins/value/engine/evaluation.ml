@@ -114,10 +114,6 @@ type loc_report = {
    propagated backward, and that the expression cannot be volatile. *)
 let extern_report = { fuel = Infty; reduction = Neither; volatile = false }
 
-(* Report used when the cache is filled with a dummy value to avoid evaluation
-   loops. *)
-let dummy_report = { fuel = Loop; reduction = Neither; volatile = false }
-
 let no_fuel = -1
 let root_fuel () = Parameters.OracleDepth.get ()
 let backward_fuel () = Parameters.ReductionDepth.get ()
@@ -343,12 +339,19 @@ module Make
   (* Was the fuel entirely consumed? *)
   let fuel_consumed = ref false
 
-  let top_record =
-    let flagged_top =
-      { v = `Value Value.top; initialized = false; escaping = true }
-    in
-    { value = flagged_top; origin = None;
-      reductness = Dull; val_alarms = Alarmset.all }
+  let bottom_entry val_alarms =
+    let value = { v = `Bottom; initialized = true; escaping = false } in
+    let record = { value; origin = None; reductness = Dull; val_alarms } in
+    let report = { fuel = Infty; reduction = Neither; volatile = false} in
+    record, report
+
+  let top_entry =
+    let v = `Value Value.top in
+    let value = { v; initialized = false; escaping = true } in
+    let val_alarms = Alarmset.all in
+    let record = { value; origin = None; reductness = Dull; val_alarms } in
+    let report = { fuel = Loop; reduction = Neither; volatile = false } in
+    record, report
 
   (* Updates the abstractions stored in the cache for the expression [expr]
      with the given record, report and value. [kind] is the type of the
@@ -805,7 +808,7 @@ module Make
       (* Fuel not consumed for this new evaluation. *)
       fuel_consumed := false;
       (* Fill the cache to avoid loops in the use of the oracle. *)
-      cache := Cache.add' !cache expr (top_record, dummy_report);
+      cache := Cache.add' !cache expr top_entry;
       (* Evaluation of [expr]. *)
       let result, alarms = coop_forward_eval context expr in
       let value =
@@ -1129,10 +1132,21 @@ module Make
         let valuation = !cache in
         let context = { context with remaining_fuel } in
         let subdivnb = context.subdivision in
-        Subdivided_Evaluation.evaluate context valuation ~subdivnb expr
-        >>=: fun (valuation, value) ->
-        cache := valuation;
-        value
+        let eval, alarms =
+          Subdivided_Evaluation.evaluate context valuation ~subdivnb expr
+        in
+        (* Always reset the reference to the cached valuation after a subdivided
+           evaluation (as the multiple evaluations modify the cache). *)
+        match eval with
+        | `Bottom ->
+          (* The evaluation of the expression requested by a domain returns
+             Bottom, but the evaluation of the primary expression may continue.
+             Thus bind Bottom to [expr] in the valuation. *)
+          cache := Cache.add' valuation expr (bottom_entry alarms);
+          `Bottom, alarms
+        | `Value (valuation, value) ->
+          cache := valuation;
+          `Value value, alarms
     else
       fun _ -> fuel_consumed := true; `Value Value.top, Alarmset.all
 

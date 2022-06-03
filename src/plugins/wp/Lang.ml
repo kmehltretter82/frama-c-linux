@@ -825,7 +825,7 @@ struct
   let e_vars e = List.sort Var.compare (Vars.elements (vars e))
   let p_vars = e_vars
   let p_call = e_fun ~result:Prop
-  let p_close p = p_forall (p_vars p) p
+  let p_close = e_close_forall
 
   let occurs x t = Vars.mem x (vars t)
   let intersect a b = Vars.intersect (vars a) (vars b)
