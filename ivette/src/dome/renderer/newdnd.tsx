@@ -32,6 +32,7 @@ import React from 'react';
 import { classes, styles } from 'dome/misc/utils';
 import {
   DraggableCore,
+  DraggableEvent,
   DraggableEventHandler
 } from 'react-draggable';
 
@@ -40,8 +41,6 @@ import {
    - `rootX,rootY` is the position where dragging started;
    - `dragX,dragY` is the current dragging position;
    - `rect` is the original DOM Rectangle of the dragged HTML node.
-
-   Hence, the relative move during dragging is simply `(dragX-rootX,dragY-rootY)`.
  */
 export interface Dragging {
   rootX: number;
@@ -49,6 +48,50 @@ export interface Dragging {
   dragX: number;
   dragY: number;
   rect: DOMRect;
+}
+
+let nodeId = 0;
+function fresh(): string {
+  while (1) {
+    const id = `dome-dnd-${++nodeId}`;
+    if (!document.getElementById(id))
+      return id;
+  }
+  return '<crash>';
+}
+
+type DropZone = () => void;
+
+export class DnD {
+
+  private registry = new Map<string, DropZone>();
+
+  onDropZone(node: Element, zone: DropZone): void {
+    let id = node.id;
+    if (!id) id = node.id = fresh();
+    this.registry.set(id, zone);
+  }
+
+  offDropZone(node: Element): void {
+    const id = node.id;
+    if (id) this.registry.delete(id);
+  }
+
+  handleEvent(e: DraggableEvent): void {
+    if (e instanceof MouseEvent) {
+      document
+        .elementsFromPoint(e.clientX, e.clientY)
+        .find((elt) => {
+          const zone = this.registry.get(elt.id);
+          if (zone) {
+            zone();
+            return true;
+          }
+          return false;
+        });
+    }
+  }
+
 }
 
 /**
@@ -92,10 +135,12 @@ function RenderOverlay(
       innerStyle: styles(style, props.styleDragging, position),
     };
   }
-  return { outerClass: className, outerStyle: style }
+  return { outerClass: className, outerStyle: style };
 }
 
 export interface DragSourceProps {
+  /** DnD controller. */
+  dnd?: DnD;
   /** Disabled dragging. */
   disabled?: boolean;
   /** Class of the element from where a drag can be initiated. */
@@ -104,9 +149,11 @@ export interface DragSourceProps {
   className?: string;
   /** Style of the DragSource elements. */
   style?: React.CSSProperties;
-  /** Additional class for the dragged (initial) element (default is `'dome-dragged'`). */
+  /** Additional class for the dragged (initial) element.
+     Default is `'dome-dragged'`. */
   classDragged?: string;
-  /** Additional class for the dragging (moved) element (default is `'dome-dragging'`) */
+  /** Additional class for the dragging (moved) element.
+     Default is `'dome-dragging'`. */
   classDragging?: string;
   /** Additional style for the dragged (initial) element. */
   styleDragged?: React.CSSProperties;
@@ -135,9 +182,9 @@ export interface DragSourceProps {
 
    The content can be rendered conditionnaly by using a function.
  */
-export function DragSource(props: DragSourceProps): JSX.Element | null {
+export function DragSource(props: DragSourceProps): JSX.Element {
   //--- Props
-  const { disabled, handle, children } = props;
+  const { dnd, disabled, handle, children } = props;
   const { onStart, onDrag, onStop } = props;
   //--- Dragging State
   const [dragging, setDragging] = React.useState<Dragging | undefined>();
@@ -153,12 +200,14 @@ export function DragSource(props: DragSourceProps): JSX.Element | null {
     }, [onStart]);
   //--- onDrag
   const handleDrag: DraggableEventHandler = React.useCallback(
-    (_, { x, y }) => {
+    (e, { x, y }) => {
+      if (e && dnd) dnd.handleEvent(e);
       if (dragging) {
-        setDragging({ ...dragging, dragX: x, dragY: y });
-        if (onDrag) onDrag(dragging);
+        const newDragging = { ...dragging, dragX: x, dragY: y };
+        setDragging(newDragging);
+        if (onDrag) onDrag(newDragging);
       }
-    }, [dragging, onDrag]);
+    }, [dnd, dragging, onDrag]);
   //--- onStop
   const handleStop: DraggableEventHandler = React.useCallback(
     () => {
@@ -182,4 +231,19 @@ export function DragSource(props: DragSourceProps): JSX.Element | null {
       </div>
     </DraggableCore>
   );
+}
+
+export function useDropTarget(
+  dnd: DnD, zone?: DropZone
+): React.RefObject<HTMLDivElement> {
+  const nodeRef = React.useRef<HTMLDivElement>(null);
+  const node = nodeRef.current;
+  React.useEffect(() => {
+    if (node && zone) {
+      dnd.onDropZone(node, zone);
+      return () => dnd.offDropZone(node);
+    }
+    return;
+  }, [dnd, node, zone]);
+  return nodeRef;
 }

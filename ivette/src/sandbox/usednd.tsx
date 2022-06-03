@@ -35,7 +35,7 @@ import './sandbox.css';
 const delta = (id: string, d: DnD.Dragging): string => {
   const dx = d.dragX - d.rootX;
   const dy = d.dragY - d.rootY;
-  return `${id} ${dx}:${dy}`
+  return `${id} ${dx}:${dy}`;
 };
 
 interface ItemProps {
