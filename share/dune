@@ -235,7 +235,6 @@
 ; Analysis scripts
 (analysis-scripts/analysis.mk as analysis-scripts/analysis.mk)
 (analysis-scripts/benchmark_database.py as analysis-scripts/benchmark_database.py)
-(analysis-scripts/benchmark.sh as analysis-scripts/benchmark.sh)
 (analysis-scripts/bench-sqlite.sh as analysis-scripts/bench-sqlite.sh)
 (analysis-scripts/build_callgraph.py as analysis-scripts/build_callgraph.py)
 (analysis-scripts/build.py as analysis-scripts/build.py)
