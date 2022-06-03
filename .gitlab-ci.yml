@@ -132,6 +132,13 @@ kernel-tests:
   tags:
     - nix
 
+linea-cabs:
+  stage: tests
+  script:
+    - ./nix/external-plugin-ci.sh linea-cabs
+  tags:
+    - nix
+
 metacsl:
   stage: tests
   script:
