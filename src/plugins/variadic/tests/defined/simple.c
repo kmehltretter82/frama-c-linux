@@ -1,9 +1,19 @@
 /* run.config
-STDOPT:
-STDOPT: #"-no-frama-c-stdlib -no-pp-annot"
+STDOPT: #"-c11"
+STDOPT: #"-no-frama-c-stdlib -no-pp-annot -c11"
 */
 
+/* The defines and typedefs below avoid issues with Musl: without them,
+   pretty-printing 'va_list' results in `typedef __gnuc_va_list va_list`, but
+   only on GNU libc-based systems (and not on Alpine Linux, which is based on
+   musl). */
+#define __GNUC_VA_LIST
+#define __va_list__
+typedef void *__builtin_va_list;
+typedef __builtin_va_list va_list;
 #include <stdarg.h>
+
+
 
 /*@ requires n>= 0; */
 int sum(int n, ...){
