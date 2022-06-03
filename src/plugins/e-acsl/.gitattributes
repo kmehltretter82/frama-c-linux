@@ -29,6 +29,7 @@ README header_spec=.ignore
 /.clang-format header_spec=.ignore
 /doc/Makefile.common header_spec=.ignore
 /doc/support/MakeLaTeXModern header_spec=.ignore
+/doc/Changelog header=.ignore
 /doc/doxygen/doxygen.cfg.in header_spec=.ignore
 /doc/refman/*.tex header_spec=.ignore
 /doc/userman/*.tex header_spec=.ignore
@@ -57,7 +58,9 @@ README header_spec=.ignore
 /examples/**/*.sh header_spec=.ignore
 /examples/**/*.py header_spec=.ignore
 
-/tests/**/* header_spec=.ignore
+/tests/test_config header=.ignore
+/tests/test_config_dev header=.ignore
+/tests/**/* header_spec header=.ignore
 
 /tests/wrapper.sh header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
 /tests/E_ACSL_test.ml header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
