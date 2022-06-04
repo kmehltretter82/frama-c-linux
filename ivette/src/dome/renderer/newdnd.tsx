@@ -112,8 +112,13 @@ interface DropZone extends DropHandler {
  */
 export class DnD {
 
+  constructor() {
+    this.handleKey = this.handleKey.bind(this);
+  }
+
   private registry = new Map<string, DropZone>();
   private dragging: HTMLElement | undefined;
+  private dropping: Dropping | undefined;
   private hovering: DropZone | undefined;
 
   onDropZone(zone: DropZone): string {
@@ -130,6 +135,9 @@ export class DnD {
 
   handleStart(node: HTMLElement): void {
     this.dragging = node;
+    const body = document.body;
+    body.addEventListener('keyup', this.handleKey);
+    body.addEventListener('keydown', this.handleKey);
   }
 
   handleEvent(e: DraggableEvent): void {
@@ -146,19 +154,38 @@ export class DnD {
       const curr = this.hovering;
       if (hover !== curr) {
         this.hovering = hover;
-        if (curr && curr.onDropOut) { curr.onDropOut(); }
+        if (curr && curr.onDropOut) {
+          this.dropping = undefined;
+          curr.onDropOut();
+        }
       }
       if (hover && hover.onDropIn) {
         const meta = e.altKey || e.ctrlKey || e.shiftKey || e.metaKey;
         const rect = hover.node.getBoundingClientRect();
         const dropX = Math.round(e.clientX - rect.left);
         const dropY = Math.round(e.clientY - rect.top);
-        hover.onDropIn({ meta, rect, dropX, dropY });
+        const d = this.dropping = { meta, rect, dropX, dropY }
+        hover.onDropIn(d);
+      }
+    }
+  }
+
+  handleKey(e: KeyboardEvent): void {
+    const callback = this.hovering?.onDropIn;
+    const drop = this.dropping;
+    if (callback && drop) {
+      const meta = e.altKey || e.ctrlKey || e.shiftKey || e.metaKey;
+      if (meta !== drop.meta) {
+        drop.meta = meta;
+        callback(drop);
       }
     }
   }
 
   handleDrop(): void {
+    const body = document.body;
+    body.removeEventListener('keyup', this.handleKey);
+    body.removeEventListener('keydown', this.handleKey);
     this.dragging = undefined;
     const target = this.hovering;
     if (target) {
