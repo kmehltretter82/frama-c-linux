@@ -38,12 +38,12 @@ const delta = (id: string, d: DnD.Dragging): string => {
   return `${id} ${dx}:${dy}`;
 };
 
-interface ItemProps {
+interface BlobProps {
   id: string;
   setState: (s: string) => void;
 }
 
-function Item(props: ItemProps): JSX.Element {
+function Blob(props: BlobProps): JSX.Element {
   const { id, setState } = props;
   return (
     <DnD.DragSource
@@ -53,9 +53,13 @@ function Item(props: ItemProps): JSX.Element {
       onDrag={(d) => setState(delta(id, d))}
       onStop={() => setState('--')}
     >
-      Item {id}
+      Blob #{id}
     </DnD.DragSource>
   );
+}
+
+function Item({ id }: { id: string }): JSX.Element {
+  return <DnD.Item className='sandbox-item' id={id}>Item {id}</DnD.Item>;
 }
 
 function UseDnD(): JSX.Element {
@@ -65,12 +69,23 @@ function UseDnD(): JSX.Element {
       <Box.Hbox>
         <LCD label={state} />
       </Box.Hbox>
-      <Box.Vbox>
-        <Item id='A' setState={setState} />
-        <Item id='B' setState={setState} />
-        <Item id='C' setState={setState} />
-      </Box.Vbox>
-    </Box.Vfill>
+      <Box.Hbox>
+        <Box.Vbox>
+          <DnD.List>
+            <Item id='A' />
+            <Item id='B' />
+            <Item id='C' />
+            <Item id='D' />
+            <Item id='E' />
+          </DnD.List>
+        </Box.Vbox>
+        <Box.Vbox>
+          <Blob id='A' setState={setState} />
+          <Blob id='B' setState={setState} />
+          <Blob id='C' setState={setState} />
+        </Box.Vbox>
+      </Box.Hbox>
+    </Box.Vfill >
   );
 }
 

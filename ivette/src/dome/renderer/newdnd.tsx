@@ -382,7 +382,7 @@ export function swap(items: string[], i: number, j: number): string[] {
       items.slice(i + 1, j + 1), a, items.slice(j + 1)
     );
   }
-  if (j <= 0 && j < i) {
+  if (0 <= j && j < i) {
     const a = items[j];
     return items.slice(0, j).concat(
       items.slice(j + 1, i + 1), a, items.slice(i + 1)
@@ -404,11 +404,11 @@ export function insertAt(items: string[], id: string, k: number): string[] {
 /* -------------------------------------------------------------------------- */
 
 interface ListContext {
-  dnd?: DnD,
-  ordered?: string[],
-  setSource?: (src: number) => void;
-  setTarget?: (tgt: number) => void;
-  setItems?: (items: string[]) => void;
+  dnd?: DnD;
+  items?: string[];
+  setSource?: (id: string) => void;
+  setTarget?: (id: string) => void;
+  onStop?: () => void;
 }
 
 const CurrentList = React.createContext<ListContext>({});
@@ -428,26 +428,17 @@ export interface ItemProps {
 
 export function Item(props: ItemProps): JSX.Element {
   //--- Ordering
-  const { dnd, ordered, setSource, setTarget, setItems } =
+  const { dnd, items, setSource, setTarget, onStop } =
     React.useContext(CurrentList);
   const { id, className, children } = props;
-  const order = getItem(ordered, id);
+  const order = getItem(items, id);
   //--- D&D Events
   const onStart = React.useCallback(() => {
-    if (setSource) setSource(order);
-  }, [setSource, order]);
-  const onStop = React.useCallback(() => {
-    if (setSource) setSource(-1);
-  }, [setSource]);
+    if (setSource) setSource(id);
+  }, [setSource, id]);
   const onDropIn = React.useCallback(() => {
-    if (setTarget) setTarget(order);
-  }, [setTarget, order]);
-  const onDropOut = React.useCallback(() => {
-    if (setTarget) setTarget(-1);
-  }, [setTarget]);
-  const onDrop = React.useCallback(() => {
-    if (ordered && setItems) setItems(ordered);
-  }, [ordered, setItems]);
+    if (setTarget) setTarget(id);
+  }, [setTarget, id]);
   //--- Styling
   const style = styles(
     props.style,
@@ -461,10 +452,8 @@ export function Item(props: ItemProps): JSX.Element {
       style={style}
       dnd={dnd}
       onStart={onStart}
-      onStop={onStop}
       onDropIn={onDropIn}
-      onDropOut={onDropOut}
-      onDrop={onDrop}
+      onStop={onStop}
     >
       {children}
     </DragSource>
@@ -479,12 +468,32 @@ export interface ListProps {
 
 export function List(props: ListProps): JSX.Element {
   const dnd = useDnD();
-  const [source, setSource] = React.useState(-1);
-  const [target, setTarget] = React.useState(-1);
   const [locals, setLocals] = React.useState<string[]>([]);
-  const ordered = swap(props.items ?? locals, source, target);
+  const [permut, setPermut] = React.useState<string[]>([]);
+  const [anchor, setAnchor] = React.useState<string | undefined>();
   const setItems = props.setItems ?? setLocals;
-  const context: ListContext = { dnd, ordered, setSource, setTarget, setItems };
+  const input = props.items ?? locals;
+  const items = anchor !== undefined ? permut : input;
+  const setSource = React.useCallback((id: string) => {
+    setAnchor(id);
+    setPermut(input);
+  }, [input]);
+  const setTarget = React.useCallback((id: string) => {
+    if (anchor !== undefined) {
+      const src = permut.indexOf(anchor);
+      const tgt = permut.indexOf(id);
+      const res = swap(permut, src, tgt);
+      setPermut(res);
+    }
+  }, [permut, anchor]);
+  const onStop = React.useCallback(() => {
+    setAnchor(undefined);
+    setItems(permut);
+  }, [setItems, permut]);
+  const context: ListContext = {
+    dnd, items,
+    setSource, setTarget, onStop
+  };
   return (
     <CurrentList.Provider value={context}>
       {props.children}
