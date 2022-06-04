@@ -102,7 +102,15 @@ interface DropZone extends DropHandler {
   node: HTMLElement;
 }
 
-class DnD {
+/**
+   D&D Controller.
+
+   This class allows to connect Drag Sources and Drop Target with each others.
+   You shall never use the methods of the `DnD` class directly.
+
+   The preferred way for creating `DnD` classes is to use the `useDnD()` React Hook.
+ */
+export class DnD {
 
   private registry = new Map<string, DropZone>();
   private dragging: HTMLElement | undefined;
@@ -139,13 +147,13 @@ class DnD {
       if (hover !== curr) {
         this.hovering = hover;
         if (curr && curr.onDropOut) { curr.onDropOut(); }
-        if (hover && hover.onDropIn) {
-          const meta = e.altKey || e.ctrlKey || e.shiftKey || e.metaKey;
-          const rect = hover.node.getBoundingClientRect();
-          const dropX = e.clientX - rect.left;
-          const dropY = e.clientY - rect.top;
-          hover.onDropIn({ meta, rect, dropX, dropY });
-        }
+      }
+      if (hover && hover.onDropIn) {
+        const meta = e.altKey || e.ctrlKey || e.shiftKey || e.metaKey;
+        const rect = hover.node.getBoundingClientRect();
+        const dropX = Math.round(e.clientX - rect.left);
+        const dropY = Math.round(e.clientY - rect.top);
+        hover.onDropIn({ meta, rect, dropX, dropY });
       }
     }
   }
@@ -175,8 +183,8 @@ export function useDropTarget(
   const onDrop = handlers?.onDrop;
   const onDropIn = handlers?.onDropIn;
   const onDropOut = handlers?.onDropOut;
+  const node = nodeRef.current;
   React.useEffect(() => {
-    const node = nodeRef.current;
     if (
       dnd && node && (onDrop || onDropIn || onDropOut)
     ) {
@@ -184,7 +192,7 @@ export function useDropTarget(
       return () => dnd.offDropZone(id);
     }
     return;
-  }, [dnd, onDrop, onDropIn, onDropOut]);
+  }, [dnd, node, onDrop, onDropIn, onDropOut]);
   return nodeRef;
 }
 
@@ -210,7 +218,7 @@ export interface DropTargetProps extends DropHandler {
  */
 
 export function DropTarget(props: DropTargetProps): JSX.Element {
-  const { dnd, disabled, className, style, children } = props;
+  const { dnd, disabled = false, className, style, children } = props;
   const nodeRef = useDropTarget(dnd, disabled ? undefined : props);
   return (
     <div ref={nodeRef} className={className} style={style}>
@@ -310,7 +318,7 @@ export interface DragSourceProps extends DragHandler, DropHandler {
  */
 export function DragSource(props: DragSourceProps): JSX.Element {
   //--- Props
-  const { dnd, disabled, handle, children } = props;
+  const { dnd, disabled = false, handle, children } = props;
   const { onStart, onDrag, onStop } = props;
   //--- Dragging State
   const [dragging, setDragging] = React.useState<Dragging | undefined>();
