@@ -172,17 +172,19 @@ export function useDropTarget(
   dnd: DnD | undefined, handlers?: DropHandler
 ): React.RefObject<HTMLDivElement> {
   const nodeRef = React.useRef<HTMLDivElement>(null);
-  const node = nodeRef.current;
+  const onDrop = handlers?.onDrop;
+  const onDropIn = handlers?.onDropIn;
+  const onDropOut = handlers?.onDropOut;
   React.useEffect(() => {
+    const node = nodeRef.current;
     if (
-      dnd && node && handlers
-      && (handlers.onDrop || handlers.onDropIn || handlers.onDropOut)
+      dnd && node && (onDrop || onDropIn || onDropOut)
     ) {
-      const id = dnd.onDropZone({ node, ...handlers });
+      const id = dnd.onDropZone({ node, onDrop, onDropIn, onDropOut });
       return () => dnd.offDropZone(id);
     }
     return;
-  }, [dnd, node, handlers]);
+  }, [dnd, onDrop, onDropIn, onDropOut]);
   return nodeRef;
 }
 
@@ -315,18 +317,17 @@ export function DragSource(props: DragSourceProps): JSX.Element {
   //--- Dropping Ref
   const nodeRef = useDropTarget(dnd, disabled ? undefined : props);
   //--- onStart
-  const nodeSelf = nodeRef.current;
   const handleStart: DraggableEventHandler = React.useCallback(
     (_, { x, y, node }) => {
-      if (dnd && nodeSelf)
-        dnd.handleStart(nodeSelf);
+      if (dnd && nodeRef.current)
+        dnd.handleStart(nodeRef.current);
       setDragging({
         rootX: x, rootY: y,
         dragX: x, dragY: y,
         rect: node.getBoundingClientRect(),
       });
       if (onStart) onStart();
-    }, [dnd, nodeSelf, onStart]);
+    }, [dnd, nodeRef, onStart]);
   //--- onDrag
   const handleDrag: DraggableEventHandler = React.useCallback(
     (e, { x, y }) => {
