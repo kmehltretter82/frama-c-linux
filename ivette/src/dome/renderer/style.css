@@ -69,7 +69,7 @@ div.dome-dragged {
     border: none ;
 }
 
-div.dome-dragging, .dome-dragging * {
+.dome-dragging * {
     cursor: move ;
 }
 
