@@ -410,14 +410,16 @@ export function DragSource(props: DragSourceProps): JSX.Element {
 /* --- Ordering                                                           --- */
 /* -------------------------------------------------------------------------- */
 
+/** Swaps items at index i and j if they are both in range. */
 export function swap(items: string[], i: number, j: number): string[] {
-  if (0 <= i && i < j) {
+  const n = items.length;
+  if (0 <= i && i < j && j < n) {
     const a = items[i];
     return items.slice(0, i).concat(
       items.slice(i + 1, j + 1), a, items.slice(j + 1)
     );
   }
-  if (0 <= j && j < i) {
+  if (0 <= j && j < i && i < n) {
     const a = items[j];
     return items.slice(0, j).concat(
       items.slice(j + 1, i + 1), a, items.slice(i + 1)
@@ -426,12 +428,22 @@ export function swap(items: string[], i: number, j: number): string[] {
   return items;
 }
 
+/** Remove item at index i when in range. */
 export function removeAt(items: string[], k: number): string[] {
-  return items.slice(0, k).concat(items.slice(k + 1));
+  const n = items.length;
+  if (0 <= k && k < n) {
+    return items.slice(0, k).concat(items.slice(k + 1));
+  }
+  return items;
 }
 
+/** Insert an item at index i when in range or off-by-one. */
 export function insertAt(items: string[], id: string, k: number): string[] {
-  return items.slice(0, k).concat(id, items.slice(k));
+  const n = items.length;
+  if (0 <= k && k <= n) {
+    return items.slice(0, k).concat(id, items.slice(k));
+  }
+  return items;
 }
 
 /* -------------------------------------------------------------------------- */
