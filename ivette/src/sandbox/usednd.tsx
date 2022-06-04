@@ -93,7 +93,7 @@ function UseDnD(): JSX.Element {
   const [items, setItems] = React.useState<string[]>([]);
   const [source, setSource] = React.useState('--');
   const [target, setTarget] = React.useState('--');
-  const onReset = () => {
+  const onReset = (): void => {
     setItems([]);
     setSource('--');
     setTarget('--');

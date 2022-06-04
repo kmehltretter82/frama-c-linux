@@ -102,14 +102,14 @@ interface DropZone extends DropHandler {
   node: HTMLElement;
 }
 
-/**
-   D&D Controller.
+/** D&D Controller.
 
    This class allows to connect Drag Sources and Drop Target with each others.
    You shall never use the methods of the `DnD` class directly.
 
-   The preferred way for creating `DnD` classes is to use the `useDnD()` React Hook.
- */
+   The preferred way for creating `DnD` classes is to use the `useDnD()`
+   React Hook.
+*/
 export class DnD {
 
   constructor() {
@@ -164,7 +164,7 @@ export class DnD {
         const rect = hover.node.getBoundingClientRect();
         const dropX = Math.round(e.clientX - rect.left);
         const dropY = Math.round(e.clientY - rect.top);
-        const d = this.dropping = { meta, rect, dropX, dropY }
+        const d = this.dropping = { meta, rect, dropX, dropY };
         hover.onDropIn(d);
       }
     }
@@ -243,7 +243,6 @@ export interface DropTargetProps extends DropHandler {
    Remark: a `<DragSource/>` also behaves as a `<DropTarget/>`
    when it has Drop handler callbacks.
  */
-
 export function DropTarget(props: DropTargetProps): JSX.Element {
   const { dnd, disabled = false, className, style, children } = props;
   const nodeRef = useDropTarget(dnd, disabled ? undefined : props);
@@ -473,6 +472,7 @@ export interface ItemProps {
   children?: React.ReactNode;
 }
 
+/** List item component. Shall only be used inside a `<List/>` component. */
 export function Item(props: ItemProps): JSX.Element {
   //--- Ordering
   const { dnd, items, setSource, setTarget, onStop } =
@@ -513,6 +513,21 @@ export interface ListProps {
   children?: React.ReactNode;
 }
 
+/** Sortable list wrapper.
+
+   This component has no DOM element on its own and shall be placed inside a
+   `<div/>` component with a `flex` display, typically an horizontal or vertical
+   Dome box.
+
+   The component wraps its <Item/> children within a local DnD context and
+   enable reordering them by Drag & Drop.
+
+   The behavior of the component can be _controlled_ or _uncontrolled_ whether
+   `items` and `setItems` properties are set or not. In controlled mode, the
+   `items` property is not mandatory to contains all the list elements, in which
+   case the missing elements would be added to the end. Notice that `setItems`
+   callback is only notified after drag & drop.
+*/
 export function List(props: ListProps): JSX.Element {
   const dnd = useDnD();
   const [locals, setLocals] = React.useState<string[]>([]);
