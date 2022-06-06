@@ -55,9 +55,7 @@ include Datatype.Make
       let hash = hash
       let rehash = Datatype.identity
       let copy = Extlib.id
-      let internal_pretty_code = Datatype.undefined
       let pretty = pretty
-      let varname = Datatype.undefined
       let mem_project = Datatype.never_any_project
     end)
 

@@ -241,24 +241,8 @@ let print_all () =
 
 let self = Occurrences.self
 let get_last_result = Occurrences.get_last_result
-
-let get =
-  Journal.register
-    "Occurrence.get"
-    (Datatype.func
-       Varinfo.ty
-       (* [JS 2011/04/01] Datatype.list buggy in presence of journalisation.
-          See comment in datatype.ml *)
-       (*(Datatype.list (Datatype.pair Kinstr.ty Lval.ty))*)
-       (let module L = Datatype.List(Occurrence_datatype) in L.ty))
-    get
-
-let print_all =
-  Journal.register
-    "Occurrence.print_all"
-    (Datatype.func Datatype.unit Datatype.unit)
-    (* pb: print_all should take a formatter as argument *)
-    print_all
+let get = get
+let print_all = print_all
 
 (* ************************************************************************** *)
 (* Main *)

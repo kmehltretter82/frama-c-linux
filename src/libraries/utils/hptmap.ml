@@ -680,9 +680,7 @@ struct
           else fun x -> !rehash_ref x
 
         let copy = Datatype.undefined
-        let internal_pretty_code = Datatype.pp_fail
         let pretty = pretty
-        let varname = Datatype.undefined
         let mem_project = Datatype.never_any_project
       end)
   let () = Type.set_ml_name D.ty None

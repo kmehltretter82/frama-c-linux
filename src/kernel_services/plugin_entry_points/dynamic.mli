@@ -30,11 +30,13 @@
 val register:
   ?comment:string ->
   plugin:string ->
-  string -> 'a Type.t -> journalize:bool -> 'a -> 'a
+  string -> 'a Type.t -> 'a -> 'a
 (** [register ~plugin name ty v] registers [v] with the name
     [name], the type [ty] and the plug-in [plugin].
     @raise Type.AlreadyExists if [name] already exists. In other words you
     cannot register a value with the same name twice.
+    @before Frama-C+dev there was a labeled argument [journalized], that has
+            been removed when Journalization has been removed.
     @plugin development guide *)
 
 (* ************************************************************************* *)
@@ -155,7 +157,8 @@ end
 *)
 val load_packages: string list -> unit
 
-(** Load the module specification. See -load-module option. *)
+(** Load the module specification. See -load-module option.
+    @modify Magnesium-20151001 new API. *)
 val load_module: string -> unit
 
 (** Sets the load path for modules in FRAMAC_PLUGIN, prepending it with [path].
@@ -173,7 +176,8 @@ val is_loaded: string -> bool
 val load_plugin_path: unit -> unit
 (** Load all plugins in the path set with [set_module_load_path].
     Must be invoked only once from boot during extending stage.
-    @since Magnesium-20151001 new API. *)
+    @since Magnesium-20151001 new API.
+    @modify Phosphorus-20170501-beta1 changed signature. *)
 (**/**)
 
 (*

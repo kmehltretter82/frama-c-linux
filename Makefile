@@ -483,8 +483,7 @@ FIRST_CMO= src/kernel_internals/runtime/fc_config \
 	src/kernel_services/plugin_entry_points/log \
 	src/kernel_services/cmdline_parameters/cmdline \
 	src/libraries/project/project_skeleton \
-	src/libraries/datatype/datatype \
-	src/kernel_services/plugin_entry_points/journal
+	src/libraries/datatype/datatype
 
 # project_skeleton requires log
 # datatype requires project_skeleton
@@ -794,7 +793,7 @@ PLUGIN_ENABLE:=$(ENABLE_CALLGRAPH)
 PLUGIN_NAME:=Callgraph
 PLUGIN_DISTRIBUTED:=yes
 PLUGIN_DIR:=src/plugins/callgraph
-PLUGIN_CMO:= options journalize subgraph cg services uses register
+PLUGIN_CMO:= options subgraph cg services uses register
 ifeq ($(HAS_DGRAPH),yes)
 PLUGIN_GUI_CMO:=cg_viewer
 PLUGIN_GENERATED:=$(PLUGIN_DIR)/cg_viewer.ml

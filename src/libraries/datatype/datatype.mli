@@ -30,16 +30,16 @@
 (* ********************************************************************** *)
 
 (** Values associated to each datatype.
-    Some others are provided directly in module {!Type}. *)
+    Some others are provided directly in module {!Type}.
+    @before Frama-C+dev there was additional fields only used for Journalization
+            that has been removed.
+*)
 type 'a t = private
   { equal: 'a -> 'a -> bool;
     compare: 'a -> 'a -> int;
     hash: 'a -> int;
     copy: 'a -> 'a;
-    internal_pretty_code: Type.precedence -> Format.formatter -> 'a -> unit;
-    pretty_code: Format.formatter -> 'a -> unit;
     pretty: Format.formatter -> 'a -> unit;
-    varname: 'a -> string;
     mem_project: (Project_skeleton.t -> bool) -> 'a -> bool }
 
 (** A type with its type value. *)
@@ -48,7 +48,10 @@ module type Ty = sig
   val ty: t Type.t
 end
 
-(** All values associated to a datatype, excepted [copy]. *)
+(** All values associated to a datatype, excepted [copy].
+    @before Frama-C+dev there was several additional values only used for
+            Journalization that has been removed.
+*)
 module type S_no_copy = sig
 
   include Ty
@@ -74,20 +77,8 @@ module type S_no_copy = sig
   val hash: t -> int
   (** Hash function: same spec than [Hashtbl.hash]. *)
 
-  val pretty_code: Format.formatter -> t -> unit
-  (** Pretty print each value in an ML-like style: the result must be a valid
-      OCaml expression. Only useful for journalisation. *)
-
-  val internal_pretty_code: Type.precedence -> Format.formatter -> t -> unit
-  (** Same spec than [pretty_code], but must take care of the precedence of the
-      context in order to put parenthesis if required. See {!Type.par}. *)
-
   val pretty: Format.formatter -> t -> unit
   (** Pretty print each value in an user-friendly way. *)
-
-  val varname: t -> string
-  (** A good prefix name to use for an OCaml variable of this type. Only useful
-      for journalisation. *)
 
   val mem_project: (Project_skeleton.t -> bool) -> t -> bool
   (** [mem_project f x] must return [true] iff there is a value [p] of type
@@ -111,11 +102,7 @@ val equal: 'a Type.t -> 'a -> 'a -> bool
 val compare: 'a Type.t -> 'a -> 'a -> int
 val hash: 'a Type.t -> 'a -> int
 val copy: 'a Type.t -> 'a -> 'a
-val internal_pretty_code:
-  'a Type.t -> Type.precedence -> Format.formatter -> 'a -> unit
-val pretty_code: 'a Type.t -> Format.formatter -> 'a -> unit
 val pretty: 'a Type.t -> Format.formatter -> 'a -> unit
-val varname: 'a Type.t -> 'a -> string
 val mem_project: 'a Type.t -> (Project_skeleton.t -> bool) -> 'a -> bool
 
 (* ********************************************************************** *)
@@ -135,22 +122,17 @@ val from_compare: 'a -> 'a -> bool
 (** Must be used for [equal] in order to implement it by [compare x y = 0]
     (with your own [compare] function). *)
 
-val from_pretty_code: Format.formatter -> 'a -> unit
-(** Must be used for [pretty] in order to implement it by [pretty_code]
-    provided by the datatype from your own [internal_pretty_code] function. *)
-
 val never_any_project: (Project_skeleton.t -> bool) -> 'a -> bool
 (** Must be used for [mem_project] if values of your type does never contain
     any project.
     @plugin development guide *)
 
-val pp_fail: Type.precedence -> Format.formatter -> 'a -> unit
-(** Must be used for [internal_pretty_code] if this pretty-printer must
-    fail only when called.
-    @plugin development guide *)
-
 (** Sub-signature of {!S}.
-    @plugin development guide *)
+    @plugin development guide
+
+    @before Frama-C+dev there was several additional values only used for
+            Journalization that has been removed.
+*)
 module type Undefined = sig
   val structural_descr: Structural_descr.t
   val equal: 'a -> 'a -> bool
@@ -158,9 +140,7 @@ module type Undefined = sig
   val hash: 'a -> int
   val rehash: 'a -> 'a
   val copy: 'a -> 'a
-  val internal_pretty_code: Type.precedence -> Format.formatter -> 'a -> unit
   val pretty: Format.formatter -> 'a -> unit
-  val varname: 'a -> string
   val mem_project: (Project_skeleton.t -> bool) -> 'a -> bool
 end
 
@@ -187,7 +167,11 @@ module Serializable_undefined: Undefined
 
 (** Input signature of {!Make} and {!Make_with_collections}.
     Values to implement in order to get a datatype.
-    Feel free to use easy builders (see above) for easy implementation. *)
+    Feel free to use easy builders (see above) for easy implementation.
+
+    @before Frama-C+dev there was several additional values only used for
+            Journalization that has been removed.
+*)
 module type Make_input = sig
 
   type t (** Type for this datatype *)
@@ -215,9 +199,7 @@ module type Make_input = sig
   val compare: t -> t -> int
   val hash: t -> int
   val copy: t -> t
-  val internal_pretty_code: Type.precedence -> Format.formatter -> t -> unit
   val pretty: Format.formatter -> t -> unit
-  val varname: t -> string
   val mem_project: (Project_skeleton.t -> bool) -> t -> bool
 
 end
@@ -366,7 +348,11 @@ module type Polymorphic = sig
 end
 
 (** Functor for polymorphic types with only 1 type variable.
-    @plugin development guide *)
+    @plugin development guide
+
+    @before Frama-C+dev the functor had several additional values only used for
+            Journalization that has been removed.
+*)
 module Polymorphic
     (P: sig
        include Type.Polymorphic_input
@@ -374,12 +360,8 @@ module Polymorphic
        val mk_compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
        val mk_hash: ('a -> int) -> 'a t -> int
        val map: ('a -> 'a) -> 'a t -> 'a t
-       val mk_internal_pretty_code:
-         (Type.precedence -> Format.formatter -> 'a -> unit) ->
-         Type.precedence -> Format.formatter -> 'a t -> unit
        val mk_pretty:
          (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
-       val mk_varname: ('a -> string) -> 'a t -> string
        val mk_mem_project:
          ((Project_skeleton.t -> bool) -> 'a -> bool) ->
          (Project_skeleton.t -> bool) -> 'a t -> bool
@@ -393,7 +375,11 @@ module type Polymorphic2 = sig
 end
 
 (** Functor for polymorphic types with 2 type variables.
-    @plugin development guide *)
+    @plugin development guide
+
+    @before Frama-C+dev the functor had several additional values only used for
+            Journalization that has been removed.
+*)
 module Polymorphic2
     (P: sig
        include Type.Polymorphic2_input
@@ -404,14 +390,9 @@ module Polymorphic2
          ('a -> 'a -> int) -> ('b -> 'b -> int) -> ('a, 'b) t -> ('a, 'b) t -> int
        val mk_hash: ('a -> int) -> ('b -> int) -> ('a, 'b) t -> int
        val map: ('a -> 'a) -> ('b -> 'b) -> ('a, 'b) t -> ('a, 'b) t
-       val mk_internal_pretty_code:
-         (Type.precedence -> Format.formatter -> 'a -> unit) ->
-         (Type.precedence -> Format.formatter -> 'b -> unit) ->
-         Type.precedence -> Format.formatter -> ('a, 'b) t -> unit
        val mk_pretty:
          (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'b -> unit) ->
          Format.formatter -> ('a, 'b) t -> unit
-       val mk_varname: ('a -> string) -> ('b -> string) -> ('a, 'b) t -> string
        val mk_mem_project:
          ((Project_skeleton.t -> bool) -> 'a -> bool) ->
          ((Project_skeleton.t -> bool) -> 'b -> bool) ->
@@ -428,7 +409,10 @@ end
 
 (** Functor for polymorphic types with 3 type variables.
     @since Oxygen-20120901
-    @plugin development guide *)
+    @plugin development guide
+    @before Frama-C+dev the functor had several additional values only used for
+            Journalization that has been removed.
+*)
 module Polymorphic3
     (P: sig
        include Type.Polymorphic3_input
@@ -443,19 +427,11 @@ module Polymorphic3
          ('a -> int) -> ('b -> int) -> ('c -> int) -> ('a, 'b, 'c) t -> int
        val map:
          ('a -> 'a) -> ('b -> 'b) -> ('c -> 'c) -> ('a, 'b, 'c) t -> ('a, 'b, 'c) t
-       val mk_internal_pretty_code:
-         (Type.precedence -> Format.formatter -> 'a -> unit) ->
-         (Type.precedence -> Format.formatter -> 'b -> unit) ->
-         (Type.precedence -> Format.formatter -> 'c -> unit) ->
-         Type.precedence -> Format.formatter -> ('a, 'b, 'c) t -> unit
        val mk_pretty:
          (Format.formatter -> 'a -> unit) ->
          (Format.formatter -> 'b -> unit) ->
          (Format.formatter -> 'c -> unit) ->
          Format.formatter -> ('a, 'b, 'c) t -> unit
-       val mk_varname:
-         ('a -> string) -> ('b -> string) -> ('c -> string) ->
-         ('a, 'b, 'c) t -> string
        val mk_mem_project:
          ((Project_skeleton.t -> bool) -> 'a -> bool) ->
          ((Project_skeleton.t -> bool) -> 'b -> bool) ->
@@ -474,7 +450,10 @@ end
 
 (** Functor for polymorphic types with 4 type variables.
     @since Oxygen-20120901
-    @plugin development guide *)
+    @plugin development guide
+    @before Frama-C+dev the functor had several additional values only used for
+            Journalization that has been removed.
+*)
 module Polymorphic4
     (P: sig
        include Type.Polymorphic4_input
@@ -493,21 +472,12 @@ module Polymorphic4
        val map:
          ('a -> 'a) -> ('b -> 'b) -> ('c -> 'c) -> ('d -> 'd) ->
          ('a, 'b, 'c, 'd) t -> ('a, 'b, 'c, 'd) t
-       val mk_internal_pretty_code:
-         (Type.precedence -> Format.formatter -> 'a -> unit) ->
-         (Type.precedence -> Format.formatter -> 'b -> unit) ->
-         (Type.precedence -> Format.formatter -> 'c -> unit) ->
-         (Type.precedence -> Format.formatter -> 'd -> unit) ->
-         Type.precedence -> Format.formatter -> ('a, 'b, 'c, 'd) t -> unit
        val mk_pretty:
          (Format.formatter -> 'a -> unit) ->
          (Format.formatter -> 'b -> unit) ->
          (Format.formatter -> 'c -> unit) ->
          (Format.formatter -> 'd -> unit) ->
          Format.formatter -> ('a, 'b, 'c, 'd) t -> unit
-       val mk_varname:
-         ('a -> string) -> ('b -> string) -> ('c -> string) -> ('d -> string) ->
-         ('a, 'b, 'c, 'd) t -> string
        val mk_mem_project:
          ((Project_skeleton.t -> bool) -> 'a -> bool) ->
          ((Project_skeleton.t -> bool) -> 'b -> bool) ->

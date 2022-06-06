@@ -65,7 +65,6 @@ module Fct_user_crit =
       let reprs = [ SlicingInternals.dummy_fct_user_crit ]
       let name = "SlicingTypes.Fct_user_crit"
       let mem_project = Datatype.never_any_project
-      let varname _ = "user_criteria"
     end)
 
 (** Function slice *)
@@ -73,8 +72,6 @@ type sl_fct_slice = SlicingInternals.fct_slice
 
 (** Marks : used to put 'colors' in the result *)
 type sl_mark = SlicingInternals.pdg_mark
-
-(** {3 For the journalization of values of these types} *)
 
 let pp_sl_project p_caller fmt _p =
   let pp fmt =
@@ -90,8 +87,6 @@ module Sl_project =
       type t = sl_project
       let reprs = [ SlicingInternals.dummy_project ]
       let name = "SlicingTypes.Sl_project"
-      let internal_pretty_code = pp_sl_project
-      let varname _s = "sl_project_"
       let mem_project = Datatype.never_any_project
     end)
 
@@ -105,7 +100,6 @@ module Sl_select =
           (fun v -> v, SlicingInternals.dummy_fct_user_crit)
           Cil_datatype.Varinfo.reprs
       let name = "SlicingTypes.Sl_select"
-      let varname _s = "sl_select"
       let mem_project = Datatype.never_any_project
     end)
 
@@ -113,7 +107,7 @@ let pp_sl_fct_slice p_caller fmt ff =
   let pp fmt =
     Format.fprintf fmt
       "@[<hv 2>!Db.Slicing.Slice.from_num_id@;%a@;%d@]"
-      (Kernel_function.internal_pretty_code Type.Call)
+      Kernel_function.pretty
       ff.SlicingInternals.ff_fct.SlicingInternals.fi_kf
       ff.SlicingInternals.ff_id
   in
@@ -127,13 +121,12 @@ module Sl_fct_slice =
       type t = fct_slice
       let name = "SlicingTypes.Sl_fct_slice"
       let reprs = [ dummy_fct_slice ]
-      let internal_pretty_code = pp_sl_fct_slice
       let mem_project = Datatype.never_any_project
     end)
 
 let dyn_sl_fct_slice = Sl_fct_slice.ty
 
-let pp_sl_mark p fmt m =
+let pp_sl_mark fmt m =
   let pp = match m.SlicingInternals.m1, m.SlicingInternals.m2 with
     | SlicingInternals.Spare, _ -> None
     | _, SlicingInternals.Spare -> None
@@ -163,7 +156,7 @@ let pp_sl_mark p fmt m =
       fun fmt ->
         Format.fprintf fmt "@[<hv 2>SlicingInternals.create_sl_mark@;~m1:%a@;~m2:%a@]"
           pp m.SlicingInternals.m1 pp m.SlicingInternals.m2
-  in Type.par p Type.Call fmt pp
+  in pp fmt
 
 module Sl_mark =
   Datatype.Make_with_collections
@@ -177,10 +170,8 @@ module Sl_mark =
       let hash = Hashtbl.hash
       let copy = Datatype.undefined
       let rehash = Datatype.undefined
-      let internal_pretty_code = pp_sl_mark
-      let pretty = Datatype.from_pretty_code
+      let pretty = pp_sl_mark
       let mem_project = Datatype.never_any_project
-      let varname = Datatype.undefined
     end)
 
 let dyn_sl_mark = Sl_mark.ty

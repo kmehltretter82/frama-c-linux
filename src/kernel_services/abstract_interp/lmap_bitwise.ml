@@ -238,10 +238,8 @@ struct
         let equal = equal
         let compare = compare
         let pretty = pretty
-        let internal_pretty_code = Datatype.undefined
         let rehash = Datatype.identity
         let copy = Datatype.undefined
-        let varname = Datatype.undefined
         let mem_project = Datatype.never_any_project
       end)
 

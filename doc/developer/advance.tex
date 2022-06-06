@@ -1769,7 +1769,7 @@ contains the type itself, the type value corresponding to this type, its name,
 functions \texttt{equal}, \texttt{compare}, \texttt{hash} and \texttt{pretty}
 which may respectively be used to check equality, to compare, to hash and to
 pretty print values of this type. It also contains some other values (for
-instance required when marshaling or journalizing). Whenever possible, a
+instance required when marshaling). Whenever possible, a
 datatype implements an extensible version of \texttt{Datatype.S}, namely
 \texttt{Datatype.S\_with\_collections}\scodeidx{Datatype}{S\_with\_collections}.
 For a type $\tau$, this extended signature additionally provides modules
@@ -1830,7 +1830,6 @@ simple sum type.
 \sscodeidx{Structural\_descr}{t}{Structure}
 \sscodeidx{Structural\_descr}{structure}{Sum}
 \scodeidx{Structural\_descr}{p\_int}
-\index{Journalisation}
 \index{Marshaling}
 \index{Project}
 \begin{ocamlcode}
@@ -1867,31 +1866,11 @@ module AB =
        let pretty fmt x = 
          Format.pp_print_string fmt
           (match x with A -> "a" | B n -> "b" ^ string_of_int n)
-       (* printer which must produce a valid OCaml value in a given
-          context. It is used when journalising. *)
-       let internal_pretty_code prec_caller fmt = function
-         | A ->
-           Type.par 
-             prec_caller 
-             Type.Basic 
-             fmt 
-             (fun fmt -> Format.pp_print_string fmt "A")
-         | B n ->
-           Type.par 
-             prec_caller 
-             Type.Call 
-             fmt 
-             (fun fmt -> Format.fprintf fmt "B %d" n)
-       (* A good prefix name to use for an OCaml variable of this type. *)
-       let varname v = "ab" ^ (match v with A -> "_a_" | B -> "_b_")
      end)
 \end{ocamlcode}
 \end{example}
 Only providing an effective implementation for the values \texttt{name} and
-\texttt{reprs} is mandatory. For instance, if you know that you never journalize
-a value of a type \texttt{t}, you can define the function
-\texttt{internal\_pretty\_code} equal to the predefined function
-\texttt{Datatype.pp\_fail}\scodeidx{Datatype}{pp\_fail}. Similarly, if you never
+\texttt{reprs} is mandatory. For instance, if you know that you never
 use values of type \texttt{t} as keys of hashtable, you can define the function
 hash equal to the function
 \texttt{Datatype.undefined}\scodeidx{Datatype}{undefined} , and so on. To ease
@@ -2224,7 +2203,7 @@ previously registered with \texttt{Dynamic.register}.
 The signature of \texttt{Dynamic.register}\scodeidx{Dynamic}{register} is as
 follows.\scodeidx{Type}{t}
 \begin{ocamlcode}
-val register: plugin:string -> string -> 'a Type.t -> journalize:bool -> 'a ->
+val register: plugin:string -> string -> 'a Type.t -> 'a ->
 unit
 \end{ocamlcode}
 The first argument is the name of the plug-in registering the value and the
@@ -2234,11 +2213,8 @@ name, binding name) must not be used for value registration anywhere else in
 (see next paragraph). The third argument is the \emph{type value}%
 \index{Type!Value} of the registered value (see
 Section~\ref{type:type-value}). It is required for safety reasons when accessing
-to the registered value (see the next paragraph). The labeled fourth argument
-\texttt{journalize} indicates whether a total call to this function must be
-written in the journal\index{Journalization} (see also
-Section~\ref{adv:journalization}). The usual value for this argument is
-\texttt{true}. The fifth argument is the value to register.
+to the registered value (see the next paragraph). The fourth argument is the
+value to register.
 
 \begin{example}
   Here is how the function \texttt{run} of the plug-in
@@ -2252,7 +2228,6 @@ let () =
     ~plugin:"Hello" 
     "run" 
     (Datatype.func Datatype.unit Datatype.unit)
-    ~journalize:true
     run
 \end{ocamlcode}
 If the string \texttt{"Hello.run"} is already used to register a
@@ -2331,10 +2306,6 @@ dynamically registered functions).
 \scodeidx{Datatype}{unit}
 \ocamlinput{./examples/generated/use_callstack.ml}
 \end{example}
-
-\section{Journalization}\label{adv:journalization}
-
-\todo
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -3165,9 +3136,8 @@ tightly coupled with handling the command line parameters.
 The parsing of the command line parameters is performed in several
 \emph{phases} and \emph{stages}
 \index{Command Line!Parsing}, 
-each one dedicated to specific operations. For instance,
-journal replays should be performed after loading dynamic plug-ins, and so
-on. Following the general rule stated at the beginning of this section, even
+each one dedicated to specific operations.
+Following the general rule stated at the beginning of this section, even
 the kernel services of \framac are internally registered as hooks routines to
 be executed at a specific stage of the initialization process, among plug-ins
 ones.
@@ -3201,25 +3171,21 @@ their execution order.
   Plug-in developers cannot customize this stage. In particular, the module
   \texttt{Cmdline}\codeidx{Cmdline} (one of the first linked modules, see
   Figure~\ref{fig:architecture}) performs a very early configuration stage,
-  such as checking if journalization has to be activated
-  (cf.~Section~\ref{adv:journalization}\index{Journalization}), or setting the
-  global verbosity and debugging levels.
-
+  such as setting the global verbosity and debugging levels.
+  
 \item \label{stage:early} \textbf{The Early Stage:} this stage initializes the
   kernel services. More precisely:
   \begin{enumerate}[(a)]
-  \item first, the journal name is set to its right value (according to the
-    option \texttt{-journal-name}) and the default project is created;
-  \item then, the parsing of command line options registered for the
+  \item first, the parsing of command line options registered for the
     \texttt{Cmdline.Early}\sscodeidxdef{Cmdline}{stage}{Early} stage;
-  \item finally, all functions registered through
+  \item then, all functions registered through
     \texttt{Cmdline.run\_after\_early\_stage}%
     \scodeidxdef{Cmdline}{run\_after\_early\_stage} are executed in an
     unspecified order.
   \end{enumerate}
 
 \item \label{stage:extending} \textbf{The Extending Stage:}\index{Linking} the searching and
-  loading of dynamically linked plug-ins, of journal, scripts and
+  loading of dynamically linked plug-ins, scripts and
   modules is performed at this stage. More precisely:
 
   \begin{enumerate}[(a)]
@@ -3232,7 +3198,7 @@ their execution order.
     \texttt{Cmdline.run\_during\_extending\_stage}
     \scodeidxdef{Cmdline}{run\_during\_extending\_stage} are executed. Such
     hooks include kernel function calls for searching, loading and linking the
-    various plug-ins, journal and scripts compilation units, with respect to
+    various plug-ins and scripts compilation units, with respect to
     the command line options parsed during stages~\ref{stage:early}
     and~\ref{stage:extending}.
   \end{enumerate}
@@ -3289,8 +3255,7 @@ their execution order.
 
 \item \textbf{The Loading Stage:} this is where the initial state of \framac
   can be replaced by another one. Typically, it would be loaded from disk
-  through the \texttt{-load} option\index{Loading} or computed by running a
-  journal (see Section~\ref{adv:journalization})\index{Journalization}. As
+  through the \texttt{-load} option\index{Loading}. As
   for the other stages:
   \begin{enumerate}[(a)]
 

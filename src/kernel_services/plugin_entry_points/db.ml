@@ -24,28 +24,15 @@ open Cil_types
 open Cil_datatype
 open Extlib
 
-type 'a how_to_journalize =
-  | Journalize of string * 'a Type.t
-  | Journalization_not_required
-  | Journalization_must_not_happen of string
-
-let register how_to_journalize r f =
-  match how_to_journalize with
-  | Journalize (name, ty) -> r := Journal.register ("!Db." ^ name) ty f
-  | Journalization_not_required -> r := f
-  | Journalization_must_not_happen name ->
-    r := Journal.never_write ("!Db." ^ name) f
+let register r f = r := f
 
 let register_compute name deps r f =
   let name = "!Db." ^ name in
-  let f = Journal.register name (Datatype.func Datatype.unit Datatype.unit) f in
   let compute, self = State_builder.apply_once name deps f in
   r := compute;
   self
 
-let register_guarded_compute name is_computed r f =
-  let name = "!Db." ^ name in
-  let f = Journal.register name (Datatype.func Datatype.unit Datatype.unit) f in
+let register_guarded_compute is_computed r f =
   let compute () = if not (is_computed ()) then f () in
   r := compute
 
@@ -202,29 +189,13 @@ module Value = struct
 
   let fun_get_args () = FunArgs.get_option ()
 
-  (* This function is *not* journalized *)
-  let fun_set_args =
-    let module L = Datatype.List(Cvalue.V) in
-    Journal.register "(failwith \"Function cannot be journalized: \
-                      Db.Value.fun_set_args\" : _ -> unit)"
-      (Datatype.func L.ty Datatype.unit)
-      (fun l ->
-         if
-           not
-             (Option.equal ListArgs.equal (Some l) (FunArgs.get_option ()))
-         then begin
-           !initial_state_changed ();
-           FunArgs.set l
-         end)
+  let fun_set_args l =
+    if not (Option.equal ListArgs.equal (Some l) (FunArgs.get_option ())) then
+      (!initial_state_changed (); FunArgs.set l)
 
-
-  let fun_use_default_args =
-    Journal.register "Db.Value.fun_use_default_args"
-      (Datatype.func Datatype.unit Datatype.unit)
-      (fun () ->
-         if FunArgs.get_option () <> None then
-           (!initial_state_changed (); FunArgs.clear ()))
-
+  let fun_use_default_args () =
+    if FunArgs.get_option () <> None then
+      (!initial_state_changed (); FunArgs.clear ())
 
   (* Initial memory state of the value analysis *)
   module VGlobals =
@@ -235,27 +206,19 @@ module Value = struct
         let dependencies = [Ast.self]
       end)
 
-  (* This function is *not* journalized *)
-  let globals_set_initial_state =
-    Journal.register "(failwith \"Function cannot be journalized: \
-                      Db.Value.globals_set_initial_state\" : _ -> unit)"
-      (Datatype.func Cvalue.Model.ty Datatype.unit)
-      (fun state ->
-         if not (Option.equal Cvalue.Model.equal
-                   (Some state)
-                   (VGlobals.get_option ()))
-         then begin
-           !initial_state_changed ();
-           VGlobals.set state
-         end)
+  let globals_set_initial_state state =
+    if not (Option.equal Cvalue.Model.equal
+              (Some state)
+              (VGlobals.get_option ()))
+    then begin
+      !initial_state_changed ();
+      VGlobals.set state
+    end
 
 
-  let globals_use_default_initial_state =
-    Journal.register
-      "Db.Value.globals_use_default_initial_state"
-      (Datatype.func Datatype.unit Datatype.unit)
-      (fun () -> if VGlobals.get_option () <> None then
-          (!initial_state_changed (); VGlobals.clear ()))
+  let globals_use_default_initial_state () =
+    if VGlobals.get_option () <> None then
+      (!initial_state_changed (); VGlobals.clear ())
 
   let initial_state_only_globals = mk_fun "Value.initial_state_only_globals"
 
@@ -319,10 +282,8 @@ module Value = struct
         let dependencies = [ self ]
       end)
 
-  let mark_as_computed =
-    Journal.register "Db.Value.mark_as_computed"
-      (Datatype.func Datatype.unit Datatype.unit)
-      Table_By_Callstack.mark_as_computed
+  let mark_as_computed () =
+    Table_By_Callstack.mark_as_computed ()
 
   let is_computed () = Table_By_Callstack.is_computed ()
 

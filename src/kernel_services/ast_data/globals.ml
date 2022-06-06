@@ -91,17 +91,6 @@ module Vars = struct
 
   let get_astinfo vi = !get_astinfo_ref vi
 
-  let pp_varinfo p fmt v =
-    let name, loc = get_astinfo v in
-    let pp fmt =
-      Format.fprintf fmt "@[<hv 2>Globals.Vars.find_from_astinfo@;%S@;%a@]"
-        name
-        (Cil_datatype.Localisation.internal_pretty_code Type.Call) loc
-    in
-    Type.par p Type.Call fmt pp
-
-  let () = Varinfo.internal_pretty_code_ref := pp_varinfo
-
   let iter_globals f l =
     let treat_global = function
       | GVar(vi,init,_) -> f vi init

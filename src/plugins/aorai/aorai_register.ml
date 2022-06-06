@@ -323,7 +323,6 @@ let run =
     ~plugin:"Aorai"
     "run"
     (Datatype.func Datatype.unit Datatype.unit)
-    ~journalize:true
     run
 
 let run, _ =

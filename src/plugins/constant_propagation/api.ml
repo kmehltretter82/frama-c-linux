@@ -350,33 +350,21 @@ module Result =
 let selection_command_line_option =
   State_selection.singleton PropagationParameters.SemanticConstFolding.self
 
-let journalized_get =
-  let get fnames cast_intro =
-    Result.memo
-      (fun _ ->
-         Eva.Analysis.compute ();
-         let fresh_project =
-           FC_file.create_project_from_visitor
-             (PropagationParameters.Project_name.get ())
-             (fun prj -> new propagate prj fnames ~cast_intro)
-         in
-         let ctx = Parameter_state.get_selection_context () in
-         let ctx = State_selection.diff ctx selection_command_line_option in
-         Project.copy ~selection:ctx fresh_project;
-         fresh_project)
-      (fnames, cast_intro)
-  in
-  Journal.register
-    "Constant_Propagation.get"
-    (Datatype.func2
-       Cil_datatype.Fundec.Set.ty
-       ~label2:("cast_intro",None)
-       Datatype.bool
-       Project.ty)
-    get
-
 (* add labels *)
-let get fnames ~cast_intro = journalized_get fnames cast_intro
+let get fnames ~cast_intro =
+  Result.memo
+    (fun _ ->
+       Eva.Analysis.compute ();
+       let fresh_project =
+         FC_file.create_project_from_visitor
+           (PropagationParameters.Project_name.get ())
+           (fun prj -> new propagate prj fnames ~cast_intro)
+       in
+       let ctx = Parameter_state.get_selection_context () in
+       let ctx = State_selection.diff ctx selection_command_line_option in
+       Project.copy ~selection:ctx fresh_project;
+       fresh_project)
+    (fnames, cast_intro)
 
 (** Constant Propagation *)
 
@@ -395,15 +383,11 @@ let compute () =
 
 let compute, self =
   let name = "Constant_Propagation.compute" in
-  let journalized_compute =
-    Journal.register name (Datatype.func Datatype.unit Datatype.unit)
-      compute
-  in
   let deps = [ PropagationParameters.SemanticConstFold.self;
                PropagationParameters.SemanticConstFolding.self;
                Result.self ]
   in
-  State_builder.apply_once name deps journalized_compute
+  State_builder.apply_once name deps compute
 
 let main () =
   let force_semantic_folding =
@@ -411,7 +395,6 @@ let main () =
     || not (Cil_datatype.Fundec.Set.is_empty
               (PropagationParameters.SemanticConstFold.get ()))
   in
-  (* must called the function stored in [Db] for journalisation purpose *)
   if force_semantic_folding then compute ()
 
 let () =

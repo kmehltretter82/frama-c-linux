@@ -206,7 +206,7 @@ and criterion =
 
 (** {2 Internals values} *)
 
-(** {3 For the journalization of these internals types} *)
+(** {3 For the datatypes of these internals types} *)
 let dummy_pdg_mark = {m1 = Spare ; m2 = Spare }
 
 (** The whole project. *)

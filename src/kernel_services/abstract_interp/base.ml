@@ -99,10 +99,8 @@ module Validity = Datatype.Make
 
       let pretty = pretty_validity
       let mem_project = Datatype.never_any_project
-      let internal_pretty_code = Datatype.pp_fail
       let rehash = Datatype.identity
       let copy (x:t) = x
-      let varname _ = "v"
     end)
 
 type cstring = CSString of string | CSWstring of Escape.wstring
@@ -450,10 +448,8 @@ module Base = struct
         let pretty = pretty
         let hash = hash
         let mem_project = Datatype.never_any_project
-        let internal_pretty_code = Datatype.pp_fail
         let rehash = Datatype.identity
         let copy = Datatype.undefined
-        let varname = Datatype.undefined
       end)
   let id = id
   let pretty_debug = pretty

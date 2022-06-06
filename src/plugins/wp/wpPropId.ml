@@ -260,10 +260,8 @@ module PropIdRaw =
 
     let copy = Datatype.undefined
     let rehash = Datatype.identity
-    let internal_pretty_code = Datatype.undefined
     let pretty = Datatype.undefined
     let mem_project = Datatype.never_any_project
-    let varname = Datatype.undefined
   end)
 
 (* -------------------------------------------------------------------------- *)

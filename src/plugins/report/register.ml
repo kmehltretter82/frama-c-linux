@@ -31,7 +31,6 @@ let print () =
 let print =
   Dynamic.register
     ~plugin:"Report"
-    ~journalize:true
     "print"
     (Datatype.func Datatype.unit Datatype.unit)
     print

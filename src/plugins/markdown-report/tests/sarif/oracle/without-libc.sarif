@@ -16,10 +16,9 @@
       "invocations": [
         {
           "commandLine":
-            "frama-c -journal-disable -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report -eva -eva-no-results -mdr-gen sarif -mdr-sarif-deterministic libc.c -mdr-no-print-libc -mdr-out ./without-libc.sarif",
+            "frama-c -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report -eva -eva-no-results -mdr-gen sarif -mdr-sarif-deterministic libc.c -mdr-no-print-libc -mdr-out ./without-libc.sarif",
           "arguments": [
-            "-journal-disable", "-check", "-no-autoload-plugins",
-            "-add-symbolic-path", ":.",
+            "-check", "-no-autoload-plugins", "-add-symbolic-path", ":.",
             "-load-module=eva,from,scope,markdown_report", "-eva",
             "-eva-no-results", "-mdr-gen", "sarif",
             "-mdr-sarif-deterministic", "libc.c", "-mdr-no-print-libc",

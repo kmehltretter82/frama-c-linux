@@ -277,16 +277,6 @@ let dump () =
   let g = Subgraph.get () in
   Options.dump GV.output_graph g
 
-include Journalize.Make
-    (struct
-      let name = "Cg"
-      let dump = dump
-      let compute = compute
-      type t = G.t
-      let ty = D.ty
-      let get = get
-    end)
-
 (*
 Local Variables:
 compile-command: "make -C ../../.."

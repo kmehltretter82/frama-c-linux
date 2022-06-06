@@ -62,7 +62,6 @@ let force_run =
     ~plugin:"Obfuscator"
     "force_run"
     (Datatype.func Datatype.unit Datatype.unit)
-    ~journalize:true
     force_run
 
 let run () =

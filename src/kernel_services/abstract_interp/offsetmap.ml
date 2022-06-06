@@ -229,9 +229,7 @@ module Make (V : module type of Offsetmap_lattice_with_isotropy) = struct
             let compare = compare
             let rehash x = !rehash_ref x
             let copy = Datatype.undefined
-            let internal_pretty_code = Datatype.undefined
             let pretty = pretty
-            let varname = Datatype.undefined
             let mem_project = Datatype.never_any_project
           end)
       include D
@@ -2460,8 +2458,6 @@ module Int_Intervals = struct
                 Int.packed_descr; Int.packed_descr |] |]
 
       let mem_project = Datatype.never_any_project
-      let varname _ = "i"
-      let internal_pretty_code = Datatype.undefined
       let copy = Datatype.undefined
     end)
 

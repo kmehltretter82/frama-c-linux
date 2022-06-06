@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module P = 
+module P =
   Plugin.Register
     (struct
       let name = "Callstack"
@@ -28,10 +28,10 @@ type callstack = (Kernel_function.t * Cil_datatype.Stmt.t) list
 let empty = []
 let push kf stmt stack = (kf, stmt) :: stack
 let pop = function [] -> [] | _ :: stack -> stack
-let rec print = function 
-  | [] -> P.feedback "" 
-  | (kf, stmt) :: stack -> 
-    P.feedback "function %a called at stmt %a" 
+let rec print = function
+  | [] -> P.feedback ""
+  | (kf, stmt) :: stack ->
+    P.feedback "function %a called at stmt %a"
       Kernel_function.pretty kf
       Cil_datatype.Stmt.pretty stmt;
     print stack
@@ -51,7 +51,7 @@ module D =
 
 (* Dynamic API registration *)
 let register name ty =
-  Dynamic.register ~plugin:"Callstack" ~journalize:false name ty
+  Dynamic.register ~plugin:"Callstack" name ty
 
 let empty = register "empty" D.ty empty
 let push = register "push" (Datatype.func3 kf_ty stmt_ty D.ty D.ty) push

@@ -657,8 +657,6 @@ src/kernel_services/plugin_entry_points/dynamic.ml: CEA_LGPL
 src/kernel_services/plugin_entry_points/dynamic.mli: CEA_LGPL
 src/kernel_services/plugin_entry_points/emitter.ml: CEA_LGPL
 src/kernel_services/plugin_entry_points/emitter.mli: CEA_LGPL
-src/kernel_services/plugin_entry_points/journal.ml: CEA_LGPL
-src/kernel_services/plugin_entry_points/journal.mli: CEA_LGPL
 src/kernel_services/plugin_entry_points/kernel.ml: CEA_LGPL
 src/kernel_services/plugin_entry_points/kernel.mli: CEA_LGPL
 src/kernel_services/plugin_entry_points/log.ml: CEA_LGPL
@@ -826,8 +824,6 @@ src/plugins/callgraph/cg.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/cg.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/cg_viewer.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/cg_viewer.yes.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/callgraph/journalize.ml: CEA_LGPL_OR_PROPRIETARY
-src/plugins/callgraph/journalize.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/options.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/options.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/callgraph/register.ml: CEA_LGPL_OR_PROPRIETARY
