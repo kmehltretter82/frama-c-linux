@@ -316,13 +316,12 @@ struct
   include
     Datatype.Make_with_collections
       (struct
-        include (Logic_var.Map)
         include Datatype.Undefined
 
         type t = ival Logic_var.Map.t
 
-        let equal = Logic_var.Map.equal (Ival_datatype.equal)
-        let compare = Logic_var.Map.compare (Ival_datatype.compare)
+        let equal = Logic_var.Map.equal Ival_datatype.equal
+        let compare = Logic_var.Map.compare Ival_datatype.compare
 
         let mem_project = Datatype.never_any_project
         let copy m =  Logic_var.Map.fold Logic_var.Map.add m Logic_var.Map.empty

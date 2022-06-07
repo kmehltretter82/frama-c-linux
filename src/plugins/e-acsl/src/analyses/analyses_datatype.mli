@@ -46,7 +46,7 @@ end
 
 module Ival_datatype: Datatype.S_with_collections with type t = ival
 
-(** profile which maps logic variables that are function parameters to their
+(** profile that maps logic variables that are function parameters to their
     interval depending on the arguments at the callsite of the function *)
 module Profile: sig
   include
@@ -59,16 +59,21 @@ module Profile: sig
 
 end
 
+(** term with a profile: a term inside a logic function or predicate may
+    contain free variables. The profile indicates the interval for those
+    free variables. *)
 module Id_term_in_profile: Datatype.S_with_collections
   with type t = term * Profile.t
 
+(** profile of logic function or predicate: a logic info representing a logic
+    function or a predicate together with a profile for its arguments. *)
 module LFProf: Datatype.S_with_collections
   with type t = logic_info * Profile.t
 
-(* logic environment: interval of all bound variables. It consists in two
-   components
-   - a profile for variables bound through functions arguments
-   - an association list for variables bound by a let or a quantification *)
+(** logic environment: interval of all bound variables. It consists in two
+    components
+    - a profile for variables bound through function arguments
+    - an association list for variables bound by a let or a quantification *)
 module Logic_env : sig
   type t
   (* add a new binding for a let or a quantification binder only *)
@@ -80,13 +85,13 @@ module Logic_env : sig
   (* find a logic variable in the environment *)
   val find : t -> logic_var -> ival
   (* get the profile of the logic environment, i.e. bindings through function
-     arguments*)
+     arguments *)
   val get_profile : t -> Profile.t
 end
 
 
-(* Imperative environment to perform fixpoint algorithm for recursive
-   functions *)
+(** Imperative environment to perform the fixpoint algorithm for recursive
+    functions *)
 module LF_env : sig
   val find : logic_info -> Profile.t -> ival
 
