@@ -1,3 +1,16 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Sparecode:" %{lib-available:frama-c-sparecode.core} "\n")
+          (echo "  - Users:" %{lib-available:frama-c-users.core} "\n")
+          (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
+          (echo "  - Inout:" %{lib-available:frama-c-inout.core} "\n")
+          (echo "  - Pdg:" %{lib-available:frama-c-pdg.core} "\n")
+  )
+  )
+)
+
 (library
   (name Sparecode)
   (public_name frama-c-sparecode.core)

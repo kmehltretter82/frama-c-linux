@@ -1,3 +1,13 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Qed:" %{lib-available:qed} "\n")
+          (echo "  - Zarith:" %{lib-available:zarith} "\n")
+  )
+  )
+)
+
 (library
   (name qed)
   (public_name qed)

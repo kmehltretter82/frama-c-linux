@@ -3,6 +3,9 @@
  (deps (universe))
  (action (progn
           (echo "From:" %{lib-available:frama-c-from.core} "\n")
+          (echo "  - Callgraph:" %{lib-available:frama-c-callgraph.core} "\n")
+          (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
+          (echo "  - Postdominators:" %{lib-available:frama-c-postdominators.core} "\n")
   )
   )
 )

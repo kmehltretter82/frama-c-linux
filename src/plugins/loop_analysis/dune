@@ -1,7 +1,16 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Loop-Analysis:" %{lib-available:frama-c-loop-analysis.core} "\n")
+          (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
+  )
+  )
+)
+
 ( library
   (name LoopAnalysis)
   (public_name frama-c-loop-analysis.core)
-  (modules options region_analysis_sig region_analysis region_analysis_stmt loop_analysis register LoopAnalysis)
   (private_modules region_analysis_sig region_analysis region_analysis_stmt loop_analysis register)
   (flags -open Frama_c_kernel :standard)
   (libraries frama-c.kernel frama-c-eva.core)

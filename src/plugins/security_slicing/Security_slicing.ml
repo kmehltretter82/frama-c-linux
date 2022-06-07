@@ -24,6 +24,11 @@
 
 (** No function is directly exported: they are dynamically registered. *)
 
+(** {2 Internal use only} *)
+
+module Components = Components
+module Security_slicing_parameters = Security_slicing_parameters
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

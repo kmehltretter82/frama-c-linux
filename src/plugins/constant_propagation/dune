@@ -1,3 +1,13 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Constant Propagation:" %{lib-available:frama-c-constant_propagation.core} "\n")
+          (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
+  )
+  )
+)
+
 ( library
   (name Constant_Propagation)
   (public_name frama-c-constant_propagation.core)

@@ -36,6 +36,12 @@ module Register: sig
 
   val print_all: (unit -> unit)
   (** Print all the occurrence of each variable declarations. *)
+
+  (* {2 Internal Use Only}*)
+
+  type access_type = Read | Write | Both
+
+  val classify_accesses: kernel_function option * kinstr *lval -> access_type
 end = Register
 
 (*

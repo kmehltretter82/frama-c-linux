@@ -21,35 +21,41 @@
 (**************************************************************************)
 
 (** Computations of the statements that write a given memory zone. *)
-include (struct
-  module Writes = Writes
-  module Reads = Reads
-end : sig
-           module Writes: sig
+include
+  (struct
+    module Writes = Writes
+    module Reads = Reads
+  end :
+   sig
+     module Writes: sig
 
-             (** Given an effect [e], something is directly modified by [e] (through an
-                 affectation, or through a call to a leaf function) if [direct] holds, and
-                 indirectly (through the effects of a call) otherwise.  *)
-             type effects = {
-               direct: bool (** Direct affectation [lv = ...], or modification through
-                                a call to a leaf function. *);
-               indirect: bool (** Modification inside the body of called function
-                                  [f(...)]*);
-             }
+       (** Given an effect [e], something is directly modified by [e] (through an
+           affectation, or through a call to a leaf function) if [direct] holds, and
+           indirectly (through the effects of a call) otherwise.  *)
+       type effects = {
+         direct: bool (** Direct affectation [lv = ...], or modification through
+                          a call to a leaf function. *);
+         indirect: bool (** Modification inside the body of called function
+                            [f(...)]*);
+       }
 
-             val compute: Locations.Zone.t -> (Cil_types.stmt * effects) list
-             (** [compute z] finds all the statements that modifies [z], and for each
-                 statement, indicates whether the modification is direct or indirect. *)
+       val compute: Locations.Zone.t -> (Cil_types.stmt * effects) list
+       (** [compute z] finds all the statements that modifies [z], and for each
+           statement, indicates whether the modification is direct or indirect. *)
 
-           end
+     end
 
-           (** Computations of the statements that read a given memory zone. *)
-           module Reads: sig
+     (** Computations of the statements that read a given memory zone. *)
+     module Reads: sig
 
-             val compute: Locations.Zone.t -> (Cil_types.stmt * Writes.effects) list
-             (** [compute z] finds all the statements that read [z]. The [effects]
-                 information indicates whether the read occur on the given statement,
-                 or through an inner call for [Call] instructions. *)
+       val compute: Locations.Zone.t -> (Cil_types.stmt * Writes.effects) list
+       (** [compute z] finds all the statements that read [z]. The [effects]
+           information indicates whether the read occur on the given statement,
+           or through an inner call for [Call] instructions. *)
 
-           end
-         end)
+     end
+   end)
+
+(** {2 Internal use only} *)
+
+module Options = Options

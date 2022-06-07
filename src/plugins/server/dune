@@ -1,3 +1,13 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Server:" %{lib-available:frama-c-server.core} "\n")
+          (echo "  - (optional) Zmq:" %{lib-available:zmq} "\n")
+  )
+  )
+)
+
 ( library
   (name server)
   (public_name frama-c-server.core)

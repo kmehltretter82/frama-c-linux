@@ -1,3 +1,13 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "NonTerm:" %{lib-available:frama-c-nonterm.core} "\n")
+          (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
+  )
+  )
+)
+
 ( library
   (name nonterm)
   (public_name frama-c-nonterm.core)

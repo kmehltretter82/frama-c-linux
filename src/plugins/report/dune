@@ -1,7 +1,15 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Report:" %{lib-available:frama-c-report.core} "\n")
+  )
+  )
+)
+
 ( library
   (name report)
   (public_name frama-c-report.core)
-  (modules report_parameters scan dump csv register classify Report)
   (private_modules report_parameters scan dump csv register classify)
   (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel)

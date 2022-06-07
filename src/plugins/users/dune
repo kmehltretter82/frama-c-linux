@@ -1,3 +1,13 @@
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Users:" %{lib-available:frama-c-users.core} "\n")
+          (echo "  - Callgraph:" %{lib-available:frama-c-callgraph.core} "\n")
+  )
+  )
+)
+
 (library
   (name Users)
   (public_name frama-c-users.core)
