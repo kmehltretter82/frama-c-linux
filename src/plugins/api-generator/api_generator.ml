@@ -559,20 +559,22 @@ let makePackage pkg path fmt =
 (* -------------------------------------------------------------------------- *)
 
 let generate () =
-  begin
-    Pkg.iter
-      begin fun pkg ->
-        let path = pkg_path ~plugin:pkg.p_plugin ~package:pkg.p_package in
-        Self.feedback "Package %s" path ;
-        let out = OUT.get () in
-        let file = Printf.sprintf "%s/%s/index.ts" out path in
-        let dir = Filename.dirname file in
-        if not (Sys.file_exists dir && Sys.is_directory dir) then
-          Extlib.mkdir ~parents:true dir 0o755 ;
-        Command.print_file file (makePackage pkg path) ;
-      end
-  end
+  if TSC.get () then
+    begin
+      Pkg.iter
+        begin fun pkg ->
+          let path = pkg_path ~plugin:pkg.p_plugin ~package:pkg.p_package in
+          Self.feedback "Package %s" path ;
+          let out = OUT.get () in
+          let file = Printf.sprintf "%s/%s/index.ts" out path in
+          let dir = Filename.dirname file in
+          if not (Sys.file_exists dir && Sys.is_directory dir) then
+            Extlib.mkdir ~parents:true dir 0o755 ;
+          Command.print_file file (makePackage pkg path) ;
+        end
+    end
 
-let () = Db.Main.extend generate
+let () =
+  Db.Main.extend generate
 
 (* -------------------------------------------------------------------------- *)
