@@ -64,15 +64,14 @@ import { tag } from 'frama-c/kernel/api/data';
 
 const getConfig_internal: Server.GetRequest<
   null,
-  { pluginpath: string[], libdir: string, datadir: string, version: string }
+  { pluginpath: string[], datadir: string[], version: string }
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.services.getConfig',
   input:  Json.jNull,
   output: Json.jObject({
             pluginpath: Json.jList(Json.jString),
-            libdir: Json.jFail(Json.jString,'String expected'),
-            datadir: Json.jFail(Json.jString,'String expected'),
+            datadir: Json.jList(Json.jString),
             version: Json.jFail(Json.jString,'String expected'),
           }),
   signals: [],
@@ -80,7 +79,7 @@ const getConfig_internal: Server.GetRequest<
 /** Frama-C Kernel configuration */
 export const getConfig: Server.GetRequest<
   null,
-  { pluginpath: string[], libdir: string, datadir: string, version: string }
+  { pluginpath: string[], datadir: string[], version: string }
   >= getConfig_internal;
 
 const load_internal: Server.SetRequest<string,string | undefined> = {

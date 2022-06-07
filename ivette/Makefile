@@ -107,8 +107,7 @@ update-distrib-files:
 api:
 	@echo "[Ivette] Generating TypeScript API"
 	@find src/frama-c -path "*/api/*" -name "*.ts" -exec rm -f {} \;
-	../bin/frama-c.byte \
-		-load-module src/frama-c/api_generator.ml \
+	../bin/frama-c \
 		-server-tsc
 	@find src/frama-c -path "*/api/*" -name "*.ts" \
 		-exec headache \
