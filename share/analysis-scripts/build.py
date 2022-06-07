@@ -23,7 +23,9 @@
 ##########################################################################
 
 """This script uses blug and a build_commands.json file to produce an
-analysis GNUmakefile, as automatically as possible."""
+analysis GNUmakefile, as automatically as possible.
+NOTE: the tool used to produce such files (blug) is not yet publicly
+available."""
 
 import argparse
 import json
