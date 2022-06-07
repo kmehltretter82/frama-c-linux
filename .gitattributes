@@ -9,6 +9,9 @@ Changelog merge=union
 ###############
 # built-in macro that also unsets the "text" and "diff" attributes
 
+*.eps binary
+*.ps binary
+
 *.pdf binary
 
 #########################
