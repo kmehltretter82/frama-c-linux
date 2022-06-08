@@ -317,3 +317,19 @@ tr:first-of-type > .eva-table-callsite-box {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Domains state print                                                --- */
+/* -------------------------------------------------------------------------- */
+
+.domain-state-box {
+    margin: 6px;
+}
+
+.domain-state {
+    user-select: text;
+    overflow: auto;
+    padding: 6px;
+    margin-top: 6px;
+    background-color: var(--background-report);
+}
+
+/* -------------------------------------------------------------------------- */
