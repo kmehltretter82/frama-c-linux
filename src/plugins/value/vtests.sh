@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/bin/bash -eu
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -21,71 +21,41 @@
 #                                                                        #
 ##########################################################################
 
-# Finds duplicate adjacent words.
+if [ -z ${TARGETS+x} ]; then
+    TARGETS="float value idct builtins"
+fi
+if [ -z ${CONFIGS+x} ]; then
+    CONFIGS="apron equality bitwise symblocs gauges octagon multidim"
+fi
+ARGS="${@-}"
 
-use strict ;
-
-my $DupCount = 0 ;
-
-if (!@ARGV) {
-  print "usage: dups <file> ...\n" ;
-  exit ;
+# has_target returns 0 if at least one of the arguments is a target
+# (i.e. not an option such as "-j 8"). If so, do not run tests
+# for all default targets, only for the specified target(s)
+has_target=0
+# sets has_target=0
+function has_target() {
+    local __has_target=1
+    for f in $@; do
+        __re="\\b$f\\b" # match argument as whole word
+        if [[ "$f" =~ \.[ci]$ || \
+            ( "$f" =~ ^[A-Za-z] && "${TARGETS[@]}" =~ $__re ) ]]; then
+            __has_target=0
+        fi
+    done
+    return $__has_target
 }
 
-while (1) {
-  my $FileName = shift @ARGV ;
+if has_target ${ARGS[@]}; then
+    TARGETS_AND_ARGS="${ARGS[@]}"
+else
+    TARGETS_AND_ARGS="${TARGETS[@]} ${ARGS[@]}"
+fi
 
-  # Exit code = number of duplicates found.
-  exit $DupCount if (!$FileName) ;
-
-  open FILE, $FileName or die $!;
-
-  my $LastWord = "" ;
-  my $LineNum = 0 ;
-
-  while (<FILE>) {
-    chomp ;
-
-    $LineNum ++ ;
-
-    my @words = split (/(\W+)/) ;
-
-    foreach my $word (@words) {
-      # Skip spaces:
-      next if $word =~ /^\s*$/ ;
-
-      # Skip punctuation:
-      if ($word =~ /^\W+$/) {
-        $LastWord = "" ;
-        next ;
-      }
-
-      # Skip numbers
-      if ($word =~ /^\d+$/) {
-        $LastWord = "" ;
-        next ;
-      }
-
-      # Found a dup?
-      # note: some words are ignored, such as "long long",
-      # or some variable/field names
-      if ($word eq $LastWord && length($word) >= 3 &&
-          !($word eq "lexbuf") &&
-          !($word eq "ofs") &&
-          !($word eq "addr") &&
-          !($word eq "ros") &&
-          !($word eq "end") &&
-          !($word eq "args") &&
-          !($word eq "pos") &&
-          !($word eq "long")) {
-        print "$FileName:$LineNum $word\n" ;
-        $DupCount ++ ;
-      } # Thanks to Sean Cronin for tip on case.
-
-      # Mark this as the last word:
-      $LastWord = $word ;
-    }
-  }
-
-  close FILE ;
-}
+echo "CONFIGS: ${CONFIGS[@]}"
+for config in ${CONFIGS[@]}
+do
+    set -x
+    ./bin/ptests.opt -config $config ${TARGETS_AND_ARGS[@]}
+    { set +x; } 2>&-
+done

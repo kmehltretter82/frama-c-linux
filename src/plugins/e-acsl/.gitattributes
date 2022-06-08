@@ -1,0 +1,69 @@
+###############################################
+# HEADER_SPEC: CEA_LGPL_OR_PROPRIETARY.E_ACSL #
+###############################################
+
+configure.ac header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+
+Makefile header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+Makefile.in header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+
+*.c header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+*.h header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+
+*.ml header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+*.mli header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+
+*.sh header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+
+/man/e-acsl-gcc.sh.1 header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+
+/scripts/e-acsl-gcc.sh.comp header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+/scripts/e-acsl-gcc.sh.comp header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+
+########################
+# HEADER_SPEC: .ignore #
+########################
+
+README header_spec=.ignore
+
+/.clang-format header_spec=.ignore
+/doc/Makefile.common header_spec=.ignore
+/doc/support/MakeLaTeXModern header_spec=.ignore
+/doc/Changelog header_spec=.ignore
+/doc/doxygen/doxygen.cfg.in header_spec=.ignore
+/doc/refman/*.tex header_spec=.ignore
+/doc/userman/*.tex header_spec=.ignore
+
+/examples/demo/TODO header_spec=.ignore
+/examples/ensuresec/push-alerts/.env-example header_spec=.ignore
+
+/headers/close-source/* header_spec=.ignore
+/headers/open-source/* header_spec=.ignore
+
+/license/* header_spec=.ignore
+
+# Becarefull at the order with the previous lines
+/contrib/**/*.c header_spec=.ignore
+
+/doc/**/Makefile header_spec=.ignore
+/doc/**/*.ml header_spec=.ignore
+/doc/**/*.mll header_spec=.ignore
+/doc/**/*.c header_spec=.ignore
+/doc/**/*.i header_spec=.ignore
+
+/examples/**/Makefile header_spec=.ignore
+/examples/**/*.c header_spec=.ignore
+/examples/**/*.i header_spec=.ignore
+/examples/**/*.ml header_spec=.ignore
+/examples/**/*.sh header_spec=.ignore
+/examples/**/*.py header_spec=.ignore
+
+/tests/test_config header_spec=.ignore
+/tests/test_config_dev header_spec=.ignore
+/tests/**/* header_spec
+
+/tests/wrapper.sh header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+/tests/E_ACSL_test.ml header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+/contrib/libdlmalloc/dlmalloc.* header_spec=MODIFIED_DLMALLOC
+/share/e-acsl/internals/e_acsl_rtl_io.* header_spec=MODIFIED_SPARETIMELABS
+

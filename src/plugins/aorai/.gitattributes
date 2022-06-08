@@ -1,0 +1,21 @@
+###########################
+# HEADER_SPEC: AORAI_LGPL #
+###########################
+
+/configure.ac header_spec=AORAI_LGPL
+
+/Makefile header_spec=AORAI_LGPL
+/Makefile.in header_spec=AORAI_LGPL
+
+*.ml header_spec=AORAI_LGPL
+*.mli header_spec=AORAI_LGPL
+*.mll header_spec=AORAI_LGPL
+*.mly header_spec=AORAI_LGPL
+
+########################
+# HEADER_SPEC: .ignore #
+########################
+
+/INSTALL header_spec=.ignore
+/VERSIONS.txt header_spec=.ignore
+/tests/**/* header_spec=.ignore

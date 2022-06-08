@@ -1,6 +1,56 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of Frama-C.                                         *)
+(*                                                                        *)
+(*  Copyright (C) 2007-2022                                               *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+type spec_format = Sep1Line1 (* <space>* FileName <space>* `:` <space>* HeaderId <space>* <eol> *)
+                 | Sep2Line1 (* <space>* FileName <space>* `:` <space>* AttributeName <space>*`:` <space>*HeaderId <space>* <eol> *)
+                 | Line3     (* FileName <eol> AttributeName <eol> HeaderId <eol> *)
+                 | Zero3     (* FileName <null> AttributeName <null> HeaderId <null> *)
+(* Sep1Line1
+   > cat headers/header_spec.txt | headers/hdrck --stdin -spec-format=2-fields-by-line -header-dirs headers/open-source
+*)
+(* Sep2Line1
+   > cat headers/header_spec.txt | tr ':' '\n' | xargs -n 2 printf " %s : header_spec : %s \n" > x-3-fields-by-line.txt
+   > cat x-3-fields-by-line.txt | headers/hdrck --stdin -spec-format=3-fields-by-line -header-dirs headers/open-source
+*)
+(* Line3
+   > cat headers/header_spec.txt | tr ':' '\n' | xargs -n 2 printf "%s\nheader_spec\n%s\n" > x-3-lines.txt
+   > cat x-3-lines.txt  | headers/hdrck --stdin -spec-format=3-lines -header-dirs headers/open-source
+*)
+(* Zero
+   > cat headers/header_spec.txt | tr ':' '\n' | xargs -n 2 printf "%s\nheader_spec\n%s\n" | tr '\n' '\0' > x-3-zeros.txt
+   > cat x-3-zeros.txt  | headers/hdrck --stdin -z -header-dirs headers/open-source
+*)
+
+(* From the git archive
+   > git ls-files -z | git check-attr --stdin -z header_spec \
+     | headers/hdrck --stdin -z -header-dirs headers/open-source -header-dirs src/plugins/e-acsl/headers/open-source
+*)
+
 (* Parameters settable from command line *)
 let debug_flag = ref false
 and spec_files = ref []
+and from_stdin = ref false
+and zero_stdin = ref false
+and spec_format = ref Sep1Line1
 and header_dirs = ref []
 and forbidden_headers = ref []
 and root_dir = ref (Sys.getcwd ())
@@ -8,7 +58,8 @@ and distrib_file = ref None
 and header_except_file = ref None
 and headache_config_file = ref "headers/headache_config.txt"
 and exit_on_warning = ref false
-and exit_on_error = ref true (* only set to false for debugging purposes *)
+and exit_on_error = ref true (* only settable to false for debugging purposes *)
+
 
 type mode =
   | Check
@@ -96,18 +147,27 @@ let get_tmp_dirname () = match !tmp_dirname with
     dirname
   | Some dirname -> dirname
 
+let get_string_null (ic:in_channel) =
+  let rec aux acc =
+    let c = input_char ic in
+    if c <> '\000' then aux (c :: acc) else acc
+  in
+  let tab = Array.of_list (List.rev (aux [])) in
+  String.init (Array.length tab) (Array.get tab)
+
+
 (* Reads [nlines] lines of a file named [filename].
  *
  * Defaults to reading the file entirely since any integer will ever be greater
  * or equal than [max_int].
  *)
-let read_lines ?nlines:(nlines=max_int) filename =
+let read_lines ?nlines:(nlines=max_int) get_line filename =
   let lines = ref [] in
-  let ic = open_in filename in
+  let ic = if filename = "--stdin" then stdin else open_in filename in
   let n = ref 1 in
   try
     while !n <= nlines do
-      lines := input_line ic :: !lines;
+      lines := get_line ic :: !lines;
       incr n
     done;
     close_in ic;
@@ -123,7 +183,10 @@ let extract_sub_dir filename =
   | sub_dir :: _ :: _ -> sub_dir
   | _ -> ""
 
-let colon_reg_exp = Str.regexp ":"
+let split_line_entry =
+  let colon_reg_exp = Str.regexp ":" in
+  fun (line:string) ->
+    List.map String.trim (Str.split colon_reg_exp line)
 
 module StringSet = struct
   include Set.Make(struct type t = string let compare = String.compare end)
@@ -143,68 +206,103 @@ end
    @param license_name
 *)
 let add_spec_entry (ignored_files: StringSet.t ref) (spec_tab: (string, string) Hashtbl.t)
-    idx (file_name : string) (license_name: string) =
-  if license_name <> ".ignore" then begin
-    try
-      let previous_entry = Hashtbl.find spec_tab file_name in
-      if license_name <> previous_entry then
+    idx ~(file_name : string) ~(license_name: string) =
+  match license_name with
+  | ("set" | "unset" | "unspecified") ->
+    warn (* error ~exit_value:9 *)
+      "%s: invalid specification (%d) for that file (git attribute value=%s)@."
+      file_name idx license_name
+  | ".ignore" -> begin
+      try
+        let previous_entry = Hashtbl.find spec_tab file_name in
         error ~exit_value:6
           "%s: specification duplicated (%d) with a different license name (%s and %s)@."
-          file_name idx license_name previous_entry
-      else if StringSet.mem file_name !ignored_files then
-        error ~exit_value:6
-          "%s: specification duplicated (%d) with a different license name (%s and %s)@."
-          file_name idx license_name ".ignore"
-      else warn "%s: specification duplicated (%d)@." file_name idx
-    with Not_found -> Hashtbl.add spec_tab file_name license_name
-  end
-  else begin
-    try
-      let previous_entry = Hashtbl.find spec_tab file_name in
-      error ~exit_value:6
-        "%s: specification duplicated (%d) with a different license name (%s and %s)@."
-        file_name idx previous_entry ".ignore"
-    with Not_found ->
-      if StringSet.mem file_name !ignored_files then
-        warn "%s: specification duplicated (%d)@." file_name idx
-      else ignored_files := StringSet.add file_name !ignored_files
-  end
+          file_name idx previous_entry ".ignore"
+      with Not_found ->
+        if StringSet.mem file_name !ignored_files then
+          warn "%s: specification duplicated (%d)@." file_name idx
+        else ignored_files := StringSet.add file_name !ignored_files
+    end
+  | _ -> begin
+      try
+        let previous_entry = Hashtbl.find spec_tab file_name in
+        if license_name <> previous_entry then
+          error ~exit_value:6
+            "%s: specification duplicated (%d) with a different license name (%s and %s)@."
+            file_name idx license_name previous_entry
+        else if StringSet.mem file_name !ignored_files then
+          error ~exit_value:6
+            "%s: specification duplicated (%d) with a different license name (%s and %s)@."
+            file_name idx license_name ".ignore"
+        else warn "%s: specification duplicated (%d)@." file_name idx
+      with Not_found ->
+        if StringSet.mem file_name !ignored_files then
+          error ~exit_value:6
+            "%s: specification duplicated (%d) with a different license name (%s and %s)@."
+            file_name idx license_name ".ignore"
+        else Hashtbl.add spec_tab file_name license_name
+    end
 
 (* Reads the contents of the specification.
-   Each line of the file is assumed to contain one association of the form:
-   <filename_id>\s+:\s+<license_id>
-   where:
-   - \s matches any whitespace character
-   - identifiers can contain anything but whitespaces.
-
+   Each line of the file using the [spec_format].
    Lines that do not match this pattern are ignored.
 
    @param spec_tab (file -> license header name) hashtable to update
    @param ignored_files set of ignored files to update.
 *)
-let read_specs (ignored_files: StringSet.t ref) (spec_tab: (string, string) Hashtbl.t) (spec_file : string)  =
-  debug "Specification file: %s@."  spec_file;
-  job_head "Checking format of specification file %s... @?" spec_file;
-  let spec_lines = read_lines spec_file in
-  let sub_dir = extract_sub_dir spec_file in
-  List.iteri
-    (fun i spec_line ->
-       match Str.split colon_reg_exp spec_line with
-       | filename :: [license_name] ->
-         let filename = String.trim filename in
-         let filename =
-           if sub_dir <> "" then path_concat sub_dir filename else filename
-         in
-         let filename = path_concat !root_dir filename in
-         let license_name = String.trim license_name in
-         add_spec_entry ignored_files spec_tab i filename license_name
-       | _ ->
-         warn "%s (%d): bad line format@." spec_file i
-    ) spec_lines;
+let read_specs spec_format (ignored_files: StringSet.t ref) (spec_tab: (string, string) Hashtbl.t) (spec_file : string option) =
+  let spec_fname = match spec_file with None -> "--stdin" | Some filename -> filename in
+  debug "Specification file: %s@." spec_fname ;
+  job_head "Checking format of specification file %s... @?" spec_fname;
+  let sub_dir = extract_sub_dir spec_fname in
+  let add_spec, get_line =
+    let add_spec_item i ~file_name ~license_name =
+      let file_name =
+        if sub_dir <> "" then path_concat sub_dir file_name else file_name
+      in
+      let file_name = path_concat !root_dir file_name in
+      add_spec_entry ignored_files spec_tab i ~file_name ~license_name
+    in
+    let add_spec_Sep1Line1 spec_lines =
+      List.iteri
+        (fun i spec_line ->
+           match split_line_entry spec_line with
+           | file_name :: [license_name] ->
+             add_spec_item i ~file_name ~license_name
+           | _ -> warn "%s (%d): bad line format@." spec_fname (i+1)
+        ) spec_lines
+    and add_spec_Sep2Line1 spec_lines =
+      List.iteri
+        (fun i spec_line ->
+           Format.printf "%s@." spec_line;
+           match split_line_entry spec_line with
+           | file_name :: "header_spec" :: [license_name] ->
+             add_spec_item i ~file_name ~license_name
+           | _ :: attr :: [_] -> warn "%s (%d): bad attribute name: %s@." spec_fname (i+1) attr
+           | _ ->                warn "%s (%d): bad line format@." spec_fname (i+1)
+        ) spec_lines
+    and add_spec_Sep0Line3 spec_lines =
+      let rec add_spec i = function
+        | [] -> ()
+        | file_name :: "header_spec" :: license_name :: spec_lines ->
+          add_spec_item i ~file_name ~license_name ;
+          add_spec (i+1) spec_lines
+        | _ :: attr :: _ :: _ ->
+          warn "%s (%d): (3-upplet: %d) attribute name: %s@." spec_fname ((3*i)+1) (i+1) attr
+        | _ -> warn "%s (%d): (3-upplet: %d) bad format@." spec_fname ((3*i)+1) (i+1)
+      in add_spec 0 spec_lines
+    in match spec_format with
+    | Sep1Line1 -> add_spec_Sep1Line1,input_line
+    | Sep2Line1 -> add_spec_Sep2Line1,input_line
+    | Line3     -> add_spec_Sep0Line3,input_line
+    | Zero3     -> add_spec_Sep0Line3, get_string_null
+  in
+  let spec_lines = read_lines get_line spec_fname in
+  add_spec spec_lines;
   job_done ()
 
 let coma_reg_exp = Str.regexp ","
-let set_cumulative (name:string) (value: string list ref) (set : string) =
+let set_cumulative ~(name:string) (value: string list ref) ~(set : string) =
   debug "Register cumulative %s option: %s" name set;
   value := List.fold_left
       (fun acc v -> let v = String.trim v in if v="" then acc else v::acc)
@@ -338,7 +436,7 @@ let check_spec_discrepancies
       ) specs ;
   if !n > 0 then begin
     error ~exit_value:4 "@[<v 2>%a%d / %d files with bad headers@]@."
-      (fun ppf l ->
+      (fun _ppf l ->
          List.iter
            (fun (file, hdr_type) ->
               error_fmt "%s : header differs from spec %s@."
@@ -352,7 +450,7 @@ let check_spec_discrepancies
 
 let check_forbidden_headers (forbidden_headers:StringSet.t) header_specifications (distributed_files:StringSet.t) =
   if not (StringSet.is_empty forbidden_headers) then begin
-    job_head "Checking that all distributed files have no forbidden header specification @?";
+    job_head "Checking that all distributed files have no forbidden header specification... @?";
     let forbidden = ref [] in
     let n = ref 0 in
     StringSet.iter
@@ -365,7 +463,7 @@ let check_forbidden_headers (forbidden_headers:StringSet.t) header_specification
       distributed_files;
     if !forbidden <> [] then
       error ~exit_value:4 "@[<v 2>%a%d / %d files with bad headers@]@."
-        (fun ppf l ->
+        (fun _ppf l ->
            List.iter
              (fun (file, hdr_type) ->
                 error_fmt "%s : forbidden header %s@."
@@ -488,42 +586,59 @@ let executable_name = Sys.argv.(0)
 let umsg =
   Format.sprintf "Usage: %s [options] <header spec files>@.%s"
     executable_name
-    ("The line format of each <header spec files> is:\n" ^
-     "  <source file> ':' <license definition>\n" ^
+    ("The default format of each <header spec files> is \"2-fields-by-line\".\n" ^
+     "The different formats are:\n" ^
+     "- \"2-fields-by-line\" format:\n\t<space>* <source file> <space>* ':' <space>* <license definition> <space>* <eol>\n" ^
+     "- \"3-fields-by-line\" format:\n\t<space>* <source file> <space>* ':' <space>* 'header_spec' <space>* ':' <space>* <license definition> <space>* <eol>\n" ^
+     "- \"3-lines\" format:\n\t<source file> <eol> 'header_spec' <eol> <license definition> <eol>\n" ^
+     "- \"3-zeros\" format:\n\t<source file> <zero> 'header_spec' <zero> <license definition> <zero>\n" ^
      "where <license definition> is '.ignore' or a license definition file.\n" ^
      "The location directory of the license definitions can be specified using the -header-dirs option.\n" ^
-     "When the name of a <header spec file> has the form 'path/./header-spec-file',\n"^
-     "then the <source file> names that it contains\n" ^
+     "When the name of a <header spec file> has the form 'path/./header-spec-file', "^
+     "then the <source file> names that it contains " ^
      "are considered beeing relative to given 'path'.\n" ^
-     "That is done before processing the option '-C <dir>'." )
+     "That is done before processing the option '-C <dir>'.'\n" ^
+     "List of the options:")
 
 let rec argspec = [
   "--help", Arg.Unit print_usage ,
   " print this option list and exits";
+  "--stdin", Arg.Set from_stdin,
+  " extract an header spec from the standard input in addition to the given header spec files";
   "-help", Arg.Unit print_usage ,
   " print this option list and exits";
   "-debug", Arg.Set debug_flag,
   " enable debug messages";
-  "-forbidden-headers", Arg.String (set_cumulative "-forbidden-headers" forbidden_headers) ,
-  " none of the distributed files may have one of these license name";
-  "-header-dirs", Arg.String (set_cumulative "-header-dirs" header_dirs),
-  " add comma separated list of directories to search for license header definitions [.]";
+
+  "-forbidden-headers", Arg.String (fun set -> set_cumulative ~name:"-forbidden-headers" forbidden_headers ~set) ,
+  "<license name>,... \t none of the checked files may have one of the <license name> []";
+  "-header-dirs", Arg.String (fun set -> set_cumulative ~name:"-header-dirs" header_dirs ~set),
+  "<directory>,... \t list of <directory> to search for license header definitions []";
   "-distrib-file", Arg.String (set_opt distrib_file),
-  " set filename with a list of files set for distribution";
+  "<filename> \t considers only the files listed into the <filename>";
   "-header-except-file", Arg.String (set_opt header_except_file),
-  " set filename with a list of files whose headers do not need checking";
+  "<filename> \t does not look at the files listed into the <filename>";
   "-headache-config-file", Arg.Set_string headache_config_file,
-  Format.sprintf " set headache configuration file [%s]" !headache_config_file;
+  Format.sprintf "<filename> \t set headache configuration file [%s]" !headache_config_file;
   "-no-exit-on-error", Arg.Unit (fun () -> exit_on_error := false),
-  " do not exit on errors ";
+  " does not exit on errors ";
   "-exit-on-warning", Arg.Set exit_on_warning,
   " considers warnings as errors (anyway, forces exit on errors too)";
   "-update", Arg.Unit (fun () -> mode := Update),
-  " update headers w.r.t to the <header spec file>";
+  " updates headers w.r.t to the <header spec file>";
   "-C", Arg.Set_string root_dir,
   Format.sprintf
-    "  prepend <dir> to filenames in header specification [%s] "
+    "<dir> \t prepends <dir> to filenames in header specification [%s] "
     !root_dir;
+  "-spec-format", Arg.String (function
+      | "2-fields-by-line" -> spec_format := Sep1Line1
+      | "3-fields-by-line" -> spec_format := Sep2Line1
+      | "3-lines" ->  spec_format := Line3
+      | "3-zeros" ->  spec_format := Zero3
+      | s -> Format.printf "invalid spec format: %s@." s ; print_usage ()),
+    "<format>\t \"2-fields-by-line\"|\"3-fields-by-line\"|\"3-lines\"|\"3-zeros\"";
+  "-z", Arg.Set zero_stdin,
+  " force to use the spec format \"3-zeros\" when reading from stdin";
 ]
 
 and sort argspec =
@@ -545,25 +660,28 @@ let _ =
   check_headache_config_file ();
   begin
     match !spec_files, !distrib_file, !header_except_file with
-    | [], _, _ ->
+    | [], _, _ when not !from_stdin ->
       Format.printf "Please set a specification file@\n@.";
       print_usage ();
     | spec_files, distrib_file_opt, header_except_opt ->
       let specified_files = Hashtbl.create 256 in
       let ignored_files = ref StringSet.empty in
-      List.iter (read_specs ignored_files specified_files) spec_files;
+      if !from_stdin then read_specs (if !zero_stdin then Zero3 else !spec_format) ignored_files specified_files None;
+      List.iter (fun f -> read_specs !spec_format ignored_files specified_files (Some f)) spec_files;
+      Format.printf "- ignored=%d@.- specified=%d@." (StringSet.cardinal !ignored_files) (Hashtbl.length specified_files);
       match !mode with
       | Check ->
         let stringset_from_opt_file = function
           | None -> StringSet.empty
           | Some file ->
-            let lines = read_lines file in
+            let lines = read_lines input_line file in
             List.fold_left
               (fun s l -> StringSet.add (path_concat !root_dir l) s)
               StringSet.empty lines
         in
         let distributed_files = stringset_from_opt_file distrib_file_opt in
         let header_exception_files = stringset_from_opt_file header_except_opt in
+        Format.printf "- excepted=%d@.- distributed=%d@." (StringSet.cardinal header_exception_files) (StringSet.cardinal distributed_files);
         check !ignored_files specified_files distributed_files header_exception_files
       | Update ->
         update_headers specified_files;

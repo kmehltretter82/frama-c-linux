@@ -1,0 +1,5 @@
+########################
+# HEADER_SPEC: .ignore #
+########################
+
+/META.in header_spec=.ignore

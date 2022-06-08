@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/bin/bash
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -21,71 +21,32 @@
 #                                                                        #
 ##########################################################################
 
-# Finds duplicate adjacent words.
+# Script for profiling Frama-C with callgrind (a valgrind tool).
+# Note: execution time with valgrind is about 15x-20x slower.
+#
+# Use this script at the root of the repository, so local_export.sh can be found
+# in bin.
+# For more focused results, you can activate the profiling only after entering
+# a specific function. For instance, to only profile Eva, add
+#
+#   --toggle-collect='*Eva__Analysis__force_compute*'
+#
+# to the command line below.
+#
+# Example of invocation :
+#
+#   devel_tools/frama-c-callgrind tests/idct/*.c -eva -float-normal -no-warn-signed-overflow
+#
+# This creates a 'callgrind.out' file (Callgrind format), which can be viewed
+# with a tool such as kcachegrind:
+#
+#   kcachegrind callgrind.out
 
-use strict ;
+BASH_ARGV0="bin/frama-c" # hackish way to tell local_export that its dir is bin
 
-my $DupCount = 0 ;
+. bin/local_export.sh
 
-if (!@ARGV) {
-  print "usage: dups <file> ...\n" ;
-  exit ;
-}
-
-while (1) {
-  my $FileName = shift @ARGV ;
-
-  # Exit code = number of duplicates found.
-  exit $DupCount if (!$FileName) ;
-
-  open FILE, $FileName or die $!;
-
-  my $LastWord = "" ;
-  my $LineNum = 0 ;
-
-  while (<FILE>) {
-    chomp ;
-
-    $LineNum ++ ;
-
-    my @words = split (/(\W+)/) ;
-
-    foreach my $word (@words) {
-      # Skip spaces:
-      next if $word =~ /^\s*$/ ;
-
-      # Skip punctuation:
-      if ($word =~ /^\W+$/) {
-        $LastWord = "" ;
-        next ;
-      }
-
-      # Skip numbers
-      if ($word =~ /^\d+$/) {
-        $LastWord = "" ;
-        next ;
-      }
-
-      # Found a dup?
-      # note: some words are ignored, such as "long long",
-      # or some variable/field names
-      if ($word eq $LastWord && length($word) >= 3 &&
-          !($word eq "lexbuf") &&
-          !($word eq "ofs") &&
-          !($word eq "addr") &&
-          !($word eq "ros") &&
-          !($word eq "end") &&
-          !($word eq "args") &&
-          !($word eq "pos") &&
-          !($word eq "long")) {
-        print "$FileName:$LineNum $word\n" ;
-        $DupCount ++ ;
-      } # Thanks to Sean Cronin for tip on case.
-
-      # Mark this as the last word:
-      $LastWord = $word ;
-    }
-  }
-
-  close FILE ;
-}
+valgrind \
+  --tool=callgrind --callgrind-out-file=callgrind.out --dump-instr=yes \
+  --separate-callers=2 --collect-jumps=yes --fn-skip='caml_*' \
+  $BINDIR/toplevel.opt "$@"

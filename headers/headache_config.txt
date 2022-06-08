@@ -1,3 +1,32 @@
+##########################################################################
+#                                                                        #
+#  This file is part of Frama-C.                                         #
+#                                                                        #
+#  Copyright (C) 2007-2022                                               #
+#    CEA (Commissariat à l'énergie atomique et aux énergies              #
+#         alternatives)                                                  #
+#                                                                        #
+#  you can redistribute it and/or modify it under the terms of the GNU   #
+#  Lesser General Public License as published by the Free Software       #
+#  Foundation, version 2.1.                                              #
+#                                                                        #
+#  It is distributed in the hope that it will be useful,                 #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
+#  GNU Lesser General Public License for more details.                   #
+#                                                                        #
+#  See the GNU Lesser General Public License version 2.1                 #
+#  for more details (enclosed in the file licenses/LGPLv2.1).            #
+#                                                                        #
+##########################################################################
+
+# note: the skip directive requires a filename starting by ".*"
+
+#############
+# This file #
+#############
+| "headache_config.txt"      -> frame open:"#" line:"#" close:"#"
+
 ##################
 # Objective Caml #
 ##################
@@ -27,13 +56,13 @@
 ############
 # Makefile #
 ############
+| ".*makefile.*" -> frame open:"#"  line:"#" close:"#"
 | ".*Make.*" -> frame open:"#"  line:"#" close:"#"
 | ".*\.mk" -> frame open:"#"  line:"#" close:"#"
 
 #################
 # Shell scripts #
 #################
-#note: the skip directive requires a filename starting by ".*" ??? 
 | "autocomplete_frama-c" -> frame open: "#" line: "#" close: "#"
 | "_frama-c" -> frame open: "#" line: "#" close: "#"
 | ".*_frama-c" -> skip match:"#compdef.*"
@@ -58,12 +87,29 @@
 | "frama-c.debug" -> frame open:"#"  line:"#" close:"#"
 | ".*frama-c.debug" -> skip match:"#!.*"
 
+#############
+# Git hooks #
+#############
+| "pre-commit" -> frame open:"#"  line:"#" close:"#"
+| ".*pre-commit" -> skip multiline_match: "#!.*" multiline_match: "# -\*-.*"
+
+###############
+# Zsh scripts #
+###############
+| ".*\.zsh" -> frame open:"#"  line:"#" close:"#"
+| ".*\.zsh" -> skip match:"#compdef .*"
+| "_frama-c" -> frame open:"#"  line:"#" close:"#"
+| ".*_frama-c" -> skip match:"#compdef .*"
+
 ################
 # Perl scripts #
 ################
 | ".*\.perl" -> frame open:"#"  line:"#" close:"#"
+| ".*\.perl" -> skip match:"#!.*"
 | "flamegraph.pl" -> frame open:"#"  line:"#" close:"#"
 | ".*flamegraph.pl" -> skip match:"#!.*"
+| "duplicates.pl" -> frame open:"#"  line:"#" close:"#"
+| ".*duplicates.pl" -> skip match:"#!.*"
 
 #########################
 # MS-Windows Resources #
