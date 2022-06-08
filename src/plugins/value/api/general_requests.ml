@@ -261,7 +261,7 @@ let _array =
     model
 
 
-(* ----- Analysis statistics -------------------------------------------- *)
+(* ----- Analysis statistics ------------------------------------------------ *)
 
 module AlarmCategory = struct
   open Server.Data
@@ -470,4 +470,71 @@ let _array =
     model
 
 
-(**************************************************************************)
+(* ----- Domains states ----------------------------------------------------- *)
+
+let compute_lval_deps request lval =
+  let zone = Results.lval_deps lval request in
+  Locations.Zone.get_bases zone
+
+let compute_expr_deps request expr =
+  let zone = Results.expr_deps expr request in
+  Locations.Zone.get_bases zone
+
+let compute_instr_deps request = function
+  | Set (lval, expr, _) ->
+    Base.SetLattice.join
+      (compute_lval_deps request lval)
+      (compute_expr_deps request expr)
+  | Local_init (vi, AssignInit (SingleInit expr), _) ->
+    Base.SetLattice.join
+      (Base.SetLattice.inject_singleton (Base.of_varinfo vi))
+      (compute_expr_deps request expr)
+  | _ -> Base.SetLattice.empty
+
+let compute_stmt_deps request stmt =
+  match stmt.skind with
+  | Instr (instr) -> compute_instr_deps request instr
+  | If (expr, _, _, _) -> compute_expr_deps request expr
+  | _ -> Base.SetLattice.empty
+
+let compute_marker_deps request = function
+  | Printer_tag.PStmt (_, stmt)
+  | PStmtStart (_, stmt) -> compute_stmt_deps request stmt
+  | PLval (_, _, lval) -> compute_lval_deps request lval
+  | PExp (_, _, expr) -> compute_expr_deps request expr
+  | PVDecl (_, _, vi) -> Base.SetLattice.inject_singleton (Base.of_varinfo vi)
+  | _ -> Base.SetLattice.empty
+
+let get_filtered_state request marker =
+  let bases = compute_marker_deps request marker in
+  match bases with
+  | Base.SetLattice.Top -> Results.print_states request
+  | Base.SetLattice.Set bases ->
+    if Base.Hptset.is_empty bases
+    then []
+    else Results.print_states ~filter:bases request
+
+let get_states marker =
+  let kinstr = Printer_tag.ki_of_localizable marker in
+  match kinstr with
+  | Kglobal -> []
+  | Kstmt stmt ->
+    let states_before = get_filtered_state (Results.before stmt) marker in
+    let states_after = get_filtered_state (Results.after stmt) marker in
+    match states_before, states_after with
+    | [], _ -> List.map (fun (name, after) -> name, "", after) states_after
+    | _, [] -> List.map (fun (name, before) -> name, before, "") states_before
+    | _, _ ->
+      let join (name, before) (name', after) =
+        assert (name = name');
+        name, before, after
+      in
+      List.rev_map2 join states_before states_after
+
+let () = Request.register ~package
+    ~kind:`GET ~name:"getStates"
+    ~descr:(Markdown.plain "Get the domain states about the given marker")
+    ~input:(module Kernel_ast.Marker)
+    ~output:(module Data.Jlist
+          (Data.Jtriple (Data.Jstring) (Data.Jstring) (Data.Jstring)))
+    get_states

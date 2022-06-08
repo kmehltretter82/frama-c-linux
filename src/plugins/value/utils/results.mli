@@ -161,6 +161,11 @@ val get_cvalue_model : request -> Cvalue.Model.t
 (** Returns the Cvalue model. *)
 val get_cvalue_model_result : request -> Cvalue.Model.t result
 
+(** Returns a textual representation of the internal domain states for the given
+    request. If [filter] is provided, states are filtered on the given bases
+    (for domains that support this feature).
+    Returns a list of pair (name, state) for all available domains. *)
+val print_states: ?filter:Base.Hptset.t -> request -> (string * string) list
 
 (** Dependencies *)
 
