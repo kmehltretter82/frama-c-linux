@@ -24,6 +24,7 @@
 import React from 'react';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
+import { GlobalState, useGlobalState } from 'dome/data/states';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Boxes from 'dome/layout/boxes';
 import { HSplit } from 'dome/layout/splitters';
@@ -31,13 +32,15 @@ import { Text } from 'frama-c/richtext';
 import { Select } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 
+const globalSelectedDomain = new GlobalState<string>("");
+
 export function EvaStates(): JSX.Element {
   const [selection] = States.useSelection();
   const selectedLoc = selection?.current;
   const marker = selectedLoc?.marker;
   const states = States.useRequest(Eva.getStates, marker);
   const [domains, setDomains] = React.useState<string[]>([]);
-  const [selected, setSelected] = React.useState<string>();
+  const [selected, setSelected] = useGlobalState(globalSelectedDomain);
   const [stateBefore, setStateBefore] = React.useState("");
   const [stateAfter, setStateAfter] = React.useState("");
 
@@ -45,7 +48,7 @@ export function EvaStates(): JSX.Element {
     if (states && states.length > 0) {
       const names = states.map((d) => d[0]);
       setDomains(names);
-      if (!selected || !names.includes(selected))
+      if (!names.includes(selected))
         setSelected(names[0]);
       const selectedDomain = states.find((d) => d[0] === selected);
       if (selectedDomain) {
@@ -54,7 +57,7 @@ export function EvaStates(): JSX.Element {
       }
     } else
       setDomains([]);
-  }, [states, selected]);
+  }, [states, selected, setSelected]);
 
   if (domains.length === 0)
     return (<></>);
@@ -71,7 +74,7 @@ export function EvaStates(): JSX.Element {
         <Select
           title="Select the analysis domain to be shown"
           value={selected}
-          onChange={setSelected}
+          onChange={(domain) => setSelected(domain ?? "")}
         >
           {list}
         </Select>
