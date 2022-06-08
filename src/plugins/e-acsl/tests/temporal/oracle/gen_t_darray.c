@@ -15,15 +15,15 @@ void area_triangle(double (*vertices)[4])
     __e_acsl_store_block((void *)(& vertices),8UL);
     __e_acsl_temporal_pull_parameter((void *)(& vertices),0U,8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(*(vertices + 0)),
+                                                  sizeof(double),
+                                                  (void *)(*(vertices + 0)),
+                                                  (void *)0);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,
                                  "(double *)*(vertices + 0)",
                                  (void *)(*(vertices + 0)));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(double)",0,sizeof(double));
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(*(vertices + 0)),
-                                                  sizeof(double),
-                                                  (void *)(*(vertices + 0)),
-                                                  (void *)0);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "rte: mem_access: \\valid_read((double *)*(vertices + 0))",
                                  0,__gen_e_acsl_valid_read);
@@ -42,15 +42,15 @@ void area_triangle(double (*vertices)[4])
     int __gen_e_acsl_valid_read_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(*(vertices + 1)),
+                                                    sizeof(double),
+                                                    (void *)(*(vertices + 1)),
+                                                    (void *)0);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
                                  "(double *)*(vertices + 1)",
                                  (void *)(*(vertices + 1)));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(double)",0,sizeof(double));
-    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(*(vertices + 1)),
-                                                    sizeof(double),
-                                                    (void *)(*(vertices + 1)),
-                                                    (void *)0);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "rte: mem_access: \\valid_read((double *)*(vertices + 1))",
                                  0,__gen_e_acsl_valid_read_2);

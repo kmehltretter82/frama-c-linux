@@ -30,6 +30,9 @@
 [eva:alarm] lazy.i:24: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
+[eva:alarm] lazy.i:24: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
 [eva:alarm] lazy.i:25: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
@@ -43,6 +46,9 @@
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [eva:alarm] lazy.i:27: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] lazy.i:28: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [eva:alarm] lazy.i:28: Warning: 

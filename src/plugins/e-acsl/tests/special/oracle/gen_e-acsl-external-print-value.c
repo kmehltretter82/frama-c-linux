@@ -18,8 +18,8 @@ int main(void)
   {
     int __gen_e_acsl_x;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"value",0,value);
     __gen_e_acsl_x = value;
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"value",0,value);
     __gen_e_acsl_assert_data.blocking = 0;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "\\let x = value; \\false";

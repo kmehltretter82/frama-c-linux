@@ -87,7 +87,7 @@ clean::
 	$(RM) manuals/*.pdf
 	$(RM) manuals/*.tgz
 	$(MAKE) -C userman clean
-	$(MAKE) -C developer clean
+	$(MAKE) -C developer dist-clean
 	$(MAKE) -C rte clean
 	$(MAKE) -C aorai clean
 	$(MAKE) -C value clean

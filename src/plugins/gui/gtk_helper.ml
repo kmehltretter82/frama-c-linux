@@ -741,7 +741,7 @@ class error_manager ?reset (o_parent:GWindow.window_skel) : host =
           ()
       in
       ignore (w#connect#response ~callback:(fun _ -> w#destroy ()));
-      ignore (w#run ());
+      ignore (w#show ());
       if reset then f_reset ()
 
     method error ?parent ?(reset=false) fmt =

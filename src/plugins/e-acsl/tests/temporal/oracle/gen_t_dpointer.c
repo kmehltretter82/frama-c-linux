@@ -25,12 +25,12 @@ int main(void)
       int __gen_e_acsl_valid;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data =
         {.values = (void *)0};
+      __gen_e_acsl_valid = __e_acsl_valid((void *)(p + i),sizeof(int *),
+                                          (void *)p,(void *)(& p));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"p",(void *)p);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"i",0,i);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(int *)",0,sizeof(int *));
-      __gen_e_acsl_valid = __e_acsl_valid((void *)(p + i),sizeof(int *),
-                                          (void *)p,(void *)(& p));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                    "\\valid(p + i)",0,__gen_e_acsl_valid);
       __gen_e_acsl_assert_data.blocking = 1;
@@ -53,32 +53,30 @@ int main(void)
       int __gen_e_acsl_and;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
         {.values = (void *)0};
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(p + i),
+                                                      sizeof(int *));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"p",
                                    (void *)p);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"i",0,i);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                      "sizeof(int *)",0,sizeof(int *));
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)(p + i),
-                                                      sizeof(int *));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                    "\\initialized(p + i)",0,
                                    __gen_e_acsl_initialized);
       if (__gen_e_acsl_initialized) {
         int __gen_e_acsl_valid_read;
         int __gen_e_acsl_valid_2;
-        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"*(p + i)",
-                                     (void *)*(p + i));
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
           {.values = (void *)0};
+        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(p + i),
+                                                      sizeof(int *),
+                                                      (void *)p,
+                                                      (void *)(& p));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"p",
                                      (void *)p);
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"i",0,i);
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                        "sizeof(int *)",0,sizeof(int *));
-        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(p + i),
-                                                      sizeof(int *),
-                                                      (void *)p,
-                                                      (void *)(& p));
         __gen_e_acsl_assert_data_3.blocking = 1;
         __gen_e_acsl_assert_data_3.kind = "RTE";
         __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(p + i)";
@@ -88,11 +86,13 @@ int main(void)
         __gen_e_acsl_assert_data_3.name = "mem_access";
         __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_3);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                       "sizeof(int)",0,sizeof(int));
         __gen_e_acsl_valid_2 = __e_acsl_valid((void *)*(p + i),sizeof(int),
                                               (void *)*(p + i),
                                               (void *)(p + i));
+        __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"*(p + i)",
+                                     (void *)*(p + i));
+        __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                       "sizeof(int)",0,sizeof(int));
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                      "\\valid(*(p + i))",0,
                                      __gen_e_acsl_valid_2);
@@ -123,30 +123,27 @@ int main(void)
     int __gen_e_acsl_and_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
+    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(p + 2),
+                                                      sizeof(int *));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"p",(void *)p);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                    "sizeof(int *)",0,sizeof(int *));
-    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(p + 2),
-                                                      sizeof(int *));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                  "\\initialized(p + 2)",0,
                                  __gen_e_acsl_initialized_2);
     if (__gen_e_acsl_initialized_2) {
       int __gen_e_acsl_valid_read_2;
       int __gen_e_acsl_valid_3;
-      /*@ assert Eva: dangling_pointer: !\dangling(p + 2); */
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"*(p + 2)",
-                                   (void *)*(p + 2));
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
         {.values = (void *)0};
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"p",
-                                   (void *)p);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
-                                     "sizeof(int *)",0,sizeof(int *));
       __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(p + 2),
                                                       sizeof(int *),
                                                       (void *)p,
                                                       (void *)(& p));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"p",
+                                   (void *)p);
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                     "sizeof(int *)",0,sizeof(int *));
       __gen_e_acsl_assert_data_5.blocking = 1;
       __gen_e_acsl_assert_data_5.kind = "RTE";
       __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(p + 2)";
@@ -156,11 +153,14 @@ int main(void)
       __gen_e_acsl_assert_data_5.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
-                                     "sizeof(int)",0,sizeof(int));
+      /*@ assert Eva: dangling_pointer: !\dangling(p + 2); */
       __gen_e_acsl_valid_3 = __e_acsl_valid((void *)*(p + 2),sizeof(int),
                                             (void *)*(p + 2),(void *)(
                                             p + 2));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"*(p + 2)",
+                                   (void *)*(p + 2));
+      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
+                                     "sizeof(int)",0,sizeof(int));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                    "\\valid(*(p + 2))",0,
                                    __gen_e_acsl_valid_3);

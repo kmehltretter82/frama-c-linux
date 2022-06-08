@@ -1,3 +1,3 @@
 #!/bin/zsh
 
-exec open -na Ivette.app --args --cwd $PWD $*
+exec open -na /Applications/Ivette.app --args --working $PWD $*

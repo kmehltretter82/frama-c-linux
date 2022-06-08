@@ -224,7 +224,7 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
           Logic_const.prel ~loc (Rge, t, Cil.lzero ~loc ())
         in
         let adata, env = Assert.empty ~loc kf env in
-        let adata, env = Assert.register_term ~loc env t e adata in
+        let adata = Assert.register_term ~loc t e adata in
         let assertion, env =
           Assert.runtime_check
             ~adata
@@ -248,9 +248,9 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
         let upper_guard_pp = Logic_const.prel ~loc (Rle, t, sizet_max_t) in
         let upper_guard = Cil.mkBinOp ~loc Le e sizet_max_e in
         let adata, env = Assert.empty ~loc kf env in
-        let adata, env = Assert.register_term ~loc env t e adata in
-        let adata, env =
-          Assert.register ~loc env "SIZE_MAX" sizet_max_e adata
+        let adata = Assert.register_term ~loc t e adata in
+        let adata =
+          Assert.register ~loc "SIZE_MAX" sizet_max_e adata
         in
         let assertion, env =
           Assert.runtime_check

@@ -59,13 +59,13 @@ int *__gen_e_acsl_f(int *x, int *y)
   {
     int __gen_e_acsl_valid;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_valid = __e_acsl_valid((void *)__retres,sizeof(int),
+                                        (void *)__retres,
+                                        (void *)(& __retres));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"\\result",
                                  (void *)__retres);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(int)",
                                    0,sizeof(int));
-    __gen_e_acsl_valid = __e_acsl_valid((void *)__retres,sizeof(int),
-                                        (void *)__retres,
-                                        (void *)(& __retres));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "\\valid(\\result)",0,__gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;

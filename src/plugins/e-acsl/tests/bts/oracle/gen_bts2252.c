@@ -93,13 +93,6 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"dest",
-                                 (void *)dest);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"sizeof(char)",
-                                 0,1);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"sizeof(char)",
-                                 0,1);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,"n",0,n);
     __gmpz_init_set_ui(__gen_e_acsl_n_2,n);
     __gmpz_init_set_si(__gen_e_acsl_,1L);
     __gmpz_init(__gen_e_acsl_sub);
@@ -117,17 +110,22 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __gen_e_acsl__3 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
     __gen_e_acsl_size = 1UL * __gen_e_acsl__3;
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,"size",0,
-                                   __gen_e_acsl_size);
     if (__gen_e_acsl_size <= 0UL) __gen_e_acsl_if = 0UL;
-    else {
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,"size",0,
-                                     __gen_e_acsl_size);
-      __gen_e_acsl_if = __gen_e_acsl_size;
-    }
+    else __gen_e_acsl_if = __gen_e_acsl_size;
     __gen_e_acsl_valid = __e_acsl_valid((void *)(dest + 1 * 0),
                                         __gen_e_acsl_if,(void *)dest,
                                         (void *)(& dest));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"dest",
+                                 (void *)dest);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"sizeof(char)",
+                                 0,1);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"sizeof(char)",
+                                 0,1);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,"n",0,n);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,"size",0,
+                                   __gen_e_acsl_size);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,"size",0,
+                                   __gen_e_acsl_size);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "room_nstring: \\valid(dest + (0 .. n - 1))",
                                  0,__gen_e_acsl_valid);
@@ -144,6 +142,14 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
       {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
+    __gen_e_acsl__4 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
+    __gen_e_acsl_size_2 = 1UL * __gen_e_acsl__4;
+    if (__gen_e_acsl_size_2 <= 0UL) __gen_e_acsl_if_2 = 0UL;
+    else __gen_e_acsl_if_2 = __gen_e_acsl_size_2;
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(dest + 1 * 0),
+                                                  __gen_e_acsl_if_2,
+                                                  (void *)dest,
+                                                  (void *)(& dest));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"dest",
                                  (void *)dest);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"sizeof(char)",
@@ -151,20 +157,10 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"sizeof(char)",
                                  0,1);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,"n",0,n);
-    __gen_e_acsl__4 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
-    __gen_e_acsl_size_2 = 1UL * __gen_e_acsl__4;
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,"size",0,
                                    __gen_e_acsl_size_2);
-    if (__gen_e_acsl_size_2 <= 0UL) __gen_e_acsl_if_2 = 0UL;
-    else {
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,"size",0,
-                                     __gen_e_acsl_size_2);
-      __gen_e_acsl_if_2 = __gen_e_acsl_size_2;
-    }
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(dest + 1 * 0),
-                                                  __gen_e_acsl_if_2,
-                                                  (void *)dest,
-                                                  (void *)(& dest));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,"size",0,
+                                   __gen_e_acsl_size_2);
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "RTE";
     __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(dest + (0 .. n - 1))";
@@ -176,6 +172,14 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
+    __gen_e_acsl__5 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
+    __gen_e_acsl_size_3 = 1UL * __gen_e_acsl__5;
+    if (__gen_e_acsl_size_3 <= 0UL) __gen_e_acsl_if_3 = 0UL;
+    else __gen_e_acsl_if_3 = __gen_e_acsl_size_3;
+    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(src + 1 * 0),
+                                                    __gen_e_acsl_if_3,
+                                                    (void *)src,
+                                                    (void *)(& src));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"src",
                                  (void *)src);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
@@ -183,20 +187,10 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                  "sizeof(char const)",0,1);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,"n",0,n);
-    __gen_e_acsl__5 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
-    __gen_e_acsl_size_3 = 1UL * __gen_e_acsl__5;
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,"size",0,
                                    __gen_e_acsl_size_3);
-    if (__gen_e_acsl_size_3 <= 0UL) __gen_e_acsl_if_3 = 0UL;
-    else {
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,"size",0,
-                                     __gen_e_acsl_size_3);
-      __gen_e_acsl_if_3 = __gen_e_acsl_size_3;
-    }
-    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(src + 1 * 0),
-                                                    __gen_e_acsl_if_3,
-                                                    (void *)src,
-                                                    (void *)(& src));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,"size",0,
+                                   __gen_e_acsl_size_3);
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "RTE";
     __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(src + (0 .. n - 1))";
@@ -206,6 +200,18 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __gen_e_acsl_assert_data_5.name = "separated_guard";
     __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+    __gen_e_acsl__6 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
+    __gen_e_acsl_size_4 = 1UL * __gen_e_acsl__6;
+    if (__gen_e_acsl_size_4 <= 0UL) __gen_e_acsl_if_4 = 0UL;
+    else __gen_e_acsl_if_4 = __gen_e_acsl_size_4;
+    __gen_e_acsl__7 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
+    __gen_e_acsl_size_5 = 1UL * __gen_e_acsl__7;
+    if (__gen_e_acsl_size_5 <= 0UL) __gen_e_acsl_if_5 = 0UL;
+    else __gen_e_acsl_if_5 = __gen_e_acsl_size_5;
+    __gen_e_acsl_separated = __e_acsl_separated(2UL,dest + 1 * 0,
+                                                __gen_e_acsl_if_4,
+                                                src + 1 * 0,
+                                                __gen_e_acsl_if_5);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"dest",
                                  (void *)dest);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"sizeof(char)",
@@ -213,16 +219,10 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"sizeof(char)",
                                  0,1);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,"n",0,n);
-    __gen_e_acsl__6 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
-    __gen_e_acsl_size_4 = 1UL * __gen_e_acsl__6;
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,"size",0,
                                    __gen_e_acsl_size_4);
-    if (__gen_e_acsl_size_4 <= 0UL) __gen_e_acsl_if_4 = 0UL;
-    else {
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,"size",0,
-                                     __gen_e_acsl_size_4);
-      __gen_e_acsl_if_4 = __gen_e_acsl_size_4;
-    }
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,"size",0,
+                                   __gen_e_acsl_size_4);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"src",
                                  (void *)src);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
@@ -230,20 +230,10 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                  "sizeof(char const)",0,1);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,"n",0,n);
-    __gen_e_acsl__7 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
-    __gen_e_acsl_size_5 = 1UL * __gen_e_acsl__7;
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,"size",0,
                                    __gen_e_acsl_size_5);
-    if (__gen_e_acsl_size_5 <= 0UL) __gen_e_acsl_if_5 = 0UL;
-    else {
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,"size",0,
-                                     __gen_e_acsl_size_5);
-      __gen_e_acsl_if_5 = __gen_e_acsl_size_5;
-    }
-    __gen_e_acsl_separated = __e_acsl_separated(2UL,dest + 1 * 0,
-                                                __gen_e_acsl_if_4,
-                                                src + 1 * 0,
-                                                __gen_e_acsl_if_5);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,"size",0,
+                                   __gen_e_acsl_size_5);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                  "separation: \\separated(dest + (0 .. n - 1), src + (0 .. n - 1))",
                                  0,__gen_e_acsl_separated);
@@ -293,14 +283,6 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"\\old(dest)",
-                                 (void *)__gen_e_acsl_at);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"sizeof(char)",
-                                 0,1);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"sizeof(char)",
-                                 0,1);
-    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_7,"\\old(n)",0,
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_at_2));
     __gmpz_init_set_si(__gen_e_acsl__8,1L);
     __gmpz_init(__gen_e_acsl_sub_3);
     __gmpz_sub(__gen_e_acsl_sub_3,
@@ -317,17 +299,23 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
     __gen_e_acsl__10 = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_2));
     __gen_e_acsl_size_6 = 1UL * __gen_e_acsl__10;
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,"size",0,
-                                   __gen_e_acsl_size_6);
     if (__gen_e_acsl_size_6 <= 0UL) __gen_e_acsl_if_6 = 0UL;
-    else {
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,"size",0,
-                                     __gen_e_acsl_size_6);
-      __gen_e_acsl_if_6 = __gen_e_acsl_size_6;
-    }
+    else __gen_e_acsl_if_6 = __gen_e_acsl_size_6;
     __gen_e_acsl_initialized = __e_acsl_initialized((void *)(__gen_e_acsl_at + 
                                                              1 * 0),
                                                     __gen_e_acsl_if_6);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"\\old(dest)",
+                                 (void *)__gen_e_acsl_at);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"sizeof(char)",
+                                 0,1);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"sizeof(char)",
+                                 0,1);
+    __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_7,"\\old(n)",0,
+                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_at_2));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,"size",0,
+                                   __gen_e_acsl_size_6);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,"size",0,
+                                   __gen_e_acsl_size_6);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
                                  "initialization: \\initialized(\\old(dest) + (0 .. \\old(n) - 1))",
                                  0,__gen_e_acsl_initialized);
@@ -388,15 +376,15 @@ int main(void)
         int __gen_e_acsl_valid_read;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data =
           {.values = (void *)0};
+        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(srcbuf + i),
+                                                      sizeof(char),
+                                                      (void *)srcbuf,
+                                                      (void *)(& srcbuf));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"srcbuf",
                                      (void *)srcbuf);
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"i",0,i);
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                        "sizeof(char)",0,sizeof(char));
-        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(srcbuf + i),
-                                                      sizeof(char),
-                                                      (void *)srcbuf,
-                                                      (void *)(& srcbuf));
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                      "\\valid_read(srcbuf + i)",0,
                                      __gen_e_acsl_valid_read);
