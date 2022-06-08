@@ -36,35 +36,68 @@ PTEST_ALIASES=$(addsuffix /ptests,$(addprefix @, tests src/plugins))
 
 .PHONY: tests.info
 tests.info:
-	echo "PURGED_PTEST_DIRS=$(PURGED_PTEST_DIRS)"
-	echo "PTEST_DIRS=$(PTEST_DIRS)"
-	echo "PTEST_OPTS=$(PTEST_OPTS)"
-	echo "PTEST_ALIASES=$(PTEST_ALIASES)"
+	echo "FRAMAC_WTESTS='$(FRAMAC_WTESTS)'"
+	echo "WTESTS='$(WTESTS)'"
+	echo "FRAMAC_PTESTS='$(FRAMAC_PTESTS)'"
+	echo "PTESTS='$(PTESTS)'"
+	echo "PURGED_PTEST_DIRS='$(PURGED_PTEST_DIRS)'"
+	echo "PTEST_DIRS='$(PTEST_DIRS)'"
+	echo "PTEST_OPTS='$(PTEST_OPTS)'"
+	echo "PTEST_ALIASES='$(PTEST_ALIASES)'"
 
-# Note: the public name of ptest.exe is frama-c-ptests
-ptests/ptests.exe: ptests/ptests.ml
-	dune build --root ptests ptests.exe
+##########################################################################
+## Command used to execute ptests (in order to generate dune test files)
 
-# Note: the public name of wtest.exe is frama-c-wtests
-ptests/wtests.exe: ptests/wtests.ml
-	dune build --root ptests wtests.exe
+# Note: the public name of ptests.exe is frama-c-ptests
+ifeq ($(FRAMAC_PTESTS),"")
 
-# Command for executing ptest (in order to generate dune test files)
+# PTESTS is external
+PTESTS=frama-c-ptests
+
+else
+
+# PTESTS is internal
 PTESTS=dune exec --root ptests -- frama-c-ptests
 #PTESTS=dune exec --root ptests -- frama-c-ptests -v
+
+# Note: the public name of ptest.exe is frama-c-ptests
+$(FRAMAC_PTESTS): ptests/ptests.ml
+	dune build --root ptests ptests.exe
+
+endif
 
 .PHONY: ptests-help
 ptests-help:
 	$(PTESTS) --help
 
-# Note: wrapper that can be used during dune testing (c.f. frama-c-ptests)
+##########################################################################
+## Command used to execute wtests, the wrapper that can be used during
+## dune testing (c.f. frama-c-ptests)
+
+# Note: the public name of wtests.exe is frama-c-wtests
+ifeq ($(FRAMAC_WTESTS),"")
+
+# WTESTS is external to Frama-C
+WTESTS=frama-c-wtests
+
+else
+
+# WTESTS is internal to Frama-C
 WTESTS=dune exec --root ptests -- frama-c-wtests
+
+# Note: the public name of wtest.exe is frama-c-wtests
+$(FRAMAC_WTESTS): ptests/wtests.ml
+	dune build --root ptests wtests.exe
+
+endif
 
 .PHONY: wtests-help
 wtests-help:
 	$(WTESTS) --help
 
-# Removes all dune files generated for testing: xargs -n 10 avoids a too long line
+##########################################################################
+## Removes all dune files generated for testing: xargs -n 10 avoids a too long line
+
 .PHONY: purge-tests
 purge-tests:
 	find $(PURGED_PTEST_DIRS) -name dune -print0 \
@@ -76,13 +109,15 @@ purge-tests:
 clean-tests: purge-tests
 	rm -rf $(addprefix _build/default/,$(PURGED_PTEST_DIRS))
 
-# Generates all dune files used for testing
+##########################################################################
+## Generates all dune files used for testing
+
 .PHONY: run-ptests
-run-ptests: config.sed purge-tests ptests/ptests.exe ptests/wtests.exe
+run-ptests: config.sed purge-tests $(FRAMAC_PTEST) $(FRAMAC_WTEST)
 	$(PTESTS) $(PTEST_OPTS) $(PTEST_DIRS)
 
 .PHONY: run-ptests.replay
-run-ptests.replay: config.sed ptests/ptests.exe
+run-ptests.replay: config.sed $(FRAMAC_PTEST)
 	$(PTESTS) $(PTEST_OPTS) $(PTEST_DIRS)
 
 # Run tests of for all configurations (and build all dune files)

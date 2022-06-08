@@ -193,16 +193,24 @@ endif
 # HEADER MANAGEMENT
 ################################
 
+# HDRCK is internal
 FRAMAC_HDRCK:=headers/hdrck.exe
 
 # Part that can be shared for external plugins
 include share/Makefile.headers
 
 ###############################################################################
-
 # Testing
+################################
 
-include Makefile.testing
+# PTESTS is internal
+FRAMAC_PTESTS:=ptests/ptests.exe
+
+# WTESTS is internal
+FRAMAC_WTESTS:=ptests/wtests.exe
+
+# Part that can be shared for external plugins
+include share/Makefile.testing
 
 ###############################################################################
 
