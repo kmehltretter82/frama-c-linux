@@ -1,0 +1,117 @@
+##########################################################################
+#                                                                        #
+#  This file is part of Frama-C.                                         #
+#                                                                        #
+#  Copyright (C) 2007-2022                                               #
+#    CEA (Commissariat à l'énergie atomique et aux énergies              #
+#         alternatives)                                                  #
+#                                                                        #
+#  you can redistribute it and/or modify it under the terms of the GNU   #
+#  Lesser General Public License as published by the Free Software       #
+#  Foundation, version 2.1.                                              #
+#                                                                        #
+#  It is distributed in the hope that it will be useful,                 #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
+#  GNU Lesser General Public License for more details.                   #
+#                                                                        #
+#  See the GNU Lesser General Public License version 2.1                 #
+#  for more details (enclosed in the file licenses/LGPLv2.1).            #
+#                                                                        #
+##########################################################################
+
+###########
+# TESTING #
+###########
+
+# Defines where to find the ptest_config files
+PURGED_PTEST_DIRS?=tests $(wildcard src/plugins/*/tests)
+PTEST_OPTS?=
+PTEST_DIRS?=$(PURGED_PTEST_DIRS)
+
+# Defines the related dune targets
+PTEST_ALIASES=$(addsuffix /ptests,$(addprefix @, tests src/plugins))
+# TODO: uncomments when a dune file is at least generated for all PTEST_DIRS
+#PTEST_ALIASES=$(addsuffix /ptests,$(addprefix @,$(PTEST_DIRS)))
+
+.PHONY: tests.info
+tests.info:
+	echo "PURGED_PTEST_DIRS=$(PURGED_PTEST_DIRS)"
+	echo "PTEST_DIRS=$(PTEST_DIRS)"
+	echo "PTEST_OPTS=$(PTEST_OPTS)"
+	echo "PTEST_ALIASES=$(PTEST_ALIASES)"
+
+# Note: the public name of ptest.exe is frama-c-ptests
+ptests/ptests.exe: ptests/ptests.ml
+	dune build --root ptests ptests.exe
+
+# Note: the public name of wtest.exe is frama-c-wtests
+ptests/wtests.exe: ptests/wtests.ml
+	dune build --root ptests wtests.exe
+
+# Command for executing ptest (in order to generate dune test files)
+PTESTS=dune exec --root ptests -- frama-c-ptests
+#PTESTS=dune exec --root ptests -- frama-c-ptests -v
+
+.PHONY: ptests-help
+ptests-help:
+	$(PTESTS) --help
+
+# Note: wrapper that can be used during dune testing (c.f. frama-c-ptests)
+WTESTS=dune exec --root ptests -- frama-c-wtests
+
+.PHONY: wtests-help
+wtests-help:
+	$(WTESTS) --help
+
+# Removes all dune files generated for testing: xargs -n 10 avoids a too long line
+.PHONY: purge-tests
+purge-tests:
+	find $(PURGED_PTEST_DIRS) -name dune -print0 \
+        | grep --null -e "/oracle.*/dune\|/result.*/dune" \
+        | xargs --null --no-run-if-empty -n 10 rm
+
+# Force the full cleaning of the testing environment
+.PHONY: clean-tests
+clean-tests: purge-tests
+	rm -rf $(addprefix _build/default/,$(PURGED_PTEST_DIRS))
+
+# Generates all dune files used for testing
+.PHONY: run-ptests
+run-ptests: config.sed purge-tests ptests/ptests.exe ptests/wtests.exe
+	$(PTESTS) $(PTEST_OPTS) $(PTEST_DIRS)
+
+.PHONY: run-ptests.replay
+run-ptests.replay: config.sed ptests/ptests.exe
+	$(PTESTS) $(PTEST_OPTS) $(PTEST_DIRS)
+
+# Run tests of for all configurations (and build all dune files)
+.PHONY: run-tests
+run-tests: FRAMAC_WP_CACHE=replay
+run-tests: run-ptests
+	dune build $(PTEST_ALIASES)
+
+# Replay tests of for all configurations (requires  all dune files)
+.PHONY: test.replay
+tests.replay: FRAMAC_WP_CACHE=replay
+tests.replay: config.sed
+	dune build $(PTEST_ALIASES)
+
+# Update cache entries of for all configurations (requires all dune files)
+.PHONY: tests.update-wp-cache
+tests.update-wp-cache: FRAMAC_WP_CACHE=update
+tests.update-wp-cache: config.sed
+	dune build $(PTEST_ALIASES)
+
+.PHONY: tests
+ifneq ($(FRAMAC_WP_CACHEDIR),)
+tests: run-tests
+else
+tests: run-tests
+	@echo "WARNING: cannot run -config qualif tests of WP plugin since FRAMAC_WP_CACHEDIR variable is undefined."
+endif
+
+###############################################################################
+# Local Variables:
+# compile-command: "make"
+# End:
