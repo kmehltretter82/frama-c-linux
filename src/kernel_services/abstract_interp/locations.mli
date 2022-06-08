@@ -265,6 +265,10 @@ module Zone : sig
 
       @since Carbon-20101201 *)
 
+  val get_bases : t -> Base.SetLattice.t
+  (** Returns the bases contained by the given zone. Never fails, but
+      may return [Base.SetLattice.Top]. *)
+
   val intersects : t -> t -> bool
 
   (** Assuming that [z1] and [z2] only contain valid bases,
