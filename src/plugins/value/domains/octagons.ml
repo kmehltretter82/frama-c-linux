@@ -1275,7 +1275,7 @@ module Domain = struct
       in
       Base.Hptset.fold aux bases Base.SetLattice.empty
 
-  let filter _kf _kind bases state =
+  let filter _kind bases state =
     if intraprocedural ()
     then state
     else

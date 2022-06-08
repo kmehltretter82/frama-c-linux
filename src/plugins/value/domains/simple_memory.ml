@@ -327,7 +327,7 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
 
   let relate _kf _bases _state = Base.SetLattice.empty
 
-  let filter _kf _kind bases state =
+  let filter _kind bases state =
     M.filter (fun elt -> Base.Hptset.mem elt bases) state
 
   let reuse _kf bases ~current_input ~previous_output =

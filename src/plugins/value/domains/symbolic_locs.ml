@@ -603,7 +603,7 @@ module D : Abstract_domain.Leaf
      by itself a variable read or written by f to a variable that is not. *)
   let relate _kf _bases _state = Base.SetLattice.empty
 
-  let filter _kf _kind = Memory.filter
+  let filter _kind = Memory.filter
 
   (* Efficient version of [reuse], but the resulting state does not satisfy
      the [_check state], as some extra dependenies of keys removed from the

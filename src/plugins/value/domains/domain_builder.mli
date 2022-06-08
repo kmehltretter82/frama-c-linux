@@ -54,7 +54,9 @@ module type LeafDomain = sig
   val incr_loop_counter: stmt -> t -> t
   val leave_loop: stmt -> t -> t
 
-  val filter: kernel_function -> [`Pre | `Post] -> Base.Hptset.t -> t -> t
+  val filter:
+    [`Pre of kernel_function | `Post of kernel_function | `Print ] ->
+    Base.Hptset.t -> t -> t
   val reuse:
     kernel_function -> Base.Hptset.t ->
     current_input:t -> previous_output:t -> t

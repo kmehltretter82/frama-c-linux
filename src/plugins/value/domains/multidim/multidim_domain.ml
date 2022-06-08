@@ -887,7 +887,7 @@ struct
 
   let relate _kf _bases _state = Base.SetLattice.empty
 
-  let filter _kf _kind bases (base_map,tracked : t) =
+  let filter _kind bases (base_map,tracked : t) =
     BaseMap.filter (fun elt -> Base.Hptset.mem elt bases) base_map,
     Option.map (Tracking.inter bases) tracked
 

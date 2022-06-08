@@ -199,7 +199,7 @@ module D : Abstract_domain.Leaf
 
   (* Memexec *)
   let relate _kf _bases _state = Base.SetLattice.empty
-  let filter _kf _kind bases state =
+  let filter _kind bases state =
     Memory.filter_by_shape bases state
 
   let reuse _kf bases ~current_input:input ~previous_output:output =

@@ -338,19 +338,24 @@ module type Reuse = sig
       disables MemExec. *)
   val relate: kernel_function -> Base.Hptset.t -> t -> Base.SetLattice.t
 
-  (** [filter kf kind bases states] reduces the state [state] to only keep
+  (** [filter kind bases states] reduces the state [state] to only keep
       properties about [bases] — it is a projection on the set of [bases].
       It allows reusing an analysis of [kf] from an initial state [pre] to a
       final state [post].
-      If [kind] is `Pre, [state] is the initial state [pre], and [bases]
-      includes all inputs of [kf] and satisfies [relate kf bases state = bases].
-      If [kind] is `Post, [state] is the final state [post], and [bases]
+      If [kind] is [`Pre kf], [state] is the initial state of function [kf],
+      and [bases] includes all inputs of [kf] and satisfies
+      [relate kf bases state = bases].
+      If [kind] is [`Post kf], [state] is the final state of [kf], and [bases]
       includes all inputs and outputs of [kf].
       Afterwards, the two resulting states [reduced_pre] and [reduced_post] are
       used as follow: when [kf] should be analyzed with the initial state [s],
       if [filter kf `Pre s = reduced_pre], then the analysis is skipped, and
-      [reuse kf s reduced_post] is used as its final state instead. *)
-  val filter: kernel_function -> [`Pre | `Post] -> Base.Hptset.t -> t -> t
+      [reuse kf s reduced_post] is used as its final state instead.
+      If [kind] is [`Print], the state is reduced before printing it for the
+      end-user. *)
+  val filter:
+    [`Pre of kernel_function | `Post of kernel_function | `Print ] ->
+    Base.Hptset.t -> t -> t
 
   (** [reuse kf bases current_input previous_output] merges the initial state
       [current_input] with a final state [previous_output] from a previous

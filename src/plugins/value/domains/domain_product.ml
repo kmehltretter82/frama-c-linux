@@ -293,8 +293,8 @@ module Make
   let relate kf bases (left, right) =
     Base.SetLattice.join
       (Left.relate kf bases left) (Right.relate kf bases right)
-  let filter kf kind bases (left, right) =
-    Left.filter kf kind bases left, Right.filter kf kind bases right
+  let filter kind bases (left, right) =
+    Left.filter kind bases left, Right.filter kind bases right
   let reuse kf bases ~current_input ~previous_output =
     let left_input, right_input = current_input
     and left_output, right_output = previous_output in
