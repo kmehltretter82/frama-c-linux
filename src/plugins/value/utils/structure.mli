@@ -34,6 +34,7 @@ module type Key = sig
   val create_key: string -> 'a key
   val eq_type : 'a key -> 'b key -> ('a, 'b) eq option
 
+  val name: 'a key -> string
   val print: 'a key Pretty_utils.formatter
   val compare: 'a key -> 'b key -> int
   val equal: 'a key -> 'b key -> bool
