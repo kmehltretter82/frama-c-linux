@@ -29,7 +29,7 @@
 # Note: the find command below is *very* ugly, but it should be POSIX-compliant.
 
 ALL_ML_FILES:=$(shell find src -name '*.ml' -print -o -name '*.mli' -print -o -path '*/tests' -prune '!' -name '*')
-ALL_ML_FILES+=ptests/ptests.ml
+ALL_ML_FILES+=ptests/ptests.ml ptests/wtests.ml
 
 ifeq ($(origin MANUAL_ML_FILES),undefined)
 MANUAL_ML_FILES:=$(ALL_ML_FILES)
