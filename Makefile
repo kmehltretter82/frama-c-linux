@@ -190,9 +190,21 @@ else
 endif
 
 ###############################################################################
+# HEADER MANAGEMENT
+################################
+
+FRAMAC_HDRCK:=headers/hdrck.exe
+
+# Part that can be shared for external plugins
+include share/Makefile.headers
+
+###############################################################################
 
 # Testing
+
 include Makefile.testing
+
+###############################################################################
 
 # Code prettyfication and lint
 include Makefile.linting

@@ -1,0 +1,175 @@
+##########################################################################
+#                                                                        #
+#  This file is part of Frama-C.                                         #
+#                                                                        #
+#  Copyright (C) 2007-2022                                               #
+#    CEA (Commissariat à l'énergie atomique et aux énergies              #
+#         alternatives)                                                  #
+#                                                                        #
+#  you can redistribute it and/or modify it under the terms of the GNU   #
+#  Lesser General Public License as published by the Free Software       #
+#  Foundation, version 2.1.                                              #
+#                                                                        #
+#  It is distributed in the hope that it will be useful,                 #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
+#  GNU Lesser General Public License for more details.                   #
+#                                                                        #
+#  See the GNU Lesser General Public License version 2.1                 #
+#  for more details (enclosed in the file licenses/LGPLv2.1).            #
+#                                                                        #
+##########################################################################
+
+#####################
+# HEADER MANAGEMENT #
+#####################
+
+##############
+# Parameters
+
+# Must be unset (for external plugins) and set (for FRAMA-C kernel)
+FRAMAC_HDRCK?=
+
+# Can be set to yes
+# - yes: adds "-exit-on-warning" option to "frama-c-hdrck"
+HEADER_STRICT?=
+
+# Defines where to find the header directories
+HEADER_DIRS?=headers $(wildcard src/plugins/*/headers)
+
+# Can be set to unset/yes/no/<relative sub-directory>
+# - unset: look at $(HEADER_DIRS)
+# - yes:   look at $(HEADER_DIRS)/open-source
+# - no:    look at $(HEADER_DIRS)/close-source
+# - <dir>: look at $(HEADER_DIRS)/<dir>
+HEADER_OPEN_SOURCE?=yes
+
+# Can be set to a file
+# - <file>: file containing the list of the files to manage
+HEADER_DISTRIB_FILE?=
+
+# Can be set to a file
+# - <file>: file containing the list of the files to ignore any way
+HEADER_EXCEPTIONS?=
+
+# Can be set to a list of files
+# - <files>: files containing, for each file to manage, the "header_spec" attribute value
+HEADER_SPEC?=
+
+# Extra parameters for "frama-c-hdrck"
+HDRCK_EXTRA?=
+
+##########################################################################
+## Command used to execute hdrck
+
+# Note: the public name of hdrck.exe is frama-c-hdrck
+ifeq ($(FRAMAC_HDRCK),"")
+
+# HDRCK is external
+HDRCK:= frama-c-hdrck
+
+else
+
+# HDRCK is internal
+HDRCK:= dune exec --root headers -- frama-c-hdrck
+
+$(FRAMAC_HDRCK): headers/hdrck.ml
+	dune build --root headers hdrck.exe
+
+endif
+
+HDRCK_OPTS:= --stdin
+
+######################################################################
+## Identifies how to get the header specification (from git/find/cat)
+## and updates HDRCK_OPTS variable
+
+ifeq ($(HEADER_SPEC),)
+
+HEADER_HAS_GIT_FILE:=$(wildcard .git/HEAD)
+ifeq ("$(HEADER_HAS_GIT_FILE)","")
+# From git
+HDRCK_SPEC:= git ls-files -z | git check-attr --stdin -z header_spec
+else
+# From a cleaned directory
+HDRCK_SPEC:= find . -print0 | git check-attr --stdin -z header_spec
+endif # HEADER_HAS_GIT_FILE
+
+HDRCK_OPTS+= -z 
+
+else
+
+# From a file
+# note: The file  format has to be specified into the var HDRCK_EXTRA
+HDRCK_SPEC:= cat $(HEADER_SPEC)
+
+endif # HEADER_SPEC
+
+################################
+## Updates HDRCK_OPTS variable
+
+ifneq ($(HEADER_DISTRIB_FILE),)
+# Adds the option "-distrib-file"
+HDRCK_OPTS+= -distrib-file $(HEADER_DISTRIB_FILE)
+endif
+
+ifneq ($(HEADER_EXCEPTIONS),)
+# Adds the option "-header-except-file"
+HDRCK_OPTS+= -header-except-file $(HEADER_EXCEPTIONS)
+endif
+
+ifeq ($(HEADER_STRICT),yes)
+# Adds the option "-exit-on-warning"
+HDRCK_OPTS+= -exit-on-warning
+endif
+
+#####################################
+## Identifies where are the headers
+## and updates HDRCK_OPTS variable
+
+ifeq ($(HEADER_OPEN_SOURCE),yes)
+HDRCK_OPTS+= $(addprefix -header-dirs=,$(addsuffix /open-source,$(HEADER_DIRS)))
+else
+ifeq ($(HEADER_OPEN_SOURCE),no)
+HDRCK_OPTS+= $(addprefix -header-dirs=,$(addsuffix /close-source,$(HEADER_DIRS)))
+else
+ifeq ($(HEADER_OPEN_SOURCE),)
+HDRCK_OPTS+= $(addprefix -header-dirs=,$(HEADER_DIRS))
+else
+HDRCK_OPTS+= $(addprefix -header-dirs=,$(addsuffix /$(HEADER_OPEN_SOURCE),$(HEADER_DIRS)))
+endif
+endif
+endif
+
+#################################
+
+.PHONY: check-headers
+check-headers: $(FRAMAC_HDRCK)
+	$(HDRCK_SPEC) | $(HDRCK) $(HDRCK_OPTS) $(HDRCK_EXTRA)
+
+.PHONY: headers
+headers: $(FRAMAC_HDRCK)
+	$(HDRCK_SPEC) | $(HDRCK) -update $(HDRCK_OPTS) $(HDRCK_EXTRA)
+
+
+#################################
+
+.PHONY: headers.info
+headers.info:
+	echo "FRAMAC_HDRCK='$(FRAMAC_HDRCK)'"
+	echo "HEADER_OPEN_SOURCE='$(HEADER_OPEN_SOURCE)'"
+	echo "HEADER_STRICT='$(HEADER_STRICT)'"
+	echo "HEADER_DIRS='$(HEADER_STRICT)'"
+	echo "HEADER_DISTRIB_FILE='$(HEADER_DISTRIB_FILE)'"
+	echo "HEADER_EXCEPTIONS='$(HEADER_EXCEPTIONS)'"
+	echo "HEADER_SPEC='$(HEADER_SPEC)'"
+	echo "HDRCK='$(HDRCK)'"
+	echo "HDRCK_SPEC='$(HDRCK_SPEC)'"
+	echo "HDRCK_OPTS='$(HDRCK_OPTS)'"
+
+
+###############################################################################
+# Local Variables:
+# compile-command: "make"
+# End:
+
