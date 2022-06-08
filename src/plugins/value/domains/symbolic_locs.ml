@@ -182,7 +182,7 @@ module Memory = struct
       include Datatype.Serializable_undefined
 
       type t = memory
-      let name = "Value.Symbolic_locs.Memory.t"
+      let name = "symbolic-locations"
 
       let reprs = [ { values = List.hd K2V.M.reprs;
                       zones = List.hd K2Z.reprs;

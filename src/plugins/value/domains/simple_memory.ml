@@ -47,7 +47,7 @@ module type S = sig
   val fold: (Base.t -> value -> 'a -> 'a) -> t -> 'a -> 'a
 end
 
-module Make_Memory (Value: Value) = struct
+module Make_Memory (Info: sig val name: string end) (Value: Value) = struct
 
   module Initial_Values = struct let v = [] end
   module Deps = struct let l = [Ast.self] end
@@ -55,8 +55,10 @@ module Make_Memory (Value: Value) = struct
   include Hptmap.Make
       (Base.Base) (Value) (Hptmap.Comp_unused) (Initial_Values) (Deps)
 
+  let name = Info.name
+
   let cache_name s =
-    Hptmap_sig.PersistentCache ("Value." ^ Value.name ^ "." ^ s)
+    Hptmap_sig.PersistentCache ("Value." ^ name ^ "." ^ s)
 
   let disjoint_union =
     let cache = cache_name "union" in
@@ -186,7 +188,7 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
     try Some (Hashtbl.find table name)
     with Not_found -> None
 
-  module M = Make_Memory (Value)
+  module M = Make_Memory (Info) (Value)
   include M
 
   include Domain_builder.Complete (M)

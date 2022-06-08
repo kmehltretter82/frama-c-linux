@@ -27,7 +27,7 @@ module Static = struct
     include Datatype.Unit
     type state = t
 
-    let name = "Unit domain"
+    let name = "unit"
     let log_category = log_key
     let structure = Abstract.Domain.Unit
 

@@ -701,7 +701,7 @@ module State = struct
         type t = state
         include Datatype.Serializable_undefined
 
-        let name = "Octagons.State"
+        let name = "octagon"
         let structural_descr =
           Structural_descr.t_record
             [| Octagons.packed_descr;

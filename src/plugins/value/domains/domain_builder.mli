@@ -27,6 +27,8 @@ open Cil_types
 open Eval
 
 module type InputDomain = sig
+  (* The [name] value from Datatype should be the domain name and will be used
+     in some logs and in the GUI for the end-user. *)
   include Datatype.S
   val top: t
   val join: t -> t -> t

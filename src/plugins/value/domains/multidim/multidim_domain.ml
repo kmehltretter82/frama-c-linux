@@ -363,6 +363,8 @@ struct
       (Datatype.Option (Tracking))
       (struct let module_name = "DomainLattice" end)
 
+  let name = "multidim"
+
   type state = t
   type value = Value.t
   type value_or_uninitialized = Value_or_Uninitialized.t

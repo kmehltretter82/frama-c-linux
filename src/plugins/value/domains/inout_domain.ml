@@ -44,7 +44,7 @@ module LatticeInout = struct
       include Datatype.Serializable_undefined
 
       type t = inout
-      let name = "Value.Inout.t"
+      let name = "inout"
 
       let reprs = [ {
           over_outputs = List.hd Zone.reprs;

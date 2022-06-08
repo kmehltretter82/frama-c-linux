@@ -75,7 +75,7 @@ module LatticeTaint = struct
 
       type t = taint
 
-      let name = "Value.Taint.t"
+      let name = "taint"
 
       let reprs =
         [ { locs_data = List.hd Zone.reprs;

@@ -532,7 +532,7 @@ module Traces = struct
       include Datatype.Serializable_undefined
 
       type t = state
-      let name = "Value.Traces_domain.Traces.state"
+      let name = "traces"
 
       let reprs = [empty]
 

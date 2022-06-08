@@ -42,14 +42,15 @@ module Make
   }
 
   let () = incr counter
-  let name = Left.name ^ "*" ^ Right.name ^
-             "(" ^ string_of_int !counter ^ ")"
+  let unique_name = Left.name ^ "*" ^ Right.name ^
+                    "(" ^ string_of_int !counter ^ ")"
 
   include Datatype.Pair_with_collections
       (Left)
       (Right)
-      (struct let module_name = name end)
+      (struct let module_name = unique_name end)
   type state = t
+  let name = Left.name ^ " * " ^ Right.name
 
   let structure = Abstract.Domain.Node (Left.structure, Right.structure)
 

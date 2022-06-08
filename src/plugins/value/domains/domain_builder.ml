@@ -325,6 +325,7 @@ module Restrict
 
   module I = struct let module_name = Domain.name ^ " option" end
   include Datatype.Option_with_collections (D) (I)
+  let name = Domain.name
 
   let default = Domain.top, Mode.all
   let structure: t Abstract.Domain.structure =

@@ -532,6 +532,8 @@ module G = struct
       (Datatype.List(Datatype.Pair(Cil_datatype.Stmt)(IterationInfo)))
       (struct let module_name = "Values.Gauges_domain.G" end)
 
+  let name = "gauges"
+
   let empty = MV.empty, []
   let top (state: t) : t =
     let top_iteration_info = function

@@ -81,6 +81,8 @@ module Memory = struct
   include
     Lmap.Make_LOffset(V_Or_Uninitialized)(V_Offsetmap)(Default_offsetmap)
 
+  let name = "bitwise"
+
   let widen kf stmt s1 s2 =
     let wh = Widen.getWidenHints kf stmt in
     widen wh s1 s2

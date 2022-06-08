@@ -376,6 +376,10 @@ module type S = sig
   type state
   include Datatype.S_with_collections with type t = state
 
+  (* The domain name, shown in some logs and in the GUI. Be sure to redefine a
+     clear and simple name instead of the default one coming from Datatype. *)
+  val name: string
+
   (** {3 Lattice Structure } *)
   include Lattice with type state := t
 
