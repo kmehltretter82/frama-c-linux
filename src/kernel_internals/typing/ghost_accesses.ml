@@ -202,7 +202,7 @@ class visitor = object(self)
                 error_if_incompatible lv (getReturnType fct.vtype) (evar fct)
               | _ -> ()
             end
-          (* Note that we do not check "assigns" for a ghost function call has
+          (* Note that we do not check "assigns" for a ghost function call since
              the method vglob_aux and vassigns requires ghost functions to have
              either a contract or a definition.
              Thus, if the casts in input are valid:

@@ -76,6 +76,10 @@ let has_definition kf = match kf.fundec with
   | Definition  _ -> true
   | Declaration _ -> false
 
+let is_ghost kf = match kf.fundec with
+  | Definition ({ svar = { vghost }}, _)
+  | Declaration (_, { vghost },_, _) -> vghost
+
 (* ************************************************************************* *)
 (** {2 Kernel functions are comparable} *)
 (* ************************************************************************* *)
