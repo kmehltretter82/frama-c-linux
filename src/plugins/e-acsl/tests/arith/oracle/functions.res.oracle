@@ -31,14 +31,14 @@
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [eva:alarm] functions.c:63: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
+  function __e_acsl_assert_register_char: precondition data->values == \null ||
+                                                       \valid(data->values) got status unknown.
 [eva:alarm] functions.c:63: Warning: 
   function __e_acsl_assert_register_char: precondition data->values == \null ||
                                                        \valid(data->values) got status unknown.
 [eva:alarm] functions.c:65: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
+  function __e_acsl_assert_register_short: precondition data->values == \null ||
+                                                        \valid(data->values) got status unknown.
 [eva:alarm] functions.c:65: Warning: 
   function __e_acsl_assert_register_short: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.

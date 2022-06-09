@@ -42,11 +42,11 @@ void __gen_e_acsl_f1(__e_acsl_mpz_t *__retres_arg, int x, int y);
 
 /*@ logic char h_char(char c) = c;
  */
-int __gen_e_acsl_h_char(int c);
+char __gen_e_acsl_h_char(char c);
 
 /*@ logic short h_short(short s) = s;
  */
-int __gen_e_acsl_h_short(int s);
+short __gen_e_acsl_h_short(short s);
 
 /*@ logic int g_hidden(int x) = x;
  */
@@ -313,13 +313,13 @@ int main(void)
   /*@ assert g(x) == x; */ ;
   char c = (char)'c';
   {
-    int __gen_e_acsl_h_char_2;
+    char __gen_e_acsl_h_char_2;
     __e_acsl_mpz_t __gen_e_acsl_app_2;
     __e_acsl_mpz_t __gen_e_acsl_c;
     int __gen_e_acsl_eq_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
-    __gen_e_acsl_h_char_2 = __gen_e_acsl_h_char((int)c);
+    __gen_e_acsl_h_char_2 = __gen_e_acsl_h_char(c);
     __gmpz_init_set_si(__gen_e_acsl_app_2,(long)__gen_e_acsl_h_char_2);
     __gmpz_init_set_si(__gen_e_acsl_c,(long)c);
     __gen_e_acsl_eq_4 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_app_2),
@@ -342,13 +342,13 @@ int main(void)
   /*@ assert h_char(c) == c; */ ;
   short s = (short)1;
   {
-    int __gen_e_acsl_h_short_2;
+    short __gen_e_acsl_h_short_2;
     __e_acsl_mpz_t __gen_e_acsl_app_3;
     __e_acsl_mpz_t __gen_e_acsl_s;
     int __gen_e_acsl_eq_5;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
       {.values = (void *)0};
-    __gen_e_acsl_h_short_2 = __gen_e_acsl_h_short((int)s);
+    __gen_e_acsl_h_short_2 = __gen_e_acsl_h_short(s);
     __gmpz_init_set_si(__gen_e_acsl_app_3,(long)__gen_e_acsl_h_short_2);
     __gmpz_init_set_si(__gen_e_acsl_s,(long)s);
     __gen_e_acsl_eq_5 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_app_3),
@@ -629,18 +629,16 @@ void __gen_e_acsl_f1(__e_acsl_mpz_t *__retres_arg, int x, int y)
 
 /*@ assigns \result;
     assigns \result \from c; */
-int __gen_e_acsl_h_char(int c)
+char __gen_e_acsl_h_char(char c)
 {
-  int __retres = (char)c;
-  return __retres;
+  return c;
 }
 
 /*@ assigns \result;
     assigns \result \from s; */
-int __gen_e_acsl_h_short(int s)
+short __gen_e_acsl_h_short(short s)
 {
-  int __retres = (short)s;
-  return __retres;
+  return s;
 }
 
 /*@ assigns \result;

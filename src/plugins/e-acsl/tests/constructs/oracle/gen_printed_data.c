@@ -109,7 +109,7 @@ int main(void)
   __e_acsl_store_block((void *)(& int_bool),1UL);
   __e_acsl_full_init((void *)(& int_bool));
   {
-    int __gen_e_acsl_x;
+    _Bool __gen_e_acsl_x;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_x = int_bool;
     __e_acsl_assert_register_bool(& __gen_e_acsl_assert_data,"int_bool",0,
@@ -128,7 +128,7 @@ int main(void)
   __e_acsl_store_block((void *)(& int_char),1UL);
   __e_acsl_full_init((void *)(& int_char));
   {
-    int __gen_e_acsl_x_2;
+    char __gen_e_acsl_x_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __gen_e_acsl_x_2 = int_char;
@@ -148,7 +148,7 @@ int main(void)
   __e_acsl_store_block((void *)(& int_schar),1UL);
   __e_acsl_full_init((void *)(& int_schar));
   {
-    int __gen_e_acsl_x_3;
+    signed char __gen_e_acsl_x_3;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __gen_e_acsl_x_3 = int_schar;
@@ -168,7 +168,7 @@ int main(void)
   __e_acsl_store_block((void *)(& int_uchar),1UL);
   __e_acsl_full_init((void *)(& int_uchar));
   {
-    int __gen_e_acsl_x_4;
+    unsigned char __gen_e_acsl_x_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
     __gen_e_acsl_x_4 = int_uchar;
@@ -228,7 +228,7 @@ int main(void)
   __e_acsl_store_block((void *)(& int_short),2UL);
   __e_acsl_full_init((void *)(& int_short));
   {
-    int __gen_e_acsl_x_7;
+    short __gen_e_acsl_x_7;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
     __gen_e_acsl_x_7 = int_short;
@@ -248,7 +248,7 @@ int main(void)
   __e_acsl_store_block((void *)(& int_ushort),2UL);
   __e_acsl_full_init((void *)(& int_ushort));
   {
-    int __gen_e_acsl_x_8;
+    unsigned short __gen_e_acsl_x_8;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
       {.values = (void *)0};
     __gen_e_acsl_x_8 = int_ushort;
@@ -308,7 +308,7 @@ int main(void)
   __e_acsl_store_block((void *)(& int_llong),8UL);
   __e_acsl_full_init((void *)(& int_llong));
   {
-    long __gen_e_acsl_x_11;
+    long long __gen_e_acsl_x_11;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
       {.values = (void *)0};
     __gen_e_acsl_x_11 = int_llong;
@@ -328,7 +328,7 @@ int main(void)
   __e_acsl_store_block((void *)(& int_ullong),8UL);
   __e_acsl_full_init((void *)(& int_ullong));
   {
-    unsigned long __gen_e_acsl_x_12;
+    unsigned long long __gen_e_acsl_x_12;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
       {.values = (void *)0};
     __gen_e_acsl_x_12 = int_ullong;

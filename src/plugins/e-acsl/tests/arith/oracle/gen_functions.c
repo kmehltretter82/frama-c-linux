@@ -41,11 +41,11 @@ long __gen_e_acsl_f1(int x, int y);
 
 /*@ logic char h_char(char c) = c;
  */
-int __gen_e_acsl_h_char(int c);
+char __gen_e_acsl_h_char(char c);
 
 /*@ logic short h_short(short s) = s;
  */
-int __gen_e_acsl_h_short(int s);
+short __gen_e_acsl_h_short(short s);
 
 /*@ logic int g_hidden(int x) = x;
  */
@@ -282,13 +282,13 @@ int main(void)
   /*@ assert g(x) == x; */ ;
   char c = (char)'c';
   {
-    int __gen_e_acsl_h_char_2;
+    char __gen_e_acsl_h_char_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
-    __gen_e_acsl_h_char_2 = __gen_e_acsl_h_char((int)c);
+    __gen_e_acsl_h_char_2 = __gen_e_acsl_h_char(c);
     __e_acsl_assert_register_char(& __gen_e_acsl_assert_data_9,"c",0,c);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"h_char(c)",0,
-                                 __gen_e_acsl_h_char_2);
+    __e_acsl_assert_register_char(& __gen_e_acsl_assert_data_9,"h_char(c)",0,
+                                  __gen_e_acsl_h_char_2);
     __e_acsl_assert_register_char(& __gen_e_acsl_assert_data_9,"c",0,c);
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
@@ -296,20 +296,20 @@ int main(void)
     __gen_e_acsl_assert_data_9.file = "functions.c";
     __gen_e_acsl_assert_data_9.fct = "main";
     __gen_e_acsl_assert_data_9.line = 63;
-    __e_acsl_assert(__gen_e_acsl_h_char_2 == (int)c,
+    __e_acsl_assert((int)__gen_e_acsl_h_char_2 == (int)c,
                     & __gen_e_acsl_assert_data_9);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_9);
   }
   /*@ assert h_char(c) == c; */ ;
   short s = (short)1;
   {
-    int __gen_e_acsl_h_short_2;
+    short __gen_e_acsl_h_short_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
       {.values = (void *)0};
-    __gen_e_acsl_h_short_2 = __gen_e_acsl_h_short((int)s);
+    __gen_e_acsl_h_short_2 = __gen_e_acsl_h_short(s);
     __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_10,"s",0,s);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"h_short(s)",
-                                 0,__gen_e_acsl_h_short_2);
+    __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_10,
+                                   "h_short(s)",0,__gen_e_acsl_h_short_2);
     __e_acsl_assert_register_short(& __gen_e_acsl_assert_data_10,"s",0,s);
     __gen_e_acsl_assert_data_10.blocking = 1;
     __gen_e_acsl_assert_data_10.kind = "Assertion";
@@ -317,7 +317,7 @@ int main(void)
     __gen_e_acsl_assert_data_10.file = "functions.c";
     __gen_e_acsl_assert_data_10.fct = "main";
     __gen_e_acsl_assert_data_10.line = 65;
-    __e_acsl_assert(__gen_e_acsl_h_short_2 == (int)s,
+    __e_acsl_assert((int)__gen_e_acsl_h_short_2 == (int)s,
                     & __gen_e_acsl_assert_data_10);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
   }
@@ -512,18 +512,16 @@ long __gen_e_acsl_f1(int x, int y)
 
 /*@ assigns \result;
     assigns \result \from c; */
-int __gen_e_acsl_h_char(int c)
+char __gen_e_acsl_h_char(char c)
 {
-  int __retres = (char)c;
-  return __retres;
+  return c;
 }
 
 /*@ assigns \result;
     assigns \result \from s; */
-int __gen_e_acsl_h_short(int s)
+short __gen_e_acsl_h_short(short s)
 {
-  int __retres = (short)s;
-  return __retres;
+  return s;
 }
 
 /*@ assigns \result;

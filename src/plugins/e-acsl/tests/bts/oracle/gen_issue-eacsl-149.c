@@ -19,13 +19,13 @@ int main(int argc, char **argv)
     __gen_e_acsl_exists = 0;
     __gen_e_acsl_x = (unsigned int)(-1 + 1);
     while (1) {
-      if (__gen_e_acsl_x < 5U) ; else break;
-      if (! (__gen_e_acsl_x == 0U)) ;
+      if ((unsigned int)((int)__gen_e_acsl_x) < 5U) ; else break;
+      if (! ((int)__gen_e_acsl_x == 0)) ;
       else {
         __gen_e_acsl_exists = 1;
         goto e_acsl_end_loop1;
       }
-      __gen_e_acsl_x ++;
+      __gen_e_acsl_x = (int)__gen_e_acsl_x + 1U;
     }
     e_acsl_end_loop1: ;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
@@ -49,13 +49,13 @@ int main(int argc, char **argv)
     __gen_e_acsl_forall = 1;
     __gen_e_acsl_x_2 = (unsigned int)(-1 + 1);
     while (1) {
-      if (__gen_e_acsl_x_2 < 5U) ; else break;
-      if (__gen_e_acsl_x_2 != 0U) ;
+      if ((unsigned int)((int)__gen_e_acsl_x_2) < 5U) ; else break;
+      if ((int)__gen_e_acsl_x_2 != 0) ;
       else {
         __gen_e_acsl_forall = 0;
         goto e_acsl_end_loop2;
       }
-      __gen_e_acsl_x_2 ++;
+      __gen_e_acsl_x_2 = (int)__gen_e_acsl_x_2 + 1U;
     }
     e_acsl_end_loop2: ;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
