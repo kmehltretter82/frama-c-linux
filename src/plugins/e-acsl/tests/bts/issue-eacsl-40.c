@@ -11,6 +11,7 @@ int main() {
   if (f) {
     char buf[4];
     int res = fread(buf, 1, 4, f);
+    fclose(f);
     if (res == 4) {
       //@ assert \initialized(&buf[3]);
       buf[0] = buf[3];
