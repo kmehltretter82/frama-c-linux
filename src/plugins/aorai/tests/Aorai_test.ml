@@ -11,12 +11,13 @@ module P = Plugin.Register
       let help = "utility script for aorai regtests"
     end)
 
-module TestNumber =
-  P.Zero
+module TestID =
+  P.String
     (struct
-      let option_name = "-aorai-test-number"
+      let option_name = "-aorai-test-id"
       let help = "test number when multiple tests are run over the same file"
       let arg_name = "n"
+      let default = "0"
     end)
 
 module InternalWpShare =
@@ -81,7 +82,7 @@ let extend () =
         tmpdir ^ "/aorai_" ^
         Filename.(
           chop_extension (basename (List.hd (Kernel.Files.get()):>string))) ^
-        "_" ^ (string_of_int (TestNumber.get ())) ^ ".i"
+        "_" ^ (TestID.get ()) ^ ".i"
       in
       let () =
         Extlib.safe_at_exit
