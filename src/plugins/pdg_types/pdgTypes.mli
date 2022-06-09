@@ -22,7 +22,7 @@
 
 (** This module defines the types that are used to store the PDG of a
     function.
-    @plugin development guide *)
+*)
 
 (** [Dpd] stands for 'dependence'. This object is used as a label on the edges
  * of the PDG. There are three kinds of dependencies :

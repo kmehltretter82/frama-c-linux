@@ -13,6 +13,14 @@
 
 {
 }
+
+let alphanum = ['A'-'Z''a'-'z''0'-'9''_']
+let lower_name = ['a'-'z'] alphanum*
+(* in order to discriminate with other code keywords, we assume that an
+   OCaml module referenced in the LaTeX index is either a single letter
+   or has a lower case letter or an underscore as second character. *)
+let upper_name = ['A'-'Z'] ['a'-'z''_'] alphanum*
+
 rule token = parse
 | "\\texttt"                               { Check_index_grammar.KWD_WITH_ARG }
 | "\\see"                                  { Check_index_grammar.KWD_WITH_ARG }
@@ -35,6 +43,8 @@ rule token = parse
 and token_2 = parse
   | '\n'* ' '* [ 'a'-'z' '-' '.' ]+[ ^ '\n' ]*                                              { token_2 lexbuf }
   | '\n'* ' '* ([ 'A'-'Z' ][ 'a'-'z' '-' '_' '.' ]+ ' '* )+ ['A'-'Z'][^ 'a'-'z' '\n']+      { token_2 lexbuf }
-  | '\n'* ' '* ([ 'A'-'Z' ][ 'a'-'z' ]+[ ^ '\n' ' ' ]* ' '* )+ ([ 'a'-'z' ]+[ ^ '\n' ' ' ]* ' '* )* as s { if not (String.contains s '.') then Check_index_grammar.STRING (Lexing.lexeme lexbuf) else token_2 lexbuf}
+  | '\n'* ' '* ((upper_name ' '*)+ lower_name ' '* (upper_name ' '*)?) {
+      Check_index_grammar.STRING (Lexing.lexeme lexbuf)
+   }
   | '\n'* ' '* [ 'A'-'Z' '_' '-' ]+ [ ^ '\n' ]*                                     { token_2 lexbuf }
   | '\n'* eof                                                                       { Check_index_grammar.EOF }

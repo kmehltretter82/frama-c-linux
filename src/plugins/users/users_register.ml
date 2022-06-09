@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(**  @plugin development guide *)
-
 include
   Plugin.Register
     (struct
@@ -30,7 +28,6 @@ include
       let help = "function callees"
     end)
 
-(** @plugin development guide *)
 module ForceUsers =
   False
     (struct

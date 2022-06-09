@@ -34,15 +34,18 @@ DEPENDENCIES= $(FRAMAC_MODERN) $(GENERATED) frama-c-book.cls
 
 all: developer.pdf check
 
-FRAMAC := $(shell command -v frama-c 2> /dev/null)
+FC_BINDIR:=$(FRAMAC_ROOT_SRCDIR)/bin
+
+.PHONY: clean-tuto
+clean-tuto:
+	$(RM) ../../lib/plugins/META.frama-c-hello ../../lib/plugins/META.frama-c-viewcfg
+	$(RM) ../../lib/plugins/top/Hello.* ../../lib/plugins/top/Viewcfg.*
 
 # local plugin.cmi (if any) is in conflict with the one of Frama-C
 check: $(GENERATED)
-ifndef FRAMAC
-	$(ECHO) frama-c is not installed in the PATH, nothing to check!
-else
+	$(MAKE) clean-tuto
 	$(ECHO) Checking compilation of example scripts
-	../../bin/frama-c \
+	$(FC_BINDIR)/frama-c \
 		-load-script ./examples/syntactic_check \
 		-load-script ./examples/callstack \
 		-load-script ./examples/use_callstack \
@@ -56,17 +59,21 @@ else
            exit 1; \
         fi
 	for i in value value_gui_options visitor ; \
-	do ../../bin/frama-c -load-script ./tutorial/viewcfg/generated/$$i/cfg_print.ml ; \
+	do $(FC_BINDIR)/frama-c -load-script ./tutorial/viewcfg/generated/$$i/cfg_print.ml ; \
 	done
 	for i in with_options with_log with_registration ; \
-	do ../../bin/frama-c -load-script ./tutorial/hello/generated/$$i/hello_world.ml ; \
+	do $(FC_BINDIR)/frama-c -load-script ./tutorial/hello/generated/$$i/hello_world.ml ; \
 	done
 	$(ECHO) compilation ok
-	$(MAKE) -C tutorial/hello/generated/with_test
-	$(MAKE) -C tutorial/hello/generated/makefile_multiple
-	$(MAKE) -C tutorial/hello/generated/makefile_single
-	$(MAKE) -C tutorial/viewcfg/generated/split
-endif
+	$(MAKE) clean-tuto
+	PATH=$(FC_BINDIR):$$PATH; $(MAKE) DEVELOPMENT=no PTESTS_OPTS=-error-code -C tutorial/hello/generated/with_test byte opt tests
+	$(MAKE) clean-tuto
+	PATH=$(FC_BINDIR):$$PATH; $(MAKE) DEVELOPMENT=no PTESTS_OPTS=-error-code -C tutorial/hello/generated/makefile_multiple opt
+	$(MAKE) clean-tuto
+	PATH=$(FC_BINDIR):$$PATH; $(MAKE) DEVELOPMENT=no PTESTS_OPTS=-error-code -C tutorial/hello/generated/makefile_single opt
+	$(MAKE) clean-tuto
+	PATH=$(FC_BINDIR):$$PATH; $(MAKE) DEVELOPMENT=no PTESTS_OPTS=-error-code -C tutorial/viewcfg/generated/split opt
+	$(MAKE) clean-tuto
 
 check-all: developer.pdf 
 	$(MAKE) -C ../.. check-devguide

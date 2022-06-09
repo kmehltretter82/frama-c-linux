@@ -131,7 +131,7 @@ lexicographic ordering.
 
 For instance, Section \emph{Wished Plug-in} introduces a new sub-section for
 the plug-in \texttt{occurrence} in the following way.
-\codeidxdef{check\_plugin}
+\scodeidxdef{configure.in}{check\_plugin}
 \begin{configurecode}
 # occurrence
 ############
@@ -1593,9 +1593,10 @@ that can be used instead of the basic ones:
   debugging level are sufficient.
 
 %%item
-  \logprintf{with\_log}{ f ?kind}%
-  Emits a message like \texttt{log}, and finally pass the generated
-  message to the continuation $f$, and returns its result.
+  \logprintf{logwith}{ f ?wkey ?emitwith ?once}%
+  Emits a message like \texttt{warning}, and finally pass the generated
+  \texttt{event} (or \texttt{None}) to the continuation $f$,
+  and returns its result.
 \end{description}
 
 The default kind is \lstinline{Result}, but all the other kind of
@@ -1643,9 +1644,6 @@ own, in addition to the one automatically created for your plug-in.
   \logroutine{log\_channel}{ channel ?kind ?prefix}%
   This routine is similar to the \lstinline{log} one.
 
-%%item
-  \logroutine{with\_log\_channel}{ channel f ?kind ?prefix}%
-  This routine is similar to the \lstinline{with_log} one.
 \end{description}
 
 With both logging routines, you may specify a prefix to be used during
@@ -1784,8 +1782,9 @@ module implements a datastructure, it usually implements
 
 \begin{example}
 The following line of code pretty prints whether two statements are equal.
-\sscodeidx{Cil\_datatype}{Stmt}{pretty}
-\sscodeidx{Cil\_datatype}{Stmt}{equal}
+\scodeidx{Cil\_datatype}{Stmt}
+\sscodeidx{Datatype}{S\_no\_copy}{equal}
+\sscodeidx{Datatype}{S\_no\_copy}{pretty}
 \begin{ocamlcode}
 (* assuming the type of [stmt1] and [stmt2] is Cil_types.stmt *)
 Format.fprintf 
@@ -1801,7 +1800,8 @@ Format.fprintf
 Module \texttt{Datatype.String}\scodeidx{Datatype}{String} implements
 \texttt{Datatype.S\_with\_collections}. Thus you can initialize a set of strings
 in the following way.
-\sscodeidx{Datatype}{String}{Set}
+\scodeidx{Datatype}{String}
+\sscodeidx{Datatype}{S\_with\_collections}{Set}
 \begin{ocamlcode}
 let string_set = 
   List.fold_left 
@@ -1957,7 +1957,8 @@ Here is how to apply \texttt{Datatype.Polymorphic} corresponding to the type
 \scodeidx{Structural\_descr}{pack}
 \scodeidx{Structural\_descr}{p\_int}
 \scodeidx{Datatype}{Int}
-\sscodeidx{Datatype}{String}{Hashtbl}
+\scodeidx{Datatype}{String}
+\sscodeidx{Datatype}{S\_with\_collections}{Hashtbl}
 \scodeidx{Datatype}{List}
 \scodeidx{Type}{par}
 \begin{ocamlcode}
@@ -2308,13 +2309,12 @@ plug-in-defined types in an abstract way through the functor
 There is no current example in the \framac open-source part, but consider a
 plug-in which provides a dynamic API for callstacks as follows.
 \scodeidx{Plugin}{Register}
-\scodeidx{Kernel\_function}{t}
-\scodeidx{Kernel\_function}{ty}
-\scodeidx{Kernel\_function}{pretty}
+\codeidx{Kernel\_function}
+\sscodeidx{Datatype}{Ty}{t}
+\sscodeidx{Datatype}{Ty}{ty}
+\sscodeidx{Datatype}{S\_no\_copy}{pretty}
 \scodeidx{Kernel\_function}{dummy}
-\sscodeidx{Cil\_datatype}{Stmt}{t}
-\sscodeidx{Cil\_datatype}{Stmt}{ty}
-\sscodeidx{Cil\_datatype}{Stmt}{pretty}
+\scodeidx{Cil\_datatype}{Stmt}
 \scodeidx{Cil}{dummyStmt}
 \scodeidx{Datatype}{Serializable\_undefined}
 \ocamlinput{./examples/generated/callstack.ml}
@@ -2322,8 +2322,10 @@ plug-in which provides a dynamic API for callstacks as follows.
 You have to use the functor \texttt{Type.Abstract} to access to the type value
 corresponding to the type of callstacks (and thus to access to the above
 dynamically registered functions).
-\scodeidx{Kernel\_function}{ty}
-\sscodeidx{Cil\_datatype}{Stmt}{ty}
+\codeidx{Kernel\_function}
+\sscodeidx{Datatype}{Ty}{ty}
+\scodeidx{Cil\_datatype}{Stmt}
+\sscodeidx{Datatype}{Ty}{t}
 \scodeidx{Type}{Abstract}
 \scodeidx{Dynamic}{get}
 \scodeidx{Datatype}{func}
@@ -2448,7 +2450,10 @@ following.
   value analysis would not be consistent anymore with the current entry point,
   leading to incorrect results.
 \begin{example}
-\sscodeidx{Db}{Value}{is\_computed}
+\scodeidx{Analysis}{is\_computed}
+\sscodeidx{Eva}{Analysis}{is\_computed}
+\scodeidx{Analysis}{compute}
+\sscodeidx{Eva}{Analysis}{compute}
 ~
 
 \begin{ocamlcode}
@@ -2503,8 +2508,10 @@ In most non-\framac applications, a state is a global mutable value. One can use
 it to store results of analyses. For example, using this mechanism inside
 \framac to create a \texttt{state} which would memoize\index{Memoization} some
 information attached to statements would result in the following piece of code.
-\scodeidx{Kernel\_function}{t} \scodeidx{Cil\_types}{varinfo}
-\sscodeidx{Cil\_datatype}{Stmt}{Hashtbl} \sscodeidx{Db}{Value}{compute}
+\codeidx{Kernel\_function}\sscodeidx{Datatype}{Ty}{t}
+\scodeidx{Cil\_types}{varinfo}
+\scodeidx{Cil\_datatype}{Stmt}\sscodeidx{Datatype}{S\_with\_collections}{Hashtbl}
+\sscodeidx{Db}{Value}{compute}
 \begin{ocamlcode}
 open Cil_datatype
 type info = Kernel_function.t * Cil_types.varinfo
@@ -2961,8 +2968,9 @@ code.
 \subsection{Definition}\label{options:definition}
 
 In \framac, a parameter is represented by a value of type
-\texttt{Typed\_parameter.t}\scodeidxdef{Typed\_parameter}{t} and by a module
-implementing the signature
+\texttt{Typed\_parameter.t}\codeidxdef{Typed\_parameter}
+\sscodeidx{Datatype}{Ty}{t}
+and by a module implementing the signature
 \texttt{Parameter\_sig.S}\scodeidxdef{Parameter\_sig}{S}. The first
 representation is a low-level one required by emitters\index{Emitter} (see
 Section~\ref{adv:annotations}) and the GUI. The second one provides a high-level
@@ -3786,10 +3794,10 @@ risk sharing\index{Sharing} the same AST\index{AST!Sharing|see{Sharing}}).
 \index{Visitor!Behavior|bfit}
 
 The visitors take as argument a
-\verb+visitor_behavior+\scodeidx{Cil}{visitor\_behavior}, which comes in two
-flavors: \verb+inplace_visit+\scodeidx{Cil}{inplace\_visit}%
-\index{Visitor!In-Place|bfit} and \verb+copy_visit+%
-\scodeidx{Cil}{copy\_visit}\index{Visitor!Copy|bfit}. In the in-place mode,
+\verb+Visitor_behavior.t+\scodeidx{Visitor\_behavior}{t}, which comes in two
+flavors: \verb+inplace+\scodeidx{Visitor\_behavior}{inplace}%
+\index{Visitor!In-Place|bfit} and \verb+copy+%
+\scodeidx{Visitor\_behavior}{copy}\index{Visitor!Copy|bfit}. In the in-place mode,
 nodes are visited in place, while in the copy mode, nodes are copied and the
 visit is done on the copy\index{AST!Copying}. For the nodes
 shared\index{Sharing} across the AST
@@ -3802,32 +3810,37 @@ shared\index{Sharing} across the AST
 \verb+logic_info+\scodeidx{Cil\_types}{logic\_info} and
 \verb+fieldinfo+\scodeidx{Cil\_types}{fieldinfo}), sharing is of course
 preserved, and the mapping between the old nodes and their copy can be
-manipulated explicitly through the following functions:
+manipulated explicitly through the following modules, which define a function
+for each of the types above.
 \begin{itemize}
 \item
-  \verb+reset_behavior_+\emph{name}
-  \scodeidxdef{Cil}{reset\_behavior\_varinfo}
-  resets the mapping corresponding to the type \emph{name}.
-\item \verb+get_original_+\emph{name}\scodeidxdef{Cil}{get\_original\_varinfo}
-  gets the original value corresponding to a copy (and behaves as the identity
-  if the given value is not known).
-\item \verb+get_+\emph{name}\scodeidxdef{Cil}{get\_varinfo} gets the copy
+  \verb+Reset+\scodeidxdef{Visitor\_behavior}{Reset}
+  allows to reset the mappings.
+\item \verb+Get+\scodeidxdef{Visitor\_behavior}{Get} gets the copy
   corresponding to an old value. If the given value is not known, it behaves as
   the identity.
-\item \verb+set_+\emph{name}\scodeidxdef{Cil}{set\_varinfo} sets a copy for a
+\item \verb+Memo+\scodeidxdef{Visitor\_behavior}{Memo} is similar to
+  \verb+Get+, except that if the given value is not known, a new binding is
+  created.
+\item \verb+Get_orig+\scodeidxdef{Visitor\_behavior}{Get\_orig}
+  gets the original value corresponding to a copy (and behaves as the identity
+  if the given value is not known).
+\item \verb+Set+\emph{name}\scodeidxdef{Visitor\_behavior}{Set} sets a copy for a
   given value. Be sure to use it before any occurrence of the old value has
   been copied, or sharing will be lost.
+\item \verb+Set_orig+\scodeidxdef{Visitor\_behavior}{Set\_orig} sets the original
+  value corresponding to a given copy.
 \end{itemize}
 
 \begin{important}
-  \verb+get_original_+\emph{name} functions allow to retrieve additional
+  Functions from the \verb+Get_orig+\emph{name} modules allow to retrieve additional
   information tied to the original AST nodes. Its result must not be modified
   in place\index{AST!Modification} (this would defeat the purpose of operating
   on a copy to leave the original AST untouched). Moreover, note that whenever
   the index used for \emph{name} is modified in the copy, the internal state of
   the visitor behavior\index{Visitor!Behavior} must be updated accordingly
-  (\emph{via} the \verb+set_+\emph{name} function) for
-  \verb+get_original_+\emph{name} to give correct results.\index{Consistency}
+  (\emph{via} the \verb+Set.+\emph{name} function) for
+  \verb+Get_orig.+\emph{name} to give correct results.\index{Consistency}
 \end{important}
 
 The list of such indices is given Figure~\ref{fig:idx-visitor}.
@@ -3903,7 +3916,7 @@ whether the table entries are visited before or after the children in the AST.
 Here is a small copy visitor that adds an assertion for each
 division in the program, stating that the divisor is not zero:
 \scodeidx{Visitor}{generic\_frama\_c\_visitor}
-\scodeidx{Cil}{copy\_visit}
+\scodeidx{Visitor\_behavior}{copy}
 \scodeidx{Cil}{lzero}
 \sscodeidx{Cil}{cilVisitor}{vexpr}
 \sscodeidx{Cil\_types}{exp\_node}{BinOp}
@@ -3917,8 +3930,8 @@ division in the program, stating that the divisor is not zero:
 \scodeidx{File}{create\_project\_from\_visitor}
 \scodeidx{Annotations}{add\_assert}
 \sscodeidx{Db}{Main}{extend}
-\scodeidx{Cil}{get\_stmt}
-\scodeidx{Cil}{get\_kernel\_function}
+\sscodeidx{Visitor\_behavior}{Get}{stmt}
+\sscodeidx{Visitor\_behavior}{Get}{kernel\_function}
 \sscodeidx{Cil}{cilVisitor}{behavior}
 \scodeidx{Ast}{self}
 \sscodeidx{Cil}{cilVisitor}{current\_kinstr}
@@ -3977,12 +3990,13 @@ Such clauses can be of different categories, as described by
 \scodeidx{Cil\_types}{ext\_category}\texttt{Cil\_types.ext\_category}.
 \begin{itemize}
 \item A contract extension will be
-stored in the \texttt{b\_extended}\sscodeidx{Cil\_types}{behavior}{b\_extended} field of
+stored in the \texttt{b\_extended}\scodeidx{Cil\_types}{behavior}{b\_extended} field of
 \texttt{Cil\_types.behavior}\scodeidx{Cil\_types}{behavior}.
 \item A global extension will be found as a global ACSL annotation in the form of a
-\scodeidx{Cil\_types}{Dextended}\texttt{Cil\_types.Dextended} constructor.
-\item A code annotation extension will be stored with an
-\scodeidx{Cil\_types}{AExtended}\texttt{Cil\_types.AExtended} constructor. Such an extension has itself
+\sscodeidx{Cil\_types}{global\_annotation}{Dextended}\texttt{Cil\_types.Dextended} constructor.
+\item A code annotation extension will be stored with the
+\sscodeidx{Cil\_types}{code\_annotation\_node}{AExtended}\texttt{Cil\_types.AExtended}
+constructor. Such an extension has itself
 different flavors, determined by the \scodeidx{Cil\_types}{ext\_code\_annot\_context} type:
 \begin{itemize}
 \item it can be meant to be evaluated exactly at the current program point
@@ -4009,8 +4023,9 @@ Similarly, in a loop annotation, \verb|loop kw e1, ..., en;| will be treated as 
 \verb|kw| extension. In case the loop annotation has a \verb|loop variant|, the extension must 
 occur before. Otherwise, there is no ordering constraint with other loop annotations clauses.
 
-Global extensions can appear either alone in a global annotation, or as part of an axiomatic with
-a set of other global annotations.
+Global extensions can either be a standalone global annotation, or a whole block
+of global extensions, the latter case following the syntax of
+\texttt{axiomatic} blocks.
 
 Finally, a code annotation extension must appear as a single code annotation, like any code annotation.
 
@@ -4048,6 +4063,8 @@ registered by one of the following functions, depending on its category.
 \scodeidx{Acsl\_extension}{register\_behavior}
 \item \texttt{Acsl\_extension.register\_global}%
 \scodeidx{Acsl\_extension}{register\_global}
+\item \texttt{Acsl\_extension.register\_global\_block}%
+\scodeidx{Acsl\_extension}{register\_global\_block}
 \item \texttt{Acsl\_extension.register\_code\_annot}%
 \scodeidx{Acsl\_extension}{register\_code\_annot}
 \item \texttt{Acsl\_extension.register\_code\_annot\_next\_stmt}%
@@ -4236,7 +4253,7 @@ for details about the provided operations on these types.
 As join operators are provided for these types, they can be easily used in
 abstract interpretation analyses\index{Abstract Interpretation} (which can
 themselves be implemented thanks to one of functors of module
-\texttt{Dataflow2}\codeidx{Dataflow}.
+\texttt{Dataflow2}\codeidx{Dataflow2}.
 
 \subsection{Map Indexed by Locations}\label{memory:map}
 
@@ -4382,55 +4399,6 @@ compiled together with \framac. However, in order to be able to compile the
 documentation with \texttt{make doc}, you must have generated the documentation
 of Frama-C's kernel (\texttt{make doc}, see above) and installed it with the 
 \texttt{make install-doc-code}\codeidx{install-doc-code} command.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% \section{License Policy}\label{adv:copyright}\index{License|bfit}
-
-%% \begin{target}developers with a SVN access.\end{target}
-
-%% \begin{prereq}
-%% knowledge of \make.
-%% \end{prereq}
-
-%% If you want to redistribute a plug-in inside \framac, you have to define a
-%% proper license policy\index{Plug-in!License}. For this purpose, some help is
-%% provided in the \texttt{Makefile}\codeidx{Makefile}. Mainly we distinguish two
-%% cases described below.
-%% \begin{itemize}
-%% \item \textbf{If the wished license is already used inside \framac}, just
-%%   extend the variable corresponding to the wished license in order to include
-%%   files of your plug-in. Next run \texttt{make headers}\index{Header}.
-%%   \begin{example}
-%%     Plug-in \texttt{slicing}\index{Slicing}\index{Plug-in!Slicing|see{Slicing}}
-%%     is released under LGPL\index{LGPL} and is proprietary of both CEA and
-%%     INRIA\index{Copyright}. Thus, in the \texttt{Makefile}, there is the following line.
-%%     \codeidx{CEA\_INRIA\_LGPL}
-%%     \begin{makefilecode}
-%% CEA_INRIA_LGPL= ... €
-%%                  src/plugins/slicing/*.ml*
-%%      \end{makefilecode}
-%%   \end{example}
-%% \item \textbf{If the wished license is unknown inside \framac}, you have to:
-%%   \begin{enumerate}
-%%   \item Add a new variable $v$ corresponding to it and assign files of your
-%%     plug-in;
-%%   \item Extend variable \texttt{LICENSES}\codeidx{LICENSES} with
-%%     this variable;
-%%   \item Add a text file in directory \texttt{licenses}\codeidx{licenses}
-%%     containing your licenses
-%%   \item Add a text file in directory \texttt{headers}\codeidx{headers}
-%%     containing the headers\index{Header} to add into files of your plug-in
-%%     (those assigned by $v$).
-
-%%     \begin{important}
-%%       The filename must be the same than the variable name $v$. Moreover this
-%%       file should contain a reference to the file containing the whole license
-%%       text.
-%%     \end{important}
-%%   \item Run \texttt{make headers}.
-%%   \end{enumerate}
-%% \end{itemize}
 
 % Local Variables:
 % ispell-local-dictionary: "english"

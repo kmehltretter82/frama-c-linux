@@ -23,8 +23,11 @@
 (** Parameter settable through a command line option.
     This is a low level API, internally used by the kernel. As a plug-in
     developer, you certainly prefer to use the API of {!Plugin} instead.
-    @since Nitrogen-20111001 *)
+    @since Nitrogen-20111001
+    @plugin development guide
+*)
 
+(** generic accessor type *)
 type ('a, 'b) gen_accessor =
   { get: unit -> 'a;
     set: 'a -> unit;

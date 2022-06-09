@@ -20,12 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Plugin registration and general services.
+    @plugin development guide
+*)
 
 (** Special signature for Kernel services, whose messages are handled in
     an ad'hoc manner. Should not be of any use for a standard plug-in,
     who would rather rely on {!Plugin.S} below.
     @since Chlorine-20180501
-    @plugin development guide
 *)
 module type S_no_log = sig
 
@@ -78,7 +80,7 @@ end
     @since Beryllium-20090601-beta1
     @modify Chlorine-20180501 removed programmatic access to [Debug_category]:
     managing categories is now entirely done by Log.Messages
-    @plugin development guide *)
+*)
 module type S = sig
   include Log.Messages
   include S_no_log

@@ -20,7 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extension of OCaml's [Hashtbl] module. *)
+(** Extension of OCaml's [Hashtbl] module.
+
+    @plugin development guide
+*)
 
 (* No need to expand OCaml's [Hashtbl.S] here: we do not provide an alternative
    implementation of [Hashtbl]. Hence, we will always be compatible with the

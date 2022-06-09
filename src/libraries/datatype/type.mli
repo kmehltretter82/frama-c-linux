@@ -45,8 +45,8 @@ type 'a ty = 'a t
 (** Precedences used for generating the minimal number of parenthesis in
     combination with function {!par} below. *)
 type precedence =
-  | Basic (** @plugin development guide *)
-  | Call (** @plugin development guide *)
+  | Basic (** Normal precedence @plugin development guide *)
+  | Call (** Instantiation of polymorphic type @plugin development guide *)
   | Tuple
   | List
   | NoPar

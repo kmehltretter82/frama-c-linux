@@ -20,6 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Creation of windows for displaying graphs. Only available
+    for lablgtk2. In lablgtk3 mode, the window will only display a
+    text saying that the feature is not available.
+*)
+
 (** Create a new window displaying a graph.
     @plugin development guide *)
 val graph_window:

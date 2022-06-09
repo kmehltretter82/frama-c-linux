@@ -45,7 +45,10 @@ type 'a t = private
 (** A type with its type value. *)
 module type Ty = sig
   type t
+  (** @plugin development guide *)
+
   val ty: t Type.t
+  (** @plugin development guide *)
 end
 
 (** All values associated to a datatype, excepted [copy]. *)
@@ -66,7 +69,9 @@ module type S_no_copy = sig
   (** List of representants of the descriptor. *)
 
   val equal: t -> t -> bool
-  (** Equality: same spec than [Stdlib.(=)]. *)
+  (** Equality: same spec than [Stdlib.(=)].
+      @plugin development guide
+  *)
 
   val compare: t -> t -> int
   (** Comparison: same spec than [Stdlib.compare]. *)
@@ -83,7 +88,9 @@ module type S_no_copy = sig
       context in order to put parenthesis if required. See {!Type.par}. *)
 
   val pretty: Format.formatter -> t -> unit
-  (** Pretty print each value in an user-friendly way. *)
+  (** Pretty print each value in an user-friendly way.
+      @plugin development guide
+  *)
 
   val varname: t -> string
   (** A good prefix name to use for an OCaml variable of this type. Only useful
@@ -279,12 +286,18 @@ module type Hashtbl = sig
 end
 
 (** A datatype for a type [t] extended with predefined set, map and hashtbl
-    over [t]. *)
+    over [t].
+
+    @plugin development guide
+*)
 module type S_with_collections = sig
   include S
   module Set: Set with type elt = t
+  (** @plugin development guide *)
+
   module Map: Map with type key = t
   module Hashtbl: Hashtbl with type key = t
+  (** @plugin development guide *)
 end
 
 (** Generic comparable datatype builder: functions [equal], [compare] and

@@ -797,7 +797,7 @@ nothing for the other globals.
 \sscodeidx{Cil}{visitAction}{DoChildrenPost}
 \sscodeidx{Cil}{visitAction}{SkipChildren}
 \sscodeidx{Visitor}{frama\_c\_visitor}{vglob\_aux}
-\scodeidx{Cil\_types}{GFun}
+\sscodeidx{Cil\_types}{global}{GFun}
 \scodeidx{Printer\_api}{S.pp\_varinfo}
 
 \texttt{Cil.SkipChildren} tells the visitor not to visit the children
@@ -976,6 +976,15 @@ CFG'' item appears, that displays the control flow graph of the
 function in a dialog box. This is achieved just by appending the following
 pieces of code at the end of the \texttt{cfg\_print.ml} file.
 
+\begin{important}
+Frama-C's GUI can be compiled against two versions of lablgtk (the OCaml
+bindings to the Gtk toolkit). The actual rendering of the control flow graph
+is actually done by the external OCamlgraph library, and only available
+when compiling against lablgtk2. If you're using lablgtk3,
+you will only see a pop-up window indicating that there's no support for
+displaying graphs.
+\end{important}
+
 Currently, we used a visitor that outputs a \dottool file with the CFG of
 all functions of all files. We use \texttt{dump\_function} to output
 the CFG of a single function instead.
@@ -990,10 +999,10 @@ representing a function definition.
 Now we write the GUI extension code:
 
 \ocamlinput{./tutorial/viewcfg/src/gui.ml}
-\scodeidx{Pretty\_source}{PVDecl}
+\sscodeidx{Pretty\_source}{localizable}{PVDecl}
 \sscodeidx{Globals}{Functions}{get}
 \scodeidx{Kernel\_function}{get\_definition}
-\scodeidx{Gtk\_helper}{graph\_window}
+\scodeidx{Dgraph\_helper}{graph\_window}
 \scodeidx{Design}{register\_extension}
 \sscodeidx{Design}{main\_window\_extension\_points}{register\_source\_selector}
 
@@ -1169,7 +1178,7 @@ Registering a state is done by a functor application:
 
 \ocamlinput{./tutorial/viewcfg/src/register_cfg_graph_state.ml}
 \scodeidx{State\_builder}{Hashtbl}
-\sscodeidx{Cil\_datatype}{Fundec}{Hashtbl}
+\scodeidx{Cil\_datatype}{Fundec}
 \scodeidx{Datatype}{String}
 \scodeidx{Ast}{self}
 \sscodeidx{Db}{Value}{self}
@@ -1256,7 +1265,7 @@ following.
 
 \ocamlinput{./tutorial/viewcfg/src/dump_function_memo_clear_cache.ml}
 \sscodeidx{Db}{Value}{is\_computed}
-\scodeidx{State\_selection}{with\_dependencies}
+\sscodeidx{State\_selection}{S}{with\_dependencies}
 \scodeidx{Project}{clear}
 
 The only part that need to be explained is the notion of
@@ -1280,7 +1289,8 @@ val clear: ?selection:State_selection.t -> ?project:t -> unit -> unit
 \end{ocamlcode}
 \scodeidxdef{Project}{clear}
 \scodeidx{State\_selection}{t}
-\scodeidx{Project}{t}
+\codeidx{Project}
+\sscodeidx{Datatype}{Ty}{t}
 
 The arguments \texttt{selection} and \texttt{project} can be seen as a
 coordinate system, and the function allows to clear specific versions
@@ -1309,7 +1319,7 @@ To summarize:
   when the former is modified in an incompatible way. For instance, it would
   have been incorrect to not call 
   \texttt{State\_selection.with\_dependencies}
-  \scodeidx{State\_selection}{with\_dependencies} in the last code snippet of
+  \sscodeidx{State\_selection}{S}{with\_dependencies} in the last code snippet of
   this tutorial.
 \end{itemize}
 
