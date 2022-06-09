@@ -43,13 +43,7 @@ let pending_typing : (unit -> unit) Stack.t = Stack.create ()
 (** Datatype and constructor *)
 (******************************************************************************)
 
-type number_ty =
-  | C_integer of ikind
-  | C_float of fkind
-  | Gmpz
-  | Rational
-  | Real
-  | Nan
+module D = Number_ty
 
 let ikind ik = C_integer ik
 let c_int = ikind IInt
@@ -57,60 +51,6 @@ let gmpz = Gmpz
 let fkind fk = C_float fk
 let rational = Rational
 let nan = Nan
-
-module D =
-  Datatype.Make_with_collections
-    (struct
-      type t = number_ty
-      let name = "E_ACSL.Typing.t"
-      let reprs = [ Gmpz; Real; Nan; c_int ]
-      include Datatype.Undefined
-
-      let compare ty1 ty2 =
-        if ty1 == ty2 then 0
-        else
-          match ty1, ty2 with
-          | C_integer i1, C_integer i2 ->
-            if i1 = i2 then 0
-            else if Cil.intTypeIncluded i1 i2 then -1 else 1
-          | C_float f1, C_float f2 ->
-            Stdlib.compare f1 f2
-          | (C_integer _ | C_float _ | Gmpz | Rational | Real), Nan
-          | (C_integer _ | C_float _ | Gmpz | Rational ), Real
-          | (C_integer _ | C_float _ | Gmpz), Rational
-          | (C_integer _ | C_float _), Gmpz
-          | C_integer _, C_float _ ->
-            -1
-          | (C_float _ | Gmpz | Rational | Real | Nan), C_integer _
-          | (Gmpz | Rational | Real | Nan), C_float _
-          | (Rational | Real | Nan), Gmpz
-          | (Real | Nan), Rational
-          | Nan, Real ->
-            1
-          | Gmpz, Gmpz
-          | Rational, Rational
-          | Real, Real
-          | Nan, Nan ->
-            assert false
-
-      let equal = Datatype.from_compare
-
-      let hash = function
-        | C_integer ik -> 7 * Hashtbl.hash ik
-        | C_float fk -> 97 * Hashtbl.hash fk
-        | Gmpz -> 787
-        | Rational -> 907
-        | Real -> 1011
-        | Nan -> 1277
-
-      let pretty fmt = function
-        | C_integer k -> Printer.pp_ikind fmt k
-        | C_float k -> Printer.pp_fkind fmt k
-        | Gmpz -> Format.pp_print_string fmt "Gmpz"
-        | Rational -> Format.pp_print_string fmt "Rational"
-        | Real -> Format.pp_print_string fmt "Real"
-        | Nan -> Format.pp_print_string fmt "Nan"
-    end)
 
 (******************************************************************************)
 (** Basic operations *)

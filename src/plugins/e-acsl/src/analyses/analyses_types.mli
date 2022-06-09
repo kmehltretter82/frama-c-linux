@@ -68,10 +68,17 @@ type annotation_kind =
   | Variant
   | RTE
 
-
 type ival =
   | Ival of Ival.t
   | Float of fkind * float option (* a float constant, if any *)
+  | Rational
+  | Real
+  | Nan
+
+type number_ty =
+  | C_integer of ikind
+  | C_float of fkind
+  | Gmpz
   | Rational
   | Real
   | Nan

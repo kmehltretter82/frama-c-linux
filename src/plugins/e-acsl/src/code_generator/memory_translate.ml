@@ -269,7 +269,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
   Typing.preprocess_term ~use_gmp_opt:false ~logic_env size_term;
   let size, adata, env =
     match Typing.get_number_ty size_term  ~logic_env with
-    | Typing.Gmpz ->
+    | Gmpz ->
       (* Start by translating [size_term] to an expression so that the full term
          with [\let] is not passed around. *)
       let size_e, adata, env = !term_to_exp_ref ~adata kf env size_term in
@@ -283,10 +283,8 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
             "translation to GMP code should always return a C variable"
       in
       gmp_to_sizet ~adata ~loc ~pp:size_term kf env cvar_term p
-    | Typing.(C_integer _ | C_float _) ->
-      !term_to_exp_ref ~adata kf env size_term
-    | Typing.(Rational | Real | Nan) ->
-      assert false
+    | C_integer _ | C_float _ -> !term_to_exp_ref ~adata kf env size_term
+    | Rational | Real | Nan -> assert false
   in
   ptr, size, adata, env
 

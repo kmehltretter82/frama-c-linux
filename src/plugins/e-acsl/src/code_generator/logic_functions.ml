@@ -22,6 +22,7 @@
 
 open Cil_types
 open Cil_datatype
+open Analyses_types
 open Analyses_datatype
 module Error = Translation_error
 
@@ -129,16 +130,16 @@ let generate_kf ~loc fname env ret_ty params_ty params_ival li =
     List.fold_right2
       (fun lvi pty (params, params_ty) ->
          let ty = match pty with
-           | Typing.Gmpz ->
+           | Gmpz ->
              (* GMP's integer are arrays: consider them as pointers in function's
                 parameters *)
              Gmp_types.Z.t_as_ptr ()
-           | Typing.C_integer ik -> TInt(ik, [])
-           | Typing.C_float ik -> TFloat(ik, [])
+           | C_integer ik -> TInt(ik, [])
+           | C_float ik -> TFloat(ik, [])
            (* for the time being, no reals but rationals instead *)
-           | Typing.Rational -> Gmp_types.Q.t ()
-           | Typing.Real -> Error.not_yet "real number"
-           | Typing.Nan -> Typing.typ_of_lty lvi.lv_type
+           | Rational -> Gmp_types.Q.t ()
+           | Real -> Error.not_yet "real number"
+           | Nan -> Typing.typ_of_lty lvi.lv_type
          in
          (* build the formals: cannot use [Cil.makeFormal] since the function
             does not exist yet *)

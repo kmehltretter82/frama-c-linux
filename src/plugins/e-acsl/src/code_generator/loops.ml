@@ -309,9 +309,9 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let var_x, x, env = Env.Logic_binding.add ~ty env kf logic_x in
     let lv_x = var var_x in
     let env = match ctx with
-      | Typing.C_integer _ -> env
-      | Typing.Gmpz -> Env.add_stmt env (Gmp.init ~loc x)
-      | Typing.(C_float _ | Rational | Real | Nan) -> assert false
+      | C_integer _ -> env
+      | Gmpz -> Env.add_stmt env (Gmp.init ~loc x)
+      | C_float _ | Rational | Real | Nan -> assert false
     in
     (* build the inner loops and loop body *)
     let body, env =

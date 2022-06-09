@@ -45,21 +45,12 @@
     safely be computed in [int]: its result belongs to [[-2;4]]. *)
 
 open Cil_types
+open Analyses_types
 open Analyses_datatype
 
 (******************************************************************************)
 (** {2 Datatypes} *)
 (******************************************************************************)
-
-(** Possible types infered by the system. *)
-
-type number_ty = private
-  | C_integer of ikind
-  | C_float of fkind
-  | Gmpz
-  | Rational
-  | Real
-  | Nan
 
 (** {3 Smart constructors} *)
 

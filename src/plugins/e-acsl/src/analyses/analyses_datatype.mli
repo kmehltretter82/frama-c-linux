@@ -101,3 +101,6 @@ module LF_env : sig
 
   val replace : logic_info -> Profile.t -> ival -> unit
 end
+
+module Number_ty:  Datatype.S_with_collections
+  with type t = number_ty

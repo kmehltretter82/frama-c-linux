@@ -23,6 +23,7 @@
 (** Utility functions for generating C implementations. *)
 
 open Cil_types
+open Analyses_types
 module Error = Translation_error
 
 (**************************************************************************)
@@ -202,9 +203,9 @@ let comparison_to_exp
       Env.not_yet env "comparison between two structs or unions"
     | Logic_aggr.NotAggregate, Logic_aggr.NotAggregate -> begin
         match ity with
-        | Typing.C_integer _ | Typing.C_float _ | Typing.Nan ->
+        | C_integer _ | C_float _ | Nan ->
           Cil.mkBinOp ~loc bop e1 e2, env
-        | Typing.Gmpz ->
+        | Gmpz ->
           let _, e, env = Env.new_var
               ~loc
               env
@@ -220,10 +221,8 @@ let comparison_to_exp
                      [ e1; e2 ] ])
           in
           Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
-        | Typing.Rational ->
-          Rational.cmp ~loc bop e1 e2 env kf t_opt
-        | Typing.Real ->
-          Error.not_yet "comparison involving real numbers"
+        | Rational -> Rational.cmp ~loc bop e1 e2 env kf t_opt
+        | Real -> Error.not_yet "comparison involving real numbers"
       end
     | _, _ ->
       Options.fatal
@@ -283,14 +282,11 @@ let env_of_li ~adata ~loc kf env li =
     let vi, vi_e, env = Env.Logic_binding.add ~ty env kf li.l_var_info in
     let e, adata, env = !term_to_exp_ref ~adata kf env t in
     let stmt = match Typing.get_number_ty ~logic_env t with
-      | Typing.(C_integer _ | C_float _ | Nan) ->
+      | C_integer _ | C_float _ | Nan ->
         Smart_stmt.assigns ~loc ~result:(Cil.var vi) e
-      | Typing.Gmpz ->
-        Gmp.init_set ~loc (Cil.var vi) vi_e e
-      | Typing.Rational ->
-        Rational.init_set ~loc (Cil.var vi) vi_e e
-      | Typing.Real ->
-        Error.not_yet "real number"
+      | Gmpz -> Gmp.init_set ~loc (Cil.var vi) vi_e e
+      | Rational -> Rational.init_set ~loc (Cil.var vi) vi_e e
+      | Real -> Error.not_yet "real number"
     in
     adata, Env.add_stmt env stmt
   | Ltype _ ->

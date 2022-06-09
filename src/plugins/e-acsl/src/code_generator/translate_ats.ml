@@ -330,11 +330,11 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
       Cil.intType
     | PoT_term t ->
       begin match Typing.get_number_ty ~logic_env t with
-        | Typing.(C_integer _ | C_float _ | Nan) ->
+        | C_integer _ | C_float _ | Nan ->
           Typing.get_typ ~logic_env t
-        | Typing.(Rational | Real) ->
+        | Rational | Real ->
           Error.not_yet "\\at on purely logic variables and over real type"
-        | Typing.Gmpz ->
+        | Gmpz ->
           Error.not_yet "\\at on purely logic variables and over gmp type"
       end
   in
@@ -357,7 +357,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
          in
          Typing.preprocess_term ~use_gmp_opt:false ~logic_env t_size;
          let malloc_stmt = match Typing.get_number_ty ~logic_env t_size with
-           | Typing.C_integer IInt ->
+           | C_integer IInt ->
              let e_size, _, _ =
                term_to_exp ~adata:Assert.no_data kf env t_size
              in
@@ -369,11 +369,11 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
                  [ e_size ]
              in
              malloc_stmt
-           | Typing.(C_integer _ | C_float _ | Gmpz) ->
+           | C_integer _ | C_float _ | Gmpz ->
              Error.not_yet
                "\\at on purely logic variables that needs to allocate \
                 too much memory (bigger than int_max bytes)"
-           | Typing.(Rational | Real | Nan) ->
+           | Rational | Real | Nan ->
              Error.not_yet "quantification over non-integer type"
          in
          let free_stmt = Smart_stmt.call ~loc "free" [e] in
@@ -411,7 +411,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
       [ Smart_stmt.block_stmt block ], env
     | PoT_term t ->
       begin match Typing.get_number_ty ~logic_env t with
-        | Typing.(C_integer _ | C_float _ | Nan) ->
+        | C_integer _ | C_float _ | Nan ->
           let env = Env.push env in
           let lval, env = lval_at_index ~loc kf env (e_at, t_index) in
           let e, _, env = term_to_exp kf env t in
@@ -425,9 +425,9 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
           (* We CANNOT return [block.bstmts] because it does NOT contain
              variable declarations. *)
           [ Smart_stmt.block_stmt block ], env
-        | Typing.(Rational | Real) ->
+        | Rational | Real ->
           Error.not_yet "\\at on purely logic variables and over real type"
-        | Typing.Gmpz ->
+        | Gmpz ->
           Error.not_yet "\\at on purely logic variables and over gmp type"
       end
   in

@@ -55,15 +55,14 @@ let constant_to_exp ~loc env t c =
     let logic_env = Env.Logic_env.get env in
     let ity = Typing.get_number_ty ~logic_env t in
     (match ity with
-     | Typing.Nan -> assert false
-     | Typing.Real -> Error.not_yet "real number constant"
-     | Typing.Rational -> mk_real (Integer.to_string n)
-     | Typing.Gmpz ->
-       (* too large integer *)
-       Cil.mkString ~loc (Integer.to_string n), Typed_number.Str_Z
-     | Typing.C_float fkind ->
+     | Nan -> assert false
+     | Real -> Error.not_yet "real number constant"
+     | Rational -> mk_real (Integer.to_string n)
+     | Gmpz -> Cil.mkString ~loc (Integer.to_string n), Typed_number.Str_Z
+     (* too large integer *)
+     | C_float fkind ->
        Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64_exn n)), C_number
-     | Typing.C_integer kind ->
+     | C_integer kind ->
        let cast = Typing.get_cast ~logic_env t in
        match cast, kind with
        | Some ty, (ILongLong | IULongLong) when Gmp_types.Z.is_t ty ->
@@ -716,15 +715,15 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     e, adata, env, Typed_number.C_number, ""
   | TBinOp(MinusPP, t1, t2) ->
     begin match Typing.get_number_ty ~logic_env t with
-      | Typing.C_integer _ ->
+      | C_integer _ ->
         let e1, adata, env = to_exp ~adata kf env t1 in
         let e2, adata, env = to_exp ~adata kf env t2 in
         let ty = Typing.get_typ ~logic_env t in
         let e = Cil.new_exp ~loc (BinOp(MinusPP, e1, e2, ty)) in
         e, adata, env, Typed_number.C_number, ""
-      | Typing.Gmpz ->
+      | Gmpz ->
         Env.not_yet env "pointer subtraction resulting in gmp"
-      | Typing.(C_float _ | Rational | Real | Nan) ->
+      | C_float _ | Rational | Real | Nan ->
         assert false
     end
   | TCastE(ty, t') ->
