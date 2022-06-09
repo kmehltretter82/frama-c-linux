@@ -359,9 +359,13 @@ let rec type_term
       let ty = ty_of_interv ?ctx ~use_gmp_opt:under_lambda i in
       dup ty
 
+    | TLval ((TVar {lv_type = Ctype (TInt (ik, _))}, _) as tlv) ->
+      type_term_lval ~profile tlv;
+      dup (C_integer ik)
+
     | TLval tlv ->
       let i = Interval.get_from_profile ~profile t in
-      let ty =  ty_of_interv ?ctx ~use_gmp_opt:under_lambda i in
+      let ty = ty_of_interv ?ctx ~use_gmp_opt:under_lambda i in
       type_term_lval ~profile tlv;
       (* Options.feedback "Type : %a" D.pretty ty; *)
       dup ty
@@ -585,10 +589,14 @@ let rec type_term
                     ~profile:new_profile
                     t_body))
             pending_typing;
-          dup (ty_of_interv
-                 ?ctx:ctx_body
-                 ~use_gmp_opt:(gmp && use_gmp_opt)
-                 (Interval.get_from_profile ~profile t))
+          (match li.l_type with
+           | Some (Ctype (TInt (ikind, _))) ->
+             dup (C_integer ikind)
+           | _ ->
+             dup (ty_of_interv
+                    ?ctx:ctx_body
+                    ~use_gmp_opt:(gmp && use_gmp_opt)
+                    (Interval.get_from_profile ~profile t)))
         | LBnone ->
           (match args with
            | [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ] ->

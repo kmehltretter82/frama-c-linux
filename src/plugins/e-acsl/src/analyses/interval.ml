@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 open Analyses_types
 open Analyses_datatype
 
@@ -34,7 +33,6 @@ module Error = Error.Make(struct let phase = dkey end)
 (* ********************************************************************* *)
 (* Basic datatypes and operations *)
 (* ********************************************************************* *)
-
 
 let is_included i1 i2 = match i1, i2 with
   | Ival i1, Ival i2 -> Ival.is_included i1 i2
@@ -357,15 +355,22 @@ let rec fixpoint ~(infer : force:bool ->
                    term ->
                    ival Error.result)
     li args_ival t' ival =
-  LF_env.replace li args_ival ival;
   let get_res = Error.map (fun x -> x) in
   let logic_env = Logic_env.make args_ival in
-  let inferred_ival = get_res (infer ~force:true ~logic_env t') in
-  if is_included inferred_ival ival
-  then
+  match li.l_type with
+  | Some (Ctype typ) ->
+    let ival = interv_of_typ typ in
+    LF_env.add li args_ival ival;
+    ignore (infer ~force:true ~logic_env t');
     ival
-  else
-    fixpoint ~infer li args_ival t' inferred_ival
+  | _ ->
+    LF_env.replace li args_ival ival;
+    let inferred_ival = get_res (infer ~force:true ~logic_env t') in
+    if is_included inferred_ival ival
+    then
+      ival
+    else
+      fixpoint ~infer li args_ival t' inferred_ival
 
 
 (* Memoization module which retrieves the computed info of some terms *)
@@ -739,7 +744,11 @@ let rec infer ~force ~logic_env t =
                fixpoint ~infer li widened_profile t' (Ival Ival.bottom))
           | LBterm t' ->
             let logic_env = Logic_env.make profile in
-            get_res (infer ~force ~logic_env t')
+            (match li.l_type with
+             | Some (Ctype (typ)) ->
+               ignore ((infer ~force ~logic_env t'));
+               interv_of_typ typ;
+             | _ -> get_res (infer ~force ~logic_env t'))
           | _ -> assert false)
        | LBnone when li.l_var_info.lv_name = "\\sum" ||
                      li.l_var_info.lv_name = "\\product" ->

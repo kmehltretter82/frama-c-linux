@@ -97,6 +97,8 @@ module LF_env : sig
 
   val clear : unit -> unit
 
+  val add : logic_info -> Profile.t -> ival -> unit
+
   val is_rec : logic_info -> bool
 
   val replace : logic_info -> Profile.t -> ival -> unit

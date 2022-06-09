@@ -395,6 +395,8 @@ module LF_env
 
   let find li profile = LFProf.Hashtbl.find tbl (li,profile)
 
+  let add li profile ival = LFProf.Hashtbl.add tbl (li,profile) ival
+
   exception Recursive
 
   let contain li = object
