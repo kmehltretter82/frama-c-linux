@@ -33,7 +33,7 @@ check-no-old-frama-c:
 frama-c:
   stage: build
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c
+    - ./nix/build-proxy.sh frama-c
   artifacts:
     when: on_failure
     paths:
@@ -76,14 +76,14 @@ cfp:
 e-acsl-tests:
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.e-acsl-tests
+    - ./nix/build-proxy.sh e-acsl-tests
 
 # EVA
 
 .build_template: &eva_template
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.eva-$CONFIG-tests
+    - ./nix/build-proxy.sh eva-$CONFIG-tests
 
 eva-default-tests:
   variables:
@@ -133,7 +133,7 @@ genassigns:
 kernel-tests:
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.kernel-tests
+    - ./nix/build-proxy.sh kernel-tests
 
 linea-cabs:
   stage: tests
@@ -153,7 +153,7 @@ mthread:
 plugins-tests:
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.plugins-tests
+    - ./nix/build-proxy.sh plugins-tests
 
 security:
   stage: tests
@@ -168,7 +168,7 @@ volatile:
 wp-tests:
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.wp-tests
+    - ./nix/build-proxy.sh wp-tests
 
 ################################################################################
 ### DISTRIB
@@ -277,7 +277,7 @@ internal_nightly:
 .build_template: &ocaml
   stage: compatibility
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.default-config-tests
+    - ./nix/build-proxy.sh default-config-tests
 
 # ocaml-4.11:
 #   variables:
