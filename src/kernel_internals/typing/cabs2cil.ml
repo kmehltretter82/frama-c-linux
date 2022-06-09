@@ -88,6 +88,10 @@ let func_locs () = FuncLocs.get ()
    parsing error, since their behavior requires non-standard parsing *)
 let unsupported_attributes = ["vector_size"]
 
+(* Attributes which must be erased to avoid issues (e.g., GCC 'malloc'
+   attributes can refer to erased functions and make the code un-reparsable *)
+let erased_attributes = ["malloc"]
+
 let stripUnderscore ?(checkUnsupported=true) s =
   if String.length s = 1 then begin
     if s = "_" then
@@ -5056,19 +5060,21 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
     and ae (e: Cabs.expression) = attrOfExp false e in
 
     (* Sometimes we need to convert attrarg into attr *)
-    let arg2attr = function
-      | ACons (s, args) -> Attr (s, args)
+    let arg2attrs = function
+      | ACons (s, _) when List.mem s erased_attributes -> []
+      | ACons (s, args) -> [Attr (s, args)]
       | a ->
         Kernel.fatal ~current:true
           "Invalid form of attribute: %a"
           Cil_printer.pp_attrparam a;
     in
+    let fold_attrs f el = List.fold_left (fun acc e -> acc @ arg2attrs (f e)) [] el in
     if s = "__attribute__" then (* Just a wrapper for many attributes*)
-      List.map (fun e -> arg2attr (attrOfExp true ~foldenum:false e)) el
+      fold_attrs (attrOfExp true ~foldenum:false) el
     else if s = "__blockattribute__" then (* Another wrapper *)
-      List.map (fun e -> arg2attr (attrOfExp true ~foldenum:false e)) el
+      fold_attrs (attrOfExp true ~foldenum:false) el
     else if s = "__declspec" then
-      List.map (fun e -> arg2attr (attrOfExp false ~foldenum:false e)) el
+      fold_attrs (attrOfExp false ~foldenum:false) el
     else
       [Attr(stripUnderscore s, List.map (attrOfExp ~foldenum:false false) el)]
 
