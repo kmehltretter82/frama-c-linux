@@ -309,10 +309,9 @@ let term_to_ptr_and_size ~adata ~loc kf env t =
   in
   let ty = Misc.cty t.term_type in
   let sizeof = Smart_exp.ptr_sizeof ~loc ty in
-  let adata, env =
+  let adata =
     Assert.register
       ~loc:t.term_loc
-      env
       (Format.asprintf "%a" Printer.pp_exp sizeof)
       sizeof
       adata

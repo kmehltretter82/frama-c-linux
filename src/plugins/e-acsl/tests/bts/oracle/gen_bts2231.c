@@ -23,10 +23,8 @@ int main(void)
     __e_acsl_mpz_t __gen_e_acsl__4;
     int __gen_e_acsl_eq;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data,"A",0,A);
     __gmpz_init_set_si(__gen_e_acsl_A,A);
     __gmpz_init_set_si(__gen_e_acsl_,3L);
-    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data,"A",0,A);
     __gmpz_init(__gen_e_acsl_mul);
     __gmpz_mul(__gen_e_acsl_mul,(__e_acsl_mpz_struct const *)(__gen_e_acsl_),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_A));
@@ -42,6 +40,8 @@ int main(void)
     __gmpz_init_set_si(__gen_e_acsl__4,(long)(-1));
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__4));
+    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data,"A",0,A);
+    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data,"A",0,A);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "A + (long)((long)(3 * A) - 1) == -1";

@@ -91,15 +91,15 @@ struct list *__gen_e_acsl_f(struct list *l)
         int __gen_e_acsl_valid_2;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data =
           {.values = (void *)0};
+        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& l->next),
+                                                      sizeof(struct list *),
+                                                      (void *)(& l->next),
+                                                      (void *)0);
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&l->next",
                                      (void *)(& l->next));
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                        "sizeof(struct list *)",0,
                                        sizeof(struct list *));
-        __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(& l->next),
-                                                      sizeof(struct list *),
-                                                      (void *)(& l->next),
-                                                      (void *)0);
         __gen_e_acsl_assert_data.blocking = 1;
         __gen_e_acsl_assert_data.kind = "RTE";
         __gen_e_acsl_assert_data.pred_txt = "\\valid_read(&l->next)";

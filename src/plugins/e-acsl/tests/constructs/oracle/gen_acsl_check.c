@@ -24,9 +24,6 @@ void g(int a, int *b)
     int __gen_e_acsl_valid_read;
     __e_acsl_store_block((void *)(& b),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"a",0,a);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"*(b + 1)",0,
-                                 *(b + 1));
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"*(b + 1)",0,
@@ -42,12 +39,12 @@ void g(int a, int *b)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"b",(void *)b);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
-                                   "sizeof(int)",0,sizeof(int));
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(b + 1),
                                                   sizeof(int),(void *)b,
                                                   (void *)(& b));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"b",(void *)b);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                   "sizeof(int)",0,sizeof(int));
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "RTE";
     __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(b + 1)";
@@ -57,6 +54,9 @@ void g(int a, int *b)
     __gen_e_acsl_assert_data_3.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"a",0,a);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"*(b + 1)",0,
+                                 *(b + 1));
     __gen_e_acsl_assert_data.blocking = 0;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "a / *(b + 1) == 0";

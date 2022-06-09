@@ -240,7 +240,6 @@ module D =
 
       let structural_descr = Structural_descr.t_abstract
       let rehash = Datatype.identity
-      let varname = Datatype.undefined
 
       let pretty fmt = function
         | Division_by_zero e ->
@@ -308,7 +307,6 @@ module D =
         | Invalid_bool lv ->
           Format.fprintf fmt "Invalid_bool(@[%a@])" Lval.pretty lv
 
-      let internal_pretty_code = Datatype.undefined
       let copy = Datatype.undefined
       let mem_project = Datatype.never_any_project
     end)

@@ -25,13 +25,13 @@ int main(int argc, char **argv)
       __e_acsl_mpz_t __gen_e_acsl_;
       __e_acsl_mpz_t __gen_e_acsl__2;
       int __gen_e_acsl_le;
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"sizeof(int)",
-                                   0,4);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"LEN",0,LEN);
       __gmpz_init_set_si(__gen_e_acsl_,4L * LEN);
       __gmpz_init_set_ui(__gen_e_acsl__2,18446744073709551615UL);
       __gen_e_acsl_le = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"sizeof(int)",
+                                   0,4);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"LEN",0,LEN);
       __gen_e_acsl_and = __gen_e_acsl_le <= 0;
       __gmpz_clear(__gen_e_acsl_);
       __gmpz_clear(__gen_e_acsl__2);
@@ -61,13 +61,13 @@ int main(int argc, char **argv)
         int __gen_e_acsl_valid;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
           {.values = (void *)0};
+        __gen_e_acsl_valid = __e_acsl_valid((void *)(arr + i),sizeof(int),
+                                            (void *)arr,(void *)(& arr));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"arr",
                                      (void *)arr);
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"i",0,i);
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                        "sizeof(int)",0,sizeof(int));
-        __gen_e_acsl_valid = __e_acsl_valid((void *)(arr + i),sizeof(int),
-                                            (void *)arr,(void *)(& arr));
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                      "\\valid(arr + i)",0,__gen_e_acsl_valid);
         __gen_e_acsl_assert_data_2.blocking = 1;
@@ -86,13 +86,13 @@ int main(int argc, char **argv)
         int __gen_e_acsl_valid_2;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
           {.values = (void *)0};
+        __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(arr + i),sizeof(int),
+                                              (void *)arr,(void *)(& arr));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"arr",
                                      (void *)arr);
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"i",0,i);
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                        "sizeof(int)",0,sizeof(int));
-        __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(arr + i),sizeof(int),
-                                              (void *)arr,(void *)(& arr));
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                      "\\valid(arr + i)",0,
                                      __gen_e_acsl_valid_2);

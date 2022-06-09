@@ -39,15 +39,14 @@ void f(int *x, int *y)
       __e_acsl_store_block((void *)(& x),8UL);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"*x",0,*x);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
         {.values = (void *)0};
+      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)x,sizeof(int),
+                                                    (void *)x,(void *)(& x));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"x",
                                    (void *)x);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                      "sizeof(int)",0,sizeof(int));
-      __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)x,sizeof(int),
-                                                    (void *)x,(void *)(& x));
       __gen_e_acsl_assert_data_2.blocking = 1;
       __gen_e_acsl_assert_data_2.kind = "RTE";
       __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(x)";
@@ -57,6 +56,7 @@ void f(int *x, int *y)
       __gen_e_acsl_assert_data_2.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"*x",0,*x);
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Precondition";
       __gen_e_acsl_assert_data.pred_txt = "*x >= 0";
@@ -96,14 +96,10 @@ void f(int *x, int *y)
       {
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
           {.values = (void *)0};
-        __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_4,
-                                      "old 2 - i",0,__gen_e_acsl_old_variant);
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
           {.values = (void *)0};
         __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_5,
                                     & __gen_e_acsl_assert_data_4);
-        __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_5,
-                                      "current 2 - i",0,2L - i);
         __gen_e_acsl_assert_data_4.blocking = 1;
         __gen_e_acsl_assert_data_4.kind = "Variant";
         __gen_e_acsl_assert_data_4.pred_txt = "(old 2 - i) >= 0";
@@ -178,11 +174,11 @@ void __gen_e_acsl_f(int *x, int *y)
     __e_acsl_store_block((void *)(& x),8UL);
     __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_valid = __e_acsl_valid((void *)y,sizeof(int),(void *)y,
+                                        (void *)(& y));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"y",(void *)y);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(int)",
                                    0,sizeof(int));
-    __gen_e_acsl_valid = __e_acsl_valid((void *)y,sizeof(int),(void *)y,
-                                        (void *)(& y));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\valid(y)",0,
                                  __gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -195,11 +191,11 @@ void __gen_e_acsl_f(int *x, int *y)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)x,sizeof(int),
+                                                  (void *)x,(void *)(& x));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"x",(void *)x);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)x,sizeof(int),
-                                                  (void *)x,(void *)(& x));
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read(x)";
@@ -212,11 +208,11 @@ void __gen_e_acsl_f(int *x, int *y)
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,*x == 1);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
+    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)x,sizeof(int),
+                                                    (void *)x,(void *)(& x));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"x",(void *)x);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                    "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)x,sizeof(int),
-                                                    (void *)x,(void *)(& x));
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "RTE";
     __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(x)";
@@ -231,14 +227,8 @@ void __gen_e_acsl_f(int *x, int *y)
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                 "number of active behaviors",0,
-                                 __gen_e_acsl_active_bhvrs);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                 "number of active behaviors",0,
-                                 __gen_e_acsl_active_bhvrs);
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Precondition";
     __gen_e_acsl_assert_data_4.pred_txt = "all behaviors complete";
@@ -252,14 +242,8 @@ void __gen_e_acsl_f(int *x, int *y)
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
-                                 "number of active behaviors",0,
-                                 __gen_e_acsl_active_bhvrs);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
-                                 "number of active behaviors",0,
-                                 __gen_e_acsl_active_bhvrs);
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "Precondition";
     __gen_e_acsl_assert_data_7.pred_txt = "all behaviors disjoint";

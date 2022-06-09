@@ -57,9 +57,7 @@ struct
       let rehash = Datatype.identity
 
       let mem_project = Datatype.never_any_project
-      let varname _ = "da"
 
-      let internal_pretty_code = Datatype.undefined
       let copy = Datatype.undefined
     end)
 
@@ -178,9 +176,7 @@ module DepsOrUnassigned = struct
       let rehash = Datatype.identity
 
       let mem_project = Datatype.never_any_project
-      let varname _ = "d"
 
-      let internal_pretty_code = Datatype.undefined
       let copy = Datatype.undefined
 
     end)
@@ -625,10 +621,8 @@ include Datatype.Make
       let compare = Datatype.undefined
       let equal = equal
       let pretty = pretty
-      let internal_pretty_code = Datatype.undefined
       let rehash = Datatype.identity
       let copy = Datatype.undefined
-      let varname = Datatype.undefined
       let mem_project = Datatype.never_any_project
     end)
 

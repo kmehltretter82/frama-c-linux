@@ -225,22 +225,6 @@ let compute_with_def_type kf stmt lval =
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 
-module D = Datatype.Option
-    (Datatype.Pair(Stmt.Hptset)(Datatype.Option(Locations.Zone)))
+let get_defs = compute
 
-module DT = Datatype.Option
-    (Datatype.Pair
-       (Stmt.Map.Make(Datatype.Pair(Datatype.Bool)(Datatype.Bool)))
-       (Datatype.Option(Locations.Zone)))
-
-let get_defs =
-  Journal.register
-    "Scope.Defs.get_defs"
-    (Datatype.func3 Kernel_function.ty Stmt.ty Lval.ty (D.ty))
-    compute
-
-let get_defs_with_type =
-  Journal.register
-    "Scope.Defs.get_defs_with_type"
-    (Datatype.func3 Kernel_function.ty Stmt.ty Lval.ty (DT.ty))
-    compute_with_def_type
+let get_defs_with_type = compute_with_def_type

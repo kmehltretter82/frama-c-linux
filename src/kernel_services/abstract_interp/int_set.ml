@@ -130,10 +130,8 @@ include Datatype.Make_with_collections
       let hash = hash
       let pretty = pretty
       let rehash x = x
-      let internal_pretty_code = Datatype.pp_fail
       let mem_project = Datatype.never_any_project
       let copy = Datatype.undefined
-      let varname = Datatype.undefined
     end)
 
 (* ---------------------------------- Utils --------------------------------- *)

@@ -183,7 +183,6 @@ platform. This tutorial focuses on specific parts of this figure.
        \node (dynamic) {Dynamic};
        \node (plugin)  {Plugin};
        \node (type)    {Type};
-       \node (journal) {Journal};
        \node (project) {Project};
      \end{tikz-vbox}
    };
@@ -202,14 +201,13 @@ platform. This tutorial focuses on specific parts of this figure.
    ($(options.west -| main-pt)+(-0.4\bigpadding,-\padding)$);
    \draw (implem-pt -| implem.west) -- (implem-pt);
    \draw[-Latex] (implem-pt) |- (type.east);
-   \draw[-Latex] (implem-pt) |- (journal.east);
    \draw[-Latex] ($(plugin-dir.west |- implem-pt)+(0,-\padding)$)
       -- ($(implem-pt)+(0.2\bigpadding,-\padding)$) |- (project.east);
 
  \end{tikzpicture}
 \end{center}
 \scodeidx{Db}{Main}\codeidx{Dynamic}\codeidx{Plugin}
-\codeidx{Project}\codeidx{Type}\codeidx{Journal}
+\codeidx{Project}\codeidx{Type}
 \codeidx{Makefile.dynamic}\codeidx{Design}
 \index{GUI}\index{Plug-in!GUI}
 \caption{Plug-in Integration Overview.}\label{fig:overview}
@@ -704,7 +702,7 @@ implementation, we explain some of \framac APIs such as how to visit
 an AST\footnote{Abstract Syntax Tree}, to hook a plug-in, to interface
 a plug-in with other plug-ins, to extend the
 GUI\footnote{Graphical User Interface}, to make a plug-in usable by
-others, to make write a plug-in into the journal, to configure a script,
+others, to configure a script,
 and to make a plug-in usable in a multi-projects setting.
 
 This section assumes the reader is already familiar with the basics of plug-ins
@@ -1103,27 +1101,6 @@ Here is the listing for the different modules:
 \todo
 
 % TODO: A script that uses "dump_function" of the CFG plug-in
-
-\subsection{Writing your Plug-in into the Journal}\label{tut2:journal}
-\index{Journalization}
-\todo
-
-% TODO: Journalize dump_function.
-
-% La journalisation, c'est le fait d'avoir la GUI rajouter des entrees
-% dans le journal, pour pouvoir les rejouer. Ca permet, quand on
-% paufine des analyses, de refaire ce qu'on a fait dans la gui
-% automatiquement; apres on peut utiliser load-script pour rejouer le
-% journal.
-
-% Pour journaliser, il faut enregister la fonction pour qu'elle soit
-% accessible de l'exterieur. Apres il y a un argument journalize qui
-% permet de journaliser. Si je fais ca pour ma fonction dump_function,
-% je vais recuperer une fonction dump_function_journalized; et c'est
-% celle ci-qu'il faudrait que j'utilise dans la GUI; comme ca a chaque
-% fois que je fais un "show-cfg", ce serait enregistre. La ce n'est
-% pas tres interessant parce que je ne fais pas de modification de
-% l'AST, mais dans le cas general ca l'est.
 
 \subsection{Writing a Configure Script}\label{tut2:configure}
 \index{Plug-in!Configure}

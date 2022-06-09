@@ -103,9 +103,6 @@ module D =
       let hash x = Datatype.String.hash x.name
       let copy x = x (* strings are immutable here *)
       let pretty fmt x = Format.pp_print_string fmt x.name
-      let internal_pretty_code = Datatype.undefined
-      let varname _ = assert false (* unused while [internal_pretty_code]
-                                      unimplemented *)
       let mem_project = Datatype.never_any_project
     end)
 
@@ -149,9 +146,6 @@ module Usable_emitter = struct
             Format.fprintf fmt "%s (v%d)" name x.version
           else
             Format.pp_print_string fmt name
-        let internal_pretty_code = Datatype.undefined
-        let varname _ = assert false (* unused while [internal_pretty_code]
-                                        unimplemented *)
         let mem_project = Datatype.never_any_project
       end)
 

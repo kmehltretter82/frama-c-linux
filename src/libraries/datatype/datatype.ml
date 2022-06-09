@@ -29,10 +29,7 @@ type 'a t =
     compare: 'a -> 'a -> int;
     hash: 'a -> int;
     copy: 'a -> 'a;
-    internal_pretty_code: Type.precedence -> Format.formatter -> 'a -> unit;
-    pretty_code: Format.formatter -> 'a -> unit;
     pretty: Format.formatter -> 'a -> unit;
-    varname: 'a -> string;
     mem_project: (Project_skeleton.t -> bool) -> 'a -> bool }
 
 type 'a info = 'a t
@@ -51,10 +48,7 @@ module type S_no_copy = sig
   val equal: t -> t -> bool
   val compare: t -> t -> int
   val hash: t -> int
-  val pretty_code: Format.formatter -> t -> unit
-  val internal_pretty_code: Type.precedence -> Format.formatter -> t -> unit
   val pretty: Format.formatter -> t -> unit
-  val varname: t -> string
   val mem_project: (Project_skeleton.t -> bool) -> t -> bool
 end
 
@@ -82,11 +76,7 @@ let equal ty = (internal_info "equal" ty).equal
 let compare ty = (internal_info "compare" ty).compare
 let hash ty = (internal_info "hash" ty).hash
 let copy ty = (internal_info "copy" ty).copy
-let internal_pretty_code ty =
-  (internal_info "internal_pretty_code" ty).internal_pretty_code
-let pretty_code ty = (internal_info "pretty_code" ty).pretty_code
 let pretty ty = (internal_info "pretty" ty).pretty
-let varname ty = (internal_info "varname" ty).varname
 let mem_project ty = (internal_info "mem_project" ty).mem_project
 
 let info ty = internal_info "info" ty
@@ -99,8 +89,6 @@ let undefined _ = assert false
 let identity x = x
 let never_any_project _ _ = false
 let from_compare _ _ = assert false
-let from_pretty_code _ _ = assert false
-let pp_fail _ _ _ = assert false
 
 module type Undefined = sig
   val structural_descr: Structural_descr.t
@@ -109,9 +97,7 @@ module type Undefined = sig
   val hash: 'a -> int
   val rehash: 'a -> 'a
   val copy: 'a -> 'a
-  val internal_pretty_code: Type.precedence -> Format.formatter -> 'a -> unit
   val pretty: Format.formatter -> 'a -> unit
-  val varname: 'a -> string
   val mem_project: (Project_skeleton.t -> bool) -> 'a -> bool
 end
 
@@ -120,9 +106,7 @@ module Partial_undefined = struct
   let compare = undefined
   let hash = undefined
   let copy = undefined
-  let internal_pretty_code = undefined
   let pretty = undefined
-  let varname = undefined
   let mem_project = undefined
 end
 
@@ -142,11 +126,6 @@ end
 (* ********************************************************************** *)
 (** {2 Generic builders} *)
 (* ********************************************************************** *)
-
-let valid_varname s =
-  let r = Str.regexp "[^A-Za-z0-9_]+" in
-  let s = Str.global_replace r "__" s in
-  String.uncapitalize_ascii s
 
 let check f fname tname fstr =
   assert
@@ -168,9 +147,7 @@ module Build
        val hash: t -> int
        val rehash: t -> t
        val copy: t -> t
-       val internal_pretty_code: Type.precedence -> Format.formatter -> t -> unit
        val pretty: Format.formatter -> t -> unit
-       val varname: t -> string
        val mem_project: (Project_skeleton.t -> bool) -> t -> bool
      end) =
 struct
@@ -186,29 +163,7 @@ struct
   let hash = T.hash
   let rehash = T.rehash
   let copy = T.copy
-  let internal_pretty_code = T.internal_pretty_code
-
-  let pretty_code =
-    if T.internal_pretty_code == undefined then undefined
-    else if T.internal_pretty_code == pp_fail then pp_fail Type.NoPar
-    else fun fmt x ->
-      (*    Format.printf "pretty code %s@." name;*)
-      let buf = Buffer.create 17 in
-      let buffmt = Format.formatter_of_buffer buf in
-      Format.fprintf buffmt "%a@?" (T.internal_pretty_code Type.NoPar) x;
-      let f =
-        Scanf.format_from_string (String.escaped (Buffer.contents buf)) ""
-      in
-      Format.fprintf fmt f
-
-  let pretty =
-    if T.pretty == from_pretty_code then pretty_code
-    else T.pretty
-
-  let varname =
-    if T.varname == undefined then undefined
-    else fun x -> valid_varname (T.varname x)
-
+  let pretty = T.pretty
   let mem_project = T.mem_project
 
   let info =
@@ -216,10 +171,7 @@ struct
       compare = compare;
       hash = hash;
       copy = copy;
-      internal_pretty_code = internal_pretty_code;
-      pretty_code = pretty_code;
       pretty = pretty;
-      varname = varname;
       mem_project = mem_project }
 
   let () = Infos.add info_tbl T.ty info
@@ -261,9 +213,7 @@ module type Make_input = sig
   val compare: t -> t -> int
   val hash: t -> int
   val copy: t -> t
-  val internal_pretty_code: Type.precedence -> Format.formatter -> t -> unit
   val pretty: Format.formatter -> t -> unit
-  val varname: t -> string
   val mem_project: (Project_skeleton.t -> bool) -> t -> bool
 end
 
@@ -353,14 +303,9 @@ module type Polymorphic2_input = sig
     ('a -> 'a -> int) -> ('b -> 'b -> int) -> ('a, 'b) t -> ('a, 'b) t -> int
   val mk_hash: ('a -> int) -> ('b -> int) -> ('a, 'b) t -> int
   val map: ('a -> 'a) -> ('b -> 'b) -> ('a, 'b) t -> ('a, 'b) t
-  val mk_internal_pretty_code:
-    (Type.precedence -> Format.formatter -> 'a -> unit) ->
-    (Type.precedence -> Format.formatter -> 'b -> unit) ->
-    Type.precedence -> Format.formatter -> ('a, 'b) t -> unit
   val mk_pretty:
     (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'b -> unit) ->
     Format.formatter -> ('a, 'b) t -> unit
-  val mk_varname: ('a -> string) -> ('b -> string) -> ('a, 'b) t -> string
   val mk_mem_project:
     ((Project_skeleton.t -> bool) -> 'a -> bool) ->
     ((Project_skeleton.t -> bool) -> 'b -> bool) ->
@@ -423,14 +368,7 @@ module Polymorphic2(P: Polymorphic2_input) = struct
                   else*) P.map f1 f2
             in
             build mk T1.copy T2.copy
-          let internal_pretty_code =
-            let mk f1 f2 =
-              if f1 == pp_fail || f2 == pp_fail then pp_fail
-              else fun p fmt x -> P.mk_internal_pretty_code f1 f2 p fmt x
-            in
-            build mk T1.internal_pretty_code T2.internal_pretty_code
           let pretty = build P.mk_pretty T1.pretty T2.pretty
-          let varname = build P.mk_varname T1.varname T2.varname
           let mem_project =
             let mk f1 f2 =
               if P.mk_mem_project == undefined then undefined
@@ -475,19 +413,11 @@ module Polymorphic3
          ('a -> int) -> ('b -> int) -> ('c -> int) -> ('a, 'b, 'c) t -> int
        val map:
          ('a -> 'a) -> ('b -> 'b) -> ('c -> 'c) -> ('a, 'b, 'c) t -> ('a, 'b, 'c) t
-       val mk_internal_pretty_code:
-         (Type.precedence -> Format.formatter -> 'a -> unit) ->
-         (Type.precedence -> Format.formatter -> 'b -> unit) ->
-         (Type.precedence -> Format.formatter -> 'c -> unit) ->
-         Type.precedence -> Format.formatter -> ('a, 'b, 'c) t -> unit
        val mk_pretty:
          (Format.formatter -> 'a -> unit) ->
          (Format.formatter -> 'b -> unit) ->
          (Format.formatter -> 'c -> unit) ->
          Format.formatter -> ('a, 'b, 'c) t -> unit
-       val mk_varname:
-         ('a -> string) -> ('b -> string) -> ('c -> string) ->
-         ('a, 'b, 'c) t -> string
        val mk_mem_project:
          ((Project_skeleton.t -> bool) -> 'a -> bool) ->
          ((Project_skeleton.t -> bool) -> 'b -> bool) ->
@@ -554,17 +484,7 @@ struct
                   else*) P.map f1 f2 f3
             in
             build mk T1.copy T2.copy T3.copy
-          let internal_pretty_code =
-            let mk f1 f2 f3 =
-              if f1 == pp_fail || f2 == pp_fail || f3 == pp_fail then pp_fail
-              else fun p fmt x -> P.mk_internal_pretty_code f1 f2 f3 p fmt x
-            in
-            build mk
-              T1.internal_pretty_code
-              T2.internal_pretty_code
-              T3.internal_pretty_code
           let pretty = build P.mk_pretty T1.pretty T2.pretty T3.pretty
-          let varname = build P.mk_varname T1.varname T2.varname T3.varname
           let mem_project =
             let mk f1 f2 f3 =
               if P.mk_mem_project == undefined then undefined
@@ -619,21 +539,12 @@ module Polymorphic4
        val map:
          ('a -> 'a) -> ('b -> 'b) -> ('c -> 'c) -> ('d -> 'd) ->
          ('a, 'b, 'c, 'd) t -> ('a, 'b, 'c, 'd) t
-       val mk_internal_pretty_code:
-         (Type.precedence -> Format.formatter -> 'a -> unit) ->
-         (Type.precedence -> Format.formatter -> 'b -> unit) ->
-         (Type.precedence -> Format.formatter -> 'c -> unit) ->
-         (Type.precedence -> Format.formatter -> 'd -> unit) ->
-         Type.precedence -> Format.formatter -> ('a, 'b, 'c, 'd) t -> unit
        val mk_pretty:
          (Format.formatter -> 'a -> unit) ->
          (Format.formatter -> 'b -> unit) ->
          (Format.formatter -> 'c -> unit) ->
          (Format.formatter -> 'd -> unit) ->
          Format.formatter -> ('a, 'b, 'c, 'd) t -> unit
-       val mk_varname:
-         ('a -> string) -> ('b -> string) -> ('c -> string) -> ('d -> string) ->
-         ('a, 'b, 'c, 'd) t -> string
        val mk_mem_project:
          ((Project_skeleton.t -> bool) -> 'a -> bool) ->
          ((Project_skeleton.t -> bool) -> 'b -> bool) ->
@@ -704,20 +615,7 @@ struct
                   else*) P.map f1 f2 f3 f4
             in
             build mk T1.copy T2.copy T3.copy T4.copy
-          let internal_pretty_code =
-            let mk f1 f2 f3 f4 =
-              if f1 == pp_fail || f2 == pp_fail || f3 == pp_fail || f4 == pp_fail
-              then pp_fail
-              else fun p fmt x -> P.mk_internal_pretty_code f1 f2 f3 f4 p fmt x
-            in
-            build mk
-              T1.internal_pretty_code
-              T2.internal_pretty_code
-              T3.internal_pretty_code
-              T4.internal_pretty_code
           let pretty = build P.mk_pretty T1.pretty T2.pretty T3.pretty T4.pretty
-          let varname =
-            build P.mk_varname T1.varname T2.varname T3.varname T4.varname
           let mem_project =
             let mk f1 f2 f3 f4 =
               if P.mk_mem_project == undefined then undefined
@@ -763,16 +661,9 @@ module Pair_arg = struct
     if x == y then 0 else let n = f1 x1 y1 in if n = 0 then f2 x2 y2 else n
   let mk_hash f1 f2 (x1,x2) = f1 x1 + 1351 * f2 x2
   let map f1 f2 (x1,x2) = f1 x1, f2 x2
-  let mk_internal_pretty_code f1 f2 p fmt (x1, x2) =
-    let pp fmt =
-      Format.fprintf
-        fmt "@[<hv 2>%a,@;%a@]" (f1 Type.Tuple) x1 (f2 Type.Tuple) x2
-    in
-    Type.par p Type.Tuple fmt pp
-  let mk_pretty f1 f2 fmt p =
-    Format.fprintf fmt "@[%a@]" (* Type.par put the parenthesis *)
-      (mk_internal_pretty_code (fun _ -> f1) (fun _ -> f2) Type.Basic) p
-  let mk_varname = undefined
+  let mk_pretty f1 f2 fmt (x1, x2) =
+    let pp fmt = Format.fprintf fmt "@[<hv 2>%a,@;%a@]" f1 x1 f2 x2 in
+    Type.par Type.Basic Type.Tuple fmt pp
   let mk_mem_project mem1 mem2 f (x1, x2) = mem1 f x1 && mem2 f x2
 end
 
@@ -819,10 +710,7 @@ let pair (type typ1) (type typ2) (ty1: typ1 Type.t) (ty2: typ2 Type.t) =
     let compare = compare X.ty
     let hash = hash X.ty
     let copy = copy X.ty
-    let internal_pretty_code = internal_pretty_code X.ty
-    let pretty_code = pretty_code X.ty
-    let pretty = from_pretty_code
-    let varname = varname ty
+    let pretty = pretty X.ty
     let mem_project = mem_project X.ty
   end
   in
@@ -848,9 +736,7 @@ struct
     let hash = undefined
     let rehash = undefined
     let copy = undefined
-    let internal_pretty_code = undefined
     let pretty = undefined
-    let varname _ = "f"
     let mem_project = never_any_project
     let reprs =
       if Type.may_use_obj () then Type.reprs ty else [ fun _ -> assert false ]
@@ -890,12 +776,8 @@ module type Polymorphic_input = sig
   val mk_compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
   val mk_hash: ('a -> int) -> 'a t -> int
   val map: ('a -> 'a) -> 'a t -> 'a t
-  val mk_internal_pretty_code:
-    (Type.precedence -> Format.formatter -> 'a -> unit) ->
-    Type.precedence -> Format.formatter -> 'a t -> unit
   val mk_pretty:
     (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
-  val mk_varname: ('a -> string) -> 'a t -> string
   val mk_mem_project:
     ((Project_skeleton.t -> bool) -> 'a -> bool) ->
     (Project_skeleton.t -> bool) -> 'a t -> bool
@@ -958,15 +840,7 @@ module Polymorphic_gen(P: Polymorphic_input) = struct
               (*if f == identity then identity else*)
               fun x -> P.map X.copy x
           let rehash = R.rehash
-
-          let internal_pretty_code =
-            let mk f =
-              if f == pp_fail then pp_fail
-              else fun p fmt x -> P.mk_internal_pretty_code f p fmt x
-            in
-            build mk X.internal_pretty_code
           let pretty = build P.mk_pretty X.pretty
-          let varname = build P.mk_varname X.varname
           let mem_project =
             let mk f =
               if P.mk_mem_project == undefined then undefined
@@ -1014,12 +888,9 @@ module Poly_ref =
       let mk_compare f x y = if x == y then 0 else f !x !y
       let mk_hash f x = f !x
       let map f x = ref (f !x)
-      let mk_internal_pretty_code f p fmt x =
-        let pp fmt = Format.fprintf fmt "@[<hv 2>ref@;%a@]" (f Type.Call) !x in
-        Type.par p Type.Call fmt pp
       let mk_pretty f fmt x =
-        mk_internal_pretty_code (fun _ -> f) Type.Basic fmt x
-      let mk_varname = undefined
+        let pp fmt = Format.fprintf fmt "@[<hv 2>ref@;%a@]" f !x in
+        Type.par Type.Basic Type.Call fmt pp
       let mk_mem_project mem f x = mem f !x
     end)
 
@@ -1038,10 +909,7 @@ let t_ref (type typ) (ty: typ Type.t) =
       let compare = compare ty
       let hash = hash ty
       let copy = copy ty
-      let internal_pretty_code = internal_pretty_code ty
-      let pretty_code = pretty_code ty
-      let pretty = from_pretty_code
-      let varname = varname ty
+      let pretty = pretty ty
       let mem_project = mem_project ty
     end)
   in
@@ -1073,16 +941,13 @@ module Poly_option =
           | Some x, Some y -> f x y
       let mk_hash f = function None -> 0 | Some x -> f x
       let map f = function None -> None | Some x -> Some (f x)
-      let mk_internal_pretty_code f p fmt = function
+      let mk_pretty f fmt = function
         | None -> Format.fprintf fmt "None"
         | Some x ->
           let pp fmt =
-            Format.fprintf fmt "@[<hv 2>Some@;%a@]" (f Type.Call) x
+            Format.fprintf fmt "@[<hv 2>Some@;%a@]" f x
           in
-          Type.par p Type.Call fmt pp
-      let mk_pretty f fmt x =
-        mk_internal_pretty_code (fun _ -> f) Type.Basic fmt x
-      let mk_varname = undefined
+          Type.par Type.Basic Type.Call fmt pp
       let mk_mem_project mem f = function None -> false | Some x -> mem f x
     end)
 
@@ -1102,10 +967,7 @@ let option (type typ) (ty: typ Type.t) =
       let compare = compare ty
       let hash = hash ty
       let copy = copy ty
-      let internal_pretty_code = internal_pretty_code ty
-      let pretty_code = pretty_code ty
-      let pretty = from_pretty_code
-      let varname = varname ty
+      let pretty = pretty ty
       let mem_project = mem_project ty
     end)
   in
@@ -1146,21 +1008,18 @@ module Poly_list =
                  (0,1) l)
         with Too_long n -> n
       let map = List.map
-      let mk_internal_pretty_code f p fmt l =
+      let mk_pretty f fmt l =
         let pp fmt =
           Format.fprintf fmt "@[<hv 2>[ %t ]@]"
             (fun fmt ->
                let rec print fmt = function
                  | [] -> ()
-                 | [ x ] -> Format.fprintf fmt "%a" (f Type.List) x
-                 | x :: l -> Format.fprintf fmt "%a;@;%a" (f Type.List) x print l
+                 | [ x ] -> Format.fprintf fmt "%a" f x
+                 | x :: l -> Format.fprintf fmt "%a;@;%a" f x print l
                in
                print fmt l)
         in
-        Type.par p Type.Basic fmt pp (* Never enclose lists in parentheses *)
-      let mk_pretty f fmt x =
-        mk_internal_pretty_code (fun _ -> f) Type.Basic fmt x
-      let mk_varname = undefined
+        Type.par Type.Basic Type.Basic fmt pp (* Never enclose lists in parentheses *)
       let mk_mem_project mem f = List.exists (mem f)
     end)
 
@@ -1180,10 +1039,7 @@ let list (type typ) (ty: typ Type.t) =
       let compare = compare ty
       let hash = hash ty
       let copy = copy ty
-      let internal_pretty_code = internal_pretty_code ty
-      let pretty_code = pretty_code ty
-      let pretty = from_pretty_code
-      let varname = varname ty
+      let pretty = pretty ty
       let mem_project = mem_project ty
     end)
   in
@@ -1234,22 +1090,19 @@ module Poly_array =
         !acc
       ;;
       let map = Array.map
-      let mk_internal_pretty_code f p fmt a =
+      let mk_pretty f fmt a =
         let pp fmt =
           Format.fprintf fmt "@[<hv 2>[| %t |]@]"
             (fun fmt ->
                let length = Array.length a in
                match length with
                | 0 -> ()
-               | _ -> (Format.fprintf fmt "%a" (f Type.List) a.(0);
+               | _ -> (Format.fprintf fmt "%a" f a.(0);
                        for i = 1 to (length - 1) do
-                         Format.fprintf fmt ";@;%a" (f Type.List) a.(i)
+                         Format.fprintf fmt ";@;%a" f a.(i)
                        done))
         in
-        Type.par p Type.Basic fmt pp (* Never enclose arrays in parentheses *)
-      let mk_pretty f fmt x =
-        mk_internal_pretty_code (fun _ -> f) Type.Basic fmt x
-      let mk_varname = undefined
+        Type.par Type.Basic Type.Basic fmt pp (* Never enclose arrays in parentheses *)
       let mk_mem_project mem f a =
         try
           for i = 0 to (Array.length a - 1) do
@@ -1274,10 +1127,7 @@ let array (type typ) (ty: typ Type.t) =
       let compare = compare ty
       let hash = hash ty
       let copy = copy ty
-      let internal_pretty_code = internal_pretty_code ty
-      let pretty_code = pretty_code ty
-      let pretty = from_pretty_code
-      let varname = varname ty
+      let pretty = pretty ty
       let mem_project = mem_project ty
     end)
   in
@@ -1304,9 +1154,7 @@ module Poly_queue =
       let mk_compare = undefined
       let mk_hash = undefined
       let map = undefined
-      let mk_internal_pretty_code = undefined
       let mk_pretty = undefined
-      let mk_varname = undefined
       let mk_mem_project mem f q =
         try Queue.iter (fun x -> if mem f x then raise Exit) q; false
         with Exit -> true
@@ -1327,10 +1175,7 @@ let queue (type typ) (ty: typ Type.t) =
       let compare = compare ty
       let hash = hash ty
       let copy = copy ty
-      let internal_pretty_code = internal_pretty_code ty
-      let pretty_code = pretty_code ty
-      let pretty = from_pretty_code
-      let varname = varname ty
+      let pretty = pretty ty
       let mem_project = mem_project ty
     end)
   in
@@ -1375,27 +1220,6 @@ struct
           (*      if E.copy == identity then identity
                   else*) fun s -> S.fold (fun x -> S.add (E.copy x)) s S.empty
 
-        let internal_pretty_code p_caller fmt s =
-          if is_empty s then
-            Format.fprintf fmt "%s.empty" Info.module_name
-          else
-            let pp fmt =
-              if S.cardinal s = 1 then
-                Format.fprintf fmt "@[<hv 2>%s.singleton@;%a@]"
-                  Info.module_name
-                  (E.internal_pretty_code Type.Call)
-                  (Caml_list.hd (S.elements s))
-              else
-                Format.fprintf fmt
-                  "@[<hv 2>List.fold_left@;\
-                   (fun acc s -> %s.add s acc)@;%s.empty@;%a@]"
-                  Info.module_name
-                  Info.module_name
-                  (let module L = List(E) in L.internal_pretty_code Type.Call)
-                  (S.elements s)
-            in
-            Type.par p_caller Type.Call fmt pp
-
         let pretty fmt s =
           let pp_elt pp fmt v =
             Format.fprintf fmt "@[%a@]" pp v
@@ -1404,7 +1228,6 @@ struct
             ~pre:"@[<hov 2>{@ " ~sep:";@ " ~suf:"@ }@]"
             S.iter (pp_elt E.pretty) fmt s
 
-        let varname = undefined
         let mem_project p s =
           try S.iter (fun x -> if E.mem_project p x then raise Exit) s; false
           with Exit -> true
@@ -1424,10 +1247,7 @@ struct
   let equal = P.equal
   let compare = P.compare
   let hash = P.hash
-  let internal_pretty_code = P.internal_pretty_code
-  let pretty_code = P.pretty_code
   let pretty = P.pretty
-  let varname = P.varname
   let mem_project = P.mem_project
   let copy = P.copy
 
@@ -1459,28 +1279,6 @@ struct
         let mk_equal = M.equal
         let mk_hash = undefined
         let map = M.map
-        let mk_internal_pretty_code = undefined
-        (*f_value p_caller fmt map =
-          (* [JS 2011/04/01] untested code! *)
-          let pp_empty fmt = Format.fprintf fmt "%s.empty" Info.module_name in
-          if M.is_empty map then
-            Type.par p_caller Type.Basic fmt pp_empty
-          else
-            let pp fmt =
-              Format.fprintf
-                fmt "@[<hv 2>@[<hv 2>let map =@;%t@;<1 -2>in@]" pp_empty;
-              M.iter
-                (fun k v ->
-                  Format.fprintf
-                    fmt
-                    "@[<hv 2>let map =@;%s.add@;@[<hv 2>map@;%a@;%a@]@;<1 -2>in@]"
-                    Info.module_name
-                    (Key.internal_pretty_code Type.Call) k
-                    (f_value Type.Call) v)
-                map;
-              Format.fprintf fmt "@[map@]@]"
-            in
-            Type.par p_caller Type.Call fmt pp*)
         let mk_pretty f_value fmt map =
           Format.fprintf fmt  "@[{{ ";
           M.iter
@@ -1490,9 +1288,6 @@ struct
                  f_value v)
             map;
           Format.fprintf fmt  " }}@]"
-        let mk_varname _ =
-          if Key.varname == undefined then undefined
-          else fun _ -> Format.sprintf "%s_map" Key.name
         let mk_mem_project =
           if Key.mem_project == undefined then undefined
           else
@@ -1570,9 +1365,7 @@ struct
           let h2 = H.create (H.length tbl) (* may be very memory-consuming *) in
           H.iter (fun k v -> H.add h2 k v) h;
           h2
-        let mk_internal_pretty_code = undefined
-        let mk_pretty = from_pretty_code
-        let mk_varname = undefined
+        let mk_pretty = undefined
         let mk_mem_project =
           if Key.mem_project == undefined then undefined
           else
@@ -1624,7 +1417,6 @@ struct
         let descr = Descr.of_type ty
         let packed_descr = Descr.pack descr
         let reprs = Type.reprs ty
-        let pretty_code = undefined
       end)
     in M.ty
 
@@ -1729,7 +1521,6 @@ module Simple_type
        val reprs: t list
        val pretty: Format.formatter -> t -> unit
        val copy: t -> t
-       val varname: t -> string
        val compare: t -> t -> int
        val equal: t -> t -> bool
      end) =
@@ -1748,10 +1539,7 @@ struct
          let hash = FCHashtbl.hash
          let rehash = identity
          let copy = X.copy
-         let internal_pretty_code =
-           if X.pretty == undefined then undefined else fun _ -> X.pretty
          let pretty = X.pretty
-         let varname = X.varname
          let mem_project = never_any_project
        end))
       (struct let module_name = module_name end)
@@ -1770,7 +1558,6 @@ module Unit =
       let compare () () = 0
       let equal () () = true
       let pretty fmt () = Format.fprintf fmt "()"
-      let varname = undefined
     end)
 let unit = Unit.ty
 
@@ -1784,7 +1571,6 @@ module Bool =
       let compare : bool -> bool -> int = Stdlib.compare
       let equal : bool -> bool -> bool = (=)
       let pretty fmt b = Format.fprintf fmt "%B" b
-      let varname _ = "b"
     end)
 let bool = Bool.ty
 
@@ -1798,7 +1584,6 @@ module Int = struct
         let compare : int -> int -> int = Stdlib.compare
         let equal : int -> int -> bool = (=)
         let pretty fmt n = Format.fprintf fmt "%d" n
-        let varname _ = "n"
       end)
   let compare : int -> int -> int = Stdlib.compare
 end
@@ -1814,7 +1599,6 @@ module Int32 =
       let compare = Int32.compare
       let equal : int32 -> int32 -> bool = (=)
       let pretty fmt n = Format.fprintf fmt "%ld" n
-      let varname _ = "n32"
     end)
 let int32 = Int32.ty
 
@@ -1828,7 +1612,6 @@ module Int64 =
       let compare = Int64.compare
       let equal : int64 -> int64 -> bool = (=)
       let pretty fmt n = Format.fprintf fmt "%Ld" n
-      let varname _ = "n64"
     end)
 let int64 = Int64.ty
 
@@ -1842,7 +1625,6 @@ module Nativeint =
       let compare = Nativeint.compare
       let equal : nativeint -> nativeint -> bool = (=)
       let pretty fmt n = Format.fprintf fmt "%nd" n
-      let varname _ = "native_n"
     end)
 let nativeint = Nativeint.ty
 
@@ -1856,7 +1638,6 @@ module Float =
       let compare : float -> float -> int = Stdlib.compare
       let equal : float -> float -> bool = (=)
       let pretty fmt f = Format.fprintf fmt "%f" f
-      let varname _ = "f"
     end)
 let float = Float.ty
 
@@ -1870,7 +1651,6 @@ module Char =
       let compare = Char.compare
       let equal : char -> char -> bool = (=)
       let pretty fmt c = Format.fprintf fmt "%c" c
-      let varname _ = "c"
     end)
 let char = Char.ty
 
@@ -1884,7 +1664,6 @@ module String =
       let compare = String.compare
       let equal : string -> string -> bool = (=)
       let pretty fmt s = Format.fprintf fmt "%S" s
-      let varname _ = "s"
     end)
 let string = String.ty
 
@@ -1900,9 +1679,7 @@ module Formatter =
       let hash = undefined
       let rehash = undefined
       let copy = undefined
-      let internal_pretty_code = undefined
       let pretty = undefined
-      let varname _ = "fmt"
       let mem_project = never_any_project
     end)
 let formatter = Formatter.ty
@@ -1919,17 +1696,8 @@ module Integer =
       let hash = Integer.hash
       let rehash = identity
       let copy = identity
-      let internal_pretty_code par fmt n =
-        let pp fmt =
-          Format.fprintf
-            fmt
-            "Integer.of_string %S"
-            (Integer.to_string n)
-        in
-        Type.par par Type.Call fmt pp
       (* TODO: this should take into account kernel's option -big-ints-hex *)
       let pretty = Integer.pretty
-      let varname _ = "integer_n"
       let mem_project = never_any_project
     end)
 let integer = Integer.ty
@@ -1944,7 +1712,6 @@ module Filepath = struct
         let compare = Filepath.Normalized.compare
         let equal : t -> t -> bool = (=)
         let pretty = Filepath.Normalized.pretty
-        let varname _ = "p"
       end)
   let dummy = Filepath.Normalized.empty
   let of_string ?existence ?base_name s =
@@ -1977,21 +1744,11 @@ module Triple_arg = struct
       else n
   let mk_hash f1 f2 f3 (x1,x2,x3) = f1 x1 + 1351 * f2 x2 + 257 * f3 x3
   let map f1 f2 f3 (x1,x2,x3) = f1 x1, f2 x2, f3 x3
-  let mk_internal_pretty_code f1 f2 f3 p fmt (x1, x2, x3) =
+  let mk_pretty f1 f2 f3 fmt (x1, x2, x3) =
     let pp fmt =
-      Format.fprintf
-        fmt "@[<hv 2>%a,@;%a,@;%a@]"
-        (f1 Type.Tuple) x1
-        (f2 Type.Tuple) x2
-        (f3 Type.Tuple) x3
+      Format.fprintf fmt "@[<hv 2>%a,@;%a,@;%a@]" f1 x1 f2 x2 f3 x3
     in
-    Type.par p Type.Tuple fmt pp
-  let mk_pretty f1 f2 f3 fmt p =
-    Format.fprintf fmt "@[(%a)@]"
-      (mk_internal_pretty_code
-         (fun _ -> f1) (fun _ -> f2) (fun _ -> f3) Type.Basic)
-      p
-  let mk_varname = undefined
+    Type.par Type.Basic Type.Tuple fmt pp
   let mk_mem_project mem1 mem2 mem3 f (x1, x2, x3) =
     mem1 f x1 && mem2 f x2 && mem3 f x3
 end
@@ -2042,10 +1799,7 @@ let triple
     let compare = compare X.ty
     let hash = hash X.ty
     let copy = copy X.ty
-    let internal_pretty_code = internal_pretty_code X.ty
-    let pretty_code = pretty_code X.ty
-    let pretty = from_pretty_code
-    let varname = varname ty
+    let pretty = pretty X.ty
     let mem_project = mem_project X.ty
   end
   in
@@ -2086,22 +1840,11 @@ module Quadruple_arg = struct
   let mk_hash f1 f2 f3 f4 (x1,x2,x3,x4) =
     f1 x1 + 1351 * f2 x2 + 257 * f3 x3 + 997 * f4 x4
   let map f1 f2 f3 f4 (x1,x2,x3,x4) = f1 x1, f2 x2, f3 x3, f4 x4
-  let mk_internal_pretty_code f1 f2 f3 f4 p fmt (x1, x2, x3, x4) =
+  let mk_pretty f1 f2 f3 f4 fmt (x1, x2, x3, x4) =
     let pp fmt =
-      Format.fprintf
-        fmt "@[<hv 2>%a,@;%a,@;%a,@;%a@]"
-        (f1 Type.Tuple) x1
-        (f2 Type.Tuple) x2
-        (f3 Type.Tuple) x3
-        (f4 Type.Tuple) x4
+      Format.fprintf fmt "@[<hv 2>%a,@;%a,@;%a,@;%a@]" f1 x1 f2 x2 f3 x3 f4 x4
     in
-    Type.par p Type.Tuple fmt pp
-  let mk_pretty f1 f2 f3 f4 fmt p =
-    Format.fprintf fmt "@[(%a)@]"
-      (mk_internal_pretty_code
-         (fun _ -> f1) (fun _ -> f2) (fun _ -> f3) (fun _ -> f4) Type.Basic)
-      p
-  let mk_varname = undefined
+    Type.par Type.Basic Type.Tuple fmt pp
   let mk_mem_project mem1 mem2 mem3 mem4 f (x1, x2, x3, x4) =
     mem1 f x1 && mem2 f x2 && mem3 f x3 && mem4 f x4
 end
@@ -2157,10 +1900,7 @@ let quadruple
     let compare = compare X.ty
     let hash = hash X.ty
     let copy = copy X.ty
-    let internal_pretty_code = internal_pretty_code X.ty
-    let pretty_code = pretty_code X.ty
-    let pretty = from_pretty_code
-    let varname = varname ty
+    let pretty = pretty X.ty
     let mem_project = mem_project X.ty
   end
   in

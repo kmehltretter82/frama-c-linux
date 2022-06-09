@@ -203,7 +203,6 @@ let impact_statement =
        (Datatype.func
           Cil_datatype.Stmt.ty
           (Datatype.list Cil_datatype.Stmt.ty)))
-    ~journalize:true
     impact_statement
 
 

@@ -113,16 +113,6 @@ let dump () =
   Service_graph.frama_c_display false;
   Options.dump S.output_graph sg
 
-include Journalize.Make
-    (struct
-      let name = "Services"
-      let dump = dump
-      let compute = compute
-      type t = S.Service_graph.t
-      let ty = S.Service_graph.Datatype.ty
-      let get = get
-    end)
-
 (*
 Local Variables:
 compile-command: "make -C ../../.."

@@ -57,7 +57,6 @@ include
       | SplitEqList l ->
         List.fold_left (fun acc i -> acc * 13 + 57 * Int.hash i) 1 l
     let copy = Datatype.identity
-    let internal_pretty_code = Datatype.undefined
     let pretty fmt = function
       | NoSplit -> Format.pp_print_string fmt "no split"
       | SplitAuto -> Format.pp_print_string fmt "auto split"
@@ -65,7 +64,6 @@ include
       | SplitEqList l ->
         Format.fprintf fmt "Split on \\result == %a"
           (Pretty_utils.pp_list ~sep:",@ " Datatype.Integer.pretty) l
-    let varname _ = "v"
     let mem_project = Datatype.never_any_project
   end)
 

@@ -6,15 +6,6 @@ let f_slice_names kf src_called fnum =
   if (fname = "main") || (fnum = 1 && not src_called) then fname
   else (fname ^ "_s_" ^ (string_of_int (fnum)))
 
-(* To be able to build framac-journal.ml *)
-let f_slice_names =
-  Journal.register
-    "Combine.f_slice_names"
-    (Datatype.func Kernel_function.ty
-       (Datatype.func Datatype.bool
-	  (Datatype.func Datatype.int Datatype.string)))
-    f_slice_names
-
 let main _ =
   Slicing.Api.Project.reset_slicing ();
 

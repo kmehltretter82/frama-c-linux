@@ -25,10 +25,10 @@
 # --------------------------------------------------------------------------
 
 ifndef FRAMAC_SHARE
-FRAMAC_SHARE  :=$(shell frama-c -journal-disable -print-path)
+FRAMAC_SHARE  :=$(shell frama-c -print-path)
 endif
 ifndef FRAMAC_LIBDIR
-FRAMAC_LIBDIR :=$(shell frama-c -journal-disable -print-libpath)
+FRAMAC_LIBDIR :=$(shell frama-c -print-libpath)
 endif
 PLUGIN_DIR ?=.
 

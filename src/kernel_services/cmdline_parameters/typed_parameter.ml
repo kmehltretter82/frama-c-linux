@@ -67,9 +67,6 @@ include
       let hash x = Datatype.String.hash x.name
       let copy x = x (* The representation of the parameter is immutable *)
       let pretty fmt x = Format.pp_print_string fmt x.name
-      let internal_pretty_code = Datatype.undefined
-      let varname _ = assert false
-      (* unused if internal_pretty_code undefined *)
       let mem_project = Datatype.never_any_project
     end)
 

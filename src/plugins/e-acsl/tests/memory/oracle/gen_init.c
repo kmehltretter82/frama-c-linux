@@ -56,10 +56,10 @@ int main(void)
     int __gen_e_acsl_initialized;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)q,sizeof(int));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"q",(void *)q);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)q,sizeof(int));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "\\initialized(q)",0,
                                  __gen_e_acsl_initialized);
@@ -77,10 +77,10 @@ int main(void)
     int __gen_e_acsl_initialized_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
+    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)p,sizeof(int));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"p",(void *)p);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                    "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)p,sizeof(int));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                  "\\initialized(p)",0,
                                  __gen_e_acsl_initialized_2);

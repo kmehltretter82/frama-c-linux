@@ -498,10 +498,8 @@ module Make_MapSet_Lattice
          let hash = hash
          let rehash = Datatype.identity
          let copy = Datatype.undefined
-         let internal_pretty_code = Datatype.pp_fail
          let pretty = pretty
          let mem_project = Datatype.never_any_project
-         let varname = Datatype.undefined
        end): Datatype.S_with_collections with type t := t)
 
 

@@ -1,0 +1,8 @@
+*.ml header_spec=CEA_WP
+*.mli header_spec=CEA_WP
+*.mll header_spec=CEA_WP
+
+configure.ac header_spec=CEA_WP
+
+Makefile header_spec=CEA_WP
+Makefile.in header_spec=CEA_WP

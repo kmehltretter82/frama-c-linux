@@ -49,28 +49,16 @@ module P = Sparecode_params
 
 (** {2 State_builder} *)
 
-let unjournalized_rm_unused_globals new_proj_name project =
-  P.feedback "remove unused global declarations from project '%s'"
-    (Project.get_name project);
-  P.result "removed unused global declarations in new project '%s'" new_proj_name;
-  Project.on project Globs.rm_unused_decl new_proj_name
-
-let journalized_rm_unused_globals  =
-  Journal.register
-    "Sparecode.Register.rm_unused_globals"
-    (Datatype.func2
-       ~label1:("new_proj_name", None) Datatype.string
-       ~label2:("project", Some Project.current) Project.ty
-       Project.ty)
-    unjournalized_rm_unused_globals
-
 let rm_unused_globals ?new_proj_name ?(project=Project.current ()) () =
   let new_proj_name =
     match new_proj_name with
     | Some name -> name
     | None -> (Project.get_name project)^ " (without unused globals)"
   in
-  journalized_rm_unused_globals new_proj_name project
+  P.feedback "remove unused global declarations from project '%s'"
+    (Project.get_name project);
+  P.result "removed unused global declarations in new project '%s'" new_proj_name;
+  Project.on project Globs.rm_unused_decl new_proj_name
 
 let run select_annot select_slice_pragma =
   P.feedback "remove unused code...";
@@ -93,21 +81,10 @@ let run select_annot select_slice_pragma =
   Project.copy ~selection:ctx new_prj;
   new_prj
 
-let journalized_get =
-  Journal.register
-    "Sparecode.Register.get"
-    (Datatype.func2
-       ~label1:("select_annot", None) Datatype.bool
-       ~label2:("select_slice_pragma", None) Datatype.bool
-       Project.ty)
-    (fun select_annot select_slice_pragma ->
-       Result.memo
-         (fun _ -> run select_annot select_slice_pragma)
-         (select_annot, select_slice_pragma))
-
-(* add labels *)
 let get ~select_annot ~select_slice_pragma =
-  journalized_get select_annot select_slice_pragma
+  Result.memo
+    (fun _ -> run select_annot select_slice_pragma)
+    (select_annot, select_slice_pragma)
 
 let main () =
   if Sparecode_params.Analysis.get () then begin

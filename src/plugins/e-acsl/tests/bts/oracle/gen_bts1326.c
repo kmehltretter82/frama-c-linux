@@ -72,6 +72,126 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
     int __gen_e_acsl_valid_read_5;
     int __gen_e_acsl_valid_read_6;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(*__gen_e_acsl_at),
+                                                  sizeof(int),
+                                                  (void *)(*__gen_e_acsl_at),
+                                                  (void *)0);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
+                                 "(int *)*__gen_e_acsl_at",
+                                 (void *)(*__gen_e_acsl_at));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
+                                   "sizeof(int)",0,sizeof(int));
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "RTE";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read((int *)*__gen_e_acsl_at)";
+    __gen_e_acsl_assert_data_2.file = "bts1326.i";
+    __gen_e_acsl_assert_data_2.fct = "atp_NORMAL_computeAverageAccel";
+    __gen_e_acsl_assert_data_2.line = 8;
+    __gen_e_acsl_assert_data_2.name = "mem_access";
+    __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
+      {.values = (void *)0};
+    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at)[1]),
+                                                    sizeof(int),
+                                                    (void *)(*__gen_e_acsl_at),
+                                                    (void *)0);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
+                                 "&(*__gen_e_acsl_at)[1]",
+                                 (void *)(& (*__gen_e_acsl_at)[1]));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
+                                   "sizeof(int)",0,sizeof(int));
+    __gen_e_acsl_assert_data_3.blocking = 1;
+    __gen_e_acsl_assert_data_3.kind = "RTE";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(&(*__gen_e_acsl_at)[1])";
+    __gen_e_acsl_assert_data_3.file = "bts1326.i";
+    __gen_e_acsl_assert_data_3.fct = "atp_NORMAL_computeAverageAccel";
+    __gen_e_acsl_assert_data_3.line = 8;
+    __gen_e_acsl_assert_data_3.name = "mem_access";
+    __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+      {.values = (void *)0};
+    __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at)[2]),
+                                                    sizeof(int),
+                                                    (void *)(*__gen_e_acsl_at),
+                                                    (void *)0);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
+                                 "&(*__gen_e_acsl_at)[2]",
+                                 (void *)(& (*__gen_e_acsl_at)[2]));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
+                                   "sizeof(int)",0,sizeof(int));
+    __gen_e_acsl_assert_data_4.blocking = 1;
+    __gen_e_acsl_assert_data_4.kind = "RTE";
+    __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(&(*__gen_e_acsl_at)[2])";
+    __gen_e_acsl_assert_data_4.file = "bts1326.i";
+    __gen_e_acsl_assert_data_4.fct = "atp_NORMAL_computeAverageAccel";
+    __gen_e_acsl_assert_data_4.line = 8;
+    __gen_e_acsl_assert_data_4.name = "mem_access";
+    __e_acsl_assert(__gen_e_acsl_valid_read_3,& __gen_e_acsl_assert_data_4);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
+      {.values = (void *)0};
+    __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at)[3]),
+                                                    sizeof(int),
+                                                    (void *)(*__gen_e_acsl_at),
+                                                    (void *)0);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,
+                                 "&(*__gen_e_acsl_at)[3]",
+                                 (void *)(& (*__gen_e_acsl_at)[3]));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
+                                   "sizeof(int)",0,sizeof(int));
+    __gen_e_acsl_assert_data_5.blocking = 1;
+    __gen_e_acsl_assert_data_5.kind = "RTE";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(&(*__gen_e_acsl_at)[3])";
+    __gen_e_acsl_assert_data_5.file = "bts1326.i";
+    __gen_e_acsl_assert_data_5.fct = "atp_NORMAL_computeAverageAccel";
+    __gen_e_acsl_assert_data_5.line = 8;
+    __gen_e_acsl_assert_data_5.name = "mem_access";
+    __e_acsl_assert(__gen_e_acsl_valid_read_4,& __gen_e_acsl_assert_data_5);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+      {.values = (void *)0};
+    __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at)[4]),
+                                                    sizeof(int),
+                                                    (void *)(*__gen_e_acsl_at),
+                                                    (void *)0);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
+                                 "&(*__gen_e_acsl_at)[4]",
+                                 (void *)(& (*__gen_e_acsl_at)[4]));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
+                                   "sizeof(int)",0,sizeof(int));
+    __gen_e_acsl_assert_data_6.blocking = 1;
+    __gen_e_acsl_assert_data_6.kind = "RTE";
+    __gen_e_acsl_assert_data_6.pred_txt = "\\valid_read(&(*__gen_e_acsl_at)[4])";
+    __gen_e_acsl_assert_data_6.file = "bts1326.i";
+    __gen_e_acsl_assert_data_6.fct = "atp_NORMAL_computeAverageAccel";
+    __gen_e_acsl_assert_data_6.line = 8;
+    __gen_e_acsl_assert_data_6.name = "mem_access";
+    __e_acsl_assert(__gen_e_acsl_valid_read_5,& __gen_e_acsl_assert_data_6);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
+      {.values = (void *)0};
+    __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)__gen_e_acsl_at_2,
+                                                    sizeof(int),
+                                                    (void *)__gen_e_acsl_at_2,
+                                                    (void *)(& __gen_e_acsl_at_2));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,
+                                 "__gen_e_acsl_at_2",
+                                 (void *)__gen_e_acsl_at_2);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
+                                   "sizeof(int)",0,sizeof(int));
+    __gen_e_acsl_assert_data_7.blocking = 1;
+    __gen_e_acsl_assert_data_7.kind = "RTE";
+    __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(__gen_e_acsl_at_2)";
+    __gen_e_acsl_assert_data_7.file = "bts1326.i";
+    __gen_e_acsl_assert_data_7.fct = "atp_NORMAL_computeAverageAccel";
+    __gen_e_acsl_assert_data_7.line = 8;
+    __gen_e_acsl_assert_data_7.name = "mem_access";
+    __e_acsl_assert(__gen_e_acsl_valid_read_6,& __gen_e_acsl_assert_data_7);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "*\\old(AverageAccel)",0,*__gen_e_acsl_at_2);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
@@ -89,126 +209,6 @@ void __gen_e_acsl_atp_NORMAL_computeAverageAccel(ArrayInt *Accel,
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "(*\\old(Accel))[0]",0,
                                  (*__gen_e_acsl_at)[0]);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
-                                 "(int *)*__gen_e_acsl_at",
-                                 (void *)(*__gen_e_acsl_at));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                   "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)(*__gen_e_acsl_at),
-                                                  sizeof(int),
-                                                  (void *)(*__gen_e_acsl_at),
-                                                  (void *)0);
-    __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "\\valid_read((int *)*__gen_e_acsl_at)";
-    __gen_e_acsl_assert_data_2.file = "bts1326.i";
-    __gen_e_acsl_assert_data_2.fct = "atp_NORMAL_computeAverageAccel";
-    __gen_e_acsl_assert_data_2.line = 8;
-    __gen_e_acsl_assert_data_2.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data_2);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
-      {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
-                                 "&(*__gen_e_acsl_at)[1]",
-                                 (void *)(& (*__gen_e_acsl_at)[1]));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
-                                   "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_valid_read_2 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at)[1]),
-                                                    sizeof(int),
-                                                    (void *)(*__gen_e_acsl_at),
-                                                    (void *)0);
-    __gen_e_acsl_assert_data_3.blocking = 1;
-    __gen_e_acsl_assert_data_3.kind = "RTE";
-    __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(&(*__gen_e_acsl_at)[1])";
-    __gen_e_acsl_assert_data_3.file = "bts1326.i";
-    __gen_e_acsl_assert_data_3.fct = "atp_NORMAL_computeAverageAccel";
-    __gen_e_acsl_assert_data_3.line = 8;
-    __gen_e_acsl_assert_data_3.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_valid_read_2,& __gen_e_acsl_assert_data_3);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
-      {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
-                                 "&(*__gen_e_acsl_at)[2]",
-                                 (void *)(& (*__gen_e_acsl_at)[2]));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
-                                   "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at)[2]),
-                                                    sizeof(int),
-                                                    (void *)(*__gen_e_acsl_at),
-                                                    (void *)0);
-    __gen_e_acsl_assert_data_4.blocking = 1;
-    __gen_e_acsl_assert_data_4.kind = "RTE";
-    __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(&(*__gen_e_acsl_at)[2])";
-    __gen_e_acsl_assert_data_4.file = "bts1326.i";
-    __gen_e_acsl_assert_data_4.fct = "atp_NORMAL_computeAverageAccel";
-    __gen_e_acsl_assert_data_4.line = 8;
-    __gen_e_acsl_assert_data_4.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_valid_read_3,& __gen_e_acsl_assert_data_4);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
-      {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,
-                                 "&(*__gen_e_acsl_at)[3]",
-                                 (void *)(& (*__gen_e_acsl_at)[3]));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_5,
-                                   "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_valid_read_4 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at)[3]),
-                                                    sizeof(int),
-                                                    (void *)(*__gen_e_acsl_at),
-                                                    (void *)0);
-    __gen_e_acsl_assert_data_5.blocking = 1;
-    __gen_e_acsl_assert_data_5.kind = "RTE";
-    __gen_e_acsl_assert_data_5.pred_txt = "\\valid_read(&(*__gen_e_acsl_at)[3])";
-    __gen_e_acsl_assert_data_5.file = "bts1326.i";
-    __gen_e_acsl_assert_data_5.fct = "atp_NORMAL_computeAverageAccel";
-    __gen_e_acsl_assert_data_5.line = 8;
-    __gen_e_acsl_assert_data_5.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_valid_read_4,& __gen_e_acsl_assert_data_5);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
-      {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
-                                 "&(*__gen_e_acsl_at)[4]",
-                                 (void *)(& (*__gen_e_acsl_at)[4]));
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_6,
-                                   "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_valid_read_5 = __e_acsl_valid_read((void *)(& (*__gen_e_acsl_at)[4]),
-                                                    sizeof(int),
-                                                    (void *)(*__gen_e_acsl_at),
-                                                    (void *)0);
-    __gen_e_acsl_assert_data_6.blocking = 1;
-    __gen_e_acsl_assert_data_6.kind = "RTE";
-    __gen_e_acsl_assert_data_6.pred_txt = "\\valid_read(&(*__gen_e_acsl_at)[4])";
-    __gen_e_acsl_assert_data_6.file = "bts1326.i";
-    __gen_e_acsl_assert_data_6.fct = "atp_NORMAL_computeAverageAccel";
-    __gen_e_acsl_assert_data_6.line = 8;
-    __gen_e_acsl_assert_data_6.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_valid_read_5,& __gen_e_acsl_assert_data_6);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
-      {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,
-                                 "__gen_e_acsl_at_2",
-                                 (void *)__gen_e_acsl_at_2);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_7,
-                                   "sizeof(int)",0,sizeof(int));
-    __gen_e_acsl_valid_read_6 = __e_acsl_valid_read((void *)__gen_e_acsl_at_2,
-                                                    sizeof(int),
-                                                    (void *)__gen_e_acsl_at_2,
-                                                    (void *)(& __gen_e_acsl_at_2));
-    __gen_e_acsl_assert_data_7.blocking = 1;
-    __gen_e_acsl_assert_data_7.kind = "RTE";
-    __gen_e_acsl_assert_data_7.pred_txt = "\\valid_read(__gen_e_acsl_at_2)";
-    __gen_e_acsl_assert_data_7.file = "bts1326.i";
-    __gen_e_acsl_assert_data_7.fct = "atp_NORMAL_computeAverageAccel";
-    __gen_e_acsl_assert_data_7.line = 8;
-    __gen_e_acsl_assert_data_7.name = "mem_access";
-    __e_acsl_assert(__gen_e_acsl_valid_read_6,& __gen_e_acsl_assert_data_7);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Postcondition";
     __gen_e_acsl_assert_data.pred_txt = "*\\old(AverageAccel) ==\n(((((*\\old(Accel))[4] + (*\\old(Accel))[3]) + (*\\old(Accel))[2]) +\n  (*\\old(Accel))[1])\n + (*\\old(Accel))[0])\n/ 5";

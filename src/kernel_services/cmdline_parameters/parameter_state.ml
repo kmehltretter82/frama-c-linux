@@ -88,7 +88,6 @@ struct
   let reset_on_copy = !Parameter_customize.reset_on_copy_ref
   let must_save = !Parameter_customize.must_save_ref
   let is_visible = !Parameter_customize.is_visible_ref
-  let module_name = !Parameter_customize.module_name_ref
   let group = !Parameter_customize.group_ref
   let stage = !Parameter_customize.cmdline_stage_ref
 
@@ -187,29 +186,14 @@ struct
          let new_ = !x in
          if not (X.equal old new_) then f old new_)
 
-  let gen_journalized name ty set =
-    let name =
-      if is_dynamic then
-        Dynamic.Parameter.get_name X.functor_name name X.option_name
-      else
-        "Kernel." ^ module_name ^ "." ^ name
-    in
-    if !Parameter_customize.journalize_ref then
-      Journal.register ~is_dyn:is_dynamic name (D.func ty D.unit) set
-    else
-      set
-
   (* like set, but do not clear the dependencies *)
-  let unsafe_set =
-    let set x =
-      Is_set.set true;
-      let old = Internal_state.get () in
-      if not (X.equal x old) then begin
-        Internal_state.set x;
-        Set_hook.apply (old, x)
-      end
-    in
-    gen_journalized "unsafe_set" X.ty set
+  let unsafe_set x =
+    Is_set.set true;
+    let old = Internal_state.get () in
+    if not (X.equal x old) then begin
+      Internal_state.set x;
+      Set_hook.apply (old, x)
+    end
 
   let force_set x =
     let old = Internal_state.get () in
@@ -232,20 +216,15 @@ struct
     Internal_state.set x;
     Set_hook.apply (old, x)
 
-  let journalized_force_set = gen_journalized "set" X.ty force_set
-
   let set x =
     Is_set.set true;
-    if not (X.equal x (Internal_state.get ())) then journalized_force_set x
+    if not (X.equal x (Internal_state.get ())) then force_set x
 
-  let unguarded_clear =
-    gen_journalized "clear" D.unit
-      (fun () ->
-         force_set (X.default ());
-         Is_set.set false)
+  let unguarded_clear () =
+    force_set (X.default ());
+    Is_set.set false
 
   let clear () =
-    (* write this call in the journal if and only if there is something to do *)
     if Is_set.get () || not (is_default ()) then unguarded_clear ()
 
   let equal = X.equal
@@ -256,7 +235,6 @@ struct
       Dynamic.register
         ~plugin:""
         (Dynamic.Parameter.get_name X.functor_name name X.option_name)
-        ~journalize:false
         ty
         f
     else

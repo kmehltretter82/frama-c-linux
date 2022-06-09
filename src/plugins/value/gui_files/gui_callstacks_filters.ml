@@ -137,13 +137,13 @@ let () =
       ~comment:"Evaluation of a l-value on the callstacks focused in the GUI"
       ~plugin:"Value" "lval_to_zone_gui"
       (Datatype.func2 Stmt.ty Lval.ty Locations.Zone.ty)
-      ~journalize:false lval_to_zone_gui
+      lval_to_zone_gui
   in
   let _eval_tlv =
     Dynamic.register
       ~comment:"Evaluation of a term, supposed to be a location, on the callstacks focused in the GUI"
       ~plugin:"Value" "tlval_to_zone_gui"
       (Datatype.func2 Stmt.ty Term.ty Locations.Zone.ty)
-      ~journalize:false tlval_to_zone_gui
+      tlval_to_zone_gui
   in
   ()

@@ -591,10 +591,8 @@ struct
         let compare = compare
         let hash = hash
         let pretty = pretty
-        let internal_pretty_code = Datatype.undefined
         let rehash = Datatype.identity
         let copy = Datatype.undefined
-        let varname = Datatype.undefined
         let mem_project = Datatype.never_any_project
       end)
   let () = Type.set_ml_name ty None

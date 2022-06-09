@@ -46,11 +46,11 @@ int __gen_e_acsl_f(int i)
   {
     int __gen_e_acsl_incr_app;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_incr_app = incr(__gen_e_acsl_at);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\result",0,
                                  __retres);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\old(i)",0,
                                  __gen_e_acsl_at);
-    __gen_e_acsl_incr_app = incr(__gen_e_acsl_at);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"incr(\\old(i))",
                                  0,__gen_e_acsl_incr_app);
     __gen_e_acsl_assert_data.blocking = 1;

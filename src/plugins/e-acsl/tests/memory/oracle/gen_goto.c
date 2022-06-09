@@ -40,10 +40,10 @@ int main(void)
   {
     int __gen_e_acsl_initialized;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)b,sizeof(char));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"b",(void *)b);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(char)",
                                    0,sizeof(char));
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)b,sizeof(char));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "\\initialized(b)",0,
                                  __gen_e_acsl_initialized);

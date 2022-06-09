@@ -2,6 +2,7 @@
    COMMENT: quantifiers
    STDOPT: +"-eva-min-loop-unroll=15"
 */
+typedef enum RIGHT { CREATE, DELETE } right;
 
 // Support predicates for some tests
 //@ predicate p1(integer i, integer j, integer k) = 0 <= i < 10 && 1 < j <= 11 && 2 <= k <= 12;
@@ -106,6 +107,9 @@ int main(void) {
     \forall integer i,j,k; 0 <= i < k && 1 <= j < k && 2 <= k < 10 ==> p1(i,j,k); */
   /*@ assert multiple_guard:
     \forall integer i,j; 0 <= i < 10 && 2 <= i < 8 && 4 <= j < 6 ==> p1(i,j,2); */
+
+  // Gitlab issue e-acsl#199
+  /*@ assert \forall right r; 0 <= r < 1 ==> 1 <= r+1 < 2; */
 
   return 0;
 }

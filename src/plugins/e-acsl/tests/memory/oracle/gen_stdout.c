@@ -39,12 +39,12 @@ int main(void)
   {
     int __gen_e_acsl_valid;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_valid = __e_acsl_valid((void *)stderr,sizeof(FILE),
+                                        (void *)stderr,(void *)(& stderr));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"__fc_stderr",
                                  (void *)stderr);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(FILE)",
                                    0,sizeof(FILE));
-    __gen_e_acsl_valid = __e_acsl_valid((void *)stderr,sizeof(FILE),
-                                        (void *)stderr,(void *)(& stderr));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "\\valid(__fc_stderr)",0,__gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -61,12 +61,12 @@ int main(void)
     int __gen_e_acsl_valid_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)stdin,sizeof(FILE),
+                                          (void *)stdin,(void *)(& stdin));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"__fc_stdin",
                                  (void *)stdin);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(FILE)",0,sizeof(FILE));
-    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)stdin,sizeof(FILE),
-                                          (void *)stdin,(void *)(& stdin));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "\\valid(__fc_stdin)",0,
                                  __gen_e_acsl_valid_2);
@@ -84,12 +84,12 @@ int main(void)
     int __gen_e_acsl_valid_3;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
+    __gen_e_acsl_valid_3 = __e_acsl_valid((void *)stdout,sizeof(FILE),
+                                          (void *)stdout,(void *)(& stdout));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"__fc_stdout",
                                  (void *)stdout);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                    "sizeof(FILE)",0,sizeof(FILE));
-    __gen_e_acsl_valid_3 = __e_acsl_valid((void *)stdout,sizeof(FILE),
-                                          (void *)stdout,(void *)(& stdout));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                  "\\valid(__fc_stdout)",0,
                                  __gen_e_acsl_valid_3);

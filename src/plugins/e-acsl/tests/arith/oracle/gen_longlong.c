@@ -45,7 +45,6 @@ int main(void)
     long __gen_e_acsl__4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl_,2L);
-    __e_acsl_assert_register_ulonglong(& __gen_e_acsl_assert_data,"x",0,x);
     __gmpz_init(__gen_e_acsl_x);
     __gmpz_import(__gen_e_acsl_x,1UL,1,8UL,0,0UL,(void const *)(& x));
     __gmpz_init(__gen_e_acsl_mul);
@@ -77,6 +76,7 @@ int main(void)
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __gen_e_acsl__4 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_mod));
+    __e_acsl_assert_register_ulonglong(& __gen_e_acsl_assert_data,"x",0,x);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "(2 * x + 1) % 2 == 1";

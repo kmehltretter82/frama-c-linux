@@ -80,9 +80,6 @@ module Emitter_with_properties =
 
       let copy = Datatype.undefined
       let pretty fmt e = Usable_emitter.pretty fmt e.emitter
-      let internal_pretty_code = Datatype.undefined
-      let varname _ = assert false (* unused while [internal_pretty_code]
-                                      unimplemented *)
       let mem_project = Datatype.never_any_project
     end)
 
