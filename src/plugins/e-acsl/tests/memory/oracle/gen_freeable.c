@@ -38,8 +38,8 @@ int main(void)
     int __gen_e_acsl_freeable;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     /*@ assert Eva: initialization: \initialized(&p); */
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"p",(void *)p);
     __gen_e_acsl_freeable = __e_acsl_freeable((void *)p);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"p",(void *)p);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\freeable(p)",
                                  0,__gen_e_acsl_freeable);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -76,8 +76,8 @@ int main(void)
     int __gen_e_acsl_freeable_3;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"p",(void *)p);
     __gen_e_acsl_freeable_3 = __e_acsl_freeable((void *)(p + 1));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"p",(void *)p);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                  "\\freeable(p + 1)",0,
                                  __gen_e_acsl_freeable_3);
@@ -95,8 +95,8 @@ int main(void)
     int __gen_e_acsl_freeable_4;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"p",(void *)p);
     __gen_e_acsl_freeable_4 = __e_acsl_freeable((void *)p);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"p",(void *)p);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                  "\\freeable(p)",0,__gen_e_acsl_freeable_4);
     __gen_e_acsl_assert_data_4.blocking = 1;
@@ -114,8 +114,8 @@ int main(void)
     int __gen_e_acsl_freeable_5;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"p",(void *)p);
     __gen_e_acsl_freeable_5 = __e_acsl_freeable((void *)p);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_5,"p",(void *)p);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
                                  "\\freeable(p)",0,__gen_e_acsl_freeable_5);
     __gen_e_acsl_assert_data_5.blocking = 1;
@@ -132,9 +132,9 @@ int main(void)
     int __gen_e_acsl_freeable_6;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
+    __gen_e_acsl_freeable_6 = __e_acsl_freeable((void *)(array));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
                                  "(char *)array",(void *)(array));
-    __gen_e_acsl_freeable_6 = __e_acsl_freeable((void *)(array));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
                                  "\\freeable((char *)array)",0,
                                  __gen_e_acsl_freeable_6);
@@ -152,9 +152,9 @@ int main(void)
     int __gen_e_acsl_freeable_7;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
+    __gen_e_acsl_freeable_7 = __e_acsl_freeable((void *)(& array[5]));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_7,"&array[5]",
                                  (void *)(& array[5]));
-    __gen_e_acsl_freeable_7 = __e_acsl_freeable((void *)(& array[5]));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
                                  "\\freeable(&array[5])",0,
                                  __gen_e_acsl_freeable_7);

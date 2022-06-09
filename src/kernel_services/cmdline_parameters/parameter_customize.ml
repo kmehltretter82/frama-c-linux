@@ -25,9 +25,6 @@ let empty_string = ""
 let cmdline_stage_ref = ref Cmdline.Configuring
 let set_cmdline_stage s = cmdline_stage_ref := s
 
-let journalize_ref = ref true
-let do_not_journalize () = journalize_ref := false
-
 let negative_option_name_ref = ref None
 let set_negative_option_name s = negative_option_name_ref := Some s
 
@@ -107,7 +104,6 @@ let add_function_name_transformation f =
 
 let reset () =
   cmdline_stage_ref := Cmdline.Configuring;
-  journalize_ref := true;
   negative_option_name_ref := None;
   negative_option_help_ref := empty_string;
   unset_option_name_ref:= empty_string;

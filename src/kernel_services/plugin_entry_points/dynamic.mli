@@ -30,11 +30,13 @@
 val register:
   ?comment:string ->
   plugin:string ->
-  string -> 'a Type.t -> journalize:bool -> 'a -> 'a
+  string -> 'a Type.t -> 'a -> 'a
 (** [register ~plugin name ty v] registers [v] with the name
     [name], the type [ty] and the plug-in [plugin].
     @raise Type.AlreadyExists if [name] already exists. In other words you
     cannot register a value with the same name twice.
+    @before Frama-C+dev there was a labeled argument [journalized], that has
+            been removed when Journalization has been removed.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (* ************************************************************************* *)

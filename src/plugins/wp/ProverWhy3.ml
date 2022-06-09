@@ -1338,10 +1338,9 @@ let prepare ~mode wpo driver task =
     end
   else None
 
-let interactive ~mode wpo pconf driver prover task =
+let interactive ~mode wpo pconf ~conf driver prover task =
   let time = Wp_parameters.InteractiveTimeout.get () in
   let timeout = if time <= 0 then None else Some time in
-  let conf = get_why3_conf () in
   match prepare ~mode wpo driver task with
   | None -> Task.return VCS.unknown
   | Some (script, merge) ->
@@ -1392,7 +1391,7 @@ let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ~prover wpo () =
         Task.return VCS.valid
       else
       if pconf.interactive then
-        interactive ~mode wpo pconf drv prover task
+        interactive ~mode wpo pconf ~conf drv prover task
       else
         Cache.get_result
           ~digest:(digest wpo drv)

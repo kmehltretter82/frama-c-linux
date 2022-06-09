@@ -19,14 +19,10 @@ int f(int x)
     {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"old x",0,
-                                   __gen_e_acsl_old_variant);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
         {.values = (void *)0};
       __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_2,
                                   & __gen_e_acsl_assert_data);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"current x",
-                                   0,x);
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Variant";
       __gen_e_acsl_assert_data.pred_txt = "(old x) >= 0";
@@ -68,10 +64,6 @@ int g(int x)
       __gen_e_acsl_lexico_2 = __gen_e_acsl_lexico(__gen_e_acsl_old_variant,x);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"old x",0,
-                                   __gen_e_acsl_old_variant);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"current x",0,
-                                   x);
       __gen_e_acsl_assert_data.blocking = 1;
       __gen_e_acsl_assert_data.kind = "Variant";
       __gen_e_acsl_assert_data.pred_txt = "lexico(old x, x)";
@@ -127,14 +119,10 @@ int fact(int n)
     {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,"old n",0,
-                                   __gen_e_acsl_old_variant);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
       __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_4,
                                   & __gen_e_acsl_assert_data_3);
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"current n",
-                                   0,n);
       __gen_e_acsl_assert_data_3.blocking = 1;
       __gen_e_acsl_assert_data_3.kind = "Variant";
       __gen_e_acsl_assert_data_3.pred_txt = "(old n) >= 0";

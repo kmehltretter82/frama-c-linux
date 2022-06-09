@@ -6,7 +6,7 @@ OPT: -wp-model Hoare -wp-no-simpl -wp-fct double_call
 */
 
 /* run.config_qualif
-OPT: -journal-disable -wp -wp-par 1
+OPT: -wp -wp-par 1
 */
 
 int G = 3;

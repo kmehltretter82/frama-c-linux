@@ -319,14 +319,8 @@ void __gen_e_acsl_o(void)
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,2UL,1,0);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,
-                                 "number of active behaviors",0,
-                                 __gen_e_acsl_active_bhvrs);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,
-                                 "number of active behaviors",0,
-                                 __gen_e_acsl_active_bhvrs);
     if (__gen_e_acsl_active_bhvrs != 1) {
       __gen_e_acsl_assert_data_6.blocking = 1;
       __gen_e_acsl_assert_data_6.kind = "Precondition";
@@ -351,14 +345,8 @@ void __gen_e_acsl_o(void)
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,2UL,2,3);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
-                                 "number of active behaviors",0,
-                                 __gen_e_acsl_active_bhvrs);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
-                                 "number of active behaviors",0,
-                                 __gen_e_acsl_active_bhvrs);
     if (__gen_e_acsl_active_bhvrs != 1) {
       __gen_e_acsl_assert_data_8.blocking = 1;
       __gen_e_acsl_assert_data_8.kind = "Precondition";
@@ -383,14 +371,8 @@ void __gen_e_acsl_o(void)
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,
-                                 "number of active behaviors",0,
-                                 __gen_e_acsl_active_bhvrs);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
-                                 "number of active behaviors",0,
-                                 __gen_e_acsl_active_bhvrs);
     __gen_e_acsl_assert_data_10.blocking = 1;
     __gen_e_acsl_assert_data_10.kind = "Precondition";
     __gen_e_acsl_assert_data_10.pred_txt = "all behaviors complete";

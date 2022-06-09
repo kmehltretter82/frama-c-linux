@@ -84,26 +84,6 @@ include Datatype.Make
       type t = state_selection
       let name = "State_selection"
       let reprs = [ full; empty; singleton State.dummy ]
-      let internal_pretty_code p_caller fmt (s, _) = match s with
-        | Full -> Format.fprintf fmt "@[State_selection.full@]"
-        | Subset sel ->
-          match Selection.fold_vertex (fun s acc -> s :: acc) sel [] with
-          | [] -> Format.fprintf fmt "@[State_selection.empty@]"
-          | [ s ] ->
-            let pp fmt =
-              Format.fprintf fmt "@[<hv 2>State_selection.singleton@;%a@]"
-                (State.internal_pretty_code Type.Call)
-                s
-            in
-            Type.par p_caller Type.Call fmt pp
-          | l ->
-            let module D = Datatype.List(State) in
-            let pp fmt =
-              Format.fprintf fmt "@[<hv 2>State_selection.of_list@;%a@]"
-                (D.internal_pretty_code Type.Call)
-                l
-            in
-            Type.par p_caller Type.Call fmt pp
     end)
 
 let transitive_closure next_vertices s =

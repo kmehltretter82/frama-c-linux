@@ -226,8 +226,7 @@ let compute () =
 
 let compute =
   let name = "Eva.Analysis.compute" in
-  let f = Journal.register name  Datatype.(func unit unit) compute in
-  fst (State_builder.apply_once name [ Self.state ] f)
+  fst (State_builder.apply_once name [ Self.state ] compute)
 
 (* Resets the Analyzer when the current project is changed. *)
 let () =

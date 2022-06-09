@@ -194,7 +194,7 @@ and criterion =
 
 (** {2 Internals values} *)
 
-(** {3 For the journalization of these internals types} *)
+(** {3 For the datatypes of these internals types} *)
 
 val dummy_pdg_mark : pdg_mark
 

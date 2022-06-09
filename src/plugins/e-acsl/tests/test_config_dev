@@ -5,7 +5,7 @@ COMMENT: Default options for `e-acsl-gcc.sh`
 MACRO: ROOT_EACSL_GCC_MISC_OPTS -q -X --no-assert-print-data
 
 COMMENT: Default options for the frama-c invocation
-MACRO: ROOT_EACSL_GCC_FC_EXTRA -journal-disable -verbose 0
+MACRO: ROOT_EACSL_GCC_FC_EXTRA -verbose 0
 
 PLUGIN: e-acsl eva,scope,variadic rtegen
 

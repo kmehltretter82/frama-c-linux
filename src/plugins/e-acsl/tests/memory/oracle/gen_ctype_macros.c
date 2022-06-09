@@ -41,22 +41,22 @@ int main(int argc, char const **argv)
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& d),
+                                                    sizeof(char *));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"&d",
                                  (void *)(& d));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(char *)",0,sizeof(char *));
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(& d),
-                                                    sizeof(char *));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "\\initialized(&d)",0,
                                  __gen_e_acsl_initialized);
     if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_valid;
+      __gen_e_acsl_valid = __e_acsl_valid((void *)d,sizeof(char),(void *)d,
+                                          (void *)(& d));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"d",(void *)d);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(char)",0,sizeof(char));
-      __gen_e_acsl_valid = __e_acsl_valid((void *)d,sizeof(char),(void *)d,
-                                          (void *)(& d));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\valid(d)",0,
                                    __gen_e_acsl_valid);
       __gen_e_acsl_and = __gen_e_acsl_valid;
@@ -147,14 +147,8 @@ int __gen_e_acsl_isupper(int c)
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "number of active behaviors",0,
-                                 __gen_e_acsl_active_bhvrs);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                 "number of active behaviors",0,
-                                 __gen_e_acsl_active_bhvrs);
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Precondition";
     __gen_e_acsl_assert_data_3.pred_txt = "all behaviors disjoint";

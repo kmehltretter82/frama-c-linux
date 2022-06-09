@@ -33,10 +33,6 @@ val set_cmdline_stage: Cmdline.stage -> unit
     recognized. Default is [Cmdline.Configuring].
     @since Beryllium-20090601-beta1 *)
 
-val do_not_journalize: unit -> unit
-(** Prevent journalization of the parameter.
-    @since Beryllium-20090601-beta1 *)
-
 val do_not_projectify: unit -> unit
 (** Prevent projectification of the parameter: its state is shared by all the
     existing projects. Also imply {!do_not_save} and {!do_not_reset_on_copy}.
@@ -190,7 +186,6 @@ val find_kf_by_name: (string -> Cil_types.kernel_function) ref
 (* ************************************************************************* *)
 
 val cmdline_stage_ref: Cmdline.stage ref
-val journalize_ref: bool ref
 val negative_option_name_ref: string option ref
 val negative_option_help_ref: string ref
 val unset_option_name_ref: string ref

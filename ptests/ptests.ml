@@ -152,7 +152,7 @@ let config_name ~env name =
 let macro_post_options = ref "" (* value set to @PTEST_POST_OPTIONS@ macro *)
 let macro_pre_options  = ref "" (* value set to @PTEST_PRE_OPTIONS@  macro *)
 let macro_options = ref "@PTEST_PRE_OPTIONS@ @PTEST_OPT@ @PTEST_POST_OPTIONS@"
-let macro_default_options = ref "-journal-disable -check -no-autoload-plugins -add-symbolic-path=\"@PTEST_SESSION@:.\""
+let macro_default_options = ref "-check -no-autoload-plugins -add-symbolic-path=\"@PTEST_SESSION@:.\""
 
 let macro_frama_c_exe = ref "frama-c"
 let macro_frama_c_cmd = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@"

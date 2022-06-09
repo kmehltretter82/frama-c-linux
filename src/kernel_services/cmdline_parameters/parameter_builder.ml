@@ -219,7 +219,7 @@ struct
       if is_dynamic then
         let plugin = empty_string in
         Dynamic.register
-          ~plugin X.option_name Typed_parameter.ty ~journalize:false p
+          ~plugin X.option_name Typed_parameter.ty p
       else p
 
     let add_aliases ?visible ?deprecated list =
@@ -328,7 +328,7 @@ struct
       if is_dynamic then
         let plugin = empty_string in
         Dynamic.register
-          ~plugin X.option_name Typed_parameter.ty ~journalize:false p
+          ~plugin X.option_name Typed_parameter.ty p
       else p
 
   end
@@ -437,7 +437,7 @@ struct
       if is_dynamic then
         let plugin = empty_string in
         Dynamic.register
-          ~plugin X.option_name Typed_parameter.ty ~journalize:false p
+          ~plugin X.option_name Typed_parameter.ty p
       else
         p
 
@@ -527,7 +527,7 @@ struct
       if is_dynamic then
         let plugin = empty_string in
         Dynamic.register
-          ~plugin X.option_name Typed_parameter.ty ~journalize:false p
+          ~plugin X.option_name Typed_parameter.ty p
       else
         p
 

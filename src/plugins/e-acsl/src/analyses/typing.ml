@@ -751,7 +751,8 @@ and type_bound_variables ~loc ~lenv (t1, lv, t2) =
     | Linteger -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz i)
     | Ctype ty ->
       (match Cil.unrollType ty with
-       | TInt(ik, _) -> mk_ctx ~use_gmp_opt:true (C_integer ik)
+       | TInt(ik, _) | TEnum({ ekind = ik }, _) ->
+         mk_ctx ~use_gmp_opt:true (C_integer ik)
        | ty ->
          Options.fatal "unexpected C type %a for quantified variable %a"
            Printer.pp_typ ty

@@ -222,9 +222,7 @@ module Make_Generic_Lattice_Set
          let hash = hash
          let rehash = Datatype.identity
          let copy = Datatype.undefined
-         let internal_pretty_code = Datatype.undefined
          let pretty = pretty
-         let varname = Datatype.undefined
          let mem_project = Datatype.never_any_project
        end) :
        Datatype.S with type t := t)
@@ -364,9 +362,7 @@ module Make_Lattice_Base (V:Lattice_Value):(Lattice_Base with type l = V.t) = st
          let hash = hash
          let rehash = Datatype.identity
          let copy = Datatype.undefined
-         let internal_pretty_code = Datatype.undefined
          let pretty = pretty
-         let varname = Datatype.undefined
          let mem_project = Datatype.never_any_project
        end) :
        Datatype.S with type t := t)
@@ -517,8 +513,6 @@ module Bool = struct
                let rehash = Datatype.identity
                let copy = Datatype.identity
                let pretty = pretty
-               let internal_pretty_code = Datatype.undefined
-               let varname = Datatype.undefined
                let mem_project = Datatype.never_any_project
              end) :
              Datatype.S with type t := t)
@@ -677,9 +671,7 @@ struct
                let hash = hash
                let rehash = Datatype.identity
                let copy = Datatype.undefined
-               let internal_pretty_code = Datatype.undefined
                let pretty = pretty
-               let varname = Datatype.undefined
                let mem_project = Datatype.never_any_project
              end) :
              Datatype.S with type t := t)
@@ -777,9 +769,7 @@ struct
          let hash = hash
          let rehash = Datatype.identity
          let copy = Datatype.undefined
-         let internal_pretty_code = Datatype.undefined
          let pretty = pretty
-         let varname = Datatype.undefined
          let mem_project = Datatype.never_any_project
        end):
        Datatype.S with type t := t)
@@ -947,9 +937,7 @@ struct
         let hash = hash
         let rehash = Datatype.undefined
         let copy = Datatype.undefined
-        let internal_pretty_code = Datatype.undefined
         let pretty = pretty
-        let varname = Datatype.undefined
         let mem_project = Datatype.never_any_project
       end)
   let () = Type.set_ml_name ty None

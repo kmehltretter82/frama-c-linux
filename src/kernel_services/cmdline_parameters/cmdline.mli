@@ -360,13 +360,6 @@ val kernel_debug_atleast_ref: (int -> bool) ref
 val kernel_verbose_atleast_ref: (int -> bool) ref
 (** @since Boron-20100401 *)
 
-val journal_enable: bool
-(** @since Beryllium-20090601-beta1 *)
-
-val journal_isset: bool
-(** -journal-enable/disable explicitly set on the command line.
-    @since Boron-20100401 *)
-
 val use_obj: bool
 (** @since Beryllium-20090601-beta1 *)
 

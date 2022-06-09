@@ -8,7 +8,7 @@ module A : sig end = struct
   let mk () = 1.05
   let _ = B false
   let f = function A n -> n | B false -> min_int | B true -> max_int
-  module T = 
+  module T =
     Datatype.Make(struct
       type t = tt
       let name = "A.t"
@@ -16,7 +16,7 @@ module A : sig end = struct
       include Datatype.Undefined
     end)
   let t = T.ty
-  module U = 
+  module U =
     Datatype.Make(struct
       type t = float
       let name = "A.u"
@@ -25,42 +25,42 @@ module A : sig end = struct
     end)
   let u = U.ty
   let mk =
-    Dynamic.register ~plugin:"A" ~journalize:false "mk"
+    Dynamic.register ~plugin:"A" "mk"
       (Datatype.func Datatype.unit u)
       mk
   let _ =
-    Dynamic.register ~plugin:"A" ~journalize:false "f"
+    Dynamic.register ~plugin:"A" "f"
       (Datatype.func t Datatype.int)
       f
   let _ =
-    Dynamic.register ~plugin:"A" ~journalize:false "g" 
+    Dynamic.register ~plugin:"A" "g"
       (Datatype.func u Datatype.int)
       (fun x -> Format.printf "%f@." x; int_of_float x)
-  let v1 = Dynamic.register ~plugin:"A" ~journalize:false "v1" t (A 1)
-  let _ = Dynamic.register ~plugin:"A" ~journalize:false "v2" t (A 2)
+  let v1 = Dynamic.register ~plugin:"A" "v1" t (A 1)
+  let _ = Dynamic.register ~plugin:"A" "v2" t (A 2)
   let _ =
-    Dynamic.register ~plugin:"A" ~journalize:false "h"
+    Dynamic.register ~plugin:"A" "h"
       (Datatype.func t (Datatype.func u Datatype.bool))
       (fun x y ->
 	 match x with A x ->
 	   Format.printf "params = %d %f@." x y;
 	   x = int_of_float y | B _ -> false)
   let _ =
-    Dynamic.register ~plugin:"A" ~journalize:false "succ"
+    Dynamic.register ~plugin:"A" "succ"
       (Datatype.func Datatype.int Datatype.int) succ
   let _ =
-    Dynamic.register ~journalize:false "ho" ~plugin:"A"
+    Dynamic.register "ho" ~plugin:"A"
       (Datatype.func (Datatype.func Datatype.int Datatype.int) (Datatype.func t u))
       (fun ff x -> float (ff (f x)))
   let _ =
-    Dynamic.register ~journalize:false ~plugin:"A" "ppu" (Datatype.func u Datatype.unit)
+    Dynamic.register ~plugin:"A" "ppu" (Datatype.func u Datatype.unit)
       (fun f -> Format.printf "ppu %f@." f)
   let ho2 =
-    Dynamic.register ~plugin:"A" "ho2" ~journalize:false
+    Dynamic.register ~plugin:"A" "ho2"
       (Datatype.func (Datatype.func t Datatype.int) (Datatype.func t u))
       (fun f x -> float (f x))
 
-  let _ = 
+  let _ =
     ignore (Dynamic.get ~plugin:"A" "mk" (Datatype.func Datatype.unit u) ())
 
   module UA = Type.Abstract(struct let name = "A.u" end)
@@ -68,11 +68,11 @@ module A : sig end = struct
     Dynamic.get ~plugin:"A" "mk" (Datatype.func Datatype.unit UA.ty) ()
 
   let _ =
-    Dynamic.register ~journalize:false ~plugin:"A" "poly"
+    Dynamic.register ~plugin:"A" "poly"
       (Datatype.list u) [ 1.; 2.; 3. ]
 
   let _ =
-    Dynamic.register ~journalize:false ~plugin:"A" "poly2" (Datatype.list u)
+    Dynamic.register ~plugin:"A" "poly2" (Datatype.list u)
       [ mk (); ho2 (function A n -> n | B _ -> min_int) v1; ho2 f v1 ]
 
 end
@@ -132,4 +132,3 @@ module B = struct
       (Dynamic.get ~plugin:"A" "ppu" (Datatype.func ty' Datatype.unit))
       (Dynamic.get ~plugin:"A" "poly2" (Datatype.list ty'))
 end
-

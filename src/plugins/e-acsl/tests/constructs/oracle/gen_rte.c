@@ -65,7 +65,6 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
     __gen_e_acsl_at_2 = e;
     __gen_e_acsl_contract = __e_acsl_contract_init(1UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"a",0,a);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"a",0,a);
@@ -78,6 +77,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
     __gen_e_acsl_assert_data_2.name = "division_by_zero";
     __e_acsl_assert(a != 0,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"a",0,a);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "1 % a == 1";
@@ -112,7 +112,6 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
       int __gen_e_acsl_var_3;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"d",0,d);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
         {.values = (void *)0};
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,"d",0,d);
@@ -125,9 +124,9 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
       __gen_e_acsl_assert_data_5.name = "division_by_zero";
       __e_acsl_assert(d != 0,& __gen_e_acsl_assert_data_5);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,"d",0,d);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"f",0,f);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_7 =
         {.values = (void *)0};
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_7,"f",0,f);
@@ -140,9 +139,9 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
       __gen_e_acsl_assert_data_7.name = "division_by_zero";
       __e_acsl_assert(f != 0,& __gen_e_acsl_assert_data_7);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"f",0,f);
       if (1 % f == 1) __gen_e_acsl_or = 1;
       else {
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"g",0,g);
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_8 =
           {.values = (void *)0};
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,"g",0,g);
@@ -155,11 +154,11 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
         __gen_e_acsl_assert_data_8.name = "division_by_zero";
         __e_acsl_assert(g != 0,& __gen_e_acsl_assert_data_8);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_6,"g",0,g);
         __gen_e_acsl_or = 1 % g == 1;
       }
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"h",0,h);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_10 =
         {.values = (void *)0};
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"h",0,h);
@@ -172,8 +171,8 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
       __gen_e_acsl_assert_data_10.name = "division_by_zero";
       __e_acsl_assert(h != 0,& __gen_e_acsl_assert_data_10);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"h",0,h);
       if (1 % h == 1) {
-        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"i",0,i);
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
           {.values = (void *)0};
         __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,"i",0,i);
@@ -186,6 +185,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
         __gen_e_acsl_assert_data_11.name = "division_by_zero";
         __e_acsl_assert(i != 0,& __gen_e_acsl_assert_data_11);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,"i",0,i);
         __gen_e_acsl_and = 1 % i == 1;
       }
       else __gen_e_acsl_and = 0;
@@ -331,8 +331,6 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
     int __gen_e_acsl_assumes_value_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
       {.values = (void *)0};
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"\\old(b)",0,
-                                 __gen_e_acsl_at);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,
@@ -346,6 +344,8 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
     __gen_e_acsl_assert_data_19.name = "division_by_zero";
     __e_acsl_assert(__gen_e_acsl_at != 0,& __gen_e_acsl_assert_data_19);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_19);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"\\old(b)",0,
+                                 __gen_e_acsl_at);
     __gen_e_acsl_assert_data_18.blocking = 1;
     __gen_e_acsl_assert_data_18.kind = "Postcondition";
     __gen_e_acsl_assert_data_18.pred_txt = "1 % \\old(b) == 1";
@@ -359,8 +359,6 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
     if (__gen_e_acsl_assumes_value_2) {
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_20 =
         {.values = (void *)0};
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"\\old(e)",
-                                   0,__gen_e_acsl_at_2);
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_21 =
         {.values = (void *)0};
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_21,
@@ -374,6 +372,8 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
       __gen_e_acsl_assert_data_21.name = "division_by_zero";
       __e_acsl_assert(__gen_e_acsl_at_2 != 0,& __gen_e_acsl_assert_data_21);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_21);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"\\old(e)",
+                                   0,__gen_e_acsl_at_2);
       __gen_e_acsl_assert_data_20.blocking = 1;
       __gen_e_acsl_assert_data_20.kind = "Postcondition";
       __gen_e_acsl_assert_data_20.pred_txt = "1 % \\old(e) == 1";

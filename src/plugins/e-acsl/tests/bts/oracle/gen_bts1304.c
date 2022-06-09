@@ -48,12 +48,12 @@ int main(void)
   {
     int __gen_e_acsl_initialized;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(buf),
+                                                    sizeof(union msg));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,
                                  "(unsigned char *)buf",(void *)(buf));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(union msg)",0,sizeof(union msg));
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(buf),
-                                                    sizeof(union msg));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "\\initialized((union msg *)((unsigned char *)buf))",
                                  0,__gen_e_acsl_initialized);

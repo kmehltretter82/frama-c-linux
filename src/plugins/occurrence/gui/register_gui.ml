@@ -74,7 +74,6 @@ let filter_accesses l =
 let _ignore =
   Dynamic.register
     ~plugin:"Occurrence"
-    ~journalize:false
     "Enabled.set"
     (Datatype.func Datatype.bool Datatype.unit)
     Enabled.set
@@ -82,7 +81,6 @@ let _ignore =
 let _ignore =
   Dynamic.register
     ~plugin:"Occurrence"
-    ~journalize:false
     "Enabled.get"
     (Datatype.func Datatype.unit Datatype.bool)
     Enabled.get

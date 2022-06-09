@@ -526,7 +526,7 @@ let to_exp ~loc ~adata kf env pot label =
           else
             Smart_exp.lval ~loc (Cil.var vi), env
         in
-        let adata, env=
+        let adata =
           Assert.register_pred_or_term ~loc env pot e adata
         in
         e, adata, env

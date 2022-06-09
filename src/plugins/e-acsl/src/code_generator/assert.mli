@@ -57,14 +57,21 @@ val clean: loc:location -> Env.t -> t -> Env.t
     not given to [runtime_check] or [runtime_check_with_msg], otherwise the
     memory allocated in the C structure will not be freed. *)
 
+val push_pending_register_data: unit -> unit
+(** [push_pending_register_data] adds a data registration to a stack of pending
+    data registration to be generated later *)
+
+val do_pending_register_data:
+  Env.t -> Env.t
+(** [do_pending_register_data] performs all the pending restrations*)
+
 val register:
   loc:location ->
-  Env.t ->
   ?force:bool ->
   string ->
   exp ->
   t ->
-  t * Env.t
+  t
 (** [register ~loc env ?force name e adata] registers the data [e] corresponding
     to the name [name] to the assertion context [adata].
     If [force] is false (default), the data is not registered if the expression
@@ -73,12 +80,11 @@ val register:
 
 val register_term:
   loc:location ->
-  Env.t ->
   ?force:bool ->
   term ->
   exp ->
   t ->
-  t * Env.t
+  t
 (** [register_term ~loc env ?force t e adata] registers the data [e]
     corresponding to the term [t] to the assertion context [adata]. The
     parameter [force] has the same signification than for the function
@@ -91,7 +97,7 @@ val register_pred:
   predicate ->
   exp ->
   t ->
-  t * Env.t
+  t
 (** [register_pred ~loc env ?force p e adata] registers the data [e]
     corresponding to the predicate [p] to the assertion context [adata]. The
     parameter [force] has the same signification than for the function
@@ -104,7 +110,7 @@ val register_pred_or_term:
   pred_or_term ->
   exp ->
   t ->
-  t * Env.t
+  t
 (** [register_pred_or_term ~loc kf env ?force pot e adata] registers the data
     [e] corresponding to the predicate or term [pot] to the assertion context
     [adata]. The parameter [force] has the same signification than for the

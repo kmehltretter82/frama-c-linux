@@ -27,12 +27,6 @@ open Cil_datatype
 
 type cpp_opt_kind = Gnu | Not_gnu | Unknown
 
-let pretty_cpp_opt_kind fmt =
-  function
-  | Gnu -> Format.pp_print_string fmt "Gnu"
-  | Not_gnu -> Format.pp_print_string fmt "Not_gnu"
-  | Unknown -> Format.pp_print_string fmt "Unknown"
-
 type file =
   | NeedCPP of
       Filepath.Normalized.t (* Filename of the [.c] to preprocess. *)
@@ -62,22 +56,6 @@ module D =
       let structural_descr = Structural_descr.t_abstract
       let mem_project = Datatype.never_any_project
       let copy = Datatype.identity (* immutable strings *)
-      let internal_pretty_code p_caller fmt t =
-        let pp fmt = match t with
-          | NoCPP s ->
-            Format.fprintf fmt "@[File.NoCPP %a@]" Filepath.Normalized.pretty s
-          | External (f,p) ->
-            Format.fprintf fmt "@[File.External (%a,%S)@]"
-              Filepath.Normalized.pretty f p
-          | NeedCPP (f,cmd,extra,kind) ->
-            Format.fprintf
-              fmt "@[File.NeedCPP (%a,%S,%S,%a)@]"
-              Filepath.Normalized.pretty f
-              cmd
-              (String.concat " " extra)
-              pretty_cpp_opt_kind kind
-        in
-        Type.par p_caller Type.Call fmt pp
     end)
 include D
 
@@ -1894,24 +1872,6 @@ let init_from_cmdline () =
     Kernel.fatal "@[<v 0>Cannot initialize from C files@ \
                   Kernel raised Bad_Initialization %s@]" s
 
-let init_from_cmdline =
-  Journal.register
-    "File.init_from_cmdline"
-    (Datatype.func Datatype.unit Datatype.unit)
-    init_from_cmdline
-
-let init_from_c_files =
-  Journal.register
-    "File.init_from_c_files"
-    (Datatype.func (Datatype.list ty) Datatype.unit)
-    init_from_c_files
-
-let prepare_from_c_files =
-  Journal.register
-    "File.prepare_from_c_files"
-    (Datatype.func Datatype.unit Datatype.unit)
-    prepare_from_c_files
-
 let () = Ast.set_default_initialization
     (fun () ->
        if Files.is_computed () then prepare_from_c_files ()
@@ -1924,21 +1884,8 @@ let pp_file_to fmt_opt =
    | None -> Kernel.CodeOutput.output (fun fmt -> pp_ast fmt ast)
    | Some fmt -> pp_ast fmt ast)
 
-let unjournalized_pretty prj (fmt_opt:Format.formatter option) () =
-  Project.on prj pp_file_to fmt_opt
-
-let journalized_pretty_ast =
-  Journal.register "File.pretty_ast"
-    (Datatype.func3
-       ~label1:("prj",Some Project.current) Project.ty
-       ~label2:("fmt",Some (fun () -> None))
-       (let module O = Datatype.Option(Datatype.Formatter) in
-        O.ty)
-       Datatype.unit Datatype.unit)
-    unjournalized_pretty
-
 let pretty_ast ?(prj=Project.current ()) ?fmt () =
-  journalized_pretty_ast prj fmt ()
+  Project.on prj pp_file_to fmt
 
 let create_rebuilt_project_from_visitor
     ?reorder ?last ?(preprocess=false) prj_name visitor =
@@ -1952,7 +1899,7 @@ let create_rebuilt_project_from_visitor
     in
     let cout = open_out (f :> string) in
     let fmt = Format.formatter_of_out_channel cout in
-    unjournalized_pretty prj (Some fmt) ();
+    pretty_ast ~prj ~fmt ();
     let redo () =
       (*      Kernel.feedback "redoing initialization on file %s" f;*)
       Files.reset ();

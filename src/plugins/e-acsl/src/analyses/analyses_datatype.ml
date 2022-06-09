@@ -82,7 +82,7 @@ module Pred_or_term =
         | PoT_pred p -> Printer.pp_predicate fmt p
         | PoT_term t -> Printer.pp_term fmt t
 
-      let varname _ = "pred_or_term"
+
     end)
 
 (** [Ext_logic_label] associates a statement to a label when necessary. For

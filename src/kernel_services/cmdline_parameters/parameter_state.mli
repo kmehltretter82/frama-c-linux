@@ -63,7 +63,6 @@ sig
   val is_dynamic: bool
   val register_dynamic:
     string -> 'arg Type.t -> 'ret Type.t -> ('arg -> 'ret) -> 'arg -> 'ret
-  val gen_journalized: string -> 'arg Type.t -> ('arg -> unit) -> 'arg -> unit
 end
 
 (**/**)

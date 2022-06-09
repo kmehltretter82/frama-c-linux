@@ -26,7 +26,6 @@
 (**
    Modules providing general services:
    - {!Dynamic}: API for plug-ins linked dynamically
-   - {!Journal}: journalisation
    - {!Log}: message outputs and printers
    - {!Plugin}: general services for plug-ins
    - {!Project} and associated files: {!Kind}, {!Datatype} and {!State_builder}.
@@ -53,22 +52,7 @@ open Cil_datatype
 (** {2 Registering} *)
 (* ************************************************************************* *)
 
-(** How to journalize the given function.
-    @since Beryllium-20090601-beta1 *)
-type 'a how_to_journalize =
-  | Journalize of string * 'a Type.t
-  (** Journalize the value with the given name and type. *)
-  | Journalization_not_required
-  (** Journalization of this value is not required
-      (usually because it has no effect on the Frama-C global state). *)
-  | Journalization_must_not_happen of string
-  (** Journalization of this value should not happen
-      (usually because it is a low-level function: this function is always
-      called from a journalized function).
-      The string is the function name which is used for displaying suitable
-      error message. *)
-
-val register: 'a how_to_journalize -> 'a ref -> 'a -> unit
+val register: 'a ref -> 'a -> unit
 (** Plugins must register values with this function. *)
 
 val register_compute:
@@ -77,9 +61,10 @@ val register_compute:
   (unit -> unit) ref -> (unit -> unit) -> State.t
 
 val register_guarded_compute:
-  string ->
   (unit -> bool) ->
   (unit -> unit) ref -> (unit -> unit) -> unit
+(** @before Frama-C+dev there was a string parameter (first position) that was
+            only used for Journalization, that has been removed. *)
 
 (** Frama-C main interface.
     @since Lithium-20081201
@@ -188,8 +173,7 @@ module Value : sig
       [fun_use_default_args] is called, when the ast is changed, or
       if the options [-libentry] or [-main] are changed. *)
 
-  (** Specify the arguments to use. This function is not journalized, and
-      will generate an error when the journal is replayed *)
+  (** Specify the arguments to use. *)
   val fun_set_args : t list -> unit
 
   val fun_use_default_args : unit -> unit
@@ -212,8 +196,7 @@ module Value : sig
       the option [-libentry]) is used when [globals_use_default_initial_state]
       is called, or when the ast changes. *)
 
-  (** Specify the initial state to use. This function is not journalized,
-      and will generate an error when the journal is replayed *)
+  (** Specify the initial state to use. *)
   val globals_set_initial_state : state -> unit
 
   val globals_use_default_initial_state : unit -> unit

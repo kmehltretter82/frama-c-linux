@@ -370,17 +370,6 @@ module LoadModule: Parameter_sig.String_list
 module AutoLoadPlugins: Parameter_sig.Bool
 (** Behavior of option "-autoload-plugins" *)
 
-(** Kernel for journalization. *)
-module Journal: sig
-
-  module Enable: Parameter_sig.Bool
-  (** Behavior of option "-journal-enable" *)
-
-  module Name: Parameter_sig.String
-  (** Behavior of option "-journal-name" *)
-
-end
-
 module Session_dir: Parameter_sig.Filepath
 (** Directory in which session files are searched.
     @since Neon-20140301

@@ -158,7 +158,6 @@ module Builtin_template = struct
         let hash b = Datatype.String.hash b.name
         let equal b1 b2 = b1.name = b2.name
         let copy = Datatype.identity
-        let internal_pretty_code = Datatype.undefined
         let pretty fmt b =
           Format.fprintf fmt "%s %s(%a%s)"
             b.rettype b.name
@@ -167,7 +166,6 @@ module Builtin_template = struct
         let rehash = Datatype.identity
         let structural_descr = Structural_descr.t_abstract
         let mem_project = Datatype.never_any_project
-        let varname b = "_cb_" ^ b.name
       end)
 end
 module Builtin_templates =

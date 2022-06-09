@@ -202,7 +202,6 @@ let force_compute_all_calldeps ()=
 (* Registration for call-wise from *)
 let () =
   Db.register_guarded_compute
-    "From.compute_all_calldeps"
     Tbl.is_computed
     Db.From.compute_all_calldeps
     force_compute_all_calldeps;

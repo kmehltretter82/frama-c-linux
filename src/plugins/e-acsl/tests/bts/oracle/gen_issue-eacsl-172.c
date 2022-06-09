@@ -15,7 +15,6 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_register_double(& __gen_e_acsl_assert_data,"d2",d2);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __e_acsl_assert_register_double(& __gen_e_acsl_assert_data_2,"d2",d2);
@@ -40,6 +39,7 @@ int main(void)
     __gen_e_acsl_assert_data_3.name = "float_to_int";
     __e_acsl_assert(d2 < 2147483648.,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert_register_double(& __gen_e_acsl_assert_data,"d2",d2);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
     __gen_e_acsl_assert_data.pred_txt = "(int)d2 > 10";

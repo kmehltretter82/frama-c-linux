@@ -172,13 +172,13 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
       int __gen_e_acsl_valid;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data =
         {.values = (void *)0};
+      __gen_e_acsl_valid = __e_acsl_valid((void *)stat_loc,sizeof(int),
+                                          (void *)stat_loc,
+                                          (void *)(& stat_loc));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"stat_loc",
                                    (void *)stat_loc);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(int)",0,sizeof(int));
-      __gen_e_acsl_valid = __e_acsl_valid((void *)stat_loc,sizeof(int),
-                                          (void *)stat_loc,
-                                          (void *)(& stat_loc));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                    "\\valid(stat_loc)",0,__gen_e_acsl_valid);
       __gen_e_acsl_assert_data.blocking = 1;
@@ -229,12 +229,12 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     if (! __gen_e_acsl_and) __gen_e_acsl_implies = 1;
     else {
       int __gen_e_acsl_initialized;
+      __gen_e_acsl_initialized = __e_acsl_initialized((void *)__gen_e_acsl_at,
+                                                      sizeof(int));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
                                    "\\old(stat_loc)",(void *)__gen_e_acsl_at);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                      "sizeof(int)",0,sizeof(int));
-      __gen_e_acsl_initialized = __e_acsl_initialized((void *)__gen_e_acsl_at,
-                                                      sizeof(int));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                    "\\initialized(\\old(stat_loc))",0,
                                    __gen_e_acsl_initialized);
@@ -289,12 +289,12 @@ int __gen_e_acsl_fclose(FILE *stream)
     int __gen_e_acsl_valid;
     __e_acsl_store_block((void *)(& stream),8UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_valid = __e_acsl_valid((void *)stream,sizeof(FILE),
+                                        (void *)stream,(void *)(& stream));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"stream",
                                  (void *)stream);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(FILE)",
                                    0,sizeof(FILE));
-    __gen_e_acsl_valid = __e_acsl_valid((void *)stream,sizeof(FILE),
-                                        (void *)stream,(void *)(& stream));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "\\valid(stream)",0,__gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;

@@ -131,18 +131,16 @@ let handle_annotations env kf stmt =
                 Printer.pp_term t
             in
             let adata, env = Assert.empty ~loc kf env in
-            let adata, env =
+            let adata =
               Assert.register
                 ~loc
-                env
                 (Format.asprintf "old %a" Printer.pp_term t_old)
                 e_old
                 adata
             in
-            let adata, env =
+            let adata =
               Assert.register
                 ~loc
-                env
                 (Format.asprintf "current %a" Printer.pp_term t)
                 e
                 adata
@@ -180,10 +178,9 @@ let handle_annotations env kf stmt =
                 Printer.pp_relation Rge
             in
             let adata1, env = Assert.empty ~loc kf env in
-            let adata1, env =
+            let adata1 =
               Assert.register
                 ~loc
-                env
                 (Format.asprintf "old %a" Printer.pp_term t)
                 e_old
                 adata1
@@ -223,10 +220,10 @@ let handle_annotations env kf stmt =
                 in
                 Assert.register
                   ~loc
-                  env
                   (Format.asprintf "current %a" Printer.pp_term t)
                   e
-                  adata2
+                  adata2,
+                env
               else
                 adata2, env
             in

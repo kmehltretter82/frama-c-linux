@@ -30,23 +30,23 @@ int main(void)
     int __gen_e_acsl_initialized;
     int __gen_e_acsl_and;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(src),
+                                                    sizeof(int *));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"(int **)src",
                                  (void *)(src));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                    "sizeof(int *)",0,sizeof(int *));
-    __gen_e_acsl_initialized = __e_acsl_initialized((void *)(src),
-                                                    sizeof(int *));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                  "\\initialized((int **)src)",0,
                                  __gen_e_acsl_initialized);
     if (__gen_e_acsl_initialized) {
       int __gen_e_acsl_valid;
+      __gen_e_acsl_valid = __e_acsl_valid((void *)src[0],sizeof(int),
+                                          (void *)src[0],(void *)(src));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"src[0]",
                                    (void *)src[0]);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                      "sizeof(int)",0,sizeof(int));
-      __gen_e_acsl_valid = __e_acsl_valid((void *)src[0],sizeof(int),
-                                          (void *)src[0],(void *)(src));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
                                    "\\valid(src[0])",0,__gen_e_acsl_valid);
       __gen_e_acsl_and = __gen_e_acsl_valid;
@@ -67,24 +67,24 @@ int main(void)
     int __gen_e_acsl_and_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
+    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& src[1]),
+                                                      sizeof(int *));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"&src[1]",
                                  (void *)(& src[1]));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                    "sizeof(int *)",0,sizeof(int *));
-    __gen_e_acsl_initialized_2 = __e_acsl_initialized((void *)(& src[1]),
-                                                      sizeof(int *));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                  "\\initialized(&src[1])",0,
                                  __gen_e_acsl_initialized_2);
     if (__gen_e_acsl_initialized_2) {
       int __gen_e_acsl_valid_2;
+      __gen_e_acsl_valid_2 = __e_acsl_valid((void *)src[1],sizeof(int),
+                                            (void *)src[1],
+                                            (void *)(& src[1]));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"src[1]",
                                    (void *)src[1]);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                      "sizeof(int)",0,sizeof(int));
-      __gen_e_acsl_valid_2 = __e_acsl_valid((void *)src[1],sizeof(int),
-                                            (void *)src[1],
-                                            (void *)(& src[1]));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
                                    "\\valid(src[1])",0,__gen_e_acsl_valid_2);
       __gen_e_acsl_and_2 = __gen_e_acsl_valid_2;
@@ -105,24 +105,24 @@ int main(void)
     int __gen_e_acsl_and_3;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
+    __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& src[2]),
+                                                      sizeof(int *));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"&src[2]",
                                  (void *)(& src[2]));
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                    "sizeof(int *)",0,sizeof(int *));
-    __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)(& src[2]),
-                                                      sizeof(int *));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                  "\\initialized(&src[2])",0,
                                  __gen_e_acsl_initialized_3);
     if (__gen_e_acsl_initialized_3) {
       int __gen_e_acsl_valid_3;
+      __gen_e_acsl_valid_3 = __e_acsl_valid((void *)src[2],sizeof(int),
+                                            (void *)src[2],
+                                            (void *)(& src[2]));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"src[2]",
                                    (void *)src[2]);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                      "sizeof(int)",0,sizeof(int));
-      __gen_e_acsl_valid_3 = __e_acsl_valid((void *)src[2],sizeof(int),
-                                            (void *)src[2],
-                                            (void *)(& src[2]));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
                                    "\\valid(src[2])",0,__gen_e_acsl_valid_3);
       __gen_e_acsl_and_3 = __gen_e_acsl_valid_3;

@@ -92,7 +92,6 @@ let generate_code =
 let generate_code =
   Dynamic.register
     ~plugin:"E_ACSL"
-    ~journalize:true
     "generate_code"
     (Datatype.func Datatype.string Project.ty)
     generate_code

@@ -45,14 +45,14 @@ void __gen_e_acsl_f(struct X *item)
     __e_acsl_store_block((void *)(& item),8UL);
     __gen_e_acsl_at = item;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"item",
-                                 (void *)item);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
-                                   "sizeof(struct X)",0,sizeof(struct X));
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)item,
                                                   sizeof(struct X),
                                                   (void *)item,
                                                   (void *)(& item));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"item",
+                                 (void *)item);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
+                                   "sizeof(struct X)",0,sizeof(struct X));
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "RTE";
     __gen_e_acsl_assert_data.pred_txt = "\\valid_read(item)";
