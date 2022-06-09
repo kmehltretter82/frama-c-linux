@@ -2,6 +2,9 @@
 # HEADER_SPEC: CEA_LGPL_OR_PROPRIETARY.E_ACSL #
 ###############################################
 
+dune-project header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+dune header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
+
 configure.ac header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
 
 Makefile header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
@@ -60,7 +63,7 @@ README header_spec=.ignore
 
 /tests/test_config header_spec=.ignore
 /tests/test_config_dev header_spec=.ignore
-/tests/**/* header_spec
+/tests/**/* header_spec=.ignore
 
 /tests/wrapper.sh header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
 /tests/E_ACSL_test.ml header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL

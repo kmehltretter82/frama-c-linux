@@ -2,6 +2,9 @@
 # HEADER_SPEC: AORAI_LGPL #
 ###########################
 
+dune-project header_spec=AORAI_LGPL
+dune header_spec=AORAI_LGPL
+
 /configure.ac header_spec=AORAI_LGPL
 
 /Makefile header_spec=AORAI_LGPL

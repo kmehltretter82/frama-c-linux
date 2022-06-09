@@ -18,6 +18,9 @@ Changelog merge=union
 # HEADER_SPEC: CEA_LGPL #
 #########################
 
+dune-project header_spec=CEA_LGPL
+dune header_spec=CEA_LGPL
+
 config* header_spec=CEA_LGPL
 
 makefile* header_spec=CEA_LGPL
@@ -158,7 +161,11 @@ README* header_spec=.ignore
 /man/frama-c.1 header_spec=.ignore
 
 /nix/empty header_spec=.ignore
+/nix/external-plugins.txt header_spec=.ignore
 /nix/frama-c-public/known_hosts header_spec=.ignore
+/nix/sources.json header_spec=.ignore
+
+/ptests/tests/**/* header_spec=.ignore
 
 /share/framac.vim header_spec=.ignore
 /share/META.frama-c header_spec=.ignore
@@ -219,6 +226,7 @@ README* header_spec=.ignore
 /src/kernel_services/analysis/dataflows.ml header_spec=CIL
 /src/kernel_services/analysis/dataflows.mli header_spec=CIL
 /src/kernel_services/ast_data/cil_types.mli header_spec=CIL
+/src/kernel_services/ast_data/cil_types.ml header_spec=CIL
 /src/kernel_services/ast_printing/cprint.ml header_spec=CIL
 /src/kernel_services/ast_printing/cprint.mli header_spec=CIL
 /src/kernel_services/ast_printing/logic_print.ml header_spec=CEA_INRIA_LGPL
@@ -238,8 +246,10 @@ README* header_spec=.ignore
 /src/kernel_services/ast_queries/logic_utils.ml header_spec=CEA_INRIA_LGPL
 /src/kernel_services/ast_queries/logic_utils.mli header_spec=CEA_INRIA_LGPL
 /src/kernel_services/parsetree/cabs.mli header_spec=CIL
+/src/kernel_services/parsetree/cabs.ml header_spec=CIL
 /src/kernel_services/parsetree/cabshelper.ml header_spec=CIL
 /src/kernel_services/parsetree/cabshelper.mli header_spec=CIL
+/src/kernel_services/parsetree/logic_ptree.ml header_spec=CEA_INRIA_LGPL
 /src/kernel_services/parsetree/logic_ptree.mli header_spec=CEA_INRIA_LGPL
 /src/kernel_services/visitors/cabsvisit.ml header_spec=CIL
 /src/kernel_services/visitors/cabsvisit.mli header_spec=CIL
@@ -248,8 +258,8 @@ README* header_spec=.ignore
 
 /src/libraries/datatype/unmarshal.ml header_spec=INRIA_BSD
 /src/libraries/datatype/unmarshal.mli header_spec=INRIA_BSD
-/src/libraries/datatype/unmarshal_hashtbl_test.ml header_spec=INRIA_BSD
-/src/libraries/datatype/unmarshal_test.ml header_spec=INRIA_BSD
+/src/libraries/datatype/tests/unmarshal_hashtbl_test.ml header_spec=INRIA_BSD
+/src/libraries/datatype/tests/unmarshal_test.ml header_spec=INRIA_BSD
 /src/libraries/project/state_topological.ml header_spec=MODIFIED_OCAMLGRAPH
 /src/libraries/project/state_topological.mli header_spec=MODIFIED_OCAMLGRAPH
 /src/libraries/utils/cilconfig.ml header_spec=CIL
@@ -258,6 +268,7 @@ README* header_spec=.ignore
 /src/libraries/utils/escape.mli header_spec=CIL
 /src/libraries/utils/hptmap.ml header_spec=MODIFIED_MENHIR
 /src/libraries/utils/hptmap.mli header_spec=MODIFIED_MENHIR
+/src/libraries/utils/hptmap_sig.ml header_spec=MODIFIED_MENHIR
 /src/libraries/utils/hptmap_sig.mli header_spec=MODIFIED_MENHIR
 /src/libraries/utils/rangemap.ml header_spec=OCAML_STDLIB
 /src/libraries/utils/rangemap.mli header_spec=OCAML_STDLIB
