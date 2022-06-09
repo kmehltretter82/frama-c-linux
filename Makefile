@@ -215,7 +215,7 @@ include share/Makefile.testing
 ###############################################################################
 
 # Code prettyfication and lint
-include Makefile.linting
+include share/Makefile.linting
 
 ###############################################################################
 # Local Variables:
