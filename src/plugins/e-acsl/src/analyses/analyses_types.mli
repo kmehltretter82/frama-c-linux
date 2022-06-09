@@ -68,6 +68,7 @@ type annotation_kind =
   | Variant
   | RTE
 
+(** Type of intervals infered by the interval inference *)
 type ival =
   | Ival of Ival.t
   | Float of fkind * float option (* a float constant, if any *)
@@ -75,6 +76,7 @@ type ival =
   | Real
   | Nan
 
+(** Type of types infered by the type inference for types representing numbers *)
 type number_ty =
   | C_integer of ikind
   | C_float of fkind

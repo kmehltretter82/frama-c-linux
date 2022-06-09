@@ -43,8 +43,6 @@ let pending_typing : (unit -> unit) Stack.t = Stack.create ()
 (** Datatype and constructor *)
 (******************************************************************************)
 
-module D = Number_ty
-
 let ikind ik = C_integer ik
 let c_int = ikind IInt
 let gmpz = Gmpz
@@ -73,7 +71,9 @@ let join ty1 ty2 =
       assert false
     | Nan, (C_integer _ | C_float _ | Gmpz | Rational | Real as ty)
     | (C_integer _ | C_float _ | Gmpz | Rational | Real as ty), Nan ->
-      Options.fatal "[typing] join failure: number %a and nan" D.pretty ty
+      Options.fatal "[typing] join failure: number %a and nan"
+        Number_ty.pretty
+        ty
     | Real, (C_integer _ | C_float _ | Gmpz | Rational)
     | (C_integer _ | C_float _ | Rational | Gmpz), Real ->
       Real
@@ -115,10 +115,10 @@ let typ_of_lty = function
 (******************************************************************************)
 
 type computed_info =
-  { ty: D.t;  (* type required for the term *)
-    op: D.t; (* type required for the operation *)
-    cast: D.t option; (* if not [None], type of the context which the term
-                         must be casted to. If [None], no cast needed. *)
+  { ty: Number_ty.t;  (* type required for the term *)
+    op: Number_ty.t; (* type required for the operation *)
+    cast: Number_ty.t option; (* if not [None], type of the context which the term
+                                 must be casted to. If [None], no cast needed. *)
   }
 
 (* Memoization module which retrieves the computed info of some terms. If the
@@ -255,7 +255,7 @@ let ty_of_interv ?ctx ?(use_gmp_opt = false) = function
 (* compute a new {!computed_info} by coercing the given type [ty] to the given
    context [ctx]. [op] is the type for the operator. *)
 let coerce ~arith_operand ~ctx ~op ty =
-  if D.compare ty ctx = 1 then
+  if Number_ty.compare ty ctx = 1 then
     (* type larger than the expected context,
        so we must introduce an explicit cast *)
     { ty; op; cast = Some ctx }
@@ -416,13 +416,17 @@ let rec type_term
         | _ -> true
       in
       let cast_first = cast_first t1 t2 in
-      ignore (type_term ~use_gmp_opt:true ~arith_operand:cast_first ~ctx ~profile t1);
+      ignore
+        (type_term ~use_gmp_opt:true ~arith_operand:cast_first ~ctx ~profile t1);
       ignore
         (type_term ~use_gmp_opt:true ~arith_operand:(not cast_first) ~ctx ~profile t2);
       dup ctx_res
 
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
-      assert (match ctx with None -> true | Some c -> D.compare c c_int >= 0);
+      assert
+        (match ctx with
+         |None -> true
+         | Some c -> Number_ty.compare c c_int >= 0);
       let i1 = Interval.get_from_profile ~profile t1 in
       let i2 = Interval.get_from_profile ~profile t2 in
       let ctx =
@@ -589,10 +593,24 @@ let rec type_term
                     ~profile:new_profile
                     t_body))
             pending_typing;
+          (* If the logic function has a given C number type, we generate a
+             function returning this type, otherwise we use the interval
+             inference *)
           (match li.l_type with
            | Some (Ctype (TInt (ikind, _))) ->
              dup (C_integer ikind)
-           | _ ->
+           | Some (Ctype (TFloat (fkind, _))) ->
+             dup (C_float fkind)
+           | None
+           | Some (Ctype (TVoid _
+                         | TPtr _
+                         | TEnum _
+                         | TArray _
+                         | TFun _
+                         | TNamed _
+                         | TComp _
+                         | TBuiltin_va_list _))
+           | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
              dup (ty_of_interv
                     ?ctx:ctx_body
                     ~use_gmp_opt:(gmp && use_gmp_opt)
@@ -812,7 +830,7 @@ and type_predicate ~profile p =
 
 let type_term ~use_gmp_opt ?ctx ~profile t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
-    Printer.pp_term t (Pretty_utils.pp_opt D.pretty) ctx;
+    Printer.pp_term t (Pretty_utils.pp_opt Number_ty.pretty) ctx;
   ignore (type_term ~use_gmp_opt ?ctx ~profile t);
   while not (Stack.is_empty pending_typing) do
     Stack.pop pending_typing ()

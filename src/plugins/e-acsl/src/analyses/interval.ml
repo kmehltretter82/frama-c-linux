@@ -357,13 +357,15 @@ let rec fixpoint ~(infer : force:bool ->
     li args_ival t' ival =
   let get_res = Error.map (fun x -> x) in
   let logic_env = Logic_env.make args_ival in
+  (* If the logic function has a given C type, we use this type to infer the
+     interval. Otherwise we compute this interval as a fixpoint *)
   match li.l_type with
   | Some (Ctype typ) ->
     let ival = interv_of_typ typ in
     LF_env.add li args_ival ival;
     ignore (infer ~force:true ~logic_env t');
     ival
-  | _ ->
+  | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
     LF_env.replace li args_ival ival;
     let inferred_ival = get_res (infer ~force:true ~logic_env t') in
     if is_included inferred_ival ival
@@ -744,11 +746,14 @@ let rec infer ~force ~logic_env t =
                fixpoint ~infer li widened_profile t' (Ival Ival.bottom))
           | LBterm t' ->
             let logic_env = Logic_env.make profile in
+            (* If the logic function returns a C type, then its application
+               ranges inside this C type *)
             (match li.l_type with
-             | Some (Ctype (typ)) ->
+             | Some (Ctype typ) ->
                ignore ((infer ~force ~logic_env t'));
                interv_of_typ typ;
-             | _ -> get_res (infer ~force ~logic_env t'))
+             | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
+               get_res (infer ~force ~logic_env t'))
           | _ -> assert false)
        | LBnone when li.l_var_info.lv_name = "\\sum" ||
                      li.l_var_info.lv_name = "\\product" ->
