@@ -18,8 +18,6 @@ default:
 variables:
   DEFAULT: "feature/bobot/jbuilder"
   OCAML: "4_12"
-#     CURRENT: $CI_COMMIT_REF_NAME
-#     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
 
 ################################################################################
 ### BUILD
