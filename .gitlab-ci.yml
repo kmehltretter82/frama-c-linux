@@ -55,19 +55,19 @@ header-check:
   tags:
     - nix
 
-# ivette:
-#   stage: build
-#   image: node:lts-gallium
-#   cache:
-#     paths:
-#       - ivette/node_modules/
-#   script:
-#     - node --version
-#     - npm --version
-#     - yarn --version
-#     - make -C ivette
-#   tags:
-#     - docker
+ivette:
+  stage: build
+  image: node:lts-gallium
+  cache:
+    paths:
+      - ivette/node_modules/
+  script:
+    - node --version
+    - npm --version
+    - yarn --version
+    - make -C ivette
+  tags:
+    - docker
 
 lint:
   stage: build
