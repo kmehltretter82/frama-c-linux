@@ -44,6 +44,10 @@ HEADER_DIRS?=headers $(wildcard src/plugins/*/headers)
 # - <dir>: look at $(HEADER_DIRS)/<dir>
 HEADER_OPEN_SOURCE?=yes
 
+# Can be set to a directory
+# - <dir>: directory containing the files to manage
+HEADER_REPO?=
+
 # Can be set to a file
 # - <file>: file containing the list of the files to manage
 HEADER_DISTRIB_FILE?=
@@ -120,6 +124,11 @@ ifneq ($(HEADER_EXCEPTIONS),)
 HDRCK_OPTS+= -header-except-file $(HEADER_EXCEPTIONS)
 endif
 
+ifneq ($(HEADER_REPO),)
+# Adds the option "-C"
+HDRCK_OPTS+= -C $(HEADER_REPO)
+endif
+
 ifeq ($(HEADER_STRICT),yes)
 # Adds the option "-exit-on-warning"
 HDRCK_OPTS+= -exit-on-warning
@@ -165,6 +174,7 @@ headers.info:
 	echo "HEADER_DIRS='$(HEADER_STRICT)'"
 	echo "HEADER_DISTRIB_FILE='$(HEADER_DISTRIB_FILE)'"
 	echo "HEADER_EXCEPTIONS='$(HEADER_EXCEPTIONS)'"
+	echo "HEADER_REPO='$(HEADER_REPO)'"
 	echo "HEADER_SPEC='$(HEADER_SPEC)'"
 	echo "HDRCK='$(HDRCK)'"
 	echo "HDRCK_SPEC='$(HDRCK_SPEC)'"
