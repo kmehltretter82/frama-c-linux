@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -aorai-ltl @PTEST_DIR@/@PTEST_NAME@.ltl -aorai-test-number @PTEST_NUMBER@ @PROVE_OPTIONS@
+   OPT: -aorai-ltl @PTEST_DIR@/@PTEST_NAME@.ltl -aorai-test-id @PTEST_NUMBER@@PTEST_CONFIG@ @PROVE_OPTIONS@
 */
 
 
