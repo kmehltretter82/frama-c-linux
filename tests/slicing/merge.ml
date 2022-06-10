@@ -1,4 +1,4 @@
-(* 
+(*
 * Small example to test function merge_slices.
 * To try it, use the following commands :
 

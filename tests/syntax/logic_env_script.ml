@@ -1,6 +1,6 @@
 open Cil_types
 
-let emitter = 
+let emitter =
   Emitter.create "test" [ Emitter.Global_annot ] ~correctness:[] ~tuning:[]
 
 let add () =
@@ -10,7 +10,7 @@ let add () =
   Logic_utils.add_logic_function li;
   Annotations.add_global emitter glob
 
-let check () =  
+let check () =
   assert (Logic_env.find_all_logic_functions "foo" <> []);
   assert (Logic_env.find_all_logic_functions "bar" <> []);
   assert (Logic_env.find_all_logic_functions "bla" <> []);
@@ -24,7 +24,7 @@ let run () =
   add ();
   check ();
   let prj = File.create_project_from_visitor "foo"
-    (fun p -> new Visitor.frama_c_copy p)
+      (fun p -> new Visitor.frama_c_copy p)
   in
   Project.on prj check ()
 

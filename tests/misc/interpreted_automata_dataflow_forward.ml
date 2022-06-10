@@ -25,7 +25,7 @@ struct
       Map.find_opt vi v2 = Some x
     in
     if Map.for_all same_entry v1 then
-       None (* Inclusion *)
+      None (* Inclusion *)
     else
       Some v2 (* No widening necessary *)
 
@@ -113,7 +113,7 @@ let run () =
   Dataflow.Result.to_dot_file ConstantsDomain.pretty results filepath;
   (* Output result to stdout *)
   match Dataflow.Result.at_return results with
-  | None -> 
+  | None ->
     Kernel.result "No result at the end of function %s." main_name
   | Some result ->
     Kernel.result "Results at the end of function %s:@.%a" main_name

@@ -1,6 +1,6 @@
 (* To use this in interactive mode :
 
-#use "tests/slicing/select.ml";;
+   #use "tests/slicing/select.ml";;
 *)
 
 exception Break
@@ -51,8 +51,8 @@ let apply () = Slicing.Api.Request.apply_next_internal (); print_project ()
 (*--------------------------*)
 
 (** clear a previously computed project and load a new source file,
-* starting at [entry_point] to be specified iif it is different from [main].
-* DOESN'T WORK at the moment because CIL datas are not cleared...*)
+ * starting at [entry_point] to be specified iif it is different from [main].
+ * DOESN'T WORK at the moment because CIL datas are not cleared...*)
 (* [Julien 25/06/2007:] Should be possible to do now (?) *)
                                                               (*
 let load_source_file ?entry_point filename  =
@@ -83,19 +83,19 @@ let get_zones str_data (kinst, kf) =
 let select_data_before_stmt str_data kinst kf =
   let mark = Slicing.Api.Mark.make ~data:true ~addr:false ~ctrl:false in
   let zone = get_zones str_data (kinst, kf) in
-    Slicing.Api.Select.select_stmt_zone_internal kf kinst ~before:true zone mark
+  Slicing.Api.Select.select_stmt_zone_internal kf kinst ~before:true zone mark
 
 
 (** build the selection for returned value of the function *)
 let select_retres kf =
   let ki = Kernel_function.find_return kf in
-    try
-      let loc = Db.Value.find_return_loc kf in
-      let zone = Locations.(enumerate_valid_bits Read loc) in
-      let mark = Slicing.Api.Mark.make ~data:true ~addr:false ~ctrl:false in
-      let before = false in
-        Slicing.Api.Select.select_stmt_zone_internal kf ki ~before zone mark
-    with Db.Value.Void_Function -> raise No_return
+  try
+    let loc = Db.Value.find_return_loc kf in
+    let zone = Locations.(enumerate_valid_bits Read loc) in
+    let mark = Slicing.Api.Mark.make ~data:true ~addr:false ~ctrl:false in
+    let before = false in
+    Slicing.Api.Select.select_stmt_zone_internal kf ki ~before zone mark
+  with Db.Value.Void_Function -> raise No_return
 ;;
 
 (** build the selection for the [data] at the end of the function *)
@@ -104,13 +104,13 @@ let select_data data kf =
     let ki = Kernel_function.find_return kf in
     let mark = Slicing.Api.Mark.make ~data:true ~addr:false ~ctrl:false in
     let zone = get_zones data (ki, kf) in
-      Slicing.Api.Select.select_stmt_zone_internal kf ki ~before:true zone mark
+    Slicing.Api.Select.select_stmt_zone_internal kf ki ~before:true zone mark
   (* with Logic_interp.Error (_, str) -> raise (Unknown_data data) *)
   with _ -> raise (Unknown_data data)
 ;;
 
 (** build the selection ONLY for the control dependencies of the statement
-* [numstmt]*)
+ * [numstmt]*)
 let select_ctrl numstmt kf =
   try
     let s = get_stmt numstmt in
@@ -130,17 +130,17 @@ let prop_to_callers (kf, ff) =
     let callers = !Db.Value.callers kf in
     let process_caller (kf_caller,_) =
       let ff_caller = Slicing.Api.Slice.create kf_caller in
-        Slicing.Api.Request.add_call_slice ~caller:ff_caller ~to_call:ff;
-        prop kf_caller ff_caller
+      Slicing.Api.Request.add_call_slice ~caller:ff_caller ~to_call:ff;
+      prop kf_caller ff_caller
     in
-      List.iter process_caller callers
+    List.iter process_caller callers
   in prop kf ff
 
 
 (** compute and print a slice of [fname] where the selection is given by
-* [select_fct] (which could be [select_retres] or [(select_data str_data)].
-* If [do_prop_to_callers] if also recursively computes new functions for
-* [fname] callers in order to call the new slices. *)
+ * [select_fct] (which could be [select_retres] or [(select_data str_data)].
+ * If [do_prop_to_callers] if also recursively computes new functions for
+ * [fname] callers in order to call the new slices. *)
 let test ?(keep_project=false) fname ?(do_prop_to_callers=false) select_fct =
   if not keep_project then Slicing.Api.Project.reset_slicing ();
   try
@@ -160,11 +160,11 @@ let test ?(keep_project=false) fname ?(do_prop_to_callers=false) select_fct =
     extract_and_print ()
   with
   | No_return ->
-      Format.printf
-        "Impossible to select 'retres' for a void function (%s)\n" fname
+    Format.printf
+      "Impossible to select 'retres' for a void function (%s)\n" fname
   | Unknown_data str ->
-      Format.printf
-        "Impossible to select this data : %s in %s\n" str fname
+    Format.printf
+      "Impossible to select this data : %s in %s\n" str fname
 ;;
 
 let test_select_retres ?(do_prop_to_callers=false) fname =

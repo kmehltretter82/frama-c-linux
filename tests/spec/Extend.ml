@@ -18,10 +18,10 @@ module Bar_table =
     (Datatype.Int.Hashtbl)
     (Datatype.List(Cil_datatype.Predicate))
     (struct
-        let name = "Bar_table"
-        let dependencies = [ Count.self ]
-        let size = 3
-     end)
+      let name = "Bar_table"
+      let dependencies = [ Count.self ]
+      let size = 3
+    end)
 
 let type_bar typing_context _loc l =
   let i = Count.next() in
@@ -57,7 +57,7 @@ let visit_bar vis ext =
       Cil.SkipChildren
     end
   | Ext_terms _ | Ext_preds _ | Ext_annot _ ->
-      Kernel.fatal "bar extension should have ids as arguments"
+    Kernel.fatal "bar extension should have ids as arguments"
 
 let type_baz typing_context _loc l =
   let t =

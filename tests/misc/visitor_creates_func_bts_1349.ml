@@ -11,12 +11,12 @@ class test prj = object(self)
       self#get_filling_actions;
     f.sbody <-
       Cil.mkBlock
-      [Cil.mkStmt ~valid_sid:true
-          (Return (Some (Cil.evar x),Cil_datatype.Location.unknown))];
+        [Cil.mkStmt ~valid_sid:true
+           (Return (Some (Cil.evar x),Cil_datatype.Location.unknown))];
     Queue.add
       (fun () ->
-        Globals.Functions.replace_by_definition
-          (Cil.empty_funspec()) f Cil_datatype.Location.unknown)
+         Globals.Functions.replace_by_definition
+           (Cil.empty_funspec()) f Cil_datatype.Location.unknown)
       self#get_filling_actions
     ;
     [GFunDecl(Cil.empty_funspec(),f.svar,Cil_datatype.Location.unknown);
@@ -24,19 +24,19 @@ class test prj = object(self)
 
   method! vglob_aux = function
     | GVar (v,i,loc) ->
-        let v'=
-          Visitor.visitFramacVarDecl (self:>Visitor.frama_c_visitor) v
-        in
-        let i'=
-          match i.init with
-            | None -> { init = None }
-            | Some i ->
-                { init = 
-                    Some (Visitor.visitFramacInit 
-                            (self:>Visitor.frama_c_visitor) v' NoOffset i) }
-        in
-        let g = GVar(v',i',loc) in
-        Cil.ChangeToPost (g::self#create_f(),fun x -> x)
+      let v'=
+        Visitor.visitFramacVarDecl (self:>Visitor.frama_c_visitor) v
+      in
+      let i'=
+        match i.init with
+        | None -> { init = None }
+        | Some i ->
+          { init =
+              Some (Visitor.visitFramacInit
+                      (self:>Visitor.frama_c_visitor) v' NoOffset i) }
+      in
+      let g = GVar(v',i',loc) in
+      Cil.ChangeToPost (g::self#create_f(),fun x -> x)
     | _ -> Cil.DoChildren
 end
 

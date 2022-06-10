@@ -201,9 +201,9 @@ let test { designator; offsets; structs } =
                 "fieldsToInit didn't find appropriate offset for %s in %s.\n\
                  expected offsets were %a\n\
                  returned offsets are  %a"
-                   field filename
-                   (Format.pp_print_list ~pp_sep Cil_printer.pp_offset) expected
-                   (Format.pp_print_list ~pp_sep Cil_printer.pp_offset) result)
+                field filename
+                (Format.pp_print_list ~pp_sep Cil_printer.pp_offset) expected
+                (Format.pp_print_list ~pp_sep Cil_printer.pp_offset) result)
          end
        with Log.AbortFatal _ ->
          let filename = generate_failure_file offset structs in

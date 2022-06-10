@@ -17,19 +17,19 @@ let run () =
   ll.l_type <- Some Linteger;
   li.l_body <-
     LBterm
-    (Logic_const.term
-       (TBinOp
-          (PlusA,
-           Logic_const.term (Tapp(lj,[],[])) Linteger,
-           Logic_const.term (Tapp(lk,[],[])) Linteger))
-       Linteger);
+      (Logic_const.term
+         (TBinOp
+            (PlusA,
+             Logic_const.term (Tapp(lj,[],[])) Linteger,
+             Logic_const.term (Tapp(lk,[],[])) Linteger))
+         Linteger);
   lj.l_body <- LBterm (Logic_const.term (Tapp(ll,[],[])) Linteger);
   lk.l_body <- LBterm (Logic_const.term (Tapp(ll,[],[])) Linteger);
   ll.l_body <- LBterm (Logic_const.tinteger 1);
   let post_cond =
     [Normal,
-     Logic_const.new_predicate 
-       (Logic_const.prel 
+     Logic_const.new_predicate
+       (Logic_const.prel
           (Req,
            Logic_const.term (Tapp(li,[],[])) Linteger,
            Logic_const.term (Tapp(li,[],[])) Linteger))]

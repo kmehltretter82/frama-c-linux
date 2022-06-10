@@ -1,5 +1,5 @@
 (* ledit bin/toplevel.top -deps tests/slicing/simple_intra_slice.c
-* *)
+ * *)
 
 include LibSelect ;;
 

@@ -5,14 +5,14 @@ let emitter = Emitter.(create "Test" [Funspec] ~correctness:[] ~tuning:[])
 let check_expr_term check fct s post =
   let exp =
     match s.skind with
-      | Instr (Set (lv,_,loc)) -> Cil.new_exp ~loc (Lval lv)
-      | If (c,_,_,_) -> c
-      | _ -> Kernel.fatal "Unexpected statement %a" Printer.pp_stmt s
+    | Instr (Set (lv,_,loc)) -> Cil.new_exp ~loc (Lval lv)
+    | If (c,_,_,_) -> c
+    | _ -> Kernel.fatal "Unexpected statement %a" Printer.pp_stmt s
   in
   let term =
     match post with
-      | (_,{ip_content={tp_statement={pred_content = Papp(_,_,[l;_])}}}) -> l
-      | _ -> Kernel.fatal "Unexpected ensures %a" Printer.pp_post_cond post
+    | (_,{ip_content={tp_statement={pred_content = Papp(_,_,[l;_])}}}) -> l
+    | _ -> Kernel.fatal "Unexpected ensures %a" Printer.pp_post_cond post
   in
   let term' = Logic_utils.expr_to_term ~coerce:false exp in
   if check && not (Cil_datatype.Term.equal term term') then
@@ -44,7 +44,7 @@ let treat_fct check fct =
   let stmts =
     List.filter
       (function
-        { skind = Instr (Set (lv,_,_)) } ->
+          { skind = Instr (Set (lv,_,_)) } ->
           (match lv with (Var v,_) -> v.vglob | _ -> true)
         | { skind = If _ } -> true
         | _ -> false)

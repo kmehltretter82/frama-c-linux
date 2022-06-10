@@ -67,7 +67,7 @@ let () =  Acsl_extension.register_global
     ~printer:ext_fooo_printer ~visitor:ext_fooo_visitor false ;
   Acsl_extension.register_global_block
     "gl_foo" ~preprocessor:preprocess_foo_ptree ext_typing_foo
-                              ~visitor:ext_foo_visitor false
+    ~visitor:ext_foo_visitor false
 
 let run () =
   let old = Project.current () in

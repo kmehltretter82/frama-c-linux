@@ -7,10 +7,10 @@ let dump f =
     (fun fmt ->
        Format.fprintf fmt "Call Sites for %s:@\n" f ;
        List.iter
-	 (fun (ckf,stmt) ->
-	    Format.fprintf fmt "  - From %s at #%03d@\n"
-	      (Kernel_function.get_name ckf)  stmt.sid)
-	 csites)
+         (fun (ckf,stmt) ->
+            Format.fprintf fmt "  - From %s at #%03d@\n"
+              (Kernel_function.get_name ckf)  stmt.sid)
+         csites)
 
 let main () =
   Ast.compute () ;
