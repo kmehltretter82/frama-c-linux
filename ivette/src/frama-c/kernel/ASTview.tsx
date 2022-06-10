@@ -35,7 +35,7 @@ import { IconButton } from 'dome/controls/buttons';
 import type { key } from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
-import { Hfill } from 'dome/layout/boxes';
+import { Filler, Inset } from 'dome/frame/toolbars';
 
 import * as Preferences from 'ivette/prefs';
 
@@ -336,19 +336,22 @@ export default function ASTview(): JSX.Element {
   return (
     <>
       <TitleBar>
-        <Hfill />
+        <Filler />
         <IconButton
-          icon='ANGLE.RIGHT'
+          icon='CHEVRON.CONTRACT'
           visible={true}
           onClick={foldAll}
           title='Collapse all multi-line ACSL properties'
+          className="titlebar-thin-icon"
         />
         <IconButton
-          icon='ANGLE.DOWN'
+          icon='CHEVRON.EXPAND'
           visible={true}
           onClick={unfoldAll}
           title='Expand all multi-line ACSL properties'
+          className="titlebar-thin-icon"
         />
+        <Inset />
       </TitleBar>
       <Text
         buffer={buffer}

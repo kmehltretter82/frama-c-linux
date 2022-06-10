@@ -47,6 +47,11 @@
     background: var(--code-bullet);
 }
 
+/* More contrasted color for thinner icons. */
+.titlebar-thin-icon {
+    fill: var(--text);
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Globals                                                            --- */
 /* -------------------------------------------------------------------------- */
