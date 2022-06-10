@@ -86,9 +86,10 @@ HDRCK_OPTS:= --stdin
 
 ifeq ($(HEADER_SPEC),)
 
-HEADER_HAS_GIT_FILE:=$(wildcard .git/HEAD)
-ifeq ("$(HEADER_HAS_GIT_FILE)","")
-# From git
+HEADER_HAS_GIT:=$(wildcard .git)r
+ifneq ($(HEADER_HAS_GIT),)
+
+# From git (including git work-trees)
 HDRCK_SPEC:= git ls-files -z | git check-attr --stdin -z header_spec
 else
 
@@ -158,6 +159,7 @@ headers: $(FRAMAC_HDRCK)
 .PHONY: headers.info
 headers.info:
 	echo "FRAMAC_HDRCK='$(FRAMAC_HDRCK)'"
+	echo "HEADER_HAS_GIT='$(HEADER_HAS_GIT)'"
 	echo "HEADER_OPEN_SOURCE='$(HEADER_OPEN_SOURCE)'"
 	echo "HEADER_STRICT='$(HEADER_STRICT)'"
 	echo "HEADER_DIRS='$(HEADER_STRICT)'"
