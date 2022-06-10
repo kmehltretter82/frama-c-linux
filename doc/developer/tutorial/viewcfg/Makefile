@@ -31,16 +31,16 @@ MLIS=$(addsuffix /ViewCfg.mli,$(filter-out generated, $(DIRS)))
 
 dirs: $(DIRS) $(MLIS)
 
-$(DIRS): 
+$(DIRS):
 	mkdir -p $@
 
 generated/src/%: src/%
 	cp $< $@
-	headache -r $<
+	headache -r $@
 
 generated/%/ViewCfg.mli: src/ViewCfg.mli
 	cp $< $@
-	headache -r $<
+	headache -r $@
 
 generated/intermediary/print_cfg_novalue.ml: generated/src/print_cfg_begin.ml\
 					     generated/src/print_cfg_vfile.ml\
@@ -61,7 +61,7 @@ generated/intermediary/print_cfg_value.ml: generated/src/print_cfg_begin.ml\
 generated/intermediary/dump_function_memo_no_clear_cache_and_deps.ml:\
 		 generated/src/register_cfg_graph_state.ml\
 		 generated/src/dump_to_string_memoized.ml\
-		 generated/src/dump_function_memo_no_clear_cache.ml	
+		 generated/src/dump_function_memo_no_clear_cache.ml
 	rm -f $@
 	for i in $^; do cat $$i >> $@; echo "" >> $@; done
 
@@ -69,7 +69,7 @@ generated/intermediary/dump_function_memo_clear_cache_and_deps.ml:\
 		 generated/src/register_cfg_graph_state.ml\
 		 generated/src/dump_to_string_memoized.ml\
 		 generated/src/register_value_computed_state.ml\
-		 generated/src/dump_function_memo_clear_cache.ml	
+		 generated/src/dump_function_memo_clear_cache.ml
 	rm -f $@
 	for i in $^; do cat $$i >> $@; echo "" >> $@; done
 
@@ -91,7 +91,7 @@ generated/value/cfg_print.ml: generated/src/print_stmt.ml\
 
 generated/value_with_gui/cfg_print.ml: generated/value/cfg_print.ml\
 				       generated/src/dump_function.ml\
-				       generated/src/gui.ml 
+				       generated/src/gui.ml
 	rm -f $@
 	for i in $^; do cat $$i >> $@; echo "" >> $@; done
 
@@ -147,8 +147,9 @@ generated/split/cfg_gui.ml: generated/src/gui.ml
 
 generated/split/Makefile: src/Makefile.split
 	cp $^ $@
+	headache -r $@
 
-pdfs/modules.pdf: 
+pdfs/modules.pdf:
 	cd generated/split && make doc
 	cd pdfs && dot -Tpdf ../generated/split/doc/code/modules.dot -o modules.pdf
 
