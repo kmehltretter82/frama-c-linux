@@ -67,7 +67,7 @@ HDRCK_EXTRA?=
 ## Command used to execute hdrck
 
 # Note: the public name of hdrck.exe is frama-c-hdrck
-ifeq ($(FRAMAC_HDRCK),"")
+ifeq ($(FRAMAC_HDRCK),)
 
 # HDRCK is external
 HDRCK:= frama-c-hdrck
@@ -101,7 +101,7 @@ $(error "Please set HEADER_SPEC variable to a file containing the header specifi
 
 endif # HEADER_HAS_GIT_FILE
 
-HDRCK_OPTS+= -z 
+HDRCK_OPTS+= -z
 
 else
 
@@ -185,4 +185,3 @@ headers.info:
 # Local Variables:
 # compile-command: "make"
 # End:
-
