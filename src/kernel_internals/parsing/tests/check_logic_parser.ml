@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let file = open_in "logic_parser.mly"
+let file = open_in "../logic_parser.mly"
 
 module Strings = Set.Make(String)
 
