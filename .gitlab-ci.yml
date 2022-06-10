@@ -15,8 +15,8 @@ default:
 ### VARIABLES
 
 variables:
-     DEFAULT: "feature/bobot/jbuilder"
-     OCAML: "4_12"
+  DEFAULT: "feature/bobot/jbuilder"
+  OCAML: "4_12"
 #     CURRENT: $CI_COMMIT_REF_NAME
 #     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
 
@@ -26,12 +26,13 @@ variables:
 build-distrib-tarball:
   stage: build
   script:
-    - nix-build -o distrib nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.src-distrib
+    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
+        --run 'autoconf && ./devel_tools/make-distrib.sh'
   tags:
     - nix
   artifacts:
     paths:
-      - distrib/frama-c.tar.gz
+      - frama-c.tar.gz
     expire_in: 1 week
 
 check-no-old-frama-c:
@@ -241,12 +242,12 @@ manuals:
 
 
 src-distrib-tests:
-    stage: distrib_and_compatibility
-    script:
-      - mkdir extracted && tar -xzf distrib/frama-c.tar.gz -C ./extracted
-      - nix-build extracted/frama-c/nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.src-distrib-tests
-    tags:
-      - nix
+  stage: distrib_and_compatibility
+  script:
+    - mkdir extracted && tar -xzf frama-c.tar.gz -C ./extracted
+    - nix-build extracted/frama-c/nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.src-distrib-tests
+  tags:
+    - nix
 
 ################################################################################
 ### PUBLIC

@@ -41,16 +41,8 @@ let
     # Release
     api-doc = oself.callPackage ./api-doc.nix {};
     manuals = oself.callPackage ./manuals.nix {};
-
-    # Src-distrib
-    # You should probably not use these targets out of Frama-CI
-    src-distrib = oself.callPackage ./src-distrib.nix {
-      git = pkgs.git ;
-    };
     src-distrib-tests = oself.callPackage ./src-distrib-tests.nix {
-      frama-c-release = oself.frama-c.override {
-        release_mode = true ;
-      } ;
+      frama-c-release = oself.frama-c.override { release_mode = true ; } ;
     };
   };
   overlay = self: super: {
