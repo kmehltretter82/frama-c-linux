@@ -30,17 +30,17 @@ all: clean $(FINAL_PLUGINS) $(MLIS)
 generated/src/Makefile%: src/Makefile%
 	mkdir -p $(dir $@)
 	cp $< $@
-	headache -r $<
+	headache -r $@
 
 generated/src/%.ml: src/%.ml
 	mkdir -p $(dir $@)
 	cp $< $@
-	headache -r $<
+	headache -r $@
 
 generated/src/tests/hello/%.c: src/%.c
 	mkdir -p $(dir $@)
 	cp $< $@
-	headache -r $<
+	headache -r $@
 
 generated/src/tests/hello/oracle/%.oracle: src/%.oracle
 	mkdir -p $(dir $@)
@@ -49,7 +49,7 @@ generated/src/tests/hello/oracle/%.oracle: src/%.oracle
 generated/%/Hello.mli: src/Hello.mli
 	mkdir -p $(dir $@)
 	cp $< $@
-	headache -r $<
+	headache -r $@
 
 generated/script: generated/src/run_print_to_file.ml \
                   generated/src/extend_run.ml
