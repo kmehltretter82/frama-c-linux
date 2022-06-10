@@ -325,14 +325,13 @@ export default function ASTview(): JSX.Element {
 
   const foldOptions: CodeMirror.FoldOptions = {
     rangeFinder: (cm, pos) => {
-      const range = CodeMirror.fold.auto(cm, pos);
-      if (!range) return undefined;
-      const text = cm.getRange(range.from, range.to);
-      if (text.includes('sequence')) return undefined;
+      const range = CodeMirror.fold.comment(cm, pos);
+      /* Allows folding multi-line comments only. */
+      if (!range || range.from.line === range.to.line) return undefined;
       return range;
     }
   };
-  
+
   // Component
   return (
     <>
@@ -342,13 +341,13 @@ export default function ASTview(): JSX.Element {
           icon='ANGLE.RIGHT'
           visible={true}
           onClick={foldAll}
-          title='Fold every specifications'
+          title='Collapse all multi-line ACSL properties'
         />
         <IconButton
           icon='ANGLE.DOWN'
           visible={true}
           onClick={unfoldAll}
-          title='Unfold every specifications'
+          title='Expand all multi-line ACSL properties'
         />
       </TitleBar>
       <Text
