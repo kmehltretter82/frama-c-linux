@@ -100,9 +100,9 @@ wtests-help:
 
 .PHONY: purge-tests
 purge-tests:
-	find $(PURGED_PTEST_DIRS) -name dune -print0 \
-        | grep --null -e "/oracle.*/dune\|/result.*/dune" \
-        | xargs --null --no-run-if-empty -n 10 rm
+	find $(PURGED_PTEST_DIRS) -name dune \
+        | grep -e "/oracle.*/dune\|/result.*/dune" \
+        | xargs --no-run-if-empty -n 10 rm
 
 # Force the full cleaning of the testing environment
 .PHONY: clean-tests
