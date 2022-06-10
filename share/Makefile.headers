@@ -90,14 +90,14 @@ HDRCK_OPTS:= --stdin
 
 ifeq ($(HEADER_SPEC),)
 
-HEADER_HAS_GIT:=$(wildcard .git)r
+HEADER_HAS_GIT:=$(wildcard .git)
 ifneq ($(HEADER_HAS_GIT),)
 
 # From git (including git work-trees)
 HDRCK_SPEC:= git ls-files -z | git check-attr --stdin -z header_spec
 else
 
-$(error "Please set HEADER_SPEC variable to a file containing the header specification.")
+HDRCK_SPEC:=
 
 endif # HEADER_HAS_GIT_FILE
 
@@ -154,6 +154,18 @@ endif
 
 #################################
 
+ifeq ($(HDRCK_SPEC),)
+
+.PHONY: check-headers
+check-headers: $(FRAMAC_HDRCK)
+	$(error "Please set HEADER_SPEC variable to a file containing the header specification.")
+
+
+.PHONY: headers
+headers: $(FRAMAC_HDRCK)
+	$(error "Please set HEADER_SPEC variable to a file containing the header specification.")
+else
+
 .PHONY: check-headers
 check-headers: $(FRAMAC_HDRCK)
 	$(HDRCK_SPEC) | $(HDRCK) $(HDRCK_OPTS) $(HDRCK_EXTRA)
@@ -162,6 +174,7 @@ check-headers: $(FRAMAC_HDRCK)
 headers: $(FRAMAC_HDRCK)
 	$(HDRCK_SPEC) | $(HDRCK) -update $(HDRCK_OPTS) $(HDRCK_EXTRA)
 
+endif # $(HDRCK_SPEC)
 
 #################################
 
