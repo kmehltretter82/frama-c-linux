@@ -44,6 +44,15 @@ frama-c:
   tags:
     - nix
 
+header-check:
+  stage: build
+  script:
+    - ls -la
+    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.frama-c-checkers-shell
+        --run 'FRAMAC_HDRCK="" make -f share/Makefile.headers check-headers'
+  tags:
+    - nix
+
 # ivette:
 #   stage: build
 #   image: node:lts-gallium
