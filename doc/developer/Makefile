@@ -41,7 +41,7 @@ DEPENDENCIES= $(FRAMAC_MODERN) $(GENERATED) frama-c-book.cls
 
 .PHONY: all check
 
-all: developer.pdf check
+all: developer.pdf # check << restore check later
 
 FRAMAC := $(shell command -v frama-c 2> /dev/null)
 
@@ -77,7 +77,7 @@ else
 	$(MAKE) -C tutorial/viewcfg/generated/split
 endif
 
-check-all: developer.pdf 
+check-all: developer.pdf
 	$(MAKE) -C ../.. check-devguide
 
 include ../MakeLaTeXModern
@@ -107,10 +107,6 @@ archives: tutorial/hello/generated
 	  mv hello-$(VERSION)/ with_doc/
 
 .PHONY: tutorial/hello/generated tutorial/viewcfg/generated
-
-###########
-
-include $(MAKECONFIG_DIR)/Makefile.generic
 
 ###########
 
