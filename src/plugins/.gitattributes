@@ -2,6 +2,9 @@
 # HEADER_SPEC: CEA_LGPL_OR_PROPRIETARY #
 ########################################
 
+dune-project header_spec=CEA_LGPL_OR_PROPRIETARY
+dune header_spec=CEA_LGPL_OR_PROPRIETARY
+
 config* header_spec=CEA_LGPL_OR_PROPRIETARY
 makefile* header_spec=CEA_LGPL_OR_PROPRIETARY
 Make* header_spec=CEA_LGPL_OR_PROPRIETARY

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2020                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -135,10 +135,10 @@ let launch command_string =
       s command_string ;
     exit 1
   | Unix.WSTOPPED s ->
-      Format.printf
-        "%% STOP %d received while executing command:@\n%s@\nStopping@."
-        s command_string;
-      exit 1
+    Format.printf
+      "%% STOP %d received while executing command:@\n%s@\nStopping@."
+      s command_string;
+    exit 1
 
 let rm_filter_result (_cmd,stdfile) = unlink stdfile
 
