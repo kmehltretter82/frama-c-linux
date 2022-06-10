@@ -1,5 +1,5 @@
 (* Some useful function to use the graphical representation of a slicing
-* project. (see tests/slicing/anim.ml for a test) *)
+ * project. (see tests/slicing/anim.ml for a test) *)
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 
 let use_dot =
@@ -28,7 +28,7 @@ let print_proj basename title n =
 ;;
 
 (* apply all requests of the project and generate a .jpg file for each step.
-* (begin at number [n])
+ * (begin at number [n])
 *)
 let build_all_graphs basename title first_n =
   Format.printf "Processing %s : " basename;

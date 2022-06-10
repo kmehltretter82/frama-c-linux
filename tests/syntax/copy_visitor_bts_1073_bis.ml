@@ -1,15 +1,15 @@
 (*============================================================================*)
 module P = Plugin.Register
-             (struct
-                let name = "Testing plugin"
-                let shortname = "test"
-                let help = "Just to test Filter..."
-              end)
+    (struct
+      let name = "Testing plugin"
+      let shortname = "test"
+      let help = "Just to test Filter..."
+    end)
 module Opt = P.False
-               (struct
-                  let option_name = "-test"
-                  let help = "switch the plug-in on"
-                end)
+    (struct
+      let option_name = "-test"
+      let help = "switch the plug-in on"
+    end)
 (*============================================================================*)
 module Visi = struct
   exception EraseAssigns
@@ -43,12 +43,12 @@ let main () =
   if Opt.get () then
     begin
       let _ast = Ast.get () in
-        P.feedback "start compute";
+      P.feedback "start compute";
       let new_proj_name = "filtered" in
       let module Transform = Filter.F (Visi) in
       let new_prj = Transform.build_cil_file new_proj_name () in
-        Project.on new_prj Opt.clear ();
-        P.feedback "exported in new project : %s" new_proj_name
+      Project.on new_prj Opt.clear ();
+      P.feedback "exported in new project : %s" new_proj_name
     end
 
 let () = Db.Main.extend main

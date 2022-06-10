@@ -6,13 +6,12 @@ class vis = object(_)
   method! vvrbl vi =
     Kernel.result "%s -> %a" vi.vname Printer.pp_location vi.vdecl;
     Cil.DoChildren
-  
+
 end
 
 let main () =
   Ast.compute ();
   Cil.visitCilFile (new vis :> Cil.cilVisitor) (Ast.get ())
-  
+
 let () =
   Db.Main.extend main
-

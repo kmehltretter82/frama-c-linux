@@ -4,6 +4,6 @@ module StateA =
     (struct
       let name = "Project.Test.StateA"
       let dependencies = []
-     end)
+    end)
 
 let () = StateA.set 3

@@ -1,13 +1,13 @@
 open Cil_types
 
-let emitter = 
+let emitter =
   Emitter.create "Test" [ Emitter.Property_status ] ~correctness:[] ~tuning:[]
 
-let emitter2 = 
+let emitter2 =
   Emitter.create "Test2" [ Emitter.Property_status ] ~correctness:[] ~tuning:[]
 
 let set_status ?(emitter=emitter) p hyps s =
-  Kernel.feedback "SETTING STATUS OF %a TO %a" 
+  Kernel.feedback "SETTING STATUS OF %a TO %a"
     Property.pretty p
     Property_status.Emitted_status.pretty s;
   Property_status.emit emitter p ~hyps s
@@ -15,7 +15,7 @@ let set_status ?(emitter=emitter) p hyps s =
 let print_status =
   Dynamic.get
     ~plugin:"Report"
-    "print" 
+    "print"
     (Datatype.func Datatype.unit Datatype.unit)
 
 let clear () =
@@ -30,13 +30,13 @@ let main () =
   let main, _, _, h, g =
     let l =
       Annotations.fold_all_code_annot
-	(fun stmt _ ca acc ->
-	  let kf = Kernel_function.find_englobing_kf stmt in
-	  let ps = Property.ip_of_code_annot kf stmt ca in
-	  match ps with
-	  | [ p ] -> p :: acc
-	  | _ -> assert false)
-	[]
+        (fun stmt _ ca acc ->
+           let kf = Kernel_function.find_englobing_kf stmt in
+           let ps = Property.ip_of_code_annot kf stmt ca in
+           match ps with
+           | [ p ] -> p :: acc
+           | _ -> assert false)
+        []
     in
     match l with
     | [ p1; p2; p3; p4; p5 ] -> p1, p2, p3, p4, p5
@@ -223,4 +223,3 @@ let main () =
   ()
 
 let () = Db.Main.extend main
-

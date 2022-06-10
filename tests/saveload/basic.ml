@@ -1,5 +1,5 @@
 (* This datatype tests the bug fix of BTS #1277 *)
-module A = 
+module A =
   Datatype.Pair
     (Datatype.List(Datatype.String))
     (Datatype.List(Datatype.String))
@@ -11,6 +11,6 @@ module StateA =
       let name = "Project.Test.StateA"
       let dependencies = []
       let default () = 0
-     end)
+    end)
 
 let () = StateA.set 10

@@ -1810,11 +1810,12 @@ ifneq ($(strip $(ML_LINT_MISSING)),)
 	exit 1
 endif
 
-INDENT_TARGET= $(patsubst %,%.indent,$(ML_LINT_CHECK))
+ML_LINT_CHECK_LIST=$(wildcard $(ML_LINT_CHECK))
+INDENT_TARGET= $(patsubst %,%.indent,$(ML_LINT_CHECK_LIST))
 
-LINT_TARGET= $(patsubst %,%.lint,$(ML_LINT_CHECK))
+LINT_TARGET= $(patsubst %,%.lint,$(ML_LINT_CHECK_LIST))
 
-FIX_SYNTAX_TARGET=$(patsubst %,%.fix-syntax,$(ML_LINT_CHECK))
+FIX_SYNTAX_TARGET=$(patsubst %,%.fix-syntax,$(ML_LINT_CHECK_LIST))
 
 .PHONY: $(INDENT_TARGET) $(LINT_TARGET) $(FIX_SYNTAX_TARGET) \
         indent lint fix-syntax

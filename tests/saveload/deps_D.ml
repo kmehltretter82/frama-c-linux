@@ -5,32 +5,32 @@ module StateA =
       let name = "Project.Test.StateA"
       let dependencies = []
       let default () = 0
-     end)
+    end)
 
 module StateB =
   State_builder.Option_ref
     (Datatype.Bool)
     (struct
-       let name = "Project.Test.StateB"
-       let dependencies = [ StateA.self ]
-     end)
+      let name = "Project.Test.StateB"
+      let dependencies = [ StateA.self ]
+    end)
 
 module StateD =
   State_builder.Ref
     (Datatype.Int)
     (struct
-       let name = "Project.Test.StateD"
-       let dependencies = [ StateA.self ]
-       let default () = 0
-     end)
+      let name = "Project.Test.StateD"
+      let dependencies = [ StateA.self ]
+      let default () = 0
+    end)
 
 module StateC =
   State_builder.Option_ref
     (Datatype.Int)
     (struct
-       let name = "Project.Test.StateC"
-       let dependencies = [ StateB.self; StateD.self ]
-     end)
+      let name = "Project.Test.StateC"
+      let dependencies = [ StateB.self; StateD.self ]
+    end)
 
 let () = StateA.set 10
 let () = StateB.set (StateA.get () = 10)

@@ -15,23 +15,23 @@ class print_term = object(self)
   method! vterm v =
     if  not self#should_print then Cil.SkipChildren
     else begin
-        Kernel.feedback
-          "Term %a:@\nstart %a@\nend %a"
-          Printer.pp_term v
-          print_pos (fst v.term_loc)
-          print_pos (snd v.term_loc);
-        Cil.DoChildren
-      end
+      Kernel.feedback
+        "Term %a:@\nstart %a@\nend %a"
+        Printer.pp_term v
+        print_pos (fst v.term_loc)
+        print_pos (snd v.term_loc);
+      Cil.DoChildren
+    end
   method! vpredicate p =
     if not self#should_print then Cil.SkipChildren
     else begin
-        Kernel.feedback
-          "Predicate %a:@\nstart %a@\nend %a"
-          Printer.pp_predicate p
-          print_pos (fst p.pred_loc)
-          print_pos (snd p.pred_loc);
-        Cil.DoChildren
-      end
+      Kernel.feedback
+        "Predicate %a:@\nstart %a@\nend %a"
+        Printer.pp_predicate p
+        print_pos (fst p.pred_loc)
+        print_pos (snd p.pred_loc);
+      Cil.DoChildren
+    end
 end
 
 let main () =

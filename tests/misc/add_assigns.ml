@@ -5,7 +5,7 @@ let emitter =
     create "assigns" [ Property_status; Funspec ] ~correctness:[] ~tuning:[])
 
 let computed = ref false
-        
+
 let main () =
   if not !computed then begin
     computed := true;

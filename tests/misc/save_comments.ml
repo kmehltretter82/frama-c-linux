@@ -6,7 +6,7 @@ let find_comment () =
   let loc1 = Kernel_function.get_location kf in
   let loc2 = Cil_datatype.Stmt.loc (Kernel_function.find_return kf) in
   let zone = (fst loc1, snd loc2) in
-  Format.printf 
+  Format.printf
     "@[In project %s, searching for comments between %a and %a:@\n%a\
      @\nEnd of comments@."
     (Project.get_name (Project.current()))
@@ -18,8 +18,8 @@ let find_comment () =
 let run () =
   let ast = Ast.get () in
   let vis = object
-      inherit Visitor.frama_c_inplace
-      method! vglob_aux g = match g with GText s -> Format.printf "got global comment %s@." s; SkipChildren | _ -> DoChildren
+    inherit Visitor.frama_c_inplace
+    method! vglob_aux g = match g with GText s -> Format.printf "got global comment %s@." s; SkipChildren | _ -> DoChildren
   end
   in
   ignore (Visitor.visitFramacFile vis ast);

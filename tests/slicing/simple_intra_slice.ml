@@ -1,5 +1,5 @@
 (* ledit bin/toplevel.top -deps tests/slicing/simple_intra_slice.c \
-  < tests/slicing/simple_intra_slice.ml
+   < tests/slicing/simple_intra_slice.ml
 *)
 
 
@@ -79,32 +79,32 @@ let main _ =
   print_fct_stmts kf;
   select_out0_and_print kf;
   select_ctrl_and_print kf 40;
-(* G++. VP 2008-02-04: Was ki 113, and corresponded to
-   if(c<Unknown) { goto L2; }, not to G++
-   Fixed ki number to the test instead of the incrementation.
-   As of this date, ki for G++ is 31.
-   VP 2008-06-25 ki for G++ is 32
-   VP 2008-07-17 ki for G++ is 37
-   BY 2011-04-14 sid for G++ is 38
-   VP 2012-04-09 sid for G++ is 44
-   VP 2017-02-16 sid for G++ is 43
- *)
+  (* G++. VP 2008-02-04: Was ki 113, and corresponded to
+     if(c<Unknown) { goto L2; }, not to G++
+     Fixed ki number to the test instead of the incrementation.
+     As of this date, ki for G++ is 31.
+     VP 2008-06-25 ki for G++ is 32
+     VP 2008-07-17 ki for G++ is 37
+     BY 2011-04-14 sid for G++ is 38
+     VP 2012-04-09 sid for G++ is 44
+     VP 2017-02-16 sid for G++ is 43
+  *)
 
   let kf = get_fct "f6"  in
   Format.printf "@[%a@]@\n" pretty_pdg kf;
   print_fct_stmts kf;
   select_ctrl_and_print kf 68;
-(* return_label
-VP 2008-02-04: Was ki 135, corresponding to first stmt in the else
-branch of if (i) { __retres = 0; goto return_label; }
-          else { /* here*/__retres = 10*n; goto return_label; }
-Fixed ki number for this particular ki.
-As of this date, ki for return_label is 92
-VP 2008-06-25: ki for return_label is 96
-VP 2008-07-17: ki for return_label is 112
-BY 2011-04-14 sid for return_label is 128
-VP 2012-04-09: sid for return_label is 134
-*)
+  (* return_label
+     VP 2008-02-04: Was ki 135, corresponding to first stmt in the else
+     branch of if (i) { __retres = 0; goto return_label; }
+            else { /* here*/__retres = 10*n; goto return_label; }
+     Fixed ki number for this particular ki.
+     As of this date, ki for return_label is 92
+     VP 2008-06-25: ki for return_label is 96
+     VP 2008-07-17: ki for return_label is 112
+     BY 2011-04-14 sid for return_label is 128
+     VP 2012-04-09: sid for return_label is 134
+  *)
 
   Slicing.Api.Project.pretty Format.std_formatter
 

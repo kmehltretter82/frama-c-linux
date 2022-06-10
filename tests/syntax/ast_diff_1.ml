@@ -1,9 +1,9 @@
 include Plugin.Register(
-    struct
-      let name = "AST diff test"
-      let shortname = "AST diff test"
-      let help = "Show results of AST diff computation"
-    end)
+  struct
+    let name = "AST diff test"
+    let shortname = "AST diff test"
+    let help = "Show results of AST diff computation"
+  end)
 
 let show_var vi c =
   result "Variable %a: %a"

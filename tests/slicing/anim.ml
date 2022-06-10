@@ -1,4 +1,4 @@
-(* 
+(*
 * Small example to view graphically the building process of a slicing project.
 * To try it, use the following commands :
 
@@ -14,8 +14,8 @@ let add_select_fun_calls kf =
   let selections =
     Slicing.Api.Select.select_func_calls_into selections ~spare:false kf
   in Slicing.Api.Select.iter_selects_internal
-       (fun s -> !Db.Slicing.Request.add_selection_internal s)
-       selections
+    (fun s -> !Db.Slicing.Request.add_selection_internal s)
+    selections
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 

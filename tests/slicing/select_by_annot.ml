@@ -12,11 +12,11 @@ let main _ =
     let mark = Slicing.Api.Mark.make ~data:true ~addr:false ~ctrl:false in
     let select = Slicing.Api.Select.empty_selects in
     let select = Slicing.Api.Select.select_func_annots select mark
-      ~spare:true ~threat:false ~user_assert:false ~slicing_pragma:true
-      ~loop_inv:true ~loop_var:true kf
+        ~spare:true ~threat:false ~user_assert:false ~slicing_pragma:true
+        ~loop_inv:true ~loop_var:true kf
     in
     Slicing.Api.Request.add_persistent_selection select
-      (*Slicing.Api.Request.read_annotations project kf_main ;;*)
+    (*Slicing.Api.Request.read_annotations project kf_main ;;*)
   in
   let kf_main = Globals.Functions.find_def_by_name "main" in
   add_annot kf_main;

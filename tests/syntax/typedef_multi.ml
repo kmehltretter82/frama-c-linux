@@ -1,4 +1,4 @@
-let run () = 
+let run () =
   File.reorder_ast ();
   File.pretty_ast ()
 

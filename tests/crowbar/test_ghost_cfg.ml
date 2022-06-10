@@ -25,11 +25,11 @@ type stmt_pos =
 type switch_or_loop = Is_switch | Is_loop
 
 type env = {
-    switch_or_loop: (switch_or_loop * bool) list;
-    should_fail: bool;
-    in_ghost: bool;
-    stmt_stack: stmt list;
-    stmt_pos: stmt_pos;
+  switch_or_loop: (switch_or_loop * bool) list;
+  should_fail: bool;
+  in_ghost: bool;
+  stmt_stack: stmt list;
+  stmt_pos: stmt_pos;
 }
 
 let empty_env =
@@ -41,7 +41,7 @@ let merge old_env new_env =
   { old_env with
     should_fail = old_env.should_fail || new_env.should_fail;
     stmt_stack = new_env.stmt_stack;
-   }
+  }
 
 let add_stack stmt env = { env with stmt_stack = stmt :: env.stmt_stack }
 
@@ -74,18 +74,18 @@ let end_of_body = [ incr_stmt; return; forward_goto_target ]
 
 let ghost_status env ghost =
   match env.stmt_pos with
-    | Normal -> env.in_ghost || ghost
-    | _ -> env.in_ghost
+  | Normal -> env.in_ghost || ghost
+  | _ -> env.in_ghost
 
 let block env stmts = env, Cil.mkBlock stmts
 
 let gen_stmts gen_stmt =
   fix
     (fun gen_stmts ->
-      choose [
-          const (fun env -> env,[]);
-          map [gen_stmt; gen_stmts]
-            (fun f1 f2 env ->
+       choose [
+         const (fun env -> env,[]);
+         map [gen_stmt; gen_stmts]
+           (fun f1 f2 env ->
               let (new_env, stmt) = f1 env in
               let env = merge env new_env in
               let (new_env, stmts) = f2 env in
@@ -129,21 +129,21 @@ let gen_return ghost env =
 let mk_label =
   let nb = ref 0 in
   fun stmt ->
-  match List.filter (function Label _ -> true | _ -> false) stmt.labels with
+    match List.filter (function Label _ -> true | _ -> false) stmt.labels with
     | [] ->
-        incr nb;
-        let name = "L" ^ (string_of_int !nb) in
-        stmt.labels <- [ Label (name, Loc.unknown, true) ]
+      incr nb;
+      let name = "L" ^ (string_of_int !nb) in
+      stmt.labels <- [ Label (name, Loc.unknown, true) ]
     | _ -> ()
 
 (* approximation for gotos: if all the statements we jump over are ghost, we
    consider that we stay inside a ghost block. Might not be completely accurate.
- *)
+*)
 let rec all_ghosts n l =
   match l with
-    | [] -> assert false
-    | s :: _ when n = 0 -> s.ghost
-    | s :: tl -> s.ghost && all_ghosts (n-1) tl
+  | [] -> assert false
+  | s :: _ when n = 0 -> s.ghost
+  | s :: tl -> s.ghost && all_ghosts (n-1) tl
 
 let gen_goto ghost tgt env =
   let loc = Loc.unknown in
@@ -183,16 +183,16 @@ let gen_break ghost env =
   let ghost = ghost_status env ghost in
   let skind, should_fail =
     match env.switch_or_loop with
-      | [] -> Instr (Skip Loc.unknown), false
-      | (Is_loop,g) :: _ -> Break Loc.unknown, not g && ghost
-      | (Is_switch,g)::_ ->
-          (match env.stmt_pos with
-             | Normal -> Break Loc.unknown, not g && ghost
-             | Case g1 -> Break Loc.unknown, not g && (g1 || ghost)
-             | Case_no_default _ -> Break Loc.unknown, false
-             | Last_case g1 -> Break Loc.unknown, not g && (g1 || ghost)
-             | Last_case_no_default _ -> Break Loc.unknown, false
-             | Default g1 -> Break Loc.unknown, not g && not g1 && ghost)
+    | [] -> Instr (Skip Loc.unknown), false
+    | (Is_loop,g) :: _ -> Break Loc.unknown, not g && ghost
+    | (Is_switch,g)::_ ->
+      (match env.stmt_pos with
+       | Normal -> Break Loc.unknown, not g && ghost
+       | Case g1 -> Break Loc.unknown, not g && (g1 || ghost)
+       | Case_no_default _ -> Break Loc.unknown, false
+       | Last_case g1 -> Break Loc.unknown, not g && (g1 || ghost)
+       | Last_case_no_default _ -> Break Loc.unknown, false
+       | Default g1 -> Break Loc.unknown, not g && not g1 && ghost)
   in
   let should_fail = env.should_fail || should_fail in
   let stmt = Cil.mkStmt ~ghost skind in
@@ -208,8 +208,8 @@ let gen_continue ghost env =
   let is_loop = function (Is_loop,_) -> true | (Is_switch,_) -> false in
   let skind, should_fail =
     match List.find_opt is_loop env.switch_or_loop with
-      | None -> Instr (Skip Loc.unknown), false
-      | Some (_,g) -> Continue Loc.unknown, not g && ghost
+    | None -> Instr (Skip Loc.unknown), false
+    | Some (_,g) -> Continue Loc.unknown, not g && ghost
   in
   let should_fail = should_fail || env.should_fail in
   let stmt = Cil.mkStmt ~ghost skind in
@@ -236,9 +236,9 @@ let gen_if ghost ghost_else stmt_then stmt_else env =
   let env = merge env new_env in
   let else_b = Cil.mkBlock else_s in
   if (not ghost) && ghoste then begin
-      let attr = Attr (Cil.frama_c_ghost_else,[]) in
-      else_b.battrs <- Cil.addAttribute attr else_b.battrs;
-    end;
+    let attr = Attr (Cil.frama_c_ghost_else,[]) in
+    else_b.battrs <- Cil.addAttribute attr else_b.battrs;
+  end;
   stmt.skind <- If(e,Cil.mkBlock then_s, Cil.mkBlock else_s,loc);
   env, stmt
 
@@ -246,13 +246,13 @@ let gen_default should_break stmts env =
   let ghost = env.in_ghost in
   (* default clause always has the same status as underlying switch.
      This simplifies deciding whether the check should fail or not.
-   *)
+  *)
   let new_env = { env with stmt_pos = Default ghost } in
   let new_env, stmts = stmts new_env in
   (* Don't make the statements in the default branch potential goto targets:
      they could be picked up by gotos inside case branches, which would become
      forward gotos, complicating the should_fail oracle computation.
-   *)
+  *)
   let new_env = { new_env with stmt_stack = env.stmt_stack } in
   let _,s1 = gen_inst ghost env in
   let epilogue =
@@ -270,12 +270,12 @@ let gen_default should_break stmts env =
 
 let ghost_case_breaks has_default other_cases =
   let rec find_ghost_seq seq = function
-      (* if there's a (non-ghost by definition) default, inspect the ghost
-         cases. Otherwise, non-ghost exits the switch anyway, ghost can break
-         at any time. *)
+    (* if there's a (non-ghost by definition) default, inspect the ghost
+       cases. Otherwise, non-ghost exits the switch anyway, ghost can break
+       at any time. *)
     | [] -> if has_default then seq else []
     | hd :: tl ->
-        if (List.hd hd).ghost then find_ghost_seq (hd :: seq) tl else seq
+      if (List.hd hd).ghost then find_ghost_seq (hd :: seq) tl else seq
   in
   let seq = find_ghost_seq [] other_cases in
   let module M = struct exception Has_break end in
@@ -284,10 +284,10 @@ let ghost_case_breaks has_default other_cases =
       inherit Cil.nopCilVisitor
       method! vstmt s =
         match s.skind with
-          | Break _ -> raise M.Has_break
-          | Loop _ | Switch _ -> (* a break there won't break the switch *)
-              Cil.SkipChildren
-          | _ -> Cil.DoChildren
+        | Break _ -> raise M.Has_break
+        | Loop _ | Switch _ -> (* a break there won't break the switch *)
+          Cil.SkipChildren
+        | _ -> Cil.DoChildren
     end
   in
   try
@@ -300,12 +300,12 @@ let rec no_ghost_case_breaks = function
   | [] -> false (* should not happen, we have at least one non-ghost case before
                    default. *)
   | stmts :: others ->
-      if (List.hd stmts).ghost then
-        begin
-          match (Extlib.last stmts).skind with
-            | Break _ -> false
-            | _ -> no_ghost_case_breaks others
-        end else true
+    if (List.hd stmts).ghost then
+      begin
+        match (Extlib.last stmts).skind with
+        | Break _ -> false
+        | _ -> no_ghost_case_breaks others
+      end else true
 
 
 
@@ -319,32 +319,32 @@ let gen_case ghost should_break my_case cases env =
   let has_default = match default with None -> false | Some _ -> true in
   let stmt_pos =
     match non_ghost_cases with
-      | [] ->
-          if has_default then Last_case ghost else Last_case_no_default ghost
-      | _ -> if has_default then Case ghost else Case_no_default ghost
+    | [] ->
+      if has_default then Last_case ghost else Last_case_no_default ghost
+    | _ -> if has_default then Case ghost else Case_no_default ghost
   in
   let should_fail =
     match stmt_pos, env.switch_or_loop with
-      | (Normal | Default _),_ -> assert false
-      | _,[] -> assert false
-      | Last_case_no_default _,_ -> false
-      | Last_case g1, (_,g2)::_ ->
-          (* if the switch is non-ghost, but the last case is, and ends with
-             a break, the default clause won't be taken. *)
-          not g2 && g1 && should_break
-      | Case_no_default g1, (_, g2)::_ ->
-          (* fails iff switch is non-ghost, current case is, and doesn't break,
-             going to the next case. *)
-          not g2 && g1 && not should_break && no_ghost_case_breaks others
-      | Case g1, (_,g2) :: _ ->
-          not g2 && g1 (* prevents taking the default clause.*)
+    | (Normal | Default _),_ -> assert false
+    | _,[] -> assert false
+    | Last_case_no_default _,_ -> false
+    | Last_case g1, (_,g2)::_ ->
+      (* if the switch is non-ghost, but the last case is, and ends with
+         a break, the default clause won't be taken. *)
+      not g2 && g1 && should_break
+    | Case_no_default g1, (_, g2)::_ ->
+      (* fails iff switch is non-ghost, current case is, and doesn't break,
+         going to the next case. *)
+      not g2 && g1 && not should_break && no_ghost_case_breaks others
+    | Case g1, (_,g2) :: _ ->
+      not g2 && g1 (* prevents taking the default clause.*)
   in
   let should_fail =
     should_fail ||
-      (* if non-ghost case is supposed to fall through another non-ghost case,
-         we have to inspect all ghost cases in between to search for a
-         break, which would indicate a failure. *)
-      (not ghost && not should_break && ghost_case_breaks has_default others)
+    (* if non-ghost case is supposed to fall through another non-ghost case,
+       we have to inspect all ghost cases in between to search for a
+       break, which would indicate a failure. *)
+    (not ghost && not should_break && ghost_case_breaks has_default others)
   in
   let should_fail = env.should_fail || should_fail in
   let new_env = { env with in_ghost = ghost; stmt_pos; should_fail } in
@@ -364,11 +364,11 @@ let gen_case ghost should_break my_case cases env =
 let gen_cases gen_stmt =
   fix
     (fun gen_cases ->
-      choose [
-          const (fun env -> env,None,[]);
-          map [ bool; gen_stmts gen_stmt ] gen_default;
-          map [ bool; bool; gen_stmts gen_stmt; gen_cases ] gen_case
-        ])
+       choose [
+         const (fun env -> env,None,[]);
+         map [ bool; gen_stmts gen_stmt ] gen_default;
+         map [ bool; bool; gen_stmts gen_stmt; gen_cases ] gen_case
+       ])
 
 let gen_switch ghost cases env =
   let loc = Loc.unknown in
@@ -384,17 +384,17 @@ let gen_switch ghost cases env =
   let (new_env, default, cases) = cases new_env in
   let acc =
     match default with
-      | None -> [],[]
-      | Some stmts -> [List.hd stmts],stmts
+    | None -> [],[]
+    | Some stmts -> [List.hd stmts],stmts
   in
   let count_case = ref 0 in
   let mk_switch case (labels, stmts) =
-      let h = List.hd case in
-      h.labels <-
-        Cil_types.Case (Cil.integer Loc.unknown !count_case, Loc.unknown)
-        :: h.labels;
-      incr count_case;
-      (h::labels, case @ stmts)
+    let h = List.hd case in
+    h.labels <-
+      Cil_types.Case (Cil.integer Loc.unknown !count_case, Loc.unknown)
+      :: h.labels;
+    incr count_case;
+    (h::labels, case @ stmts)
   in
   let (labels, stmts) = List.fold_right mk_switch cases acc in
   let block = Cil.mkBlock stmts in
@@ -435,40 +435,40 @@ let gen_loop ghost stmts env =
 let gen_stmt =
   fix (fun gen_stmt ->
       choose [
-          map [bool] gen_inst;
-          map [bool; gen_stmts gen_stmt] gen_block;
-          map [bool] gen_return;
-          map [bool; uint16] gen_goto;
-          map [bool] gen_break;
-          map [bool] gen_continue;
-          map [bool; bool; gen_stmts gen_stmt; gen_stmts gen_stmt] gen_if;
-          map [bool; gen_cases gen_stmt] gen_switch;
-          map [bool; gen_stmts gen_stmt] gen_loop;
-    ])
+        map [bool] gen_inst;
+        map [bool; gen_stmts gen_stmt] gen_block;
+        map [bool] gen_return;
+        map [bool; uint16] gen_goto;
+        map [bool] gen_break;
+        map [bool] gen_continue;
+        map [bool; bool; gen_stmts gen_stmt; gen_stmts gen_stmt] gen_if;
+        map [bool; gen_cases gen_stmt] gen_switch;
+        map [bool; gen_stmts gen_stmt] gen_loop;
+      ])
 
 let gen_body =
   map [gen_stmts gen_stmt]
     (fun f ->
-      let (env, stmts) = f empty_env in
-      let stmts = stmts @ end_of_body in
-      env, Cil.mkBlock stmts)
+       let (env, stmts) = f empty_env in
+       let stmts = stmts @ end_of_body in
+       env, Cil.mkBlock stmts)
 
 let gen_file =
   map [gen_body]
     (fun (env, body) ->
-      let f = Cil.emptyFunctionFromVI f in
-      f.svar.vdefined <- true;
-      f.sbody <- body;
-      (env,
-       { fileName = Filepath.Normalized.empty;
-         globals = [
-             GVarDecl (x,Cil_datatype.Location.unknown);
-             GVarDecl (y,Cil_datatype.Location.unknown);
-             GFun (f, Cil_datatype.Location.unknown)
-           ];
-         globinit = None;
-         globinitcalled = false
-       }))
+       let f = Cil.emptyFunctionFromVI f in
+       f.svar.vdefined <- true;
+       f.sbody <- body;
+       (env,
+        { fileName = Filepath.Normalized.empty;
+          globals = [
+            GVarDecl (x,Cil_datatype.Location.unknown);
+            GVarDecl (y,Cil_datatype.Location.unknown);
+            GFun (f, Cil_datatype.Location.unknown)
+          ];
+          globinit = None;
+          globinitcalled = false
+        }))
 
 let ignore_deferred_errors () =
   try Log.treat_deferred_error () with Log.AbortError _ -> ()
@@ -495,56 +495,56 @@ let check_file (env, file) =
       Log.treat_deferred_error ();
       true
     with
-      | Log.AbortError _ ->
-          ignore_deferred_errors ();
-          false
-      | exn ->
-          Printf.printf
-            "Uncaught exception: %s\n%t\nFile saved in %s\n%!"
-            (Printexc.to_string exn) Printexc.print_backtrace file_name;
-          ignore_deferred_errors ();
-          report file_name "Found code leading to an unknown exception"
+    | Log.AbortError _ ->
+      ignore_deferred_errors ();
+      false
+    | exn ->
+      Printf.printf
+        "Uncaught exception: %s\n%t\nFile saved in %s\n%!"
+        (Printexc.to_string exn) Printexc.print_backtrace file_name;
+      ignore_deferred_errors ();
+      report file_name "Found code leading to an unknown exception"
   in
   if env.should_fail && success then
     report file_name "Found ghost code that should not have been accepted"
   else if not (env.should_fail) then begin
-      if success then begin
-          let norm_buf = Buffer.create 150 in
-          let fmt = Format.formatter_of_buffer norm_buf in
-          let f = Globals.Functions.find_by_name "f" in
-          Kernel_function.pretty fmt f;
-          let prj2 = Project.create "copy" in
-          Project.set_current prj2;
-          Kernel.Files.set [ Filepath.Normalized.of_string file_name ];
-          let parse_success =
-            try
-              File.init_from_cmdline (); true
-            with
-              Log.AbortError _ -> ignore_deferred_errors (); false
-          in
-          if parse_success then begin
-            let copy_buf = Buffer.create 150 in
-            let fmt = Format.formatter_of_buffer copy_buf in
-            let f = Globals.Functions.find_by_name "f" in
-            Kernel_function.pretty fmt f;
-            if Buffer.contents norm_buf <> Buffer.contents copy_buf then begin
-              let norm = open_out (file_name ^ ".norm.c") in
-              Buffer.output_buffer norm norm_buf;
-              flush norm;
-              close_out norm;
-              let copy = open_out (file_name ^ ".copy.c") in
-              Buffer.output_buffer copy copy_buf;
-              flush copy;
-              close_out copy;
-              report file_name "Found ghost code not well pretty-printed"
-            end else true
-          end else begin
-            report file_name "Error during re-parsing of pretty-printed code"
-          end
-        end
-      else
-        report file_name "Found ghost code that should have been accepted"
+    if success then begin
+      let norm_buf = Buffer.create 150 in
+      let fmt = Format.formatter_of_buffer norm_buf in
+      let f = Globals.Functions.find_by_name "f" in
+      Kernel_function.pretty fmt f;
+      let prj2 = Project.create "copy" in
+      Project.set_current prj2;
+      Kernel.Files.set [ Filepath.Normalized.of_string file_name ];
+      let parse_success =
+        try
+          File.init_from_cmdline (); true
+        with
+          Log.AbortError _ -> ignore_deferred_errors (); false
+      in
+      if parse_success then begin
+        let copy_buf = Buffer.create 150 in
+        let fmt = Format.formatter_of_buffer copy_buf in
+        let f = Globals.Functions.find_by_name "f" in
+        Kernel_function.pretty fmt f;
+        if Buffer.contents norm_buf <> Buffer.contents copy_buf then begin
+          let norm = open_out (file_name ^ ".norm.c") in
+          Buffer.output_buffer norm norm_buf;
+          flush norm;
+          close_out norm;
+          let copy = open_out (file_name ^ ".copy.c") in
+          Buffer.output_buffer copy copy_buf;
+          flush copy;
+          close_out copy;
+          report file_name "Found ghost code not well pretty-printed"
+        end else true
+      end else begin
+        report file_name "Error during re-parsing of pretty-printed code"
+      end
     end
+    else
+      report file_name "Found ghost code that should have been accepted"
+  end
   else true
 
 let () =

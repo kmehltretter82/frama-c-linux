@@ -4,7 +4,7 @@ module P =
       let name = "Orphan"
       let shortname = "orphan"
       let help = ""
-     end)
+    end)
 
 module S =
   P.True(struct let option_name = "-orphan" let help = "" end)

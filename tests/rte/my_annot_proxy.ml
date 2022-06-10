@@ -5,13 +5,13 @@ let print () =
 let print_status () =
   Kernel.log "printing status";
   let rte_state_getter_list = !Db.RteGen.get_all_status () in
-    Globals.Functions.iter
-      (fun kf ->
-	 Kernel.log "kf = %s" (Kernel_function.get_name kf) ;
-	 List.iter
-	   (fun (s, _, getter) -> Kernel.log "- %s = %b" s (getter kf))
-	   rte_state_getter_list);
-    Kernel.log "================================"
+  Globals.Functions.iter
+    (fun kf ->
+       Kernel.log "kf = %s" (Kernel_function.get_name kf) ;
+       List.iter
+         (fun (s, _, getter) -> Kernel.log "- %s = %b" s (getter kf))
+         rte_state_getter_list);
+  Kernel.log "================================"
 
 let main () =
   Dynamic.Parameter.Bool.set "-rte-mem" true;

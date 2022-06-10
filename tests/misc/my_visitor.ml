@@ -2,13 +2,13 @@ open Logic_const
 open Cil
 open Cil_types
 
-module P = 
+module P =
   Plugin.Register
     (struct
       let name = "My_visitor"
       let shortname = "my_vis"
       let help = ""
-     end)
+    end)
 
 module S =
   P.True(struct let option_name = "-s" let help = "" end)
@@ -19,11 +19,11 @@ module S2 =
 module Enabled =
   P.True(struct let option_name = "-my-visitor" let help = "" end)
 
-let emitter1 = 
+let emitter1 =
   Emitter.create "emitter1" [ Emitter.Code_annot ]
     ~correctness:[ S.parameter ] ~tuning:[]
 
-let emitter2 = 
+let emitter2 =
   Emitter.create "emitter2" [ Emitter.Code_annot ]
     ~correctness:[ S2.parameter ] ~tuning:[]
 

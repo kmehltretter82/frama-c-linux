@@ -18,7 +18,7 @@
 
 (*i $Id: size.mli,v 1.1 2007-11-28 12:52:04 uid568 Exp $ i*)
 
-(* Sizes of ocaml values (in their memory representation). 
+(* Sizes of ocaml values (in their memory representation).
    Sizes are given in words ([size_w]), bytes ([size_b]) or kilobytes
    ([size_kb]), in a system-independent way. *)
 

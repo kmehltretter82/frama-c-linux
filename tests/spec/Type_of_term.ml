@@ -1,11 +1,11 @@
 open Cil_types
 
 include Plugin.Register
-  (struct
+    (struct
       let name = "type_of_term"
       let shortname = "type_of_term"
       let help = "checks typeOfTermLval over sets"
-   end)
+    end)
 
 class visitor =
   object
