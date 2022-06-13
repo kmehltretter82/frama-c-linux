@@ -39,6 +39,9 @@ autom4te.cache
 .Makefile.plugin.generated
 .ocamldebug
 
+#lint
+/.lint/
+
 #tests
 
 /tests/**/result*/
