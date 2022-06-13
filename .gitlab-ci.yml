@@ -70,10 +70,10 @@ header-check:
 lint:
   stage: build
   script:
-   - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.lint
-  coverage: '/lint coverage: \d+\.\d+/'
+    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
+        --run 'LINT_MAKEFILE=share/Makefile.linting make -f share/Makefile.linting lint'
   tags:
-   - nix
+    - nix
 
 ################################################################################
 ### TESTS
