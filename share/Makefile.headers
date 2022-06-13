@@ -56,9 +56,13 @@ HEADER_DISTRIB_FILE?=
 # - <file>: file containing the list of the files to ignore any way
 HEADER_EXCEPTIONS?=
 
-# Can be set to a list of files
-# - <files>: files containing, for each file to manage, the "header_spec" attribute value
+# Can be set to a file
+# - <files>: input file containing, for each file to manage, the "header_spec" attribute value
 HEADER_SPEC?=
+
+# Can be set to a file
+# - yes: save the  "header_spec" attribute specification into the file "HEADER_SPEC"
+HEADER_SAVE_SPEC?=no
 
 # Extra parameters for "frama-c-hdrck"
 HDRCK_EXTRA?=
@@ -95,20 +99,42 @@ ifneq ($(HEADER_HAS_GIT),)
 
 # From git (including git work-trees)
 HDRCK_SPEC:= git ls-files -z | git check-attr --stdin -z header_spec
-else
-
-HDRCK_SPEC:=
-
-endif # HEADER_HAS_GIT_FILE
-
 HDRCK_OPTS+= -z
 
 else
 
+# Note: in such a case, GIT is required...
+HDRCK_SPEC:=
+
+endif # HEADER_HAS_GIT
+
+else # HEADER_SPEC
+
+ifeq ($(HEADER_SAVE_SPEC),yes)
+
+HEADER_HAS_GIT:=$(wildcard .git)
+ifneq ($(HEADER_HAS_GIT),)
+
+# From git (including git work-trees)
+HDRCK_SPEC:= git ls-files -z | git check-attr --stdin -z header_spec | tee $(HEADER_SPEC)
+HDRCK_OPTS+= -z
+
+else
+
+# Note: in such a case, GIT is required...
+HDRCK_SPEC:=
+
+endif # HEADER_HAS_GIT
+
+else # HEADER_SAVE_SPEC
+
 # From a file
-# note: The file  format has to be specified into the var HDRCK_EXTRA
 HDRCK_SPEC:= cat $(HEADER_SPEC)
 
+# The file format can be overloaded in using the var HDRCK_EXTRA
+HDRCK_OPTS+= -spec-format 3-zeros
+
+endif # HEADER_SAVE_SPEC
 endif # HEADER_SPEC
 
 ################################
@@ -198,3 +224,4 @@ headers.info:
 # Local Variables:
 # compile-command: "make"
 # End:
+
