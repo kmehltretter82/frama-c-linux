@@ -20,4 +20,7 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(dirs src tools tests headers share bin)
+(install
+ (package frama-c)
+ (section (site (frama-c share)))
+ (files (headache_config.txt as headache_config.txt)))
