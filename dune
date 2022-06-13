@@ -20,4 +20,4 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(dirs src ptests headers tests share bin)
+(dirs src tools tests share bin)

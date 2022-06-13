@@ -220,7 +220,7 @@ README* header_spec=.ignore
 /nix/frama-c-public/known_hosts header_spec=.ignore
 /nix/sources.json header_spec=.ignore
 
-/ptests/tests/**/* header_spec=.ignore
+/tools/ptests/tests/**/* header_spec=.ignore
 
 /share/framac.vim header_spec=.ignore
 /share/META.frama-c header_spec=.ignore

@@ -39,6 +39,12 @@ endif
 DUNE_DISPLAY?=progress
 DUNE_BUILD_OPTS+=--display $(DUNE_DISPLAY)
 
+# PTESTS SRC
+FRAMAC_PTESTS_SRC:=tools/ptests
+
+# HDRCK SRC
+FRAMAC_HDRCK_SRC:=tools/hdrck
+
 ###################
 # Frama-C Version #
 ###################
@@ -77,7 +83,8 @@ config.sed: VERSION share/Makefile.config share/Makefile.common Makefile configu
 
 clean:: purge-tests # to be done before a "dune" command
 	dune clean
-	dune clean --root ptests
+	dune clean --root $(FRAMAC_PTESTS_SRC)
+	dune clean --root $(FRAMAC_HDRCK_SRC)
 	rm -rf _build .merlin config.sed autom4te.cache
 
 ########################################################################
@@ -144,10 +151,10 @@ include share/Makefile.headers
 ################################
 
 # PTESTS is internal
-FRAMAC_PTESTS:=ptests/ptests.exe
+FRAMAC_PTESTS:=$(FRAMAC_PTESTS_SRC)/ptests.exe
 
 # WTESTS is internal
-FRAMAC_WTESTS:=ptests/wtests.exe
+FRAMAC_WTESTS:=$(FRAMAC_PTESTS_SRC)/wtests.exe
 
 # Frama-C also have ptest directories in plugins, so we do not use default
 PTEST_ALL_DIRS:=tests $(wildcard src/plugins/*/tests)

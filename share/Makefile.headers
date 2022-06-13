@@ -79,10 +79,10 @@ HDRCK:= frama-c-hdrck
 else
 
 # HDRCK is internal
-HDRCK:= dune exec --root headers -- frama-c-hdrck
+HDRCK:= dune exec --root $(FRAMAC_HDRCK_SRC) -- frama-c-hdrck
 
-$(FRAMAC_HDRCK): headers/hdrck.ml
-	dune build --root headers hdrck.exe
+$(FRAMAC_HDRCK): $(FRAMAC_HDRCK_SRC)/hdrck.ml
+	dune build --root $(FRAMAC_HDRCK_SRC) hdrck.exe
 
 endif
 
@@ -224,4 +224,3 @@ headers.info:
 # Local Variables:
 # compile-command: "make"
 # End:
-
