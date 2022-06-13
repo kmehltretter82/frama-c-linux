@@ -16,7 +16,7 @@ let run () =
   Annotations.add_ensures e main [];
   File.pretty_ast();
   (try
-    Annotations.add_complete e main ["foo"; "bar"];
+     Annotations.add_complete e main ["foo"; "bar"];
    with
      Log.AbortFatal s -> Kernel.warning "Caught fatal error: %s" s);
   (try

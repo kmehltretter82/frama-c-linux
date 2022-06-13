@@ -19,4 +19,3 @@ let run () =
   Project.on prj pretty ()
 
 let () = run ()
-  

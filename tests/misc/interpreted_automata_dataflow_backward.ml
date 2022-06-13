@@ -16,7 +16,7 @@ struct
 
   let widen v1 v2 =
     if Set.subset v2 v1 then
-       None (* Inclusion *)
+      None (* Inclusion *)
     else
       Some v2 (* No widening necessary *)
 
@@ -37,19 +37,19 @@ struct
   let transfer t v =
     let open Interpreted_automata in
     let r = match t with
-    | Skip | Prop _ | Leave _ | Return (None,_) ->
-      v (* Nothing to do *)
-    | Enter b ->
-      Set.diff v (Set.of_list b.blocals) (* If unconditionnaly initialized, they should not be there *)
-    | Instr (Set ((Var vi, NoOffset), exp, _), _)
-    | Instr (Local_init (vi, AssignInit (SingleInit exp), _), _) ->
-      Set.union (Set.remove vi v) (vars exp)
-    | Guard (exp,_,_)
-    | Instr (Set (_, exp, _), _)
-    | Return (Some exp, _) ->
-      Set.union v (vars exp)
-    | Instr _ ->
-      v (* All remaining cases are incorrectly ignored *)
+      | Skip | Prop _ | Leave _ | Return (None,_) ->
+        v (* Nothing to do *)
+      | Enter b ->
+        Set.diff v (Set.of_list b.blocals) (* If unconditionnaly initialized, they should not be there *)
+      | Instr (Set ((Var vi, NoOffset), exp, _), _)
+      | Instr (Local_init (vi, AssignInit (SingleInit exp), _), _) ->
+        Set.union (Set.remove vi v) (vars exp)
+      | Guard (exp,_,_)
+      | Instr (Set (_, exp, _), _)
+      | Return (Some exp, _) ->
+        Set.union v (vars exp)
+      | Instr _ ->
+        v (* All remaining cases are incorrectly ignored *)
     in
     Some r
 end

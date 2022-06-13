@@ -4,7 +4,7 @@ let check_vi_exists vi _ =
   try
     ignore (Globals.Functions.get vi)
   with Not_found ->
-    Kernel.fatal 
+    Kernel.fatal
       "%s(%d) has an entry in FormalsDecl, but does not exist in AST"
       vi.vname vi.vid
 

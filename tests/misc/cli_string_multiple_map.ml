@@ -33,4 +33,3 @@ let main () =
   Datatype.String.Map.iter print (M.get ())
 
 let () = Db.Main.extend main
-

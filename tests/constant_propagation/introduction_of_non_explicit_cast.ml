@@ -5,8 +5,8 @@ let main _ =
   Project.on
     new_proj
     (fun () ->
-      Kernel.CodeOutput.output
-        (fun fmt -> Format.fprintf fmt "After Constant propagation :@."))
+       Kernel.CodeOutput.output
+         (fun fmt -> Format.fprintf fmt "After Constant propagation :@."))
     ();
   File.pretty_ast ~prj:new_proj ();;
 

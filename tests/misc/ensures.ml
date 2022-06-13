@@ -16,8 +16,8 @@ let run () =
             in
             let function_name = kf_name ^ ": behavior " ^ bname in
             let status = Property_status.get ip in
-            Kernel.result "@[%s@ @[%a@]@]" 
-	      function_name Property_status.pretty status)
+            Kernel.result "@[%s@ @[%a@]@]"
+              function_name Property_status.pretty status)
          ip)
 
 let () = Db.Main.extend run

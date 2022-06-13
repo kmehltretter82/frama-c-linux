@@ -1,10 +1,10 @@
 include
   Plugin.Register(
-    struct
-      let name = "test"
-      let shortname = "test"
-      let help = "test"
-    end)
+  struct
+    let name = "test"
+    let shortname = "test"
+    let help = "test"
+  end)
 
 let akey = register_category "a"
 let ckey = register_category "a:b:c"

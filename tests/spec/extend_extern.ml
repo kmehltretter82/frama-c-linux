@@ -25,9 +25,9 @@ let main () =
       "Checking handler of exception occurring in extension typing";
     Ast.compute (); assert false
   with
-    | Log.AbortFatal _ -> Kernel.feedback "Extension typing failed as expected"
-    | Not_found -> Kernel.fatal "kernel did not capture our exception"
-    | Assert_failure _ -> Kernel.fatal "kernel silently captured our exception"
+  | Log.AbortFatal _ -> Kernel.feedback "Extension typing failed as expected"
+  | Not_found -> Kernel.fatal "kernel did not capture our exception"
+  | Assert_failure _ -> Kernel.fatal "kernel silently captured our exception"
 
 let () = Kernel.TypeCheck.set false
 

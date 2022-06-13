@@ -50,7 +50,7 @@ let main _ =
   (* Project2 :
    * same than project1, except that we use [select_min_call_internal].
    * But as [send_bis] is an undefined function, this makes no difference.
-   *)
+  *)
   Slicing.Api.Project.reset_slicing ();
   (*let pdg_k = !Db.Pdg.get kf_k;;*)
   let calls = !Db.Pdg.find_call_stmts (*pdg_k*)~caller:kf_k kf_send_bis in
@@ -69,7 +69,7 @@ let main _ =
    * Select the calls to [k] to be visible in a minimal version.
    * This builds an empty slice [k_1] for [k] and call it in [f] and [g].
    * [f_1] is also called in [g_1] because it calls [k_1].
-   *)
+  *)
 
   Slicing.Api.Project.reset_slicing ();
   add_select_fun_calls kf_k;
@@ -84,10 +84,10 @@ let main _ =
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 (* Project4 is CAS_1 from Patrick's 19th April 2007 mail.
-* step 1 - select calls to send and apply : OK
-* step 2 - (automatically done in step1)
-* step 3 - select calls to send_bis and apply : TODO
-* step 4 - (automatically done in step3)
+ * step 1 - select calls to send and apply : OK
+ * step 2 - (automatically done in step1)
+ * step 3 - select calls to send_bis and apply : TODO
+ * step 4 - (automatically done in step3)
 *)
 
 (*
@@ -113,8 +113,8 @@ extract_and_print project;;
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 (* Project5 : same than the previous one,
-* except that we create the two requests before applying.
-* *)
+ * except that we create the two requests before applying.
+ * *)
 
 (*
 let project = mk_project();;

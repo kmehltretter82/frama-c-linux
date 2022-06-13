@@ -1,7 +1,7 @@
 (* ledit bin/toplevel.top -deps tests/slicing/mark_all_slices.c
-  #use "tests/slicing/select.ml";;
-ou
-  #use "tests/slicing/mark_all_slices.ml";;
+   #use "tests/slicing/select.ml";;
+   ou
+   #use "tests/slicing/mark_all_slices.ml";;
 
 *)
 
@@ -38,7 +38,7 @@ let main _ =
 
   (* select B2 in main_1 : this should create a second slice all_2
    * and its result should be computed even if it is not needed by this request
-   *)
+  *)
   let select = select_data "B2" kf_main in
   Slicing.Api.Request.add_slice_selection_internal ff_main select;
   Slicing.Api.Request.apply_next_internal ();

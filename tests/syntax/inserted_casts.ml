@@ -1,9 +1,9 @@
 include Plugin.Register
-  (struct
-    let name = "test"
-    let shortname = "test"
-    let help = "unitary test of inserted cast hook"
-   end)
+    (struct
+      let name = "test"
+      let shortname = "test"
+      let help = "unitary test of inserted cast hook"
+    end)
 
 let print_warning e ot nt =
   result "Inserting cast for expression %a of type %a to type %a@."

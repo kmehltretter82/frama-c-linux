@@ -66,18 +66,18 @@ let mk_comp_type
     Cil_const.mkCompInfo cstruct (type_name()) mk_fields []
   in
   let kind =
-   match cstruct, nb_fields, kind1, kind2 with
-     | _, 0, _, _ -> Incomplete
-     | _, _, Incomplete, _ -> Incomplete
-     | _, _, FAM_struct, _ -> Incomplete
-     | _, 1, Complete, _ -> Complete
-     | true, 1, FAM_array, _ -> Incomplete
-     | _, _, FAM_array, _ -> Incomplete
-     | _, _, _, Incomplete -> Incomplete
-     | _, _, _, FAM_struct -> Incomplete
-     | true, _, Complete, FAM_array -> FAM_struct
-     | _, _, _, FAM_array -> Incomplete
-     | _, _, Complete, Complete -> Complete
+    match cstruct, nb_fields, kind1, kind2 with
+    | _, 0, _, _ -> Incomplete
+    | _, _, Incomplete, _ -> Incomplete
+    | _, _, FAM_struct, _ -> Incomplete
+    | _, 1, Complete, _ -> Complete
+    | true, 1, FAM_array, _ -> Incomplete
+    | _, _, FAM_array, _ -> Incomplete
+    | _, _, _, Incomplete -> Incomplete
+    | _, _, _, FAM_struct -> Incomplete
+    | true, _, Complete, FAM_array -> FAM_struct
+    | _, _, _, FAM_array -> Incomplete
+    | _, _, Complete, Complete -> Complete
   in
   let types =
     match nb_fields with

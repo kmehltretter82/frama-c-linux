@@ -13,7 +13,7 @@ let pretty_status fmt = function
     Format.fprintf fmt "%a (hyps: %t)"
       Property_status.Emitted_status.pretty s
       (fun fmt ->
-        Pretty_utils.pp_list Property.pretty fmt e.Property_status.properties)
+         Pretty_utils.pp_list Property.pretty fmt e.Property_status.properties)
   | Property_status.Never_tried ->
     Format.fprintf fmt "no try"
   | Property_status.Inconsistent _
@@ -23,9 +23,9 @@ let report msg l =
   P.feedback msg;
   List.iter
     (fun (_, _, p) ->
-      P.feedback "%a: %a"
-        Property.pretty p
-        pretty_status (Property_status.get p))
+       P.feedback "%a: %a"
+         Property.pretty p
+         pretty_status (Property_status.get p))
     l
 
 let main () =
@@ -39,12 +39,12 @@ let main () =
     Annotations.fold_all_code_annot
       ~sorted:true
       (fun stmt _ ca (even, acc) ->
-        let ppt = Property.ip_of_code_annot_single kf stmt ca in
-        (if even then Property_status.(emit emitter ~hyps:[] ppt Dont_know)
-         else
+         let ppt = Property.ip_of_code_annot_single kf stmt ca in
+         (if even then Property_status.(emit emitter ~hyps:[] ppt Dont_know)
+          else
             let hyps = List.map (fun (_, _, ppt) -> ppt) acc in
             Property_status.(emit emitter ~hyps ppt Dont_know));
-        not even, (ca, stmt, ppt) :: acc)
+         not even, (ca, stmt, ppt) :: acc)
       (true, [])
   in
   let l = List.rev l in

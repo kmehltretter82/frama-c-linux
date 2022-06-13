@@ -26,7 +26,7 @@ let main () =
   let _b =  B.ty in
   let _s = Dynamic.get ~plugin:"AA" "mk" (Datatype.func Datatype.unit a) () in
   (* is now statically checked and no more dynamically *)
-(*  Dynamic.get ~plugin:"BB" "print" (Datatype.func b Datatype.unit) s;*)
+  (*  Dynamic.get ~plugin:"BB" "print" (Datatype.func b Datatype.unit) s;*)
   ()
 
 

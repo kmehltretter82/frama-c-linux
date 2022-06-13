@@ -22,10 +22,10 @@ let reparse v s =
             let v' = Z.of_string ("0x" ^ remains) in
             4 * (String.length remains), v'
           end else begin
-           let remains = String.sub s idx (String.length s - idx) in
-           let v' = Z.of_string ("0b" ^ remains) in
-           String.length remains, v'
-         end
+            let remains = String.sub s idx (String.length s - idx) in
+            let v' = Z.of_string ("0b" ^ remains) in
+            String.length remains, v'
+          end
         in
         let m = Z.(one lsl len) in
         let m = Z.pred m in

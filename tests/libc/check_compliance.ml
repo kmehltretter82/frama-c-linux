@@ -77,7 +77,7 @@ struct
     fun format json ->
       let table = Hashtbl.create 500 in
       json |> to_assoc |> List.iter (fun (ident, values) ->
-        Hashtbl.replace table ident (convert values format));
+          Hashtbl.replace table ident (convert values format));
       table
 end
 

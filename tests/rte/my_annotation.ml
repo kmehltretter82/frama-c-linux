@@ -7,9 +7,9 @@ let print_status () =
   let _, _, get_signedOv_status = !Db.RteGen.get_signedOv_status () in
   Globals.Functions.iter
     (fun kf ->
-      Kernel.log "kf = %s rte_gen_status = %b\n"
-	(Kernel_function.get_name kf)
-	(get_signedOv_status kf))
+       Kernel.log "kf = %s rte_gen_status = %b\n"
+         (Kernel_function.get_name kf)
+         (get_signedOv_status kf))
 
 let main () =
   Dynamic.Parameter.Bool.set "-rte-mem" true;
@@ -37,15 +37,15 @@ let main () =
   print ();
   print_status ();
 
-(*  Dynamic.Parameter.Bool.set "-rte-all" true;*)
+  (*  Dynamic.Parameter.Bool.set "-rte-all" true;*)
   let one_on_two = ref true in
   Globals.Functions.iter
     (fun kf ->
-      if !one_on_two then begin
-	set_signed kf false;
-	!Db.RteGen.annotate_kf kf
-      end;
-      one_on_two := not !one_on_two);
+       if !one_on_two then begin
+         set_signed kf false;
+         !Db.RteGen.annotate_kf kf
+       end;
+       one_on_two := not !one_on_two);
   print ()  ;
   print_status ()
 

@@ -50,11 +50,11 @@ let inject_range f1 f2 = join (inject f1) (inject f2)
    values. *)
 let interesting_double =
   [-.infinity; -1.2e307; -120.; -1.2e-323; -0.;
-     infinity;  1.3e308;  130.;  1.3e-323; +0.; ]
+   infinity;  1.3e308;  130.;  1.3e-323; +0.; ]
 
 let interesting_float =
   [-.infinity; -2.2e37; -120.; -1.5e-33; -0.;
-     infinity;  2.3e37;  130.;  1.6e-33; +0.; ]
+   infinity;  2.3e37;  130.;  1.6e-33; +0.; ]
 
 let product itvs =
   let l = Extlib.product (fun a b -> (a, b)) itvs itvs in

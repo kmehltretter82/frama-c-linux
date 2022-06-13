@@ -1,11 +1,11 @@
 open Cil_types
 open Cil
 
-class vis prj = 
-object(self)
-  inherit Visitor.frama_c_refresh prj
-  method! vglob_aux g =
-    match g with
+class vis prj =
+  object(self)
+    inherit Visitor.frama_c_refresh prj
+    method! vglob_aux g =
+      match g with
       | GFun (f,loc) ->
         let my_kf = Option.get self#current_kf in
         let f1 = Visitor.visitFramacFunction (self:>Visitor.frama_c_visitor) f
@@ -22,7 +22,7 @@ object(self)
         self#set_current_kf my_kf;
         ChangeTo ([GFun(f1,loc); GFun(f2,loc)])
       | _ -> DoChildren
-end
+  end
 
 let run () =
   let prj =

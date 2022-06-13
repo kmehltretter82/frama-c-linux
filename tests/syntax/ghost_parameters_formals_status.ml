@@ -17,12 +17,12 @@ let run () =
           (Pretty_utils.pp_flowlist ~left:"" ~sep:"" ~right:"" pretty_formal) l
     in
     let vi = Kernel_function.get_vi kf in
-    let formals = Cil.getFormalsDecl vi in    
+    let formals = Cil.getFormalsDecl vi in
     Kernel.feedback "Type of %s is %a.@ %a"
       vi.vname
       Cil_datatype.Typ.pretty vi.vtype
       pretty_formal_list formals
   in
   Globals.Functions.iter print_info
-  
+
 let () = Db.Main.extend run

@@ -7,9 +7,9 @@ let print_status () =
   let  _, _, get_signedOv_status = !Db.RteGen.get_signedOv_status () in
   Globals.Functions.iter
     (fun kf ->
-      Kernel.log "kf = %s rte_gen_status = %b\n"
-	(Kernel_function.get_name kf)
-	(get_signedOv_status kf))
+       Kernel.log "kf = %s rte_gen_status = %b\n"
+         (Kernel_function.get_name kf)
+         (get_signedOv_status kf))
 
 let main () =
   Dynamic.Parameter.Bool.set "-rte-mem" false;

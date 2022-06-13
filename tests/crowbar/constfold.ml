@@ -133,35 +133,35 @@ let gen_cabs typ expr =
      DECDEF(None,([SpecType Tint],[("result", JUSTBASE,[],loc),NO_INIT]),loc);
      false,
      FUNDEF(
-      None,([SpecType Tvoid],("f", PROTO(JUSTBASE,[],[],false),[],loc)),
-      { blabels = [];
-        battrs = [];
-        bstmts = [
-          { stmt_ghost = false;
-            stmt_node =
-              DEFINITION(
-                DECDEF(
-                  None,
-                  ([SpecType typ], [("x",JUSTBASE,[],loc),SINGLE_INIT expr]),
-                  loc))};
-          { stmt_ghost = false;
-            stmt_node =
-              COMPUTATION(
-                mk_exp(
-                  BINARY(
-                    ASSIGN,
-                    mk_exp (VARIABLE "result"),
-                    mk_exp (
-                      BINARY(
-                        EQ,
-                        mk_exp (VARIABLE "x"),
-                        mk_exp(
-                          INDEX(
-                            mk_exp (VARIABLE "a"),
-                            mk_exp (CONSTANT (CONST_INT "0")))))))), loc)}
-          ]
-      },
-    loc,loc)])
+       None,([SpecType Tvoid],("f", PROTO(JUSTBASE,[],[],false),[],loc)),
+       { blabels = [];
+         battrs = [];
+         bstmts = [
+           { stmt_ghost = false;
+             stmt_node =
+               DEFINITION(
+                 DECDEF(
+                   None,
+                   ([SpecType typ], [("x",JUSTBASE,[],loc),SINGLE_INIT expr]),
+                   loc))};
+           { stmt_ghost = false;
+             stmt_node =
+               COMPUTATION(
+                 mk_exp(
+                   BINARY(
+                     ASSIGN,
+                     mk_exp (VARIABLE "result"),
+                     mk_exp (
+                       BINARY(
+                         EQ,
+                         mk_exp (VARIABLE "x"),
+                         mk_exp(
+                           INDEX(
+                             mk_exp (VARIABLE "a"),
+                             mk_exp (CONSTANT (CONST_INT "0")))))))), loc)}
+         ]
+       },
+       loc,loc)])
 
 let () = Kernel.AutoLoadPlugins.off()
 

@@ -5,7 +5,7 @@ module StateA =
       let name = "Project.Test.StateA"
       let dependencies = []
       let default () = 0
-     end)
+    end)
 
 module StateABis =
   State_builder.Option_ref
@@ -13,7 +13,7 @@ module StateABis =
     (struct
       let name = "Project.Test.StateABis"
       let dependencies = []
-     end)
+    end)
 
 let () = StateA.set 5
 let () = StateABis.set 10

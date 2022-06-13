@@ -1,12 +1,12 @@
 open Cil_types
 
-let find () = 
+let find () =
   let module M = struct exception Found of typeinfo end in
   try
     List.iter
       (function
         | GType (ty,_) ->
-            if ty.tname = "T" then raise (M.Found ty)
+          if ty.tname = "T" then raise (M.Found ty)
         | _ -> ())
       (Ast.get ()).globals;
     Kernel.fatal "No typedef for T: test is broken"
@@ -21,7 +21,7 @@ let print_models typ =
 let e = Emitter.create "test" [Emitter.Global_annot] ~correctness:[] ~tuning:[]
 
 let add_model ty =
-  let m = 
+  let m =
     { mi_name = "test_field";
       mi_attr = [];
       mi_field_type = Linteger;

@@ -5,6 +5,6 @@ module StateA =
       let name = "Project.Test.StateA"
       let dependencies = []
       let default () = 0
-     end)
+    end)
 
 let () = StateA.set 10

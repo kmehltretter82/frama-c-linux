@@ -42,9 +42,9 @@ module A : sig end = struct
     Dynamic.register ~plugin:"A" "h"
       (Datatype.func t (Datatype.func u Datatype.bool))
       (fun x y ->
-	 match x with A x ->
-	   Format.printf "params = %d %f@." x y;
-	   x = int_of_float y | B _ -> false)
+         match x with A x ->
+           Format.printf "params = %d %f@." x y;
+           x = int_of_float y | B _ -> false)
   let _ =
     Dynamic.register ~plugin:"A" "succ"
       (Datatype.func Datatype.int Datatype.int) succ
@@ -104,28 +104,28 @@ module B = struct
   let ho =
     Dynamic.get ~plugin:"A" "ho"
       (Datatype.func
-	 (Datatype.func Datatype.int Datatype.int) (Datatype.func ty ty'))
+         (Datatype.func Datatype.int Datatype.int) (Datatype.func ty ty'))
   let ppu = Dynamic.get ~plugin:"A" "ppu" (Datatype.func ty' Datatype.unit)
   let res =
     ho (Dynamic.get ~plugin:"A" "succ"
-	  (Datatype.func Datatype.int Datatype.int)) v2
+          (Datatype.func Datatype.int Datatype.int)) v2
   let () = Format.printf "print:@."; ppu res
   let ho_bug =
     try
       ignore
-	(Dynamic.get ~plugin:"A" "ho"
-	   (Datatype.func
-	      (Datatype.func ty Datatype.int) (Datatype.func ty ty')) f v2);
+        (Dynamic.get ~plugin:"A" "ho"
+           (Datatype.func
+              (Datatype.func ty Datatype.int) (Datatype.func ty ty')) f v2);
       assert false
     with Dynamic.Incompatible_type s ->
       print_endline s
   (*  let () = (* is now statically checked and no more dynamically *)
-    try
+      try
       List.iter
-	(Dynamic.get ~plugin:"A" "ppu" (Datatype.func ty' Datatype.unit))
-	(Dynamic.get ~plugin:"A" "poly" (Datatype.list ty'));
+      (Dynamic.get ~plugin:"A" "ppu" (Datatype.func ty' Datatype.unit))
+      (Dynamic.get ~plugin:"A" "poly" (Datatype.list ty'));
       assert false
-    with Dynamic.Incompatible_type s ->
+      with Dynamic.Incompatible_type s ->
       print_endline s*)
   let () =
     List.iter

@@ -1,21 +1,21 @@
-let emitter = 
+let emitter =
   Emitter.create
-    "Test" 
-    [ Emitter.Property_status ] 
-    ~correctness:[ Kernel.LibEntry.parameter ] 
+    "Test"
+    [ Emitter.Property_status ]
+    ~correctness:[ Kernel.LibEntry.parameter ]
     ~tuning:[ Kernel.SafeArrays.parameter ]
 
 let set_status s =
   Annotations.iter_all_code_annot
     (fun stmt _ ca ->
-      let kf = Kernel_function.find_englobing_kf stmt in
-      let ps = Property.ip_of_code_annot kf stmt ca in
-      List.iter (fun p -> Property_status.emit emitter p ~hyps:[] s) ps)
+       let kf = Kernel_function.find_englobing_kf stmt in
+       let ps = Property.ip_of_code_annot kf stmt ca in
+       List.iter (fun p -> Property_status.emit emitter p ~hyps:[] s) ps)
 
 let print_status =
   Dynamic.get
     ~plugin:"Report"
-    "print" 
+    "print"
     (Datatype.func Datatype.unit Datatype.unit)
 
 let main () =
@@ -40,7 +40,7 @@ let main () =
   set_status Property_status.False_and_reachable;
   print_status ();
   Kernel.feedback "CHANGING DEFAULT PROJECT TO p";
-  Project.set_current p;  
+  Project.set_current p;
   print_status ();
   Kernel.feedback "SETTING A CORRECTNESS PARAMETER";
   Kernel.LibEntry.on ();

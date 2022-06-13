@@ -13,8 +13,8 @@ let main () =
   debug ~level:0 "debug (level 0)";
   warning "warning";
   (* temporarily disabled to avoid leaking version number in test oracle
-  error "error";
-  failure "failure";*)
+     error "error";
+     failure "failure";*)
   ()
 
 let () = Db.Main.extend main
