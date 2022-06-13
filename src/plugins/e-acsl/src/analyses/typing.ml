@@ -129,9 +129,7 @@ module Memo: sig
     (term -> computed_info) ->
     term ->
     computed_info Error.result
-  val get: profile: Profile.t ->
-    term ->
-    computed_info Error.result
+  val get: profile: Profile.t -> term -> computed_info Error.result
   val clear: unit -> unit
 end = struct
 
@@ -427,11 +425,7 @@ let rec type_term
         (match ctx with
          |None -> true
          | Some c -> Number_ty.compare c c_int >= 0);
-      let i1 = Interval.get_from_profile ~profile t1 in
-      let i2 = Interval.get_from_profile ~profile t2 in
-      let ctx =
-        mk_ctx ~use_gmp_opt:true (ty_of_interv ?ctx (Interval.join i1 i2))
-      in
+      let ctx = ctx_relation ~profile t1 t2 in
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t1);
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t2);
       let ty = match ctx with
@@ -706,13 +700,23 @@ and type_term_offset ~profile t = match t with
     ignore (type_term ~use_gmp_opt:false ~ctx ~profile t);
     type_term_offset ~profile toff
 
+(* assign a number type to a variable bound by a quantifiers. See [ctx_relation]
+   for an explanation of the cases *)
 and number_ty_bound_variable ~profile (t1, lv, t2) =
   let i1 = Interval.get_from_profile ~profile t1 in
   let i2 = Interval.get_from_profile ~profile t2 in
   let i = Interval.(widen (join i1 i2)) in
   match lv.lv_type with
   | Linteger ->
-    mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz i)
+    (match t2.term_type with
+     | Ctype (TInt (ik, _) as typ) when
+         Interval.is_included i (Interval.interv_of_typ typ)
+       -> mk_ctx ~use_gmp_opt:true (C_integer ik)
+     | _ -> (match t2.term_node with
+         | TLogic_coerce(_, {term_type = Ctype (TInt (ik, _) as typ)}) when
+             Interval.is_included i (Interval.interv_of_typ typ)
+           -> mk_ctx ~use_gmp_opt:true (C_integer ik)
+         | _ -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz i)))
   | Ctype ty ->
     (match Cil.unrollType ty with
      | TInt(ik, _) | TEnum({ ekind = ik}, _)-> join
@@ -764,10 +768,7 @@ and type_predicate ~profile p =
       c_int
     | Pdangling _ -> Error.not_yet "\\dangling"
     | Prel(_, t1, t2) ->
-      let i1 = Interval.get_from_profile ~profile t1 in
-      let i2 = Interval.get_from_profile ~profile t2 in
-      let i = Interval.join i1 i2 in
-      let ctx = mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:c_int i) in
+      let ctx = ctx_relation ~profile t1 t2 in
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t1);
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t2);
       (match ctx with
@@ -827,6 +828,36 @@ and type_predicate ~profile p =
     | Pfresh _ -> Error.not_yet "\\fresh"
   in
   coerce ~arith_operand:false ~ctx:c_int ~op c_int
+
+(** When typing a binary relation, generate the context in which the relation
+    should be typed, to avoid spurious casts:
+    - Compute the union of the interval of the two terms
+    - Check if any of the term has a number C type that contains this union,
+      and if so use this C type
+    - Otherwise use the type corresponding to the union *)
+and ctx_relation ~profile t1 t2 =
+  let i1 = Interval.get_from_profile ~profile t1 in
+  let i2 = Interval.get_from_profile ~profile t2 in
+  let i = Interval.join i1 i2 in
+  match t1.term_type with
+  | Ctype (TInt (ik, _) as typ) when
+      Interval.is_included i (Interval.interv_of_typ typ)
+    -> mk_ctx ~use_gmp_opt:true (C_integer ik)
+  | _ ->
+    match t2.term_type with
+    | Ctype (TInt (ik, _) as typ) when
+        Interval.is_included i (Interval.interv_of_typ typ)
+      -> mk_ctx ~use_gmp_opt:true (C_integer ik)
+    | _ -> match t1.term_node with
+      | TLogic_coerce(_, {term_type = Ctype (TInt (ik, _) as typ)}) when
+          Interval.is_included i (Interval.interv_of_typ typ)
+        -> mk_ctx ~use_gmp_opt:true (C_integer ik)
+      | _ -> match t2.term_node with
+        | TLogic_coerce(_, {term_type = Ctype (TInt (ik, _) as typ)}) when
+            Interval.is_included i (Interval.interv_of_typ typ)
+          -> mk_ctx ~use_gmp_opt:true (C_integer ik)
+        | _ -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:c_int i)
+
 
 let type_term ~use_gmp_opt ?ctx ~profile t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
