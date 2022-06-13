@@ -22,11 +22,9 @@
 
 [@@@ api_start]
 
-(** Eva's result API is a work-in-progress interface to allow accessing the
-    analysis results once its completed. It is experimental and is very likely
-    to change in the future. It aims at replacing [Db.Value] but does not
-    completely covers all its usages yet. As for now, this interface has some
-    advantages over Db's :
+(** Eva's result API is a new interface to access the results of an analysis,
+    once it is completed. It may slightly change in the future. It aims at
+    replacing most uses of [Db.Value], and has some advantages over Db's :
 
     - evaluations uses every available domains and not only Cvalue;
     - the caller may distinguish failure cases when a request is unsucessful;
