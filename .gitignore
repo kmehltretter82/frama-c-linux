@@ -61,8 +61,8 @@ autom4te.cache
 /tests/crowbar/test_ghost_cfg
 /tests/*/*.opt
 
-/devel_tools/fc-time
-/devel_tools/fc-memuse
+/dev/fc-time
+/dev/fc-memuse
 /bin/ocamldep_transitive_closure
 
 #share

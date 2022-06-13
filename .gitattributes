@@ -166,13 +166,13 @@ README* header_spec=.ignore
 
 /bin/sed_get_* header_spec=.ignore
 
-/devel_tools/docker/*.template header_spec=.ignore
+/dev/docker/*.template header_spec=.ignore
 
 # TODO: header_spec=JCF_LGPL_2_only
-/devel_tools/size.mli header_spec=.ignore
-/devel_tools/size.ml header_spec=.ignore
-/devel_tools/size_states.ml header_spec=.ignore
-/devel_tools/size_states.mli header_spec=.ignore
+/dev/size.mli header_spec=.ignore
+/dev/size.ml header_spec=.ignore
+/dev/size_states.ml header_spec=.ignore
+/dev/size_states.mli header_spec=.ignore
 
 /doc/CC-BY-SA-4.0 header_spec=.ignore
 /doc/CHANGES.obfuscator header_spec=.ignore
@@ -337,7 +337,7 @@ README* header_spec=.ignore
 /bin/frama-c* header_spec=CEA_LGPL
 
 /doc/code/*.txt header_spec=CEA_LGPL
-/devel_tools/git-hooks/pre-commit header_spec=CEA_LGPL
+/dev/git-hooks/pre-commit header_spec=CEA_LGPL
 
 /headers/headache_config.txt header_spec=CEA_LGPL
 /headers/*.sh header_spec=CEA_LGPL_OR_PROPRIETARY
