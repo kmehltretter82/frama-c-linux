@@ -2,6 +2,7 @@
 # MERGE: union #
 ################
 
+.git-blame-ignore-revs merge=union
 Changelog merge=union
 
 ###############
