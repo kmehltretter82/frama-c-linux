@@ -15,8 +15,11 @@ let
     mk_tests = oself.callPackage ./mk_tests.nix {};
     mk_plugin = oself.callPackage ./mk_plugin.nix {};
 
-    # Shell containing checkers (hdrck, ocp-indent)
+    # Shells containing checkers (hdrck, ocp-indent, Frama-C for plugins)
     frama-c-checkers-shell = oself.callPackage ./frama-c-checkers-shell.nix {
+      git = pkgs.git ;
+    };
+    plugin-checkers-shell = oself.callPackage ./plugin-checkers-shell.nix {
       git = pkgs.git ;
     };
 
