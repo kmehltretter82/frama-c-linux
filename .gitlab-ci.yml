@@ -46,10 +46,12 @@ frama-c:
 
 header-check:
   stage: build
+  variables:
+    FRAMAC_HDRCK: ""
   script:
     - ls -la
-    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
-        --run 'FRAMAC_HDRCK="" make -f share/Makefile.headers check-headers'
+    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.frama-c-checkers-shell
+        --run 'make -f share/Makefile.headers check-headers'
   tags:
     - nix
 
@@ -69,9 +71,11 @@ header-check:
 
 lint:
   stage: build
+  variables:
+    LINT_MAKEFILE: "share/Makefile.linting"
   script:
     - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
-        --run 'LINT_MAKEFILE=share/Makefile.linting make -f share/Makefile.linting lint'
+        --run 'make -f share/Makefile.linting lint'
   tags:
     - nix
 
