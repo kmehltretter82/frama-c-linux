@@ -50,7 +50,7 @@ header-check:
     FRAMAC_HDRCK: ""
   script:
     - ls -la
-    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_4_12.frama-c-checkers-shell
+    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
         --run 'make -f share/Makefile.headers check-headers'
   tags:
     - nix
