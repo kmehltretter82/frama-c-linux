@@ -2,6 +2,7 @@
 # MERGE: union #
 ################
 
+.git-blame-ignore-revs merge=union
 Changelog merge=union
 
 ###############
@@ -13,6 +14,17 @@ Changelog merge=union
 *.ps binary
 
 *.pdf binary
+
+##################################
+# CHECK-SYNTAX/INDENT: set/unset #
+##################################
+
+# SET
+*.ml check-syntax check-indent
+*.mli check-syntax check-indent
+
+# UNSET
+/doc/**/*.ml* -check-syntax -check-indent
 
 #########################
 # HEADER_SPEC: CEA_LGPL #

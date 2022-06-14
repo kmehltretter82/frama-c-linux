@@ -25,11 +25,11 @@
 (* -------------------------------------------------------------------------- *)
 
 module Self = Plugin.Register
-  (struct
-    let name = "Server TypeScript API"
-    let shortname = "server-tsc"
-    let help = "Generate TypeScript API for Server"
-  end)
+    (struct
+      let name = "Server TypeScript API"
+      let shortname = "server-tsc"
+      let help = "Generate TypeScript API for Server"
+    end)
 
 module TSC = Self.Action
     (struct
@@ -353,7 +353,7 @@ let makeDeclaration fmt names d =
       (Pretty_utils.pp_list
          ~empty:"[]" ~pre:"@[<hov 2>[ " ~sep:",@ " ~suf:"@ ]@]"
          (fun fmt s -> Format.fprintf fmt "{ name: '%s' }" s))
-         rq.rq_signals;
+      rq.rq_signals;
     Format.fprintf fmt "};@\n" ;
     makeDescr fmt d.d_descr ;
     Format.fprintf fmt

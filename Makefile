@@ -122,7 +122,7 @@ config.sed: VERSION share/Makefile.config share/Makefile.common Makefile configu
 	@echo "s/@FLOAT_MAX_FLOAT@/$(FLOAT_MAX_FLOAT)/g" >> $@
 	@echo "s/@FORMAT_PP_OPT@/$(FORMAT_PP_OPT)/g" >> $@
 
-clean: purge-tests
+clean:: purge-tests # to be done before a "dune" command
 	dune clean
 	dune clean --root ptests
 	rm -rf _build .merlin config.sed

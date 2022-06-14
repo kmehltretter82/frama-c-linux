@@ -24,100 +24,30 @@
 # Code prettyfication and lint #
 ################################
 
-# We're interested by any .ml[i]? file in src, except for scripts in test
-# directories, and generated files (in particular lexers and parsers)
-# Note: the find command below is *very* ugly, but it should be POSIX-compliant.
+SED?=sed
+ISED?=sed -i
 
-ALL_ML_FILES:=$(shell find src -name '*.ml' -print -o -name '*.mli' -print -o -path '*/tests' -prune '!' -name '*')
-ALL_ML_FILES+=ptests/ptests.ml ptests/wtests.ml
+############
 
-ifeq ($(origin MANUAL_ML_FILES),undefined)
-MANUAL_ML_FILES:=$(ALL_ML_FILES)
-endif
+# Can be set to the path of that makefile
+LINT_MAKEFILE ?=
 
-MANUAL_ML_FILES:=\
-  $(filter-out $(GENERATED) $(PLUGIN_GENERATED_LIST), $(MANUAL_ML_FILES))
+################################
 
-# Allow control of files to be linted/fixed by external sources
-# (e.g. pre-commit hook that will concentrate on files which have changed)
+LINT.makefile=$(wildcard $(LINT_MAKEFILE))
+ifeq ($(LINT.makefile),)
 
-sinclude .Makefile.lint
-
-HAS_GIT_FILE:=$(wildcard .git/HEAD)
-
-ifeq ("$(HAS_GIT_FILE)","")
-LINT_OTHER_SOURCES:=
+LINT.make?=$(MAKE) --quiet
 else
-LINT_OTHER_SOURCES:=\
-  $(filter-out \
-    $(shell git ls-tree --name-only HEAD src/plugins/*), \
-    $(wildcard src/plugins/*))
+
+LINT.make?=$(MAKE) --quiet -f $(LINT.makefile)
 endif
 
-$(foreach dir,$(LINT_OTHER_SOURCES),$(eval sinclude $(dir)/.Makefile.lint))
 
-ML_LINT_MISSING:=$(filter-out $(MANUAL_ML_FILES), $(ML_LINT_KO))
+################################
+## CHECK ocp-indent VERSION
 
-# By default, also checks files with unknown status:
-# this requires new files to pass lint checker from the beginning
-
-ML_LINT_CHECK?=$(filter-out $(ML_LINT_KO), $(MANUAL_ML_FILES))
-
-# this NEWLINE variable containing a literal newline character is used to avoid
-# the error "argument list too long", in some instances of "foreach".
-# For details, see https://stackoverflow.com/questions/7039811
-define NEWLINE
-
-
-endef
-
-# pre-requisite intentionally left blank: this target should only be used
-# if the file is not present to generate it once and forall,
-# and be edited manually afterwards
-# double colon here tells make not to attempt updating the .Makefile.lint
-# if it does not exist, but just to ignore it.
-.Makefile.lint::
-	echo "ML_LINT_KO:=" >> $@
-	$(foreach file,$(sort $(MANUAL_ML_FILES)), \
-            if ! $(MAKE) ML_LINT_CHECK=$(file) lint; \
-            then echo "ML_LINT_KO+=$(file)" >> $@; fi;$(NEWLINE) )
-
-$(foreach dir,$(LINT_OTHER_SOURCES),\
-  $(eval $(dir)/.Makefile.lint:: ; \
-     $(foreach file, $(sort $(filter $(dir)/%, $(MANUAL_ML_FILES))), \
-            if ! $$(MAKE) ML_LINT_CHECK=$(file) lint; \
-            then echo "ML_LINT_KO+=$(file)" >> $$@; fi; )))
-
-.PHONY: stats-lint
-stats-lint:
-	echo \
-         "scale = 2; bad = $(words $(ML_LINT_MISSING)); \
-          all = $(words $(sort $(MANUAL_ML_FILES))); \
-	  fail = $(words $(ML_LINT_KO)); \
-          \"lint coverage: \"; \
-          ((all - fail) * 100) / all; " | bc
-	echo "number of files supposed to pass lint: $(words $(ML_LINT_CHECK))"
-	echo "number of files supposed to fail lint: $(words $(ML_LINT_KO))"
-ifneq ($(strip $(ML_LINT_MISSING)),)
-	echo "number of files missing from src/ : $(words $(ML_LINT_MISSING))"
-	$(foreach file, $(ML_LINT_MISSING), echo $(file);)
-	exit 1
-endif
-
-INDENT_TARGET= $(patsubst %,%.indent,$(ML_LINT_CHECK))
-
-LINT_TARGET= $(patsubst %,%.lint,$(ML_LINT_CHECK))
-
-FIX_SYNTAX_TARGET=$(patsubst %,%.fix-syntax,$(ML_LINT_CHECK))
-
-.PHONY: $(INDENT_TARGET) $(LINT_TARGET) $(FIX_SYNTAX_TARGET) \
-        indent lint fix-syntax
-
-indent: $(INDENT_TARGET)
-
-lint:: $(LINT_TARGET)
-
-check-ocp-indent-version:
+.lint/check-ocp-indent-version:
 	if command -v ocp-indent >/dev/null; then \
 		if [ -z "$(shell ocp-indent --version)" ]; then echo "warning: ocp-indent returned an empty string, assuming it is the correct version"; \
 		else \
@@ -131,18 +61,106 @@ check-ocp-indent-version:
 	else \
 		exit 1; \
 	fi;
+	mkdir -p $(dir $@)
+	touch $@
 
-fix-syntax: $(FIX_SYNTAX_TARGET)
+###############
+## Main target
 
-$(INDENT_TARGET): %.indent: % check-ocp-indent-version
+LINT.HAS_GIT:=$(wildcard .git)
+ifeq ($(LINT.HAS_GIT),)
+
+.PHONY:
+lint:
+	echo "'make lint' requires git"
+	echo "but,that is not the case of 'make LINT_FILE=<file> check-syntax'"
+
+else
+
+.PHONY:
+lint:
+	git ls-files -z | git check-attr --stdin -z check-syntax \
+        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
+        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" check-syntax || exit 255'
+	git ls-files -z | git check-attr --stdin -z check-indent \
+        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
+        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" check-indent || exit 255'
+
+endif
+
+###############################
+## Cleaning
+
+# Targets are generated into .lint/ directories
+
+.PHONY: clean-lint
+clean-lint:
+	echo "Cleaning LINT targets..."
+	rm -rf .lint
+
+clean:: clean-lint
+
+###############################
+## Internal targets of the recursive make
+
+LINT_FILE.list=$(addprefix .lint/,$(wildcard $(LINT_FILE)))
+
+LINT_FILE.check-syntax= $(addsuffix .check-syntax,$(LINT_FILE.list))
+LINT_FILE.check-indent= $(addsuffix .check-indent,$(LINT_FILE.list))
+
+LINT_FILE.fix-syntax= $(addsuffix .fix-syntax,$(LINT_FILE.list))
+LINT_FILE.fix-indent= $(addsuffix .fix-indent,$(LINT_FILE.list))
+
+###############################
+
+.PHONY: check-syntax
+check-syntax: $(LINT_FILE.check-syntax)
+
+.PHONY: check-syntax 
+check-syntax: $(LINT_FILE.check-syntax)
+
+.PHONY: fix-syntax
+fix-syntax: $(LINT_FILE.fix-syntax)
+
+.PHONY: check-indent
+check-indent: $(LINT_FILE.check-indent)
+
+.PHONY: fix-indent
+fix-indent: $(LINT_FILE.fix-indent)
+
+###############################
+## INDENTATION ASPECT
+
+$(LINT_FILE.check-indent): .lint/%.check-indent: % .lint/check-ocp-indent-version
+	echo "Check indent: $<"
+	ocp-indent $< > $<.tmp
+	if cmp -s $< $<.tmp; \
+        then rm -f $<.tmp; \
+        else \
+          echo "File $< is not indented correctly."; \
+          echo "Please run: make LINT_FILE=$< fix-indent";\
+          rm $<.tmp; \
+          exit 1; \
+        fi
+	mkdir -p $(dir $@)
+	touch $@
+
+$(LINT_FILE.fix-indent): .lint/%.fix-indent: % .lint/check-ocp-indent-version
+	echo "Fixes indent: $<"
 	ocp-indent -i $<
+	mkdir -p $(dir $@)
+	touch .lint/$<.check-indent # no more need of check-indent
 
-$(LINT_TARGET): %.lint: % check-ocp-indent-version
+###############################
+## SYNTACTICAL ASPECT
+
+$(LINT_FILE.check-syntax): .lint/%.check-syntax: %
 	# See SO 1825552 on mixing grep and \t (and cry)
 	# For OK_NL, we have three cases:
 	# - for empty files, the computation boils down to 0 - 0 == 0
 	# - for non-empty files with a proper \n at the end, to 1 - 1 == 0
 	# - for empty files without \n, to 1 - 0 == 1 that will be catched
+	echo "Check syntax: $<"
 	OK_TAB=$$(grep -c -e "$$(printf '^ *\t')" $<) ; \
         OK_SPACE=$$(grep -c -e '[[:blank:]]$$' $<) ; \
         OK_NL=$$(($$(tail -c -1 $< | wc -c) - $$(tail -n -1 $< | wc -l))) ; \
@@ -154,20 +172,14 @@ $(LINT_TARGET): %.lint: % check-ocp-indent-version
           echo "$$OK_SPACE lines with spaces at end of line"; \
           test $$OK_NL -eq 0 || echo "No newline at end of file"; \
           test $$OK_EMPTY -eq 0 || echo "Empty line(s) at end of file"; \
-          echo "Please run make ML_LINT_CHECK=$< fix-syntax"; \
+          echo "Please run: make LINT_FILE=$< fix-syntax"; \
           exit 1 ; \
         fi
-	ocp-indent $< > $<.tmp;
-	if cmp -s $< $<.tmp; \
-        then rm -f $<.tmp; \
-        else \
-          echo "File $< is not indented correctly."; \
-          echo "Please run make ML_LINT_CHECK=$< indent";\
-          rm $<.tmp; \
-          exit 1; \
-        fi
+	mkdir -p $(dir $@)
+	touch $@
 
-$(FIX_SYNTAX_TARGET): %.fix-syntax: %
+$(LINT_FILE.fix-syntax): .lint/%.fix-syntax: %
+	echo "Fixes syntax: $<"
 	$(ISED) -e 's/^ *\t\+/ /' $<
 	$(ISED) -e 's/\(.*[^[:blank:]]\)[[:blank:]]\+$$/\1/' $<
 	$(ISED) -e 's/^[ \t]\+$$//' $<
@@ -179,11 +191,25 @@ $(FIX_SYNTAX_TARGET): %.fix-syntax: %
             mv $<.tmp $<; \
           done; \
         fi
+	mkdir -p $(dir $@)
+	touch .lint/$<.check-syntax # no more need of check-syntax
 
 # Avoid a UTF-8 locale at all cost: in such setting, sed does not work
 # reliably if you happen to have latin-1 encoding somewhere,
 # which is still unfortunately the case in some dark corners of the platform
 %.fix-syntax: LC_ALL = C
+
+###############################
+## Info
+
+lint.info:
+	echo "LINT.HAS_GIT='$(LINT.HAS_GIT)'"
+	echo "LINT.make='$(LINT.make)'"
+	echo "LINT_FILE.list='$(LINT_FILE.list)'"
+	echo "LINT_FILE.check-syntax='$(LINT_FILE.check-syntax)'"
+	echo "LINT_FILE.check-indent='$(LINT_FILE.check-indent)'"
+	echo "LINT_FILE.fix-syntax='$(LINT_FILE.fix-syntax)'"
+	echo "LINT_FILE.fix-indent='$(LINT_FILE.fix-indent)'"
 
 ###############################################################################
 # Local Variables:
