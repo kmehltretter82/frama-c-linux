@@ -10,21 +10,30 @@ Changelog merge=union
 ###############
 # built-in macro that also unsets the "text" and "diff" attributes
 
-*.eps binary
-*.ps binary
+*.ico binary -check-eoleof
 
-*.pdf binary
+*.eps binary -check-eoleof
+*.ps  binary -check-eoleof
+*.gif binary -check-eoleof
+*.jpg binary -check-eoleof
+*.png binary -check-eoleof
+*.svg binary -check-eoleof
 
-##################################
-# CHECK-SYNTAX/INDENT: set/unset #
-##################################
+*.odg binary -check-eoleof
+*.pdf binary -check-eoleof
 
-# SET
-*.ml check-syntax check-indent
-*.mli check-syntax check-indent
+*.eot binary -check-eoleof
+*.woff binary -check-eoleof
 
-# UNSET
-/doc/**/*.ml* -check-syntax -check-indent
+###########################################
+# CHECK-SYNTAX/INDENT/EOL-EOF: set/-unset #
+###########################################
+
+*.ml  check-syntax check-indent -check-eoleof
+*.mli check-syntax check-indent -check-eoleof
+
+/doc/developer/check_api/run.oracle -check-eoleof
+/ivette/**/*.icns -check-eoleof
 
 #########################
 # HEADER_SPEC: CEA_LGPL #

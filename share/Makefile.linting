@@ -77,14 +77,7 @@ lint:
 
 else
 
-.PHONY:
-lint:
-	git ls-files -z | git check-attr --stdin -z check-syntax \
-        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
-        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" check-syntax || exit 255'
-	git ls-files -z | git check-attr --stdin -z check-indent \
-        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
-        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" check-indent || exit 255'
+lint: check-eoleof check-syntax check-eoleof
 
 endif
 
@@ -101,32 +94,69 @@ clean-lint:
 clean:: clean-lint
 
 ###############################
-## Internal targets of the recursive make
+
+ifeq ($(LINT_FILE),)
+
+# No lint file given
+
+.PHONY: check-eoleof
+check-eoleof:
+	git ls-files -z \
+        | git check-attr --stdin -z check-eoleof \
+        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
+        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" check-eoleof || exit 255'
+
+.PHONY: check-syntax
+check-syntax:
+	git ls-files -z  \
+        | git check-attr --stdin -z check-syntax \
+        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
+        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" check-syntax || exit 255'
+
+.PHONY: check-indent
+check-indent:
+	git ls-files -z  \
+        | git check-attr --stdin -z check-indent \
+        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
+        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" check-indent || exit 255'
+
+else # LINT_FILE are given
+
+## Internal targets from the recursive make
 
 LINT_FILE.list=$(addprefix .lint/,$(wildcard $(LINT_FILE)))
 
+LINT_FILE.check-eoleof= $(addsuffix .check-eoleof,$(LINT_FILE.list))
 LINT_FILE.check-syntax= $(addsuffix .check-syntax,$(LINT_FILE.list))
 LINT_FILE.check-indent= $(addsuffix .check-indent,$(LINT_FILE.list))
 
+LINT_FILE.fix-eoleof= $(addsuffix .fix-eoleof,$(LINT_FILE.list))
 LINT_FILE.fix-syntax= $(addsuffix .fix-syntax,$(LINT_FILE.list))
 LINT_FILE.fix-indent= $(addsuffix .fix-indent,$(LINT_FILE.list))
 
-###############################
+## check-XXX targets
+
+.PHONY: check-eoleof
+check-eoleof: $(LINT_FILE.check-eoleof)
 
 .PHONY: check-syntax
 check-syntax: $(LINT_FILE.check-syntax)
 
-.PHONY: check-syntax 
-check-syntax: $(LINT_FILE.check-syntax)
+.PHONY: check-indent
+check-indent: $(LINT_FILE.check-indent)
+
+## fix-XXX targets
 
 .PHONY: fix-syntax
 fix-syntax: $(LINT_FILE.fix-syntax)
 
-.PHONY: check-indent
-check-indent: $(LINT_FILE.check-indent)
+.PHONY: fix-eoleof
+fix-eoleof: $(LINT_FILE.fix-eoleof)
 
 .PHONY: fix-indent
 fix-indent: $(LINT_FILE.fix-indent)
+
+endif
 
 ###############################
 ## INDENTATION ASPECT
@@ -150,6 +180,34 @@ $(LINT_FILE.fix-indent): .lint/%.fix-indent: % .lint/check-ocp-indent-version
 	ocp-indent -i $<
 	mkdir -p $(dir $@)
 	touch .lint/$<.check-indent # no more need of check-indent
+
+###############################
+## EOL EOF ASPECT (included by check-syntax target)
+
+$(LINT_FILE.check-eoleof): .lint/%.check-eoleof: %
+	# See SO 1825552 on mixing grep and \t (and cry)
+	# For OK_NL, we have three cases:
+	# - for empty files, the computation boils down to 0 - 0 == 0
+	# - for non-empty files with a proper \n at the end, to 1 - 1 == 0
+	# - for empty files without \n, to 1 - 0 == 1 that will be catched
+	echo "Check EOL EOF: $<"
+	OK_NL=$$(($$(tail -c -1 $< | wc -c) - $$(tail -n -1 $< | wc -l))) ; \
+       if test $$OK_NL -gt 0; then \
+          echo "File $< does not pass syntactic checks:"; \
+          echo "No newline at end of file"; \
+          echo "Please run: make LINT_FILE=$< fix-eoleof"; \
+          exit 1 ; \
+        fi
+	mkdir -p $(dir $@)
+	touch $@
+
+$(LINT_FILE.fix-eoleof): .lint/%.fix-eoleof: %
+	echo "Fixes EOL EOF: $<"
+	$(ISED) -e '$$a\' $<
+	mkdir -p $(dir $@)
+	touch .lint/$<.check-eoleof # no more need of this checking
+
+%.fix-eoleof: LC_ALL = C
 
 ###############################
 ## SYNTACTICAL ASPECT
