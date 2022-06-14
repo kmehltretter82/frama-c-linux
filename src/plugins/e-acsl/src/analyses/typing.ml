@@ -423,7 +423,7 @@ let rec type_term
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
       assert
         (match ctx with
-         |None -> true
+         | None -> true
          | Some c -> Number_ty.compare c c_int >= 0);
       let ctx = ctx_relation ~profile t1 t2 in
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t1);
