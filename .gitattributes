@@ -11,6 +11,7 @@ Changelog merge=union
 # built-in macro that also unsets the "text" and "diff" attributes
 
 *.ico binary -check-eoleof
+*.icns binary -check-eoleof
 
 *.eps binary -check-eoleof
 *.ps  binary -check-eoleof
@@ -33,7 +34,6 @@ Changelog merge=union
 *.mli check-syntax check-indent -check-eoleof
 
 /doc/developer/check_api/run.oracle -check-eoleof
-/ivette/**/*.icns -check-eoleof
 
 #########################
 # HEADER_SPEC: CEA_LGPL #

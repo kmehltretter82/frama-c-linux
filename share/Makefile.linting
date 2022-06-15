@@ -77,7 +77,7 @@ lint:
 
 else
 
-lint: check-eoleof check-syntax check-eoleof
+lint: check-eoleof check-syntax check-indent
 
 endif
 
