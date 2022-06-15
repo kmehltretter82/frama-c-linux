@@ -27,10 +27,10 @@ let all_entry_points () =
   (*## Find entry points *)
   Globals.Functions.iter
     (fun kf ->
-      if Kernel_function.is_definition kf &&
-        (Kernel_function.find_syntactic_callsites kf = [])
-      then
-        run (Kernel_function.get_name kf) ());
+       if Kernel_function.is_definition kf &&
+          (Kernel_function.find_syntactic_callsites kf = [])
+       then
+         run (Kernel_function.get_name kf) ());
   Kernel.feedback "Analyzed %d potential entry points" !nb_entry_points
 
 (*# Basic script *)
