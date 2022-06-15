@@ -45,6 +45,10 @@
     "__STDC_ANALYZABLE__"; "__STDC_IEC_559__"; "__STDC_IEC_559_COMPLEX__";
     "__STDC_LIB_EXT1__"; "__STDC_NO_ATOMICS__"; "__STDC_NO_COMPLEX__";
     "__STDC_NO_THREADS__"; "__STDC_NO_VLA__";
+
+    (* from TS 18661-1:2014 (for glibc >=2.35) *)
+    "__STDC_IEC_60559_BFP__"; "__STDC_IEC_60559_COMPLEX__";
+
     (* expanding assert, an ACSL keyword, is not a good idea. *)
     "assert";
     (* __nonnull is predefined by Clang on macOS. *)

@@ -56,7 +56,8 @@ and forbidden_headers = ref []
 and root_dir = ref (Sys.getcwd ())
 and distrib_file = ref None
 and header_except_file = ref None
-and headache_config_file = ref "headers/headache_config.txt"
+and headache_config_file = ref [] (* empty -> headache_config_file_default *)
+and headache_config_file_default = "headers/headache_config.txt"
 and exit_on_warning = ref false
 and exit_on_error = ref true (* only settable to false for debugging purposes *)
 
@@ -135,7 +136,11 @@ let error ~exit_value =
    in the header_spec.txt files.
 *)
 let path_concat p1 p2 =
-  p1 ^ "/" ^ p2
+  (* Note: use String.ends_with when minimum OCaml version is 4.13 *)
+  if String.length p1 > 0 && String.get p1 (String.length p1 - 1) = '/' then
+    p1 ^ p2
+  else
+    p1 ^ "/" ^ p2
 
 (* Temporary directory management (cont.) *)
 let get_tmp_dirname () = match !tmp_dirname with
@@ -385,8 +390,11 @@ let extract_header filename template_hdr =
   debug "%s: %s does not conform to %s@." filename hdr_filename template_hdr;
   let create_file filename = let oc = open_out filename in close_out oc in
   create_file hdr_filename;
+  let config_file_opts = if !headache_config_file = [] then Format.sprintf "-c %s" headache_config_file_default
+    else String.concat "-c " !headache_config_file
+  in
   let cmd = Format.sprintf "headache -c %s -e %s > %s"
-      !headache_config_file filename hdr_filename in
+      config_file_opts filename hdr_filename in
   let ret = Sys.command cmd in
   if ret <> 0 then
     if ret = 255 then
@@ -406,11 +414,12 @@ let extract_header filename template_hdr =
  * @requires all header specifications have a corresponding existing template
 *)
 let check_spec_discrepancies
+    ~config_file_opts
     (specs: (string, string) Hashtbl.t)
     (headers: (string, string) Hashtbl.t) : unit =
   let eq_header orig_file template_hdr =
     let cmd = Format.sprintf "headache -c %s -e %s | diff --strip-trailing-cr -q - %s > /dev/null"
-        !headache_config_file orig_file template_hdr
+        config_file_opts orig_file template_hdr
     in
     let ret = Sys.command cmd in
     if ret = 255 then
@@ -537,16 +546,17 @@ let check files_ignored header_specifications distributed_files exceptions =
  * The headers are simply overwritten.
  * No warning is emitted if the new license is not the same as the old license.
  *
+ * @param ~config_file_opts -> headache options setting the list of config files
  * @param header_specifications file -> license header name hashtable
  * @requires: files and licenses appearing in [header_specifications] exists
 *)
-let update_headers header_specifications =
+let update_headers ~config_file_opts header_specifications =
   let headers = get_header_files () in
   check_declared_headers header_specifications headers;
   let update filename header =
     debug "Updating %s with license %s@." filename header;
     let cmd = Format.sprintf "headache -r -c %s -h %s %s"
-        !headache_config_file header filename in
+        config_file_opts header filename in
     let ret = Sys.command cmd in
     if ret <> 0 then
       if ret = 255 then
@@ -568,10 +578,15 @@ let update_headers header_specifications =
 
 
 let check_headache_config_file () =
-  if not (Sys.file_exists !headache_config_file) then
-    error ~exit_value:5
-      "Headache configuration file %s does not appear to exist@."
-      !headache_config_file
+  let config_files =
+    if !headache_config_file = [] then [ headache_config_file_default ]
+    else !headache_config_file
+  in List.iter (fun file ->
+      if not (Sys.file_exists file) then
+        error ~exit_value:5
+          "Headache configuration file %s does not appear to exist@."
+          file) config_files ;
+  String.concat " -c " config_files
 
 (** Option management (cont.) **)
 
@@ -618,8 +633,8 @@ let rec argspec = [
   "<filename> \t considers only the files listed into the <filename>";
   "-header-except-file", Arg.String (set_opt header_except_file),
   "<filename> \t does not look at the files listed into the <filename>";
-  "-headache-config-file", Arg.Set_string headache_config_file,
-  Format.sprintf "<filename> \t set headache configuration file [%s]" !headache_config_file;
+  "-headache-config-file", Arg.String (fun set -> set_cumulative ~name:"-headache-config-file" headache_config_file ~set),
+  Format.sprintf "<filenames> \t set the list of headache configuration files [%s]" headache_config_file_default;
   "-no-exit-on-error", Arg.Unit (fun () -> exit_on_error := false),
   " does not exit on errors ";
   "-exit-on-warning", Arg.Set exit_on_warning,
@@ -657,7 +672,7 @@ let _ =
     (Format.eprintf "error: 'headache' command not in PATH or incompatible \
                      version (option -e unsupported)@."; exit 6);
   Arg.parse (Arg.align (sort argspec)) (fun s -> spec_files := s::!spec_files) umsg;
-  check_headache_config_file ();
+  let config_file_opts = check_headache_config_file () in
   begin
     match !spec_files, !distrib_file, !header_except_file with
     | [], _, _ when not !from_stdin ->
@@ -682,9 +697,9 @@ let _ =
         let distributed_files = stringset_from_opt_file distrib_file_opt in
         let header_exception_files = stringset_from_opt_file header_except_opt in
         Format.printf "- excepted=%d@.- distributed=%d@." (StringSet.cardinal header_exception_files) (StringSet.cardinal distributed_files);
-        check !ignored_files specified_files distributed_files header_exception_files
+        check ~config_file_opts !ignored_files specified_files distributed_files header_exception_files
       | Update ->
-        update_headers specified_files;
+        update_headers ~config_file_opts specified_files;
   end;
   if !exit_on_warning && not !has_no_warning_nor_error then
     exit 8 ;

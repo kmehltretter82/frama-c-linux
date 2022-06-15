@@ -22,18 +22,18 @@
 module Self =
   Plugin.Register
     (struct
-       let name = "Hello world"
-       let shortname = "hello"
-       let help = "The famous 'Hello world' plugin"
-     end)
+      let name = "Hello world"
+      let shortname = "hello"
+      let help = "The famous 'Hello world' plugin"
+    end)
 
 (** Register the new Frama-C option "-hello". *)
 module Enabled =
   Self.False
     (struct
-       let option_name = "-hello"
-       let help = "pretty print \"Hello world!\""
-     end)
+      let option_name = "-hello"
+      let help = "pretty print \"Hello world!\""
+    end)
 
 let print () = Self.result "Hello world!"
 
@@ -45,7 +45,7 @@ let print () = Self.result "Hello world!"
 let print =
   Dynamic.register
     ~comment:"[Dynamic.get \"Hello.run\" (Datatype.func Datatype.unit \
-Datatype.unit)] calls [run] and pretty prints \"Hello world!\""
+              Datatype.unit)] calls [run] and pretty prints \"Hello world!\""
     ~plugin:"Hello"
     "run"
     (Datatype.func Datatype.unit Datatype.unit)
