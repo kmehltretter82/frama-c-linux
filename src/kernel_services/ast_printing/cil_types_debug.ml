@@ -43,7 +43,7 @@ let print_full_varinfo = false
 let print_full_fundec = false
 let print_full_spec = false
 
-let pp_list fmt = Pretty_utils.pp_list fmt ~sep:", " ~pre:"[" ~last:"]" ~suf:"" ~empty:"[]"
+let pp_list fmt = Pretty_utils.pp_list fmt ~sep:"; " ~pre:"[" ~suf:"]" ~empty:"[]"
 let pp_option fmt = Pretty_utils.pp_opt ~none:"None" ~pre:"Some(" ~suf:")" fmt
 let pp_ref pp fmt r = Format.fprintf fmt "Ref(%a)" pp !r
 let pp_pair fmt1 fmt2 = Pretty_utils.pp_pair ~pre:"(" ~sep:", " ~suf:")" fmt1 fmt2
@@ -350,7 +350,7 @@ and pp_varinfo fmt varinfo =
        vdescrpure=%a;\
        vghost=%a;\
        vsource=%a;\
-       vlogic_var_assoc=%a;\
+       vlogic_var_assoc=%s;\
        }"
       pp_string varinfo.vname
       pp_string varinfo.vorig_name
@@ -370,7 +370,8 @@ and pp_varinfo fmt varinfo =
       pp_bool varinfo.vdescrpure
       pp_bool varinfo.vghost
       pp_bool varinfo.vsource
-      (pp_option pp_logic_var) varinfo.vlogic_var_assoc
+      (* the code below prevents infinite recursion *)
+      (if varinfo.vlogic_var_assoc = None then "None" else "Some " ^ (Option.get varinfo.vlogic_var_assoc).lv_name)
   else
     Format.fprintf fmt "{vname=%a;vid=%a}"
       pp_string varinfo.vname
