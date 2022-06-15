@@ -63,55 +63,55 @@ let merge3
     if c <> 0 then c else
       let c = s2 y' y in
       if c <> 0 then c else
-	s3 z' z
+ s3 z' z
   in
   let rec merge3_rev acc triplets =
     match triplets , acc with
       | [] , _ -> acc
       | (a,b,c)::tail , (dir_a,all_a)::a_merged when a = dir_a ->
-	  begin
-	    match all_a with
-	      | (dir_b,all_b)::b_merged when b = dir_b ->
-		  merge3_rev ((dir_a,(dir_b,c::all_b)::b_merged)::a_merged) tail
-	      | _ ->
-		  merge3_rev ((dir_a,(b,[c])::all_a)::a_merged) tail
-	  end
+   begin
+     match all_a with
+       | (dir_b,all_b)::b_merged when b = dir_b ->
+   merge3_rev ((dir_a,(dir_b,c::all_b)::b_merged)::a_merged) tail
+       | _ ->
+   merge3_rev ((dir_a,(b,[c])::all_a)::a_merged) tail
+   end
       | (a,b,c)::tail , merged ->
-	  merge3_rev (( a , [b,[c]] )::merged) tail
+   merge3_rev (( a , [b,[c]] )::merged) tail
   in
   merge3_rev [] (List.sort (sort3_rev s1 s2 s3) triplets)
 
 module Generator (G:Odoc_html.Html_generator) =
 struct
   class html = object (self)
-      
+
     inherit G.html as super
 
     val mutable memo = []
-      
+
     method private loaded_modules =
       match memo with
       | [] ->
-	let l = List.flatten
-	  (List.map
-	     (fun f ->
-	       Odoc_info.verbose (Odoc_messages.loading f);
-	       try
-		 let l = Odoc_analyse.load_modules f in
-		 Odoc_info.verbose Odoc_messages.ok;
-		 l
-	       with Failure s ->
-		 prerr_endline s ;
-		 incr Odoc_global.errors ;
-		 []
-	     )
-	     !Odoc_global.load
-	  )
-	in
-	memo <- l;
-	l
+ let l = List.flatten
+   (List.map
+      (fun f ->
+        Odoc_info.verbose (Odoc_messages.loading f);
+        try
+  let l = Odoc_analyse.load_modules f in
+  Odoc_info.verbose Odoc_messages.ok;
+  l
+        with Failure s ->
+  prerr_endline s ;
+  incr Odoc_global.errors ;
+  []
+      )
+      !Odoc_global.load
+   )
+ in
+ memo <- l;
+ l
       | (_ :: _) as l -> l
-        
+
     method private path s =
       let name = root_name s in
       if List.exists (fun m -> m = name) !lib_files then
@@ -126,18 +126,18 @@ struct
         let match_s = Str.matched_string str_t in
         let rel = Odoc_info.Name.get_relative m_name match_s in
         let s_final = Odoc_info.apply_if_equal
-	  Odoc_info.use_hidden_modules
-	  match_s
-	  rel
+   Odoc_info.use_hidden_modules
+   match_s
+   rel
         in
         if String.Set.mem match_s known_types_names then
-	  "<a href=\"" ^ self#path match_s ^ Naming.complete_target Naming.mark_type
-	    match_s ^"\">" ^ s_final ^ "</a>"
+   "<a href=\"" ^ self#path match_s ^ Naming.complete_target Naming.mark_type
+     match_s ^"\">" ^ s_final ^ "</a>"
         else
-	  if String.Set.mem match_s known_classes_names then
+   if String.Set.mem match_s known_classes_names then
             let (html_file, _) = Naming.html_files match_s in
             "<a href=\""^ self#path html_file ^ html_file^"\">"^s_final^"</a>"
-	  else
+   else
             s_final
       in
       let s2 = Str.global_substitute
@@ -154,15 +154,15 @@ struct
         let match_s = Str.matched_string str_t in
         let rel = Odoc_info.Name.get_relative m_name match_s in
         let s_final = Odoc_info.apply_if_equal
-	  Odoc_info.use_hidden_modules
-	  match_s
-	  rel
+   Odoc_info.use_hidden_modules
+   match_s
+   rel
         in
         if String.Set.mem match_s known_modules_names then
-	  let (html_file, _) = Naming.html_files match_s in
-	  "<a href=\"" ^ self#path match_s ^ html_file^"\">"^s_final^"</a>"
+   let (html_file, _) = Naming.html_files match_s in
+   "<a href=\"" ^ self#path match_s ^ html_file^"\">"^s_final^"</a>"
         else
-	  s_final
+   s_final
       in
       let s2 = Str.global_substitute
         (Str.regexp "\\([A-Z]\\([a-zA-Z_'0-9]\\)*\\.\\)+\\([A-Z][a-zA-Z_'0-9]*\\)")
@@ -175,10 +175,10 @@ struct
     method html_of_Module_list b l =
       let dir f = (* <dir> , <name> *)
         let chop dir f =
-	  let n = Str.search_forward (Str.regexp dir) f 0 in
-	  let f = String.sub f n (String.length f - n) in
-	  let d = Filename.dirname f in
-	  String.capitalize_ascii (Filename.basename d)
+   let n = Str.search_forward (Str.regexp dir) f 0 in
+   let f = String.sub f n (String.length f - n) in
+   let d = Filename.dirname f in
+   String.capitalize_ascii (Filename.basename d)
         in
         try
           Chapter(1,"Kernel Services","src/kernel_services"),
@@ -207,34 +207,34 @@ struct
       in
       List.iter
         (fun (chapter, subdirs) ->
-	  let dir =
-	    ( match chapter with
-	    | Chapter (n,a,d) ->
-	      bp b "<h1 class=\"chapter\">Chapter %d. %s</h1>" n a ; d
-	    | Directory d ->
-	      bp b "<h1>Directory %s</h1>" d ; d)
-	  in
-	  List.iter
-	    (fun (subdir,modules) ->
-	      bp b "<h2 class=\"section\">Section %s <span class=\"directory\">(in %s/%s)</span></h2>\n"
-		subdir dir (String.lowercase_ascii subdir) ;
-	      bs b "<br>\n<table class=\"indextable\">\n";
-	      List.iter
-		(fun m ->
-		  bs b "<tr><td>";
-		  (try
-		     let (html, _) = Naming.html_files m.m_name in
-		     bp b "<a href=\"%s\">%s</a></td>" html m.m_name;
-		     bs b "<td>";
-		     self#html_of_info_first_sentence b m.m_info;
-		   with Not_found ->
-		     Odoc_global.pwarning
-		       (Odoc_messages.cross_module_not_found m.m_name);
-		     bp b "%s</td><td>" m.m_name);
-		  bs b "</td></tr>\n")
-		modules;
-	      bs b "</table>\n")
-	    subdirs)
+   let dir =
+     ( match chapter with
+     | Chapter (n,a,d) ->
+       bp b "<h1 class=\"chapter\">Chapter %d. %s</h1>" n a ; d
+     | Directory d ->
+       bp b "<h1>Directory %s</h1>" d ; d)
+   in
+   List.iter
+     (fun (subdir,modules) ->
+       bp b "<h2 class=\"section\">Section %s <span class=\"directory\">(in %s/%s)</span></h2>\n"
+ subdir dir (String.lowercase_ascii subdir) ;
+       bs b "<br>\n<table class=\"indextable\">\n";
+       List.iter
+ (fun m ->
+   bs b "<tr><td>";
+   (try
+      let (html, _) = Naming.html_files m.m_name in
+      bp b "<a href=\"%s\">%s</a></td>" html m.m_name;
+      bs b "<td>";
+      self#html_of_info_first_sentence b m.m_info;
+    with Not_found ->
+      Odoc_global.pwarning
+        (Odoc_messages.cross_module_not_found m.m_name);
+      bp b "%s</td><td>" m.m_name);
+   bs b "</td></tr>\n")
+ modules;
+       bs b "</table>\n")
+     subdirs)
         toc_modules
 
     (** Print html code for an included module. *)
@@ -253,8 +253,8 @@ struct
                 (html_file, m.m_name)
             | Modtype mt ->
               let (html_file, _) =
-		Naming.html_files mt.mt_name
-	      in
+ Naming.html_files mt.mt_name
+       in
               (html_file, mt.mt_name)
           in
           bp b "<a href=\"%s%s\">%s</a>" (self#path name) file name
@@ -322,8 +322,8 @@ struct
       (* generate html for each module *)
       let keep_list =
         let keep m =
-	  not (List.exists (equal_module m) self#loaded_modules) &&
-	    not (List.exists (equal_module_name m) !lib_files)
+   not (List.exists (equal_module m) self#loaded_modules) &&
+     not (List.exists (equal_module_name m) !lib_files)
         in
         List.filter keep module_list
       in
@@ -363,20 +363,20 @@ struct
     method private html_of_ignore _t = ""
 
     method private html_of_modify t = match t with
-    | [] -> 
-      Odoc_info.warning "Found an empty @modify tag"; 
+    | [] ->
+      Odoc_info.warning "Found an empty @modify tag";
       ""
     | Raw s :: l ->
       let time, explanation =
-	try
-	  let idx = String.index s ' ' in
-	  String.sub s 0 idx,
-	  ":" ^ String.sub s idx (String.length s - idx)
-	with Not_found ->
-	  s, ""
+ try
+   let idx = String.index s ' ' in
+   String.sub s 0 idx,
+   ":" ^ String.sub s idx (String.length s - idx)
+ with Not_found ->
+   s, ""
       in
       let text =
-	Bold [ Raw "Change in "; Raw time ] :: Raw explanation :: l
+ Bold [ Raw "Change in "; Raw time ] :: Raw explanation :: l
       in
       let buf = Buffer.create 7 in
       self#html_of_text buf text;
@@ -386,8 +386,8 @@ struct
       assert false
 
     method private html_of_call t = match t with
-    | [] -> 
-      Odoc_info.warning "Found an empty @call tag"; 
+    | [] ->
+      Odoc_info.warning "Found an empty @call tag";
       ""
     | l ->
       let buf = Buffer.create 97 in
@@ -405,7 +405,7 @@ struct
       tag_functions <-
         ("modify", self#html_of_modify) ::
         ("ignore", self#html_of_ignore) ::
-	("call", self#html_of_call) ::
+ ("call", self#html_of_call) ::
         ("plugin", self#html_of_plugin_developer_guide) :: tag_functions
 
   end

@@ -13,4 +13,3 @@ let print_stmt out = function
   | UnspecifiedSequence _ -> Format.fprintf out "<unspecified sequence>"
   | TryFinally _ | TryExcept _ | TryCatch _ -> Format.fprintf out "<try>"
   | Throw _ -> Format.fprintf out "<throw>"
-

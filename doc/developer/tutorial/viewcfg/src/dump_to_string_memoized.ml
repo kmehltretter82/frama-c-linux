@@ -1,6 +1,6 @@
-let dump_to_string fundec = 
+let dump_to_string fundec =
   Self.feedback "Computing CFG for function %s" (fundec.svar.vorig_name);
-  ignore 
+  ignore
     (Visitor.visitFramacFunction (new print_cfg Format.str_formatter) fundec);
   Format.flush_str_formatter ()
 

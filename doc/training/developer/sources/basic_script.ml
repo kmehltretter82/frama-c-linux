@@ -15,7 +15,7 @@ let run f () =
 (*# Main driver function*)
 let all_entry_points () =
   (*## Setting options. *)
-  let files = [ "huffman.c"; "rice.c"; "shannonfano.c"; "lz.c"; "rle.c"; 
+  let files = [ "huffman.c"; "rice.c"; "shannonfano.c"; "lz.c"; "rle.c";
                 "systimer.c" ]
   in
   let files = List.map (Filename.concat "bcl") files in
@@ -27,7 +27,7 @@ let all_entry_points () =
   (*## Find entry points *)
   Globals.Functions.iter
     (fun kf ->
-      if Kernel_function.is_definition kf && 
+      if Kernel_function.is_definition kf &&
         (Kernel_function.find_syntactic_callsites kf = [])
       then
         run (Kernel_function.get_name kf) ());

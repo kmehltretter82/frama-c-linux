@@ -67,7 +67,7 @@ end
 (* This function creates a new project initialized with the current file plus
    the annotations related to division. *)
 let create_syntactic_check_project () =
-  ignore 
+  ignore
     (File.create_project_from_visitor "syntactic check" (new non_zero_divisor))
 
 let () = Db.Main.extend create_syntactic_check_project

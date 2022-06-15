@@ -17,7 +17,7 @@ open Odoc_html
 open Odoc_module
 open Odoc_info
 
-let remove_nl s = Str.global_replace (Str.regexp "\n") "" s 
+let remove_nl s = Str.global_replace (Str.regexp "\n") "" s
 let remove_useless_space s = Str.global_replace (Str.regexp "  ") " " s
 
 let doc_dev_path = ref "."
@@ -28,14 +28,14 @@ let print_in_file l =
     | h :: q ->  h ^ "\n" ^ string_of_list q
   in
   let file_path = !doc_dev_path ^ "/code_file" in
-  try 
+  try
     let chan_out = open_out file_path in
     output_string chan_out (string_of_list l) ;
     flush chan_out ;
-    close_out chan_out 
+    close_out chan_out
   with Sys_error _ as exn ->
     Format.eprintf
-      "cannot handle file %s: %s" 
+      "cannot handle file %s: %s"
       file_path
       (Printexc.to_string exn)
 
@@ -43,7 +43,7 @@ module Generator (G : Odoc_html.Html_generator) = struct
 
   class html = object (self)
 
-    inherit G.html as super 
+    inherit G.html as super
     val mutable last_name = ""
     val mutable last_type = ""
     val mutable last_info = ""
@@ -55,19 +55,19 @@ module Generator (G : Odoc_html.Html_generator) = struct
     | (s, t) :: [] ->
       self#html_of_text b t;
       let temp =
-	last_info ^ " raised exception: " 
-	^ Odoc_info.string_of_text [Raw s] ^ "." 
+ last_info ^ " raised exception: "
+ ^ Odoc_info.string_of_text [Raw s] ^ "."
       in
       last_info <- temp
-    | _ -> 
+    | _ ->
       let temp = last_info ^ " raised exceptions: " in
       last_info <- temp;
       List.iter
-	(fun (ex, desc) ->
+ (fun (ex, desc) ->
           self#html_of_text b desc;
-	  let temp = last_info ^ ", " ^ Odoc_info.string_of_text desc in
-	  last_info <- temp)
-	l
+   let temp = last_info ^ ", " ^ Odoc_info.string_of_text desc in
+   last_info <- temp)
+ l
 
     method html_of_info ?(cls="") ?(indent=true) b = function
     | None ->
@@ -75,21 +75,21 @@ module Generator (G : Odoc_html.Html_generator) = struct
     | Some info ->
       (match info.Odoc_info.i_deprecated with
       | None -> ()
-      | Some d -> 
-	self#html_of_text b d;
-	last_info <- string_of_text d);
+      | Some d ->
+ self#html_of_text b d;
+ last_info <- string_of_text d);
       (match info.Odoc_info.i_desc with
       | None -> ()
       | Some d when d = [Odoc_info.Raw ""] -> ()
-      | Some d -> 
-	self#html_of_text b d;
-	last_info <- string_of_text d);
+      | Some d ->
+ self#html_of_text b d;
+ last_info <- string_of_text d);
       self#html_of_raised_exceptions b info.Odoc_info.i_raised_exceptions;
       self#html_of_return_opt b info.Odoc_info.i_return_value;
       self#html_of_custom b info.Odoc_info.i_custom
 
     (** Print html code for the first sentence of a description.
-	The titles and lists in this first sentence has been removed.*)
+ The titles and lists in this first sentence has been removed.*)
     method html_of_info_first_sentence b = function
     | None -> ()
     | Some info ->
@@ -97,11 +97,11 @@ module Generator (G : Odoc_html.Html_generator) = struct
       | None -> ()
       | Some d when d = [Odoc_info.Raw ""] -> ()
       | Some d ->
-	self#html_of_text b
+ self#html_of_text b
           (Odoc_info.text_no_title_no_list
              (Odoc_info.first_sentence_of_text d));
-	last_info <- string_of_text
-	  (Odoc_info.text_no_title_no_list
+ last_info <- string_of_text
+   (Odoc_info.text_no_title_no_list
              (Odoc_info.first_sentence_of_text d));
 
     method generate module_list =
@@ -110,12 +110,12 @@ module Generator (G : Odoc_html.Html_generator) = struct
 
     method private html_of_type_expr_param_list_1 b m_name t =
       if string_of_type_param_list t <> "" then
-	last_type <- 
-	  last_type ^ "parameters: "^ string_of_type_param_list t 
-	^ ", constructors: " 
+ last_type <-
+   last_type ^ "parameters: "^ string_of_type_param_list t
+ ^ ", constructors: "
 
     method private html_of_type_expr_list_2 ?par b m_name sep l =
-      last_type <- last_type ^ " of " ^ string_of_type_list ?par sep l 
+      last_type <- last_type ^ " of " ^ string_of_type_list ?par sep l
 
     method private html_of_type_expr_3 b m_name t =
       last_type <- last_type ^ ": " ^ string_of_type_expr t
@@ -124,20 +124,20 @@ module Generator (G : Odoc_html.Html_generator) = struct
       last_type <- string_of_type_expr t
 
     method html_of_class_type_param_expr_list b m_name l =
-      last_type <- string_of_class_type_param_list l 
+      last_type <- string_of_class_type_param_list l
 
     method html_of_class_parameter_list b father c =
-      last_type <- string_of_class_params c 
+      last_type <- string_of_class_params c
 
     method html_of_type_expr_param_list b m_name t =
-      last_type <- string_of_type_param_list t 
+      last_type <- string_of_type_param_list t
 
     method html_of_module_type b ?code m_name t =
-      last_type <- string_of_module_type ?code t 
+      last_type <- string_of_module_type ?code t
 
     method html_of_module_parameter b father p =
       let s_functor, s_arrow =
-	if !Odoc_html.html_short_functors then "", "" else "functor ", "-> "
+ if !Odoc_html.html_short_functors then "", "" else "functor ", "-> "
       in
       last_type <- last_type ^ s_functor ^ "(" ^ p.mp_name ^ " : ";
       self#html_of_module_type_kind b father p.mp_kind;
@@ -148,17 +148,17 @@ module Generator (G : Odoc_html.Html_generator) = struct
     | Module_type_struct eles ->
       (match mt with
       | None ->
-	(match modu with
-	| None ->
-	  last_type <- last_type ^ "sig ";
+ (match modu with
+ | None ->
+   last_type <- last_type ^ "sig ";
           List.iter (self#html_of_module_element b father) eles;
-	  last_type <- last_type ^ " end "
-	| Some m ->
-	  last_type <- last_type ^ "sig ";
+   last_type <- last_type ^ " end "
+ | Some m ->
+   last_type <- last_type ^ "sig ";
           List.iter (self#html_of_module_element b father) eles;
-	  last_type <- last_type ^ " end ")
+   last_type <- last_type ^ " end ")
       | Some mt ->
-	last_type <- last_type ^ mt.mt_name)
+ last_type <- last_type ^ mt.mt_name)
     | Module_type_functor (p, k) ->
       self#html_of_module_parameter b father p;
       self#html_of_module_type_kind b father ?modu ?mt k
@@ -174,13 +174,13 @@ module Generator (G : Odoc_html.Html_generator) = struct
     | Module_struct eles ->
       (match modu with
       | None ->
-	last_type <- last_type ^ "sig " ;
-	List.iter (self#html_of_module_element b father) eles;
-	last_type <- last_type ^ "end "
+ last_type <- last_type ^ "sig " ;
+ List.iter (self#html_of_module_element b father) eles;
+ last_type <- last_type ^ "end "
       | Some m ->
-	last_type <- last_type ^ "sig " ;
-	List.iter (self#html_of_module_element b father) eles;
-	last_type <- last_type ^ "end ");
+ last_type <- last_type ^ "sig " ;
+ List.iter (self#html_of_module_element b father) eles;
+ last_type <- last_type ^ "end ");
     | Module_alias a ->
       last_type <- last_type ^ (a.Module.ma_name)
     | Module_functor (p, k) ->
@@ -188,7 +188,7 @@ module Generator (G : Odoc_html.Html_generator) = struct
       (match k with
       | Module_functor _ -> ()
       | _ when !Odoc_html.html_short_functors ->
-	last_type <- last_type ^ " : "
+ last_type <- last_type ^ " : "
       | _ -> ());
       self#html_of_module_kind b father ?modu k;
     | Module_apply (k1, k2) ->
@@ -197,7 +197,7 @@ module Generator (G : Odoc_html.Html_generator) = struct
       last_type <- last_type ^ " ( " ;
       self#html_of_module_kind b father k2;
       self#html_of_text b [Code ")"];
-      last_type <- last_type ^ " ) " 
+      last_type <- last_type ^ " ) "
     | Module_with (k, s) ->
       self#html_of_module_type_kind b father ?modu k;
       last_type <- last_type ^ s
@@ -217,7 +217,7 @@ module Generator (G : Odoc_html.Html_generator) = struct
 
     method html_of_exception b e =
       last_name <- e.Exception.ex_name;
-      last_type <- 
+      last_type <-
         (match e.Exception.ex_args with
            | Odoc_type.Cstr_tuple t -> Odoc_info.string_of_type_list " " t
            | Odoc_type.Cstr_record r -> Odoc_info.string_of_record r
@@ -273,9 +273,9 @@ module Generator (G : Odoc_html.Html_generator) = struct
       super#html_of_attribute b a
 
     method html_of_method b m =
-      last_name <- m.Value.met_value.Value.val_name; 
+      last_name <- m.Value.met_value.Value.val_name;
       last_type <- "";
-      super#html_of_method b m  
+      super#html_of_method b m
 
     method html_of_module b ?(info=true) ?(complete=true) ?(with_link=true) m =
       last_name <- m.Module.m_name;
@@ -313,13 +313,13 @@ module Generator (G : Odoc_html.Html_generator) = struct
     method html_of_class_type b ?(complete=true) ?(with_link=true) ct =
       last_name <- ct.Class.clt_name;
       last_type <- "" ;
-      super#html_of_class_type b ~complete:complete ~with_link:with_link ct 
+      super#html_of_class_type b ~complete:complete ~with_link:with_link ct
 
     method private html_of_plugin_developer_guide _t =
-      let temp = 
-	last_name ^ "/" 
-	^ remove_useless_space
-	  (remove_useless_space (remove_nl (last_type ^ "/" ^ last_info ^ "/")))
+      let temp =
+ last_name ^ "/"
+ ^ remove_useless_space
+   (remove_useless_space (remove_nl (last_type ^ "/" ^ last_info ^ "/")))
       in
       to_print <- temp :: to_print;
       last_name <- "" ;
@@ -329,7 +329,7 @@ module Generator (G : Odoc_html.Html_generator) = struct
 
     initializer
       tag_functions <-
-	("plugin", self#html_of_plugin_developer_guide) :: tag_functions
+ ("plugin", self#html_of_plugin_developer_guide) :: tag_functions
   end
 end
 

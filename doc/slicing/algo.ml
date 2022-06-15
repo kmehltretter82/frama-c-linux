@@ -11,7 +11,7 @@ let rec mark_rec_pdg_elem pdg stmt_elems m e ff =
 and
 (* [add_elem_mark] ajoute la marque [m] à l'instruction correspondant à
    l'élément [e] et marque les autres éléments éventuels comme superflus. *)
-      add_elem_mark pdg stmt_elems m e ff = 
+      add_elem_mark pdg stmt_elems m e ff =
   let stmt = H.get_stmt e stmt_elems in
   let old_m = H.get_stmt_mark stmt ff in
   let new_m = H.combine_mark old_m m in
