@@ -25,6 +25,10 @@ variables:
 
 build-distrib-tarball:
   stage: build
+  variables:
+    OPEN_SOURCE: "yes"
+    CI_LINK: "yes"
+    HDRCK: "frama-c-hdrck"
   script:
     - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
         --run 'autoconf && ./devel_tools/make-distrib.sh'
@@ -32,7 +36,7 @@ build-distrib-tarball:
     - nix
   artifacts:
     paths:
-      - frama-c.tar.gz
+      - ./*.tar.gz
     expire_in: 1 week
 
 check-no-old-frama-c:
@@ -240,12 +244,11 @@ manuals:
 #     OCAML: "4_13"
 #   <<: *ocaml
 
-
 src-distrib-tests:
   stage: distrib_and_compatibility
   script:
-    - mkdir extracted && tar -xzf frama-c.tar.gz -C ./extracted
-    - nix-build extracted/frama-c/nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.src-distrib-tests
+    - mkdir extracted && tar -xzf frama-c.tar.gz --strip-components 1 -C ./extracted
+    - nix-build extracted/nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.src-distrib-tests
   tags:
     - nix
 
