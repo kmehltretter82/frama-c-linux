@@ -23,10 +23,17 @@
 ################################
 # Code prettyfication and lint #
 ################################
+# make lint includes:
+# - make check-utf8 (should be fixed manually): valid UTF-8 encoding
+# - make check-eoleof: EOF preceded by an EOL
+# - make check-syntax: EOF preceded by an EOL + no TAB + no BLANK at the end
+# - make check-indent: valid indentation
 
 ################################
 ## Default variables
 
+IS_UTF8 ?= iconv -f UTF-8
+TO_UTF8 ?= iconv -t UTF-8
 OCP_INDENT ?= ocp-indent
 
 # Default values necessary for
@@ -58,7 +65,7 @@ endif
 
 
 ################################
-## CHECK $(OCP_INDENT)VERSION
+## CHECK ocp-indent VERSION
 
 .lint/check-ocp-indent-version:
 	if command -v $(OCP_INDENT) >/dev/null; then \
@@ -85,8 +92,8 @@ ifeq ($(LINT.HAS_GIT),)
 
 .PHONY:
 lint:
-	echo "'make lint' requires git"
-	echo "but,that is not the case of 'make LINT_FILE=<file> check-syntax'"
+	echo "'make lint' requires a git repository but, that is not"
+	echo "the case for example with 'make LINT_FILE=<file> check-syntax'"
 
 else
 
@@ -111,6 +118,13 @@ clean:: clean-lint
 ifeq ($(LINT_FILE),)
 
 # No lint file given
+
+.PHONY: check-utf8
+check-utf8:
+	$(GIT) ls-files -z \
+        | $(GIT) check-attr --stdin -z check-utf8 \
+        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
+        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" check-utf8 || exit 255'
 
 .PHONY: check-eoleof
 check-eoleof:
@@ -139,6 +153,7 @@ else # LINT_FILE are given
 
 LINT_FILE.list=$(addprefix .lint/,$(wildcard $(LINT_FILE)))
 
+LINT_FILE.check-utf8= $(addsuffix .check-utf8,$(LINT_FILE.list))
 LINT_FILE.check-eoleof= $(addsuffix .check-eoleof,$(LINT_FILE.list))
 LINT_FILE.check-syntax= $(addsuffix .check-syntax,$(LINT_FILE.list))
 LINT_FILE.check-indent= $(addsuffix .check-indent,$(LINT_FILE.list))
@@ -148,6 +163,9 @@ LINT_FILE.fix-syntax= $(addsuffix .fix-syntax,$(LINT_FILE.list))
 LINT_FILE.fix-indent= $(addsuffix .fix-indent,$(LINT_FILE.list))
 
 ## check-XXX targets
+
+.PHONY: check-utf8
+check-utf8: $(LINT_FILE.check-utf8)
 
 .PHONY: check-eoleof
 check-eoleof: $(LINT_FILE.check-eoleof)
@@ -172,6 +190,21 @@ fix-indent: $(LINT_FILE.fix-indent)
 endif
 
 ###############################
+## UTF8 ASPECT (should be fixed manually)
+
+$(LINT_FILE.check-utf8): .lint/%.check-utf8: %
+	echo "Check UTF8: $<"
+	if ! $(IS_UTF8) $< > /dev/null; \
+        then \
+          echo "File $< uses an invalid UTF-8 encoding."; \
+          echo "Please fixe it manually, pearhaps with: $(TO_UTF8) --from-code=<NAME> $<";\
+          echo "The next command may help you to find that <NAME>: file $<";\
+          exit 1; \
+        fi
+	$(MKDIR) $(dir $@)
+	$(TOUCH) $@
+
+###############################
 ## INDENTATION ASPECT
 
 $(LINT_FILE.check-indent): .lint/%.check-indent: % .lint/check-ocp-indent-version
@@ -188,6 +221,7 @@ $(LINT_FILE.check-indent): .lint/%.check-indent: % .lint/check-ocp-indent-versio
 	$(MKDIR) $(dir $@)
 	$(TOUCH) $@
 
+.PHONY: $(LINT_FILE.fix-indent)
 $(LINT_FILE.fix-indent): .lint/%.fix-indent: % .lint/check-ocp-indent-version
 	echo "Fixes indent: $<"
 	$(OCP_INDENT) -i $<
@@ -214,6 +248,8 @@ $(LINT_FILE.check-eoleof): .lint/%.check-eoleof: %
 	$(MKDIR) $(dir $@)
 	$(TOUCH) $@
 
+# The real target is a check-XXX one
+.PHONY: $(LINT_FILE.fix-eoleof)
 $(LINT_FILE.fix-eoleof): .lint/%.fix-eoleof: %
 	echo "Fixes EOL EOF: $<"
 	$(ISED) -e '$$a\' $<
@@ -249,6 +285,8 @@ $(LINT_FILE.check-syntax): .lint/%.check-syntax: %
 	$(MKDIR) $(dir $@)
 	$(TOUCH) $@
 
+# The real target is a check-XXX one
+.PHONY: $(LINT_FILE.fix-syntax)
 $(LINT_FILE.fix-syntax): .lint/%.fix-syntax: %
 	echo "Fixes syntax: $<"
 	$(ISED) -e 's/^ *\t\+/ /' $<
