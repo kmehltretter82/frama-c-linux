@@ -20,7 +20,7 @@
 #                                                                        #
 ##########################################################################
 
-#vide : pour ne pas utiliser de règles implicites
+#vide : pour ne pas utiliser de rÃ¨gles implicites
 .SUFFIXE:
 .PHONY: clean all debug
 

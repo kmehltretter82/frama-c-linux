@@ -57,8 +57,6 @@ Changelog merge=union
 /doc/developer/TODO -check-utf8
 /doc/index.html -check-utf8
 /doc/makeLatex -check-utf8
-/doc/scope/M.v -check-utf8
-/doc/scope/Makefile -check-utf8
 /doc/training/developer/macros.tex -check-utf8
 /doc/value/README -check-utf8
 
