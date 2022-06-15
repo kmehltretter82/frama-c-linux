@@ -8,7 +8,7 @@ let mydir = builtins.getEnv("PWD");
       selection = "${mydir}/${name}-${ocaml.version}-opam-selection.nix";
     };
      opamPackages =
-      [ "ocamlfind" "zarith" "ocamlgraph" "yojson" "zmq"
+      [ "ocamlfind=1.9.3" "zarith" "ocamlgraph" "yojson" "zmq"
         "ppx_import" "ppx_deriving" "ppx_deriving_yojson"
         "coq=8.13.0" "alt-ergo=2.2.0"
         "why3=1.5.0" "why3-coq=1.5.0"
