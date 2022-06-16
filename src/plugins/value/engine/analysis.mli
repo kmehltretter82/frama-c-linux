@@ -88,7 +88,9 @@ val compute : unit -> unit
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val is_computed : unit -> bool
-(** Return [true] iff the Eva analysis has been done. *)
+(** Return [true] iff the Eva analysis has been done.
+    @plugin development guide
+*)
 
 val self : State.t
 (** Internal state of Eva analysis from projects viewpoint. *)

@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(**  @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-
 include
   Plugin.Register
     (struct
@@ -30,7 +28,6 @@ include
       let help = "function callees"
     end)
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module ForceUsers =
   False
     (struct

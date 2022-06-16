@@ -168,6 +168,7 @@ val expr_to_term : ?coerce:bool -> exp -> term
     [expr_to_predicate] instead.
 
     @before 21.0-Scandium was unsound in many cases.
+    @plugin development guide
 *)
 
 val expr_to_predicate: exp -> predicate

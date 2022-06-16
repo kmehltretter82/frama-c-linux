@@ -20,12 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Plugin registration and general services.
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+*)
 
 (** Special signature for Kernel services, whose messages are handled in
     an ad'hoc manner. Should not be of any use for a standard plug-in,
     who would rather rely on {!Plugin.S} below.
     @since Chlorine-20180501
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 module type S_no_log = sig
 

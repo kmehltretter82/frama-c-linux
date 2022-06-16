@@ -213,9 +213,23 @@ val dummy: unit -> t
 
 val get_vi : t -> varinfo
 val get_id: t -> int
+(** @return the identifier of the function (which is the identifier of the
+    associated varinfo). *)
+
 val get_name : t -> string
+
 val get_type : t -> typ
+(** Be careful! The return type, as normalized by Cabs2Cil does not have any
+    qualifier at first level (e.g no ghost).
+    @return the type of the given kernel function
+*)
+
 val get_return_type : t -> typ
+(** Be careful! The return type, as normalized by Cabs2Cil does not have any
+    qualifier at first level (e.g no ghost).
+    @return the return type of the function
+*)
+
 val get_location: t -> Cil_types.location
 val get_global : t -> global
 (** For functions with a declaration and a definition, returns the definition.*)
@@ -235,6 +249,10 @@ val get_definition : t -> fundec
 val has_definition : t -> bool
 (** @return [true] iff the given kernel function has a defintion.
     @since 21.0-Scandium *)
+
+val is_ghost : t -> bool
+(** @return [true] iff the given kernel function is ghost
+    @since Frama-C+dev *)
 
 (* ************************************************************************* *)
 (** {2 Membership of variables} *)

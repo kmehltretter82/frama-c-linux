@@ -11,20 +11,55 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let replace_space_by_dot s = Str.global_replace (Str.regexp " ") "." s
+let repair_word s = Str.global_replace (Str.regexp_string "\\") "" s
 
-let repair_word s =
-  let rec repair_word_aux st =
-    try let d1 = String.index st '$'
-      in
-      try let d2 = String.index_from st d1 '$'
-        in (Str.string_before st d1)^
-           (repair_word_aux (Str.string_after st (d2+1)))
-      with Not_found -> st
-    with Not_found -> st
+let index_entry = Str.regexp {|^\\indexentry{\(.*\)}{[0-9]*}|}
+
+let index_subentry = Str.regexp {|^.*@texttt *{\(fontsize  {8}{10}selectfont  \)?\([A-Za-z0-9_]+\)}$|}
+
+let all_caps = Str.regexp "^[A-Z0-9_]+$"
+
+let is_lower s = 'a' <= s.[0] && s.[0] <= 'z'
+let is_upper s = 'A' <= s.[0] && s.[0] <= 'Z'
+
+(* We have a prefix composed of module names, then maybe a lower case
+   symbol, possibly followed by a single symbol (in the case of a
+   type constructor or record field).
+*)
+let is_ocaml_symbol l =
+  let rec aux = function
+    | [] | [_] -> true
+    | [ t; _ ] when is_lower t -> true
+    | x :: l -> is_upper x && aux l
   in
-  Str.global_replace (Str.regexp "\\") "" (repair_word_aux s)
+  match l with
+  | [] -> false
+  | x :: l -> is_upper x && aux l
 
+let inspect_subentry l =
+  let check_one_entry e =
+    let e = repair_word e in
+    if Str.string_match index_subentry e 0 then begin
+      let word = Str.matched_group 2 e in
+      if Str.string_match all_caps word 0 then raise Exit else word
+    end else raise Exit
+  in
+  try
+    let l = List.map check_one_entry l in
+    if is_ocaml_symbol l then
+      (String.concat "." l)  ^ "\n"
+    else ""
+  with Exit -> ""
+
+let inspect_entry line =
+  if Str.string_match index_entry line 0 then begin
+    let content = Str.matched_group 1 line in
+    match Str.split (Str.regexp_string "|") content with
+    | [ entry; _ ] -> inspect_subentry (Str.split (Str.regexp_string "!") entry)
+    | _ -> ""
+  end else ""
+
+let external_names = [ "Landmarks"; "Makefile" ]
 
 (** [fill_tbl] takes a file containing data which is
     as "element_name/type/comment/" or "element_name".
@@ -34,52 +69,22 @@ let repair_word s =
 let fill_tbl tbl file_name =
   try
     let c = open_in file_name in
+    let add_if_needed name infos =
+      if not (Hashtbl.mem tbl name || List.mem name external_names) then
+        Hashtbl.add tbl name infos
+    in
     try
       while true do
-        let s = input_line c
-        in
-        if not (Str.string_match (Str.regexp "Command.Line") s 0)
-        && not ( Hashtbl.mem tbl s)
-        then match (Str.split (Str.regexp "/") s) with
-          | []    -> ()
-          | h::[] -> Hashtbl.add tbl h []
-          | h::q  -> Hashtbl.add tbl h q
+        let s = input_line c in
+        match (Str.split (Str.regexp "/") s) with
+        | []    -> ()
+        | h::[] -> add_if_needed h []
+        | h::q  -> add_if_needed h q
       done
     with End_of_file -> close_in c
   with Sys_error _ as exn ->
     Format.eprintf "cannot handle file %s: %s" file_name
       (Printexc.to_string exn)
-
-(** [fill_list] takes a file containing data which is
-    as "element_name/type/comment/" if (has_type=true) or
-    "element_name" if (has_type=false). It fills the list [li]
-    with all the element names and alphabetically sorts them. *)
-let fill_list li name ~has_type =
-  let fill_list_no_sorting l file_name =
-    try let c = open_in file_name in
-      try
-        while true do
-          let s = input_line c in
-          if not (Str.string_match
-                    (Str.regexp "Command.Line") s 0)&& not ( List.mem s !l)
-          then begin
-            if has_type then
-              try let t =(Str.string_before s
-                            (String.index_from s 0 '/' )) in
-                match t with
-                |""  -> ()
-                | _  -> if not( List.mem t !l)
-                  then l := t::!l
-              with Not_found ->()
-            else l := s::!l
-          end
-        done
-      with End_of_file -> close_in c
-    with Sys_error _ as exn ->
-      Format.eprintf "cannot handle file %s: %s" file_name
-        (Printexc.to_string exn) in
-  fill_list_no_sorting li name ;
-  li := List.sort String.compare !li
 
 (** [run_oracle] takes two hashtables [t1] and [t2] when called.
     It first tests if the file "run.oracle" is already existing.
@@ -180,6 +185,9 @@ let compare t1 t2 name1 name2 =
     name2 name1;
   List.iter (compare_aux t1) t2
 
+let sort_keys tbl =
+  let l = Hashtbl.fold (fun k _ l -> k :: l) tbl [] in
+  List.sort String.compare l
 
 (** here are used the lexer and parser "check_index_lexer" and
     "check_index_grammar" to create the file "index_file".
@@ -187,29 +195,25 @@ let compare t1 t2 name1 name2 =
 let () =
   let index_hstbl: (string,string list) Hashtbl.t = Hashtbl.create 197 in
   let code_hstbl: (string,string list) Hashtbl.t = Hashtbl.create 197 in
-  let index_list = ref [] in
-  let code_list = ref [] in
   try
     let chan_out = open_out ( "index_file") in
     try
       let chan_in = open_in ( "main.idx") in
-      let lexbuf = Lexing.from_channel chan_in in
-      let temp =
-        repair_word (Check_index_grammar.main Check_index_lexer.token lexbuf)
-      in
-      let lexbuf_2 =Lexing.from_string temp in
-      let result =
-        Check_index_grammar.main Check_index_lexer.token_2 lexbuf_2
-      in
-      output_string chan_out (replace_space_by_dot result);
-      close_out chan_out ; close_in chan_in;
-      fill_tbl code_hstbl "code_file";
-      fill_tbl index_hstbl "index_file";
-      fill_list code_list "code_file" ~has_type:true;
-      fill_list index_list "index_file" ~has_type:false;
-      compare !index_list !code_list "THE INDEX \
+      try
+        while true do
+          let line = input_line chan_in in
+          let res = inspect_entry line in
+          output_string chan_out res;
+        done
+      with End_of_file -> ();
+        close_out chan_out ; close_in chan_in;
+        fill_tbl code_hstbl "code_file";
+        fill_tbl index_hstbl "index_file";
+        let code_list = sort_keys code_hstbl in
+        let index_list = sort_keys index_hstbl in
+        compare index_list code_list "THE INDEX \
                                       OF THE DEVELOPER GUIDE" "THE CODE";
-      run_oracle index_hstbl code_hstbl ;
+        run_oracle index_hstbl code_hstbl ;
     with Sys_error _ as exn ->
       Format.eprintf "cannot handle file %s: %s" "index_file"
         (Printexc.to_string exn)

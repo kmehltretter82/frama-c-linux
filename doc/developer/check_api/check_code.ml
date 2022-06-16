@@ -11,8 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* do not work with OCaml 4 or higher *)
-
 open Odoc_html
 open Odoc_module
 open Odoc_info
@@ -29,7 +27,7 @@ let print_in_file l =
   in
   let file_path = !doc_dev_path ^ "/code_file" in
   try
-    let chan_out = open_out file_path in
+    let chan_out = open_out_gen [Open_append; Open_creat] 0o644 file_path in
     output_string chan_out (string_of_list l) ;
     flush chan_out ;
     close_out chan_out
@@ -225,26 +223,14 @@ module Generator (G : Odoc_html.Html_generator) = struct
       super#html_of_exception b e
 
     method private print_record b father l =
-      last_type <- last_type ^ "{";
       let print_one r =
-        if last_type <> "" &&
-           String.get last_type ((String.length last_type) -1) = '{'
-        then begin
-          if r.Type.rf_mutable then last_type <- last_type ^ "mutable "
-        end else begin
-          if r.Type.rf_mutable then last_type <- last_type ^ "; mutable "
-          else last_type <- last_type ^ "; "
-        end;
-        last_type <- last_type ^ r.Type.rf_name ;
-        self#html_of_type_expr_3 b father r.Type.rf_type;
+        last_name <- father ^ "." ^ r.Type.rf_name;
+        last_type <- father ^ " -> " ^ Odoc_info.string_of_type_expr r.Type.rf_type;
         self#html_of_info b r.Type.rf_text
       in
       print_concat b "\n" print_one l;
-      last_type <- last_type ^ "}"
 
     method html_of_type b t =
-      last_name <- t.Type.ty_name;
-      last_type <- "";
       Odoc_info.reset_type_names ();
       let father = Name.father t.Type.ty_name in
       self#html_of_type_expr_param_list_1 b father t;
@@ -252,7 +238,8 @@ module Generator (G : Odoc_html.Html_generator) = struct
        | Type.Type_abstract -> ()
        | Type.Type_variant l ->
          let print_one constr =
-           last_type <- last_type ^ " | " ^ constr.Type.vc_name ;
+           last_type <- "";
+           last_name <- t.Type.ty_name ^ "." ^  constr.Type.vc_name;
            (match constr.Type.vc_args with
             | Odoc_type.Cstr_tuple [] -> ()
             | Odoc_type.Cstr_tuple l ->
@@ -265,6 +252,8 @@ module Generator (G : Odoc_html.Html_generator) = struct
          print_concat b "\n" print_one l;
        | Type.Type_record l -> self#print_record b father l
        | _ -> ());
+      last_name <- t.Type.ty_name;
+      last_type <- "";
       self#html_of_info b t.Type.ty_info;
 
     method html_of_attribute b a =

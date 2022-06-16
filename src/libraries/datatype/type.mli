@@ -45,8 +45,12 @@ type 'a ty = 'a t
 (** Precedences used for generating the minimal number of parenthesis in
     combination with function {!par} below. *)
 type precedence =
-  | Basic (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-  | Call (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  | Basic
+  (** Normal precedence
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  | Call
+  (** Instantiation of polymorphic type
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
   | Tuple
   | List
   | NoPar

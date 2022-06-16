@@ -143,7 +143,8 @@ and global =
       entire program. Cannot have storage Extern or function type. *)
 
   | GFun of fundec * location
-  (** A function definition. *)
+  (** A function definition.
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   | GAsm of string * location
   (** Global asm statement. These ones can contain only a template *)
@@ -1527,7 +1528,7 @@ and relation =
   | Rle
   | Rge
   | Req
-  | Rneq (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  | Rneq (** Different @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 
 (** predicates *)
@@ -1683,6 +1684,7 @@ and ext_category =
   | Ext_global
   | Ext_code_annot of ext_code_annot_context
 
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 and ext_code_annot_context =
   | Ext_here (** at current program point. *)
   | Ext_next_stmt (** covers next statement. *)
@@ -1691,6 +1693,8 @@ and ext_code_annot_context =
 
 (** Behavior of a function or statement. This type shares the name of its
     constructors with {!Logic_ptree.behavior}.
+
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 and behavior = {
   mutable b_name : string; (** name of the behavior. *)
@@ -1701,8 +1705,7 @@ and behavior = {
   mutable b_assigns : assigns; (** assignments. *)
   mutable b_allocation : allocation; (** frees, allocates. *)
   mutable b_extended : acsl_extension list
-  (** extensions
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** extensions *)
 }
 
 (** kind of termination a post-condition applies to. See ACSL manual. *)
@@ -1766,7 +1769,10 @@ and code_annotation_node =
   | AExtended of string list * bool * acsl_extension
   (** extension in a code or loop annotation.
       Boolean flag is true for loop extensions and false for code extensions
-      @since Silicon-20161101 *)
+      @since Silicon-20161101
+
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+  *)
 
 (** function contract. *)
 
@@ -1804,7 +1810,9 @@ and global_annotation =
   (** Model field for a type t, seen as a logic function with one
       argument of type t *)
   | Dextended of acsl_extension * attributes * location
-  (** Extended global clause. *)
+  (** Extended global clause.
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+  *)
 
 type kinstr =
   | Kstmt of stmt

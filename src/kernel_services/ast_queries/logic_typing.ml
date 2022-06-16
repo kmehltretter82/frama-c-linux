@@ -3765,7 +3765,10 @@ struct
 
   let funspec old_behaviors vi formals typ s =
     let env = append_pre_label (Lenv.funspec()) in
-    let log_return_typ = Ctype (Cil.getReturnType typ) in
+    let typ = Cil.getReturnType typ in
+    (* Qualifiers are dropped on return type, recover ghost *)
+    let typ = if vi.vghost then Cil.typeAddGhost typ else typ in
+    let log_return_typ = Ctype typ in
     let env =
       match formals with
       | None -> (* This is the spec of a function declaration *)

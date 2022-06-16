@@ -22,7 +22,7 @@
 
 (** This module defines the types that are used to store the PDG of a
     function.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+*)
 
 (** [Dpd] stands for 'dependence'. This object is used as a label on the edges
  * of the PDG. There are three kinds of dependencies :

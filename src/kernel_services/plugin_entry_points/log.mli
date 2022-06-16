@@ -134,6 +134,7 @@ module type Messages = sig
   type warn_category
   (** Same as above, but for warnings
       @since Chlorine-20180501
+      @plugin development guide
   *)
 
   val verbose_atleast : int -> bool
@@ -263,7 +264,9 @@ module type Messages = sig
       In case the [wkey] is considered as a [Failure], the continution is not called.
       This kind of message denotes a fatal error aborting Frama-C.
       Notice that the [~emitwith] action is called iff a message is logged.
-      @since 18.0-Argon *)
+      @since 18.0-Argon
+      @plugin development guide
+  *)
 
   val register : kind -> (event -> unit) -> unit
   (** Local registry for listeners. *)
@@ -327,6 +330,7 @@ module type Messages = sig
   *)
 
   val register_warn_category: string -> warn_category
+  (** @plugin development guide *)
 
   val is_warn_category: string -> bool
 
@@ -346,6 +350,7 @@ module type Messages = sig
   val get_all_warn_categories_status: unit -> (warn_category * warn_status) list
 
   val set_warn_status: warn_category -> warn_status -> unit
+  (** @plugin development guide *)
 
   val get_warn_status: warn_category -> warn_status
 
