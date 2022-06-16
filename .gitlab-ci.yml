@@ -5,6 +5,13 @@ stages:
   - make_public
 
 ################################################################################
+### DEFAULT JOB PARAMETERS
+
+default:
+  interruptible: true
+  tags: [ nix ]
+
+################################################################################
 ### VARIABLES
 
 variables:
@@ -28,8 +35,6 @@ check-no-old-frama-c:
   script:
     - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a HEAD)
     - git merge-base --is-ancestor a35d2118fe6999dddce9e1847eff626fae9cc37c HEAD
-  tags:
-    - nix
 
 frama-c:
   stage: build
@@ -41,8 +46,6 @@ frama-c:
       - commits.nix
       - results.log
     expire_in: 1 day
-  tags:
-    - nix
 
 header-check:
   stage: build
@@ -52,8 +55,6 @@ header-check:
     - ls -la
     - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
         --run 'make -f share/Makefile.headers check-headers'
-  tags:
-    - nix
 
 ivette:
   stage: build
@@ -76,8 +77,6 @@ lint:
   script:
     - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
         --run 'make -f share/Makefile.linting lint'
-  tags:
-    - nix
 
 ################################################################################
 ### TESTS
@@ -86,8 +85,6 @@ acsl-importer:
   stage: tests
   script:
     - ./nix/external-plugin-ci.sh ACSL-importer
-  tags:
-    - nix
 
 # build-from-distrib-tarball:
 #   stage: tests
@@ -100,99 +97,71 @@ caveat-importer:
   stage: tests
   script:
     - ./nix/external-plugin-ci.sh Caveat-importer
-  tags:
-    - nix
 
 cfp:
   stage: tests
   script:
     - ./nix/external-plugin-ci.sh context-from-precondition
-  tags:
-    - nix
 
 e-acsl-tests:
   stage: tests
   script:
     - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.e-acsl-tests
-  tags:
-    - nix
 
 eva-tests:
   stage: tests
   script:
     - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.eva-tests
-  tags:
-    - nix
 
 frama-clang:
   stage: tests
   script:
     - ./nix/external-plugin-ci.sh frama-clang
-  tags:
-    - nix
 
 genassigns:
   stage: tests
   script:
     - ./nix/external-plugin-ci.sh genassigns
-  tags:
-    - nix
 
 kernel-tests:
   stage: tests
   script:
     - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.kernel-tests
-  tags:
-    - nix
 
 linea-cabs:
   stage: tests
   script:
     - ./nix/external-plugin-ci.sh linea-cabs
-  tags:
-    - nix
 
 metacsl:
   stage: tests
   script:
     - ./nix/external-plugin-ci.sh meta
-  tags:
-    - nix
 
 mthread:
   stage: tests
   script:
     - ./nix/external-plugin-ci.sh mthread
-  tags:
-    - nix
 
 plugins-tests:
   stage: tests
   script:
     - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.plugins-tests
-  tags:
-    - nix
 
 security:
   stage: tests
   script:
     - ./nix/external-plugin-ci.sh security
-  tags:
-    - nix
 
 volatile:
   stage: tests
   script:
     - ./nix/external-plugin-ci.sh Volatile
-  tags:
-    - nix
 
 wp-tests:
   stage: tests
   script:
     - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.wp-tests
-  tags:
-    - nix
 
 ################################################################################
 ### DISTRIB
@@ -203,8 +172,6 @@ wp-tests:
   stage: distrib_and_compatibility
   script:
     - nix-build -o api nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.api-doc
-  tags:
-    - nix
 
 api-doc-default: # Check that we successfully build but no artifact
   <<: *api-doc
@@ -232,8 +199,6 @@ api-doc-scheduled: # Keep artifact for master branch each night
   stage: distrib_and_compatibility
   script:
     - ./nix/internal-tests.sh
-  tags:
-    - nix
 
 internal:
   <<: *internal_template
@@ -250,8 +215,6 @@ internal_nightly:
   stage: distrib_and_compatibility
   script:
     - nix-build -o manuals nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.manuals
-  tags:
-    - nix
 
 manuals:
   <<: *manuals
@@ -268,8 +231,6 @@ manuals:
   stage: distrib_and_compatibility
   script:
     - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.default-config-tests
-  tags:
-    - nix
 
 # ocaml-4.11:
 #   variables:
@@ -304,10 +265,9 @@ make_public:
     - echo "$FRAMA_C_PUBLIC_SSH_PRIVATE_KEY" | nix run -f channel:nixos-19.03 coreutils --command base64 -d > nix/frama-c-public/id_ed25519
     - nix run -f channel:nixos-19.03 coreutils --command chmod 400 nix/frama-c-public/id_ed25519
     - GIT_SSH=nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git push git@git.frama-c.com:pub/frama-c.git origin/master:refs/heads/master
-  tags:
-    - nix
   only:
     - schedules
+  interruptible: false
 
 make_public_meta:
   stage: make_public
@@ -316,10 +276,9 @@ make_public_meta:
     - nix run -f channel:nixos-19.03 coreutils --command chmod 400 nix/frama-c-public/id_ed25519
     - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git clone git@git.frama-c.com:frama-c/meta.git nix/frama-c-public/meta
     - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git -C nix/frama-c-public/meta push git@git.frama-c.com:pub/meta origin/master:refs/heads/master
-  tags:
-    - nix
   only:
     - schedules
+  interruptible: false
 
 make_public_fclang:
   stage: make_public
@@ -328,7 +287,6 @@ make_public_fclang:
     - nix run -f channel:nixos-19.03 coreutils --command chmod 400 nix/frama-c-public/id_ed25519
     - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git clone git@git.frama-c.com:frama-c/frama-clang.git nix/frama-c-public/frama-clang
     - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git -C nix/frama-c-public/frama-clang push git@git.frama-c.com:pub/frama-clang origin/master:refs/heads/master
-  tags:
-    - nix
   only:
     - schedules
+  interruptible: false
