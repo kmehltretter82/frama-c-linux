@@ -1482,6 +1482,11 @@ val isWFGhostType : typ -> bool
     @return true iff the type is well formed
     @since 21.0-Scandium *)
 
+val typeAddGhost : typ -> typ
+(** Add the ghost attribute to a type (does nothing if the type is alreay ghost)
+    @return the ghost qualified original type
+    @since Frama-C+dev *)
+
 (* ************************************************************************* *)
 (** {2 The visitor} *)
 (* ************************************************************************* *)

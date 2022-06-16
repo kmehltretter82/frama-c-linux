@@ -495,11 +495,12 @@ let get_bhv_aux_fct kf bhv =
     let assumes = Visitor.visitFramacPredicates vis bhv.b_assumes in
     let assumes = List.map Logic_const.refresh_predicate assumes in
     let assigns = Writes [] in
+    let ret_typ = Cil.typeAddGhost Cil.intType in
     let post_cond =
       [Normal,
        Logic_const.(
          new_predicate
-           (prel (Req,tlogic_coerce (tresult Cil.intType) Linteger,lone())))]
+           (prel (Req,tlogic_coerce (tresult ret_typ) Linteger,lone())))]
     in
     let bhv_in =
       Cil.mk_behavior ~name:bhv.b_name ~assumes ~assigns ~post_cond ()
@@ -515,7 +516,7 @@ let get_bhv_aux_fct kf bhv =
         Logic_const.(
           new_predicate
             (prel
-               (Req, tlogic_coerce (tresult Cil.intType) Linteger, lzero())))]
+               (Req, tlogic_coerce (tresult ret_typ) Linteger, lzero())))]
     in
     let bhv_out = Cil.mk_behavior ~name ~assumes ~assigns ~post_cond () in
     Globals.Functions.replace_by_declaration (Cil.empty_funspec()) vi loc;

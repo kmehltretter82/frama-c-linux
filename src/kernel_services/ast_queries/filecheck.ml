@@ -737,6 +737,10 @@ module Base_checker = struct
              check_abort "\\result found outside of a function contract"
            | Some kf ->
              let t1 = Kernel_function.get_return_type kf in
+             let t1 =
+               if Kernel_function.is_ghost kf
+               then Cil.typeAddGhost t1 else t1
+             in
              if Cil.isVoidType t1 then
                check_abort
                  "\\result found in a contract for function %a that returns void"
