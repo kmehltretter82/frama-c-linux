@@ -128,28 +128,19 @@ endif
 .PHONY: clean-lint
 clean-lint:
 	echo "Cleaning LINT targets..."
-	$(RM) -r .lint
+	rm -rf .lint
 
 clean:: clean-lint
 
-.PHONY: clean-check-eoleof
-clean-check-eoleof:
-	echo "Cleaning LINT $(patsubst clean-%,%,$@) targets..."
-	find .lint -type f -name \*.$(patsubst clean-%,%,$@) | xargs -n 10 $(RM)
+#### clean-check-XXX targets
 
-.PHONY: clean-check-utf8
-clean-check-utf8:
-	echo "Cleaning LINT $(patsubst clean-%,%,$@) targets..."
-	find .lint -type f -name \*.$(patsubst clean-%,%,$@) | xargs -n 10 $(RM)
+LINT.clean-targets= \
+        clean-check-eoleof clean-check-utf8 clean-check-syntax clean-check-ident
+.PHONY: clean-check-eoleof clean-check-utf8 clean-check-syntax clean-check-ident
 
-.PHONY: clean-check-syntax
-clean-check-syntax:
-	echo "Cleaning LINT $(patsubst clean-%,%,$@) targets..."
-	find .lint -type f -name \*.$(patsubst clean-%,%,$@) | xargs -n 10 $(RM)
-
-.PHONY: clean-check-ident
-clean-check-indent:
-	echo "Cleaning LINT $(patsubst clean-%,%,$@) targets..."
+# Generic rule
+$(LINT.clean-targets):
+	echo "[LINT] Cleaning $(patsubst clean-%,%,$@) targets..."
 	find .lint -type f -name \*.$(patsubst clean-%,%,$@) | xargs -n 10 $(RM)
 
 ###############################
@@ -160,69 +151,34 @@ ifeq ($(LINT_FILE),)
 
 LINT.dir=$(wildcard $(LINT_DIR))
 
-.PHONY: check-utf8
-check-utf8:
-	echo "Checking UTF8..."
+#### check-XXX targets
+
+LINT.check-targets= \
+        check-syntax check-indent check-eoleof check-utf8
+.PHONY: check-syntax check-indent check-eoleof check-utf8
+
+# Generic rule
+$(LINT.check-targets):
+	echo "[LINT] Checking from GIT attribute $@..."
 	$(GIT) ls-files $(LINT.dir) -z \
         | $(GIT) check-attr --stdin -z $@ \
         | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
         | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
 
-.PHONY: fix-utf8
-fix-utf8:
-	echo "Fixing UTF8..."
+#### fix-XXX targets
+
+LINT.fix-targets= \
+        fix-eoleof fix-utf8 fix-syntax fix-ident
+.PHONY: fix-eoleof fix-utf8 fix-syntax fix-ident
+
+# Generic rule
+$(LINT.fix-targets):
+	echo "[LINT] Fixing from GIT attribute $(patsubst fix-%,check-%,$@)..."
 	$(GIT) ls-files $(LINT.dir) -z \
         | $(GIT) check-attr --stdin -z $(patsubst fix-%,check-%,$@) \
         | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
         | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
 
-.PHONY: check-eoleof
-check-eoleof:
-	echo "Checking EOL EOF..."
-	$(GIT) ls-files $(LINT.dir) -z \
-        | $(GIT) check-attr --stdin -z $@ \
-        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
-        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
-
-.PHONY: fix-eoleof
-fix-eoleof:
-	echo "Fixing EOL EOF..."
-	$(GIT) ls-files $(LINT.dir) -z \
-        | $(GIT) check-attr --stdin -z $(patsubst fix-%,check-%,$@) \
-        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
-        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
-
-.PHONY: check-syntax
-check-syntax:
-	echo "Checking syntax..."
-	$(GIT) ls-files $(LINT.dir) -z \
-        | $(GIT) check-attr --stdin -z $@ \
-        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
-        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
-
-.PHONY: fix-syntax
-fix-syntax:
-	echo "Fixing syntax..."
-	$(GIT) ls-files $(LINT.dir) -z \
-        | $(GIT) check-attr --stdin -z $(patsubst fix-%,check-%,$@) \
-        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
-        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
-
-.PHONY: check-indent
-check-indent:
-	echo "Checking indent..."
-	$(GIT) ls-files $(LINT.dir) -z \
-        | $(GIT) check-attr --stdin -z $@ \
-        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
-        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
-
-.PHONY: fix-indent
-fix-indent:
-	echo "Fixing indent..."
-	$(GIT) ls-files $(LINT.dir) -z \
-        | $(GIT) check-attr --stdin -z $(patsubs fix-,check-,$@) \
-        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
-        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
 
 else # LINT_FILE are given
 
