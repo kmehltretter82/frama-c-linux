@@ -52,22 +52,19 @@ Changelog merge=union
 
 ## Unset "-check-utf8"
 
-/doc/acsl_tutorial_slides/script -check-utf8
-/doc/developer/METADOC.txt -check-utf8
-/doc/developer/TODO -check-utf8
-/doc/index.html -check-utf8
-/doc/makeLatex -check-utf8
 /doc/training/developer/macros.tex -check-utf8
-/doc/value/README -check-utf8
-
-/src/plugins/e-acsl/tests/builtin/utils -check-utf8
-/src/plugins/e-acsl/tests/format/utils -check-utf8
 
 /src/plugins/wp/doc/coqdoc/coqdoc.sty -check-utf8
 /src/plugins/wp/doc/manual/wp_logicvar.tex -check-utf8
 /src/plugins/wp/doc/manual/wp_store.tex -check-utf8
 
+# Don't check symbolic links (that gives an error)
+
 ## Unset all: "-check-syntax -check-indent -check-eoleof -check-utf8"
+
+# Don't check symbolic links (that gives an error for check-utf8). Please checks only the linked target.
+/src/plugins/e-acsl/tests/builtin/utils -check-syntax -check-indent -check-eoleof -check-utf8
+/src/plugins/e-acsl/tests/format/utils  -check-syntax -check-indent -check-eoleof -check-utf8
 
 # File names that cannot be checked (due to sh: 1: Syntax error: Unterminated quoted string)
 /tests/syntax/foo\".c                 -check-syntax -check-indent -check-eoleof -check-utf8
