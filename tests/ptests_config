@@ -21,6 +21,7 @@ apron_SUITES =
 bitwise_SUITES = value builtins float idct
 equality_SUITES = value builtins float idct
 gauges_SUITES = value builtins float idct
+multidim_SUITES = value builtins float idct
 octagon_SUITES = value builtins float idct
 symblocs_SUITES = value builtins float idct
 # todo:
