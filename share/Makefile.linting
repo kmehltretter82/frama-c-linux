@@ -35,8 +35,8 @@
 ################################
 ## Default variables
 
-IS_UTF8 ?= iconv -f UTF-8
-TO_UTF8 ?= iconv -t UTF-8
+IS_UTF8 ?= iconv -f UTF-8 -t UTF-8
+TO_UTF8 ?= iconv -f <NAME> -t UTF-8
 OCP_INDENT ?= ocp-indent
 
 # Default values necessary for
@@ -55,7 +55,7 @@ TOUCH   ?= touch
 # Can be set to the path of that makefile
 LINT_MAKEFILE ?=
 
-# Can be set to a sub-directory to restrict the checking 
+# Can be set to a sub-directory to restrict the checking
 LINT_DIR ?= .
 
 ################################
@@ -204,7 +204,8 @@ $(LINT_FILE.check-utf8): .lint/%.check-utf8: %
 	if ! $(IS_UTF8) $< > /dev/null; \
         then \
           echo "File $< uses an invalid UTF-8 encoding."; \
-          echo "Please fixe it manually, pearhaps with: $(TO_UTF8) --from-code=<NAME> $<";\
+          echo "Please fixe it manually, pearhaps with:"; \
+					echo "  $(TO_UTF8) --from-code=<NAME> $< -o fixed ; mv fixed $<";\
           echo "The next command may help you to find that <NAME>: file $<";\
           exit 1; \
         fi
