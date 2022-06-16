@@ -102,12 +102,12 @@ let run_oracle t1 t2 =
   in
   let fill_oracle s =
     try let chan_out = open_out "run.oracle"
-	in
-	output_string chan_out s;
-	close_out chan_out
+      in
+      output_string chan_out s;
+      close_out chan_out
     with Sys_error _ as exn ->
       Format.eprintf "cannot handle file %s: %s" "run.oracle" 
-	(Printexc.to_string exn) 
+        (Printexc.to_string exn) 
   in
   let rec string_of_list l = match l with
     | []    -> ""
@@ -124,9 +124,9 @@ let run_oracle t1 t2 =
   in
   let wo_tbl t k _d = 
     try let element_info = Hashtbl.find t k
-	in
-	to_fill := 
-	  !to_fill ^ "\n" ^ k ^ "/" ^ (string_of_list element_info)
+      in
+      to_fill := 
+        !to_fill ^ "\n" ^ k ^ "/" ^ (string_of_list element_info)
     with Not_found -> ()
   in
   let w_tbl t k _d = 
@@ -137,31 +137,31 @@ let run_oracle t1 t2 =
       let element_info = Hashtbl.find t k
       in
       to_fill := 
-	!to_fill ^ "\n" ^ k ^ "/"^ string_of_list element_info;
+        !to_fill ^ "\n" ^ k ^ "/"^ string_of_list element_info;
       let previous_element_info = Hashtbl.find tbl k 
       in
       if not (element_info = previous_element_info) then
-	Format.printf " \n \n ----%s---- \n\n ** Information \
- previously registered in 'run.oracle' :\n %s \n\n ** Information in \
- the current API :\n %s \n "
-	  k (string_of_info_list previous_element_info)
-	  (string_of_info_list element_info)
+        Format.printf " \n \n ----%s---- \n\n ** Information \
+                       previously registered in 'run.oracle' :\n %s \n\n ** Information in \
+                       the current API :\n %s \n "
+          k (string_of_info_list previous_element_info)
+          (string_of_info_list element_info)
     with Not_found -> 
       (* element not previously registered *)
       ()
   in
   Format.printf "%s" " \n \n*****************************\
-*************************************\
-\nELEMENTS OF THE INDEX OF THE DEVELOPER GUIDE EXISTING \
-IN THE CODE: \n*****************************************\
-*************************\n\n";
+                      *************************************\
+                      \nELEMENTS OF THE INDEX OF THE DEVELOPER GUIDE EXISTING \
+                      IN THE CODE: \n*****************************************\
+                      *************************\n\n";
   if (Sys.file_exists "run.oracle") 
   then (Hashtbl.iter (w_tbl t2) t1; 
-	fill_oracle !to_fill)
+        fill_oracle !to_fill)
   else (Hashtbl.iter (wo_tbl t2) t1 ;
-	fill_oracle !to_fill)
-    
-    
+        fill_oracle !to_fill)
+
+
 (** [compare] takes two lists and returns the elements 
     of the first list not in the second list and then the elements
     of the second list not in the first list.
@@ -171,17 +171,17 @@ let compare t1 t2 name1 name2 =
   let compare_aux t k =
     if not(List.mem k t) then Format.printf "%s" (k ^ "\n") in
   Format.printf " \n \n*****************************************\
-*******************\
-\nELEMENTS OF %s NOT IN %s: \n***********************************\
-*************************\
-\n\n" 
+                 *******************\
+                 \nELEMENTS OF %s NOT IN %s: \n***********************************\
+                 *************************\
+                 \n\n" 
     name1 name2;
   List.iter (compare_aux t2) t1;
   Format.printf " \n \n*******************************************\
-*****************\
-\nELEMENTS OF %s NOT IN %s: \n************************************\
-************************\
-\n\n"
+                 *****************\
+                 \nELEMENTS OF %s NOT IN %s: \n************************************\
+                 ************************\
+                 \n\n"
     name2 name1; 
   List.iter (compare_aux t1) t2
 
@@ -206,17 +206,17 @@ let () =
           output_string chan_out res;
         done
       with End_of_file -> ();
-      close_out chan_out ; close_in chan_in;
-      fill_tbl code_hstbl "code_file";
-      fill_tbl index_hstbl "index_file";
-      let code_list = sort_keys code_hstbl in
-      let index_list = sort_keys index_hstbl in
-      compare index_list code_list "THE INDEX \
-OF THE DEVELOPER GUIDE" "THE CODE";
-      run_oracle index_hstbl code_hstbl ;
+        close_out chan_out ; close_in chan_in;
+        fill_tbl code_hstbl "code_file";
+        fill_tbl index_hstbl "index_file";
+        let code_list = sort_keys code_hstbl in
+        let index_list = sort_keys index_hstbl in
+        compare index_list code_list "THE INDEX \
+                                      OF THE DEVELOPER GUIDE" "THE CODE";
+        run_oracle index_hstbl code_hstbl ;
     with Sys_error _ as exn ->
       Format.eprintf "cannot handle file %s: %s" "index_file"
-	(Printexc.to_string exn)
+        (Printexc.to_string exn)
   with Sys_error _ as exn ->
     Format.eprintf "cannot handle file %s: %s" "main.idx" 
       (Printexc.to_string exn)

@@ -14,8 +14,8 @@ let run () =
   let end_val = Cvalue.V.project_ival end_binding in
   if Ival.is_singleton_int init_val && Ival.is_singleton_int end_val then begin
     if not
-      (Abstract_interp.Int.equal
-         (Ival.project_int init_val) (Ival.project_int end_val))
+        (Abstract_interp.Int.equal
+           (Ival.project_int init_val) (Ival.project_int end_val))
     then
       Kernel.error "Glob has been assigned"
   end else begin

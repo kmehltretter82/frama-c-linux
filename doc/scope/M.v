@@ -175,7 +175,7 @@ Parameter ma : inst -> inst -> mark.
 Axiom maStart : forall L I, ma L I = Start -> L = I.
 Axiom maL : forall L, ma L L = Start.
 
-(** propriété du marquage après stabilité *)
+(** propriÃ©tÃ© du marquage aprÃ¨s stabilitÃ© *)
 Axiom Pma : forall L i', 
   ma L i' = lmerge (List.map (fun i => trans i (ma L i)) (pred i')).
 
