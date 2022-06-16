@@ -29,13 +29,13 @@
 # - make check-eoleof: EOF preceded by an EOL
 # - make check-syntax: EOF preceded by an EOL + no TAB + no BLANK at the end
 # - make check-indent: valid indentation
-# For all these targets (and the coresponding fix-XXX), it is possible to restrict the search to a sub-directory:
+# For all these targets (and the corresponding fix-XXX), it is possible to restrict the search to a sub-directory:
 # - make LINT_DIR=<subdir> <lint-target>
 # It is possible to force the action to given files:
-# - make LINT_FILE=<subdir> <lint-target>
+# - make LINT_FILE=<file> <lint-target>
 # Notes:
 # - when LINT_FILE is given, .gitattributes and LINT_DIR are ignored;
-# - to use fix-utf8 target, the variable LINT_FROM_CODE=<from-encoding-name>
+# - to use fix-utf8 target, the variable LINT_FROM_ENCODING=<from-encoding-name>
 #   has to be set.
 
 # make clean-lint (removing linting targets) includes
@@ -234,21 +234,21 @@ $(LINT_FILE.check-utf8): .lint/%.check-utf8: %
 	if ! $(IS_UTF8) $< > /dev/null; \
         then \
           echo "File $< uses an invalid UTF-8 encoding."; \
-          echo "Please fixe it manualy or in running: make LINT_FROM_CODE=<ENCODING-NAME> LINT_FILE=$< fix-utf8";\
+          echo "Please fixe it manualy or in running: make LINT_FROM_ENCODING=<ENCODING-NAME> LINT_FILE=$< fix-utf8";\
           echo "The next command may help you to find that <ENCODING-NAME>: file $<";\
           exit 1; \
         fi
 	$(MKDIR) $(dir $@)
 	$(TOUCH) $@
 
-ifneq ($(LINT_FROM_CODE),)
+ifneq ($(LINT_FROM_ENCODING),)
 
 .PHONY: $(LINT_FILE.fix-utf8)
 $(LINT_FILE.fix-utf8): .lint/%.fix-utf8: %
 	if ! $(IS_UTF8) $< > /dev/null 2> /dev/null; \
         then \
-          echo "Fixes UTF8 (from $(LINT_FROM_CODE)): $<"; \
-          if ! $(TO_UTF8) $(LINT_FROM_CODE) $< > $<.tmp; then exit 1; fi; \
+          echo "Fixes UTF8 (from $(LINT_FROM_ENCODING)): $<"; \
+          if ! $(TO_UTF8) $(LINT_FROM_ENCODING) $< > $<.tmp; then exit 1; fi; \
            $(MV) $<.tmp $<; \
         fi
 	$(MKDIR) $(dir $@)
@@ -257,7 +257,7 @@ $(LINT_FILE.fix-utf8): .lint/%.fix-utf8: %
 else
 
 $(LINT_FILE.fix-utf8): .lint/%.fix-utf8: % .lint/check-ocp-indent-version
-	$(error "Target fix-utf8 requires to define LINT_FROM_CODE variable")
+	$(error "Target fix-utf8 requires to define LINT_FROM_ENCODING variable")
 
 endif # LINT_FROM_ENCODING
 
