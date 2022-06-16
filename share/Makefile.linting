@@ -33,10 +33,16 @@
 # - make LINT_DIR=<subdir> <lint-target>
 # It is possible to force the action to given files:
 # - make LINT_FILE=<subdir> <lint-target>
-# Note:
+# Notes:
 # - when LINT_FILE is given, .gitattributes and LINT_DIR are ignored;
-# - to use fix-utf8 taget, the variable LINT_FROM_CODE=<from-encoding-name>
+# - to use fix-utf8 target, the variable LINT_FROM_CODE=<from-encoding-name>
 #   has to be set.
+
+# make clean-lint (removing linting targets) includes
+# - make clean-utf8
+# - make clean-eoleof
+# - make clean-syntax
+# - make clean-indent
 
 ################################
 ## Default variables
@@ -125,6 +131,26 @@ clean-lint:
 	$(RM) -r .lint
 
 clean:: clean-lint
+
+.PHONY: clean-check-eoleof
+clean-check-eoleof:
+	echo "Cleaning LINT $(patsubst clean-%,%,$@) targets..."
+	find .lint -type f -name \*.$(patsubst clean-%,%,$@) | xargs -n 10 $(RM)
+
+.PHONY: clean-check-utf8
+clean-check-utf8:
+	echo "Cleaning LINT $(patsubst clean-%,%,$@) targets..."
+	find .lint -type f -name \*.$(patsubst clean-%,%,$@) | xargs -n 10 $(RM)
+
+.PHONY: clean-check-syntax
+clean-check-syntax:
+	echo "Cleaning LINT $(patsubst clean-%,%,$@) targets..."
+	find .lint -type f -name \*.$(patsubst clean-%,%,$@) | xargs -n 10 $(RM)
+
+.PHONY: clean-check-ident
+clean-check-indent:
+	echo "Cleaning LINT $(patsubst clean-%,%,$@) targets..."
+	find .lint -type f -name \*.$(patsubst clean-%,%,$@) | xargs -n 10 $(RM)
 
 ###############################
 
