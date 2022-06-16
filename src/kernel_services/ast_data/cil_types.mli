@@ -143,7 +143,9 @@ and global =
       entire program. Cannot have storage Extern or function type. *)
 
   | GFun of fundec * location
-  (** A function definition. *)
+  (** A function definition.
+      @plugin development guide
+  *)
 
   | GAsm of string * location
   (** Global asm statement. These ones can contain only a template *)
@@ -1527,7 +1529,7 @@ and relation =
   | Rle
   | Rge
   | Req
-  | Rneq (** @plugin development guide *)
+  | Rneq (** Different @plugin development guide *)
 
 
 (** predicates *)
@@ -1683,6 +1685,7 @@ and ext_category =
   | Ext_global
   | Ext_code_annot of ext_code_annot_context
 
+(** @plugin development guide *)
 and ext_code_annot_context =
   | Ext_here (** at current program point. *)
   | Ext_next_stmt (** covers next statement. *)
@@ -1691,6 +1694,8 @@ and ext_code_annot_context =
 
 (** Behavior of a function or statement. This type shares the name of its
     constructors with {!Logic_ptree.behavior}.
+
+    @plugin development guide
 *)
 and behavior = {
   mutable b_name : string; (** name of the behavior. *)
@@ -1701,8 +1706,7 @@ and behavior = {
   mutable b_assigns : assigns; (** assignments. *)
   mutable b_allocation : allocation; (** frees, allocates. *)
   mutable b_extended : acsl_extension list
-  (** extensions
-      @plugin development guide *)
+  (** extensions  *)
 }
 
 (** kind of termination a post-condition applies to. See ACSL manual. *)
@@ -1766,7 +1770,10 @@ and code_annotation_node =
   | AExtended of string list * bool * acsl_extension
   (** extension in a code or loop annotation.
       Boolean flag is true for loop extensions and false for code extensions
-      @since Silicon-20161101 *)
+      @since Silicon-20161101
+
+      @plugin development guide
+  *)
 
 (** function contract. *)
 
@@ -1804,7 +1811,9 @@ and global_annotation =
   (** Model field for a type t, seen as a logic function with one
       argument of type t *)
   | Dextended of acsl_extension * attributes * location
-  (** Extended global clause. *)
+  (** Extended global clause.
+      @plugin development guide
+  *)
 
 type kinstr =
   | Kstmt of stmt

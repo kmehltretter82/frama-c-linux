@@ -79,6 +79,7 @@ PLUGIN_TYPES_CMX_LIST :=
 PLUGIN_DEP_LIST:=
 PLUGIN_DOC_LIST :=
 PLUGIN_DOC_DIRS :=
+PLUGIN_DOC_DUMP_LIST :=
 PLUGIN_DISTRIBUTED_LIST:=
 PLUGIN_DIST_TARGET_LIST:=
 PLUGIN_DIST_DOC_LIST:=
@@ -1240,7 +1241,9 @@ FILES_FOR_OCAMLDEP+= $(addsuffix /*.mli,$(FRAMAC_SRC_DIRS)) \
 
 MODULES_TODOC+=$(filter-out $(MODULES_NODOC),\
 	$(MLI_ONLY) \
-	$(filter-out $(PLUGIN_TYPES_CMO_LIST:.cmo=.mli),$(CMO:.cmo=.mli)))
+	$(filter-out $(PLUGIN_TYPES_CMO_LIST:.cmo=.mli),$(CMO:.cmo=.mli)) \
+	$(STARTUP_CMO:.cmo=.mli) \
+)
 
 ################################
 # toplevel.{byte,opt} binaries #
@@ -1706,26 +1709,32 @@ $(CHECK_API_DIR)/check_code.cmo: $(CHECK_API_DIR)/check_code.ml
 
 $(CHECK_API_DIR)/check_code.cmxs: $(CHECK_API_DIR)/check_code.ml
 	$(PRINT_PACKING) $@
-	$(OCAMLOPT) -o $@ -shared -I +ocamldoc \
-		str.cmxa $(CHECK_API_DIR)/check_code.ml
+	$(OCAMLOPT) -package ocamldoc -o $@ -shared \
+		$(CHECK_API_DIR)/check_code.ml
 
 CHECK_CODE=$(CHECK_API_DIR)/check_code.cmxs
 
-.PHONY: check-devguide
-check-devguide: $(CHECK_CODE) $(DOC_DEPEND) $(DOC_DIR)/kernel-doc.ocamldoc
+.PHONY: check-devguide devguide
+devguide: byte $(OCAMLBEST)
+	$(MAKE) FRAMAC_INTERNAL=no -C $(DOC_DEV_DIR)
+
+check-devguide: $(CHECK_CODE) $(DOC_DEPEND) $(DOC_DIR)/kernel-doc.ocamldoc plugins-doc devguide
 	$(PRINT) 'Checking     developer guide consistency'
 	$(MKDIR) $(CHECK_API_DIR)/html
+	$(RM) $(CHECK_API_DIR)/code_file
+	$(foreach doc_dump, \
+                  $(DOC_DIR)/kernel-doc.ocamldoc $(PLUGIN_DOC_DUMP_LIST), \
 	$(OCAMLDOC) $(DOC_FLAGS) -I $(OCAMLLIB) \
 	  -g $(CHECK_CODE) \
 	  -passopt -docdevpath -passopt "`pwd`/$(CHECK_API_DIR)" \
-	  -load $(DOC_DIR)/kernel-doc.ocamldoc \
-	  -d $(CHECK_API_DIR)/html
+	  -load $(doc_dump) \
+	  -d $(CHECK_API_DIR)/html; )
 	$(RM) -r  $(CHECK_API_DIR)/html
 	$(MAKE) --silent -C $(CHECK_API_DIR) main.idx
 	$(MAKE) --silent -C $(CHECK_API_DIR) >$(CHECK_API_DIR)/summary.txt
 	$(ECHO) see all the information displayed here \
 		in $(CHECK_API_DIR)/summary.txt
-	$(RM) code_file
+
 ################################
 # Code prettyfication and lint #
 ################################

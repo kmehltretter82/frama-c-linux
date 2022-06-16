@@ -20,8 +20,6 @@
 #                                                                        #
 ##########################################################################
 
-export FRAMAC_INTERNAL=no
-
 export FRAMAC_OPT=$(BINDIR)/frama-c$(EXE)
 export FRAMAC_BYTE=$(BINDIR)/frama-c.byte$(EXE)
 

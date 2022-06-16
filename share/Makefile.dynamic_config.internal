@@ -20,7 +20,7 @@
 #                                                                        #
 ##########################################################################
 
-export FRAMAC_INTERNAL=yes
+export FRAMAC_INTERNAL?=yes
 
 export FRAMAC_OPT=$(FRAMAC_ROOT_SRCDIR)/bin/toplevel.opt$(EXE)
 export FRAMAC_BYTE=$(FRAMAC_ROOT_SRCDIR)/bin/toplevel.byte$(EXE)

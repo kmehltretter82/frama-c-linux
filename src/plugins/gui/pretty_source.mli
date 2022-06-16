@@ -36,7 +36,10 @@ type localizable = Printer_tag.localizable =
       of the varinfo to distinguish between the various possibilities.
       If the varinfo is a global or a local, the kernel_function is the
       one in which the variable is declared. The [kinstr] argument is given
-      for local variables with an explicit initializer. *)
+      for local variables with an explicit initializer.
+
+      @plugin development guide
+  *)
   | PGlobal of global (** all globals but variable declarations and function
                           definitions. *)
   | PIP of Property.t

@@ -80,13 +80,16 @@ module Lenv : sig
 
 end
 
-type type_namespace = Typedef | Struct | Union | Enum
 (** The different namespaces a C type can belong to, used when we are searching
     a type by its name. *)
+type type_namespace = Typedef | Struct | Union | Enum
 
 module Type_namespace: Datatype.S with type t = type_namespace
 
-(** Functions that can be called when type-checking an extension of ACSL. *)
+(** Functions that can be called when type-checking an extension of ACSL.
+
+    @plugin development guide
+*)
 type typing_context = {
   is_loop: unit -> bool;
   anonCompFieldName : string;
@@ -124,8 +127,6 @@ type typing_context = {
       [typing_context], which allows for open recursion. Namely, it is
       possible for the extension to change the type-checking functions for
       the sub-nodes of the parsed tree, and not only for the toplevel [lexpr].
-
-      @plugin development guide
   *)
   type_term:
     typing_context -> Lenv.t -> Logic_ptree.lexpr -> term;

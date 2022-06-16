@@ -10,6 +10,13 @@ char *__gen_e_acsl_literal_string;
 char *__gen_e_acsl_literal_string_2;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
+/*@ requires valid_stream: \valid(stream);
+    ensures result_zero_or_EOF: \result == 0 || \result == -1;
+    assigns \result;
+    assigns \result \from (indirect: stream), (indirect: *stream);
+ */
+int __gen_e_acsl_fclose(FILE *stream);
+
 /*@ requires valid_filename: valid_read_string(filename);
     requires valid_mode: valid_read_string(mode);
     ensures
@@ -408,6 +415,63 @@ FILE *__gen_e_acsl_fopen(char const * restrict filename,
   return __retres;
 }
 
+/*@ requires valid_stream: \valid(stream);
+    ensures result_zero_or_EOF: \result == 0 || \result == -1;
+    assigns \result;
+    assigns \result \from (indirect: stream), (indirect: *stream);
+ */
+int __gen_e_acsl_fclose(FILE *stream)
+{
+  int __retres;
+  {
+    int __gen_e_acsl_valid;
+    __e_acsl_store_block((void *)(& stream),8UL);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_valid = __e_acsl_valid((void *)stream,sizeof(FILE),
+                                        (void *)stream,(void *)(& stream));
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"stream",
+                                 (void *)stream);
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(FILE)",
+                                   0,sizeof(FILE));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                 "\\valid(stream)",0,__gen_e_acsl_valid);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Precondition";
+    __gen_e_acsl_assert_data.pred_txt = "\\valid(stream)";
+    __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdio.h";
+    __gen_e_acsl_assert_data.fct = "fclose";
+    __gen_e_acsl_assert_data.line = 120;
+    __gen_e_acsl_assert_data.name = "valid_stream";
+    __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+  }
+  __retres = fclose(stream);
+  {
+    int __gen_e_acsl_or;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\result",0,
+                                 __retres);
+    if (__retres == 0) __gen_e_acsl_or = 1;
+    else {
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\result",0,
+                                   __retres);
+      __gen_e_acsl_or = __retres == -1;
+    }
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Postcondition";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\result == 0 || \\result == -1";
+    __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdio.h";
+    __gen_e_acsl_assert_data_2.fct = "fclose";
+    __gen_e_acsl_assert_data_2.line = 122;
+    __gen_e_acsl_assert_data_2.name = "result_zero_or_EOF";
+    __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    __e_acsl_delete_block((void *)(& stream));
+    return __retres;
+  }
+}
+
 void __e_acsl_globals_init(void)
 {
   static char __e_acsl_already_run = 0;
@@ -443,6 +507,7 @@ int main(void)
     __e_acsl_store_block((void *)(buf_0),4UL);
     tmp_0 = __gen_e_acsl_fread((void *)(buf_0),(size_t)1,(size_t)4,f);
     int res = (int)tmp_0;
+    __gen_e_acsl_fclose(f);
     if (res == 4) {
       {
         int __gen_e_acsl_initialized;
@@ -462,7 +527,7 @@ int main(void)
         __gen_e_acsl_assert_data.pred_txt = "\\initialized(&buf_0[3])";
         __gen_e_acsl_assert_data.file = "issue-eacsl-40.c";
         __gen_e_acsl_assert_data.fct = "main";
-        __gen_e_acsl_assert_data.line = 15;
+        __gen_e_acsl_assert_data.line = 16;
         __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
       }

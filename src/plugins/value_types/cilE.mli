@@ -20,8 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Value analysis alarms
-    @plugin development guide *)
+(** Value analysis alarms *)
 
 (* ************************************************************************* *)
 (* [JS 2011/03/11] All the below stuff manage warnings of the value analysis

@@ -50,7 +50,7 @@ val copy: Project.t -> t
 
 val refresh: Project.t -> t
 (** Makes fresh copies of the mutable structures and provides fresh id
-    for the structures that have ids. Note that as for {!copy_visit}, only
+    for the structures that have ids. Note that as for {!copy}, only
     varinfo that are declared in the scope of the visit will be copied and
     provided with a new id.
 *)
@@ -99,12 +99,16 @@ module type Get = sig
   val enumitem: t -> enumitem -> enumitem
   val typeinfo: t -> typeinfo -> typeinfo
   val stmt: t -> stmt -> stmt
+  (** @plugin development guide *)
+
   val logic_info: t -> logic_info -> logic_info
   val logic_type_info: t -> logic_type_info -> logic_type_info
   val fieldinfo: t -> fieldinfo -> fieldinfo
   val model_info: t -> model_info -> model_info
   val logic_var: t -> logic_var -> logic_var
   val kernel_function: t -> kernel_function -> kernel_function
+  (** @plugin development guide *)
+
   val fundec: t -> fundec -> fundec
 end
 
@@ -187,6 +191,7 @@ module Set: Set
     {!Cil_types.varinfo}: [Set_orig.varinfo vis vi new_original_repr].
 
     @since 20.0-Calcium
+    @plugin development guide
 *)
 module Set_orig: Set
 
