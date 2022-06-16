@@ -48,7 +48,6 @@ Changelog merge=union
 
 /tests/spec/unfinished-oneline-acsl-comment.i -check-eoleof
 /doc/developer/check_api/run.oracle -check-eoleof
-/src/plugins/server/tests/batch/wrong.json -check-eoleof
 
 ## Unset "-check-utf8"
 
