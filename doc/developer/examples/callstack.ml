@@ -17,7 +17,7 @@ module P =
       let name = "Callstack"
       let shortname = "Callstack"
       let help = "callstack library"
-     end)
+    end)
 
 (* A callstack is a list of a pair (kf * stmt) where [kf] is the kernel
    function called at statement [stmt]. Building the datatype also creates the
@@ -47,7 +47,7 @@ module D =
       let name = "Callstack.t"
       let reprs = [ empty; [ Kernel_function.dummy (), Cil.dummyStmt ] ]
       include Datatype.Serializable_undefined
-     end)
+    end)
 
 (* Dynamic API registration *)
 let register name ty =

@@ -8,7 +8,7 @@ let cfg_selector
       let fundec = Kernel_function.get_definition kf in
       let window:GWindow.window = main_ui#main_window in
       Dgraph_helper.graph_window_through_dot
-	~parent:window ~title:"Control flow graph"
+        ~parent:window ~title:"Control flow graph"
         (dump_function fundec)
     in
     ignore (popup_factory#add_item "Show _CFG" ~callback)
