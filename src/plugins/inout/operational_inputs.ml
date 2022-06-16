@@ -590,6 +590,8 @@ module Callwise = struct
   let call_for_callwise_inout (call_type, state, call_stack) =
     let (current_function, ki as call_site) = List.hd call_stack in
     let merge_inout inout =
+      Db.Operational_inputs.Record_Inout_Callbacks.apply
+        (call_stack, inout);
       if ki = Kglobal
       then merge_call_in_global_tables call_site inout
       else
