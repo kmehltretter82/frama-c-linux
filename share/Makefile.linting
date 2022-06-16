@@ -103,7 +103,7 @@ lint:
 
 else
 
-lint: check-eoleof check-syntax check-indent
+lint: check-eoleof check-syntax check-indent check-utf8
 
 endif
 
