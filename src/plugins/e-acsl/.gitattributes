@@ -23,6 +23,13 @@ Makefile.in header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
 /scripts/e-acsl-gcc.sh.comp header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
 /scripts/e-acsl-gcc.sh.comp header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
 
+###########################################
+# CHECK-INDENT                            #
+###########################################
+
+/tests/*/*.c check-clang-format
+/share/**/*.c check-clang-format
+
 ########################
 # HEADER_SPEC: .ignore #
 ########################
@@ -69,4 +76,3 @@ README header_spec=.ignore
 /tests/E_ACSL_test.ml header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
 /contrib/libdlmalloc/dlmalloc.* header_spec=MODIFIED_DLMALLOC
 /share/e-acsl/internals/e_acsl_rtl_io.* header_spec=MODIFIED_SPARETIMELABS
-
