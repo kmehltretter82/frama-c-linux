@@ -5,35 +5,69 @@
 .git-blame-ignore-revs merge=union
 Changelog merge=union
 
-###############
-# BINARY: set #
-###############
-# built-in macro that also unsets the "text" and "diff" attributes
+##################################################
+# BINARY/CHECK-SYNTAX/INDENT/EOL-EOF: set/-unset #
+##################################################
 
-*.ico binary -check-eoleof
-*.icns binary -check-eoleof
+# note: "binary" is a built-in macro that also
+#       unsets the "text" and "diff" attributes
 
-*.eps binary -check-eoleof
-*.ps  binary -check-eoleof
-*.gif binary -check-eoleof
-*.jpg binary -check-eoleof
-*.png binary -check-eoleof
-*.svg binary -check-eoleof
+# note: set "check-eoleof" and "check-utf8" by default to all files
+* check-eoleof check-utf8
 
-*.odg binary -check-eoleof
-*.pdf binary -check-eoleof
+# note: unset "-check-eoleof" and "-check-utf8" for "binary"
+*.ico binary -check-eoleof -check-utf8
+*.icns binary -check-eoleof -check-utf8
 
-*.eot binary -check-eoleof
-*.woff binary -check-eoleof
+*.eps binary -check-eoleof -check-utf8
+*.ps  binary -check-eoleof -check-utf8
+*.gif binary -check-eoleof -check-utf8
+*.jpg binary -check-eoleof -check-utf8
+*.png binary -check-eoleof -check-utf8
+*.svg binary -check-eoleof -check-utf8
+
+*.odg binary -check-eoleof -check-utf8
+*.pdf binary -check-eoleof -check-utf8
+
+*.eot binary -check-eoleof -check-utf8
+*.woff binary -check-eoleof -check-utf8
 
 ###########################################
 # CHECK-SYNTAX/INDENT/EOL-EOF: set/-unset #
 ###########################################
 
+## Set "check-syntax" and "check-indent"
+
+# note: "check-syntax" includes already "check-eoleof"
 *.ml  check-syntax check-indent -check-eoleof
 *.mli check-syntax check-indent -check-eoleof
 
+## Unset "-check-eoleof"
+
+*.dot -check-eoleof
+
+/tests/spec/unfinished-oneline-acsl-comment.i -check-eoleof
 /doc/developer/check_api/run.oracle -check-eoleof
+
+## Unset "-check-utf8"
+
+/doc/training/developer/macros.tex -check-utf8
+
+/src/plugins/wp/doc/coqdoc/coqdoc.sty -check-utf8
+/src/plugins/wp/doc/manual/wp_logicvar.tex -check-utf8
+/src/plugins/wp/doc/manual/wp_store.tex -check-utf8
+
+# Don't check symbolic links (that gives an error)
+
+## Unset all: "-check-syntax -check-indent -check-eoleof -check-utf8"
+
+# Don't check symbolic links (that gives an error for check-utf8). Please checks only the linked target.
+/src/plugins/e-acsl/tests/builtin/utils -check-syntax -check-indent -check-eoleof -check-utf8
+/src/plugins/e-acsl/tests/format/utils  -check-syntax -check-indent -check-eoleof -check-utf8
+
+# File names that cannot be checked (due to sh: 1: Syntax error: Unterminated quoted string)
+/tests/syntax/foo\".c                 -check-syntax -check-indent -check-eoleof -check-utf8
+/tests/syntax/oracle/foo\".res.oracle -check-syntax -check-indent -check-eoleof -check-utf8
 
 #########################
 # HEADER_SPEC: CEA_LGPL #

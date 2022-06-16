@@ -24,13 +24,52 @@
 # Code prettyfication and lint #
 ################################
 
-SED?=sed
-ISED?=sed -i
+# make lint includes:
+# - make check-utf8: valid UTF-8 encoding
+# - make check-eoleof: EOF preceded by an EOL
+# - make check-syntax: EOF preceded by an EOL + no TAB + no BLANK at the end
+# - make check-indent: valid indentation
+# For all these targets (and the corresponding fix-XXX), it is possible to restrict the search to a sub-directory:
+# - make LINT_DIR=<subdir> <lint-target>
+# It is possible to force the action to given files:
+# - make LINT_FILE=<file> <lint-target>
+# Notes:
+# - when LINT_FILE is given, .gitattributes and LINT_DIR are ignored;
+# - to use fix-utf8 target, the variable LINT_FROM_ENCODING=<from-encoding-name>
+#   has to be set.
+
+# make clean-lint (removing linting targets) includes
+# - make clean-utf8
+# - make clean-eoleof
+# - make clean-syntax
+# - make clean-indent
+
+################################
+## Default variables
+
+IS_UTF8 ?= iconv -f UTF-8 -t UTF-8
+TO_UTF8 ?= iconv -t UTF-8 -f
+
+OCP_INDENT ?= ocp-indent
+
+# Default values necessary for
+#   LINT_MAKEFILE=<this-makefile> make -f <this-makefile> <lint-target>`
+# Otherwise theses variables are defined into share/Makefile.common
+SED     ?= LC_ALL=C sed
+ISED    ?= sed -i
+GIT     ?= git
+MKDIR   ?= mkdir -p
+MV      ?= mv
+RM      ?= rm -f
+TOUCH   ?= touch
 
 ############
 
 # Can be set to the path of that makefile
 LINT_MAKEFILE ?=
+
+# Can be set to a sub-directory to restrict the checking
+LINT_DIR ?= .
 
 ################################
 
@@ -48,21 +87,21 @@ endif
 ## CHECK ocp-indent VERSION
 
 .lint/check-ocp-indent-version:
-	if command -v ocp-indent >/dev/null; then \
-		if [ -z "$(shell ocp-indent --version)" ]; then echo "warning: ocp-indent returned an empty string, assuming it is the correct version"; \
+	if command -v $(OCP_INDENT) >/dev/null; then \
+		if [ -z "$(shell $(OCP_INDENT) --version)" ]; then echo "warning: $(OCP_INDENT) returned an empty string, assuming it is the correct version"; \
 		else \
-			$(eval ocp_version_major := $(shell ocp-indent --version | $(SED) -E "s/^([0-9]+)\.[0-9]+\..*/\1/")) \
-			$(eval ocp_version_minor := $(shell ocp-indent --version | $(SED) -E "s/^[0-9]+\.([0-9]+)\..*/\1/")) \
+			$(eval ocp_version_major := $(shell $(OCP_INDENT) --version | $(SED) -E "s/^([0-9]+)\.[0-9]+\..*/\1/")) \
+			$(eval ocp_version_minor := $(shell $(OCP_INDENT) --version | $(SED) -E "s/^[0-9]+\.([0-9]+)\..*/\1/")) \
 			if [ "$(ocp_version_major)" -lt 1 -o "$(ocp_version_minor)" -lt 7 ]; then \
-				echo "error: ocp-indent 1.7.0 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
+				echo "error: $(OCP_INDENT) 1.7.0 required for linting (got $(ocp_version_major).$(ocp_version_minor))"; \
 			exit 1; \
 			fi; \
 		fi; \
 	else \
 		exit 1; \
 	fi;
-	mkdir -p $(dir $@)
-	touch $@
+	$(MKDIR) $(dir $@)
+	$(TOUCH) $@
 
 ###############
 ## Main target
@@ -72,12 +111,12 @@ ifeq ($(LINT.HAS_GIT),)
 
 .PHONY:
 lint:
-	echo "'make lint' requires git"
-	echo "but,that is not the case of 'make LINT_FILE=<file> check-syntax'"
+	echo "'make lint' requires a git repository but, that is not"
+	echo "the case for example with 'make LINT_FILE=<file> check-syntax'"
 
 else
 
-lint: check-eoleof check-syntax check-indent
+lint: check-eoleof check-syntax check-indent check-utf8
 
 endif
 
@@ -93,32 +132,53 @@ clean-lint:
 
 clean:: clean-lint
 
+#### clean-check-XXX targets
+
+LINT.clean-targets= \
+        clean-check-eoleof clean-check-utf8 clean-check-syntax clean-check-ident
+.PHONY: clean-check-eoleof clean-check-utf8 clean-check-syntax clean-check-ident
+
+# Generic rule
+$(LINT.clean-targets):
+	echo "[LINT] Cleaning $(patsubst clean-%,%,$@) targets..."
+	find .lint -type f -name \*.$(patsubst clean-%,%,$@) | xargs -n 10 $(RM)
+
 ###############################
 
 ifeq ($(LINT_FILE),)
 
 # No lint file given
 
-.PHONY: check-eoleof
-check-eoleof:
-	git ls-files -z \
-        | git check-attr --stdin -z check-eoleof \
-        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
-        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" check-eoleof || exit 255'
+LINT.dir=$(wildcard $(LINT_DIR))
 
-.PHONY: check-syntax
-check-syntax:
-	git ls-files -z  \
-        | git check-attr --stdin -z check-syntax \
-        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
-        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" check-syntax || exit 255'
+#### check-XXX targets
 
-.PHONY: check-indent
-check-indent:
-	git ls-files -z  \
-        | git check-attr --stdin -z check-indent \
+LINT.check-targets= \
+        check-syntax check-indent check-eoleof check-utf8
+.PHONY: check-syntax check-indent check-eoleof check-utf8
+
+# Generic rule
+$(LINT.check-targets):
+	echo "[LINT] Checking from GIT attribute $@..."
+	$(GIT) ls-files $(LINT.dir) -z \
+        | $(GIT) check-attr --stdin -z $@ \
         | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
-        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" check-indent || exit 255'
+        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
+
+#### fix-XXX targets
+
+LINT.fix-targets= \
+        fix-eoleof fix-utf8 fix-syntax fix-ident
+.PHONY: fix-eoleof fix-utf8 fix-syntax fix-ident
+
+# Generic rule
+$(LINT.fix-targets):
+	echo "[LINT] Fixing from GIT attribute $(patsubst fix-%,check-%,$@)..."
+	$(GIT) ls-files $(LINT.dir) -z \
+        | $(GIT) check-attr --stdin -z $(patsubst fix-%,check-%,$@) \
+        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
+        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
+
 
 else # LINT_FILE are given
 
@@ -126,15 +186,20 @@ else # LINT_FILE are given
 
 LINT_FILE.list=$(addprefix .lint/,$(wildcard $(LINT_FILE)))
 
+LINT_FILE.check-utf8= $(addsuffix .check-utf8,$(LINT_FILE.list))
 LINT_FILE.check-eoleof= $(addsuffix .check-eoleof,$(LINT_FILE.list))
 LINT_FILE.check-syntax= $(addsuffix .check-syntax,$(LINT_FILE.list))
 LINT_FILE.check-indent= $(addsuffix .check-indent,$(LINT_FILE.list))
 
+LINT_FILE.fix-utf8= $(addsuffix .fix-utf8,$(LINT_FILE.list))
 LINT_FILE.fix-eoleof= $(addsuffix .fix-eoleof,$(LINT_FILE.list))
 LINT_FILE.fix-syntax= $(addsuffix .fix-syntax,$(LINT_FILE.list))
 LINT_FILE.fix-indent= $(addsuffix .fix-indent,$(LINT_FILE.list))
 
 ## check-XXX targets
+
+.PHONY: check-utf8
+check-utf8: $(LINT_FILE.check-utf8)
 
 .PHONY: check-eoleof
 check-eoleof: $(LINT_FILE.check-eoleof)
@@ -147,11 +212,14 @@ check-indent: $(LINT_FILE.check-indent)
 
 ## fix-XXX targets
 
-.PHONY: fix-syntax
-fix-syntax: $(LINT_FILE.fix-syntax)
+.PHONY: fix-utf8
+fix-utf8: $(LINT_FILE.fix-utf8)
 
 .PHONY: fix-eoleof
 fix-eoleof: $(LINT_FILE.fix-eoleof)
+
+.PHONY: fix-syntax
+fix-syntax: $(LINT_FILE.fix-syntax)
 
 .PHONY: fix-indent
 fix-indent: $(LINT_FILE.fix-indent)
@@ -159,27 +227,63 @@ fix-indent: $(LINT_FILE.fix-indent)
 endif
 
 ###############################
+## UTF8 ASPECT
+
+$(LINT_FILE.check-utf8): .lint/%.check-utf8: %
+	echo "Check UTF8: $<"
+	if ! $(IS_UTF8) $< > /dev/null; \
+        then \
+          echo "File $< uses an invalid UTF-8 encoding."; \
+          echo "Please fixe it manualy or in running: make LINT_FROM_ENCODING=<ENCODING-NAME> LINT_FILE=$< fix-utf8";\
+          echo "The next command may help you to find that <ENCODING-NAME>: file $<";\
+          exit 1; \
+        fi
+	$(MKDIR) $(dir $@)
+	$(TOUCH) $@
+
+ifneq ($(LINT_FROM_ENCODING),)
+
+.PHONY: $(LINT_FILE.fix-utf8)
+$(LINT_FILE.fix-utf8): .lint/%.fix-utf8: %
+	if ! $(IS_UTF8) $< > /dev/null 2> /dev/null; \
+        then \
+          echo "Fixes UTF8 (from $(LINT_FROM_ENCODING)): $<"; \
+          if ! $(TO_UTF8) $(LINT_FROM_ENCODING) $< > $<.tmp; then exit 1; fi; \
+           $(MV) $<.tmp $<; \
+        fi
+	$(MKDIR) $(dir $@)
+	$(TOUCH) .lint/$<.check-utf8 # no more need of check-indent
+
+else
+
+$(LINT_FILE.fix-utf8): .lint/%.fix-utf8: % .lint/check-ocp-indent-version
+	$(error "Target fix-utf8 requires to define LINT_FROM_ENCODING variable")
+
+endif # LINT_FROM_ENCODING
+
+###############################
 ## INDENTATION ASPECT
 
 $(LINT_FILE.check-indent): .lint/%.check-indent: % .lint/check-ocp-indent-version
 	echo "Check indent: $<"
-	ocp-indent $< > $<.tmp
+	$(OCP_INDENT) $< > $<.tmp
 	if cmp -s $< $<.tmp; \
-        then rm -f $<.tmp; \
+        then $(RM) $<.tmp; \
         else \
           echo "File $< is not indented correctly."; \
           echo "Please run: make LINT_FILE=$< fix-indent";\
-          rm $<.tmp; \
+          $(RM) $<.tmp; \
           exit 1; \
         fi
-	mkdir -p $(dir $@)
-	touch $@
+	$(MKDIR) $(dir $@)
+	$(TOUCH) $@
 
+.PHONY: $(LINT_FILE.fix-indent)
 $(LINT_FILE.fix-indent): .lint/%.fix-indent: % .lint/check-ocp-indent-version
 	echo "Fixes indent: $<"
-	ocp-indent -i $<
-	mkdir -p $(dir $@)
-	touch .lint/$<.check-indent # no more need of check-indent
+	$(OCP_INDENT) -i $<
+	$(MKDIR) $(dir $@)
+	$(TOUCH) .lint/$<.check-indent # no more need of check-indent
 
 ###############################
 ## EOL EOF ASPECT (included by check-syntax target)
@@ -198,14 +302,16 @@ $(LINT_FILE.check-eoleof): .lint/%.check-eoleof: %
           echo "Please run: make LINT_FILE=$< fix-eoleof"; \
           exit 1 ; \
         fi
-	mkdir -p $(dir $@)
-	touch $@
+	$(MKDIR) $(dir $@)
+	$(TOUCH) $@
 
+# The real target is a check-XXX one
+.PHONY: $(LINT_FILE.fix-eoleof)
 $(LINT_FILE.fix-eoleof): .lint/%.fix-eoleof: %
 	echo "Fixes EOL EOF: $<"
 	$(ISED) -e '$$a\' $<
-	mkdir -p $(dir $@)
-	touch .lint/$<.check-eoleof # no more need of this checking
+	$(MKDIR) $(dir $@)
+	$(TOUCH) .lint/$<.check-eoleof # no more need of this checking
 
 %.fix-eoleof: LC_ALL = C
 
@@ -233,9 +339,11 @@ $(LINT_FILE.check-syntax): .lint/%.check-syntax: %
           echo "Please run: make LINT_FILE=$< fix-syntax"; \
           exit 1 ; \
         fi
-	mkdir -p $(dir $@)
-	touch $@
+	$(MKDIR) $(dir $@)
+	$(TOUCH) $@
 
+# The real target is a check-XXX one
+.PHONY: $(LINT_FILE.fix-syntax)
 $(LINT_FILE.fix-syntax): .lint/%.fix-syntax: %
 	echo "Fixes syntax: $<"
 	$(ISED) -e 's/^ *\t\+/ /' $<
@@ -246,11 +354,11 @@ $(LINT_FILE.fix-syntax): .lint/%.fix-syntax: %
         else \
           while tail -n -1 $< | grep -l -e '^[ \t]*$$'; do \
             head -n -1 $< > $<.tmp; \
-            mv $<.tmp $<; \
+            $(MV) $<.tmp $<; \
           done; \
         fi
-	mkdir -p $(dir $@)
-	touch .lint/$<.check-syntax # no more need of check-syntax
+	$(MKDIR) $(dir $@)
+	$(TOUCH) .lint/$<.check-syntax # no more need of check-syntax
 
 # Avoid a UTF-8 locale at all cost: in such setting, sed does not work
 # reliably if you happen to have latin-1 encoding somewhere,

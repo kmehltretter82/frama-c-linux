@@ -1,22 +1,22 @@
-# Fichier à inclure dans son makefile pour faire des compilation latex.
-# L'utilisateur doit définir certaines variables (notées +)
-# et peut en option en (re)définir d'autres (notées *) :
+# Fichier Ã  inclure dans son makefile pour faire des compilation latex.
+# L'utilisateur doit dÃ©finir certaines variables (notÃ©es +)
+# et peut en option en (re)dÃ©finir d'autres (notÃ©es *) :
 #
-# === outils (peuvent être redéfinis si on veut préciser le path par exemple) :
+# === outils (peuvent Ãªtre redÃ©finis si on veut prÃ©ciser le path par exemple) :
 # TEXI (= texi2dvi)
 # HEVEA (HEVEAOPTS), HACHA
 
 # === fichiers :
-# * TOPTEX=top.tex : déterminé par défaut par un grep de documentclass
-# * GENERATED_TEX= : fichiers .tex générés (vide par défaut)
+# * TOPTEX=top.tex : dÃ©terminÃ© par dÃ©faut par un grep de documentclass
+# * GENERATED_TEX= : fichiers .tex gÃ©nÃ©rÃ©s (vide par dÃ©faut)
 #
 # * FIGURES_TODO= : noms de figures sans extension (-> .eps + .pdf)
 #                   (suppose qu'on a le .eps et le .pdf 
 #                   ou qu'on sait a une cible pour les fabriquer...)
 #
-# * HVA=macros.hva : si on a besoin de définir des choses pour hevea
+# * HVA=macros.hva : si on a besoin de dÃ©finir des choses pour hevea
 #
-# Les figures (fichiers .fig) sont compilés en postscript et/ou en pdf
+# Les figures (fichiers .fig) sont compilÃ©s en postscript et/ou en pdf
 # en fonction des besoins. Si on souhaite compiler une figure en latex
 # (formules, etc) il faut simplement nommer le fichier *.tex.fig
 #
@@ -25,14 +25,14 @@
 # debug_latex, 
 # clean_latex, clean_hevea, clean
 #
-# loop : lance gv sur TOPTEX.ps et une boucle de compilation qui met à jour
-#        le contenu visualisé.
-#        Il est conseillé d'utiliser plutôt la cible 'sloop' pour ne pas avoir
-#        un écran qui défile en permanence.
+# loop : lance gv sur TOPTEX.ps et une boucle de compilation qui met Ã  jour
+#        le contenu visualisÃ©.
+#        Il est conseillÃ© d'utiliser plutÃ´t la cible 'sloop' pour ne pas avoir
+#        un Ã©cran qui dÃ©file en permanence.
 #------------------------------------------------------------------------------
 
 
-# l'avantage de texi2dvi par rapport à latex, 
+# l'avantage de texi2dvi par rapport Ã  latex, 
 # c'est qu'il s'occupe de l'index, de la biblio,
 # et de lancer latex autant de fois qu'il le faut.
 TEXI?=texi2dvi
@@ -73,13 +73,13 @@ FIGURES_EPS = $(SIMPLE_FIGURES_EPS) $(FIGURES_PSTEX)
 FIGURES_PDF = $(SIMPLE_FIGURES_PDF) $(FIGURES_PDFTEX)
 GENERATED_FIGURES = $(FIGURES_EPS) $(FIGURES_PDF) $(FIGURES_TEX)
 
-# plus utile : hevea se débrouille tout seul.
+# plus utile : hevea se dÃ©brouille tout seul.
 #IMAGES_GIF = $(shell grep -s gif $(SRC).html | grep "^[ ]*<IMG" | sed -e 's=[^"]*"\(.*.gif\).*=\1=')
 
-# TODO : à étendre au cas d'une biblio multiple (plusieurs fichiers .bib).
+# TODO : Ã  Ã©tendre au cas d'une biblio multiple (plusieurs fichiers .bib).
 BIB_NAME = $(shell grep -h "bibliography{" $(TOPTEX) \
               | sed -e 's/\\bibliography{\(.*\)}/\1.bib/')
-# TODO: à modifier pour chercher dans BIBINPUTS
+# TODO: Ã  modifier pour chercher dans BIBINPUTS
 
 ifneq ($(strip $(BIB_NAME)),)
   BIB_FILE = $(BIB_NAME)
@@ -115,7 +115,7 @@ debug_latex :
 	@echo "HVA = $(HVA)"
 
 #------------------------------------------------------------------------------
-# Dépendances :
+# DÃ©pendances :
 
 $(SRC).dvi : $(ALL_TEX) $(FIGURES_TEX) $(FIGURES_EPS) $(BBL_FILE) $(FIGURES_PDF)
 # no <TAB> here
@@ -129,7 +129,7 @@ $(SRC).html : $(ALL_TEX) $(SRC).pdf $(SRC).bbl
 #------------------------------------------------------------------------------
 # Regles de production :
 
-# dessins .eps à partir des .fig de xfig
+# dessins .eps Ã  partir des .fig de xfig
 %.eps : %.tex.fig
 	fig2dev -L pstex $< $@
 
@@ -160,7 +160,7 @@ $(SRC).html : $(ALL_TEX) $(SRC).pdf $(SRC).bbl
 	$(TEXI2DVI)  $<
 
 $(SRC).bbl : $(BIB_FILE)
-	@echo "=== Fichier .bib plus récent -> effacement du .bbl"
+	@echo "=== Fichier .bib plus rÃ©cent -> effacement du .bbl"
 	rm -f $(SRC).bbl
 
 
@@ -193,9 +193,9 @@ $(SRC).html: $(HVA) $(SRC).tex
 index.html: $(SRC).html
 	$(HACHA) -o index.html $(SRC).html
 
-# ceci n'est normalement plus utile sous UNIX grace à l'option -fix de hevea
+# ceci n'est normalement plus utile sous UNIX grace Ã  l'option -fix de hevea
 #$(IMAGES_GIF) : $(SRC).image.tex
-	#@echo "=== Génération des images gif"
+	#@echo "=== GÃ©nÃ©ration des images gif"
 	#imagen $(SRC)
 
 #------------------------------------------------------------------------------
@@ -228,14 +228,14 @@ sloop:
 
 #------------------------------------------------------------------------------
 clean_hevea :
-	@echo "=== Ménage des fichiers hevea"
+	@echo "=== MÃ©nage des fichiers hevea"
 	rm -f $(SRC).html $(SRC).h{toc,aux,ind,idx} $(SRC).cb
 	rm -f index.html $(SRC)[0-9][0-9][0-9].html $(SRC).css
 	rm -f $(SRC).image.cb $(SRC).image.tex $(SRC)[0-9][0-9][0-9].gif 
 	rm -f previous_motif.gif next_motif.gif contents_motif.gif
 
 clean_tmp_tex :
-	@echo "=== Ménage des fichiers temporaires de latex"
+	@echo "=== MÃ©nage des fichiers temporaires de latex"
 	rm -f $(SRC).aux
 	rm -f $(SRC).log
 	rm -f $(SRC).blg
@@ -249,12 +249,12 @@ clean_tmp_tex :
 	rm -f $(SRC).out
 
 clean_latex : clean_tmp_tex
-	@echo "=== Ménage des fichiers latex"
+	@echo "=== MÃ©nage des fichiers latex"
 	rm -f $(SRC).bbl
 	rm -f $(SRC).dvi
 	rm -f $(SRC).ps
 	rm -f $(SRC).pdf
-	@echo "=== Ménage des figures"
+	@echo "=== MÃ©nage des figures"
 	rm -f *.~[0-9]*~ *.bak *~
 	rm -f $(GENERATED_FIGURES)
 

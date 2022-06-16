@@ -61,8 +61,6 @@ autom4te.cache
 /devel_tools/fc-time
 /devel_tools/fc-memuse
 /bin/ocamldep_transitive_closure
-/bin/isutf8
-/bin/isutf8.exe
 
 #share
 /share/Makefile.config
