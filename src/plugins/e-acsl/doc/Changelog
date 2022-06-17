@@ -25,6 +25,7 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* E-ACSL       [2022-17-06] Fix wrong cast from pointer to integer (frama-c/frama-c#1119)
 
 ##############################
 Plugin E-ACSL 25.0 (Manganese)
