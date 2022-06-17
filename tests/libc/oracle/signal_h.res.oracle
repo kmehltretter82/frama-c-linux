@@ -283,7 +283,7 @@
   kill_res ∈ {-1; 0}
   sa1 ∈
      {{ garbled mix of &{__fc_sigaction}
-      (origin: Library function) }} or UNINITIALIZED
+      (origin: Library function {signal_h.c:45}) }} or UNINITIALIZED
   sa2 ∈
      {{ garbled mix of &{__fc_sigaction}
       (origin: Library function {signal_h.c:48}) }} or UNINITIALIZED
