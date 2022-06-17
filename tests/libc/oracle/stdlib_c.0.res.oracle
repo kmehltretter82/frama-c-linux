@@ -81,13 +81,24 @@
   allocating variable __malloc_posix_memalign_l199_0
 [eva] Recording results for posix_memalign
 [eva] Done for function posix_memalign
+[eva] computing for function posix_memalign <- main.
+  Called from stdlib_c.c:40.
+[eva] FRAMAC_SHARE/libc/stdlib.c:199: Call to builtin Frama_C_malloc
+[eva] Recording results for posix_memalign
+[eva] Done for function posix_memalign
 [eva] computing for function free <- main.
   Called from stdlib_c.c:41.
 [eva] stdlib_c.c:41: Warning: ignoring unsupported allocates clause
 [eva] stdlib_c.c:41: function free: precondition 'freeable' got status valid.
 [eva] Done for function free
+[eva] computing for function free <- main.
+  Called from stdlib_c.c:41.
+[eva] Done for function free
 [eva] stdlib_c.c:44: Call to builtin Frama_C_malloc
 [eva] stdlib_c.c:44: allocating variable __malloc_main_l44
+[eva] stdlib_c.c:44: Call to builtin Frama_C_malloc
+[eva] stdlib_c.c:44: Call to builtin Frama_C_malloc
+[eva] stdlib_c.c:44: Call to builtin Frama_C_malloc
 [eva] computing for function realpath <- main.
   Called from stdlib_c.c:46.
 [eva] computing for function Frama_C_interval <- realpath <- main.
@@ -109,11 +120,32 @@
 [eva] Done for function Frama_C_make_unknown
 [eva] Recording results for realpath
 [eva] Done for function realpath
+[eva] stdlib_c.c:46: Reusing old results for call to realpath
+[eva] stdlib_c.c:46: Reusing old results for call to realpath
+[eva] stdlib_c.c:46: Reusing old results for call to realpath
 [eva:alarm] stdlib_c.c:48: Warning: 
   assertion 'valid_if_exact' got status unknown.
 [eva] computing for function Frama_C_nondet <- main.
   Called from stdlib_c.c:50.
 [eva] using specification for function Frama_C_nondet
+[eva] Done for function Frama_C_nondet
+[eva] computing for function Frama_C_nondet <- main.
+  Called from stdlib_c.c:50.
+[eva] Done for function Frama_C_nondet
+[eva] computing for function Frama_C_nondet <- main.
+  Called from stdlib_c.c:50.
+[eva] Done for function Frama_C_nondet
+[eva] computing for function Frama_C_nondet <- main.
+  Called from stdlib_c.c:50.
+[eva] Done for function Frama_C_nondet
+[eva] computing for function Frama_C_nondet <- main.
+  Called from stdlib_c.c:50.
+[eva] Done for function Frama_C_nondet
+[eva] computing for function Frama_C_nondet <- main.
+  Called from stdlib_c.c:50.
+[eva] Done for function Frama_C_nondet
+[eva] computing for function Frama_C_nondet <- main.
+  Called from stdlib_c.c:50.
 [eva] Done for function Frama_C_nondet
 [eva] computing for function Frama_C_nondet <- main.
   Called from stdlib_c.c:50.
@@ -128,12 +160,6 @@
 [eva] computing for function free <- main.
   Called from stdlib_c.c:53.
 [eva] Done for function free
-[eva] computing for function free <- main.
-  Called from stdlib_c.c:53.
-[eva] Done for function free
-[eva] computing for function free <- main.
-  Called from stdlib_c.c:53.
-[eva] Done for function free
 [eva] computing for function realpath <- main.
   Called from stdlib_c.c:54.
 [eva] computing for function Frama_C_interval <- realpath <- main.
@@ -144,34 +170,6 @@
 [eva] Done for function Frama_C_interval
 [eva] FRAMAC_SHARE/libc/stdlib.c:224: Call to builtin Frama_C_malloc
 [eva] FRAMAC_SHARE/libc/stdlib.c:224: allocating variable __malloc_realpath_l224
-[eva] computing for function Frama_C_make_unknown <- realpath <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:230.
-[eva] Done for function Frama_C_make_unknown
-[eva] Recording results for realpath
-[eva] Done for function realpath
-[eva] computing for function realpath <- main.
-  Called from stdlib_c.c:54.
-[eva] computing for function Frama_C_interval <- realpath <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:213.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- realpath <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:222.
-[eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/stdlib.c:224: Call to builtin Frama_C_malloc
-[eva] computing for function Frama_C_make_unknown <- realpath <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:230.
-[eva] Done for function Frama_C_make_unknown
-[eva] Recording results for realpath
-[eva] Done for function realpath
-[eva] computing for function realpath <- main.
-  Called from stdlib_c.c:54.
-[eva] computing for function Frama_C_interval <- realpath <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:213.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- realpath <- main.
-  Called from FRAMAC_SHARE/libc/stdlib.c:222.
-[eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/stdlib.c:224: Call to builtin Frama_C_malloc
 [eva] computing for function Frama_C_make_unknown <- realpath <- main.
   Called from FRAMAC_SHARE/libc/stdlib.c:230.
 [eva] Done for function Frama_C_make_unknown
