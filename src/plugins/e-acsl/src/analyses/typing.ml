@@ -708,15 +708,21 @@ and number_ty_bound_variable ~profile (t1, lv, t2) =
   let i = Interval.(widen (join i1 i2)) in
   match lv.lv_type with
   | Linteger ->
-    (match t2.term_type with
-     | Ctype (TInt (ik, _) as typ) when
-         Interval.is_included i (Interval.interv_of_typ typ)
-       -> mk_ctx ~use_gmp_opt:true (C_integer ik)
-     | _ -> (match t2.term_node with
-         | TLogic_coerce(_, {term_type = Ctype (TInt (ik, _) as typ)}) when
+    let t2 = Logic_utils.remove_logic_coerce t2 in
+    let ty =
+      match t2.term_type with
+      | Ctype typ ->
+        (match Cil.unrollType typ with
+         | TInt (ik, _) | TEnum({ ekind = ik }, _) when
              Interval.is_included i (Interval.interv_of_typ typ)
-           -> mk_ctx ~use_gmp_opt:true (C_integer ik)
-         | _ -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz i)))
+           -> Some (C_integer ik)
+         | TInt _ | TEnum _ | TFloat _ | TVoid _ | TPtr _ | TArray _ | TFun _
+         | TComp _ | TBuiltin_va_list _ | TNamed _ -> None)
+      | _ -> None
+    in
+    (match ty with
+     | Some ty -> mk_ctx ~use_gmp_opt:true ty
+     | None -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:Gmpz i))
   | Ctype ty ->
     (match Cil.unrollType ty with
      | TInt(ik, _) | TEnum({ ekind = ik}, _)-> join
@@ -839,25 +845,34 @@ and ctx_relation ~profile t1 t2 =
   let i1 = Interval.get_from_profile ~profile t1 in
   let i2 = Interval.get_from_profile ~profile t2 in
   let i = Interval.join i1 i2 in
-  match t1.term_type with
-  | Ctype (TInt (ik, _) as typ) when
-      Interval.is_included i (Interval.interv_of_typ typ)
-    -> mk_ctx ~use_gmp_opt:true (C_integer ik)
-  | _ ->
+  let t1 = Logic_utils.remove_logic_coerce t1 in
+  let ty1 =
+    match t1.term_type with
+    | Ctype typ ->
+      (match Cil.unrollType typ with
+       | TInt (ik, _) | TEnum({ ekind = ik }, _) when
+           Interval.is_included i (Interval.interv_of_typ typ)
+         -> Some (C_integer ik)
+       | TInt _ | TEnum _ | TFloat _ | TVoid _ | TPtr _ | TArray _ | TFun _
+       | TComp _ | TBuiltin_va_list _ | TNamed _ -> None)
+    | _ -> None
+  in
+  let t2 = Logic_utils.remove_logic_coerce t2 in
+  let ty2 =
     match t2.term_type with
-    | Ctype (TInt (ik, _) as typ) when
-        Interval.is_included i (Interval.interv_of_typ typ)
-      -> mk_ctx ~use_gmp_opt:true (C_integer ik)
-    | _ -> match t1.term_node with
-      | TLogic_coerce(_, {term_type = Ctype (TInt (ik, _) as typ)}) when
-          Interval.is_included i (Interval.interv_of_typ typ)
-        -> mk_ctx ~use_gmp_opt:true (C_integer ik)
-      | _ -> match t2.term_node with
-        | TLogic_coerce(_, {term_type = Ctype (TInt (ik, _) as typ)}) when
-            Interval.is_included i (Interval.interv_of_typ typ)
-          -> mk_ctx ~use_gmp_opt:true (C_integer ik)
-        | _ -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:c_int i)
-
+    | Ctype typ ->
+      (match Cil.unrollType typ with
+       | TInt (ik, _) | TEnum({ ekind = ik }, _) when
+           Interval.is_included i (Interval.interv_of_typ typ)
+         -> Some (C_integer ik)
+       | TInt _ | TEnum _ | TFloat _ | TVoid _ | TPtr _ | TArray _ | TFun _
+       | TComp _ | TBuiltin_va_list _ | TNamed _ -> None)
+    | _ -> None
+  in
+  match ty1, ty2 with
+  | Some ty, _
+  | None, Some ty -> mk_ctx ~use_gmp_opt:true ty
+  | None, None -> mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx:c_int i)
 
 let type_term ~use_gmp_opt ?ctx ~profile t =
   Options.feedback ~dkey ~level:4 "typing term '%a' in ctx '%a'."
