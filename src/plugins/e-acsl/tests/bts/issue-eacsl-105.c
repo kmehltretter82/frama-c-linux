@@ -1,5 +1,5 @@
 /* run.config
-   COMMENT: frama-c/e-acsl#105, test for delete block before exiting the 
+   COMMENT: frama-c/e-acsl#105, test for delete block before exiting the
     function in the presence of early return.
 */
 

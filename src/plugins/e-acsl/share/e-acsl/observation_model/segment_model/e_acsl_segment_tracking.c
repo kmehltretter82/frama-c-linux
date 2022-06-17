@@ -167,7 +167,7 @@ void validate_shadow_layout() {
 #  endif
 
   /* Each segment has 3 partitions:
-	 - application memory
+  - application memory
      - primary/secondary shadows */
   int num_partitions = sizeof(mem_partitions) / sizeof(memory_partition *);
   int num_seg_in_part = 3;
