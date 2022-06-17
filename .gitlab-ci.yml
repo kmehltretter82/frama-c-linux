@@ -78,10 +78,47 @@ e-acsl-tests:
   script:
     - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.e-acsl-tests
 
-eva-tests:
+# EVA
+
+.build_template: &eva_template
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.eva-tests
+    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.eva-$CONFIG-tests
+
+eva-default-tests:
+  variables:
+    CONFIG: "default"
+  <<: *eva_template
+
+eva-bitwise-tests:
+  variables:
+    CONFIG: "bitwise"
+  <<: *eva_template
+
+eva-equality-tests:
+  variables:
+    CONFIG: "equality"
+  <<: *eva_template
+
+eva-gauges-tests:
+  variables:
+    CONFIG: "gauges"
+  <<: *eva_template
+
+eva-multidim-tests:
+  variables:
+    CONFIG: "multidim"
+  <<: *eva_template
+
+eva-octagon-tests:
+  variables:
+    CONFIG: "octagon"
+  <<: *eva_template
+
+eva-symblocs-tests:
+  variables:
+    CONFIG: "symblocs"
+  <<: *eva_template
 
 frama-clang:
   stage: tests

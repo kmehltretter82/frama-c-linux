@@ -28,7 +28,13 @@ let
     # Tests
     default-config-tests = oself.callPackage ./default-config-tests.nix {};
     e-acsl-tests = oself.callPackage ./e-acsl-tests.nix {};
-    eva-tests = oself.callPackage ./eva-tests.nix {};
+    eva-default-tests = oself.callPackage ./eva-tests.nix { config = ""; };
+    eva-bitwise-tests = oself.callPackage ./eva-tests.nix { config = "bitwise" ; };
+    eva-equality-tests = oself.callPackage ./eva-tests.nix { config = "equality" ; };
+    eva-gauges-tests = oself.callPackage ./eva-tests.nix { config = "gauges" ; };
+    eva-multidim-tests = oself.callPackage ./eva-tests.nix { config = "multidim" ; };
+    eva-octagon-tests = oself.callPackage ./eva-tests.nix { config = "octagon" ; };
+    eva-symblocs-tests = oself.callPackage ./eva-tests.nix { config = "symblocs" ; };
     full-tests = oself.callPackage ./full-tests.nix {};
     kernel-tests = oself.callPackage ./kernel-tests.nix {};
     plugins-tests = oself.callPackage ./plugins-tests.nix {};
