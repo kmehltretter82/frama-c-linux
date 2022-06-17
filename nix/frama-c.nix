@@ -37,6 +37,7 @@
 , dos2unix
 , doxygen
 , python3
+, release_mode ? false
 }:
 
 # We do not use buildDunePackage because Frama-C still uses a Makefile to build
@@ -49,7 +50,10 @@ stdenvNoCC.mkDerivation rec {
         (builtins.readFile ../VERSION));
   slang = lib.strings.removeSuffix "\n" (builtins.readFile ../VERSION_CODENAME);
 
-  src = gitignoreSource ./..;
+  src =
+    if release_mode
+    then ./..
+    else gitignoreSource ./.. ;
 
   nativeBuildInputs = [
     autoconf
@@ -89,17 +93,18 @@ stdenvNoCC.mkDerivation rec {
 
   outputs = [ "out" "build_dir" ];
 
-  preConfigure = ''
-    autoconf
+  preConfigure = (if release_mode then "" else "autoconf \n") + ''
     patchShebangs src/plugins/value/gen-api.sh
     chmod +x src/plugins/value/gen-api.sh
   '';
 
   # Do not use default parallel building, but allow 2 cores for Frama-C build
   enableParallelBuilding = false;
+  dune_opt = if release_mode then "--release" else "" ;
+
   buildPhase = ''
     make config.sed
-    dune build -j2 --display short @install
+    dune build -j2 --display short $release_mode @install
     make ptests/ptests.exe
     make ptests/wtests.exe
   '';

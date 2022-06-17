@@ -17,7 +17,7 @@ TAGS
 #artifacts from execution
 frama_c_journal.ml
 /.frama-c/
-/frama-c-*.tar.gz
+/frama-c*.tar.gz
 /.merlin
 /headers/hdrck
 /headers/hdrck.exe
@@ -30,7 +30,7 @@ autom4te.cache
 /.depend
 /config.log
 /config.status
-/frama-c-*.tar.gz
+/frama-c*.tar.gz
 /distributed
 /.log.autoconf
 /.Makefile.user

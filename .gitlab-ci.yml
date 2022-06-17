@@ -1,7 +1,8 @@
 stages:
   - build
   - tests
-  - distrib_and_compatibility
+  - distrib
+  - compatibility
   - make_public
 
 ################################################################################
@@ -15,20 +16,13 @@ default:
 ### VARIABLES
 
 variables:
-     DEFAULT: "feature/bobot/jbuilder"
-     OCAML: "4_12"
+  DEFAULT: "feature/bobot/jbuilder"
+  OCAML: "4_12"
 #     CURRENT: $CI_COMMIT_REF_NAME
 #     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
 
 ################################################################################
 ### BUILD
-
-# build-distrib-tarball:
-#   stage: build
-#   script:
-#     -
-#   tags:
-#     - nix
 
 check-no-old-frama-c:
   stage: build
@@ -47,15 +41,6 @@ frama-c:
       - results.log
     expire_in: 1 day
 
-header-check:
-  stage: build
-  variables:
-    FRAMAC_HDRCK: ""
-  script:
-    - ls -la
-    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
-        --run 'make -f share/Makefile.headers check-headers'
-
 ivette:
   stage: build
   image: node:lts-gallium
@@ -70,14 +55,6 @@ ivette:
   tags:
     - docker
 
-lint:
-  stage: build
-  variables:
-    LINT_MAKEFILE: "share/Makefile.linting"
-  script:
-    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
-        --run 'make -f share/Makefile.linting lint'
-
 ################################################################################
 ### TESTS
 
@@ -85,13 +62,6 @@ acsl-importer:
   stage: tests
   script:
     - ./nix/external-plugin-ci.sh ACSL-importer
-
-# build-from-distrib-tarball:
-#   stage: tests
-#   script:
-#     -
-#   tags:
-#     - nix
 
 caveat-importer:
   stage: tests
@@ -169,7 +139,7 @@ wp-tests:
 # API documentation
 
 .build_template: &api-doc
-  stage: distrib_and_compatibility
+  stage: distrib
   script:
     - nix-build -o api nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.api-doc
 
@@ -193,26 +163,47 @@ api-doc-scheduled: # Keep artifact for master branch each night
   only:
     - schedules
 
-# Internalized plugins tests
+# Build distribution tarball
 
-.build_template: &internal_template
-  stage: distrib_and_compatibility
+build-distrib-tarball:
+  stage: distrib
+  variables:
+    OPEN_SOURCE: "yes"
+    CI_LINK: "yes"
+    HDRCK: "frama-c-hdrck"
   script:
-    - ./nix/internal-tests.sh
+    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
+        --run 'autoconf && ./devel_tools/make-distrib.sh'
+  artifacts:
+    paths:
+      - ./*.tar.gz
+    expire_in: 1 week
 
-internal:
-  <<: *internal_template
-  when: manual
+# Check files header
 
-internal_nightly:
-  <<: *internal_template
-  only:
-    - schedules
+header-check:
+  stage: distrib
+  variables:
+    FRAMAC_HDRCK: ""
+  script:
+    - ls -la
+    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
+        --run 'make -f share/Makefile.headers check-headers'
+
+# Lint files
+
+lint:
+  stage: distrib
+  variables:
+    LINT_MAKEFILE: "share/Makefile.linting"
+  script:
+    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
+        --run 'make -f share/Makefile.linting lint'
 
 # Manuals
 
 .build_template: &manuals
-  stage: distrib_and_compatibility
+  stage: distrib
   script:
     - nix-build -o manuals nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.manuals
 
@@ -225,10 +216,29 @@ manuals:
       - manuals/*.tgz
     expire_in: 7 days # Note: the LAST artifact of the ref is always kept
 
+################################################################################
+### COMPATIBILITY
+
+# Internalized plugins tests
+
+.build_template: &internal_template
+  stage: compatibility
+  script:
+    - ./nix/internal-tests.sh
+
+internal:
+  <<: *internal_template
+  when: manual
+
+internal_nightly:
+  <<: *internal_template
+  only:
+    - schedules
+
 # OCaml versions
 
 .build_template: &ocaml
-  stage: distrib_and_compatibility
+  stage: compatibility
   script:
     - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.default-config-tests
 
@@ -242,6 +252,11 @@ manuals:
 #     OCAML: "4_13"
 #   <<: *ocaml
 
+src-distrib-tests:
+  stage: compatibility
+  script:
+    - mkdir extracted && tar -xzf frama-c.tar.gz --strip-components 1 -C ./extracted
+    - nix-build extracted/nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.src-distrib-tests
 
 ################################################################################
 ### PUBLIC

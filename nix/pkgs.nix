@@ -41,6 +41,9 @@ let
     # Release
     api-doc = oself.callPackage ./api-doc.nix {};
     manuals = oself.callPackage ./manuals.nix {};
+    src-distrib-tests = oself.callPackage ./src-distrib-tests.nix {
+      frama-c-release = oself.frama-c.override { release_mode = true ; } ;
+    };
   };
   overlay = self: super: {
     niv = (import sources.niv {}).niv;
