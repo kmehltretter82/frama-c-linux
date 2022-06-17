@@ -52,17 +52,21 @@ TO_UTF8 ?= iconv -t UTF-8 -f
 
 OCP_INDENT   ?= ocp-indent
 CLANG_FORMAT ?= clang-format
+# wc, tail, head, cmp
 
 # Default values necessary for
 #   LINT_MAKEFILE=<this-makefile> make -f <this-makefile> <lint-target>`
 # Otherwise theses variables are defined into share/Makefile.common
 SED     ?= LC_ALL=C sed
 ISED    ?= sed -i
+FIND    ?= find
 GIT     ?= git
 MKDIR   ?= mkdir -p
 MV      ?= mv
 RM      ?= rm -f
+RMDIR   ?= rm -rf
 TOUCH   ?= touch
+XARGS   ?= xargs --no-run-if-empty
 
 ############
 
@@ -136,7 +140,7 @@ endif
 .PHONY: clean-lint
 clean-lint:
 	echo "Cleaning LINT targets..."
-	rm -rf .lint
+	$(RMDIR) .lint
 
 clean:: clean-lint
 
@@ -157,7 +161,7 @@ LINT.clean-targets+= \
 # Generic rule
 $(LINT.clean-targets):
 	echo "[LINT] Cleaning $(patsubst clean-%,%,$@) targets..."
-	find .lint -type f -name \*.$(patsubst clean-%,%,$@) | xargs -n 10 $(RM)
+	$(FIND) .lint -type f -name \*.$(patsubst clean-%,%,$@) | $(XARGS) -n 10 $(RM)
 
 ###############################
 
@@ -180,7 +184,7 @@ $(LINT.check-targets):
 	$(GIT) ls-files $(LINT.dir) -z \
         | $(GIT) check-attr --stdin -z $@ \
         | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
-        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
+        | $(XARGS) -0 -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
 
 #### fix-XXX targets
 
@@ -195,7 +199,7 @@ $(LINT.fix-targets):
 	$(GIT) ls-files $(LINT.dir) -z \
         | $(GIT) check-attr --stdin -z $(patsubst fix-%,check-%,$@) \
         | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
-        | xargs --null -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
+        | $(XARGS) -0 -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
 
 
 else # LINT_FILE are given
