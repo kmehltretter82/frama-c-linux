@@ -2,21 +2,79 @@
 # MERGE: union #
 ################
 
+.git-blame-ignore-revs merge=union
 Changelog merge=union
 
-###############
-# BINARY: set #
-###############
-# built-in macro that also unsets the "text" and "diff" attributes
+##################################################
+# BINARY/CHECK-SYNTAX/INDENT/EOL-EOF: set/-unset #
+##################################################
 
-*.eps binary
-*.ps binary
+# note: "binary" is a built-in macro that also
+#       unsets the "text" and "diff" attributes
 
-*.pdf binary
+# note: set "check-eoleof" and "check-utf8" by default to all files
+* check-eoleof check-utf8
+
+# note: unset "-check-eoleof" and "-check-utf8" for "binary"
+*.ico binary -check-eoleof -check-utf8
+*.icns binary -check-eoleof -check-utf8
+
+*.eps binary -check-eoleof -check-utf8
+*.ps  binary -check-eoleof -check-utf8
+*.gif binary -check-eoleof -check-utf8
+*.jpg binary -check-eoleof -check-utf8
+*.png binary -check-eoleof -check-utf8
+*.svg binary -check-eoleof -check-utf8
+
+*.odg binary -check-eoleof -check-utf8
+*.pdf binary -check-eoleof -check-utf8
+
+*.eot binary -check-eoleof -check-utf8
+*.woff binary -check-eoleof -check-utf8
+
+###########################################
+# CHECK-SYNTAX/INDENT/EOL-EOF: set/-unset #
+###########################################
+
+## Set "check-syntax" and "check-indent"
+
+# note: "check-syntax" includes already "check-eoleof"
+*.ml  check-syntax check-indent -check-eoleof
+*.mli check-syntax check-indent -check-eoleof
+
+## Unset "-check-eoleof"
+
+*.dot -check-eoleof
+
+/tests/spec/unfinished-oneline-acsl-comment.i -check-eoleof
+/doc/developer/check_api/run.oracle -check-eoleof
+
+## Unset "-check-utf8"
+
+/doc/training/developer/macros.tex -check-utf8
+
+/src/plugins/wp/doc/coqdoc/coqdoc.sty -check-utf8
+/src/plugins/wp/doc/manual/wp_logicvar.tex -check-utf8
+/src/plugins/wp/doc/manual/wp_store.tex -check-utf8
+
+# Don't check symbolic links (that gives an error)
+
+## Unset all: "-check-syntax -check-indent -check-eoleof -check-utf8"
+
+# Don't check symbolic links (that gives an error for check-utf8). Please checks only the linked target.
+/src/plugins/e-acsl/tests/builtin/utils -check-syntax -check-indent -check-eoleof -check-utf8
+/src/plugins/e-acsl/tests/format/utils  -check-syntax -check-indent -check-eoleof -check-utf8
+
+# File names that cannot be checked (due to sh: 1: Syntax error: Unterminated quoted string)
+/tests/syntax/foo\".c                 -check-syntax -check-indent -check-eoleof -check-utf8
+/tests/syntax/oracle/foo\".res.oracle -check-syntax -check-indent -check-eoleof -check-utf8
 
 #########################
 # HEADER_SPEC: CEA_LGPL #
 #########################
+
+dune-project header_spec=CEA_LGPL
+dune header_spec=CEA_LGPL
 
 config* header_spec=CEA_LGPL
 
@@ -158,7 +216,11 @@ README* header_spec=.ignore
 /man/frama-c.1 header_spec=.ignore
 
 /nix/empty header_spec=.ignore
+/nix/external-plugins.txt header_spec=.ignore
 /nix/frama-c-public/known_hosts header_spec=.ignore
+/nix/sources.json header_spec=.ignore
+
+/ptests/tests/**/* header_spec=.ignore
 
 /share/framac.vim header_spec=.ignore
 /share/META.frama-c header_spec=.ignore
@@ -219,6 +281,7 @@ README* header_spec=.ignore
 /src/kernel_services/analysis/dataflows.ml header_spec=CIL
 /src/kernel_services/analysis/dataflows.mli header_spec=CIL
 /src/kernel_services/ast_data/cil_types.mli header_spec=CIL
+/src/kernel_services/ast_data/cil_types.ml header_spec=CIL
 /src/kernel_services/ast_printing/cprint.ml header_spec=CIL
 /src/kernel_services/ast_printing/cprint.mli header_spec=CIL
 /src/kernel_services/ast_printing/logic_print.ml header_spec=CEA_INRIA_LGPL
@@ -238,8 +301,10 @@ README* header_spec=.ignore
 /src/kernel_services/ast_queries/logic_utils.ml header_spec=CEA_INRIA_LGPL
 /src/kernel_services/ast_queries/logic_utils.mli header_spec=CEA_INRIA_LGPL
 /src/kernel_services/parsetree/cabs.mli header_spec=CIL
+/src/kernel_services/parsetree/cabs.ml header_spec=CIL
 /src/kernel_services/parsetree/cabshelper.ml header_spec=CIL
 /src/kernel_services/parsetree/cabshelper.mli header_spec=CIL
+/src/kernel_services/parsetree/logic_ptree.ml header_spec=CEA_INRIA_LGPL
 /src/kernel_services/parsetree/logic_ptree.mli header_spec=CEA_INRIA_LGPL
 /src/kernel_services/visitors/cabsvisit.ml header_spec=CIL
 /src/kernel_services/visitors/cabsvisit.mli header_spec=CIL
@@ -248,8 +313,8 @@ README* header_spec=.ignore
 
 /src/libraries/datatype/unmarshal.ml header_spec=INRIA_BSD
 /src/libraries/datatype/unmarshal.mli header_spec=INRIA_BSD
-/src/libraries/datatype/unmarshal_hashtbl_test.ml header_spec=INRIA_BSD
-/src/libraries/datatype/unmarshal_test.ml header_spec=INRIA_BSD
+/src/libraries/datatype/tests/unmarshal_hashtbl_test.ml header_spec=INRIA_BSD
+/src/libraries/datatype/tests/unmarshal_test.ml header_spec=INRIA_BSD
 /src/libraries/project/state_topological.ml header_spec=MODIFIED_OCAMLGRAPH
 /src/libraries/project/state_topological.mli header_spec=MODIFIED_OCAMLGRAPH
 /src/libraries/utils/cilconfig.ml header_spec=CIL
@@ -258,6 +323,7 @@ README* header_spec=.ignore
 /src/libraries/utils/escape.mli header_spec=CIL
 /src/libraries/utils/hptmap.ml header_spec=MODIFIED_MENHIR
 /src/libraries/utils/hptmap.mli header_spec=MODIFIED_MENHIR
+/src/libraries/utils/hptmap_sig.ml header_spec=MODIFIED_MENHIR
 /src/libraries/utils/hptmap_sig.mli header_spec=MODIFIED_MENHIR
 /src/libraries/utils/rangemap.ml header_spec=OCAML_STDLIB
 /src/libraries/utils/rangemap.mli header_spec=OCAML_STDLIB
