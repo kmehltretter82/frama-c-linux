@@ -1,25 +1,25 @@
 =========================================================================
-Ce fichier contient les règles à suivre pour écrire la doc du développeur
+Ce fichier contient les rÃ¨gles Ã  suivre pour Ã©crire la doc du dÃ©veloppeur
 =========================================================================
 
-* Les instructions de "doc/www/src/metadoc.NE_PAS_ECRIRE" doivent être 
-  appliquées.
+* Les instructions de "doc/www/src/metadoc.NE_PAS_ECRIRE" doivent Ãªtre 
+  appliquÃ©es.
 
 * Les fichiers portent l'extension .pretex pour permettre leur preprocessing
 
-* L'index doit être tenu à jour
+* L'index doit Ãªtre tenu Ã  jour
 
-* Les redondances dans l'index (deux entrées différentes correspondant à la
-  même chose) ne sont autorisées seulement si une des deux entrées référence
-  proprement l'autre à l'aide d'un tag "see".
+* Les redondances dans l'index (deux entrÃ©es diffÃ©rentes correspondant Ã  la
+  mÃªme chose) ne sont autorisÃ©es seulement si une des deux entrÃ©es rÃ©fÃ©rence
+  proprement l'autre Ã  l'aide d'un tag "see".
 
-* L'annexe "Changes" doit être tenue à jour.
+* L'annexe "Changes" doit Ãªtre tenue Ã  jour.
 
-* Les macros doivent être définies dans macros.tex
+* Les macros doivent Ãªtre dÃ©finies dans macros.tex
 
-* Les macros doivent être au maximum utilisées. 
+* Les macros doivent Ãªtre au maximum utilisÃ©es. 
   En particulier:
-    o les environnements dérivés de "code" pour le code
+    o les environnements dÃ©rivÃ©s de "code" pour le code
         - autoconfcode pour les configure.in
         - makecode pour les makefile
 	- ccode pour le C
@@ -27,10 +27,10 @@ Ce fichier contient les règles à suivre pour écrire la doc du développeur
 	- code pour les autres codes (ligne de commandes par exemple)
     o l'environnement "example" pour les exemples
     o l'environnement "important" pour les choses importantes
-    o l'environnement "convention" pour les conventions qu'un développeur doit
+    o l'environnement "convention" pour les conventions qu'un dÃ©veloppeur doit
       respecter
-    o l'environnement "prereq" pour les prérequis nécessaires à la bonne
-      compréhension 
-    o les macros pour les noms de langage/d'outils (c'est la même macro
-      \langage à l'origine)
-    o les macros pour les entrées d'index
+    o l'environnement "prereq" pour les prÃ©requis nÃ©cessaires Ã  la bonne
+      comprÃ©hension 
+    o les macros pour les noms de langage/d'outils (c'est la mÃªme macro
+      \langage Ã  l'origine)
+    o les macros pour les entrÃ©es d'index
