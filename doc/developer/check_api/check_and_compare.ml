@@ -122,14 +122,14 @@ let run_oracle t1 t2 =
       then h ^ "\n" ^ (string_of_info_list q)
       else (string_of_info_list q)
   in
-  let wo_tbl t k d =
+  let wo_tbl t k _d =
     try let element_info = Hashtbl.find t k
       in
       to_fill :=
         !to_fill ^ "\n" ^ k ^ "/" ^ (string_of_list element_info)
     with Not_found -> ()
   in
-  let w_tbl t k d =
+  let w_tbl t k _d =
     let tbl: (string,string list) Hashtbl.t = Hashtbl.create 197
     in
     fill_tbl tbl "run.oracle";
