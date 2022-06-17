@@ -50,7 +50,8 @@
 IS_UTF8 ?= iconv -f UTF-8 -t UTF-8
 TO_UTF8 ?= iconv -t UTF-8 -f
 
-OCP_INDENT ?= ocp-indent
+OCP_INDENT   ?= ocp-indent
+CLANG_FORMAT ?= clang-format
 
 # Default values necessary for
 #   LINT_MAKEFILE=<this-makefile> make -f <this-makefile> <lint-target>`
@@ -104,8 +105,8 @@ endif
 	$(TOUCH) $@
 
 .lint/check-clang-format-installed:
-	if ! command -v clang-format >/dev/null; then \
-		echo "error: clang-format must be installed"; \
+	if ! command -v $(CLANG_FORMAT) >/dev/null; then \
+		echo "error: $(CLANG_FORMAT) must be installed"; \
 		exit 1; \
 	fi;
 	mkdir -p $(dir $@)
@@ -343,14 +344,14 @@ $(LINT_FILE.fix-ml-indent): .lint/%.fix-indent: % .lint/check-ocp-indent-version
 
 $(LINT_FILE.check-c-indent): .lint/%.check-indent: % .lint/check-clang-format-installed
 	echo "Check C indent: $<"
-	clang-format --dry-run -Werror $<
+	$(CLANG_FORMAT) --dry-run -Werror $<
 	$(MKDIR) $(dir $@)
 	$(TOUCH) $@
 
 .PHONY: $(LINT_FILE.fix-c-indent)
 $(LINT_FILE.fix-c-indent): .lint/%.fix-indent: % .lint/check-clang-format-installed
 	echo "Fixes C indent: $<"
-	clang-format -i $<
+	$(CLANG_FORMAT) -i $<
 	$(MKDIR) $(dir $@)
 	$(TOUCH) .lint/$<.check-indent # no more need of check-indent
 
