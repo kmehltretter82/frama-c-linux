@@ -39,14 +39,14 @@ let generate_spec needed _ _ _ =
     Cil_types.Writes [ Logic_const.new_identified_term t, From [] ]
   in {
     spec_behavior = [ {
-      b_name = Cil.default_behavior_name ;
-      b_requires = [] ;
-      b_assumes = [] ;
-      b_post_cond = [] ;
-      b_assigns = assigns ;
-      b_allocation = FreeAllocAny ;
-      b_extended = []
-    } ] ;
+        b_name = Cil.default_behavior_name ;
+        b_requires = [] ;
+        b_assumes = [] ;
+        b_post_cond = [] ;
+        b_assigns = assigns ;
+        b_allocation = FreeAllocAny ;
+        b_extended = []
+      } ] ;
     spec_variant = None ;
     spec_terminates = None ;
     spec_complete_behaviors = [] ;

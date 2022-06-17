@@ -6,15 +6,15 @@ class print =
 
     method! vglob_aux g =
       begin match g with
-      | GFun(fd, _) ->
-        Kernel.feedback "%a is%s ghost"
-          Cil_datatype.Varinfo.pretty fd.svar
-          (if fd.svar.vghost then "" else " not")
-      | GFunDecl(_, vi, _) ->
-        Kernel.feedback "%a is%s ghost"
-          Cil_datatype.Varinfo.pretty vi
-          (if vi.vghost then "" else " not")
-      | _ -> ()
+        | GFun(fd, _) ->
+          Kernel.feedback "%a is%s ghost"
+            Cil_datatype.Varinfo.pretty fd.svar
+            (if fd.svar.vghost then "" else " not")
+        | GFunDecl(_, vi, _) ->
+          Kernel.feedback "%a is%s ghost"
+            Cil_datatype.Varinfo.pretty vi
+            (if vi.vghost then "" else " not")
+        | _ -> ()
       end ;
       Cil.DoChildren
 

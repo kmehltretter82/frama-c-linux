@@ -19,9 +19,9 @@ class nop =
       | Multi _
       | Inside _
       | Clause _ ->
-          feedback#set_title "NOP" ;
-          feedback#set_descr "Does nothing; just for testing." ;
-          Applicable (fun s -> ["Nop", s])
+        feedback#set_title "NOP" ;
+        feedback#set_descr "Does nothing; just for testing." ;
+        Applicable (fun s -> ["Nop", s])
 
   end
 

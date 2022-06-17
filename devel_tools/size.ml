@@ -53,19 +53,19 @@ let rec traverse t =
       let n = size t in
       let tag = tag t in
       if tag < no_scan_tag then begin
- count := !count + 1 + n;
- for i = 0 to n - 1 do
-   let f = field t i in
-   if is_block f then traverse f
- done
+        count := !count + 1 + n;
+        for i = 0 to n - 1 do
+          let f = field t i in
+          if is_block f then traverse f
+        done
       end else if tag = string_tag then
- count := !count + 1 + n
+        count := !count + 1 + n
       else if tag = double_tag then
- count := !count + size_of_double
+        count := !count + size_of_double
       else if tag = double_array_tag then
- count := !count + 1 + size_of_double * n
+        count := !count + 1 + size_of_double * n
       else
- incr count
+        incr count
     end
   end
 
@@ -80,8 +80,8 @@ let res () =
 let size_w ?except o =
   reset_table ();
   (match except with
-     | None -> ()
-     | Some except -> traverse (repr except)
+   | None -> ()
+   | Some except -> traverse (repr except)
   );
   count := 0;
   traverse (repr o);
