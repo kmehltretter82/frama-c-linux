@@ -103,6 +103,13 @@ endif
 	$(MKDIR) $(dir $@)
 	$(TOUCH) $@
 
+.lint/check-clang-format-installed:
+	if ! command -v clang-format >/dev/null; then \
+		echo "error: clang-format must be installed"; \
+		exit 1; \
+	fi;
+	mkdir -p $(dir $@)
+
 ###############
 ## Main target
 
@@ -135,8 +142,10 @@ clean:: clean-lint
 #### clean-check-XXX targets
 
 LINT.clean-targets= \
-        clean-check-eoleof clean-check-utf8 clean-check-syntax clean-check-ident
-.PHONY: clean-check-eoleof clean-check-utf8 clean-check-syntax clean-check-ident
+        clean-check-eoleof clean-check-utf8 clean-check-syntax \
+				clean-check-indent clean-check-clang-format
+.PHONY: clean-check-eoleof clean-check-utf8 clean-check-syntax \
+				clean-check-indent clean-check-clang-format
 
 # Generic rule
 $(LINT.clean-targets):
@@ -154,8 +163,8 @@ LINT.dir=$(wildcard $(LINT_DIR))
 #### check-XXX targets
 
 LINT.check-targets= \
-        check-syntax check-indent check-eoleof check-utf8
-.PHONY: check-syntax check-indent check-eoleof check-utf8
+        check-syntax check-indent check-clang-format check-eoleof check-utf8
+.PHONY: check-syntax check-indent check-clang-format check-eoleof check-utf8
 
 # Generic rule
 $(LINT.check-targets):
@@ -168,8 +177,8 @@ $(LINT.check-targets):
 #### fix-XXX targets
 
 LINT.fix-targets= \
-        fix-eoleof fix-utf8 fix-syntax fix-ident
-.PHONY: fix-eoleof fix-utf8 fix-syntax fix-ident
+        fix-eoleof fix-utf8 fix-syntax fix-indent fix-clang-format
+.PHONY: fix-eoleof fix-utf8 fix-syntax fix-indent fix-clang-format
 
 # Generic rule
 $(LINT.fix-targets):
@@ -190,11 +199,13 @@ LINT_FILE.check-utf8= $(addsuffix .check-utf8,$(LINT_FILE.list))
 LINT_FILE.check-eoleof= $(addsuffix .check-eoleof,$(LINT_FILE.list))
 LINT_FILE.check-syntax= $(addsuffix .check-syntax,$(LINT_FILE.list))
 LINT_FILE.check-indent= $(addsuffix .check-indent,$(LINT_FILE.list))
+LINT_FILE.check-clang-format= $(addsuffix .check-clang-format,$(LINT_FILE.list))
 
 LINT_FILE.fix-utf8= $(addsuffix .fix-utf8,$(LINT_FILE.list))
 LINT_FILE.fix-eoleof= $(addsuffix .fix-eoleof,$(LINT_FILE.list))
 LINT_FILE.fix-syntax= $(addsuffix .fix-syntax,$(LINT_FILE.list))
 LINT_FILE.fix-indent= $(addsuffix .fix-indent,$(LINT_FILE.list))
+LINT_FILE.fix-clang-format= $(addsuffix .fix-clang-format,$(LINT_FILE.list))
 
 ## check-XXX targets
 
@@ -210,6 +221,9 @@ check-syntax: $(LINT_FILE.check-syntax)
 .PHONY: check-indent
 check-indent: $(LINT_FILE.check-indent)
 
+.PHONY: check-clang-format
+check-clang-format: $(LINT_FILE.check-clang-format)
+
 ## fix-XXX targets
 
 .PHONY: fix-utf8
@@ -223,6 +237,9 @@ fix-syntax: $(LINT_FILE.fix-syntax)
 
 .PHONY: fix-indent
 fix-indent: $(LINT_FILE.fix-indent)
+
+.PHONY: fix-clang-format
+fix-clang-format: $(LINT_FILE.fix-clang-format)
 
 endif
 
@@ -262,7 +279,7 @@ $(LINT_FILE.fix-utf8): .lint/%.fix-utf8: % .lint/check-ocp-indent-version
 endif # LINT_FROM_ENCODING
 
 ###############################
-## INDENTATION ASPECT
+## ML INDENTATION ASPECT
 
 $(LINT_FILE.check-indent): .lint/%.check-indent: % .lint/check-ocp-indent-version
 	echo "Check indent: $<"
@@ -282,6 +299,22 @@ $(LINT_FILE.check-indent): .lint/%.check-indent: % .lint/check-ocp-indent-versio
 $(LINT_FILE.fix-indent): .lint/%.fix-indent: % .lint/check-ocp-indent-version
 	echo "Fixes indent: $<"
 	$(OCP_INDENT) -i $<
+	$(MKDIR) $(dir $@)
+	$(TOUCH) .lint/$<.check-indent # no more need of check-indent
+
+###############################
+## C INDENTATION ASPECT
+
+$(LINT_FILE.check-clang-format): .lint/%.check-clang-format: % .lint/check-clang-format-installed
+	echo "Check clang-format: $<"
+	clang-format --dry-run -Werror $<
+	$(MKDIR) $(dir $@)
+	$(TOUCH) $@
+
+.PHONY: $(LINT_FILE.fix-clang-format)
+$(LINT_FILE.fix-clang-format): .lint/%.fix-clang-format: % .lint/check-clang-format-installed
+	echo "Fixes clang-format: $<"
+	clang-format -i $<
 	$(MKDIR) $(dir $@)
 	$(TOUCH) .lint/$<.check-indent # no more need of check-indent
 

@@ -1,5 +1,6 @@
 { lib
 , stdenv
+, clang_10
 , frama-c-hdrck
 , git
 , gnumake
@@ -9,6 +10,7 @@
 stdenv.mkDerivation rec {
   name = "frama-c-checkers-shell";
   buildInputs = [
+    clang_10
     frama-c-hdrck
     git
     gnumake
