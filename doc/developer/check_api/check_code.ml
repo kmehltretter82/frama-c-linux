@@ -87,7 +87,7 @@ module Generator (G : Odoc_html.Html_generator) = struct
         self#html_of_custom b info.Odoc_info.i_custom
 
     (** Print html code for the first sentence of a description.
- The titles and lists in this first sentence has been removed.*)
+        The titles and lists in this first sentence has been removed.*)
     method html_of_info_first_sentence b = function
       | None -> ()
       | Some info ->

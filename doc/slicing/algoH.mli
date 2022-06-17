@@ -38,7 +38,7 @@ val get_stmts : t_elem list -> t_stmt_elems -> t_stmt list ;;
 (* retrouver les éléments correspondant à une instruction *)
 val get_elems : t_stmt -> t_stmt_elems -> t_elem list ;;
 
-type t_state 
+type t_state
 
 type t_data
 

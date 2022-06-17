@@ -105,7 +105,7 @@ let has_no_warning_nor_error = ref true
 let warn fmt =
   pp_job_first_line ();
   if !exit_on_warning then
-      has_no_warning_nor_error := false ;
+    has_no_warning_nor_error := false ;
   Format.printf "- [warning] ";
   Format.printf fmt
 
@@ -164,7 +164,7 @@ let get_string_null (ic:in_channel) =
  *
  * Defaults to reading the file entirely since any integer will ever be greater
  * or equal than [max_int].
- *)
+*)
 let read_lines ?nlines:(nlines=max_int) get_line filename =
   let lines = ref [] in
   let ic = if filename = "--stdin" then stdin else open_in filename in
@@ -355,7 +355,7 @@ let get_header_files ?directories:(dirs=(get_header_dirs ())) () :
                      warn "%s: duplicated license name (same contents as file: %s)@." filepath previous_entry
                  else
                    error ~exit_value:7
-                      "%s: duplicated license name (contents differs to file: %s)@." filepath previous_entry
+                     "%s: duplicated license name (contents differs to file: %s)@." filepath previous_entry
                with Not_found -> ());
               Hashtbl.add license_path_tbl license_name filepath;
            )
@@ -408,7 +408,7 @@ let extract_header filename template_hdr =
  * @param headers a license header -> template header file hashtable
  * @requires all files in specs exist
  * @requires all header specifications have a corresponding existing template
- *)
+*)
 let check_spec_discrepancies
     (specs: (string, string) Hashtbl.t)
     (headers: (string, string) Hashtbl.t) : unit =
@@ -433,18 +433,18 @@ let check_spec_discrepancies
          let hdr_file_spec = Hashtbl.find headers hdr_type in
          (* Guaranteed to exists after check_declared_headers *)
          if not (eq_header file hdr_file_spec) then begin
-            discrepancies := (file, hdr_type) :: !discrepancies;
-            incr n;
+           discrepancies := (file, hdr_type) :: !discrepancies;
+           incr n;
          end;
        end
-      ) specs ;
+    ) specs ;
   if !n > 0 then begin
     error ~exit_value:4 "@[<v 2>%a%d / %d files with bad headers@]@."
       (fun _ppf l ->
          List.iter
            (fun (file, hdr_type) ->
               error_fmt "%s : header differs from spec %s@."
-             file hdr_type
+                file hdr_type
            ) l) !discrepancies
       !n
       (Hashtbl.length specs) ;
@@ -473,8 +473,8 @@ let check_forbidden_headers (forbidden_headers:StringSet.t) header_specification
                 error_fmt "%s : forbidden header %s@."
                   file hdr_type
              ) l) !forbidden
-      !n
-      (StringSet.cardinal distributed_files);
+        !n
+        (StringSet.cardinal distributed_files);
     job_done ()
   end
 
@@ -543,7 +543,7 @@ let check files_ignored header_specifications distributed_files exceptions =
  *
  * @param header_specifications file -> license header name hashtable
  * @requires: files and licenses appearing in [header_specifications] exists
- *)
+*)
 let update_headers header_specifications =
   let headers = get_header_files () in
   check_declared_headers header_specifications headers;
@@ -640,7 +640,7 @@ let rec argspec = [
       | "3-lines" ->  spec_format := Line3
       | "3-zeros" ->  spec_format := Zero3
       | s -> Format.printf "invalid spec format: %s@." s ; print_usage ()),
-    "<format>\t \"2-fields-by-line\"|\"3-fields-by-line\"|\"3-lines\"|\"3-zeros\"";
+  "<format>\t \"2-fields-by-line\"|\"3-fields-by-line\"|\"3-lines\"|\"3-zeros\"";
   "-z", Arg.Set zero_stdin,
   " force to use the spec format \"3-zeros\" when reading from stdin";
 ]
@@ -693,6 +693,6 @@ let _ =
   if !exit_on_warning && not !has_no_warning_nor_error then
     exit 8 ;
 
-(* Local Variables: *)
-(* compile-command: "ocamlc -o hdrck unix.cma str.cma hdrck.ml" *)
-(* End: *)
+  (* Local Variables: *)
+  (* compile-command: "ocamlc -o hdrck unix.cma str.cma hdrck.ml" *)
+  (* End: *)

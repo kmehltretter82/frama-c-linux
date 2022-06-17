@@ -70,15 +70,15 @@ let run () =
     Property_status.iter (fun x ->
         match Wpo.goals_of_property x with
         | h :: _ ->
-            inter_po := Wpo.{
-                po_gid = "";
-                po_sid = "";
-                po_name = "";
-                po_idx = Function(kf, None);
-                po_model = model;
-                po_pid = h.po_pid;
-                po_formula = Wpo.GoalAnnot vc_annot;
-              }
+          inter_po := Wpo.{
+              po_gid = "";
+              po_sid = "";
+              po_name = "";
+              po_idx = Function(kf, None);
+              po_model = model;
+              po_pid = h.po_pid;
+              po_formula = Wpo.GoalAnnot vc_annot;
+            }
         | _ -> ()
       );
     spawn !inter_po;
