@@ -309,6 +309,24 @@ let mk_ctx ~use_gmp_opt = function
     else c
   | Gmpz | Rational | Real | Nan as c -> c
 
+(* If a term has a C type, return it when it is smaller than [int] or [int], \
+   return [None] if the term has no C type *)
+let c_type_or_int_in_ival_of t i =
+  let t = Logic_utils.remove_logic_coerce t in
+  match t.term_type with
+  | Ctype typ ->
+    (match Cil.unrollType typ with
+     | TInt (ik, _) | TEnum({ ekind = ik }, _) when
+         Interval.is_included i (Interval.interv_of_typ typ)
+       ->
+       if Cil.intTypeIncluded ik IInt
+       then Some (C_integer IInt)
+       else Some (C_integer ik)
+     | TInt _ | TEnum _ | TFloat _ | TVoid _ | TPtr _ | TArray _ | TFun _
+     | TComp _ | TBuiltin_va_list _ -> None
+     | TNamed _ -> assert false)
+  | _ -> None
+
 (* the number_ty corresponding to [t] whenever use as an offset.
    In that case, it cannot be a GMP, so it must be coerced to an integral type
    in that case *)
@@ -708,32 +726,16 @@ and number_ty_bound_variable ~profile (t1, lv, t2) =
   let i = Interval.(widen (join i1 i2)) in
   match lv.lv_type with
   | Linteger ->
-    let t2 = Logic_utils.remove_logic_coerce t2 in
     let ty =
-      match t2.term_type with
-      | Ctype typ ->
-        (match Cil.unrollType typ with
-         | TInt (ik, _) | TEnum({ ekind = ik }, _) when
-             Interval.is_included i (Interval.interv_of_typ typ)
-           ->
-           if Cil.intTypeIncluded ik IInt
-           then Some (C_integer IInt)
-           else Some (C_integer ik)
-         | TInt _ | TEnum _ | TFloat _ | TVoid _ | TPtr _ | TArray _ | TFun _
-         | TComp _ | TBuiltin_va_list _ -> None
-         | TNamed _ -> assert false)
-      | _ -> None
-    in
-    let ty =
-      match ty with
+      match c_type_or_int_in_ival_of t2 i with
       | Some ty -> ty
       | None -> ty_of_interv ~ctx:Gmpz i
     in mk_ctx ~use_gmp_opt:true ty
   | Ctype ty ->
     (match Cil.unrollType ty with
      | TInt(ik, _) | TEnum({ ekind = ik}, _)-> join
-                        (ty_of_interv i)
-                        (mk_ctx ~use_gmp_opt:true (C_integer ik))
+                                                 (ty_of_interv i)
+                                                 (mk_ctx ~use_gmp_opt:true (C_integer ik))
      | ty ->
        Options.fatal "unexpected C type %a for quantified variable %a"
          Printer.pp_typ ty
@@ -851,40 +853,8 @@ and ctx_relation ~profile t1 t2 =
   let i1 = Interval.get_from_profile ~profile t1 in
   let i2 = Interval.get_from_profile ~profile t2 in
   let i = Interval.join i1 i2 in
-  let t1 = Logic_utils.remove_logic_coerce t1 in
-  let ty1 =
-    match t1.term_type with
-    | Ctype typ ->
-      (match Cil.unrollType typ with
-       | TInt (ik, _) | TEnum({ ekind = ik }, _) when
-           Interval.is_included i (Interval.interv_of_typ typ)
-         ->
-         if Cil.intTypeIncluded ik IInt
-         then Some (C_integer IInt)
-         else Some (C_integer ik)
-       | TInt _ | TEnum _ | TFloat _ | TVoid _ | TPtr _ | TArray _ | TFun _
-       | TComp _ | TBuiltin_va_list _ -> None
-       | TNamed _ -> assert false)
-    | _ -> None
-  in
-  let t2 = Logic_utils.remove_logic_coerce t2 in
-  let ty2 =
-    match t2.term_type with
-    | Ctype typ ->
-      (match Cil.unrollType typ with
-       | TInt (ik, _) | TEnum({ ekind = ik }, _) when
-           Interval.is_included i (Interval.interv_of_typ typ)
-         ->
-         if Cil.intTypeIncluded ik IInt
-         then Some (C_integer IInt)
-         else Some (C_integer ik)
-       | TInt _ | TEnum _ | TFloat _ | TVoid _ | TPtr _ | TArray _ | TFun _
-       | TComp _ | TBuiltin_va_list _ -> None
-       | TNamed _ -> assert false)
-    | _ -> None
-  in
   let ty =
-    match ty1, ty2 with
+    match c_type_or_int_in_ival_of t1 i, c_type_or_int_in_ival_of t2 i with
     | Some ty, _
     | None, Some ty -> ty
     | None, None -> ty_of_interv ~ctx:c_int i
