@@ -233,8 +233,7 @@ build-distrib-tarball:
     CI_LINK: "yes"
     HDRCK: "frama-c-hdrck"
   script:
-    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
-        --run 'autoconf && ./devel_tools/make-distrib.sh'
+    - ./nix/shell-checkers.sh "autoconf && ./dev/make-distrib.sh"
   artifacts:
     paths:
       - ./*.tar.gz
@@ -247,9 +246,7 @@ header-check:
   variables:
     FRAMAC_HDRCK: ""
   script:
-    - ls -la
-    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
-        --run 'make -f share/Makefile.headers check-headers'
+    - ./nix/shell-checkers.sh "make -f share/Makefile.headers check-headers"
 
 # Lint files
 
@@ -258,8 +255,7 @@ lint:
   variables:
     LINT_MAKEFILE: "share/Makefile.linting"
   script:
-    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
-        --run 'make -f share/Makefile.linting lint'
+    - ./nix/shell-checkers.sh "make -f share/Makefile.linting lint"
 
 # Manuals
 
