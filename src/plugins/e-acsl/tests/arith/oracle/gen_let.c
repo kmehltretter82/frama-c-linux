@@ -174,8 +174,7 @@ int main(void)
     __gen_e_acsl_assert_data_7.file = "let.c";
     __gen_e_acsl_assert_data_7.fct = "main";
     __gen_e_acsl_assert_data_7.line = 27;
-    __e_acsl_assert((int)c < (int)((char)__gen_e_acsl_u_9),
-                    & __gen_e_acsl_assert_data_7);
+    __e_acsl_assert((int)c < __gen_e_acsl_u_9,& __gen_e_acsl_assert_data_7);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
   }
   /*@ assert \let u = 'b'; c < u; */ ;
