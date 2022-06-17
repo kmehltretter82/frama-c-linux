@@ -35,6 +35,7 @@
 #include "netinet/in.c"
 #include "pwd.c"
 #include "signal.c"
+#include "sys/socket.c"
 #include "stdatomic.c"
 #include "stdio.c"
 #include "stdlib.c"

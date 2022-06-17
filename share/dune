@@ -236,6 +236,7 @@
 (libc/sys/sendfile.h as libc/sys/sendfile.h)
 (libc/sys/shm.h as libc/sys/shm.h)
 (libc/sys/signal.h as libc/sys/signal.h)
+(libc/sys/socket.c as libc/sys/socket.c)
 (libc/sys/socket.h as libc/sys/socket.h)
 (libc/sys/stat.h as libc/sys/stat.h)
 (libc/sys/statvfs.h as libc/sys/statvfs.h)

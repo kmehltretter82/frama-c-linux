@@ -23,6 +23,6 @@
 #include "getopt.h"
 __PUSH_FC_STDLIB
 
-int optind = 1;
+//int optind = 1;
 
 __POP_FC_STDLIB

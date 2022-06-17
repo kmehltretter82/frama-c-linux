@@ -22,7 +22,22 @@
 
 #include "unistd.h"
 #include "__fc_builtin.h"
+#include "string.h"
 __PUSH_FC_STDLIB
 
 volatile char __fc_ttyname[TTY_NAME_MAX];
+
+int optind = 1;
+char *optarg;
+int opterr = 1; // initial value is not zero (zero silences error messages)
+
+int getopt(int argc, char * const argv[], const char *optstring) {
+  if (argc == 0) {
+    return -1;
+  }
+  optind = Frama_C_interval(1, argc - 1);
+  optarg = Frama_C_nondet_ptr(0, &argv[optind][Frama_C_interval(0, strlen(argv[optind])-1)]);
+  return Frama_C_nondet(-1, Frama_C_char_interval(CHAR_MIN, CHAR_MAX));
+}
+
 __POP_FC_STDLIB
