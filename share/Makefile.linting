@@ -329,7 +329,7 @@ $(LINT_FILE.check-eoleof): .lint/%.check-eoleof: %
 	# - for empty files without \n, to 1 - 0 == 1 that will be catched
 	echo "Check EOL EOF: $<"
 	OK_NL=$$(($$(tail -c -1 $< | wc -c) - $$(tail -n -1 $< | wc -l))) ; \
-       if test $$OK_NL -gt 0; then \
+        if test $$OK_NL -gt 0; then \
           echo "File $< does not pass syntactic checks:"; \
           echo "No newline at end of file"; \
           echo "Please run: make LINT_FILE=$< fix-eoleof"; \
