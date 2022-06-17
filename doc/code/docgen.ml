@@ -363,8 +363,8 @@ struct
     method private html_of_ignore _t = ""
 
     method private html_of_modify t = match t with
-      | [] -> 
-        Odoc_info.warning "Found an empty @modify tag"; 
+      | [] ->
+        Odoc_info.warning "Found an empty @modify tag";
         ""
       | Raw s :: l ->
         let time, explanation =
@@ -386,8 +386,8 @@ struct
         assert false
 
     method private html_of_call t = match t with
-      | [] -> 
-        Odoc_info.warning "Found an empty @call tag"; 
+      | [] ->
+        Odoc_info.warning "Found an empty @call tag";
         ""
       | l ->
         let buf = Buffer.create 97 in

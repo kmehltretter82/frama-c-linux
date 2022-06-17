@@ -15,7 +15,7 @@ open Odoc_html
 open Odoc_module
 open Odoc_info
 
-let remove_nl s = Str.global_replace (Str.regexp "\n") "" s 
+let remove_nl s = Str.global_replace (Str.regexp "\n") "" s
 let remove_useless_space s = Str.global_replace (Str.regexp "  ") " " s
 
 let doc_dev_path = ref "."
@@ -26,14 +26,14 @@ let print_in_file l =
     | h :: q ->  h ^ "\n" ^ string_of_list q
   in
   let file_path = !doc_dev_path ^ "/code_file" in
-  try 
+  try
     let chan_out = open_out_gen [Open_append; Open_creat] 0o644 file_path in
     output_string chan_out (string_of_list l) ;
     flush chan_out ;
-    close_out chan_out 
+    close_out chan_out
   with Sys_error _ as exn ->
     Format.eprintf
-      "cannot handle file %s: %s" 
+      "cannot handle file %s: %s"
       file_path
       (Printexc.to_string exn)
 
@@ -41,7 +41,7 @@ module Generator (G : Odoc_html.Html_generator) = struct
 
   class html = object (self)
 
-    inherit G.html as super 
+    inherit G.html as super
     val mutable last_name = ""
     val mutable last_type = ""
     val mutable last_info = ""
@@ -53,11 +53,11 @@ module Generator (G : Odoc_html.Html_generator) = struct
       | (s, t) :: [] ->
         self#html_of_text b t;
         let temp =
-          last_info ^ " raised exception: " 
-          ^ Odoc_info.string_of_text [Raw s] ^ "." 
+          last_info ^ " raised exception: "
+          ^ Odoc_info.string_of_text [Raw s] ^ "."
         in
         last_info <- temp
-      | _ -> 
+      | _ ->
         let temp = last_info ^ " raised exceptions: " in
         last_info <- temp;
         List.iter
@@ -73,13 +73,13 @@ module Generator (G : Odoc_html.Html_generator) = struct
       | Some info ->
         (match info.Odoc_info.i_deprecated with
          | None -> ()
-         | Some d -> 
+         | Some d ->
            self#html_of_text b d;
            last_info <- string_of_text d);
         (match info.Odoc_info.i_desc with
          | None -> ()
          | Some d when d = [Odoc_info.Raw ""] -> ()
-         | Some d -> 
+         | Some d ->
            self#html_of_text b d;
            last_info <- string_of_text d);
         self#html_of_raised_exceptions b info.Odoc_info.i_raised_exceptions;
@@ -87,7 +87,7 @@ module Generator (G : Odoc_html.Html_generator) = struct
         self#html_of_custom b info.Odoc_info.i_custom
 
     (** Print html code for the first sentence of a description.
-        	The titles and lists in this first sentence has been removed.*)
+ The titles and lists in this first sentence has been removed.*)
     method html_of_info_first_sentence b = function
       | None -> ()
       | Some info ->
@@ -108,12 +108,12 @@ module Generator (G : Odoc_html.Html_generator) = struct
 
     method private html_of_type_expr_param_list_1 b m_name t =
       if string_of_type_param_list t <> "" then
-        last_type <- 
-          last_type ^ "parameters: "^ string_of_type_param_list t 
-          ^ ", constructors: " 
+        last_type <-
+          last_type ^ "parameters: "^ string_of_type_param_list t
+          ^ ", constructors: "
 
     method private html_of_type_expr_list_2 ?par b m_name sep l =
-      last_type <- last_type ^ " of " ^ string_of_type_list ?par sep l 
+      last_type <- last_type ^ " of " ^ string_of_type_list ?par sep l
 
     method private html_of_type_expr_3 b m_name t =
       last_type <- last_type ^ ": " ^ string_of_type_expr t
@@ -122,16 +122,16 @@ module Generator (G : Odoc_html.Html_generator) = struct
       last_type <- string_of_type_expr t
 
     method html_of_class_type_param_expr_list b m_name l =
-      last_type <- string_of_class_type_param_list l 
+      last_type <- string_of_class_type_param_list l
 
     method html_of_class_parameter_list b father c =
-      last_type <- string_of_class_params c 
+      last_type <- string_of_class_params c
 
     method html_of_type_expr_param_list b m_name t =
-      last_type <- string_of_type_param_list t 
+      last_type <- string_of_type_param_list t
 
     method html_of_module_type b ?code m_name t =
-      last_type <- string_of_module_type ?code t 
+      last_type <- string_of_module_type ?code t
 
     method html_of_module_parameter b father p =
       let s_functor, s_arrow =
@@ -195,7 +195,7 @@ module Generator (G : Odoc_html.Html_generator) = struct
         last_type <- last_type ^ " ( " ;
         self#html_of_module_kind b father k2;
         self#html_of_text b [Code ")"];
-        last_type <- last_type ^ " ) " 
+        last_type <- last_type ^ " ) "
       | Module_with (k, s) ->
         self#html_of_module_type_kind b father ?modu k;
         last_type <- last_type ^ s
@@ -215,7 +215,7 @@ module Generator (G : Odoc_html.Html_generator) = struct
 
     method html_of_exception b e =
       last_name <- e.Exception.ex_name;
-      last_type <- 
+      last_type <-
         (match e.Exception.ex_args with
          | Odoc_type.Cstr_tuple t -> Odoc_info.string_of_type_list " " t
          | Odoc_type.Cstr_record r -> Odoc_info.string_of_record r
@@ -262,9 +262,9 @@ module Generator (G : Odoc_html.Html_generator) = struct
       super#html_of_attribute b a
 
     method html_of_method b m =
-      last_name <- m.Value.met_value.Value.val_name; 
+      last_name <- m.Value.met_value.Value.val_name;
       last_type <- "";
-      super#html_of_method b m  
+      super#html_of_method b m
 
     method html_of_module b ?(info=true) ?(complete=true) ?(with_link=true) m =
       last_name <- m.Module.m_name;
@@ -302,11 +302,11 @@ module Generator (G : Odoc_html.Html_generator) = struct
     method html_of_class_type b ?(complete=true) ?(with_link=true) ct =
       last_name <- ct.Class.clt_name;
       last_type <- "" ;
-      super#html_of_class_type b ~complete:complete ~with_link:with_link ct 
+      super#html_of_class_type b ~complete:complete ~with_link:with_link ct
 
     method private html_of_plugin_developer_guide _t =
-      let temp = 
-        last_name ^ "/" 
+      let temp =
+        last_name ^ "/"
         ^ remove_useless_space
           (remove_useless_space (remove_nl (last_type ^ "/" ^ last_info ^ "/")))
       in

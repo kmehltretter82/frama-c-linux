@@ -25,17 +25,17 @@ let callstack_ref = ref (get "empty" C.ty)
 
 (* operations over this mutable callstack *)
 
-let push_callstack = 
+let push_callstack =
   (* getting the function outside the closure is more efficient *)
   let push = get "push" (Datatype.func3 kf_ty stmt_ty C.ty C.ty) in
   fun kf stmt -> callstack_ref := push kf stmt !callstack_ref
 
-let pop_callstack = 
+let pop_callstack =
   (* getting the function outside the closure is more efficient *)
   let pop = get "pop" (Datatype.func C.ty C.ty) in
   fun () -> callstack_ref := pop !callstack_ref
 
-let print_callstack = 
+let print_callstack =
   (* getting the function outside the closure is more efficient *)
   let print = get "print" (Datatype.func C.ty Datatype.unit) in
   fun () -> print !callstack_ref
