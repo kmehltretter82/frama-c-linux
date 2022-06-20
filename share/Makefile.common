@@ -28,31 +28,6 @@
 
 include $(MAKECONFIG_DIR)/Makefile.config
 
-#######################
-# Working directories #
-#######################
-
-# Frama-C kernel directories
-FRAMAC_SRC_DIRS= plugins/pdg_types plugins/value_types \
-	       libraries/stdlib libraries/utils \
-	       libraries/project libraries/datatype \
-	       kernel_internals/parsing \
-	       kernel_internals/typing \
-	       kernel_internals/runtime \
-	       kernel_services/parsetree \
-	       kernel_services/ast_data \
-	       kernel_services/ast_queries \
-	       kernel_services/ast_printing \
-	       kernel_services/ast_building \
-	       kernel_services/cmdline_parameters \
-	       kernel_services/plugin_entry_points \
-	       kernel_services/abstract_interp \
-	       kernel_services/visitors \
-	       kernel_services/analysis \
-	       kernel_services/ast_transformations \
-	       plugins/gui
-FRAMAC_SRC_DIRS:= $(addprefix src/, $(FRAMAC_SRC_DIRS))
-
 ##################
 # Flags          #
 ##################
