@@ -40,6 +40,10 @@ import { RichTextBuffer, CSSMarker, Decorator } from './buffers';
 import './style.css';
 import './dark-code.css';
 import 'codemirror/lib/codemirror.css';
+import 'codemirror/addon/fold/foldcode';
+import 'codemirror/addon/fold/foldgutter';
+import 'codemirror/addon/fold/comment-fold';
+import 'codemirror/addon/fold/foldgutter.css';
 
 const CSS_HOVERED = 'dome-xText-hover';
 const CSS_SELECTED = 'dome-xText-select';
