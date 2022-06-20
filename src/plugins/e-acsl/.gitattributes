@@ -27,8 +27,8 @@ Makefile.in header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
 # CHECK-INDENT                            #
 ###########################################
 
-/tests/*/*.c check-syntax check-clang-format
-/share/**/*.c check-syntax check-clang-format
+/tests/*/*.c check-syntax check-indent
+/share/**/*.c check-syntax check-indent
 
 ########################
 # HEADER_SPEC: .ignore #
