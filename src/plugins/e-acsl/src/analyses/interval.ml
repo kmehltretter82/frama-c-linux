@@ -21,75 +21,18 @@
 (**************************************************************************)
 
 open Cil_types
+open Analyses_types
+open Analyses_datatype
 
 (* Implements Figure 3 of J. Signoles' JFLA'15 paper "Rester statique pour
    devenir plus rapide, plus précis et plus mince".
    Also implements a support for real numbers. *)
-
-module Error = Error.Make(struct let phase = Options.Dkey.interval end)
+let dkey = Options.Dkey.interval
+module Error = Error.Make(struct let phase = dkey end)
 
 (* ********************************************************************* *)
 (* Basic datatypes and operations *)
 (* ********************************************************************* *)
-
-type ival =
-  | Ival of Ival.t
-  | Float of fkind * float option (* a float constant, if any *)
-  | Rational
-  | Real
-  | Nan
-
-module D =
-  Datatype.Make_with_collections
-    (struct
-      type t = ival
-      let name = "E_ACSL.Interval.t"
-      let reprs = [ Float (FFloat, Some 0.); Rational; Real; Nan ]
-      include Datatype.Undefined
-
-      let compare i1 i2 =
-        if i1 == i2 then 0
-        else
-          match i1, i2 with
-          | Ival i1, Ival i2 ->
-            Ival.compare i1 i2
-          | Float (k1, f1), Float (k2, f2) ->
-            (* faster to compare a kind than a float *)
-            let n = Stdlib.compare k1 k2 in
-            if n = 0 then Stdlib.compare f1 f2 else n
-          | Ival _, (Float _ | Rational | Real | Nan)
-          | Float _, (Rational | Real | Nan)
-          | Rational, (Real | Nan)
-          | Real, Nan ->
-            -1
-          | Nan, (Ival _ | Float _ | Rational | Real)
-          | Real, (Ival _ | Float _ | Rational)
-          | Rational, (Ival _ | Float _)
-          | Float _, Ival _ ->
-            1
-          | Rational, Rational | Real, Real | Nan, Nan ->
-            assert false
-
-      let equal = Datatype.from_compare
-
-      let hash = function
-        | Ival i -> 7 * Ival.hash i
-        | Float(k, f) -> 17 * Hashtbl.hash f + 97 * Hashtbl.hash k
-        | Rational -> 787
-        | Real -> 1011
-        | Nan -> 1277
-
-      let pretty fmt = function
-        | Ival i -> Ival.pretty fmt i
-        | Float(_, Some f) -> Format.pp_print_float fmt f
-        | Float(FFloat, None) -> Format.pp_print_string fmt "float"
-        | Float(FDouble, None) -> Format.pp_print_string fmt "double"
-        | Float(FLongDouble, None) -> Format.pp_print_string fmt "long double"
-        | Rational -> Format.pp_print_string fmt "Rational"
-        | Real -> Format.pp_print_string fmt "Real"
-        | Nan -> Format.pp_print_string fmt "NaN"
-
-    end)
 
 let is_included i1 i2 = match i1, i2 with
   | Ival i1, Ival i2 -> Ival.is_included i1 i2
@@ -393,143 +336,155 @@ let ikind_of_ival iv =
       (* TODO: do not raise an exception, but returns a value instead *)
       raise Cil.Not_representable (* GMP *)
 
-(* function call profiles (intervals for their formal parameters) *)
-module Profile = struct
-  include Datatype.List_with_collections
-      (D)
-      (struct
-        let module_name = "E_ACSL.Interval.Logic_function_env.Profile"
-      end)
-  let is_included p1 p2 = List.for_all2 is_included p1 p2
-end
 
-(* Imperative environments *)
-module rec Env: sig
+let interv_of_typ_containing_interv = function
+  | Float _ | Rational | Real | Nan as x ->
+    x
+  | Ival i ->
+    try
+      let kind = ikind_of_ival i in
+      interv_of_typ (TInt(kind, []))
+    with Cil.Not_representable ->
+      top_ival
+
+let widen_profile =
+  Cil_datatype.Logic_var.Map.map interv_of_typ_containing_interv
+
+let rec fixpoint ~(infer : force:bool ->
+                   logic_env:Logic_env.t ->
+                   term ->
+                   ival Error.result)
+    li args_ival t' ival =
+  let get_res = Error.map (fun x -> x) in
+  let logic_env = Logic_env.make args_ival in
+  (* If the logic function has a given C type, we use this type to infer the
+     interval. Otherwise we compute this interval as a fixpoint *)
+  match li.l_type with
+  | Some (Ctype typ) ->
+    let ival = interv_of_typ typ in
+    LF_env.add li args_ival ival;
+    ignore (infer ~force:true ~logic_env t');
+    ival
+  | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
+    LF_env.replace li args_ival ival;
+    let inferred_ival = get_res (infer ~force:true ~logic_env t') in
+    if is_included inferred_ival ival
+    then
+      ival
+    else
+      fixpoint ~infer li args_ival t' inferred_ival
+
+
+(* Memoization module which retrieves the computed info of some terms *)
+module Memo: sig
+  val memo:
+    force_infer:bool -> Profile.t -> (term -> ival) -> term -> ival Error.result
+  val get: Profile.t -> term -> ival Error.result
   val clear: unit -> unit
-  val add: Cil_types.logic_var -> ival -> unit
-  val find: Cil_types.logic_var -> ival
-  val remove: Cil_types.logic_var -> unit
 end = struct
+  (* The comparison over terms is the physical equality. It cannot be the
+     structural one (given by [Cil_datatype.Term.equal]) for efficiency.
 
-  open Cil_datatype
-  let tbl: ival Logic_var.Hashtbl.t = Logic_var.Hashtbl.create 7
+     By construction (see prepare_ast.ml), there are no physically equal terms
+     in the E-ACSL's generated AST, but
+     - type info of many terms are accessed several times
+     - the translation of E-ACSL guarded quantifications generates
+       new terms (see module {!Quantif}) which must be typed. The term
+       corresponding to the bound variable [x] is actually used twice: once in
+       the guard and once for encoding [x+1] when incrementing it. *)
+  let nondep_tbl : ival Error.result Misc.Id_term.Hashtbl.t =
+    Misc.Id_term.Hashtbl.create 97
 
-  (* TODO: when adding, also join with the old value (if any). Would certainly
-     be the correct way to handle a \let in a recursive logic functions (if the
-     \let body depends on one formal) *)
-  let add = Logic_var.Hashtbl.add tbl
-  let remove = Logic_var.Hashtbl.remove tbl
-  let find = Logic_var.Hashtbl.find tbl
+  (* The interval of the logic function
+     //@ logic integer f (integer x) = x + 1;
+     depends on the interval of [x]. The same term [x+1] can be infered to be
+     in different intervals if the function [f] is applied several times with
+     different arguments. In this case, we add the interval of [x] as a key
+     to retrieve the type of [x+1].
+     There are two other kinds of binders for logical variables: [TLet] and
+     the quantifiers, however in those cases, a term is only ever translated
+     once. *)
+
+  let dep_tbl : ival Error.result Id_term_in_profile.Hashtbl.t
+    = Id_term_in_profile.Hashtbl.create 97
+
+  (* Small functor to access the result of a memoized inference *)
+  module Accesses (X : Datatype.S_with_collections)
+      (Tbl: sig val tbl : ival Error.result X.Hashtbl.t end)
+    : sig
+      val get : X.Hashtbl.key -> ival Error.result
+      val memo : force_infer:bool -> (term -> ival) -> term -> X.Hashtbl.key ->
+        (ival, exn) Result.t
+    end = struct
+    let get k =
+      try X.Hashtbl.find Tbl.tbl k
+      with Not_found -> Error.not_memoized ()
+
+    let memo ~force_infer f t k =
+      if force_infer then
+        let x =
+          try Result.Ok (f t);
+          with Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Error exn
+        in
+        X.Hashtbl.replace Tbl.tbl k x;
+        x
+      else
+        try X.Hashtbl.find Tbl.tbl k
+        with Not_found ->
+          let x =
+            try Result.Ok (f t);
+            with Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Error exn
+          in
+          X.Hashtbl.add Tbl.tbl k x;
+          x
+  end
+
+  module Nondep = Accesses (Misc.Id_term) (struct let tbl = nondep_tbl end)
+  module Dep = Accesses (Id_term_in_profile) (struct let tbl = dep_tbl end)
+
+  let get profile t =
+    if Profile.is_empty profile
+    then Nondep.get t
+    else Dep.get (t,profile)
+
+  let memo ~force_infer profile f t =
+    if Profile.is_empty profile
+    then Nondep.memo ~force_infer f t t
+    else Dep.memo ~force_infer f t (t,profile)
 
   let clear () =
-    Logic_var.Hashtbl.clear tbl;
-    Logic_function_env.clear ()
-
+    Options.feedback ~level:4 "clearing the typing tables";
+    Misc.Id_term.Hashtbl.clear nondep_tbl;
+    Id_term_in_profile.Hashtbl.clear dep_tbl
 end
 
-(* Environment for handling logic functions *)
-and Logic_function_env: sig
-  val widen: infer:(term -> ival) -> term -> ival -> bool * ival
+(* For recursive functions, it is necessary to use a widened profile to query
+   the table (because of the fixpoint algorithm). This module associates to a
+   term in a profile, the profile that should be used to query the table *)
+module Widened_profile: sig
+  val get: Profile.t -> logic_info -> Profile.t
+  val add: Profile.t -> logic_info -> Profile.t -> unit
   val clear: unit -> unit
 end = struct
 
-  (* The environment associates to each term (denoting a logic function
-     application) a profile, i.e. the list of intervals for its formal
-     parameters.  It helps to type these applications.
+  let widened_profile_tbl : Profile.t LFProf.Hashtbl.t
+    = LFProf.Hashtbl.create 97
 
-     For each pair of function name and profile, an interval containing the
-     result is also stored. It helps to generate the function definitions for
-     each logic function (for each function, one definition per profile) . *)
+  let get profile li =
+    LFProf.Hashtbl.find_def widened_profile_tbl (li, profile) profile
 
-  module Terms = Hashtbl.Make
-      (struct
-        type t = term
-        let equal = (==)
-        let hash = Cil_datatype.Term.hash
-      end)
-
-  module LF =
-    Datatype.Pair_with_collections
-      (Datatype.String)
-      (Profile)
-      (struct
-        let module_name = "E_ACSL.Interval.Logic_function_env.LF"
-      end)
-
-  let terms: Profile.t Terms.t = Terms.create 7
-  let named_profiles = LF.Hashtbl.create 7
+  let add profile i args_ival =
+    LFProf.Hashtbl.add widened_profile_tbl (i, profile) args_ival
 
   let clear () =
-    Terms.clear terms;
-    LF.Hashtbl.clear named_profiles
+    Options.feedback ~level:4 "clearing the typing tables";
+    LFProf.Hashtbl.clear widened_profile_tbl
 
-  let interv_of_typ_containing_interv = function
-    | Float _ | Rational | Real | Nan as x ->
-      x
-    | Ival i ->
-      try
-        let kind = ikind_of_ival i in
-        interv_of_typ (TInt(kind, []))
-      with Cil.Not_representable ->
-        top_ival
-
-  let rec map3 f l1 l2 l3 = match l1, l2, l3 with
-    | [], [], [] -> []
-    | x1 :: l1, x2 :: l2, x3 :: l3 -> f x1 x2 x3 :: map3 f l1 l2 l3
-    | _, _, _ -> invalid_arg "E_ACSL.Interval.map3"
-
-  let extract_profile ~infer old_profile t = match t.term_node with
-    | Tapp(li, _, args) ->
-      let old_profile = match old_profile with
-        | None -> List.map (fun _ -> bottom) li.l_profile
-        | Some p -> p
-      in
-      li.l_var_info.lv_name,
-      map3
-        (fun param old_i arg ->
-           let i = infer arg in
-           (* over-approximation of the interval to reach the fixpoint
-              faster, and to generate fewer specialized functions *)
-           let larger_i = interv_of_typ_containing_interv i in
-           (* merge the old profile and the new one *)
-           let new_i = join larger_i old_i in
-           Env.add param new_i;
-           new_i)
-        li.l_profile
-        old_profile
-        args
-    | _ ->
-      assert false
-
-  let widen_one_callsite ~infer old_profile t i =
-    let (_, p as named_p) = extract_profile ~infer old_profile t in
-    try
-      let old_i = LF.Hashtbl.find named_profiles named_p in
-      if is_included i old_i then true, p, old_i (* fixpoint reached *)
-      else begin
-        let j = join i old_i in
-        LF.Hashtbl.replace named_profiles named_p j;
-        false, p, j
-      end
-    with Not_found ->
-      LF.Hashtbl.add named_profiles named_p i;
-      false, p, i
-
-  let widen ~infer t i =
-    try
-      let old_p = Terms.find terms t in
-      let is_included, new_p, i = widen_one_callsite ~infer (Some old_p) t i in
-      if Profile.is_included new_p old_p then is_included, i
-      else begin
-        Terms.replace terms t new_p;
-        false, i
-      end
-    with Not_found ->
-      let is_included, p, i = widen_one_callsite ~infer None t i in
-      Terms.add terms t p;
-      is_included, i
 
 end
+
+let plus_one i =
+  lift_arith_binop Ival.add_int i (singleton Integer.one)
 
 (* ********************************************************************* *)
 (* Main functions *)
@@ -639,238 +594,266 @@ let infer_sum_product oper lambda min max = match lambda, min, max with
      | Z.Overflow (* if the exponent of \product is too high *) -> top_ival)
   | _ -> Error.not_yet "extended quantifiers with non-integer parameters"
 
-let rec infer t =
+let rec infer ~force ~logic_env t =
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
-  match t.term_node with
-  | TConst (Integer (n, _)) -> singleton n
-  | TConst (LChr c) ->
-    let n = Cil.charConstToInt c in
-    singleton n
-  | TConst (LEnum enumitem) ->
-    let rec find_idx n = function
-      | [] -> assert false
-      | ei :: l -> if ei == enumitem then n else find_idx (n + 1) l
-    in
-    let n = Integer.of_int (find_idx 0 enumitem.eihost.eitems) in
-    singleton n
-  | TLval lv -> infer_term_lval lv
-  | TSizeOf ty -> infer_sizeof ty
-  | TSizeOfE t -> infer_sizeof (get_cty t)
-  | TSizeOfStr str -> singleton_of_int (String.length str + 1 (* '\0' *))
-  | TAlignOf ty -> infer_alignof ty
-  | TAlignOfE t -> infer_alignof (get_cty t)
+  let get_res = Error.map (fun x -> x) in
+  let t = Logic_normalizer.get_term t in
+  let compute t =
+    match t.term_node with
+    | TConst (Integer (n, _)) -> singleton n
+    | TConst (LChr c) ->
+      let n = Cil.charConstToInt c in
+      singleton n
+    | TConst (LEnum enumitem) ->
+      let rec find_idx n = function
+        | [] -> assert false
+        | ei :: l -> if ei == enumitem then n else find_idx (n + 1) l
+      in
+      let n = Integer.of_int (find_idx 0 enumitem.eihost.eitems) in
+      singleton n
+    | TLval lv -> infer_term_lval ~force ~logic_env lv
+    | TSizeOf ty -> infer_sizeof ty
+    | TSizeOfE t ->
+      ignore (infer ~force ~logic_env t);
+      infer_sizeof (get_cty t)
+    | TSizeOfStr str -> singleton_of_int (String.length str + 1 (* '\0' *))
+    | TAlignOf ty -> infer_alignof ty
+    | TAlignOfE t ->
+      ignore (infer ~force ~logic_env t);
+      infer_alignof (get_cty t)
 
-  | TUnOp (Neg, t) ->
-    let i = infer t in
-    lift_unop Ival.neg_int i
-  | TUnOp (BNot, t) ->
-    let i = infer t in
-    lift_unop Ival.bitwise_signed_not i
-  | TUnOp (LNot, _)
-  | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), _, _) ->
-    Ival Ival.zero_or_one
+    | TUnOp (Neg, t) ->
+      let i = infer ~force ~logic_env t in
+      Error.map (lift_unop Ival.neg_int) i
+    | TUnOp (BNot, t) ->
+      let i = infer ~force ~logic_env t in
+      Error.map (lift_unop Ival.bitwise_signed_not) i
+    | TUnOp (LNot, t) ->
+      ignore (infer ~force ~logic_env t);
+      Ival Ival.zero_or_one
 
-  | TBinOp (PlusA, t1, t2) ->
-    let i1 = infer t1 in
-    let i2 = infer t2 in
-    lift_arith_binop Ival.add_int i1 i2
-  | TBinOp (MinusA, t1, t2) ->
-    let i1 = infer t1 in
-    let i2 = infer t2 in
-    lift_arith_binop Ival.sub_int i1 i2
-  | TBinOp (Mult, t1, t2) ->
-    let i1 = infer t1 in
-    let i2 = infer t2 in
-    lift_arith_binop Ival.mul i1 i2
-  | TBinOp (Div, t1, t2) ->
-    let i1 = infer t1 in
-    let i2 = infer t2 in
-    lift_arith_binop Ival.div i1 i2
-  | TBinOp (Mod, t1, t2) ->
-    let i1 = infer t1 in
-    let i2 = infer t2 in
-    lift_arith_binop Ival.c_rem i1 i2
-  | TBinOp (Shiftlt, t1, t2) ->
-    let i1 = infer t1 in
-    let i2 = infer t2 in
-    lift_arith_binop Ival.shift_left i1 i2
-  | TBinOp (Shiftrt, t1, t2) ->
-    let i1 = infer t1 in
-    let i2 = infer t2 in
-    lift_arith_binop Ival.shift_right i1 i2
-  | TBinOp (BAnd, t1, t2) ->
-    let i1 = infer t1 in
-    let i2 = infer t2 in
-    lift_arith_binop Ival.bitwise_and i1 i2
-  | TBinOp (BXor, t1, t2) ->
-    let i1 = infer t1 in
-    let i2 = infer t2 in
-    lift_arith_binop Ival.bitwise_xor i1 i2
-  | TBinOp (BOr, t1, t2) ->
-    let i1 = infer t1 in
-    let i2 = infer t2 in
-    lift_arith_binop Ival.bitwise_or i1 i2
-  | TCastE (ty, t) ->
-    let src = infer t in
-    let dst = interv_of_typ ty in
-    cast ~src ~dst
-  | Tif (_, t2, t3) ->
-    let i2 = infer t2 in
-    let i3 = infer t3 in
-    join i2 i3
-  | Tat (t, _) ->
-    infer t
-  | TBinOp (MinusPP, t, _) ->
-    (match Cil.unrollType (get_cty t) with
-     | TArray(_, _, _) as ta ->
-       begin
-         try
-           let n = Cil.bitsSizeOf ta in
-           (* the second argument must be in the same block than [t].
-              Consequently the result of the difference belongs to
-              [0; \block_length(t)] *)
-           let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
-           ival Integer.zero (Integer.of_int nb_bytes)
-         with Cil.SizeOfError _ ->
-           Lazy.force interv_of_unknown_block
-       end
-     | TPtr _ ->
-       Lazy.force interv_of_unknown_block
-     | _ -> assert false)
-  | Tblock_length (_, t)
-  | Toffset(_, t) ->
-    (match Cil.unrollType (get_cty t) with
-     | TArray(_, _, _) as ta ->
-       begin
-         try
-           let n = Cil.bitsSizeOf ta in
-           let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
-           singleton_of_int nb_bytes
-         with Cil.SizeOfError _ ->
-           Lazy.force interv_of_unknown_block
-       end
-     | TPtr _ -> Lazy.force interv_of_unknown_block
-     | _ -> assert false)
-  | Tnull  -> singleton_of_int 0
-  | TLogic_coerce (_, t) -> infer t
-  | Tapp (li, lst, args) ->
-    (match li.l_body with
-     | LBpred _ ->
-       Ival Ival.zero_or_one
-     | LBterm t' ->
-       let rec fixpoint i =
-         let is_included, new_i =
-           Logic_function_env.widen ~infer t i
+    | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), t1, t2) ->
+      ignore (infer ~force ~logic_env t1);
+      ignore (infer ~force ~logic_env t2);
+      Ival Ival.zero_or_one
+
+    | TBinOp (PlusA, t1, t2) ->
+      let i1 = infer ~force ~logic_env t1 in
+      let i2 = infer ~force ~logic_env t2 in
+      Error.map2 (lift_arith_binop Ival.add_int) i1 i2
+    | TBinOp (MinusA, t1, t2) ->
+      let i1 = infer ~force ~logic_env t1 in
+      let i2 = infer ~force ~logic_env t2 in
+      Error.map2 (lift_arith_binop Ival.sub_int) i1 i2
+    | TBinOp (Mult, t1, t2) ->
+      let i1 = infer ~force ~logic_env t1 in
+      let i2 = infer ~force ~logic_env t2 in
+      Error.map2 (lift_arith_binop Ival.mul) i1 i2
+    | TBinOp (Div, t1, t2) ->
+      let i1 = infer ~force ~logic_env t1 in
+      let i2 = infer ~force ~logic_env t2 in
+      Error.map2 (lift_arith_binop Ival.div) i1 i2
+    | TBinOp (Mod, t1, t2) ->
+      let i1 = infer ~force ~logic_env t1 in
+      let i2 = infer ~force ~logic_env t2 in
+      Error.map2 (lift_arith_binop Ival.c_rem) i1 i2
+    | TBinOp (Shiftlt, t1, t2) ->
+      let i1 = infer ~force ~logic_env t1 in
+      let i2 = infer ~force ~logic_env t2 in
+      Error.map2 (lift_arith_binop Ival.shift_left) i1 i2
+    | TBinOp (Shiftrt, t1, t2) ->
+      let i1 = infer ~force ~logic_env t1 in
+      let i2 = infer ~force ~logic_env t2 in
+      Error.map2 (lift_arith_binop Ival.shift_right) i1 i2
+    | TBinOp (BAnd, t1, t2) ->
+      let i1 = infer ~force ~logic_env t1 in
+      let i2 = infer ~force ~logic_env t2 in
+      Error.map2 (lift_arith_binop Ival.bitwise_and) i1 i2
+    | TBinOp (BXor, t1, t2) ->
+      let i1 = infer ~force ~logic_env t1 in
+      let i2 = infer ~force ~logic_env t2 in
+      Error.map2 (lift_arith_binop Ival.bitwise_xor) i1 i2
+    | TBinOp (BOr, t1, t2) ->
+      let i1 = infer ~force ~logic_env t1 in
+      let i2 = infer ~force ~logic_env t2 in
+      Error.map2 (lift_arith_binop Ival.bitwise_or) i1 i2
+    | TCastE (ty, t) ->
+      let src = infer ~force ~logic_env t in
+      let dst = interv_of_typ ty in
+      Error.map (fun src -> cast ~src ~dst) src
+    | Tif (t1, t2, t3) ->
+      ignore (infer ~force ~logic_env t1);
+      let i2 = infer ~force ~logic_env t2 in
+      let i3 = infer ~force ~logic_env t3 in
+      Error.map2 join i2 i3
+    | Tat (t, _) ->
+      get_res (infer ~force ~logic_env t)
+    | TBinOp (MinusPP, t1, t2) ->
+      ignore (infer ~force ~logic_env t1);
+      ignore (infer ~force ~logic_env t2);
+      (match Cil.unrollType (get_cty t1) with
+       | TArray(_, _, _) as ta ->
+         begin
+           try
+             let n = Cil.bitsSizeOf ta in
+             (* the second argument must be in the same block than [t].
+                Consequently the result of the difference belongs to
+                [0; \block_length(t)] *)
+             let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
+             ival Integer.zero (Integer.of_int nb_bytes)
+           with Cil.SizeOfError _ ->
+             Lazy.force interv_of_unknown_block
+         end
+       | TPtr _ -> Lazy.force interv_of_unknown_block
+       | _ -> assert false)
+    | Tblock_length (_, t)
+    | Toffset(_, t) ->
+      ignore (infer ~force ~logic_env t);
+      (match Cil.unrollType (get_cty t) with
+       | TArray(_, _, _) as ta ->
+         begin
+           try
+             let n = Cil.bitsSizeOf ta in
+             let nb_bytes = if n mod 8 = 0 then n / 8 else n / 8 + 1 in
+             singleton_of_int nb_bytes
+           with Cil.SizeOfError _ ->
+             Lazy.force interv_of_unknown_block
+         end
+       | TPtr _ -> Lazy.force interv_of_unknown_block
+       | _ -> assert false)
+    | Tnull  -> singleton_of_int 0
+    | TLogic_coerce (_, t) -> get_res (infer ~force ~logic_env t)
+    | Tapp (li,_,args) ->
+      (match li.l_body with
+       | LBpred _ | LBterm _ ->
+         let profile =
+           Profile.make
+             li.l_profile
+             (List.map
+                (fun arg -> get_res (infer ~force ~logic_env arg))
+                args)
          in
-         if is_included then begin
-           List.iter (fun lv -> Env.remove lv) li.l_profile;
-           new_i
-         end else
-           let i = infer t' in
-           List.iter (fun lv -> Env.remove lv) li.l_profile;
-           fixpoint i
-       in
-       fixpoint bottom
-     | LBnone when li.l_var_info.lv_name = "\\sum" ||
-                   li.l_var_info.lv_name = "\\product" ->
-       (match args with
-        | [ t1; t2; { term_node = Tlambda([ k ], _) } as lambda ] ->
-          let t1_iv = infer t1 in
-          let t2_iv = infer t2 in
-          let k_iv = join t1_iv t2_iv in
-          Env.add k k_iv;
-          let lambda_iv = infer lambda in
-          Env.remove k;
-          let t2incr =
-            Logic_const.term (TBinOp(PlusA, t2, Cil.lone ())) Linteger
-          in
-          (* it is correct and precise to use k_ival to compute lambda_ival, but
-             not during the code generation since the type used for k is the
-             greatest type between the type of t1 and the type of t2+1, that is
-             why the ival associated to k is updated *)
-          Env.add k (join t1_iv (infer t2incr));
-          (* k is removed during code generation, it is needed for generating
-             the code of the lambda term *)
-          infer_sum_product li.l_var_info lambda_iv t1_iv t2_iv
-        | _ -> Error.not_yet "extended quantifiers without lambda term")
-     | LBnone when li.l_var_info.lv_name = "\\numof" ->
-       (match args with
-        | [ t1; t2; { term_node = Tlambda([ k ], p) } ] ->
-          let logic_info = Cil_const.make_logic_info "\\sum" in
-          logic_info.l_type <- li.l_type;
-          logic_info.l_tparams <- li.l_tparams;
-          logic_info.l_labels <- li.l_labels;
-          logic_info.l_profile <- li.l_profile;
-          logic_info.l_body <- li.l_body;
-          let numof_as_sum =
-            let conditional_term =
-              Logic_const.term
-                (Tif(p, Cil.lone (), Cil.lzero ())) Linteger
+         (match li.l_body with
+          | LBpred p ->
+            let logic_env = Logic_env.make profile in
+            ignore (infer_predicate ~logic_env p);
+            Ival Ival.zero_or_one
+          | LBterm t' when LF_env.is_rec li ->
+            let widened_profile = widen_profile profile in
+            Widened_profile.add profile li widened_profile;
+            (try LF_env.find li widened_profile
+             with Not_found ->
+               fixpoint ~infer li widened_profile t' (Ival Ival.bottom))
+          | LBterm t' ->
+            let logic_env = Logic_env.make profile in
+            (* If the logic function returns a C type, then its application
+               ranges inside this C type *)
+            (match li.l_type with
+             | Some (Ctype typ) ->
+               ignore ((infer ~force ~logic_env t'));
+               interv_of_typ typ;
+             | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
+               get_res (infer ~force ~logic_env t'))
+          | _ -> assert false)
+       | LBnone when li.l_var_info.lv_name = "\\sum" ||
+                     li.l_var_info.lv_name = "\\product" ->
+         (match args with
+          | [ t1; t2; { term_node = Tlambda([ k ], _) } as lambda ] ->
+            let t1_iv = infer ~force ~logic_env t1 in
+            let t2_iv = infer ~force ~logic_env t2 in
+            let k_iv = Error.map2 join t1_iv t2_iv in
+            let logic_env_with_k =
+              Logic_env.add logic_env k k_iv
             in
-            let lambda_term =
-              Logic_const.term (Tlambda([ k ], conditional_term)) Linteger
-            in
-            (Logic_const.term
-               (Tapp(logic_info, lst, [ t1; t2; lambda_term ])) Linteger)
-          in infer numof_as_sum
-        | _ ->
-          Options.fatal "unexpected input for an extended quantifier \\numof")
-     | LBnone
-     | LBreads _ ->
-       (match li.l_type with
-        | None -> assert false
-        | Some ret_type -> interv_of_logic_typ ret_type)
-     | LBinductive _ ->
-       Error.not_yet "logic functions inductively defined")
+            let lambda_iv = infer ~force ~logic_env:logic_env_with_k lambda in
+            Error.map3 (infer_sum_product li.l_var_info) lambda_iv t1_iv t2_iv
+          | _ -> Error.not_yet "extended quantifiers without lambda term")
+       | LBnone
+       | LBreads _ ->
+         List.iter
+           (fun arg -> ignore (infer ~force ~logic_env arg))
+           args;
+         (match li.l_type with
+          | None -> assert false
+          | Some ret_type -> interv_of_logic_typ ret_type)
+       | LBinductive _ ->
+         Error.not_yet "logic functions inductively defined")
 
-  | Tunion _ -> Error.not_yet "tset union"
-  | Tinter _ -> Error.not_yet "tset intersection"
-  | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"
-  | Trange(Some n1, Some n2) ->
-    let i1 = infer n1 in
-    let i2 = infer n2 in
-    join i1 i2
-  | Trange(None, _) | Trange(_, None) ->
-    Options.abort "unbounded ranges are not part of E-ACSl"
+    | Tunion _ -> Error.not_yet "tset union"
+    | Tinter _ -> Error.not_yet "tset intersection"
+    | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"
+    | Trange(Some n1, Some n2) ->
+      let i1 = infer ~force ~logic_env n1 in
+      let i2 = infer ~force ~logic_env n2 in
+      Error.map2 join i1 i2
+    | Trange(None, _) | Trange(_, None) ->
+      Options.abort "unbounded ranges are not part of E-ACSl"
 
-  | Tlet (li, t) ->
-    let li_t = Misc.term_of_li li in
-    let li_v = li.l_var_info in
-    let i1 = infer li_t in
-    Env.add li_v i1;
-    let i2 = infer t in
-    Env.remove li_v;
-    i2
-  | TConst (LReal lr) ->
-    if lr.r_lower = lr.r_upper then Float(FDouble, Some lr.r_nearest)
-    else Rational
-  | Tlambda ([ _ ],lt) ->
-    infer lt
-  | Tlambda (_,_)
-  | TConst (LStr _ | LWStr _)
-  | TBinOp (PlusPI,_,_)
-  | TBinOp (MinusPI,_,_)
-  | TAddrOf _
-  | TStartOf _
-  | TDataCons (_,_)
-  | Tbase_addr (_,_)
-  | TUpdate (_,_,_)
-  | Ttypeof _
-  | Ttype _
-  | Tempty_set ->
-    Nan
+    | Tlet (li,t) ->
+      let li_t = Misc.term_of_li li in
+      let li_v = li.l_var_info in
+      let i1 = infer ~force ~logic_env li_t in
+      let logic_env =
+        Error.map (Logic_env.add logic_env li_v) i1
+      in
+      get_res (infer ~force ~logic_env t)
+    | TConst (LReal lr) ->
+      if lr.r_lower = lr.r_upper then Float(FDouble, Some lr.r_nearest)
+      else Rational
+    | Tlambda ([ _ ],lt) ->
+      get_res (infer ~force ~logic_env lt)
 
-and infer_term_lval (host, offset as tlv) =
+    | TStartOf lv
+    | TAddrOf lv ->
+      ignore (infer_term_lval ~force ~logic_env lv);
+      Nan
+
+    | TBinOp (PlusPI, t1 ,t2)
+    | TBinOp (MinusPI, t1, t2) ->
+      ignore (infer ~force ~logic_env t1);
+      ignore (infer ~force ~logic_env t2);
+      Nan
+
+    | Tbase_addr (_,t)
+    | Ttypeof t ->
+      ignore (infer ~force ~logic_env t);
+      Nan
+
+    |TDataCons(_,l) ->
+      List.iter (fun t -> ignore (infer ~force ~logic_env t)) l;
+      Nan
+
+    | TUpdate(t1, toff, t2) ->
+      ignore (infer ~force ~logic_env t1);
+      ignore (infer ~force ~logic_env t2);
+      infer_term_offset ~force ~logic_env toff;
+      Nan
+
+    | Tlambda (_,_)
+    | TConst (LStr _ | LWStr _)
+    | Ttype _
+    | Tempty_set ->
+      Nan
+  in
+  Memo.memo
+    ~force_infer:force
+    (Logic_env.get_profile logic_env)
+    compute
+    t
+
+and infer_term_lval ~force ~logic_env (host, offset as tlv) =
   match offset with
-  | TNoOffset -> infer_term_host host
+  | TNoOffset -> infer_term_host ~force ~logic_env host
   | _ ->
+    ignore (infer_term_host ~force ~logic_env host);
+    infer_term_offset ~force ~logic_env offset;
     let ty = Logic_utils.logicCType (Cil.typeOfTermLval tlv) in
     interv_of_typ ty
 
-and infer_term_host thost =
+and infer_term_host ~force ~logic_env thost =
   match thost with
   | TVar v ->
-    (try Env.find v with Not_found ->
+    (try Logic_env.find logic_env v with Not_found ->
      match v.lv_type with
      | Linteger -> top_ival
      | Ctype (TFloat(fk, _)) -> Float(fk, None)
@@ -880,6 +863,7 @@ and infer_term_host thost =
   | TResult ty ->
     interv_of_typ ty
   | TMem t ->
+    ignore (infer ~force ~logic_env t);
     let ty = Logic_utils.logicCType t.term_type in
     match Cil.unrollType ty with
     | TPtr(ty, _) | TArray(ty, _, _) ->
@@ -889,12 +873,213 @@ and infer_term_host thost =
         Printer.pp_typ ty
         Printer.pp_term t
 
+
+and infer_term_offset ~force ~logic_env t =
+  match t with
+  | TNoOffset -> ()
+  | TField(_, toff)
+  | TModel(_, toff) -> infer_term_offset ~force ~logic_env toff
+  | TIndex(t, toff) ->
+    ignore (infer ~force ~logic_env t);
+    infer_term_offset ~force ~logic_env toff
+
+(* [type_bound_variables] infers an interval associated with each of
+   the provided bounds of a quantified variable, and provides a term
+   accordingly. It could happen that the bounds provided for a quantifier
+   [lv] are bigger than its type. [type_bound_variables] handles such cases
+   and provides smaller bounds whenever possible.
+   Let B be the inferred interval and R the range of [lv.typ]
+   - Case 1: B \subseteq R
+     Example: [\forall unsigned char c; 4 <= c <= 100 ==> 0 <= c <= 255]
+     Return: B
+   - Case 2: B \not\subseteq R and the bounds of B are inferred exactly
+     Example: [\forall unsigned char c; 4 <= c <= 300 ==> 0 <= c <= 255]
+     Return: B \intersect R
+   - Case 3: B \not\subseteq R and the bounds of B are NOT inferred exactly
+     Example: [\let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0]
+     Return: R with a guard guaranteeing that [lv] does not overflow *)
+and infer_bound_variable ~loc ~logic_env (t1, lv, t2) =
+  let get_res = Error.map (fun x -> x) in
+  let i1 = get_res (infer ~force:false ~logic_env t1) in
+  let i2 = get_res (infer ~force:false ~logic_env t2) in
+  let i = widen (join i1 i2) in
+  let t1, t2, i =
+    match lv.lv_type with
+    | Ltype _ | Lvar _ | Lreal | Larrow _ ->
+      Error.not_yet "quantification over non-integer type"
+    | Linteger -> t1, t2, i
+    | Ctype ty ->
+      let ity = extended_interv_of_typ ty in
+      if is_included i ity then
+        (* case 1 *)
+        t1, t2, i
+      else if is_singleton_int i1 &&
+              is_singleton_int i2 then
+        begin
+          (* case 2 *)
+          let i = meet i ity in
+          (* We can now update the bounds in the preprocessed form
+             that come from the meet of the two intervals *)
+          let min, max = Misc.finite_min_and_max (extract_ival i) in
+          let t1 = Logic_const.tint ~loc min in
+          let t2 = Logic_const.tint ~loc max in
+          t1, t2, i
+        end else
+        (* case 3 *)
+        let min, max = Misc.finite_min_and_max (extract_ival ity) in
+        let guard_lower = Logic_const.tint ~loc min in
+        let guard_upper = Logic_const.tint ~loc max in
+        let lv_term = Logic_const.tvar ~loc lv in
+        let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
+        let guard_upper = Logic_const.prel ~loc (Rlt, lv_term, guard_upper) in
+        let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
+        ignore (infer_predicate ~logic_env guard);
+        Bound_variables.add_guard_for_small_type lv guard;
+        t1, t2, i
+  in
+  ignore (infer ~force:false ~logic_env t1);
+  ignore (infer ~force:false ~logic_env t2);
+  Logic_env.add logic_env lv i, (t1, lv, t2)
+
+and infer_predicate ~logic_env p =
+  let get_res = Error.map (fun x -> x) in
+  let p = Logic_normalizer.get_pred p in
+  match p.pred_content with
+  | Pfalse | Ptrue -> ()
+  | Papp(li, _, args) ->
+    (match li.l_body with
+     | LBpred p ->
+       let profile =
+         Profile.make
+           li.l_profile
+           (List.map
+              (fun arg -> get_res (infer ~force:false ~logic_env arg))
+              args)
+       in
+       let logic_env = Logic_env.make profile in
+       ignore (infer_predicate ~logic_env p)
+     | LBnone -> ()
+     | LBreads _ -> ()
+     | LBinductive _ -> ()
+     | LBterm _ ->
+       Options.fatal "unexpected logic definition"
+         Printer.pp_predicate p
+    )
+  | Pdangling _ -> ()
+  | Prel(_, t1, t2) ->
+    ignore (infer ~force:false ~logic_env t1);
+    ignore (infer ~force:false ~logic_env t2)
+  | Pand(p1, p2)
+  | Por(p1, p2)
+  | Pxor(p1, p2)
+  | Pimplies(p1, p2)
+  | Piff(p1, p2) ->
+    infer_predicate ~logic_env p1;
+    infer_predicate ~logic_env p2
+  | Pnot p ->
+    infer_predicate ~logic_env p;
+  | Pif(t, p1, p2) ->
+    ignore (infer ~force:false ~logic_env t);
+    infer_predicate ~logic_env p1;
+    infer_predicate ~logic_env p2
+  | Plet(li, p) ->
+    let li_t = Misc.term_of_li li in
+    let li_v = li.l_var_info in
+    let i = infer ~force:false ~logic_env li_t in
+    let logic_env =
+      Error.map (Logic_env.add logic_env li_v) i
+    in
+    infer_predicate ~logic_env p
+  | Pforall _
+  | Pexists _ ->
+    let guards, goal =
+      Error.retrieve_preprocessing
+        "quantified predicate"
+        Bound_variables.get_preprocessed_quantifier
+        p
+        Printer.pp_predicate
+    in
+    let loc = p.pred_loc in
+    let rec do_analysis guards new_guards logic_env =
+      match guards with
+      | [] -> logic_env, new_guards
+      | guard :: guards ->
+        let  logic_env, new_guard =
+          infer_bound_variable ~loc ~logic_env guard
+        in
+        do_analysis guards (new_guard :: new_guards) logic_env
+    in
+    let logic_env, new_guards = do_analysis guards [] logic_env in
+    Bound_variables.replace p new_guards goal;
+    infer_predicate ~logic_env goal
+  | Pseparated tlist ->
+    List.iter
+      (fun t -> ignore (infer ~force:false ~logic_env t))
+      tlist;
+  | Pinitialized(_, t)
+  | Pfreeable(_, t)
+  | Pallocable(_, t)
+  | Pvalid(_, t)
+  | Pvalid_read(_, t)
+  | Pobject_pointer(_,t)
+  | Pvalid_function t ->
+    ignore (infer ~force:false ~logic_env t);
+  | Pat(p, _) -> infer_predicate ~logic_env p
+  | Pfresh _ -> Error.not_yet "\\fresh"
+
 let infer t =
   let i = infer t in
-  Logic_function_env.clear();
   i
 
-include D
+include Ival_datatype
+
+let typer_visitor ~logic_env = object
+  inherit E_acsl_visitor.visitor dkey
+
+  (* global logic functions and predicates are evaluated are callsites *)
+  method !glob_annot _ = Cil.SkipChildren
+
+  method !vpredicate p =
+    (* Do not raise a warning for e-acsl errors at preprocessing time,
+       those errrors are stored in the table and warnings are raised at
+       translation time *)
+    (try infer_predicate ~logic_env p
+     with Error.Not_yet _ | Error.Typing_error _  -> ());
+    Cil.SkipChildren
+end
+
+let infer_program ast =
+  let visitor = typer_visitor ~logic_env:Logic_env.empty in
+  visitor#visit_file ast
+
+let preprocess_predicate ~logic_env p =
+  let visitor = typer_visitor ~logic_env in
+  ignore @@ visitor#visit_predicate p
+
+let preprocess_code_annot ~logic_env annot =
+  let visitor = typer_visitor ~logic_env in
+  ignore @@ visitor#visit_code_annot annot
+
+let preprocess_term ~logic_env t =
+  ignore (infer ~force:false ~logic_env t)
+
+let get_from_profile ~profile t =
+  let t = Logic_normalizer.get_term t in
+  Error.retrieve_preprocessing
+    "Interval inference"
+    (Memo.get profile)
+    t
+    Printer.pp_term
+
+let get ~logic_env =
+  get_from_profile ~profile:(Logic_env.get_profile logic_env)
+
+let get_widened_profile = Widened_profile.get
+
+let clear () =
+  Memo.clear();
+  Widened_profile.clear();
+  LF_env.clear()
 
 (*
 Local Variables:

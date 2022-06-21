@@ -187,9 +187,10 @@ let check_integer_bounds ~from target =
     If [check_lower_bound] is set to false, then the lower bound check is not
     performed. *)
 let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
-  Typing.type_term ~use_gmp_opt:false ~lenv:(Env.Local_vars.get env) t;
-  match Typing.get_number_ty ~lenv:(Env.Local_vars.get env) t with
-  | Typing.Gmpz ->
+  let logic_env = Env.Logic_env.get env in
+  Typing.preprocess_term ~use_gmp_opt:false ~logic_env t;
+  match Typing.get_number_ty ~logic_env t with
+  | Gmpz ->
     let e, _, env =
       Translate_utils.gmp_to_sizet
         ~adata:Assert.no_data
@@ -201,7 +202,7 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
         t
     in
     e, env
-  | Typing.(C_integer _ | C_float _) as nty ->
+  | C_integer _ | C_float _ as nty ->
     (* We know that [t] can be translated to a C type, so we start with that *)
     let e, _, env = Translate_terms.to_exp ~adata:Assert.no_data kf env t in
     (* Then we can check if the expression will fit in a [size_t] *)
@@ -210,9 +211,8 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
     let check_lower_bound, check_upper_bound =
       let lower, upper =
         match nty with
-        | Typing.C_integer t_kind ->
-          check_integer_bounds ~from:t_kind sizet_kind
-        | Typing.C_float _ -> true, true
+        | C_integer t_kind -> check_integer_bounds ~from:t_kind sizet_kind
+        | C_float _ -> true, true
         | _ -> assert false
       in
       lower && check_lower_bound, upper
@@ -284,9 +284,8 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
              List.rev (assigns :: stmts))
       in
       e, env
-  | Typing.(Rational | Real) ->
-    Env.not_yet env "cast of rational or real to size_t"
-  | Typing.Nan ->
+  | Rational | Real -> Env.not_yet env "cast of rational or real to size_t"
+  | Nan ->
     Options.fatal
       "Trying to translate a term that is not an integer or a C type: %a"
       Printer.pp_term t

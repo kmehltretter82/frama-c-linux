@@ -386,7 +386,7 @@ int main(void)
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_9 =
         {.values = (void *)0};
       __gen_e_acsl_forall_10 = 1;
-      __gen_e_acsl_i_2 = (char)0;
+      __gen_e_acsl_i_2 = 0;
       while (1) {
         if (__gen_e_acsl_i_2 < 10) ; else break;
         {
@@ -1121,13 +1121,13 @@ int main(void)
   ;
   {
     int __gen_e_acsl_forall_18;
-    int __gen_e_acsl_r;
+    unsigned int __gen_e_acsl_r;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_35 =
       {.values = (void *)0};
     __gen_e_acsl_forall_18 = 1;
     __gen_e_acsl_r = 0U;
     while (1) {
-      if (__gen_e_acsl_r < 1) ; else break;
+      if (__gen_e_acsl_r < 1U) ; else break;
       {
         int __gen_e_acsl_and_18;
         if (1 <= __gen_e_acsl_r + 1) __gen_e_acsl_and_18 = __gen_e_acsl_r + 1 < 2;

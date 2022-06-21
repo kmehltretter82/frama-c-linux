@@ -436,7 +436,7 @@ int main(void)
       else {
         {
           int __gen_e_acsl_if_2;
-          if ((int)(__gen_e_acsl_k_9 % 2UL) == 1) __gen_e_acsl_if_2 = 1;
+          if ((int)(__gen_e_acsl_k_9 % 2U) == 1) __gen_e_acsl_if_2 = 1;
           else __gen_e_acsl_if_2 = 0;
           __gen_e_acsl_lambda_9 = __gen_e_acsl_if_2;
         }

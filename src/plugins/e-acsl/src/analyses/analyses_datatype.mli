@@ -43,3 +43,66 @@ module At_data: sig
     (** [create ?error kf kinstr lscope pot label] creates an [at_data] from the
         given arguments. *)
 end
+
+module Ival_datatype: Datatype.S_with_collections with type t = ival
+
+(** profile that maps logic variables that are function parameters to their
+    interval depending on the arguments at the callsite of the function *)
+module Profile: sig
+  include
+    Datatype.S_with_collections
+    with type t = ival Cil_datatype.Logic_var.Map.t
+
+  val make: logic_var list -> ival list -> t
+  val is_empty: t -> bool
+  val empty: t
+
+end
+
+(** term with a profile: a term inside a logic function or predicate may
+    contain free variables. The profile indicates the interval for those
+    free variables. *)
+module Id_term_in_profile: Datatype.S_with_collections
+  with type t = term * Profile.t
+
+(** profile of logic function or predicate: a logic info representing a logic
+    function or a predicate together with a profile for its arguments. *)
+module LFProf: Datatype.S_with_collections
+  with type t = logic_info * Profile.t
+
+(** logic environment: interval of all bound variables. It consists in two
+    components
+    - a profile for variables bound through function arguments
+    - an association list for variables bound by a let or a quantification *)
+module Logic_env : sig
+  type t
+  (* add a new binding for a let or a quantification binder only *)
+  val add : t -> logic_var -> ival -> t
+  (* the empty environment *)
+  val empty : t
+  (* create a new environment from a profile, for function calls *)
+  val make : Profile.t -> t
+  (* find a logic variable in the environment *)
+  val find : t -> logic_var -> ival
+  (* get the profile of the logic environment, i.e. bindings through function
+     arguments *)
+  val get_profile : t -> Profile.t
+end
+
+
+(** Imperative environment to perform the fixpoint algorithm for recursive
+    functions *)
+module LF_env : sig
+  val find : logic_info -> Profile.t -> ival
+
+  val clear : unit -> unit
+
+  val add : logic_info -> Profile.t -> ival -> unit
+
+  val is_rec : logic_info -> bool
+
+  val replace : logic_info -> Profile.t -> ival -> unit
+end
+
+module Number_ty:  Datatype.S_with_collections
+  with type t = number_ty

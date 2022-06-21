@@ -47,17 +47,12 @@
     Note: this is a partial wrapper on top of [Ival.t], to which most
     functions are delegated. *)
 
+open Analyses_types
+open Analyses_datatype
+
 (* ************************************************************************** *)
 (** {3 Useful operations on intervals} *)
 (* ************************************************************************** *)
-
-type ival =
-  | Ival of Ival.t
-  | Float of Cil_types.fkind * float option
-  | Rational
-  | Real
-  | Nan
-
 type t = ival
 
 val is_included: t -> t -> bool
@@ -88,28 +83,50 @@ val extended_interv_of_typ: Cil_types.typ -> t
     @raise Is_a_real if the given type is a float type.
     @raise Not_a_number if the given type does not represent any number. *)
 
-
-(* ************************************************************************** *)
-(** {3 Environment for interval computations} *)
-(* ************************************************************************** *)
-
-(** Environment which maps logic variables to intervals. This environment must
-    be extended from outside. *)
-module Env: sig
-  val clear: unit -> unit
-  val add: Cil_types.logic_var -> t -> unit
-  val remove: Cil_types.logic_var -> unit
-end
+val plus_one : ival -> ival
+(** @return the result of adding one to an interval. This is because when we
+      have a condition [x<t], we need to generate [t+1] *)
 
 (* ************************************************************************** *)
 (** {3 Inference system} *)
 (* ************************************************************************** *)
+(* The inference phase infers the smallest possible integer interval which the
+   values of the term can fit in. *)
 
-val infer: Cil_types.term -> t
-(** [infer t] infers the smallest possible integer interval which the values
-    of the term can fit in.
+val get_from_profile: profile:Profile.t -> Cil_types.term -> t
+(** @return the value computed by the interval inference phase
     @raise Is_a_real if the term is either a float or a real.
-    @raise Not_a_number if the term does not represent any number. *)
+    @raise Not_a_number if the term does not represent any
+    number.*)
+
+val get: logic_env:Logic_env.t -> Cil_types.term -> t
+(** @return the value computed by the interval inference phase, same as
+      [get_from_profile] but with a full-fledged logic environment instead of a
+      function profile *)
+
+
+(*****************************************************************************)
+(** {2 Interval processing} *)
+(*****************************************************************************)
+
+val infer_program : Cil_types.file -> unit
+(** compute and store the type of all the terms that will be translated
+    in a program *)
+
+val preprocess_predicate :
+  logic_env:Logic_env.t -> Cil_types.predicate -> unit
+(** compute and store the type of all the terms in a code annotation *)
+
+val preprocess_code_annot :
+  logic_env:Logic_env.t -> Cil_types.code_annotation -> unit
+(** compute and store the type of all the terms in a code annotation *)
+
+val preprocess_term :
+  logic_env:Logic_env.t -> Cil_types.term -> unit
+
+val get_widened_profile : Profile.t -> Cil_types.logic_info -> Profile.t
+
+val clear : unit -> unit
 
 (*
 Local Variables:

@@ -22,6 +22,7 @@
 
 open Cil_types
 open Analyses_types
+open Analyses_datatype
 open Contract_types
 
 (** Environments.
@@ -176,10 +177,12 @@ val set_rte: t -> bool -> t
 val generate_rte: t -> bool
 (** Returns the current value of RTE generation for the given environment *)
 
-module Local_vars: sig
-  val push_new: t -> t
-  val add: t -> Typing.number_ty -> t
-  val get: t -> Typing.Function_params_ty.t
+module Logic_env: sig
+  val push_new: t -> Profile.t -> t
+  val add : t -> logic_var -> ival -> t
+  val get: t -> Logic_env.t
+  val get_profile : t -> Profile.t
+  val pop: t -> t
 end
 
 (* ************************************************************************** *)
