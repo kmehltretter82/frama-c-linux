@@ -32,6 +32,7 @@
 
 ( library
   (name callgraph)
+  (optional)
   (public_name frama-c-callgraph.core)
   (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel frama-c-eva.core)

@@ -32,6 +32,7 @@
 
 ( library
   (name studia)
+  (optional)
   (public_name frama-c-studia.core)
   (flags -open Frama_c_kernel :standard)
   (libraries frama-c.kernel frama-c-eva.core)

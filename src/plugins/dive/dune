@@ -33,6 +33,7 @@
 
 ( library
   (name dive)
+  (optional)
   (public_name frama-c-dive.core)
   (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel frama-c-studia.core frama-c-server.core)

@@ -32,6 +32,7 @@
 
 (library
   (name Users)
+  (optional)
   (public_name frama-c-users.core)
   (flags -open Frama_c_kernel :standard)
   (libraries frama-c.kernel frama-c-callgraph.core)

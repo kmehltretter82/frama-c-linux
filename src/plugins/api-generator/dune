@@ -22,6 +22,7 @@
 
 ( library
   (name api_generator)
+  (optional)
   (public_name frama-c-api-generator.core)
   (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel frama-c-server.core)
