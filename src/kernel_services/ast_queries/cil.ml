@@ -3960,8 +3960,8 @@ let find_sizeof t f =
     let t', size = f () in
     TypSize.add t' (Size size) ;
     size
-  with SizeOfError(t',msg) as e ->
-    TypSize.add t (Error (t', msg)) ;
+  with SizeOfError(msg, t') as e ->
+    TypSize.add t' (Error (msg, t')) ;
     raise e
 
 let selfTypSize = TypSize.self
@@ -4434,8 +4434,10 @@ and bitsSizeOf t =
     find_sizeof t
       (fun () ->
          begin
-           match constFold true len with
-             { enode = Const(CInt64(l,_,_)) } as v->
+           let v = constFold true len in
+           let norm_typ = TArray(bt, Some v, attrs) in
+           match v with
+             { enode = Const(CInt64(l,_,_)) } ->
              let sz = Integer.mul (Integer.of_int (bitsSizeOf bt)) l in
              let sz' =
                match Integer.to_int_opt sz with
@@ -4444,11 +4446,12 @@ and bitsSizeOf t =
                  raise
                    (SizeOfError
                       ("Array is so long that its size can't be "
-                       ^"represented with an OCaml int.", t))
+                       ^"represented with an OCaml int.", norm_typ))
 
              in
-             (TArray(bt, Some v,attrs), sz') (*WAS: addTrailing sz' (8 * bytesAlignOf t)*)
-           | _ -> raise (SizeOfError ("Array with non-constant length.", t))
+             (norm_typ, sz') (*WAS: addTrailing sz' (8 * bytesAlignOf t)*)
+           | _ ->
+             raise (SizeOfError ("Array with non-constant length.", norm_typ))
          end)
   | TVoid _ ->
     if theMachine.theMachine.sizeof_void >= 0 then
