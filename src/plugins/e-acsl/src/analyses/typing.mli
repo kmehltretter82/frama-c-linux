@@ -111,10 +111,6 @@ val get_effective_typ: logic_env:Logic_env.t -> term -> typ
 val get_cast: logic_env:Logic_env.t -> term -> typ option
 (** Get the type which the given term must be converted to (if any). *)
 
-val get_cast_of_predicate:
-  logic_env:Logic_env.t -> predicate -> typ option
-(** Like {!get_cast}, but for predicates. *)
-
 val unsafe_set:
   term ->
   ?ctx:number_ty ->

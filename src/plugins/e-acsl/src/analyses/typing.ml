@@ -756,89 +756,85 @@ and type_predicate ~profile p =
   let p = Logic_normalizer.get_pred p in
   Cil.CurrentLoc.set p.pred_loc;
   (* this pattern matching also follows the formal rules of the JFLA's paper *)
-  let type_sub_pred p =
-    match p.pred_content with
-    | Pfalse | Ptrue -> ()
-    | Papp(li, _, args) ->
-      begin
-        match li.l_body with
-        | LBpred p ->
-          List.iter
-            (fun x -> ignore (type_term ~use_gmp_opt: true ~profile x))
-            args;
-          let new_profile =
-            Profile.make
-              li.l_profile
-              (List.map (Interval.get_from_profile ~profile) args)
-          in
-          ignore (type_predicate ~profile:new_profile p);
-        | LBnone -> ()
-        | LBreads _ -> ()
-        | LBinductive _ -> ()
-        | LBterm _ ->
-          Options.fatal "unexpected logic definition"
-            Printer.pp_predicate p
-      end
-    | Pdangling _ -> Error.not_yet "\\dangling"
-    | Prel(_, t1, t2) ->
-      let ctx =
-        try
-          Some (ctx_relation ~profile t1 t2)
-        with _ -> None
-      in
-      do_both
-        (fun () -> ignore (type_term ~use_gmp_opt:true ?ctx ~profile t1))
-        (fun () -> ignore (type_term ~use_gmp_opt:true ?ctx ~profile t2));
-    | Pand(p1, p2)
-    | Por(p1, p2)
-    | Pxor(p1, p2)
-    | Pimplies(p1, p2)
-    | Piff(p1, p2) ->
-      do_both
-        (fun () -> ignore (type_predicate ~profile p1))
-        (fun () -> ignore (type_predicate ~profile p2))
-    | Pnot p ->
-      ignore (type_predicate ~profile p)
-    | Pif(t, p1, p2) ->
-      let ctx = mk_ctx ~use_gmp_opt:false c_int in
-      ignore (type_term ~use_gmp_opt:false ~ctx ~profile t);
-      do_both
-        (fun () -> ignore (type_predicate ~profile p1))
-        (fun () -> ignore (type_predicate ~profile p2))
-    | Plet(li, p) ->
-      let li_t = Misc.term_of_li li in
-      ignore (type_term ~use_gmp_opt:true ~profile li_t);
-      ignore (type_predicate ~profile p)
-    | Pforall _
-    | Pexists _ ->
-      let guards, goal =
-        Error.retrieve_preprocessing
-          "preprocessing of quantified predicate"
-          Bound_variables.get_preprocessed_quantifier
-          p
-          Printer.pp_predicate
-      in
-      List.iter
-        (fun (t1, x, t2) -> type_bound_variables ~profile (t1, x, t2))
-        guards;
-      ignore (type_predicate ~profile goal)
-    | Pseparated tlist ->
-      List.iter
-        (fun t -> ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~profile t))
-        tlist
-    | Pinitialized(_, t)
-    | Pfreeable(_, t)
-    | Pallocable(_, t)
-    | Pvalid(_, t)
-    | Pvalid_read(_, t)
-    | Pobject_pointer(_,t)
-    | Pvalid_function t ->
-      ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~profile t)
-    | Pat(p, _) -> ignore (type_predicate ~profile p)
-    | Pfresh _ -> Error.not_yet "\\fresh"
-  in
-  type_sub_pred p;
-  coerce ~arith_operand:false ~ctx:c_int c_int
+  match p.pred_content with
+  | Pfalse | Ptrue -> ()
+  | Papp(li, _, args) ->
+    begin
+      match li.l_body with
+      | LBpred p ->
+        List.iter
+          (fun x -> ignore (type_term ~use_gmp_opt: true ~profile x))
+          args;
+        let new_profile =
+          Profile.make
+            li.l_profile
+            (List.map (Interval.get_from_profile ~profile) args)
+        in
+        type_predicate ~profile:new_profile p;
+      | LBnone -> ()
+      | LBreads _ -> ()
+      | LBinductive _ -> ()
+      | LBterm _ ->
+        Options.fatal "unexpected logic definition"
+          Printer.pp_predicate p
+    end
+  | Pdangling _ -> Error.not_yet "\\dangling"
+  | Prel(_, t1, t2) ->
+    let ctx =
+      try
+        Some (ctx_relation ~profile t1 t2)
+      with _ -> None
+    in
+    do_both
+      (fun () -> ignore (type_term ~use_gmp_opt:true ?ctx ~profile t1))
+      (fun () -> ignore (type_term ~use_gmp_opt:true ?ctx ~profile t2));
+  | Pand(p1, p2)
+  | Por(p1, p2)
+  | Pxor(p1, p2)
+  | Pimplies(p1, p2)
+  | Piff(p1, p2) ->
+    do_both
+      (fun () -> type_predicate ~profile p1)
+      (fun () -> type_predicate ~profile p2)
+  | Pnot p ->
+    type_predicate ~profile p
+  | Pif(t, p1, p2) ->
+    let ctx = mk_ctx ~use_gmp_opt:false c_int in
+    ignore (type_term ~use_gmp_opt:false ~ctx ~profile t);
+    do_both
+      (fun () -> type_predicate ~profile p1)
+      (fun () -> type_predicate ~profile p2)
+  | Plet(li, p) ->
+    let li_t = Misc.term_of_li li in
+    ignore (type_term ~use_gmp_opt:true ~profile li_t);
+    type_predicate ~profile p
+  | Pforall _
+  | Pexists _ ->
+    let guards, goal =
+      Error.retrieve_preprocessing
+        "preprocessing of quantified predicate"
+        Bound_variables.get_preprocessed_quantifier
+        p
+        Printer.pp_predicate
+    in
+    List.iter
+      (fun (t1, x, t2) -> type_bound_variables ~profile (t1, x, t2))
+      guards;
+    type_predicate ~profile goal
+  | Pseparated tlist ->
+    List.iter
+      (fun t -> ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~profile t))
+      tlist
+  | Pinitialized(_, t)
+  | Pfreeable(_, t)
+  | Pallocable(_, t)
+  | Pvalid(_, t)
+  | Pvalid_read(_, t)
+  | Pobject_pointer(_,t)
+  | Pvalid_function t ->
+    ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~profile t)
+  | Pat(p, _) -> type_predicate ~profile p
+  | Pfresh _ -> Error.not_yet "\\fresh"
 
 (** When typing a binary relation, generate the context in which the relation
     should be typed, to avoid spurious casts:
@@ -908,12 +904,6 @@ let get_cast ~logic_env t =
     Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term in
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> None
-
-let get_cast_of_predicate ~logic_env p =
-  let profile = Logic_env.get_profile logic_env in
-  let info = type_predicate ~profile p in
-  try Option.map typ_of_number_ty info.cast
-  with Not_a_number -> assert false
 
 let get_effective_ty ~logic_env t =
   let profile = Logic_env.get_profile logic_env in

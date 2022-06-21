@@ -325,11 +325,7 @@ and to_exp ~adata ?inplace ?name kf ?rte env p =
              predicate_content_to_exp ?inplace ~adata ?name kf env p
            in
            let env = if rte then !translate_rte_exp_ref kf env e else env in
-           let cast =
-             Typing.get_cast_of_predicate
-               ~logic_env:(Env.Logic_env.get env)
-               p
-           in
+           let cast = None in
            let env = Assert.do_pending_register_data env in
            Extlib.nest
              adata
