@@ -3957,8 +3957,8 @@ let find_sizeof t f =
     | Error (msg, t') -> raise (SizeOfError(msg, t'))
   with Not_found ->
   try
-    let size = f () in
-    TypSize.add t (Size size) ;
+    let t', size = f () in
+    TypSize.add t' (Size size) ;
     size
   with SizeOfError(t',msg) as e ->
     TypSize.add t (Error (t', msg)) ;
@@ -4378,7 +4378,7 @@ and bitsSizeOf t =
       (SizeOfError
          (Format.sprintf "abstract type '%s'" (compFullName comp), t))
   | TComp ({cfields=Some[]}, _) when acceptEmptyCompinfo() ->
-    find_sizeof t (fun () -> 0)
+    find_sizeof t (fun () -> t,0)
   | TComp ({cfields=Some[]} as comp,_) ->
     find_sizeof t
       (fun () ->
@@ -4405,9 +4405,9 @@ and bitsSizeOf t =
          then
            (* On MSVC if we have just a zero-width bitfields then the length
             * is 32 and is not padded  *)
-           32
+           t, 32
          else
-           addTrailing lastoff.oaFirstFree (8 * bytesAlignOf t))
+           t, addTrailing lastoff.oaFirstFree (8 * bytesAlignOf t))
 
   | TComp (comp, _) -> (* Union *)
     find_sizeof t
@@ -4428,14 +4428,14 @@ and bitsSizeOf t =
          (* Note: we treat None above *)
          let max = List.fold_left fold 0 (Option.get comp.cfields) in
          (* Add trailing by simulating adding an extra field *)
-         addTrailing max (8 * bytesAlignOf t))
+         t, addTrailing max (8 * bytesAlignOf t))
 
-  | TArray(bt, Some len, _) ->
+  | TArray(bt, Some len, attrs) ->
     find_sizeof t
       (fun () ->
          begin
-           match (constFold true len).enode with
-             Const(CInt64(l,_,_)) ->
+           match constFold true len with
+             { enode = Const(CInt64(l,_,_)) } as v->
              let sz = Integer.mul (Integer.of_int (bitsSizeOf bt)) l in
              let sz' =
                match Integer.to_int_opt sz with
@@ -4447,7 +4447,7 @@ and bitsSizeOf t =
                        ^"represented with an OCaml int.", t))
 
              in
-             sz' (*WAS: addTrailing sz' (8 * bytesAlignOf t)*)
+             (TArray(bt, Some v,attrs), sz') (*WAS: addTrailing sz' (8 * bytesAlignOf t)*)
            | _ -> raise (SizeOfError ("Array with non-constant length.", t))
          end)
   | TVoid _ ->
