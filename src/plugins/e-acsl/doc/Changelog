@@ -25,12 +25,14 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-* E-ACSL       [2022-17-06] Fix wrong cast from pointer to integer (frama-c/frama-c#1119)
 
 ##############################
 Plugin E-ACSL 25.0 (Manganese)
 ##############################
 
 -* E-ACSL       [2022-23-05] Fix crash for quantifications over enum types (frama-c/e-acsl#199)
+-*  E-ACSL      [2022-06-09] Fix wrong cast of pointer to integer (frama-c/frama-c#1119)
 -  E-ACSL       [2022-03-04] Improve translation of `\at()` terms and
                 predicates (frama-c/e-acsl#108).
 -* E-ACSL       [2022-03-01] Fix normalization of global annotations that

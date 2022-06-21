@@ -362,7 +362,7 @@ export default function ASTinfo(): JSX.Element {
         />
       </TitleBar>
       <Boxes.Scroll>
-        {markers.getSelected().map(renderMark)}
+        {React.Children.toArray(markers.getSelected().map(renderMark))}
       </Boxes.Scroll>
     </>
   );

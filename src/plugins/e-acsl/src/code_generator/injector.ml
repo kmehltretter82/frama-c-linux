@@ -223,6 +223,7 @@ let inject_in_instr env kf stmt = function
 let add_new_block_in_stmt env kf stmt =
   (* Add temporal analysis instrumentations *)
   let env = Temporal.handle_stmt stmt env kf in
+  let logic_env = Env.Logic_env.get env in
   let new_stmt, env =
     if Functions.check kf then
       let env =
@@ -232,7 +233,7 @@ let add_new_block_in_stmt env kf stmt =
           (* translate potential RTEs of ghost code *)
           let rtes = Rte.stmt ~warn:false kf stmt in
           List.iter
-            (Typing.preprocess_rte ~lenv:(Env.Local_vars.get env))
+            (Typing.preprocess_rte ~logic_env)
             rtes;
           Translate_rtes.rte_annots Printer.pp_stmt stmt kf env rtes
         end else

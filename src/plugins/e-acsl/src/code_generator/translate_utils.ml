@@ -23,6 +23,7 @@
 (** Utility functions for generating C implementations. *)
 
 open Cil_types
+open Analyses_types
 module Error = Translation_error
 
 (**************************************************************************)
@@ -78,7 +79,7 @@ let () =
   E_acsl_visitor.must_translate_ppt_opt_ref := must_translate_opt
 
 let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
-  let lenv = Env.Local_vars.get env in
+  let logic_env = Env.Logic_env.get env in
   let pp = match pp with Some size_pp -> size_pp | None -> t in
   let sizet = Cil.(theMachine.typeOfSizeOf) in
   let stmts = [] in
@@ -93,7 +94,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
           pred_name = pred_name :: lower_guard_pp.pred_name }
       in
       let lower_guard = Logic_const.prel ~loc (Rge, t, zero_term) in
-      Typing.type_named_predicate ~lenv lower_guard;
+      Typing.preprocess_predicate ~logic_env lower_guard;
       let adata_lower_guard, env = Assert.empty ~loc kf env in
       let lower_guard, adata_lower_guard, env =
         !predicate_to_exp_ref ~adata:adata_lower_guard kf env lower_guard
@@ -123,7 +124,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
       pred_name = pred_name :: upper_guard_pp.pred_name }
   in
   let upper_guard = Logic_const.prel ~loc (Rle, t, sizet_max) in
-  Typing.type_named_predicate ~lenv upper_guard;
+  Typing.preprocess_predicate ~logic_env upper_guard;
   let adata_upper_guard, env = Assert.empty ~loc kf env in
   let upper_guard, adata_upper_guard, env =
     !predicate_to_exp_ref ~adata:adata_upper_guard kf env upper_guard
@@ -202,9 +203,9 @@ let comparison_to_exp
       Env.not_yet env "comparison between two structs or unions"
     | Logic_aggr.NotAggregate, Logic_aggr.NotAggregate -> begin
         match ity with
-        | Typing.C_integer _ | Typing.C_float _ | Typing.Nan ->
+        | C_integer _ | C_float _ | Nan ->
           Cil.mkBinOp ~loc bop e1 e2, env
-        | Typing.Gmpz ->
+        | Gmpz ->
           let _, e, env = Env.new_var
               ~loc
               env
@@ -220,10 +221,8 @@ let comparison_to_exp
                      [ e1; e2 ] ])
           in
           Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
-        | Typing.Rational ->
-          Rational.cmp ~loc bop e1 e2 env kf t_opt
-        | Typing.Real ->
-          Error.not_yet "comparison involving real numbers"
+        | Rational -> Rational.cmp ~loc bop e1 e2 env kf t_opt
+        | Real -> Error.not_yet "comparison involving real numbers"
       end
     | _, _ ->
       Options.fatal
@@ -244,7 +243,7 @@ let conditional_to_exp ?(name="if") ~loc kf t_opt e1 (e2, env2) (e3, env3) =
   | _ ->
     let ty = match t_opt with
       | None (* predicate *) -> Cil.intType
-      | Some t -> Typing.get_typ ~lenv:(Env.Local_vars.get env) t
+      | Some t -> Typing.get_typ ~logic_env:(Env.Logic_env.get env) t
     in
     let _, e, env =
       Env.new_var
@@ -278,19 +277,16 @@ let env_of_li ~adata ~loc kf env li =
   match li.l_var_info.lv_type with
   | Ctype _ | Linteger | Lreal ->
     let t = Misc.term_of_li li in
-    let lenv = Env.Local_vars.get env in
-    let ty = Typing.get_typ ~lenv t in
+    let logic_env = Env.Logic_env.get env in
+    let ty = Typing.get_typ ~logic_env t in
     let vi, vi_e, env = Env.Logic_binding.add ~ty env kf li.l_var_info in
     let e, adata, env = !term_to_exp_ref ~adata kf env t in
-    let stmt = match Typing.get_number_ty ~lenv t with
-      | Typing.(C_integer _ | C_float _ | Nan) ->
+    let stmt = match Typing.get_number_ty ~logic_env t with
+      | C_integer _ | C_float _ | Nan ->
         Smart_stmt.assigns ~loc ~result:(Cil.var vi) e
-      | Typing.Gmpz ->
-        Gmp.init_set ~loc (Cil.var vi) vi_e e
-      | Typing.Rational ->
-        Rational.init_set ~loc (Cil.var vi) vi_e e
-      | Typing.Real ->
-        Error.not_yet "real number"
+      | Gmpz -> Gmp.init_set ~loc (Cil.var vi) vi_e e
+      | Rational -> Rational.init_set ~loc (Cil.var vi) vi_e e
+      | Real -> Error.not_yet "real number"
     in
     adata, Env.add_stmt env stmt
   | Ltype _ ->

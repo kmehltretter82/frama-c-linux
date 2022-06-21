@@ -81,8 +81,14 @@ module type S = sig
     Format.formatter ->
     'a result ->
     unit
-    (** [pp_result pp] where [pp] is a formatter for ['a] returns a formatter for
-        ['a result]. *)
+  (** [pp_result pp] where [pp] is a formatter for ['a] returns a formatter for
+      ['a result]. *)
+
+  val map : ('a -> 'b) -> 'a result -> 'b
+  val map2 : ('a -> 'b -> 'c) -> 'a result -> 'b result -> 'c
+  val map3 : ('a -> 'b -> 'c -> 'd) -> 'a result -> 'b result -> 'c result -> 'd
+  (** Apply a function to one or several results and propagate the errors *)
+
 end
 
 (** Functor to build an [Error] module for a given [phase]. *)

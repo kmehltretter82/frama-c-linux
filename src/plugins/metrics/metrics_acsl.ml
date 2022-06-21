@@ -286,13 +286,11 @@ let dump_acsl_stats fmt =
 let dump_acsl_stats_html fmt =
   Format.pp_set_formatter_stag_functions fmt Metrics_base.html_stag_functions;
   Format.fprintf fmt
-    "@[<v 0> <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\
-     \"http://www.w3.org/TR/html4/strict.dtd\">@ \
+    "@[<v 0> <!DOCTYPE html>@ \
      @{<html>@ \
      @{<head>@ \
      @{<title>%s@}@ \
-     <meta content=\"text/html; charset=iso-8859-1\" \
-     http-equiv=\"Content-Type\"/>@ \
+     <meta charset=\"utf-8\">@ \
      @{<style type=\"text/css\">%s@}@ \
      @}@ \
      @{<body>\

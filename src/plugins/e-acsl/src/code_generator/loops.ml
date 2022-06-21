@@ -66,10 +66,9 @@ let handle_annotations env kf stmt =
            | Some (t, measure_opt) ->
              let env = Env.set_annotation_kind env Variant in
              let env = Env.push env in
-             (* There cannot be bound logical variables since we cannot write
-                loops inside logic functions or predicates, hence lenv is []*)
-             Typing.type_term ~use_gmp_opt:true ~lenv:[] t;
-             let ty = Typing.get_typ ~lenv:[] t in
+             let logic_env = Env.Logic_env.get env in
+             Typing.preprocess_term ~use_gmp_opt:true ~logic_env t;
+             let ty = Typing.get_typ ~logic_env t in
              if Gmp_types.is_t ty then Error.not_yet "loop variant using GMP";
              let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
              let vi_old, e_old, env =
@@ -99,7 +98,6 @@ let handle_annotations env kf stmt =
       | [] -> begin
           (* No statements remaining in the loop: variant check *)
           let env = Env.set_annotation_kind env Variant in
-          let lenv = Env.Local_vars.get env in
           match variant with
           | Some (t, e_old, Some measure) ->
             let env = Env.push env in
@@ -110,7 +108,8 @@ let handle_annotations env kf stmt =
                 term_name = [];
                 term_type = Linteger;}
             in
-            Typing.type_term ~use_gmp_opt:true ~lenv tapp;
+            let logic_env = Env.Logic_env.get env in
+            Typing.preprocess_term ~use_gmp_opt:true ~logic_env tapp;
             let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
             let e_tapp, _, env =
               Logic_functions.app_to_exp
@@ -167,7 +166,8 @@ let handle_annotations env kf stmt =
             let variant_pos =
               Logic_const.prel ~loc (Rge, t_old, Logic_const.tinteger ~loc 0)
             in
-            Typing.type_named_predicate ~lenv variant_pos;
+            let logic_env = Env.Logic_env.get env in
+            Typing.preprocess_predicate ~logic_env variant_pos;
             let variant_pos_e, _, env =
               !predicate_to_exp_ref ~adata:Assert.no_data kf env variant_pos
             in
@@ -199,7 +199,7 @@ let handle_annotations env kf stmt =
             let variant_dec =
               Logic_const.prel ~loc (Rgt, t_old, t)
             in
-            Typing.type_named_predicate ~lenv variant_dec;
+            Typing.preprocess_predicate ~logic_env variant_dec;
             let variant_dec_e, _, env =
               !predicate_to_exp_ref ~adata:Assert.no_data kf env variant_dec
             in
@@ -280,30 +280,25 @@ let handle_annotations env kf stmt =
 (**************************** Nested loops ********************************)
 (**************************************************************************)
 let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
-  let lenv = Env.Local_vars.get env in
   let term_to_exp = !term_to_exp_ref ~adata:Assert.no_data in
+  let logic_env = Env.Logic_env.get env in
   match lscope_vars with
   | [] ->
     mk_innermost_block env
   | Lvs_quantif(t1, rel1, logic_x, rel2, t2) :: lscope_vars' ->
     assert (rel1 == Rle && rel2 == Rlt);
-    Typing.type_term ~use_gmp_opt:false ~lenv t1;
-    Typing.type_term ~use_gmp_opt:false ~lenv t2;
     let ctx =
-      let ty1 = Typing.get_number_ty ~lenv t1 in
-      let ty2 = Typing.get_number_ty ~lenv t2 in
-      Typing.join ty1 ty2
+      Typing.number_ty_bound_variable
+        ~profile:(Env.Logic_env.get_profile env)
+        (t1, logic_x, t2)
     in
-    let t_plus_one ?ty t =
-      (* whenever provided, [ty] is known to be the type of the result *)
+    let t_plus_one ~ty t =
+      (* [ty] is the type of the result *)
       let tone = Cil.lone ~loc () in
       let res = Logic_const.term ~loc (TBinOp(PlusA, t, tone)) Linteger in
-      Option.iter
-        (fun ty ->
-           Typing.unsafe_set tone ~ctx:ty ~lenv ctx;
-           Typing.unsafe_set t ~ctx:ty ~lenv ctx;
-           Typing.unsafe_set res ~lenv ty)
-        ty;
+      Typing.unsafe_set ~logic_env tone ~ctx:ty ctx;
+      Typing.unsafe_set ~logic_env t ~ctx:ty ctx;
+      Typing.unsafe_set ~logic_env res ty;
       res
     in
     let ty =
@@ -314,9 +309,9 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let var_x, x, env = Env.Logic_binding.add ~ty env kf logic_x in
     let lv_x = var var_x in
     let env = match ctx with
-      | Typing.C_integer _ -> env
-      | Typing.Gmpz -> Env.add_stmt env (Gmp.init ~loc x)
-      | Typing.(C_float _ | Rational | Real | Nan) -> assert false
+      | C_integer _ -> env
+      | Gmpz -> Env.add_stmt env (Gmp.init ~loc x)
+      | C_float _ | Rational | Real | Nan -> assert false
     in
     (* build the inner loops and loop body *)
     let body, env =
@@ -337,17 +332,17 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
        to avoid the extra addition (relevant when computing with GMP) *)
     let guard =
       match t2.term_node with
-      | TBinOp (PlusA, t2_minus_one, {term_node = TConst(Integer (n, _))}) when Integer.is_one n ->
+      | TBinOp (PlusA, t2_minus_one, {term_node = TConst(Integer (n, _))}) when
+          Integer.is_one n ->
         Logic_const.term ~loc
-          (TBinOp(Le, tlv, { t2_minus_one with term_node = t2_minus_one.term_node }))
+          (TBinOp(Le, tlv, t2_minus_one))
           Linteger
       | _ ->
-        (* must copy [t2] to force it being typed again *)
         Logic_const.term ~loc
-          (TBinOp(Lt, tlv, { t2 with term_node = t2.term_node } ))
+          (TBinOp(Lt, tlv, t2))
           Linteger
     in
-    Typing.type_term ~use_gmp_opt:false ~lenv ~ctx:Typing.c_int guard;
+    Typing.preprocess_term ~use_gmp_opt:false ~ctx:Typing.c_int ~logic_env guard;
     let guard_exp, _, env = term_to_exp kf (Env.push env) guard in
     let break_stmt = Smart_stmt.break ~loc:guard_exp.eloc in
     let guard_blk, env = Env.pop_and_get
@@ -413,7 +408,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     Env.Logic_binding.remove env logic_x;
     [ start ;  stmt ], env
   | Lvs_let(lv, t) :: lscope_vars' ->
-    let ty = Typing.get_typ ~lenv t in
+    let ty = Typing.get_typ ~logic_env t in
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env kf lv in
     let e, _, env = term_to_exp kf env t in
     let ty = Cil.typeOf e in

@@ -609,13 +609,11 @@ let dump_html fmt cil_visitor =
       (fun fmt cil_visitor -> cil_visitor#print_stats fmt) cil_visitor
   in
   Format.fprintf fmt "@[<v 0>\
-                      <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\
-                      \"http://www.w3.org/TR/html4/strict.dtd\">@ \
+                      <!DOCTYPE html>@ \
                       @{<html>@ \
                       @{<head>@ \
                       @{<title>%s@}@ \
-                      <meta content=\"text/html; charset=iso-8859-1\" \
-                      http-equiv=\"Content-Type\"/>@ \
+                      <meta charset=\"utf-8\">@ \
                       @{<style type=\"text/css\">%s@}@ \
                       @}@ \
                       @{<body>\

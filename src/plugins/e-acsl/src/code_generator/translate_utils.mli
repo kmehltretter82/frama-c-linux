@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Analyses_types
 
 (** Utility functions for generating C implementations. *)
 
@@ -55,7 +56,7 @@ val comparison_to_exp:
   loc:location ->
   kernel_function ->
   Env.t ->
-  Typing.number_ty ->
+  number_ty ->
   ?e1:exp ->
   binop ->
   term ->

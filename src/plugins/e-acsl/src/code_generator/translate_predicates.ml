@@ -72,7 +72,7 @@ let relation_to_binop = function
    translation. *)
 let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
   let loc = p.pred_loc in
-  let lenv = Env.Local_vars.get env in
+  let logic_env = Env.Logic_env.get env in
   Cil.CurrentLoc.set loc;
   match p.pred_content with
   | Pfalse -> Cil.zero ~loc, adata, env
@@ -88,7 +88,7 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
   | Pvalid_function _ -> Env.not_yet env "\\valid_function"
   | Prel(rel, t1, t2) ->
     let ity =
-      Typing.get_integer_op_of_predicate ~lenv p
+      Typing.get_integer_op_of_predicate ~logic_env p
     in
     Translate_utils.comparison_to_exp
       ~adata
@@ -199,7 +199,6 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
     let e, adata, env = to_exp ~adata kf env p in
     (* Remove the logic var from the logic scope *)
     let env = Env.Logic_scope.remove env lvs in
-    Interval.Env.remove li.l_var_info;
     e, adata, env
   | Pforall _ | Pexists _ ->
     let e, env = Quantif.quantif_to_exp kf env p in
@@ -238,7 +237,7 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
            let p = { p with pred_name = name :: p.pred_name } in
            let tp = Logic_const.toplevel_predicate ~kind:Assert p in
            let annot = Logic_const.new_code_annotation (AAssert ([],tp)) in
-           Typing.preprocess_rte ~lenv:(Env.Local_vars.get env) annot;
+           Typing.preprocess_rte ~logic_env:(Env.Logic_env.get env) annot;
            !translate_rte_annots_ref
              Printer.pp_code_annotation
              annot
@@ -324,7 +323,7 @@ and to_exp ~adata ?inplace ?name kf ?rte env p =
            let env = if rte then !translate_rte_exp_ref kf env e else env in
            let cast =
              Typing.get_cast_of_predicate
-               ~lenv:(Env.Local_vars.get env)
+               ~logic_env:(Env.Logic_env.get env)
                p
            in
            let env = Assert.do_pending_register_data env in

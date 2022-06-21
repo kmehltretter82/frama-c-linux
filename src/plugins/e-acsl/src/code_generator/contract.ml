@@ -162,7 +162,7 @@ let assumes_predicate env assumes =
       Logic_const.ptrue
       assumes
   in
-  Typing.preprocess_predicate (Env.Local_vars.get env) p;
+  Typing.preprocess_predicate ~logic_env:(Env.Logic_env.get env) p;
   p
 
 let create ~loc spec =
@@ -360,7 +360,9 @@ let check_other_requires kf env contract =
                  let requires =
                    { requires with pred_name = b.b_name :: requires.pred_name }
                  in
-                 Typing.preprocess_predicate (Env.Local_vars.get env) requires;
+                 Typing.preprocess_predicate
+                   ~logic_env:(Env.Logic_env.get env)
+                   requires;
                  (* Create runtime check *)
                  let adata, env = Assert.empty ~loc kf env in
                  let requires_e, adata, env =
@@ -681,7 +683,7 @@ let check_post_conds kf env contract =
                          pred_name = b.b_name :: post_cond.pred_name }
                      in
                      Typing.preprocess_predicate
-                       (Env.Local_vars.get env)
+                       ~logic_env:(Env.Logic_env.get env)
                        post_cond;
                      (* Create runtime check *)
                      let adata, env = Assert.empty ~loc kf env in

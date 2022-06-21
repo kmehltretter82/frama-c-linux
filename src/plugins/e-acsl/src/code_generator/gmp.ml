@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Analyses_types
 module Error = Translation_error
 
 (**************************************************************************)
@@ -70,31 +71,24 @@ let get_set_suffix_and_arg res_ty e =
     end
   in
   match (exp_number_ty, res_number_ty) with
-  | Typing.Gmpz, Typing.Gmpz | Typing.Rational, Typing.Rational ->
-    "", [ e ]
-  | Typing.Gmpz, Typing.Rational ->
-    "_z", [ e ]
-  | Typing.Rational, Typing.Gmpz ->
-    "_q", [ e ]
-  | Typing.C_integer IChar, _ ->
+  | Gmpz, Gmpz | Rational, Rational -> "", [ e ]
+  | Gmpz, Rational -> "_z", [ e ]
+  | Rational, Gmpz -> "_q", [ e ]
+  | C_integer IChar, _ ->
     (if Cil.theMachine.Cil.theMachine.char_is_unsigned then "_ui"
      else "_si"),
     args_uisi e
-  | Typing.C_integer (IBool | IUChar | IUInt | IUShort | IULong), _ ->
+  | C_integer (IBool | IUChar | IUInt | IUShort | IULong), _ ->
     "_ui", args_uisi e
-  | Typing.C_integer (ISChar | IShort | IInt | ILong), _ ->
-    "_si", args_uisi e
-  | Typing.C_integer (ILongLong | IULongLong as ikind), _ ->
-    raise (Longlong ikind)
-  | Typing.C_float (FDouble | FFloat), _ ->
-    (* FFloat is a strict subset of FDouble (modulo exceptional numbers)
-       Hence, calling [set_d] for both of them is sound.
-       HOWEVER: the machdep MUST NOT be vulnerable to double rounding
-       [TODO] check the statement above *)
-    "_d", [ e ]
-  | Typing.C_float FLongDouble, _ ->
-    Error.not_yet "creating gmp from long double"
-  | Typing.Gmpz, _ | Typing.Rational, _ | Typing.Real, _ | Typing.Nan, _ -> (
+  | C_integer (ISChar | IShort | IInt | ILong), _ -> "_si", args_uisi e
+  | C_integer (ILongLong | IULongLong as ikind), _ -> raise (Longlong ikind)
+  | C_float (FDouble | FFloat), _ -> "_d", [ e ]
+  (* FFloat is a strict subset of FDouble (modulo exceptional numbers)
+     Hence, calling [set_d] for both of them is sound.
+     HOWEVER: the machdep MUST NOT be vulnerable to double rounding
+     [TODO] check the statement above *)
+  | C_float FLongDouble, _ -> Error.not_yet "creating gmp from long double"
+  | Gmpz, _ | Rational, _ | Real, _ | Nan, _ -> (
       match Cil.unrollType ty with
       | TPtr(TInt(IChar, _), _) ->
         "_str",

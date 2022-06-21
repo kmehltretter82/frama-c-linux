@@ -67,7 +67,7 @@ let exp ?filter kf env e =
     | Some f -> List.filter f l
     | None -> l
   in
-  List.iter (Typing.preprocess_rte ~lenv:(Env.Local_vars.get env)) l;
+  List.iter (Typing.preprocess_rte ~logic_env:(Env.Logic_env.get env)) l;
   let env = rte_annots Printer.pp_exp e kf env l in
   Assert.do_pending_register_data env
 

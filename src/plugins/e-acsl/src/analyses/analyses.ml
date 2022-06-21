@@ -29,6 +29,8 @@ let preprocess () =
   Logic_normalizer.preprocess ast;
   analyses_feedback "normalizing quantifiers";
   Bound_variables.preprocess ast;
+  analyses_feedback "infering interval of annotations";
+  Interval.infer_program ast;
   analyses_feedback "typing annotations";
   Typing.type_program ast;
   analyses_feedback
@@ -40,6 +42,6 @@ let reset () =
   Literal_strings.reset ();
   Bound_variables.clear_guards ();
   Logic_normalizer.clear ();
-  Interval.Env.clear();
+  Interval.clear ();
   Typing.clear ();
   Labels.reset ()

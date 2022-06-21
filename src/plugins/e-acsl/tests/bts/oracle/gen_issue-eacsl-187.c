@@ -49,7 +49,7 @@ int __gen_e_acsl_p(int n)
   __gen_e_acsl_i = 0;
   while (1) {
     if (__gen_e_acsl_i < n) ; else break;
-    if (2L * __gen_e_acsl_i < n * (long)__gen_e_acsl_i + 1L) ;
+    if (2 * __gen_e_acsl_i < n * __gen_e_acsl_i + 1) ;
     else {
       __gen_e_acsl_forall = 0;
       goto e_acsl_end_loop1;

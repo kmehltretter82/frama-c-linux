@@ -664,7 +664,6 @@ let normalize_guard ~loc (t1, rel1, lv, rel2, t2) =
   in
   t1, lv, t2
 
-
 let compute_guards loc ~is_forall p bounded_vars hyps =
   try
     let guards,goal = compute_quantif_guards p ~is_forall bounded_vars hyps in

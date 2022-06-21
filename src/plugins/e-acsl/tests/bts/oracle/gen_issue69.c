@@ -17,7 +17,7 @@ int main(void)
     int __gen_e_acsl_c;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_forall = 1;
-    __gen_e_acsl_c = (unsigned char)4;
+    __gen_e_acsl_c = 4;
     while (1) {
       if (__gen_e_acsl_c < 256) ; else break;
       {
@@ -59,7 +59,7 @@ int main(void)
     __gen_e_acsl_forall_2 = 1;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __gen_e_acsl_u = (char)(1 + 1);
+    __gen_e_acsl_u = 1 + 1;
     while (1) {
       {
         int __gen_e_acsl_and_2;

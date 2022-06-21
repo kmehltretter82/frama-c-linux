@@ -14,13 +14,13 @@ int main(int argc, char **argv)
   __e_acsl_memory_init(& argc,& argv,8UL);
   {
     int __gen_e_acsl_exists;
-    int __gen_e_acsl_x;
+    unsigned int __gen_e_acsl_x;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_exists = 0;
     __gen_e_acsl_x = (unsigned int)(-1 + 1);
     while (1) {
-      if (__gen_e_acsl_x < 5) ; else break;
-      if (! (__gen_e_acsl_x == 0)) ;
+      if (__gen_e_acsl_x < 5U) ; else break;
+      if (! (__gen_e_acsl_x == 0U)) ;
       else {
         __gen_e_acsl_exists = 1;
         goto e_acsl_end_loop1;
@@ -43,14 +43,14 @@ int main(int argc, char **argv)
   /*@ assert \exists unsigned int x; -1 < x < 5 && x == 0; */ ;
   {
     int __gen_e_acsl_forall;
-    int __gen_e_acsl_x_2;
+    unsigned int __gen_e_acsl_x_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __gen_e_acsl_forall = 1;
     __gen_e_acsl_x_2 = (unsigned int)(-1 + 1);
     while (1) {
-      if (__gen_e_acsl_x_2 < 5) ; else break;
-      if (__gen_e_acsl_x_2 != 0) ;
+      if (__gen_e_acsl_x_2 < 5U) ; else break;
+      if (__gen_e_acsl_x_2 != 0U) ;
       else {
         __gen_e_acsl_forall = 0;
         goto e_acsl_end_loop2;

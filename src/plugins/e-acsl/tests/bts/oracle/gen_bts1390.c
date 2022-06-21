@@ -77,18 +77,17 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
   __e_acsl_store_block((void *)(& __retres),8UL);
   {
     int __gen_e_acsl_exists;
-    unsigned int __gen_e_acsl_i;
+    int __gen_e_acsl_i;
     int __gen_e_acsl_forall;
-    unsigned int __gen_e_acsl_k;
+    int __gen_e_acsl_k;
     __e_acsl_store_block((void *)(& buf),8UL);
     __gen_e_acsl_at = buf;
     __gen_e_acsl_at_2 = c;
     __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __gen_e_acsl_exists = 0;
-    __gen_e_acsl_i = 0U;
+    __gen_e_acsl_i = 0;
     while (1) {
-      if (__gen_e_acsl_i < (unsigned int)((int)((unsigned int)n))) ;
-      else break;
+      if (__gen_e_acsl_i < (int)((unsigned int)n)) ; else break;
       {
         int __gen_e_acsl_valid_read;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data =
@@ -99,8 +98,8 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
                                                       (void *)(& buf));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"buf",
                                      (void *)buf);
-        __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data,
-                                      "__gen_e_acsl_i",0,__gen_e_acsl_i);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
+                                     "__gen_e_acsl_i",0,__gen_e_acsl_i);
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
                                        "sizeof(char)",0,sizeof(char));
         __gen_e_acsl_assert_data.blocking = 1;
@@ -124,10 +123,9 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,
                                            __gen_e_acsl_exists);
     __gen_e_acsl_forall = 1;
-    __gen_e_acsl_k = 0U;
+    __gen_e_acsl_k = 0;
     while (1) {
-      if (__gen_e_acsl_k < (unsigned int)((int)((unsigned int)n))) ;
-      else break;
+      if (__gen_e_acsl_k < (int)((unsigned int)n)) ; else break;
       {
         int __gen_e_acsl_valid_read_2;
         __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
@@ -138,8 +136,8 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
                                                         (void *)(& buf));
         __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"buf",
                                      (void *)buf);
-        __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_2,
-                                      "__gen_e_acsl_k",0,__gen_e_acsl_k);
+        __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                     "__gen_e_acsl_k",0,__gen_e_acsl_k);
         __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
                                        "sizeof(char)",0,sizeof(char));
         __gen_e_acsl_assert_data_2.blocking = 1;
@@ -175,7 +173,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
         {.values = (void *)0};
       __gen_e_acsl_forall_2 = 1;
-      __gen_e_acsl_j = 0;
+      __gen_e_acsl_j = 0U;
       while (1) {
         {
           unsigned long __gen_e_acsl_offset;

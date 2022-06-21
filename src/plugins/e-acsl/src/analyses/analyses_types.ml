@@ -67,3 +67,21 @@ type annotation_kind =
   | Invariant
   | Variant
   | RTE
+
+(** Type of intervals inferred by the interval inference *)
+type ival =
+  | Ival of Ival.t
+  | Float of fkind * float option (* a float constant, if any *)
+  | Rational
+  | Real
+  | Nan
+
+(** Type of types inferred by the type inference for types representing
+    numbers *)
+type number_ty =
+  | C_integer of ikind
+  | C_float of fkind
+  | Gmpz
+  | Rational
+  | Real
+  | Nan

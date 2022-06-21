@@ -54,6 +54,9 @@ module type S = sig
     Format.formatter ->
     'a result ->
     unit
+  val map: ('a -> 'b) -> 'a result -> 'b
+  val map2: ('a -> 'b -> 'c) -> 'a result -> 'b result -> 'c
+  val map3 : ('a -> 'b -> 'c -> 'd) -> 'a result -> 'b result -> 'c result -> 'd
 end
 
 module Make_with_opt(P: sig val phase:Options.category option end): S = struct
@@ -125,6 +128,24 @@ module Make_with_opt(P: sig val phase:Options.category option end): S = struct
     match res with
     | Result.Ok a -> Format.fprintf fmt "@[%a@]" pp a
     | Result.Error err -> Format.fprintf fmt "@[%s@]" (Printexc.to_string err)
+
+  let map f = function
+    | Result.Ok a -> f a
+    | Result.Error e -> raise e
+
+  let map2 f a b =
+    match a,b with
+    | Result.Ok a, Result.Ok b -> f a b
+    | Result.Ok _, Result.Error e
+    | Result.Error e, _ -> raise e
+
+  let map3 f a b c =
+    match a,b,c with
+    | Result.Ok a, Result.Ok b, Result.Ok c -> f a b c
+    | Result.Ok _, Result.Ok _, Result.Error e
+    | Result.Ok _, Result.Error e, _
+    | Result.Error e, _, _ -> raise e
+
 end
 
 module Make(P: sig val phase:Options.category end): S =

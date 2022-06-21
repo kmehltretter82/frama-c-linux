@@ -215,11 +215,8 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
           Logic_const.term ~loc (TBinOp(Mult, s, n1)) Linteger))
       (Ctype typ_charptr)
   in
-  Typing.type_term
-    ~use_gmp_opt:false
-    ~ctx:Typing.nan
-    ~lenv:(Env.Local_vars.get env)
-    ptr;
+  let logic_env = Env.Logic_env.get env in
+  Typing.preprocess_term ~use_gmp_opt:false ~ctx:Typing.nan ~logic_env ptr;
   let (ptr, adata), env =
     Env.with_params_and_result
       ~rte:true
@@ -269,11 +266,10 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
     in
     Logic_const.term ~loc (Tlet (size_term_info, size_term_if)) Linteger
   in
-  let lenv = Env.Local_vars.get env in
-  Typing.type_term ~use_gmp_opt:false ~lenv size_term;
+  Typing.preprocess_term ~use_gmp_opt:false ~logic_env size_term;
   let size, adata, env =
-    match Typing.get_number_ty size_term  ~lenv with
-    | Typing.Gmpz ->
+    match Typing.get_number_ty size_term  ~logic_env with
+    | Gmpz ->
       (* Start by translating [size_term] to an expression so that the full term
          with [\let] is not passed around. *)
       let size_e, adata, env = !term_to_exp_ref ~adata kf env size_term in
@@ -287,10 +283,8 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
             "translation to GMP code should always return a C variable"
       in
       gmp_to_sizet ~adata ~loc ~pp:size_term kf env cvar_term p
-    | Typing.(C_integer _ | C_float _) ->
-      !term_to_exp_ref ~adata kf env size_term
-    | Typing.(Rational | Real | Nan) ->
-      assert false
+    | C_integer _ | C_float _ -> !term_to_exp_ref ~adata kf env size_term
+    | Rational | Real | Nan -> assert false
   in
   ptr, size, adata, env
 
@@ -480,7 +474,7 @@ let call_with_tset
     in
     (* There's no more quantifiers in the arguments now, we can call back
        [predicate_to_exp] to translate the predicate as usual *)
-    Typing.preprocess_predicate (Env.Local_vars.get env) p_quantified;
+    Typing.preprocess_predicate ~logic_env:(Env.Logic_env.get env) p_quantified;
     !predicate_to_exp_ref ~adata kf env p_quantified
   | [] ->
     (* No arguments require quantifiers, so we can directly translate the

@@ -26,12 +26,16 @@
 
 import React from 'react';
 import _ from 'lodash';
+import CodeMirror from 'codemirror/lib/codemirror';
 
 import * as Dome from 'dome';
 import * as Settings from 'dome/data/settings';
+import { TitleBar } from 'ivette';
+import { IconButton } from 'dome/controls/buttons';
 import type { key } from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { Text } from 'dome/text/editors';
+import { Filler, Inset } from 'dome/frame/toolbars';
 
 import * as Preferences from 'ivette/prefs';
 
@@ -152,10 +156,10 @@ function getBulletColor(status: States.Tag): string {
 function makeBullet(status: States.Tag): HTMLDivElement {
   const marker = document.createElement('div');
   marker.style.color = getBulletColor(status);
+  marker.style.textAlign = 'center';
   if (status.descr)
     marker.title = status.descr;
   marker.innerHTML = '◉';
-  marker.align = 'center';
   return marker;
 }
 
@@ -182,25 +186,19 @@ export default function ASTview(): JSX.Element {
   const statusDict = States.useTags(Properties.propStatusTags);
 
   const setBullets = React.useCallback(() => {
-    if (theFunction) {
-      propertyStatus.forEach((prop) => {
-        if (prop.fct === theFunction) {
-          const status = statusDict.get(prop.status);
-          if (status) {
-            const bullet = makeBullet(status);
-            const markers = buffer.findTextMarker(prop.key);
-            markers.forEach((marker) => {
-              const pos = marker.find();
-              if (pos) {
-                buffer.forEach((cm) => {
-                  cm.setGutterMarker(pos.from.line, 'bullet', bullet);
-                });
-              }
-            });
-          }
-        }
-      });
-    }
+    propertyStatus.forEach((prop) => {
+      const status = statusDict.get(prop.status);
+      if (theFunction && prop.fct === theFunction && status) {
+        const bullet = makeBullet(status);
+        const markers = buffer.findTextMarker(prop.key);
+        buffer.forEach((cm) => {
+          markers.forEach((marker) => {
+            const line = marker.find()?.from.line;
+            if (line) cm.setGutterMarker(line, 'bullet', bullet);
+          });
+        });
+      }
+    });
   }, [buffer, theFunction, propertyStatus, statusDict]);
 
   React.useEffect(() => {
@@ -208,19 +206,19 @@ export default function ASTview(): JSX.Element {
     return () => { buffer.off('change', setBullets); };
   }, [buffer, setBullets]);
 
-  async function reload(): Promise<void> {
+  const reload = React.useCallback(async () => {
     printed.current = theFunction;
     loadAST(buffer, theFunction, theMarker);
-  }
+  }, [buffer, theFunction, theMarker]);
 
   // Hook: async loading
-  React.useEffect(() => {
-    if (printed.current !== theFunction)
-      reload();
-  });
+  React.useEffect(() => { if (printed.current !== theFunction) reload(); });
 
   // Also reload the buffer when the AST is recomputed.
-  Server.onSignal(Ast.changed, reload);
+  React.useEffect(() => {
+    Server.onSignal(Ast.changed, reload);
+    return () => { Server.offSignal(Ast.changed, reload); };
+  });
 
   React.useEffect(() => {
     const decorator = (marker: string): string | undefined => {
@@ -313,9 +311,48 @@ export default function ASTview(): JSX.Element {
       Dome.popupMenu(items);
   }
 
+  const foldAll = (): void => buffer.forEach(CodeMirror.commands.foldAll);
+  const unfoldAll = (): void => buffer.forEach(CodeMirror.commands.unfoldAll);
+
+  const defaultFold = React.useCallback((): void => {
+    buffer.forEach((cm) => { CodeMirror.commands.unfoldAll(cm); });
+  }, [buffer]);
+
+  React.useEffect(() => {
+    buffer.on('change', defaultFold);
+    return () => { buffer.off('change', defaultFold); };
+  });
+
+  const foldOptions: CodeMirror.FoldOptions = {
+    rangeFinder: (cm, pos) => {
+      const range = CodeMirror.fold.comment(cm, pos);
+      /* Allows folding multi-line comments only. */
+      if (!range || range.from.line === range.to.line) return undefined;
+      return range;
+    }
+  };
+
   // Component
   return (
     <>
+      <TitleBar>
+        <Filler />
+        <IconButton
+          icon='CHEVRON.CONTRACT'
+          visible={true}
+          onClick={foldAll}
+          title='Collapse all multi-line ACSL properties'
+          className="titlebar-thin-icon"
+        />
+        <IconButton
+          icon='CHEVRON.EXPAND'
+          visible={true}
+          onClick={unfoldAll}
+          title='Expand all multi-line ACSL properties'
+          className="titlebar-thin-icon"
+        />
+        <Inset />
+      </TitleBar>
       <Text
         buffer={buffer}
         mode="text/x-csrc"
@@ -324,7 +361,9 @@ export default function ASTview(): JSX.Element {
         onHover={onHover}
         onSelection={onSelection}
         onContextMenu={onContextMenu}
-        gutters={['bullet']}
+        foldGutter={true}
+        foldOptions={foldOptions}
+        gutters={['bullet', 'CodeMirror-foldgutter']}
         readOnly
       />
     </>
