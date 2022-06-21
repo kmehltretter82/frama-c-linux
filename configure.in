@@ -578,6 +578,37 @@ AC_CONFIG_FILES([share/Makefile.config], [chmod a-w share/Makefile.config])
 AC_OUTPUT()
 
 ###########
+# Plugins #
+###########
+
+rm -f src/plugins/.disabled
+rm -f src/plugins/dune
+
+m4_foreach_w([__plugin],m4_esyscmd([ls src/plugins]),
+  [
+    m4_define([plugin_dir],[src/plugins/__plugin])
+    m4_syscmd(test -d plugin_dir)
+    m4_define([is_plugin],m4_sysval)
+    m4_if(is_plugin,0,[
+      AC_ARG_ENABLE(
+        __plugin,
+        AC_HELP_STRING([--disable-__plugin], [Disable __plugin]),
+        [ENABLE___plugin=$enableval],
+        [ENABLE___plugin=yes]
+      )
+      if test "$ENABLE___plugin" = no ; then
+        echo "__plugin" >> src/plugins/.disabled
+      fi
+    ],)
+  ])
+
+if test -f src/plugins/.disabled ; then
+  echo "(data_only_dirs $(cat src/plugins/.disabled))" > src/plugins/dune
+  chmod a-w  src/plugins/dune
+  rm src/plugins/.disabled
+fi
+
+###########
 # Summary #
 ###########
 
