@@ -147,13 +147,15 @@ eval last=\$${$$\#}; \
 mv $$new_temp $$last' sed_inplace
 SED	= LC_ALL=C sed
 RM	= rm -f
-ifeq ($(shell uname -s 2> /dev/null),Darwin)
-TAR     = gtar
-else
-TAR     = tar
-endif
 TOUCH   = touch
 GIT	= git
+
+ifeq ($(PLATFORM),MacOS)
+TAR     = gtar
+else
+# Unix, Cygwin
+TAR     = tar
+endif
 
 ##################
 # Make commands #

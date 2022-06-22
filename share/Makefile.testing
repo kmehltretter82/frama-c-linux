@@ -24,10 +24,29 @@
 # TESTING #
 ###########
 
+################################
+## Default variables
+
 # Defines where to find the ptest_config files
 PURGED_PTEST_DIRS?=tests $(wildcard src/plugins/*/tests)
 PTEST_OPTS?=
 PTEST_DIRS?=$(PURGED_PTEST_DIRS)
+
+############
+# Default values necessary for make -f <this-makefile>
+
+GREP    ?= grep
+RM      ?= rm -f
+RMDIR   ?= rm -rf
+
+ifeq ($(PLATFORM),MacOS)
+XARGS   ?= xargs
+else
+# Unix, Cygwin
+XARGS   ?= xargs --no-run-if-empty
+endif
+
+##########################################################################
 
 # Defines the related dune targets
 PTEST_ALIASES=$(addsuffix /ptests,$(addprefix @, tests src/plugins))
@@ -58,7 +77,7 @@ else
 
 # PTESTS is internal
 PTESTS=dune exec $(DUNE_BUILD_OPTS) --root ptests -- frama-c-ptests
-#PTESTS=dune exec --root ptests -- frama-c-ptests -v
+#PTESTS=dune exec $(DUNE_BUILD_OPTS) --root ptests -- frama-c-ptests -v
 
 # Note: the public name of ptest.exe is frama-c-ptests
 $(FRAMAC_PTESTS): ptests/ptests.ml
@@ -96,18 +115,18 @@ wtests-help:
 	$(WTESTS) --help
 
 ##########################################################################
-## Removes all dune files generated for testing: xargs -n 10 avoids a too long line
+## Removes all dune files generated for testing
 
 .PHONY: purge-tests
 purge-tests:
 	find $(PURGED_PTEST_DIRS) -name dune \
-        | grep -e "/oracle.*/dune\|/result.*/dune" \
-        | xargs --no-run-if-empty -n 10 rm
+        | $(GREP) -e "/oracle.*/dune\|/result.*/dune" \
+        | $(XARGS) -n 10 $(RM)
 
 # Force the full cleaning of the testing environment
 .PHONY: clean-tests
 clean-tests: purge-tests
-	rm -rf $(addprefix _build/default/,$(PURGED_PTEST_DIRS))
+	$(RMDIR) $(addprefix _build/default/,$(PURGED_PTEST_DIRS))
 
 ##########################################################################
 ## Generates all dune files used for testing
