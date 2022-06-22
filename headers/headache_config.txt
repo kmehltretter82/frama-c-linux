@@ -159,6 +159,7 @@
 #########
 | ".*\.tex" -> frame open: "%" line: "%" close: "%"
 | ".*\.sty" -> frame open: "%" line: "%" close: "%"
+| ".*\.bib" -> frame open: "%" line: "%" close: "%"
 
 ########
 # HTML #
