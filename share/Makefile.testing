@@ -35,10 +35,16 @@ PTEST_DIRS?=$(PURGED_PTEST_DIRS)
 ############
 # Default values necessary for make -f <this-makefile>
 
-XARGS   ?= xargs --no-run-if-empty
 GREP    ?= grep
 RM      ?= rm -f
 RMDIR   ?= rm -rf
+
+ifeq ($(PLATFORM),MacOS)
+XARGS   ?= xargs
+else
+# Unix, Cygwin
+XARGS   ?= xargs --no-run-if-empty
+endif
 
 ##########################################################################
 

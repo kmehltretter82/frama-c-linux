@@ -66,7 +66,13 @@ MV      ?= mv
 RM      ?= rm -f
 RMDIR   ?= rm -rf
 TOUCH   ?= touch
+
+ifeq ($(PLATFORM),MacOS)
+XARGS   ?= xargs
+else
+# Unix, Cygwin
 XARGS   ?= xargs --no-run-if-empty
+endif
 
 ############
 
