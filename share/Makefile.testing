@@ -141,13 +141,13 @@ run-ptests.replay: config.sed $(FRAMAC_PTEST)
 
 # Run tests of for all configurations (and build all dune files)
 .PHONY: run-tests
-run-tests: FRAMAC_WP_CACHE=replay
+run-tests: FRAMAC_WP_CACHE=offline
 run-tests: run-ptests
 	dune build $(PTEST_ALIASES)
 
 # Replay tests of for all configurations (requires  all dune files)
 .PHONY: test.replay
-tests.replay: FRAMAC_WP_CACHE=replay
+tests.replay: FRAMAC_WP_CACHE=offline
 tests.replay: config.sed
 	dune build $(PTEST_ALIASES)
 
