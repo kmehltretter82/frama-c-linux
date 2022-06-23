@@ -39,8 +39,9 @@
 #   OCAMLLIB      the path to the ocaml standard library
 #   OCAMLVERSION  the ocaml version number
 #   OCAMLWIN32    "yes"/"no" depending on Sys.os_type = "Win32"
-#   EXE           ".exe" if OCAMLWIN32=yes, "" otherwise
-#   DLLEXT        ".dll" if OCAMLWIN32=yes, ".so" otherwise
+#   PLATFORM      "Win32", "Cygwin", "MacOS" or "Unix"
+#   EXE           ".exe" if PLATFORM=Win32 (or Cygwin), "" otherwise
+#   DLLEXT        ".dll" if PLATFORM=Win32 (or Cygwin), ".so" otherwise
 
 AC_INIT(src/init/boot/boot.ml)
 
@@ -531,9 +532,6 @@ plugin_use_external(tests,unix2dos)
 # Substitutions to perform #
 ############################
 
-EXTERNAL_PLUGINS="${EXTERNAL_PLUGINS} ${EXTRA_EXTERNAL_PLUGINS}"
-
-AC_SUBST(PLATFORM)
 AC_SUBST(VERBOSEMAKE)
 AC_SUBST(DEVELOPMENT)
 AC_SUBST(HAS_APRON)
@@ -564,15 +562,10 @@ AC_SUBST(FRAMAC_GNU_CPP)
 AC_SUBST(DEFAULT_CPP_KEEP_COMMENTS)
 AC_SUBST(CC)
 
-AC_SUBST(EXTERNAL_PLUGINS)
-
 AC_SUBST(LABLGTK_PATH)
 
-# m4_foreach_w is not supported in some old autoconf versions.
-# Sadly AC_FOREACH is deprecated now...
-AC_FOREACH([p],PLUGINS_LIST,
-        [AC_SUBST([ENABLE_]p)
-        ])
+# used by some share/Makefile.xxx
+AC_SUBST(PLATFORM)
 
 ################################################
 # Finally create the Makefile from Makefile.in #
