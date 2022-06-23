@@ -1539,10 +1539,12 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     wtest.oracle_err
     errlog;
   Format.fprintf result_fmt
-    "(alias (deps (alias %S)) (name %S); (enabled_if (and true %a))\n\
+    "(alias (name %S)\n  \
+     (deps (alias %S))\n  \
+     (enabled_if (and true %a))\n\
      )@."
-    diff_alias
     (ptests_alias ~env)
+    diff_alias
     Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
   ;
   let oracle_subdir = SubDir.oracle_subdir ~env command.directory in
@@ -1739,17 +1741,19 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
       let pp_list_alias fmt l = List.iter (Format.fprintf fmt "(alias %S)") l in
       Format.fprintf result_fmt
         "; TEST FILE %S\n\
-         (alias (deps %a%a) (name %S)) ; to performs all sub-tests related to a file\n\
-         (alias (deps %a%a) (name %S)) ; to reproduce and visualize the all sub-test outputs related to a file@."
+         (alias (name %S)\n  \
+         (deps %a%a)) ; to performs all sub-tests related to a file\n\
+         (alias (name %S)\n  \
+         (deps %a%a)) ; to reproduce and visualize the all sub-test outputs related to a file@."
         file
         (* alias #1 *)
+        (Format.sprintf "%s.wtests" test_name)
         pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec.wtests" test_name i) config.dc_commands)
         pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
-        (Format.sprintf "%s.wtests" test_name)
         (* alias #2 *)
+        file
         pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec" test_name i) config.dc_commands)
-        pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
-        file;
+        pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow);
     end ;
     List.iter make_cmd config.dc_commands;
     List.iter make_execnow_cmd config.dc_execnow;
@@ -1794,7 +1798,10 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
        let result_cout = (open_out result_dune_file) in
        let result_fmt = Format.formatter_of_out_channel result_cout  in
        Format.fprintf result_fmt "(copy_files ../*.*)@.";
-       Format.fprintf result_fmt "(alias (deps (alias %s)) (name %s))@." (ptests_alias ~env) env.dune_alias;
+       Format.fprintf result_fmt
+         "(alias (name %s)\n  \
+          (deps (alias %s)))@."
+         env.dune_alias (ptests_alias ~env);
        let oracle_dune_file = SubDir.make_file (SubDir.oracle_subdir ~env directory) "dune" in
        let oracle_cout = (open_out oracle_dune_file) in
        let oracle_fmt = Format.formatter_of_out_channel oracle_cout in
