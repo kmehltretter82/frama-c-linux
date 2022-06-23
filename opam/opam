@@ -139,7 +139,6 @@ depopts: [
   "apron"
   "coq"
   "mlgmpidl"
-  "ppx_deriving_yojson"
   "zmq"
 ]
 
