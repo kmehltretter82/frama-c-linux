@@ -45,7 +45,8 @@ export function EvaStates(): JSX.Element {
   const [stateAfter, setStateAfter] = React.useState("");
   const [filter, setFilter] = useGlobalState(globalFilter);
 
-  const states = States.useRequest(Eva.getStates, [marker, filter]);
+  const requestArg = marker ? [marker, filter] : undefined;
+  const states = States.useRequest(Eva.getStates, requestArg);
 
   React.useEffect(() => {
     if (states && states.length > 0) {
