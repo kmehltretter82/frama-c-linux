@@ -159,7 +159,7 @@ let find_call_input_nodes pdg_caller call_stmt ?(z=Locations.Zone.top) in_key =
     (* skip undef zone: any result different from None is due to calldeps or
        some imprecision. *)
     let nodes, _undef =
-      !Db.Pdg.find_location_nodes_at_stmt
+      Pdg.Api.find_location_nodes_at_stmt
         pdg_caller call_stmt ~before:true zone'
     in
     nodes
@@ -201,7 +201,7 @@ let all_call_out_nodes ~callee ~caller call_stmt =
     in
     let test_out acc (out_key, call_out_node) =
       (* skip undef: any zone found undef is due to an imprecision or a bug*)
-      let out_nodes, _ = !Db.Pdg.find_output_nodes callee out_key in
+      let out_nodes, _ = Pdg.Api.find_output_nodes callee out_key in
       let out_nodes = node_list_to_set out_nodes in
       (call_out_node, out_nodes) :: acc
     in

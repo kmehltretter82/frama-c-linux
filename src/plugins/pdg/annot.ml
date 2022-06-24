@@ -117,13 +117,13 @@ let find_code_annot_nodes pdg stmt annot =
       let labels = decl_label_info.Db.Properties.Interp.To_zone.lbl in
       let stmt_key = Key.stmt_key stmt in
       let stmt_node = match stmt_key with
-        | Key.Stmt _ -> !Db.Pdg.find_stmt_node pdg stmt
-        | Key.CallStmt _ -> !Db.Pdg.find_call_ctrl_node pdg stmt
+        | Key.Stmt _ -> Sets.find_stmt_node pdg stmt
+        | Key.CallStmt _ -> Sets.find_call_ctrl_node pdg stmt
         | _ -> assert false
       in
-      let ctrl_dpds = !Db.Pdg.direct_ctrl_dpds pdg stmt_node in
+      let ctrl_dpds = Sets.direct_ctrl_dpds pdg stmt_node in
       let add_stmt_nodes s acc =
-        try !Db.Pdg.find_stmt_and_blocks_nodes pdg s @ acc
+        try Sets.find_stmt_and_blocks_nodes pdg s @ acc
         with Not_found -> acc
       in
       (* can safely ignore pragmas.ctrl

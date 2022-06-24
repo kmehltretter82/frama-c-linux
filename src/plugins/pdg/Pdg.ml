@@ -22,7 +22,6 @@
 
 (** Program Dependences Graph. *)
 
-(** Functions for this plugin are registered through the [Db] module,
-    the dynamic API, and the module Below. *)
-
 module Register = Register
+
+module Api = Api

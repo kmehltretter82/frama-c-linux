@@ -262,7 +262,7 @@ let compute_ctrl_info pdg ctrl_part used_stmts =
   let module CtrlCompute = Dataflow2.Backwards(CtrlComputer) in
   let seen = Stmt.Hashtbl.create 50 in
   let rec add_node_ctrl_nodes new_stmts node =
-    let ctrl_nodes = !Db.Pdg.direct_ctrl_dpds pdg node in
+    let ctrl_nodes = Pdg.Api.direct_ctrl_dpds pdg node in
     List.fold_left add_ctrl_node new_stmts ctrl_nodes
   and add_ctrl_node new_stmts ctrl_node =
     debug2 "[zones] add ctrl node %a@." PdgTypes.Node.pretty ctrl_node;
@@ -287,7 +287,7 @@ let compute_ctrl_info pdg ctrl_part used_stmts =
     if Stmt.Hashtbl.mem seen stmt then new_stmts
     else begin
       Stmt.Hashtbl.add seen stmt ();
-      match !Db.Pdg.find_simple_stmt_nodes pdg stmt with
+      match Pdg.Api.find_simple_stmt_nodes pdg stmt with
       | [] -> []
       | n::_ -> add_node_ctrl_nodes new_stmts n
     end
@@ -323,7 +323,7 @@ let compute kf stmt lval =
   let used_stmts = DataComputer.get_and_reset_used_stmts () in
   let all_used_stmts =
     if used_stmts = [] then []
-    else compute_ctrl_info (!Db.Pdg.get kf) ctrl_part used_stmts
+    else compute_ctrl_info (Pdg.Api.get kf) ctrl_part used_stmts
   in
   let all_used_stmts =
     List.fold_left

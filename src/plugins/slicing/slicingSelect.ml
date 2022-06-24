@@ -72,7 +72,7 @@ let basic_add_select kf select nodes ?(undef) nd_marks =
   match sel with
   | SlicingInternals.CuTop _ -> select
   | SlicingInternals.CuSelect sel ->
-    let pdg = !Db.Pdg.get kf in
+    let pdg = Pdg.Api.get kf in
     let nodes =
       List.map (fun n -> (n, None) (*TODO: add z_part ? *)) nodes in
     (* let nd_marks = SlicingActions.build_node_and_dpds_selection mark in *)
@@ -89,7 +89,7 @@ let select_pdg_nodes kf ?(select=empty_db_select kf) nodes mark =
   SlicingParameters.debug ~level:1 "[Register.select_pdg_nodes]" ;
   let nd_marks = SlicingActions.build_node_and_dpds_selection mark in
   try basic_add_select kf select nodes nd_marks
-  with Db.Pdg.Top | Db.Pdg.Bottom ->
+  with Pdg.Api.Top | Pdg.Api.Bottom ->
     assert false (* if we have node, we must have a pdg somewhere ! *)
 
 let mk_select pdg sel nodes undef mark =
@@ -120,9 +120,9 @@ let select_stmt_zone kf ?(select=empty_db_select kf) stmt ~before loc mark =
     | SlicingInternals.CuTop _ -> select
     | SlicingInternals.CuSelect sel ->
       try
-        let pdg = !Db.Pdg.get kf in
+        let pdg = Pdg.Api.get kf in
         let nodes, undef =
-          !Db.Pdg.find_location_nodes_at_stmt pdg stmt ~before loc in
+          Pdg.Api.find_location_nodes_at_stmt pdg stmt ~before loc in
         let sel = mk_select pdg sel nodes undef mark in
         (fvar, sel)
       with
@@ -138,8 +138,8 @@ let select_stmt_zone kf ?(select=empty_db_select kf) stmt ~before loc mark =
           (if before then "before" else "after") stmt.sid
           Kernel_function.pretty kf;
         select
-      | Db.Pdg.Top -> top_db_select kf mark
-      | Db.Pdg.Bottom -> bottom_msg kf; select
+      | Pdg.Api.Top -> top_db_select kf mark
+      | Pdg.Api.Bottom -> bottom_msg kf; select
 
 
 (** this one is similar to [select_stmt_zone] with the return statement
@@ -154,10 +154,10 @@ let select_in_out_zone ~at_end ~use_undef kf select loc mark =
   | SlicingInternals.CuTop _ -> select
   | SlicingInternals.CuSelect sel ->
     try
-      let pdg = !Db.Pdg.get kf in
+      let pdg = Pdg.Api.get kf in
       let find =
-        if at_end then !Db.Pdg.find_location_nodes_at_end
-        else !Db.Pdg.find_location_nodes_at_begin in
+        if at_end then Pdg.Api.find_location_nodes_at_end
+        else Pdg.Api.find_location_nodes_at_begin in
       let nodes, undef = find pdg loc in
       let undef = if use_undef then undef else None in
       let sel = mk_select pdg sel nodes undef mark in
@@ -169,8 +169,8 @@ let select_in_out_zone ~at_end ~use_undef kf select loc mark =
         Locations.Zone.pretty loc SlicingMarks.pretty_mark mark
         (if at_end then "end" else "begin") Kernel_function.pretty kf;
       select
-    | Db.Pdg.Top -> top_db_select kf mark
-    | Db.Pdg.Bottom -> bottom_msg kf; select
+    | Pdg.Api.Top -> top_db_select kf mark
+    | Pdg.Api.Bottom -> bottom_msg kf; select
 
 let select_zone_at_end kf  ?(select=empty_db_select kf) loc mark =
   select_in_out_zone ~at_end:true ~use_undef:true kf select loc mark
@@ -183,9 +183,9 @@ let select_zone_at_entry kf  ?(select=empty_db_select kf) loc mark =
 
 let stmt_nodes_to_select pdg stmt =
   try
-    let stmt_nodes = !Db.Pdg.find_stmt_and_blocks_nodes pdg stmt in
+    let stmt_nodes = Pdg.Api.find_stmt_and_blocks_nodes pdg stmt in
     SlicingParameters.debug ~level:2 "[Register.stmt_nodes_to_select] results on stmt %d (%a)" stmt.sid
-      (fun fmt l -> List.iter (!Db.Pdg.pretty_node true fmt) l)
+      (fun fmt l -> List.iter (Pdg.Api.pretty_node true fmt) l)
       stmt_nodes;
     stmt_nodes
   with Not_found ->
@@ -203,23 +203,23 @@ let select_stmt_computation kf ?(select=empty_db_select kf) stmt mark =
     end
   else
     try
-      let pdg = !Db.Pdg.get kf in
+      let pdg = Pdg.Api.get kf in
       let stmt_nodes = stmt_nodes_to_select pdg stmt in
       let nd_marks = SlicingActions.build_node_and_dpds_selection mark in
       basic_add_select kf select stmt_nodes nd_marks
-    with Db.Pdg.Top -> top_db_select kf mark
-       | Db.Pdg.Bottom -> bottom_msg kf; select
+    with Pdg.Api.Top -> top_db_select kf mark
+       | Pdg.Api.Bottom -> bottom_msg kf; select
 
 let select_label kf ?(select=empty_db_select kf) label mark =
   SlicingParameters.debug ~level:1 "[Register.select_label] on label "
   (* Logic_label.pretty label *);
   try
-    let pdg = !Db.Pdg.get kf in
+    let pdg = Pdg.Api.get kf in
     let nodes =
       let add_label_nodes l acc = match l with
         | StmtLabel stmt ->
           let add acc l =
-            try !Db.Pdg.find_label_node pdg !stmt l :: acc
+            try Pdg.Api.find_label_node pdg !stmt l :: acc
             with Not_found -> acc
           in
           List.fold_left add acc (!stmt).labels
@@ -230,8 +230,8 @@ let select_label kf ?(select=empty_db_select kf) label mark =
     in
     let nd_marks = SlicingActions.build_node_and_dpds_selection mark in
     basic_add_select kf select nodes nd_marks
-  with Db.Pdg.Top -> top_db_select kf mark
-     | Db.Pdg.Bottom -> bottom_msg kf; select
+  with Pdg.Api.Top -> top_db_select kf mark
+     | Pdg.Api.Bottom -> bottom_msg kf; select
 
 (** marking a call node means that a [choose_call] will have to decide that to
  * call according to the slicing-level, but anyway, the call will be visible.
@@ -239,42 +239,42 @@ let select_label kf ?(select=empty_db_select kf) label mark =
 let select_minimal_call kf ?(select=empty_db_select kf) stmt m =
   SlicingParameters.debug ~level:1 "[Register.select_minimal_call]";
   try
-    let pdg = !Db.Pdg.get kf in
+    let pdg = Pdg.Api.get kf in
     let call = check_call stmt true in
-    let call_node = !Db.Pdg.find_call_ctrl_node pdg call in
+    let call_node = Pdg.Api.find_call_ctrl_node pdg call in
     let nd_marks = SlicingActions.build_simple_node_selection m in
     basic_add_select kf select [call_node] nd_marks
-  with Db.Pdg.Top -> top_db_select kf m
-     | Db.Pdg.Bottom -> bottom_msg kf; select
+  with Pdg.Api.Top -> top_db_select kf m
+     | Pdg.Api.Bottom -> bottom_msg kf; select
 
 let select_stmt_ctrl kf ?(select=empty_db_select kf) stmt =
   SlicingParameters.debug ~level:1 "[Register.select_stmt_ctrl] of sid:%d" stmt.sid;
   let mark = SlicingMarks.mk_user_mark ~ctrl:true ~data:false ~addr:false in
   try
-    let pdg = !Db.Pdg.get kf in
-    let stmt_nodes = !Db.Pdg.find_simple_stmt_nodes pdg stmt in
+    let pdg = Pdg.Api.get kf in
+    let stmt_nodes = Pdg.Api.find_simple_stmt_nodes pdg stmt in
     let nd_marks = SlicingActions.build_ctrl_dpds_selection mark in
     basic_add_select kf select stmt_nodes nd_marks
-  with Db.Pdg.Top -> top_db_select kf mark
-     | Db.Pdg.Bottom -> bottom_msg kf; empty_db_select kf
+  with Pdg.Api.Top -> top_db_select kf mark
+     | Pdg.Api.Bottom -> bottom_msg kf; empty_db_select kf
 
 let select_entry_point kf ?(select=empty_db_select kf) mark =
   SlicingParameters.debug ~level:1 "[Register.select_entry_point] of %a"
     Kernel_function.pretty kf;
   try
-    let pdg = !Db.Pdg.get kf in
-    let node = !Db.Pdg.find_entry_point_node pdg in
+    let pdg = Pdg.Api.get kf in
+    let node = Pdg.Api.find_entry_point_node pdg in
     let nd_marks = SlicingActions.build_simple_node_selection mark in
     basic_add_select kf select [node] nd_marks
-  with Db.Pdg.Top -> top_db_select kf mark
-     | Db.Pdg.Bottom -> bottom_msg kf; empty_db_select kf
+  with Pdg.Api.Top -> top_db_select kf mark
+     | Pdg.Api.Bottom -> bottom_msg kf; empty_db_select kf
 
 let select_return kf ?(select=empty_db_select kf) mark =
   SlicingParameters.debug ~level:1 "[Register.select_return] of %a"
     Kernel_function.pretty kf;
   try
-    let pdg = !Db.Pdg.get kf in
-    let node = !Db.Pdg.find_ret_output_node pdg in
+    let pdg = Pdg.Api.get kf in
+    let node = Pdg.Api.find_ret_output_node pdg in
     let nd_marks = SlicingActions.build_simple_node_selection mark in
     basic_add_select kf select [node] nd_marks
   with
@@ -283,8 +283,8 @@ let select_return kf ?(select=empty_db_select kf) mark =
       "@[Nothing to select for return stmt of %a@]"
       Kernel_function.pretty kf;
     select
-  | Db.Pdg.Top -> top_db_select kf mark
-  | Db.Pdg.Bottom -> bottom_msg kf; empty_db_select kf
+  | Pdg.Api.Top -> top_db_select kf mark
+  | Pdg.Api.Bottom -> bottom_msg kf; empty_db_select kf
 
 let select_decl_var kf ?(select=empty_db_select kf) vi mark =
   SlicingParameters.debug ~level:1 "[Register.select_decl_var] of %s in %a@."
@@ -292,8 +292,8 @@ let select_decl_var kf ?(select=empty_db_select kf) vi mark =
   if vi.Cil_types.vglob (* no slicing request on globals *)
   then select
   else try
-      let pdg = !Db.Pdg.get kf in
-      let node = !Db.Pdg.find_decl_var_node pdg vi in
+      let pdg = Pdg.Api.get kf in
+      let node = Pdg.Api.find_decl_var_node pdg vi in
       let nd_marks = SlicingActions.build_simple_node_selection mark in
       basic_add_select kf select [node] nd_marks
     with
@@ -302,8 +302,8 @@ let select_decl_var kf ?(select=empty_db_select kf) vi mark =
         "@[Nothing to select for %s declarationin %a@]"
         vi.Cil_types.vname Kernel_function.pretty kf;
       select
-    | Db.Pdg.Top -> top_db_select kf mark
-    | Db.Pdg.Bottom -> bottom_msg kf; empty_db_select kf
+    | Pdg.Api.Top -> top_db_select kf mark
+    | Pdg.Api.Bottom -> bottom_msg kf; empty_db_select kf
 
 
 let merge_select select1 select2 =
@@ -351,7 +351,7 @@ let add_crit_ff_change_call ff_caller call f_to_call =
 let call_ff_in_caller ~caller ~to_call =
   let kf_caller = SlicingMacros.get_ff_kf caller in
   let kf_to_call = SlicingMacros.get_ff_kf to_call in
-  let call_stmts = !Db.Pdg.find_call_stmts ~caller:kf_caller  kf_to_call in
+  let call_stmts = Pdg.Api.find_call_stmts ~caller:kf_caller  kf_to_call in
   let ff_to_call = SlicingInternals.CallSlice to_call in
   let add_change_call stmt =
     add_crit_ff_change_call caller stmt ff_to_call ;
@@ -367,7 +367,7 @@ let call_fsrc_in_caller ~caller ~to_call =
   let kf_caller = SlicingMacros.get_ff_kf caller in
   let fi_to_call = SlicingMacros.get_kf_fi to_call in
   let kf_to_call = SlicingMacros.get_fi_kf fi_to_call in
-  let call_stmts = !Db.Pdg.find_call_stmts ~caller:kf_caller kf_to_call in
+  let call_stmts = Pdg.Api.find_call_stmts ~caller:kf_caller kf_to_call in
   let add_change_call stmt =
     add_crit_ff_change_call caller stmt (SlicingInternals.CallSrc (Some fi_to_call))
   in List.iter add_change_call call_stmts
@@ -375,9 +375,9 @@ let call_fsrc_in_caller ~caller ~to_call =
 let call_min_f_in_caller ~caller ~to_call =
   let kf_caller = SlicingMacros.get_ff_kf caller in
   let pdg = SlicingMacros.get_ff_pdg caller in
-  let call_stmts = !Db.Pdg.find_call_stmts ~caller:kf_caller to_call in
+  let call_stmts = Pdg.Api.find_call_stmts ~caller:kf_caller to_call in
   let call_nodes =
-    List.map (fun call -> (!Db.Pdg.find_call_ctrl_node pdg call),None)
+    List.map (fun call -> (Pdg.Api.find_call_ctrl_node pdg call),None)
       call_stmts in
   let m = SlicingMarks.mk_user_spare in
   let nd_marks = SlicingActions.build_simple_node_selection m in
@@ -389,7 +389,7 @@ let is_already_selected ff db_select =
   match select with
   | SlicingInternals.CuTop _ -> assert false
   | SlicingInternals.CuSelect to_select ->
-    (* let pdg = !Db.Pdg.get (Globals.Functions.get fvar) in *)
+    (* let pdg = Pdg.Api.get (Globals.Functions.get fvar) in *)
     let new_marks = Fct_slice.filter_already_in ff to_select in
     let ok = if new_marks = [] then true else false in
     if ok then

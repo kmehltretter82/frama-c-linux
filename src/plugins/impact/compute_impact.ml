@@ -166,7 +166,7 @@ let add_to_result wl n kf init =
 (** return [true] if the location in [n] is contained in [skip], in which
     case the node should be skipped entirely *)
 let node_to_skip skip n =
-  match !Db.Pdg.node_key n with
+  match Pdg.Api.node_key n with
   | Key.SigKey (Signature.In (Signature.InImpl z))
   | Key.SigKey (Signature.Out (Signature.OutLoc z))
   | Key.SigCallKey (_, Signature.In (Signature.InImpl z))
@@ -179,7 +179,7 @@ let node_to_skip skip n =
     the results *)
 let filter wl (n, z) =
   not (Locations.Zone.is_bottom z) &&
-  match !Db.Pdg.node_key n with
+  match Pdg.Api.node_key n with
   | Key.SigKey (Signature.In Signature.InCtrl) -> false
   (* do not consider node [InCtrl]. YYY: find when this may happen *)
   | Key.VarDecl _ -> false
@@ -320,7 +320,7 @@ let add_downward_call wl (caller_kf, pdg) (called_kf, called_pdg) stmt =
     callee are directly in the worklist, and the call is registered in the
     field [downward_calls]. *)
 let downward_one_call_node wl (pnode, _ as node) caller_kf pdg =
-  match !Db.Pdg.node_key pnode with
+  match Pdg.Api.node_key pnode with
   | Key.SigKey (Signature.In Signature.InCtrl) (* never in the worklist *)
   | Key.VarDecl _ (* never in the worklist *)
   | Key.CallStmt _ (* pdg returns a SigCallKey instead *)
@@ -335,31 +335,31 @@ let downward_one_call_node wl (pnode, _ as node) caller_kf pdg =
     let called_kfs = Eva.Results.callee stmt in
     List.iter
       (fun called_kf ->
-         let called_pdg = !Db.Pdg.get called_kf in
+         let called_pdg = Pdg.Api.get called_kf in
          let nodes_callee, pdg_ok =
            Options.debug ~level:3 "%a: considering call to %a"
              Pdg_aux.pretty_node node Kernel_function.pretty called_kf;
            try
              (match key with
               | Signature.In (Signature.InNum n) ->
-                (try [!Db.Pdg.find_input_node called_pdg n,
+                (try [Pdg.Api.find_input_node called_pdg n,
                       Locations.Zone.top]
                  with Not_found -> [])
               | Signature.In Signature.InCtrl ->
-                (try [!Db.Pdg.find_entry_point_node called_pdg,
+                (try [Pdg.Api.find_entry_point_node called_pdg,
                       Locations.Zone.top]
                  with Not_found -> [])
               | Signature.In (Signature.InImpl _) -> assert false
               | Signature.Out _ -> []
              ), true
            with
-           | Db.Pdg.Top ->
+           | Pdg.Api.Top ->
              Options.warning
                "no precise pdg for function %s. \n\
                 Ignoring this function in the analysis (potentially incorrect results)."
                (Kernel_function.get_name called_kf);
              [], false
-           | Db.Pdg.Bottom ->
+           | Pdg.Api.Bottom ->
              (*Function that fails or never returns immediately *)
              [], false
            | Not_found -> assert false
@@ -398,7 +398,7 @@ let downward_one_call_inputs wl kf_caller kf_callee (node, deps)  =
       (fun nsrc ->
          add_to_reason wl ~nsrc ~ndst:node' InterproceduralDownward)
       inter;
-    add_to_do wl kf_callee (!Db.Pdg.get kf_callee) node';
+    add_to_do wl kf_callee (Pdg.Api.get kf_callee) node';
 ;;
 
 (** Propagate impact for all calls registered in [downward_calls]. For each
@@ -447,10 +447,10 @@ let all_upward_callers wl kfs =
       let todo =
         if not (KFS.mem kf wl.callers) then (
           Options.debug "Found caller %a" Kernel_function.pretty kf;
-          let pdg_kf = !Db.Pdg.get kf in
+          let pdg_kf = Pdg.Api.get kf in
           List.fold_left
             (fun todo (caller, callsites) ->
-               let pdg_caller = !Db.Pdg.get caller in
+               let pdg_caller = Pdg.Api.get caller in
                List.iter (aux_call (caller, pdg_caller) (kf, pdg_kf)) callsites;
                KFS.add caller todo
             ) todo (Eva.Results.callsites kf);
@@ -486,9 +486,9 @@ let upward_in_callers wl =
                  add_to_reason wl ~nsrc ~ndst:n InterproceduralUpward
                ) inter;
              if init then
-               add_to_do_part_of_initial wl caller (!Db.Pdg.get caller) n
+               add_to_do_part_of_initial wl caller (Pdg.Api.get caller) n
              else
-               add_to_do wl caller (!Db.Pdg.get caller) n
+               add_to_do wl caller (Pdg.Api.get caller) n
         ) (Lazy.force l)
   in
   KfKfCall.Map.iter aux wl.upward_calls;
@@ -522,7 +522,7 @@ let initial_worklist ?(skip=Locations.Zone.bottom) ?(reason=false) nodes kf =
   }
   in
   (* Fill the [todo] field *)
-  initial_to_do_list wl kf (!Db.Pdg.get kf) nodes;
+  initial_to_do_list wl kf (Pdg.Api.get kf) nodes;
   let initial_callers =
     if Options.Upward.get () then KFS.singleton kf else KFS.empty
   in
@@ -536,10 +536,10 @@ let initial_worklist ?(skip=Locations.Zone.bottom) ?(reason=false) nodes kf =
     callees of the call. *)
 let initial_nodes ~skip kf stmt =
   Options.debug ~level:3 "computing initial nodes for %d" stmt.sid;
-  let pdg = !Db.Pdg.get kf in
+  let pdg = Pdg.Api.get kf in
   if Eva.Results.is_reachable stmt then
     try
-      let all = !Db.Pdg.find_simple_stmt_nodes pdg stmt in
+      let all = Pdg.Api.find_simple_stmt_nodes pdg stmt in
       let filter n = match PdgTypes.Node.elem_key n with
         | Key.SigCallKey (_, Signature.In _) -> false
         | _ -> not (node_to_skip skip n)
@@ -669,7 +669,7 @@ let result_to_nodes (res: result) : nodes =
 
 (** Transform a set of PDG nodes into a set of statements *)
 let nodes_to_stmts ns =
-  let get_stmt node = Key.stmt (!Db.Pdg.node_key node) in
+  let get_stmt node = Key.stmt (Pdg.Api.node_key node) in
   let set =
     (* Do not generate a list immediately, some nodes would be duplicated *)
     NS.fold

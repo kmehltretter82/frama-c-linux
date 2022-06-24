@@ -41,7 +41,7 @@ module BoolInfo = struct
                               | Some fm -> Spare_marks.key_visible fm key
     in
     Sparecode_params.debug ~level:3 "%s : %a -> %b"
-      txt !Db.Pdg.pretty_key key visible;
+      txt Pdg.Api.pretty_key key visible;
     visible
 
   let param_visible (fm,_) n =

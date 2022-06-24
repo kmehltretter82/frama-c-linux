@@ -36,12 +36,12 @@ let in_marks_to_caller pdg call m2m ?(rqs=[]) in_marks =
   let build rqs (in_key, m) =
     match in_key with
     | Signature.InCtrl ->
-      add_n_m rqs (!Db.Pdg.find_call_ctrl_node pdg call) None m
+      add_n_m rqs (Sets.find_call_ctrl_node pdg call) None m
     | Signature.InNum in_num ->
-      add_n_m rqs (!Db.Pdg.find_call_input_node pdg call in_num) None m
+      add_n_m rqs (Sets.find_call_num_input_node pdg call in_num) None m
     | Signature.InImpl zone ->
       let nodes, undef =
-        !Db.Pdg.find_location_nodes_at_stmt pdg call ~before:true zone
+        Sets.find_location_nodes_at_stmt pdg call ~before:true zone
       in
       let rqs =
         List.fold_left (fun acc (n,z) -> add_n_m acc n z m) rqs nodes in
@@ -64,10 +64,10 @@ let translate_in_marks pdg_called in_new_marks
     in_marks_to_caller pdg call (m2m (Some call) pdg) ~rqs in_new_marks
   in
   let build rqs caller =
-    let pdg_caller = !Db.Pdg.get caller in
+    let pdg_caller = Pdg_tbl.get caller in
     let caller_rqs =
       try
-        let call_stmts = !Db.Pdg.find_call_stmts ~caller kf_called in
+        let call_stmts = Sets.find_call_stmts ~caller kf_called in
         (* TODO : more intelligent merge ? *)
         let rqs = List.fold_left (translate pdg_caller) [] call_stmts in
         PdgMarks.SelList rqs
@@ -98,7 +98,7 @@ let call_out_marks_to_called called_pdg m2m ?(rqs=[]) out_marks =
 
 let translate_out_mark _pdg m2m other_rqs (call, l) =
   let add_list l_out_m rqs called_kf  =
-    let called_pdg = !Db.Pdg.get called_kf in
+    let called_pdg = Pdg_tbl.get called_kf in
     let m2m = m2m (Some call) called_pdg in
     try
       let node_marks =
@@ -165,7 +165,7 @@ module F_Proj (C : PdgMarks.Config) :
     let fct_var = Kernel_function.get_vi kf in
     try Varinfo.Hashtbl.find proj fct_var
     with Not_found ->
-      let pdg = !Db.Pdg.get kf in
+      let pdg = Pdg_tbl.get kf in
       let info = F.create pdg in
       Varinfo.Hashtbl.add proj fct_var info;
       info

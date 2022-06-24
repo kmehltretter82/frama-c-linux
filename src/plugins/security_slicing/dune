@@ -26,6 +26,7 @@
  (action (progn
           (echo "Security Slicing:" %{lib-available:frama-c-security_slicing.core} "\n")
           (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
+          (echo "  - Pdg:" %{lib-available:frama-c-pdg.core} "\n")
   )
   )
 )
@@ -35,7 +36,7 @@
   (optional)
   (public_name frama-c-security_slicing.core)
   (flags -open Frama_c_kernel :standard -w -9)
-  (libraries frama-c.kernel frama-c-eva.core)
+  (libraries frama-c.kernel frama-c-eva.core frama-c-pdg.core)
 )
 
 (plugin (optional) (name security_slicing) (libraries frama-c-security_slicing.core) (site (frama-c plugins)))

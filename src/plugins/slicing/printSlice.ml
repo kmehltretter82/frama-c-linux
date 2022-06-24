@@ -334,7 +334,7 @@ let build_dot_project filename title =
 
 let print_fct_stmts fmt kf =
   try
-    let pdg = !Db.Pdg.get kf in
+    let pdg = Pdg.Api.get kf in
     print_fct_from_pdg fmt pdg;
     Format.pp_print_flush fmt ()
   with Not_found -> ()

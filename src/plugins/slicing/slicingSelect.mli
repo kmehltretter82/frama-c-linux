@@ -69,7 +69,7 @@ val select_pdg_nodes :
   SlicingTypes.sl_select
 
 val mk_select :
-  Db.Pdg.t ->
+  Pdg.Api.t ->
   SlicingActions.select ->
   (PdgTypes.Node.t * Locations.Zone.t option) list ->
   Locations.Zone.t option ->
@@ -117,7 +117,7 @@ val select_zone_at_entry :
   SlicingTypes.sl_select
 
 val stmt_nodes_to_select :
-  Db.Pdg.t -> Cil_types.stmt -> PdgTypes.Node.t list
+  Pdg.Api.t -> Cil_types.stmt -> PdgTypes.Node.t list
 
 val select_stmt_computation :
   Kernel_function.t ->

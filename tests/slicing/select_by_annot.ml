@@ -7,7 +7,7 @@ open LibSelect;;
 
 let main _ =
   Slicing.Api.Project.reset_slicing ();
-  let pretty_pdg fmt kf = !Db.Pdg.pretty fmt (!Db.Pdg.get kf) in
+  let pretty_pdg fmt kf = Pdg.Api.pretty fmt (Pdg.Api.get kf) in
   let add_annot kf =
     let mark = Slicing.Api.Mark.make ~data:true ~addr:false ~ctrl:false in
     let select = Slicing.Api.Select.empty_selects in

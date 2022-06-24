@@ -127,7 +127,7 @@ let get_pdg_kf pdg = PdgTypes.Pdg.get_kf pdg
 
 (** {4 getting PDG} *)
 
-let get_fi_pdg fi = let kf = get_fi_kf fi in  !Db.Pdg.get kf
+let get_fi_pdg fi = let kf = get_fi_kf fi in  Pdg.Api.get kf
 
 let get_ff_pdg ff = get_fi_pdg ff.SlicingInternals.ff_fct
 
