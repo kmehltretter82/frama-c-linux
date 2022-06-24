@@ -514,13 +514,18 @@ let get_filtered_state request marker =
     then []
     else Results.print_states ~filter:bases request
 
-let get_states marker =
+let get_state filter request marker =
+  if filter
+  then get_filtered_state request marker
+  else Results.print_states request
+
+let get_states (marker, filter) =
   let kinstr = Printer_tag.ki_of_localizable marker in
   match kinstr with
   | Kglobal -> []
   | Kstmt stmt ->
-    let states_before = get_filtered_state (Results.before stmt) marker in
-    let states_after = get_filtered_state (Results.after stmt) marker in
+    let states_before = get_state filter (Results.before stmt) marker in
+    let states_after = get_state filter (Results.after stmt) marker in
     match states_before, states_after with
     | [], _ -> List.map (fun (name, after) -> name, "", after) states_after
     | _, [] -> List.map (fun (name, before) -> name, before, "") states_before
@@ -534,7 +539,7 @@ let get_states marker =
 let () = Request.register ~package
     ~kind:`GET ~name:"getStates"
     ~descr:(Markdown.plain "Get the domain states about the given marker")
-    ~input:(module Kernel_ast.Marker)
+    ~input:(module Data.Jpair (Kernel_ast.Marker) (Data.Jbool))
     ~output:(module Data.Jlist
           (Data.Jtriple (Data.Jstring) (Data.Jstring) (Data.Jstring)))
     get_states

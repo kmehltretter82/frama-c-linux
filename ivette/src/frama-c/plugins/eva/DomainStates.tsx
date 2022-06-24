@@ -29,20 +29,23 @@ import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Boxes from 'dome/layout/boxes';
 import { HSplit } from 'dome/layout/splitters';
 import { Text } from 'frama-c/richtext';
-import { Select } from 'dome/controls/buttons';
+import { Checkbox, Select } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 
-const globalSelectedDomain = new GlobalState<string>("");
+const globalSelectedDomain = new GlobalState("");
+const globalFilter = new GlobalState(true);
 
 export function EvaStates(): JSX.Element {
   const [selection] = States.useSelection();
   const selectedLoc = selection?.current;
   const marker = selectedLoc?.marker;
-  const states = States.useRequest(Eva.getStates, marker);
   const [domains, setDomains] = React.useState<string[]>([]);
   const [selected, setSelected] = useGlobalState(globalSelectedDomain);
   const [stateBefore, setStateBefore] = React.useState("");
   const [stateAfter, setStateAfter] = React.useState("");
+  const [filter, setFilter] = useGlobalState(globalFilter);
+
+  const states = States.useRequest(Eva.getStates, [marker, filter]);
 
   React.useEffect(() => {
     if (states && states.length > 0) {
@@ -78,6 +81,16 @@ export function EvaStates(): JSX.Element {
         >
           {list}
         </Select>
+        <Boxes.Filler/>
+        <Checkbox
+          label="Filtered state"
+          title="If enabled, only the part of the states relevant to the
+        selected marker are shown, for domains supporting this feature.
+        For other domains or if disabled, entire domain states are printed.
+        Beware that entire domain states can be very large."
+          value={filter}
+          onChange={setFilter}
+        />
       </Boxes.Hbox>
       <HSplit
         settings="ivette.eva.domainStates.beforeAfterSplit"
