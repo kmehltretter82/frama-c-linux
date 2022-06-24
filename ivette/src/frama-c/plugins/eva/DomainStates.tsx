@@ -92,18 +92,20 @@ export function EvaStates(): JSX.Element {
           onChange={setFilter}
         />
       </Boxes.Hbox>
-      <HSplit
-        settings="ivette.eva.domainStates.beforeAfterSplit"
-      >
-        <div className="domain-state-box">
-          State before the selected statement:
-          <Text className="domain-state" text={stateBefore} />
-        </div>
-        <div className="domain-state-box">
-          State after the selected statement:
-          <Text className="domain-state" text={stateAfter} />
-        </div>
-      </HSplit>
+      <Boxes.Scroll>
+        <HSplit
+          settings="ivette.eva.domainStates.beforeAfterSplit"
+        >
+          <div className="domain-state-box">
+            State before the selected statement:
+            <Text className="domain-state" text={stateBefore} />
+          </div>
+          <div className="domain-state-box">
+            State after the selected statement:
+            <Text className="domain-state" text={stateAfter} />
+          </div>
+        </HSplit>
+      </Boxes.Scroll>
     </>);
 }
 
