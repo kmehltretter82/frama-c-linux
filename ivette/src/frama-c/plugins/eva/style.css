@@ -325,6 +325,7 @@ tr:first-of-type > .eva-table-callsite-box {
 }
 
 .domain-state {
+    cursor: auto;
     user-select: text;
     overflow: auto;
     padding: 6px;
