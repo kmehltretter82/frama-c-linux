@@ -1242,9 +1242,20 @@ module Fmt = struct
   let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a.core}" pr s
   let package_as_deps pr fmt s = Format.fprintf fmt "(package %a)" pr s
 end
+
+let home_regexp = Str.regexp "^\\(~\\|[$]HOME\\|[$]\\{HOME\\}\\)\\(/.*\\)"
+let get_home_env () =
+  try
+    Unix.getenv "HOME"
+  with Not_found -> "~"
+
 let pp_list_deps fmt l =
   List.iter (fun s ->
       let s = Filename.sanitize_with_space s in
+      let s = match str_string_match2 home_regexp s 0 with
+        | None -> s
+        | Some (_,subdir) -> (get_home_env ()) ^ subdir
+      in
       if String.contains s '*' then
         Format.fprintf fmt " (glob_files %S)" s
       else
@@ -1914,7 +1925,8 @@ let () =
   List.iter (fun dir ->
       Format.printf "Test directory: %s@." dir;
       let absolute_tests_dir = Filename.dirname
-          (if Filename.is_relative dir then Filename.concat absolute_cwd dir else dir)
+          (if Filename.is_relative dir
+           then Filename.concat absolute_cwd dir else dir)
       in
       let suites = Ptests_config.parse ~dir in
       if !verbosity >= 1 then Format.printf "%% Nb config= %d@." (StringMap.cardinal suites);
