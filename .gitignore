@@ -39,6 +39,9 @@ autom4te.cache
 .Makefile.plugin.generated
 .ocamldebug
 
+# This file is generated (on need) during configure
+/src/plugins/dune
+
 #lint
 /.lint/
 

@@ -1394,6 +1394,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
        (alias %S)\n  \
        (targets %S %S %a %a)\n  \
        (deps %S %S %S %a %a)\n  \
+       (enabled_if (and true %a))\n\
        (action (run %s %S %S %a))\n\
        )@."
       (* rule: *)
@@ -1411,6 +1412,8 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       wtest.oracle_err
       pp_list (List.map (Filename.concat wtest.oracle_dir) command.log_files)
       pp_command_deps command
+      (* enabled_if: *)
+      Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
       (* action: *)
       !wrapper_cmd
       wrapper_basename
@@ -1434,6 +1437,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
        (alias %S)\n  \
        (targets %S %S %a %a)\n  \
        (deps   %a)\n  \
+       (enabled_if (and true %a))\n\
        (action (with-stderr-to %S (with-stdout-to %S (%s (system %S)))))\n\
        )@."
       (* rule: *)
@@ -1447,6 +1451,8 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       pp_list command.bin_files
       (* deps: *)
       pp_command_deps command
+      (* enabled_if: *)
+      Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
       (* action: *)
       cmderrlog
       cmdreslog
@@ -1458,6 +1464,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       Format.fprintf result_fmt
         "(rule ; FILTER %s #%d OF TEST FILE %S\n  \
          (deps %S)
+         (enabled_if (and true %a))\n\
          (action (with-stdout-to %S (with-accepted-exit-codes (or 0 1 2 125) (system %S))))\n\
          )@."
         (* rule: *)
@@ -1466,6 +1473,8 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
         command.file
         (* deps: *)
         fin
+        (* enabled_if: *)
+        Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
         (* action: *)
         fout cmd
   in
@@ -1475,12 +1484,15 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       Format.fprintf result_fmt
         "(rule ; COMPARE TARGET #%d OF TEST #%d FOR TEST FILE %S\n  \
          (alias %s)\n  \
+         (enabled_if (and true %a))\n\
          (action (diff %S %S))\n\
          )@."
         (* rule: *)
         n command.nth command.file
         (* alias: *)
         (ptests_alias ~env)
+        (* enabled_if: *)
+        Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
         (* action: *)
         (SubDir.make_file (SubDir.oracle_dir ~env) log)
         log
@@ -1489,6 +1501,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     "(rule ; REPRODUCE TEST #%d OF TEST FILE %S\n  \
      (alias %S)\n  \
      (deps  %a (universe))\n  \
+     (enabled_if (and true %a))\n\
      (action (%s (system %S)))\n\
      )@."
     (* rule: *)
@@ -1497,6 +1510,8 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (mk_alias command "exec")
     (* deps: *)
     pp_command_deps command
+    (* enabled_if: *)
+    Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
     (* action: *)
     accepted_exit_code
     command_string
@@ -1505,6 +1520,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     "(rule ; SHOW TEST COMMAND #%d OF TEST FILE %S\n  \
      (alias %S)\n  \
      (deps  %a (universe))\n  \
+     (enabled_if (and true %a))\n\
      (action (system %S))\n\
      )@."
     (* rule: *)
@@ -1513,6 +1529,8 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (mk_alias command "exec.show")
     (* deps: *)
     pp_command_deps command (* to get an updated build even in case of using the result *)
+    (* enabled_if: *)
+    Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
     (* action: *)
     ("echo '" ^ show_cmd wtest.cmd ^"'");
 
@@ -1521,28 +1539,36 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
   Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
+     (enabled_if (and true %a))\n\
      (action (diff %S %S))\n\
      )@."
     (* alias: *)
     diff_alias
+    (* enabled_if: *)
+    Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
     (* action: *)
     wtest.oracle_out
     reslog;
   Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
+     (enabled_if (and true %a))\n\
      (action (diff %S %S))\n\
      )@."
     (* alias: *)
     diff_alias
+    (* enabled_if: *)
+    Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
     (* action: *)
     wtest.oracle_err
     errlog;
   Format.fprintf result_fmt
-    "(alias (deps (alias %S)) (name %S); (enabled_if (and true %a))\n\
+    "(alias (name %S)\n  \
+     (deps (alias %S))\n  \
+     (enabled_if (and true %a))\n\
      )@."
-    diff_alias
     (ptests_alias ~env)
+    diff_alias
     Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
   ;
   let oracle_subdir = SubDir.oracle_subdir ~env command.directory in
@@ -1657,6 +1683,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
              (alias %s)\n  \
              (deps %a %a)\n  \
              (targets %a %a)\n  \
+             (enabled_if (and true %a))\n\
              (action (run %s %%{dep:%s} %S))\n\
              )@."
             (* rule: *)
@@ -1669,6 +1696,8 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
             (* targets: *)
             pp_list wtest.log
             pp_list wtest.bin
+            (* enabled_if: *)
+            Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps cmd.deps.load_plugin)
             (* action: *)
             !wrapper_cmd
             wrapper_basename
@@ -1688,6 +1717,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
              (alias %s)\n  \
              (deps (package frama-c)%a)\n  \
              (targets %a %a)\n  \
+             (enabled_if (and true %a))\n\
              (action (system %S))\n\
              )@."
             (* rule: *)
@@ -1699,6 +1729,8 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
             (* targets: *)
             pp_list wtest.log
             pp_list wtest.bin
+            (* enabled_if: *)
+            Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps cmd.deps.load_plugin)
             (* action: *)
             wtest.cmd
         end;
@@ -1709,6 +1741,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
           "(rule ; SHOW EXECNOW COMMAND #%d OF TEST FILE %S\n  \
            (alias %s)\n  \
            (deps  %a (universe))\n  \
+           (enabled_if (and true %a))\n\
            (action (system %S))\n\
            )@."
           (* rule: *)
@@ -1717,6 +1750,8 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
           (mk_alias cmd "execnow.show")
           (* deps: *)
           pp_command_deps cmd (* to get an updated build even in case of using the result *)
+          (* enabled_if: *)
+          Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps cmd.deps.load_plugin)
           (* action: *)
           ("echo '" ^ show_cmd wtest.cmd ^"'");
         ;
@@ -1724,12 +1759,15 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
             Format.fprintf result_fmt
               "(rule ; COMPARE TARGET #%d OF EXECNOW #%d FOR TEST FILE %S\n  \
                (alias %s)\n  \
+               (enabled_if (and true %a))\n\
                (action (diff %S %S))\n\
                )@."
               (* rule: *)
               n nth file
               (* alias: *)
               (ptests_alias ~env)
+              (* enabled_if: *)
+              Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps cmd.deps.load_plugin)
               (* action: *)
               (SubDir.make_file (SubDir.oracle_dir ~env) log)
               log
@@ -1739,17 +1777,19 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
       let pp_list_alias fmt l = List.iter (Format.fprintf fmt "(alias %S)") l in
       Format.fprintf result_fmt
         "; TEST FILE %S\n\
-         (alias (deps %a%a) (name %S)) ; to performs all sub-tests related to a file\n\
-         (alias (deps %a%a) (name %S)) ; to reproduce and visualize the all sub-test outputs related to a file@."
+         (alias (name %S)\n  \
+         (deps %a%a)) ; to performs all sub-tests related to a file\n\
+         (alias (name %S)\n  \
+         (deps %a%a)) ; to reproduce and visualize the all sub-test outputs related to a file@."
         file
         (* alias #1 *)
+        (Format.sprintf "%s.wtests" test_name)
         pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec.wtests" test_name i) config.dc_commands)
         pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
-        (Format.sprintf "%s.wtests" test_name)
         (* alias #2 *)
+        file
         pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.exec" test_name i) config.dc_commands)
-        pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow)
-        file;
+        pp_list_alias (List.mapi (fun i _ -> Format.sprintf "%s.%d.execnow.wtests" test_name i) config.dc_execnow);
     end ;
     List.iter make_cmd config.dc_commands;
     List.iter make_execnow_cmd config.dc_execnow;
@@ -1794,7 +1834,10 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
        let result_cout = (open_out result_dune_file) in
        let result_fmt = Format.formatter_of_out_channel result_cout  in
        Format.fprintf result_fmt "(copy_files ../*.*)@.";
-       Format.fprintf result_fmt "(alias (deps (alias %s)) (name %s))@." (ptests_alias ~env) env.dune_alias;
+       Format.fprintf result_fmt
+         "(alias (name %s)\n  \
+          (deps (alias %s)))@."
+         env.dune_alias (ptests_alias ~env);
        let oracle_dune_file = SubDir.make_file (SubDir.oracle_subdir ~env directory) "dune" in
        let oracle_cout = (open_out oracle_dune_file) in
        let oracle_fmt = Format.formatter_of_out_channel oracle_cout in

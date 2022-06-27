@@ -32,6 +32,7 @@
 
 ( library
   (name LoopAnalysis)
+  (optional)
   (public_name frama-c-loop-analysis.core)
   (private_modules region_analysis_sig region_analysis region_analysis_stmt loop_analysis register)
   (flags -open Frama_c_kernel :standard)

@@ -35,6 +35,7 @@
 
 (library
   (name Sparecode)
+  (optional)
   (public_name frama-c-sparecode.core)
   (private_modules sparecode_params globs spare_marks transform register)
   (flags :standard -open Frama_c_kernel)

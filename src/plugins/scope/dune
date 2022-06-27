@@ -33,6 +33,7 @@
 
 (library
   (name scope)
+  (optional)
   (public_name frama-c-scope.core)
   (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel frama-c-eva.core frama-c-inout.core)
