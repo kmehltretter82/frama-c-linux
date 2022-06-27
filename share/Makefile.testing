@@ -162,7 +162,11 @@ ifneq ($(FRAMAC_WP_CACHEDIR),)
 tests: run-tests
 else
 tests: run-tests
-	@echo "WARNING: cannot run -config qualif tests of WP plugin since FRAMAC_WP_CACHEDIR variable is undefined."
+	@echo "Warning: cannot run some tests related to WP plugin since FRAMAC_WP_CACHEDIR variable is undefined."
+	@echo "Fix proposal:"
+	@echo "> cd <DIR>"
+	@echo "> git clone git@git.frama-c.com:frama-c/wp-cache.git"
+	@echo "> export FRAMAC_WP_CACHEDIR=<DIR>/wp-cache"
 endif
 
 ###############################################################################
