@@ -43,5 +43,19 @@ int main() {
     //@ assert r <= 3;
   }
 
+  int c = getchar();
+  //@ check must_be_unknown: c == EOF;
+  //@ check must_be_unknown: CHAR_MIN <= c <= CHAR_MAX;
+  //@ assert c == EOF || CHAR_MIN <= c <= CHAR_MAX;
+  c = fgetc(stdin);
+  //@ check must_be_unknown: c == EOF;
+  //@ check must_be_unknown: CHAR_MIN <= c <= CHAR_MAX;
+  //@ assert c == EOF || CHAR_MIN <= c <= CHAR_MAX;
+  char buf[10];
+  char *r = fgets(buf, 10, stdin);
+  if (r) {
+    //@ assert at_least_one_char: \initialized(&buf[0]);
+  }
+
   return 0;
 }
