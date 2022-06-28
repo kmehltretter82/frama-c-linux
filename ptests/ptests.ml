@@ -1239,7 +1239,7 @@ module Fmt = struct
     Format.fprintf fmt "frama-c-%s" base
   let quote pr fmt s = Format.fprintf fmt "%S" (Format.asprintf "%a" pr s)
   let list pr fmt l = List.iter (fun s -> Format.fprintf fmt " %a" pr s) l
-  let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a}" pr s
+  let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a.core}" pr s
   let package_as_deps pr fmt s = Format.fprintf fmt "(package %a)" pr s
 end
 let pp_list_deps fmt l =
