@@ -14,6 +14,7 @@ let mydir = builtins.getEnv("PWD");
         "why3=1.5.0" "why3-coq=1.5.0"
         "menhir=20211012"
         "easy-format=1.3.2"
+        "biniou=1.2.1"
       ];
     # only pure nix packages. See mk_deriv below for adding opam2nix packages
     mk_buildInputs = { nixPackages ? [] } :
