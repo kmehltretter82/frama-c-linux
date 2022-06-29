@@ -70,7 +70,7 @@ let find_fun_variant_nodes = Annot.find_fun_variant_nodes
 
 let find_call_out_nodes_to_select = Sets.find_call_out_nodes_to_select
 let find_in_nodes_to_select_for_this_call =
-    Sets.find_in_nodes_to_select_for_this_call
+  Sets.find_in_nodes_to_select_for_this_call
 
 (**************************************************************************)
 

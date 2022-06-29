@@ -221,7 +221,7 @@ val find_fun_variant_nodes : t -> Cil_types.term ->
     they use polymorphic types. **)
 
 val find_call_out_nodes_to_select :
-    t -> PdgTypes.NodeSet.t -> t ->  Cil_types.stmt -> PdgTypes.Node.t list
+  t -> PdgTypes.NodeSet.t -> t ->  Cil_types.stmt -> PdgTypes.Node.t list
 (** [find_call_out_nodes_to_select pdg_called called_selected_nodes
     pdg_caller call_stmt]
     @return the call outputs nodes [out] such that
@@ -229,7 +229,7 @@ val find_call_out_nodes_to_select :
     intersects [called_selected_nodes]. *)
 
 val find_in_nodes_to_select_for_this_call :
-    t -> PdgTypes.NodeSet.t -> Cil_types.stmt -> t -> PdgTypes.Node.t list
+  t -> PdgTypes.NodeSet.t -> Cil_types.stmt -> t -> PdgTypes.Node.t list
 (** [find_in_nodes_to_select_for_this_call
     pdg_caller caller_selected_nodes call_stmt pdg_called]
     @return the called input nodes such that the corresponding nodes
