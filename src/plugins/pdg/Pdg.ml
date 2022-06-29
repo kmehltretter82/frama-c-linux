@@ -22,6 +22,6 @@
 
 (** Program Dependences Graph. *)
 
-module Register = Register
-
 module Api = Api
+
+module Marks = Marks

@@ -22,6 +22,6 @@
 
 (** Program Dependences Graph. *)
 
-module Register : module type of Marks
-
 module Api : module type of Api
+
+module Marks : module type of Marks

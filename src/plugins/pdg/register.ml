@@ -27,11 +27,6 @@ let () =
          ~onto:Pdg_tbl.self
          [ !Db.From.self ])
 
-(* This module contains polymorphic functions : cannot be registered in Db.
-   Can be used through Pdg.Register instead (see Pdg.mli) *)
-include Marks
-
-
 let deps =
   [Pdg_tbl.self; Pdg_parameters.BuildAll.self; Pdg_parameters.BuildFct.self]
 

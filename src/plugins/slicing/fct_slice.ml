@@ -452,7 +452,7 @@ end = struct
         None
     in
     let new_input_marks =
-      Pdg.Register.in_marks_to_caller pdg_caller call m2m in_info in
+      Pdg.Marks.in_marks_to_caller pdg_caller call m2m in_info in
     new_input_marks, !new_input
 
   let marks_for_call_outputs (_, out_info) = out_info
@@ -524,7 +524,7 @@ end = struct
           (if new_out then "(new out)" else "");
         m_opt
     in let new_called_marks =
-         Pdg.Register.call_out_marks_to_called ff_pdg m2m new_call_marks
+         Pdg.Marks.call_out_marks_to_called ff_pdg m2m new_call_marks
     in new_called_marks, !new_output
 
   let persistent_in_marks_to_prop fi to_prop  =
@@ -537,7 +537,7 @@ end = struct
     in
     let pdg = SlicingMacros.get_fi_pdg fi in
     let pdg_node_marks =
-      Pdg.Register.translate_in_marks pdg ~m2m in_info [] in
+      Pdg.Marks.translate_in_marks pdg ~m2m in_info [] in
     pdg_node_marks
 
   let get_new_marks ff nodes_marks =
