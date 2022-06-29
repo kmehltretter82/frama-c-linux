@@ -26,6 +26,8 @@
 
 open Cil_types
 
+open Pdg_types
+
 (**/**)
 
 let find_sub_stmts st = match st.skind with

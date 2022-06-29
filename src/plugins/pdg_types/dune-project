@@ -1,3 +1,4 @@
+(lang dune 2.9)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                        ;;
 ;;  This file is part of Frama-C.                                         ;;
@@ -20,23 +21,5 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(rule
- (alias frama-c-configure)
- (deps (universe))
- (action (progn
-          (echo "Postdominators:" %{lib-available:frama-c-postdominators.core} "\n")
-          (echo "  - Pdg-Types:" %{lib-available:frama-c-pdg-types.core} "\n")
-          (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
-  )
-  )
-)
-
-( library
-  (name postdominators)
-  (optional)
-  (public_name frama-c-postdominators.core)
-  (flags -open Frama_c_kernel :standard -w -9)
-  (libraries frama-c.kernel frama-c-pdg-types.core frama-c-eva.core)
-)
-
-(plugin (optional) (name postdominators) (libraries frama-c-postdominators.core) (site (frama-c plugins)))
+(name frama-c-pdg_types)
+(using dune_site 0.1)

@@ -26,6 +26,8 @@
 open Cil_types
 open Cil
 
+open Pdg_types
+
 (**/**)
 
 module Visibility (SliceName : sig

@@ -23,6 +23,8 @@
 open Cil_types
 open Cil
 
+open Pdg_types
+
 module BoolInfo = struct
   type proj = Spare_marks.proj
   type fct = Spare_marks.fct option * Kernel_function.t

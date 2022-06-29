@@ -22,6 +22,9 @@
 
 open SlicingTypes
 open Cil_types
+
+open Pdg_types
+
 open SlicingInternals
 
 type select = sl_mark PdgMarks.select

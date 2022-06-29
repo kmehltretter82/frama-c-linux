@@ -20,11 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Pdg_types
 open PdgIndex
 open Locations
 
 type node = PdgTypes.Node.t * Zone.t
-
 
 module NS = struct
   include Hptmap.Make

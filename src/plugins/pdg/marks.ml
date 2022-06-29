@@ -20,8 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open PdgIndex
 open Cil_datatype
+
+open Pdg_types
+open PdgIndex
 
 (** compute the marks to propagate in the caller nodes from the marks of
  * a function inputs [in_marks].

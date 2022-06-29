@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Pdg_types
+
 let debug n format = Sparecode_params.debug ~level:n format
 let fatal fmt = Sparecode_params.fatal fmt
 

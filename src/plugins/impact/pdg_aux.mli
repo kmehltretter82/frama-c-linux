@@ -23,6 +23,8 @@
 open Cil_types
 open Locations
 
+open Pdg_types
+
 (** Useful functions that are not directly accessible through the other
     Pdg modules. *)
 

@@ -22,7 +22,10 @@
 
 open Cil_types
 open Cil_datatype
+
+open Pdg_types
 open PdgIndex
+
 open Reason_graph
 
 (** Computation of the PDG nodes that are impacted by the "execution"

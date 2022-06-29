@@ -27,6 +27,8 @@
 open Cil_datatype
 open Cil_types
 
+open Pdg_types
+
 let debug1 fmt = Datascope.R.debug ~level:1 fmt
 
 module Interproc =

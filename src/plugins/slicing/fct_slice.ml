@@ -41,6 +41,7 @@
 (**/**)
 open Cil_types
 
+open Pdg_types
 (**/**)
 
 (* Look at (only once) the callers of [kf] ([kf] included). *)

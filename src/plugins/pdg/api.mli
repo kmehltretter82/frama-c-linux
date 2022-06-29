@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Pdg_types
+
 type t = PdgTypes.Pdg.t
 (** Program Dependence Graph type *)
 

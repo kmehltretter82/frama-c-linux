@@ -27,6 +27,8 @@
 
 (**/**)
 
+open Pdg_types
+
 type select = SlicingTypes.sl_mark PdgMarks.select
 type n_or_d_marks = (SlicingInternals.node_or_dpds * SlicingInternals.pdg_mark) list
 

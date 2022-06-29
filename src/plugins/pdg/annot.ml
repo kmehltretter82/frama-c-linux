@@ -22,6 +22,8 @@
 
 open Cil_types
 open Cil_datatype
+
+open Pdg_types
 open PdgIndex
 
 type data_info = ((PdgTypes.Node.t * Locations.Zone.t option) list

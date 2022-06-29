@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Pdg_types
+
 val check_call : Cil_types.stmt -> bool -> Cil_types.stmt
 
 val print_select :

@@ -28,6 +28,8 @@
 
 open Cil_types
 
+open Pdg_types
+
 (**/**)
 
 (** {2 Options} *)

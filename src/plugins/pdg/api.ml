@@ -22,6 +22,8 @@
 
 [@@@ warning "-32" ]
 
+open Pdg_types
+
 type t = PdgTypes.Pdg.t
 
 type t_nodes_and_undef =

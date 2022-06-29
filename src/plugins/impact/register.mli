@@ -22,6 +22,8 @@
 
 open Cil_types
 
+open Pdg_types
+
 val compute_pragmas: (unit -> stmt list)
 (** Compute the impact analysis from the impact pragma in the program.
     Print and slice the results according to the parameters -impact-print

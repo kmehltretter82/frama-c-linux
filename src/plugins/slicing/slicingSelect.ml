@@ -23,6 +23,8 @@
 open Cil_types
 open Cil_datatype
 
+open Pdg_types
+
 (* ---------------------------------------------------------------------- *)
 (** {1 For internal use} *)
 

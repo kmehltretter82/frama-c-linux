@@ -22,6 +22,8 @@
 
 (** Everything related with the marks. Mainly quite low level function. *)
 
+open Pdg_types
+
 (**/**)
 
 let debug = false

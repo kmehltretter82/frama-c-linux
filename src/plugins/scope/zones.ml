@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Pdg_types
+
 module R = Datascope.R
 let debug1 fmt = R.debug ~level:1 fmt
 let debug2 fmt = R.debug ~level:2 fmt

@@ -31,6 +31,8 @@
     {!module: Build.Computer} below).
 *)
 
+open Pdg_types
+
 let dkey = Pdg_parameters.register_category "build"
 let debug fmt = Pdg_parameters.debug ~dkey fmt
 let debug2 fmt = Pdg_parameters.debug ~dkey fmt ~level:2

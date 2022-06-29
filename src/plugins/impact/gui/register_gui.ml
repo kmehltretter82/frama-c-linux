@@ -23,6 +23,7 @@
 open Pretty_source
 open Gtk_helper
 open Cil_types
+open Pdg_types
 
 module SelectedStmt = struct
   include State_builder.Option_ref
