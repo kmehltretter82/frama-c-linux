@@ -157,15 +157,18 @@ function TestDir
     case "$CONFIG" in
         "<all>")
             ALIAS=$1/ptests
+            CFG="(all configs)"
             ;;
         "<default>")
             ALIAS=$1/ptests_config
+            CFG="(default config)"
             ;;
         *)
             ALIAS=$1/ptests_config_$CONFIG
+            CFG="(config $CONFIG)"
             ;;
     esac
-    Head "Running test on directory $1"
+    Head "Running test on directory $1 $CFG"
     Run dune build @$ALIAS
 }
 
@@ -178,15 +181,15 @@ function TestFile
     CloneCache
     DIR=$(dirname $1)
     FILE=$(basename $1)
-    [ "$CONFIG" != "<all>" ] || \
-        echo "Warning: can not run single test in all config"
 
     case "$CONFIG" in
         "<all>"|"<default>")
             RESULT=result
+            CFG="(default config)"
             ;;
         *)
             RESULT=result_$CONFIG
+            CFG="(config $CONFIG)"
             ;;
     esac
     if [ "$LOGS" = "yes" ]
@@ -195,7 +198,7 @@ function TestFile
     else
         ALIAS=$DIR/$RESULT/${FILE%.*}.wtests
     fi
-    Head "Running test on file $1"
+    Head "Running test on file $1 $CFG"
     Cmd dune build @$ALIAS
 }
 
