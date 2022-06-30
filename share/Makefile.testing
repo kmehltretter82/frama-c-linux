@@ -160,6 +160,10 @@ tests.update-wp-cache: config.sed
 .PHONY: tests
 ifneq ($(FRAMAC_WP_CACHEDIR),)
 tests: run-tests
+	echo "Number of *.res.log files:"
+	find $(addprefix _build/default/,$(PTEST_DIRS)) -name \*.res.log \
+        | $(GREP) -c "^"
+
 else
 tests: run-tests
 	@echo "Warning: cannot run some tests related to WP plugin since FRAMAC_WP_CACHEDIR variable is undefined."
@@ -168,6 +172,12 @@ tests: run-tests
 	@echo "> git clone git@git.frama-c.com:frama-c/wp-cache.git"
 	@echo "> FRAMAC_WP_CACHEDIR=<DIR>/wp-cache make tests"
 endif
+
+.PHONY: count-tests
+count-tests:
+	echo "Number of *.res.log files:"
+	find $(addprefix _build/default/,$(PTEST_DIRS)) -name \*.res.log \
+        | $(GREP) -c "^"
 
 ###############################################################################
 # Local Variables:
