@@ -21,6 +21,7 @@
 #                                                                        #
 ##########################################################################
 
+THIS_SCRIPT="$0"
 CONFIG="<all>"
 VERBOSE=
 UPDATE=
@@ -34,9 +35,9 @@ FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 # ---  Help Message
 # --------------------------------------------------------------------------
 
-THIS_SCRIPT="$0"
 function Usage
 {
+    SetEnv
     echo "USAGE"
     echo ""
     echo "${THIS_SCRIPT} [OPTIONS|TESTS]..."
@@ -65,12 +66,12 @@ function Usage
     echo ""
     echo "VARIABLES"
     echo ""
-    echo "  FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
-    echo "    Git URL: $FRAMAC_WP_CACHE_GIT"
-    echo "    Please, always push updates to #master branch"
-    echo ""
-    echo "  FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
+    echo "  FRAMAC_WP_CACHE ($FRAMAC_WP_CACHE)"
     echo "    Management mode of wp-cache"
+    echo ""
+    echo "  FRAMAC_WP_CACHEDIR ($FRAMAC_WP_CACHEDIR)"
+    echo "    Use $FRAMAC_WP_CACHE_GIT"
+    echo "    Please, always push to master branch"
     echo ""
 }
 
@@ -117,6 +118,21 @@ function Cmd
 # ---  WP Cache Environment
 # --------------------------------------------------------------------------
 
+function SetEnv
+{
+    if [ "$FRAMAC_WP_CACHE" = "" ]
+    then
+        FRAMAC_WP_CACHE=offline
+        Echo "Set FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
+    fi
+
+    if [ "$FRAMAC_WP_CACHEDIR" = "" ]
+    then
+        FRAMAC_WP_CACHEDIR=./.wp-cache
+        Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
+    fi
+}
+
 function CloneCache
 {
     if [ ! -d "$FRAMAC_WP_CACHEDIR" ]; then
@@ -131,29 +147,13 @@ function PullCache
     Run git -C $FRAMAC_WP_CACHEDIR pull --rebase
 }
 
-function SetEnv
-{
-    if [ "$FRAMAC_WP_CACHE" = "" ]
-    then
-        FRAMAC_WP_CACHE=offline
-        Echo "Set FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
-    fi
-
-    if [ "$FRAMAC_WP_CACHEDIR" = "" ]
-    then
-        FRAMAC_WP_CACHEDIR=./.wp-cache
-        Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
-    fi
-
-    CloneCache
-}
-
 # --------------------------------------------------------------------------
 # ---  Test Dir Processing
 # --------------------------------------------------------------------------
 
 function TestDir
 {
+    CloneCache
     case "$CONFIG" in
         "<all>")
             ALIAS=$1/ptests
@@ -175,6 +175,7 @@ function TestDir
 
 function TestFile
 {
+    CloneCache
     DIR=$(dirname $1)
     FILE=$(basename $1)
     [ "$CONFIG" != "<all>" ] || \
