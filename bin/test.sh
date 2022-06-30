@@ -22,8 +22,9 @@
 ##########################################################################
 
 CONFIG="<all>"
-UPDATE=
 VERBOSE=
+UPDATE=
+LOGS=
 TESTS=
 COUNT=
 
@@ -42,21 +43,24 @@ function Usage
     echo ""
     echo "TESTS SPECIFICATION"
     echo ""
-    echo "  If no test is specified, run all tests in all config."
     echo "  Tip: use shell completion"
     echo ""
-    echo "  <DIR>     all tests in directory"
-    echo "  <FILE>    single test file"
+    echo "  <DIR>     all tests in <DIR>"
+    echo "  <FILE>    single test file <FILE>"
+    echo ""
+    echo "  -a|--all            run all tests"
+    echo "  -d|--default        run tests from default config only"
+    echo "  -c|--config <name>  run tests from specified config only"
+    echo ""
     echo ""
     echo "OPTIONS"
     echo ""
     echo "  -r|--clean          clean (remove all) test results (includes -p)"
-    echo "  -p|--ptests         prepare (all) dune files"
-    echo "  -v|--verbose        display (next) tests output"
+    echo "  -p|--ptests         prepare (all) dune files and pull cache"
+    echo "  -n|--count          print number of (all) tests"
+    echo "  -l|--logs           print output of tests (single file, no diff)"
     echo "  -u|--update         run tests and update wp-cache"
-    echo "  -d|--default        run tests from default config only"
-    echo "  -c|--config <name>  run tests from specified config only"
-    echo ""
+    echo "  -v|--verbose        print executed commands"
     echo "  -h|--help           print this help"
     echo ""
     echo "VARIABLES"
@@ -137,13 +141,11 @@ function SetEnv
 
     if [ "$FRAMAC_WP_CACHEDIR" = "" ]
     then
-        FRAMAC_WP_CACHEDIR=.wp-cache
+        FRAMAC_WP_CACHEDIR=./.wp-cache
         Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
     fi
 
     CloneCache
-    PullCache
-
 }
 
 # --------------------------------------------------------------------------
@@ -186,14 +188,14 @@ function TestFile
             RESULT=result_$CONFIG
             ;;
     esac
-    if [ "$VERBOSE" == "yes" ]
+    if [ "$LOGS" = "yes" ]
     then
         ALIAS=$DIR/$RESULT/$FILE
     else
         ALIAS=$DIR/$RESULT/${FILE%.*}.wtests
     fi
     Head "Running test on file $1"
-    Cmd build @$ALIAS
+    Cmd dune build @$ALIAS
 }
 
 # --------------------------------------------------------------------------
@@ -217,6 +219,36 @@ function RunTests
     done
 }
 
+
+# --------------------------------------------------------------------------
+# ---  Tests Numbering
+# --------------------------------------------------------------------------
+
+function CountTests
+{
+    #-- Count number of .res.log files
+    if [ "$COUNT" = "yes" ]; then
+
+        BUILD=_build/default
+
+        Head "Number of .res.log files by test directory..."
+        NB=
+        for dir in tests src/plugins/*/tests ; do
+            if [ ! -d "$dir" ] ; then
+                NB="$((find $BUILD/$dir -name \*.res.log 2> /dev/null) | wc -l)"
+                [ "$NB" = "0"] || echo "- $dir= $NB"
+            fi
+        done
+        [ "$NB" != "" ] || echo "- <none>"
+
+    fi
+    #-- Check wp-cache status
+    Head "Check $FRAMAC_WP_CACHEDIR status"
+    if [ "$UPDATE" = "yes" ]; then
+        git -C $FRAMAC_WP_CACHEDIR status -s
+    fi
+}
+
 # --------------------------------------------------------------------------
 # ---  Command Line Processing
 # --------------------------------------------------------------------------
@@ -229,21 +261,26 @@ do
             exit 0
             ;;
         "-r"|"--clean")
+            PullCache
             Head "Cleaning all tests..."
             Cmd make clean-tests
             Head "Generating dune files..."
             Cmd make run-ptests
             ;;
         "-p"|"--ptests")
+            PullCache
             Head "Generating dune files..."
             Cmd make run-ptests
             ;;
         "-u"|"--update")
-            UPDATE=yes
             FRAMAC_WP_CACHE=update
+            UPDATE=yes
             ;;
         "-v"|"--verbose")
             VERBOSE=yes
+            ;;
+        "-l"|"--logs")
+            LOGS=yes
             ;;
         "-d"|"--default")
             CONFIG="<default>"
@@ -267,20 +304,4 @@ done
 
 SetEnv
 RunTests $TESTS
-
-#-- Count number of .res.log files
-if [ "$COUNT" = "yes" ]; then
-
-    BUILD=_build/default
-
-    Head "Number of .res.log files by test directory..."
-    NB=
-    for dir in tests src/plugins/*/tests ; do
-        if [ ! -d "$dir" ] ; then
-            NB="$((find $BUILD/$dir -name \*.res.log 2> /dev/null) | wc -l)"
-            [ "$NB" = "0"] || echo "- $dir= $NB"
-        fi
-    done
-    [ "$NB" != "" ] || echo "- <none>"
-
-fi
+CountTests
