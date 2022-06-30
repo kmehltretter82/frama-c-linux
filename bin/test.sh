@@ -243,8 +243,8 @@ function CountTests
 
     fi
     #-- Check wp-cache status
-    Head "Check $FRAMAC_WP_CACHEDIR status"
     if [ "$UPDATE" = "yes" ]; then
+        Head "Check $FRAMAC_WP_CACHEDIR status"
         git -C $FRAMAC_WP_CACHEDIR status -s
     fi
 }
