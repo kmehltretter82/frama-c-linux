@@ -342,7 +342,6 @@ let add_domain (type v) dname mode (abstraction: v abstraction) (module Acc: Acc
   (* Set the name of the domain. *)
   let module Domain = struct
     include (val domain)
-    let name = dname
     module Store = struct
       include Store
       let register_global_state storage state =

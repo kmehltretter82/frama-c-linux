@@ -46,7 +46,9 @@ module type LeafDomain = sig
   val incr_loop_counter: stmt -> t -> t
   val leave_loop: stmt -> t -> t
 
-  val filter: kernel_function -> [`Pre | `Post] -> Base.Hptset.t -> t -> t
+  val filter:
+    [`Pre of kernel_function | `Post of kernel_function | `Print ] ->
+    Base.Hptset.t -> t -> t
   val reuse:
     kernel_function -> Base.Hptset.t ->
     current_input:t -> previous_output:t -> t
@@ -72,7 +74,7 @@ module Complete (Domain: InputDomain) = struct
   let incr_loop_counter _stmt state = state
   let leave_loop _stmt state = state
 
-  let filter _kf _kind _bases state = state
+  let filter _kind _bases state = state
   let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
 
   let show_expr _valuation _state fmt _expr =
@@ -325,6 +327,7 @@ module Restrict
 
   module I = struct let module_name = Domain.name ^ " option" end
   include Datatype.Option_with_collections (D) (I)
+  let name = Domain.name
 
   let default = Domain.top, Mode.all
   let structure: t Abstract.Domain.structure =
@@ -575,9 +578,9 @@ module Restrict
     | None -> Base.SetLattice.empty
     | Some (state, _mode) -> Domain.relate kf bases state
 
-  let filter kf kind bases = function
+  let filter kind bases = function
     | None -> None
-    | Some (state, mode) -> Some (Domain.filter kf kind bases state, mode)
+    | Some (state, mode) -> Some (Domain.filter kind bases state, mode)
 
   let reuse kf bases ~current_input ~previous_output =
     match current_input, previous_output with

@@ -28,6 +28,7 @@ module type Key = sig
   val create_key: string -> 'a key
   val eq_type : 'a key -> 'b key -> ('a, 'b) eq option
 
+  val name: 'a key -> string
   val print: 'a key Pretty_utils.formatter
   val compare: 'a key -> 'b key -> int
   val equal: 'a key -> 'b key -> bool
@@ -82,6 +83,7 @@ module Make () = struct
   let hash x = x.tag
   let tag x = x.tag
 
+  let name x = x.name
   let print fmt x = Format.pp_print_string fmt x.name
 end
 
