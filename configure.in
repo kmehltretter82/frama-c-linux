@@ -607,10 +607,11 @@ if test -f src/plugins/.disabled ; then
   echo "(include_subdirs no)" >> src/plugins/dune
   echo ";; Disabled plugin list:" >> src/plugins/dune
   echo "(data_only_dirs $(cat src/plugins/.disabled))" >> src/plugins/dune
+  cat src/plugins/.disabled | sed -n -e 's|^\(.*\)$|(rule (alias "frama-c-configure") (deps (universe)) (action (echo "Disabled plug-in: src/plugins/\1\n")))|p' >> src/plugins/dune
   echo ";; Test" >> src/plugins/dune
   echo "(alias (name ptests) (deps (alias ptests_config)))" >> src/plugins/dune
 # "sed -n" is the posix version of "sed --quiet"
-  cat src/plugins/.disabled | sed -n -e 's/^\(.*\)$/(rule (alias "ptests_config") (deps (universe)) (action (echo "Warning: testing with disabled \1 plug-in\n")))/p' >> src/plugins/dune
+  cat src/plugins/.disabled | sed -n -e 's|^\(.*\)$|(rule (alias "ptests_config") (deps (universe)) (action (echo "Testing with disabled plug-in: src/plugins/\1\n")))|p' >> src/plugins/dune
   chmod a-w src/plugins/dune
   rm src/plugins/.disabled
 fi
