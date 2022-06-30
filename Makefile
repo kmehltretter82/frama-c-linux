@@ -33,12 +33,15 @@ $(error \
   "You should run ./configure first (or autoconf if there is no configure)")
 endif
 
+DUNE_BUILD_OPTS?=
+
 RELEASE?=no
 ifeq ($(RELEASE),yes)
-DUNE_BUILD_OPTS=--release
-else
-DUNE_BUILD_OPTS=
+DUNE_BUILD_OPTS+=--release
 endif
+
+DUNE_DISPLAY?=progress # Dune default, see '--display' dune option
+DUNE_BUILD_OPTS+=--display $(DUNE_DISPLAY)
 
 ###################
 # Frama-C Version #
