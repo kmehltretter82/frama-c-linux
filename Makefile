@@ -209,6 +209,9 @@ FRAMAC_PTESTS:=ptests/ptests.exe
 # WTESTS is internal
 FRAMAC_WTESTS:=ptests/wtests.exe
 
+# Frama-C also have ptest directories in plugins, so we do not use default
+PTEST_ALL_DIRS:=tests $(wildcard src/plugins/*/tests)
+
 # Part that can be shared for external plugins
 include share/Makefile.testing
 

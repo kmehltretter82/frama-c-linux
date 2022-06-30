@@ -28,9 +28,10 @@
 ## Default variables
 
 # Defines where to find the ptest_config files
-PURGED_PTEST_DIRS?=tests $(wildcard src/plugins/*/tests)
+# Default: only consider tests directory, it can be customized via the variable
+PTEST_ALL_DIRS?=tests
 PTEST_OPTS?=
-PTEST_DIRS?=$(PURGED_PTEST_DIRS)
+PTEST_DIRS?=$(PTEST_ALL_DIRS)
 
 ############
 # Default values necessary for make -f <this-makefile>
@@ -49,9 +50,7 @@ endif
 ##########################################################################
 
 # Defines the related dune targets
-PTEST_ALIASES=$(addsuffix /ptests,$(addprefix @, tests src/plugins))
-# TODO: uncomments when a dune file is at least generated for all PTEST_DIRS
-#PTEST_ALIASES=$(addsuffix /ptests,$(addprefix @,$(PTEST_DIRS)))
+PTEST_ALIASES=$(addsuffix /ptests,$(addprefix @,$(PTEST_DIRS)))
 
 .PHONY: tests.info
 tests.info:
@@ -59,7 +58,7 @@ tests.info:
 	echo "WTESTS='$(WTESTS)'"
 	echo "FRAMAC_PTESTS='$(FRAMAC_PTESTS)'"
 	echo "PTESTS='$(PTESTS)'"
-	echo "PURGED_PTEST_DIRS='$(PURGED_PTEST_DIRS)'"
+	echo "PTEST_ALL_DIRS='$(PTEST_ALL_DIRS)'"
 	echo "PTEST_DIRS='$(PTEST_DIRS)'"
 	echo "PTEST_OPTS='$(PTEST_OPTS)'"
 	echo "PTEST_ALIASES='$(PTEST_ALIASES)'"
@@ -119,14 +118,14 @@ wtests-help:
 
 .PHONY: purge-tests
 purge-tests:
-	find $(PURGED_PTEST_DIRS) -name dune \
+	find $(PTEST_ALL_DIRS) -name dune \
         | $(GREP) -e "/oracle.*/dune\|/result.*/dune" \
         | $(XARGS) -n 10 $(RM)
 
 # Force the full cleaning of the testing environment
 .PHONY: clean-tests
 clean-tests: purge-tests
-	$(RMDIR) $(addprefix _build/default/,$(PURGED_PTEST_DIRS))
+	$(RMDIR) $(addprefix _build/default/,$(PTEST_ALL_DIRS))
 
 ##########################################################################
 ## Generates all dune files used for testing
