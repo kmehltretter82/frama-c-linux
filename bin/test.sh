@@ -28,7 +28,7 @@ UPDATE=
 LOGS=
 TESTS=
 
-LOG_ERR=.test-errors.log
+VERBOSE_LOG=.test-errors.log
 
 FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
@@ -151,18 +151,18 @@ function PullCache
 # ---  Test Dir Alias
 # --------------------------------------------------------------------------
 
-rm -rf $LOG_ERR
+rm -rf $VERBOSE_LOG
 function TestAlias
 {
 
     if [ "$VERBOSE" != "yes" ]; then
         Run dune build $@
-    elif [ "$LOG_ERR" = "" ]; then
+    elif [ "$VERBOSE_LOG" = "" ]; then
         Run build --display short
     else
         # note: the Run function cannot performs redirection
-        echo "> build --display short $@ 2> >(tee -a $LOG_ERR >&2)"
-        dune build --display short $@ 2> >(tee -a $LOG_ERR >&2)
+        echo "> build --display short $@ 2> >(tee -a $VERBOSE_LOG >&2)"
+        dune build --display short $@ 2> >(tee -a $VERBOSE_LOG >&2)
     fi
 }
 
@@ -252,18 +252,18 @@ function CountTests
     #-- Count number of .res.log files
     if [ "$VERBOSE" = "yes" ]; then
 
-        if [ -f "$LOG_ERR" ]; then
-            echo "# Number of executed frama-c-wtests= $(grep -c "^frama-c-wtests " $LOG_ERR)"
-            Cmd rm -f $LOG_ERR
+        if [ -f "$VERBOSE_LOG" ]; then
+            echo "# Number of executed frama-c-wtests= $(grep -c "^frama-c-wtests " $VERBOSE_LOG)"
+            Cmd rm -f $VERBOSE_LOG
         fi
 
         BUILD=_build/default
 
-        Head "Number of *.res.log files by test directory..."
+        Head "Number of *.{err,res}.log files by test directory..."
         NB=
         for dir in tests src/plugins/*/tests ; do
             if [ -d "$dir" ]; then
-                NB="$((find $BUILD/$dir -name \*.res.log 2> /dev/null) | wc -l)"
+                NB="$((find $BUILD/$dir -name \*.err.log -or -name \*.res.log 2> /dev/null) | wc -l)"
                 [ "$NB" = "0" ] || echo "- $dir= $NB"
             fi
         done
