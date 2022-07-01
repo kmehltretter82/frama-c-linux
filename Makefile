@@ -212,6 +212,9 @@ FRAMAC_WTESTS:=ptests/wtests.exe
 # Frama-C also have ptest directories in plugins, so we do not use default
 PTEST_ALL_DIRS:=tests $(wildcard src/plugins/*/tests)
 
+# Ptests needs config.sed so that dune can build Frama-C (if it is not built)
+PTEST_DEPS:=config.sed
+
 # Part that can be shared for external plugins
 include share/Makefile.testing
 

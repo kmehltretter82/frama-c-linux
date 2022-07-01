@@ -30,8 +30,12 @@
 # Defines where to find the ptest_config files
 # Default: only consider tests directory, it can be customized via the variable
 PTEST_ALL_DIRS?=tests
+# Additional options transmitted to ptests
 PTEST_OPTS?=
+# Selected ptests directories for testing
 PTEST_DIRS?=$(PTEST_ALL_DIRS)
+# Additional dependencies to build before testing
+PTEST_DEPS?=
 
 ############
 # Default values necessary for make -f <this-makefile>
@@ -61,6 +65,7 @@ tests.info:
 	echo "PTEST_ALL_DIRS='$(PTEST_ALL_DIRS)'"
 	echo "PTEST_DIRS='$(PTEST_DIRS)'"
 	echo "PTEST_OPTS='$(PTEST_OPTS)'"
+	echo "PTEST_DEPS='$(PTEST_DEPS)'"
 	echo "PTEST_ALIASES='$(PTEST_ALIASES)'"
 
 ##########################################################################
@@ -139,11 +144,11 @@ clean-tests: purge-tests
 ## Generates all dune files used for testing
 
 .PHONY: run-ptests
-run-ptests: config.sed purge-tests $(FRAMAC_PTEST) $(FRAMAC_WTEST)
+run-ptests: $(PTEST_DEPS) purge-tests $(FRAMAC_PTEST) $(FRAMAC_WTEST)
 	$(PTESTS) $(PTEST_OPTS) $(PTEST_DIRS)
 
 .PHONY: run-ptests.replay
-run-ptests.replay: config.sed $(FRAMAC_PTEST)
+run-ptests.replay: $(PTEST_DEPS) $(FRAMAC_PTEST)
 	$(PTESTS) $(PTEST_OPTS) $(PTEST_DIRS)
 
 # Run tests of for all configurations (and build all dune files)
@@ -155,13 +160,13 @@ run-tests: run-ptests
 # Replay tests of for all configurations (requires  all dune files)
 .PHONY: test.replay
 tests.replay: FRAMAC_WP_CACHE=offline
-tests.replay: config.sed
+tests.replay: $(PTEST_DEPS)
 	dune build $(PTEST_ALIASES)
 
 # Update cache entries of for all configurations (requires all dune files)
 .PHONY: tests.update-wp-cache
 tests.update-wp-cache: FRAMAC_WP_CACHE=update
-tests.update-wp-cache: config.sed
+tests.update-wp-cache: $(PTEST_DEPS)
 	dune build $(PTEST_ALIASES)
 
 .PHONY: tests
