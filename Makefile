@@ -182,25 +182,12 @@ force-reconfigure:
 ##############################################################################
 # INSTALL/UNINSTALL
 ################################
-.PHONY: install uninstall
 
-FRAMAC_INSTALLDIR?=""
+FRAMAC_INSTALLDIR?=
 
-install:
-ifeq ($(FRAMAC_INSTALLDIR),"")
-	dune install
-else
-	dune install --prefix ${FRAMAC_INSTALLDIR}
-	@echo 'DO NOT FORGET TO EXPAND YOUR OCAMLPATH VARIABLE:'
-	@echo '  export OCAMLPATH="${FRAMAC_INSTALLDIR}/lib:$$OCAMLPATH"'
-endif
+INSTALLDIR:=$(FRAMAC_INSTALLDIR)
 
-uninstall:
-ifeq ($(FRAMAC_INSTALLDIR),"")
-	dune uninstall
-else
-	dune uninstall --prefix ${FRAMAC_INSTALLDIR}
-endif
+include share/Makefile.installation
 
 ###############################################################################
 # HEADER MANAGEMENT
