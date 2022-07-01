@@ -179,33 +179,29 @@ tests.update-wp-cache: $(PTEST_DEPS)
 endif
 
 .PHONY: tests
-ifeq ($(PTEST_USE_WP_CACHE),yes)
-
-ifneq ($(FRAMAC_WP_CACHEDIR),)
-tests: run-tests
-	echo "Number of *.res.log files:"
-	find $(addprefix _build/default/,$(PTEST_DIRS)) -name \*.res.log \
+tests:: run-tests
+	echo "Number of *.{err,res}.log files:"
+	find $(addprefix _build/default/,$(PTEST_DIRS)) -name \*.err.log -or -name \*.res.log \
         | $(GREP) -c "^"
-else
-tests: run-tests
+
+ifneq ($(PTEST_USE_WP_CACHE),no)
+ifeq ($(FRAMAC_WP_CACHEDIR),)
+
+tests::
 	@echo "Warning: cannot run some tests related to WP plugin since FRAMAC_WP_CACHEDIR variable is undefined."
 	@echo "Fix proposal:"
 	@echo "> cd <DIR>"
 	@echo "> git clone git@git.frama-c.com:frama-c/wp-cache.git"
 	@echo "> FRAMAC_WP_CACHEDIR=<DIR>/wp-cache make tests"
-endif # FRAMAC_WP_CACHEDIR
+	@echo "Otherwise, use 'make PTEST_USE_WP_CACHE=no tests' to remove this warning"
 
-else
-tests: run-tests
-	echo "Number of *.res.log files:"
-	find $(addprefix _build/default/,$(PTEST_DIRS)) -name \*.res.log \
-        | $(GREP) -c "^"
+endif # FRAMAC_WP_CACHEDIR
 endif # PTEST_USE_WP_CACHE
 
 .PHONY: count-tests
 count-tests:
-	echo "Number of *.res.log files:"
-	find $(addprefix _build/default/,$(PTEST_DIRS)) -name \*.res.log \
+	echo "Number of *.{err,res}.log files:"
+	find $(addprefix _build/default/,$(PTEST_DIRS)) -name \*.res.log -or -name \*.err.log \
         | $(GREP) -c "^"
 
 ###############################################################################
