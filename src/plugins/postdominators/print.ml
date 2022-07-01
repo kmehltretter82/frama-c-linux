@@ -23,8 +23,8 @@
 open Cil_types
 open Cil_datatype
 
-let pretty_stmt fmt s =
-  let key = PdgIndex.Key.stmt_key s in !Db.Pdg.pretty_key fmt key
+let pretty_stmt fmt s = let open Pdg_types in
+  let key = PdgIndex.Key.stmt_key s in PdgIndex.Key.pretty fmt key
 
 module Printer = struct
 

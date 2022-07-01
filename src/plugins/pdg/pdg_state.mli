@@ -22,6 +22,8 @@
 
 exception Cannot_fold
 
+open Pdg_types
+
 open PdgTypes
 (** Types data_state and Node.t come froms this module *)
 

@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Program Dependences Graph. *)
-
-module Api = Api
-
-module Marks = Marks
+module PdgIndex = PdgIndex
+module PdgMarks = PdgMarks
+module PdgTypes = PdgTypes

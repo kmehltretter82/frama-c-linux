@@ -22,8 +22,8 @@
 
 open Pretty_source
 open Gtk_helper
-open Db
 open Cil_types
+open Pdg_types
 
 module SelectedStmt = struct
   include State_builder.Option_ref
@@ -43,7 +43,7 @@ let () =
     (fun () ->
        State_dependency_graph.add_codependencies
          ~onto:SelectedStmt.self
-         [ !Db.Pdg.self ])
+         [ Pdg.Api.self ])
 
 module Highlighted_stmt : sig
   val add: Kernel_function.t -> stmt -> unit
@@ -232,7 +232,7 @@ let pp_impact_on_inputs (main_ui:Design.main_window_extension_points) kf =
     let call, formals, zones =
       Pdg_aux.NS.fold
         (fun (node, z) (call, formals, zones as acc) ->
-           match !Pdg.node_key node with
+           match Pdg.Api.node_key node with
            | SigCallKey _ | CallStmt _ | Stmt _ | Label _ ->
              acc (* Related to one stmt: skip *)
            | VarDecl _ -> acc (* skip *)
@@ -268,7 +268,7 @@ let pp_impacted_call_outputs
     let ret, zones =
       Pdg_aux.NS.fold
         (fun (node, z) (ret, zones as acc) ->
-           match !Pdg.node_key node with
+           match Pdg.Api.node_key node with
            | SigCallKey (stmt', key)
              when Cil_datatype.Stmt.equal call_stmt stmt' ->
              (match key with

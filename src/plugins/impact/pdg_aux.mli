@@ -21,8 +21,9 @@
 (**************************************************************************)
 
 open Cil_types
-open PdgTypes
 open Locations
+
+open Pdg_types
 
 (** Useful functions that are not directly accessible through the other
     Pdg modules. *)
@@ -30,7 +31,7 @@ open Locations
 
 (** Refinement of a PDG node: we add an indication of which zone is really
     impacted *)
-type node = Node.t * Zone.t
+type node = PdgTypes.Node.t * Zone.t
 
 val pretty_node: node Pretty_utils.formatter
 
@@ -53,9 +54,9 @@ module NS: sig
   val inter: t -> t -> t
   val diff: t -> t -> t
 
-  val remove: Node.t -> t -> t
+  val remove: PdgTypes.Node.t -> t -> t
 
-  val mem: Node.t -> t -> bool
+  val mem: PdgTypes.Node.t -> t -> bool
   val mem': node -> t -> bool
   val intersects: t -> t -> bool
   val for_all': (node -> bool) -> t -> bool
@@ -76,7 +77,7 @@ type call_interface = (PdgTypes.Node.t * NS.t) list
     of [callee]. Each input node in [callee] is returned with the set
     of nodes that define it in [caller].  *)
 val all_call_input_nodes:
-  caller:Db.Pdg.t ->  callee:kernel_function * Db.Pdg.t -> stmt ->
+  caller:Pdg.Api.t ->  callee:kernel_function * Pdg.Api.t -> stmt ->
   call_interface
 
 (** [all_call_out_nodes ~callee ~caller stmt] find all the nodes of [callee]
@@ -84,4 +85,4 @@ val all_call_input_nodes:
     that occurs at [stmt]. Each such out node is returned, with the set
     of nodes that define it in [callee] *)
 val all_call_out_nodes :
-  callee:Db.Pdg.t ->  caller:Db.Pdg.t -> stmt -> call_interface
+  callee:Pdg.Api.t ->  caller:Pdg.Api.t -> stmt -> call_interface

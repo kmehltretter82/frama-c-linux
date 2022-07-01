@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Pdg_types
+
 val compute_pdg : Cil_types.kernel_function -> PdgTypes.Pdg.t
 
 (*

@@ -26,6 +26,8 @@
 open Cil_types
 open Cil
 
+open Pdg_types
+
 (**/**)
 
 module Visibility (SliceName : sig
@@ -138,7 +140,7 @@ module Visibility (SliceName : sig
         begin
           SlicingParameters.debug ~level:3
             "[SlicingTransform.Visibility.all_nodes_visible] node %a invisible"
-            (!Db.Pdg.pretty_node true) n;
+            (Pdg.Api.pretty_node true) n;
           false
         end
       else visi
@@ -173,7 +175,7 @@ module Visibility (SliceName : sig
               SlicingParameters.debug ~level:2
                 "[SlicingTransform.Visibility.data_nodes_visible]@\n\
                  node %a invisible"
-                (!Db.Pdg.pretty_node true) n;
+                (Pdg.Api.pretty_node true) n;
               false
             end
           else visi
@@ -242,10 +244,10 @@ module Visibility (SliceName : sig
     | Iproto -> false
     | Iff {slice = ff} ->
       let kf = SlicingMacros.get_ff_kf ff  in
-      let pdg = !Db.Pdg.get kf in
+      let pdg = Pdg.Api.get kf in
       try
         let ctrl_nodes, decl_nodes, data_info =
-          !Db.Pdg.find_code_annot_nodes pdg stmt annot
+          Pdg.Api.find_code_annot_nodes pdg stmt annot
         in
         let data_visible = data_nodes_visible ff (decl_nodes, data_info) in
         let visible = ((all_nodes_visible ff ctrl_nodes) && data_visible) in
@@ -276,9 +278,9 @@ module Visibility (SliceName : sig
       | Iproto -> true
       | Iff {slice = ff} ->
         let kf = SlicingMacros.get_ff_kf ff  in
-        let pdg = !Db.Pdg.get kf in
+        let pdg = Pdg.Api.get kf in
         try
-          let nodes = !Db.Pdg.find_fun_precond_nodes pdg p in
+          let nodes = Pdg.Api.find_fun_precond_nodes pdg p in
           data_nodes_visible ff nodes
         with NoDataInfo ->
           all_logic_var_visible ff p
@@ -296,9 +298,9 @@ module Visibility (SliceName : sig
       | Iproto -> true
       | Iff {slice = ff} ->
         let kf = SlicingMacros.get_ff_kf ff  in
-        let pdg = !Db.Pdg.get kf in
+        let pdg = Pdg.Api.get kf in
         try
-          let nodes = !Db.Pdg.find_fun_postcond_nodes pdg p in
+          let nodes = Pdg.Api.find_fun_postcond_nodes pdg p in
           data_nodes_visible ff nodes
         with NoDataInfo -> all_logic_var_visible ff p
 
@@ -316,9 +318,9 @@ module Visibility (SliceName : sig
       | Iproto -> true
       | Iff {slice = ff} ->
         let kf = SlicingMacros.get_ff_kf ff  in
-        let pdg = !Db.Pdg.get kf in
+        let pdg = Pdg.Api.get kf in
         try
-          let nodes = !Db.Pdg.find_fun_variant_nodes pdg v in
+          let nodes = Pdg.Api.find_fun_variant_nodes pdg v in
           data_nodes_visible ff nodes
         with NoDataInfo -> all_logic_var_visible_term ff v
     in SlicingParameters.debug ~level:2 "[SlicingTransform.Visibility.fun_variant_visible] -> %s"
