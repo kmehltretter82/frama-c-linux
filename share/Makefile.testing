@@ -66,8 +66,12 @@ tests.info:
 ##########################################################################
 ## Command used to execute ptests (in order to generate dune test files)
 
-# Note: the public name of ptests.exe is frama-c-ptests
-ifeq ($(FRAMAC_PTESTS),"")
+# Note:
+# - in the Frama-C repository:
+#   ptests is in the project, so this variable is used to tell where is ptests.
+# - in a plug-in:
+#   ptests is installed and its public name is frama-c-ptests
+ifeq ($(FRAMAC_PTESTS),)
 
 # PTESTS is external
 PTESTS=frama-c-ptests
@@ -92,8 +96,12 @@ ptests-help:
 ## Command used to execute wtests, the wrapper that can be used during
 ## dune testing (c.f. frama-c-ptests)
 
-# Note: the public name of wtests.exe is frama-c-wtests
-ifeq ($(FRAMAC_WTESTS),"")
+# Note:
+# - in the Frama-C repository:
+#   wtests is in the project, so this variable is used to tell where is wtests.
+# - in a plug-in:
+#   wtests is installed and its public name is frama-c-wtests
+ifeq ($(FRAMAC_WTESTS),)
 
 # WTESTS is external to Frama-C
 WTESTS=frama-c-wtests
