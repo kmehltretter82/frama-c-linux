@@ -1230,6 +1230,8 @@ let basic_command_string command =
 
 let pp_list fmt l = List.iter (Format.fprintf fmt " %S") l
 module Fmt = struct
+  let framac_plugin fmt s =
+    Format.fprintf fmt "frama-c-%s.core" s
   let plugin_as_package fmt s =
     let base =
       if String.contains s '.' then
@@ -1239,7 +1241,7 @@ module Fmt = struct
     Format.fprintf fmt "frama-c-%s" base
   let quote pr fmt s = Format.fprintf fmt "%S" (Format.asprintf "%a" pr s)
   let list pr fmt l = List.iter (fun s -> Format.fprintf fmt " %a" pr s) l
-  let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a.core}" pr s
+  let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a}" pr s
   let package_as_deps pr fmt s = Format.fprintf fmt "(package %a)" pr s
 end
 
@@ -1424,7 +1426,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       pp_list (List.map (Filename.concat wtest.oracle_dir) command.log_files)
       pp_command_deps command
       (* enabled_if: *)
-      Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
+      Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
       (* action: *)
       !wrapper_cmd
       wrapper_basename
@@ -1463,7 +1465,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       (* deps: *)
       pp_command_deps command
       (* enabled_if: *)
-      Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
+      Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
       (* action: *)
       cmderrlog
       cmdreslog
@@ -1485,7 +1487,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
         (* deps: *)
         fin
         (* enabled_if: *)
-        Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
+        Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
         (* action: *)
         fout cmd
   in
@@ -1503,7 +1505,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
         (* alias: *)
         (ptests_alias ~env)
         (* enabled_if: *)
-        Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
+        Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
         (* action: *)
         (SubDir.make_file (SubDir.oracle_dir ~env) log)
         log
@@ -1522,7 +1524,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (* deps: *)
     pp_command_deps command
     (* enabled_if: *)
-    Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
+    Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
     (* action: *)
     accepted_exit_code
     command_string
@@ -1541,7 +1543,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (* deps: *)
     pp_command_deps command (* to get an updated build even in case of using the result *)
     (* enabled_if: *)
-    Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
+    Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
     (* action: *)
     ("echo '" ^ show_cmd wtest.cmd ^"'");
 
@@ -1556,7 +1558,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (* alias: *)
     diff_alias
     (* enabled_if: *)
-    Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
+    Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
     (* action: *)
     wtest.oracle_out
     reslog;
@@ -1569,7 +1571,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (* alias: *)
     diff_alias
     (* enabled_if: *)
-    Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
+    Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
     (* action: *)
     wtest.oracle_err
     errlog;
@@ -1580,7 +1582,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
      )@."
     (ptests_alias ~env)
     diff_alias
-    Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps command.deps.load_plugin)
+    Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
   ;
   let oracle_subdir = SubDir.oracle_subdir ~env command.directory in
   oracle_target oracle_fmt oracle_subdir (Filename.basename (oracle_prefix ^ ".err.oracle"));
@@ -1708,7 +1710,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
             pp_list wtest.log
             pp_list wtest.bin
             (* enabled_if: *)
-            Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps cmd.deps.load_plugin)
+            Fmt.(list (var_libavailable framac_plugin)) (list_of_deps cmd.deps.load_plugin)
             (* action: *)
             !wrapper_cmd
             wrapper_basename
@@ -1741,7 +1743,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
             pp_list wtest.log
             pp_list wtest.bin
             (* enabled_if: *)
-            Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps cmd.deps.load_plugin)
+            Fmt.(list (var_libavailable framac_plugin)) (list_of_deps cmd.deps.load_plugin)
             (* action: *)
             wtest.cmd
         end;
@@ -1762,7 +1764,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
           (* deps: *)
           pp_command_deps cmd (* to get an updated build even in case of using the result *)
           (* enabled_if: *)
-          Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps cmd.deps.load_plugin)
+          Fmt.(list (var_libavailable framac_plugin)) (list_of_deps cmd.deps.load_plugin)
           (* action: *)
           ("echo '" ^ show_cmd wtest.cmd ^"'");
         ;
@@ -1778,7 +1780,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
               (* alias: *)
               (ptests_alias ~env)
               (* enabled_if: *)
-              Fmt.(list (var_libavailable plugin_as_package )) (list_of_deps cmd.deps.load_plugin)
+              Fmt.(list (var_libavailable framac_plugin)) (list_of_deps cmd.deps.load_plugin)
               (* action: *)
               (SubDir.make_file (SubDir.oracle_dir ~env) log)
               log
