@@ -24,7 +24,7 @@
  (alias frama-c-configure)
  (deps (universe))
  (action (progn
-          (echo "Pdg-Types:" %{lib-available:frama-c-pdg-types.core} "\n")
+          (echo "Pdg-Types:" %{lib-available:frama-c-pdg.types.core} "\n")
   )
   )
 )
@@ -32,9 +32,9 @@
 ( library
  (name Pdg_types)
   (optional)
-  (public_name frama-c-pdg-types.core)
+  (public_name frama-c-pdg.types.core)
   (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel)
 )
 
-(plugin (optional) (name pdg-types) (libraries frama-c-pdg-types.core) (site (frama-c plugins)))
+(plugin (optional) (name pdg-types) (libraries frama-c-pdg.types.core) (site (frama-c plugins)))
