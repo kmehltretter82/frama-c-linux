@@ -40,7 +40,10 @@ ifeq ($(RELEASE),yes)
 DUNE_BUILD_OPTS+=--release
 endif
 
-DUNE_DISPLAY?=progress # Dune default, see '--display' dune option
+# DUNE_DISPLAY: chose Dune build verbosity (see '--display' dune option)
+# Default: progress (same as dune default)
+# Recommend for tests: short
+DUNE_DISPLAY?=progress
 DUNE_BUILD_OPTS+=--display $(DUNE_DISPLAY)
 
 ###################
