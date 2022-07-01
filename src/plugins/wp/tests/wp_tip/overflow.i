@@ -3,7 +3,7 @@
 */
 
 /* run.config_qualif
-   DEPS: @WP_SESSION@/script/*
+   DEPS: @WP_SESSION@/script/lemma_*.json
    OPT: -wp-prover script,alt-ergo -wp-timeout 1 @USING_WP_SESSION@
 */
 
