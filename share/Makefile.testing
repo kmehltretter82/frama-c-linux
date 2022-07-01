@@ -36,6 +36,8 @@ PTEST_OPTS?=
 PTEST_DIRS?=$(PTEST_ALL_DIRS)
 # Additional dependencies to build before testing
 PTEST_DEPS?=
+# Indicate whether we use global WP cache
+PTEST_USE_WP_CACHE?=no
 
 ############
 # Default values necessary for make -f <this-makefile>
@@ -66,6 +68,7 @@ tests.info:
 	echo "PTEST_DIRS='$(PTEST_DIRS)'"
 	echo "PTEST_OPTS='$(PTEST_OPTS)'"
 	echo "PTEST_DEPS='$(PTEST_DEPS)'"
+	echo "PTEST_USE_WP_CACHE='$(PTEST_USE_WP_CACHE)'"
 	echo "PTEST_ALIASES='$(PTEST_ALIASES)'"
 
 ##########################################################################
@@ -153,29 +156,36 @@ run-ptests.replay: $(PTEST_DEPS) $(FRAMAC_PTEST)
 
 # Run tests of for all configurations (and build all dune files)
 .PHONY: run-tests
+ifeq ($(PTEST_USE_WP_CACHE),yes) # Set WP cache only if needed
 run-tests: FRAMAC_WP_CACHE=offline
+endif
 run-tests: run-ptests
 	dune build $(PTEST_ALIASES)
 
 # Replay tests of for all configurations (requires  all dune files)
 .PHONY: test.replay
+ifeq ($(PTEST_USE_WP_CACHE),yes) # Set WP cache only if needed
 tests.replay: FRAMAC_WP_CACHE=offline
+endif
 tests.replay: $(PTEST_DEPS)
 	dune build $(PTEST_ALIASES)
 
-# Update cache entries of for all configurations (requires all dune files)
+# Update WP cache entries for all configurations (requires all dune files)
+ifeq ($(PTEST_USE_WP_CACHE),yes) # Only visible when ptests use WP cache
 .PHONY: tests.update-wp-cache
 tests.update-wp-cache: FRAMAC_WP_CACHE=update
 tests.update-wp-cache: $(PTEST_DEPS)
 	dune build $(PTEST_ALIASES)
+endif
 
 .PHONY: tests
+ifeq ($(PTEST_USE_WP_CACHE),yes)
+
 ifneq ($(FRAMAC_WP_CACHEDIR),)
 tests: run-tests
 	echo "Number of *.res.log files:"
 	find $(addprefix _build/default/,$(PTEST_DIRS)) -name \*.res.log \
         | $(GREP) -c "^"
-
 else
 tests: run-tests
 	@echo "Warning: cannot run some tests related to WP plugin since FRAMAC_WP_CACHEDIR variable is undefined."
@@ -183,7 +193,14 @@ tests: run-tests
 	@echo "> cd <DIR>"
 	@echo "> git clone git@git.frama-c.com:frama-c/wp-cache.git"
 	@echo "> FRAMAC_WP_CACHEDIR=<DIR>/wp-cache make tests"
-endif
+endif # FRAMAC_WP_CACHEDIR
+
+else
+tests: run-tests
+	echo "Number of *.res.log files:"
+	find $(addprefix _build/default/,$(PTEST_DIRS)) -name \*.res.log \
+        | $(GREP) -c "^"
+endif # PTEST_USE_WP_CACHE
 
 .PHONY: count-tests
 count-tests:
