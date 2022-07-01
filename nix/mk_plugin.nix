@@ -112,7 +112,7 @@ stdenv.mkDerivation {
   '';
 
   installFlags = [
-    "FRAMAC_INSTALLDIR=$(out)"
+    "INSTALLDIR=$(out)"
   ];
 
   postInstall = if install-opam then ''
