@@ -3957,11 +3957,11 @@ let find_sizeof t f =
     | Error (msg, t') -> raise (SizeOfError(msg, t'))
   with Not_found ->
   try
-    let size = f () in
-    TypSize.add t (Size size) ;
+    let t', size = f () in
+    TypSize.add t' (Size size) ;
     size
-  with SizeOfError(t',msg) as e ->
-    TypSize.add t (Error (t', msg)) ;
+  with SizeOfError(msg, t') as e ->
+    TypSize.add t' (Error (msg, t')) ;
     raise e
 
 let selfTypSize = TypSize.self
@@ -4378,7 +4378,7 @@ and bitsSizeOf t =
       (SizeOfError
          (Format.sprintf "abstract type '%s'" (compFullName comp), t))
   | TComp ({cfields=Some[]}, _) when acceptEmptyCompinfo() ->
-    find_sizeof t (fun () -> 0)
+    find_sizeof t (fun () -> t,0)
   | TComp ({cfields=Some[]} as comp,_) ->
     find_sizeof t
       (fun () ->
@@ -4405,9 +4405,9 @@ and bitsSizeOf t =
          then
            (* On MSVC if we have just a zero-width bitfields then the length
             * is 32 and is not padded  *)
-           32
+           t, 32
          else
-           addTrailing lastoff.oaFirstFree (8 * bytesAlignOf t))
+           t, addTrailing lastoff.oaFirstFree (8 * bytesAlignOf t))
 
   | TComp (comp, _) -> (* Union *)
     find_sizeof t
@@ -4428,14 +4428,16 @@ and bitsSizeOf t =
          (* Note: we treat None above *)
          let max = List.fold_left fold 0 (Option.get comp.cfields) in
          (* Add trailing by simulating adding an extra field *)
-         addTrailing max (8 * bytesAlignOf t))
+         t, addTrailing max (8 * bytesAlignOf t))
 
-  | TArray(bt, Some len, _) ->
+  | TArray(bt, Some len, attrs) ->
     find_sizeof t
       (fun () ->
          begin
-           match (constFold true len).enode with
-             Const(CInt64(l,_,_)) ->
+           let v = constFold true len in
+           let norm_typ = TArray(bt, Some v, attrs) in
+           match v with
+             { enode = Const(CInt64(l,_,_)) } ->
              let sz = Integer.mul (Integer.of_int (bitsSizeOf bt)) l in
              let sz' =
                match Integer.to_int_opt sz with
@@ -4444,11 +4446,12 @@ and bitsSizeOf t =
                  raise
                    (SizeOfError
                       ("Array is so long that its size can't be "
-                       ^"represented with an OCaml int.", t))
+                       ^"represented with an OCaml int.", norm_typ))
 
              in
-             sz' (*WAS: addTrailing sz' (8 * bytesAlignOf t)*)
-           | _ -> raise (SizeOfError ("Array with non-constant length.", t))
+             (norm_typ, sz') (*WAS: addTrailing sz' (8 * bytesAlignOf t)*)
+           | _ ->
+             raise (SizeOfError ("Array with non-constant length.", norm_typ))
          end)
   | TVoid _ ->
     if theMachine.theMachine.sizeof_void >= 0 then
