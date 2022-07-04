@@ -1250,6 +1250,7 @@ let get_home_env () =
   try
     Unix.getenv "HOME"
   with Not_found -> "~"
+let deps_regexp = Str.regexp "^\\([^:]*\\):\\(.*\\)"
 
 let pp_list_deps fmt l =
   List.iter (fun s ->
@@ -1260,8 +1261,11 @@ let pp_list_deps fmt l =
       in
       if String.contains s '*' then
         Format.fprintf fmt " (glob_files %S)" s
-      else
-        Format.fprintf fmt " %S" s) l
+      else match str_string_match2 deps_regexp s 0 with
+        | None -> Format.fprintf fmt " %S" s
+        | Some (kind,deps) ->
+          (* kind={env_var,source_tree,glob_files,...} *)
+          Format.fprintf fmt " (%s %S)" kind deps) l
 
 let pp_command_deps fmt command =
   Format.fprintf fmt "%S %a (package frama-c) %a"
