@@ -18,6 +18,7 @@
 Open Source Release <next-release>
 ##################################
 
+o!  Pdg       [2022-07-01] Removed from Db. Use proper Pdg API instead.
 -!  Kernel    [2022-06-06] Remove journalisation.
 
 ####################################
