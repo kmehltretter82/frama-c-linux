@@ -184,9 +184,8 @@ module Make (Abstract: Abstractions.Eva) = struct
       in
       call_result
     | Some (states, i) ->
-      let stack = Eva_utils.call_stack () in
       let cvalue = Abstract.Dom.get_cvalue_or_top init_state in
-      Db.Value.Call_Type_Value_Callbacks.apply (`Memexec, cvalue, stack);
+      Cvalue_callbacks.apply_call_hooks call.callstack call.kf `Memexec cvalue;
       (* Evaluate the preconditions of kf, to update the statuses
          at this call. *)
       let spec = Annotations.funspec call.kf in
@@ -202,7 +201,8 @@ module Make (Abstract: Abstractions.Eva) = struct
         Self.debug ~dkey
           "calling Record_Value_New callbacks on saved previous result";
       end;
-      Db.Value.Record_Value_Callbacks_New.apply (stack, Value_types.Reuse i);
+      let reuse = Cvalue_callbacks.Reuse i in
+      Cvalue_callbacks.apply_call_results_hooks call.callstack call.kf reuse;
       (* call can be cached since it was cached once *)
       Transfer.{states; cacheable = Cacheable; builtin=false}
 
@@ -234,11 +234,10 @@ module Make (Abstract: Abstractions.Eva) = struct
   let compute_using_spec_or_body target kinstr call state =
     let global = match kinstr with Kglobal -> true | _ -> false in
     let pp = not global && Parameters.ValShowProgress.get () in
-    let call_stack = Eva_utils.call_stack () in
     if pp then
       Self.feedback
         "@[computing for function %a.@\nCalled from %a.@]"
-        Value_types.Callstack.pretty_short call_stack
+        Value_types.Callstack.pretty_short call.callstack
         Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc kinstr);
     let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
     let compute, kind =
@@ -248,7 +247,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       | `Spec funspec ->
         compute_using_spec funspec, `Spec funspec
     in
-    Db.Value.Call_Type_Value_Callbacks.apply (kind, cvalue_state, call_stack);
+    Cvalue_callbacks.apply_call_hooks call.callstack call.kf kind cvalue_state;
     let resulting_states, cacheable = compute kinstr call state in
     if pp then
       Self.feedback
@@ -293,8 +292,8 @@ module Make (Abstract: Abstractions.Eva) = struct
     let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
     match final_state with
     | `Bottom ->
-      let cs = Eva_utils.call_stack () in
-      Db.Value.Call_Type_Value_Callbacks.apply (`Spec spec, cvalue_state, cs);
+      let kind = `Spec spec in
+      Cvalue_callbacks.apply_call_hooks call.callstack call.kf kind cvalue_state;
       let cacheable = Eval.Cacheable in
       Transfer.{states; cacheable; builtin=true}
     | `Value final_state ->

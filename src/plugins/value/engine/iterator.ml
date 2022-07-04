@@ -448,8 +448,8 @@ module Make_Dataflow
     (* TODO: apply on all domains. *)
     let states = Partitioning.contents f in
     let cvalue_states = gather_cvalues states in
-    Db.Value.Compute_Statement_Callbacks.apply
-      (stmt, Eva_utils.call_stack (), cvalue_states)
+    let callstack = Eva_utils.call_stack () in
+    Cvalue_callbacks.apply_statement_hooks callstack stmt cvalue_states
 
   let update_vertex ?(widening : bool = false) (v : vertex)
       (sources : ('branch * flow) list) : bool =
@@ -723,21 +723,12 @@ module Make_Dataflow
       Db.Value.Record_Value_Callbacks.apply
         (callstack, merged_pre_cvalues)
     end;
-    if not (Db.Value.Record_Value_Callbacks_New.is_empty ())
-    then begin
-      if Parameters.ValShowProgress.get () then
-        Self.debug ~dkey:dkey_callbacks
-          "now calling Record_Value_New callbacks";
-      if Parameters.MemExecAll.get () then
-        Db.Value.Record_Value_Callbacks_New.apply
-          (callstack,
-           Value_types.NormalStore ((merged_pre_cvalues, merged_post_cvalues),
-                                    (Mem_exec.new_counter ())))
-      else
-        Db.Value.Record_Value_Callbacks_New.apply
-          (callstack,
-           Value_types.Normal (merged_pre_cvalues, merged_post_cvalues))
-    end;
+    let states =
+      Cvalue_callbacks.{ before_stmts = merged_pre_cvalues;
+                         after_stmts = merged_post_cvalues }
+    in
+    let results = Cvalue_callbacks.Store (states, Mem_exec.new_counter ()) in
+    Cvalue_callbacks.apply_call_results_hooks callstack kf results;
     if not (Db.Value.Record_Value_After_Callbacks.is_empty ())
     then begin
       if Parameters.ValShowProgress.get () then

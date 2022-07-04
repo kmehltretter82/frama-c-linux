@@ -731,9 +731,8 @@ module Make (Abstract: Abstractions.Eva) = struct
     let cvalue_state = Domain.get_cvalue_or_top state in
     Db.Value.Call_Value_Callbacks.apply (cvalue_state, stack_with_call);
     Db.Value.merge_initial_state (Eva_utils.call_stack ()) cvalue_state;
-    Db.Value.Call_Type_Value_Callbacks.apply
-      (`Builtin None, cvalue_state, stack_with_call)
-
+    let kind = `Builtin None in
+    Cvalue_callbacks.apply_call_hooks stack_with_call kf kind cvalue_state
 
   (* --------------------- Process the call statement ---------------------- *)
 
