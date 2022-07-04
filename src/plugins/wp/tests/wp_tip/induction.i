@@ -3,11 +3,11 @@
 */
 
 /* run.config_qualif
-   DEPS: @WP_SESSION@/script/lemma_*.json
+   DEPS: @PTEST_DEPS@ @WP_SESSION@/script/lemma_*.json
    OPT: -wp-prover script,alt-ergo -wp-timeout 1 @USING_WP_SESSION@
-   DEPS: @WP_SESSION@/script/lemma_*.json
+   DEPS: @PTEST_DEPS@ @WP_SESSION@/script/lemma_*.json
    OPT: -wp-prover script,alt-ergo -wp-timeout 1 @USING_WP_SESSION@
-   DEPS: @WP_SESSION@/script/lemma_*.json
+   DEPS: @PTEST_DEPS@ @WP_SESSION@/script/lemma_*.json
    OPT: -wp-prover script,alt-ergo -wp-timeout 1 @USING_WP_SESSION@
 */
 
