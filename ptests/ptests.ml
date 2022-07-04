@@ -765,7 +765,7 @@ end = struct
 
   let make_custom_opts =
     let space = Str.regexp " " in
-    fun ~file ~dir stdopts s ->
+    fun ~file:_ ~dir:_ stdopts s ->
       let rec aux opts s =
         try
           Scanf.sscanf s "%_[ ]%1[+#\\-]%_[ ]%S%_[ ]%s@\n"
@@ -777,10 +777,7 @@ end = struct
                | _ -> assert false (* format of scanned string disallow it *))
         with
         | Scanf.Scan_failure _ ->
-          if s <> "" then
-            Format.eprintf "%a: unknown STDOPT configuration string: %s@."
-              (SubDir.pp_file ~dir) file s;
-          opts
+          if s <> "" then s::opts else opts
         | End_of_file -> opts
       in
       (* NB: current settings does not allow to remove a multiple-argument
