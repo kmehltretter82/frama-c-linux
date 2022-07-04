@@ -48,10 +48,6 @@ val is_gui: bool
       @since frama-c-trunk not anymore a reference
 *)
 
-val ocaml_wflags: string
-(** Warning flags used when compiling Frama-C.
-    @since Chlorine-20180501 *)
-
 val datadirs: Filepath.Normalized.t list
 (** Directories where architecture independent files are in order of
     priority.

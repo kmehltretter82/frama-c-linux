@@ -53,8 +53,8 @@ let dump_to_json () =
     "is_gui", `Bool Fc_config.is_gui ;
     (* "lablgtk", `String Fc_config.lablgtk ;
      * "ocamlc", `String Fc_config.ocamlc ;
-     * "ocamlopt", `String Fc_config.ocamlopt ; *)
-    "ocaml_wflags", `String Fc_config.ocaml_wflags ;
+     * "ocamlopt", `String Fc_config.ocamlopt ;
+     * "ocaml_wflags", `String Fc_config.ocaml_wflags ; *)
     "datadir", `String (Fc_config.datadir:>string) ;
     "datadirs",
     list string (Filepath.Normalized.to_string_list Fc_config.datadirs) ;

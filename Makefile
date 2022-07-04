@@ -101,7 +101,6 @@ config.sed: VERSION share/Makefile.config share/Makefile.common Makefile configu
 	@echo "s|@VERSION_CODENAME@|$(VERSION_CODENAME)|" >> $@
 	@echo "s|@MAJOR_VERSION@|$(MAJOR_VERSION)|g" >> $@
 	@echo "s|@MINOR_VERSION@|$(MINOR_VERSION)|g" >> $@
-	@echo "s|@WARNINGS@|$(WARNINGS)|" >> $@
 	@echo "s|@FRAMAC_DEFAULT_CPP@|$(FRAMAC_DEFAULT_CPP)|" >> $@
 	@echo "s|@FRAMAC_DEFAULT_CPP_ARGS@|$(FRAMAC_DEFAULT_CPP_ARGS)|" >> $@
 	@echo "s|@FRAMAC_GNU_CPP@|$(FRAMAC_GNU_CPP)|" >> $@

@@ -32,7 +32,6 @@ let minor_version = @MINOR_VERSION@
 
 let is_gui = Frama_c_very_first.Gui_init.is_gui
 
-let ocaml_wflags = "@WARNINGS@"
 let datadirs = (List.map Filepath.Normalized.of_string Config_data.Sites.share)
 let datadir = List.hd (List.rev datadirs)
 
