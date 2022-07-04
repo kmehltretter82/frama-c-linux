@@ -94,45 +94,25 @@ MAJOR_VERSION=$(shell $(SED) -E 's/^([0-9]+)\..*/\1/' VERSION)
 MINOR_VERSION=$(shell $(SED) -E 's/^[0-9]+\.([0-9]+).*/\1/' VERSION)
 VERSION_CODENAME=$(shell $(CAT) VERSION_CODENAME)
 
+# File used by dune to build src/kernel_internals/runtime/fc_config.ml
 config.sed: VERSION share/Makefile.config share/Makefile.common Makefile configure.in
 	@echo "# generated file" > $@
-	@echo "s|@VERSION_CODENAME@|$(VERSION_CODENAME)|" >> $@
 	@echo "s|@VERSION@|$(VERSION)|" >> $@
-	@echo "s|@CURR_DATE@|$$(LC_ALL=C date)|" >> $@
-	@echo "s|@OCAMLC@|$(OCAMLC)|" >> $@
-	@echo "s|@OCAMLOPT@|$(OCAMLOPT)|" >> $@
+	@echo "s|@VERSION_CODENAME@|$(VERSION_CODENAME)|" >> $@
+	@echo "s|@MAJOR_VERSION@|$(MAJOR_VERSION)|g" >> $@
+	@echo "s|@MINOR_VERSION@|$(MINOR_VERSION)|g" >> $@
 	@echo "s|@WARNINGS@|$(WARNINGS)|" >> $@
-	@echo "s|@FRAMAC_DATADIR@|$(FRAMAC_DATADIR)|" >> $@
-	@echo "s|@FRAMAC_LIBDIR@|$(FRAMAC_LIBDIR)|" >> $@
-	@echo "s|@FRAMAC_ROOT_SRCDIR@|$(FRAMAC_ROOT_SRCDIR)|" >> $@
-	@echo "s|@FRAMAC_PLUGINDIR@|$(FRAMAC_PLUGINDIR)|" >> $@
 	@echo "s|@FRAMAC_DEFAULT_CPP@|$(FRAMAC_DEFAULT_CPP)|" >> $@
 	@echo "s|@FRAMAC_DEFAULT_CPP_ARGS@|$(FRAMAC_DEFAULT_CPP_ARGS)|" >> $@
 	@echo "s|@FRAMAC_GNU_CPP@|$(FRAMAC_GNU_CPP)|" >> $@
 	@echo "s|@DEFAULT_CPP_KEEP_COMMENTS@|$(DEFAULT_CPP_KEEP_COMMENTS)|" >> $@
 	@echo "s|@DEFAULT_CPP_SUPPORTED_ARCH_OPTS@|$(DEFAULT_CPP_SUPPORTED_ARCH_OPTS)|" >> $@
 	@echo "s|@OPTDOT@|$(OPTDOT)|" >> $@
-	@echo "s|@EXE@|$(EXE)|" >> $@
-	@echo "s/@SPLIT_ON_CHAR@/$(SPLIT_ON_CHAR)/g" >> $@
-	@echo "s/@STACK_FOLD@/$(STACK_FOLD)/g" >> $@
-	@echo "s/@NTH_OPT@/$(NTH_OPT)/g" >> $@
-	@echo "s/@FIND_OPT@/$(FIND_OPT)/g" >> $@
-	@echo "s/@ASSOC_OPT@/$(ASSOC_OPT)/g" >> $@
-	@echo "s/@ASSQ_OPT@/$(ASSQ_OPT)/g" >> $@
-	@echo "s/@HAS_YOJSON@/$(HAS_YOJSON)/g" >> $@
-	@echo "s|@MAJOR_VERSION@|$(MAJOR_VERSION)|g" >> $@
-	@echo "s|@MINOR_VERSION@|$(MINOR_VERSION)|g" >> $@
-	@echo "s/@DYNLINK_INIT@/$(DYNLINK_INIT)/g" >> $@
-	@echo "s/@FORMAT_STAG@/$(FORMAT_STAG)/g" >> $@
-	@echo "s/@FORMAT_STRING_OF_STAG@/$(FORMAT_STRING_OF_STAG)/g" >> $@
-	@echo "s/@FORMAT_STAG_OF_STRING@/$(FORMAT_STAG_OF_STRING)/g" >> $@
-	@echo "s/@FLOAT_MAX_FLOAT@/$(FLOAT_MAX_FLOAT)/g" >> $@
-	@echo "s/@FORMAT_PP_OPT@/$(FORMAT_PP_OPT)/g" >> $@
 
 clean:: purge-tests # to be done before a "dune" command
 	dune clean
 	dune clean --root ptests
-	rm -rf _build .merlin config.sed
+	rm -rf _build .merlin config.sed autom4te.cache
 
 ########################################################################
 # Makefile.config is rebuilt whenever configure.in is modified         #
