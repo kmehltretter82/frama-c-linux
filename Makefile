@@ -22,7 +22,6 @@
 
 # This file is the main makefile of Frama-C.
 
-FRAMAC_SRC=.
 MAKECONFIG_DIR=share
 
 include share/Makefile.common
