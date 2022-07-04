@@ -29,6 +29,22 @@
 include $(MAKECONFIG_DIR)/Makefile.config
 
 ##################
+# Make commands #
+##################
+
+define assert_defined
+ifndef $(1)
+$$(error Undefined variable $(1) please report.)
+endif
+endef
+
+######################
+# Required variables #
+######################
+
+$(eval $(call assert_defined,PLATFORM))
+
+##################
 # Flags          #
 ##################
 
@@ -99,21 +115,9 @@ GIT	= git
 ifeq ($(PLATFORM),MacOS)
 TAR     = gtar
 else
-# Unix, Cygwin
+# Unix, Cygwin, Win32
 TAR     = tar
 endif
-
-##################
-# Make commands #
-##################
-
-map=$(foreach a,$(2),$(call $(1),$(a)))
-
-define assert_defined
-ifndef $(1)
-$$(error Undefined variable $(1) please report.)
-endif
-endef
 
 ###########################
 # Command pretty printing #
