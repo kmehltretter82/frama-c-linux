@@ -86,7 +86,7 @@ module type S = sig
 end
 
 (* Builds a memory from a value abstraction. *)
-module Make_Memory (Value: Value) : sig
+module Make_Memory (Info: sig val name: string end) (Value: Value) : sig
   include Datatype.S_with_collections
   include S with type t := t
              and type value := Value.t

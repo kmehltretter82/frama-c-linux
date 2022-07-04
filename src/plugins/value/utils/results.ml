@@ -293,6 +293,26 @@ struct
     | Some extract ->
       convert (Response.map_join extract Cvalue.Model.join (get req))
 
+  let print_states ?filter req =
+    let state = Response.map_join (fun x -> x) A.Dom.join (get req) in
+    let print (type s)
+        (key: s Abstract.Domain.key)
+        (module Domain: Abstract_domain.S with type state = s)
+        (state: s) acc =
+      let name = Structure.Key_Domain.name key in
+      let state =
+        match filter with
+        | None -> state
+        | Some bases -> Domain.filter `Print bases state
+      in
+      let str = Format.asprintf "%a" Domain.pretty state in
+      (name, str) :: acc
+    in
+    let polymorphic_fold_fun = A.Dom.{ fold = print } in
+    match state with
+    | `Top | `Bottom -> []
+    | `Value state -> A.Dom.fold polymorphic_fold_fun state []
+
   (* Evaluation *)
 
   let eval_lval lval req =
@@ -486,6 +506,10 @@ let get_cvalue_model req =
   | Ok state -> state
   | Error Bottom -> Cvalue.Model.bottom
   | Error (Top | DisabledDomain) -> Cvalue.Model.top
+
+let print_states ?filter req =
+  let module E = Make () in
+  E.print_states ?filter req
 
 
 (* Depedencies *)

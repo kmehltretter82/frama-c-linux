@@ -701,7 +701,7 @@ module State = struct
         type t = state
         include Datatype.Serializable_undefined
 
-        let name = "Octagons.State"
+        let name = "octagon"
         let structural_descr =
           Structural_descr.t_record
             [| Octagons.packed_descr;
@@ -1275,7 +1275,7 @@ module Domain = struct
       in
       Base.Hptset.fold aux bases Base.SetLattice.empty
 
-  let filter _kf _kind bases state =
+  let filter _kind bases state =
     if intraprocedural ()
     then state
     else

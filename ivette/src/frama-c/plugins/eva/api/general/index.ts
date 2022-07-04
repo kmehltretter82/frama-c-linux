@@ -580,4 +580,30 @@ export const functionStats: State.Array<
   functionStatsData
   > = functionStats_internal;
 
+const getStates_internal: Server.GetRequest<
+  [ marker, boolean ],
+  [ string, string, string ][]
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.getStates',
+  input:  Json.jTry(
+            Json.jPair(
+              jMarkerSafe,
+              Json.jFail(Json.jBoolean,'Boolean expected'),
+            )),
+  output: Json.jList(
+            Json.jTry(
+              Json.jTriple(
+                Json.jFail(Json.jString,'String expected'),
+                Json.jFail(Json.jString,'String expected'),
+                Json.jFail(Json.jString,'String expected'),
+              ))),
+  signals: [],
+};
+/** Get the domain states about the given marker */
+export const getStates: Server.GetRequest<
+  [ marker, boolean ],
+  [ string, string, string ][]
+  >= getStates_internal;
+
 /* ------------------------------------- */

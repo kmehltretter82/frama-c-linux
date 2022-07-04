@@ -35,3 +35,6 @@ clean:
 		*.haux  *.hbbl *.htoc \
                 *.cb *.cm? *.bbl *.blg *.idx *.ind *.ilg \
 		transf trans.ml pp.ml pp
+
+super-clean: clean
+	rm -f $(MAIN).pdf

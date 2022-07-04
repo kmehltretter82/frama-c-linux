@@ -476,6 +476,8 @@ module Zone = struct
       Base.SetLattice.mem b top_param
     | Map m -> M.mem b m
 
+  let get_bases = get_keys
+
   let shape x = x
 
   let fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both ~join ~empty =
