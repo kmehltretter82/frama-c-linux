@@ -154,52 +154,13 @@ PRINT_HEVEA	=$(PRINT) 'Hevea       '#
 # Tests #
 #########
 
-
 #################
 # Documentation #
 #################
 
-NATIVE_OCAMLDOC:=$(shell ocamlfind ocamldoc -v | grep -o ocamldoc.opt)
-
-ifeq ("$(NATIVE_OCAMLDOC)","ocamldoc.opt")
-DOC_PLUGIN=$(DOC_DIR)/docgen.cmxs
-else
-DOC_PLUGIN=$(DOC_DIR)/docgen.cmo
-endif
-
 ##########################
 # Plugin File Generation #
 ##########################
-
-#take the name of the plugin as argument $(1)
-define include_generic_plugin_Makefile
-$(call assert_defined,PLUGIN_DIR)
-$(PLUGIN_DIR)/.Makefile.plugin.generated: $(MAKECONFIG_DIR)/Makefile.plugin.template
-	$(PRINT_MAKING)	$$@
-	$(SED) -e "s/@PLUGIN_NAME@/$(1)/g" $$< > $$@
-
-# We still clean the old Makefile.plugin.generated (without the dot) temporarily
-clean::
-	rm -rf $(PLUGIN_DIR)/.Makefile.plugin.generated
-	rm -rf $(PLUGIN_DIR)/Makefile.plugin.generated
-
-#We always define this variable because it can't wait the generation
-#of the Makefile.plugin.generated since the targets of rules defined in the
-#Makefile of the plugins could use this variable
-$(1)_DIR:=$(PLUGIN_DIR)
-
-sinclude $(PLUGIN_DIR)/.Makefile.plugin.generated
-
-endef
-
-%.check_mli_exists: %.mli
-	touch $@
-
-.PHONY:common_force_rule
-
-%.check_mli_exists: common_force_rule
-	$(error "The file '$*.mli' must be provided. The simplest workaround is 'touch $*.mli')
-
 
 ##########################################################################
 # Local Variables:
