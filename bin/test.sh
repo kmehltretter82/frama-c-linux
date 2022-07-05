@@ -38,7 +38,6 @@ FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
 function Usage
 {
-    SetEnv
     echo "USAGE"
     echo ""
     echo "${THIS_SCRIPT} [OPTIONS|TESTS]..."
@@ -136,14 +135,14 @@ function SetEnv
 function CloneCache
 {
     if [ ! -d "$FRAMAC_WP_CACHEDIR" ]; then
-        Head "Cloning WP cache..."
+        Head "Cloning WP cache (from $FRAMAC_WP_CACHE_GIT to $FRAMAC_WP_CACHEDIR)..."
         Cmd git clone $FRAMAC_WP_CACHE_GIT $FRAMAC_WP_CACHEDIR
     fi
 }
 
 function PullCache
 {
-    Head "Pull WP cache..."
+    Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
     Run git -C $FRAMAC_WP_CACHEDIR pull --rebase
 }
 
@@ -282,6 +281,7 @@ function CountTests
 # ---  Command Line Processing
 # --------------------------------------------------------------------------
 
+SetEnv
 while [ "$1" != "" ]
 do
     case "$1" in
@@ -327,7 +327,5 @@ do
     esac
     shift
 done
-
-SetEnv
 RunTests $TESTS
 CountTests
