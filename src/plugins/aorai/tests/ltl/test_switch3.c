@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -aorai-ltl @PTEST_DIR@/@PTEST_NAME@.ltl -aorai-acceptance -aorai-test-id @PTEST_NUMBER@@PTEST_CONFIG@ @PROVE_OPTIONS@
+   STDOPT: -aorai-ltl @PTEST_DIR@/@PTEST_NAME@.ltl -aorai-acceptance
 */
 
 /* Calcul de la longueur cumulee des chaines de caracteres prises en parametre */

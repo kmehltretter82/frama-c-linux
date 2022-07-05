@@ -1,6 +1,6 @@
 /* run.config*
-   OPT: -aorai-buchi @PTEST_DIR@/@PTEST_NAME@.promela -aorai-acceptance -aorai-test-id @PTEST_NUMBER@@PTEST_CONFIG@ @PROVE_OPTIONS@
-   OPT: -aorai-buchi %{dep:@PTEST_DIR@/test_recursion3.promela} -aorai-acceptance -aorai-test-id @PTEST_NUMBER@@PTEST_CONFIG@ @PROVE_OPTIONS@
+   STDOPT: -aorai-buchi @PTEST_DIR@/@PTEST_NAME@.promela -aorai-acceptance
+   STDOPT: -aorai-buchi %{dep:@PTEST_DIR@/test_recursion3.promela} -aorai-acceptance
 */
 
 /* Calcul de la longueur cumulee des chaines de caracteres prises en parametre */

@@ -1,6 +1,6 @@
 /* run.config*
-   OPT: -aorai-automata %{dep:@PTEST_DIR@/@PTEST_NAME@.ya} -aorai-test-id @PTEST_NUMBER@@PTEST_CONFIG@ @PROVE_OPTIONS@
-   OPT: -aorai-automata %{dep:@PTEST_DIR@/@PTEST_NAME@-2.ya} -aorai-test-id @PTEST_NUMBER@@PTEST_CONFIG@ @PROVE_OPTIONS@
+   STDOPT: -aorai-automata %{dep:@PTEST_DIR@/@PTEST_NAME@.ya}
+   STDOPT: -aorai-automata %{dep:@PTEST_DIR@/@PTEST_NAME@-2.ya}
  */
 
 void a(void) {}
