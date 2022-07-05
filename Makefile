@@ -26,12 +26,6 @@ MAKECONFIG_DIR=share
 
 include share/Makefile.common
 
-#Check share/Makefile.config available
-ifndef FRAMAC_ROOT_SRCDIR
-$(error \
-  "You should run ./configure first (or autoconf if there is no configure)")
-endif
-
 RELEASE?=no
 ifeq ($(RELEASE),yes)
 DUNE_BUILD_OPTS=--release
