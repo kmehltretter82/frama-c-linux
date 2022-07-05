@@ -22,6 +22,9 @@
 
 [@@@ api_start]
 
+(** Register actions to performed during the Eva analysis,
+    with access to the states of the cvalue domain. *)
+
 type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
 type state = Cvalue.Model.t
 
@@ -31,6 +34,10 @@ type analysis_kind =
   | `Def
   | `Memexec ]
 
+(** Registers a function to be applied at the beginning of the analysis of each
+    function call. Arguments of the callback are the callstack of the call,
+    the function called, the kind of analysis performed by Eva for this call,
+    and the cvalue state at the beginning of the call. *)
 val register_call_hook:
   (callstack -> Cil_types.kernel_function -> analysis_kind -> state -> unit)
   -> unit
@@ -39,10 +46,18 @@ val register_call_hook:
 type state_by_stmt = (state Cil_datatype.Stmt.Hashtbl.t) Lazy.t
 type results = { before_stmts: state_by_stmt; after_stmts: state_by_stmt }
 
+(** Results of a function call. *)
 type call_results =
   | Store of results * int
+  (** Cvalue states before and after each statement of the given function,
+      plus a unique integer id for the call. *)
   | Reuse of int
+  (** The results are the same as a previous call with the given integer id,
+      previously recorded with the [Store] constructor. *)
 
+(** Registers a function to be applied at the end of the analysis of each
+    function call. Arguments of the callback are the callstack of the call,
+    the function called and the cvalue states resulting from its analysis. *)
 val register_call_results_hook:
   (callstack -> Cil_types.kernel_function -> call_results -> unit)
   -> unit
