@@ -142,6 +142,7 @@ function CloneCache
 
 function PullCache
 {
+    CloneCache
     Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
     Run git -C $FRAMAC_WP_CACHEDIR pull --rebase
 }
