@@ -58,7 +58,6 @@ function Usage
     echo ""
     echo "  -r|--clean          clean (remove all) test results (includes -p)"
     echo "  -p|--ptests         prepare (all) dune files and pull cache"
-    echo "  -n|--count          print number of (all) tests"
     echo "  -l|--logs           print output of tests (single file, no diff)"
     echo "  -u|--update         run tests and update wp-cache"
     echo "  -v|--verbose        print executed commands"
