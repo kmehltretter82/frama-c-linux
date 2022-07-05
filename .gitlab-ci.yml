@@ -21,7 +21,7 @@ default:
 
 variables:
   DEFAULT: "feature/bobot/jbuilder"
-  OCAML: "4_12"
+  OCAML: "4_11"
 
 ################################################################################
 ### PREPARE
@@ -268,20 +268,14 @@ internal_nightly:
 
 # OCaml versions
 
-.build_template: &ocaml_template
+ocaml-versions:
   stage: compatibility
   script:
     - ./nix/build-proxy.sh default-config-tests
-
-# ocaml-4.11:
-#   variables:
-#     OCAML: "4_11"
-#   <<: *ocaml_template
-
-# ocaml-4.13:
-#   variables:
-#     OCAML: "4_13"
-#   <<: *ocaml_template
+  parallel:
+    matrix:
+      - OCAML: ["4_08", "4_13"]
+  when: manual
 
 # Opam pin
 
