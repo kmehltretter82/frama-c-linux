@@ -199,16 +199,16 @@ wp-tests:
 
 # API documentation
 
-.build_template: &api-doc
+.build_template: &api_doc_template
   stage: distrib
   script:
     - nix-build -o api nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.api-doc
 
 api-doc-default: # Check that we successfully build but no artifact
-  <<: *api-doc
+  <<: *api_doc_template
 
 api-doc-artifact: # Note: the Nix store avoids rebuilding
-  <<: *api-doc
+  <<: *api_doc_template
   artifacts:
     paths:
       - api/frama-c-api.tar.gz
@@ -216,7 +216,7 @@ api-doc-artifact: # Note: the Nix store avoids rebuilding
   when: manual
 
 api-doc-scheduled: # Keep artifact for master branch each night
-  <<: *api-doc
+  <<: *api_doc_template
   artifacts:
     paths:
       - api/frama-c-api.tar.gz
@@ -259,13 +259,13 @@ lint:
 
 # Manuals
 
-.build_template: &manuals
+.build_template: &manuals_template
   stage: distrib
   script:
     - nix-build -o manuals nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.manuals
 
 manuals:
-  <<: *manuals
+  <<: *manuals_template
   when: manual
   artifacts:
     paths:
@@ -294,7 +294,7 @@ internal_nightly:
 
 # OCaml versions
 
-.build_template: &ocaml
+.build_template: &ocaml_template
   stage: compatibility
   script:
     - ./nix/build-proxy.sh default-config-tests
@@ -302,16 +302,16 @@ internal_nightly:
 # ocaml-4.11:
 #   variables:
 #     OCAML: "4_11"
-#   <<: *ocaml
+#   <<: *ocaml_template
 
 # ocaml-4.13:
 #   variables:
 #     OCAML: "4_13"
-#   <<: *ocaml
+#   <<: *ocaml_template
 
 # Opam pin
 
-.build_template: &opam
+.build_template: &opam_template
   stage: compatibility
   image: 'ocaml/opam:ubuntu-20.04-ocaml-4.08'
   script: >
@@ -323,11 +323,11 @@ internal_nightly:
     - docker
 
 opam-pin:
-  <<: *opam
+  <<: *opam_template
   when: manual
 
 opam-pin-nightly:
-  <<: *opam
+  <<: *opam_template
   only:
     - schedules
 
