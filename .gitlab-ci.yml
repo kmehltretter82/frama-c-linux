@@ -309,6 +309,30 @@ internal_nightly:
 #     OCAML: "4_13"
 #   <<: *ocaml
 
+# Opam pin
+
+.build_template: &opam
+  stage: compatibility
+  image: 'ocaml/opam:ubuntu-20.04-ocaml-4.08'
+  script: >
+    true
+    && opam pin . -n
+    && opam depext frama-c --with-test
+    && opam install --jobs 2 frama-c --with-test
+  tags:
+    - docker
+
+opam-pin:
+  <<: *opam
+  when: manual
+
+opam-pin-nightly:
+  <<: *opam
+  only:
+    - schedules
+
+# Distrib
+
 src-distrib-tests:
   stage: compatibility
   script:
