@@ -102,8 +102,6 @@ e-acsl-tests:
   script:
     - ./nix/build-proxy.sh e-acsl-tests
 
-# EVA
-
 .build_template: &eva_template
   stage: tests
   script:
@@ -114,35 +112,11 @@ eva-default-tests:
     CONFIG: "default"
   <<: *eva_template
 
-eva-bitwise-tests:
-  variables:
-    CONFIG: "bitwise"
+eva-domains:
   <<: *eva_template
-
-eva-equality-tests:
-  variables:
-    CONFIG: "equality"
-  <<: *eva_template
-
-eva-gauges-tests:
-  variables:
-    CONFIG: "gauges"
-  <<: *eva_template
-
-eva-multidim-tests:
-  variables:
-    CONFIG: "multidim"
-  <<: *eva_template
-
-eva-octagon-tests:
-  variables:
-    CONFIG: "octagon"
-  <<: *eva_template
-
-eva-symblocs-tests:
-  variables:
-    CONFIG: "symblocs"
-  <<: *eva_template
+  parallel:
+    matrix:
+      - CONFIG: ["bitwise","equality","gauges","multidim","octagon","symblocs"]
 
 frama-clang:
   stage: tests
