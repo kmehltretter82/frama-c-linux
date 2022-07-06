@@ -32,20 +32,20 @@ check-no-old-frama-c:
     - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a HEAD)
     - git merge-base --is-ancestor a35d2118fe6999dddce9e1847eff626fae9cc37c HEAD
 
-.build_template: &do_not_interrupt_template
+.build_template: &do_not_stop_pipeline_template
   stage: prepare
   interruptible: false
   script:
     - echo "This pipeline won't be interrupted"
 
-automatic-do-not-interrupt:
-  <<: *do_not_interrupt_template
+unstoppable-pipeline:
+  <<: *do_not_stop_pipeline_template
   only:
     variables:
       - $DEFAULT == $CI_COMMIT_BRANCH
 
-manual-do-not-interrupt:
-  <<: *do_not_interrupt_template
+do-not-stop-pipeline:
+  <<: *do_not_stop_pipeline_template
   when: manual
   except:
     variables:
