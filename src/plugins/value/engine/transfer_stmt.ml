@@ -531,9 +531,9 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* ------------------------- Make an Eval.call ---------------------------- *)
 
   (* Create an Eval.call *)
-  let create_call kf args =
+  let create_call stmt kf args =
     let return = Library_functions.get_retres_vi kf in
-    let callstack = Eva_utils.call_stack () in
+    let callstack = (kf, Kstmt stmt) :: Eva_utils.call_stack () in
     let arguments, rest =
       let formals = Kernel_function.get_formals kf in
       let rec format_arguments acc args formals = match args, formals with
@@ -572,12 +572,12 @@ module Make (Abstract: Abstractions.Eva) = struct
     let arguments = List.map replace_arg call.arguments in
     { call with arguments; }
 
-  let make_call ~subdivnb kf arguments valuation state =
+  let make_call ~subdivnb stmt kf arguments valuation state =
     (* Evaluate the arguments of the call. *)
     let determinate = is_determinate kf in
     compute_actuals ~subdivnb ~determinate valuation state arguments
     >>=: fun (args, valuation) ->
-    let call = create_call kf args in
+    let call = create_call stmt kf args in
     let recursion = Recursion.make call in
     let call = Extlib.opt_fold replace_recursive_call recursion call in
     call, recursion, valuation
@@ -731,9 +731,8 @@ module Make (Abstract: Abstractions.Eva) = struct
     let cvalue_state = Domain.get_cvalue_or_top state in
     Db.Value.Call_Value_Callbacks.apply (cvalue_state, stack_with_call);
     Db.Value.merge_initial_state (Eva_utils.call_stack ()) cvalue_state;
-    Db.Value.Call_Type_Value_Callbacks.apply
-      (`Builtin None, cvalue_state, stack_with_call)
-
+    let kind = `Builtin None in
+    Cvalue_callbacks.apply_call_hooks stack_with_call kf kind cvalue_state
 
   (* --------------------- Process the call statement ---------------------- *)
 
@@ -756,7 +755,7 @@ module Make (Abstract: Abstractions.Eva) = struct
           [(Partition.Key.empty, state)]
         else
           (* Create the call. *)
-          let eval, alarms = make_call ~subdivnb kf args valuation state in
+          let eval, alarms = make_call ~subdivnb stmt kf args valuation state in
           Alarmset.emit ki_call alarms;
           let states =
             let+ call, recursion, valuation = eval in

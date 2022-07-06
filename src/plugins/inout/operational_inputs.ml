@@ -587,11 +587,10 @@ module Callwise = struct
 
   let call_inout_stack = ref []
 
-  let call_for_callwise_inout (call_type, state, call_stack) =
-    let (current_function, ki as call_site) = List.hd call_stack in
+  let call_for_callwise_inout callstack _kf call_type state =
+    let (current_function, ki as call_site) = List.hd callstack in
     let merge_inout inout =
-      Db.Operational_inputs.Record_Inout_Callbacks.apply
-        (call_stack, inout);
+      Db.Operational_inputs.Record_Inout_Callbacks.apply (callstack, inout);
       if ki = Kglobal
       then merge_call_in_global_tables call_site inout
       else
@@ -698,35 +697,30 @@ module Callwise = struct
     in
     Computer.end_dataflow ()
 
-  let record_for_callwise_inout ((call_stack: Db.Value.callstack), value_res) =
+  let record_for_callwise_inout callstack kf value_res =
     let inout = match value_res with
-      | Value_types.Normal (states, _after_states)
-      | Value_types.NormalStore ((states, _after_states), _) ->
-        let kf, _ = List.hd call_stack in
+      | Eva.Cvalue_callbacks.Store ({before_stmts}, memexec_counter) ->
         let inout =
           if Eva.Analysis.save_results kf
-          then compute_call_from_value_states kf call_stack (Lazy.force states)
+          then
+            let cvalue_states = Lazy.force before_stmts in
+            compute_call_from_value_states kf callstack cvalue_states
           else top
         in
-        (match value_res with
-         | Value_types.NormalStore (_, memexec_counter) ->
-           MemExec.replace memexec_counter inout
-         | _ -> ());
+        MemExec.replace memexec_counter inout;
         inout
-
-      | Value_types.Reuse counter ->
+      | Reuse counter ->
         MemExec.find counter
     in
-    Db.Operational_inputs.Record_Inout_Callbacks.apply
-      (call_stack, inout);
-    end_record call_stack inout
+    Db.Operational_inputs.Record_Inout_Callbacks.apply (callstack, inout);
+    end_record callstack inout
 
 
   (* Register our callbacks inside the value analysis *)
 
   let () =
-    Db.Value.Record_Value_Callbacks_New.extend_once record_for_callwise_inout;
-    Db.Value.Call_Type_Value_Callbacks.extend_once call_for_callwise_inout;;
+    Eva.Cvalue_callbacks.register_call_results_hook record_for_callwise_inout;
+    Eva.Cvalue_callbacks.register_call_hook call_for_callwise_inout
 
 end
 
