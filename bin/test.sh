@@ -159,8 +159,8 @@ function TestAlias
 
     if [ "$DUNE_LOG" = "" ]; then
         Run dune build $DUNE_OPT $@
-    elif [ "$SAVE" != "yes" ]; then
-        Run dune build $DUNE_OPT
+    elif [ "$SAVE" != "yes" ] && [ "$VERBOSE" != "yes" ]; then
+        Run dune build $DUNE_OPT $@
     else
         # note: the Run function cannot performs redirection
         echo "> dune build $DUNE_OPT $@ 2> >(tee -a $DUNE_LOG >&2)"
