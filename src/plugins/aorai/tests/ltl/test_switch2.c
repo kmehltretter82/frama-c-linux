@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: -aorai-ltl @PTEST_DIR@/@PTEST_NAME@.ltl -aorai-acceptance
+   STDOPT: -aorai-ltl %{dep:@PTEST_NAME@.ltl} -aorai-acceptance
 */
 
 int status=0;
