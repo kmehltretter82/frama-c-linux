@@ -27,6 +27,7 @@ VERBOSE=
 UPDATE=
 LOGS=
 TESTS=
+SAVE=
 
 DUNE_OPT=
 DUNE_LOG=.test-errors.log
@@ -61,6 +62,7 @@ function Usage
     echo "  -p|--ptests         prepare (all) dune files and pull cache"
     echo "  -l|--logs           print output of tests (single file, no diff)"
     echo "  -u|--update         run tests and update wp-cache"
+    echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
     echo "  -h|--help           print this help"
     echo ""
@@ -157,6 +159,8 @@ function TestAlias
 
     if [ "$DUNE_LOG" = "" ]; then
         Run dune build $DUNE_OPT $@
+    elif [ "$SAVE" != "yes" ]; then
+        Run dune build $DUNE_OPT
     else
         # note: the Run function cannot performs redirection
         echo "> dune build $DUNE_OPT $@ 2> >(tee -a $DUNE_LOG >&2)"
@@ -264,7 +268,9 @@ function Status
                 done
             fi
         fi
-        Cmd rm -f $1
+        if [ "$SAVE" != "yes" ]; then
+            Cmd rm -f $1
+        fi
     fi
 
     #-- Check wp-cache status
@@ -308,6 +314,9 @@ do
             ;;
         "-l"|"--logs")
             LOGS=yes
+            ;;
+        "-s"|"--save" )
+             SAVE=yes
             ;;
         "-d"|"--default")
             CONFIG="<default>"
