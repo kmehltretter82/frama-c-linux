@@ -1,2 +1,2 @@
-DEFAULT_SUITES= ya
-prove_SUITES= ya
+DEFAULT_SUITES= ya ltl
+prove_SUITES= ya ltl
