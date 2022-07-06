@@ -51,38 +51,6 @@ else
 OPTDOT=None
 endif
 
-ifeq ($(HAS_OCAML408),yes)
-  DYNLINK_INIT=fun () -> ()
-  FORMAT_STAG=stag
-  FORMAT_STRING_OF_STAG=match s with \
-        Format.String_tag str -> str \
-      | _ -> raise (Invalid_argument \"unsupported tag extension\")
-  FORMAT_STAG_OF_STRING=Format.String_tag s
-  FORMAT_PP_OPT=Format.pp_print_option
-  HAS_OCAML407_OR_408=yes
-else
-  DYNLINK_INIT=Dynlink.init
-  FORMAT_STAG=tag
-  FORMAT_STRING_OF_STAG=s
-  FORMAT_STAG_OF_STRING=s
-  ifeq ($(HAS_OCAML407),yes)
-    HAS_OCAML407_OR_408=yes
-  else
-    HAS_OCAML407_OR_408=no
-  endif
-  FORMAT_PP_OPT=fun ?(none=(fun _ () -> ())) pp fmt o -> \
-    match o with \
-    | None -> none fmt () \
-    | Some v -> pp fmt v
-endif
-
-ifeq ($(HAS_OCAML407_OR_408),yes)
-  FLOAT_MAX_FLOAT=Float.max_float
-else
-  FLOAT_MAX_FLOAT=Pervasives.max_float
-endif
-
-
 MAJOR_VERSION=$(shell $(SED) -E 's/^([0-9]+)\..*/\1/' VERSION)
 MINOR_VERSION=$(shell $(SED) -E 's/^[0-9]+\.([0-9]+).*/\1/' VERSION)
 VERSION_CODENAME=$(shell $(CAT) VERSION_CODENAME)
