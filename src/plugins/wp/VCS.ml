@@ -385,10 +385,12 @@ let merge r1 r2 =
     prover_errmsg = err.prover_errmsg ;
   }
 
-let choose r1 r2 =
+let leq r1 r2 =
   match is_valid r1 , is_valid r2 with
-  | true , false -> r1
-  | false , true -> r2
-  | _ -> if compare r1 r2 <= 0 then r1 else r2
+  | true , false -> true
+  | false , true -> false
+  | _ -> compare r1 r2 <= 0
+
+let choose r1 r2 = if leq r1 r2 then r1 else r2
 
 let best = List.fold_left choose no_result

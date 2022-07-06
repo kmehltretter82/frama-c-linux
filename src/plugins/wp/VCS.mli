@@ -129,6 +129,7 @@ val pp_result_qualif : ?updating:bool -> prover -> result ->
 val compare : result -> result -> int (* best is minimal *)
 
 val merge : result -> result -> result
+val leq : result -> result -> bool
 val choose : result -> result -> result
 val best : result list -> result
 
