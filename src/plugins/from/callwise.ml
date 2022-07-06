@@ -64,9 +64,9 @@ let record_callwise_dependencies_in_db call_site froms =
     Tbl.replace call_site (Function_Froms.join previous froms)
   with Not_found -> Tbl.add call_site froms
 
-let call_for_individual_froms (call_type, value_initial_state, call_stack) =
+let call_for_individual_froms callstack _kf call_type value_initial_state =
   if From_parameters.ForceCallDeps.get () then begin
-    let current_function, call_site = List.hd call_stack in
+    let current_function, call_site = List.hd callstack in
     let register_from froms =
       record_callwise_dependencies_in_db call_site froms;
       match !call_froms_stack with
@@ -151,15 +151,13 @@ let compute_call_from_value_states current_function states =
   Callwise_Froms.compute_and_return current_function
 
 
-let record_for_individual_froms (call_stack, value_res) =
+let record_for_individual_froms callstack cur_kf value_res =
   if From_parameters.ForceCallDeps.get () then begin
     let froms = match value_res with
-      | Value_types.Normal (states, _after_states)
-      | Value_types.NormalStore ((states, _after_states), _) ->
-        let cur_kf, _ = List.hd call_stack in
+      | Eva.Cvalue_callbacks.Store ({before_stmts}, memexec_counter) ->
         let froms =
           if Eva.Analysis.save_results cur_kf
-          then compute_call_from_value_states cur_kf (Lazy.force states)
+          then compute_call_from_value_states cur_kf (Lazy.force before_stmts)
           else Function_Froms.top
         in
         let pre_state = match !call_froms_stack with
@@ -168,28 +166,21 @@ let record_for_individual_froms (call_stack, value_res) =
         in
         if From_parameters.VerifyAssigns.get () then
           !Db.Value.verify_assigns_froms cur_kf ~pre:pre_state froms;
-        (match value_res with
-         | Value_types.NormalStore (_, memexec_counter) ->
-           MemExec.replace memexec_counter froms
-         | _ -> ());
+        MemExec.replace memexec_counter froms;
         froms
 
-      | Value_types.Reuse counter ->
+      | Reuse counter ->
         MemExec.find counter
     in
-    end_record call_stack froms
+    end_record callstack froms
 
   end
 
 
 (* Register our callbacks inside the value analysis *)
-let () = From_parameters.ForceCallDeps.add_update_hook
-    (fun _bold bnew ->
-       if bnew then begin
-         Db.Value.Call_Type_Value_Callbacks.extend_once call_for_individual_froms;
-         Db.Value.Record_Value_Callbacks_New.extend_once
-           record_for_individual_froms;
-       end)
+let () =
+  Eva.Cvalue_callbacks.register_call_hook call_for_individual_froms;
+  Eva.Cvalue_callbacks.register_call_results_hook record_for_individual_froms
 
 
 let force_compute_all_calldeps ()=

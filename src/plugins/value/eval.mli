@@ -238,7 +238,7 @@ type callstack = call_site list
 type ('loc, 'value) call = {
   kf: kernel_function;                        (** The called function. *)
   callstack: callstack;                       (** The current callstack
-                                                  (without this call). *)
+                                                  (with this call on top). *)
   arguments: ('loc, 'value) argument list;    (** The arguments of the call. *)
   rest: (exp * ('loc, 'value) assigned) list; (** Extra-arguments. *)
   return: varinfo option;                     (** Fake varinfo to store the

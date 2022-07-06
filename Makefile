@@ -856,7 +856,7 @@ endif
 PLUGIN_CMO:= partitioning/split_strategy domains/domain_mode self parameters \
 	utils/eva_audit utils/eva_perf utils/eva_annotations \
 	utils/eva_dynamic utils/eva_utils utils/red_statuses \
-	utils/active_behaviors \
+	utils/cvalue_callbacks utils/active_behaviors \
 	utils/widen_hints_ext utils/widen \
 	partitioning/split_return \
 	partitioning/per_stmt_slevel \
@@ -937,7 +937,7 @@ PLUGIN_TYPES_TODOC:=$(addsuffix .mli,$(VALUE_TYPES))
 API_MLI := $(addprefix $(PLUGIN_DIR)/, \
   engine/analysis.mli utils/results.mli \
   parameters.mli utils/eva_annotations.mli \
-  eval.mli domains/cvalue/builtins.mli \
+  eval.mli domains/cvalue/builtins.mli utils/cvalue_callbacks.mli \
   legacy/eval_terms.mli utils/eva_results.mli utils/unit_tests.mli)
 
 $(PLUGIN_DIR)/Eva.mli: $(PLUGIN_DIR)/gen-api.sh Makefile $(API_MLI)

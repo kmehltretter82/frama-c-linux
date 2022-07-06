@@ -1507,6 +1507,8 @@ src/plugins/value/utils/active_behaviors.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/active_behaviors.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/backward_formals.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/backward_formals.mli: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/cvalue_callbacks.ml: CEA_LGPL_OR_PROPRIETARY
+src/plugins/value/utils/cvalue_callbacks.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_annotations.ml: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_annotations.mli: CEA_LGPL_OR_PROPRIETARY
 src/plugins/value/utils/eva_audit.ml: CEA_LGPL_OR_PROPRIETARY
