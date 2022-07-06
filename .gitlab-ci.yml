@@ -82,20 +82,6 @@ ivette:
 ################################################################################
 ### TESTS
 
-acsl-importer:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh ACSL-importer
-
-caveat-importer:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh Caveat-importer
-
-cfp:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh context-from-precondition
 
 e-acsl-tests:
   stage: tests
@@ -118,55 +104,40 @@ eva-domains:
     matrix:
       - CONFIG: ["bitwise","equality","gauges","multidim","octagon","symblocs"]
 
-frama-clang:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh frama-clang
-
-genassigns:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh genassigns
-
 kernel-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh kernel-tests
-
-linea-cabs:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh linea-cabs
-
-metacsl:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh meta
-
-mthread:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh mthread
 
 plugins-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh plugins-tests
 
-security:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh security
-
-volatile:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh Volatile
-
 wp-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh wp-tests
+
+external-plugins:
+  stage: tests
+  script:
+    - ./nix/external-plugin-ci.sh $PLUGIN
+  parallel:
+    matrix:
+      - PLUGIN: [
+          "ACSL-importer",
+          "Caveat-importer",
+          "context-from-precondition",
+          "frama-clang",
+          "genassigns",
+          "linea-cabs",
+          "meta",
+          "mthread",
+          "security",
+          "Volatile"
+        ]
+  when: manual
 
 ################################################################################
 ### DISTRIB
