@@ -28,7 +28,8 @@ UPDATE=
 LOGS=
 TESTS=
 
-VERBOSE_LOG=.test-errors.log
+DUNE_OPT=
+DUNE_LOG=.test-errors.log
 
 FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
@@ -150,18 +151,16 @@ function PullCache
 # ---  Test Dir Alias
 # --------------------------------------------------------------------------
 
-rm -rf $VERBOSE_LOG
+[ "$DUNE_LOG" = "" ] || rm -rf $DUNE_LOG
 function TestAlias
 {
 
-    if [ "$VERBOSE" != "yes" ]; then
-        Run dune build $@
-    elif [ "$VERBOSE_LOG" = "" ]; then
-        Run build --display short
+    if [ "$DUNE_LOG" = "" ]; then
+        Run dune build $DUNE_OPT $@
     else
         # note: the Run function cannot performs redirection
-        echo "> build --display short $@ 2> >(tee -a $VERBOSE_LOG >&2)"
-        dune build --display short $@ 2> >(tee -a $VERBOSE_LOG >&2)
+        echo "> dune build $DUNE_OPT $@ 2> >(tee -a $DUNE_LOG >&2)"
+        dune build $DUNE_OPT $@ 2> >(tee -a $DUNE_LOG >&2)
     fi
 }
 
@@ -246,28 +245,26 @@ function RunTests
 # ---  Tests Numbering
 # --------------------------------------------------------------------------
 
-function CountTests
+function Status
 {
-    #-- Count number of .res.log files
-    if [ "$VERBOSE" = "yes" ]; then
-
-        if [ -f "$VERBOSE_LOG" ]; then
-            echo "# Number of executed frama-c-wtests= $(grep -c "^frama-c-wtests " $VERBOSE_LOG)"
-            Cmd rm -f $VERBOSE_LOG
-        fi
-
-        BUILD=_build/default
-
-        Head "Number of *.{err,res}.log files by test directory..."
-        NB=
-        for dir in tests src/plugins/*/tests ; do
-            if [ -d "$dir" ]; then
-                NB="$((find $BUILD/$dir -name \*.err.log -or -name \*.res.log 2> /dev/null) | wc -l)"
-                [ "$NB" = "0" ] || echo "- $dir= $NB"
+    #-- Count number of executed tests
+    if [ "$1" != "" ] && [ -f "$1" ]; then
+        if [ "$VERBOSE" = "yes" ] ; then
+            #-- Total
+            NB=$(grep -c "^frama-c-wtests " "$1")
+            Head "Number of executed frama-c-wtests= $NB"
+            #-- Details
+            Head "Details by directory:"
+            if  [ "$NB" != "0" ]; then
+                for dir in tests/* src/plugins/*/tests/* ; do
+                    if [ -d "$dir" ]; then
+                        NB=$(grep -c "^frama-c-wtests $dir" "$1")
+                        [ "$NB" = "0" ] || echo "- $dir= $NB"
+                    fi
+                done
             fi
-        done
-        [ "$NB" != "" ] || echo "- <none>"
-
+        fi
+        Cmd rm -f $1
     fi
 
     #-- Check wp-cache status
@@ -306,6 +303,7 @@ do
             UPDATE=yes
             ;;
         "-v"|"--verbose")
+            DUNE_OPT+="--display=short"
             VERBOSE=yes
             ;;
         "-l"|"--logs")
@@ -328,4 +326,4 @@ do
     shift
 done
 RunTests $TESTS
-CountTests
+Status $DUNE_LOG
