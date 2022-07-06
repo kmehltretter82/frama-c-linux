@@ -29,6 +29,8 @@
 let dkey = Pdg_parameters.register_category "state"
 
 module P = Pdg_parameters
+
+open Pdg_types
 open PdgTypes
 
 exception Cannot_fold

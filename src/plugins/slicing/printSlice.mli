@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Pdg_types
+
 val print_fct_from_pdg :
   Format.formatter ->
   ?ff:SlicingInternals.fct_slice -> PdgTypes.Pdg.t -> unit

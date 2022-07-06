@@ -23,6 +23,8 @@
 (** Provides function to extract information from the PDG. *)
 
 open Cil_types
+
+open Pdg_types
 open PdgIndex
 
 type nodes_and_undef =

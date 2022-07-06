@@ -27,6 +27,8 @@
 
 open Cil_datatype
 
+open Pdg_types
+
 (** {3 About options} *)
 
 (** associate a level to each function in order to control how it will be

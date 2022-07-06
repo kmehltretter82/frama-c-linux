@@ -181,7 +181,7 @@ module Make
           | Base.SetLattice.Top -> raise TooImprecise
           | Base.SetLattice.Set bases -> bases
         in
-        let state_input = Domain.filter kf `Pre input_bases input_state in
+        let state_input = Domain.filter (`Pre kf) input_bases input_state in
         (* Outputs bases, that is bases that are copy-pasted, also include
            input bases. Indeed, those may get reduced during the call. *)
         let all_output_bases =
@@ -197,7 +197,7 @@ module Make
           Extlib.opt_fold Base.Hptset.add return_base all_output_bases
         in
         let clear (key,state) =
-          key, Domain.filter kf `Post all_output_bases state
+          key, Domain.filter (`Post kf) all_output_bases state
         in
         let outputs = List.map clear call_result in
         let call_number = current_counter () in
@@ -241,7 +241,7 @@ module Make
       then ()
       else
         (* restrict [state] to the inputs of this call *)
-        let st_filtered = Domain.filter kf `Pre binputs state in
+        let st_filtered = Domain.filter (`Pre kf) binputs state in
         try
           let bases, outputs, i = Domain.Hashtbl.find hstates st_filtered in
           (* We have found a previous execution, in which the outputs are

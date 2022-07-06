@@ -24,6 +24,8 @@
     functions below should be inlined, as there is no good reason to treat
     those types as semi-private *)
 
+open Pdg_types
+
 open SlicingInternals
 
 val str_level_option : level_option -> string
@@ -40,8 +42,8 @@ val ff_src_name : fct_slice -> string
 val get_fi_kf : fct_info -> Cil_types.kernel_function
 val get_ff_kf : fct_slice -> Cil_types.kernel_function
 val get_pdg_kf : PdgTypes.Pdg.t -> Kernel_function.t
-val get_fi_pdg : fct_info -> Db.Pdg.t
-val get_ff_pdg : fct_slice -> Db.Pdg.t
+val get_fi_pdg : fct_info -> Pdg.Api.t
+val get_ff_pdg : fct_slice -> Pdg.Api.t
 val ff_slicing_level : fct_slice -> level_option
 val change_fi_slicing_level : fct_info -> level_option -> unit
 val change_slicing_level : Kernel_function.t -> int -> unit

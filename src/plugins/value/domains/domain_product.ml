@@ -42,14 +42,15 @@ module Make
   }
 
   let () = incr counter
-  let name = Left.name ^ "*" ^ Right.name ^
-             "(" ^ string_of_int !counter ^ ")"
+  let unique_name = Left.name ^ "*" ^ Right.name ^
+                    "(" ^ string_of_int !counter ^ ")"
 
   include Datatype.Pair_with_collections
       (Left)
       (Right)
-      (struct let module_name = name end)
+      (struct let module_name = unique_name end)
   type state = t
+  let name = Left.name ^ " * " ^ Right.name
 
   let structure = Abstract.Domain.Node (Left.structure, Right.structure)
 
@@ -292,8 +293,8 @@ module Make
   let relate kf bases (left, right) =
     Base.SetLattice.join
       (Left.relate kf bases left) (Right.relate kf bases right)
-  let filter kf kind bases (left, right) =
-    Left.filter kf kind bases left, Right.filter kf kind bases right
+  let filter kind bases (left, right) =
+    Left.filter kind bases left, Right.filter kind bases right
   let reuse kf bases ~current_input ~previous_output =
     let left_input, right_input = current_input
     and left_output, right_output = previous_output in

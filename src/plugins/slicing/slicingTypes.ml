@@ -22,6 +22,8 @@
 
 (** Slicing module types. *)
 
+open Pdg_types
+
 exception Slicing_Internal_Error of string
 exception ChangeCallErr of string
 exception PtrCallExpr

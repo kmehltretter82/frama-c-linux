@@ -24,6 +24,8 @@
     @raise Kernel_function.No_Definition on annotations for function declarations.
 *)
 
+open Pdg_types
+
 (** [data_info] is composed of [(node,z_part) list, undef_loc)]
  *             and correspond to data dependencies nodes.
  *             Can be None if we don't know how to compute them.

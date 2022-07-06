@@ -75,7 +75,7 @@ module LatticeTaint = struct
 
       type t = taint
 
-      let name = "Value.Taint.t"
+      let name = "taint"
 
       let reprs =
         [ { locs_data = List.hd Zone.reprs;
@@ -369,7 +369,7 @@ module TaintDomain = struct
   (* MemExec cache. *)
   let relate _kf _bases _state = Base.SetLattice.empty
 
-  let filter _kf _kind bases state =
+  let filter _kind bases state =
     let filter_base = Zone.filter_base (fun b -> Base.Hptset.mem b bases) in
     { state with locs_data = filter_base state.locs_data;
                  locs_control = filter_base state.locs_control;

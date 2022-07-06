@@ -145,7 +145,7 @@ ACSL_SUFFIX=-$(ACSL_VERSION)
 endif
 
 clean::
-	$(MAKE) -C acsl clean
+	$(MAKE) -C acsl super-clean
 
 all: \
 	manuals/acsl-implementation$(FC_SUFFIX).pdf \
@@ -164,7 +164,7 @@ EACSL_VERSION=$(shell grep 'newcommand{\\eacsllangversion' $(EACSL_DOC)/refman/m
 
 ifeq ($(EACSL_VERSION),)
 
-$(info could not retrieve E-ACSL version from ../src/plugins/e-acsl/doc/refman/main.tex")
+$(info "could not retrieve E-ACSL version from ../src/plugins/e-acsl/doc/refman/main.tex")
 
 else
 
@@ -178,8 +178,8 @@ ifneq ($(ACSL_VERSION),$(EACSL_VERSION))
 endif
 
 clean::
-	$(MAKE) -C $(EACSL_DOC)/refman/ clean
-	$(MAKE) -C $(EACSL_DOC)/userman/ clean
+	$(MAKE) -C $(EACSL_DOC)/refman/ super-clean
+	$(MAKE) -C $(EACSL_DOC)/userman/ super-clean
 
 all: \
 	manuals/e-acsl-implementation$(FC_SUFFIX).pdf \

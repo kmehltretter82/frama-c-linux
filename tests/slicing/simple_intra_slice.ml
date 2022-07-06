@@ -7,7 +7,7 @@ include LibSelect;;
 
 let main _ =
   Slicing.Api.Project.reset_slicing ();
-  let pretty_pdg fmt kf = !Db.Pdg.pretty fmt (!Db.Pdg.get kf) in
+  let pretty_pdg fmt kf = Pdg.Api.pretty fmt (Pdg.Api.get kf) in
   let apply_all_actions = Slicing.Api.Request.apply_all_internal in
   let print_slice = Slicing.Api.Slice.pretty in
   let print_fct_stmts kf =

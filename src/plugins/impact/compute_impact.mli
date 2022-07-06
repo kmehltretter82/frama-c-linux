@@ -22,6 +22,8 @@
 
 open Cil_types
 
+open Pdg_types
+
 type nodes = Pdg_aux.NS.t
 type result = nodes Kernel_function.Map.t
 

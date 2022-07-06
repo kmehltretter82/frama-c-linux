@@ -22,6 +22,8 @@
 
 open SlicingTypes
 
+open Pdg_types
+
 val bottom_mark : sl_mark
 val mk_user_mark : data:bool -> addr:bool -> ctrl:bool -> sl_mark
 

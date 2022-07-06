@@ -306,6 +306,8 @@ module Select : sig
 
   (** {3 Pdg selectors.} *)
 
+  open Pdg_types
+
   val select_pdg_nodes :
     set -> Mark.t -> PdgTypes.Node.t list -> Cil_types.kernel_function -> set
 

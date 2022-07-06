@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Pdg_types
+
 (** Why is a node impacted. The reasons will be given as [n is impacted
     by the effect of [n'], and the impact is of type reason]. *)
 type reason_type =

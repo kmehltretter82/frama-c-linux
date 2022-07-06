@@ -27,6 +27,8 @@
 open Cil_datatype
 open Cil_types
 
+open Pdg_types
+
 let debug1 fmt = Datascope.R.debug ~level:1 fmt
 
 module Interproc =
@@ -60,19 +62,19 @@ let _pp_set prefix fmt =
 let rec add_callee_nodes z acc nodes =
   let new_nodes, acc = NSet.fold
       (fun node acc2 ->
-         match !Db.Pdg.node_key node with
+         match Pdg.Api.node_key node with
          | PdgIndex.Key.SigCallKey (cid, PdgIndex.Signature.Out out_key) ->
            let callees = Eva.Results.callee (PdgIndex.Key.call_from_id cid) in
            List.fold_left (fun (new_nodes, acc) kf ->
-               let callee_pdg = !Db.Pdg.get kf in
+               let callee_pdg = Pdg.Api.get kf in
                let outputs = match out_key with
                  | PdgIndex.Signature.OutLoc out ->
                    (* [out] might be an over-approximation of the location
                       we are searching for. We refine the search if needed. *)
                    let z = Locations.Zone.narrow out z in
-                   fst (!Db.Pdg.find_location_nodes_at_end callee_pdg z)
+                   fst (Pdg.Api.find_location_nodes_at_end callee_pdg z)
                  | PdgIndex.Signature.OutRet -> (* probably never occurs *)
-                   fst (!Db.Pdg.find_output_nodes callee_pdg out_key)
+                   fst (Pdg.Api.find_output_nodes callee_pdg out_key)
                in
                let outputs = List.map fst outputs in
                add_list_to_set outputs new_nodes, add_list_to_set outputs acc)
@@ -99,25 +101,25 @@ let rec add_caller_nodes z kf acc (undef, nodes) =
       | None -> acc_undef, acc
       | Some undef ->
         let nodes_for_undef, undef' =
-          !Db.Pdg.find_location_nodes_at_stmt pdg stmt ~before:true undef
+          Pdg.Api.find_location_nodes_at_stmt pdg stmt ~before:true undef
         in
         let acc_undef = join_undef acc_undef undef' in
         let acc = add_list_to_set (List.map fst nodes_for_undef) acc in
         acc_undef, acc
     in
     let add_call_input_nodes node (acc_undef, acc) =
-      match !Db.Pdg.node_key node with
+      match Pdg.Api.node_key node with
       | PdgIndex.Key.SigKey (PdgIndex.Signature.In in_key) ->
         begin match in_key with
           | PdgIndex.Signature.InCtrl ->
             (* We only look for the values *)
             acc_undef, acc
           | PdgIndex.Signature.InNum n_param ->
-            let n = !Db.Pdg.find_call_input_node pdg stmt n_param in
+            let n = Pdg.Api.find_call_input_node pdg stmt n_param in
             acc_undef, NSet.add n acc
           | PdgIndex.Signature.InImpl z' ->
             let z = Locations.Zone.narrow z z' in
-            let nodes, undef'= !Db.Pdg.find_location_nodes_at_stmt
+            let nodes, undef'= Pdg.Api.find_location_nodes_at_stmt
                 pdg stmt ~before:true z
             in
             let acc_undef = join_undef acc_undef undef' in
@@ -128,7 +130,7 @@ let rec add_caller_nodes z kf acc (undef, nodes) =
     NSet.fold add_call_input_nodes nodes (acc_undef, acc)
   in
   let add_one_caller_nodes acc (kf, stmts) =
-    let pdg = !Db.Pdg.get kf in
+    let pdg = Pdg.Api.get kf in
     let acc_undef, caller_nodes =
       List.fold_left (add_one_call_nodes pdg) (None, NSet.empty) stmts
     in add_caller_nodes z kf (NSet.union caller_nodes acc) (acc_undef, caller_nodes)
@@ -138,9 +140,9 @@ let compute_aux kf stmt zone =
   debug1 "[Defs.compute] for %a at sid:%d in '%a'@."
     Locations.Zone.pretty zone stmt.sid Kernel_function.pretty kf;
   try
-    let pdg = !Db.Pdg.get kf in
+    let pdg = Pdg.Api.get kf in
     let nodes, undef =
-      !Db.Pdg.find_location_nodes_at_stmt pdg stmt ~before:true zone
+      Pdg.Api.find_location_nodes_at_stmt pdg stmt ~before:true zone
     in
     let nodes = add_list_to_set (List.map fst nodes) NSet.empty  in
     let nodes =
@@ -152,13 +154,13 @@ let compute_aux kf stmt zone =
       else nodes
     in
     Some (nodes, undef)
-  with Db.Pdg.Bottom | Db.Pdg.Top | Not_found ->
+  with Pdg.Api.Bottom | Pdg.Api.Top | Not_found ->
     None
 
 let compute kf stmt lval =
   let extract (nodes, undef) =
     let add_node node defs =
-      match PdgIndex.Key.stmt (!Db.Pdg.node_key node) with
+      match PdgIndex.Key.stmt (Pdg.Api.node_key node) with
       | None -> defs
       | Some s -> Stmt.Hptset.add s defs
     in
@@ -185,7 +187,7 @@ let compute_with_def_type_zone kf stmt zone =
         let after = (direct || prev_d, indirect || pred_i) in
         Stmt.Map.add stmt after acc
       in
-      match !Db.Pdg.node_key node with
+      match Pdg.Api.node_key node with
       | PdgIndex.Key.Stmt s -> change s (true, false)
       | PdgIndex.Key.CallStmt _ -> assert false
       | PdgIndex.Key.SigCallKey (s, sign) ->

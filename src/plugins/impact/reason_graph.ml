@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Pdg_types
+
 module NodeSet = PdgTypes.NodeSet
 
 
@@ -216,7 +218,7 @@ let print_dot_graph reason =
 
 (* Very basic textual debugging function *)
 let _print_reason reason =
-  let pp_node = !Db.Pdg.pretty_node false in
+  let pp_node = Pdg.Api.pretty_node false in
   let pp fmt (nsrc, ndst, reason) =
     Format.fprintf fmt "@[<v 2>%a -> %a (%s)@]"
       pp_node nsrc pp_node ndst

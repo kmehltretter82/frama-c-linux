@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Pdg_types
+
 open PdgMarks
 
 (** [in_marks_to_caller] translate the input information part returned by

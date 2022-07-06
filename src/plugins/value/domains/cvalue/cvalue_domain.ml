@@ -181,7 +181,8 @@ module State = struct
       let mem_project = Datatype.never_any_project
     end )
 
-  let key = Structure.Key_Domain.create_key "cvalue_domain"
+  let name = "cvalue"
+  let key = Structure.Key_Domain.create_key name
 
   type value = Model.value
   type location = Model.location
@@ -287,7 +288,7 @@ module State = struct
   let relate _kf _bases _state = Base.SetLattice.empty
 
   (* Auxiliary function that keeps only some bases inside a memory state *)
-  let filter _kf _kind bases (state, clob) =
+  let filter _kind bases (state, clob) =
     Cvalue.Model.filter_by_shape bases state, clob
 
   let reuse _ _ ~current_input:(state, _) ~previous_output:(output, clob) =

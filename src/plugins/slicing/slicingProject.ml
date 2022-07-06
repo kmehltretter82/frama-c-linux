@@ -24,6 +24,8 @@
 
 (**/**)
 
+open Pdg_types
+
 module T = SlicingInternals
 module M = SlicingMacros
 
