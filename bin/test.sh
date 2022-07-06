@@ -30,8 +30,8 @@ TESTS=
 SAVE=
 
 DUNE_OPT=
-DUNE_LOG=.test-errors.log
-
+DUNE_LOG=./.test-errors.log
+CACHEDIR=./.wp-cache
 FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
 # --------------------------------------------------------------------------
@@ -130,14 +130,18 @@ function SetEnv
         FRAMAC_WP_CACHE=offline
         Echo "Set FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
     fi
+
     if [ "$FRAMAC_WP_QUALIF" != "" ]; then
-        FRAMAC_WP_CACHEDIR=$FRAMAC_WP_QUALIF
-    else
-        if [ "$FRAMAC_WP_CACHEDIR" = "" ]; then
-            FRAMAC_WP_CACHEDIR=./.wp-cache
-            Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
-        fi
+        FRAMAC_WP_CACHEDIR="$FRAMAC_WP_QUALIF"
+        Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
+    elif [ "$FRAMAC_WP_CACHEDIR" = "" ]; then
+        FRAMAC_WP_CACHEDIR="$CACHEDIR"
+        Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
     fi
+
+    [ ! -f "$FRAMAC_WP_CACHEDIR" ] || [ -d "$FRAMAC_WP_CACHEDIR" ] \
+        || Error "$FRAMAC_WP_CACHEDIR is not a directory"
+
 }
 
 function CloneCache
