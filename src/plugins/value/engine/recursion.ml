@@ -179,7 +179,7 @@ let make_recursion call depth =
 let make call =
   let is_same_kf (f, _) = Kernel_function.equal f call.kf in
   let previous_calls = List.filter is_same_kf call.callstack in
-  let depth = List.length previous_calls in
+  let depth = List.length previous_calls - 1 in
   if depth > 0
   then Some (make_recursion call depth)
   else None

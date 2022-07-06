@@ -265,14 +265,12 @@ let apply_builtin (builtin:builtin) call ~pre ~post =
   let arguments = compute_arguments call.arguments call.rest in
   try
     let call_result = builtin pre arguments in
-    let call_stack = Eva_utils.call_stack () in
     let froms =
       match call_result with
       | Full result -> `Builtin result.c_from
-      | States _ -> `Builtin None
-      | Result _ -> `Spec (Annotations.funspec call.kf)
+      | States _ | Result _ -> `Builtin None
     in
-    Db.Value.Call_Type_Value_Callbacks.apply (froms, pre, call_stack);
+    Cvalue_callbacks.apply_call_hooks call.callstack call.kf froms pre;
     process_result call post call_result
   with
   | Invalid_nb_of_args n ->

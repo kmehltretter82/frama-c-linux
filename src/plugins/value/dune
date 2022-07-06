@@ -65,6 +65,7 @@
   builtins_watchpoint
   compute_functions
   cvalue_backward
+  cvalue_callbacks
   cvalue_domain
   cvalue_forward
   cvalue_init
@@ -165,7 +166,7 @@
   (deps
     gen-api.sh Eva.ml.in Eva.mli.in
     engine/analysis.mli utils/results.mli parameters.mli utils/eva_annotations.mli eval.mli
-    domains/cvalue/builtins.mli legacy/eval_terms.mli utils/eva_results.mli utils/unit_tests.mli
+    domains/cvalue/builtins.mli  utils/cvalue_callbacks.mli legacy/eval_terms.mli utils/eva_results.mli utils/unit_tests.mli
   )
   (action (run %{deps}))
 )
