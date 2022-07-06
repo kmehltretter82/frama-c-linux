@@ -282,11 +282,10 @@ ocaml-versions:
 .build_template: &opam_template
   stage: compatibility
   image: 'ocaml/opam:ubuntu-20.04-ocaml-4.08'
-  script: >
-    true
-    && opam pin . -n
-    && opam depext frama-c --with-test
-    && opam install --jobs 2 frama-c --with-test
+  script:
+    - opam pin . -n
+    - opam depext frama-c --with-test
+    - opam install --jobs 2 frama-c --with-test
   tags:
     - docker
 
@@ -298,6 +297,26 @@ opam-pin-nightly:
   <<: *opam_template
   only:
     - schedules
+  allow_failure: true
+
+# TODO: Enable this rule later:
+#
+# opam-pin-minimal:
+#   variables:
+#     OPAMSOLVERTIMEOUT: "500"
+#     OPAMCRITERIA: "+count[version-lag,solution]"
+#     OPAMEXTERNALSOLVER: "builtin-0install"
+#   stage: prepare
+#   image: 'ocaml/opam:ubuntu-20.04-ocaml-4.08'
+#   script:
+#     - sudo ln -f /usr/bin/opam-2.1 /usr/bin/opam
+#     - opam --version
+#     - opam init --reinit -ni
+#     - opam pin . -n
+#     - opam depext frama-c --with-test
+#     - opam install --jobs 2 frama-c --with-test
+#   tags:
+#     - docker
 
 # Distrib
 
