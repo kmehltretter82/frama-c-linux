@@ -137,7 +137,6 @@ external-plugins:
           "security",
           "Volatile"
         ]
-  when: manual
 
 ################################################################################
 ### DISTRIB
