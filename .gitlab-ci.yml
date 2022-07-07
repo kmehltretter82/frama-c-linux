@@ -248,7 +248,7 @@ ocaml-versions:
     - ./nix/build-proxy.sh default-config-tests
   parallel:
     matrix:
-      - OCAML: ["4.08", "4.13"]
+      - OCAML: ["4.08", "4.14"]
   when: manual
 
 # Opam pin
