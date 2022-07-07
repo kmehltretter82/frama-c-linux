@@ -120,6 +120,7 @@ endif
           exit 1; \
         fi;
 	mkdir -p $(dir $@)
+	$(TOUCH) $@
 
 ###############
 ## Main target
