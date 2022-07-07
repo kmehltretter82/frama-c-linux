@@ -187,6 +187,7 @@ let pretty fmt s =
 
 let to_json_p (p,r) : Json.t = `Assoc [
     "prover", `String (VCS.name_of_prover p) ;
+    "hprover", `String (VCS.title_of_prover p) ;
     "time", `Float r.time ;
     "htime", `String (Pretty_utils.to_string Rformat.pp_time r.time) ;
     "success", `Int r.success ;

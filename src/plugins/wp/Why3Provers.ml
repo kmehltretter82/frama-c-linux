@@ -93,7 +93,7 @@ let print_wp s =
   let prv = String.split_on_char ',' name in
   String.concat ":" prv
 
-let title p = Format.asprintf "%a" Why3.Whyconf.print_prover p
+let title p = Pretty_utils.to_string Why3.Whyconf.print_prover p
 let name p = p.Why3.Whyconf.prover_name
 let compare = Why3.Whyconf.Prover.compare
 let is_mainstream p = p.Why3.Whyconf.prover_altern = ""
