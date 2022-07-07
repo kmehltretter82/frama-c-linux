@@ -255,7 +255,7 @@ ocaml-versions:
 
 .build_template: &opam_template
   stage: compatibility
-  image: 'ocaml/opam:ubuntu-20.04-ocaml-4.08'
+  image: 'ocaml/opam:ubuntu-20.04-ocaml-$OCAML'
   script:
     - opam pin . -n
     - opam depext frama-c --with-test
