@@ -59,7 +59,6 @@ autom4te.cache
 /tests/crowbar/mutable
 /tests/crowbar/output-*
 /tests/crowbar/test_ghost_cfg
-/tests/spec/preprocess_dos.c
 /tests/*/*.opt
 
 /devel_tools/fc-time
