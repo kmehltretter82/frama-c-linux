@@ -62,6 +62,7 @@ module Filename = struct
       fun a b -> cygpath (temp_file a b)
     else
       fun a b -> temp_file a b
+  [@@ warning "-32"]
 
   let sanitize f = String.escaped f
 
@@ -107,8 +108,6 @@ let trim_right s =
 (** the pattern that ends the parsing of options in a test file *)
 let end_comment = Str.regexp ".*\\*/"
 
-let regex_cmxs = Str.regexp ("\\([^/]+\\)[.]cmxs\\($\\|[ \t]\\)")
-
 let output_unix_error (exn : exn) =
   match exn with
   | Unix.Unix_error (error, _function, arg) ->
@@ -124,6 +123,7 @@ let mv src dest =
     Unix.rename src dest
   with Unix.Unix_error _ as e ->
     output_unix_error e
+[@@ warning "-32"]
 
 let unlink ?(silent = true) file =
   let open Unix in
@@ -275,7 +275,7 @@ let example_msg =
 let umsg = "Usage: frama-c-ptests [options] [names of test suites]"
 
 let default_dune_alias = ref "ptests"
-let rec argspec =
+let argspec =
   [
     ("-v", Arg.Unit (fun () -> incr verbosity),
      "Increase verbosity (up to  twice)") ;
@@ -317,7 +317,6 @@ let rec argspec =
     ("-dune-alias", Arg.String (fun s -> default_dune_alias := s),
      " <name> Use @<name> as dune alias to exectute tests (defaults to "^ !default_dune_alias ^")");
   ]
-and help_msg () = Arg.usage (Arg.align argspec) umsg
 
 let fail s =
   Format.printf "Error: %s@.Aborting (CWD=%s).@." s (Sys.getcwd());
@@ -419,7 +418,6 @@ module SubDir: sig
       Anyway, fails if the given dirname doesn't exists *)
 
   val make_file: t -> string -> string
-  val make_subdir: t -> string -> t
 
   val oracle_subdir: env:env_t -> t -> t
   val result_subdir: env:env_t -> t -> t
@@ -443,7 +441,6 @@ end = struct
   let result_subdir ~env dir = Filename.concat dir (config_name ~env "result")
 
   let make_file = Filename.concat
-  let make_subdir = Filename.concat
 
   let oracle_dir ~env = oracle_subdir ~env ".."
   let get_oracle_dir = oracle_dir
@@ -473,8 +470,6 @@ module Macros = struct
         | _ -> default) defaults macros
 
   let empty = StringMap.empty
-
-  let macro_regex = Str.regexp "\\([^@]*\\)@\\([^@]*\\)@\\(.*\\)"
 
   let pp_macros fmt macros =
     Format.fprintf fmt "Macros (%d):@."  (StringMap.cardinal macros);
@@ -551,17 +546,11 @@ module Macros = struct
         let s = String.trim (expand ~file macros s) in
         if s = "" then "true" else s) enabled_if
 
-  let get ?(default="") name macros =
-    try StringMap.find name macros with Not_found -> default
-
   let add_list l map =
     List.fold_left (fun acc (k,v) -> StringMap.add k v acc) map l
 
   let add_expand ~file name def macros =
     StringMap.add name (expand ~file macros def) macros
-
-  let append_expand ~file name def macros =
-    StringMap.add name (get name macros ^ expand ~file macros def) macros
 
   let default_macros () = add_list
       [ "frama-c-exe", !macro_frama_c_exe;
@@ -1164,21 +1153,6 @@ type toplevel_command =
     deps: deps;
   }
 
-type command =
-  | Toplevel of toplevel_command
-  | Target of execnow * command Queue.t
-
-type log = Err | Res
-
-type diff =
-  | Command_error of toplevel_command * log
-  | Target_error of execnow
-  | Log_error of SubDir.t (* directory *) * string (* file *)
-
-type cmps =
-  | Cmp_Toplevel of toplevel_command
-  | Cmp_Log of SubDir.t (* directory *) * string (* file *)
-
 let catenate_number nb_files prefix n =
   if nb_files > 1
   then prefix ^ "." ^ (string_of_int n)
@@ -1343,7 +1317,7 @@ let update_oracle_dir ~env wtest =
 let std = false
 let pp_wtest ?(compacted=false) fmt wtest =
   let writer = (if compacted
-                then (fun json -> Format.fprintf fmt "%s" (Yojson.Safe.to_string ~std json)) 
+                then (fun json -> Format.fprintf fmt "%s" (Yojson.Safe.to_string ~std json))
                 else (fun json -> Format.fprintf fmt "%a" (Yojson.Safe.pretty_print ~std) json))
   in writer (wtest_to_yojson wtest)
 

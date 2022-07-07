@@ -592,10 +592,6 @@ let check_headache_config_file () =
 
 let set_opt (var:'a option ref) (value:'a) = var := Some value
 
-let get_opt = function
-  | None -> assert false
-  | Some v -> v
-
 let executable_name = Sys.argv.(0)
 
 let umsg =
