@@ -68,11 +68,15 @@ function Usage
     echo ""
     echo "VARIABLES"
     echo ""
-    echo "  FRAMAC_WP_CACHE ($FRAMAC_WP_CACHE)"
-    echo "    Management mode of wp-cache"
+    echo "  FRAMAC_WP_CACHE"
+    echo "    Management mode of wp-cache ($FRAMAC_WP_CACHE)"
     echo ""
-    echo "  FRAMAC_WP_CACHEDIR ($FRAMAC_WP_CACHEDIR)"
-    echo "    Use $FRAMAC_WP_CACHE_GIT"
+    echo "  FRAMAC_WP_QUALIF"
+    echo "  FRAMAC_WP_CACHEDIR"
+    echo "    Location of wp-cache ($FRAMAC_WP_CACHEDIR)"
+    if [ ! -d $FRAMAC_WP_CACHEDIR ]; then
+        echo "    About to clone from $FRAMAC_WP_CACHE_GIT"
+    fi
     echo "    Please, always push to master branch"
     echo ""
 }
@@ -126,12 +130,14 @@ function SetEnv
         FRAMAC_WP_CACHE=offline
         Echo "Set FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
     fi
-
-    if [ "$FRAMAC_WP_CACHEDIR" = "" ]; then
-        FRAMAC_WP_CACHEDIR=./.wp-cache
-        Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
+    if [ "$FRAMAC_WP_QUALIF" != "" ]; then
+        FRAMAC_WP_CACHEDIR=$FRAMAC_WP_QUALIF
+    else
+        if [ "$FRAMAC_WP_CACHEDIR" = "" ]; then
+            FRAMAC_WP_CACHEDIR=./.wp-cache
+            Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
+        fi
     fi
-
 }
 
 function CloneCache
