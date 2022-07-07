@@ -41,8 +41,12 @@ let configure =
   begin fun () ->
     if !todo then
       begin
-        let args = Array.of_list ("why3"::Wp_parameters.Why3Flags.get ()) in
+        let commands = "why3"::Wp_parameters.Why3Flags.get () in
+        let args = Array.of_list commands in
         begin try
+            (* Ensure that an error message generating directly by why3 is
+               reported as coming from Why3, not from Frama-C. *)
+            Why3.Getopt.commands := commands;
             Why3.Getopt.parse_all
               (Why3.Debug.Args.[desc_debug;desc_debug_all;desc_debug_list])
               (fun opt -> raise (Arg.Bad ("unknown option: " ^ opt)))
