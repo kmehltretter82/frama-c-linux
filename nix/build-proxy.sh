@@ -21,7 +21,7 @@
 #                                                                        #
 ##########################################################################
 
-# OCAML must be set to the right version of OCAML (format: N_MM)
+# OCAML must be set to the right version of OCAML (format: N_MM or N.MM)
 
 if [[ $# != 1 ]];
 then
@@ -32,4 +32,21 @@ EOF
   exit 2
 fi
 
-nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.$1
+if [ -z ${OCAML+x} ]; then
+  echo "OCAML variable must be set to a version of OCaml"
+  exit 2
+fi
+
+# Normalize version for Nix
+OCAML=${OCAML/./_}
+
+OUTOPT=""
+if [ ! -z ${OUT+x} ]; then
+  OUTOPT="-o $OUT"
+fi
+
+if [ -z ${DIR+x} ]; then
+  DIR="."
+fi
+
+nix-build $OUTOPT $DIR/nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.$1

@@ -24,7 +24,7 @@
 # DEFAULT variable can be configured to indicate reference branch when the
 # current branch does not exist in a plugin.
 #
-# OCAML must be set to the right version of OCAML (format: N_MM)
+# OCAML must be set to the right version of OCAML (format: N_MM or N.MM)
 
 set -euxo pipefail
 
@@ -32,6 +32,9 @@ if [ -z ${OCAML+x} ]; then
   echo "OCAML variable must be set to a version of OCaml"
   exit 2
 fi
+
+# Normalize version for Nix
+OCAML=${OCAML/./_}
 
 DEFAULT=${DEFAULT:-master}
 

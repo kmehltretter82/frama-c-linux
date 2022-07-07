@@ -21,7 +21,7 @@ default:
 
 variables:
   DEFAULT: "feature/bobot/jbuilder"
-  OCAML: "4_11"
+  OCAML: "4.11"
 
 ################################################################################
 ### PREPARE
@@ -145,8 +145,10 @@ external-plugins:
 
 .build_template: &api_doc_template
   stage: distrib
+  variables:
+    OUT: "api"
   script:
-    - nix-build -o api nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.api-doc
+    - ./nix/build-proxy.sh api-doc
 
 api-doc-default: # Check that we successfully build but no artifact
   <<: *api_doc_template
@@ -205,8 +207,10 @@ lint:
 
 .build_template: &manuals_template
   stage: distrib
+  variables:
+    OUT: "manuals"
   script:
-    - nix-build -o manuals nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.manuals
+    - ./nix/build-proxy.sh manuals
 
 manuals:
   <<: *manuals_template
@@ -244,7 +248,7 @@ ocaml-versions:
     - ./nix/build-proxy.sh default-config-tests
   parallel:
     matrix:
-      - OCAML: ["4_08", "4_13"]
+      - OCAML: ["4.08", "4.13"]
   when: manual
 
 # Opam pin
@@ -292,9 +296,11 @@ opam-pin-nightly:
 
 src-distrib-tests:
   stage: compatibility
+  variables:
+    DIR: "extracted"
   script:
-    - mkdir extracted && tar -xzf frama-c.tar.gz --strip-components 1 -C ./extracted
-    - nix-build extracted/nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.src-distrib-tests
+    - mkdir $DIR && tar -xzf frama-c.tar.gz --strip-components 1 -C ./extracted
+    - ./nix/build-proxy.sh src-distrib-tests
 
 ################################################################################
 ### PUBLIC
