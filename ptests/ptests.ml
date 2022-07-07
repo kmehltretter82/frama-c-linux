@@ -546,6 +546,11 @@ module Macros = struct
         let s = expand ~file macros s in
         if String.equal s "" then None else Some s) ls
 
+  let expand_enabled_if ~file (macros:t) enabled_if =
+    Option.map (fun s ->
+        let s = String.trim (expand ~file macros s) in
+        if s = "" then "true" else s) enabled_if
+
   let get ?(default="") name macros =
     try StringMap.find name macros with Not_found -> default
 
@@ -576,6 +581,7 @@ module Macros = struct
         "PTEST_MODULE", "";
         "PTEST_SCRIPT", "";
         "PTEST_PLUGIN", "";
+        "PTEST_ENABLED_IF", "true";
       ] empty
 
 end
@@ -586,6 +592,7 @@ type deps =  {
   load_libs: string list option;
   load_module: string list option;
   deps_cmd: string list option;
+  enabled_if: string option;
 }
 
 type execnow =
@@ -619,6 +626,7 @@ type config =
                                   *)
     dc_libs : string list option; (** libraries to compile *)
     dc_deps : string list option ; (** deps *)
+    dc_enabled_if : string option ; (** enabled if condition *)
     dc_plugin : string list option; (** only plugins to load *)
     dc_module : string list option; (** module to load *)
     dc_macros: Macros.t; (** existing macros. *)
@@ -670,11 +678,13 @@ end = struct
         "PTEST_FILE", ptest_file;
         "PTEST_NAME", ptest_name;
       ] in
-    let subst = Macros.expand_list ~file
-        (Macros.add_list ptest_vars Macros.empty)
+    let ptest_macros = Macros.add_list ptest_vars Macros.empty in
+    let subst = Macros.expand_list ~file ptest_macros in
+    let dc_enabled_if = Macros.expand_enabled_if  ~file ptest_macros config.dc_enabled_if
     in
     ptest_name,
     { config with
+      dc_enabled_if;
       dc_execnow = List.rev config.dc_execnow;
       dc_deps = Option.map subst config.dc_deps ;
       dc_plugin = Option.map subst config.dc_plugin;
@@ -698,6 +708,7 @@ end = struct
                load_libs=None;
                load_module=None;
                deps_cmd=None;
+               enabled_if=None;
              };
         timeout=""
       } ]
@@ -709,6 +720,7 @@ end = struct
       dc_execnow = [];
       dc_libs = None;
       dc_deps = None;
+      dc_enabled_if = None;
       dc_plugin = None;
       dc_module = None;
       dc_filter = None ;
@@ -788,7 +800,7 @@ end = struct
       (* preserve options ordering *)
       List.fold_right (fun x s -> s ^ " " ^ x) opts ""
 
-  let deps_of_config ?(deps={load_module=None;load_libs=None;load_plugin=None;deps_cmd=None}) config =
+  let deps_of_config ?(deps={load_module=None;load_libs=None;load_plugin=None;deps_cmd=None;enabled_if=None}) config =
     let select ~prev ~config = match config with
       | None -> prev
       | _ -> config
@@ -796,7 +808,8 @@ end = struct
     { load_module = select ~prev:deps.load_module ~config:config.dc_module;
       load_plugin = select ~prev:deps.load_plugin ~config:config.dc_plugin;
       load_libs= select ~prev:deps.load_libs ~config:config.dc_libs;
-      deps_cmd = select ~prev:deps.deps_cmd ~config:config.dc_deps
+      deps_cmd = select ~prev:deps.deps_cmd ~config:config.dc_deps;
+      enabled_if = select ~prev:deps.enabled_if ~config:config.dc_enabled_if
     }
 
   let config_exec ~once ~drop:_ ~file ~dir s current =
@@ -827,6 +840,13 @@ end = struct
       in
       let _,_,res = (add "" acc) in
       res
+
+  let config_enabled_if ~drop:_ ~file ~dir:_ s current =
+    let s = Macros.expand ~file current.dc_macros s in
+    let s = if s = "" then "true" else s in
+    { current with
+      dc_enabled_if = Some s;
+      dc_macros = Macros.add_list ["PTEST_ENABLED_IF", s] current.dc_macros }
 
   let config_deps ~drop:_ ~file ~dir:_ s current =
     let s = Macros.expand ~file current.dc_macros s in
@@ -985,6 +1005,7 @@ end = struct
       "MACRO", config_macro;
       "LIBS", config_libs;
       "DEPS", config_deps;
+      "ENABLED_IF", config_enabled_if;
       "MODULE", config_module "PTEST_MODULE";
       "SCRIPT", config_module "PTEST_SCRIPT";
       "PLUGIN", config_plugin;
@@ -1019,12 +1040,12 @@ end = struct
     let r = ref { default with dc_commands = [] } in
     let treat_line s =
       try
-        Scanf.sscanf s "%[ *]%[A-Za-z0-9]: %s@\n"
+        Scanf.sscanf s "%[ *]%[_A-Za-z0-9]: %s@\n"
           (fun _ name opt ->
              try
                r := (List.assoc name config_options) ~drop ~file ~dir opt !r
              with Not_found ->
-               Format.eprintf "@[%s: unknown configuration option: %s@.@]" file name)
+               Format.eprintf "@[%s: unknown directive: %s@.@]" file name)
       with
       | Scanf.Scan_failure _ ->
         if Str.string_match end_comment s 0
@@ -1264,6 +1285,11 @@ let pp_list_deps fmt l =
           (* kind={env_var,source_tree,glob_files,...} *)
           Format.fprintf fmt " (%s %S)" kind deps) l
 
+let pp_enabled_if fmt deps =
+  Format.fprintf fmt "(and %s%a)"
+    (Option.value ~default:"true" deps.enabled_if)
+    Fmt.(list (var_libavailable framac_plugin)) (list_of_deps deps.load_plugin)
+
 let pp_command_deps fmt command =
   Format.fprintf fmt "%S %a (package frama-c) %a"
     (* the test file *)
@@ -1317,7 +1343,7 @@ let update_oracle_dir ~env wtest =
 let std = false
 let pp_wtest ?(compacted=false) fmt wtest =
   let writer = (if compacted
-                then (fun json -> Format.fprintf fmt "%s" (Yojson.Safe.to_string ~std json))
+                then (fun json -> Format.fprintf fmt "%s" (Yojson.Safe.to_string ~std json)) 
                 else (fun json -> Format.fprintf fmt "%a" (Yojson.Safe.pretty_print ~std) json))
   in writer (wtest_to_yojson wtest)
 
@@ -1408,7 +1434,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
        (alias %S)\n  \
        (targets %S %S %a %a)\n  \
        (deps %S %S %S %a %a)\n  \
-       (enabled_if (and true %a))\n\
+       (enabled_if %a)\n\
        (action (run %s %S %S %a))\n\
        )@."
       (* rule: *)
@@ -1427,7 +1453,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       pp_list (List.map (Filename.concat wtest.oracle_dir) command.log_files)
       pp_command_deps command
       (* enabled_if: *)
-      Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
+      pp_enabled_if command.deps
       (* action: *)
       !wrapper_cmd
       wrapper_basename
@@ -1451,7 +1477,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
        (alias %S)\n  \
        (targets %S %S %a %a)\n  \
        (deps   %a)\n  \
-       (enabled_if (and true %a))\n\
+       (enabled_if %a)\n\
        (action (with-stderr-to %S (with-stdout-to %S (%s (system %S)))))\n\
        )@."
       (* rule: *)
@@ -1466,7 +1492,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       (* deps: *)
       pp_command_deps command
       (* enabled_if: *)
-      Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
+      pp_enabled_if command.deps
       (* action: *)
       cmderrlog
       cmdreslog
@@ -1478,7 +1504,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       Format.fprintf result_fmt
         "(rule ; FILTER %s #%d OF TEST FILE %S\n  \
          (deps %S)
-         (enabled_if (and true %a))\n\
+         (enabled_if %a)\n\
          (action (with-stdout-to %S (with-accepted-exit-codes (or 0 1 2 125) (system %S))))\n\
          )@."
         (* rule: *)
@@ -1488,7 +1514,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
         (* deps: *)
         fin
         (* enabled_if: *)
-        Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
+        pp_enabled_if command.deps
         (* action: *)
         fout cmd
   in
@@ -1498,7 +1524,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       Format.fprintf result_fmt
         "(rule ; COMPARE TARGET #%d OF TEST #%d FOR TEST FILE %S\n  \
          (alias %s)\n  \
-         (enabled_if (and true %a))\n\
+         (enabled_if %a)\n\
          (action (diff %S %S))\n\
          )@."
         (* rule: *)
@@ -1506,7 +1532,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
         (* alias: *)
         (ptests_alias ~env)
         (* enabled_if: *)
-        Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
+        pp_enabled_if command.deps
         (* action: *)
         (SubDir.make_file (SubDir.oracle_dir ~env) log)
         log
@@ -1515,7 +1541,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     "(rule ; REPRODUCE TEST #%d OF TEST FILE %S\n  \
      (alias %S)\n  \
      (deps  %a (universe))\n  \
-     (enabled_if (and true %a))\n\
+     (enabled_if %a)\n\
      (action (%s (system %S)))\n\
      )@."
     (* rule: *)
@@ -1525,7 +1551,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (* deps: *)
     pp_command_deps command
     (* enabled_if: *)
-    Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
+    pp_enabled_if command.deps
     (* action: *)
     accepted_exit_code
     command_string
@@ -1534,7 +1560,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     "(rule ; SHOW TEST COMMAND #%d OF TEST FILE %S\n  \
      (alias %S)\n  \
      (deps  %a (universe))\n  \
-     (enabled_if (and true %a))\n\
+     (enabled_if %a)\n\
      (action (system %S))\n\
      )@."
     (* rule: *)
@@ -1544,7 +1570,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (* deps: *)
     pp_command_deps command (* to get an updated build even in case of using the result *)
     (* enabled_if: *)
-    Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
+    pp_enabled_if command.deps
     (* action: *)
     ("echo '" ^ show_cmd wtest.cmd ^"'");
 
@@ -1553,37 +1579,37 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
   Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
-     (enabled_if (and true %a))\n\
+     (enabled_if %a)\n\
      (action (diff %S %S))\n\
      )@."
     (* alias: *)
     diff_alias
     (* enabled_if: *)
-    Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
+    pp_enabled_if command.deps
     (* action: *)
     wtest.oracle_out
     reslog;
   Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
-     (enabled_if (and true %a))\n\
+     (enabled_if %a)\n\
      (action (diff %S %S))\n\
      )@."
     (* alias: *)
     diff_alias
     (* enabled_if: *)
-    Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
+    pp_enabled_if command.deps
     (* action: *)
     wtest.oracle_err
     errlog;
   Format.fprintf result_fmt
     "(alias (name %S)\n  \
      (deps (alias %S))\n  \
-     (enabled_if (and true %a))\n\
+     (enabled_if %a)\n\
      )@."
     (ptests_alias ~env)
     diff_alias
-    Fmt.(list (var_libavailable framac_plugin)) (list_of_deps command.deps.load_plugin)
+    pp_enabled_if command.deps
   ;
   let oracle_subdir = SubDir.oracle_subdir ~env command.directory in
   oracle_target oracle_fmt oracle_subdir (Filename.basename (oracle_prefix ^ ".err.oracle"));
@@ -1593,11 +1619,12 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
 
 let deps_command ~file macros deps =
   let subst = Macros.expand_list ~file macros in
+  let enabled_if = Macros.expand_enabled_if ~file macros deps.enabled_if in
   let load_plugin = Option.map subst deps.load_plugin in
   let load_module = Option.map subst deps.load_module in
   let load_libs = Option.map (fun libs -> List.map (fun s -> s^".cmxs") (subst libs)) deps.load_libs in
   let deps_cmd = Option.map subst deps.deps_cmd in
-  { load_plugin; load_module; load_libs;
+  { enabled_if; load_plugin; load_module; load_libs;
     (* Merge LIBS: MODULE: and DEPS: directives as a dependency to files *)
     deps_cmd = Some ((list_of_deps load_libs) @ (list_of_deps load_module) @ (list_of_deps deps_cmd));
   }
@@ -1697,7 +1724,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
              (alias %s)\n  \
              (deps %a %a)\n  \
              (targets %a %a)\n  \
-             (enabled_if (and true %a))\n\
+             (enabled_if %a)\n\
              (action (run %s %%{dep:%s} %S))\n\
              )@."
             (* rule: *)
@@ -1711,7 +1738,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
             pp_list wtest.log
             pp_list wtest.bin
             (* enabled_if: *)
-            Fmt.(list (var_libavailable framac_plugin)) (list_of_deps cmd.deps.load_plugin)
+            pp_enabled_if cmd.deps
             (* action: *)
             !wrapper_cmd
             wrapper_basename
@@ -1731,7 +1758,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
              (alias %s)\n  \
              (deps (package frama-c)%a)\n  \
              (targets %a %a)\n  \
-             (enabled_if (and true %a))\n\
+             (enabled_if %a)\n\
              (action (system %S))\n\
              )@."
             (* rule: *)
@@ -1744,7 +1771,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
             pp_list wtest.log
             pp_list wtest.bin
             (* enabled_if: *)
-            Fmt.(list (var_libavailable framac_plugin)) (list_of_deps cmd.deps.load_plugin)
+            pp_enabled_if cmd.deps
             (* action: *)
             wtest.cmd
         end;
@@ -1755,7 +1782,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
           "(rule ; SHOW EXECNOW COMMAND #%d OF TEST FILE %S\n  \
            (alias %s)\n  \
            (deps  %a (universe))\n  \
-           (enabled_if (and true %a))\n\
+           (enabled_if %a)\n\
            (action (system %S))\n\
            )@."
           (* rule: *)
@@ -1765,7 +1792,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
           (* deps: *)
           pp_command_deps cmd (* to get an updated build even in case of using the result *)
           (* enabled_if: *)
-          Fmt.(list (var_libavailable framac_plugin)) (list_of_deps cmd.deps.load_plugin)
+          pp_enabled_if cmd.deps
           (* action: *)
           ("echo '" ^ show_cmd wtest.cmd ^"'");
         ;
@@ -1773,7 +1800,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
             Format.fprintf result_fmt
               "(rule ; COMPARE TARGET #%d OF EXECNOW #%d FOR TEST FILE %S\n  \
                (alias %s)\n  \
-               (enabled_if (and true %a))\n\
+               (enabled_if %a)\n\
                (action (diff %S %S))\n\
                )@."
               (* rule: *)
@@ -1781,7 +1808,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
               (* alias: *)
               (ptests_alias ~env)
               (* enabled_if: *)
-              Fmt.(list (var_libavailable framac_plugin)) (list_of_deps cmd.deps.load_plugin)
+              pp_enabled_if cmd.deps
               (* action: *)
               (SubDir.make_file (SubDir.oracle_dir ~env) log)
               log
