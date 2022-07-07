@@ -51,7 +51,8 @@ do
     if [[ ! "$i" =~ [.]in$ ]]; then
         file=$(basename $i)
         module=${file%.*}
-        printf '\nmodule %s: sig\n' ${module^}  >> Eva.mli
+        Module="$(echo "${module:0:1}" | tr '[:lower:]' '[:upper:]')${module:1}"
+        printf '\nmodule %s: sig\n' $Module >> Eva.mli
         awk '/\[@@@ api_start\]/{flag=1;next} /\[@@@ api_end\]/{flag=0} flag{ print (NF ? "  ":"") $0 }' $i  >> Eva.mli
         printf 'end\n' >> Eva.mli
     fi
@@ -66,6 +67,7 @@ do
     if [[ ! "$i" =~ [.]in$ ]]; then
         file=$(basename $i)
         module=${file%.*}
-        printf '\nmodule %s = %s\n' ${module^} ${module^} >> Eva.ml
+        Module="$(echo "${module:0:1}" | tr '[:lower:]' '[:upper:]')${module:1}"
+        printf '\nmodule %s = %s\n' $Module $Module >> Eva.ml
     fi
 done
