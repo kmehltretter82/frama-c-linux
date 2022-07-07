@@ -108,12 +108,11 @@ let consolidated = function
           results in
     r.verdict,
     (if cached then 1 else 0),
-    if p = Qed then
-      [Qed,pqed r]
+    if p = Qed then [Qed,pqed r]
     else
-      pmerge
-        [Qed,psolver r]
-        (if VCS.is_valid r then [p,presult r] else [])
+    if VCS.is_valid r
+    then pmerge [Qed,psolver r] [p,presult r]
+    else []
 
 let results prs =
   let verdict, cached, provers = consolidated prs in
