@@ -42,3 +42,11 @@ module List: sig
   (** since 4.12.0 *)
   val compare: ('a -> 'a -> int) -> 'a list -> 'a list -> int
 end
+
+module Seq: sig
+  (** since 4.14.0 *)
+  val mapi: (int -> 'a -> 'b) -> 'a Seq.t -> 'b Seq.t
+
+  (** since 4.14.0 *)
+  val unzip : ('a * 'b) Seq.t -> 'a Seq.t * 'b Seq.t
+end

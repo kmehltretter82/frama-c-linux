@@ -161,31 +161,27 @@ let opt_physical_location_of_loc loc =
   else [ Location.of_loc loc ]
 (* Cil_types *)
 let gen_results remarks =
-  let treat_alarm _e kf s ~rank:_ alarm annot (i, rules, content) =
-    if not (Mdr_params.PrintLibc.get ()) && kf_is_in_libc kf then
-      (* skip alarm in libc *)
-      (i, rules, content)
-    else
-      let prop = Property.ip_of_code_annot_single kf s annot in
-      let ruleId = Alarms.get_name alarm in
-      let rules =
-        Datatype.String.Map.add ruleId (Alarms.get_description alarm) rules
-      in
-      let label = "Alarm-" ^ string_of_int i in
-      let kind = kind_of_status (Property_status.Feedback.get prop) in
-      let level = level_of_status (Property_status.Feedback.get prop) in
-      let remark = get_remark remarks label in
-      let message = make_message alarm annot remark in
-      let locations = opt_physical_location_of_loc (Cil_datatype.Stmt.loc s) in
-      let res =
-        Sarif_result.create ~kind ~level ~ruleId ~message ~locations ()
-      in
-      (i+1, rules, res :: content)
+  let keep_alarm (_,kf,_,_,_,_) =
+    (* skip alarm in libc *)
+    Mdr_params.PrintLibc.get () || not (kf_is_in_libc kf)
   in
-  let _, rules, content =
-    Alarms.fold treat_alarm (0, Datatype.String.Map.empty,[])
+  let treat_alarm i (_e,kf,s,_rank,alarm,annot) =
+    let prop = Property.ip_of_code_annot_single kf s annot in
+    let ruleId = Alarms.get_name alarm in
+    let label = "Alarm-" ^ string_of_int i in
+    let kind = kind_of_status (Property_status.Feedback.get prop) in
+    let level = level_of_status (Property_status.Feedback.get prop) in
+    let remark = get_remark remarks label in
+    let message = make_message alarm annot remark in
+    let locations = opt_physical_location_of_loc (Cil_datatype.Stmt.loc s) in
+    let res = Sarif_result.create ~kind ~level ~ruleId ~message ~locations () in
+    (ruleId, Alarms.get_description alarm), res
   in
-  rules, List.rev content
+  let rules, content =
+    Alarms.to_seq () |> Seq.filter keep_alarm |>
+    Transitioning.Seq.mapi treat_alarm |> Transitioning.Seq.unzip
+  in
+  Datatype.String.Map.of_seq rules, List.of_seq content
 
 let is_alarm = function
   | Property.(IPCodeAnnot { ica_ca }) -> Option.is_some (Alarms.find ica_ca)

@@ -45,3 +45,15 @@ module List = struct
         let n = f x1 x2 in
         if n = 0 then compare f q1 q2 else n
 end
+
+
+module Seq = struct
+  open Stdlib.Seq
+
+  let mapi f seq =
+    let i = ref 0 in
+    map (fun x -> let y = f !i x in incr i; y) seq
+
+  let unzip seq =
+    map fst seq, map snd seq
+end
