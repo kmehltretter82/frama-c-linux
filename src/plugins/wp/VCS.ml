@@ -79,9 +79,12 @@ let name_of_prover = function
   | Qed -> "qed"
   | Tactical -> "script"
 
-let title_of_prover = function
+let title_of_prover ?version = function
   | Why3 s ->
-    if Wp_parameters.has_dkey dkey_shell
+    let v = match version with Some v -> v | None ->
+      Wp_parameters.has_dkey dkey_shell
+    in
+    if v
     then Why3Provers.name s
     else Why3Provers.title s
   | Qed -> "Qed"

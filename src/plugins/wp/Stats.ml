@@ -207,7 +207,8 @@ let pp_stats fmt s =
   List.iter
     (fun (p,pr) ->
        let success = truncate pr.success in
-       Format.fprintf fmt " (%a" VCS.pp_prover p ;
+       let title = VCS.title_of_prover ~version:false p in
+       Format.fprintf fmt " (%s" title ;
        if success > 0 && np > 1 then
          Format.fprintf fmt " %d/%d" success np ;
        if not shell && pr.time > Rformat.epsilon then
