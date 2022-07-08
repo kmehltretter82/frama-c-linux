@@ -236,6 +236,8 @@ manuals:
 internal:
   <<: *internal_template
   when: manual
+  except:
+    - schedules
 
 internal_nightly:
   <<: *internal_template
@@ -246,16 +248,26 @@ internal_nightly:
 
 # OCaml versions
 
-ocaml-versions:
+.build_template: &ocaml_versions_template
   stage: compatibility
   script:
     - ./nix/build-proxy.sh default-config-tests
   parallel:
     matrix:
       - OCAML: ["4.08", "4.13"]
+
+ocaml-versions:
+  <<: *ocaml_versions_template
   # in schedules, each OCAML is tested in its own complete pipeline
   except:
     - schedules
+
+ocaml-versions-nightly:
+  <<: *ocaml_versions_template
+  # we still check them for the publisher pipeline job
+  only:
+    variables:
+      - $PUBLISH == "yes"
 
 # Opam pin
 
@@ -272,6 +284,8 @@ ocaml-versions:
 opam-pin:
   <<: *opam_template
   when: manual
+  except:
+    - schedules
 
 opam-pin-nightly:
   <<: *opam_template
