@@ -44,11 +44,21 @@
 # - to use fix-utf8 target, the variable LINT_FROM_ENCODING=<from-encoding-name>
 #   has to be set.
 #
-# Aliases when LINT_FILE is undefined:
-# - make <lint-target>.before-push     -> LINT_DIFF="--cached origin/$(git branch --show-current)" make <lint-target>
-# - make <lint-target>.before-ammend   -> LINT_DIFF="--cached HEAD"  make <lint-target>
-# - make <lint-target>.before-add      -> LINT_DIFF="HEAD"           make <lint-target>
-# - make <lint-target>.previous-commit -> LINT_DIFF="--cached HEAD~1" make <lint-target>
+# Advanced targets when LINT_FILE is undefined
+# - make <lint-target>.unstaged
+#   looks at unstaged files
+# - make <lint-target>.before-commit-a
+#   looks at unstaged and staged files
+# - make <lint-target>.before-commit-a--ammend
+#   looks at unstaged, staged and previously committed files
+# - make <lint-target>.before-commit--ammend
+#   looks at staged and previously committed files and checks that there is no unstaged files
+# - make <lint-target>.before-commit
+#   looks at staged files and checks that there is no unstaged files
+# - make <lint-target>.previous-commit
+#   looks at files of the last commit and checks that there is no staged nor unstaged files
+# - make <lint-target>.before-push:
+#   looks at files modified from origin/$(git branch --show-current) and checks that there is no staged nor unstaged files
 
 # make clean-lint (removing linting targets) includes
 # - make clean-utf8
@@ -86,6 +96,7 @@ MV      ?= mv
 RM      ?= rm -f
 RMDIR   ?= rm -rf
 TOUCH   ?= touch
+WC      ?= wc
 
 ifeq ($(PLATFORM),MacOS)
 XARGS   ?= xargs
@@ -189,66 +200,91 @@ $(LINT.clean-targets):
 
 ###############################
 
+ifeq ($(LINT_FILE),) ############# No lint file given
+
+######## LINT_DIR filter
+LINT.dir=$(wildcard $(LINT_DIR))
+
+######## LINT_DIFF filter
+
 define LINT.file-list-from-git-diff
-LINT.FILE_LIST=$(GIT) diff --name-status $(1) | $(GREP) -v "^D" | $(SED) "s/^.[ \t]*//" | $(TR) '\n' '\000'
+$(GIT) diff --name-status $(1) | $(GREP) -v "^D" | $(SED) "s/^.[ \t]*//" | $(TR) '\n' '\000'
 endef
 
-###############################
-
-ifeq ($(LINT_FILE),)
-
-# No lint file given
-
-LINT.dir=$(wildcard $(LINT_DIR))
+define LINT.file-list-filter-with-git-diff
+LINT.$(1)-filter-targets=$$(addsuffix .$(1),$$(LINT.main-targets))
+.PHONY: $(LINT.$(1)-filter-targets)
+$$(LINT.$(1)-filter-targets):: LINT.FILE_LIST=$$(call LINT.file-list-from-git-diff,$(2))
+$$(LINT.$(1)-filter-targets):: %.$(1) : $(3) %
+	@echo [LINT] Done: LINT_DIFF=\"$(2)\" make $$(basename $$@)
+	@echo [LINT] git diff --name-status
+	$$(GIT) diff --name-status HEAD
+endef
 
 ifeq ($(LINT_DIFF),)
 LINT.FILE_LIST=$(GIT) ls-files $(LINT.dir) -z
 else
 $(info [LINT] Looking at files modified from branch/commit: '$(LINT_DIFF)')
-$(eval $(call LINT.file-list-from-git-diff,$(LINT_DIFF)))
+LINT.FILE_LIST=$(call LINT.file-list-from-git-diff,$(LINT_DIFF))
+$(info $(LINT.FILE_LIST))
 endif
 
-#### LINT_DIFF="--cached origin/$(git branch --show-current)"
+#### rules for make <lint-target>.before-push
+##   looks at files modified from origin/$(git branch --show-current) and checks that there is no staged nor unstaged files
 
-LINT.before-push-targets=$(addsuffix .before-push,$(LINT.main-targets))
+PHONY: LINT.checked-unmodified-ok
+LINT.checked-unmodified-ok:
+	$(eval LINT.checked-unmodified := $(shell $(GIT) diff --name-status HEAD | $(WC) -l))
+	if [ 0 != $(LINT.checked-unmodified) ]; then \
+           echo "[LINT] Staged or unstaged files=$(LINT.checked-unmodified):"; \
+            $(GIT) diff --name-status HEAD; \
+           echo "[LINT] Error: may check some staged or unstaged file versions" ; \
+           exit 1; \
+        fi;
 
-.PHONY: $(LINT.before-push-targets)
-$(LINT.before-push-targets): $(eval $(call LINT.file-list-from-git-diff,--cached origin/$(shell git branch --show-current)))
-$(LINT.before-push-targets): %.before-push : %
-	@echo [LINT] git diff --name-status
-	$(GIT) diff --name-status
+$(eval $(call LINT.file-list-filter-with-git-diff,before-push,--cached origin/$(shell git branch --show-current),LINT.checked-unmodified-ok))
 
-#### LINT_DIFF="--cached HEAD"
+#### rules for make <lint-target>.unstaged
+##   looks at unstaged files
 
-LINT.before-ammend-targets=$(addsuffix .before-ammend,$(LINT.main-targets))
+$(eval $(call LINT.file-list-filter-with-git-diff,unstaged, ))
 
-.PHONY: $(LINT.before-ammend-targets)
-$(LINT.before-ammend-targets): $(eval $(call LINT.file-list-from-git-diff,--cached HEAD))
-$(LINT.before-ammend-targets): %.before-ammend : %
-	@echo [LINT] git diff --name-status
-	$(GIT) diff --name-status
+#### rules for make <lint-target>.before-commit
+##   looks at staged files and checks that there is no unstaged files
 
-#### LINT_DIFF="HEAD"
+PHONY: LINT.checked-unstaged-ok
+LINT.checked-unstaged-ok:
+	$(eval LINT.checked-unstaged := $(shell $(GIT) diff --name-status | $(WC) -l))
+	if [ 0 != $(LINT.checked-unstaged) ]; then \
+	   echo "[LINT] Unstaged files=$(LINT.checked-unstaged):"; \
+           $(GIT) diff --name-status ; \
+           echo "[LINT] Error: may check some unstaged version files version." ; \
+           exit 1; \
+        fi;
 
-LINT.before-add-targets=$(addsuffix .before-add,$(LINT.main-targets))
+$(eval $(call LINT.file-list-filter-with-git-diff,staged,--cached HEAD,LINT.checked-unstaged-ok))
 
-.PHONY: $(LINT.before-add-targets)
-$(LINT.before-add-targets): $(eval $(call LINT.file-list-from-git-diff,HEAD))
-$(LINT.before-add-targets): %.before-add : %
-	@echo [LINT] git diff --name-status
-	$(GIT) diff --name-status
+#### rules for make <lint-target>.before-commit-a
+## looks at unstaged and staged files
 
-#### LINT_DIFF="--cached HEAD~1"
+$(eval $(call LINT.file-list-filter-with-git-diff,before-commit-a,HEAD,))
 
-LINT.previous-commit-targets=$(addsuffix .previous-commit,$(LINT.main-targets))
+#### rules for make <lint-target>.before-commit-a--ammend
+##   looks at unstaged, staged and previously committed files
 
-.PHONY: $(LINT.previous-commit-targets)
-$(LINT.previous-commit-targets): $(eval $(call LINT.file-list-from-git-diff,--cached HEAD~1))
-$(LINT.previous-commit-targets): %.previous-commit : %
-	@echo [LINT] git diff --name-status
-	$(GIT) diff --name-status
+$(eval $(call LINT.file-list-filter-with-git-diff,before-commit-a--ammend,HEAD~1,))
 
-#### filter set attr
+#### rules for make <lint-target>.before-commit--amend
+##   looks at staged and previously committed files and checks that there is no unstaged files
+
+$(eval $(call LINT.file-list-filter-with-git-diff,before-commit--ammend,HEAD~1,LINT.checked-unstaged-ok))
+
+#### rules for make <lint-target>.previous-commit
+## looks at files of the last commit and checks that there is no staged nor unstaged files
+
+$(eval $(call LINT.file-list-filter-with-git-diff,previous-commit,HEAD~1,LINT.checked-unmodified-ok))
+
+#### get attr / filter set attr
 
 LINT.GET_ATTR=$(GIT) check-attr --stdin -z
 LINT.FILTER_FILE_ATTR=$(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p'
@@ -275,7 +311,7 @@ $(LINT.fix-targets):
         | $(XARGS) -0 -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
 
 
-else # LINT_FILE are given
+else #############  LINT_FILE are given
 
 ## Internal targets from the recursive make
 
