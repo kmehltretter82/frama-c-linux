@@ -117,6 +117,10 @@ val after : Cil_types.stmt -> request
 (** Just before a statement or at the start of the analysis. *)
 val before_kinstr : Cil_types.kinstr -> request
 
+(** Evaluation in a given cvalue state.
+    Callstacks selection are silently ignored on such requests. *)
+val in_cvalue_state: Cvalue.Model.t -> request
+
 
 (** Callstack selection *)
 

@@ -39,11 +39,15 @@ type control_point =
   | Before of Cil_types.stmt
   | After of Cil_types.stmt
 
-type request = {
+type context = {
   control_point : control_point;
   selector : callstack list option;
   filter: (callstack -> bool) list;
 }
+
+type request =
+  | Point of context
+  | Cvalue of Cvalue.Model.t
 
 type error = Bottom | Top | DisabledDomain
 type 'a result = ('a,error) Result.t
@@ -61,11 +65,8 @@ let pretty_result f fmt r =
 
 (* Building requests *)
 
-let make control_point = {
-  control_point;
-  selector = None;
-  filter = [];
-}
+let make control_point =
+  Point { control_point; selector = None; filter = []; }
 
 let before stmt = make (Before stmt)
 let after stmt = make (After stmt)
@@ -78,9 +79,20 @@ let before_kinstr = function
   | Cil_types.Kglobal -> at_start
   | Kstmt stmt -> before stmt
 
-let in_callstacks l req = { req with selector = Some l }
-let in_callstack cs req = { req with selector = Some [cs] }
-let filter_callstack f req = { req with filter = f :: req.filter }
+let change_context f = function
+  | Point ctx -> Point (f ctx)
+  | Cvalue _ as x -> x
+
+let in_callstacks l =
+  change_context (fun ctx -> { ctx with selector = Some l })
+
+let in_callstack cs =
+  change_context (fun ctx -> { ctx with selector = Some [cs] })
+
+let filter_callstack f =
+  change_context (fun ctx -> { ctx with filter = f :: ctx.filter })
+
+let in_cvalue_state cvalue = Cvalue cvalue
 
 
 (* Manipulating request results *)
@@ -120,7 +132,7 @@ struct
     | `Top -> Top
     | `Value state -> ByCallstack [cs,state]
 
-  let by_callstack : request ->
+  let by_callstack : context ->
     [< `Bottom | `Top | `Value of 'a Value_types.Callstack.Hashtbl.t ] ->
     ('a, restricted_to_callstack) t =
     fun req -> function
@@ -212,49 +224,64 @@ struct
     | Address: (EvalTypes.loc, 'c) Response.t * Locations.access ->
         (address,'c) evaluation
 
-  let get_by_callstack (req : request) :
+  let get_from_cvalue cvalue =
+    if Cvalue.Model.(equal cvalue bottom)
+    then `Bottom
+    else if Cvalue.Model.(equal cvalue top)
+    then `Top
+    else
+      let state = cvalue, Locals_scoping.bottom () in
+      `Value (A.Dom.set Cvalue_domain.State.key state A.Dom.top)
+
+  let get_by_callstack (ctx : context) :
     (_, restricted_to_callstack) Response.t =
     let open Response in
-    let selection = req.selector in
-    match req.control_point with
+    let selection = ctx.selector in
+    match ctx.control_point with
     | Before stmt ->
       A.get_stmt_state_by_callstack ?selection ~after:false stmt
-      |> by_callstack req
+      |> by_callstack ctx
     | After stmt ->
       A.get_stmt_state_by_callstack ?selection ~after:true stmt
-      |> by_callstack req
+      |> by_callstack ctx
     | Initial ->
       A.get_global_state () |> singleton []
     | Start kf ->
-      A.get_initial_state_by_callstack ?selection kf |> by_callstack req
+      A.get_initial_state_by_callstack ?selection kf |> by_callstack ctx
 
   let get (req : request) : (_, unrestricted_response) Response.t =
-    if req.filter <> [] || Option.is_some req.selector then
-      Response.coercion @@ get_by_callstack req
-    else
-      let open Response in
-      let state =
-        match req.control_point with
-        | Before stmt -> A.get_stmt_state ~after:false stmt
-        | After stmt -> A.get_stmt_state ~after:true stmt
-        | Start kf -> A.get_initial_state kf
-        | Initial -> A.get_global_state ()
-      in
-      consolidated ~top:A.Dom.top state
+    let open Response in
+    match req with
+    | Cvalue state -> consolidated ~top:A.Dom.top  (get_from_cvalue state)
+    | Point req ->
+      if req.filter <> [] || Option.is_some req.selector then
+        Response.coercion @@ get_by_callstack req
+      else
+        let state =
+          match req.control_point with
+          | Before stmt -> A.get_stmt_state ~after:false stmt
+          | After stmt -> A.get_stmt_state ~after:true stmt
+          | Start kf -> A.get_initial_state kf
+          | Initial -> A.get_global_state ()
+        in
+        consolidated ~top:A.Dom.top state
 
   let convert : 'a or_top_bottom -> 'a result = function
     | `Top -> Result.error Top
     | `Bottom -> Result.error Bottom
     | `Value v -> Result.ok v
 
-  let callstacks req =
-    get_by_callstack req |> Response.callstacks
+  let callstacks = function
+    | Point ctx -> get_by_callstack ctx |> Response.callstacks
+    | Cvalue _ -> []
 
-  let by_callstack req =
-    let f cs _res acc =
-      (cs, in_callstack cs req) :: acc
-    in
-    get_by_callstack req |> Response.fold f []
+  let by_callstack = function
+    | Cvalue _ -> assert false
+    | Point ctx as req ->
+      let f cs _res acc =
+        (cs, in_callstack cs req) :: acc
+      in
+      get_by_callstack ctx |> Response.fold f []
 
   let is_reachable req =
     match get req with
