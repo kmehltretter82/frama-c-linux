@@ -636,6 +636,7 @@ struct
   let mem key = H.mem !state key
   let iter f = H.iter f !state
   let fold f acc = H.fold f !state acc
+  let to_seq () = H.to_seq !state
   let iter_sorted ~cmp f = H.iter_sorted ~cmp f !state
   let fold_sorted ~cmp f acc = H.fold_sorted ~cmp f !state acc
   let remove key =

@@ -136,6 +136,7 @@ sig
   val mem: H.key -> bool
   val iter: (H.key -> internal_tbl -> unit) -> unit
   val fold: (H.key -> internal_tbl -> 'a -> 'a) -> 'a -> 'a
+  val to_seq: unit -> (H.key * internal_tbl) Seq.t
   val iter_sorted:
     cmp: (H.key -> H.key -> int) -> (H.key -> internal_tbl -> unit) -> unit
   val fold_sorted:
