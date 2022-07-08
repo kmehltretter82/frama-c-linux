@@ -27,8 +27,12 @@
 open VCS
 
 type pstats = {
-  time: float; (* cumulated, in seconds *)
-  success: int; (* cumulated number of success *)
+  tmin : float ;
+  tval : float ;
+  tmax : float ;
+  tnbr : float ;
+  time : float ;
+  success : float ;
 }
 
 type stats = {
@@ -54,29 +58,40 @@ module Plist = Qed.Listmap.Make
     end)
 
 let pzero = {
+  tmin = max_float ;
+  tval = 0.0 ;
+  tmax = 0.0 ;
+  tnbr = 0.0 ;
   time = 0.0 ;
-  success = 0 ;
+  success = 0.0 ;
 }
 
 let padd a b =
   if a == pzero then b else
   if b == pzero then a else
     {
+      tmin = min a.tmin b.tmin ;
+      tmax = max a.tmax b.tmax ;
+      tval = a.tval +. b.tval ;
       time = a.time +. b.time ;
-      success = a.success + b.success ;
+      tnbr = a.tnbr +. b.tnbr ;
+      success = a.success +. b.success ;
     }
 
 let pmerge = Plist.union (fun _ a b -> padd a b)
 
+let ptime t valid =
+  { tmin = t ; tval = t ; tmax = t ; time = t ; tnbr = 1.0 ;
+    success = if valid then 1.0 else 0.0 }
 
-let pqed r =
-  { time = r.solver_time ; success = if VCS.is_valid r then 1 else 0 }
+let psmoke r =
+  { pzero with
+    time = r.prover_time ;
+    success = if VCS.is_valid valid then 1.0 else 0.0 }
 
-let presult r =
-  { time = r.prover_time ; success = if VCS.is_valid r then 1 else 0 }
-
-let psolver r =
-  { time = r.solver_time ; success = 0 }
+let pqed r = ptime r.solver_time (VCS.is_valid r)
+let presult r = ptime r.prover_time (VCS.is_valid r)
+let psolver r = ptime r.solver_time false
 
 (* -------------------------------------------------------------------------- *)
 (* --- Global Stats                                                       --- *)
@@ -96,7 +111,7 @@ let zero = {
 let choose (p,rp) (q,rq) =
   if VCS.leq rp rq then (p,rp) else (q,rq)
 
-let consolidated = function
+let consolidated ~smoke = function
   | [] -> NoResult, 0, []
   | u::w as results ->
     let p,r = List.fold_left choose u w in
@@ -111,11 +126,14 @@ let consolidated = function
     if p = Qed then [Qed,pqed r]
     else
     if VCS.is_valid r
-    then pmerge [Qed,psolver r] [p,presult r]
+    then pmerge [Qed,psolver r] [p,if smoke then psmoke r else presult r]
     else []
 
-let results prs =
-  let verdict, cached, provers = consolidated prs in
+let smoked_result (p,r) = p, { r with verdict = VCS.smoked r.verdict }
+
+let results ~smoke prs =
+  let prs = if smoke then List.map smoked_result prs else prs in
+  let verdict, cached, provers = consolidated ~smoke prs in
   match verdict with
   | Valid ->
     { zero with provers ; cached ; proved = 1 }
@@ -143,20 +161,40 @@ let add a b =
     }
 
 let tactical ~qed children =
-  let provers =
-    [Qed,{ time = qed ; success = if children = [] then 1 else 0 }]
-  in List.fold_left add { zero with provers ; tactics = 1 } children
+  let valid = children = [] in
+  let provers = [Qed,ptime qed valid] in
+  List.fold_left add { zero with provers ; tactics = 1 } children
 
 (* -------------------------------------------------------------------------- *)
 (* --- Utils                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-let proofs s =
-  s.proved + s.timeout + s.unknown + s.noresult + s.failed
-
+let proofs s = s.proved + s.timeout + s.unknown + s.noresult + s.failed
 let complete s = s.proved = proofs s
 
-let pretty fmt s =
+let pp_pstats fmt p =
+  if p.tnbr > 0.0 &&
+     p.tmin > Rformat.epsilon &&
+     not (Wp_parameters.has_dkey VCS.dkey_shell)
+  then
+    let mean = p.tval /. p.tnbr in
+    let epsilon = 0.05 *. mean in
+    let delta = p.tmax -. p.tmin in
+    if delta < epsilon then
+      Format.fprintf fmt " (%a)" Rformat.pp_time mean
+    else
+      let middle = (p.tmin +. p.tmax) *. 0.5 in
+      if abs_float (middle -. mean) < epsilon then
+        Format.fprintf fmt " (%a-%a)"
+          Rformat.pp_time p.tmin
+          Rformat.pp_time p.tmax
+      else
+        Format.fprintf fmt " (%a-%a-%a)"
+          Rformat.pp_time p.tmin
+          Rformat.pp_time mean
+          Rformat.pp_time p.tmax
+
+let pp_stats fmt s =
   let vp = s.proved in
   let np = proofs s in
   if vp < np && np > 1 then
@@ -168,9 +206,10 @@ let pretty fmt s =
   let shell = Wp_parameters.has_dkey dkey_shell in
   List.iter
     (fun (p,pr) ->
+       let success = truncate pr.success in
        Format.fprintf fmt " (%a" VCS.pp_prover p ;
-       if pr.success > 0 && np > 1 then
-         Format.fprintf fmt " %d/%d" pr.success np ;
+       if success > 0 && np > 1 then
+         Format.fprintf fmt " %d/%d" success np ;
        if not shell && pr.time > Rformat.epsilon then
          Format.fprintf fmt " %a" Rformat.pp_time pr.time ;
        Format.fprintf fmt ")"
@@ -185,16 +224,16 @@ let pretty fmt s =
 (* --- Yojson                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let to_json_p (p,r) : Json.t = `Assoc [
+let pstats_to_json (p,r) : Json.t = `Assoc [
     "prover", `String (VCS.name_of_prover p) ;
     "hprover", `String (VCS.title_of_prover p) ;
     "time", `Float r.time ;
     "htime", `String (Pretty_utils.to_string Rformat.pp_time r.time) ;
-    "success", `Int r.success ;
+    "success", `Int (truncate r.success) ;
   ]
 
-let to_json s : Json.t = `Assoc [
-    "provers", `List (List.map to_json_p s.provers);
+let stats_to_json s : Json.t = `Assoc [
+    "provers", `List (List.map pstats_to_json s.provers);
     "tactics", `Int s.tactics;
     "proved", `Int s.proved;
     "timeout", `Int s.timeout;

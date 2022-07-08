@@ -26,14 +26,18 @@
 
 (** Prover Stats *)
 type pstats = {
-  time: float; (** cumulated, in seconds *)
-  success: int; (** cumulated number of success *)
+  tmin : float ; (** minimum prover time (non-smoke proof only) *)
+  tval : float ; (** cummulated prover time (non-smoke proof only) *)
+  tmax : float ; (** maximum prover time (non-smoke proof only) *)
+  tnbr : float ; (** number of non-smoke proofs *)
+  time : float ; (** cumulated prover time (smoke and non-smoke) *)
+  success : float ; (** number of success (valid xor smoke) *)
 }
 
 (** Cumulated Stats *)
 type stats = {
   provers : (VCS.prover * pstats) list ;
-  tactics : int ; (* number of tactics *)
+  tactics : int ;
   proved : int ;
   timeout : int ;
   unknown : int ;
@@ -42,14 +46,15 @@ type stats = {
   cached : int ;
 }
 
-val pretty : Format.formatter -> stats -> unit
+val pp_pstats : Format.formatter -> pstats -> unit
+val pp_stats : Format.formatter -> stats -> unit
 
-val results : (VCS.prover * VCS.result) list -> stats
+val results : smoke:bool -> (VCS.prover * VCS.result) list -> stats
 val tactical : qed:float -> stats list -> stats
 
 val proofs : stats -> int
 val complete : stats -> bool
 
-val to_json : stats -> Json.t
+val stats_to_json : stats -> Json.t
 
 (* -------------------------------------------------------------------------- *)
