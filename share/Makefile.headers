@@ -30,7 +30,9 @@
 # Must be unset (for external plugins) and set (for FRAMA-C kernel)
 FRAMAC_HDRCK?=
 
-# Can be set to no
+HDRCK?=frama-c-hdrck
+
+# Can be set to no/yes
 # - yes: adds "-exit-on-warning" option to "frama-c-hdrck"
 HEADER_STRICT?=yes
 
@@ -68,119 +70,129 @@ HEADER_SAVE_SPEC?=no
 HDRCK_EXTRA?=
 
 ##########################################################################
+## Tools
+
+GIT  ?= git
+DUNE ?= dune
+TEE  ?= tee
+
+##########################################################################
 ## Command used to execute hdrck
 
 # Note: the public name of hdrck.exe is frama-c-hdrck
 ifeq ($(FRAMAC_HDRCK),)
 
 # HDRCK is external
-HDRCK:= frama-c-hdrck
+HDRCK.CMD:= $(HDRCK)
 
 else
 
 # HDRCK is internal
-HDRCK:= dune exec --root $(FRAMAC_HDRCK_SRC) -- frama-c-hdrck
+HDRCK.CMD:= $(DUNE) exec --root $(FRAMAC_HDRCK_SRC) -- $(HDRCK)
 
-$(FRAMAC_HDRCK): $(FRAMAC_HDRCK_SRC)/hdrck.ml
-	dune build --root $(FRAMAC_HDRCK_SRC) hdrck.exe
+$(FRAMAC_HDRCK): tools/hdrck/hdrck.ml
+	$(DUNE) build --root $(FRAMAC_HDRCK_SRC) hdrck.exe
 
 endif
 
-HDRCK_OPTS:= --stdin
+HDRCK.OPTS:= --stdin
 
 ######################################################################
 ## Identifies how to get the header specification (from git/find/cat)
-## and updates HDRCK_OPTS variable
+## and updates HDRCK.OPTS variable
+
+HDRCK.FILE_LIST=$(GIT) ls-files -z
+HDRCK.FILE_ATTR=$(GIT) check-attr --stdin -z header_spec
 
 ifeq ($(HEADER_SPEC),)
 
-HEADER_HAS_GIT:=$(wildcard .git)
-ifneq ($(HEADER_HAS_GIT),)
+HDRCK.HAS_GIT:=$(wildcard .git)
+ifneq ($(HDRCK.HAS_GIT),)
 
 # From git (including git work-trees)
-HDRCK_SPEC:= git ls-files -z | git check-attr --stdin -z header_spec
-HDRCK_OPTS+= -z
+HDRCK.SPEC:=$(HDRCK.FILE_LIST) | $(HDRCK.FILE_ATTR)
+HDRCK.OPTS+= -z
 
 else
 
 # Note: in such a case, GIT is required...
-HDRCK_SPEC:=
+HDRCK.SPEC:=
 
-endif # HEADER_HAS_GIT
+endif # HDRCK.HAS_GIT
 
 else # HEADER_SPEC
 
 ifeq ($(HEADER_SAVE_SPEC),yes)
 
-HEADER_HAS_GIT:=$(wildcard .git)
-ifneq ($(HEADER_HAS_GIT),)
+HDRCK.HAS_GIT:=$(wildcard .git)
+ifneq ($(HDRCK.HAS_GIT),)
 
 # From git (including git work-trees)
-HDRCK_SPEC:= git ls-files -z | git check-attr --stdin -z header_spec | tee $(HEADER_SPEC)
-HDRCK_OPTS+= -z
+HDRCK.SPEC:= $(HDRCK.FILE_LIST) | $(HDRCK.FILE_ATTR) | $(TEE) $(HEADER_SPEC)
+HDRCK.OPTS+= -z
 
 else
 
 # Note: in such a case, GIT is required...
-HDRCK_SPEC:=
+HDRCK.SPEC:=
 
-endif # HEADER_HAS_GIT
+endif # HDRCK.HAS_GIT
 
 else # HEADER_SAVE_SPEC
 
 # From a file
-HDRCK_SPEC:= cat $(HEADER_SPEC)
+HDRCK.SPEC:= cat $(HEADER_SPEC)
 
 # The file format can be overloaded in using the var HDRCK_EXTRA
-HDRCK_OPTS+= -spec-format 3-zeros
+HDRCK.OPTS+= -spec-format 3-zeros
 
 endif # HEADER_SAVE_SPEC
 endif # HEADER_SPEC
 
 ################################
-## Updates HDRCK_OPTS variable
+## Updates HDRCK.OPTS variable
 
 ifneq ($(HEADER_DISTRIB_FILE),)
 # Adds the option "-distrib-file"
-HDRCK_OPTS+= -distrib-file $(HEADER_DISTRIB_FILE)
+HDRCK.OPTS+= -distrib-file $(HEADER_DISTRIB_FILE)
 endif
 
 ifneq ($(HEADER_EXCEPTIONS),)
 # Adds the option "-header-except-file"
-HDRCK_OPTS+= -header-except-file $(HEADER_EXCEPTIONS)
+HDRCK.OPTS+= -header-except-file $(HEADER_EXCEPTIONS)
 endif
 
 ifneq ($(HEADER_REPO),)
 # Adds the option "-C"
-HDRCK_OPTS+= -C $(HEADER_REPO)
+HDRCK.OPTS+= -C $(HEADER_REPO)
 endif
 
 ifeq ($(HEADER_STRICT),yes)
 # Adds the option "-exit-on-warning"
-HDRCK_OPTS+= -exit-on-warning
+HDRCK.OPTS+= -exit-on-warning
 endif
 
 #####################################
 ## Identifies where are the headers
-## and updates HDRCK_OPTS variable
+## and updates HDRCK.OPTS variable
 
 ifeq ($(HEADER_OPEN_SOURCE),yes)
-HDRCK_OPTS+= $(addprefix -header-dirs=,$(addsuffix /open-source,$(HEADER_DIRS)))
+HDRCK.OPTS+= $(addprefix -header-dirs=,$(addsuffix /open-source,$(HEADER_DIRS)))
 else
 ifeq ($(HEADER_OPEN_SOURCE),no)
-HDRCK_OPTS+= $(addprefix -header-dirs=,$(addsuffix /close-source,$(HEADER_DIRS)))
+HDRCK.OPTS+= $(addprefix -header-dirs=,$(addsuffix /close-source,$(HEADER_DIRS)))
 else
 ifeq ($(HEADER_OPEN_SOURCE),)
-HDRCK_OPTS+= $(addprefix -header-dirs=,$(HEADER_DIRS))
+HDRCK.OPTS+= $(addprefix -header-dirs=,$(HEADER_DIRS))
 else
-HDRCK_OPTS+= $(addprefix -header-dirs=,$(addsuffix /$(HEADER_OPEN_SOURCE),$(HEADER_DIRS)))
+HDRCK.OPTS+= $(addprefix -header-dirs=,$(addsuffix /$(HEADER_OPEN_SOURCE),$(HEADER_DIRS)))
 endif
 endif
 endif
 
 #################################
 
-ifeq ($(HDRCK_SPEC),)
+ifeq ($(HDRCK.SPEC),)
 
 .PHONY: check-headers
 check-headers: $(FRAMAC_HDRCK)
@@ -194,20 +206,19 @@ else
 
 .PHONY: check-headers
 check-headers: $(FRAMAC_HDRCK)
-	$(HDRCK_SPEC) | $(HDRCK) $(HDRCK_OPTS) $(HDRCK_EXTRA)
+	$(HDRCK.SPEC) | $(HDRCK.CMD) $(HDRCK.OPTS) $(HDRCK_EXTRA)
 
 .PHONY: headers
 headers: $(FRAMAC_HDRCK)
-	$(HDRCK_SPEC) | $(HDRCK) -update $(HDRCK_OPTS) $(HDRCK_EXTRA)
+	$(HDRCK.SPEC) | $(HDRCK.CMD) -update $(HDRCK.OPTS) $(HDRCK_EXTRA)
 
-endif # $(HDRCK_SPEC)
+endif # $(HDRCK.SPEC)
 
 #################################
 
 .PHONY: headers.info
 headers.info:
 	echo "FRAMAC_HDRCK='$(FRAMAC_HDRCK)'"
-	echo "HEADER_HAS_GIT='$(HEADER_HAS_GIT)'"
 	echo "HEADER_OPEN_SOURCE='$(HEADER_OPEN_SOURCE)'"
 	echo "HEADER_STRICT='$(HEADER_STRICT)'"
 	echo "HEADER_DIRS='$(HEADER_STRICT)'"
@@ -215,9 +226,10 @@ headers.info:
 	echo "HEADER_EXCEPTIONS='$(HEADER_EXCEPTIONS)'"
 	echo "HEADER_REPO='$(HEADER_REPO)'"
 	echo "HEADER_SPEC='$(HEADER_SPEC)'"
-	echo "HDRCK='$(HDRCK)'"
-	echo "HDRCK_SPEC='$(HDRCK_SPEC)'"
-	echo "HDRCK_OPTS='$(HDRCK_OPTS)'"
+	echo "HDRCK.HAS_GIT='$(HDRCK.HAS_GIT)'"
+	echo "HDRCK.CMD='$(HDRCK.CMD)'"
+	echo "HDRCK.SPEC='$(HDRCK.SPEC)'"
+	echo "HDRCK.OPTS='$(HDRCK.OPTS)'"
 
 
 ###############################################################################
