@@ -26,7 +26,8 @@
 
 let cfg = lazy
   begin
-    try Why3.Whyconf.init_config None
+    let extra_config = Wp_parameters.Why3ExtraConfig.get () in
+    try Why3.Whyconf.init_config ~extra_config None
     with exn ->
       Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
   end

@@ -136,6 +136,7 @@ module Steps: Parameter_sig.Int
 module Procs: Parameter_sig.Int
 module ProofTrace: Parameter_sig.Bool
 module Why3Flags: Parameter_sig.String_list
+module Why3ExtraConfig: Parameter_sig.String_list
 
 module Auto: Parameter_sig.String_list
 module AutoDepth: Parameter_sig.Int

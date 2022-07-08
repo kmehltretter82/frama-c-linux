@@ -983,6 +983,16 @@ module Why3Flags =
       let help = "Additional options for Why3"
     end)
 
+let () = Parameter_customize.set_group wp_prover_options
+let () = Parameter_customize.no_category ()
+module Why3ExtraConfig =
+  String_list
+    (struct
+      let option_name = "-wp-why3-extra-config"
+      let arg_name = "file,..."
+      let help = "Additional config files for Why3"
+    end)
+
 (* ------------------------------------------------------------------------ *)
 (* --- PO Management                                                    --- *)
 (* ------------------------------------------------------------------------ *)
