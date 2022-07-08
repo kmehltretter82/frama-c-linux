@@ -251,7 +251,6 @@ ocaml-versions:
   parallel:
     matrix:
       - OCAML: ["4.08", "4.13"]
-  when: manual
   # in schedules, each OCAML is tested in its own complete pipeline
   except:
     - schedules
