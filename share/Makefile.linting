@@ -20,6 +20,7 @@
 #                                                                        #
 ##########################################################################
 
+
 ################################
 # Code prettyfication and lint #
 ################################
@@ -29,17 +30,31 @@
 # - make check-eoleof: EOF preceded by an EOL
 # - make check-syntax: EOF preceded by an EOL + no TAB + no BLANK at the end
 # - make check-indent: valid indentation
+#
 # For all these targets (and the corresponding fix-XXX), it is possible to restrict the search to a sub-directory:
 # - make LINT_DIR=<subdir> <lint-target>
 # It is possible to force the action to given files:
 # - make LINT_FILE=<file> <lint-target>
 # or to the files modified between HEAD and a specific branch/commit:
 # - make LINT_DIFF=<branch/commit> <lint-target>
+#
 # Notes:
 # - when LINT_FILE is given, .gitattributes, LINT_DIFF and LINT_DIR are ignored;
 # - when LINT_DIFF is given, LINT_DIR is ignored (but .gitattributes is used);
 # - to use fix-utf8 target, the variable LINT_FROM_ENCODING=<from-encoding-name>
 #   has to be set.
+#
+# Aliases when LINT_FILE is undefined:
+# - make <lint-target>.before-push     -> LINT_DIFF="--cached origin/$(git branch --show-current)" make <lint-target>
+# - make <lint-target>.before-ammend   -> LINT_DIFF="--cached HEAD"  make <lint-target>
+# - make <lint-target>.before-add      -> LINT_DIFF="HEAD"           make <lint-target>
+# - make <lint-target>.previous-commit -> LINT_DIFF="--cached HEAD~1" make <lint-target>
+
+# make clean-lint (removing linting targets) includes
+# - make clean-utf8
+# - make clean-eoleof
+# - make clean-syntax
+# - make clean-indent
 
 # make clean-lint (removing linting targets) includes
 # - make clean-utf8
@@ -98,7 +113,6 @@ else
 LINT.make?=$(MAKE) --quiet -f $(LINT.makefile)
 endif
 
-
 ################################
 ## CHECK ocp-indent VERSION
 
@@ -130,17 +144,24 @@ endif
 ###############
 ## Main target
 
+LINT.check-targets= \
+        check-syntax check-indent check-eoleof check-utf8
+
+LINT.fix-targets=$(subst check-,fix-,$(LINT.check-targets))
+LINT.main-targets=lint $(LINT.check-targets) $(LINT.fix-targets)
+
 LINT.HAS_GIT:=$(wildcard .git)
 ifeq ($(LINT.HAS_GIT),)
 
-.PHONY:
+.PHONY: lint
 lint:
 	echo "'make lint' requires a git repository but, that is not"
 	echo "the case for example with 'make LINT_FILE=<file> check-syntax'"
 
 else
 
-lint: check-eoleof check-syntax check-indent check-utf8
+.PHONY: lint
+lint: $(LINT.check-targets)
 
 endif
 
@@ -158,22 +179,19 @@ clean:: clean-lint
 
 #### clean-check-XXX targets
 
-LINT.clean-targets=
+LINT.clean-targets=$(addprefix clean-,$(LINT.check-targets))
 
-# Same list on both lines
-LINT.clean-targets+= \
-        clean-check-eoleof clean-check-utf8 clean-check-syntax
-.PHONY: clean-check-eoleof clean-check-utf8 clean-check-syntax \
-
-# Same list on both lines
-LINT.clean-targets+= \
-        clean-check-indent
-.PHONY: clean-check-indent
-
+.PHONY: $(LINT.clean-targets)
 # Generic rule
 $(LINT.clean-targets):
 	echo "[LINT] Cleaning $(patsubst clean-%,%,$@) targets..."
 	$(FIND) .lint -type f -name \*.$(patsubst clean-%,%,$@) | $(XARGS) -n 10 $(RM)
+
+###############################
+
+define LINT.file-list-from-git-diff
+LINT.FILE_LIST=$(GIT) diff --name-status $(1) | $(GREP) -v "^D" | $(SED) "s/^.[ \t]*//" | $(TR) '\n' '\000'
+endef
 
 ###############################
 
@@ -184,40 +202,76 @@ ifeq ($(LINT_FILE),)
 LINT.dir=$(wildcard $(LINT_DIR))
 
 ifeq ($(LINT_DIFF),)
-FILE_LIST=$(GIT) ls-files $(LINT.dir) -z
+LINT.FILE_LIST=$(GIT) ls-files $(LINT.dir) -z
 else
 $(info [LINT] Looking at files modified from branch/commit: '$(LINT_DIFF)')
-FILE_LIST=$(GIT) diff --name-status --cached $(LINT_DIFF) | $(GREP) -v "^D" | $(SED) "s/^.[ \t]*//" | $(TR) '\n' '\000'
+$(eval $(call LINT.file-list-from-git-diff,$(LINT_DIFF)))
 endif
+
+#### LINT_DIFF="--cached origin/$(git branch --show-current)"
+
+LINT.before-push-targets=$(addsuffix .before-push,$(LINT.main-targets))
+
+.PHONY: $(LINT.before-push-targets)
+$(LINT.before-push-targets): $(eval $(call LINT.file-list-from-git-diff,--cached origin/$(shell git branch --show-current)))
+$(LINT.before-push-targets): %.before-push : %
+	@echo [LINT] git diff --name-status
+	$(GIT) diff --name-status
+
+#### LINT_DIFF="--cached HEAD"
+
+LINT.before-ammend-targets=$(addsuffix .before-ammend,$(LINT.main-targets))
+
+.PHONY: $(LINT.before-ammend-targets)
+$(LINT.before-ammend-targets): $(eval $(call LINT.file-list-from-git-diff,--cached HEAD))
+$(LINT.before-ammend-targets): %.before-ammend : %
+	@echo [LINT] git diff --name-status
+	$(GIT) diff --name-status
+
+#### LINT_DIFF="HEAD"
+
+LINT.before-add-targets=$(addsuffix .before-add,$(LINT.main-targets))
+
+.PHONY: $(LINT.before-add-targets)
+$(LINT.before-add-targets): $(eval $(call LINT.file-list-from-git-diff,HEAD))
+$(LINT.before-add-targets): %.before-add : %
+	@echo [LINT] git diff --name-status
+	$(GIT) diff --name-status
+
+#### LINT_DIFF="--cached HEAD~1"
+
+LINT.previous-commit-targets=$(addsuffix .previous-commit,$(LINT.main-targets))
+
+.PHONY: $(LINT.previous-commit-targets)
+$(LINT.previous-commit-targets): $(eval $(call LINT.file-list-from-git-diff,--cached HEAD~1))
+$(LINT.previous-commit-targets): %.previous-commit : %
+	@echo [LINT] git diff --name-status
+	$(GIT) diff --name-status
+
+#### filter set attr
+
+LINT.GET_ATTR=$(GIT) check-attr --stdin -z
+LINT.FILTER_FILE_ATTR=$(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p'
 
 #### check-XXX targets
 
-# Same list on both lines
-LINT.check-targets= \
-        check-syntax check-indent check-clang-format check-eoleof check-utf8
-.PHONY: check-syntax check-indent check-clang-format check-eoleof check-utf8
-
+.PHONY: $(LINT.check-targets)
 # Generic rule
 $(LINT.check-targets):
 	echo "[LINT] Checking from GIT attribute $@..."
-	$(FILE_LIST) \
-        | $(GIT) check-attr --stdin -z $@ \
-        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
+	$(LINT.FILE_LIST) \
+        | $(LINT.GET_ATTR) $@ \
+        | $(LINT.FILTER_FILE_ATTR) \
         | $(XARGS) -0 -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
 
 #### fix-XXX targets
 
-# Same list on both lines
-LINT.fix-targets= \
-        fix-eoleof fix-utf8 fix-syntax fix-indent
-.PHONY: fix-eoleof fix-utf8 fix-syntax fix-indent
-
 # Generic rule
 $(LINT.fix-targets):
 	echo "[LINT] Fixing from GIT attribute $(patsubst fix-%,check-%,$@)..."
-	$(FILE_LIST) \
-        | $(GIT) check-attr --stdin -z $(patsubst fix-%,check-%,$@) \
-        | $(SED) -zne 'x;n;n;s/^set$$//;t print;b;:print;x;p' \
+	$(LINT.FILE_LIST) \
+        | $(LINT.GET_ATTR) $(patsubst fix-%,check-%,$@) \
+        | $(LINT.FILTER_FILE_ATTR) \
         | $(XARGS) -0 -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
 
 
