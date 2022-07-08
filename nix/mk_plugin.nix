@@ -100,7 +100,7 @@ stdenv.mkDerivation {
     mkdir home
     HOME=$(pwd)/home
     why3 config detect
-    export FRAMAC_WP_CACHE=replay
+    export FRAMAC_WP_CACHE=offline
     export FRAMAC_WP_CACHEDIR=$wp_cache
     ''
   else "") ;
@@ -112,7 +112,7 @@ stdenv.mkDerivation {
   '';
 
   installFlags = [
-    "FRAMAC_INSTALLDIR=$(out)"
+    "INSTALLDIR=$(out)"
   ];
 
   postInstall = if install-opam then ''

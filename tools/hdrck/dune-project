@@ -1,4 +1,4 @@
-(lang dune 2.9)
+(lang dune 3.0)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                        ;;
 ;;  This file is part of Frama-C.                                         ;;
@@ -22,8 +22,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (package
-  (name frama-c-ptests)
-  (depends
-    (ppx_deriving_yojson (>= 3.5.1))
-  )
+  (name frama-c-hdchk)
 )

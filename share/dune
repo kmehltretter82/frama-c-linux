@@ -24,6 +24,11 @@
  (package frama-c)
  (section (site (frama-c share)))
  (files
+; Useful Makefiles
+(Makefile.headers as Makefile.headers)
+(Makefile.linting as Makefile.linting)
+(Makefile.installation as Makefile.installation)
+(Makefile.testing as Makefile.testing)
 ; GUI Images
 (frama-c.ico as frama-c.ico)
 (frama-c.png as frama-c.png)

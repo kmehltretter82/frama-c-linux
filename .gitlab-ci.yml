@@ -1,9 +1,13 @@
+################################################################################
+### STAGES
+
 stages:
+  - prepare
   - build
   - tests
   - distrib
   - compatibility
-  - make_public
+  - publish
 
 ################################################################################
 ### DEFAULT JOB PARAMETERS
@@ -17,23 +21,44 @@ default:
 
 variables:
   DEFAULT: "feature/bobot/jbuilder"
-  OCAML: "4_12"
-#     CURRENT: $CI_COMMIT_REF_NAME
-#     FRAMA_CI_OPT: "--override frama-c:$CI_COMMIT_REF_NAME,$CI_COMMIT_SHA"
+  OCAML: "4.11"
+  PUBLISH: "no"
 
 ################################################################################
-### BUILD
+### PREPARE
 
 check-no-old-frama-c:
-  stage: build
+  stage: prepare
   script:
     - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a HEAD)
     - git merge-base --is-ancestor a35d2118fe6999dddce9e1847eff626fae9cc37c HEAD
 
+.build_template: &do_not_stop_pipeline_template
+  stage: prepare
+  interruptible: false
+  script:
+    - echo "This pipeline won't be interrupted"
+
+unstoppable-pipeline:
+  <<: *do_not_stop_pipeline_template
+  only:
+    variables:
+      - $DEFAULT == $CI_COMMIT_BRANCH
+
+do-not-stop-pipeline:
+  <<: *do_not_stop_pipeline_template
+  when: manual
+  except:
+    variables:
+      - $DEFAULT == $CI_COMMIT_BRANCH
+
+################################################################################
+### BUILD
+
 frama-c:
   stage: build
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c
+    - ./nix/build-proxy.sh frama-c
   artifacts:
     when: on_failure
     paths:
@@ -58,147 +83,94 @@ ivette:
 ################################################################################
 ### TESTS
 
-acsl-importer:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh ACSL-importer
-
-caveat-importer:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh Caveat-importer
-
-cfp:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh context-from-precondition
 
 e-acsl-tests:
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.e-acsl-tests
-
-# EVA
+    - ./nix/build-proxy.sh e-acsl-tests
 
 .build_template: &eva_template
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.eva-$CONFIG-tests
+    - ./nix/build-proxy.sh eva-$CONFIG-tests
 
 eva-default-tests:
   variables:
     CONFIG: "default"
   <<: *eva_template
 
-eva-bitwise-tests:
-  variables:
-    CONFIG: "bitwise"
+eva-domains:
   <<: *eva_template
-
-eva-equality-tests:
-  variables:
-    CONFIG: "equality"
-  <<: *eva_template
-
-eva-gauges-tests:
-  variables:
-    CONFIG: "gauges"
-  <<: *eva_template
-
-eva-multidim-tests:
-  variables:
-    CONFIG: "multidim"
-  <<: *eva_template
-
-eva-octagon-tests:
-  variables:
-    CONFIG: "octagon"
-  <<: *eva_template
-
-eva-symblocs-tests:
-  variables:
-    CONFIG: "symblocs"
-  <<: *eva_template
-
-frama-clang:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh frama-clang
-
-genassigns:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh genassigns
+  parallel:
+    matrix:
+      - CONFIG: ["bitwise","equality","gauges","multidim","octagon","symblocs"]
 
 kernel-tests:
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.kernel-tests
-
-linea-cabs:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh linea-cabs
-
-metacsl:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh meta
-
-mthread:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh mthread
+    - ./nix/build-proxy.sh kernel-tests
 
 plugins-tests:
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.plugins-tests
-
-security:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh security
-
-volatile:
-  stage: tests
-  script:
-    - ./nix/external-plugin-ci.sh Volatile
+    - ./nix/build-proxy.sh plugins-tests
 
 wp-tests:
   stage: tests
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.wp-tests
+    - ./nix/build-proxy.sh wp-tests
+
+external-plugins:
+  stage: tests
+  script:
+    - ./nix/external-plugin-ci.sh $PLUGIN
+  parallel:
+    matrix:
+      - PLUGIN: [
+          "ACSL-importer",
+          "Caveat-importer",
+          "context-from-precondition",
+          "frama-clang",
+          "genassigns",
+          "linea-cabs",
+          "meta",
+          "mthread",
+          "security",
+          "Volatile"
+        ]
 
 ################################################################################
 ### DISTRIB
 
 # API documentation
 
-.build_template: &api-doc
+.build_template: &api_doc_template
   stage: distrib
+  variables:
+    OUT: "api"
   script:
-    - nix-build -o api nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.api-doc
+    - ./nix/build-proxy.sh api-doc
 
 api-doc-default: # Check that we successfully build but no artifact
-  <<: *api-doc
+  <<: *api_doc_template
 
 api-doc-artifact: # Note: the Nix store avoids rebuilding
-  <<: *api-doc
+  <<: *api_doc_template
   artifacts:
     paths:
       - api/frama-c-api.tar.gz
     expire_in: 7 days
   when: manual
 
-api-doc-scheduled: # Keep artifact for master branch each night
-  <<: *api-doc
+api-doc-scheduled: # Keep artifact for published branch each night
+  <<: *api_doc_template
   artifacts:
     paths:
       - api/frama-c-api.tar.gz
     expire_in: 7 days # Note: the LAST artifact of the ref is always kept
   only:
-    - schedules
+    variables:
+      - $PUBLISH == "yes"
 
 # Build distribution tarball
 
@@ -209,8 +181,7 @@ build-distrib-tarball:
     CI_LINK: "yes"
     HDRCK: "frama-c-hdrck"
   script:
-    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
-        --run 'autoconf && ./devel_tools/make-distrib.sh'
+    - ./nix/shell-checkers.sh "autoconf && ./dev/make-distrib.sh"
   artifacts:
     paths:
       - ./*.tar.gz
@@ -223,9 +194,7 @@ header-check:
   variables:
     FRAMAC_HDRCK: ""
   script:
-    - ls -la
-    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
-        --run 'make -f share/Makefile.headers check-headers'
+    - ./nix/shell-checkers.sh "make -f share/Makefile.headers check-headers"
 
 # Lint files
 
@@ -234,18 +203,19 @@ lint:
   variables:
     LINT_MAKEFILE: "share/Makefile.linting"
   script:
-    - nix-shell nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.frama-c-checkers-shell
-        --run 'make -f share/Makefile.linting lint'
+    - ./nix/shell-checkers.sh "make -f share/Makefile.linting lint"
 
 # Manuals
 
-.build_template: &manuals
+.build_template: &manuals_template
   stage: distrib
+  variables:
+    OUT: "manuals"
   script:
-    - nix-build -o manuals nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.manuals
+    - ./nix/build-proxy.sh manuals
 
 manuals:
-  <<: *manuals
+  <<: *manuals_template
   when: manual
   artifacts:
     paths:
@@ -269,76 +239,136 @@ internal:
 
 internal_nightly:
   <<: *internal_template
+  # The Opam target may affect this job
+  timeout: 2h
   only:
     - schedules
 
 # OCaml versions
 
-.build_template: &ocaml
+ocaml-versions:
   stage: compatibility
   script:
-    - nix-build nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.default-config-tests
+    - ./nix/build-proxy.sh default-config-tests
+  parallel:
+    matrix:
+      - OCAML: ["4.08", "4.13"]
+  # in schedules, each OCAML is tested in its own complete pipeline
+  except:
+    - schedules
 
-# ocaml-4.11:
-#   variables:
-#     OCAML: "4_11"
-#   <<: *ocaml
+# Opam pin
 
-# ocaml-4.13:
+.build_template: &opam_template
+  stage: compatibility
+  image: 'ocaml/opam:ubuntu-20.04-ocaml-$OCAML'
+  script:
+    - opam pin . -n
+    - opam depext frama-c --with-test
+    - opam install --jobs 2 frama-c --with-test
+  tags:
+    - docker
+
+opam-pin:
+  <<: *opam_template
+  when: manual
+
+opam-pin-nightly:
+  <<: *opam_template
+  only:
+    - schedules
+  allow_failure: true
+
+# TODO: Enable this rule later:
+#
+# opam-pin-minimal:
 #   variables:
-#     OCAML: "4_13"
-#   <<: *ocaml
+#     OPAMSOLVERTIMEOUT: "500"
+#     OPAMCRITERIA: "+count[version-lag,solution]"
+#     OPAMEXTERNALSOLVER: "builtin-0install"
+#   stage: prepare
+#   image: 'ocaml/opam:ubuntu-20.04-ocaml-$OCAML'
+#   script:
+#     - sudo ln -f /usr/bin/opam-2.1 /usr/bin/opam
+#     - opam --version
+#     - opam init --reinit -ni
+#     - opam pin . -n
+#     - opam depext frama-c --with-test
+#     - opam install --jobs 2 frama-c --with-test
+#   tags:
+#     - docker
+
+# Distrib
+
+.build_template: &src_distrib_tests_template
+  stage: compatibility
+  variables:
+    DIR: "extracted"
+  script:
+    - mkdir $DIR && tar -xzf frama-c.tar.gz --strip-components 1 -C ./extracted
+    - ./nix/build-proxy.sh src-distrib-tests
 
 src-distrib-tests:
-  stage: compatibility
-  script:
-    - mkdir extracted && tar -xzf frama-c.tar.gz --strip-components 1 -C ./extracted
-    - nix-build extracted/nix/pkgs.nix -A ocaml-ng.ocamlPackages_$OCAML.src-distrib-tests
+  <<: *src_distrib_tests_template
+  except:
+    - schedules
+
+src-distrib-tests-nightly:
+  <<: *src_distrib_tests_template
+  # The Opam target may affect this job
+  timeout: 2h
+  only:
+    - schedules
 
 ################################################################################
-### PUBLIC
+### PUBLISH
 
-# make_public stage is used to push the current master branch of Frama-C and
+# publish stage is used to push the current master branch of Frama-C and
 # associated plugins from the internal frama-c group to the public pub group.
-# For that, it uses the 'frama-c to frama-c-public' deploy key. Thus, to publish
+#
+# For that, it uses the 'frama-c to frama-c-public' publish key. Thus, to publish
 # a new plugin (while keeping its main repository internal), you can add a new
 # target to this stage, adapting the script for MetAcsl or Frama-Clang to your
 # own plugin.
-# You must also activate the deploy key on both frama-c/my_plugin
+#
+# You must also activate the publish key on both frama-c/my_plugin
 # and pub/my_plugin repositories (the former should be read-only, the latter
-# must provide write access to the deploy key).
+# must provide write access to the publish key).
 # Do not forget to trigger the target only on schedules, so that all public
 # repositories stay synchronized.
 
-make_public:
-  stage: make_public
+publish-frama-c:
+  stage: publish
   script:
     - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a origin/master)
     - echo "$FRAMA_C_PUBLIC_SSH_PRIVATE_KEY" | nix run -f channel:nixos-19.03 coreutils --command base64 -d > nix/frama-c-public/id_ed25519
     - nix run -f channel:nixos-19.03 coreutils --command chmod 400 nix/frama-c-public/id_ed25519
     - GIT_SSH=nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git push git@git.frama-c.com:pub/frama-c.git origin/master:refs/heads/master
   only:
-    - schedules
+    variables:
+      - $PUBLISH == "yes"
   interruptible: false
 
-make_public_meta:
-  stage: make_public
+publish-meta:
+  stage: publish
   script:
     - echo "$FRAMA_C_PUBLIC_SSH_PRIVATE_KEY" | nix run -f channel:nixos-19.03 coreutils --command base64 -d > nix/frama-c-public/id_ed25519
     - nix run -f channel:nixos-19.03 coreutils --command chmod 400 nix/frama-c-public/id_ed25519
     - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git clone git@git.frama-c.com:frama-c/meta.git nix/frama-c-public/meta
     - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git -C nix/frama-c-public/meta push git@git.frama-c.com:pub/meta origin/master:refs/heads/master
   only:
-    - schedules
+    variables:
+      - $PUBLISH == "yes"
   interruptible: false
 
-make_public_fclang:
-  stage: make_public
+publish-fclang:
+  stage: publish
   script:
     - echo "$FRAMA_C_PUBLIC_SSH_PRIVATE_KEY" | nix run -f channel:nixos-19.03 coreutils --command base64 -d > nix/frama-c-public/id_ed25519
     - nix run -f channel:nixos-19.03 coreutils --command chmod 400 nix/frama-c-public/id_ed25519
     - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git clone git@git.frama-c.com:frama-c/frama-clang.git nix/frama-c-public/frama-clang
     - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git -C nix/frama-c-public/frama-clang push git@git.frama-c.com:pub/frama-clang origin/master:refs/heads/master
   only:
-    - schedules
+    variables:
+      - $PUBLISH == "yes"
   interruptible: false

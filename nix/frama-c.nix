@@ -105,8 +105,8 @@ stdenvNoCC.mkDerivation rec {
   buildPhase = ''
     make config.sed
     dune build -j2 --display short $release_mode @install
-    make ptests/ptests.exe
-    make ptests/wtests.exe
+    make tools/ptests/ptests.exe
+    make tools/ptests/wtests.exe
   '';
 
   installFlags = [

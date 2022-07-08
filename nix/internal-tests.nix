@@ -111,8 +111,8 @@ stdenvNoCC.mkDerivation rec {
   buildPhase = ''
     make config.sed
     dune build -j2 --display short @install
-    make ptests/ptests.exe
-    make ptests/wtests.exe
+    make tools/ptests/ptests.exe
+    make tools/ptests/wtests.exe
   '';
 
   wp_cache = fetchGit "git@git.frama-c.com:frama-c/wp-cache.git";
@@ -123,7 +123,7 @@ stdenvNoCC.mkDerivation rec {
     mkdir home
     HOME=$(pwd)/home
     why3 config detect
-    export FRAMAC_WP_CACHE=replay
+    export FRAMAC_WP_CACHE=offline
     export FRAMAC_WP_CACHEDIR=$wp_cache
   '';
 

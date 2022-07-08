@@ -13,7 +13,7 @@ stdenv.mkDerivation rec {
         (builtins.readFile ../VERSION));
   slang = lib.strings.removeSuffix "\n" (builtins.readFile ../VERSION_CODENAME);
 
-  src = gitignoreSource ./../headers ;
+  src = gitignoreSource ./../tools/hdrck ;
 
   buildInputs = [
     dune_3

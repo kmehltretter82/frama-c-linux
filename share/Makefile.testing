@@ -87,12 +87,12 @@ PTESTS=frama-c-ptests
 else
 
 # PTESTS is internal
-PTESTS=dune exec $(DUNE_BUILD_OPTS) --root ptests -- frama-c-ptests
-#PTESTS=dune exec $(DUNE_BUILD_OPTS) --root ptests -- frama-c-ptests -v
+PTESTS=dune exec $(DUNE_BUILD_OPTS) --root $(FRAMAC_PTESTS_SRC) -- frama-c-ptests
+#PTESTS=dune exec $(DUNE_BUILD_OPTS) --root $(FRAMAC_PTESTS_SRC) -- frama-c-ptests -v
 
 # Note: the public name of ptest.exe is frama-c-ptests
-$(FRAMAC_PTESTS): ptests/ptests.ml
-	dune build --root ptests ptests.exe
+$(FRAMAC_PTESTS): $(FRAMAC_PTESTS_SRC)/ptests.ml
+	dune build --root $(FRAMAC_PTESTS_SRC) ptests.exe
 
 endif
 
@@ -117,11 +117,11 @@ WTESTS=frama-c-wtests
 else
 
 # WTESTS is internal to Frama-C
-WTESTS=dune exec $(DUNE_BUILD_OPTS) --root ptests -- frama-c-wtests
+WTESTS=dune exec $(DUNE_BUILD_OPTS) --root $(FRAMAC_PTESTS_SRC) -- frama-c-wtests
 
 # Note: the public name of wtest.exe is frama-c-wtests
-$(FRAMAC_WTESTS): ptests/wtests.ml
-	dune build --root ptests wtests.exe
+$(FRAMAC_WTESTS): $(FRAMAC_PTESTS_SRC)/wtests.ml
+	dune build --root $(FRAMAC_PTESTS_SRC) wtests.exe
 
 endif
 
