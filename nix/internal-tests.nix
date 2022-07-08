@@ -123,7 +123,7 @@ stdenvNoCC.mkDerivation rec {
     mkdir home
     HOME=$(pwd)/home
     why3 config detect
-    export FRAMAC_WP_CACHE=replay
+    export FRAMAC_WP_CACHE=offline
     export FRAMAC_WP_CACHEDIR=$wp_cache
   '';
 
