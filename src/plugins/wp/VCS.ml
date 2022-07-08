@@ -55,7 +55,7 @@ let parse_prover = function
     | Fallback p ->
       Wp_parameters.warning ~current:false ~once:true
         "Prover '%s' not found, fallback to '%s'"
-        (String.concat ":" prv) (Why3Provers.print_wp p) ;
+        (String.concat ":" prv) (Why3Provers.ident_wp p) ;
       Some (Why3 p)
     | NotFound ->
       Wp_parameters.error ~once:true
@@ -75,18 +75,15 @@ let parse_mode m =
     Batch
 
 let name_of_prover = function
-  | Why3 s -> Why3Provers.print_wp s
+  | Why3 s -> Why3Provers.ident_wp s
   | Qed -> "qed"
   | Tactical -> "script"
 
 let title_of_prover ?version = function
   | Why3 s ->
-    let v = match version with Some v -> v | None ->
-      Wp_parameters.has_dkey dkey_shell
-    in
-    if v
-    then Why3Provers.name s
-    else Why3Provers.title s
+    let version = match version with Some v -> v | None ->
+      not (Wp_parameters.has_dkey dkey_shell)
+    in Why3Provers.title ~version s
   | Qed -> "Qed"
   | Tactical -> "Script"
 
@@ -112,7 +109,7 @@ let sanitize_why3 s =
   Buffer.contents buffer
 
 let filename_for_prover = function
-  | Why3 s -> sanitize_why3 (Why3Provers.print_wp s)
+  | Why3 s -> sanitize_why3 (Why3Provers.ident_wp s)
   | Qed -> "Qed"
   | Tactical -> "Tactical"
 

@@ -873,7 +873,7 @@ let do_prover_detect () =
            Wp_parameters.result "Prover %10s %-6s [%a%s]"
              p.prover_name p.prover_version
              print_prover_shortcuts_for p
-             (Why3Provers.print_wp p)
+             (Why3Provers.ident_wp p)
         ) provers
 
 (* ------------------------------------------------------------------------ *)

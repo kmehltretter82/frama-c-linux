@@ -124,16 +124,14 @@ let consolidated ~smoke = function
     r.verdict,
     (if cached then 1 else 0),
     if p = Qed then [Qed,pqed r]
-    else
-    if VCS.is_valid r
-    then pmerge [Qed,psolver r] [p,if smoke then psmoke r else presult r]
-    else []
+    else pmerge [Qed,psolver r] [p,if smoke then psmoke r else presult r]
 
 let smoked_result (p,r) = p, { r with verdict = VCS.smoked r.verdict }
 
 let results ~smoke prs =
   let prs = if smoke then List.map smoked_result prs else prs in
   let verdict, cached, provers = consolidated ~smoke prs in
+  verdict,
   match verdict with
   | Valid ->
     { zero with provers ; cached ; proved = 1 }
@@ -194,7 +192,7 @@ let pp_pstats fmt p =
           Rformat.pp_time mean
           Rformat.pp_time p.tmax
 
-let pp_stats fmt s =
+let pp_stats ~shell ~updating fmt s =
   let vp = s.proved in
   let np = proofs s in
   if vp < np && np > 1 then
@@ -203,21 +201,30 @@ let pp_stats fmt s =
     Format.fprintf fmt " (Tactics %d)" s.tactics
   else if np <= 1 && s.tactics = 1 then
     Format.fprintf fmt " (Tactic)" ;
-  let shell = Wp_parameters.has_dkey dkey_shell in
+  let perfo = not shell || (not updating && s.cached < vp) in
+  let only_qed = match s.provers with [Qed,_] -> true | _ -> false in
   List.iter
     (fun (p,pr) ->
        let success = truncate pr.success in
-       let title = VCS.title_of_prover ~version:false p in
-       Format.fprintf fmt " (%s" title ;
-       if success > 0 && np > 1 then
-         Format.fprintf fmt " %d/%d" success np ;
-       if not shell && pr.time > Rformat.epsilon then
-         Format.fprintf fmt " %a" Rformat.pp_time pr.time ;
-       Format.fprintf fmt ")"
+       let print_perfo = perfo && pr.time > Rformat.epsilon in
+       let print_proofs = success > 0 && np > 1 in
+       if p != Qed || only_qed || print_perfo || print_proofs then
+         begin
+           let title = VCS.title_of_prover ~version:false p in
+           Format.fprintf fmt " (%s" title ;
+           if print_proofs then
+             Format.fprintf fmt " %d/%d" success np ;
+           if print_perfo then
+             Format.fprintf fmt " %a" Rformat.pp_time pr.time ;
+           Format.fprintf fmt ")"
+         end
     ) s.provers ;
   if 0 < s.cached then
-    if s.cached = np then
+    if s.cached = vp || updating then
       Format.fprintf fmt " (Cached)"
+    else
+    if shell then
+      Format.fprintf fmt " (Cache miss %d)" (np - s.cached)
     else
       Format.fprintf fmt " (Cached %d/%d)" s.cached np
 
