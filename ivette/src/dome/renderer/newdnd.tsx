@@ -123,8 +123,7 @@ export class DnD {
 
   onDropZone(zone: DropZone): string {
     const node = zone.node;
-    let id = node.id;
-    if (!id) id = node.id = freshId();
+    const id = node.id ? node.id : node.id = freshId();
     this.registry.set(id, zone);
     return id;
   }
@@ -142,15 +141,10 @@ export class DnD {
 
   handleEvent(e: DraggableEvent): void {
     if (this.dragging && e instanceof MouseEvent) {
-      let hover: DropZone | undefined;
-      document
+      const element = document
         .elementsFromPoint(e.clientX, e.clientY)
-        .find((elt) => {
-          if (elt === this.dragging) return false;
-          const zone = this.registry.get(elt.id);
-          if (zone) { hover = zone; return true; }
-          else return false;
-        });
+        .find((elt) => elt !== this.dragging && this.registry.get(elt.id));
+      const hover = element ? this.registry.get(element.id) : undefined;
       const curr = this.hovering;
       if (hover !== curr) {
         this.hovering = hover;
@@ -212,9 +206,7 @@ export function useDropTarget(
   const onDropOut = handlers?.onDropOut;
   const node = nodeRef.current;
   React.useEffect(() => {
-    if (
-      dnd && node && (onDrop || onDropIn || onDropOut)
-    ) {
+    if (dnd && node && (onDrop || onDropIn || onDropOut)) {
       const id = dnd.onDropZone({ node, onDrop, onDropIn, onDropOut });
       return () => dnd.offDropZone(id);
     }
@@ -410,39 +402,21 @@ export function DragSource(props: DragSourceProps): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 /** Swaps items at index i and j if they are both in range. */
-export function swap(items: string[], i: number, j: number): string[] {
-  const n = items.length;
-  if (0 <= i && i < j && j < n) {
-    const a = items[i];
-    return items.slice(0, i).concat(
-      items.slice(i + 1, j + 1), a, items.slice(j + 1)
-    );
-  }
-  if (0 <= j && j < i && i < n) {
-    const a = items[j];
-    return items.slice(0, j).concat(
-      items.slice(j + 1, i + 1), a, items.slice(i + 1)
-    );
-  }
-  return items;
+export function swap<A>(ls: A[], a: number, b: number): A[] {
+  const n = ls.length;
+  if (a === b || 0 > a || a >= n || 0 > b || b >= n) return ls ;
+  const [ i, j ] = a < b ? [ a, b ] : [ b, a ] ;
+  return ls.slice(0, i).concat(ls.slice(i + 1, j + 1), ls[i], ls.slice(j + 1));
 }
 
 /** Remove item at index i when in range. */
-export function removeAt(items: string[], k: number): string[] {
-  const n = items.length;
-  if (0 <= k && k < n) {
-    return items.slice(0, k).concat(items.slice(k + 1));
-  }
-  return items;
+export function removeAt<A>(ls: A[], k: number): A[] {
+  return 0 <= k && k < ls.length ? ls.slice(0, k).concat(ls.slice(k + 1)) : ls;
 }
 
 /** Insert an item at index i when in range or off-by-one. */
-export function insertAt(items: string[], id: string, k: number): string[] {
-  const n = items.length;
-  if (0 <= k && k <= n) {
-    return items.slice(0, k).concat(id, items.slice(k));
-  }
-  return items;
+export function insertAt<A>(ls: A[], id: A, k: number): A[] {
+  return 0 <= k && k <= ls.length ? ls.slice(0, k).concat(id, ls.slice(k)) : ls;
 }
 
 /* -------------------------------------------------------------------------- */

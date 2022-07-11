@@ -720,18 +720,17 @@ export function useClock(period: number, initStart = false): Timer {
     setTime(0);
   }, [time]);
   React.useEffect(() => {
-    if (running) {
-      const event = INC_CLOCK(period);
-      const callback = (t: number): void => {
-        if (!started.current) started.current = t;
-        else setTime(t - started.current);
-      };
-      System.emitter.on(event, callback);
-      return () => {
-        System.emitter.off(event, callback);
-        DEC_CLOCK(period);
-      };
-    } return undefined;
+    if (!running) return undefined;
+    const event = INC_CLOCK(period);
+    const callback = (t: number): void => {
+      if (!started.current) started.current = t;
+      else setTime(t - started.current);
+    };
+    System.emitter.on(event, callback);
+    return () => {
+      System.emitter.off(event, callback);
+      DEC_CLOCK(period);
+    };
   }, [period, running]);
   const periods = Math.ceil(time / period);
   const blink = !!(periods & 1);
