@@ -47,7 +47,16 @@ val get_logerr : t -> prover -> string
 val get_sequent : t -> Conditions.sequent
 val get_formula: t -> Lang.F.pred
 val is_trivial : t -> bool
-val is_proved : t -> bool
+
+(** One prover at least returns Valid verdict. *)
+val is_valid : t -> bool
+
+(** No prover with Valid verdict, and at least one non-Valid verdict. *)
+val is_unknown : t -> bool
+
+(** Same as [is_valid] for non-smoke tests. For smoke-tests,
+    same as [is_unknown]. *)
+val is_passed : t -> bool
 
 (** {2 Database}
     Notice that a property or a function have no proof obligation until you

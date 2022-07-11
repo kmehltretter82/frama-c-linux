@@ -150,7 +150,7 @@ struct
     ProofEngine.validate ~incomplete:true env.tree ;
     if not env.signaled then
       let wpo = ProofEngine.main env.tree in
-      let proved = Wpo.is_proved wpo in
+      let proved = Wpo.is_valid wpo in
       if proved || finalize then
         begin
           env.signaled <- true ;

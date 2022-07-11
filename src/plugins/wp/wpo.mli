@@ -158,32 +158,42 @@ val clear_results : t -> unit
 
 val compute : t -> Definitions.axioms option * Conditions.sequent
 
-val has_verdict : t -> prover -> bool
-val get_result : t -> prover -> result
-val get_results : t -> (prover * result) list
-val get_proof : t -> [`Passed|`Failed|`Unknown] * Property.t
-val get_target : t -> Property.t
-val is_trivial : t -> bool
-(** do not tries simplification, do not check prover results *)
+(** Warning: Prover results are stored as they are from prover output,
+    without taking into consideration that validity is inverted
+    for smoke tests.
 
-val is_proved : t -> bool
-(** do not tries simplification, check prover results *)
+    On the contrary, proof validity is computed with respect to
+    smoke test/non-smoke test.
+*)
+
+(** Definite result for this prover (not computing) *)
+val has_verdict : t -> prover -> bool
+
+(** Raw prover result (without any respect to smoke tests) *)
+val get_result : t -> prover -> result
+
+(** All raw prover results (without any respect to smoke tests) *)
+val get_results : t -> (prover * result) list
+
+(** Consolidated wrt to associated property and smoke test. *)
+val get_proof : t -> [`Passed|`Failed|`Unknown] * Property.t
+
+(** Associated property. *)
+val get_target : t -> Property.t
+
+val is_trivial : t -> bool
+(** Currently trivial sequent (no forced simplification) *)
+
+val is_valid : t -> bool
+(** Checks for some prover with valid verdict (no forced simplification) *)
 
 val is_unknown : t -> bool
-(** at least one prover returns « Unknown » *)
+(** Checks that all provers has a non-valid verdict *)
 
 val is_passed : t -> bool
-(** proved, or unknown for smoke tests *)
+(** valid, or unknown for smoke tests *)
 
 val warnings : t -> Warning.t list
-
-(** [true] if the result is valid. Dynamically exported.
-    @since Nitrogen-20111001
-*)
-val is_valid: result -> bool
-
-val get_time: result -> float
-val get_steps: result -> int
 
 val is_tactic : t -> bool
 val is_smoke_test : t -> bool

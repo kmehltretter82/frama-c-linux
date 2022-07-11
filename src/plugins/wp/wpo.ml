@@ -693,8 +693,6 @@ let warnings = function
   | { po_formula = GoalAnnot vcq } -> vcq.VC_Annot.warn
   | { po_formula = GoalLemma _ } -> []
 
-let get_time = function { prover_time=t } -> t
-let get_steps= function { prover_steps=n } -> n
 let get_target g = WpPropId.property_of_id g.po_pid
 
 let get_proof g =
@@ -813,27 +811,20 @@ let compute g =
     Some( lemma.l_cluster , depends ) ,
     WpContext.on_context ctxt VC_Lemma.sequent w
 
-let is_proved g =
+let is_valid g =
   is_trivial g || List.exists (fun (_,r) -> VCS.is_valid r) (get_results g)
 
-let is_unknown g = List.exists
+let is_unknown g =
+  not (is_valid g) &&
+  List.exists
     (fun (_,r) -> VCS.is_verdict r && not (VCS.is_valid r))
-    ( get_results g )
+    (get_results g)
 
 let is_passed g =
   if is_smoke_test g then
-    not (is_proved g)
+    is_unknown g
   else
-    is_proved g
-
-let get_result =
-  Dynamic.register ~plugin:"Wp" "Wpo.get_result"
-    (Datatype.func2 WpoType.ty ProverType.ty ResultType.ty)
-    get_result
-
-let is_valid =
-  Dynamic.register ~plugin:"Wp" "Wpo.is_valid"
-    (Datatype.func ResultType.ty Datatype.bool) VCS.is_valid
+    is_valid g
 
 (* -------------------------------------------------------------------------- *)
 (* --- Proof Obligations : Pretty-printing                                --- *)

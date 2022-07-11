@@ -122,13 +122,13 @@ let set_saved t s = t.saved <- s
 (* -------------------------------------------------------------------------- *)
 
 let rec walk f node =
-  if not (Wpo.is_proved node.goal) then
+  if not (Wpo.is_valid node.goal) then
     match node.script with
     | Tactic (_,children) -> iter_all (walk f) children
     | Opened | Script _ -> f node
 
 let rec witer f node =
-  let proved = Wpo.is_proved node.goal in
+  let proved = Wpo.is_valid node.goal in
   if proved then f ~proved node else
     match node.script with
     | Tactic (_,children) -> iter_all (witer f) children
@@ -145,7 +145,7 @@ let iteri f tree =
 (* --- Consolidating                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-let proved n = Wpo.is_proved n.goal
+let proved n = Wpo.is_valid n.goal
 
 let pending n =
   let k = ref 0 in
@@ -168,7 +168,7 @@ let validate ?(incomplete=false) tree =
   match tree.root with
   | None -> ()
   | Some root ->
-    if not (Wpo.is_proved tree.main) then
+    if not (Wpo.is_valid tree.main) then
       if incomplete then
         let result = consolidate root in
         Wpo.set_result tree.main VCS.Tactical result
@@ -217,7 +217,7 @@ type status = [
 let status t : status =
   match t.root with
   | None ->
-    if Wpo.is_proved t.main
+    if Wpo.is_valid t.main
     then if Wpo.is_smoke_test t.main then `Invalid else `Proved
     else if Wpo.is_smoke_test t.main then `Passed else `Unproved
   | Some root ->

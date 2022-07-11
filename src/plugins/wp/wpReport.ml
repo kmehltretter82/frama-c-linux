@@ -215,8 +215,8 @@ let add_results ~status (plist:pstats list) (wpo:Wpo.t) =
   List.iter
     (fun (p,r) ->
        let re = result ~status ~smoke r in
-       let st = Wpo.get_steps r in
-       let tc = Wpo.get_time r in
+       let st = r.VCS.prover_steps in
+       let tc = r.VCS.prover_time in
        let ts = r.VCS.solver_time in
        if re <> NORESULT then
          begin
