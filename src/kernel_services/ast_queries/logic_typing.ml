@@ -3561,7 +3561,7 @@ struct
 
   (* For Widen_hints and Widen_variables, we check that the arguments of the
      pragma can be understood later. Keep this code synchronized with
-     src/plugins/value/utils/widen.ml. *)
+     src/plugins/eva/utils/widen.ml. *)
   let loop_pragma env p =
     let accept_int = function
         { term_node = TConst (Integer _)} -> true | _ -> false
