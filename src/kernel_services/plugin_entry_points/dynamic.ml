@@ -86,7 +86,6 @@ let dynlib_module name file =
 (* --- Utilities                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let split_word = Str.(split (regexp ":"))
 let split_ext p =
   try
     let k = String.rindex p '.' in
@@ -101,12 +100,6 @@ let split_ext p =
 let is_package =
   let pkg = Str.regexp "[a-z-_][a-z-_0-9.]*$" in
   fun name -> Str.string_match pkg name 0
-
-let is_meta =
-  let meta = Str.regexp "META.frama-c-[a-z-_][a-z-_0-9]*$" in
-  fun name -> Str.string_match meta name 0
-
-let is_dir d = Sys.file_exists d && Sys.is_directory d
 
 let is_file base ext =
   let file = base ^ ext in
