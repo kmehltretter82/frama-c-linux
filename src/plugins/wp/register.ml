@@ -369,7 +369,7 @@ let do_wpo_success ~shell ~updating goal success =
     | None -> ()
     | Some prover ->
       Wp_parameters.feedback ~ontty:`Silent
-        "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
+        "[Generated] Goal %s (%a)" (Wpo.get_gid goal) VCS.pp_prover prover
   else
   if Wpo.is_smoke_test goal then
     begin match success with
