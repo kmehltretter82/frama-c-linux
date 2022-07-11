@@ -2,9 +2,9 @@
 [kernel] Parsing unroll.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] 3 goals scheduled
-[wp] [Valid] typed_lemma_LEFT (Script)
-[wp] [Valid] typed_lemma_RIGHT (Script)
-[wp] [Valid] typed_lemma_SUM (Script)
+[wp] [Valid] typed_lemma_LEFT (Script) (Qed 2/2)
+[wp] [Valid] typed_lemma_RIGHT (Script) (Qed 2/2)
+[wp] [Valid] typed_lemma_SUM (Script) (Qed 2/2)
 [wp] Proved goals:    3 / 3
   Qed:             0 
   Script:          3

@@ -54,7 +54,6 @@
   Prove: false.
   
   ------------------------------------------------------------
-[wp] [Unknown] typed_function_loop_invariant_X_preserved (Script)
 [wp:script:allgoals] 
   typed_function_loop_invariant_X_preserved subgoal:
   

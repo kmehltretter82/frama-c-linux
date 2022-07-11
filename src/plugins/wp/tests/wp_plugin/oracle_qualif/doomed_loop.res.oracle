@@ -3,11 +3,11 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 8 goals scheduled
-[wp] [Passed (Invalid)] typed_foo_wp_smoke_dead_loop_s2 (Qed)
+[wp] [Failed (Doomed)] typed_foo_wp_smoke_dead_loop_s2 (Qed)
 [wp] doomed_loop.i:22: Warning: Failed smoke-test
-[wp] [Passed (Invalid)] typed_foo_wp_smoke_dead_code_s7 (Qed)
+[wp] [Failed (Doomed)] typed_foo_wp_smoke_dead_code_s7 (Qed)
 [wp] doomed_loop.i:23: Warning: Failed smoke-test
-[wp] [Passed (Invalid)] typed_foo_wp_smoke_dead_code_s9 (Qed)
+[wp] [Failed (Doomed)] typed_foo_wp_smoke_dead_code_s9 (Qed)
 [wp] doomed_loop.i:25: Warning: Failed smoke-test
 [wp] [Valid] typed_foo_loop_invariant_A_preserved (Qed)
 [wp] [Unknown] typed_foo_loop_invariant_A_established (Alt-Ergo) (Cached)

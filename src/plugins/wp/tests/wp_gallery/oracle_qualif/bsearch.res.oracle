@@ -3,13 +3,13 @@
 [wp] Running WP plugin...
 [rte:annot] annotating function binary_search
 [wp] 28 goals scheduled
-[wp] [Failed (Doomed)] typed_binary_search_wp_smoke_default_requires (Alt-Ergo) (Cached)
-[wp] [Failed (Doomed)] typed_binary_search_wp_smoke_dead_loop_s3 (Alt-Ergo) (Cached)
-[wp] [Failed (Doomed)] typed_binary_search_wp_smoke_dead_code_s8 (Alt-Ergo) (Cached)
-[wp] [Failed (Doomed)] typed_binary_search_wp_smoke_dead_code_s12 (Alt-Ergo) (Cached)
-[wp] [Failed (Doomed)] typed_binary_search_wp_smoke_dead_code_s16 (Alt-Ergo) (Cached)
-[wp] [Failed (Doomed)] typed_binary_search_wp_smoke_dead_code_s17 (Alt-Ergo) (Cached)
-[wp] [Failed (Doomed)] typed_binary_search_wp_smoke_dead_code_s18 (Alt-Ergo) (Cached)
+[wp] [Passed (Timeout)] typed_binary_search_wp_smoke_default_requires (Alt-Ergo) (Cached)
+[wp] [Passed (Timeout)] typed_binary_search_wp_smoke_dead_loop_s3 (Alt-Ergo) (Cached)
+[wp] [Passed (Timeout)] typed_binary_search_wp_smoke_dead_code_s8 (Alt-Ergo) (Cached)
+[wp] [Passed (Timeout)] typed_binary_search_wp_smoke_dead_code_s12 (Alt-Ergo) (Cached)
+[wp] [Passed (Timeout)] typed_binary_search_wp_smoke_dead_code_s16 (Alt-Ergo) (Cached)
+[wp] [Passed (Timeout)] typed_binary_search_wp_smoke_dead_code_s17 (Alt-Ergo) (Cached)
+[wp] [Passed (Timeout)] typed_binary_search_wp_smoke_dead_code_s18 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_binary_search_ensures_Result (Alt-Ergo) (Cached)
 [wp] [Valid] typed_binary_search_ensures_Found (Qed)
 [wp] [Valid] typed_binary_search_ensures_NotFound (Alt-Ergo) (Cached)

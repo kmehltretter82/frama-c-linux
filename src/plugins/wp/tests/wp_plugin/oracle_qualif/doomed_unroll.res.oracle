@@ -5,9 +5,9 @@
 [wp] doomed_unroll.i:15: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 [wp] 5 goals scheduled
-[wp] [Failed (Doomed)] typed_foo_wp_smoke_dead_code_s27 (Alt-Ergo) (Cached)
-[wp] [Failed (Doomed)] typed_foo_wp_smoke_dead_code_s31 (Alt-Ergo) (Cached)
-[wp] [Failed (Doomed)] typed_foo_wp_smoke_dead_code_s35 (Alt-Ergo) (Cached)
+[wp] [Passed (Unknown)] typed_foo_wp_smoke_dead_code_s27 (Alt-Ergo) (Cached)
+[wp] [Passed (Unknown)] typed_foo_wp_smoke_dead_code_s31 (Alt-Ergo) (Cached)
+[wp] [Passed (Unknown)] typed_foo_wp_smoke_dead_code_s35 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_foo_loop_invariant_preserved (Qed)
 [wp] [Valid] typed_foo_loop_invariant_established (Qed)
 [wp] Proved goals:    5 / 5

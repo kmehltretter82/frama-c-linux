@@ -14,7 +14,6 @@
   Prove: (is_uint16 us_0) -> ((us_0 mod 256)=(land 255 us_0))
   
   ------------------------------------------------------------
-[wp] [Valid] typed_check_lemma_and_modulo_us_255 (Script)
 [wp:script:allgoals] 
   typed_check_lemma_and_modulo_u subgoal:
   
@@ -56,7 +55,4 @@
   Prove: exists i : Z. (lsl(1, i) = lsl(1, shift_0)) /\ (0 <= i).
   
   ------------------------------------------------------------
-[wp] [Valid] typed_check_lemma_and_modulo_u (Script)
-[wp] Proved goals:    2 / 2
-  Qed:             0 
-  Script:          2
+[wp] Proved goals:    0 / 2

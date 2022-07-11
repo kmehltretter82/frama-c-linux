@@ -2,8 +2,8 @@
 [kernel] Parsing bitmask0x8000.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] 2 goals scheduled
-[wp] [Valid] typed_lemma_res_n (Script)
-[wp] [Valid] typed_lemma_res_y (Script)
+[wp] [Valid] typed_lemma_res_n (Script) (Qed 1/2) (Alt-Ergo 1/2) (Cached)
+[wp] [Valid] typed_lemma_res_y (Script) (Qed 1/2) (Alt-Ergo 1/2) (Cached)
 [wp] Proved goals:    2 / 2
   Qed:             0 
   Script:          2

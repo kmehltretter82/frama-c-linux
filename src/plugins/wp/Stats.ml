@@ -152,13 +152,13 @@ let results ~smoke prs =
     else
       let cached = List.fold_left
           (fun c (_,r) -> if r.VCS.cached then succ c else c)
-          0 doomed in
+          0 passed in
       let stucked = List.map
           (fun (p,r) -> p, ptime r.prover_time true)
-          doomed in
+          passed in
       let solver = List.fold_left
           (fun t (_,r) -> t +. r.solver_time)
-          0.0 doomed in
+          0.0 passed in
       let provers = pmerge [Qed,ptime solver false] stucked in
       let verdict =
         if missing <> [] then NoResult else
@@ -166,7 +166,7 @@ let results ~smoke prs =
           | [] -> NoResult
           | u::w -> (snd @@ List.fold_left choose_worst u w).verdict in
       let proved = List.length passed in
-      let failed = List.length missing + List.length doomed in
+      let failed = List.length missing in
       { empty with verdict ; provers ; cached ; proved ; failed }
 
 let add a b =

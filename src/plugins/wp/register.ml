@@ -330,14 +330,14 @@ let do_wpo_success ~shell ~updating goal success =
   else
     let smoke = Wpo.is_smoke_test goal in
     let stats = ProofEngine.consolidated goal in
+    let proof, target = Wpo.get_proof goal in
     begin
-      if shell || stats.verdict <> Valid then
+      if shell || proof <> `Passed then
         do_report_stats ~shell ~updating goal ~smoke stats ;
-      if smoke && stats.verdict <> Valid then
+      if smoke && proof <> `Passed then
         begin
-          let target = Wpo.get_target goal in
           let source = fst (Property.location target) in
-          Wp_parameters.warning ~source "Failed smoke-test"
+          Wp_parameters.warning ~once:true ~source "Failed smoke-test"
         end ;
     end
 
