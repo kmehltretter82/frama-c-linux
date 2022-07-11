@@ -63,7 +63,8 @@ module PROOFS = WpContext.StaticGenerator(Wpo.S)
         }
     end)
 
-let () = Wpo.on_remove PROOFS.remove
+let () = Wpo.add_removed_hook PROOFS.remove
+let () = Wpo.add_cleared_hook PROOFS.clear
 
 let get wpo =
   try

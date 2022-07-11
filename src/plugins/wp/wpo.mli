@@ -142,7 +142,6 @@ val qed_time : t -> float
 
 val clear : unit -> unit
 val remove : t -> unit
-val on_remove : (t -> unit) -> unit
 
 val add : t -> unit
 val age : t -> int (* generation *)
@@ -155,6 +154,19 @@ val resolve : t -> bool
 
 val set_result : t -> prover -> result -> unit
 val clear_results : t -> unit
+
+val add_modified_hook : (t -> unit) -> unit
+(** Hook is invoked for each goal results modification.
+    Remark: [clear()] does not trigger those hooks,
+    Cf. [add_cleared_hook] instead. *)
+
+val add_removed_hook : (t -> unit) -> unit
+(** Hook is invoked for each removed goal.
+    Remark: [clear()] does not trigger those hooks,
+    Cf. [add_cleared_hook] instead. *)
+
+val add_cleared_hook : (unit -> unit) -> unit
+(** Register a hook when the entire table is cleared. *)
 
 val compute : t -> Definitions.axioms option * Conditions.sequent
 

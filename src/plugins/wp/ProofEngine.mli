@@ -67,8 +67,6 @@ val node_context : node -> WpContext.t
 val title : node -> string
 val proved : node -> bool
 val pending : node -> int
-(** 0 means proved *)
-
 val parent : node -> node option
 val children : node -> (string * node) list
 val tactical : node -> ProofScript.jtactic option
