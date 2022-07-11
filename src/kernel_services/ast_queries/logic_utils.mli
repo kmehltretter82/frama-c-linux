@@ -23,7 +23,7 @@
 (**************************************************************************)
 
 (** Utilities for ACSL constructs.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 open Cil_types
 
@@ -33,7 +33,7 @@ exception Not_well_formed of location * string
 
 (** basic utilities for logic terms and predicates. See also {! Logic_const}
     to build terms and predicates.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (** add a logic function in the environment.
     See {!Logic_env.add_logic_function_gen}*)

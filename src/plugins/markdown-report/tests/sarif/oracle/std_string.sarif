@@ -16,12 +16,13 @@
       "invocations": [
         {
           "commandLine":
-            "frama-c -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report std_string.c -eva -then -mdr-sarif-deterministic -mdr-gen sarif -mdr-out ./std_string.sarif",
+            "frama-c -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report std_string.c -eva -then -mdr-sarif-deterministic -mdr-gen sarif -mdr-out ./std_string.sarif.unfiltered",
           "arguments": [
-            "-check", "-no-autoload-plugins", "-add-symbolic-path", ":.",
-            "-load-module=eva,from,scope,markdown_report", "std_string.c",
-            "-eva", "-then", "-mdr-sarif-deterministic", "-mdr-gen", "sarif",
-            "-mdr-out", "./std_string.sarif"
+            "-check", "-no-autoload-plugins",
+            "-add-symbolic-path=PTEST_SESSION:.",
+            "-load-plugin=eva,from,scope,inout,markdown-report",
+            "std_string.c", "-eva", "-then", "-mdr-sarif-deterministic",
+            "-mdr-gen", "sarif", "-mdr-out", "./std_string.sarif.unfiltered"
           ],
           "exitCode": 0,
           "executionSuccessful": true

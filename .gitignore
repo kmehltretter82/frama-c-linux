@@ -3,9 +3,6 @@
 ###########
 
 TAGS
-*.cm*
-*.o
-*.a
 *.annot
 #ocamlyacc -v
 *.output
@@ -20,20 +17,20 @@ TAGS
 #artifacts from execution
 frama_c_journal.ml
 /.frama-c/
-/frama-c-*.tar.gz
+/frama-c*.tar.gz
 /.merlin
 /headers/hdrck
 /headers/hdrck.exe
 
 #build
-
+/_opam/
 configure
 autom4te.cache
 .log.autoconf
 /.depend
 /config.log
 /config.status
-/frama-c-*.tar.gz
+/frama-c*.tar.gz
 /distributed
 /.log.autoconf
 /.Makefile.user
@@ -42,27 +39,31 @@ autom4te.cache
 .Makefile.plugin.generated
 .ocamldebug
 
+# This file is generated (on need) during configure
+/src/plugins/dune
+
+#lint
+/.lint/
+
 #tests
 
-/tests/ptests_config
-/tests/**/result/
-/tests/**/result_*/
+/.wp-cache
+/tests/**/result*/
+/tests/**/oracle*/dune
+
+/src/plugins/*/tests/**/result*/
+/src/plugins/*/tests/**/oracle*/dune
 
 /tests/crowbar/*constfold
 /tests/crowbar/integer_bb_pretty
 /tests/crowbar/mutable
 /tests/crowbar/output-*
 /tests/crowbar/test_ghost_cfg
-/tests/spec/preprocess_dos.c
 /tests/*/*.opt
 
-/devel_tools/fc-time
-/devel_tools/fc-memuse
+/dev/fc-time
+/dev/fc-memuse
 /bin/ocamldep_transitive_closure
-/bin/check_newlines
-/bin/check_newlines.exe
-/bin/isutf8
-/bin/isutf8.exe
 
 #share
 /share/Makefile.config
@@ -200,8 +201,7 @@ Makefile.plugin.generated
 /src/kernel_internals/parsing/clexer.ml
 /src/kernel_internals/parsing/cparser.ml
 /src/kernel_internals/parsing/cparser.mli
-/src/libraries/stdlib/transitioning.ml
-/src/plugins/callgraph/cg_viewer.ml
+# /src/plugins/callgraph/cg_viewer.ml
 /src/plugins/gui/debug_manager.ml
 /src/plugins/gui/dgraph_helper.ml
 /src/plugins/gui/GSourceView.ml
@@ -214,6 +214,17 @@ Makefile.plugin.generated
 
 /doc/developer/hello.tar.gz
 hello-*.tar.gz
+
+# Dune conversion
+.merlin
+_build
+*.install
+/config.sed
+
+# Nix
+
+# When a nix-build is executed it generates
+/result*
 
 #######################
 # should remain empty #

@@ -1,0 +1,29 @@
+# todo: adds bugs?
+# todo: adds crowbar? Yes, but these tests do not use ptests
+# todo: adds journal? No, the journal suite directory will be removed later to master
+
+### Tests of kernel
+
+DEFAULT_SUITES= cil compliance dynamic fc_script jcdb libc misc
+DEFAULT_SUITES= pretty_printing saveload spec syntax test
+
+### Tests of small plugins
+
+DEFAULT_SUITES= callgraph constant_propagation impact metrics occurrence pdg
+DEFAULT_SUITES= rte rte_manual scope slicing sparecode
+
+### Tests of EVA
+
+DEFAULT_SUITES= value/numerors value/traces
+DEFAULT_SUITES= value builtins float idct
+
+### Tests of EVA domains
+apron_SUITES =
+bitwise_SUITES = value builtins float idct
+equality_SUITES = value builtins float idct
+gauges_SUITES = value builtins float idct
+multidim_SUITES = value builtins float idct
+octagon_SUITES = value builtins float idct
+symblocs_SUITES = value builtins float idct
+# todo:
+IGNORE= apron_SUITES = builtins float idct value

@@ -1,5 +1,5 @@
 /* run.config
- COMMENT: to uncomment with dune -> PLUGIN: @PTEST_PLUGIN@ markdown-report.eva-info
+   PLUGIN: @PTEST_PLUGIN@ markdown-report.eva-info
    OPT: -mdr-remarks %{dep:@PTEST_DIR@/@PTEST_NAME@.remarks.md}
  */
 

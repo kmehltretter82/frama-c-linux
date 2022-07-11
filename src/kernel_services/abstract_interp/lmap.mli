@@ -22,7 +22,7 @@
 
 (** Maps from bases to memory maps. The memory maps are those of the
     [Offsetmap] module.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (** Contents of a variable when it is not present in the state.
     See function [default_contents] in the functor below *)
@@ -34,10 +34,10 @@ type 'a default_contents =
 
 module Make_LOffset
     (V: sig
-       include module type of Offsetmap_lattice_with_isotropy
+       include Offsetmap_lattice_with_isotropy.S
        include Lattice_type.With_Top_Opt with type t := t
      end)
-    (Offsetmap: module type of Offsetmap_sig
+    (Offsetmap: Offsetmap_sig.S
      with type v = V.t
       and type widen_hint = V.numerical_widen_hint)
     (Default_offsetmap: sig
@@ -70,7 +70,7 @@ module Make_LOffset
            match [default_contents] on constant keys.
        *)
      end):
-  module type of Lmap_sig
+  Lmap_sig.S
   with type v = V.t
    and type widen_hint_base = V.numerical_widen_hint
    and type offsetmap = Offsetmap.t

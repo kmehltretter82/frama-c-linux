@@ -1,5 +1,5 @@
 /* run.config
-   
+   PLUGIN: @PTEST_PLUGIN@ inout
    STDOPT: +"-occurrence"
 */
 

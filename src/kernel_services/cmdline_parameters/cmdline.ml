@@ -86,7 +86,7 @@ let long_plugin_name s =
   if s = Log.kernel_label_name then "Frama-C" else "Plug-in " ^ s
 
 let additional_info () =
-  if !Fc_config.is_gui then
+  if Fc_config.is_gui then
     "\nReverting to previous state.\n\
      Check the Console tab for additional information."
   else

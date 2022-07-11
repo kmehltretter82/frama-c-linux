@@ -1,11 +1,11 @@
 /* run.config
  COMMENT: depends from files mentionned into "abs.driver"
- DEPS: abs.why
+ DEPS: @PTEST_DEPS@ abs.why
    OPT: -wp-driver %{dep:@PTEST_DIR@/abs.driver}
  */
 /* run.config_qualif
  COMMENT: depends from files mentionned into "abs.driver"
- DEPS: abs.why
+ DEPS: @PTEST_DEPS@ abs.why
    OPT: -wp -wp-driver %{dep:@PTEST_DIR@/abs.driver} -wp-prover alt-ergo
 */
 /*@ axiomatic Absolute { logic integer ABS(integer x) ; } */

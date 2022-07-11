@@ -1,0 +1,60 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                        ;;
+;;  This file is part of Frama-C.                                         ;;
+;;                                                                        ;;
+;;  Copyright (C) 2007-2022                                               ;;
+;;    CEA (Commissariat à l'énergie atomique et aux énergies              ;;
+;;         alternatives)                                                  ;;
+;;                                                                        ;;
+;;  you can redistribute it and/or modify it under the terms of the GNU   ;;
+;;  Lesser General Public License as published by the Free Software       ;;
+;;  Foundation, version 2.1.                                              ;;
+;;                                                                        ;;
+;;  It is distributed in the hope that it will be useful,                 ;;
+;;  but WITHOUT ANY WARRANTY; without even the implied warranty of        ;;
+;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         ;;
+;;  GNU Lesser General Public License for more details.                   ;;
+;;                                                                        ;;
+;;  See the GNU Lesser General Public License version 2.1                 ;;
+;;  for more details (enclosed in the file licenses/LGPLv2.1).            ;;
+;;                                                                        ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(library
+  (name frama_c_boot)
+  (public_name frama-c.boot)
+  (modules boot)
+  (flags :standard -open Frama_c_kernel)
+  (libraries frama_c_kernel)
+)
+
+
+(rule
+  (targets empty_file.ml)
+  (action (with-stdout-to empty_file.ml (echo "")))
+)
+
+(rule
+  (targets empty_file_gui.ml)
+  (deps empty_file.ml)
+  (action (copy# empty_file.ml empty_file_gui.ml))
+)
+
+(executable
+  (name empty_file)
+  (public_name frama-c)
+  (modules empty_file)
+  (package frama-c)
+  (flags :standard -open Frama_c_kernel -linkall)
+  (libraries frama-c.kernel frama-c.init.cmdline frama-c.boot)
+)
+
+(executable
+  (name empty_file_gui)
+  (public_name frama-c-gui)
+  (modules empty_file_gui)
+  (package frama-c)
+  (flags :standard -open Frama_c_kernel -linkall)
+  (libraries threads frama-c.init.gui frama-c.kernel frama-c.gui frama-c.boot)
+  (optional)
+)

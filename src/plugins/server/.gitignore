@@ -1,2 +1,3 @@
 /Makefile
-/Server.mli
+/tests/*/result
+/tests/**/dune

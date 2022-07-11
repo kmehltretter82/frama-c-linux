@@ -23,6 +23,7 @@
 (** PDG (program dependence graph) access functions. *)
 
 open Cil_types
+open Pdg_types
 
 type nodes_and_undef =
   (PdgTypes.Node.t * Locations.Zone.t option) list * Locations.Zone.t option

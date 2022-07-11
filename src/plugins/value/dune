@@ -1,0 +1,208 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                        ;;
+;;  This file is part of Frama-C.                                         ;;
+;;                                                                        ;;
+;;  Copyright (C) 2007-2022                                               ;;
+;;    CEA (Commissariat à l'énergie atomique et aux énergies              ;;
+;;         alternatives)                                                  ;;
+;;                                                                        ;;
+;;  you can redistribute it and/or modify it under the terms of the GNU   ;;
+;;  Lesser General Public License as published by the Free Software       ;;
+;;  Foundation, version 2.1.                                              ;;
+;;                                                                        ;;
+;;  It is distributed in the hope that it will be useful,                 ;;
+;;  but WITHOUT ANY WARRANTY; without even the implied warranty of        ;;
+;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         ;;
+;;  GNU Lesser General Public License for more details.                   ;;
+;;                                                                        ;;
+;;  See the GNU Lesser General Public License version 2.1                 ;;
+;;  for more details (enclosed in the file licenses/LGPLv2.1).            ;;
+;;                                                                        ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "EVA:" %{lib-available:frama-c-eva.core} "\n")
+          (echo "Numerors:" %{lib-available:frama-c-eva.numerors.core} "\n")
+          (echo " - MLMPFR:" %{lib-available:mlmpfr} "\n")
+          (echo "Apron domains:" %{lib-available:frama-c-eva.apron} "\n")
+          (echo " - apron.octMPQ:" %{lib-available:apron.octMPQ} "\n")
+          (echo " - apron.boxMPQ:" %{lib-available:apron.boxMPQ} "\n")
+          (echo " - apron.polkaMPQ:" %{lib-available:apron.polkaMPQ} "\n")
+          (echo " - apron.apron:" %{lib-available:apron.apron} "\n")
+  )
+  )
+)
+
+( library
+  (name eva)
+  (optional)
+  (public_name frama-c-eva.core)
+  (modules
+  abstract
+  abstract_domain
+  abstract_location
+  abstract_memory
+  abstract_offset
+  abstract_structure
+  abstract_value
+  abstractions
+  active_behaviors
+  alarmset
+  analysis
+  auto_loop_unroll
+  backward_formals
+  builtins
+  builtins_float
+  builtins_malloc
+  builtins_memory
+  builtins_misc
+  builtins_print_c
+  builtins_split
+  builtins_string
+  builtins_watchpoint
+  compute_functions
+  cvalue_backward
+  cvalue_callbacks
+  cvalue_domain
+  cvalue_forward
+  cvalue_init
+  cvalue_offsetmap
+  cvalue_specification
+  cvalue_transfer
+  domain_builder
+  domain_lift
+  domain_mode
+  domain_product
+  domain_store
+  equality
+  equality_domain
+  eva
+  eva_annotations
+  eva_audit
+  eva_dynamic
+  eva_perf
+  eva_results
+  eva_utils
+  eval
+  eval_annots
+  eval_op
+  eval_terms
+  eval_typ
+  evaluation
+  function_args
+  function_calls
+  gauges_domain
+  general_requests
+  hcexprs
+  initialization
+  inout_domain
+  iterator
+  library_functions
+  locals_scoping
+  location_lift
+  main_locations
+  main_values
+  mem_exec
+  multidim
+  multidim_domain
+  octagons
+  offsm_domain
+  offsm_value
+  parameters
+  partition
+  partitioning_index
+  partitioning_parameters
+  per_stmt_slevel
+  powerset
+  printer_domain
+  pretty_memory
+  recursion
+  red_statuses
+  register
+  results
+  segmentation
+  self
+  sign_domain
+  sign_value
+  simple_memory
+  simpler_domains
+  split_return
+  split_strategy
+  structure
+  subdivided_evaluation
+  summary
+  symbolic_locs
+  taint_domain
+  trace_partitioning
+  traces_domain
+  transfer_logic
+  transfer_specification
+  transfer_stmt
+  typed_memory
+  unit_domain
+  unit_tests
+  value_product
+  values_request
+  warn
+  widen
+  widen_hints_ext
+)
+
+;  (public_interfaces (Eva))
+  (flags -open Frama_c_kernel :standard -w -9)
+ (libraries frama-c.kernel frama-c-server.core
+            ; frama-c-callgraph.core frama-c-rtegen.core frama-c-loop-analysis.core
+            ; frama-c-scope.core
+ )
+)
+
+(plugin (optional) (name eva) (libraries frama-c-eva.core) (site (frama-c plugins)))
+
+(rule
+  (targets Eva.ml Eva.mli)
+  (deps
+    gen-api.sh Eva.ml.in Eva.mli.in
+    engine/analysis.mli utils/results.mli parameters.mli utils/eva_annotations.mli eval.mli
+    domains/cvalue/builtins.mli  utils/cvalue_callbacks.mli legacy/eval_terms.mli utils/eva_results.mli utils/unit_tests.mli
+  )
+  (action (run %{deps}))
+)
+
+( library
+  (name numerors)
+  (public_name frama-c-eva.numerors.core)
+  (flags -open Frama_c_kernel -open Eva.Private :standard)
+  (modules numerors_domain numerors_utils numerors_float numerors_interval numerors_arithmetics numerors_value)
+  (libraries frama-c.kernel frama-c-eva.core mlmpfr)
+  (optional)
+)
+
+(plugin (optional) (name eva.numerors) (libraries frama-c-eva.numerors.core) (site (frama-c plugins)))
+
+( library
+  (name apron_domain)
+  (public_name frama-c-eva.apron)
+  (flags -open Frama_c_kernel -open Eva.Private :standard -w -9)
+  (modules apron_domain)
+  (libraries frama-c.kernel frama-c-eva.core apron.octMPQ apron.boxMPQ apron.polkaMPQ apron.apron)
+  (optional)
+)
+
+;(plugin (optional) (name eva-apron) (libraries frama-c-eva.apron) (site (frama-c plugins)))
+
+( library
+  (name eva_gui)
+  (public_name frama-c-eva.gui)
+  (optional)
+  (modules gui_callstacks_filters gui_callstacks_manager gui_eval gui_types register_gui gui_red)
+;  (public_interfaces ())
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva -open Eva.Private :standard -w -9)
+  (libraries eva frama-c.kernel frama-c.gui)
+)
+
+(plugin (optional) (name eva-gui) (libraries frama-c-eva.gui) (site (frama-c plugins_gui)))
+
+(include_subdirs unqualified)

@@ -16,10 +16,11 @@
       "invocations": [
         {
           "commandLine":
-            "frama-c -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report cwe125.c -save ./cwe125_parse.sav",
+            "frama-c -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report cwe125.c -save ./cwe125_parse.sav",
           "arguments": [
-            "-check", "-no-autoload-plugins", "-add-symbolic-path", ":.",
-            "-load-module=eva,from,scope,markdown_report", "cwe125.c",
+            "-check", "-no-autoload-plugins",
+            "-add-symbolic-path=PTEST_SESSION:.",
+            "-load-plugin=eva,from,scope,inout,markdown-report", "cwe125.c",
             "-save", "./cwe125_parse.sav"
           ],
           "exitCode": 0,
@@ -27,10 +28,11 @@
         },
         {
           "commandLine":
-            "frama-c -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report -load ./cwe125_parse.sav -eva -save ./cwe125_eva.sav",
+            "frama-c -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report -load ./cwe125_parse.sav -eva -save ./cwe125_eva.sav",
           "arguments": [
-            "-check", "-no-autoload-plugins", "-add-symbolic-path", ":.",
-            "-load-module=eva,from,scope,markdown_report", "-load",
+            "-check", "-no-autoload-plugins",
+            "-add-symbolic-path=PTEST_SESSION:.",
+            "-load-plugin=eva,from,scope,inout,markdown-report", "-load",
             "./cwe125_parse.sav", "-eva", "-save", "./cwe125_eva.sav"
           ],
           "exitCode": 0,
@@ -38,13 +40,14 @@
         },
         {
           "commandLine":
-            "frama-c -check -no-autoload-plugins -add-symbolic-path :. -load-module=eva,from,scope,markdown_report -load ./cwe125_eva.sav -then -mdr-out ./cwe125.sarif -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
+            "frama-c -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report -load ./cwe125_eva.sav -then -mdr-out ./cwe125.sarif.unfiltered -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
           "arguments": [
-            "-check", "-no-autoload-plugins", "-add-symbolic-path", ":.",
-            "-load-module=eva,from,scope,markdown_report", "-load",
-            "./cwe125_eva.sav", "-then", "-mdr-out", "./cwe125.sarif",
-            "-mdr-gen", "sarif", "-mdr-no-print-libc",
-            "-mdr-sarif-deterministic"
+            "-check", "-no-autoload-plugins",
+            "-add-symbolic-path=PTEST_SESSION:.",
+            "-load-plugin=eva,from,scope,inout,markdown-report", "-load",
+            "./cwe125_eva.sav", "-then", "-mdr-out",
+            "./cwe125.sarif.unfiltered", "-mdr-gen", "sarif",
+            "-mdr-no-print-libc", "-mdr-sarif-deterministic"
           ],
           "exitCode": 0,
           "executionSuccessful": true

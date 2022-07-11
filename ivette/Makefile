@@ -106,15 +106,11 @@ update-distrib-files:
 
 api:
 	@echo "[Ivette] Generating TypeScript API"
-	@find src/frama-c -path "*/api/*" -name "*.ts" -exec rm -f {} \;
-	../bin/frama-c.byte \
-		-load-module src/frama-c/api_generator.ml \
-		-server-tsc
-	@find src/frama-c -path "*/api/*" -name "*.ts" \
-		-exec headache \
-			-h ../headers/open-source/CEA_LGPL \
-			-c ../headers/headache_config.txt {} \;\
-		-exec chmod a-w {} \;
+	./api.sh build src
+
+check-api:
+	@echo "[Ivette] Checking TypeScript API"
+	./api.sh check src
 
 # --------------------------------------------------------------------------
 # --- Ivette Documentation

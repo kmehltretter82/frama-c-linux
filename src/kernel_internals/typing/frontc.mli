@@ -46,7 +46,7 @@ val setMSVCMode: unit -> unit
 
 (** add a syntactic transformation that will be applied to all freshly parsed
     C files.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 val add_syntactic_transformation: (Cabs.file -> Cabs.file) -> unit
 
 (** the main command to parse a file. Return a thunk that can be used to

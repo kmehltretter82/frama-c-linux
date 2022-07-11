@@ -53,6 +53,13 @@
 | ".*config\.h\.in" -> frame open:"/*"  line:"*" close:"*/"
 | ".*configure\..*" -> frame open:"#"  line:"#" close:"#"
 
+########
+# Dune #
+########
+| "dune-project"  -> frame open:";;" line:";" close:";;"
+| ".*dune-project" -> skip match:"(lang.*"
+| "dune"          -> frame open:";;" line:";" close:";;"
+
 ############
 # Makefile #
 ############
@@ -152,6 +159,7 @@
 #########
 | ".*\.tex" -> frame open: "%" line: "%" close: "%"
 | ".*\.sty" -> frame open: "%" line: "%" close: "%"
+| ".*\.bib" -> frame open: "%" line: "%" close: "%"
 
 ########
 # HTML #

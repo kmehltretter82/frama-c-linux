@@ -31,8 +31,8 @@ let main _ =
    * the call to [send_bis] is visible as wished. *)
 
   Slicing.Api.Project.reset_slicing ();
-  (*let pdg_k = !Db.Pdg.get kf_k;;*)
-  let calls = !Db.Pdg.find_call_stmts ~caller:kf_k(*pdg_k*) kf_send_bis in
+  (*let pdg_k = Pdg.Api.get kf_k;;*)
+  let calls = Pdg.Api.find_call_stmts ~caller:kf_k(*pdg_k*) kf_send_bis in
   let sb_call = match calls with c::[] -> c | _ -> assert false in
   let mark = Slicing.Api.Mark.make ~data:true ~addr:false ~ctrl:false in
   let select = Slicing.Api.Select.select_stmt_internal kf_k sb_call mark in
@@ -52,8 +52,8 @@ let main _ =
    * But as [send_bis] is an undefined function, this makes no difference.
   *)
   Slicing.Api.Project.reset_slicing ();
-  (*let pdg_k = !Db.Pdg.get kf_k;;*)
-  let calls = !Db.Pdg.find_call_stmts (*pdg_k*)~caller:kf_k kf_send_bis in
+  (*let pdg_k = Pdg.Api.get kf_k;;*)
+  let calls = Pdg.Api.find_call_stmts (*pdg_k*)~caller:kf_k kf_send_bis in
   let sb_call = match calls with c::[] -> c | _ -> assert false in
   let mark = Slicing.Api.Mark.make ~data:true ~addr:false ~ctrl:false in
   let select = Slicing.Api.Select.select_min_call_internal kf_k sb_call mark in

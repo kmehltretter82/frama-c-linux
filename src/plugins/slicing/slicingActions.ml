@@ -27,6 +27,8 @@
 
 (**/**)
 
+open Pdg_types
+
 type select = SlicingTypes.sl_mark PdgMarks.select
 type n_or_d_marks = (SlicingInternals.node_or_dpds * SlicingInternals.pdg_mark) list
 
@@ -156,10 +158,10 @@ let mk_appli_select_calls fi = SlicingInternals.CrAppli (SlicingInternals.CaCall
 let mk_crit_mark_calls fi_caller to_call mark =
   let select = try
       let caller = SlicingMacros.get_fi_kf fi_caller in
-      let pdg_caller =  !Db.Pdg.get caller in
-      let call_stmts = !Db.Pdg.find_call_stmts ~caller to_call in
+      let pdg_caller =  Pdg.Api.get caller in
+      let call_stmts = Pdg.Api.find_call_stmts ~caller to_call in
       let stmt_mark stmt =
-        let stmt_ctrl_node = !Db.Pdg.find_call_ctrl_node pdg_caller stmt in
+        let stmt_ctrl_node = Pdg.Api.find_call_ctrl_node pdg_caller stmt in
         (PdgMarks.mk_select_node stmt_ctrl_node, mark)
       in
       let select = List.map stmt_mark call_stmts in
@@ -182,7 +184,7 @@ let mk_crit_add_output_marks ff select =
     (*
 let mk_crit_add_all_outputs_mark ff mark =
   let pdg = SlicingMacros.get_ff_pdg ff in
-  let nodes = !Db.Pdg.find_all_outputs_nodes pdg in
+  let nodes = Pdg.Api.find_all_outputs_nodes pdg in
   let nd_m = build_simple_node_selection mark in
   let select = mk_mark_nodes nodes nd_m in
   mk_ff_user_crit ff select
@@ -206,7 +208,7 @@ let rec print_nd_and_mark_list fmt ndm_list =
     print_nd_and_mark fmt x; print_nd_and_mark_list fmt ndm_list
 
 let print_nodes fmt nodes =
-  let print n = Format.fprintf fmt "%a " (!Db.Pdg.pretty_node true) n in
+  let print n = Format.fprintf fmt "%a " (Pdg.Api.pretty_node true) n in
   List.iter print nodes
 
 let print_node_mark fmt n z m =

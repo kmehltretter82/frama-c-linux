@@ -81,7 +81,9 @@ endif
 # Generation      #
 ###################
 
-FC_SUFFIX=$(VERSION_SAFE)-$(VERSION_CODENAME)
+ifneq ($(NO_SUFFIX),yes)
+FC_SUFFIX=-$(VERSION_SAFE)-$(VERSION_CODENAME)
+endif
 
 clean::
 	$(RM) manuals/*.pdf
@@ -95,35 +97,35 @@ clean::
 	$(MAKE) -C ../src/plugins/wp/doc/manual clean
 
 all: \
-	manuals/user-manual-$(FC_SUFFIX).pdf \
-	manuals/plugin-development-guide-$(FC_SUFFIX).pdf \
-	manuals/rte-manual-$(FC_SUFFIX).pdf \
-	manuals/aorai-manual-$(FC_SUFFIX).pdf \
-	manuals/aorai-example-$(FC_SUFFIX).tgz \
-	manuals/eva-manual-$(FC_SUFFIX).pdf \
-	manuals/metrics-manual-$(FC_SUFFIX).pdf \
-	manuals/wp-manual-$(FC_SUFFIX).pdf \
+	manuals/user-manual$(FC_SUFFIX).pdf \
+	manuals/plugin-development-guide$(FC_SUFFIX).pdf \
+	manuals/rte-manual$(FC_SUFFIX).pdf \
+	manuals/aorai-manual$(FC_SUFFIX).pdf \
+	manuals/aorai-example$(FC_SUFFIX).tgz \
+	manuals/eva-manual$(FC_SUFFIX).pdf \
+	manuals/metrics-manual$(FC_SUFFIX).pdf \
+	manuals/wp-manual$(FC_SUFFIX).pdf \
 
 manuals/%:
 	mkdir --parent manuals
 	$(CP) $< $@
 
-%.pdf: 
+%.pdf:
 	$(PRINT) Generating $@
 	$(MAKE) -C $(@D) $(@F)
 
-%.tgz: 
+%.tgz:
 	$(PRINT) Generating $@
 	$(MAKE) -C $(@D) $(@F)
 
-manuals/user-manual-$(FC_SUFFIX).pdf: userman/userman.pdf
-manuals/plugin-development-guide-$(FC_SUFFIX).pdf: developer/developer.pdf
-manuals/rte-manual-$(FC_SUFFIX).pdf: rte/main.pdf
-manuals/aorai-manual-$(FC_SUFFIX).pdf: aorai/main.pdf
-manuals/aorai-example-$(FC_SUFFIX).tgz: aorai/aorai-example.tgz
-manuals/eva-manual-$(FC_SUFFIX).pdf: value/main.pdf
-manuals/metrics-manual-$(FC_SUFFIX).pdf: metrics/metrics.pdf
-manuals/wp-manual-$(FC_SUFFIX).pdf: ../src/plugins/wp/doc/manual/wp.pdf
+manuals/user-manual$(FC_SUFFIX).pdf: userman/userman.pdf
+manuals/plugin-development-guide$(FC_SUFFIX).pdf: developer/developer.pdf
+manuals/rte-manual$(FC_SUFFIX).pdf: rte/main.pdf
+manuals/aorai-manual$(FC_SUFFIX).pdf: aorai/main.pdf
+manuals/aorai-example$(FC_SUFFIX).tgz: aorai/aorai-example.tgz
+manuals/eva-manual$(FC_SUFFIX).pdf: value/main.pdf
+manuals/metrics-manual$(FC_SUFFIX).pdf: metrics/metrics.pdf
+manuals/wp-manual$(FC_SUFFIX).pdf: ../src/plugins/wp/doc/manual/wp.pdf
 
 
 ###################
@@ -137,17 +139,20 @@ $(info 'acsl' not in doc; try: git clone https://github.com/acsl-language/acsl.g
 
 else
 
-ACSL_SUFFIX=$(shell grep acslversion acsl/version.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
+ACSL_VERSION=$(shell grep acslversion acsl/version.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
+ifneq ($(NO_SUFFIX),yes)
+ACSL_SUFFIX=-$(ACSL_VERSION)
+endif
 
 clean::
 	$(MAKE) -C acsl super-clean
 
 all: \
-	manuals/acsl-implementation-$(FC_SUFFIX).pdf \
-	manuals/acsl-$(ACSL_SUFFIX).pdf \
+	manuals/acsl-implementation$(FC_SUFFIX).pdf \
+	manuals/acsl$(ACSL_SUFFIX).pdf \
 
-manuals/acsl-implementation-$(FC_SUFFIX).pdf: acsl/acsl-implementation.pdf
-manuals/acsl-$(ACSL_SUFFIX).pdf: acsl/acsl.pdf
+manuals/acsl-implementation$(FC_SUFFIX).pdf: acsl/acsl-implementation.pdf
+manuals/acsl$(ACSL_SUFFIX).pdf: acsl/acsl.pdf
 
 
 ###################
@@ -155,17 +160,21 @@ manuals/acsl-$(ACSL_SUFFIX).pdf: acsl/acsl.pdf
 ###################
 
 EACSL_DOC=../src/plugins/e-acsl/doc
-EACSL_SUFFIX=$(shell grep 'newcommand{\\eacsllangversion' $(EACSL_DOC)/refman/main.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
+EACSL_VERSION=$(shell grep 'newcommand{\\eacsllangversion' $(EACSL_DOC)/refman/main.tex | sed 's/.*{\([^{}\\]*\).*/\1/')
 
-ifeq ($(EACSL_SUFFIX),)   
+ifeq ($(EACSL_VERSION),)
 
 $(info "could not retrieve E-ACSL version from ../src/plugins/e-acsl/doc/refman/main.tex")
 
 else
 
+ifneq ($(NO_SUFFIX),yes)
+EACSL_SUFFIX:=-$(EACSL_VERSION)
+endif
+
 # Sanity check: version differences between Frama-C, and E-ACSL
-ifneq ($(ACSL_SUFFIX),$(EACSL_SUFFIX))
-    $(info WARNING: different versions for ACSL and E-ACSL manuals: $(ACSL_SUFFIX) versus $(EACSL_SUFFIX))
+ifneq ($(ACSL_VERSION),$(EACSL_VERSION))
+    $(info WARNING: different versions for ACSL and E-ACSL manuals: $(ACSL_VERSION) versus $(EACSL_VERSION))
 endif
 
 clean::
@@ -173,13 +182,13 @@ clean::
 	$(MAKE) -C $(EACSL_DOC)/userman/ super-clean
 
 all: \
-	manuals/e-acsl-implementation-$(FC_SUFFIX).pdf \
-	manuals/e-acsl-manual-$(FC_SUFFIX).pdf \
-	manuals/e-acsl-$(EACSL_SUFFIX).pdf \
+	manuals/e-acsl-implementation$(FC_SUFFIX).pdf \
+	manuals/e-acsl-manual$(FC_SUFFIX).pdf \
+	manuals/e-acsl$(EACSL_SUFFIX).pdf \
 
-manuals/e-acsl-implementation-$(FC_SUFFIX).pdf: $(EACSL_DOC)/refman/e-acsl-implementation.pdf
-manuals/e-acsl-manual-$(FC_SUFFIX).pdf: $(EACSL_DOC)/userman/main.pdf
-manuals/e-acsl-$(EACSL_SUFFIX).pdf: $(EACSL_DOC)/refman/e-acsl.pdf
+manuals/e-acsl-implementation$(FC_SUFFIX).pdf: $(EACSL_DOC)/refman/e-acsl-implementation.pdf
+manuals/e-acsl-manual$(FC_SUFFIX).pdf: $(EACSL_DOC)/userman/main.pdf
+manuals/e-acsl$(EACSL_SUFFIX).pdf: $(EACSL_DOC)/refman/e-acsl.pdf
 
 endif
 

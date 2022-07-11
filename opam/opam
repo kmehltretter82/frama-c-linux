@@ -88,10 +88,9 @@ tags: [
 
 build: [
   ["autoconf"] {dev}
-  ["./configure" "--prefix" prefix
-                 "--mandir=%{man}%"
-  ]
-  [make "-j%{jobs}%"]
+  ["./configure"]
+  [make "config.sed"]
+  ["dune" "build" "-j%{jobs}%" "--release" "@install"]
   [make "-C" "doc" "download"] {with-doc}
 ]
 
@@ -101,14 +100,18 @@ install: [
 ]
 
 run-test: [
-  [make "-j%{jobs}%" "PTESTS_OPTS=-error-code" "tests"] { arch != "ppc64" & arch != "x86_32" & arch != "arm32" }
-  # tests are disabled on PPC64 due to floating-point oracle differences
-  # (some ULPs in libc trigonometric functions) and due to the lack of
-  # available hardware to test them locally
+  ["dune" "exec" "--" "frama-c-ptests" "tests" "src/plugins/*/tests"
+  ] { arch != "ppc64" & arch != "x86_32" & arch != "arm32" }
+  ["dune" "build" "-j%{jobs}%" "@ptests_config"
+  ] { arch != "ppc64" & arch != "x86_32" & arch != "arm32" }
 ]
 
 # Please keep depends and depopts sorted by package name
 depends: [
+  "dune" { >= "2.8.2" }
+  "dune-configurator"
+  "dune-private-libs"
+  "dune-site"
   "conf-autoconf" { build }
   ( ( "lablgtk" { >= "2.18.8" } & "conf-gnomecanvas" & "conf-gtksourceview"
       & ("ocamlgraph" { < "2.0" } | "ocamlgraph_gtk" ))
@@ -117,12 +120,13 @@ depends: [
   ( "alt-ergo-free" | "alt-ergo" )
   "conf-graphviz" { post }
   "conf-time" { with-test }
+  "ppx_deriving_yojson"
   "ocaml" { >= "4.08.1" }
   "ocamlfind" # needed beyond build stage, used by -load-module
   "ocamlgraph" { >= "1.8.8" }
   "why3" { >= "1.5.0" }
-  "yojson" {>= "1.6.0"}
-  "zarith" {>= "1.5"}
+  "yojson" { >= "1.6.0" & < "2.0.0" }
+  "zarith" { >= "1.5" }
   "ppx_deriving"
   "ppx_import"
 ]
@@ -134,7 +138,6 @@ depopts: [
   "apron"
   "coq"
   "mlgmpidl"
-  "ppx_deriving_yojson"
   "zmq"
 ]
 

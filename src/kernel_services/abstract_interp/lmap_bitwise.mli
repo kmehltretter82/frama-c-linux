@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Functors making map indexed by zone.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 open Locations
 
@@ -40,7 +40,7 @@ module type Location_map_bitwise = sig
   include Lattice_type.With_Top with type t := t
 
   module LOffset :
-    module type of Offsetmap_bitwise_sig
+    Offsetmap_bitwise_sig.S
     with type v = v
      and type intervals = Int_Intervals.t
 

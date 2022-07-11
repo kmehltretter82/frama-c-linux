@@ -20,12 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Pdg_types
+
 let debug n format = Sparecode_params.debug ~level:n format
 let fatal fmt = Sparecode_params.fatal fmt
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 (** The project is composed of [FctIndex] marked with [BoolMark]
- * to be used by [Pdg.Register.F_Proj], and another table to store if a function
+ * to be used by [Pdg.Api.Marks.F_Proj], and another table to store if a function
  * is visible (useful for Top PDG). *)
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 
@@ -122,7 +124,7 @@ module Config = struct
 
 end
 
-module ProjBoolMarks = Pdg.Register.F_Proj (Config)
+module ProjBoolMarks = Pdg.Api.Marks.F_Proj (Config)
 
 type proj = ProjBoolMarks.t * unit KfTopVisi.t
 type fct = ProjBoolMarks.fct
@@ -172,7 +174,7 @@ let rec add_pdg_selection to_select pdg sel_mark = match to_select with
   | [] ->
     let l = match sel_mark with None -> [] | Some m -> [m] in [(pdg, l)]
   | (p, ln) :: tl ->
-    if Db.Pdg.from_same_fun p pdg
+    if Pdg.Api.from_same_fun p pdg
     then
       let ln = match sel_mark with None -> ln
                                  | Some sel_mark -> sel_mark::ln
@@ -273,7 +275,7 @@ let rec process_call_inputs proj =
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 
 let select_entry_point proj _kf pdg =
-  let ctrl = !Db.Pdg.find_entry_point_node pdg in
+  let ctrl = Pdg.Api.find_entry_point_node pdg in
   let to_select = add_node_to_select true [] None ctrl in
   select_pdg_elements proj pdg to_select
 
@@ -281,9 +283,9 @@ let select_all_outputs proj kf pdg =
   let outputs = !Db.Outputs.get_external kf in
   debug 1 "@[selecting output zones %a@]" Locations.Zone.pretty outputs;
   try
-    let nodes, undef = !Db.Pdg.find_location_nodes_at_end pdg outputs in
+    let nodes, undef = Pdg.Api.find_location_nodes_at_end pdg outputs in
     let nodes =
-      try ((!Db.Pdg.find_ret_output_node pdg),None) :: nodes
+      try ((Pdg.Api.find_ret_output_node pdg),None) :: nodes
       with Not_found -> nodes
     in
     let nodes_and_co = ([], [], Some (nodes, undef)) in
@@ -308,7 +310,7 @@ class annot_visitor ~filter pdg = object (self)
           let stmt = Option.get self#current_stmt in
           debug 1 "selecting annotation : %a @."
             Printer.pp_code_annotation annot;
-          let info = !Db.Pdg.find_code_annot_nodes pdg stmt annot in
+          let info = Pdg.Api.find_code_annot_nodes pdg stmt annot in
           to_select <- add_nodes_and_undef_to_select true info to_select
         with
           Not_found -> () (* unreachable *)
@@ -322,7 +324,7 @@ end
 let select_annotations ~select_annot ~select_slice_pragma proj =
   let visit_fun kf =
     debug 1 "look for annotations in function %a@." Kernel_function.pretty kf;
-    let pdg = !Db.Pdg.get kf in
+    let pdg = Pdg.Api.get kf in
     if PdgTypes.Pdg.is_top pdg then debug 1 "pdg top: skip annotations"
     else if PdgTypes.Pdg.is_bottom pdg
     then debug 1 "pdg bottom: skip annotations"
@@ -357,7 +359,7 @@ let select_useful_things ~select_annot ~select_slice_pragma kf_entry =
   assert (!call_in_to_check = []);
   debug 1 "selecting function %a outputs and entry point@."
     Kernel_function.pretty kf_entry;
-  let pdg = !Db.Pdg.get kf_entry in
+  let pdg = Pdg.Api.get kf_entry in
   if PdgTypes.Pdg.is_top pdg
   then KfTopVisi.set proj kf_entry
   else if PdgTypes.Pdg.is_bottom pdg

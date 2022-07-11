@@ -29,7 +29,7 @@ let print_stmt kf =
   Slicing.PrintSlice.print_fct_stmts fmt kf
 
 (* print PDG (for debugging purposes) *)
-let print_pdg kf = !Db.Pdg.pretty fmt (!Db.Pdg.get kf) ;;
+let print_pdg kf = Pdg.Api.pretty fmt (Pdg.Api.get kf) ;;
 
 let print_ff ff = Slicing.Api.Slice.pretty fmt ff
 

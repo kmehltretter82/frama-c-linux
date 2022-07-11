@@ -1,6 +1,6 @@
 /* run.config*
-   OPT: -aorai-automata %{dep:@PTEST_DIR@/@PTEST_NAME@.ya} -aorai-test-id @PTEST_NUMBER@@PTEST_CONFIG@ @PROVE_OPTIONS@
-   OPT: -aorai-automata %{dep:@PTEST_DIR@/assigns_det.ya} -aorai-test-id @PTEST_NUMBER@@PTEST_CONFIG@ @PROVE_OPTIONS@
+   STDOPT: -aorai-automata %{dep:@PTEST_DIR@/@PTEST_NAME@.ya}
+   STDOPT: -aorai-automata %{dep:@PTEST_DIR@/assigns_det.ya}
  MODULE: name_projects
  LIBS:
    OPT: -aorai-automata %{dep:@PTEST_DIR@/@PTEST_NAME@.ya} -then -print

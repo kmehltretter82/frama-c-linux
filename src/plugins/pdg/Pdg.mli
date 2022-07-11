@@ -22,7 +22,6 @@
 
 (** Program Dependences Graph. *)
 
-(** Functions for this plugin are registered through the [Db] module,
-    the dynamic API, and the module Below. *)
+module Api : module type of Api
 
-module Register : module type of Marks
+module Marks : module type of Marks

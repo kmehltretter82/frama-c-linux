@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Value accesses through dynamic typing.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (* ************************************************************************* *)
 (** {2 Registration} *)
@@ -37,7 +37,7 @@ val register:
     cannot register a value with the same name twice.
     @before Frama-C+dev there was a labeled argument [journalized], that has
             been removed when Journalization has been removed.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (* ************************************************************************* *)
 (** {2 Access} *)
@@ -60,7 +60,7 @@ val get: plugin:string -> string -> 'a Type.t -> 'a
     @raise Incompatible_type if the name is not registered
     with a compatible type
     @raise Failure _ in the -no-obj mode
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val iter: (string -> 'a Type.t -> 'a -> unit) -> unit
 val iter_comment : (string -> string -> unit) -> unit
@@ -72,7 +72,7 @@ val iter_comment : (string -> string -> unit) -> unit
 
 (** Module to use for accessing parameters of plug-ins.
     Assume that the plug-in is already loaded.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Parameter : sig
 
   (** Set of common operations on parameters. *)
@@ -100,7 +100,7 @@ module Parameter : sig
   (**/**)
 
   (** Boolean parameters.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
   module Bool: sig
     include Common with type t = bool
     val on: string -> unit -> unit
@@ -157,27 +157,16 @@ end
 *)
 val load_packages: string list -> unit
 
-(** Load the module specification. See -load-module option.
-    @modify Magnesium-20151001 new API. *)
+(** Load the module specification. See -load-module option. *)
 val load_module: string -> unit
 
-(** Sets the load path for modules in FRAMAC_PLUGIN, prepending it with [path].
-    Does not load any plugins.
-    Must be invoked only once from boot during extending stage.
-    @since Phosphorus-20170501-beta1. *)
-val set_module_load_path : string list -> unit
-
-(** [is_loaded package] returns [true] iff [package] has already been loaded.
-    @since 23.0-Vanadium
-*)
-val is_loaded: string -> bool
+val load_plugin: string -> unit
 
 (**/**)
 val load_plugin_path: unit -> unit
 (** Load all plugins in the path set with [set_module_load_path].
     Must be invoked only once from boot during extending stage.
-    @since Magnesium-20151001 new API.
-    @modify Phosphorus-20170501-beta1 changed signature. *)
+    @since Magnesium-20151001 new API. *)
 (**/**)
 
 (*

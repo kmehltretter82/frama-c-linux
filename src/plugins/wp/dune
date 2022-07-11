@@ -1,0 +1,68 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                        ;;
+;;  This file is part of Frama-C.                                         ;;
+;;                                                                        ;;
+;;  Copyright (C) 2007-2022                                               ;;
+;;    CEA (Commissariat à l'énergie atomique et aux énergies              ;;
+;;         alternatives)                                                  ;;
+;;                                                                        ;;
+;;  you can redistribute it and/or modify it under the terms of the GNU   ;;
+;;  Lesser General Public License as published by the Free Software       ;;
+;;  Foundation, version 2.1.                                              ;;
+;;                                                                        ;;
+;;  It is distributed in the hope that it will be useful,                 ;;
+;;  but WITHOUT ANY WARRANTY; without even the implied warranty of        ;;
+;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         ;;
+;;  GNU Lesser General Public License for more details.                   ;;
+;;                                                                        ;;
+;;  See the GNU Lesser General Public License version 2.1                 ;;
+;;  for more details (enclosed in the file licenses/LGPLv2.1).            ;;
+;;                                                                        ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "WP:" %{lib-available:frama-c-wp.core} "\n")
+          (echo "  - Ocamlgraph:" %{lib-available:ocamlgraph} "\n")
+          (echo "  - Qed:" %{lib-available:qed} "\n")
+          (echo "  - Rtegen:" %{lib-available:frama-c-rtegen.core} "\n")
+          (echo "  - Why3:" %{lib-available:why3} "\n")
+          (echo "  - Zarith:" %{lib-available:zarith} "\n")
+  )
+  )
+)
+
+(library
+ (name wp)
+  (optional)
+  (public_name frama-c-wp.core)
+  (flags (-open Frama_c_kernel :standard -w -9))
+  (libraries frama-c.kernel frama-c-rtegen.core why3 qed zarith ocamlgraph)
+)
+
+(plugin (optional) (name wp) (libraries frama-c-wp.core) (site (frama-c plugins)))
+
+
+(ocamllex driver rformat script)
+
+;find share \( -not -name ".gitignore" \) -type f -printf "(%p as wp/%p)\n" >> dune
+; wp/share -> wp
+
+(install
+ (package frama-c-wp)
+ (section (site (frama-c share)))
+ (files
+(share/Makefile.resources as wp/Makefile.resources)
+(share/install.ml as wp/install.ml)
+(share/why3/frama_c_wp/vlist.mlw as wp/why3/frama_c_wp/vlist.mlw)
+(share/why3/frama_c_wp/cbits.mlw as wp/why3/frama_c_wp/cbits.mlw)
+(share/why3/frama_c_wp/cint.mlw as wp/why3/frama_c_wp/cint.mlw)
+(share/why3/frama_c_wp/qed.mlw as wp/why3/frama_c_wp/qed.mlw)
+(share/why3/frama_c_wp/vset.mlw as wp/why3/frama_c_wp/vset.mlw)
+(share/why3/frama_c_wp/memory.mlw as wp/why3/frama_c_wp/memory.mlw)
+(share/why3/frama_c_wp/cmath.mlw as wp/why3/frama_c_wp/cmath.mlw)
+(share/why3/frama_c_wp/cfloat.mlw as wp/why3/frama_c_wp/cfloat.mlw)
+(share/wp.driver as wp/wp.driver)
+))

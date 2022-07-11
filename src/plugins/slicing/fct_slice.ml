@@ -41,6 +41,7 @@
 (**/**)
 open Cil_types
 
+open Pdg_types
 (**/**)
 
 (* Look at (only once) the callers of [kf] ([kf] included). *)
@@ -356,7 +357,7 @@ end = struct
   let merge ff1 ff2 =
     let pdg1, fm1 = ff1.SlicingInternals.ff_marks in
     let pdg2, fm2 = ff2.SlicingInternals.ff_marks in
-    assert (Db.Pdg.from_same_fun pdg1 pdg2) ;
+    assert (Pdg.Api.from_same_fun pdg1 pdg2) ;
     let merge_marks m1 m2 = SlicingMarks.merge_marks [m1; m2] in
     let merge_call_info _c1 _c2 = None in
     let fm = PdgIndex.FctIndex.merge fm1 fm2 merge_marks merge_call_info in
@@ -418,7 +419,7 @@ end = struct
     let m2m s m =
       let key = match s with
         | PdgMarks.SelIn loc -> PdgIndex.Key.implicit_in_key loc
-        | PdgMarks.SelNode (n,_z) -> !Db.Pdg.node_key n
+        | PdgMarks.SelNode (n,_z) -> Pdg.Api.node_key n
       in
       let old_m = get_mark old_marks key in
       let add_mark =
@@ -436,7 +437,7 @@ end = struct
         SlicingParameters.debug ~level:2
           "[Fct_Slice.FctMarks.marks_for_caller_inputs] for %a : \
            old=%a new=%a -> %a"
-          !Db.Pdg.pretty_key key SlicingMarks.pretty_mark old_m
+          Pdg.Api.pretty_key key SlicingMarks.pretty_mark old_m
           SlicingMarks.pretty_mark m
           SlicingMarks.pretty_mark
           (match new_m with None -> SlicingMarks.bottom_mark | Some m -> m);
@@ -452,7 +453,7 @@ end = struct
         None
     in
     let new_input_marks =
-      Pdg.Register.in_marks_to_caller pdg_caller call m2m in_info in
+      Pdg.Marks.in_marks_to_caller pdg_caller call m2m in_info in
     new_input_marks, !new_input
 
   let marks_for_call_outputs (_, out_info) = out_info
@@ -467,7 +468,7 @@ end = struct
       let pdg = SlicingMacros.get_ff_pdg ff_call in
       let spare = SlicingMarks.mk_gen_spare in
       let rec add2 marks n =
-        match !Db.Pdg.node_key n with
+        match Pdg.Api.node_key n with
         | PdgIndex.Key.SigCallKey (_, (PdgIndex.Signature.In _)) ->
           marks
         | PdgIndex.Key.SigCallKey (_, (PdgIndex.Signature.Out key)) ->
@@ -497,7 +498,7 @@ end = struct
          * it has already been taken into account in the "from". *)
         None
       | PdgMarks.SelNode (n, _z_opt) ->
-        let nkey = !Db.Pdg.node_key n in
+        let nkey = Pdg.Api.node_key n in
             (*
           let nkey = match z_opt with None -> nkey
             | Some z -> match nkey with
@@ -516,7 +517,7 @@ end = struct
           | _ -> (); false
         in
         SlicingParameters.debug ~level:2 "[Fct_Slice.FctMarks.check_called_marks] for %a : old=%a new=%a -> %a %s"
-          !Db.Pdg.pretty_key nkey
+          Pdg.Api.pretty_key nkey
           SlicingMarks.pretty_mark old_m
           SlicingMarks.pretty_mark m
           SlicingMarks.pretty_mark
@@ -524,7 +525,7 @@ end = struct
           (if new_out then "(new out)" else "");
         m_opt
     in let new_called_marks =
-         Pdg.Register.call_out_marks_to_called ff_pdg m2m new_call_marks
+         Pdg.Marks.call_out_marks_to_called ff_pdg m2m new_call_marks
     in new_called_marks, !new_output
 
   let persistent_in_marks_to_prop fi to_prop  =
@@ -532,12 +533,12 @@ end = struct
     SlicingParameters.debug ~level:2 "[Fct_Slice.FctMarks.persistent_in_marks_to_prop] from %s" (SlicingMacros.fi_name fi);
     let m2m _call _pdg_caller _n m =
       (* SlicingParameters.debug ~level:2 "  in_m2m %a in %s ?@."
-          PdgIndex.Key.pretty (!Db.Pdg.node_key n) (SlicingMacros.pdg_name pdg_caller); *)
+          PdgIndex.Key.pretty (Pdg.Api.node_key n) (SlicingMacros.pdg_name pdg_caller); *)
       SlicingMarks.missing_input_mark ~call:SlicingMarks.bottom_mark ~called:m
     in
     let pdg = SlicingMacros.get_fi_pdg fi in
     let pdg_node_marks =
-      Pdg.Register.translate_in_marks pdg ~m2m in_info [] in
+      Pdg.Marks.translate_in_marks pdg ~m2m in_info [] in
     pdg_node_marks
 
   let get_new_marks ff nodes_marks =
@@ -546,13 +547,13 @@ end = struct
       let nkey = match n with
         | PdgMarks.SelNode (n, _z_opt) ->
           (* TODO : something to do for z_opt ? *)
-          !Db.Pdg.node_key n
+          Pdg.Api.node_key n
         | PdgMarks.SelIn l -> PdgIndex.Key.implicit_in_key l
       in
       let oldm = get_mark fm nkey in
       let newm = SlicingMarks.minus_marks m oldm in
       (* Format.printf "get_new_marks for %a : old=%a new=%a -> %a@."
-         !Db.Pdg.pretty_key nkey SlicingMarks.pretty_mark oldm
+         Pdg.Api.pretty_key nkey SlicingMarks.pretty_mark oldm
          SlicingMarks.pretty_mark m SlicingMarks.pretty_mark newm; *)
       if not (SlicingMarks.is_bottom_mark newm) then (n, newm)::acc else acc
     in List.fold_left add_if_new [] nodes_marks
@@ -571,7 +572,7 @@ end = struct
 
   let mark_spare_call_nodes ff call =
     let pdg = SlicingMacros.get_ff_pdg ff in
-    let nodes = !Db.Pdg.find_simple_stmt_nodes pdg call in
+    let nodes = Pdg.Api.find_simple_stmt_nodes pdg call in
     mark_spare_nodes ff nodes
 
   (** TODO :
@@ -587,8 +588,8 @@ end = struct
     let rec check_in_params n params = match params with
       | [] -> []
       | _ :: params ->
-          let node = !Db.Pdg.find_input_node pdg n in
-          let dpds = !Db.Pdg.direct_dpds pdg node in
+          let node = Pdg.Api.find_input_node pdg n in
+          let dpds = Pdg.Api.direct_dpds pdg node in
           let get_n_mark n = get_mark ff_marks (PdgTypes.Node.elem_key n) in
           let dpds_marks = List.map get_n_mark dpds in
           let m = SlicingMarks.inter_marks dpds_marks in
@@ -596,7 +597,7 @@ end = struct
           if not (SlicingMarks.is_bottom_mark m) then begin
             SlicingKernel.debug ~level:2
               "[Fct_Slice.FctMarks.mark_visible_inputs] %a -> %a"
-              (!Db.Pdg.pretty_node true) node SlicingMarks.pretty_mark m;
+              (Pdg.Api.pretty_node true) node SlicingMarks.pretty_mark m;
             PdgMarks.add_node_to_select marks (node, None) m
           end else
             marks
@@ -609,15 +610,15 @@ end = struct
   let mark_visible_output ff_marks =
     let pdg, _ = ff_marks  in
     try
-      let out_node = !Db.Pdg.find_ret_output_node pdg in
-      let dpds = !Db.Pdg.direct_dpds pdg out_node in
+      let out_node = Pdg.Api.find_ret_output_node pdg in
+      let dpds = Pdg.Api.direct_dpds pdg out_node in
       let get_n_mark n = get_mark ff_marks (PdgTypes.Node.elem_key n) in
       let dpds_marks = List.map get_n_mark dpds in
       let m = SlicingMarks.inter_marks dpds_marks in
       if not (SlicingMarks.is_bottom_mark m) then begin
         SlicingParameters.debug ~level:2
           "[Fct_Slice.FctMarks.mark_visible_outputs] %a -> %a"
-          (!Db.Pdg.pretty_node true) out_node SlicingMarks.pretty_mark m;
+          (Pdg.Api.pretty_node true) out_node SlicingMarks.pretty_mark m;
         let select = PdgMarks.add_node_to_select [] (out_node, None) m in
         let to_prop = mark_and_propagate ff_marks select in
         assert (to_prop = PropMark.empty_to_prop); ()
@@ -634,10 +635,10 @@ end = struct
           with PdgIndex.CallStatement -> assert false
         with Not_found -> SlicingMarks.bottom_mark
       in
-      Format.fprintf fmt "%a : %a" (!Db.Pdg.pretty_node true) node
+      Format.fprintf fmt "%a : %a" (Pdg.Api.pretty_node true) node
         SlicingMarks.pretty_mark m
     in
-    !Db.Pdg.iter_nodes print_node pdg
+    Pdg.Api.iter_nodes print_node pdg
 
   let debug_marked_ff fmt ff =
     Format.fprintf fmt "@[<hv>Print slice =@ %s@]" (SlicingMacros.ff_name ff);
@@ -663,7 +664,7 @@ let get_called_slice ff call =
 
 let _pretty_node_marks fmt marks =
   let print fmt (n, m) =
-    (!Db.Pdg.pretty_node true) fmt n; SlicingMarks.pretty_mark fmt m
+    (Pdg.Api.pretty_node true) fmt n; SlicingMarks.pretty_mark fmt m
   in
   Format.fprintf fmt "%a" (fun fmt x -> List.iter (print fmt) x) marks
 
@@ -1000,7 +1001,7 @@ let get_call_in_nodes called_kf call_info called_in_zone =
   let _, nodes, in_zone =
     List.fold_left check_param (1, [], called_in_zone) param_list
   in
-  let impl_in_nodes, undef = !Db.Pdg.find_location_nodes_at_stmt
+  let impl_in_nodes, undef = Pdg.Api.find_location_nodes_at_stmt
                                pdg_caller call_stmt ~before:true in_zone
   in (nodes @ impl_in_nodes), undef
 
@@ -1232,7 +1233,7 @@ let apply_missing_inputs ff call missing_inputs =
         assert (not (SlicingMarks.is_bottom_mark m));
         match sel with
           | PdgMarks.SelNode (n, _)
-              when (!Db.Pdg.node_key n = PdgIndex.Key.top_input) -> true
+              when (Pdg.Api.node_key n = PdgIndex.Key.top_input) -> true
           | _ -> visible_top tl
   in let is_top_visible = visible_top input_marks in
   *)

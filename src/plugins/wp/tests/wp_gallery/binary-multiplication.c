@@ -3,7 +3,7 @@
 */
 
 /* run.config_qualif
-
+   DEPS: @PTEST_DEPS@ @WP_SESSION@/script/BinaryMultiplication_*.json
    OPT: -wp-rte -wp-prover=alt-ergo,script -wp-prop=-lack @USING_WP_SESSION@
 */
 

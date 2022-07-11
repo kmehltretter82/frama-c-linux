@@ -688,7 +688,7 @@ module PrintLibc =
       let option_name = "-print-libc"
       let help = "when pretty-printing C code, keep prototypes coming \
                   from Frama-C standard library"
-      let default = !Fc_config.is_gui (* always print by default on the GUI *)
+      let default = Fc_config.is_gui (* always print by default on the GUI *)
     end)
 
 let () = Parameter_customize.set_group inout_source
@@ -850,31 +850,31 @@ module LoadState =
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.do_not_projectify ()
-module AddPath =
-  String_list
-    (struct
-      let option_name = "-add-path"
-      let module_name = "AddPath"
-      let arg_name = "DIR,..."
-      let help = "Prepend directories to FRAMAC_PLUGIN for loading dynamic plug-ins"
-    end)
-
-let () = Parameter_customize.set_group saveload
-let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
-let () = Parameter_customize.do_not_projectify ()
 module LoadModule =
   String_list
     (struct
       let option_name = "-load-module"
       let module_name = "LoadModule"
       let arg_name = "SPEC,..."
-      let help = "Dynamically load plug-ins, modules and scripts. \
+      let help = "Dynamically load modules and scripts. \
                   Each <SPEC> can be an OCaml source or object file, with \
                   or without extension, or a Findlib package. \
                   Loading order is preserved and \
                   additional dependencies can be listed in *.depend files."
     end)
-let () = LoadModule.add_aliases [ "-load-script" ]
+
+let () = Parameter_customize.set_group saveload
+let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
+let () = Parameter_customize.do_not_projectify ()
+module LoadPlugin =
+  String_list
+    (struct
+      let option_name = "-load-plugin"
+      let module_name = "LoadPlugin"
+      let arg_name = "SPEC,..."
+      let help = "Dynamically load plug-ins. \
+                  Loading order is preserved."
+    end)
 
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
@@ -889,8 +889,8 @@ module AutoLoadPlugins =
 
 let bootstrap_loader () =
   begin
-    Dynamic.set_module_load_path (AddPath.get ());
     if AutoLoadPlugins.get () then Dynamic.load_plugin_path () ;
+    List.iter Dynamic.load_plugin (LoadPlugin.get()) ;
     List.iter Dynamic.load_module (LoadModule.get()) ;
   end
 

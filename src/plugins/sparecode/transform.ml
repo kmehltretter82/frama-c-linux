@@ -23,6 +23,8 @@
 open Cil_types
 open Cil
 
+open Pdg_types
+
 module BoolInfo = struct
   type proj = Spare_marks.proj
   type fct = Spare_marks.fct option * Kernel_function.t
@@ -41,7 +43,7 @@ module BoolInfo = struct
                               | Some fm -> Spare_marks.key_visible fm key
     in
     Sparecode_params.debug ~level:3 "%s : %a -> %b"
-      txt !Db.Pdg.pretty_key key visible;
+      txt Pdg.Api.pretty_key key visible;
     visible
 
   let param_visible (fm,_) n =

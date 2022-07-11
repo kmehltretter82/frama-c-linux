@@ -41,7 +41,7 @@ end
 type t = private
   { pid: int; mutable name: string; mutable unique_name: string }
 (** @since Carbon-20101201
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 type project = t
 (** @since Carbon-20101201 *)

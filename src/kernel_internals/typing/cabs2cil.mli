@@ -136,7 +136,7 @@ val register_for_loop_body_hook: (Cabs.statement -> unit) -> unit
 *)
 val register_for_loop_incr_hook: (Cabs.expression -> unit) -> unit
 
-(** @plugin development guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 val convFile: Cabs.file -> Cil_types.file
 
 

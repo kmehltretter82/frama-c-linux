@@ -1,5 +1,5 @@
 /* run.config
-
+   DEPS: @PTEST_DEPS@ @WP_SESSION@/script/function_*.json
    OPT: -wp-par 1 -wp-prop X -wp-no-print -wp-prover qed,script -wp-msg-key script @USING_WP_SESSION@
 */
 /* run.config_qualif

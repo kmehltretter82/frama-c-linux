@@ -56,8 +56,6 @@ module Frama_c_builtins =
       let size = 3
     end)
 
-let () = Cil.dependency_on_ast Frama_c_builtins.self
-
 let is_builtin v = Cil.hasAttribute "FC_BUILTIN" v.vattr
 
 let is_unused_builtin v = is_builtin v && not v.vreferenced

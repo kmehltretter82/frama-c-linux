@@ -7,7 +7,6 @@ top/
 .merlin
 *~
 /Makefile
-/Markdown_report.mli
-/tests/ptests_config
+/tests/**/dune
 /tests/*/result
 /tests/*/result_*

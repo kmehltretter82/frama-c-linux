@@ -23,6 +23,8 @@
 open SlicingInternals
 open Cil_types
 
+open Pdg_types
+
 (** Return [true] if the source function is called
  * (even indirectly via transitivity) from a [Slice.t]. *)
 val is_src_fun_called :

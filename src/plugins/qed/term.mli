@@ -39,8 +39,9 @@ module Make
     (** {2 Global State}
         One given [term] has valid meaning only for one particular state. *)
 
-    (** Hash-consing, cache, rewriting rules, etc. *)
     type state
+    (** Hash-consing, cache, rewriting rules, etc. *)
+
     val create : unit -> state
     (** Create a new fresh state. Local state is not modified. *)
 

@@ -24,7 +24,7 @@
     Provide ways to implement signature [State_builder.S].
     Depending on the builder, also provide some additional useful
     information.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (* ************************************************************************* *)
 (* ************************************************************************* *)
@@ -85,7 +85,7 @@ end
     [Datatype] represents the datatype of a state, [Local_state]
     explains how to deal with the client-side state and [Info] are additional
     required information.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Register
     (Datatype: Datatype.S)
     (Local_state: State.Local with type t = Datatype.t)
@@ -119,7 +119,7 @@ module type Ref = sig
   (** Reset the reference to its default value. *)
 end
 
-(** @plugin development guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Ref
     (Data:Datatype.S)
     (Info:sig
@@ -358,7 +358,7 @@ module type Hashtbl = sig
   val remove: key -> unit
 end
 
-(** @plugin development guide
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
     - [H] is the hashtable implementation
     - [Data] is the datatype for values stored in the table
 *)

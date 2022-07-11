@@ -80,15 +80,15 @@ module Lenv : sig
 
 end
 
+type type_namespace = Typedef | Struct | Union | Enum
 (** The different namespaces a C type can belong to, used when we are searching
     a type by its name. *)
-type type_namespace = Typedef | Struct | Union | Enum
 
 module Type_namespace: Datatype.S with type t = type_namespace
 
 (** Functions that can be called when type-checking an extension of ACSL.
 
-    @plugin development guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 type typing_context = {
   is_loop: unit -> bool;

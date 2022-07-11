@@ -97,7 +97,7 @@ val is_builtin_overridden: kernel_function -> bool
 val clobbered_set_from_ret: Cvalue.Model.t -> Cvalue.V.t -> Base.SetLattice.t
 
 type call = (Precise_locs.precise_location, Cvalue.V.t) Eval.call
-type result = Cvalue_domain.State.t
+type result = Cvalue.Model.t * Locals_scoping.clobbered_set
 
 (** Returns the cvalue builtin for a function, if any. Also returns the name of
     the builtin and the specification of the function; the preconditions must be

@@ -179,6 +179,8 @@ val is_relative: ?base_name:Normalized.t -> Normalized.t -> bool
     printed identically in different machines. *)
 val add_symbolic_dir: string -> Normalized.t -> unit
 
+val add_symbolic_dir_list: string -> Normalized.t list -> unit
+
 (** Remove all symbolic dirs that have been added earlier.
     @since 23.0-Vanadium *)
 val reset_symbolic_dirs: unit -> unit

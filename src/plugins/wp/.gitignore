@@ -1,17 +1,15 @@
 /Makefile
 /.make-wp-coq
 /.make-wp-why3
-
-/Wp.mli
-/gui/Wp.mli
 /.WP_API_GENERATED
-/driver.ml
-/rformat.ml
-/script.ml
-/why3_xml.ml
-/ProverDetect.ml
 
-/tests/ptests_config
+
+
+
+
+
+/tests/*/oracle/dune
+/tests/*/oracle_*/dune
 /tests/*/result
 /tests/*/result_*
 
@@ -19,4 +17,4 @@
 /doc/*/.make-icons
 /doc/*/.make-images
 
-/why3_api.ml
+

@@ -122,235 +122,39 @@ let is_object base =
 (* --- Package Loading                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-let packages = Hashtbl.create 64
-
-let () = List.iter (fun p -> Hashtbl.add packages p ()) ("frama-c.kernel"::Fc_config.library_names)
-
-let missing pkg = not (Hashtbl.mem packages pkg)
-
-let once pkg =
-  if Hashtbl.mem packages pkg then false
-  else ( Hashtbl.add packages pkg () ; true )
-
-let is_loaded pkg = Hashtbl.mem packages pkg
-
-exception ArchiveError of string
-
-let load_archive pkg base file =
-  let path =
-    try Findlib.resolve_path ~base file
-    with Not_found ->
-      let msg = Printf.sprintf "archive '%s' not found in '%s'" file base in
-      raise (ArchiveError msg)
-  in dynlib_module pkg path
-
-let mem_package pkg =
-  try ignore (Findlib.package_directory pkg) ; true
-  with Findlib.No_such_package _ -> false
-
-let is_virtual pkg =
-  try ignore (Findlib.package_property [] pkg "archive") ; false
-  with Not_found -> true
-
 let load_packages pkgs =
-  Klog.debug ~dkey "trying to load %a"
-    (Pretty_utils.pp_list ~sep:"@, " Format.pp_print_string) pkgs;
-  try
-    let pkgs = List.filter missing pkgs in
-    List.iter
-      begin fun pkg ->
-        if once pkg then
-          let base = Findlib.package_directory pkg in
-          (*  The way plugins are specified in META have been
-              normalized late. So people started to
-              specified it in different ways:
-              - archive(byte,plugin)
-              - archive(byte)
-              - archive(native,plugin)
-              - archive(plugin)
-
-              The normalized one are:
-              - plugin(byte)
-              - plugin(native)
-          *)
-          let gui = if !Fc_config.is_gui then ["gui"] else [] in
-          let predicates =
-            (* The order is important for the archive cases *)
-            if Dynlink.is_native then
-              [
-                "plugin", ["native"]@gui;
-                "archive", ["plugin"]@gui;
-                "archive", ["native";"plugin"]@gui;
-              ]
-            else
-              [
-                "plugin", ["byte"]@gui;
-                "archive", ["byte";"plugin"]@gui;
-                "archive", ["byte"]@gui;
-              ]
-          in
-          let rec find_package_archives = function
-
-            (* Search by priority order *)
-            | (var,predicates)::others ->
-              begin
-                try Some (Findlib.package_property predicates pkg var)
-                with Not_found -> find_package_archives others
-              end
-
-            (* Look for virtual package *)
-            | [] ->
-              if is_virtual pkg then None else
-                let msg = Printf.sprintf
-                    "package '%s' doesn't contains any known \
-                     specification for dynamic linking"
-                    pkg
-                in raise (ArchiveError msg)
-
-          in match find_package_archives predicates with
-          | None -> (* virtual package *) ()
-          | Some archive ->
-            let archives = split_word archive in
-            if archives = [] then
-              Klog.warning "no archive to load for package '%s'" pkg
-            else
-              List.iter (load_archive pkg base) archives
-      end
-      (Findlib.package_deep_ancestors
-         (if Dynlink.is_native then [ "native" ] else [ "byte" ])
-         pkgs)
-  with
-  | Findlib.No_such_package(pkg,details) ->
-    Cmdline.add_loading_failures pkg;
-    Klog.error "[findlib] package '%s' not found (%s)" pkg details
-  | Findlib.Package_loop pkg ->
-    Cmdline.add_loading_failures pkg;
-    Klog.error "[findlib] cyclic dependencies for package '%s'" pkg
-  | ArchiveError msg ->
-    Cmdline.add_loading_failures "unknown package";
-    Klog.error "[findlib] %s" msg
-
-(* -------------------------------------------------------------------------- *)
-(* --- Load Objects                                                       --- *)
-(* -------------------------------------------------------------------------- *)
-
-let load_path = ref [] (* initialized by load_modules *)
-
-let load_script base =
-  Klog.feedback ~dkey "compiling script '%s.ml'" base ;
-  let cmd = Buffer.create 80 in
-  let fmt = Format.formatter_of_buffer cmd in
-  begin
-    if Dynlink.is_native then
-      Format.fprintf fmt "%s -shared -o %S.cmxs" Fc_config.ocamlopt base
-    else
-      Format.fprintf fmt "%s -c" Fc_config.ocamlc ;
-    Format.fprintf fmt
-      " -g %s -w -70 -warn-error a -I %s" Fc_config.ocaml_wflags (Fc_config.libdir :> string) ;
-    if !Fc_config.is_gui && Fc_config.lablgtk <> "" then
-      Format.fprintf fmt " -package %s" Fc_config.lablgtk;
-    List.iter (fun p -> Format.fprintf fmt " -I %s" p) !load_path ;
-    Format.fprintf fmt " %S.ml" base ;
-    Format.pp_print_flush fmt () ;
-    let cmd = Buffer.contents cmd in
-    Klog.feedback ~dkey "running '%s'" cmd ;
-    begin
-      let res = Sys.command cmd in
-      if res <> 0
-      then Klog.error "compilation of '%s.ml' failed" base
-      else
-        let pkg = Filename.basename base in
-        if Dynlink.is_native then
-          dynlib_module pkg (base ^ ".cmxs")
-        else
-          dynlib_module pkg (base ^ ".cmo") ;
-    end ;
-    let erase = Printf.sprintf "rm -f %s.cm* %s.o" base base in
-    Klog.feedback ~dkey "running '%s'" erase ;
-    let st = Sys.command erase in
-    if st <> 0 then
-      Klog.warning "Error when cleaning '%s.[o|cm*]' files" base ;
-  end
+  List.iter Dune_site_plugins.V1.load pkgs
 
 (* -------------------------------------------------------------------------- *)
 (* --- Command-Line Entry Points                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* See https://github.com/ocaml/dune/pull/636 about why the path separator for
-   ocamlfind is ';' on Cygwin. *)
-let ocamlfind_path_separator = if Sys.cygwin || Sys.win32 then ";" else ":"
-
-let set_module_load_path path =
-  let add_dir ~user d ps =
-    if is_dir d then d::ps else
-      ( if user then Klog.warning "cannot load '%s' (not a directory)" d
-      ; ps ) in
-  let plugin_path = Filepath.Normalized.to_string_list Fc_config.plugin_dir in
-  Klog.debug ~dkey "plugin_dir: %s"
-    (String.concat ocamlfind_path_separator plugin_path);
-  load_path :=
-    List.fold_right (add_dir ~user:true) path
-      (List.fold_right (add_dir ~user:false)
-         ((Fc_config.libdir :> string) :: plugin_path) []);
-  let env_ocamlpath =
-    try Str.split (Str.regexp ocamlfind_path_separator) (Sys.getenv "OCAMLPATH")
-    with Not_found -> []
-  in
-  let findlib_path =
-    String.concat ocamlfind_path_separator (!load_path@env_ocamlpath)
-  in
-  Klog.debug ~dkey "setting findlib path to %s" findlib_path;
-  Findlib.init ~env_ocamlpath:findlib_path ()
-
 let load_plugin_path () =
-  let scan_directory pkgs dir =
-    Klog.feedback ~dkey "Loading directory '%s'" dir ;
-    try
-      let content = Sys.readdir dir in
-      Array.sort String.compare content ;
-      Array.iter
-        (fun name ->
-           if is_meta name then
-             (* name starts with "META.frama-c-" *)
-             let pkg = String.sub name 5 (String.length name - 5) in
-             pkgs := pkg :: !pkgs
-        ) content ;
-    with Sys_error error ->
-      Klog.error "impossible to read '%s' (%s)" dir error
-  in
-  let pkgs = ref [] in
-  List.iter (scan_directory pkgs) !load_path ;
-  load_packages (List.rev !pkgs)
+  if Fc_config.is_gui then Config_data.Plugins.Plugins_gui.load_all ();
+  Config_data.Plugins.Plugins.load_all ()
+
+let load_plugin m =
+  Config_data.Plugins.Plugins.load m
 
 let load_module m =
   let base,ext = split_ext m in
   match ext with
   | ".ml" ->
-    begin
-      (* force script compilation *)
-      match is_file base ".ml" with
-      | Some _ -> load_script base
-      | None -> Klog.error "Missing source file '%s'" m
-    end
-  | "" | "." | ".cmo" | ".cma" | ".cmxs" ->
+    Klog.error "Script loading as been deprecated in favor of the command frama-c-init-plugin"
+  | _ ->
     begin
       (* load object or compile script or find package *)
       match is_object base with
       | Some file -> dynlib_module (Filename.basename base) file
       | None ->
         match is_file base ".ml" with
-        | Some _ -> load_script base
+        | Some _ ->
+          Klog.error "Script loading as been deprecated in favor of the command frama-c-init-plugin"
         | None ->
-          if is_package m && mem_package m then load_packages [m]
+          if is_package m && Dune_site_plugins.V1.available m then load_packages [m]
           else
-            let fc =
-              "frama-c-" ^ String.lowercase_ascii m
-            in
-            if mem_package fc then load_packages [fc]
-            else Klog.error "package or module '%s' not found" m
+            load_plugin m
     end
-  | _ ->
-    Klog.error "don't know what to do with '%s' (unexpected %s)" m ext
 
 (* ************************************************************************* *)
 (** {2 Registering and accessing dynamic values} *)

@@ -23,6 +23,8 @@
 open Cil_types
 open Cil_datatype
 
+open Pdg_types
+
 let rec pp_stmt fmt s = match s.skind with
   | Instr _ | Return _ | Goto _ | Break _ | Continue _ | TryFinally _
   | TryExcept _ | Throw _ | TryCatch _ ->

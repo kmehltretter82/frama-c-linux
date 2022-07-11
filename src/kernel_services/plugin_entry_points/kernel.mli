@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Provided services for kernel developers.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 (* ************************************************************************* *)
 (** {2 Log Machinery} *)
@@ -285,14 +285,14 @@ module Quiet: Parameter_sig.Bool
 module Permissive: Parameter_sig.Bool
 (** Behavior of option "-permissive" *)
 
-(** @plugin development guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Unicode: sig
   include Parameter_sig.Bool
   val without_unicode: ('a -> 'b) -> 'a -> 'b
   (** Execute the given function as if the option [-unicode] was not set. *)
 end
 (** Behavior of option "-unicode".
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 module Time: Parameter_sig.String
 (** Behavior of option "-time" *)
@@ -324,7 +324,7 @@ module PrintReturn : Parameter_sig.Bool
     @since Sulfur-20171101 *)
 
 (** Behavior of option "-ocode".
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module CodeOutput : sig
   include Parameter_sig.Filepath
   val output: (Format.formatter -> unit) -> unit
@@ -573,7 +573,7 @@ module UnspecifiedAccess: Parameter_sig.Bool
 
 module SafeArrays: Parameter_sig.Bool
 (** Behavior of option "-safe-arrays".
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 module SignedOverflow: Parameter_sig.Bool
 (** Behavior of option "-warn-signed-overflow" *)

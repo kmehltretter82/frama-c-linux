@@ -22,6 +22,8 @@
 
 open Cil_types
 
+open Pdg_types
+
 (* TODO: This .mli exists mainly to avoid problems with 'make -j'. This API
    is too vast and must be simplified. For example, functions should not
    receive variables as names (ie. strings) but directly as zones, possibly

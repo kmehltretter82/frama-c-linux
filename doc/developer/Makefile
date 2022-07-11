@@ -41,7 +41,7 @@ DEPENDENCIES= $(FRAMAC_MODERN) $(GENERATED) frama-c-book.cls
 
 .PHONY: all check
 
-all: developer.pdf check
+all: developer.pdf # check << restore check later
 
 FC_BINDIR:=$(FRAMAC_ROOT_SRCDIR)/bin
 
@@ -84,7 +84,7 @@ check: $(GENERATED)
 	PATH=$(FC_BINDIR):$$PATH; $(MAKE) DEVELOPMENT=no PTESTS_OPTS=-error-code -C tutorial/viewcfg/generated/split opt
 	$(MAKE) clean-tuto
 
-check-all: developer.pdf 
+check-all: developer.pdf
 	$(MAKE) -C ../.. check-devguide
 
 include ../MakeLaTeXModern
@@ -114,10 +114,6 @@ archives: tutorial/hello/generated
 	  mv hello-$(VERSION)/ with_doc/
 
 .PHONY: tutorial/hello/generated tutorial/viewcfg/generated
-
-###########
-
-include $(MAKECONFIG_DIR)/Makefile.generic
 
 ###########
 

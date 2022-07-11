@@ -1,0 +1,19 @@
+{ mk_tests } :
+
+mk_tests {
+  tests-name = "kernel-tests";
+  tests-command = ''
+    dune exec -- frama-c-ptests tests
+    dune build -j1 --display short \
+      @tests/cil/ptests \
+      @tests/compliance/ptests \
+      @tests/jcdb/ptests \
+      @tests/libc/ptests \
+      @tests/misc/ptests \
+      @tests/pretty_printing/ptests \
+      @tests/saveload/ptests \
+      @tests/spec/ptests \
+      @tests/syntax/ptests \
+      @tests/test/ptests
+  '';
+}

@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Functors for building computations which use kernel datatypes.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 module Stmt_set_ref(Info: State_builder.Info) :
   State_builder.Set_ref with type elt = Cil_types.stmt
@@ -29,7 +29,7 @@ module Stmt_set_ref(Info: State_builder.Info) :
 module Kinstr_hashtbl(Data:Datatype.S)(Info: State_builder.Info_with_size) :
   State_builder.Hashtbl with type key = Cil_types.kinstr and type data = Data.t
 
-(** @plugin development guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Stmt_hashtbl(Data:Datatype.S)(Info: State_builder.Info_with_size) :
   State_builder.Hashtbl with type key = Cil_types.stmt and type data = Data.t
 

@@ -188,6 +188,10 @@ let add_symbolic_dir name dir =
   Hashtbl.replace symbolic_dirs dir name ;
   (insert cwd (dir:>string)).symbolic_name <- Some name
 
+(** Initialize using Config *)
+let add_symbolic_dir_list name =
+  List.iter (fun d -> add_symbolic_dir name d)
+
 let reset_symbolic_dirs () = Hashtbl.clear symbolic_dirs
 
 let all_symbolic_dirs () =

@@ -1,0 +1,42 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                        ;;
+;;  This file is part of Frama-C.                                         ;;
+;;                                                                        ;;
+;;  Copyright (C) 2007-2022                                               ;;
+;;    CEA (Commissariat à l'énergie atomique et aux énergies              ;;
+;;         alternatives)                                                  ;;
+;;                                                                        ;;
+;;  you can redistribute it and/or modify it under the terms of the GNU   ;;
+;;  Lesser General Public License as published by the Free Software       ;;
+;;  Foundation, version 2.1.                                              ;;
+;;                                                                        ;;
+;;  It is distributed in the hope that it will be useful,                 ;;
+;;  but WITHOUT ANY WARRANTY; without even the implied warranty of        ;;
+;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         ;;
+;;  GNU Lesser General Public License for more details.                   ;;
+;;                                                                        ;;
+;;  See the GNU Lesser General Public License version 2.1                 ;;
+;;  for more details (enclosed in the file licenses/LGPLv2.1).            ;;
+;;                                                                        ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Slicing:" %{lib-available:frama-c-slicing.core} "\n")
+          (echo "  - Pdg:" %{lib-available:frama-c-pdg.core} "\n")
+          (echo "  - Sparecode:" %{lib-available:frama-c-sparecode.core} "\n")
+  )
+  )
+)
+
+( library
+  (name slicing)
+  (optional)
+  (public_name frama-c-slicing.core)
+  (flags -open Frama_c_kernel :standard -w -9)
+  (libraries frama-c.kernel frama-c-pdg.core frama-c-sparecode.core)
+)
+
+(plugin (optional) (name slicing) (libraries frama-c-slicing.core) (site (frama-c plugins)))

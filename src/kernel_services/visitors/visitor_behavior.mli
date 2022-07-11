@@ -32,11 +32,11 @@ type t
 (** How the visitor should behave in front of mutable fields: in
     place modification or copy of the structure. This type is abstract.
     Use one of the two values below in your classes.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val inplace: unit -> t
 (** In-place modification. Behavior of the original cil visitor.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val copy: Project.t -> t
 (** Makes fresh copies of the mutable structures.
@@ -46,7 +46,7 @@ val copy: Project.t -> t
       AST. This allows for instance to copy a function with its
       formals and local variables, and to keep the references to other
       globals in the function's body.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val refresh: Project.t -> t
 (** Makes fresh copies of the mutable structures and provides fresh id
@@ -74,7 +74,7 @@ val get_project: t -> Project.t option
     AST elements in [vis]. For example for {!Cil_types.varinfo}: [Reset.varinfo vis].
 
     @since 20.0-Calcium
-    @plugin development guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 module Reset: sig
   val varinfo: t -> unit
@@ -120,7 +120,7 @@ end
     [Get.varinfo vis vi].
 
     @since 20.0-Calcium
-    @plugin development guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 module Get: Get
 
@@ -132,7 +132,7 @@ module Get: Get
     {!Cil_types.varinfo}: [Get_orig.varinfo vis new_vi].
 
     @since 20.0-Calcium
-    @plugin development guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 module Get_orig: Get
 
@@ -145,7 +145,7 @@ module Get_orig: Get
     {!Cil_types.varinfo}: [Memo.varinfo vis vi].
 
     @since 20.0-Calcium
-    @plugin development guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 module Memo: Get
 
@@ -178,7 +178,7 @@ end
     {!Cil_types.varinfo}: [Set.varinfo vis vi new_representative].
 
     @since 20.0-Calcium
-    @plugin development guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 module Set: Set
 

@@ -1,0 +1,89 @@
+# This template is meant to execute Frama-C tests
+#
+# Input variables:
+#
+# - tests-name (mandatory):
+#   The name used for the derivation.
+#
+# - tests-command (mandatory):
+#   The tests command to execute, generally something like:
+#   ''
+#     dune exec -- frama-c-ptests tests src/plugins/e-acsl/tests
+#     dune build -j1 --display short @src/plugins/e-acsl/tests/ptests
+#   ''
+#
+# - has-wp-proofs (optional, defaults to 'false')
+#   Indicates whether the tests execute WP proofs, if it the case the derivation
+#   receives an additional build-input 'alt-ergo'. Furthermore, it configures
+#   Why3 before build phase and export the WP global cache. Note however that
+#   this cache is used only if the tests use the option '-wp-cache-env'
+
+{ lib
+, alt-ergo
+, frama-c
+, perl
+, stdenvNoCC
+, time
+, unixtools
+, which
+} :
+
+{ tests-name
+, tests-command
+, has-wp-proofs ? false
+} :
+
+stdenvNoCC.mkDerivation {
+  pname = tests-name ;
+  version = frama-c.version;
+  slang = frama-c.slang;
+
+  src = frama-c.build_dir + "/dir.tar";
+  sourceRoot = ".";
+
+  buildInputs = frama-c.buildInputs ++ [
+    frama-c
+    perl
+    time
+    unixtools.getopt
+    which
+  ] ++
+  (if has-wp-proofs then [ alt-ergo ] else []);
+
+  postPatch = ''
+    patchShebangs .
+  '' ;
+
+  # Keep main configuration
+  configurePhase = ''
+    true
+  '';
+
+  wp_cache =
+    if has-wp-proofs
+    then fetchGit "git@git.frama-c.com:frama-c/wp-cache.git"
+    else "" ;
+
+  preBuild =
+    if has-wp-proofs
+    then ''
+        mkdir home
+        HOME=$(pwd)/home
+        why3 config detect
+        export FRAMAC_WP_CACHE=offline
+        export FRAMAC_WP_CACHEDIR=$wp_cache
+      ''
+    else "" ;
+
+  buildPhase = ''
+    runHook preBuild
+  '' +
+  tests-command + ''
+    runHook postBuild
+  '';
+
+  # No installation required
+  installPhase = ''
+    touch $out
+  '';
+}

@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 module CamlString = String
+module FramacFilepath = Filepath
 
 let empty_string = ""
 
@@ -317,12 +318,13 @@ struct
         end)
 
     let mk_dir d =
+      let d' = FramacFilepath.Normalized.of_string d in
       try
         Extlib.mkdir ~parents:true d 0o755;
-        L.warning "creating %s directory `%s'" O.option_name d;
+        L.warning "creating %s directory `%a'" O.option_name FramacFilepath.Normalized.pretty d';
         d
       with Unix.Unix_error _ ->
-        L.abort "cannot create %s directory `%s'" O.option_name d
+        L.abort "cannot create %s directory `%a'" O.option_name FramacFilepath.Normalized.pretty d'
 
     let set filepath = Dir_name.set filepath
     let get () = Dir_name.get ()
@@ -370,7 +372,18 @@ struct
           in
           match dir with
           | None ->
-            L.abort "no directory %s exist in %s directories" s O.option_name
+            let pp_path fmt (path:Dir_name.t) =
+              Format.pp_print_string fmt (path :> string)
+            in
+            let pp_subdir fmt = function
+              | "." -> ()
+              | s -> Format.fprintf fmt " sub-directory %s in " s
+            in
+            L.abort "there is no%a %s directories: %a"
+              pp_subdir s
+              O.option_name
+              (Format.pp_print_list ~pp_sep:(fun fmt () -> Format.fprintf fmt ", ") pp_path)
+              (base_dirs ())
           | Some d -> d
         end
       | _ ->
@@ -413,7 +426,7 @@ struct
       | `Must_exist ->
         if Sys.file_exists (filepath :> string)
         then filepath
-        else L.abort "no file %s exist in %s directories" s O.option_name
+        else L.abort "there is no file %s in %s directories" (filepath :> string) O.option_name
       | `Normalize_only ->
         filepath
       | `Create_path ->

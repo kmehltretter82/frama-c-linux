@@ -42,57 +42,27 @@ val minor_version: int
 (** Frama-C minor version number.
     @since 19.0-Potassium *)
 
-val is_gui: bool ref
+val is_gui: bool
 (** Is the Frama-C GUI running?
-    @since Beryllium-20090601-beta1 *)
-
-val lablgtk: string
-(** Name of the lablgtk version against which Frama-C has been compiled.
-    blank if only command-line mode is available. *)
-
-val ocamlc: string
-(** Name of the bytecode compiler.
-    @since Boron-20100401 *)
-
-val ocamlopt: string
-(** Name of the native compiler.
-    @since Boron-20100401 *)
-
-val ocaml_wflags: string
-(** Warning flags used when compiling Frama-C.
-    @since Chlorine-20180501 *)
-
-val datadir: Filepath.Normalized.t
-(** Directory where architecture independent files are.
-    Main directory, use {!datadirs} for the others *)
+      @since Beryllium-20090601-beta1
+      @since frama-c-trunk not anymore a reference
+*)
 
 val datadirs: Filepath.Normalized.t list
 (** Directories where architecture independent files are in order of
     priority.
     @since 19.0-Potassium *)
 
+val datadir: Filepath.Normalized.t
+(** Last directory of datadirs (the directory of frama-c installation)
+    @since 19.0-Potassium *)
+
 val framac_libc: Filepath.Normalized.t
 (** Directory where Frama-C libc headers are.
     @since 19.0-Potassium *)
 
-val libdir: Filepath.Normalized.t
-(** Directory where the Frama-C kernel library is.
-    @since Beryllium-20090601-beta1 *)
-
 val plugin_dir: Filepath.Normalized.t list
 (** Directory where the Frama-C dynamic plug-ins are. *)
-
-val plugin_path: string
-(** The colon-separated concatenation of [plugin_dir].
-    @since Magnesium-20151001 *)
-
-val compilation_unit_names: string list
-(** List of names of all kernel compilation units.
-    @since Boron-20100401 *)
-
-val library_names: string list
-(** List of linked libraries.
-    @since Magnesium-20151001 *)
 
 val preprocessor: string
 (** Name of the default command to call the preprocessor.

@@ -1,0 +1,2 @@
+MACRO: frama-c-exe echo frama-c
+MACRO: PTEST_DEFAULT_OPTIONS default-options:=@PTEST_DEFAULT_OPTIONS@:=

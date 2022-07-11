@@ -22,6 +22,9 @@
 
 open SlicingTypes
 open Cil_types
+
+open Pdg_types
+
 open SlicingInternals
 
 type select = sl_mark PdgMarks.select
@@ -43,7 +46,7 @@ val build_node_and_dpds_selection :
   ?nd_marks:n_or_d_marks -> sl_mark -> n_or_d_marks
 
 val translate_crit_to_select :
-  Db.Pdg.t -> ?to_select:select ->
+  Pdg.Api.t -> ?to_select:select ->
   ((PdgTypes.Node.t * Locations.Zone.t option) list * n_or_d_marks) list
   -> select
 

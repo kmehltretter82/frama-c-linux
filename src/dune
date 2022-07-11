@@ -1,0 +1,59 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                        ;;
+;;  This file is part of Frama-C.                                         ;;
+;;                                                                        ;;
+;;  Copyright (C) 2007-2022                                               ;;
+;;    CEA (Commissariat à l'énergie atomique et aux énergies              ;;
+;;         alternatives)                                                  ;;
+;;                                                                        ;;
+;;  you can redistribute it and/or modify it under the terms of the GNU   ;;
+;;  Lesser General Public License as published by the Free Software       ;;
+;;  Foundation, version 2.1.                                              ;;
+;;                                                                        ;;
+;;  It is distributed in the hope that it will be useful,                 ;;
+;;  but WITHOUT ANY WARRANTY; without even the implied warranty of        ;;
+;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         ;;
+;;  GNU Lesser General Public License for more details.                   ;;
+;;                                                                        ;;
+;;  See the GNU Lesser General Public License version 2.1                 ;;
+;;  for more details (enclosed in the file licenses/LGPLv2.1).            ;;
+;;                                                                        ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Frama-C:" %{lib-available:frama-c.kernel} "\n")
+          (echo "  - str:" %{lib-available:str} "\n")
+          (echo "  - unix:" %{lib-available:unix} "\n")
+          (echo "  - zarith:" %{lib-available:zarith} "\n")
+          (echo "  - ocamlgraph:" %{lib-available:ocamlgraph} "\n")
+          (echo "  - dynlink:" %{lib-available:dynlink} "\n")
+          (echo "  - bytes:" %{lib-available:bytes} "\n")
+          (echo "  - yojson:" %{lib-available:yojson} "\n")
+          (echo "  - dune-site:" %{lib-available:dune-site} "\n")
+          (echo "  - dune-site.plugins:" %{lib-available:dune-site.plugins} "\n")
+          (echo "  - ppx_import:" %{lib-available:ppx_import} "\n")
+          (echo "  - ppx_deriving.eq:" %{lib-available:ppx_deriving.eq} "\n")
+  )
+  )
+)
+
+(library
+  (name frama_c_kernel)
+  (public_name frama-c.kernel)
+  (foreign_stubs (language c) (names c_bindings))
+  (flags :standard -w -9-32-34)
+  (libraries frama-c.init str unix zarith ocamlgraph dynlink bytes yojson dune-site dune-site.plugins)
+  (preprocess (staged_pps ppx_import ppx_deriving.eq))
+)
+
+(generate_sites_module (module config_data) (sites frama-c) (plugins (frama-c plugins) (frama-c plugins_gui)))
+
+(include_subdirs unqualified)
+
+(alias
+  (name all)
+  (deps (file frama_c_kernel.cma)(file frama_c_kernel.cmxa))
+)

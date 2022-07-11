@@ -46,7 +46,7 @@
     CIL original API documentation is available as
     an html version at http://manju.cs.berkeley.edu/cil.
 
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 open Cil_types
 open Cil_datatype
@@ -1079,7 +1079,7 @@ val mkEmptyStmt: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
 val dummyInstr: instr
 
 (** A statement consisting of just [dummyInstr].
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 val dummyStmt: stmt
 
 (** Create an instruction equivalent to a pure expression. The new instruction
@@ -1493,33 +1493,33 @@ val typeAddGhost : typ -> typ
 
 (** Different visiting actions. 'a will be instantiated with [exp], [instr],
     etc.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 type 'a visitAction =
   | SkipChildren (** Do not visit the children. Return the node as it is.
-                     @plugin development guide *)
+                     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
   | DoChildren (** Continue with the children of this node. Rebuild the node on
                    return if any of the children changes (use == test).
-                   @plugin development guide *)
+                   @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
   | DoChildrenPost of ('a -> 'a)
   (** visit the children, and apply the given function to the result.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
   | JustCopy (** visit the children, but only to make the necessary copies
                  (only useful for copy visitor).
-                 @plugin development guide *)
+                 @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
   | JustCopyPost of ('a -> 'a)
   (** same as JustCopy + applies the given function to the result.
-      @plugin development guide*)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide*)
   | ChangeTo of 'a  (** Replace the expression with the given one.
-                        @plugin development guide *)
+                        @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
   | ChangeToPost of 'a * ('a -> 'a)
   (** applies the expression to the function and gives back the result.
       Useful to insert some actions in an inheritance chain.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
   | ChangeDoChildrenPost of 'a * ('a -> 'a)
   (** First consider that the entire exp is replaced by the first parameter. Then
       continue with the children. On return rebuild the node if any of the
       children has changed and then apply the function on the node.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val mk_behavior :
   ?name:string ->
@@ -1566,11 +1566,11 @@ val find_default_requires: behavior list -> identified_predicate list
     {!Visitor.generic_frama_c_visitor} instead of {!genericCilVisitor} or
     {!nopCilVisitor}
 
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 class type cilVisitor = object
   method behavior: Visitor_behavior.t
   (** the kind of behavior expected for the behavior.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method project: Project.t option
   (** Project the visitor operates on. Non-nil for copy visitor.
@@ -1581,7 +1581,7 @@ class type cilVisitor = object
 
   method vfile: file -> file visitAction
   (** visit a whole file.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vvdec: varinfo -> varinfo visitAction
   (** Invoked for each variable declaration. The children to be traversed
@@ -1591,20 +1591,20 @@ class type cilVisitor = object
       formals and locals of function definitions. This means that the list
       of formals of a function may be traversed multiple times if there exists
       both a declaration and a definition, or multiple declarations.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vvrbl: varinfo -> varinfo visitAction
   (** Invoked on each variable use. Here only the [SkipChildren] and
       [ChangeTo] actions make sense since there are no subtrees. Note that
       the type and attributes of the variable are not traversed for a
       variable use.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vexpr: exp -> exp visitAction
   (** Invoked on each expression occurrence. The subtrees are the
       subexpressions, the types (for a [Cast] or [SizeOf] expression) or the
       variable use.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vlval: lval -> lval visitAction
   (** Invoked on each lvalue occurrence *)
@@ -1613,7 +1613,7 @@ class type cilVisitor = object
   (** Invoked on each offset occurrence that is *not* as part of an
       initializer list specification, i.e. in an lval or recursively inside an
       offset.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vinitoffs: offset -> offset visitAction
   (** Invoked on each offset appearing in the list of a
@@ -1630,7 +1630,7 @@ class type cilVisitor = object
       [Goto] and [Case] statements that point to the original statement. If you
       use the [ChangeTo] action then you should take care of preserving that
       sharing yourself.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vblock: block -> block visitAction
   (** Block. *)
@@ -1640,7 +1640,7 @@ class type cilVisitor = object
 
   method vglob: global -> global list visitAction
   (** Global (vars, types, etc.)
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vinit: varinfo -> offset -> init -> init visitAction
   (** Initializers. Pass the global where this occurs, and the offset *)
@@ -1692,7 +1692,7 @@ class type cilVisitor = object
   (** [Kstmt stmt] when visiting statement stmt, [Kglobal] when called outside
       of a statement.
       @since Carbon-20101201
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method push_stmt : stmt -> unit
   method pop_stmt : stmt -> unit
@@ -1715,29 +1715,29 @@ class type cilVisitor = object
   method vterm_offset: term_offset -> term_offset visitAction
   method vlogic_label: logic_label -> logic_label visitAction
   method vlogic_info_decl: logic_info -> logic_info visitAction
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vlogic_info_use: logic_info -> logic_info visitAction
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vlogic_type_info_decl: logic_type_info -> logic_type_info visitAction
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vlogic_type_info_use: logic_type_info -> logic_type_info visitAction
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vlogic_type_def: logic_type_def -> logic_type_def visitAction
   method vlogic_ctor_info_decl: logic_ctor_info -> logic_ctor_info visitAction
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vlogic_ctor_info_use: logic_ctor_info -> logic_ctor_info visitAction
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vlogic_var_decl: logic_var -> logic_var visitAction
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vlogic_var_use: logic_var -> logic_var visitAction
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method vquantifiers: quantifiers -> quantifiers visitAction
 
@@ -1773,11 +1773,11 @@ class type cilVisitor = object
   method fill_global_tables: unit
   (** fill the global environment tables at the end of a full copy in a
       new project.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   method get_filling_actions: (unit -> unit) Queue.t
   (** get the queue of actions to be performed at the end of a full copy.
-      @plugin development guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 end
 
@@ -1831,19 +1831,19 @@ val doVisitList:
 (** Visit a file. This will re-cons all globals TWICE (so that it is
  * tail-recursive). Use {!Cil.visitCilFileSameGlobals} if your visitor will
  * not change the list of globals.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 val visitCilFileCopy: cilVisitor -> file -> file
 
 (** Same thing, but the result is ignored. The given visitor must thus be
     an inplace visitor. Nothing is done if the visitor is a copy visitor.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 val visitCilFile: cilVisitor -> file -> unit
 
 (** A visitor for the whole file that does not *physically* change the
     globals (but maybe changes things inside the globals through
     side-effects). Use this function instead of {!Cil.visitCilFile}
     whenever appropriate because it is more efficient for long files.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 val visitCilFileSameGlobals: cilVisitor -> file -> unit
 
 (** Same as {!visitCilFilesSameGlobals}, but only visits function definitions
@@ -2122,6 +2122,9 @@ val isSigned: ikind -> bool
     an lvalue which is a bitfield, the size of the bitfield is returned. *)
 val bitsSizeOfBitfield: typ -> int
 
+val selfTypSize: State.t
+(** Cache for sizeof *)
+
 (** Returns a unique number representing the integer
     conversion rank. *)
 val rank: ikind -> int
@@ -2274,7 +2277,7 @@ val cvar_to_term: loc:location -> varinfo -> term
 val make_temp_logic_var: logic_type -> logic_var
 
 (** The constant logic term zero.
-    @plugin development guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 val lzero : ?loc:location -> unit -> term
 
 (** The constant logic term 1. *)
@@ -2337,14 +2340,7 @@ val separate_if_succs: stmt -> stmt * stmt
 
 (**/**)
 
-val dependency_on_ast: State.t -> unit
-(** indicates that the given state depends on the AST. *)
-
-val set_dependencies_of_ast : State.t -> unit
-(** Makes all states that have been marked as depending on the AST by
-    {!dependency_on_ast} depend on the given state. Should only be used
-    once when creating the AST state.
-*)
+val switch_case_state_self: State.t
 
 val pp_typ_ref: (Format.formatter -> typ -> unit) ref
 val pp_global_ref: (Format.formatter -> global -> unit) ref
