@@ -2,7 +2,7 @@
 [kernel] Parsing params.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] 1 goal scheduled
-[wp] [Alt-Ergo] Goal typed_lemma_lem : Valid
+[wp] [Valid] typed_lemma_lem (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 1
   Qed:             0 
   Alt-Ergo:        1

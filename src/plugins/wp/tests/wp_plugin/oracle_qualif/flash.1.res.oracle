@@ -3,12 +3,12 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
-[wp] [Qed] Goal typed_flash_job_ensures_Events : Valid
-[wp] [Qed] Goal typed_flash_job_ensures_A_reads : Valid
-[wp] [Qed] Goal typed_flash_job_ensures_B_reads : Valid
-[wp] [Qed] Goal typed_flash_job_ensures_B_writes : Valid
-[wp] [Qed] Goal typed_flash_job_ensures_ReadValues : Valid
-[wp] [Qed] Goal typed_flash_job_ensures_WriteValues : Valid
+[wp] [Valid] typed_flash_job_ensures_Events (Qed)
+[wp] [Valid] typed_flash_job_ensures_A_reads (Qed)
+[wp] [Valid] typed_flash_job_ensures_B_reads (Qed)
+[wp] [Valid] typed_flash_job_ensures_B_writes (Qed)
+[wp] [Valid] typed_flash_job_ensures_ReadValues (Qed)
+[wp] [Valid] typed_flash_job_ensures_WriteValues (Qed)
 [wp] Proved goals:    6 / 6
   Qed:             6
 ------------------------------------------------------------

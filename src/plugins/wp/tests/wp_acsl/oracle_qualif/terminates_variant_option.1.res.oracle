@@ -11,26 +11,26 @@
 [wp] terminates_variant_option.i:59: Warning: 
   Loop variant is always trivially verified (terminates \false)
 [wp] 20 goals scheduled
-[wp] [Alt-Ergo] Goal typed_fails_positive_loop_invariant_preserved : Valid
-[wp] [Qed] Goal typed_fails_positive_loop_invariant_established : Valid
-[wp] [Qed] Goal typed_fails_positive_loop_assigns_part1 : Valid
-[wp] [Qed] Goal typed_fails_positive_loop_assigns_part2 : Valid
-[wp] [Qed] Goal typed_fails_positive_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_fails_positive_loop_variant_positive : Valid
-[wp] [Qed] Goal typed_fails_decreases_loop_assigns : Valid
-[wp] [Alt-Ergo] Goal typed_fails_decreases_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_fails_decreases_loop_variant_positive : Valid
-[wp] [Alt-Ergo] Goal typed_f1_loop_invariant_preserved : Valid
-[wp] [Qed] Goal typed_f1_loop_invariant_established : Valid
-[wp] [Qed] Goal typed_f1_loop_assigns : Valid
-[wp] [Qed] Goal typed_f1_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_f1_loop_variant_positive : Valid
-[wp] [Qed] Goal typed_trivial_variant_loop_assigns : Valid
-[wp] [Qed] Goal typed_trivial_variant_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_trivial_variant_loop_variant_positive : Valid
-[wp] [Qed] Goal typed_trivial_variant_default_loop_assigns : Valid
-[wp] [Qed] Goal typed_trivial_variant_default_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_trivial_variant_default_loop_variant_positive : Valid
+[wp] [Valid] typed_fails_positive_loop_invariant_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_fails_positive_loop_invariant_established (Qed)
+[wp] [Valid] typed_fails_positive_loop_assigns_part1 (Qed)
+[wp] [Valid] typed_fails_positive_loop_assigns_part2 (Qed)
+[wp] [Valid] typed_fails_positive_loop_variant_decrease (Qed)
+[wp] [Valid] typed_fails_positive_loop_variant_positive (Qed)
+[wp] [Valid] typed_fails_decreases_loop_assigns (Qed)
+[wp] [Valid] typed_fails_decreases_loop_variant_decrease (Alt-Ergo) (Cached)
+[wp] [Valid] typed_fails_decreases_loop_variant_positive (Qed)
+[wp] [Valid] typed_f1_loop_invariant_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_f1_loop_invariant_established (Qed)
+[wp] [Valid] typed_f1_loop_assigns (Qed)
+[wp] [Valid] typed_f1_loop_variant_decrease (Qed)
+[wp] [Valid] typed_f1_loop_variant_positive (Qed)
+[wp] [Valid] typed_trivial_variant_loop_assigns (Qed)
+[wp] [Valid] typed_trivial_variant_loop_variant_decrease (Qed)
+[wp] [Valid] typed_trivial_variant_loop_variant_positive (Qed)
+[wp] [Valid] typed_trivial_variant_default_loop_assigns (Qed)
+[wp] [Valid] typed_trivial_variant_default_loop_variant_decrease (Qed)
+[wp] [Valid] typed_trivial_variant_default_loop_variant_positive (Qed)
 [wp] Proved goals:   24 / 24
   Qed:            17 
   Alt-Ergo:        3

@@ -8,98 +8,98 @@
 [wp] [CFG] Goal init_t2_v2_exits : Valid (Unreachable)
 [wp] [CFG] Goal init_t2_v3_exits : Valid (Unreachable)
 [wp] 92 goals scheduled
-[wp] [Alt-Ergo] Goal typed_init_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_init_loop_invariant_Partial_preserved : Valid
-[wp] [Qed] Goal typed_init_loop_invariant_Partial_established : Valid
-[wp] [Qed] Goal typed_init_loop_invariant_Range_preserved : Valid
-[wp] [Qed] Goal typed_init_loop_invariant_Range_established : Valid
-[wp] [Qed] Goal typed_init_loop_assigns_part1 : Valid
-[wp] [Qed] Goal typed_init_loop_assigns_part2 : Valid
-[wp] [Alt-Ergo] Goal typed_init_loop_assigns_part3 : Valid
-[wp] [Qed] Goal typed_init_assigns : Valid
-[wp] [Qed] Goal typed_init_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_init_loop_variant_positive : Valid
-[wp] [Alt-Ergo] Goal typed_init_t1_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_init_t1_loop_invariant_Partial_preserved : Valid
-[wp] [Qed] Goal typed_init_t1_loop_invariant_Partial_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_t1_loop_invariant_Range_preserved : Valid
-[wp] [Qed] Goal typed_init_t1_loop_invariant_Range_established : Valid
-[wp] [Qed] Goal typed_init_t1_loop_assigns : Valid
-[wp] [Qed] Goal typed_init_t1_assigns_part1 : Valid
-[wp] [Qed] Goal typed_init_t1_assigns_part2 : Valid
-[wp] [Alt-Ergo] Goal typed_init_t1_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_init_t1_loop_variant_positive : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v1_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v1_loop_invariant_Partial_i_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_v1_loop_invariant_Partial_i_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v1_loop_invariant_Range_i_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_v1_loop_invariant_Range_i_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v1_loop_invariant_Partial_j_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_v1_loop_invariant_Partial_j_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v1_loop_invariant_Previous_i_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_v1_loop_invariant_Previous_i_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v1_loop_invariant_Range_j_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_v1_loop_invariant_Range_j_established : Valid
-[wp] [Qed] Goal typed_init_t2_v1_assert_Last_j : Valid
-[wp] [Qed] Goal typed_init_t2_v1_assert_Last_i : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v1_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_init_t2_v1_loop_variant_positive : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v1_loop_variant_2_decrease : Valid
-[wp] [Qed] Goal typed_init_t2_v1_loop_variant_2_positive : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v2_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v2_loop_invariant_Partial_i_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_v2_loop_invariant_Partial_i_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v2_loop_invariant_Range_i_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_v2_loop_invariant_Range_i_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v2_loop_invariant_Partial_j_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_v2_loop_invariant_Partial_j_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v2_loop_invariant_Previous_i_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_v2_loop_invariant_Previous_i_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v2_loop_invariant_Range_j_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_v2_loop_invariant_Range_j_established : Valid
-[wp] [Qed] Goal typed_init_t2_v2_assert_Last_j : Valid
-[wp] [Qed] Goal typed_init_t2_v2_assert_Last_i : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v2_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_init_t2_v2_loop_variant_positive : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v2_loop_variant_2_decrease : Valid
-[wp] [Qed] Goal typed_init_t2_v2_loop_variant_2_positive : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v3_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v3_loop_invariant_Partial_i_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_v3_loop_invariant_Partial_i_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v3_loop_invariant_Range_i_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_v3_loop_invariant_Range_i_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v3_loop_invariant_Partial_j_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v3_loop_invariant_Partial_j_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v3_loop_invariant_Range_j_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_v3_loop_invariant_Range_j_established : Valid
-[wp] [Qed] Goal typed_init_t2_v3_assert_Last_j : Valid
-[wp] [Qed] Goal typed_init_t2_v3_assert_Last_i : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v3_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_init_t2_v3_loop_variant_positive : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_v3_loop_variant_2_decrease : Valid
-[wp] [Qed] Goal typed_init_t2_v3_loop_variant_2_positive : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_bis_v1_ensures : Valid
-[wp] [Qed] Goal typed_init_t2_bis_v1_exits : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_bis_v1_loop_invariant_Partial_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_bis_v1_loop_invariant_Partial_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_bis_v1_loop_invariant_Range_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_bis_v1_loop_invariant_Range_established : Valid
-[wp] [Qed] Goal typed_init_t2_bis_v1_assert_Offset : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_bis_v1_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_init_t2_bis_v1_loop_variant_positive : Valid
-[wp] [Qed] Goal typed_init_t2_bis_v1_call_init_requires : Valid
-[wp] [Qed] Goal typed_init_t2_bis_v1_call_init_requires_2 : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_bis_v2_ensures : Valid
-[wp] [Qed] Goal typed_init_t2_bis_v2_exits : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_bis_v2_loop_invariant_Partial_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_bis_v2_loop_invariant_Partial_established : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_bis_v2_loop_invariant_Range_preserved : Valid
-[wp] [Qed] Goal typed_init_t2_bis_v2_loop_invariant_Range_established : Valid
-[wp] [Qed] Goal typed_init_t2_bis_v2_assert_Offset_i : Valid
-[wp] [Alt-Ergo] Goal typed_init_t2_bis_v2_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_init_t2_bis_v2_loop_variant_positive : Valid
-[wp] [Qed] Goal typed_init_t2_bis_v2_call_init_requires : Valid
-[wp] [Qed] Goal typed_init_t2_bis_v2_call_init_requires_2 : Valid
+[wp] [Valid] typed_init_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_loop_invariant_Partial_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_loop_invariant_Partial_established (Qed)
+[wp] [Valid] typed_init_loop_invariant_Range_preserved (Qed)
+[wp] [Valid] typed_init_loop_invariant_Range_established (Qed)
+[wp] [Valid] typed_init_loop_assigns_part1 (Qed)
+[wp] [Valid] typed_init_loop_assigns_part2 (Qed)
+[wp] [Valid] typed_init_loop_assigns_part3 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_assigns (Qed)
+[wp] [Valid] typed_init_loop_variant_decrease (Qed)
+[wp] [Valid] typed_init_loop_variant_positive (Qed)
+[wp] [Valid] typed_init_t1_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t1_loop_invariant_Partial_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t1_loop_invariant_Partial_established (Qed)
+[wp] [Valid] typed_init_t1_loop_invariant_Range_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t1_loop_invariant_Range_established (Qed)
+[wp] [Valid] typed_init_t1_loop_assigns (Qed)
+[wp] [Valid] typed_init_t1_assigns_part1 (Qed)
+[wp] [Valid] typed_init_t1_assigns_part2 (Qed)
+[wp] [Valid] typed_init_t1_loop_variant_decrease (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t1_loop_variant_positive (Qed)
+[wp] [Valid] typed_init_t2_v1_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v1_loop_invariant_Partial_i_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v1_loop_invariant_Partial_i_established (Qed)
+[wp] [Valid] typed_init_t2_v1_loop_invariant_Range_i_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v1_loop_invariant_Range_i_established (Qed)
+[wp] [Valid] typed_init_t2_v1_loop_invariant_Partial_j_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v1_loop_invariant_Partial_j_established (Qed)
+[wp] [Valid] typed_init_t2_v1_loop_invariant_Previous_i_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v1_loop_invariant_Previous_i_established (Qed)
+[wp] [Valid] typed_init_t2_v1_loop_invariant_Range_j_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v1_loop_invariant_Range_j_established (Qed)
+[wp] [Valid] typed_init_t2_v1_assert_Last_j (Qed)
+[wp] [Valid] typed_init_t2_v1_assert_Last_i (Qed)
+[wp] [Valid] typed_init_t2_v1_loop_variant_decrease (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v1_loop_variant_positive (Qed)
+[wp] [Valid] typed_init_t2_v1_loop_variant_2_decrease (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v1_loop_variant_2_positive (Qed)
+[wp] [Valid] typed_init_t2_v2_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v2_loop_invariant_Partial_i_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v2_loop_invariant_Partial_i_established (Qed)
+[wp] [Valid] typed_init_t2_v2_loop_invariant_Range_i_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v2_loop_invariant_Range_i_established (Qed)
+[wp] [Valid] typed_init_t2_v2_loop_invariant_Partial_j_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v2_loop_invariant_Partial_j_established (Qed)
+[wp] [Valid] typed_init_t2_v2_loop_invariant_Previous_i_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v2_loop_invariant_Previous_i_established (Qed)
+[wp] [Valid] typed_init_t2_v2_loop_invariant_Range_j_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v2_loop_invariant_Range_j_established (Qed)
+[wp] [Valid] typed_init_t2_v2_assert_Last_j (Qed)
+[wp] [Valid] typed_init_t2_v2_assert_Last_i (Qed)
+[wp] [Valid] typed_init_t2_v2_loop_variant_decrease (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v2_loop_variant_positive (Qed)
+[wp] [Valid] typed_init_t2_v2_loop_variant_2_decrease (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v2_loop_variant_2_positive (Qed)
+[wp] [Valid] typed_init_t2_v3_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v3_loop_invariant_Partial_i_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v3_loop_invariant_Partial_i_established (Qed)
+[wp] [Valid] typed_init_t2_v3_loop_invariant_Range_i_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v3_loop_invariant_Range_i_established (Qed)
+[wp] [Valid] typed_init_t2_v3_loop_invariant_Partial_j_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v3_loop_invariant_Partial_j_established (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v3_loop_invariant_Range_j_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v3_loop_invariant_Range_j_established (Qed)
+[wp] [Valid] typed_init_t2_v3_assert_Last_j (Qed)
+[wp] [Valid] typed_init_t2_v3_assert_Last_i (Qed)
+[wp] [Valid] typed_init_t2_v3_loop_variant_decrease (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v3_loop_variant_positive (Qed)
+[wp] [Valid] typed_init_t2_v3_loop_variant_2_decrease (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_v3_loop_variant_2_positive (Qed)
+[wp] [Valid] typed_init_t2_bis_v1_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_bis_v1_exits (Qed)
+[wp] [Valid] typed_init_t2_bis_v1_loop_invariant_Partial_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_bis_v1_loop_invariant_Partial_established (Qed)
+[wp] [Valid] typed_init_t2_bis_v1_loop_invariant_Range_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_bis_v1_loop_invariant_Range_established (Qed)
+[wp] [Valid] typed_init_t2_bis_v1_assert_Offset (Qed)
+[wp] [Valid] typed_init_t2_bis_v1_loop_variant_decrease (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_bis_v1_loop_variant_positive (Qed)
+[wp] [Valid] typed_init_t2_bis_v1_call_init_requires (Qed)
+[wp] [Valid] typed_init_t2_bis_v1_call_init_requires_2 (Qed)
+[wp] [Valid] typed_init_t2_bis_v2_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_bis_v2_exits (Qed)
+[wp] [Valid] typed_init_t2_bis_v2_loop_invariant_Partial_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_bis_v2_loop_invariant_Partial_established (Qed)
+[wp] [Valid] typed_init_t2_bis_v2_loop_invariant_Range_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_bis_v2_loop_invariant_Range_established (Qed)
+[wp] [Valid] typed_init_t2_bis_v2_assert_Offset_i (Qed)
+[wp] [Valid] typed_init_t2_bis_v2_loop_variant_decrease (Alt-Ergo) (Cached)
+[wp] [Valid] typed_init_t2_bis_v2_loop_variant_positive (Qed)
+[wp] [Valid] typed_init_t2_bis_v2_call_init_requires (Qed)
+[wp] [Valid] typed_init_t2_bis_v2_call_init_requires_2 (Qed)
 [wp] Proved goals:   97 / 97
   Qed:            53 
   Alt-Ergo:       39

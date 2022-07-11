@@ -5,7 +5,7 @@
 [wp] gnu_zero_array.i:14: Warning: 
   Cast with incompatible pointers types (source: sint8*) (target: S*)
 [wp] 1 goal scheduled
-[wp] [Alt-Ergo] Goal typed_main_assert_rte_mem_access : Unsuccess (Stronger)
+[wp] [Timeout] typed_main_assert_rte_mem_access (Alt-Ergo) (Cached) (Stronger)
 [wp] Proved goals:    0 / 1
   Alt-Ergo:        0  (unsuccess: 1)
 ------------------------------------------------------------

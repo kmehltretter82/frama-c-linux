@@ -3,62 +3,62 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 56 goals scheduled
-[wp] [Qed] Goal typed_band_ensures : Valid
-[wp] [Qed] Goal typed_band_ensures_band0 : Valid
-[wp] [Qed] Goal typed_band_bit0_ensures_band1 : Valid
-[wp] [Qed] Goal typed_band_bit0_ensures_band2 : Valid
-[wp] [Qed] Goal typed_band_bit1_ensures_band3 : Valid
-[wp] [Qed] Goal typed_band_bit2_ensures_band4 : Valid
-[wp] [Qed] Goal typed_band_bit3_ensures_band5 : Valid
-[wp] [Qed] Goal typed_band_bit4_ensures_band6 : Valid
-[wp] [Qed] Goal typed_bor_ensures : Valid
-[wp] [Qed] Goal typed_bor_ensures_bor0 : Valid
-[wp] [Qed] Goal typed_bor_bit1_ensures_bor1 : Valid
-[wp] [Qed] Goal typed_bor_bit2_ensures_bor2 : Valid
-[wp] [Qed] Goal typed_bor_bit3_ensures_bor3 : Valid
-[wp] [Qed] Goal typed_bxor_ensures : Valid
-[wp] [Qed] Goal typed_bxor_bit1_ensures : Valid
-[wp] [Qed] Goal typed_bxor_bit2_ensures : Valid
-[wp] [Qed] Goal typed_bxor_bit3_ensures : Valid
-[wp] [Qed] Goal typed_bnot_ensures : Valid
-[wp] [Qed] Goal typed_lshift_ensures : Valid
-[wp] [Qed] Goal typed_lshift_shift1_ensures_lsl1 : Valid
-[wp] [Qed] Goal typed_lshift_shift1_ensures_lsl2 : Valid
-[wp] [Qed] Goal typed_lshift_shift2_ensures_lsl3 : Valid
-[wp] [Qed] Goal typed_rshift_ensures : Valid
-[wp] [Qed] Goal typed_rshift_shift1_ensures_lsr1 : Valid
-[wp] [Qed] Goal typed_bor_bool_true_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_bor_bool_false_ensures : Valid
-[wp] [Qed] Goal typed_band_bool_true_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_band_bool_false_ensures : Valid
-[wp] [Qed] Goal typed_bxor_bool_true_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_bxor_bool_false_ensures : Valid
-[wp] [Qed] Goal typed_lemma_check : Valid
-[wp] [Qed] Goal typed_lemma_check_2 : Valid
-[wp] [Qed] Goal typed_lemma_check_3 : Valid
-[wp] [Qed] Goal typed_lemma_check_4 : Valid
-[wp] [Qed] Goal typed_lemma_check_5 : Valid
-[wp] [Qed] Goal typed_lemma_check_6 : Valid
-[wp] [Qed] Goal typed_lemma_check_7 : Valid
-[wp] [Qed] Goal typed_cast_uchar_ensures : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_test_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_test1_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_unset_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_set_unset_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_set_unset2_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_defined_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_defined2_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_to_signed_positive_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_to_signed_positive2_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_to_signed_negative_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_to_signed_negative2_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_to_signed_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_to_signed2_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_lsl_lowest_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_lsl_higher_set_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_lsl_higher_unset_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_lsr_set_ok : Valid
-[wp] [Qed] Goal typed_cast_uchar_check_bit_lsr_unset_ok : Valid
+[wp] [Valid] typed_band_ensures (Qed)
+[wp] [Valid] typed_band_ensures_band0 (Qed)
+[wp] [Valid] typed_band_bit0_ensures_band1 (Qed)
+[wp] [Valid] typed_band_bit0_ensures_band2 (Qed)
+[wp] [Valid] typed_band_bit1_ensures_band3 (Qed)
+[wp] [Valid] typed_band_bit2_ensures_band4 (Qed)
+[wp] [Valid] typed_band_bit3_ensures_band5 (Qed)
+[wp] [Valid] typed_band_bit4_ensures_band6 (Qed)
+[wp] [Valid] typed_bor_ensures (Qed)
+[wp] [Valid] typed_bor_ensures_bor0 (Qed)
+[wp] [Valid] typed_bor_bit1_ensures_bor1 (Qed)
+[wp] [Valid] typed_bor_bit2_ensures_bor2 (Qed)
+[wp] [Valid] typed_bor_bit3_ensures_bor3 (Qed)
+[wp] [Valid] typed_bxor_ensures (Qed)
+[wp] [Valid] typed_bxor_bit1_ensures (Qed)
+[wp] [Valid] typed_bxor_bit2_ensures (Qed)
+[wp] [Valid] typed_bxor_bit3_ensures (Qed)
+[wp] [Valid] typed_bnot_ensures (Qed)
+[wp] [Valid] typed_lshift_ensures (Qed)
+[wp] [Valid] typed_lshift_shift1_ensures_lsl1 (Qed)
+[wp] [Valid] typed_lshift_shift1_ensures_lsl2 (Qed)
+[wp] [Valid] typed_lshift_shift2_ensures_lsl3 (Qed)
+[wp] [Valid] typed_rshift_ensures (Qed)
+[wp] [Valid] typed_rshift_shift1_ensures_lsr1 (Qed)
+[wp] [Valid] typed_bor_bool_true_ensures (Qed)
+[wp] [Valid] typed_bor_bool_false_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_band_bool_true_ensures (Qed)
+[wp] [Valid] typed_band_bool_false_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_bxor_bool_true_ensures (Qed)
+[wp] [Valid] typed_bxor_bool_false_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lemma_check (Qed)
+[wp] [Valid] typed_lemma_check_2 (Qed)
+[wp] [Valid] typed_lemma_check_3 (Qed)
+[wp] [Valid] typed_lemma_check_4 (Qed)
+[wp] [Valid] typed_lemma_check_5 (Qed)
+[wp] [Valid] typed_lemma_check_6 (Qed)
+[wp] [Valid] typed_lemma_check_7 (Qed)
+[wp] [Valid] typed_cast_uchar_ensures (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_test_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_test1_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_unset_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_set_unset_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_set_unset2_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_defined_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_defined2_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_to_signed_positive_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_to_signed_positive2_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_to_signed_negative_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_to_signed_negative2_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_to_signed_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_to_signed2_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_lsl_lowest_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_lsl_higher_set_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_lsl_higher_unset_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_lsr_set_ok (Qed)
+[wp] [Valid] typed_cast_uchar_check_bit_lsr_unset_ok (Qed)
 [wp] Proved goals:   56 / 56
   Qed:            53 
   Alt-Ergo:        3

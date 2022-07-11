@@ -3,7 +3,7 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 1 goal scheduled
-[wp] [Alt-Ergo] Goal typed_f_ensures_A : Valid
+[wp] [Valid] typed_f_ensures_A (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 1
   Qed:             0 
   Alt-Ergo:        1
@@ -13,7 +13,7 @@
 ------------------------------------------------------------
 [wp] Running WP plugin...
 [wp] 1 goal scheduled
-[wp] [Alt-Ergo] Goal typed_f_ensures_B : Valid
+[wp] [Valid] typed_f_ensures_B (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 1
   Qed:             0 
   Alt-Ergo:        1

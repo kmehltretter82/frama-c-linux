@@ -3,7 +3,7 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 1 goal scheduled
-[wp] [Alt-Ergo] Goal typed_foo_assert_ko : Unsuccess
+[wp] [Timeout] typed_foo_assert_ko (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 1
   Alt-Ergo:        0  (unsuccess: 1)
 ------------------------------------------------------------

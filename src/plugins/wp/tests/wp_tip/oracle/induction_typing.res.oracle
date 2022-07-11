@@ -28,7 +28,7 @@
   Prove: ([ 1 ] *^ x) = a_1.
   
   ------------------------------------------------------------
-[wp] [Qed] Goal typed_function_loop_invariant_X_established : Valid
+[wp] [Valid] typed_function_loop_invariant_X_established (Qed)
 [wp:script:allgoals] 
   typed_function_loop_invariant_X_preserved subgoal:
   
@@ -54,7 +54,7 @@
   Prove: false.
   
   ------------------------------------------------------------
-[wp] [Script] Goal typed_function_loop_invariant_X_preserved : Unsuccess
+[wp] [Unknown] typed_function_loop_invariant_X_preserved (Script)
 [wp:script:allgoals] 
   typed_function_loop_invariant_X_preserved subgoal:
   

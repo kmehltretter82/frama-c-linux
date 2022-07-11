@@ -5,7 +5,7 @@
   No code nor implicit assigns clause for function Write, generating default assigns from the prototype
 [wp] Warning: Missing RTE guards
 [wp] 1 goal scheduled
-[wp] [Alt-Ergo] Goal typed_Job_ensures : Valid
+[wp] [Valid] typed_Job_ensures (Alt-Ergo)
 [wp] Proved goals:    1 / 1
   Qed:             0 
   Alt-Ergo:        1

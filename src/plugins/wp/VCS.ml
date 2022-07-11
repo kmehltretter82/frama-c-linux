@@ -202,9 +202,11 @@ type result = {
   prover_errmsg : string ;
 }
 
-let is_verdict r = match r.verdict with
+let is_result = function
   | Valid | Unknown | Invalid | Timeout | Stepout | Failed -> true
   | NoResult | Computing _ -> false
+
+let is_verdict r = is_result r.verdict
 
 let is_valid = function { verdict = Valid } -> true | _ -> false
 let is_computing = function { verdict=Computing _ } -> true | _ -> false

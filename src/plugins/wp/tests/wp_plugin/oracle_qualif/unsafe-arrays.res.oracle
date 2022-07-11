@@ -3,9 +3,9 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 3 goals scheduled
-[wp] [Qed] Goal typed_f_ensures_ARRAYS : Valid
-[wp] [Qed] Goal typed_f_ensures_STRUCT : Valid
-[wp] [Alt-Ergo] Goal typed_f_ensures_INDIRP : Valid
+[wp] [Valid] typed_f_ensures_ARRAYS (Qed)
+[wp] [Valid] typed_f_ensures_STRUCT (Qed)
+[wp] [Valid] typed_f_ensures_INDIRP (Alt-Ergo) (Cached)
 [wp] Proved goals:    3 / 3
   Qed:             2 
   Alt-Ergo:        1

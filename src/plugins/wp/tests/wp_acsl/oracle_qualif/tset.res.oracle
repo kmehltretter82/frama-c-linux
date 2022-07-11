@@ -2,10 +2,10 @@
 [kernel] Parsing tset.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] 4 goals scheduled
-[wp] [Qed] Goal typed_lemma_UNION_DESCR : Valid
-[wp] [Alt-Ergo] Goal typed_lemma_UNION_EQ : Valid
-[wp] [Qed] Goal typed_lemma_UNION_LIFT : Valid
-[wp] [Alt-Ergo] Goal typed_lemma_UNION_RANGE : Valid
+[wp] [Valid] typed_lemma_UNION_DESCR (Qed)
+[wp] [Valid] typed_lemma_UNION_EQ (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lemma_UNION_LIFT (Qed)
+[wp] [Valid] typed_lemma_UNION_RANGE (Alt-Ergo) (Cached)
 [wp] Proved goals:    4 / 4
   Qed:             2 
   Alt-Ergo:        2

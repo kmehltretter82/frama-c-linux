@@ -3,12 +3,12 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
-[wp] [Alt-Ergo] Goal typed_land_check_A : Unsuccess
-[wp] [Alt-Ergo] Goal typed_land_check_B : Unsuccess
-[wp] [Alt-Ergo] Goal typed_lor_check_A : Unsuccess
-[wp] [Alt-Ergo] Goal typed_lor_check_B : Unsuccess
-[wp] [Alt-Ergo] Goal typed_lxor_check_A : Unsuccess
-[wp] [Alt-Ergo] Goal typed_lxor_check_B : Unsuccess
+[wp] [Timeout] typed_land_check_A (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_land_check_B (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_lor_check_A (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_lor_check_B (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_lxor_check_A (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_lxor_check_B (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 6
   Alt-Ergo:        0  (unsuccess: 6)
 ------------------------------------------------------------

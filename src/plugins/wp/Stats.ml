@@ -219,7 +219,8 @@ let pp_stats ~shell ~updating fmt s =
            Format.fprintf fmt ")"
          end
     ) s.provers ;
-  if 0 < s.cached then
+  if 0 < s.cached && List.exists (fun (p,_) -> p <> Qed) s.provers
+  then
     if s.cached = vp || updating then
       Format.fprintf fmt " (Cached)"
     else

@@ -13,33 +13,33 @@
 [wp] decreases.i:105: Warning: 
   On call to mw2, relation (Rel) does not match caller (Wrong)
 [wp] 27 goals scheduled
-[wp] [Qed] Goal typed_fact_terminates : Valid
-[wp] [Alt-Ergo] Goal typed_fact_variant : Valid
-[wp] [Alt-Ergo] Goal typed_fails_fact_variant : Unsuccess
-[wp] [Alt-Ergo] Goal typed_facto_gen_variant : Valid
-[wp] [Alt-Ergo] Goal typed_fails_facto_gen_variant : Unsuccess
-[wp] [Qed] Goal typed_fact_i_terminates_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_fact_i_terminates_part2 : Valid
-[wp] [Qed] Goal typed_fact_i_variant : Valid
-[wp] [Qed] Goal typed_fails_fact_i_terminates_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_fails_fact_i_terminates_part2 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_fails_fact_i_variant : Unsuccess
-[wp] [Alt-Ergo] Goal typed_m2_variant_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_m2_variant_part2 : Valid
-[wp] [Alt-Ergo] Goal typed_m1_variant : Valid
-[wp] [Alt-Ergo] Goal typed_missing_variant_part1 : Unsuccess (Degenerated)
-[wp] [Alt-Ergo] Goal typed_missing_variant_part2 : Valid
-[wp] [Qed] Goal typed_mt2_terminates_part1 : Valid
-[wp] [Qed] Goal typed_mt2_terminates_part2 : Valid
-[wp] [Alt-Ergo] Goal typed_mt2_variant_part1 : Valid
-[wp] [Qed] Goal typed_mt2_variant_part2 : Valid
-[wp] [Qed] Goal typed_mt1_terminates_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_mt1_terminates_part2 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_mt1_variant : Valid
-[wp] [Alt-Ergo] Goal typed_mw2_variant_part1 : Unsuccess (Degenerated)
-[wp] [Alt-Ergo] Goal typed_mw2_variant_part2 : Valid
-[wp] [Alt-Ergo] Goal typed_mw1_variant : Unsuccess (Degenerated)
-[wp] [Qed] Goal typed_se_variant : Valid
+[wp] [Valid] typed_fact_terminates (Qed)
+[wp] [Valid] typed_fact_variant (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_fails_fact_variant (Alt-Ergo) (Cached)
+[wp] [Valid] typed_facto_gen_variant (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_fails_facto_gen_variant (Alt-Ergo) (Cached)
+[wp] [Valid] typed_fact_i_terminates_part1 (Qed)
+[wp] [Valid] typed_fact_i_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_fact_i_variant (Qed)
+[wp] [Valid] typed_fails_fact_i_terminates_part1 (Qed)
+[wp] [Timeout] typed_fails_fact_i_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_fails_fact_i_variant (Alt-Ergo) (Cached)
+[wp] [Valid] typed_m2_variant_part1 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_m2_variant_part2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_m1_variant (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_missing_variant_part1 (Alt-Ergo) (Cached) (Degenerated)
+[wp] [Valid] typed_missing_variant_part2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_mt2_terminates_part1 (Qed)
+[wp] [Valid] typed_mt2_terminates_part2 (Qed)
+[wp] [Valid] typed_mt2_variant_part1 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_mt2_variant_part2 (Qed)
+[wp] [Valid] typed_mt1_terminates_part1 (Qed)
+[wp] [Timeout] typed_mt1_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_mt1_variant (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_mw2_variant_part1 (Alt-Ergo) (Cached) (Degenerated)
+[wp] [Valid] typed_mw2_variant_part2 (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_mw1_variant (Alt-Ergo) (Cached) (Degenerated)
+[wp] [Valid] typed_se_variant (Qed)
 [wp] Proved goals:   19 / 27
   Qed:             9 
   Alt-Ergo:       10  (unsuccess: 8)

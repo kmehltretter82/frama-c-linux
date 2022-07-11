@@ -3,9 +3,9 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 3 goals scheduled
-[wp] [Alt-Ergo] Goal typed_atomic_check_FAIL : Unsuccess
-[wp] [Alt-Ergo] Goal typed_comp_check_FAIL : Unsuccess
-[wp] [Alt-Ergo] Goal typed_array_check_FAIL : Unsuccess
+[wp] [Timeout] typed_atomic_check_FAIL (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_comp_check_FAIL (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_array_check_FAIL (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 3
   Alt-Ergo:        0  (unsuccess: 3)
 ------------------------------------------------------------

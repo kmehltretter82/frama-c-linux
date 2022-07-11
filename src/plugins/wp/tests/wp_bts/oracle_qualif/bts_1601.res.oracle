@@ -3,14 +3,14 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 8 goals scheduled
-[wp] [Alt-Ergo] Goal typed_foo_assert : Valid
-[wp] [Qed] Goal typed_foo_assert_2 : Valid
-[wp] [Qed] Goal typed_foo_assert_3 : Valid
-[wp] [Qed] Goal typed_foo_assert_4 : Valid
-[wp] [Qed] Goal typed_foo_assert_5 : Valid
-[wp] [Qed] Goal typed_foo_assert_6 : Valid
-[wp] [Qed] Goal typed_foo_assert_7 : Valid
-[wp] [Qed] Goal typed_foo_basic_ensures : Valid
+[wp] [Valid] typed_foo_assert (Alt-Ergo) (Cached)
+[wp] [Valid] typed_foo_assert_2 (Qed)
+[wp] [Valid] typed_foo_assert_3 (Qed)
+[wp] [Valid] typed_foo_assert_4 (Qed)
+[wp] [Valid] typed_foo_assert_5 (Qed)
+[wp] [Valid] typed_foo_assert_6 (Qed)
+[wp] [Valid] typed_foo_assert_7 (Qed)
+[wp] [Valid] typed_foo_basic_ensures (Qed)
 [wp] Proved goals:    8 / 8
   Qed:             7 
   Alt-Ergo:        1

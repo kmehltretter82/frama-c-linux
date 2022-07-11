@@ -3,8 +3,8 @@
 [wp] Running WP plugin...
 [rte:annot] annotating function f
 [wp] 2 goals scheduled
-[wp] [Qed] Goal typed_f_assert : Valid
-[wp] [Alt-Ergo] Goal typed_f_assert_rte_mem_access : Unsuccess
+[wp] [Valid] typed_f_assert (Qed)
+[wp] [Timeout] typed_f_assert_rte_mem_access (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 2
   Qed:             1 
   Alt-Ergo:        0  (unsuccess: 1)

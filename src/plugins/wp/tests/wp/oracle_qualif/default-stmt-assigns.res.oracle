@@ -5,7 +5,7 @@
 [wp] default-stmt-assigns.i:2: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 [wp] 1 goal scheduled
-[wp] [Alt-Ergo] Goal typed_automaton_state_accessor_assert : Unsuccess
+[wp] [Unknown] typed_automaton_state_accessor_assert (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 1
   Alt-Ergo:        0  (unsuccess: 1)
 ------------------------------------------------------------

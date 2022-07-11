@@ -11,24 +11,24 @@
 [wp] terminates_formulae.i:90: Warning: 
   No 'decreases' clause on recursive function 'no_decreases', cannot prove termination
 [wp] 18 goals scheduled
-[wp] [Alt-Ergo] Goal typed_base_call_terminates : Unsuccess
-[wp] [Qed] Goal typed_call_same_terminates : Valid
-[wp] [Alt-Ergo] Goal typed_call_change_terminates : Unsuccess
-[wp] [Qed] Goal typed_call_param_same_terminates : Valid
-[wp] [Alt-Ergo] Goal typed_call_param_change_terminates : Unsuccess
-[wp] [Qed] Goal typed_variant_loop_assigns : Valid
-[wp] [Alt-Ergo] Goal typed_variant_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_variant_loop_variant_positive : Valid
-[wp] [Qed] Goal typed_general_variant_loop_assigns : Valid
-[wp] [Alt-Ergo] Goal typed_general_variant_loop_variant_relation : Valid
-[wp] [Alt-Ergo] Goal typed_no_variant_terminates : Unsuccess
-[wp] [Qed] Goal typed_no_variant_loop_assigns : Valid
-[wp] [Qed] Goal typed_decreases_terminates : Valid
-[wp] [Alt-Ergo] Goal typed_decreases_variant : Valid
-[wp] [Qed] Goal typed_general_decreases_terminates : Valid
-[wp] [Alt-Ergo] Goal typed_general_decreases_variant : Valid
-[wp] [Qed] Goal typed_no_decreases_terminates_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_no_decreases_terminates_part2 : Unsuccess
+[wp] [Timeout] typed_base_call_terminates (Alt-Ergo) (Cached)
+[wp] [Valid] typed_call_same_terminates (Qed)
+[wp] [Timeout] typed_call_change_terminates (Alt-Ergo) (Cached)
+[wp] [Valid] typed_call_param_same_terminates (Qed)
+[wp] [Timeout] typed_call_param_change_terminates (Alt-Ergo) (Cached)
+[wp] [Valid] typed_variant_loop_assigns (Qed)
+[wp] [Valid] typed_variant_loop_variant_decrease (Alt-Ergo) (Cached)
+[wp] [Valid] typed_variant_loop_variant_positive (Qed)
+[wp] [Valid] typed_general_variant_loop_assigns (Qed)
+[wp] [Valid] typed_general_variant_loop_variant_relation (Alt-Ergo) (Cached)
+[wp] [Unknown] typed_no_variant_terminates (Alt-Ergo) (Cached)
+[wp] [Valid] typed_no_variant_loop_assigns (Qed)
+[wp] [Valid] typed_decreases_terminates (Qed)
+[wp] [Valid] typed_decreases_variant (Alt-Ergo) (Cached)
+[wp] [Valid] typed_general_decreases_terminates (Qed)
+[wp] [Valid] typed_general_decreases_variant (Alt-Ergo) (Cached)
+[wp] [Valid] typed_no_decreases_terminates_part1 (Qed)
+[wp] [Unknown] typed_no_decreases_terminates_part2 (Alt-Ergo) (Cached)
 [wp] Proved goals:   15 / 20
   Qed:             9 
   Alt-Ergo:        4  (unsuccess: 5)

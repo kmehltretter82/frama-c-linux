@@ -295,56 +295,14 @@ let do_wpo_result goal prover res =
       do_wpo_stat goal prover res ;
     end
 
-let results g =
-  List.filter
-    (fun (_,r) -> VCS.is_verdict r)
-    (Wpo.get_results g)
-
-let do_wpo_failed goal =
-  let updating = Cache.is_updating () in
-  match results goal with
-  | [p,r] ->
-    Wp_parameters.result "[%a] Goal %s : %t%a"
-      VCS.pp_prover p (Wpo.get_gid goal)
-      (VCS.pp_result_qualif ~updating p r) pp_warnings goal
-  | pres ->
-    Wp_parameters.result "[Failed] Goal %s%t" (Wpo.get_gid goal)
-      begin fun fmt ->
-        pp_warnings fmt goal ;
-        List.iter
-          (fun (p,r) ->
-             Format.fprintf fmt "@\n%8s: @[<hv>%t@]"
-               (VCS.title_of_prover p)
-               (VCS.pp_result_qualif ~updating p r)
-          ) pres ;
-      end
-
-let do_wpo_smoke status goal =
-  Wp_parameters.result "[%s] Smoke-test %s%t"
-    (match status with
-     | `Failed -> "Failed"
-     | `Passed -> "Passed"
-     | `Unknown -> "Partial")
-    (Wpo.get_gid goal)
-    begin fun fmt ->
-      pp_warnings fmt goal ;
-      let updating = Cache.is_updating () in
-      List.iter
-        (fun (p,r) ->
-           Format.fprintf fmt "@\n%8s: @[<hv>%t@]"
-             (VCS.title_of_prover p)
-             (VCS.pp_result_qualif ~updating p r)
-        ) (results goal) ;
-    end
-[@@@ warning "-32"]
 let do_report_stats ~shell ~updating ~smoke goal (verdict,stats) =
   let status =
     if smoke then
       match verdict with
       | VCS.NoResult | Computing _ -> ""
-      | Invalid -> "Passed"
-      | Valid -> "Failed"
+      | Valid -> "Failed (Doomed)"
       | Failed ->  "Unknown (Failure)"
+      | Invalid -> "Passed (Invalid)"
       | Unknown -> "Passed (Unknown)"
       | Timeout -> "Passed (Timeout)"
       | Stepout -> "Passed (Stepout)"
@@ -361,7 +319,6 @@ let do_report_stats ~shell ~updating ~smoke goal (verdict,stats) =
     Wp_parameters.feedback "[%s] %s%a%a"
       status (Wpo.get_gid goal) (Stats.pp_stats ~shell ~updating) stats
       pp_warnings goal
-[@@@ warning "+32"]
 
 let do_wpo_success ~shell ~updating goal success =
   if Wp_parameters.Generate.get () then
@@ -371,32 +328,18 @@ let do_wpo_success ~shell ~updating goal success =
       Wp_parameters.feedback ~ontty:`Silent
         "[Generated] Goal %s (%a)" (Wpo.get_gid goal) VCS.pp_prover prover
   else
-  if Wpo.is_smoke_test goal then
-    begin match success with
-      | None ->
-        Wp_parameters.feedback ~ontty:`Silent
-          "[Passed] Smoke-test %s" (Wpo.get_gid goal)
-      | Some _ ->
-        let status,target = Wpo.get_proof goal in
-        do_wpo_smoke status goal ;
-        if status = `Failed then
+    let smoke = Wpo.is_smoke_test goal in
+    let prs = Wpo.get_results goal in
+    let (verdict,_) as vstats = Stats.results ~smoke prs in
+    begin
+      if shell || verdict <> Valid then
+        do_report_stats ~shell ~updating goal ~smoke vstats ;
+      if smoke && verdict <> Valid then
+        begin
+          let target = Wpo.get_target goal in
           let source = fst (Property.location target) in
           Wp_parameters.warning ~source "Failed smoke-test"
-    end
-  else
-    begin match success with
-      | None -> do_wpo_failed goal
-      | Some (VCS.Tactical as script) ->
-        Wp_parameters.feedback ~ontty:`Silent
-          "[%a] Goal %s : Valid"
-          VCS.pp_prover script (Wpo.get_gid goal)
-      | Some prover ->
-        ignore shell ;
-        let result = Wpo.get_result goal prover in
-        Wp_parameters.feedback ~ontty:`Silent
-          "[%a] Goal %s : %t"
-          VCS.pp_prover prover (Wpo.get_gid goal)
-          (VCS.pp_result_qualif ~updating prover result)
+        end ;
     end
 
 let do_report_time fmt s =

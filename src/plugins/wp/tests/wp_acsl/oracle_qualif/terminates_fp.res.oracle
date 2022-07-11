@@ -28,35 +28,35 @@
 [wp] terminates_fp.i:78: Warning: 
   No 'decreases' clause on recursive function 'warns_recursive', cannot prove termination
 [wp] 29 goals scheduled
-[wp] [Qed] Goal typed_t_spec_call_point_gt_ht_s2 : Valid
-[wp] [Qed] Goal typed_t_spec_terminates : Valid
-[wp] [Alt-Ergo] Goal typed_t_spec_in_bhv_call_point_gt_hnt_s6 : Valid
-[wp] [Qed] Goal typed_t_spec_in_bhv_complete_B1_B2 : Valid
-[wp] [Qed] Goal typed_t_spec_in_bhv_disjoint_B1_B2 : Valid
-[wp] [Qed] Goal typed_t_spec_in_bhv_terminates_part1 : Valid
-[wp] [Qed] Goal typed_t_spec_in_bhv_terminates_part2 : Valid
-[wp] [Qed] Goal typed_t_spec_in_bhv_call_point_gt_hnt_s6 : Valid
-[wp] [Qed] Goal typed_t_spec_in_bhv_call_point_gt_hnt_s6 : Valid
-[wp] [Qed] Goal typed_no_t_spec_call_point_gnt_hnt_s10 : Valid
-[wp] [Qed] Goal typed_no_t_spec_terminates_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_no_t_spec_terminates_part2 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_no_t_spec_in_bhv_call_point_gnt_hnt_s14 : Valid
-[wp] [Qed] Goal typed_no_t_spec_in_bhv_complete_B1_B2 : Valid
-[wp] [Qed] Goal typed_no_t_spec_in_bhv_disjoint_B1_B2 : Valid
-[wp] [Qed] Goal typed_no_t_spec_in_bhv_terminates_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_no_t_spec_in_bhv_terminates_part2 : Unsuccess
-[wp] [Qed] Goal typed_no_t_spec_in_bhv_call_point_gnt_hnt_s14 : Valid
-[wp] [Qed] Goal typed_no_t_spec_in_bhv_call_point_gnt_hnt_s14 : Valid
-[wp] [Qed] Goal typed_no_t_spec_cond_call_point_gt_hnt_s18 : Valid
-[wp] [Qed] Goal typed_no_t_spec_cond_terminates_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_no_t_spec_cond_terminates_part2 : Unsuccess
-[wp] [Qed] Goal typed_no_t_spec_cond_m_call_point_gt_ht_s22 : Valid
-[wp] [Qed] Goal typed_no_t_spec_cond_m_call_point_hnt_s24_part1 : Valid
-[wp] [Qed] Goal typed_no_t_spec_cond_m_call_point_hnt_s24_part2 : Valid
-[wp] [Qed] Goal typed_no_t_spec_cond_m_terminates_part1 : Valid
-[wp] [Alt-Ergo] Goal typed_no_t_spec_cond_m_terminates_part2 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_no_t_spec_cond_m_terminates_part3 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_warns_recursive_terminates : Unsuccess
+[wp] [Valid] typed_t_spec_call_point_gt_ht_s2 (Qed)
+[wp] [Valid] typed_t_spec_terminates (Qed)
+[wp] [Valid] typed_t_spec_in_bhv_call_point_gt_hnt_s6 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_t_spec_in_bhv_complete_B1_B2 (Qed)
+[wp] [Valid] typed_t_spec_in_bhv_disjoint_B1_B2 (Qed)
+[wp] [Valid] typed_t_spec_in_bhv_terminates_part1 (Qed)
+[wp] [Valid] typed_t_spec_in_bhv_terminates_part2 (Qed)
+[wp] [Valid] typed_t_spec_in_bhv_call_point_gt_hnt_s6 (Qed)
+[wp] [Valid] typed_t_spec_in_bhv_call_point_gt_hnt_s6 (Qed)
+[wp] [Valid] typed_no_t_spec_call_point_gnt_hnt_s10 (Qed)
+[wp] [Valid] typed_no_t_spec_terminates_part1 (Qed)
+[wp] [Unknown] typed_no_t_spec_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_no_t_spec_in_bhv_call_point_gnt_hnt_s14 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_no_t_spec_in_bhv_complete_B1_B2 (Qed)
+[wp] [Valid] typed_no_t_spec_in_bhv_disjoint_B1_B2 (Qed)
+[wp] [Valid] typed_no_t_spec_in_bhv_terminates_part1 (Qed)
+[wp] [Unknown] typed_no_t_spec_in_bhv_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_no_t_spec_in_bhv_call_point_gnt_hnt_s14 (Qed)
+[wp] [Valid] typed_no_t_spec_in_bhv_call_point_gnt_hnt_s14 (Qed)
+[wp] [Valid] typed_no_t_spec_cond_call_point_gt_hnt_s18 (Qed)
+[wp] [Valid] typed_no_t_spec_cond_terminates_part1 (Qed)
+[wp] [Unknown] typed_no_t_spec_cond_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_no_t_spec_cond_m_call_point_gt_ht_s22 (Qed)
+[wp] [Valid] typed_no_t_spec_cond_m_call_point_hnt_s24_part1 (Qed)
+[wp] [Valid] typed_no_t_spec_cond_m_call_point_hnt_s24_part2 (Qed)
+[wp] [Valid] typed_no_t_spec_cond_m_terminates_part1 (Qed)
+[wp] [Unknown] typed_no_t_spec_cond_m_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Unknown] typed_no_t_spec_cond_m_terminates_part3 (Alt-Ergo) (Cached)
+[wp] [Unknown] typed_warns_recursive_terminates (Alt-Ergo) (Cached)
 [wp] Proved goals:   23 / 29
   Qed:            21 
   Alt-Ergo:        2  (unsuccess: 6)

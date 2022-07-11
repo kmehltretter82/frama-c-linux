@@ -10,21 +10,21 @@
 [kernel:annot:missing-spec] opaque_struct.i:79: Warning: 
   Neither code nor specification for function use, generating default assigns from the prototype
 [wp] 15 goals scheduled
-[wp] [Alt-Ergo] Goal typed_check_lemma_fail : Unsuccess
-[wp] [Qed] Goal typed_check_lemma_succeed_L1 : Valid
-[wp] [Alt-Ergo] Goal typed_check_lemma_succeed_L2 : Valid
-[wp] [Alt-Ergo] Goal typed_assigns_check_fail : Unsuccess
-[wp] [Qed] Goal typed_assigns_check_succeed : Valid
-[wp] [Alt-Ergo] Goal typed_initialized_assigns_check_fails : Unsuccess
-[wp] [Alt-Ergo] Goal typed_initialized_assigns_check_succeed : Valid
-[wp] [Alt-Ergo] Goal typed_uninitialized_assigns_check_fail : Unsuccess
-[wp] [Alt-Ergo] Goal typed_uninitialized_assigns_check_fail_2 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_assigned_via_pointer_check_fail : Unsuccess
-[wp] [Alt-Ergo] Goal typed_assigns_effect_check_fail : Unsuccess
-[wp] [Alt-Ergo] Goal typed_assigns_effect_check_fail_2 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_assigns_effect_check_succeed : Valid
-[wp] [Qed] Goal typed_chunk_typing_assert_rte_mem_access : Valid
-[wp] [Qed] Goal typed_chunk_typing_assert_rte_mem_access_2 : Valid
+[wp] [Unknown] typed_check_lemma_fail (Alt-Ergo) (Cached)
+[wp] [Valid] typed_check_lemma_succeed_L1 (Qed)
+[wp] [Valid] typed_check_lemma_succeed_L2 (Alt-Ergo) (Cached)
+[wp] [Unknown] typed_assigns_check_fail (Alt-Ergo) (Cached)
+[wp] [Valid] typed_assigns_check_succeed (Qed)
+[wp] [Unknown] typed_initialized_assigns_check_fails (Alt-Ergo) (Cached)
+[wp] [Valid] typed_initialized_assigns_check_succeed (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_uninitialized_assigns_check_fail (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_uninitialized_assigns_check_fail_2 (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_assigned_via_pointer_check_fail (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_assigns_effect_check_fail (Alt-Ergo) (Cached)
+[wp] [Timeout] typed_assigns_effect_check_fail_2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_assigns_effect_check_succeed (Alt-Ergo) (Cached)
+[wp] [Valid] typed_chunk_typing_assert_rte_mem_access (Qed)
+[wp] [Valid] typed_chunk_typing_assert_rte_mem_access_2 (Qed)
 [wp] Proved goals:    7 / 15
   Qed:             4 
   Alt-Ergo:        3  (unsuccess: 8)

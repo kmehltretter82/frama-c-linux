@@ -3,10 +3,10 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 4 goals scheduled
-[wp] [Alt-Ergo] Goal typed_main_check_c1 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_main_assert_a1 : Unsuccess
-[wp] [Qed] Goal typed_main_check_c2 : Valid
-[wp] [Qed] Goal typed_main_assert_a2 : Valid
+[wp] [Stepout] typed_main_check_c1 (Alt-Ergo) (Cached)
+[wp] [Stepout] typed_main_assert_a1 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_main_check_c2 (Qed)
+[wp] [Valid] typed_main_assert_a2 (Qed)
 [wp] Proved goals:    2 / 4
   Qed:             2 
   Alt-Ergo:        0  (unsuccess: 2)

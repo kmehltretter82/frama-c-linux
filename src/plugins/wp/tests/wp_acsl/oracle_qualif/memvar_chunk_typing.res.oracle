@@ -2,7 +2,7 @@
 [kernel] Parsing memvar_chunk_typing.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] 1 goal scheduled
-[wp] [Alt-Ergo] Goal typed_lemma_L : Valid
+[wp] [Valid] typed_lemma_L (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 1
   Qed:             0 
   Alt-Ergo:        1

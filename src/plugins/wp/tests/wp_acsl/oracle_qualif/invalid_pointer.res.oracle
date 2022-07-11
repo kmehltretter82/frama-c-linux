@@ -4,26 +4,26 @@
 [wp] Warning: Missing RTE guards
 [wp] invalid_pointer.c:23: Warning: void object
 [wp] 20 goals scheduled
-[wp] [Qed] Goal typed_memvar_check_M1 : Valid
-[wp] [Qed] Goal typed_memvar_check_P0 : Valid
-[wp] [Qed] Goal typed_memvar_check_P1 : Valid
-[wp] [Qed] Goal typed_memvar_check_P2 : Valid
-[wp] [Alt-Ergo] Goal typed_pointer_check_M1 : Valid
-[wp] [Alt-Ergo] Goal typed_pointer_check_P0 : Valid
-[wp] [Alt-Ergo] Goal typed_pointer_check_P1 : Valid
-[wp] [Alt-Ergo] Goal typed_pointer_check_P2 : Valid
-[wp] [Qed] Goal typed_pointer_check_qed_NULL : Valid
-[wp] [Alt-Ergo] Goal typed_pointer_check_prover_NULL : Valid
-[wp] [Alt-Ergo] Goal typed_array_check_ARR : Valid
-[wp] [Qed] Goal typed_compound_check_M1 : Valid
-[wp] [Qed] Goal typed_compound_check_P0 : Valid
-[wp] [Qed] Goal typed_compound_check_P1 : Valid
-[wp] [Qed] Goal typed_compound_check_P2 : Valid
-[wp] [Alt-Ergo] Goal typed_compound_check_F : Valid
-[wp] [Alt-Ergo] Goal typed_compound_check_G : Valid
-[wp] [Alt-Ergo] Goal typed_compound_check_F2 : Valid
-[wp] [Alt-Ergo] Goal typed_compound_check_G2 : Valid
-[wp] [Qed] Goal typed_compound_check_AM : Valid
+[wp] [Valid] typed_memvar_check_M1 (Qed)
+[wp] [Valid] typed_memvar_check_P0 (Qed)
+[wp] [Valid] typed_memvar_check_P1 (Qed)
+[wp] [Valid] typed_memvar_check_P2 (Qed)
+[wp] [Valid] typed_pointer_check_M1 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_pointer_check_P0 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_pointer_check_P1 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_pointer_check_P2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_pointer_check_qed_NULL (Qed)
+[wp] [Valid] typed_pointer_check_prover_NULL (Alt-Ergo) (Cached)
+[wp] [Valid] typed_array_check_ARR (Alt-Ergo) (Cached)
+[wp] [Valid] typed_compound_check_M1 (Qed)
+[wp] [Valid] typed_compound_check_P0 (Qed)
+[wp] [Valid] typed_compound_check_P1 (Qed)
+[wp] [Valid] typed_compound_check_P2 (Qed)
+[wp] [Valid] typed_compound_check_F (Alt-Ergo) (Cached)
+[wp] [Valid] typed_compound_check_G (Alt-Ergo) (Cached)
+[wp] [Valid] typed_compound_check_F2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_compound_check_G2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_compound_check_AM (Qed)
 [wp] Proved goals:   20 / 20
   Qed:            10 
   Alt-Ergo:       10

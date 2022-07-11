@@ -5,11 +5,11 @@
 [wp] doomed_unroll.i:15: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 [wp] 5 goals scheduled
-[wp] [Passed] Smoke-test typed_foo_wp_smoke_dead_code_s27
-[wp] [Passed] Smoke-test typed_foo_wp_smoke_dead_code_s31
-[wp] [Passed] Smoke-test typed_foo_wp_smoke_dead_code_s35
-[wp] [Qed] Goal typed_foo_loop_invariant_preserved : Valid
-[wp] [Qed] Goal typed_foo_loop_invariant_established : Valid
+[wp] [Failed (Doomed)] typed_foo_wp_smoke_dead_code_s27 (Alt-Ergo) (Cached)
+[wp] [Failed (Doomed)] typed_foo_wp_smoke_dead_code_s31 (Alt-Ergo) (Cached)
+[wp] [Failed (Doomed)] typed_foo_wp_smoke_dead_code_s35 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_foo_loop_invariant_preserved (Qed)
+[wp] [Valid] typed_foo_loop_invariant_established (Qed)
 [wp] Proved goals:    5 / 5
   Qed:             2 
   Alt-Ergo:        3

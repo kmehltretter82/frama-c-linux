@@ -12,7 +12,7 @@
   __retres ∈ [-2147483647..2147483647]
 [wp] Running WP plugin...
 [wp] 1 goal scheduled
-[wp] [Alt-Ergo] Goal typed_main_assert_Eva_signed_overflow : Unsuccess
+[wp] [Timeout] typed_main_assert_Eva_signed_overflow (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 1
   Alt-Ergo:        0  (unsuccess: 1)
 ------------------------------------------------------------

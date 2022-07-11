@@ -5,25 +5,25 @@
 [wp] wp_behav.c:82: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 [wp] 19 goals scheduled
-[wp] [Qed] Goal typed_f_ensures_qed_ok : Valid
-[wp] [Qed] Goal typed_f_x1_ensures_qed_ok : Valid
-[wp] [Qed] Goal typed_f_assert_qed_ok : Valid
-[wp] [Qed] Goal typed_f_x2_ensures_qed_ok : Valid
-[wp] [Qed] Goal typed_f_assert_qed_ok_2 : Valid
-[wp] [Qed] Goal typed_min_complete_bx_by : Valid
-[wp] [Qed] Goal typed_min_disjoint_bx_by : Valid
-[wp] [Qed] Goal typed_min_bx_ensures_qed_ok : Valid
-[wp] [Qed] Goal typed_min_by_ensures_qed_ok : Valid
-[wp] [Alt-Ergo] Goal typed_bhv_complete_neg_pos : Valid
-[wp] [Qed] Goal typed_bhv_pos_ensures_qed_ok : Valid
-[wp] [Qed] Goal typed_bhv_neg_ensures_qed_ok : Valid
-[wp] [Alt-Ergo] Goal typed_assert_needed_assert_ko : Unsuccess
-[wp] [Qed] Goal typed_assert_needed_assert_qed_ok_ok_with_hyp : Valid
-[wp] [Alt-Ergo] Goal typed_bts0513_ensures_ko1 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_bts0513_ensures_ko2 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_razT_loop_invariant_qed_ok_preserved : Valid
-[wp] [Qed] Goal typed_razT_loop_invariant_qed_ok_established : Valid
-[wp] [Alt-Ergo] Goal typed_razT_b1_ensures_e1 : Unsuccess
+[wp] [Valid] typed_f_ensures_qed_ok (Qed)
+[wp] [Valid] typed_f_x1_ensures_qed_ok (Qed)
+[wp] [Valid] typed_f_assert_qed_ok (Qed)
+[wp] [Valid] typed_f_x2_ensures_qed_ok (Qed)
+[wp] [Valid] typed_f_assert_qed_ok_2 (Qed)
+[wp] [Valid] typed_min_complete_bx_by (Qed)
+[wp] [Valid] typed_min_disjoint_bx_by (Qed)
+[wp] [Valid] typed_min_bx_ensures_qed_ok (Qed)
+[wp] [Valid] typed_min_by_ensures_qed_ok (Qed)
+[wp] [Valid] typed_bhv_complete_neg_pos (Alt-Ergo) (Cached)
+[wp] [Valid] typed_bhv_pos_ensures_qed_ok (Qed)
+[wp] [Valid] typed_bhv_neg_ensures_qed_ok (Qed)
+[wp] [Timeout] typed_assert_needed_assert_ko (Alt-Ergo) (Cached)
+[wp] [Valid] typed_assert_needed_assert_qed_ok_ok_with_hyp (Qed)
+[wp] [Unknown] typed_bts0513_ensures_ko1 (Alt-Ergo) (Cached)
+[wp] [Unknown] typed_bts0513_ensures_ko2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_razT_loop_invariant_qed_ok_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_razT_loop_invariant_qed_ok_established (Qed)
+[wp] [Timeout] typed_razT_b1_ensures_e1 (Alt-Ergo) (Cached)
 [wp] Proved goals:   15 / 19
   Qed:            13 
   Alt-Ergo:        2  (unsuccess: 4)

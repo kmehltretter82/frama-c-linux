@@ -11,11 +11,11 @@
 [wp] terminates_call_options.c:38: Warning: 
   Missing terminates clause on call to div, defaults to \false
 [wp] 5 goals scheduled
-[wp] [Qed] Goal typed_definition_assigns : Valid
-[wp] [Alt-Ergo] Goal typed_call_declaration_terminates : Unsuccess
-[wp] [Alt-Ergo] Goal typed_call_definition_terminates : Unsuccess
-[wp] [Alt-Ergo] Goal typed_libc_call_terminates_part1 : Unsuccess
-[wp] [Alt-Ergo] Goal typed_libc_call_terminates_part2 : Unsuccess
+[wp] [Valid] typed_definition_assigns (Qed)
+[wp] [Unknown] typed_call_declaration_terminates (Alt-Ergo) (Cached)
+[wp] [Unknown] typed_call_definition_terminates (Alt-Ergo) (Cached)
+[wp] [Unknown] typed_libc_call_terminates_part1 (Alt-Ergo) (Cached)
+[wp] [Unknown] typed_libc_call_terminates_part2 (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 5
   Qed:             1 
   Alt-Ergo:        0  (unsuccess: 4)

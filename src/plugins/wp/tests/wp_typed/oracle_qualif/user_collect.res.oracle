@@ -3,38 +3,38 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 32 goals scheduled
-[wp] [Qed] Goal typed_job_ensures_K : Valid
-[wp] [Qed] Goal typed_job_ensures_P : Valid
-[wp] [Qed] Goal typed_job_assigns_part1 : Valid
-[wp] [Qed] Goal typed_job_assigns_part2 : Valid
-[wp] [Qed] Goal typed_job_assigns_part3 : Valid
-[wp] [Qed] Goal typed_job2_ensures_K : Valid
-[wp] [Qed] Goal typed_job2_ensures_Q : Valid
-[wp] [Qed] Goal typed_job2_assigns_part1 : Valid
-[wp] [Qed] Goal typed_job2_assigns_part2 : Valid
-[wp] [Qed] Goal typed_job2_assigns_part3 : Valid
-[wp] [Qed] Goal typed_job3_ensures_K : Valid
-[wp] [Alt-Ergo] Goal typed_job3_ensures_Q : Valid
-[wp] [Qed] Goal typed_job3_assigns_part1 : Valid
-[wp] [Qed] Goal typed_job3_assigns_part2 : Valid
-[wp] [Qed] Goal typed_job3_assigns_part3 : Valid
-[wp] [Qed] Goal typed_caller_ensures_K : Valid
-[wp] [Alt-Ergo] Goal typed_caller_ensures_P1 : Valid
-[wp] [Alt-Ergo] Goal typed_caller_ensures_P2 : Valid
-[wp] [Qed] Goal typed_caller_call_job_requires : Valid
-[wp] [Qed] Goal typed_caller_call_job_2_requires : Valid
-[wp] [Qed] Goal typed_caller2_ensures_K : Valid
-[wp] [Alt-Ergo] Goal typed_caller2_ensures_Q1 : Valid
-[wp] [Alt-Ergo] Goal typed_caller2_ensures_Q2 : Valid
-[wp] [Alt-Ergo] Goal typed_caller2_ensures_R : Valid
-[wp] [Qed] Goal typed_caller2_call_job2_requires : Valid
-[wp] [Qed] Goal typed_caller2_call_job2_2_requires : Valid
-[wp] [Qed] Goal typed_caller3_ensures_K : Valid
-[wp] [Alt-Ergo] Goal typed_caller3_ensures_Q1 : Valid
-[wp] [Alt-Ergo] Goal typed_caller3_ensures_Q2 : Valid
-[wp] [Alt-Ergo] Goal typed_caller3_ensures_R : Valid
-[wp] [Qed] Goal typed_caller3_call_job3_requires : Valid
-[wp] [Qed] Goal typed_caller3_call_job3_2_requires : Valid
+[wp] [Valid] typed_job_ensures_K (Qed)
+[wp] [Valid] typed_job_ensures_P (Qed)
+[wp] [Valid] typed_job_assigns_part1 (Qed)
+[wp] [Valid] typed_job_assigns_part2 (Qed)
+[wp] [Valid] typed_job_assigns_part3 (Qed)
+[wp] [Valid] typed_job2_ensures_K (Qed)
+[wp] [Valid] typed_job2_ensures_Q (Qed)
+[wp] [Valid] typed_job2_assigns_part1 (Qed)
+[wp] [Valid] typed_job2_assigns_part2 (Qed)
+[wp] [Valid] typed_job2_assigns_part3 (Qed)
+[wp] [Valid] typed_job3_ensures_K (Qed)
+[wp] [Valid] typed_job3_ensures_Q (Alt-Ergo) (Cached)
+[wp] [Valid] typed_job3_assigns_part1 (Qed)
+[wp] [Valid] typed_job3_assigns_part2 (Qed)
+[wp] [Valid] typed_job3_assigns_part3 (Qed)
+[wp] [Valid] typed_caller_ensures_K (Qed)
+[wp] [Valid] typed_caller_ensures_P1 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_caller_ensures_P2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_caller_call_job_requires (Qed)
+[wp] [Valid] typed_caller_call_job_2_requires (Qed)
+[wp] [Valid] typed_caller2_ensures_K (Qed)
+[wp] [Valid] typed_caller2_ensures_Q1 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_caller2_ensures_Q2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_caller2_ensures_R (Alt-Ergo) (Cached)
+[wp] [Valid] typed_caller2_call_job2_requires (Qed)
+[wp] [Valid] typed_caller2_call_job2_2_requires (Qed)
+[wp] [Valid] typed_caller3_ensures_K (Qed)
+[wp] [Valid] typed_caller3_ensures_Q1 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_caller3_ensures_Q2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_caller3_ensures_R (Alt-Ergo) (Cached)
+[wp] [Valid] typed_caller3_call_job3_requires (Qed)
+[wp] [Valid] typed_caller3_call_job3_2_requires (Qed)
 [wp] Proved goals:   32 / 32
   Qed:            23 
   Alt-Ergo:        9

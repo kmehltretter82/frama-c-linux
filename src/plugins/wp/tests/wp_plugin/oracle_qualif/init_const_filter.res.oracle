@@ -3,7 +3,7 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 1 goal scheduled
-[wp] [Alt-Ergo] Goal typed_default_init_check_X : Valid
+[wp] [Valid] typed_default_init_check_X (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 1
   Qed:             0 
   Alt-Ergo:        1
