@@ -127,15 +127,15 @@ function Cmd
 function SetEnv
 {
     if [ "$FRAMAC_WP_CACHE" = "" ]; then
-        FRAMAC_WP_CACHE=offline
+        export FRAMAC_WP_CACHE=offline
         Echo "Set FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
     fi
 
     if [ "$FRAMAC_WP_QUALIF" != "" ]; then
-        FRAMAC_WP_CACHEDIR="$FRAMAC_WP_QUALIF"
+        export FRAMAC_WP_CACHEDIR="$FRAMAC_WP_QUALIF"
         Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
     elif [ "$FRAMAC_WP_CACHEDIR" = "" ]; then
-        FRAMAC_WP_CACHEDIR="$CACHEDIR"
+        export FRAMAC_WP_CACHEDIR="$CACHEDIR"
         Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
     fi
 
