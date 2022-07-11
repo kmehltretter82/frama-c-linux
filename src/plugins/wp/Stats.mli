@@ -36,6 +36,7 @@ type pstats = {
 
 (** Cumulated Stats *)
 type stats = {
+  verdict : VCS.verdict ;
   provers : (VCS.prover * pstats) list ;
   tactics : int ;
   proved : int ;
@@ -48,9 +49,12 @@ type stats = {
 
 val pp_pstats : Format.formatter -> pstats -> unit
 val pp_stats : shell:bool -> updating:bool -> Format.formatter -> stats -> unit
+val pretty : Format.formatter -> stats -> unit
 
-val results : smoke:bool -> (VCS.prover * VCS.result) list -> VCS.verdict * stats
+val empty : stats
+val results : smoke:bool -> (VCS.prover * VCS.result) list -> stats
 val tactical : qed:float -> stats list -> stats
+val script : stats -> VCS.result
 
 val proofs : stats -> int
 val complete : stats -> bool

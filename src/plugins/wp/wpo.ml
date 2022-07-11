@@ -830,17 +830,21 @@ let compute g =
 let is_valid g =
   is_trivial g || List.exists (fun (_,r) -> VCS.is_valid r) (get_results g)
 
-let is_unknown g =
+let all_not_valid g =
+  not (is_trivial g) &&
+  List.for_all (fun (_,r) -> VCS.is_not_valid r) (get_results g)
+
+let is_passed g =
+  if is_smoke_test g then
+    all_not_valid g
+  else
+    is_valid g
+
+let has_unknown g =
   not (is_valid g) &&
   List.exists
     (fun (_,r) -> VCS.is_verdict r && not (VCS.is_valid r))
     (get_results g)
-
-let is_passed g =
-  if is_smoke_test g then
-    is_unknown g
-  else
-    is_valid g
 
 (* -------------------------------------------------------------------------- *)
 (* --- Proof Obligations : Pretty-printing                                --- *)

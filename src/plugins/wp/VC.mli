@@ -48,11 +48,11 @@ val get_sequent : t -> Conditions.sequent
 val get_formula: t -> Lang.F.pred
 val is_trivial : t -> bool
 
-(** One prover at least returns Valid verdict. *)
+(** One prover at least returns a valid verdict. *)
 val is_valid : t -> bool
 
-(** No prover with Valid verdict, and at least one non-Valid verdict. *)
-val is_unknown : t -> bool
+(** At least one non-valid verdict. *)
+val has_unknown : t -> bool
 
 (** Same as [is_valid] for non-smoke tests. For smoke-tests,
     same as [is_unknown]. *)

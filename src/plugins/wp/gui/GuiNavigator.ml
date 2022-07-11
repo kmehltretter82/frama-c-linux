@@ -139,7 +139,7 @@ class behavior
             | `All -> true
             | `Smoke -> Wpo.is_smoke_test g
             | `Scripts -> has_proof g
-            | `ToProve -> to_prove g && (Wpo.is_unknown g || has_proof g)
+            | `ToProve -> to_prove g && (Wpo.has_unknown g || has_proof g)
           in if ok then list#add g
         in
         begin

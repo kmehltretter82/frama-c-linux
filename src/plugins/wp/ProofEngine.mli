@@ -34,10 +34,14 @@ val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
 val proof : main:Wpo.t -> tree
 val reset : tree -> unit
 val remove : Wpo.t -> unit
-val validate : ?incomplete:bool -> tree -> unit
+
+(** Re-compute stats & set status of the entire script *)
+val validate : tree -> unit
+
+(** Consolidate statistics wrt current script or prover results *)
+val consolidated : Wpo.t -> Stats.stats
 
 (** Leaves are numbered from 0 to n-1 *)
-
 
 type status = [
   | `Unproved (** proof obligation not proved *)
@@ -67,6 +71,7 @@ val node_context : node -> WpContext.t
 val title : node -> string
 val proved : node -> bool
 val pending : node -> int
+val stats : node -> Stats.stats
 val parent : node -> node option
 val children : node -> (string * node) list
 val tactical : node -> ProofScript.jtactic option

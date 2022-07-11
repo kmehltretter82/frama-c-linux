@@ -209,6 +209,7 @@ let is_result = function
 let is_verdict r = is_result r.verdict
 
 let is_valid = function { verdict = Valid } -> true | _ -> false
+let is_not_valid r = is_verdict r && not (is_valid r)
 let is_computing = function { verdict=Computing _ } -> true | _ -> false
 
 let smoked = function
@@ -349,16 +350,16 @@ let pp_result_qualif ?(updating=true) prover result fmt =
   else
     pp_result fmt result
 
+let vrank = function
+  | NoResult | Computing _ -> 0
+  | Failed -> 1
+  | Unknown -> 2
+  | Timeout | Stepout -> 3
+  | Valid -> 4
+  | Invalid -> 5
+
 let compare p q =
-  let rank = function
-    | NoResult | Computing _ -> 0
-    | Failed -> 1
-    | Unknown -> 2
-    | Timeout | Stepout -> 3
-    | Valid -> 4
-    | Invalid -> 5
-  in
-  let r = rank q.verdict - rank p.verdict in
+  let r = vrank q.verdict - vrank p.verdict in
   if r <> 0 then r else
     let s = Stdlib.compare p.prover_steps q.prover_steps in
     if s <> 0 then s else
@@ -394,5 +395,4 @@ let leq r1 r2 =
   | _ -> compare r1 r2 <= 0
 
 let choose r1 r2 = if leq r1 r2 then r1 else r2
-
 let best = List.fold_left choose no_result

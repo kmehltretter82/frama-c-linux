@@ -36,6 +36,7 @@ type pstats = {
 }
 
 type stats = {
+  verdict : VCS.verdict ;
   provers : (VCS.prover * pstats) list ;
   tactics : int ;
   proved : int ;
@@ -84,11 +85,6 @@ let ptime t valid =
   { tmin = t ; tval = t ; tmax = t ; time = t ; tnbr = 1.0 ;
     success = if valid then 1.0 else 0.0 }
 
-let psmoke r =
-  { pzero with
-    time = r.prover_time ;
-    success = if VCS.is_valid valid then 1.0 else 0.0 }
-
 let pqed r = ptime r.solver_time (VCS.is_valid r)
 let presult r = ptime r.prover_time (VCS.is_valid r)
 let psolver r = ptime r.solver_time false
@@ -97,7 +93,8 @@ let psolver r = ptime r.solver_time false
 (* --- Global Stats                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let zero = {
+let empty = {
+  verdict = NoResult;
   provers = [];
   tactics = 0;
   proved = 0;
@@ -108,46 +105,75 @@ let zero = {
   cached = 0 ;
 }
 
-let choose (p,rp) (q,rq) =
-  if VCS.leq rp rq then (p,rp) else (q,rq)
+let choose_best a b =
+  if VCS.leq (snd a) (snd b) then a else b
 
-let consolidated ~smoke = function
+let choose_worst a b =
+  if VCS.leq (snd b) (snd a) then a else b
+
+let consolidated_valid = function
   | [] -> NoResult, 0, []
   | u::w as results ->
-    let p,r = List.fold_left choose u w in
+    let p,r = List.fold_left choose_best u w in
     let cached =
       p = Qed ||
       if VCS.is_valid r then r.cached else
         List.for_all
           (fun (_,r) -> r.VCS.cached || not (VCS.is_verdict r))
           results in
-    r.verdict,
+    r.VCS.verdict,
     (if cached then 1 else 0),
     if p = Qed then [Qed,pqed r]
-    else pmerge [Qed,psolver r] [p,if smoke then psmoke r else presult r]
+    else pmerge [Qed,psolver r] [p,presult r]
 
-let smoked_result (p,r) = p, { r with verdict = VCS.smoked r.verdict }
-
-let results ~smoke prs =
-  let prs = if smoke then List.map smoked_result prs else prs in
-  let verdict, cached, provers = consolidated ~smoke prs in
-  verdict,
+let valid_stats prs =
+  let verdict, cached, provers = consolidated_valid prs in
   match verdict with
   | Valid ->
-    { zero with provers ; cached ; proved = 1 }
+    { empty with verdict ; provers ; cached ; proved = 1 }
   | Timeout | Stepout ->
-    { zero with provers ; cached ; timeout = 1 }
+    { empty with verdict ; provers ; cached ; timeout = 1 }
   | Unknown ->
-    { zero with provers ; cached ; unknown = 1 }
+    { empty with verdict ; provers ; cached ; unknown = 1 }
   | NoResult | Computing _ ->
-    { zero with provers ; cached ; noresult = 1 }
+    { empty with verdict ; provers ; cached ; noresult = 1 }
   | Failed | Invalid ->
-    { zero with provers ; cached ; failed = 1 }
+    { empty with verdict ; provers ; cached ; failed = 1 }
+
+let results ~smoke prs =
+  if not smoke then valid_stats prs
+  else
+    let verdict, missing =
+      List.partition (fun (_,r) -> VCS.is_verdict r) prs in
+    let doomed, passed =
+      List.partition (fun (_,r) -> VCS.is_valid r) verdict in
+    if doomed <> [] then
+      valid_stats doomed
+    else
+      let cached = List.fold_left
+          (fun c (_,r) -> if r.VCS.cached then succ c else c)
+          0 doomed in
+      let stucked = List.map
+          (fun (p,r) -> p, ptime r.prover_time true)
+          doomed in
+      let solver = List.fold_left
+          (fun t (_,r) -> t +. r.solver_time)
+          0.0 doomed in
+      let provers = pmerge [Qed,ptime solver false] stucked in
+      let verdict =
+        if missing <> [] then NoResult else
+          match passed with
+          | [] -> NoResult
+          | u::w -> (snd @@ List.fold_left choose_worst u w).verdict in
+      let proved = List.length passed in
+      let failed = List.length missing + List.length doomed in
+      { empty with verdict ; provers ; cached ; proved ; failed }
 
 let add a b =
-  if a == zero then b else
-  if b == zero then a else
+  if a == empty then b else
+  if b == empty then a else
     {
+      verdict = VCS.combine a.verdict b.verdict ;
       provers = pmerge a.provers b.provers ;
       tactics = a.tactics + b.tactics ;
       proved = a.proved + b.proved ;
@@ -159,9 +185,19 @@ let add a b =
     }
 
 let tactical ~qed children =
-  let valid = children = [] in
-  let provers = [Qed,ptime qed valid] in
-  List.fold_left add { zero with provers ; tactics = 1 } children
+  let valid = List.for_all (fun c -> c.verdict = Valid) children in
+  let qed_only = children = [] in
+  let verdict = if valid then Valid else Unknown in
+  let provers = [Qed,ptime qed qed_only] in
+  List.fold_left add { empty with verdict ; provers ; tactics = 1 } children
+
+let script stats =
+  let cached = stats.cached = stats.proved in
+  let solver = List.fold_left
+      (fun t (p,s) -> if p = Qed then t +. s.time else t) 0.0 stats.provers in
+  let time = List.fold_left
+      (fun t (p,s) -> if p <> Qed then t +. s.time else t) 0.0 stats.provers in
+  VCS.result ~cached ~solver ~time stats.verdict
 
 (* -------------------------------------------------------------------------- *)
 (* --- Utils                                                              --- *)
@@ -195,20 +231,20 @@ let pp_pstats fmt p =
 let pp_stats ~shell ~updating fmt s =
   let vp = s.proved in
   let np = proofs s in
-  if vp < np && np > 1 then
-    Format.fprintf fmt " (Proofs %d/%d)" vp np ;
   if s.tactics > 1 then
-    Format.fprintf fmt " (Tactics %d)" s.tactics
-  else if np <= 1 && s.tactics = 1 then
-    Format.fprintf fmt " (Tactic)" ;
+    Format.fprintf fmt " (Script %d)" s.tactics
+  else if s.tactics = 1 then
+    Format.fprintf fmt " (Script)" ;
   let perfo = not shell || (not updating && s.cached < vp) in
-  let only_qed = match s.provers with [Qed,_] -> true | _ -> false in
+  let qed_only =
+    match s.provers with [Qed,_] -> vp = np | _ -> false in
   List.iter
     (fun (p,pr) ->
        let success = truncate pr.success in
        let print_perfo = perfo && pr.time > Rformat.epsilon in
        let print_proofs = success > 0 && np > 1 in
-       if p != Qed || only_qed || print_perfo || print_proofs then
+       let print_qed = qed_only && s.verdict = Valid && vp = np in
+       if p != Qed || print_qed || print_perfo || print_proofs then
          begin
            let title = VCS.title_of_prover ~version:false p in
            Format.fprintf fmt " (%s" title ;
@@ -228,6 +264,8 @@ let pp_stats ~shell ~updating fmt s =
       Format.fprintf fmt " (Cache miss %d)" (np - s.cached)
     else
       Format.fprintf fmt " (Cached %d/%d)" s.cached np
+
+let pretty = pp_stats ~shell:false ~updating:false
 
 (* -------------------------------------------------------------------------- *)
 (* --- Yojson                                                             --- *)

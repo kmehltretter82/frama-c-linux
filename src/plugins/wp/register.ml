@@ -295,20 +295,20 @@ let do_wpo_result goal prover res =
       do_wpo_stat goal prover res ;
     end
 
-let do_report_stats ~shell ~updating ~smoke goal (verdict,stats) =
+let do_report_stats ~shell ~updating ~smoke goal (stats : Stats.stats) =
   let status =
     if smoke then
-      match verdict with
-      | VCS.NoResult | Computing _ -> ""
+      match stats.verdict with
       | Valid -> "Failed (Doomed)"
       | Failed ->  "Unknown (Failure)"
-      | Invalid -> "Passed (Invalid)"
+      | NoResult | Computing _ -> "Unknown (Incomplete)"
       | Unknown -> "Passed (Unknown)"
       | Timeout -> "Passed (Timeout)"
       | Stepout -> "Passed (Stepout)"
+      | Invalid -> "Passed (Invalid)"
     else
-      match verdict with
-      | VCS.NoResult | Computing _ -> ""
+      match stats.verdict with
+      | NoResult | Computing _ -> ""
       | Valid -> "Valid"
       | Invalid -> "Invalid"
       | Failed ->  "Failure"
@@ -329,12 +329,11 @@ let do_wpo_success ~shell ~updating goal success =
         "[Generated] Goal %s (%a)" (Wpo.get_gid goal) VCS.pp_prover prover
   else
     let smoke = Wpo.is_smoke_test goal in
-    let prs = Wpo.get_results goal in
-    let (verdict,_) as vstats = Stats.results ~smoke prs in
+    let stats = ProofEngine.consolidated goal in
     begin
-      if shell || verdict <> Valid then
-        do_report_stats ~shell ~updating goal ~smoke vstats ;
-      if smoke && verdict <> Valid then
+      if shell || stats.verdict <> Valid then
+        do_report_stats ~shell ~updating goal ~smoke stats ;
+      if smoke && stats.verdict <> Valid then
         begin
           let target = Wpo.get_target goal in
           let source = fst (Property.location target) in

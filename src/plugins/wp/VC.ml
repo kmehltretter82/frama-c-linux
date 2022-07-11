@@ -41,8 +41,8 @@ let get_logout = Wpo.get_file_logout
 let get_logerr = Wpo.get_file_logerr
 let is_trivial = Wpo.is_trivial
 let is_valid = Wpo.is_valid
-let is_unknown = Wpo.is_unknown
 let is_passed = Wpo.is_passed
+let has_unknown = Wpo.has_unknown
 
 let get_formula po =
   match po.po_formula with

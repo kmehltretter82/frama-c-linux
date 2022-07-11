@@ -114,6 +114,7 @@ val is_auto : prover -> bool
 val is_result : verdict -> bool
 val is_verdict : result -> bool
 val is_valid: result -> bool
+val is_not_valid: result -> bool
 val is_computing: result -> bool
 val is_proved: smoke:bool -> result -> bool
 
@@ -129,6 +130,7 @@ val pp_result_qualif : ?updating:bool -> prover -> result ->
 
 val compare : result -> result -> int (* best is minimal *)
 
+val combine : verdict -> verdict -> verdict
 val merge : result -> result -> result
 val leq : result -> result -> bool
 val choose : result -> result -> result

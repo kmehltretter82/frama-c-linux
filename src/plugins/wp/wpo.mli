@@ -199,11 +199,14 @@ val is_trivial : t -> bool
 val is_valid : t -> bool
 (** Checks for some prover with valid verdict (no forced simplification) *)
 
-val is_unknown : t -> bool
-(** Checks that all provers has a non-valid verdict *)
+val all_not_valid : t -> bool
+(** Checks for all provers to give a non-valid, computed verdict *)
 
 val is_passed : t -> bool
-(** valid, or unknown for smoke tests *)
+(** valid, or all-not-valid for smoke tests *)
+
+val has_unknown : t -> bool
+(** Checks there is some provers with a non-valid verdict *)
 
 val warnings : t -> Warning.t list
 
