@@ -20,7 +20,7 @@ default:
 ### VARIABLES
 
 variables:
-  DEFAULT: "feature/bobot/jbuilder"
+  DEFAULT: "master"
   OCAML: "4.11"
   PUBLISH: "no"
 
