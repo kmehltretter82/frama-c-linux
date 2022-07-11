@@ -127,10 +127,6 @@ let pp_warnings fmt wpo =
 (* ---  Prover Stats                                                    --- *)
 (* ------------------------------------------------------------------------ *)
 
-let do_wpo_display goal =
-  let result = if Wpo.is_trivial goal then "trivial" else "not tried" in
-  Wp_parameters.feedback "Goal %s : %s" (Wpo.get_gid goal) result
-
 module PM =
   Map.Make(struct
     type t = VCS.prover
@@ -340,17 +336,43 @@ let do_wpo_smoke status goal =
              (VCS.pp_result_qualif ~updating p r)
         ) (results goal) ;
     end
+[@@@ warning "-32"]
+let do_report_stats ~shell ~updating ~smoke goal (verdict,stats) =
+  let status =
+    if smoke then
+      match verdict with
+      | VCS.NoResult | Computing _ -> ""
+      | Invalid -> "Passed"
+      | Valid -> "Failed"
+      | Failed ->  "Unknown (Failure)"
+      | Unknown -> "Passed (Unknown)"
+      | Timeout -> "Passed (Timeout)"
+      | Stepout -> "Passed (Stepout)"
+    else
+      match verdict with
+      | VCS.NoResult | Computing _ -> ""
+      | Valid -> "Valid"
+      | Invalid -> "Invalid"
+      | Failed ->  "Failure"
+      | Unknown -> "Unknown"
+      | Timeout -> "Timeout"
+      | Stepout -> "Stepout"
+  in if status <> "" then
+    Wp_parameters.feedback "[%s] %s%a%a"
+      status (Wpo.get_gid goal) (Stats.pp_stats ~shell ~updating) stats
+      pp_warnings goal
+[@@@ warning "+32"]
 
-let do_wpo_success goal s =
+let do_wpo_success ~shell ~updating goal success =
   if Wp_parameters.Generate.get () then
-    match s with
+    match success with
     | None -> ()
     | Some prover ->
       Wp_parameters.feedback ~ontty:`Silent
         "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
   else
   if Wpo.is_smoke_test goal then
-    begin match s with
+    begin match success with
       | None ->
         Wp_parameters.feedback ~ontty:`Silent
           "[Passed] Smoke-test %s" (Wpo.get_gid goal)
@@ -362,15 +384,15 @@ let do_wpo_success goal s =
           Wp_parameters.warning ~source "Failed smoke-test"
     end
   else
-    begin match s with
+    begin match success with
       | None -> do_wpo_failed goal
       | Some (VCS.Tactical as script) ->
         Wp_parameters.feedback ~ontty:`Silent
           "[%a] Goal %s : Valid"
           VCS.pp_prover script (Wpo.get_gid goal)
       | Some prover ->
+        ignore shell ;
         let result = Wpo.get_result goal prover in
-        let updating = Cache.is_updating () in
         Wp_parameters.feedback ~ontty:`Silent
           "[%a] Goal %s : %t"
           VCS.pp_prover prover (Wpo.get_gid goal)
@@ -497,6 +519,8 @@ let spawn_wp_proofs ~script goals =
     begin
       let server = ProverTask.server () in
       ignore (Wp_parameters.Share.get_dir "."); (* To prevent further errors *)
+      let shell = Wp_parameters.has_dkey VCS.dkey_shell in
+      let updating = Cache.is_updating () in
       Bag.iter
         (fun goal ->
            if  script.tactical
@@ -513,7 +537,7 @@ let spawn_wp_proofs ~script goals =
                ~start:do_wpo_start
                ~progress:do_progress
                ~result:do_wpo_result
-               ~success:do_wpo_success
+               ~success:(do_wpo_success ~shell ~updating)
                goal
            else
              Prover.spawn goal
@@ -521,7 +545,7 @@ let spawn_wp_proofs ~script goals =
                ~start:do_wpo_start
                ~progress:do_progress
                ~result:do_wpo_result
-               ~success:do_wpo_success
+               ~success:(do_wpo_success ~shell ~updating)
                script.provers
         ) goals ;
       Task.on_server_wait server do_wpo_wait ;
@@ -713,6 +737,10 @@ let do_session ~script goals =
   let session = do_collect_session goals in
   do_update_session script session ;
   do_show_session script.update session
+
+let do_wpo_display goal =
+  let result = if Wpo.is_trivial goal then "trivial" else "not tried" in
+  Wp_parameters.feedback "Goal %s : %s" (Wpo.get_gid goal) result
 
 let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
   let script = default_script_mode () in
