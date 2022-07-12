@@ -2384,8 +2384,6 @@ end
 
 module Int_Intervals = struct
 
-  type itv = Int.t * Int.t
-
   type intervals =
     | Top
     | Intervals of Int.t * Int_Intervals_Map.t * Int.t * Int.t
