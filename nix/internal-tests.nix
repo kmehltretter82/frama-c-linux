@@ -129,7 +129,7 @@ stdenvNoCC.mkDerivation rec {
 
   checkPhase = ''
     runHook preCheck
-    dune exec -- frama-c-ptests tests src/plugins/*/tests
+    dune exec -- frama-c-ptests -never-disabled tests src/plugins/*/tests
     dune build -j1 --display short @ptests_config
   '';
 
