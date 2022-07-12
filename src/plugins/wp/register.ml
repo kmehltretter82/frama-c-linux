@@ -250,6 +250,8 @@ let stats_to_json g (s : Stats.stats) : Json.t =
         "function", `String (Kernel_function.get_name kf);
         "behavior", `String bhv ;
       ] in
+  let proofs = Stats.proofs s in
+  let subgoals = if proofs > 1 then ["subgoals", `Int proofs] else [] in
   `Assoc
     ([
       "goal", `String g.po_gid ;
@@ -262,13 +264,12 @@ let stats_to_json g (s : Stats.stats) : Json.t =
         "verdict", `String (VCS.name_of_verdict s.verdict) ;
       ] @ script @ [
         "provers", `List (List.map pstats_to_json s.provers) ;
-      ] @
+      ] @ subgoals @
       List.filter (function (_,`Int n) -> n > 0 | _ -> true) [
         "tactics", `Int s.tactics;
         "proved", `Int s.proved;
         "timeout", `Int s.timeout;
         "unknown", `Int s.unknown ;
-        "noresult", `Int s.noresult ;
         "failed", `Int s.failed ;
         "cached", `Int s.cached ;
       ])
