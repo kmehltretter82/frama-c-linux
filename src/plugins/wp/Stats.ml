@@ -232,9 +232,9 @@ let pp_stats ~shell ~updating fmt s =
   let vp = s.proved in
   let np = proofs s in
   if s.tactics > 1 then
-    Format.fprintf fmt " (Script %d)" s.tactics
+    Format.fprintf fmt " (Tactics %d)" s.tactics
   else if s.tactics = 1 then
-    Format.fprintf fmt " (Script)" ;
+    Format.fprintf fmt " (Tactic)" ;
   let perfo = not shell || (not updating && s.cached < vp) in
   let qed_only =
     match s.provers with [Qed,_] -> vp = np | _ -> false in
@@ -266,28 +266,5 @@ let pp_stats ~shell ~updating fmt s =
       Format.fprintf fmt " (Cached %d/%d)" s.cached np
 
 let pretty = pp_stats ~shell:false ~updating:false
-
-(* -------------------------------------------------------------------------- *)
-(* --- Yojson                                                             --- *)
-(* -------------------------------------------------------------------------- *)
-
-let pstats_to_json (p,r) : Json.t = `Assoc [
-    "prover", `String (VCS.name_of_prover p) ;
-    "hprover", `String (VCS.title_of_prover p) ;
-    "time", `Float r.time ;
-    "htime", `String (Pretty_utils.to_string Rformat.pp_time r.time) ;
-    "success", `Int (truncate r.success) ;
-  ]
-
-let stats_to_json s : Json.t = `Assoc [
-    "provers", `List (List.map pstats_to_json s.provers);
-    "tactics", `Int s.tactics;
-    "proved", `Int s.proved;
-    "timeout", `Int s.timeout;
-    "unknown", `Int s.unknown ;
-    "noresult", `Int s.noresult ;
-    "failed", `Int s.failed ;
-    "cached", `Int s.cached ;
-  ]
 
 (* -------------------------------------------------------------------------- *)

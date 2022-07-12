@@ -19,10 +19,10 @@
 [wp] [Valid] typed_BinaryMultiplication_loop_assigns (Qed)
 [wp] [Valid] typed_BinaryMultiplication_loop_variant_decrease (Alt-Ergo) (Cached)
 [wp] [Valid] typed_BinaryMultiplication_loop_variant_positive (Qed)
-[wp] [Valid] typed_BinaryMultiplication_loop_invariant_inv1_ok_preserved (Script 4) (Qed 1/10) (Alt-Ergo 9/10) (Cached)
+[wp] [Valid] typed_BinaryMultiplication_loop_invariant_inv1_ok_preserved (Tactics 4) (Qed 1/10) (Alt-Ergo 9/10) (Cached)
 [wp] Proved goals:   17 / 17
   Qed:             4
-  Script:          1
+  Script:          1 (Tactics 4) (Qed 1/10) (Alt-Ergo 9/10) (Cached)
   Alt-Ergo:       12
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success

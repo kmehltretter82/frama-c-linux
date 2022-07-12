@@ -61,6 +61,4 @@ val script : stats -> VCS.result
 val proofs : stats -> int
 val complete : stats -> bool
 
-val stats_to_json : stats -> Json.t
-
 (* -------------------------------------------------------------------------- *)

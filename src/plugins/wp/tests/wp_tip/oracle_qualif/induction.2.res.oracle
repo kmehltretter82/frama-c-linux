@@ -2,7 +2,7 @@
 [kernel] Parsing induction.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] 1 goal scheduled
-[wp] [Unsuccess] typed_lemma_ByInd (Script)
+[wp] [Unsuccess] typed_lemma_ByInd (Tactic)
 [wp] Proved goals:    0 / 1
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success

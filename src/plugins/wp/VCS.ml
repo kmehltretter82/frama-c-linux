@@ -310,6 +310,15 @@ let pp_perf_shell fmt r =
   if not (Wp_parameters.has_dkey dkey_shell) then
     pp_perf_forced fmt r
 
+let name_of_verdict = function
+  | NoResult | Computing _ -> "none"
+  | Invalid -> "invalid"
+  | Valid -> "valid"
+  | Failed -> "failed"
+  | Unknown -> "unknown"
+  | Stepout -> "stepout"
+  | Timeout -> "timeout"
+
 let pp_result fmt r =
   match r.verdict with
   | NoResult -> Format.pp_print_string fmt "No Result"

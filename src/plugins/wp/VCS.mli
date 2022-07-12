@@ -124,6 +124,8 @@ val verdict: smoke:bool -> result -> verdict
 val configure : result -> config
 val autofit : result -> bool (** Result that fits the default configuration *)
 
+val name_of_verdict : verdict -> string
+
 val pp_result : Format.formatter -> result -> unit
 val pp_result_qualif : ?updating:bool -> prover -> result ->
   Format.formatter -> unit

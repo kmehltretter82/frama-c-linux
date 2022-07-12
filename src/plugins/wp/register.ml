@@ -86,7 +86,7 @@ let do_wp_print_for goals =
 let do_wp_report model =
   begin
     let reports = Wp_parameters.Report.get () in
-    let jreport = Wp_parameters.ReportJson.get () in
+    let jreport = Wp_parameters.OldReportJson.get () in
     if reports <> [] || jreport <> "" then
       begin
         let stats = WpReport.fcstat () in
@@ -98,7 +98,8 @@ let do_wp_report model =
           | [jinput;joutput] ->
             WpReport.export_json stats ~jinput ~joutput () ;
           | _ ->
-            Wp_parameters.error "Invalid format for option -wp-report-json"
+            Wp_parameters.error
+              "Invalid format for option -wp-deprecated-report-json"
         end ;
         List.iter (WpReport.export stats) reports ;
       end ;
@@ -132,14 +133,16 @@ module GOALS = Wpo.S.Set
 let scheduled = ref 0
 let exercised = ref 0
 let session = ref GOALS.empty
-let global = ref Stats.empty
+let global_stats = ref Stats.empty
+let script_stats = ref Stats.empty
 
 let clear_scheduled () =
   begin
     scheduled := 0 ;
     exercised := 0 ;
     session := GOALS.empty ;
-    global := Stats.empty ;
+    global_stats := Stats.empty ;
+    script_stats := Stats.empty ;
     CfgInfos.trivial_terminates := 0 ;
     WpReached.unreachable_proved := 0 ;
     WpReached.unreachable_failed := 0 ;
@@ -219,6 +222,72 @@ let do_report_cache_usage mode =
         end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Prover JSON Results                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+let pstats_to_json (p,r) : Json.t = `Assoc [
+    "prover", `String (VCS.name_of_prover p) ;
+    "time", `Float r.Stats.time ;
+    "success", `Int (truncate r.Stats.success) ;
+  ]
+
+let stats_to_json g (s : Stats.stats) : Json.t =
+  let smoke = Wpo.is_smoke_test g in
+  let target = Wpo.get_target g in
+  let source = fst (Property.location target) in
+  let script = match ProofSession.get g with
+    | NoScript -> []
+    | Script file | Deprecated file -> [ "script", `String file ]
+  in
+  let index =
+    match g.po_idx with
+    | Axiomatic None -> []
+    | Axiomatic (Some ax) ->
+      [ "axiomatic", `String ax ]
+    | Function(kf,None) ->
+      [ "function", `String (Kernel_function.get_name kf) ]
+    | Function(kf,Some bhv) -> [
+        "function", `String (Kernel_function.get_name kf);
+        "behavior", `String bhv ;
+      ] in
+  `Assoc
+    ([
+      "goal", `String g.po_gid ;
+      "property", `String (Property.Names.get_prop_name_id target) ;
+      "file", `String (source.pos_path :> string) ;
+      "line", `Int source.pos_lnum ;
+    ] @ index @ [
+        "smoke", `Bool smoke ;
+        "passed", `Bool (Wpo.is_passed g) ;
+        "verdict", `String (VCS.name_of_verdict s.verdict) ;
+      ] @ script @ [
+        "provers", `List (List.map pstats_to_json s.provers) ;
+      ] @
+      List.filter (function (_,`Int n) -> n > 0 | _ -> true) [
+        "tactics", `Int s.tactics;
+        "proved", `Int s.proved;
+        "timeout", `Int s.timeout;
+        "unknown", `Int s.unknown ;
+        "noresult", `Int s.noresult ;
+        "failed", `Int s.failed ;
+        "cached", `Int s.cached ;
+      ])
+
+let do_report_json () =
+  let file = Wp_parameters.ReportJson.get () in
+  if file <> "" then
+    let json = List.rev @@
+      GOALS.fold
+        (fun g json ->
+           let s = ProofEngine.consolidated g in
+           let js = stats_to_json g s in
+           js :: json
+        ) !session [] in
+    let pretty =
+      Wp_parameters.verbose_atleast 2 || Wp_parameters.debug_atleast 1 in
+    Json.save_file ~pretty file (`List json)
+
+(* -------------------------------------------------------------------------- *)
 (* --- Prover Results                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -263,12 +332,14 @@ let do_wpo_success ~shell ~updating goal success =
   else
     let smoke = Wpo.is_smoke_test goal in
     let gstats = Stats.results ~smoke @@ Wpo.get_results goal in
-    let stats = ProofEngine.consolidated goal in
+    let cstats = ProofEngine.consolidated goal in
     let proof, target = Wpo.get_proof goal in
     begin
-      global := Stats.add !global gstats ;
+      global_stats := Stats.add !global_stats gstats ;
+      if cstats.tactics > 0 then
+        script_stats := Stats.add !script_stats cstats ;
       if shell || proof <> `Passed then
-        do_report_stats ~shell ~updating goal ~smoke stats ;
+        do_report_stats ~shell ~updating goal ~smoke cstats ;
       if smoke && proof <> `Passed then
         begin
           let source = fst (Property.location target) in
@@ -288,7 +359,7 @@ let do_report_scheduled () =
       !CfgInfos.trivial_terminates in
     if total > 0 then
       begin
-        let gstats = !global in
+        let gstats = !global_stats in
         let unreachable = !WpReached.unreachable_proved in
         let terminating = !CfgInfos.trivial_terminates in
         let passed = GOALS.fold
@@ -296,6 +367,7 @@ let do_report_scheduled () =
                if Wpo.is_passed g then succ n else n
             ) !session (unreachable + terminating) in
         let mode = Cache.get_mode () in
+        let updating = Cache.is_updating () in
         if mode <> Cache.NoCache then do_report_cache_usage mode ;
         let shell = Wp_parameters.has_dkey VCS.dkey_shell in
         let lines = ref [] in
@@ -309,9 +381,12 @@ let do_report_scheduled () =
              let name = VCS.title_of_prover p in
              let success = truncate s.Stats.success in
              if success > 0 || (not shell && p = Qed) then
-             add_line name success (fun fmt ->
-                 if shell then Stats.pp_pstats fmt s
-               )
+               add_line name success (fun fmt ->
+                   if p = Tactical then
+                     Stats.pp_stats ~shell ~updating fmt !script_stats
+                   else
+                   if not shell then Stats.pp_pstats fmt s
+                 )
           ) gstats.provers ;
         if gstats.failed > 0 then add_line "Failed" gstats.failed none ;
         if not shell then
@@ -335,6 +410,7 @@ let do_report_scheduled () =
 let do_list_scheduled_result () =
   begin
     do_report_scheduled () ;
+    do_report_json () ;
     clear_scheduled () ;
   end
 
