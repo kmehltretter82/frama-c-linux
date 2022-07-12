@@ -182,7 +182,7 @@ README* header_spec=.ignore
 /doc/developer/METADOC.txt header_spec=.ignore
 /doc/qualification/testing header_spec=.ignore
 /doc/release/periodic-elements.txt header_spec=.ignore
-/doc/value/watchpoints header_spec=.ignore
+/doc/eva/watchpoints header_spec=.ignore
 /doc/scope/M.v header_spec=.ignore
 
 /doc/aorai/example/example* header_spec=.ignore
@@ -190,7 +190,7 @@ README* header_spec=.ignore
 /doc/*.hva header_spec=.ignore
 
 /doc/training/**/* header_spec=.ignore
-/doc/value/examples/parametrizing/*.log header_spec=.ignore
+/doc/eva/examples/parametrizing/*.log header_spec=.ignore
 /doc/**/make* header_spec=.ignore
 /doc/**/TODO header_spec=.ignore
 /doc/**/*.bnf header_spec=.ignore
