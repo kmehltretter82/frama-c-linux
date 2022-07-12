@@ -1,3 +1,4 @@
-This directory contains generic lattices for abstract interpretation.
+This directory contains generic lattices for abstract interpretation
+and the C memory model of Eva.
 
-Nowadays it is mainly used by the Value plug-in and its derived plug-ins.
+It is mainly used by Eva and its derived plug-ins (From, Inout).
