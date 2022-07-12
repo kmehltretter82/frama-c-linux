@@ -92,7 +92,7 @@ clean::
 	$(MAKE) -C developer dist-clean
 	$(MAKE) -C rte clean
 	$(MAKE) -C aorai clean
-	$(MAKE) -C value clean
+	$(MAKE) -C eva clean
 	$(MAKE) -C metrics clean
 	$(MAKE) -C ../src/plugins/wp/doc/manual clean
 
@@ -123,7 +123,7 @@ manuals/plugin-development-guide$(FC_SUFFIX).pdf: developer/developer.pdf
 manuals/rte-manual$(FC_SUFFIX).pdf: rte/main.pdf
 manuals/aorai-manual$(FC_SUFFIX).pdf: aorai/main.pdf
 manuals/aorai-example$(FC_SUFFIX).tgz: aorai/aorai-example.tgz
-manuals/eva-manual$(FC_SUFFIX).pdf: value/main.pdf
+manuals/eva-manual$(FC_SUFFIX).pdf: eva/main.pdf
 manuals/metrics-manual$(FC_SUFFIX).pdf: metrics/metrics.pdf
 manuals/wp-manual$(FC_SUFFIX).pdf: ../src/plugins/wp/doc/manual/wp.pdf
 

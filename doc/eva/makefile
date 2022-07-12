@@ -4,7 +4,7 @@ all: main.pdf
 
 include ../MakeLaTeXModern
 
-# by default, the Value manual corresponds to the open-source release
+# by default, the Eva manual corresponds to the open-source release
 OPENSOURCE?=yes
 export OPENSOURCE
 
@@ -13,9 +13,9 @@ main.pdf: ../../VERSION examples/**.c
 	$(MAKE) $(FRAMAC_MODERN)
 	latexmk -pdf main.tex
 ifeq ($(OPENSOURCE),no)
-	@echo "Generated CLOSED-SOURCE Value manual (OPENSOURCE=$(OPENSOURCE))"
+	@echo "Generated CLOSED-SOURCE Eva manual (OPENSOURCE=$(OPENSOURCE))"
 else
-	@echo "Generated OPEN-SOURCE Value manual (OPENSOURCE=$(OPENSOURCE))"
+	@echo "Generated OPEN-SOURCE Eva manual (OPENSOURCE=$(OPENSOURCE))"
 endif
 
 clean:
