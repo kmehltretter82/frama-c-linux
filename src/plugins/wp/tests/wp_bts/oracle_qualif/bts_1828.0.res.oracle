@@ -4,14 +4,14 @@
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
 [wp] [Valid] typed_local_frame_assert_ok (Alt-Ergo) (Cached)
-[wp] [Unknown] typed_global_frame_ensures_sep_iff_ref (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_global_frame_ensures_one_iff_ref (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_global_frame_ensures_sep_iff_ref (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_global_frame_ensures_one_iff_ref (Alt-Ergo) (Cached)
 [wp] [Valid] typed_global_frame_ensures_zero_always (Qed)
 [wp] [Valid] typed_global_frame_assert_ok (Qed)
 [wp] [Valid] typed_global_frame_assert_ok_2 (Qed)
 [wp] Proved goals:    4 / 6
-  Qed:             3 
-  Alt-Ergo:        1  (unsuccess: 2)
+  Qed:             3
+  Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   local_frame               -        1        1       100%

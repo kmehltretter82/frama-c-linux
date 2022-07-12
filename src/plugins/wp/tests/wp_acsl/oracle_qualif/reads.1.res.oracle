@@ -3,11 +3,10 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 3 goals scheduled
-[wp] [Stepout] typed_modifies_y_ensures_qed_ko_H_KO (Alt-Ergo) (Cached)
-[wp] [Stepout] typed_modifies_x_ensures_qed_ko_G_KO (Alt-Ergo) (Cached)
-[wp] [Stepout] typed_modifies_x_ensures_qed_ko_H_KO (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_modifies_y_ensures_qed_ko_H_KO (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_modifies_x_ensures_qed_ko_G_KO (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_modifies_x_ensures_qed_ko_H_KO (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 3
-  Alt-Ergo:        0  (unsuccess: 3)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   modifies_y                -        -        1       0.0%

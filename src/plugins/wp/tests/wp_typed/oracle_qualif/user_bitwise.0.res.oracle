@@ -16,7 +16,7 @@
 [wp] [Valid] typed_ref_rrn64_ensures_b1 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ref_rrn64_ensures_b2 (Alt-Ergo) (Cached)
 [wp] Proved goals:   12 / 12
-  Qed:             2 
+  Qed:             2
   Alt-Ergo:       10
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

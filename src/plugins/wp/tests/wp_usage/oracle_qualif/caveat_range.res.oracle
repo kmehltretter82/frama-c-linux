@@ -16,7 +16,7 @@
 [wp] [Valid] typed_caveat_reset_loop_assigns_part3 (Qed)
 [wp] [Valid] typed_caveat_reset_assigns (Qed)
 [wp] Proved goals:   12 / 12
-  Qed:             8 
+  Qed:             8
   Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

@@ -18,7 +18,7 @@
 [wp] [Valid] typed_pointers_and_companions_ulong_assert_a10 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_pointers_and_companions_ulong_assigns (Qed)
 [wp] Proved goals:   14 / 14
-  Qed:            10 
+  Qed:            10
   Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

@@ -32,7 +32,7 @@
 [wp] [Valid] typed_RANGE_NESTED_ARRAY_VARS_assigns_exit (Alt-Ergo) (Cached)
 [wp] [Valid] typed_RANGE_NESTED_ARRAY_VARS_assigns_normal (Alt-Ergo) (Cached)
 [wp] Proved goals:   28 / 28
-  Qed:            16 
+  Qed:            16
   Alt-Ergo:       12
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

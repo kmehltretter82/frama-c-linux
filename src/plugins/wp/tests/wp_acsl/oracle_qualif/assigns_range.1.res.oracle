@@ -3,14 +3,13 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
-[wp] [Stepout] typed_call_assigns_t1_assigns_exit (Alt-Ergo) (Cached)
-[wp] [Stepout] typed_call_assigns_t1_assigns_normal (Alt-Ergo) (Cached)
-[wp] [Stepout] typed_call_assigns_t2_assigns_exit (Alt-Ergo) (Cached)
-[wp] [Stepout] typed_call_assigns_t2_assigns_normal (Alt-Ergo) (Cached)
-[wp] [Stepout] typed_call_assigns_t4_assigns_exit (Alt-Ergo) (Cached)
-[wp] [Stepout] typed_call_assigns_t4_assigns_normal (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_call_assigns_t1_assigns_exit (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_call_assigns_t1_assigns_normal (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_call_assigns_t2_assigns_exit (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_call_assigns_t2_assigns_normal (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_call_assigns_t4_assigns_exit (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_call_assigns_t4_assigns_normal (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 6
-  Alt-Ergo:        0  (unsuccess: 6)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   call_assigns_t1           -        -        2       0.0%

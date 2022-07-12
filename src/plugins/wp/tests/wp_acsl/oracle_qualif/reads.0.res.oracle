@@ -7,12 +7,12 @@
 [wp] [Valid] typed_g_ensures_qed_ok (Alt-Ergo) (Cached)
 [wp] [Valid] typed_modifies_y_ensures_qed_ok_F_OK (Qed)
 [wp] [Valid] typed_modifies_y_ensures_qed_ok_G_OK (Qed)
-[wp] [Timeout] typed_modifies_y_ensures_qed_ok_W_OK_todo (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_modifies_y_ensures_qed_ok_W_OK_todo (Alt-Ergo) (Cached)
 [wp] [Valid] typed_modifies_x_ensures_qed_ok_F_OK (Qed)
-[wp] [Timeout] typed_modifies_x_ensures_qed_ok_W_OK_todo (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_modifies_x_ensures_qed_ok_W_OK_todo (Alt-Ergo) (Cached)
 [wp] Proved goals:    5 / 7
-  Qed:             3 
-  Alt-Ergo:        2  (unsuccess: 2)
+  Qed:             3
+  Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         -        1        1       100%

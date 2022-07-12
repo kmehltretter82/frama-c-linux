@@ -101,7 +101,8 @@
 [wp] [Valid] typed_init_t2_bis_v2_call_init_requires (Qed)
 [wp] [Valid] typed_init_t2_bis_v2_call_init_requires_2 (Qed)
 [wp] Proved goals:   97 / 97
-  Qed:            53 
+  Unreachable:     5
+  Qed:            53
   Alt-Ergo:       39
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

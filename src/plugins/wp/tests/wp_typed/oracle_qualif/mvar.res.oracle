@@ -7,7 +7,6 @@
 [wp] 1 goal scheduled
 [wp] [Valid] typed_Job_ensures (Alt-Ergo)
 [wp] Proved goals:    1 / 1
-  Qed:             0 
   Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

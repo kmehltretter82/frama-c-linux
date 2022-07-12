@@ -6,7 +6,6 @@
 [wp] [Valid] typed_job_ensures_SEP (Alt-Ergo) (Cached)
 [wp] [Valid] typed_job_ensures_ALT (Alt-Ergo) (Cached)
 [wp] Proved goals:    2 / 2
-  Qed:             0 
   Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

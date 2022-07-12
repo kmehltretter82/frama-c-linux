@@ -11,7 +11,7 @@
 [wp] [Valid] typed_g_assigns (Qed)
 [wp] [Valid] typed_h_ensures (Alt-Ergo) (Cached)
 [wp] Proved goals:    7 / 7
-  Qed:             4 
+  Qed:             4
   Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

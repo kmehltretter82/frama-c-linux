@@ -9,7 +9,7 @@
 [wp] [Valid] typed_f_assert_4 (Qed)
 [wp] [Valid] typed_f_assert_5 (Alt-Ergo) (Cached)
 [wp] Proved goals:    5 / 5
-  Qed:             2 
+  Qed:             2
   Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

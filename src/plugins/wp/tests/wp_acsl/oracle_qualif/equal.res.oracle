@@ -10,7 +10,7 @@
 [wp] [Valid] typed_with_ptr_array_ensures (Alt-Ergo) (Cached)
 [wp] [Valid] typed_with_ptr_and_array_struct_ensures (Alt-Ergo) (Cached)
 [wp] Proved goals:    6 / 6
-  Qed:             1 
+  Qed:             1
   Alt-Ergo:        5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

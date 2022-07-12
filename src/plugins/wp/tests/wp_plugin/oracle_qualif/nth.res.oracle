@@ -17,7 +17,7 @@
 [wp] [Valid] typed_check_lemma_nth_repeat_2_ok (Qed)
 [wp] [Valid] typed_check_lemma_nth_repeat_3_ok (Qed)
 [wp] [Valid] typed_check_lemma_nth_repeat_4_ok (Qed)
-[wp] [Timeout] typed_check_lemma_nth_repeat_undefined_1_ko (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_check_lemma_nth_repeat_undefined_1_ko (Alt-Ergo) (Cached)
 [wp] [Valid] typed_check_lemma_repeat1_ok (Qed)
 [wp] [Valid] typed_check_lemma_repeat2_ok (Qed)
 [wp] [Valid] typed_check_lemma_repeat_nil_ok (Qed)
@@ -29,8 +29,8 @@
 [wp] [Valid] typed_check_lemma_right_unfold_repeat2_ok (Qed)
 [wp] [Valid] typed_check_lemma_subsequence1_ok (Qed)
 [wp] Proved goals:   25 / 26
-  Qed:            22 
-  Alt-Ergo:        3  (unsuccess: 1)
+  Qed:            22
+  Alt-Ergo:        3
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Axiomatic Equality       13        -       13       100%

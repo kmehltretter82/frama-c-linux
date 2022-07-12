@@ -19,11 +19,11 @@
 [wp] [Valid] typed_definition_assigns (Qed)
 [wp] [Valid] typed_call_declaration_terminates (Qed)
 [wp] [Valid] typed_call_definition_terminates (Qed)
-[wp] [Unknown] typed_no_spec_generates_goal_terminates (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_no_spec_generates_goal_terminates (Alt-Ergo) (Cached)
 [wp] [Valid] typed_libc_call_terminates (Qed)
 [wp] Proved goals:    5 / 6
-  Qed:             4 
-  Alt-Ergo:        0  (unsuccess: 1)
+  Terminating:     1
+  Qed:             4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   definition                1        -        1       100%

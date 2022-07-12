@@ -27,13 +27,13 @@
 [wp] [Valid] typed_NESTED_ARRAY_STATIC_assigns_normal (Qed)
 [wp] [Valid] typed_NESTED_ARRAY_VARS_assigns_exit (Alt-Ergo) (Cached)
 [wp] [Valid] typed_NESTED_ARRAY_VARS_assigns_normal (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_RANGE_NESTED_ARRAY_STATIC_assigns_exit (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_RANGE_NESTED_ARRAY_STATIC_assigns_normal (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_RANGE_NESTED_ARRAY_VARS_assigns_exit (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_RANGE_NESTED_ARRAY_VARS_assigns_normal (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_RANGE_NESTED_ARRAY_STATIC_assigns_exit (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_RANGE_NESTED_ARRAY_STATIC_assigns_normal (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_RANGE_NESTED_ARRAY_VARS_assigns_exit (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_RANGE_NESTED_ARRAY_VARS_assigns_normal (Alt-Ergo) (Cached)
 [wp] Proved goals:   24 / 28
-  Qed:            16 
-  Alt-Ergo:        8  (unsuccess: 4)
+  Qed:            16
+  Alt-Ergo:        8
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   NO_UNFOLD_OK_1            2        -        2       100%

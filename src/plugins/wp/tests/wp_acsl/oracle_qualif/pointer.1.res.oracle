@@ -8,15 +8,14 @@
 [wp] [Valid] typed_array_ensures_Lt (Qed)
 [wp] [Valid] typed_array_ensures_Le (Qed)
 [wp] [Valid] typed_array_ensures_Eq (Qed)
-[wp] [Timeout] typed_pointer_ensures_qed_ko_Le_oracle_ko (Alt-Ergo) (Cached)
-[wp] [Unknown] typed_pointer_ensures_qed_ko_Eq_oracle_ko (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_mixed_array_pointer_ensures_qed_ko_Le_oracle_ko (Alt-Ergo) (Cached) (Stronger)
-[wp] [Unknown] typed_mixed_array_pointer_ensures_qed_ko_Lt_oracle_ko (Alt-Ergo) (Cached) (Stronger)
-[wp] [Timeout] typed_absurd_ensures_qed_ko_Base_oracle_ko (Alt-Ergo) (Cached)
-[wp] [Unknown] typed_absurd_ensures_qed_ko_Comp_oracle_ko (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_pointer_ensures_qed_ko_Le_oracle_ko (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_pointer_ensures_qed_ko_Eq_oracle_ko (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_mixed_array_pointer_ensures_qed_ko_Le_oracle_ko (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_mixed_array_pointer_ensures_qed_ko_Lt_oracle_ko (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_absurd_ensures_qed_ko_Base_oracle_ko (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_absurd_ensures_qed_ko_Comp_oracle_ko (Alt-Ergo) (Cached)
 [wp] Proved goals:    3 / 9
-  Qed:             3 
-  Alt-Ergo:        0  (unsuccess: 6)
+  Qed:             3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   array                     3        -        3       100%

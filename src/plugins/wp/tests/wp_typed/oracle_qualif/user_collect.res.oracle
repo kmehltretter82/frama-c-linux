@@ -36,7 +36,7 @@
 [wp] [Valid] typed_caller3_call_job3_requires (Qed)
 [wp] [Valid] typed_caller3_call_job3_2_requires (Qed)
 [wp] Proved goals:   32 / 32
-  Qed:            23 
+  Qed:            23
   Alt-Ergo:        9
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

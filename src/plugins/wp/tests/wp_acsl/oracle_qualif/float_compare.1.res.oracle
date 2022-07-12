@@ -23,7 +23,7 @@
 [wp] [Valid] typed_real_cmp_fnan_ensures_POS (Qed)
 [wp] [Valid] typed_real_cmp_fnan_ensures_NEG (Qed)
 [wp] Proved goals:   19 / 19
-  Qed:            15 
+  Qed:            15
   Alt-Ergo:        4
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success

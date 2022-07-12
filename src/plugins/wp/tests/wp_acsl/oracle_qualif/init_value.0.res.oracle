@@ -28,7 +28,7 @@
 [wp] [Valid] typed_fa3_ensures_qed_ok (Qed)
 [wp] [Valid] typed_fs1_ensures_qed_ok (Alt-Ergo) (Cached)
 [wp] Proved goals:   24 / 24
-  Qed:            19 
+  Qed:            19
   Alt-Ergo:        5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

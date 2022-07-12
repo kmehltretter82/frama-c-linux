@@ -11,7 +11,7 @@
 [wp] [Valid] typed_main_call_swap_requires (Qed)
 [wp] [Valid] typed_main_call_swap_requires_2 (Qed)
 [wp] Proved goals:    7 / 7
-  Qed:             6 
+  Qed:             6
   Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

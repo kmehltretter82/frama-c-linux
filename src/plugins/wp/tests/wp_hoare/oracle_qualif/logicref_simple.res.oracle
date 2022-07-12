@@ -13,7 +13,7 @@
 [wp] [Valid] typed_ref_fvpositive_assert_OK (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ref_fvpositive_assigns (Qed)
 [wp] Proved goals:    9 / 9
-  Qed:             5 
+  Qed:             5
   Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

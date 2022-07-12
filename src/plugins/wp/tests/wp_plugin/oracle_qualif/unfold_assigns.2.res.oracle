@@ -23,17 +23,17 @@
 [wp] [Valid] typed_PARTIAL_ASSIGNS_STATIC_assigns_normal (Alt-Ergo) (Cached)
 [wp] [Valid] typed_PARTIAL_ASSIGNS_VARS_assigns_exit (Alt-Ergo) (Cached)
 [wp] [Valid] typed_PARTIAL_ASSIGNS_VARS_assigns_normal (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_NESTED_ARRAY_STATIC_assigns_exit (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_NESTED_ARRAY_STATIC_assigns_normal (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_NESTED_ARRAY_VARS_assigns_exit (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_NESTED_ARRAY_VARS_assigns_normal (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_RANGE_NESTED_ARRAY_STATIC_assigns_exit (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_RANGE_NESTED_ARRAY_STATIC_assigns_normal (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_RANGE_NESTED_ARRAY_VARS_assigns_exit (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_RANGE_NESTED_ARRAY_VARS_assigns_normal (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_NESTED_ARRAY_STATIC_assigns_exit (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_NESTED_ARRAY_STATIC_assigns_normal (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_NESTED_ARRAY_VARS_assigns_exit (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_NESTED_ARRAY_VARS_assigns_normal (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_RANGE_NESTED_ARRAY_STATIC_assigns_exit (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_RANGE_NESTED_ARRAY_STATIC_assigns_normal (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_RANGE_NESTED_ARRAY_VARS_assigns_exit (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_RANGE_NESTED_ARRAY_VARS_assigns_normal (Alt-Ergo) (Cached)
 [wp] Proved goals:   20 / 28
-  Qed:            14 
-  Alt-Ergo:        6  (unsuccess: 8)
+  Qed:            14
+  Alt-Ergo:        6
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   NO_UNFOLD_OK_1            2        -        2       100%

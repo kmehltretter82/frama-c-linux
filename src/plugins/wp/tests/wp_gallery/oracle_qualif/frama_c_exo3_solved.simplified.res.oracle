@@ -30,7 +30,7 @@
 [wp] [Valid] typed_pair_no_pair_ensures (Alt-Ergo) (Cached)
 [wp] [Valid] typed_pair_has_pair_ensures (Alt-Ergo) (Cached)
 [wp] Proved goals:   26 / 26
-  Qed:            18 
+  Qed:            18
   Alt-Ergo:        8
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
@@ -49,7 +49,7 @@
 [wp] [Valid] typed_pair_assert_rte_index_bound_6 (Qed)
 [wp] [Valid] typed_pair_assert_rte_signed_overflow_2 (Qed)
 [wp] Proved goals:    9 / 9
-  Qed:             6 
+  Qed:             6
   Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

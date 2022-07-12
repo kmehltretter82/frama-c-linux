@@ -8,7 +8,7 @@
 [wp] [Valid] typed_call_ensures_part1 (Qed)
 [wp] [Valid] typed_call_ensures_part2 (Qed)
 [wp] [Valid] typed_call_call_f1_requires (Alt-Ergo) (Cached)
-[wp] [Unknown] typed_behavior_call_point_h1_h2_s15 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_behavior_call_point_h1_h2_s15 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_behavior_call_point_h1_h2_s15 (Qed)
 [wp] [Valid] typed_behavior_bhv1_ensures_part1 (Qed)
 [wp] [Valid] typed_behavior_bhv1_ensures_part2 (Qed)
@@ -42,7 +42,7 @@
 [wp] [Valid] typed_some_behaviors_bhv0_assigns_normal_part4 (Qed)
 [wp] [Valid] typed_some_behaviors_bhv0_assigns_normal_part5 (Qed)
 [wp] [Valid] typed_some_behaviors_bhv0_assigns_normal_part6 (Qed)
-[wp] [Unknown] typed_missing_context_call_point_h1_s25 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_missing_context_call_point_h1_s25 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_missing_context_ensures (Qed)
 [wp] [Valid] typed_missing_context_assigns_exit (Qed)
 [wp] [Valid] typed_missing_context_assigns_normal_part1 (Qed)
@@ -52,8 +52,8 @@
 [wp] [Valid] typed_no_call_ensures_part2 (Qed)
 [wp] [Valid] typed_no_call_call_unreachable_g_requires (Qed)
 [wp] Proved goals:   45 / 47
-  Qed:            43 
-  Alt-Ergo:        2  (unsuccess: 2)
+  Qed:            43
+  Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   call                      2        2        4       100%

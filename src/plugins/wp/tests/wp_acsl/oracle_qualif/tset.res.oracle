@@ -7,7 +7,7 @@
 [wp] [Valid] typed_lemma_UNION_LIFT (Qed)
 [wp] [Valid] typed_lemma_UNION_RANGE (Alt-Ergo) (Cached)
 [wp] Proved goals:    4 / 4
-  Qed:             2 
+  Qed:             2
   Alt-Ergo:        2
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success

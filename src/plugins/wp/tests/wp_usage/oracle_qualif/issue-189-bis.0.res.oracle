@@ -34,7 +34,7 @@
 [wp] [Valid] typed_memcpy_context_vars_loop_assigns_part4 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_memcpy_context_vars_assigns (Qed)
 [wp] Proved goals:   30 / 30
-  Qed:            20 
+  Qed:            20
   Alt-Ergo:       10
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

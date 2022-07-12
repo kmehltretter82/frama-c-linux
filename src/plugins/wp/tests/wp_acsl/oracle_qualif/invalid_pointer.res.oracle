@@ -25,7 +25,7 @@
 [wp] [Valid] typed_compound_check_G2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_compound_check_AM (Qed)
 [wp] Proved goals:   20 / 20
-  Qed:            10 
+  Qed:            10
   Alt-Ergo:       10
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

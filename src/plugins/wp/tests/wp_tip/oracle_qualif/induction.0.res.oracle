@@ -4,7 +4,6 @@
 [wp] 1 goal scheduled
 [wp] [Valid] typed_lemma_ByInd (Script) (Alt-Ergo 3/3) (Cached)
 [wp] Proved goals:    1 / 1
-  Qed:             0 
   Script:          1
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success

@@ -11,10 +11,10 @@
 [wp] [Valid] typed_init_loop_assigns_part1 (Qed)
 [wp] [Valid] typed_init_loop_assigns_part2 (Qed)
 [wp] [Valid] typed_init_loop_assigns_part3 (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_init_assigns (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_init_assigns (Alt-Ergo) (Cached)
 [wp] Proved goals:    8 / 9
-  Qed:             3 
-  Alt-Ergo:        5  (unsuccess: 1)
+  Qed:             3
+  Alt-Ergo:        5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   init                      3        5        9      88.9%

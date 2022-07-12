@@ -45,7 +45,7 @@
 [wp] [Valid] typed_iter_ptr_loop_variant_decrease (Qed)
 [wp] [Valid] typed_iter_ptr_loop_variant_positive (Alt-Ergo) (Cached)
 [wp] Proved goals:   41 / 41
-  Qed:            15 
+  Qed:            15
   Alt-Ergo:       26
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
@@ -62,7 +62,7 @@
 [wp] [Valid] typed_find_assert_rte_signed_overflow (Qed)
 [wp] [Valid] typed_find_ptr_assert_rte_mem_access (Alt-Ergo) (Cached)
 [wp] Proved goals:    3 / 3
-  Qed:             1 
+  Qed:             1
   Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

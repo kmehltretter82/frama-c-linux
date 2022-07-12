@@ -44,7 +44,7 @@
 [wp] [Valid] typed_issue_751_call_checks_4_requires_strict_pos_min (Alt-Ergo) (Cached)
 [wp] [Valid] typed_issue_751_call_checks_4_requires_strict_neg_min (Qed)
 [wp] Proved goals:   40 / 40
-  Qed:            27 
+  Qed:            27
   Alt-Ergo:       13
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

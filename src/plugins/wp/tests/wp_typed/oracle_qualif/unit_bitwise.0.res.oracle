@@ -65,7 +65,7 @@
 [wp] [Valid] typed_cast_assert_ok_6 (Qed)
 [wp] [Valid] typed_cast_assert_ok_7 (Qed)
 [wp] Proved goals:   61 / 61
-  Qed:            45 
+  Qed:            45
   Alt-Ergo:       16
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success

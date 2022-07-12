@@ -11,27 +11,28 @@
 [wp] terminates_formulae.i:90: Warning: 
   No 'decreases' clause on recursive function 'no_decreases', cannot prove termination
 [wp] 18 goals scheduled
-[wp] [Timeout] typed_base_call_terminates (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_base_call_terminates (Alt-Ergo) (Cached)
 [wp] [Valid] typed_call_same_terminates (Qed)
-[wp] [Timeout] typed_call_change_terminates (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_call_change_terminates (Alt-Ergo) (Cached)
 [wp] [Valid] typed_call_param_same_terminates (Qed)
-[wp] [Timeout] typed_call_param_change_terminates (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_call_param_change_terminates (Alt-Ergo) (Cached)
 [wp] [Valid] typed_variant_loop_assigns (Qed)
 [wp] [Valid] typed_variant_loop_variant_decrease (Alt-Ergo) (Cached)
 [wp] [Valid] typed_variant_loop_variant_positive (Qed)
 [wp] [Valid] typed_general_variant_loop_assigns (Qed)
 [wp] [Valid] typed_general_variant_loop_variant_relation (Alt-Ergo) (Cached)
-[wp] [Unknown] typed_no_variant_terminates (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_no_variant_terminates (Alt-Ergo) (Cached)
 [wp] [Valid] typed_no_variant_loop_assigns (Qed)
 [wp] [Valid] typed_decreases_terminates (Qed)
 [wp] [Valid] typed_decreases_variant (Alt-Ergo) (Cached)
 [wp] [Valid] typed_general_decreases_terminates (Qed)
 [wp] [Valid] typed_general_decreases_variant (Alt-Ergo) (Cached)
 [wp] [Valid] typed_no_decreases_terminates_part1 (Qed)
-[wp] [Unknown] typed_no_decreases_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_no_decreases_terminates_part2 (Alt-Ergo) (Cached)
 [wp] Proved goals:   15 / 20
-  Qed:             9 
-  Alt-Ergo:        4  (unsuccess: 5)
+  Terminating:     2
+  Qed:             9
+  Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   base_call                 -        -        1       0.0%

@@ -10,7 +10,7 @@
 [wp] [Valid] typed_ref_global_frame_assert_ok (Qed)
 [wp] [Valid] typed_ref_global_frame_assert_ok_2 (Qed)
 [wp] Proved goals:    6 / 6
-  Qed:             5 
+  Qed:             5
   Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

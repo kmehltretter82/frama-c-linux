@@ -9,10 +9,10 @@
 [wp] [Valid] typed_f_ensures_Q_NotWrite (Qed)
 [wp] [Valid] typed_g_ensures_P_not_Const (Qed)
 [wp] [Valid] typed_g_assert_Read (Alt-Ergo) (Cached)
-[wp] [Unknown] typed_g_assert_Guard_against_Const (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_g_assert_Guard_against_Const (Alt-Ergo) (Cached)
 [wp] Proved goals:    6 / 7
-  Qed:             4 
-  Alt-Ergo:        2  (unsuccess: 1)
+  Qed:             4
+  Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         3        1        4       100%

@@ -5,16 +5,16 @@
 [wp] 9 goals scheduled
 [wp] [Valid] typed_l_int_assert_SUCCS (Qed)
 [wp] [Valid] typed_l_int_assert_SUCCS_2 (Qed)
-[wp] [Unknown] typed_l_int_check_FAILS (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_l_int_check_FAILS (Alt-Ergo) (Cached)
 [wp] [Valid] typed_l_array_assert_SUCCS (Alt-Ergo) (Cached)
 [wp] [Valid] typed_l_array_assert_SUCCS_2 (Alt-Ergo) (Cached)
-[wp] [Unknown] typed_l_array_check_FAILS (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_l_array_check_FAILS (Alt-Ergo) (Cached)
 [wp] [Valid] typed_l_struct_assert_SUCCS (Qed)
 [wp] [Valid] typed_l_struct_assert_SUCCS_2 (Qed)
-[wp] [Unknown] typed_l_struct_check_FAILS (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_l_struct_check_FAILS (Alt-Ergo) (Cached)
 [wp] Proved goals:    6 / 9
-  Qed:             4 
-  Alt-Ergo:        2  (unsuccess: 3)
+  Qed:             4
+  Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   l_int                     2        -        3      66.7%

@@ -11,7 +11,7 @@
 [wp] [Valid] typed_bxor_bool_true_ensures (Qed)
 [wp] [Valid] typed_bxor_bool_false_ensures (Alt-Ergo) (Cached)
 [wp] Proved goals:    7 / 7
-  Qed:             2 
+  Qed:             2
   Alt-Ergo:        5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

@@ -11,13 +11,12 @@
 [wp] [Valid] typed_f3_ok_assigns_normal (Qed)
 [wp] [Valid] typed_f4_ok_assigns_exit (Qed)
 [wp] [Valid] typed_f4_ok_assigns_normal (Qed)
-[wp] [Timeout] typed_f5_ko_assigns_exit (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_f5_ko_assigns_normal (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_f6_ko_assigns_exit (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_f6_ko_assigns_normal (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_f5_ko_assigns_exit (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_f5_ko_assigns_normal (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_f6_ko_assigns_exit (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_f6_ko_assigns_normal (Alt-Ergo) (Cached)
 [wp] Proved goals:    8 / 12
-  Qed:             8 
-  Alt-Ergo:        0  (unsuccess: 4)
+  Qed:             8
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f1_ok                     2        -        2       100%

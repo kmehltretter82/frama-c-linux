@@ -15,7 +15,6 @@
 [wp] [Valid] typed_double_convertible_check_3 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_double_convertible_check_4 (Alt-Ergo) (Cached)
 [wp] Proved goals:    8 / 8
-  Qed:             0 
   Alt-Ergo:        8
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

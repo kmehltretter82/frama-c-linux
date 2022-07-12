@@ -43,7 +43,7 @@
 [wp] [Valid] typed_caveat_loops_g_not_called_ensures_ok_v1 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_caveat_loops_g_not_called_ensures_ok_v2 (Alt-Ergo) (Cached)
 [wp] Proved goals:   39 / 39
-  Qed:            28 
+  Qed:            28
   Alt-Ergo:       11
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

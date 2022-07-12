@@ -32,23 +32,23 @@
 [wp] [Valid] typed_main_requires_qed_ok_2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_main_requires_qed_ok_3 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_main_requires_qed_ok_4 (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_main_requires_qed_ok_5 (Alt-Ergo) (Cached) (Stronger)
-[wp] [Timeout] typed_main_requires_qed_ok_6 (Alt-Ergo) (Cached) (Stronger)
-[wp] [Timeout] typed_main_requires_qed_ok_7 (Alt-Ergo) (Cached) (Stronger)
-[wp] [Unknown] typed_main_requires_qed_ok_8 (Alt-Ergo) (Cached) (Stronger)
-[wp] [Unknown] typed_main_requires_qed_ok_9 (Alt-Ergo) (Cached) (Stronger)
-[wp] [Unknown] typed_main_requires_qed_ok_10 (Alt-Ergo) (Cached) (Stronger)
-[wp] [Timeout] typed_main_requires_qed_ok_11 (Alt-Ergo) (Cached) (Stronger)
-[wp] [Timeout] typed_main_requires_qed_ok_12 (Alt-Ergo) (Cached) (Stronger)
-[wp] [Timeout] typed_main_requires_qed_ok_13 (Alt-Ergo) (Cached) (Stronger)
-[wp] [Unknown] typed_main_requires_qed_ok_14 (Alt-Ergo) (Cached) (Stronger)
-[wp] [Unknown] typed_main_requires_qed_ok_15 (Alt-Ergo) (Cached) (Stronger)
-[wp] [Unknown] typed_main_requires_qed_ok_16 (Alt-Ergo) (Cached) (Stronger)
-[wp] [Timeout] typed_main_requires_qed_ok_17 (Alt-Ergo) (Cached) (Stronger)
-[wp] [Timeout] typed_main_requires_qed_ok_18 (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_main_requires_qed_ok_5 (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_main_requires_qed_ok_6 (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_main_requires_qed_ok_7 (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_main_requires_qed_ok_8 (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_main_requires_qed_ok_9 (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_main_requires_qed_ok_10 (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_main_requires_qed_ok_11 (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_main_requires_qed_ok_12 (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_main_requires_qed_ok_13 (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_main_requires_qed_ok_14 (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_main_requires_qed_ok_15 (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_main_requires_qed_ok_16 (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_main_requires_qed_ok_17 (Alt-Ergo) (Cached) (Stronger)
+[wp] [Unsuccess] typed_main_requires_qed_ok_18 (Alt-Ergo) (Cached) (Stronger)
 [wp] Proved goals:    7 / 21
-  Qed:             3 
-  Alt-Ergo:        4  (unsuccess: 14)
+  Qed:             3
+  Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   h                         2        1        3       100%

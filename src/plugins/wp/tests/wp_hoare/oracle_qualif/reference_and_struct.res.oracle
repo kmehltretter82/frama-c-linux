@@ -36,7 +36,7 @@
 [wp] [Valid] typed_ref_call_array_in_struct_param_assigns_normal (Qed)
 [wp] [Valid] typed_ref_call_array_in_struct_param_call_load_5_requires (Qed)
 [wp] Proved goals:   32 / 32
-  Qed:            27 
+  Qed:            27
   Alt-Ergo:        5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

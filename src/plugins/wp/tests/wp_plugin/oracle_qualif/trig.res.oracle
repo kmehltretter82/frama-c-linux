@@ -5,11 +5,11 @@
 [wp] 4 goals scheduled
 [wp] [Valid] typed_foo_assert_ok_S (Alt-Ergo) (Cached)
 [wp] [Valid] typed_foo_assert_ok_A (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_foo_assert_ok_B (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_foo_assert_ok_B (Alt-Ergo) (Cached)
 [wp] [Valid] typed_foo_call_fconcat_requires_qed_ok (Qed)
 [wp] Proved goals:    3 / 4
-  Qed:             1 
-  Alt-Ergo:        2  (unsuccess: 1)
+  Qed:             1
+  Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   foo                       1        2        4      75.0%

@@ -43,7 +43,7 @@
 [wp] [Valid] typed_function_loop_variant_decrease (Qed)
 [wp] [Valid] typed_function_loop_variant_positive (Qed)
 [wp] Proved goals:   39 / 39
-  Qed:            22 
+  Qed:            22
   Alt-Ergo:       17
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

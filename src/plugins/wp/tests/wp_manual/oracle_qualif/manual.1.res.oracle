@@ -14,7 +14,7 @@
 [wp] [Valid] typed_swap_assigns_part1 (Qed)
 [wp] [Valid] typed_swap_assigns_part2 (Qed)
 [wp] Proved goals:    8 / 8
-  Qed:             5 
+  Qed:             5
   Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

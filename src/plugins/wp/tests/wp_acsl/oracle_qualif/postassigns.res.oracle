@@ -31,7 +31,7 @@
 [wp] [Valid] typed_job3_assigns_part1 (Qed)
 [wp] [Valid] typed_job3_assigns_part2 (Qed)
 [wp] Proved goals:   27 / 27
-  Qed:            24 
+  Qed:            24
   Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

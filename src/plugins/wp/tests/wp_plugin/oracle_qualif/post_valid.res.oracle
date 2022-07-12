@@ -4,11 +4,10 @@
 [wp] Warning: Missing RTE guards
 [wp] 3 goals scheduled
 [wp] [Valid] typed_job_ensures_LOCAL (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_job_ensures_FORMAL (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_job_ensures_FORMAL (Alt-Ergo) (Cached)
 [wp] [Valid] typed_job_ensures_GLOBAL (Alt-Ergo) (Cached)
 [wp] Proved goals:    2 / 3
-  Qed:             0 
-  Alt-Ergo:        2  (unsuccess: 1)
+  Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   job                       -        2        3      66.7%

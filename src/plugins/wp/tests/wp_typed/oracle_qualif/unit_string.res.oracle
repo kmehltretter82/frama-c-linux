@@ -10,7 +10,6 @@
 [wp] [Valid] typed_f_assert_B_rw (Alt-Ergo) (Cached)
 [wp] [Valid] typed_f_assert_VAL (Alt-Ergo) (Cached)
 [wp] Proved goals:    6 / 6
-  Qed:             0 
   Alt-Ergo:        6
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

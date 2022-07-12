@@ -6,10 +6,9 @@
 [wp] [Valid] typed_validA_assert_OK (Qed)
 [wp] [Valid] typed_validA_assert_OK_2 (Qed)
 [wp] [Valid] typed_validB_assert_OK (Qed)
-[wp] [Unknown] typed_validB_assert_KO (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_validB_assert_KO (Alt-Ergo) (Cached)
 [wp] Proved goals:    3 / 4
-  Qed:             3 
-  Alt-Ergo:        0  (unsuccess: 1)
+  Qed:             3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   validA                    2        -        2       100%

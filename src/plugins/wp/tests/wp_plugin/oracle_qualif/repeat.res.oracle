@@ -52,7 +52,7 @@
 [wp] [Valid] typed_shifted_assigns_normal_part1 (Qed)
 [wp] [Valid] typed_shifted_assigns_normal_part2 (Qed)
 [wp] Proved goals:   47 / 47
-  Qed:            44 
+  Qed:            44
   Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

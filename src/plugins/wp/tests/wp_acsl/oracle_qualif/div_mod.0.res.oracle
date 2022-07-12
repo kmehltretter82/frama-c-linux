@@ -26,7 +26,6 @@
 [wp] [Valid] typed_f_ensures_sm2_mod_pos_neg (Alt-Ergo) (Cached)
 [wp] [Valid] typed_f_ensures_sm3_mod_neg_neg (Alt-Ergo) (Cached)
 [wp] Proved goals:   22 / 22
-  Qed:             0 
   Alt-Ergo:       22
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

@@ -31,21 +31,22 @@
 [wp] [Valid] typed_simpl_r_terminates (Qed)
 [wp] [Valid] typed_simpl_r_variant (Alt-Ergo) (Cached)
 [wp] [Valid] typed_simpl_rf_terminates_part1 (Qed)
-[wp] [Unknown] typed_simpl_rf_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_simpl_rf_terminates_part2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_mutual_1_terminates_part1 (Qed)
-[wp] [Unknown] typed_mutual_1_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_mutual_1_terminates_part2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_mutual_2_terminates (Qed)
-[wp] [Timeout] typed_mutual_2_variant (Alt-Ergo) (Cached) (Degenerated)
+[wp] [Unsuccess] typed_mutual_2_variant (Alt-Ergo) (Cached) (Degenerated)
 [wp] [Valid] typed_caller_no_cluster_terminates (Qed)
 [wp] [Valid] typed_fp_call_point_function_s41 (Qed)
 [wp] [Valid] typed_fp_terminates_part1 (Qed)
-[wp] [Unknown] typed_fp_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_fp_terminates_part2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_function_terminates (Qed)
-[wp] [Timeout] typed_function_variant (Alt-Ergo) (Cached) (Degenerated)
+[wp] [Unsuccess] typed_function_variant (Alt-Ergo) (Cached) (Degenerated)
 [wp] [Valid] typed_function_call_fp_requires (Qed)
 [wp] Proved goals:   11 / 16
-  Qed:             9 
-  Alt-Ergo:        1  (unsuccess: 5)
+  Terminating:     1
+  Qed:             9
+  Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   simpl_r                   1        1        2       100%

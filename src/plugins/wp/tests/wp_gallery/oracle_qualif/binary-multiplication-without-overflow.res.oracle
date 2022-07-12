@@ -20,7 +20,7 @@
 [wp] [Valid] typed_BinaryMultiplication_loop_variant_decrease (Alt-Ergo) (Cached)
 [wp] [Valid] typed_BinaryMultiplication_loop_variant_positive (Qed)
 [wp] Proved goals:   16 / 16
-  Qed:             5 
+  Qed:             5
   Alt-Ergo:       11
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success

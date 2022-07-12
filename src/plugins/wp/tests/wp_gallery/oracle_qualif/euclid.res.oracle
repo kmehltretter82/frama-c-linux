@@ -3,11 +3,11 @@
 [wp] Running WP plugin...
 [rte:annot] annotating function euclid_gcd
 [wp] 16 goals scheduled
-[wp] [Passed (Timeout)] typed_euclid_euclid_gcd_wp_smoke_default_requires (Alt-Ergo) (Cached)
-[wp] [Passed (Timeout)] typed_euclid_euclid_gcd_wp_smoke_dead_loop_s1 (Alt-Ergo) (Cached)
-[wp] [Passed (Timeout)] typed_euclid_euclid_gcd_wp_smoke_dead_code_s6 (Alt-Ergo) (Cached)
-[wp] [Passed (Timeout)] typed_euclid_euclid_gcd_wp_smoke_dead_code_s11 (Alt-Ergo) (Cached)
-[wp] [Passed (Timeout)] typed_euclid_euclid_gcd_wp_smoke_dead_code_s12 (Alt-Ergo) (Cached)
+[wp] [Passed] (Unsuccess) typed_euclid_euclid_gcd_wp_smoke_default_requires (Alt-Ergo) (Cached)
+[wp] [Passed] (Unsuccess) typed_euclid_euclid_gcd_wp_smoke_dead_loop_s1 (Alt-Ergo) (Cached)
+[wp] [Passed] (Unsuccess) typed_euclid_euclid_gcd_wp_smoke_dead_code_s6 (Alt-Ergo) (Cached)
+[wp] [Passed] (Unsuccess) typed_euclid_euclid_gcd_wp_smoke_dead_code_s11 (Alt-Ergo) (Cached)
+[wp] [Passed] (Unsuccess) typed_euclid_euclid_gcd_wp_smoke_dead_code_s12 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_euclid_euclid_gcd_ensures (Alt-Ergo) (Cached)
 [wp] [Valid] typed_euclid_euclid_gcd_loop_invariant_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_euclid_euclid_gcd_loop_invariant_established (Qed)
@@ -20,7 +20,7 @@
 [wp] [Valid] typed_euclid_euclid_gcd_loop_variant_decrease (Alt-Ergo) (Cached)
 [wp] [Valid] typed_euclid_euclid_gcd_loop_variant_positive (Qed)
 [wp] Proved goals:   16 / 16
-  Qed:             7 
+  Qed:             7
   Alt-Ergo:        9
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

@@ -32,7 +32,8 @@
 [wp] [Valid] typed_trivial_variant_default_loop_variant_decrease (Qed)
 [wp] [Valid] typed_trivial_variant_default_loop_variant_positive (Qed)
 [wp] Proved goals:   24 / 24
-  Qed:            17 
+  Terminating:     4
+  Qed:            17
   Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

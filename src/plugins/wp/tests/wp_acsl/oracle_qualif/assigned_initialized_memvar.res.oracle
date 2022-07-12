@@ -12,11 +12,11 @@
 [wp] [Valid] typed_range_check_CHECK (Qed)
 [wp] [Valid] typed_range_loop_assigns_part1 (Qed)
 [wp] [Valid] typed_range_loop_assigns_part2 (Qed)
-[wp] [Timeout] typed_field_check_FAILS (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_field_check_FAILS (Alt-Ergo) (Cached)
 [wp] [Valid] typed_field_loop_assigns (Qed)
-[wp] [Timeout] typed_array_check_FAILS (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_array_check_FAILS (Alt-Ergo) (Cached)
 [wp] [Valid] typed_array_loop_assigns (Qed)
-[wp] [Timeout] typed_index_check_FAILS (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_index_check_FAILS (Alt-Ergo) (Cached)
 [wp] [Valid] typed_index_loop_assigns_part1 (Qed)
 [wp] [Valid] typed_index_loop_assigns_part2 (Qed)
 [wp] [Valid] typed_descr_loop_invariant_CHECK_preserved (Alt-Ergo) (Cached)
@@ -27,11 +27,11 @@
 [wp] [Valid] typed_descr_loop_assigns_part3 (Qed)
 [wp] [Valid] typed_descr_loop_assigns_part4 (Qed)
 [wp] [Valid] typed_descr_loop_assigns_part5 (Qed)
-[wp] [Timeout] typed_comp_check_FAILS (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_comp_check_FAILS (Alt-Ergo) (Cached)
 [wp] [Valid] typed_comp_loop_assigns (Qed)
 [wp] Proved goals:   22 / 26
-  Qed:            15 
-  Alt-Ergo:        7  (unsuccess: 4)
+  Qed:            15
+  Alt-Ergo:        7
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   initialize                2        2        4       100%

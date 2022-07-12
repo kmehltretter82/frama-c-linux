@@ -6,7 +6,6 @@
 [wp] [Valid] typed_foo_assert_A (Alt-Ergo) (Cached)
 [wp] [Valid] typed_foo_assert_B (Alt-Ergo)
 [wp] Proved goals:    2 / 2
-  Qed:             0 
   Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

@@ -12,7 +12,7 @@
 [wp] [Valid] typed_copy_loop_assigns_part2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_copy_assigns (Qed)
 [wp] Proved goals:    8 / 8
-  Qed:             4 
+  Qed:             4
   Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

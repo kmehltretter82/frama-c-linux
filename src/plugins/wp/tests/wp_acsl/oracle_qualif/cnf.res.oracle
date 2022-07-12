@@ -298,7 +298,7 @@
 [wp:cnf] CNF=P_C /\ ((not P_B) \/ P_C) /\ ((not P_A) \/ (not P_B) \/ P_C)
 [wp] [Valid] typed_f_ensures_e2 (Alt-Ergo) (Cached)
 [wp] Proved goals:   43 / 43
-  Qed:            12 
+  Qed:            12
   Alt-Ergo:       31
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

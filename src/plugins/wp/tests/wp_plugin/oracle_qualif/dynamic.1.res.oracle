@@ -9,7 +9,7 @@
 [wp] [Valid] typed_guarded_call_ensures_2_part1 (Qed)
 [wp] [Valid] typed_guarded_call_ensures_2_part2 (Qed)
 [wp] Proved goals:    5 / 5
-  Qed:             3 
+  Qed:             3
   Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

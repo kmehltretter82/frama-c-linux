@@ -3,12 +3,11 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 4 goals scheduled
-[wp] [Timeout] typed_band_int_assert_ko (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_bnot_uint_ensures_ko (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_bnot_uchar_ensures_ko (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_cast_assert_ko (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_band_int_assert_ko (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_bnot_uint_ensures_ko (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_bnot_uchar_ensures_ko (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_cast_assert_ko (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 4
-  Alt-Ergo:        0  (unsuccess: 4)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   band_int                  -        -        1       0.0%

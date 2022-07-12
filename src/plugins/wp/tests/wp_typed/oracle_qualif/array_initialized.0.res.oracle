@@ -10,7 +10,7 @@
 [wp] [Valid] typed_main_pointer_assert (Alt-Ergo) (Cached)
 [wp] [Valid] typed_simpl_ensures (Alt-Ergo) (Cached)
 [wp] Proved goals:    5 / 5
-  Qed:             1 
+  Qed:             1
   Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

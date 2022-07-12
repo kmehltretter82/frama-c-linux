@@ -52,6 +52,8 @@ val pp_stats : shell:bool -> updating:bool -> Format.formatter -> stats -> unit
 val pretty : Format.formatter -> stats -> unit
 
 val empty : stats
+val add : stats -> stats -> stats
+
 val results : smoke:bool -> (VCS.prover * VCS.result) list -> stats
 val tactical : qed:float -> stats list -> stats
 val script : stats -> VCS.result

@@ -7,7 +7,7 @@
 [wp] [Valid] typed_f_ensures_STRUCT (Qed)
 [wp] [Valid] typed_f_ensures_INDIRP (Alt-Ergo) (Cached)
 [wp] Proved goals:    3 / 3
-  Qed:             2 
+  Qed:             2
   Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

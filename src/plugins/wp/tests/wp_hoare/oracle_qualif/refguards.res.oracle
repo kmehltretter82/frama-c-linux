@@ -11,10 +11,10 @@
 [wp] [Valid] typed_ref_s_ensures_3 (Qed)
 [wp] [Valid] typed_ref_s_ensures_4 (Qed)
 [wp] [Valid] typed_ref_s_ensures_5 (Qed)
-[wp] [Timeout] typed_ref_s_ensures_KO (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_ref_s_ensures_KO (Alt-Ergo) (Cached)
 [wp] Proved goals:    8 / 9
-  Qed:             7 
-  Alt-Ergo:        1  (unsuccess: 1)
+  Qed:             7
+  Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         1        -        1       100%

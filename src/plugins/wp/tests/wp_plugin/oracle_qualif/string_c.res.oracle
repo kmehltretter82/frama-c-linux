@@ -48,7 +48,7 @@
 [wp] [Valid] typed_memmove_loop_variant_2_decrease (Alt-Ergo) (Cached)
 [wp] [Valid] typed_memmove_loop_variant_2_positive (Qed)
 [wp] Proved goals:   44 / 44
-  Qed:            26 
+  Qed:            26
   Alt-Ergo:       18
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

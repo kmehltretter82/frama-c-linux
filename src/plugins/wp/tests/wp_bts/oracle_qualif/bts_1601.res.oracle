@@ -12,7 +12,7 @@
 [wp] [Valid] typed_foo_assert_7 (Qed)
 [wp] [Valid] typed_foo_basic_ensures (Qed)
 [wp] Proved goals:    8 / 8
-  Qed:             7 
+  Qed:             7
   Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

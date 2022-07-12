@@ -18,7 +18,7 @@
 [wp] [Valid] typed_job_struct_assigns_assert_KO_WHEN_VOLATILE (Qed) (Stronger, 4 warnings)
 [wp] [Valid] typed_default_init_check_KO_WHEN_VOLATILE (Alt-Ergo) (Cached) (Stronger)
 [wp] Proved goals:    5 / 5
-  Qed:             4 
+  Qed:             4
   Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

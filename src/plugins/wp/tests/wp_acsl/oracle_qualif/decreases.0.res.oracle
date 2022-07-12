@@ -15,34 +15,34 @@
 [wp] 27 goals scheduled
 [wp] [Valid] typed_fact_terminates (Qed)
 [wp] [Valid] typed_fact_variant (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_fails_fact_variant (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_fails_fact_variant (Alt-Ergo) (Cached)
 [wp] [Valid] typed_facto_gen_variant (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_fails_facto_gen_variant (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_fails_facto_gen_variant (Alt-Ergo) (Cached)
 [wp] [Valid] typed_fact_i_terminates_part1 (Qed)
 [wp] [Valid] typed_fact_i_terminates_part2 (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_fact_i_variant (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_fact_i_variant (Alt-Ergo) (Cached)
 [wp] [Valid] typed_fails_fact_i_terminates_part1 (Qed)
-[wp] [Timeout] typed_fails_fact_i_terminates_part2 (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_fails_fact_i_variant (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_fails_fact_i_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_fails_fact_i_variant (Alt-Ergo) (Cached)
 [wp] [Valid] typed_m2_variant_part1 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_m2_variant_part2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_m1_variant (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_missing_variant_part1 (Alt-Ergo) (Cached) (Degenerated)
+[wp] [Unsuccess] typed_missing_variant_part1 (Alt-Ergo) (Cached) (Degenerated)
 [wp] [Valid] typed_missing_variant_part2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_mt2_terminates_part1 (Qed)
 [wp] [Valid] typed_mt2_terminates_part2 (Qed)
 [wp] [Valid] typed_mt2_variant_part1 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_mt2_variant_part2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_mt1_terminates_part1 (Qed)
-[wp] [Timeout] typed_mt1_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_mt1_terminates_part2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_mt1_variant (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_mw2_variant_part1 (Alt-Ergo) (Cached) (Degenerated)
+[wp] [Unsuccess] typed_mw2_variant_part1 (Alt-Ergo) (Cached) (Degenerated)
 [wp] [Valid] typed_mw2_variant_part2 (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_mw1_variant (Alt-Ergo) (Cached) (Degenerated)
+[wp] [Unsuccess] typed_mw1_variant (Alt-Ergo) (Cached) (Degenerated)
 [wp] [Valid] typed_se_variant (Qed)
 [wp] Proved goals:   18 / 27
-  Qed:             7 
-  Alt-Ergo:       11  (unsuccess: 9)
+  Qed:             7
+  Alt-Ergo:       11
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   fact                      1        1        2       100%

@@ -22,7 +22,7 @@
 [wp] [Valid] typed_check_acsl_check_ok_C2_absurd_is_cint (Alt-Ergo) (Cached)
 [wp] [Valid] typed_check_acsl_check_ok_C5_absurd_cmp (Qed)
 [wp] Proved goals:   18 / 18
-  Qed:             9 
+  Qed:             9
   Alt-Ergo:        9
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

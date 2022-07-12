@@ -10,7 +10,7 @@
 [wp] [Valid] typed_main_ensures_P_qed_ok (Alt-Ergo) (Cached)
 [wp] [Valid] typed_main_ensures_Q_qed_ok (Alt-Ergo) (Cached)
 [wp] Proved goals:    6 / 6
-  Qed:             3 
+  Qed:             3
   Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

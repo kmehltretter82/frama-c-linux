@@ -60,7 +60,7 @@
 [wp] [Valid] typed_cast_uchar_check_bit_lsr_set_ok (Qed)
 [wp] [Valid] typed_cast_uchar_check_bit_lsr_unset_ok (Qed)
 [wp] Proved goals:   56 / 56
-  Qed:            53 
+  Qed:            53
   Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

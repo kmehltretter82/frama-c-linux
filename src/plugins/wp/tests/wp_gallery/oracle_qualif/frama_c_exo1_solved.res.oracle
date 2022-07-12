@@ -14,7 +14,7 @@
 [wp] [Valid] typed_exo1_loop_variant_decrease (Qed)
 [wp] [Valid] typed_exo1_loop_variant_positive (Qed)
 [wp] Proved goals:   10 / 10
-  Qed:             6 
+  Qed:             6
   Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
@@ -29,7 +29,7 @@
 [wp] [Valid] typed_exo1_assert_rte_signed_overflow_2 (Qed)
 [wp] [Valid] typed_exo1_assert_rte_signed_overflow_3 (Qed)
 [wp] Proved goals:    5 / 5
-  Qed:             3 
+  Qed:             3
   Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

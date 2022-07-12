@@ -58,7 +58,8 @@
 [wp] [Valid] typed_main_assigns_normal_part2 (Qed)
 [wp] [Valid] typed_main_call_stringCompare_requires_validStrings (Alt-Ergo) (Cached)
 [wp] Proved goals:   54 / 54
-  Qed:            33 
+  Unreachable:     2
+  Qed:            33
   Alt-Ergo:       19
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
@@ -80,7 +81,7 @@
 [wp] [Valid] typed_stringCompare_assert_rte_signed_overflow_2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_stringLength_assert_rte_mem_access (Alt-Ergo) (Cached)
 [wp] Proved goals:    8 / 8
-  Qed:             2 
+  Qed:             2
   Alt-Ergo:        6
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

@@ -27,9 +27,8 @@
 [wp] [Valid] typed_init_t2_bis_v2_assigns_normal_part1 (Qed)
 [wp] [Valid] typed_init_t2_bis_v2_assigns_normal_part2 (Script) (Alt-Ergo 2/2) (Cached)
 [wp] Proved goals:   23 / 23
-  Qed:            11 
-  Script:         12 
-  Alt-Ergo:        0  (unsuccess: 12)
+  Qed:            11
+  Script:         12
 [wp] Proof script for typed_init_t2_bis_v2_assigns_normal_part2:
   [ { "header": "Split", "tactic": "Wp.split", "params": {},
       "select": { "select": "clause-goal",

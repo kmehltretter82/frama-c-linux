@@ -19,7 +19,7 @@
 [wp] [Valid] typed_boolean_casts_check_b0 (Qed)
 [wp] [Valid] typed_boolean_casts_check_b1 (Qed)
 [wp] Proved goals:   15 / 15
-  Qed:            14 
+  Qed:            14
   Alt-Ergo:        1
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success

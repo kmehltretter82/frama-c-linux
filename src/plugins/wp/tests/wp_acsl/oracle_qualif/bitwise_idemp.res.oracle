@@ -3,14 +3,13 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
-[wp] [Timeout] typed_land_check_A (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_land_check_B (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_lor_check_A (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_lor_check_B (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_lxor_check_A (Alt-Ergo) (Cached)
-[wp] [Timeout] typed_lxor_check_B (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_land_check_A (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_land_check_B (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_lor_check_A (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_lor_check_B (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_lxor_check_A (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_lxor_check_B (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 6
-  Alt-Ergo:        0  (unsuccess: 6)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   land                      -        -        2       0.0%

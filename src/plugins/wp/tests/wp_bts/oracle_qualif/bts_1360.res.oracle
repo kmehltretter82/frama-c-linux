@@ -7,7 +7,7 @@
 [wp] [Valid] typed_foo_wrong_ensures (Qed)
 [wp] [Valid] typed_foo_wrong_assert_rte_mem_access (Qed)
 [wp] [Valid] typed_foo_wrong_assert_rte_mem_access_2 (Qed)
-[wp] [Timeout] typed_foo_wrong_assert_rte_mem_access_3 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_foo_wrong_assert_rte_mem_access_3 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_foo_wrong_assigns (Qed)
 [wp] [Valid] typed_foo_correct_ensures (Qed)
 [wp] [Valid] typed_foo_correct_assert_rte_mem_access (Alt-Ergo) (Cached)
@@ -15,8 +15,8 @@
 [wp] [Valid] typed_foo_correct_assert_rte_mem_access_3 (Qed)
 [wp] [Valid] typed_foo_correct_assigns (Qed)
 [wp] Proved goals:    9 / 10
-  Qed:             8 
-  Alt-Ergo:        1  (unsuccess: 1)
+  Qed:             8
+  Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   foo_wrong                 4        -        5      80.0%

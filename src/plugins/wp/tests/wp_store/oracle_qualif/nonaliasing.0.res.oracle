@@ -6,7 +6,6 @@
 [wp] [Valid] typed_f_ensures_qed_ok_P (Alt-Ergo) (Cached)
 [wp] [Valid] typed_f_ensures_qed_ok_Q (Alt-Ergo) (Cached)
 [wp] Proved goals:    2 / 2
-  Qed:             0 
   Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

@@ -17,16 +17,16 @@
 [wp] [Valid] typed_bhv_complete_neg_pos (Alt-Ergo) (Cached)
 [wp] [Valid] typed_bhv_pos_ensures_qed_ok (Qed)
 [wp] [Valid] typed_bhv_neg_ensures_qed_ok (Qed)
-[wp] [Timeout] typed_assert_needed_assert_ko (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_assert_needed_assert_ko (Alt-Ergo) (Cached)
 [wp] [Valid] typed_assert_needed_assert_qed_ok_ok_with_hyp (Qed)
-[wp] [Unknown] typed_bts0513_ensures_ko1 (Alt-Ergo) (Cached)
-[wp] [Unknown] typed_bts0513_ensures_ko2 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_bts0513_ensures_ko1 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_bts0513_ensures_ko2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_razT_loop_invariant_qed_ok_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_razT_loop_invariant_qed_ok_established (Qed)
-[wp] [Timeout] typed_razT_b1_ensures_e1 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_razT_b1_ensures_e1 (Alt-Ergo) (Cached)
 [wp] Proved goals:   15 / 19
-  Qed:            13 
-  Alt-Ergo:        2  (unsuccess: 4)
+  Qed:            13
+  Alt-Ergo:        2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         5        -        5       100%
