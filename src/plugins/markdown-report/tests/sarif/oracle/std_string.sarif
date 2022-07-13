@@ -4391,6 +4391,106 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
+          "message": {
+            "text": "behavior default! in function Frama_C_watch_cardinal."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/__fc_builtin.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 198,
+                  "startColumn": 12,
+                  "endLine": 198,
+                  "endColumn": 34,
+                  "byteLength": 22
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "assigns clause in function Frama_C_watch_cardinal."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/__fc_builtin.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 198,
+                  "startColumn": 12,
+                  "endLine": 198,
+                  "endColumn": 34,
+                  "byteLength": 22
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "behavior default! in function Frama_C_watch_value."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/__fc_builtin.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 195,
+                  "startColumn": 12,
+                  "endLine": 195,
+                  "endColumn": 31,
+                  "byteLength": 19
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "assigns clause in function Frama_C_watch_value."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/__fc_builtin.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 195,
+                  "startColumn": 12,
+                  "endLine": 195,
+                  "endColumn": 31,
+                  "byteLength": 19
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
           "message": { "text": "behavior default! in function _Exit." },
           "locations": [
             {
