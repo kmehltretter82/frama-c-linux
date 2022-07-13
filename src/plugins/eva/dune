@@ -85,6 +85,7 @@
 
 (rule
   (targets Eva.ml Eva.mli)
+  (mode (promote (only Eva.mli)))
   (deps
     gen-api.sh Eva.header
     engine/analysis.mli utils/results.mli parameters.mli utils/eva_annotations.mli eval.mli
