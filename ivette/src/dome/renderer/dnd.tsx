@@ -22,7 +22,7 @@
 
 /**
    @packageDocumentation
-   @module dome/newdnd
+   @module dome/dnd
    @description
 
    D&D Facilities
@@ -404,8 +404,8 @@ export function DragSource(props: DragSourceProps): JSX.Element {
 /** Swaps items at index i and j if they are both in range. */
 export function swap<A>(ls: A[], a: number, b: number): A[] {
   const n = ls.length;
-  if (a === b || 0 > a || a >= n || 0 > b || b >= n) return ls ;
-  const [ i, j ] = a < b ? [ a, b ] : [ b, a ] ;
+  if (a === b || 0 > a || a >= n || 0 > b || b >= n) return ls;
+  const [i, j] = a < b ? [a, b] : [b, a];
   return ls.slice(0, i).concat(ls.slice(i + 1, j + 1), ls[i], ls.slice(j + 1));
 }
 
