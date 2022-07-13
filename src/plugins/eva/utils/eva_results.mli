@@ -35,11 +35,12 @@ type results
 val get_results: unit -> results
 val set_results: results -> unit
 val merge: results -> results -> results
-val change_callstacks:
-  (Value_types.callstack -> Value_types.callstack) -> results -> results
+
 (** Change the callstacks for the results for which this is meaningful.
     For technical reasons, the top of the callstack must currently
     be preserved. *)
+val change_callstacks:
+  (Value_types.callstack -> Value_types.callstack) -> results -> results
 
 [@@@ api_end]
 
