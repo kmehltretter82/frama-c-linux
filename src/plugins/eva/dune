@@ -40,126 +40,48 @@
   (name eva)
   (optional)
   (public_name frama-c-eva.core)
-  (modules
-  abstract
-  abstract_domain
-  abstract_location
-  abstract_memory
-  abstract_offset
-  abstract_structure
-  abstract_value
-  abstractions
-  active_behaviors
-  alarmset
-  analysis
-  auto_loop_unroll
-  backward_formals
-  builtins
-  builtins_float
-  builtins_malloc
-  builtins_memory
-  builtins_misc
-  builtins_print_c
-  builtins_split
-  builtins_string
-  builtins_watchpoint
-  compute_functions
-  cvalue_backward
-  cvalue_callbacks
-  cvalue_domain
-  cvalue_forward
-  cvalue_init
-  cvalue_offsetmap
-  cvalue_specification
-  cvalue_transfer
-  domain_builder
-  domain_lift
-  domain_mode
-  domain_product
-  domain_store
-  equality
-  equality_domain
-  eva
-  eva_annotations
-  eva_audit
-  eva_dynamic
-  eva_perf
-  eva_results
-  eva_utils
-  eval
-  eval_annots
-  eval_op
-  eval_terms
-  eval_typ
-  evaluation
-  function_args
-  function_calls
-  gauges_domain
-  general_requests
-  hcexprs
-  initialization
-  inout_domain
-  iterator
-  library_functions
-  locals_scoping
-  location_lift
-  main_locations
-  main_values
-  mem_exec
-  multidim
-  multidim_domain
-  octagons
-  offsm_domain
-  offsm_value
-  parameters
-  partition
-  partitioning_index
-  partitioning_parameters
-  per_stmt_slevel
-  powerset
-  printer_domain
-  pretty_memory
-  recursion
-  red_statuses
-  register
-  results
-  segmentation
-  self
-  sign_domain
-  sign_value
-  simple_memory
-  simpler_domains
-  split_return
-  split_strategy
-  structure
-  subdivided_evaluation
-  summary
-  symbolic_locs
-  taint_domain
-  trace_partitioning
-  traces_domain
-  transfer_logic
-  transfer_specification
-  transfer_stmt
-  typed_memory
-  unit_domain
-  unit_tests
-  value_product
-  values_request
-  warn
-  widen
-  widen_hints_ext
-)
-
-;  (public_interfaces (Eva))
   (flags -open Frama_c_kernel :standard -w -9)
- (libraries frama-c.kernel frama-c-server.core
-            ; frama-c-callgraph.core frama-c-rtegen.core frama-c-loop-analysis.core
-            ; frama-c-scope.core
- )
+  (libraries frama-c.kernel frama-c-server.core)
 )
 
 (plugin (optional) (name eva) (libraries frama-c-eva.core) (site (frama-c plugins)))
+
+(include_subdirs unqualified)
+
+(subdir gui (include_subdirs no))
+(subdir gui ( library
+  (name eva_gui)
+  (public_name frama-c-eva.gui)
+  (optional)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva -open Eva.Private :standard -w -9)
+  (libraries eva frama-c.kernel frama-c.gui)
+))
+
+(plugin (optional) (name eva-gui) (libraries frama-c-eva.gui) (site (frama-c plugins_gui)))
+
+(subdir domains/numerors (include_subdirs no))
+(subdir domains/numerors ( library
+  (name numerors)
+  (optional)
+  (public_name frama-c-eva.numerors.core)
+  (flags -open Frama_c_kernel -open Eva.Private :standard)
+  (libraries frama-c.kernel frama-c-eva.core mlmpfr)
+))
+
+(plugin (optional) (name eva.numerors) (libraries frama-c-eva.numerors.core) (site (frama-c plugins)))
+
+(subdir domains/apron (include_subdirs no))
+(subdir domains/apron ( library
+  (name apron_domain)
+  (public_name frama-c-eva.apron)
+  (flags -open Frama_c_kernel -open Eva.Private :standard -w -9)
+  (modules apron_domain)
+  (libraries frama-c.kernel frama-c-eva.core apron.octMPQ apron.boxMPQ apron.polkaMPQ apron.apron)
+  (optional)
+))
+
+;(plugin (optional) (name eva-apron) (libraries frama-c-eva.apron) (site (frama-c plugins)))
+
 
 (rule
   (targets Eva.ml Eva.mli)
@@ -170,39 +92,3 @@
   )
   (action (run %{deps}))
 )
-
-( library
-  (name numerors)
-  (public_name frama-c-eva.numerors.core)
-  (flags -open Frama_c_kernel -open Eva.Private :standard)
-  (modules numerors_domain numerors_utils numerors_float numerors_interval numerors_arithmetics numerors_value)
-  (libraries frama-c.kernel frama-c-eva.core mlmpfr)
-  (optional)
-)
-
-(plugin (optional) (name eva.numerors) (libraries frama-c-eva.numerors.core) (site (frama-c plugins)))
-
-( library
-  (name apron_domain)
-  (public_name frama-c-eva.apron)
-  (flags -open Frama_c_kernel -open Eva.Private :standard -w -9)
-  (modules apron_domain)
-  (libraries frama-c.kernel frama-c-eva.core apron.octMPQ apron.boxMPQ apron.polkaMPQ apron.apron)
-  (optional)
-)
-
-;(plugin (optional) (name eva-apron) (libraries frama-c-eva.apron) (site (frama-c plugins)))
-
-( library
-  (name eva_gui)
-  (public_name frama-c-eva.gui)
-  (optional)
-  (modules gui_callstacks_filters gui_callstacks_manager gui_eval gui_types register_gui gui_red)
-;  (public_interfaces ())
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva -open Eva.Private :standard -w -9)
-  (libraries eva frama-c.kernel frama-c.gui)
-)
-
-(plugin (optional) (name eva-gui) (libraries frama-c-eva.gui) (site (frama-c plugins_gui)))
-
-(include_subdirs unqualified)
