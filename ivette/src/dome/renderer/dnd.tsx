@@ -55,8 +55,7 @@ export interface Dragging {
    Drop over information:
    - `meta` indicates if a modifier key is pressed;
    - `rect` is the original DOM Rectangle of the hovered HTML node;
-   - `dropX,dropY` is the position in `rect` where the drag hovers in;
-
+   - `dropX,dropY` is the position inside `rect` where the drag hovers in;
  */
 export interface Dropping {
   meta: boolean;
@@ -66,7 +65,6 @@ export interface Dropping {
 }
 
 /** Drag Callbacks. */
-
 export interface DragHandler {
   /** Callback when drag is initiated. */
   onStart?: () => void;
@@ -77,10 +75,12 @@ export interface DragHandler {
 }
 
 /** Drop Callbacks. */
-
 export interface DropHandler {
+  /** Callback when the drag source enters the drop target. */
   onDropIn?: (d: Dropping) => void;
+  /** Callback when the drag source leaves the drop target. */
   onDropOut?: () => void;
+  /** Callback when the drag source is dropped in the target. */
   onDrop?: () => void;
 }
 
@@ -189,6 +189,7 @@ export class DnD {
   }
 }
 
+/** React Hook for creating a local DnD controller. */
 export function useDnD(): DnD {
   return React.useMemo(() => new DnD(), []);
 }
@@ -197,6 +198,21 @@ export function useDnD(): DnD {
 /* --- Drop Targets                                                       --- */
 /* -------------------------------------------------------------------------- */
 
+/** React Hook for connecting a drop target to a DnD controller and drop event
+   callbacks.
+
+   Usage: the hook returns a Rect reference `r` that you shall pass to the HTML
+   `<div ref={r}/>` element of your drop target.  Once this element is mounted
+   into the DOM, the DnD controller and your handler will start receiving drag
+   and drop events.
+
+   Undefined DnD controller and handlers switch off Drag & Drop events from the
+   drop target.
+
+   Alternatively, you can also use `<DropTarget/>` and `<DragSource/>`
+   components that already offers such a `<div/>` element connected to a DnD
+   controller.
+*/
 export function useDropTarget(
   dnd: DnD | undefined, handlers?: DropHandler
 ): React.RefObject<HTMLDivElement> {
@@ -228,13 +244,12 @@ export interface DropTargetProps extends DropHandler {
   children?: React.ReactNode;
 }
 
-/**
-   This container can be dropped in when dragging DragSource
-   of the specified DnD controller.
+/** A container `<div/>` element that can be dropped in when dragging some
+   DragSource connected to the specified DnD controller.
 
-   Remark: a `<DragSource/>` also behaves as a `<DropTarget/>`
-   when it has Drop handler callbacks.
- */
+   See also `<DragSource/>` component that can also behaves as a Drop target.
+   If you need a more precise control over the underlying `<div/>` element,
+   refer to the `useDropTarget()` React Hook.  */
 export function DropTarget(props: DropTargetProps): JSX.Element {
   const { dnd, disabled = false, className, style, children } = props;
   const nodeRef = useDropTarget(dnd, disabled ? undefined : props);
@@ -288,9 +303,9 @@ function RenderOverlay(
   return { outerClass: className, outerStyle: style };
 }
 
-/**
-   Can be used to conditionally render an element wrt to dragging informations.
- */
+/** Can be used to dynamically render an element with respect to current
+   dragging state. The parameter `d` is `undefined` when there is no current
+   dragging action. Otherwize, `d` contains the relevant dragging data.  */
 export type DraggingRenderer = (d: Dragging | undefined) => JSX.Element;
 
 export interface DragSourceProps extends DragHandler, DropHandler {
@@ -324,15 +339,15 @@ export interface DragSourceProps extends DragHandler, DropHandler {
   children?: React.ReactNode | DraggingRenderer;
 }
 
-/**
-   This container can be dragged around all over the application window. Its
+/** This container can be dragged around all over the application window. Its
    content is rendered inside a double `<div/>`, the outer one being fixed when
    dragged, and the inner one being moved around when dragging.
 
-   The content can be rendered conditionnaly by using a function.
+   The content of the inner most `<div/>` can be rendered dynamically by using a
+   function of type `DraggingRenderer`.
 
-   When a Drag Source has Drop Handler callbacks, the element is also
-   registered as a Drop Target into the DnD controller.
+   When a Drag Source has Drop Handler callbacks, the element is also registered
+   as a Drop Target into the DnD controller.
  */
 export function DragSource(props: DragSourceProps): JSX.Element {
   //--- Props
@@ -431,6 +446,7 @@ interface ListContext {
   onStop?: () => void;
 }
 
+// Propagates the englobing List container callbacks down to ListItem elements
 const CurrentList = React.createContext<ListContext>({});
 
 function getItem(ordered: string[] | undefined, id: string): number {
@@ -439,14 +455,17 @@ function getItem(ordered: string[] | undefined, id: string): number {
   return 0 <= k ? k : ordered.push(id);
 }
 
+/** List Item properties. */
 export interface ItemProps {
-  id: string;
-  className?: string;
-  style?: React.CSSProperties;
-  children?: React.ReactNode;
+  id: string; /** Shall be unique inside the same `<List/>` container. */
+  className?: string; /** Additional class for the List Item contents. */
+  style?: React.CSSProperties; /** Additional style for the List Item contents. */
+  children?: React.ReactNode; /** List Item contents. */
 }
 
-/** List item component. Shall only be used inside a `<List/>` component. */
+/** List item component. Shall only be used inside a `<List/>` component.  The
+   item contents is rendered inside a `<DragSource/>` component automatically
+   connected to the englobing `<List/>` DnD controller.  */
 export function Item(props: ItemProps): JSX.Element {
   //--- Ordering
   const { dnd, items, setSource, setTarget, onStop } =
@@ -498,9 +517,9 @@ export interface ListProps {
 
    The behavior of the component can be _controlled_ or _uncontrolled_ whether
    `items` and `setItems` properties are set or not. In controlled mode, the
-   `items` property is not mandatory to contains all the list elements, in which
+   `items` property is not required to contains all the list elements, in which
    case the missing elements would be added to the end. Notice that `setItems`
-   callback is only notified after drag & drop.
+   callback is only notified after a complete drag & drop sequence of events.
 */
 export function List(props: ListProps): JSX.Element {
   const dnd = useDnD();
