@@ -91,9 +91,7 @@ Make* header_spec=CEA_LGPL
 *.js header_spec=CEA_LGPL
 
 *.ml header_spec=CEA_LGPL
-*.ml.in header_spec=CEA_LGPL
 *.mli header_spec=CEA_LGPL
-*.mli.in header_spec=CEA_LGPL
 *.mll header_spec=CEA_LGPL
 *.mly header_spec=CEA_LGPL
 

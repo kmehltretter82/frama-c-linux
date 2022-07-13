@@ -53,7 +53,7 @@
   (name eva_gui)
   (public_name frama-c-eva.gui)
   (optional)
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva -open Eva.Private :standard -w -9)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva__Private :standard -w -9)
   (libraries eva frama-c.kernel frama-c.gui)
 ))
 
@@ -64,7 +64,7 @@
   (name numerors)
   (optional)
   (public_name frama-c-eva.numerors.core)
-  (flags -open Frama_c_kernel -open Eva.Private :standard)
+  (flags -open Frama_c_kernel -open Eva__Private :standard)
   (libraries frama-c.kernel frama-c-eva.core mlmpfr)
 ))
 
@@ -74,7 +74,7 @@
 (subdir domains/apron ( library
   (name apron_domain)
   (public_name frama-c-eva.apron)
-  (flags -open Frama_c_kernel -open Eva.Private :standard -w -9)
+  (flags -open Frama_c_kernel -open Eva__Private :standard -w -9)
   (modules apron_domain)
   (libraries frama-c.kernel frama-c-eva.core apron.octMPQ apron.boxMPQ apron.polkaMPQ apron.apron)
   (optional)
@@ -86,7 +86,7 @@
 (rule
   (targets Eva.ml Eva.mli)
   (deps
-    gen-api.sh Eva.ml.in Eva.mli.in
+    gen-api.sh Eva.header
     engine/analysis.mli utils/results.mli parameters.mli utils/eva_annotations.mli eval.mli
     domains/cvalue/builtins.mli  utils/cvalue_callbacks.mli legacy/eval_terms.mli utils/eva_results.mli utils/unit_tests.mli
   )

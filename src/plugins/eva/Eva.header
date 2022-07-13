@@ -19,29 +19,3 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
-
-module Private = struct
-  module Abstractions = Eva__Abstractions
-  module Analysis = Eva__Analysis
-  module Alarmset = Eva__Alarmset
-  module Parameters = Parameters
-  module Main_values = Eva__Main_values
-  module Eval = Eva__Eval
-  module Eval_terms = Eva__Eval_terms
-  module Eva_utils = Eva_utils
-  module Eva_results = Eva_results
-  module Self = Self
-  module Red_statuses = Eva__Red_statuses
-  module Abstract_value = Eva__Abstract_value
-  module Abstract_domain = Eva__Abstract_domain
-  module Active_behaviors = Active_behaviors
-  module Function_calls = Function_calls
-  module Simple_memory = Eva__Simple_memory
-  module Structure = Eva__Structure
-  module Eval_typ = Eva__Eval_typ
-  module Eval_op = Eva__Eval_op
-  module Domain_builder = Eva__Domain_builder
-  module Main_locations = Eva__Main_locations
-  module Eval_annots = Eva__Eval_annots
-  module Eva_dynamic = Eva_dynamic
-end

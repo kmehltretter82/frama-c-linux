@@ -20,35 +20,27 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** ../.. *)
-
-(** For internal use *)
-(* Private first so that we do not override internal modules with public ones *)
-
-module Private: sig
-  module Abstractions = Abstractions
-  module Analysis = Analysis
-  module Alarmset = Alarmset
-  module Parameters = Parameters
-  module Main_values = Main_values
-  module Eval = Eval
-  module Eva_utils = Eva_utils
-  module Eva_results = Eva_results
-  module Self = Self
-  module Eval_terms = Eval_terms
-  module Red_statuses = Red_statuses
-  module Abstract_value = Abstract_value
-  module Abstract_domain = Abstract_domain
-  module Active_behaviors = Active_behaviors
-  module Function_calls = Function_calls
-  module Simple_memory = Simple_memory
-  module Structure = Structure
-  module Eval_typ = Eval_typ
-  module Eval_op = Eval_op
-  module Domain_builder = Domain_builder
-  module Main_locations = Main_locations
-  module Eval_annots = Eval_annots
-  module Eva_dynamic = Eva_dynamic
-end
-
-(** ../.. *)
+module Abstract_domain = Abstract_domain
+module Abstract_value = Abstract_value
+module Abstractions = Abstractions
+module Active_behaviors = Active_behaviors
+module Alarmset = Alarmset
+module Analysis = Analysis
+module Domain_builder = Domain_builder
+module Eva_dynamic = Eva_dynamic
+module Eva_results = Eva_results
+module Eva_utils = Eva_utils
+module Eval = Eval
+module Eval_annots = Eval_annots
+module Eval_op = Eval_op
+module Eval_terms = Eval_terms
+module Eval_typ = Eval_typ
+module Function_calls = Function_calls
+module Main_locations = Main_locations
+module Main_values = Main_values
+module Parameters = Parameters
+module Red_statuses = Red_statuses
+module Results = Results
+module Self = Self
+module Simple_memory = Simple_memory
+module Structure = Structure

@@ -27,7 +27,7 @@ dir=$(dirname $0)
 
 # Generate MLI
 
-cat $dir/Eva.mli.in >> Eva.mli
+cat $dir/Eva.header >> Eva.mli
 
 printf '\n(** Eva public API.
 
@@ -48,7 +48,7 @@ printf '\n(* This file is generated. Do not edit. *)\n' >> Eva.mli
 
 for i in "$@"
 do
-    if [[ ! "$i" =~ [.]in$ ]]; then
+    if [[ ! "$i" =~ [.]header$ ]]; then
         file=$(basename $i)
         module=${file%.*}
         Module="$(echo "${module:0:1}" | tr '[:lower:]' '[:upper:]')${module:1}"
@@ -60,11 +60,11 @@ done
 
 # Generate ML
 
-cat $dir/Eva.ml.in >> Eva.ml
+cat $dir/Eva.header >> Eva.ml
 
 for i in "$@"
 do
-    if [[ ! "$i" =~ [.]in$ ]]; then
+    if [[ ! "$i" =~ [.]header$ ]]; then
         file=$(basename $i)
         module=${file%.*}
         Module="$(echo "${module:0:1}" | tr '[:lower:]' '[:upper:]')${module:1}"
