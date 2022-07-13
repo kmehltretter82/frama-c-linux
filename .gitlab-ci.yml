@@ -15,7 +15,7 @@ stages:
 
 default:
   interruptible: true
-  tags: [ nix ]
+  tags: [ nix-v2 ]
 
 ################################################################################
 ### VARIABLES
