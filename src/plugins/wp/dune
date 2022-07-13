@@ -39,7 +39,11 @@
   (optional)
   (public_name frama-c-wp.core)
   (flags (-open Frama_c_kernel :standard -w -9))
-  (libraries frama-c.kernel frama-c-rtegen.core why3 qed server zarith ocamlgraph)
+  (libraries
+     frama-c.kernel
+     frama-c-rtegen.core
+     frama-c-server.core
+     qed why3 zarith ocamlgraph)
 )
 
 (plugin (optional) (name wp) (libraries frama-c-wp.core) (site (frama-c plugins)))
