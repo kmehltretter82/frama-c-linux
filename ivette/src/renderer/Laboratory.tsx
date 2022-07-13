@@ -30,7 +30,7 @@ import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import { Catch } from 'dome/errors';
-import { DnD, DragSource } from 'dome/dnd';
+import { DnD, DragSource } from 'dome/olddnd';
 import { SideBar, Section, Item } from 'dome/frame/sidebars';
 import { RSplit } from 'dome/layout/splitters';
 import * as Grids from 'dome/layout/grids';
