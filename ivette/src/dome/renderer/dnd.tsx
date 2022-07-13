@@ -30,6 +30,7 @@
 
 import React from 'react';
 import { classes, styles } from 'dome/misc/utils';
+import { swap } from 'dome/data/arrays';
 import {
   DraggableCore,
   DraggableEvent,
@@ -410,28 +411,6 @@ export function DragSource(props: DragSourceProps): JSX.Element {
       </div>
     </DraggableCore>
   );
-}
-
-/* -------------------------------------------------------------------------- */
-/* --- Ordering                                                           --- */
-/* -------------------------------------------------------------------------- */
-
-/** Swaps items at index i and j if they are both in range. */
-export function swap<A>(ls: A[], a: number, b: number): A[] {
-  const n = ls.length;
-  if (a === b || 0 > a || a >= n || 0 > b || b >= n) return ls;
-  const [i, j] = a < b ? [a, b] : [b, a];
-  return ls.slice(0, i).concat(ls.slice(i + 1, j + 1), ls[i], ls.slice(j + 1));
-}
-
-/** Remove item at index i when in range. */
-export function removeAt<A>(ls: A[], k: number): A[] {
-  return 0 <= k && k < ls.length ? ls.slice(0, k).concat(ls.slice(k + 1)) : ls;
-}
-
-/** Insert an item at index i when in range or off-by-one. */
-export function insertAt<A>(ls: A[], id: A, k: number): A[] {
-  return 0 <= k && k <= ls.length ? ls.slice(0, k).concat(id, ls.slice(k)) : ls;
 }
 
 /* -------------------------------------------------------------------------- */
