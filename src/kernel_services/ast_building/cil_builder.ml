@@ -396,6 +396,7 @@ struct
   let (<<), (>>) = shiftl, shiftr
   let (<), (>), (<=), (>=), (==), (!=) = lt, gt, le, ge, eq, ne
   let (--) = range
+  let (.@[]) = index
 
   (* Convert *)
 

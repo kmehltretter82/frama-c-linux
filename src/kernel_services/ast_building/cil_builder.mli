@@ -177,7 +177,6 @@ sig
   val compound : Cil_types.typ -> init list -> [> init]
   val values : (init,'values) typ -> 'values -> init
 
-
   (* Redefined operators *)
 
   val (+) : [< exp] -> [< exp] -> [> exp]
@@ -194,6 +193,7 @@ sig
   val (==) : [< exp] -> [< exp] -> [> exp]
   val (!=) : [< exp] -> [< exp] -> [> exp]
   val (--) : [< exp] -> [< exp] -> [> exp]
+  val (.@[]) : [< lval] -> [< exp] -> [> exp] (* C index operator [] *)
 
   (* Export CIL objects from built expressions *)
 
