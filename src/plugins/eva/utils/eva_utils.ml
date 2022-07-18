@@ -274,41 +274,58 @@ let dump_garbled_mix () =
       (Pretty_utils.pp_list ~pre:"" ~suf:"" ~sep:"@ " pp_one) l
 
 
+type deps = Function_Froms.Deps.deps = {
+  data: Locations.Zone.t;
+  indirect: Locations.Zone.t;
+}
+
+let bottom_deps =
+  { data = Locations.Zone.bottom; indirect = Locations.Zone.bottom }
+
+let join_deps a b =
+  { data = Locations.Zone.join a.data b.data;
+    indirect = Locations.Zone.join a.indirect b.indirect; }
+
+let deps_to_zone deps = Locations.Zone.join deps.data deps.indirect
+
 (* Computation of the inputs of an expression. *)
-let rec zone_of_expr find_loc expr =
+let rec deps_of_expr find_loc expr =
   let rec process expr = match expr.enode with
     | Lval lval ->
       (* Dereference of an lvalue. *)
-      zone_of_lval find_loc lval
+      deps_of_lval find_loc lval
     | UnOp (_, e, _) | CastE (_, e) ->
       (* Unary operators. *)
       process e
     | BinOp (_, e1, e2, _) ->
       (* Binary operators. *)
-      Locations.Zone.join (process e1) (process e2)
+      join_deps (process e1) (process e2)
     | StartOf lv | AddrOf lv ->
       (* computation of an address: the inputs of the lvalue whose address
          is computed are read to compute said address. *)
-      indirect_zone_of_lval find_loc lv
+      { data = indirect_zone_of_lval find_loc lv;
+        indirect = Locations.Zone.bottom; }
     | Const _ | SizeOf _ | AlignOf _ | SizeOfStr _ | SizeOfE _ | AlignOfE _ ->
       (* static constructs, nothing is read to evaluate them. *)
-      Locations.Zone.bottom
+      bottom_deps
   in
   process expr
 
+and zone_of_expr find_loc expr = deps_to_zone (deps_of_expr find_loc expr)
+
 (* dereference of an lvalue: first, its address must be computed,
    then its contents themselves are read *)
-and zone_of_lval find_loc lval =
+and deps_of_lval find_loc lval =
   let ploc = find_loc lval in
   let zone = Precise_locs.enumerate_valid_bits Read ploc in
-  Locations.Zone.join zone
-    (indirect_zone_of_lval find_loc lval)
+  { data = zone;
+    indirect = indirect_zone_of_lval find_loc lval; }
 
 (* Computations of the inputs of a lvalue : union of the "host" part and
    the offset. *)
 and indirect_zone_of_lval find_loc (lhost, offset) =
-  (Locations.Zone.join
-     (zone_of_lhost find_loc lhost) (zone_of_offset find_loc offset))
+  Locations.Zone.join
+    (zone_of_lhost find_loc lhost) (zone_of_offset find_loc offset)
 
 (* Computation of the inputs of a host. Nothing for a variable, and the
    inputs of [e] for a dereference [*e]. *)
