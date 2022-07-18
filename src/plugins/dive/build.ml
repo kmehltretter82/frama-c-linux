@@ -85,8 +85,7 @@ struct
     before_kinstr kinstr |> eval_lval lval |> as_cvalue
 
   let to_location kinstr lval =
-    before_kinstr kinstr |> eval_address lval |> as_location |>
-    Result.value ~default:Locations.loc_bottom
+    before_kinstr kinstr |> eval_address lval |> as_location
 
   let to_zone kinstr lval =
     before_kinstr kinstr |> eval_address lval |> as_zone

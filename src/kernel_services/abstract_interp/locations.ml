@@ -615,6 +615,7 @@ let loc_of_typoffset b typ offset =
   with SizeOfError _ as _e ->
     make_loc (Location_Bits.inject b Ival.top) Int_Base.top
 
+let loc_top = make_loc Location_Bits.top Int_Base.top
 let loc_bottom = make_loc Location_Bits.bottom Int_Base.top
 let is_bottom_loc l = Location_Bits.(equal l.loc bottom)
 

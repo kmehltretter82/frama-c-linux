@@ -645,9 +645,15 @@ let as_precise_loc address =
   | Error Bottom -> Precise_locs.loc_bottom
   | Error (Top | DisabledDomain) -> Precise_locs.loc_top
 
-let as_location (Address lvaluation) =
+let as_location_result (Address lvaluation) =
   let module E = (val lvaluation : Lvaluation) in
   E.as_location E.v
+
+let as_location address =
+  match as_location_result address with
+  | Ok loc -> loc
+  | Error Bottom -> Locations.loc_bottom
+  | Error (Top | DisabledDomain) -> Locations.loc_top
 
 let as_zone_result (Address lvaluation) =
   let module E = (val lvaluation : Lvaluation) in
@@ -667,10 +673,7 @@ let is_singleton: type a. a evaluation -> bool = function
     Cvalue.V.cardinal_zero_or_one cvalue && not (Cvalue.V.is_bottom cvalue)
   | Address _ as lvaluation ->
     let loc = as_location lvaluation in
-    let is_singleton loc =
-      Locations.cardinal_zero_or_one loc && not (Locations.is_bottom_loc loc)
-    in
-    Result.fold ~ok:is_singleton ~error:(fun _ -> false) loc
+    Locations.cardinal_zero_or_one loc && not (Locations.is_bottom_loc loc)
 
 let is_initialized (Value evaluation) =
   let module E = (val evaluation : Evaluation) in
