@@ -3,7 +3,7 @@
 mk_tests {
   tests-name = "plugins-tests";
   tests-command = ''
-    dune exec -- frama-c-ptests tests src/plugins/*/tests
+    dune exec -- frama-c-ptests -never-disabled tests src/plugins/*/tests
     dune build -j1 --display short \
       @tests/callgraph/ptests \
       @tests/constant_propagation/ptests \

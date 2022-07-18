@@ -3,7 +3,7 @@
 mk_tests {
   tests-name = "e-acsl-tests";
   tests-command = ''
-    dune exec -- frama-c-ptests tests src/plugins/e-acsl/tests
+    dune exec -- frama-c-ptests -never-disabled tests src/plugins/e-acsl/tests
     dune build -j1 --display short @src/plugins/e-acsl/tests/ptests
   '';
 }

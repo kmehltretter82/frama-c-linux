@@ -3,7 +3,7 @@
 mk_tests {
   tests-name = "kernel-tests";
   tests-command = ''
-    dune exec -- frama-c-ptests tests
+    dune exec -- frama-c-ptests -never-disabled tests
     dune build -j1 --display short \
       @tests/cil/ptests \
       @tests/compliance/ptests \

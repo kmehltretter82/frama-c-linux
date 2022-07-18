@@ -159,6 +159,8 @@ let macro_frama_c_cmd = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@"
 let macro_frama_c = ref "@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@"
 let macro_frama_c_share = ref "../../../../install/default/share/frama-c/share"
 
+let never_disabled = ref false
+
 let default_toplevel = ref "@frama-c@"
 
 (** the files in [suites] whose name matches
@@ -313,6 +315,9 @@ let argspec =
      " <value> Set the @frama-c@ macro (defaults to "^ !macro_frama_c ^")");
     ("-macro-frama-c-share", Arg.String (fun s -> macro_frama_c_share := s),
      " <value> Set the @FRAMAC_SHARE@ macro (defaults to "^ !macro_frama_c_share ^")");
+
+    ("-never-disabled", Arg.Set never_disabled,
+     " disable the generation of the enabled_if dune field: tests are never disabled (for CI purpose)");
 
     ("-dune-alias", Arg.String (fun s -> default_dune_alias := s),
      " <name> Use @<name> as dune alias to exectute tests (defaults to "^ !default_dune_alias ^")");
@@ -1259,10 +1264,15 @@ let pp_list_deps fmt l =
           (* kind={env_var,source_tree,glob_files,...} *)
           Format.fprintf fmt " (%s %S)" kind deps) l
 
-let pp_enabled_if fmt deps =
+let pp_enabled_if_content fmt deps =
   Format.fprintf fmt "(and %s%a)"
     (Option.value ~default:"true" deps.enabled_if)
     Fmt.(list (var_libavailable framac_plugin)) (list_of_deps deps.load_plugin)
+
+let pp_enabled_if fmt deps =
+  Format.fprintf fmt "%s(enabled_if %a)"
+    (if !never_disabled then ";" else "")
+    pp_enabled_if_content deps
 
 let pp_command_deps fmt command =
   Format.fprintf fmt "%S %a (package frama-c) %a"
@@ -1408,7 +1418,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
        (alias %S)\n  \
        (targets %S %S %a %a)\n  \
        (deps %S %S %S %a %a)\n  \
-       (enabled_if %a)\n\
+       %a\n\
        (action (run %s %S %S %a))\n\
        )@."
       (* rule: *)
@@ -1451,7 +1461,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
        (alias %S)\n  \
        (targets %S %S %a %a)\n  \
        (deps   %a)\n  \
-       (enabled_if %a)\n\
+       %a\n\
        (action (with-stderr-to %S (with-stdout-to %S (%s (system %S)))))\n\
        )@."
       (* rule: *)
@@ -1478,7 +1488,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       Format.fprintf result_fmt
         "(rule ; FILTER %s #%d OF TEST FILE %S\n  \
          (deps %S)
-         (enabled_if %a)\n\
+         %a\n\
          (action (with-stdout-to %S (with-accepted-exit-codes (or 0 1 2 125) (system %S))))\n\
          )@."
         (* rule: *)
@@ -1498,7 +1508,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       Format.fprintf result_fmt
         "(rule ; COMPARE TARGET #%d OF TEST #%d FOR TEST FILE %S\n  \
          (alias %s)\n  \
-         (enabled_if %a)\n\
+         %a\n\
          (action (diff %S %S))\n\
          )@."
         (* rule: *)
@@ -1515,7 +1525,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     "(rule ; REPRODUCE TEST #%d OF TEST FILE %S\n  \
      (alias %S)\n  \
      (deps  %a (universe))\n  \
-     (enabled_if %a)\n\
+     %a\n\
      (action (%s (system %S)))\n\
      )@."
     (* rule: *)
@@ -1534,7 +1544,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     "(rule ; SHOW TEST COMMAND #%d OF TEST FILE %S\n  \
      (alias %S)\n  \
      (deps  %a (universe))\n  \
-     (enabled_if %a)\n\
+     %a\n\
      (action (system %S))\n\
      )@."
     (* rule: *)
@@ -1553,7 +1563,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
   Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
-     (enabled_if %a)\n\
+     %a\n\
      (action (diff %S %S))\n\
      )@."
     (* alias: *)
@@ -1566,7 +1576,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
   Format.fprintf result_fmt
     "(rule\n  \
      (alias %S)\n  \
-     (enabled_if %a)\n\
+     %a\n\
      (action (diff %S %S))\n\
      )@."
     (* alias: *)
@@ -1579,7 +1589,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
   Format.fprintf result_fmt
     "(alias (name %S)\n  \
      (deps (alias %S))\n  \
-     (enabled_if %a)\n\
+     %a\n\
      )@."
     (ptests_alias ~env)
     diff_alias
@@ -1698,7 +1708,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
              (alias %s)\n  \
              (deps %a %a)\n  \
              (targets %a %a)\n  \
-             (enabled_if %a)\n\
+             %a\n\
              (action (run %s %%{dep:%s} %S))\n\
              )@."
             (* rule: *)
@@ -1732,7 +1742,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
              (alias %s)\n  \
              (deps (package frama-c)%a)\n  \
              (targets %a %a)\n  \
-             (enabled_if %a)\n\
+             %a\n\
              (action (system %S))\n\
              )@."
             (* rule: *)
@@ -1756,7 +1766,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
           "(rule ; SHOW EXECNOW COMMAND #%d OF TEST FILE %S\n  \
            (alias %s)\n  \
            (deps  %a (universe))\n  \
-           (enabled_if %a)\n\
+           %a\n\
            (action (system %S))\n\
            )@."
           (* rule: *)
@@ -1774,7 +1784,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
             Format.fprintf result_fmt
               "(rule ; COMPARE TARGET #%d OF EXECNOW #%d FOR TEST FILE %S\n  \
                (alias %s)\n  \
-               (enabled_if %a)\n\
+               %a\n\
                (action (diff %S %S))\n\
                )@."
               (* rule: *)
