@@ -58,7 +58,7 @@ let extend () =
         Wp.VC.command vcs;
         Bag.iter
           (fun vc ->
-             if not (Wp.VC.is_proved vc) then
+             if not (Wp.VC.is_passed vc) then
                P.warning "Could not prove %a in automaton function %a"
                  Property.pretty (Wp.VC.get_property vc)
                  Kernel_function.pretty kf)
