@@ -235,13 +235,16 @@ let pp_stats ~shell ~updating fmt s =
     Format.fprintf fmt " (Tactics %d)" s.tactics
   else if s.tactics = 1 then
     Format.fprintf fmt " (Tactic)" ;
-  let perfo = not shell || (not updating && s.cached < vp) in
+  let print_cache =
+    0 < s.cached && List.exists (fun (p,_) -> p <> Qed) s.provers in
+  let print_perfo =
+    not shell || (print_cache && not updating && s.cached < np) in
   let qed_only =
     match s.provers with [Qed,_] -> vp = np | _ -> false in
   List.iter
     (fun (p,pr) ->
        let success = truncate pr.success in
-       let print_perfo = perfo && pr.time > Rformat.epsilon in
+       let print_perfo = print_perfo && pr.time > Rformat.epsilon in
        let print_proofs = success > 0 && np > 1 in
        let print_qed = qed_only && s.verdict = Valid && vp = np in
        if p != Qed || print_qed || print_perfo || print_proofs then
@@ -255,9 +258,8 @@ let pp_stats ~shell ~updating fmt s =
            Format.fprintf fmt ")"
          end
     ) s.provers ;
-  if 0 < s.cached && List.exists (fun (p,_) -> p <> Qed) s.provers
-  then
-    if s.cached = vp || updating then
+  if print_cache then
+    if s.cached = np || updating then
       Format.fprintf fmt " (Cached)"
     else
     if shell then
