@@ -607,17 +607,7 @@ struct
       if not (Eva.Analysis.save_results kf) then Function_Froms.top
       else
         try
-          Stack.iter
-            (fun g ->
-               if kf == g then begin
-                 if Db.Value.ignored_recursive_call kf then
-                   From_parameters.error
-                     "during dependencies computations for %a, \
-                      ignoring probable recursive"
-                     Kernel_function.pretty kf;
-                 raise Exit
-               end)
-            call_stack;
+          Stack.iter (fun g -> if kf == g then raise Exit) call_stack;
           Stack.push kf call_stack;
           let state =
             { empty_from with
