@@ -38,6 +38,7 @@ PTEST_DIRS?=$(PTEST_ALL_DIRS)
 PTEST_DEPS?=
 # Indicate whether we use global WP cache
 PTEST_USE_WP_CACHE?=no
+FRAMAC_WP_CACHEDIR?=$(FRAMAC_WP_QUALIF)
 
 ############
 # Default values necessary for make -f <this-makefile>
