@@ -115,9 +115,7 @@ let () =
   (* Once this function has been moved to Eva, remove the dependency of Inout
      from From. *)
   Db.From.find_deps_no_transitivity_state :=
-    (fun s e ->
-       let deps = From_compute.find_deps_no_transitivity s e in
-       Function_Froms.Deps.to_zone deps);
+    (fun s e -> Eva.Results.(in_cvalue_state s |> expr_deps e));
 
   ignore (
     Db.register_compute "From.compute_all"

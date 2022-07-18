@@ -55,14 +55,6 @@ val compute_using_prototype_for_state :
   Function_Froms.froms
 
 
-(** Direct computation of the dependencies on expressions, offsets and
-    lvals. The state at the statement is taken from Values_To_Use *)
-val find_deps_no_transitivity :
-  Db.Value.state -> exp -> Function_Froms.Deps.t
-val find_deps_lval_no_transitivity :
-  Db.Value.state -> lval -> Function_Froms.Deps.t
-
-
 (** Functor computing the functional dependencies, according to the three
     modules above. *)
 module Make (To_Use: To_Use) : sig

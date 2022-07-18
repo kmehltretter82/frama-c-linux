@@ -36,37 +36,6 @@ sig
   val cleanup_and_save : kernel_function -> Function_Froms.t -> Function_Froms.t
 end
 
-let rec find_deps_no_transitivity state expr =
-  (* The value of the expression [expr], just before executing the statement
-     [instr], is a function of the values of the returned zones. *)
-  match expr.enode with
-  | AlignOfE _| AlignOf _| SizeOfStr _ |SizeOfE _| SizeOf _ | Const _
-    -> Function_Froms.Deps.bottom
-  | AddrOf lv  | StartOf lv ->
-    let deps, _ = !Db.Value.lval_to_loc_with_deps_state (* loc ignored *)
-        state
-        ~deps:Zone.bottom
-        lv
-    in
-    Function_Froms.Deps.from_data_deps deps
-  | CastE (_, e)|UnOp (_, e, _) ->
-    find_deps_no_transitivity state e
-  | BinOp (_, e1, e2, _) ->
-    Function_Froms.Deps.join
-      (find_deps_no_transitivity state e1)
-      (find_deps_no_transitivity state e2)
-  | Lval v ->
-    find_deps_lval_no_transitivity state v
-
-and find_deps_lval_no_transitivity state lv =
-  let ind_deps, direct_deps, _exact =
-    !Db.Value.lval_to_zone_with_deps_state
-      state ~for_writing:false ~deps:(Some Zone.bottom) lv
-  in
-  From_parameters.debug "find_deps_lval_no_trs:@\n deps:%a@\n direct_deps:%a"
-    Zone.pretty ind_deps Zone.pretty direct_deps;
-  { Function_Froms.Deps.data = direct_deps; indirect = ind_deps }
-
 let compute_using_prototype_for_state state kf assigns =
   let varinfo = Kernel_function.get_vi kf in
   let return_deps,deps =
