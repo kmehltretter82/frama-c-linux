@@ -30,7 +30,7 @@
   )
 )
 
-( library
+(library
   (name server)
   (optional)
   (public_name frama-c-server.core)

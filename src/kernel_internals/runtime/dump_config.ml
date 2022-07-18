@@ -67,7 +67,6 @@ let dump_to_json () =
     "preprocessor_supported_arch_options",
     list string Fc_config.preprocessor_supported_arch_options ;
     "preprocessor_keep_comments", `Bool Fc_config.preprocessor_keep_comments ;
-    "dot", (match Fc_config.dot with Some cmd -> `String cmd | None -> `Null) ;
     "current_machdep", `String (Kernel.Machdep.get ()) ;
     "machdeps", list string (File.list_available_machdeps ()) ;
     "plugins", list string (list_plugin_names ()) ;

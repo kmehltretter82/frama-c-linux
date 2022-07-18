@@ -57,18 +57,12 @@ VERSION_CODENAME:=$(shell $(CAT) VERSION_CODENAME)
 all: config.sed
 	dune build $(DUNE_BUILD_OPTS) @install
 
-ifeq ($(HAS_DOT),yes)
-OPTDOT=Some \"$(DOT)\"
-else
-OPTDOT=None
-endif
-
 MAJOR_VERSION=$(shell $(SED) -E 's/^([0-9]+)\..*/\1/' VERSION)
 MINOR_VERSION=$(shell $(SED) -E 's/^[0-9]+\.([0-9]+).*/\1/' VERSION)
 VERSION_CODENAME=$(shell $(CAT) VERSION_CODENAME)
 
 # File used by dune to build src/kernel_internals/runtime/fc_config.ml
-config.sed: VERSION share/Makefile.config share/Makefile.common Makefile configure.in
+config.sed: VERSION share/Makefile.config share/Makefile.common Makefile configure.ac
 	@echo "# generated file" > $@
 	@echo "s|@VERSION@|$(VERSION)|" >> $@
 	@echo "s|@VERSION_CODENAME@|$(VERSION_CODENAME)|" >> $@
@@ -79,7 +73,6 @@ config.sed: VERSION share/Makefile.config share/Makefile.common Makefile configu
 	@echo "s|@FRAMAC_GNU_CPP@|$(FRAMAC_GNU_CPP)|" >> $@
 	@echo "s|@DEFAULT_CPP_KEEP_COMMENTS@|$(DEFAULT_CPP_KEEP_COMMENTS)|" >> $@
 	@echo "s|@DEFAULT_CPP_SUPPORTED_ARCH_OPTS@|$(DEFAULT_CPP_SUPPORTED_ARCH_OPTS)|" >> $@
-	@echo "s|@OPTDOT@|$(OPTDOT)|" >> $@
 
 clean:: purge-tests # to be done before a "dune" command
 	dune clean
@@ -88,7 +81,7 @@ clean:: purge-tests # to be done before a "dune" command
 	rm -rf _build .merlin config.sed autom4te.cache
 
 ########################################################################
-# Makefile.config is rebuilt whenever configure.in is modified         #
+# Makefile.config is rebuilt whenever configure.ac is modified         #
 ########################################################################
 
 share/Makefile.config: share/Makefile.config.in config.status
@@ -105,7 +98,7 @@ config.status: configure
 	$(PRINT_MAKING) $@
 	./config.status --recheck
 
-configure: configure.in .force-reconfigure
+configure: configure.ac .force-reconfigure
 	$(PRINT_MAKING) $@
 	autoconf -f
 

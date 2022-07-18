@@ -1,3 +1,4 @@
+#!/bin/sh
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -20,32 +21,4 @@
 #                                                                        #
 ##########################################################################
 
-# Print_api plugin
-##################
-
-# Frama-C should be properly installed with "make install"
-# befor any use of this makefile
-
-ifndef FRAMAC_SHARE
-FRAMAC_SHARE	:=$(shell frama-c.byte -print-path)
-endif
-ifndef FRAMAC_LIBDIR
-FRAMAC_LIBDIR	:=$(shell frama-c.byte -print-libpath)
-endif
-
-PLUGIN_DIR	?= .
-PLUGIN_NAME	:= Print_api
-PLUGIN_CMO	:= grammar lexer print_interface
-PLUGIN_GENERATED:= $(PLUGIN_DIR)/grammar.ml $(PLUGIN_DIR)/grammar.mli \
-		$(PLUGIN_DIR)/lexer.ml
-PLUGIN_DISTRIB_EXTERNAL:=Makefile
-
-include $(FRAMAC_SHARE)/Makefile.dynamic
-
-clean:: 
-	$(RM) $(Print_api_DIR)/dynamic_plugins.mli
-	$(RM) $(Print_api_DIR)/grammar.output
-	$(RM) $(Print_api_DIR)/grammar.ml
-	$(RM) $(Print_api_DIR)/grammar.mli
-	$(RM) $(Print_api_DIR)/lexer.ml
-	$(RM) -r _build
+autoconf -f && ./configure && make -k clean && make -k
