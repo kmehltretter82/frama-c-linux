@@ -118,10 +118,6 @@ struct
     method private compute_kf_with_def kf =
       let f = Kernel_function.get_definition kf in
       if List.exists (Kernel_function.equal kf) call_stack then (
-        if Db.Value.ignored_recursive_call kf then
-          Inout_parameters.warning ~current:true ~once:true
-            "During %s analysis of %a: ignoring probable recursive call."
-            X.analysis_name Kernel_function.pretty kf;
         self#add_cycle (Kernel_function.Hptset.singleton kf);
         self#bottom
       )

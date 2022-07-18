@@ -743,16 +743,7 @@ module FunctionWise = struct
           let stmt_state s = Db.Value.get_stmt_state s
           let at_call stmt kf = get_external_aux ~stmt kf
         end) in
-      Stack.iter
-        (fun g -> if kf == g then begin
-             if Db.Value.ignored_recursive_call kf then
-               Inout_parameters.warning ~current:true
-                 "During inout context analysis of %a:@ \
-                  ignoring probable recursive call."
-                 Kernel_function.pretty kf;
-             raise Exit
-           end)
-        call_stack;
+      Stack.iter (fun g -> if kf == g then raise Exit) call_stack;
       Stack.push kf call_stack;
 
       let module [@warning "-60"] Compute =
