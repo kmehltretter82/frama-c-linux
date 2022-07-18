@@ -396,6 +396,25 @@ struct
       in
       Response.map extract r, access
 
+  let as_precise_loc res =
+    match A.Loc.get Main_locations.PLoc.key with
+    | None ->
+      Result.error DisabledDomain
+    | Some get ->
+      let join ploc1 ploc2 =
+        if Precise_locs.equal_loc ploc1 ploc2 then ploc1 else
+          let loc1 = Precise_locs.imprecise_location ploc1
+          and loc2 = Precise_locs.imprecise_location ploc2 in
+          assert (Int_Base.equal loc1.size loc2.size);
+          let size = loc1.size in
+          let loc_bit = Locations.Location_Bits.join loc1.loc loc2.loc in
+          let ploc_bit = Precise_locs.inject_location_bits loc_bit in
+          Precise_locs.make_precise_loc ploc_bit ~size
+      and extract loc =
+        loc >>-: get
+      in
+      extract_loc res |> fst |> Response.map_join' extract join |> convert
+
   let as_location res =
     match A.Loc.get Main_locations.PLoc.key with
     | None ->
@@ -461,22 +480,6 @@ struct
     | LValue r -> Response.is_bottom r
     | Value r -> Response.is_bottom r
     | Address (r, _lval) -> Response.is_bottom r
-
-  (* Dependencies *)
-
-  let compute_deps eval_deps arg req =
-    let error = function
-      | Bottom -> Locations.Zone.bottom
-      | Top | DisabledDomain -> Locations.Zone.top
-    in
-    let compute cvalue =
-      eval_deps (cvalue, Locals_scoping.bottom ()) arg
-    in
-    req |> get_cvalue_model |> Result.fold ~error ~ok:compute
-
-  let lval_deps = compute_deps Register.eval_deps_lval
-  let expr_deps = compute_deps Register.eval_deps
-  let address_deps = compute_deps Register.eval_deps_addr
 end
 
 
@@ -510,21 +513,6 @@ let get_cvalue_model req =
 let print_states ?filter req =
   let module E = Make () in
   E.print_states ?filter req
-
-
-(* Depedencies *)
-
-let expr_deps exp req =
-  let module E = Make () in
-  E.expr_deps exp req
-
-let lval_deps lval req =
-  let module E = Make () in
-  E.lval_deps lval req
-
-let address_deps lval req =
-  let module E = Make () in
-  E.address_deps lval req
 
 
 (* Evaluation *)
@@ -647,6 +635,16 @@ let as_int evaluation =
   with Z.Overflow ->
     Result.error Top
 
+let as_precise_loc_result (Address lvaluation) =
+  let module E = (val lvaluation : Lvaluation) in
+  E.as_precise_loc E.v
+
+let as_precise_loc address =
+  match as_precise_loc_result address with
+  | Ok ploc -> ploc
+  | Error Bottom -> Precise_locs.loc_bottom
+  | Error (Top | DisabledDomain) -> Precise_locs.loc_top
+
 let as_location (Address lvaluation) =
   let module E = (val lvaluation : Lvaluation) in
   E.as_location E.v
@@ -686,6 +684,20 @@ let alarms : type a. a evaluation -> Alarms.t list =
   | Address lvaluation ->
     let module L = (val lvaluation : Lvaluation) in
     L.alarms L.v
+
+(* Dependencies *)
+
+let expr_deps expr request =
+  let lval_to_loc lv = eval_address lv request |> as_precise_loc in
+  Eva_utils.zone_of_expr lval_to_loc expr
+
+let lval_deps lval request =
+  let lval_to_loc lv = eval_address lv request |> as_precise_loc in
+  Eva_utils.zone_of_expr lval_to_loc (Cil.dummy_exp (Lval lval))
+
+let address_deps lval request =
+  let lval_to_loc lv = eval_address lv request |> as_precise_loc in
+  Eva_utils.indirect_zone_of_lval lval_to_loc lval
 
 (* Reachability *)
 
