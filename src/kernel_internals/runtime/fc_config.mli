@@ -98,11 +98,6 @@ val preprocessor_keep_comments: bool
     @since Neon-rc3
 *)
 
-val dot: string option
-(** Dot command name.
-    @return [None] if `dot' is not installed.
-    @since Carbon-20101201 *)
-
 (*
   Local Variables:
   compile-command: "make -C ../../.."

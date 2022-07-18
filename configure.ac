@@ -519,16 +519,6 @@ CPPFLAGS=$OLD_CPPFLAGS
 
 AC_MSG_RESULT(Default preprocessor supported architecture-related options: $DEFAULT_CPP_SUPPORTED_ARCH_OPTS)
 
-# dot and xdot tools
-####################
-
-configure_tool([DOT],[dot],[dot not found: you should install GraphViz],no)
-
-configure_tool([UNIX2DOS],[unix2dos],
-               [unix2dos not found: you should install tofrodos],no)
-
-plugin_use_external(tests,unix2dos)
-
 ############################
 # Substitutions to perform #
 ############################

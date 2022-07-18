@@ -57,12 +57,6 @@ VERSION_CODENAME:=$(shell $(CAT) VERSION_CODENAME)
 all: config.sed
 	dune build $(DUNE_BUILD_OPTS) @install
 
-ifeq ($(HAS_DOT),yes)
-OPTDOT=Some \"$(DOT)\"
-else
-OPTDOT=None
-endif
-
 MAJOR_VERSION=$(shell $(SED) -E 's/^([0-9]+)\..*/\1/' VERSION)
 MINOR_VERSION=$(shell $(SED) -E 's/^[0-9]+\.([0-9]+).*/\1/' VERSION)
 VERSION_CODENAME=$(shell $(CAT) VERSION_CODENAME)
@@ -79,7 +73,6 @@ config.sed: VERSION share/Makefile.config share/Makefile.common Makefile configu
 	@echo "s|@FRAMAC_GNU_CPP@|$(FRAMAC_GNU_CPP)|" >> $@
 	@echo "s|@DEFAULT_CPP_KEEP_COMMENTS@|$(DEFAULT_CPP_KEEP_COMMENTS)|" >> $@
 	@echo "s|@DEFAULT_CPP_SUPPORTED_ARCH_OPTS@|$(DEFAULT_CPP_SUPPORTED_ARCH_OPTS)|" >> $@
-	@echo "s|@OPTDOT@|$(OPTDOT)|" >> $@
 
 clean:: purge-tests # to be done before a "dune" command
 	dune clean
