@@ -950,7 +950,7 @@
 [inout] Out (internal) for function copy:
     dst; src; p
 [inout] Inputs for function copy:
-    t[0..1]
+    t{[0][bits 8 to 31]; [1][bits 0 to 23]}
 [inout] Out (internal) for function main1:
     __fc_heap_status; t[0..1]; i; p; n; r; __malloc_w_main1_l23[0..31]
 [inout] Inputs for function main1:
