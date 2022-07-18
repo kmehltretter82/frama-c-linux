@@ -312,6 +312,7 @@ struct
 
   let of_exp e = `exp (CilExp e)
   let of_exp_copy e = `exp (CilExpCopy e)
+  let of_exp_list l = List.map of_exp l
   let unop op e = `exp (Unop (op, harden_exp e))
   let neg e = unop Cil_types.Neg e
   let lognot e = unop Cil_types.LNot e

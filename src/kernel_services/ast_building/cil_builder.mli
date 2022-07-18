@@ -122,6 +122,7 @@ sig
 
   val of_exp : Cil_types.exp -> [> exp]
   val of_exp_copy : Cil_types.exp -> [> exp]
+  val of_exp_list : Cil_types.exp list -> [> exp] list
   val unop : Cil_types.unop -> [< exp] -> [> exp]
   val neg : [< exp] -> [> exp]
   val lognot : [< exp] -> [> exp]
@@ -329,3 +330,4 @@ sig
   val (+=) : [< lval] -> [< exp] -> unit
   val (-=) : [< lval] -> [< exp] -> unit
 end
+
