@@ -33,7 +33,7 @@ import _ from 'lodash' ;
 import React from 'react' ;
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
-import { dispatchEvent, DnD, DragSource, DropTarget } from 'dome/dnd' ;
+import { dispatchEvent, DnD, DragSource, DropTarget } from 'dome/olddnd' ;
 import { AutoSizer } from 'react-virtualized' ;
 import { DraggableCore } from 'react-draggable' ;
 

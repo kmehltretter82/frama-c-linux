@@ -22,7 +22,7 @@
 
 /**
    @packageDocumentation
-   @module dome/dnd
+   @module dome/olddnd
    @description
 
 ## Drag & Drop
