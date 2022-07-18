@@ -180,9 +180,10 @@ endif
 
 .PHONY: tests
 tests:: run-tests
-	echo "Number of *.{err,res}.log files:"
-	find $(addprefix _build/default/,$(PTEST_DIRS)) -name \*.err.log -or -name \*.res.log \
-        | $(GREP) -c "^"
+	@echo "Number of *.{err,res}.log files:"
+	@find $(addprefix _build/default/,$(PTEST_DIRS)) \
+	-name \*.err.log -or -name \*.res.log \
+        | wc -l
 
 ifneq ($(PTEST_USE_WP_CACHE),no)
 ifeq ($(FRAMAC_WP_CACHEDIR),)
@@ -200,9 +201,10 @@ endif # PTEST_USE_WP_CACHE
 
 .PHONY: count-tests
 count-tests:
-	echo "Number of *.{err,res}.log files:"
-	find $(addprefix _build/default/,$(PTEST_DIRS)) -name \*.res.log -or -name \*.err.log \
-        | $(GREP) -c "^"
+	@echo "Number of *.{err,res}.log files:"
+	@find $(addprefix _build/default/,$(PTEST_DIRS)) \
+	-name \*.res.log -or -name \*.err.log \
+        | wc -l
 
 ###############################################################################
 # Local Variables:
