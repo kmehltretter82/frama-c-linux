@@ -275,6 +275,15 @@ end
 module Stateful (Location : T) :
 sig
   include module type of Exp
+    with type ('v,'s) typ = ('v,'s) Type.typ
+     and type const' = Exp.const'
+     and type var' = Exp.var'
+     and type lval' = Exp.lval'
+     and type exp' = Exp.exp'
+     and type init' = Exp.init'
+     and type label = Exp.label
+
+  val loc : Cil_types.location (* = T.loc *)
 
   (* Functions *)
   val open_function : ?ghost:bool -> ?vorig_name:string -> string -> [> var]
