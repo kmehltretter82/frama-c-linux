@@ -236,7 +236,7 @@ README* header_spec=.ignore
 # HEADER_SPEC: others #
 #######################
 
-/configure.in header_spec=CEA_INRIA_LGPL
+/configure.ac header_spec=CEA_INRIA_LGPL
 
 /doc/aorai/Makefile header_spec=AORAI_LGPL
 

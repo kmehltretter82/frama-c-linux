@@ -43,7 +43,8 @@
 #   EXE           ".exe" if PLATFORM=Win32 (or Cygwin), "" otherwise
 #   DLLEXT        ".dll" if PLATFORM=Win32 (or Cygwin), ".so" otherwise
 
-AC_INIT(src/init/boot/boot.ml)
+AC_INIT
+AC_CONFIG_SRCDIR([src/init/boot/boot.ml])
 
 define([FRAMAC_MAIN_AUTOCONF])
 m4_include(share/configure.ac)
@@ -348,7 +349,7 @@ AC_ARG_ENABLE(
 
 if test "$LOCAL_MACHDEP" = yes ; then
 
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 AC_CHECK_HEADERS(wchar.h)
 
 # Find out the true definitions of some integer types
@@ -518,16 +519,6 @@ CPPFLAGS=$OLD_CPPFLAGS
 
 AC_MSG_RESULT(Default preprocessor supported architecture-related options: $DEFAULT_CPP_SUPPORTED_ARCH_OPTS)
 
-# dot and xdot tools
-####################
-
-configure_tool([DOT],[dot],[dot not found: you should install GraphViz],no)
-
-configure_tool([UNIX2DOS],[unix2dos],
-               [unix2dos not found: you should install tofrodos],no)
-
-plugin_use_external(tests,unix2dos)
-
 ############################
 # Substitutions to perform #
 ############################
@@ -575,7 +566,7 @@ new_section "creating makefile"
 
 AC_CONFIG_FILES([share/Makefile.config], [chmod a-w share/Makefile.config])
 
-AC_OUTPUT()
+AC_OUTPUT
 
 ###########
 # Plugins #
@@ -592,7 +583,7 @@ m4_foreach_w([__plugin],m4_esyscmd([ls src/plugins]),
     m4_if(is_plugin,0,[
       AC_ARG_ENABLE(
         __plugin,
-        AC_HELP_STRING([--disable-__plugin], [Disable __plugin]),
+        AS_HELP_STRING([--disable-__plugin],[Disable __plugin]),
         [ENABLE___plugin=$enableval],
         [ENABLE___plugin=yes]
       )

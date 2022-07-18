@@ -20,4 +20,5 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(alias (name default) (deps (alias install)))
 (dirs src tools tests headers share bin)

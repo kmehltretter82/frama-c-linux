@@ -41,7 +41,7 @@ if [ -z ${HDRCK+x} ]; then
 fi
 
 if [ -z ${VERSION+x} ]; then
-  VERSION=$(cat VERSION | sed "s,~,-,")
+  VERSION=$(cat VERSION)
 fi
 
 if [ -z ${VERSION_CODENAME+x} ]; then
@@ -52,12 +52,23 @@ if [ -z ${CI_LINK+x} ]; then
   CI_LINK="no"
 fi
 
-FRAMAC="frama-c-$VERSION-$VERSION_CODENAME"
+VERSION_SAFE=${VERSION/~/-}
+
+FRAMAC="frama-c-$VERSION_SAFE-$VERSION_CODENAME"
 FRAMAC_TAR="$FRAMAC.tar"
 
 ################################################################################
-# Prepare archive
+# Check Opam file
 
+OPAM_VERSION=$(cat opam/opam | grep "^version" | sed 's/version: \"\(.*\)\"/\1/')
+
+if [ "$VERSION" != "$OPAM_VERSION" ]; then
+  echo "VERSION ($VERSION) and OPAM_VERSION ($OPAM_VERSION) differ"
+  exit 2
+fi
+
+################################################################################
+# Prepare archive
 
 git archive HEAD -o $FRAMAC_TAR --prefix "$FRAMAC/"
 
@@ -100,7 +111,7 @@ for plugin in $EXTERNAL_PLUGINS ; do
   tr '\n' '\0' >> $HEADER_SPEC
 done
 
-PLUGINS=$(find src/plugins -type d -mindepth 1 -maxdepth 1)
+PLUGINS=$(find src/plugins -mindepth 1 -maxdepth 1 -type d)
 
 for plugin in $PLUGINS ; do
   HEADER_DIRS="$HEADER_DIRS -header-dirs $plugin/headers/$HEADER_KIND"
@@ -114,7 +125,7 @@ echo $TMP_DIR
 tar xf $FRAMAC_TAR -C $TMP_DIR
 
 $HDRCK $HEADER_OPT $HEADER_DIRS -spec-format="3-zeros" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
-echo $VERSION > $TMP_DIR/$FRAMAC/VERSION
+echo $VERSION_SAFE > $TMP_DIR/$FRAMAC/VERSION
 echo $VERSION_CODENAME > $TMP_DIR/$FRAMAC/VERSION_CODENAME
 
 ################################################################################

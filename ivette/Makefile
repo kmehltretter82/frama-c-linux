@@ -144,7 +144,7 @@ doc: $(NODEBIN)/typedoc icons
 	@yarn run typedoc $(DOCFILES)
 	@echo "\n[Ivette] main page"
 	@echo ""
-	@echo "   file://$(PWD)/ivette/doc/html/index.html"
+	@echo "   file://$(PWD)/doc/html/index.html"
 	@echo ""
 
 $(NODEBIN)/%:

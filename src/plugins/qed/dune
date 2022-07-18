@@ -25,15 +25,11 @@
  (deps (universe))
  (action (progn
           (echo "Qed:" %{lib-available:qed} "\n")
-          (echo "  - Zarith:" %{lib-available:zarith} "\n")
-  )
-  )
-)
+          (echo "  - Zarith:" %{lib-available:zarith} "\n"))))
 
 (library
   (name qed)
   (optional)
   (public_name qed)
   (flags (-open Frama_c_kernel :standard -w -9))
-  (libraries frama-c.kernel zarith)
-)
+  (libraries frama-c.kernel zarith))
