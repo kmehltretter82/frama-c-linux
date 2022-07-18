@@ -268,6 +268,14 @@ val as_zone: address evaluation -> Locations.Zone.t
 (** Converts into a Zone result. *)
 val as_zone_result : address evaluation -> Locations.Zone.t result
 
+(** Converts into a C location abstraction. Error cases are converted into
+    bottom or top locations accordingly. *)
+val as_precise_loc : address evaluation -> Precise_locs.precise_location
+
+(** Converts into a C location abstraction. *)
+val as_precise_loc_result :
+  address evaluation -> Precise_locs.precise_location result
+
 
 (** Evaluation properties *)
 
