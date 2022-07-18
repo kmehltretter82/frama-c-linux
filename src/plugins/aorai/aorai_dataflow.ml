@@ -388,7 +388,7 @@ module Computer(I: Init) = struct
   *)
   type data = (Data_for_aorai.state * Cil_datatype.Stmt.Set.t)
   type t = data
-  let copy = Extlib.id
+  let copy = Fun.id
   let pretty fmt (s,_) = Data_for_aorai.pretty_state fmt s
 
   (* we do not propagate inside the loop the actions made before,

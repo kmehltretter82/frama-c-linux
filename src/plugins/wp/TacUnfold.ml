@@ -157,7 +157,7 @@ let fold_selection goal_unfolds step_unfolds sequent =
       (Pretty_utils.pp_list ~sep:", " pp) unfolded
   in
   let add_goal = match goal_unfolds with
-    | None -> Extlib.id
+    | None -> Stdlib.Fun.id
     | Some goal_unfolds -> tactical_goal goal_unfolds
   in
   feedback, add_goal seq

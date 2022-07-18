@@ -63,7 +63,7 @@ let () = Instantiate.Transform.register (module struct
     let retype_args = retype_args
     let generate_prototype = generate_prototype function_name
     let generate_spec = generate_spec "i"
-    let args_for_original _ = Extlib.id
+    let args_for_original _ = Fun.id
   end)
 
 let () = Instantiate.Transform.register (module struct
@@ -76,5 +76,5 @@ let () = Instantiate.Transform.register (module struct
     let retype_args = retype_args
     let generate_prototype = generate_prototype function_name
     let generate_spec = generate_spec "j"
-    let args_for_original _ = Extlib.id
+    let args_for_original _ = Fun.id
   end)

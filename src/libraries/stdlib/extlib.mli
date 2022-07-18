@@ -26,12 +26,6 @@
 val nop: 'a -> unit
 (** Do nothing. *)
 
-external id: 'a -> 'a = "%identity"
-(** identity function.
-    @since Oxygen-20120901
-*)
-
-
 val adapt_filename: string -> string
 (** Ensure that the given filename has the extension "cmo" in bytecode
     and "cmxs" in native *)

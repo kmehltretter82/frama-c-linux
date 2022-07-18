@@ -377,13 +377,13 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
       in
       match res with
       | SkipChildren -> b
-      | JustCopy -> visit_clauses self#plain_copy_visitor Extlib.id
+      | JustCopy -> visit_clauses self#plain_copy_visitor Fun.id
       | JustCopyPost f -> visit_clauses self#plain_copy_visitor f
-      | ChangeTo b -> register_annots b Extlib.id
+      | ChangeTo b -> register_annots b Fun.id
       | ChangeToPost (b,f) -> register_annots b f
       | ChangeDoChildrenPost (b,f) ->
         register_annots (Cil.childrenBehavior (self:>Cil.cilVisitor) b) f
-      | DoChildren -> visit_clauses self Extlib.id
+      | DoChildren -> visit_clauses self Fun.id
       | DoChildrenPost f -> visit_clauses self f
 
     method private vfunspec_annot () =
@@ -829,7 +829,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
         res
       | JustCopy -> JustCopyPost post_action
       | JustCopyPost f -> JustCopyPost (post_action $ f)
-      | DoChildren -> DoChildrenPost (post_do_children Extlib.id)
+      | DoChildren -> DoChildrenPost (post_do_children Fun.id)
       | DoChildrenPost f -> DoChildrenPost (post_do_children f)
       | ChangeTo l -> ChangeToPost (l,post_change_to)
       | ChangeToPost (l,f) -> ChangeToPost (l, post_change_to $ f)

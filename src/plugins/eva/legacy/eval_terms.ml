@@ -1196,7 +1196,7 @@ let rec eval_term ~alarm_mode env t =
     (* we must handle coercion from singleton to set, for which there is
        nothing to do, AND coercion from an integer type to a floating-point
        type, that require a conversion. *)
-    (match Logic_const.plain_or_set Extlib.id ltyp with
+    (match Logic_const.plain_or_set Fun.id ltyp with
      | Linteger when Logic_typing.is_integral_type t.term_type
                   || Logic_const.is_boolean_type t.term_type -> r
      | Ctype typ when Cil.isIntegralOrPointerType typ -> r

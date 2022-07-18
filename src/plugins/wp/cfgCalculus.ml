@@ -198,7 +198,7 @@ struct
     | Some t when is_default_bhv env.mode && is_selected ~goal:true env t ->
       f env t
     | _ ->
-      Extlib.id
+      Fun.id
 
   (* --- Decomposition of WP Rules --- *)
 
@@ -222,7 +222,7 @@ struct
       let smoking =
         is_default_bhv env.mode && env.dead s in
       let cas = CfgAnnot.get_code_assertions ~smoking env.mode.kf s in
-      let opt_fold f = Option.fold ~none:Extlib.id ~some:f in
+      let opt_fold f = Option.fold ~none:Fun.id ~some:f in
       let do_assert env CfgAnnot.{ code_admitted ; code_verified } w =
         opt_fold (prove_property env) code_verified @@
         opt_fold (use_property env) code_admitted w
@@ -283,7 +283,7 @@ struct
       prove_invariant env loop_ind loop_pred @@
       begin match loop_hyp with
         | CfgAnnot.Always pid -> use_property env (pid, loop_pred)
-        | _ -> Extlib.id (* we never assume this one for checks *)
+        | _ -> Fun.id (* we never assume this one for checks *)
       end w
     in
     insert_terminates @@

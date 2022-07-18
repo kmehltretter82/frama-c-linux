@@ -1660,7 +1660,7 @@ module String =
       type t = string
       let name = "string"
       let reprs = [ "" ]
-      let copy = Extlib.id (* immutable strings do not need copy. *)
+      let copy = Fun.id (* immutable strings do not need copy. *)
       let compare = String.compare
       let equal : string -> string -> bool = (=)
       let pretty fmt s = Format.fprintf fmt "%S" s
@@ -1708,7 +1708,7 @@ module Filepath = struct
         type t = Filepath.Normalized.t
         let name = "Filepath.Normalized"
         let reprs = [ Filepath.Normalized.of_string "/" ]
-        let copy = Extlib.id (* immutable strings do not need copy. *)
+        let copy = Fun.id (* immutable strings do not need copy. *)
         let compare = Filepath.Normalized.compare
         let equal : t -> t -> bool = (=)
         let pretty = Filepath.Normalized.pretty

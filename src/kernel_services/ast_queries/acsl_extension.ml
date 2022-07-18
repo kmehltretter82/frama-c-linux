@@ -65,7 +65,7 @@ let default_short_printer name _printer fmt _ext_kind = Format.fprintf fmt "%s" 
 
 let make
     name category
-    ?(preprocessor=Extlib.id)
+    ?(preprocessor=Fun.id)
     typer
     ?(visitor=fun _ _ -> Cil.DoChildren)
     ?(printer=default_printer)
@@ -75,7 +75,7 @@ let make
 
 let make_block
     name category
-    ?(preprocessor=Extlib.id)
+    ?(preprocessor=Fun.id)
     typer
     ?(visitor=fun _ _ -> Cil.DoChildren)
     ?(printer=default_printer)

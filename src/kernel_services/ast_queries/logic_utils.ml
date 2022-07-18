@@ -2733,7 +2733,7 @@ class simplify_const_lval global_find_init = object (self)
         | Some itvs ->
           (* Replace the value/set of values found by something that has the
              expected logic type (plain/Set) *)
-          let typ = Logic_const.plain_or_set Extlib.id t.term_type in
+          let typ = Logic_const.plain_or_set Fun.id t.term_type in
           let aux i l = Logic_const.term (TConst (Integer (i,None))) typ :: l in
           let l = Datatype.Integer.Set.fold aux itvs [] in
           match l, Logic_const.is_plain_type t.term_type with

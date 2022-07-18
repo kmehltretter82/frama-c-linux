@@ -22,8 +22,6 @@
 
 let nop _ = ()
 
-external id: 'a -> 'a = "%identity"
-
 let adapt_filename f =
   let change_suffix ext =
     try Filename.chop_extension f ^ ext

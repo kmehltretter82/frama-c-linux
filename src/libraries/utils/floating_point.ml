@@ -384,7 +384,7 @@ let truncate_to_integer =
         float_of_bits (pred (bits_of_float (to_float max_int))) *)
   in
   fun x ->
-    let max_64_float = Extlib.id max_64_float in
+    let max_64_float = Fun.id max_64_float in
     if x < min_64_float
     then raise (Float_Non_representable_as_Int64 Neg);
     if x > (max_64_float +. max_64_float)

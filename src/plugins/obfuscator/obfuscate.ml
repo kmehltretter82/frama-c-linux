@@ -47,7 +47,7 @@ class visitor = object
                (fun (s,t,a) ->
                   (Dictionary.fresh Obfuscator_kind.Formal_in_type s, t, a)) l)
       in
-      Cil.ChangeDoChildrenPost(TFun(t,args',variadic,attrs), Extlib.id)
+      Cil.ChangeDoChildrenPost(TFun(t,args',variadic,attrs), Fun.id)
     | _ -> Cil.DoChildren
 
   method! vglob_aux = function
@@ -158,7 +158,7 @@ class visitor = object
       let pred' = { pred with pred_name = names' } in
       let ip_content = Logic_const.toplevel_predicate ~kind:tp_kind pred' in
       let p' = { p with ip_content } in
-      Cil.ChangeDoChildrenPost (p', Extlib.id)
+      Cil.ChangeDoChildrenPost (p', Fun.id)
     end
 
   method! vterm t =
@@ -168,11 +168,11 @@ class visitor = object
   method! vannotation = function
     | Daxiomatic(str, globs, attrs, loc) ->
       let str' = Dictionary.fresh Obfuscator_kind.Axiomatic str in
-      Cil.ChangeDoChildrenPost(Daxiomatic(str',globs,attrs,loc),Extlib.id)
+      Cil.ChangeDoChildrenPost(Daxiomatic(str',globs,attrs,loc),Fun.id)
     | Dlemma(str, labs, typs, pred, attrs, loc) ->
       let str' = Dictionary.fresh Obfuscator_kind.Lemma str in
       Cil.ChangeDoChildrenPost(
-        Dlemma(str',labs,typs, pred, attrs, loc),Extlib.id)
+        Dlemma(str',labs,typs, pred, attrs, loc),Fun.id)
     | _ ->
       Cil.DoChildren
 

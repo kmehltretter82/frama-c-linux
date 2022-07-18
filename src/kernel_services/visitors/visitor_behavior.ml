@@ -191,7 +191,7 @@ type t =
       'a.(fundec -> fundec -> 'a -> 'a) -> 'a -> 'a;
   }
 
-let id = Extlib.id
+let id = Fun.id
 let alphabetaunit _ _ = ()
 let alphabetabeta _ x = x
 let unitunit: unit -> unit = id

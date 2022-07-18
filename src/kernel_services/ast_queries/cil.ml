@@ -824,7 +824,7 @@ type 'a visitAction =
                                                 function on the node *)
 
 
-let id = Extlib.id
+let id = Fun.id
 let alphabetabeta _ x = x
 let alphabetafalse _ _ = false
 let alphatrue _ = true

@@ -54,7 +54,7 @@ include Datatype.Make
       let compare = compare
       let hash = hash
       let rehash = Datatype.identity
-      let copy = Extlib.id
+      let copy = Fun.id
       let pretty = pretty
       let mem_project = Datatype.never_any_project
     end)
