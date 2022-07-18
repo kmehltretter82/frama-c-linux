@@ -27,28 +27,11 @@ dir=$(dirname $0)
 
 # Generate MLI
 
-cat $dir/Eva.mli.in >> Eva.mli
-
-printf '\n(** Eva public API.
-
-   The main modules are:
-   - Analysis: run the analysis.
-   - Results: access analysis results, especially the values of expressions
-      and memory locations of lvalues at each program point.
-
-   The following modules allow configuring the Eva analysis:
-   - Parameters: change the configuration of the analysis.
-   - Eva_annotations: add local annotations to guide the analysis.
-   - Builtins: register ocaml builtins to be used by the cvalue domain
-       instead of analysing the body of some C functions.
-
-   Other modules are for internal use only. *)\n' >> Eva.mli
-
-printf '\n(* This file is generated. Do not edit. *)\n' >> Eva.mli
+cat $dir/Eva.header >> Eva.mli
 
 for i in "$@"
 do
-    if [[ ! "$i" =~ [.]in$ ]]; then
+    if [[ ! "$i" =~ [.]header$ ]]; then
         file=$(basename $i)
         module=${file%.*}
         Module="$(echo "${module:0:1}" | tr '[:lower:]' '[:upper:]')${module:1}"
@@ -60,11 +43,11 @@ done
 
 # Generate ML
 
-cat $dir/Eva.ml.in >> Eva.ml
+cat $dir/Eva.header >> Eva.ml
 
 for i in "$@"
 do
-    if [[ ! "$i" =~ [.]in$ ]]; then
+    if [[ ! "$i" =~ [.]header$ ]]; then
         file=$(basename $i)
         module=${file%.*}
         Module="$(echo "${module:0:1}" | tr '[:lower:]' '[:upper:]')${module:1}"

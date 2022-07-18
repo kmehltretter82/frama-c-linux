@@ -20,32 +20,31 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+(** For internal use only: the Eva gui and optional domains (numerors and apron)
+    are compiled separately from the Eva core. This is used to give them access
+    to the internal modules of Eva they need. *)
 
-val is_non_terminating_instr: stmt -> bool
-(** Returns [true] iff there exists executions of the statement that does
-    not always fail/loop (for function calls). Must be called *only* on
-    statements that are instructions. *)
-
-(** {2 Results} *)
-
-[@@@ api_start]
-type results
-
-val get_results: unit -> results
-val set_results: results -> unit
-val merge: results -> results -> results
-
-(** Change the callstacks for the results for which this is meaningful.
-    For technical reasons, the top of the callstack must currently
-    be preserved. *)
-val change_callstacks:
-  (Value_types.callstack -> Value_types.callstack) -> results -> results
-
-[@@@ api_end]
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)
+module Abstract_domain = Abstract_domain
+module Abstract_value = Abstract_value
+module Abstractions = Abstractions
+module Active_behaviors = Active_behaviors
+module Alarmset = Alarmset
+module Analysis = Analysis
+module Domain_builder = Domain_builder
+module Eva_dynamic = Eva_dynamic
+module Eva_results = Eva_results
+module Eva_utils = Eva_utils
+module Eval = Eval
+module Eval_annots = Eval_annots
+module Eval_op = Eval_op
+module Eval_terms = Eval_terms
+module Eval_typ = Eval_typ
+module Function_calls = Function_calls
+module Main_locations = Main_locations
+module Main_values = Main_values
+module Parameters = Parameters
+module Red_statuses = Red_statuses
+module Results = Results
+module Self = Self
+module Simple_memory = Simple_memory
+module Structure = Structure
