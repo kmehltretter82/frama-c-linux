@@ -191,7 +191,7 @@ let eval_assigns kf state assigns =
     }
 
 let compute_using_prototype_state state kf =
-  let behaviors = !Db.Value.valid_behaviors kf state in
+  let behaviors = Eva.Logic_inout.valid_behaviors kf state in
   let assigns = Ast_info.merge_assigns behaviors in
   eval_assigns kf state assigns
 
@@ -230,8 +230,9 @@ module CallwiseResults =
 module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
     val _version: string (* Debug: Callwise or functionwise *)
     val _kf: kernel_function (* Debug: Function being analyzed *)
-    val kf_pre_state: Db.Value.state (* Memory pre-state of the function. *)
-    val stmt_state: stmt -> Db.Value.state (* Memory state at the given stmt *)
+    val kf_pre_state: Cvalue.Model.t (* Memory pre-state of the function. *)
+    val stmt_state: stmt -> Cvalue.Model.t (* Memory state at the given stmt *)
+    val stmt_request: stmt -> Eva.Results.request (* Request at the given stmt *)
     val at_call: stmt -> kernel_function -> Inout_type.t (* Results of the
                                                             analysis for the given call. Must not contain locals or formals *)
   end) = struct
@@ -289,8 +290,8 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
 
   (* Transfer function on expression. *)
   let transfer_exp s exp data =
-    let state = X.stmt_state s in
-    let inputs = !Db.From.find_deps_no_transitivity_state state exp in
+    let request = X.stmt_request s in
+    let inputs = Eva.Results.expr_deps exp request in
     let new_inputs = Zone.diff inputs data.under_outputs_d in
     store_non_terminating_inputs new_inputs;
     {data with over_inputs_d = Zone.join data.over_inputs_d new_inputs}
@@ -298,12 +299,13 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
   (* Initialized const variables should be included as outputs of the function,
      so [for_writing] must be false for local initializations. It should be
      true for all other instructions. *)
-  let add_out ~for_writing state lv deps data =
-    let deps, new_outs, exact =
-      !Db.Value.lval_to_zone_with_deps_state state
-        ~deps:(Some deps) ~for_writing lv
-    in
+  let add_out ~for_writing request lv deps data =
+    let lv_address = Eva.Results.eval_address ~for_writing lv request in
+    let new_outs = Eva.Results.as_zone lv_address in
+    let exact = Eva.Results.is_singleton lv_address in
     store_non_terminating_outputs new_outs;
+    let lv_deps = Eva.Results.address_deps lv request in
+    let deps = Zone.join lv_deps deps in
     let new_inputs = Zone.diff deps data.under_outputs_d in
     store_non_terminating_inputs new_inputs;
     let new_sure_outs =
@@ -318,34 +320,21 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
       over_outputs_d = Zone.join data.over_outputs_d new_outs }
 
   let transfer_call ~for_writing s dest f args _loc data =
-    let state = X.stmt_state s in
-    let f_inputs, called =
-      !Db.Value.expr_to_kernel_function_state
-        ~deps:(Some Zone.bottom)
-        state
-        f
-    in
-    let acc_f_arg_inputs =
-      (* add the inputs of [argl] to the inputs of the
-         function expression *)
-      List.fold_right
-        (fun arg inputs ->
-           let arg_inputs = !Db.From.find_deps_no_transitivity_state
-               state arg
-           in Zone.join inputs arg_inputs)
-        args
-        f_inputs
-    in
+    let request = X.stmt_request s in
+    (* Join the inputs of [args] and of the function expression. *)
+    let eval_deps acc e = Zone.join acc (Eva.Results.expr_deps e request) in
+    let f_args_inputs = List.fold_left eval_deps Zone.bottom (f :: args) in
     let data =
       catenate
         data
-        { over_inputs_d = acc_f_arg_inputs ;
+        { over_inputs_d = f_args_inputs ;
           under_outputs_d = Zone.bottom;
           over_outputs_d = Zone.bottom; }
     in
+    let called = Eva.Results.(eval_callee f request |> default []) in
     let for_functions =
-      Kernel_function.Hptset.fold
-        (fun kf acc  ->
+      List.fold_left
+        (fun acc kf ->
            let res = X.at_call s kf in
            store_non_terminating_subcall data.over_outputs_d res;
            let for_function = {
@@ -354,15 +343,15 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
              over_outputs_d = res.over_outputs_if_termination;
            } in
            join for_function acc)
-        called
         bottom
+        called
     in
     let result = catenate data for_functions in
     let result =
       (* Treatment for the possible assignment of the call result *)
       (match dest with
        | None -> result
-       | Some lv -> add_out ~for_writing state lv Zone.bottom result)
+       | Some lv -> add_out ~for_writing request lv Zone.bottom result)
     in result
 
   (* Propagate all zones in predicates for the given statement, only in the case
@@ -395,18 +384,16 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
   let transfer_instr stmt (i: instr) (data: t) =
     match i with
     | Set (lv, exp, _) ->
-      let state = X.stmt_state stmt in
-      let e_inputs =
-        !Db.From.find_deps_no_transitivity_state state exp
-      in
-      add_out ~for_writing:true state lv e_inputs data
+      let request = X.stmt_request stmt in
+      let e_inputs = Eva.Results.expr_deps exp request in
+      add_out ~for_writing:true request lv e_inputs data
     | Local_init (v, AssignInit i, _) ->
-      let state = X.stmt_state stmt in
+      let request = X.stmt_request stmt in
       let rec aux lv i acc =
         match i with
         | SingleInit e ->
-          let e_inputs = !Db.From.find_deps_no_transitivity_state state e in
-          add_out ~for_writing:false state lv e_inputs acc
+          let e_inputs = Eva.Results.expr_deps e request in
+          add_out ~for_writing:false request lv e_inputs acc
         | CompoundInit(ct, initl) ->
           (* Avoid folding implicit zero-initializer of large arrays. *)
           let implicit = Cumulative_analysis.fold_implicit_initializer ct in
@@ -417,7 +404,7 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
                zone of the array as outputs. It is exactly the written zone for
                arrays of scalar elements. Nothing is read by zero-initializers,
                so the inputs are empty. *)
-            add_out ~for_writing:false state lv Zone.bottom acc
+            add_out ~for_writing:false request lv Zone.bottom acc
       in
       aux (Cil.var v) i data
     | Call (lvaloption,funcexp,argl,loc) ->
@@ -433,8 +420,8 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
      the condition. In this case, we just make sure that dead
      edges get bottom, instead of the input state. *)
   let transfer_guard stmt e t =
-    let state = X.stmt_state stmt in
-    let v_e = !Db.Value.eval_expr state e in
+    let request = X.stmt_request stmt in
+    let v_e = Eva.Results.(eval_exp e request |> as_cvalue) in
     let t1 = Cil.unrollType (Cil.typeOf e) in
     let do_then, do_else =
       if Cil.isIntegralType t1 || Cil.isPointerType t1
@@ -473,7 +460,7 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
   ;;
 
   let transfer_stmt s data =
-    if Db.Value.is_reachable (X.stmt_state s)
+    if Cvalue.Model.is_reachable (X.stmt_state s)
     then begin
       transfer_annotations s;
       transfer_stmt s data
@@ -663,19 +650,14 @@ module Callwise = struct
 
         (* Returns the [kf] pre-state with respect to the single [call_stack]. *)
         let kf_pre_state =
-          match Db.Value.get_initial_state_callstack kf with
-          | None ->
-            Cvalue.Model.bottom
-          | Some cs ->
-            begin
-              match Value_types.Callstack.Hashtbl.find_opt cs call_stack with
-              | None -> Cvalue.Model.bottom
-              | Some state -> state
-            end
+          Eva.Results.(at_start_of kf |> in_callstack call_stack |>
+                       get_cvalue_model)
 
         let stmt_state stmt =
           try Cil_datatype.Stmt.Hashtbl.find states stmt
           with Not_found -> Cvalue.Model.bottom
+
+        let stmt_request stmt = Eva.Results.in_cvalue_state (stmt_state stmt)
 
         let at_call stmt kf =
           let _cur_kf, table = List.hd !call_inout_stack in
@@ -739,8 +721,9 @@ module FunctionWise = struct
       let module Computer = Computer(Fenv)(struct
           let _version = "functionwise"
           let _kf = kf
-          let kf_pre_state = Db.Value.get_initial_state kf
-          let stmt_state s = Db.Value.get_stmt_state s
+          let kf_pre_state = Eva.Results.(at_start_of kf |> get_cvalue_model)
+          let stmt_state s = Eva.Results.(before s |> get_cvalue_model)
+          let stmt_request s = Eva.Results.before s
           let at_call stmt kf = get_external_aux ~stmt kf
         end) in
       Stack.iter (fun g -> if kf == g then raise Exit) call_stack;

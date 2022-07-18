@@ -37,7 +37,7 @@ open Cil_types
 val fold_implicit_initializer: typ -> bool
 
 
-val specialize_state_on_call: ?stmt:stmt -> kernel_function -> Db.Value.state
+val specialize_state_on_call: ?stmt:stmt -> kernel_function -> Cvalue.Model.t
 (** If the given statement is a call to the given function,
     enrich the superposed memory state at this statement with
     the formal arguments of this function. This is usually more precise
@@ -50,7 +50,7 @@ val specialize_state_on_call: ?stmt:stmt -> kernel_function -> Db.Value.state
 class virtual ['a] cumulative_visitor : object
   inherit Visitor.frama_c_inplace
 
-  method specialize_state_on_call: kernel_function -> Db.Value.state
+  method specialize_state_on_call: kernel_function -> Cvalue.Model.t
   (** If the current statement is a call to the given function,
       enrich the superposed memory state at this statement with
       the formal arguments of this function. Useful to do an analysis

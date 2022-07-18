@@ -40,10 +40,8 @@ class virtual do_it_ = object(self)
     begin match base with
       | Var _ -> ()
       | Mem e ->
-        let state =
-          Db.Value.get_state (Kstmt (Option.get self#current_stmt))
-        in
-        let r = !Db.Value.eval_expr state e in
+        let stmt = Option.get self#current_stmt in
+        let r = Eva.Results.(before stmt |> eval_exp e |> as_cvalue) in
         let loc = loc_bytes_to_loc_bits r in
         let size = Bit_utils.sizeof_lval lv in
         self#join

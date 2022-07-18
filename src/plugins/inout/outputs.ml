@@ -55,35 +55,32 @@ class virtual do_it_ = object(self)
     self#join bits_loc
 
   method! vinst i =
-    if Db.Value.is_reachable (Db.Value.noassert_get_state self#current_kinstr)
+    let stmt = Option.get self#current_stmt in
+    if Eva.Results.is_reachable stmt
     then
       (* noassert needed for Eval.memoize. Not really satisfactory *)
       begin
+        let assign_lval lval =
+          let for_writing = not (Cil.is_mutable_or_initialized lval) in
+          self#do_assign ~for_writing lval
+        in
         match i with
         | Set (lv,_,_) ->
-          let for_writing = not (Cil.is_mutable_or_initialized lv) in
-          self#do_assign ~for_writing lv
-        | Call (lv_opt,exp,_,_) ->
-          (match lv_opt with None -> ()
-                           | Some lv ->
-                             let for_writing =
-                               not (Cil.is_mutable_or_initialized lv)
-                             in
-                             self#do_assign ~for_writing lv);
-          let state = Db.Value.get_state self#current_kinstr in
-          if Cvalue.Model.is_top state then
-            self#join Zone.top
-          else
-            let _, callees =
-              !Db.Value.expr_to_kernel_function_state ~deps:None state exp in
-            Kernel_function.Hptset.iter
-              (fun kf ->
-                 let { Inout_type.over_outputs = z } =
-                   Operational_inputs.get_external_aux
-                     ?stmt:self#current_stmt kf
-                 in
-                 self#join z
-              ) callees
+          assign_lval lv
+        | Call (lv_opt, exp, _, _) ->
+          begin
+            Option.iter assign_lval lv_opt;
+            let callees = Eva.Results.(before stmt |> eval_callee exp) in
+            match callees with
+            | Ok callees ->
+              let join_outputs kf =
+                let inout = Operational_inputs.get_external_aux ~stmt kf in
+                self#join inout.over_outputs
+              in
+              List.iter join_outputs callees
+            | Error (Top | DisabledDomain) -> self#join Zone.top
+            | Error Bottom -> ()
+          end
         | Local_init (v, AssignInit i, _) ->
           let rec aux lv = function
             | SingleInit _ -> self#do_assign ~for_writing:false lv
@@ -102,8 +99,8 @@ class virtual do_it_ = object(self)
           in
           aux (Cil.var v) i
         | Local_init (v, ConsInit(f, _, _),_) ->
-          let state = Db.Value.get_state self#current_kinstr in
-          if Cvalue.Model.is_top state then self#join Zone.top
+          if Cvalue.Model.is_top Eva.Results.(before stmt |> get_cvalue_model)
+          then self#join Zone.top
           else begin
             let { Inout_type.over_outputs = z }  =
               Operational_inputs.get_external_aux ?stmt:self#current_stmt
@@ -125,9 +122,9 @@ class virtual do_it_ = object(self)
 
   method compute_funspec kf =
     let state = self#specialize_state_on_call kf in
-    let behaviors = !Db.Value.valid_behaviors kf state in
+    let behaviors = Eva.Logic_inout.valid_behaviors kf state in
     let assigns = Ast_info.merge_assigns behaviors in
-    !Db.Value.assigns_outputs_to_zone state ~result:None assigns
+    Eva.Logic_inout.assigns_outputs_to_zone state ~result:None assigns
 end
 
 module Analysis = Cumulative_analysis.Make(
