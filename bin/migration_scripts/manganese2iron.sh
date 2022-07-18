@@ -85,7 +85,8 @@ process_file ()
     echo "Processing file $file"
   fi
   sedi "$file" \
-   -e 's/Extlib\.id/Fun.id/g'
+   -e 's/Extlib\.id/Fun.id/g' \
+   -e 's/Extlib\.swap/Fun.flip/g'
    # this line left empty on purpose
 }
 

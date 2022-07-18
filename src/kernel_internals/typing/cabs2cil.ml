@@ -4324,7 +4324,7 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
       let res =
         match current_chunk.stmts with
         | [(s1, m1, w1, r1, c1); (s2, m2, w2, r2, c2)] ->
-          Extlib.swap
+          Fun.flip
             Option.bind
             (function
               | [ s1' ] -> Some (s1', m1 @ m2, w1 @ w2, r1 @ r2, c1 @ c2)
@@ -9690,7 +9690,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
              let attr = fc_stdlib_attribute [] in
              let tdecl =
                List.fold_left
-                 (Extlib.swap Logic_utils.add_attribute_glob_annot) tdecl attr
+                 (Fun.flip Logic_utils.add_attribute_glob_annot) tdecl attr
              in
              cabsPushGlobal (GAnnot(tdecl,CurrentLoc.get ()))
            with LogicTypeError ((source,_),msg) ->

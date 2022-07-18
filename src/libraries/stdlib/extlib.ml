@@ -68,8 +68,6 @@ let mk_fun s = ref (fun _ -> mk_labeled_fun s)
 
 let ($) f g x = f (g x)
 
-let swap f x y = f y x
-
 let uncurry f x = f (fst x) (snd x)
 
 let iter_uncurry2 iter f v =

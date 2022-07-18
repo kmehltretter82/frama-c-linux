@@ -62,9 +62,6 @@ val mk_fun: string -> ('a -> 'b) ref
 val ($) : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c
 (** Composition. *)
 
-val swap: ('a -> 'b -> 'c) -> 'b -> 'a -> 'c
-(** Swap arguments. *)
-
 val uncurry: ('a -> 'b -> 'c) -> ('a * 'b) -> 'c
 
 val iter_uncurry2:

@@ -6627,7 +6627,7 @@ let rec free_vars_term bound_vars t = match t.term_node with
       Logic_var.Set.empty t
   | Tlambda(prms,expr) ->
     let bound_vars =
-      List.fold_left (Extlib.swap Logic_var.Set.add) bound_vars prms
+      List.fold_left (Fun.flip Logic_var.Set.add) bound_vars prms
     in
     free_vars_term bound_vars expr
   | Trange(i1,i2) ->
@@ -6753,7 +6753,7 @@ and free_vars_predicate bound_vars p = match p.pred_content with
   | Pforall (lvs,p) | Pexists (lvs,p) ->
     let new_bv =
       List.fold_left
-        (Extlib.swap Logic_var.Set.add) bound_vars lvs
+        (Fun.flip Logic_var.Set.add) bound_vars lvs
     in
     free_vars_predicate new_bv p
 
