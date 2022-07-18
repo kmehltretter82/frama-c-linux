@@ -37,27 +37,13 @@ let fold_implicit_initializer typ =
 
 let specialize_state_on_call ?stmt kf =
   match stmt with
-  | Some ({ skind = Instr (Call (_, _, l, _)) } as stmt) ->
-    let at_stmt = Db.Value.get_stmt_state stmt in
-    if Cvalue.Model.is_top at_stmt then
-      Cvalue.Model.top (* can occur with -no-results-function option *)
-    else !Db.Value.add_formals_to_state at_stmt kf l
-  | Some
-      ({skind =
-          Instr(Local_init(v, ConsInit(_,args,kind),_))} as stmt) ->
-    let at_stmt = Db.Value.get_stmt_state stmt in
-    if Cvalue.Model.is_top at_stmt then
-      Cvalue.Model.top
-    else begin
-      let args =
-        match kind with
-        | Constructor -> Cil.mkAddrOfVi v :: args
-        | Plain_func -> args
-      in
-      !Db.Value.add_formals_to_state at_stmt kf args
-    end
-  | _ -> Db.Value.get_initial_state kf
-
+  | None -> Eva.Results.(at_start_of kf |> get_cvalue_model)
+  | Some stmt ->
+    let filter = function
+      | (_, Kstmt s) :: _ -> Cil_datatype.Stmt.equal s stmt
+      | _ -> false
+    in
+    Eva.Results.(at_start_of kf |> filter_callstack filter |> get_cvalue_model)
 
 class virtual ['a] cumulative_visitor = object
   inherit frama_c_inplace as self
