@@ -26,8 +26,6 @@ open Options
 module List = Extends.List
 module Typ = Extends.Typ
 
-type call_builder  = Cil_types.exp -> Cil_types.exp list -> Cil_types.instr
-
 let pp_prototype name fmt tparams =
   Format.fprintf fmt "%s(%a)"
     name
@@ -37,8 +35,6 @@ let pp_overload name fmt l =
   let prototypes = List.map fst l in
   Pretty_utils.pp_list ~sep:"@\n" (pp_prototype name) fmt prototypes
 
-
-let new_globals : (global list) ref = ref []
 
 (* State to store the number of fallback functions generated for a particular
    function name. This number is used to generate a unique function name. *)
@@ -169,73 +165,66 @@ let match_args ~callee tparams args =
 
 (* translate a call by applying argument matching/pruning and changing
    callee *)
-let match_call ~loc ~fundec scope mk_call new_callee new_tparams args =
+let match_call ~builder new_callee new_tparams args =
+  let module Build = (val builder : Builder.S) in
+
   let new_args, unused_args = match_args ~callee:new_callee new_tparams args in
-  let call = mk_call (Cil.evar ~loc new_callee) new_args in
-  let reads =
-    List.map (fun e -> Cil.mkPureExprInstr ~fundec ~scope e) unused_args
-  in
-  reads @ [call]
+  Build.start_translation ();
+  Build.(List.iter pure (of_exp_list unused_args));
+  Build.(translated_call (var new_callee) (of_exp_list new_args))
 
 (* ************************************************************************ *)
 (* Fallback calls                                                           *)
 (* ************************************************************************ *)
 
-let fallback_fun_call ~callee loc mk_call vf args =
-  let build_fallback_fun ~vf args =
-    let module Build =
-      Cil_builder.Stateful (struct let loc = vf.vf_decl.vdecl end)
-    in
+let fallback_fun_call ~builder ~callee vf args =
+  let module Build = (val builder : Builder.S) in
 
-    (* Choose function name *)
-    let name = callee.vname in
-    let vorig_name = callee.vorig_name in
-    let count =
-      try Fallback_counts.find name
-      with Not_found -> 0
-    in
-    let count = count + 1 in
-    Fallback_counts.replace name count;
-    let new_name = name ^ "_fallback_" ^ (string_of_int count) in
-
-    (* Start building the function *)
-    let funvar = Build.open_function ~vorig_name new_name in
-
-    (* Set function return type and attributes *)
-    let ret_typ, params, _, attrs = Cil.splitFunctionType vf.vf_original_type in
-    Build.set_return_type' ret_typ;
-    List.iter Build.add_attribute attrs;
-    Build.add_stdlib_generated ();
-
-    (* Add parameters *)
-    let fixed_params_count = Typ.params_count vf.vf_original_type in
-    let add_static_param (name,typ,attributes) =
-      ignore (Build.parameter ~attributes typ name)
-    and add_variadic_param i e =
-      let typ = Cil.typeOf e in
-      ignore (Build.parameter typ ("param" ^ string_of_int i))
-    in
-    List.iter add_static_param (Option.get params);
-    List.iteri add_variadic_param (List.drop fixed_params_count args);
-
-    (* Build the default behaviour *)
-    let glob = Build.finish_declaration ~register:false () in
-    glob, Build.cil_varinfo funvar
+  (* Choose function name *)
+  let name = callee.vname in
+  let vorig_name = callee.vorig_name in
+  let count =
+    try Fallback_counts.find name
+    with Not_found -> 0
   in
+  let count = count + 1 in
+  Fallback_counts.replace name count;
+  let new_name = name ^ "_fallback_" ^ (string_of_int count) in
 
-  (* Create the new callee *)
-  let glob, new_callee = build_fallback_fun ~vf args in
-  new_globals := glob :: !new_globals;
+  (* Start building the function *)
+  let loc = vf.vf_decl.vdecl in
+  let new_callee = Build.open_function ~loc ~vorig_name new_name in
+
+  (* Set function return type and attributes *)
+  let ret_typ, params, _, attrs = Cil.splitFunctionType vf.vf_original_type in
+  Build.set_return_type' ret_typ;
+  List.iter Build.add_attribute attrs;
+  Build.add_stdlib_generated ();
+
+  (* Add parameters *)
+  let fixed_params_count = Typ.params_count vf.vf_original_type in
+  let add_static_param (name,typ,attributes) =
+    ignore (Build.parameter ~attributes typ name)
+  and add_variadic_param i e =
+    let typ = Cil.typeOf e in
+    ignore (Build.parameter typ ("param" ^ string_of_int i))
+  in
+  List.iter add_static_param (Option.get params);
+  List.iteri add_variadic_param (List.drop fixed_params_count args);
+
+  (* Build the default behaviour *)
+  Build.finish_declaration ();
 
   (* Store the translation *)
-  Replacements.add new_callee vf.vf_decl;
+  Replacements.add (Build.cil_varinfo new_callee) vf.vf_decl;
 
   (* Translate the call *)
+  Build.start_translation ();
   Self.result ~current:true ~level:2
-    "Fallback translation of call %s to a call to the specialized version %s."
-    vf.vf_decl.vorig_name new_callee.vname;
-  let call = mk_call (Cil.evar ~loc new_callee) args in
-  [call]
+    "Fallback translation of call %s to a call to the specialized version %a."
+    vf.vf_decl.vorig_name Build.pretty new_callee;
+  Build.(translated_call new_callee (List.map of_exp args))
+
 
 (* ************************************************************************ *)
 (* Aggregator calls                                                         *)
@@ -245,7 +234,9 @@ let find_null exp_list =
   List.ifind (fun e -> Cil.isZero (Cil.constFold false e)) exp_list
 
 
-let aggregator_call ~fundec ~ghost aggregator scope loc mk_call vf args =
+let aggregator_call ~builder aggregator vf args =
+  let module Build = (val builder : Builder.S) in
+
   let {a_target; a_pos; a_type; a_param} = aggregator in
   let name = vf.vf_decl.vorig_name
   and tparams = Typ.params_types a_target.vtype
@@ -289,19 +280,17 @@ let aggregator_call ~fundec ~ghost aggregator scope loc mk_call vf args =
     name a_target.vorig_name;
   let pname = if pname = "" then "param" else pname in
 
-  let module Build = Cil_builder.Stateful (struct let loc = loc end) in
-  Build.open_block ~into:fundec ~ghost ();
+  Build.start_translation ();
   let init = match args_middle with (* C standard forbids arrays of size 0 *)
-    | [] -> [Build.of_init (Cil.makeZeroInit ~loc ptyp)]
+    | [] -> [Build.(of_init (Cil.makeZeroInit ~loc ptyp))]
     | l -> List.map Build.of_exp l
   in
   let size = List.length init in
   let vaggr = Build.(local (array ~size (of_ctyp ptyp)) pname ~init) in
   let new_args = args_left @ [Build.(cil_exp ~loc (addr vaggr))] @ args_right in
   let new_args,_ = match_args ~callee:vf.vf_decl tparams new_args in
-  Build.(List.iter pure (List.map of_exp unused_args));
-  Build.of_instr (mk_call (Cil.evar ~loc a_target) new_args);
-  Build.finish_instr_list ~scope ()
+  Build.(List.iter pure (of_exp_list unused_args));
+  Build.(translated_call (var a_target) (of_exp_list new_args))
 
 
 (* ************************************************************************ *)
@@ -338,7 +327,7 @@ let filter_matching_prototypes overload args =
   List.filter check overload
 
 
-let overloaded_call ~fundec overload block loc mk_call vf args =
+let overloaded_call ~builder overload vf args =
   let name = vf.vf_decl.vorig_name in
 
   (* Find the matching prototype *)
@@ -372,7 +361,7 @@ let overloaded_call ~fundec overload block loc mk_call vf args =
   Self.result ~current:true ~level:2
     "Translating call to the specialized version %a."
     (pp_prototype name) tparams;
-  match_call ~loc ~fundec block mk_call new_callee tparams args
+  match_call ~builder new_callee tparams args
 
 
 
@@ -443,11 +432,9 @@ let format_length typ =
   find_predicate_by_width typ "format_length" "wformat_length"
 
 
-let build_specialized_fun env vf format_fun tvparams =
+let build_specialized_fun ~builder env vf format_fun tvparams =
   let open Format_types in
-  let module Build =
-    Cil_builder.Stateful (struct let loc = vf.vf_decl.vdecl end)
-  in
+  let module Build = (val builder : Builder.S) in
 
   (* Choose function name *)
   let name = vf.vf_decl.vorig_name in
@@ -455,7 +442,8 @@ let build_specialized_fun env vf format_fun tvparams =
   let new_name = name ^ "_va_" ^ (string_of_int vf.vf_specialization_count) in
 
   (* Start building the function *)
-  let funvar = Build.open_function ~vorig_name:name new_name in
+  let loc = vf.vf_decl.vdecl in
+  let funvar = Build.open_function ~loc ~vorig_name:name new_name in
 
   (* Set function return type and attributes *)
   let ret_typ, params, _, attrs = Cil.splitFunctionType vf.vf_original_type in
@@ -612,8 +600,8 @@ let build_specialized_fun env vf format_fun tvparams =
   Build.assigns !dests !sources;
 
   (* Build the default behaviour *)
-  let glob = Build.finish_declaration ~register:false () in
-  glob, Build.cil_varinfo funvar
+  Build.finish_declaration ();
+  Build.cil_varinfo funvar
 
 
 (* --- Call translation --- *)
@@ -720,7 +708,7 @@ let infer_format_from_args vf format_fun args =
   | PrintfLike -> Format_types.FFormat (List.map f_format format)
   | ScanfLike -> Format_types.SFormat (List.map s_format format)
 
-let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
+let format_fun_call ~builder env format_fun vf args =
   (* Extract the format if possible *)
   let format =
     try
@@ -754,8 +742,7 @@ let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
   in
 
   (* Create the new callee *)
-  let glob, new_callee = build_specialized_fun env vf format_fun tvparams in
-  new_globals := glob :: !new_globals;
+  let new_callee = build_specialized_fun ~builder env vf format_fun tvparams in
 
   (* Store the translation *)
   Replacements.add new_callee vf.vf_decl;
@@ -765,4 +752,4 @@ let format_fun_call ~fundec env format_fun scope loc mk_call vf args =
     "Translating call to %s to a call to the specialized version %s."
     vf.vf_decl.vorig_name new_callee.vname;
   let tparams = Typ.params_types new_callee.vtype in
-  match_call ~loc ~fundec scope mk_call new_callee tparams args
+  match_call ~builder new_callee tparams args

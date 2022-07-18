@@ -20,24 +20,29 @@
 (*                                                                        *)
 (**************************************************************************)
 
-exception Translate_call_exn of Cil_types.varinfo
+(* A Builder.S module is a stateful module that
+   1. extends Cil_builder.Stateful which already contains building utilities and
+   2. stores the current state of the building process with instructions,
+      variables and globals that remains to be added to the AST. It . *)
 
-val fallback_fun_call :
-  builder:Builder.t -> callee:Cil_types.varinfo ->
-  Va_types.variadic_function -> Cil_types.exp list -> unit
+module type S =
+sig
+  include (module type of Cil_builder.Stateful ())
 
-val aggregator_call :
-  builder:Builder.t ->
-  Va_types.aggregator ->
-  Va_types.variadic_function -> Cil_types.exp list -> unit
+  (* The loc of the call being translated *)
+  val loc : Cil_types.location
 
-val overloaded_call :
-  builder:Builder.t ->
-  Va_types.overload ->
-  Va_types.variadic_function -> Cil_types.exp list -> unit
+  (* These two following function stores the built global for later addition
+     to the AST *)
+  val finish_function : unit -> unit
+  val finish_declaration : unit -> unit
 
-val format_fun_call :
-  builder:Builder.t ->
-  Environment.t ->
-  Va_types.format_fun ->
-  Va_types.variadic_function -> Cil_types.exp list -> unit
+  (** Start the translation of the call. Call this before declaring variables
+      or inserting statements. *)
+  val start_translation : unit -> unit
+  (* Build a call or a Local_init with constructor depending on the currently
+      translated instruction *)
+  val translated_call : [< exp] -> [< exp] list -> unit
+end
+
+type t = (module S)

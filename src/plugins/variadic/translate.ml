@@ -77,7 +77,8 @@ let translate_variadics (file : file) =
   let v = object (self)
     inherit Cil.nopCilVisitor
 
-    val curr_block = Stack.create ()
+    val curr_block = Stack.create () (* Opened blocks to store generated locals *)
+    val mutable pending_globals = [] (* List of globals to add before the current global once it's finished visiting *)
 
     method! vblock b =
       Stack.push b curr_block;
@@ -86,6 +87,31 @@ let translate_variadics (file : file) =
     method private enclosing_block () =
       try Stack.top curr_block
       with Stack.Empty -> Options.Self.fatal "No enclosing block here"
+
+    method private make_builder ~loc ~fundec ~ghost ~mk_call =
+      let module B =
+      struct
+        include Cil_builder.Stateful ()
+
+        let loc = loc
+
+        let finish_function () =
+          pending_globals <- finish_function () :: pending_globals
+
+        let finish_declaration () =
+          pending_globals <-
+            finish_declaration ~register:false () :: pending_globals
+
+        let start_translation () =
+          open_block ~loc ~into:fundec ~ghost ()
+
+        let translated_call callee args =
+          of_instr
+            (mk_call (cil_exp ~loc callee) (List.map (cil_exp ~loc) args))
+      end
+      in
+      (module B : Builder.S)
+
 
     method! vtype _typ =
       Cil.DoChildrenPost (Generic.translate_type)
@@ -109,9 +135,9 @@ let translate_variadics (file : file) =
             Generic.add_vpar vi;
             fundec.sformals <- Cil.getFormalsDecl vi;
           end;
-          Standard.new_globals := [];
+          pending_globals <- [];
           Cil.DoChildrenPost (fun globs ->
-              List.rev (globs @ !Standard.new_globals))
+              List.rev_append pending_globals globs)
 
         | _ ->
           Cil.DoChildren
@@ -160,35 +186,48 @@ let translate_variadics (file : file) =
       let loc = Cil_datatype.Instr.loc i in
       let block = self#enclosing_block () in
       let ghost = (Option.get self#current_stmt).ghost in
-      let make_new_args mk_call f args =
+      let translate_call mk_call translator args =
+        File.must_recompute_cfg fundec;
+        let builder = self#make_builder ~loc ~fundec ~ghost ~mk_call in
+        translator ~builder args;
+        let module Builder = (val builder : Builder.S) in
+        Builder.finish_instr_list ~scope:block ()
+      in
+      let mk_translator f =
         let vf = Table.find classification f in
-        try begin
-          match vf.vf_class with
-          | Overload o -> Standard.overloaded_call ~fundec o block loc mk_call vf args
-          | Aggregator a -> Standard.aggregator_call ~fundec ~ghost a block loc mk_call vf args
-          | FormatFun f -> Standard.format_fun_call ~fundec env f block loc mk_call vf args
-          | Builtin ->
-            Self.result ~level:2 ~current:true
-              "Call to variadic builtin %s left untransformed." f.vname;
-            raise Not_found
-          | _ ->
-            Generic.translate_call
-              ~fundec ~ghost block loc mk_call (Cil.evar ~loc f) args
-        end with Standard.Translate_call_exn callee ->
-          Standard.fallback_fun_call ~callee loc mk_call vf args
+        let cover_failure f =
+          fun ~builder args ->
+            try
+              f ~builder args
+            with Standard.Translate_call_exn callee ->
+              Standard.fallback_fun_call ~callee ~builder vf args
+        in
+        match vf.vf_class with
+        | Overload o -> cover_failure (Standard.overloaded_call o vf)
+        | Aggregator a -> cover_failure (Standard.aggregator_call a vf)
+        | FormatFun f -> cover_failure (Standard.format_fun_call env f vf)
+        | Builtin ->
+          Self.result ~level:2 ~current:true
+            "Call to variadic builtin %s left untransformed." f.vname;
+          raise Not_found
+        | _ ->
+          Generic.translate_call (Cil.evar ~loc f)
       in
       begin match i with
+        (* Translate builtins *)
         | Call(_, {enode = Lval(Var vi, _)}, _, _)
           when Classify.is_va_builtin vi.vname ->
           File.must_recompute_cfg fundec;
           Cil.ChangeTo (Generic.translate_va_builtin fundec i)
+
+        (* Translate variadic calls *)
         | Call(lv, {enode = Lval(Var vi, NoOffset)}, args, loc) ->
           begin
             try
               let mk_call f args = Call (lv, f, args, loc) in
-              let res = make_new_args mk_call vi args in
-              File.must_recompute_cfg fundec;
-              Cil.ChangeTo res
+              let translator = mk_translator vi in
+              let instr_list = translate_call mk_call translator args in
+              Cil.ChangeTo instr_list
             with Not_found ->
               Cil.DoChildren
           end
@@ -199,20 +238,12 @@ let translate_variadics (file : file) =
           in
           if is_variadic then begin
             let mk_call f args = Call (lv, f, args, loc) in
-            let res =
-              Generic.translate_call
-                ~fundec
-                ~ghost
-                block
-                loc
-                mk_call
-                callee
-                args
-            in
-            File.must_recompute_cfg fundec;
-            Cil.ChangeTo res
+            let translator = Generic.translate_call callee in
+            let instr_list = translate_call mk_call translator args in
+            Cil.ChangeTo instr_list
           end else
             Cil.DoChildren
+
         | Local_init(v, ConsInit(c, args, kind), loc) ->
           begin
             try
@@ -240,9 +271,9 @@ let translate_variadics (file : file) =
                 | Plain_func -> args
                 | Constructor -> Cil.mkAddrOfVi v :: args
               in
-              let res = make_new_args mk_call c args in
-              File.must_recompute_cfg fundec;
-              Cil.ChangeTo res
+              let translator = mk_translator c in
+              let instr_list = translate_call mk_call translator args in
+              Cil.ChangeTo instr_list
             with Not_found ->
               Cil.DoChildren
           end
