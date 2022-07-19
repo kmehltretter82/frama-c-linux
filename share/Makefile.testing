@@ -43,6 +43,8 @@ PTEST_ALIASES?=$(addsuffix /ptests,$(addprefix @,$(PTEST_DIRS)))
 
 ifneq ($(FRAMAC_WP_QUALIF),)
 FRAMAC_WP_CACHEDIR=$(FRAMAC_WP_QUALIF)
+else
+FRAMAC_WP_CACHEDIR?=
 endif
 
 ############
