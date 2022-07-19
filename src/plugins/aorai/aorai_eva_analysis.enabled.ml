@@ -53,7 +53,9 @@ let show_non_det_state fmt state =
     (* TODO: sync Data_for_aorai.get_state_var with current project*)
     let vi = Data_for_aorai.get_varinfo s.Promelaast.name in
     let e = Cil.evar vi in
-    let cvalue = !Db.Value.eval_expr state e in
+    let cvalue =
+      Eva.Results.(in_cvalue_state state |> eval_exp e |> as_cvalue)
+    in
     if Cvalue.V.contains_non_zero cvalue then
       print_state s (not (Cvalue.V.contains_zero cvalue))
   in
