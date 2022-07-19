@@ -102,11 +102,14 @@ val get_number_ty: logic_env:Logic_env.t -> term -> number_ty
 (** @return the infered type for the given term. *)
 
 val get_effective_ty: logic_env:Logic_env.t -> term -> number_ty
+(** @return the cast infered by the type system if any, or the type otherwise *)
 
 val get_typ: logic_env:Logic_env.t -> term -> typ
 (** Get the type which the given term must be generated to. *)
 
 val get_effective_typ: logic_env:Logic_env.t -> term -> typ
+(** Get the type which the given term must be converted to if any, and the
+    translation type otherwise *)
 
 val get_cast: logic_env:Logic_env.t -> term -> typ option
 (** Get the type which the given term must be converted to (if any). *)

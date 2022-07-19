@@ -399,11 +399,13 @@ let rec type_term
       ty_of_interv ?ctx i
 
     | TUnOp (LNot, t') ->
-      let ctx = try
+      let ctx =
+        try
           let i = Interval.get_from_profile ~profile t in
           let i' = Interval.get_from_profile ~profile t' in
           Some (mk_ctx ~use_gmp_opt:true (ty_of_interv (Interval.join i i')))
-        with _ -> None in
+        with Error.Not_yet _ ->
+          None in
       ignore (type_term ~use_gmp_opt:true ~arith_operand:true ?ctx ~profile t');
       c_int (* converted into [t == 0] in case of GMP *)
 
@@ -783,27 +785,27 @@ and type_predicate ~profile p =
     let ctx =
       try
         Some (ctx_relation ~profile t1 t2)
-      with _ -> None
+      with Error.Not_yet _ ->
+        None
     in
-    do_both
-      (fun () -> ignore (type_term ~use_gmp_opt:true ?ctx ~profile t1))
-      (fun () -> ignore (type_term ~use_gmp_opt:true ?ctx ~profile t2));
+    let
+      on t = (fun () -> ignore (type_term ~use_gmp_opt:true ?ctx ~profile t))
+    in
+    do_both (on t1) (on t2);
   | Pand(p1, p2)
   | Por(p1, p2)
   | Pxor(p1, p2)
   | Pimplies(p1, p2)
   | Piff(p1, p2) ->
-    do_both
-      (fun () -> type_predicate ~profile p1)
-      (fun () -> type_predicate ~profile p2)
+    let on p = fun () -> type_predicate ~profile p in
+    do_both (on p1) (on p2)
   | Pnot p ->
     type_predicate ~profile p
   | Pif(t, p1, p2) ->
     let ctx = mk_ctx ~use_gmp_opt:false c_int in
     ignore (type_term ~use_gmp_opt:false ~ctx ~profile t);
-    do_both
-      (fun () -> type_predicate ~profile p1)
-      (fun () -> type_predicate ~profile p2)
+    let on p = fun () -> type_predicate ~profile p in
+    do_both (on p1) (on p2)
   | Plet(li, p) ->
     let li_t = Misc.term_of_li li in
     ignore (type_term ~use_gmp_opt:true ~profile li_t);
@@ -901,14 +903,16 @@ let get_typ ~logic_env t =
 let get_cast ~logic_env t =
   let profile = Logic_env.get_profile logic_env in
   let info =
-    Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term in
+    Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term
+  in
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> None
 
 let get_effective_ty ~logic_env t =
   let profile = Logic_env.get_profile logic_env in
   let info =
-    Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term in
+    Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term
+  in
   match info.cast with
   | Some ty -> ty
   | None -> info.ty
