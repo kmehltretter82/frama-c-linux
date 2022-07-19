@@ -153,6 +153,9 @@ FRAMAC_WTESTS:=$(FRAMAC_PTESTS_SRC)/wtests.exe
 # Frama-C also have ptest directories in plugins, so we do not use default
 PTEST_ALL_DIRS:=tests $(wildcard src/plugins/*/tests)
 
+# Test aliasing definition allowing ./configure --disable-<plugin> 
+PTEST_ALIASES:=@tests/ptests @src/plugins/ptests
+
 # Ptests needs config.sed so that dune can build Frama-C (if it is not built)
 PTEST_DEPS:=config.sed
 

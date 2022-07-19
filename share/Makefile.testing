@@ -38,6 +38,14 @@ PTEST_DIRS?=$(PTEST_ALL_DIRS)
 PTEST_DEPS?=
 # Indicate whether we use global WP cache
 PTEST_USE_WP_CACHE?=no
+# Defines the related dune targets
+PTEST_ALIASES?=$(addsuffix /ptests,$(addprefix @,$(PTEST_DIRS)))
+
+ifneq ($(FRAMAC_WP_QUALIF),)
+FRAMAC_WP_CACHEDIR=$(FRAMAC_WP_QUALIF)
+else
+FRAMAC_WP_CACHEDIR?=
+endif
 
 ############
 # Default values necessary for make -f <this-makefile>
@@ -54,9 +62,6 @@ XARGS   ?= xargs --no-run-if-empty
 endif
 
 ##########################################################################
-
-# Defines the related dune targets
-PTEST_ALIASES=$(addsuffix /ptests,$(addprefix @,$(PTEST_DIRS)))
 
 .PHONY: tests.info
 tests.info:
@@ -180,9 +185,10 @@ endif
 
 .PHONY: tests
 tests:: run-tests
-	echo "Number of *.{err,res}.log files:"
-	find $(addprefix _build/default/,$(PTEST_DIRS)) -name \*.err.log -or -name \*.res.log \
-        | $(GREP) -c "^"
+	@echo "Number of *.{err,res}.log files:"
+	@find $(addprefix _build/default/,$(PTEST_DIRS)) \
+	-name \*.err.log -or -name \*.res.log \
+        | wc -l
 
 ifneq ($(PTEST_USE_WP_CACHE),no)
 ifeq ($(FRAMAC_WP_CACHEDIR),)
@@ -200,9 +206,10 @@ endif # PTEST_USE_WP_CACHE
 
 .PHONY: count-tests
 count-tests:
-	echo "Number of *.{err,res}.log files:"
-	find $(addprefix _build/default/,$(PTEST_DIRS)) -name \*.res.log -or -name \*.err.log \
-        | $(GREP) -c "^"
+	@echo "Number of *.{err,res}.log files:"
+	@find $(addprefix _build/default/,$(PTEST_DIRS)) \
+	-name \*.res.log -or -name \*.err.log \
+        | wc -l
 
 ###############################################################################
 # Local Variables:
