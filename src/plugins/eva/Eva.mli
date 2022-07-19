@@ -156,7 +156,7 @@ module Results: sig
         function body: all requests in the function will lead to a Bottom error.
       - results have not been saved, due to the [-eva-no-results] parameter:
         all requests in the function will lead to a Top error. *)
-  val are_available: Cil_types.kernel_function -> bool
+  val are_available : Cil_types.kernel_function -> bool
 
   type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
 
@@ -214,7 +214,7 @@ module Results: sig
 
   (** Evaluation in a given cvalue state.
       Callstacks selection are silently ignored on such requests. *)
-  val in_cvalue_state: Cvalue.Model.t -> request
+  val in_cvalue_state : Cvalue.Model.t -> request
 
 
   (** Callstack selection *)
@@ -264,7 +264,7 @@ module Results: sig
       request. If [filter] is provided, states are filtered on the given bases
       (for domains that support this feature).
       Returns a list of pair (name, state) for all available domains. *)
-  val print_states: ?filter:Base.Hptset.t -> request -> (string * string) list
+  val print_states : ?filter:Base.Hptset.t -> request -> (string * string) list
 
   (** Dependencies *)
 
@@ -362,7 +362,7 @@ module Results: sig
 
   (** Converts into a Zone. Error cases are converted into bottom or top zones
       accordingly. *)
-  val as_zone: address evaluation -> Locations.Zone.t
+  val as_zone : address evaluation -> Locations.Zone.t
 
   (** Converts into a Zone result. *)
   val as_zone_result : address evaluation -> Locations.Zone.t result
@@ -410,7 +410,7 @@ module Results: sig
       the main function has been analyzed for [Kglobal]. *)
   val is_reachable_kinstr : Cil_types.kinstr -> bool
 
-  val condition_truth_value: Cil_types.stmt -> bool * bool
+  val condition_truth_value : Cil_types.stmt -> bool * bool
   (** Provided [stmt] is an 'if' construct, [fst (condition_truth_value stmt)]
       (resp. snd) is true if and only if the condition of the 'if' has been
       evaluated to true (resp. false) at least once during the analysis. *)
