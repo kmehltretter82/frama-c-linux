@@ -930,6 +930,7 @@ end
 type daemon = {
   trigger : unit -> unit ;
   on_delayed : (int -> unit) option ;
+  on_finished : (unit -> unit) option ;
   debounced : float ; (* in ms *)
   mutable next_at : float ; (* next trigger time *)
   mutable last_yield_at : float ; (* last yield time *)
@@ -939,32 +940,33 @@ type daemon = {
 
 let daemons = ref []
 
-let on_progress ?(debounced=0) ?on_delayed trigger =
+let on_progress ?(debounced=0) ?on_delayed ?on_finished trigger =
   let d = {
     trigger ;
     debounced = float debounced *. 0.001 ;
     on_delayed ;
+    on_finished ;
     last_yield_at = 0.0 ;
     next_at = 0.0 ;
   } in
   daemons := List.append !daemons [d] ; d
 
 let off_progress d =
-  daemons := List.filter (fun d0 -> d != d0) !daemons
+  daemons := List.filter (fun d0 -> d != d0) !daemons ;
+  match d.on_finished with
+  | None -> ()
+  | Some f -> f ()
 
-(* ---- Canceling ---- *)
+let while_progress ?debounced ?on_delayed ?on_finished progress =
+  let d : daemon option ref = ref None in
+  let trigger () =
+    if not @@ progress () then
+      Option.iter off_progress !d
+  in
+  d := Some (on_progress ?debounced ?on_delayed ?on_finished trigger)
 
-exception Cancel
-
-(* ---- Processing ---- *)
-
-let warn_error exn =
-  Kernel.failure
-    "Unexpected Db.daemon exception:@\n%s"
-    (Printexc.to_string exn)
-
-let with_progress ?debounced ?on_delayed trigger job data =
-  let d = on_progress ?debounced ?on_delayed trigger in
+let with_progress ?debounced ?on_delayed ?on_finished trigger job data =
+  let d = on_progress ?debounced ?on_delayed ?on_finished trigger in
   let result =
     try job data
     with exn ->
@@ -973,10 +975,19 @@ let with_progress ?debounced ?on_delayed trigger job data =
   in
   off_progress d ; result
 
+(* ---- Canceling ---- *)
+
+exception Cancel
+
 (* ---- Triggering ---- *)
 
 let canceled = ref false
 let cancel () = canceled := true
+
+let warn_error exn =
+  Kernel.failure
+    "Unexpected Db.daemon exception:@\n%s"
+    (Printexc.to_string exn)
 
 let fire ~warn_on_delayed ~forced ~time d =
   if forced || time > d.next_at then

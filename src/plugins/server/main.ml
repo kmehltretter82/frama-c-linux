@@ -90,6 +90,10 @@ type 'a process = {
   mutable killed : bool ;
 }
 
+type 'a pending =
+  | Process of 'a process
+  | Command of (unit -> unit)
+
 type 'a running =
   | Idle (* Server is waiting for requests *)
   | CmdLine (* Frama-C command line is running *)
@@ -101,7 +105,7 @@ type 'a server = {
   equal : 'a -> 'a -> bool ; (* RqId equality *)
   polling : int ; (* server polling, in milliseconds *)
   fetch : unit -> 'a message option ; (* fetch some client message *)
-  q_in : 'a process Queue.t ; (* queue of pending `EXEC and `GET jobs *)
+  q_in : 'a pending Queue.t ; (* queue of pending `EXEC and `GET jobs *)
   q_out : 'a response Queue.t ; (* queue of pending responses *)
   mutable daemon : Db.daemon option ; (* Db.yield daemon *)
   mutable s_active : Signals.t ; (* signals the client is listening to *)
@@ -175,7 +179,7 @@ let delayed process =
     Some (fun d -> Senv.debug "No yield since %dms during %s" d process)
   else None
 
-let execute server ?yield proc =
+let execute_process server ?yield proc =
   Senv.debug ~level:2 "%a" (pp_process server.pretty) proc ;
   let resp = match yield with
     | Some yield when proc.yield ->
@@ -232,7 +236,9 @@ let kill_running ?id s =
     | None -> p.killed <- true
     | Some id -> if s.equal id p.id then p.killed <- true
 
-let kill_request eq id p = if eq id p.id then p.killed <- true
+let kill_request eq id = function
+  | Process p -> if eq id p.id then p.killed <- true
+  | Command _ -> ()
 
 let process_request (server : 'a server) (request : 'a request) : unit =
   if Senv.debug_atleast 1 && (Senv.debug_atleast 2 || request <> `Poll) then
@@ -268,18 +274,15 @@ let process_request (server : 'a server) (request : 'a request) : unit =
       | None ->
         Senv.debug "Rejected %a" server.pretty id ;
         Queue.push (`Rejected id) server.q_out
-      | Some( `GET , handler ) ->
-        let proc = { id ; request ; handler ; data ;
-                     yield = false ; killed = false } in
-        execute server proc ;
-      | Some( `SET , handler ) ->
-        let proc = { id ; request ; handler ; data ;
-                     yield = false ; killed = false } in
-        Queue.push proc server.q_in
-      | Some( `EXEC , handler ) ->
-        let proc = { id ; request ; handler ; data ;
-                     yield = true ; killed = false } in
-        Queue.push proc server.q_in
+      | Some( kind , handler ) ->
+        let yield = match kind with `GET | `SET -> false | `EXEC -> true in
+        let proc = {
+          id ; request ; handler ; data ;
+          yield ; killed = false ;
+        } in
+        match kind with
+        | `GET -> execute_process server proc
+        | `SET | `EXEC -> Queue.push (Process proc) server.q_in
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -331,24 +334,32 @@ let do_signal server s =
 (* --- One Step Process                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rec fetch_exec q =
-  if Queue.is_empty q then None
+let rec process server =
+  if Queue.is_empty server.q_in then
+    communicate server
   else
-    let e = Queue.pop q in
-    if e.killed then fetch_exec q else Some e
-
-let process server =
-  match fetch_exec server.q_in with
-  | None -> communicate server
-  | Some exec ->
-    server.running <- ExecRequest exec ;
-    try
-      execute server ~yield:(do_yield server) exec ;
-      server.running <- Idle ;
-      true
-    with exn ->
-      server.running <- Idle ;
-      raise exn
+    match Queue.pop server.q_in with
+    | Process { killed } when killed -> process server
+    | pending ->
+      try
+        let yield = do_yield server in
+        begin
+          match pending with
+          | Process p ->
+            server.running <- ExecRequest p ;
+            execute_process server ~yield p
+          | Command cmd ->
+            server.running <- CmdLine ;
+            Db.with_progress
+              ~debounced:server.polling
+              ?on_delayed:(delayed "<async>")
+              yield cmd ()
+        end ;
+        server.running <- Idle ;
+        true
+      with exn ->
+        server.running <- Idle ;
+        raise exn
 
 (* -------------------------------------------------------------------------- *)
 (* --- Server Main Loop                                                   --- *)
@@ -376,6 +387,42 @@ let create ~pretty ?(equal=(=)) ~fetch () =
     cmdline = None ;
     shutdown = false ;
   }
+
+(* -------------------------------------------------------------------------- *)
+(* --- Async                                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+let schedule server job data =
+  let status = ref Task.Yield in
+  let command () =
+    match !status with
+    | Task.Return _ -> ()
+    | _ ->
+      let st =
+        try Task.Result (job data)
+        with
+        | Db.Cancel -> Task.Canceled
+        | exn -> Task.Failed exn
+      in status := Task.Return st
+  in
+  let ping coin =
+    match coin, !status with
+    | Task.Kill, Task.Yield ->
+      let st = Task.Return Task.Canceled in
+      status := st ; st
+    | _, st -> st
+  in
+  Queue.push (Command command) server.q_in ;
+  Task.async ping
+
+type scheduler = Offline | Server : 'a server -> scheduler
+
+let scheduler = ref Offline
+
+let async job data =
+  match !scheduler with
+  | Offline -> Task.call job data
+  | Server s -> schedule s job data
 
 (* -------------------------------------------------------------------------- *)
 (* --- Start / Stop                                                       --- *)
@@ -433,6 +480,8 @@ let foreground server =
     server.running <- Idle ;
     server.cmdline <- Some false ;
     emitter := do_signal server ;
+    Task.on_idle := Db.while_progress ~debounced:50 ;
+    scheduler := Server server ;
     match server.daemon with
     | None -> ()
     | Some daemon ->
@@ -465,10 +514,12 @@ let run server =
     end;
     Senv.feedback "Server shutdown." ;
     emitter := nop ;
+    scheduler := Offline ;
     set_active false ;
   with exn ->
     Senv.feedback "Server interruped (fatal error)." ;
     emitter := nop ;
+    scheduler := Offline ;
     set_active false ;
     raise exn
 

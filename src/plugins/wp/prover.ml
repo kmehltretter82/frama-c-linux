@@ -76,7 +76,7 @@ let run_prover wpo ?config ?(mode=Batch) ?progress ?result prover =
   Task.return (VCS.is_valid res)
 
 let simplify ?start ?result wpo =
-  Task.call
+  Server.Main.async
     (fun wpo ->
        let r = Wpo.get_result wpo VCS.Qed in
        VCS.( r.verdict == Valid ) ||

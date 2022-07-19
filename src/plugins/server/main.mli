@@ -141,4 +141,11 @@ val on_signal : signal -> (bool -> unit) -> unit
     Callbacks shall {i never} raise any exception. *)
 val on : (bool -> unit) -> unit
 
+(** Register an asynchronous task on the server.
+    When the server is not working in background, this is
+    equivalent to [Task.call] ; otherwize,
+    the continuation is scheduled on the server
+    like an [`EXEC] request. *)
+val async : ('a -> 'b) -> 'a -> 'b Task.task
+
 (* -------------------------------------------------------------------------- *)
