@@ -38,6 +38,8 @@ PTEST_DIRS?=$(PTEST_ALL_DIRS)
 PTEST_DEPS?=
 # Indicate whether we use global WP cache
 PTEST_USE_WP_CACHE?=no
+# Defines the related dune targets
+PTEST_ALIASES?=$(addsuffix /ptests,$(addprefix @,$(PTEST_DIRS)))
 
 ifneq ($(FRAMAC_WP_QUALIF),)
 FRAMAC_WP_CACHEDIR=$(FRAMAC_WP_QUALIF)
@@ -58,9 +60,6 @@ XARGS   ?= xargs --no-run-if-empty
 endif
 
 ##########################################################################
-
-# Defines the related dune targets
-PTEST_ALIASES=$(addsuffix /ptests,$(addprefix @,$(PTEST_DIRS)))
 
 .PHONY: tests.info
 tests.info:
