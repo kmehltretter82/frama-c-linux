@@ -99,6 +99,6 @@
   gen-api.sh Eva.header
   engine/analysis.mli utils/results.mli parameters.mli
   utils/eva_annotations.mli eval.mli domains/cvalue/builtins.mli
-  utils/cvalue_callbacks.mli legacy/eval_terms.mli utils/eva_results.mli
+  utils/cvalue_callbacks.mli legacy/logic_inout.mli legacy/eval_terms.mli utils/eva_results.mli
   utils/unit_tests.mli)
  (action (run %{deps})))

@@ -176,7 +176,7 @@ let check_fct_assigns kf ab ~pre_state found_froms =
          List.iter2 check_from assigns_deps assigns_zones)
   in List.iter check_for_behavior behaviors
 
-let verify_assigns_from kf ~pre froms =
+let verify_assigns kf ~pre froms =
   let funspec = Annotations.funspec kf in
   let env = Eval_terms.env_pre_f ~pre () in
   let eval_predicate pred =
@@ -186,6 +186,4 @@ let verify_assigns_from kf ~pre froms =
     | Eval_terms.Unknown -> Alarmset.Unknown
   in
   let ab = Active_behaviors.create eval_predicate funspec in
-  check_fct_assigns kf ab ~pre_state:pre froms;;
-
-Db.Value.verify_assigns_froms := verify_assigns_from;;
+  check_fct_assigns kf ab ~pre_state:pre froms

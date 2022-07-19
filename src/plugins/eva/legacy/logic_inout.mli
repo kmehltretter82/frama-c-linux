@@ -20,4 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** No function exported. Registers Db.Value.verify_assigns_from. *)
+[@@@ api_start]
+
+(** Evaluate the assigns clauses of the given function in its given pre-state,
+    and compare them with the given froms (computed by the from plugin).
+    Emits warnings if needed, and sets statuses to the assigns clauses. *)
+val verify_assigns:
+  Cil_types.kernel_function -> pre:Cvalue.Model.t -> Function_Froms.froms -> unit
+
+[@@@ api_end]

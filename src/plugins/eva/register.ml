@@ -505,6 +505,8 @@ let register (module Eval: Eval) (module Export: Export) =
 
 let () = Db.Value.initial_state_only_globals := Analysis.cvalue_initial_state
 
+let () = Db.Value.verify_assigns_froms := Logic_inout.verify_assigns
+
 let () =
   let eval = (module Eval : Eval) in
   let export = (module Export ((val eval : Eval)) : Export) in
