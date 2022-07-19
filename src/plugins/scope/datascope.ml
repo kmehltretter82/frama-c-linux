@@ -613,8 +613,8 @@ let get_prop_scope_at_stmt kf stmt annot =
    in Db *)
 let emitter = lazy (
   let conv = List.map Typed_parameter.get in
-  let correctness = conv (Emitter.correctness_parameters !Db.Value.emitter) in
-  let tuning = conv (Emitter.tuning_parameters !Db.Value.emitter) in
+  let correctness = conv (Emitter.correctness_parameters Eva.Analysis.emitter) in
+  let tuning = conv (Emitter.tuning_parameters Eva.Analysis.emitter) in
   Emitter.create "RedundantAlarms" [Emitter.Property_status]
     ~correctness ~tuning)
 
