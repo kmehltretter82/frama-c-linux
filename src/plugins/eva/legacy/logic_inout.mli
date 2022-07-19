@@ -22,6 +22,22 @@
 
 [@@@ api_start]
 
+(** Returns the list of behaviors of the given function that are active for
+    the given initial state. *)
+val valid_behaviors:
+  Cil_types.kernel_function -> Cvalue.Model.t -> Cil_types.behavior list
+
+(** Evaluation of the memory zone read by the \from part of an assigns clause,
+    in the given cvalue state.  *)
+val assigns_inputs_to_zone:
+  Cvalue.Model.t -> Cil_types.assigns -> Locations.Zone.t
+
+(** Evaluation of the memory zone written by an assigns clauses, in the given
+    cvalue state. *)
+val assigns_outputs_to_zone:
+  result: Cil_types.varinfo option ->
+  Cvalue.Model.t -> Cil_types.assigns -> Locations.Zone.t
+
 (** Evaluate the assigns clauses of the given function in its given pre-state,
     and compare them with the given froms (computed by the from plugin).
     Emits warnings if needed, and sets statuses to the assigns clauses. *)

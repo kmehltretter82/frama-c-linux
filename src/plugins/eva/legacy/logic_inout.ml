@@ -22,6 +22,68 @@
 
 open Cil_types
 
+let valid_behaviors kf state =
+  let funspec = Annotations.funspec kf in
+  let eval_predicate pred =
+    match Eval_terms.(eval_predicate (env_pre_f ~pre:state ()) pred) with
+    | True -> Alarmset.True
+    | False -> Alarmset.False
+    | Unknown -> Alarmset.Unknown
+  in
+  let ab = Active_behaviors.create eval_predicate funspec in
+  Active_behaviors.active_behaviors ab
+
+(* -------------------------------------------------------------------------- *)
+(* --- Compute inout from assigns clauses                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let eval_error_reason fmt e =
+  if e <> Eval_terms.CAlarm
+  then Eval_terms.pretty_logic_evaluation_error fmt e
+
+let eval_tlval_as_zone assigns kind env acc t =
+  try
+    let alarm_mode = Eval_terms.Ignore in
+    let zone = Eval_terms.eval_tlval_as_zone ~alarm_mode kind env t.it_content in
+    Locations.Zone.join acc zone
+  with Eval_terms.LogicEvalError e ->
+    let pp_clause fmt =
+      if kind = Read
+      then Printer.pp_from fmt assigns
+      else Printer.pp_term fmt (fst assigns).it_content
+    in
+    Self.warning ~current:true ~once:true
+      "Failed to interpret %sassigns clause '%t'%a"
+      (if kind = Read then "inputs in " else "")
+      pp_clause eval_error_reason e;
+    Locations.Zone.top
+
+let assigns_inputs_to_zone state assigns =
+  let env = Eval_terms.env_assigns ~pre:state in
+  let treat_asgn acc (_,ins as asgn) =
+    match ins with
+    | FromAny -> Locations.Zone.top
+    | From l -> List.fold_left (eval_tlval_as_zone asgn Read env) acc l
+  in
+  match assigns with
+  | WritesAny -> Locations.Zone.top
+  | Writes l  -> List.fold_left treat_asgn Locations.Zone.bottom l
+
+let assigns_outputs_to_zone ~result state assigns =
+  let env = Eval_terms.env_post_f ~pre:state ~post:state ~result () in
+  let treat_asgn acc (out,_ as asgn) =
+    if Logic_utils.is_result out.it_content && result = None
+    then acc
+    else eval_tlval_as_zone asgn Write env acc out
+  in
+  match assigns with
+  | WritesAny -> Locations.Zone.top
+  | Writes l  -> List.fold_left treat_asgn Locations.Zone.bottom l
+
+(* -------------------------------------------------------------------------- *)
+(* --- Verify assigns clauses                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
 (* Eval: under-approximation of the term.  Note that ACSL states
    that assigns clauses are evaluated in the pre-state.
    We skip [\result]: it is meaningless when evaluating the 'assigns' part,
