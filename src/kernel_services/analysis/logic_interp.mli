@@ -26,12 +26,15 @@
 (* TODO: remove the module Properties from Db and export directly the
    functions from here. *)
 
+open Cil_types
+
 module To_zone : sig
   exception NYI of string
   val not_yet_implemented : string ref
+  val compute_term_deps: (stmt -> term -> Locations.Zone.t option) ref
 end
 
-exception Error of Cil_types.location * string
+exception Error of location * string
 
 (*
 Local Variables:

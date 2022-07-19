@@ -423,6 +423,9 @@ module To_zone : sig
   val not_yet_implemented : string ref
   exception NYI of string
 
+  val compute_term_deps: (stmt -> term -> Locations.Zone.t option) ref
+  (** Provided by Eva, compute the memory zone on which a term depends. *)
+
   val from_term: term -> ctx -> (zone_info * decl)
   (** Entry point to get zones
       needed to evaluate the [term] relative to the [ctx] of
@@ -516,6 +519,8 @@ struct
 
   let zone_result = ref (Some other_zones)
   let not_yet_implemented = ref ""
+
+  let compute_term_deps = ref (fun _stmt _expr -> None)
 
   let add_top_zone not_yet_implemented_msg = match !zone_result with
     | None -> (* top zone *) ()
@@ -808,18 +813,12 @@ struct
 
       method private do_term_lval t =
         let current_before, current_stmt = self#get_ctrl_point () in
-        let state = Db.Value.get_stmt_state current_stmt in
-        try
-          let deps = !Db.From.find_deps_term_no_transitivity_state state t in
-          (* TODO: what we should we do with other program points? *)
-          let z = Logic_label.Map.find (BuiltinLabel Here) deps in
-          let z =
-            Locations.Zone.filter_base
-              (function Base.CLogic_Var _ -> false | _ -> true)
-              z
-          in
-          add_result ~before:current_before current_stmt z
-        with Db.From.Not_lval ->
+        match !compute_term_deps current_stmt t with
+        | Some zone ->
+          let filter = function Base.CLogic_Var _ -> false | _ -> true in
+          let zone = Locations.Zone.filter_base filter zone in
+          add_result ~before:current_before current_stmt zone
+        | None ->
           raise (NYI "[logic_interp] dependencies of a term lval")
 
       method! vterm t =
