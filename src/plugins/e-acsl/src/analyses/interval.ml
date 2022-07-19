@@ -903,6 +903,10 @@ and compute_logic_env_if_branches logic_env t =
   in
   let add_eq logic_env x v = Logic_env.refine logic_env x (get_res (ival v)) in
   let t_branch, f_branch =
+    (* we do not discriminate between strict and weak inequalities. This is
+       slighlty less precise but allow for better reusing of the code in the
+       case of recursive functions, the main advantage in typing
+       conditionals is for recursive functions. *)
     match t.term_node with
     | TBinOp(op, {term_node = TLval(TVar x, TNoOffset)}, v) ->
       begin

@@ -93,11 +93,11 @@ module Logic_env : sig
   val find : t -> logic_var -> ival
 
   (** get the profile of the logic environment, i.e. bindings through function
-     arguments *)
+      arguments *)
   val get_profile : t -> Profile.t
 
-  (** refine the interval of a logic variable : replace an interval with a
-  more precise one *)
+  (** refine the interval of a logic variable: replace an interval with a more
+      precise one *)
   val refine : t -> logic_var -> ival -> t
 end
 

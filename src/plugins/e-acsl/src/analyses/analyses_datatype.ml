@@ -395,13 +395,13 @@ module Logic_env
     let new_lq_bind =
       try Logic_var.Map.update x update env.let_quantif_bind
       with Not_found ->
-        match Logic_var.Map.find_opt x env.profile with
-        | Some i ->
-          (* The profile must remain unchanged, so if the variable is bound in
-             the profile, we add the refined interval in the other bindings,
-             which are checked first when finding the interval *)
-          Logic_var.Map.add x (!ival_meet_ref i ival) env.let_quantif_bind
-        | None -> Options.abort "updating a variable not in environment"
+      match Logic_var.Map.find_opt x env.profile with
+      | Some i ->
+        (* The profile must remain unchanged, so if the variable is bound in
+           the profile, we add the refined interval in the other bindings,
+           which are checked first when finding the interval *)
+        Logic_var.Map.add x (!ival_meet_ref i ival) env.let_quantif_bind
+      | None -> Options.abort "updating a variable not in environment"
     in
     {env with let_quantif_bind = new_lq_bind}
 
