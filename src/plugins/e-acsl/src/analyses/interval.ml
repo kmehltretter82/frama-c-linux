@@ -687,7 +687,8 @@ let rec infer ~force ~logic_env t =
     | Tif (t1, t2, t3) ->
       ignore (infer ~force ~logic_env t1);
       let logic_env_tbranch, logic_env_fbranch =
-        compute_logic_env_if_branches logic_env t1 in
+        compute_logic_env_if_branches logic_env t1
+      in
       let i2 = infer ~force ~logic_env:logic_env_tbranch t2 in
       let i3 = infer ~force ~logic_env:logic_env_fbranch t3 in
       Error.map2 join i2 i3
@@ -878,7 +879,6 @@ and infer_term_host ~force ~logic_env thost =
         Printer.pp_typ ty
         Printer.pp_term t
 
-
 and infer_term_offset ~force ~logic_env t =
   match t with
   | TNoOffset -> ()
@@ -888,18 +888,20 @@ and infer_term_offset ~force ~logic_env t =
     ignore (infer ~force ~logic_env t);
     infer_term_offset ~force ~logic_env toff
 
+(* Update the interval of variables when they appear in a comparison of the form
+   [x op t] or [t op x] *)
 and compute_logic_env_if_branches logic_env t =
   let get_res = Error.map (fun x -> x) in
   let ival v = infer ~force:false ~logic_env v in
   let add_ub logic_env x v =
     let max = Ival.max_int (Error.map extract_ival (ival v)) in
     Logic_env.refine logic_env x (Ival (Ival.inject_range None max))
-  and add_lb logic_env x v =
+  in
+  let add_lb logic_env x v =
     let min = Ival.min_int (Error.map extract_ival (ival v)) in
     Logic_env.refine logic_env x (Ival (Ival.inject_range min None))
-  and add_eq logic_env x v =
-    Logic_env.refine logic_env x (get_res (ival v))
   in
+  let add_eq logic_env x v = Logic_env.refine logic_env x (get_res (ival v)) in
   let t_branch, f_branch =
     match t.term_node with
     | TBinOp(op, {term_node = TLval(TVar x, TNoOffset)}, v) ->

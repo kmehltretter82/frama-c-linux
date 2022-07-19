@@ -76,20 +76,28 @@ module LFProf: Datatype.S_with_collections
     - an association list for variables bound by a let or a quantification *)
 module Logic_env : sig
   type t
-  (* forward reference to meet of intervals *)
+
+  (** forward reference to meet of intervals *)
   val ival_meet_ref : (ival -> ival -> ival) ref
-  (* add a new binding for a let or a quantification binder only *)
+
+  (** add a new binding for a let or a quantification binder only *)
   val add : t -> logic_var -> ival -> t
-  (* the empty environment *)
+
+  (** the empty environment *)
   val empty : t
-  (* create a new environment from a profile, for function calls *)
+
+  (** create a new environment from a profile, for function calls *)
   val make : Profile.t -> t
-  (* find a logic variable in the environment *)
+
+  (** find a logic variable in the environment *)
   val find : t -> logic_var -> ival
-  (* get the profile of the logic environment, i.e. bindings through function
+
+  (** get the profile of the logic environment, i.e. bindings through function
      arguments *)
   val get_profile : t -> Profile.t
-  (* refine the interval of a logic variable *)
+
+  (** refine the interval of a logic variable : replace an interval with a
+  more precise one *)
   val refine : t -> logic_var -> ival -> t
 end
 
