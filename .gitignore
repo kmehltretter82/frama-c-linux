@@ -29,6 +29,7 @@ autom4te.cache
 .log.autoconf
 /.depend
 /config.log
+/config.prefix
 /config.status
 /frama-c*.tar.gz
 /distributed

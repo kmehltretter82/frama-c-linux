@@ -88,7 +88,7 @@ tags: [
 
 build: [
   ["autoconf"] {dev}
-  ["./configure"]
+  ["./configure" "--prefix" prefix]
   [make "config.sed"]
   ["dune" "build" "-j%{jobs}%" "--release" "@install"]
   [make "-C" "doc" "download"] {with-doc}

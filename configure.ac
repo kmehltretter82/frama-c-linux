@@ -88,8 +88,14 @@ fi
 # Check for invalid command-line options #
 ##########################################
 case $prefix in
-  *\ * ) AC_MSG_ERROR(spaces not allowed in --prefix argument "$prefix");;
-  * ) ;;
+  *\'*|*\"* ) AC_MSG_ERROR(quotes not allowed in --prefix argument: $prefix);;
+  NONE )
+    # no prefix: remove existing config.prefix if any
+    rm -f config.prefix
+    ;;
+  * )
+    echo "FRAMAC_INSTALLDIR?=\"$prefix\"" > config.prefix
+    ;;
 esac
 
 #############################

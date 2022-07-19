@@ -40,6 +40,7 @@ install:
 ifeq ($(INSTALLDIR),)
 	dune install
 else
+	@echo "Installing to prefix: ${INSTALLDIR}"
 	dune install --prefix ${INSTALLDIR}
 	@echo 'DO NOT FORGET TO EXPAND YOUR OCAMLPATH VARIABLE:'
 	@echo '  export OCAMLPATH="${INSTALLDIR}/lib:$$OCAMLPATH"'
@@ -49,5 +50,6 @@ uninstall:
 ifeq ($(INSTALLDIR),)
 	dune uninstall
 else
+	@echo "Uninstalling from prefix: ${INSTALLDIR}"
 	dune uninstall --prefix ${INSTALLDIR}
 endif

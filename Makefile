@@ -123,6 +123,7 @@ force-reconfigure:
 # INSTALL/UNINSTALL
 ################################
 
+sinclude config.prefix
 FRAMAC_INSTALLDIR?=
 
 INSTALLDIR:=$(FRAMAC_INSTALLDIR)
