@@ -768,7 +768,7 @@ struct
 
   let datatype = "Eva"
   let configure () =
-    if not (Db.Value.is_computed ()) then
+    if not (Wp_eva.is_computed ()) then
       Wp_parameters.abort ~current:true
         "Could not use Eva memory model without a previous run of the analysis.";
     (fun () -> ())
@@ -780,8 +780,8 @@ struct
     let bottom = Model.bottom
     let join = Model.join
 
-    let of_kinstr k = Db.Value.get_state k
-    let of_stmt k = Db.Value.get_stmt_state k
+    let of_kinstr k = Wp_eva.get_cvalue_state k
+    let of_stmt s = Wp_eva.get_cvalue_state (Kstmt s)
     let of_kf kf =
       let state = ref bottom in
       let vis = object
