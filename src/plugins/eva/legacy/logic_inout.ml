@@ -22,6 +22,17 @@
 
 open Cil_types
 
+let predicate_deps ~pre ~here predicate =
+  let env = Eval_terms.env_annot ~pre ~here () in
+  let logic_deps = Eval_terms.predicate_deps env predicate in
+  let join logic_deps =
+    Cil_datatype.Logic_label.Map.fold
+      (fun _ -> Locations.Zone.join)
+      logic_deps
+      Locations.Zone.bottom
+  in
+  Option.map join logic_deps
+
 let valid_behaviors kf state =
   let funspec = Annotations.funspec kf in
   let eval_predicate pred =

@@ -378,7 +378,7 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
              let pre = X.kf_pre_state
              and here = X.stmt_state stmt in
              let deps =
-               Eva.Eval_terms.annot_predicate_deps ~pre ~here p.tp_statement
+               Eva.Logic_inout.predicate_deps ~pre ~here p.tp_statement
              in
              match deps with
              | None ->

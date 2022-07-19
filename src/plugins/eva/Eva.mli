@@ -610,6 +610,18 @@ end
 
 module Logic_inout: sig
 
+  (** Functions used by the Inout and From plugins to interpret predicate
+      and assigns clauses. This API may change according to these plugins
+      development. *)
+
+  (** [predicate_deps ~pre ~here p] computes the logic dependencies needed
+      to evaluate the predicate [p] in cvalue state [here], in a function
+      whose pre-state is [pre].
+      Returns None on either an evaluation error or on unsupported construct. *)
+  val predicate_deps:
+    pre:Cvalue.Model.t -> here:Cvalue.Model.t ->
+    Cil_types.predicate -> Locations.Zone.t option
+
   (** Returns the list of behaviors of the given function that are active for
       the given initial state. *)
   val valid_behaviors:
@@ -632,17 +644,6 @@ module Logic_inout: sig
   val verify_assigns:
     Cil_types.kernel_function -> pre:Cvalue.Model.t -> Function_Froms.froms -> unit
 
-end
-
-module Eval_terms: sig
-
-  (** [annot_predicate_deps ~pre ~here p] computes the logic dependencies needed
-      to evaluate the predicate [p] in a code annotation in cvalue state [here],
-      in a function whose pre-state is [pre].
-      Returns None on either an evaluation error or on unsupported construct. *)
-  val annot_predicate_deps:
-    pre:Cvalue.Model.t -> here:Cvalue.Model.t ->
-    Cil_types.predicate -> Locations.Zone.t option
 end
 
 module Eva_results: sig
