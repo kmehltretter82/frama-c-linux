@@ -87,8 +87,12 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
   | Pobject_pointer _ -> Env.not_yet env "\\object_pointer"
   | Pvalid_function _ -> Env.not_yet env "\\valid_function"
   | Prel(rel, t1, t2) ->
+    let t1 = Logic_normalizer.get_term t1 in
+    let t2 = Logic_normalizer.get_term t2 in
     let ity =
-      Typing.get_integer_op_of_predicate ~logic_env p
+      Typing.join
+        (Typing.get_effective_ty ~logic_env t1)
+        (Typing.get_effective_ty ~logic_env t2)
     in
     Translate_utils.comparison_to_exp
       ~adata
@@ -321,11 +325,6 @@ and to_exp ~adata ?inplace ?name kf ?rte env p =
              predicate_content_to_exp ?inplace ~adata ?name kf env p
            in
            let env = if rte then !translate_rte_exp_ref kf env e else env in
-           let cast =
-             Typing.get_cast_of_predicate
-               ~logic_env:(Env.Logic_env.get env)
-               p
-           in
            let env = Assert.do_pending_register_data env in
            Extlib.nest
              adata
@@ -334,7 +333,7 @@ and to_exp ~adata ?inplace ?name kf ?rte env p =
                 ?name
                 env
                 kf
-                cast
+                None
                 Typed_number.C_number
                 None
                 e)

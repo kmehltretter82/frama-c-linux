@@ -116,7 +116,6 @@ let typ_of_lty = function
 
 type computed_info =
   { ty: Number_ty.t;  (* type required for the term *)
-    op: Number_ty.t; (* type required for the operation *)
     cast: Number_ty.t option; (* if not [None], type of the context which the term
                                  must be casted to. If [None], no cast needed. *)
   }
@@ -252,19 +251,19 @@ let ty_of_interv ?ctx ?(use_gmp_opt = false) = function
 
 (* compute a new {!computed_info} by coercing the given type [ty] to the given
    context [ctx]. [op] is the type for the operator. *)
-let coerce ~arith_operand ~ctx ~op ty =
+let coerce ~arith_operand ~ctx ty =
   if Number_ty.compare ty ctx = 1 then
     (* type larger than the expected context,
        so we must introduce an explicit cast *)
-    { ty; op; cast = Some ctx }
+    { ty; cast = Some ctx }
   else
     (* only add an explicit cast if the context is [Gmp] and [ty] is not;
        or if the term corresponding to [ty] is an operand of an arithmetic
        operation which must be explicitly coerced in order to force the
        operation to be of the expected type. *)
   if (ctx = Gmpz && ty <> Gmpz) || arith_operand
-  then { ty; op; cast = Some ctx }
-  else { ty; op; cast = None }
+  then { ty; cast = Some ctx }
+  else { ty; cast = None }
 
 let number_ty_of_typ ~post ty =
   (* Consider GMP types only in a post typing phase *)
@@ -346,7 +345,6 @@ let rec type_term
     ~profile
     t =
   let ctx = Option.map (mk_ctx ~use_gmp_opt) ctx in
-  let dup ty = ty, ty in
   let compute_ctx ?ctx i =
     (* in order to get a minimal amount of generated casts for operators, the
        result is typed in the given context [ctx], but not the operands.
@@ -354,7 +352,8 @@ let rec type_term
     match ctx with
     | None ->
       (* no context: factorize *)
-      dup (mk_ctx ~use_gmp_opt:true (ty_of_interv i))
+      let ctx =  mk_ctx ~use_gmp_opt:true (ty_of_interv i) in
+      ctx, ctx
     | Some ctx ->
       mk_ctx ~use_gmp_opt:true (ty_of_interv ~ctx i),
       mk_ctx ~use_gmp_opt:true (ty_of_interv i)
@@ -372,19 +371,16 @@ let rec type_term
       let i = Interval.get_from_profile ~profile t in
       (* a constant or a left value directly under a lambda should be a gmp
          if the infered context for the lambda is gmp *)
-      let ty = ty_of_interv ?ctx ~use_gmp_opt:under_lambda i in
-      dup ty
+      ty_of_interv ?ctx ~use_gmp_opt:under_lambda i
 
     | TLval ((TVar {lv_type = Ctype (TInt (ik, _))}, _) as tlv) ->
       type_term_lval ~profile tlv;
-      dup (C_integer ik)
+      C_integer ik
 
     | TLval tlv ->
       let i = Interval.get_from_profile ~profile t in
-      let ty = ty_of_interv ?ctx ~use_gmp_opt:under_lambda i in
       type_term_lval ~profile tlv;
-      (* Options.feedback "Type : %a" D.pretty ty; *)
-      dup ty
+      ty_of_interv ?ctx ~use_gmp_opt:under_lambda i
 
     | Toffset(_, t')
     | Tblock_length(_, t')
@@ -393,25 +389,37 @@ let rec type_term
       let i = Interval.get_from_profile ~profile t in
       (* [t'] must be typed, but it is a pointer *)
       ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~profile t');
-      let ty = ty_of_interv ?ctx i in
-      dup ty
+      ty_of_interv ?ctx i
 
     | TBinOp (MinusPP, t1, t2) ->
       let i = Interval.get_from_profile ~profile t in
       (* [t1] and [t2] must be typed, but they are pointers *)
       ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~profile t1);
       ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~profile t2);
-      let ty = ty_of_interv ?ctx i in
-      dup ty
+      ty_of_interv ?ctx i
 
-    | TUnOp (unop, t') ->
+    | TUnOp (LNot, t') ->
+      let ctx =
+        try
+          let i = Interval.get_from_profile ~profile t in
+          let i' = Interval.get_from_profile ~profile t' in
+          Some (mk_ctx ~use_gmp_opt:true (ty_of_interv (Interval.join i i')))
+        (* during the typing phase, we catch the Not_yet exception so that [t']
+           gets typed even if [t] is not. This prevents exceptions during the
+           translation phase *)
+        with Error.Not_yet _ ->
+          None
+      in
+      ignore (type_term ~use_gmp_opt:true ~arith_operand:true ?ctx ~profile t');
+      c_int (* converted into [t == 0] in case of GMP *)
+
+    | TUnOp ((Neg | BNot), t') ->
       let i = Interval.get_from_profile ~profile t in
       let i' = Interval.get_from_profile ~profile t' in
       let ctx_res, ctx = compute_ctx ?ctx (Interval.join i i') in
       ignore (type_term ~use_gmp_opt:true ~arith_operand:true ~ctx ~profile t');
-      (match unop with
-       | LNot -> c_int, ctx_res (* converted into [t == 0] in case of GMP *)
-       | Neg | BNot -> dup ctx_res)
+      ctx_res
+
 
     | TBinOp ((PlusA | MinusA | Mult | Div | Mod | Shiftlt | Shiftrt | BAnd
               | BOr | BXor), t1, t2)
@@ -436,7 +444,7 @@ let rec type_term
         (type_term ~use_gmp_opt:true ~arith_operand:cast_first ~ctx ~profile t1);
       ignore
         (type_term ~use_gmp_opt:true ~arith_operand:(not cast_first) ~ctx ~profile t2);
-      dup ctx_res
+      ctx_res
 
     | TBinOp ((Lt | Gt | Le | Ge | Eq | Ne), t1, t2) ->
       assert
@@ -446,11 +454,7 @@ let rec type_term
       let ctx = ctx_relation ~profile t1 t2 in
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t1);
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t2);
-      let ty = match ctx with
-        | Nan -> c_int
-        | Real | Rational | Gmpz | C_float _ | C_integer _ -> ctx
-      in
-      c_int, ty
+      c_int
 
     | TBinOp ((LAnd | LOr), t1, t2) ->
       let i1 = Interval.get_from_profile ~profile t1 in
@@ -459,7 +463,7 @@ let rec type_term
       (* both operands fit in an int. *)
       ignore (type_term ~use_gmp_opt:true ~ctx:c_int ~profile t1);
       ignore (type_term ~use_gmp_opt:true ~ctx:c_int ~profile t2);
-      dup ty
+      ty
 
     | TCastE(_, t') ->
       (* compute the smallest interval from the whole term [t] *)
@@ -468,7 +472,7 @@ let rec type_term
          infer from the arguments of the cast. *)
       let ctx = ty_of_interv ?ctx i in
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t');
-      dup ctx
+      ctx
 
     | Tif (t1, t2, t3) ->
       let ctx1 =
@@ -482,29 +486,29 @@ let rec type_term
       let ctx = mk_ctx ~use_gmp_opt:true ctx in
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t2);
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t3);
-      dup ctx
+      ctx
 
     | Tat (t, _)
     | TLogic_coerce (_, t) ->
-      dup (type_term ~use_gmp_opt ~arith_operand ?ctx ~profile t).ty
+      (type_term ~use_gmp_opt ~arith_operand ?ctx ~profile t).ty
 
     | TAddrOf tlv
     | TStartOf tlv ->
       (* it is a pointer, but subterms must be typed. *)
       type_term_lval tlv ~profile;
-      dup Nan
+      Nan
 
     | Tbase_addr (_, t) ->
       (* it is a pointer, but subterms must be typed. *)
       ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~profile t);
-      dup Nan
+      Nan
 
     | TBinOp ((PlusPI | MinusPI), t1, t2) ->
       (* both [t1] and [t2] must be typed. *)
       ignore (type_term ~use_gmp_opt:true ~ctx:Nan ~profile t1);
       let ctx = type_offset ~profile t2 in
       ignore (type_term ~use_gmp_opt:false ~ctx ~profile t2);
-      dup Nan
+      Nan
 
     | Tapp(li, _, args) ->
       if Builtins.mem li.l_var_info.lv_name then
@@ -517,7 +521,7 @@ let rec type_term
         List.iter2 typ_arg li.l_profile args;
         (* [li.l_type is [None] for predicate only: not possible here.
            Thus using [Option.get] is fine *)
-        dup (ty_of_logic_ty ~profile (Option.get li.l_type))
+        ty_of_logic_ty ~profile (Option.get li.l_type)
       else begin
         (* TODO: what if the type of the parameter is smaller than the infered
            type of the argument? For now, it is silently ignored (both
@@ -558,7 +562,7 @@ let rec type_term
             (fun () ->
                ignore (type_predicate ~profile:new_profile p))
             pending_typing;
-          dup c_int
+          c_int
         | LBterm t_body ->
           List.iter
             (fun x ->
@@ -610,9 +614,9 @@ let rec type_term
              inference *)
           (match li.l_type with
            | Some (Ctype (TInt (ikind, _))) ->
-             dup (C_integer ikind)
+             C_integer ikind
            | Some (Ctype (TFloat (fkind, _))) ->
-             dup (C_float fkind)
+             C_float fkind
            | None
            | Some (Ctype (TVoid _
                          | TPtr _
@@ -623,10 +627,10 @@ let rec type_term
                          | TComp _
                          | TBuiltin_va_list _))
            | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
-             dup (ty_of_interv
-                    ?ctx:ctx_body
-                    ~use_gmp_opt:(gmp && use_gmp_opt)
-                    (Interval.get_from_profile ~profile t)))
+             ty_of_interv
+               ?ctx:ctx_body
+               ~use_gmp_opt:(gmp && use_gmp_opt)
+               (Interval.get_from_profile ~profile t))
         | LBnone ->
           (match args with
            | [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ] ->
@@ -642,7 +646,7 @@ let rec type_term
              let ival = Interval.get_from_profile ~profile t in
              let ty = ty_of_interv ival ~use_gmp_opt:true ?ctx in
              ignore (type_term ~use_gmp_opt:true ?ctx ~profile lambda);
-             dup ty
+             ty
            | [ ] | [ _ ] | [ _; _ ] | _ :: _ :: _ :: _ ->
              (* TODO : improve error message to distinguish error messages
                 corresponding to unsupported primitives and wrong application
@@ -666,15 +670,14 @@ let rec type_term
       ignore (type_term ~use_gmp_opt ~profile n1);
       ignore (type_term ~use_gmp_opt ~profile n2);
       let i = Interval.get_from_profile ~profile t in
-      let ty = ty_of_interv ?ctx i in
-      dup ty
+      ty_of_interv ?ctx i
 
     | Tlet(li, t) ->
       let li_t = Misc.term_of_li li in
       ignore (type_term ~use_gmp_opt:true ~profile li_t);
-      dup (type_term ~use_gmp_opt:true ?ctx ~profile t).ty
+      (type_term ~use_gmp_opt:true ?ctx ~profile t).ty
     | Tlambda ([ _ ],lt) ->
-      dup (type_term ~use_gmp_opt:true ~under_lambda:true ?ctx ~profile lt).ty;
+      (type_term ~use_gmp_opt:true ~under_lambda:true ?ctx ~profile lt).ty
     | Tlambda (_,_) -> Error.not_yet "lambda"
     | TDataCons (_,_) -> Error.not_yet "datacons"
     | TUpdate (_,_,_) -> Error.not_yet "update"
@@ -683,16 +686,16 @@ let rec type_term
     | TConst (LStr _ | LWStr _)
     | Ttypeof _
     | Ttype _
-    | Tempty_set  -> dup Nan
+    | Tempty_set  -> Nan
   in
   let t = Logic_normalizer.get_term t in
   match
     Memo.memo ~profile
       (fun t ->
-         let ty, op = infer t in
+         let ty = infer t in
          match ctx with
-         | None -> { ty; op; cast = None }
-         | Some ctx -> coerce ~arith_operand ~ctx ~op ty)
+         | None -> { ty; cast = None }
+         | Some ctx -> coerce ~arith_operand ~ctx ty)
       t
   with
   | Result.Ok res -> res
@@ -753,95 +756,91 @@ and type_bound_variables ~profile (t1, lv, t2) =
   ignore(type_term ~use_gmp_opt:false ~ctx ~profile t2)
 
 and type_predicate ~profile p =
+  let
+    do_both f g = (try f() with e -> try g(); raise e with | _ -> raise e); g()
+  in
   let p = Logic_normalizer.get_pred p in
   Cil.CurrentLoc.set p.pred_loc;
   (* this pattern matching also follows the formal rules of the JFLA's paper *)
-  let op =
-    match p.pred_content with
-    | Pfalse | Ptrue -> c_int
-    | Papp(li, _, args) ->
-      begin
-        match li.l_body with
-        | LBpred p ->
-          List.iter
-            (fun x -> ignore (type_term ~use_gmp_opt: true ~profile x))
-            args;
-          let new_profile =
-            Profile.make
-              li.l_profile
-              (List.map (Interval.get_from_profile ~profile) args)
-          in
-          ignore (type_predicate ~profile:new_profile p);
-        | LBnone -> ()
-        | LBreads _ -> ()
-        | LBinductive _ -> ()
-        | LBterm _ ->
-          Options.fatal "unexpected logic definition"
-            Printer.pp_predicate p
-      end;
-      c_int
-    | Pdangling _ -> Error.not_yet "\\dangling"
-    | Prel(_, t1, t2) ->
-      let ctx = ctx_relation ~profile t1 t2 in
-      ignore (type_term ~use_gmp_opt:true ~ctx ~profile t1);
-      ignore (type_term ~use_gmp_opt:true ~ctx ~profile t2);
-      (match ctx with
-       | Nan -> c_int
-       | Real | Rational | Gmpz | C_float _ | C_integer _ -> ctx)
-    | Pand(p1, p2)
-    | Por(p1, p2)
-    | Pxor(p1, p2)
-    | Pimplies(p1, p2)
-    | Piff(p1, p2) ->
-      ignore (type_predicate ~profile p1);
-      ignore (type_predicate ~profile p2);
-      c_int
-    | Pnot p ->
-      ignore (type_predicate ~profile p);
-      c_int
-    | Pif(t, p1, p2) ->
-      let ctx = mk_ctx ~use_gmp_opt:false c_int in
-      ignore (type_term ~use_gmp_opt:false ~ctx ~profile t);
-      ignore (type_predicate ~profile p1);
-      ignore (type_predicate ~profile p2);
-      c_int
-    | Plet(li, p) ->
-      let li_t = Misc.term_of_li li in
-      ignore (type_term ~use_gmp_opt:true ~profile li_t);
-      (type_predicate ~profile p).ty
-    | Pforall _
-    | Pexists _ ->
-      begin
-        let guards, goal =
-          Error.retrieve_preprocessing
-            "preprocessing of quantified predicate"
-            Bound_variables.get_preprocessed_quantifier
-            p
-            Printer.pp_predicate
-        in
+  match p.pred_content with
+  | Pfalse | Ptrue -> ()
+  | Papp(li, _, args) ->
+    begin
+      match li.l_body with
+      | LBpred p ->
         List.iter
-          (fun (t1, x, t2) -> type_bound_variables ~profile (t1, x, t2))
-          guards;
-        (type_predicate ~profile goal).ty
-      end
-    | Pseparated tlist ->
-      List.iter
-        (fun t -> ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~profile t))
-        tlist;
-      c_int
-    | Pinitialized(_, t)
-    | Pfreeable(_, t)
-    | Pallocable(_, t)
-    | Pvalid(_, t)
-    | Pvalid_read(_, t)
-    | Pobject_pointer(_,t)
-    | Pvalid_function t ->
-      ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~profile t);
-      c_int
-    | Pat(p, _) -> (type_predicate ~profile p).ty
-    | Pfresh _ -> Error.not_yet "\\fresh"
-  in
-  coerce ~arith_operand:false ~ctx:c_int ~op c_int
+          (fun x -> ignore (type_term ~use_gmp_opt: true ~profile x))
+          args;
+        let new_profile =
+          Profile.make
+            li.l_profile
+            (List.map (Interval.get_from_profile ~profile) args)
+        in
+        type_predicate ~profile:new_profile p;
+      | LBnone -> ()
+      | LBreads _ -> ()
+      | LBinductive _ -> ()
+      | LBterm _ ->
+        Options.fatal "unexpected logic definition"
+          Printer.pp_predicate p
+    end
+  | Pdangling _ -> Error.not_yet "\\dangling"
+  | Prel(_, t1, t2) ->
+    let ctx =
+      try
+        Some (ctx_relation ~profile t1 t2)
+      (* as before, we catch the exception Not_yet to ensure that [t1] and [t2]
+         get typed in all cases. *)
+      with Error.Not_yet _ ->
+        None
+    in
+    let on t () = ignore (type_term ~use_gmp_opt:true ?ctx ~profile t) in
+    do_both (on t1) (on t2);
+  | Pand(p1, p2)
+  | Por(p1, p2)
+  | Pxor(p1, p2)
+  | Pimplies(p1, p2)
+  | Piff(p1, p2) ->
+    let on p () = type_predicate ~profile p in
+    do_both (on p1) (on p2)
+  | Pnot p ->
+    type_predicate ~profile p
+  | Pif(t, p1, p2) ->
+    let ctx = mk_ctx ~use_gmp_opt:false c_int in
+    ignore (type_term ~use_gmp_opt:false ~ctx ~profile t);
+    let on p  () = type_predicate ~profile p in
+    do_both (on p1) (on p2)
+  | Plet(li, p) ->
+    let li_t = Misc.term_of_li li in
+    ignore (type_term ~use_gmp_opt:true ~profile li_t);
+    type_predicate ~profile p
+  | Pforall _
+  | Pexists _ ->
+    let guards, goal =
+      Error.retrieve_preprocessing
+        "preprocessing of quantified predicate"
+        Bound_variables.get_preprocessed_quantifier
+        p
+        Printer.pp_predicate
+    in
+    List.iter
+      (fun (t1, x, t2) -> type_bound_variables ~profile (t1, x, t2))
+      guards;
+    type_predicate ~profile goal
+  | Pseparated tlist ->
+    List.iter
+      (fun t -> ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~profile t))
+      tlist
+  | Pinitialized(_, t)
+  | Pfreeable(_, t)
+  | Pallocable(_, t)
+  | Pvalid(_, t)
+  | Pvalid_read(_, t)
+  | Pobject_pointer(_,t)
+  | Pvalid_function t ->
+    ignore (type_term ~use_gmp_opt:false ~ctx:Nan ~profile t)
+  | Pat(p, _) -> type_predicate ~profile p
+  | Pfresh _ -> Error.not_yet "\\fresh"
 
 (** When typing a binary relation, generate the context in which the relation
     should be typed, to avoid spurious casts:
@@ -879,7 +878,7 @@ let type_named_predicate ~profile p =
 let unsafe_set t ?ctx ~logic_env ty =
   let profile = Logic_env.get_profile logic_env in
   let ctx = match ctx with None -> ty | Some ctx -> ctx in
-  let mk _ = coerce ~arith_operand:false ~ctx ~op:ty ty in
+  let mk _ = coerce ~arith_operand:false ~ctx ty in
   ignore (Memo.memo mk ~profile t)
 
 (******************************************************************************)
@@ -889,14 +888,6 @@ let unsafe_set t ?ctx ~logic_env ty =
 let get_number_ty ~logic_env t =
   let profile = Logic_env.get_profile logic_env in
   (Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term).ty
-
-let get_integer_op ~logic_env t =
-  let profile = Logic_env.get_profile logic_env in
-  (Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term).op
-
-let get_integer_op_of_predicate ~logic_env p =
-  let profile = Logic_env.get_profile logic_env in
-  (type_predicate ~profile p).op
 
 (* {!typ_of_integer}, but handle the not-integer cases. *)
 let extract_typ t ty =
@@ -911,29 +902,27 @@ let extract_typ t ty =
   | Larrow _ -> Error.not_yet "unsupported logic type: type arrow"
 
 let get_typ ~logic_env t =
-  let profile = Logic_env.get_profile logic_env in
-  let info =
-    Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term in
-  extract_typ t info.ty
-
-let get_op ~logic_env t =
-  let profile = Logic_env.get_profile logic_env in
-  let info =
-    Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term  in
-  extract_typ t info.op
+  extract_typ t (get_number_ty ~logic_env t)
 
 let get_cast ~logic_env t =
   let profile = Logic_env.get_profile logic_env in
   let info =
-    Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term in
+    Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term
+  in
   try Option.map typ_of_number_ty info.cast
   with Not_a_number -> None
 
-let get_cast_of_predicate ~logic_env p =
+let get_effective_ty ~logic_env t =
   let profile = Logic_env.get_profile logic_env in
-  let info = type_predicate ~profile p in
-  try Option.map typ_of_number_ty info.cast
-  with Not_a_number -> assert false
+  let info =
+    Error.retrieve_preprocessing "typing" (Memo.get ~profile) t Printer.pp_term
+  in
+  match info.cast with
+  | Some ty -> ty
+  | None -> info.ty
+
+let get_effective_typ ~logic_env t =
+  extract_typ t (get_effective_ty ~logic_env t)
 
 let clear = Memo.clear
 

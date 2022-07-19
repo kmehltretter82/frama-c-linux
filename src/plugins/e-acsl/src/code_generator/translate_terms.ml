@@ -318,7 +318,8 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     else
       Cil.new_exp ~loc (UnOp(op, e, ty)), adata, env, Typed_number.C_number, ""
   | TUnOp(LNot, t) ->
-    let ty = Typing.get_op ~logic_env t in
+    let t = Logic_normalizer.get_term t in
+    let ty = Typing.get_effective_typ ~logic_env t in
     if Gmp_types.Z.is_t ty then
       (* [!t] is converted into [t == 0] *)
       let zero = Logic_const.tinteger 0 in
@@ -438,7 +439,13 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     end
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
-    let ity = Typing.get_integer_op ~logic_env t in
+    let ity =
+      let t1 = Logic_normalizer.get_term t1 in
+      let t2 = Logic_normalizer.get_term t2 in
+      Typing.join
+        (Typing.get_effective_ty ~logic_env t1)
+        (Typing.get_effective_ty ~logic_env t2)
+    in
     let e, adata, env =
       Translate_utils.comparison_to_exp
         ~adata

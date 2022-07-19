@@ -374,6 +374,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
         guard :: body @ [ next ], env
       | Some p ->
         let adata, env = Assert.empty ~loc kf env in
+        Typing.preprocess_predicate ~logic_env p;
         let e, adata, env =
           (* Even though p is considered a RTE, it was generated while
              typing the loop, and was already typed at this moment. Thus

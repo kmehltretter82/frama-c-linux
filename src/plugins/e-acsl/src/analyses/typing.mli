@@ -101,28 +101,19 @@ val clear: unit -> unit
 val get_number_ty: logic_env:Logic_env.t -> term -> number_ty
 (** @return the infered type for the given term. *)
 
-val get_integer_op: logic_env:Logic_env.t -> term -> number_ty
-(** @return the infered type for the top operation of the given term.
-    It is meaningless to call this function over a non-arithmetical/logical
-    operator. *)
-
-val get_integer_op_of_predicate:
-  logic_env:Logic_env.t -> predicate -> number_ty
-(** @return the infered type for the top operation of the given predicate. *)
+val get_effective_ty: logic_env:Logic_env.t -> term -> number_ty
+(** @return the necessary cast infered by the type system if any, or the type
+    infered for the given term otherwise *)
 
 val get_typ: logic_env:Logic_env.t -> term -> typ
 (** Get the type which the given term must be generated to. *)
 
-val get_op: logic_env:Logic_env.t -> term -> typ
-(** Get the type which the operation on top of the given term must be generated
-    to. *)
+val get_effective_typ: logic_env:Logic_env.t -> term -> typ
+(** Get the type which the given term must be converted to if any, and the
+    translation type otherwise *)
 
 val get_cast: logic_env:Logic_env.t -> term -> typ option
 (** Get the type which the given term must be converted to (if any). *)
-
-val get_cast_of_predicate:
-  logic_env:Logic_env.t -> predicate -> typ option
-(** Like {!get_cast}, but for predicates. *)
 
 val unsafe_set:
   term ->
