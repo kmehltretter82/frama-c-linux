@@ -100,8 +100,7 @@ end
 (** {2 Values} *)
 (* ************************************************************************* *)
 
-(** The Value analysis itself.
-    @see <../value/index.html> internal documentation. *)
+(** Deprecated module: use the Eva.mli API instead. *)
 module Value : sig
 
   type state = Cvalue.Model.t
@@ -500,6 +499,9 @@ module Value : sig
 
   val initial_state_changed: (unit -> unit) ref
 end
+[@@alert db_deprecated
+    "Db.Value is deprecated and will be removed in a future version \
+     of Frama-C. Please use the Eva.mli public API instead."]
 
 (** Functional dependencies between function inputs and function outputs.
     @see <../from/index.html> internal documentation. *)
@@ -528,11 +530,11 @@ module From : sig
   val find_deps_no_transitivity : (stmt -> exp -> Locations.Zone.t) ref
 
   val find_deps_no_transitivity_state :
-    (Value.state -> exp -> Locations.Zone.t) ref
+    (Cvalue.Model.t -> exp -> Locations.Zone.t) ref
 
   (** @raise Not_lval if the given expression is not a C lvalue. *)
   val find_deps_term_no_transitivity_state :
-    (Value.state -> term -> Value_types.logic_dependencies) ref
+    (Cvalue.Model.t -> term -> Value_types.logic_dependencies) ref
 
   val self: State.t ref
 
@@ -637,12 +639,12 @@ module Properties : sig
     (** {3 From logic terms to Locations.location} *)
 
     val loc_to_loc:
-      (result: Cil_types.varinfo option -> Value.state -> term ->
+      (result: Cil_types.varinfo option -> Cvalue.Model.t -> term ->
        Locations.location) ref
     (** @raise No_conversion if the translation fails. *)
 
     val loc_to_loc_under_over:
-      (result: Cil_types.varinfo option -> Value.state -> term ->
+      (result: Cil_types.varinfo option -> Cvalue.Model.t -> term ->
        Locations.location * Locations.location * Locations.Zone.t) ref
     (** Same as {!loc_to_loc}, except that we return simultaneously an
         under-approximation of the term (first location), and an

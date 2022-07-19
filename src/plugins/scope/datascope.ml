@@ -640,8 +640,7 @@ let rm_asserts () =
   end
 
 
-let () =
-  Db.register   Db.Value.rm_asserts rm_asserts
+let () = Db.register Db.Value.rm_asserts rm_asserts [@alert "-db_deprecated"]
 
 let rm_asserts =
   Dynamic.register
