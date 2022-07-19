@@ -404,8 +404,12 @@ let rec type_term
           let i = Interval.get_from_profile ~profile t in
           let i' = Interval.get_from_profile ~profile t' in
           Some (mk_ctx ~use_gmp_opt:true (ty_of_interv (Interval.join i i')))
+        (* during the typing phase, we catch the Not_yet exception so that [t']
+           gets typed even if [t] is not. This prevents exceptions during the
+           translation phase *)
         with Error.Not_yet _ ->
-          None in
+          None
+      in
       ignore (type_term ~use_gmp_opt:true ~arith_operand:true ?ctx ~profile t');
       c_int (* converted into [t == 0] in case of GMP *)
 
@@ -785,26 +789,26 @@ and type_predicate ~profile p =
     let ctx =
       try
         Some (ctx_relation ~profile t1 t2)
+      (* as before, we catch the exception Not_yet to ensure that [t1] and [t2]
+         get typed in all cases. *)
       with Error.Not_yet _ ->
         None
     in
-    let
-      on t = (fun () -> ignore (type_term ~use_gmp_opt:true ?ctx ~profile t))
-    in
+    let on t () = ignore (type_term ~use_gmp_opt:true ?ctx ~profile t) in
     do_both (on t1) (on t2);
   | Pand(p1, p2)
   | Por(p1, p2)
   | Pxor(p1, p2)
   | Pimplies(p1, p2)
   | Piff(p1, p2) ->
-    let on p = fun () -> type_predicate ~profile p in
+    let on p () = type_predicate ~profile p in
     do_both (on p1) (on p2)
   | Pnot p ->
     type_predicate ~profile p
   | Pif(t, p1, p2) ->
     let ctx = mk_ctx ~use_gmp_opt:false c_int in
     ignore (type_term ~use_gmp_opt:false ~ctx ~profile t);
-    let on p = fun () -> type_predicate ~profile p in
+    let on p  () = type_predicate ~profile p in
     do_both (on p1) (on p2)
   | Plet(li, p) ->
     let li_t = Misc.term_of_li li in

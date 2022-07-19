@@ -102,7 +102,8 @@ val get_number_ty: logic_env:Logic_env.t -> term -> number_ty
 (** @return the infered type for the given term. *)
 
 val get_effective_ty: logic_env:Logic_env.t -> term -> number_ty
-(** @return the cast infered by the type system if any, or the type otherwise *)
+(** @return the necessary cast infered by the type system if any, or the type
+    infered for the given term otherwise *)
 
 val get_typ: logic_env:Logic_env.t -> term -> typ
 (** Get the type which the given term must be generated to. *)
