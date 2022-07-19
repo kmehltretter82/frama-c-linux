@@ -4,7 +4,7 @@
 
 include LibSelect;;
 
-let callers kf = !Db.Value.callers kf
+let callers kf = Eva.Results.callers kf
 
 (** simple implementation to select every calls to [kf] source function.
  * The problem of this implementation is that it can generate several slice
@@ -13,7 +13,7 @@ let callers kf = !Db.Value.callers kf
  * *)
 let call_f kf =
   let callers = callers kf in
-  let process_caller (kf_caller,_) =
+  let process_caller kf_caller =
     let ff_caller = Slicing.Api.Slice.create kf_caller in
     Slicing.Api.Request.add_call_fun ~caller:ff_caller ~to_call:kf;
     prop_to_callers (kf_caller, ff_caller);
@@ -30,14 +30,14 @@ let slice_on_fun_calls kf =
       Cil_datatype.Varinfo.Hashtbl.add table vf ff;
       ff
   in
-  let rec process_ff_caller ff (kf_caller,_) =
+  let rec process_ff_caller ff kf_caller =
     let ff_caller = get_slice kf_caller in
     Slicing.Api.Request.add_call_slice ~caller:ff_caller ~to_call:ff;
     process_ff_callers (kf_caller, ff_caller)
   and process_ff_callers (kf, ff) =
     List.iter (process_ff_caller ff) (callers kf)
   in
-  let process_src_caller kf_to_call (kf_caller,_) =
+  let process_src_caller kf_to_call kf_caller =
     let ff_caller = get_slice kf_caller in
     Slicing.Api.Request.add_call_fun ~caller:ff_caller ~to_call:kf_to_call;
     process_ff_callers (kf_caller, ff_caller)

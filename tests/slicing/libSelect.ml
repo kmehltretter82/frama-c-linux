@@ -73,10 +73,10 @@ let load_source_file ?entry_point filename  =
 let get_stmt sid = fst (Kernel_function.find_from_sid sid)
 
 (** build the [zone] which represents [data] before [kinst] *)
-let get_zones str_data (kinst, kf) =
+let get_zones str_data (stmt, kf) =
   let lval_term = !Db.Properties.Interp.term_lval kf str_data in
   let lval = !Db.Properties.Interp.term_lval_to_lval ~result:None lval_term in
-  let loc = !Db.Value.lval_to_loc (Cil_types.Kstmt kinst) lval in
+  let loc = Eva.Results.(before stmt |> eval_address lval |> as_location) in
   Locations.(enumerate_valid_bits Read loc)
 ;;
 
@@ -85,17 +85,18 @@ let select_data_before_stmt str_data kinst kf =
   let zone = get_zones str_data (kinst, kf) in
   Slicing.Api.Select.select_stmt_zone_internal kf kinst ~before:true zone mark
 
-
 (** build the selection for returned value of the function *)
 let select_retres kf =
-  let ki = Kernel_function.find_return kf in
-  try
-    let loc = Db.Value.find_return_loc kf in
+  let stmt = Kernel_function.find_return kf in
+  match stmt with
+  | { skind = Return (None, _) } -> raise No_return
+  | { skind = Return (Some {enode = Lval lval}, _)} ->
+    let loc = Eva.Results.(before stmt |> eval_address lval |> as_location) in
     let zone = Locations.(enumerate_valid_bits Read loc) in
     let mark = Slicing.Api.Mark.make ~data:true ~addr:false ~ctrl:false in
     let before = false in
-    Slicing.Api.Select.select_stmt_zone_internal kf ki ~before zone mark
-  with Db.Value.Void_Function -> raise No_return
+    Slicing.Api.Select.select_stmt_zone_internal kf stmt ~before zone mark
+  | _ -> assert false
 ;;
 
 (** build the selection for the [data] at the end of the function *)
@@ -127,8 +128,8 @@ let select_ctrl numstmt kf =
  * order to call ff instead. *)
 let prop_to_callers (kf, ff) =
   let rec prop kf ff =
-    let callers = !Db.Value.callers kf in
-    let process_caller (kf_caller,_) =
+    let callers = Eva.Results.callers kf in
+    let process_caller kf_caller =
       let ff_caller = Slicing.Api.Slice.create kf_caller in
       Slicing.Api.Request.add_call_slice ~caller:ff_caller ~to_call:ff;
       prop kf_caller ff_caller
