@@ -29,6 +29,7 @@ let current_computation_state = Self.current_computation_state
 let register_computation_hook = Self.register_computation_hook
 let is_computed = Self.is_computed
 let self = Self.state
+let emitter = Eva_utils.emitter
 
 type results = Function_calls.results = Complete | Partial | NoResults
 type status = Function_calls.analysis_status =

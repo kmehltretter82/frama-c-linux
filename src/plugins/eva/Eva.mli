@@ -68,6 +68,9 @@ module Analysis: sig
       finishes. If [on] is given, the hook will only be called when the
       analysis switches to this specific state. *)
 
+  val emitter: Emitter.t
+  (** Emitter used by Eva to emit property statuses. *)
+
   (** Kind of results for the analysis of a function body. *)
   type results =
     | Complete
