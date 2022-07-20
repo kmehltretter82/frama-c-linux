@@ -27,6 +27,11 @@
 ; Auto-Complete
 (autocomplete_frama-c as autocomplete_frama-c)
 (_frama-c as _frama-c)
+; Emacs
+(emacs/frama-c-init.el as emacs/frama-c-init.el)
+(emacs/frama-c-dev.el as emacs/frama-c-dev.el)
+(emacs/frama-c-recommended.el as emacs/frama-c-recommended.el)
+(emacs/acsl.el as emacs/acsl.el)
 ; Useful Makefiles
 (Makefile.common as Makefile.common)
 (Makefile.headers as Makefile.headers)
