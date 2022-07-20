@@ -207,8 +207,8 @@ let is_result = function
   | NoResult | Computing _ -> false
 
 let is_verdict r = is_result r.verdict
-
 let is_valid = function { verdict = Valid } -> true | _ -> false
+let is_trivial r = is_valid r && r.prover_time = 0.0
 let is_not_valid r = is_verdict r && not (is_valid r)
 let is_computing = function { verdict=Computing _ } -> true | _ -> false
 

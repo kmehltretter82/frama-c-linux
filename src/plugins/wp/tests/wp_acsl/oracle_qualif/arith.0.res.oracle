@@ -3,7 +3,7 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 24 goals scheduled
-[wp] [Valid] typed_lemma_ASSOC_land_qed_ok (Alt-Ergo)
+[wp] [Valid] typed_lemma_ASSOC_land_qed_ok (Alt-Ergo) (Trivial)
 [wp] [Valid] typed_lemma_L01_lnot_qed_ok (Qed)
 [wp] [Valid] typed_lemma_L10_land_neutral_qed_ok (Qed)
 [wp] [Valid] typed_lemma_L11_land_absorbant_qed_ok (Qed)

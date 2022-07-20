@@ -34,21 +34,28 @@ type pstats = {
   success : float ; (** number of success (valid xor smoke) *)
 }
 
-(** Cumulated Stats *)
+(** Cumulated Stats
+
+    Remark: for each sub-goal, only the _best_ prover result is kept *)
 type stats = {
-  verdict : VCS.verdict ;
-  provers : (VCS.prover * pstats) list ;
-  tactics : int ;
-  proved : int ;
-  timeout : int ;
-  unknown : int ;
-  noresult : int ;
-  failed : int ;
-  cached : int ;
+  verdict : VCS.verdict ; (** global verdict *)
+  provers : (VCS.prover * pstats) list ; (** meaningfull provers *)
+  tactics : int ; (** number of tactics *)
+  proved : int ; (** number of proved sub-goals *)
+  trivial : int ; (** number of proved sub-goals with Qed or No-prover time *)
+  timeout : int ; (** number of resulting timeouts and stepouts *)
+  unknown : int ; (** number of resulting unknown *)
+  noresult : int ; (** number of no-result *)
+  failed : int ; (** number of resulting failures *)
+  cached : int ; (** number of cached (non-trivial) results *)
 }
 
 val pp_pstats : Format.formatter -> pstats -> unit
-val pp_stats : shell:bool -> updating:bool -> Format.formatter -> stats -> unit
+val pp_stats :
+  shell:bool ->
+  cache:Cache.mode ->
+  Format.formatter -> stats -> unit
+
 val pretty : Format.formatter -> stats -> unit
 
 val empty : stats

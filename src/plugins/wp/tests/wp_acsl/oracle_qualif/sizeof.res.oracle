@@ -4,7 +4,7 @@
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
 [wp] [Valid] typed_foo_assert_A (Alt-Ergo) (Cached)
-[wp] [Valid] typed_foo_assert_B (Alt-Ergo)
+[wp] [Valid] typed_foo_assert_B (Alt-Ergo) (Trivial)
 [wp] Proved goals:    2 / 2
   Alt-Ergo:        2
 ------------------------------------------------------------

@@ -136,8 +136,11 @@ module MODE = WpContext.StaticGenerator(Datatype.Unit)
 let get_mode = MODE.get
 let set_mode m = MODE.clear () ; Wp_parameters.Cache.set (mode_name m)
 
-let is_updating () =
-  match MODE.get () with
+let is_active = function
+  | NoCache -> false
+  | Replay | Offline | Update | Rebuild | Cleanup -> true
+
+let is_updating = function
   | NoCache | Replay | Offline -> false
   | Update | Rebuild | Cleanup -> true
 

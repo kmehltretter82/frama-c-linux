@@ -296,7 +296,7 @@ let do_wpo_result goal prover res =
   if VCS.is_verdict res && prover = VCS.Qed then
     do_progress goal "Qed"
 
-let do_report_stats ~shell ~updating ~smoke goal (stats : Stats.stats) =
+let do_report_stats ~shell ~cache ~smoke goal (stats : Stats.stats) =
   let status =
     if smoke then
       match stats.verdict with
@@ -320,10 +320,10 @@ let do_report_stats ~shell ~updating ~smoke goal (stats : Stats.stats) =
       | Stepout -> "[Stepout]"
   in if status <> "" then
     Wp_parameters.feedback "%s %s%a%a"
-      status (Wpo.get_gid goal) (Stats.pp_stats ~shell ~updating) stats
+      status (Wpo.get_gid goal) (Stats.pp_stats ~shell ~cache) stats
       pp_warnings goal
 
-let do_wpo_success ~shell ~updating goal success =
+let do_wpo_success ~shell ~cache goal success =
   if Wp_parameters.Generate.get () then
     match success with
     | None -> ()
@@ -340,7 +340,7 @@ let do_wpo_success ~shell ~updating goal success =
       if cstats.tactics > 0 then
         script_stats := Stats.add !script_stats cstats ;
       if shell || proof <> `Passed then
-        do_report_stats ~shell ~updating goal ~smoke cstats ;
+        do_report_stats ~shell ~cache goal ~smoke cstats ;
       if smoke && proof <> `Passed then
         begin
           let source = fst (Property.location target) in
@@ -367,9 +367,8 @@ let do_report_scheduled () =
             (fun g n ->
                if Wpo.is_passed g then succ n else n
             ) !session (unreachable + terminating) in
-        let mode = Cache.get_mode () in
-        let updating = Cache.is_updating () in
-        if mode <> Cache.NoCache then do_report_cache_usage mode ;
+        let cache = Cache.get_mode () in
+        if Cache.is_active cache then do_report_cache_usage cache ;
         let shell = Wp_parameters.has_dkey VCS.dkey_shell in
         let lines = ref [] in
         let none = fun _fmt -> () in
@@ -384,7 +383,7 @@ let do_report_scheduled () =
              if success > 0 || (not shell && p = Qed) then
                add_line name success (fun fmt ->
                    if p = Tactical then
-                     Stats.pp_stats ~shell ~updating fmt !script_stats
+                     Stats.pp_stats ~shell ~cache fmt !script_stats
                    else
                    if not shell then Stats.pp_pstats fmt s
                  )
@@ -441,7 +440,7 @@ let spawn_wp_proofs ~script goals =
       let server = ProverTask.server () in
       ignore (Wp_parameters.Share.get_dir "."); (* To prevent further errors *)
       let shell = Wp_parameters.has_dkey VCS.dkey_shell in
-      let updating = Cache.is_updating () in
+      let cache = Cache.get_mode () in
       Bag.iter
         (fun goal ->
            if  script.tactical
@@ -458,7 +457,7 @@ let spawn_wp_proofs ~script goals =
                ~start:do_wpo_start
                ~progress:do_progress
                ~result:do_wpo_result
-               ~success:(do_wpo_success ~shell ~updating)
+               ~success:(do_wpo_success ~shell ~cache)
                goal
            else
              Prover.spawn goal
@@ -466,7 +465,7 @@ let spawn_wp_proofs ~script goals =
                ~start:do_wpo_start
                ~progress:do_progress
                ~result:do_wpo_result
-               ~success:(do_wpo_success ~shell ~updating)
+               ~success:(do_wpo_success ~shell ~cache)
                script.provers
         ) goals ;
       Task.on_server_wait server do_wpo_wait ;

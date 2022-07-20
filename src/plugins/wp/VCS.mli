@@ -114,6 +114,7 @@ val is_auto : prover -> bool
 val is_result : verdict -> bool
 val is_verdict : result -> bool
 val is_valid: result -> bool
+val is_trivial: result -> bool
 val is_not_valid: result -> bool
 val is_computing: result -> bool
 val is_proved: smoke:bool -> result -> bool
