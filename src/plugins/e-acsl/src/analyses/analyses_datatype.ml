@@ -364,6 +364,11 @@ module Logic_env
   type t = { profile : Profile.t;
              let_quantif_bind : Profile.t}
 
+  (* forward reference to meet of intervals *)
+  let ival_meet_ref
+    : (ival -> ival -> ival) ref
+    = ref (fun _i1 _i2 -> Extlib.mk_labeled_fun "ival_meet_ref")
+
   let add env x i =
     { env with let_quantif_bind = Logic_var.Map.add  x i env.let_quantif_bind}
 
@@ -381,6 +386,24 @@ module Logic_env
       Logic_var.Map.find x env.profile
 
   let get_profile env = env.profile
+
+  let refine env x ival =
+    let update = function
+      | None -> raise Not_found
+      | Some i -> Some (!ival_meet_ref i ival)
+    in
+    let new_lq_bind =
+      try Logic_var.Map.update x update env.let_quantif_bind
+      with Not_found ->
+      match Logic_var.Map.find_opt x env.profile with
+      | Some i ->
+        (* The profile must remain unchanged, so if the variable is bound in
+           the profile, we add the refined interval in the other bindings,
+           which are checked first when finding the interval *)
+        Logic_var.Map.add x (!ival_meet_ref i ival) env.let_quantif_bind
+      | None -> Options.abort "updating a variable not in environment"
+    in
+    {env with let_quantif_bind = new_lq_bind}
 
 end
 

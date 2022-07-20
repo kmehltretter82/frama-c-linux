@@ -113,7 +113,7 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   __gen_e_acsl_at_8 = (long *)malloc(64UL);
   __gen_e_acsl_at_7 = (int *)malloc(12000UL);
-  __gen_e_acsl_at_6 = (long *)malloc(3072UL);
+  __gen_e_acsl_at_6 = (long *)malloc(2496UL);
   __gen_e_acsl_at_5 = (int *)malloc(528UL);
   __gen_e_acsl_at_3 = (int *)malloc(12UL);
   __gen_e_acsl_at_2 = (long *)malloc(8UL);
@@ -182,7 +182,7 @@ int main(void)
           else __gen_e_acsl_if_2 = 3;
           if (__gen_e_acsl_v_2 <= __gen_e_acsl_if_2) ; else break;
         }
-        *(__gen_e_acsl_at_6 + ((__gen_e_acsl_u_2 - 9) * 32 + (__gen_e_acsl_v_2 - -4))) = 
+        *(__gen_e_acsl_at_6 + ((__gen_e_acsl_u_2 - 9) * 26 + (__gen_e_acsl_v_2 - -4))) = 
         (n + (long)__gen_e_acsl_u_2) + __gen_e_acsl_v_2;
         __gen_e_acsl_v_2 ++;
       }
@@ -547,7 +547,7 @@ int main(void)
                                                             __gen_e_acsl_at_6 + (int)(
                                                             (long)((int)(
                                                             (long)((int)(
-                                                            __gen_e_acsl_u_7 - 9L)) * 32L)) + (int)(
+                                                            __gen_e_acsl_u_7 - 9L)) * 26L)) + (int)(
                                                             __gen_e_acsl_v_5 - -4L))),
                                                             sizeof(long),
                                                             (void *)__gen_e_acsl_at_6,
@@ -565,7 +565,7 @@ int main(void)
                                            "sizeof(long)",0,sizeof(long));
             __gen_e_acsl_assert_data_12.blocking = 1;
             __gen_e_acsl_assert_data_12.kind = "RTE";
-            __gen_e_acsl_assert_data_12.pred_txt = "\\valid_read(__gen_e_acsl_at_6 +\n            (int)((int)((int)(__gen_e_acsl_u_7 - 9) * 32) +\n                  (int)(__gen_e_acsl_v_5 - -4)))";
+            __gen_e_acsl_assert_data_12.pred_txt = "\\valid_read(__gen_e_acsl_at_6 +\n            (int)((int)((int)(__gen_e_acsl_u_7 - 9) * 26) +\n                  (int)(__gen_e_acsl_v_5 - -4)))";
             __gen_e_acsl_assert_data_12.file = "at_on-purely-logic-variables.c";
             __gen_e_acsl_assert_data_12.fct = "main";
             __gen_e_acsl_assert_data_12.line = 46;
@@ -576,10 +576,10 @@ int main(void)
             /*@ assert
                 Eva: initialization:
                   \initialized(__gen_e_acsl_at_6 +
-                               (int)((int)((int)(__gen_e_acsl_u_7 - 9) * 32)
+                               (int)((int)((int)(__gen_e_acsl_u_7 - 9) * 26)
                                      + (int)(__gen_e_acsl_v_5 - -4)));
             */
-            if (*(__gen_e_acsl_at_6 + ((__gen_e_acsl_u_7 - 9) * 32 + (
+            if (*(__gen_e_acsl_at_6 + ((__gen_e_acsl_u_7 - 9) * 26 + (
                                        __gen_e_acsl_v_5 - -4))) > 0L) 
               ;
             else {

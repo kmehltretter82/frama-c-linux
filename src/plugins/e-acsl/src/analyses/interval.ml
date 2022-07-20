@@ -216,6 +216,8 @@ let meet i1 i2 = match i1, i2 with
   | Nan, (Ival _ | Float _ | Rational | Real) ->
     Nan
 
+let () = Logic_env.ival_meet_ref := meet
+
 let is_singleton_int = function
   | Ival iv -> Ival.is_singleton_int iv
   | Float _ | Rational | Real | Nan -> false
@@ -372,7 +374,8 @@ let rec fixpoint ~(infer : force:bool ->
     then
       ival
     else
-      fixpoint ~infer li args_ival t' inferred_ival
+      let assumed_ival = interv_of_typ_containing_interv inferred_ival in
+      fixpoint ~infer li args_ival t' assumed_ival
 
 
 (* Memoization module which retrieves the computed info of some terms *)
@@ -683,8 +686,11 @@ let rec infer ~force ~logic_env t =
       Error.map (fun src -> cast ~src ~dst) src
     | Tif (t1, t2, t3) ->
       ignore (infer ~force ~logic_env t1);
-      let i2 = infer ~force ~logic_env t2 in
-      let i3 = infer ~force ~logic_env t3 in
+      let logic_env_tbranch, logic_env_fbranch =
+        compute_logic_env_if_branches logic_env t1
+      in
+      let i2 = infer ~force ~logic_env:logic_env_tbranch t2 in
+      let i3 = infer ~force ~logic_env:logic_env_fbranch t3 in
       Error.map2 join i2 i3
     | Tat (t, _) ->
       get_res (infer ~force ~logic_env t)
@@ -873,7 +879,6 @@ and infer_term_host ~force ~logic_env thost =
         Printer.pp_typ ty
         Printer.pp_term t
 
-
 and infer_term_offset ~force ~logic_env t =
   match t with
   | TNoOffset -> ()
@@ -882,6 +887,65 @@ and infer_term_offset ~force ~logic_env t =
   | TIndex(t, toff) ->
     ignore (infer ~force ~logic_env t);
     infer_term_offset ~force ~logic_env toff
+
+(* Update the interval of variables when they appear in a comparison of the form
+   [x op t] or [t op x] *)
+and compute_logic_env_if_branches logic_env t =
+  let get_res = Error.map (fun x -> x) in
+  let ival v = infer ~force:false ~logic_env v in
+  let add_ub logic_env x v =
+    let max = Ival.max_int (Error.map extract_ival (ival v)) in
+    Logic_env.refine logic_env x (Ival (Ival.inject_range None max))
+  in
+  let add_lb logic_env x v =
+    let min = Ival.min_int (Error.map extract_ival (ival v)) in
+    Logic_env.refine logic_env x (Ival (Ival.inject_range min None))
+  in
+  let add_eq logic_env x v = Logic_env.refine logic_env x (get_res (ival v)) in
+  let t_branch, f_branch =
+    (* we do not discriminate between strict and weak inequalities. This is
+       slighlty less precise but allow for better reusing of the code in the
+       case of recursive functions, the main advantage in typing
+       conditionals is for recursive functions. *)
+    match t.term_node with
+    | TBinOp(op, {term_node = TLval(TVar x, TNoOffset)}, v) ->
+      begin
+        match op with
+        | Lt | Le ->
+          add_ub logic_env x v,
+          add_lb logic_env x v
+        | Gt | Ge ->
+          add_lb logic_env x v,
+          add_ub logic_env x v
+        | Eq ->
+          add_eq logic_env x v,
+          logic_env
+        | Ne ->
+          logic_env,
+          add_eq logic_env x v
+        | _ -> logic_env, logic_env
+      end
+    | _ -> logic_env, logic_env
+  in
+  match t.term_node with
+  | TBinOp(op, u, {term_node = TLval(TVar y, TNoOffset)}) ->
+    begin
+      match op with
+      | Lt | Le ->
+        add_lb t_branch y u,
+        add_ub f_branch y u
+      | Gt | Ge ->
+        add_ub t_branch y u,
+        add_lb f_branch y u
+      | Eq ->
+        add_eq t_branch y u,
+        logic_env
+      | Ne ->
+        logic_env,
+        add_eq f_branch y u
+      | _ -> t_branch, f_branch
+    end
+  | _ -> t_branch, f_branch
 
 (* [type_bound_variables] infers an interval associated with each of
    the provided bounds of a quantified variable, and provides a term
