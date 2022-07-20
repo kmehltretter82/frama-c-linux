@@ -28,8 +28,16 @@
 # Note:
 # - that checks the unstaged version of the files and these files are
 #   only commited with a `git commit -a` command.
-# - so, a `git commit` command may checks the wrong version of a file.
+# - so, a `git commit` command may  checks the wrong version of a file.
 
-echo "Pre-commit Hook looking at staged and unstaged file version..."
-## looks at unstaged and staged files
+echo "Pre-commit Hook..."
+
+# Extract the files that have an unstaged version
+UNSTAGED="git diff --name-status"
+if [ "$(${UNSTAGED} | wc -l)" != "0" ]; then
+  echo "WARNING: These files will only be verified for a 'git commit -a' command."
+  ${UNSTAGED}
+fi
+
+# Verifies the current version of files
 make lint.before-commit-a
