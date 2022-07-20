@@ -4,6 +4,7 @@
 [wp] 1 goal scheduled
 [wp] [Unsuccess] typed_lemma_U32 (Tactic)
 [wp] Proved goals:    0 / 1
+  Unsuccess:       1
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Lemma                     -        -        1       0.0%

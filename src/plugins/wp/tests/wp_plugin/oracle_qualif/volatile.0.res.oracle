@@ -10,6 +10,7 @@
 [wp] [Unsuccess] typed_default_init_check_KO_WHEN_VOLATILE (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 5
   Qed:             1
+  Unsuccess:       4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   job_assigns               -        -        1       0.0%

@@ -5,6 +5,7 @@
 [wp] 1 goal scheduled
 [wp] [Unsuccess] typed_foo_assert_ko (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 1
+  Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   foo                       -        -        1       0.0%

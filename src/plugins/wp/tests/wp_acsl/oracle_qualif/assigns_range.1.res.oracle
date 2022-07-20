@@ -10,6 +10,7 @@
 [wp] [Unsuccess] typed_call_assigns_t4_assigns_exit (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_call_assigns_t4_assigns_normal (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 6
+  Unsuccess:       6
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   call_assigns_t1           -        -        2       0.0%

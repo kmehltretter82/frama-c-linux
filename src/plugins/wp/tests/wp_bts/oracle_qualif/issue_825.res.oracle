@@ -13,6 +13,7 @@
 [wp] [Unsuccess] typed_issue_check_ko_2 (Alt-Ergo) (Cached)
 [wp] Proved goals:    4 / 8
   Qed:             4
+  Unsuccess:       4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   job                       4        -        6      66.7%

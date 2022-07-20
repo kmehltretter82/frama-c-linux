@@ -78,6 +78,7 @@ end
   end
 [wp] [Unsuccess] typed_f_ensures (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 1
+  Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         -        -        1       0.0%
@@ -157,6 +158,7 @@ end
   end
 [wp] [Unsuccess] typed_ref_f_ensures (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 1
+  Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         -        -        2       0.0%

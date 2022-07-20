@@ -22,6 +22,7 @@
 [wp] [Unsuccess] typed_mismatch3_ensures (Alt-Ergo) (Cached) (Stronger)
 [wp] Proved goals:    5 / 8
   Alt-Ergo:        5
+  Unsuccess:       3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   fits1                     -        1        1       100%

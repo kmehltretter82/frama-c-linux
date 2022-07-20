@@ -16,6 +16,7 @@
 [wp] [Unsuccess] typed_ref_absurd_ensures_qed_ko_Comp_oracle_ko (Alt-Ergo) (Cached)
 [wp] Proved goals:    3 / 9
   Qed:             3
+  Unsuccess:       6
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   array                     3        -        3       100%

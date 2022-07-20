@@ -48,6 +48,7 @@
 [wp] Proved goals:   33 / 42
   Qed:            29
   Alt-Ergo:        4
+  Unsuccess:       9
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   initialize                4        2        6       100%

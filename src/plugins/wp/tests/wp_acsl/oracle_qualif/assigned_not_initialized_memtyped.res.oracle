@@ -14,6 +14,7 @@
 [wp] [Valid] typed_assigned_glob_array_check_OK (Alt-Ergo) (Cached)
 [wp] Proved goals:    2 / 9
   Alt-Ergo:        2
+  Unsuccess:       7
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   atomic                    -        -        1       0.0%

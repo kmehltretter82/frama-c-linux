@@ -7,6 +7,7 @@
 [wp] [Unsuccess] typed_bit_test_check2_ensures_ko (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_bit_test_check3_ensures_ko (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 3
+  Unsuccess:       3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   check1                    -        -        1       0.0%

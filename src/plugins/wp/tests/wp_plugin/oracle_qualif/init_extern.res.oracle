@@ -9,6 +9,7 @@
 [wp] [Unsuccess] typed_f_ensures_KO_2 (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 3
   Qed:             1
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         1        -        3      33.3%

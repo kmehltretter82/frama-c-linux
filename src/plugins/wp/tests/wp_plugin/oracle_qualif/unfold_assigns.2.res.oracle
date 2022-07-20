@@ -34,6 +34,7 @@
 [wp] Proved goals:   20 / 28
   Qed:            14
   Alt-Ergo:        6
+  Unsuccess:       8
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   NO_UNFOLD_OK_1            2        -        2       100%

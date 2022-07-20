@@ -9,6 +9,7 @@
 [wp] [Unsuccess] typed_f1_variant_invert_ensures_FAILS_AS_EXPECTED (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_f2_ensures_BUG_LEGACY_WP (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 5
+  Unsuccess:       5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f1                        -        -        1       0.0%

@@ -13,6 +13,7 @@
 [wp] [Unsuccess] typed_ko_ensures_ko_exp_log_add_mul (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_ko_ensures_ko_sqrt_pos (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 9
+  Unsuccess:       9
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   ko                        -        -        9       0.0%

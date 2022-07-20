@@ -12,6 +12,7 @@
 [wp] Proved goals:    4 / 6
   Qed:             3
   Alt-Ergo:        1
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   local_frame               -        1        1       100%

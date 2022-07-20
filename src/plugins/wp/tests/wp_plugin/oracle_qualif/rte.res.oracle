@@ -14,6 +14,7 @@
 [wp] Proved goals:    3 / 6
   Qed:             1
   Alt-Ergo:        2
+  Unsuccess:       3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   job                       1        1        5      40.0%

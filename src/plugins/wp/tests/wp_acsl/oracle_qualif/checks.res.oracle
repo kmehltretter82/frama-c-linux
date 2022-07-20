@@ -9,6 +9,7 @@
 [wp] [Valid] typed_main_assert_a2 (Qed)
 [wp] Proved goals:    2 / 4
   Qed:             2
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   main                      2        -        4      50.0%

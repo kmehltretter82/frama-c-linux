@@ -22,6 +22,7 @@
 [wp] [Unsuccess] typed_fs1_ensures_qed_ko (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_fs1_ensures_qed_ko_2 (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 18
+  Unsuccess:      18
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   main_ko                   -        -        9       0.0%

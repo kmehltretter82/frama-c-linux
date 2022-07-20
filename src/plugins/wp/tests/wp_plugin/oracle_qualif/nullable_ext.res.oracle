@@ -12,6 +12,7 @@
 [wp] [Valid] typed_caveat_with_declaration_assigns (Qed)
 [wp] Proved goals:    5 / 6
   Qed:             5
+  Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   nullable_coherence        2        -        3      66.7%

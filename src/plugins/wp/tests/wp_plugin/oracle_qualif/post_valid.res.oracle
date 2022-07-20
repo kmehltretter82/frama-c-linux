@@ -8,6 +8,7 @@
 [wp] [Valid] typed_job_ensures_GLOBAL (Alt-Ergo) (Cached)
 [wp] Proved goals:    2 / 3
   Alt-Ergo:        2
+  Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   job                       -        2        3      66.7%

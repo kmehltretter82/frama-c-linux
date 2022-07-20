@@ -11,6 +11,7 @@
 [wp] [Unsuccess] typed_job_ensures_WriteValues (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 6
   Qed:             1
+  Unsuccess:       5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   job                       1        -        6      16.7%

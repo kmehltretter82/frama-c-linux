@@ -27,6 +27,7 @@
 [wp] Proved goals:   13 / 21
   Qed:            11
   Alt-Ergo:        2
+  Unsuccess:       8
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Axiomatic Th              -        -        2       0.0%

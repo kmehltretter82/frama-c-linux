@@ -9,6 +9,7 @@
 [wp] [Unsuccess] typed_split_ensures_Hyp_Forall_And (Tactic)
 [wp] [Unsuccess] typed_split_ensures_Hyp_Forall_Or_bis (Tactic)
 [wp] Proved goals:    0 / 5
+  Unsuccess:       5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   split                     -        -        5       0.0%

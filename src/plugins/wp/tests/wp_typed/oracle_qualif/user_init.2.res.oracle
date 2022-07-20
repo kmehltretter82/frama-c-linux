@@ -21,6 +21,7 @@
 [wp] [Unsuccess] typed_init_t2_bis_v1_assigns_normal_part2 (Alt-Ergo) (Cached)
 [wp] Proved goals:    7 / 16
   Qed:             7
+  Unsuccess:       9
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   init_t2_v1                3        -        8      37.5%

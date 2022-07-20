@@ -28,6 +28,7 @@
 [wp] [Valid] typed_ref_write_assigns (Qed)
 [wp] Proved goals:   21 / 23
   Qed:            21
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   g                         7        -        7       100%

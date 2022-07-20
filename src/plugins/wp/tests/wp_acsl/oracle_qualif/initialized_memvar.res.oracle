@@ -80,6 +80,7 @@
   Qed:            52
   Script:          1 (Tactic) (Qed 2/2)
   Alt-Ergo:        9
+  Unsuccess:      11
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   globals                  13        7       31      64.5%

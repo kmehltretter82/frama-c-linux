@@ -9,6 +9,7 @@
 [wp] 1 goal scheduled
 [wp] [Unsuccess] typed_g_assert (Alt-Ergo) (Cached) (Stronger)
 [wp] Proved goals:    0 / 1
+  Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   g                         -        -        1       0.0%

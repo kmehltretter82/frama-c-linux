@@ -61,6 +61,7 @@
 [wp] [Unsuccess] typed_bitwise_ensures_ko_r_precedence_equiv_implies (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_bitwise_ensures_ko_l_precedence_equiv_implies (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 37
+  Unsuccess:      37
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   predicate                 -        -       23       0.0%

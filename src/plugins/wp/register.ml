@@ -390,7 +390,12 @@ let do_report_scheduled () =
                  )
           ) gstats.provers ;
         if gstats.failed > 0 then add_line "Failed" gstats.failed none ;
-        if not shell then
+        if shell then
+          begin
+            let n = gstats.timeout + gstats.unknown in
+            if n > 0 then add_line "Unsuccess" n none
+          end
+        else
           begin
             if gstats.timeout > 0 then add_line "Timeout" gstats.timeout none ;
             if gstats.unknown > 0 then add_line "Unknown" gstats.unknown none ;

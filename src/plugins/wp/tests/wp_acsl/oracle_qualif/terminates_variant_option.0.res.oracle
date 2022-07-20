@@ -31,6 +31,7 @@
   Terminating:     4
   Qed:            10
   Alt-Ergo:        3
+  Unsuccess:       7
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   fails_positive            4        1        6      83.3%

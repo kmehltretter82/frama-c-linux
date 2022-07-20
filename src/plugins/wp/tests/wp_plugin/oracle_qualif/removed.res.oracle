@@ -14,6 +14,7 @@
 [wp] 1 goal scheduled
 [wp] [Unsuccess] typed_main_assert_Eva_signed_overflow (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 1
+  Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   main                      -        -        1       0.0%

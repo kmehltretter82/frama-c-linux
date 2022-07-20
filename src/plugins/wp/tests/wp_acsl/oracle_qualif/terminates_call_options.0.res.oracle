@@ -18,6 +18,7 @@
 [wp] [Unsuccess] typed_libc_call_terminates_part2 (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 5
   Qed:             1
+  Unsuccess:       4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   definition                1        -        1       100%

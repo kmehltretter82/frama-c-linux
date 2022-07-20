@@ -8,6 +8,7 @@
 [wp] [Unsuccess] typed_job_ko_success_assert_Wrong (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 3
   Alt-Ergo:        1
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         -        1        1       100%

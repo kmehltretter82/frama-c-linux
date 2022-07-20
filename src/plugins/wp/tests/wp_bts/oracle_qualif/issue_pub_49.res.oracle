@@ -38,6 +38,7 @@
 [wp] [Valid] typed_caller4_assigns_normal_part6 (Qed)
 [wp] Proved goals:   29 / 33
   Qed:            29
+  Unsuccess:       4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   is_class                  2        -        2       100%

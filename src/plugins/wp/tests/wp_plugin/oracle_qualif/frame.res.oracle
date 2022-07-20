@@ -11,6 +11,7 @@
 [wp] [Unsuccess] typed_alias_ensures_KO (Alt-Ergo) (Cached)
 [wp] Proved goals:    2 / 6
   Qed:             2
+  Unsuccess:       4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   local                     1        -        2      50.0%

@@ -24,6 +24,7 @@
 [wp] Proved goals:    5 / 6
   Terminating:     1
   Qed:             4
+  Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   definition                1        -        1       100%

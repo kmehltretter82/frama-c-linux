@@ -9,6 +9,7 @@
 [wp] [Unsuccess] typed_min_bx_ensures_qed_ko (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_min_by_ensures_qed_ko (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 5
+  Unsuccess:       5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         -        -        3       0.0%

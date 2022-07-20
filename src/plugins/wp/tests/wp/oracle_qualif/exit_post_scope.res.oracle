@@ -8,6 +8,7 @@
 [wp] [Unsuccess] typed_foo_ensures (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_foo_exits (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 2
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   foo                       -        -        2       0.0%

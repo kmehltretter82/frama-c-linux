@@ -6,6 +6,7 @@
 [wp] [Unsuccess] typed_test_sqrtf_assert_KO (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_test_sqrt_assert_KO (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 2
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   test_sqrtf                -        -        1       0.0%

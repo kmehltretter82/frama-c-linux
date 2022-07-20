@@ -11,6 +11,7 @@
 [wp] [Valid] typed_caveat_nullable_in_context_assigns_part2 (Qed)
 [wp] Proved goals:    4 / 5
   Qed:             4
+  Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   nullable_coherence        2        -        3      66.7%

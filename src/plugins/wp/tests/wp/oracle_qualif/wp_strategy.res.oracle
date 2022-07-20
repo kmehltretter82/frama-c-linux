@@ -10,6 +10,7 @@
 [wp] [Valid] hoare_bts0513_bis_assert_qed_ok_ok (Qed)
 [wp] Proved goals:    1 / 4
   Qed:             1
+  Unsuccess:       3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   bts0513                   -        -        2       0.0%

@@ -33,6 +33,7 @@
   Terminating:     2
   Qed:             9
   Alt-Ergo:        4
+  Unsuccess:       5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   base_call                 -        -        1       0.0%

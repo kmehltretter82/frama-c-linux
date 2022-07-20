@@ -47,6 +47,7 @@
   Terminating:     1
   Qed:             9
   Alt-Ergo:        1
+  Unsuccess:       5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   simpl_r                   1        1        2       100%

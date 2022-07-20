@@ -7,6 +7,7 @@
 [wp] [Unsuccess] typed_comp_check_FAIL (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_array_check_FAIL (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 3
+  Unsuccess:       3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   atomic                    -        -        1       0.0%

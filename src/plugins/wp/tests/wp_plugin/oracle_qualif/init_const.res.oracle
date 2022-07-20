@@ -9,6 +9,7 @@
 [wp] [Valid] typed_fD_ensures_OK (Qed)
 [wp] Proved goals:    2 / 4
   Qed:             2
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   fA                        -        -        1       0.0%

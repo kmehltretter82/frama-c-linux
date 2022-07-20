@@ -17,6 +17,7 @@
 [wp] [Unsuccess] typed_f6_ko_assigns_normal (Alt-Ergo) (Cached)
 [wp] Proved goals:    8 / 12
   Qed:             8
+  Unsuccess:       4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f1_ok                     2        -        2       100%

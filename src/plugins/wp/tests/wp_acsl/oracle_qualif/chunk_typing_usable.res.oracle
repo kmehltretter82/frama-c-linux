@@ -9,6 +9,7 @@
 [wp] [Valid] typed_usable_lemma_ensures (Alt-Ergo) (Cached)
 [wp] Proved goals:    2 / 3
   Alt-Ergo:        2
+  Unsuccess:       1
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Lemma                     -        -        1       0.0%

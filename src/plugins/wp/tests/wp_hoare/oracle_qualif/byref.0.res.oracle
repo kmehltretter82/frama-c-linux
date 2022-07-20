@@ -17,6 +17,7 @@
 [wp] [Valid] typed_global_call_f_requires (Qed)
 [wp] Proved goals:   11 / 12
   Qed:            11
+  Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         2        -        2       100%

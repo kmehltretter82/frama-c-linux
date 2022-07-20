@@ -60,6 +60,7 @@
 [wp] Proved goals:   23 / 29
   Qed:            21
   Alt-Ergo:        2
+  Unsuccess:       6
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   t_spec                    2        -        2       100%

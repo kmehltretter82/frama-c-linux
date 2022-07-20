@@ -704,3 +704,4 @@
   ------------------------------------------------------------
 [wp] [Unsuccess] typed_test_goal_ex_imply_ensures (Tactic)
 [wp] Proved goals:    0 / 23
+  Unsuccess:      23

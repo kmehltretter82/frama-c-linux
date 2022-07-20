@@ -11,6 +11,7 @@
 [wp] [Valid] typed_LoopCurrent_loop_variant_positive (Qed)
 [wp] Proved goals:    5 / 6
   Qed:             5
+  Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   LoopCurrent               5        -        6      83.3%

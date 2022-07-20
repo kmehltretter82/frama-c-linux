@@ -54,6 +54,7 @@
 [wp] Proved goals:   45 / 47
   Qed:            43
   Alt-Ergo:        2
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   call                      2        2        4       100%

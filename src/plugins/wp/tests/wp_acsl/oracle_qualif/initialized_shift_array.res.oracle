@@ -19,6 +19,7 @@
 [wp] Proved goals:    5 / 11
   Qed:             1
   Alt-Ergo:        4
+  Unsuccess:       6
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   succ_full_first_cell      1        -        1       100%

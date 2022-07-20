@@ -6,6 +6,7 @@
 [wp] [Unsuccess] typed_caveat_f_ensures_ko (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_caveat_g_ensures_ko (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 2
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         -        -        1       0.0%

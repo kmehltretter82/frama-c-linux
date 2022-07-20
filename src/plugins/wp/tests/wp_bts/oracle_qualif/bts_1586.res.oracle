@@ -9,6 +9,7 @@
 [wp] [Unsuccess] typed_main_normal_KO_assert_FALSE (Alt-Ergo) (Cached)
 [wp] Proved goals:    2 / 4
   Qed:             2
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   compute_bizarre           1        -        1       100%

@@ -8,6 +8,7 @@
 [wp] [Unsuccess] typed_f_ko_1_ensures_qed_ko_2 (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_f_ko_1_ensures_qed_ko_3 (Alt-Ergo) (Cached)
 [wp] Proved goals:    0 / 4
+  Unsuccess:       4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         -        -        4       0.0%
