@@ -32,11 +32,13 @@
 
 echo "Pre-commit Hook..."
 
-# Extract the files that have an unstaged version
+# Extract the files that have both an unstaged version and a staged one.
 UNSTAGED="git diff --name-status"
-if [ "$(${UNSTAGED} | wc -l)" != "0" ]; then
-  echo "WARNING: These files will only be verified for a 'git commit -a' command."
-  ${UNSTAGED}
+STAGED="git diff --name-status --cached"
+(($UNSTAGED ; $STAGED) | sed "s:^.::" | sort -u) | diff - <(($UNSTAGED ; $STAGED) | sed "s:^.::" | sort)
+if [ "$?" != "0" ]; then
+    echo "WARNING: These previous files are both unstaged and in the index."
+    echo "         They will be verified only for a 'git commit -a' command."
 fi
 
 # Verifies the current version of files
