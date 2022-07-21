@@ -44,7 +44,7 @@ let merge_call_froms table callsite froms =
 (** State for the analysis of one function call *)
 type from_state = {
   current_function: Kernel_function.t (** Function being analyzed *);
-  value_initial_state: Db.Value.state (** State of Value at the beginning of
+  value_initial_state: Cvalue.Model.t (** State of Eva at the beginning of
                                           the call *);
   table_for_calls: Function_Froms.t Kinstr.Hashtbl.t
 (** State of the From plugin for each statement containing a function call
@@ -94,7 +94,7 @@ let call_for_individual_froms callstack _kf call_type value_initial_state =
       register_from result
     | `Builtin None ->
       let behaviors =
-        !Db.Value.valid_behaviors current_function value_initial_state
+        Eva.Logic_inout.valid_behaviors current_function value_initial_state
       in
       compute_from_behaviors behaviors
     | `Spec spec ->
@@ -136,9 +136,10 @@ let compute_call_from_value_states current_function states =
       try Kinstr.Hashtbl.find table_for_calls (Cil_types.Kstmt callsite)
       with Not_found -> raise From_compute.Call_did_not_take_place
 
-    let get_value_state s =
-      try Stmt.Hashtbl.find states s
-      with Not_found -> Cvalue.Model.bottom
+    let stmt_request stmt =
+      Eva.Results.in_cvalue_state
+        (try Stmt.Hashtbl.find states stmt
+         with Not_found -> Cvalue.Model.bottom)
 
     let keep_base kf base =
       let fundec = Kernel_function.get_definition kf in
@@ -165,7 +166,7 @@ let record_for_individual_froms callstack cur_kf value_res =
           | { value_initial_state } :: _ -> value_initial_state
         in
         if From_parameters.VerifyAssigns.get () then
-          !Db.Value.verify_assigns_froms cur_kf ~pre:pre_state froms;
+          Eva.Logic_inout.verify_assigns cur_kf ~pre:pre_state froms;
         MemExec.replace memexec_counter froms;
         froms
 

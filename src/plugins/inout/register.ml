@@ -52,7 +52,7 @@ let main () =
     Eva.Analysis.compute ();
     Callgraph.Uses.iter_in_rev_order
       (fun kf ->
-         if Kernel_function.is_definition kf && !Db.Value.is_called kf
+         if Kernel_function.is_definition kf && Eva.Results.is_called kf
          then begin
            if forceout
            then Inout_parameters.result "%a" Outputs.pretty_internal kf ;

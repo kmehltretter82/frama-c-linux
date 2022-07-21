@@ -22,6 +22,79 @@
 
 open Cil_types
 
+let predicate_deps ~pre ~here predicate =
+  let env = Eval_terms.env_annot ~pre ~here () in
+  let logic_deps = Eval_terms.predicate_deps env predicate in
+  let join logic_deps =
+    Cil_datatype.Logic_label.Map.fold
+      (fun _ -> Locations.Zone.join)
+      logic_deps
+      Locations.Zone.bottom
+  in
+  Option.map join logic_deps
+
+let valid_behaviors kf state =
+  let funspec = Annotations.funspec kf in
+  let eval_predicate pred =
+    match Eval_terms.(eval_predicate (env_pre_f ~pre:state ()) pred) with
+    | True -> Alarmset.True
+    | False -> Alarmset.False
+    | Unknown -> Alarmset.Unknown
+  in
+  let ab = Active_behaviors.create eval_predicate funspec in
+  Active_behaviors.active_behaviors ab
+
+(* -------------------------------------------------------------------------- *)
+(* --- Compute inout from assigns clauses                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let eval_error_reason fmt e =
+  if e <> Eval_terms.CAlarm
+  then Eval_terms.pretty_logic_evaluation_error fmt e
+
+let eval_tlval_as_zone assigns kind env acc t =
+  try
+    let alarm_mode = Eval_terms.Ignore in
+    let zone = Eval_terms.eval_tlval_as_zone ~alarm_mode kind env t.it_content in
+    Locations.Zone.join acc zone
+  with Eval_terms.LogicEvalError e ->
+    let pp_clause fmt =
+      if kind = Read
+      then Printer.pp_from fmt assigns
+      else Printer.pp_term fmt (fst assigns).it_content
+    in
+    Self.warning ~current:true ~once:true
+      "Failed to interpret %sassigns clause '%t'%a"
+      (if kind = Read then "inputs in " else "")
+      pp_clause eval_error_reason e;
+    Locations.Zone.top
+
+let assigns_inputs_to_zone state assigns =
+  let env = Eval_terms.env_assigns ~pre:state in
+  let treat_asgn acc (_,ins as asgn) =
+    match ins with
+    | FromAny -> Locations.Zone.top
+    | From l -> List.fold_left (eval_tlval_as_zone asgn Read env) acc l
+  in
+  match assigns with
+  | WritesAny -> Locations.Zone.top
+  | Writes l  -> List.fold_left treat_asgn Locations.Zone.bottom l
+
+let assigns_outputs_to_zone ~result state assigns =
+  let env = Eval_terms.env_post_f ~pre:state ~post:state ~result () in
+  let treat_asgn acc (out,_ as asgn) =
+    if Logic_utils.is_result out.it_content && result = None
+    then acc
+    else eval_tlval_as_zone asgn Write env acc out
+  in
+  match assigns with
+  | WritesAny -> Locations.Zone.top
+  | Writes l  -> List.fold_left treat_asgn Locations.Zone.bottom l
+
+(* -------------------------------------------------------------------------- *)
+(* --- Verify assigns clauses                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
 (* Eval: under-approximation of the term.  Note that ACSL states
    that assigns clauses are evaluated in the pre-state.
    We skip [\result]: it is meaningless when evaluating the 'assigns' part,
@@ -176,7 +249,7 @@ let check_fct_assigns kf ab ~pre_state found_froms =
          List.iter2 check_from assigns_deps assigns_zones)
   in List.iter check_for_behavior behaviors
 
-let verify_assigns_from kf ~pre froms =
+let verify_assigns kf ~pre froms =
   let funspec = Annotations.funspec kf in
   let env = Eval_terms.env_pre_f ~pre () in
   let eval_predicate pred =
@@ -186,6 +259,4 @@ let verify_assigns_from kf ~pre froms =
     | Eval_terms.Unknown -> Alarmset.Unknown
   in
   let ab = Active_behaviors.create eval_predicate funspec in
-  check_fct_assigns kf ab ~pre_state:pre froms;;
-
-Db.Value.verify_assigns_froms := verify_assigns_from;;
+  check_fct_assigns kf ab ~pre_state:pre froms

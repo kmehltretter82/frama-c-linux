@@ -68,6 +68,9 @@ module Analysis: sig
       finishes. If [on] is given, the hook will only be called when the
       analysis switches to this specific state. *)
 
+  val emitter: Emitter.t
+  (** Emitter used by Eva to emit property statuses. *)
+
   (** Kind of results for the analysis of a function body. *)
   type results =
     | Complete
@@ -153,7 +156,7 @@ module Results: sig
         function body: all requests in the function will lead to a Bottom error.
       - results have not been saved, due to the [-eva-no-results] parameter:
         all requests in the function will lead to a Top error. *)
-  val are_available: Cil_types.kernel_function -> bool
+  val are_available : Cil_types.kernel_function -> bool
 
   type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
 
@@ -209,6 +212,11 @@ module Results: sig
   (** Just before a statement or at the start of the analysis. *)
   val before_kinstr : Cil_types.kinstr -> request
 
+  (** Evaluation in a given cvalue state. Callstacks selection are silently
+      ignored on such requests. For internal use, could be modified or removed
+      in a future version. *)
+  val in_cvalue_state : Cvalue.Model.t -> request
+
 
   (** Callstack selection *)
 
@@ -257,7 +265,7 @@ module Results: sig
       request. If [filter] is provided, states are filtered on the given bases
       (for domains that support this feature).
       Returns a list of pair (name, state) for all available domains. *)
-  val print_states: ?filter:Base.Hptset.t -> request -> (string * string) list
+  val print_states : ?filter:Base.Hptset.t -> request -> (string * string) list
 
   (** Dependencies *)
 
@@ -273,6 +281,17 @@ module Results: sig
       evaluate the given lvalue, excluding the lvalue zone itself. *)
   val address_deps : Cil_types.lval -> request -> Locations.Zone.t
 
+  (** Memory dependencies of an expression. *)
+  type deps = Function_Froms.Deps.deps = {
+    data: Locations.Zone.t;
+    (** Memory zone directly required to evaluate the given expression. *)
+    indirect: Locations.Zone.t;
+    (** Memory zone read to compute data addresses. *)
+  }
+
+  (** Computes (an overapproximation of) the memory dependencies of an
+      expression. *)
+  val expr_dependencies : Cil_types.exp -> request -> deps
 
   (** Evaluation *)
 
@@ -335,15 +354,27 @@ module Results: sig
   val as_cvalue_or_uninitialized : value evaluation -> Cvalue.V_Or_Uninitialized.t
 
 
+  (** Converts into a C location abstraction. Error cases are converted into
+      bottom or top locations accordingly. *)
+  val as_location : address evaluation -> Locations.location
+
   (** Converts into a C location abstraction. *)
-  val as_location : address evaluation -> Locations.location result
+  val as_location_result : address evaluation -> Locations.location result
 
   (** Converts into a Zone. Error cases are converted into bottom or top zones
       accordingly. *)
-  val as_zone: address evaluation -> Locations.Zone.t
+  val as_zone : address evaluation -> Locations.Zone.t
 
   (** Converts into a Zone result. *)
   val as_zone_result : address evaluation -> Locations.Zone.t result
+
+  (** Converts into a C location abstraction. Error cases are converted into
+      bottom or top locations accordingly. *)
+  val as_precise_loc : address evaluation -> Precise_locs.precise_location
+
+  (** Converts into a C location abstraction. *)
+  val as_precise_loc_result :
+    address evaluation -> Precise_locs.precise_location result
 
 
   (** Evaluation properties *)
@@ -380,7 +411,7 @@ module Results: sig
       the main function has been analyzed for [Kglobal]. *)
   val is_reachable_kinstr : Cil_types.kinstr -> bool
 
-  val condition_truth_value: Cil_types.stmt -> bool * bool
+  val condition_truth_value : Cil_types.stmt -> bool * bool
   (** Provided [stmt] is an 'if' construct, [fst (condition_truth_value stmt)]
       (resp. snd) is true if and only if the condition of the 'if' has been
       evaluated to true (resp. false) at least once during the analysis. *)
@@ -564,7 +595,10 @@ end
 module Cvalue_callbacks: sig
 
   (** Register actions to performed during the Eva analysis,
-      with access to the states of the cvalue domain. *)
+      with access to the states of the cvalue domain.
+      This API is for internal use only, and may be modified or removed
+      in a future version. Please contact us if you need to register callbacks
+      to be executed during an Eva analysis. *)
 
   type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
   type state = Cvalue.Model.t
@@ -605,18 +639,49 @@ module Cvalue_callbacks: sig
 
 end
 
-module Eval_terms: sig
+module Logic_inout: sig
 
-  (** [annot_predicate_deps ~pre ~here p] computes the logic dependencies needed
-      to evaluate the predicate [p] in a code annotation in cvalue state [here],
-      in a function whose pre-state is [pre].
+  (** Functions used by the Inout and From plugins to interpret predicate
+      and assigns clauses. This API may change according to these plugins
+      development. *)
+
+  (** [predicate_deps ~pre ~here p] computes the logic dependencies needed
+      to evaluate the predicate [p] in cvalue state [here], in a function
+      whose pre-state is [pre].
       Returns None on either an evaluation error or on unsupported construct. *)
-  val annot_predicate_deps:
+  val predicate_deps:
     pre:Cvalue.Model.t -> here:Cvalue.Model.t ->
     Cil_types.predicate -> Locations.Zone.t option
+
+  (** Returns the list of behaviors of the given function that are active for
+      the given initial state. *)
+  val valid_behaviors:
+    Cil_types.kernel_function -> Cvalue.Model.t -> Cil_types.behavior list
+
+  (** Evaluation of the memory zone read by the \from part of an assigns clause,
+      in the given cvalue state.  *)
+  val assigns_inputs_to_zone:
+    Cvalue.Model.t -> Cil_types.assigns -> Locations.Zone.t
+
+  (** Evaluation of the memory zone written by an assigns clauses, in the given
+      cvalue state. *)
+  val assigns_outputs_to_zone:
+    result: Cil_types.varinfo option ->
+    Cvalue.Model.t -> Cil_types.assigns -> Locations.Zone.t
+
+  (** Evaluate the assigns clauses of the given function in its given pre-state,
+      and compare them with the given froms (computed by the from plugin).
+      Emits warnings if needed, and sets statuses to the assigns clauses. *)
+  val verify_assigns:
+    Cil_types.kernel_function -> pre:Cvalue.Model.t -> Function_Froms.froms -> unit
+
 end
 
 module Eva_results: sig
+
+  (** Internal temporary API: please do not use it, as it should be removed in a
+      future version. *)
+
   type results
 
   val get_results: unit -> results

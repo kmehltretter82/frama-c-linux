@@ -2745,17 +2745,6 @@ and predicate_deps env pred =
   try Some (do_eval env pred)
   with LogicEvalError _ -> None
 
-let annot_predicate_deps ~pre ~here predicate =
-  let env = env_annot ~pre ~here () in
-  let logic_deps = predicate_deps env predicate in
-  let join logic_deps =
-    Cil_datatype.Logic_label.Map.fold
-      (fun _ -> Locations.Zone.join)
-      logic_deps
-      Locations.Zone.bottom
-  in
-  Option.map join logic_deps
-
 (* -------------------------------------------------------------------------- *)
 (* --- Export                                                             --- *)
 (* -------------------------------------------------------------------------- *)

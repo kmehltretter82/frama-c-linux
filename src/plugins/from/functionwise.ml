@@ -37,7 +37,7 @@ let () = From_parameters.ForceDeps.set_output_dependencies [Tbl.self]
 let force_compute = ref (fun _ -> assert false)
 
 module To_Use = struct
-  let get_value_state s = Db.Value.get_stmt_state s
+  let stmt_request stmt = Eva.Results.before stmt
 
   let memo kf =
     Tbl.memo
@@ -110,16 +110,12 @@ let () =
        let deps = To_Use.memo v in
        Function_Froms.pretty_with_type (Kernel_function.get_type v) fmt deps);
   Db.From.find_deps_no_transitivity :=
-    (fun stmt lv ->
-       let state = Db.Value.get_stmt_state stmt in
-       let deps = From_compute.find_deps_no_transitivity state lv in
-       Function_Froms.Deps.to_zone deps);
+    (fun stmt expr ->
+       Eva.Results.(before stmt |> expr_deps expr));
   (* Once this function has been moved to Eva, remove the dependency of Inout
      from From. *)
   Db.From.find_deps_no_transitivity_state :=
-    (fun s e ->
-       let deps = From_compute.find_deps_no_transitivity s e in
-       Function_Froms.Deps.to_zone deps);
+    (fun s e -> Eva.Results.(in_cvalue_state s |> expr_deps e));
 
   ignore (
     Db.register_compute "From.compute_all"

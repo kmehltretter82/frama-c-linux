@@ -32,8 +32,9 @@ sig
   (** How to find the Froms for a given call during the analysis. *)
   val get_from_call : kernel_function -> stmt -> Function_Froms.t
 
-  (** How to find the state of Value at a given statement during the analysis.*)
-  val get_value_state : stmt -> Db.Value.state
+  (** The Eva request that can be used to evaluate expressions at a given
+      statement through the Eva public API. *)
+  val stmt_request : stmt -> Eva.Results.request
 
   val keep_base : kernel_function -> Base.t -> bool
   (** Return true if the given base is in scope after a call to the given
@@ -48,18 +49,10 @@ end
 (** Function that compute the Froms from a given prototype, called
     in the given state *)
 val compute_using_prototype_for_state :
-  Db.Value.state ->
+  Cvalue.Model.t ->
   Kernel_function.t ->
   assigns ->
   Function_Froms.froms
-
-
-(** Direct computation of the dependencies on expressions, offsets and
-    lvals. The state at the statement is taken from Values_To_Use *)
-val find_deps_no_transitivity :
-  Db.Value.state -> exp -> Function_Froms.Deps.t
-val find_deps_lval_no_transitivity :
-  Db.Value.state -> lval -> Function_Froms.Deps.t
 
 
 (** Functor computing the functional dependencies, according to the three

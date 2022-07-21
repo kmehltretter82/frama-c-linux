@@ -118,16 +118,3 @@ val predicate_deps: eval_env -> Cil_types.predicate -> logic_deps option
 
 val reduce_by_predicate :
   eval_env -> bool -> predicate -> eval_env
-
-
-
-[@@@ api_start]
-
-(** [annot_predicate_deps ~pre ~here p] computes the logic dependencies needed
-    to evaluate the predicate [p] in a code annotation in cvalue state [here],
-    in a function whose pre-state is [pre].
-    Returns None on either an evaluation error or on unsupported construct. *)
-val annot_predicate_deps:
-  pre:Cvalue.Model.t -> here:Cvalue.Model.t ->
-  Cil_types.predicate -> Locations.Zone.t option
-[@@@ api_end]

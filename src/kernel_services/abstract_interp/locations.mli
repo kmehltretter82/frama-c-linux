@@ -332,6 +332,7 @@ type location = private {
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Location: Datatype.S with type t = location
 
+val loc_top : location
 val loc_bottom : location
 val is_bottom_loc: location -> bool
 

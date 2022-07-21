@@ -45,55 +45,43 @@ class virtual do_it_ = object(self)
       Cil.SkipChildren (* do not visit the additional lvals *)
     | _ -> super#vstmt_aux s
 
+  (* On assignment and addrof, only read the lvalue address.  *)
+  method private read_address lv =
+    let request = Eva.Results.before_kinstr self#current_kinstr in
+    let deps = Eva.Results.address_deps lv request in
+    self#join deps
+
   method! vlval lv =
-    let state = Db.Value.get_state self#current_kinstr in
-    let deps, bits_loc, _exact =
-      !Db.Value.lval_to_zone_with_deps_state
-        state ~deps:(Some Zone.bottom) ~for_writing:false lv
-    in
+    let request = Eva.Results.before_kinstr self#current_kinstr in
+    let deps = Eva.Results.lval_deps lv request in
     self#join deps;
-    self#join bits_loc;
     Cil.SkipChildren
 
-  method private do_assign lv =
-    let deps,_loc =
-      !Db.Value.lval_to_loc_with_deps (* loc ignored *)
-        ~deps:Zone.bottom
-        self#current_kinstr
-        lv
-    in
-    (*      Format.printf "do_assign deps:%a@."
-            Zone.pretty deps; *)
+  method private do_arg_calls stmt f args =
+    let deps = Eva.Results.(before stmt |> expr_deps f) in
     self#join deps;
-
-  method private do_arg_calls f args =
-    let state = Db.Value.get_state self#current_kinstr in
-    (if Cvalue.Model.is_top state then
-       self#join Zone.top
-     else
-       let deps_callees, callees =
-         !Db.Value.expr_to_kernel_function_state
-           ~deps:(Some Zone.bottom) state f
-       in
-       self#join deps_callees;
-       Kernel_function.Hptset.iter
-         (fun kf -> self#join (self#compute_kf kf)) callees;
-    );
-    List.iter
-      (fun exp -> ignore (visitFramacExpr (self:>frama_c_visitor) exp)) args
+    let () =
+      match Eva.Results.(before stmt |> eval_callee f) with
+      | Ok callees ->
+        List.iter (fun kf -> self#join (self#compute_kf kf)) callees
+      | Error (Top | DisabledDomain) -> self#join Zone.top;
+      | Error Bottom -> ()
+    in
+    List.iter (fun e -> ignore (visitFramacExpr (self:>frama_c_visitor) e)) args;
 
   method! vinst i =
-    if Db.Value.is_reachable (Db.Value.get_state self#current_kinstr) then begin
+    let stmt = Option.get self#current_stmt in
+    if Eva.Results.is_reachable stmt then begin
       match i with
       | Set (lv,exp,_) ->
-        self#do_assign lv;
+        self#read_address lv;
         ignore (visitFramacExpr (self:>frama_c_visitor) exp);
         Cil.SkipChildren
 
       | Local_init(v, AssignInit i,_) ->
         let rec aux lv = function
           | SingleInit e ->
-            self#do_assign lv;
+            self#read_address lv;
             ignore (visitFramacExpr (self:>frama_c_visitor) e)
           | CompoundInit (ct,initl) ->
             (* No need to consider implicit zero-initializers, for which
@@ -109,15 +97,15 @@ class virtual do_it_ = object(self)
         Cil.SkipChildren
 
       | Call (lv_opt,exp,args,_) ->
-        Option.iter self#do_assign lv_opt;
-        self#do_arg_calls exp args;
+        Option.iter self#read_address lv_opt;
+        self#do_arg_calls stmt exp args;
         Cil.SkipChildren
       | Local_init(v, ConsInit(f, args, Plain_func), _) ->
-        self#do_assign (Cil.var v);
-        self#do_arg_calls (Cil.evar f) args;
+        self#read_address (Cil.var v);
+        self#do_arg_calls stmt (Cil.evar f) args;
         Cil.SkipChildren
       | Local_init(v, ConsInit(f, args, Constructor), _) ->
-        self#do_arg_calls (Cil.evar f) (Cil.mkAddrOfVi v :: args);
+        self#do_arg_calls stmt (Cil.evar f) (Cil.mkAddrOfVi v :: args);
         Cil.SkipChildren
       | Skip _ | Asm _ | Code_annot _ -> Cil.DoChildren
     end
@@ -126,12 +114,7 @@ class virtual do_it_ = object(self)
   method! vexpr exp =
     match exp.enode with
     | AddrOf lv | StartOf lv ->
-      let deps,_loc =
-        !Db.Value.lval_to_loc_with_deps (* loc ignored *)
-          ~deps:Zone.bottom
-          self#current_kinstr lv
-      in
-      self#join deps;
+      self#read_address lv;
       Cil.SkipChildren
     | SizeOfE _ | AlignOfE _ | SizeOf _ | AlignOf _ ->
       (* we're not evaluating an expression here: there's no input. *)
@@ -140,9 +123,9 @@ class virtual do_it_ = object(self)
 
   method compute_funspec kf =
     let state = self#specialize_state_on_call kf in
-    let behaviors = !Db.Value.valid_behaviors kf state in
+    let behaviors = Eva.Logic_inout.valid_behaviors kf state in
     let assigns = Ast_info.merge_assigns behaviors in
-    !Db.Value.assigns_inputs_to_zone state assigns
+    Eva.Logic_inout.assigns_inputs_to_zone state assigns
 
   method clean_kf_result (_ : kernel_function) (r: Locations.Zone.t) = r
 end

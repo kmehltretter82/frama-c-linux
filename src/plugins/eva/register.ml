@@ -34,76 +34,6 @@ let main () =
 let () = Db.Main.extend main
 
 
-(* Functions to register in Db.Value *)
-
-let eval_error_reason fmt e =
-  if e <> Eval_terms.CAlarm
-  then Eval_terms.pretty_logic_evaluation_error fmt e
-
-let assigns_inputs_to_zone state assigns =
-  let env = Eval_terms.env_assigns ~pre:state in
-  let treat_asgn acc (_,ins as asgn) =
-    match ins with
-    | FromAny -> Zone.top
-    | From l ->
-      try
-        List.fold_left
-          (fun acc t ->
-             let z =
-               Eval_terms.eval_tlval_as_zone ~alarm_mode:Eval_terms.Ignore
-                 Read env t.it_content
-             in
-             Zone.join acc z)
-          acc
-          l
-      with Eval_terms.LogicEvalError e ->
-        Self.warning ~current:true ~once:true
-          "Failed to interpret inputs in assigns clause '%a'%a"
-          Printer.pp_from asgn eval_error_reason e;
-        Zone.top
-  in
-  match assigns with
-  | WritesAny -> Zone.top
-  | Writes l  -> List.fold_left treat_asgn Zone.bottom l
-
-let assigns_outputs_aux ~eval ~bot ~top ~join state ~result assigns =
-  let env = Eval_terms.env_post_f ~pre:state ~post:state ~result () in
-  let treat_asgn acc ({it_content = out},_) =
-    if Logic_utils.is_result out && result = None
-    then acc
-    else
-      try
-        let z = eval env out in
-        join z acc
-      with Eval_terms.LogicEvalError e ->
-        Self.warning ~current:true ~once:true
-          "Failed to interpret assigns clause '%a'%a"
-          Printer.pp_term out eval_error_reason e;
-        join top acc
-  in
-  match assigns with
-  | WritesAny -> join top bot
-  | Writes l  -> List.fold_left treat_asgn bot l
-
-let assigns_outputs_to_zone =
-  let eval env term =
-    Eval_terms.eval_tlval_as_zone
-      ~alarm_mode:Eval_terms.Ignore Write env term
-  in
-  assigns_outputs_aux ~eval
-    ~bot:Locations.Zone.bottom ~top:Locations.Zone.top ~join:Locations.Zone.join
-
-let assigns_outputs_to_locations =
-  let eval env term =
-    Eval_terms.eval_tlval_as_location
-      ~alarm_mode:Eval_terms.Ignore env term
-  in
-  assigns_outputs_aux
-    ~eval
-    ~bot:[] ~top:(Locations.make_loc Locations.Location_Bits.top Int_Base.top)
-    ~join:(fun v l -> v :: l)
-
-
 (* "access" functions before evaluation, registered in Db.Value *)
 let access_value_of_lval kinstr lv =
   let state = Db.Value.get_state kinstr in
@@ -132,30 +62,19 @@ let eval_predicate ~pre ~here p =
   | False -> Property_status.False_if_reachable
   | Unknown -> Property_status.Dont_know
 
-let valid_behaviors kf state =
-  let funspec = Annotations.funspec kf in
-  let eval_predicate pred =
-    match Eval_terms.(eval_predicate (env_pre_f ~pre:state ()) pred) with
-    | Eval_terms.True -> Alarmset.True
-    | Eval_terms.False -> Alarmset.False
-    | Eval_terms.Unknown -> Alarmset.Unknown
-  in
-  let ab = Active_behaviors.create eval_predicate funspec in
-  Active_behaviors.active_behaviors ab
-
 let () =
   Db.Value.is_called := Function_calls.is_called;
   Db.Value.callers := Function_calls.callsites;
   Db.Value.use_spec_instead_of_definition :=
     Function_calls.use_spec_instead_of_definition;
-  Db.Value.assigns_outputs_to_zone := assigns_outputs_to_zone;
-  Db.Value.assigns_outputs_to_locations := assigns_outputs_to_locations;
-  Db.Value.assigns_inputs_to_zone := assigns_inputs_to_zone;
+  Db.Value.assigns_outputs_to_zone :=
+    (fun s ~result a -> Logic_inout.assigns_outputs_to_zone ~result s a);
+  Db.Value.assigns_inputs_to_zone := Logic_inout.assigns_inputs_to_zone;
   Db.Value.access := access_value_of_lval;
   Db.Value.access_location := access_value_of_location;
   Db.Value.access_expr := access_value_of_expr;
   Db.Value.Logic.eval_predicate := eval_predicate;
-  Db.Value.valid_behaviors := valid_behaviors;
+  Db.Value.valid_behaviors := Logic_inout.valid_behaviors;
   Db.From.find_deps_term_no_transitivity_state :=
     find_deps_term_no_transitivity_state;
 
@@ -504,6 +423,8 @@ let register (module Eval: Eval) (module Export: Export) =
 
 
 let () = Db.Value.initial_state_only_globals := Analysis.cvalue_initial_state
+
+let () = Db.Value.verify_assigns_froms := Logic_inout.verify_assigns
 
 let () =
   let eval = (module Eval : Eval) in

@@ -61,7 +61,7 @@
       function body: all requests in the function will lead to a Bottom error.
     - results have not been saved, due to the [-eva-no-results] parameter:
       all requests in the function will lead to a Top error. *)
-val are_available: Cil_types.kernel_function -> bool
+val are_available : Cil_types.kernel_function -> bool
 
 type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
 
@@ -117,6 +117,11 @@ val after : Cil_types.stmt -> request
 (** Just before a statement or at the start of the analysis. *)
 val before_kinstr : Cil_types.kinstr -> request
 
+(** Evaluation in a given cvalue state. Callstacks selection are silently
+    ignored on such requests. For internal use, could be modified or removed
+    in a future version. *)
+val in_cvalue_state : Cvalue.Model.t -> request
+
 
 (** Callstack selection *)
 
@@ -165,7 +170,7 @@ val get_cvalue_model_result : request -> Cvalue.Model.t result
     request. If [filter] is provided, states are filtered on the given bases
     (for domains that support this feature).
     Returns a list of pair (name, state) for all available domains. *)
-val print_states: ?filter:Base.Hptset.t -> request -> (string * string) list
+val print_states : ?filter:Base.Hptset.t -> request -> (string * string) list
 
 (** Dependencies *)
 
@@ -181,6 +186,17 @@ val lval_deps : Cil_types.lval -> request -> Locations.Zone.t
     evaluate the given lvalue, excluding the lvalue zone itself. *)
 val address_deps : Cil_types.lval -> request -> Locations.Zone.t
 
+(** Memory dependencies of an expression. *)
+type deps = Function_Froms.Deps.deps = {
+  data: Locations.Zone.t;
+  (** Memory zone directly required to evaluate the given expression. *)
+  indirect: Locations.Zone.t;
+  (** Memory zone read to compute data addresses. *)
+}
+
+(** Computes (an overapproximation of) the memory dependencies of an
+    expression. *)
+val expr_dependencies : Cil_types.exp -> request -> deps
 
 (** Evaluation *)
 
@@ -243,15 +259,27 @@ val as_cvalue_result : value evaluation -> Cvalue.V.t result
 val as_cvalue_or_uninitialized : value evaluation -> Cvalue.V_Or_Uninitialized.t
 
 
+(** Converts into a C location abstraction. Error cases are converted into
+    bottom or top locations accordingly. *)
+val as_location : address evaluation -> Locations.location
+
 (** Converts into a C location abstraction. *)
-val as_location : address evaluation -> Locations.location result
+val as_location_result : address evaluation -> Locations.location result
 
 (** Converts into a Zone. Error cases are converted into bottom or top zones
     accordingly. *)
-val as_zone: address evaluation -> Locations.Zone.t
+val as_zone : address evaluation -> Locations.Zone.t
 
 (** Converts into a Zone result. *)
 val as_zone_result : address evaluation -> Locations.Zone.t result
+
+(** Converts into a C location abstraction. Error cases are converted into
+    bottom or top locations accordingly. *)
+val as_precise_loc : address evaluation -> Precise_locs.precise_location
+
+(** Converts into a C location abstraction. *)
+val as_precise_loc_result :
+  address evaluation -> Precise_locs.precise_location result
 
 
 (** Evaluation properties *)
@@ -288,7 +316,7 @@ val is_reachable : Cil_types.stmt -> bool
     the main function has been analyzed for [Kglobal]. *)
 val is_reachable_kinstr : Cil_types.kinstr -> bool
 
-val condition_truth_value: Cil_types.stmt -> bool * bool
+val condition_truth_value : Cil_types.stmt -> bool * bool
 (** Provided [stmt] is an 'if' construct, [fst (condition_truth_value stmt)]
     (resp. snd) is true if and only if the condition of the 'if' has been
     evaluated to true (resp. false) at least once during the analysis. *)

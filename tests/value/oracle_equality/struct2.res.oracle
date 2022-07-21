@@ -23,13 +23,19 @@
 ---
 >   tab6[0] ∈ {0}
 >       [1] ∈ {2}
-206,207c204,205
+186d183
+<   tab4[0] FROM tab2[0..1]; v; i (and SELF)
+188c185
+<   tab6[0..1] FROM tab2[0..1]; i; j (and SELF)
+---
+>   tab6[1] FROM tab2[0..1]; i; j
+206,207c203,204
 <     s4.e[0].a; s8.b; s7; tab1[0..1]; tab2[0..1]; tab3[0..1]; tab4[0]; tab5[0];
 <     tab6[0..1]; p; p2; p3; p4; p5; p6; p7; q; r; s; t; a; b
 ---
 >     s4.e[0].a; s8.b; s7; tab1[0..1]; tab2[0..1]; tab3[0..1]; tab5[0]; tab6[1];
 >     p; p2; p3; p4; p5; p6; p7; q; r; s; t; a; b
-211c209
+211c208
 <            [9].a}; s1; s2; s5.e[0].b; s6.b; s8; tabl[0..1]; tab1[0..1];
 ---
 >            [9].a}; s1; s2; s5.e[0].b; s6.b; s8; tabl[0..1]; tab1[0];

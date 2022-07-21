@@ -31,41 +31,10 @@ exception Call_did_not_take_place
 module type To_Use =
 sig
   val get_from_call : kernel_function -> stmt -> Function_Froms.t
-  val get_value_state : stmt -> Db.Value.state
+  val stmt_request : stmt -> Eva.Results.request
   val keep_base : kernel_function -> Base.t -> bool
   val cleanup_and_save : kernel_function -> Function_Froms.t -> Function_Froms.t
 end
-
-let rec find_deps_no_transitivity state expr =
-  (* The value of the expression [expr], just before executing the statement
-     [instr], is a function of the values of the returned zones. *)
-  match expr.enode with
-  | AlignOfE _| AlignOf _| SizeOfStr _ |SizeOfE _| SizeOf _ | Const _
-    -> Function_Froms.Deps.bottom
-  | AddrOf lv  | StartOf lv ->
-    let deps, _ = !Db.Value.lval_to_loc_with_deps_state (* loc ignored *)
-        state
-        ~deps:Zone.bottom
-        lv
-    in
-    Function_Froms.Deps.from_data_deps deps
-  | CastE (_, e)|UnOp (_, e, _) ->
-    find_deps_no_transitivity state e
-  | BinOp (_, e1, e2, _) ->
-    Function_Froms.Deps.join
-      (find_deps_no_transitivity state e1)
-      (find_deps_no_transitivity state e2)
-  | Lval v ->
-    find_deps_lval_no_transitivity state v
-
-and find_deps_lval_no_transitivity state lv =
-  let ind_deps, direct_deps, _exact =
-    !Db.Value.lval_to_zone_with_deps_state
-      state ~for_writing:false ~deps:(Some Zone.bottom) lv
-  in
-  From_parameters.debug "find_deps_lval_no_trs:@\n deps:%a@\n direct_deps:%a"
-    Zone.pretty ind_deps Zone.pretty direct_deps;
-  { Function_Froms.Deps.data = direct_deps; indirect = ind_deps }
 
 let compute_using_prototype_for_state state kf assigns =
   let varinfo = Kernel_function.get_vi kf in
@@ -80,7 +49,7 @@ let compute_using_prototype_for_state state kf assigns =
       let (rt_typ,_,_,_) = splitFunctionTypeVI varinfo in
       let input_zone out ins =
         (* Technically out is unused, but there is a signature problem *)
-        !Db.Value.assigns_inputs_to_zone state (Writes [out, ins])
+        Eva.Logic_inout.assigns_inputs_to_zone state (Writes [out, ins])
       in
       let treat_assign acc (out, ins) =
         try
@@ -245,23 +214,21 @@ struct
 
 
   let find stmt deps_tbl expr =
-    let state = To_Use.get_value_state stmt in
-    let pre_trans = find_deps_no_transitivity state expr in
+    let request = To_Use.stmt_request stmt in
+    let pre_trans = Eva.Results.expr_dependencies expr request in
     merge_deps
       (fun d -> Function_Froms.Memory.find_precise deps_tbl d) pre_trans
 
-  let lval_to_zone_with_deps stmt ~for_writing lv =
-    let state = To_Use.get_value_state stmt in
-    !Db.Value.lval_to_zone_with_deps_state
-      state ~deps:(Some Zone.bottom) ~for_writing lv
+  let lval_to_zone_with_deps stmt lv =
+    let request = To_Use.stmt_request stmt in
+    Eva.Results.lval_deps lv request
 
   let lval_to_precise_loc_with_deps stmt ~for_writing lv =
-    let state = To_Use.get_value_state stmt in
-    let deps, loc =
-      !Db.Value.lval_to_precise_loc_with_deps_state
-        state ~deps:(Some Zone.bottom) lv
-    in
-    let exact = Precise_locs.valid_cardinal_zero_or_one ~for_writing loc in
+    let request = To_Use.stmt_request stmt in
+    let deps = Eva.Results.address_deps lv request in
+    let address = Eva.Results.eval_address ~for_writing lv request in
+    let loc = Eva.Results.as_precise_loc address
+    and exact = Eva.Results.(is_singleton address || is_bottom address) in
     deps, loc, exact
 
   let empty_from =
@@ -353,11 +320,9 @@ struct
 
     let transfer_call stmt dest f args _loc state =
       Db.yield ();
-      let value_state = To_Use.get_value_state stmt in
-      let f_deps, called_vinfos =
-        !Db.Value.expr_to_kernel_function_state
-          value_state ~deps:(Some Zone.bottom) f
-      in
+      let request = To_Use.stmt_request stmt in
+      let called_vinfos = Eva.Results.(eval_callee f request |> default []) in
+      let f_deps = Eva.Results.expr_deps f request in
       (* dependencies for the evaluation of [f] *)
       let f_deps =
         Function_Froms.Memory.find state.deps_table f_deps
@@ -428,7 +393,7 @@ struct
               let init = Cil.is_mutable_or_initialized lv in
               transfer_assign stmt ~init lv deps_ret state
       in
-      let f f acc =
+      let f acc f =
         let p = do_on f in
         match acc with
         | None -> Some p
@@ -441,7 +406,7 @@ struct
       in
       let result =
         try
-          (match Kernel_function.Hptset.fold f called_vinfos None with
+          (match List.fold_left f None called_vinfos with
            | None -> state
            | Some s -> s);
         with Call_did_not_take_place -> state
@@ -495,8 +460,8 @@ struct
 
 
     let transfer_guard s e d =
-      let value_state = To_Use.get_value_state s in
-      let interpreted_e = !Db.Value.eval_expr value_state e in
+      let request = To_Use.stmt_request s in
+      let interpreted_e = Eva.Results.(eval_exp e request |> as_cvalue) in
       let t1 = unrollType (typeOf e) in
       let do_then, do_else =
         if isIntegralType t1 || isPointerType t1
@@ -582,11 +547,8 @@ struct
     let deps_return =
       (match return.skind with
        | Return (Some ({enode = Lval v}),_) ->
-         let deps, target, _exact =
-           lval_to_zone_with_deps ~for_writing:false return v
-         in
-         let z = Zone.join target deps in
-         let deps = Function_Froms.Memory.find_precise state.deps_table z in
+         let zone = lval_to_zone_with_deps return v in
+         let deps = Function_Froms.Memory.find_precise state.deps_table zone in
          let size = Bit_utils.sizeof (Cil.typeOfLval v) in
          Function_Froms.(Memory.add_to_return ~size deps)
        | Return (None,_) ->
@@ -607,17 +569,7 @@ struct
       if not (Eva.Analysis.save_results kf) then Function_Froms.top
       else
         try
-          Stack.iter
-            (fun g ->
-               if kf == g then begin
-                 if Db.Value.ignored_recursive_call kf then
-                   From_parameters.error
-                     "during dependencies computations for %a, \
-                      ignoring probable recursive"
-                     Kernel_function.pretty kf;
-                 raise Exit
-               end)
-            call_stack;
+          Stack.iter (fun g -> if kf == g then raise Exit) call_stack;
           Stack.push kf call_stack;
           let state =
             { empty_from with
@@ -671,8 +623,8 @@ struct
             deps_table = Function_Froms.Memory.empty }
 
   let compute_using_prototype kf =
-    let state = Db.Value.get_initial_state kf in
-    let behaviors = !Db.Value.valid_behaviors kf state in
+    let state = Eva.Results.(at_start_of kf |> get_cvalue_model) in
+    let behaviors = Eva.Logic_inout.valid_behaviors kf state in
     let assigns = Ast_info.merge_assigns behaviors in
     compute_using_prototype_for_state state kf assigns
 
