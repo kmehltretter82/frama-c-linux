@@ -70,6 +70,10 @@ let () = Cmdline.run_after_early_stage print_sharepath
 let print_libpath = print_configl Kernel.PrintLib.get Fc_config.plugin_dir
 let () = Cmdline.run_after_early_stage print_libpath
 
+let print_pluginpath =
+  print_config Kernel.PrintPluginPath.get Fc_config.plugin_path
+let () = Cmdline.run_after_early_stage print_pluginpath
+
 (**************************************************************************)
 (* Hooks run after loading plug-ins *)
 (**************************************************************************)

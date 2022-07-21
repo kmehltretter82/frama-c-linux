@@ -37,6 +37,9 @@ let datadir = List.hd (List.rev datadirs)
 
 let plugin_dir = List.map Filepath.Normalized.of_string Config_data.Sites.plugins
 
+let plugin_path =
+  String.concat ":" (Filepath.Normalized.to_string_list plugin_dir)
+
 let framac_libc = Filepath.Normalized.concat datadir "libc"
 
 let () = Filepath.add_symbolic_dir_list "FRAMAC_SHARE" datadirs
