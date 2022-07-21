@@ -113,23 +113,46 @@ let choose_best a b =
 let choose_worst a b =
   if VCS.leq (snd b) (snd a) then a else b
 
-let consolidated_valid = function
-  | [] -> NoResult, 0, 0, []
-  | u::w as results ->
-    let p,r = List.fold_left choose_best u w in
-    let trivial = p = Qed || VCS.is_trivial r in
-    let cached =
-      List.for_all
-        (fun (_,r) -> r.VCS.cached || not (VCS.is_verdict r))
-        results in
-    r.VCS.verdict,
-    (if trivial then 1 else 0),
-    (if cached then 1 else 0),
-    if p = Qed then [Qed,pqed r]
-    else pmerge [Qed,psolver r] [p,presult r]
+let is_trivial (p,r) =
+  p = Qed || VCS.is_trivial r
 
-let valid_stats prs =
-  let verdict, trivial, cached, provers = consolidated_valid prs in
+let is_cached ((_,r) as pr) =
+  r.VCS.cached || not (VCS.is_verdict r) || is_trivial pr
+
+type consolidated = {
+  cs_verdict : VCS.verdict ;
+  cs_cached : int ;
+  cs_trivial : int ;
+  cs_provers : (prover * pstats) list ;
+}
+
+let consolidated = function
+  | [] ->
+    { cs_verdict = NoResult ;
+      cs_trivial = 0 ;
+      cs_cached = 0 ;
+      cs_provers = [] }
+  | u::w as results ->
+    let (p,r) as pr = List.fold_left choose_best u w in
+    let trivial = is_trivial pr in
+    let cached = not trivial && List.for_all is_cached results in
+    let provers =
+      if p = Qed then [Qed,pqed r]
+      else pmerge [Qed,psolver r] [p,presult r]
+    in
+    {
+      cs_verdict = r.VCS.verdict ;
+      cs_trivial = (if trivial then 1 else 0) ;
+      cs_cached = (if cached then 1 else 0) ;
+      cs_provers = provers ;
+    }
+
+let stats prs =
+  let { cs_verdict = verdict ;
+        cs_trivial = trivial ;
+        cs_cached = cached ;
+        cs_provers = provers ;
+      } = consolidated prs in
   match verdict with
   | Valid ->
     { empty with verdict ; provers ; trivial ; cached ; proved = 1 }
@@ -143,14 +166,14 @@ let valid_stats prs =
     { empty with verdict ; provers ; trivial ; cached ; failed = 1 }
 
 let results ~smoke prs =
-  if not smoke then valid_stats prs
+  if not smoke then stats prs
   else
     let verdict, missing =
       List.partition (fun (_,r) -> VCS.is_verdict r) prs in
     let doomed, passed =
       List.partition (fun (_,r) -> VCS.is_valid r) verdict in
     if doomed <> [] then
-      valid_stats doomed
+      stats doomed
     else
       let trivial = List.fold_left
           (fun c (p,r) -> if p = Qed || VCS.is_trivial r then succ c else c)
@@ -236,18 +259,20 @@ let pp_pstats fmt p =
 
 let pp_stats ~shell ~cache fmt s =
   let total = proofs s in
-  let valids = s.proved in
-  let cached = s.trivial + s.cached in
+  let cacheable = total - s.trivial in
   if s.tactics > 1 then
     Format.fprintf fmt " (Tactics %d)" s.tactics
   else if s.tactics = 1 then
     Format.fprintf fmt " (Tactic)" ;
   let updating = Cache.is_updating cache in
-  let cache_miss = Cache.is_active cache && not updating && cached < total in
+  let cache_miss =
+    Cache.is_active cache && not updating && s.cached < cacheable in
   let qed_only =
-    match s.provers with [Qed,_] -> valids = total | _ -> false in
+    match s.provers with [Qed,_] -> s.proved = total | _ -> false in
   let print_cache =
-    not qed_only && Cache.is_active cache && 0 < cached in
+    not qed_only && Cache.is_active cache &&
+    (updating || 0 < s.trivial || 0 < s.cached)
+  in
   List.iter
     (fun (p,pr) ->
        let success = truncate pr.success in
@@ -255,7 +280,7 @@ let pp_stats ~shell ~cache fmt s =
          pr.time > Rformat.epsilon &&
          (not shell || cache_miss) in
        let print_proofs = success > 0 && total > 1 in
-       let print_qed = qed_only && s.verdict = Valid && valids = total in
+       let print_qed = qed_only && s.verdict = Valid && s.proved = total in
        if p != Qed || print_qed || print_perfo || print_proofs
        then
          begin
@@ -269,13 +294,12 @@ let pp_stats ~shell ~cache fmt s =
          end
     ) s.provers ;
   if shell && cache_miss then
-    Format.fprintf fmt " (Cache miss %d)" (total - cached)
+    Format.fprintf fmt " (Cache miss %d)" (cacheable - s.cached)
   else
   if print_cache then
     if s.trivial = total then
       Format.fprintf fmt " (Trivial)"
     else
-      let cacheable = total - s.trivial in
       if updating || s.cached = cacheable then
         Format.fprintf fmt " (Cached)"
       else
