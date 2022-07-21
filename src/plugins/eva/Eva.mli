@@ -212,8 +212,9 @@ module Results: sig
   (** Just before a statement or at the start of the analysis. *)
   val before_kinstr : Cil_types.kinstr -> request
 
-  (** Evaluation in a given cvalue state.
-      Callstacks selection are silently ignored on such requests. *)
+  (** Evaluation in a given cvalue state. Callstacks selection are silently
+      ignored on such requests. For internal use, could be modified or removed
+      in a future version. *)
   val in_cvalue_state : Cvalue.Model.t -> request
 
 
@@ -594,7 +595,10 @@ end
 module Cvalue_callbacks: sig
 
   (** Register actions to performed during the Eva analysis,
-      with access to the states of the cvalue domain. *)
+      with access to the states of the cvalue domain.
+      This API is for internal use only, and may be modified or removed
+      in a future version. Please contact us if you need to register callbacks
+      to be executed during an Eva analysis. *)
 
   type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
   type state = Cvalue.Model.t
@@ -674,6 +678,10 @@ module Logic_inout: sig
 end
 
 module Eva_results: sig
+
+  (** Internal temporary API: please do not use it, as it should be removed in a
+      future version. *)
+
   type results
 
   val get_results: unit -> results

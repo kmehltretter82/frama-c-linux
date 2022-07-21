@@ -30,6 +30,10 @@ val is_non_terminating_instr: stmt -> bool
 (** {2 Results} *)
 
 [@@@ api_start]
+
+(** Internal temporary API: please do not use it, as it should be removed in a
+    future version. *)
+
 type results
 
 val get_results: unit -> results

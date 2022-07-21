@@ -23,7 +23,10 @@
 [@@@ api_start]
 
 (** Register actions to performed during the Eva analysis,
-    with access to the states of the cvalue domain. *)
+    with access to the states of the cvalue domain.
+    This API is for internal use only, and may be modified or removed
+    in a future version. Please contact us if you need to register callbacks
+    to be executed during an Eva analysis. *)
 
 type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
 type state = Cvalue.Model.t
