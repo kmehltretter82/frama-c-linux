@@ -83,6 +83,10 @@ ivette:
 ################################################################################
 ### TESTS
 
+check-ts-api:
+  stage: tests
+  script:
+    - ./nix/build-proxy.sh ts-api
 
 e-acsl-tests:
   stage: tests
