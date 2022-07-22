@@ -152,7 +152,7 @@ SHELL        := $(shell which bash)
 
 %.parse: SOURCES = $(filter-out %/command,$^)
 %.parse: PARSE = $(FRAMAC) $(FCFLAGS) $(if $(value MACHDEP),-machdep $(MACHDEP),) -cpp-extra-args="$(CPPFLAGS)" $(SOURCES)
-%.parse: $$(if $$^,,.IMPOSSIBLE) $$(shell $(DIR)cmd-dep.sh $$@/command $$(PARSE))
+%.parse: $$(if $$^,,.IMPOSSIBLE) $$(shell $(SHELL) $(DIR)cmd-dep.sh $$@/command $$(PARSE))
 	@$(call display_command,$(PARSE))
 	mkdir -p $@
 	mv -f $@/{command,running}
@@ -178,7 +178,7 @@ SHELL        := $(shell which bash)
 
 %.eva: EVA = $(FRAMAC) $(FCFLAGS) -eva $(EVAFLAGS)
 %.eva: PARSE_RESULT = $(word 1,$(subst ., ,$*)).parse
-%.eva: $$(PARSE_RESULT) $$(shell $(DIR)cmd-dep.sh $$@/command $$(EVA)) $(if $(BENCHMARK),.FORCE,)
+%.eva: $$(PARSE_RESULT) $$(shell $(SHELL) $(DIR)cmd-dep.sh $$@/command $$(EVA)) $(if $(BENCHMARK),.FORCE,)
 	@$(call display_command,$(EVA))
 	mkdir -p $@
 	mv -f $@/{command,running}
@@ -202,7 +202,7 @@ SHELL        := $(shell which bash)
 	} 2>&1 |
 	  $(SED_UNBUFFERED) '/\[eva\] Values at end of function/,999999d' |
 	  tee $@/eva.log
-	$(DIR)parse-coverage.sh $@/eva.log $@/stats.txt
+	$(SHELL) $(DIR)parse-coverage.sh $@/eva.log $@/stats.txt
 	{
 	  printf 'timestamp=%q\n' "$(HR_TIMESTAMP)";
 	  printf 'warnings=%s\n' "`cat $@/warnings.log | grep ':\[\(eva\|kernel\|from\)\]' | wc -l`";
@@ -218,7 +218,7 @@ SHELL        := $(shell which bash)
 
 %.wp: WP = $(FRAMAC) $(FCFLAGS) -wp $(WPFLAGS)
 %.wp: PARSE_RESULT = $(word 1,$(subst ., ,$*)).parse
-%.wp: $$(PARSE_RESULT) $$(shell $(DIR)cmd-dep.sh $$@/command $$(WP)) $(if $(BENCHMARK),.FORCE,)
+%.wp: $$(PARSE_RESULT) $$(shell $(SHELL) $(DIR)cmd-dep.sh $$@/command $$(WP)) $(if $(BENCHMARK),.FORCE,)
 	@$(call display_command,$(WP))
 	mkdir -p $@
 	mv -f $@/{command,running}
