@@ -52,8 +52,8 @@ if [ "${from_archive}" != "git" ]; then \
    (cd /frama-c && rm -f * && git clone --depth 1 https://git.frama-c.com/pub/frama-c.git .) \
 ; fi
 
-RUN cd /frama-c && @PATCH_FRAMAC@ && autoconf && ./configure --disable-gui
-RUN cd /frama-c && make -j && sudo make install
+RUN cd /frama-c && @PATCH_FRAMAC@ && @CONFIGURE@
+RUN cd /frama-c && @MAKE_MAKE_INSTALL@
 
 # Run quick sanity checks
 RUN \
@@ -153,7 +153,7 @@ FROM frama-c-slim AS frama-c-stripped-prepare
 RUN \
 mkdir -p /home/opam/.opam/minimal/bin && \
 (cd /home/opam/.opam/*/bin && \
-  cp -P $(ls -d alt-ergo ocaml ocamlc ocamlc.opt ocamlfind ocamlopt ocamlopt.opt why3 2>/dev/null) /home/opam/.opam/minimal/bin/) && \
+  cp -P $(ls -d frama-c frama-c-config frama-c-gui frama-c-script e-acsl-gcc.sh alt-ergo ocaml ocamlc ocamlc.opt ocamlfind ocamlopt ocamlopt.opt why3 2>/dev/null) /home/opam/.opam/minimal/bin/) && \
 rm -rf /home/opam/.opam/@OCAMLV@/bin && \
 mv /home/opam/.opam/minimal/bin /home/opam/.opam/@OCAMLV@/bin/
 
@@ -182,8 +182,8 @@ RUN find /home/opam/.opam \( -name "*.cmt*" -o -name "*.[ao]" -o -name "*.cm[ao]
 
 # Remove non-essential installed files
 RUN sudo rm -f /usr/bin/opam-2.*
-RUN sudo rm /usr/local/bin/frama-c.byte
-RUN sudo find /usr/local/lib/frama-c \( -name "*.[ao]" -o -name "*.cm[ao]" -o -name "*.cmxa" \) -exec rm {} \;
+RUN sudo rm -f /usr/local/bin/frama-c.byte
+RUN sudo find /usr/local/lib/frama-c \( -name "*.[ao]" -o -name "*.cm[ao]" -o -name "*.cmxa" \) -exec rm {} \; || true
 RUN cd /usr/share && sudo rm -rf gtk-2.0 X11 xml/docbook
 
 # Remove non-essential apk libraries

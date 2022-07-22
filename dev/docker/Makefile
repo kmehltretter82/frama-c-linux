@@ -29,6 +29,7 @@ help:
 # LIST OF VARIABLES IN TEMPLATE FILES, TO BE REPLACED VIA SED
 # @ALPINE_BASE@
 # @ALPINE_OPAM_BASE@
+# @CONFIGURE@
 # @CVC4@
 # @CVC4_VERSION@
 # @ENV@
@@ -36,6 +37,7 @@ help:
 # @GUI_ALPINE_DEPS@
 # @GUI_OPAM_DEPS@
 # @GUI_REMAKE@
+# @MAKE_MAKE_INSTALL@
 # @OCAMLV@
 # @OPAM_CACHE_FIX@
 # @OPAM_DEPS@
@@ -115,6 +117,8 @@ sed 's|@OPAM_DEPS@|\\\
 alt-ergo.2.2.0 \\\
 apron.v0.9.12 \\\
 conf-graphviz.0.1 \\\
+dune.3.3.1 \\\
+dune-site.3.3.1 \\\
 mlgmpidl.1.2.12 \\\
 ocamlfind.1.8.1 \\\
 ocamlgraph.1.8.8 \\\
@@ -127,13 +131,15 @@ zmq.5.1.3 \\\
 conf-python-3.1.0.0 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|./dev/disable-plugins.sh gui \&\& make clean|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make \&\& make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config detect|g' | \
 sed 's|@WP_TEST@|frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,z3|g' | \
 sed 's|@GUI_ALPINE_DEPS@||g' | \
 sed 's|@GUI_OPAM_DEPS@|lablgtk3 lablgtk3-sourceview3 conf-gtksourceview3|g' | \
-sed 's|@GUI_REMAKE@|make clean \&\& ./configure --enable-gui \&\& make -j \&\& sudo make install|g' | \
-sed 's|@FRAMAC_TESTS@|sudo apk add ncurses \&\& cd /frama-c \&\& make tests PTESTS_OPTS=-error-code|g' | \
+sed 's|@GUI_REMAKE@|./dev/disable-plugins.sh none \&\& make clean \&\& make \&\& make install|g' | \
+sed 's|@FRAMAC_TESTS@|sudo apk add ncurses \&\& cd /frama-c \&\& make run-ptests \&\& dune build @ptests_config|g' | \
 sed 's|@OCAMLV@|4.08|g' | \
 cat > $@
 
@@ -182,6 +188,8 @@ zmq.5.1.3 \\\
 conf-python-3.1.0.0 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config detect|g' | \
 sed 's|@WP_TEST@|frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,z3|g' | \
@@ -238,6 +246,8 @@ zmq.5.1.3 \\\
 conf-python-3.1.0.0 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config detect|g' | \
 sed 's|@WP_TEST@|frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,z3|g' | \
@@ -292,6 +302,8 @@ zmq.5.1.3 \\\
 conf-python-3.1.0.0 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config detect|g' | \
 sed 's|@WP_TEST@|frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,Z3|g' | \
@@ -346,6 +358,8 @@ zmq.5.1.3 \\\
 conf-python-3.1.0.0 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config detect|g' | \
 sed 's|@WP_TEST@|frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,Z3|g' | \
@@ -385,6 +399,8 @@ zmq.5.1.3 \\\
 conf-python-3.1.0.0 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect|g' | \
 sed 's|@WP_TEST@|frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,Z3|g' | \
@@ -424,6 +440,8 @@ zmq.5.1.3 \\\
 conf-python-3.1.0.0 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --full-config|g' | \
 sed 's|@WP_TEST@|frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,Z3|g' | \
@@ -466,6 +484,8 @@ zmq.5.1.3 \\\
 conf-python-3.1.0.0 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's|@WP_TEST@|frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,Z3|g' | \
@@ -504,6 +524,8 @@ zarith.1.7 \\\
 conf-python-3.1.0.0 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's|@WP_TEST@|frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,Z3|g' | \
@@ -541,6 +563,8 @@ zarith.1.7 \\\
 conf-python-3.1.0.0 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's|@WP_TEST@|frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,Z3|g' | \
@@ -578,6 +602,8 @@ yojson.1.7.0 \\\
 zarith.1.7 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's|@WP_TEST@|frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,Z3|g' | \
@@ -614,6 +640,8 @@ why3.0.88.3 \\\
 zarith.1.7 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's|@WP_TEST@|frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,Z3|g' | \
@@ -649,6 +677,8 @@ why3.0.88.3 \\\
 zarith.1.7 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's|@WP_TEST@|frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,Z3|g' | \
@@ -684,6 +714,8 @@ why3.0.88.3 \\\
 zarith.1.7 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's#@WP_TEST@#! ( frama-c -wp wp_usage/reads.i -wp-timeout 1 -wp-prover alt-ergo,CVC4,Z3 | grep "No prover" )#g' | \
@@ -719,6 +751,8 @@ why3.0.88.3 \\\
 zarith.1.7 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's#@WP_TEST@#! ( frama-c -wp wp_usage/reads.i -wp-timeout 1 -wp-prover alt-ergo,CVC4,Z3 | grep "No prover" )#g' | \
@@ -753,6 +787,8 @@ why3.0.88.3 \\\
 zarith.1.7 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's#@WP_TEST@#! ( frama-c -wp wp_usage/reads.i -wp-timeout 1 -wp-prover alt-ergo,CVC4,Z3 | grep "No prover" )#g' | \
@@ -786,6 +822,8 @@ why3.0.88.3 \\\
 zarith.1.7 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|true|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's#@WP_TEST@# ! ( printf "int g;\\n//@assigns g;\\nvoid f(){g = 1;}\\nint main() {f(); return g;}" > /tmp/simple.c; frama-c -wp /tmp/simple.c -wp-prover alt-ergo,CVC4,Z3 | grep "No prover" ); rm -f /tmp/simple.c#g' | \
@@ -821,6 +859,8 @@ why3-base.0.88.3 \\\
 zarith.1.7 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|cd /frama-c \&\& sed -i s/-fno-pic// Makefile|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's#@WP_TEST@# ! ( printf "int g;\\n//@assigns g;\\nvoid f(){g = 1;}\\nint main() {f(); return g;}" > /tmp/simple.c; frama-c -wp /tmp/simple.c -wp-prover alt-ergo,CVC4,Z3 | grep "No prover" ); rm -f /tmp/simple.c#g' | \
@@ -856,6 +896,8 @@ why3-base.0.88.3 \\\
 zarith.1.7 \\\
 conf-time.1|' | \
 sed 's|@PATCH_FRAMAC@|cd /frama-c \&\& sed -i s/-fno-pic// Makefile|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's#@WP_TEST@# ! ( printf "int g;\\n//@assigns g;\\nvoid f(){g = 1;}\\nint main() {f(); return g;}" > /tmp/simple.c; frama-c -wp /tmp/simple.c -wp-prover alt-ergo,CVC4,Z3 | grep "No prover" ); rm -f /tmp/simple.c#g' | \
@@ -891,6 +933,8 @@ ocamlfind.1.7.3-1 \\\
 why3-base.0.85 \\\
 zarith.1.7|' | \
 sed 's|@PATCH_FRAMAC@|cd /frama-c \&\& sed -i s/-fno-pic// Makefile \&\& sed -i "s/ 81/  1/" configure.in|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's#@WP_TEST@# ! ( printf "int g;\\n//@assigns g;\\nvoid f(){g = 1;}\\nint main() {f(); return g;}" > /tmp/simple.c; frama-c -wp /tmp/simple.c -wp-prover alt-ergo,CVC4,Z3 | grep "No prover" ); rm -f /tmp/simple.c#g' | \
@@ -923,6 +967,8 @@ ocamlfind.1.7.3-1 \\\
 why3-base.0.85 \\\
 zarith.1.7|' | \
 sed 's|@PATCH_FRAMAC@|cd /frama-c \&\& sed -i s/-fno-pic// Makefile \&\& sed -i "s/ 81/  1/" configure.in|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's#@WP_TEST@# ! ( printf "int g;\\n//@assigns g;\\nvoid f(){g = 1;}\\nint main() {f(); return g;}" > /tmp/simple.c; frama-c -wp /tmp/simple.c -wp-prover alt-ergo,CVC4,Z3 | grep "No prover" ); rm -f /tmp/simple.c#g' | \
@@ -958,6 +1004,8 @@ ocamlfind.1.7.3-1 \\\
 why3-base.0.85 \\\
 zarith.1.7|' | \
 sed 's|@PATCH_FRAMAC@|cd /frama-c \&\& sed -i s/-fno-pic// Makefile \&\& sed -i "s/ 81/  1/" configure.in|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@|-wp -report|g'| \
 sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 sed 's#@WP_TEST@# ! ( printf "int g;\\n//@assigns g;\\nvoid f(){g = 1;}\\nint main() {f(); return g;}" > /tmp/simple.c; frama-c -wp /tmp/simple.c -wp-prover alt-ergo,CVC4,Z3 | grep "No prover" ); rm -f /tmp/simple.c#g' | \
@@ -992,6 +1040,8 @@ conf-autoconf.0.1 \\\
 conf-graphviz.0.1 \\\
 ocamlfind.1.7.3-1|' | \
 sed 's|@PATCH_FRAMAC@|cd /frama-c \&\& sed -i s/-fno-pic// Makefile \&\& sed -i "s/ 81/  1/" configure.in|g' | \
+sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 sed 's|@WP_REPORT@||g'| \
 sed 's|@WHY3_CONFIG@|true|g' | \
 sed 's#@WP_TEST@#true#g' | \
@@ -1025,6 +1075,8 @@ cat > $@
 # ocamlfind.1.7.3-1 \\\
 # zarith.1.7|' | \
 # sed 's|@PATCH_FRAMAC@|cd /frama-c \&\& sed -i s/-fno-pic// Makefile \&\& sed -i "s/ 81/  1/" configure.in|g' | \
+# sed 's|@CONFIGURE@|autoconf \&\& ./configure --disable-gui|g' | \
+# sed 's|@MAKE_MAKE_INSTALL@|make -j \&\& sudo make install|g' | \
 # sed 's|@WP_REPORT@||g'| \
 # sed 's|@WHY3_CONFIG@|why3 config --detect-provers|g' | \
 # sed 's#@WP_TEST@#true#g' | \
