@@ -22,3 +22,12 @@
 
 (alias (name default) (deps (alias install)))
 (dirs src tools tests headers share bin)
+
+(executable
+ (name configurator)
+ (libraries dune-configurator str))
+
+(rule
+ (deps VERSION VERSION_CODENAME)
+ (targets config.sed python-3.7-available)
+ (action (run ./configurator.exe)))
