@@ -30,9 +30,9 @@
 # Must be unset (for external plugins) and set (for FRAMA-C kernel)
 FRAMAC_HDRCK?=
 
-# Can be set to yes
+# Can be set to no
 # - yes: adds "-exit-on-warning" option to "frama-c-hdrck"
-HEADER_STRICT?=
+HEADER_STRICT?=yes
 
 # Defines where to find the header directories
 HEADER_DIRS?=headers $(wildcard src/plugins/*/headers)
