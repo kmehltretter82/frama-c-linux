@@ -771,6 +771,15 @@ let fold f =
          by_emitter
          acc)
 
+let to_seq () =
+  State.to_seq () |>
+  Seq.flat_map (fun (_,emitter) -> Usable_emitter.Hashtbl.to_seq emitter) |>
+  Seq.flat_map
+    (fun (e,h) ->
+       D.Hashtbl.to_seq h |>
+       Seq.map (fun (alarm, (annot, kf, stmt, rank)) ->
+           Usable_emitter.get e, kf, stmt, rank, alarm, annot))
+
 let find annot =
   try Some (Alarm_of_annot.find annot)
   with Not_found -> None
