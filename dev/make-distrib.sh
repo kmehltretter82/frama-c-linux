@@ -23,11 +23,6 @@
 
 set -euxo pipefail
 
-if [ ! -f configure ] ; then
-  echo "No 'configure' file, you should first run 'autoconf'"
-  exit 2
-fi
-
 ################################################################################
 # Configuration
 
@@ -83,7 +78,6 @@ for plugin in $EXTERNAL_PLUGINS ; do
 done
 
 tar --concatenate --file=$TAR_ACC
-tar rf $FRAMAC_TAR configure --transform "s,^,$FRAMAC/,"
 
 ################################################################################
 # Prepare header options

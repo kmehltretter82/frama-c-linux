@@ -43,7 +43,9 @@ DEPENDENCIES= $(FRAMAC_MODERN) $(GENERATED) frama-c-book.cls
 
 all: developer.pdf # check << restore check later
 
-FC_BINDIR:=$(FRAMAC_ROOT_SRCDIR)/bin
+# This variable does not exist anymore.
+# FC_BINDIR:=$(FRAMAC_ROOT_SRCDIR)/bin
+# Thus TODO: use `dune exec -- frama-c` for the following commands
 
 .PHONY: clean-tuto
 clean-tuto:

@@ -185,7 +185,7 @@ build-distrib-tarball:
     CI_LINK: "yes"
     HDRCK: "frama-c-hdrck"
   script:
-    - ./nix/shell-checkers.sh "autoconf && ./dev/make-distrib.sh"
+    - ./nix/shell-checkers.sh "./dev/make-distrib.sh"
   artifacts:
     paths:
       - ./*.tar.gz

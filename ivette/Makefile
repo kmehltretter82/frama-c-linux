@@ -159,7 +159,9 @@ include $(DOME)/template/makefile
 # --- Ivette Installation
 # --------------------------------------------------------------------------
 
-sinclude ../share/Makefile.config
+INSTALLDIR?=/usr/local
+BINDIR=$(INSTALLDIR)/bin
+LIBDIR=$(INSTALLDIR)/lib
 
 dist-dir:
 	@echo "Cleaning dist"

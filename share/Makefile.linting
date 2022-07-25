@@ -98,7 +98,7 @@ RMDIR   ?= rm -rf
 TOUCH   ?= touch
 WC      ?= wc
 
-ifeq ($(PLATFORM),MacOS)
+ifeq ($(PLATFORM),Darwin)
 XARGS   ?= xargs
 else
 # Unix, Cygwin

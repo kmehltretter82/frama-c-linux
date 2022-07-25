@@ -8,12 +8,12 @@
 , wrapGAppsHook
 , writeText
 # Generic
-, autoconf
 , findlib
 # Frama-C build
 , apron
 , camlzip
 , dune_3
+, dune-configurator
 , dune-site
 , gcc9
 , graphviz
@@ -56,7 +56,6 @@ stdenvNoCC.mkDerivation rec {
     else gitignoreSource ./.. ;
 
   nativeBuildInputs = [
-    autoconf
     which
     wrapGAppsHook
   ];
@@ -65,6 +64,7 @@ stdenvNoCC.mkDerivation rec {
     apron
     camlzip
     dune_3
+    dune-configurator
     dune-site
     findlib
     gcc9
@@ -93,9 +93,10 @@ stdenvNoCC.mkDerivation rec {
 
   outputs = [ "out" "build_dir" ];
 
-  preConfigure = (if release_mode then "" else "autoconf \n") + ''
+  preConfigure = ''
     patchShebangs src/plugins/eva/gen-api.sh
     chmod +x src/plugins/eva/gen-api.sh
+    dune build @frama-c-configure
   '';
 
   # Do not use default parallel building, but allow 2 cores for Frama-C build
@@ -103,14 +104,13 @@ stdenvNoCC.mkDerivation rec {
   dune_opt = if release_mode then "--release" else "" ;
 
   buildPhase = ''
-    make config.sed
     dune build -j2 --display short $release_mode @install
     make tools/ptests/ptests.exe
     make tools/ptests/wtests.exe
   '';
 
   installFlags = [
-    "FRAMAC_INSTALLDIR=$(out)"
+    "INSTALLDIR=$(out)"
   ];
 
   # Simpler for our test target

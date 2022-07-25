@@ -58,55 +58,11 @@ clean:: purge-tests # to be done before a "dune" command
 	dune clean
 	dune clean --root $(FRAMAC_PTESTS_SRC)
 	dune clean --root $(FRAMAC_HDRCK_SRC)
-	rm -rf _build .merlin autom4te.cache
-
-########################################################################
-# Makefile.config is rebuilt whenever configure.ac is modified         #
-########################################################################
-
-share/Makefile.config: share/Makefile.config.in config.status
-	$(PRINT_MAKING) $@
-	./config.status --file $@
-
-share/Makefile.dynamic_config: share/Makefile.dynamic_config.internal
-	$(PRINT_MAKING) $@
-	$(RM) $@
-	$(CP) $< $@
-	$(CHMOD_RO) $@
-
-config.status: configure
-	$(PRINT_MAKING) $@
-	./config.status --recheck
-
-configure: configure.ac .force-reconfigure
-	$(PRINT_MAKING) $@
-	autoconf -f
-
-# If 'make clean' has to be performed after 'git pull':
-# change '.make-clean-stamp' before 'git commit'
-.make-clean: .make-clean-stamp
-	$(TOUCH) $@
-	$(QUIET_MAKE) clean
-
-include .make-clean
-
-# force "make clean" to be executed for all users of GIT
-force-clean:
-	expr `$(CAT) .make-clean-stamp` + 1 > .make-clean-stamp
-
-# force a reconfiguration for all git users
-force-reconfigure:
-	expr `$(CAT) .force-reconfigure` + 1 > .force-reconfigure
-
+	rm -rf _build .merlin
 
 ##############################################################################
 # INSTALL/UNINSTALL
 ################################
-
-sinclude config.prefix
-FRAMAC_INSTALLDIR?=
-
-INSTALLDIR:=$(FRAMAC_INSTALLDIR)
 
 include share/Makefile.installation
 

@@ -19,10 +19,6 @@ stdenv.mkDerivation rec {
     git
   ];
 
-  configurePhase = ''
-    autoconf
-  '';
-
   preBuild = ''
     patchShebangs ./devel_tools/make-distrib.sh
   '';
