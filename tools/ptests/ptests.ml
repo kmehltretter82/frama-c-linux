@@ -1340,7 +1340,7 @@ let print_json_wrapper ~file wtest =
   if !verbosity >= 2 then Format.printf "%% Generates %S wrapper file...@." file;
   let wrapper_cout = open_out file in
   let wrapper_fmt = Format.formatter_of_out_channel wrapper_cout  in
-  Format.fprintf wrapper_fmt "%a@" (pp_wtest ~compacted:false) wtest;
+  Format.fprintf wrapper_fmt "%a@." (pp_wtest ~compacted:false) wtest;
   close_out wrapper_cout
 
 let oracle_target oracle_fmt dir fname =
