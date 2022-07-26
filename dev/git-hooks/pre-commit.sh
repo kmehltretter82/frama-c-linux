@@ -1,5 +1,4 @@
 #!/bin/bash
-# -*- mode: bash
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -22,21 +21,26 @@
 #                                                                        #
 ##########################################################################
 
-if git rev-parse --verify HEAD >/dev/null 2>&1
-then
-    against=HEAD
-else
-    # Initial commit: diff against an empty tree object
-    against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+# Examples of installation of this pre-commit hook (client side):
+# - cp ./dev/git-hooks/pre-commit.sh .git/hooks/pre-commit
+# - (cd .git/hooks/ && ln -s ../../dev/git-hooks/pre-commit.sh pre-commit)
+
+# Note:
+# - that checks the unstaged version of the files and these files are
+#   only commited with a `git commit -a` command.
+# - so, a `git commit` command may  checks the wrong version of a file.
+
+echo "Pre-commit Hook..."
+
+# Extract the files that have both an unstaged version and a staged one.
+UNSTAGED="git diff --name-status"
+STAGED="git diff --name-status --cached"
+(($UNSTAGED ; $STAGED) | sed "s:^.::" | sort -u) | diff - <(($UNSTAGED ; $STAGED) | sed "s:^.::" | sort)
+if [ "$?" != "0" ]; then
+    echo "WARNING: These previous files are both unstaged and in the index."
+    echo "         They will be verified only for a 'git commit -a' command."
 fi
 
-if git config --get frama-c.makelevel > /dev/null 2>&1 ; then
-  MAKELEVEL=-j$(git config --int --get frama-c.makelevel);
-else
-  MAKELEVEL=-j4;
-fi
-
-MANUAL_ML_FILES=\
-$(git diff-index --name-only --diff-filter d $against | \
-    grep -e '^src/.*\.mli\?$' | tr '\n' ' ') \
-make ${MAKELEVEL} lint
+# Verifies the current version of files
+make lint.before-commit-a
+make check-headers.before-commit-a

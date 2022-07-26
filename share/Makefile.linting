@@ -217,8 +217,8 @@ LINT.$(1)-filter-targets=$$(addsuffix .$(1),$$(LINT.main-targets))
 $$(LINT.$(1)-filter-targets):: LINT.FILE_LIST=$$(call LINT.file-list-from-git-diff,$(2))
 $$(LINT.$(1)-filter-targets):: %.$(1) : $(3) %
 	@echo [LINT] Done: LINT_DIFF=\"$(2)\" make $$(basename $$@)
-	@echo [LINT] git diff --name-status
-	$$(GIT) diff --name-status HEAD
+	@echo [LINT] checked file list:
+	$$(GIT) diff --name-status $(2)
 endef
 
 ifeq ($(LINT_DIFF),)
@@ -262,7 +262,7 @@ LINT.checked-unstaged-ok:
            exit 1; \
         fi;
 
-$(eval $(call LINT.file-list-filter-with-git-diff,staged,--cached HEAD,LINT.checked-unstaged-ok))
+$(eval $(call LINT.file-list-filter-with-git-diff,before-commit,--cached HEAD,LINT.checked-unstaged-ok))
 
 #### rules for make <lint-target>.before-commit-a
 ## looks at unstaged and staged files
