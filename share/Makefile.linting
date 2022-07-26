@@ -262,7 +262,7 @@ LINT.checked-unstaged-ok:
            exit 1; \
         fi;
 
-$(eval $(call LINT.file-list-filter-with-git-diff,staged,--cached HEAD,LINT.checked-unstaged-ok))
+$(eval $(call LINT.file-list-filter-with-git-diff,before-commit,--cached HEAD,LINT.checked-unstaged-ok))
 
 #### rules for make <lint-target>.before-commit-a
 ## looks at unstaged and staged files
