@@ -25,7 +25,7 @@ case "$1" in
   "-h"|"--help")
     echo "Usage: $0 <plugin directories>"
     echo "  - directories are given without prefix src/plugins"
-    echo "  - if no directory is given all plugins are enabled"
+    echo "  - if no directory is given all plugins are enabled (alternative: none)"
     exit 0
 esac
 
@@ -34,7 +34,7 @@ if [ ! -f VERSION ]; then
   exit 2
 fi
 
-if [ $# == "0" ]; then
+if [[ "$#" == "0" || ( "$#" == "1" && "$1" == "none" ) ]]; then
   rm -f src/plugins/dune
   echo "All plugin enabled"
   echo "Make sure to clean the current directory before rebuilding"
@@ -60,11 +60,11 @@ cat > src/plugins/dune <<EOL
  (alias "frama-c-configure")
  (deps (universe))
  (action (progn
-  (echo "Disabled plug-in(s):")
+  (echo "Disabled plug-in(s):\n")
 EOL
 
 for PLUGIN in "$@" ; do
-  echo "  (echo \"- src/plugins/$PLUGIN\")" >> src/plugins/dune
+  echo "  (echo \"- src/plugins/$PLUGIN\n\")" >> src/plugins/dune
 done
 
 cat >> src/plugins/dune <<EOL
@@ -75,10 +75,10 @@ cat >> src/plugins/dune <<EOL
  (alias "ptests_config")
  (deps (universe))
  (action (progn
-  (echo "Testing with disabled plug-in(s):")
+  (echo "Testing with disabled plug-in(s):\n")
 EOL
 for PLUGIN in "$@" ; do
-  echo "  (echo \"- src/plugins/$PLUGIN\")" >> src/plugins/dune
+  echo "  (echo \"- src/plugins/$PLUGIN\n\")" >> src/plugins/dune
 done
 echo ")))" >> src/plugins/dune
 

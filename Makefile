@@ -62,6 +62,11 @@ FRAMAC_HDRCK_SRC:=tools/hdrck
 .PHONY: all
 
 all:
+ifneq ($(DISABLED_PLUGINS),)
+	dune clean
+	rm -rf _build .merlin
+	./dev/disable-plugins.sh ${DISABLED_PLUGINS}
+endif
 	dune build $(DUNE_BUILD_OPTS) @install
 
 clean:: purge-tests # to be done before a "dune" command
@@ -78,6 +83,8 @@ help::
 	@echo "Build configuration variables"
 	@echo "  - RELEASE: compile in release mode if set to 'yes'"
 	@echo "  - DUNE_DISPLAY: parameter transmitted to dune --display option"
+	@echo "  - DISABLED_PLUGINS: disable these plugins before (re)building"
+	@echo "    (none for enabling all plugins)"
 
 ##############################################################################
 # INSTALL/UNINSTALL
