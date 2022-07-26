@@ -279,6 +279,7 @@ ocaml-versions-nightly:
   stage: compatibility
   image: 'ocaml/opam:ubuntu-20.04-ocaml-$OCAML'
   script:
+    - sudo apt update
     - opam pin . -n
     - opam depext frama-c --with-test
     - opam install --jobs 2 frama-c --with-test
