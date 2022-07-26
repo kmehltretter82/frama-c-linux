@@ -106,8 +106,8 @@ HDRCK.FILE_ATTR=$(GIT) check-attr --stdin -z header_spec
 
 ifeq ($(HEADER_SPEC),)
 
-HDRCK.HAS_GIT:=$(wildcard .git)
-ifneq ($(HDRCK.HAS_GIT),)
+HDRCK.HAS_GIT:=$(shell git rev-parse --is-inside-work-tree 2> /dev/null)
+ifeq ($(HDRCK.HAS_GIT),true)
 
 # From git (including git work-trees)
 HDRCK.SPEC:=$(HDRCK.FILE_LIST) | $(HDRCK.FILE_ATTR)
@@ -124,8 +124,8 @@ else # HEADER_SPEC
 
 ifeq ($(HEADER_SAVE_SPEC),yes)
 
-HDRCK.HAS_GIT:=$(wildcard .git)
-ifneq ($(HDRCK.HAS_GIT),)
+HDRCK.HAS_GIT:=$(shell git rev-parse --is-inside-work-tree 2> /dev/null)
+ifeq ($(HDRCK.HAS_GIT),true)
 
 # From git (including git work-trees)
 HDRCK.SPEC:= $(HDRCK.FILE_LIST) | $(HDRCK.FILE_ATTR) | $(TEE) $(HEADER_SPEC)

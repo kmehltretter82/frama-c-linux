@@ -161,8 +161,8 @@ LINT.check-targets= \
 LINT.fix-targets=$(subst check-,fix-,$(LINT.check-targets))
 LINT.main-targets=lint $(LINT.check-targets) $(LINT.fix-targets)
 
-LINT.HAS_GIT:=$(wildcard .git)
-ifeq ($(LINT.HAS_GIT),)
+LINT.HAS_GIT:=$(shell git rev-parse --is-inside-work-tree 2> /dev/null)
+ifneq ($(LINT.HAS_GIT),true)
 
 .PHONY: lint
 lint:
