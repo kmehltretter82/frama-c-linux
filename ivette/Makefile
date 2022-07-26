@@ -61,6 +61,14 @@ tsc: dome-pkg dome-templ
 	yarn run lint --fix --cache --cache-location .eslint-cache
 
 # --------------------------------------------------------------------------
+# --- Help
+# --------------------------------------------------------------------------
+
+help::
+	@echo "Ivette installation configuration variables"
+	@echo "  - PREFIX: used to customize installation path"
+
+# --------------------------------------------------------------------------
 # --- Ivette Package Loader
 # --------------------------------------------------------------------------
 

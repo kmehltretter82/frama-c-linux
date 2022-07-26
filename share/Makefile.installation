@@ -25,6 +25,14 @@
 ################
 
 ################################
+## Help
+
+help::
+	@echo "Installation configuration variables"
+	@echo "  - INSTALLDIR: used to customize installation path"
+	@echo "  - MANDIR: used to customize man files installation path"
+
+################################
 ## Default variables
 
 # Set this variable to request a specific installation directory

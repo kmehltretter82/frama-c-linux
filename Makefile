@@ -26,6 +26,10 @@ MAKECONFIG_DIR=share
 
 include share/Makefile.common
 
+##############################################################################
+# DUNE OPTIONS
+################################
+
 DUNE_BUILD_OPTS?=
 
 RELEASE?=no
@@ -39,15 +43,21 @@ endif
 DUNE_DISPLAY?=progress
 DUNE_BUILD_OPTS+=--display $(DUNE_DISPLAY)
 
+##############################################################################
 # PTESTS SRC
+################################
+
 FRAMAC_PTESTS_SRC:=tools/ptests
 
+##############################################################################
 # HDRCK SRC
+################################
+
 FRAMAC_HDRCK_SRC:=tools/hdrck
 
-###################
-# Frama-C Version #
-###################
+##############################################################################
+# Frama-C
+################################
 
 .PHONY: all
 
@@ -59,6 +69,15 @@ clean:: purge-tests # to be done before a "dune" command
 	dune clean --root $(FRAMAC_PTESTS_SRC)
 	dune clean --root $(FRAMAC_HDRCK_SRC)
 	rm -rf _build .merlin
+
+##############################################################################
+# HELP
+################################
+
+help::
+	@echo "Build configuration variables"
+	@echo "  - RELEASE: compile in release mode if set to 'yes'"
+	@echo "  - DUNE_DISPLAY: parameter transmitted to dune --display option"
 
 ##############################################################################
 # INSTALL/UNINSTALL
