@@ -121,9 +121,14 @@ stdenvNoCC.mkDerivation rec {
     tar -cf $build_dir/dir.tar .
   '';
 
-  # Required so that tests of external plugins can be excuted
+  # Nix moves these directories after they have been installed by Dune and
+  # compress manuals ...
+  # Note: Required so that tests of external plugins can be executed. Don't know
+  # why tests fail without them.
   postFixup = ''
     cp -r $out/share/doc $out/doc
+    cp -r $out/share/man $out/man
+    gzip -d $out/man/man1/*
   '';
 
   # Allow loading of external Frama-C plugins
