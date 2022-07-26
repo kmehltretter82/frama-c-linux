@@ -43,3 +43,4 @@ fi
 
 # Verifies the current version of files
 make lint.before-commit-a
+make check-headers.before-commit-a
