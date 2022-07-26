@@ -21,6 +21,14 @@
 #                                                                        #
 ##########################################################################
 
+case "$1" in
+  "-h"|"--help")
+    echo "Usage: $0 <plugin directories>"
+    echo "  - directories are given without prefix src/plugins"
+    echo "  - if no directory is given all plugins are enabled"
+    exit 0
+esac
+
 if [ ! -f VERSION ]; then
   echo "This script is meant to be run from the root directory of Frama-C"
   exit 2
@@ -35,7 +43,12 @@ fi
 
 PLUGINS=
 for PLUGIN in "$@" ; do
-  PLUGINS="$PLUGINS $PLUGIN"
+  if [ -d "src/plugins/$PLUGIN" ]; then
+    PLUGINS="$PLUGINS $PLUGIN"
+  else
+    echo "Error: src/plugins/$PLUGIN is not a directory"
+    exit 2
+  fi
 done
 
 cat > src/plugins/dune <<EOL
