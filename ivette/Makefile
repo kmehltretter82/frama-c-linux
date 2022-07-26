@@ -159,9 +159,8 @@ include $(DOME)/template/makefile
 # --- Ivette Installation
 # --------------------------------------------------------------------------
 
-INSTALLDIR?=/usr/local
-BINDIR=$(INSTALLDIR)/bin
-LIBDIR=$(INSTALLDIR)/lib
+BINDIR=$(PREFIX)/bin
+LIBDIR=$(PREFIX)/lib
 
 dist-dir:
 	@echo "Cleaning dist"

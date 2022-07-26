@@ -33,6 +33,18 @@
 PLATFORM:=$(shell uname -s)
 
 #############
+# Locations #
+#############
+
+# Note that Dune rules do NOT use these variables.
+# They are used by other Makefiles
+#   - Ivette (PREFIX)
+#   - Manuals (DOCDIR)
+
+PREFIX ?= /usr/local
+DOCDIR ?= $(PREFIX)/share/doc
+
+#############
 # Verbosing #
 #############
 

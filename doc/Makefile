@@ -28,7 +28,6 @@ MAKECONFIG_DIR=$(FRAMAC_SRC)/share
 
 include $(FRAMAC_SRC)/share/Makefile.common
 
-DOCDIR ?= "$(DESTDIR)${prefix}/share/doc"
 FRAMAC_DOCDIR ?= $(DOCDIR)/frama-c
 
 .PHONY: .force
