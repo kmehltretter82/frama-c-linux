@@ -296,7 +296,6 @@ opam-pin-nightly:
   <<: *opam_template
   only:
     - schedules
-  allow_failure: true
 
 # TODO: Enable this rule later:
 #
