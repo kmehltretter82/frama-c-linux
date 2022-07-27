@@ -1,5 +1,5 @@
 /* run.config
-DONTRUN: main configuration in %{dep:@PTEST_DIR@/multi_axiomatic_1.i}
+DONTRUN: main configuration in %{dep:./multi_axiomatic_1.i}
 */
 /*@
 	axiomatic ax { logic int Acc(int m); }

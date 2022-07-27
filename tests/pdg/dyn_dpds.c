@@ -6,10 +6,10 @@
 
 /*
    To have a look at the dot PDG :
-   bin/toplevel.byte -deps -pdg-dot pdg -fct-pdg main %{dep:@PTEST_DIR@/@PTEST_NAME@.c} ;
+   bin/toplevel.byte -deps -pdg-dot pdg -fct-pdg main %{dep:./@PTEST_NAME@.c} ;
    zgrviewer pdg.main.dot
 
-   or use @PTEST_DIR@/@PTEST_NAME@.ml to test the dynamic dependencies.
+   or use ./@PTEST_NAME@.ml to test the dynamic dependencies.
 */
 
 int G;

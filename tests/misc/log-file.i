@@ -7,9 +7,9 @@
    LOG: log-file-value-default.txt
    LOG: plugin-log-all.txt
 PLUGIN: @EVA_PLUGINS@
-   STDOPT: #"-kernel-log w:@PTEST_RESULT@/log-file-kernel-warnings.txt,r:@PTEST_RESULT@/log-file-kernel-results.txt -eva-log f:@PTEST_RESULT@/log-file-feedback.txt,afewr:@PTEST_RESULT@/log-file-value-all.txt -eva-log :@PTEST_RESULT@/log-file-value-default.txt -then -kernel-log f:@PTEST_RESULT@/log-file-feedback.txt"
+   STDOPT: #"-kernel-log w:./log-file-kernel-warnings.txt,r:./log-file-kernel-results.txt -eva-log f:./log-file-feedback.txt,afewr:./log-file-value-all.txt -eva-log :./log-file-value-default.txt -then -kernel-log f:./log-file-feedback.txt"
  MODULE: plugin_log
-   OPT: -kernel-msg-key foo-category -kernel-log=a:@PTEST_RESULT@/plugin-log-all.txt
+   OPT: -kernel-msg-key foo-category -kernel-log=a:./plugin-log-all.txt
    DONTRUN: test disabled due to non-deterministic errors in CI
  */
 int f(void); // generates kernel warning (missing spec)

@@ -1,6 +1,6 @@
 /* run.config
  DEPS: model1.h
-  STDOPT: +"%{dep:@PTEST_DIR@/model2.c}"
+  STDOPT: +"%{dep:./model2.c}"
 */
 
 #include "model1.h"

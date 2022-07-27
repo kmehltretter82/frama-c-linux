@@ -252,13 +252,15 @@ let example_msg =
      @@<alias-name>                         # Tests all configurations related to the <alias-name>@  \
      @@<alias-name>_config                  # Tests only the default configuration.@  \
      @@<alias-name>_config_<configuration>  # Tests only the specified <configuration>.@  \
-     @@<PTEST_NAME>.wtests                  # Tests the specified file.@  \
-     @@<PTEST_NAME>.<PTEST_NUMBER>.exec.wtests     # Tests the specified sub-test comand.@  \
-     @@<PTEST_NAME>.<PTEST_NUMBER>.execnow.wtests  # Tests the specified execnow command.@  \
      @@<PTEST_FILE>                         # Force to reproduce the corresponding test and prints the outputs.@  \
-     @@<PTEST_NAME>.<PTEST_NUMBER>.exec.show     # Prints the related sub-test command.@  \
-     @@<PTEST_NAME>.<PTEST_NUMBER>.execnow.show  # Prints the related execnow command.@  \
-     @@<PTEST_NAME>.<PTEST_NUMBER>.diff          # Prints the difference from the related oracles.@  \
+     @@<PTEST_NAME>.wtests                        # Tests the specified file.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.exec.wtests    # Tests the specified sub-test command.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.execnow.wtests # Tests the specified execnow command.@  \
+     @@<PTEST_NAME>.diff                          # Prints differences with the oracles related to the specified file.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.exec.diff      # Prints differences with the oracles related to the specified sub-test command.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.execnow.diff   # Prints differences with the oracles related to the specified execnow command.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.exec.show      # Prints the related sub-test command.@  \
+     @@<PTEST_NAME>.<PTEST_NUMBER>.execnow.show   # Prints the related execnow command.@  \
      Note: the <alias-name> defaults to 'ptests'. It can be specified in different ways:@  \
      - from the command line option '-dune-alias <alias-name>'@  \
      - from directives in 'ptests_config' files such as 'DUNE_ALIAS = <alias-name>'@  \
@@ -1158,11 +1160,6 @@ type toplevel_command =
     deps: deps;
   }
 
-let catenate_number nb_files prefix n =
-  if nb_files > 1
-  then prefix ^ "." ^ (string_of_int n)
-  else prefix
-
 let name_without_extension command =
   try
     Filename.chop_extension command.file
@@ -1176,7 +1173,10 @@ let make_oracle_file ~env x = Filename.concat (config_name ~env "oracle") x
 
 let gen_prefix gen_file cmd =
   let prefix = gen_file (name_without_extension cmd) in
-  catenate_number cmd.nb_files prefix cmd.nth
+  if cmd.nb_files > 1
+  then prefix ^ "." ^ (string_of_int cmd.nth)
+  else prefix
+
 let oracle_prefix ~env = gen_prefix (make_oracle_file ~env)
 let log_prefix ~env = gen_prefix (make_result_file ~env)
 
@@ -1297,8 +1297,6 @@ let redirection ?reslog ?errlog cmd =
 
 let ptests_alias ~env = config_name ~env (env.dune_alias ^ "_config")
 
-let mk_alias cmd suffix = Format.sprintf "%s.%d.%s" cmd.test_name cmd.nth suffix
-
 type wtest = {
   dir: (string [@default ""]); (* information on the test directory *)
   info: (string [@default ""]); (* information *)
@@ -1367,6 +1365,12 @@ let oracle_target oracle_fmt dir fname =
   Format.fprintf oracle_fmt
     "(rule (target %S) (mode fallback) (action (write-file %S \"\")))\n" fname fname
 
+let subtest_alias_prefix cmd =
+  Format.sprintf "%s.%d.%s"
+    cmd.test_name
+    cmd.nth
+    (if cmd.execnow then "execnow" else "exec")
+
 let command_string ~env ~result_fmt ~oracle_fmt command =
   let log_prefix = log_prefix ~env command in
   let reslog = log_prefix ^ ".res.log" in
@@ -1411,7 +1415,8 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
         oracle_err = Filename.concat ".." (oracle_prefix ^ ".err.oracle");
       }
   in
-  let wrapper_basename =  mk_alias command "exec.wtests" in
+  let subtest_alias = subtest_alias_prefix command in
+  let wrapper_basename = subtest_alias ^ ".wtests" in
   if !wrapper_cmd <> "" then begin
     Format.fprintf result_fmt
       "(rule ; %s\n  \
@@ -1514,7 +1519,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
         (* rule: *)
         n command.nth command.file
         (* alias: *)
-        (ptests_alias ~env)
+        (subtest_alias ^ ".diff")
         (* enabled_if: *)
         pp_enabled_if command.deps
         (* action: *)
@@ -1531,7 +1536,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (* rule: *)
     command.nth command.file
     (* alias: *)
-    (mk_alias command "exec")
+    subtest_alias
     (* deps: *)
     pp_command_deps command
     (* enabled_if: *)
@@ -1550,7 +1555,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (* rule: *)
     command.nth command.file
     (* alias: *)
-    (mk_alias command "exec.show")
+    (subtest_alias ^ ".show")
     (* deps: *)
     pp_command_deps command (* to get an updated build even in case of using the result *)
     (* enabled_if: *)
@@ -1558,7 +1563,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (* action: *)
     ("echo '" ^ show_cmd wtest.cmd ^"'");
 
-  let diff_alias = log_prefix ^ ".diff" in
+  let diff_alias = subtest_alias ^ ".diff" in
   (* diff with oracles *)
   Format.fprintf result_fmt
     "(rule\n  \
@@ -1591,8 +1596,16 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
      (deps (alias %S))\n  \
      %a\n\
      )@."
-    (ptests_alias ~env)
+    (command.test_name ^ ".diff")
     diff_alias
+    pp_enabled_if command.deps;
+  Format.fprintf result_fmt
+    "(alias (name %S)\n  \
+     (deps (alias %S))\n  \
+     %a\n\
+     )@."
+    (ptests_alias ~env)
+    (command.test_name ^ ".diff")
     pp_enabled_if command.deps
   ;
   let oracle_subdir = SubDir.oracle_subdir ~env command.directory in
@@ -1701,7 +1714,8 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
           (* Detect the problem even if the LOG/BIN is a macro expanded there into an @EMPTY_STRING@ *)
           Format.eprintf "%s: EXEC/EXECNOW#%d without LOG nor BIN target (DEPRECATED): %s@."
             file nth wtest.cmd;
-        let wrapper_basename =  mk_alias cmd "execnow.wtests" in
+        let subtest_alias = subtest_alias_prefix cmd in
+        let wrapper_basename = subtest_alias ^ ".wtests" in
         if !wrapper_cmd <> "" then begin
           Format.fprintf result_fmt
             "(rule ; %s\n  \
@@ -1772,7 +1786,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
           (* rule: *)
           nth file
           (* alias: *)
-          (mk_alias cmd "execnow.show")
+          (subtest_alias ^ ".show")
           (* deps: *)
           pp_command_deps cmd (* to get an updated build even in case of using the result *)
           (* enabled_if: *)
@@ -1780,23 +1794,42 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
           (* action: *)
           ("echo '" ^ show_cmd wtest.cmd ^"'");
         ;
-        List.iteri (fun n log ->
-            Format.fprintf result_fmt
-              "(rule ; COMPARE TARGET #%d OF EXECNOW #%d FOR TEST FILE %S\n  \
-               (alias %s)\n  \
-               %a\n\
-               (action (diff %S %S))\n\
-               )@."
-              (* rule: *)
-              n nth file
-              (* alias: *)
-              (ptests_alias ~env)
-              (* enabled_if: *)
-              pp_enabled_if cmd.deps
-              (* action: *)
-              (SubDir.make_file (SubDir.oracle_dir ~env) log)
-              log
-          ) wtest.log
+        if wtest.log <> [] then begin
+          List.iteri (fun n log ->
+              Format.fprintf result_fmt
+                "(rule ; COMPARE TARGET #%d OF EXECNOW #%d FOR TEST FILE %S\n  \
+                 (alias %s)\n  \
+                 %a\n\
+                 (action (diff %S %S))\n\
+                 )@."
+                (* rule: *)
+                n nth file
+                (* alias: *)
+                (subtest_alias ^ ".diff")
+                (* enabled_if: *)
+                pp_enabled_if cmd.deps
+                (* action: *)
+                (SubDir.make_file (SubDir.oracle_dir ~env) log)
+                log
+            ) wtest.log;
+          let diff_alias = subtest_alias ^ ".diff" in
+          Format.fprintf result_fmt
+            "(alias (name %S)\n  \
+             (deps (alias %S))\n  \
+             %a\n\
+             )@."
+            (cmd.test_name ^ ".diff")
+            diff_alias
+            pp_enabled_if cmd.deps;
+          Format.fprintf result_fmt
+            "(alias (name %S)\n  \
+             (deps (alias %S))\n  \
+             %a\n\
+             )@."
+            (ptests_alias ~env)
+            (cmd.test_name ^ ".diff")
+            pp_enabled_if cmd.deps
+        end
     in
     if config.dc_commands <> [] || config.dc_execnow <> [] then begin
       let pp_list_alias fmt l = List.iter (Format.fprintf fmt "(alias %S)") l in

@@ -1,6 +1,6 @@
 /* run.config
    NOFRAMAC: testing frama-c-script, not frama-c itself
-   EXECNOW: LOG build-callgraph.res LOG build-callgraph.err PTESTS_TESTING=1 %{bin:frama-c-script} heuristic-print-callgraph %{dep:@PTEST_DIR@/@PTEST_NAME@.i} > @PTEST_RESULT@/build-callgraph.res 2> @PTEST_RESULT@/build-callgraph.err
+   EXECNOW: LOG build-callgraph.res LOG build-callgraph.err PTESTS_TESTING=1 %{bin:frama-c-script} heuristic-print-callgraph %{dep:./@PTEST_NAME@.i} > ./build-callgraph.res 2> ./build-callgraph.err
  */
 
 #include <stdio.h>
