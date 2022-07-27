@@ -28,6 +28,7 @@ import _ from 'lodash';
 import React, { useEffect } from 'react';
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
+import * as Utils from 'dome/misc/utils';
 import * as States from 'frama-c/states';
 import * as Compare from 'dome/data/compare';
 import * as Settings from 'dome/data/settings';
@@ -613,10 +614,7 @@ export default function RenderProperties(): JSX.Element {
 
   useEffect(() => {
     model.removeAllData();
-    const data = kernelData.map(entry1 => ({
-      ...entry1, 
-      ...(evaData.find(entry2 => entry2.key === entry1.key))
-    }));
+    const data = Utils.mergeArraysByKey(kernelData, evaData);
     model.updateData(data);
     model.reload();
   }, [model, kernelData, evaData]);

@@ -109,4 +109,24 @@ export function styles(
   return (empty ? undefined : buffer);
 }
 
+
+export type Indexed = { key: unknown; }
+
+export function mergeArrays<A, B>(
+    a1: Array<A>,
+    a2: Array<B>,
+    match: (x1: A, x2: B) => boolean
+): Array<A & Partial<B>> {
+  return a1.map(x1 => ({...x1, ...(a2.find(x2 => match(x1, x2)))}));
+}
+
+export function mergeArraysByKey<A, B>(
+    a1: Array<A & Indexed>,
+    a2: Array<B & Indexed>
+): Array<A & Partial<B>> {
+  return mergeArrays(a1, a2, (x1, x2) => x1.key === x2.key);
+}
+
+
+
 // --------------------------------------------------------------------------
