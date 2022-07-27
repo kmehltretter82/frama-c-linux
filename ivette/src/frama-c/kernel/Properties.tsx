@@ -47,7 +47,7 @@ import { statusData } from 'frama-c/kernel/api/properties';
 import * as Properties from 'frama-c/kernel/api/properties';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 
-type Property = statusData & Eva.propertiesData;
+type Property = statusData & Partial<Eva.propertiesData>;
 
 // --------------------------------------------------------------------------
 // --- Filters
@@ -305,13 +305,15 @@ const byStatus =
   );
 
 const byTaint =
-  Compare.byRank(
-    'data_tainted',
-    'control_tainted',
-    'not_tainted',
-    'error',
-    'not_applicable',
-    'not_computed',
+  Compare.option(
+    Compare.byRank(
+      'data_tainted',
+      'control_tainted',
+      'not_tainted',
+      'error',
+      'not_applicable',
+      'not_computed',
+    )
   );
 
 const byProperty: Compare.ByFields<Property> = {
@@ -516,7 +518,9 @@ function PropertyColumns(): JSX.Element {
     [alarmDict],
   );
   const getTaint = React.useCallback(
-    ({ taint }: Property) => (taintDict.get(taint) ?? { name: taint }),
+    ({ taint }: Property) => (
+      taint === undefined ? taint : (taintDict.get(taint) ?? { name: taint })
+    ),
     [taintDict],
   );
   return (
@@ -609,13 +613,10 @@ export default function RenderProperties(): JSX.Element {
 
   useEffect(() => {
     model.removeAllData();
-    const data = new Array(kernelData.length);
-    for (let i = 0; i < kernelData.length; i++) {
-      const kernel = kernelData[i];
-      const { key } = kernel;
-      const eva = evaData.find((elt) => elt.key === key);
-      data[i] = { ...kernel, ...eva };
-    }
+    const data = kernelData.map(entry1 => ({
+      ...entry1, 
+      ...(evaData.find(entry2 => entry2.key === entry1.key))
+    }));
     model.updateData(data);
     model.reload();
   }, [model, kernelData, evaData]);
