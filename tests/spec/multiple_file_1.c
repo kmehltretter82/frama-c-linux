@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -print %{dep:@PTEST_DIR@/multiple_file_2.c}
+   OPT: -print %{dep:./multiple_file_2.c}
 */
 
 /* see bug #43 */

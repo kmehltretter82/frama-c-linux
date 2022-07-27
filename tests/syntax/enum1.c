@@ -1,6 +1,6 @@
 /* run.config
  DEPS: enum.h
-   STDOPT: +"%{dep:@PTEST_DIR@/enum2.c}"
+   STDOPT: +"%{dep:./enum2.c}"
 */
 
 

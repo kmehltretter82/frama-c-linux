@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"%{dep:@PTEST_DIR@/merge_different_assigns_bis.i}"
+   STDOPT: +"%{dep:./merge_different_assigns_bis.i}"
 */
 
 int x, z, t, u, v, w;

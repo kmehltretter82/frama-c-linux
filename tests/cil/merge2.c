@@ -1,4 +1,4 @@
 /* run.config
-   STDOPT: +"%{dep:@PTEST_DIR@/merge.c}"
+   STDOPT: +"%{dep:./merge.c}"
  */
 int x =2;

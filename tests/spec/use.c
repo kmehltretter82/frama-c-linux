@@ -1,6 +1,6 @@
 /* run.config
  DEPS: dec.h
-   STDOPT: +"%{dep:@PTEST_DIR@/use2.c}"
+   STDOPT: +"%{dep:./use2.c}"
 */
 
 // BTS 0887
