@@ -41,8 +41,10 @@ if [[ "$#" == "0" || ( "$#" == "1" && "$1" == "none" ) ]]; then
   exit 0
 fi
 
+IFS='\, ' read -a DISABLED_PLUGINS <<< "$@"
+
 PLUGINS=
-for PLUGIN in "$@" ; do
+for PLUGIN in "${DISABLED_PLUGINS[@]}" ; do
   if [ -d "src/plugins/$PLUGIN" ]; then
     PLUGINS="$PLUGINS $PLUGIN"
   else
@@ -63,7 +65,7 @@ cat > src/plugins/dune <<EOL
   (echo "Disabled plug-in(s):\n")
 EOL
 
-for PLUGIN in "$@" ; do
+for PLUGIN in "${DISABLED_PLUGINS[@]}" ; do
   echo "  (echo \"- src/plugins/$PLUGIN\n\")" >> src/plugins/dune
 done
 
@@ -77,7 +79,7 @@ cat >> src/plugins/dune <<EOL
  (action (progn
   (echo "Testing with disabled plug-in(s):\n")
 EOL
-for PLUGIN in "$@" ; do
+for PLUGIN in "${DISABLED_PLUGINS[@]}" ; do
   echo "  (echo \"- src/plugins/$PLUGIN\n\")" >> src/plugins/dune
 done
 echo ")))" >> src/plugins/dune
