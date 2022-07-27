@@ -48,7 +48,7 @@ import { statusData } from 'frama-c/kernel/api/properties';
 import * as Properties from 'frama-c/kernel/api/properties';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 
-type Property = statusData & Partial<Eva.propertiesData>;
+type Property = statusData | (statusData & Eva.propertiesData)
 
 // --------------------------------------------------------------------------
 // --- Filters
@@ -203,22 +203,24 @@ function filterAlarm(alarm: string | undefined): boolean {
 
 function filterEva(p: Property): boolean {
   let b = true;
-  if (p.priority === false && filter('eva.priority_only'))
+  if ('priority' in p && p.priority === false && filter('eva.priority_only'))
     b = false;
-  switch (p.taint) {
-    case 'not_tainted':
-    case 'not_applicable':
-      if (filter('eva.data_tainted_only') || filter('eva.ctrl_tainted_only'))
-        b = false;
-      break;
-    case 'data_tainted':
-      if (filter('eva.ctrl_tainted_only'))
-        b = false;
-      break;
-    case 'control_tainted':
-      if (filter('eva.data_tainted_only'))
-        b = false;
-      break;
+  if ('taint' in p) {
+    switch (p.taint) {
+      case 'not_tainted':
+      case 'not_applicable':
+        if (filter('eva.data_tainted_only') || filter('eva.ctrl_tainted_only'))
+          b = false;
+        break;
+      case 'data_tainted':
+        if (filter('eva.ctrl_tainted_only'))
+          b = false;
+        break;
+      case 'control_tainted':
+        if (filter('eva.data_tainted_only'))
+          b = false;
+        break;
+    }
   }
   return b;
 }
@@ -519,8 +521,8 @@ function PropertyColumns(): JSX.Element {
     [alarmDict],
   );
   const getTaint = React.useCallback(
-    ({ taint }: Property) => (
-      taint === undefined ? taint : (taintDict.get(taint) ?? { name: taint })
+    (p: Property) => (
+      'taint' in p ? taintDict.get(p.taint) ?? { name: p.taint } : undefined
     ),
     [taintDict],
   );
