@@ -1,6 +1,6 @@
 /* run.config
  DEPS: anon_enum_libc.h
-   OPT: -cpp-extra-args="-I @PTEST_DIR@" -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -print -then -ocode="" ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -print
+   OPT: -cpp-extra-args="-I ./" -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -print -then -ocode="" ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.c -print
 */
 struct { int x; float y; } s1;
 enum { BLA=4, BLI=12 };

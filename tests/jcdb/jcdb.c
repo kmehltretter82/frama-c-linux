@@ -1,7 +1,7 @@
 /* run.config
  DEPS: compile_commands.json
  COMMENT: parsing option are defined in the default json file "compile_commands.json"
-   OPT: -json-compilation-database @PTEST_DIR@ -print
+   OPT: -json-compilation-database ./ -print
  DEPS:
    OPT: %{dep:./jcdb2.c} -json-compilation-database %{dep:./with_arguments.json} -print
  MODULE: @PTEST_NAME@

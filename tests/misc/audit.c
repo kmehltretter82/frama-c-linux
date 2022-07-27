@@ -1,6 +1,6 @@
 /* run.config
  PLUGIN: @EVA_PLUGINS@
-   EXECNOW: BIN audit.json cat %{dep:./audit-in.json} | sed -e 's:PTEST_DIR:@PTEST_DIR@:' > ./audit.json 2> @DEV_NULL@
+   EXECNOW: BIN audit.json cat %{dep:./audit-in.json} | sed -e 's:PTEST_DIR:.:' > ./audit.json 2> @DEV_NULL@
  DEPS: audit_included.h, audit_included_but_not_listed.h
  LOG: audit-out.json
    STDOPT: #"-audit-check %{dep:./audit.json} -audit-prepare ./audit-out.json -kernel-warn-key audit=active"
