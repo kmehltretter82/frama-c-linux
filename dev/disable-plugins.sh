@@ -37,7 +37,7 @@ fi
 if [[ "$#" == "0" || ( "$#" == "1" && "$1" == "none" ) ]]; then
   rm -f src/plugins/dune
   echo "All plugins enabled"
-  echo "Make sure to clean the current directory before rebuilding"
+  echo "Make sure to \"dune clean\" the Frama-C directory before rebuilding"
   exit 0
 fi
 
