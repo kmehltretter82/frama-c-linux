@@ -71,7 +71,7 @@ want full details about specific parts.
 
 In this Section, we detail how to modify the file \texttt{configure.in} in
 order to configure plug-ins (\framac configuration has been introduced in
-Section~\ref{tut2:configure} and~\ref{tut2:makefile}).
+%Section~\ref{tut2:configure} and~\ref{tut2:makefile}).
 
 First Section~\ref{conf:principle} introduces the general principle and
 organisation of \texttt{configure.in}. Then Section~\ref{conf:add} explains how
@@ -487,24 +487,25 @@ have to:
 \item include \texttt{Makefile.dynamic}.
 \end{enumerate}
 
-\begin{example}
-A minimal \texttt{Makefile} is shown below. That is the Makefile of the plug-in
-\texttt{Hello World} presented in the tutorial (see
-Section~\ref{tut2:hello}). Each variable set in this example has to be set
-by any plug-in.
-\codeidx{Makefile.dynamic}
-\codeidx{FRAMAC\_SHARE}
-\codeidx{PLUGIN\_CMO}
-\codeidx{PLUGIN\_NAME}
-\makefileinput{./tutorial/hello/generated/makefile_multiple/Makefile}
-\texttt{FRAMAC\_SHARE} must be set to the \framac share directory.
-\texttt{PLUGIN\_NAME} is the capitalized name of your plug-in while
-\texttt{PLUGIN\_CMO} is the list of the files $.cmo$ generated from your \caml
-sources.
-Note that, by default, during compilation of your plug-in all warnings are
-disabled; it is recommended to define environment variable
-\texttt{DEVELOPMENT=yes} to enable the standard set of compilation warnings.
-\end{example}
+TODO : replace example
+%% \begin{example}
+%% A minimal \texttt{Makefile} is shown below. That is the Makefile of the plug-in
+%% \texttt{Hello World} presented in the tutorial (see
+%% Section~\ref{tut2:hello}). Each variable set in this example has to be set
+%% by any plug-in.
+%% \codeidx{Makefile.dynamic}
+%% \codeidx{FRAMAC\_SHARE}
+%% \codeidx{PLUGIN\_CMO}
+%% \codeidx{PLUGIN\_NAME}
+%% \makefileinput{./tutorial/hello/generated/makefile_multiple/Makefile}
+%% \texttt{FRAMAC\_SHARE} must be set to the \framac share directory.
+%% \texttt{PLUGIN\_NAME} is the capitalized name of your plug-in while
+%% \texttt{PLUGIN\_CMO} is the list of the files $.cmo$ generated from your \caml
+%% sources.
+%% Note that, by default, during compilation of your plug-in all warnings are
+%% disabled; it is recommended to define environment variable
+%% \texttt{DEVELOPMENT=yes} to enable the standard set of compilation warnings.
+%% \end{example}
 
 \begin{important}
 To run your specific Makefile, you must have properly installed \framac

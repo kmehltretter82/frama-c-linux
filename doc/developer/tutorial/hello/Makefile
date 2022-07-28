@@ -20,22 +20,34 @@
 #                                                                        #
 ##########################################################################
 
-PLUGIN_DIRS = script with_registration with_log makefile_single makefile_multiple with_options with_test with_doc
+PLUGIN_DIRS = empty simple with_registration with_log multiple with_options with_test with_doc
 FINAL_PLUGINS = $(patsubst %,generated/%,$(PLUGIN_DIRS))
 DIRS = generated $(addprefix generated/, src $(PLUGIN_DIRS))
-MLIS=$(addsuffix /Hello.mli,$(filter-out generated, $(DIRS)))
 
-all: clean $(FINAL_PLUGINS) $(MLIS)
+all: clean $(FINAL_PLUGINS)
 
-generated/src/Makefile%: src/Makefile%
+generated/src/dune: src/dune
 	mkdir -p $(dir $@)
 	cp $< $@
-	headache -r $@
+	headache -c ../../../../headers/headache_config.txt -r $@
+
+generated/src/dune-project: src/dune-project
+	mkdir -p $(dir $@)
+	cp $< $@
+	headache -c ../../../../headers/headache_config.txt -r $@
 
 generated/src/%.ml: src/%.ml
 	mkdir -p $(dir $@)
 	cp $< $@
 	headache -r $@
+
+generated/src/tests/ptests_config: src/ptests_config
+	mkdir -p $(dir $@)
+	cp $< $@
+
+generated/src/tests/test_config: src/test_config
+	mkdir -p $(dir $@)
+	cp $< $@
 
 generated/src/tests/hello/%.c: src/%.c
 	mkdir -p $(dir $@)
@@ -46,58 +58,77 @@ generated/src/tests/hello/oracle/%.oracle: src/%.oracle
 	mkdir -p $(dir $@)
 	cp $< $@
 
-generated/%/Hello.mli: src/Hello.mli
+generated/%/Hello.ml: src/Hello.ml
 	mkdir -p $(dir $@)
 	cp $< $@
 	headache -r $@
 
-generated/script: generated/src/run_print_to_file.ml \
+generated/empty: generated/src/dune \
+                 generated/src/dune-project \
+                 generated/src/Hello.ml
+	mkdir -p $@
+	cp generated/src/dune $@/dune
+	cp generated/src/dune-project $@/dune-project
+	cp generated/src/Hello.ml $@/Hello.ml
+
+generated/simple: generated/empty \
+                  generated/src/run_print_to_file.ml \
                   generated/src/extend_run.ml
 	mkdir -p $@
-	for i in $^; do cat $$i >> $@/hello_world.ml; echo "" >> $@/hello_world.ml; done
+	cp generated/empty/* $@
+	for i in $(filter %.ml, $^); do \
+	  cat $$i >> $@/hello_world.ml; \
+		echo "" >> $@/hello_world.ml; \
+	done
 
-generated/with_registration: generated/src/help_msg.ml \
+generated/with_registration: generated/empty \
+                             generated/src/help_msg.ml \
                              generated/src/register.ml \
                              generated/src/run_print_to_file.ml \
                              generated/src/extend_run.ml
 	mkdir -p $@
-	for i in $^; do cat $$i >> $@/hello_world.ml; echo "" >> $@/hello_world.ml; done
+	cp generated/empty/* $@
+	for i in $(filter %.ml, $^); do \
+	  cat $$i >> $@/hello_world.ml; \
+		echo "" >> $@/hello_world.ml; \
+	done
 
-generated/with_log: generated/src/help_msg.ml \
+generated/with_log: generated/empty \
+                    generated/src/help_msg.ml \
                     generated/src/register.ml \
                     generated/src/run_log.ml \
                     generated/src/extend_run.ml
 	mkdir -p $@
-	for i in $^; do cat $$i >> $@/hello_world.ml; echo "" >> $@/hello_world.ml; done
+	cp generated/empty/* $@
+	for i in $(filter %.ml, $^); do \
+	  cat $$i >> $@/hello_world.ml; \
+		echo "" >> $@/hello_world.ml; \
+	done
 
-generated/with_options: generated/src/help_msg.ml \
+generated/with_options: generated/empty \
+												generated/src/help_msg.ml \
                         generated/src/register.ml \
                         generated/src/options_enabled.ml \
                         generated/src/options_output_file.ml \
                         generated/src/run_with_options.ml \
-                        generated/src/extend_run.ml \
-                        generated/src/Makefile.single-file
+                        generated/src/extend_run.ml
 	mkdir -p $@
-	cp generated/src/Makefile.single-file $@/Makefile
-	for i in $(filter-out generated/src/Makefile.single-file, $^); do \
+	cp generated/empty/* $@
+	for i in $(filter %.ml, $^); do \
 	  cat $$i >> $@/hello_world.ml; \
 	  echo "" >> $@/hello_world.ml; \
 	done
 
-generated/makefile_single: generated/with_options generated/src/Makefile.single-file
+generated/multiple: generated/empty \
+                    generated/src/help_msg.ml \
+                    generated/src/register.ml \
+                    generated/src/options_enabled.ml \
+                    generated/src/options_output_file.ml \
+                    generated/src/print.ml \
+                    generated/src/run_call_print.ml \
+                    generated/src/extend_run.ml
 	mkdir -p $@
-	cp generated/with_options/hello_world.ml $@/hello_world.ml
-	cp generated/src/Makefile.single-file $@/Makefile
-
-generated/makefile_multiple: generated/src/help_msg.ml \
-                             generated/src/register.ml \
-                             generated/src/options_enabled.ml \
-                             generated/src/options_output_file.ml \
-                             generated/src/print.ml \
-                             generated/src/run_call_print.ml \
-                             generated/src/extend_run.ml \
-                             generated/src/Makefile.multiple-files
-	mkdir -p $@
+	cp generated/empty/* $@
 	cp generated/src/help_msg.ml $@/hello_options.ml
 	echo "" >> $@/hello_options.ml
 	cat generated/src/register.ml >> $@/hello_options.ml
@@ -109,25 +140,25 @@ generated/makefile_multiple: generated/src/help_msg.ml \
 	cp generated/src/run_call_print.ml $@/hello_run.ml
 	echo "" >> $@/hello_run.ml
 	cat generated/src/extend_run.ml >> $@/hello_run.ml
-	cp generated/src/Makefile.multiple-files $@/Makefile
 
-generated/with_test: generated/src/run_call_print_bug.ml \
-                     generated/src/tests/hello/hello_test.c \
-                     generated/src/tests/hello/oracle/hello_test.res.oracle \
-                     generated/src/Makefile.test
+generated/with_test: generated/multiple \
+                     generated/src/run_call_print_bug.ml \
+                     generated/src/tests/ptests_config \
+                     generated/src/tests/test_config \
+                     generated/src/tests/hello/hello_test.c
 	mkdir -p $@
-	cp generated/makefile_multiple/hello_options.ml $@/hello_options.ml
-	cp generated/makefile_multiple/hello_print.ml $@/hello_print.ml
-	cp generated/makefile_multiple/hello_run.ml $@/hello_run.ml
-	cp generated/src/run_call_print_bug.ml $@/hello_run_bug.ml
-	echo "" >> $@/hello_run_bug.ml
-	cat generated/src/extend_run.ml >> $@/hello_run_bug.ml
-	mkdir -p $@/tests/hello/oracle
+	cp generated/multiple/* $@
+	cp generated/src/run_call_print_bug.ml $@/hello_run.ml.bug
+	echo "" >> $@/hello_run.ml.bug
+	cat generated/src/extend_run.ml >> $@/hello_run.ml.bug
+	mkdir -p $@/tests
+	cp generated/src/tests/ptests_config $@/tests/ptests_config
+	cp generated/src/tests/test_config $@/tests/test_config
+	mkdir -p $@/tests/hello
 	cp generated/src/tests/hello/hello_test.c $@/tests/hello/hello_test.c
-	cp generated/src/tests/hello/oracle/hello_test.res.oracle $@/tests/hello/oracle/hello_test.res.oracle
-	cp generated/src/Makefile.test $@/Makefile
 
-generated/with_doc: generated/src/help_msg.ml \
+generated/with_doc: generated/empty \
+                    generated/src/help_msg.ml \
                     generated/src/register.ml \
                     generated/src/options_enabled.ml \
                     generated/src/options_output_file.ml \
@@ -145,9 +176,9 @@ generated/with_doc: generated/src/help_msg.ml \
                     generated/src/hello_print.doc.ml \
                     generated/src/hello_run.doc.ml \
                     generated/src/tests/hello/oracle/hello_test.err.oracle \
-                    generated/src/tests/hello/oracle/hello_test.res.oracle \
-                    generated/src/Makefile.test
+                    generated/src/tests/hello/oracle/hello_test.res.oracle
 	mkdir -p $@
+	cp generated/empty/* $@
 	cp generated/src/hello_options.doc.ml $@/hello_options.ml
 	echo "" >> $@/hello_options.ml
 	cat generated/src/help_msg.doc.ml >> $@/hello_options.ml
@@ -177,7 +208,6 @@ generated/with_doc: generated/src/help_msg.ml \
 	mkdir -p $@/tests/hello/oracle
 	cp generated/src/tests/hello/oracle/hello_test.err.oracle $@/tests/hello/oracle/hello_test.err.oracle
 	cp generated/src/tests/hello/oracle/hello_test.res.oracle $@/tests/hello/oracle/hello_test.res.oracle
-	cp generated/src/Makefile.test $@/Makefile
 
 tests:
 	cd generated/script && frama-c -load-script hello_world.ml && cat hello.out
