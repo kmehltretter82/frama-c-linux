@@ -36,6 +36,7 @@ import { Icon } from 'dome/controls/icons';
 import { IconButton, Checkbox } from 'dome/controls/buttons';
 import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
+import * as ArrayUtils from 'dome/data/arrays';
 import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
 import { TitleBar } from 'ivette';
 import { Scroll, Folder } from 'dome/layout/boxes';
@@ -47,7 +48,7 @@ import { statusData } from 'frama-c/kernel/api/properties';
 import * as Properties from 'frama-c/kernel/api/properties';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 
-type Property = statusData & Eva.propertiesData;
+type Property = statusData | (statusData & Eva.propertiesData)
 
 // --------------------------------------------------------------------------
 // --- Filters
@@ -202,22 +203,24 @@ function filterAlarm(alarm: string | undefined): boolean {
 
 function filterEva(p: Property): boolean {
   let b = true;
-  if (p.priority === false && filter('eva.priority_only'))
+  if ('priority' in p && p.priority === false && filter('eva.priority_only'))
     b = false;
-  switch (p.taint) {
-    case 'not_tainted':
-    case 'not_applicable':
-      if (filter('eva.data_tainted_only') || filter('eva.ctrl_tainted_only'))
-        b = false;
-      break;
-    case 'data_tainted':
-      if (filter('eva.ctrl_tainted_only'))
-        b = false;
-      break;
-    case 'control_tainted':
-      if (filter('eva.data_tainted_only'))
-        b = false;
-      break;
+  if ('taint' in p) {
+    switch (p.taint) {
+      case 'not_tainted':
+      case 'not_applicable':
+        if (filter('eva.data_tainted_only') || filter('eva.ctrl_tainted_only'))
+          b = false;
+        break;
+      case 'data_tainted':
+        if (filter('eva.ctrl_tainted_only'))
+          b = false;
+        break;
+      case 'control_tainted':
+        if (filter('eva.data_tainted_only'))
+          b = false;
+        break;
+    }
   }
   return b;
 }
@@ -305,13 +308,15 @@ const byStatus =
   );
 
 const byTaint =
-  Compare.byRank(
-    'data_tainted',
-    'control_tainted',
-    'not_tainted',
-    'error',
-    'not_applicable',
-    'not_computed',
+  Compare.option(
+    Compare.byRank(
+      'data_tainted',
+      'control_tainted',
+      'not_tainted',
+      'error',
+      'not_applicable',
+      'not_computed',
+    )
   );
 
 const byProperty: Compare.ByFields<Property> = {
@@ -516,7 +521,9 @@ function PropertyColumns(): JSX.Element {
     [alarmDict],
   );
   const getTaint = React.useCallback(
-    ({ taint }: Property) => (taintDict.get(taint) ?? { name: taint }),
+    (p: Property) => (
+      'taint' in p ? taintDict.get(p.taint) ?? { name: p.taint } : undefined
+    ),
     [taintDict],
   );
   return (
@@ -609,13 +616,7 @@ export default function RenderProperties(): JSX.Element {
 
   useEffect(() => {
     model.removeAllData();
-    const data = new Array(kernelData.length);
-    for (let i = 0; i < kernelData.length; i++) {
-      const kernel = kernelData[i];
-      const { key } = kernel;
-      const eva = evaData.find((elt) => elt.key === key);
-      data[i] = { ...kernel, ...eva };
-    }
+    const data = ArrayUtils.mergeArraysByKey(kernelData, evaData);
     model.updateData(data);
     model.reload();
   }, [model, kernelData, evaData]);
