@@ -284,9 +284,7 @@ let do_report_json () =
            let js = stats_to_json g s in
            js :: json
         ) !session [] in
-    let pretty =
-      Wp_parameters.verbose_atleast 2 || Wp_parameters.debug_atleast 1 in
-    Json.save_file ~pretty file (`List json)
+    Json.save_file file (`List json)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Results                                                     --- *)
