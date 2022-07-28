@@ -109,22 +109,4 @@ export function styles(
   return (empty ? undefined : buffer);
 }
 
-
-export type Indexed = { key: unknown; }
-
-export function mergeArrays<A, B>(
-  a1: A[],
-  a2: B[],
-  match: (x1: A, x2: B) => boolean): (A | (A & B))[] {
-  return a1.map(x1 => ({...x1, ...(a2.find(x2 => match(x1, x2)))}));
-}
-
-export function mergeArraysByKey<A, B>(
-  a1: (A & Indexed)[],
-  a2: (B & Indexed)[]
-): (A | A & B)[] {
-  return mergeArrays(a1, a2, (x1, x2) => x1.key === x2.key);
-}
-
-
 // --------------------------------------------------------------------------
