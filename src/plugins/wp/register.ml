@@ -334,17 +334,19 @@ let do_wpo_success ~shell ~cache goal success =
     let smoke = Wpo.is_smoke_test goal in
     let gstats = Stats.results ~smoke @@ Wpo.get_results goal in
     let cstats = ProofEngine.consolidated goal in
-    let proof, target = Wpo.get_proof goal in
+    let success = Wpo.is_passed goal in
     begin
       global_stats := Stats.add !global_stats gstats ;
       if cstats.tactics > 0 then
         script_stats := Stats.add !script_stats cstats ;
-      if shell || proof <> `Passed then
+      if shell || not success then
         do_report_stats ~shell ~cache goal ~smoke cstats ;
-      if smoke && proof <> `Passed then
+      if smoke then
         begin
-          let source = fst (Property.location target) in
-          Wp_parameters.warning ~once:true ~source "Failed smoke-test"
+          let proof, target = Wpo.get_proof goal in
+          if proof <> `Passed then
+            let source = fst (Property.location target) in
+            Wp_parameters.warning ~once:true ~source "Failed smoke-test"
         end ;
     end
 
