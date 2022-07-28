@@ -300,10 +300,10 @@ let pp_stats ~shell ~cache fmt s =
     if s.trivial = total then
       Format.fprintf fmt " (Trivial)"
     else
-      if updating || s.cached = cacheable then
-        Format.fprintf fmt " (Cached)"
-      else
-        Format.fprintf fmt " (Cached %d/%d)" s.cached cacheable
+    if updating || s.cached = cacheable then
+      Format.fprintf fmt " (Cached)"
+    else
+      Format.fprintf fmt " (Cached %d/%d)" s.cached cacheable
 
 let pretty = pp_stats ~shell:false ~cache:NoCache
 
