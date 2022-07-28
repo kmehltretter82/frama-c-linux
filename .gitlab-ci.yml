@@ -185,7 +185,7 @@ build-distrib-tarball:
     CI_LINK: "yes"
     HDRCK: "frama-c-hdrck"
   script:
-    - ./nix/shell-checkers.sh "autoconf && ./dev/make-distrib.sh"
+    - ./nix/shell-checkers.sh "./dev/make-distrib.sh"
   artifacts:
     paths:
       - ./*.tar.gz
@@ -279,6 +279,7 @@ ocaml-versions-nightly:
   stage: compatibility
   image: 'ocaml/opam:ubuntu-20.04-ocaml-$OCAML'
   script:
+    - sudo apt update
     - opam pin . -n
     - opam depext frama-c --with-test
     - opam install --jobs 2 frama-c --with-test
@@ -295,7 +296,6 @@ opam-pin-nightly:
   <<: *opam_template
   only:
     - schedules
-  allow_failure: true
 
 # TODO: Enable this rule later:
 #

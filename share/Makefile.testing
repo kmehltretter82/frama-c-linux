@@ -54,7 +54,7 @@ GREP    ?= grep
 RM      ?= rm -f
 RMDIR   ?= rm -rf
 
-ifeq ($(PLATFORM),MacOS)
+ifeq ($(PLATFORM),Darwin)
 XARGS   ?= xargs
 else
 # Unix, Cygwin

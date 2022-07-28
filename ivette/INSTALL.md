@@ -43,8 +43,6 @@ command to run the server.
 From the `Frama-C` main directory, simply type:
 
 ```
-$ autoconf -f
-$ ./configure
 $ make -C ivette dist
 $ [sudo] make -C ivette install
 ```

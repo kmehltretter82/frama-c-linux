@@ -26,35 +26,29 @@
 #                                                                        #
 ##########################################################################
 
-#################
-# Make commands #
-#################
+#############
+# Platform  #
+#############
 
-define assert_defined
-ifndef $(1)
-$$(error Undefined variable $(1) please report.)
-endif
-endef
+PLATFORM:=$(shell uname -s)
 
-##################################
-# Configure & required variables #
-##################################
+#############
+# Locations #
+#############
 
-$(eval $(call assert_defined,MAKECONFIG_DIR))
+# Note that Dune rules do NOT use these variables.
+# They are used by other Makefiles
+#   - Ivette (PREFIX)
+#   - Manuals (DOCDIR)
 
-include $(MAKECONFIG_DIR)/Makefile.config
-
-#Check share/Makefile.config available
-ifndef FRAMAC_ROOT_SRCDIR
-$(error \
-  "You should run ./configure first (or autoconf if there is no configure)")
-endif
-
-$(eval $(call assert_defined,PLATFORM))
+PREFIX ?= /usr/local
+DOCDIR ?= $(PREFIX)/share/doc
 
 #############
 # Verbosing #
 #############
+
+VERBOSEMAKE?=no
 
 ifneq ($(VERBOSEMAKE),no) # Do not change to ifeq ($(VERBOSEMAKE),yes), as this
                           # version makes it easier for the user to set the
@@ -115,7 +109,7 @@ RM	= rm -f
 TOUCH   = touch
 GIT	= git
 
-ifeq ($(PLATFORM),MacOS)
+ifeq ($(PLATFORM),Darwin)
 TAR     = gtar
 else
 # Unix, Cygwin, Win32

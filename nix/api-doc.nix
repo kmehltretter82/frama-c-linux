@@ -20,7 +20,6 @@ stdenv.mkDerivation rec {
   preConfigure = frama-c.preConfigure;
 
   buildPhase = ''
-    make config.sed
     dune build -j1 @doc
 
     cp -r _build/default/_doc/_html frama-c-api

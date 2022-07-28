@@ -28,11 +28,9 @@ MAKECONFIG_DIR=$(FRAMAC_SRC)/share
 
 include $(FRAMAC_SRC)/share/Makefile.common
 
-DOCDIR ?= "$(DESTDIR)${prefix}/share/doc"
 FRAMAC_DOCDIR ?= $(DOCDIR)/frama-c
 
 .PHONY: .force
-
 
 ###################
 # Frama-C Version #
@@ -201,3 +199,13 @@ acsl/acsl-implementation.pdf: | acsl/acsl.pdf
 $(EACSL_DOC)/refman/e-acsl-implementation.pdf: | $(EACSL_DOC)/refman/e-acsl.pdf
 
 endif
+
+##############################################################################
+# HELP
+################################
+
+help::
+	@echo "Documentation installation configuration variable"
+	@echo "  - PREFIX: documentation will be in PREFIX/share/doc/frama-c"
+	@echo "  - DOCDIR: (overrides previous variable) documentation will be in DOCDIR/frama-c"
+	@echo "  - FRAMAC_DOCDIR: (overrides previous variable) documentation will be in FRAMAC_DOCDIR"

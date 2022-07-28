@@ -87,16 +87,13 @@ tags: [
 ]
 
 build: [
-  ["autoconf"] {dev}
-  ["./configure" "--prefix" prefix]
-  [make "config.sed"]
   ["dune" "build" "-j%{jobs}%" "--release" "@install"]
   [make "-C" "doc" "download"] {with-doc}
 ]
 
 install: [
-  [make "install"]
-  [make "-C" "doc" "install"] {with-doc}
+  [make "INSTALLDIR=%{prefix}%" "MANDIR=%{mandir}%" "install"]
+  [make "PREFIX=%{prefix}%" "-C" "doc" "install"] {with-doc}
 ]
 
 run-test: [
@@ -112,7 +109,6 @@ depends: [
   "dune-configurator"
   "dune-private-libs"
   "dune-site"
-  "conf-autoconf" { build }
   ( ( "lablgtk" { >= "2.18.8" } & "conf-gnomecanvas" & "conf-gtksourceview"
       & ("ocamlgraph" { < "2.0" } | "ocamlgraph_gtk" ))
     | ( "lablgtk3" { >= "3.1.0" & os!="macos" }
