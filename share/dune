@@ -25,6 +25,7 @@
  (section (site (frama-c share)))
  (files
 ; Useful Makefiles
+(Makefile.common as Makefile.common)
 (Makefile.headers as Makefile.headers)
 (Makefile.linting as Makefile.linting)
 (Makefile.installation as Makefile.installation)
