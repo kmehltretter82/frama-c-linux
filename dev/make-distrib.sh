@@ -21,8 +21,6 @@
 #                                                                        #
 ##########################################################################
 
-set -euxo pipefail
-
 ################################################################################
 # Configuration
 
@@ -69,6 +67,7 @@ git archive HEAD -o $FRAMAC_TAR --prefix "$FRAMAC/"
 
 TAR_ACC=$FRAMAC_TAR
 
+PLUGINS=$(find src/plugins -mindepth 1 -maxdepth 1 -type d)
 EXTERNAL_PLUGINS=$(find src/plugins -type d -name ".git" | sed "s/\/.git//")
 
 for plugin in $EXTERNAL_PLUGINS ; do
@@ -80,23 +79,11 @@ done
 tar --concatenate --file=$TAR_ACC
 
 ################################################################################
-# Prepare header options
-
-if [[ "$OPEN_SOURCE" == "yes" ]]; then
-  HEADER_KIND="open-source"
-  HEADER_OPT=
-else
-  HEADER_KIND="close-source"
-  HEADER_OPT="-update"
-fi
-
-################################################################################
 # Prepare header spec
 
 HEADER_SPEC="header-spec.txt"
-git ls-files -z | git check-attr --stdin -z header_spec > $HEADER_SPEC
 
-HEADER_DIRS="-header-dirs headers/$HEADER_KIND"
+git ls-files -z | git check-attr --stdin -z header_spec > $HEADER_SPEC
 
 for plugin in $EXTERNAL_PLUGINS ; do
   git -C $plugin ls-files -z |\
@@ -105,10 +92,47 @@ for plugin in $EXTERNAL_PLUGINS ; do
   tr '\n' '\0' >> $HEADER_SPEC
 done
 
-PLUGINS=$(find src/plugins -mindepth 1 -maxdepth 1 -type d)
+################################################################################
+# Build option for check
 
+# Frama-C is checked in open-source mode
+CHECK_HEADER_OPT="-header-dirs headers/open-source"
+
+# For plugins, either they can be open-source and we assume they have OS headers
+# or they are close-source
 for plugin in $PLUGINS ; do
-  HEADER_DIRS="$HEADER_DIRS -header-dirs $plugin/headers/$HEADER_KIND"
+  if [ -d "$plugin/headers/open-source" ] ; then
+    CHECK_HEADER_OPT="$CHECK_HEADER_OPT -header-dirs $plugin/headers/open-source"
+  else
+    CHECK_HEADER_OPT="$CHECK_HEADER_OPT -header-dirs $plugin/headers/close-source"
+  fi
+done
+
+################################################################################
+# Build option for update
+
+if [[ "$OPEN_SOURCE" == "yes" ]]; then
+  HEADER_KIND="open-source"
+else
+  HEADER_KIND="close-source"
+fi
+
+MAKE_HEADER_OPT="-header-dirs headers/$HEADER_KIND"
+
+# Plugins can:
+# - have both open and close -> just use header kind
+# - have only close -> just use header kind, if it is open, build will fail
+# - have only open -> just use open
+for plugin in $PLUGINS ; do
+  if [ "$OPEN_SOURCE" == "yes" ] ; then
+    MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/open-source"
+  else
+    if [ ! -d "$plugin/headers/close-source" ] ; then
+      MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/open-source"
+    else
+      MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/close-source"
+    fi
+  fi
 done
 
 ################################################################################
@@ -118,12 +142,27 @@ TMP_DIR=$(mktemp -d)
 echo $TMP_DIR
 tar xf $FRAMAC_TAR -C $TMP_DIR
 
-$HDRCK $HEADER_OPT $HEADER_DIRS -spec-format="3-zeros" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
-echo $VERSION_SAFE > $TMP_DIR/$FRAMAC/VERSION
-echo $VERSION_CODENAME > $TMP_DIR/$FRAMAC/VERSION_CODENAME
+# Check
+$HDRCK $CHECK_HEADER_OPT -spec-format="3-zeros" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
+# Update
+$HDRCK -update $MAKE_HEADER_OPT -spec-format="3-zeros" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
+
+################################################################################
+# Sanity check
+
+if [ "$OPEN_SOURCE" == "yes" ] ; then
+  OUT=$(grep -Iir "Contact CEA LIST for licensing." $TMP_DIR | grep -v "headers/" | grep -v "dev/make-distrib.sh")
+  if [ "$?" == "0" ]; then
+    echo "Looks like there are some files containing undetected close source licences"
+    exit 1
+  fi
+fi
 
 ################################################################################
 # Finalize archive
+
+echo $VERSION_SAFE > $TMP_DIR/$FRAMAC/VERSION
+echo $VERSION_CODENAME > $TMP_DIR/$FRAMAC/VERSION_CODENAME
 
 tar czf $FRAMAC_TAR.gz -C $TMP_DIR $FRAMAC
 
