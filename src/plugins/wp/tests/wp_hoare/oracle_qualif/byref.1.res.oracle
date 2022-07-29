@@ -3,18 +3,18 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 12 goals scheduled
-[wp] [Qed] Goal typed_ref_f_ensures : Valid
-[wp] [Qed] Goal typed_ref_f_assigns : Valid
-[wp] [Qed] Goal typed_ref_wrong_without_ref_ensures : Valid
-[wp] [Qed] Goal typed_ref_wrong_without_ref_call_f_requires : Valid
-[wp] [Qed] Goal typed_ref_pointer_ensures : Valid
-[wp] [Qed] Goal typed_ref_pointer_call_f_requires : Valid
-[wp] [Qed] Goal typed_ref_local_ensures : Valid
-[wp] [Qed] Goal typed_ref_local_call_f_requires : Valid
-[wp] [Qed] Goal typed_ref_formal_ensures : Valid
-[wp] [Qed] Goal typed_ref_formal_call_f_requires : Valid
-[wp] [Qed] Goal typed_ref_global_ensures : Valid
-[wp] [Qed] Goal typed_ref_global_call_f_requires : Valid
+[wp] [Valid] typed_ref_f_ensures (Qed)
+[wp] [Valid] typed_ref_f_assigns (Qed)
+[wp] [Valid] typed_ref_wrong_without_ref_ensures (Qed)
+[wp] [Valid] typed_ref_wrong_without_ref_call_f_requires (Qed)
+[wp] [Valid] typed_ref_pointer_ensures (Qed)
+[wp] [Valid] typed_ref_pointer_call_f_requires (Qed)
+[wp] [Valid] typed_ref_local_ensures (Qed)
+[wp] [Valid] typed_ref_local_call_f_requires (Qed)
+[wp] [Valid] typed_ref_formal_ensures (Qed)
+[wp] [Valid] typed_ref_formal_call_f_requires (Qed)
+[wp] [Valid] typed_ref_global_ensures (Qed)
+[wp] [Valid] typed_ref_global_call_f_requires (Qed)
 [wp] Proved goals:   12 / 12
   Qed:            12
 ------------------------------------------------------------

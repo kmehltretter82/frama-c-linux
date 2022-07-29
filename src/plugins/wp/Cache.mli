@@ -30,7 +30,8 @@ val get_hits : unit -> int
 val get_miss : unit -> int
 val get_removed : unit -> int
 
-val is_updating : unit -> bool
+val is_active : mode -> bool
+val is_updating : mode -> bool
 
 val cleanup_cache : unit -> unit
 

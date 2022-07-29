@@ -142,7 +142,6 @@ val qed_time : t -> float
 
 val clear : unit -> unit
 val remove : t -> unit
-val on_remove : (t -> unit) -> unit
 
 val add : t -> unit
 val age : t -> int (* generation *)
@@ -156,34 +155,60 @@ val resolve : t -> bool
 val set_result : t -> prover -> result -> unit
 val clear_results : t -> unit
 
+val add_modified_hook : (t -> unit) -> unit
+(** Hook is invoked for each goal results modification.
+    Remark: [clear()] does not trigger those hooks,
+    Cf. [add_cleared_hook] instead. *)
+
+val add_removed_hook : (t -> unit) -> unit
+(** Hook is invoked for each removed goal.
+    Remark: [clear()] does not trigger those hooks,
+    Cf. [add_cleared_hook] instead. *)
+
+val add_cleared_hook : (unit -> unit) -> unit
+(** Register a hook when the entire table is cleared. *)
+
 val compute : t -> Definitions.axioms option * Conditions.sequent
 
+(** Warning: Prover results are stored as they are from prover output,
+    without taking into consideration that validity is inverted
+    for smoke tests.
+
+    On the contrary, proof validity is computed with respect to
+    smoke test/non-smoke test.
+*)
+
+(** Definite result for this prover (not computing) *)
 val has_verdict : t -> prover -> bool
+
+(** Raw prover result (without any respect to smoke tests) *)
 val get_result : t -> prover -> result
+
+(** All raw prover results (without any respect to smoke tests) *)
 val get_results : t -> (prover * result) list
+
+(** Consolidated wrt to associated property and smoke test. *)
 val get_proof : t -> [`Passed|`Failed|`Unknown] * Property.t
+
+(** Associated property. *)
 val get_target : t -> Property.t
+
 val is_trivial : t -> bool
-(** do not tries simplification, do not check prover results *)
+(** Currently trivial sequent (no forced simplification) *)
 
-val is_proved : t -> bool
-(** do not tries simplification, check prover results *)
+val is_valid : t -> bool
+(** Checks for some prover with valid verdict (no forced simplification) *)
 
-val is_unknown : t -> bool
-(** at least one prover returns « Unknown » *)
+val all_not_valid : t -> bool
+(** Checks for all provers to give a non-valid, computed verdict *)
 
 val is_passed : t -> bool
-(** proved, or unknown for smoke tests *)
+(** valid, or all-not-valid for smoke tests *)
+
+val has_unknown : t -> bool
+(** Checks there is some provers with a non-valid verdict *)
 
 val warnings : t -> Warning.t list
-
-(** [true] if the result is valid. Dynamically exported.
-    @since Nitrogen-20111001
-*)
-val is_valid: result -> bool
-
-val get_time: result -> float
-val get_steps: result -> int
 
 val is_tactic : t -> bool
 val is_smoke_test : t -> bool

@@ -32,10 +32,9 @@ val find_opt : string -> t option
 type fallback = Exact of t | Fallback of t | NotFound
 val find_fallback : string -> fallback
 
-val print_why3 : t -> string
-val print_wp : t -> string
-val title : t -> string
-val name : t -> string
+val ident_why3 : t -> string
+val ident_wp : t -> string
+val title : ?version:bool -> t -> string
 val compare : t -> t -> int
 
 val provers : unit -> t list

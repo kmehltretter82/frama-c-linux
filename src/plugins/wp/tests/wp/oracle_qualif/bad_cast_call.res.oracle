@@ -7,9 +7,9 @@
 [wp] bad_cast_call.i:8: Warning: 
   Cast with incompatible pointers types (source: sint8*) (target: char**)
 [wp] 1 goal scheduled
-[wp] [Alt-Ergo] Goal typed_foo_assert_MUST_FAIL : Unsuccess (Stronger)
+[wp] [Unsuccess] typed_foo_assert_MUST_FAIL (Alt-Ergo) (Cached) (Stronger)
 [wp] Proved goals:    0 / 1
-  Alt-Ergo:        0  (unsuccess: 1)
+  Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   foo                       -        -        1       0.0%

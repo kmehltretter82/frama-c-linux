@@ -158,6 +158,9 @@ module type Messages = sig
       @since Beryllium-20090601-beta1
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
+  val has_tty : unit -> bool
+  (** Returns [true] is this Log's channel is in console mode *)
+
   val feedback : ?ontty:ontty -> ?level:int -> ?dkey:category -> 'a pretty_printer
   (** Progress and feedback. Level is tested against the verbosity level.
       @since Beryllium-20090601-beta1

@@ -16,14 +16,15 @@
 [wp] FRAMAC_SHARE/libc/stdlib.h:641: Warning: 
   Missing terminates clause for div, populates 'terminates \true'
 [wp] 5 goals scheduled
-[wp] [Qed] Goal typed_definition_assigns : Valid
-[wp] [Qed] Goal typed_call_declaration_terminates : Valid
-[wp] [Qed] Goal typed_call_definition_terminates : Valid
-[wp] [Alt-Ergo] Goal typed_no_spec_generates_goal_terminates : Unsuccess
-[wp] [Qed] Goal typed_libc_call_terminates : Valid
+[wp] [Valid] typed_definition_assigns (Qed)
+[wp] [Valid] typed_call_declaration_terminates (Qed)
+[wp] [Valid] typed_call_definition_terminates (Qed)
+[wp] [Unsuccess] typed_no_spec_generates_goal_terminates (Alt-Ergo) (Cached)
+[wp] [Valid] typed_libc_call_terminates (Qed)
 [wp] Proved goals:    5 / 6
-  Qed:             4 
-  Alt-Ergo:        0  (unsuccess: 1)
+  Terminating:     1
+  Qed:             4
+  Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   definition                1        -        1       100%

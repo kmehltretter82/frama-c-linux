@@ -4,13 +4,13 @@
 [rte:annot] annotating function bts0513_bis
 [wp] Running WP plugin...
 [wp] 4 goals scheduled
-[wp] [Alt-Ergo] Goal hoare_bts0513_ensures_qed_ko_ko1 : Unsuccess
-[wp] [Alt-Ergo] Goal hoare_bts0513_ensures_qed_ko_ko2 : Unsuccess
-[wp] [Alt-Ergo] Goal hoare_bts0513_bis_assert_qed_ko_ko1 : Unsuccess
-[wp] [Qed] Goal hoare_bts0513_bis_assert_qed_ok_ok : Valid
+[wp] [Unsuccess] hoare_bts0513_ensures_qed_ko_ko1 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] hoare_bts0513_ensures_qed_ko_ko2 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] hoare_bts0513_bis_assert_qed_ko_ko1 (Alt-Ergo) (Cached)
+[wp] [Valid] hoare_bts0513_bis_assert_qed_ok_ok (Qed)
 [wp] Proved goals:    1 / 4
-  Qed:             1 
-  Alt-Ergo:        0  (unsuccess: 3)
+  Qed:             1
+  Unsuccess:       3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   bts0513                   -        -        2       0.0%

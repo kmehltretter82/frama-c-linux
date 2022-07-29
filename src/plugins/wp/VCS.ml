@@ -55,7 +55,7 @@ let parse_prover = function
     | Fallback p ->
       Wp_parameters.warning ~current:false ~once:true
         "Prover '%s' not found, fallback to '%s'"
-        (String.concat ":" prv) (Why3Provers.print_wp p) ;
+        (String.concat ":" prv) (Why3Provers.ident_wp p) ;
       Some (Why3 p)
     | NotFound ->
       Wp_parameters.error ~once:true
@@ -75,15 +75,15 @@ let parse_mode m =
     Batch
 
 let name_of_prover = function
-  | Why3 s -> Why3Provers.print_wp s
+  | Why3 s -> Why3Provers.ident_wp s
   | Qed -> "qed"
   | Tactical -> "script"
 
-let title_of_prover = function
+let title_of_prover ?version = function
   | Why3 s ->
-    if Wp_parameters.has_dkey dkey_shell
-    then Why3Provers.name s
-    else Why3Provers.title s
+    let version = match version with Some v -> v | None ->
+      not (Wp_parameters.has_dkey dkey_shell)
+    in Why3Provers.title ~version s
   | Qed -> "Qed"
   | Tactical -> "Script"
 
@@ -109,7 +109,7 @@ let sanitize_why3 s =
   Buffer.contents buffer
 
 let filename_for_prover = function
-  | Why3 s -> sanitize_why3 (Why3Provers.print_wp s)
+  | Why3 s -> sanitize_why3 (Why3Provers.ident_wp s)
   | Qed -> "Qed"
   | Tactical -> "Tactical"
 
@@ -202,11 +202,14 @@ type result = {
   prover_errmsg : string ;
 }
 
-let is_verdict r = match r.verdict with
+let is_result = function
   | Valid | Unknown | Invalid | Timeout | Stepout | Failed -> true
   | NoResult | Computing _ -> false
 
+let is_verdict r = is_result r.verdict
 let is_valid = function { verdict = Valid } -> true | _ -> false
+let is_trivial r = is_valid r && r.prover_time = 0.0
+let is_not_valid r = is_verdict r && not (is_valid r)
 let is_computing = function { verdict=Computing _ } -> true | _ -> false
 
 let smoked = function
@@ -307,6 +310,15 @@ let pp_perf_shell fmt r =
   if not (Wp_parameters.has_dkey dkey_shell) then
     pp_perf_forced fmt r
 
+let name_of_verdict = function
+  | NoResult | Computing _ -> "none"
+  | Invalid -> "invalid"
+  | Valid -> "valid"
+  | Failed -> "failed"
+  | Unknown -> "unknown"
+  | Stepout -> "stepout"
+  | Timeout -> "timeout"
+
 let pp_result fmt r =
   match r.verdict with
   | NoResult -> Format.pp_print_string fmt "No Result"
@@ -347,16 +359,16 @@ let pp_result_qualif ?(updating=true) prover result fmt =
   else
     pp_result fmt result
 
+let vrank = function
+  | NoResult | Computing _ -> 0
+  | Failed -> 1
+  | Unknown -> 2
+  | Timeout | Stepout -> 3
+  | Valid -> 4
+  | Invalid -> 5
+
 let compare p q =
-  let rank = function
-    | NoResult | Computing _ -> 0
-    | Failed -> 1
-    | Unknown -> 2
-    | Timeout | Stepout -> 3
-    | Valid -> 4
-    | Invalid -> 5
-  in
-  let r = rank q.verdict - rank p.verdict in
+  let r = vrank q.verdict - vrank p.verdict in
   if r <> 0 then r else
     let s = Stdlib.compare p.prover_steps q.prover_steps in
     if s <> 0 then s else
@@ -385,10 +397,11 @@ let merge r1 r2 =
     prover_errmsg = err.prover_errmsg ;
   }
 
-let choose r1 r2 =
+let leq r1 r2 =
   match is_valid r1 , is_valid r2 with
-  | true , false -> r1
-  | false , true -> r2
-  | _ -> if compare r1 r2 <= 0 then r1 else r2
+  | true , false -> true
+  | false , true -> false
+  | _ -> compare r1 r2 <= 0
 
+let choose r1 r2 = if leq r1 r2 then r1 else r2
 let best = List.fold_left choose no_result

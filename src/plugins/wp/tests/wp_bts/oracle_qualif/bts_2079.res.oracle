@@ -3,8 +3,8 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
-[wp] [Qed] Goal typed_main_ensures_Eval_P : Valid
-[wp] [Qed] Goal typed_main_ensures_Eval_Q : Valid
+[wp] [Valid] typed_main_ensures_Eval_P (Qed)
+[wp] [Valid] typed_main_ensures_Eval_Q (Qed)
 [wp] Proved goals:    2 / 2
   Qed:             2
 ------------------------------------------------------------

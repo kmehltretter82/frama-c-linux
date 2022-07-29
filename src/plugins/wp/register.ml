@@ -86,7 +86,7 @@ let do_wp_print_for goals =
 let do_wp_report model =
   begin
     let reports = Wp_parameters.Report.get () in
-    let jreport = Wp_parameters.ReportJson.get () in
+    let jreport = Wp_parameters.OldReportJson.get () in
     if reports <> [] || jreport <> "" then
       begin
         let stats = WpReport.fcstat () in
@@ -98,7 +98,8 @@ let do_wp_report model =
           | [jinput;joutput] ->
             WpReport.export_json stats ~jinput ~joutput () ;
           | _ ->
-            Wp_parameters.error "Invalid format for option -wp-report-json"
+            Wp_parameters.error
+              "Invalid format for option -wp-deprecated-report-json"
         end ;
         List.iter (WpReport.export stats) reports ;
       end ;
@@ -127,73 +128,25 @@ let pp_warnings fmt wpo =
 (* ---  Prover Stats                                                    --- *)
 (* ------------------------------------------------------------------------ *)
 
-let do_wpo_display goal =
-  let result = if Wpo.is_trivial goal then "trivial" else "not tried" in
-  Wp_parameters.feedback "Goal %s : %s" (Wpo.get_gid goal) result
-
-module PM =
-  Map.Make(struct
-    type t = VCS.prover
-    let compare = VCS.cmp_prover
-  end)
-
-type pstat = {
-  mutable proved : int ;
-  mutable unknown : int ;
-  mutable interrupted : int ;
-  mutable incache : int ;
-  mutable failed : int ;
-  mutable n_time : int ;   (* nbr of measured times *)
-  mutable a_time : float ; (* sum of measured times *)
-  mutable u_time : float ; (* max time *)
-  mutable d_time : float ; (* min time *)
-  mutable steps : int ;
-}
-
 module GOALS = Wpo.S.Set
 
 let scheduled = ref 0
 let exercised = ref 0
 let session = ref GOALS.empty
-let provers = ref PM.empty
+let global_stats = ref Stats.empty
+let script_stats = ref Stats.empty
 
 let clear_scheduled () =
   begin
     scheduled := 0 ;
     exercised := 0 ;
     session := GOALS.empty ;
-    provers := PM.empty ;
+    global_stats := Stats.empty ;
+    script_stats := Stats.empty ;
     CfgInfos.trivial_terminates := 0 ;
     WpReached.unreachable_proved := 0 ;
     WpReached.unreachable_failed := 0 ;
   end
-
-let get_pstat p =
-  try PM.find p !provers with Not_found ->
-    let s = {
-      proved = 0 ;
-      unknown = 0 ;
-      interrupted = 0 ;
-      failed = 0 ;
-      steps = 0 ;
-      incache = 0 ;
-      n_time = 0 ;
-      a_time = 0.0 ;
-      u_time = 0.0 ;
-      d_time = max_float ;
-    } in provers := PM.add p s !provers ; s
-
-let add_step s n =
-  if n > s.steps then s.steps <- n
-
-let add_time s t =
-  if t > 0.0 then
-    begin
-      s.n_time <- succ s.n_time ;
-      s.a_time <- t +. s.a_time ;
-      if t < s.d_time then s.d_time <- t ;
-      if t > s.u_time then s.u_time <- t ;
-    end
 
 let do_list_scheduled goals =
   Bag.iter
@@ -269,174 +222,131 @@ let do_report_cache_usage mode =
         end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Prover JSON Results                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+let pstats_to_json (p,r) : Json.t = `Assoc [
+    "prover", `String (VCS.name_of_prover p) ;
+    "time", `Float r.Stats.time ;
+    "success", `Int (truncate r.Stats.success) ;
+  ]
+
+let stats_to_json g (s : Stats.stats) : Json.t =
+  let smoke = Wpo.is_smoke_test g in
+  let target = Wpo.get_target g in
+  let source = fst (Property.location target) in
+  let script = match ProofSession.get g with
+    | NoScript -> []
+    | Script file | Deprecated file -> [ "script", `String file ]
+  in
+  let index =
+    match g.po_idx with
+    | Axiomatic None -> []
+    | Axiomatic (Some ax) ->
+      [ "axiomatic", `String ax ]
+    | Function(kf,None) ->
+      [ "function", `String (Kernel_function.get_name kf) ]
+    | Function(kf,Some bhv) -> [
+        "function", `String (Kernel_function.get_name kf);
+        "behavior", `String bhv ;
+      ] in
+  let proofs = Stats.proofs s in
+  let subgoals = if proofs > 1 then ["subgoals", `Int proofs] else [] in
+  `Assoc
+    ([
+      "goal", `String g.po_gid ;
+      "property", `String (Property.Names.get_prop_name_id target) ;
+      "file", `String (source.pos_path :> string) ;
+      "line", `Int source.pos_lnum ;
+    ] @ index @ [
+        "smoke", `Bool smoke ;
+        "passed", `Bool (Wpo.is_passed g) ;
+        "verdict", `String (VCS.name_of_verdict s.verdict) ;
+      ] @ script @ [
+        "provers", `List (List.map pstats_to_json s.provers) ;
+      ] @ subgoals @
+      List.filter (function (_,`Int n) -> n > 0 | _ -> true) [
+        "tactics", `Int s.tactics;
+        "proved", `Int s.proved;
+        "timeout", `Int s.timeout;
+        "unknown", `Int s.unknown ;
+        "failed", `Int s.failed ;
+        "cached", `Int s.cached ;
+      ])
+
+let do_report_json () =
+  let file = Wp_parameters.ReportJson.get () in
+  if file <> "" then
+    let json = List.rev @@
+      GOALS.fold
+        (fun g json ->
+           let s = ProofEngine.consolidated g in
+           let js = stats_to_json g s in
+           js :: json
+        ) !session [] in
+    Json.save_file file (`List json)
+
+(* -------------------------------------------------------------------------- *)
 (* --- Prover Results                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-let do_wpo_stat goal prover res =
-  let s = get_pstat prover in
-  let open VCS in
-  if res.cached then s.incache <- succ s.incache ;
-  let smoke = Wpo.is_smoke_test goal in
-  let verdict = VCS.verdict ~smoke res in
-  match verdict with
-  | NoResult | Computing _ | Unknown ->
-    s.unknown <- succ s.unknown
-  | Stepout | Timeout ->
-    s.interrupted <- succ s.interrupted
-  | Failed | Invalid ->
-    s.failed <- succ s.failed
-  | Valid ->
-    s.proved <- succ s.proved ;
-    add_step s res.prover_steps ;
-    add_time s res.prover_time ;
-    if prover <> Qed then
-      add_time (get_pstat Qed) res.solver_time
-
 let do_wpo_result goal prover res =
-  if VCS.is_verdict res then
-    begin
-      if prover = VCS.Qed then do_progress goal "Qed" ;
-      do_wpo_stat goal prover res ;
-    end
+  if VCS.is_verdict res && prover = VCS.Qed then
+    do_progress goal "Qed"
 
-let results g =
-  List.filter
-    (fun (_,r) -> VCS.is_verdict r)
-    (Wpo.get_results g)
+let do_report_stats ~shell ~cache ~smoke goal (stats : Stats.stats) =
+  let status =
+    if smoke then
+      match stats.verdict with
+      | Valid -> "[Failed] (Doomed)"
+      | Failed ->  "[Unknown] (Failure)"
+      | NoResult | Computing _ -> "[Unknown] (Incomplete)"
+      | (Unknown | Timeout | Stepout) when shell -> "[Passed] (Unsuccess)"
+      | Unknown -> "[Passed] (Unknown)"
+      | Timeout -> "[Passed] (Timeout)"
+      | Stepout -> "[Passed] (Stepout)"
+      | Invalid -> "[Passed] (Invalid)"
+    else
+      match stats.verdict with
+      | NoResult | Computing _ -> ""
+      | Valid -> "[Valid]"
+      | Invalid -> "[Invalid]"
+      | Failed ->  "[Failure]"
+      | (Unknown | Timeout | Stepout) when shell -> "[Unsuccess]"
+      | Unknown -> "[Unknown]"
+      | Timeout -> "[Timeout]"
+      | Stepout -> "[Stepout]"
+  in if status <> "" then
+    Wp_parameters.feedback "%s %s%a%a"
+      status (Wpo.get_gid goal) (Stats.pp_stats ~shell ~cache) stats
+      pp_warnings goal
 
-let do_wpo_failed goal =
-  let updating = Cache.is_updating () in
-  match results goal with
-  | [p,r] ->
-    Wp_parameters.result "[%a] Goal %s : %t%a"
-      VCS.pp_prover p (Wpo.get_gid goal)
-      (VCS.pp_result_qualif ~updating p r) pp_warnings goal
-  | pres ->
-    Wp_parameters.result "[Failed] Goal %s%t" (Wpo.get_gid goal)
-      begin fun fmt ->
-        pp_warnings fmt goal ;
-        List.iter
-          (fun (p,r) ->
-             Format.fprintf fmt "@\n%8s: @[<hv>%t@]"
-               (VCS.title_of_prover p)
-               (VCS.pp_result_qualif ~updating p r)
-          ) pres ;
-      end
-
-let do_wpo_smoke status goal =
-  Wp_parameters.result "[%s] Smoke-test %s%t"
-    (match status with
-     | `Failed -> "Failed"
-     | `Passed -> "Passed"
-     | `Unknown -> "Partial")
-    (Wpo.get_gid goal)
-    begin fun fmt ->
-      pp_warnings fmt goal ;
-      let updating = Cache.is_updating () in
-      List.iter
-        (fun (p,r) ->
-           Format.fprintf fmt "@\n%8s: @[<hv>%t@]"
-             (VCS.title_of_prover p)
-             (VCS.pp_result_qualif ~updating p r)
-        ) (results goal) ;
-    end
-
-let do_wpo_success goal s =
+let do_wpo_success ~shell ~cache goal success =
   if Wp_parameters.Generate.get () then
-    match s with
+    match success with
     | None -> ()
     | Some prover ->
       Wp_parameters.feedback ~ontty:`Silent
-        "[%a] Goal %s : Valid" VCS.pp_prover prover (Wpo.get_gid goal)
+        "[Generated] Goal %s (%a)" (Wpo.get_gid goal) VCS.pp_prover prover
   else
-  if Wpo.is_smoke_test goal then
-    begin match s with
-      | None ->
-        Wp_parameters.feedback ~ontty:`Silent
-          "[Passed] Smoke-test %s" (Wpo.get_gid goal)
-      | Some _ ->
-        let status,target = Wpo.get_proof goal in
-        do_wpo_smoke status goal ;
-        if status = `Failed then
-          let source = fst (Property.location target) in
-          Wp_parameters.warning ~source "Failed smoke-test"
-    end
-  else
-    begin match s with
-      | None -> do_wpo_failed goal
-      | Some (VCS.Tactical as script) ->
-        Wp_parameters.feedback ~ontty:`Silent
-          "[%a] Goal %s : Valid"
-          VCS.pp_prover script (Wpo.get_gid goal)
-      | Some prover ->
-        let result = Wpo.get_result goal prover in
-        let updating = Cache.is_updating () in
-        Wp_parameters.feedback ~ontty:`Silent
-          "[%a] Goal %s : %t"
-          VCS.pp_prover prover (Wpo.get_gid goal)
-          (VCS.pp_result_qualif ~updating prover result)
-    end
-
-let do_report_time fmt s =
-  begin
-    if s.n_time > 0 &&
-       s.u_time > Rformat.epsilon &&
-       not (Wp_parameters.has_dkey VCS.dkey_shell)
-    then
-      let mean = s.a_time /. float s.n_time in
-      let epsilon = 0.05 *. mean in
-      let delta = s.u_time -. s.d_time in
-      if delta < epsilon then
-        Format.fprintf fmt " (%a)" Rformat.pp_time mean
-      else
-        let middle = (s.u_time +. s.d_time) *. 0.5 in
-        if abs_float (middle -. mean) < epsilon then
-          Format.fprintf fmt " (%a-%a)"
-            Rformat.pp_time s.d_time
-            Rformat.pp_time s.u_time
-        else
-          Format.fprintf fmt " (%a-%a-%a)"
-            Rformat.pp_time s.d_time
-            Rformat.pp_time mean
-            Rformat.pp_time s.u_time
-  end
-
-let do_report_steps fmt s =
-  begin
-    if s.steps > 0 &&
-       not (Wp_parameters.has_dkey VCS.dkey_shell)
-    then
-      Format.fprintf fmt " (%d)" s.steps ;
-  end
-
-let do_report_stopped fmt s =
-  if Wp_parameters.has_dkey VCS.dkey_shell then
+    let smoke = Wpo.is_smoke_test goal in
+    let gstats = Stats.results ~smoke @@ Wpo.get_results goal in
+    let cstats = ProofEngine.consolidated goal in
+    let success = Wpo.is_passed goal in
     begin
-      let n = s.interrupted + s.unknown in
-      if n > 0 then
-        Format.fprintf fmt " (unsuccess: %d)" n ;
+      global_stats := Stats.add !global_stats gstats ;
+      if cstats.tactics > 0 then
+        script_stats := Stats.add !script_stats cstats ;
+      if shell || not success then
+        do_report_stats ~shell ~cache goal ~smoke cstats ;
+      if smoke then
+        begin
+          let proof, target = Wpo.get_proof goal in
+          if proof <> `Passed then
+            let source = fst (Property.location target) in
+            Wp_parameters.warning ~once:true ~source "Failed smoke-test"
+        end ;
     end
-  else
-    begin
-      if s.interrupted > 0 then
-        Format.fprintf fmt " (interrupted: %d)" s.interrupted ;
-      if s.unknown > 0 then
-        Format.fprintf fmt " (unknown: %d)" s.unknown ;
-      if s.incache > 0 then
-        Format.fprintf fmt " (cached: %d)" s.incache ;
-    end
-
-let do_report_prover_stats pp_prover fmt (p,s) =
-  begin
-    let name = VCS.title_of_prover p in
-    Format.fprintf fmt "%a %4d " pp_prover name s.proved ;
-    do_report_time fmt s ;
-    do_report_steps fmt s ;
-    do_report_stopped fmt s ;
-    if s.failed > 0 then
-      Format.fprintf fmt " (failed: %d)" s.failed ;
-    Format.fprintf fmt "@\n" ;
-  end
 
 let do_report_scheduled () =
   if Wp_parameters.Generate.get () then
@@ -450,30 +360,62 @@ let do_report_scheduled () =
       !CfgInfos.trivial_terminates in
     if total > 0 then
       begin
-        let passed =
-          !WpReached.unreachable_proved + !CfgInfos.trivial_terminates
-        in
+        let gstats = !global_stats in
+        let unreachable = !WpReached.unreachable_proved in
+        let terminating = !CfgInfos.trivial_terminates in
         let passed = GOALS.fold
             (fun g n ->
                if Wpo.is_passed g then succ n else n
-            ) !session passed in
-        let mode = Cache.get_mode () in
-        if mode <> Cache.NoCache then do_report_cache_usage mode ;
+            ) !session (unreachable + terminating) in
+        let cache = Cache.get_mode () in
+        if Cache.is_active cache then do_report_cache_usage cache ;
+        let shell = Wp_parameters.has_dkey VCS.dkey_shell in
+        let lines = ref [] in
+        let none = fun _fmt -> () in
+        let add_line title count pp =
+          lines := (title,count,pp) :: !lines in
+        if terminating > 0 then add_line "Terminating" terminating none ;
+        if unreachable > 0 then add_line "Unreachable" unreachable none ;
+        List.iter
+          (fun (p,s) ->
+             let name = VCS.title_of_prover p in
+             let success = truncate s.Stats.success in
+             if success > 0 || (not shell && p = Qed) then
+               add_line name success (fun fmt ->
+                   if p = Tactical then
+                     Stats.pp_stats ~shell ~cache fmt !script_stats
+                   else
+                   if not shell then Stats.pp_pstats fmt s
+                 )
+          ) gstats.provers ;
+        if gstats.failed > 0 then add_line "Failed" gstats.failed none ;
+        if shell then
+          begin
+            let n = gstats.timeout + gstats.unknown in
+            if n > 0 then add_line "Unsuccess" n none
+          end
+        else
+          begin
+            if gstats.timeout > 0 then add_line "Timeout" gstats.timeout none ;
+            if gstats.unknown > 0 then add_line "Unknown" gstats.unknown none ;
+          end ;
+        let iter f = List.iter f (List.rev !lines) in
+        let title (p,_,_) = p in
+        let pp_title fmt p = Format.fprintf fmt "%s:" p in
+        let pp_item pp fmt (a,n,msg) =
+          Format.fprintf fmt "%a %4d%t@\n" pp a n msg in
         Wp_parameters.result "%t"
           begin fun fmt ->
             Format.fprintf fmt "Proved goals: %4d / %d@\n" passed total ;
             Pretty_utils.pp_items
-              ~min:12 ~align:`Left
-              ~title:(fun (prover,_) -> VCS.title_of_prover prover)
-              ~iter:(fun f -> PM.iter (fun p s -> f (p,s)) !provers)
-              ~pp_title:(fun fmt a -> Format.fprintf fmt "%s:" a)
-              ~pp_item:do_report_prover_stats fmt ;
+              ~min:12 ~align:`Left ~title ~iter ~pp_title ~pp_item fmt ;
           end ;
       end
 
 let do_list_scheduled_result () =
   begin
     do_report_scheduled () ;
+    do_report_json () ;
     clear_scheduled () ;
   end
 
@@ -497,6 +439,8 @@ let spawn_wp_proofs ~script goals =
     begin
       let server = ProverTask.server () in
       ignore (Wp_parameters.Share.get_dir "."); (* To prevent further errors *)
+      let shell = Wp_parameters.has_dkey VCS.dkey_shell in
+      let cache = Cache.get_mode () in
       Bag.iter
         (fun goal ->
            if  script.tactical
@@ -513,7 +457,7 @@ let spawn_wp_proofs ~script goals =
                ~start:do_wpo_start
                ~progress:do_progress
                ~result:do_wpo_result
-               ~success:do_wpo_success
+               ~success:(do_wpo_success ~shell ~cache)
                goal
            else
              Prover.spawn goal
@@ -521,7 +465,7 @@ let spawn_wp_proofs ~script goals =
                ~start:do_wpo_start
                ~progress:do_progress
                ~result:do_wpo_result
-               ~success:do_wpo_success
+               ~success:(do_wpo_success ~shell ~cache)
                script.provers
         ) goals ;
       Task.on_server_wait server do_wpo_wait ;
@@ -714,6 +658,10 @@ let do_session ~script goals =
   do_update_session script session ;
   do_show_session script.update session
 
+let do_wpo_display goal =
+  let result = if Wpo.is_trivial goal then "trivial" else "not tried" in
+  Wp_parameters.feedback "Goal %s : %s" (Wpo.get_gid goal) result
+
 let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
   let script = default_script_mode () in
   let mode = VCS.parse_mode (Wp_parameters.Interactive.get ()) in
@@ -873,7 +821,7 @@ let do_prover_detect () =
            Wp_parameters.result "Prover %10s %-6s [%a%s]"
              p.prover_name p.prover_version
              print_prover_shortcuts_for p
-             (Why3Provers.print_wp p)
+             (Why3Provers.ident_wp p)
         ) provers
 
 (* ------------------------------------------------------------------------ *)

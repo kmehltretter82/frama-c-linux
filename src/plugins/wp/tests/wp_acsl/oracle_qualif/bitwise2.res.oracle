@@ -3,11 +3,11 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 5 goals scheduled
-[wp] [Qed] Goal typed_job1_ensures : Valid
-[wp] [Qed] Goal typed_job1bis_ensures : Valid
-[wp] [Qed] Goal typed_job2_ensures : Valid
-[wp] [Qed] Goal typed_job3_ensures : Valid
-[wp] [Qed] Goal typed_job4_ensures : Valid
+[wp] [Valid] typed_job1_ensures (Qed)
+[wp] [Valid] typed_job1bis_ensures (Qed)
+[wp] [Valid] typed_job2_ensures (Qed)
+[wp] [Valid] typed_job3_ensures (Qed)
+[wp] [Valid] typed_job4_ensures (Qed)
 [wp] Proved goals:    5 / 5
   Qed:             5
 ------------------------------------------------------------

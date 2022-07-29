@@ -42,7 +42,7 @@ module Pset : Set.S with type elt = prover
 module Pmap : Map.S with type key = prover
 
 val name_of_prover : prover -> string
-val title_of_prover : prover -> string
+val title_of_prover : ?version:bool -> prover -> string
 val filename_for_prover : prover -> string
 val title_of_mode : mode -> string
 
@@ -111,8 +111,11 @@ val cached : result -> result (** only for true verdicts *)
 val result : ?cached:bool -> ?solver:float -> ?time:float -> ?steps:int -> verdict -> result
 
 val is_auto : prover -> bool
+val is_result : verdict -> bool
 val is_verdict : result -> bool
 val is_valid: result -> bool
+val is_trivial: result -> bool
+val is_not_valid: result -> bool
 val is_computing: result -> bool
 val is_proved: smoke:bool -> result -> bool
 
@@ -122,13 +125,17 @@ val verdict: smoke:bool -> result -> verdict
 val configure : result -> config
 val autofit : result -> bool (** Result that fits the default configuration *)
 
+val name_of_verdict : verdict -> string
+
 val pp_result : Format.formatter -> result -> unit
 val pp_result_qualif : ?updating:bool -> prover -> result ->
   Format.formatter -> unit
 
 val compare : result -> result -> int (* best is minimal *)
 
+val combine : verdict -> verdict -> verdict
 val merge : result -> result -> result
+val leq : result -> result -> bool
 val choose : result -> result -> result
 val best : result list -> result
 

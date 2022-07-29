@@ -3,16 +3,16 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 10 goals scheduled
-[wp] [Qed] Goal typed_f1_ok_ensures : Valid
-[wp] [Qed] Goal typed_f1_ok_exits : Valid
-[wp] [Qed] Goal typed_f2_ok_ensures : Valid
-[wp] [Qed] Goal typed_f2_ok_exits : Valid
-[wp] [Qed] Goal typed_f3_ko_ensures : Valid
-[wp] [Qed] Goal typed_f3_ok_ensures : Valid
-[wp] [Qed] Goal typed_f4_ok_ensures : Valid
-[wp] [Qed] Goal typed_f4_ko_ensures : Valid
-[wp] [Qed] Goal typed_f5_ok_ensures : Valid
-[wp] [Qed] Goal typed_f5_ko_ensures : Valid
+[wp] [Valid] typed_f1_ok_ensures (Qed)
+[wp] [Valid] typed_f1_ok_exits (Qed)
+[wp] [Valid] typed_f2_ok_ensures (Qed)
+[wp] [Valid] typed_f2_ok_exits (Qed)
+[wp] [Valid] typed_f3_ko_ensures (Qed)
+[wp] [Valid] typed_f3_ok_ensures (Qed)
+[wp] [Valid] typed_f4_ok_ensures (Qed)
+[wp] [Valid] typed_f4_ko_ensures (Qed)
+[wp] [Valid] typed_f5_ok_ensures (Qed)
+[wp] [Valid] typed_f5_ko_ensures (Qed)
 [wp] Proved goals:   10 / 10
   Qed:            10
 ------------------------------------------------------------

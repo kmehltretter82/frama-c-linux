@@ -12,13 +12,13 @@
 [wp] volatile.i:35: Warning: unsafe read-access to volatile l-value
 [wp] volatile.i:45: Warning: unsafe read-access to volatile l-value
 [wp] 5 goals scheduled
-[wp] [Qed] Goal typed_job_assigns_assert_KO_WHEN_VOLATILE : Valid
-[wp] [Qed] Goal typed_job_read_assert_KO_WHEN_VOLATILE : Valid
-[wp] [Qed] Goal typed_job_struct_assert_ok_dead_code : Valid
-[wp] [Qed] Goal typed_job_struct_assigns_assert_KO_WHEN_VOLATILE : Valid
-[wp] [Alt-Ergo] Goal typed_default_init_check_KO_WHEN_VOLATILE : Valid
+[wp] [Valid] typed_job_assigns_assert_KO_WHEN_VOLATILE (Qed) (Stronger, 2 warnings)
+[wp] [Valid] typed_job_read_assert_KO_WHEN_VOLATILE (Qed) (Stronger, 2 warnings)
+[wp] [Valid] typed_job_struct_assert_ok_dead_code (Qed)
+[wp] [Valid] typed_job_struct_assigns_assert_KO_WHEN_VOLATILE (Qed) (Stronger, 4 warnings)
+[wp] [Valid] typed_default_init_check_KO_WHEN_VOLATILE (Alt-Ergo) (Cached) (Stronger)
 [wp] Proved goals:    5 / 5
-  Qed:             4 
+  Qed:             4
   Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

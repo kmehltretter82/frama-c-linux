@@ -7,9 +7,9 @@
 [wp] loopextra.i:3: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 [wp] 3 goals scheduled
-[wp] [Qed] Goal typed_f_assert : Valid
-[wp] [Qed] Goal typed_f_assert_2 : Valid
-[wp] [Qed] Goal typed_f_assert_3 : Valid
+[wp] [Valid] typed_f_assert (Qed)
+[wp] [Valid] typed_f_assert_2 (Qed)
+[wp] [Valid] typed_f_assert_3 (Qed)
 [wp] Proved goals:    3 / 3
   Qed:             3
 ------------------------------------------------------------

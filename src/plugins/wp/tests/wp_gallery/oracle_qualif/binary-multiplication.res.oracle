@@ -3,26 +3,26 @@
 [wp] Running WP plugin...
 [rte:annot] annotating function BinaryMultiplication
 [wp] 17 goals scheduled
-[wp] [Alt-Ergo] Goal typed_lemma_ax4_ok : Valid
-[wp] [Alt-Ergo] Goal typed_lemma_ax5_ok : Valid
-[wp] [Alt-Ergo] Goal typed_lemma_ax7_ok : Valid
-[wp] [Qed] Goal typed_lemma_sizeof_ok_ok : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_ensures_product : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a1_ok_deductible : Valid
-[wp] [Qed] Goal typed_BinaryMultiplication_loop_invariant_inv1_ok_established : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_invariant_inv2_ok_established : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a2_ok : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a3_ok : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a4_ok : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_assert_a5_ok : Valid
-[wp] [Qed] Goal typed_BinaryMultiplication_loop_assigns : Valid
-[wp] [Alt-Ergo] Goal typed_BinaryMultiplication_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_BinaryMultiplication_loop_variant_positive : Valid
-[wp] [Script] Goal typed_BinaryMultiplication_loop_invariant_inv1_ok_preserved : Valid
+[wp] [Valid] typed_lemma_ax4_ok (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lemma_ax5_ok (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lemma_ax7_ok (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lemma_sizeof_ok_ok (Qed)
+[wp] [Valid] typed_BinaryMultiplication_ensures_product (Alt-Ergo) (Cached)
+[wp] [Valid] typed_BinaryMultiplication_assert_a1_ok_deductible (Alt-Ergo) (Cached)
+[wp] [Valid] typed_BinaryMultiplication_loop_invariant_inv1_ok_established (Qed)
+[wp] [Valid] typed_BinaryMultiplication_loop_invariant_inv2_ok_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_BinaryMultiplication_loop_invariant_inv2_ok_established (Alt-Ergo) (Cached)
+[wp] [Valid] typed_BinaryMultiplication_assert_a2_ok (Alt-Ergo) (Cached)
+[wp] [Valid] typed_BinaryMultiplication_assert_a3_ok (Alt-Ergo) (Cached)
+[wp] [Valid] typed_BinaryMultiplication_assert_a4_ok (Alt-Ergo) (Cached)
+[wp] [Valid] typed_BinaryMultiplication_assert_a5_ok (Alt-Ergo) (Cached)
+[wp] [Valid] typed_BinaryMultiplication_loop_assigns (Qed)
+[wp] [Valid] typed_BinaryMultiplication_loop_variant_decrease (Alt-Ergo) (Cached)
+[wp] [Valid] typed_BinaryMultiplication_loop_variant_positive (Qed)
+[wp] [Valid] typed_BinaryMultiplication_loop_invariant_inv1_ok_preserved (Tactics 4) (Qed 1/10) (Alt-Ergo 9/10) (Cached)
 [wp] Proved goals:   17 / 17
-  Qed:             4 
-  Script:          1 
+  Qed:             4
+  Script:          1 (Tactics 4) (Qed 1/10) (Alt-Ergo 9/10) (Cached)
   Alt-Ergo:       12
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success

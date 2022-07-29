@@ -2,6 +2,6 @@
 [kernel] Parsing no_step_limit.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] 1 goal scheduled
-[wp] [no-steps] Goal typed_lemma_truc : Unsuccess
+[wp] [Unsuccess] typed_lemma_truc (no-steps)
 [wp] Proved goals:    0 / 1
-  no-steps:        0  (unsuccess: 1)
+  Unsuccess:       1

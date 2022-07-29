@@ -3,12 +3,12 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
-[wp] [Qed] Goal typed_g_exits_ok : Valid
-[wp] [Qed] Goal typed_g_loop_assigns : Valid
-[wp] [Qed] Goal typed_g_assigns_exit : Valid
-[wp] [Qed] Goal typed_g_assigns_normal_part1 : Valid
-[wp] [Qed] Goal typed_g_assigns_normal_part2 : Valid
-[wp] [Qed] Goal typed_g_assigns_normal_part3 : Valid
+[wp] [Valid] typed_g_exits_ok (Qed)
+[wp] [Valid] typed_g_loop_assigns (Qed)
+[wp] [Valid] typed_g_assigns_exit (Qed)
+[wp] [Valid] typed_g_assigns_normal_part1 (Qed)
+[wp] [Valid] typed_g_assigns_normal_part2 (Qed)
+[wp] [Valid] typed_g_assigns_normal_part3 (Qed)
 [wp] Proved goals:    6 / 6
   Qed:             6
 ------------------------------------------------------------

@@ -804,6 +804,7 @@ sig
     ('a,formatter,unit) format -> 'a
 
   val result  : ?level:int -> ?dkey:category -> 'a pretty_printer
+  val has_tty : unit -> bool
   val feedback: ?ontty:ontty -> ?level:int -> ?dkey:category -> 'a pretty_printer
   val debug   : ?level:int -> ?dkey:category -> 'a pretty_printer
   val warning : ?wkey: warn_category -> 'a pretty_printer
@@ -1037,6 +1038,8 @@ struct
     else Pretty_utils.nullprintf text
 
   let transient channel = channel.terminal.isatty && !tty ()
+
+  let has_tty () = transient channel
 
   let feedback
       ?(ontty=`Message)

@@ -3,16 +3,17 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 7 goals scheduled
-[wp] [Alt-Ergo] Goal typed_f_ensures_qed_ok : Valid
-[wp] [Alt-Ergo] Goal typed_g_ensures_qed_ok : Valid
-[wp] [Qed] Goal typed_modifies_y_ensures_qed_ok_F_OK : Valid
-[wp] [Qed] Goal typed_modifies_y_ensures_qed_ok_G_OK : Valid
-[wp] [Alt-Ergo] Goal typed_modifies_y_ensures_qed_ok_W_OK_todo : Unsuccess
-[wp] [Qed] Goal typed_modifies_x_ensures_qed_ok_F_OK : Valid
-[wp] [Alt-Ergo] Goal typed_modifies_x_ensures_qed_ok_W_OK_todo : Unsuccess
+[wp] [Valid] typed_f_ensures_qed_ok (Alt-Ergo) (Cached)
+[wp] [Valid] typed_g_ensures_qed_ok (Alt-Ergo) (Cached)
+[wp] [Valid] typed_modifies_y_ensures_qed_ok_F_OK (Qed)
+[wp] [Valid] typed_modifies_y_ensures_qed_ok_G_OK (Qed)
+[wp] [Unsuccess] typed_modifies_y_ensures_qed_ok_W_OK_todo (Alt-Ergo) (Cached)
+[wp] [Valid] typed_modifies_x_ensures_qed_ok_F_OK (Qed)
+[wp] [Unsuccess] typed_modifies_x_ensures_qed_ok_W_OK_todo (Alt-Ergo) (Cached)
 [wp] Proved goals:    5 / 7
-  Qed:             3 
-  Alt-Ergo:        2  (unsuccess: 2)
+  Qed:             3
+  Alt-Ergo:        2
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f                         -        1        1       100%

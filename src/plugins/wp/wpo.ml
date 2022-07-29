@@ -550,6 +550,18 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Wpo Hooks                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+let modified_hooks : (t -> unit) list ref = ref []
+let removed_hooks : (t -> unit) list ref = ref []
+let cleared_hooks : (unit -> unit) list ref = ref []
+
+let add_modified_hook f = modified_hooks := !modified_hooks @ [f]
+let add_removed_hook f = removed_hooks := !removed_hooks @ [f]
+let add_cleared_hook f = cleared_hooks := !cleared_hooks @ [f]
+
+(* -------------------------------------------------------------------------- *)
 (* --- Wpo Database                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -596,6 +608,7 @@ let clear_system system =
     system.results <- WPOmap.empty ;
     system.age <- WPOmap.empty ;
     Hproof.clear system.proofs ;
+    List.iter (fun f -> f ()) !cleared_hooks ;
   end
 
 module SYSTEM = State_builder.Ref
@@ -667,15 +680,12 @@ let add g =
           Wp_parameters.feedback ~ontty:`Feedback "Computing [%d goals...]" !added ;
         added := 0 ;
       end ;
+    List.iter (fun f -> f g) !modified_hooks ;
   end
-
-let remove_hook = ref []
-let on_remove f = remove_hook := !remove_hook @ [f]
 
 let remove g =
   let system = SYSTEM.get () in
   begin
-    List.iter (fun f -> f g) !remove_hook ;
     let ip = WpPropId.property_of_id g.po_pid in
     system.wpo_idx <- unindex_wpo Gmap.add Gmap.find g.po_idx g system.wpo_idx ;
     system.wpo_ip <- unindex_wpo Pmap.add Pmap.find ip g system.wpo_ip ;
@@ -687,14 +697,13 @@ let remove g =
     end ;
     system.results <- WPOmap.remove g system.results ;
     Hproof.remove system.proofs (proof g ip) ;
+    List.iter (fun f -> f g) !removed_hooks ;
   end
 
 let warnings = function
   | { po_formula = GoalAnnot vcq } -> vcq.VC_Annot.warn
   | { po_formula = GoalLemma _ } -> []
 
-let get_time = function { prover_time=t } -> t
-let get_steps= function { prover_steps=n } -> n
 let get_target g = WpPropId.property_of_id g.po_pid
 
 let get_proof g =
@@ -724,31 +733,34 @@ let clear_results g =
   try
     let rs = WPOmap.find g system.results in
     Results.clear rs ;
+    List.iter (fun f -> f g) !modified_hooks ;
   with Not_found -> ()
 
 let set_result g p r =
   let system = SYSTEM.get () in
-  begin
-    let rs =
-      try WPOmap.find g system.results
-      with Not_found ->
-        let rs = Results.create () in
-        system.results <- WPOmap.add g rs system.results ; rs
-    in
-    Results.replace rs p r ;
-    if not (WpPropId.is_check g.po_pid) &&
-       not (WpPropId.is_tactic g.po_pid) &&
-       VCS.is_verdict r
-    then
+  let rs =
+    try WPOmap.find g system.results
+    with Not_found ->
+      let rs = Results.create () in
+      system.results <- WPOmap.add g rs system.results ; rs
+  in
+  Results.replace rs p r ;
+  if not (WpPropId.is_check g.po_pid) &&
+     not (WpPropId.is_tactic g.po_pid) &&
+     VCS.is_verdict r
+  then
+    begin
       let smoke = is_smoke_test g in
       let proof = find_proof system g in
       let emitter = WpContext.get_emitter g.po_model in
       let target = WpPropId.target proof in
       let unproved = not (WpPropId.is_proved proof) in
-      if VCS.is_valid r then
-        WpPropId.add_proof proof g.po_pid (get_depend g)
-      else if smoke then
-        WpPropId.add_invalid_proof proof ;
+      begin
+        if VCS.is_valid r then
+          WpPropId.add_proof proof g.po_pid (get_depend g)
+        else if smoke then
+          WpPropId.add_invalid_proof proof ;
+      end ;
       let proved = WpPropId.is_proved proof in
       let status =
         if smoke then
@@ -764,8 +776,10 @@ let set_result g p r =
       in
       let hyps = if smoke then [] else WpPropId.dependencies proof in
       Property_status.emit emitter ~hyps target status ;
-      if smoke && unproved && proved then WpReached.set_doomed emitter g.po_pid ;
-  end
+      if smoke && unproved && proved then
+        WpReached.set_doomed emitter g.po_pid ;
+    end ;
+  List.iter (fun f -> f g) !modified_hooks
 
 let has_verdict g p =
   let system = SYSTEM.get () in
@@ -813,27 +827,24 @@ let compute g =
     Some( lemma.l_cluster , depends ) ,
     WpContext.on_context ctxt VC_Lemma.sequent w
 
-let is_proved g =
+let is_valid g =
   is_trivial g || List.exists (fun (_,r) -> VCS.is_valid r) (get_results g)
 
-let is_unknown g = List.exists
-    (fun (_,r) -> VCS.is_verdict r && not (VCS.is_valid r))
-    ( get_results g )
+let all_not_valid g =
+  not (is_trivial g) &&
+  List.for_all (fun (_,r) -> VCS.is_not_valid r) (get_results g)
 
 let is_passed g =
   if is_smoke_test g then
-    not (is_proved g)
+    all_not_valid g
   else
-    is_proved g
+    is_valid g
 
-let get_result =
-  Dynamic.register ~plugin:"Wp" "Wpo.get_result"
-    (Datatype.func2 WpoType.ty ProverType.ty ResultType.ty)
-    get_result
-
-let is_valid =
-  Dynamic.register ~plugin:"Wp" "Wpo.is_valid"
-    (Datatype.func ResultType.ty Datatype.bool) VCS.is_valid
+let has_unknown g =
+  not (is_valid g) &&
+  List.exists
+    (fun (_,r) -> VCS.is_verdict r && not (VCS.is_valid r))
+    (get_results g)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Proof Obligations : Pretty-printing                                --- *)

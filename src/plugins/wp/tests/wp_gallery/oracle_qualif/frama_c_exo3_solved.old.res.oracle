@@ -3,42 +3,42 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 34 goals scheduled
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_ensures_2 : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_ensures_3 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_preserved : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_established : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_2_preserved : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_2_established : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_3_preserved : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_3_established : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_4_preserved : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_4_established : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_5_preserved : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_5_established : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_6_preserved : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_6_established : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_7_preserved : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_7_established : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_8_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_8_established : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_9_preserved : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_invariant_9_established : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_10_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_loop_invariant_10_established : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_assert : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_assert_2 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_assigns : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_assigns_2 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assigns_part1 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assigns_part2 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assigns_part3 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_variant_decrease : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_variant_positive : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_variant_2_decrease : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_loop_variant_2_positive : Valid
+[wp] [Valid] typed_ref_equal_elements_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_ensures_2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_ensures_3 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_preserved (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_established (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_2_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_2_established (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_3_preserved (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_3_established (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_4_preserved (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_4_established (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_5_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_5_established (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_6_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_6_established (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_7_preserved (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_7_established (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_8_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_8_established (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_9_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_9_established (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_10_preserved (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_loop_invariant_10_established (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_assert (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_assert_2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_loop_assigns (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_assigns_2 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assigns_part1 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assigns_part2 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assigns_part3 (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_variant_decrease (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_variant_positive (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_variant_2_decrease (Qed)
+[wp] [Valid] typed_ref_equal_elements_loop_variant_2_positive (Qed)
 [wp] Proved goals:   34 / 34
-  Qed:            21 
+  Qed:            21
   Alt-Ergo:       13
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
@@ -56,24 +56,24 @@
 [wp] Running WP plugin...
 [rte:annot] annotating function equal_elements
 [wp] 16 goals scheduled
-[wp] [Qed] Goal typed_ref_equal_elements_assert_rte_mem_access : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assert_rte_mem_access_2 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assert_rte_index_bound : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assert_rte_index_bound_2 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assert_rte_signed_overflow : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_assert_rte_mem_access_3 : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_assert_rte_index_bound_3 : Valid
-[wp] [Alt-Ergo] Goal typed_ref_equal_elements_assert_rte_index_bound_4 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assert_rte_mem_access_4 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assert_rte_mem_access_5 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assert_rte_mem_access_6 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assert_rte_mem_access_7 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assert_rte_mem_access_8 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assert_rte_index_bound_5 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assert_rte_index_bound_6 : Valid
-[wp] [Qed] Goal typed_ref_equal_elements_assert_rte_signed_overflow_2 : Valid
+[wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access (Qed)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access_2 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_index_bound (Qed)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_index_bound_2 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_signed_overflow (Qed)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access_3 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_index_bound_3 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_index_bound_4 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access_4 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access_5 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access_6 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access_7 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access_8 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_index_bound_5 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_index_bound_6 (Qed)
+[wp] [Valid] typed_ref_equal_elements_assert_rte_signed_overflow_2 (Qed)
 [wp] Proved goals:   16 / 16
-  Qed:            13 
+  Qed:            13
   Alt-Ergo:        3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

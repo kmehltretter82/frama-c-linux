@@ -2,12 +2,11 @@
 [kernel] Parsing unroll.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] 3 goals scheduled
-[wp] [Script] Goal typed_lemma_LEFT : Valid
-[wp] [Script] Goal typed_lemma_RIGHT : Valid
-[wp] [Script] Goal typed_lemma_SUM : Valid
+[wp] [Valid] typed_lemma_LEFT (Tactic) (Qed 2/2)
+[wp] [Valid] typed_lemma_RIGHT (Tactic) (Qed 2/2)
+[wp] [Valid] typed_lemma_SUM (Tactic) (Qed 2/2)
 [wp] Proved goals:    3 / 3
-  Qed:             0 
-  Script:          3
+  Script:          3 (Tactics 3) (Qed 6/6)
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Lemma                     -        -        3       100%

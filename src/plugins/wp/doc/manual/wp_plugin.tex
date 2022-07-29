@@ -1631,10 +1631,63 @@ Reports are generated with the following command-line options:
   (described below).
 \item[\tt -wp-report-basename <name>] set the basename for exported
   reports (described below).
-\item[\tt -wp-report-json <file>.json] output the reports in JSON format.
-  If the file already exists, it is used to stabilize the \verb+range+ of steps
-  reports in all other reports (see below).
+\item[\tt -wp-report-json <file>.json] output the proof report in JSON format.
 \end{description}
+
+See sections below for details on the generated report formats.
+
+\clearpage
+\subsection{JSON Reports}
+
+The generated JSON report format consists of an array of JSON records, one for
+each generated toplevel goal. Each record consists of the following fields,
+some of them being optional when indicated:
+
+\begin{description}
+\raggedright
+\itemsep0pt
+\newcommand{\jsarray}[1]{[#1,\ldots]}
+\item[\tt "goal":<string>] goal identifier (same as in console report);
+\item[\tt "property":<string>] property identifier (see \textsf{Frama-C/Report} documentation);
+\item[\tt "file":<string>] source file location;
+\item[\tt "line":<number>] source line location;
+\item[\tt "axiomatic"?:<string>] axiomatic name (optional);
+\item[\tt "function"?:<string>] function name (optional);
+\item[\tt "behavior"?:<string>] behavior name (optional, non-default);
+\item[\tt "smoke":<boolean>] smoke-tests goal
+  (\textbf{warning:} Cf. fields \verb+"verdict"+ and \verb+"passed"+ below);
+\item[\tt "verdict":<string>] prover returned status. Can be \verb+"none"+,
+  \verb+"valid"+, \verb+"failed"+, \verb+"unknown"+, \verb+"stepout"+ or
+  \verb+"timeout"+ (\textbf{warning:} Cf. field \verb+"passed"+ below);
+\item[\tt "passed":<boolean>] is \verb+"true"+ when the prover verdict is valid for non-smoke tests,
+  or when the prover verdict is \textit{not} valid for smoke tests;
+\item[\tt "script"?:<string>] script file, when available (optional);
+\item[\tt "tactics"?:<number>] number of tactics involved in the script (optional);
+\item[\tt "provers":\jsarray{<prover>}] prover detailed output. Each entry of the array is a record
+  that consists of the following fields:
+  \begin{description}
+  \item[\tt "prover":<string>] prover name (with version, see option \texttt{-wp-prover});
+  \item[\tt "time":<number>] prover time, in milliseconds. For \texttt{Qed}
+    prover, includes also the total simplification time for other provers and
+    tactics that contributes to the goal;
+  \item[\tt "success":<number>] number of valid sub-goals the prover contributes to.
+  \end{description}
+\item[\tt "subgoals"?:<number>] number of associated sub-goals (optional, when more than one);
+\item[\tt "proved"?:<number>] number of sub-goals proved (optional, when non-zero);
+\item[\tt "failed"?:<number>] number of sub-goals ending with prover failure or failed smoke-tests
+  (optional, when non-zero);
+\item[\tt "timeout"?:<number>] number of sub-goals ending in timeout or step-out
+  (except for smoke-tests) (optional, when non-zero);
+\item[\tt "unknown"?:<number>] number of sub-goals with unknown verdict
+  (except for smoke-tests) (optional, when non-zero);
+\item[\tt "cached"?:<number>] number of cached sub-goals verdicts
+  (including \texttt{Qed} proved sub-goals) (optional, when non-zero).
+\end{description}
+
+Notice that the JSON report file is printed in compact form without extra space nor indentation,
+unless verbose level is greater than 2 or debug level is greater than 1.
+
+\subsection{Template-based Reports}
 
 Reports are created from user defined wp-report specification files.
 The general format of a wp-report file is as follows:

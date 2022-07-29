@@ -1013,9 +1013,20 @@ module Report =
 let () = Parameter_customize.set_group wp_po
 let () = Parameter_customize.do_not_save ()
 module ReportJson =
+  String(struct
+    let option_name = "-wp-report-json"
+    let arg_name ="file.json"
+    let default = ""
+    let help = "Output proof results in JSON format."
+  end)
+let () = on_reset ReportJson.clear
+
+let () = Parameter_customize.set_group wp_po
+let () = Parameter_customize.do_not_save ()
+module OldReportJson =
   String
     (struct
-      let option_name = "-wp-report-json"
+      let option_name = "-wp-deprecated-report-json"
       let arg_name = "file.json"
       let default = ""
       let help =

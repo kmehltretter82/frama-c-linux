@@ -4,12 +4,12 @@
 [rte:annot] annotating function usable_axiom
 [rte:annot] annotating function usable_lemma
 [wp] 3 goals scheduled
-[wp] [Alt-Ergo] Goal typed_lemma_provable_lemma : Unsuccess
-[wp] [Alt-Ergo] Goal typed_usable_axiom_ensures : Valid
-[wp] [Alt-Ergo] Goal typed_usable_lemma_ensures : Valid
+[wp] [Unsuccess] typed_lemma_provable_lemma (Alt-Ergo) (Cached)
+[wp] [Valid] typed_usable_axiom_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_usable_lemma_ensures (Alt-Ergo) (Cached)
 [wp] Proved goals:    2 / 3
-  Qed:             0 
-  Alt-Ergo:        2  (unsuccess: 1)
+  Alt-Ergo:        2
+  Unsuccess:       1
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Lemma                     -        -        1       0.0%

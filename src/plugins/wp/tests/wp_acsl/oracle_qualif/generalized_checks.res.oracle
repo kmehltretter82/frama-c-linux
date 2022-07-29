@@ -3,30 +3,31 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 21 goals scheduled
-[wp] [Alt-Ergo] Goal typed_check_lemma_C_ko : Unsuccess
-[wp] [Alt-Ergo] Goal typed_lemma_L_ko : Unsuccess
-[wp] [Alt-Ergo] Goal typed_job_ensures_B : Valid
-[wp] [Alt-Ergo] Goal typed_job_check_ensures_CB1 : Valid
-[wp] [Alt-Ergo] Goal typed_job_check_ensures_CB2_ko : Unsuccess
-[wp] [Qed] Goal typed_job_assigns_exit : Valid
-[wp] [Qed] Goal typed_job_assigns_normal_part1 : Valid
-[wp] [Qed] Goal typed_job_assigns_normal_part2 : Valid
-[wp] [Qed] Goal typed_caller_ensures_R : Valid
-[wp] [Alt-Ergo] Goal typed_caller_ensures_R1_ko : Unsuccess
-[wp] [Alt-Ergo] Goal typed_caller_ensures_R2_ko : Unsuccess
-[wp] [Qed] Goal typed_caller_assigns_exit : Valid
-[wp] [Qed] Goal typed_caller_assigns_normal_part1 : Valid
-[wp] [Qed] Goal typed_caller_assigns_normal_part2 : Valid
-[wp] [Qed] Goal typed_caller_call_job_requires_A : Valid
-[wp] [Qed] Goal typed_caller_call_job_check_requires_CA1 : Valid
-[wp] [Alt-Ergo] Goal typed_caller_call_job_check_requires_CA2_ko : Unsuccess
-[wp] [Qed] Goal typed_loop_check_loop_invariant_false_but_preserved_preserved : Valid
-[wp] [Alt-Ergo] Goal typed_loop_check_loop_invariant_false_but_preserved_established : Unsuccess
-[wp] [Alt-Ergo] Goal typed_loop_check_implied_by_false_invariant : Unsuccess
-[wp] [Qed] Goal typed_loop_loop_assigns : Valid
+[wp] [Unsuccess] typed_check_lemma_C_ko (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_lemma_L_ko (Alt-Ergo) (Cached)
+[wp] [Valid] typed_job_ensures_B (Alt-Ergo) (Cached)
+[wp] [Valid] typed_job_check_ensures_CB1 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_job_check_ensures_CB2_ko (Alt-Ergo) (Cached)
+[wp] [Valid] typed_job_assigns_exit (Qed)
+[wp] [Valid] typed_job_assigns_normal_part1 (Qed)
+[wp] [Valid] typed_job_assigns_normal_part2 (Qed)
+[wp] [Valid] typed_caller_ensures_R (Qed)
+[wp] [Unsuccess] typed_caller_ensures_R1_ko (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_caller_ensures_R2_ko (Alt-Ergo) (Cached)
+[wp] [Valid] typed_caller_assigns_exit (Qed)
+[wp] [Valid] typed_caller_assigns_normal_part1 (Qed)
+[wp] [Valid] typed_caller_assigns_normal_part2 (Qed)
+[wp] [Valid] typed_caller_call_job_requires_A (Qed)
+[wp] [Valid] typed_caller_call_job_check_requires_CA1 (Qed)
+[wp] [Unsuccess] typed_caller_call_job_check_requires_CA2_ko (Alt-Ergo) (Cached)
+[wp] [Valid] typed_loop_check_loop_invariant_false_but_preserved_preserved (Qed)
+[wp] [Unsuccess] typed_loop_check_loop_invariant_false_but_preserved_established (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_loop_check_implied_by_false_invariant (Alt-Ergo) (Cached)
+[wp] [Valid] typed_loop_loop_assigns (Qed)
 [wp] Proved goals:   13 / 21
-  Qed:            11 
-  Alt-Ergo:        2  (unsuccess: 8)
+  Qed:            11
+  Alt-Ergo:        2
+  Unsuccess:       8
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
   Axiomatic Th              -        -        2       0.0%

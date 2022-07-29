@@ -29,6 +29,7 @@ type node = {
   goal : Wpo.t ; (* only GoalAnnot of a sequent *)
   parent : node option ;
   mutable script : script ;
+  mutable stats : Stats.stats ;
   mutable search_index : int ;
   mutable search_space : Strategy.t array ; (* sorted by priority *)
 }
@@ -63,7 +64,8 @@ module PROOFS = WpContext.StaticGenerator(Wpo.S)
         }
     end)
 
-let () = Wpo.on_remove PROOFS.remove
+let () = Wpo.add_removed_hook PROOFS.remove
+let () = Wpo.add_cleared_hook PROOFS.clear
 
 let get wpo =
   try
@@ -122,17 +124,10 @@ let set_saved t s = t.saved <- s
 (* -------------------------------------------------------------------------- *)
 
 let rec walk f node =
-  if not (Wpo.is_proved node.goal) then
+  if not (Wpo.is_valid node.goal) then
     match node.script with
     | Tactic (_,children) -> iter_all (walk f) children
     | Opened | Script _ -> f node
-
-let rec witer f node =
-  let proved = Wpo.is_proved node.goal in
-  if proved then f ~proved node else
-    match node.script with
-    | Tactic (_,children) -> iter_all (witer f) children
-    | Opened | Script _ -> f ~proved node
 
 let iteri f tree =
   match tree.root with
@@ -145,36 +140,43 @@ let iteri f tree =
 (* --- Consolidating                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-let proved n = Wpo.is_proved n.goal
+let proved n = Wpo.is_valid n.goal
 
 let pending n =
   let k = ref 0 in
   walk (fun _ -> incr k) n ; !k
 
-let has_pending n =
-  try walk (fun _ -> raise Exit) n ; false
-  with Exit -> true
+let rec consolidate n =
+  let s =
+    if Wpo.is_valid n.goal then
+      Stats.results ~smoke:false (Wpo.get_results n.goal)
+    else
+      match n.script with
+      | Opened | Script _ -> Stats.empty
+      | Tactic(_,children) ->
+        let qed = Wpo.qed_time n.goal in
+        let results = List.map (fun (_,n) -> consolidate n) children in
+        Stats.tactical ~qed results
+  in n.stats <- s ; s
 
-let consolidate root =
-  let result = ref VCS.valid in
-  witer
-    (fun ~proved:_ node ->
-       let rs = List.map snd (Wpo.get_results node.goal) in
-       result := VCS.merge !result (VCS.best rs) ;
-    ) root ;
-  !result
-
-let validate ?(incomplete=false) tree =
+let validate tree =
   match tree.root with
   | None -> ()
   | Some root ->
-    if not (Wpo.is_proved tree.main) then
-      if incomplete then
-        let result = consolidate root in
-        Wpo.set_result tree.main VCS.Tactical result
-      else
-      if not (has_pending root) then
-        Wpo.set_result tree.main VCS.Tactical VCS.valid
+    if not (Wpo.is_valid tree.main) then
+      let stats = consolidate root in
+      Wpo.set_result tree.main Tactical (Stats.script stats)
+
+let consolidated wpo =
+  let smoke = Wpo.is_smoke_test wpo in
+  let prs = Wpo.get_results wpo in
+  try
+    if Wpo.is_smoke_test wpo || not (PROOFS.mem wpo) then raise Not_found ;
+    match PROOFS.get wpo with
+    | { root = Some { stats ; script = Tactic _ } } -> stats
+    | _ -> raise Not_found
+  with Not_found ->
+    Stats.results ~smoke prs
 
 (* -------------------------------------------------------------------------- *)
 (* --- Accessors                                                          --- *)
@@ -185,6 +187,7 @@ let head t = match t.head with
   | None -> t.main
   | Some n -> n.goal
 let goal n = n.goal
+let stats n = n.stats
 let tree_context t = Wpo.get_context t.main
 let node_context n = Wpo.get_context n.goal
 let parent n = n.parent
@@ -217,7 +220,7 @@ type status = [
 let status t : status =
   match t.root with
   | None ->
-    if Wpo.is_proved t.main
+    if Wpo.is_valid t.main
     then if Wpo.is_smoke_test t.main then `Invalid else `Proved
     else if Wpo.is_smoke_test t.main then `Passed else `Unproved
   | Some root ->
@@ -319,6 +322,7 @@ let mk_tree_node ~tree ~anchor goal = {
   tree = tree.main ; goal ;
   parent = Some anchor ;
   script = Opened ;
+  stats = Stats.empty ;
   search_index = 0 ;
   search_space = [| |] ;
 }
@@ -327,6 +331,7 @@ let mk_root_node goal = {
   tree = goal ; goal ;
   parent = None ;
   script = Opened ;
+  stats = Stats.empty ;
   search_index = 0 ;
   search_space = [| |] ;
 }

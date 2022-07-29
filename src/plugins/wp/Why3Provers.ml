@@ -87,14 +87,15 @@ let find_fallback name =
         end
       | _ -> NotFound
 
-let print_why3 = Why3.Whyconf.prover_parseable_format
-let print_wp s =
+let ident_why3 = Why3.Whyconf.prover_parseable_format
+let ident_wp s =
   let name = Why3.Whyconf.prover_parseable_format s in
   let prv = String.split_on_char ',' name in
   String.concat ":" prv
 
-let title p = Format.asprintf "%a" Why3.Whyconf.print_prover p
-let name p = p.Why3.Whyconf.prover_name
+let title ?(version=true) p =
+  if version then Pretty_utils.to_string Why3.Whyconf.print_prover p
+  else p.Why3.Whyconf.prover_name
 let compare = Why3.Whyconf.Prover.compare
 let is_mainstream p = p.Why3.Whyconf.prover_altern = ""
 

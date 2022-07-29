@@ -141,16 +141,16 @@ struct
   let stuck env =
     if not env.signaled then
       begin
-        ProofEngine.validate ~incomplete:true env.tree ;
+        ProofEngine.validate env.tree ;
         env.success (ProofEngine.main env.tree) None ;
         env.signaled <- true ;
       end
 
   let validate ?(finalize=false) env =
-    ProofEngine.validate ~incomplete:true env.tree ;
+    ProofEngine.validate env.tree ;
     if not env.signaled then
       let wpo = ProofEngine.main env.tree in
-      let proved = Wpo.is_proved wpo in
+      let proved = Wpo.is_valid wpo in
       if proved || finalize then
         begin
           env.signaled <- true ;
