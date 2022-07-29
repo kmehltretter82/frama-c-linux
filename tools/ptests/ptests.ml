@@ -1284,9 +1284,12 @@ let pp_command_deps fmt command =
     Fmt.(list (package_as_deps (quote plugin_as_package))) (list_of_deps command.deps.load_plugin)
 
 let show_cmd =
-  let regexp = Str.regexp "%{[a-z]+:\\([^}]+\\)}" in
-  let subst = Str.global_replace regexp "\\1" in
-  subst
+  let regexp_read = Str.regexp "%{read:\\([^}]+\\)}" in
+  let subst_read = Str.global_replace regexp_read "$(cat \\1)" in
+  let regexp_ignore = Str.regexp "%{[a-z]+:\\([^}]+\\)}" in
+  let subst_ignore = Str.global_replace regexp_ignore "\\1" in
+  fun x ->
+    subst_ignore (subst_read x)
 
 let redirection ?reslog ?errlog cmd =
   match reslog, errlog with
