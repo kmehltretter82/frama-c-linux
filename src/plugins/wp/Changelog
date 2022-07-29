@@ -24,6 +24,9 @@
 Plugin WP <next-release>
 ########################
 
+- Cmd         [2022-07-29] Improves the WP JSON report provided by
+                           -wp-report-json
+
 ##########################
 Plugin WP 25.0 (Manganese)
 ##########################
