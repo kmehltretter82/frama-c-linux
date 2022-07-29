@@ -31,6 +31,12 @@ class non_zero_divisor prj = object (self)
   (* A division is an expression: we override the vexpr method *)
   method! vexpr e = match e.enode with
     | BinOp((Div|Mod), _, denom, _) ->
+      (* denom might contain references to variables. Since we haven't visited
+         the node yet, they're bound to the varinfo of the original project.
+         we perform a plain copy, which will just ensure that they are replaced
+         with varinfos of the new project: frama_c_plain_copy is a visitor that
+         performs a copy, using the same correspondance tables as self. *)
+      let denom = Visitor.visitFramacExpr self#frama_c_plain_copy denom in
       let logic_denom = Logic_utils.expr_to_term ~coerce:false denom in
       let assertion = Logic_const.prel (Rneq, logic_denom, Cil.lzero ()) in
       (* At this point, we have built the assertion we want to insert. It remains
