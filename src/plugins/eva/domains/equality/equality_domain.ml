@@ -104,6 +104,7 @@ module Deps = struct
     with Not_found -> (* cannot find [e] in [m] *)
       state
 
+  let import (m, i) = HCEToZone.import m, BaseToHCESet.import i
 end
 
 
@@ -167,7 +168,15 @@ module Internal = struct
     else `Value (e1, d1, z1)
 end
 
-module Store = Domain_builder.Complete (Internal)
+module Store = struct
+  include Domain_builder.Complete (Internal)
+
+  let import (equalities, deps, zone) =
+    let equalities = Equality.Set.import equalities in
+    let deps = Deps.import deps in
+    let zone = Eva_diff.import_zone zone in
+    (equalities, deps, zone)
+end
 
 type t = Internal.t
 let key = Store.key

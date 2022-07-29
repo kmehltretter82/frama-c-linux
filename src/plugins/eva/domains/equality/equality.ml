@@ -95,6 +95,9 @@ module Set = struct
       Equality.union left_eq right_eq,
       HCESet.union left_set right_set,
       HCESet.union left_set' right_set'
+
+    let import (equality, set, set') =
+      Equality.import equality, HCESet.import set, HCESet.import set'
   end
 
   include Hptmap.Make (HCE) (Data)
@@ -418,4 +421,12 @@ module Set = struct
     fold2_join_heterogeneous
       ~cache ~empty_left ~empty_right ~both ~join ~empty
 
+  let import =
+    let cache_name = "Eva.Equality.Set.import" in
+    let f key data =
+      let key = HCE.import key in
+      let data = Data.import data in
+      singleton key data
+    in
+    cached_fold ~cache_name ~temporary:false ~f ~joiner:naive_union ~empty
 end

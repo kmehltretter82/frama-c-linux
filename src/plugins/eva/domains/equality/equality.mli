@@ -146,4 +146,6 @@ module Set : sig
 
   (* Returns the set of lvalues only present in the left tree. *)
   val lvalues_only_left: t -> t -> elt tree
+
+  val import: t -> t
 end
