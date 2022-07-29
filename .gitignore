@@ -24,21 +24,10 @@ frama_c_journal.ml
 
 #build
 /_opam/
-configure
-autom4te.cache
-.log.autoconf
-/.depend
-/config.log
-/config.prefix
-/config.status
 /frama-c*.tar.gz
 /distributed
-/.log.autoconf
-/.Makefile.user
-/ocamlgraph/
-*.check_mli_exists
-.Makefile.plugin.generated
-.ocamldebug
+_build
+*.install
 
 # This file is generated (on need) during configure
 /src/plugins/dune
@@ -214,12 +203,6 @@ Makefile.plugin.generated
 
 /doc/developer/hello.tar.gz
 hello-*.tar.gz
-
-# Dune conversion
-.merlin
-_build
-*.install
-/config.sed
 
 # Nix
 
