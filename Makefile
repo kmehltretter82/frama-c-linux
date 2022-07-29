@@ -24,24 +24,7 @@
 
 MAKECONFIG_DIR=share
 
-include share/Makefile.common
-
-##############################################################################
-# DUNE OPTIONS
-################################
-
-DUNE_BUILD_OPTS?=
-
-RELEASE?=no
-ifeq ($(RELEASE),yes)
-DUNE_BUILD_OPTS+=--release
-endif
-
-# DUNE_DISPLAY: chose Dune build verbosity (see '--display' dune option)
-# Default: progress (same as dune default)
-# Recommend for tests: short
-DUNE_DISPLAY?=progress
-DUNE_BUILD_OPTS+=--display $(DUNE_DISPLAY)
+include $(MAKECONFIG_DIR)/Makefile.common
 
 ##############################################################################
 # PTESTS SRC
