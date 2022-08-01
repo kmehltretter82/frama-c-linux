@@ -32,14 +32,13 @@ SRC	= developer \
 SRC	:= $(addsuffix .tex, $(SRC))
 SRC	+= macros.sty
 
-GENERATED= tutorial/viewcfg/generated \
-	tutorial/hello/generated \
+GENERATED= \
 	examples/generated/callstack.ml \
 	examples/generated/use_callstack.ml \
 	examples/generated/syntactic_check.ml
 DEPENDENCIES= $(FRAMAC_MODERN) $(GENERATED) frama-c-book.cls
 
-.PHONY: all check
+.PHONY: all check check-hello
 
 all: developer.pdf # check << restore check later
 
@@ -47,14 +46,8 @@ all: developer.pdf # check << restore check later
 # FC_BINDIR:=$(FRAMAC_ROOT_SRCDIR)/bin
 # Thus TODO: use `dune exec -- frama-c` for the following commands
 
-.PHONY: clean-tuto
-clean-tuto:
-	$(RM) ../../lib/plugins/META.frama-c-hello ../../lib/plugins/META.frama-c-viewcfg
-	$(RM) ../../lib/plugins/top/Hello.* ../../lib/plugins/top/Viewcfg.*
-
 # local plugin.cmi (if any) is in conflict with the one of Frama-C
-check: $(GENERATED)
-	$(MAKE) clean-tuto
+check: $(GENERATED) check-hello
 	$(ECHO) Checking compilation of example scripts
 	$(FC_BINDIR)/frama-c \
 		-load-script ./examples/syntactic_check \
@@ -86,6 +79,46 @@ check: $(GENERATED)
 	PATH=$(FC_BINDIR):$$PATH; $(MAKE) DEVELOPMENT=no PTESTS_OPTS=-error-code -C tutorial/viewcfg/generated/split opt
 	$(MAKE) clean-tuto
 
+check-hello: check-hello-v1 check-hello-v2 check-hello-v3 check-hello-v4 check-hello-v5 check-hello-v6 check-hello-v7
+
+duneb := dune build --root .
+dunee := dune exec --root .
+
+check-hello-clean:
+	$(ECHO) Cleaning Hello tutorial files...
+	rm -rf tutorial/hello/v*/_build
+	rm -rf tutorial/hello/v*/hello.out
+
+check-hello-v1: check-hello-clean
+	(cd tutorial/hello/v1-* && $(duneb) && $(dunee) -- frama-c && cat hello.out) 2>&1 > checks/hello/v1.res
+	diff checks/hello/v1.res checks/hello/v1.oracle
+
+check-hello-v2: check-hello-clean
+	(cd tutorial/hello/v2-* && $(duneb) && $(dunee) -- frama-c -plugins | grep Hello) 2>&1 > checks/hello/v2.res
+	diff checks/hello/v2.res checks/hello/v2.oracle
+
+check-hello-v3: check-hello-clean
+	(cd tutorial/hello/v3-* && $(duneb) && $(dunee) -- frama-c) 2>&1 > checks/hello/v3.res
+	diff checks/hello/v3.res checks/hello/v3.oracle
+
+check-hello-v4: check-hello-clean
+	(cd tutorial/hello/v4-* && $(duneb) && $(dunee) -- frama-c -hello) 2>&1 > checks/hello/v4.res
+	diff checks/hello/v4.res checks/hello/v4.oracle
+
+check-hello-v5:check-hello-clean
+	(cd tutorial/hello/v5-* && $(duneb) && $(dunee) -- frama-c -hello) 2>&1 > checks/hello/v5.res
+	diff checks/hello/v5.res checks/hello/v5.oracle
+
+check-hello-v6: check-hello-clean
+	(cd tutorial/hello/v6-* && $(duneb) @install && $(duneb) @ptests 2>&1 || true) > checks/hello/v6.res
+	diff checks/hello/v6.res checks/hello/v6.oracle
+
+check-hello-v7: check-hello-clean
+	#redirect the stderr of 'dune build @doc' because of warnings 'Couldn't find ... Frama_c_kernel__Plugin'
+	#checks that a specific generated HTML file exists and contains something related to the source code
+	(cd tutorial/hello/v7-* && $(duneb) @install && ($(duneb) @doc 2>/dev/null) && grep -o "welcome message" _build/default/_doc/_html/frama-c-hello/Hello/Hello_options/index.html) 2>&1 > checks/hello/v7.res
+	diff checks/hello/v7.res checks/hello/v7.oracle
+
 check-all: developer.pdf
 	$(MAKE) -C ../.. check-devguide
 
@@ -98,9 +131,6 @@ install:
 	rm -f ../manuals/plugin-development-guide.pdf
 	cp developer.pdf ../manuals/plugin-development-guide.pdf
 
-tutorial/hello/generated:
-	cd tutorial/hello && make
-
 tutorial/viewcfg/generated:
 	cd tutorial/viewcfg && make
 
@@ -109,11 +139,20 @@ examples/generated/%.ml: examples/%.ml
 	cp $^ $@
 	headache -r $@
 
-archives: tutorial/hello/generated
-	cd tutorial/hello/generated/; \
-	  mv with_doc/ hello-$(VERSION)/; \
-	  tar -zcvf ../../../hello-$(VERSION).tar.gz hello-$(VERSION)/*; \
-	  mv hello-$(VERSION)/ with_doc/
+archives: FILES=$(shell cd tutorial/hello/v7-doc && git ls-files)
+
+# - use 'git ls-files' to avoid including extraneous files in archive
+# - use several tar options to improve build reproducibility
+archives:
+	export VERSION="$(shell cat ../../VERSION)" && \
+	cd tutorial/hello && \
+	rm -rf hello-$$VERSION && \
+	cp -r v7-doc hello-$$VERSION && \
+	tar -cf - $(addprefix hello-$$VERSION/,$(FILES)) \
+	  --numeric-owner --owner=0 --group=0 --sort=name \
+	  --mtime="$$(date +"%F") Z" --mode='a+rw' | \
+	    gzip -9 -n > ../../hello-$$VERSION.tar.gz && \
+	rm -rf hello-$$VERSION
 
 .PHONY: tutorial/hello/generated tutorial/viewcfg/generated
 
