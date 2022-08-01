@@ -43,12 +43,13 @@ stdenv.mkDerivation rec {
   '';
 
   buildPhase = ''
-    make -C doc NO_SUFFIX=yes all
+    make -C doc NO_SUFFIX=yes all version
   '';
 
   installPhase = ''
     mkdir -p $out
     cp ./doc/manuals/*.pdf $out
     cp ./doc/manuals/*.tgz $out
+    cp ./doc/manuals/*.txt $out
   '';
 }

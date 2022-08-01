@@ -149,9 +149,13 @@ all: \
 	manuals/acsl-implementation$(FC_SUFFIX).pdf \
 	manuals/acsl$(ACSL_SUFFIX).pdf \
 
+version: manuals/acsl-version.txt
+
 manuals/acsl-implementation$(FC_SUFFIX).pdf: acsl/acsl-implementation.pdf
 manuals/acsl$(ACSL_SUFFIX).pdf: acsl/acsl.pdf
 
+manuals/acsl-version.txt:
+	echo ${ACSL_VERSION} > $@
 
 ###################
 # E-ACSL          #
@@ -182,11 +186,16 @@ clean::
 all: \
 	manuals/e-acsl-implementation$(FC_SUFFIX).pdf \
 	manuals/e-acsl-manual$(FC_SUFFIX).pdf \
-	manuals/e-acsl$(EACSL_SUFFIX).pdf \
+	manuals/e-acsl$(EACSL_SUFFIX).pdf
+
+version: manuals/e-acsl-version.txt
 
 manuals/e-acsl-implementation$(FC_SUFFIX).pdf: $(EACSL_DOC)/refman/e-acsl-implementation.pdf
 manuals/e-acsl-manual$(FC_SUFFIX).pdf: $(EACSL_DOC)/userman/main.pdf
 manuals/e-acsl$(EACSL_SUFFIX).pdf: $(EACSL_DOC)/refman/e-acsl.pdf
+
+manuals/e-acsl-version.txt:
+	echo ${EACSL_VERSION} > $@
 
 endif
 
