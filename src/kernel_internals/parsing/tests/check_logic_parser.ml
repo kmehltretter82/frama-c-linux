@@ -28,7 +28,30 @@ let tokens = ref Strings.empty
 
 let wildcards = ref Strings.empty
 
-type state = Throw | Wildcard
+type state = Throw | Wildcard | Comment
+
+let remove_comment in_comm s =
+  let b = Buffer.create 5 in
+  let token (in_comm, prev) c =
+    if in_comm then begin
+      match prev, c with
+      | Some '*', '/' -> false, None
+      | _ -> true, Some c
+    end else begin
+      match prev, c with
+      | Some '/', '*' -> true, None
+      | Some c1, c2 ->
+        Buffer.add_char b c1; false, Some c2
+      | _ -> false, Some c
+    end
+  in
+  let (in_comm, last) = Seq.fold_left token (in_comm, None) (String.to_seq s) in
+  if not in_comm then begin
+    match last with
+    | Some c -> Buffer.add_char b c
+    | None -> ()
+  end;
+  in_comm, Buffer.contents b
 
 let is_token_line s = String.length s >= 6 && String.sub s 0 6 = "%token"
 
@@ -52,6 +75,7 @@ let add_tokens s =
 let wildcard_rules =
   [ "bs_keyword"; "wildcard"; "keyword"; "c_keyword";
     "non_logic_keyword"; "acsl_c_keyword"; "is_ext_spec";
+    "is_acsl_typename";
     "is_acsl_spec"; "is_acsl_decl_or_code_annot";
     "is_acsl_other"; "post_cond";
     "identifier_or_typename"
@@ -91,23 +115,41 @@ let add_wildcards s =
   if s <> "" then
     try
       add_wildcard s
-    with Scanf.Scan_failure _ -> ()
+    with Scanf.Scan_failure _ | End_of_file -> ()
 
 let () =
   try
-    let state = ref Throw in
+    let state = Stack.create () in
+    Stack.push Throw state;
     while true do
       let s = input_line file in
+      let in_comm, s = remove_comment (Stack.top state = Comment) s in
+      (* if we exit from comment, return to previous state and analyze line *)
+      if not in_comm && Stack.top state = Comment then begin
+        ignore (Stack.pop state);
+      end;
       if is_token_line s then add_tokens s
-      else if !state = Throw then begin
+      else if Stack.top state = Throw then begin
         if is_wildcard_rule s then begin
-          state:=Wildcard;
-          add_wildcards s
+          Stack.clear state;
+          Stack.push Wildcard state;
+          add_wildcards s;
         end
       end
-      else (* state is Wildcard *)
-      if is_other_rule s then state:=Throw
-      else add_wildcards s
+      else if Stack.top state = Wildcard then begin
+        if is_other_rule s then begin
+          Stack.clear state;
+          Stack.push Throw state;
+        end
+        else begin
+          add_wildcards s;
+        end;
+      end;
+      (* if we have started an unfinished comment,
+         pass in comment mode for the next line. *)
+      if in_comm && Stack.top state <> Comment then begin
+        Stack.push Comment state;
+      end
     done
   with End_of_file -> ()
 

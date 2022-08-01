@@ -1145,7 +1145,13 @@ contract:
 // use that to detect potentially missing ';' at end of clause
 clause_kw:
 | ADMIT_REQUIRES { "admit requires" }
+| ADMIT_INVARIANT { "admit invariant" }
+| ADMIT_LEMMA { "admit lemma" }
+| ADMIT_LOOP { "admit loop" }
 | CHECK_REQUIRES { "check requires" }
+| CHECK_INVARIANT { "check invariant" }
+| CHECK_LEMMA { "check lemma" }
+| CHECK_LOOP { "check loop" }
 | REQUIRES { "requires" }
 | ASSUMES {"assumes"}
 | ASSIGNS { "assigns" }
@@ -1495,6 +1501,8 @@ beg_pragma_or_code_annotation:
 | INVARIANT {}
 | CHECK_INVARIANT {}
 | ADMIT_INVARIANT {}
+| CHECK_LOOP {}
+| ADMIT_LOOP {}
 | EXT_CODE_ANNOT {}
 ;
 
@@ -1871,7 +1879,7 @@ identifier_or_typename: /* allowed as C field names */
 | is_acsl_typename  { $1 }
 | TYPENAME { $1 } /* followed by the same list than 'identifier' */
 | IDENTIFIER { $1 }
-/* token list used inside ascl clauses: */
+/* token list used inside acsl clauses: */
 | BEHAVIORS  { "behaviors" }
 | LABEL      { "label" }
 | READS      { "reads" }
@@ -1880,7 +1888,7 @@ identifier_or_typename: /* allowed as C field names */
 
 identifier: /* part included into 'identifier_or_typename', but duplicated to avoid parsing conflicts */
 | IDENTIFIER { $1 }
-/* token list used inside ascl clauses: */
+/* token list used inside acsl clauses: */
 | BEHAVIORS  { "behaviors" }
 | LABEL      { "label" }
 | READS      { "reads" }
@@ -1975,8 +1983,14 @@ is_acsl_decl_or_code_annot:
 | IMPACT    { "impact" }
 | INDUCTIVE { "inductive" }
 | INVARIANT { "invariant" }
+| ADMIT_INVARIANT { "admit invariant" }
+| CHECK_INVARIANT { "check invariant" }
 | LEMMA     { "lemma" }
+| ADMIT_LEMMA { "admit lemma" }
+| CHECK_LEMMA { "check lemma" }
 | LOOP      { "loop" }
+| ADMIT_LOOP { "admit loop" }
+| CHECK_LOOP { "check loop" }
 | PRAGMA    { "pragma" }
 | PREDICATE { "predicate" }
 | SLICE     { "slice" }
