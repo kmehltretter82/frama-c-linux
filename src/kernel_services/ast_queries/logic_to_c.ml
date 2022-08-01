@@ -64,52 +64,52 @@ let singleton f loc =
     [ l ] -> l
   | _ -> error_lval()
 
-let rec loc_lval_to_lval ~result (lh, lo) =
+let rec loc_lval_to_lval ?result (lh, lo) =
   Extlib.product
     (fun x y -> (x,y))
-    (loc_lhost_to_lhost ~result lh)
-    (loc_offset_to_offset ~result lo)
+    (loc_lhost_to_lhost ?result lh)
+    (loc_offset_to_offset ?result lo)
 
-and loc_lhost_to_lhost ~result = function
+and loc_lhost_to_lhost ?result = function
   | TVar lvar -> [Var (logic_var_to_var lvar)]
-  | TMem lterm -> List.map (fun x -> Mem x) (loc_to_exp ~result lterm)
+  | TMem lterm -> List.map (fun x -> Mem x) (loc_to_exp ?result lterm)
   | TResult _ ->
     ( match result with
         None -> error_lval()
       | Some v -> [Var v])
 
-and loc_offset_to_offset ~result = function
+and loc_offset_to_offset ?result = function
   | TNoOffset -> [NoOffset]
   | TModel _ -> error_lval ()
   | TField (fi, lo) ->
-    List.map (fun x -> Field (fi,x)) (loc_offset_to_offset ~result lo)
+    List.map (fun x -> Field (fi,x)) (loc_offset_to_offset ?result lo)
   | TIndex (lexp, lo) ->
     Extlib.product
       (fun x y -> Index(x,y))
-      (loc_to_exp ~result lexp)
-      (loc_offset_to_offset ~result lo)
+      (loc_to_exp ?result lexp)
+      (loc_offset_to_offset ?result lo)
 
-and loc_to_exp ~result {term_node = lnode ; term_type = ltype; term_loc = loc} =
+and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
   match lnode with
   | TLval lv ->
-    List.map (fun x -> new_exp ~loc (Lval x)) (loc_lval_to_lval ~result lv)
+    List.map (fun x -> new_exp ~loc (Lval x)) (loc_lval_to_lval ?result lv)
   | TAddrOf lv ->
-    List.map (fun x -> new_exp ~loc (AddrOf x)) (loc_lval_to_lval ~result lv)
+    List.map (fun x -> new_exp ~loc (AddrOf x)) (loc_lval_to_lval ?result lv)
   | TStartOf lv ->
-    List.map (fun x -> new_exp ~loc (StartOf x)) (loc_lval_to_lval ~result lv)
+    List.map (fun x -> new_exp ~loc (StartOf x)) (loc_lval_to_lval ?result lv)
   | TSizeOfE lexp ->
-    List.map (fun x -> new_exp ~loc (SizeOfE x)) (loc_to_exp ~result lexp)
+    List.map (fun x -> new_exp ~loc (SizeOfE x)) (loc_to_exp ?result lexp)
   | TAlignOfE lexp ->
-    List.map (fun x -> new_exp ~loc (AlignOfE x)) (loc_to_exp ~result lexp)
+    List.map (fun x -> new_exp ~loc (AlignOfE x)) (loc_to_exp ?result lexp)
   | TUnOp (unop, lexp) ->
     List.map
       (fun x -> new_exp ~loc (UnOp (unop, x, logic_type_to_typ ltype)))
-      (loc_to_exp ~result lexp)
+      (loc_to_exp ?result lexp)
   | TBinOp (binop, lexp1, lexp2) ->
     Extlib.product
       (fun x y -> new_exp ~loc (BinOp (binop, x,y, logic_type_to_typ ltype)))
-      (loc_to_exp ~result lexp1)
-      (loc_to_exp ~result lexp2)
+      (loc_to_exp ?result lexp1)
+      (loc_to_exp ?result lexp2)
   | TSizeOfStr string -> [new_exp ~loc (SizeOfStr string)]
   | TConst constant ->
     (* TODO: Very likely to fail on large integer and incorrect on reals not
@@ -117,32 +117,32 @@ and loc_to_exp ~result {term_node = lnode ; term_type = ltype; term_loc = loc} =
     [new_exp ~loc (Const (Logic_utils.lconstant_to_constant constant))]
   | TCastE (typ, lexp) ->
     List.map
-      (fun x -> new_exp ~loc (CastE (typ, x))) (loc_to_exp ~result lexp)
+      (fun x -> new_exp ~loc (CastE (typ, x))) (loc_to_exp ?result lexp)
   | TAlignOf typ -> [new_exp ~loc (AlignOf typ)]
   | TSizeOf typ -> [new_exp ~loc (SizeOf typ)]
   | Trange (Some low, Some high) ->
-    let low = singleton (loc_to_exp ~result) low in
-    let high = singleton (loc_to_exp ~result) high in
+    let low = singleton (loc_to_exp ?result) low in
+    let high = singleton (loc_to_exp ?result) high in
     range low high
-  | Tunion l -> List.concat (List.map (loc_to_exp ~result) l)
+  | Tunion l -> List.concat (List.map (loc_to_exp ?result) l)
   | Tempty_set -> []
   | Tinter _ | Tcomprehension _ -> error_lval()
   | Tat ({term_node = TAddrOf (TVar _, TNoOffset)} as taddroflval, _) ->
-    loc_to_exp ~result taddroflval
+    loc_to_exp ?result taddroflval
   | TLogic_coerce(Linteger, t) when Logic_typing.is_integral_type t.term_type ->
-    loc_to_exp ~result t
+    loc_to_exp ?result t
   | TLogic_coerce(Lreal, t) when Logic_typing.is_integral_type t.term_type ->
     List.map
       (fun x -> new_exp ~loc (CastE (logic_type_to_typ Lreal, x)))
-      (loc_to_exp ~result t)
+      (loc_to_exp ?result t)
   | TLogic_coerce(Lreal, t) when Logic_typing.is_arithmetic_type t.term_type ->
-    loc_to_exp ~result t
+    loc_to_exp ?result t
   | TLogic_coerce (set, t)
     when
       Logic_const.is_set_type set &&
       Logic_utils.is_same_type
         (Logic_typing.type_of_set_elem set) t.term_type ->
-    loc_to_exp ~result t
+    loc_to_exp ?result t
   | Tnull -> [ Cil.mkCast ~newt:(TPtr(TVoid [], [])) (Cil.zero ~loc) ]
 
   (* additional constructs *)
@@ -157,12 +157,12 @@ and loc_to_exp ~result {term_node = lnode ; term_type = ltype; term_loc = loc} =
   | TLogic_coerce _
     -> error_lval ()
 
-let rec loc_to_lval ~result t =
+let rec loc_to_lval ?result t =
   match t.term_node with
-  | TLval lv -> loc_lval_to_lval ~result lv
-  | TAddrOf lv -> loc_lval_to_lval ~result lv
-  | TStartOf lv -> loc_lval_to_lval ~result lv
-  | Tunion l1 -> List.concat (List.map (loc_to_lval ~result) l1)
+  | TLval lv -> loc_lval_to_lval ?result lv
+  | TAddrOf lv -> loc_lval_to_lval ?result lv
+  | TStartOf lv -> loc_lval_to_lval ?result lv
+  | Tunion l1 -> List.concat (List.map (loc_to_lval ?result) l1)
   | Tempty_set -> []
   (* coercions to arithmetic types cannot be lval. We only have to consider
      a coercion to set here.
@@ -171,7 +171,7 @@ let rec loc_to_lval ~result t =
       Logic_typing.is_set_type set &&
       Logic_utils.is_same_type
         (Logic_typing.type_of_set_elem set) t.term_type ->
-    loc_to_lval ~result t
+    loc_to_lval ?result t
   | Tinter _ -> error_lval() (* TODO *)
   | Tcomprehension _ -> error_lval()
   | TSizeOfE _ | TAlignOfE _ | TUnOp _ | TBinOp _ | TSizeOfStr _
@@ -181,13 +181,13 @@ let rec loc_to_lval ~result t =
   | Ttypeof _ | Ttype _ | Tlet _ | TLogic_coerce _ ->
     error_lval ()
 
-let loc_to_offset ~result loc =
+let loc_to_offset ?result loc =
   let rec aux h =
     function
       TLval(h',o) | TStartOf (h',o) ->
-      (match h with None -> Some h', loc_offset_to_offset ~result o
+      (match h with None -> Some h', loc_offset_to_offset ?result o
                   | Some h when Logic_utils.is_same_lhost h h' ->
-                    Some h, loc_offset_to_offset ~result o
+                    Some h, loc_offset_to_offset ?result o
                   | Some _ -> error_lval()
       )
     | Tat ({ term_node = TLval(TResult _,_)} as lv, BuiltinLabel Post) ->
@@ -206,10 +206,10 @@ let loc_to_offset ~result loc =
       -> error_lval ()
   in snd (aux None loc.term_node)
 
-let term_lval_to_lval ~result = singleton (loc_lval_to_lval ~result)
+let term_lval_to_lval ?result = singleton (loc_lval_to_lval ?result)
 
-let term_to_lval ~result = singleton (loc_to_lval ~result)
+let term_to_lval ?result = singleton (loc_to_lval ?result)
 
-let term_to_exp ~result = singleton (loc_to_exp ~result)
+let term_to_exp ?result = singleton (loc_to_exp ?result)
 
-let term_offset_to_offset ~result = singleton (loc_offset_to_offset ~result)
+let term_offset_to_offset ?result = singleton (loc_offset_to_offset ?result)

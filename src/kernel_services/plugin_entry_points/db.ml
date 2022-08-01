@@ -702,17 +702,19 @@ module Properties = struct
     let term = ref Logic_parse_string.term
     let predicate = ref Logic_parse_string.predicate
 
-    let term_lval_to_lval = ref Logic_to_c.term_lval_to_lval
-    let term_to_exp = ref Logic_to_c.term_to_exp
-    let term_to_lval = ref Logic_to_c.term_to_lval
-    let loc_to_lval = ref Logic_to_c.loc_to_lval
+    let mandatory_result f ~result = f ?result
+    let term_lval_to_lval = ref (mandatory_result Logic_to_c.term_lval_to_lval)
+    let term_to_exp = ref (mandatory_result Logic_to_c.term_to_exp)
+    let term_to_lval = ref (mandatory_result Logic_to_c.term_to_lval)
+    let loc_to_lval = ref (mandatory_result Logic_to_c.loc_to_lval)
     (* loc_to_loc and loc_to_locs are defined in Value/Eval_logic, not
        in Logic_interp *)
     let loc_to_loc = mk_resultfun "Properties.Interp.loc_to_loc"
     let loc_to_loc_under_over = mk_resultfun "Properties.Interp.loc_to_loc_with_deps"
-    let loc_to_offset = ref Logic_to_c.loc_to_offset
-    let loc_to_exp = ref Logic_to_c.loc_to_exp
-    let term_offset_to_offset = ref Logic_to_c.term_offset_to_offset
+    let loc_to_offset = ref (mandatory_result Logic_to_c.loc_to_offset)
+    let loc_to_exp = ref (mandatory_result Logic_to_c.loc_to_exp)
+    let term_offset_to_offset =
+      ref (mandatory_result Logic_to_c.term_offset_to_offset)
 
     module To_zone : sig
       (** The signature of the mli is copy pasted here because of
