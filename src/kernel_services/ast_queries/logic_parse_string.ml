@@ -70,69 +70,67 @@ let find_var kf kinstr ?label var =
 (** Create a logic typer, the interpretation being done for the given
     kernel_function and stmt (the stmt is used check that loop invariants
     are allowed). *)
-(* It is theoretically possible to use a first-class module instead, but the
-   required signatures are not exported in Logic_typing. *)
-module DefaultLT (X:
-                  sig
-                    val kf: Kernel_function.t
-                    val kinstr: Cil_types.kinstr
-                  end) =
-  Logic_typing.Make
-    (struct
-      let anonCompFieldName = Cabs2cil.anonCompFieldName
-      let conditionalConversion = Cabs2cil.logicConditionalConversion
 
-      let is_loop () =
-        match X.kinstr with
-        | Kglobal -> false
-        | Kstmt s -> Kernel_function.stmt_in_loop X.kf s
+let default_typer kf kinstr =
+  let module LT = Logic_typing.Make
+      (struct
+        let anonCompFieldName = Cabs2cil.anonCompFieldName
+        let conditionalConversion = Cabs2cil.logicConditionalConversion
 
-      let find_macro _ = raise Not_found
+        let is_loop () =
+          match kinstr with
+          | Kglobal -> false
+          | Kstmt s -> Kernel_function.stmt_in_loop kf s
 
-      let find_var ?label var = find_var X.kf X.kinstr ?label var
+        let find_macro _ = raise Not_found
 
-      let find_enum_tag x =
-        try
-          Globals.Types.find_enum_tag x
-        with Not_found ->
-          (* The ACSL typer tries to parse a string, first as a variable,
-             then as an enum. We report the "Unbound variable" message
-             here, as it is nicer for the user. However, this short-circuits
-             the later stages of resolution, for example global logic
-             variables. *)
-          raise (Unbound ("Unbound variable " ^ x))
+        let find_var ?label var = find_var kf kinstr ?label var
 
-      let find_comp_field info s =
-        let field = Cil.getCompField info s in
-        Field(field,NoOffset)
+        let find_enum_tag x =
+          try
+            Globals.Types.find_enum_tag x
+          with Not_found ->
+            (* The ACSL typer tries to parse a string, first as a variable,
+               then as an enum. We report the "Unbound variable" message
+               here, as it is nicer for the user. However, this short-circuits
+               the later stages of resolution, for example global logic
+               variables. *)
+            raise (Unbound ("Unbound variable " ^ x))
 
-      let find_type = Globals.Types.find_type
+        let find_comp_field info s =
+          let field = Cil.getCompField info s in
+          Field(field,NoOffset)
 
-      let find_label s = Kernel_function.find_label X.kf s
-      include Logic_env
+        let find_type = Globals.Types.find_type
 
-      let add_logic_function =
-        add_logic_function_gen Logic_utils.is_same_logic_profile
+        let find_label s = Kernel_function.find_label kf s
+        include Logic_env
 
-      let remove_logic_info =
-        remove_logic_info_gen Logic_utils.is_same_logic_profile
+        let add_logic_function =
+          add_logic_function_gen Logic_utils.is_same_logic_profile
 
-      let integral_cast ty t =
-        raise
-          (Failure
-             (Format.asprintf
-                "term %a has type %a, but %a is expected."
-                Printer.pp_term t
-                Printer.pp_logic_type Linteger
-                Printer.pp_typ ty))
+        let remove_logic_info =
+          remove_logic_info_gen Logic_utils.is_same_logic_profile
 
-      let error loc msg =
-        Pretty_utils.ksfprintf (fun e -> raise (Error (loc, e))) msg
+        let integral_cast ty t =
+          raise
+            (Failure
+               (Format.asprintf
+                  "term %a has type %a, but %a is expected."
+                  Printer.pp_term t
+                  Printer.pp_logic_type Linteger
+                  Printer.pp_typ ty))
 
-      let on_error f rollback x =
-        try f x with Error (loc,msg) as exn -> rollback (loc,msg); raise exn
+        let error loc msg =
+          Pretty_utils.ksfprintf (fun e -> raise (Error (loc, e))) msg
 
-    end)
+        let on_error f rollback x =
+          try f x with Error (loc,msg) as exn -> rollback (loc,msg); raise exn
+
+      end)
+  in
+  (module LT : Logic_typing.S)
+
 
 (** Set up the parser for the infamous 'C hack' needed to parse typedefs *)
 let sync_typedefs () =
@@ -148,10 +146,7 @@ let wrap f parsetree loc =
 
 let code_annot kf stmt s =
   sync_typedefs ();
-  let module LT = DefaultLT(struct
-      let kf = kf
-      let kinstr = Kstmt stmt
-    end) in
+  let module LT = (val default_typer kf (Kstmt stmt) : Logic_typing.S) in
   let loc = Stmt.loc stmt in
   let pa =
     Option.bind
@@ -171,10 +166,7 @@ let default_term_env () =
 
 let term kf ?(loc=Location.unknown) ?(env=default_term_env ()) s =
   sync_typedefs ();
-  let module LT = DefaultLT(struct
-      let kf = kf
-      let kinstr = Kglobal
-    end) in
+  let module LT = (val default_typer kf Kglobal : Logic_typing.S) in
   let pa_expr = Option.map snd (Logic_lexer.lexpr (fst loc, s)) in
   let parse pa_expr = LT.term env pa_expr in
   wrap parse pa_expr loc
@@ -186,10 +178,7 @@ let term_lval kf ?(loc=Location.unknown) ?(env=default_term_env ()) s =
 
 let predicate kf ?(loc=Location.unknown) ?(env=default_term_env ()) s =
   sync_typedefs ();
-  let module LT = DefaultLT(struct
-      let kf = kf
-      let kinstr = Kglobal
-    end) in
+  let module LT = (val default_typer kf Kglobal : Logic_typing.S) in
   let pa_expr = Option.map snd (Logic_lexer.lexpr (fst loc, s)) in
   let parse pa_expr = LT.predicate env pa_expr in
   wrap parse pa_expr loc
