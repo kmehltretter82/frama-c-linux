@@ -367,8 +367,6 @@ export interface functionsData {
   stdlib?: boolean;
   /** Is the function a Frama-C builtin? */
   builtin?: boolean;
-  /** Has the function been analyzed by Eva */
-  eva_analyzed?: boolean;
   /** Source location */
   sloc: source;
 }
@@ -384,7 +382,6 @@ export const jFunctionsData: Json.Loose<functionsData> =
     defined: Json.jBoolean,
     stdlib: Json.jBoolean,
     builtin: Json.jBoolean,
-    eva_analyzed: Json.jBoolean,
     sloc: jSourceSafe,
   });
 
@@ -397,7 +394,7 @@ export const byFunctionsData: Compare.Order<functionsData> =
   Compare.byFields
     <{ key: Json.key<'#functions'>, name: string, signature: string,
        main?: boolean, defined?: boolean, stdlib?: boolean,
-       builtin?: boolean, eva_analyzed?: boolean, sloc: source }>({
+       builtin?: boolean, sloc: source }>({
     key: Compare.string,
     name: Compare.alpha,
     signature: Compare.string,
@@ -405,7 +402,6 @@ export const byFunctionsData: Compare.Order<functionsData> =
     defined: Compare.defined(Compare.boolean),
     stdlib: Compare.defined(Compare.boolean),
     builtin: Compare.defined(Compare.boolean),
-    eva_analyzed: Compare.defined(Compare.boolean),
     sloc: bySource,
   });
 

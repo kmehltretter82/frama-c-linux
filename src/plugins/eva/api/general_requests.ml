@@ -71,10 +71,34 @@ let () = Request.register ~package
 
 (* ----- Functions ---------------------------------------------------------- *)
 
-let () =
-  Analysis.register_computation_hook
-    (fun _ -> States.reload Kernel_ast.Functions.array)
+module Functions =
+struct
+  let key kf = Printf.sprintf "kf#%d" (Kernel_function.get_id kf)
 
+  let iter f =
+    Globals.Functions.iter
+      (fun kf ->
+         let name = Kernel_function.get_name kf in
+         if not (Ast_info.is_frama_c_builtin name) then f kf)
+
+  let _array : kernel_function States.array =
+    let model = States.model () in
+
+    States.column model
+      ~name:"eva_analyzed"
+      ~descr:(Markdown.plain "Has the function been analyzed by Eva")
+      ~data:(module Data.Jbool)
+      ~default:false
+      ~get:Results.is_called;
+
+    States.register_array model
+      ~package ~key
+      ~name:"functions"
+      ~descr:(Markdown.plain "AST Functions")
+      ~iter
+      ~add_reload_hook:(fun f ->
+          Analysis.register_computation_hook (fun _ -> f () ))
+end
 
 (* ----- Dead code: unreachable and non-terminating statements -------------- *)
 

@@ -123,6 +123,83 @@ export const getCallers: Server.GetRequest<
   [ Json.key<'#fct'>, Json.key<'#stmt'> ][]
   >= getCallers_internal;
 
+/** Data for array rows [`functions`](#functions)  */
+export interface functionsData {
+  /** Entry identifier. */
+  key: Json.key<'#functions'>;
+  /** Has the function been analyzed by Eva */
+  eva_analyzed?: boolean;
+}
+
+/** Loose decoder for `functionsData` */
+export const jFunctionsData: Json.Loose<functionsData> =
+  Json.jObject({
+    key: Json.jFail(Json.jKey<'#functions'>('#functions'),
+           '#functions expected'),
+    eva_analyzed: Json.jBoolean,
+  });
+
+/** Safe decoder for `functionsData` */
+export const jFunctionsDataSafe: Json.Safe<functionsData> =
+  Json.jFail(jFunctionsData,'FunctionsData expected');
+
+/** Natural order for `functionsData` */
+export const byFunctionsData: Compare.Order<functionsData> =
+  Compare.byFields
+    <{ key: Json.key<'#functions'>, eva_analyzed?: boolean }>({
+    key: Compare.string,
+    eva_analyzed: Compare.defined(Compare.boolean),
+  });
+
+/** Signal for array [`functions`](#functions)  */
+export const signalFunctions: Server.Signal = {
+  name: 'plugins.eva.general.signalFunctions',
+};
+
+const reloadFunctions_internal: Server.GetRequest<null,null> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.reloadFunctions',
+  input:  Json.jNull,
+  output: Json.jNull,
+  signals: [],
+};
+/** Force full reload for array [`functions`](#functions)  */
+export const reloadFunctions: Server.GetRequest<null,null>= reloadFunctions_internal;
+
+const fetchFunctions_internal: Server.GetRequest<
+  number,
+  { pending: number, updated: functionsData[],
+    removed: Json.key<'#functions'>[], reload: boolean }
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.fetchFunctions',
+  input:  Json.jNumber,
+  output: Json.jObject({
+            pending: Json.jFail(Json.jNumber,'Number expected'),
+            updated: Json.jList(jFunctionsData),
+            removed: Json.jList(Json.jKey<'#functions'>('#functions')),
+            reload: Json.jFail(Json.jBoolean,'Boolean expected'),
+          }),
+  signals: [],
+};
+/** Data fetcher for array [`functions`](#functions)  */
+export const fetchFunctions: Server.GetRequest<
+  number,
+  { pending: number, updated: functionsData[],
+    removed: Json.key<'#functions'>[], reload: boolean }
+  >= fetchFunctions_internal;
+
+const functions_internal: State.Array<Json.key<'#functions'>,functionsData> = {
+  name: 'plugins.eva.general.functions',
+  getkey: ((d:functionsData) => d.key),
+  signal: signalFunctions,
+  fetch: fetchFunctions,
+  reload: reloadFunctions,
+  order: byFunctionsData,
+};
+/** AST Functions */
+export const functions: State.Array<Json.key<'#functions'>,functionsData> = functions_internal;
+
 /** Unreachable and non terminating statements. */
 export interface deadCode {
   /** List of unreachable statements. */

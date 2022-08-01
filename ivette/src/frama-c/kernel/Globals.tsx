@@ -31,10 +31,12 @@ import { alpha } from 'dome/data/compare';
 import { Section, Item } from 'dome/frame/sidebars';
 import { Button } from 'dome/controls/buttons';
 import * as Toolbars from 'dome/frame/toolbars';
+import * as ArrayUtils from 'dome/data/arrays';
 
 import * as States from 'frama-c/states';
-import { functions, functionsData } from 'frama-c/kernel/api/ast';
+import * as Kernel from 'frama-c/kernel/api/ast';
 import { computationState } from 'frama-c/plugins/eva/api/general';
+import * as Eva from 'frama-c/plugins/eva/api/general';
 
 // --------------------------------------------------------------------------
 // --- Global Search Hints
@@ -51,7 +53,7 @@ function makeFunctionHint(fct: functionsData): Toolbars.Hint {
 
 async function lookupGlobals(pattern: string): Promise<Toolbars.Hint[]> {
   const lookup = pattern.toLowerCase();
-  const fcts = States.getSyncArray(functions).getArray();
+  const fcts = States.getSyncArray(Kernel.functions).getArray();
   return fcts.filter((fn) => (
     0 <= fn.name.toLowerCase().indexOf(lookup)
   )).map(makeFunctionHint);
@@ -96,13 +98,18 @@ function FctItem(props: FctItemProps): JSX.Element {
 // --- Globals Section(s)
 // --------------------------------------------------------------------------
 
+type functionsData =
+  Kernel.functionsData | (Kernel.functionsData & Eva.functionsData)
+
 export default function Globals(): JSX.Element {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
-  const fcts = States.useSyncArray(functions).getArray().sort(
+  const kernelFcts = States.useSyncArray(Kernel.functions).getArray().sort(
     (f, g) => alpha(f.name, g.name),
   );
+  const evaFcts = States.useSyncArray(Eva.functions).getArray();
+  const fcts = ArrayUtils.mergeArraysByKey(kernelFcts, evaFcts);
   const { useFlipSettings } = Dome;
   const [stdlib, flipStdlib] =
     useFlipSettings('ivette.globals.stdlib', false);
@@ -132,7 +139,8 @@ export default function Globals(): JSX.Element {
       (stdlib || !fct.stdlib)
       && (builtin || !fct.builtin)
       && (undef || fct.defined)
-      && (!evaOnly || !evaComputed || (fct.eva_analyzed === true))
+      && (!evaOnly || !evaComputed ||
+        ('eva_analyzed' in fct && fct.eva_analyzed === true))
       && (!selected || !multipleSelectionActive || isSelected(fct));
     return visible || (!!current && fct.name === current);
   }

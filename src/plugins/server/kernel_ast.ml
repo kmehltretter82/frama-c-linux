@@ -508,9 +508,6 @@ struct
     let vi = Kernel_function.get_vi kf in
     Cil.is_in_libc vi.vattr
 
-  let is_eva_analyzed kf =
-    if Db.Value.is_computed () then !Db.Value.is_called kf else false
-
   let iter f =
     Globals.Functions.iter
       (fun kf ->
@@ -554,12 +551,6 @@ struct
         ~data:(module Data.Jbool)
         ~default:false
         ~get:is_builtin;
-      States.column model
-        ~name:"eva_analyzed"
-        ~descr:(Md.plain "Has the function been analyzed by Eva")
-        ~data:(module Data.Jbool)
-        ~default:false
-        ~get:is_eva_analyzed;
       States.column model
         ~name:"sloc"
         ~descr:(Md.plain "Source location")
