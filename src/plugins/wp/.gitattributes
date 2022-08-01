@@ -24,6 +24,9 @@ MakeDoc header_spec=CEA_WP
 # HEADER_SPEC: others #
 #######################
 
+# If these files are removed, do not forget to remove corresponding header
+# files in 'headers' since they are only used here.
+
 /doc/coqdoc/coq2tex/*.mll header_spec=XL_COMPCERT
 
 /share/coqwp/BuiltIn.v header_spec=UNMODIFIED_WHY3
