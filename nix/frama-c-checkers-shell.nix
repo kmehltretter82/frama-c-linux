@@ -3,6 +3,7 @@
 , clang_10
 , frama-c-hdrck
 , git
+, git-lfs
 , gnumake
 , headache
 , ocp-indent
@@ -13,6 +14,7 @@ stdenv.mkDerivation rec {
     clang_10
     frama-c-hdrck
     git
+    git-lfs
     gnumake
     headache
     ocp-indent
