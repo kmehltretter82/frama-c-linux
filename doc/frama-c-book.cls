@@ -335,8 +335,8 @@ morekeywords={include},%
   {language={[ANSI]C},alsolanguage=ACSL,style=framac-code-style,basicstyle=\lp@basic}
 \lstnewenvironment{ccode}[1][]%
 {\lstset{language={[ANSI]C},alsolanguage=ACSL,style=framac-code-style,basicstyle=\lp@basic,#1}}{}
-\newcommand{\cinput}[1]%
-{\lstinputlisting[language={[ANSI]C},alsolanguage=ACSL,style=framac-code-style,basicstyle=\lp@basic]{#1}}
+\newcommand{\cinput}[2][]%
+{\lstinputlisting[language={[ANSI]C},alsolanguage=ACSL,style=framac-code-style,basicstyle=\lp@basic,#1]{#2}}
 \newcommand{\cinline}[1]%
 {\lstinline[style=framac-code]{#1}}
 % --- Ocaml ----------------------------------------------------------------

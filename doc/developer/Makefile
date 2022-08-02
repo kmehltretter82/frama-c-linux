@@ -154,6 +154,15 @@ install:
 	rm -f ../manuals/plugin-development-guide.pdf
 	cp developer.pdf ../manuals/plugin-development-guide.pdf
 
+viewcfg: viewcfg-clean viewcfg-v1
+
+viewcfg-clean:
+	$(ECHO) Cleaning ViewCfg files...
+	rm -rf tutorial/viewcfg/v*/_build
+
+viewcfg-v1:
+	cd tutorial/viewcfg/v1 && $(duneb) @install && $(duneb) @ptests
+
 tutorial/viewcfg/generated:
 	cd tutorial/viewcfg && make
 

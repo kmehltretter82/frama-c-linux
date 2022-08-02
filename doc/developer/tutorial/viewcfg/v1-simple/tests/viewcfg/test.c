@@ -1,8 +1,11 @@
+/* run.config
+   LOG: cfg.dot
+   OPT:
+ */
 void f(int g)
 {
   g++;
   g--;
-  
 }
 
 int main(int argc, char **argv)
@@ -17,6 +20,5 @@ int main(int argc, char **argv)
     {
       f(3);
     }
-  
   return 0;
 }

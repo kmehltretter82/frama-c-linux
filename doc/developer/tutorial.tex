@@ -212,7 +212,8 @@ afterwards. In case of success, there will be no visible output at the end.
   so make sure that your Hello directory is not inside another one containing
   a Dune project (\eg if you are running this directly from the \framac source
   archive), otherwise \verb|dune build| may fail. You can always add option
-  ``\verb|--root .|'' to force Dune to ignore parent directories.
+  ``\verb|--root .|'', or create an empty \texttt{dune-workspace} file in
+  the current directory to force Dune to ignore parent directories.
 \end{important}
 
 Note a few details about the naming conventions:
@@ -784,9 +785,8 @@ In this section, we create a new ViewCfg plug-in that computes the control
 flow graph of a function and outputs it in the \dottool format. Through its
 implementation, we explain some of \framac APIs such as how to visit
 an AST\footnote{Abstract Syntax Tree}, how to hook a plug-in, how to interface
-a plug-in with other plug-ins, how to extend the
-GUI\footnote{Graphical User Interface}, how to make a plug-in usable by
-others, and how to make a plug-in usable in a multi-project setting.
+a plug-in with other plug-ins, and how to make a plug-in usable in a
+multi-project setting (which also allows it to save/load data).
 
 This section assumes the reader is already familiar with the basics of plug-ins
 for \framac as covered by the Hello plug-in in the previous
@@ -815,7 +815,7 @@ suitable for us, as it will recursively print substatements of compound
 statements (blocks, if, while, ...), while we only want to pretty-print
 the node representing the current statement: substatements will be represented
 by other nodes. Thus we will use the following small function:
-\ocamlinput[firstline=29,lastline=43]{./tutorial/viewcfg/v1/view_cfg.ml}
+\ocamlinput[linerange={7-21}]{./tutorial/viewcfg/v1-simple/view_cfg.ml}
 \sscodeidx{Cil\_types}{stmtkind}{Instr}
 \sscodeidx{Cil\_types}{stmtkind}{Return}
 \sscodeidx{Cil\_types}{stmtkind}{Goto}
@@ -852,7 +852,7 @@ children. By inheriting from the visitor, and redefining some of the
 methods, one can perform actions on selected parts of the AST, without
 the need to traverse the AST explicitly.
 
-\ocamlinput[firstline=45,lastline=46]{./tutorial/viewcfg/v1/view_cfg.ml}
+\ocamlinput[linerange={23-24}]{./tutorial/viewcfg/v1-simple/view_cfg.ml}
 \scodeidx{Visitor}{frama\_c\_inplace}
 
 Here we used the so-called ``in place'' visitor, which should be used for
@@ -866,7 +866,7 @@ at the file level, we create the whole graph structure.
 %in the code below, the fancy 'at'-terms such as ``\texttt{@[<hov 2>}'' are
 %  related to OCaml's Format module, and can be ignored for now.}.
 
-\ocamlinput[firstline=48,lastline=50]{./tutorial/viewcfg/v1/view_cfg.ml}
+\ocamlinput[linerange={26-28}]{./tutorial/viewcfg/v1-simple/view_cfg.ml}
 \sscodeidx{Cil}{visitAction}{DoChildrenPost}
 \sscodeidx{Cil}{cilVisitor}{vfile}
 
@@ -880,7 +880,7 @@ in the file.
 Then, for each function, we encapsulate the CFG in a subgraph, and do
 nothing for the other globals.
 
-\ocamlinput[firstline=52,lastline=58]{./tutorial/viewcfg/v1/view_cfg.ml}
+\ocamlinput[linerange={30-36}]{./tutorial/viewcfg/v1-simple/view_cfg.ml}
 \sscodeidx{Cil}{visitAction}{DoChildrenPost}
 \sscodeidx{Cil}{visitAction}{SkipChildren}
 \sscodeidx{Visitor}{frama\_c\_visitor}{vglob\_aux}
@@ -895,7 +895,7 @@ should have been used instead.}.
 Last, for each statement, we create a node in the graph, and create
 the edges toward its successors:
 
-\ocamlinput[firstline=60,lastline=65]{./tutorial/viewcfg/v1/view_cfg.ml}
+\ocamlinput[linerange={38-43}]{./tutorial/viewcfg/v1-simple/view_cfg.ml}
 \sscodeidx{Cil}{visitAction}{DoChildren}
 \sscodeidx{Visitor}{frama\_c\_visitor}{vstmt\_aux}
 
@@ -905,7 +905,7 @@ cannot contain other statements, like \texttt{Instr}, and avoid
 visiting the expressions.
 
 Finally, we close the \texttt{object} definition:
-\ocamlinput[firstline=67,lastline=67]{./tutorial/viewcfg/v1/view_cfg.ml}
+\ocamlinput[linerange={45-45}]{./tutorial/viewcfg/v1-simple/view_cfg.ml}
 
 \subsubsection*{Hooking into \framac}
 
@@ -916,7 +916,7 @@ will not have had the time to parse the sources and produce its AST
 (used by \verb|Ast.get ()|). For more details about initialization issues,
 see Section~\ref{adv:init}.
 
-\ocamlinput[firstline=69,lastline=75]{./tutorial/viewcfg/v1/view_cfg.ml}
+\ocamlinput[linerange={47-53}]{./tutorial/viewcfg/v1-simple/view_cfg.ml}
 
 Now, since \framac uses Dune, this code needs to be integrated as a Dune
 project, as has been done in the Hello tutorial. We need to create a new
@@ -925,10 +925,10 @@ file. We will then add the corresponding \texttt{dune} and
 \texttt{dune-project} files:
 
 \listingname{dune}
-\duneinput[linerange={23-999}]{./tutorial/viewcfg/v1/dune}
+\duneinput{./tutorial/viewcfg/v1-simple/dune}
 
 \listingname{dune-project}
-\duneinput[linerange={1-1,24-999}]{./tutorial/viewcfg/v1/dune-project}
+\duneinput{./tutorial/viewcfg/v1-simple/dune-project}
 
 Finally, we need an (empty) interface file, called \texttt{ViewCfg.ml}, in
 the same directory.
@@ -948,7 +948,7 @@ And run it as a \framac plugin:
 And the graph can be visualized with an external tool, such as {\em dotty} or
 {\em xdot}.
 \begin{shell}
-  dotty cfg.out
+  dotty cfg.dot
 \end{shell}
 
 This produces a graph like in Figure~\ref{fig:tut:basiccfg}
@@ -957,7 +957,7 @@ This produces a graph like in Figure~\ref{fig:tut:basiccfg}
   \centering
   \begin{minipage}[h]{0.45\linewidth}
   \listingname{test.c}
-  \cinput{./tutorial/viewcfg/tests/test.c}
+  \cinput[linerange={5-999}]{./tutorial/viewcfg/v1-simple/tests/viewcfg/test.c}
   \end{minipage}%
   \begin{minipage}[h]{0.4\linewidth}
     \includegraphics[width=\textwidth]{./tutorial/viewcfg/pdfs/cfg.pdf}
@@ -995,9 +995,9 @@ for our plug-in.
 We have already seen how to register options in the previous ``Hello'' tutorial.
 We now apply these principles to the ViewCfg plug-in.
 
-\ocamlinput{./tutorial/viewcfg/src/register_and_options.ml}
+\ocamlinput[linerange={9-26}]{./tutorial/viewcfg/v2-options/view_cfg.ml}
 \scodeidx{Plugin}{Register}
-\ocamlinput{./tutorial/viewcfg/src/extend_with_run_with_options.ml}
+\ocamlinput[linerange={66-74}]{./tutorial/viewcfg/v2-options/view_cfg.ml}
 \scodeidx{Visitor}{visitFramacFileSameGlobals}
 \scodeidx{Ast}{get}
 
@@ -1025,44 +1025,62 @@ section~\ref{adv:project} of this manual should help you understand the
 underlying notion of states).
 
 With these command-line options, we can properly interface our ViewCfg plug-in
-with the \texttt{value} plug-in.
+with the \texttt{eva} plug-in.
 
-\subsection{Interfacing with a kernel-integrated plug-in}
+\subsection{Interfacing with other plug-ins}
 
-Kernel-integrated plug-ins, such as \texttt{value}, use a special mechanism
-to statically register their APIs for other plug-ins that wish to access them.
-This mechanism is the \texttt{Db} module of the \framac kernel,
-the entry point for all kernel-integrated plug-ins. By using the functions
-exported through the \texttt{Db.Value} module, our plug-in will obtain
-reachability information computed by \texttt{value}.
+Plug-ins can use functions specified in the public interfaces of other
+plug-ins, as long as they are declared as dependencies. To do so, you only
+need to add them to the \texttt{libraries} stanza\footnote{A stanza is,
+roughly speaking, a ``term'' in \texttt{dune} parlance: a parenthesized
+expression.} in the \texttt{dune} file.
+We will use a function from the \textsf{Eva} plug-in in our example,
+so we will add \texttt{frama-c-eva.core} to the \texttt{dune} file:
 
+\duneinput[linerange={5-5}]{./tutorial/viewcfg/v3-eva/dune-project}
+
+Now our plug-in can call all functions and access all types declared in
+\textsf{Eva}'s public interface.
+
+For historical reasons, several kernel-integrated plug-ins, such as
+\textsf{From}, \textsf{InOut} and \textsf{Slicing}, had their API exposed
+via the \texttt{Db} module of the \framac kernel. This has been deprecated
+for \textsf{Eva}, and newer plug-ins expose their public interface directly.
+
+In our example, we will use \textsf{Eva}'s new API to obtain reachability
+information computed by the value analysis.
 The code modification we propose is to color in pink the nodes guaranteed to
 be unreachable by the value analysis. For this purpose, we change the
 \texttt{vstmt\_aux} method in the visitor:
 
-\ocamlinput{./tutorial/viewcfg/src/print_cfg_vstmt_aux_value.ml}
-\sscodeidx{Db}{Value}{is\_computed}
-\sscodeidx{Db}{Value}{get\_stmt\_state}
-\sscodeidx{Db}{Value}{is\_reachable}
+\ocamlinput[linerange={57-70}]{./tutorial/viewcfg/v3-eva/view_cfg.ml}
+\sscodeidx{Eva}{Analysis}{is\_computed}
+\sscodeidx{Eva}{Results}{is\_reachable}
 \sscodeidx{Cil}{visitAction}{DoChildren}
 \sscodeidx{Visitor}{frama\_c\_visitor}{vstmt\_aux}
 
 This code fills the nodes with green if the node may be
 reachable, and in pink if the node is guaranteed not to be
-reachable; but only if the value analysis was previously computed. 
+reachable; but only if the value analysis was previously computed.
 
-To test this code, frama-c should be launched with:
+To test this code, we recompile the plug-in with the modified \texttt{dune}
+file to take into account the dependency on \textsf{Eva}, as well as the
+modified \texttt{vstmt\_aux}. We run \verb|dune build @install| and then
+we run \textsf{Eva}, and then our plug-in:
 \begin{shell}
-  frama-c test.c -load-script cfg_print.ml -val -then -cfg && dotty cfg.out
+  dune exec -- frama-c test.c -eva -then -cfg && dotty cfg.dot
 \end{shell}
 
-Note that the relative order of the parameters \texttt{-load-script} and
-\texttt{-val} in this example is not relevant
-(see Section~\ref{adv:init} for details).
-However, it is important to ensure that \texttt{-cfg} is separated from
-\texttt{-val} by a \texttt{-then}; otherwise, it is not guaranteed that
-the \texttt{value} plug-in will run before the ViewCfg plug-in, which might
-lead to a non-colored graph in some cases, and colored in others.
+The relative order of most options and file names is not important
+{\em between} occurrences of \texttt{-then}, but it {\em is} important
+whether they are before or after \texttt{-then}-related options
+(\texttt{-then}, \texttt{-then-on}, \texttt{-then-last});
+see Section~\ref{adv:init} for details. Here, we want to ensure that
+\textsf{Eva} is run {\em before} our plug-in, so we order it as
+\verb|-eva -then -cfg|. Without \texttt{-then}, even if \texttt{-eva}
+is before \texttt{-cfg} in the command line, it is {\em not} guaranteed
+that it will run before; options in the same ``block'' can be thought of as
+{\em concurrent}: there is no specified order between them.
 
 The resulting graph is shown in Figure~\ref{fig:tut:coloredcfg}.
 
@@ -1070,7 +1088,7 @@ The resulting graph is shown in Figure~\ref{fig:tut:coloredcfg}.
   \centering
   \begin{minipage}[h]{0.45\linewidth}
   \listingname{test.c}
-  \cinput{./tutorial/viewcfg/tests/test.c}
+  \cinput[linerange={5-999}]{./tutorial/viewcfg/v3-eva/tests/viewcfg/test.c}
   \end{minipage}%
   \begin{minipage}[h]{0.4\linewidth}
     \includegraphics[width=\textwidth]{./tutorial/viewcfg/pdfs/cfg_colored.pdf}
@@ -1079,168 +1097,124 @@ The resulting graph is shown in Figure~\ref{fig:tut:coloredcfg}.
   \label{fig:tut:coloredcfg}
 \end{figure}
 
-\subsection{Extending the Frama-C GUI}
-\label{tut2:gui}
-\index{Plug-in!GUI}
+\subsection{Splitting files and providing a mini-GUI for testing}
+\label{tut2:split-and-gui}
 
-In this section, we will extend our plug-in so that the control flow
-graph can be displayed interactively. For that, we will extend the \framac GUI
-so that when you right-click on a function in the code, a new ``Show
-CFG'' item appears, that displays the control flow graph of the
-function in a dialog box. This is achieved just by appending the following
-pieces of code at the end of the \texttt{cfg\_print.ml} file.
+Our plug-in is starting to amass enough code that we should envisage to split
+it into several modules, for better organizing it. Dune automatically compiles
+all source files it finds, unless specified otherwise, and it handles
+dependencies between them, so it is essentially free to do so. As we did in the
+{\em Hello} tutorial, we will split our \verb|view_cfg.ml| file into smaller
+modules.
 
-\begin{important}
-Frama-C's GUI can be compiled against two versions of lablgtk (the OCaml
-bindings to the Gtk toolkit). The actual rendering of the control flow graph
-is actually done by the external OCamlgraph library, and only available
-when compiling against lablgtk2. If you're using lablgtk3,
-you will only see a pop-up window indicating that there's no support for
-displaying graphs.
-\end{important}
+We will create the following files:
 
-Currently, we used a visitor that outputs a \dottool file with the CFG of
-all functions of all files. We use \texttt{dump\_function} to output
-the CFG of a single function instead.
+\begin{description}
+\item[options.ml]: will contain the module registration (\verb|Self|) and
+  command-line options (\verb|Enabled| and \verb|OutputFile|);
+\item[visit.ml]: will contain the \verb|print_stmt| function and the visitor;
+\item[run.ml]: will contain the definition of function \verb|run| and the
+  call to \verb|Db.Main.extend|.
+\end{description}
 
-\ocamlinput{./tutorial/viewcfg/src/dump_function.ml}
+Note that a few changes are needed to the code: functions from other files
+need to include that file name as module, \eg
+\verb|Enabled.get| becomes \verb|Options.Enabled.get|.
 
-We reused the \texttt{print\_cfg} visitor, but we selected a different
-starting point. The argument \texttt{fundec} gets type
-\texttt{Cil\_types.fundec}\scodeidx{Cil\_types}{fundec}, which is the CIL type
-representing a function definition.
+For simplicity's sake, we will remove options \verb|-cfg| and \verb|-cfg-output|
+and replace them with a single boolean option, \verb|-cfg-gui|, to launch the
+GUI (this prevents unsuitable combinations of \verb|-cfg| and \verb|-cfg-gui|).
+The new option is defined as below:
 
-Now we write the GUI extension code:
+\ocamlinput[linerange={7-11}]{./tutorial/viewcfg/v4-bogue/options.ml}
 
-\ocamlinput{./tutorial/viewcfg/src/gui.ml}
-\sscodeidx{Pretty\_source}{localizable}{PVDecl}
-\sscodeidx{Globals}{Functions}{get}
+And the \verb|run| function in \verb|run.ml| becomes simply:
+
+\ocamlinput[linerange={1-3}]{./tutorial/viewcfg/v4-bogue/run.ml}
+
+We can now erase \verb|view_cfg.ml| and re-run \verb|dune build @install| to
+compile the plug-in.
+
+\subsubsection{Mini-GUI for testing}
+
+Extending \framac's Ivette graphical user interface is a task too large for
+this tutorial; Ivette being a desktop Electron application, written in
+TypeScript and using React, there is a substantial amount of explaining to
+do before one can show how to integrate a \framac plug-in in it.
+
+Instead, for this tutorial, we will use a lightweight OCaml GUI library,
+BOGUE\footnote{\url{http://sanette.github.io/bogue/Principles.html}}.
+You can install it through opam:
+
+\begin{shell}
+\$ opam install bogue
+\end{shell}
+
+It is based on SDL2, which means you may need to install non-OCaml
+dependencies\footnote{With opam $< 2.1$, you may need to install and
+run \texttt{depext}. With opam $\geq 2.1$, depext is already included.}.
+
+Since we will be using BOGUE in our plug-in, we need to declare it in the
+\texttt{dune} file:
+
+\duneinput[linerange={5-5}]{./tutorial/viewcfg/v4-bogue/dune}
+
+We also need a way to print an individual function as a standalone graph,
+without having to call the file visitor (\verb|Visit.vfile|). We will call
+it \verb|dump_function| and put it in a separate file, \verb|dump.ml|:
+
+\listingname{./dump.ml}
+\ocamlinput{./tutorial/viewcfg/v4-bogue/dump.ml}
+\scodeidx{Visitor}{visitFramacFunction}
+
+The code prints a feedback message, then the header, calls the visitor,
+and prints the footer. This function will be called by our ``mini-GUI'',
+and the output will be sent to \texttt{dotty}, which will open a window
+with our graph.
+
+The actual GUI code is put inside a file appropriately named \texttt{gui.ml}:
+
+\listingname{./gui.ml}
+\ocamlinput{./tutorial/viewcfg/v4-bogue/gui.ml}
+\sscodeidx{Globals}{Functions}{find\_by\_name}
 \scodeidx{Kernel\_function}{get\_definition}
-\scodeidx{Dgraph\_helper}{graph\_window}
-\scodeidx{Design}{register\_extension}
-\sscodeidx{Design}{main\_window\_extension\_points}{register\_source\_selector}
 
-Let us explain this code from the end. \texttt{Design.register\_extension} is
-the entry point for extending the GUI. Its argument is a function which takes as
-argument an object corresponding to the main window of the \framac GUI. This
-object provides access to the main widgets of the window, and several
-extension points.
-
-Here we have implemented a single extension, the ``source selector'',
-that allows to add entries to menu obtained when right-clicking on the
-source. This is implemented by the \texttt{cfg\_selector} function.
-
-This function takes a \texttt{localizable} argument, which gives information on
-where the user clicks on the source. Here we do something only if the user
-clicks on the declaration of a variable whose type is a function (\ie when the
-user clicked on a function declaration or definition).  In that case, we add an
-item to the popup menu, that calls the \texttt{callback} function if
-clicked. The \texttt{callback} function calls a \framac GUI function that
-displays a graph from \dottool printing functions. It uses several important \framac
-APIs: \texttt{Globals} and \texttt{Kernel\_function}, which contain several
-functions for manipulating globals and functions.
-
-Note that this GUI extension could also have been done through a script
-(instead of a plug-in), but it would have been less than ideal.
-In particular, the GUI \ocaml modules are available only when a script
-is loaded with \texttt{frama-c-gui}, and not when loaded with
-\texttt{frama-c}. When the user wants to view the CFG from the GUI,
-outputting the CFG of all functions in \texttt{cfg.out} is useless.
-A better architectural solution is to split our plug-in in several files,
-with its own Makefile, to better manage its functionalities.
-
-\subsection{Splitting files and writing a Makefile}\label{tut2:makefile}
-\index{Plug-in!Makefile}
-
-The \framac plug-in development environment allows to split GUI-related
-and non-GUI related modules, so that GUI-related modules are loaded
-and run only if \framac is executed with \texttt{frama-c-gui}. This
-requires splitting the module into several files. We choose the
-following architecture:
-
-\begin{itemize}
-\item \texttt{cfg\_options.ml} implements plug-in registration and
-  configuration options;
-\item \texttt{cfg\_core.ml} implements the main functions for
-  computing the CFG;
-\item \texttt{cfg\_register.ml} implements ``global'' computation of
-  the CFG using the \texttt{-cfg} option, and hooking into the \framac
-  main loop;
-\item \texttt{cfg\_gui.ml} implements GUI registration.
-\end{itemize}
-
-Dependencies between the modules\footnote{This graphic is generated in
-  file \texttt{doc/code/modules.dot} after running \texttt{make doc}.}
-is presented on Figure \ref{fig:tut:cfgarchitecture}.
+Most of the code is boilerplate for Bogue. The only \framac-related part is
+the checking of the function name: \verb|Globals.Functions.find_by_name| raises
+exception \verb|Not_found| if the name input by the user does not exist. But
+even if it does, since we need a function {\em definition}, we must check that
+it is not simply {\em declared}. Besides that, we simply call
+\verb|dump_function|. Figure~\ref{fig:tut:bogue} shows what this mini-GUI looks
+like.
 
 \begin{figure}[htbp]
   \centering
-    \includegraphics[width=0.5\textwidth]{./tutorial/viewcfg/pdfs/modules.pdf}
-  \caption{CFG plug-in architecture}
-  \label{fig:tut:cfgarchitecture}
+  \includegraphics[width=0.35\textwidth]{./tutorial/viewcfg/pdfs/bogue.pdf}
+  \caption{Mini-GUI with Bogue for testing our plug-in.}
+  \label{fig:tut:bogue}
 \end{figure}
 
-To break recursive dependencies between \ocaml modules, it is typical
-that plug-in registration is done at the bottom of the module
-hierarchy, while definition of the \texttt{run} function is at the
-top. The GUI is also at the top of the hierarchy: the \framac
-\texttt{Makefile} requires that normal plug-in modules do not depend on
-GUI modules. Note that currently, the dependency from
-\texttt{Cfg\_core} and \texttt{Cfg\_gui} to \texttt{Cfg\_register} is
-artificial, but in future evolutions the GUI could depend on
-configuration options.
+Whenever we click the ``Show CFG'' button, a new \texttt{dotty} window is
+opened. After we close it, we can repeat the operation as we like.
 
-\listingname{Makefile}
-\codeidx{Makefile.dynamic}
-\codeidx{FRAMAC\_SHARE}
-\codeidx{PLUGIN\_CMO}
-\codeidx{PLUGIN\_GUI\_CMO}
-\codeidx{PLUGIN\_NAME}
-\makefileinput{./tutorial/viewcfg/generated/split/Makefile}
+Note that the feedback message ``Computing CFG for function'' is emitted
+each time we click the button, which means we perform a new visit.
+For large computations and programs, this is wasteful,
+and we should be able to easily cache the result.
+The next section will show how to do it using {\em states}.
 
-In the \texttt{Makefile}, the \texttt{PLUGIN\_CMO} variable must
-contain the list of file names of the ml files, in the correct \ocaml
-build order. Modules in \texttt{PLUGIN\_CMO} must not depend on modules in
-\texttt{PLUGIN\_GUI\_CMO}.
-
-We also need to add an interface for the whole plug-in:
-\listingname{ViewCfg.mli}
-\ocamlinput{./tutorial/viewcfg/generated/split/ViewCfg.mli}
-
-Here is the listing for the different modules:
-
-\listingname{cfg\_options.ml}
-\ocamlinput{./tutorial/viewcfg/generated/split/cfg_options.ml}
-
-\listingname{cfg\_core.ml}
-\ocamlinput{./tutorial/viewcfg/generated/split/cfg_core.ml}
-
-\listingname{cfg\_register.ml}
-\ocamlinput{./tutorial/viewcfg/generated/split/cfg_register.ml}
-
-\listingname{cfg\_gui.ml}
-\ocamlinput{./tutorial/viewcfg/generated/split/cfg_gui.ml}
-
-\subsection{Getting your Plug-in Usable by Others}\label{tut2:api}
-\index{Plug-in!API}
-\todo
-
-% TODO: A script that uses "dump_function" of the CFG plug-in
-
-% Detect \dottool at compile time.
-% Link to section 5.3: plug-in specific configure.in
-
-\subsection{Getting your plug-in Usable in a Multi Projects Setting}
+\subsection{Saving/Loading Data, and Usability in a Multi-Project Setting}
 \label{tut2:project-and-state}
 \index{Project}
 
 \subsubsection{Registering and using state}
 
 In this section, we will learn how to register state into \framac. A
-\emph{state} is a piece of information kept by a plug-in. For instance,
-the \texttt{value} plug-in computes, for each statement, a table associating to
-each AST's variable a set of values the program may have at runtime: this
-association table is a state.
+\emph{state} is a piece of information kept by a plug-in. For instance, we can
+use a boolean state to store whether an expensive analysis has been executed,
+to avoid recomputing it. Another example of state: the \textsf{Eva} plug-in
+computes, for each statement, a table associating to each AST variable a set of
+values the program may have at runtime; this association table is a state.
 
 State registration provides several features:
 \begin{itemize}
@@ -1251,99 +1225,143 @@ State registration provides several features:
   parameters of the analysis of the different plug-ins.
 \end{itemize}
 
-In this tutorial, we will store the file representing the \dottool
-output of the control flow graph of a function (as needed by
-\texttt{dump\_function}) as a string, by using a hashtable from \texttt{fundec}
-to \texttt{string}. Storing this string will allow us to memoize~\cite{michie68}
+We will modify our \verb|Dump| module to output the \dottool graph as a string,
+and store it in a hash table from \texttt{fundec} to \texttt{string}.
+Storing this string will allow us to memoize~\cite{michie68}
 our computation: the string is computed the first time the CFG of a
 function is displayed, while the following requests will reuse the result of
-the computation. Registering the hashtable as a \framac state is
+the computation. Registering the hash table as a \framac state is
 \emph{mandatory} to ensure \framac consistency: for instance, by using a
-standard \caml hashtable, a user that would have loaded several session through
-the GUI could observe the CFG of function of a previous session instead of the
+standard \caml hash table, a user that would have loaded several sessions through
+a GUI could observe the CFG of function of a previous session instead of the
 one he wants to observe.
 
 Registering a state is done by a functor application:
 
-\ocamlinput{./tutorial/viewcfg/src/register_cfg_graph_state.ml}
+\ocamlinput[linerange={10-17}]{./tutorial/viewcfg/v5-state/dump.ml}
 \scodeidx{State\_builder}{Hashtbl}
 \scodeidx{Cil\_datatype}{Fundec}
 \scodeidx{Datatype}{String}
 \scodeidx{Ast}{self}
-\sscodeidx{Db}{Value}{self}
+\sscodeidx{Eva}{Analysis}{self}
 
 The \texttt{State\_builder} module provides several functors that help
 registering states. \texttt{State\_builder.Hashtbl} allows the developer to
-create a hashtable. It is parameterized by a module describing the hashtable
+create a hash table. It is parameterized by a module describing the hash table
 and its key, a module describing the data associated to keys, and
-other informations. 
+other information.
 
 The \texttt{Datatype} and \texttt{Cil\_datatype} modules describe the
-hashtable and its associated data, and explain for instance how the
+hash table and its associated data, and explain for instance how the
 datatype should be copied, printed, or marshalled to the disk. They
 are part of the \texttt{Type} library~\cite{signoles:jfla11}, described in
 Section~\ref{adv:datatype}. \texttt{Datatype} provides
 descriptions for standard \caml types, and \texttt{Cil\_datatype} for
 the CIL types (in the \texttt{Cil\_types} module).
 
-The last module argument describes the initial size of the hashtable, a name
-(mainly used for internal debugging), and a list of \emph{dependencies}. Here we
-expressed that our hashtable depends on the Ast and the results of the
-\texttt{Value} plug-in. For instance, whenever the \framac kernel updates one of these
-states, it will automatically reset our hashtable. This ensures consistency of
-the analysis: if the Ast of a function changes, or the value analysis is
-executed with a different entry point, this potentially affects the display of
-the control flow graph, that we must recompute.
+The last module argument describes the initial size of the hash table%
+\footnote{This initial size is an optimization feature; the table automatically
+grows when needed.}, a name (mainly used for internal debugging),
+and a list of \emph{dependencies}.
+Here we expressed that our hash table depends on the AST and the results of the
+\textsf{Eva} plug-in. For instance, whenever the \framac kernel updates one of
+these states, it will automatically reset our hash table.
+This ensures consistency of the analysis: if the AST of a function changes,
+or the value analysis is executed with a different entry point,
+this potentially affects the display of the control flow graph,
+that we must recompute.
 
 Once the module has been declared, it is fairly easy to use it.
 
-\ocamlinput{./tutorial/viewcfg/src/dump_to_string_memoized.ml}
+\ocamlinput[linerange={3-8}]{./tutorial/viewcfg/v5-state/dump.ml}
 \scodeidx{Visitor}{visitFramacFunction}
-\ocamlinput{./tutorial/viewcfg/src/dump_function_memo_no_clear_cache.ml}
+\ocamlinput[linerange={19-24}]{./tutorial/viewcfg/v5-state/dump.ml}
 
 \texttt{dump\_function} now takes two steps: first the CFG is printed
 to a string, then the string is printed to the \texttt{fmt}
 argument. This allows the \texttt{dump\_to\_string} part to be
 \emph{memoized}, \ie the results of \texttt{dump\_to\_string} are
 saved so that later calls to \texttt{dump\_function} with the same
-\texttt{fundec} argument reuse that result. 
+\texttt{fundec} argument reuse that result.
 
-If you launch \texttt{frama-c-gui} with the above code, click on
-functions to view their CFG, and inspect the console, you will observe
-that the string ``Computing CFG for function ...'' is displayed only
-once per function.
+To check this, we re-run our mini-GUI with:
 
-One can see the effects of the dependency on the \texttt{Value} plug-in
-by first launching the value analysis, inspecting the CFG for the
-\texttt{f} function, then changing the entry point to \texttt{f} in the
-CFG and re-running the value analysis. The console indicates that the
-\texttt{CFG} have been recomputed. Indeed the state of the
-\texttt{Value} plug-in, and of its dependencies, was reset when the
-entry point was changed.
+\begin{shell}
+\$ dune exec -- frama-c <file> -cfg-gui
+\end{shell}
+
+The first graph for each function will show the message
+``Computing CFG for function ...'', but subsequent calls will no longer do it.
+
+Also, we can see the effects of the dependency on the \textsf{Eva} plug-in
+by first launching the value analysis and then our plug-in:
+
+\begin{shell}
+\$ dune exec -- frama-c <file> -eva -then -cfg-gui
+\end{shell}
+
+In this case, the graphs will be colored.
+
+Finally, to check that the state dependency on \textsf{Eva} works, we will use
+a more complex command line:
+
+\begin{shell}
+\$ dune exec -- frama-c <file> -eva -then -cfg-gui -then -main f
+\end{shell}
+
+We have three stages: first run \textsf{Eva}, then open the mini-GUI, then
+change the entry point (\verb|-main f| means that the program will start
+executing from function \verb|f|) {\em and} re-open the mini-GUI.
+Remember that most \framac options {\em persist} from one stage to the next:
+the same way that we do not have to repeat \verb|-eva| after the first
+\verb|-then|, we do not have to repeat \verb|-cfg-gui| after the second
+\verb|-then|. If we want to avoid re-running the mini-GUI in future stages,
+we need to use \texttt{apply\_once}, as mentioned in Section~\ref{tut2:options}.
+
+What we observe is the following: when the mini-GUI opens, we click
+{\em Show CFG}, see a ``Computing CFG for function ...'' message, and get a
+mostly-green CFG. Then, we close the mini-GUI, and it opens again. Clicking
+{\em Show CFG} will show the same ``Computing CFG'' message, but the graph will
+be entirely pink: with \verb|f| as the entry point, function \verb|main| is
+never called, therefore entirely unreachable. Because the entry point changed,
+and \textsf{Eva} depends on its state, it is automatically recomputed.
+Because our plug-in depends on \textsf{Eva}'s state, it recomputes the graph
+when we ask again for the CFG.
 
 Another way to observe how \framac automatically handles states is to display a
-CFG, save the session, close and restart \framac, 
-and then reload the session: the control flow graph is not recomputed,
-which means that \framac has automatically saved the
-\texttt{Cfg\_graph\_state} with the rest of the session. Everything
-should also work properly when loading several sessions.
+CFG, save the session (option \verb|-save <file>|), and then load it again:
+
+\begin{shell}
+\$ dune exec -- frama-c <file> -eva -then -cfg-gui -save session.sav
+\end{shell}
+
+Then click on the ``Show CFG'' (see the feedback message), then close the CFG
+and the mini-GUI. Reload the session:
+
+\begin{shell}
+\$ dune exec -- frama-c -load session.sav
+\end{shell}
+
+Click ``Show CFG'' and you will {\em not} see the ``Computing CFG'' message:
+the state \texttt{Cfg\_graph\_state} had beem automatically saved by \framac
+and has just been loaded from the session.
 
 \subsubsection{Clearing states, selection and projects}
 
 There is one caveat though: if the user computes the CFG before
-running the \texttt{Value} analysis, and then runs \texttt{Value}, he
-will not see a colored graph (unless he re-launch the \texttt{Value}
-analysis with different parameters). This is because the state of the
-CFG is reset when the state of \texttt{Value} is reset, not when it is
+running the \textsf{Eva} analysis, and then runs \textsf{Eva}, they
+will not see a colored graph (unless they re-launch \textsf{Eva}
+with different parameters). This is because the state of the
+CFG is reset when the state of \textsf{Eva} is reset, not when it is
 first computed.
 
 To solve this problem, we will manually reset the
-\texttt{Cfg\_graph\_state} if we detect that the \texttt{Value}
-analysis has been run since the last time we computed the CFG. For
+\texttt{Cfg\_graph\_state} if we detect that \textsf{Eva}
+has been run since the last time we computed the CFG. For
 that, we have to remember the previous value of
-\texttt{Db.Value.is\_computed ()}, \ie to register another state:
+\texttt{Eva.Analysis.is\_computed ()}, \ie to register another state:
 
-\ocamlinput{./tutorial/viewcfg/src/register_value_computed_state.ml}
+\ocamlinput[linerange={19-25}]{./tutorial/viewcfg/v6-state-clear/dump.ml}
 \scodeidx{State\_builder}{Ref}
 \scodeidx{Datatype}{Bool}
 
@@ -1352,29 +1370,29 @@ This new state only consists of a reference to a boolean value.
 Then we just replace \texttt{dump\_function} in the code above by the
 following.
 
-\ocamlinput{./tutorial/viewcfg/src/dump_function_memo_clear_cache.ml}
-\sscodeidx{Db}{Value}{is\_computed}
+\ocamlinput[linerange={29-37}]{./tutorial/viewcfg/v6-state-clear/dump.ml}
+\sscodeidx{Eva}{Analysis}{is\_computed}
 \sscodeidx{State\_selection}{S}{with\_dependencies}
 \scodeidx{Project}{clear}
 
-The only part that need to be explained is the notion of
+The only parts that need to be explained are the notions of
 \emph{selection} and \emph{project}. A selection is just a set of
 states; here we selected the state \texttt{Cfg\_graph\_state} with all
-its dependencies, as resetting this state would also impact states
-that would depend on it (even if there is none for now). We use
+of its dependencies, as resetting this state would also impact states
+that would depend on it (even if there are none for now). We use
 \texttt{Project.clear} to reset the selection.
 
 \subsubsection{Project explanation}
 
 A \emph{project}~\cite{project} is a consistent version of all the \emph{states}
 of \framac. \framac is multi-AST, \ie \framac plug-ins can change the AST of the
-program, or perform incompatible analysis (\eg with different entry
-points). Projects consistently groups a version of the AST of the program, with
-the states related to this AST.
+program, or perform incompatible analyses (\eg with different entry
+points). Projects consistently group a version of the program's AST with
+the states related to it.
 
-The \texttt{Project.clear} function has type :
+The \texttt{Project.clear} function has type:
 \begin{ocamlcode}
-val clear: ?selection:State_selection.t -> ?project:t -> unit -> unit  
+val clear: ?selection:State_selection.t -> ?project:t -> unit -> unit
 \end{ocamlcode}
 \scodeidxdef{Project}{clear}
 \scodeidx{State\_selection}{t}
@@ -1406,16 +1424,16 @@ To summarize:
 \item As a plug-in developer, you have to remember that is up to you to preserve
   consistency between your states and their dependencies by clearing the latter
   when the former is modified in an incompatible way. For instance, it would
-  have been incorrect to not call 
+  have been incorrect not to call
   \texttt{State\_selection.with\_dependencies}
-  \sscodeidx{State\_selection}{S}{with\_dependencies} in the last code snippet of
-  this tutorial.
+  \sscodeidx{State\_selection}{S}{with\_dependencies}
+  in the last code snippet of this tutorial.
 \end{itemize}
 
 Projects are generally created using copy visitors. We encourage the reader to
-experiment with multiple projects development by using them. An interesting
+experiment with multi-project development by using them. An interesting
 exercise would be to change the AST so that execution of each instruction is
-logged to a file, and then re-read that file to print in the CFG how much time
+logged to a file, and then re-read that file to print in the CFG how many times
 each instruction has been executed. Another interesting exercise would be
 to use the \texttt{apply\_once} function so that the ViewCfg plug-in is executed
 only once, as explained in section~\ref{tut2:options} of this tutorial.
