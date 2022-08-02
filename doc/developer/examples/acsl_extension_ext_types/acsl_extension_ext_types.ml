@@ -4,7 +4,7 @@ open Cil_types
 
 let preprocessor =
   List.map (fun e -> begin match e with
-      | { lexpr_node = PLnamed ("load", { lexpr_node = PLvar s}) } ->
+      | { lexpr_node = PLnamed ("load", { lexpr_node = PLvar s; _ }) ; _ } ->
         if not (Logic_env.is_logic_type s) then Logic_env.add_typename s
         else Kernel.error "Type already exists %s" s
       | _ -> ()
@@ -19,7 +19,7 @@ module Ts = struct
 end
 
 let typer ctxt loc = function
-  | [ { lexpr_node = PLnamed ("load", { lexpr_node = PLvar s}) } ] ->
+  | [ { lexpr_node = PLnamed ("load", { lexpr_node = PLvar s; _ }) ; _ } ] ->
     let ti = { lt_name = s ; lt_params = [] ; lt_def = None ; lt_attr = []} in
     ctxt.add_logic_type s ti ;
     Ext_id (Ts.add ti)

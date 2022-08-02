@@ -2293,7 +2293,7 @@ plug-in which provides a dynamic API for callstacks as follows.
 \scodeidx{Cil\_datatype}{Stmt}
 \scodeidx{Cil}{dummyStmt}
 \scodeidx{Datatype}{Serializable\_undefined}
-\ocamlinput{./examples/generated/callstack.ml}
+\ocamlinput{./examples/callstack/callstack.ml}
 
 You have to use the functor \texttt{Type.Abstract} to access to the type value
 corresponding to the type of callstacks (and thus to access to the above
@@ -2307,7 +2307,7 @@ dynamically registered functions).
 \scodeidx{Datatype}{func}
 \scodeidx{Datatype}{func3}
 \scodeidx{Datatype}{unit}
-\ocamlinput{./examples/generated/use_callstack.ml}
+\ocamlinput{./examples/callstack/use_callstack.ml}
 \end{example}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3901,7 +3901,7 @@ division in the program, stating that the divisor is not zero:
 \scodeidx{Ast}{self}
 \sscodeidx{Cil}{cilVisitor}{current\_kinstr}
 \sscodeidx{Visitor}{frama\_c\_visitor}{current\_kf}
-\ocamlinput{./examples/generated/syntactic_check.ml}
+\ocamlinput{./examples/syntactic_check/syntactic_check.ml}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -4067,7 +4067,7 @@ recognize only subtrees of an otherwise normal ACSL predicate or term. For
 instance, the following code will let extension \verb|foo| replace all
 occurrences of \verb|\foo| by \verb|42|.
 
-\ocamlinput{./examples/acsl_extension_foo.ml}
+\ocamlinput{./examples/acsl_extension_foo/acsl_extension_foo.ml}
 
 With this extension enabled, \framac will interpret the following clause in
 a given source file:
@@ -4146,7 +4146,7 @@ The following code shows a more complete extension example. It provides the
 user a way to load some types (assumed to be external to Frama-C) so that they
 can be used in ACSL specification.
 
-\ocamlinput{./examples/acsl_extension_ext_types.ml}
+\ocamlinput{./examples/acsl_extension_ext_types/acsl_extension_ext_types.ml}
 
 Namely, specification:
 
@@ -4163,7 +4163,7 @@ Namely, specification:
 is correctly parsed and typed by Frama-C and leads to the following displayed
 version in the interface:
 
-\includegraphics[width=\textwidth]{examples/acsl_extension_ext_types}
+\includegraphics[width=\textwidth]{examples/acsl_extension_ext_types/acsl_extension_ext_types}
 
 
 

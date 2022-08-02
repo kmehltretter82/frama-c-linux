@@ -47,7 +47,7 @@ all: developer.pdf # check << restore check later
 # Thus TODO: use `dune exec -- frama-c` for the following commands
 
 # local plugin.cmi (if any) is in conflict with the one of Frama-C
-check: $(GENERATED) check-hello
+check: $(GENERATED) check-hello check-examples
 	$(ECHO) Checking compilation of example scripts
 	$(FC_BINDIR)/frama-c \
 		-load-script ./examples/syntactic_check \
@@ -91,33 +91,56 @@ check-hello-clean:
 
 check-hello-v1: check-hello-clean
 	(cd tutorial/hello/v1-* && $(duneb) && $(dunee) -- frama-c && cat hello.out) 2>&1 > checks/hello/v1.res
-	diff checks/hello/v1.res checks/hello/v1.oracle
+	diff checks/hello/v1.oracle checks/hello/v1.res
 
 check-hello-v2: check-hello-clean
 	(cd tutorial/hello/v2-* && $(duneb) && $(dunee) -- frama-c -plugins | grep Hello) 2>&1 > checks/hello/v2.res
-	diff checks/hello/v2.res checks/hello/v2.oracle
+	diff checks/hello/v2.oracle checks/hello/v2.res
 
 check-hello-v3: check-hello-clean
 	(cd tutorial/hello/v3-* && $(duneb) && $(dunee) -- frama-c) 2>&1 > checks/hello/v3.res
-	diff checks/hello/v3.res checks/hello/v3.oracle
+	diff checks/hello/v3.oracle checks/hello/v3.res
 
 check-hello-v4: check-hello-clean
 	(cd tutorial/hello/v4-* && $(duneb) && $(dunee) -- frama-c -hello) 2>&1 > checks/hello/v4.res
-	diff checks/hello/v4.res checks/hello/v4.oracle
+	diff checks/hello/v4.oracle checks/hello/v4.res
 
 check-hello-v5:check-hello-clean
 	(cd tutorial/hello/v5-* && $(duneb) && $(dunee) -- frama-c -hello) 2>&1 > checks/hello/v5.res
-	diff checks/hello/v5.res checks/hello/v5.oracle
+	diff checks/hello/v5.oracle checks/hello/v5.res
 
 check-hello-v6: check-hello-clean
 	(cd tutorial/hello/v6-* && $(duneb) @install && $(duneb) @ptests 2>&1 || true) > checks/hello/v6.res
-	diff checks/hello/v6.res checks/hello/v6.oracle
+	diff checks/hello/v6.oracle checks/hello/v6.res
 
 check-hello-v7: check-hello-clean
 	#redirect the stderr of 'dune build @doc' because of warnings 'Couldn't find ... Frama_c_kernel__Plugin'
 	#checks that a specific generated HTML file exists and contains something related to the source code
 	(cd tutorial/hello/v7-* && $(duneb) @install && ($(duneb) @doc 2>/dev/null) && grep -o "welcome message" _build/default/_doc/_html/frama-c-hello/Hello/Hello_options/index.html) 2>&1 > checks/hello/v7.res
-	diff checks/hello/v7.res checks/hello/v7.oracle
+	diff checks/hello/v7.oracle checks/hello/v7.res
+
+# For check-examples, we perform no explicit oracle comparisons:
+# we simply build the code and run tests (which must always succeed).
+check-examples: check-examples-acsl_extension_foo check-examples-acsl_extension_ext_types \
+  check-examples-callstack check-examples-syntactic_check
+
+check-examples-clean:
+	$(ECHO) Cleaning example files...
+	rm -rf examples/*/_build
+
+check-examples-acsl_extension_foo: check-examples-clean
+	cd examples/acsl_extension_foo && $(duneb) @install && $(duneb) @ptests
+
+check-examples-acsl_extension_ext_types: check-examples-clean
+	cd examples/acsl_extension_ext_types && $(duneb) @install && $(duneb) @ptests
+
+check-examples-callstack: check-examples-clean
+	# no test oracles; just check that the code compiles
+	cd examples/callstack && $(duneb) @install
+
+check-examples-syntactic_check: check-examples-clean
+	cd examples/syntactic_check && $(duneb) @install && $(duneb) @ptests 2>&1
+
 
 check-all: developer.pdf
 	$(MAKE) -C ../.. check-devguide

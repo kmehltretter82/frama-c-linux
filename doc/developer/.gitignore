@@ -17,5 +17,5 @@ mecanism.eps
 pp
 pp.ml
 /checks/hello/*.res
-/tutorial/hello/v6-test-with-bug/tests/hello/oracle/
-/tutorial/hello/v6-test-with-bug/tests/hello/result/
+/**/tests/**/result*/
+/**/tests/**/oracle*/dune
