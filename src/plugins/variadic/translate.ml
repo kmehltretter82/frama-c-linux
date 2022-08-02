@@ -57,6 +57,22 @@ let translate_variadics (file : file) =
   in
   Cil.visitCilFile v file;
 
+  (* Utility function that tells if there is a call inside a statement *)
+  let contains_call stmt =
+    let result = ref false in
+    let vis = object
+      inherit Cil.nopCilVisitor
+      method! vinst = function
+        | Call _ -> result := true; Cil.SkipChildren
+        | _ -> Cil.DoChildren
+      method! vexpr _ = Cil.SkipChildren
+      method! vtype _ = Cil.SkipChildren
+    end
+    in
+    ignore (Cil.visitCilStmt vis stmt);
+    !result
+  in
+
   (* The translating visitor *)
   let v = object (self)
     inherit Cil.nopCilVisitor
@@ -123,6 +139,19 @@ let translate_variadics (file : file) =
           | _ -> s
         in
         Cil.DoChildrenPost keep_block_if_needed
+      | UnspecifiedSequence _ ->
+        let update_seq_if_needed s =
+          match s.skind with
+          | UnspecifiedSequence seq ->
+            let update (stmt,modified,writes,reads,calls) =
+              let contains_call' stmt_ref = contains_call !stmt_ref in
+              (stmt,modified,writes,reads,List.filter contains_call' calls)
+            in
+            s.skind <- UnspecifiedSequence (List.map update seq);
+            s
+          | _ -> s
+        in
+        Cil.DoChildrenPost update_seq_if_needed
       | _ -> Cil.DoChildren
 
     (* Replace variadic calls *)
