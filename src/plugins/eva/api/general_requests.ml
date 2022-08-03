@@ -73,8 +73,6 @@ let () = Request.register ~package
 
 module Functions =
 struct
-  let key kf = Printf.sprintf "kf#%d" (Kernel_function.get_id kf)
-
   let iter f =
     Globals.Functions.iter
       (fun kf ->
@@ -92,7 +90,8 @@ struct
       ~get:Results.is_called;
 
     States.register_array model
-      ~package ~key
+      ~package
+      ~key:Server.Kernel_ast.Functions.key
       ~name:"functions"
       ~descr:(Markdown.plain "AST Functions")
       ~iter

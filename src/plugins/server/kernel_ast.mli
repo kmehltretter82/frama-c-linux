@@ -95,6 +95,7 @@ end
 
 module Functions :
 sig
+  val key : kernel_function -> string
   val array : kernel_function States.array
 end
 
