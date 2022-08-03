@@ -112,6 +112,11 @@ module type Shape = sig
   (** [fold_rev] performs exactly the same job as [fold], but presents keys
       to [f] in the opposite order. *)
 
+  val to_seq : 'v map -> (key * 'v) Seq.t
+  (** [to_seq m] builds a sequence of each pair of key and datume in the
+      map [m]. Keys are presented in the sequence in increasing order according
+      to the map's ordering. *)
+
   val cached_fold :
     cache_name:string ->
     temporary:bool ->

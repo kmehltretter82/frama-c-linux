@@ -43,7 +43,7 @@ type node_range =
   | Normal of int (* From 0 = almost singleton to 100 = almost all possible values *)
   | Wide (* Too many values for the type to be reasonable *)
 
-type 'a computation = NotDone | Partial of 'a | Done
+type computation = NotDone | Partial of (unit Seq.t) | Done
 
 type node = {
   node_key : int;
@@ -53,8 +53,8 @@ type node = {
   mutable node_hidden : bool;
   mutable node_values : Cvalue.V.t option;
   mutable node_range : node_range;
-  mutable node_writes_computation : (Cil_types.stmt list) computation;
-  mutable node_reads_computation : (Cil_types.stmt list) computation;
+  mutable node_writes_computation : computation;
+  mutable node_reads_computation : computation;
   mutable node_writes_stmts : Cil_types.stmt list;
 }
 

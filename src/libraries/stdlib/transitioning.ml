@@ -56,4 +56,38 @@ module Seq = struct
 
   let unzip seq =
     map fst seq, map snd seq
+
+  let rec append xs ys () =
+    match xs () with
+    | Nil -> ys ()
+    | Cons (x, xt) -> Cons (x, append xt ys)
+
+  let take n xs =
+    if n < 0 then invalid_arg "Seq.take";
+    let rec aux n xs =
+      if n = 0
+      then empty
+      else fun () ->
+        match xs () with
+        | Nil -> Nil
+        | Cons (x, xs) -> Cons (x, aux (n-1) xs)
+    in
+    aux n xs
+
+  let drop n xs =
+    if n < 0
+    then invalid_arg "Seq.drop"
+    else if n = 0
+    then xs
+    else
+      let rec aux n xs =
+        match xs () with
+        | Nil -> Nil
+        | Cons (_, xs) ->
+          let n = n - 1 in
+          if n = 0
+          then xs ()
+          else aux n xs
+      in
+      fun () -> aux n xs
 end

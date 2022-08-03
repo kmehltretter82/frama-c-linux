@@ -145,6 +145,8 @@ module Location_Bytes : sig
       presented to [f]. Raises {!Error_Top} if [loc] is [Top _] or if
       one offset cannot be enumerated. *)
 
+  val to_seq_i : t -> (Base.t * Ival.t) Seq.t
+
   val cached_fold:
     cache_name:string ->
     temporary:bool ->

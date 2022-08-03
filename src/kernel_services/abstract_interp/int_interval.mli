@@ -98,3 +98,4 @@ val reduce_sign: t -> bool -> t or_bottom
 val reduce_bit: int -> t -> bool -> t or_bottom
 
 val fold_int: ?increasing:bool -> (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
+val to_seq: ?increasing:bool -> t -> Integer.t Seq.t

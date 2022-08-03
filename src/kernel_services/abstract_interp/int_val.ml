@@ -221,6 +221,10 @@ let fold_int ?(increasing=true) f v acc =
 
 let fold_enum f v acc = fold_int (fun x acc -> f (inject_singleton x) acc) v acc
 
+let to_seq ?(increasing=true) = function
+  | Itv i -> Int_interval.to_seq ~increasing i
+  | Set s -> Int_set.to_seq ~increasing s
+
 (* -------------------------------- Accessors ------------------------------- *)
 
 let min_int = function

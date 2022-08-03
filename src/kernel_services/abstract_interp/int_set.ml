@@ -199,6 +199,20 @@ let mem v a =
   in
   c 0
 
+let to_seq ?(increasing=true) =
+  if increasing
+  then Array.to_seq
+  else
+    fun a ->
+      let rec aux i () =
+        if i >= 0
+        then
+          let x = Array.unsafe_get a i in
+          Seq.Cons (x, aux (i-1))
+        else Seq.Nil
+      in
+      aux (Array.length a -1)
+
 (* ------------------------------- Set or top ------------------------------- *)
 
 type set_or_top = [ `Set of t | `Top of Integer.t * Integer.t * Integer.t ]
