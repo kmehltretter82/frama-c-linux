@@ -73,12 +73,6 @@ let () = Request.register ~package
 
 module Functions =
 struct
-  let iter f =
-    Globals.Functions.iter
-      (fun kf ->
-         let name = Kernel_function.get_name kf in
-         if not (Ast_info.is_frama_c_builtin name) then f kf)
-
   let _array : kernel_function States.array =
     let model = States.model () in
 
@@ -94,7 +88,7 @@ struct
       ~key:Server.Kernel_ast.Functions.key
       ~name:"functions"
       ~descr:(Markdown.plain "AST Functions")
-      ~iter
+      ~iter:Server.Kernel_ast.Functions.iter
       ~add_reload_hook:(fun f ->
           Analysis.register_computation_hook (fun _ -> f () ))
 end
