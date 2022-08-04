@@ -72,6 +72,8 @@ fi
 MANUALS_DIR="./manuals"
 API_DIR="./api"
 
+FRAMAC_COM_DOWNLOAD="https://www.frama-c.com/download"
+
 ##########################################################################
 # Check stable or beta and build names
 
@@ -82,7 +84,7 @@ VERSION_SAFE="$(echo ${VERSION/~/-})"
 VERSION_MODIFIER=$(cat VERSION | sed -e s/[0-9.]*\\\(.*\\\)/\\1/)
 VERSION_MAJOR=$(cat VERSION | sed -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
 VERSION_MINOR=$(cat VERSION | sed -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
-# TAG="$(git describe --tag)"
+TAG="$(git describe --tag)"
 CODENAME="$(cat VERSION_CODENAME)"
 LOWER_CODENAME="$(echo "$CODENAME" | tr '[:upper:]' '[:lower:]')"
 VERSION_AND_CODENAME="${VERSION_SAFE}-${CODENAME}"
@@ -93,13 +95,13 @@ if [ "$VERSION_MODIFIER" == "+dev" ]; then
   exit 2
 fi
 
-# if [ "$VERSION_SAFE" != "$TAG" ]; then
-#   echo "The current commit is not tagged with the current version:"
-#   echo "Frama-C Version: $VERSION"
-#   echo "Frama-C Tag    : $TAG"
-#   echo_red "Aborting"
-#   exit 2
-# fi
+if [ "$VERSION_SAFE" != "$TAG" ]; then
+  echo "The current commit is not tagged with the current version:"
+  echo "Frama-C Version: $VERSION"
+  echo "Frama-C Tag    : $TAG"
+  echo_red "Aborting"
+  exit 2
+fi
 
 if test -n "$VERSION_MODIFIER"; then
   FINAL=no
@@ -157,6 +159,7 @@ MANUALS=(
 
 COMPANIONS=(
   "aorai-example"
+  "hello"
 )
 
 for manual in "${MANUALS[@]}"; do
@@ -164,7 +167,7 @@ for manual in "${MANUALS[@]}"; do
 done
 
 for companion in "${COMPANIONS[@]}"; do
-  prepare_file "$MANUALS_DIR/$companion.tgz"
+  prepare_file "$MANUALS_DIR/$companion.tar.gz"
 done
 
 prepare_file "$MANUALS_DIR/acsl-version.txt"
@@ -200,21 +203,13 @@ function version_name {
 # $2 : extension
 
 function copy_normal {
-  if [ "yes" == "$GENERIC" ]; then
-    cp "$MANUALS_DIR/$1.$2" "$MANS_TARGET_DIR/$(generic_name $1).$2"
-  fi
+  cp "$MANUALS_DIR/$1.$2" "$MANS_TARGET_DIR/$(generic_name $1).$2"
   cp "$MANUALS_DIR/$1.$2" "$MANS_TARGET_DIR/$(version_name $1).$2"
 }
 
 function copy_e_acsl {
-  if [ "yes" == "$EACSL_SUBDIR" ]; then
-    EACSL_TARGET_DIR="$MANS_TARGET_DIR/e-acsl"
-  else
-    EACSL_TARGET_DIR="$MANS_TARGET_DIR"
-  fi
-  if [ "yes" == "$GENERIC" ]; then
-    cp "$MANUALS_DIR/$1.$2" "$EACSL_TARGET_DIR/$(generic_name $1).$2"
-  fi
+  EACSL_TARGET_DIR="$MANS_TARGET_DIR/e-acsl"
+  cp "$MANUALS_DIR/$1.$2" "$EACSL_TARGET_DIR/$(generic_name $1).$2"
   cp "$MANUALS_DIR/$1.$2" "$EACSL_TARGET_DIR/$(version_name $1).$2"
 }
 
@@ -227,18 +222,14 @@ function copy_files {
     fi
   done
   for companion in "${COMPANIONS[@]}"; do
-    copy_normal $companion "tgz"
+    copy_normal $companion "tar.gz"
   done
 
   # Eva has an old manual name that might be in use:
-  if [ "yes" == "$GENERIC" ]; then
-    cp "$MANS_TARGET_DIR/frama-c-eva-manual.pdf" "$MANS_TARGET_DIR/frama-c-value-analysis.pdf"
-  fi
+  cp "$MANS_TARGET_DIR/frama-c-eva-manual.pdf" "$MANS_TARGET_DIR/frama-c-value-analysis.pdf"
 
   cp $TARGZ_BASE "$GZ_TARGET_DIR/$TARGZ_VERSION"
-  if [ "yes" == "$GENERIC" ]; then
-    cp $TARGZ_BASE "$GZ_TARGET_DIR/$TARGZ_GENERIC"
-  fi
+  cp $TARGZ_BASE "$GZ_TARGET_DIR/$TARGZ_GENERIC"
 
   cp $TARGZ_API "$MANS_TARGET_DIR/frama-c-$VERSION_AND_CODENAME-api.tar.gz"
 }
@@ -258,7 +249,7 @@ cat opam/opam | grep -v "^version\:" | grep -v "^name\:" > $OPAM_FC_DIR/opam
 cat >>$OPAM_FC_DIR/opam << EOL
 
 url {
-  src: "https://git.frama-c.com/pub/frama-c/-/wikis/downloads/$TARGZ_VERSION"
+  src: "$FRAMAC_COM_DOWNLOAD/$TARGZ_VERSION"
   checksum: "sha256=$(sha256sum $TARGZ_BASE | cut -d" " -f1)"
 }
 EOL
@@ -271,19 +262,8 @@ echo "Opam file built"
 show_step "Building website"
 
 WIKI_DIR="wiki"
-WIKI_DL_DIR="$WIKI_DIR/downloads"
-WIKI_MANS_DIR="$WIKI_DIR/manuals"
 
 mkdir -p $WIKI_DIR
-mkdir -p $WIKI_DL_DIR
-mkdir -p $WIKI_MANS_DIR
-
-GZ_TARGET_DIR="$WIKI_DL_DIR"
-MANS_TARGET_DIR="$WIKI_MANS_DIR"
-EACSL_SUBDIR="no"
-GENERIC="no"
-
-copy_files
 
 echo "Download directory built"
 
@@ -291,12 +271,23 @@ WIKI_PAGE="$WIKI_DIR/Frama-C-${VERSION_AND_CODENAME}.md"
 
 echo "# Frama-C release $VERSION ($CODENAME)" > $WIKI_PAGE
 echo "## Sources" >> $WIKI_PAGE
-echo "- [$TARGZ_VERSION](downloads/$TARGZ_VERSION)" >> $WIKI_PAGE
+echo "- [$TARGZ_VERSION]($FRAMAC_COM_DOWNLOAD/$TARGZ_VERSION)" >> $WIKI_PAGE
 echo "" >> $WIKI_PAGE
 echo "## Manuals" >> $WIKI_PAGE
-for manual in  "${MANUALS[@]}"; do
+for manual in "${MANUALS[@]}"; do
+  if [[ $manual =~ ^e-acsl.*$ ]]; then
+    DIR="$FRAMAC_COM_DOWNLOAD/e-acsl"
+  else
+    DIR="$FRAMAC_COM_DOWNLOAD"
+  fi
   NAME=$(version_name $manual)
-  echo "- [$manual](manuals/$NAME.pdf)" >> $WIKI_PAGE
+  echo "- [$manual]($DIR/$NAME.pdf)" >> $WIKI_PAGE
+done
+echo "" >> $WIKI_PAGE
+echo "## Companion archives" >> $WIKI_PAGE
+for archive in "${COMPANIONS[@]}"; do
+  NAME=$(version_name $archive)
+  echo "- [$archive]($FRAMAC_COM_DOWNLOAD/$NAME.tar.gz)" >> $WIKI_PAGE
 done
 echo "" >> $WIKI_PAGE
 echo "## Main changes" >> $WIKI_PAGE
@@ -432,7 +423,7 @@ releases:
     - name: Aoraï manual
       link: /download/aorai-manual-$VERSION_AND_CODENAME.pdf
       help: Aoraï example
-      help_link: /download/aorai-example-$VERSION_AND_CODENAME.tgz
+      help_link: /download/aorai-example-$VERSION_AND_CODENAME.tar.gz
     - name: Metrics manual"
       link: /download/metrics-manual-$VERSION_AND_CODENAME.pdf"
     - name: Rte manual"
