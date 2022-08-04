@@ -377,7 +377,7 @@ function add_version_page {
         echo "      - name: Aoraï manual" >> $VERSION_WEBPAGE_PATH
         echo "        link: /download/aorai-manual-$FRAMAC_VERSION_AND_CODENAME.pdf" >> $VERSION_WEBPAGE_PATH
         echo "        help: Aoraï example" >> $VERSION_WEBPAGE_PATH
-        echo "        help_link: /download/aorai-example-$FRAMAC_VERSION_AND_CODENAME.tgz" >> $VERSION_WEBPAGE_PATH
+        echo "        help_link: /download/aorai-example-$FRAMAC_VERSION_AND_CODENAME.tar.gz" >> $VERSION_WEBPAGE_PATH
     fi
     check_manual_path_MUST_ADD "metrics"
     if [[ $MUST_ADD == "yes" ]]; then

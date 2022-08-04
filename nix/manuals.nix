@@ -49,7 +49,7 @@ stdenv.mkDerivation rec {
   installPhase = ''
     mkdir -p $out
     cp ./doc/manuals/*.pdf $out
-    cp ./doc/manuals/*.tgz $out
+    cp ./doc/manuals/*.tar.gz $out
     cp ./doc/manuals/*.txt $out
   '';
 }

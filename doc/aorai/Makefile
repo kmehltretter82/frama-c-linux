@@ -35,23 +35,23 @@ EXAMPLES=example.c example.ltl example.ya \
 
 BNF=ya_file.bnf basic_ya.bnf extended_ya.bnf ya_variables.bnf
 
-all: main.pdf $(ARCHIVENAME).tgz
+all: main.pdf $(ARCHIVENAME).tar.gz
 
 main.pdf: main.tex $(BNF:.bnf=.tex) macros.tex
 	touch main.aux #work around latexmk bug
 	latexmk -pdf main.tex
 
-$(ARCHIVENAME).tgz: $(addprefix example/, $(EXAMPLES))
+$(ARCHIVENAME).tar.gz: $(addprefix example/, $(EXAMPLES))
 	@rm -fr $(ARCHIVENAME)
 	@mkdir $(ARCHIVENAME)
 	@cp $^ $(ARCHIVENAME)
 	@tar czvf $@ $(ARCHIVENAME)
 
-install: main.pdf $(ARCHIVENAME).tgz
+install: main.pdf $(ARCHIVENAME).tar.gz
 	mkdir -p ../manuals
-	@echo "copying example.tgz in ${DWNLDDIR}/$(ARCHIVENAME).tgz"
-	@rm -f "${DWNLDDIR}/$(ARCHIVENAME).tgz"
-	@cp $(ARCHIVENAME).tgz "${DWNLDDIR}/$(ARCHIVENAME).tgz"
+	@echo "copying example.tar.gz in ${DWNLDDIR}/$(ARCHIVENAME).tar.gz"
+	@rm -f "${DWNLDDIR}/$(ARCHIVENAME).tar.gz"
+	@cp $(ARCHIVENAME).tar.gz "${DWNLDDIR}/$(ARCHIVENAME).tar.gz"
 	@echo "copying main.pdf    in $(DWNLDDIR)/$(DOCNAME)"
 	@rm -f "$(DWNLDDIR)/$(DOCNAME)"
 	@cp main.pdf "$(DWNLDDIR)/$(DOCNAME)"
@@ -62,7 +62,7 @@ clean:
 		*.cm? *.idx *.o pp.ml pp *.dvi *.blg *.bbl \
 		main???.png *.image.tex *.haux *.htoc *.html \
 		*.backup *.pdf *.backup example/frama_c_journal.ml \
-                $(ARCHIVENAME) $(ARCHIVENAME).tgz
+                $(ARCHIVENAME) $(ARCHIVENAME).tar.gz
 
 .SUFFIXES: .tex .bnf .ml .cmo .mll
 

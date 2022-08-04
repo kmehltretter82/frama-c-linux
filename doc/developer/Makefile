@@ -143,20 +143,19 @@ check-viewcfg-v5:
 check-viewcfg-v6:
 	cd tutorial/viewcfg/v2-* && $(duneb) @install
 
-archives: FILES=$(shell cd tutorial/hello/v7-doc && git ls-files)
+hello.tar.gz: FILES=$(shell cd tutorial/hello/v7-doc && git ls-files)
 
 # - use 'git ls-files' to avoid including extraneous files in archive
 # - use several tar options to improve build reproducibility
-archives:
-	export VERSION="$(shell cat ../../VERSION)" && \
+hello.tar.gz:
 	cd tutorial/hello && \
-	rm -rf hello-$$VERSION && \
-	cp -r v7-doc hello-$$VERSION && \
-	tar -cf - $(addprefix hello-$$VERSION/,$(FILES)) \
+	rm -rf hello && \
+	cp -r v7-doc hello && \
+	tar -cf - $(addprefix hello/,$(FILES)) \
 	  --numeric-owner --owner=0 --group=0 --sort=name \
 	  --mtime="$$(date +"%F") Z" --mode='a+rw' | \
-	    gzip -9 -n > ../../hello-$$VERSION.tar.gz && \
-	rm -rf hello-$$VERSION
+	    gzip -9 -n > ../../hello.tar.gz && \
+	rm -rf hello
 
 ###########
 

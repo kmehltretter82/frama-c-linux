@@ -86,9 +86,9 @@ _build
 
 /doc/acsl/
 
-/doc/aorai/aorai-example.tgz
+/doc/aorai/aorai-example.tar.gz
 /doc/aorai/aorai-example/
-/doc/aorai/frama-c-aorai-example.tgz
+/doc/aorai/frama-c-aorai-example.tar.gz
 /doc/aorai/frama-c-aorai-example
 /doc/aorai/main.pdf
 /doc/aorai/ya_file.tex

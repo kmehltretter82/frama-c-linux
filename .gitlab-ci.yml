@@ -232,7 +232,7 @@ manuals:
   artifacts:
     paths:
       - manuals/*.pdf
-      - manuals/*.tgz
+      - manuals/*.tar.gz
       - manuals/*.txt
     expire_in: 7 days # Note: the LAST artifact of the ref is always kept
 
