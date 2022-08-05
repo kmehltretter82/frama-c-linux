@@ -265,6 +265,7 @@ release-content:
       - website
       - wiki
       - opam-repository
+      - release-data.json
   only:
     variables:
       - $RELEASE == "yes"
@@ -400,12 +401,26 @@ src-distrib-tests-long:
     - echo "$FRAMA_CI_BOT_SSH_PRIVATE" | nix run -f channel:nixos-19.03 coreutils --command base64 -d > nix/frama-c-public/id_ed25519
     - nix run -f channel:nixos-19.03 coreutils --command chmod 400 nix/frama-c-public/id_ed25519
 
-release-frama-c:
+release-branch:
   stage: release
   <<: *prepare_ssh_template
   script:
     - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a origin/$CI_COMMIT_BRANCH)
     - GIT_SSH=nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git push git@git.frama-c.com:pub/frama-c.git origin/$CI_COMMIT_BRANCH:refs/heads/$CI_COMMIT_BRANCH
+  only:
+    variables:
+      - $RELEASE == "yes"
+  when: manual
+  interruptible: false
+
+release-create:
+  stage: release
+  script:
+    - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a origin/$CI_COMMIT_BRANCH)
+    - nix-shell -p curl --run './nix/frama-c-public/publish-release.sh'
+  needs:
+    - release-branch
+    - release-content
   only:
     variables:
       - $RELEASE == "yes"

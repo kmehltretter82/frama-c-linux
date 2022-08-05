@@ -38,6 +38,7 @@
 #   - wiki (for the public Frama-C instance)
 #   - website
 #   - opam-repository
+#   - release-data.json
 # with the correct tree for generated files.
 
 ##########################################################################
@@ -88,6 +89,13 @@ TAG="$(git describe --tag)"
 CODENAME="$(cat VERSION_CODENAME)"
 LOWER_CODENAME="$(echo "$CODENAME" | tr '[:upper:]' '[:lower:]')"
 VERSION_AND_CODENAME="${VERSION_SAFE}-${CODENAME}"
+
+if [ "$VERSION_MINOR" != 0 ]; then
+  PREVIOUS="$VERSION_MAJOR.$(($VERSION_MINOR - 1))"
+else
+  PREVIOUS="$(($VERSION_MAJOR - 1)).0"
+fi
+PREVIOUS_NAME=$(git show $PREVIOUS:VERSION_CODENAME)
 
 if [ "$VERSION_MODIFIER" == "+dev" ]; then
   echo "Development version ($VERSION)"
@@ -259,7 +267,7 @@ echo "Opam file built"
 ##########################################################################
 # Make wiki
 
-show_step "Building website"
+show_step "Building wiki"
 
 WIKI_DIR="wiki"
 
@@ -294,6 +302,38 @@ echo "## Main changes" >> $WIKI_PAGE
 sed 's/\(\#.*\)/##\1/' $CHANGES >> $WIKI_PAGE
 
 echo "Wiki page built"
+
+##########################################################################
+# Make wiki
+
+show_step "Building release json file"
+
+JSON_DATA="release-data.json"
+
+cat >$JSON_DATA <<EOL
+{
+  "name": "Frama-C $VERSION $CODENAME",
+  "tag_name": "$VERSION_SAFE",
+  "ref": "stable/$LOWER_CODENAME",
+  "assets": {
+    "links": [
+      {
+        "name": "API Documentation",
+        "url": "https://frama-c.com/download/frama-c-$VERSION_AND_CODENAME-api.tar.gz",
+        "link_type":"other"
+      },
+      {
+        "name": "Official source archive",
+        "url": "https://frama-c.com/download/$TARGZ_VERSION",
+        "link_type":"other"
+      }
+    ]
+  },
+EOL
+  echo "  \"description\": \"# Main changes since $PREVIOUS $PREVIOUS_NAME\n$(cat $CHANGES | sed -z 's/\n/\\n/g' | sed 's/\(\#.*\)/#\1/')\"" >> $JSON_DATA
+  echo "}" >> $JSON_DATA
+
+echo "Release data file built"
 
 ##########################################################################
 # Make website
@@ -343,13 +383,6 @@ echo "Installation file built"
 # Event
 
 mkdir -p $WEBSITE_EVENTS_DIR
-
-if [ "$VERSION_MINOR" != 0 ]; then
-  PREVIOUS="$VERSION_MAJOR.$(($VERSION_MINOR - 1))"
-else
-  PREVIOUS="$(($VERSION_MAJOR - 1)).0"
-fi
-PREVIOUS_NAME=$(git show $PREVIOUS:VERSION_CODENAME)
 
 TEXTUAL_VERSION="Frama-C $VERSION ($CODENAME)"
 TEXTUAL_PREVIOUS="Frama-C $PREVIOUS ($PREVIOUS_NAME)"
