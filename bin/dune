@@ -27,6 +27,5 @@
   (frama-c-script as frama-c-script)
   (frama-c-config as frama-c-config)
   (test.sh as frama-c-test.sh)
-  (local_export.sh as local_export.sh)
  )
 )
