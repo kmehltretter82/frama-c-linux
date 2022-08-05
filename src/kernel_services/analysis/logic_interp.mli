@@ -28,4 +28,5 @@ module To_zone : sig
   val compute_term_deps: (stmt -> term -> Locations.Zone.t option) ref
 end
 
-exception Error of location * string
+exception [@alert deprecated "Use directly Logic_parse_string.Error istead."]
+  Error of location * string

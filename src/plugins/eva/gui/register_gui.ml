@@ -340,7 +340,7 @@ module Select (Eval: Eval) = struct
         let pred = !Db.Properties.Interp.predicate ~env kf txt in
         select_predicate main_ui loc pred
     with
-    | Logic_interp.Error (_, mess) ->
+    | Logic_parse_string.Error (_, mess) ->
       main_ui#error "Invalid %a: %s" pp_term_or_pred tp mess
     | Parsing.Parse_error ->
       main_ui#error "Invalid %a: Parse error" pp_term_or_pred tp

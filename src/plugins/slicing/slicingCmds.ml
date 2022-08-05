@@ -685,7 +685,7 @@ let add_persistent_cmdline () =
         SlicingParameters.Select.WrAccess.clear () ;
       end;
       add_persistent_selection !selection;
-    with Logic_interp.Error(_loc,msg) ->
+    with Logic_parse_string.Error(_loc,msg) ->
       SlicingParameters.warning ~wkey:SlicingParameters.wkey_cmdline
         "%s. Slicing requests from the command line are ignored." msg
   end;

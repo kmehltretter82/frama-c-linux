@@ -41,8 +41,8 @@ module Cache = Hashtbl.Make(Key)
 
 let get_term kf term =
   let env = logic_environment () in
-  try Some (!Db.Properties.Interp.term ~env kf term)
-  with Logic_interp.Error _ | Parsing.Parse_error -> None
+  try Some (Logic_parse_string.term ~env kf term)
+  with Logic_parse_string.Error _ | Parsing.Parse_error -> None
 
 let key_of_localizable =
   let open Printer_tag in
