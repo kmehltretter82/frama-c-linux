@@ -52,8 +52,8 @@ val find_independant_nodes : t -> node list -> node list
 val bfs : ?iter_succ:((node -> unit) -> t -> node -> unit) -> ?limit:int ->
   t -> node list -> node list
 
-val ouptput_to_dot : out_channel -> t -> unit
-val ouptput_to_json : out_channel -> t -> unit
+val output_to_dot : out_channel -> t -> unit
+val output_to_json : out_channel -> t -> unit
 
 val to_json : t -> Json.t
 val diff_to_json : t -> graph_diff -> Json.t

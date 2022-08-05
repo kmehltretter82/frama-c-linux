@@ -178,7 +178,7 @@ let bfs ?(iter_succ=iter_succ) ?(limit=max_int) g roots =
   Table.fold (fun n _ l -> n :: l) explored []
 
 
-let ouptput_to_dot out_channel g =
+let output_to_dot out_channel g =
   let open Graph.Graphviz.DotAttributes in
   (* let g = add_dummy_nodes g in *)
 
@@ -413,7 +413,7 @@ struct
       ("sub", `List removed_nodes)]
 end
 
-let ouptput_to_json out_channel g =
+let output_to_json out_channel g =
   let json = JsonPrinter.output_graph g in
   Yojson.Basic.to_channel out_channel json
 
