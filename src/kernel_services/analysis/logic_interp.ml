@@ -149,80 +149,72 @@ struct
       ki_opt = Some(ki, true);
       kf = kf }
 
+  type result = {
+    pragmas: pragmas;
+    locals: Varinfo.Set.t;
+    labels: Logic_label.Set.t;
+    zones: (Locations.Zone.t * Locations.Zone.t) Stmt.Map.t option;
+  }
 
   let empty_pragmas =
     { ctrl = Stmt.Set.empty;
       stmt = Stmt.Set.empty }
 
-  let other_zones = Stmt.Hashtbl.create 7
-  let locals = ref Varinfo.Set.empty
-  let labels = ref Logic_label.Set.empty
-  let pragmas = ref empty_pragmas
+  let empty_results = {
+    pragmas = empty_pragmas;
+    locals = Varinfo.Set.empty;
+    labels = Logic_label.Set.empty;
+    zones = Some Stmt.Map.empty;
+  }
 
-  let zone_result = ref (Some other_zones)
   let not_yet_implemented = ref ""
 
   let compute_term_deps = ref (fun _stmt _expr -> None)
 
-  let add_top_zone not_yet_implemented_msg = match !zone_result with
-    | None -> (* top zone *) ()
-    | Some other_zones ->
-      Stmt.Hashtbl.clear other_zones;
+  let add_top_zone not_yet_implemented_msg =
+    function
+    | None -> (* top zone *) None
+    | Some _ ->
       not_yet_implemented := not_yet_implemented_msg;
-      zone_result := None
+      None
 
-  let add_result ~before ki zone = match !zone_result with
-    | None -> (* top zone *) ()
+  let add_zone ~before ki zone =
+    function
+    | None -> (* top zone *) None
     | Some other_zones ->
       let zone_true, zone_false =
-        try Stmt.Hashtbl.find other_zones ki
+        try Stmt.Map.find ki other_zones
         with Not_found -> Locations.Zone.bottom, Locations.Zone.bottom
       in
-      Stmt.Hashtbl.replace other_zones
-        ki
-        (if before then Locations.Zone.join zone_true zone, zone_false
-         else zone_true, Locations.Zone.join zone_false zone)
+      let new_zone =
+        if before
+        then Locations.Zone.join zone_true zone, zone_false
+        else zone_true, Locations.Zone.join zone_false zone
+      in
+      Some (Stmt.Map.add ki new_zone other_zones)
 
-  let get_result_aux () =
-    let result =
-      let zones = match !zone_result with
-        | None ->
-          (* clear references for the next time when giving the result.
-             Note that other_zones has been cleared in [add_top_zone]. *)
-          zone_result := Some other_zones;
-          None
-        | Some other_zones ->
-          let z =
-            Stmt.Hashtbl.fold
-              (fun ki (zone_true, zone_false) other_zones ->
-                 let add before zone others =
-                   if Locations.Zone.equal Locations.Zone.bottom zone then
-                     others
-                   else
-                     { before = before; ki = ki; zone = zone} :: others
-                 in
-                 add true zone_true (add false zone_false other_zones))
-              other_zones
-              []
-          in
-          (* clear table for the next time when giving the result *)
-          Stmt.Hashtbl.clear other_zones;
-          Some z
-      in zones, {var = !locals; lbl = !labels}
+  let get_result result =
+    let zones =
+      match result.zones with
+      | None -> None
+      | Some other_zones ->
+        let zones =
+          Stmt.Map.to_seq other_zones |>
+          Seq.flat_map (fun (ki, (zone_true, zone_false)) ->
+              List.to_seq [
+                { before=false; ki; zone=zone_false } ;
+                { before=true; ki; zone=zone_true }
+              ]) |>
+          Seq.filter (fun x ->
+              not (Locations.Zone.equal Locations.Zone.bottom x.zone)) |>
+          List.of_seq
+        in
+        Some zones
     in
-    let res_pragmas = !pragmas in
-    (* clear references for the next time when giving the result *)
-    (* TODO: this is hideous and error-prone as some functions are
-       recursive. See VP comment about a more functional setting *)
-    locals := Varinfo.Set.empty ;
-    labels := Logic_label.Set.empty ;
-    pragmas := empty_pragmas;
-    result, res_pragmas
+    zones, {var = result.locals; lbl = result.labels}
 
-  let get_result () = fst (get_result_aux ())
-
-  let get_annot_result () =
-    get_result_aux ()
+  let get_annot_result result =
+    get_result result, result.pragmas
 
   (** Logic_var utility: *)
   let extract_locals logicvars =
@@ -265,7 +257,8 @@ struct
     | _, (StmtLabel _ | FormalLabel _ | BuiltinLabel _) -> false
 
 
-  class populate_zone before_opt ki_opt kf =
+  let populate_zone ctx visit cil_node current_zones =
+    let { state_opt=before_opt; ki_opt; kf } = ctx in
     (* interpretation from the
        - pre-state if  [before_opt=Some true]
        - post-state if [before_opt=Some false]
@@ -275,9 +268,11 @@ struct
          otherwise [ki_opt=Some(ki, code_annot)],
        - the contract of the statement [ki] when [code_annot=false]
        - the annotation of the statement [ki] when [code_annot=true] *)
-    object(self)
+    let vis = object(self)
       inherit Visitor.frama_c_inplace
       val mutable current_label = AbsLabel_here
+      val mutable zones = current_zones
+      method get_zones = zones
 
       method private get_ctrl_point () =
         let get_fct_entry_point () =
@@ -459,7 +454,7 @@ struct
         | Some zone ->
           let filter = function Base.CLogic_Var _ -> false | _ -> true in
           let zone = Locations.Zone.filter_base filter zone in
-          add_result ~before:current_before current_stmt zone
+          zones <- add_zone ~before:current_before current_stmt zone zones
         | None ->
           raise (NYI "[logic_interp] dependencies of a term lval")
 
@@ -487,164 +482,154 @@ struct
           SkipChildren
         | _ -> DoChildren
     end
+    in
+    try
+      ignore (visit (vis :> Visitor.frama_c_inplace) cil_node);
+      vis#get_zones
+    with NYI msg ->
+      add_top_zone msg (vis#get_zones)
 
-  (** Entry point to get the list of [ki] * [Locations.Zone.t]
-      needed to evaluate the [term]
-      relative to the [ctx] of interpretation. *)
-  let from_term term ctx =
-    (* [VP 2011-01-28] TODO: factorize from_terms and from_term, and use
-       a more functional setting. *)
-    (try
-       ignore(Visitor.visitFramacTerm
-                (new populate_zone ctx.state_opt ctx.ki_opt ctx.kf) term)
-     with NYI msg ->
-       add_top_zone msg) ;
-    locals := Varinfo.Set.union (extract_locals_from_term term) !locals;
-    labels := Logic_label.Set.union (extract_labels_from_term term) !labels;
-    get_result ()
+  let update_pragmas f results =
+    { results with pragmas = f results.pragmas }
+
+  let add_ctrl_pragma stmt =
+    update_pragmas (fun x -> { x with ctrl = Stmt.Set.add stmt x.ctrl })
+
+  let add_stmt_pragma stmt =
+    update_pragmas (fun x -> { x with stmt = Stmt.Set.add stmt x.stmt })
+
+  let add_results_from_term ctx results t =
+    let zones = populate_zone ctx Visitor.visitFramacTerm t results.zones in
+    {
+      results with
+      zones;
+      locals = Varinfo.Set.union (extract_locals_from_term t) results.locals;
+      labels = Logic_label.Set.union (extract_labels_from_term t) results.labels
+    }
+
+  let add_results_from_pred ctx results p =
+    let zones = populate_zone ctx Visitor.visitFramacPredicate p results.zones in
+    {
+      results with
+      zones;
+      locals = Varinfo.Set.union (extract_locals_from_pred p) results.locals;
+      labels = Logic_label.Set.union (extract_labels_from_pred p) results.labels
+    }
 
   (** Entry point to get the list of [ki] * [Locations.Zone.t]
       needed to evaluate the list of [terms]
       relative to the [ctx] of interpretation. *)
   let from_terms terms ctx =
-    let f x =
-      (try
-         ignore(Visitor.visitFramacTerm
-                  (new populate_zone ctx.state_opt ctx.ki_opt ctx.kf) x)
-       with NYI msg ->
-         add_top_zone msg) ;
-      locals := Varinfo.Set.union (extract_locals_from_term x) !locals;
-      labels := Logic_label.Set.union (extract_labels_from_term x) !labels
-    in
-    List.iter f terms;
-    get_result ()
+    List.fold_left (add_results_from_term ctx) empty_results terms |>
+    get_result
 
   (** Entry point to get the list of [ki] * [Locations.Zone.t]
-      needed to evaluate the [pred]
+      needed to evaluate the [term]
       relative to the [ctx] of interpretation. *)
-  let from_pred pred ctx =
-    (try
-       ignore(Visitor.visitFramacPredicate
-                (new populate_zone ctx.state_opt ctx.ki_opt ctx.kf) pred)
-     with NYI msg ->
-       add_top_zone msg) ;
-    locals := Varinfo.Set.union (extract_locals_from_pred pred) !locals;
-    labels := Logic_label.Set.union (extract_labels_from_pred pred) !labels;
-    get_result ()
+  let from_term term ctx =
+    add_results_from_term ctx empty_results term |>
+    get_result
 
   (** Entry point to get the list of [ki] * [Locations.Zone.t]
       needed to evaluate the list of [preds]
       relative to the [ctx] of interpretation. *)
   let from_preds preds ctx =
-    let f pred =
-      (try
-         ignore(Visitor.visitFramacPredicate
-                  (new populate_zone ctx.state_opt ctx.ki_opt ctx.kf) pred)
-       with NYI msg ->
-         add_top_zone msg) ;
-      locals := Varinfo.Set.union (extract_locals_from_pred pred) !locals;
-      labels := Logic_label.Set.union (extract_labels_from_pred pred) !labels
-    in
-    List.iter f preds;
-    get_result ()
+    List.fold_left (add_results_from_pred ctx) empty_results preds |>
+    get_result
+
+  (** Entry point to get the list of [ki] * [Locations.Zone.t]
+      needed to evaluate the [pred]
+      relative to the [ctx] of interpretation. *)
+  let from_pred pred ctx =
+    add_results_from_pred ctx empty_results pred |>
+    get_result
 
   (** Used by annotations entry points. *)
-  let get_zone_from_annot a (ki,kf) loop_body_opt =
-    let get_zone_from_term k x =
-      (try
-         ignore
-           (Visitor.visitFramacTerm
-              (new populate_zone (Some true) (Some (k, true)) kf) x)
-       with NYI msg ->
-         add_top_zone msg) ;
-      (* to select the declaration of the variables *)
-      locals := Varinfo.Set.union (extract_locals_from_term x) !locals;
-      (* to select the labels of the annotation *)
-      labels := Logic_label.Set.union (extract_labels_from_term x) !labels
-    and get_zone_from_pred k x =
-      (try
-         ignore
-           (Visitor.visitFramacPredicate
-              (new populate_zone (Some true) (Some (k,true)) kf) x)
-       with NYI msg ->
-         add_top_zone msg) ;
-      (* to select the declaration of the variables *)
-      locals := Varinfo.Set.union (extract_locals_from_pred x) !locals;
-      (* to select the labels of the annotation *)
-      labels := Logic_label.Set.union (extract_labels_from_pred x) !labels
+  let get_zone_from_annot a (ki,kf) loop_body_opt results =
+    let get_zone_from_term k term results =
+      let ctx = { state_opt = Some true; ki_opt = Some (k, true); kf } in
+      add_results_from_term ctx results term
+    and get_zone_from_pred k pred results =
+      let ctx = { state_opt = Some true; ki_opt = Some (k, true); kf } in
+      add_results_from_pred ctx results pred
     in
     match a.annot_content with
     | APragma (Slice_pragma (SPexpr term) | Impact_pragma (IPexpr term)) ->
+      results |>
       (* to preserve the interpretation of the pragma *)
-      get_zone_from_term ki term;
+      get_zone_from_term ki term |>
       (* to select the reachability of the pragma *)
-      pragmas :=
-        { !pragmas with ctrl = Stmt.Set.add ki !pragmas.ctrl }
+      add_ctrl_pragma ki
     | APragma (Slice_pragma SPctrl) ->
       (* to select the reachability of the pragma *)
-      pragmas :=
-        { !pragmas with ctrl = Stmt.Set.add ki !pragmas.ctrl }
+      add_ctrl_pragma ki results
     | APragma (Slice_pragma SPstmt | Impact_pragma IPstmt) ->
       (* to preserve the effect of the statement *)
-      pragmas :=
-        { !pragmas with stmt = Stmt.Set.add ki !pragmas.stmt}
+      add_stmt_pragma ki results
     | AAssert (_behav,pred) ->
       (* to preserve the interpretation of the assertion *)
-      get_zone_from_pred ki pred.tp_statement;
+      get_zone_from_pred ki pred.tp_statement results
     | AInvariant (_behav,true,pred) -> (* loop invariant *)
       (* WARNING this is obsolete *)
       (* [JS 2010/09/02] TODO: so what is the right way to do? *)
       (* to preserve the interpretation of the loop invariant *)
-      get_zone_from_pred (Option.get loop_body_opt) pred.tp_statement;
+      get_zone_from_pred (Option.get loop_body_opt) pred.tp_statement results
     | AInvariant (_behav,false,pred) -> (* code invariant *)
       (* to preserve the interpretation of the code invariant *)
-      get_zone_from_pred ki pred.tp_statement;
+      get_zone_from_pred ki pred.tp_statement results
     | AVariant (term,_) ->
       (* to preserve the interpretation of the variant *)
-      get_zone_from_term (Option.get loop_body_opt) term;
+      get_zone_from_term (Option.get loop_body_opt) term results
     | APragma (Loop_pragma (Unroll_specs terms))
     | APragma (Loop_pragma (Widen_hints terms))
     | APragma (Loop_pragma (Widen_variables terms)) ->
       (* to select the declaration of the variables *)
-      List.iter
-        (fun term ->
-           locals := Varinfo.Set.union (extract_locals_from_term term) !locals;
-           labels := Logic_label.Set.union (extract_labels_from_term term) !labels)
-        terms
-    | AAllocation (_,FreeAllocAny) -> ();
+      List.fold_left
+        (fun results term -> {
+             results with
+             locals = Varinfo.Set.union (extract_locals_from_term term) results.locals;
+             labels = Logic_label.Set.union (extract_labels_from_term term) results.labels
+           })
+        results terms
+    | AAllocation (_,FreeAllocAny) -> results
     | AAllocation (_,FreeAlloc(f,a)) ->
-      let get_zone x =
-        get_zone_from_term (Option.get loop_body_opt) x.it_content
+      let get_zone results x =
+        get_zone_from_term (Option.get loop_body_opt) x.it_content results
       in
-      List.iter get_zone f ;
-      List.iter get_zone a
-    | AAssigns (_, WritesAny) -> ()
+      let results = List.fold_left get_zone results f in
+      let results = List.fold_left get_zone results a in
+      results
+    | AAssigns (_, WritesAny) -> results
     | AAssigns (_, Writes l) -> (* loop assigns *)
-      let get_zone x =
-        get_zone_from_term (Option.get loop_body_opt) x.it_content
+      let get_zone results x =
+        get_zone_from_term (Option.get loop_body_opt) x.it_content results
       in
-      List.iter
-        (fun (zone,deps) ->
-           get_zone zone;
+      List.fold_left
+        (fun results (zone,deps) ->
+           let results = get_zone results zone in
            match deps with
-             FromAny -> ()
-           | From l -> List.iter get_zone l)
-        l
+             FromAny -> results
+           | From l -> List.fold_left get_zone results l)
+        results l
     | AStmtSpec _ -> (* TODO *)
       raise (NYI "[logic_interp] statement contract")
     | AExtended _ -> raise (NYI "[logic_interp] extension")
+
   (* Used by annotations entry points. *)
-  let get_from_stmt_annots code_annot_filter ((ki, _kf) as stmt) =
-    Option.iter
-      (fun caf ->
-         let loop_body_opt = match ki.skind with
-           | Loop(_, { bstmts = body :: _ }, _, _, _) -> Some body
-           | _ -> None
-         in
-         Annotations.iter_code_annot
-           (fun _ a ->
-              if caf a then get_zone_from_annot a stmt loop_body_opt)
-           ki)
+  let get_from_stmt_annots code_annot_filter ((ki, _kf) as stmt) results =
+    Option.fold
+      ~none:results
+      ~some:(fun caf ->
+          let loop_body_opt = match ki.skind with
+            | Loop(_, { bstmts = body :: _ }, _, _, _) -> Some body
+            | _ -> None
+          in
+          Annotations.fold_code_annot
+            (fun _ a results ->
+               if caf a
+               then get_zone_from_annot a stmt loop_body_opt results
+               else results)
+            ki results)
       code_annot_filter
 
   (** Used by annotations entry points. *)
@@ -658,22 +643,24 @@ struct
   (** Entry point to get the list of [ki] * [Locations.Zone.t]
       needed to evaluate the code annotations related to this [stmt]. *)
   let from_stmt_annot annot stmt =
-    from_ki_annot annot stmt;
-    get_annot_result ()
+    from_ki_annot annot stmt empty_results |>
+    get_annot_result
 
   (** Entry point to get the list of [ki] * [Locations.Zone.t]
       needed to evaluate the code annotations related to this [stmt]. *)
   let from_stmt_annots code_annot_filter stmt =
-    get_from_stmt_annots code_annot_filter stmt ;
-    get_annot_result ()
+    get_from_stmt_annots code_annot_filter stmt empty_results |>
+    get_annot_result
 
   (** Entry point to get the list of [ki] * [Locations.Zone.t]
       needed to evaluate the code annotations related to this [kf]. *)
   let from_func_annots iter_on_kf_stmt code_annot_filter kf =
+    let results = ref empty_results in
     let from_stmt_annots ki =
-      get_from_stmt_annots code_annot_filter (ki, kf)
-    in iter_on_kf_stmt from_stmt_annots kf;
-    get_annot_result ()
+      results := get_from_stmt_annots code_annot_filter (ki, kf) !results
+    in
+    iter_on_kf_stmt from_stmt_annots kf;
+    get_annot_result !results
 
   (** To quickly build a annotation filter *)
   let code_annot_filter annot ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop_var ~others =
