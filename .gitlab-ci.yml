@@ -374,7 +374,7 @@ src-distrib-tests-long:
 
 .build_template: &prepare_ssh_template
   before_script:
-    - echo "$FRAMA_C_PUBLIC_SSH_PRIVATE_KEY" | nix run -f channel:nixos-19.03 coreutils --command base64 -d > nix/frama-c-public/id_ed25519
+    - echo "$FRAMA_CI_BOT_SSH_PRIVATE" | nix run -f channel:nixos-19.03 coreutils --command base64 -d > nix/frama-c-public/id_ed25519
     - nix run -f channel:nixos-19.03 coreutils --command chmod 400 nix/frama-c-public/id_ed25519
 
 release-frama-c:
