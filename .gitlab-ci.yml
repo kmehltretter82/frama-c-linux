@@ -335,6 +335,7 @@ opam-pin:
       - schedules
     variables:
       - $RELEASE == "yes"
+  when: manual
 
 opam-pin-automatic:
   <<: *opam_pin_template
