@@ -54,6 +54,28 @@ do-not-stop-pipeline:
     variables:
       - $DEFAULT == $CI_COMMIT_BRANCH
 
+check-publish:
+  stage: prepare
+  script: >
+    [[ "$RELEASE" == "no" ]] &&
+    [[ "$DEFAULT" == "$CI_COMMIT_BRANCH" ]] &&
+    [[ "$DEFAULT" == "master" ]]
+  only:
+    variables:
+      - $PUBLISH == "yes"
+
+check-release:
+  stage: prepare
+  script: >
+    [[ "$PUBLISH" == "no" ]] &&
+    [[ "$DEFAULT" == "$CI_COMMIT_BRANCH" ]] &&
+    [[ "$DEFAULT" == "stable/$(cat VERSION_CODENAME | tr '[:upper:]' '[:lower:]')" ]] &&
+    [[ "$(git describe --tag)" == "$(cat VERSION | sed 's/~/-/')" ]]
+    [[ "$(cat VERSION)" == "$(cat opam/opam | grep "^version" | sed 's/version: \"\(.*\)\"/\1/')" ]]
+  only:
+    variables:
+      - $RELEASE == "yes"
+
 ################################################################################
 ### BUILD
 
