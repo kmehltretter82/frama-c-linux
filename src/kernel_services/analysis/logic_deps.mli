@@ -24,13 +24,13 @@ open Cil_types
 
 val compute_term_deps: (stmt -> term -> Locations.Zone.t option) ref
 
-type ctx = Db.Properties.Interp.To_zone.t_ctx
+type ctx
 
-val mk_ctx_func_contrat: kernel_function -> state_opt:bool option -> ctx
+val mk_ctx_func_contrat: ?before:bool -> kernel_function -> ctx
 (** To build an interpretation context relative to function
     contracts. *)
 
-val mk_ctx_stmt_contrat: kernel_function -> stmt -> state_opt:bool option -> ctx
+val mk_ctx_stmt_contrat: ?before:bool -> kernel_function -> stmt -> ctx
 (** To build an interpretation context relative to statement
     contracts. *)
 

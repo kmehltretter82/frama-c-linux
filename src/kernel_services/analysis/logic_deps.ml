@@ -31,37 +31,37 @@ let not_yet_implemented = ref ""
     term depends. *)
 let compute_term_deps = ref (fun _stmt _expr -> None)
 
-(* Reimport here the type definitions of Db.Properties.Interp. See
-    documentation there. *)
-type ctx = Db.Properties.Interp.To_zone.t_ctx =
-  {state_opt:bool option;
-   ki_opt:(stmt * bool) option;
-   kf:Kernel_function.t}
+type ctx = {
+  site: ctx_site;
+  before: bool option;
+  kf: Kernel_function.t
+}
+
+and ctx_site =
+  | FunctionContract
+  | StatementContract of stmt
+  | StatementAnnotation of stmt
 
 type pragmas = Db.Properties.Interp.To_zone.t_pragmas =
   {ctrl: Stmt.Set.t ; stmt: Stmt.Set.t}
 
 type t = Db.Properties.Interp.To_zone.t
 = {before:bool ; ki:stmt ; zone:Locations.Zone.t}
+
 type zone_info = Db.Properties.Interp.To_zone.t_zone_info
 
 type decl = Db.Properties.Interp.To_zone.t_decl =
   {var: Varinfo.Set.t ; lbl: Logic_label.Set.t}
 
-let mk_ctx_func_contrat kf ~state_opt =
-  { state_opt = state_opt;
-    ki_opt = None;
-    kf = kf }
 
-let mk_ctx_stmt_contrat kf ki ~state_opt =
-  { state_opt=state_opt;
-    ki_opt= Some(ki, false);
-    kf = kf }
+let mk_ctx_func_contrat ?before kf =
+  { before; site=FunctionContract; kf }
 
-let mk_ctx_stmt_annot kf ki =
-  { state_opt = Some true;
-    ki_opt = Some(ki, true);
-    kf = kf }
+let mk_ctx_stmt_contrat ?before kf stmt =
+  { before; site=StatementContract stmt; kf }
+
+let mk_ctx_stmt_annot kf stmt =
+  { before=Some true; site=StatementAnnotation stmt; kf }
 
 type result = {
   pragmas: pragmas;
@@ -166,18 +166,15 @@ let is_same_label absl l =
   | AbsLabel_loop_current, BuiltinLabel LoopCurrent -> true
   | _, (StmtLabel _ | FormalLabel _ | BuiltinLabel _) -> false
 
-
 let populate_zone ctx visit cil_node current_zones =
-  let { state_opt=before_opt; ki_opt; kf } = ctx in
   (* interpretation from the
-     - pre-state if  [before_opt=Some true]
-     - post-state if [before_opt=Some false]
+     - pre-state if [before=Some true]
+     - post-state if [before=Some false]
      - pre-state with possible reference to the post-state if
-        [before_opt=None] of a property relative to
-     - the contract of function [kf] when [ki_opt=None]
-        otherwise [ki_opt=Some(ki, code_annot)],
-     - the contract of the statement [ki] when [code_annot=false]
-     - the annotation of the statement [ki] when [code_annot=true] *)
+        [before=None] of a property relative to
+     - the contract of function [kf] when [side=FunctionContract]
+     - the contract of the statement [ki] when [site=StatementContract stmt]
+     - the annotation of the statement [ki] when [site=StatementAnnotation stmt] *)
   let vis = object(self)
     inherit Visitor.frama_c_inplace
     val mutable current_label = AbsLabel_here
@@ -188,21 +185,20 @@ let populate_zone ctx visit cil_node current_zones =
       let get_fct_entry_point () =
         (* TODO: to replace by true, None *)
         true,
-        (try Some (Kernel_function.find_first_stmt kf)
+        (try Some (Kernel_function.find_first_stmt ctx.kf)
          with Kernel_function.No_Statement ->
            (* raised when [kf] has no code. *)
            None)
       in
       let get_ctrl_point dft =
-        let before = Option.value ~default:dft before_opt in
-        match ki_opt with
-        | None -> (* function contract *)
-
+        let before = Option.value ~default:dft ctx.before in
+        match ctx.site with
+        | FunctionContract ->
           if before then get_fct_entry_point ()
           else before, None
         (* statement contract *)
-        | Some (ki,_) ->  (* statement contract and code annotation *)
-          before, Some ki
+        | StatementContract stmt | StatementAnnotation stmt ->  (* statement contract and code annotation *)
+          before, Some stmt
       in
       let result = match current_label with
         | AbsLabel_stmt stmt -> true, Some stmt
@@ -233,62 +229,61 @@ let populate_zone ctx visit cil_node current_zones =
 
     method private change_label_to_old: 'a.'a -> 'a visitAction =
       fun x ->
-      match ki_opt,before_opt with
+      match ctx.site, ctx.before with
       (* function contract *)
-      | None,Some true ->
+      | FunctionContract, Some true ->
         failwith "The use of the label Old is forbidden inside clauses \
                   related to the pre-state of function contracts."
-      | None,None
-      | None,Some false ->
+      | FunctionContract, None
+      | FunctionContract, Some false ->
         (* refers to the pre-state of the contract. *)
         self#change_label AbsLabel_pre x
       (* statement contract *)
-      | Some (_ki,false),Some true  ->
+      | StatementContract _stmt, Some true  ->
         failwith "The use of the label Old is forbidden inside clauses \
                   related to the pre-state of statement contracts."
-      | Some (ki,false),None
-      | Some (ki,false),Some false  ->
+      | StatementContract stmt, None
+      | StatementContract stmt, Some false  ->
         (* refers to the pre-state of the contract. *)
-        self#change_label (AbsLabel_stmt ki) x
+        self#change_label (AbsLabel_stmt stmt) x
       (* code annotation *)
-      | Some (_ki,true),None
-      | Some (_ki,true),Some _ ->
+      | StatementAnnotation _stmt, _ ->
         (* refers to the pre-state of the function contract. *)
         self#change_label AbsLabel_pre x
 
     method private change_label_to_post: 'a.'a -> 'a visitAction =
       fun x ->
       (* allowed when [before_opt=None] for function/statement contracts *)
-      match ki_opt,before_opt with
+      match ctx.site, ctx.before with
       (* function contract *)
-      | None,Some _ ->
+      | FunctionContract, Some _ ->
         failwith "Function contract where the use of the label Post is \
                   forbidden."
-      | None,None ->
+      | FunctionContract, None ->
         (* refers to the post-state of the contract. *)
         self#change_label AbsLabel_post x
       (* statement contract *)
-      | Some (_ki,false),Some _  ->
+      | StatementContract _stmt, Some _  ->
         failwith "Statement contract where the use of the label Post is \
                   forbidden."
-      | Some (_ki,false),None ->
+      | StatementContract _stmt,None ->
         (* refers to the pre-state of the contract. *)
         self#change_label AbsLabel_post x
       (* code annotation *)
-      | Some (_ki,true), _ ->
+      | StatementAnnotation _stmt, _ ->
         failwith "The use of the label Post is forbidden inside code \
                   annotations."
 
     method private change_label_to_pre: 'a.'a -> 'a visitAction =
       fun x ->
-      match ki_opt with
+      match ctx.site with
       (* function contract *)
-      | None ->
+      | FunctionContract ->
         failwith "The use of the label Pre is forbidden inside function \
                   contracts."
       (* statement contract *)
       (* code annotation *)
-      | Some _ ->
+      | StatementContract _ | StatementAnnotation _ ->
         (* refers to the pre-state of the function contract. *)
         self#change_label AbsLabel_pre x
 
@@ -297,14 +292,14 @@ let populate_zone ctx visit cil_node current_zones =
 
     method private change_label_to_stmt: 'a.stmt -> 'a -> 'a visitAction =
       fun stmt x ->
-      match ki_opt with
+      match ctx.site with
       (* function contract *)
-      | None ->
+      | FunctionContract ->
         failwith "the use of C labels is forbidden inside clauses related \
                   to function contracts."
       (* statement contract *)
       (* code annotation *)
-      | Some _ ->
+      | StatementContract _ | StatementAnnotation _ ->
         (* refers to the state at the C label of the statement [stmt]. *)
         self#change_label (AbsLabel_stmt stmt) x
 
@@ -457,10 +452,10 @@ let from_pred pred ctx =
 (** Used by annotations entry points. *)
 let get_zone_from_annot a (ki,kf) loop_body_opt results =
   let get_zone_from_term k term results =
-    let ctx = { state_opt = Some true; ki_opt = Some (k, true); kf } in
+    let ctx = mk_ctx_stmt_annot kf k in
     add_results_from_term ctx results term
   and get_zone_from_pred k pred results =
-    let ctx = { state_opt = Some true; ki_opt = Some (k, true); kf } in
+    let ctx = mk_ctx_stmt_annot kf k in
     add_results_from_pred ctx results pred
   in
   match a.annot_content with
@@ -609,16 +604,26 @@ let to_result_from_pred p =
      true)
 
 
+let adapt_ctx ctx =
+  let open Db.Properties.Interp.To_zone in
+  let site = match ctx.ki_opt with
+    | None -> FunctionContract
+    | Some (stmt, false) -> StatementContract stmt
+    | Some (stmt, true) -> StatementAnnotation stmt
+  in
+  { site; before=ctx.state_opt; kf=ctx.kf  }
+
 let () =
   Db.Properties.Interp.To_zone.code_annot_filter := code_annot_filter;
-  Db.Properties.Interp.To_zone.mk_ctx_func_contrat := mk_ctx_func_contrat;
-  Db.Properties.Interp.To_zone.mk_ctx_stmt_contrat := mk_ctx_stmt_contrat;
-  Db.Properties.Interp.To_zone.mk_ctx_stmt_annot := mk_ctx_stmt_annot;
 
-  Db.Properties.Interp.To_zone.from_term := from_term;
-  Db.Properties.Interp.To_zone.from_terms := from_terms;
-  Db.Properties.Interp.To_zone.from_pred := from_pred;
-  Db.Properties.Interp.To_zone.from_preds := from_preds;
+  Db.Properties.Interp.To_zone.from_term :=
+    (fun term ctx -> from_term term (adapt_ctx ctx));
+  Db.Properties.Interp.To_zone.from_terms :=
+    (fun terms ctx -> from_terms terms (adapt_ctx ctx));
+  Db.Properties.Interp.To_zone.from_pred :=
+    (fun pred ctx -> from_pred pred (adapt_ctx ctx));
+  Db.Properties.Interp.To_zone.from_preds :=
+    (fun preds ctx -> from_preds preds (adapt_ctx ctx));
   Db.Properties.Interp.To_zone.from_stmt_annot := from_stmt_annot;
   Db.Properties.Interp.To_zone.from_stmt_annots := from_stmt_annots;
   Db.Properties.Interp.To_zone.from_func_annots := from_func_annots;
