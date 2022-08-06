@@ -43,7 +43,7 @@ let compute_term_deps stmt t =
   let state = Results.(before stmt |> get_cvalue_model) in
   term_deps state t
 
-let () = Logic_interp.To_zone.compute_term_deps := compute_term_deps
+let () = Logic_deps.compute_term_deps := compute_term_deps
 
 let valid_behaviors kf state =
   let funspec = Annotations.funspec kf in

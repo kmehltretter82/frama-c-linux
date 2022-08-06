@@ -20,12 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* This module exists for compatibility only and will be removed in future
+   versions *)
+
 open Cil_types
 
 module To_zone : sig
   exception NYI of string
   val not_yet_implemented : string ref
-  val compute_term_deps: (stmt -> term -> Locations.Zone.t option) ref
 end
 
 exception [@alert deprecated "Use directly Logic_parse_string.Error istead."]
