@@ -782,20 +782,19 @@ and type_predicate ~profile p =
     begin
       match li.l_body with
       | LBpred p ->
-         List.iter
-            (fun x -> ignore (type_term ~use_gmp_opt: true ~profile x))
-            args;
-          let new_profile =
-            Profile.make
-              li.l_profile
-              (List.map (Interval.get_from_profile ~profile) args)
-          in
-          let new_profile = Interval.get_widened_profile new_profile li in
-          if Recursive_pred.is_done new_profile li
-          then ()
-          else
-            (Recursive_pred.add new_profile li;
-             ignore (type_predicate ~profile:new_profile p))
+        List.iter
+          (fun x -> ignore (type_term ~use_gmp_opt: true ~profile x))
+          args;
+        let new_profile =
+          Profile.make
+            li.l_profile
+            (List.map (Interval.get_from_profile ~profile) args)
+        in
+        let new_profile = Interval.get_widened_profile new_profile li in
+        if not (Recursive_pred.is_done new_profile li)
+        then
+          (Recursive_pred.add new_profile li;
+           ignore (type_predicate ~profile:new_profile p))
       | LBnone -> ()
       | LBreads _ -> ()
       | LBinductive _ -> ()

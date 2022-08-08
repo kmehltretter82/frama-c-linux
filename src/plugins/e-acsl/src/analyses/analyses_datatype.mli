@@ -105,16 +105,18 @@ end
 (** Imperative environment to perform the fixpoint algorithm for recursive
     functions *)
 module LF_env : sig
+  (* find the currently infered interval for a call to a logic function *)
   val find : logic_info -> Profile.t -> ival
-
+  (* clear the table of intervals for logic function (to do between typing )
+     each logic function calls *)
   val clear : unit -> unit
-
+  (* add an interval for a logic function call *)
   val add : logic_info -> Profile.t -> ival -> unit
-
+  (* add an interval for a predicate call *)
   val add_pred : logic_info -> Profile.t -> unit
-
+  (* determine wether a logic function or predicate is recursive *)
   val is_rec : logic_info -> bool
-
+  (* replace the current interval for a logic function call *)
   val replace : logic_info -> Profile.t -> ival -> unit
 end
 

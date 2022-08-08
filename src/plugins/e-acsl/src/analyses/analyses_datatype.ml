@@ -420,8 +420,8 @@ module LF_env
 
   let add li profile ival = LFProf.Hashtbl.add tbl (li,profile) ival
 
-  let add_pred li profile = LFProf.Hashtbl.add tbl (li,profile)
-      (Ival Ival.zero_or_one)
+  let add_pred li profile =
+    LFProf.Hashtbl.add tbl (li,profile) (Ival Ival.zero_or_one)
 
   exception Recursive
 
