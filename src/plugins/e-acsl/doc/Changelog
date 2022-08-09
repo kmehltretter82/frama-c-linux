@@ -26,6 +26,7 @@ Plugin E-ACSL <next-release>
 ############################
 
 - E-ACSL        [2022-19-07] Improve typing precision of variables appearing in comparisons
+-* E-ACSL       [2022-09-08] Fix typing of recursive predicates (frama-c/e-acsl#198)
 -* E-ACSL       [2022-17-06] Fix wrong cast from pointer to integer (frama-c/frama-c#1119)
 
 ##############################
