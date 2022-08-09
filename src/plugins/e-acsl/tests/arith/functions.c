@@ -67,6 +67,7 @@ int main(void) {
   mystruct m;
   m.k = 8;
   m.l = 9;
+  /*@ assert \let r = t1(m); r.k == 8; */;
   /*@ assert t2(t1(m)) == 17; */;
 
   k(9);

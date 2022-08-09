@@ -81,10 +81,15 @@ let rec get_assigns_from ~loc env lprofile lv =
 
 (* Special case when the function takes an extra argument as its result:
    For the argument [__e_acsl_mpz_t *__retres_arg], this function generates the
-   expression [( *__retres_arg )[0]] *)
-let get_gmp_integer ~loc vi =
-  Smart_exp.lval
-    ~loc
-    (Mem
-       (Smart_exp.lval  ~loc (Var vi, NoOffset)),
-     (Index (Cil.zero ~loc, NoOffset)))
+   expression [( *__retres_arg )[0]]. For a struct argument, this function just
+   generates the variable corresponding to the argument. *)
+let get_assigned_var ~loc vi ret_gmp =
+  let var =
+    if ret_gmp then
+      Smart_exp.lval
+        ~loc
+        (Mem
+           (Smart_exp.lval  ~loc (Var vi, NoOffset)),
+         (Index (Cil.zero ~loc, NoOffset)))
+    else Smart_exp.lval ~loc (Var vi, NoOffset)
+  in Logic_utils.expr_to_term var
