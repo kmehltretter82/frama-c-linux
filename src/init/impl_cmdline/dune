@@ -24,4 +24,5 @@
   (name frama_c_very_first_cmdline)
   (public_name frama-c.init.cmdline)
   (implements frama-c.init)
+  (instrumentation (backend landmarks))
 )

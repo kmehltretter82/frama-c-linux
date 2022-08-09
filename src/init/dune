@@ -26,6 +26,7 @@
   (modules frama_c_init gui_init)
   (virtual_modules gui_init)
   (libraries threads)
+  (instrumentation (backend landmarks))
 )
 
 (include_subdirs no)

@@ -39,7 +39,8 @@
  (optional)
  (public_name frama-c-eva.core)
  (flags -open Frama_c_kernel :standard -w -9 -alert -db_deprecated)
- (libraries frama-c.kernel frama-c-server.core))
+ (libraries frama-c.kernel frama-c-server.core)
+ (instrumentation (backend landmarks)))
 
 (plugin
  (name eva)
@@ -56,7 +57,8 @@
   (optional)
   (public_name frama-c-eva.gui)
   (flags -open Frama_c_kernel -open Frama_c_gui -open Eva__Private :standard -w -9 -alert -db_deprecated)
-  (libraries eva frama-c.kernel frama-c.gui)))
+  (libraries eva frama-c.kernel frama-c.gui)
+  (instrumentation (backend landmarks))))
 
 (plugin
  (name eva-gui)
@@ -71,7 +73,8 @@
   (optional)
   (public_name frama-c-eva.numerors.core)
   (flags -open Frama_c_kernel -open Eva__Private :standard)
-  (libraries frama-c.kernel frama-c-eva.core mlmpfr)))
+  (libraries frama-c.kernel frama-c-eva.core mlmpfr)
+  (instrumentation (backend landmarks))))
 
 (plugin
  (name eva.numerors)
@@ -88,7 +91,8 @@
   (flags -open Frama_c_kernel -open Eva__Private :standard -w -9)
   (libraries
    frama-c.kernel frama-c-eva.core
-   apron.octMPQ apron.boxMPQ apron.polkaMPQ apron.apron)))
+   apron.octMPQ apron.boxMPQ apron.polkaMPQ apron.apron)
+  (instrumentation (backend landmarks))))
 
 (plugin
   (name eva.apron)
