@@ -208,6 +208,19 @@ end = struct
 
 end
 
+module Recursive_pred : sig
+  val add: Profile.t -> logic_info -> unit
+  val is_done: Profile.t -> logic_info -> bool
+end = struct
+  let known = ref LFProf.Set.empty
+
+  let add profile li =
+    known := LFProf.Set.add (li, profile) !known
+
+  let is_done profile li = LFProf.Set.mem (li, profile) !known
+
+end
+
 (******************************************************************************)
 (** {2 Coercion rules} *)
 (******************************************************************************)
@@ -558,6 +571,7 @@ let rec type_term
               li.l_profile
               (List.map (Interval.get_from_profile ~profile) args)
           in
+          let new_profile = Interval.get_widened_profile new_profile li in
           Stack.push
             (fun () ->
                ignore (type_predicate ~profile:new_profile p))
@@ -776,7 +790,11 @@ and type_predicate ~profile p =
             li.l_profile
             (List.map (Interval.get_from_profile ~profile) args)
         in
-        type_predicate ~profile:new_profile p;
+        let new_profile = Interval.get_widened_profile new_profile li in
+        if not (Recursive_pred.is_done new_profile li)
+        then
+          (Recursive_pred.add new_profile li;
+           ignore (type_predicate ~profile:new_profile p))
       | LBnone -> ()
       | LBreads _ -> ()
       | LBinductive _ -> ()

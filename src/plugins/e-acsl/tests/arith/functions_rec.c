@@ -6,6 +6,18 @@
   STDOPT: +"-eva-unroll-recursive-calls 100"
 */
 
+/*@ predicate even (integer n) =
+      n == 0 ? \true :
+      n > 0 ? ! even (n - 1) :
+      ! even (n + 1);
+*/
+
+/*@ predicate even_and_not_negative (integer n) =
+      n == 0 ? \true :
+      n > 0 ? ! even (n - 1) :
+      \false;
+*/
+
 /*@ logic integer f1(integer n) =
     n <= 0 ? 0 : f1(n - 1) + n; */
 
@@ -25,9 +37,12 @@
   n >= 0 ? 0 : f5(n + 1) + n; */
 
 int main(void) {
+  /*@ assert even(10); @*/;
+  /*@ assert even(-6); @*/;
+  /*@ assert even_and_not_negative(10); */;
   /*@ assert f1(0) == 0; */;
   /*@ assert f1(1) == 1; */;
-  /*@ assert f1(100) == 5050; */;
+  /*@ assert f1(10) == 55; */;
 
   /*@ assert f2(7) == 1; */;
 
