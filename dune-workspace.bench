@@ -1,8 +1,8 @@
 (lang dune 2.8)
-(context default)
 (context
  (default
   (name bench)
+  (profile bench)
   (instrument_with landmarks)
   (env
     (_ (env-vars ("OCAML_LANDMARKS" "auto")))))
