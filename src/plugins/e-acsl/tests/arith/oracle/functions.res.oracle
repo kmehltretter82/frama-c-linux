@@ -1,71 +1,73 @@
 [e-acsl] beginning translation.
-[e-acsl] functions.c:70: Warning: 
+[e-acsl] functions.c:73: Warning: 
   E-ACSL construct `function application' is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] functions.c:48: Warning: 
+[eva:alarm] functions.c:51: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] functions.c:48: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] functions.c:50: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] functions.c:52: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] functions.c:52: Warning: 
-  function __e_acsl_assert_register_long: precondition data->values == \null ||
-                                                       \valid(data->values) got status unknown.
-[eva:alarm] functions.c:53: Warning: 
+[eva:alarm] functions.c:51: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [eva:alarm] functions.c:53: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] functions.c:54: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] functions.c:55: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] functions.c:55: Warning: 
+  function __e_acsl_assert_register_long: precondition data->values == \null ||
+                                                       \valid(data->values) got status unknown.
+[eva:alarm] functions.c:56: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] functions.c:56: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] functions.c:57: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] functions.c:60: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] functions.c:60: Warning: 
+[eva:alarm] functions.c:58: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] functions.c:63: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [eva:alarm] functions.c:63: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] functions.c:66: Warning: 
   function __e_acsl_assert_register_char: precondition data->values == \null ||
                                                        \valid(data->values) got status unknown.
-[eva:alarm] functions.c:63: Warning: 
+[eva:alarm] functions.c:66: Warning: 
   function __e_acsl_assert_register_char: precondition data->values == \null ||
                                                        \valid(data->values) got status unknown.
-[eva:alarm] functions.c:65: Warning: 
+[eva:alarm] functions.c:68: Warning: 
   function __e_acsl_assert_register_short: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
-[eva:alarm] functions.c:65: Warning: 
+[eva:alarm] functions.c:68: Warning: 
   function __e_acsl_assert_register_short: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
-[eva:alarm] functions.c:70: Warning: 
+[eva:alarm] functions.c:73: Warning: 
   function __e_acsl_assert_register_struct: precondition data->values == \null ||
                                                          \valid(data->values) got status unknown.
-[eva:alarm] functions.c:70: Warning: 
+[eva:alarm] functions.c:73: Warning: 
   function __e_acsl_assert_register_struct: precondition data->values == \null ||
                                                          \valid(data->values) got status unknown.
-[eva:alarm] functions.c:70: Warning: assertion got status unknown.
-[eva:alarm] functions.c:71: Warning: 
+[eva:alarm] functions.c:73: Warning: assertion got status unknown.
+[eva:alarm] functions.c:74: Warning: 
   function __e_acsl_assert_register_struct: precondition data->values == \null ||
                                                          \valid(data->values) got status unknown.
-[eva:alarm] functions.c:71: Warning: 
+[eva:alarm] functions.c:74: Warning: 
   function __e_acsl_assert_register_long: precondition data->values == \null ||
                                                        \valid(data->values) got status unknown.
 [eva:alarm] functions.c:28: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] functions.c:76: Warning: 
+[eva:alarm] functions.c:79: Warning: 
   non-finite double value. assert \is_finite(__gen_e_acsl__9);
-[eva:alarm] functions.c:76: Warning: 
+[eva:alarm] functions.c:79: Warning: 
   function __e_acsl_assert_register_double: precondition data->values == \null ||
                                                          \valid(data->values) got status unknown.
-[eva:alarm] functions.c:76: Warning: 
+[eva:alarm] functions.c:79: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] functions.c:78: Warning: assertion got status unknown.
+[eva:alarm] functions.c:81: Warning: assertion got status unknown.
+[eva:alarm] functions.c:83: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
