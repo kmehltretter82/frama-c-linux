@@ -105,7 +105,7 @@ let pred_to_block ~loc kf env ret_vi p =
   generate_return_block ~loc env ret_vi e
 
 (* Generate the function's body for terms. *)
-let term_to_block ~loc kf env ret_ty ret_vi t =
+let term_to_block ~loc ~is_mpq kf env ret_ty ret_vi t =
   let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
   if Cil.isVoidType ret_ty then
     (* if the function's result is a GMP, it is the first parameter of the
@@ -113,7 +113,9 @@ let term_to_block ~loc kf env ret_ty ret_vi t =
     let set =
       let lv_star_ret = Cil.mkMem ~addr:(Cil.evar ~loc ret_vi) ~off:NoOffset in
       let star_ret = Smart_exp.lval ~loc lv_star_ret in
-      Gmp.init_set ~loc lv_star_ret star_ret e
+      if is_mpq
+      then Rational.init_set ~loc lv_star_ret star_ret e
+      else Gmp.init_set ~loc lv_star_ret star_ret e
     in
     let return_void = Cil.mkStmt ~valid_sid:true (Return (None, loc)) in
     let b, env = Env.pop_and_get env set ~global_clear:false Env.Middle in
@@ -123,8 +125,8 @@ let term_to_block ~loc kf env ret_ty ret_vi t =
   else
     generate_return_block ~loc env ret_vi e
 
-let generate_body ~loc kf env ret_ty ret_vi = function
-  | LBterm t -> term_to_block ~loc kf env ret_ty ret_vi t
+let generate_body ~loc ~is_mpq kf env ret_ty ret_vi = function
+  | LBterm t -> term_to_block ~loc ~is_mpq kf env ret_ty ret_vi t
   | LBpred p -> pred_to_block ~loc kf env ret_vi p
   | LBnone |LBreads _ | LBinductive _ -> assert false
 
@@ -238,7 +240,7 @@ let generate_kf ~loc fname env ret_ty params_ty params_ival li =
           kf
           (Writes [ assigned_var , From assigns_from]);
     end;
-    let b, env = generate_body ~loc kf env ret_ty ret_vi li.l_body in
+    let b, env = generate_body ~loc ~is_mpq kf env ret_ty ret_vi li.l_body in
     fundec.sbody <- b;
     (* add the generated variables in the necessary lists *)
     (* TODO: factorized the code below that add the generated vars with method
