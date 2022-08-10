@@ -46,6 +46,8 @@ val lnot: loc:location -> exp -> exp
 val null: loc:location -> exp
 (** [null ~loc] creates an expression to represent the NULL pointer. *)
 
+val mem: loc:location -> varinfo -> exp
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

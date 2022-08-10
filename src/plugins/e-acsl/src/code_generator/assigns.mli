@@ -32,6 +32,6 @@ val get_assigns_from :
    the result of a logic function *)
 
 val get_assigned_var :
-  loc:Cil_types.location -> Cil_types.varinfo -> bool -> Cil_types.term
+  loc:Cil_types.location -> is_gmp:bool -> Cil_types.varinfo -> Cil_types.term
 (* @returns the expression that gets assigned when the result of the function is
    passed as an additional argument *)

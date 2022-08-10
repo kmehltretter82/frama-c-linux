@@ -56,15 +56,13 @@ let term_to_exp_ref
 (* @return true iff the result of the function is provided by reference as the
    first extra argument at each call *)
 let result_as_extra_argument typ =
-  let is_composite = function
+  let is_composite typ =
+    match Cil.unrollType typ with
     | TComp _ | TPtr _ | TArray _ -> true
     | TInt _ | TVoid _  | TFloat _ | TFun _ | TNamed _ | TEnum _
     | TBuiltin_va_list _ -> false
   in
-  Gmp_types.Z.is_t typ ||
-  is_composite typ
-(* TODO: to be extended to any compound type? E.g. returning a struct is not
-   good practice... *)
+  Gmp_types.Z.is_t typ || Gmp_types.Q.is_t typ || is_composite typ
 
 (*****************************************************************************)
 (****************** Generation of function bodies ****************************)
@@ -158,7 +156,8 @@ let generate_kf ~loc fname env ret_ty params_ty params_ival li =
   in
   (* build the varinfo storing the result *)
   let res_as_extra_arg = result_as_extra_argument ret_ty in
-  let ret_gmp = Gmp_types.Z.is_t ret_ty in
+  let is_mpz = Gmp_types.Z.is_t ret_ty in
+  let is_mpq = Gmp_types.Q.is_t ret_ty in
   let ret_vi, ret_ty, params_with_ret, params_ty_with_ret =
     let vname = "__retres" in
     if res_as_extra_arg then
@@ -217,7 +216,7 @@ let generate_kf ~loc fname env ret_ty params_ty params_ival li =
     let assigned_var =
       Logic_const.new_identified_term
         (if res_as_extra_arg then
-           Assigns.get_assigned_var ~loc ret_vi ret_gmp
+           Assigns.get_assigned_var ~loc ~is_gmp:(is_mpz || is_mpq) ret_vi
          else
            Logic_const.tresult fundec.svar.vtype)
     in
