@@ -411,28 +411,20 @@ int main(void)
   {
     __e_acsl_mpq_t __gen_e_acsl_over_2;
     __e_acsl_mpq_t __gen_e_acsl__11;
-    __e_acsl_mpq_t __gen_e_acsl__12;
-    __e_acsl_mpq_t __gen_e_acsl_div_3;
     int __gen_e_acsl_eq_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_15 =
       {.values = (void *)0};
     __gen_e_acsl_over(& __gen_e_acsl_over_2,1.,2.);
     __gmpq_init(__gen_e_acsl__11);
-    __gmpq_set_d(__gen_e_acsl__11,1.);
-    __gmpq_init(__gen_e_acsl__12);
-    __gmpq_set_d(__gen_e_acsl__12,2.);
-    __gmpq_init(__gen_e_acsl_div_3);
-    __gmpq_div(__gen_e_acsl_div_3,
-               (__e_acsl_mpq_struct const *)(__gen_e_acsl__11),
-               (__e_acsl_mpq_struct const *)(__gen_e_acsl__12));
+    __gmpq_set_d(__gen_e_acsl__11,0.5);
     __gen_e_acsl_eq_2 = __gmpq_cmp((__e_acsl_mpq_struct const *)(__gen_e_acsl_over_2),
-                                   (__e_acsl_mpq_struct const *)(__gen_e_acsl_div_3));
+                                   (__e_acsl_mpq_struct const *)(__gen_e_acsl__11));
     __e_acsl_assert_register_mpq(& __gen_e_acsl_assert_data_15,
                                  "over(1., 2.)",
                                  (__e_acsl_mpq_struct const *)(__gen_e_acsl_over_2));
     __gen_e_acsl_assert_data_15.blocking = 1;
     __gen_e_acsl_assert_data_15.kind = "Assertion";
-    __gen_e_acsl_assert_data_15.pred_txt = "over(1., 2.) == 1. / 2.";
+    __gen_e_acsl_assert_data_15.pred_txt = "over(1., 2.) == 0.5";
     __gen_e_acsl_assert_data_15.file = "functions.c";
     __gen_e_acsl_assert_data_15.fct = "main";
     __gen_e_acsl_assert_data_15.line = 83;
@@ -440,10 +432,8 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
     __gmpq_clear(__gen_e_acsl_over_2);
     __gmpq_clear(__gen_e_acsl__11);
-    __gmpq_clear(__gen_e_acsl__12);
-    __gmpq_clear(__gen_e_acsl_div_3);
   }
-  /*@ assert over(1., 2.) == 1. / 2.; */ ;
+  /*@ assert over(1., 2.) == 0.5; */ ;
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;

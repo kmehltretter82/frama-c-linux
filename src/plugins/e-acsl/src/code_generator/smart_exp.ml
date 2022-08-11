@@ -72,10 +72,9 @@ let null ~loc =
   Cil.mkCast ~newt:(TPtr (TVoid [], [])) (Cil.zero ~loc)
 
 let mem ~loc vi =
-  lval ~loc
-    (Cil.mkMem
-       ~addr:(lval ~loc (Var vi, NoOffset))
-       ~off:(Index (Cil.zero ~loc, NoOffset)))
+  lval
+    ~loc
+    (Cil.mkMem ~addr:(Cil.evar ~loc vi) ~off:(Index (Cil.zero ~loc, NoOffset)))
 
 (*
 Local Variables:

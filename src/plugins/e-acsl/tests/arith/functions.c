@@ -80,7 +80,7 @@ int main(void) {
 
   /*@ assert f_sum (100) == 100; */;
 
-  /*@ assert over(1., 2.) == 1./2.; */;
+  /*@ assert over(1., 2.) == 0.5; */;
 
   // not yet supported
   /* /\*@ assert p_notyet(27); *\/ ; */

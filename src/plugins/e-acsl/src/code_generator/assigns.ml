@@ -84,9 +84,5 @@ let rec get_assigns_from ~loc env lprofile lv =
    expression [( *__retres_arg )[0]]. For a struct argument, this function just
    generates the variable corresponding to the argument. *)
 let get_assigned_var ~loc ~is_gmp vi =
-  let var =
-    if is_gmp
-    then Smart_exp.mem ~loc vi
-    else Smart_exp.lval ~loc (Cil.var vi)
-  in
-  Logic_utils.expr_to_term var
+  let var = if is_gmp then Smart_exp.mem ~loc vi else Cil.evar ~loc vi
+  in Logic_utils.expr_to_term var
