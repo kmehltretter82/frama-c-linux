@@ -47,8 +47,7 @@ val null: loc:location -> exp
 (** [null ~loc] creates an expression to represent the NULL pointer. *)
 
 val mem: loc:location -> varinfo -> exp
-(** [mem ~loc v] creates an expression to represent the array access to the
-    first location of v *)
+(** [mem ~loc v] creates a Mem expression with an explicit index of 0 *)
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."
