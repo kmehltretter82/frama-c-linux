@@ -284,8 +284,7 @@ let env_of_li ~adata ~loc kf env li =
     let stmt = match Typing.get_number_ty ~logic_env t with
       | C_integer _ | C_float _ | Nan ->
         Smart_stmt.assigns ~loc ~result:(Cil.var vi) e
-      | Gmpz -> Gmp.init_set ~loc (Cil.var vi) vi_e e
-      | Rational -> Rational.init_set ~loc (Cil.var vi) vi_e e
+      | Gmpz | Rational -> Gmp.init_set ~loc (Cil.var vi) vi_e e
       | Real -> Error.not_yet "real number"
     in
     adata, Env.add_stmt env stmt

@@ -31,7 +31,7 @@ val get_assigns_from :
 (* @returns the list of expressions that are allowed to be used to assign the
    the result of a logic function *)
 
-val get_gmp_integer :
-  loc:Cil_types.location -> Cil_types.varinfo -> Cil_types.exp
+val get_assigned_var :
+  loc:Cil_types.location -> is_gmp:bool -> Cil_types.varinfo -> Cil_types.term
 (* @returns the expression that gets assigned when the result of the function is
-   a pointer on a GMP type *)
+   passed as an additional argument *)

@@ -58,7 +58,7 @@ int __gen_e_acsl_g(int x);
 
 /*@ logic mystruct t1(mystruct m) = m;
  */
-mystruct __gen_e_acsl_t1(mystruct m);
+void __gen_e_acsl_t1(mystruct *__retres_arg, mystruct m);
 
 /*@ logic integer t2(mystruct m) = m.k + m.l;
  */
@@ -378,7 +378,7 @@ int main(void)
     int __gen_e_acsl_eq_6;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
       {.values = (void *)0};
-    __gen_e_acsl_t1_2 = __gen_e_acsl_t1(m);
+    __gen_e_acsl_t1(& __gen_e_acsl_t1_2,m);
     __gen_e_acsl_t2(& __gen_e_acsl_t2_2,__gen_e_acsl_t1_2);
     __gmpz_init_set_si(__gen_e_acsl__16,17L);
     __gen_e_acsl_eq_6 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_t2_2),
@@ -657,11 +657,12 @@ int __gen_e_acsl_g(int x)
   return __gen_e_acsl_g_hidden_2;
 }
 
-/*@ assigns \result;
-    assigns \result \from m; */
-mystruct __gen_e_acsl_t1(mystruct m)
+/*@ assigns __retres_arg;
+    assigns __retres_arg \from m; */
+void __gen_e_acsl_t1(mystruct *__retres_arg, mystruct m)
 {
-  return m;
+  *__retres_arg = m;
+  return;
 }
 
 /*@ assigns (*__retres_arg)[0];

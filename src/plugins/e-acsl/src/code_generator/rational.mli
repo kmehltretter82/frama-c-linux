@@ -33,11 +33,6 @@ val create:
   exp * Env.t
 (** Create a real *)
 
-(* TODO: change the call convention *)
-val init_set: loc:location -> lval -> exp -> exp -> stmt
-(** [init_set lval lval_as_exp exp] sets [lval] to [exp] while guranteeing that
-    [lval] is properly initialized wrt the underlying real library. *)
-
 val normalize_str: string -> string
 (** Normalize the string so that it fits the representation used by the
     underlying real library. For example, "0.1" is a real number in ACSL

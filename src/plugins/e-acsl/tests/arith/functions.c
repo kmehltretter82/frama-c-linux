@@ -43,6 +43,9 @@ int glob = 5;
 // Test sums inside functions
 /*@ logic integer f_sum (integer x) = \sum(1,x,\lambda integer y; 1); */
 
+// Test functions returning a rational
+/*@ logic real over(real a, real b) = a/b; */
+
 int main(void) {
   int x = 1, y = 2;
   /*@ assert p1(x, y); */;
@@ -67,6 +70,7 @@ int main(void) {
   mystruct m;
   m.k = 8;
   m.l = 9;
+  /*@ assert \let r = t1(m); r.k == 8; */;
   /*@ assert t2(t1(m)) == 17; */;
 
   k(9);
@@ -74,7 +78,9 @@ int main(void) {
   double d = 2.0;
   /*@ assert f2(d) > 0; */;
 
-  /*@ assert f_sum (100) == 100; */
+  /*@ assert f_sum (100) == 100; */;
+
+  /*@ assert over(1., 2.) == 0.5; */;
 
   // not yet supported
   /* /\*@ assert p_notyet(27); *\/ ; */

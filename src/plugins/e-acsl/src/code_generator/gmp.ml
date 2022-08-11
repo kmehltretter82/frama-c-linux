@@ -106,40 +106,6 @@ let generic_affect ~loc fname lv ev e =
   end else
     Smart_stmt.assigns ~loc:e.eloc ~result:lv e
 
-let init_set ~loc lv ev e =
-  let fname =
-    let ty = Cil.typeOf ev in
-    if Gmp_types.Z.is_t ty then
-      "__gmpz_init_set"
-    else if Gmp_types.Q.is_t ty then
-      Options.fatal "no __gmpq_init_set: init then set separately"
-    else
-      ""
-  in
-  try generic_affect ~loc fname lv ev e
-  with
-  | Longlong IULongLong ->
-    (match e.enode with
-     | Lval elv ->
-       assert (Gmp_types.Z.is_t (Cil.typeOf ev));
-       let call =
-         Smart_stmt.rtl_call ~loc
-           ~prefix:""
-           "__gmpz_import"
-           [ ev;
-             Cil.one ~loc;
-             Cil.one ~loc;
-             Cil.sizeOf ~loc (TInt(IULongLong, []));
-             Cil.zero ~loc;
-             Cil.zero ~loc;
-             Cil.mkAddrOf ~loc elv ]
-       in
-       Smart_stmt.block_stmt (Cil.mkBlock [ init ~loc ev; call ])
-     | _ ->
-       Error.not_yet "unsigned long long expression requiring GMP")
-  | Longlong ILongLong ->
-    Error.not_yet "long long requiring GMP"
-
 let affect ~loc lv ev e =
   let fname =
     let ty = Cil.typeOf ev in
@@ -150,6 +116,43 @@ let affect ~loc lv ev e =
   try generic_affect ~loc fname lv ev e
   with Longlong _ ->
     Error.not_yet "quantification over long long and requiring GMP"
+
+let init_set ~loc lv ev e =
+  let mpz_init_set fname =
+    try generic_affect ~loc fname lv ev e
+    with
+    | Longlong IULongLong ->
+      (match e.enode with
+       | Lval elv ->
+         assert (Gmp_types.Z.is_t (Cil.typeOf ev));
+         let call =
+           Smart_stmt.rtl_call ~loc
+             ~prefix:""
+             "__gmpz_import"
+             [ ev;
+               Cil.one ~loc;
+               Cil.one ~loc;
+               Cil.sizeOf ~loc (TInt(IULongLong, []));
+               Cil.zero ~loc;
+               Cil.zero ~loc;
+               Cil.mkAddrOf ~loc elv ]
+         in
+         Smart_stmt.block_stmt (Cil.mkBlock [ init ~loc ev; call ])
+       | _ ->
+         Error.not_yet "unsigned long long expression requiring GMP")
+    | Longlong ILongLong ->
+      Error.not_yet "long long requiring GMP"
+  in
+  let ty = Cil.typeOf ev in
+  if Gmp_types.Z.is_t ty then
+    mpz_init_set "__gmpz_init_set"
+  else if Gmp_types.Q.is_t ty then
+    Smart_stmt.block_stmt
+      (Cil.mkBlock
+         [ init ~loc ev ;
+           affect ~loc lv ev e ])
+  else
+    mpz_init_set ""
 
 (*
 Local Variables:

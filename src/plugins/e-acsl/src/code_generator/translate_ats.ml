@@ -282,10 +282,7 @@ let pretranslate_to_exp ~loc kf env pot =
       t_opt
       ty
       (fun var_vi var_e ->
-         let init_set =
-           if Gmp_types.Q.is_t ty then Rational.init_set else Gmp.init_set
-         in
-         [ init_set ~loc (Cil.var var_vi) var_e e ])
+         [ Gmp.init_set ~loc (Cil.var var_vi) var_e e ])
   in
   var_vi, env
 
