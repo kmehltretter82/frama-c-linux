@@ -412,11 +412,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let ty = Typing.get_typ ~logic_env t in
     let vi_of_lv, exp_of_lv, env = Env.Logic_binding.add ~ty env kf lv in
     let e, _, env = term_to_exp kf env t in
-    let ty = Cil.typeOf e in
-    let init_set =
-      if Gmp_types.Q.is_t ty then Rational.init_set else Gmp.init_set
-    in
-    let let_stmt = init_set ~loc (Cil.var vi_of_lv) exp_of_lv  e in
+    let let_stmt = Gmp.init_set ~loc (Cil.var vi_of_lv) exp_of_lv  e in
     let stmts, env =
       mk_nested_loops ~loc mk_innermost_block kf env lscope_vars'
     in

@@ -22,13 +22,6 @@
 
 open Cil_types
 
-(* No init_set for GMPQ: init then set separately *)
-let init_set ~loc lval vi_e e =
-  Smart_stmt.block_stmt
-    (Cil.mkBlock
-       [ Gmp.init ~loc vi_e ;
-         Gmp.affect ~loc lval vi_e e ])
-
 let create ~loc ?name e env kf t_opt =
   let ty = Cil.typeOf e in
   if Gmp_types.Q.is_t ty then
