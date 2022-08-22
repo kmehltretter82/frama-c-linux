@@ -58,7 +58,7 @@
 # - make <lint-target>.previous-commit
 #   looks at files of the last commit and checks that there is no staged nor unstaged files
 # - make <lint-target>.before-push:
-#   looks at files modified from origin/$(git branch --show-current) and checks that there is no staged nor unstaged files
+#   looks at files modified from origin/$(git rev-parse --abbrev-ref HEAD) and checks that there is no staged nor unstaged files
 
 # make clean-lint (removing linting targets) includes
 # - make clean-utf8
@@ -230,7 +230,7 @@ $(info $(LINT.FILE_LIST))
 endif
 
 #### rules for make <lint-target>.before-push
-##   looks at files modified from origin/$(git branch --show-current) and checks that there is no staged nor unstaged files
+##   looks at files modified from origin/$(git rev-parse --abbrev-ref HEAD) and checks that there is no staged nor unstaged files
 
 PHONY: LINT.checked-unmodified-ok
 LINT.checked-unmodified-ok:
@@ -242,7 +242,7 @@ LINT.checked-unmodified-ok:
            exit 1; \
         fi;
 
-$(eval $(call LINT.file-list-filter-with-git-diff,before-push,--cached origin/$(shell git branch --show-current),LINT.checked-unmodified-ok))
+$(eval $(call LINT.file-list-filter-with-git-diff,before-push,--cached origin/$(shell git rev-parse --abbrev-ref HEAD),LINT.checked-unmodified-ok))
 
 #### rules for make <lint-target>.unstaged
 ##   looks at unstaged files
