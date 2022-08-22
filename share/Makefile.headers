@@ -230,7 +230,7 @@ $(info $(HEADER.FILE_LIST))
 endif # $(HEADER_DIFF)
 
 #### rules for make <headers-target>.before-push
-##   looks at files modified from origin/$(git branch --show-current) and checks that there is no staged nor unstaged files
+##   looks at files modified from origin/$(git rev-parse --abbrev-ref HEAD) and checks that there is no staged nor unstaged files
 
 PHONY: HDRCK.checked-unmodified-ok
 HDRCK.checked-unmodified-ok:
@@ -242,7 +242,7 @@ HDRCK.checked-unmodified-ok:
            exit 1; \
         fi;
 
-$(eval $(call HDRCK.file-list-filter-with-git-diff,before-push,--cached origin/$(shell git branch --show-current),HDRCK.checked-unmodified-ok))
+$(eval $(call HDRCK.file-list-filter-with-git-diff,before-push,--cached origin/$(shell git rev-parse --abbrev-ref HEAD),HDRCK.checked-unmodified-ok))
 
 #### rules for make <headers-target>.unstaged
 ##   looks at unstaged files
