@@ -39,7 +39,7 @@ let rec possible_value_of_integral_const = function
   | _ -> None
 
 and possible_value_of_integral_expr e =
-  match e.enode with
+  match (Cil.constFold true e).enode with
   | Const c -> possible_value_of_integral_const c
   | _ -> None
 
