@@ -28,12 +28,46 @@ open Cil_types
 (** {2 Expressions} *)
 (* ************************************************************************** *)
 
+(** [true] iff the constant is an integer constant
+    (i.e. neither a float nor a string). Enum tags and chars
+    are integer constant
+*)
 val is_integral_const: constant -> bool
+
+(** returns the value of the corresponding integer literal or [None]
+    if the constant is not an integer (i.e. {!is_integral_const} returns false.
+*)
 val possible_value_of_integral_const: constant -> Integer.t option
+
+(** returns the value of the corresponding integer constant expression
+    [None] if the expression is not a constant expression or does not
+    evaluate to an integer constant.
+*)
 val possible_value_of_integral_expr: exp -> Integer.t option
+
+(** returns the value of the corresponding integer literal. It is
+    the responsability of the caller to ensure the constant is indeed
+    an integer constant. If unsure, use {!possible_value_of_integral_const}
+*)
 val value_of_integral_const: constant -> Integer.t
+
+(** returns the value of the corresponding integer constant expression. It
+    is the responsibility of the caller to ensure that the argument is indeed
+    an integer constant expression. If unsure, use
+    {!possible_value_of_integral_expr}
+*)
 val value_of_integral_expr: exp -> Integer.t
+
+(** [true] iff the expression is a constant expression that evaluates to
+    a null pointer, i.e. 0 or a cast to 0. *)
 val is_null_expr: exp -> bool
+
+(** [true] iff the expression is a constant expression that evaluates to
+    a non-null pointer.
+
+    {b Warning:} note that for the purpose of this function [&x] is {i not} a
+    constant expression, hence the function will return [false] in this case.
+*)
 val is_non_null_expr: exp -> bool
 
 (* ************************************************************************** *)

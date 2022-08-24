@@ -53,16 +53,20 @@ let value_of_integral_expr e =
   | None -> assert false
   | Some i -> i
 
-let rec is_null_expr e = match e.enode with
+let rec uncast e = match e.enode with
+  | CastE(_,e) -> uncast e
+  | _ -> e
+
+let is_null_expr e =
+  match (uncast (Cil.constFold true e)).enode with
   | Const c when is_integral_const c ->
     Integer.equal (value_of_integral_const c) Integer.zero
-  | CastE(_,e) -> is_null_expr e
   | _ -> false
 
-let rec is_non_null_expr e = match e.enode with
+let is_non_null_expr e =
+  match (uncast (Cil.constFold true e)).enode with
   | Const c when is_integral_const c ->
     not (Integer.equal (value_of_integral_const c) Integer.zero)
-  | CastE(_,e) -> is_non_null_expr e
   | _ -> false
 
 (* ************************************************************************** *)
