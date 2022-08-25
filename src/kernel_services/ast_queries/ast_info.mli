@@ -69,7 +69,7 @@ val value_of_integral_expr: exp -> Integer.t
 
     @before Frama-C+dev the function would return [false] as soon as the
     expression was not an integer literal (possibly casted).
- *)
+*)
 val is_null_expr: exp -> bool
 
 (** [true] iff the expression is a constant expression that evaluates to
