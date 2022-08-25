@@ -48,6 +48,8 @@ The `./bin/test.sh` uses, in order of proprity:
 - `FRAMAC_WP_CACHEDIR` environement variable,
 - local `./.wp-cache` directory.
 
+Of course, these environment variables must be set to an absolute path to prevent from different execution locations of Frama-C.
+
 It is _not_ recommended to use the `FRAMAC_WP_CACHEDIR` variable in your default
 shell setup, unless is it a temporary directory (eg. `/tmp/wp-sandbox`) since
 _every_ run of `frama-c -wp` might then use it by default. Be carefull if you do so.
