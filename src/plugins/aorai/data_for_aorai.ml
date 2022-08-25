@@ -31,6 +31,8 @@ open Logic_simplification
 
 exception Empty_automaton
 
+let typing_dkey = Aorai_option.register_category "type-automaton"
+
 module Aorai_state =
   Datatype.Make_with_collections(
   struct
@@ -999,6 +1001,7 @@ let add_if_needed states st =
   else states
 
 let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end seq =
+  let dkey = typing_dkey in
   let loc = Cil_datatype.Location.unknown in
   match seq with
   | [] -> (* We identify start and end. *)
@@ -1045,7 +1048,7 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
              || is_single_trans || at_most_one -> curr_end
       | _ -> new_intermediate_state ()
     in
-    Aorai_option.debug "Examining single elt:@\n%s -> %s:@[%a@]"
+    Aorai_option.debug ~dkey "Examining single elt:@\n%s -> %s:@[%a@]"
       curr_start.name my_end.name Promelaoutput.Parsed.print_seq_elt elt;
     let guard_exit_loop env current counter =
       if is_opt then TTrue
@@ -1168,7 +1171,7 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
       let make_counter_term st =
         Logic_const.term (TLval (make_counter st)) (Ctype Cil.intType)
       in
-      Aorai_option.debug "Inner start is %s; Inner end is %s"
+      Aorai_option.debug ~dkey "Inner start is %s; Inner end is %s"
         inner_start.name inner_end.name;
       let treat_state (states, oth_trans) st =
         let trans = Path_analysis.get_transitions_of_state st auto in
@@ -1182,7 +1185,7 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
                    let init_trans =
                      new_trans st tr.stop tr.cross init_actions
                    in
-                   Aorai_option.debug "New init trans %a"
+                   Aorai_option.debug ~dkey "New init trans %a"
                      print_eps_trans init_trans;
                    if at_most_one then init_trans :: acc
                    else begin
@@ -1209,7 +1212,7 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
                      let loop_trans =
                        new_trans inner_end tr.stop loop_cross loop_actions
                      in
-                     Aorai_option.debug "New loop trans %a"
+                     Aorai_option.debug ~dkey "New loop trans %a"
                        print_eps_trans loop_trans;
                      init_trans :: loop_trans :: acc
                    end)
@@ -1248,7 +1251,7 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
           in
           let min_cond = Epsilon min_cond in
           let exit_trans = new_trans inner_end oth_start min_cond [] in
-          Aorai_option.debug "New exit trans %a"
+          Aorai_option.debug ~dkey "New exit trans %a"
             print_eps_trans exit_trans;
           let trans = exit_trans :: trans @ oth_trans in
           states, trans
@@ -1317,6 +1320,7 @@ let find_otherwise_trans auto st =
   with Not_found -> None
 
 let type_trans auto metaenv env tr =
+  let dkey = typing_dkey in
   let needs_pebble = not (single_path auto tr) in
   let has_siblings =
     match Path_analysis.get_transitions_of_state tr.start auto with
@@ -1325,7 +1329,7 @@ let type_trans auto metaenv env tr =
     | [ _ ] -> false (* We only have one sequence to exit from there anyway *)
     | _::_::_ -> true
   in
-  Aorai_option.debug
+  Aorai_option.debug ~dkey
     "Analyzing transition %s -> %s: %a (needs pebble: %B)"
     tr.start.name tr.stop.name
     Promelaoutput.Parsed.print_guard
@@ -1393,7 +1397,7 @@ let type_trans auto metaenv env tr =
       | [] | [ _ ] -> false
       | _::_::_ -> true
     in
-    Aorai_option.debug "Resulting transitions:@\n%a"
+    Aorai_option.debug ~dkey "Resulting transitions:@\n%a"
       (Pretty_utils.pp_list ~sep:"@\n"
          (fun fmt tr -> Format.fprintf fmt "%a"
              print_eps_trans tr))
@@ -1417,7 +1421,7 @@ let add_reject_trans auto intermediate_states =
     match cond with
       TFalse -> states,trans
     | _ ->
-      Aorai_option.debug
+      Aorai_option.debug ~dkey:typing_dkey
         "Adding default transition %s -> %s: %a"
         st.name reject_state.name Promelaoutput.Typed.print_condition cond;
       states, new_trans st reject_state cond [] :: trans
@@ -1425,6 +1429,7 @@ let add_reject_trans auto intermediate_states =
   List.fold_left treat_one_state auto intermediate_states
 
 let propagate_epsilon_transitions (states, _ as auto) =
+  let dkey = typing_dkey in
   let rec transitive_closure start conds actions known_states curr =
     let known_states = curr :: known_states in
     let trans = Path_analysis.get_transitions_of_state curr auto in
@@ -1432,8 +1437,8 @@ let propagate_epsilon_transitions (states, _ as auto) =
       (fun acc tr ->
          match tr.cross with
          | Epsilon cond ->
-           Aorai_option.debug "Treating epsilon trans %s -> %s"
-             curr.name tr.stop.name;
+           Aorai_option.debug ~dkey
+             "Treating epsilon trans %s -> %s" curr.name tr.stop.name;
            if List.exists (fun st -> st.nums = tr.stop.nums) known_states
            then acc
            else
@@ -1441,7 +1446,8 @@ let propagate_epsilon_transitions (states, _ as auto) =
                start (tand cond conds) (tr.actions @ actions)
                known_states tr.stop @ acc
          | Normal cond ->
-           Aorai_option.debug "Adding transition %s -> %s from epsilon trans"
+           Aorai_option.debug ~dkey
+             "Adding transition %s -> %s from epsilon trans"
              start.name tr.stop.name;
            let tr =
              new_trans start tr.stop (tand cond conds) (tr.actions @ actions)
@@ -1456,31 +1462,31 @@ let propagate_epsilon_transitions (states, _ as auto) =
   (states, trans)
 
 let add_default_trans (states, transitions as auto) otherwise =
+  let dkey = typing_dkey in
   let add_one_trans acc tr =
     let st = tr.start in
     let my_trans = Path_analysis.get_transitions_of_state st auto in
-    Aorai_option.debug "Considering new otherwise transition: %s -> %s"
+    Aorai_option.debug ~dkey "Considering new otherwise transition: %s -> %s"
       st.name tr.stop.name;
     let cond =
       List.fold_left
         (fun acc c ->
            let cond = c.cross in
-           Aorai_option.debug "considering trans %s -> %s: %a"
+           Aorai_option.debug ~dkey "considering trans %s -> %s: %a"
              c.start.name c.stop.name Promelaoutput.Typed.print_condition cond;
            let neg = tnot cond in
-           Aorai_option.debug "negation: %a"
+           Aorai_option.debug ~dkey "negation: %a"
              Promelaoutput.Typed.print_condition neg;
-           Aorai_option.debug "acc: %a"
+           Aorai_option.debug ~dkey "acc: %a"
              Promelaoutput.Typed.print_condition acc;
            let res = tand acc (tnot cond) in
-           Aorai_option.debug "partial result: %a"
+           Aorai_option.debug ~dkey "partial result: %a"
              Promelaoutput.Typed.print_condition res;
-           res
-        )
+           res)
         TTrue
         my_trans
     in
-    Aorai_option.debug "resulting transition: %a"
+    Aorai_option.debug ~dkey "resulting transition: %a"
       Promelaoutput.Typed.print_condition cond;
     let cond,_ = Logic_simplification.simplifyCond cond in
     let new_trans = new_trans st tr.stop cond [] in
@@ -1490,6 +1496,7 @@ let add_default_trans (states, transitions as auto) otherwise =
   states, transitions
 
 let type_cond_auto auto =
+  let dkey = typing_dkey in
   let original_auto = auto in
   let otherwise = List.filter (fun t -> t.cross = Otherwise) auto.trans in
   let add_if_needed acc st =
@@ -1499,9 +1506,9 @@ let type_cond_auto auto =
     let (intermediate_states, trans, needs_reject) =
       type_trans (auto.states,auto.trans) auto.metavariables [] tr
     in
-    Aorai_option.debug
+    Aorai_option.debug ~dkey
       "Considering parsed transition %s -> %s" tr.start.name tr.stop.name;
-    Aorai_option.debug
+    Aorai_option.debug ~dkey
       "Resulting transitions:@\n%a@\nEnd of transitions"
       (Pretty_utils.pp_list ~sep:"@\n" print_eps_trans) trans;
     let add_reject =
@@ -1533,7 +1540,7 @@ let type_cond_auto auto =
     | None -> auto
   in
   let auto = { original_auto with states ; trans } in
-  if Aorai_option.debug_atleast 1 then
+  if Aorai_option.is_debug_key_enabled typing_dkey then
     Promelaoutput.Typed.output_dot_automata auto "aorai_debug_typed.dot";
   let (_,trans) =
     List.fold_left
@@ -1618,7 +1625,7 @@ let setAutomata auto =
   Automaton.set (Some auto);
   check_states "typed automaton";
   check_observables auto;
-  if Aorai_option.debug_atleast 1 then
+  if Aorai_option.is_debug_key_enabled typing_dkey then
     Promelaoutput.Typed.output_dot_automata auto "aorai_debug_reduced.dot";
   if (Array.length !cond_of_parametrizedTransitions) <
      (getNumberOfTransitions  ())
@@ -2036,10 +2043,10 @@ let set_kf_init_state kf state =
   let set _ = state in
   ignore (Pre_state.memo ~change set kf)
 
-let dkey = Aorai_option.register_category "dataflow"
+let dataflow_dkey = Aorai_option.register_category "dataflow"
 
 let replace_kf_init_state kf state =
-  Aorai_option.debug ~dkey
+  Aorai_option.debug ~dkey:dataflow_dkey
     "Replacing pre-state of %a:@\n  @[%a@]"
     Kernel_function.pretty kf pretty_state state;
   Pre_state.replace kf state
@@ -2145,7 +2152,7 @@ let pretty_loop_invariant fmt =
        Format.fprintf fmt "Function %a, sid %d:@\n  @[%a@]@\n"
          Kernel_function.pretty kf stmt.sid pretty_state state)
 
-let debug_computed_state ?(dkey=dkey) () =
+let debug_computed_state ?(dkey=dataflow_dkey) () =
   Aorai_option.debug ~dkey
     "Computed state:@\nPre-states:@\n  @[%t@]@\nPost-states:@\n  @[%t@]@\n\
      Loop init:@\n  @[%t@]@\nLoop invariants:@\n  @[%t@]"
