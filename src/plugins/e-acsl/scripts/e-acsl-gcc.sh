@@ -340,7 +340,7 @@ LONGOPTIONS="help,compile,compile-only,debug:,ocode:,oexec:,verbose:,
   frama-c-only,extra-cpp-args:,frama-c-stdlib,full-mmodel,full-mtracking,gmp,
   quiet,logfile:,ld-flags:,cpp-flags:,frama-c-extra:,memory-model:,keep-going,
   frama-c:,gcc:,e-acsl-share:,instrumented-only,rte:,oexec-e-acsl:,concurrency,
-  print-mmodels,rt-debug,rte-select:,then,e-acsl-extra:,check,fail-with-code:,
+  print-mmodels,rt-debug,rte-select:,then,then-last,e-acsl-extra:,check,fail-with-code:,
   temporal,weak-validity,stack-size:,heap-size:,zone-sizes:,rt-verbose,
   free-valid-address,external-assert:,assert-print-data,no-assert-print-data,
   external-print-value:,validate-format-strings,no-trace,libc-replacements,
@@ -388,7 +388,7 @@ OPTION_FREE_VALID_ADDRESS=  # Fail if NULL is used as input to free
 OPTION_VALIDATE_FORMAT_STRINGS= # Runtime format string validation
 OPTION_LIBC_REPLACEMENTS= # Replace libc functions with RTL definitions
 OPTION_RTE_SELECT=        # Generate assertions for these functions only
-OPTION_THEN=              # Adds -then in front of -e-acsl in FC command.
+OPTION_THEN=              # Adds -then* in front of -e-acsl in FC command.
 OPTION_STACK_SIZE=        # Size of a heap shadow space (in MB)
 OPTION_HEAP_SIZE=         # Size of a stack shadow space (in MB)
 OPTIONS_TLS_SIZE=         # Size of a TLS shadow space (in MB)
@@ -656,6 +656,11 @@ do
     --then)
       shift;
       OPTION_THEN=-then
+    ;;
+    # Separate extra Frama-C flags from e-acsl launch with -then-last.
+    --then-last)
+      shift;
+      OPTION_THEN=-then-last
     ;;
     # Extra E-ACSL options
     --e-acsl-extra)
