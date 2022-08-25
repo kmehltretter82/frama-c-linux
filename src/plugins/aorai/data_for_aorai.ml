@@ -112,11 +112,6 @@ module Max_value_counter =
 let find_max_value t =
   try Some (Max_value_counter.find t) with Not_found -> None
 
-let raise_error msg =
-  Aorai_option.fatal "Aorai plugin internal error. \nStatus : %s.\n" msg;;
-(*  Format.printf "Aorai plugin internal error. \nStatus : %s.\n" msg; *)
-(*  assert false                                                             *)
-
 let por t1 t2 =
   match t1,t2 with
     PTrue,_ | _,PTrue -> PTrue
@@ -165,7 +160,7 @@ let add_logic name log_info = Hashtbl.replace declared_logics name log_info
 let get_logic name =
   try Hashtbl.find declared_logics name
   with Not_found ->
-    raise_error ("Logic function '"^name^"' not declared in hashtbl")
+    Aorai_option.fatal "Logic function '%s' not declared in hashtbl" name
 
 let declared_predicates = Hashtbl.create 97
 
@@ -174,7 +169,8 @@ let add_predicate name pred_info =
 
 let get_predicate name =
   try Hashtbl.find declared_predicates name
-  with Not_found -> raise_error ("Predicate '"^name^"' not declared in hashtbl")
+  with Not_found ->
+    Aorai_option.fatal "Predicate '%s' not declared in hashtbl" name
 
 (* ************************************************************************* *)
 (* Some constant names used for generation *)
@@ -1716,7 +1712,7 @@ let set_varinfo = Aux_varinfos.add
 let get_varinfo name =
   try
     Aux_varinfos.find name
-  with Not_found -> raise_error ("Variable not declared ("^name^")")
+  with Not_found -> Aorai_option.fatal "Variable %s not declared" name
 
 let get_logic_var name =
   let vi = get_varinfo name in Cil.cvar_to_lvar vi
@@ -1740,8 +1736,8 @@ let get_paraminfo funcname paramname =
   try
     Paraminfos.find (funcname,paramname)
   with Not_found ->
-    raise_error
-      ("Parameter '"^paramname^"' not declared for function '"^funcname^"'.")
+    Aorai_option.fatal
+      "Parameter '%s' not declared for function '%s'." paramname funcname
 
 (* Add a new param into the association table funcname -> varinfo *)
 let set_returninfo funcname vi =
@@ -1754,7 +1750,7 @@ let get_returninfo funcname =
   try
     Paraminfos.find (funcname,"\\return")
   with Not_found ->
-    raise_error ("Return varinfo not declared for function '"^funcname^"'.")
+    Aorai_option.fatal "Return varinfo not declared for function '%s'." funcname
 
 type range =
   | Fixed of int (** constant value *)
@@ -2259,7 +2255,7 @@ let set_usedinfo name einfo =
 
 let get_usedinfo name =
   try Hashtbl.find used_enuminfo name
-  with Not_found -> raise_error ("Incomplete enum information.")
+  with Not_found -> Aorai_option.fatal "Incomplete enum information."
 
 let get_cenum_option name =
   let opnamed = func_to_op_func name in
@@ -2298,12 +2294,13 @@ let func_to_cenum func =
     let rec search = function
       | {einame = n} as ei ::_ when n=name -> CEnum ei
       | _::l -> search l
-      | [] -> raise_error
-                ("Operation '"^name^"' not found in operations enumeration")
+      | [] ->
+        Aorai_option.fatal
+          "Operation '%s' not found in operations enumeration" name
     in
     search ei.eitems
   (*    CEnum(ex,s,ei)*)
-  with Not_found -> raise_error ("Operation not found")
+  with Not_found -> Aorai_option.fatal "Operation not found"
 
 let op_status_to_cenum status =
   try
@@ -2312,14 +2309,7 @@ let op_status_to_cenum status =
     let rec search = function
       | {einame=n} as ei ::_ when n=name -> CEnum ei
       | _::l -> search l
-      | [] -> raise_error ("Status not found")
+      | [] -> Aorai_option.fatal "Status not found"
     in
     search ei.eitems
-  with Not_found -> raise_error ("Status not found")
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
+  with Not_found -> Aorai_option.fatal "Status not found"
