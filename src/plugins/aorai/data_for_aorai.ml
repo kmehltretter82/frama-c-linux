@@ -1177,11 +1177,14 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
         let trans = Path_analysis.get_transitions_of_state st auto in
         if st.nums = inner_start.nums then begin
           let loop_trans =
-            if needs_counter then begin
+            if has_loop then begin
               List.fold_left
                 (fun acc tr ->
-                   let init_action = Counter_init (make_counter tr.stop) in
-                   let init_actions = init_action :: tr.actions in
+                   let init_actions =
+                     if needs_counter then
+                       Counter_init (make_counter tr.stop) :: tr.actions
+                     else tr.actions
+                   in
                    let init_trans =
                      new_trans st tr.stop tr.cross init_actions
                    in

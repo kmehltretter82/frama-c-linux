@@ -1,8 +1,3 @@
 [kernel] Parsing seq_unlimited.i (no preprocessing)
-[aorai] seq_unlimited.i:21: Warning: 
-  Call to find does not follow automaton's specification. This path is assumed to be dead
-[aorai] Warning: Call to main does not follow automaton's specification. This path is assumed to be dead
-[aorai] seq_unlimited.i:23: Warning: 
-  Call to main not conforming to automaton (pre-cond). Assuming it is on a dead path
 [kernel] Parsing TMPDIR/aorai_seq_unlimited_0_prove.i (no preprocessing)
 [wp] Warning: Missing RTE guards
