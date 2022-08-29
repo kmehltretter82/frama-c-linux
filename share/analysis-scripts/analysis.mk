@@ -134,7 +134,6 @@ clean-backups:
 	  -regex '^.*_[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}-[0-9]{2}\.eva(\.(log|stats|alarms|warnings|metrics))?' \
 	  -delete
 
-
 # --- Generic rules ---
 
 HR_TIMESTAMP := $(shell date +"%H:%M:%S %d/%m/%Y")# Human readable
@@ -151,10 +150,20 @@ SHELL        := $(shell which bash)
 	@#
 
 %.parse: SOURCES = $(filter-out %/command,$^)
-%.parse: PARSE = $(FRAMAC) $(FCFLAGS) $(if $(value MACHDEP),-machdep $(MACHDEP),) -cpp-extra-args="$(CPPFLAGS)" $(SOURCES)
+%.parse: PARSE = $(FRAMAC) \
+                 $(if $(AST_DIFF),\
+                   $(if $(wildcard $@/framac.sav),\
+                    -load $@/framac.reparse -then -ast-diff,),) \
+                 $(FCFLAGS) \
+                 $(if $(value MACHDEP),-machdep $(MACHDEP),) \
+                 -cpp-extra-args="$(CPPFLAGS)" $(SOURCES) \
+
 %.parse: $$(if $$^,,.IMPOSSIBLE) $$(shell $(SHELL) $(DIR)cmd-dep.sh $$@/command $$(PARSE))
 	@$(call display_command,$(PARSE))
 	mkdir -p $@
+	$(if $(AST_DIFF),\
+          $(if $(wildcard $@/framac.sav),mv $@/framac.sav $@/framac.reparse,true)\
+          ,true)
 	mv -f $@/{command,running}
 	{
 	  $(call time_with_output,$@/stats.txt) \
