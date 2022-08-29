@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: eva,inout
+   PLUGIN: @EVA_PLUGINS@
    OPT: -eva -machdep gcc_x86_64
 */
 
