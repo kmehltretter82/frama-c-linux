@@ -6530,7 +6530,7 @@ unsigned long long __fc_atomic_fetch_and_explicit(void *obj,
 
 _Bool atomic_flag_test_and_set(atomic_flag volatile *object)
 {
-  _Bool r = (_Bool)(object->__fc_val != 0);
+  _Bool r = (_Bool)((int)object->__fc_val != 0);
   object->__fc_val = (unsigned char)1;
   return r;
 }
@@ -6538,7 +6538,7 @@ _Bool atomic_flag_test_and_set(atomic_flag volatile *object)
 _Bool atomic_flag_test_and_set_explicit(atomic_flag volatile *object,
                                         memory_order order)
 {
-  _Bool r = (_Bool)(object->__fc_val != 0);
+  _Bool r = (_Bool)((int)object->__fc_val != 0);
   object->__fc_val = (unsigned char)1;
   return r;
 }
