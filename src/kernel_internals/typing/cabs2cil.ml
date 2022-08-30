@@ -2936,12 +2936,9 @@ let rec castTo ?context ?(fromsource=false)
       end else begin
         Kernel.debug ~dkey
           "bool conversion by checking !=0: %a" Cil_printer.pp_exp e;
-        nt,
-        Cil.mkCastT
-          ~oldt:ot ~newt:nt
-          (constFold true
-             (new_exp  ~loc:e.eloc
-                (BinOp(Ne,e,Cil.integer ~loc:e.eloc 0,intType))))
+        let cmp = Cil.mkBinOp ~loc:e.eloc Ne e (Cil.integer ~loc:e.eloc 0) in
+        let oldt = Cil.typeOf cmp in
+        nt, Cil.mkCastT ~oldt ~newt:nt cmp
       end
     | TInt(_,_), TInt(_,_) ->
       (* We used to ignore attributes on integer-integer casts. Not anymore *)
