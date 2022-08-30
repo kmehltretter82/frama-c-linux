@@ -1403,6 +1403,7 @@ let dropQualifiers = Cil.type_remove_qualifier_attributes
 
 (* true if the expression is known to be a boolean result, i.e. 0 or 1. *)
 let rec is_boolean_result e =
+  Cil.(isBoolType (typeOf e)) ||
   match e.enode with
   | Const _ ->
     (match Cil.isInteger e with
@@ -2932,7 +2933,7 @@ let rec castTo ?context ?(fromsource=false)
     | t, TInt(IBool,_) when is_scalar_type t ->
       if is_boolean_result e then begin
         Kernel.debug ~dkey "Explicit cast to Boolean: %a" Cil_printer.pp_exp e;
-        nt,Cil.mkCastT ~oldt:ot ~newt:nt e
+        result
       end else begin
         Kernel.debug ~dkey
           "bool conversion by checking !=0: %a" Cil_printer.pp_exp e;
