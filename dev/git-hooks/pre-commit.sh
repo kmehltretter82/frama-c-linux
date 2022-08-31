@@ -41,6 +41,6 @@ if [ "$?" != "0" ]; then
     echo "         They will be verified only for a 'git commit -a' command."
 fi
 
-# Verifies the current version of files
-make lint.before-commit-a
-make check-headers.before-commit-a
+# Verifies the current version of the files
+make lint.before-commit-a || exit 1
+make check-headers.before-commit-a || exit 1
