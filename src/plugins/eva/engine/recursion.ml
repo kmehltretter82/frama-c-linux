@@ -44,6 +44,11 @@ let mark_unknown_requires kinstr kf funspec =
   in
   List.iter emit_behavior funspec.spec_behavior
 
+let need_assigns funspec =
+  match Cil.find_default_behavior funspec with
+  | None -> true
+  | Some bhv -> bhv.b_assigns = WritesAny
+
 let get_spec kinstr kf =
   let funspec = Annotations.funspec ~populate:false kf in
   if List.for_all (fun b -> b.b_assigns = WritesAny) funspec.spec_behavior
@@ -74,6 +79,15 @@ let get_spec kinstr kf =
         Kernel_function.pretty kf
         (if depth > 0 then Format.asprintf " of depth %i" depth else "")
         Kernel_function.pretty kf
+    in
+    let funspec =
+      if need_assigns funspec
+      then
+        begin
+          ignore (!Annotations.populate_spec_ref kf funspec);
+          Annotations.funspec ~populate:false kf
+        end
+      else funspec
     in
     mark_unknown_requires kinstr kf funspec;
     funspec
