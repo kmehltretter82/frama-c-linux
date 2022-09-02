@@ -20,24 +20,25 @@ with \framac and other plug-ins to implement analyzers of \C programs.
 
 \section{Development Environment}\label{tut2:environment}
 
-The \framac team currently recommends using
-VS~Code\footnote{\url{https://code.visualstudio.com}} as IDE.
-It offers extensions (automatically suggested when you open an OCaml source
-file) which provide type checking, syntax highlighting, and code navigation
-features.
-The \framac team currently uses the \texttt{ocp-indent} opam package
-for code indentation. Consider installing it if you want to ensure your
-code follows the same conventions.
+It is easy to develop a plug-in for \framac with any IDE, as long as it
+supports the OCaml language. This includes (but is not limited to)
+Emacs or Vim with the Merlin\footnote{\url{https://ocaml.github.io/merlin}}
+tool, or VS~Code with the {\em OCaml platform} extension.
+The last is probably the easiest to setup for a beginner in OCaml.
 
-Other IDEs often used for OCaml development include Vim and Emacs. For them,
-Merlin\footnote{\url{https://ocaml.github.io/merlin}} (code navigation, typing
-and auto-completion tool) is currently the main editor service.
-It is used by OCaml-LSP\footnote{\url{https://github.com/ocaml/ocaml-lsp}},
+Most modern IDEs support (directly or indirectly, via Merlin)
+OCaml-LSP\footnote{\url{https://github.com/ocaml/ocaml-lsp}},
 which is an implementation of LSP ({\em Language Server Protocol} for OCaml.
+
+Concerning code formatting, the \framac team currently uses the
+\texttt{ocp-indent} opam package for code indentation.
+Consider installing it if you want to ensure your code follows the same
+conventions.
 
 Overall, it is \textbf{strongly} suggested to use an OCaml-aware IDE and take
 the time to set it up. Plug-ins use several different parts of the \framac API,
-and a properly setup IDE greatly improves productivity.
+and a properly setup IDE greatly improves productivity, offering features such
+as auto-completion, type checking, syntax highlighting, and code navigation.
 
 \section{What Does a Plug-in Look Like?}\label{tut2:architecture}
 \index{Plug-in!Architecture}\index{Architecture!Plug-in}
@@ -206,6 +207,7 @@ Then the plugin can be built using the following command:
 If Dune is installed, this should compile the project successfully.
 Note that Dune emits messages {\em during} compilation, but erases them
 afterwards. In case of success, there will be no visible output at the end.
+Note that this behavior can be configured with Dune's option \verb|--display|.
 
 \begin{important}
   Dune always looks for \texttt{dune-project} files in the parent directories,
@@ -649,8 +651,8 @@ The new oracle should be committed to source control, for future testing.
   earlier will not only compile your plug-in, but also run its tests.
   Therefore, if you want to simply compile it, you will have to run
   \verb|dune build @install| instead. Despite the name, the command will
-       {\em not} install your plug-in (that is performed by
-       \verb|dune install|).
+       {\em not} install your plug-in, it will only build and collect all
+       files necessary for its installation.
 \end{important}
 
 Now, let's introduce an error. Assume the plug-in has been modified as follows:
