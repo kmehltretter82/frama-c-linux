@@ -47,7 +47,9 @@ end = struct
 
   (* assume [vi] is not already in [tbl] *)
   let generate_vi vi =
-    let new_name = Functions.RTL.mk_gen_name vi.vname in
+    let new_name = Varname.get ~scope:Global
+        (Functions.RTL.mk_gen_name vi.vname)
+    in
     let new_vi =
       Cil.makeGlobalVar
         ~referenced:vi.vreferenced

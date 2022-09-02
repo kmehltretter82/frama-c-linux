@@ -495,7 +495,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
               fname
         in
         let gen_fname =
-          Varname.get ~scope:Varname.Global (Functions.RTL.mk_gen_name fname)
+          Varname.get ~scope:Global (Functions.RTL.mk_gen_name fname)
         in
         let profile = Profile.make li.l_profile params_ival in
         let profile = Interval.get_widened_profile profile li in
