@@ -61,7 +61,7 @@ module Result = struct
   let log ~error = function
     | Ok v -> v
     | Warning (v, log) -> Self.warning "%a" pp_log log ; v
-    | Error log -> Self.error "%a" pp_log log ; error
+    | Error log -> Self.warning "%a" pp_log log ; error
 end
 
 
