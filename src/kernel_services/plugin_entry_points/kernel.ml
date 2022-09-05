@@ -995,8 +995,9 @@ module CppExtraArgs =
       let module_name = "CppExtraArgs"
       let option_name = "-cpp-extra-args"
       let arg_name = "args"
-      let help = "additional arguments passed to the preprocessor while \
-                  preprocessing the C code but not while preprocessing annotations"
+      let help = "additional arguments passed to the preprocessor \
+                  (mainly -D and -I) while preprocessing the C code \
+                  but not while preprocessing annotations"
     end)
 
 let () = Parameter_customize.set_group parsing
