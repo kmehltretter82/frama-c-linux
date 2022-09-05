@@ -28,10 +28,12 @@
 #
 # FRAMAC        frama-c binary
 # FRAMAC_GUI    frama-c gui binary
+# IVETTE        ivette binary
 # CPPFLAGS      preprocessing flags
 # MACHDEP       machdep
 # FCFLAGS       general flags to use with frama-c
 # FCGUIFLAGS    flags to use with frama-c-gui
+# IVETTEFLAGS   flags to use with Ivette
 # EVAFLAGS      flags to use with the Eva plugin
 # EVABUILTINS   Eva builtins to be set (via -eva-builtin)
 # EVAUSESPECS   Eva functions to be overridden by specs (-eva-use-spec)
@@ -108,6 +110,7 @@ fc_list = $(subst $(space),$(comma),$(strip $1))
 FRAMAC     ?= frama-c
 FRAMAC_SCRIPT = $(FRAMAC)-script
 FRAMAC_GUI ?= frama-c-gui
+IVETTE     ?= ivette
 EVAFLAGS   ?= \
   -eva-no-print -eva-no-show-progress -eva-msg-key=-initial-state \
   -eva-print-callstacks -eva-warn-key alarm=inactive \
@@ -119,6 +122,7 @@ EVAFLAGS   ?= \
 WPFLAGS    ?=
 FCFLAGS    ?=
 FCGUIFLAGS ?=
+IVETTEFLAGS ?=
 
 export LIBOVERLAY_SCROLLBAR=0
 
@@ -255,6 +259,9 @@ SHELL        := $(shell which bash)
 
 %.gui: %
 	$(FRAMAC_GUI) $(FCGUIFLAGS) -load $^/framac.sav &
+
+%.ivette: %
+	$(IVETTE) $(IVETTEFLAGS) -load $^/framac.sav &
 
 # Produce and open an SVG + HTML from raw flamegraph data produced by Eva
 %/flamegraph: %/flamegraph.html
