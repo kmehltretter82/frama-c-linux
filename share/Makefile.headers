@@ -207,7 +207,7 @@ else
 ifneq ($(HDRCK.HAS_GIT),)
 
 define HDRCK.file-list-from-git-diff
-$(GIT) diff --name-status $(1) | $(GREP) -v "^D" | $(SED) "s/^.[ \t]*//" | $(TR) '\n' '\000' | $(HDRCK.FILE_ATTR)
+$(GIT) diff --name-status $(1) | $(GREP) -v "^D" | $(SED) -e "s/^[CR][0-9]\+[ \t]\+[^ \t]\+[ \t]\+//" -e "s/^[AM][ \t]*//" | $(TR) '\n' '\000' | $(HDRCK.FILE_ATTR)
 endef
 
 HDRCK.main-targets=check-headers headers
