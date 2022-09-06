@@ -57,6 +57,8 @@ val dkey_dataflow_scc: category
 
 val dkey_dominators: category
 
+val dkey_dyncalls: category
+
 val dkey_emitter: category
 
 val dkey_emitter_clear: category

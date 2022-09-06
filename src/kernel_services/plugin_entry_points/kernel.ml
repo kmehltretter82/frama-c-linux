@@ -60,6 +60,8 @@ let dkey_dataflow_scc = register_category "dataflow:scc"
 
 let dkey_dominators = register_category "dominators"
 
+let dkey_dyncalls = register_category "dyncalls"
+
 let dkey_emitter = register_category "emitter"
 let dkey_emitter_clear = register_category "emitter:clear"
 
