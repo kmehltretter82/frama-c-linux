@@ -1,0 +1,10 @@
+[kernel] Parsing function_ptr.i (no preprocessing)
+[aorai] function_ptr.i:19: Warning: 
+  Call to f does not follow automaton's specification. This path is assumed to be dead
+[aorai] function_ptr.i:19: Warning: 
+  Call to g does not follow automaton's specification. This path is assumed to be dead
+[aorai] Warning: Call to main does not follow automaton's specification. This path is assumed to be dead
+[aorai] function_ptr.i:20: Warning: 
+  Call to main not conforming to automaton (pre-cond). Assuming it is on a dead path
+[kernel] Parsing TMPDIR/aorai_function_ptr_0_prove.i (no preprocessing)
+[wp] Warning: Missing RTE guards

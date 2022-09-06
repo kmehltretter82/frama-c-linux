@@ -493,10 +493,14 @@ module Computer(I: Init) = struct
     match i with
     | Call (_,{ enode = Lval(Var v,NoOffset) },args,_) ->
       do_call s v args d
-    | Call (_,e,_,_) ->
-      Aorai_option.not_yet_implemented
-        ~source:(fst e.eloc)
-        "Indirect call to %a is not handled yet" Printer.pp_exp e
+    | Call (_,e,args,_) ->
+      (match Dyncall.get s with
+       | Some (_,l) ->
+         List.fold_left (fun d f -> do_call s (Kernel_function.get_vi f) args d) d l
+       | None ->
+         Aorai_option.not_yet_implemented
+           ~source:(fst e.eloc)
+           "Indirect call to %a is not handled yet" Printer.pp_exp e)
     | Local_init (v, ConsInit(f,args,kind),_) ->
       let args =
         match kind with
