@@ -61,6 +61,16 @@ if [ "$VERSION" != "$OPAM_VERSION" ]; then
 fi
 
 ################################################################################
+# Check that no versioned file is ignored
+
+IGNORED_FILES="$(git ls-files --ignored --exclude-standard -c)"
+if [ "" != "$IGNORED_FILES" ]; then
+  echo "Some versioned files are ignored by .gitignore:"
+  echo $IGNORED_FILES
+  exit 2
+fi
+
+################################################################################
 # Prepare archive
 
 git archive HEAD -o $FRAMAC_TAR --prefix "$FRAMAC/"
