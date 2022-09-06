@@ -166,6 +166,11 @@ module State = struct
   end
 
   include State_builder.Hashcons (State') (StateInfos)
+
+  let threads t = let { threads } = get t in threads
+  let mutexes t = let { mutexes } = get t in mutexes
+  let memory t = let { memory } = get t in memory
+  let return t = let { return } = get t in return
 end
 
 
@@ -236,6 +241,7 @@ module Cache = struct
   open Datatype_with_Lattice
   include Cil_datatype.Stmt.Hashtbl
   let cache : State.t t = create 17
+  let copy () = copy cache
   let reset () = reset cache
   let merge l r =
     let l = get l and r = get r in
