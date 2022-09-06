@@ -206,8 +206,12 @@ else
 
 ifneq ($(HDRCK.HAS_GIT),)
 
+define HDRCK.file-list-from-git-diff-info
+$(GIT) diff --name-status $(1) | $(GREP) -v "^D" | $(SED) -e "s/^[CR][0-9]\+[ \t]\+[^ \t]\+[ \t]\+//" -e "s/^[AM][ \t]*//"
+endef
+
 define HDRCK.file-list-from-git-diff
-$(GIT) diff --name-status $(1) | $(GREP) -v "^D" | $(SED) -e "s/^[CR][0-9]\+[ \t]\+[^ \t]\+[ \t]\+//" -e "s/^[AM][ \t]*//" | $(TR) '\n' '\000' | $(HDRCK.FILE_ATTR)
+ $(call HDRCK.file-list-from-git-diff-info,$(1)) | $(TR) '\n' '\000' | $(HDRCK.FILE_ATTR)
 endef
 
 HDRCK.main-targets=check-headers headers
@@ -218,7 +222,7 @@ $$(HDRCK.$(1)-filter-targets):: HDRCK.SPEC=$$(call HDRCK.file-list-from-git-diff
 $$(HDRCK.$(1)-filter-targets):: %.$(1) : $(3) %
 	@echo [HDRCK] Done: HDRCK_DIFF=\"$(2)\" make $$(basename $$@)
 	@echo [HDRCK] checked file list:
-	$$(GIT) diff --name-status $(2)
+	$$(call HDRCK.file-list-from-git-diff-info,$(2))
 endef
 
 ifneq ($(HEADER_DIFF),)
