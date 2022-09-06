@@ -8,7 +8,6 @@
 /frama-c-affiliation.tex
 /hello_world/
 /tutorial/viewcfg/generated/
-/tutorial/hello/generated/
 /examples/generated/
 *.idx
 *.out
@@ -17,3 +16,6 @@ developer.idxs
 mecanism.eps
 pp
 pp.ml
+/checks/hello/*.res
+/**/tests/**/result*/
+/**/tests/**/oracle*/dune

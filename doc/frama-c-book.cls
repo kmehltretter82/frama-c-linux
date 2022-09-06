@@ -335,8 +335,8 @@ morekeywords={include},%
   {language={[ANSI]C},alsolanguage=ACSL,style=framac-code-style,basicstyle=\lp@basic}
 \lstnewenvironment{ccode}[1][]%
 {\lstset{language={[ANSI]C},alsolanguage=ACSL,style=framac-code-style,basicstyle=\lp@basic,#1}}{}
-\newcommand{\cinput}[1]%
-{\lstinputlisting[language={[ANSI]C},alsolanguage=ACSL,style=framac-code-style,basicstyle=\lp@basic]{#1}}
+\newcommand{\cinput}[2][]%
+{\lstinputlisting[language={[ANSI]C},alsolanguage=ACSL,style=framac-code-style,basicstyle=\lp@basic,#1]{#2}}
 \newcommand{\cinline}[1]%
 {\lstinline[style=framac-code]{#1}}
 % --- Ocaml ----------------------------------------------------------------
@@ -362,12 +362,39 @@ literate=%
 {'c}{$\gamma$ }1%
 {µ}{`{}}1%
 {€}{\textbackslash}1%
+{à}{{\`a}}1%
+{é}{{\'e}}1%
+}
+\lstdefinestyle{ocaml-basic}{
+  language=Ocaml,
+  basicstyle=\lp@basic
 }
 
-\lstdefinestyle{ocaml-basic}%
-{language=Ocaml,basicstyle=\lp@basic}
+\lstdefinelanguage{Dune}{%
+literate=%
+{à}{{\`a}}1%
+{é}{{\'e}}1%
+,
+  style=framac-code-style,%
+  morekeywords={
+    dune, flags, generate_opam_files, lang, libraries, name, optional, package,
+    plugin, public_name, site, using
+  },%
+  morekeywords=[2]{
+    :standard
+  },
+  morecomment=[l]{;},
+}
+\lstdefinestyle{dune-basic}{%
+  language=Dune,%
+  style=framac-code-style,%
+  basicstyle=\lp@inline,%
+}
+
 \newcommand{\ocamlinput}[2][]{\lstinputlisting[style=ocaml-basic,#1]{#2}}
 \lstnewenvironment{ocamlcode}[1][]{\lstset{style=ocaml-basic,#1}}{}
+\newcommand{\duneinput}[2][]{\lstinputlisting[style=dune-basic,#1]{#2}}
+\lstnewenvironment{dunecode}[1][]{\lstset{style=dune-basic,#1}}{}
 % --------------------------------------------------------------------------
 \lstdefinelanguage{Why}{%
   morekeywords={

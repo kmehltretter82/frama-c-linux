@@ -71,7 +71,7 @@ want full details about specific parts.
 
 In this Section, we detail how to modify the file \texttt{configure.in} in
 order to configure plug-ins (\framac configuration has been introduced in
-Section~\ref{tut2:configure} and~\ref{tut2:makefile}).
+%Section~\ref{tut2:configure} and~\ref{tut2:makefile}).
 
 First Section~\ref{conf:principle} introduces the general principle and
 organisation of \texttt{configure.in}. Then Section~\ref{conf:add} explains how
@@ -487,24 +487,25 @@ have to:
 \item include \texttt{Makefile.dynamic}.
 \end{enumerate}
 
-\begin{example}
-A minimal \texttt{Makefile} is shown below. That is the Makefile of the plug-in
-\texttt{Hello World} presented in the tutorial (see
-Section~\ref{tut2:hello}). Each variable set in this example has to be set
-by any plug-in.
-\codeidx{Makefile.dynamic}
-\codeidx{FRAMAC\_SHARE}
-\codeidx{PLUGIN\_CMO}
-\codeidx{PLUGIN\_NAME}
-\makefileinput{./tutorial/hello/generated/makefile_multiple/Makefile}
-\texttt{FRAMAC\_SHARE} must be set to the \framac share directory.
-\texttt{PLUGIN\_NAME} is the capitalized name of your plug-in while
-\texttt{PLUGIN\_CMO} is the list of the files $.cmo$ generated from your \caml
-sources.
-Note that, by default, during compilation of your plug-in all warnings are
-disabled; it is recommended to define environment variable
-\texttt{DEVELOPMENT=yes} to enable the standard set of compilation warnings.
-\end{example}
+TODO : replace example
+%% \begin{example}
+%% A minimal \texttt{Makefile} is shown below. That is the Makefile of the plug-in
+%% \texttt{Hello World} presented in the tutorial (see
+%% Section~\ref{tut2:hello}). Each variable set in this example has to be set
+%% by any plug-in.
+%% \codeidx{Makefile.dynamic}
+%% \codeidx{FRAMAC\_SHARE}
+%% \codeidx{PLUGIN\_CMO}
+%% \codeidx{PLUGIN\_NAME}
+%% \makefileinput{./tutorial/hello/generated/makefile_multiple/Makefile}
+%% \texttt{FRAMAC\_SHARE} must be set to the \framac share directory.
+%% \texttt{PLUGIN\_NAME} is the capitalized name of your plug-in while
+%% \texttt{PLUGIN\_CMO} is the list of the files $.cmo$ generated from your \caml
+%% sources.
+%% Note that, by default, during compilation of your plug-in all warnings are
+%% disabled; it is recommended to define environment variable
+%% \texttt{DEVELOPMENT=yes} to enable the standard set of compilation warnings.
+%% \end{example}
 
 \begin{important}
 To run your specific Makefile, you must have properly installed \framac
@@ -2292,7 +2293,7 @@ plug-in which provides a dynamic API for callstacks as follows.
 \scodeidx{Cil\_datatype}{Stmt}
 \scodeidx{Cil}{dummyStmt}
 \scodeidx{Datatype}{Serializable\_undefined}
-\ocamlinput{./examples/generated/callstack.ml}
+\ocamlinput{./examples/callstack/callstack.ml}
 
 You have to use the functor \texttt{Type.Abstract} to access to the type value
 corresponding to the type of callstacks (and thus to access to the above
@@ -2306,7 +2307,7 @@ dynamically registered functions).
 \scodeidx{Datatype}{func}
 \scodeidx{Datatype}{func3}
 \scodeidx{Datatype}{unit}
-\ocamlinput{./examples/generated/use_callstack.ml}
+\ocamlinput{./examples/callstack/use_callstack.ml}
 \end{example}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -3900,7 +3901,7 @@ division in the program, stating that the divisor is not zero:
 \scodeidx{Ast}{self}
 \sscodeidx{Cil}{cilVisitor}{current\_kinstr}
 \sscodeidx{Visitor}{frama\_c\_visitor}{current\_kf}
-\ocamlinput{./examples/generated/syntactic_check.ml}
+\ocamlinput{./examples/syntactic_check/syntactic_check.ml}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -4066,7 +4067,7 @@ recognize only subtrees of an otherwise normal ACSL predicate or term. For
 instance, the following code will let extension \verb|foo| replace all
 occurrences of \verb|\foo| by \verb|42|.
 
-\ocamlinput{./examples/acsl_extension_foo.ml}
+\ocamlinput{./examples/acsl_extension_foo/acsl_extension_foo.ml}
 
 With this extension enabled, \framac will interpret the following clause in
 a given source file:
@@ -4145,7 +4146,7 @@ The following code shows a more complete extension example. It provides the
 user a way to load some types (assumed to be external to Frama-C) so that they
 can be used in ACSL specification.
 
-\ocamlinput{./examples/acsl_extension_ext_types.ml}
+\ocamlinput{./examples/acsl_extension_ext_types/acsl_extension_ext_types.ml}
 
 Namely, specification:
 
@@ -4162,7 +4163,7 @@ Namely, specification:
 is correctly parsed and typed by Frama-C and leads to the following displayed
 version in the interface:
 
-\includegraphics[width=\textwidth]{examples/acsl_extension_ext_types}
+\includegraphics[width=\textwidth]{examples/acsl_extension_ext_types/acsl_extension_ext_types}
 
 
 

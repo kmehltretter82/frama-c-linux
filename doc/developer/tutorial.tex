@@ -4,94 +4,41 @@
 
 \begin{target}beginners.\end{target}
 
-This chapter aims at helping a developer to write his first \framac plug-in. At
-the end of the tutorial, any developer should be able to extend \framac with a
-simple analysis available as a \framac plug-in. This chapter was written as a
+This chapter aims at helping a developer to write their first \framac plug-in.
+At the end of the tutorial, any developer should be able to extend \framac with
+a simple analysis available as a \framac plug-in. This chapter was written as a
 step-by-step explanation on how to proceed towards this goal. It will get you
 started, but it does not tell the whole story. You will get it with your own
 experiments, and by reading the other chapters of this guide as needed.
 
-First, Section~\ref{tut2:environment} describes how to quickly setup a
+Section~\ref{tut2:environment} provides some tips for setting up a
 development environment for \framac.
 Section~\ref{tut2:architecture} shows what a plug-in looks like. Then
 Section~\ref{tut2:hello} explains the basis for writing a standard \framac
 plug-in\index{Plug-in}, while Section \ref{tut2:cfg} details how to interact
 with \framac and other plug-ins to implement analyzers of \C programs.
 
-\section{Quick Setup of a Development Environment}\label{tut2:environment}
+\section{Development Environment}\label{tut2:environment}
 
-This setup is based on Emacs as the IDE, with OPAM for OCaml package
-installation and Merlin for OCaml source code navigation.
-Similar environments can be setup using other editors, such as Vim and
-Sublime Text, but they are not detailed here; please refer to the Merlin
-documentation for further details on how to setup other editors for OCaml
-development.
+It is easy to develop a plug-in for \framac with any IDE, as long as it
+supports the OCaml language. This includes (but is not limited to)
+Emacs or Vim with the Merlin\footnote{\url{https://ocaml.github.io/merlin}}
+tool, or VS~Code with the {\em OCaml platform} extension.
+The last is probably the easiest to setup for a beginner in OCaml.
 
-\subsection{Emacs Configuration Files}
+Most modern IDEs support (directly or indirectly, via Merlin)
+OCaml-LSP\footnote{\url{https://github.com/ocaml/ocaml-lsp}},
+which is an implementation of LSP ({\em Language Server Protocol} for OCaml.
 
-The \framac source distribution includes, in its \texttt{share} directory,
-some \texttt{frama-c-*.el} files ({\em Emacs-lisp} scripts)
-with default settings for an OCaml development environment based on
-Emacs + OPAM + Merlin. To set it up, do the following:
+Concerning code formatting, the \framac team currently uses the
+\texttt{ocp-indent} opam package for code indentation.
+Consider installing it if you want to ensure your code follows the same
+conventions.
 
-\begin{enumerate}
-\item Install Emacs, OPAM, and OPAM packages \textsf{merlin}, \textsf{tuareg}
-  and \textsf{ocp-indent};
-\item Copy \texttt{share/emacs/frama-c-*.el} to a directory in your Emacs load-path;
-\item Add \texttt{(load-library "frama-c-recommended")} to your \texttt{.emacs}
-  init file.
-\end{enumerate}
-
-For instance, run these commands (after having installed OPAM):
-
-\begin{verbatim}
-opam install merlin tuareg ocp-indent
-mkdir ~/.emacs.d/frama-c
-cp <path to frama-c sources>/share/emacs/frama-c-*.el ~/.emacs.d/frama-c/
-\end{verbatim}
-
-And then add this in the beginning of your \texttt{\textasciitilde/.emacs}:
-
-\begin{verbatim}
-(add-to-list 'load-path "~/.emacs.d/frama-c")
-(load-library "frama-c-recommended")
-\end{verbatim}
-
-You can replace \texttt{frama-c-recommended} with \texttt{frama-c-dev} in the
-above line. The former contains some extra, optional settings, while the latter
-contains only the most important settings for OCaml development. We recommend
-you review the definitions in \texttt{frama-c-recommended} and remove those you
-find unnecessary.
-
-\subsection{Quick Merlin guide}
-
-Merlin\footnote{Merlin is available on Github
-  (\url{https://github.com/the-lambda-church/merlin}) and as an OPAM package.}
-is a tool for OCaml type information, source code navigation and
-auto-completion.
-
-Detailed instructions for using Merlin with Emacs are available at
-\url{https://github.com/the-lambda-church/merlin/wiki/emacs-from-scratch}.
-
-The \framac Makefile contains a target \textsf{merlin} that generates an
-appropriate \texttt{.merlin} file to be used when editing \framac
-\texttt{.ml/.mli} files. Run \texttt{make merlin} after compiling \framac,
-and the generated \texttt{.merlin} file will be automatically used when opening 
-\framac OCaml sources.
-
-Here is a quick summary of the most useful commands when editing
-\texttt{.ml/.mli} files:
-
-\begin{itemize}
-\item \texttt{Ctrl+c  Ctrl+t}: display type information
-  (repeat it to further expand types)
-\item \texttt{Ctrl+c  Ctrl+l}: jump to definition
-  (for variables, types, modules, etc.)
-\item \texttt{Ctrl+c  Ctrl+x}: jump to next error in current buffer
-\end{itemize}
-
-Merlin also includes an auto-complete feature. Check its website for
-further documentation.
+Overall, it is \textbf{strongly} suggested to use an OCaml-aware IDE and take
+the time to set it up. Plug-ins use several different parts of the \framac API,
+and a properly setup IDE greatly improves productivity, offering features such
+as auto-completion, type checking, syntax highlighting, and code navigation.
 
 \section{What Does a Plug-in Look Like?}\label{tut2:architecture}
 \index{Plug-in!Architecture}\index{Architecture!Plug-in}
@@ -138,21 +85,21 @@ platform. This tutorial focuses on specific parts of this figure.
     }
   };
 
-  \coordinate[yshift=\padding] (makefile-se) at (gui.north east);
-  \coordinate (makefile-nw) at (gui.west |- implem.north);
+  \coordinate[yshift=\padding] (dune-se) at (gui.north east);
+  \coordinate (dune-nw) at (gui.west |- implem.north);
   \node[fill=palered, rounded corners=5pt,node font=\large,
-        fit=(makefile-nw) (makefile-se),
+        fit=(dune-nw) (dune-se),
         inner sep=0pt,draw]
-        (makefile)
-        {Makefile};
+        (dune)
+        {dune\\dune-project\\frama-c-plug-in.opam};
 
    \node[node font={\Large\bfseries},yshift=\padding,anchor=south]
-   at ($(implem.north west)!0.5!(makefile.north east)$)
+   at ($(implem.north west)!0.5!(dune.north east)$)
    (plugin-title)
    {Plug-in directory};
    \begin{scope}[on background layer]
      \node[fill=LightCyan, rounded corners=7pt,draw,
-           fit=(implem) (gui) (makefile) (plugin-title), inner sep=\padding]
+           fit=(implem) (gui) (dune) (plugin-title), inner sep=\padding]
            (plugin-dir)
            {};
    \end{scope}
@@ -167,10 +114,6 @@ platform. This tutorial focuses on specific parts of this figure.
 
    \node[anchor=south east,xshift=-\padding] at (registration.north west)
    {\usebox{\captionbox}};
-
-   \node[anchor=south,yshift=\bigpadding,fill=palered,draw,
-   minimum height=1.5\designheight]
-   at (plugin-dir.north -| gui.north) (makefile-dynamic) {Makefile.dynamic};
 
    \newlength{\kernelwidth}
    \setlength{\kernelwidth}{\widthof{Dynamic}}%TODO:compute dynamically
@@ -187,7 +130,6 @@ platform. This tutorial focuses on specific parts of this figure.
      \end{tikz-vbox}
    };
 
-   \draw[-Latex] (makefile.north) -- (makefile-dynamic.south);
    \draw[-Latex] (gui.south) -- (design.north);
    \coordinate (main-pt) at ($(db-main.east)+(0.9\bigpadding,0)$);
    \draw (register.west) -| (main-pt);
@@ -229,66 +171,135 @@ the next section shows how to:
 
 \section{The Hello plug-in}\label{tut2:hello}
 
-This simple plug-in explain how to make your plug-in interact basically
-with several aspects of the \framac framework: registration, getting
-command-line options, compilation and installation, console output,
-testing, and documentation. (In case of difficulty, it is explained at
-the end of this section how to generate the whole plug-in.)
+This simple plug-in illustrates how to create your own plug-in basically with
+several aspects of the \framac framework: building the plugin and installing the
+plug-in, registration, getting command-line options, console output, testing and
+documentation. (In case of difficulty, it is explained at the end of this
+section how to generate the whole plug-in.)
 
-\subsection{A Simple Script}\label{tut2:script}
-\index{Plug-in!Script}
+\subsection{Creating a new plug-in}\label{tut2:basic}
+\index{Plug-in!Basic}
 
-The easiest way to extend \framac is to write a simple script. A
-simple 'Hello World' script consists of a single \ocaml file:
+A plug-in is built using Dune\footnote{\url{https://dune.build}}. It is composed
+minimally of the following files:
 
-\listingname{./hello\_world.ml\footnotemark}
-\ocamlinput{./tutorial/hello/generated/script/hello_world.ml}
-\sscodeidx{Db}{Main}{extend} 
+\begin{itemize}
+  \item a \texttt{dune-project} file that describes the project;
+  \item a \texttt{dune} file that describes the build of the project;
+  \item a \texttt{<My\_plugin>.ml} file that defines the API of the plugin
+    (which can be empty).
+\end{itemize}
 
-This script defines a simple function that writes a message to an
-output file, then registers the function \texttt{run} as an entry point for the
-script. \framac will call it among the other plug-in entry points if the script
-is loaded.
+For example, for the Hello plugin:
 
-The script is compiled, loaded and run with the command
-\texttt{frama-c -load-script hello\_world.ml}. Executing this command
-creates a \texttt{hello.out} file in the current directory.
+\listingname{./dune-project}
+\duneinput{./tutorial/hello/v1-simple/dune-project}
 
-\subsection{Registering a Script as a Plug-in}\label{tut2:plugin}
+\listingname{./dune}
+\duneinput{./tutorial/hello/v1-simple/dune}
+
+\texttt{Hello.ml} is just an empty file.
+
+Then the plugin can be built using the following command:
+
+\lstinline{dune build}
+
+If Dune is installed, this should compile the project successfully.
+Note that Dune emits messages {\em during} compilation, but erases them
+afterwards. In case of success, there will be no visible output at the end.
+Note that this behavior can be configured with Dune's option \verb|--display|.
+
+\begin{important}
+  Dune always looks for \texttt{dune-project} files in the parent directories,
+  so make sure that your Hello directory is not inside another one containing
+  a Dune project (\eg if you are running this directly from the \framac source
+  archive), otherwise \verb|dune build| may fail. You can always add option
+  ``\verb|--root .|'', or create an empty \texttt{dune-workspace} file in
+  the current directory to force Dune to ignore parent directories.
+\end{important}
+
+Note a few details about the naming conventions:
+
+\begin{itemize}
+  \item in the \texttt{dune-project} file, the name of the plugin is
+    \texttt{frama-c-<my-plugin>}
+  \item in the \texttt{dune} file, the name of:
+  \begin{itemize}
+  \item the library is \texttt{My\_plugin} (it is a module name);
+  \item the public name of the library is \texttt{frama-c-<my-plugin>.core}
+    (dune project name core);
+  \item the name of the plugin is \texttt{my-plugin};
+  \item the plugin must at least include the library
+    \texttt{frama-c-<my-plugin>.core}.
+  \end{itemize}
+\end{itemize}
+
+Of course, for now, our plug-in does nothing, so let us change that.
+
+\subsection{A Very Simple Plug-in}\label{tut2:simple}
+\index{Plug-in!Simple}
+
+Let us add a simple file to our plug-in:
+
+\listingname{./hello\_world.ml}
+\ocamlinput{./tutorial/hello/v1-simple/hello_world.ml}
+\sscodeidx{Db}{Main}{extend}
+
+This file defines a simple function that writes a message to an output file,
+then registers the function \texttt{run} as an entry point. \framac will call
+it among the other plug-in entry points if the plug-in is loaded.
+
+The plug-in is compiled the same way as previously explained in~\ref{tut2:basic}.
+Then, one can execute the script using the command:
+
+\lstinline{dune exec -- frama-c}
+
+Executing this command creates a \texttt{hello.out} file in the current
+directory.
+
+\begin{important}
+  You can think of \verb+dune exec --+ as a wrapper for \texttt{frama-c}
+  which adds your plug-in to those already present in \framac.
+  It operates on a local Dune sandbox, allowing you to test it without
+  risking ``polluting'' your installed \framac.
+\end{important}
+
+\subsection{Registering a Plug-in in Frama-C}\label{tut2:plugin}
 \index{Plug-in!Registration}
 
 To make this script better integrated into \framac, its code must register
-itself as a plug-in. Such a registration provides general services, such as
-outputting on the \framac console, or extending \framac with new command-line
+itself as a plug-in. Registration provides general services, such as
+outputting to the \framac console and extending \framac with new command-line
 options.
 
 Registering a plug-in is achieved through the use of the
 \texttt{Plugin.Register} functor:
 
 \listingname{./hello\_world.ml}
-\ocamlinput{./tutorial/hello/generated/with_registration/hello_world.ml}
+\ocamlinput{./tutorial/hello/v2-register/hello_world.ml}
 \sscodeidx{Db}{Main}{extend}
 \scodeidx{Plugin}{Register}
 
-The argument for this functor is a module with three values:
+The argument to the \texttt{Plugin.Register} functor is a module with three
+values:
 \begin{itemize}
 \item \texttt{name} is an arbitrary, non-empty string containing the full name
   of the module.
-\item \texttt{shortname} is a small string containing the short name of the
-  module, usually used as a prefix for plug-in options. No space is allowed in
-  that string.
-\item \texttt{help} is a string containing free-form text, containing a
+\item \texttt{shortname} is a small string containing the {\em short name} of
+  the module, to be used as a prefix for all plug-in options\footnote{\framac
+  does  not enforce that all plug-in options are prefixed with its shortname,
+  but it is customary to do so.}. It cannot contain spaces.
+\item \texttt{help} is a string containing free-form text, with a
   description of the module.
 \end{itemize}
 
 Visible results of the registration include:
 \begin{itemize}
-\item ``hello world'' appears in the list of available plug-ins
-  (consultable with \texttt{frama-c -load-script
-    hello\_world.ml -plugins});
+\item ``hello world'' appears in the list of available plug-ins;
+  you can check it by running
+  \verb|dune exec -- frama-c -plugins|;
 \item default options for the plug-in work, including the inline help
-  (available with \texttt{frama-c -load-script
-    hello\_world.ml -hello-help}).
+  (available with \verb|dune exec -- frama-c -hello-help|).
 \end{itemize}
 
 \subsection{Displaying Messages}\label{tut2:messages}
@@ -298,81 +309,86 @@ The signature of the module \texttt{Self} obtained by applying
 \texttt{Plugin.Register} is \texttt{General\_services}. One of these general
 services is logging, \ie message display. In \framac, one should never attempt
 to write messages directly to \texttt{stderr} or \texttt{stdout}: use the
-general services instead\footnote{However writing to a new file using standard
+general services instead\footnote{However, writing to a new file using standard
   \ocaml primitives is OK.}.
 
 \listingname{./hello\_world.ml}
-\ocamlinput{./tutorial/hello/generated/with_log/hello_world.ml}
+\ocamlinput{./tutorial/hello/v3-log/hello_world.ml}
 \sscodeidx{Db}{Main}{extend}
 \scodeidx{Plugin}{Register}
 
 Running this script yields the following output:
 \begin{shell}
-\$ frama-c -load-script hello_world.ml
+\$ dune exec -- frama-c
 [hello] Hello, world!
 [hello] 11 * 5 = 55
 \end{shell}
 
 The \texttt{result} routine is the function to use to output results of your
-plug-in. The \framac output routines takes the same arguments than the \caml
-function \texttt{Format.printf}.
+plug-in. The \framac output routines take the same arguments as the \caml
+function \texttt{Format.printf}\footnote{The
+\href{https://v2.ocaml.org/api/Format.html}{Format} module is part of the
+OCaml standard library and provides advanced pretty-printing features.
+If you are not familiar with it, consider grepping some \framac messages
+to get a feel for how to use it.}.
 
-The function \texttt{feedback} outputs messages that show progress to the
-user. In this example, we gave to feedback a log level of 2, because
-we estimated that in most case the user is not interested in seeing
-the progress of a fast operation (simple multiplication). The default
+Function \texttt{feedback} outputs messages that show progress to the
+user. In this example, we decided to emit a feedback message with a log level
+of 2, because we estimated that in most cases the user is not interested in
+seeing the progress of a fast operation (simple multiplication). The default
 log level is 1, so by default this message is not displayed. To see
 it, the verbosity of the \texttt{hello} plug-in must be increased:
 
 \begin{shell}
-\$ frama-c -load-script hello_world.ml -hello-verbose 2
+\$ dune exec -- frama-c -hello-verbose 2
 [hello] Hello, world!
 [hello] Computing the product of 11 and 5...
 [hello] 11 * 5 = 55
 \end{shell}
 
-For a comprehensive list of the logging routines and options, see
+For a comprehensive list of logging routines and options, see
 Section~\ref{adv:log}.
 
-\subsection{Adding Command Line Options}\label{tut2:basic-options}
-\index{Plug-in!Command Line Options}\index{Command Line}
+\subsection{Adding Command-Line Options}\label{tut2:basic-options}
+\index{Plug-in!Command-Line Options}\index{Command Line}
 
 We now extend the \texttt{hello world} plug-in with new options.
 
-If the plug-in is installed (with \texttt{make install}), it will be loaded and
-executed on every invocation of \texttt{frama-c}, which is surely not what you
-want. To avoid this behavior, we add a boolean option, set by default to false,
-that conditionally enables the execution of the main function of the plug-in
-(the usual convention for the name of the option is to take the short name of
-the module with no suffix, \ie \texttt{-hello} in our case).
+If the plug-in is installed (globally, with \verb|make install|, or locally,
+with \verb|dune exec|), it will be loaded and
+executed on {\em every} invocation of \texttt{frama-c}, which is not how most
+plug-ins work. To change this behavior, we add a boolean option, set by default
+to false, that conditionally enables the execution of the main function of the
+plug-in. The usual convention for the name of this option is the short
+name of the module, without suffix, \ie \texttt{-hello} in our case.
 
 We also add another option, \texttt{-hello-output}, that takes a string
 argument. When set, the hello message is displayed in the file given as
 argument.
 
 \listingname{./hello\_world.ml}
-\ocamlinput{./tutorial/hello/generated/with_options/hello_world.ml}
+\ocamlinput{./tutorial/hello/v4-options/hello_world.ml}
 
 Registering these new options is done by calling the \texttt{Self.False} and
-\texttt{Self.String} functors, which respectively creates a new boolean option
-whose default value is false and a new string option with a user-defined default
-value (here \texttt{"-"}). The values of these options are obtained \via
-\texttt{Enabled.get ()} and \texttt{Output\_file.get ()}. 
+\texttt{Self.String} functors, which respectively create a new boolean option
+whose default value is false and a new string option with a user-defined
+default value (here, \texttt{"-"}). The values of these options are obtained
+\via \texttt{Enabled.get ()} and \texttt{Output\_file.get ()}.
 
 With this change, the hello message is displayed only if \framac is
 executed with the \texttt{-hello} option.
 \begin{shell}
-\$ frama-c
-\$ frama-c -load-script hello_world.ml -hello
+\$ dune exec -- frama-c
+\$ dune exec -- frama-c -hello
 [hello] Hello, world!
-\$ frama-c -load-script hello_world.ml -hello -hello-output hello.out
+\$ dune exec -- frama-c -hello -hello-output hello.out
 \$ ls hello.out
 hello.out
 \end{shell}
 
 These new options also appear in the inline help for the hello plug-in:
 \begin{shell}
-\$ frama-c -load-script hello_world.ml -hello-help
+\$ dune exec -- frama-c -hello-help
 ...
 ***** LIST OF AVAILABLE OPTIONS:
 
@@ -383,111 +399,70 @@ These new options also appear in the inline help for the hello plug-in:
 ...
 \end{shell}
 
+\subsection{About the plug-in build process}
 
-\subsection{Writing a Makefile}\label{tut2:basic-makefile}
-\index{Plug-in!Makefile}
+As mentioned before, each plug-in needs a module declaring its public API.
+In our examples, this was file \verb|Hello.ml|, which was left empty.
+To make it more explicit to future users of our plug-in, it is customary to
+add a comment such as the following:
 
-The use of \texttt{load-script} is ideal for small experimentations,
-or when writing very specific extensions. When a plug-in becomes larger,
-or more general-purpose, and must be split into several files, it is a
-good idea to build and install it properly. \framac provides means to
-simplify this through the use of \texttt{Makefile}s.
-
-First, lets us create a \texttt{hello} directory that will contain all
-of our plug-in files. We put \verb+hello_world.ml+ inside it, and then
-create our \texttt{Makefile} there.
-
-\subsubsection*{A simple Makefile}
-
-% TODO: Recuperer toutes les informations du tutoriel 1
-
-We write a simple \texttt{./Makefile} for our
-\texttt{./hello\_world.ml} plug-in:
-
-\listingname{./Makefile}
-\codeidx{Makefile.dynamic}
-\codeidx{FRAMAC\_SHARE}
-\codeidx{PLUGIN\_CMO}
-\codeidx{PLUGIN\_NAME}
-\makefileinput{./tutorial/hello/generated/makefile_single/Makefile}
-
-This \texttt{Makefile} sets some variables before including the generic
-\texttt{Makefile.dynamic} which is installed within \framac. It may be
-customized in several ways to help building a plug-in (see
-Section~\ref{adv:dynamic-make} for details).
+\listingname{./Hello.ml}
+\ocamlinput{./tutorial/hello/v5-multiple/Hello.ml}
 
 \begin{important}
-  The name of each compilation unit (here \texttt{hello\_world}) must be
-  different from the plug-in name set by the \texttt{Makefile} (here
-  \texttt{Hello}), from any other plug-in names (\eg \texttt{value}\footnote{
-    \texttt{value} is the technical plug-in name of the \texttt{Eva} plug-in})
-    and from any other \framac kernel \caml files (\eg \texttt{plug-in}).
+  Note the unusual capitalization of the filename \texttt{Hello.ml}, which
+  must correspond to the name of the plug-in specified in the Dune file
+  (the \texttt{name} part inside \texttt{library}).
 \end{important}
 
-The plug-in also needs an interface file. Indeed, thanks to
-\texttt{Makefile.dynamic}, each plug-in is packed into a single module
-\texttt{\$(PLUGIN\_NAME)}\codeidx{PLUGIN\_NAME} (here \texttt{Hello}) which
-needs an interface. Here we simply export an empty interface in order to hide
-the whole implementation to other developers.
+Note that, to avoid issues, the name of each compilation unit
+(here \texttt{hello\_world}) must be different from the plug-in name set in
+the \texttt{dune} file (here \texttt{Hello}), from any other plug-in names
+(\eg \texttt{eva}, \texttt{wp}, etc.) and from any other \framac kernel
+\caml files (\eg \texttt{plugin}).
 
-\listingname{./Hello.mli}
-\ocamlinput{./tutorial/hello/src/Hello.mli}
-\begin{important}
-  Note the unusual capitalization of the filename \texttt{Hello.mli} which is
-  required for compilation purposes.
-\end{important}
+The module name chosen by a plug-in (here \texttt{Hello}) is used by Dune to
+{\em pack} that plug-in; any functions declared in it become part of the
+plug-in's public API. They become accessible to other plug-ins and need to be
+maintained by the plug-in developer. Leaving it empty avoids exposing
+unnecessary implementation details.
 
-Inside the plug-in's directory, run \texttt{make} to compile it. Note that the
-compiled files are copied into a \texttt{top} (for {\em top-level}) subdirectory
-(if our plug-in had GUI-dependent modules, they would be placed in a
-\texttt{gui} subdirectory).
-The module can then be loaded and executed by using
-\texttt{frama-c -load-module top/Hello}.
+Inside the plug-in's directory, \texttt{dune build} compiles it and creates the
+packed module. It can be installed along with the other \framac plug-ins using
+\verb|dune install|.
 
-Then run \texttt{make install} to install the plug-in (you need to have write
-access to the \texttt{plugins} directory, located at the path given by the
-command \texttt{frama-c-config -print-libpath}).
+You can then just launch \texttt{frama-c} (without any options), and the
+\texttt{Hello} plug-in will be automatically loaded. Check it with the command
+\verb|frama-c -hello-help|.
 
-Just launch \texttt{frama-c} (without any option): the \texttt{Hello}
-plug-in is now always loaded, without the need to pass other options to
-the command line. Check it with the command \texttt{frama-c -hello-help}.
+You can uninstall it by running \verb|dune uninstall|.
 
 \subsubsection*{Splitting your source files}
 
 Here is a slightly more complex example where the plug-in has been split into
-several files. Usually plug-in registration through \texttt{Plugin.Register}
+several files. Usually, plug-in registration through \texttt{Plugin.Register}
 should be done at the bottom of the module hierarchy, while registration of the
-run function through \texttt{Db.Main.extend} should be at the top, as in the
-following example. The \texttt{PLUGIN\_CMO} variable must contain the list of
-file names, in the correct \ocaml build order.
-
-\listingname{./Makefile}
-\codeidx{Makefile.dynamic}
-\codeidx{FRAMAC\_SHARE}
-\codeidx{PLUGIN\_CMO}
-\codeidx{PLUGIN\_NAME}
-\makefileinput{./tutorial/hello/generated/makefile_multiple/Makefile}
-
+\texttt{run} function through \texttt{Db.Main.extend} should be at the top.
 The three following files completely replace the \texttt{./hello\_world.ml}
 from the previous section. Modules are directly called by their name in the
 classical \ocaml way.
 
 \listingname{./hello\_options.ml}
-\ocamlinput{./tutorial/hello/generated/makefile_multiple/hello_options.ml}
+\ocamlinput{./tutorial/hello/v5-multiple/hello_options.ml}
 \scodeidx{Plugin}{Register}
 
 \listingname{./hello\_print.ml}
-\ocamlinput{./tutorial/hello/generated/makefile_multiple/hello_print.ml}
+\ocamlinput{./tutorial/hello/v5-multiple/hello_print.ml}
 
 \listingname{./hello\_run.ml}
-\ocamlinput{./tutorial/hello/generated/makefile_multiple/hello_run.ml}
+\ocamlinput{./tutorial/hello/v5-multiple/hello_run.ml}
 \sscodeidx{Db}{Main}{extend}
 
 The plug-in can be tested again by running:
 
 \begin{shell}
-\$ make
-\$ make install
+\$ dune build
+\$ dune install
 <...>
 \$ frama-c -hello -hello-output hello.out
 \$ more hello.out
@@ -504,192 +479,304 @@ Frama-C supports non-regression testing of plug-ins. This is useful to check
 that further plug-in modifications do not introduce new bugs. The tool allowing
 to perform the tests is called \ptests\index{Ptests}.
 
-To build these tests, the location of the subdirectories containing them must
-be indicated in the \texttt{Makefile} through the variable
-\texttt{PLUGIN\_TESTS\_DIRS}\codeidx{PLUGIN\_TESTS\_DIRS} set at
-\texttt{hello} as this will be the name of the
-subdirectory of \texttt{.tests/} where the plug-in's tests will be located:
+\begin{important}
+  Historically, \texttt{ptests} was developed before \framac used Dune. It was
+  adapted to Dune to maintain backwards compatibility, but new plug-ins may
+  prefer using Dune's test sytem directly.
+\end{important}
 
-\listingname{./Makefile}
-\codeidx{Makefile.dynamic}
-\codeidx{FRAMAC\_SHARE}
-\codeidx{PLUGIN\_CMO}
-\codeidx{PLUGIN\_NAME}
-\codeidx{PLUGIN\_TESTS\_DIRS}
-\makefileinput{./tutorial/hello/generated/with_test/Makefile}
+This is the general layout of the \texttt{tests} directory in a \framac
+plug-in; each file will be explained later.
 
-This enables the creation of a
-\texttt{./tests/ptests\_config} file holding the environement needed by
-\ptests to run the plug-in's tests by running:
-\begin{shell}
-\$ mkdir tests
-\$ make
-<...>
-Generating   tests/ptests_config
+\begin{shell}[breaklines=true]
+<plug-in directory>
++- tests
+   +- ptests_config
+   +- test_config
+   +- suite1
+      +- test1.c
+      +- ...
+      +- oracle
+         +- test1.res.oracle
+         +- test1.err.oracle
+         +- ...
+      +- result
+         +- test1.res.log
+         +- test1.err.log
+         +- ...
+  +- ...
 \end{shell}
 
-For non-regression testing, the current behaviour of a program is taken as
+Inside the \texttt{tests} directory, \verb|ptests_config| lists the
+{\em test suites}, \ie directories containing tests.
+
+\listingname{./tests/ptests\_config}
+\makefileinput{./tutorial/hello/v5-multiple/tests/ptests_config}
+
+Small plug-ins typically have a single test directory with the plug-in name.
+
+Then, a default configuration must be provided for the tests. This is done by
+adding a \texttt{test\_config} file to the \texttt{tests} directory.
+
+\listingname{./tests/test\_config}
+\makefileinput{./tutorial/hello/v5-multiple/tests/test_config}
+
+This configuration must include the plug-ins required by the test; usually, the
+plug-in itself, but also other plug-ins on which it depends. The plug-in name
+is the one provided in the \texttt{plugin} section of the \texttt{dune} file.
+
+For non-regression testing, the current behavior of a program is taken as
 the oracle against which future versions will be tested. In this tutorial, the
 test will be about the correct \texttt{Hello, world!} output made by the option
 \texttt{-hello} of the plug-in.
 
-Each test directory must contain a
+Each test file should contain a
 \texttt{run.config}\index{Test!Configuration}\index{Test!Header}
-comment with the test directives\index{Test!Directive} and the C
-source code used for the test.
-(There are other ways to declare and control tests as developed
-in Section~\ref{ptests:configuration}.)
-For this tutorial, there will be no such source code. A file
-\texttt{./tests/hello/hello\_test.c} is then created:
+comment with test directives\index{Test!Directive} and the C
+source code used for the test (note: there are other ways to declare and
+control tests, as detailed in Section~\ref{ptests:configuration}).
+
+For this tutorial, no actual C code is needed, so
+\texttt{./tests/hello/hello\_test.c} will only contain the run.config header:
 
 \listingname{./tests/hello/hello\_test.c}
 \nscodeidx{Test!Directive}{OPT}
-\lstinputlisting[style=c]{./tutorial/hello/generated/with_test/tests/hello/hello_test.c}
+\lstinputlisting[style=c]{./tutorial/hello/v5-multiple/tests/hello/hello_test.c}
 
-In this file, there is only one directive
-\texttt{OPT: -hello}\nscodeidx{Test!Directive}{OPT} which requires
-to run \framac on this test with the \texttt{-hello} option.
-A look at Section~\ref{ptests:directives} gives you an idea of the kind of
+In this file, there is only one directive,
+\texttt{OPT: -hello}\nscodeidx{Test!Directive}{OPT}, which specifies that
+\framac will set option \texttt{-hello} when running the test.
+A look at Section~\ref{ptests:directives} gives you an idea of the kinds of
 directives which can be used to test plug-ins.
 
-Once the \texttt{run.config} has been configured, it becomes possible to
-get the output generated by the plug-in:
+Once \texttt{run.config} has been configured, it becomes possible to generate
+Dune test files via the \ptests tool:
+
 \begin{shell}[breaklines=true]
-\$ ptests.opt -show
-Env:
-<...>
-Command:
-/usr/local/bin/frama-c.byte tests/hello/hello_test.c -check  -hello 2>tests/hello/result/hello_test.err.log >tests/hello/result/hello_test.res.log
-[kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
-[kernel] Parsing tests/hello/hello_test.c (with preprocessing)
-[hello] Hello, world!
-Env:
-<...>
-Command:
-<...>
+\$ frama-c-ptests
+Test directory: tests
+Total number of generated dune files: 2
 \end{shell}
-The option \texttt{-show} runs the tests and shows the output
-(but not their examination). Other options are detailed
-in Section~\ref{ptests:options} to give a better idea of the
-extent to which \ptests is configurable.
-Under \texttt{Env} is displayed the context (coming from the file
-\texttt{./hello/ptests\_config}).
-Then, \texttt{Command} shows the executed command for this test case followed
-by bash pipes to control the dataflow. (Note the \texttt{-hello}
-option which has been passed to \framac as requested by \texttt{OPT: -hello}
-in the \texttt{run.config}.)
-Two outputs are considered as results for each test:
-an \emph{error} output and a \emph{result} output.
-These outputs are logged in the two following files:
-\texttt{./tests/hello/result/hello\_test.err.log} and
-\texttt{./tests/hello/result/hello\_test.res.log}.
-The three lines beginning by \texttt{[kernel]} and \texttt{[hello]}
-are the actual non-erroneous outputs made by \framac: two of them are generated
-by the kernel (which could be muted by changing the verbosity) while the third
-one is generated by our plug-in \texttt{Hello}. \texttt{Env} and
-\texttt{Command} parts appear once again because some test strategies need it,
-which is not the case in the simple setting of this tutorial.
 
-Once you have verified the output is as expected, set it as an
-oracle to be used for later non-regression tests by running:
+This must be done each time a test configuration is modified or a test file or
+directory is added.
+
+Then, one can execute the tests and get the output generated by the plug-in,
+by running \verb|dune build @ptests|. Note that if you forget the intermediate
+step of running \verb|frama-c-ptests|, you may end up with the following error:
+
+\begin{shell}[breaklines=true]
+Error: Alias "ptests" specified on the command line is empty.
+It is not defined in tests or any of its descendants.
+\end{shell}
+
+But with the \texttt{dune} files generated by \verb|frama-c-ptests|, you can
+run the tests:
+
+\begin{shell}[breaklines=true]
+\$ dune build @ptests
+Files ../oracle/hello_test.res.oracle and hello_test.res.log differ
+% dune build @"tests/hello/result/hello_test.0.exec.wtests": diff failure on diff:
+(cd _build/default/tests/hello/result && diff --new-file "hello_test.res.log"
+"../oracle/hello_test.res.oracle")
+File "tests/hello/oracle/hello_test.res.oracle", line 1, characters 0-0:
+diff --git a/_build/default/tests/hello/oracle/hello_test.res.oracle
+            b/_build/default/tests/hello/result/hello_test.res.log
+index e69de29..5f6ab23 100644
+--- a/_build/default/tests/hello/oracle/hello_test.res.oracle
++++ b/_build/default/tests/hello/result/hello_test.res.log
+@@ -0,0 +1,2 @@
++[kernel] Parsing hello_test.c (with preprocessing)
++[hello] Hello, world!
+\end{shell}
+
+There is a lot of information in the output. The relevant parts
+can be summarized as:
+
+\begin{itemize}
+\item Dune runs its tests inside a {\em sandboxed} environment, in directory
+  \verb|_build/default|, which is (approximately) a copy of the plug-in
+  file tree;
+\item Dune compared two files, none of which existed before running the test:
+  \verb|result/hello_test.res.log| and \verb|oracle/hello_test.res.oracle|;
+\item The last lines (which should be colored, if your terminal supports colors)
+  show the textual difference between the expected and actual outputs.
+\end{itemize}
+
+The first file, \verb|result/hello_test.res.log|, is the {\em actual} output of
+the execution of the test command.
+The second file, \verb|oracle/hello_test.res.oracle|, is the {\em expected}
+output of the test.
+
+The result file is re-generated each time the test is run.
+The oracle file, however, is supposed to exist beforehand
+(unless the test produces no output).
+
+In reality, there are 2 pairs of files for each test: a pair
+\texttt{.res.\{log,oracle\}} and another \texttt{.err.\{log,oracle\}}.
+The first one contains results sent to the standard output ({\em stdout}),
+while the second one contains messages sent to the standard error
+({\em stderr}). In our example, the error output is empty, so it generates no
+differences. Note that Dune only outputs messages in case of errors,
+\ie tests producing the expected result are silent.
+
+Finally, concerning the actual diff in the test (last two lines), the first
+line (starting with \texttt{[kernel]}) is emitted by the \framac kernel,
+and the second one is our plug-in's result, as expected.
+
+Once you have verified the actual output is the one {\em you} expected,
+you can {\em promote} it to the status of ``official oracle'' for future
+non-regression tests, by running:
 \begin{shell}
-\$ ptests.opt -update
+\$ dune promote
 \end{shell}
-This command copies the two log files to
-\texttt{./tests/hello/oracle/hello\_test.err.oracle} and
-\texttt{./tests/hello/oracle/hello\_test.res.oracle}.
+Note, however, that if the oracles do not exist, they must be created:
+\begin{shell}
+\$ frama-c-ptests -create-missing-oracles tests
+\$ dune promote
+\end{shell}
 
-The setting of this test case is now finished.
-Let's now assume the plug-in is later erroneously modified as follows:
+The option \texttt{-create-missing-oracles} always creates both result and
+error oracles. Most of the time, however, only the former is useful.
+After promoting tests, it is useful to remove empty oracles:
+
+\begin{shell}
+\$ frama-c-ptests -remove-empty-oracles tests
+\end{shell}
+
+The new oracle should be committed to source control, for future testing.
+
+\begin{important}
+  Once your plug-in has test files, the \verb|dune build| command presented
+  earlier will not only compile your plug-in, but also run its tests.
+  Therefore, if you want to simply compile it, you will have to run
+  \verb|dune build @install| instead. Despite the name, the command will
+       {\em not} install your plug-in, it will only build and collect all
+       files necessary for its installation.
+\end{important}
+
+Now, let's introduce an error. Assume the plug-in has been modified as follows:
 
 \listingname{./hello\_run.ml}
-\ocamlinput{./tutorial/hello/generated/with_test/hello_run_bug.ml}
+\ocamlinput{./tutorial/hello/v6-test-with-bug/hello_run.ml}
 \sscodeidx{Db}{Main}{extend}
 
-where \texttt{Hello, world!} is incorrectly changed to \texttt{Hello world!}.
-Running the command:
+We assume that ``\texttt{Hello, world!}'' has been unintentionally changed to
+``\texttt{Hello world!}''.
+Running these commands:
 \begin{shell}[breaklines=true]
-\$ make
+\$ dune build @install
 <...>
-\$ make tests
-TESTING PLUG-IN Hello
-% Dispatch finished, waiting for workers to complete
-Env:
-<...>
-Command:
-<...>
-% Comparisons finished, waiting for diffs to complete
---- tests/hello/oracle/hello_test.res.oracle    2017-06-02 14:39:49.407624816 +0200
-+++ tests/hello/result/hello_test.res.log       2017-06-02 14:40:03.483624679 +0200
-@@ -1,3 +1,3 @@
- [kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin_for_normalization.i (no preprocessing)
- [kernel] Parsing tests/hello/hello_test.c (with preprocessing)
+\$ dune build @ptests
+Files ../oracle/hello_test.res.oracle and hello_test.res.log are different
+% dune build @"tests/hello/result/hello_test.0.exec.wtests": diff failure on diff:
+ (cd _build/default/tests/hello/result && diff --new-file "hello_test.res.log" "../oracle/hello_test.res.oracle")
+File "tests/hello/oracle/hello_test.res.oracle", line 1, characters 0-0:
+diff --git a/_build/default/tests/hello/oracle/hello_test.res.oracle b/_build/default/tests/hello/result/hello_test.res.log
+index 5f6ab2389a..cf2e5c010c 100644
+--- a/_build/default/tests/hello/oracle/hello_test.res.oracle
++++ b/_build/default/tests/hello/result/hello_test.res.log
+@@ -1,2 +1,2 @@
+ [kernel] Parsing hello_test.c (with preprocessing)
 -[hello] Hello, world!
 +[hello] Hello world!
-% Diffs finished. Summary:
-Run = 1
-Ok   = 1 of 2
-Time = 0.380000 s.
-real 0.45
-user 0.38
-sys 0.03
 \end{shell}
-displays the differences (à la \texttt{diff}) between the current executions
-and the saved oracles. Here the diff clearly shows that the only difference is
+displays the differences (à la \texttt{diff}) between the current execution
+and the saved oracles. Here, the diff clearly shows that the only difference is
 the missing comma in the generated message due to our (erroneous) modification.
-One test is marked as being successful: that is the test comparing
-\texttt{stderr} (which contains an empty string). After fixing the \ocaml code,
-running \texttt{make \&\& make tests} again shows that all test cases are
-successful.
+After fixing the \ocaml code, running again the previous commands shows that all
+test cases are successful.
 
-You may use other \framac's plug-ins as examples of how to integrate a
+You may check other \framac plug-ins as examples of how to integrate a
 plug-in with \ptests. Small plug-ins such as \texttt{Report} and
 \texttt{Variadic} are good examples (see directories
-\texttt{src/plugins/report/tests/} and \texttt{src/plugins/variadic/tests/}).
+\texttt{src/plugins/report/tests} and \texttt{src/plugins/variadic/tests}).
 Please note \framac offers no particular support for other kinds of testing
-purposes, such as test-driven development (TDD)\footnote{For the purpose of
-driving the development of a plug-in, one should have to manually create
-\texttt{./tests/*/oracle/*.err.oracle} and
-\texttt{./tests/*/oracle/*.res.oracle} files for example.} for instance.
+purposes, such as test-driven development (TDD)\footnote{For instance, one
+required feature for TDD that \texttt{ptests} does not support, is to
+{\em force} the user to manually create \texttt{./tests/*/oracle/*.oracle}
+files before running a new test.}.
 Additional information about plug-in testing is available in
 Sections~\ref{adv:ptests} and~\ref{sec:ptests}.
+
+\subsubsection{Summary of Testing Operations}
+
+Here's a summarized list of operations in order to add a new test:
+
+\begin{enumerate}
+\item Create a test case (\texttt{.c} or \texttt{.i} file in
+  \texttt{tests/<suite>}).
+\item Add a \texttt{run.config} header to the test.
+\item \verb|frama-c-ptests|
+\item \verb|frama-c-ptests -create-missing-oracles|
+\item \verb|dune build @ptests|
+\item Manually inspect oracle diffs to check that they are ok.
+\item \verb|dune promote|
+\item \verb|frama-c-ptests -remove-empty-oracles|
+\end{enumerate}
+
+Operations to perform when modifying the plug-in code:
+
+\begin{enumerate}
+\item \verb|dune build @install|
+\item \verb|dune build @ptests|
+\item If there are expected diffs, run \verb|dune promote|;
+  otherwise, fix code and re-run the first steps.
+\end{enumerate}
 
 \subsection{Documenting your Source Code}
 \label{tut2:doc}
 \index{Plug-in!Documentation}
 
-\framac automatically generates the documentation of plug-ins when the command
-\texttt{make doc} is run\footnote{Frama-C kernel needs to have been
-installed with code documentation support. If this was not the case, you can
-run \texttt{make doc install-doc-code} in Frama-C's main directory as hinted
-by the error message appearing in the terminal before trying again to generate
-the documentation of the plug-in.}. This relies on \ocamldoc and
-requires the plug-in to be documented following the \ocamldoc guidelines
-(please refer to the corresponding chapter in \cite{caml}).
+One can generate the documentation of a plugin using the command:
+
+\lstinline{dune build @doc}
+
+This relies on \odoc and requires the plug-in to be documented following the
+\odoc guidelines (check \url{https://ocaml.github.io/odoc} for details).
 
 We show here how the Hello plug-in could be slightly documented and use
-\ocamldoc features such as @-tags and cross references:
+\odoc features such as @-tags and cross references. First, we modify the
+\texttt{Hello.ml} file to export all inner modules, otherwise \odoc will not
+generate documentation for them:
+
+\listingname{./Hello.ml}
+\ocamlinput{./tutorial/hello/v7-doc/Hello.ml}
+
+Then, we add some documentation tags to our modules:
 
 \listingname{./hello\_options.ml}
-\ocamlinput{./tutorial/hello/generated/with_doc/hello_options.ml}
+\ocamlinput{./tutorial/hello/v7-doc/hello_options.ml}
 \scodeidx{Plugin}{Register}
 
 \listingname{./hello\_print.ml}
-\ocamlinput{./tutorial/hello/generated/with_doc/hello_print.ml}
+\ocamlinput{./tutorial/hello/v7-doc//hello_print.ml}
 
 \listingname{./hello\_run.ml}
-\ocamlinput{./tutorial/hello/generated/with_doc/hello_run.ml}
+\ocamlinput{./tutorial/hello/v7-doc//hello_run.ml}
 \sscodeidx{Db}{Main}{extend}
 
-The documentation files of the plug-in are added to
-\texttt{./doc/code/} and the link to this
-is added to the plug-ins index file
-\texttt{./doc/code/index.html}.
+Running \verb|dune build @doc| will generate documentation files in
+\texttt{./\_build/default/\_doc/\_html}. Open \texttt{index.html} in your
+browser and navigate to see them. Note that \odoc may report some warnings
+due to absence of annotation data for \framac's modules:
 
-This simple tutorial now comes to its end. It focused on the standard features of
-architectures and interfaces of \framac plug-ins. A companion archive
+\begin{shell}
+Warning: Couldn't find the following modules:
+  Frama_c_kernel Frama_c_kernel__Plugin
+\end{shell}
+
+This should not prevent the generation of documentation for the library itself;
+but links to modules such as \texttt{Enabled} and \texttt{Output\_file} will
+not work.
+
+\subsection{Conclusion}
+
+This simple tutorial now comes to its end. It focused on the standard features
+of architectures and interfaces of \framac plug-ins. A companion archive
 \texttt{hello.tar.gz} is available in the download section of the \framac
-website\footnote{The direct link is: \url{http://frama-c.com/download.html}.}.
+website\footnote{The direct link is:
+\url{https://www.frama-c.com/download/hello.tar.gz}.}.
 The next tutorial will make you dive in \C analysis.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -699,11 +786,9 @@ The next tutorial will make you dive in \C analysis.
 In this section, we create a new ViewCfg plug-in that computes the control
 flow graph of a function and outputs it in the \dottool format. Through its
 implementation, we explain some of \framac APIs such as how to visit
-an AST\footnote{Abstract Syntax Tree}, to hook a plug-in, to interface
-a plug-in with other plug-ins, to extend the
-GUI\footnote{Graphical User Interface}, to make a plug-in usable by
-others, to configure a script,
-and to make a plug-in usable in a multi-projects setting.
+an AST\footnote{Abstract Syntax Tree}, how to hook a plug-in, how to interface
+a plug-in with other plug-ins, and how to make a plug-in usable in a
+multi-project setting (which also allows it to save/load data).
 
 This section assumes the reader is already familiar with the basics of plug-ins
 for \framac as covered by the Hello plug-in in the previous
@@ -713,7 +798,7 @@ section.
 \index{Visitor}
 
 Writing an analysis for \C programs is the primary purpose of a \framac
-plug-in. That usually requires to visit the AST to compute information for some
+plug-in. That usually requires visiting the AST to compute information for some
 \C constructs. There are two different ways of doing that in \framac:
 \begin{itemize}
 \item through a direct recursive descent; or
@@ -727,12 +812,12 @@ to combine both ways to tune it to specific needs.
 \subsubsection*{Pretty-printing with direct recursive descent}
 
 Frama-C already has a function to pretty-print statements (namely
-\texttt{Printer.pp\_stmt}\scodeidx{Printer\_api}{S.pp\_stmt}), but it is not suitable
-for us, as it will recursively print substatements of compound statements
-(blocks, if, while, ...) while we only want to pretty print the node representing the
-current statement: substatements will be represented by other nodes. Thus we
-will use the following small function:
-\ocamlinput{./tutorial/viewcfg/src/print_stmt.ml}
+\texttt{Printer.pp\_stmt}\scodeidx{Printer\_api}{S.pp\_stmt}), but it is not
+suitable for us, as it will recursively print substatements of compound
+statements (blocks, if, while, ...), while we only want to pretty-print
+the node representing the current statement: substatements will be represented
+by other nodes. Thus we will use the following small function:
+\ocamlinput[linerange={7-21}]{./tutorial/viewcfg/v1-simple/view_cfg.ml}
 \sscodeidx{Cil\_types}{stmtkind}{Instr}
 \sscodeidx{Cil\_types}{stmtkind}{Return}
 \sscodeidx{Cil\_types}{stmtkind}{Goto}
@@ -752,22 +837,24 @@ The \texttt{Cil\_types} module contains the definition of the AST of a \C
 program, like constructors \texttt{Cil\_types.Instr},
 \texttt{Cil\_types.Return}, and so on which are of type
 \texttt{Cil\_types.stmtkind}. The \texttt{Printer} module contains
-functions that prints the different Cil types. The documentation of these module
+functions that print the different Cil types. The documentation of these module
 is available on the \framac website\footnote{From
-  \url{http://frama-c.com/download.html}.}, or by typing \texttt{make doc} in
+\url{https://www.frama-c.com/html/framac-versions.html};
+look for {\em API Documentation} inside the page corresponding to your \framac
+version.}, or by typing \texttt{make doc} in
 the \framac source distribution.
 
 \subsubsection*{Creating the graphs with a visitor}
 
 In order to create our output, we must make a pass through the whole
-AST. An easy way to do that is to use \framac visitor mechanism. A
+AST. An easy way to do that is to use the \framac visitor mechanism. A
 visitor is a class with one method per type of the AST, whose default
 behavior is to just call the method corresponding to each of its
 children. By inheriting from the visitor, and redefining some of the
 methods, one can perform actions on selected parts of the AST, without
 the need to traverse the AST explicitly.
 
-\ocamlinput{./tutorial/viewcfg/src/print_cfg_begin.ml}
+\ocamlinput[linerange={23-24}]{./tutorial/viewcfg/v1-simple/view_cfg.ml}
 \scodeidx{Visitor}{frama\_c\_inplace}
 
 Here we used the so-called ``in place'' visitor, which should be used for
@@ -777,21 +864,25 @@ section~\ref{sec:visitors-projects}).
 
 There are three kinds of nodes where we have something to do. First,
 at the file level, we create the whole graph structure.
+%\footnote{{\em Note}:
+%in the code below, the fancy 'at'-terms such as ``\texttt{@[<hov 2>}'' are
+%  related to OCaml's Format module, and can be ignored for now.}.
 
-\ocamlinput{./tutorial/viewcfg/src/print_cfg_vfile.ml}
+\ocamlinput[linerange={26-28}]{./tutorial/viewcfg/v1-simple/view_cfg.ml}
 \sscodeidx{Cil}{visitAction}{DoChildrenPost}
 \sscodeidx{Cil}{cilVisitor}{vfile}
 
 \texttt{Cil.DoChildrenPost} is one of the possible
-\texttt{visitAction}, that tells the visitor what to do after the
+\texttt{visitAction}\,s, that tells the visitor what to do after the
 function is executed. With \texttt{DoChildrenPost func}, the \texttt{func}
-argument is called once the children have been executed: here we close the
-parenthesis once that all functions have been printed in the file.
+argument is called once, after all children have been executed. Therefore,
+we use it to close the curly braces after all functions have been printed
+in the file.
 
 Then, for each function, we encapsulate the CFG in a subgraph, and do
 nothing for the other globals.
 
-\ocamlinput{./tutorial/viewcfg/src/print_cfg_vglob.ml}
+\ocamlinput[linerange={30-36}]{./tutorial/viewcfg/v1-simple/view_cfg.ml}
 \sscodeidx{Cil}{visitAction}{DoChildrenPost}
 \sscodeidx{Cil}{visitAction}{SkipChildren}
 \sscodeidx{Visitor}{frama\_c\_visitor}{vglob\_aux}
@@ -806,7 +897,7 @@ should have been used instead.}.
 Last, for each statement, we create a node in the graph, and create
 the edges toward its successors:
 
-\ocamlinput{./tutorial/viewcfg/src/print_cfg_vstmt_aux_novalue.ml}
+\ocamlinput[linerange={38-43}]{./tutorial/viewcfg/v1-simple/view_cfg.ml}
 \sscodeidx{Cil}{visitAction}{DoChildren}
 \sscodeidx{Visitor}{frama\_c\_visitor}{vstmt\_aux}
 
@@ -815,23 +906,51 @@ This code could be optimized, for instance by replacing the final
 cannot contain other statements, like \texttt{Instr}, and avoid
 visiting the expressions.
 
-Finally we close the \texttt{object} definition:
-\ocamlinput{./tutorial/viewcfg/src/print_cfg_end.ml}
+Finally, we close the \texttt{object} definition:
+\ocamlinput[linerange={45-45}]{./tutorial/viewcfg/v1-simple/view_cfg.ml}
 
 \subsubsection*{Hooking into \framac}
 
-It just remains to hook this script into \framac.
+Now we need to ensure the code is called at the appropriate time when
+\framac is run. Note that if we simply add a function at the toplevel
+(\ie \verb|let () = run ()|), it will {\em not} work, because \framac
+will not have had the time to parse the sources and produce its AST
+(used by \verb|Ast.get ()|). For more details about initialization issues,
+see Section~\ref{adv:init}.
 
-\ocamlinput{./tutorial/viewcfg/src/extend_with_simple_run.ml}
+\ocamlinput[linerange={47-53}]{./tutorial/viewcfg/v1-simple/view_cfg.ml}
 
-Assuming the script is called \texttt{cfg\_print.ml}, it can then be run with:
+Now, since \framac uses Dune, this code needs to be integrated as a Dune
+project, as has been done in the Hello tutorial. We need to create a new
+directory. In it, we will put all of the code seen so far, in an \texttt{.ml}
+file. We will then add the corresponding \texttt{dune} and
+\texttt{dune-project} files:
+
+\listingname{dune}
+\duneinput{./tutorial/viewcfg/v1-simple/dune}
+
+\listingname{dune-project}
+\duneinput{./tutorial/viewcfg/v1-simple/dune-project}
+
+Finally, we need an (empty) interface file, called \texttt{ViewCfg.ml}, in
+the same directory.
+
+With all of this, we can compile the project with:
+
 \begin{shell}
-  frama-c -load-script cfg_print.ml [other_options] file.c [file2.c] 
+  dune build
 \end{shell}
 
-And the graph can be visualized with 
+And run it as a \framac plugin:
+
 \begin{shell}
-  dotty cfg.out
+  dune exec -- frama-c [options] file.c [file2.c]
+\end{shell}
+
+And the graph can be visualized with an external tool, such as {\em dotty} or
+{\em xdot}.
+\begin{shell}
+  dotty cfg.dot
 \end{shell}
 
 This produces a graph like in Figure~\ref{fig:tut:basiccfg}
@@ -840,7 +959,7 @@ This produces a graph like in Figure~\ref{fig:tut:basiccfg}
   \centering
   \begin{minipage}[h]{0.45\linewidth}
   \listingname{test.c}
-  \cinput{./tutorial/viewcfg/tests/test.c}
+  \cinput[linerange={5-999}]{./tutorial/viewcfg/v1-simple/tests/viewcfg/test.c}
   \end{minipage}%
   \begin{minipage}[h]{0.4\linewidth}
     \includegraphics[width=\textwidth]{./tutorial/viewcfg/pdfs/cfg.pdf}
@@ -856,32 +975,31 @@ There are many possible enhancements to this code:
 
 \begin{itemize}
 \item There is a bug when trying to print statements that contain
-  strings (such as \verb|printf("Hello\n")| such statements must be
-  protected using the \verb|"%S"| Format directive;
-\item The script could be transformed into a regular plug-in, by
-  registering into \framac, and taking options from the command line;
-  for instance to compute the control flow graph of a single function
-  given as an argument;
+  strings (such as \verb|printf("Hello\n")|, due to double quotes.
+  Such statements must be protected using the \verb|"%S"| Format directive;
+\item The plug-in could be properly registered as such, allowing it to
+  accept command-line options, for instance to compute the control flow graph
+  of a single function given as argument;
 \item The graphs could be fancier, in particular by distinguishing
-  between branching nodes and plain ones, or showing exit of blocks as
-  well as their beginning; or linking a call with the called function.
+  between branching nodes and plain ones, or showing block entries and exits;
+  or linking call sites to the called functions.
 \end{itemize}
 
 We will concentrate on another extension, which is to reuse the
-analysis of the \texttt{value} \framac plug-in to color unreachable
-nodes.
+analysis of the \texttt{Eva} plug-in to color unreachable nodes.
 To do so, because we will combine different plug-ins, we need to ensure their
-correct ordering. This requires the definition of some command-line options.
+correct ordering. This requires the definition of some command-line options
+for our plug-in.
 
-\subsection{Plug-In registration and command-line options}\label{tut2:options}
+\subsection{Plug-in registration and command-line options}\label{tut2:options}
 \index{Plug-in!Command Line Options}\index{Command Line}
 
 We have already seen how to register options in the previous ``Hello'' tutorial.
 We now apply these principles to the ViewCfg plug-in.
 
-\ocamlinput{./tutorial/viewcfg/src/register_and_options.ml}
+\ocamlinput[linerange={9-26}]{./tutorial/viewcfg/v2-options/view_cfg.ml}
 \scodeidx{Plugin}{Register}
-\ocamlinput{./tutorial/viewcfg/src/extend_with_run_with_options.ml}
+\ocamlinput[linerange={66-74}]{./tutorial/viewcfg/v2-options/view_cfg.ml}
 \scodeidx{Visitor}{visitFramacFileSameGlobals}
 \scodeidx{Ast}{get}
 
@@ -909,44 +1027,62 @@ section~\ref{adv:project} of this manual should help you understand the
 underlying notion of states).
 
 With these command-line options, we can properly interface our ViewCfg plug-in
-with the \texttt{value} plug-in.
+with the \texttt{eva} plug-in.
 
-\subsection{Interfacing with a kernel-integrated plug-in}
+\subsection{Interfacing with other plug-ins}
 
-Kernel-integrated plug-ins, such as \texttt{value}, use a special mechanism
-to statically register their APIs for other plug-ins that wish to access them.
-This mechanism is the \texttt{Db} module of the \framac kernel,
-the entry point for all kernel-integrated plug-ins. By using the functions
-exported through the \texttt{Db.Value} module, our plug-in will obtain
-reachability information computed by \texttt{value}.
+Plug-ins can use functions specified in the public interfaces of other
+plug-ins, as long as they are declared as dependencies. To do so, you only
+need to add them to the \texttt{libraries} stanza\footnote{A stanza is,
+roughly speaking, a ``term'' in \texttt{dune} parlance: a parenthesized
+expression.} in the \texttt{dune} file.
+We will use a function from the \textsf{Eva} plug-in in our example,
+so we will add \texttt{frama-c-eva.core} to the \texttt{dune} file:
 
+\duneinput[linerange={5-5}]{./tutorial/viewcfg/v3-eva/dune}
+
+Now our plug-in can call all functions and access all types declared in
+\textsf{Eva}'s public interface.
+
+For historical reasons, several kernel-integrated plug-ins, such as
+\textsf{From}, \textsf{InOut} and \textsf{Slicing}, had their API exposed
+via the \texttt{Db} module of the \framac kernel. This has been deprecated
+for \textsf{Eva}, and newer plug-ins expose their public interface directly.
+
+In our example, we will use \textsf{Eva}'s new API to obtain reachability
+information computed by the value analysis.
 The code modification we propose is to color in pink the nodes guaranteed to
 be unreachable by the value analysis. For this purpose, we change the
 \texttt{vstmt\_aux} method in the visitor:
 
-\ocamlinput{./tutorial/viewcfg/src/print_cfg_vstmt_aux_value.ml}
-\sscodeidx{Db}{Value}{is\_computed}
-\sscodeidx{Db}{Value}{get\_stmt\_state}
-\sscodeidx{Db}{Value}{is\_reachable}
+\ocamlinput[linerange={57-70}]{./tutorial/viewcfg/v3-eva/view_cfg.ml}
+\sscodeidx{Eva}{Analysis}{is\_computed}
+\sscodeidx{Eva}{Results}{is\_reachable}
 \sscodeidx{Cil}{visitAction}{DoChildren}
 \sscodeidx{Visitor}{frama\_c\_visitor}{vstmt\_aux}
 
 This code fills the nodes with green if the node may be
 reachable, and in pink if the node is guaranteed not to be
-reachable; but only if the value analysis was previously computed. 
+reachable; but only if the value analysis was previously computed.
 
-To test this code, frama-c should be launched with:
+To test this code, we recompile the plug-in with the modified \texttt{dune}
+file to take into account the dependency on \textsf{Eva}, as well as the
+modified \texttt{vstmt\_aux}. We run \verb|dune build @install| and then
+we run \textsf{Eva}, and then our plug-in:
 \begin{shell}
-  frama-c test.c -load-script cfg_print.ml -val -then -cfg && dotty cfg.out
+  dune exec -- frama-c test.c -eva -then -cfg && dotty cfg.dot
 \end{shell}
 
-Note that the relative order of the parameters \texttt{-load-script} and
-\texttt{-val} in this example is not relevant
-(see Section~\ref{adv:init} for details).
-However, it is important to ensure that \texttt{-cfg} is separated from
-\texttt{-val} by a \texttt{-then}; otherwise, it is not guaranteed that
-the \texttt{value} plug-in will run before the ViewCfg plug-in, which might
-lead to a non-colored graph in some cases, and colored in others.
+The relative order of most options and file names is not important
+{\em between} occurrences of \texttt{-then}, but it {\em is} important
+whether they are before or after \texttt{-then}-related options
+(\texttt{-then}, \texttt{-then-on}, \texttt{-then-last});
+see Section~\ref{adv:init} for details. Here, we want to ensure that
+\textsf{Eva} is run {\em before} our plug-in, so we order it as
+\verb|-eva -then -cfg|. Without \texttt{-then}, even if \texttt{-eva}
+is before \texttt{-cfg} in the command line, it is {\em not} guaranteed
+that it will run before; options in the same ``block'' can be thought of as
+{\em concurrent}: there is no specified order between them.
 
 The resulting graph is shown in Figure~\ref{fig:tut:coloredcfg}.
 
@@ -954,7 +1090,7 @@ The resulting graph is shown in Figure~\ref{fig:tut:coloredcfg}.
   \centering
   \begin{minipage}[h]{0.45\linewidth}
   \listingname{test.c}
-  \cinput{./tutorial/viewcfg/tests/test.c}
+  \cinput[linerange={5-999}]{./tutorial/viewcfg/v3-eva/tests/viewcfg/test.c}
   \end{minipage}%
   \begin{minipage}[h]{0.4\linewidth}
     \includegraphics[width=\textwidth]{./tutorial/viewcfg/pdfs/cfg_colored.pdf}
@@ -963,172 +1099,124 @@ The resulting graph is shown in Figure~\ref{fig:tut:coloredcfg}.
   \label{fig:tut:coloredcfg}
 \end{figure}
 
-\subsection{Extending the Frama-C GUI}
-\label{tut2:gui}
-\index{Plug-in!GUI}
+\subsection{Splitting files and providing a mini-GUI for testing}
+\label{tut2:split-and-gui}
 
-In this section, we will extend our plug-in so that the control flow
-graph can be displayed interactively. For that, we will extend the \framac GUI
-so that when you right-click on a function in the code, a new ``Show
-CFG'' item appears, that displays the control flow graph of the
-function in a dialog box. This is achieved just by appending the following
-pieces of code at the end of the \texttt{cfg\_print.ml} file.
+Our plug-in is starting to amass enough code that we should envisage to split
+it into several modules, for better organizing it. Dune automatically compiles
+all source files it finds, unless specified otherwise, and it handles
+dependencies between them, so it is essentially free to do so. As we did in the
+{\em Hello} tutorial, we will split our \verb|view_cfg.ml| file into smaller
+modules.
 
-\begin{important}
-Frama-C's GUI can be compiled against two versions of lablgtk (the OCaml
-bindings to the Gtk toolkit). The actual rendering of the control flow graph
-is actually done by the external OCamlgraph library, and only available
-when compiling against lablgtk2. If you're using lablgtk3,
-you will only see a pop-up window indicating that there's no support for
-displaying graphs.
-\end{important}
+We will create the following files:
 
-Currently, we used a visitor that outputs a \dottool file with the CFG of
-all functions of all files. We use \texttt{dump\_function} to output
-the CFG of a single function instead.
+\begin{description}
+\item[options.ml]: will contain the module registration (\verb|Self|) and
+  command-line options (\verb|Enabled| and \verb|OutputFile|);
+\item[visit.ml]: will contain the \verb|print_stmt| function and the visitor;
+\item[run.ml]: will contain the definition of function \verb|run| and the
+  call to \verb|Db.Main.extend|.
+\end{description}
 
-\ocamlinput{./tutorial/viewcfg/src/dump_function.ml}
+Note that a few changes are needed to the code: functions from other files
+need to include that file name as module, \eg
+\verb|Enabled.get| becomes \verb|Options.Enabled.get|.
 
-We reused the \texttt{print\_cfg} visitor, but we selected a different
-starting point. The argument \texttt{fundec} gets type
-\texttt{Cil\_types.fundec}\scodeidx{Cil\_types}{fundec}, which is the CIL type
-representing a function definition.
+For simplicity's sake, we will remove options \verb|-cfg| and \verb|-cfg-output|
+and replace them with a single boolean option, \verb|-cfg-gui|, to launch the
+GUI (this prevents unsuitable combinations of \verb|-cfg| and \verb|-cfg-gui|).
+The new option is defined as below:
 
-Now we write the GUI extension code:
+\ocamlinput[linerange={7-11}]{./tutorial/viewcfg/v4-bogue/options.ml}
 
-\ocamlinput{./tutorial/viewcfg/src/gui.ml}
-\sscodeidx{Pretty\_source}{localizable}{PVDecl}
-\sscodeidx{Globals}{Functions}{get}
+And the \verb|run| function in \verb|run.ml| becomes simply:
+
+\ocamlinput[linerange={1-3}]{./tutorial/viewcfg/v4-bogue/run.ml}
+
+We can now erase \verb|view_cfg.ml| and re-run \verb|dune build @install| to
+compile the plug-in.
+
+\subsubsection{Mini-GUI for testing}
+
+Extending \framac's Ivette graphical user interface is a task too large for
+this tutorial; Ivette being a desktop Electron application, written in
+TypeScript and using React, there is a substantial amount of explaining to
+do before one can show how to integrate a \framac plug-in in it.
+
+Instead, for this tutorial, we will use a lightweight OCaml GUI library,
+BOGUE\footnote{\url{http://sanette.github.io/bogue/Principles.html}}.
+You can install it through opam:
+
+\begin{shell}
+\$ opam install bogue
+\end{shell}
+
+It is based on SDL2, which means you may need to install non-OCaml
+dependencies\footnote{With opam $< 2.1$, you may need to install and
+run \texttt{depext}. With opam $\geq 2.1$, depext is already included.}.
+
+Since we will be using BOGUE in our plug-in, we need to declare it in the
+\texttt{dune} file:
+
+\duneinput[linerange={5-5}]{./tutorial/viewcfg/v4-bogue/dune}
+
+We also need a way to print an individual function as a standalone graph,
+without having to call the file visitor (\verb|Visit.vfile|). We will call
+it \verb|dump_function| and put it in a separate file, \verb|dump.ml|:
+
+\listingname{./dump.ml}
+\ocamlinput{./tutorial/viewcfg/v4-bogue/dump.ml}
+\scodeidx{Visitor}{visitFramacFunction}
+
+The code prints a feedback message, then the header, calls the visitor,
+and prints the footer. This function will be called by our ``mini-GUI'',
+and the output will be sent to \texttt{dotty}, which will open a window
+with our graph.
+
+The actual GUI code is put inside a file appropriately named \texttt{gui.ml}:
+
+\listingname{./gui.ml}
+\ocamlinput{./tutorial/viewcfg/v4-bogue/gui.ml}
+\sscodeidx{Globals}{Functions}{find\_by\_name}
 \scodeidx{Kernel\_function}{get\_definition}
-\scodeidx{Dgraph\_helper}{graph\_window}
-\scodeidx{Design}{register\_extension}
-\sscodeidx{Design}{main\_window\_extension\_points}{register\_source\_selector}
 
-Let us explain this code from the end. \texttt{Design.register\_extension} is
-the entry point for extending the GUI. Its argument is a function which takes as
-argument an object corresponding to the main window of the \framac GUI. This
-object provides access to the main widgets of the window, and several
-extension points.
-
-Here we have implemented a single extension, the ``source selector'',
-that allows to add entries to menu obtained when right-clicking on the
-source. This is implemented by the \texttt{cfg\_selector} function.
-
-This function takes a \texttt{localizable} argument, which gives information on
-where the user clicks on the source. Here we do something only if the user
-clicks on the declaration of a variable whose type is a function (\ie when the
-user clicked on a function declaration or definition).  In that case, we add an
-item to the popup menu, that calls the \texttt{callback} function if
-clicked. The \texttt{callback} function calls a \framac GUI function that
-displays a graph from \dottool printing functions. It uses several important \framac
-APIs: \texttt{Globals} and \texttt{Kernel\_function}, which contain several
-functions for manipulating globals and functions.
-
-Note that this GUI extension could also have been done through a script
-(instead of a plug-in), but it would have been less than ideal.
-In particular, the GUI \ocaml modules are available only when a script
-is loaded with \texttt{frama-c-gui}, and not when loaded with
-\texttt{frama-c}. When the user wants to view the CFG from the GUI,
-outputting the CFG of all functions in \texttt{cfg.out} is useless.
-A better architectural solution is to split our plug-in in several files,
-with its own Makefile, to better manage its functionalities.
-
-\subsection{Splitting files and writing a Makefile}\label{tut2:makefile}
-\index{Plug-in!Makefile}
-
-The \framac plug-in development environment allows to split GUI-related
-and non-GUI related modules, so that GUI-related modules are loaded
-and run only if \framac is executed with \texttt{frama-c-gui}. This
-requires splitting the module into several files. We choose the
-following architecture:
-
-\begin{itemize}
-\item \texttt{cfg\_options.ml} implements plug-in registration and
-  configuration options;
-\item \texttt{cfg\_core.ml} implements the main functions for
-  computing the CFG;
-\item \texttt{cfg\_register.ml} implements ``global'' computation of
-  the CFG using the \texttt{-cfg} option, and hooking into the \framac
-  main loop;
-\item \texttt{cfg\_gui.ml} implements GUI registration.
-\end{itemize}
-
-Dependencies between the modules\footnote{This graphic is generated in
-  file \texttt{doc/code/modules.dot} after running \texttt{make doc}.}
-is presented on Figure \ref{fig:tut:cfgarchitecture}.
+Most of the code is boilerplate for Bogue. The only \framac-related part is
+the checking of the function name: \verb|Globals.Functions.find_by_name| raises
+exception \verb|Not_found| if the name input by the user does not exist. But
+even if it does, since we need a function {\em definition}, we must check that
+it is not simply {\em declared}. Besides that, we simply call
+\verb|dump_function|. Figure~\ref{fig:tut:bogue} shows what this mini-GUI looks
+like.
 
 \begin{figure}[htbp]
   \centering
-    \includegraphics[width=0.5\textwidth]{./tutorial/viewcfg/pdfs/modules.pdf}
-  \caption{CFG plug-in architecture}
-  \label{fig:tut:cfgarchitecture}
+  \includegraphics[width=0.35\textwidth]{./tutorial/viewcfg/pdfs/bogue.pdf}
+  \caption{Mini-GUI with Bogue for testing our plug-in.}
+  \label{fig:tut:bogue}
 \end{figure}
 
-To break recursive dependencies between \ocaml modules, it is typical
-that plug-in registration is done at the bottom of the module
-hierarchy, while definition of the \texttt{run} function is at the
-top. The GUI is also at the top of the hierarchy: the \framac
-\texttt{Makefile} requires that normal plug-in modules do not depend on
-GUI modules. Note that currently, the dependency from
-\texttt{Cfg\_core} and \texttt{Cfg\_gui} to \texttt{Cfg\_register} is
-artificial, but in future evolutions the GUI could depend on
-configuration options.
+Whenever we click the ``Show CFG'' button, a new \texttt{dotty} window is
+opened. After we close it, we can repeat the operation as we like.
 
-\listingname{Makefile}
-\codeidx{Makefile.dynamic}
-\codeidx{FRAMAC\_SHARE}
-\codeidx{PLUGIN\_CMO}
-\codeidx{PLUGIN\_GUI\_CMO}
-\codeidx{PLUGIN\_NAME}
-\makefileinput{./tutorial/viewcfg/generated/split/Makefile}
+Note that the feedback message ``Computing CFG for function'' is emitted
+each time we click the button, which means we perform a new visit.
+For large computations and programs, this is wasteful,
+and we should be able to easily cache the result.
+The next section will show how to do it using {\em states}.
 
-In the \texttt{Makefile}, the \texttt{PLUGIN\_CMO} variable must
-contain the list of file names of the ml files, in the correct \ocaml
-build order. Modules in \texttt{PLUGIN\_CMO} must not depend on modules in
-\texttt{PLUGIN\_GUI\_CMO}.
-
-We also need to add an interface for the whole plug-in:
-\listingname{ViewCfg.mli}
-\ocamlinput{./tutorial/viewcfg/generated/split/ViewCfg.mli}
-
-Here is the listing for the different modules:
-
-\listingname{cfg\_options.ml}
-\ocamlinput{./tutorial/viewcfg/generated/split/cfg_options.ml}
-
-\listingname{cfg\_core.ml}
-\ocamlinput{./tutorial/viewcfg/generated/split/cfg_core.ml}
-
-\listingname{cfg\_register.ml}
-\ocamlinput{./tutorial/viewcfg/generated/split/cfg_register.ml}
-
-\listingname{cfg\_gui.ml}
-\ocamlinput{./tutorial/viewcfg/generated/split/cfg_gui.ml}
-
-\subsection{Getting your Plug-in Usable by Others}\label{tut2:api}
-\index{Plug-in!API}
-\todo
-
-% TODO: A script that uses "dump_function" of the CFG plug-in
-
-\subsection{Writing a Configure Script}\label{tut2:configure}
-\index{Plug-in!Configure}
-\todo
-
-% Detect \dottool at compile time.
-% Link to section 5.3: plug-in specific configure.in
-
-\subsection{Getting your plug-in Usable in a Multi Projects Setting}
+\subsection{Saving/Loading Data, and Usability in a Multi-Project Setting}
 \label{tut2:project-and-state}
 \index{Project}
 
 \subsubsection{Registering and using state}
 
 In this section, we will learn how to register state into \framac. A
-\emph{state} is a piece of information kept by a plug-in. For instance,
-the \texttt{value} plug-in computes, for each statement, a table associating to
-each AST's variable a set of values the program may have at runtime: this
-association table is a state.
+\emph{state} is a piece of information kept by a plug-in. For instance, we can
+use a boolean state to store whether an expensive analysis has been executed,
+to avoid recomputing it. Another example of state: the \textsf{Eva} plug-in
+computes, for each statement, a table associating to each AST variable a set of
+values the program may have at runtime; this association table is a state.
 
 State registration provides several features:
 \begin{itemize}
@@ -1139,99 +1227,143 @@ State registration provides several features:
   parameters of the analysis of the different plug-ins.
 \end{itemize}
 
-In this tutorial, we will store the file representing the \dottool
-output of the control flow graph of a function (as needed by
-\texttt{dump\_function}) as a string, by using a hashtable from \texttt{fundec}
-to \texttt{string}. Storing this string will allow us to memoize~\cite{michie68}
+We will modify our \verb|Dump| module to output the \dottool graph as a string,
+and store it in a hash table from \texttt{fundec} to \texttt{string}.
+Storing this string will allow us to memoize~\cite{michie68}
 our computation: the string is computed the first time the CFG of a
 function is displayed, while the following requests will reuse the result of
-the computation. Registering the hashtable as a \framac state is
+the computation. Registering the hash table as a \framac state is
 \emph{mandatory} to ensure \framac consistency: for instance, by using a
-standard \caml hashtable, a user that would have loaded several session through
-the GUI could observe the CFG of function of a previous session instead of the
+standard \caml hash table, a user that would have loaded several sessions through
+a GUI could observe the CFG of function of a previous session instead of the
 one he wants to observe.
 
 Registering a state is done by a functor application:
 
-\ocamlinput{./tutorial/viewcfg/src/register_cfg_graph_state.ml}
+\ocamlinput[linerange={10-17}]{./tutorial/viewcfg/v5-state/dump.ml}
 \scodeidx{State\_builder}{Hashtbl}
 \scodeidx{Cil\_datatype}{Fundec}
 \scodeidx{Datatype}{String}
 \scodeidx{Ast}{self}
-\sscodeidx{Db}{Value}{self}
+\sscodeidx{Eva}{Analysis}{self}
 
 The \texttt{State\_builder} module provides several functors that help
 registering states. \texttt{State\_builder.Hashtbl} allows the developer to
-create a hashtable. It is parameterized by a module describing the hashtable
+create a hash table. It is parameterized by a module describing the hash table
 and its key, a module describing the data associated to keys, and
-other informations. 
+other information.
 
 The \texttt{Datatype} and \texttt{Cil\_datatype} modules describe the
-hashtable and its associated data, and explain for instance how the
+hash table and its associated data, and explain for instance how the
 datatype should be copied, printed, or marshalled to the disk. They
 are part of the \texttt{Type} library~\cite{signoles:jfla11}, described in
 Section~\ref{adv:datatype}. \texttt{Datatype} provides
 descriptions for standard \caml types, and \texttt{Cil\_datatype} for
 the CIL types (in the \texttt{Cil\_types} module).
 
-The last module argument describes the initial size of the hashtable, a name
-(mainly used for internal debugging), and a list of \emph{dependencies}. Here we
-expressed that our hashtable depends on the Ast and the results of the
-\texttt{Value} plug-in. For instance, whenever the \framac kernel updates one of these
-states, it will automatically reset our hashtable. This ensures consistency of
-the analysis: if the Ast of a function changes, or the value analysis is
-executed with a different entry point, this potentially affects the display of
-the control flow graph, that we must recompute.
+The last module argument describes the initial size of the hash table%
+\footnote{This initial size is an optimization feature; the table automatically
+grows when needed.}, a name (mainly used for internal debugging),
+and a list of \emph{dependencies}.
+Here we expressed that our hash table depends on the AST and the results of the
+\textsf{Eva} plug-in. For instance, whenever the \framac kernel updates one of
+these states, it will automatically reset our hash table.
+This ensures consistency of the analysis: if the AST of a function changes,
+or the value analysis is executed with a different entry point,
+this potentially affects the display of the control flow graph,
+that we must recompute.
 
 Once the module has been declared, it is fairly easy to use it.
 
-\ocamlinput{./tutorial/viewcfg/src/dump_to_string_memoized.ml}
+\ocamlinput[linerange={3-8}]{./tutorial/viewcfg/v5-state/dump.ml}
 \scodeidx{Visitor}{visitFramacFunction}
-\ocamlinput{./tutorial/viewcfg/src/dump_function_memo_no_clear_cache.ml}
+\ocamlinput[linerange={19-24}]{./tutorial/viewcfg/v5-state/dump.ml}
 
 \texttt{dump\_function} now takes two steps: first the CFG is printed
 to a string, then the string is printed to the \texttt{fmt}
 argument. This allows the \texttt{dump\_to\_string} part to be
 \emph{memoized}, \ie the results of \texttt{dump\_to\_string} are
 saved so that later calls to \texttt{dump\_function} with the same
-\texttt{fundec} argument reuse that result. 
+\texttt{fundec} argument reuse that result.
 
-If you launch \texttt{frama-c-gui} with the above code, click on
-functions to view their CFG, and inspect the console, you will observe
-that the string ``Computing CFG for function ...'' is displayed only
-once per function.
+To check this, we re-run our mini-GUI with:
 
-One can see the effects of the dependency on the \texttt{Value} plug-in
-by first launching the value analysis, inspecting the CFG for the
-\texttt{f} function, then changing the entry point to \texttt{f} in the
-CFG and re-running the value analysis. The console indicates that the
-\texttt{CFG} have been recomputed. Indeed the state of the
-\texttt{Value} plug-in, and of its dependencies, was reset when the
-entry point was changed.
+\begin{shell}
+\$ dune exec -- frama-c <file> -cfg-gui
+\end{shell}
+
+The first graph for each function will show the message
+``Computing CFG for function ...'', but subsequent calls will no longer do it.
+
+Also, we can see the effects of the dependency on the \textsf{Eva} plug-in
+by first launching the value analysis and then our plug-in:
+
+\begin{shell}
+\$ dune exec -- frama-c <file> -eva -then -cfg-gui
+\end{shell}
+
+In this case, the graphs will be colored.
+
+Finally, to check that the state dependency on \textsf{Eva} works, we will use
+a more complex command line:
+
+\begin{shell}
+\$ dune exec -- frama-c <file> -eva -then -cfg-gui -then -main f
+\end{shell}
+
+We have three stages: first run \textsf{Eva}, then open the mini-GUI, then
+change the entry point (\verb|-main f| means that the program will start
+executing from function \verb|f|) {\em and} re-open the mini-GUI.
+Remember that most \framac options {\em persist} from one stage to the next:
+the same way that we do not have to repeat \verb|-eva| after the first
+\verb|-then|, we do not have to repeat \verb|-cfg-gui| after the second
+\verb|-then|. If we want to avoid re-running the mini-GUI in future stages,
+we need to use \texttt{apply\_once}, as mentioned in Section~\ref{tut2:options}.
+
+What we observe is the following: when the mini-GUI opens, we click
+{\em Show CFG}, see a ``Computing CFG for function ...'' message, and get a
+mostly-green CFG. Then, we close the mini-GUI, and it opens again. Clicking
+{\em Show CFG} will show the same ``Computing CFG'' message, but the graph will
+be entirely pink: with \verb|f| as the entry point, function \verb|main| is
+never called, therefore entirely unreachable. Because the entry point changed,
+and \textsf{Eva} depends on its state, it is automatically recomputed.
+Because our plug-in depends on \textsf{Eva}'s state, it recomputes the graph
+when we ask again for the CFG.
 
 Another way to observe how \framac automatically handles states is to display a
-CFG, save the session, close and restart \framac, 
-and then reload the session: the control flow graph is not recomputed,
-which means that \framac has automatically saved the
-\texttt{Cfg\_graph\_state} with the rest of the session. Everything
-should also work properly when loading several sessions.
+CFG, save the session (option \verb|-save <file>|), and then load it again:
+
+\begin{shell}
+\$ dune exec -- frama-c <file> -eva -then -cfg-gui -save session.sav
+\end{shell}
+
+Then click on the ``Show CFG'' (see the feedback message), then close the CFG
+and the mini-GUI. Reload the session:
+
+\begin{shell}
+\$ dune exec -- frama-c -load session.sav
+\end{shell}
+
+Click ``Show CFG'' and you will {\em not} see the ``Computing CFG'' message:
+the state \texttt{Cfg\_graph\_state} had beem automatically saved by \framac
+and has just been loaded from the session.
 
 \subsubsection{Clearing states, selection and projects}
 
 There is one caveat though: if the user computes the CFG before
-running the \texttt{Value} analysis, and then runs \texttt{Value}, he
-will not see a colored graph (unless he re-launch the \texttt{Value}
-analysis with different parameters). This is because the state of the
-CFG is reset when the state of \texttt{Value} is reset, not when it is
+running the \textsf{Eva} analysis, and then runs \textsf{Eva}, they
+will not see a colored graph (unless they re-launch \textsf{Eva}
+with different parameters). This is because the state of the
+CFG is reset when the state of \textsf{Eva} is reset, not when it is
 first computed.
 
 To solve this problem, we will manually reset the
-\texttt{Cfg\_graph\_state} if we detect that the \texttt{Value}
-analysis has been run since the last time we computed the CFG. For
+\texttt{Cfg\_graph\_state} if we detect that \textsf{Eva}
+has been run since the last time we computed the CFG. For
 that, we have to remember the previous value of
-\texttt{Db.Value.is\_computed ()}, \ie to register another state:
+\texttt{Eva.Analysis.is\_computed ()}, \ie to register another state:
 
-\ocamlinput{./tutorial/viewcfg/src/register_value_computed_state.ml}
+\ocamlinput[linerange={19-25}]{./tutorial/viewcfg/v6-state-clear/dump.ml}
 \scodeidx{State\_builder}{Ref}
 \scodeidx{Datatype}{Bool}
 
@@ -1240,29 +1372,29 @@ This new state only consists of a reference to a boolean value.
 Then we just replace \texttt{dump\_function} in the code above by the
 following.
 
-\ocamlinput{./tutorial/viewcfg/src/dump_function_memo_clear_cache.ml}
-\sscodeidx{Db}{Value}{is\_computed}
+\ocamlinput[linerange={29-37}]{./tutorial/viewcfg/v6-state-clear/dump.ml}
+\sscodeidx{Eva}{Analysis}{is\_computed}
 \sscodeidx{State\_selection}{S}{with\_dependencies}
 \scodeidx{Project}{clear}
 
-The only part that need to be explained is the notion of
+The only parts that need to be explained are the notions of
 \emph{selection} and \emph{project}. A selection is just a set of
 states; here we selected the state \texttt{Cfg\_graph\_state} with all
-its dependencies, as resetting this state would also impact states
-that would depend on it (even if there is none for now). We use
+of its dependencies, as resetting this state would also impact states
+that would depend on it (even if there are none for now). We use
 \texttt{Project.clear} to reset the selection.
 
 \subsubsection{Project explanation}
 
 A \emph{project}~\cite{project} is a consistent version of all the \emph{states}
 of \framac. \framac is multi-AST, \ie \framac plug-ins can change the AST of the
-program, or perform incompatible analysis (\eg with different entry
-points). Projects consistently groups a version of the AST of the program, with
-the states related to this AST.
+program, or perform incompatible analyses (\eg with different entry
+points). Projects consistently group a version of the program's AST with
+the states related to it.
 
-The \texttt{Project.clear} function has type :
+The \texttt{Project.clear} function has type:
 \begin{ocamlcode}
-val clear: ?selection:State_selection.t -> ?project:t -> unit -> unit  
+val clear: ?selection:State_selection.t -> ?project:t -> unit -> unit
 \end{ocamlcode}
 \scodeidxdef{Project}{clear}
 \scodeidx{State\_selection}{t}
@@ -1294,16 +1426,16 @@ To summarize:
 \item As a plug-in developer, you have to remember that is up to you to preserve
   consistency between your states and their dependencies by clearing the latter
   when the former is modified in an incompatible way. For instance, it would
-  have been incorrect to not call 
+  have been incorrect not to call
   \texttt{State\_selection.with\_dependencies}
-  \sscodeidx{State\_selection}{S}{with\_dependencies} in the last code snippet of
-  this tutorial.
+  \sscodeidx{State\_selection}{S}{with\_dependencies}
+  in the last code snippet of this tutorial.
 \end{itemize}
 
 Projects are generally created using copy visitors. We encourage the reader to
-experiment with multiple projects development by using them. An interesting
+experiment with multi-project development by using them. An interesting
 exercise would be to change the AST so that execution of each instruction is
-logged to a file, and then re-read that file to print in the CFG how much time
+logged to a file, and then re-read that file to print in the CFG how many times
 each instruction has been executed. Another interesting exercise would be
 to use the \texttt{apply\_once} function so that the ViewCfg plug-in is executed
 only once, as explained in section~\ref{tut2:options} of this tutorial.
