@@ -398,6 +398,7 @@ src-distrib-tests-long:
 
 .build_template: &prepare_ssh_template
   before_script:
+    - export GIT_SSH=$PWD/nix/frama-c-public/ssh.sh
     - echo "$FRAMA_CI_BOT_SSH_PRIVATE" | nix run -f channel:nixos-19.03 coreutils --command base64 -d > nix/frama-c-public/id_ed25519
     - nix run -f channel:nixos-19.03 coreutils --command chmod 400 nix/frama-c-public/id_ed25519
 
@@ -406,7 +407,7 @@ release-branch:
   <<: *prepare_ssh_template
   script:
     - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a origin/$CI_COMMIT_BRANCH)
-    - GIT_SSH=nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git push git@git.frama-c.com:pub/frama-c.git origin/$CI_COMMIT_BRANCH:refs/heads/$CI_COMMIT_BRANCH
+    - nix run -f channel:nixos-19.03 openssh --command git push git@git.frama-c.com:pub/frama-c.git origin/$CI_COMMIT_BRANCH:refs/heads/$CI_COMMIT_BRANCH
   only:
     variables:
       - $RELEASE == "yes"
@@ -416,7 +417,6 @@ release-branch:
 release-create:
   stage: release
   script:
-    - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a origin/$CI_COMMIT_BRANCH)
     - nix-shell -p curl --run './nix/frama-c-public/publish-release.sh'
   needs:
     - release-branch
@@ -431,7 +431,7 @@ release-opam:
   stage: release
   <<: *prepare_ssh_template
   script:
-    - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command ./nix/frama-c-public/publish-opam.sh
+    - nix-shell -p openssh --run './nix/frama-c-public/publish-opam.sh'
   only:
     variables:
       - $RELEASE == "yes"
@@ -441,7 +441,7 @@ release-website:
   stage: release
   <<: *prepare_ssh_template
   script:
-    - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command ./nix/frama-c-public/publish-website.sh
+    - nix-shell -p openssh --run './nix/frama-c-public/publish-website.sh'
   only:
     variables:
       - $RELEASE == "yes"
@@ -451,7 +451,7 @@ release-wiki:
   stage: release
   <<: *prepare_ssh_template
   script:
-    - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command ./nix/frama-c-public/publish-wiki.sh
+    - nix-shell -p openssh --run './nix/frama-c-public/publish-wiki.sh'
   only:
     variables:
       - $RELEASE == "yes"
@@ -479,7 +479,7 @@ publish-frama-c:
   <<: *prepare_ssh_template
   script:
     - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a origin/master)
-    - GIT_SSH=nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git push git@git.frama-c.com:pub/frama-c.git origin/master:refs/heads/master
+    - nix run -f channel:nixos-19.03 openssh --command git push git@git.frama-c.com:pub/frama-c.git origin/master:refs/heads/master
   only:
     variables:
       - $PUBLISH == "yes"
@@ -489,8 +489,8 @@ publish-fclang:
   stage: publish
   <<: *prepare_ssh_template
   script:
-    - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git clone git@git.frama-c.com:frama-c/frama-clang.git nix/frama-c-public/frama-clang
-    - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git -C nix/frama-c-public/frama-clang push git@git.frama-c.com:pub/frama-clang origin/master:refs/heads/master
+    - nix run -f channel:nixos-19.03 openssh --command git clone git@git.frama-c.com:frama-c/frama-clang.git nix/frama-c-public/frama-clang
+    - nix run -f channel:nixos-19.03 openssh --command git -C nix/frama-c-public/frama-clang push git@git.frama-c.com:pub/frama-clang origin/master:refs/heads/master
   only:
     variables:
       - $PUBLISH == "yes"
@@ -500,8 +500,8 @@ publish-meta:
   stage: publish
   <<: *prepare_ssh_template
   script:
-    - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git clone git@git.frama-c.com:frama-c/meta.git nix/frama-c-public/meta
-    - GIT_SSH=$PWD/nix/frama-c-public/ssh.sh nix run -f channel:nixos-19.03 openssh --command git -C nix/frama-c-public/meta push git@git.frama-c.com:pub/meta origin/master:refs/heads/master
+    - nix run -f channel:nixos-19.03 openssh --command git clone git@git.frama-c.com:frama-c/meta.git nix/frama-c-public/meta
+    - nix run -f channel:nixos-19.03 openssh --command git -C nix/frama-c-public/meta push git@git.frama-c.com:pub/meta origin/master:refs/heads/master
   only:
     variables:
       - $PUBLISH == "yes"
