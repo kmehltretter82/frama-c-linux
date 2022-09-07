@@ -18,6 +18,7 @@
 Open Source Release <next-release>
 ##################################
 
+-   Kernel    [2022-09-07] Improve error message for invalid options -D/-I/-U.
 o!  Configure [2022-07-28] Removed autoconf and configure
 o!  Makefile  [2022-07-11] Removed Makefile, Frama-C is now built using Dune 3.x
 o!  Pdg       [2022-07-01] Removed from Db. Use proper Pdg API instead.
