@@ -210,11 +210,8 @@ let run typ expr =
   let kf = Globals.Functions.find_by_name "f" in
   let r = Globals.Vars.find_from_astinfo "result" Cil_types.VGlobal in
   let ret = Kernel_function.find_return kf in
-  let state = Db.Value.get_stmt_state ret in
-  let v1 =
-    !Db.Value.eval_expr
-      ~with_alarms:CilE.warn_none_mode state (Cil.evar ~loc r)
-  in
+  let expr = Cil.evar ~loc r in
+  let v1 = Eva.Results.(before ret |> eval_exp expr |> as_cvalue) in
   let itv =
     try Cvalue.V.project_ival v1
     with exn ->

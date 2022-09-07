@@ -22,16 +22,25 @@
 
 open Cil_types
 
+let join_logic_deps logic_deps =
+  Cil_datatype.Logic_label.Map.fold
+    (fun _ -> Locations.Zone.join) logic_deps Locations.Zone.bottom
+
 let predicate_deps ~pre ~here predicate =
   let env = Eval_terms.env_annot ~pre ~here () in
   let logic_deps = Eval_terms.predicate_deps env predicate in
-  let join logic_deps =
-    Cil_datatype.Logic_label.Map.fold
-      (fun _ -> Locations.Zone.join)
-      logic_deps
-      Locations.Zone.bottom
-  in
-  Option.map join logic_deps
+  Option.map join_logic_deps logic_deps
+
+let term_deps stmt t =
+  try
+    let state = Results.(before stmt |> get_cvalue_model) in
+    let env = Eval_terms.env_only_here state in
+    let r = Eval_terms.eval_term ~alarm_mode:Eval_terms.Ignore env t in
+    let zone = join_logic_deps r.Eval_terms.ldeps in
+    Some zone
+  with Eval_terms.LogicEvalError _ -> None
+
+let () = Logic_interp.To_zone.compute_term_deps := term_deps
 
 let valid_behaviors kf state =
   let funspec = Annotations.funspec kf in
