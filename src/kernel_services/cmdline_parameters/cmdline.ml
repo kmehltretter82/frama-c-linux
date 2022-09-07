@@ -770,6 +770,24 @@ let set_files used_loading l =
            if permissive then (warning "" "has no name"; acc)
            else error "" "has no name. What do you exactly have in mind?"
          else if s.[0] = '-' then
+           (* Option prefixes -I/-D/-U, from the GCC preprocessor, are commonly
+              used by mistake; the code below detects them and provides a
+              helpful error message. *)
+           if String.length s > 1 &&
+              (s.[1] == 'D' || s.[1] == 'I' || s.[1] == 'U')
+           then
+             if permissive then
+               (warning s ("is invalid in Frama-C, \
+                            use instead: -cpp-extra-args=\"" ^ s ^
+                           "\"\n(see option -kernel-h for more information)");
+                acc)
+             else
+               Kernel_log.abort
+                 "option `%s' is invalid in Frama-C, \
+                  use instead: -cpp-extra-args=\"%s\"@\n\
+                  see option -kernel-h for more information."
+                 s s
+           else
            if permissive then (warning s "is unknown"; acc)
            else error s "is unknown"
          else
