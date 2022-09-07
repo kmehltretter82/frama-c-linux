@@ -20,7 +20,7 @@ roles, and we must distinguish between:
 %% \item[Binary Builders:] they are responsible for creating a binary distribution
 %%   of the release for a specific architecture \expertise{none currently}.
 \item[Web Site Maintainers:] they are responsible for updating the web site,
-  during the release and for possible later updates \expertise{Florent ? Thibaud ?}.
+  during the release and for possible later updates \expertise{Allan, Augustin}.
 \item[Release Manager:] they are responsible for the organisation of the
   release process
 \end{description}
@@ -30,24 +30,23 @@ roles, and we must distinguish between:
 A \FramaC release consists of the following main steps:
 \begin{enumerate}
 
-\item \textbf{The branch stage.} A branch is created, in which the release
-  will be prepared. It will ultimately become the released version.
-  The development of unstable features may continue in master, while the
-  branch is dedicated to the ongoing release.
+\item \textbf{The branch stage (Chapter~\ref{chap:branch}).} A branch is
+  created, in which the release  will be prepared. It will ultimately become the
+  released version. The development of unstable features may continue in master,
+  while the branch is dedicated to the ongoing release.
 
-\item \textbf{The build stage.} The source files are setup by the
-  developers, and the bug tracking system is updated to reflect the
-  distribution state. A source distribution is created and registered,
-  with its updated documentation.
+\item \textbf{The validation stage (Chapter~\ref{chap:validation}).} When we
+  estimate that \FramaC is ready to be released, the bug tracking system is
+  updated to reflect the distribution state. All artifacts that must be
+  distributed are generated in the continuous integration and validated by the
+  Release Manager. The version commit is created and tagged.
 
-\item \textbf{The web stage.} A snap-shot of the complete web site is
-  created, by merging the new release files with the old,
-  already distributed ones. %% Some old data might be dropped away if
-  %% necessary, although they are still committed somewhere in the
-  %% repository.
-
-\item \textbf{The go-online stage}. The web-site snapshot is put on
-  the web. Time to notify the world!
+\item \textbf{The deployment stage (Chapter~\ref{chap:deploy}).} The Release
+  Manager starts the release pipeline in the continuous integration. The last
+  stage releases the branch, the GitLab release, the website, the wiki and
+  creates an opam repository branch on the Frama-C organisation on GitHub. Time
+  to send an email on the Frama-C discuss mailing list, tweet and spread the
+  world!
 
 \end{enumerate}
 

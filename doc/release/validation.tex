@@ -1,0 +1,201 @@
+\chapter{Validation stage}
+\label{chap:validation}
+
+Final validation before running the release pipeline.
+
+\section{Prerequisites on dependencies}
+
+Install all dependencies of Frama-C, including recommended ones.
+
+Check coherence between:
+\begin{itemize}
+  \item \texttt{opam/opam} \todo{Should always be up to date}
+  \item \texttt{reference-configuration.md} \todo{Should always be up to date}
+\end{itemize}
+
+Run the command:
+\begin{itemize}
+  \item \texttt{dune build @frama-c-configure}
+\end{itemize}
+all plugins should be enabled. Check dependencies in case they have changed.
+If you don't know them, ask plug-in developers to verify them.
+
+\section{Prerequisites on installation}
+
+\begin{itemize}
+  \item Check the contents of \texttt{INSTALL.md} \todo{Should always be up to date}
+  \item Check the contents of \texttt{README.md} \todo{Should always be up to date}
+\end{itemize}
+
+\section{Fix version}
+
+The tasks listed in this section are performed by the Release Manager.
+
+\subsection{Versions in documentation files}
+
+Check the following files:
+\begin{itemize}
+  \item \texttt{ALL\_VERSIONS} (non-beta only)
+  \item \texttt{VERSION} (for beta releases, add suffix \texttt{\textasciitilde{}beta}, not \texttt{-beta})
+  \item \texttt{VERSION\_CODENAME}
+  \item \texttt{Changelog}
+  \item \texttt{src/plugins/wp/Changelog}
+  \item \texttt{src/plugins/e-acsl/doc/Changelog}
+  \item \texttt{INSTALL.md} ("Reference configuration")
+  \item \texttt{opam/opam} (for beta releases, add suffix \texttt{\textasciitilde{}beta}, not \texttt{-beta})
+\end{itemize}
+
+\subsection{Versions in source: API documentation}
+
+To update the \textsf{API} documentation, you must update the \texttt{@since}
+tags. This involves the following script (\texttt{sed -i} must work for this
+purpose):
+\begin{shell}
+./dev/update_api_doc.sh <NEXT>
+\end{shell}
+\verb+<NEXT>+ is the long name of the final release, i.e.
+\verb+`cat VERSION`-`VERSION_CODENAME`+
+(without the \verb+beta+ suffix, if any).
+
+Check that no \verb|+dev| suffix remains inside comments:
+
+\begin{shell}
+git grep +dev src
+\end{shell}
+
+Test by recompiling Frama-C and rebuilding the API documentation:
+\begin{shell}
+dune build @install
+dune build @doc
+\end{shell}
+
+You can also check that the elements referred to in the index of the
+development guide are marked as such in the API doc and vice-versa
+by issuing \texttt{make check-devguide}\todo{Fix this}.
+
+\subsection{Manuals}
+
+Manuals are built by the continuous integration. However, the Release Manager
+should check whether a new version of ACSL or E-ACSL must be released.
+
+Also, most of the manuals include an appendix with the list of changes that have
+happened, divided by version of Frama-C. Make sure that the first section has
+the correct release name.
+
+Manuals experts:
+\begin{center}
+  \begin{tabular}{lll}
+    \hline
+    \textsf{User Manual}     & \texttt{doc/userman}   & \expertise{Julien} \\
+    \textsf{Developer Guide} & \texttt{doc/developer} & \expertise{Julien} \\
+    \textsf{ACSL}            & (from Github)          & \expertise{Virgile} \\
+    \textsf{Aoraï}           & \texttt{doc/aorai}     & \expertise{Virgile} \\
+    \textsf{E-ACSL} & \texttt{src/plugins/e-acsl/doc/*} & \expertise{Julien} \\
+    \textsf{Eva}             & \texttt{doc/eva}       & \expertise{David} \\
+    \textsf{Metrics}         & \texttt{doc/metrics}   & \expertise{André} \\
+    \textsf{RTE}             & \texttt{doc/rte}       & \expertise{Julien} \\
+    \textsf{WP}  & \texttt{src/plugins/wp/doc/manual/} & \expertise{Loïc} \\
+  \end{tabular}
+\end{center}
+
+\subsection{Contributors}
+
+Update the Frama-C's authors list in files
+\texttt{src/plugins/gui/help\_manager.ml} and \texttt{opam/opam}. Traditionally,
+an author is added if they have contributed 100+ LoC in the release, as counted
+by:
+\begin{verbatim}
+git ls-files -z | \
+parallel -0 -n1 git blame --line-porcelain | \
+sed -n 's/^author //p' | sort -f | uniq -ic | sort -nr
+\end{verbatim}
+(source for the command: \url{https://gist.github.com/amitchhajer/4461043})
+
+\subsection{Commit}
+
+Commit any change that you have done during these checks \textbf{and push}.
+
+\section{Last pipeline artifacts validation}
+
+In the last continuous integration pipeline of the release branch, force the
+run of the following targets:
+\begin{itemize}
+  \item manuals
+  \item opam-pin
+\end{itemize}
+Both should succeed. Collect the artifacts of the following targets:
+\begin{itemize}
+  \item api-doc
+  \item build-distrib-tarball
+  \item manuals
+\end{itemize}
+
+Check that these artifacts are as expected. In particular:
+\begin{itemize}
+  \item API documentatation:
+    \begin{itemize}
+      \item check that you can browse the API documentation
+      \item if there are minor bugs/typos, note them for later, but it's not
+        worth delaying the release to fix them.
+    \end{itemize}
+  \item Check versions in manuals
+  \item Tarball
+    \begin{itemize}
+      \item Check that no non-free components are distributed
+      \item Check that no \texttt{/home/user} path can be found in the distribution,
+      \item Build and test
+        \begin{itemize}
+          \item on Linux (the CI has already done it, but the GUI is not tested)
+          \item on MacOS \expertise{André, Loïc}
+          \item on Windows (WSL) \expertise{Allan, André}
+        \end{itemize}
+      \item consider decompressing both the current and the previous release
+         archives in different directories, then using \texttt{meld} to compare
+         them. This allows spotting if some files were unexpectedly added, for
+         instance.
+    \end{itemize}
+\end{itemize}
+
+Alternatively, you can use \texttt{docker} to compile the archive against a
+precise configuration:
+\begin{itemize}
+  \item \verb+cp distributed/frama-c-<VERSION>.tar.gz developer_tools/docker+
+  \item \verb+cd developer_tools/docker+
+  \item \verb+make Dockerfile.dev+
+  \item \verb+docker build . -t framac/frama-c:dev --target frama-c-gui-slim \+\\
+        \verb+  -f Dockerfile.dev --build-arg=from_archive=frama-c-<VERSION>.tar.gz+
+\end{itemize}
+For the GUI: you might want to install the
+\href{https://github.com/mviereck/x11docker}{\texttt{x11docker}} script, in
+order to be able to launch \verb+x11docker framac/frama-c:dev frama-c-gui+
+
+\section{Validate release}
+
+Create the main changes file in the directory \texttt{releases}. This file must
+be named <VERSION without ext>.md (e.g. \texttt{25.0}: \texttt{25.0.md},
+\texttt{25.0~beta}: \texttt{25.0.md}, \texttt{25.1}: \texttt{25.1.md}). The
+expected format is:
+
+\begin{lstlisting}
+  # Kernel
+
+  - item
+  - ...
+
+  # <Plugin-Name> (Prefer alphabetic order)
+
+  - item
+  - ...
+
+  # ...
+\end{lstlisting}
+
+It should only list main changes, that will be displayed on the event section
+of the website and the wiki page.
+
+Create the version commit, tag it using \texttt{git tag \$(cat VERSION | sed -e "s/~/-/")}
+and push it (e.g. via \texttt{git push origin \$(cat VERSION | sed -e "s/~/-/")}).
+
+%%%Local Variables:
+%%%TeX-master: "release"
+%%%End:
