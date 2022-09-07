@@ -496,7 +496,15 @@ module Computer(I: Init) = struct
     | Call (_,e,args,_) ->
       (match Dyncall.get s with
        | Some (_,l) ->
-         List.fold_left (fun d f -> do_call s (Kernel_function.get_vi f) args d) d l
+           let (state,loops) = d in
+           let state' =
+             List.fold_left
+               (fun acc f ->
+                 let s,_ = do_call s (Kernel_function.get_vi f) args d in
+                 Data_for_aorai.merge_state acc s)
+               state l
+           in
+           (state',loops)
        | None ->
          Aorai_option.not_yet_implemented
            ~source:(fst e.eloc)
