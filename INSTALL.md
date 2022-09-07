@@ -59,7 +59,7 @@ rights):
     opam install frama-c
 
 For older `opam` versions, you have to install it
-separately and call it explicitely with the following commands, before
+separately and call it explicitly with the following commands, before
 installing Frama-C as above. Again, installing the external dependencies
 requires administrative rights.
 
@@ -94,7 +94,7 @@ why3 config detect
 ### Reference configuration
 
 See file [reference-configuration.md](reference-configuration.md)
-for a set of packages that is known to work with Frama-C 24 (Chromium).
+for a set of packages that is known to work with Frama-C+dev.
 
 ### Installing Custom Versions of Frama-C
 
