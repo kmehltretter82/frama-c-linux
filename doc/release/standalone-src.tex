@@ -4,48 +4,23 @@
 \label{chap:make-src-distrib}
 
 Requirements and tips to create a source release of Frama-C
-(i.e. \texttt{make src-distrib}).
+(i.e. \texttt{dev/make-distrib.sh}).
 
 \section{Requirements}
 
 You will need the following programs:
 
 \begin{itemize}
-\item a custom (unreleased) version of \texttt{headache};
 \item on Mac OS, binaries \texttt{gtar} and \texttt{gzip}.
 \end{itemize}
 
 Details about how to install them are presented below.
 
-\section{Custom headache}
-
-Clone the following repository (by default, every Frama-C developer has
-access to it):
-
-\texttt{git clone git@git.frama-c.com/dev/headache.git}
-
-Then run:
-
-\verb+./configure && make && make install+
-
-Note that some extra opam packages may be needed, such as \texttt{camomile}.
-
-This version of \texttt{headache} needs to be in your PATH for the next steps.
-
 \section{Check your headers}
 
-Before making a source distribution, make sure your headers are up-to-date,
-by running:
-
-\texttt{make check-headers}
-
-Any plug-ins you are distributing along with Frama-C should have their
-distributed files (all OCaml sources, plus those listed in
-\verb+PLUGIN_DISTRIBUTED_EXTERNAL+) listed in file:
-
-\verb+headers/header_spec.txt+
-
-Their headers will then be checked by the above make target.
+Headers are checked by the script. For external plugins, they must provide a
+\texttt{.gitattributes} file as \texttt{git} is used to find the headers to
+apply.
 
 \textbf{Note:} if you fail to check your headers, the distribution script may
 corrupt your files. You were warned.
@@ -75,10 +50,10 @@ or an {\em open-source} distribution.
   inside a virtual machine for a paper).
 \end{itemize}
 
-Use Makefile variable \verb+OPEN_SOURCE=yes+ to create an open-source release,
+Use the variable \verb+OPEN_SOURCE=yes+ to create an open-source release,
 as in:
 
-\verb+make src-distrib OPEN_SOURCE=yes+
+\verb+OPEN_SOURCE=yes ./dev/make-distrib.sh+
 
 Otherwise, by default a closed-source archive will be created.
 
