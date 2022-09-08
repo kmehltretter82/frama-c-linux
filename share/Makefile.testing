@@ -204,6 +204,11 @@ tests::
 endif # FRAMAC_WP_CACHEDIR
 endif # PTEST_USE_WP_CACHE
 
+.PHONY: default-tests
+default-tests: run-ptests
+	dune build --display short @ptests_config
+	$(MAKE) count-tests
+
 .PHONY: count-tests
 count-tests:
 	@echo "Number of *.{err,res}.log files:"
