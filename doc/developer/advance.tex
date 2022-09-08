@@ -31,9 +31,8 @@ In this chapter, we suppose that the reader is able to write a minimal plug-in
 like \texttt{hello}\index{Hello} described in chapter~\ref{chap:tutorial} and
 knows about the software architecture of \framac (chapter~\ref{chap:archi}). Moreover
 plug-in development requires the use of advanced features of
-\caml (module system, classes and objects, \emph{etc}). Static plug-in
-development requires some knowledge of \autoconf and \make.
- Each section summarizes its own prerequisites at its beginning (if any).
+\caml (module system, classes and objects, \emph{etc}).
+Plug-in development also requires some familiarity with the Dune build system.
 
 Note that the following subsections can be read in no particular
 order: their contents are indeed quite independent from one another even if
@@ -41,406 +40,150 @@ there are references from one chapter to another one. Pointers to
 reference manuals (Chapter~\ref{chap:refman}) are also provided for readers who
 want full details about specific parts.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Plug-in dependencies}\label{adv:dependencies}
 
-%% \section{File Tree Overview}\label{adv:files}
-
-%% \begin{target}beginners.\end{target}
-
-%% The \framac main directory is split in several sub-directories. The \framac source
-%% code is mostly provided in directories \texttt{cil}\codeidx{cil} and
-%% \texttt{src}\codeidx{src}. The first one contains the source code of
-%% \cil~\cite{cil}\index{Cil} extended with an \acsl~\cite{acsl}
-%% implementation\index{ACSL}. The second one is the core implementation of
-%% \framac. This last directory contains directories of the \framac
-%% kernel\index{Kernel} and directories of the provided \framac plug-in.
-
-%% A pretty complete description of the \framac file tree is provided in
-%% Section~\ref{refman:files}.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{\framac Configure.in}\label{adv:configure}
-\codeidxdef{configure.in}
-
-\begin{target}not for standard plug-ins developers.\end{target}
+\begin{target}standard plug-in developers.\end{target}
 
 \begin{prereq}
-  Knowledge of \autoconf and shell programming.
+  Basic knowledge of the Dune build system.
 \end{prereq}
 
-In this Section, we detail how to modify the file \texttt{configure.in} in
-order to configure plug-ins (\framac configuration has been introduced in
-%Section~\ref{tut2:configure} and~\ref{tut2:makefile}).
+Some plug-ins only depend on the \framac kernel, and in this case, require no
+special configuration. However, many plug-ins depend either on other \framac
+plug-ins, or on external libraries, tools and components. In both cases, it is
+important to specify such dependencies, to avoid the user trying and failing
+to compile or run your plug-in.
 
-First Section~\ref{conf:principle} introduces the general principle and
-organisation of \texttt{configure.in}. Then Section~\ref{conf:add} explains how
-to configure a new simple plug-in without any dependency. Next we show how to
-exhibit dependencies with external libraries and tools
-(Section~\ref{conf:dep-lib}) and with other plug-ins
-(Section~\ref{conf:dep-plug}). Finally Section~\ref{conf:lib} presents the
-configuration of external libraries and tools needed by a new plug-in but not
-used anywhere else in \framac.
-
-\subsection{Principle}\label{conf:principle}
-
-When you execute \texttt{autoconf}, file \texttt{configure.in} is used to
-generate the \texttt{configure} script. Each \framac user executes this script
-to check his/her system and determine the most appropriate configuration: at the
-end of this configuration (if successful), the script summarizes the
-status of each plug-in, which can be:\index{Plug-in!Status}
-\begin{itemize}
-\item \emph{available} (everything is fine with this plug-in);
-\item \emph{partially available}: either an optional dependency of the plug-in
-  is not fully available, or a mandatory dependency of the plug-in is only
-  partially available; or\index{Plug-in!Dependency}
-\item \emph{not available}: either the plug-in itself is not provided by
-  default, or a mandatory dependency of the plug-in is not available.
-\end{itemize}
-
-The important notion in the above definitions is
-\emph{dependency}\index{Plug-in!Dependency|bfit}. A dependency of a plug-in $p$
-is either an external library/tool\index{Library}\index{Tool} or another
-\framac plug-in. It is either \emph{mandatory} or \emph{optional}. A mandatory
-dependency must be present in order to build $p$, whereas an optional
-dependency provides features to $p$ that are additional but not highly required
-(especially $p$ must be compilable without any optional dependency).
-
-Hence, for the plug-in developer, the main role of \texttt{configure.in} is to
-define the optional and mandatory dependencies of each plug-in. Another standard
-job of \texttt{configure.in} is the addition of options \texttt{---enable-$p$}
-and \texttt{---disable-$p$} to \texttt{configure} for a plug-in $p$. These
-options respectively forces $p$ to be available and disables $p$ (its status is
-automatically ``not available'').
-
-Indeed \texttt{configure.in} is organised in different sections specialized in
-different configuration checks. Each of them begins with a title delimited by
-comments and it is highlighted when \texttt{configure} is executed. These
-sections are described in Section~\ref{refman:configure}. Now we focus on
-the modifications to perform in order to integrate a new plug-in in \framac.
-
-\subsection{Addition of a Simple Plug-in}\label{conf:add}
-
-In order to add a new plug-in, you have to add a new subsection for the new
-plug-in to Section \emph{Plug-in wished}. This action is usually very easy to
-perform by copying/pasting from another existing plug-in (\eg
-\texttt{occurrence}\index{Plug-in!Occurrence|see{Occurrence}}\index{Occurrence})
-and by replacing the plug-in name (here \texttt{occurrence}) by the new plug-in
-name in the pasted part. In these sections, plug-ins are sorted according to a
-lexicographic ordering.
-
-For instance, Section \emph{Wished Plug-in} introduces a new sub-section for
-the plug-in \texttt{occurrence} in the following way.
-\scodeidxdef{configure.in}{check\_plugin}
-\begin{configurecode}
-# occurrence
-############
-check_plugin(occurrence,src/plugins/occurrence,
-             [support for occurrence analysis],yes)
-\end{configurecode}
-\begin{itemize}
-\item The first argument is the plug-in name,
-\item the second one is the name of directory containing the source files 
-  of the plug-in (usually a sub-directory of \texttt{src/plugins}), 
-\item the third one is an help message for the \texttt{--enable-occurrence} 
-  option of \texttt{configure},
-\item the last one indicates if the plug-in is enabled by default
-  (\texttt{yes/no}).
-\end{itemize}
+Plug-in dependencies are usually defined in the plug-in's \verb|dune| file.
+There are mainly two kinds of dependencies: {\em mandatory} and {\em optional}.
+Mandatory dependencies are necessary for the plug-in to run {\em at all}, and
+their absence means the plug-in must be disabled. Optional dependencies do not
+prevent compilation and usage of the plug-in, but it may work less efficiently,
+precisely, or fail when specific features are requested.
 
 \begin{important}
-The plug-in name must contain only alphanumeric characters and
-underscores. It must be the same as the \texttt{name} value given as
-argument to the functor \texttt{Plugin.Register} of
-section~\ref{adv:plugin-services} (with spaces replaced by underscore). It must
-also be the same (modulo upper/lower case) as the \texttt{PLUGIN\_NAME} variable
-given in the plugin's Makefile presented in section~\ref{adv:dynamic-make}.
+  Plug-in developers must ensure that optional dependencies are tested for
+  their absence and dealt with gracefully; a plug-in must {\em not} crash when
+  optional dependencies are missing.
 \end{important}
 
-\begin{important}
-  The macro \texttt{check\_plugin}\scodeidx{configure.in}{check\_plugin} sets
-  the following variables:
-  \texttt{FORCE\_OCCURRENCE}\scodeidxdef{configure.in}{FORCE\_$plugin$},
-  \texttt{REQUIRE\_OCCURRENCE}\scodeidx{configure.in}{REQUIRE\_$plugin$},
-  \texttt{USE\_OCCURRENCE}\scodeidx{configure.in}{USE\_$plugin$}, and
-  \texttt{ENABLE\_OCCURRENCE}\scodeidxdef{configure.in}{ENABLE\_$plugin$}.
-\end{important}
+Most dependencies (OCaml library dependencies, such as other plug-ins or OCaml
+modules) are specified using Dune's \verb|library| stanza%
+\footnote{Full documentation about Dune's \texttt|library| stanza is available
+at \url{https://dune.readthedocs.io/en/stable/concepts.html\#library-deps}}.
+As is often the case, examples are very instructive; here is an example of
+mandatory dependencies from the \textsf{Dive} plug-in's \verb|dune| file:
 
-The first variable indicates if the user explicitly requires the availability of
-\texttt{occurrence} \emph{via} setting the option
-\texttt{---enable-occurrence}. The second and third variables are used by others
-plug-ins in order to handle their dependencies (see
-Section~\ref{conf:dep-plug}). The fourth variable \texttt{ENABLE\_OCCURRENCE} indicates
-the plug-in status (available, partially available or not available). 
-%At the end of these lines of code, it says if the plug-in should be compiled: if
-If \texttt{---enable-occurrence} is set, then \texttt{ENABLE\_OCCURRENCE} is \yes
-(plug-in available); if \texttt{---disable-occurrence} is set, then its value is
-\texttt{no} (plug-in not available). If no option is specified on the command
-line of \texttt{configure}, its value is set to the default one (according to
-%\texttt{\$default}). 
-the value of the fourth argument of \texttt{check\_plugin}).
+\begin{lstlisting}
+(library
+  [...]
+  (libraries frama-c.kernel frama-c-studia.core frama-c-server.core)
+)
+\end{lstlisting}
 
-%%%%
-\subsection{Configuration of New Libraries or Tools}
-\label{conf:lib}
-\index{Library!Configuration}
-\index{Tool!Configuration}
+The \verb|libraries| field contains \verb|frama-c.kernel| (essential for all
+plug-ins), but also \verb|frama-c-studia.core| and \verb|frama-c-server.core|,
+meaning this plug-in requires both the \textsf{Studia} and \textsf{Server}
+plug-ins to be enabled. If any of them has been disabled (either due to
+missing dependencies, or as a result of a user request), then \textsf{Dive}
+will also be disabled.
 
-Some plug-ins need additional tools or libraries to be fully
-functional. The \texttt{configure} script takes care of these in two
-steps. First, it checks that an appropriate version of each external
-dependency exists on the system. Second, it verifies for each plug-in
-that its dependencies are met. Section~\ref{conf:dep-lib} explains how
-to make a plug-in depend on a given library (or tool). The present
-section deals with the first part, that is how to check for a given
-library or tool on a system. Configuration of new libraries and configuration of
-new tools are similar.  In this section, we therefore choose to focus
-on the configuration of new libraries. This is done by calling a
-predefined macro called
-\texttt{configure\_library}\scodeidxdef{configure.in}{configure\_library}\scodeidxdef{configure.in}{configure\_tools}\footnote{For
-  tools, there is a macro \texttt{configure\_tool} which works in the
-  same way as \texttt{configure\_library}.}, or its more specialized version
-\texttt{configure\_pkg}\scodeidxdef{configure.in}{configure\_pkg}.
+{\em Note: to explicitly disable a plug-in, use the
+  \verb|dev/disable-plugins.sh| script.}
 
-\texttt{configure\_pkg} is meant to be used for checking the presence of
-OCaml libraries that are managed as
-\texttt{findlib}\footnote{\url{http://projects.camlcity.org/projects/findlib.html}}
-packages, which is the case for most modern OCaml libraries nowadays.
-It takes two arguments, the name of the package (as known by \texttt{findlib}),
-and a message that will be displayed if the package is not found.
+Note that OCaml libraries can also be specified, e.g. adding \verb|zarith|
+to \verb|libraries| above would require that Zarith be installed and available
+via \verb|ocamlfind|.
 
-The \texttt{configure\_library} macro takes three arguments. The first one is
-the name of the library, the second one is a filename
-which is used by the script to check the availability of the library.
-In case there are multiple locations possible for the library, this
-argument can be a list of filenames. In this case, the argument must
-be properly quoted ({\it i.e.} enclosed in a {\tt [}, {\tt]} pair).
-Each name is checked in turn. The first one which corresponds to an
-existing file is selected.  If no name in the list corresponds to an
-existing file, the library is considered to be unavailable. The last
-argument is a warning message to display if a configuration problem
-appears (usually because the library does not exist). Using these
-arguments, the script checks the availability of the library.
+\subsection{Declaring dependencies}
 
-Results of these macros are available through variables which are
-substituted in the files generated by \texttt{configure}, where
-\texttt{$library$} stands for the \emph{uppercased}
-version of the library name.
-\begin{itemize}
-\item For \texttt{configure\_pkg}:
-\begin{itemize}
-\item \texttt{HAS\_OCAML\_$library$}
-\scodeidxdef{configure.in}{HAS\_OCAML\_$library$}
-is set to \texttt{yes} or \texttt{no} depending on the availability
-of the library
-\end{itemize}
-\item For \texttt{configure\_library}:
-\begin{itemize}
-\item \texttt{HAS\_$library$}\scodeidxdef{configure.in}{HAS\_$library$}
-  is set to \texttt{yes} or \texttt{no} depending on the availability
-  of the library
-\item \texttt{SELECTED\_$library$}\scodeidxdef{configure.in}{SELECTED\_$library$}
-contains the name of the version selected as described above.
-\end{itemize}
-\end{itemize}
-
-If checking for \ocaml{} libraries and object files without
-\texttt{configure\_pkg}, remember that
-they come in two flavors: bytecode and native
-code, which have distinct suffixes. Therefore, you should use the
-variables \texttt{LIB\_SUFFIX}\scodeidx{configure.in}{LIB\_SUFFIX}
-(for libraries) and
-\texttt{OBJ\_SUFFIX}\scodeidx{configure.in}{OBJ\_SUFFIX}
-(for object files) to check the presence of a
-given file. These variables are initialized at the beginning of the
-\texttt{configure} script depending on the availability of a
-native-code compiler on the current installation.
-
-\begin{example}
-  The library \lablgtksourceview\index{Lablgtksourceview2} (used to have a
-  better rendering of C sources in the GUI) is part of
-  \lablgtk\index{Lablgtk}~\cite{lablgtk}.
-  This is checked through the following command,
-  where \texttt{LABLGTKPATH\_FOR\_CONFIGURE} is the path where
-  \texttt{configure} has found \lablgtk itself.
-
-\begin{configurecode}
-configure_library(
-  [GTKSOURCEVIEW],
-  [\$LABLGTKPATH_FOR_CONFIGURE/lablgtksourceview2.\$LIB_SUFFIX],
-  [lablgtksourceview not found])
-\end{configurecode}
-\end{example}
-
-\subsection{Addition of Library/Tool Dependencies}\label{conf:dep-lib}
-\index{Library!Dependency}\index{Tool!Dependency}
-
-Dependencies upon OCaml packages (checked by \texttt{configure\_pkg}) are
-governed by two macros:
+Optional dependencies can be detected and disabled in different ways:
 
 \begin{itemize}
-\item \texttt{plugin\_require\_pkg($plugin$,$library$)}%
-\scodeidxdef{configure.in}{plugin\_require\_pkg} indicates that
-$plugin$ requires $library$ in order to be compiled.
-\item \texttt{plugin\_use\_pkg($plugin$,$library$)}%
-\scodeidxdef{configure.in}{plugin\_use\_pkg} indicates that
-$plugin$ uses $library$, but can nevertheless be compiled if $library$
-is not installed (potentially offering reduced functionality).
+\item If the module is dynamically accessible via \verb|Db| (see
+  Section~\ref{adv:static-registration} for more details), the detection
+  can be done directly in OCaml and requires no special handling in the
+  \verb|dune| file;
+\item Otherwise, you can define two versions of the implementation
+  (both implementing the same interface), in two different files.
+  One of these files will use the required module, while the other will
+  implement a dummy version without it.
+  The \verb|select| notation from the \verb|library| stanza allows telling
+  Dune which file to compile.
 \end{itemize}
 
-Dependencies upon external tools and libraries (checked by
-\texttt{configure\_library} or \texttt{configure\_tool})
-are governed by two macros:
-\begin{itemize}
-\item \texttt{plugin\_require\_external($plugin$,$library$)}%
-\scodeidxdef{configure.in}{plugin\_require\_external} indicates that
-$plugin$ requires $library$ in order to be compiled.
-\item \texttt{plugin\_use\_external($plugin$,$library$)}%
-\scodeidxdef{configure.in}{plugin\_use\_external} indicates that
-$plugin$ uses $library$, but can nevertheless be compiled if $library$
-is not installed (potentially offering reduced functionality).
-\end{itemize}
+Here is an example of \verb|select| from the \textsf{Aoraï} plug-in,
+which defines an optional dependency on the \textsf{Eva} plug-in:
 
-\begin{convention}
-  The best place to perform such extensions is just after the addition of $p$
-  which sets the value of \texttt{ENABLE\_$p$}.
-\end{convention}
+\begin{lstlisting}
+(libraries [...]
+ (select aorai_eva_analysis.ml from
+  (frama-c-eva.core -> aorai_eva_analysis.enabled.ml)
+  (  -> aorai_eva_analysis.disabled.ml)
+ )
+\end{lstlisting}
 
-\begin{example}
-  Plug-in \texttt{gui}\index{Plug-in!GUI} requires
-  \lablgtk\index{Lablgtk} and \gnomecanvas\index{GnomeCanvas}. It
-  also optionally uses \dottool\index{Dot} for displaying graphs (graph cannot
-  be displayed without this tool). So, just after its declaration, there are the
-  following lines in \texttt{configure.in}.
-\begin{configurecode}
-plugin_require_external(gui,lablgtk)
-plugin_require_external(gui,gnomecanvas)
-plugin_use_external(gui,dot)
-\end{configurecode}
-\end{example}
+In the example above, \textsf{Aoraï} defines two files:
+\verb|aorai_eva_analysis.enabled.ml| and \verb|aorai_eva_analysis.disabled.ml|
+(we recommend this naming convention, but it is not enforced by \verb|dune|).
+The general form of the \verb|select| stanza is:
 
-\subsection{Addition of Plug-in Dependencies}\label{conf:dep-plug}
-\index{Plug-in!Dependency|bfit}
+\begin{lstlisting}
+(select <file> from
+  (<cond_1> -> <file_1>)
+  (<cond_2> -> <file_2>)
+  ...
+  ( -> <default>)
+)
+\end{lstlisting}
 
-Adding a dependency with another plug-in is quite the same as adding a
-dependency with an external library or tool (see
-Section~\ref{conf:dep-lib}). For this purpose, \texttt{configure.in}
-uses two macros
-\begin{itemize}
-\item \texttt{plugin\_require($plugin1$,$plugin2$)}%
-\scodeidxdef{configure.in}{plugin\_require} states that
-$plugin1$ needs $plugin2$.
-\item \texttt{plugin\_use($plugin1$,$plugin2$)}%
-\scodeidxdef{configure.in}{plugin\_use} states that
-$plugin1$ can be used in absence of $plugin2$, but requires $plugin2$
-for full functionality.
-\end{itemize}
+It then checks for each condition \verb|<cond_i>| in order, and the first one
+that matches is selected, otherwise it will be the fallback/default one. The
+selected \verb|<file_i>| will be renamed to \verb|<file>| and used in the build.
 
-There can be mutual dependencies between plug-ins. This is for instance
-the case for plug-ins \texttt{value} and \texttt{from}.
+\subsection{Notifying users via frama-c-configure}
 
-\section{Plug-in Specific Configure.ac}
-\codeidxdef{configure.ac}
-\label{sec:config-external}
+\framac has a special Dune target, \verb|@frama-c-configure|, which prints a
+summary of the configuration seen by Dune. It is especially helpful to
+understand why a given plug-in is disabled.
 
-\begin{target}standard plug-ins developers.\end{target}
+Plug-in developers should {\em always} include such a section in their
+\verb|dune| file, listing each optional component and its current availability
+via the \verb|%{lib-available:<lib>}| special variable.
 
-\begin{prereq}
-  Knowledge of \autoconf and shell programming.
-\end{prereq}
+Here is an example from \textsf{Frama-Clang}, which requires the following
+modules:
 
-External plug-ins can have their own configuration file, and can rely on the
-macros defined for \framac. In addition, as mentioned in
-section~\ref{dynamic-make:comp-same-time}, those plug-ins can be
-compiled directly from \framac's own Makefile. In order for them to
-integrate well in this setting, they should follow a particular layout,
-described below.
-First, they need to be able to refer to the auxiliary \texttt{configure.ac}
-file defining \framac-specific macros when they are used as stand-alone plug-ins.
-This can be done by the following code
-\begin{configurecode}
-m4_define([plugin_file],Makefile)
+\begin{lstlisting}
+(libraries frama-c.kernel frama-c-wp.core camlp-streams zarith)
+\end{lstlisting}
 
-m4_define([FRAMAC_SHARE_ENV],
-          [m4_normalize(m4_esyscmd([echo $FRAMAC_SHARE]))])
+The plug-in library name is \verb|frama-c-clang.core|. It is displayed as the
+``summary'' of the configuration, written as the first line,
+with each dependency as a subitem:
 
-m4_define([FRAMAC_SHARE],
-	  [m4_ifval(FRAMAC_SHARE_ENV,[FRAMAC_SHARE_ENV],
-                                     [m4_esyscmd(frama-c -print-path)])])
+\begin{lstlisting}
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Clang:" %{lib-available:frama-c-clang.core} "\n")
+          (echo "  - zarith:" %{lib-available:zarith} "\n")
+          (echo "  - camlp5:" %{lib-available:camlp5} "\n") ; for gen_ast
+          (echo "  - camlp-streams:" %{lib-available:camlp-streams} "\n")
+          (echo "  - wp:" %{lib-available:frama-c-wp.core} "\n")
+  )
+  )
+)
+\end{lstlisting}
 
-m4_ifndef([FRAMAC_M4_MACROS],
-         [m4_include(FRAMAC_SHARE/configure.ac)]
-        )
-\end{configurecode}
-%$ emacs-highlighting is a bit lost otherwise...
-
-\texttt{plugin\_file} is the file which must be present to ensure that
-\texttt{autoconf} is called in the appropriate directory (see documentation for
-the \texttt{AC\_INIT} macro of autoconf). \texttt{configure.ac} can be found in
-two ways: either by relying on the \texttt{FRAMAC\_SHARE} shell variable (when
-\framac{} is not installed, {\it i.e.} when configuring the plug-in together
-with the main \framac), or by calling an installed \framac (when installing
-the plug-in separately). The inclusion of \texttt{configure.ac} needs to be
-guarded to prevent multiple inclusions, as the configuration file of the plug-in
-might itself be included by \texttt{configure.in}
-(see section~\ref{dynamic-make:comp-same-time} for more details).
-
-The configuration of the plug-in itself or related libraries and tools can then
-proceed as described in Sections~\ref{conf:add} and \ref{conf:lib}. References
-to specific files in the plug-in source directory should be guarded with the
-following macro:
-\begin{configurecode}
-PLUGIN_RELATIVE_PATH(file)
-\end{configurecode}
-
-If the external plug-in has some dependencies as described in
-sections~\ref{conf:dep-lib}~and~\ref{conf:dep-plug},
-the configure script \texttt{configure} must check that all dependencies
-are met. This is done with the following macro:\scodeidxdef{configure.in}{check\_plugin\_dependencies}
-\begin{configurecode}
-check_plugin_dependencies
-\end{configurecode}
-It is only after this point that the variables
-\texttt{HAS\_$library$}, \texttt{SELECTED\_$library$}, and
-\texttt{ENABLE\_$plugin$} get their final value. If parts of the
-\texttt{configure} script depends on these variables,
-they should appear after the call to
-\texttt{check\_plugin\_dependencies}.
-
-An external plug-in can
-have dependencies upon previously installed plug-ins.
-However two separately installed plug-ins can not be
-mutually dependent on each other. Nevertheless, they can be compiled together
-with the main \framac sources using the \texttt{---enable-external} option
-of \texttt{configure} (see section~\ref{dynamic-make:comp-same-time}
-for more details).
-
-Finally, the configuration must end with the following command:
-\begin{configurecode}
-write_plugin_config(files)
-\end{configurecode}
-where \texttt{files} are the files that must be processed by configure
-(as in \texttt{AC\_CONFIG\_FILES} macro). \texttt{PLUGIN\_RELATIVE\_PATH} is
-unneeded here.
-
-\begin{important}
-For technical reasons, the macros
-\texttt{configure\_library}, \texttt{configure\_tool}, 
-\texttt{check\_plugin\_dependencies}, and \texttt{write\_plugin\_config}
-must not be inside a conditional part of the \texttt{configure}
-script. More precisely,
-they are using the diversion mechanism of \texttt{autoconf} in order to
-ensure that the tests are performed after all dependencies information
-has been gathered from all existing plugins. Diversion is a very primitive,
-text-to-text transformation. Using those macros within a
-conditional (or anything that alters the control-flow of the script) is likely
-to result in putting some unrelated part of the script in the same branch of
-the conditional.
-\end{important}
+Note that \verb|camlp5| is not among the dependencies declared in
+\verb|libraries|; it is used by another component (\verb|gen_ast|, as
+mentioned in the comment).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{\framac Makefile}\label{adv:make}\codeidxdef{Makefile}
+\section{\framac Makefiles}\label{adv:make}\codeidxdef{Makefile}
 
 \begin{target}not for standard plug-in developers.\end{target}
 
