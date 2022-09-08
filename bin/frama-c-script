@@ -123,6 +123,7 @@ cd "$WORKING_DIR"
 # All scripts called by frama-c-script may rely on FRAMAC_BIN pointing to the
 # directory containing frama-c, frama-c-config and frama-c-script.
 export FRAMAC_BIN="$DIR"
+FRAMAC_LIB=$("${DIR}/frama-c-config" -print-lib-path)
 FRAMAC_SHARE=$("${DIR}/frama-c-config" -print-share-path)
 if [ -z ${FRAMAC_SESSION+x} ]; then
     FRAMAC_SESSION="./.frama-c";
@@ -179,7 +180,7 @@ flamegraph() {
         mkdir "$dir" || { echo "error: could not create '$dir'"; exit 1; }
     fi
     out_svg="$dir/flamegraph.svg"
-    "${FRAMAC_SHARE}/analysis-scripts/flamegraph.pl" \
+    "${FRAMAC_LIB}/analysis-scripts/flamegraph.pl" \
         --title "Eva Flamegraph" --inverted --hash "$path" \
         --width 1400 --fontsize 11 > "$out_svg.tmp"
     if [ ! $? -eq 0 ]; then
@@ -221,11 +222,11 @@ case "$command" in
         ;;
     "build")
         shift;
-        ${FRAMAC_SHARE}/analysis-scripts/build.py "$@";
+        ${FRAMAC_LIB}/analysis-scripts/build.py "$@";
         ;;
     "list-files")
         shift;
-        "${FRAMAC_SHARE}"/analysis-scripts/list_files.py "$@";
+        "${FRAMAC_LIB}"/analysis-scripts/list_files.py "$@";
         ;;
     "list-functions")
         shift;
@@ -236,7 +237,7 @@ case "$command" in
         ;;
     "find-fun")
         shift;
-        "${FRAMAC_SHARE}"/analysis-scripts/find_fun.py "$@";
+        "${FRAMAC_LIB}"/analysis-scripts/find_fun.py "$@";
         ;;
     "flamegraph")
         shift;
@@ -244,7 +245,7 @@ case "$command" in
         ;;
     "summary")
         shift;
-        "${FRAMAC_SHARE}"/analysis-scripts/summary.py "$@";
+        "${FRAMAC_LIB}"/analysis-scripts/summary.py "$@";
         ;;
     "configure")
         shift;
@@ -252,31 +253,31 @@ case "$command" in
         ;;
     "heuristic-print-callgraph")
         shift;
-        ${FRAMAC_SHARE}/analysis-scripts/print_callgraph.py "$@";
+        ${FRAMAC_LIB}/analysis-scripts/print_callgraph.py "$@";
         ;;
     "heuristic-detect-recursion")
         shift;
-        ${FRAMAC_SHARE}/analysis-scripts/detect_recursion.py "$@";
+        ${FRAMAC_LIB}/analysis-scripts/detect_recursion.py "$@";
         ;;
     "heuristic-list-functions")
         shift;
-        ${FRAMAC_SHARE}/analysis-scripts/heuristic_list_functions.py "$@";
+        ${FRAMAC_LIB}/analysis-scripts/heuristic_list_functions.py "$@";
         ;;
     "estimate-difficulty")
         shift;
-        ${FRAMAC_SHARE}/analysis-scripts/estimate_difficulty.py "$@";
+        ${FRAMAC_LIB}/analysis-scripts/estimate_difficulty.py "$@";
         ;;
     "make-wrapper")
         shift;
-        "${FRAMAC_SHARE}"/analysis-scripts/make_wrapper.py "$0" "$@";
+        "${FRAMAC_LIB}"/analysis-scripts/make_wrapper.py "$0" "$@";
         ;;
     "normalize-jcdb")
         shift;
-        "${FRAMAC_SHARE}"/analysis-scripts/normalize_jcdb.py "$@";
+        "${FRAMAC_LIB}"/analysis-scripts/normalize_jcdb.py "$@";
         ;;
     "creduce")
         shift;
-        ${FRAMAC_SHARE}/analysis-scripts/creduce.sh "$@";
+        ${FRAMAC_LIB}/analysis-scripts/creduce.sh "$@";
         ;;
     *)
         echo "error: unrecognized command: $command";
