@@ -35,6 +35,9 @@ let is_gui = Frama_c_very_first.Gui_init.is_gui
 let datadirs = (List.map Filepath.Normalized.of_string Config_data.Sites.share)
 let datadir = List.hd (List.rev datadirs)
 
+let libdirs = (List.map Filepath.Normalized.of_string Config_data.Sites.lib)
+let libdir = List.hd (List.rev libdirs)
+
 let plugin_dir = List.map Filepath.Normalized.of_string Config_data.Sites.plugins
 
 let plugin_path =
