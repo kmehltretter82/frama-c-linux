@@ -2,7 +2,7 @@
  EXIT: 1
    STDOPT:
 */
-
+#include "__fc_builtin.h"
 int x,y,z;
 
 int main(int c){

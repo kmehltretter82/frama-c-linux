@@ -512,6 +512,12 @@ extern long long Frama_C_abstract_max(long long i);
     assigns \result \from i; */
 extern long long Frama_C_abstract_min(long long i);
 
+/*@ assigns \nothing; */
+extern void Frama_C_watch_value(void *p, size_t size, int i, int n);
+
+/*@ assigns \nothing; */
+extern void Frama_C_watch_cardinal(void *p, size_t size, int i, int n);
+
 unsigned int volatile __fc_unsigned_int_entropy;
 long volatile __fc_long_entropy;
 unsigned long volatile __fc_unsigned_long_entropy;

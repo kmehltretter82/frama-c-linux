@@ -113,8 +113,8 @@ let watch_hook (stmt, _callstack, states) =
          in
          if watching
          then begin
-           Self.feedback ~once:true ~current:true
-             "Watchpoint: %a %a%t"
+           Self.warning ~wkey:Self.wkey_watchpoint ~once:true ~current:true
+             "%a %a%t"
              Printer.pp_exp name
              V.pretty vs
              Eva_utils.pp_callstack;

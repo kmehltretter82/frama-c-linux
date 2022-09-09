@@ -191,6 +191,12 @@ extern long long Frama_C_abstract_max(long long i);
 //@ assigns \result \from i;
 extern long long Frama_C_abstract_min(long long i);
 
+//@ assigns \nothing;
+extern void Frama_C_watch_value(void *p, size_t size, int i, int n);
+
+//@ assigns \nothing;
+extern void Frama_C_watch_cardinal(void *p, size_t size, int i, int n);
+
 __END_DECLS
 
 __POP_FC_STDLIB
