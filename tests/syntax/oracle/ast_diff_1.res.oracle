@@ -19,9 +19,11 @@
 [AST diff test] Variable x:  => x
 [AST diff test] Variable c:  => c
 [AST diff test] Variable g:  => g
+[AST diff test] Variable se:  => se
+[AST diff test] Variable S:  => S
 [AST diff test] Variable has_static_local_x:  => has_static_local_y
-[AST diff test] Variable __retres:  => __retres
 [AST diff test] Variable h:  => h
+[AST diff test] Variable __retres:  => __retres
 [AST diff test] Variable use_logic_builtin:  => use_logic_builtin
 [AST diff test] Variable x:  => x
 [AST diff test] Variable y:  => y
@@ -36,6 +38,7 @@
 [AST diff test] Function f:  => f
 [AST diff test] Function with_goto_unchanged:  => with_goto_unchanged
 [AST diff test] Function g: N/A
+[AST diff test] Function se:  => se
 [AST diff test] Function h: -> h (body changed)
 [AST diff test] Function use_logic_builtin:  => use_logic_builtin
 [AST diff test] Function has_static_local:  => has_static_local

@@ -1357,7 +1357,16 @@ and enuminfo_correspondance ?loc ei env =
   in
   Enuminfo.memo add ei
 
-and enumitem_correspondance ?loc:_loc ei _env = Enumitem.find ei
+(* For now, all enumitems are treated with their parent enuminfo: if
+   we don't find one, we let enuminfo_correspondance do the job. *)
+and enumitem_correspondance ?loc ei env =
+  let add ei =
+    match enuminfo_correspondance ?loc ei.eihost env with
+    | `Not_present -> `Not_present
+    | `Same _ -> Enumitem.find ei
+  in
+  try Enumitem.find ei with
+  | Not_found -> add ei
 
 and gvar_correspondance ?loc vi env =
   let add vi =
