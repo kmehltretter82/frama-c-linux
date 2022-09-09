@@ -87,3 +87,12 @@ void with_goto_unchanged(int c) {
   L1: X++;
   L2: X++;
 }
+
+enum e { t = 1 };
+
+struct s { char c[t]; };
+
+void se() {
+  struct s S;
+  S.c[0] = 1;
+}
