@@ -501,8 +501,7 @@ plug-in; each file will be explained later.
          +- test1.err.oracle
          +- ...
       +- result
-         +- test1.res.log
-         +- test1.err.log
+         +- test1.0.exec.wtests
          +- ...
   +- ...
 \end{shell}
@@ -707,7 +706,6 @@ Here's a summarized list of operations in order to add a new test:
 \item Create a test case (\texttt{.c} or \texttt{.i} file in
   \texttt{tests/<suite>}).
 \item Add a \texttt{run.config} header to the test.
-\item \verb|frama-c-ptests|
 \item \verb|frama-c-ptests -create-missing-oracles|
 \item \verb|dune build @ptests|
 \item Manually inspect oracle diffs to check that they are ok.
