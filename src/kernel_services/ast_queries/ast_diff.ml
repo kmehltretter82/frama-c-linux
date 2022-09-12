@@ -187,6 +187,12 @@ type is_same_env =
        We thus collect them in the environment.
     *)
     goto_targets: (stmt * stmt) list;
+    (* enum items are added collectively when the whole enuminfo is
+       found to be identical (or not). On the other hand, the
+       definition of an enumitem can refer to the previous ones in the
+       same enuminfo. We keep the list of previously visited tags here.
+    *)
+    enumitem: enumitem Cil_datatype.Enumitem.Map.t;
   }
 
 module type Correspondence_table = sig
@@ -271,7 +277,8 @@ let empty_env =
     logic_type_info = Cil_datatype.Logic_type_info.Map.empty;
     logic_local_vars = Cil_datatype.Logic_var.Map.empty;
     logic_type_vars = Datatype.String.Map.empty;
-    goto_targets = []
+    goto_targets = [];
+    enumitem = Cil_datatype.Enumitem.Map.empty;
   }
 
 let add_locals f f' env =
@@ -915,9 +922,12 @@ and is_same_compinfo ci ci' env =
   is_same_opt (is_same_list is_same_fieldinfo) ci.cfields ci'.cfields env
 
 and is_same_enuminfo ei ei' env =
-  Cil_datatype.Attributes.equal ei.eattr ei'.eattr &&
-  Ikind.equal ei.ekind ei'.ekind &&
-  is_same_list is_same_enumitem ei.eitems ei'.eitems env
+  let res, _ =
+    (Cil_datatype.Attributes.equal ei.eattr ei'.eattr &&
+     Ikind.equal ei.ekind ei'.ekind, env) &&&
+    is_same_list_env is_same_enumitem ei.eitems ei'.eitems
+  in
+  res
 
 and is_same_fieldinfo fi fi' env =
   (* we don't compare names: it's the order in which they appear in the
@@ -927,7 +937,12 @@ and is_same_fieldinfo fi fi' env =
   is_same_opt (fun x y _ -> x = y) fi.fbitfield fi'.fbitfield env &&
   Cil_datatype.Attributes.equal fi.fattr fi'.fattr
 
-and is_same_enumitem ei ei' env = is_same_exp ei.eival ei'.eival env
+and is_same_enumitem ei ei' env =
+  if is_same_exp ei.eival ei'.eival env then
+    true,
+    { env with enumitem = Cil_datatype.Enumitem.Map.add ei ei' env.enumitem }
+  else
+    false, env
 
 and is_same_formal (_,t,a) (_,t',a') env =
   is_same_type t t' env && Cil_datatype.Attributes.equal a a'
@@ -1365,8 +1380,11 @@ and enumitem_correspondence ?loc ei env =
     | `Not_present -> `Not_present
     | `Same _ -> Enumitem.find ei
   in
-  try Enumitem.find ei with
-  | Not_found -> add ei
+  match Cil_datatype.Enumitem.Map.find_opt ei env.enumitem with
+  | Some ei' -> `Same ei'
+  | None ->
+    (try Enumitem.find ei with
+     | Not_found -> add ei)
 
 and gvar_correspondence ?loc vi env =
   let add vi =

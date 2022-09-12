@@ -88,7 +88,10 @@ void with_goto_unchanged(int c) {
   L2: X++;
 }
 
-enum e { t = 1 };
+enum e {
+  t = 1,
+  u = t + 2
+};
 
 struct s { char c[t]; };
 
