@@ -87,7 +87,8 @@ process_file ()
   sedi "$file" \
    -e 's/Extlib\.id/Fun.id/g' \
    -e 's/Extlib\.swap/Fun.flip/g' \
-   -e 's/Extlib\.xor/(<>)/g'
+   -e 's/Extlib\.xor/(<>)/g' \
+   -e 's/Extlib\.iteri/List.iteri/g'
    # this line left empty on purpose
 }
 

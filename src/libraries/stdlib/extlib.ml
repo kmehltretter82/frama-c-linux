@@ -165,8 +165,6 @@ let opt_of_list =
   | [a] -> Some a
   | _ -> raise (Invalid_argument "Extlib.opt_of_list")
 
-let iteri f l = let i = ref 0 in List.iter (fun x -> f !i x; incr i) l
-
 let mapi f l =
   let res =
     snd (List.fold_left (fun (i,acc) x -> (i+1,f i x :: acc)) (0,[]) l)

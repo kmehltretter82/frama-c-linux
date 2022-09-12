@@ -139,11 +139,6 @@ val opt_of_list: 'a list -> 'a option
     @raise Invalid_argument on lists with more than one argument
     @since Oxygen-20120901 *)
 
-val iteri: (int -> 'a -> unit) -> 'a list -> unit
-(** Same as iter, but the function to be applied take also as argument the
-    index of the element (starting from 0). Tail-recursive
-    @since Nitrogen-20111001 *)
-
 val mapi: (int -> 'a -> 'b) -> 'a list -> 'b list
 (** Same as map, but the function to be applied take also as argument the
     index of the element (starting from 0). Tail-recursive
