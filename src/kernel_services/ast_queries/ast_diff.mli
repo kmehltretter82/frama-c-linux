@@ -30,10 +30,10 @@ open Cil_types
 (** the original project from which a diff is computed. *)
 module Orig_project: State_builder.Option_ref with type data = Project.t
 
-(** possible correspondances between new items and original ones. *)
-type 'a correspondance =
+(** possible correspondences between new items and original ones. *)
+type 'a correspondence =
   [ `Same of 'a (** symbol with identical definition has been found. *)
-  | `Not_present (** no correspondance *)
+  | `Not_present (** no correspondence *)
   ]
 
 (** for kernel function, we are a bit more precise than a yes/no answer.
@@ -42,80 +42,80 @@ type 'a correspondance =
     the body itself is identical, otherwise, there's no point in checking
     the callees.
 *)
-type partial_correspondance =
+type partial_correspondence =
   [ `Spec_changed (** body and callees haven't changed *)
   | `Body_changed (** spec hasn't changed *)
   | `Callees_changed (** spec and body haven't changed *)
   | `Callees_spec_changed (** body hasn't changed *)
   ]
 
-type 'a code_correspondance =
-  [ 'a correspondance
-  | `Partial of 'a * partial_correspondance
+type 'a code_correspondence =
+  [ 'a correspondence
+  | `Partial of 'a * partial_correspondence
   ]
 
-module type Correspondance_table = sig
+module type Correspondence_table = sig
   include State_builder.Hashtbl
   val pretty_data: Format.formatter -> data -> unit
 end
 
-(** varinfos correspondances *)
+(** varinfos correspondences *)
 module Varinfo:
-  Correspondance_table
-  with type key = varinfo and type data = varinfo correspondance
+  Correspondence_table
+  with type key = varinfo and type data = varinfo correspondence
 
 module Compinfo:
-  Correspondance_table
-  with type key = compinfo and type data = compinfo correspondance
+  Correspondence_table
+  with type key = compinfo and type data = compinfo correspondence
 
 module Enuminfo:
-  Correspondance_table
-  with type key = enuminfo and type data = enuminfo correspondance
+  Correspondence_table
+  with type key = enuminfo and type data = enuminfo correspondence
 
 module Enumitem:
-  Correspondance_table
-  with type key = enumitem and type data = enumitem correspondance
+  Correspondence_table
+  with type key = enumitem and type data = enumitem correspondence
 
 module Typeinfo:
-  Correspondance_table
-  with type key = typeinfo and type data = typeinfo correspondance
+  Correspondence_table
+  with type key = typeinfo and type data = typeinfo correspondence
 
 module Stmt:
-  Correspondance_table
-  with type key = stmt and type data = stmt code_correspondance
+  Correspondence_table
+  with type key = stmt and type data = stmt code_correspondence
 
 module Logic_info:
-  Correspondance_table
-  with type key = logic_info and type data = logic_info correspondance
+  Correspondence_table
+  with type key = logic_info and type data = logic_info correspondence
 
 module Logic_type_info:
-  Correspondance_table
-  with type key = logic_type_info and type data = logic_type_info correspondance
+  Correspondence_table
+  with type key = logic_type_info and type data = logic_type_info correspondence
 
 module Logic_ctor_info:
-  Correspondance_table
-  with type key = logic_ctor_info and type data = logic_ctor_info correspondance
+  Correspondence_table
+  with type key = logic_ctor_info and type data = logic_ctor_info correspondence
 
 module Fieldinfo:
-  Correspondance_table
-  with type key = fieldinfo and type data = fieldinfo correspondance
+  Correspondence_table
+  with type key = fieldinfo and type data = fieldinfo correspondence
 
 module Model_info:
-  Correspondance_table
-  with type key = model_info and type data = model_info correspondance
+  Correspondence_table
+  with type key = model_info and type data = model_info correspondence
 
 module Logic_var:
-  Correspondance_table
-  with type key = logic_var and type data = logic_var correspondance
+  Correspondence_table
+  with type key = logic_var and type data = logic_var correspondence
 
 module Kernel_function:
-  Correspondance_table
+  Correspondence_table
   with type key = kernel_function
-   and type data = kernel_function code_correspondance
+   and type data = kernel_function code_correspondence
 
 module Fundec:
-  Correspondance_table
-  with type key = fundec and type data = fundec correspondance
+  Correspondence_table
+  with type key = fundec and type data = fundec correspondence
 
 (** performs a comparison of AST between the current and the original
     project, which must have been set beforehand.
