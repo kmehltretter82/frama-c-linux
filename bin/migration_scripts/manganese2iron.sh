@@ -88,7 +88,8 @@ process_file ()
    -e 's/Extlib\.id/Fun.id/g' \
    -e 's/Extlib\.swap/Fun.flip/g' \
    -e 's/Extlib\.xor/(<>)/g' \
-   -e 's/Extlib\.iteri/List.iteri/g'
+   -e 's/Extlib\.iteri/List.iteri/g' \
+   -e 's/Extlib\.iteri/List.mapi/g'
    # this line left empty on purpose
 }
 

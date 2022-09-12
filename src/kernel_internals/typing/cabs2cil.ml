@@ -4386,7 +4386,7 @@ let default_argument_promotion idx exp =
 (* Promote variadic arguments with standard argument promotions.*)
 let promote_variadic_arguments (chunk,args) =
   let args =
-    Extlib.mapi
+    List.mapi
       (fun i arg -> snd (default_argument_promotion i arg))
       args
   in
@@ -6934,7 +6934,7 @@ and doExp local_env
                warn_no_proto f;
                let (prm_types,args) =
                  List.split
-                   (Extlib.mapi default_argument_promotion args)
+                   (List.mapi default_argument_promotion args)
                in
                let typ = TFun (resType, Some prm_types, false,attrs) in
                Cil.update_var_type f typ;

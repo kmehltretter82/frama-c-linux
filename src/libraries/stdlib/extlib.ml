@@ -165,11 +165,6 @@ let opt_of_list =
   | [a] -> Some a
   | _ -> raise (Invalid_argument "Extlib.opt_of_list")
 
-let mapi f l =
-  let res =
-    snd (List.fold_left (fun (i,acc) x -> (i+1,f i x :: acc)) (0,[]) l)
-  in List.rev res
-
 let subsets k l =
   let rec aux k l len =
     if k = 0 then [[]]

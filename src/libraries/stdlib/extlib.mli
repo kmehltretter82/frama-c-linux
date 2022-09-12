@@ -139,11 +139,6 @@ val opt_of_list: 'a list -> 'a option
     @raise Invalid_argument on lists with more than one argument
     @since Oxygen-20120901 *)
 
-val mapi: (int -> 'a -> 'b) -> 'a list -> 'b list
-(** Same as map, but the function to be applied take also as argument the
-    index of the element (starting from 0). Tail-recursive
-    @since Oxygen-20120901 *)
-
 val subsets: int -> 'a list -> 'a list list
 (** [subsets k l] computes the combinations of [k] elements from list [l].
     E.g. subsets 2 [1;2;3;4] = [[1;2];[1;3];[1;4];[2;3];[2;4];[3;4]].
