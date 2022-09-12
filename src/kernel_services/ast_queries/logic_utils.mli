@@ -168,7 +168,7 @@ val expr_to_term : ?coerce:bool -> exp -> term
     [expr_to_predicate] instead.
 
     @before 21.0-Scandium was unsound in many cases.
-    @plugin development guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 
 val expr_to_predicate: exp -> predicate

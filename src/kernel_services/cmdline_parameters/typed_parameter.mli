@@ -24,7 +24,7 @@
     This is a low level API, internally used by the kernel. As a plug-in
     developer, you certainly prefer to use the API of {!Plugin} instead.
     @since Nitrogen-20111001
-    @plugin development guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 
 (** generic accessor type *)

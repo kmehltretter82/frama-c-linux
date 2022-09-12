@@ -45,10 +45,10 @@ type 'a t = private
 (** A type with its type value. *)
 module type Ty = sig
   type t
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val ty: t Type.t
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 end
 
 (** All values associated to a datatype, excepted [copy].
@@ -73,7 +73,7 @@ module type S_no_copy = sig
 
   val equal: t -> t -> bool
   (** Equality: same spec than [Stdlib.(=)].
-      @plugin development guide
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
   *)
 
   val compare: t -> t -> int
@@ -84,7 +84,7 @@ module type S_no_copy = sig
 
   val pretty: Format.formatter -> t -> unit
   (** Pretty print each value in an user-friendly way.
-      @plugin development guide
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
   *)
 
   val mem_project: (Project_skeleton.t -> bool) -> t -> bool
@@ -270,16 +270,16 @@ end
 (** A datatype for a type [t] extended with predefined set, map and hashtbl
     over [t].
 
-    @plugin development guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 module type S_with_collections = sig
   include S
   module Set: Set with type elt = t
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   module Map: Map with type key = t
   module Hashtbl: Hashtbl with type key = t
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 end
 
 (** Generic comparable datatype builder: functions [equal], [compare] and
