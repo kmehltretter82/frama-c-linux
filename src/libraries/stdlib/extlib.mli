@@ -177,9 +177,6 @@ val list_slice: ?first:int -> ?last:int -> 'a list -> 'a list
 (** {2 Options} *)
 (* ************************************************************************* *)
 
-val opt_fold: ('a -> 'b -> 'b) -> 'a option -> 'b -> 'b
-(** @since Oxygen-20120901 *)
-
 (** [merge f k a b]  returns
     - [None] if both [a] and [b] are [None]
     - [Some a'] (resp. [b'] if [b] (resp [a]) is [None]

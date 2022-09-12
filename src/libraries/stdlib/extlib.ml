@@ -220,11 +220,6 @@ let list_slice ?(first = 0) ?last l =
 (** {2 Options} *)
 (* ************************************************************************* *)
 
-let opt_fold f o b =
-  match o with
-  | None -> b
-  | Some a -> f a b
-
 let merge_opt f k o1 o2 =
   match o1,o2 with
   | None, None -> None

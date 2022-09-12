@@ -266,14 +266,16 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
      abstraction of the domain itself. *)
   let assume _stmt _expr _pos = update
 
-  let start_recusive_call recursion state =
+  let start_recursive_call recursion state =
     let state = remove_variables recursion.withdrawal state in
     (* No collision should occur in the substitution. *)
     let decide _key _v1 _v2 = assert false in
     snd (replace_key ~decide recursion.base_substitution state)
 
   let start_call _stmt call recursion _valuation state =
-    let state = Extlib.opt_fold start_recusive_call recursion state in
+    let state =
+      let start_recursive_call r = start_recursive_call r state in
+      Option.fold ~some:start_recursive_call ~none:state recursion in
     let bind_argument state argument =
       let typ = argument.formal.vtype in
       let loc = Main_locations.PLoc.eval_varinfo argument.formal in
@@ -292,7 +294,8 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
 
   let finalize_call _stmt call recursion ~pre ~post =
     let kf_name = Kernel_function.get_name call.kf in
-    let post = Extlib.opt_fold (finalize_recursive_call ~pre) recursion post in
+    let finalize a = finalize_recursive_call ~pre a post in
+    let post = Option.fold ~some:finalize ~none:post recursion in
     match find_builtin kf_name, call.return with
     | None, _ | _, None   -> `Value post
     | Some f, Some return ->

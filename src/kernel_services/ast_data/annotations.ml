@@ -694,12 +694,14 @@ let fold_disjoint f =
     (fun f l acc -> List.fold_left (Fun.flip f) acc l)
     f
 
+let fold_opt_spec f opt default =
+  Option.fold ~some:(fun v -> f v default) ~none:default opt
+
 let fold_terminates f =
-  fold_spec_gen
-    (fun s -> s.spec_terminates) Extlib.opt_fold f
+  fold_spec_gen (fun s -> s.spec_terminates) fold_opt_spec f
 
 let fold_decreases f =
-  fold_spec_gen (fun s -> s.spec_variant) Extlib.opt_fold f
+  fold_spec_gen (fun s -> s.spec_variant) fold_opt_spec f
 
 let fold_bhv_gen get fold f kf b acc =
   let get spec =

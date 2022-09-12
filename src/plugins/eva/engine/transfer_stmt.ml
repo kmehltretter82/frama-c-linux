@@ -579,7 +579,8 @@ module Make (Abstract: Abstractions.Eva) = struct
     >>=: fun (args, valuation) ->
     let call = create_call stmt kf args in
     let recursion = Recursion.make call in
-    let call = Extlib.opt_fold replace_recursive_call recursion call in
+    let replace a = replace_recursive_call a call in
+    let call = Option.fold ~some:replace ~none:call recursion in
     call, recursion, valuation
 
   (* ----------------- show_each and dump_each directives ------------------- *)
