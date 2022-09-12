@@ -20,64 +20,143 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Wp_parameters = Wp_parameters
-module Ctypes = Ctypes
-module Clabels = Clabels
+(** This the API of the WP plug-in *)
+
+(** {1 WP Core calculus} *)
+
+module CfgAnnot = CfgAnnot
+module CfgCalculus = CfgCalculus
+module CfgCompiler = CfgCompiler
+module CfgDump = CfgDump
+module CfgGenerator = CfgGenerator
+module CfgInfos = CfgInfos
+module CfgInit = CfgInit
+module CfgWP = CfgWP
+
+(** {1 Memory models}*)
+
+module MemDebug = MemDebug
+module MemEmpty = MemEmpty
+module MemLoader = MemLoader
+module MemMemory = MemMemory
+module MemRegion = MemRegion
+module MemTyped = MemTyped
+module MemVal = MemVal
+module MemVar = MemVar
+module MemZeroAlias = MemZeroAlias
+
+(** {2 Alias analysis and hypotheses}*)
+
 module MemoryContext = MemoryContext
-module LogicUsage = LogicUsage
 module RefUsage = RefUsage
-module NormatLabels = NormAtLabels
-module WpPropId = WpPropId
-module Mcfg = Mcfg
-module Context = Context
-module Warning = Warning
-module Lang = Lang
-module Repr = Repr
-module Passive = Passive
-module Splitter = Splitter
-module LogicBuiltins = LogicBuiltins
-module Definitions = Definitions
-module Cint =   Cint
-module Cfloat = Cfloat
-module Vset = Vset
-module Cstring = Cstring
-module Sigs = Sigs
-module Mstate = Mstate
-module Conditions = Conditions
-module Filtering = Filtering
-module Plang = Plang
-module Pcfg = Pcfg
-module Pcond = Pcond
+module WpTarget = WpTarget
+
+(** {1 Compiler}*)
+
 module CodeSemantics = CodeSemantics
+module Conditions = Conditions
+module Definitions = Definitions
+module LogicAssigns = LogicAssigns
+module LogicBuiltins = LogicBuiltins
 module LogicCompiler = LogicCompiler
 module LogicSemantics = LogicSemantics
-module Sigma = Sigma
-module MemVar = MemVar
-module MemTyped = MemTyped
-module CfgCompiler = CfgCompiler
+module LogicUsage = LogicUsage
 module StmtSemantics = StmtSemantics
-module Factory = Factory
-module Driver = Driver
-module VCS = VCS
-module Tactical = Tactical
-module Strategy = Strategy
-module Auto = Auto
-module VC = VC
-module Wpo = Wpo
-module ProverTask = ProverTask
-module Prover = Prover
-module AssignsCompleteness = AssignsCompleteness
 
-(** For gui *)
-module ProofEngine = ProofEngine
-module ProofScript = ProofScript
+module AssignsCompleteness = AssignsCompleteness
+module Cache = Cache
+module Cfloat = Cfloat
+module Cint = Cint
+module Clabels = Clabels
+module Cleaning = Cleaning
+module Cmath = Cmath
+module Context = Context
+module Cstring = Cstring
+module Ctypes = Ctypes
+module Cvalues = Cvalues
+module Driver = Driver
+module Dyncall = Dyncall
+module Factory = Factory
+module Filter_axioms = Filter_axioms
+module Filtering = Filtering
+module Footprint = Footprint
+module Generator = Generator
+module Lang = Lang
+module Layout = Layout
+module Letify = Letify
+module Matrix = Matrix
+module Mstate = Mstate
+module NormAtLabels = NormAtLabels
+module Passive = Passive
+module Pcfg = Pcfg
+module Pcond = Pcond
+module Plang = Plang
 module ProofSession = ProofSession
+module Prover = Prover
 module ProverScript = ProverScript
 module ProverSearch = ProverSearch
-module WpRTE = WpRTE
-module Rformat = Rformat
-module WpContext = WpContext
-module Why3Provers = Why3Provers
+module ProverTask = ProverTask
 module ProverWhy3 = ProverWhy3
-module Cache = Cache
-module WpTarget = WpTarget
+
+module RegionAccess = RegionAccess
+module RegionAnalysis = RegionAnalysis
+module RegionAnnot = RegionAnnot
+module RegionDump = RegionDump
+module Region = Region
+module Register = Register
+module Repr = Repr
+module Rformat = Rformat
+module Sigma = Sigma
+module Sigs = Sigs
+module Splitter = Splitter
+module Stats = Stats
+module VC = VC
+module VCS = VCS
+module Warning = Warning
+module Why3Provers = Why3Provers
+module WpContext = WpContext
+module Wp_error = Wp_error
+module Wp_eva = Wp_eva
+module Wpo = Wpo
+module Wp_parameters = Wp_parameters
+module WpPropId = WpPropId
+module WpReached = WpReached
+module WpReport = WpReport
+module Wprop = Wprop
+module WpRTE = WpRTE
+module WpTac = WpTac
+
+(** {1 Interactive proof} *)
+
+module Auto = Auto
+module ProofEngine = ProofEngine
+module ProofScript = ProofScript
+module Script = Script
+module Strategy = Strategy
+module Tactical = Tactical
+
+(** {2 Tactics}*)
+
+module TacArray = TacArray
+module TacBitrange = TacBitrange
+module TacBittest = TacBittest
+module TacBitwised = TacBitwised
+module TacChoice = TacChoice
+module TacClear = TacClear
+module TacCompound = TacCompound
+module TacCongruence = TacCongruence
+module TacCut = TacCut
+module TacFilter = TacFilter
+module TacHavoc = TacHavoc
+module TacInduction = TacInduction
+module TacInstance = TacInstance
+module TacLemma = TacLemma
+module TacModMask = TacModMask
+module TacNormalForm = TacNormalForm
+module TacOverflow = TacOverflow
+module TacRange = TacRange
+module TacRewrite = TacRewrite
+module TacSequence = TacSequence
+module TacShift = TacShift
+module TacSplit = TacSplit
+module TacUnfold = TacUnfold
