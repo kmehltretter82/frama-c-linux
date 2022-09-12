@@ -754,9 +754,9 @@ struct
 
   let in_state st f x =
     let old = !state in
-    Extlib.try_finally
+    Stdlib.Fun.protect
       ~finally:(fun () -> state := old)
-      (fun x -> state := st; f x) x
+      (fun () -> state := st; f x)
 
   let clock = ref true
   let constants = ref Tset.empty

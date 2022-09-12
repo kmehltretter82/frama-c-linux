@@ -262,13 +262,7 @@ val format_string_of_stag: Format.stag -> string
 external address_of_value: 'a -> int = "address_of_value" [@@noalloc]
 
 (* ************************************************************************* *)
-(** {2 Exception catcher} *)
-(* ************************************************************************* *)
-
-val try_finally: finally:(unit -> unit) -> ('a -> 'b) -> 'a -> 'b
-
-(* ************************************************************************* *)
-(** System commands *)
+(** {2 System commands} *)
 (* ************************************************************************* *)
 
 val mkdir : ?parents:bool -> string -> Unix.file_perm -> unit
@@ -311,7 +305,7 @@ val safe_remove: string -> unit
 val safe_remove_dir: string -> unit
 
 (* ************************************************************************* *)
-(** Comparison functions *)
+(** {2 Comparison functions} *)
 (* ************************************************************************* *)
 
 (** Use this function instead of [Stdlib.compare], as this makes

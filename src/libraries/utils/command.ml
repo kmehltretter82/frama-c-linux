@@ -68,12 +68,12 @@ let rec bincopy buffer cin cout =
 let on_inc file job =
   let inc = open_in file in
   let finally () = safe_close_in inc in
-  Extlib.try_finally ~finally job inc
+  Fun.protect ~finally (fun () -> job inc)
 
 let on_out file job =
   let out = open_out file in
   let finally () = safe_close_out out in
-  Extlib.try_finally ~finally job out
+  Fun.protect ~finally (fun () -> job out)
 
 let copy src tgt =
   on_inc src
@@ -82,7 +82,7 @@ let copy src tgt =
 let read_file file job =
   let inc = open_in file in
   let finally () = safe_close_in inc in
-  Extlib.try_finally ~finally job inc
+  Fun.protect ~finally (fun () -> job inc)
 
 let read_lines file job =
   read_file file
@@ -97,14 +97,14 @@ let write_file file job =
   assert (file <> "");
   let out = open_out file in
   let finally () = flush out; safe_close_out out in
-  Extlib.try_finally ~finally job out
+  Fun.protect ~finally (fun () -> job out)
 
 let print_file file job =
   write_file file
     (fun out ->
        let fmt = Format.formatter_of_out_channel out in
        let finally () = Format.pp_print_flush fmt () in
-       Extlib.try_finally ~finally job fmt)
+       Fun.protect ~finally (fun () -> job fmt))
 
 (* -------------------------------------------------------------------------- *)
 (* --- Timing                                                             --- *)
