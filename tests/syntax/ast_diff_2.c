@@ -90,7 +90,10 @@ void with_goto_unchanged(int c) {
 
 enum e {
   t = 1,
-  u = t + 2
+  u = t + 2,
+#ifdef ADD_ENUM_TAG
+  v = t + u,
+#endif
 };
 
 struct s { char c[t]; };

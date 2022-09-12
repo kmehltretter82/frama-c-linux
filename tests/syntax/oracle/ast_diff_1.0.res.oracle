@@ -1,5 +1,5 @@
 [kernel] Parsing ast_diff_1.i (no preprocessing)
-[kernel] Parsing ast_diff_2.i (no preprocessing)
+[kernel] Parsing ast_diff_2.c (with preprocessing)
 [AST diff test] Showing correspondances between orig_default and default
 [AST diff test] Variable i:  => i
 [AST diff test] Variable local_var_use:  => local_var_use
