@@ -332,6 +332,25 @@ in case of \texttt{UNROLL} pragma.
 supported are typedefs redefinition.
 \end{description}
 
+\section{Incremental parsing} (experimental)\label{sec:incremental-parsing}
+
+Parsing large code bases takes a non-negligible amount of time.
+More importantly, non-modular analyses need to be recomputed in their entirety
+even for minuscule AST changes.
+
+In order to help deal with these issues, and to help support for future
+incremental analyses (which recompute results only for the modified AST parts
+and their dependencies), you can use option \optiondef{-}{ast-diff}.
+It enables computing the difference between a previous AST (loaded via
+option \verb|-load| (Section~\ref{sec:saveload}) and the AST computed from the
+current sources. This difference is stored by the \FramaC kernel and can be
+used by plug-ins which support it.
+
+{\em Note: currently, parsing and type-checking are systematically performed
+  even with this option, and \verb|-ast-diff| compares the normalized ASTs.
+  In the future, though, these steps should be refactored to allow saving
+  further time.}
+
 \section{Predefined macros}\label{sec:predefined-macros}
 
 \FramaC, like several compilers and code analysis tools, predefines and uses

@@ -42,6 +42,8 @@
 # FLAMEGRAPH    If set (to any value), running an analysis will produce an
 #               SVG + HTML flamegraph at the end.
 #
+# AST_DIFF      If set (to any value), enables usage of -ast-diff during parse.
+#
 # There are several ways to define or change these variables.
 #
 # With an environment variable:
@@ -62,6 +64,11 @@
 #
 # target.parse: file1.c file2.c file3.c...
 #
+# NOTE ABOUT AST_DIFF:
+# - If AST_DIFF is set to a non-empty value (e.g. `fcmake AST_DIFF=y`), then
+#   during parsing (rule %.parse), we check if there already exists a framac.sav
+#   file. If so, we rename it framac.reparse and, instead of parsing from zero,
+#   we reload this file and apply -ast-diff before reparsing the sources.
 
 # Test if Makefile is > 4.0
 ifneq (4.0,$(firstword $(sort $(MAKE_VERSION) 4.0)))
