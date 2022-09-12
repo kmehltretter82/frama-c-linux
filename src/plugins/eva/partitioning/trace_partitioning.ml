@@ -117,7 +117,9 @@ struct
   let smashed (s : store) : state Lattice_bounds.or_bottom =
     match expanded s with
     | [] -> `Bottom
-    | (_k, v1) :: l -> `Value (List.fold_left Domain.join v1 (List.map snd l))
+    | (_k, v1) :: l ->
+      let f acc (_k, v) = Domain.join acc v in
+      `Value (List.fold_left f v1 l)
 
   let contents (flow : flow) : state list =
     Flow.to_list flow
