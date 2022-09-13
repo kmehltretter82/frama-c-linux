@@ -344,7 +344,13 @@ and their dependencies), you can use option \optiondef{-}{ast-diff}.
 It enables computing the difference between a previous AST (loaded via
 option \verb|-load| (Section~\ref{sec:saveload}) and the AST computed from the
 current sources. This difference is stored by the \FramaC kernel and can be
-used by plug-ins which support it.
+used by plug-ins which support it. Note however that since \verb|-load| implies that
+files given on the command line are ignored, \verb|-load| and \verb|-ast-diff| with
+the list of C file to consider must be properly sequenced through the use of
+\verb|-then| or one of its variants (Section~\ref{sec:then}), as in:
+\begin{lstlisting}[language=shell]
+frama-c -load previous.sav -then -ast-diff file1.c file2.c [...]
+\end{lstlisting}
 
 {\em Note: currently, parsing and type-checking are systematically performed
   even with this option, and \verb|-ast-diff| compares the normalized ASTs.
