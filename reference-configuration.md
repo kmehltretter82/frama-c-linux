@@ -15,7 +15,7 @@ support libraries (notably gtksourceview). lablgtk3 should be preferred.
 - ocamlgraph.1.8.8
 - ppx_deriving_yojson.3.6.1 (for mdr, optional)
 - ppx_import.1.9.1
-- why3.1.5.0
+- why3.1.5.1
 - yojson.1.7.0
 - zarith.1.12
 
