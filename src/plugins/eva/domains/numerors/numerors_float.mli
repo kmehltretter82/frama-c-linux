@@ -114,9 +114,7 @@ val prec : t -> Precisions.t
 (** Returns the exponent of its input *)
 val exponent : t -> int
 
-(** Returns the significand of its input. This function is known to generate a
-    core dump if the version of your MPFR library is the 3.0.1. The version 4.0
-    of the library does not have the bug anymore. *)
+(** Returns the significand of its input. *)
 val significand : t -> t
 
 (** Returns a element containing the same value as <dst> but with the sign

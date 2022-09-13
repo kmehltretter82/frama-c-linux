@@ -133,7 +133,7 @@ depopts: [
   # libraries: because we use dynamic linking
   "apron"
   "coq"
-  "mlgmpidl"
+  "mlmpfr" { >= "4.1.0-bugfix2"}
   "zmq"
 ]
 

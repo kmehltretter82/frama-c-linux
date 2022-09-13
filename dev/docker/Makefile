@@ -119,7 +119,7 @@ apron.v0.9.12 \\\
 conf-graphviz.0.1 \\\
 dune.3.3.1 \\\
 dune-site.3.3.1 \\\
-mlgmpidl.1.2.12 \\\
+mlmpfr.4.1.0-bugfix2 \\\
 ocamlfind.1.8.1 \\\
 ocamlgraph.1.8.8 \\\
 ppx_deriving_yojson.3.6.1 \\\
