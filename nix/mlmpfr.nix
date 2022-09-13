@@ -8,7 +8,7 @@
 
 buildDunePackage rec {
   pname = "mlmpfr";
-  version = "4.1.0-bugfix1";
+  version = "4.1.0-bugfix2";
 
   minimumOCamlVersion = "4.04";
 
@@ -16,7 +16,7 @@ buildDunePackage rec {
     owner = "thvnx";
     repo = pname;
     rev = pname+"."+version;
-    sha256 = "13n6spgz5p6jhpjackvfsn33iinpadgr3v4gm63d5195mi9fgn8d";
+    sha256 = "19g26jv6cjinpl5pcjif1ldyaagxlandp3qjajsy8srqg4a5rg0d";
   };
 
   buildInputs = [ gmp mpfr ];
