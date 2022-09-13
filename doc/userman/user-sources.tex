@@ -346,7 +346,7 @@ option \verb|-load| (Section~\ref{sec:saveload}) and the AST computed from the
 current sources. This difference is stored by the \FramaC kernel and can be
 used by plug-ins which support it. Note however that since \verb|-load| implies that
 files given on the command line are ignored, \verb|-load| and \verb|-ast-diff| with
-the list of C file to consider must be properly sequenced through the use of
+the list of C files to consider must be properly sequenced through the use of
 \verb|-then| or one of its variants (Section~\ref{sec:then}), as in:
 \begin{lstlisting}[language=shell]
 frama-c -load previous.sav -then -ast-diff file1.c file2.c [...]
