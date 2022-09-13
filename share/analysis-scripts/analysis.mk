@@ -163,8 +163,8 @@ SHELL        := $(shell which bash)
 %.parse: SOURCES = $(filter-out %/command,$^)
 %.parse: PARSE = $(FRAMAC) \
                  $(if $(AST_DIFF),\
-                   $(if $(wildcard $@/framac.sav),\
-                    -load $@/framac.reparse -then -ast-diff,),) \
+                   $(if $(wildcard $@/framac.sav $*.eva/framac.sav),\
+                    -load $@/framac.reparse -then -no-eva -ast-diff,),) \
                  $(FCFLAGS) \
                  $(if $(value MACHDEP),-machdep $(MACHDEP),) \
                  -cpp-extra-args="$(CPPFLAGS)" $(SOURCES) \
@@ -173,8 +173,11 @@ SHELL        := $(shell which bash)
 	@$(call display_command,$(PARSE))
 	mkdir -p $@
 	$(if $(AST_DIFF),\
-          $(if $(wildcard $@/framac.sav),mv $@/framac.sav $@/framac.reparse,true)\
-          ,true)
+	  $(if $(wildcard $*.eva/framac.sav), \
+               mv $*.eva/framac.sav $@/framac.reparse,\
+               $(if $(wildcard $@/framac.sav), \
+                    mv $@/framac.sav $@/framac.reparse,true)),\
+          true)
 	mv -f $@/{command,running}
 	{
 	  $(call time_with_output,$@/stats.txt) \
