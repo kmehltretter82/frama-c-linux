@@ -31,12 +31,15 @@ stdenv.mkDerivation rec {
   prefixKey = "-prefix ";
 
   preConfigure = ''
-    configureFlagsArray=(--strict --libdir $out/lib/ocaml/${ocaml.version}/site-lib)
+    configureFlagsArray=(--strict -libdir $out/lib/ocaml/${ocaml.version}/site-lib)
     patchShebangs ./config/find_stuffversion.pl
     patchShebangs ./etc/META.pl
   '';
 
-  buildFlags = [ "world.opt" ];
+  buildPhase = ''
+    make world.opt
+    make all
+  '';
 
   dontStrip = true;
 

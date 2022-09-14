@@ -6,9 +6,9 @@ let
     camlp5 = oself.callPackage ./camlp5.nix {};
     camlzip = oself.callPackage ./camlzip.nix {};
     headache = oself.callPackage ./headache.nix {};
+    menhirLib = oself.callPackage ./menhirLib.nix {};
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
     ocp-indent = oself.callPackage ./ocp-indent.nix {};
-    odoc = oself.callPackage ./odoc.nix {};
     psmt2-frontend = oself.callPackage ./psmt2-frontend.nix {};
     why3 = oself.callPackage ./why3.nix {};
 
