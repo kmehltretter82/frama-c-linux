@@ -117,7 +117,7 @@ depends: [
   "conf-graphviz" { post }
   "conf-time" { with-test }
   "ppx_deriving_yojson"
-  "ocaml" { >= "4.08.1" }
+  "ocaml" { >= "4.11.1" }
   "ocamlfind" # needed beyond build stage, used by -load-module
   "ocamlgraph" { >= "1.8.8" }
   "why3" { >= "1.5.1" }
