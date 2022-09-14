@@ -134,7 +134,7 @@ module type Messages = sig
   type warn_category
   (** Same as above, but for warnings
       @since Chlorine-20180501
-      @plugin development guide
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
   *)
 
   val verbose_atleast : int -> bool
@@ -268,7 +268,7 @@ module type Messages = sig
       This kind of message denotes a fatal error aborting Frama-C.
       Notice that the [~emitwith] action is called iff a message is logged.
       @since 18.0-Argon
-      @plugin development guide
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
   *)
 
   val register : kind -> (event -> unit) -> unit
@@ -333,7 +333,7 @@ module type Messages = sig
   *)
 
   val register_warn_category: string -> warn_category
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val is_warn_category: string -> bool
 
@@ -353,7 +353,7 @@ module type Messages = sig
   val get_all_warn_categories_status: unit -> (warn_category * warn_status) list
 
   val set_warn_status: warn_category -> warn_status -> unit
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val get_warn_status: warn_category -> warn_status
 

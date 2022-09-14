@@ -89,7 +89,7 @@ val compute : unit -> unit
 
 val is_computed : unit -> bool
 (** Return [true] iff the Eva analysis has been done.
-    @plugin development guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 
 val self : State.t

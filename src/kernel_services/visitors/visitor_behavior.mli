@@ -99,7 +99,7 @@ module type Get = sig
   val enumitem: t -> enumitem -> enumitem
   val typeinfo: t -> typeinfo -> typeinfo
   val stmt: t -> stmt -> stmt
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val logic_info: t -> logic_info -> logic_info
   val logic_type_info: t -> logic_type_info -> logic_type_info
@@ -107,7 +107,7 @@ module type Get = sig
   val model_info: t -> model_info -> model_info
   val logic_var: t -> logic_var -> logic_var
   val kernel_function: t -> kernel_function -> kernel_function
-  (** @plugin development guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val fundec: t -> fundec -> fundec
 end
@@ -191,7 +191,7 @@ module Set: Set
     {!Cil_types.varinfo}: [Set_orig.varinfo vis vi new_original_repr].
 
     @since 20.0-Calcium
-    @plugin development guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 module Set_orig: Set
 

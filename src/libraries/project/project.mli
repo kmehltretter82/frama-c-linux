@@ -200,7 +200,7 @@ val register_before_remove_hook: (t -> unit) -> unit
 (* ************************************************************************* *)
 
 exception IOError of string
-(** @plugin development guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val save: ?selection:State_selection.t -> ?project:t -> Filepath.Normalized.t -> unit
 (** Save a given project in a file. Default project is [current ()].

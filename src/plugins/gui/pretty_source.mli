@@ -38,7 +38,7 @@ type localizable = Printer_tag.localizable =
       one in which the variable is declared. The [kinstr] argument is given
       for local variables with an explicit initializer.
 
-      @plugin development guide
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
   *)
   | PGlobal of global (** all globals but variable declarations and function
                           definitions. *)
