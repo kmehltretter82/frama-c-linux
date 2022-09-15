@@ -162,9 +162,6 @@ SHELL        := $(shell which bash)
 
 %.parse: SOURCES = $(filter-out %/command,$^)
 %.parse: PARSE = $(FRAMAC) \
-                 $(if $(AST_DIFF),\
-                   $(if $(wildcard $@/framac.sav $*.eva/framac.sav),\
-                    -load $@/framac.reparse -then -no-eva -ast-diff,),) \
                  $(FCFLAGS) \
                  $(if $(value MACHDEP),-machdep $(MACHDEP),) \
                  -cpp-extra-args="$(CPPFLAGS)" $(SOURCES) \
@@ -199,7 +196,14 @@ SHELL        := $(shell which bash)
 	mv $@/{running,command}
 	touch $@ # Update timestamp and prevent remake if nothing changes
 
-%.eva: EVA = $(FRAMAC) $(FCFLAGS) -eva $(EVAFLAGS)
+define incremental
+  $(if $(AST_DIFF),\
+    $(if $(wildcard $@/framac.sav),\
+      -eva-load $@/framac.sav,\
+      $(warning Cannot do incremental analysis: no previously saved state)))
+endef
+
+%.eva: EVA = $(FRAMAC) $(FCFLAGS) -eva $(call incremental,$1) $(EVAFLAGS)
 %.eva: PARSE_RESULT = $(word 1,$(subst ., ,$*)).parse
 %.eva: $$(PARSE_RESULT) $$(shell $(SHELL) $(DIR)cmd-dep.sh $$@/command $$(EVA)) $(if $(BENCHMARK),.FORCE,)
 	@$(call display_command,$(EVA))
@@ -208,13 +212,15 @@ SHELL        := $(shell which bash)
 	{
 	  $(call time_with_output,$@/stats.txt) \
 	    $(EVA) \
-	      -load $(PARSE_RESULT)/framac.sav -save $@/framac.sav \
+	      -load $(PARSE_RESULT)/framac.sav \
 	      -eva-flamegraph $@/flamegraph.txt \
 	      -kernel-log w:$@/warnings.log \
 	      -from-log w:$@/warnings.log \
 	      -inout-log w:$@/warnings.log \
 	      -scope-log w:$@/warnings.log \
 	      -eva-log w:$@/warnings.log \
+	      -then \
+              -remove-projects @all_but_current -save $@/framac.sav \
 	      -then \
 	      -report-csv $@/alarms.csv -report-no-proven \
 	      -report-log w:$@/warnings.log \
