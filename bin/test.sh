@@ -233,7 +233,7 @@ function TestFile
     if [ "$LOGS" = "yes" ]; then
         ALIAS=$DIR/$RESULT/$FILE
     else
-        ALIAS=$DIR/$RESULT/${FILE%.*}.wtests
+        ALIAS=$DIR/$RESULT/${FILE%.*}.diff
     fi
     Head "Register test on file $1 $CFG"
     DUNE_ALIAS="${DUNE_ALIAS} @$ALIAS"
