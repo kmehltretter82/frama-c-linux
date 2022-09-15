@@ -47,6 +47,11 @@ else
 FRAMAC_WP_CACHEDIR?=
 endif
 
+ifeq ($(PTEST_USE_WP_CACHE),yes)
+# we need these variable to be present in the shell environment of the commands
+export FRAMAC_WP_CACHEDIR FRAMAC_WP_CACHE
+endif
+
 ############
 # Default values necessary for make -f <this-makefile>
 

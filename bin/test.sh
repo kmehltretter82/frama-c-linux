@@ -31,7 +31,7 @@ SAVE=
 
 DUNE_OPT=
 DUNE_LOG=./.test-errors.log
-CACHEDIR=./.wp-cache
+CACHEDIR=$(pwd -P)/.wp-cache
 FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
 # --------------------------------------------------------------------------
@@ -73,7 +73,7 @@ function Usage
     echo ""
     echo "  FRAMAC_WP_QUALIF"
     echo "  FRAMAC_WP_CACHEDIR"
-    echo "    Location of wp-cache ($FRAMAC_WP_CACHEDIR)"
+    echo "    Absolute path to wp-cache directory ($FRAMAC_WP_CACHEDIR)"
     if [ ! -d $FRAMAC_WP_CACHEDIR ]; then
         echo "    About to clone from $FRAMAC_WP_CACHE_GIT"
     fi
@@ -141,6 +141,11 @@ function SetEnv
 
     [ ! -f "$FRAMAC_WP_CACHEDIR" ] || [ -d "$FRAMAC_WP_CACHEDIR" ] \
         || Error "$FRAMAC_WP_CACHEDIR is not a directory"
+
+    case "$FRAMAC_WP_CACHEDIR" in
+        /*);;
+        *) Error "Requires an absolute path to $FRAMAC_WP_CACHEDIR";;
+    esac
 
 }
 
