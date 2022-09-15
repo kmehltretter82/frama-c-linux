@@ -76,6 +76,14 @@ check-release:
     variables:
       - $RELEASE == "yes"
 
+# Observed: when several shell with same dependencies are started, deadlock may
+#           occur when building these dependencies. We build these dependencies
+#           before running the rest of the pipeline to avoid that.
+prepare-shell-checkers:
+  stage: prepare
+  script:
+    - ./nix/shell-checkers.sh "true"
+
 ################################################################################
 ### BUILD
 
