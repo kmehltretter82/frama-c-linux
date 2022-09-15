@@ -22,14 +22,19 @@
 
 open Cil_types
 
+type status_accessor =
+  string
+  * (Cil_types.kernel_function -> bool -> unit)
+  * (Cil_types.kernel_function -> bool)
+
 module type S = sig
   val is_computed: kernel_function -> bool
   val set: kernel_function -> bool -> unit
-  val accessor: Db.RteGen.status_accessor
+  val accessor: status_accessor
 end
 
 let states : State.t list ref = ref []
-let accessors : Db.RteGen.status_accessor list ref = ref []
+let accessors : status_accessor list ref = ref []
 
 module Make
     (M:sig
@@ -202,7 +207,6 @@ let proxy =
   State_builder.Proxy.create "RTE" State_builder.Proxy.Backward !states
 
 let self = State_builder.Proxy.get proxy
-let () = Db.RteGen.self := self
 
 let all_statuses = !accessors
 

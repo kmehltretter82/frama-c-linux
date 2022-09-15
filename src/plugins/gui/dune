@@ -30,6 +30,7 @@
           (echo "  - lablgtk2.sourceview2:" %{lib-available:lablgtk2.sourceview2} "\n")
           (echo "  - lablgtk3:" %{lib-available:lablgtk3} "\n")
           (echo "  - lablgtk3-sourceview3:" %{lib-available:lablgtk3-sourceview3} "\n")
+          (echo "  - Rtegen:" %{lib-available:frama-c-rtegen.core} "\n")
   )
   )
 )
@@ -58,7 +59,7 @@
         dgraph_helper
 )
   (flags -open Frama_c_kernel -linkall :standard -w -9)
-  (libraries frama-c.init.gui frama-c.kernel
+  (libraries frama-c.init.gui frama-c.kernel frama-c-rtegen.core
    (select gtk_compat.ml from
       (lablgtk2 lablgtk2.gnomecanvas lablgtk2.sourceview2 -> gtk_compat.2.ml)
       (lablgtk3 lablgtk3-sourceview3 -> gtk_compat.3.ml)

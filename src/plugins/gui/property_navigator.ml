@@ -408,7 +408,7 @@ open Refreshers
 
 (* Process the rte statuses for the given kf, and add the result in the
    accumulator. Filter the statuses according to user-selected filters*)
-let aux_rte kf acc (name, _, rte_status_get: Db.RteGen.status_accessor) =
+let aux_rte kf acc (name, _, rte_status_get: RteGen.Api.status_accessor) =
   let st = rte_status_get kf in
   match st, rteGenerated.get (), rteNotGenerated.get () with
   | true, true, _
@@ -705,7 +705,7 @@ let make_panel (main_ui:main_window_extension_points) =
          ) main_ui#file_tree#selected_globals)
     in
 
-    let rte_get_all_statuses = !Db.RteGen.get_all_status () in
+    let rte_get_all_statuses = RteGen.Api.get_all_status () in
     (* All non-filtered RTE statuses for a given function *)
     let rte_kf kf = List.fold_left (aux_rte kf) [] rte_get_all_statuses in
     (* Add RTE statuses for all functions. We cannot simply iterate over

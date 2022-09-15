@@ -20,6 +20,25 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Runtime Error Annotation Generation plugin.
+    @see <./index.html> internal documentation. *)
+
+(** Same result as having [-rte] on the command line*)
+val compute : unit -> unit
+
+(** Generates RTE for a single function. Uses the status of the various
+    RTE options do decide which kinds of annotations must be generated.
+*)
+val annotate_kf : Cil_types.kernel_function -> unit
+
+(** Generates all possible RTE for a given function. *)
+val do_all_rte : Cil_types.kernel_function -> unit
+
+(** Generates all possible RTE except pre-conditions for a given function. *)
+val do_rte : Cil_types.kernel_function -> unit
+
+val self: State.t
+
 type status_accessor =
   string (* name *)
   * (Cil_types.kernel_function -> bool -> unit) (* for each kf and each kind of
@@ -28,45 +47,18 @@ type status_accessor =
                                                    generated *)
   * (Cil_types.kernel_function -> bool) (* is this kind of annotation generated
                                            in kf? *)
-module type S = sig
-  val is_computed: Kernel_function.t -> bool
-  val set: Kernel_function.t -> bool -> unit
-  val accessor: status_accessor
-end
 
-(* No module for Trivial: dependency added for generators below *)
-
-module Initialized: S
-module Mem_access: S
-module Pointer_value: S
-module Pointer_call: S
-module Div_mod: S
-module Shift: S
-module Left_shift_negative: S
-module Right_shift_negative: S
-module Signed_overflow: S
-module Signed_downcast: S
-module Unsigned_overflow: S
-module Unsigned_downcast: S
-module Pointer_downcast: S
-module Float_to_int: S
-module Finite_float: S
-module Bool_value: S
-
-val all_statuses: status_accessor list
-
-(** The Emitter for Annotations registered by RTE *)
-val emitter: Emitter.t
-
-open Cil_types
-
-(** Returns all annotations actually {i registered} by RTE so far *)
-val get_registered_annotations: stmt -> code_annotation list
-
-val self: State.t
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
- *)
+val get_all_status : unit -> status_accessor list
+val get_divMod_status : unit -> status_accessor
+val get_initialized_status: unit -> status_accessor
+val get_memAccess_status : unit -> status_accessor
+val get_pointerCall_status: unit -> status_accessor
+val get_signedOv_status : unit -> status_accessor
+val get_signed_downCast_status : unit -> status_accessor
+val get_unsignedOv_status : unit -> status_accessor
+val get_unsignedDownCast_status : unit -> status_accessor
+val get_pointer_downcast_status : unit -> status_accessor
+val get_float_to_int_status : unit -> status_accessor
+val get_finite_float_status : unit -> status_accessor
+val get_pointer_value_status : unit -> status_accessor
+val get_bool_value_status : unit -> status_accessor

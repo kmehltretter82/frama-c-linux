@@ -20,81 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(* dedicated computations *)
-(* -------------------------------------------------------------------------- *)
+let _ignore =
+  Dynamic.register
+    ~comment:"Generate all RTE annotations in the given function."
+    ~plugin:"RteGen"
+    "do_all_rte"
+    (Datatype.func Kernel_function.ty Datatype.unit)
+    Api.do_all_rte
 
-(* annotate for all rte + unsigned overflows (which are not rte), for a given
-   function *)
-let do_all_rte kf =
-  let flags =
-    { (Flags.all ()) with
-      Flags.signed_downcast = false;
-      unsigned_downcast = false; }
-  in
-  Visit.annotate ~flags kf
-
-(* annotate for rte only (not unsigned overflows and downcasts) for a given
-   function *)
-let do_rte kf =
-  let flags =
-    { (Flags.all ()) with
-      Flags.unsigned_overflow = false;
-      signed_downcast = false;
-      unsigned_downcast = false; }
-  in
-  Visit.annotate ~flags kf
-
-let compute () =
-  (* compute RTE annotations, whether Enabled is set or not *)
-  Ast.compute () ;
-  let include_function kf =
-    let fsel = Options.FunctionSelection.get () in
-    Kernel_function.Set.is_empty fsel
-    || Kernel_function.Set.mem kf fsel
-  in
-  Globals.Functions.iter
-    (fun kf -> if include_function kf then !Db.RteGen.annotate_kf kf)
-
-let () =
-  Db.register Db.RteGen.annotate_kf Visit.annotate;
-  Db.register Db.RteGen.compute compute;
-  Db.register Db.RteGen.do_rte do_rte;
-
-  Db.register Db.RteGen.do_all_rte do_all_rte;
-  let _ignore =
-    Dynamic.register
-      ~comment:"Generate all RTE annotations in the given function."
-      ~plugin:"RteGen"
-      "do_all_rte"
-      (Datatype.func Kernel_function.ty Datatype.unit)
-      do_all_rte
-  in
-
-  let open Generator in
-  let open Db.RteGen in
-  let register_getter fctref fct =
-    Db.register fctref (fun () -> fct)
-  in
-  register_getter get_signedOv_status Signed_overflow.accessor;
-  register_getter get_divMod_status Div_mod.accessor;
-  register_getter get_initialized_status Initialized.accessor;
-  register_getter get_signed_downCast_status Signed_downcast.accessor;
-  register_getter get_memAccess_status Mem_access.accessor;
-  register_getter get_pointerCall_status Pointer_call.accessor;
-  register_getter get_unsignedOv_status Unsigned_overflow.accessor;
-  register_getter get_unsignedDownCast_status Unsigned_downcast.accessor;
-  register_getter get_pointer_downcast_status Pointer_downcast.accessor;
-  register_getter get_float_to_int_status Float_to_int.accessor;
-  register_getter get_finite_float_status Finite_float.accessor;
-  register_getter get_pointer_value_status Pointer_value.accessor;
-  register_getter get_bool_value_status Bool_value.accessor ;
-  register_getter get_all_status all_statuses;
-;;
-
-(* dynamic registration *)
-
-let _ =
+let _ignore =
   Dynamic.register
     ~comment:"The emitter used for generating RTE annotations"
     ~plugin:"RteGen"
@@ -147,7 +81,7 @@ let main () =
   if Options.Enabled.get () then begin
     Options.feedback ~dkey:Options.dkey_annot ~level:2
       "generating annotations";
-    !Db.RteGen.compute ();
+    Api.compute ();
     Options.feedback ~dkey:Options.dkey_annot ~level:2
       "annotations computed"
   end

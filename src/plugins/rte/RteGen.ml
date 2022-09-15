@@ -28,3 +28,6 @@ module Generator = Generator
 
 (** Visitors to iterate over Alarms and/or generate Code-Annotations *)
 module Visit = Visit
+
+(** Replaces old Db API *)
+module Api = Api

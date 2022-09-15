@@ -82,7 +82,7 @@ let kind_of_property = function
 (* -------------------------------------------------------------------------- *)
 
 let is_rte_generated kf =
-  List.for_all (fun (_, _, lookup) -> lookup kf) (!Db.RteGen.get_all_status ())
+  List.for_all (fun (_, _, lookup) -> lookup kf) (RteGen.Api.get_all_status ())
 
 class popup () =
   object(self)
