@@ -1,8 +1,8 @@
 /* run.config*
  EXIT: 1
  PLUGIN: eva
-   OPT: -eva @EVA_CONFIG@ -main main1
-   OPT: -eva @EVA_CONFIG@ -main main2
+   OPT: -eva @EVA_DEFAULT_OPTIONS@ -machdep x86_32 -main main1
+   OPT: -eva @EVA_DEFAULT_OPTIONS@ -machdep x86_32 -main main2
 */
 struct s;
 struct s s;

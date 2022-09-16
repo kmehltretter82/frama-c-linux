@@ -10,12 +10,12 @@ support libraries (notably gtksourceview). lablgtk3 should be preferred.
 - apron.v0.9.13 (for eva, optional)
 - coq.8.13.0 (for wp, optional)
 - lablgtk3.3.1.1 + lablgtk3-sourceview3.3.1.1 | lablgtk.2.18.11
-- mlgmpidl.1.2.14 (for eva, optional)
+- mlmpfr.4.1.0-bugfix2 (for eva, optional)
 - ocamlfind.1.8.1
 - ocamlgraph.1.8.8
 - ppx_deriving_yojson.3.6.1 (for mdr, optional)
 - ppx_import.1.9.1
-- why3.1.5.0
+- why3.1.5.1
 - yojson.1.7.0
 - zarith.1.12
 

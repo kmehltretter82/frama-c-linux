@@ -9,6 +9,7 @@
 , zarith
 , menhir
 , menhirLib
+, mlmpfr
 , js_of_ocaml
 , js_of_ocaml-ppx
 , ppx_deriving
@@ -40,6 +41,7 @@ stdenv.mkDerivation rec {
     zarith
     menhir
     menhirLib
+    mlmpfr
     # Emacs compilation of why3.el
     emacs
     # Documentation

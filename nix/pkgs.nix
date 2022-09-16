@@ -33,6 +33,7 @@ let
     default-config-tests = oself.callPackage ./default-config-tests.nix {};
     e-acsl-tests = oself.callPackage ./e-acsl-tests.nix {};
     eva-default-tests = oself.callPackage ./eva-tests.nix { config = ""; };
+    eva-apron-tests = oself.callPackage ./eva-tests.nix { config = "apron" ; };
     eva-bitwise-tests = oself.callPackage ./eva-tests.nix { config = "bitwise" ; };
     eva-equality-tests = oself.callPackage ./eva-tests.nix { config = "equality" ; };
     eva-gauges-tests = oself.callPackage ./eva-tests.nix { config = "gauges" ; };

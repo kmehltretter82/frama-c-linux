@@ -13,3 +13,11 @@
 >   R2 ∈ {0; 12}
 >   R3 ∈ {0; 7}
 >   R4 ∈ {0; 2}
+48c44
+<   R4 FROM tab[0..8]; x (and SELF)
+---
+>   R4 FROM tab[0..5]; x (and SELF)
+53c49
+<     y; t; tab[0..8]
+---
+>     y; t; tab[0..5]

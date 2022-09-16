@@ -107,7 +107,15 @@ eva-domains:
   <<: *eva_template
   parallel:
     matrix:
-      - CONFIG: ["bitwise","equality","gauges","multidim","octagon","symblocs"]
+      - CONFIG: [
+          "apron",
+          "bitwise",
+          "equality",
+          "gauges",
+          "multidim",
+          "octagon",
+          "symblocs"
+        ]
 
 kernel-tests:
   stage: tests

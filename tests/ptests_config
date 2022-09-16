@@ -18,12 +18,11 @@ DEFAULT_SUITES= value/numerors value/traces
 DEFAULT_SUITES= value builtins float idct
 
 ### Tests of EVA domains
-apron_SUITES =
+
+apron_SUITES = builtins float idct value
 bitwise_SUITES = value builtins float idct
 equality_SUITES = value builtins float idct
 gauges_SUITES = value builtins float idct
 multidim_SUITES = value builtins float idct
 octagon_SUITES = value builtins float idct
 symblocs_SUITES = value builtins float idct
-# todo:
-IGNORE= apron_SUITES = builtins float idct value

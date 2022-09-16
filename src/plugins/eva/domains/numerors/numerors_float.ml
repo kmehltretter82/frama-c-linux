@@ -23,6 +23,7 @@
 open Numerors_utils
 
 module P = Precisions
+module Mpfr = Mlmpfr
 
 (* Type declaration *)
 type t = P.t * Mpfr.mpfr_float
