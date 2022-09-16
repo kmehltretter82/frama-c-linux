@@ -97,7 +97,7 @@ module Behaviors =
     (struct
       let option_name = "-wp-bhv"
       let arg_name = "b,..."
-      let help = "Select only properties belonging to listed behaviors."
+      let help = "Select only properties belonging to listed behaviors (the name \"default!\" can be used to select the default anonymous behavior) of the selected functions (defaults to all behaviors)."
     end)
 let () = on_reset Behaviors.clear
 
