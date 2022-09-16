@@ -20,18 +20,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extension of the GUI in order to navigate in ACSL properties. *)
-
-module Rte: sig
-  type status_accessor =
-    string
-    * (Cil_types.kernel_function -> bool -> unit)
-    * (Cil_types.kernel_function -> bool)
-  val register_get_all_status : (unit -> status_accessor list) -> unit
-end
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)
+let () =
+  Property_navigator.Rte.register_get_all_status RteGen.Api.get_all_status
