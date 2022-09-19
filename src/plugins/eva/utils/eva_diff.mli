@@ -29,6 +29,7 @@ val import_varinfo: varinfo -> varinfo
 val import_base: Base.t -> Base.t
 val import_bases: Base.Hptset.t -> Base.Hptset.t
 val import_zone: Locations.Zone.t -> Locations.Zone.t
+val import_deps: Deps.t -> Deps.t
 val import_cvalue: Cvalue.V.t -> Cvalue.V.t
 val import_offsetmap: Cvalue.V_Offsetmap.t -> Cvalue.V_Offsetmap.t
 

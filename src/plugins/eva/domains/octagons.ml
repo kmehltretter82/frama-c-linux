@@ -75,6 +75,7 @@ module type Variable = sig
   val id: t -> int (* Unique id, needed to use variables as hptmap keys. *)
   val deps: eval_loc:(Cil_types.lval -> Precise_locs.precise_location) ->
     t -> dependencies
+  val import: t -> t
 end
 
 (* Variables of the octagons. Should be extended later to also include
@@ -155,13 +156,27 @@ module Variable : Variable = struct
       { data = Locations.Zone.bottom ; indirect = Locations.Zone.bottom }
     | Lval lval ->
       Eva_utils.deps_of_lval eval_loc (Option.get (HCE.to_lval lval))
+
+  let import (var, _id) =
+    let new_var =
+      match var with
+      | Var vi -> Var (Eva_diff.import_varinfo vi)
+      | Int vi -> Int (Eva_diff.import_varinfo vi)
+      | StartOf vi -> StartOf (Eva_diff.import_varinfo vi)
+      | Lval hce -> Lval (HCE.import hce)
+    in
+    make new_var
 end
 
-module VarSet =
-  Hptset.Make
-    (Variable)
-    (struct let v = [ [ ] ] end)
-    (struct let l = [ Ast.self ] end)
+module VarSet = struct
+  include Hptset.Make
+      (Variable)
+      (struct let v = [ [ ] ] end)
+      (struct let l = [ Ast.self ] end)
+
+  let import set =
+    fold (fun key acc -> add (Variable.import key) acc) set empty
+end
 
 (* Pairs of related variables in an octagon.
    This module imposes an order between the two variables X and Y in a pair
@@ -185,6 +200,10 @@ module Pair = struct
     if debug then assert (Variable.kind x = Variable.kind y);
     let pair, swap = if x_id < y_id then (x, y), false else (y, x), true in
     hashcons pair, swap
+
+  let import t =
+    let x, y = get t in
+    fst (make (Variable.import x) (Variable.import y))
 
   let fst t = fst (get t)
   let kind t = Variable.kind (fst t)
@@ -728,6 +747,17 @@ module Octagons = struct
         let ival = Arith.sub kind ival octagon.value in
         Some ival
     with Not_found -> None
+
+  let import =
+    let cache_name = "Eva.Octagons.Octagons.import" in
+    let f pair diamond = singleton (Pair.import pair) diamond in
+    let joiner =
+      let cache_name = "Eva.Octagons.Octagons.import.joiner" in
+      let cache = Hptmap_sig.PersistentCache cache_name in
+      let decide _ = Diamond.join in
+      internal_join ~cache ~symmetric:true ~idempotent:true ~decide
+    in
+    cached_fold ~cache_name ~temporary:false ~f ~joiner ~empty
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -774,6 +804,11 @@ module Relations = struct
     if VarSet.is_empty set
     then remove variable t
     else add variable set t
+
+  let import =
+    let cache_name = "Octagons.Relations.import" in
+    let f var set = singleton (Variable.import var) (VarSet.import set) in
+    cached_fold ~cache_name ~temporary:false ~f ~joiner:union ~empty
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -827,6 +862,17 @@ module Intervals = struct
       if Ival.(equal top r) then None else Some r
     in
     inter ~cache ~symmetric:false ~idempotent:true ~decide
+
+  let import =
+    let f var ival = singleton (Variable.import var) ival in
+    let joiner =
+      let cache_name = "Octagons.Intervals.import.joiner" in
+      let cache = Hptmap_sig.PersistentCache cache_name in
+      let decide _ = Ival.join in
+      internal_join ~cache ~symmetric:true ~idempotent:true ~decide
+    in
+    let cache_name = "Octagons.Intervals.import" in
+    cached_fold ~cache_name ~temporary:false ~f ~joiner ~empty
 end
 
 
@@ -840,6 +886,8 @@ struct
 
   include Hptmap.Make (Variable) (Deps) (Hptmap.Comp_unused)
       (struct let v = [[]] end) (struct let l = [Ast.self] end)
+
+  let internal_join = join
 
   let is_included: t -> t -> bool =
     let cache_name = cache_prefix ^ ".is_included" in
@@ -887,6 +935,19 @@ struct
     let decide_both _ d1 d2 = if Deps.equal d1 d2 then Some d1 else None in
     merge ~cache ~symmetric:true ~idempotent:true
       ~decide_left:Neutral ~decide_right:Neutral ~decide_both
+
+  let import =
+    let cache_name = "Eva.Octagons.VariableToDeps.import" in
+    let f var deps =
+      singleton (Variable.import var) (Eva_diff.import_deps deps)
+    in
+    let joiner =
+      let cache_name = "Eva.Octagons.VariableToDeps.import.joiner" in
+      let cache = Hptmap_sig.PersistentCache cache_name in
+      let decide _ = Deps.join in
+      internal_join ~cache ~symmetric:true ~idempotent:true ~decide
+    in
+    cached_fold ~cache_name ~temporary:false ~f ~joiner ~empty
 end
 
 module BaseToVariables = struct
@@ -906,6 +967,7 @@ module BaseToVariables = struct
     let inter (s1,t1) (s2,t2) = VSet.inter s1 s2, VSet.inter t1 t2
     let union (s1,t1) (s2,t2) = VSet.union s1 s2, VSet.union t1 t2
     let is_empty (s, t) = VSet.is_empty s && VSet.is_empty t
+    let import (s, t) = (VSet.import s, VSet.import t)
   end
 
   include Hptmap.Make (Base.Base) (VSetPair) (Hptmap.Comp_unused)
@@ -974,6 +1036,13 @@ module BaseToVariables = struct
 
   let all_variables m =
     fold (fun _b (dv, iv) acc -> VSet.(union (union dv iv) acc)) m VSet.empty
+
+  let import =
+    let cache_name = cache_prefix ^ ".import" in
+    let f base sets =
+      singleton (Eva_diff.import_base base) (VSetPair.import sets)
+    in
+    cached_fold ~cache_name ~temporary:false ~f ~joiner:join ~empty
 end
 
 module Deps = struct
@@ -1112,6 +1181,9 @@ module Deps = struct
   let is_included (m1, _: t) (m2, _: t) =
     VariableToDeps.is_included m1 m2
 
+  let import (m, i: t) : t =
+    VariableToDeps.import m, BaseToVariables.import i
+
   (* Check inverse dependencies. *)
   let check (abort: ('a, Format.formatter, unit) format -> 'a) (m, i: t) =
     let check_inverse var deps =
@@ -1241,6 +1313,13 @@ module State = struct
       (* Check consistency of the dependency maps. *)
       Deps.check abort t.deps;
       t
+
+  let import t =
+    { octagons = Octagons.import t.octagons;
+      intervals = Intervals.import t.intervals;
+      relations = Relations.import t.relations;
+      modified = Eva_diff.import_zone t.modified;
+      deps = Deps.import t.deps; }
 
   (* Is an octagon no more precise than the intervals inferred for the related
      variables? If so, do not save the octagon in the domain. *)
@@ -1942,6 +2021,8 @@ module Domain = struct
     else
       let t = interprocedural_reuse kf ~current_input ~previous_output in
       check "reuse result" t
+
+  let import = State.import
 end
 
 include Domain

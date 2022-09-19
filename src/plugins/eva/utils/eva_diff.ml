@@ -68,6 +68,10 @@ let import_zone zone =
     assert Locations.Zone.(equal zone top);
     zone
 
+let import_deps deps =
+  Deps.{ data = import_zone deps.data;
+         indirect = import_zone deps.indirect; }
+
 
 let change_to find x = Cil.ChangeTo (import find x)
 
