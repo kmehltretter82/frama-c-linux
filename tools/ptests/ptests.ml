@@ -1264,6 +1264,14 @@ let pp_list_deps fmt l =
           (* kind={env_var,source_tree,glob_files,...} *)
           Format.fprintf fmt " (%s %S)" kind deps) l
 
+let update_enabled_if ~enabled_if deps =
+  (* code similar to pp_enabled_if_content *)
+  Option.iter (fun cond -> enabled_if := StringSet.add cond !enabled_if) deps.enabled_if;
+  List.iter (fun lib ->
+      let cond = Format.asprintf "%a" Fmt.(var_libavailable framac_plugin) lib in
+      enabled_if := StringSet.add cond !enabled_if)
+    (list_of_deps deps.load_plugin)
+
 let pp_enabled_if_content fmt deps =
   Format.fprintf fmt "(and %s%a)"
     (Option.value ~default:"true" deps.enabled_if)
@@ -1629,7 +1637,7 @@ let deps_command ~file macros deps =
     deps_cmd = Some ((list_of_deps load_libs) @ (list_of_deps load_module) @ (list_of_deps deps_cmd));
   }
 
-let update_modules ~file modules deps =
+let update_modules ~file ~modules deps =
   let load_module = list_of_deps deps.load_module in
   if load_module <> [] then begin
     let plugin_libs = StringSet.union
@@ -1646,7 +1654,7 @@ let update_modules ~file modules deps =
   end
 
 (** process a test file *)
-let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
+let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~enabled_if =
   let config = Test_config.scan_test_file ~env directory ~file config in
   if not config.dc_dont_run then
     let test_name,config,ptest_vars = Test_config.ptest_vars ~env directory ~file config  in
@@ -1661,7 +1669,8 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
         let log_files = Macros.expand_list ~file macros logs in
         let bin_files = Macros.expand_list ~file macros bins in
         let deps = deps_command ~file macros deps in
-        update_modules ~file modules deps;
+        update_modules ~file ~modules deps;
+        update_enabled_if ~enabled_if deps;
         command_string ~env ~result_fmt ~oracle_fmt
           { test_name ; file; options; toplevel; nb_files; directory; nth; timeout;
             macros; log_files; bin_files;
@@ -1688,7 +1697,8 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config modules =
         let macros = Macros.add_defaults ~defaults:config.dc_macros macros in
         let cmd =
           let deps = deps_command ~file macros execnow.ex_deps in
-          update_modules ~file modules deps;
+          update_modules ~file ~modules deps;
+          update_enabled_if ~enabled_if deps;
           { test_name; file; nb_files = nb_files_execnow; directory; nth;
             log_files = [];
             bin_files = [];
@@ -1869,6 +1879,69 @@ let update_dir_ref dir config =
   let dc_execnow = List.map update_execnow config.dc_execnow in
   { config with dc_execnow }
 
+let build_modules fmt modules =
+  (* Prints rules dedicated to the build of the MODULEs *)
+  let n = ref 0 in
+  StringMap.iter (fun cmxs (libs,files) ->
+      let cmxs = Filename.basename cmxs in
+      let files = StringSet.elements (StringSet.of_list files) in
+      incr n;
+      Format.fprintf fmt
+        "(executable ; MODULE #%d FOR TEST FILES: %a\n  \
+         (name %S)\n  \
+         (modules %S)\n  \
+         (modes plugin)\n  \
+         (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a)\n  \
+         (flags :standard -w -50-9-32-6-34 -open Frama_c_kernel)\n\
+         )@."
+        (* executable: *)
+        !n pp_list files
+        (* name: *)
+        cmxs
+        (* module: *)
+        cmxs
+        (* libraries: *)
+        pp_list (StringSet.elements libs))
+    modules
+
+let warn_if_not_enabled =
+  let dune_var_regex = Str.regexp "%{" in
+  let escaped_cond s = Str.global_replace dune_var_regex "\\%{" s in
+  fun ~env ~suite fmt enabled_if ->
+    if not (StringSet.is_empty enabled_if) then begin
+      Format.fprintf fmt
+        "(alias (name disabled_%s)\n  \
+         (deps (alias disabled_%s)))@."
+        env.dune_alias (ptests_alias ~env);
+      Format.fprintf fmt
+        "(alias (name %s)\n  \
+         (deps (alias disabled_%s)))@."
+        env.dune_alias env.dune_alias;
+      Format.fprintf fmt
+        "(alias (name %s)\n  \
+         (deps (alias disabled_%s)))@."
+        (ptests_alias ~env) (ptests_alias ~env);
+      let pp_disabled fmt cond = Format.fprintf fmt "(= false %s)" cond in
+      let pp_enabled  fmt cond = Format.fprintf fmt "              (echo \"- %s: \" %s \"\\n\")\n  "
+          (escaped_cond cond) cond in
+      let conds = StringSet.elements enabled_if in
+      Format.fprintf fmt
+        "(rule ; Warns when some test conditions are disabled\n  \
+         (alias disabled_%s)\n  \
+         (enabled_if (or false %a))\n  \
+         (action (progn (echo \"WARNING: Enabling conditions of some tests are false for @@%s/%s\\n\")\n  \
+         %a))\n\
+         )@."
+        (* alias: *)
+        (ptests_alias ~env)
+        (* enabled_if *)
+        (Fmt.list pp_disabled) conds
+        (* action: *)
+        suite
+        (ptests_alias ~env)
+        (Fmt.list pp_enabled) conds
+    end
+
 let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
   StringMap.iter
     (fun suite alias ->
@@ -1904,6 +1977,7 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
        let oracle_fmt = Format.formatter_of_out_channel oracle_cout in
        let has_test = ref false in
        let modules = ref StringMap.empty in
+       let enabled_if = ref StringSet.empty in
        let dir_files = Array.to_list (Sys.readdir (SubDir.get directory)) in
        (* ignore hidden files (starting with '.') *)
        let dir_files =
@@ -1916,31 +1990,11 @@ let process ~env default_config (suites:Ptests_config.alias StringMap.t) =
             if test_pattern dir_config file
             then begin
               if !verbosity >= 2 then Format.printf "%% - Process test file %s ...@." file;
-              has_test := process_file ~env ~result_fmt ~oracle_fmt file directory dir_config modules || !has_test;
+              has_test := process_file ~env ~result_fmt ~oracle_fmt file directory dir_config ~modules ~enabled_if || !has_test;
             end;
          ) dir_files;
-       let n = ref 0 in
-       StringMap.iter (fun cmxs (libs,files) ->
-           let cmxs = Filename.basename cmxs in
-           let files = StringSet.elements (StringSet.of_list files) in
-           incr n;
-           Format.fprintf result_fmt
-             "(executable ; MODULE #%d FOR TEST FILES: %a\n  \
-              (name %S)\n  \
-              (modules %S)\n  \
-              (modes plugin)\n  \
-              (libraries frama-c.init.cmdline frama-c.boot frama-c.kernel %a)\n  \
-              (flags :standard -w -50-9-32-6-34 -open Frama_c_kernel)\n\
-              )@."
-             (* executable: *)
-             !n pp_list files
-             (* name: *)
-             cmxs
-             (* module: *)
-             cmxs
-             (* libraries: *)
-             pp_list (StringSet.elements libs))
-         !modules ;
+       build_modules result_fmt !modules;
+       warn_if_not_enabled ~env ~suite result_fmt !enabled_if;
        Format.fprintf result_fmt "@.";
        Format.fprintf oracle_fmt "@.";
        close_out result_cout;
