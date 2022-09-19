@@ -659,5 +659,7 @@ module Restrict
     let is_computed = Domain.Store.is_computed
   end
 
-  let import _state = assert false (* TODO *)
+  let import = function
+    | None -> None
+    | Some (state, mode) -> Some (Domain.import state, mode)
 end
