@@ -91,12 +91,50 @@ module CreatedVars =
       let size = 32
     end)
 
+
+(* Is [t2] an array of elements of type [t1] or, if [t1] is an array type,
+   the same array type with no length? *)
+let is_array_extended t1 t2 =
+  match Cil.unrollType t1, Cil.unrollType t2 with
+  | (TArray (t1, Some _, _) | t1), TArray (t2, None, []) ->
+    Cil_datatype.Typ.equal t1 t2
+  | _ -> false
+
+(* If [vi] and [v2] are two variable base validity, is the validity [v1]
+   included in [v2]? *)
+let is_validity_included v1 v2 =
+  match v1, v2 with
+  | Base.Variable v1, Base.Variable v2 ->
+    Integer.le v2.min_alloc v1.min_alloc
+    && Integer.ge v2.max_alloc v1.max_alloc
+    && (not v1.weak || v2.weak)
+  | _ -> false
+
+(* Checks that the previously created variable [vi] with base [base] is
+   compatible with the expected [typ] and [validity]. The variable should
+   have exactly these type and validity, except for dynamic allocation bases:
+   these bases can be extended during an analysis to represent more
+   allocations, so the existing variable may have "larger" type and validity
+   than requested. *)
+let check_existing_variable name vi base typ validity alloc =
+  let base_validity = Base.validity base in
+  if not (Cil_datatype.Typ.equal typ vi.vtype
+          || (alloc <> None && is_array_extended typ vi.vtype))
+  || not (Base.Validity.equal validity base_validity
+          || (alloc <> None && is_validity_included validity base_validity))
+  then
+    Self.fatal
+      "Trying to register a new variable %s with type %a and validity %a, \
+       incompatible with the existing variable %a of type %a and validity %a."
+      name Printer.pp_typ typ Base.pretty_validity validity
+      Printer.pp_varinfo vi Printer.pp_typ vi.vtype
+      Base.pretty_validity base_validity
+
 let register name ?descr ?libc typ validity alloc =
   match CreatedVars.find name with
   | vi ->
     let base = Base.of_varinfo vi in
-    assert (Cil_datatype.Typ.equal typ vi.vtype);
-    assert (Base.Validity.equal validity (Base.validity base));
+    check_existing_variable name vi base typ validity alloc;
     vi, base
   | exception Not_found ->
     let vi, base = create name ?descr ?libc typ validity alloc in
