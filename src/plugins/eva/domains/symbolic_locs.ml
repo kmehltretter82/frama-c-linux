@@ -104,6 +104,20 @@ module K2V = struct
     M.merge ~cache
       ~symmetric ~idempotent ~decide_both ~decide_left ~decide_right
 
+  let import =
+    let f hce cvalue =
+      let hce = Hcexprs.HCE.import hce in
+      let cvalue = Eva_diff.import_cvalue cvalue in
+      M.singleton hce cvalue
+    in
+    let joiner =
+      let cache_name = cache_prefix ^ ".import.joiner" in
+      let cache = Hptmap_sig.PersistentCache cache_name in
+      let decide _ = V.join in
+      M.join ~cache ~symmetric:true ~idempotent:true ~decide
+    in
+    let cache_name = cache_prefix ^ ".import" in
+    M.cached_fold ~cache_name ~temporary:false ~f ~joiner ~empty
 end
 
 (* Whether the value of an expression should be retained by the domain:
@@ -451,6 +465,12 @@ module Memory = struct
       zones = K2Z.merge ~into:into.zones t.zones;
       deps = B2K.union into.deps t.deps;
       syntactic_deps = B2K.union into.syntactic_deps t.syntactic_deps }
+
+  let import t =
+    { values = K2V.import t.values;
+      zones = K2Z.import t.zones;
+      deps = B2K.import t.deps;
+      syntactic_deps = B2K.import t.syntactic_deps }
 end
 
 module D : Abstract_domain.Leaf
@@ -638,6 +658,8 @@ module D : Abstract_domain.Leaf
   let logic_assign _assigns location state =
     let loc = Precise_locs.imprecise_location location in
     Memory.kill loc state
+
+  let import t = Memory.import t
 end
 
 let registered =
