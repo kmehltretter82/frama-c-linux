@@ -1,5 +1,5 @@
 /* run.config
- COMMENT: with dune, the LIBS directive must be replaced by a MODULE directive (see also ./test_config file)
+ COMMENT: note: the module global_decl_loc is also used by another test file (global_decl_loc2.i)
  MODULE: global_decl_loc
    OPT: %{dep:./global_decl_loc2.i}
  */

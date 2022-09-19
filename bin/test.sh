@@ -29,6 +29,7 @@ LOGS=
 TESTS=
 SAVE=
 
+DUNE_ALIAS=
 DUNE_OPT=
 DUNE_LOG=./.test-errors.log
 CACHEDIR=$(pwd -P)/.wp-cache
@@ -169,9 +170,10 @@ function PullCache
 # --------------------------------------------------------------------------
 
 [ "$DUNE_LOG" = "" ] || rm -rf $DUNE_LOG
-function TestAlias
+function RunAlias
 {
 
+    Head "Running tests..."
     if [ "$DUNE_LOG" = "" ]; then
         Run dune build $DUNE_OPT $@
     elif [ "$SAVE" != "yes" ] && [ "$VERBOSE" != "yes" ]; then
@@ -204,8 +206,8 @@ function TestDir
             CFG="(config $CONFIG)"
             ;;
     esac
-    Head "Running test on directory $1 $CFG"
-    TestAlias @$ALIAS
+    Head "Register test on directory $1 $CFG"
+    DUNE_ALIAS="${DUNE_ALIAS} @$ALIAS"
 }
 
 # --------------------------------------------------------------------------
@@ -231,17 +233,17 @@ function TestFile
     if [ "$LOGS" = "yes" ]; then
         ALIAS=$DIR/$RESULT/$FILE
     else
-        ALIAS=$DIR/$RESULT/${FILE%.*}.wtests
+        ALIAS=$DIR/$RESULT/${FILE%.*}.diff
     fi
-    Head "Running test on file $1 $CFG"
-    TestAlias @$ALIAS
+    Head "Register test on file $1 $CFG"
+    DUNE_ALIAS="${DUNE_ALIAS} @$ALIAS"
 }
 
 # --------------------------------------------------------------------------
 # ---  Tests Processing
 # --------------------------------------------------------------------------
 
-function RunTests
+function Register
 {
     while [ "$1" != "" ]
     do
@@ -251,7 +253,7 @@ function RunTests
             TestFile $1
         else
             case $1 in
-                @*) Head "Running test on alias $1"; TestAlias $1;;
+                @*) Head "Register test on alias $1"; DUNE_ALIAS="${DUNE_ALIAS} $1";;
                 *) ErrorUsage "ERROR: don't known what to do with '$1'";;
             esac
         fi
@@ -349,5 +351,6 @@ do
     esac
     shift
 done
-RunTests $TESTS
+Register $TESTS
+RunAlias ${DUNE_ALIAS}
 Status $DUNE_LOG
