@@ -358,12 +358,37 @@ module Make
     let list = Project.on project gather () in
     List.iter import_cache list
 
+
+  let check_saved_project filename project =
+    if not (Project.on project Self.is_computed ()) then
+      Self.abort "No Eva analysis performed in saved file %s" filename;
+    let check_parameter soundness param =
+      let current = Typed_parameter.get_value param in
+      let saved = Project.on project Typed_parameter.get_value param in
+      if not (String.equal current saved
+              || Typed_parameter.equal param Parameters.Load.parameter)
+      then
+        let msg =
+          Format.asprintf
+            "Current value of option %s is different from the saved file %s.@ \
+             As this parameter affects the %s of the analysis, the results \
+             of the previous analysis should not be reused."
+            param.name filename (if soundness then "soundness" else "precision")
+        in
+        if soundness
+        then Self.abort "%s" msg
+        else Self.warning "%s" msg
+    in
+    List.iter (check_parameter true) Parameters.parameters_correctness;
+    List.iter (check_parameter false) Parameters.parameters_tuning
+
   let load_cache filepath =
     try
       Self.feedback "Loading previous session from save file %a"
         Filepath.Normalized.pretty filepath;
       let name = Filename.basename (filepath :> string) in
       let saved = Project.load ~name filepath in
+      check_saved_project name saved;
       Self.feedback
         "Computing AST differences between saved file and current session";
       Ast_diff.compare_from_prj saved;
