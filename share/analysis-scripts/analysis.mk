@@ -184,7 +184,9 @@ SHELL        := $(shell which bash)
 	      -metrics -metrics-log a:$@/metrics.log \
 	      -save $@/framac.sav \
 	      -print -ocode $@/framac.ast -then -no-print \
-	    || ($(RM) $@/stats.txt && false) # Prevents having error code reporting in stats.txt
+	    || (mv -f $@/{running,command} &&
+	        $(RM) $@/stats.txt &&
+	        false) # Prevents having error code reporting in stats.txt
 	} 2>&1 |
 	  $(SED_UNBUFFERED) '/\[metrics\]/,999999d' |
 	  tee $@/parse.log
@@ -220,14 +222,16 @@ endef
 	      -scope-log w:$@/warnings.log \
 	      -eva-log w:$@/warnings.log \
 	      -then \
-              -remove-projects @all_but_current -save $@/framac.sav \
+	      -remove-projects @all_but_current -save $@/framac.sav \
 	      -then \
 	      -report-csv $@/alarms.csv -report-no-proven \
 	      -report-log w:$@/warnings.log \
 	      -metrics-eva-cover \
 	      -metrics-log a:$@/metrics.log \
 	      -nonterm -nonterm-log a:$@/nonterm.log \
-	    || ($(RM) $@/stats.txt && false) # Prevents having error code reporting in stats.txt
+	    || (mv -f $@/{running,command} &&
+	        $(RM) $@/stats.txt &&
+	        false) # Prevents having error code reporting in stats.txt
 	} 2>&1 |
 	  $(SED_UNBUFFERED) '/\[eva\] Values at end of function/,999999d' |
 	  tee $@/eva.log
@@ -260,7 +264,9 @@ endef
 	      -then \
 	      -report-csv $@/alarms.csv -report-no-proven \
 	      -report-log w:$@/warnings.log \
-	    || ($(RM) $@/stats.txt && false) # Prevents having error code reporting in stats.txt
+	    || (mv -f $@/{running,command} &&
+	        $(RM) $@/stats.txt &&
+	        false) # Prevents having error code reporting in stats.txt
 	} 2>&1 |
 	  tee $@/wp.log
 	{
