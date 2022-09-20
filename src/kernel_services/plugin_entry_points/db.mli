@@ -646,14 +646,17 @@ module Properties : sig
       (** To build an interpretation context relative to statement
           annotations. *)
 
-      type t = {before:bool ; ki:stmt ; zone:Locations.Zone.t}
+      type t = Logic_deps.t =
+        {before:bool ;
+         ki:stmt ; zone:Locations.Zone.t}
       type t_zone_info = (t list) option
       (** list of zones at some program points.
        *   None means that the computation has failed. *)
 
-      type t_decl = {var: Varinfo.Set.t ; (* related to vars of the annot *)
-                     lbl: Logic_label.Set.t} (* related to labels of the annot *)
-      type t_pragmas =
+      type t_decl = Logic_deps.decl =
+        {var: Varinfo.Set.t ; (* related to vars of the annot *)
+         lbl: Logic_label.Set.t} (* related to labels of the annot *)
+      type t_pragmas = Logic_deps.pragmas =
         {ctrl: Stmt.Set.t ; (* related to //@ slice pragma ctrl/expr *)
          stmt: Stmt.Set.t}  (* related to statement assign and
                                //@ slice pragma stmt *)

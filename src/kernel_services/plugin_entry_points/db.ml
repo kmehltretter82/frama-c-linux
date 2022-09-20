@@ -716,116 +716,66 @@ module Properties = struct
     let term_offset_to_offset =
       ref (mandatory_result Logic_to_c.term_offset_to_offset)
 
-    module To_zone : sig
-      (** The signature of the mli is copy pasted here because of
-          http://caml.inria.fr/mantis/view.php?id=7313 *)
-      type t_ctx =
-        {state_opt:bool option;
-         ki_opt:(stmt * bool) option;
-         kf:Kernel_function.t}
-
-      val mk_ctx_func_contrat:
-        (kernel_function -> state_opt:bool option -> t_ctx) ref
-      (** To build an interpretation context relative to function
-          contracts. *)
-
-      val mk_ctx_stmt_contrat:
-        (kernel_function -> stmt -> state_opt:bool option -> t_ctx) ref
-      (** To build an interpretation context relative to statement
-          contracts. *)
-
-      val mk_ctx_stmt_annot:
-        (kernel_function -> stmt -> t_ctx) ref
-      (** To build an interpretation context relative to statement
-          annotations. *)
-
-      type t = {before:bool ; ki:stmt ; zone:Locations.Zone.t}
-      type t_zone_info = (t list) option
-      (** list of zones at some program points.
-       *   None means that the computation has failed. *)
-
-      type t_decl = {var: Varinfo.Set.t ; (* related to vars of the annot *)
-                     lbl: Logic_label.Set.t} (* related to labels of the annot *)
-      type t_pragmas =
-        {ctrl: Stmt.Set.t ; (* related to //@ slice pragma ctrl/expr *)
-         stmt: Stmt.Set.t}  (* related to statement assign and
-                               //@ slice pragma stmt *)
-
-      val from_term: (term -> t_ctx -> t_zone_info * t_decl) ref
-      (** Entry point to get zones needed to evaluate the [term] relative to
-          the [ctx] of interpretation. *)
-
-      val from_terms: (term list -> t_ctx -> t_zone_info * t_decl) ref
-      (** Entry point to get zones needed to evaluate the list of [terms]
-          relative to the [ctx] of interpretation. *)
-
-      val from_pred: (predicate -> t_ctx -> t_zone_info * t_decl) ref
-      (** Entry point to get zones needed to evaluate the [predicate]
-          relative to the [ctx] of interpretation. *)
-
-      val from_preds: (predicate list -> t_ctx -> t_zone_info * t_decl) ref
-      (** Entry point to get zones needed to evaluate the list of
-          [predicates] relative to the [ctx] of interpretation. *)
-
-      val from_zone: (identified_term -> t_ctx -> t_zone_info * t_decl) ref
-      (** Entry point to get zones needed to evaluate the [zone] relative to
-          the [ctx] of interpretation. *)
-
-      val from_stmt_annot:
-        (code_annotation -> stmt * kernel_function
-         -> (t_zone_info * t_decl) * t_pragmas) ref
-      (** Entry point to get zones needed to evaluate an annotation on the
-          given stmt. *)
-
-      val from_stmt_annots:
-        ((code_annotation -> bool) option ->
-         stmt * kernel_function -> (t_zone_info * t_decl) * t_pragmas) ref
-      (** Entry point to get zones needed to evaluate annotations of this
-          [stmt]. *)
-
-      val from_func_annots:
-        (((stmt -> unit) -> kernel_function -> unit) ->
-         (code_annotation -> bool) option ->
-         kernel_function -> (t_zone_info * t_decl) * t_pragmas) ref
-      (** Entry point to get zones
-          needed to evaluate annotations of this [kf]. *)
-
-      val code_annot_filter:
-        (code_annotation ->
-         threat:bool -> user_assert:bool -> slicing_pragma:bool ->
-         loop_inv:bool -> loop_var:bool -> others:bool -> bool) ref
-        (** To quickly build an annotation filter *)
-
-    end
-    = struct
+    module To_zone =
+    struct
       type t_ctx =
         { state_opt: bool option;
           ki_opt: (stmt * bool) option;
           kf:Kernel_function.t }
-      let mk_ctx_func_contrat = mk_fun "Interp.To_zone.mk_ctx_func_contrat"
-      let mk_ctx_stmt_contrat = mk_fun "Interp.To_zone.mk_ctx_stmt_contrat"
-      let mk_ctx_stmt_annot = mk_fun "Interp.To_zone.mk_ctx_stmt_annot"
-      type t = {before:bool ; ki:stmt ; zone:Locations.Zone.t}
+
+      type t = Logic_deps.t =
+        {before:bool ;
+         ki:stmt ; zone:Locations.Zone.t}
       type t_zone_info = (t list) option
-      type t_decl =
-        { var: Varinfo.Set.t;
-          lbl: Logic_label.Set.t }
-      type t_pragmas =
-        { ctrl: Stmt.Set.t;
-          stmt: Stmt.Set.t }
-      let from_term = mk_fun "Interp.To_zone.from_term"
-      let from_terms= mk_fun "Interp.To_zone.from_terms"
-      let from_pred = mk_fun "Interp.To_zone.from_pred"
-      let from_preds= mk_fun "Interp.To_zone.from_preds"
-      let from_zone = mk_fun "Interp.To_zone.from_zone"
-      let from_stmt_annot= mk_fun "Interp.To_zone.from_stmt_annot"
-      let from_stmt_annots= mk_fun "Interp.To_zone.from_stmt_annots"
-      let from_func_annots= mk_fun "Interp.To_zone.from_func_annots"
-      let code_annot_filter= mk_fun "Interp.To_zone.code_annot_filter"
+      type t_decl = Logic_deps.decl =
+        {var: Varinfo.Set.t ;
+         lbl: Logic_label.Set.t}
+      type t_pragmas = Logic_deps.pragmas =
+        {ctrl: Stmt.Set.t ;
+         stmt: Stmt.Set.t}
+
+      let mk_ctx_func_contrat = ref (fun kf ~state_opt ->
+          { state_opt = state_opt;
+            ki_opt = None;
+            kf = kf })
+
+      let mk_ctx_stmt_contrat = ref (fun kf ki ~state_opt ->
+          { state_opt=state_opt;
+            ki_opt= Some(ki, false);
+            kf = kf })
+
+      let mk_ctx_stmt_annot = ref (fun kf ki ->
+          { state_opt = Some true;
+            ki_opt = Some(ki, true);
+            kf = kf })
+
+      let adapt_ctx ctx =
+        let site = match ctx.ki_opt with
+          | None -> Logic_deps.FunctionContract
+          | Some (stmt, false) -> StatementContract stmt
+          | Some (stmt, true) -> StatementAnnotation stmt
+        in
+        { Logic_deps.site; before=ctx.state_opt; kf=ctx.kf  }
+
+      let code_annot_filter = ref Logic_deps.code_annot_filter
+
+      let from_term =
+        ref (fun term ctx -> Logic_deps.from_term term (adapt_ctx ctx))
+      let from_terms =
+        ref (fun terms ctx -> Logic_deps.from_terms terms (adapt_ctx ctx))
+      let from_pred =
+        ref (fun pred ctx -> Logic_deps.from_pred pred (adapt_ctx ctx))
+      let from_preds =
+        ref (fun preds ctx -> Logic_deps.from_preds preds (adapt_ctx ctx))
+      let from_stmt_annot = ref Logic_deps.from_stmt_annot
+      let from_stmt_annots = ref Logic_deps.from_stmt_annots
+      let from_func_annots = ref Logic_deps.from_func_annots
+
+      let from_zone : (identified_term -> t_ctx -> t_zone_info * t_decl) ref =
+        mk_fun "Interp.To_zone.from_zone"
     end
 
-    let to_result_from_pred =
-      mk_fun "Properties.Interp.to_result_from_pred"
+    let to_result_from_pred = ref Logic_deps.to_result_from_pred;
   end
 
 end

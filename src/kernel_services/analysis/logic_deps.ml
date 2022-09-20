@@ -42,17 +42,10 @@ and ctx_site =
   | StatementContract of stmt
   | StatementAnnotation of stmt
 
-type pragmas = Db.Properties.Interp.To_zone.t_pragmas =
-  {ctrl: Stmt.Set.t ; stmt: Stmt.Set.t}
-
-type t = Db.Properties.Interp.To_zone.t
-= {before:bool ; ki:stmt ; zone:Locations.Zone.t}
-
-type zone_info = Db.Properties.Interp.To_zone.t_zone_info
-
-type decl = Db.Properties.Interp.To_zone.t_decl =
-  {var: Varinfo.Set.t ; lbl: Logic_label.Set.t}
-
+type pragmas = {ctrl: Stmt.Set.t ; stmt: Stmt.Set.t}
+type t = {before:bool ; ki:stmt ; zone:Locations.Zone.t}
+type zone_info = (t list) option
+type decl = {var: Varinfo.Set.t ; lbl: Logic_label.Set.t}
 
 let mk_ctx_func_contrat ?before kf =
   { before; site=FunctionContract; kf }
@@ -602,30 +595,3 @@ let to_result_from_pred p =
      false
    with Prune ->
      true)
-
-
-let adapt_ctx ctx =
-  let open Db.Properties.Interp.To_zone in
-  let site = match ctx.ki_opt with
-    | None -> FunctionContract
-    | Some (stmt, false) -> StatementContract stmt
-    | Some (stmt, true) -> StatementAnnotation stmt
-  in
-  { site; before=ctx.state_opt; kf=ctx.kf  }
-
-let () =
-  Db.Properties.Interp.To_zone.code_annot_filter := code_annot_filter;
-
-  Db.Properties.Interp.To_zone.from_term :=
-    (fun term ctx -> from_term term (adapt_ctx ctx));
-  Db.Properties.Interp.To_zone.from_terms :=
-    (fun terms ctx -> from_terms terms (adapt_ctx ctx));
-  Db.Properties.Interp.To_zone.from_pred :=
-    (fun pred ctx -> from_pred pred (adapt_ctx ctx));
-  Db.Properties.Interp.To_zone.from_preds :=
-    (fun preds ctx -> from_preds preds (adapt_ctx ctx));
-  Db.Properties.Interp.To_zone.from_stmt_annot := from_stmt_annot;
-  Db.Properties.Interp.To_zone.from_stmt_annots := from_stmt_annots;
-  Db.Properties.Interp.To_zone.from_func_annots := from_func_annots;
-
-  Db.Properties.Interp.to_result_from_pred := to_result_from_pred;

@@ -24,7 +24,16 @@ open Cil_types
 
 val compute_term_deps: (stmt -> term -> Locations.Zone.t option) ref
 
-type ctx
+type ctx = {
+  site: ctx_site;
+  before: bool option;
+  kf: Kernel_function.t
+}
+
+and ctx_site =
+  | FunctionContract
+  | StatementContract of stmt
+  | StatementAnnotation of stmt
 
 val mk_ctx_func_contrat: ?before:bool -> kernel_function -> ctx
 (** To build an interpretation context relative to function
@@ -38,13 +47,16 @@ val mk_ctx_stmt_annot: kernel_function -> stmt -> ctx
 (** To build an interpretation context relative to statement
     annotations. *)
 
-type t = Db.Properties.Interp.To_zone.t
-type zone_info = Db.Properties.Interp.To_zone.t_zone_info
+type t = {before:bool ; ki:stmt ; zone:Locations.Zone.t}
+type zone_info = (t list) option
 (** list of zones at some program points.
  *   None means that the computation has failed. *)
 
-type decl = Db.Properties.Interp.To_zone.t_decl
-type pragmas = Db.Properties.Interp.To_zone.t_pragmas
+type decl = {var: Cil_datatype.Varinfo.Set.t ; (* related to vars of the annot *)
+             lbl: Cil_datatype.Logic_label.Set.t} (* related to labels of the annot *)
+type pragmas =
+  {ctrl: Cil_datatype.Stmt.Set.t ; (* related to //@ slice pragma ctrl/expr *)
+   stmt: Cil_datatype.Stmt.Set.t}
 
 val from_term: term -> ctx -> zone_info * decl
 (** Entry point to get zones needed to evaluate the [term] relative to
