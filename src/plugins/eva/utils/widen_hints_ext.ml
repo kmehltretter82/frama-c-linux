@@ -114,7 +114,7 @@ let widen_hint_terms_of_terms terms =
           Some (named_lval, hint_thresholds)
         | {term_node = TLval tlv} ->
           let (lhost, offset) =
-            !Db.Properties.Interp.term_lval_to_lval ~result:None tlv
+            Logic_to_c.term_lval_to_lval tlv
           in
           let hint_vars = match lhost with
             | Mem e -> HintMem (e, offset)

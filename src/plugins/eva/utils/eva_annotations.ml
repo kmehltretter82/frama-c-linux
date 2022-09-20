@@ -191,7 +191,7 @@ struct
      when possible, to avoid changes due to its reconversion to a C term. *)
   type t = split_term * Cil_types.term option
 
-  let term_to_exp = !Db.Properties.Interp.term_to_exp ~result:None
+  let term_to_exp = Logic_to_c.term_to_exp ?result:None
 
   let parse ~typing_context:context = function
     | [t] ->
@@ -206,7 +206,7 @@ struct
         with
         | No_term ->
           Predicate (context.type_predicate context context.pre_state t), None
-        | Db.Properties.Interp.No_conversion ->
+        | Logic_to_c.No_conversion ->
           Kernel.warning ~wkey:Kernel.wkey_annot_error ~once:true ~current:true
             "split/merge expressions must be valid expressions; ignoring";
           raise Parse_error
@@ -354,8 +354,6 @@ let get_allocation = Allocation.get
 
 
 module ArraySegmentation = Register (struct
-    module Interp = Db.Properties.Interp
-
     type t = Cil_types.varinfo * Cil_types.offset * Cil_types.exp list
     let name = "array_partition"
     let is_loop_annot = false
@@ -363,11 +361,12 @@ module ArraySegmentation = Register (struct
     let convert = function
       | {term_node =  TLval (TVar {lv_origin=Some vi}, toffset)} :: tbounds ->
         begin try
-            let offset = !Interp.term_offset_to_offset ~result:None toffset
-            and bounds = List.map (!Interp.term_to_exp ~result:None) tbounds in
+            let offset = Logic_to_c.term_offset_to_offset toffset
+            and bounds = List.map (Logic_to_c.term_to_exp ?result:None) tbounds
+            in
             Some (vi, offset, bounds)
           with
-            Interp.No_conversion -> None
+            Logic_to_c.No_conversion -> None
         end
       | _ -> None
 

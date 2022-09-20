@@ -124,11 +124,11 @@ class occurrence = object (self)
 
   method! vterm_lval tlv =
     (try
-       let lv = !Db.Properties.Interp.term_lval_to_lval ~result:None tlv in
+       let lv = Logic_to_c.term_lval_to_lval tlv in
        ignore (self#vlval lv)
      with
      (* Translation to lval failed.*)
-     | Db.Properties.Interp.No_conversion -> ());
+     | Logic_to_c.No_conversion -> ());
     DoChildren
 
   method! vstmt_aux s =

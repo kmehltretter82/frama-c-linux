@@ -428,9 +428,9 @@ exception ToDo
 
 let get_annot_zone kf stmt annot =
   let add_zone z info =
-    let s = info.Db.Properties.Interp.To_zone.ki in
-    let before = info.Db.Properties.Interp.To_zone.before in
-    let zone = info.Db.Properties.Interp.To_zone.zone in
+    let s = info.Logic_deps.ki in
+    let before = info.Logic_deps.before in
+    let zone = info.Logic_deps.zone in
     R.debug ~level:2 "[forward_prop_scope] need %a %s stmt %d@."
       Locations.Zone.pretty zone
       (if before then "before" else "after") s.sid;
@@ -439,9 +439,7 @@ let get_annot_zone kf stmt annot =
     else (* TODO *)
       raise ToDo
   in
-  let (info, _), _ =
-    !Db.Properties.Interp.To_zone.from_stmt_annot annot (stmt, kf)
-  in
+  let (info, _), _ = Logic_deps.from_stmt_annot annot (stmt, kf) in
   match info with
   | None -> raise ToDo
   | Some info ->

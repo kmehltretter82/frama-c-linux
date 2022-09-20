@@ -718,6 +718,10 @@ module Properties : sig
   end
 
 end
+[@@alert db_deprecated
+    "Db.Properties is deprecated and will be removed in a future version \
+     of Frama-C. Please use the Logic_to_c, Logic_deps or Logic_parse_string
+     instead."]
 
 (* ************************************************************************* *)
 (** {2 Plugins} *)

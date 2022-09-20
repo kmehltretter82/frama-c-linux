@@ -316,9 +316,9 @@ let select_stmt_lval set mark lval_str ~before ki ~eval kf =
     let zone =
       Datatype.String.Set.fold
         (fun lval_str acc ->
-           let lval_term = !Db.Properties.Interp.term_lval kf lval_str in
+           let lval_term = Logic_parse_string.term_lval kf lval_str in
            let lval =
-             !Db.Properties.Interp.term_lval_to_lval ~result:None lval_term
+             Logic_to_c.term_lval_to_lval lval_term
            in
            let zone = get_lval_zone eval lval in
            Locations.Zone.join zone acc)
@@ -347,8 +347,8 @@ let select_lval_rw set mark ~rd ~wr ~eval kf ki_opt=
       let zone =
         Datatype.String.Set.fold
           (fun lval_str acc ->
-             let lval_term = !Db.Properties.Interp.term_lval kf lval_str in
-             let lval = !Db.Properties.Interp.term_lval_to_lval ~result:None lval_term in
+             let lval_term = Logic_parse_string.term_lval kf lval_str in
+             let lval = Logic_to_c.term_lval_to_lval lval_term in
              let zone = get_lval_zone ~for_writing eval lval in
              Locations.Zone.join zone acc)
           lval_str Locations.Zone.bottom
@@ -437,19 +437,19 @@ let select_ZoneAnnot_pragmas set ~spare pragmas kf =
     Cil_datatype.Stmt.Set.fold
       (* selection related to statement assign and //@ slice pragma stmt *)
       (fun ki' acc -> select_stmt acc ~spare ki' kf)
-      pragmas.Db.Properties.Interp.To_zone.stmt set
+      pragmas.Logic_deps.stmt set
   in
   Cil_datatype.Stmt.Set.fold
     (* selection related to //@ slice pragma ctrl/expr *)
     (fun ki' acc -> select_stmt_ctrl acc ~spare ki' kf)
-    pragmas.Db.Properties.Interp.To_zone.ctrl
+    pragmas.Logic_deps.ctrl
     set
 
 let select_ZoneAnnot_zones_decl_vars set mark (zones,decl_vars) kf =
   let set =
     Cil_datatype.Varinfo.Set.fold
       (fun vi acc -> select_decl_var acc mark vi kf)
-      decl_vars.Db.Properties.Interp.To_zone.var
+      decl_vars.Logic_deps.var
       set
   in
   let set =
@@ -457,16 +457,16 @@ let select_ZoneAnnot_zones_decl_vars set mark (zones,decl_vars) kf =
       (fun l acc ->
          let selection = SlicingSelect.select_label kf l mark
          in add_to_selection acc selection)
-      decl_vars.Db.Properties.Interp.To_zone.lbl
+      decl_vars.Logic_deps.lbl
       set
   in
   List.fold_right
     (fun z acc ->
        (* selection related to the parsing/compilation of the annotation *)
        select_stmt_zone acc mark
-         z.Db.Properties.Interp.To_zone.zone
-         ~before:z.Db.Properties.Interp.To_zone.before
-         z.Db.Properties.Interp.To_zone.ki
+         z.Logic_deps.zone
+         ~before:z.Logic_deps.before
+         z.Logic_deps.ki
          kf)
     zones set
 
@@ -482,8 +482,7 @@ let get_or_raise (info_data_opt, info_decl) = match info_data_opt with
     Note: add also a transparent selection on the whole statement. *)
 let select_stmt_pred set mark pred ki kf =
   let zones_decl_vars =
-    !Db.Properties.Interp.To_zone.from_pred pred
-      (!Db.Properties.Interp.To_zone.mk_ctx_stmt_annot kf ki)
+    Logic_deps.from_pred pred (Logic_deps.mk_ctx_stmt_annot kf ki)
   in
   select_ZoneAnnot_zones_decl_vars set mark (get_or_raise zones_decl_vars) kf
 
@@ -492,8 +491,7 @@ let select_stmt_pred set mark pred ki kf =
     Note: add also a transparent selection on the whole statement. *)
 let select_stmt_term set mark term ki kf =
   let zones_decl_vars =
-    !Db.Properties.Interp.To_zone.from_term term
-      (!Db.Properties.Interp.To_zone.mk_ctx_stmt_annot kf ki)
+    Logic_deps.from_term term (Logic_deps.mk_ctx_stmt_annot kf ki)
   in
   select_ZoneAnnot_zones_decl_vars set mark (get_or_raise zones_decl_vars) kf
 
@@ -502,7 +500,7 @@ let select_stmt_term set mark term ki kf =
     Note: add also a transparent selection on the whole statement. *)
 let select_stmt_annot set mark ~spare annot ki kf =
   let zones_decl_vars,pragmas =
-    !Db.Properties.Interp.To_zone.from_stmt_annot annot (ki, kf)
+    Logic_deps.from_stmt_annot annot (ki, kf)
   in let set = select_ZoneAnnot_pragmas set ~spare pragmas kf
   in select_ZoneAnnot_zones_decl_vars set mark (get_or_raise zones_decl_vars) kf
 
@@ -511,8 +509,8 @@ let select_stmt_annot set mark ~spare annot ki kf =
     Note: add also a transparent selection on the whole statement. *)
 let select_stmt_annots set mark ~spare  ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop_var ki kf =
   let zones_decl_vars,pragmas =
-    !Db.Properties.Interp.To_zone.from_stmt_annots
-      (Some (!Db.Properties.Interp.To_zone.code_annot_filter
+    Logic_deps.from_stmt_annots
+      (Some (Logic_deps.code_annot_filter
                ~threat ~user_assert ~slicing_pragma
                ~loop_inv ~loop_var ~others:false))
       (ki, kf)
@@ -524,9 +522,9 @@ let select_stmt_annots set mark ~spare  ~threat ~user_assert ~slicing_pragma ~lo
 let select_func_annots set mark ~spare ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop_var kf =
   try
     let zones_decl_vars,pragmas =
-      !Db.Properties.Interp.To_zone.from_func_annots Kinstr.iter_from_func
+      Logic_deps.from_func_annots Kinstr.iter_from_func
         (Some
-           (!Db.Properties.Interp.To_zone.code_annot_filter
+           (Logic_deps.code_annot_filter
               ~threat ~user_assert ~slicing_pragma ~loop_inv
               ~loop_var ~others:false))
         kf

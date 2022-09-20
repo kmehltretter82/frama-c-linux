@@ -819,12 +819,12 @@ let build_marker =
   Option.map @@ fun input ->
   let env = logic_environment () in
   let kf = Kernel_function.find_englobing_kf input.atStmt in
-  let term = !Db.Properties.Interp.term ~env kf input.term in
+  let term = Logic_parse_string.term ~env kf input.term in
   let key = (input.atStmt, term) in
   match Cache.find_opt cache key with
   | Some tag -> tag
   | None ->
-    let exp = !Db.Properties.Interp.term_to_exp ~result:None term in
+    let exp = Logic_to_c.term_to_exp term in
     let tag = Printer_tag.PExp (Some kf, Kstmt input.atStmt, exp) in
     Cache.add cache key tag ; tag
 

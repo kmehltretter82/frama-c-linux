@@ -55,9 +55,6 @@ struct
     | Per_stmt_slevel.NoMerge -> false
     | Per_stmt_slevel.Merge f -> f stmt
 
-  let term_to_exp term =
-    !Db.Properties.Interp.term_to_exp ~result:None term
-
   let min_loop_unroll = MinLoopUnroll.get ()
   let auto_loop_unroll = AutoLoopUnroll.get ()
   let default_loop_unroll = DefaultLoopUnroll.get ()
@@ -96,8 +93,8 @@ struct
         try
           match Logic_utils.constFoldTermToInt t with
           | Some n -> Partition.IntLimit (Integer.to_int_exn n)
-          | None   -> Partition.ExpLimit (term_to_exp t)
-        with Z.Overflow | Db.Properties.Interp.No_conversion ->
+          | None   -> Partition.ExpLimit (Logic_to_c.term_to_exp t)
+        with Z.Overflow | Logic_to_c.No_conversion ->
           warn "invalid loop unrolling parameter; ignoring";
           default
       end
@@ -134,7 +131,7 @@ struct
         in
         action :: acc
       with
-        Db.Properties.Interp.No_conversion ->
+        Logic_to_c.No_conversion ->
         warn "split/merge expressions must be valid expressions; ignoring";
         acc (* Impossible to convert term to lval *)
     in
