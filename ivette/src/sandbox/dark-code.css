@@ -12,19 +12,16 @@
   overflow: hidden;
 }
 
-.cm-decoration-element {}
-.cm-decoration-element:hover {
+.cm-hovered-code:hover {
   background-color: var(--code-hover);
 }
-.cm-decoration-element:focus {
+
+.cm-selected-code {
   background-color: var(--code-select);
 }
-.cm-decoration-element:focus:hover {
-  background-color: var(--code-select-hover);
-}
 
-.cm-underline:hover {
-  text-decoration: underline 3px red;
+.cm-selected-code:hover {
+  background-color: var(--code-select-hover);
 }
 
 .cm-s-dark-code.CodeMirror, .cm-s-dark-code .CodeMirror-gutters {
