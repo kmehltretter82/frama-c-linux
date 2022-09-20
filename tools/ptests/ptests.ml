@@ -188,7 +188,8 @@ let example_msg =
      DEPS: <file>...     @[<v 0># Adds a dependency to next sub-test and execnow commands.@ \
      # Notes: a dependency to the included file can be added with this directive.@ \
      # That is not necessary for files mentioned into the command or options when using the %%{dep:<file>} feature of dune.@]@  \
-     BIN: <file>...      @[<v 0># Defines binary targets built by the next sub-test command.@ \
+     ENABLED_IF: <cond>  @[<v 0># Adds an enabling conditions to next sub-test and execnow commands (defaults to \"true\").@]@  \
+     BIN: <file>...      @[<v 0># Defines binary targets built by the next sub-test command.@]@  \
      LOG: <file>...      @[<v 0># Defines textual targets built by the next sub-test command.@ \
      # Note: the textual targets are compared to oracles.@]@  \
      CMD: <command>      @[<v 0># Defines the command to execute for all tests in order to get results to be compared to oracles.@]@  \
@@ -226,6 +227,7 @@ let example_msg =
      @@PTEST_DEFAULT_OPTIONS@@ # The default option list: %s@  \
      @@PTEST_LIBS@@            # The current list of modules defined by the LIBS directive.@  \
      @@PTEST_DEPS@@            # The current list of dependencies defined by the DEPS directive.@  \
+     @@PTEST_ENABLED_IF@@      # The current value of ENABLED_IF directive.@  \
      @@PTEST_MODULE@@          # The current list of modules defined by the MODULE directive.@  \
      @@PTEST_SCRIPT@@          # The current list of modules defined by the SCRIPT directive (DEPRECATED).@  \
      @@PTEST_PLUGIN@@          # The current list of plugins set by the PLUGIN directive.@  \
