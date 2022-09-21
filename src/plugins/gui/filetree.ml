@@ -455,7 +455,7 @@ module State = struct
           Cil_builtins.is_unused_builtin vi
         | _ -> false
       in
-      let gls = Extlib.filter_out is_unused all in
+      let gls = List.filter (fun g -> not @@ is_unused g) all in
       if gls = [] then None else Some (f, gls)
     in
     List.filter_map globals_of_file files

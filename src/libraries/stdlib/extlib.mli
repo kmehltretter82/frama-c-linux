@@ -92,9 +92,6 @@ val last: 'a list -> 'a
     @raise Invalid_argument on an empty list
     @since Nitrogen-20111001 *)
 
-val filter_out: ('a -> bool) -> 'a list -> 'a list
-(** Filter out elements that pass the test *)
-
 val replace: ('a -> 'a -> bool) -> 'a -> 'a list -> 'a list
 (** [replace cmp x l] replaces the first element [y] of [l] such that
     [cmp x y] is true by [x]. If no such element exists, [x] is added

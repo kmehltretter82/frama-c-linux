@@ -1610,7 +1610,7 @@ let remove_extended e kf ext =
   let set_spec spec _tbl =
     List.iter
       (fun b ->
-         b.b_extended <- Extlib.filter_out ((==) ext) b.b_extended;
+         b.b_extended <- List.filter ((!=) ext) b.b_extended;
          Property_status.remove
            (Property.(ip_of_extended (ELContract kf) ext)))
       spec.spec_behavior

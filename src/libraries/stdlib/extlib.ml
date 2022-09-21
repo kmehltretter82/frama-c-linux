@@ -94,8 +94,6 @@ let rec last = function
   | [a] -> a
   | _ :: l -> last l
 
-let filter_out f ls = List.filter (fun x -> not (f x)) ls
-
 let replace cmp x l =
   let rec aux = function
     | [] -> [x]
