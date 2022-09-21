@@ -105,7 +105,7 @@ run-test: [
 
 # Please keep depends and depopts sorted by package name
 depends: [
-  "dune" { >= "3.0.0" }
+  "dune" { >= "3.2.0" }
   "dune-configurator"
   "dune-private-libs"
   "dune-site"
