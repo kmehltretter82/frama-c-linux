@@ -102,8 +102,6 @@ val replace: ('a -> 'a -> bool) -> 'a -> 'a list -> 'a list
     @since Neon-20140301
 *)
 
-val filter_map': ('a -> 'b) -> ('b -> bool) -> 'a list -> 'b list
-
 val fold_map: ('a -> 'b -> 'a * 'c) -> 'a -> 'b list -> 'a * 'c list
 (** Combines [fold_left] and [map] *)
 

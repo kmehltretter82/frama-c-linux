@@ -174,11 +174,11 @@ let mul_int x i =
 let mod_integer (o,sum) i =
   (* mod everything *)
   let o = Integer.e_rem o i in
-  let sum = Extlib.filter_map'
-      (fun (d,b) -> Integer.e_rem d i, b)
-      (fun (d,_b) -> not (Integer.is_zero d))
-      sum
+  let non_zero_rem (d, b) =
+    let rem = Integer.e_rem d i in
+    if Integer.is_zero rem then None else Some (rem, b)
   in
+  let sum = List.filter_map non_zero_rem sum in
   let sum = Terms.(normalize (reorder sum)) in (* order was not preserverd *)
   (* We must then ensure that the set of represented offset is < i,
      i.e. that the highest possible value is < i.

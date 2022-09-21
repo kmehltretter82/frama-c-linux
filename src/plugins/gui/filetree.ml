@@ -455,9 +455,10 @@ module State = struct
           Cil_builtins.is_unused_builtin vi
         | _ -> false
       in
-      f, Extlib.filter_out is_unused all
+      let gls = Extlib.filter_out is_unused all in
+      if gls = [] then None else Some (f, gls)
     in
-    Extlib.filter_map' globals_of_file (fun (_, gl) -> gl <> []) files
+    List.filter_map globals_of_file files
 
 
   (** Make and fill the custom model with default values. *)
