@@ -577,6 +577,7 @@ struct
     id: string;
     rank: int;
     label: string;
+    descr: string;
     title: string;
     enable: unit -> bool;
     pretty: Format.formatter -> Printer_tag.localizable -> unit
@@ -590,15 +591,17 @@ struct
     let jtype = Package.(Jrecord[
         "id", Jstring ;
         "label", Jstring ;
+        "descr", Jstring ;
         "title", Jstring ;
-        "descr", Jtext.jtype ;
+        "text", Jtext.jtype ;
       ])
     let of_json _ = failwith "Information.Info"
     let to_json (info,text) = `Assoc [
         "id", `String info.id ;
         "label", `String info.label ;
+        "descr", `String info.descr ;
         "title", `String info.title ;
-        "descr", text ;
+        "text", text ;
       ]
   end
 
@@ -640,9 +643,9 @@ struct
 
   let update () = Request.emit signal
 
-  let register ~id ~label ~title ?(enable = fun _ -> true) pretty =
+  let register ~id ~label ~descr ?(title = descr) ?(enable = fun _ -> true) pretty =
     let rank = incr rankId ; !rankId in
-    let info = { id ; rank ; label ; title ; enable ; pretty } in
+    let info = { id ; rank ; label ; descr; title ; enable ; pretty } in
     if Hashtbl.mem registry id then
       ( let msg = Format.sprintf
             "Server.Kernel_ast.register_info: duplicate %S" id in
@@ -669,7 +672,7 @@ let () = Request.register ~package
 let () = Information.register
     ~id:"kernel.ast.location"
     ~label:"Location"
-    ~title:"Source file location"
+    ~descr:"Source file location"
     begin fun fmt loc ->
       let location = Printer_tag.loc_of_localizable loc in
       Filepath.pp_pos fmt (fst location)
@@ -678,7 +681,7 @@ let () = Information.register
 let () = Information.register
     ~id:"kernel.ast.varinfo"
     ~label:"Var"
-    ~title:"Variable Information"
+    ~descr:"Variable Information"
     begin fun fmt loc ->
       match loc with
       | PLval (_ , _, (Var x,NoOffset)) | PVDecl(_,_,x) ->
@@ -702,7 +705,7 @@ let () = Information.register
 let () = Information.register
     ~id:"kernel.ast.typeinfo"
     ~label:"Type"
-    ~title:"Type of C/ASCL expression"
+    ~descr:"Type of C/ASCL expression"
     begin fun fmt loc ->
       let open Printer in
       match loc with

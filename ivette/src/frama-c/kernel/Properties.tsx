@@ -212,11 +212,11 @@ function filterEva(p: Property): boolean {
         if (filter('eva.data_tainted_only') || filter('eva.ctrl_tainted_only'))
           b = false;
         break;
-      case 'data_tainted':
+      case 'direct_taint':
         if (filter('eva.ctrl_tainted_only'))
           b = false;
         break;
-      case 'control_tainted':
+      case 'indirect_taint':
         if (filter('eva.data_tainted_only'))
           b = false;
         break;

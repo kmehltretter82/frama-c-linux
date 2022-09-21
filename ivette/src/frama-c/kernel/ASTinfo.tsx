@@ -80,20 +80,17 @@ function markerKind (props: AST.markerInfoData): JSX.Element {
 interface InfoItemProps {
   label: string;
   title: string;
-  descr: DATA.text;
+  text: DATA.text;
 }
 
 function InfoItem(props: InfoItemProps): JSX.Element {
   return (
     <div className="astinfo-infos">
-      <div
-        className="dome-text-label astinfo-kind"
-        title={props.title}
-      >
+      <div className="dome-text-label astinfo-kind" title={props.title}>
         {props.label}
       </div>
-      <div className="dome-text-cell astinfo-data">
-        <Text text={props.descr} />
+      <div className="dome-text-cell astinfo-data" title={props.title}>
+        <Text text={props.text} />
       </div>
     </div>
   );
@@ -102,8 +99,9 @@ function InfoItem(props: InfoItemProps): JSX.Element {
 interface ASTinfos {
   id: string;
   label: string;
+  descr: string;
   title: string;
-  descr: DATA.text;
+  text: DATA.text;
 }
 
 interface InfoSectionProps {
@@ -281,7 +279,7 @@ function openFilter(
     };
     return {
       id: info.id,
-      label: `${info.title} (${info.label})`,
+      label: `${info.descr} (${info.label})`,
       checked,
       onClick,
     };

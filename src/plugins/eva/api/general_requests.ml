@@ -184,7 +184,7 @@ let () =
   Server.Kernel_ast.Information.register
     ~id:"eva.value"
     ~label:"Value"
-    ~title:"Possible values inferred by Eva"
+    ~descr:"Possible values inferred by Eva"
     ~enable:Analysis.is_computed
     print_value
 
