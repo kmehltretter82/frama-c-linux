@@ -112,12 +112,6 @@ let filter_map' f filter l=
     | [] -> []
     | x::tl -> let x' = f x in if filter x' then x' :: aux tl else aux tl
   in aux l
-let rec filter_map_opt f = function
-  | [] -> []
-  | x::tl ->
-    match f x with
-    | None -> filter_map_opt f tl
-    | Some x' -> x' :: filter_map_opt  f tl
 
 let rec fold_map f acc = function
   | [] -> acc, []

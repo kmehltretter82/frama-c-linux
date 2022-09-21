@@ -5654,7 +5654,7 @@ and makeCompType ghost (isstruct: bool)
       (* _Static_assert is not stored in the Cil AST *)
       None
     | FIELD (f,g) -> Some (f,g) in
-  let flds = Extlib.filter_map_opt to_field nglist in
+  let flds = List.filter_map to_field nglist in
   let flds = List.rev (fold addFieldGroup [] flds) in
 
   let fld_table = Hashtbl.create 17 in

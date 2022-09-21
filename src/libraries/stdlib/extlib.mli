@@ -104,8 +104,6 @@ val replace: ('a -> 'a -> bool) -> 'a -> 'a list -> 'a list
 
 val filter_map: ('a -> bool) -> ('a -> 'b) -> 'a list -> 'b list
 val filter_map': ('a -> 'b) -> ('b -> bool) -> 'a list -> 'b list
-val filter_map_opt: ('a -> 'b option) -> 'a list -> 'b list
-(** Combines [filter] and [map]. *)
 
 val fold_map: ('a -> 'b -> 'a * 'c) -> 'a -> 'b list -> 'a * 'c list
 (** Combines [fold_left] and [map] *)

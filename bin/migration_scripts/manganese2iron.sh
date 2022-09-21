@@ -89,7 +89,8 @@ process_file ()
    -e 's/Extlib\.swap/Fun.flip/g' \
    -e 's/Extlib\.xor/(<>)/g' \
    -e 's/Extlib\.iteri/List.iteri/g' \
-   -e 's/Extlib\.iteri/List.mapi/g'
+   -e 's/Extlib\.iteri/List.mapi/g' \
+   -e 's/Extlib\.filter_map_opt/List.filter_map/g'
    # this line left empty on purpose
 }
 
