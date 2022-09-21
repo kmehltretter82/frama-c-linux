@@ -61,8 +61,21 @@ val framac_libc: Filepath.Normalized.t
 (** Directory where Frama-C libc headers are.
     @since 19.0-Potassium *)
 
+val libdirs: Filepath.Normalized.t list
+(** Directories where library and executable files are, in order of
+    priority.
+    @since Frama-C+dev *)
+
+val libdir: Filepath.Normalized.t
+(** Last directory of libdirs (the directory of frama-c installation)
+    @since Frama-C+dev *)
+
 val plugin_dir: Filepath.Normalized.t list
 (** Directory where the Frama-C dynamic plug-ins are. *)
+
+val plugin_path: string
+(** The colon-separated concatenation of [plugin_dir].
+    @since Magnesium-20151001 *)
 
 val preprocessor: string
 (** Name of the default command to call the preprocessor.

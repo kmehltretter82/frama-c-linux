@@ -1,6 +1,6 @@
 # Customized makefile template for testing 'frama-c-script make-wrapper'.
 
-include $(shell $(FRAMAC) -no-autoload-plugins -print-share-path)/analysis-scripts/prologue.mk
+include $(shell $(FRAMAC) -no-autoload-plugins -print-lib-path)/analysis-scripts/prologue.mk
 
 FCFLAGS     += \
   -kernel-warn-key annot:missing-spec=abort \
@@ -18,5 +18,5 @@ make-for-make-wrapper.parse: \
   # make-wrapper3.c is deliberately absent of this list
 
 ### Epilogue. Do not modify this block. #######################################
-include $(shell $(FRAMAC) -no-autoload-plugins -print-share-path)/analysis-scripts/epilogue.mk
+include $(shell $(FRAMAC) -no-autoload-plugins -print-lib-path)/analysis-scripts/epilogue.mk
 ###############################################################################

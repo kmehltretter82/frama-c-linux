@@ -155,8 +155,8 @@ else
 fi
 echo "[info] using FRAMAC: $FRAMAC"
 
-if [ -z "$FRAMAC_SHARE" ]; then
-    FRAMAC_SHARE="$("$FRAMAC" -print-share-path)"
+if [ -z "$FRAMAC_LIB" ]; then
+    FRAMAC_LIB="$("$FRAMAC" -print-lib-path)"
 fi
 
 if ! sed --version >/dev/null 2>&1; then
@@ -230,10 +230,10 @@ if [ ! -e "$script_for_creduce" ]; then
     read -p "Please enter 1 or 2: " errorkind
     case $errorkind in
         1)
-            cp "$FRAMAC_SHARE/analysis-scripts/script_for_creduce_fatal.sh" "$script_for_creduce"
+            cp "$FRAMAC_LIB/analysis-scripts/script_for_creduce_fatal.sh" "$script_for_creduce"
             ;;
         2)
-            cp "$FRAMAC_SHARE/analysis-scripts/script_for_creduce_non_fatal.sh" "$script_for_creduce"
+            cp "$FRAMAC_LIB/analysis-scripts/script_for_creduce_non_fatal.sh" "$script_for_creduce"
             echo "Script copied. Please edit $script_for_creduce and re-run this script."
             exit 0
             ;;

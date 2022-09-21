@@ -31,10 +31,12 @@ let print_config () =
           "Frama-C %s@\n\
            Environment:@\n  \
            FRAMAC_SHARE  = %S@\n  \
-           FRAMAC_PLUGIN = %S%t@."
+           FRAMAC_PLUGIN = %S@\n  \
+           FRAMAC_LIB    = %S%t@."
           Fc_config.version_and_codename
           (String.concat ":" (Filepath.Normalized.to_string_list Fc_config.datadirs))
           (String.concat ":" (Filepath.Normalized.to_string_list Fc_config.plugin_dir))
+          (String.concat ":" (Filepath.Normalized.to_string_list Fc_config.libdirs))
           (fun fmt ->
              if Fc_config.preprocessor = "" then
                Format.fprintf fmt "@\nWarning: no default pre-processor"
@@ -67,8 +69,12 @@ let () = Cmdline.run_after_early_stage print_version
 let print_sharepath = print_configl Kernel.PrintShare.get Fc_config.datadirs
 let () = Cmdline.run_after_early_stage print_sharepath
 
-let print_libpath = print_configl Kernel.PrintLib.get Fc_config.plugin_dir
+let print_libpath = print_configl Kernel.PrintLib.get [Fc_config.libdir]
 let () = Cmdline.run_after_early_stage print_libpath
+
+let print_pluginpath =
+  print_config Kernel.PrintPluginPath.get Fc_config.plugin_path
+let () = Cmdline.run_after_early_stage print_pluginpath
 
 (**************************************************************************)
 (* Hooks run after loading plug-ins *)

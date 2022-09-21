@@ -212,7 +212,7 @@ def copy_fc_stubs():
     global fc_stubs_copied
     dest = dot_framac_dir / "fc_stubs.c"
     if not fc_stubs_copied:
-        fc_stubs = lines_of_file(share_dir / "analysis-scripts" / "fc_stubs.c")
+        fc_stubs = lines_of_file(lib_dir / "analysis-scripts" / "fc_stubs.c")
         re_main = re.compile(r"\bmain\b")
         for i, line in enumerate(fc_stubs):
             if line.startswith("//"):
@@ -370,7 +370,7 @@ if not dot_framac_dir.is_dir():
     dot_framac_dir.mkdir(parents=True, exist_ok=False)
 
 fc_config = json.loads(call_and_get_output([framac_bin / "frama-c", "-print-config-json"]))
-share_dir = Path(fc_config["datadir"])
+lib_dir = Path(fc_config["lib_dir"])
 
 # copy fc_stubs if at least one main function has arguments
 any_has_arguments = False
@@ -391,7 +391,7 @@ if any_has_arguments:
 
 gnumakefile = dot_framac_dir / "GNUmakefile"
 
-template = lines_of_file(share_dir / "analysis-scripts" / "template.mk")
+template = lines_of_file(lib_dir / "analysis-scripts" / "template.mk")
 
 if machdep:
     machdeps = fc_config["machdeps"]

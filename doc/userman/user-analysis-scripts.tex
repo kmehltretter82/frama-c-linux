@@ -32,7 +32,7 @@ Most scripts are accessible via the \texttt{frama-c-script} command, installed
 along with \FramaC. Running this command without any arguments prints the list
 of commands, with a brief description of each of them. Some extra scripts are
 available by directly running them; in both cases, the actual scripts
-themselves are installed in Frama-C's \texttt{share} directory, underneath
+themselves are installed in Frama-C's \texttt{lib} directory, underneath
 \texttt{analysis-scripts}.
 
 \subsection{General Framework}
@@ -434,7 +434,7 @@ The following commands require a JSON Compilation Database.
 Finally, there is the following script, which is {\em not} available as a
 command in \texttt{frama-c-script}, since its usage scenario is very
 different. It is available at\\
-\texttt{\$FRAMAC\_SHARE/analysis-scripts/creduce.sh}.
+\texttt{\$FRAMAC\_LIB/analysis-scripts/creduce.sh}.
 
 \begin{description}
 \item[creduce.sh]: A script to help running the C-Reduce\footnote{%

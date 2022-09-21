@@ -61,6 +61,9 @@ let dump_to_json () =
     "framac_libc", `String (Fc_config.framac_libc:>string) ;
     "plugin_dir",
     list string (Filepath.Normalized.to_string_list Fc_config.plugin_dir) ;
+    "lib_dir", `String (Fc_config.libdir:>string) ;
+    "lib_dirs",
+    list string (Filepath.Normalized.to_string_list Fc_config.libdirs) ;
     "preprocessor", `String Fc_config.preprocessor ;
     "using_default_cpp", `Bool Fc_config.using_default_cpp ;
     "preprocessor_is_gnu_like", `Bool Fc_config.preprocessor_is_gnu_like ;

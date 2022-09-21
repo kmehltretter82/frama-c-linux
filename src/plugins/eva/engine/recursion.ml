@@ -53,7 +53,7 @@ let get_spec kinstr kf =
        Try to increase@ the %s parameter@ \
        or write a correct specification@ for function %a.@\n%t@]"
       (* note: the "\n" before the pretty print of the stack is required by:
-         FRAMAC_SHARE/analysis-scripts/make_wrapper.py
+         FRAMAC_LIB/analysis-scripts/make_wrapper.py
       *)
       Kernel_function.pretty kf
       Parameters.RecursiveUnroll.name

@@ -22,4 +22,4 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (using dune_site 0.1)
-(package (name frama-c) (sites (share share) (lib plugins) (lib plugins_gui)))
+(package (name frama-c) (sites (share share) (libexec lib) (lib plugins) (lib plugins_gui)))
