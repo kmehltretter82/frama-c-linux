@@ -507,6 +507,10 @@ module type Counter = sig
   (** @return the current value of the counter, without incrementing it.
       @since Fluorine-20130401 *)
 
+  val set: int -> unit
+  (** Sets the value of the counter.
+      @since Frama-C+dev. *)
+
   (** Resets the counter to 0.
       @since Frama-C+dev *)
   val reset: unit -> unit
