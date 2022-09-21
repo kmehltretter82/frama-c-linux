@@ -81,19 +81,19 @@ FRAMAC_COM_DOWNLOAD="https://www.frama-c.com/download"
 show_step "Checking version"
 
 VERSION="$(cat VERSION)"
-VERSION_SAFE="$(echo ${VERSION/~/-})"
-VERSION_MODIFIER=$(cat VERSION | sed -e s/[0-9.]*\\\(.*\\\)/\\1/)
-VERSION_MAJOR=$(cat VERSION | sed -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
-VERSION_MINOR=$(cat VERSION | sed -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
+VERSION_SAFE="${VERSION/~/-}"
+VERSION_MODIFIER=$(sed VERSION -e s/[0-9.]*\\\(.*\\\)/\\1/)
+VERSION_MAJOR=$(sed VERSION -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
+VERSION_MINOR=$(sed VERSION -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
 TAG="$(git describe --tag)"
 CODENAME="$(cat VERSION_CODENAME)"
 LOWER_CODENAME="$(echo "$CODENAME" | tr '[:upper:]' '[:lower:]')"
 VERSION_AND_CODENAME="${VERSION_SAFE}-${CODENAME}"
 
 if [ "$VERSION_MINOR" != 0 ]; then
-  PREVIOUS="$VERSION_MAJOR.$(($VERSION_MINOR - 1))"
+  PREVIOUS="$VERSION_MAJOR.$((VERSION_MINOR - 1))"
 else
-  PREVIOUS="$(($VERSION_MAJOR - 1)).0"
+  PREVIOUS="$((VERSION_MAJOR - 1)).0"
 fi
 PREVIOUS_NAME=$(git show $PREVIOUS:VERSION_CODENAME)
 
@@ -132,7 +132,7 @@ function prepare_file {
     exit 2
   fi
   echo_green "OK"
-  chmod 644 $1
+  chmod 644 "$1"
 }
 
 show_step "Searching for a Frama-C source archive"
@@ -186,7 +186,7 @@ EACSL_VERSION=$(cat "$MANUALS_DIR/e-acsl-version.txt")
 show_step "Searching for changes"
 
 CHANGES="releases/$VERSION_MAJOR.$VERSION_MINOR.md"
-prepare_file $CHANGES
+prepare_file "$CHANGES"
 
 ##########################################################################
 # File copy
@@ -211,26 +211,26 @@ function version_name {
 # $2 : extension
 
 function copy_normal {
-  cp "$MANUALS_DIR/$1.$2" "$MANS_TARGET_DIR/$(generic_name $1).$2"
-  cp "$MANUALS_DIR/$1.$2" "$MANS_TARGET_DIR/$(version_name $1).$2"
+  cp "$MANUALS_DIR/$1.$2" "$MANS_TARGET_DIR/$(generic_name "$1").$2"
+  cp "$MANUALS_DIR/$1.$2" "$MANS_TARGET_DIR/$(version_name "$1").$2"
 }
 
 function copy_e_acsl {
   EACSL_TARGET_DIR="$MANS_TARGET_DIR/e-acsl"
-  cp "$MANUALS_DIR/$1.$2" "$EACSL_TARGET_DIR/$(generic_name $1).$2"
-  cp "$MANUALS_DIR/$1.$2" "$EACSL_TARGET_DIR/$(version_name $1).$2"
+  cp "$MANUALS_DIR/$1.$2" "$EACSL_TARGET_DIR/$(generic_name "$1").$2"
+  cp "$MANUALS_DIR/$1.$2" "$EACSL_TARGET_DIR/$(version_name "$1").$2"
 }
 
 function copy_files {
   for manual in "${MANUALS[@]}"; do
     if [[ $manual =~ ^e-acsl.*$ ]]; then
-      copy_e_acsl $manual "pdf"
+      copy_e_acsl "$manual" "pdf"
     else
-      copy_normal $manual "pdf"
+      copy_normal "$manual" "pdf"
     fi
   done
   for companion in "${COMPANIONS[@]}"; do
-    copy_normal $companion "tar.gz"
+    copy_normal "$companion" "tar.gz"
   done
 
   # Eva has an old manual name that might be in use:
@@ -294,7 +294,7 @@ done
 echo "" >> $WIKI_PAGE
 echo "## Companion archives" >> $WIKI_PAGE
 for archive in "${COMPANIONS[@]}"; do
-  NAME=$(version_name $archive)
+  NAME=$(version_name "$archive")
   echo "- [$archive]($FRAMAC_COM_DOWNLOAD/$NAME.tar.gz)" >> $WIKI_PAGE
 done
 echo "" >> $WIKI_PAGE
@@ -330,7 +330,7 @@ cat >$JSON_DATA <<EOL
     ]
   },
 EOL
-  echo "  \"description\": \"# Main changes since $PREVIOUS $PREVIOUS_NAME\n$(cat $CHANGES | sed -z 's/\n/\\n/g' | sed 's/\(\#.*\)/#\1/')\"" >> $JSON_DATA
+  echo "  \"description\": \"# Main changes since $PREVIOUS $PREVIOUS_NAME\n$(sed "$CHANGES" -z 's/\n/\\n/g' | sed 's/\(\#.*\)/#\1/')\"" >> $JSON_DATA
   echo "}" >> $JSON_DATA
 
 echo "Release data file built"
@@ -355,8 +355,6 @@ mkdir -p $WEBSITE_DL_DIR/e-acsl
 
 GZ_TARGET_DIR=$WEBSITE_DL_DIR
 MANS_TARGET_DIR=$WEBSITE_DL_DIR
-EACSL_SUBDIR="yes"
-GENERIC="yes"
 
 copy_files
 
@@ -376,7 +374,7 @@ version: $LOWER_CODENAME
 title: Installation instructions for $CODENAME
 ---
 EOL
-cat ./INSTALL.md | sed -e "s/^\(# Installing Frama-C\)$/\1 $EXT/" >>$INSTALL_WEBPAGE
+sed ./INSTALL.md -e "s/^\(# Installing Frama-C\)$/\1 $EXT/" >>$INSTALL_WEBPAGE
 
 echo "Installation file built"
 
