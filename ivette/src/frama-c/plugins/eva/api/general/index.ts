@@ -247,12 +247,12 @@ export enum taintStatus {
   error = 'error',
   /** **Not applicable:** no taint for this kind of property */
   not_applicable = 'not_applicable',
-  /** **Data tainted:**
+  /** **Direct taint:**
       this property is related to a memory location that can be affected by an attacker */
-  data_tainted = 'data_tainted',
-  /** **Control tainted:**
+  direct_taint = 'direct_taint',
+  /** **Indirect taint:**
       this property is related to a memory location whose assignment depends on path conditions that can be affected by an attacker */
-  control_tainted = 'control_tainted',
+  indirect_taint = 'indirect_taint',
   /** **Untainted property:** this property is safe */
   not_tainted = 'not_tainted',
 }

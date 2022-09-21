@@ -289,6 +289,22 @@ module Results: sig
     (** Memory zone read to compute data addresses. *)
   }
 
+  (** Taint of a memory zone, according to the taint domain. *)
+  type taint =
+    | Direct
+    (** Direct data dependency from values provided by the attacker to the given
+        memory zone, meaning that the attacker may be able to alter its value. *)
+    | Indirect
+    (** Indirect dependency from values provided by the attacker to the given
+        memory zone. The attacker cannot directly alter this memory, but he may
+        be able to impact on the path by which its value is computed. *)
+    | Untainted
+    (** No taint: the given memory zone cannot be modified by the attacker. *)
+
+  (** Evaluates the taint of a given memory zone, according to the taint domain.
+      Returns an error if the taint domain was not enabled. *)
+  val is_tainted : Locations.Zone.t -> request -> (taint, error) Result.t
+
   (** Computes (an overapproximation of) the memory dependencies of an
       expression. *)
   val expr_dependencies : Cil_types.exp -> request -> deps

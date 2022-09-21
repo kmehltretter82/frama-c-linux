@@ -196,7 +196,9 @@ let () =
 
 module Taint = struct
   open Server.Data
-  open Taint_domain
+
+  type taint = Results.taint = Direct | Indirect | Untainted
+  type error = NotComputed | Irrelevant | LogicError
 
   let dictionary = Enum.dictionary ()
 
@@ -220,38 +222,68 @@ module Taint = struct
     tag (Error Irrelevant) "not_applicable" "—"
       "Not applicable" "no taint for this kind of property"
 
-  let tag_data_tainted =
-    tag (Ok Data) "data_tainted" "Tainted (data)"
-      "Data tainted"
+  let tag_direct_taint =
+    tag (Ok Direct) "direct_taint" "Tainted (direct)"
+      "Direct taint"
       "this property is related to a memory location that can be affected \
        by an attacker"
 
-  let tag_control_tainted =
-    tag (Ok Control) "control_tainted" "Tainted (control)"
-      "Control tainted"
+  let tag_indirect_taint =
+    tag (Ok Indirect) "indirect_taint" "Tainted (indirect)"
+      "Indirect taint"
       "this property is related to a memory location whose assignment depends \
        on path conditions that can be affected by an attacker"
 
   let tag_untainted =
-    tag (Ok None) "not_tainted" "Untainted"
+    tag (Ok Untainted) "not_tainted" "Untainted"
       "Untainted property" "this property is safe"
 
   let () = Enum.set_lookup dictionary
       begin function
-        | Error Taint_domain.NotComputed -> tag_not_computed
-        | Error Taint_domain.Irrelevant -> tag_not_applicable
-        | Error Taint_domain.LogicError -> tag_error
-        | Ok Data -> tag_data_tainted
-        | Ok Control -> tag_control_tainted
-        | Ok None -> tag_untainted
+        | Error NotComputed -> tag_not_computed
+        | Error Irrelevant -> tag_not_applicable
+        | Error LogicError -> tag_error
+        | Ok Direct -> tag_direct_taint
+        | Ok Indirect -> tag_indirect_taint
+        | Ok Untainted -> tag_untainted
       end
 
   let data = Request.dictionary ~package ~name:"taintStatus"
       ~descr:(Markdown.plain "Taint status of logical properties") dictionary
 
-  include (val data : S with type t = taint_result)
-end
+  include (val data : S with type t = (taint, error) result)
 
+  let zone_of_predicate kinstr predicate =
+    let state = Results.(before_kinstr kinstr |> get_cvalue_model) in
+    let env = Eval_terms.env_only_here state in
+    let logic_deps = Eval_terms.predicate_deps env predicate in
+    match Option.map Cil_datatype.Logic_label.Map.bindings logic_deps with
+    | Some [ BuiltinLabel Here, zone ] -> Ok zone
+    | _ -> Error LogicError
+
+  let get_predicate = function
+    | Property.IPCodeAnnot ica ->
+      begin
+        match ica.ica_ca.annot_content with
+        | AAssert (_, predicate) | AInvariant (_, _, predicate) ->
+          Ok predicate.tp_statement
+        | _ -> Error Irrelevant
+      end
+    | IPPropertyInstance { ii_pred = None } -> Error LogicError
+    | IPPropertyInstance { ii_pred = Some ip } -> Ok ip.ip_content.tp_statement
+    | _ -> Error Irrelevant
+
+  let is_tainted_property ip =
+    if not (Analysis.is_computed () && Taint_domain.Store.is_computed ())
+    then Error NotComputed
+    else
+      let (let+) = Result.bind in
+      let kinstr = Property.get_kinstr ip in
+      let+ predicate = get_predicate ip in
+      let+ zone = zone_of_predicate kinstr predicate in
+      let result = Results.(before_kinstr kinstr |> is_tainted zone) in
+      Result.map_error (fun _ -> NotComputed) result
+end
 
 let model = States.model ()
 
@@ -265,7 +297,7 @@ let () = States.column model ~name:"taint"
     ~descr:(Markdown.plain "Is the property tainted according to \
                             the Eva taint domain?")
     ~data:(module Taint)
-    ~get:(fun ip -> Taint_domain.is_tainted_property ip)
+    ~get:(fun ip -> Taint.is_tainted_property ip)
 
 let _array =
   States.register_array

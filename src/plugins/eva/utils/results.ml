@@ -320,6 +320,11 @@ struct
     | Some extract ->
       convert (Response.map_join extract Cvalue.Model.join (get req))
 
+  let get_state req key join =
+    match A.Dom.get key with
+    | None -> Result.error DisabledDomain
+    | Some extract -> convert (Response.map_join extract join (get req))
+
   let print_states ?filter req =
     let state = Response.map_join (fun x -> x) A.Dom.join (get req) in
     let print (type s)
@@ -737,6 +742,15 @@ type deps = Function_Froms.Deps.deps = {
 let expr_dependencies expr request =
   let lval_to_loc lv = eval_address lv request |> as_precise_loc in
   Eva_utils.deps_of_expr lval_to_loc expr
+
+(* Taint *)
+
+type taint = Taint_domain.taint = Direct | Indirect | Untainted
+
+let is_tainted zone request =
+  let module M = Make () in
+  let state = M.get_state request Taint_domain.key Taint_domain.join in
+  Result.map (fun state -> Taint_domain.is_tainted state zone) state
 
 (* Reachability *)
 

@@ -24,7 +24,7 @@ open Cil_types
 open Cil_datatype
 open Locations
 
-type taint = {
+type taint_state = {
   (* Over-approximation of the memory locations that are tainted due to a data
      dependency. *)
   locs_data: Zone.t;
@@ -73,7 +73,7 @@ module LatticeTaint = struct
   include Datatype.Make_with_collections(struct
       include Datatype.Serializable_undefined
 
-      type t = taint
+      type t = taint_state
 
       let name = "taint"
 
@@ -296,7 +296,7 @@ end
 
 
 module TaintDomain = struct
-  type state = taint
+  type state = taint_state
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
   type origin
@@ -595,48 +595,15 @@ let flag =
 let () = Abstractions.register_hook interpret_taint_logic
 
 
-type taint_error = NotComputed | Irrelevant | LogicError
-type taint_ok = Data | Control | None
-type taint_result = (taint_ok, taint_error) result
+type taint = Direct | Indirect | Untainted
 
-let zone_of_predicate env predicate =
-  let logic_deps = Eval_terms.predicate_deps env predicate in
-  let deps_list = Option.map Logic_label.Map.bindings logic_deps in
-  match deps_list with
-  | Some [ BuiltinLabel Here, zone ] -> Ok zone
-  | _ -> Error LogicError
-
-let get_predicate = function
-  | Property.IPCodeAnnot ica ->
-    begin
-      match ica.ica_ca.annot_content with
-      | AAssert (_, predicate) | AInvariant (_, _, predicate) ->
-        Ok predicate.tp_statement
-      | _ -> Error Irrelevant
-    end
-  | IPPropertyInstance { ii_pred = None } -> Error LogicError
-  | IPPropertyInstance { ii_pred = Some pred } -> Ok pred.ip_content.tp_statement
-  | _ -> Error Irrelevant
-
-let get_stmt ip =
-  let kinstr = Property.get_kinstr ip in
-  match kinstr with
-  | Kglobal -> Error Irrelevant
-  | Kstmt stmt -> Ok stmt
-
-let is_tainted_property ip =
-  let (let+) = Result.bind in
-  if not (Store.is_computed ()) then Error NotComputed else
-    let+ stmt = get_stmt ip in
-    let+ predicate = get_predicate ip in
-    match Store.get_stmt_state ~after:false stmt with
-    | `Bottom -> Ok None
-    | `Value state ->
-      let cvalue = Db.Value.get_stmt_state ~after:false stmt in
-      let env = Eval_terms.env_only_here cvalue in
-      let+ zone = zone_of_predicate env predicate in
-      if Zone.intersects zone state.locs_data
-      then Ok Data
-      else if Zone.intersects zone state.locs_control
-      then Ok Control
-      else Ok None
+let is_tainted state ?indirect zone =
+  let intersects_any_taint z =
+    Zone.intersects (Zone.join state.locs_data state.locs_control) z
+  in
+  if Zone.intersects zone state.locs_data
+  then Direct
+  else if Zone.intersects zone state.locs_control
+       || Option.fold indirect ~none:false ~some:intersects_any_taint
+  then Indirect
+  else Untainted
