@@ -370,11 +370,6 @@ let string_del_suffix ?(strict=false) suffix s =
       (String.sub s 0 (String.length s - String.length suffix))
   else None
 
-let string_split s i =
-  let s1 = String.sub s 0 i in
-  let s2 = String.sub s (i+1) (String.length s - i -1) in
-  (s1,s2)
-
 let make_unique_name mem ?(sep=" ") ?(start=2) from =
   let rec build base id =
     let fullname = base ^ sep ^ string_of_int id in

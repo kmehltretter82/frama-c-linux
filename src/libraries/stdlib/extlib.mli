@@ -226,12 +226,6 @@ val string_del_suffix: ?strict:bool -> string -> string -> string option
     @since Aluminium-20160501
 *)
 
-val string_split: string -> int -> string * string
-(** [string_split s i] returns the beginning of [s] up to char [i-1] and the
-    end of [s] starting from char [i+1]
-    @raise Invalid_argument if [i] is not in the range [[0,(length s -1)]]
-    @since Oxygen-20120901 *)
-
 val make_unique_name:
   (string -> bool) -> ?sep:string -> ?start:int -> string -> int*string
 (** [make_unique_name mem s] returns [(0, s)] when [(mem s)=false]
