@@ -93,13 +93,15 @@ struct
   let to_callstacks stmt =
     before stmt |> callstacks
 
-  let studia_is_direct (_,{Studia.Writes.direct}) = direct
+  let studia_direct_effect = function
+    | e, { Studia.Writes.direct = true } -> Some e
+    | _ -> None
 
   let writes kinstr lval =
     let zone = to_zone kinstr lval in
     Self.debug ~dkey "computing writes for %a" Cil_printer.pp_lval lval;
     let result = Studia.Writes.compute zone in
-    let writes = Extlib.filter_map studia_is_direct fst result in
+    let writes = List.filter_map studia_direct_effect result in
     Self.debug ~dkey "%d found" (List.length writes);
     writes
 
@@ -107,7 +109,7 @@ struct
     let zone = to_zone kinstr lval in
     Self.debug ~dkey "computing reads for %a" Cil_printer.pp_lval lval;
     let result = Studia.Reads.compute zone in
-    let reads = Extlib.filter_map studia_is_direct fst result in
+    let reads = List.filter_map studia_direct_effect result in
     Self.debug ~dkey "%d found" (List.length reads);
     reads
 

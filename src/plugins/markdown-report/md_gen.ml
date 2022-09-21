@@ -97,26 +97,28 @@ let section_stubs env =
   let opt = Dynamic.Parameter.String.get "-eva-use-spec" () in
   let l = String.split_on_char ',' opt in
   let use_spec =
-    Extlib.filter_map
+    List.filter_map
       (* The option can include categories in Frama-C's List/Set/Map sense,
          which begins with a '@'. In particular, @default is included by
          default. Theoretically, there could also be some '-' to suppress
          the inclusion of a function
       *)
-      (fun s -> String.length s <> 0 && s.[0] <> '@' && s.[0] <> '-')
       (fun s ->
-         let kf = Globals.Functions.find_by_name s in
-         let anchor = sanitize_anchor s in
-         let content =
-           if env.is_draft then insert_marks env anchor
-           else
-             let intro = Markdown.text @@ Markdown.format
-                 "`%s` has the following specification" s in
-             let funspec = Markdown.codeblock ~lang:"acsl" "%a"
-                 Printer.pp_funspec (Annotations.funspec kf) in
-             Block ( intro @ funspec ) :: insert_remark env anchor
-         in
-         H4 (code s, Some anchor) :: content)
+         if String.length s <> 0 && s.[0] <> '@' && s.[0] <> '-'
+         then
+           let kf = Globals.Functions.find_by_name s in
+           let anchor = sanitize_anchor s in
+           let content =
+             if env.is_draft then insert_marks env anchor
+             else
+               let intro = Markdown.text @@ Markdown.format
+                   "`%s` has the following specification" s in
+               let funspec = Markdown.codeblock ~lang:"acsl" "%a"
+                   Printer.pp_funspec (Annotations.funspec kf) in
+               Block ( intro @ funspec ) :: insert_remark env anchor
+           in
+           Some (H4 (code s, Some anchor) :: content)
+         else None)
       l
   in
   let describe_func kf =

@@ -375,12 +375,13 @@ let clauses_of_partition kf loc p =
 let out_pointers_separation kf loc p =
   let ret_t = Kernel_function.get_return_type kf in
   let addr_of t = addr_of_lval ~loc t.it_content in
-  let asgnd_ptrs =
-    Extlib.filter_map
-      (* Search assigned pointers via a pointer,
+  let assigned_ptr t =
+    (* Search assigned pointers via a pointer,
          e.g. 'assigns *p ;' with '*p' of type pointer or set of pointers *)
-      (fun t -> ptrset t.it_content) addr_of (assigned_via_pointers kf)
+    if ptrset t.it_content then Some (addr_of t)
+    else None
   in
+  let asgnd_ptrs = List.filter_map assigned_ptr (assigned_via_pointers kf) in
   let asgnd_ptrs =
     if Cil.isPointerType ret_t then tresult ~loc ret_t :: asgnd_ptrs
     else asgnd_ptrs

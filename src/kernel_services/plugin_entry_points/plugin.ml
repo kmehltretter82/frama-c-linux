@@ -745,8 +745,9 @@ struct
         | '+' -> true, CamlString.sub s 1 (CamlString.length s - 1)
         | _ -> true, s
       in
-      let non_empty s = s <> "" in
-      Change_category (Extlib.filter_map non_empty parse_single categories)
+      let non_empty_category s =
+        if s <> "" then Some (parse_single s) else None in
+      Change_category (List.filter_map non_empty_category categories)
     end
 
   let debug_category_optname = output_mode "Msg_key" "msg-key"

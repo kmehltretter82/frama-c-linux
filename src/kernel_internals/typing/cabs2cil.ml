@@ -942,14 +942,11 @@ let declared_in_current_scope ~ghost s =
     Datatype.String.Hashtbl.mem env s
   | cur_scope :: _ ->
     let names_declared_in_current_scope =
-      Extlib.filter_map
+      List.filter_map
         (function
-          | UndoRemoveFromEnv (ghost',_)  -> ghost || not ghost'
-          | UndoAlphaEnv _ -> false)
-        (function
-          | UndoRemoveFromEnv (_, s) -> s
-          | UndoAlphaEnv _ -> assert false (* already filtered *)
-        ) !cur_scope
+          | UndoRemoveFromEnv (ghost',s) when ghost || not ghost' -> Some s
+          | _ -> None)
+        !cur_scope
     in
     List.mem s names_declared_in_current_scope
 

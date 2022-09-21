@@ -102,11 +102,6 @@ let replace cmp x l =
     | y::l -> if cmp x y then x::l else y :: aux l
   in aux l
 
-let filter_map filter f l =
-  let rec aux = function
-      [] -> []
-    | x::tl -> if filter x then f x :: aux tl else aux tl
-  in aux l
 let filter_map' f filter l=
   let rec aux = function
     | [] -> []
