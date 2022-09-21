@@ -33,9 +33,15 @@
 
 ##########################################################################
 
-curl \
-  --header 'Content-Type: application/json' \
-  --header "PRIVATE-TOKEN:$FRAMA_CI_BOT_RELEASE_TOKEN" \
-  --data-binary "@release-data.json" \
-  --request POST \
-  "https://git.frama-c.com/api/v4/projects/1113/releases"
+TAG="$(git describe --tag)"
+
+if [[ $TAG =~ .*-beta$ ]] ; then
+  git push "git@git.frama-c.com:pub/frama-c.git" "$TAG"
+else
+  curl \
+    --header 'Content-Type: application/json' \
+    --header "PRIVATE-TOKEN:$FRAMA_CI_BOT_RELEASE_TOKEN" \
+    --data-binary "@release-data.json" \
+    --request POST \
+    "https://git.frama-c.com/api/v4/projects/780/releases"
+fi

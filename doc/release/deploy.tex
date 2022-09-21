@@ -112,11 +112,12 @@ page (\url{https://git.frama-c.com/pub/frama-c/-/wikis/home}).
 In the release pipeline, run the job \texttt{release - release-branch}. It will
 push the stable branch on the public repository.
 
-Then, either the release is beta, or not. If the release is a beta, just push
-the tag of the release on the public GitLab. Else, run the job
-\texttt{release - release-create}. After this, the release should
-be available in \url{https://git.frama-c.com/pub/frama-c/-/releases}. As well
-as the tag of the version in \url{https://git.frama-c.com/pub/frama-c/-/tags}.
+Then, run the job \texttt{release - release-create}. After this, either the
+tag indicates a beta release and then this tag is pushed on the public GitLab
+repository (\url{https://git.frama-c.com/pub/frama-c/-/tags}), or it is a final
+release and the release should be available in
+\url{https://git.frama-c.com/pub/frama-c/-/releases}, as well as the tag of the
+version in \url{https://git.frama-c.com/pub/frama-c/-/tags}.
 
 \section{Announcements}
 
