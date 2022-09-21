@@ -200,6 +200,7 @@ external-plugins:
           "genassigns",
           "linea-cabs",
           "meta",
+          "Minimal",
           "mthread",
           "security",
           "Volatile"
