@@ -1907,8 +1907,14 @@ let build_modules fmt modules =
     modules
 
 let warn_if_not_enabled =
-  let dune_var_regex = Str.regexp "%{" in
-  let escaped_cond s = Str.global_replace dune_var_regex "\\%{" s in
+  let dune_cond_regexp = Str.regexp "^(\\(.*\\))" in
+  let doublequote_regexp = Str.regexp "\"" in
+  let dune_var_regexp = Str.regexp "%{" in
+  let dune_cond_item s = Str.global_replace dune_cond_regexp "\\1" s in
+  let escaped_cond s =
+    let s = Str.global_replace dune_var_regexp "\\%{" s in
+    Str.global_replace doublequote_regexp "\\\"" s
+  in
   fun ~env ~suite fmt enabled_if ->
     if not (StringSet.is_empty enabled_if) then begin
       Format.fprintf fmt
@@ -1923,9 +1929,12 @@ let warn_if_not_enabled =
         "(alias (name %s)\n  \
          (deps (alias disabled_%s)))@."
         (ptests_alias ~env) (ptests_alias ~env);
-      let pp_disabled fmt cond = Format.fprintf fmt "(= false %s)" cond in
-      let pp_enabled  fmt cond = Format.fprintf fmt "              (echo \"- %s: \" %s \"\\n\")\n  "
-          (escaped_cond cond) cond in
+      let pp_disabled fmt cond = Format.fprintf fmt "(not %s)" cond in
+      let pp_enabled  fmt cond =
+        let cond = dune_cond_item cond in
+        Format.fprintf fmt "              (echo \"- %s: \" %s \"\\n\")\n  "
+          (escaped_cond cond) cond
+      in
       let conds = StringSet.elements enabled_if in
       Format.fprintf fmt
         "(rule ; Warns when some test conditions are disabled\n  \
