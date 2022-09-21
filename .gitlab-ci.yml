@@ -193,17 +193,17 @@ external-plugins:
   parallel:
     matrix:
       - PLUGIN: [
-          "ACSL-importer",
-          "Caveat-importer",
+          "acsl-importer",
+          "caveat-importer",
           "context-from-precondition",
           "frama-clang",
           "genassigns",
           "linea-cabs",
           "meta",
-          "Minimal",
+          "minimal",
           "mthread",
           "security",
-          "Volatile"
+          "volatile"
         ]
 
 ################################################################################
