@@ -800,6 +800,187 @@ itself, it needs to be doubled, {\it i.e.} \texttt{@@} will be translated as
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\section{Plug-in Migration from Makefile to Dune}\label{adv:dune-migration}
+
+\begin{target}developers who have an existing plug-in for Frama-C 25 or less and
+  want to migrate this plug-in to Frama-C 26 or more.\end{target}
+
+\begin{prereq}
+  Being familiar with the plug-in to migrate. Depending on how complex the
+  plug-in is, it may require an advanced knowledge of the Dune build system.
+\end{prereq}
+
+Please note that this section is a best effort procedure for making the
+migration as smooth as possible. If the plug-in is particularly complex,
+please contact us if you need some help for migrating it.
+
+\subsection{Files organization changes}
+
+Previously for a plug-in named \texttt{Plugin}, only the file
+\texttt{Plugin.mli} was necessary to expose the signature of the plug-in. Now,
+one has to also provide an implementation file \texttt{Plugin.ml}.
+
+For most plug-ins, the \texttt{autoconf} and \texttt{configure} will be useless.
+In particular, \framac does not provide any \texttt{autoconf} and
+\texttt{configure} features anymore. So for most plug-ins these files will be
+entirely removed (see~\ref{adv:dune-migration:conf}). Thus, the
+\texttt{Makefile.in} does not exist anymore. A \texttt{Makefile} may be useful
+to provide some shortcuts.
+
+If a plugin has a graphical user-interface, it is recommended to put the related
+files into a separate directory in the directory of the plug-in
+(see~\ref{adv:dune-migration:gui}).
+
+It was previously possible to indicate \texttt{.} as a test suite for \ptests.
+In such a case, tests source files were directly in the \texttt{tests} directory.
+This is not possible anymore. If the plug-in tests follow this architecture,
+these tests should be moved in a subdirectory of \texttt{tests} and the oracles
+updated before starting the migration.
+
+\subsection{Template \texttt{dune} file}
+
+This basic template should be enough for most plug-ins. The next sections
+explain how to add more information to this file to handle some common cases.
+
+\begin{lstlisting}[language=Dune]
+( rule
+  (alias frama-c-configure)
+  (deps (universe))
+  (action ( progn
+            (echo "MyPlugin:" %{lib-available:frama-c-myplugin.core} "\n")
+            (echo " - Frama-C:" %{lib-available:frama-c.kernel} "\n")
+          )
+  )
+)
+
+( library
+  (optional)
+  (name myplugin)
+  (public_name frama-c-myplugin.core)
+  (flags -open Frama_c_kernel :standard)
+  (libraries frama-c.kernel)
+)
+
+( plugin
+  (optional)
+  (name myplugin) (libraries frama-c-myplugin.core) (site (frama-c plugins))
+)
+\end{lstlisting}
+
+For the creation of the \texttt{dune-project} file, please refer to
+Section~\ref{tut2:hello}.
+
+\subsection{\texttt{autoconf} and \texttt{configure}}\label{adv:dune-migration:conf}
+
+Indicating whether a plug-in is available and why (availability of the
+dependencies) is now handled via the \texttt{frama-c-configure} rule.
+
+When working in the Frama-C \texttt{src/plugins} directory, enabling or
+disabling the plug-in at build time is done thanks to the script
+\texttt{dev/disable-plugins.sh}.
+
+Plug-ins dependencies are now declared in the \texttt{dune} file. In the
+\texttt{libraries} field. For instance, if in the \texttt{autoconf} of the
+plug-in, the following lines are present:
+
+\begin{lstlisting}
+plugin_require_external(myplugin,zmq)
+plugin_use_external(myplugin,zarith)
+plugin_require(myplugin,wp)
+plugin_use(myplugin,eva)
+\end{lstlisting}
+
+The \texttt{libraries} should be now:
+\begin{lstlisting}[language=Dune]
+  (libraries
+     frama-c.kernel
+     zmq
+     (select zarith_dependent.ml from
+       (%{lib-available:zarith} -> zarith_dependent.ok.ml)
+       ( -> zarith_dependent.ko.ml)
+     )
+     frama-c-wp.core
+     (select eva_dependent.ml from
+       (%{lib-available:frama-c-eva.core} -> eva_dependent.ok.ml)
+       ( -> eva_dependent.ko.ml)
+     )
+  )
+\end{lstlisting}
+For external binaries, the keywod is \texttt{bin-available}.
+
+In the case some file must be generated at build time, it is recommended to use
+a rule together with an action of generation. The executable itself can be
+generated from an \ocaml file itself. For example:
+
+\begin{lstlisting}[language=Dune]
+(executable
+ (name myconfigurator)
+ (libraries str))
+
+(rule
+ (deps VERSION_FILE)
+ (targets generated-file)
+ (action (run ./myconfigurator.exe))
+\end{lstlisting}
+
+\subsection{GUI migration}\label{adv:dune-migration:gui}
+
+Just like there is a \texttt{dune} for the core features of the plug-in, there
+is now a \texttt{dune} file for the GUI, that depends on the core features of
+the plug-in and the \framac GUI. This file is to put in the \texttt{gui}
+subdirectory. Again, if there are additional dependencies, they must be
+indicated in the \texttt{libraries} field:
+\begin{lstlisting}
+( library
+  (name myplugin_gui)
+  (public_name frama-c-myplugin.gui)
+  (optional)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open MyPlugin :standard)
+  (libraries frama-c.kernel frama-c.gui frama-c-myplugin.core)
+)
+
+(plugin (optional) (name myplugin-gui) (libraries frama-c-myplugin.gui) (site (frama-c plugins_gui)))
+\end{lstlisting}
+
+\subsection{Build and \texttt{Makefile.in}}
+
+Provided that the \lstinline{dune} files are ready. The plug-in can now be
+built using the command \texttt{dune build @install}. The file
+\lstinline{Makefile.in} can now be removed.
+
+\subsection{Migrating tests}
+
+In the \texttt{test\_config*} files, the \texttt{PLUGIN} field is now mandatory
+and must list the plug-in and all the plug-ins on which it directly depends on.
+For example the plug-in defined in our previous \texttt{dune} file, and assuming
+that the tests use all mandatory and optional dependencies:
+
+\begin{lstlisting}
+PLUGIN: myplugin,wp,eva
+OPT: ...
+\end{lstlisting}
+
+The \texttt{ptests\_config} file now lists the test suites. Notice that this file
+was previously generated and probably list in the ignored files for the versioning
+system. Now, it must be versioned in such a case. Assuming that the plug-in has
+three suites \texttt{basic}, \texttt{eva} and \texttt{wp}. This file now
+contains:
+
+\begin{lstlisting}
+DEFAULT_SUITES=basic eva wp
+\end{lstlisting}
+
+For most plug-ins, these modifications should be enough so that:
+\begin{lstlisting}
+dune exec -- frama-c-ptests
+dune build @ptests
+\end{lstlisting}
+behaves in expected way.
+
+For more advanced usage of \texttt{ptests} please refer to Section~\ref{adv:ptests}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Plug-in General Services}\label{adv:plugin-services}
 
 Module \texttt{Plugin}\codeidxdef{Plugin} provides an access to some general
@@ -912,7 +1093,7 @@ let print_one v l =
   Format.printf "variable %s (%d):@\n" v.vname v.vid;
   List.iter
     (fun (ki, lv) ->
-       Format.printf "  sid %a: %a@\n" d_ki ki d_lval lv) 
+       Format.printf "  sid %a: %a@\n" d_ki ki d_lval lv)
     l
 
 let print_all () =
@@ -929,7 +1110,7 @@ let print_one fmt v l =
   Format.fprintf fmt "variable %s (%d):@\n" v.vname v.vid;
   List.iter
     (fun (ki, lv) ->
-       Format.fprintf fmt "  sid %a: %a@\n" d_ki ki d_lval lv) 
+       Format.fprintf fmt "  sid %a: %a@\n" d_ki ki d_lval lv)
     l
 \end{ocamlcode}
 
@@ -1067,10 +1248,10 @@ output can be associated to a debugging key with the optional argument
 Each category must be registered through the
 \lstinline|register_category| function. You can define subcategories
 by putting colons in the registered name. For instance \lstinline|a:b:c| defines
-a subcategory \lstinline|c| of \lstinline|a:b|, itself a subcategory of 
+a subcategory \lstinline|c| of \lstinline|a:b|, itself a subcategory of
 \lstinline|a|. User can then choose to
 output debugging messages belonging to a given category (and its subcategories)
-with the \lstinline{-plugin-msg-key <category>} option. 
+with the \lstinline{-plugin-msg-key <category>} option.
 
 In order to decide whether a message should be output, both level and category
 options are examined:
@@ -1080,7 +1261,7 @@ options are examined:
 \item if only \lstinline|~level| is provided, the message is output if the
   corresponding verbosity or debugging level is sufficient
 \item if only \lstinline|~dkey| is used, the message is output if the
-  corresponding category is in used 
+  corresponding category is in used
   (even if the verbosity or debugging level is \lstinline|0|)
 \item if both \lstinline|~level| and \lstinline|~dkey| are present,
   the message is output if the two conditions above
@@ -1282,7 +1463,7 @@ It is also possible to have a momentary direct access to
 \begin{description}
 %%item
   \logroutine{print\_on\_output}{ "..."}%
-  The routine immediately locks the output of \lstinline{Log} and 
+  The routine immediately locks the output of \lstinline{Log} and
   prints the provided message. All message echoes are delayed until
   the routine actually returns. Notification to listeners is not
   delayed, however.
@@ -1390,10 +1571,10 @@ The following line of code pretty prints whether two statements are equal.
 \sscodeidx{Datatype}{S\_no\_copy}{pretty}
 \begin{ocamlcode}
 (* assuming the type of [stmt1] and [stmt2] is Cil_types.stmt *)
-Format.fprintf 
+Format.fprintf
   fmt (* a formatter previously defined somewhere *)
-  "statements %a and %a are %sequal" 
-  Cil_datatype.Stmt.pretty stmt1 
+  "statements %a and %a are %sequal"
+  Cil_datatype.Stmt.pretty stmt1
   Cil_datatype.Stmt.pretty stmt2
   (if Cil_datatype.Stmt.equal stmt1 stmt2 then "" else "not ")
 \end{ocamlcode}
@@ -1406,10 +1587,10 @@ in the following way.
 \scodeidx{Datatype}{String}
 \sscodeidx{Datatype}{S\_with\_collections}{Set}
 \begin{ocamlcode}
-let string_set = 
-  List.fold_left 
+let string_set =
+  List.fold_left
     (fun acc s -> Datatype.String.Set.add s acc)
-    Datatype.String.Set.empty 
+    Datatype.String.Set.empty
     [ "foo"; "bar"; "baz" ]
 \end{ocamlcode}
 \end{example}
@@ -1446,14 +1627,14 @@ module AB =
           type *)
        let name = "ab"
        (* representants of the type: a non-empty list of values of this type. It
-          is only used for safety check: the best the list represents the 
+          is only used for safety check: the best the list represents the
           different possible physical representation of the type, the best the
           check is. *)
        let reprs = [ A; B 0 ]
        (* structural descriptor describing the physical representation of the
           type. It is used when marshaling. *)
-       let structural_descr = 
-         Structural_descr.Structure 
+       let structural_descr =
+         Structural_descr.Structure
            (Structural_desr.Sum [| [| Structural_descr.p_int |] |])
        (* equality, compare and hash are the standard OCaml ones *)
        let equal (x:t) y = x = y
@@ -1466,7 +1647,7 @@ module AB =
        (* the type ab does never contain any value of type Project.t *)
        let mem_project = Datatype.never_any_project
        (* pretty printer *)
-       let pretty fmt x = 
+       let pretty fmt x =
          Format.pp_print_string fmt
           (match x with A -> "a" | B n -> "b" ^ string_of_int n)
      end)
@@ -1510,7 +1691,7 @@ serializable. In such a case, you can use the very useful predefined structure
 
 As for type values, it is not possible to create a datatype corresponding to
 polymorphic types, but it is possible to create them for each of their
-monomorphic instances. 
+monomorphic instances.
 
 \begin{important}
 For building such instances, you \emph{must} not apply the functor
@@ -1523,7 +1704,7 @@ Instead, you must use the functor
 type parameter and the functor
 \texttt{Datatype.Polymorphic2}\scodeidx{Datatype}{Polymorphic2} for types with
 two type parameters\footnote{%
-\texttt{Polymorphic3}\scodeidx{Datatype}{Polymorphic3} and 
+\texttt{Polymorphic3}\scodeidx{Datatype}{Polymorphic3} and
 \texttt{Polymorphic4}\scodeidx{Datatype}{Polymorphic4}
 also exist in case of polymorphic types with 3 or 4 type parameters.}.
 These functors takes as argument how to build the datatype
@@ -1545,15 +1726,15 @@ Here is how to apply \texttt{Datatype.Polymorphic} corresponding to the type
 \scodeidx{Type}{par}
 \begin{ocamlcode}
 type 'a ab = A of 'a | B of int
-module Poly_ab = 
+module Poly_ab =
   Datatype.Polymorphic
     (struct
        type 'a t = 'a ab
        let name ty = Type.name ty ^ " ab"
        let module_name = "Ab"
        let reprs ty = [ A ty ]
-       let structural_descr d = 
-         Structural_descr.Structure 
+       let structural_descr d =
+         Structural_descr.Structure
           (Structural_descr.Sum
             [| [| Structural_descr.pack d |]; [| Structural_descr.p_int |] |]
        let mk_equal f x y = match x, y with
@@ -1569,18 +1750,18 @@ module Poly_ab =
       let map f = function A x -> A (f x) | B x -> B x
       let mk_internal_pretty_code f prec_caller fmt = function
         | A x ->
-          Type.par 
-            prec_caller 
-            Type.Basic 
-            fmt 
+          Type.par
+            prec_caller
+            Type.Basic
+            fmt
             (fun fmt -> Format.fprintf fmt "A %a" (f Type.Call) x)
         | B n ->
-          Type.par 
-            prec_caller 
-            Type.Call 
-            fmt 
+          Type.par
+            prec_caller
+            Type.Call
+            fmt
             (fun fmt -> Format.fprintf fmt "B %d" n)
-      let mk_pretty f fmt x = 
+      let mk_pretty f fmt x =
         mk_internal_pretty_code (fun _ -> f) Type.Basic fmt x
       let mk_varname _ = "ab"
       let mk_mem_project mem f = function
@@ -1640,7 +1821,7 @@ depends on \texttt{Plugin\_A} through the special variable
 
 \begin{example}
 \texttt{Plugin\_A} declares and provides access to a function \texttt{compute}
-in the following way. 
+in the following way.
 
 \listingname{File plugin\_a/my\_analysis\_a.ml}
 \begin{ocamlcode}
@@ -1828,9 +2009,9 @@ value to register.
 \begin{ocamlcode}
 let run () : unit = ...
 let () =
-  Dynamic.register 
-    ~plugin:"Hello" 
-    "run" 
+  Dynamic.register
+    ~plugin:"Hello"
+    "run"
     (Datatype.func Datatype.unit Datatype.unit)
     run
 \end{ocamlcode}
@@ -1862,11 +2043,11 @@ depending on the case, you will get a compile-time or a runtime error.
   Here is how the previously registered function \texttt{run} of
   \texttt{Hello} may be applied.
 \begin{ocamlcode}
-let () = 
+let () =
   Dynamic.get
-    ~plugin:"Hello" 
-    "run" 
-    (Datatype.func Datatype.unit Datatype.unit) 
+    ~plugin:"Hello"
+    "run"
+    (Datatype.func Datatype.unit Datatype.unit)
     ()
 \end{ocamlcode}
 The given strings and the given type value\index{Type!Value} must be the same
@@ -2166,7 +2347,7 @@ For solving this issue, it is possible to postpone the addition of a
 state kind to dependencies until all modules have been initialized. However,
 dependencies must be correct before anything serious is computed by \framac. So
 the right way to do this is the use of the function
-\texttt{Cmdline.run\_after\_extended\_stage}% 
+\texttt{Cmdline.run\_after\_extended\_stage}%
 \scodeidx{Cmdline}{run\_after\_extended\_stage} (see
 Section~\ref{adv:init} for advanced explanation about the way \framac is
 initialized).
@@ -2244,13 +2425,13 @@ project. However, the AST plays a special role as a state. Namely, it can be
 changed in place, bypassing the project mechanism. In particular, it is possible
 to add globals. Plugins that perform such changes should inform the kernel
 when they are done using
-\texttt{Ast.mark\_as\_changed}\scodeidxdef{Ast}{mark\_as\_changed} or 
+\texttt{Ast.mark\_as\_changed}\scodeidxdef{Ast}{mark\_as\_changed} or
 \texttt{Ast.mark\_as\_grown}\scodeidxdef{Ast}{mark\_as\_grown}. The latter
 must be used when the only changes are additions, leaving existing nodes
 untouched, while the former must be used for more intrusive changes.
 In addition, it is possible to tell the kernel that a state is ``monotonic''
 with respect to AST changes, in the sense that it does not need to be cleared
-when nodes are added (the information that should be associated to the new 
+when nodes are added (the information that should be associated to the new
 nodes will be computed as needed). This is done with the function
 \texttt{Ast.add\_monotonic\_state}\scodeidxdef{Ast}{add\_monotonic\_state}.
 \texttt{Ast.mark\_as\_grown} will not touch such a state, while
@@ -2279,7 +2460,7 @@ registration. Indeed here is the key point: from the outside, only this local
 version is used for efficiency purposes (remember
 Figure~\ref{fig:proj-mechanism}). It would work even if projects do not
 exist. Each project knows a \emph{global version}\index{State!Global
-  Version|bfit}. The project management system \emph{automatically} 
+  Version|bfit}. The project management system \emph{automatically}
 switches\index{Context Switch} the local version when the current
 project\index{Project!Current} changes in order to conserve a physical
 equality\index{Equality!Physical} between local version and current global
@@ -2625,7 +2806,7 @@ Thus it is a set of \texttt{kernel\_function}s initialized by default to
 the empty set. \framac uses
 the field \texttt{arg\_name} in order to print the name of the argument when
 displaying help. The field \texttt{help} is the help message itself. The
-Interface for this module is simple: 
+Interface for this module is simple:
 \scodeidx{Parameter\_sig}{Kernel\_function\_set}
 \begin{ocamlcode}
 module Pragma: Parameter_sig.Kernel_function_set
@@ -2676,7 +2857,7 @@ in order to know whether callsite-wise dependencies have been required.
 
 It is possible to modify the default behavior of command line options in several
 ways by applying functions just before or just after applying the functor
-defining the corresponding parameter. 
+defining the corresponding parameter.
 
 Functions which can be applied afterwards are defined in the output signature of
 the applied functor.
@@ -2701,7 +2882,7 @@ module \texttt{Parameter\_customize}\codeidxdef{Parameter\_customize}.
 \begin{example}
 Here is how the opposite of option "-safe-arrays" is renamed into
 "-unsafe-arrays" (otherwise, by default, it would be "-no-safe-arrays").
-\scodeidx{Parameter\_customize}{set\_negative\_option\_name} 
+\scodeidx{Parameter\_customize}{set\_negative\_option\_name}
 \scodeidx{Kernel}{SafeArrays}
 \begin{ocamlcode}
 let () = Parameter_customize.set_negative_option_name "-unsafe-arrays"
@@ -2746,7 +2927,7 @@ tightly coupled with handling the command line parameters.
 
 The parsing of the command line parameters is performed in several
 \emph{phases} and \emph{stages}
-\index{Command Line!Parsing}, 
+\index{Command Line!Parsing},
 each one dedicated to specific operations.
 Following the general rule stated at the beginning of this section, even
 the kernel services of \framac are internally registered as hooks routines to
@@ -2783,7 +2964,7 @@ their execution order.
   \texttt{Cmdline}\codeidx{Cmdline} (one of the first linked modules, see
   Figure~\ref{fig:architecture}) performs a very early configuration stage,
   such as setting the global verbosity and debugging levels.
-  
+
 \item \label{stage:early} \textbf{The Early Stage:} this stage initializes the
   kernel services. More precisely:
   \begin{enumerate}[(a)]
@@ -2923,7 +3104,7 @@ their execution order.
 
 \item \textbf{The Main Stage:} this is the step where plug-ins actually run
   their main entry points registered through
-  \texttt{Db.Main.extend}\sscodeidx{Db}{Main}{extend}. For all intents and purposes, you should consider 
+  \texttt{Db.Main.extend}\sscodeidx{Db}{Main}{extend}. For all intents and purposes, you should consider
   that this stage is the one where these hooks are executed.
 
 \end{enumerate}
@@ -2957,7 +3138,7 @@ from the latter with the \verb+Cabs2cil.convFile+\scodeidx{Cabs2cil}{convFile}
 function, which guarantees that the resulting \verb+Cil_types.file+ respects
 all invariants expected by the Frama-C kernel.
 \item\textbf{Type-checking:} a normal \verb+Cabs.file+ ({\it i.e.} not obtained
-through a custom parsing function) can be transformed before being 
+through a custom parsing function) can be transformed before being
 type-checked. Transformation hooks are registered through
 \verb+Frontc.add_syntactic_transformation+%
 \scodeidxdef{Frontc}{add\_syntactic\_transformation}.
@@ -2978,7 +3159,7 @@ type-checked. Transformation hooks are registered through
   (respectively \verb+File.add_code_transformation_after_cleanup+%
   \scodeidxdefsmall{File}{add\_code\_transformation\_after\_cleanup}). If such a
   transformation modify the control-flow graph of a function \texttt{f}, in
-  particular by adding statements, it must call 
+  particular by adding statements, it must call
   \verb|File.must_recompute_cfg|\scodeidxdef{File}{must\_recompute\_cfg}, in
   order to have the graph recomputed afterwards.
 \end{enumerate}
@@ -3208,7 +3389,7 @@ compile and run the program, the assembly code may provide some useful data.
 \end{prereq}
 
 Module \texttt{Cil}\codeidx{Cil} offers a visitor\index{Visitor!Cil|bfit},
-\verb+Cil.cilVisitor+\scodeidxdef{Cil}{cilVisitor}, 
+\verb+Cil.cilVisitor+\scodeidxdef{Cil}{cilVisitor},
 that allows to traverse (parts of) an
 AST\index{AST}. It is a class with one method per type of the AST, whose
 default behavior is simply to call the method corresponding to its
@@ -3286,7 +3467,7 @@ More detailed information can be found in \verb+cil.mli+.
 
 \begin{important}
   For the \framac visitor, two methods,
-  \verb+vstmt+\sscodeidx{Cil}{cilVisitor}{vstmt} 
+  \verb+vstmt+\sscodeidx{Cil}{cilVisitor}{vstmt}
   and \verb+vglob+\sscodeidx{Cil}{cilVisitor}{vglob} take
   care of maintaining the coherence\index{Consistency} between the transformed
   AST\index{AST!Modification} and the internal state of \framac%
@@ -3587,7 +3768,7 @@ can be freely mixed with other behavior clauses (post-conditions, \verb|assigns|
 \verb|allocates|).
 
 Similarly, in a loop annotation, \verb|loop kw e1, ..., en;| will be treated as belonging to the
-\verb|kw| extension. In case the loop annotation has a \verb|loop variant|, the extension must 
+\verb|kw| extension. In case the loop annotation has a \verb|loop variant|, the extension must
 occur before. Otherwise, there is no ordering constraint with other loop annotations clauses.
 
 Global extensions can either be a standalone global annotation, or a whole block
@@ -3754,7 +3935,7 @@ Namely, specification:
 
 \begin{lstlisting}[language=C,alsolanguage=ACSL]
 /*@ ext_type load: foo ; */
-/*@ 
+/*@
   axiomatic Pred {
     predicate P(foo f) reads \nothing ;
   }
@@ -3868,7 +4049,7 @@ compile the GUI plug-in code (see Section~\ref{make:plugin}).
 Besides time-consuming computations have to call the function
 \texttt{!Db.progress}\scodeidx{Db}{progress} from time to time in order to keep the GUI reactive.
 
-%Mainly that's all! 
+%Mainly that's all!
 The GUI implementation uses
 \lablgtk~\cite{lablgtk}\index{Lablgtk}: you can use any \lablgtk-compatible
 code in your gui extension. A complete example of a GUI extension may be found in
@@ -3961,10 +4142,10 @@ an entry for your plug-in in the plug-in list.
 
 \paragraph{Internal Documentation for External Plug-ins}
 
-External plug-ins can be documented in the same way as plug-ins that are 
+External plug-ins can be documented in the same way as plug-ins that are
 compiled together with \framac. However, in order to be able to compile the
 documentation with \texttt{make doc}, you must have generated the documentation
-of Frama-C's kernel (\texttt{make doc}, see above) and installed it with the 
+of Frama-C's kernel (\texttt{make doc}, see above) and installed it with the
 \texttt{make install-doc-code}\codeidx{install-doc-code} command.
 
 % Local Variables:
