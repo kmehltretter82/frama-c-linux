@@ -188,6 +188,62 @@ let () =
     ~enable:Analysis.is_computed
     print_value
 
+let print_taint fmt marker =
+  let loc = Cil_datatype.Location.unknown in
+  let expr, stmt =
+    match marker with
+    | Printer_tag.PLval (_kf, Kstmt stmt, lval) ->
+      Cil.new_exp ~loc (Lval lval), stmt
+    | Printer_tag.PExp (_kf, Kstmt stmt, expr) -> expr, stmt
+    | PVDecl (_kf, Kstmt stmt, vi) ->
+      Cil.new_exp ~loc (Lval (Var vi, NoOffset)), stmt
+    | PTermLval (_kf, Kstmt stmt, _ip, tlval) ->
+      begin
+        try
+          let result = None in
+          let lval = !Db.Properties.Interp.term_lval_to_lval ~result tlval in
+          Cil.new_exp ~loc (Lval lval), stmt
+        with Db.Properties.Interp.No_conversion -> raise Not_found
+      end
+    | _ -> raise Not_found
+  in
+  let evaluate_taint request =
+    let deps = Results.expr_dependencies expr request in
+    Result.get_ok (Results.is_tainted deps.data request),
+    Result.get_ok (Results.is_tainted deps.indirect request)
+  in
+  let before = evaluate_taint Results.(before stmt) in
+  let after = evaluate_taint Results.(after stmt) in
+  let str_taint = function
+    | Results.Untainted -> "untainted"
+    | Direct -> "direct taint"
+    | Indirect -> "indirect taint"
+  in
+  let pretty fmt = let open Results in function
+      | taint, Untainted -> Format.fprintf fmt "%s" (str_taint taint)
+      | t1, t2 ->
+        Format.fprintf fmt
+          "%s to the value, %s %s to values used to compute lvalues addresses"
+          (str_taint t1) (if t1 = Untainted then "but" else "and") (str_taint t2)
+  in
+  if before = after
+  then Format.fprintf fmt "%a" pretty before
+  else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
+
+let () =
+  let enable () = Analysis.is_computed () && Taint_domain.Store.is_computed () in
+  let title =
+    "Taint status:\n\
+     - Direct taint: data dependency from values provided by the attacker, \
+     meaning that the attacker may be able to alter this value\n\
+     - Indirect taint: the attacker cannot directly alter this value, but he \
+     may be able to impact the path by which its value is computed.\n\
+     - Untainted: cannot be modified by the attacker."
+  in
+  Server.Kernel_ast.Information.register
+    ~id:"eva.taint" ~label:"Taint" ~descr: "Taint status according to Eva"
+    ~title ~enable print_taint
+
 let () =
   Analysis.register_computation_hook
     (fun _ -> Server.Kernel_ast.Information.update ())
