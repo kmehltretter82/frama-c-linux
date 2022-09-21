@@ -353,10 +353,12 @@ module Make
   let import_cached_calls_from name project =
     let gather () =
       print_cache_size ("In save file " ^ name);
-      PreviousCalls.fold (fun kf data acc -> (kf, data) :: acc) []
+      PreviousCalls.fold (fun kf data acc -> (kf, data) :: acc) [],
+      SaveCounter.get ()
     in
-    let list = Project.on project gather () in
-    List.iter import_cache list
+    let list, counter = Project.on project gather () in
+    List.iter import_cache list;
+    SaveCounter.set counter
 
 
   let check_saved_project filename project =
