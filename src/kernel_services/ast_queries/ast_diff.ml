@@ -29,16 +29,16 @@ module Orig_project =
     let dependencies = []
   end)
 
-type 'a correspondance =
+type 'a correspondence =
   [ `Same of 'a (** symbol with identical definition has been found. *)
-  | `Not_present (** no correspondance *)
+  | `Not_present (** no correspondence *)
   ]
 
-module Correspondance_input =
+module Correspondence_input =
 struct
-  type 'a t = 'a correspondance
-  let name a = Type.name a ^ " correspondance"
-  let module_name = "Correspondance"
+  type 'a t = 'a correspondence
+  let name a = Type.name a ^ " correspondence"
+  let module_name = "Correspondence"
   let structural_descr _ = Structural_descr.t_abstract
   let reprs x = [ `Not_present; `Same x]
   let mk_equal eq x y =
@@ -67,7 +67,7 @@ struct
     | `Same x -> mem query x
 end
 
-module Correspondance = Datatype.Polymorphic(Correspondance_input)
+module Correspondence = Datatype.Polymorphic(Correspondence_input)
 
 (* for kernel function, we are a bit more precise than a yes/no answer.
    More precisely, we check whether a function has the same spec,
@@ -75,14 +75,14 @@ module Correspondance = Datatype.Polymorphic(Correspondance_input)
    the body itself is identical, otherwise, there's no point in checking
    the callees.
 *)
-type partial_correspondance =
+type partial_correspondence =
   [ `Spec_changed (* body and callees haven't changed *)
   | `Body_changed (* spec hasn't changed *)
   | `Callees_changed (* spec and body haven't changed *)
   | `Callees_spec_changed (* body hasn't changed *)
   ]
 
-type body_correspondance =
+type body_correspondence =
   [ `Body_changed
   | `Callees_changed
   | `Same_body
@@ -111,24 +111,24 @@ let pretty_pc fmt =
   | `Callees_changed -> pp_print_string fmt "(callees changed)"
   | `Callees_spec_changed -> pp_print_string fmt "(callees and spec changed)"
 
-type 'a code_correspondance =
-  [ 'a correspondance
-  | `Partial of 'a * partial_correspondance
+type 'a code_correspondence =
+  [ 'a correspondence
+  | `Partial of 'a * partial_correspondence
   ]
 
-module Code_correspondance_input =
+module Code_correspondence_input =
 struct
-  type 'a t = 'a code_correspondance
-  let name a = Type.name a ^ " code_correspondance"
-  let module_name = "Code_correspondance"
+  type 'a t = 'a code_correspondence
+  let name a = Type.name a ^ " code_correspondence"
+  let module_name = "Code_correspondence"
   let structural_descr _ = Structural_descr.t_abstract
-  let reprs = Correspondance_input.reprs
+  let reprs = Correspondence_input.reprs
   let mk_equal eq x y =
     match x,y with
     | `Partial(x,pc), `Partial(x',pc') -> eq x x' && (compare_pc pc pc' = 0)
     | `Partial _, _ | _, `Partial _ -> false
-    | (#correspondance as c), (#correspondance as c') ->
-      Correspondance_input.mk_equal eq c c'
+    | (#correspondence as c), (#correspondence as c') ->
+      Correspondence_input.mk_equal eq c c'
 
   let mk_compare cmp x y =
     match x,y with
@@ -138,28 +138,28 @@ struct
     | `Same _, `Partial _ -> 1
     | `Partial _, `Not_present -> 1
     | `Not_present, `Partial _ -> -1
-    | (#correspondance as c), (#correspondance as c') ->
-      Correspondance_input.mk_compare cmp c c'
+    | (#correspondence as c), (#correspondence as c') ->
+      Correspondence_input.mk_compare cmp c c'
 
   let mk_hash hash = function
     | `Partial (x,_) -> 57 * hash x
-    | #correspondance as x -> Correspondance_input.mk_hash hash x
+    | #correspondence as x -> Correspondence_input.mk_hash hash x
 
   let map f = function
     | `Partial(x,pc) -> `Partial(f x,pc)
-    | (#correspondance as x) -> Correspondance_input.map f x
+    | (#correspondence as x) -> Correspondence_input.map f x
 
   let mk_pretty pp fmt = function
     | `Partial(x,flags) ->
       Format.fprintf fmt "-> %a %a" pp x pretty_pc flags
-    | #correspondance as x -> Correspondance_input.mk_pretty pp fmt x
+    | #correspondence as x -> Correspondence_input.mk_pretty pp fmt x
 
   let mk_mem_project f p = function
     | `Partial (x,_) -> f p x
-    | #correspondance as x -> Correspondance_input.mk_mem_project f p x
+    | #correspondence as x -> Correspondence_input.mk_mem_project f p x
 end
 
-module Code_correspondance = Datatype.Polymorphic(Code_correspondance_input)
+module Code_correspondence = Datatype.Polymorphic(Code_correspondence_input)
 
 module Info(I: sig val name: string end) =
   (struct
@@ -187,15 +187,21 @@ type is_same_env =
        We thus collect them in the environment.
     *)
     goto_targets: (stmt * stmt) list;
+    (* enum items are added collectively when the whole enuminfo is
+       found to be identical (or not). On the other hand, the
+       definition of an enumitem can refer to the previous ones in the
+       same enuminfo. We keep the list of previously visited tags here.
+    *)
+    enumitem: enumitem Cil_datatype.Enumitem.Map.t;
   }
 
-module type Correspondance_table = sig
+module type Correspondence_table = sig
   include State_builder.Hashtbl
   val pretty_data: Format.formatter -> data -> unit
 end
 
 module Build(H:Datatype.S_with_collections)(D:Datatype.S):
-  Correspondance_table with type key = H.t and type data = D.t =
+  Correspondence_table with type key = H.t and type data = D.t =
 struct
   include
     State_builder.Hashtbl(H.Hashtbl)(D)
@@ -203,43 +209,43 @@ struct
   let pretty_data = D.pretty
 end
 
-module Build_correspondance(H:Datatype.S_with_collections) =
-  Build(H)(Correspondance.Make(H))
+module Build_correspondence(H:Datatype.S_with_collections) =
+  Build(H)(Correspondence.Make(H))
 
-module Build_code_correspondance(H:Datatype.S_with_collections) =
-  Build(H)(Code_correspondance.Make(H))
+module Build_code_correspondence(H:Datatype.S_with_collections) =
+  Build(H)(Code_correspondence.Make(H))
 
-module Varinfo = Build_correspondance(Cil_datatype.Varinfo)
+module Varinfo = Build_correspondence(Cil_datatype.Varinfo)
 
-module Compinfo = Build_correspondance(Cil_datatype.Compinfo)
+module Compinfo = Build_correspondence(Cil_datatype.Compinfo)
 
-module Enuminfo = Build_correspondance(Cil_datatype.Enuminfo)
+module Enuminfo = Build_correspondence(Cil_datatype.Enuminfo)
 
-module Enumitem = Build_correspondance(Cil_datatype.Enumitem)
+module Enumitem = Build_correspondence(Cil_datatype.Enumitem)
 
-module Typeinfo = Build_correspondance(Cil_datatype.Typeinfo)
+module Typeinfo = Build_correspondence(Cil_datatype.Typeinfo)
 
-module Stmt = Build_code_correspondance(Cil_datatype.Stmt)
+module Stmt = Build_code_correspondence(Cil_datatype.Stmt)
 
-module Logic_info = Build_correspondance(Cil_datatype.Logic_info)
+module Logic_info = Build_correspondence(Cil_datatype.Logic_info)
 
-module Logic_type_info = Build_correspondance(Cil_datatype.Logic_type_info)
+module Logic_type_info = Build_correspondence(Cil_datatype.Logic_type_info)
 
-module Logic_ctor_info = Build_correspondance(Cil_datatype.Logic_ctor_info)
+module Logic_ctor_info = Build_correspondence(Cil_datatype.Logic_ctor_info)
 
-module Fieldinfo = Build_correspondance(Cil_datatype.Fieldinfo)
+module Fieldinfo = Build_correspondence(Cil_datatype.Fieldinfo)
 
-module Model_info = Build_correspondance(Cil_datatype.Model_info)
+module Model_info = Build_correspondence(Cil_datatype.Model_info)
 
-module Logic_var = Build_correspondance(Cil_datatype.Logic_var)
+module Logic_var = Build_correspondence(Cil_datatype.Logic_var)
 
 module Kf = Kernel_function
 
-module Kernel_function = Build_code_correspondance(Kernel_function)
+module Kernel_function = Build_code_correspondence(Kernel_function)
 
-module Fundec = Build_correspondance(Cil_datatype.Fundec)
+module Fundec = Build_correspondence(Cil_datatype.Fundec)
 
-let make_correspondance candidate has_same_spec code_corres =
+let make_correspondence candidate has_same_spec code_corres =
   match has_same_spec, code_corres with
   | false, `Body_changed -> `Not_present
   | false, `Callees_changed ->
@@ -271,7 +277,8 @@ let empty_env =
     logic_type_info = Cil_datatype.Logic_type_info.Map.empty;
     logic_local_vars = Cil_datatype.Logic_var.Map.empty;
     logic_type_vars = Datatype.String.Map.empty;
-    goto_targets = []
+    goto_targets = [];
+    enumitem = Cil_datatype.Enumitem.Map.empty;
   }
 
 let add_locals f f' env =
@@ -281,7 +288,7 @@ let add_locals f f' env =
   List.fold_left2 add_one env f f'
 
 (* local static variables are in fact global. As soon as we have determined
-   that they have a correspondance, we add them to the global bindings *)
+   that they have a correspondence, we add them to the global bindings *)
 let add_statics l l' =
   let add_one v v' = Varinfo.add v (`Same v') in
   List.iter2 add_one l l'
@@ -306,11 +313,11 @@ let logic_type_vars_env l l' env =
     true, { env with logic_type_vars }
   end else false, env
 
-let formals_correspondance f f' =
+let formals_correspondence f f' =
   let add_one v v' = Varinfo.add v (`Same v') in
   List.iter2 add_one f f'
 
-let logic_prms_correspondance p p' =
+let logic_prms_correspondence p p' =
   let add_one lv lv' =
     Logic_var.add lv (`Same lv') in
   List.iter2 add_one p p'
@@ -400,7 +407,7 @@ let check_goto_targets env =
     | `Not_present -> false
     | `Same s'' | `Partial (s'',_) ->
       (* From the goto point of view, what matters is that the targets
-         themselves have a correspondance. If they're e.g. calls to a
+         themselves have a correspondence. If they're e.g. calls to a
          function that has itself changed, or blocks whose content has
          changed, it has already been detected when comparing the targets,
          and will be dealt with accordingly as the fundec level. *)
@@ -553,7 +560,7 @@ and is_same_predicate_node p p' env =
 and is_same_logic_constant c c' env =
   match c,c' with
   | LEnum ei, LEnum ei' ->
-    (match enumitem_correspondance ei env with
+    (match enumitem_correspondence ei env with
      | `Same ei'' -> Cil_datatype.Enumitem.equal ei' ei''
      | `Not_present -> false)
   | LEnum _, _ | _, LEnum _ -> false
@@ -657,13 +664,13 @@ and is_matching_logic_var lv lv' env =
           if lv.lv_name = "\\exit_status" && lv'.lv_name = "\\exit_status"
           then begin Logic_var.add lv (`Same lv'); true end
           else begin
-            match logic_var_correspondance lv env with
+            match logic_var_correspondence lv env with
             | None -> false
             | Some lv'' -> Cil_datatype.Logic_var.equal lv' lv''
           end))
   | _ -> false
 
-and logic_var_correspondance lv env =
+and logic_var_correspondence lv env =
   match find_candidate_logic_var lv env with
   | None -> None
   | Some lv' -> Logic_var.add lv (`Same lv'); Some lv'
@@ -889,20 +896,20 @@ and is_same_type t t' env =
     (var = var') &&
     Cil_datatype.Attributes.equal a a'
   | TNamed(t,a), TNamed(t',a') ->
-    let correspondance = typeinfo_correspondance t env in
-    (match correspondance with
+    let correspondence = typeinfo_correspondence t env in
+    (match correspondence with
      | `Not_present -> false
      | `Same t'' -> Cil_datatype.Typeinfo.equal t' t'') &&
     Cil_datatype.Attributes.equal a a'
   | TComp(c,a), TComp(c', a') ->
-    let correspondance = compinfo_correspondance c env in
-    (match correspondance with
+    let correspondence = compinfo_correspondence c env in
+    (match correspondence with
      | `Not_present -> false
      | `Same c'' -> Cil_datatype.Compinfo.equal c' c'') &&
     Cil_datatype.Attributes.equal a a'
   | TEnum(e,a), TEnum(e',a') ->
-    let correspondance = enuminfo_correspondance e env in
-    (match correspondance with
+    let correspondence = enuminfo_correspondence e env in
+    (match correspondence with
      | `Not_present -> false
      | `Same e'' -> Cil_datatype.Enuminfo.equal e' e'') &&
     Cil_datatype.Attributes.equal a a'
@@ -915,9 +922,12 @@ and is_same_compinfo ci ci' env =
   is_same_opt (is_same_list is_same_fieldinfo) ci.cfields ci'.cfields env
 
 and is_same_enuminfo ei ei' env =
-  Cil_datatype.Attributes.equal ei.eattr ei'.eattr &&
-  Ikind.equal ei.ekind ei'.ekind &&
-  is_same_list is_same_enumitem ei.eitems ei'.eitems env
+  let res, _ =
+    (Cil_datatype.Attributes.equal ei.eattr ei'.eattr &&
+     Ikind.equal ei.ekind ei'.ekind, env) &&&
+    is_same_list_env is_same_enumitem ei.eitems ei'.eitems
+  in
+  res
 
 and is_same_fieldinfo fi fi' env =
   (* we don't compare names: it's the order in which they appear in the
@@ -927,7 +937,12 @@ and is_same_fieldinfo fi fi' env =
   is_same_opt (fun x y _ -> x = y) fi.fbitfield fi'.fbitfield env &&
   Cil_datatype.Attributes.equal fi.fattr fi'.fattr
 
-and is_same_enumitem ei ei' env = is_same_exp ei.eival ei'.eival env
+and is_same_enumitem ei ei' env =
+  if is_same_exp ei.eival ei'.eival env then
+    true,
+    { env with enumitem = Cil_datatype.Enumitem.Map.add ei ei' env.enumitem }
+  else
+    false, env
 
 and is_same_formal (_,t,a) (_,t',a') env =
   is_same_type t t' env && Cil_datatype.Attributes.equal a a'
@@ -955,7 +970,7 @@ and is_same_local_init i i' env =
     if is_same_varinfo c c' env &&
        is_same_list is_same_exp args args' env
     then begin
-      match gfun_correspondance c env with
+      match gfun_correspondence c env with
       | `Partial _ | `Not_present -> `Callees_changed
       | `Same _ -> `Same_body
     end else `Body_changed
@@ -964,7 +979,7 @@ and is_same_local_init i i' env =
 and is_same_constant c c' env =
   match c,c' with
   | CEnum ei, CEnum ei' ->
-    (match enumitem_correspondance ei env with
+    (match enumitem_correspondence ei env with
      | `Same ei'' -> Cil_datatype.Enumitem.equal ei' ei''
      | `Not_present -> false)
   | CEnum _, _ | _, CEnum _ -> false
@@ -1002,7 +1017,7 @@ and is_same_lhost h h' env =
 
 and is_matching_varinfo vi vi' env =
   if vi.vglob then begin
-    match gvar_correspondance vi env with
+    match gvar_correspondence vi env with
     | `Not_present -> false
     | `Same vi'' -> Cil_datatype.Varinfo.equal vi' vi''
   end else begin
@@ -1043,7 +1058,7 @@ and is_same_extended_asm a a' env =
   in
   (res, env) &&& is_same_list_env bind a.asm_gotos a'.asm_gotos
 
-and is_same_instr i i' env: body_correspondance*is_same_env =
+and is_same_instr i i' env: body_correspondence*is_same_env =
   match i, i' with
   | Set(lv,e,_), Set(lv',e',_) ->
     if is_same_lval lv lv' env && is_same_exp e e' env then
@@ -1056,7 +1071,7 @@ and is_same_instr i i' env: body_correspondance*is_same_env =
     then begin
       match f.enode, f'.enode with
       | Lval(Var f,NoOffset), Lval(Var f', NoOffset) ->
-        (match gfun_correspondance f env with
+        (match gfun_correspondence f env with
          | `Partial _ | `Not_present -> `Callees_changed, env
          | `Same f'' ->
            if Cil_datatype.Varinfo.equal f' (Kf.get_vi f'') then
@@ -1179,11 +1194,11 @@ and is_same_stmt s s' env =
         | _ -> `Body_changed, env
       end else `Body_changed, env
   in
-  let res = make_correspondance s' annot_res code_res in
+  let res = make_correspondence s' annot_res code_res in
   Stmt.add s res; code_res, env
 
 (* is_same_block will return its modified environment in order
-   to update correspondance table with respect to locals, in case
+   to update correspondence table with respect to locals, in case
    the body of the enclosing function is unchanged. *)
 and is_same_block b b' env =
   let local_decls = List.filter (fun x -> not x.vdefined) b.blocals in
@@ -1226,10 +1241,10 @@ and is_same_binder b b' env =
   | Catch_all, Catch_all -> `Same_body, env
   | (Catch_exn _ | Catch_all), _ -> `Body_changed, env
 
-(* correspondance of formals is supposed to have already been checked,
+(* correspondence of formals is supposed to have already been checked,
    and formals mapping to have been put in the local env
 *)
-and is_same_fundec f f' env: body_correspondance =
+and is_same_fundec f f' env: body_correspondence =
   (* The goto_targets field of [env] accumulates visited goto targets to be
      verified after the function body. If the given environment is not empty,
      resets this field for this function. *)
@@ -1297,7 +1312,7 @@ and find_candidate_model_info ?loc:_loc mi env =
   in
   List.find_opt find_one candidates
 
-and typeinfo_correspondance ?loc ti env =
+and typeinfo_correspondence ?loc ti env =
   let add ti =
     match find_candidate_type ?loc ti with
     | None -> `Not_present
@@ -1307,7 +1322,7 @@ and typeinfo_correspondance ?loc ti env =
   in
   Typeinfo.memo add ti
 
-and compinfo_correspondance ?loc ci env =
+and compinfo_correspondence ?loc ci env =
   let add ci =
     match find_candidate_compinfo ?loc ci with
     | None -> `Not_present
@@ -1337,13 +1352,13 @@ and compinfo_correspondance ?loc ci env =
   | Some ci' -> `Same ci'
   | None -> Compinfo.memo add ci
 
-and enuminfo_correspondance ?loc ei env =
+and enuminfo_correspondence ?loc ei env =
   let add ei =
     match find_candidate_enuminfo ?loc ei with
     | None -> `Not_present
     | Some ei' ->
       if is_same_enuminfo ei ei' env then begin
-        (* add items correspondance. By definition, we have
+        (* add items correspondence. By definition, we have
            the same number of items here. *)
         List.iter2 (fun ei ei' -> Enumitem.add ei (`Same ei'))
           ei.eitems ei'.eitems;
@@ -1357,14 +1372,26 @@ and enuminfo_correspondance ?loc ei env =
   in
   Enuminfo.memo add ei
 
-and enumitem_correspondance ?loc:_loc ei _env = Enumitem.find ei
+(* For now, all enumitems are treated with their parent enuminfo: if
+   we don't find one, we let enuminfo_correspondance do the job. *)
+and enumitem_correspondence ?loc ei env =
+  let add ei =
+    match enuminfo_correspondence ?loc ei.eihost env with
+    | `Not_present -> `Not_present
+    | `Same _ -> Enumitem.find ei
+  in
+  match Cil_datatype.Enumitem.Map.find_opt ei env.enumitem with
+  | Some ei' -> `Same ei'
+  | None ->
+    (try Enumitem.find ei with
+     | Not_found -> add ei)
 
-and gvar_correspondance ?loc vi env =
+and gvar_correspondence ?loc vi env =
   let add vi =
     match find_candidate_varinfo ?loc vi Cil_types.VGlobal with
     | None when Cil.isFunctionType vi.vtype ->
       begin
-        match gfun_correspondance ?loc vi env with
+        match gfun_correspondence ?loc vi env with
         | `Same kf' -> `Same (Kf.get_vi kf')
         | `Partial(kf',_) ->
           (* a partial match at kf level is still the
@@ -1387,8 +1414,8 @@ and gvar_correspondance ?loc vi env =
   in
   Varinfo.memo add vi
 
-and gfun_correspondance ?loc vi env =
-  (* NB: we also take care of the correspondance between the underlying varinfo,
+and gfun_correspondence ?loc vi env =
+  (* NB: we also take care of the correspondence between the underlying varinfo,
      in case we have to refer to it directly, e.g. as an AddrOf argument.
   *)
   let kf = get_original_kf vi in
@@ -1406,7 +1433,7 @@ and gfun_correspondance ?loc vi env =
         (* from a variable point of view, e.g. if we take its address,
            they are similar *)
         Varinfo.add vi (`Same (Kf.get_vi kf'));
-        (* we only add formals to global correspondance tables if some
+        (* we only add formals to global correspondence tables if some
            part of the kf is unchanged (otherwise, we can't reuse information
            about the formals anyways). Hence, we only add them into the local
            env for now. *)
@@ -1421,10 +1448,10 @@ and gfun_correspondance ?loc vi env =
           | true, true ->
             is_same_fundec (Kf.get_definition kf) (Kf.get_definition kf') env
         in
-        let res = make_correspondance kf' same_spec same_body in
+        let res = make_correspondence kf' same_spec same_body in
         (match res with
          | `Not_present -> ()
-         | `Same _ | `Partial _ -> formals_correspondance formals formals');
+         | `Same _ | `Partial _ -> formals_correspondence formals formals');
         res
       end else begin
         (* signatures do not match, we consider that pointers
@@ -1445,7 +1472,7 @@ and is_matching_logic_info li li' env =
      | `Same li'' -> Cil_datatype.Logic_info.equal li' li''
      | exception Not_found ->
        begin
-         let res = logic_info_correspondance li env in
+         let res = logic_info_correspondence li env in
          Logic_info.add li res;
          match res with
          | `Not_present -> false
@@ -1453,7 +1480,7 @@ and is_matching_logic_info li li' env =
        end)
   | Some li'' -> Cil_datatype.Logic_info.equal li' li''
 
-and logic_info_correspondance ?loc li env =
+and logic_info_correspondence ?loc li env =
   let add li =
     match find_candidate_logic_info ?loc li env with
     | None -> `Not_present
@@ -1464,7 +1491,7 @@ and logic_info_correspondance ?loc li env =
       in
       let res = is_same_logic_info li li' env in
       if res then begin
-        logic_prms_correspondance li.l_profile li'.l_profile;
+        logic_prms_correspondence li.l_profile li'.l_profile;
         `Same li'
       end else `Not_present
   in
@@ -1478,7 +1505,7 @@ and is_matching_logic_ctor c c' env =
   | `Same c'' -> Cil_datatype.Logic_ctor_info.equal c' c''
   | exception Not_found ->
     let ty = c.ctor_type in
-    let res = logic_type_correspondance ty env in
+    let res = logic_type_correspondence ty env in
     Logic_type_info.add ty res;
     if not (Logic_ctor_info.mem c) then
       Kernel.fatal "Unbound logic type constructor %a in AST diff"
@@ -1493,13 +1520,13 @@ and is_matching_logic_type_info t t' env =
     (match Cil_datatype.Logic_type_info.Map.find_opt t env.logic_type_info with
      | Some t'' -> Cil_datatype.Logic_type_info.equal t' t''
      | None ->
-       let res = logic_type_correspondance t env in
+       let res = logic_type_correspondence t env in
        Logic_type_info.add t res;
        (match res with
         | `Same t'' -> Cil_datatype.Logic_type_info.equal t' t''
         | `Not_present -> false))
 
-and logic_type_correspondance ?loc ti env =
+and logic_type_correspondence ?loc ti env =
   let add ti =
     match find_candidate_logic_type ?loc ti with
     | None -> `Not_present
@@ -1518,7 +1545,7 @@ and logic_type_correspondance ?loc ti env =
   | Some ti' -> `Same ti'
   | None -> Logic_type_info.memo add ti
 
-let model_info_correspondance ?loc mi =
+let model_info_correspondence ?loc mi =
   let add mi =
     match find_candidate_model_info ?loc mi empty_env with
     | None -> `Not_present
@@ -1528,49 +1555,49 @@ let model_info_correspondance ?loc mi =
   in
   Model_info.memo add mi
 
-let rec gannot_correspondance =
+let rec gannot_correspondence =
   function
   | Dfun_or_pred (li,loc) ->
-    ignore (logic_info_correspondance ~loc li empty_env)
+    ignore (logic_info_correspondence ~loc li empty_env)
 
   | Dvolatile _ -> ()
   (* reading and writing function themselves will be checked elsewhere. *)
 
   | Daxiomatic(_,l,_,_) ->
-    List.iter gannot_correspondance l
-  | Dtype (ti,loc) -> ignore (logic_type_correspondance ~loc ti empty_env)
+    List.iter gannot_correspondence l
+  | Dtype (ti,loc) -> ignore (logic_type_correspondence ~loc ti empty_env)
   | Dlemma _ -> ()
   (* TODO: we currently do not have any appropriate structure for
      storing information about lemmas. *)
   | Dinvariant(li, loc) ->
-    ignore (logic_info_correspondance ~loc li empty_env)
+    ignore (logic_info_correspondence ~loc li empty_env)
   | Dtype_annot(li,loc) ->
-    ignore (logic_info_correspondance ~loc li empty_env)
+    ignore (logic_info_correspondence ~loc li empty_env)
   | Dmodel_annot (mi,loc) ->
-    ignore (model_info_correspondance ~loc mi)
+    ignore (model_info_correspondence ~loc mi)
   | Dextended _ -> ()
 (* TODO: provide mechanism for extension themselves
    to give relevant information. *)
 
-let global_correspondance g =
+let global_correspondence g =
   match g with
-  | GType (ti,loc) -> ignore (typeinfo_correspondance ~loc ti empty_env)
+  | GType (ti,loc) -> ignore (typeinfo_correspondence ~loc ti empty_env)
   | GCompTag(ci,loc) | GCompTagDecl(ci,loc) ->
-    ignore (compinfo_correspondance ~loc ci empty_env)
+    ignore (compinfo_correspondence ~loc ci empty_env)
   | GEnumTag(ei,loc) | GEnumTagDecl(ei,loc) ->
-    ignore (enuminfo_correspondance ~loc ei empty_env)
+    ignore (enuminfo_correspondence ~loc ei empty_env)
   | GVar(vi,_,loc) | GVarDecl(vi,loc) ->
-    ignore (gvar_correspondance ~loc vi empty_env)
-  | GFunDecl(_,vi,loc) -> ignore (gfun_correspondance ~loc vi empty_env)
-  | GFun(f,loc) -> ignore (gfun_correspondance ~loc f.svar empty_env)
-  | GAnnot (g,_) -> gannot_correspondance g
+    ignore (gvar_correspondence ~loc vi empty_env)
+  | GFunDecl(_,vi,loc) -> ignore (gfun_correspondence ~loc vi empty_env)
+  | GFun(f,loc) -> ignore (gfun_correspondence ~loc f.svar empty_env)
+  | GAnnot (g,_) -> gannot_correspondence g
   | GAsm _ | GPragma _ | GText _ -> ()
 
 
 let compare_ast () =
   let prj = Orig_project.get () in
   let ast = Project.on prj Ast.get () in
-  Cil.iterGlobals ast global_correspondance
+  Cil.iterGlobals ast global_correspondence
 
 let compare_from_prj prj =
   Orig_project.set prj;

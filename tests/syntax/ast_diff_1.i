@@ -1,6 +1,7 @@
 /* run.config
    MODULE: @PTEST_NAME@
-     OPT: -then -ast-diff %{dep:ast_diff_2.i}
+     OPT: -then -ast-diff %{dep:ast_diff_2.c}
+     OPT: -then -ast-diff %{dep:ast_diff_2.c} -cpp-extra-args="-DADD_ENUM_TAG"
 */
 int X;
 int Y=3;
@@ -93,4 +94,16 @@ void with_goto_unchanged(int c) {
   X++;
   L1: X++;
   L2: X++;
+}
+
+enum e {
+  t = 1,
+  u = t + 2
+};
+
+struct s { char c[t]; };
+
+void se() {
+  struct s S;
+  S.c[0] = 1;
 }
