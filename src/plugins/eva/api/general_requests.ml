@@ -161,24 +161,35 @@ let () = Request.register ~package
 
 (* ----- Register Eva information ------------------------------------------- *)
 
+let term_lval_to_lval tlval =
+  try !Db.Properties.Interp.term_lval_to_lval ~result:None tlval
+  with Db.Properties.Interp.No_conversion -> raise Not_found
+
 let print_value fmt loc =
-  let stmt, eval =
+  let is_scalar = Cil.isScalarType in
+  let kinstr, eval =
     match loc with
-    | Printer_tag.PLval (_kf, Kstmt stmt, lval)
-      when Cil.isScalarType (Cil.typeOfLval lval) ->
-      stmt, Results.eval_lval lval
-    | Printer_tag.PExp (_kf, Kstmt stmt, expr)
-      when Cil.isScalarType (Cil.typeOf expr) ->
-      stmt, Results.eval_exp expr
+    | Printer_tag.PLval (_kf, ki, lval) when is_scalar (Cil.typeOfLval lval) ->
+      ki, Results.eval_lval lval
+    | Printer_tag.PExp (_kf, ki, expr) when is_scalar (Cil.typeOf expr) ->
+      ki, Results.eval_exp expr
+    | PVDecl (_kf, ki, vi) when is_scalar vi.vtype ->
+      ki, Results.eval_var vi
+    | PTermLval (_kf, ki, _ip, tlval) ->
+      let lval = term_lval_to_lval tlval in
+      ki, Results.eval_lval lval
     | _ -> raise Not_found
   in
-  let eval_cvalue at = Results.(at stmt |> eval |> as_cvalue_or_uninitialized) in
-  let before = eval_cvalue Results.before in
-  let after = eval_cvalue Results.after in
   let pretty = Cvalue.V_Or_Uninitialized.pretty in
-  if Cvalue.V_Or_Uninitialized.equal before after
-  then pretty fmt before
-  else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
+  let eval_cvalue at = Results.(eval at |> as_cvalue_or_uninitialized) in
+  let before = eval_cvalue (Results.before_kinstr kinstr) in
+  match kinstr with
+  | Kglobal -> pretty fmt before
+  | Kstmt stmt ->
+    let after = eval_cvalue (Results.after stmt) in
+    if Cvalue.V_Or_Uninitialized.equal before after
+    then pretty fmt before
+    else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
 
 let () =
   Server.Kernel_ast.Information.register
@@ -198,13 +209,8 @@ let print_taint fmt marker =
     | PVDecl (_kf, Kstmt stmt, vi) ->
       Cil.new_exp ~loc (Lval (Var vi, NoOffset)), stmt
     | PTermLval (_kf, Kstmt stmt, _ip, tlval) ->
-      begin
-        try
-          let result = None in
-          let lval = !Db.Properties.Interp.term_lval_to_lval ~result tlval in
-          Cil.new_exp ~loc (Lval lval), stmt
-        with Db.Properties.Interp.No_conversion -> raise Not_found
-      end
+      let lval = term_lval_to_lval tlval in
+      Cil.new_exp ~loc (Lval lval), stmt
     | _ -> raise Not_found
   in
   let evaluate_taint request =
