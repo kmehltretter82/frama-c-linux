@@ -84,7 +84,7 @@ mandatory dependencies from the \textsf{Dive} plug-in's \verb|dune| file:
 The \verb|libraries| field contains \verb|frama-c.kernel| (essential for all
 plug-ins), but also \verb|frama-c-studia.core| and \verb|frama-c-server.core|,
 meaning this plug-in requires both the \textsf{Studia} and \textsf{Server}
-plug-ins to be enabled. If any of them has been disabled (either due to
+plug-ins to be enabled. If any of them is disabled (either due to
 missing dependencies, or as a result of a user request), then \textsf{Dive}
 will also be disabled.
 
@@ -153,7 +153,7 @@ Plug-in developers should {\em always} include such a section in their
 via the \verb|%{lib-available:<lib>}| special variable.
 
 Here is an example from \textsf{Frama-Clang}, which requires the following
-modules:
+libraries:
 
 \begin{lstlisting}
 (libraries frama-c.kernel frama-c-wp.core camlp-streams zarith)
@@ -229,9 +229,9 @@ Each result of the execution is compared with the previously saved result
 if there is no difference.  Actually, the number of results is twice the
 number of tests, because standard and error outputs are compared separately.
 
-First, Section~\ref{ptests:use} shows how to use \ptests.
-Next, Section~\ref{ptests:structure} shows the test file structure for \framac
-plug-ins.
+First, Section~\ref{ptests:use} explains how to use \ptests.
+Next, Section~\ref{ptests:structure} describes the test file structure for
+\framac plug-ins.
 Section~\ref{ptests:header} introduces the syntax of test headers, that is,
 how to define test cases and their options. Section~\ref{ptests:dependencies}
 explains how to declare test dependencies (files other than the test itself).
@@ -241,8 +241,9 @@ directives.
 \subsection{Using \ptests}\label{ptests:use}
 
 \ptests only {\em prepares} tests (by creating appropriate dune files), but
-does not run them. Whenever a new test file is added, or existing test files
-are modified, you need to run \verb|frama-c-ptests| to regenerate them.
+does not run them. Whenever a new test file is added, or test headers of
+existing test files are modified, you need to run \verb|frama-c-ptests| to
+regenerate them.
 Note that, to run all of \framac tests (which include several directories, plus
 the tests of many plug-ins), you should run \verb|make run-ptests| instead,
 which will call \verb|frama-c-ptests| with the proper arguments to generate
@@ -295,18 +296,18 @@ Inside \verb|tests|, two files are mandatory:
 \verb|ptests_config|\codeidx{ptests\_config} usually contains a single line
 with the list of {\em test suites} for that plug-in, prefixed with
 \verb|DEFAULT_SUITES=|.
-A test suite\index{Test!Suite|bfit} is a sub-directory in directory
-\texttt{tests}.
+A test suite\index{Test!Suite|bfit} is a sub-directory of the current \texttt{tests}
+directory.
 
 \begin{lstlisting}
 DEFAULT_SUITES=basic parsing misc options
 \end{lstlisting}
 
-In the example above, our plug-in has at least four directories inside
-\verb|tests|. Each test suite can contain any number of test files.
+In the example above, our plug-in has at least four sub-directories inside the
+\verb|tests| directory. Each test suite can contain any number of test files.
 
 \verb|test_config|\codeidx{test\_config} contains a list of
-common {\em directives} to be applied to each test, in all suites.
+common {\em directives} to be applied to each test, in all test suites.
 It typically contains a line \verb|PLUGIN: <module>| with the name of the
 plug-in being developed (for more details about \verb|PLUGIN:|, check
 Section~\ref{ptests:directives}).
@@ -321,8 +322,7 @@ other files, e.g. the existence of a file \verb|test_config_prove| will
 create a configuration named \verb|prove|. A test case can contain multiple
 {\em test headers} (to be detailed in the next section), with different
 directives for each configuration. Configurations are specified
-when running tests, e.g. instead of running \verb|dune build @ptests|
-(which is in fact equivalent to \verb|dune build @ptests_config|),
+when running tests, e.g. instead of running \verb|dune build @ptests|,
 you can run instead \verb|dune build @ptests_config_prove| to run tests only
 from the \verb|prove| configuration.
 
@@ -418,8 +418,11 @@ Files in \verb|result| are named \verb|<test_name>.<test_number>.exec.wtests|
 Section~\ref{ptests:directives} for details about this and other directives.}
 directives, they end with \verb|.execnow.wtests|). They are always 0-numbered,
 even when there is a single test case per file.
-These are JSON files containing the data to be used in each test, e.g.
+These are JSON files containing the data to be used (by \verb|frama-c-wrapper|
+via the generated \verb|dune| file) in each test, e.g.
 the command-line to be run, the output file name, and the associated oracle.
+These \verb|.wtests| files are not generated when the use of \verb|frama-c-wrapper|
+is not required (via \ptests' option \verb|-wrapper ""|).
 
 \subsection{What happens when you run a test}\label{ptests:inside}
 
@@ -487,12 +490,13 @@ to the same file.
 \subsubsection{Working directory and relative paths}
 
 Any directive can identify a file using a relative path.
-The current working directory (considered as \texttt{.}) is the directory
-containing the test file itself.
-Remember that Dune copies files to its sandbox (by default, a subdirectory
-inside \verb|_build|) before running it; missing dependencies will not exist
-in that directory. Also, pay attention to references to the parent directory
-(\verb|..|), since it will likely not match what you expect.
+The current working directory (considered as \texttt{.}) will be a directory
+inside Dune's sandbox, that is, a \verb|result| directory inside the ``mirror''
+directory of the test file. This ``mirror'' directory structure is created
+by Dune (by default, inside a \verb|_build| directory in the root of the Dune
+project), with dependencies copied lazily for each test. Therefore, pay
+attention to the fact that references to the parent directory
+(\verb|..|) will likely not match what you expect.
 
 \subsection{Detailed directives}\label{ptests:directives}\index{Test!Directive}
 
@@ -578,9 +582,10 @@ basename of the oracle.
 \\
 \hline
 \texttt{LOG}\nscodeidxdef{Test!Directive}{LOG}
-& Add an additional file to compare against an oracle.
-Note that this directive also has an alternative ``inline'' syntax
-(see text for more details).
+& Add an additional file that the test must generate and compare against an
+oracle. Note that this directive is only used by `OPT` and `STDOPT` directives.
+The syntax for \texttt{EXECNOW} related to that need is different
+(see the description of \texttt{EXECNOW} directive).
 & \textit{None}
 \\
 \hline
@@ -707,6 +712,10 @@ In the following, we detail some aspects of several directives.
   \texttt{EXECNOW} directives from a given level are added to the directives of
   the following levels.
 
+  \textbf{Note:} An \texttt{EXECNOW} command without \verb|LOG| outputs nor
+  \verb|BIN| outputs will not be be executed by Dune, since there is no output
+  to consume.
+
 \item The \texttt{MACRO}\nscodeidx{Test!Directive}{MACRO} directive
   has the following syntax:
   \begin{code}
@@ -750,7 +759,8 @@ FILTER: diff --new-file @PTEST_DIR@/oracle_config/@PTEST_ORACLE@ -
   and an empty command drops the previous \texttt{FILTER} directives.
 \item The \texttt{DEPS}\nscodeidx{Test!Directive}{DEPS} directive takes a set
   of filepaths and adds them to the set of dependencies for the next
-  \texttt{OPT}/\texttt{STDOPT}. Whenever these dependencies change, the test
+  \texttt{OPT}/\texttt{STDOPT}/\texttt{EXECNOW} directives.
+  Whenever these dependencies change, the test
   cases depending on them must be re-run. Otherwise, Dune does not re-run
   successful tests. Dependencies also ensure that tests which require output
   from others are run serially and not in parallel.
@@ -768,8 +778,6 @@ FILTER: diff --new-file @PTEST_DIR@/oracle_config/@PTEST_ORACLE@ -
     The special variable notation is interpreted by Dune before executing the
     command. All dependencies (either via \texttt{DEPS} or \verb|%{dep:}|) are
     collected and added to the set of dependencies for the test case.
-    The set of dependencies is reset to the default value after a
-    \texttt{OPT}/\texttt{STDOPT} directive.
 \item
   If there are \texttt{OPT}/\texttt{STDOPT} directives \textit{after} a
   \texttt{NOFRAMAC} directive, they will be executed, unless
