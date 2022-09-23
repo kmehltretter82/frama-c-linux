@@ -22,6 +22,9 @@
 
 open Cil_types
 
+let eval_callee_ref : (stmt -> exp -> kernel_function list option) ref =
+  ref (fun _ _ -> None)
+
 module Orig_project =
   State_builder.Option_ref(Project.Datatype)(
   struct
@@ -1020,7 +1023,7 @@ and is_same_extended_asm a a' env =
   in
   (res, env) &&& is_same_list_env bind a.asm_gotos a'.asm_gotos
 
-and is_same_instr i i' env: body_correspondence*is_same_env =
+and is_same_instr (s, i) (_s', i') env: body_correspondence*is_same_env =
   match i, i' with
   | Set(lv,e,_), Set(lv',e',_) ->
     if is_same_lval lv lv' env && is_same_exp e e' env then
@@ -1029,7 +1032,8 @@ and is_same_instr i i' env: body_correspondence*is_same_env =
       `Body_changed, env
   | Call(lv,f,args,_), Call(lv',f',args',_) ->
     if is_same_opt is_same_lval lv lv' env &&
-       is_same_list is_same_exp args args' env
+       is_same_list is_same_exp args args' env &&
+       is_same_exp f f' env
     then begin
       match f.enode, f'.enode with
       | Lval(Var f,NoOffset), Lval(Var f', NoOffset) ->
@@ -1040,8 +1044,19 @@ and is_same_instr i i' env: body_correspondence*is_same_env =
              `Same_body, env
            else
              `Callees_changed, env)
-      | _ -> `Callees_changed, env
-      (* by default, we consider that indirect call might have changed *)
+      | _ ->
+        (* On function pointers, use Eva results to known which functions might
+           have been called. *)
+        match Project.on (Orig_project.get ()) (!eval_callee_ref s) f with
+        | None -> `Callees_changed, env (* Eva results not provided *)
+        | Some callees ->
+          let correspondances =
+            List.map (fun f -> gfun_correspondence (Kf.get_vi f) env) callees
+          in
+          if List.for_all (function `Same _ -> true | _ -> false) correspondances
+          then `Same_body, env
+          else `Callees_changed, env
+          (* by default, we consider that indirect call might have changed *)
     end else `Body_changed, env
   | Local_init(v,i,_), Local_init(v',i',_) ->
     if is_same_varinfo v v' env then begin
@@ -1062,12 +1077,12 @@ and is_same_instr i i' env: body_correspondence*is_same_env =
     Kernel.fatal "Unexpected Code_annot instruction in normalized AST"
   | _ -> `Body_changed, env
 
-and is_same_instr_list l l' env =
+and is_same_instr_list (s, l) (s', l') env =
   match l, l' with
   | [], [] -> `Same_body, env
   | [], _ | _, [] -> `Body_changed, env
   | i::tl, i'::tl' ->
-    is_same_instr i i' env &&> is_same_instr_list tl tl'
+    is_same_instr (s, i) (s', i') env &&> is_same_instr_list (s, tl) (s', tl')
 
 and same_switch_labels l l' env =
   let l = List.filter Cil.is_case_label l in
@@ -1104,7 +1119,7 @@ and is_same_stmt s s' env =
     then
       begin
         match s.skind,s'.skind with
-        | Instr i, Instr i' -> is_same_instr i i' env
+        | Instr i, Instr i' -> is_same_instr (s, i) (s, i') env
         | Return (r,_), Return(r', _) ->
           if is_same_opt is_same_exp r r' env then `Same_body, env
           else `Body_changed, env
@@ -1150,7 +1165,7 @@ and is_same_stmt s s' env =
         | TryExcept(b1,(h,e),b2,_), TryExcept(b1',(h',e'),b2',_) ->
           if is_same_exp e e' env then begin
             is_same_block b1 b1' env &&>
-            is_same_instr_list h h' &&>
+            is_same_instr_list (s, h) (s', h') &&>
             is_same_block b2 b2'
           end else `Body_changed, env
         | _ -> `Body_changed, env

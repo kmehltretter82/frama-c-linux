@@ -125,3 +125,6 @@ val compare_ast: unit-> unit
 (** [compare_from_prj prj] sets [prj] as the original project
     and fill the tables. *)
 val compare_from_prj: Project.t -> unit
+
+(** Internal reference for the Eva plugin. *)
+val eval_callee_ref: (stmt -> exp -> kernel_function list option) ref
