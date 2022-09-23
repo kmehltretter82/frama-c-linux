@@ -527,7 +527,7 @@ int main(void)
         __gen_e_acsl_assert_data.pred_txt = "\\initialized(&buf_0[3])";
         __gen_e_acsl_assert_data.file = "issue-eacsl-40.c";
         __gen_e_acsl_assert_data.fct = "main";
-        __gen_e_acsl_assert_data.line = 16;
+        __gen_e_acsl_assert_data.line = 31;
         __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data);
         __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
       }
