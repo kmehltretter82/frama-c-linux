@@ -311,6 +311,14 @@ module G = struct
       binary_predicate cache UniversalPredicate
         ~decide_fast ~decide_fst ~decide_snd ~decide_both
 
+    let import =
+      let f base cvalue =
+        let base = Eva_diff.import_base base in
+        let cvalue = Eva_diff.import_cvalue cvalue in
+        singleton base cvalue
+      in
+      let cache_name = "Eva.Gauges.MV.import" in
+      cached_fold ~cache_name ~temporary:false ~f ~joiner:merge_disjoint ~empty
   end
 
   (* A MC contains, for interesting variables, the coefficient that is
@@ -356,7 +364,12 @@ module G = struct
       binary_predicate cache UniversalPredicate
         ~decide_fast ~decide_fst ~decide_snd ~decide_both
 
-
+    let import =
+      let f base bounds =
+        singleton (Eva_diff.import_base base) bounds
+      in
+      let cache_name = "Eva.Gauges.MC.import" in
+      cached_fold ~cache_name ~temporary:false ~f ~joiner:merge_disjoint ~empty
   end
 
   (* This function computes how much the bounds of [v2] have increased from
@@ -429,7 +442,7 @@ module G = struct
     MV.fold2_join_heterogeneous
       ~cache ~empty_left ~empty_right ~both ~join ~empty mv mc
 
-  type multiple_iterations = { nb: Bounds.t; coeffs: MC. t}
+  type multiple_iterations = { nb: Bounds.t; coeffs: MC.t }
 
   module MultipleIterations = struct
 
@@ -475,6 +488,7 @@ module G = struct
     let restrict mv mi =
       { mi with coeffs = MC.inter_with_shape mv mi.coeffs }
 
+    let import mi = { nb = mi.nb; coeffs = MC.import mi.coeffs }
   end
 
   type iteration_info =
@@ -521,6 +535,10 @@ module G = struct
       | MultipleIterations mi ->
         MultipleIterations (MultipleIterations.restrict mv mi)
 
+    let import = function
+      | PreciseIteration _ as pi -> pi
+      | MultipleIterations mi ->
+        MultipleIterations (MultipleIterations.import mi)
   end
 
   (* type t = MV.t * (stmt * iteration_info) list *)
@@ -1288,6 +1306,17 @@ module D : Abstract_domain.Leaf
 
   let top = G.empty (* must not be used, not neutral w.r.t. join (because
                        join crashes...)!! *)
+
+  let import (mv, list : t) =
+    let mv = MV.import mv in
+    let import (stmt, info) =
+      match Ast_diff.Stmt.find stmt with
+      | `Same stmt -> stmt, IterationInfo.import info
+      | _ -> raise Not_found
+    in
+    let list = List.map import list in
+    mv, list
+
 end
 
 let registered =
