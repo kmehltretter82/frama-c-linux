@@ -30,6 +30,9 @@ let nb_dune_files = ref 0
 let nb_ignores = ref 0
 let ignored_suites = ref []
 
+let config_filter = ref None
+let default_config = "DEFAULT"
+
 (* Set to an empty string to use no wrapper *)
 let wrapper_cmd = ref "frama-c-wtests -brief"
 
@@ -221,7 +224,7 @@ let example_msg =
      @@PTEST_NAME@@            # Basename of the test file.@  \
      @@PTEST_NUMBER@@          # Test command number.@  \
      @@PTEST_CONFIG@@          # Test configuration suffix.@  \
-     @@PTEST_SUITE_DIR@        # Path to the directory contained the source of the test file (../).
+     @@PTEST_SUITE_DIR@@       # Path to the directory contained the source of the test file (../).@  \
      @@PTEST_RESULT@@          # Shorthand alias to @@PTEST_SUITE_DIR@@/result@@PTEST_CONFIG@@ (the result directory dedicated to the tested configuration).@  \
      @@PTEST_ORACLE@@          # Basename of the current oracle file (macro only usable in FILTER directives).@  \
      @@PTEST_DEFAULT_OPTIONS@@ # The default option list: %s@  \
@@ -292,6 +295,12 @@ let argspec =
     ("-create-missing-oracles", Arg.Set create_missing_oracles,
      " creates missing oracles to allow the use of dune promote") ;
 
+    ("-config", Arg.String (function
+         | "" | "''" -> config_filter := Some ""
+         | s when String.equal s default_config -> config_filter := Some ""
+         | s -> config_filter := Some s),
+     "<configuration> Skip the other configurations") ;
+
     ("-remove-empty-oracles", Arg.Set remove_empty_oracles,
      " remove empty oracles") ;
 
@@ -352,7 +361,7 @@ end = struct
     let get_config_suites (key,value) =
       Option.bind (str_string_match1 regexp_config key 0)
         (function
-          | "DEFAULT" -> Some ("", (split_blank value))
+          | s when String.equal s default_config -> Some ("", (split_blank value))
           | config -> Some (config, (split_blank value)))
     in
     fun ~dir ->
@@ -2046,15 +2055,22 @@ let () =
       let suites = Ptests_config.parse ~dir in
       if !verbosity >= 1 then Format.printf "%% Nb config= %d@." (StringMap.cardinal suites);
       let nb = !nb_dune_files in
-      let nbi = !nb_ignores in
       StringMap.iter (fun config_mode suites ->
-          if !verbosity >= 1 then Format.printf "%% - %s_SUITES -> nb suites= %d@."
-              (match config_mode with "" -> "DEFAULT" | s -> s) (StringMap.cardinal suites);
-          let env = { config = config_mode ; dir ; dune_alias = "" ; absolute_tests_dir ; absolute_cwd} in
-          let directory = SubDir.create ~with_subdir:false ~env dir in
-          let config = Test_config.current_config ~env directory in
-          let config = update_dir_ref directory config in
-          process ~env config suites) suites ;
+          match !config_filter with
+          | Some only when only <> config_mode ->
+            let nbi = StringMap.cardinal suites in
+            Format.printf "%% - %s_SUITES -> nb suites= %d (skipped config -> ignored)@."
+              (match config_mode with "" -> default_config | s -> s) nbi;
+            nb_ignores := !nb_ignores + nbi
+          | _ ->
+            if !verbosity >= 1 then Format.printf "%% - %s_SUITES -> nb suites= %d@."
+                (match config_mode with "" -> default_config | s -> s) (StringMap.cardinal suites);
+            let env = { config = config_mode ; dir ; dune_alias = "" ; absolute_tests_dir ; absolute_cwd} in
+            let directory = SubDir.create ~with_subdir:false ~env dir in
+            let config = Test_config.current_config ~env directory in
+            let config = update_dir_ref directory config in
+            process ~env config suites) suites ;
+      let nbi = !nb_ignores in
       if !verbosity >= 1 then Format.printf "%% Nb dune files= %d@." (!nb_dune_files-nb);
       if (!nb_ignores-nbi) <> 0 then Format.printf "- %d ignored suite(s)@." (!nb_ignores-nbi);
     ) suites ;
