@@ -265,53 +265,54 @@ const CodeDecorationPlugin: Plugin<CodeData, CodeDecorationState> = {
 const unreachableClass = Decoration.mark({ class: 'cm-dead-code' });
 const nonTerminatingClass = Decoration.mark({ class: 'cm-non-term-code' });
 
-// Internal state of the plugin.
+// Internal state of the plugin. The <unreachable> and <nonTerminating> fields
+// are used as cache to avoid converting over and over dead markers to ranges.
 interface DeadCodeState {
   decorations: DecorationSet;
   unreachable: Range[];
   nonTerminating: Range[];
-  fct?: string;
-  deadCode: deadCode;
-  ranges: Map<string, Range>;
 }
 
-// Data neeeded for the plugin initialization.
-interface DeadCodeInit extends CodeData { deadCode: deadCode }
-
-
-
-function mapFilter<X, Y>(f: (x: X) => Y | undefined, xs: X[]): Y[] {
-  const ys: Y[] = [];
-  for (const x of xs) { const y = f(x); if(y) ys.push(y); }
-  return ys;
-}
-
+// Data needed for the plugin initialization. The <deadCode> field contains
+// all the relevant unreachable and non terminating markers. During the plugin
+// initialization, they are converted to ranges using the <ranges> field.
+interface DeadCodeInit { deadCode: deadCode, ranges: Map<string, Range> }
 
 // Plugin declaration.
 const DeadCodePlugin: Plugin<DeadCodeInit, DeadCodeState> = {
 
-  create: (init) => ({
-    decorations: RangeSet.empty,
-    unreachable: mapFilter(init.ranges.get, init.deadCode.unreachable),
-    nonTerminating: mapFilter(init.ranges.get, init.deadCode.nonTerminating),
-    fct: init.fct,
-    deadCode: init.deadCode,
-    ranges: init.ranges,
-  }),
+  create: (init) => {
+    const unreachable: Range[] = [];
+    init.deadCode.unreachable.forEach(marker => {
+      const r = init.ranges.get(marker); if (!r) return;
+      unreachable.push(r);
+    });
+    const nonTerminating: Range[] = [];
+    init.deadCode.nonTerminating.forEach(marker => {
+      const r = init.ranges.get(marker); if (!r) return;
+      nonTerminating.push(r);
+    });
+    return {
+      decorations: RangeSet.empty,
+      unreachable, nonTerminating,
+    };
+  },
 
   decorations: (state) => state.decorations,
 
+  // TODO: Do stuff only for relevant events.
   update: (state, update) => {
-    console.log(state);
     const visible = update.view.visibleRanges;
     const keep = (i: Range): boolean => visible.some(o => isBetween(i, o));
-    const unreachable = state.unreachable.filter(keep).map(r => unreachableClass.range(r.from, r.to));
-    const nonTerminating = state.nonTerminating.filter(keep).map(r => nonTerminatingClass.range(r.from, r.to));
-    const decorations = RangeSet.of(unreachable).update({ add: nonTerminating });
+    const unreachable = state.unreachable.filter(keep)
+      .map(r => unreachableClass.range(r.from, r.to));
+    const nonTerm = state.nonTerminating.filter(keep)
+      .map(r => nonTerminatingClass.range(r.from, r.to));
+    const decorations = RangeSet.of(unreachable.concat(nonTerm), true);
     return { ...state, decorations };
   },
 
-}
+};
 
 
 
