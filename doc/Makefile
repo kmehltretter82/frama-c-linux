@@ -85,7 +85,7 @@ endif
 
 clean::
 	$(RM) manuals/*.pdf
-	$(RM) manuals/*.tgz
+	$(RM) manuals/*.tar.gz
 	$(MAKE) -C userman clean
 	$(MAKE) -C developer dist-clean
 	$(MAKE) -C rte clean
@@ -99,7 +99,8 @@ all: \
 	manuals/plugin-development-guide$(FC_SUFFIX).pdf \
 	manuals/rte-manual$(FC_SUFFIX).pdf \
 	manuals/aorai-manual$(FC_SUFFIX).pdf \
-	manuals/aorai-example$(FC_SUFFIX).tgz \
+	manuals/aorai-example$(FC_SUFFIX).tar.gz \
+	manuals/hello$(FC_SUFFIX).tar.gz \
 	manuals/eva-manual$(FC_SUFFIX).pdf \
 	manuals/metrics-manual$(FC_SUFFIX).pdf \
 	manuals/wp-manual$(FC_SUFFIX).pdf \
@@ -112,7 +113,7 @@ manuals/%:
 	$(PRINT) Generating $@
 	$(MAKE) -C $(@D) $(@F)
 
-%.tgz:
+%.tar.gz:
 	$(PRINT) Generating $@
 	$(MAKE) -C $(@D) $(@F)
 
@@ -120,7 +121,8 @@ manuals/user-manual$(FC_SUFFIX).pdf: userman/userman.pdf
 manuals/plugin-development-guide$(FC_SUFFIX).pdf: developer/developer.pdf
 manuals/rte-manual$(FC_SUFFIX).pdf: rte/main.pdf
 manuals/aorai-manual$(FC_SUFFIX).pdf: aorai/main.pdf
-manuals/aorai-example$(FC_SUFFIX).tgz: aorai/aorai-example.tgz
+manuals/aorai-example$(FC_SUFFIX).tar.gz: aorai/aorai-example.tar.gz
+manuals/hello$(FC_SUFFIX).tar.gz: developer/hello.tar.gz
 manuals/eva-manual$(FC_SUFFIX).pdf: eva/main.pdf
 manuals/metrics-manual$(FC_SUFFIX).pdf: metrics/metrics.pdf
 manuals/wp-manual$(FC_SUFFIX).pdf: ../src/plugins/wp/doc/manual/wp.pdf
@@ -149,9 +151,13 @@ all: \
 	manuals/acsl-implementation$(FC_SUFFIX).pdf \
 	manuals/acsl$(ACSL_SUFFIX).pdf \
 
+version: manuals/acsl-version.txt
+
 manuals/acsl-implementation$(FC_SUFFIX).pdf: acsl/acsl-implementation.pdf
 manuals/acsl$(ACSL_SUFFIX).pdf: acsl/acsl.pdf
 
+manuals/acsl-version.txt:
+	echo ${ACSL_VERSION} > $@
 
 ###################
 # E-ACSL          #
@@ -182,11 +188,16 @@ clean::
 all: \
 	manuals/e-acsl-implementation$(FC_SUFFIX).pdf \
 	manuals/e-acsl-manual$(FC_SUFFIX).pdf \
-	manuals/e-acsl$(EACSL_SUFFIX).pdf \
+	manuals/e-acsl$(EACSL_SUFFIX).pdf
+
+version: manuals/e-acsl-version.txt
 
 manuals/e-acsl-implementation$(FC_SUFFIX).pdf: $(EACSL_DOC)/refman/e-acsl-implementation.pdf
 manuals/e-acsl-manual$(FC_SUFFIX).pdf: $(EACSL_DOC)/userman/main.pdf
 manuals/e-acsl$(EACSL_SUFFIX).pdf: $(EACSL_DOC)/refman/e-acsl.pdf
+
+manuals/e-acsl-version.txt:
+	echo ${EACSL_VERSION} > $@
 
 endif
 

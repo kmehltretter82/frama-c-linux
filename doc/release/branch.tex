@@ -1,4 +1,5 @@
-\chapter{The Branch Stage}
+\chapter{Branch stage}
+\label{chap:branch}
 
 That is the procedure for forking the release from \texttt{master}.
 
@@ -54,9 +55,11 @@ in the Frama-C group
 \expertise{François, Julien}.
 
 
-\section{BTS}
+\section{GitLab issues}
 
-Check public issue tracker at \url{https://git.frama-c.com/pub/frama-c/issues/} All issues should have been at least acknowledged: at least they should be assigned to someone, preferably tagged appropriately.
+Check public issue tracker at \url{https://git.frama-c.com/pub/frama-c/issues/}.
+All issues should have been at least acknowledged: at least they should be
+assigned to someone, preferably tagged appropriately.
 
 Send a message to the Frama-C channel on LSL's Mattermost.
 Each developer should have a
@@ -98,7 +101,6 @@ This should go directly below
 \begin{verbatim}
 \section*{\framacversion}
 \end{verbatim}
-
 and this line should be commented out.
 
 \begin{itemize}
@@ -119,11 +121,9 @@ merging back \texttt{stable/element} into \texttt{master}.
 
 \section{Copyright}
 
-Check that the date in copyright headers is correct. If not then the script
-\texttt{headers/updates-headers.sh} can be used to update them.
-
+Check that the date in copyright headers is correct. If not then:
 \begin{itemize}
-  \item Update the dates in the license files in:
+  \item update the dates in the license files in:
   \begin{itemize}
     \item \texttt{headers/close-source/*}
     \item \texttt{headers/open-source/*}
@@ -132,13 +132,11 @@ Check that the date in copyright headers is correct. If not then the script
     \item \texttt{src/plugins/e-acsl/headers/close-source/*}
     \item \texttt{src/plugins/e-acsl/headers/open-source/*}
   \end{itemize}
-  \item Update the headers with the following commands:
+  \item update the headers with the following command:
   \begin{itemize}
-    \item \texttt{./headers/updates-headers.sh headers/header\_spec.txt headers/open-source}
-    \item \texttt{./headers/updates-headers.sh ivette/headers/header\_spec.txt headers/open-source ivette}
-    \item \texttt{./headers/updates-headers.sh src/plugins/e-acsl/headers/header\_spec.txt src/plugins/e-acsl/headers/open-source src/plugins/e-acsl}
+    \item \texttt{make headers}
   \end{itemize}
-  \item Check if some copyright are left to update by \texttt{grep}-ing the date in the sources: \texttt{grep -r -e "-yyyy" .}
+  \item Check if some copyrights are left to update by \texttt{grep}-ing the date in the sources: \texttt{grep -r -e "-yyyy" .}
 \end{itemize}
 
 %%%Local Variables:
