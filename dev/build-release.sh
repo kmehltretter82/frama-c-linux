@@ -371,7 +371,7 @@ cat >$INSTALL_WEBPAGE <<EOL
 ---
 layout: installation_page
 version: $LOWER_CODENAME
-title: Installation instructions for $CODENAME
+title: Installation instructions for Frama-C $VERSION ($CODENAME)
 ---
 EOL
 sed ./INSTALL.md -e "s/^\(# Installing Frama-C\)$/\1 $EXT/" >>$INSTALL_WEBPAGE
