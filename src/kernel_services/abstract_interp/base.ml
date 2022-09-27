@@ -550,6 +550,9 @@ let of_string_exp e =
   in
   LiteralStrings.memo (fun _ -> String (Cil_const.new_raw_id (), cstring)) e.eid
 
+let of_string_id id cstring =
+  LiteralStrings.memo (fun _ -> String (Cil_const.new_raw_id (), cstring)) id
+
 module SetLattice = Make_Hashconsed_Lattice_Set(Base)(Hptset)
 
 module BMap =

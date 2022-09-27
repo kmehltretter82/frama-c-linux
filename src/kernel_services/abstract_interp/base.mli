@@ -142,6 +142,7 @@ val update_variable_validity:
 
 val of_varinfo: Cil_types.varinfo -> t
 val of_string_exp: Cil_types.exp -> t
+val of_string_id: int -> cstring -> t
 val of_c_logic_var: Cil_types.logic_var -> t
 (** Must only be called on logic variables that have a C type *)
 
