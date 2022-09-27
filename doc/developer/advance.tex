@@ -31,9 +31,8 @@ In this chapter, we suppose that the reader is able to write a minimal plug-in
 like \texttt{hello}\index{Hello} described in chapter~\ref{chap:tutorial} and
 knows about the software architecture of \framac (chapter~\ref{chap:archi}). Moreover
 plug-in development requires the use of advanced features of
-\caml (module system, classes and objects, \emph{etc}). Static plug-in
-development requires some knowledge of \autoconf and \make.
- Each section summarizes its own prerequisites at its beginning (if any).
+\caml (module system, classes and objects, \emph{etc}).
+Plug-in development also requires some familiarity with the Dune build system.
 
 Note that the following subsections can be read in no particular
 order: their contents are indeed quite independent from one another even if
@@ -41,730 +40,475 @@ there are references from one chapter to another one. Pointers to
 reference manuals (Chapter~\ref{chap:refman}) are also provided for readers who
 want full details about specific parts.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Plug-in dependencies}\label{adv:dependencies}
 
-%% \section{File Tree Overview}\label{adv:files}
-
-%% \begin{target}beginners.\end{target}
-
-%% The \framac main directory is split in several sub-directories. The \framac source
-%% code is mostly provided in directories \texttt{cil}\codeidx{cil} and
-%% \texttt{src}\codeidx{src}. The first one contains the source code of
-%% \cil~\cite{cil}\index{Cil} extended with an \acsl~\cite{acsl}
-%% implementation\index{ACSL}. The second one is the core implementation of
-%% \framac. This last directory contains directories of the \framac
-%% kernel\index{Kernel} and directories of the provided \framac plug-in.
-
-%% A pretty complete description of the \framac file tree is provided in
-%% Section~\ref{refman:files}.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{\framac Configure.in}\label{adv:configure}
-\codeidxdef{configure.in}
-
-\begin{target}not for standard plug-ins developers.\end{target}
+\begin{target}standard plug-in developers.\end{target}
 
 \begin{prereq}
-  Knowledge of \autoconf and shell programming.
+  Basic knowledge of the Dune build system.
 \end{prereq}
 
-In this Section, we detail how to modify the file \texttt{configure.in} in
-order to configure plug-ins (\framac configuration has been introduced in
-%Section~\ref{tut2:configure} and~\ref{tut2:makefile}).
+Some plug-ins only depend on the \framac kernel, and in this case, require no
+special configuration. However, many plug-ins depend either on other \framac
+plug-ins, or on external libraries, tools and components. In both cases, it is
+important to specify such dependencies, to avoid the user trying and failing
+to compile or run your plug-in.
 
-First Section~\ref{conf:principle} introduces the general principle and
-organisation of \texttt{configure.in}. Then Section~\ref{conf:add} explains how
-to configure a new simple plug-in without any dependency. Next we show how to
-exhibit dependencies with external libraries and tools
-(Section~\ref{conf:dep-lib}) and with other plug-ins
-(Section~\ref{conf:dep-plug}). Finally Section~\ref{conf:lib} presents the
-configuration of external libraries and tools needed by a new plug-in but not
-used anywhere else in \framac.
-
-\subsection{Principle}\label{conf:principle}
-
-When you execute \texttt{autoconf}, file \texttt{configure.in} is used to
-generate the \texttt{configure} script. Each \framac user executes this script
-to check his/her system and determine the most appropriate configuration: at the
-end of this configuration (if successful), the script summarizes the
-status of each plug-in, which can be:\index{Plug-in!Status}
-\begin{itemize}
-\item \emph{available} (everything is fine with this plug-in);
-\item \emph{partially available}: either an optional dependency of the plug-in
-  is not fully available, or a mandatory dependency of the plug-in is only
-  partially available; or\index{Plug-in!Dependency}
-\item \emph{not available}: either the plug-in itself is not provided by
-  default, or a mandatory dependency of the plug-in is not available.
-\end{itemize}
-
-The important notion in the above definitions is
-\emph{dependency}\index{Plug-in!Dependency|bfit}. A dependency of a plug-in $p$
-is either an external library/tool\index{Library}\index{Tool} or another
-\framac plug-in. It is either \emph{mandatory} or \emph{optional}. A mandatory
-dependency must be present in order to build $p$, whereas an optional
-dependency provides features to $p$ that are additional but not highly required
-(especially $p$ must be compilable without any optional dependency).
-
-Hence, for the plug-in developer, the main role of \texttt{configure.in} is to
-define the optional and mandatory dependencies of each plug-in. Another standard
-job of \texttt{configure.in} is the addition of options \texttt{---enable-$p$}
-and \texttt{---disable-$p$} to \texttt{configure} for a plug-in $p$. These
-options respectively forces $p$ to be available and disables $p$ (its status is
-automatically ``not available'').
-
-Indeed \texttt{configure.in} is organised in different sections specialized in
-different configuration checks. Each of them begins with a title delimited by
-comments and it is highlighted when \texttt{configure} is executed. These
-sections are described in Section~\ref{refman:configure}. Now we focus on
-the modifications to perform in order to integrate a new plug-in in \framac.
-
-\subsection{Addition of a Simple Plug-in}\label{conf:add}
-
-In order to add a new plug-in, you have to add a new subsection for the new
-plug-in to Section \emph{Plug-in wished}. This action is usually very easy to
-perform by copying/pasting from another existing plug-in (\eg
-\texttt{occurrence}\index{Plug-in!Occurrence|see{Occurrence}}\index{Occurrence})
-and by replacing the plug-in name (here \texttt{occurrence}) by the new plug-in
-name in the pasted part. In these sections, plug-ins are sorted according to a
-lexicographic ordering.
-
-For instance, Section \emph{Wished Plug-in} introduces a new sub-section for
-the plug-in \texttt{occurrence} in the following way.
-\scodeidxdef{configure.in}{check\_plugin}
-\begin{configurecode}
-# occurrence
-############
-check_plugin(occurrence,src/plugins/occurrence,
-             [support for occurrence analysis],yes)
-\end{configurecode}
-\begin{itemize}
-\item The first argument is the plug-in name,
-\item the second one is the name of directory containing the source files 
-  of the plug-in (usually a sub-directory of \texttt{src/plugins}), 
-\item the third one is an help message for the \texttt{--enable-occurrence} 
-  option of \texttt{configure},
-\item the last one indicates if the plug-in is enabled by default
-  (\texttt{yes/no}).
-\end{itemize}
+Plug-in dependencies are usually defined in the plug-in's \verb|dune| file.
+There are mainly two kinds of dependencies: {\em mandatory} and {\em optional}.
+Mandatory dependencies are necessary for the plug-in to run {\em at all}, and
+their absence means the plug-in must be disabled. Optional dependencies do not
+prevent compilation and usage of the plug-in, but it may work less efficiently,
+precisely, or fail when specific features are requested.
 
 \begin{important}
-The plug-in name must contain only alphanumeric characters and
-underscores. It must be the same as the \texttt{name} value given as
-argument to the functor \texttt{Plugin.Register} of
-section~\ref{adv:plugin-services} (with spaces replaced by underscore). It must
-also be the same (modulo upper/lower case) as the \texttt{PLUGIN\_NAME} variable
-given in the plugin's Makefile presented in section~\ref{adv:dynamic-make}.
+  Plug-in developers must ensure that optional dependencies are tested for
+  their absence and dealt with gracefully; a plug-in must {\em not} crash when
+  optional dependencies are missing.
 \end{important}
 
-\begin{important}
-  The macro \texttt{check\_plugin}\scodeidx{configure.in}{check\_plugin} sets
-  the following variables:
-  \texttt{FORCE\_OCCURRENCE}\scodeidxdef{configure.in}{FORCE\_$plugin$},
-  \texttt{REQUIRE\_OCCURRENCE}\scodeidx{configure.in}{REQUIRE\_$plugin$},
-  \texttt{USE\_OCCURRENCE}\scodeidx{configure.in}{USE\_$plugin$}, and
-  \texttt{ENABLE\_OCCURRENCE}\scodeidxdef{configure.in}{ENABLE\_$plugin$}.
-\end{important}
+Most dependencies (OCaml library dependencies, such as other plug-ins or OCaml
+modules) are specified using Dune's \verb|library| stanza%
+\footnote{Full documentation about Dune's \texttt|library| stanza is available
+at \url{https://dune.readthedocs.io/en/stable/concepts.html\#library-deps}}.
+As is often the case, examples are very instructive; here is an example of
+mandatory dependencies from the \textsf{Dive} plug-in's \verb|dune| file:
 
-The first variable indicates if the user explicitly requires the availability of
-\texttt{occurrence} \emph{via} setting the option
-\texttt{---enable-occurrence}. The second and third variables are used by others
-plug-ins in order to handle their dependencies (see
-Section~\ref{conf:dep-plug}). The fourth variable \texttt{ENABLE\_OCCURRENCE} indicates
-the plug-in status (available, partially available or not available). 
-%At the end of these lines of code, it says if the plug-in should be compiled: if
-If \texttt{---enable-occurrence} is set, then \texttt{ENABLE\_OCCURRENCE} is \yes
-(plug-in available); if \texttt{---disable-occurrence} is set, then its value is
-\texttt{no} (plug-in not available). If no option is specified on the command
-line of \texttt{configure}, its value is set to the default one (according to
-%\texttt{\$default}). 
-the value of the fourth argument of \texttt{check\_plugin}).
+\begin{lstlisting}
+(library
+  [...]
+  (libraries frama-c.kernel frama-c-studia.core frama-c-server.core)
+)
+\end{lstlisting}
 
-%%%%
-\subsection{Configuration of New Libraries or Tools}
-\label{conf:lib}
-\index{Library!Configuration}
-\index{Tool!Configuration}
+The \verb|libraries| field contains \verb|frama-c.kernel| (essential for all
+plug-ins), but also \verb|frama-c-studia.core| and \verb|frama-c-server.core|,
+meaning this plug-in requires both the \textsf{Studia} and \textsf{Server}
+plug-ins to be enabled. If any of them is disabled (either due to
+missing dependencies, or as a result of a user request), then \textsf{Dive}
+will also be disabled.
 
-Some plug-ins need additional tools or libraries to be fully
-functional. The \texttt{configure} script takes care of these in two
-steps. First, it checks that an appropriate version of each external
-dependency exists on the system. Second, it verifies for each plug-in
-that its dependencies are met. Section~\ref{conf:dep-lib} explains how
-to make a plug-in depend on a given library (or tool). The present
-section deals with the first part, that is how to check for a given
-library or tool on a system. Configuration of new libraries and configuration of
-new tools are similar.  In this section, we therefore choose to focus
-on the configuration of new libraries. This is done by calling a
-predefined macro called
-\texttt{configure\_library}\scodeidxdef{configure.in}{configure\_library}\scodeidxdef{configure.in}{configure\_tools}\footnote{For
-  tools, there is a macro \texttt{configure\_tool} which works in the
-  same way as \texttt{configure\_library}.}, or its more specialized version
-\texttt{configure\_pkg}\scodeidxdef{configure.in}{configure\_pkg}.
+{\em Note: to explicitly disable a plug-in, use the
+  \verb|dev/disable-plugins.sh| script.}
 
-\texttt{configure\_pkg} is meant to be used for checking the presence of
-OCaml libraries that are managed as
-\texttt{findlib}\footnote{\url{http://projects.camlcity.org/projects/findlib.html}}
-packages, which is the case for most modern OCaml libraries nowadays.
-It takes two arguments, the name of the package (as known by \texttt{findlib}),
-and a message that will be displayed if the package is not found.
+Note that OCaml libraries can also be specified, e.g. adding \verb|zarith|
+to \verb|libraries| above would require that Zarith be installed and available
+via \verb|ocamlfind|.
 
-The \texttt{configure\_library} macro takes three arguments. The first one is
-the name of the library, the second one is a filename
-which is used by the script to check the availability of the library.
-In case there are multiple locations possible for the library, this
-argument can be a list of filenames. In this case, the argument must
-be properly quoted ({\it i.e.} enclosed in a {\tt [}, {\tt]} pair).
-Each name is checked in turn. The first one which corresponds to an
-existing file is selected.  If no name in the list corresponds to an
-existing file, the library is considered to be unavailable. The last
-argument is a warning message to display if a configuration problem
-appears (usually because the library does not exist). Using these
-arguments, the script checks the availability of the library.
+\subsection{Declaring dependencies}
 
-Results of these macros are available through variables which are
-substituted in the files generated by \texttt{configure}, where
-\texttt{$library$} stands for the \emph{uppercased}
-version of the library name.
-\begin{itemize}
-\item For \texttt{configure\_pkg}:
-\begin{itemize}
-\item \texttt{HAS\_OCAML\_$library$}
-\scodeidxdef{configure.in}{HAS\_OCAML\_$library$}
-is set to \texttt{yes} or \texttt{no} depending on the availability
-of the library
-\end{itemize}
-\item For \texttt{configure\_library}:
-\begin{itemize}
-\item \texttt{HAS\_$library$}\scodeidxdef{configure.in}{HAS\_$library$}
-  is set to \texttt{yes} or \texttt{no} depending on the availability
-  of the library
-\item \texttt{SELECTED\_$library$}\scodeidxdef{configure.in}{SELECTED\_$library$}
-contains the name of the version selected as described above.
-\end{itemize}
-\end{itemize}
-
-If checking for \ocaml{} libraries and object files without
-\texttt{configure\_pkg}, remember that
-they come in two flavors: bytecode and native
-code, which have distinct suffixes. Therefore, you should use the
-variables \texttt{LIB\_SUFFIX}\scodeidx{configure.in}{LIB\_SUFFIX}
-(for libraries) and
-\texttt{OBJ\_SUFFIX}\scodeidx{configure.in}{OBJ\_SUFFIX}
-(for object files) to check the presence of a
-given file. These variables are initialized at the beginning of the
-\texttt{configure} script depending on the availability of a
-native-code compiler on the current installation.
-
-\begin{example}
-  The library \lablgtksourceview\index{Lablgtksourceview2} (used to have a
-  better rendering of C sources in the GUI) is part of
-  \lablgtk\index{Lablgtk}~\cite{lablgtk}.
-  This is checked through the following command,
-  where \texttt{LABLGTKPATH\_FOR\_CONFIGURE} is the path where
-  \texttt{configure} has found \lablgtk itself.
-
-\begin{configurecode}
-configure_library(
-  [GTKSOURCEVIEW],
-  [\$LABLGTKPATH_FOR_CONFIGURE/lablgtksourceview2.\$LIB_SUFFIX],
-  [lablgtksourceview not found])
-\end{configurecode}
-\end{example}
-
-\subsection{Addition of Library/Tool Dependencies}\label{conf:dep-lib}
-\index{Library!Dependency}\index{Tool!Dependency}
-
-Dependencies upon OCaml packages (checked by \texttt{configure\_pkg}) are
-governed by two macros:
+Optional dependencies can be detected and disabled in different ways:
 
 \begin{itemize}
-\item \texttt{plugin\_require\_pkg($plugin$,$library$)}%
-\scodeidxdef{configure.in}{plugin\_require\_pkg} indicates that
-$plugin$ requires $library$ in order to be compiled.
-\item \texttt{plugin\_use\_pkg($plugin$,$library$)}%
-\scodeidxdef{configure.in}{plugin\_use\_pkg} indicates that
-$plugin$ uses $library$, but can nevertheless be compiled if $library$
-is not installed (potentially offering reduced functionality).
+\item If the module is dynamically accessible via \verb|Db| (see
+  Section~\ref{adv:static-registration} for more details), the detection
+  can be done directly in OCaml and requires no special handling in the
+  \verb|dune| file;
+\item Otherwise, you can define two versions of the implementation
+  (both implementing the same interface), in two different files.
+  One of these files will use the required module, while the other will
+  implement a dummy version without it.
+  The \verb|select| notation from the \verb|library| stanza allows telling
+  Dune which file to compile.
 \end{itemize}
 
-Dependencies upon external tools and libraries (checked by
-\texttt{configure\_library} or \texttt{configure\_tool})
-are governed by two macros:
-\begin{itemize}
-\item \texttt{plugin\_require\_external($plugin$,$library$)}%
-\scodeidxdef{configure.in}{plugin\_require\_external} indicates that
-$plugin$ requires $library$ in order to be compiled.
-\item \texttt{plugin\_use\_external($plugin$,$library$)}%
-\scodeidxdef{configure.in}{plugin\_use\_external} indicates that
-$plugin$ uses $library$, but can nevertheless be compiled if $library$
-is not installed (potentially offering reduced functionality).
-\end{itemize}
+Here is an example of \verb|select| from the \textsf{Aoraï} plug-in,
+which defines an optional dependency on the \textsf{Eva} plug-in:
 
-\begin{convention}
-  The best place to perform such extensions is just after the addition of $p$
-  which sets the value of \texttt{ENABLE\_$p$}.
-\end{convention}
+\begin{lstlisting}
+(libraries [...]
+ (select aorai_eva_analysis.ml from
+  (frama-c-eva.core -> aorai_eva_analysis.enabled.ml)
+  (  -> aorai_eva_analysis.disabled.ml)
+ )
+\end{lstlisting}
 
-\begin{example}
-  Plug-in \texttt{gui}\index{Plug-in!GUI} requires
-  \lablgtk\index{Lablgtk} and \gnomecanvas\index{GnomeCanvas}. It
-  also optionally uses \dottool\index{Dot} for displaying graphs (graph cannot
-  be displayed without this tool). So, just after its declaration, there are the
-  following lines in \texttt{configure.in}.
-\begin{configurecode}
-plugin_require_external(gui,lablgtk)
-plugin_require_external(gui,gnomecanvas)
-plugin_use_external(gui,dot)
-\end{configurecode}
-\end{example}
+In the example above, \textsf{Aoraï} defines two files:
+\verb|aorai_eva_analysis.enabled.ml| and \verb|aorai_eva_analysis.disabled.ml|
+(we recommend this naming convention, but it is not enforced by \verb|dune|).
+The general form of the \verb|select| stanza is:
 
-\subsection{Addition of Plug-in Dependencies}\label{conf:dep-plug}
-\index{Plug-in!Dependency|bfit}
+\begin{lstlisting}
+(select <file> from
+  (<cond_1> -> <file_1>)
+  (<cond_2> -> <file_2>)
+  ...
+  ( -> <default>)
+)
+\end{lstlisting}
 
-Adding a dependency with another plug-in is quite the same as adding a
-dependency with an external library or tool (see
-Section~\ref{conf:dep-lib}). For this purpose, \texttt{configure.in}
-uses two macros
-\begin{itemize}
-\item \texttt{plugin\_require($plugin1$,$plugin2$)}%
-\scodeidxdef{configure.in}{plugin\_require} states that
-$plugin1$ needs $plugin2$.
-\item \texttt{plugin\_use($plugin1$,$plugin2$)}%
-\scodeidxdef{configure.in}{plugin\_use} states that
-$plugin1$ can be used in absence of $plugin2$, but requires $plugin2$
-for full functionality.
-\end{itemize}
+It then checks for each condition \verb|<cond_i>| in order, and the first one
+that matches is selected, otherwise it will be the fallback/default one. The
+selected \verb|<file_i>| will be renamed to \verb|<file>| and used in the build.
 
-There can be mutual dependencies between plug-ins. This is for instance
-the case for plug-ins \texttt{value} and \texttt{from}.
+\subsection{Notifying users via frama-c-configure}
 
-\section{Plug-in Specific Configure.ac}
-\codeidxdef{configure.ac}
-\label{sec:config-external}
+\framac has a special Dune target, \verb|@frama-c-configure|, which prints a
+summary of the configuration as seen by Dune when run via
+\verb|dune build @frama-c-configure|. It is especially helpful to
+understand why a given plug-in is disabled.
 
-\begin{target}standard plug-ins developers.\end{target}
+Plug-in developers should {\em always} include such a section in their
+\verb|dune| file, listing each optional library and its current availability,
+via the \verb|%{lib-available:<lib>}| special variable.
 
-\begin{prereq}
-  Knowledge of \autoconf and shell programming.
-\end{prereq}
+Here is an example from \textsf{Frama-Clang}, which requires the following
+libraries:
 
-External plug-ins can have their own configuration file, and can rely on the
-macros defined for \framac. In addition, as mentioned in
-section~\ref{dynamic-make:comp-same-time}, those plug-ins can be
-compiled directly from \framac's own Makefile. In order for them to
-integrate well in this setting, they should follow a particular layout,
-described below.
-First, they need to be able to refer to the auxiliary \texttt{configure.ac}
-file defining \framac-specific macros when they are used as stand-alone plug-ins.
-This can be done by the following code
-\begin{configurecode}
-m4_define([plugin_file],Makefile)
+\begin{lstlisting}
+(libraries frama-c.kernel frama-c-wp.core camlp-streams zarith)
+\end{lstlisting}
 
-m4_define([FRAMAC_SHARE_ENV],
-          [m4_normalize(m4_esyscmd([echo $FRAMAC_SHARE]))])
+Its plug-in library name is \verb|frama-c-clang.core|. Its availability
+must be displayed as the ``summary'' of the configuration, written as the first
+line, with each dependency as a subitem:
 
-m4_define([FRAMAC_SHARE],
-	  [m4_ifval(FRAMAC_SHARE_ENV,[FRAMAC_SHARE_ENV],
-                                     [m4_esyscmd(frama-c -print-path)])])
+\begin{lstlisting}
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Clang:" %{lib-available:frama-c-clang.core} "\n")
+          (echo "  - zarith:" %{lib-available:zarith} "\n")
+          (echo "  - camlp5:" %{lib-available:camlp5} "\n") ; for gen_ast
+          (echo "  - camlp-streams:" %{lib-available:camlp-streams} "\n")
+          (echo "  - wp:" %{lib-available:frama-c-wp.core} "\n")
+  )
+  )
+)
+\end{lstlisting}
 
-m4_ifndef([FRAMAC_M4_MACROS],
-         [m4_include(FRAMAC_SHARE/configure.ac)]
-        )
-\end{configurecode}
-%$ emacs-highlighting is a bit lost otherwise...
-
-\texttt{plugin\_file} is the file which must be present to ensure that
-\texttt{autoconf} is called in the appropriate directory (see documentation for
-the \texttt{AC\_INIT} macro of autoconf). \texttt{configure.ac} can be found in
-two ways: either by relying on the \texttt{FRAMAC\_SHARE} shell variable (when
-\framac{} is not installed, {\it i.e.} when configuring the plug-in together
-with the main \framac), or by calling an installed \framac (when installing
-the plug-in separately). The inclusion of \texttt{configure.ac} needs to be
-guarded to prevent multiple inclusions, as the configuration file of the plug-in
-might itself be included by \texttt{configure.in}
-(see section~\ref{dynamic-make:comp-same-time} for more details).
-
-The configuration of the plug-in itself or related libraries and tools can then
-proceed as described in Sections~\ref{conf:add} and \ref{conf:lib}. References
-to specific files in the plug-in source directory should be guarded with the
-following macro:
-\begin{configurecode}
-PLUGIN_RELATIVE_PATH(file)
-\end{configurecode}
-
-If the external plug-in has some dependencies as described in
-sections~\ref{conf:dep-lib}~and~\ref{conf:dep-plug},
-the configure script \texttt{configure} must check that all dependencies
-are met. This is done with the following macro:\scodeidxdef{configure.in}{check\_plugin\_dependencies}
-\begin{configurecode}
-check_plugin_dependencies
-\end{configurecode}
-It is only after this point that the variables
-\texttt{HAS\_$library$}, \texttt{SELECTED\_$library$}, and
-\texttt{ENABLE\_$plugin$} get their final value. If parts of the
-\texttt{configure} script depends on these variables,
-they should appear after the call to
-\texttt{check\_plugin\_dependencies}.
-
-An external plug-in can
-have dependencies upon previously installed plug-ins.
-However two separately installed plug-ins can not be
-mutually dependent on each other. Nevertheless, they can be compiled together
-with the main \framac sources using the \texttt{---enable-external} option
-of \texttt{configure} (see section~\ref{dynamic-make:comp-same-time}
-for more details).
-
-Finally, the configuration must end with the following command:
-\begin{configurecode}
-write_plugin_config(files)
-\end{configurecode}
-where \texttt{files} are the files that must be processed by configure
-(as in \texttt{AC\_CONFIG\_FILES} macro). \texttt{PLUGIN\_RELATIVE\_PATH} is
-unneeded here.
-
-\begin{important}
-For technical reasons, the macros
-\texttt{configure\_library}, \texttt{configure\_tool}, 
-\texttt{check\_plugin\_dependencies}, and \texttt{write\_plugin\_config}
-must not be inside a conditional part of the \texttt{configure}
-script. More precisely,
-they are using the diversion mechanism of \texttt{autoconf} in order to
-ensure that the tests are performed after all dependencies information
-has been gathered from all existing plugins. Diversion is a very primitive,
-text-to-text transformation. Using those macros within a
-conditional (or anything that alters the control-flow of the script) is likely
-to result in putting some unrelated part of the script in the same branch of
-the conditional.
-\end{important}
+Note that \verb|camlp5| is not among the dependencies declared in
+\verb|libraries|; it is used by another component, \verb|gen_ast|.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{\framac Makefile}\label{adv:make}\codeidxdef{Makefile}
+\section{\framac Makefiles}\label{adv:make}\codeidxdef{Makefile}
 
-\begin{target}not for standard plug-in developers.\end{target}
+\begin{target}standard plug-in developers.\end{target}
 
 \begin{prereq}
   Knowledge of \make.
 \end{prereq}
 
-In this section, we detail the use of \texttt{Makefile} dedicated to \framac
-compilation. This file is split in several sections which are described in
-Section~\ref{make:sections}. By default, executing \texttt{make} only displays
-an overview of commands. For example, here is the output of the compilation of
-source file \texttt{src/kernel\_services/plugin\_entry\_points/db.cmo}.
-\begin{shell}
-\$ make src/kernel_services/plugin_entry_points/db.cmo
-Ocamlc      src/kernel_services/plugin_entry_points/db.cmo
-\end{shell}
-If you wish the exact command line, you have to set variable
-\texttt{VERBOSEMAKE}\codeidxdef{VERBOSEMAKE} to \texttt{yes} like below.
-\begin{shell}
-\$ make VERBOSEMAKE=yes src/kernel_services/plugin_entry_points/db.cmo
-\end{shell}
+Since the adoption of Dune, \framac's \texttt{Makefile}s were largely
+simplified. They are still used for some tasks, partially due to conciseness
+(\verb|make| is shorter than \verb|dune build|), partially because some tasks
+are better suited for them.
 
+Plug-in developers usually just need to copy and paste the existing Makefile
+template and rename the opam file name (\verb|frama-c-<plugin>.opam|).
+
+This Makefile reuses code from other Makefiles, distributed in Frama-C's
+{\em share} directory, such as \verb|Makefile.testing|,
+\verb|Makefile.installation|, etc. Their names indicate the kinds of features
+they provide. Many are shortcuts for specific dune targets, but they also
+provide linting and copyright headers-related features.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Plug-in Specific Makefile}\label{adv:dynamic-make}
-\codeidxdef{Makefile.dynamic}
-
-\begin{prereq}
-  Knowledge of \make.
-\end{prereq}
-
-\subsection{Using \texttt{Makefile.dynamic}}
-\label{dynamic-make:dynamic}
-
-In this section, we detail how to write a Makefile for a given plug-in. Even if
-it is still possible to write such a Makefile from scratch, \framac provides a
-generic Makefile, called \texttt{Makefile.dynamic}\codeidx{Makefile.dynamic},
-which helps the plug-in developer in this task. This file is installed in the
-\framac share directory. So for writing your plug-in specific Makefile, you
-have to:
-\begin{enumerate}
-\item set some variables for customizing your plug-in;
-\item include \texttt{Makefile.dynamic}.
-\end{enumerate}
-
-TODO : replace example
-%% \begin{example}
-%% A minimal \texttt{Makefile} is shown below. That is the Makefile of the plug-in
-%% \texttt{Hello World} presented in the tutorial (see
-%% Section~\ref{tut2:hello}). Each variable set in this example has to be set
-%% by any plug-in.
-%% \codeidx{Makefile.dynamic}
-%% \codeidx{FRAMAC\_SHARE}
-%% \codeidx{PLUGIN\_CMO}
-%% \codeidx{PLUGIN\_NAME}
-%% \makefileinput{./tutorial/hello/generated/makefile_multiple/Makefile}
-%% \texttt{FRAMAC\_SHARE} must be set to the \framac share directory.
-%% \texttt{PLUGIN\_NAME} is the capitalized name of your plug-in while
-%% \texttt{PLUGIN\_CMO} is the list of the files $.cmo$ generated from your \caml
-%% sources.
-%% Note that, by default, during compilation of your plug-in all warnings are
-%% disabled; it is recommended to define environment variable
-%% \texttt{DEVELOPMENT=yes} to enable the standard set of compilation warnings.
-%% \end{example}
-
-\begin{important}
-To run your specific Makefile, you must have properly installed \framac
-before, or compile your plugin together with Frama-C, as described in
-section~\ref{dynamic-make:comp-same-time}.
-\end{important}
-
-You may possibly need to do \texttt{make depend} before running
-\texttt{make}.
-
-Which variable can be set and how they are useful is explained
-Section~\ref{make:plugin}. Furthermore, Section~\ref{make:dynamic} explains
-the specific features of \texttt{Makefile.dynamic}.
-
-
-\subsection{Compiling \framac and external plug-ins at the same time}
-\label{dynamic-make:comp-same-time}
-\begin{target}
-  plug-in developers using the git repository of \framac.
-\end{target}
-It is also possible to get a completely independent plug-in
-recompiled and tested together with \framac's kernel. For that,
-\framac must be aware of the existence of the plug-in. This can be
-done in two ways:
-\begin{itemize}
-\item All sub-directories of \verb+src/plugins+ directory in \framac sources
-  which are not known to \framac's kernel are assumed to be external
-  plug-ins.
-\item One can use the \verb+--enable-external+ option of configure
-  which takes as argument the path to the plug-in
-\end{itemize}
-
-In the first case, the plug-in behaves as any other built-in plug-in:
-\verb+autoconf+ run in \framac's main directory will take care of it
-and it can be \verb+enabled+ or \verb+disabled+ in the same way as the
-others. If the plug-in has its own \verb+configure.in+ or
-\verb+configure.ac+ file, the configuration instructions contained
-in it (in particular additional dependencies) will be read as well.
-
-In the second case, the plug-in is added to the list of external
-plug-ins at configure time. If the plug-in has its own configure, it
-is run as well.
-
-Provided it properly uses the variables set by \texttt{Makefile.dynamic},
-the plug-in's \texttt{Makefile} does not require
-specific adaptations depending on whether it is compiled together with
-the kernel or with respect to an already-existing \framac installation.
-It is however possible to check the compilation mode with the
-\codeidx{FRAMAC\_INTERNAL}\texttt{FRAMAC\_INTERNAL} variable, which is set to
-\texttt{yes} when compiling together with \framac kernel and to \texttt{no}
-otherwise.
-
-\codeidx{clean-install}
-\codeidx{install}
-In addition, if a plug-in wishes to install custom files through the
-\texttt{install::} target, this target must depend on \texttt{clean-install}.
-Indeed, \framac's main \texttt{Makefile} needs to remove all existing files
-before performing a fresh installation, in order to avoid potential interference
-with an obsolete (and usually incompatible) module from a previous installation.
-Adding the dependency thus ensures that the removal will take place before any
-new file has been installed.
-
-\begin{example} If a plug-in wants to install \texttt{external/my\_lib.cm*} in
-  addition to the normal plugin files, it should use the following code:
-  \footnote{Note that the variable \texttt{FRAMAC\_LIBDIR} is automatically set
-    in the \framac \texttt{Makefile} to the value provided by the command
-    \texttt{frama-c-config -print-libpath}.\codeidx{FRAMAC\_LIBDIR}}
-\begin{makefilecode}
-install:: clean-install
-        $(PRINT_INSTALL) "My beautiful library"
-        $(MKDIR) $(FRAMAC_LIBDIR)
-        $(CP) external/my_lib.cm* $(FRAMAC_LIBDIR)
-\end{makefilecode}
-\end{example} %$ %Fix emacs highlighting
-
 
 \section{Testing}\label{adv:ptests}\index{Test|bfit}
 
 In this section, we present \ptests, a tool provided by \framac in order to
 perform non-regression and unit tests.
 
-\ptests\index{Ptests|bfit} runs the \framac toplevel on each specified test
-(which are usually \C files). Specific directives can be used for each
-test. Each result of the execution is compared from the previously saved result
-(called the \emph{oracle}\index{Oracle|bfit}). A test is successful if and only
-if there is no difference.  Actually the number of results is twice that the
-number of tests because standard and error outputs are compared separately.
+\begin{important}
+  Historically, \ptests has been developed before \framac switched to Dune.
+  It has been ported to Dune, but some features had to be adapted and others
+  became redundant; it is likely that in the future \ptests will be
+  replaced with direct usage of the Dune testing framework.
+\end{important}
 
-First Section~\ref{ptests:use} shows how to use \ptests. Next
-Section~\ref{ptests:configuration} introduces how to use predefined directives
-to configure tests, while Section~\ref{ptests:alternative} explains
-how to set up various testing goals for the same test base. Last
-Section~\ref{ptests:options} details \ptests' options, while
-Section~\ref{ptests:directives} describes \ptests' directive.
+\ptests\index{Ptests|bfit} is a test preparation tool that parses specially
+crafted \C comments to create several Dune test targets, so that users can
+more easily create test cases with custom \framac commands.
+
+The generated test targets are then run via Dune.
+Each result of the execution is compared with the previously saved result
+(called the \emph{oracle}\index{Oracle|bfit}). A test is successful if and only
+if there is no difference.  Actually, the number of results is twice the
+number of tests, because standard and error outputs are compared separately.
+
+First, Section~\ref{ptests:use} explains how to use \ptests.
+Next, Section~\ref{ptests:structure} describes the test file structure for
+\framac plug-ins.
+Section~\ref{ptests:header} introduces the syntax of test headers, that is,
+how to define test cases and their options. Section~\ref{ptests:dependencies}
+explains how to declare test dependencies (files other than the test itself).
+Last, Section~\ref{ptests:directives} presents the full list of \ptests
+directives.
 
 \subsection{Using \ptests}\label{ptests:use}
 
-If you're using a \texttt{Makefile} written following the principles given in
-section~\ref{adv:dynamic-make}, the simplest way of using \ptests is through 
-\texttt{make tests} which is
-roughly equivalent to
-\begin{shell}
-\$ time ./bin/ptests.opt
-\end{shell}
-or
-\begin{shell}
-\$ time ptests.opt
-\end{shell}
-depending on whether you're inside \framac's sources or compiling a plug-in 
-against an already installed \framac distribution.
+\ptests only {\em prepares} tests (by creating appropriate dune files), but
+does not run them. Whenever a new test file is added, or test headers of
+existing test files are modified, you need to run \verb|frama-c-ptests| to
+regenerate them.
+Note that, to run all of \framac tests (which include several directories, plus
+the tests of many plug-ins), you should run \verb|make run-ptests| instead,
+which will call \verb|frama-c-ptests| with the proper arguments to generate
+test targets for {\em all} directories.
 
-A specific target \texttt{\$(PLUGIN\_NAME)\_TESTS} will specifically run the tests
-of the plugin. One can add new tests as dependencies of this target.
-The default tests are run by the target \texttt{\$(PLUGIN\_NAME)\_DEFAULT\_TESTS}.
+If new tests are created (by adding a new file, or adding an extra test case to
+an existing file), you must run \verb|frama-c-ptests -create-missing-oracles|.
+This will create empty test oracles for Dune.
 
-Additionally, when running \texttt{make tests} or
-\texttt{make \$(PLUGIN\_NAME)\_TESTS}
-it is possible to pass options to \texttt{ptests.opt} through the
-\texttt{PTESTS\_OPTS} variable.
+Then, to run the tests, use \verb|dune build @ptests|.
+If there are differences between the current run and oracles from previous runs,
+Dune will indicate them and mark the tests as failures. If the changes are
+intended, after manual inspection you can {\em promote} them as new oracles,
+via \verb|dune promote|. This will simply replace the existing oracles with the
+new ones. Finally, you can use \verb|frama-c-ptests -remove-empty-oracles|
+to remove empty oracles (typically, messages sent to the standard error)
+before committing the files to version control.
 
-\begin{example}
-The following command will update the oracles of all tests of the Aoraï plug-in:
-\begin{shell}
-\$ make PTESTS_OPTS=-update Aorai_TESTS
-\end{shell}
-\end{example}
+If you simply want to re-run all tests for your plug-in, run \verb|make tests|.
 
-\texttt{ptests.opt} runs tests belonging to a sub-directory 
-of directory \texttt{tests}\codeidx{tests} that is specified in
-\ptests configuration file. This configuration file,
-\texttt{tests/ptests\_config}, is automatically generated by \framac's
-\texttt{Makefile} from the options you set in your plugin's \texttt{Makefile}.
-\ptests also accepts specific \emph{test suites}
-in arguments.  A test suite\index{Test!Suite|bfit} is either the name of a
-sub-directory in directory \texttt{tests} or a filename (with its path relative
-to the current directory).
+\subsection{Test directory structure}\label{ptests:structure}
 
-\begin{example}
-  If you want to test plug-in
-  \texttt{sparecode}\index{Plug-in!Sparecode|see{Sparecode}}\index{Sparecode}
-  and specific test \texttt{tests/pdg/variadic.c}, just run
-\begin{shell}
-\$ ./bin/ptests.opt sparecode tests/pdg/variadic.c
-\end{shell}
-which should display (if there are 7 tests in directory
-\texttt{tests/sparecode})
-\begin{shell}
-% Dispatch finished, waiting for workers to complete
-% Comparisons finished, waiting for diffs to complete
-% Diffs finished. Summary:
-Run = 8
-Ok  = 16 of 16
-\end{shell}
-\end{example}
+This is the file structure of the \verb|tests| directory, where \framac
+plug-ins are expected to place their tests:
 
-\ptests accepts different options which are used to customize test
-sequences. These options are detailed in Section~\ref{ptests:options}.
+\begin{lstlisting}
+<plug-in directory>
++- tests
+   +- ptests_config
+   +- test_config
+   +- suite1
+      +- test1.c
+      +- ...
+      +- oracle
+         +- test1.res.oracle
+         +- test1.err.oracle
+         +- ...
+      +- result
+         +- test1.res.log
+         +- test1.err.log
+         +- ...
+  +- ...
+\end{lstlisting}
 
-\begin{example}
-If the code of plug-in \texttt{plugin} has changed, a typical sequence of tests
-is the following one.
-\begin{shell}
-\$ ./bin/ptests.opt plugin
-\$ ./bin/ptests.opt -update plugin
-\$ make tests
-\end{shell}
-So we first run the tests suite corresponding to \texttt{plugin} in order to
-display what tests have been modified by the changes. After checking the
-displayed differences, we validate the changes by updating the
-oracles\index{Oracle}. Finally we run all the test suites\index{Test!Suite} in
-order to ensure that the changes do not break anything else in \framac.
-\end{example}
-\begin{example}
-For adding a new test, the typical sequence of command is the following.
-\begin{shell}
-\$ ./bin/ptests.opt -show tests/plugin/new_test.c
-\$ ./bin/ptests.opt -update tests/plugin/new_test.c
-\$ make tests
-\end{shell}
-We first ask \ptests to print the output of the test on the command line, check
-that it corresponds to what we expect, and then take it as the initial oracle.
-If some changes have been made to the code in order to let \texttt{new\_test.c}
-pass, we must of course launch the whole test suite and check that all
-existing tests are alright.
-\end{example}
+\subsubsection{Files \texttt{test\_config} and \texttt{ptests\_config}}
+
+Inside \verb|tests|, two files are mandatory:
+\verb|ptests_config| and \verb|test_config|.
+
+\verb|ptests_config|\codeidx{ptests\_config} usually contains a single line
+with the list of {\em test suites} for that plug-in, prefixed with
+\verb|DEFAULT_SUITES=|.
+A test suite\index{Test!Suite|bfit} is a sub-directory of the current \texttt{tests}
+directory.
+
+\begin{lstlisting}
+DEFAULT_SUITES=basic parsing misc options
+\end{lstlisting}
+
+In the example above, our plug-in has at least four sub-directories inside the
+\verb|tests| directory. Each test suite can contain any number of test files.
+
+\verb|test_config|\codeidx{test\_config} contains a list of
+common {\em directives} to be applied to each test, in all test suites.
+It typically contains a line \verb|PLUGIN: <module>| with the name of the
+plug-in being developed (for more details about \verb|PLUGIN:|, check
+Section~\ref{ptests:directives}).
+
+Each test suite can also contain its own \verb|test_config| file. Each test
+case in that suite will then inherit the directives from the parent
+\verb|test_config| as well as those from the \verb|test_config| in its
+directory.
+
+Finally, different {\em test configurations} can be specified by creating
+other files, e.g. the existence of a file \verb|test_config_prove| will
+create a configuration named \verb|prove|. A test case can contain multiple
+{\em test headers} (to be detailed in the next section), with different
+directives for each configuration. Configurations are specified
+when running tests, e.g. instead of running \verb|dune build @ptests|,
+you can run instead \verb|dune build @ptests_config_prove| to run tests only
+from the \verb|prove| configuration.
 
 \begin{important}
-If you're creating a whole new test suite \texttt{suite}, 
-don't forget to create the sub-directories \texttt{suite/result} and
-\texttt{suite/oracle} where \ptests will store the current results and
-the oracles for all the tests in \texttt{suite}
+  All Dune \verb|@ptests|-related targets must be run {\em after}
+  \verb|frama-c-ptests| (or \verb|make run-ptests|) has been run, otherwise
+  Dune may not find the generated files and report errors such as
+  {\em Alias "ptests\_config" specified on the command line is empty}.
 \end{important}
 
-\subsection{Configuration}\label{ptests:configuration}
-\index{Test!Configuration|bfit}
+The catch-all command \verb|make tests| run tests for {\em all} suites, and
+{\em all} configurations.
 
-In order to exactly perform the test that you wish, some directives can be set
-in three different places. We indicate first these places and next the possible
-directives.
+\subsubsection{Test headers}\label{ptests:header}
 
-The places are:
-\begin{itemize}
-\item inside file \texttt{tests/test\_config};\codeidx{test\_config}
-\item inside file \texttt{tests/$subdir$/test\_config} (for each sub-directory
-  $subdir$ of \texttt{tests}); or
-\item inside each test file, in a special comment of the
-  form\index{Test!Header}
+Inside each test suite, we find one or more test files: either \verb|.c|
+or \verb|.i| files which typically start with the following
+header\index{Test!Header}:
+
 \begin{listing-nonumber}
 /* run.config
-   ... directives ...
+  // test directives, one per line
+  ...
 */
 \end{listing-nonumber}
-\end{itemize}
 
-In each of the above case, the configuration is done by a list of
-directives\index{Test!Directive}. Each directive has to be on one line and to
-have the form
+That is, a multiline C comment block (\verb|/* */|) with \verb|run.config|
+and a list of lines containing test directives. This test header
+tells \ptests how to generate the test commands.
+
+Note that a configuration suffix can be added to \verb|run.config|. Also,
+we can define multiple test headers, such as:
+
 \begin{listing-nonumber}
-CONFIG_OPTION:value
+/* run.config
+  STDOPT:
+*/
+/* run.config_eva
+  STDOPT: +"-eva"
+*/
 \end{listing-nonumber}
-There is exactly one directive by line. The different directives (\emph{i.e.}
-possibilities for \texttt{CONFIG\_OPTION}) are detailed in
-Section~\ref{ptests:directives}.
+
+This will create a test case for the default configuration, and a different one
+for the \verb|eva| configuration.
+
+Multiple configurations may share the same set of directives:
+\begin{listing-nonumber}
+/* run.config, run.config_<name> [, ...]
+   ... common directives ...
+*/
+\end{listing-nonumber}
+The following wildcard is also supported, and matches any
+configuration: \lstinline+/* run.config* +.
+Note that it does not define a new configuration, but generates tests for
+every existing configuration in the directory (as defined by the existence of
+\verb|test_config_*| files).
+
+\subsubsection{\texttt{oracle} and \texttt{result} directories}\label{ptests:oracles}
+
+Inside each test suite, there are two directories, \verb|oracle| and
+\verb|result|\footnote{If there are other configurations, there will also be
+an \texttt{oracle\_<config>} and a \texttt{result\_<config>} directory per
+configuration.}, each containing at least one file per test case
+(remember that a single test file can contain several test cases, one per
+directive).
+
+The \verb|oracle| directory contains the test oracles, that is, the expected
+results saved from previous runs.
+
+The \verb|result| directory contains the generated Dune files produced by
+\ptests.
 
 \begin{important}
-  \textbf{Concurrency issues:}
-  tests using compiled modules ({\tt -load-script} or {\tt -load-module}) may
-  lead to concurrency issues when the same module is used in different test
-  files, or in different test cases within the same file. One way to avoid
-  issues is to serialize tests via \texttt{MODULE} directives, which will
-  take care of the compilation and of adding the corresponding
-  \texttt{-load-module} option to further \texttt{OPT} and
-  \texttt{STDOPT} directives:
-
-  \begin{listing-nonumber}
-    MODULE: script.cmx
-    STDOPT: +"-opt1" ...
-    STDOPT: #"-opt2" ...
-  \end{listing-nonumber}
-  The {\tt .cmx} extension is optional and the prefix {\tt @PTEST\_DIR@/}
-  is automatically added to the module names (the directive accepts a list
-  of modules that can be separed by blank or comma).
-
-  In addition, if the same script {\tt tests/suite/script.ml}
-  is shared by several test files in {\tt tests/suite},
-  it is necessary to compile the script once
-  when entering the directory hosting the suite. The {\tt MODULE} directive is
-  not well suited for that, and it is thus needed to resort to an {\tt EXECNOW}
-  directive in {\tt tests/suite/test\_config}:
-
-  \begin{listing-nonumber}
-    EXECNOW: make -s @PTEST_DIR@/common_module.cmxs
-  \end{listing-nonumber}
-
-  It is then necessary to explicitly use
-  {\tt -load-module @PTEST\_DIR@/common\_module.cmxs} in the appropriate
-  {\tt OPT} and {\tt STDOPT} directives.
-
+  The naming of these directories is due to historical reasons; the
+  \verb|result| directory used to contain the current test outputs,
+  which were then compared to the oracles, mirroring their directory
+  structure. Nowadays, it could be called \verb|targets|, for instance.
 \end{important}
+
+Oracle files are named \verb|<test_name><optional_test_number>.<stream>.oracle|.
+\verb|<test_name>| is simply the filename of the test file, minus its
+extension\footnote{Note that this prevents having two tests in the same
+suite which differ only by their extension, e.g. \texttt{test1.c} and
+\texttt{test1.i}.}. \verb|<optional_test_number>| is a 0-numbered list of
+test numbers for files with multiple tests: \verb|.0|, then \verb|.1|,
+\verb|.2|, etc. It is omitted if the test file defines a single test case.
+\verb|<stream>| is \verb|out| for \verb|stdout| (standard output) and
+\verb|err| for \verb|stderr| (standard error). Therefore, there are two
+oracle files for each test case. An absent oracle is equivalent to an empty one.
+
+Files in \verb|result| are named \verb|<test_name>.<test_number>.exec.wtests|
+(or, in case there are \verb|EXECNOW|\footnote{See
+Section~\ref{ptests:directives} for details about this and other directives.}
+directives, they end with \verb|.execnow.wtests|). They are always 0-numbered,
+even when there is a single test case per file.
+These are JSON files containing the data to be used (by \verb|frama-c-wrapper|
+via the generated \verb|dune| file) in each test, e.g.
+the command-line to be run, the output file name, and the associated oracle.
+These \verb|.wtests| files are not generated when the use of \verb|frama-c-wrapper|
+is not required (via \ptests' option \verb|-wrapper ""|).
+
+\subsection{What happens when you run a test}\label{ptests:inside}
+
+Complex tests using relative paths or extra files require understanding how
+Dune runs the tests, so that they can be properly written.
+
+By default, Dune will create a \verb|_build| directory where it stores compiled
+files and other resources the user may request. When a test is run, Dune will
+copy the test file and its dependencies (detailed in the next section)
+to a subdirectory inside \verb|_build| (usually, mirroring the original
+directory structure), \verb|cd| to the test subdirectory, and run the test
+command from there. It will redirect the standard and error streams to
+two files (\verb|<test>.res.log| and \verb|<test>.err.log|), and compare them
+to the test oracles. If they are identical, by default Dune will not report
+anything. Otherwise, it will print a message and the diff between the current
+result and the previous oracle.
+
+\subsubsection{Test dependencies}\label{ptests:dependencies}
+
+Dune tracks dependencies between files so that it knows when objects must be
+rebuilt and tests must be run again. For compiling \ocaml files, it usually
+computes this information automatically. For tests, however, such information
+must come from the user. \ptests will use it to generate Dune rules that
+will ensure tests are re-run if their dependencies are modified.
+Properly annotating test dependencies is essential to ensure reproducible,
+parallelizable tests. Otherwise, non-deterministic behavior may occur.
+
+One way to declare dependencies is to use a \verb|DEPS| directive%
+\footnote{Section~\ref{ptests:directives} provides details about \ptests
+directives.} with a space-separated list of files. For instance, a test
+\verb|file.c| which \#includes a \verb|file.h| must declare it as a dependency:
+
+\begin{lstlisting}[language=C]
+/* run.config
+   DEPS: file.h
+*/
+#include "file.h"
+...
+\end{lstlisting}
+
+When tests mention their dependencies in the command line, a shorter syntax is
+available, using the Dune special variable \verb|%{dep:<file>}|.
+For instance, tests from \verb|saveload| typically consist of multiple
+sub-tests, one creating a session file with \verb|-save| and another loading it
+with \verb|-load|.
+The second test obviously must run {\em after} the first one; adding the
+dependency will ensure that Dune will sequence them correctly. In the example
+below, each \verb|STDOPT| directive defines a test case.
+
+\begin{lstlisting}[language=C]
+/* run.config
+   STDOPT: +"-save test1.sav"
+   STDOPT: +"-load %{dep:test1.sav}"
+*/
+...
+\end{lstlisting}
+
+You can combine \verb|DEPS| and \verb|%{dep:}| as you wish in your tests.
+Prefer \verb|%{dep:}| for local dependencies, since it does not accumulate
+towards following tests, and \verb|DEPS| for dependencies which are common to
+several tests.
+
+Note that forgetting to specify dependencies can lead to test failures in
+unexpected ways, such as the dependencies not being copied to Dune's test
+directory, or two tests running in parallel and reading/writing concurrently
+to the same file.
+
+\subsubsection{Working directory and relative paths}
+
+Any directive can identify a file using a relative path.
+The current working directory (considered as \texttt{.}) will be a directory
+inside Dune's sandbox, that is, a \verb|result| directory inside the ``mirror''
+directory of the test file. This ``mirror'' directory structure is created
+by Dune (by default, inside a \verb|_build| directory in the root of the Dune
+project), with dependencies copied lazily for each test. Therefore, pay
+attention to the fact that references to the parent directory
+(\verb|..|) will likely not match what you expect.
+
+\subsection{Detailed directives}\label{ptests:directives}\index{Test!Directive}
+
+Directives can have various functions: some create test cases, while others
+modify the environment (and therefore affect other directives).
+Each directive is specified in a separate line and has the form
+\begin{listing-nonumber}
+DIRECTIVE: value (everything until the newline character)
+\end{listing-nonumber}
 
 \begin{example}
   Test \texttt{tests/sparecode/calls.c} declares the following directives.
@@ -776,305 +520,164 @@ Section~\ref{ptests:directives}.
 */
 \end{listing-nonumber}
 These directives state that we want to test sparecode and slicing analyses on
-this file. Thus running the following instruction executes two test cases.
-\begin{shell}
-\$ ./bin/ptests.opt tests/sparecode/calls.c
-% Dispatch finished, waiting for workers to complete
-% Comparisons finished, waiting for diffs to complete
-% Diffs finished. Summary:
-Run = 2
-Ok  = 4 of 4
-\end{shell}
+this file. Two test cases are defined, each with its specific set of options.
+The default command (\texttt{frama-c}) will be run with these arguments, plus
+the test file name, plus a few other implicit options (\verb|-check|,
+\verb|-no-autoload-plugins|, \verb|-load-module|, etc).
 \end{example}
 
-\subsection{Alternative Testing}\label{ptests:alternative}
-
-You may want to set up different testing goals for the same test
-base. Common cases include:
-\begin{itemize}
-\item checking the result of an analysis with or without an option;
-\item checking a preliminary result of an analysis, in particular if the
-      complete analysis is costly;
-\item checking separately different results of an analysis.
-\end{itemize}
-
-This is possible with option \texttt{-config} of \ptests, which takes as
-argument the name of a special test configuration, as in
-\begin{shell}
-\$ ./bin/ptests.opt -config <special_name> plugin
-\end{shell}
-
-Then, the directives for this test can be found:
-\begin{itemize}
-\item inside file \texttt{tests/test\_config\_<special\_name>};
-\item inside file \texttt{tests/$subdir$/test\_config\_<special\_name>} (for
-  each sub-directory $subdir$ of \texttt{tests}); or
-\item inside each test file, in a special comment of the
-  form\index{Test!Header}
-\begin{listing-nonumber}
-/* run.config_<special_name>
-   ... directives ...
-*/
-\end{listing-nonumber}
-Multiple configurations may share the same set of directives:
-\begin{listing-nonumber}
-/* run.config, run.config_<special_name> [, ...]
-   ... common directives ...
-*/
-\end{listing-nonumber}
-The following wildcard is also supported, and accepts any
-configuration: \lstinline+/* run.config* +.
-\end{itemize}
-
-All operations for this test configuration should take option
-\texttt{-config} in argument, as in
-\begin{shell}
-\$ ./bin/ptests.opt -update -config <special_name> plugin
-\end{shell}
-
-\begin{important}
-In addition, option \texttt{-config <special\_name>} requires subdirectories
-\texttt{result\_<special\_name>} and \texttt{oracle\_<special\_name>} to store
-results and oracle of the specific configuration.
-\end{important}
-
-\subsection{Detailed options}\label{ptests:options}
-
-Figure~\ref{fig:ptests-options} details the options of \ptests.
-\begin{figure}[ht]
-\begin{center}
-\begin{tabular}{|c|c|p{6cm}|c|}
-\hline
-\textbf{kind} & \textbf{Name} & \textbf{Specification} & \textbf{Default}\\
-\hline
-\hline \multirow{3}{16mm}{\centering{Toplevel}}
-& \texttt{-add-options} & 
-  Additional options appended to the normal toplevel command-line & \\
-& \texttt{-add-options-pre} &
-   Additional options prepended to the normal toplevel command line & \\
-& \texttt{-byte} & Use bytecode toplevel & no \\
-& \texttt{-opt} & Use native toplevel & yes \\
-& \texttt{-gui} & Use GUI instead of console-based toplevel & no \\
-\hline \multirow{5}{16mm}{\centering{Behavior}}
-& \texttt{-run} & Delete current results; run tests and examine results & yes
-\\
-& \texttt{-dry-run} & Print commands, but do not execute them & no
-\\
-& \texttt{-examine} & Only examine current results; do not run tests & no \\
-& \texttt{-show} & Run tests and show results, but do not examine
-                   them; implies \texttt{-byte} &
-no \\
-& \texttt{-update} & Take current results as new oracles\index{Oracle}; do not
-run tests & no \\
-\hline \multirow{4}{16mm}{\centering{Misc.}}
-& \texttt{-exclude suite} & Do not consider the given \texttt{suite} &
-\\
-& \texttt{-diff cmd} & Use \texttt{cmd} to show differences between
-results and oracles when examining results
-& \texttt{diff -u} \\
-& \texttt{-cmp cmd} & Use \texttt{cmd} to compare results against
-oracles when examining results
-& \texttt{cmp -s} \\
-& \texttt{-use-diff-as-cmp} & Use the same command for diff and cmp &
-no \\
-& \texttt{-j n} & Set level of parallelism to \texttt{n} & 4 \\
-& \texttt{-v} & Increase verbosity (up to twice) & 0 \\
-& \texttt{-help} & Display helps & no \\
-\hline
-\end{tabular}
-\end{center}
-\caption{\ptests options.}\label{fig:ptests-options}
-\end{figure}
-
-The commands provided through the \texttt{-diff} and \texttt{-cmp}
-options play two related but distinct roles. \texttt{cmp} is always
-used for each test (in fact it is used twice: one for the standard output
-and one for the error output). Only its exit code is taken into
-account by \ptests and the output of \texttt{cmp} is discarded.
-An exit code of \texttt{1} means that the two files have
-differences. The two files will then be analyzed by \texttt{diff},
-whose role is to show the differences between the files. An exit code
-of \texttt{0} means that the two files are identical. Thus, they won't
-be processed by \texttt{diff}. An exit code of \texttt{2} indicates an
-error during the comparison (for instance because the corresponding
-oracle does not exist). Any other exit code results in a fatal
-error. It is possible to use the same command for both \texttt{cmp}
-and \texttt{diff} with the \texttt{-use-diff-as-cmp} option, which
-will take as \texttt{cmp} command the command used for \texttt{diff}.
-
-The \texttt{-exclude} option can take as argument a whole suite or an
-individual test. It can be used with any behavior.
-
-The \texttt{-gui} option will launch Frama-C's GUI instead of the console-based
-toplevel. It can be combined with \texttt{-byte} to launch the bytecode GUI. 
-In this mode the default level of parallelism is reduced to 1.
-
-\subsection{Detailed directives}\label{ptests:directives}
-
 Figure~\ref{fig:test-directives} shows all the directives that can be used in
-the configuration header of a test (or a test suite).
+the configuration header of a test (or a test suite). Those whose name are
+underlined are the directives that {\em actually} create test cases; the others
+modify or disable test cases.
 \begin{figure}[ht]
 \begin{center}
-\begin{tabular}{|c|c|p{4.5cm}|p{5.2cm}|}
+\begin{tabular}{|l|p{9cm}|p{4cm}|}
 \hline
-\textbf{Kind} & \textbf{Name} & \textbf{Specification} & \textbf{default}\\
+\textbf{Name} & \textbf{Specification} & \textbf{default}\\
 \hline
-\hline \multirow{4}{23mm}{\centering{Command}}
-& \texttt{PLUGIN}\nscodeidxdef{Test!Directive}{PLUGIN}
-& Plugins to be loaded with each subsequent run.
-& \texttt{from inout eva scope variadic} for tests under \texttt{./tests} directory
+\texttt{CMD}\nscodeidxdef{Test!Directive}{CMD}
+& Program to run.
+& \texttt{frama-c}
 \\
-& \texttt{SCRIPT}\nscodeidxdef{Test!Directive}{SCRIPT}
-& ML scripts to be loaded with each subsequent run (their compilation is performed by the \texttt{frama-c} command).
+\hline
+\texttt{COMMENT}\nscodeidxdef{Test!Directive}{COMMENT}
+& A configuration comment; this directive does nothing.
 & \textit{None}
 \\
-& \texttt{LIBS}\nscodeidxdef{Test!Directive}{LIBS}
-& Libraries to be loaded with each subsequent run (their compilation is not managed by \texttt{ptests} contrary to the modules of \texttt{MODULE} directive).
+\hline
+\texttt{DEPS}\nscodeidxdef{Test!Directive}{DEPS}
+& The list of files this test depends on.
 & \textit{None}
 \\
-& \texttt{CMD}\nscodeidxdef{Test!Directive}{CMD}
-& Program to run
-& \texttt{./bin/toplevel.opt}
-\\
-& \texttt{OPT}\nscodeidxdef{Test!Directive}{OPT}
-& Options given to the program
-& \texttt{-val -out -input -deps} for tests under \texttt{./tests} directory
-\\
-& \texttt{STDOPT}\nscodeidxdef{Test!Directive}{STDOPT}
-& Add and remove options from the default set
+\hline
+\texttt{DONTRUN}\nscodeidxdef{Test!Directive}{DONTRUN}
+& Disable this test file for the current configuration.
 & \textit{None}
 \\
-& \texttt{EXIT}\nscodeidxdef{Test!Directive}{EXIT}
-& Indicate expected exit status if not 0.
+\hline
+\texttt{\underline{EXECNOW}}\nscodeidxdef{Test!Directive}{EXECNOW}
+& Run a custom command.
 & \textit{None}
 \\
-& \texttt{LOG}\nscodeidxdef{Test!Directive}{LOG}
-& Add an additional file to compare against an oracle
+\hline
+\texttt{EXIT}\nscodeidxdef{Test!Directive}{EXIT}
+& Indicate expected exit code, if not 0.
 & \textit{None}
 \\
-& \texttt{EXECNOW}\nscodeidxdef{Test!Directive}{EXECNOW}
-& Run a command before the following commands. When specified in a configuration
-file, run it only once.
-& \textit{None}
-\\
-& \texttt{EXEC}\nscodeidxdef{Test!Directive}{EXEC}
-& Similar to \texttt{EXECNOW}, but run it once per testing file.
-& \textit{None}
-\\
-& \texttt{MACRO}\nscodeidxdef{Test!Directive}{MACRO}
-& Define a new macro
-& \textit{None}
-\\
-& \texttt{FILTER}\nscodeidxdef{Test!Directive}{FILTER}
-& Command reading the standard input used to filter results. In such a command, the predefined macro \texttt{@PTEST\_ORACLE@} is set to the basename of the oracle.
-& \textit{None}
-\\
-& \texttt{MODULE}\nscodeidxdef{Test!Directive}{MODULE}
-& Register a dynamic module to be built and to be loaded with each subsequent
-test
-& \textit{None}
-\\
-& \texttt{TIMEOUT}\nscodeidxdef{Test!Directive}{TIMEOUT}
-& kill the test after the given duration (in seconds of CPU user time)
-and report a failure
-& \textit{None}
-\\
-& \texttt{NOFRAMAC}\nscodeidxdef{Test!Directive}{NOFRAMAC}
-& empty the list of frama-c commands to be launched
-(\texttt{EXEC} and \texttt{EXECNOW} directives are still executed).
-& \textit{None}
-\\
-\hline \multirow{2}{23mm}{\centering{Test suite}}
-& \texttt{DONTRUN}\nscodeidxdef{Test!Directive}{DONTRUN}
-& Do not execute this test
-& \textit{None}
-\\
-& \texttt{FILEREG}\nscodeidxdef{Test!Directive}{FILEREG}
-& selects the files to test
+\hline
+\texttt{FILEREG}\nscodeidxdef{Test!Directive}{FILEREG}
+& File name pattern of files considered as test cases.
 & \texttt{.*\bss.\bss(c|i\bss)}
 \\
-\hline \multirow{2}{23mm}{\centering{Misc.}}
-& \texttt{COMMENT}\nscodeidxdef{Test!Directive}{COMMENT}
-& Comment in the configuration
+\hline
+\texttt{FILTER}\nscodeidxdef{Test!Directive}{FILTER}
+& Command reading the standard input used to filter results.
+In such a command, the predefined macro \texttt{@PTEST\_ORACLE@} is set to the
+basename of the oracle.
 & \textit{None}
 \\
-& \texttt{GCC}\nscodeidxdef{Test!Directive}{GCC}
-& Unused (compatibility only)
+\hline
+\texttt{LIBS}\nscodeidxdef{Test!Directive}{LIBS}
+& Libraries to be loaded with each subsequent run (their compilation is not
+  managed by \ptests, contrary to the modules of \texttt{MODULE} directive).
+& \textit{None}
+\\
+\hline
+\texttt{LOG}\nscodeidxdef{Test!Directive}{LOG}
+& Add an additional file that the test must generate and compare against an
+oracle. Note that this directive is only used by `OPT` and `STDOPT` directives.
+The syntax for \texttt{EXECNOW} related to that need is different
+(see the description of \texttt{EXECNOW} directive).
+& \textit{None}
+\\
+\hline
+\texttt{MACRO}\nscodeidxdef{Test!Directive}{MACRO}
+& Define a new macro.
+& \textit{None}
+\\
+\hline
+\texttt{MODULE}\nscodeidxdef{Test!Directive}{MODULE}
+& Register a dynamic module to be built and loaded with each subsequent test.
+& \textit{None}
+\\
+\hline
+\texttt{NOFRAMAC}\nscodeidxdef{Test!Directive}{NOFRAMAC}
+& Empty the list of frama-c commands to be launched
+(\texttt{EXECNOW} directives are still executed). Used when the test must not
+run \texttt|frama-c|, but another command.
+& \textit{None}
+\\
+\hline
+\texttt{\underline{OPT}}\nscodeidxdef{Test!Directive}{OPT}
+& Options given to the program.
+& \textit{None} (but usually defined in \texttt{test\_config})
+\\
+\hline
+\texttt{PLUGIN}\nscodeidxdef{Test!Directive}{PLUGIN}
+& Plugins to be loaded with each subsequent run.
+& \textit{None} (but usually defined in \texttt{test\_config})
+\\
+\hline
+\texttt{\underline{STDOPT}}\nscodeidxdef{Test!Directive}{STDOPT}
+& Add and remove options from the default set (see text for syntax details).
+& \textit{None}
+\\
+\hline
+\texttt{TIMEOUT}\nscodeidxdef{Test!Directive}{TIMEOUT}
+& Kill the test after the given duration (in seconds of CPU user time)
+and report a failure.
 & \textit{None}
 \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Directives in configuration headers of test
-  files.}\label{fig:test-directives}
+\caption{Directives in configuration headers of test files.
+  Underlined directives are the only ones which actually generate test cases.
+}\label{fig:test-directives}
 \end{figure}
-Any directive can identify a file using a relative path.
-The default directory considered for \texttt{.} is always the parent
-directory of directory \texttt{tests}\codeidx{tests}. The
-\texttt{DONTRUN} and \texttt{NOFRAMAC} directives
-do not need to have any content, but it might be
-useful to provide an explanation of why the test should not be run
-({\it e.g} test of a feature that is under development and not fully
-operational yet).
 
-If there are \texttt{OPT}/\texttt{STDOPT} directives \textit{after} a
-\texttt{NOFRAMAC} directive, they will be executed, unless
-they are themselves discarded by another subsequent \texttt{NOFRAMAC}
-directive.
-
-As said in Section~\ref{ptests:configuration}, these directives can be
-found in different places:
-\begin{enumerate}
-\item default value of the directive (as specified in
-  Fig.~\ref{fig:test-directives});
-\item inside file \texttt{tests/test\_config};\codeidx{test\_config}
-\item inside file \texttt{tests/$subdir$/test\_config} (for each sub-directory
-  $subdir$ of \texttt{tests}); or
-\item inside each test file
-\end{enumerate}
-As presented in Section~\ref{ptests:alternative}, alternative directives for
-test configuration <special\_name> can be found in slightly different places:
-\begin{itemize}
-\item default value of the directive (as specified in
-  Fig.~\ref{fig:test-directives});
-\item inside file \texttt{tests/test\_config\_<special\_name>};
-\item inside file \texttt{tests/$subdir$/test\_config\_<special\_name>} (for each sub-directory
-  $subdir$ of \texttt{tests}); or
-\item inside each test file.
-\end{itemize}
-For a given test \texttt{tests/suite/test.c}, each existing file in
-the sequence above is read in order and defines a configuration level
-(the default configuration level always exists).
+In the following, we detail some aspects of several directives.
 
 \begin{itemize}
+\item \texttt{DONTRUN} and \texttt{NOFRAMAC} directives
+  do not need any content, but it might be
+  useful to provide an explanation of why the test should not be run
+  ({\it e.g} test of a feature that is under development and not fully
+  operational yet).
 \item
   \texttt{CMD} allows changing the command that is used for the
   following \texttt{OPT} directives (until a new \texttt{CMD}
   directive is found). No new test case is generated
-  if there is no further \texttt{OPT} directive. At a given
+  if there is no further \texttt{OPT} directive. For a given
   configuration level, the default value for directive
   \texttt{CMD}\nscodeidx{Test!Directive}{CMD} is the last
   \texttt{CMD} directive of the preceding configuration level.
 \item \texttt{LOG} adds a file to be compared against an oracle in the
-  next \texttt{OPT} or \texttt{STDOPT} directive. Several files can be monitored from a single
-  \texttt{OPT}/\texttt{STDOPT} directive, through several \texttt{LOG} directives. 
+  next \texttt{OPT} or \texttt{STDOPT} directive. Several files can be
+  monitored from a single \texttt{OPT}/\texttt{STDOPT} directive,
+  through several \texttt{LOG} directives.
   These files must be generated in the result
   directory of the corresponding suite (and potentially alternative
   configuration).
   After an \texttt{OPT} or \texttt{STDOPT} directive is encountered,
   the set of additional \texttt{LOG} files is reset to its default.
-\item By default, \framac is expected to return successfully (i.e., with
-  an exit status of 0). If a test is supposed to lead to an error, an
-  \texttt{EXIT} directive must be used. It takes as argument an integer
+  Note that \texttt{EXECNOW} directives can also be prefixed with
+  \texttt{LOG}s, but they are written in the same line, without the
+  separating colon (\texttt{:}).
+\item By default, the test command (usually, \texttt|frama-c|) is expected
+  to return successfully (i.e., with an exit status of 0).
+  If a test is supposed to lead to an error, an \texttt{EXIT} directive must be
+  used. It takes as argument an integer
   (typically 1 to denote a user error) representing the expected exit status
   for the subsequent tests. All tests triggered by \texttt{OPT} or
   \texttt{STDOPT} directives encountered after the \texttt{EXIT} directive
   will be expected to exit with the corresponding status, until a new
   \texttt{EXIT} directive is encountered. (\texttt{EXIT: 0} will thus
   indicate that subsequent tests are expected to exit normally).
-\item If there are several directives \texttt{OPT} in the same
+\item If there are several \texttt{OPT} directives in the same
   configuration level, they correspond to different test cases. The
-  \texttt{OPT} directive(s) of a given configuration level replace(s)
+  \texttt{OPT} directives of a given configuration level replace
   the ones of the preceding level.
 \item The \texttt{STDOPT}\nscodeidx{Test!Directive}{STDOPT}
   directive takes as default set of options
@@ -1086,41 +689,32 @@ the sequence above is read in order and defines a configuration level
   \begin{code}
     STDOPT: [[+#-]"opt" ...]
   \end{code}
-options are always given between quotes. An option following a \texttt{+}
-(resp. \texttt{\#}) is added to the end (resp. start) of current set of options
-while an option following a \texttt{-} is removed from it. The directive can be
-empty (meaning that the corresponding test will use the standard set of
-options). As with \texttt{OPT}, each \texttt{STDOPT} corresponds to a different
-(set of) test case(s). \texttt{LOG} directives preceding an \texttt{STDOPT}
-are taken into account.
-\item The syntax for directives
-  \texttt{EXECNOW}\nscodeidx{Test!Directive}{EXECNOW}
-  and \texttt{EXEC}\nscodeidxdef{Test!Directive}{EXEC} is the following.
+  unlike in \texttt{OPT}, here \textbf{options are always given between quotes}.
+  An option following a \texttt{+}
+  (resp. \texttt{\#}) is added to the end (resp. start) of the current set of
+  options, while an option following a \texttt{-} is removed from it.
+  The directive can be empty (meaning that the corresponding test will use the
+  standard set of options). As with \texttt{OPT}, each \texttt{STDOPT}
+  corresponds to a different (set of) test case(s).
+  \texttt{LOG} directives preceding an \texttt{STDOPT} are taken into account.
+\item The syntax for \texttt{EXECNOW}\nscodeidx{Test!Directive}{EXECNOW}
+  directives is the following.
   \begin{code}
     EXECNOW: [ [ LOG file | BIN file ] ... ] cmd
   \end{code}
-or
-  \begin{code}
-    EXEC: [ [ LOG file | BIN file ] ... ] cmd
-  \end{code}
   Files after \texttt{LOG} are log files generated by command \texttt{cmd} and
-  compared from oracles, whereas files after \texttt{BIN} are binary files also
-  generated by \texttt{cmd} but not compared from oracles. Full access path to
-  these files have to be specified only in \texttt{cmd}. All the commands
-  described by directives \texttt{EXECNOW} or \texttt{EXEC} are executed in
-  order and
-  before running any of the other directives. If the execution of
-  one \texttt{EXECNOW} or \texttt{EXEC} directive fails ({\it i.e.} has a
-  non-zero return
-  code), the remaining actions are not executed.
-  \texttt{EXECNOW} or \texttt{EXEC}
-  directives from a given level are added to the directives of the following
-  levels.
+  compared from oracles, whereas files after \texttt{BIN} are binary files, also
+  generated by \texttt{cmd}, but not compared to any oracles. Full access path to
+  these files has to be specified only in \texttt{cmd}. Execution order between
+  different \texttt{OPT}/\texttt{STDOPT}/\texttt{EXECNOW} directives is
+  unspecified, unless there are dependencies between them (see \texttt{DEPS}
+  directive).
+  \texttt{EXECNOW} directives from a given level are added to the directives of
+  the following levels.
 
-  The distinction between \texttt{EXECNOW} and \texttt{EXEC} only occurs when
-  the command is put in a test configuration file:
-  \texttt{EXECNOW} executes the command only once for the test suite, while
-  \texttt{EXEC} executes it once per test file of the test suite.
+  \textbf{Note:} An \texttt{EXECNOW} command without \verb|BIN| and without
+  \verb|LOG| will not be be executed by Dune; a warning is emitted in this case.
+
 \item The \texttt{MACRO}\nscodeidx{Test!Directive}{MACRO} directive
   has the following syntax:
   \begin{code}
@@ -1133,19 +727,16 @@ or
   \texttt{STDOPT} or \texttt{EXECNOW} directive at this configuration level
   or in any level below it will be replaced by \texttt{content}. Existing
   predefined macros are listed in section~\ref{sec:ptests-macros}.
-\item \texttt{MODULE}\nscodeidx{Test!Directive}{MODULE}
+\item The \texttt{MODULE}\nscodeidx{Test!Directive}{MODULE}
  directive takes as argument the name of a \texttt{.cmxs}
   module. It will then add a directive to compile this file with the
   command \texttt{@PTEST\_MAKE\_MODULE@ <MODULE>} where
   \texttt{@PTEST\_MAKE\_MODULE@} defaults to \texttt{make -s}. Option
   \texttt{-load-module <MODULE>} will then be appended to any subsequent Frama-C
   command triggered by the test.
-\item \texttt{LIBS}\nscodeidx{Test!Directive}{LIBS}
+\item The \texttt{LIBS}\nscodeidx{Test!Directive}{LIBS}
  directive takes as argument the name of a \texttt{.cmxs}
   module. The \texttt{-load-module <LIBS>} will then be appended to any subsequent Frama-C command triggered by the test. The compilation is not managed by \texttt{ptests}.
-\item \texttt{SCRIPT}\nscodeidx{Test!Directive}{SCRIPT}
- directive takes as argument the name of a \texttt{.ml}
- file. The \texttt{-load-script <SCRIPT>} will then be appended to any subsequent Frama-C command triggered by the test.
 \item The \texttt{FILEREG}\nscodeidx{Test!Directive}{FILEREG}
   directive contains a regular expression indicating which files in
   the directory containing the current test suite are actually part of
@@ -1165,6 +756,32 @@ FILTER: diff --new-file @PTEST_DIR@/oracle_config/@PTEST_ORACLE@ -
   \end{code}
   Chaining multiple filter commands is possible by defining several \texttt{FILTER} directives (they are applied in the reverse order),
   and an empty command drops the previous \texttt{FILTER} directives.
+\item The \texttt{DEPS}\nscodeidx{Test!Directive}{DEPS} directive takes a set
+  of filepaths and adds them to the set of dependencies for the next
+  \texttt{OPT}/\texttt{STDOPT}/\texttt{EXECNOW} directives.
+  Whenever these dependencies change, the test
+  cases depending on them must be re-run. Otherwise, Dune does not re-run
+  successful tests. Dependencies also ensure that tests which require output
+  from others are run serially and not in parallel.
+  Note that Dune also has a special variable notation which can be used to
+  specify dependencies: \verb|%{dep:<file>}|. For instance, the following
+    block:
+    \begin{code}
+      DEPS: file1.h file2.c
+      OPT: -cpp-extra-args="-Ifile1.h" file2.c
+    \end{code}
+    Is equivalent to:
+    \begin{code}
+      OPT: -cpp-extra-args="-I%\{dep:file1.h\}" %\{dep:file2.c\}
+    \end{code}
+    The special variable notation is interpreted by Dune before executing the
+    command. All dependencies (either via \texttt{DEPS} or \verb|%{dep:}|) are
+    collected and added to the set of dependencies for the test case.
+\item
+  If there are \texttt{OPT}/\texttt{STDOPT} directives \textit{after} a
+  \texttt{NOFRAMAC} directive, they will be executed, unless
+  they are themselves discarded by another subsequent \texttt{NOFRAMAC}
+  directive.
 \end{itemize}
 
 \begin{important}
@@ -1179,22 +796,194 @@ itself, it needs to be doubled, {\it i.e.} \texttt{@@} will be translated as
   \textbf{Summary: ordering of test executions}
 
   There is no total ordering between the tests in a test file header.
-  The only guaranteed order between test executions is the following:
-
-  \begin{enumerate}
-  \item \texttt{EXEC} and \texttt{EXECNOW} commands are executed sequentially,
-    from top to bottom.
-  \item Then, all \texttt{OPT}/\texttt{STDOPT} commands execute in an
-    unspecified order (possibly simultaneously).
-  \end{enumerate}
+  The only ordering is dictated by the dependencies declared in the test cases.
+  Dune will by default run tests in parallel.
 
   A consequence of this ordering is that, if you need a test to produce output
-  that will be consumed by another test, the producer \emph{must} be defined via
-  \texttt{EXEC}/\texttt{EXECNOW} (e.g. using \texttt{@frama-c@} and explicitly
-  giving its arguments), while the consumer can be either in a later
-  \texttt{EXEC}/\texttt{EXECNOW}, or in a \texttt{OPT}/\texttt{STDOPT}
-  directive.
+  that will be consumed by another test, the consumer \emph{must} declare the
+  produced file as a dependency.
 \end{important}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Plug-in Migration from Makefile to Dune}\label{adv:dune-migration}
+
+\begin{target}developers who have an existing plug-in for Frama-C 25 or less and
+  want to migrate this plug-in to Frama-C 26 or more.\end{target}
+
+\begin{prereq}
+  Being familiar with the plug-in to migrate. Depending on how complex the
+  plug-in is, it may require an advanced knowledge of the Dune build system.
+\end{prereq}
+
+Please note that this section is a best effort procedure for making the
+migration as smooth as possible. If the plug-in is particularly complex,
+please contact us if you need some help for migrating it.
+
+\subsection{Files organization changes}
+
+Previously for a plug-in named \texttt{Plugin}, only the file
+\texttt{Plugin.mli} was necessary to expose the signature of the plug-in. Now,
+one has to also provide an implementation file \texttt{Plugin.ml}.
+
+For most plug-ins, the \texttt{autoconf} and \texttt{configure} will be useless.
+In particular, \framac does not provide any \texttt{autoconf} and
+\texttt{configure} features anymore. So for most plug-ins these files will be
+entirely removed (see~\ref{adv:dune-migration:conf}). Thus, the
+\texttt{Makefile.in} does not exist anymore. A \texttt{Makefile} may be useful
+to provide some shortcuts.
+
+If a plugin has a graphical user-interface, it is recommended to put the related
+files into a separate directory in the directory of the plug-in
+(see~\ref{adv:dune-migration:gui}).
+
+It was previously possible to indicate \texttt{.} as a test suite for \ptests.
+In such a case, tests source files were directly in the \texttt{tests} directory.
+This is not possible anymore. If the plug-in tests follow this architecture,
+these tests should be moved in a subdirectory of \texttt{tests} and the oracles
+updated before starting the migration.
+
+\subsection{Template \texttt{dune} file}
+
+This basic template should be enough for most plug-ins. The next sections
+explain how to add more information to this file to handle some common cases.
+
+\begin{lstlisting}[language=Dune]
+( rule
+  (alias frama-c-configure)
+  (deps (universe))
+  (action ( progn
+            (echo "MyPlugin:" %{lib-available:frama-c-myplugin.core} "\n")
+            (echo " - Frama-C:" %{lib-available:frama-c.kernel} "\n")
+          )
+  )
+)
+
+( library
+  (optional)
+  (name myplugin)
+  (public_name frama-c-myplugin.core)
+  (flags -open Frama_c_kernel :standard)
+  (libraries frama-c.kernel)
+)
+
+( plugin
+  (optional)
+  (name myplugin) (libraries frama-c-myplugin.core) (site (frama-c plugins))
+)
+\end{lstlisting}
+
+For the creation of the \texttt{dune-project} file, please refer to
+Section~\ref{tut2:hello}.
+
+\subsection{\texttt{autoconf} and \texttt{configure}}\label{adv:dune-migration:conf}
+
+Indicating whether a plug-in is available and why (availability of the
+dependencies) is now handled via the \texttt{frama-c-configure} rule.
+
+When working in the Frama-C \texttt{src/plugins} directory, enabling or
+disabling the plug-in at build time is done thanks to the script
+\texttt{dev/disable-plugins.sh}.
+
+Plug-ins dependencies are now declared in the \texttt{dune} file. In the
+\texttt{libraries} field. For instance, if in the \texttt{autoconf} of the
+plug-in, the following lines are present:
+
+\begin{lstlisting}
+plugin_require_external(myplugin,zmq)
+plugin_use_external(myplugin,zarith)
+plugin_require(myplugin,wp)
+plugin_use(myplugin,eva)
+\end{lstlisting}
+
+The \texttt{libraries} should be now:
+\begin{lstlisting}[language=Dune]
+  (libraries
+     frama-c.kernel
+     zmq
+     (select zarith_dependent.ml from
+       (%{lib-available:zarith} -> zarith_dependent.ok.ml)
+       ( -> zarith_dependent.ko.ml)
+     )
+     frama-c-wp.core
+     (select eva_dependent.ml from
+       (%{lib-available:frama-c-eva.core} -> eva_dependent.ok.ml)
+       ( -> eva_dependent.ko.ml)
+     )
+  )
+\end{lstlisting}
+For external binaries, the keywod is \texttt{bin-available}.
+
+In the case some file must be generated at build time, it is recommended to use
+a rule together with an action of generation. The executable itself can be
+generated from an \ocaml file itself. For example:
+
+\begin{lstlisting}[language=Dune]
+(executable
+ (name myconfigurator)
+ (libraries str))
+
+(rule
+ (deps VERSION_FILE)
+ (targets generated-file)
+ (action (run ./myconfigurator.exe))
+\end{lstlisting}
+
+\subsection{GUI migration}\label{adv:dune-migration:gui}
+
+Just like there is a \texttt{dune} for the core features of the plug-in, there
+is now a \texttt{dune} file for the GUI, that depends on the core features of
+the plug-in and the \framac GUI. This file is to put in the \texttt{gui}
+subdirectory. Again, if there are additional dependencies, they must be
+indicated in the \texttt{libraries} field:
+\begin{lstlisting}
+( library
+  (name myplugin_gui)
+  (public_name frama-c-myplugin.gui)
+  (optional)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open MyPlugin :standard)
+  (libraries frama-c.kernel frama-c.gui frama-c-myplugin.core)
+)
+
+(plugin (optional) (name myplugin-gui) (libraries frama-c-myplugin.gui) (site (frama-c plugins_gui)))
+\end{lstlisting}
+
+\subsection{Build and \texttt{Makefile.in}}
+
+Provided that the \lstinline{dune} files are ready. The plug-in can now be
+built using the command \texttt{dune build @install}. The file
+\lstinline{Makefile.in} can now be removed.
+
+\subsection{Migrating tests}
+
+In the \texttt{test\_config*} files, the \texttt{PLUGIN} field is now mandatory
+and must list the plug-in and all the plug-ins on which it directly depends on.
+For example the plug-in defined in our previous \texttt{dune} file, and assuming
+that the tests use all mandatory and optional dependencies:
+
+\begin{lstlisting}
+PLUGIN: myplugin,wp,eva
+OPT: ...
+\end{lstlisting}
+
+The \texttt{ptests\_config} file now lists the test suites. Notice that this file
+was previously generated and probably list in the ignored files for the versioning
+system. Now, it must be versioned in such a case. Assuming that the plug-in has
+three suites \texttt{basic}, \texttt{eva} and \texttt{wp}. This file now
+contains:
+
+\begin{lstlisting}
+DEFAULT_SUITES=basic eva wp
+\end{lstlisting}
+
+For most plug-ins, these modifications should be enough so that:
+\begin{lstlisting}
+dune exec -- frama-c-ptests
+dune build @ptests
+\end{lstlisting}
+behaves in expected way.
+
+For more advanced usage of \texttt{ptests} please refer to Section~\ref{adv:ptests}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1310,7 +1099,7 @@ let print_one v l =
   Format.printf "variable %s (%d):@\n" v.vname v.vid;
   List.iter
     (fun (ki, lv) ->
-       Format.printf "  sid %a: %a@\n" d_ki ki d_lval lv) 
+       Format.printf "  sid %a: %a@\n" d_ki ki d_lval lv)
     l
 
 let print_all () =
@@ -1327,7 +1116,7 @@ let print_one fmt v l =
   Format.fprintf fmt "variable %s (%d):@\n" v.vname v.vid;
   List.iter
     (fun (ki, lv) ->
-       Format.fprintf fmt "  sid %a: %a@\n" d_ki ki d_lval lv) 
+       Format.fprintf fmt "  sid %a: %a@\n" d_ki ki d_lval lv)
     l
 \end{ocamlcode}
 
@@ -1465,10 +1254,10 @@ output can be associated to a debugging key with the optional argument
 Each category must be registered through the
 \lstinline|register_category| function. You can define subcategories
 by putting colons in the registered name. For instance \lstinline|a:b:c| defines
-a subcategory \lstinline|c| of \lstinline|a:b|, itself a subcategory of 
+a subcategory \lstinline|c| of \lstinline|a:b|, itself a subcategory of
 \lstinline|a|. User can then choose to
 output debugging messages belonging to a given category (and its subcategories)
-with the \lstinline{-plugin-msg-key <category>} option. 
+with the \lstinline{-plugin-msg-key <category>} option.
 
 In order to decide whether a message should be output, both level and category
 options are examined:
@@ -1478,7 +1267,7 @@ options are examined:
 \item if only \lstinline|~level| is provided, the message is output if the
   corresponding verbosity or debugging level is sufficient
 \item if only \lstinline|~dkey| is used, the message is output if the
-  corresponding category is in used 
+  corresponding category is in used
   (even if the verbosity or debugging level is \lstinline|0|)
 \item if both \lstinline|~level| and \lstinline|~dkey| are present,
   the message is output if the two conditions above
@@ -1680,7 +1469,7 @@ It is also possible to have a momentary direct access to
 \begin{description}
 %%item
   \logroutine{print\_on\_output}{ "..."}%
-  The routine immediately locks the output of \lstinline{Log} and 
+  The routine immediately locks the output of \lstinline{Log} and
   prints the provided message. All message echoes are delayed until
   the routine actually returns. Notification to listeners is not
   delayed, however.
@@ -1788,10 +1577,10 @@ The following line of code pretty prints whether two statements are equal.
 \sscodeidx{Datatype}{S\_no\_copy}{pretty}
 \begin{ocamlcode}
 (* assuming the type of [stmt1] and [stmt2] is Cil_types.stmt *)
-Format.fprintf 
+Format.fprintf
   fmt (* a formatter previously defined somewhere *)
-  "statements %a and %a are %sequal" 
-  Cil_datatype.Stmt.pretty stmt1 
+  "statements %a and %a are %sequal"
+  Cil_datatype.Stmt.pretty stmt1
   Cil_datatype.Stmt.pretty stmt2
   (if Cil_datatype.Stmt.equal stmt1 stmt2 then "" else "not ")
 \end{ocamlcode}
@@ -1804,10 +1593,10 @@ in the following way.
 \scodeidx{Datatype}{String}
 \sscodeidx{Datatype}{S\_with\_collections}{Set}
 \begin{ocamlcode}
-let string_set = 
-  List.fold_left 
+let string_set =
+  List.fold_left
     (fun acc s -> Datatype.String.Set.add s acc)
-    Datatype.String.Set.empty 
+    Datatype.String.Set.empty
     [ "foo"; "bar"; "baz" ]
 \end{ocamlcode}
 \end{example}
@@ -1844,14 +1633,14 @@ module AB =
           type *)
        let name = "ab"
        (* representants of the type: a non-empty list of values of this type. It
-          is only used for safety check: the best the list represents the 
+          is only used for safety check: the best the list represents the
           different possible physical representation of the type, the best the
           check is. *)
        let reprs = [ A; B 0 ]
        (* structural descriptor describing the physical representation of the
           type. It is used when marshaling. *)
-       let structural_descr = 
-         Structural_descr.Structure 
+       let structural_descr =
+         Structural_descr.Structure
            (Structural_desr.Sum [| [| Structural_descr.p_int |] |])
        (* equality, compare and hash are the standard OCaml ones *)
        let equal (x:t) y = x = y
@@ -1864,7 +1653,7 @@ module AB =
        (* the type ab does never contain any value of type Project.t *)
        let mem_project = Datatype.never_any_project
        (* pretty printer *)
-       let pretty fmt x = 
+       let pretty fmt x =
          Format.pp_print_string fmt
           (match x with A -> "a" | B n -> "b" ^ string_of_int n)
      end)
@@ -1908,7 +1697,7 @@ serializable. In such a case, you can use the very useful predefined structure
 
 As for type values, it is not possible to create a datatype corresponding to
 polymorphic types, but it is possible to create them for each of their
-monomorphic instances. 
+monomorphic instances.
 
 \begin{important}
 For building such instances, you \emph{must} not apply the functor
@@ -1921,7 +1710,7 @@ Instead, you must use the functor
 type parameter and the functor
 \texttt{Datatype.Polymorphic2}\scodeidx{Datatype}{Polymorphic2} for types with
 two type parameters\footnote{%
-\texttt{Polymorphic3}\scodeidx{Datatype}{Polymorphic3} and 
+\texttt{Polymorphic3}\scodeidx{Datatype}{Polymorphic3} and
 \texttt{Polymorphic4}\scodeidx{Datatype}{Polymorphic4}
 also exist in case of polymorphic types with 3 or 4 type parameters.}.
 These functors takes as argument how to build the datatype
@@ -1943,15 +1732,15 @@ Here is how to apply \texttt{Datatype.Polymorphic} corresponding to the type
 \scodeidx{Type}{par}
 \begin{ocamlcode}
 type 'a ab = A of 'a | B of int
-module Poly_ab = 
+module Poly_ab =
   Datatype.Polymorphic
     (struct
        type 'a t = 'a ab
        let name ty = Type.name ty ^ " ab"
        let module_name = "Ab"
        let reprs ty = [ A ty ]
-       let structural_descr d = 
-         Structural_descr.Structure 
+       let structural_descr d =
+         Structural_descr.Structure
           (Structural_descr.Sum
             [| [| Structural_descr.pack d |]; [| Structural_descr.p_int |] |]
        let mk_equal f x y = match x, y with
@@ -1967,18 +1756,18 @@ module Poly_ab =
       let map f = function A x -> A (f x) | B x -> B x
       let mk_internal_pretty_code f prec_caller fmt = function
         | A x ->
-          Type.par 
-            prec_caller 
-            Type.Basic 
-            fmt 
+          Type.par
+            prec_caller
+            Type.Basic
+            fmt
             (fun fmt -> Format.fprintf fmt "A %a" (f Type.Call) x)
         | B n ->
-          Type.par 
-            prec_caller 
-            Type.Call 
-            fmt 
+          Type.par
+            prec_caller
+            Type.Call
+            fmt
             (fun fmt -> Format.fprintf fmt "B %d" n)
-      let mk_pretty f fmt x = 
+      let mk_pretty f fmt x =
         mk_internal_pretty_code (fun _ -> f) Type.Basic fmt x
       let mk_varname _ = "ab"
       let mk_mem_project mem f = function
@@ -2038,7 +1827,7 @@ depends on \texttt{Plugin\_A} through the special variable
 
 \begin{example}
 \texttt{Plugin\_A} declares and provides access to a function \texttt{compute}
-in the following way. 
+in the following way.
 
 \listingname{File plugin\_a/my\_analysis\_a.ml}
 \begin{ocamlcode}
@@ -2226,9 +2015,9 @@ value to register.
 \begin{ocamlcode}
 let run () : unit = ...
 let () =
-  Dynamic.register 
-    ~plugin:"Hello" 
-    "run" 
+  Dynamic.register
+    ~plugin:"Hello"
+    "run"
     (Datatype.func Datatype.unit Datatype.unit)
     run
 \end{ocamlcode}
@@ -2260,11 +2049,11 @@ depending on the case, you will get a compile-time or a runtime error.
   Here is how the previously registered function \texttt{run} of
   \texttt{Hello} may be applied.
 \begin{ocamlcode}
-let () = 
+let () =
   Dynamic.get
-    ~plugin:"Hello" 
-    "run" 
-    (Datatype.func Datatype.unit Datatype.unit) 
+    ~plugin:"Hello"
+    "run"
+    (Datatype.func Datatype.unit Datatype.unit)
     ()
 \end{ocamlcode}
 The given strings and the given type value\index{Type!Value} must be the same
@@ -2564,7 +2353,7 @@ For solving this issue, it is possible to postpone the addition of a
 state kind to dependencies until all modules have been initialized. However,
 dependencies must be correct before anything serious is computed by \framac. So
 the right way to do this is the use of the function
-\texttt{Cmdline.run\_after\_extended\_stage}% 
+\texttt{Cmdline.run\_after\_extended\_stage}%
 \scodeidx{Cmdline}{run\_after\_extended\_stage} (see
 Section~\ref{adv:init} for advanced explanation about the way \framac is
 initialized).
@@ -2642,13 +2431,13 @@ project. However, the AST plays a special role as a state. Namely, it can be
 changed in place, bypassing the project mechanism. In particular, it is possible
 to add globals. Plugins that perform such changes should inform the kernel
 when they are done using
-\texttt{Ast.mark\_as\_changed}\scodeidxdef{Ast}{mark\_as\_changed} or 
+\texttt{Ast.mark\_as\_changed}\scodeidxdef{Ast}{mark\_as\_changed} or
 \texttt{Ast.mark\_as\_grown}\scodeidxdef{Ast}{mark\_as\_grown}. The latter
 must be used when the only changes are additions, leaving existing nodes
 untouched, while the former must be used for more intrusive changes.
 In addition, it is possible to tell the kernel that a state is ``monotonic''
 with respect to AST changes, in the sense that it does not need to be cleared
-when nodes are added (the information that should be associated to the new 
+when nodes are added (the information that should be associated to the new
 nodes will be computed as needed). This is done with the function
 \texttt{Ast.add\_monotonic\_state}\scodeidxdef{Ast}{add\_monotonic\_state}.
 \texttt{Ast.mark\_as\_grown} will not touch such a state, while
@@ -2677,7 +2466,7 @@ registration. Indeed here is the key point: from the outside, only this local
 version is used for efficiency purposes (remember
 Figure~\ref{fig:proj-mechanism}). It would work even if projects do not
 exist. Each project knows a \emph{global version}\index{State!Global
-  Version|bfit}. The project management system \emph{automatically} 
+  Version|bfit}. The project management system \emph{automatically}
 switches\index{Context Switch} the local version when the current
 project\index{Project!Current} changes in order to conserve a physical
 equality\index{Equality!Physical} between local version and current global
@@ -3023,7 +2812,7 @@ Thus it is a set of \texttt{kernel\_function}s initialized by default to
 the empty set. \framac uses
 the field \texttt{arg\_name} in order to print the name of the argument when
 displaying help. The field \texttt{help} is the help message itself. The
-Interface for this module is simple: 
+Interface for this module is simple:
 \scodeidx{Parameter\_sig}{Kernel\_function\_set}
 \begin{ocamlcode}
 module Pragma: Parameter_sig.Kernel_function_set
@@ -3074,7 +2863,7 @@ in order to know whether callsite-wise dependencies have been required.
 
 It is possible to modify the default behavior of command line options in several
 ways by applying functions just before or just after applying the functor
-defining the corresponding parameter. 
+defining the corresponding parameter.
 
 Functions which can be applied afterwards are defined in the output signature of
 the applied functor.
@@ -3099,7 +2888,7 @@ module \texttt{Parameter\_customize}\codeidxdef{Parameter\_customize}.
 \begin{example}
 Here is how the opposite of option "-safe-arrays" is renamed into
 "-unsafe-arrays" (otherwise, by default, it would be "-no-safe-arrays").
-\scodeidx{Parameter\_customize}{set\_negative\_option\_name} 
+\scodeidx{Parameter\_customize}{set\_negative\_option\_name}
 \scodeidx{Kernel}{SafeArrays}
 \begin{ocamlcode}
 let () = Parameter_customize.set_negative_option_name "-unsafe-arrays"
@@ -3144,7 +2933,7 @@ tightly coupled with handling the command line parameters.
 
 The parsing of the command line parameters is performed in several
 \emph{phases} and \emph{stages}
-\index{Command Line!Parsing}, 
+\index{Command Line!Parsing},
 each one dedicated to specific operations.
 Following the general rule stated at the beginning of this section, even
 the kernel services of \framac are internally registered as hooks routines to
@@ -3181,7 +2970,7 @@ their execution order.
   \texttt{Cmdline}\codeidx{Cmdline} (one of the first linked modules, see
   Figure~\ref{fig:architecture}) performs a very early configuration stage,
   such as setting the global verbosity and debugging levels.
-  
+
 \item \label{stage:early} \textbf{The Early Stage:} this stage initializes the
   kernel services. More precisely:
   \begin{enumerate}[(a)]
@@ -3321,7 +3110,7 @@ their execution order.
 
 \item \textbf{The Main Stage:} this is the step where plug-ins actually run
   their main entry points registered through
-  \texttt{Db.Main.extend}\sscodeidx{Db}{Main}{extend}. For all intents and purposes, you should consider 
+  \texttt{Db.Main.extend}\sscodeidx{Db}{Main}{extend}. For all intents and purposes, you should consider
   that this stage is the one where these hooks are executed.
 
 \end{enumerate}
@@ -3355,7 +3144,7 @@ from the latter with the \verb+Cabs2cil.convFile+\scodeidx{Cabs2cil}{convFile}
 function, which guarantees that the resulting \verb+Cil_types.file+ respects
 all invariants expected by the Frama-C kernel.
 \item\textbf{Type-checking:} a normal \verb+Cabs.file+ ({\it i.e.} not obtained
-through a custom parsing function) can be transformed before being 
+through a custom parsing function) can be transformed before being
 type-checked. Transformation hooks are registered through
 \verb+Frontc.add_syntactic_transformation+%
 \scodeidxdef{Frontc}{add\_syntactic\_transformation}.
@@ -3376,7 +3165,7 @@ type-checked. Transformation hooks are registered through
   (respectively \verb+File.add_code_transformation_after_cleanup+%
   \scodeidxdefsmall{File}{add\_code\_transformation\_after\_cleanup}). If such a
   transformation modify the control-flow graph of a function \texttt{f}, in
-  particular by adding statements, it must call 
+  particular by adding statements, it must call
   \verb|File.must_recompute_cfg|\scodeidxdef{File}{must\_recompute\_cfg}, in
   order to have the graph recomputed afterwards.
 \end{enumerate}
@@ -3606,7 +3395,7 @@ compile and run the program, the assembly code may provide some useful data.
 \end{prereq}
 
 Module \texttt{Cil}\codeidx{Cil} offers a visitor\index{Visitor!Cil|bfit},
-\verb+Cil.cilVisitor+\scodeidxdef{Cil}{cilVisitor}, 
+\verb+Cil.cilVisitor+\scodeidxdef{Cil}{cilVisitor},
 that allows to traverse (parts of) an
 AST\index{AST}. It is a class with one method per type of the AST, whose
 default behavior is simply to call the method corresponding to its
@@ -3684,7 +3473,7 @@ More detailed information can be found in \verb+cil.mli+.
 
 \begin{important}
   For the \framac visitor, two methods,
-  \verb+vstmt+\sscodeidx{Cil}{cilVisitor}{vstmt} 
+  \verb+vstmt+\sscodeidx{Cil}{cilVisitor}{vstmt}
   and \verb+vglob+\sscodeidx{Cil}{cilVisitor}{vglob} take
   care of maintaining the coherence\index{Consistency} between the transformed
   AST\index{AST!Modification} and the internal state of \framac%
@@ -3985,7 +3774,7 @@ can be freely mixed with other behavior clauses (post-conditions, \verb|assigns|
 \verb|allocates|).
 
 Similarly, in a loop annotation, \verb|loop kw e1, ..., en;| will be treated as belonging to the
-\verb|kw| extension. In case the loop annotation has a \verb|loop variant|, the extension must 
+\verb|kw| extension. In case the loop annotation has a \verb|loop variant|, the extension must
 occur before. Otherwise, there is no ordering constraint with other loop annotations clauses.
 
 Global extensions can either be a standalone global annotation, or a whole block
@@ -4152,7 +3941,7 @@ Namely, specification:
 
 \begin{lstlisting}[language=C,alsolanguage=ACSL]
 /*@ ext_type load: foo ; */
-/*@ 
+/*@
   axiomatic Pred {
     predicate P(foo f) reads \nothing ;
   }
@@ -4266,7 +4055,7 @@ compile the GUI plug-in code (see Section~\ref{make:plugin}).
 Besides time-consuming computations have to call the function
 \texttt{!Db.progress}\scodeidx{Db}{progress} from time to time in order to keep the GUI reactive.
 
-%Mainly that's all! 
+%Mainly that's all!
 The GUI implementation uses
 \lablgtk~\cite{lablgtk}\index{Lablgtk}: you can use any \lablgtk-compatible
 code in your gui extension. A complete example of a GUI extension may be found in
@@ -4359,10 +4148,10 @@ an entry for your plug-in in the plug-in list.
 
 \paragraph{Internal Documentation for External Plug-ins}
 
-External plug-ins can be documented in the same way as plug-ins that are 
+External plug-ins can be documented in the same way as plug-ins that are
 compiled together with \framac. However, in order to be able to compile the
 documentation with \texttt{make doc}, you must have generated the documentation
-of Frama-C's kernel (\texttt{make doc}, see above) and installed it with the 
+of Frama-C's kernel (\texttt{make doc}, see above) and installed it with the
 \texttt{make install-doc-code}\codeidx{install-doc-code} command.
 
 % Local Variables:
