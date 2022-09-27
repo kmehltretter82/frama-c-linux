@@ -1818,32 +1818,42 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
           (* action: *)
           ("echo '" ^ show_cmd wtest.cmd ^"'");
         ;
-        if wtest.log <> [] then begin
-          List.iteri (fun n log ->
-              Format.fprintf result_fmt
-                "(rule ; COMPARE TARGET #%d OF EXECNOW #%d FOR TEST FILE %S\n  \
-                 (alias %s)\n  \
-                 %a\n\
-                 (action (diff %S %S))\n\
-                 )@."
-                (* rule: *)
-                n nth file
-                (* alias: *)
-                (subtest_alias ^ ".diff")
-                (* enabled_if: *)
-                pp_enabled_if cmd.deps
-                (* action: *)
-                (SubDir.make_file (SubDir.oracle_dir ~env) log)
-                log
-            ) wtest.log;
-          let diff_alias = subtest_alias ^ ".diff" in
+        let diff_subtest_alias = subtest_alias ^ ".diff" in
+        List.iteri (fun n log ->
+            Format.fprintf result_fmt
+              "(rule ; COMPARE TARGET #%d OF EXECNOW #%d FOR TEST FILE %S\n  \
+               (alias %s)\n  \
+               %a\n\
+               (action (diff %S %S))\n\
+               )@."
+              (* rule: *)
+              n nth file
+              (* alias: *)
+              diff_subtest_alias
+              (* enabled_if: *)
+              pp_enabled_if cmd.deps
+              (* action: *)
+              (SubDir.make_file (SubDir.oracle_dir ~env) log)
+              log
+          ) wtest.log;
+        if wtest.bin <> [] then
+          (* for EXECNOW with unconsumed BIN and without LOG *)
+          Format.fprintf result_fmt
+            "(alias (name %S)\n  \
+             (deps %a)\n  \
+             %a\n\
+             )@."
+            diff_subtest_alias
+            pp_list wtest.bin
+            pp_enabled_if cmd.deps;
+        if (wtest.log <> []) || (wtest.bin <> []) then begin
           Format.fprintf result_fmt
             "(alias (name %S)\n  \
              (deps (alias %S))\n  \
              %a\n\
              )@."
             (cmd.test_name ^ ".diff")
-            diff_alias
+            diff_subtest_alias
             pp_enabled_if cmd.deps;
           Format.fprintf result_fmt
             "(alias (name %S)\n  \
