@@ -202,27 +202,22 @@ function filterAlarm(alarm: string | undefined): boolean {
 }
 
 function filterEva(p: Property): boolean {
-  let b = true;
   if ('priority' in p && p.priority === false && filter('eva.priority_only'))
-    b = false;
+    return false;
   if ('taint' in p) {
     switch (p.taint) {
       case 'not_tainted':
       case 'not_applicable':
-        if (filter('eva.data_tainted_only') || filter('eva.ctrl_tainted_only'))
-          b = false;
-        break;
+        const data_tainted_only = filter('eva.data_tainted_only');
+        const ctrl_tainted_only = filter('eva.ctrl_tainted_only');
+        return !(data_tainted_only || ctrl_tainted_only);
       case 'direct_taint':
-        if (filter('eva.ctrl_tainted_only'))
-          b = false;
-        break;
+        return !(filter('eva.ctrl_tainted_only'));
       case 'indirect_taint':
-        if (filter('eva.data_tainted_only'))
-          b = false;
-        break;
+        return !(filter('eva.data_tainted_only'));
     }
   }
-  return b;
+  return true;
 }
 
 function filterProperty(p: Property): boolean {

@@ -597,13 +597,9 @@ let () = Abstractions.register_hook interpret_taint_logic
 
 type taint = Direct | Indirect | Untainted
 
-let is_tainted state ?indirect zone =
-  let intersects_any_taint z =
-    Zone.intersects (Zone.join state.locs_data state.locs_control) z
-  in
-  if Zone.intersects zone state.locs_data
-  then Direct
-  else if Zone.intersects zone state.locs_control
-       || Option.fold indirect ~none:false ~some:intersects_any_taint
-  then Indirect
+let is_tainted { locs_data ; locs_control } ?indirect zone =
+  let intersects_any z = Zone.(intersects (join locs_data locs_control) z) in
+  let is_indirect () = Option.fold indirect ~none:false ~some:intersects_any in
+  if Zone.intersects zone locs_data then Direct
+  else if Zone.intersects zone locs_control || is_indirect () then Indirect
   else Untainted
