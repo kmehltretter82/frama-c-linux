@@ -87,7 +87,7 @@ tags: [
 ]
 
 build: [
-  ["dune" "build" "-j%{jobs}%" "--release" "@install"]
+  ["dune" "build" "-j%{jobs}%" "--release" "--promote-install-files=false" "@install"]
   [make "-C" "doc" "download"] {with-doc}
 ]
 
