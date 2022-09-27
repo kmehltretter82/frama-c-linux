@@ -208,9 +208,8 @@ function filterEva(p: Property): boolean {
     switch (p.taint) {
       case 'not_tainted':
       case 'not_applicable':
-        const data_tainted_only = filter('eva.data_tainted_only');
-        const ctrl_tainted_only = filter('eva.ctrl_tainted_only');
-        return !(data_tainted_only || ctrl_tainted_only);
+        return !filter('eva.data_tainted_only') &&
+               !filter('eva.ctrl_tainted_only');
       case 'direct_taint':
         return !(filter('eva.ctrl_tainted_only'));
       case 'indirect_taint':
