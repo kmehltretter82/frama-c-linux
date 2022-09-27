@@ -1,63 +1,54 @@
 # Frama-C Docker images
 
-Frama-C Docker images are currently based on Alpine Linux,
-using opam's Docker images
-(from https://hub.docker.com/r/ocaml/opam/).
+Frama-C Docker images are currently based on Alpine Linux.
 
 The user is `opam` and it has sudo rights.
-To add packages, run `sudo apk add <package>`.
 
-## Using the Makefile
+To add Alpine packages, run `sudo apk add <package>`.
 
-The `Makefile` contains several targets and templates to build most
-Frama-C versions. For each version, there are three images: one
-for the command-line version `frama-c`; a stripped-down version of the former,
-for a slimmer image, but which does not allow recompilation of Frama-C
-or of any external plugin; and a third image including the graphical
-interface (`frama-c-gui`), to be used with Singularity, x11docker, or any other
-tool which enables running a graphical application from a Docker image.
+An OCaml switch is set up with the packages mentioned in
+`reference-configuration.md`, plus a few external SMT solvers
+(CVC4, Z3).
 
-Run `make` to get a list of targets.
+There are 2 main images, each with 3 variants:
 
-If you have access to the Frama-C Docker Hub, you can also run a
-`push-<version>` target to upload images related to that version to
-the Docker Hub.
+- `dev` image: based on the public Frama-C git repository;
+- `custom` image: based on a custom .tar.gz archive put in this directory.
+  Note: it _must_ be named `frama-c-<something>.tar.gz`, where
+  `<something>` may be a version number, codename, etc.
+  It _must_ be put in this directory.
 
-## Commands to generate images
+Each of these is declined in 3 variants:
 
-Some commands in this section are those used by the above Makefile;
-others allow creating different images (e.g. with the Frama-C sources)
-which are not directly available as Makefile targets.
+- standard (no suffix): an image with the command line `frama-c` version,
+  without GUI;
+- `-gui`: the standard image + `frama-c-gui`. To be used with Singularity,
+  x11docker, or any other tool which enables running a graphical application
+  from a Docker image.
+- `-stripped`: the standard image reduced to a minimal set of files, for
+  smaller size. Note: this image has several files removed, rendering some
+  non-essential components unusable.
 
-Note: a Dockerfile is needed for the commands below.
-      For most versions, running `make Dockerfile.dev` and then using it
-      (adding `-f Dockerfile.dev` to the commands below) is enough.
-      However, if specific build commands or dependencies are needed,
-      you can copy the generated Dockerfile
-      (e.g. `cp Dockerfile.dev Dockerfile`) and adapt it as needed,
-      before running one of the commands below.
+Note that only _some_ usages of Frama-C have been tested; notify us if your
+intended plug-in or usage scenario does not work (and is not listed in the
+*Known issues* below).
 
-- Build slim development image (from public Git master branch):
+## Known issues
 
-        docker build . -t framac/frama-c:dev --target frama-c-slim
+- E-ACSL does not currently work in these images: its `musl` libc does not
+  contain some debugging information required by E-ACSL.
+- The `-stripped` variants no longer have a working OCaml compiler;
+  loading some modules or compiling plug-ins may not work.
 
-- Build slim development image with GUI:
+## Built images
 
-        docker build . -t framac/frama-c-gui:dev --target frama-c-gui-slim
+The `dev`: images are tagged with their default names in the Docker Hub:
+`framac/frama-c:dev`, `framac/frama-c-gui:dev`, `framac/frama-c:dev-stripped`.
 
-- Build stripped (minimal) version:
+The `custom` images are tagged with prefix `frama-c-custom`, since they are
+intended for local usage.
 
-        docker build . -t framac/frama-c:dev-stripped --target frama-c-stripped
-
-- Build image from archive (note: it _must_ be named `frama-c-<something>.tar.gz`, where
-  `<something>` may be a version number, codename, etc:
-
-        docker build . -t framac/frama-c:dev --target frama-c-slim --build-arg=from_archive=frama-c-<version>.tar.gz
-
-- Build image containing Frama-C's source code in `/frama-c` (without and with GUI):
-
-        docker build . -t framac/frama-c-source:dev --target frama-c
-        docker build . -t framac/frama-c-gui-source:dev --target frama-c-gui
+## Helpful commands
 
 - Start Singularity instance
 

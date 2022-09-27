@@ -170,7 +170,8 @@ README* header_spec=.ignore
 
 /bin/sed_get_* header_spec=.ignore
 
-/dev/docker/*.template header_spec=.ignore
+/dev/docker/*.sh header_spec=.ignore
+/dev/docker/Dockerfile header_spec=.ignore
 
 # TODO: header_spec=JCF_LGPL_2_only
 /dev/size.mli header_spec=.ignore
