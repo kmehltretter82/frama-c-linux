@@ -794,12 +794,7 @@ let dkey = Kernel.register_category "cil-builder"
 
 exception WrongContext of string
 
-module type T =
-sig
-  val loc : Cil_types.location
-end
-
-module Stateful (Location : T) =
+module Stateful () =
 struct
   include Exp
 
@@ -811,6 +806,7 @@ struct
 
   type scope =
     {
+      loc: Cil_types.location;
       scope_type: scope_type;
       ghost: bool;
       mutable stmts: stmt list; (* In reverse order *)
@@ -824,9 +820,6 @@ struct
     | Function of {fundec: Cil_types.fundec}
 
 
-  let loc = Location.loc
-
-
   (* Conversion to Cil *)
 
   let build_instr_list l =
@@ -837,7 +830,7 @@ struct
     in
     List.fold_left rev_build_one [] l
 
-  let build_stmt_list ~ghost l =
+  let build_stmt_list { loc ; ghost ; stmts } =
     let rev_build_one acc = function
       | Label l ->
         begin match acc with
@@ -856,10 +849,10 @@ struct
       | CilInstr instr ->
         Cil.mkStmt ~ghost (Cil_types.Instr instr) :: acc
     in
-    List.fold_left rev_build_one [] l
+    List.fold_left rev_build_one [] stmts
 
   let build_block b =
-    let block = Cil.mkBlock (build_stmt_list ~ghost:b.ghost b.stmts) in
+    let block = Cil.mkBlock (build_stmt_list  b) in
     block.Cil_types.blocals <- List.rev b.vars;
     block
 
@@ -869,9 +862,9 @@ struct
     | Block ->
       Cil_types.Block block
     | IfThen { ifthen_exp } ->
-      Cil_types.If (ifthen_exp, block, Cil.mkBlock [], loc)
+      Cil_types.If (ifthen_exp, block, Cil.mkBlock [], b.loc)
     | IfThenElse { ifthenelse_exp; then_block } ->
-      Cil_types.If (ifthenelse_exp, then_block, block, loc)
+      Cil_types.If (ifthenelse_exp, then_block, block, b.loc)
     | Switch { switch_exp } ->
       let open Cil_types in
       (* Cases are only allowed in the current block by the case function *)
@@ -879,7 +872,7 @@ struct
         List.exists (function Case _ -> true | _ -> false) stmt.labels
       in
       let case_stmts = List.filter contains_case block.bstmts in
-      Cil_types.Switch (switch_exp, block, case_stmts , loc)
+      Cil_types.Switch (switch_exp, block, case_stmts , b.loc)
     | Function _ ->
       raise (WrongContext "not convertible to stmtkind")
 
@@ -963,6 +956,11 @@ struct
     fundec.Cil_types.slocals <- fundec.Cil_types.slocals @ [v];
     b.vars <- v :: b.vars
 
+  let current_loc () =
+    match !stack with
+    | [] -> Cil_datatype.Location.unknown
+    | state :: _ -> state.loc
+
 
   (* Statements *)
 
@@ -978,15 +976,19 @@ struct
     append_stmt b (CilStmtkind sk)
 
   let break () =
+    let loc = current_loc () in
     of_stmtkind (Cil_types.Break loc)
 
   let return exp =
+    let loc = current_loc () in
     of_stmtkind (Cil_types.Return (cil_exp_opt ~loc exp, loc))
 
 
   (* Blocks *)
 
-  let new_block ?(ghost=false) scope_type = {
+  let new_block ?(loc=current_loc ()) ?(ghost=false) scope_type =
+  {
+    loc;
     scope_type;
     ghost;
     stmts = [];
@@ -1008,32 +1010,32 @@ struct
     | Function {fundec} -> fundec
     | _ -> raise (WrongContext "not in a opened function context")
 
-  let open_function ?ghost ?vorig_name name =
+    let open_function ?(loc=current_loc ()) ?ghost ?vorig_name name =
     check_empty ();
     let vorig_name = Option.value ~default:name vorig_name in
     let fundec = Cil.emptyFunction vorig_name in
     fundec.svar.vdecl <- loc;
     fundec.svar.vname <- name;
     set_owner fundec;
-    push (new_block ?ghost (Function {fundec}));
+    push (new_block ~loc ?ghost (Function {fundec}));
     `var fundec.Cil_types.svar
 
-  let open_block ?into ?ghost () =
+  let open_block ?(loc=current_loc ()) ?into ?ghost () =
     Option.iter set_owner into;
-    push (new_block ?ghost Block)
+    push (new_block ~loc ?ghost Block)
 
-  let open_ghost ?into () =
-    open_block ?into ~ghost:true ()
+  let open_ghost ?(loc=current_loc ()) ?into () =
+    open_block ~loc ?into ~ghost:true ()
 
-  let open_switch ?into exp =
+  let open_switch ?(loc=current_loc ()) ?into exp =
     Option.iter set_owner into;
     let switch_exp = cil_exp ~loc exp in
-    push (new_block (Switch {switch_exp}))
+    push (new_block ~loc (Switch {switch_exp}))
 
-  let open_if ?into exp =
+  let open_if ?(loc=current_loc ()) ?into exp =
     Option.iter set_owner into;
     let ifthen_exp = cil_exp ~loc exp in
-    push (new_block (IfThen {ifthen_exp}))
+    push (new_block ~loc (IfThen {ifthen_exp}))
 
   let open_else () =
     let b = pop () in
@@ -1076,12 +1078,12 @@ struct
     vi.vdefined <- true;
     vi.vghost <- b.ghost;
     if register then begin
-      Globals.Functions.replace_by_definition spec fundec loc;
+      Globals.Functions.replace_by_definition spec fundec b.loc;
       let keepSwitch = Kernel.KeepSwitch.get () in
       Cfg.prepareCFG ~keepSwitch fundec;
       Cfg.cfgFun fundec;
     end;
-    GFun (fundec,loc)
+    GFun (fundec,b.loc)
 
   let finish_declaration ?(register=true) () =
     let b = finish () in
@@ -1093,13 +1095,14 @@ struct
     vi.vdefined <- false;
     vi.vghost <- b.ghost;
     if register then begin
-      Globals.Functions.replace_by_declaration spec vi loc;
+      Globals.Functions.replace_by_declaration spec vi b.loc;
     end;
-    GFunDecl (spec, vi, loc)
+    GFunDecl (spec, vi, b.loc)
 
   let case exp =
     let b = top () in
     let _ = extract_switch_block b in
+    let loc = b.loc in
     let label = Cil_types.Case (cil_exp ~loc exp, loc) in
     append_stmt b (Label label)
 
@@ -1149,7 +1152,8 @@ struct
   let assigns dests sources =
     let open Cil_types in
     let b = current_behavior ()
-    and restyp = get_return_type () in
+    and restyp = get_return_type ()
+    and loc = current_loc () in
     let map_source src =
       match (src :> source) with
       | #Exp.exp as e ->
@@ -1172,13 +1176,15 @@ struct
   let requires pred =
     let open Cil_types in
     let b = current_behavior ()
-    and restyp = get_return_type () in
+    and restyp = get_return_type ()
+    and loc = current_loc () in
     b.b_requires <- b.b_requires @ [cil_ipred ~loc ~restyp pred]
 
   let ensures pred =
     let open Cil_types in
     let b = current_behavior ()
-    and restyp = get_return_type () in
+    and restyp = get_return_type ()
+    and loc = current_loc () in
     b.b_post_cond <- b.b_post_cond @ [Normal, cil_ipred ~loc ~restyp pred]
 
 
@@ -1187,6 +1193,7 @@ struct
   let local' ?(ghost=false) ?init typ name =
     let fundec = get_owner () and b = top () in
     let ghost = ghost || b.ghost in
+    let loc = current_loc () in
     let v = Cil.makeLocalVar ~insert:false ~ghost ~loc fundec name typ in
     begin match init with
       | None -> ()
@@ -1214,6 +1221,7 @@ struct
   let parameter ?(ghost=false) ?(attributes=[]) typ name =
     let fundec = get_owner () and b = top () in
     let ghost = ghost || b.ghost in
+    let loc = current_loc () in
     let v = Cil.makeFormalVar ~ghost ~loc fundec name typ in
     v.Cil_types.vattr <- attributes;
     `var v
@@ -1226,6 +1234,7 @@ struct
     append_instr b i
 
   let assign lval exp =
+    let loc = current_loc () in
     let lval' = cil_lval ~loc lval
     and exp' = cil_exp ~loc exp in
     of_instr (Cil_types.Set (lval', exp', loc))
@@ -1234,17 +1243,20 @@ struct
     assign lval (add lval (of_int 1))
 
   let call dest callee args =
+    let loc = current_loc () in
     let dest' = cil_lval_opt ~loc dest
     and callee' = cil_exp ~loc callee
     and args' = cil_exp_list ~loc args in
     of_instr (Cil_types.Call (dest', callee', args', loc))
 
   let pure exp =
+    let loc = current_loc () in
     let exp' = cil_exp ~loc exp in
     let `var v = local' (Cil.typeOf exp') "tmp" ~init:(Exp.of_exp exp') in
     v.vdescr <- Some (Format.asprintf "%a" !Cil.pp_exp_ref exp')
 
   let skip () =
+    let loc = current_loc () in
     of_instr (Cil_types.Skip (loc))
 
 

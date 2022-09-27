@@ -267,12 +267,7 @@ end
 
 exception WrongContext of string
 
-module type T =
-sig
-  val loc : Cil_types.location
-end
-
-module Stateful (Location : T) :
+module Stateful () :
 sig
   include module type of Exp
     with type ('v,'s) typ = ('v,'s) Type.typ
@@ -283,10 +278,10 @@ sig
      and type init' = Exp.init'
      and type label = Exp.label
 
-  val loc : Cil_types.location (* = T.loc *)
-
   (* Functions *)
-  val open_function : ?ghost:bool -> ?vorig_name:string -> string -> [> var]
+  val open_function :
+    ?loc:Cil_types.location -> ?ghost:bool -> ?vorig_name:string ->
+    string -> [> var]
   val set_return_type : ('s,'v) typ -> unit
   val set_return_type' : Cil_types.typ -> unit
   val add_attribute : Cil_types.attribute -> unit
@@ -306,10 +301,18 @@ sig
   val of_stmtkind : Cil_types.stmtkind -> unit
   val of_stmt : Cil_types.stmt -> unit
   val of_stmts : Cil_types.stmt list -> unit
-  val open_block : ?into:Cil_types.fundec -> ?ghost:bool -> unit -> unit
-  val open_ghost : ?into:Cil_types.fundec -> unit -> unit
-  val open_switch : ?into:Cil_types.fundec -> [< exp] -> unit
-  val open_if : ?into:Cil_types.fundec -> [< exp] -> unit
+  val open_block :
+    ?loc:Cil_types.location -> ?into:Cil_types.fundec -> ?ghost:bool ->
+    unit -> unit
+  val open_ghost :
+    ?loc:Cil_types.location -> ?into:Cil_types.fundec ->
+    unit -> unit
+  val open_switch :
+    ?loc:Cil_types.location -> ?into:Cil_types.fundec ->
+    [< exp] -> unit
+  val open_if :
+    ?loc:Cil_types.location -> ?into:Cil_types.fundec ->
+    [< exp] -> unit
   val open_else : unit -> unit
   val close : unit -> unit
   val finish_block : unit -> Cil_types.block
