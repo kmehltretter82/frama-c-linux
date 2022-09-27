@@ -361,13 +361,23 @@ module PrintConfig =
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 let () = Parameter_customize.set_negative_option_name ""
+module Version =
+  False(struct
+    let option_name = "-version"
+    let module_name = "Version"
+    let help = "print the Frama-C version"
+  end)
+let () = Version.add_aliases [ "-v"; "--version" ]
+
+let () = Parameter_customize.set_group help
+let () = Parameter_customize.set_cmdline_stage Cmdline.Early
+let () = Parameter_customize.set_negative_option_name ""
 module PrintVersion =
   False(struct
     let option_name = "-print-version"
     let module_name = "PrintVersion"
     let help = "print the Frama-C version"
   end)
-let () = PrintVersion.add_aliases [ "-v"; "-version" ; "--version" ]
 
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
