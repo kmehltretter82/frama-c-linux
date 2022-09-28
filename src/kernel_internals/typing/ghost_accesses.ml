@@ -172,21 +172,22 @@ class visitor = object(self)
         if not (isGhostType (typeOfLval lv)) then
           Error.assigns_non_ghost_lvalue ~current:true lv
       in
-      let call_varinfo = function
-        | { enode = Lval ( (Var vi), NoOffset ) } -> Some vi
-        | _ -> None
+      let is_builtin vi =
+        Ast_info.is_frama_c_builtin vi.vname ||
+        Cil_builtins.is_builtin vi
       in
-      let is_ghost vi = vi.vghost || Ast_info.is_frama_c_builtin vi.vname in
       let failed = match i with
         | Call(_, fexp, _, _) ->
-          begin match call_varinfo fexp with
-            | Some fct when not (is_ghost fct) ->
+          begin match Kernel_function.(Option.map get_vi @@ get_called fexp) with
+            | Some fct
+              when not (is_builtin fct) && not fct.vghost ->
               Error.non_ghost_function_call_in_ghost ~current:true () ; true
             | None ->
               Error.function_pointer_call ~current:true () ; true
             | _ -> false
           end
-        | Local_init(_, ConsInit(fct, _, _), _) when not (is_ghost fct) ->
+        | Local_init(_, ConsInit(fct, _, _), _)
+          when not (is_builtin fct) && not fct.vghost ->
           Error.non_ghost_function_call_in_ghost ~current:true () ; true
         | _ -> false
       in
@@ -197,9 +198,13 @@ class visitor = object(self)
               error_if_not_writable lv ;
               match i with
               | Call(_, fexp, _, _) ->
-                error_if_incompatible lv (getReturnType (typeOf fexp)) fexp
+                let vi =
+                  Kernel_function.(get_vi @@ Option.get @@ get_called fexp) in
+                if not (is_builtin vi) then
+                  error_if_incompatible lv (getReturnType (typeOf fexp)) fexp
               | Local_init(_, ConsInit(fct, _, _), _) ->
-                error_if_incompatible lv (getReturnType fct.vtype) (evar fct)
+                if not (is_builtin fct) then
+                  error_if_incompatible lv (getReturnType fct.vtype) (evar fct)
               | _ -> ()
             end
           (* Note that we do not check "assigns" for a ghost function call since
