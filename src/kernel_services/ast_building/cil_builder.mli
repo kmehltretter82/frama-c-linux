@@ -204,6 +204,7 @@ sig
   exception NotAPredicate of exp
   exception NotAFunction of Cil_types.logic_info
   exception Typing_error of string
+  exception OutOfScope of string
 
   val cil_logic_label : label -> Cil_types.logic_label
   val cil_constant : [< const] -> Cil_types.constant
@@ -245,18 +246,37 @@ sig
   val incr : [< lval] -> [> instr]
   val call : [< lval | `none] -> [< exp] -> [< exp] list -> [> instr]
 
+  val local : ?ghost:bool -> ?init:'v -> (init,'v) typ -> string ->
+    [> var] * [> instr]
+  val local' : ?ghost:bool -> ?init:init -> Cil_types.typ -> string ->
+    [> var] * [> instr]
+  val local_copy : ?ghost:bool -> ?suffix:string -> [< var] ->
+    [> var] * [> instr]
+
   (* Statements *)
   val of_stmtkind : Cil_types.stmtkind -> [> stmt]
   val of_stmt : Cil_types.stmt -> [> stmt]
   val of_stmts : Cil_types.stmt list -> [> stmt]
   val block : [< stmt] list -> [> stmt]
+  val sequence : [< stmt] list -> [> stmt] (* does not generate block *)
   val ghost : [< stmt] -> [> stmt]
+  val if_ : [< exp] -> then_:[< stmt] list -> else_:[< stmt] list -> [> stmt]
 
-  val cil_instr : loc:Cil_types.location -> instr -> Cil_types.instr
-  val cil_stmtkind : loc:Cil_types.location -> stmt -> Cil_types.stmtkind
-  val cil_stmt : loc:Cil_types.location -> stmt -> Cil_types.stmt
+  (* Conversion to Cil *)
+
+  (* for the three following function into is mandatory if the built ast
+     contains locals declarations *)
+  val cil_instr : ?into:Cil_types.fundec ->
+    loc:Cil_types.location -> instr -> Cil_types.instr
+  val cil_stmtkind : ?into:Cil_types.fundec ->
+    loc:Cil_types.location -> stmt -> Cil_types.stmtkind
+  val cil_stmt : ?into:Cil_types.fundec ->
+    loc:Cil_types.location -> stmt -> Cil_types.stmt
 
   (* Operators *)
+  val (let+) : var * stmt -> (var -> stmt list) -> stmt list
+  val (and+) : var -> var -> var * var
+
   val (:=) : [< lval] -> [< exp] -> [> instr] (* assign *)
   val (+=) : [< lval] -> [< exp] -> [> instr]
   val (-=) : [< lval] -> [< exp] -> [> instr]
@@ -342,4 +362,3 @@ sig
   val (+=) : [< lval] -> [< exp] -> unit
   val (-=) : [< lval] -> [< exp] -> unit
 end
-

@@ -112,6 +112,34 @@ struct
 end
 
 
+(* --- Variables scoping --- *)
+
+module Scope =
+struct
+  type id = int64
+
+  let new_id : unit -> id =
+    let last_id = ref Int64.zero in
+    fun () ->
+      last_id := Int64.(add !last_id one);
+      !last_id
+
+  module IdMap = Map.Make (Int64)
+
+  type t = Cil_types.varinfo IdMap.t
+
+  exception OutOfScope of string
+
+  let empty : t = IdMap.empty
+  let add : id -> Cil_types.varinfo -> t -> t = IdMap.add
+
+  let resolve (scope : t) (id : id) (name : string) : Cil_types.varinfo =
+    match IdMap.find_opt id scope with
+    | Some vi -> vi
+    | None -> raise (OutOfScope name)
+end
+
+
 (* --- C & Logic expressions builder --- *)
 
 module Exp =
@@ -135,7 +163,8 @@ struct
     | Integer of Integer.t
     | CilConstant of Cil_types.constant
   and var' =
-    Cil_types.varinfo
+    | CilVar of Cil_types.varinfo
+    | NewVar of Scope.id * string * Cil_types.typ
   and lval' =
     | CilLval of Cil_types.lval
     | Var of var'
@@ -183,8 +212,9 @@ struct
     | Int i -> Format.pp_print_int fmt i
     | Integer i -> Integer.pretty fmt i
     | CilConstant c -> Printer.pp_constant fmt c
-  and pretty_var fmt v =
-    Printer.pp_varinfo fmt v
+  and pretty_var fmt = function
+    | CilVar vi -> Printer.pp_varinfo fmt vi
+    | NewVar (_id,name,_typ) -> Format.pp_print_string fmt name
   and pretty_lval fmt = function
     | CilLval lv -> Printer.pp_lval fmt lv
     | Var v -> pretty_var fmt v
@@ -305,7 +335,7 @@ struct
 
   (* Lvalues *)
 
-  let var v = `var v
+  let var v = `var (CilVar v)
   let of_lval lv = `lval (CilLval lv)
 
   (* Expressions *)
@@ -407,6 +437,7 @@ struct
   exception NotAPredicate of exp
   exception NotAFunction of Cil_types.logic_info
   exception Typing_error of string
+  exception OutOfScope = Scope.OutOfScope
 
   let typing_error s =
     raise (Typing_error s)
@@ -423,16 +454,20 @@ struct
     | Int i -> build_constant (Integer (Integer.of_int i))
     | Integer i -> Cil_types.(CInt64 (i, IInt, None))
 
-  and build_lval ~loc = function
+  and build_var ~scope = function
+    | CilVar vi -> vi
+    | NewVar (vid, name,_typ) -> Scope.resolve scope vid name
+
+  and build_lval ~scope ~loc = function
     | Result as lv -> raise (LogicInC (`lval lv))
     | CilLval lval -> lval
-    | Var v -> Cil_types.(Var v, NoOffset)
+    | Var v -> Cil_types.(Var (build_var ~scope v), NoOffset)
     | Mem e ->
-      let e' = build_exp ~loc e in
+      let e' = build_exp ~scope ~loc e in
       Cil.mkMem ~addr:e' ~off:Cil_types.NoOffset
     | Index (lv, e) ->
-      let (host, offset) as lv' = build_lval ~loc lv
-      and e' = build_exp ~loc e in
+      let (host, offset) as lv' = build_lval ~scope ~loc lv
+      and e' = build_exp ~scope ~loc e in
       begin match Cil.(unrollType (typeOfLval lv')) with
         | TArray _ ->
           let offset' = Cil_types.Index (e', NoOffset) in
@@ -445,7 +480,7 @@ struct
                              or a pointer"
       end
     | (Field (lv,_) | FieldNamed (lv,_)) as e ->
-      let (host, offset) as lv' = build_lval ~loc lv in
+      let (host, offset) as lv' = build_lval ~scope ~loc lv in
       let host', offset', ci = match Cil.(unrollTypeDeep (typeOfLval lv')) with
         | TComp (ci,_) -> host, offset, ci
         | TPtr (TComp (ci,_),_) ->
@@ -461,16 +496,16 @@ struct
       let offset'' = Cil_types.(Field (f, NoOffset)) in
       host', Cil.addOffset offset'' offset'
 
-  and build_exp ~loc = function
+  and build_exp ~scope ~loc = function
     | CilTerm _ | Range _ | App _ | Pred _ as e -> raise (LogicInC (`exp e))
     | CilExp exp -> exp
     | CilExpCopy exp -> Cil.copy_exp exp
     | Const c->
       Cil.new_exp ~loc (Cil_types.Const (build_constant c))
     | Lval lval ->
-      Cil.new_exp ~loc (Cil_types.Lval (build_lval ~loc lval))
+      Cil.new_exp ~loc (Cil_types.Lval (build_lval ~scope ~loc lval))
     | Unop (op,e) ->
-      let e' = build_exp ~loc e in
+      let e' = build_exp ~scope ~loc e in
       let oldt = Cil.typeOf e' in
       let newt = Cil.integralPromotion oldt in
       Cil.(new_exp ~loc (Cil_types.UnOp (op, mkCastT ~oldt ~newt e', oldt)))
@@ -478,8 +513,8 @@ struct
       let is_pointer_type e =
         Cil.(isPointerType (typeOf e))
       in
-      let e1' = build_exp ~loc e1
-      and e2' = build_exp ~loc e2 in
+      let e1' = build_exp ~scope ~loc e1
+      and e2' = build_exp ~scope ~loc e2 in
       let op' = match op with (* Normalize operation *)
         | PlusA when is_pointer_type e1' -> Cil_types.PlusPI
         | MinusA when is_pointer_type e1' -> Cil_types.MinusPI
@@ -489,22 +524,23 @@ struct
       in
       Cil.mkBinOp ~loc op' e1' e2'
     | Cast (Cil_types.Ctype newt, e) ->
-      Cil.mkCast ~force:false ~newt (build_exp ~loc e)
+      Cil.mkCast ~force:false ~newt (build_exp ~scope ~loc e)
     | Cast _ ->
       raise NotACType
     | Addr lv ->
-      Cil.mkAddrOrStartOf ~loc (build_lval ~loc lv)
+      Cil.mkAddrOrStartOf ~loc (build_lval ~scope ~loc lv)
 
-  let rec build_term_lval ~loc ~restyp = function
+  let rec build_term_lval ~scope ~loc ~restyp = function
     | Result -> Cil_types.(TResult (Option.get restyp), TNoOffset)
     | CilLval _ as lv -> raise (CInLogic (`lval lv))
-    | Var v -> Cil_types.(TVar (Cil.cvar_to_lvar v), TNoOffset)
+    | Var v ->
+      Cil_types.(TVar (Cil.cvar_to_lvar (build_var ~scope v)), TNoOffset)
     | Mem t ->
-      let t' = build_term ~loc ~restyp t in
+      let t' = build_term ~scope ~loc ~restyp t in
       Cil_types.(TMem t', TNoOffset)
     | Index (tlv, t) ->
-      let (host, offset) as tlv' = build_term_lval ~loc ~restyp tlv
-      and t' = build_term ~loc ~restyp t in
+      let (host, offset) as tlv' = build_term_lval ~scope ~loc ~restyp tlv
+      and t' = build_term ~scope ~loc ~restyp t in
       let lty = Cil.typeOfTermLval tlv' in
       begin match Logic_utils.unroll_type lty with
         | Ctype (TArray _) ->
@@ -518,7 +554,7 @@ struct
                              array or a C pointer"
       end
     | (Field (tlv,_) | FieldNamed (tlv,_)) as t ->
-      let (host, offset) as tlv' = build_term_lval ~loc ~restyp tlv in
+      let (host, offset) as tlv' = build_term_lval ~scope ~loc ~restyp tlv in
       let lty = match Logic_utils.unroll_type (Cil.typeOfTermLval tlv') with
         | Ctype cty -> Cil_types.Ctype (Cil.unrollTypeDeep cty)
         | lty -> lty
@@ -538,7 +574,7 @@ struct
       let offset'' = Cil_types.(TField (f, TNoOffset)) in
       host', Logic_const.addTermOffset offset'' offset'
 
-  and build_term ~loc ~restyp = function
+  and build_term ~scope ~loc ~restyp = function
     | Const (CilConstant _) | CilExp _ | CilExpCopy _ as e ->
       raise (CInLogic (`exp e))
     | Pred _ as e ->
@@ -549,16 +585,16 @@ struct
     | Const (Integer i) ->
       Logic_const.tint ~loc i
     | Lval lval ->
-      let tlval = build_term_lval ~loc ~restyp lval in
+      let tlval = build_term_lval ~scope ~loc ~restyp lval in
       Logic_const.term ~loc Cil_types.(TLval tlval) (Cil.typeOfTermLval tlval)
     | Unop (op,t) ->
-      let t' = build_term t ~loc ~restyp in
+      let t' = build_term t ~scope ~loc ~restyp in
       let ty = t'.Cil_types.term_type in
       (* TODO: type conversion *)
       Logic_const.term ~loc Cil_types.(TUnOp (op,t')) ty
     | Binop (op,t1,t2) ->
-      let t1' = build_term ~loc ~restyp t1
-      and t2' = build_term ~loc ~restyp t2 in
+      let t1' = build_term ~scope ~loc ~restyp t1
+      and t2' = build_term ~scope ~loc ~restyp t2 in
       let ty = t1'.Cil_types.term_type in
       let op' = match op with (* Normalize operation *)
         | PlusA when Logic_utils.isLogicPointer t1' -> Cil_types.PlusPI
@@ -570,25 +606,25 @@ struct
       (* TODO: type conversion *)
       Logic_const.term ~loc Cil_types.(TBinOp (op',t1',t2')) ty
     | Cast (Ctype ct, t) ->
-      let t' = build_term ~loc ~restyp t in
+      let t' = build_term ~scope ~loc ~restyp t in
       Logic_utils.mk_cast ~loc ct t'
     | Cast (ty, t) ->
-      let t' = build_term ~loc ~restyp t in
+      let t' = build_term ~scope ~loc ~restyp t in
       Logic_utils.numeric_coerce ty t'
     | Addr lval ->
-      let tlval = build_term_lval ~loc ~restyp lval in
+      let tlval = build_term_lval ~scope ~loc ~restyp lval in
       let ty = Cil.typeOfTermLval tlval in
       Logic_utils.mk_logic_AddrOf ~loc tlval ty
     | Range (t1,t2) ->
-      let t1' = Option.map (build_term ~loc ~restyp) t1
-      and t2' = Option.map (build_term ~loc ~restyp) t2 in
+      let t1' = Option.map (build_term ~scope ~loc ~restyp) t1
+      and t2' = Option.map (build_term ~scope ~loc ~restyp) t2 in
       Logic_const.trange ~loc (t1',t2')
     | App (logic_info, labels, args) ->
       let ty = match logic_info.l_type with
         | None -> raise (NotAFunction logic_info)
         | Some ty -> ty
       in
-      let args' = List.map (build_term ~loc ~restyp) args in
+      let args' = List.map (build_term ~scope ~loc ~restyp) args in
       Logic_const.term ~loc (Tapp (logic_info, labels, args')) ty
 
   and build_relation e = function
@@ -600,83 +636,91 @@ struct
     | Cil_types.Ne -> Cil_types.Rneq
     | _ -> raise (NotAPredicate (`exp e))
 
-  and build_pred_node ~loc ~restyp = function
+  and build_pred_node ~scope ~loc ~restyp = function
     | Unop (Cil_types.LNot, p) ->
-      let p' = build_pred ~loc ~restyp p in
+      let p' = build_pred ~scope ~loc ~restyp p in
       Cil_types.Pnot p'
     | Binop (Cil_types.LAnd, p1, p2) ->
-      let p1' = build_pred ~loc ~restyp p1
-      and p2' = build_pred ~loc ~restyp p2 in
+      let p1' = build_pred ~scope ~loc ~restyp p1
+      and p2' = build_pred ~scope ~loc ~restyp p2 in
       Cil_types.Pand (p1',p2')
     | Binop (Cil_types.LOr, p1, p2) ->
-      let p1' = build_pred ~loc ~restyp p1
-      and p2' = build_pred ~loc ~restyp p2 in
+      let p1' = build_pred ~scope ~loc ~restyp p1
+      and p2' = build_pred ~scope ~loc ~restyp p2 in
       Cil_types.Por (p1',p2')
     | Binop (binop, t1, t2) as e ->
       let rel = build_relation e binop
-      and t1' = build_term ~loc ~restyp t1
-      and t2' = build_term ~loc ~restyp t2 in
+      and t1' = build_term ~scope ~loc ~restyp t1
+      and t2' = build_term ~scope ~loc ~restyp t2 in
       Cil_types.Prel (rel, t1', t2')
     | Const _ | CilExp _ | CilExpCopy _  | CilTerm _
     | Lval _ | Unop _ | Cast _ | Addr _ | Range _ as e ->
       raise (NotAPredicate (`exp e))
     | App (logic_info, labels, args) ->
-      let args' = List.map (build_term ~loc ~restyp) args in
+      let args' = List.map (build_term ~scope ~loc ~restyp) args in
       Cil_types.Papp (logic_info, labels, args')
     | Pred (ObjectPointer (l, t)) ->
-      Cil_types.Pobject_pointer (l, build_term ~loc ~restyp t)
+      Cil_types.Pobject_pointer (l, build_term ~scope ~loc ~restyp t)
     | Pred (Valid (l, t)) ->
-      Cil_types.Pvalid (l, build_term ~loc ~restyp t)
+      Cil_types.Pvalid (l, build_term ~scope ~loc ~restyp t)
     | Pred (ValidRead (l, t)) ->
-      Cil_types.Pvalid_read (l, build_term ~loc ~restyp t)
+      Cil_types.Pvalid_read (l, build_term ~scope ~loc ~restyp t)
     | Pred (Initialized (l, t)) ->
-      Cil_types.Pinitialized (l, build_term ~loc ~restyp t)
+      Cil_types.Pinitialized (l, build_term ~scope ~loc ~restyp t)
     | Pred (Dangling (l, t)) ->
-      Cil_types.Pdangling (l, build_term ~loc ~restyp t)
+      Cil_types.Pdangling (l, build_term ~scope ~loc ~restyp t)
     | Pred (Allocable (l, t)) ->
-      Cil_types.Pallocable (l, build_term ~loc ~restyp t)
+      Cil_types.Pallocable (l, build_term ~scope ~loc ~restyp t)
     | Pred (Freeable (l, t)) ->
-      Cil_types.Pfreeable (l, build_term ~loc ~restyp t)
+      Cil_types.Pfreeable (l, build_term ~scope ~loc ~restyp t)
     | Pred (Fresh (l1, l2, t1, t2)) ->
-      let t1' = build_term ~loc ~restyp t1
-      and t2' = build_term ~loc ~restyp t2 in
+      let t1' = build_term ~scope ~loc ~restyp t1
+      and t2' = build_term ~scope ~loc ~restyp t2 in
       Cil_types.Pfresh (l1, l2, t1', t2')
 
-  and build_pred ~loc ~restyp t =
-    Logic_const.unamed ~loc (build_pred_node ~loc ~restyp t)
+  and build_pred ~scope ~loc ~restyp t =
+    Logic_const.unamed ~loc (build_pred_node ~scope ~loc ~restyp t)
 
-  let rec build_init ~loc = function
+  let rec build_init ~scope ~loc = function
     | CilInit init -> init
     | SingleInit e ->
-      Cil_types.SingleInit (build_exp ~loc e)
+      Cil_types.SingleInit (build_exp ~scope ~loc e)
     | CompoundInit (typ,l) ->
       let index i = Cil_types.(Index (Cil.integer ~loc i, NoOffset)) in
-      let initl = List.mapi (fun i sub -> index i, build_init ~loc sub) l in
+      let initl =
+        List.mapi (fun i sub -> index i, build_init ~scope ~loc sub) l
+      in
       Cil_types.CompoundInit (typ, initl)
 
 
   (* Export *)
 
   let cil_logic_label label = label
-  let cil_varinfo v = harden_var v
   let cil_constant c = build_constant (harden_const c)
-  let cil_lval ~loc lv = build_lval ~loc (harden_lval lv)
+  let cil_varinfo v = build_var ~scope:Scope.empty (harden_var v)
+  let cil_lval ~loc lv = build_lval ~scope:Scope.empty ~loc (harden_lval lv)
   let cil_lval_opt ~loc lv =
-    Option.map (build_lval ~loc) (harden_lval_opt lv)
-  let cil_exp ~loc e = build_exp ~loc (harden_exp e)
-  let cil_exp_opt ~loc e = Option.map (build_exp ~loc) (harden_exp_opt e)
+    Option.map (build_lval ~scope:Scope.empty ~loc) (harden_lval_opt lv)
+  let cil_exp ~loc e = build_exp ~scope:Scope.empty ~loc (harden_exp e)
+  let cil_exp_opt ~loc e =
+    Option.map (build_exp ~scope:Scope.empty ~loc) (harden_exp_opt e)
   let cil_exp_list ~loc l = List.map (cil_exp ~loc) l
   let cil_term_lval ~loc ?restyp lv =
-    build_term_lval ~loc ~restyp (harden_lval lv)
-  let cil_term ~loc ?restyp e = build_term ~loc ~restyp (harden_exp e)
+    build_term_lval ~scope:Scope.empty ~loc ~restyp (harden_lval lv)
+  let cil_term ~loc ?restyp e =
+    build_term ~scope:Scope.empty ~loc ~restyp (harden_exp e)
   let cil_iterm ~loc ?restyp e =
     Logic_const.new_identified_term (cil_term ~loc ?restyp e)
-  let cil_pred ~loc ?restyp e = build_pred ~loc ~restyp (harden_exp e)
+  let cil_pred ~loc ?restyp e =
+    build_pred ~scope:Scope.empty ~loc ~restyp (harden_exp e)
   let cil_ipred ~loc ?restyp e =
     Logic_const.new_predicate (cil_pred ~loc ?restyp e)
-  let cil_init ~loc i = build_init ~loc (harden_init i)
+  let cil_init ~loc i = build_init ~scope:Scope.empty ~loc (harden_init i)
 
-  let cil_typeof (`var vi) = vi.Cil_types.vtype
+  let cil_typeof (`var v) =
+    match v with
+    | CilVar vi -> vi.Cil_types.vtype
+    | NewVar (_id,_name,typ) -> typ
 end
 
 
@@ -686,32 +730,29 @@ module Pure =
 struct
   include Exp
 
+  exception DeclarationOutsideOfFunction
+
+  type ghost = NoGhost | Ghost
+
   type instr' =
     | CilInstr of Cil_types.instr
     | Skip
     | Assign of lval' * exp'
     | Call of lval' option * exp' * exp' list
+    | Local of var' * init' option * ghost
+    | LocalCopy of Cil_types.varinfo * var' * init' option * ghost
 
   type stmt' =
     | CilStmt of Cil_types.stmt
     | CilStmtkind of Cil_types.stmtkind
     | Instr of instr'
     | Sequence of stmt' list
-    | Ghost of stmt'
+    | Block of stmt' list
+    | GhostSection of stmt'
+    | If of exp' * stmt' list * stmt' list
 
   type instr = [ `instr of instr' ]
   type stmt = [ instr | `stmt of stmt' ]
-
-  (* Sequences *)
-
-  let flatten_sequences l =
-    let rec add_one acc = function
-      | Sequence l -> add_list acc l
-      | stmt -> stmt :: acc
-    and add_list acc l =
-      List.fold_left add_one acc l
-    in
-    List.rev (add_list [] l)
 
   (* Depolymorphize *)
 
@@ -723,6 +764,9 @@ struct
     match (s :> stmt) with
     | #instr as instr -> Instr (harden_instr instr)
     | `stmt stmt -> stmt
+
+  let harden_stmt_list l =
+    List.map harden_stmt l
 
   (* Build *)
 
@@ -736,48 +780,163 @@ struct
   let of_stmtkind sk = `stmt (CilStmtkind sk)
   let of_stmt s = `stmt (CilStmt s)
   let of_stmts l = `stmt (Sequence (List.map (fun s -> CilStmt s) l))
-  let block l = `stmt (Sequence (List.map harden_stmt l))
-  let ghost s = `stmt (Ghost (harden_stmt s))
+  let sequence l = `stmt (Sequence (List.map harden_stmt l))
+  let block l = `stmt (Block (List.map harden_stmt l))
+  let ghost s = `stmt (GhostSection (harden_stmt s))
 
+  let if_ cond ~then_ ~else_ =
+    `stmt (If (harden_exp cond, harden_stmt_list then_, harden_stmt_list else_))
+
+  let local' ?(ghost=false) ?init typ name =
+    let var = NewVar (Scope.new_id (), name, typ) in
+    let ghost = if ghost then Ghost else NoGhost in
+    let instr = Local (var, Option.map harden_init init, ghost) in
+    `var var, `instr instr
+
+  let local ?ghost ?init ty name =
+    let init = Option.map (values ty) init in
+    local' ?ghost ?init (cil_typ ty) name
+
+  let local_copy ?(ghost=false) ?(suffix="_tmp") v =
+    let name, typ, vi =
+      match harden_var v with
+      | NewVar (_id, name, typ) -> name, typ, None
+      | CilVar vi -> vi.vname, vi.vtype, Some vi
+    in
+    let var = NewVar (Scope.new_id (), name ^ suffix, typ) in
+    let ghost = if ghost then Ghost else NoGhost in
+    let instr = match vi with
+      | None -> Local (var, None, ghost)
+      | Some vi -> LocalCopy (vi, var, None, ghost)
+    in
+    `var var, `instr instr
 
   (* Convert *)
 
-  let build_instr ~loc = function
-    | CilInstr i -> i
+  (* block: refers to the innermost englobing block where locals must be added
+     fundec: refers to the owner function where locals must also be added *)
+
+  let build_local_definition ~scope ~loc ~block ~fundec v init ghost copied_vi =
+    let vi, scope = match v with
+      | CilVar vi -> vi, scope
+      | NewVar (id, name, typ) ->
+        let temp = false and global = false and formal = false in
+        let ghost = match ghost with Ghost -> true | NoGhost -> false in
+        let vi =
+          match copied_vi with
+          | None -> Cil.makeVarinfo ~temp ~ghost global formal name typ
+          | Some vi -> Cil.copyVarinfo vi name
+        in
+        let block, fundec = match block, fundec with
+          | Some block, Some fundec -> block, fundec
+          | None, _ | _, None -> raise DeclarationOutsideOfFunction
+        in
+        (* Register the variable *)
+        Cil.refresh_local_name fundec vi;
+        vi.vdecl <- loc;
+        fundec.slocals <- fundec.slocals @ [vi];
+        block.Cil_types.blocals <- vi :: block.Cil_types.blocals;
+        vi, Scope.add id vi scope
+    in
+    (* Initialization *)
+    let initialization =
+      match init with
+      | None -> Cil_types.Skip loc
+      | Some init ->
+        vi.vdefined <- true;
+        let local_init = Cil_types.AssignInit (build_init ~scope ~loc init) in
+        Cil_types.Local_init (vi, local_init, loc)
+    in
+    initialization, scope
+
+  let build_instr ~scope ~loc ~block ~fundec = function
+    | CilInstr i -> i, scope
     | Skip ->
-      Cil_types.Skip (loc)
+      Cil_types.Skip (loc), scope
     | Assign (dest,src) ->
-      let dest' = build_lval ~loc dest
-      and src' = build_exp ~loc src in
+      let dest' = build_lval ~scope ~loc dest
+      and src' = build_exp ~scope ~loc src in
       let src' = Cil.mkCast ~newt:(Cil.typeOfLval dest') src' in
-      Cil_types.Set (dest', src', loc)
+      Cil_types.Set (dest', src', loc), scope
     | Call (dest,callee,args) ->
-      let dest' = Option.map (build_lval ~loc) dest
-      and callee' = build_exp ~loc callee
-      and args' = List.map (build_exp ~loc) args in
-      Cil_types.Call (dest', callee', args', loc)
+      let dest' = Option.map (build_lval ~scope ~loc) dest
+      and callee' = build_exp ~scope ~loc callee
+      and args' = List.map (build_exp ~scope ~loc) args in
+      Cil_types.Call (dest', callee', args', loc), scope
+    | Local (v, init, ghost) ->
+      build_local_definition ~scope ~loc ~block ~fundec v init ghost None
+    | LocalCopy (vi, v, init, ghost) ->
+      build_local_definition ~scope ~loc ~block ~fundec v init ghost (Some vi)
 
-  let rec build_stmtkind ~loc ~ghost = function
-    | CilStmt s -> s.Cil_types.skind
-    | CilStmtkind sk -> sk
-    | Instr i -> Cil_types.Instr (build_instr ~loc i)
-    | Sequence l -> Cil_types.Block (build_block ~loc ~ghost l)
-    | Ghost s -> Cil_types.Block (build_block ~loc ~ghost:true [s])
+  let rec build_stmtkind ~scope ~loc ~ghost ~block ~fundec = function
+    | CilStmtkind sk -> sk, scope
+    | Instr i ->
+      let instr, scope = build_instr ~scope ~loc ~block ~fundec i in
+      Cil_types.Instr instr, scope
+    | If (exp, then_stmts, else_stmt) ->
+      Cil_types.If (
+        build_exp ~scope ~loc exp,
+        build_block ~scope ~loc ~ghost ~fundec then_stmts,
+        build_block ~scope ~loc ~ghost ~fundec else_stmt,
+        loc
+      ),
+      scope
+    | Sequence s | Block s ->
+      Cil_types.Block (build_block ~scope ~loc ~ghost ~fundec s), scope
+    | (CilStmt _)  as s | GhostSection s ->
+      Cil_types.Block (build_block ~scope ~loc ~ghost:true ~fundec [s]), scope
 
-  and build_stmt ~loc ~ghost = function
-    | CilStmt s -> s
-    | Ghost s -> build_stmt ~loc ~ghost:true s
-    | stmt -> Cil.mkStmt ~ghost (build_stmtkind ~loc ~ghost stmt)
+  and build_stmtlist_rev ~scope ~loc ~ghost ~block ~fundec acc l =
+    let add_one (acc,scope) stmt =
+      match stmt with
+      | CilStmt s -> s :: acc, scope
+      | Sequence s -> (* do not build a block if unecessary *)
+        build_stmtlist_rev ~scope ~loc ~ghost ~block ~fundec acc s
+      | GhostSection stmt -> (* do not build a block if unecessary *)
+        build_stmtlist_rev ~scope ~loc ~ghost:true ~block ~fundec acc [stmt]
+      | _ ->
+        let stmtkind, scope =
+          build_stmtkind ~scope ~loc ~ghost ~block ~fundec stmt
+        in
+        match stmtkind with
+        | Instr (Cil_types.Skip _) -> acc, scope (* Filter skips out *)
+        | stmtkind ->
+          Cil.mkStmt ~ghost stmtkind :: acc, scope
+    in
+    List.fold_left add_one (acc,scope) l
 
-  and build_block ~loc ~ghost l =
-    let bstmts = List.map (build_stmt ~ghost ~loc) (flatten_sequences l) in
-    Cil.mkBlock bstmts
+  and build_stmt ~scope ~loc ~ghost ~block ~fundec = function
+    | CilStmt s -> s, scope
+    | GhostSection s -> build_stmt ~scope ~loc ~ghost:true ~block ~fundec s
+    | stmt ->
+      let stmtkind, scope =
+        build_stmtkind ~scope ~loc ~ghost ~block ~fundec stmt
+      in
+      Cil.mkStmt ~ghost stmtkind, scope
+
+  and build_block ~scope ~loc ~ghost ~fundec l =
+    let block = Cil.mkBlock [] in
+    let bstmts, _scope =
+      build_stmtlist_rev ~scope ~loc ~ghost ~block:(Some block) ~fundec [] l
+    in
+    block.bstmts <- List.rev bstmts;
+    block
+
 
   (* Export *)
 
-  let cil_instr ~loc i = build_instr ~loc (harden_instr i)
-  let cil_stmtkind ~loc s = build_stmtkind ~loc ~ghost:false (harden_stmt s)
-  let cil_stmt ~loc s = build_stmt ~loc ~ghost:false (harden_stmt s)
+  let top_block =
+    Option.map (fun fundec -> fundec.Cil_types.sbody)
+
+  let cil_instr ?into:fundec ~loc i =
+    let scope = Scope.empty and block = top_block fundec in
+    fst (build_instr ~scope ~loc ~block ~fundec (harden_instr i))
+  let cil_stmtkind ?into:fundec ~loc s =
+    let scope = Scope.empty and block = top_block fundec in
+    fst (build_stmtkind ~scope ~loc ~block ~fundec ~ghost:false (harden_stmt s))
+  let cil_stmt ?into:fundec ~loc s =
+    let scope = Scope.empty and block = top_block fundec in
+    fst (build_stmt ~scope ~loc ~block ~fundec ~ghost:false (harden_stmt s))
 
 
   (* Operators *)
@@ -785,6 +944,9 @@ struct
   let (:=) = assign
   let (+=) lv e = assign lv (add lv e)
   let (-=) lv e = assign lv (sub lv e)
+
+  let (let+) (var, stmt) f = stmt :: f var
+  let (and+) var1 var2 = (var1, var2)
 end
 
 
@@ -987,13 +1149,13 @@ struct
   (* Blocks *)
 
   let new_block ?(loc=current_loc ()) ?(ghost=false) scope_type =
-  {
-    loc;
-    scope_type;
-    ghost;
-    stmts = [];
-    vars = [];
-  }
+    {
+      loc;
+      scope_type;
+      ghost;
+      stmts = [];
+      vars = [];
+    }
 
   let extract_ifthen_block b =
     match b.scope_type with
@@ -1010,7 +1172,7 @@ struct
     | Function {fundec} -> fundec
     | _ -> raise (WrongContext "not in a opened function context")
 
-    let open_function ?(loc=current_loc ()) ?ghost ?vorig_name name =
+  let open_function ?(loc=current_loc ()) ?ghost ?vorig_name name =
     check_empty ();
     let vorig_name = Option.value ~default:name vorig_name in
     let fundec = Cil.emptyFunction vorig_name in
@@ -1018,7 +1180,7 @@ struct
     fundec.svar.vname <- name;
     set_owner fundec;
     push (new_block ~loc ?ghost (Function {fundec}));
-    `var fundec.Cil_types.svar
+    `var (CilVar fundec.Cil_types.svar)
 
   let open_block ?(loc=current_loc ()) ?into ?ghost () =
     Option.iter set_owner into;
@@ -1203,20 +1365,33 @@ struct
         v.vdefined <- true
     end;
     append_local v;
-    `var v
+    `var (CilVar v)
 
   let local ?ghost ?init ty name =
     let init = Option.map (values ty) init in
     local' ?ghost ?init (cil_typ ty) name
 
-  let local_copy ?(ghost=false) ?(suffix="_tmp") (`var vi) =
+  let local_copy ?(ghost=false) ?(suffix="_tmp") v =
+    let name, typ, vi =
+      match harden_var v with
+      | NewVar (_id, name, typ) -> name, typ, None
+      | CilVar vi -> vi.vname, vi.vtype, Some vi
+    in
+    let name = name ^ suffix in
     let fundec = get_owner () and b = top () in
     let ghost = ghost || b.ghost in
-    let v = Cil.copyVarinfo vi (vi.Cil_types.vname ^ suffix) in
+    let v =
+      match vi with
+      | None ->
+        let temp = false and global = false and formal = false in
+        Cil.makeVarinfo ~temp ~ghost global formal name typ
+      | Some vi ->
+        Cil.copyVarinfo vi name
+    in
     v.vghost <- v.vghost || ghost;
     Cil.refresh_local_name fundec v;
     append_local v;
-    `var v
+    `var (CilVar v)
 
   let parameter ?(ghost=false) ?(attributes=[]) typ name =
     let fundec = get_owner () and b = top () in
@@ -1224,7 +1399,7 @@ struct
     let loc = current_loc () in
     let v = Cil.makeFormalVar ~ghost ~loc fundec name typ in
     v.Cil_types.vattr <- attributes;
-    `var v
+    `var (CilVar v)
 
 
   (* Instructions *)
@@ -1252,8 +1427,10 @@ struct
   let pure exp =
     let loc = current_loc () in
     let exp' = cil_exp ~loc exp in
-    let `var v = local' (Cil.typeOf exp') "tmp" ~init:(Exp.of_exp exp') in
-    v.vdescr <- Some (Format.asprintf "%a" !Cil.pp_exp_ref exp')
+    match local' (Cil.typeOf exp') "tmp" ~init:(Exp.of_exp exp') with
+    | `var (CilVar v) ->
+      v.vdescr <- Some (Format.asprintf "%a" !Cil.pp_exp_ref exp')
+    | _ -> assert false
 
   let skip () =
     let loc = current_loc () in
