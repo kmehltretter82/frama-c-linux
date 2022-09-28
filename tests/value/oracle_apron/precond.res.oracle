@@ -1,3 +1,11 @@
+21c21
+<   No code nor implicit assigns clause for function g, generating default assigns from the prototype
+---
+>   Neither code nor implicit assigns clause for function g, generating default assigns from the prototype
+30c30
+<   No code nor implicit assigns clause for function f2, generating default assigns from the prototype
+---
+>   Neither code nor implicit assigns clause for function f2, generating default assigns from the prototype
 45a46,47
 > [eva] computing for function f <- main.
 >   Called from precond.c:39.

@@ -1,8 +1,8 @@
 # frama-c -wp [...]
 [kernel] Parsing invertible.i (no preprocessing)
 [wp] Running WP plugin...
-[kernel] invertible.i:17: Warning: 
-  No code nor implicit assigns clause for function main, generating default assigns from the prototype
+[kernel:annot:missing-spec] invertible.i:17: Warning: 
+  Neither code nor implicit assigns clause for function main, generating default assigns from the prototype
 ------------------------------------------------------------
   Function main
 ------------------------------------------------------------

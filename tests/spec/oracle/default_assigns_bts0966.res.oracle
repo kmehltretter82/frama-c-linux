@@ -4,8 +4,8 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   auto_states[0..3] ∈ {0}
-[kernel] default_assigns_bts0966.i:34: Warning: 
-  No code nor implicit assigns clause for function copy, generating default assigns from the specification
+[kernel:annot:missing-spec] default_assigns_bts0966.i:34: Warning: 
+  Neither code nor implicit assigns clause for function copy, generating default assigns from the specification
 [eva] using specification for function copy
 [eva] default_assigns_bts0966.i:20: Warning: 
   no \from part for clause 'assigns auto_states[Init], auto_states[Copy];'
