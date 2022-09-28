@@ -5,6 +5,19 @@
 .git-blame-ignore-revs merge=union
 Changelog merge=union
 
+################
+# DISTRIBUTION #
+################
+
+/CLA.pdf export-ignore
+/ivette/ivette.icns export-ignore
+/share/libc/*.pdf export-ignore
+/doc/** export-ignore
+/doc/code -export-ignore
+/doc/code/* -export-ignore
+/doc/Makefile -export-ignore
+/doc/README -export-ignore
+
 ##################################################
 # BINARY/CHECK-SYNTAX/INDENT/EOL-EOF: set/-unset #
 ##################################################
