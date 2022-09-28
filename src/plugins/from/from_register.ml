@@ -23,7 +23,7 @@
 open Cil_types
 
 let pretty_with_indirect fmt v =
-  let deps = !Db.From.get v in
+  let deps = Functionwise.get v in
   Function_Froms.pretty_with_type_indirect (Kernel_function.get_type v) fmt deps
 
 let display fmtopt =
@@ -37,7 +37,7 @@ let display fmtopt =
          let pretty =
            if From_parameters.ShowIndirectDeps.get ()
            then pretty_with_indirect
-           else !Db.From.pretty
+           else Functionwise.pretty
          in
          match fmtopt with
          | None ->
@@ -63,7 +63,7 @@ module MapStmtCalls = Map.Make(SortCalls)
 let iter_callwise_calls_sorted f =
   let hkf = Kernel_function.Hashtbl.create 17 in
   let kglobal = ref None in
-  !Db.From.Callwise.iter
+  Callwise.iter
     (fun ki d ->
        match ki with
        | Kglobal -> kglobal := Some d
@@ -148,27 +148,17 @@ let main () =
   if From_parameters.ForceDeps.get () then
     From_parameters.ForceDeps.output
       (fun () ->
-         !Db.From.compute_all ();
+         Functionwise.compute_all ();
          print_deps ();
       );
   if From_parameters.ForceCallDeps.get () then
     From_parameters.ForceCallDeps.output
       (fun () ->
-         !Db.From.compute_all_calldeps ();
+         Callwise.force_compute_all_calldeps ();
          if not_quiet then print_calldeps ();
       )
 
 let () = Db.Main.extend main
-
-let access_from zone mem = Function_Froms.Memory.find mem zone
-
-(* Registration for most Db.From functions is done at the end of the
-   Functionwise and Callwise modules *)
-let () =
-  Db.From.display := (fun fmt -> display (Some fmt));
-  Db.From.access := access_from;
-
-
 
 (*
 Local Variables:

@@ -86,43 +86,35 @@ module To_Use = struct
 end
 
 module From = From_compute.Make(To_Use)
+let () = force_compute := From.compute
 
-let () =
-  force_compute := From.compute
 
+let self = Tbl.self
+
+let compute kf = ignore (To_Use.memo kf)
 
 let force_compute_all () =
-  Eva.Analysis.compute ();
-  Callgraph.Uses.iter_in_rev_order
-    (fun kf ->
-       if Kernel_function.is_definition kf && Eva.Results.is_called kf
-       then !Db.From.compute kf)
+  Eva.Analysis.compute () ;
+  Callgraph.Uses.iter_in_rev_order @@ fun kf ->
+  let is_definition = Kernel_function.is_definition kf in
+  if is_definition && Eva.Results.is_called kf then compute kf
 
-(* Db Registration for function-wise from *)
-let () =
-  Db.From.self := Tbl.self;
-  Db.From.is_computed := Tbl.mem;
-  Db.From.compute :=
-    (fun kf -> ignore (To_Use.memo kf));
-  Db.From.get := To_Use.memo;
-  Db.From.pretty :=
-    (fun fmt v ->
-       let deps = To_Use.memo v in
-       Function_Froms.pretty_with_type (Kernel_function.get_type v) fmt deps);
-  Db.From.find_deps_no_transitivity :=
-    (fun stmt expr ->
-       Eva.Results.(before stmt |> expr_deps expr));
-  (* Once this function has been moved to Eva, remove the dependency of Inout
-     from From. *)
-  Db.From.find_deps_no_transitivity_state :=
-    (fun s e -> Eva.Results.(in_cvalue_state s |> expr_deps e));
+let compute_all =
+  let name = "From.compute_all" in
+  State_builder.apply_once name [Tbl.self] force_compute_all |> fst
 
-  ignore (
-    Db.register_compute "From.compute_all"
-      [Tbl.self]
-      Db.From.compute_all
-      force_compute_all);
+let is_computed = Tbl.mem
 
+let get = To_Use.memo
+
+let pretty fmt v =
+  Function_Froms.pretty_with_type (Kernel_function.get_type v) fmt (get v)
+
+let find_deps_no_transitivity stmt expr =
+  Eva.Results.(before stmt |> expr_deps expr)
+
+let find_deps_no_transitivity_state state expr =
+  Eva.Results.(in_cvalue_state state |> expr_deps expr)
 
 (*
 Local Variables:

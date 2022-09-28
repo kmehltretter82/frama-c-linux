@@ -559,6 +559,9 @@ module From : sig
     val find : (kinstr -> Function_Froms.t) ref
   end
 end
+[@@alert db_deprecated
+    "Db.From is deprecated and will be removed in a future version \
+     of Frama-C. Please use the From module instead."]
 
 (* ************************************************************************* *)
 (** {2 Properties} *)

@@ -28,7 +28,7 @@ let () =
     (fun () ->
        State_dependency_graph.add_codependencies
          ~onto:Pdg_tbl.self
-         [ !Db.From.self ])
+         [ From.self ])
 
 let deps =
   [Pdg_tbl.self; Pdg_parameters.BuildAll.self; Pdg_parameters.BuildFct.self]

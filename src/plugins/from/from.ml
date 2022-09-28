@@ -20,10 +20,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Computation of callwise functional dependencies. The results are computed
-    while the value analysis runs, and the results are usually much more
-    precise than the functionwise results. *)
+let self = Functionwise.self
+let compute = Functionwise.compute
+let compute_all = Functionwise.compute_all
+let is_computed = Functionwise.is_computed
+let get = Functionwise.get
+let pretty = Functionwise.pretty
+let find_deps_no_transitivity = Functionwise.find_deps_no_transitivity
+let find_deps_no_transitivity_state =
+  Functionwise.find_deps_no_transitivity_state
 
-val force_compute_all_calldeps : unit -> unit
-val iter : (Cil_types.kinstr -> Function_Froms.froms -> unit) -> unit
-val find : Cil_types.kinstr -> Function_Froms.froms
+let access zone mem = Function_Froms.Memory.find mem zone
+
+let display fmt = From_register.display (Some fmt)
+
+let force_compute_all_calldeps = Callwise.force_compute_all_calldeps
+module Callwise = struct
+  let iter = Callwise.iter
+  let find = Callwise.find
+end

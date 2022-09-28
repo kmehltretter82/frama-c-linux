@@ -28,6 +28,15 @@ open Locations
 
 exception Call_did_not_take_place
 
+module Record_From_Callbacks =
+  Hook.Build
+    (struct
+      type t =
+        (Kernel_function.t Stack.t) *
+        Function_Froms.Memory.t Stmt.Hashtbl.t *
+        (Kernel_function.t * Function_Froms.Memory.t) list Stmt.Hashtbl.t
+    end)
+
 module type To_Use =
 sig
   val get_from_call : kernel_function -> stmt -> Function_Froms.t
@@ -363,7 +372,7 @@ struct
                      (List.length formal_args)
                      (List.length args_froms))
             end;
-            if not (Db.From.Record_From_Callbacks.is_empty ())
+            if not (Record_From_Callbacks.is_empty ())
             then
               states_with_formals :=
                 (kf, !state_with_formals) :: !states_with_formals;
@@ -408,7 +417,7 @@ struct
            | Some s -> s);
         with Call_did_not_take_place -> state
       in
-      if not (Db.From.Record_From_Callbacks.is_empty ())
+      if not (Record_From_Callbacks.is_empty ())
       then
         Stmt.Hashtbl.replace
           callwise_states_with_formals
@@ -582,7 +591,7 @@ struct
           in
           let module Compute = Dataflows.Simple_forward(Fenv)(Dataflow_arg) in
           let ret_id = Kernel_function.find_return kf in
-          if not (Db.From.Record_From_Callbacks.is_empty ())
+          if not (Record_From_Callbacks.is_empty ())
           then begin
             From_parameters.feedback "Now calling From callbacks";
             let states =
@@ -590,7 +599,7 @@ struct
             in
             Compute.iter_on_result (fun k record ->
                 Stmt.Hashtbl.add states k record.deps_table);
-            Db.From.Record_From_Callbacks.apply
+            Record_From_Callbacks.apply
               (call_stack, states, Dataflow_arg.callwise_states_with_formals)
           end;
           let _poped = Stack.pop call_stack in

@@ -32,9 +32,9 @@ let main (main_ui:Design.main_window_extension_points) =
           begin
             try
               let kf = Globals.Functions.get v in
-              if !Db.From.is_computed kf then
+              if From.is_computed kf then
                 main_ui#pretty_information
-                  "@[Functional dependencies:@\n%a@]@." !Db.From.pretty kf
+                  "@[Functional dependencies:@\n%a@]@." From.pretty kf
             with Not_found -> ()
           end
         | _ -> ();

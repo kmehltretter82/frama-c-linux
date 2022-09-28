@@ -957,7 +957,7 @@ let add_change_call_action ff call call_info f_to_call actions =
 (** This function doesn't use the PDG call dependencies on purpose !
 * See explanations in [add_spare_call_inputs] *)
 let get_called_needed_input called_kf need_out0 needed_out_zone =
-  let froms = !Db.From.get called_kf in
+  let froms = From.get called_kf in
   let from_table = froms.Function_Froms.deps_table in
   let acc_in_zones out (default, from_out) in_zones =
     if  Locations.Zone.valid_intersects needed_out_zone out then

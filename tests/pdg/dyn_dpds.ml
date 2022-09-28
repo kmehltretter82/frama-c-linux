@@ -9,7 +9,7 @@ let get_zones str_data (stmt, kf) =
   let lval_term = !Db.Properties.Interp.term_lval kf str_data in
   let lval = !Db.Properties.Interp.term_lval_to_lval ~result:None lval_term in
   let loc =
-    !Db.From.find_deps_no_transitivity
+    From.find_deps_no_transitivity
       stmt
       (Cil.new_exp ~loc:Cil_datatype.Location.unknown (Cil_types.Lval lval))
   in
