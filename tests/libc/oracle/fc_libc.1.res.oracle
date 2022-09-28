@@ -401,122 +401,19 @@ struct termios {
    cc_t c_cc[32] ;
 };
 int volatile Frama_C_entropy_source __attribute__((__unused__));
-void Frama_C_make_unknown(char *p, size_t l);
+ __attribute__((__FC_BUILTIN__)) void Frama_C_make_unknown(char *p, size_t l);
 
-int Frama_C_nondet(int a, int b);
+ __attribute__((__FC_BUILTIN__)) int Frama_C_nondet(int a, int b);
 
-void *Frama_C_nondet_ptr(void *a, void *b);
+ __attribute__((__FC_BUILTIN__)) int Frama_C_interval(int min, int max);
 
-int Frama_C_interval(int min, int max);
+ __attribute__((__FC_BUILTIN__)) char Frama_C_char_interval(char min,
+                                                            char max);
 
-/*@ requires order: min ≤ max;
-    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-extern int Frama_C_interval_split(int min, int max);
+ __attribute__((__FC_BUILTIN__)) unsigned int Frama_C_unsigned_int_interval
+(unsigned int min, unsigned int max);
 
-unsigned char Frama_C_unsigned_char_interval(unsigned char min,
-                                             unsigned char max);
-
-char Frama_C_char_interval(char min, char max);
-
-/*@ requires order: min ≤ max;
-    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-extern unsigned short Frama_C_unsigned_short_interval(unsigned short min,
-                                                      unsigned short max);
-
-/*@ requires order: min ≤ max;
-    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-extern short Frama_C_short_interval(short min, short max);
-
-unsigned int Frama_C_unsigned_int_interval(unsigned int min, unsigned int max);
-
-/*@ requires order: min ≤ max;
-    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-extern int Frama_C_int_interval(int min, int max);
-
-unsigned long Frama_C_unsigned_long_interval(unsigned long min,
-                                             unsigned long max);
-
-long Frama_C_long_interval(long min, long max);
-
-/*@ requires order: min ≤ max;
-    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-extern unsigned long long Frama_C_unsigned_long_long_interval(unsigned long long min,
-                                                              unsigned long long max);
-
-/*@ requires order: min ≤ max;
-    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-extern long long Frama_C_long_long_interval(long long min, long long max);
-
-/*@ requires order: min ≤ max;
-    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-extern size_t Frama_C_size_t_interval(size_t min, size_t max);
-
-float Frama_C_float_interval(float min, float max);
-
-double Frama_C_double_interval(double min, double max);
-
-/*@ requires finite: \is_finite(min) ∧ \is_finite(max);
-    requires order: min ≤ max;
-    ensures
-      result_bounded:
-        \is_finite(\result) ∧ \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-extern double Frama_C_real_interval_as_double(double min, double max);
-
- __attribute__((__noreturn__)) void Frama_C_abort(void);
-
-/*@ assigns \result;
-    assigns \result \from p; */
-extern size_t Frama_C_offset(void const *p);
-
-/*@ assigns \result;
-    assigns \result \from i; */
-extern long long Frama_C_abstract_cardinal(long long i);
-
-/*@ assigns \result;
-    assigns \result \from i; */
-extern long long Frama_C_abstract_max(long long i);
-
-/*@ assigns \result;
-    assigns \result \from i; */
-extern long long Frama_C_abstract_min(long long i);
-
-/*@ assigns \nothing; */
-extern void Frama_C_watch_value(void *p, size_t size, int i, int n);
-
-/*@ assigns \nothing; */
-extern void Frama_C_watch_cardinal(void *p, size_t size, int i, int n);
+ __attribute__((__noreturn__, __FC_BUILTIN__)) void Frama_C_abort(void);
 
 unsigned int volatile __fc_unsigned_int_entropy;
 long volatile __fc_long_entropy;
@@ -536,6 +433,7 @@ void Frama_C_update_entropy(void)
     assigns *(p + (0 .. l - 1)) \from Frama_C_entropy_source;
     assigns Frama_C_entropy_source \from Frama_C_entropy_source;
  */
+ __attribute__((__FC_BUILTIN__)) void Frama_C_make_unknown(char *p, size_t l);
 void Frama_C_make_unknown(char *p, size_t l)
 {
   Frama_C_update_entropy();
@@ -554,22 +452,10 @@ void Frama_C_make_unknown(char *p, size_t l)
     assigns \result \from a, b, Frama_C_entropy_source;
     assigns Frama_C_entropy_source \from Frama_C_entropy_source;
  */
+ __attribute__((__FC_BUILTIN__)) int Frama_C_nondet(int a, int b);
 int Frama_C_nondet(int a, int b)
 {
   int tmp;
-  Frama_C_update_entropy();
-  if (Frama_C_entropy_source) tmp = a; else tmp = b;
-  return tmp;
-}
-
-/*@ ensures result_a_or_b: \result ≡ \old(a) ∨ \result ≡ \old(b);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from a, b, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-void *Frama_C_nondet_ptr(void *a, void *b)
-{
-  void *tmp;
   Frama_C_update_entropy();
   if (Frama_C_entropy_source) tmp = a; else tmp = b;
   return tmp;
@@ -581,6 +467,7 @@ void *Frama_C_nondet_ptr(void *a, void *b)
     assigns \result \from min, max, Frama_C_entropy_source;
     assigns Frama_C_entropy_source \from Frama_C_entropy_source;
  */
+ __attribute__((__FC_BUILTIN__)) int Frama_C_interval(int min, int max);
 int Frama_C_interval(int min, int max)
 {
   int r;
@@ -599,6 +486,8 @@ int Frama_C_interval(int min, int max)
     assigns \result \from min, max, Frama_C_entropy_source;
     assigns Frama_C_entropy_source \from Frama_C_entropy_source;
  */
+ __attribute__((__FC_BUILTIN__)) char Frama_C_char_interval(char min,
+                                                            char max);
 char Frama_C_char_interval(char min, char max)
 {
   char __retres;
@@ -608,62 +497,14 @@ char Frama_C_char_interval(char min, char max)
   return __retres;
 }
 
-/*@ requires finite: \is_finite(min) ∧ \is_finite(max);
-    requires order: min ≤ max;
-    ensures
-      result_bounded:
-        \is_finite(\result) ∧ \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-float Frama_C_float_interval(float min, float max)
-{
-  float tmp;
-  Frama_C_update_entropy();
-  if (Frama_C_entropy_source) tmp = min; else tmp = max;
-  return tmp;
-}
-
-/*@ requires finite: \is_finite(min) ∧ \is_finite(max);
-    requires order: min ≤ max;
-    ensures
-      result_bounded:
-        \is_finite(\result) ∧ \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-double Frama_C_double_interval(double min, double max)
-{
-  double tmp;
-  Frama_C_update_entropy();
-  if (Frama_C_entropy_source) tmp = min; else tmp = max;
-  return tmp;
-}
-
 /*@ requires order: min ≤ max;
     ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
     assigns \result, Frama_C_entropy_source;
     assigns \result \from min, max, Frama_C_entropy_source;
     assigns Frama_C_entropy_source \from Frama_C_entropy_source;
  */
-unsigned char Frama_C_unsigned_char_interval(unsigned char min,
-                                             unsigned char max)
-{
-  unsigned char __retres;
-  int tmp;
-  tmp = Frama_C_interval((int)min,(int)max);
-  __retres = (unsigned char)tmp;
-  return __retres;
-}
-
-/*@ requires order: min ≤ max;
-    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
+ __attribute__((__FC_BUILTIN__)) unsigned int Frama_C_unsigned_int_interval
+(unsigned int min, unsigned int max);
 unsigned int Frama_C_unsigned_int_interval(unsigned int min, unsigned int max)
 {
   unsigned int r;
@@ -676,49 +517,12 @@ unsigned int Frama_C_unsigned_int_interval(unsigned int min, unsigned int max)
   return r;
 }
 
-/*@ requires order: min ≤ max;
-    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-long Frama_C_long_interval(long min, long max)
-{
-  long r;
-  long aux;
-  Frama_C_update_entropy();
-  aux = __fc_long_entropy;
-  if (aux >= min) 
-    if (aux <= max) r = aux; else r = min;
-  else r = min;
-  return r;
-}
-
-/*@ requires order: min ≤ max;
-    ensures result_bounded: \old(min) ≤ \result ≤ \old(max);
-    assigns \result, Frama_C_entropy_source;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
- */
-unsigned long Frama_C_unsigned_long_interval(unsigned long min,
-                                             unsigned long max)
-{
-  unsigned long r;
-  unsigned long aux;
-  Frama_C_update_entropy();
-  aux = __fc_unsigned_long_entropy;
-  if (aux >= min) 
-    if (aux <= max) r = aux; else r = min;
-  else r = min;
-  return r;
-}
-
 extern  __attribute__((__noreturn__)) void __builtin_abort(void);
 
 /*@ terminates \false;
     ensures never_terminates: \false;
     assigns \nothing; */
- __attribute__((__noreturn__)) void Frama_C_abort(void);
+ __attribute__((__noreturn__, __FC_BUILTIN__)) void Frama_C_abort(void);
 void Frama_C_abort(void)
 {
   __builtin_abort();
