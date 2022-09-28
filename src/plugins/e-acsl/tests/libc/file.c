@@ -36,5 +36,6 @@ int main() {
   //@ assert !\initialized(&buf2[0]);
   //@ assert \initialized(&buf2[1..4]);
   //@ assert !\initialized(&buf2[5]);
+  fclose(f);
   return 0;
 }
