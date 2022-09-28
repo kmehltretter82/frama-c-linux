@@ -1958,6 +1958,7 @@ let warn_if_not_enabled =
       Format.fprintf fmt
         "(rule ; Warns when some test conditions are disabled\n  \
          (alias disabled_%s)\n  \
+         (deps (universe))\n  \
          (enabled_if (or false %a))\n  \
          (action (progn (echo \"WARNING: Enabling conditions of some tests are false for @@%s/%s\\n\")\n  \
          %a))\n\
