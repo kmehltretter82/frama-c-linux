@@ -179,6 +179,7 @@ let example_msg =
      # <comment>                 @[<v 0># Just a comment line.@]@  \
      DEFAULT_SUITES = <suite>... @[<v 0># Cumulative list of subdirectories containing test suites (specified by \"test_config\" files).@]@  \
      <mode>_SUITES = <suite>...  @[<v 0># Cumulative list of subdirectories containing test suites (specified by \"test_config_<mode>\" files).@]@  \
+     IGNORE = <mode>_SUITE = <suite>...   @[<v 0># Cumulative list of ignored test suites.@]@  \
      DUNE_ALIAS = <alias-name>   @[<v 0># The dune alias @@<alias-name> has to be used to executes the next defined suites (defaults to \"ptests\").@]@  \
      @]@ \
      @[<v 1>\
@@ -354,7 +355,7 @@ end = struct
   (** parses the [dir/ptests_config] file  *)
   let parse =
     let split_blank = Str.split (Str.regexp "[ ]+") in
-    let regexp = Str.regexp " *\\([^#=][^=]*\\)=\\(.*\\)" in
+    let regexp = Str.regexp " *\\([^#=][^= ]*\\) *=\\(.*\\)" in
     let regexp_config = Str.regexp "\\([a-zA-Z_]+\\)_SUITES" in
     let regexp_comment = Str.regexp " *#" in
     let get_key_value s = str_string_match2 regexp s 0 in
