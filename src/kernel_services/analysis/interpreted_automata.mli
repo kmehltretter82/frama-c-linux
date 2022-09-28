@@ -57,6 +57,7 @@ type 'a control =
     should be read. *)
 
 type vertex = private {
+  vertex_kf : Cil_types.kernel_function;
   vertex_key : int;
   mutable vertex_start_of : Cil_types.stmt option;
   mutable vertex_info : info;
@@ -99,6 +100,7 @@ and guard_kind = Then | Else
 val pretty_transition: vertex transition Pretty_utils.formatter
 
 type 'vertex edge = private {
+  edge_kf : Cil_types.kernel_function;
   edge_key : int;
   edge_kinstr : kinstr;
   edge_transition : 'vertex transition;

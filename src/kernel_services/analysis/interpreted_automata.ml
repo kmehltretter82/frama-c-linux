@@ -41,6 +41,7 @@ type 'a control =
      the given cases and default vertices. *)
 
 type vertex = {
+  vertex_kf : Cil_types.kernel_function;
   vertex_key : int;
   mutable vertex_start_of : Cil_types.stmt option;
   mutable vertex_info : info;
@@ -74,6 +75,7 @@ type 'vertex transition =
 and guard_kind = Then | Else
 
 type 'vertex edge = {
+  edge_kf : Cil_types.kernel_function;
   edge_key : int;
   edge_kinstr : Cil_types.kinstr;
   edge_transition : 'vertex transition;
@@ -81,6 +83,7 @@ type 'vertex edge = {
 }
 
 let dummy_vertex = {
+  vertex_kf = Kernel_function.dummy ();
   vertex_key = -1;
   vertex_start_of = None;
   vertex_info = NoneInfo;
@@ -88,11 +91,16 @@ let dummy_vertex = {
 }
 
 let dummy_edge = {
+  edge_kf = Kernel_function.dummy ();
   edge_key = -1;
   edge_kinstr = Kglobal;
   edge_transition = Skip;
   edge_loc = Cil_datatype.Location.unknown;
 }
+
+(* Compare function helper *)
+let (<?>) c lcmp =
+  if c <> 0 then c else Lazy.force lcmp
 
 module Vertex = Datatype.Make_with_collections
     (struct
@@ -102,9 +110,14 @@ module Vertex = Datatype.Make_with_collections
       let name = "Interpreted_automata.Vertex"
       let copy v =
         { v with vertex_key = v.vertex_key }
-      let compare v1 v2 = v1.vertex_key - v2.vertex_key
-      let hash v = v.vertex_key
-      let equal v1 v2 = v1.vertex_key = v2.vertex_key
+      let compare v1 v2 =
+        v1.vertex_key - v2.vertex_key <?>
+        lazy (Kernel_function.compare v1.vertex_kf v2.vertex_kf)
+      let hash v =
+        Hashtbl.hash (Kernel_function.hash v.vertex_kf, v.vertex_key)
+      let equal v1 v2 =
+        v1.vertex_key = v2.vertex_key &&
+        Kernel_function.equal v1.vertex_kf v2.vertex_kf
       let pretty fmt v = Format.pp_print_int fmt v.vertex_key
     end)
 
@@ -117,9 +130,14 @@ struct
         let reprs = [dummy_edge]
         let name = "Interpreted_automata.Edge"
         let copy e = e
-        let compare e1 e2 = e1.edge_key - e2.edge_key
-        let hash e = e.edge_key
-        let equal e1 e2 = e1.edge_key = e2.edge_key
+        let compare e1 e2 =
+          e1.edge_key - e2.edge_key <?>
+          lazy (Kernel_function.compare e1.edge_kf e2.edge_kf)
+        let hash e =
+          Hashtbl.hash (Kernel_function.hash e.edge_kf, e.edge_key)
+        let equal e1 e2 =
+          e1.edge_key = e2.edge_key &&
+          Kernel_function.equal e1.edge_kf e2.edge_kf
         let pretty fmt e = Format.pp_print_int fmt e.edge_key
       end)
   let default = dummy_edge
@@ -255,6 +273,7 @@ let build_automaton ~annotations kf =
   and next_edge = ref 0 in
   let add_vertex () =
     let v = {
+      vertex_kf = kf;
       vertex_key = !next_vertex;
       vertex_start_of = None;
       vertex_info = NoneInfo;
@@ -264,6 +283,7 @@ let build_automaton ~annotations kf =
     G.add_vertex g v; v
   and add_edge src dest edge_kinstr edge_transition edge_loc =
     let e = {
+      edge_kf = kf;
       edge_key = !next_edge;
       edge_kinstr;
       edge_transition;
