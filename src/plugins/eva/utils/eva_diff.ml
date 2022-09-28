@@ -67,13 +67,17 @@ let import_offsetmap offsm =
 
 let import_zone zone =
   let import base itv acc =
-    let zone = Locations.Zone.inject base itv in
+    let itv =
+      try Int_Intervals.(inject (project_set itv))
+      with Abstract_interp.Error_Top -> Int_Intervals.top
+    in
+    let zone = Locations.Zone.inject (import_base base) itv in
     Locations.Zone.join acc zone
   in
   try Locations.Zone.(fold_i import zone bottom)
   with Abstract_interp.Error_Top ->
     assert Locations.Zone.(equal zone top);
-    zone
+    Locations.Zone.top
 
 let import_deps deps =
   Deps.{ data = import_zone deps.data;

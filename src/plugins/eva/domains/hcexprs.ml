@@ -150,12 +150,8 @@ module HCE = struct
 
   let import h =
     match get h with
-    | E expr ->
-      let expr' = Eva_diff.import_expr expr in
-      if Exp.equal expr expr' then h else of_exp expr
-    | LV lval ->
-      let lval' = Eva_diff.import_lval lval in
-      if Lval.equal lval lval' then h else of_lval lval
+    | E expr -> of_exp (Eva_diff.import_expr expr)
+    | LV lval -> of_lval (Eva_diff.import_lval lval)
 end
 
 module HCESet = struct
