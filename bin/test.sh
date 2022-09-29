@@ -35,6 +35,8 @@ DUNE_LOG=./.test-errors.log
 CACHEDIR=$(pwd -P)/.wp-cache
 FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
+TEST_DIRS="tests/* src/plugins/*/tests/*"
+
 # --------------------------------------------------------------------------
 # ---  Help Message
 # --------------------------------------------------------------------------
@@ -121,6 +123,13 @@ function Cmd
     [ "$?" = "0" ] || Error "(command exits $?): $@"
 }
 
+function RequiredTools
+{
+    for tool in $@ ; do
+        Where=$(which $tool) || Error "Executable not found: $tool"
+    done
+}
+
 # --------------------------------------------------------------------------
 # ---  WP Cache Environment
 # --------------------------------------------------------------------------
@@ -154,6 +163,7 @@ function CloneCache
 {
     if [ ! -d "$FRAMAC_WP_CACHEDIR" ]; then
         Head "Cloning WP cache (from $FRAMAC_WP_CACHE_GIT to $FRAMAC_WP_CACHEDIR)..."
+        RequiredTools git
         Cmd git clone $FRAMAC_WP_CACHE_GIT $FRAMAC_WP_CACHEDIR
     fi
 }
@@ -162,6 +172,7 @@ function PullCache
 {
     CloneCache
     Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
+    RequiredTools git
     Run git -C $FRAMAC_WP_CACHEDIR pull --rebase
 }
 
@@ -277,7 +288,7 @@ function Status
             #-- Details
             Head "Details by directory:"
             if  [ "$NB" != "0" ]; then
-                for dir in tests/* src/plugins/*/tests/* ; do
+                for dir in $TEST_DIRS ; do
                     if [ -d "$dir" ]; then
                         NB=$(grep -c "^frama-c-wtests $dir" "$1")
                         [ "$NB" = "0" ] || echo "- $dir= $NB"
@@ -293,7 +304,8 @@ function Status
     #-- Check wp-cache status
     if [ "$UPDATE" = "yes" ]; then
         Head "Check $FRAMAC_WP_CACHEDIR status"
-        git -C $FRAMAC_WP_CACHEDIR status -s
+        RequiredTools git
+        Run git -C $FRAMAC_WP_CACHEDIR status -s
     fi
 }
 
@@ -343,7 +355,12 @@ do
             shift
             ;;
         "-a"|"--all")
-            TESTS="tests src/plugins/*/tests"
+            TESTS=""
+            for dir in $TEST_DIRS ; do
+                if [ -d "$dir" ]; then
+                    TESTS="$TESTS $dir"
+                fi
+            done
             ;;
        *)
             TESTS+=" $1"
