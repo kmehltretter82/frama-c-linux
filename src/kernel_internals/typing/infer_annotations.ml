@@ -227,7 +227,7 @@ let populate_funspec_aux kf spec =
         if not (is_frama_c_builtin name) then
           Kernel.warning ~once:true ~current:true
             ~wkey:Kernel.wkey_missing_spec
-            "No code nor %s assigns clause for function %a, \
+            "Neither code nor %s assigns clause for function %a, \
              generating default assigns from the %s"
             explicit_name Kernel_function.pretty kf orig_name
       in
