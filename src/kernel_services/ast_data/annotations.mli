@@ -355,7 +355,7 @@ val add_spec:
     [register_children] is directly given to the function [add_behaviors].
 
     @since 23.0-Vanadium
-    @modify Frama-C+dev: adds the [force] parameter
+    @before Frama-C+dev: the [force] parameter does not exist
 *)
 
 val add_behaviors:
@@ -373,8 +373,7 @@ val add_decreases:
     function, an exception [AlreadySpecified] is raised. If [force] is [true]
     the old specification is dropped and the new one replaces it.
 
-    @modify Aluminium-20160501 restructuration of annotations management
-    @modify Frama-C+dev: adds the [force] parameter
+    @before Frama-C+dev: the [force] parameter does not exist
 *)
 
 val add_terminates:
@@ -385,8 +384,7 @@ val add_terminates:
     function, an exception [AlreadySpecified] is raised. If [force] is [true]
     the old specification is dropped and the new one replaces it.
 
-    @modify Aluminium-20160501 restructuration of annotations management
-    @modify Frama-C+dev: adds the [force] parameter
+    @before Frama-C+dev: the [force] parameter does not exist
 *)
 
 val add_complete: string list contract_component_addition
