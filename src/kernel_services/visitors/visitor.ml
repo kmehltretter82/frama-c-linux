@@ -408,10 +408,8 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
         { spec_behavior = snd (List.split old_behaviors);
           spec_complete_behaviors = snd (List.split old_complete);
           spec_disjoint_behaviors = snd (List.split old_disjoint);
-          spec_terminates =
-            (Option.map snd) old_terminates;
-          spec_variant =
-            (Option.map snd) old_decreases
+          spec_terminates = Option.map snd old_terminates;
+          spec_variant = Option.map snd old_decreases
         }
       in
       let res = self#vspec spec in
@@ -430,6 +428,10 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
                b')
             old_behaviors
         in
+        Queue.add
+          (fun () ->
+             ignore (Annotations.funspec ~populate:false new_kf))
+          self#get_filling_actions ;
         let new_terminates =
           Option.map
             (fun (e,t) ->

@@ -1,8 +1,8 @@
 # frama-c -wp [...]
 [kernel] Parsing reads.i (no preprocessing)
 [wp] Running WP plugin...
-[kernel] reads.i:86: Warning: 
-  No code nor implicit assigns clause for function recursive_usage, generating default assigns from the prototype
+[kernel:annot:missing-spec] reads.i:86: Warning: 
+  Neither code nor implicit assigns clause for function recursive_usage, generating default assigns from the prototype
 .................................................
 ... Ref Usage
 .................................................

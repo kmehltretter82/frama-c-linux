@@ -23,7 +23,8 @@ struct Block {
    SN sum ;
 };
 typedef struct Block FB;
-/*@ region *fb; */
+/*@ terminates \true;
+    region *fb; */
 void fb_ADD(FB *fb)
 {
   (fb->out1)->v += (fb->out2)->v;
@@ -31,7 +32,8 @@ void fb_ADD(FB *fb)
   return;
 }
 
-/*@ region IN: \pattern{PMEM}, (fb->inp1..fb->inp3);
+/*@ terminates \true;
+    region IN: \pattern{PMEM}, (fb->inp1..fb->inp3);
     region OUT: \pattern{PVECTOR}, (fb->out1..fb->out3);
     region IDX: \pattern{PVECTOR}, (fb->idx1..fb->idx3);
  */

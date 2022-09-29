@@ -46,9 +46,10 @@ let mark_unknown_requires kinstr kf funspec =
 
 let get_spec kinstr kf =
   let funspec = Annotations.funspec ~populate:false kf in
-  if Cil.is_empty_funspec funspec then begin
+  if List.for_all (fun b -> b.b_assigns = WritesAny) funspec.spec_behavior
+  then begin
     Self.error ~current:true
-      "@[Recursive call to %a@ without a specification.@ \
+      "@[Recursive call to %a@ without assigns clause.@ \
        Generating probably incomplete assigns to interpret the call.@ \
        Try to increase@ the %s parameter@ \
        or write a correct specification@ for function %a.@\n%t@]"

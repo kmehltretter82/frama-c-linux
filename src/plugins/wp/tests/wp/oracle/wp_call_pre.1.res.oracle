@@ -2,8 +2,8 @@
 [kernel] Parsing wp_call_pre.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[kernel] wp_call_pre.c:32: Warning: 
-  No code nor implicit assigns clause for function f, generating default assigns from the prototype
+[kernel:annot:missing-spec] wp_call_pre.c:32: Warning: 
+  Neither code nor implicit assigns clause for function f, generating default assigns from the prototype
 
 Goal Pre-condition 'qed_ok,Rmain' in 'main':
 Prove: true.

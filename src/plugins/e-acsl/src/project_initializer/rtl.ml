@@ -468,7 +468,13 @@ let merge_rtl_spec rtl_prj rtl_global =
       let vis_replace_formals = new vis_replace_leaves ~formals:formals_assoc () in
       let spec = Visitor.visitFramacFunspec vis_replace_formals spec in
       (* Add the updated spec to the user's kf *)
-      Annotations.add_spec Options.emitter user_kf spec
+      try Annotations.add_spec Options.emitter user_kf spec
+      with Annotations.AlreadySpecified(clauses) ->
+        Options.error ~source:(fst @@ Kernel_function.get_location user_kf)
+          "Found inconsistent specification for function %a (clause%s: %a)"
+          Cil_printer.pp_varinfo vi
+          (if 1 < List.length clauses then "s" else "")
+          (Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string) clauses
     end
   | GVarDecl _ | GVar _ | GType _ | GCompTag _ | GCompTagDecl _ | GEnumTag _
   | GEnumTagDecl _ | GAnnot _ | GAsm _ | GPragma _ | GText _ ->

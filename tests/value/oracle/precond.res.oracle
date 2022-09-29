@@ -17,8 +17,8 @@
 [eva] precond.c:32: function f: precondition 'i' got status valid.
 [eva] Recording results for f
 [eva] Done for function f
-[kernel] precond.c:34: Warning: 
-  No code nor implicit assigns clause for function g, generating default assigns from the prototype
+[kernel:annot:missing-spec] precond.c:34: Warning: 
+  Neither code nor implicit assigns clause for function g, generating default assigns from the prototype
 [eva] computing for function g <- main.
   Called from precond.c:34.
 [eva] using specification for function g
@@ -26,8 +26,8 @@
 [eva] Done for function g
 [eva] computing for function aux <- main.
   Called from precond.c:36.
-[kernel] precond.c:21: Warning: 
-  No code nor implicit assigns clause for function f2, generating default assigns from the prototype
+[kernel:annot:missing-spec] precond.c:21: Warning: 
+  Neither code nor implicit assigns clause for function f2, generating default assigns from the prototype
 [eva] computing for function f2 <- aux <- main.
   Called from precond.c:21.
 [eva] using specification for function f2

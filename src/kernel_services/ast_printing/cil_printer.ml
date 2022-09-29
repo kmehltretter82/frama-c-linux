@@ -3054,7 +3054,7 @@ class cil_printer () = object (self)
     let nl_assigns = nl || b.b_allocation != FreeAllocAny in
     let nl_extended = nl_assigns || b.b_assigns != WritesAny in
     let nl_ensures = nl_extended || b.b_extended != [] in
-    let nl_decreases = nl_extended || b.b_post_cond != [] in
+    let nl_decreases = nl_ensures || b.b_post_cond != [] in
     let nl_requires = nl_decreases || variant != None || terminates != None in
     let nl_assumes = nl_requires || b.b_requires != [] in
     let pp_list nl fmt =

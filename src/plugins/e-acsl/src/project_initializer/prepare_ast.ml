@@ -598,6 +598,13 @@ let unduplicable_functions =
     Datatype.String.Set.empty
     white_list
 
+(* Note: it might not have terminates at all, the point is just to ignore it. *)
+let spec_has_only_terminates spec =
+  spec.spec_variant = None &&
+  List.for_all Cil.is_empty_behavior spec.spec_behavior &&
+  spec.spec_disjoint_behaviors = [] &&
+  spec.spec_complete_behaviors = []
+
 let must_duplicate kf vi =
   (* it is not already duplicated *)
   not (Dup_functions.mem vi)
@@ -614,8 +621,11 @@ let must_duplicate kf vi =
     not (Functions.instrument kf)
     ||
     (* or: *)
-    ((* it has a function contract *)
-      not (Cil.is_empty_funspec (Annotations.funspec ~populate:false kf))
+    ( let spec = Annotations.funspec ~populate:false kf in
+      (* it has a function contract *)
+      not (Cil.is_empty_funspec spec)
+      && (* there are some annotations that might be treated *)
+      not (spec_has_only_terminates spec)
       && (* its annotations must be monitored *)
       Functions.check kf))
 
