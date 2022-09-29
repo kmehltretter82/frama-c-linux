@@ -57,6 +57,8 @@ sig
 
   val ptr : ('v,'s) typ -> ('v,'v) typ
   val array : ?size:int -> ('v,'s) typ -> ('v,'s list) typ
+  val structure :
+    Cil_types.compinfo -> (Cil_types.fieldinfo -> 'a -> 'v) -> ('v, 'a) typ
 
   (* Attributes *)
   val attribute : ('v,'s) typ -> string -> Cil_types.attrparam list

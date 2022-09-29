@@ -32,6 +32,7 @@ struct
   type ('value,'shape) morphology =
     | Single : ('value,'value) morphology
     | Listed : ('value,'shape) typ -> ('value,'shape list) morphology
+    | Record : (Cil_types.fieldinfo -> 'a -> 'value) -> ('value,'a) morphology
 
   and ('value,'shape) typ = ('value,'shape) morphology * Cil_types.logic_type
 
@@ -75,6 +76,8 @@ struct
       Ctype (TArray (t, size, []))
     | _, _ -> raise NotACType
 
+  let structure compinfo f =
+    Record f,Ctype (TComp (compinfo, []))
 
   (* Attrbutes *)
 
@@ -198,7 +201,8 @@ struct
   and init' =
     | CilInit of Cil_types.init
     | SingleInit of exp'
-    | CompoundInit of Cil_types.typ * init' list
+    | ArrayInit of Cil_types.typ * init' list
+    | StructInit of Cil_types.typ * (Cil_types.fieldinfo * init') list (* ordered *)
 
   type const = [ `const of const' ]
   type var = [ `var of var' ]
@@ -263,8 +267,11 @@ struct
   and pretty_init fmt = function
     | CilInit init -> Printer.pp_init fmt init
     | SingleInit e -> pretty_exp fmt e
-    | CompoundInit (_,l) ->
+    | ArrayInit (_,l) ->
       Format.fprintf fmt "{%a}" (Pretty_utils.pp_list ~sep:",@ " pretty_init) l
+    | StructInit (_,l) ->
+      Format.fprintf fmt "{%a}" (Pretty_utils.pp_list ~sep:",@ " pretty_init) @@
+      List.map snd l
 
   let pretty fmt = function
     | `none -> ()
@@ -412,13 +419,28 @@ struct
   (* Initializations *)
 
   let of_init i = `init (CilInit i)
-  let compound t l = `init (CompoundInit (t, List.map harden_init l))
+  let compound t l =
+    match t with
+    | Cil_types.TArray _ ->
+      `init (ArrayInit (t, List.map harden_init l))
+    | Cil_types.TComp (comp,_) ->
+      let field_init field init =
+        field, harden_init init
+      in
+      `init (StructInit (t, List.map2 field_init (Option.get comp.cfields) l ))
+    | _ -> assert false (* TODO: handle error *)
 
   let rec values : type a. (init, a) typ -> a -> [> init] =
     fun ty x ->
     match ty with
     | Single, Ctype _ -> x
     | Listed sub, Ctype t-> compound t (List.map (values sub) x)
+    | Record f, Ctype (TComp (comp,_) as t) ->
+      let field_init field =
+        field, harden_init (f field x)
+      in
+      `init (StructInit (t, List.map field_init (Option.get comp.cfields)))
+    | Record _, _ -> assert false
     | _, _ -> raise NotACType
 
   (* Operators *)
@@ -685,10 +707,16 @@ struct
     | CilInit init -> init
     | SingleInit e ->
       Cil_types.SingleInit (build_exp ~scope ~loc e)
-    | CompoundInit (typ,l) ->
+    | ArrayInit (typ,l) ->
       let index i = Cil_types.(Index (Cil.integer ~loc i, NoOffset)) in
       let initl =
         List.mapi (fun i sub -> index i, build_init ~scope ~loc sub) l
+      in
+      Cil_types.CompoundInit (typ, initl)
+    | StructInit (typ,l) ->
+      let field fi = Cil_types.(Field (fi,NoOffset)) in
+      let initl =
+        List.map (fun (fi,sub) -> field fi, build_init ~scope ~loc sub) l
       in
       Cil_types.CompoundInit (typ, initl)
 
