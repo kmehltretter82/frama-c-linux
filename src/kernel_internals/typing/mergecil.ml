@@ -2671,7 +2671,7 @@ let oneFilePass2 (f: file) =
             visit vi';
             vi'.vaddrof <- vi.vaddrof || vi'.vaddrof;
             vi'.vdefined <- vi.vdefined || vi'.vdefined;
-            if Extlib.xor vi'.vghost vi.vghost then
+            if vi'.vghost <> vi.vghost then
               Kernel.abort
                 "Cannot merge: Global %a has both ghost and non-ghost status"
                 Cil_printer.pp_varinfo vi';

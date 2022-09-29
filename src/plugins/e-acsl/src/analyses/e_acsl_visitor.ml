@@ -245,10 +245,9 @@ class visitor cat
           ignore @@ self#set_do_visit_funspec old_vfunspec;
           ignore @@ self#set_run_from_visitor old_run_from_visitor
         in
-        Extlib.try_finally
+        Fun.protect
           ~finally
-          (fun item -> visit_func (self :> Visitor.frama_c_inplace) item)
-          item
+          (fun () -> visit_func (self :> Visitor.frama_c_inplace) item)
 
     (** see documentation in e_acsl_visitor.mli *)
     method visit_file file =
@@ -336,7 +335,7 @@ class visitor cat
         self#reset_visit_error ~force:old_visit_error ();
         self#set_akind old_akind
       in
-      Extlib.try_finally ~finally f arg
+      Fun.protect ~finally (fun () -> f arg)
 
     (** [process_spec spec] visits the given [spec] in the same manner than
         the E-ACSL injector, setting the annotation kind to its correct value as

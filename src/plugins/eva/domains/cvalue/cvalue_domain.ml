@@ -270,11 +270,10 @@ module State = struct
     let (pre, clob) = pre in
     let (post, post_clob) = post in
     Locals_scoping.(remember_bases_with_locals clob post_clob.clob);
-    let post =
-      Extlib.opt_fold
-        (finalize_recursive_call stmt call ~pre:(pre, clob))
-        recursion post
+    let finalize a =
+      finalize_recursive_call stmt call ~pre:(pre, clob) a post
     in
+    let post = Option.fold ~some:finalize ~none:post recursion in
     Cvalue_transfer.finalize_call stmt call recursion ~pre ~post
     >>-: fun state ->
     state, clob

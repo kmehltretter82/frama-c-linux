@@ -54,8 +54,8 @@ let display_as_table table_contents (parent:GPack.box) =
       ~rows:(List.length table_contents)
       ~homogeneous:true
       ~packing:parent#pack () in
-  Extlib.iteri (fun i row ->
-      Extlib.iteri (fun j text ->
+  List.iteri (fun i row ->
+      List.iteri (fun j text ->
           table#attach ~left:j ~top:i
             ((GMisc.label ~justify:`LEFT ~text:text ()):>GObj.widget)) row)
     table_contents ;

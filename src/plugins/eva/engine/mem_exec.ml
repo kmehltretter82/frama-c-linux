@@ -193,8 +193,9 @@ module Make
            output_bases. *)
         let return_varinfo = Library_functions.get_retres_vi kf in
         let return_base = Option.map Base.of_varinfo return_varinfo in
+        let add b = Base.Hptset.add b all_output_bases in
         let all_output_bases =
-          Extlib.opt_fold Base.Hptset.add return_base all_output_bases
+          Option.fold ~some:add ~none:all_output_bases return_base
         in
         let clear (key,state) =
           key, Domain.filter (`Post kf) all_output_bases state

@@ -24,7 +24,9 @@ let collect_headers () =
   let all_headers = List.fold_left (fun acc dir ->
       let contents = Array.to_list (Sys.readdir dir) in
       let headers =
-        Extlib.filter_map is_header (Filename.concat dir) contents
+        List.filter_map
+          (fun c -> if is_header c then Some (Filename.concat dir c) else None)
+          contents
       in
       acc @ headers
     ) base_headers subdirs

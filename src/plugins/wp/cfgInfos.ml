@@ -306,7 +306,7 @@ let collect_loops_no_variant kf stmt =
   let open Cil_types in
   let fold_no_variant _ = function
     | { annot_content = AVariant v } as ca -> fun _ -> Some (ca, v)
-    | _ -> Extlib.id
+    | _ -> Fun.id
   in
   let props_of_v ca v =
     let (d, _), (p, _) = CfgAnnot.mk_variant_properties kf stmt ca v in
@@ -452,7 +452,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
            let dead = unreachable infos src in
            let cas = CfgAnnot.get_code_assertions kf stmt in
            let ca_pids =
-             Extlib.filter_map_opt
+             List.filter_map
                (fun CfgAnnot.{ code_verified=ca } -> Option.map fst ca) cas in
            let loop_pids = loop_contract_pids kf stmt in
            if dead then

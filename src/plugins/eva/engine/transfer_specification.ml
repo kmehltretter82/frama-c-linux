@@ -524,7 +524,9 @@ module Make
     >>- fun (behaviors, complete_behaviors) ->
     (* List of true behaviors other than the default behavior. *)
     let true_behaviors =
-      Extlib.filter_map (fun (_b, st) -> st = Alarmset.True) fst behaviors
+      List.filter_map
+        (fun (b, st) -> if st = Alarmset.True then Some b else None)
+        behaviors
     in
     (* Without any true behaviors or complete sets, compute the effects of
        the default behavior. *)

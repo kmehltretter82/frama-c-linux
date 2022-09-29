@@ -192,7 +192,7 @@
     let split l1 l2 =
       let treat_one (only1,both,only2) x =
         if List.mem x l1 then
-          (Extlib.filter_out (fun y -> x=y) only1,x::both,only2)
+          (List.filter (fun y -> x <> y) only1,x::both,only2)
         else (only1,both,x::only2)
       in List.fold_left treat_one (l1,[],[]) l2
     in

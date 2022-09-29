@@ -2215,12 +2215,12 @@ struct
         method! vterm_node t =
           match t with
           | Tapp(info',[],args) when Cil_datatype.Logic_info.equal info info' ->
-            ChangeDoChildrenPost(Tapp(info,[curr_lab], args),Extlib.id)
+            ChangeDoChildrenPost(Tapp(info,[curr_lab], args),Fun.id)
           | _ -> DoChildren
         method! vpredicate_node p =
           match p with
           | Papp(info',[],args) when Cil_datatype.Logic_info.equal info info' ->
-            ChangeDoChildrenPost (Papp(info, [curr_lab], args),Extlib.id)
+            ChangeDoChildrenPost (Papp(info, [curr_lab], args),Fun.id)
           | _ -> DoChildren
 
         method private treat_ind_case (n,labs,t,p as ind) =

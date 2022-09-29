@@ -828,10 +828,14 @@ let do_prover_detect () =
 (* ---  Main Entry Points                                               --- *)
 (* ------------------------------------------------------------------------ *)
 
+let step_finally ~finally f x =
+  let r = try f x with e -> finally () ; raise e in
+  finally () ; r
+
 let rec try_sequence jobs () = match jobs with
   | [] -> ()
   | head :: tail ->
-    Extlib.try_finally ~finally:(try_sequence tail) head ()
+    step_finally ~finally:(try_sequence tail) head ()
 
 let sequence jobs () =
   if Wp_parameters.has_dkey dkey_raised

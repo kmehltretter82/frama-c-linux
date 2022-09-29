@@ -769,7 +769,7 @@ class error_manager ?reset (o_parent:GWindow.window_skel) : host =
         if cancelable then Project.Undo.breakpoint ();
         let old_gui_unlocked = !gui_unlocked in
         let res =
-          Extlib.try_finally
+          Fun.protect
             ~finally:(fun () -> if old_gui_unlocked then begin
                 Unlock.apply ();
                 gui_unlocked := true
@@ -780,7 +780,6 @@ class error_manager ?reset (o_parent:GWindow.window_skel) : host =
                  gui_unlocked := false;
                end;
                f ())
-            ()
         in
         if cancelable then Project.Undo.clear_breakpoint ();
         Some res

@@ -54,5 +54,5 @@ let () = Transform.register (module struct
     let retype_args = Memmove_base.retype_args
     let generate_prototype = Memmove_base.generate_prototype
     let generate_spec = generate_spec
-    let args_for_original _ = Extlib.id
+    let args_for_original _ = Fun.id
   end)

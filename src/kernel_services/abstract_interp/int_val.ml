@@ -889,14 +889,15 @@ struct
       if List.length !acc > small_cardinal () then raise Do_not_fit_small_sets
     done;
     (* Keep only values that can actually be obtained *)
-    let is_admissible (r, v1, v2) =
+    let admissible (r, v1, v2) =
       match v1, v2 with
       | Set s1, Set s2 ->
         let op = Op.concrete_bitwise in
-        Int_set.(exists (fun i1 -> exists (fun i2 -> op i1 i2 = r) s2) s1)
-      | _, _ -> true
+        if Int_set.(exists (fun i1 -> exists (fun i2 -> op i1 i2 = r) s2) s1)
+        then Some r else None
+      | _, _ -> Some r
     in
-    let list = Extlib.filter_map is_admissible (fun (r, _, _) -> r) !acc in
+    let list = List.filter_map admissible !acc in
     Set (Int_set.inject_list list)
 
   (* If lower is true (resp. false), compute the lower (resp. upper) bound of

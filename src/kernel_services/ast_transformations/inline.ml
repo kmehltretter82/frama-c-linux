@@ -99,7 +99,7 @@ let inline_call loc caller callee return args =
         let tlv = Logic_utils.lval_to_term_lval lv in
         let offset = Visitor.visitFramacTermOffset self offset in
         Cil.ChangeToPost
-          (Logic_const.addTermOffsetLval offset tlv, Extlib.id)
+          (Logic_const.addTermOffsetLval offset tlv, Fun.id)
       | TResult _, None ->
         Kernel.fatal
           "inlining non-void returning function without lval to store result"

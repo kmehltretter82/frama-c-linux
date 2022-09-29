@@ -124,8 +124,9 @@ let edges g =
 
 
 let update_node_values node new_values typ =
+  let join n = Cvalue.V.join n new_values in
   node.node_values <-
-    Some (Extlib.opt_fold Cvalue.V.join node.node_values new_values);
+    Some (Option.fold ~some:join ~none:new_values node.node_values);
   node.node_range <-
     Node_range.(upper_bound node.node_range (evaluate new_values typ))
 

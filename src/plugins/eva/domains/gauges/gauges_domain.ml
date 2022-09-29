@@ -1221,7 +1221,8 @@ module D : Abstract_domain.Leaf
       match function_calls_handling with
       | FullInterprocedural ->
         update valuation state >>-: fun state ->
-        Extlib.opt_fold start_recursive_call recursion state
+        let start_recursive_call r = start_recursive_call r state in
+        Option.fold ~some:start_recursive_call ~none:state recursion
       | IntraproceduralAll
       | IntraproceduralNonReferenced -> `Value G.empty
     in

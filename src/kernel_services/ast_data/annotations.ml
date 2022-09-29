@@ -685,21 +685,23 @@ let fold_behaviors f =
 let fold_complete f =
   fold_spec_gen
     (fun s -> s.spec_complete_behaviors)
-    (fun f l acc -> List.fold_left (Extlib.swap f) acc l)
+    (fun f l acc -> List.fold_left (Fun.flip f) acc l)
     f
 
 let fold_disjoint f =
   fold_spec_gen
     (fun s -> s.spec_disjoint_behaviors)
-    (fun f l acc -> List.fold_left (Extlib.swap f) acc l)
+    (fun f l acc -> List.fold_left (Fun.flip f) acc l)
     f
 
+let fold_opt_spec f opt default =
+  Option.fold ~some:(fun v -> f v default) ~none:default opt
+
 let fold_terminates f =
-  fold_spec_gen
-    (fun s -> s.spec_terminates) Extlib.opt_fold f
+  fold_spec_gen (fun s -> s.spec_terminates) fold_opt_spec f
 
 let fold_decreases f =
-  fold_spec_gen (fun s -> s.spec_variant) Extlib.opt_fold f
+  fold_spec_gen (fun s -> s.spec_variant) fold_opt_spec f
 
 let fold_bhv_gen get fold f kf b acc =
   let get spec =
@@ -710,15 +712,15 @@ let fold_bhv_gen get fold f kf b acc =
 
 let fold_requires f =
   fold_bhv_gen (fun b -> b.b_requires)
-    (fun f l acc -> List.fold_left (Extlib.swap f) acc l) f
+    (fun f l acc -> List.fold_left (Fun.flip f) acc l) f
 
 let fold_assumes f =
   fold_bhv_gen (fun b -> b.b_assumes)
-    (fun f l acc -> List.fold_left (Extlib.swap f) acc l) f
+    (fun f l acc -> List.fold_left (Fun.flip f) acc l) f
 
 let fold_ensures f =
   fold_bhv_gen (fun b -> b.b_post_cond)
-    (fun f l acc -> List.fold_left (Extlib.swap f) acc l) f
+    (fun f l acc -> List.fold_left (Fun.flip f) acc l) f
 
 let fold_assigns f =
   fold_filter_generic WritesAny
@@ -730,7 +732,7 @@ let fold_allocates f =
 
 let fold_extended f =
   fold_bhv_gen (fun b -> b.b_extended)
-    (fun f l acc -> List.fold_left (Extlib.swap f) acc l) f
+    (fun f l acc -> List.fold_left (Fun.flip f) acc l) f
 
 (* remove_code_annot is called when adding a code annotation that must
    stay unique for a given combination of statement, active behaviors and
@@ -1608,7 +1610,7 @@ let remove_extended e kf ext =
   let set_spec spec _tbl =
     List.iter
       (fun b ->
-         b.b_extended <- Extlib.filter_out ((==) ext) b.b_extended;
+         b.b_extended <- List.filter ((!=) ext) b.b_extended;
          Property_status.remove
            (Property.(ip_of_extended (ELContract kf) ext)))
       spec.spec_behavior

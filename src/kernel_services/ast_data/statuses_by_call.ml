@@ -283,7 +283,7 @@ let replace_call_precondition ip stmt ip_at_call =
      let cur = PreCondAt.find (ip, stmt) in
      PreCondAt.remove (ip, stmt);
      let all = PreCondProxyGenerated.find ip in
-     let all' = Extlib.filter_out (Property.equal cur) all in
+     let all' = List.filter (fun p -> not @@ Property.equal cur p) all in
      PreCondProxyGenerated.replace ip all';
    with Not_found -> ());
   PreCondAt.replace (ip, stmt) ip_at_call;

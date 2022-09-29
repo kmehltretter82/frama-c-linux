@@ -942,14 +942,11 @@ let declared_in_current_scope ~ghost s =
     Datatype.String.Hashtbl.mem env s
   | cur_scope :: _ ->
     let names_declared_in_current_scope =
-      Extlib.filter_map
+      List.filter_map
         (function
-          | UndoRemoveFromEnv (ghost',_)  -> ghost || not ghost'
-          | UndoAlphaEnv _ -> false)
-        (function
-          | UndoRemoveFromEnv (_, s) -> s
-          | UndoAlphaEnv _ -> assert false (* already filtered *)
-        ) !cur_scope
+          | UndoRemoveFromEnv (ghost',s) when ghost || not ghost' -> Some s
+          | _ -> None)
+        !cur_scope
     in
     List.mem s names_declared_in_current_scope
 
@@ -4324,7 +4321,7 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
       let res =
         match current_chunk.stmts with
         | [(s1, m1, w1, r1, c1); (s2, m2, w2, r2, c2)] ->
-          Extlib.swap
+          Fun.flip
             Option.bind
             (function
               | [ s1' ] -> Some (s1', m1 @ m2, w1 @ w2, r1 @ r2, c1 @ c2)
@@ -4386,7 +4383,7 @@ let default_argument_promotion idx exp =
 (* Promote variadic arguments with standard argument promotions.*)
 let promote_variadic_arguments (chunk,args) =
   let args =
-    Extlib.mapi
+    List.mapi
       (fun i arg -> snd (default_argument_promotion i arg))
       args
   in
@@ -5654,7 +5651,7 @@ and makeCompType ghost (isstruct: bool)
       (* _Static_assert is not stored in the Cil AST *)
       None
     | FIELD (f,g) -> Some (f,g) in
-  let flds = Extlib.filter_map_opt to_field nglist in
+  let flds = List.filter_map to_field nglist in
   let flds = List.rev (fold addFieldGroup [] flds) in
 
   let fld_table = Hashtbl.create 17 in
@@ -6934,7 +6931,7 @@ and doExp local_env
                warn_no_proto f;
                let (prm_types,args) =
                  List.split
-                   (Extlib.mapi default_argument_promotion args)
+                   (List.mapi default_argument_promotion args)
                in
                let typ = TFun (resType, Some prm_types, false,attrs) in
                Cil.update_var_type f typ;
@@ -9690,7 +9687,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
              let attr = fc_stdlib_attribute [] in
              let tdecl =
                List.fold_left
-                 (Extlib.swap Logic_utils.add_attribute_glob_annot) tdecl attr
+                 (Fun.flip Logic_utils.add_attribute_glob_annot) tdecl attr
              in
              cabsPushGlobal (GAnnot(tdecl,CurrentLoc.get ()))
            with LogicTypeError ((source,_),msg) ->

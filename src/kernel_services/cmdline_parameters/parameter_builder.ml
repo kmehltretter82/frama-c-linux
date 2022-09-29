@@ -570,7 +570,7 @@ struct
          val reorder: t -> t
          (* Used after having parsed a comma-separated string representing
             parameters. The add actions are done in the reverse order with
-            respect to the list. Can be [Extlib.id] for unordered collections.
+            respect to the list. Can be [Fun.id] for unordered collections.
          *)
        end)
       (S: sig (* the collection, as a state *)
@@ -972,7 +972,7 @@ struct
 
     module C = struct
       include E.Set
-      let reorder = Extlib.id
+      let reorder = Fun.id
       let of_singleton_string = E.of_singleton_string
     end
 
@@ -1321,7 +1321,7 @@ struct
       let remove (k, _v) m = K.Map.remove k m
       let iter f m = K.Map.iter (fun k v -> f (k, Some v)) m
       let fold f m acc = K.Map.fold (fun k v -> f (k, Some v)) m acc
-      let reorder = Extlib.id
+      let reorder = Fun.id
 
       exception Found of V.t
       let of_singleton_string =
@@ -1549,7 +1549,7 @@ struct
       let remove (k, _) m = K.Map.remove k m
       let iter f m = K.Map.iter (fun k l -> f (k, l)) m
       let fold f m acc = K.Map.fold (fun k v -> f (k, v)) m acc
-      let reorder = Extlib.id
+      let reorder = Fun.id
 
       exception Found of V.t list
 

@@ -18,12 +18,11 @@ class stdlib_visitor = object
       in_stdlib := false;
       Cil.SkipChildren
     | attrparams ->
-      let headers =
-        Extlib.filter_map' (fun ap ->
-            match ap with
-            | AStr s -> s
-            | _ -> assert false
-          ) (Extlib.string_suffix ".h") attrparams
+      let when_header = function
+        | AStr s when Extlib.string_suffix ".h" s -> Some s
+        | _ -> None
+      in
+      let headers = List.filter_map when_header attrparams
       in
       in_stdlib := true;
       begin

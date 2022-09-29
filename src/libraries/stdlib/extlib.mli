@@ -26,12 +26,6 @@
 val nop: 'a -> unit
 (** Do nothing. *)
 
-external id: 'a -> 'a = "%identity"
-(** identity function.
-    @since Oxygen-20120901
-*)
-
-
 val adapt_filename: string -> string
 (** Ensure that the given filename has the extension "cmo" in bytecode
     and "cmxs" in native *)
@@ -68,9 +62,6 @@ val mk_fun: string -> ('a -> 'b) ref
 val ($) : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c
 (** Composition. *)
 
-val swap: ('a -> 'b -> 'c) -> 'b -> 'a -> 'c
-(** Swap arguments. *)
-
 val uncurry: ('a -> 'b -> 'c) -> ('a * 'b) -> 'c
 
 val iter_uncurry2:
@@ -101,20 +92,12 @@ val last: 'a list -> 'a
     @raise Invalid_argument on an empty list
     @since Nitrogen-20111001 *)
 
-val filter_out: ('a -> bool) -> 'a list -> 'a list
-(** Filter out elements that pass the test *)
-
 val replace: ('a -> 'a -> bool) -> 'a -> 'a list -> 'a list
 (** [replace cmp x l] replaces the first element [y] of [l] such that
     [cmp x y] is true by [x]. If no such element exists, [x] is added
     at the tail of [l].
     @since Neon-20140301
 *)
-
-val filter_map: ('a -> bool) -> ('a -> 'b) -> 'a list -> 'b list
-val filter_map': ('a -> 'b) -> ('b -> bool) -> 'a list -> 'b list
-val filter_map_opt: ('a -> 'b option) -> 'a list -> 'b list
-(** Combines [filter] and [map]. *)
 
 val fold_map: ('a -> 'b -> 'a * 'c) -> 'a -> 'b list -> 'a * 'c list
 (** Combines [fold_left] and [map] *)
@@ -148,16 +131,6 @@ val opt_of_list: 'a list -> 'a option
     @raise Invalid_argument on lists with more than one argument
     @since Oxygen-20120901 *)
 
-val iteri: (int -> 'a -> unit) -> 'a list -> unit
-(** Same as iter, but the function to be applied take also as argument the
-    index of the element (starting from 0). Tail-recursive
-    @since Nitrogen-20111001 *)
-
-val mapi: (int -> 'a -> 'b) -> 'a list -> 'b list
-(** Same as map, but the function to be applied take also as argument the
-    index of the element (starting from 0). Tail-recursive
-    @since Oxygen-20120901 *)
-
 val subsets: int -> 'a list -> 'a list list
 (** [subsets k l] computes the combinations of [k] elements from list [l].
     E.g. subsets 2 [1;2;3;4] = [[1;2];[1;3];[1;4];[2;3];[2;4];[3;4]].
@@ -185,9 +158,6 @@ val list_slice: ?first:int -> ?last:int -> 'a list -> 'a list
 (* ************************************************************************* *)
 (** {2 Options} *)
 (* ************************************************************************* *)
-
-val opt_fold: ('a -> 'b -> 'b) -> 'a option -> 'b -> 'b
-(** @since Oxygen-20120901 *)
 
 (** [merge f k a b]  returns
     - [None] if both [a] and [b] are [None]
@@ -220,14 +190,6 @@ val opt_map2: ('a -> 'b -> 'c) -> 'a option -> 'b option -> 'c option
     @since 24.0-Chromium *)
 
 (* ************************************************************************* *)
-(** {2 Booleans} *)
-(* ************************************************************************* *)
-
-val xor: bool -> bool -> bool
-(** exclusive-or.
-    @since Oxygen-20120901 *)
-
-(* ************************************************************************* *)
 (** {2 Strings} *)
 (* ************************************************************************* *)
 
@@ -255,12 +217,6 @@ val string_del_suffix: ?strict:bool -> string -> string -> string option
     and None of [suf] is not a suffix of [s].
     @since Aluminium-20160501
 *)
-
-val string_split: string -> int -> string * string
-(** [string_split s i] returns the beginning of [s] up to char [i-1] and the
-    end of [s] starting from char [i+1]
-    @raise Invalid_argument if [i] is not in the range [[0,(length s -1)]]
-    @since Oxygen-20120901 *)
 
 val make_unique_name:
   (string -> bool) -> ?sep:string -> ?start:int -> string -> int*string
@@ -292,13 +248,7 @@ val format_string_of_stag: Format.stag -> string
 external address_of_value: 'a -> int = "address_of_value" [@@noalloc]
 
 (* ************************************************************************* *)
-(** {2 Exception catcher} *)
-(* ************************************************************************* *)
-
-val try_finally: finally:(unit -> unit) -> ('a -> 'b) -> 'a -> 'b
-
-(* ************************************************************************* *)
-(** System commands *)
+(** {2 System commands} *)
 (* ************************************************************************* *)
 
 val mkdir : ?parents:bool -> string -> Unix.file_perm -> unit
@@ -341,7 +291,7 @@ val safe_remove: string -> unit
 val safe_remove_dir: string -> unit
 
 (* ************************************************************************* *)
-(** Comparison functions *)
+(** {2 Comparison functions} *)
 (* ************************************************************************* *)
 
 (** Use this function instead of [Stdlib.compare], as this makes

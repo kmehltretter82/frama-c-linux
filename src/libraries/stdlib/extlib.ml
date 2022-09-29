@@ -22,8 +22,6 @@
 
 let nop _ = ()
 
-external id: 'a -> 'a = "%identity"
-
 let adapt_filename f =
   let change_suffix ext =
     try Filename.chop_extension f ^ ext
@@ -70,8 +68,6 @@ let mk_fun s = ref (fun _ -> mk_labeled_fun s)
 
 let ($) f g x = f (g x)
 
-let swap f x y = f y x
-
 let uncurry f x = f (fst x) (snd x)
 
 let iter_uncurry2 iter f v =
@@ -98,30 +94,11 @@ let rec last = function
   | [a] -> a
   | _ :: l -> last l
 
-let filter_out f ls = List.filter (fun x -> not (f x)) ls
-
 let replace cmp x l =
   let rec aux = function
     | [] -> [x]
     | y::l -> if cmp x y then x::l else y :: aux l
   in aux l
-
-let filter_map filter f l =
-  let rec aux = function
-      [] -> []
-    | x::tl -> if filter x then f x :: aux tl else aux tl
-  in aux l
-let filter_map' f filter l=
-  let rec aux = function
-    | [] -> []
-    | x::tl -> let x' = f x in if filter x' then x' :: aux tl else aux tl
-  in aux l
-let rec filter_map_opt f = function
-  | [] -> []
-  | x::tl ->
-    match f x with
-    | None -> filter_map_opt f tl
-    | Some x' -> x' :: filter_map_opt  f tl
 
 let rec fold_map f acc = function
   | [] -> acc, []
@@ -168,13 +145,6 @@ let opt_of_list =
   | [] -> None
   | [a] -> Some a
   | _ -> raise (Invalid_argument "Extlib.opt_of_list")
-
-let iteri f l = let i = ref 0 in List.iter (fun x -> f !i x; incr i) l
-
-let mapi f l =
-  let res =
-    snd (List.fold_left (fun (i,acc) x -> (i+1,f i x :: acc)) (0,[]) l)
-  in List.rev res
 
 let subsets k l =
   let rec aux k l len =
@@ -224,11 +194,6 @@ let list_slice ?(first = 0) ?last l =
 (** {2 Options} *)
 (* ************************************************************************* *)
 
-let opt_fold f o b =
-  match o with
-  | None -> b
-  | Some a -> f a b
-
 let merge_opt f k o1 o2 =
   match o1,o2 with
   | None, None -> None
@@ -252,24 +217,10 @@ let opt_map2 f x y = match x, y with
   | Some x, Some y -> Some (f x y)
 
 (* ************************************************************************* *)
-(** Booleans                                                                 *)
-(* ************************************************************************* *)
-
-let xor x y = if x then not y else y
-
-(* ************************************************************************* *)
 (** {2 Performance} *)
 (* ************************************************************************* *)
 
 external address_of_value: 'a -> int = "address_of_value" [@@noalloc]
-
-(* ************************************************************************* *)
-(** {2 Exception catcher} *)
-(* ************************************************************************* *)
-
-let try_finally ~finally f x =
-  let r = try f x with e -> finally () ; raise e in
-  finally () ; r
 
 (* ************************************************************************* *)
 (** System commands *)
@@ -399,11 +350,6 @@ let string_del_suffix ?(strict=false) suffix s =
     Some
       (String.sub s 0 (String.length s - String.length suffix))
   else None
-
-let string_split s i =
-  let s1 = String.sub s 0 i in
-  let s2 = String.sub s (i+1) (String.length s - i -1) in
-  (s1,s2)
 
 let make_unique_name mem ?(sep=" ") ?(start=2) from =
   let rec build base id =

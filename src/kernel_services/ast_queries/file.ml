@@ -1582,7 +1582,7 @@ module Remove_spurious = struct
       then acc
       else begin
         let known_li =
-          List.fold_left (Extlib.swap Logic_info.Set.add) acc.logic_infos lis
+          List.fold_left (Fun.flip Logic_info.Set.add) acc.logic_infos lis
         in
         { acc with
           kept = g::acc.kept;

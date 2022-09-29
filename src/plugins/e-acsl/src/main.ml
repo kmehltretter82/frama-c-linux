@@ -64,13 +64,12 @@ let generate_code =
               Kernel.SignedOverflow.unsafe_set signed;
               Kernel.UnsignedOverflow.unsafe_set unsigned
             in
-            Extlib.try_finally
+            Fun.protect
               ~finally
               (fun () ->
                  Gmp_types.init ();
                  Analyses.preprocess ();
-                 Injector.inject ())
-              ();
+                 Injector.inject ()) ;
             (* remove the RTE's results computed from E-ACSL: they are partial
                and associated with the wrong kernel function (the one of the old
                project). *)

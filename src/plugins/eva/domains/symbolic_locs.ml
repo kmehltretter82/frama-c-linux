@@ -570,7 +570,8 @@ module D : Abstract_domain.Leaf
 
   let start_call _stmt _call recursion valuation state =
     update valuation state >>-: fun state ->
-    Extlib.opt_fold start_recursive_call recursion state
+    let start_recursive_call r = start_recursive_call r state in
+    Option.fold ~some:start_recursive_call ~none:state recursion
 
   let finalize_call _stmt _call _recursion ~pre:_ ~post = `Value post
 

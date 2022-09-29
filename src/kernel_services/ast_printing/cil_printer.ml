@@ -579,7 +579,7 @@ class cil_printer () = object (self)
     let tmp = logic_printer_enabled in
     logic_printer_enabled <- false;
     let finally () = logic_printer_enabled <- tmp in
-    Extlib.try_finally ~finally (f fmt) x;
+    Fun.protect ~finally (fun () -> f fmt x);
 
   val mutable force_brace = false
 
@@ -589,7 +589,7 @@ class cil_printer () = object (self)
     let tmp = force_brace in
     force_brace <- true;
     let finally () = force_brace <- tmp in
-    Extlib.try_finally ~finally f fmt x;
+    Fun.protect ~finally (fun () -> f fmt x);
 
   val current_stmt = Stack.create ()
 
