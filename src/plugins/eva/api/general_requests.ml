@@ -161,32 +161,94 @@ let () = Request.register ~package
 
 (* ----- Register Eva information ------------------------------------------- *)
 
+let term_lval_to_lval tlval =
+  try !Db.Properties.Interp.term_lval_to_lval ~result:None tlval
+  with Db.Properties.Interp.No_conversion -> raise Not_found
+
 let print_value fmt loc =
-  let stmt, eval =
+  let is_scalar = Cil.isScalarType in
+  let kinstr, eval =
     match loc with
-    | Printer_tag.PLval (_kf, Kstmt stmt, lval)
-      when Cil.isScalarType (Cil.typeOfLval lval) ->
-      stmt, Results.eval_lval lval
-    | Printer_tag.PExp (_kf, Kstmt stmt, expr)
-      when Cil.isScalarType (Cil.typeOf expr) ->
-      stmt, Results.eval_exp expr
+    | Printer_tag.PLval (_kf, ki, lval) when is_scalar (Cil.typeOfLval lval) ->
+      ki, Results.eval_lval lval
+    | Printer_tag.PExp (_kf, ki, expr) when is_scalar (Cil.typeOf expr) ->
+      ki, Results.eval_exp expr
+    | PVDecl (_kf, ki, vi) when is_scalar vi.vtype ->
+      ki, Results.eval_var vi
+    | PTermLval (_kf, ki, _ip, tlval) ->
+      let lval = term_lval_to_lval tlval in
+      ki, Results.eval_lval lval
     | _ -> raise Not_found
   in
-  let eval_cvalue at = Results.(at stmt |> eval |> as_cvalue_or_uninitialized) in
-  let before = eval_cvalue Results.before in
-  let after = eval_cvalue Results.after in
   let pretty = Cvalue.V_Or_Uninitialized.pretty in
-  if Cvalue.V_Or_Uninitialized.equal before after
-  then pretty fmt before
-  else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
+  let eval_cvalue at = Results.(eval at |> as_cvalue_or_uninitialized) in
+  let before = eval_cvalue (Results.before_kinstr kinstr) in
+  match kinstr with
+  | Kglobal -> pretty fmt before
+  | Kstmt stmt ->
+    let after = eval_cvalue (Results.after stmt) in
+    if Cvalue.V_Or_Uninitialized.equal before after
+    then pretty fmt before
+    else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
 
 let () =
   Server.Kernel_ast.Information.register
     ~id:"eva.value"
     ~label:"Value"
-    ~title:"Possible values inferred by Eva"
+    ~descr:"Possible values inferred by Eva"
     ~enable:Analysis.is_computed
     print_value
+
+let print_taint fmt marker =
+  let loc = Cil_datatype.Location.unknown in
+  let expr, stmt =
+    match marker with
+    | Printer_tag.PLval (_kf, Kstmt stmt, lval) ->
+      Cil.new_exp ~loc (Lval lval), stmt
+    | Printer_tag.PExp (_kf, Kstmt stmt, expr) -> expr, stmt
+    | PVDecl (_kf, Kstmt stmt, vi) ->
+      Cil.new_exp ~loc (Lval (Var vi, NoOffset)), stmt
+    | PTermLval (_kf, Kstmt stmt, _ip, tlval) ->
+      let lval = term_lval_to_lval tlval in
+      Cil.new_exp ~loc (Lval lval), stmt
+    | _ -> raise Not_found
+  in
+  let evaluate_taint request =
+    let deps = Results.expr_dependencies expr request in
+    Result.get_ok (Results.is_tainted deps.data request),
+    Result.get_ok (Results.is_tainted deps.indirect request)
+  in
+  let before = evaluate_taint Results.(before stmt) in
+  let after = evaluate_taint Results.(after stmt) in
+  let str_taint = function
+    | Results.Untainted -> "untainted"
+    | Direct -> "direct taint"
+    | Indirect -> "indirect taint"
+  in
+  let pretty fmt = let open Results in function
+      | taint, Untainted -> Format.fprintf fmt "%s" (str_taint taint)
+      | t1, t2 ->
+        Format.fprintf fmt
+          "%s to the value, %s %s to values used to compute lvalues addresses"
+          (str_taint t1) (if t1 = Untainted then "but" else "and") (str_taint t2)
+  in
+  if before = after
+  then Format.fprintf fmt "%a" pretty before
+  else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
+
+let () =
+  let enable () = Analysis.is_computed () && Taint_domain.Store.is_computed () in
+  let title =
+    "Taint status:\n\
+     - Direct taint: data dependency from values provided by the attacker, \
+     meaning that the attacker may be able to alter this value\n\
+     - Indirect taint: the attacker cannot directly alter this value, but he \
+     may be able to impact the path by which its value is computed.\n\
+     - Untainted: cannot be modified by the attacker."
+  in
+  Server.Kernel_ast.Information.register
+    ~id:"eva.taint" ~label:"Taint" ~descr: "Taint status according to Eva"
+    ~title ~enable print_taint
 
 let () =
   Analysis.register_computation_hook
@@ -196,7 +258,9 @@ let () =
 
 module Taint = struct
   open Server.Data
-  open Taint_domain
+
+  type taint = Results.taint = Direct | Indirect | Untainted
+  type error = NotComputed | Irrelevant | LogicError
 
   let dictionary = Enum.dictionary ()
 
@@ -220,38 +284,68 @@ module Taint = struct
     tag (Error Irrelevant) "not_applicable" "—"
       "Not applicable" "no taint for this kind of property"
 
-  let tag_data_tainted =
-    tag (Ok Data) "data_tainted" "Tainted (data)"
-      "Data tainted"
+  let tag_direct_taint =
+    tag (Ok Direct) "direct_taint" "Tainted (direct)"
+      "Direct taint"
       "this property is related to a memory location that can be affected \
        by an attacker"
 
-  let tag_control_tainted =
-    tag (Ok Control) "control_tainted" "Tainted (control)"
-      "Control tainted"
+  let tag_indirect_taint =
+    tag (Ok Indirect) "indirect_taint" "Tainted (indirect)"
+      "Indirect taint"
       "this property is related to a memory location whose assignment depends \
        on path conditions that can be affected by an attacker"
 
   let tag_untainted =
-    tag (Ok None) "not_tainted" "Untainted"
+    tag (Ok Untainted) "not_tainted" "Untainted"
       "Untainted property" "this property is safe"
 
   let () = Enum.set_lookup dictionary
       begin function
-        | Error Taint_domain.NotComputed -> tag_not_computed
-        | Error Taint_domain.Irrelevant -> tag_not_applicable
-        | Error Taint_domain.LogicError -> tag_error
-        | Ok Data -> tag_data_tainted
-        | Ok Control -> tag_control_tainted
-        | Ok None -> tag_untainted
+        | Error NotComputed -> tag_not_computed
+        | Error Irrelevant -> tag_not_applicable
+        | Error LogicError -> tag_error
+        | Ok Direct -> tag_direct_taint
+        | Ok Indirect -> tag_indirect_taint
+        | Ok Untainted -> tag_untainted
       end
 
   let data = Request.dictionary ~package ~name:"taintStatus"
       ~descr:(Markdown.plain "Taint status of logical properties") dictionary
 
-  include (val data : S with type t = taint_result)
-end
+  include (val data : S with type t = (taint, error) result)
 
+  let zone_of_predicate kinstr predicate =
+    let state = Results.(before_kinstr kinstr |> get_cvalue_model) in
+    let env = Eval_terms.env_only_here state in
+    let logic_deps = Eval_terms.predicate_deps env predicate in
+    match Option.map Cil_datatype.Logic_label.Map.bindings logic_deps with
+    | Some [ BuiltinLabel Here, zone ] -> Ok zone
+    | _ -> Error LogicError
+
+  let get_predicate = function
+    | Property.IPCodeAnnot ica ->
+      begin
+        match ica.ica_ca.annot_content with
+        | AAssert (_, predicate) | AInvariant (_, _, predicate) ->
+          Ok predicate.tp_statement
+        | _ -> Error Irrelevant
+      end
+    | IPPropertyInstance { ii_pred = None } -> Error LogicError
+    | IPPropertyInstance { ii_pred = Some ip } -> Ok ip.ip_content.tp_statement
+    | _ -> Error Irrelevant
+
+  let is_tainted_property ip =
+    if not (Analysis.is_computed () && Taint_domain.Store.is_computed ())
+    then Error NotComputed
+    else
+      let (let+) = Result.bind in
+      let kinstr = Property.get_kinstr ip in
+      let+ predicate = get_predicate ip in
+      let+ zone = zone_of_predicate kinstr predicate in
+      let result = Results.(before_kinstr kinstr |> is_tainted zone) in
+      Result.map_error (fun _ -> NotComputed) result
+end
 
 let model = States.model ()
 
@@ -265,7 +359,7 @@ let () = States.column model ~name:"taint"
     ~descr:(Markdown.plain "Is the property tainted according to \
                             the Eva taint domain?")
     ~data:(module Taint)
-    ~get:(fun ip -> Taint_domain.is_tainted_property ip)
+    ~get:(fun ip -> Taint.is_tainted_property ip)
 
 let _array =
   States.register_array

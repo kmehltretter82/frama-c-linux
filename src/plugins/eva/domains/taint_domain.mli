@@ -28,25 +28,9 @@ include Abstract_domain.Leaf
 
 val flag: Abstractions.flag
 
-type taint_error =
-  | NotComputed (** The Eva analysis has not been run, or the taint domain
-                    was not enabled. *)
-  | Irrelevant  (** Properties other than assertions, invariants and
-                    preconditions are irrelevant here. *)
-  | LogicError  (** The memory zone on which the property depends could not
-                    be computed. *)
+type taint = | Direct | Indirect | Untainted
 
-type taint_ok =
-  | Data    (** Data-taint: there is a data dependency from the values provided
-                by the attacker to the given property, meaning that the attacker
-                may alter the values on which the property depends. *)
-  | Control (** Control-taint: there is a control-dependency from the values
-                provided by the attacker to the given property. The attacker
-                cannot directly alter the values on which the property depends,
-                but he may be able to choose the path where these values are
-                computed. *)
-  | None    (** No taint: the property cannot be altered by the attacker. *)
-
-type taint_result = (taint_ok, taint_error) result
-
-val is_tainted_property: Property.t -> taint_result
+(** Is a memory zone tainted according to a given state? 
+    If [indirect] is provided, return an [Indirect] taint if [indirect] is
+    tainted (either directly or indirectly). *)
+val is_tainted: state -> ?indirect:Locations.Zone.t -> Locations.Zone.t -> taint
