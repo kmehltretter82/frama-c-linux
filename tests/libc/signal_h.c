@@ -1,8 +1,8 @@
 /* run.config
    STDOPT: #"-eva-slevel 2"
 */
+#include <errno.h>
 #include <signal.h>
-
 volatile int nondet;
 
 int main() {
@@ -53,6 +53,13 @@ int main() {
   }
 
   //@ assert valid_nsig: NSIG >= 0;
+
+  if (nondet) {
+    errno = 0;
+    int r = sigsuspend(&s);
+    //@ assert sigsuspend_errno_eintr: errno == EINTR;
+    //@ assert sigsuspend_return: r == -1;
+  }
 
   return 0;
 }

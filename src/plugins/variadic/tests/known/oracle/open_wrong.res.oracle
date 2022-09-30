@@ -1,7 +1,7 @@
-[variadic] FRAMAC_SHARE/libc/fcntl.h:121: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:128: 
   Declaration of variadic function fcntl.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:124: Declaration of variadic function open.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:131: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:131: Declaration of variadic function open.
+[variadic] FRAMAC_SHARE/libc/fcntl.h:138: 
   Declaration of variadic function openat.
 [variadic:prototype] open_wrong.c:13: Warning: 
   No matching prototype found for this call to open.
