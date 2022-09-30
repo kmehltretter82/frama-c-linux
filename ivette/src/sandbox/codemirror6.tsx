@@ -1,8 +1,12 @@
 import React from 'react';
+import { cpp } from '@codemirror/lang-cpp';
 import { DOMEventHandlers } from '@codemirror/view';
 import { EditorState, Extension, RangeSet } from '@codemirror/state';
 import { EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
 import { Decoration, DecorationSet, drawSelection } from '@codemirror/view';
+
+import { tags } from '@lezer/highlight';
+import { syntaxHighlighting, HighlightStyle } from '@codemirror/language';
 
 import { deadCode, getDeadCode } from 'frama-c/plugins/eva/api/general';
 import * as Server from 'frama-c/server';
@@ -317,6 +321,20 @@ const DeadCodePlugin: Plugin<DeadCodeInit, DeadCodeState> = {
 
 
 // -----------------------------------------------------------------------------
+//  Code highlighting
+// -----------------------------------------------------------------------------
+
+const HighlightPlugin = syntaxHighlighting(HighlightStyle.define([
+  { tag: tags.comment, class: 'cm-comment' },
+  { tag: tags.typeName, class: 'cm-type' },
+  { tag: tags.number, class: 'cm-number' },
+  { tag: tags.controlKeyword, class: 'cm-keyword' },
+  { tag: tags.definition(tags.variableName) , class: 'cm-def' },
+]));
+
+
+
+// -----------------------------------------------------------------------------
 //  AST View component
 // -----------------------------------------------------------------------------
 
@@ -325,8 +343,7 @@ function Editor(): JSX.Element {
   // Necessary extensions for our needs
   const [baseExtensions] = React.useState<Extension[]>(() => {
     const multipleSelections = EditorState.allowMultipleSelections.of(true);
-    const drawSelectionExt = drawSelection();
-    return [multipleSelections, drawSelectionExt];
+    return [ drawSelection(), multipleSelections, HighlightPlugin, cpp() ];
   });
 
   // Creating the codemirror vue and binding it to the editor div

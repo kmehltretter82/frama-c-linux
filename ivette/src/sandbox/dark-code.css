@@ -5,8 +5,8 @@
 }
 
 .cm-editor {
-  background-color: #1e2b3d;
-  color: var(--text-discrete);
+  background-color: var(--background-report);
+  color: var(--text);
   height: 100%;
   width: 100%;
   overflow: hidden;
@@ -31,3 +31,9 @@
 .cm-non-term-code {
   color: var(--dead-code);
 }
+
+.cm-comment { color: var(--info-text); }
+.cm-type { color: #bacd5f; }
+.cm-number { color: #d3869b; }
+.cm-keyword { color: #d84954; }
+.cm-def { color: #0000ff; }
