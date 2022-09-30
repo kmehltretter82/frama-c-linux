@@ -24,8 +24,6 @@
 # Script for profiling Frama-C with callgrind (a valgrind tool).
 # Note: execution time with valgrind is about 15x-20x slower.
 #
-# Use this script at the root of the repository, so local_export.sh can be found
-# in bin.
 # For more focused results, you can activate the profiling only after entering
 # a specific function. For instance, to only profile Eva, add
 #
@@ -42,11 +40,7 @@
 #
 #   kcachegrind callgrind.out
 
-BASH_ARGV0="bin/frama-c" # hackish way to tell local_export that its dir is bin
-
-. bin/local_export.sh
-
-valgrind \
+dune exec -- valgrind \
   --tool=callgrind --callgrind-out-file=callgrind.out --dump-instr=yes \
   --separate-callers=2 --collect-jumps=yes --fn-skip='caml_*' \
-  $BINDIR/toplevel.opt "$@"
+  frama-c "$@"
