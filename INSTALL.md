@@ -320,13 +320,13 @@ Arch Linux: `pikaur -S frama-c`
 
 2. On Linux-like distributions:
 
-        ./configure && make && sudo make install
+        ./make RELEASE=yes && make install
 
     See section *Configuration* below for options.
 
 3. On Windows+Cygwin:
 
-        ./configure --prefix="$(cygpath -a -m <installation path>)" && make && make install
+        ./make RELEASE=yes && make install
 
 4. The binary `frama-c` (and `frama-c-gui` if you have lablgtk2) is now installed.
 
@@ -350,26 +350,48 @@ root source folder):
 
 #### Compilation
 
-Type `make` (you can use `-j` for parallelization).
+There are basically two compilation modes: development and release.
 
-Some Makefile targets of interest are:
-- `doc`      generates the API documentation.
-- `tests`    performs Frama-C's own tests.
+Typing `make` builds in development mode, this is a shortcut for:
+```
+dune build @install
+```
 
+Typing `make RELEASE=yes` builds in release mode, this is shortcut for:
+```
+dune build @install --release --promote-install-files=false
+```
+
+For more precise build configuration, use directly the `dune` command.
+
+#### Testing
+
+Basic tests can be executed using:
+
+```
+make run-ptests
+dune build @ptests_config
+```
 
 #### Installation
 
-Type `make install`
-(depending on the installation directory, this may require superuser
-privileges. The installation directory is chosen through `--prefix`).
+Type `make install` (depending on the installation directory, this may require
+superuser privileges. The installation directory is chosen through the variable
+`INSTALLDIR`). This is a shortcut for:
 
+```
+dune install
+```
 
 #### API Documentation
 
 For plugin developers, the API documentation of the Frama-C kernel and
-distributed plugins is available in the file `frama-c-api.tar.gz`, after running
-`make doc-distrib`.
+distributed plugins is available in the `_build/default/_doc/_html` directory
+after running:
 
+```
+dune build @doc
+```
 
 #### Uninstallation
 
@@ -409,9 +431,9 @@ available:
 - `frama-c`
 - `frama-c-gui`       if available
 - `frama-c-config`    lightweight wrapper used to display configuration paths
-- `frama-c.byte`      bytecode version of frama-c
-- `frama-c-gui.byte`  bytecode version of frama-c-gui, if available
-- `ptests.opt`        testing tool for Frama-c
+- `frama-c-hdrck`     header checking tool for Frama-C
+- `frama-c-ptests`    testing tool for Frama-c
+- `frama-c-wtests`    testing tool for Frama-c
 - `frama-c-script`    utilities related to analysis parametrization
 
 ## Shared files: (in `/INSTALL_DIR/share/frama-c` and subdirectories)
@@ -424,10 +446,6 @@ available:
   Emacs settings, scripts for running Eva, ...)
 - an annotated C standard library (with ACSL annotations) in `libc`
 - plugin-specific files (in directories `wp`, `e-acsl`, etc.)
-
-## Documentation files: (in `/INSTALL_DIR/share/frama-c/doc`)
-
-- files used to generate dynamic plugin documentation
 
 ## Object files: (in `/INSTALL_DIR/lib/frama-c`)
 
@@ -448,7 +466,7 @@ Plugins may be released independently of Frama-C.
 
 The standard way for installing them should be:
 
-    ./configure && make && make install
+    dune build @install && dune install
 
 Plugins may have their own custom installation procedures.
 Consult their specific documentation for details.

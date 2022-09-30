@@ -34,7 +34,7 @@ DUNE_BUILD_OPTS?=
 
 RELEASE?=no
 ifeq ($(RELEASE),yes)
-DUNE_BUILD_OPTS+=--release
+DUNE_BUILD_OPTS+=--release --promote-install-files=false
 endif
 
 # DUNE_DISPLAY: chose Dune build verbosity (see '--display' dune option)
