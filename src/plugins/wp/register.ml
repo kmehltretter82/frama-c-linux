@@ -308,6 +308,7 @@ let do_report_stats ~shell ~cache ~smoke goal (stats : Stats.stats) =
       | Invalid -> "[Passed] (Invalid)"
     else
       match stats.verdict with
+      | NoResult when shell -> "[CacheMiss]"
       | NoResult | Computing _ -> ""
       | Valid -> "[Valid]"
       | Invalid -> "[Invalid]"
