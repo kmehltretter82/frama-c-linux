@@ -62,3 +62,11 @@ void fp(void (*pf)(unsigned), unsigned n){
     //@ calls function ;
     (*pf)(n-1) ;
 }
+
+///// Recursion terminates because unreachable
+
+//@ terminates n > 0 ;
+void no_decr_ok_term(int n){
+  if(n <= 0)
+    no_decr_ok_term(n); // unreachable when termination condition is true
+}

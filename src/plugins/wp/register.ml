@@ -713,7 +713,7 @@ let dkey_builtins = Wp_parameters.register_category "builtins"
 let cmdline_run () =
   begin
     if Wp_parameters.CachePrint.get () then
-      Kernel.feedback "Cache directory: %s" (Cache.get_dir ()) ;
+      Wp_parameters.feedback "Cache directory: %s" (Cache.get_dir ()) ;
     let fct = Wp_parameters.get_fct () in
     if fct <> Wp_parameters.Fct_none then
       begin
