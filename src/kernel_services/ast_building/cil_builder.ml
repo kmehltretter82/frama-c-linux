@@ -1132,7 +1132,7 @@ struct
     reset_owner ();
     match !stack with
     | [] -> raise (WrongContext "not in an opened context")
-    | [b] -> b
+    | [b] -> stack := []; b
     | _ :: _ :: _ -> raise (WrongContext "all contextes have not been closed")
 
   let append_stmt b s =
