@@ -287,7 +287,7 @@ end
 
 (* --- Stateful builder --- *)
 
-exception WrongContext of string
+exception BuildError of string
 
 module Stateful () :
 sig

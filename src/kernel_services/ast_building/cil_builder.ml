@@ -22,6 +22,11 @@
 
 let unknown_loc = Cil_datatype.Location.unknown
 
+exception BuildError of string
+
+let error format =
+  Format.kasprintf (fun s -> raise (BuildError s)) format
+
 
 (* --- Types --- *)
 
@@ -982,8 +987,6 @@ end
 
 let dkey = Kernel.register_category "cil-builder"
 
-exception WrongContext of string
-
 module Stateful () =
 struct
   include Exp
@@ -1015,7 +1018,7 @@ struct
   let build_instr_list l =
     let rev_build_one acc = function
       | Label _ | CilStmt _ | CilStmtkind _ ->
-        raise (WrongContext "not convertible to instr")
+        error "the statement is not an instruction"
       | CilInstr instr -> instr :: acc
     in
     List.fold_left rev_build_one [] l
@@ -1064,7 +1067,7 @@ struct
       let case_stmts = List.filter contains_case block.bstmts in
       Cil_types.Switch (switch_exp, block, case_stmts , b.loc)
     | Function _ ->
-      raise (WrongContext "not convertible to stmtkind")
+      error "the function block is not convertible to Cil_types.stmtkind"
 
 
   (* State management *)
@@ -1076,12 +1079,12 @@ struct
 
   let set_owner o =
     if Option.is_some !owner then
-      raise (WrongContext "already in a function");
+      error "already in a function context";
     owner := Some o
 
   let get_owner () =
     match !owner with
-    | None -> raise (WrongContext "function context not set")
+    | None -> error "function context not set"
     | Some fundec -> fundec
 
 
@@ -1101,15 +1104,15 @@ struct
 
   let check_empty () =
     if !stack <> [] then
-      raise (WrongContext "some contextes have not been closed")
+      error "some contextes have not been closed: %t" pretty_stack !stack
 
   let check_not_empty () =
     if !stack = [] then
-      raise (WrongContext "only a finish_* function can close all contextes")
+      error "only a finish_* function can close all contextes"
 
   let top () =
     match !stack with
-    | [] -> raise (WrongContext "not in an opened context")
+    | [] -> error "not in an opened context"
     | state :: _ -> state
 
   let push state =
@@ -1123,7 +1126,7 @@ struct
   let pop () =
     Kernel.debug ~dkey "pop from %t" pretty_stack;
     match !stack with
-    | [] -> raise (WrongContext "not in an opened context")
+    | [] -> error "not in an opened context"
     | hd :: tail ->
       stack := tail;
       hd
@@ -1131,9 +1134,9 @@ struct
   let finish () =
     reset_owner ();
     match !stack with
-    | [] -> raise (WrongContext "not in an opened context")
+    | [] -> error "not in an opened context"
     | [b] -> stack := []; b
-    | _ :: _ :: _ -> raise (WrongContext "all contextes have not been closed")
+    | _ :: _ :: _ -> error "all contextes have not been closed"
 
   let append_stmt b s =
     b.stmts <- s :: b.stmts
@@ -1188,17 +1191,17 @@ struct
   let extract_ifthen_block b =
     match b.scope_type with
     | IfThen {ifthen_exp} -> ifthen_exp
-    | _ -> raise (WrongContext "not in an opened if-then-else context")
+    | _ -> error "not in an opened if-then-else context"
 
   let extract_switch_block b =
     match b.scope_type with
     | Switch {switch_exp} -> switch_exp
-    | _ -> raise (WrongContext "not in a opened switch context")
+    | _ -> error "not in a opened switch context"
 
   let extract_function_block b =
     match b.scope_type with
     | Function {fundec} -> fundec
-    | _ -> raise (WrongContext "not in a opened function context")
+    | _ -> error "not in a opened function context"
 
   let open_function ?(loc=current_loc ()) ?ghost ?vorig_name name =
     check_empty ();
@@ -1242,7 +1245,7 @@ struct
     let b = finish () in
     match build_stmtkind b with
     | Cil_types.Block b -> b
-    | _ -> raise (WrongContext "not in an opened simple block context")
+    | _ -> error "not in an opened simple block context"
 
   let finish_instr_list ?scope () =
     let b = finish () in
@@ -1251,7 +1254,7 @@ struct
       | Some block, vars ->
         block.Cil_types.blocals <- List.rev vars @ block.Cil_types.blocals
       | None, _ :: _ ->
-        raise (WrongContext "a scope must be provided to insert local variables")
+        error "a scope must be provided to insert local variables"
     end;
     build_instr_list b.stmts
 
@@ -1281,7 +1284,7 @@ struct
     let open Cil_types in
     let vi = fundec.svar and spec = fundec.sspec in
     if b.stmts <> [] then
-      raise (WrongContext "there must not be any built statements");
+      error "there must not be any built statements";
     vi.vdefined <- false;
     vi.vghost <- b.ghost;
     if register then begin
