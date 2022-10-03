@@ -168,6 +168,7 @@ ifneq ($(LINT.HAS_GIT),true)
 lint:
 	echo "'make lint' requires a git repository but, that is not"
 	echo "the case for example with 'make LINT_FILE=<file> check-syntax'"
+	git rev-parse --is-inside-work-tree
 
 else
 
@@ -204,6 +205,8 @@ ifeq ($(LINT_FILE),) ############# No lint file given
 
 ######## LINT_DIR filter
 LINT.dir=$(wildcard $(LINT_DIR))
+
+ifeq ($(LINT.HAS_GIT),true)  ############# For Git repository
 
 ######## LINT_DIFF filter
 
@@ -314,6 +317,7 @@ $(LINT.fix-targets):
         | $(LINT.FILTER_FILE_ATTR) \
         | $(XARGS) -0 -IXX sh -c '$(LINT.make) LINT_FILE="XX" $@ || exit 255'
 
+endif ############  For Git repository
 
 else #############  LINT_FILE are given
 
