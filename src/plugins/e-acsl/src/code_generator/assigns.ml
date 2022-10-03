@@ -72,8 +72,8 @@ let rec get_assigns_from ~loc env lprofile lv =
     else if lvar.lv_type = Linteger then
       (deref_gmp_arg ~loc var) :: (get_assigns_from ~loc env lvars lv)
     else begin
-      Options.warning ~current:true "skipping function %a when generating\
-                                     assigns because pointers as arguments\
+      Options.warning ~current:true "no assigns clause generated for \
+                                     function %a because pointers as arguments \
                                      is not yet supported"
         Printer.pp_logic_var lv;
       raise NoAssigns
