@@ -609,7 +609,8 @@ type execnow =
     ex_bin: string list; (** bin files *)
     ex_dir: SubDir.t;    (** directory of test suite *)
     ex_timeout: string;
-    ex_deps: deps
+    ex_deps: deps;
+    ex_exit_code: string option
   }
 
 
@@ -742,7 +743,7 @@ end = struct
       dc_timeout = "";
     }
 
-  let scan_execnow ~file ~once dir ex_timeout ex_deps (s:string) =
+  let scan_execnow ~file ~once dir ex_exit_code ex_timeout ex_deps (s:string) =
     if once=false then
       Format.eprintf "%s: using EXEC directive (DEPRECATED): %s@."
         file s;
@@ -775,6 +776,7 @@ end = struct
           ex_dir = dir;
           ex_deps;
           ex_timeout;
+          ex_exit_code;
         }
     in
     if execnow.ex_log = [] && execnow.ex_bin = [] then
@@ -824,7 +826,10 @@ end = struct
     let s = Macros.expand ~file current.dc_macros s in
     { current with
       dc_execnow =
-        scan_execnow ~file ~once dir current.dc_timeout (deps_of_config current) s :: current.dc_execnow }
+        scan_execnow ~file ~once dir
+          current.dc_exit_code current.dc_timeout (deps_of_config current)
+          s :: current.dc_execnow
+    }
 
   let split_list =
     (* considers blanks (not preceded by '\'), tabs and commas as separators *)
@@ -1394,6 +1399,17 @@ let subtest_alias_prefix cmd =
     cmd.nth
     (if cmd.execnow then "execnow" else "exec")
 
+let get_exit_code ~file = function
+  | None -> 0
+  | Some exit_code ->
+    try int_of_string exit_code with
+    | _ ->
+      Format.eprintf "@[%s: integer required for directive EXIT: %s (defaults to 0)@]@." file exit_code ;
+      0
+
+let pp_accepted_exit_code fmt cmd =
+  Format.fprintf fmt "with-accepted-exit-codes %d" cmd.exit_code
+
 let command_string ~env ~result_fmt ~oracle_fmt command =
   let log_prefix = log_prefix ~env command in
   let reslog = log_prefix ^ ".res.log" in
@@ -1402,7 +1418,6 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     | None -> reslog,errlog
     | Some _ -> (log_prefix ^ ".res.unfiltered-log"),(log_prefix ^ ".err.unfiltered-log")
   in
-  let accepted_exit_code = Format.sprintf "with-accepted-exit-codes %d" command.exit_code in
   let command_string = basic_command_string command in
   let filter_res,filter_err,wtest =
     match command.filter with
@@ -1490,7 +1505,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
        (targets %S %S %a %a)\n  \
        (deps   %a)\n  \
        %a\n\
-       (action (with-stderr-to %S (with-stdout-to %S (%s (system %S)))))\n\
+       (action (with-stderr-to %S (with-stdout-to %S (%a (system %S)))))\n\
        )@."
       (* rule: *)
       wtest.info
@@ -1508,7 +1523,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
       (* action: *)
       cmderrlog
       cmdreslog
-      accepted_exit_code
+      pp_accepted_exit_code command
       command_string
   end;
   let filter_rule txt fin fout cmd =
@@ -1554,7 +1569,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
      (alias %S)\n  \
      (deps  %a (universe))\n  \
      %a\n\
-     (action (%s (system %S)))\n\
+     (action (%a (system %S)))\n\
      )@."
     (* rule: *)
     command.nth command.file
@@ -1565,7 +1580,7 @@ let command_string ~env ~result_fmt ~oracle_fmt command =
     (* enabled_if: *)
     pp_enabled_if command.deps
     (* action: *)
-    accepted_exit_code
+    pp_accepted_exit_code command
     command_string
   ;
   Format.fprintf result_fmt
@@ -1688,13 +1703,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             macros; log_files; bin_files;
             filter = (* from a global directive applyed to all OPT tests  *)
               (match config.dc_filter with None -> None | Some s -> Some (Macros.expand ~file macros s));
-            exit_code = begin
-              match exit_code with
-              | None -> 0
-              | Some exit_code ->
-                try int_of_string exit_code with
-                | _ -> Format.eprintf "@[%s: integer required for directive EXIT: %s (defaults to 0)@]@." file exit_code ; 0
-            end;
+            exit_code = get_exit_code ~file exit_code;
             execnow=false;
             deps;
           }
@@ -1716,7 +1725,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             bin_files = [];
             options = "";
             toplevel = execnow.ex_cmd;
-            exit_code = 0;
+            exit_code = get_exit_code ~file execnow.ex_exit_code;
             timeout=execnow.ex_timeout;
             macros;
             filter = None; (* no FILTER applied to EXECNOW LOG *)
@@ -1731,6 +1740,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
               info = Format.sprintf "EXECNOW #%d OF TEST FILE %s/%s"
                   nth (SubDir.get directory) file;
               cmd = cmd_string;
+              ret_code = cmd.exit_code;
               log = Macros.expand_list ~file cmd.macros execnow.ex_log;
               bin = Macros.expand_list ~file cmd.macros execnow.ex_bin;
             }
@@ -1748,7 +1758,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
              (deps %a %a)\n  \
              (targets %a %a)\n  \
              %a\n\
-             (action (run %s %%{dep:%s} %S))\n\
+             (action (%a (run %s %%{dep:%s} %S)))\n\
              )@."
             (* rule: *)
             wtest.info
@@ -1763,6 +1773,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             (* enabled_if: *)
             pp_enabled_if cmd.deps
             (* action: *)
+            pp_accepted_exit_code cmd
             !wrapper_cmd
             wrapper_basename
             wtest.cmd;
@@ -1782,7 +1793,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
              (deps (package frama-c)%a)\n  \
              (targets %a %a)\n  \
              %a\n\
-             (action (system %S))\n\
+             (action (%a (system %S)))\n\
              )@."
             (* rule: *)
             wtest.info
@@ -1796,6 +1807,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             (* enabled_if: *)
             pp_enabled_if cmd.deps
             (* action: *)
+            pp_accepted_exit_code cmd
             wtest.cmd
         end;
         let oracle_subdir = SubDir.oracle_subdir ~env cmd.directory in
