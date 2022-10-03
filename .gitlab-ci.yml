@@ -339,11 +339,15 @@ opam-pin:
       - $RELEASE == "yes"
   when: manual
 
-opam-pin-automatic:
+opam-pin-nightly:
   <<: *opam_pin_template
   only:
     refs:
       - schedules
+
+opam-pin-release:
+  <<: *opam_pin_template
+  only:
     variables:
       - $RELEASE == "yes"
 
