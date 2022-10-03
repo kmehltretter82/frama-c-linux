@@ -77,12 +77,13 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
   match p.pred_content with
   | Pfalse -> Cil.zero ~loc, adata, env
   | Ptrue -> Cil.one ~loc, adata, env
-  | Papp (_, _::_,_) -> Env.not_yet env "predicates with labels"
-  | Papp (li, [], args) ->
+  | Papp (li, [], args)
+  | Papp (li, [BuiltinLabel Here], args) ->
     let e, adata, env =
       Logic_functions.app_to_exp ~adata ~loc kf env li args in
     let adata = Assert.register_pred ~loc env p e adata in
     e, adata, env
+  | Papp (_, _::_,_) -> Env.not_yet env "predicates with labels"
   | Pdangling _ -> Env.not_yet env "\\dangling"
   | Pobject_pointer _ -> Env.not_yet env "\\object_pointer"
   | Pvalid_function _ -> Env.not_yet env "\\valid_function"

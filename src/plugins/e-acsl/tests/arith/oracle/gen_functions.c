@@ -83,10 +83,14 @@ int glob = 5;
  */
 double __gen_e_acsl_f2(double x);
 
-/*@ predicate p_notyet{L}(integer x) = x > 0;
+/*@ predicate p_here{L}(integer x) = x > 0;
  */
-/*@ logic integer f_notyet{L}(integer x) = x;
+int __gen_e_acsl_p_here(int x);
+
+/*@ logic integer f_here{L}(integer x) = x;
  */
+int __gen_e_acsl_f_here(int x);
+
 /*@ logic integer f_sum(integer x) = \sum(1, x, \lambda integer y; 1);
  */
 int __gen_e_acsl_f_sum(int x);
@@ -434,6 +438,41 @@ int main(void)
     __gmpq_clear(__gen_e_acsl__11);
   }
   /*@ assert over(1., 2.) == 0.5; */ ;
+  {
+    int __gen_e_acsl_p_here_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
+      {.values = (void *)0};
+    __gen_e_acsl_p_here_2 = __gen_e_acsl_p_here(27);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"p_here(27)",
+                                 0,__gen_e_acsl_p_here_2);
+    __gen_e_acsl_assert_data_16.blocking = 1;
+    __gen_e_acsl_assert_data_16.kind = "Assertion";
+    __gen_e_acsl_assert_data_16.pred_txt = "p_here(27)";
+    __gen_e_acsl_assert_data_16.file = "functions.c";
+    __gen_e_acsl_assert_data_16.fct = "main";
+    __gen_e_acsl_assert_data_16.line = 86;
+    __e_acsl_assert(__gen_e_acsl_p_here_2,& __gen_e_acsl_assert_data_16);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_16);
+  }
+  /*@ assert p_here(27); */ ;
+  {
+    int __gen_e_acsl_f_here_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
+      {.values = (void *)0};
+    __gen_e_acsl_f_here_2 = __gen_e_acsl_f_here(27);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,"f_here(27)",
+                                 0,__gen_e_acsl_f_here_2);
+    __gen_e_acsl_assert_data_17.blocking = 1;
+    __gen_e_acsl_assert_data_17.kind = "Assertion";
+    __gen_e_acsl_assert_data_17.pred_txt = "f_here(27) == 27";
+    __gen_e_acsl_assert_data_17.file = "functions.c";
+    __gen_e_acsl_assert_data_17.fct = "main";
+    __gen_e_acsl_assert_data_17.line = 87;
+    __e_acsl_assert(__gen_e_acsl_f_here_2 == 27,
+                    & __gen_e_acsl_assert_data_17);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_17);
+  }
+  /*@ assert f_here(27) == 27; */ ;
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;
@@ -636,6 +675,21 @@ double __gen_e_acsl_f2(double x)
   __gmpq_clear(__gen_e_acsl_div);
   /*@ assert Eva: is_nan_or_infinite: \is_finite(__gen_e_acsl__9); */
   return __gen_e_acsl__9;
+}
+
+/*@ assigns \result;
+    assigns \result \from x; */
+int __gen_e_acsl_p_here(int x)
+{
+  int __retres = x > 0;
+  return __retres;
+}
+
+/*@ assigns \result;
+    assigns \result \from x; */
+int __gen_e_acsl_f_here(int x)
+{
+  return x;
 }
 
 /*@ assigns \result;

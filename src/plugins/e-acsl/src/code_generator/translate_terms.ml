@@ -765,7 +765,8 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
   | Tapp(li, _, _)
     when li.l_body = LBnone && li.l_var_info.lv_name = "\\numof" ->
     assert false
-  | Tapp(li, [], args) ->
+  | Tapp(li, [], args)
+  | Tapp(li, [BuiltinLabel Here], args) ->
     let e, adata, env =
       Logic_functions.app_to_exp ~adata ~loc ~tapp:t kf env li args in
     let adata = Assert.register_term ~loc t e adata in
