@@ -1,22 +1,30 @@
 import React from 'react';
+import * as Dictionary from 'lodash';
 import { cpp } from '@codemirror/lang-cpp';
-import { DOMEventHandlers } from '@codemirror/view';
 import { EditorState, Extension, RangeSet } from '@codemirror/state';
 import { EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
+import { DOMEventHandlers, GutterMarker, gutter } from '@codemirror/view';
 import { Decoration, DecorationSet, drawSelection } from '@codemirror/view';
 
 import { tags } from '@lezer/highlight';
 import { syntaxHighlighting, HighlightStyle } from '@codemirror/language';
 
-import { deadCode, getDeadCode } from 'frama-c/plugins/eva/api/general';
+import * as Dome from 'dome';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
+import type { key } from 'dome/data/json';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { text } from 'frama-c/kernel/api/data';
+import { CompactModel } from 'dome/table/arrays';
+import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as Properties from 'frama-c/kernel/api/properties';
+import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
 
 import { registerSandbox } from 'ivette';
 
 import './dark-code.css';
+
+const Debug = new Dome.Debug('AST View');
 
 
 
@@ -280,7 +288,7 @@ interface DeadCodeState {
 // Data needed for the plugin initialization. The <deadCode> field contains
 // all the relevant unreachable and non terminating markers. During the plugin
 // initialization, they are converted to ranges using the <ranges> field.
-interface DeadCodeInit { deadCode: deadCode, ranges: Map<string, Range> }
+interface DeadCodeInit { deadCode: Eva.deadCode, ranges: Map<string, Range> }
 
 // Plugin declaration.
 const DeadCodePlugin: Plugin<DeadCodeInit, DeadCodeState> = {
@@ -321,6 +329,196 @@ const DeadCodePlugin: Plugin<DeadCodeInit, DeadCodeState> = {
 
 
 // -----------------------------------------------------------------------------
+//  Property bullets extension
+// -----------------------------------------------------------------------------
+
+// Bullet colors.
+function getBulletColor(status: States.Tag): string {
+  switch (status.name) {
+    case 'unknown': return '#FF8300';
+    case 'invalid':
+    case 'invalid_under_hyp': return '#FF0000';
+    case 'valid':
+    case 'valid_under_hyp': return '#00B900';
+    case 'considered_valid': return '#73bbbb';
+    case 'invalid_but_dead':
+    case 'valid_but_dead':
+    case 'unknown_but_dead': return '#000000';
+    case 'never_tried': return '#FFFFFF';
+    case 'inconsistent': return '#FF00FF';
+    default: return '#FF8300';
+  }
+}
+
+// Build the gutter marker depending on the tag.
+function makeBullet(status?: States.Tag): GutterMarker {
+  const marker = document.createElement('div');
+  marker.innerHTML = '◉'
+  if (status) {
+    marker.style.color = getBulletColor(status);
+    marker.style.textAlign = 'center';
+    if (status.descr) marker.title = status.descr;
+  }
+  return new class extends GutterMarker { toDOM() { return marker; } };
+}
+
+// Extension modifying the default gutter theme.
+const gutterTheme: Extension = EditorView.baseTheme({
+  '.cm-gutters': {
+    borderRight: '1px solid var(--code-bullet)',
+    width: '2.0em',
+    background: 'var(--background-report)',
+  }
+});
+
+// To compute the properties gutters, we need the properties statuses, the
+// map between markers and ranges and the map between markers and tags.
+interface PropertiesData {
+  statuses: Properties.statusData[],
+  ranges: Map<string, Range>,
+  statusDict: Map<string, States.Tag>,
+}
+
+// For each property, we retrieve the range and tag from the data. The extension
+// will afterward compute the corresponding line when asked by CodeMirror
+// and build the correct gutter. If necessary, we could filter the ranges
+// to avoid computations for invisible properties.
+function PropertiesExtension(props: PropertiesData): Extension {
+  const ranges: [Range, GutterMarker][] = [];
+  props.statuses.forEach((data) => {
+    const marker = props.ranges.get(data.key); if (!marker) return;
+    const tag = props.statusDict.get(data.status); if (!tag) return;
+    ranges.push([marker, makeBullet(tag)]);
+  });
+  return gutter({
+    class: 'cm-bullet',
+    initialSpacer: () => makeBullet(),
+    markers: (view) => RangeSet.of(ranges.map(([r, bullet]) => {
+      return bullet.range(view.lineBlockAt(r.from).from);
+    }))
+  });
+}
+
+
+
+// -----------------------------------------------------------------------------
+//  Studia access
+// -----------------------------------------------------------------------------
+
+type access = 'Reads' | 'Writes';
+
+interface StudiaProps {
+  marker: string,
+  info: Ast.markerInfoData,
+  kind: access,
+}
+
+interface StudiaInfos {
+  name: string,
+  title: string,
+  locations: { fct: key<'#fct'>, marker: Ast.marker }[],
+  index: number,
+}
+
+async function studia(props: StudiaProps): Promise<StudiaInfos> {
+  const { marker, info, kind } = props;
+  const request = kind === 'Reads' ? getReadsLval : getWritesLval;
+  const data = await Server.send(request, marker);
+  const locations = data.direct.map(([f, m]) => ({ fct: f, marker: m }));
+  const lval = info.name;
+  if (locations.length > 0) {
+    const name = `${kind} of ${lval}`;
+    const acc = (kind === 'Reads') ? 'accessing' : 'modifying';
+    const title =
+      `List of statements ${acc} the memory location pointed by ${lval}.`;
+    return { name, title, locations, index: 0 };
+  }
+  const name = `No ${kind.toLowerCase()} of ${lval}`;
+  return { name, title: '', locations: [], index: 0 };
+}
+
+
+
+// -----------------------------------------------------------------------------
+//  Function callers
+// -----------------------------------------------------------------------------
+
+type Caller = { fct: key<'#fct'>, marker: key<'#stmt'> };
+
+async function functionCallers(functionName: string): Promise<Caller[]> {
+  try {
+    const data = await Server.send(Eva.getCallers, functionName);
+    const locations = data.map(([fct, marker]) => ({ fct, marker }));
+    return locations;
+  } catch (err) {
+    Debug.error(`Fail to retrieve callers of function '${functionName}':`, err);
+    return [];
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
+//  Context menu plugin
+// -----------------------------------------------------------------------------
+
+interface ContextMenuState {
+  tree: Tree,
+  locations: Caller[],
+  markersInfo: CompactModel<string, Ast.markerInfoData>,
+  updateSelection: (a: States.SelectionActions) => void,
+}
+
+const ContextMenuPlugin: Plugin<ContextMenuState, ContextMenuState> = {
+  create: state => state,
+  eventHandlers: {
+    contextmenu: (state, event, view) => {
+      const coords = { x: event.clientX, y: event.clientY };
+      const position = view.posAtCoords(coords); if (!position) return state;
+      const node = coveringNode(state.tree, position);
+      if (!node || !node.id) return state;
+      const items: Dome.PopupMenuItem[] = [];
+      const info = state.markersInfo.getData(node.id);
+      if (info?.var === 'function') {
+        if (info.kind === 'declaration') {
+          const callers = Dictionary.groupBy(state.locations, e => e.fct);
+          Dictionary.forEach(callers, (e) => {
+            const callerName = e[0].fct;
+            const callSites = e.length > 1 ? `(${e.length} call sites)` : '';
+            items.push({
+              label: `Go to caller ${callerName} ` + callSites,
+              onClick: () => state.updateSelection({
+                name: `Call sites of function ${info.name}`,
+                locations: state.locations,
+                index: state.locations.findIndex(l => l.fct === callerName)
+              })
+            });
+          });
+        } else {
+          const location = { fct: info.name };
+          const onClick = (): void => state.updateSelection({ location });
+          const label = `Go to definition of ${info.name}`;
+          items.push({ label, onClick });
+        }
+      }
+      const enabled = info?.kind === 'lvalue' || info?.var === 'variable';
+      const onClick = (kind: access): void => {
+        if (info && node.id)
+          studia({ marker: node.id, info, kind }).then(state.updateSelection);
+      };
+      const reads = 'Studia: select reads';
+      const writes = 'Studia: select writes';
+      items.push({ label: reads, enabled, onClick: () => onClick('Reads') });
+      items.push({ label: writes, enabled, onClick: () => onClick('Writes') });
+      if (items.length > 0) Dome.popupMenu(items);
+      return state;
+    }
+  }
+}
+
+
+
+// -----------------------------------------------------------------------------
 //  Code highlighting
 // -----------------------------------------------------------------------------
 
@@ -340,13 +538,17 @@ const HighlightPlugin = syntaxHighlighting(HighlightStyle.define([
 
 function Editor(): JSX.Element {
 
-  // Necessary extensions for our needs
+  // Necessary extensions for our needs.
   const [baseExtensions] = React.useState<Extension[]>(() => {
     const multipleSelections = EditorState.allowMultipleSelections.of(true);
-    return [ drawSelection(), multipleSelections, HighlightPlugin, cpp() ];
+    return [
+      drawSelection(), multipleSelections,
+      HighlightPlugin, cpp(),
+      gutterTheme,
+    ];
   });
 
-  // Creating the codemirror vue and binding it to the editor div
+  // Creating the codemirror vue and binding it to the editor div.
   const parent = React.useRef(null);
   const editor = React.useRef<EditorView | null>(null);
   React.useEffect(() => {
@@ -355,23 +557,38 @@ function Editor(): JSX.Element {
     editor.current = new EditorView({ state, parent: parent.current });
   }, [parent, baseExtensions]);
 
-  // State infos used to decide which function to print
+  // State infos used to decide which function to print.
   const printed = React.useRef<string | undefined>();
-  const [selection] = States.useSelection();
+  const [selection, updateSelection] = States.useSelection();
   const fct = selection?.current?.fct;
 
-  // Callback function called when the focused function changes
+  // Sync arrays for properties and context menus.
+  const properties = States.useSyncArray(Properties.status).getArray();
+  const statusDict = States.useTags(Properties.propStatusTags);
+  const markersInfo = States.useSyncArray(Ast.markerInfo);
+
+  // Callback function called when the focused function changes.
   const focusCallback = React.useCallback(async () => {
     const view = editor.current; if (!view) return;
+
     const data = await extractCodeData(fct);
-    const deadCode = await Server.send(getDeadCode, fct);
     const code = buildExtension(data, CodeDecorationPlugin);
+
+    const deadCode = await Server.send(Eva.getDeadCode, fct);
     const dead = buildExtension({ deadCode, ...data }, DeadCodePlugin);
-    const extensions = baseExtensions.concat([code, dead]);
+
+    const locations = await functionCallers(fct ?? '');
+    const menuProps = { locations, markersInfo, updateSelection, ...data };
+    const menu = buildExtension(menuProps, ContextMenuPlugin);
+
+    const propertiesData = { statuses: properties, statusDict, ...data };
+    const propExt = PropertiesExtension(propertiesData);
+
+    const extensions = baseExtensions.concat([code, dead, menu, propExt]);
     const state = EditorState.create({ doc: data.code, extensions });
     printed.current = fct;
     view.setState(state);
-  }, [editor, fct, baseExtensions]);
+  }, [editor, fct, properties, baseExtensions]);
 
   // Update the component when the focused function changes.
   React.useEffect(() => {
