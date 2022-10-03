@@ -272,11 +272,12 @@ let generate_kf ~loc fname env ret_ty params_ty params_ival li =
 (**************************************************************************)
 (***************************** Memoization ********************************)
 (**************************************************************************)
+type fgen = (kernel_function, exn) result
 
 (* for each logic_info, associate its possible profiles, i.e. the types of its
    parameters + the generated varinfo for the function *)
 let memo_tbl:
-  kernel_function Profile.Hashtbl.t Logic_info.Hashtbl.t
+  fgen Profile.Hashtbl.t Logic_info.Hashtbl.t
   = Logic_info.Hashtbl.create 7
 
 let reset () = Logic_info.Hashtbl.clear memo_tbl
@@ -292,8 +293,10 @@ let add_generated_functions globals =
             predicate *)
          let params = Logic_info.Hashtbl.find memo_tbl li in
          let add_fundecl kf acc =
-           GFunDecl(Cil.empty_funspec (), Kernel_function.get_vi kf, loc)
-           :: acc
+           let nospec = Cil.empty_funspec () in
+           match kf with
+           | Ok kf -> GFunDecl(nospec, Kernel_function.get_vi kf, loc) :: acc
+           | Error _ -> acc (* Exception has already been signaled *)
          in
          aux
            (Profile.Hashtbl.fold_sorted
@@ -309,11 +312,13 @@ let add_generated_functions globals =
   let rev_globals = aux [] globals in
   (* add the definitions at the end of [globals] *)
   let add_fundec kf globals =
-    let fundec =
+    let get_fundec kf =
       try Kernel_function.get_definition kf
       with Kernel_function.No_Definition -> assert false
     in
-    GFun(fundec, Location.unknown) :: globals
+    match kf with
+    | Ok kf ->  GFun(get_fundec kf, Location.unknown) :: globals
+    | Error _ -> globals
   in
   let rev_globals =
     Logic_info.Hashtbl.fold_sorted
@@ -337,7 +342,7 @@ let function_to_exp ~loc ?tapp fname env kf li params_ty profile args =
   let gen tbl =
     let vi, kf, gen_body =
       generate_kf fname ~loc env ret_ty params_ty profile li in
-    Profile.Hashtbl.add tbl profile kf;
+    Profile.Hashtbl.add tbl profile (Ok kf);
     vi, gen_body
   in
   (* memoise the function's varinfo *)
@@ -346,6 +351,10 @@ let function_to_exp ~loc ?tapp fname env kf li params_ty profile args =
       let h = Logic_info.Hashtbl.find memo_tbl li in
       try
         let kf = Profile.Hashtbl.find h profile in
+        let kf = match kf with
+          | Ok kf -> kf
+          | Error exn -> raise exn
+        in
         Kernel_function.get_vi kf,
         (fun () -> ()) (* body generation already planified *)
       with Not_found -> gen h
@@ -500,7 +509,13 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
         let profile = Profile.make li.l_profile params_ival in
         let profile = Interval.get_widened_profile profile li in
         let vi, e, env =
-          function_to_exp ~loc ?tapp gen_fname env kf li params_ty profile args
+          try
+            function_to_exp ~loc ?tapp gen_fname env kf li params_ty profile args
+          with exn ->
+            (* Those accesses always succeed *)
+            let h = Logic_info.Hashtbl.find memo_tbl li in
+            Profile.Hashtbl.replace h profile (Error exn);
+            raise exn
         in
         vi, e, adata, env
       end
