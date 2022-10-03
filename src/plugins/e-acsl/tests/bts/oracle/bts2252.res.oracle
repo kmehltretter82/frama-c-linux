@@ -1,6 +1,8 @@
 [e-acsl] beginning translation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:379: Warning: 
-  E-ACSL construct `predicates with labels' is not yet supported.
+  no assigns clause generated for function valid_read_nstring because pointers as arguments is not yet supported
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:284: Warning: 
+  E-ACSL construct `labeled \valid_read' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:388: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'

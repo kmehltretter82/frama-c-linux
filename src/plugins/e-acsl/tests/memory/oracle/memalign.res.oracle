@@ -5,10 +5,12 @@
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:700: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:710: Warning: 
-  E-ACSL construct `predicates with labels' is not yet supported.
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:717: Warning: 
-  E-ACSL construct `predicates with labels' is not yet supported.
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:700: Warning: 
   Some assumes clauses could not be translated.
