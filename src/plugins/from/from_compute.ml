@@ -52,23 +52,24 @@ let compute_using_prototype_for_state state kf assigns =
         Eva.Logic_inout.assigns_inputs_to_zone state (Writes [out, ins])
       in
       let treat_assign acc (out, ins) =
-        try
-          let (output_loc_under, output_loc_over, _deps) =
-            !Db.Properties.Interp.loc_to_loc_under_over
-              ~result:None state out.it_content
-          in
+        let output =
+          Eva.Logic_inout.assigns_tlval_to_zones state Write out.it_content
+        in
+        match output with
+        | None ->
+          From_parameters.result
+            ~once:true ~current:true "Unable to extract assigns in %a"
+            Kernel_function.pretty kf;
+          acc
+        | Some output ->
           let input_zone = input_zone out ins in
           (* assign clauses do not let us specify address
              dependencies for now, so we assume it is all data
              dependencies *)
-          let input_deps =
-            Function_Froms.Deps.from_data_deps input_zone
-          in
+          let input_deps = Function_Froms.Deps.from_data_deps input_zone in
           (* Weak update of the over-approximation of the zones assigned *)
-          let acc = Function_Froms.Memory.add_binding_loc ~exact:false
-              acc output_loc_over input_deps in
-          let output_loc_under_zone = Locations.enumerate_valid_bits_under
-              Write output_loc_under in
+          let acc = Function_Froms.Memory.add_binding ~exact:false
+              acc output.over input_deps in
           (* Now, perform a strong update on the zones that are guaranteed
                    to be assigned (under-approximation) AND that do not depend
                    on themselves.
@@ -78,16 +79,12 @@ let compute_using_prototype_for_state state kf assigns =
                    zones is an exact operation. *)
           let sure_out_zone =
             Zone.(if equal top input_zone then bottom
-                  else diff output_loc_under_zone input_zone)
+                  else diff output.under input_zone)
           in
           let acc = Function_Froms.Memory.add_binding ~exact:true
               acc sure_out_zone input_deps in
           acc
-        with Db.Properties.Interp.No_conversion ->
-          From_parameters.result
-            ~once:true ~current:true "Unable to extract assigns in %a"
-            Kernel_function.pretty kf;
-          acc
+
       in
       let treat_ret_assign acc (out, from) =
         let zone_from = input_zone out from in
