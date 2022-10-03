@@ -19,14 +19,16 @@
   Missing terminates clause for simpl_r, populates 'terminates \true'
 [wp] clusters.i:15: Warning: 
   Missing terminates clause for simpl_rf, populates 'terminates \true'
-[wp] clusters.i:60: Warning: 
-  No 'decreases' clause on recursive function 'simpl_rf', cannot prove termination
-[wp] clusters.i:60: Warning: 
-  No 'decreases' clause on recursive function 'mutual_1', cannot prove termination
+[wp] clusters.i:16: Warning: 
+  Missing decreases clause on recursive function simpl_rf, call must be unreachable
+[wp] clusters.i:29: Warning: 
+  Missing decreases clause on recursive function mutual_1, call must be unreachable
 [wp] clusters.i:36: Warning: No decreases clause for mutual_1
-[wp] clusters.i:60: Warning: 
-  No 'decreases' clause on recursive function 'fp', cannot prove termination
+[wp] clusters.i:63: Warning: 
+  Missing decreases clause on recursive function fp, call must be unreachable
 [wp] clusters.i:55: Warning: No decreases clause for fp
+[wp] clusters.i:71: Warning: 
+  Missing decreases clause on recursive function no_decr_ok_term, call must be unreachable
 ------------------------------------------------------------
   Function caller_no_cluster
 ------------------------------------------------------------
@@ -44,13 +46,16 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Termination-condition (generated) in 'fp' (1/2):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Termination-condition (generated) in 'fp' (2/2):
-Call Result at line 64
+Goal Termination-condition (generated) in 'fp':
+Call Effect at line 63
+Tags: Call function.
+Assume {
+  Type: is_uint32(n).
+  (* Heap *)
+  Type: region(G_function_58) <= 0.
+  (* Then *)
+  Have: n != 0.
+}
 Prove: false.
 
 ------------------------------------------------------------
@@ -88,7 +93,8 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (generated) in 'mutual_1' (2/2):
-Call Result at line 31
+Call Effect at line 29
+Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
 Prove: false.
 
 ------------------------------------------------------------
@@ -111,6 +117,15 @@ Prove: false.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
+  Function no_decr_ok_term
+------------------------------------------------------------
+
+Goal Termination-condition (file clusters.i, line 68) in 'no_decr_ok_term':
+Call Effect at line 71
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function simpl_r
 ------------------------------------------------------------
 
@@ -129,13 +144,9 @@ Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
   Function simpl_rf
 ------------------------------------------------------------
 
-Goal Termination-condition (generated) in 'simpl_rf' (1/2):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Termination-condition (generated) in 'simpl_rf' (2/2):
-Call Result at line 17
+Goal Termination-condition (generated) in 'simpl_rf':
+Call Effect at line 16
+Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
 Prove: false.
 
 ------------------------------------------------------------

@@ -244,41 +244,43 @@ let call_goal_precond env _stmt kf _es ~pre k =
   Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
   merge env u k
 
-let call_terminates env _stmt kf _es (_gpid, prop) ?callee_t k =
+let call_terminates env _stmt ?kf _es (_gpid, prop) ?callee_t k =
   let u = node () in
   let pp_opt_pred = Pretty_utils.pp_opt ~none:"FALSE" Printer.pp_predicate in
+  let pp_opt_kf = Pretty_utils.pp_opt ~none:"(?)" Kernel_function.pretty in
   Format.fprintf !out "  %a [ color=red , label=\"Prove Terminates %a%t\" ] ;@."
-    pretty u Kernel_function.pretty kf
+    pretty u pp_opt_kf kf
     begin fun fmt ->
       if Wp_parameters.debug_atleast 1 then
         Format.fprintf fmt "\n@[<hov 2>Terminates if %a[%s] ==> %a[%a];@]"
           Printer.pp_predicate prop "Caller"
           pp_opt_pred callee_t
-          Kernel_function.pretty kf
+          pp_opt_kf kf
     end ;
   Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
   merge env u k
 
-let call_decreases env _s kf _es (_id, (caller_d, rel)) ?caller_t ?callee_d k =
+let call_decreases env _s ?kf _es (_id, (caller_d, rel)) ?caller_t ?callee_d k =
   let u = node () in
   let pp_opt_pred = Pretty_utils.pp_opt ~none:"TRUE" Printer.pp_predicate in
+  let pp_opt_kf = Pretty_utils.pp_opt ~none:"(?)" Kernel_function.pretty in
   let pp_rel fmt callee_d =
     match rel with
     | None ->
       Format.fprintf fmt "%a ==> %a[%a] < %a[%s] && %a[%a] >= 0"
         pp_opt_pred caller_t
-        Printer.pp_term callee_d Kernel_function.pretty kf
+        Printer.pp_term callee_d pp_opt_kf kf
         Printer.pp_term caller_d "Caller"
-        Printer.pp_term callee_d Kernel_function.pretty kf
+        Printer.pp_term callee_d pp_opt_kf kf
     | Some rel ->
       Format.fprintf fmt "%a ==> %a(%a[%s], %a[%a])"
         pp_opt_pred caller_t
         Printer.pp_logic_info rel
         Printer.pp_term caller_d "Caller"
-        Printer.pp_term callee_d Kernel_function.pretty kf
+        Printer.pp_term callee_d pp_opt_kf kf
   in
   Format.fprintf !out "  %a [ color=red , label=\"Prove Decreases %a%t\" ] ;@."
-    pretty u Kernel_function.pretty kf
+    pretty u pp_opt_kf kf
     begin fun fmt ->
       match callee_d with
       | None ->

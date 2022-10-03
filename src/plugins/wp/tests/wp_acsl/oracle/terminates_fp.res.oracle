@@ -25,8 +25,10 @@
 [wp] terminates_fp.i:11: Warning: 
   Missing terminates clause for ht, populates 'terminates \true'
 [wp] terminates_fp.i:79: Warning: Missing 'calls' for default behavior
-[wp] terminates_fp.i:78: Warning: 
-  No 'decreases' clause on recursive function 'warns_recursive', cannot prove termination
+[wp] terminates_fp.i:79: Warning: 
+  No terminates clause on callee (unknown function)
+[wp] terminates_fp.i:79: Warning: 
+  Missing decreases clause on recursive function warns_recursive, call must be unreachable
 ------------------------------------------------------------
   Function no_t_spec
 ------------------------------------------------------------
@@ -245,7 +247,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (generated) in 'warns_recursive':
-Call Result at line 80
+Call Effect at line 79
 Prove: false.
 
 ------------------------------------------------------------

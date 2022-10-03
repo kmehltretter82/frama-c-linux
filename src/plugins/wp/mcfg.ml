@@ -105,11 +105,12 @@ module type S = sig
     t_prop -> t_prop
 
   val call_terminates : t_env -> stmt ->
-    kernel_function -> exp list ->
-    WpPropId.pred_info -> ?callee_t:predicate -> t_prop -> t_prop
+    ?kf:kernel_function -> exp list ->
+    WpPropId.pred_info ->
+    ?callee_t:predicate -> t_prop -> t_prop
 
   val call_decreases : t_env -> stmt ->
-    kernel_function -> exp list ->
+    ?kf:kernel_function -> exp list ->
     WpPropId.variant_info ->
     ?caller_t: predicate ->
     ?callee_d: variant -> t_prop -> t_prop

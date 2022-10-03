@@ -322,12 +322,17 @@ struct
       Cil.treat_constructor_as_func
         begin fun r fct args _loc ->
           match Kf.get_called fct with
-          | Some kf -> call env s r kf args w
+          | Some kf ->
+            call env s r kf args @@
+            call_terminates env s args @@
+            call_decreases env s args @@ w
           | None ->
             WpLog.warning ~once:true "No function for constructor '%s'"
               vf.vname ;
             let any = WpPropId.mk_stmt_assigns_any_desc s in
-            W.use_assigns env.we None any (W.merge env.we w env.wk)
+            W.use_assigns env.we None any @@
+            call_terminates env s args @@
+            call_decreases env s args (W.merge env.we w env.wk)
         end x vf args kind loc
     | Call(res,fct,args,_loc) ->
       begin
@@ -341,7 +346,9 @@ struct
                then "default behavior"
                else env.mode.bhv.b_name) ;
             let any = WpPropId.mk_stmt_assigns_any_desc s in
-            W.use_assigns env.we None any (W.merge env.we w env.wk)
+            W.use_assigns env.we None any @@
+            call_terminates env s args @@
+            call_decreases env s args (W.merge env.we w env.wk)
           | Some(prop,kfs) ->
             let id = WpPropId.mk_property prop in
             W.call_dynamic env.we s id fct @@
@@ -371,31 +378,68 @@ struct
         W.call_goal_precond env.we s kf es ~pre w_call
       else w_call
     in
-    let callee_t =
-      (* TODO when kernel terminates complete: remove this code. *)
-      let generated, callee_t = c.contract_terminates in
-      if generated && env.terminates <> None then
+    call_decreases env s ~kf es @@
+    call_terminates env s ~kf es w_pre
+
+  and call_terminates env s ?kf es w : W.t_prop =
+    match env.terminates with
+    | Some t when is_selected ~goal:true env t && is_default_bhv env.mode ->
+      let callee_t =
+        match kf with
+        | None -> None
+        | Some callee ->
+          (* TODO: remove generated case when kernel support is available *)
+          let generated, callee_t =
+            (CfgAnnot.get_call_contract callee s).contract_terminates
+          in
+          if generated then
+            Wp_parameters.warning ~once:true
+              "Missing terminates clause on call to %a, defaults to %a"
+              Kernel_function.pretty callee Cil_printer.pp_predicate callee_t ;
+          Some callee_t
+      in
+      let wt = W.call_terminates env.we s ?kf es t ?callee_t w in
+      let is_recursive = match kf with
+        | None -> true
+        | Some callee -> CfgInfos.in_cluster ~caller:env.mode.kf callee
+      in
+      if Option.is_none env.decreases && is_recursive
+      then begin
         Wp_parameters.warning ~once:true
-          "Missing terminates clause on call to %a, defaults to %a"
-          Kernel_function.pretty kf Cil_printer.pp_predicate callee_t ;
-      Some callee_t
-    in
-    let selected t = is_selected ~goal:true env t && is_default_bhv env.mode in
-    let in_cluster = CfgInfos.in_cluster ~caller:env.mode.kf kf in
-    let w_term = match env.terminates with
-      | Some t when selected t ->
-        W.call_terminates env.we s kf es t ?callee_t w_pre
-      | _ -> w_pre
-    in
-    let w_decr = match env.decreases with
-      | Some d when selected d && in_cluster ->
-        W.call_decreases env.we s kf es d
+          "Missing decreases clause on recursive function %a, call must be \
+           unreachable"
+          Kernel_function.pretty env.mode.kf ;
+        W.call_terminates
+          env.we s ?kf es t ?callee_t:(Some Logic_const.pfalse) wt
+      end
+      else wt
+    | _ -> w
+
+  and call_decreases env s ?kf es w =
+    match env.decreases with
+    | Some d when is_selected ~goal:true env d && is_default_bhv env.mode ->
+      let in_cluster = match kf with
+        | None ->
+          Wp_parameters.warning ~once:true
+            "Unknown caller, assuming that it is in the recursive cluster of %a"
+            Kernel_function.pretty env.mode.kf ;
+          true
+        | Some callee ->
+          CfgInfos.in_cluster ~caller:env.mode.kf callee
+      in
+      if not in_cluster then w
+      else
+        let callee_d =
+          match kf with
+          | None -> None
+          | Some callee ->
+            (CfgAnnot.get_call_contract callee s).contract_decreases
+        in
+        W.call_decreases env.we s ?kf es d
           ?caller_t:(Option.map snd env.terminates)
-          ?callee_d:c.contract_decreases
-          w_term
-      | _ -> w_term
-    in
-    w_decr
+          ?callee_d
+          w
+    | _ -> w
 
   let do_complete_disjoint env w =
     if not (is_default_bhv env.mode) then w
@@ -415,20 +459,6 @@ struct
       let prove goal env t w =
         prove_subproperty env t ~deps goal return FromReturn w
       in
-      if CfgInfos.is_recursive env.mode.kf then
-        (* there is a dependency on terminates or decreases is missing *)
-        let goal =
-          if None <> env.decreases then Logic_const.ptrue
-          else begin
-            WpLog.warning ~once:true
-              "No 'decreases' clause on recursive function '%a', \
-               cannot prove termination"
-              Kernel_function.pretty env.mode.kf ;
-            Logic_const.pfalse
-          end
-        in
-        on_selected_terminates env (prove goal) w
-      else
       if not @@ Property.Set.is_empty deps then
         on_selected_terminates env (prove Logic_const.ptrue) w
       else w

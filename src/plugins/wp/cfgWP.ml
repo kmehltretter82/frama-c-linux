@@ -1054,7 +1054,7 @@ struct
   (* --- WP RULE : call terminates                                          --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let call_terminates wenv stmt kf args (id, caller_t) ?callee_t wp =
+  let call_terminates wenv stmt ?kf args (id, caller_t) ?callee_t wp =
     in_wenv wenv wp
       (fun env wp ->
          let outcome = Warning.catch
@@ -1081,13 +1081,23 @@ struct
            { wp with vcs = vcs }
          | Warning.Result(warn2, args) ->
            let warn = W.union warn warn2 in
+           let pp_opt_kf =
+             Pretty_utils.pp_opt
+               ~none:"(unknown function)" Kernel_function.pretty in
            let compile_callee = function
              | None ->
-               Warning.error "No terminates clause for %a"
-                 Kernel_function.pretty kf
+               Warning.error
+                 "No terminates clause on callee %a"
+                 pp_opt_kf kf
+             | Some p when Logic_utils.is_same_predicate Logic_const.pfalse p ->
+               (* We intercept this particular case where call environment is
+                  not necessary as it might be generated for function pointers.
+               *)
+               Lang.F.p_false
+
              | Some callee_t ->
                let init = L.mem_at env Clabels.init in
-               let call = L.call kf args in
+               let call = L.call (Option.get kf) args in
                let call_e = L.mk_env ~here:sigma () in
                let call_f = L.call_pre init call sigma in
                L.in_frame call_f (L.pred `Positive call_e) callee_t
@@ -1109,7 +1119,7 @@ struct
   (* --- WP RULE : call decreases                                           --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let call_decreases wenv stmt kf args (id, caller_d) ?caller_t ?callee_d wp =
+  let call_decreases wenv stmt ?kf args (id, caller_d) ?caller_t ?callee_d wp =
     in_wenv wenv wp
       (fun env wp ->
          let compile_caller_t caller_t =
@@ -1142,24 +1152,27 @@ struct
            { wp with vcs = vcs }
          | Warning.Result(warn2, args) ->
            let warn = W.union warn warn2 in
-           let init = L.mem_at env Clabels.init in
-           let call = L.call kf args in
-           let call_e = L.mk_env ~here:sigma () in
-           let call_f = L.call_pre init call sigma in
            let compile_decreases (caller_d, callee_d) =
+             let pp_opt_kf =
+               Pretty_utils.pp_opt
+                 ~none:"(unknown function)" Kernel_function.pretty in
              match caller_d, callee_d with
              | _, None ->
                Warning.error "No decreases clause for %a"
-                 Kernel_function.pretty kf
+                 pp_opt_kf kf
              | (_, r), Some (_, r')
                when not @@ Option.equal Logic_utils.is_same_logic_info r r' ->
                let none : Pretty_utils.sformat = "<None>" in
                Warning.error
                  "On call to %a, relation (%a) does not match caller (%a)"
-                 Kernel_function.pretty kf
+                 pp_opt_kf kf
                  (Pretty_utils.pp_opt ~none Cil_printer.pp_logic_info) r
                  (Pretty_utils.pp_opt ~none Cil_printer.pp_logic_info) r'
              | (caller_d, rel), Some (callee_d,_ ) ->
+               let init = L.mem_at env Clabels.init in
+               let call = L.call (Option.get kf) args in
+               let call_e = L.mk_env ~here:sigma () in
+               let call_f = L.call_pre init call sigma in
                let rel caller callee = match rel with
                  | None ->
                    p_and (p_leq e_zero caller) (p_lt callee caller)

@@ -8,8 +8,8 @@
   'Rel' relation must be well-founded
 [wp] [CFG] Goal general_variant_terminates : Valid (Trivial)
 [wp] [CFG] Goal variant_terminates : Valid (Trivial)
-[wp] terminates_formulae.i:90: Warning: 
-  No 'decreases' clause on recursive function 'no_decreases', cannot prove termination
+[wp] terminates_formulae.i:91: Warning: 
+  Missing decreases clause on recursive function no_decreases, call must be unreachable
 ------------------------------------------------------------
   Function base_call
 ------------------------------------------------------------
@@ -113,14 +113,10 @@ Prove: P_Rel(x, to_uint32(x - 1)).
   Function no_decreases
 ------------------------------------------------------------
 
-Goal Termination-condition (file terminates_formulae.i, line 89) in 'no_decreases' (1/2):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Termination-condition (file terminates_formulae.i, line 89) in 'no_decreases' (2/2):
-Call Result at line 92
-Prove: false.
+Goal Termination-condition (file terminates_formulae.i, line 89) in 'no_decreases':
+Call Effect at line 91
+Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
+Prove: !P_Q.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

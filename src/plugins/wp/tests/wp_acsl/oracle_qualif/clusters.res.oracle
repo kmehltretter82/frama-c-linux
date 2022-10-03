@@ -19,42 +19,44 @@
   Missing terminates clause for simpl_r, populates 'terminates \true'
 [wp] clusters.i:15: Warning: 
   Missing terminates clause for simpl_rf, populates 'terminates \true'
-[wp] clusters.i:60: Warning: 
-  No 'decreases' clause on recursive function 'simpl_rf', cannot prove termination
-[wp] clusters.i:60: Warning: 
-  No 'decreases' clause on recursive function 'mutual_1', cannot prove termination
+[wp] clusters.i:16: Warning: 
+  Missing decreases clause on recursive function simpl_rf, call must be unreachable
+[wp] clusters.i:29: Warning: 
+  Missing decreases clause on recursive function mutual_1, call must be unreachable
 [wp] clusters.i:36: Warning: No decreases clause for mutual_1
-[wp] clusters.i:60: Warning: 
-  No 'decreases' clause on recursive function 'fp', cannot prove termination
+[wp] clusters.i:63: Warning: 
+  Missing decreases clause on recursive function fp, call must be unreachable
 [wp] clusters.i:55: Warning: No decreases clause for fp
-[wp] 15 goals scheduled
+[wp] clusters.i:71: Warning: 
+  Missing decreases clause on recursive function no_decr_ok_term, call must be unreachable
+[wp] 14 goals scheduled
 [wp] [Valid] typed_simpl_r_terminates (Qed)
 [wp] [Valid] typed_simpl_r_variant (Alt-Ergo) (Cached)
-[wp] [Valid] typed_simpl_rf_terminates_part1 (Qed)
-[wp] [Unsuccess] typed_simpl_rf_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_simpl_rf_terminates (Alt-Ergo) (Cached)
 [wp] [Valid] typed_mutual_1_terminates_part1 (Qed)
 [wp] [Unsuccess] typed_mutual_1_terminates_part2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_mutual_2_terminates (Qed)
 [wp] [Unsuccess] typed_mutual_2_variant (Alt-Ergo) (Cached) (Degenerated)
 [wp] [Valid] typed_caller_no_cluster_terminates (Qed)
 [wp] [Valid] typed_fp_call_point_function_s41 (Qed)
-[wp] [Valid] typed_fp_terminates_part1 (Qed)
-[wp] [Unsuccess] typed_fp_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_fp_terminates (Alt-Ergo) (Cached)
 [wp] [Valid] typed_function_terminates (Qed)
 [wp] [Unsuccess] typed_function_variant (Alt-Ergo) (Cached) (Degenerated)
 [wp] [Valid] typed_function_call_fp_requires (Qed)
-[wp] Proved goals:   11 / 16
+[wp] [Valid] typed_no_decr_ok_term_terminates (Qed)
+[wp] Proved goals:   10 / 15
   Terminating:     1
-  Qed:             9
+  Qed:             8
   Alt-Ergo:        1
   Unsuccess:       5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   simpl_r                   1        1        2       100%
-  simpl_rf                  1        -        2      50.0%
+  simpl_rf                  -        -        1       0.0%
   mutual_1                  1        -        2      50.0%
   mutual_2                  1        -        2      50.0%
   caller_no_cluster         1        -        1       100%
-  fp                        2        -        3      66.7%
+  fp                        1        -        2      50.0%
   function                  2        -        3      66.7%
+  no_decr_ok_term           1        -        1       100%
 ------------------------------------------------------------
