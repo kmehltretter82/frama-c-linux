@@ -100,6 +100,24 @@ let assigns_outputs_to_zone ~result state assigns =
   | WritesAny -> Locations.Zone.top
   | Writes l  -> List.fold_left treat_asgn Locations.Zone.bottom l
 
+type tlval_zones = {
+  under: Locations.Zone.t;
+  over: Locations.Zone.t;
+  deps: Locations.Zone.t;
+}
+
+let assigns_tlval_to_zones state access tlval =
+  let env = Eval_terms.env_post_f ~pre:state ~post:state ~result:None () in
+  let alarm_mode = Eval_terms.Ignore in
+  try
+    let under, over =
+      Eval_terms.eval_tlval_as_zone_under_over ~alarm_mode access env tlval
+    in
+    let deps = join_logic_deps (Eval_terms.tlval_deps env tlval) in
+    Some { under; over; deps; }
+  with Eval_terms.LogicEvalError _ -> None
+
+
 (* -------------------------------------------------------------------------- *)
 (* --- Verify assigns clauses                                             --- *)
 (* -------------------------------------------------------------------------- *)
