@@ -127,7 +127,7 @@ RUN \
   rm -rf /home/opam/opam-repository && \
   rm -rf /home/opam/.opam/repo/default/.git*
 
-# Stage 3 (optional): tests
+# Stage 5 (optional): tests
 
 FROM frama-c AS tests
 ARG OCAML_VERSION
@@ -140,7 +140,7 @@ RUN cd /frama-c && make run-ptests && dune build @ptests_config
 ## Run an extra test for WP with provers
 RUN cd /frama-c/ && cd src/plugins/wp/tests/ && frama-c -wp wp_gallery/binary-multiplication-without-overflow.c -wp-prover alt-ergo,cvc4,z3
 
-# Stage 4 (optional): GUI
+# Stage 6 (optional): GUI
 
 FROM frama-c AS frama-c-gui
 ARG OCAML_VERSION
@@ -153,7 +153,7 @@ RUN cd /frama-c && ./dev/disable-plugins.sh none && make clean && make && make i
 ## Sanity check
 RUN which frama-c-gui
 
-# Stage 5 (to be deployed): 'slim' image
+# Stage 7 (to be deployed): 'slim' image
 
 FROM $DISTRO AS frama-c-slim
 ARG OCAML_VERSION
@@ -191,7 +191,7 @@ ENV LIBGL_ALWAYS_INDIRECT=1
 
 RUN why3 config detect
 
-# Stage 6 (optional, to be deployed): 'slim' image with frama-c-gui
+# Stage 8 (optional, to be deployed): 'slim' image with frama-c-gui
 
 FROM $DISTRO AS frama-c-gui-slim
 ARG OCAML_VERSION
@@ -228,7 +228,7 @@ RUN why3 config detect
 ## Sanity check
 RUN which frama-c-gui
 
-## Stage 7: preparation of 'stripped' image (~200 MB compressed)
+## Stage 9: preparation of 'stripped' image (~200 MB compressed)
 ## Note: this image only contains the Frama-C binaries and files closely
 ## related to it; most other OCaml tools have been removed.
 ## Even recompilation of Frama-C is not guaranteed to work.
@@ -289,7 +289,7 @@ RUN find /home/opam/.opam \( -name "*.cmt*" -o -name "*.[ao]" -o -name "*.cm[ao]
 RUN sudo rm -r /usr/share/gtk-3.0 /usr/share/X11
 RUN sudo rm -f /usr/bin/*gnu-lto-dump*
 
-## Stage 7 (optional): stripped, slimmest image (running Frama-C works,
+## Stage 10 (optional): stripped, slimmest image (running Frama-C works,
 ## but almost everything else does not (e.g. recompiling OCaml modules))
 
 FROM $DISTRO AS frama-c-stripped
