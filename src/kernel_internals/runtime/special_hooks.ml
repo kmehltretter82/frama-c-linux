@@ -50,9 +50,11 @@ let print_config () =
   end
 let () = Cmdline.run_after_early_stage print_config
 
-let print_config get value () =
+let print_config ?(newline=false) get value () =
   if get () then begin
     Log.print_on_output (fun fmt -> Format.fprintf fmt "%s%!" value) ;
+    if newline
+    then Log.print_on_output (fun fmt -> Format.pp_print_newline fmt ());
     raise Cmdline.Exit
   end
 
@@ -62,9 +64,14 @@ let print_configl get value () =
     Log.print_on_output (fun fmt -> (Format.fprintf fmt "%s%!" (String.concat "\n" value))) ;
     raise Cmdline.Exit
   end
+
 let print_version =
   print_config Kernel.PrintVersion.get Fc_config.version_and_codename
 let () = Cmdline.run_after_early_stage print_version
+
+let print_version_newline =
+  print_config ~newline:true Kernel.Version.get Fc_config.version_and_codename
+let () = Cmdline.run_after_early_stage print_version_newline
 
 let print_sharepath = print_configl Kernel.PrintShare.get Fc_config.datadirs
 let () = Cmdline.run_after_early_stage print_sharepath

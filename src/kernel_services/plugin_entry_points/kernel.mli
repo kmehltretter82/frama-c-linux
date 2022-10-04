@@ -247,11 +247,14 @@ val checks: Cmdline.Group.t
 (** {2 Installation Information} *)
 (* ************************************************************************* *)
 
-module PrintConfig: Parameter_sig.Bool
-(** Behavior of option "-print-config" *)
+module Version: Parameter_sig.Bool
+(** Behavior of option "-version" *)
 
 module PrintVersion: Parameter_sig.Bool
 (** Behavior of option "-print-version" *)
+
+module PrintConfig: Parameter_sig.Bool
+(** Behavior of option "-print-config" *)
 
 module PrintShare: Parameter_sig.Bool
 (** Behavior of option "-print-share-path" *)
