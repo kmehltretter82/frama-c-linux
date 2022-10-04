@@ -139,7 +139,9 @@ let split_command_args s =
     never need quotes. *)
 let quote_define_argument arg = Format.sprintf "%S" arg
 
-(* Filters and normalize useful flags: -I, -D, -U, ... *)
+(* Filters and normalize useful flags: -I, -D, -U, ...
+   This includes removing extraneous double quotes
+   (when the first and last characters are both '"') *)
 let filter_useful_flags ~requote option_list =
   let convert_define arg =
     if requote then quote_define_argument arg else arg
@@ -150,11 +152,20 @@ let filter_useful_flags ~requote option_list =
     | Define s -> s ^ convert_define suffix
     | Undefine s -> s ^ suffix
   in
+  let remove_extraneous_quotes arg =
+    let len = String.length arg in
+    if len = 0 then arg
+    else
+    if String.get arg 0 = '"' && String.get arg (len-1) = '"' then
+      String.sub arg 1 (len-2)
+    else arg
+  in
   (* we must process the arguments in-order, since several -D and -U may
      exist on the command line *)
   (* prev is the prefix of the previous argument (if any) *)
   let _, res =
     List.fold_left (fun (prev, acc_res) arg ->
+        let arg = remove_extraneous_quotes arg in
         match prev with
         | None -> begin
             match has_whitelisted_prefix arg with
