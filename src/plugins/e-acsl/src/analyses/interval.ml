@@ -377,7 +377,6 @@ let rec fixpoint ~(infer : force:bool ->
       let assumed_ival = interv_of_typ_containing_interv inferred_ival in
       fixpoint ~infer li args_ival t' assumed_ival
 
-
 (* Memoization module which retrieves the computed info of some terms *)
 module Memo: sig
   val memo:
@@ -482,8 +481,6 @@ end = struct
   let clear () =
     Options.feedback ~level:4 "clearing the typing tables";
     LFProf.Hashtbl.clear widened_profile_tbl
-
-
 end
 
 let plus_one i =
@@ -742,17 +739,18 @@ let rec infer ~force ~logic_env t =
          if LF_env.is_rec li then
            let widened_profile = widen_profile profile in
            Widened_profile.add profile li widened_profile;
-           (match li.l_body with
-            | LBpred p ->
-              LF_env.add_pred li widened_profile;
-              infer_predicate
-                ~logic_env:(Logic_env.make widened_profile) p;
-              Ival Ival.zero_or_one
-            | LBterm t' ->
-              (try LF_env.find li widened_profile
-               with Not_found ->
-                 fixpoint ~infer li widened_profile t' (Ival Ival.bottom))
-            | _ -> assert false)
+           try LF_env.find li widened_profile
+           with
+           | Not_found ->
+             (match li.l_body with
+              | LBpred p ->
+                LF_env.add_pred li widened_profile;
+                infer_predicate
+                  ~logic_env:(Logic_env.make widened_profile) p;
+                Ival Ival.zero_or_one
+              | LBterm t' ->
+                fixpoint ~infer li widened_profile t' (Ival Ival.bottom)
+              | _ -> assert false)
          else
            let logic_env = Logic_env.make profile in
            (match li.l_body with
@@ -1059,8 +1057,11 @@ and infer_predicate ~logic_env p =
     infer_predicate ~logic_env p;
   | Pif(t, p1, p2) ->
     ignore (infer ~force:false ~logic_env t);
-    infer_predicate ~logic_env p1;
-    infer_predicate ~logic_env p2
+    let logic_env_tbranch, logic_env_fbranch =
+      compute_logic_env_if_branches logic_env t
+    in
+    infer_predicate ~logic_env:logic_env_tbranch p1;
+    infer_predicate ~logic_env:logic_env_fbranch p2
   | Plet(li, p) ->
     let li_t = Misc.term_of_li li in
     let li_v = li.l_var_info in
