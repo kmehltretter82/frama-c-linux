@@ -127,8 +127,7 @@ eva-default-tests:
     CONFIG: "default"
   <<: *eva_template
 
-eva-domains:
-  <<: *eva_template
+.build_template: &eva_domains
   parallel:
     matrix:
       - CONFIG: [
@@ -140,6 +139,25 @@ eva-domains:
           "octagon",
           "symblocs"
         ]
+
+eva-domains:
+  <<: *eva_template
+  <<: *eva_domains
+  when: manual
+
+eva-domains-nightly:
+  <<: *eva_template
+  <<: *eva_domains
+  only:
+    refs:
+      - schedules
+
+eva-domains-release:
+  <<: *eva_template
+  <<: *eva_domains
+  only:
+    variables:
+      - $RELEASE == "yes"
 
 kernel-tests:
   stage: tests
@@ -301,7 +319,7 @@ internal_nightly:
     - ./nix/build-proxy.sh default-config-tests
   parallel:
     matrix:
-      - OCAML: ["4.08", "4.13"]
+      - OCAML: ["4.13"]
 
 ocaml-versions:
   <<: *ocaml_versions_template
