@@ -21,7 +21,7 @@
 ##########################################################################
 
 .ONESHELL:
-.PHONY: dev* custom* help
+.PHONY: dev* custom* help push
 
 help:
 	@echo "Available targets are:"
@@ -38,6 +38,11 @@ help:
 	echo "- fedora: based on fedora:36"
 	echo "- alpine: based on alpine:3.16"
 	echo "          (smallest image, but E-ACSL does not work due to musl)"
+	echo
+	echo "Targets for users with write access to the framac Docker Hub:"
+	echo "- push TAG=<tag1> AS=<tag2>: perform a docker push with image"
+	echo "  <tag1> sent as <tag2>. Usage example:"
+	echo "  make push TAG=framac/frama-c:dev.debian AS=framac/frama-c:dev"
 
 DEPS=../../reference-configuration.md Dockerfile *.sh
 
@@ -76,4 +81,18 @@ custom-gui.%: custom.%
 
 custom-stripped.%: custom.%
 	docker build . -t frama-c-$@ $(BUILD_ARGS) --target frama-c-stripped
+endif
+
+# check if either TAG or AS are empty
+ifeq ($(TAG)$(AS),$(AS)$(TAG))
+push:
+	@echo "error: run '$(MAKE) $@ TAG=<orig> AS=<new>'"
+	echo "        where <tag> is the current tag of the image to be pushed,"
+	echo "        and <new> is the name used in the Docker Hub"
+	echo "        e.g. framac/frama-c:dev, framac/frama-c-gui:dev, etc."
+	echo "(if you supplied identical tags, just run 'docker push $(TAG)')"
+else
+push:
+	docker tag $(TAG) $(AS)
+	docker push $(AS)
 endif
