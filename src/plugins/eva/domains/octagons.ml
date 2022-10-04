@@ -803,7 +803,7 @@ module State = struct
 
         let hash t =
           Hashtbl.hash (Octagons.hash t.octagons,
-                        Relations.hash t.relations,
+                        Intervals.hash t.intervals,
                         Zone.hash t.modified)
 
         let pretty fmt { octagons } =
