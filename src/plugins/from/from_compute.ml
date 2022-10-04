@@ -101,9 +101,7 @@ let compute_using_prototype_for_state state kf assigns =
            now, so we assume it is all data dependencies *)
         let inputs_deps = Function_Froms.Deps.from_data_deps zone_from in
         try
-          let coffs =
-            !Db.Properties.Interp.loc_to_offset ~result:None out.it_content
-          in
+          let coffs = Logic_to_c.loc_to_offset out.it_content in
           List.fold_left
             (fun acc coff ->
                let (base,width) = bitsOffset rt_typ coff in
@@ -112,7 +110,7 @@ let compute_using_prototype_for_state state kf assigns =
                                         ~start:base ~size ~m:acc inputs_deps)
             )
             acc coffs
-        with Db.Properties.Interp.No_conversion | SizeOfError _ ->
+        with Logic_to_c.No_conversion | SizeOfError _ ->
           From_parameters.result  ~once:true ~current:true
             "Unable to extract a proper offset. \
              Using FROM for the whole \\result";
