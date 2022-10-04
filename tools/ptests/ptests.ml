@@ -1760,7 +1760,7 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
              (deps %a %a)\n  \
              (targets %a %a)\n  \
              %a\n\
-             (action (%a (run %s %%{dep:%s} %S)))\n\
+             (action (run %s %%{dep:%s} %S))\n\
              )@."
             (* rule: *)
             wtest.info
@@ -1775,7 +1775,6 @@ let process_file ~env ~result_fmt ~oracle_fmt file directory config ~modules ~en
             (* enabled_if: *)
             pp_enabled_if cmd.deps
             (* action: *)
-            pp_accepted_exit_code cmd
             !wrapper_cmd
             wrapper_basename
             wtest.cmd;
