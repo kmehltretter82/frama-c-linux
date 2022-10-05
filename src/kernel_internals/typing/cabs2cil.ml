@@ -4963,6 +4963,13 @@ and makeVarSizeVarInfo ghost (ldecl : location)
         ~isglobal:false
         ldecl spec_res (n,ndt,a), empty, zero ~loc:ldecl, false
     | Some (ndt', se, len) ->
+      (* In this case, we have changed the type from VLA to pointer: add the
+         qualifier to the elements. *)
+      let spec_res = match spec_res with
+        | (t, sto , inline , attrs) when ghost ->
+          (t, sto , inline , ("ghost", []) :: attrs)
+        | normal -> normal
+      in
       makeVarInfoCabs ~ghost ~isformal:false
         ~isglobal:false
         ldecl spec_res (n,ndt',a), se, len, true

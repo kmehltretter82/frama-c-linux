@@ -52,6 +52,7 @@
   \return(gethostbyname) == 0 (auto)
   \return(Frama_C_nondet) == 0 (auto)
   \return(Frama_C_nondet_ptr) == 0 (auto)
+  \return(Frama_C_malloc_fresh) == 0 (auto)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

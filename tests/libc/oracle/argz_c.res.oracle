@@ -52,6 +52,7 @@
   \return(argz_replace) == 0, 6 (auto)
   \return(argz_next) == 0 (auto)
   \return(Frama_C_nondet_ptr) == 0 (auto)
+  \return(Frama_C_malloc_fresh) == 0 (auto)
   \return(char_equal_ignore_case) == 0 (auto)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
