@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Kernel    [2022-10-05] Support for ghost VLA and calls to builtins with
+              ghost arguments.
 -   Eva       [2022-09-16] Numerors now needs MLMPFR 4.1.0+bugfix2
 -   Kernel    [2022-09-07] Improve error message for invalid options -D/-I/-U.
 o!  Configure [2022-07-28] Removed autoconf and configure
