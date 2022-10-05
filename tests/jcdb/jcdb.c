@@ -22,4 +22,4 @@ int main () {
   #ifndef __FRAMAC__
   printf("%s\n", s); // for GCC debugging
   #endif
-  return MACRO_FOR_INCR(TEST); }
+  return MACRO_FOR_INCR(TEST) - TEST2; }
