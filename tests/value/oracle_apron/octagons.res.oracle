@@ -1,4 +1,11 @@
-358,361c358,361
+221c221,224
+< [eva] octagons.c:185: Reusing old results for call to neg
+---
+> [eva] computing for function neg <- interprocedural <- main.
+>   Called from octagons.c:185.
+> [eva] Recording results for neg
+> [eva] Done for function neg
+355,358c358,361
 <   a ∈ [-1024..2147483647]
 <   b ∈ [-1023..2147483647]
 <   c ∈ [-1023..2147483647]

@@ -2,7 +2,14 @@
 < [eva] octagons.c:54: Frama_C_show_each_unreduced_char: [-128..127], [-128..127]
 ---
 > [eva] octagons.c:54: Frama_C_show_each_unreduced_char: [-118..114], [6..127]
-345c345
+221c221,224
+< [eva] octagons.c:185: Reusing old results for call to neg
+---
+> [eva] computing for function neg <- interprocedural <- main.
+>   Called from octagons.c:185.
+> [eva] Recording results for neg
+> [eva] Done for function neg
+342c345
 <   ct ∈ [--..--] or UNINITIALIZED
 ---
 >   ct ∈ [6..127] or UNINITIALIZED

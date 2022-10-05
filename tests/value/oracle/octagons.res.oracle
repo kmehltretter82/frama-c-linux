@@ -218,10 +218,7 @@
   Called from octagons.c:184.
 [eva] Recording results for neg
 [eva] Done for function neg
-[eva] computing for function neg <- interprocedural <- main.
-  Called from octagons.c:185.
-[eva] Recording results for neg
-[eva] Done for function neg
+[eva] octagons.c:185: Reusing old results for call to neg
 [eva] computing for function diff <- interprocedural <- main.
   Called from octagons.c:194.
 [eva] Recording results for diff
