@@ -1015,7 +1015,7 @@ module State = struct
     with Not_found -> `Value state
 
   let add_octagon state octagon =
-    if is_redundant state.intervals octagon
+    if Ival.(equal top octagon.value) || is_redundant state.intervals octagon
     then `Value state
     else
       let state =
@@ -1035,6 +1035,11 @@ module State = struct
       Octagons.add_octagon octagon state.octagons >>-: fun octagons ->
       let relations = Relations.relate octagon.variables state.relations in
       { state with octagons; relations }
+
+  let add_diamond state variables diamond =
+    add_octagon state { variables; operation = Add; value = diamond.add }
+    >>- fun state ->
+    add_octagon state { variables; operation = Sub; value = diamond.sub }
 
   let remove state x =
     let intervals = Intervals.remove x state.intervals in
@@ -1381,7 +1386,7 @@ module Domain = struct
       let relations = Relations.filter mem_var state.relations in
       { state with octagons; intervals; relations; }
 
-  let reuse =
+  let interprocedural_reuse =
     let cache = Hptmap_sig.PersistentCache "Octagons.reuse"
     and symmetric = false
     and idempotent = true
@@ -1389,17 +1394,38 @@ module Domain = struct
     let join_oct = Octagons.internal_join ~cache ~symmetric ~idempotent ~decide
     and join_itv = Intervals.internal_join ~cache ~symmetric ~idempotent ~decide
     and join_rel = Relations.union in
-    fun _kf _bases ~current_input ~previous_output ->
-      if intraprocedural ()
-      then previous_output
+    fun ~current_input ~previous_output ->
+      let current_input = kill previous_output.modified current_input in
+      (* We use [add_diamond] to add each relation from the previous output
+         into the current input, in order to benefit from the (partial)
+         saturation of octagons performed by this function. For a maximum
+         precision, a complete saturation would be required.
+         Otherwise, we use instead a more efficient (but less precise) merge
+         of the maps from the previous output and the current input. *)
+      if saturate_octagons
+      then
+        let intervals =
+          join_itv previous_output.intervals current_input.intervals
+        in
+        let state = { current_input with intervals } in
+        let add_diamond variables diamond acc =
+          Bottom.non_bottom (add_diamond acc variables diamond)
+        in
+        Octagons.fold add_diamond previous_output.octagons state
       else
-        let current_input = kill previous_output.modified current_input in
-        let prev_output = previous_output in
-        check "reuse result"
-          { octagons = join_oct prev_output.octagons current_input.octagons;
-            intervals = join_itv prev_output.intervals current_input.intervals;
-            relations = join_rel prev_output.relations current_input.relations;
-            modified = current_input.modified }
+        { octagons = join_oct previous_output.octagons current_input.octagons;
+          intervals = join_itv previous_output.intervals current_input.intervals;
+          relations = join_rel previous_output.relations current_input.relations;
+          modified = current_input.modified }
+
+  let reuse _kf _bases ~current_input ~previous_output =
+    if intraprocedural ()
+    then previous_output
+    else
+      let t = interprocedural_reuse ~current_input ~previous_output in
+      check "reuse result" t
+
+
 
 end
 
