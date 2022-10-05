@@ -28,10 +28,12 @@
 #
 # FRAMAC        frama-c binary
 # FRAMAC_GUI    frama-c gui binary
+# IVETTE        ivette binary
 # CPPFLAGS      preprocessing flags
 # MACHDEP       machdep
 # FCFLAGS       general flags to use with frama-c
 # FCGUIFLAGS    flags to use with frama-c-gui
+# IVETTEFLAGS   flags to use with Ivette
 # EVAFLAGS      flags to use with the Eva plugin
 # EVABUILTINS   Eva builtins to be set (via -eva-builtin)
 # EVAUSESPECS   Eva functions to be overridden by specs (-eva-use-spec)
@@ -39,6 +41,8 @@
 #
 # FLAMEGRAPH    If set (to any value), running an analysis will produce an
 #               SVG + HTML flamegraph at the end.
+#
+# AST_DIFF      If set (to any value), enables usage of -ast-diff during parse.
 #
 # There are several ways to define or change these variables.
 #
@@ -60,6 +64,11 @@
 #
 # target.parse: file1.c file2.c file3.c...
 #
+# NOTE ABOUT AST_DIFF:
+# - If AST_DIFF is set to a non-empty value (e.g. `fcmake AST_DIFF=y`), then
+#   during parsing (rule %.parse), we check if there already exists a framac.sav
+#   file. If so, we rename it framac.reparse and, instead of parsing from zero,
+#   we reload this file and apply -ast-diff before reparsing the sources.
 
 # Test if Makefile is > 4.0
 ifneq (4.0,$(firstword $(sort $(MAKE_VERSION) 4.0)))
@@ -108,6 +117,7 @@ fc_list = $(subst $(space),$(comma),$(strip $1))
 FRAMAC     ?= frama-c
 FRAMAC_SCRIPT = $(FRAMAC)-script
 FRAMAC_GUI ?= frama-c-gui
+IVETTE     ?= ivette
 EVAFLAGS   ?= \
   -eva-no-print -eva-no-show-progress -eva-msg-key=-initial-state \
   -eva-print-callstacks -eva-warn-key alarm=inactive \
@@ -119,6 +129,7 @@ EVAFLAGS   ?= \
 WPFLAGS    ?=
 FCFLAGS    ?=
 FCGUIFLAGS ?=
+IVETTEFLAGS ?=
 
 export LIBOVERLAY_SCROLLBAR=0
 
@@ -133,7 +144,6 @@ clean-backups:
 	find . -regextype posix-extended \
 	  -regex '^.*_[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}-[0-9]{2}\.eva(\.(log|stats|alarms|warnings|metrics))?' \
 	  -delete
-
 
 # --- Generic rules ---
 
@@ -151,10 +161,20 @@ SHELL        := $(shell which bash)
 	@#
 
 %.parse: SOURCES = $(filter-out %/command,$^)
-%.parse: PARSE = $(FRAMAC) $(FCFLAGS) $(if $(value MACHDEP),-machdep $(MACHDEP),) -cpp-extra-args="$(CPPFLAGS)" $(SOURCES)
+%.parse: PARSE = $(FRAMAC) \
+                 $(FCFLAGS) \
+                 $(if $(value MACHDEP),-machdep $(MACHDEP),) \
+                 -cpp-extra-args="$(CPPFLAGS)" $(SOURCES) \
+
 %.parse: $$(if $$^,,.IMPOSSIBLE) $$(shell $(SHELL) $(DIR)cmd-dep.sh $$@/command $$(PARSE))
 	@$(call display_command,$(PARSE))
 	mkdir -p $@
+	$(if $(AST_DIFF),\
+	  $(if $(wildcard $*.eva/framac.sav), \
+               mv $*.eva/framac.sav $@/framac.reparse,\
+               $(if $(wildcard $@/framac.sav), \
+                    mv $@/framac.sav $@/framac.reparse,true)),\
+          true)
 	mv -f $@/{command,running}
 	{
 	  $(call time_with_output,$@/stats.txt) \
@@ -164,7 +184,9 @@ SHELL        := $(shell which bash)
 	      -metrics -metrics-log a:$@/metrics.log \
 	      -save $@/framac.sav \
 	      -print -ocode $@/framac.ast -then -no-print \
-	    || ($(RM) $@/stats.txt && false) # Prevents having error code reporting in stats.txt
+	    || (mv -f $@/{running,command} &&
+	        $(RM) $@/stats.txt &&
+	        false) # Prevents having error code reporting in stats.txt
 	} 2>&1 |
 	  $(SED_UNBUFFERED) '/\[metrics\]/,999999d' |
 	  tee $@/parse.log
@@ -176,7 +198,14 @@ SHELL        := $(shell which bash)
 	mv $@/{running,command}
 	touch $@ # Update timestamp and prevent remake if nothing changes
 
-%.eva: EVA = $(FRAMAC) $(FCFLAGS) -eva $(EVAFLAGS)
+define incremental
+  $(if $(AST_DIFF),\
+    $(if $(wildcard $@/framac.sav),\
+      -eva-load $@/framac.sav,\
+      $(warning Cannot do incremental analysis: no previously saved state)))
+endef
+
+%.eva: EVA = $(FRAMAC) $(FCFLAGS) -eva $(call incremental,$1) $(EVAFLAGS)
 %.eva: PARSE_RESULT = $(word 1,$(subst ., ,$*)).parse
 %.eva: $$(PARSE_RESULT) $$(shell $(SHELL) $(DIR)cmd-dep.sh $$@/command $$(EVA)) $(if $(BENCHMARK),.FORCE,)
 	@$(call display_command,$(EVA))
@@ -185,7 +214,7 @@ SHELL        := $(shell which bash)
 	{
 	  $(call time_with_output,$@/stats.txt) \
 	    $(EVA) \
-	      -load $(PARSE_RESULT)/framac.sav -save $@/framac.sav \
+	      -load $(PARSE_RESULT)/framac.sav \
 	      -eva-flamegraph $@/flamegraph.txt \
 	      -kernel-log w:$@/warnings.log \
 	      -from-log w:$@/warnings.log \
@@ -193,12 +222,16 @@ SHELL        := $(shell which bash)
 	      -scope-log w:$@/warnings.log \
 	      -eva-log w:$@/warnings.log \
 	      -then \
+	      -remove-projects @all_but_current -save $@/framac.sav \
+	      -then \
 	      -report-csv $@/alarms.csv -report-no-proven \
 	      -report-log w:$@/warnings.log \
 	      -metrics-eva-cover \
 	      -metrics-log a:$@/metrics.log \
 	      -nonterm -nonterm-log a:$@/nonterm.log \
-	    || ($(RM) $@/stats.txt && false) # Prevents having error code reporting in stats.txt
+	    || (mv -f $@/{running,command} &&
+	        $(RM) $@/stats.txt &&
+	        false) # Prevents having error code reporting in stats.txt
 	} 2>&1 |
 	  $(SED_UNBUFFERED) '/\[eva\] Values at end of function/,999999d' |
 	  tee $@/eva.log
@@ -231,7 +264,9 @@ SHELL        := $(shell which bash)
 	      -then \
 	      -report-csv $@/alarms.csv -report-no-proven \
 	      -report-log w:$@/warnings.log \
-	    || ($(RM) $@/stats.txt && false) # Prevents having error code reporting in stats.txt
+	    || (mv -f $@/{running,command} &&
+	        $(RM) $@/stats.txt &&
+	        false) # Prevents having error code reporting in stats.txt
 	} 2>&1 |
 	  tee $@/wp.log
 	{
@@ -246,6 +281,9 @@ SHELL        := $(shell which bash)
 
 %.gui: %
 	$(FRAMAC_GUI) $(FCGUIFLAGS) -load $^/framac.sav &
+
+%.ivette: %
+	$(IVETTE) $(IVETTEFLAGS) -load $^/framac.sav &
 
 # Produce and open an SVG + HTML from raw flamegraph data produced by Eva
 %/flamegraph: %/flamegraph.html

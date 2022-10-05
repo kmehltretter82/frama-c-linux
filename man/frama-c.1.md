@@ -119,6 +119,11 @@ with non-trivial control flow are never duplicated. Defaults to yes.
 : reads ACSL annotations. This is the default. Annotations are pre-processed
 by default. Use -no-pp-annot if you don't want to expand macros in annotations.
 
+[-no]-ast-diff
+: computes AST differences between a loaded session (loaded with **-load**)
+and the current sources. These can then be used by plug-ins supporting
+incremental analyses.
+
 -autocomplete *p1,...,pn*
 : lists the options of plugins *p1,...,pn* in a format suitable for
 autocompletion scripts.
