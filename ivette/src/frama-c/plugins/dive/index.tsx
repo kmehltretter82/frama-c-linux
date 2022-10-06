@@ -219,23 +219,14 @@ class Dive {
     if (!container)
       return [];
 
+    const ref = (node as any).popperRef();
     const common = {
+      getReferenceClientRect: ref.getBoundingClientRect,
       interactive: true,
-      multiple: true,
       animation: 'shift-away',
       duration: 500,
       trigger: 'manual',
       appendTo: document.body,
-      lazy: false,
-      // Cytoscape extensions are not typed yet
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onCreate: (instance: any) => {
-        const { popperInstance } = instance;
-        if (popperInstance) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          popperInstance.reference = (node as any).popperRef();
-        }
-      },
     };
 
     const tips = [];
@@ -245,8 +236,7 @@ class Dive {
         ...common,
         content: node.data().values,
         placement: 'top',
-        //distance: 10,
-        offset: [10, 10],
+        offset: [0, 20],
         arrow: true,
       }));
     }
@@ -256,8 +246,7 @@ class Dive {
         ...common,
         content: node.data().type,
         placement: 'bottom',
-        //distance: 20,
-        offset: [20, 20],
+        offset: [0, 20],
         theme: 'light-border',
         arrow: false,
       }));
