@@ -142,7 +142,7 @@ class Dive {
     };
     (this.cy as CytoscapeExtended).panzoom(panzoomDefaults);
 
-    this.layout = 'cose-bilkent';
+    this.layout = 'dagre';
 
     if (!this.headless) {
       this.cy.scratch('cxtmenu')?.destroy?.(); // Remove previous menu
