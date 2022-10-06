@@ -42,8 +42,6 @@ import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jMarkerSafe } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { marker } from 'frama-c/kernel/api/ast';
 
 /** Emitted when EVA results has changed */
@@ -53,14 +51,9 @@ export const changed: Server.Signal = {
 
 export type callstack = Json.index<'#eva-callstack-id'>;
 
-/** Loose decoder for `callstack` */
-export const jCallstack: Json.Loose<callstack> =
+/** Decoder for `callstack` */
+export const jCallstack: Json.Decoder<callstack> =
   Json.jIndex<'#eva-callstack-id'>('#eva-callstack-id');
-
-/** Safe decoder for `callstack` */
-export const jCallstackSafe: Json.Safe<callstack> =
-  Json.jFail(Json.jIndex<'#eva-callstack-id'>('#eva-callstack-id'),
-    '#eva-callstack-id expected');
 
 /** Natural order for `callstack` */
 export const byCallstack: Compare.Order<callstack> = Compare.number;
@@ -68,8 +61,8 @@ export const byCallstack: Compare.Order<callstack> = Compare.number;
 const getCallstacks_internal: Server.GetRequest<marker[],callstack[]> = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getCallstacks',
-  input:  Json.jList(jMarker),
-  output: Json.jList(jCallstack),
+  input:  Json.jArray(jMarker),
+  output: Json.jArray(jCallstack),
   signals: [],
 };
 /** Callstacks for markers */
@@ -83,12 +76,12 @@ const getCallstackInfo_internal: Server.GetRequest<
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getCallstackInfo',
   input:  jCallstack,
-  output: Json.jList(
+  output: Json.jArray(
             Json.jObject({
-              callee: Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
-              caller: Json.jKey<'#fct'>('#fct'),
-              stmt: Json.jKey<'#stmt'>('#stmt'),
-              rank: Json.jNumber,
+              callee: Json.jKey<'#fct'>('#fct'),
+              caller: Json.jOption(Json.jKey<'#fct'>('#fct')),
+              stmt: Json.jOption(Json.jKey<'#stmt'>('#stmt')),
+              rank: Json.jOption(Json.jNumber),
             })),
   signals: [],
 };
@@ -106,9 +99,7 @@ const getStmtInfo_internal: Server.GetRequest<
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getStmtInfo',
   input:  Json.jKey<'#stmt'>('#stmt'),
-  output: Json.jObject({
-            rank: Json.jFail(Json.jNumber,'Number expected'),
-            fct: Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
+  output: Json.jObject({ rank: Json.jNumber, fct: Json.jKey<'#fct'>('#fct'),
           }),
   signals: [],
 };
@@ -127,12 +118,12 @@ const getProbeInfo_internal: Server.GetRequest<
   name:   'plugins.eva.values.getProbeInfo',
   input:  jMarker,
   output: Json.jObject({
-            condition: Json.jFail(Json.jBoolean,'Boolean expected'),
-            effects: Json.jFail(Json.jBoolean,'Boolean expected'),
-            rank: Json.jFail(Json.jNumber,'Number expected'),
-            stmt: Json.jKey<'#stmt'>('#stmt'),
-            code: Json.jString,
-            evaluable: Json.jFail(Json.jBoolean,'Boolean expected'),
+            condition: Json.jBoolean,
+            effects: Json.jBoolean,
+            rank: Json.jNumber,
+            stmt: Json.jOption(Json.jKey<'#stmt'>('#stmt')),
+            code: Json.jOption(Json.jString),
+            evaluable: Json.jBoolean,
           }),
   signals: [],
 };
@@ -153,32 +144,21 @@ export interface evaluation {
   pointedVars: [ string, marker ][];
 }
 
-/** Loose decoder for `evaluation` */
-export const jEvaluation: Json.Loose<evaluation> =
+/** Decoder for `evaluation` */
+export const jEvaluation: Json.Decoder<evaluation> =
   Json.jObject({
-    value: Json.jFail(Json.jString,'String expected'),
-    alarms: Json.jList(
-              Json.jTry(
-                Json.jPair(
-                  Json.jFail(
-                    Json.jUnion<"True" | "False" | "Unknown">(
-                      Json.jTag("True"),
-                      Json.jTag("False"),
-                      Json.jTag("Unknown"),
-                    ),'Union expected'),
-                  Json.jFail(Json.jString,'String expected'),
-                ))),
-    pointedVars: Json.jList(
-                   Json.jTry(
-                     Json.jPair(
-                       Json.jFail(Json.jString,'String expected'),
-                       jMarkerSafe,
-                     ))),
+    value: Json.jString,
+    alarms: Json.jArray(
+              Json.jPair(
+                Json.jUnion<"True" | "False" | "Unknown">(
+                  Json.jTag("True"),
+                  Json.jTag("False"),
+                  Json.jTag("Unknown"),
+                ),
+                Json.jString,
+              )),
+    pointedVars: Json.jArray(Json.jPair( Json.jString, jMarker,)),
   });
-
-/** Safe decoder for `evaluation` */
-export const jEvaluationSafe: Json.Safe<evaluation> =
-  Json.jFail(jEvaluation,'Evaluation expected');
 
 /** Natural order for `evaluation` */
 export const byEvaluation: Compare.Order<evaluation> =
@@ -197,12 +177,15 @@ const getValues_internal: Server.GetRequest<
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getValues',
-  input:  Json.jObject({ callstack: jCallstack, target: jMarkerSafe,}),
+  input:  Json.jObject({
+            callstack: Json.jOption(jCallstack),
+            target: jMarker,
+          }),
   output: Json.jObject({
-            vElse: jEvaluation,
-            vThen: jEvaluation,
-            vAfter: jEvaluation,
-            vBefore: jEvaluation,
+            vElse: Json.jOption(jEvaluation),
+            vThen: Json.jOption(jEvaluation),
+            vAfter: Json.jOption(jEvaluation),
+            vBefore: Json.jOption(jEvaluation),
           }),
   signals: [],
 };

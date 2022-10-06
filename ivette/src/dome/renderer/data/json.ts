@@ -42,6 +42,20 @@ export type json =
 
 export type jobject = { [key: string]: json };
 
+
+/* Parsing exceptions.
+   Stores a string telling what was expected and a json of what have been
+   given */
+
+class JsonError extends Error {
+  expected = '';
+  constructor(expected : string, given : json) {
+    super(`expected ${expected} but given ${given}`);
+    this.name = this.constructor.name;
+    this.expected = expected;
+  }
+}
+
 /**
    Parse without _revivals_.
    Returned data is guaranteed to have only [[json]] type.
@@ -53,9 +67,15 @@ export function parse(text: string, noError = false): json {
   if (noError) {
     try {
       return JSON.parse(text);
-    } catch (err) {
-      D.error('Invalid format:', err);
-      return undefined;
+    }
+    catch (err) {
+      if (err instanceof JsonError) {
+        D.error(err);
+        return undefined;
+      }
+      else {
+        throw err;
+      }
     }
   } else
     return JSON.parse(text);
@@ -76,19 +96,13 @@ export function pretty(js: any): string {
 }
 
 // --------------------------------------------------------------------------
-// --- SAFE Decoder
+// --- Decoder & Encoder types
 // --------------------------------------------------------------------------
 
 /** Decoder for values of type `D`.
     You can abbreviate `Safe<D | undefined>` with `Loose<D>`. */
-export interface Safe<D> {
+export interface Decoder<D> {
   (js?: json): D;
-}
-
-/** Decoder for values of type `D`, if any.
-    Same as `Safe<D | undefined>`. */
-export interface Loose<D> {
-  (js?: json): D | undefined;
 }
 
 /**
@@ -106,162 +120,181 @@ export function identity<A>(v: A): A { return v; }
 // --- Primitives
 // --------------------------------------------------------------------------
 
-/** 'null' or 'undefined'. */
-export const jNull: Loose<null> = (js: json) =>
-  js === null ? null : undefined;
+/** 'null' or throws JsonError. */
+export const jNull: Decoder<null> = (js: json) => {
+  if (js === null) {
+    return null;
+   }
+   else {
+    throw new JsonError("null", js);
+   }
+};
 
 /** Identity. */
-export const jAny: Safe<json> = (js: json) => js;
+export const jAny: Decoder<json> = (js: json) => js;
 
-/** JSON Object. */
-export const jObj: Loose<jobject> = (js: json) => (
-  typeof js === 'object' && !Array.isArray(js) && js !== null ? js : undefined
-);
+/** JSON Object or throws JsonError. */
+export const jObj: Decoder<jobject> = (js: json) => {
+  if (typeof js === 'object' && !Array.isArray(js) && js !== null) {
+    return js;
+  }
+  else {
+    throw new JsonError("object", js);
+  }
+};
 
-/** Primitive JSON number or `undefined`. */
-export const jNumber: Loose<number> = (js: json) => (
-  typeof js === 'number' && !Number.isNaN(js) ? js : undefined
-);
+/** Primitive JSON number or throws JsonError. */
+export const jNumber: Decoder<number> = (js: json) => {
+  if (typeof js === 'number' && !Number.isNaN(js)) {
+    return js;
+  }
+  else {
+    throw new JsonError("object", js);
+  }
+};
 
-/** Primitive JSON number, rounded to integer, or `undefined`. */
-export const jInt: Loose<number> = (js: json) => (
-  typeof js === 'number' && !Number.isNaN(js) ? Math.round(js) : undefined
-);
+/** Primitive JSON number if it is an integer or throws JsonError. */
+export const jInt: Decoder<number> = (js: json) => {
+  if (typeof js === 'number' && Number.isInteger(js)) {
+    return js;
+  }
+  else {
+    throw new JsonError("integer", js); 
+  }
+};
 
 /** Primitive JSON number or `0`. */
-export const jZero: Safe<number> = (js: json) => (
+export const jZero: Decoder<number> = (js: json) => (
   typeof js === 'number' && !Number.isNaN(js) ? js : 0
 );
 
-/** Primitive JSON boolean or `undefined`. */
-export const jBoolean: Loose<boolean> = (js: json) => (
-  typeof js === 'boolean' ? js : undefined
-);
+/** Primitive JSON boolean or throws JsonError. */
+export const jBoolean: Decoder<boolean> = (js: json) => {
+  if (typeof js === 'boolean') {
+    return js;
+  }
+  else {
+    throw new JsonError("boolean", js); 
+  }
+};
 
 /** Primitive JSON boolean or `true`. */
-export const jTrue: Safe<boolean> = (js: json) => (
+export const jTrue: Decoder<boolean> = (js: json) => (
   typeof js === 'boolean' ? js : true
 );
 
 /** Primitive JSON boolean or `false`. */
-export const jFalse: Safe<boolean> = (js: json) => (
+export const jFalse: Decoder<boolean> = (js: json) => (
   typeof js === 'boolean' ? js : false
 );
 
-/** Primitive JSON string or `undefined`. */
-export const jString: Loose<string> = (js: json) => (
-  typeof js === 'string' ? js : undefined
-);
+/** Primitive JSON string or throws JsonError. */
+export const jString: Decoder<string> = (js: json) => {
+    if (typeof js === 'string') {
+      return js;
+    }
+    else {
+      throw new JsonError("string", js); 
+    }
+  };
+  
 
 /** JSON constant.
-    Capture the tag or returns `undefined`.
+    Capture the tag or throw JsonError.
     Can be used with [[jUnion]], although [[jEnum]]
     might be more efficient.
 */
-export function jTag<A>(tg: A): Loose<A> {
-  return (js: json) => (Object.is(js, tg) ? tg : undefined);
+export function jTag<A>(tg: A): Decoder<A> {
+  return (js: json) => {
+    if (Object.is(js, tg)) {
+      return tg;
+    }
+    else {
+      throw new JsonError(`"${tg}"`, js); 
+    }
+   };
 }
 
 /**
-   Lookup tags in a dictionary.
+   Lookup tags in a dictionary, throw JsonError if the tag is not found. 
    Can be used directly for enum types, eg. `jEnum(myEnumType)`.
  */
-export function jEnum<A>(d: { [tag: string]: A }): Loose<A> {
-  return (v: json) => (typeof v === 'string' ? d[v] : undefined);
+export function jEnum<A>(d: { [tag: string]: A }): Decoder<A> {
+  return (js: json) => {
+    if (typeof js === 'string' && js in d) {
+      return d[js];
+    }
+    else {
+      const tags = Object.keys(d).map((tg) => `"${tg}"`);
+      throw new JsonError(tags.join(' | '), js);
+    }
+  };
 }
 
 /**
-   One of the enumerated _constants_ or `undefined`.
+   One of the enumerated _constants_ or throws JsonError.
    The typechecker will prevent you from listing values that are not in
    type `A`. However, it will not protected you from missings constants in `A`.
 */
-export function jTags<A>(...values: ((string | number) & A)[]): Loose<A> {
-  const m = new Map<string | number, A>();
-  values.forEach((v) => m.set(v, v));
-  return (v: json) => (typeof v === 'string' ? m.get(v) : undefined);
+export function jTags<A extends string | number>(...values: A[]): Decoder<A> {
+  const m = new Set<string | number>();
+  values.forEach((v) => m.add(v));
+  return (js: json) => {
+    if ((typeof js === 'string' || typeof js === 'number') && m.has(js)) {
+      return js as A; // m.has(js) implies js extends A
+    }
+    else {
+      const tags = values.map((tg) => typeof tg === 'string' ? `"${tg}"` : tg);
+      throw new JsonError(tags.join(' | '), js);
+    }
+  };
 }
 
 /**
-   Refine a loose decoder with some default value.
-   The default value is returned when the provided JSON is `undefined` or
-   when the loose decoder returns `undefined`.
+   Force returning `undefined` or a default value for `undefined` _or_ `null`
+   JSON input.
  */
-export function jDefault<A>(
-  fn: Loose<A>,
-  defaultValue: A,
-): Safe<A> {
-  return (js: json) => (
-    js === undefined ? defaultValue : (fn(js) ?? defaultValue)
-  );
-}
-
-/**
-   Force returning `undefined` or a default value for
-   `undefined` _or_ `null` JSON input.
-   Typically useful to leverage an existing `Safe<A>` decoder.
- */
-export function jOption<A>(fn: Safe<A>, defaultValue?: A): Loose<A> {
+export function jOption<A>(fn: Decoder<A>, defaultValue?: A)
+    : Decoder<A | undefined> {
   return (js: json) => (
     js === undefined || js === null ? defaultValue : fn(js)
   );
 }
 
 /**
-   Fail when the loose decoder returns `undefined`.
-   See also [[jCatch]] and [[jTry]].
+   Provide a fallback value in case of a JsonError.
  */
-export function jFail<A>(fn: Loose<A>, error: string | Error): Safe<A> {
-  return (js: json) => {
-    const d = fn(js);
-    if (d !== undefined) return d;
-    throw (typeof (error) === 'string' ? new Error(error) : error);
-  };
-}
-
-/**
-   Provide a fallback value in case of undefined value or error.
-   See also [[jFail]] and [[jTry]].
- */
-export function jCatch<A>(fn: Loose<A>, fallBack: A): Safe<A> {
+export function jCatch<A>(fn: Decoder<A>, fallBack: A): Decoder<A> {
   return (js: json) => {
     try {
-      return fn(js) ?? fallBack;
-    } catch (err) {
-      D.warn(err);
-      return fallBack;
+      return fn(js);
+    }
+    catch (err) {
+      if (err instanceof JsonError) {
+        return fallBack;
+      }
+      else {
+        throw err;
+      }
     }
   };
 }
 
 /**
-   Provides an (optional) default value in case of error or undefined value.
-   See also [[jFail]] and [[jCatch]].
+   Converts objects to Maps.
  */
-export function jTry<A>(fn: Loose<A>, defaultValue?: A): Loose<A> {
+export function jMap<A>(fn: Decoder<A>): Decoder<Map<string, A>> {
   return (js: json) => {
-    try {
-      return fn(js) ?? defaultValue;
-    } catch (err) {
-      D.warn(err);
-      return defaultValue;
-    }
-  };
-}
-
-/**
-   Converts maps to dictionaries.
- */
-export function jMap<A>(fn: Loose<A>): Safe<Map<string, A>> {
-  return (js: json) => {
-    const m = new Map<string, A>();
     if (js !== null && typeof js === 'object' && !Array.isArray(js)) {
-      const keys = Object.keys(js);
-      keys.forEach((k) => {
-        const v = fn(js[k]);
-        if (v !== undefined) m.set(k, v);
-      });
+      const m = new Map<string, A>();
+      for (const k of Object.keys(js)) {
+        m.set(k, fn(js[k]));
+      }
+      return m;
     }
-    return m;
+    else {
+      throw new JsonError('object', js);
+    }
   };
 }
 
@@ -282,28 +315,46 @@ export function eMap<A>(fn: Encoder<A>): Encoder<Map<string, undefined | A>> {
 }
 
 /**
-   Apply the decoder on each item of a JSON array, or return `[]` otherwise.
-   Can be also applied on a _loose_ decoder, but you will get
-   an array with possibly `undefined` elements. Use [[jList]]
-   to discard undefined elements, or use a true _safe_ decoder.
+   Apply the decoder on each item of a JSON array or throw JsonError if
+   the decoded json is not an array.
  */
-export function jArray<A>(fn: Safe<A>): Safe<A[]> {
-  return (js: json) => (Array.isArray(js) ? js.map(fn) : []);
+export function jArray<A>(fn: Decoder<A>): Decoder<A[]> {
+  return (js: json) => {
+    if (Array.isArray(js)) {
+      return js.map(fn);
+    }
+    else {
+      throw new JsonError('array', js);
+    }
+  };
 }
 
 /**
-   Apply the loose decoder on each item of a JSON array, discarding
-   all `undefined` elements. To keep the all possibly undefined array entries,
-   use [[jArray]] instead.
- */
-export function jList<A>(fn: Loose<A>): Safe<A[]> {
+    Apply the decoder on each item of a JSON array, discarding
+    all errors.
+  */
+export function jList<A>(fn: Decoder<A>): Decoder<A[]> {
   return (js: json) => {
-    const buffer: A[] = [];
-    if (Array.isArray(js)) js.forEach((vj) => {
-      const d = fn(vj);
-      if (d !== undefined) buffer.push(d);
-    });
-    return buffer;
+    if (Array.isArray(js)) {
+      const buffer = [];
+      for (const element of js) {
+        try {
+          buffer.push(fn(element));
+        }
+        catch (err) {
+          if (err instanceof JsonError) {
+            continue;
+          }
+          else {
+            throw err;
+          }
+        }  
+      }
+      return buffer;
+    }
+    else {
+      throw new JsonError('array', js);
+    }
   };
 }
 
@@ -323,105 +374,120 @@ export function eList<A>(fn: Encoder<A>): Encoder<(A | undefined)[]> {
   };
 }
 
-/** Apply a pair of decoders to JSON pairs, or return `undefined`. */
+/** Apply a pair of decoders to JSON pairs, or throw JsonError if not a pair. */
 export function jPair<A, B>(
-  fa: Safe<A>,
-  fb: Safe<B>,
-): Loose<[A, B]> {
-  return (js: json) => (Array.isArray(js) ? [
-    fa(js[0]),
-    fb(js[1]),
-  ] : undefined);
+  fa: Decoder<A>,
+  fb: Decoder<B>,
+): Decoder<[A, B]> {
+  return (js: json) => {
+    if (Array.isArray(js) && js.length === 2) {
+      return [fa(js[0]) as A, fb(js[1]) as B];
+    }
+    else {
+      throw new JsonError('[A, B]', js);
+    }
+  };
 }
 
 /** Similar to [[jPair]]. */
 export function jTriple<A, B, C>(
-  fa: Safe<A>,
-  fb: Safe<B>,
-  fc: Safe<C>,
-): Loose<[A, B, C]> {
-  return (js: json) => (Array.isArray(js) ? [
-    fa(js[0]),
-    fb(js[1]),
-    fc(js[2]),
-  ] : undefined);
+  fa: Decoder<A>,
+  fb: Decoder<B>,
+  fc: Decoder<C>,
+): Decoder<[A, B, C]> {
+  return (js: json) => {
+    if (Array.isArray(js) && js.length === 3) {
+      return [fa(js[0]), fb(js[1]), fc(js[2])];
+    }
+    else {
+      throw new JsonError('[A, B, C]', js);
+    }
+  };
 }
 
 /** Similar to [[jPair]]. */
 export function jTuple4<A, B, C, D>(
-  fa: Safe<A>,
-  fb: Safe<B>,
-  fc: Safe<C>,
-  fd: Safe<D>,
-): Loose<[A, B, C, D]> {
-  return (js: json) => (Array.isArray(js) ? [
-    fa(js[0]),
-    fb(js[1]),
-    fc(js[2]),
-    fd(js[3]),
-  ] : undefined);
+  fa: Decoder<A>,
+  fb: Decoder<B>,
+  fc: Decoder<C>,
+  fd: Decoder<D>,
+): Decoder<[A, B, C, D]> {
+  return (js: json) => {
+    if (Array.isArray(js) && js.length === 4) {
+      return [fa(js[0]), fb(js[1]), fc(js[2]), fd(js[3])];
+    }
+    else {
+      throw new JsonError('[A, B, C, D]', js);
+    }
+  };
 }
 
 /** Similar to [[jPair]]. */
 export function jTuple5<A, B, C, D, E>(
-  fa: Safe<A>,
-  fb: Safe<B>,
-  fc: Safe<C>,
-  fd: Safe<D>,
-  fe: Safe<E>,
-): Loose<[A, B, C, D, E]> {
-  return (js: json) => (Array.isArray(js) ? [
-    fa(js[0]),
-    fb(js[1]),
-    fc(js[2]),
-    fd(js[3]),
-    fe(js[4]),
-  ] : undefined);
+  fa: Decoder<A>,
+  fb: Decoder<B>,
+  fc: Decoder<C>,
+  fd: Decoder<D>,
+  fe: Decoder<E>,
+): Decoder<[A, B, C, D, E]> {
+  return (js: json) => {
+    if (Array.isArray(js) && js.length === 5) {
+      return [fa(js[0]), fb(js[1]), fc(js[2]), fd(js[3]), fe(js[4])];
+    }
+    else {
+      throw new JsonError('[A, B, C, D, E]', js);
+    }
+  };
 }
 
 /**
    Decoders for each property of object type `A`.
-   Optional fields in `A` can be assigned a loose decoder.
+   Optional fields in `A` can use jOption
 */
 export type Props<A> = {
-  [P in keyof A]: Safe<A[P]>;
+  [P in (keyof A & string)] : Decoder<A[P]>;
 };
 
 /**
    Decode an object given the decoders of its fields.
    Returns `undefined` for non-object JSON.
  */
-export function jObject<A>(fp: Props<A>): Loose<A> {
+export function jObject<A extends object>(decoders: Props<A>): Decoder<A> {
   return (js: json) => {
     if (js !== null && typeof js === 'object' && !Array.isArray(js)) {
-      const buffer = {} as A;
-      const keys = Object.keys(fp);
-      keys.forEach((k) => {
-        const fn = fp[k as keyof A];
-        if (fn !== undefined) {
-          const fj = js[k];
-          if (fj !== undefined) {
-            const fv = fn(fj);
-            if (fv !== undefined) buffer[k as keyof A] = fv;
-          }
-        }
-      });
-      return buffer;
+      const buffer : Partial<A> = {};
+      for (const k of Object.keys(decoders) as (keyof A & string)[]) {
+        buffer[k] = decoders[k](js[k]);
+      }
+      return buffer as A; // All fields should be present
     }
-    return undefined;
+    else {
+      throw new JsonError('object', js);
+    }
   };
 }
 
 /**
-   Returns the first decoder result that is not undefined.
+   Returns the first decoder result that does not fail with a JsonError.
  */
-export function jUnion<A>(...cases: Loose<A>[]): Loose<A> {
+export function jUnion<A>(...cases: Decoder<A>[]): Decoder<A> {
   return (js: json) => {
-    for (let i = 0; i < cases.length; i++) {
-      const fv = cases[i](js);
-      if (fv !== undefined) return fv;
+    const errors = [];
+    for (const fv of cases) {
+      try {
+        return fv(js);
+      }
+      catch (err) {
+        if (err instanceof JsonError) {
+          errors.push(err.expected);
+          continue;
+        }
+        else {
+          throw err;
+        }
+      }
     }
-    return undefined;
+    throw new JsonError(errors.join(' or '), js);
   };
 }
 
@@ -463,7 +529,7 @@ declare const tag: unique symbol;
 export type phantom<K, A> = A & { tag: K };
 
 export function forge<K, A>(_tag: K, data: A): phantom<K, A> {
-  return data as any;
+  return data as phantom<K, A>;
 }
 
 /** String key with kind.
@@ -475,13 +541,27 @@ export type key<K> = phantom<K, string>;
 export type index<K> = phantom<K, number>;
 
 /** Decoder for `key<K>` strings. */
-export function jKey<K>(kd: K): Loose<key<K>> {
-  return (js: json) => (typeof js === 'string' ? forge(kd, js) : undefined);
+export function jKey<K>(kd: K): Decoder<key<K>> {
+  return (js: json)  => {
+    if (typeof js === 'string') {
+      return forge(kd, js);
+    }
+    else {
+      throw new JsonError(`key<${kd}>`, js); 
+    }
+  };
 }
 
 /** Decoder for `index<K>` numbers. */
-export function jIndex<K>(kd: K): Loose<index<K>> {
-  return (js: json) => (typeof js === 'number' ? forge(kd, js) : undefined);
+export function jIndex<K>(kd: K): Decoder<index<K>> {
+  return (js: json)  => {
+    if (typeof js === 'number') {
+      return forge(kd, js);
+    }
+    else {
+      throw new JsonError(`index<${kd}>`, js); 
+    }
+  };
 }
 
 /** Dictionaries. */
@@ -491,22 +571,31 @@ export type dict<A> = { [key: string]: A };
    Decode a JSON dictionary, discarding all inconsistent entries.
    If the JSON contains no valid entry, still returns `{}`.
 */
-export function jDict<A>(fn: Loose<A>): Safe<dict<A>> {
+export function jDict<A>(fn: Decoder<A>): Decoder<dict<A>> {
   return (js: json) => {
     const buffer: dict<A> = {};
     if (js !== null && typeof js === 'object' && !Array.isArray(js)) {
-      const keys = Object.keys(js);
-      keys.forEach((key) => {
-        const fd = js[key];
-        if (fd !== undefined) {
-          const fv = fn(fd);
-          if (fv !== undefined) buffer[key] = fv;
+      for (const k of Object.keys(js)) {
+        try {
+          const fv = fn(js[k]);
+          if (fv !== undefined) {
+            buffer[k] = fv;
+          }
         }
-      });
+        catch (err) {
+          if (err instanceof JsonError) {
+            continue;
+          }
+          else {
+            throw err;
+          }
+        }
+      }
     }
     return buffer;
   };
 }
+
 
 /**
    Encode a dictionary into JSON, discarding all inconsistent entries.

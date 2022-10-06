@@ -44,7 +44,7 @@ import type { State } from './states';
 
 /** @internal */
 interface Settings<A> {
-  decoder: JSON.Loose<A>;
+  decoder: JSON.Decoder<A>;
   encoder: JSON.Encoder<A>;
   defaultValue: A;
 }
@@ -62,12 +62,12 @@ interface Settings<A> {
  */
 export class GlobalSettings<A> {
   name: string;
-  decoder: JSON.Loose<A>;
+  decoder: JSON.Decoder<A>;
   encoder: JSON.Encoder<A>;
   defaultValue: A;
   constructor(
     name: string,
-    decoder: JSON.Loose<A>,
+    decoder: JSON.Decoder<A>,
     encoder: JSON.Encoder<A>,
     defaultValue: A,
   ) {
@@ -114,22 +114,22 @@ export class GString extends GlobalSettings<string> {
 export class GOption<A extends JSON.json>
   extends GlobalSettings<A | undefined>
 {
-  constructor(name: string, encoder: JSON.Loose<A>, defaultValue?: A) {
+  constructor(name: string, encoder: JSON.Decoder<A>, defaultValue?: A) {
     super(name, encoder, JSON.identity, defaultValue);
   }
 }
 
 /** Smart constructor for (JSON serializable) data with default. */
 export class GDefault<A extends JSON.json> extends GlobalSettings<A> {
-  constructor(name: string, encoder: JSON.Loose<A>, defaultValue: A) {
+  constructor(name: string, encoder: JSON.Decoder<A>, defaultValue: A) {
     super(name, encoder, JSON.identity, defaultValue);
   }
 }
 
 /** Smart constructor for object (JSON serializable) data. */
-export class GObject<A extends JSON.json> extends GlobalSettings<A> {
+export class GObject<A extends JSON.json & object> extends GlobalSettings<A> {
   constructor(name: string, fields: JSON.Props<A>, defaultValue: A) {
-    super(name, JSON.jObject(fields), JSON.identity, defaultValue);
+    super(name, JSON.jObject<A>(fields), JSON.identity, defaultValue);
   }
 }
 
@@ -248,7 +248,7 @@ function useSettings<A>(
 ): State<A> {
   // Local State
   const [value, setValue] = React.useState<A>(() => (
-    JSON.jCatch(S.decoder, S.defaultValue)(D.load(K))
+    JSON.jCatch(S.decoder, S.defaultValue)(D.load(K)) ?? S.defaultValue
   ));
   // Foreign Settings Update
   React.useEffect(() => {
@@ -288,7 +288,7 @@ const WindowSettingsDriver = new Driver({
  */
 export function getWindowSettings<A>(
   key: string | undefined,
-  decoder: JSON.Loose<A>,
+  decoder: JSON.Decoder<A>,
   defaultValue: A,
 ): A {
   return key ?
@@ -316,7 +316,7 @@ export function setWindowSettings(
  */
 export function useWindowSettings<A>(
   key: string | undefined,
-  decoder: JSON.Loose<A & JSON.json>,
+  decoder: JSON.Decoder<A & JSON.json>,
   defaultValue: A & JSON.json,
 ): State<A & JSON.json> {
   return useSettings({
@@ -329,7 +329,7 @@ export function useWindowSettings<A>(
 /** Same as [[useWindowSettings]] with a specific encoder. */
 export function useWindowSettingsData<A>(
   key: string | undefined,
-  decoder: JSON.Loose<A>,
+  decoder: JSON.Decoder<A>,
   encoder: JSON.Encoder<A>,
   defaultValue: A,
 ): State<A> {
@@ -377,7 +377,7 @@ const LocalStorageDriver = new Driver({
  */
 export function getLocalStorage<A>(
   key: string | undefined,
-  decoder: JSON.Loose<A>,
+  decoder: JSON.Decoder<A>,
   defaultValue: A,
 ): A {
   return key ?
@@ -400,7 +400,7 @@ export function setLocalStorage(
 
 export function useLocalStorage<A>(
   key: string | undefined,
-  decoder: JSON.Loose<A & JSON.json>,
+  decoder: JSON.Decoder<A & JSON.json>,
   defaultValue: A & JSON.json,
 ): State<A & JSON.json> {
   return useSettings<A & JSON.json>({
@@ -413,7 +413,7 @@ export function useLocalStorage<A>(
 /** Same as [[useLocalStorage]] with a specific encoder. */
 export function useLocalStorageData<A>(
   key: string | undefined,
-  decoder: JSON.Loose<A>,
+  decoder: JSON.Decoder<A>,
   encoder: JSON.Encoder<A>,
   defaultValue: A,
 ): State<A> {

@@ -44,11 +44,7 @@ import { bySource } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jMarkerSafe } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { jSource } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { jSourceSafe } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { marker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -57,8 +53,6 @@ import { source } from 'frama-c/kernel/api/ast';
 import { byTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { jTag } from 'frama-c/kernel/api/data';
-//@ts-ignore
-import { jTagSafe } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { tag } from 'frama-c/kernel/api/data';
 
@@ -70,9 +64,9 @@ const getConfig_internal: Server.GetRequest<
   name:   'kernel.services.getConfig',
   input:  Json.jNull,
   output: Json.jObject({
-            pluginpath: Json.jList(Json.jString),
-            datadir: Json.jList(Json.jString),
-            version: Json.jFail(Json.jString,'String expected'),
+            pluginpath: Json.jArray(Json.jString),
+            datadir: Json.jArray(Json.jString),
+            version: Json.jString,
           }),
   signals: [],
 };
@@ -86,7 +80,7 @@ const load_internal: Server.SetRequest<string,string | undefined> = {
   kind: Server.RqKind.SET,
   name:   'kernel.services.load',
   input:  Json.jString,
-  output: Json.jString,
+  output: Json.jOption(Json.jString),
   signals: [],
 };
 /** Load a save file. Returns an error, if not successfull. */
@@ -96,7 +90,7 @@ const save_internal: Server.SetRequest<string,string | undefined> = {
   kind: Server.RqKind.SET,
   name:   'kernel.services.save',
   input:  Json.jString,
-  output: Json.jString,
+  output: Json.jOption(Json.jString),
   signals: [],
 };
 /** Save the current session. Returns an error, if not successfull. */
@@ -118,12 +112,8 @@ export enum logkind {
   DEBUG = 'DEBUG',
 }
 
-/** Loose decoder for `logkind` */
-export const jLogkind: Json.Loose<logkind> = Json.jEnum(logkind);
-
-/** Safe decoder for `logkind` */
-export const jLogkindSafe: Json.Safe<logkind> =
-  Json.jFail(Json.jEnum(logkind),'kernel.services.logkind expected');
+/** Decoder for `logkind` */
+export const jLogkind: Json.Decoder<logkind> = Json.jEnum(logkind);
 
 /** Natural order for `logkind` */
 export const byLogkind: Compare.Order<logkind> = Compare.byEnum(logkind);
@@ -132,7 +122,7 @@ const logkindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.services.logkindTags',
   input:  Json.jNull,
-  output: Json.jList(jTag),
+  output: Json.jArray(jTag),
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -158,22 +148,18 @@ export interface messageData {
   fct?: Json.key<'#fct'>;
 }
 
-/** Loose decoder for `messageData` */
-export const jMessageData: Json.Loose<messageData> =
+/** Decoder for `messageData` */
+export const jMessageData: Json.Decoder<messageData> =
   Json.jObject({
-    key: Json.jFail(Json.jKey<'#message'>('#message'),'#message expected'),
-    kind: jLogkindSafe,
-    plugin: Json.jFail(Json.jString,'String expected'),
-    message: Json.jFail(Json.jString,'String expected'),
-    category: Json.jString,
-    source: jSource,
-    marker: jMarker,
-    fct: Json.jKey<'#fct'>('#fct'),
+    key: Json.jKey<'#message'>('#message'),
+    kind: jLogkind,
+    plugin: Json.jString,
+    message: Json.jString,
+    category: Json.jOption(Json.jString),
+    source: Json.jOption(jSource),
+    marker: Json.jOption(jMarker),
+    fct: Json.jOption(Json.jKey<'#fct'>('#fct')),
   });
-
-/** Safe decoder for `messageData` */
-export const jMessageDataSafe: Json.Safe<messageData> =
-  Json.jFail(jMessageData,'MessageData expected');
 
 /** Natural order for `messageData` */
 export const byMessageData: Compare.Order<messageData> =
@@ -215,10 +201,10 @@ const fetchMessage_internal: Server.GetRequest<
   name:   'kernel.services.fetchMessage',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jFail(Json.jNumber,'Number expected'),
-            updated: Json.jList(jMessageData),
-            removed: Json.jList(Json.jKey<'#message'>('#message')),
-            reload: Json.jFail(Json.jBoolean,'Boolean expected'),
+            pending: Json.jNumber,
+            updated: Json.jArray(jMessageData),
+            removed: Json.jArray(Json.jKey<'#message'>('#message')),
+            reload: Json.jBoolean,
           }),
   signals: [],
 };
@@ -254,18 +240,15 @@ export interface log {
   source?: source;
 }
 
-/** Loose decoder for `log` */
-export const jLog: Json.Loose<log> =
+/** Decoder for `log` */
+export const jLog: Json.Decoder<log> =
   Json.jObject({
-    kind: jLogkindSafe,
-    plugin: Json.jFail(Json.jString,'String expected'),
-    message: Json.jFail(Json.jString,'String expected'),
-    category: Json.jString,
-    source: jSource,
+    kind: jLogkind,
+    plugin: Json.jString,
+    message: Json.jString,
+    category: Json.jOption(Json.jString),
+    source: Json.jOption(jSource),
   });
-
-/** Safe decoder for `log` */
-export const jLogSafe: Json.Safe<log> = Json.jFail(jLog,'Log expected');
 
 /** Natural order for `log` */
 export const byLog: Compare.Order<log> =
@@ -293,7 +276,7 @@ const getLogs_internal: Server.GetRequest<null,log[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.services.getLogs',
   input:  Json.jNull,
-  output: Json.jList(jLog),
+  output: Json.jArray(jLog),
   signals: [],
 };
 /** Flush the last emitted logs since last call (max 100) */

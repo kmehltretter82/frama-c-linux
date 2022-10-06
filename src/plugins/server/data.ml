@@ -64,12 +64,9 @@ let package = Package.package ~name:"data" ~title:"Informations" ()
 let derived ~package ~id jtype =
   let module Md = Markdown in
   begin
-    declare ~package ~name:(Derived.safe id).name
-      ~descr:(Md.plain "Safe decoder for" @ Md.code id.name)
-      (D_safe(id,jtype)) ;
-    declare ~package ~name:(Derived.loose id).name
-      ~descr:(Md.plain "Loose decoder for" @ Md.code id.name)
-      (D_loose(id,jtype)) ;
+    declare ~package ~name:(Derived.decode id).name
+      ~descr:(Md.plain "Decoder for" @ Md.code id.name)
+      (D_decoder(id,jtype)) ;
     declare ~package ~name:(Derived.order id).name
       ~descr:(Md.plain "Natural order for" @ Md.code id.name)
       (D_order(id,jtype)) ;
@@ -130,14 +127,6 @@ end
 (* -------------------------------------------------------------------------- *)
 
 module Jlist(A : S) : S with type t = A.t list =
-struct
-  type t = A.t list
-  let jtype = Jlist A.jtype
-  let to_json xs = `List (List.map A.to_json xs)
-  let of_json js = List.map A.of_json (Ju.to_list js)
-end
-
-module Jalist(A : S) : S with type t = A.t list =
 struct
   type t = A.t list
   let jtype = Jarray A.jtype
@@ -239,7 +228,7 @@ struct
         "Rich text format uses `[tag; …text ]` to apply \
          the tag `tag` to the enclosed text. \
          Empty tag `\"\"` can also used to simply group text together." in
-    let jdef = Junion [ Jnull; Jstring; Jlist Jself ] in
+    let jdef = Junion [ Jnull; Jstring; Jarray Jself ] in
     declare ~package ~name:"text" ~descr jdef
 end
 
@@ -284,7 +273,7 @@ let jlist (type a) (d : a data) : a list data =
   (module A : S with type t = a list)
 
 let jalist (type a) (d : a data) : a list data =
-  let module A = Jalist(val d) in
+  let module A = Jlist(val d) in
   (module A : S with type t = a list)
 
 let jarray (type a) (d : a data) : a array data =

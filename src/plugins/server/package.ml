@@ -171,7 +171,6 @@ type jtype =
   | Jindex of string (* kind of an integer used for indexing *)
   | Joption of jtype
   | Jdict of jtype (* dictionaries *)
-  | Jlist of jtype (* order does not matter *)
   | Jarray of jtype (* order matters *)
   | Jtuple of jtype list
   | Junion of jtype list
@@ -221,8 +220,7 @@ type declKindInfo =
   | D_value of jtype
   | D_state of jtype
   | D_array of arrayInfo (* key kind *)
-  | D_safe of ident * jtype (* safe decoder *)
-  | D_loose of ident * jtype (* loose decoder *)
+  | D_decoder of ident * jtype
   | D_order of ident * jtype (* natural ordering *)
 
 type declInfo = {
@@ -278,9 +276,7 @@ struct
   let fetch id = derived ~prefix:"fetch" id
   let reload id = derived ~prefix:"reload" id
   let order id = derived ~prefix:"by" id
-  let loose id = derived ~prefix:"j" id
-  let safe id = derived ~prefix:"j" ~suffix:"Safe" id
-  let decode ~safe:ok id = if ok then safe id else loose id
+  let decode id = derived ~prefix:"j" id
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -292,21 +288,20 @@ let rec isRecursive = function
   | Jdata _ | Jenum _
   | Jany | Jnull | Jboolean | Jnumber
   | Jstring | Jalpha | Jkey _ | Jindex _ | Jtag _ -> false
-  | Joption js | Jdict js  | Jarray js | Jlist js -> isRecursive js
+  | Joption js | Jdict js  | Jarray js -> isRecursive js
   | Jtuple js | Junion js -> List.exists isRecursive js
   | Jrecord fjs -> List.exists (fun (_,js) -> isRecursive js) fjs
 
 let rec visit_jtype fn = function
   | Jany | Jself | Jnull | Jboolean | Jnumber
   | Jstring | Jalpha | Jkey _ | Jindex _ | Jtag _ -> ()
-  | Joption js | Jdict js  | Jarray js | Jlist js -> visit_jtype fn js
+  | Joption js | Jdict js  | Jarray js -> visit_jtype fn js
   | Jtuple js | Junion js -> List.iter (visit_jtype fn) js
   | Jrecord fjs -> List.iter (fun (_,js) -> visit_jtype fn js) fjs
   | Jdata id | Jenum id ->
     begin
       fn id ;
-      fn (Derived.safe id) ;
-      fn (Derived.loose id) ;
+      fn (Derived.decode id) ;
       fn (Derived.order id) ;
     end
 
@@ -322,7 +317,7 @@ let visit_request f { rq_input ; rq_output } =
 let visit_dkind f = function
   | D_signal | D_enum _ | D_array _ -> ()
   | D_type js | D_state js | D_value js -> visit_jtype f js
-  | D_loose(id,js) | D_safe(id,js) | D_order(id,js) -> f id ; visit_jtype f js
+  | D_decoder (id,js) | D_order(id,js) -> f id ; visit_jtype f js
   | D_record fds -> List.iter (visit_field f) fds
   | D_request rq -> visit_request f rq
 
@@ -470,7 +465,7 @@ let rec md_jtype pp = function
   | Joption js -> protect pp js @ Md.code "?"
   | Jtuple js -> Md.code "[" @ md_jlist pp "," js @ Md.code "]"
   | Junion js -> md_jlist pp "|" js
-  | Jarray js | Jlist js -> protect pp js @ Md.code "[]"
+  | Jarray js -> protect pp js @ Md.code "[]"
   | Jrecord fjs -> Md.code "{" @ fields pp fjs @ Md.code "}"
   | Jdict js ->
     Md.code "{[key]:" @ md_jtype pp js @ Md.code "}"

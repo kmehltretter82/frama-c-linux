@@ -804,7 +804,7 @@ export const { useWindowSettings } = Settings;
  */
 export function useGlobalSettings<A extends Json.json>(
   globalKey: string,
-  decoder: Json.Loose<A>,
+  decoder: Json.Decoder<A>,
   defaultValue: A,
 ): State<A> {
   // Object creation is cheaper than useMemo...

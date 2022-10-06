@@ -42,32 +42,24 @@ import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jMarkerSafe } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { marker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { jTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { jTagSafe } from 'frama-c/kernel/api/data';
-//@ts-ignore
 import { tag } from 'frama-c/kernel/api/data';
 
 /** State of the computation of Eva Analysis. */
 export type computationStateType = "not_computed" | "computing" | "computed";
 
-/** Loose decoder for `computationStateType` */
-export const jComputationStateType: Json.Loose<computationStateType> =
+/** Decoder for `computationStateType` */
+export const jComputationStateType: Json.Decoder<computationStateType> =
   Json.jUnion<"not_computed" | "computing" | "computed">(
     Json.jTag("not_computed"),
     Json.jTag("computing"),
     Json.jTag("computed"),
   );
-
-/** Safe decoder for `computationStateType` */
-export const jComputationStateTypeSafe: Json.Safe<computationStateType> =
-  Json.jFail(jComputationStateType,'ComputationStateType expected');
 
 /** Natural order for `computationStateType` */
 export const byComputationStateType: Compare.Order<computationStateType> =
@@ -109,12 +101,11 @@ const getCallers_internal: Server.GetRequest<
   kind: Server.RqKind.GET,
   name:   'plugins.eva.general.getCallers',
   input:  Json.jKey<'#fct'>('#fct'),
-  output: Json.jList(
-            Json.jTry(
-              Json.jPair(
-                Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
-                Json.jFail(Json.jKey<'#stmt'>('#stmt'),'#stmt expected'),
-              ))),
+  output: Json.jArray(
+            Json.jPair(
+              Json.jKey<'#fct'>('#fct'),
+              Json.jKey<'#stmt'>('#stmt'),
+            )),
   signals: [],
 };
 /** Get the list of call site of a function */
@@ -131,17 +122,12 @@ export interface functionsData {
   eva_analyzed?: boolean;
 }
 
-/** Loose decoder for `functionsData` */
-export const jFunctionsData: Json.Loose<functionsData> =
+/** Decoder for `functionsData` */
+export const jFunctionsData: Json.Decoder<functionsData> =
   Json.jObject({
-    key: Json.jFail(Json.jKey<'#functions'>('#functions'),
-           '#functions expected'),
-    eva_analyzed: Json.jBoolean,
+    key: Json.jKey<'#functions'>('#functions'),
+    eva_analyzed: Json.jOption(Json.jBoolean),
   });
-
-/** Safe decoder for `functionsData` */
-export const jFunctionsDataSafe: Json.Safe<functionsData> =
-  Json.jFail(jFunctionsData,'FunctionsData expected');
 
 /** Natural order for `functionsData` */
 export const byFunctionsData: Compare.Order<functionsData> =
@@ -175,10 +161,10 @@ const fetchFunctions_internal: Server.GetRequest<
   name:   'plugins.eva.general.fetchFunctions',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jFail(Json.jNumber,'Number expected'),
-            updated: Json.jList(jFunctionsData),
-            removed: Json.jList(Json.jKey<'#functions'>('#functions')),
-            reload: Json.jFail(Json.jBoolean,'Boolean expected'),
+            pending: Json.jNumber,
+            updated: Json.jArray(jFunctionsData),
+            removed: Json.jArray(Json.jKey<'#functions'>('#functions')),
+            reload: Json.jBoolean,
           }),
   signals: [],
 };
@@ -208,16 +194,12 @@ export interface deadCode {
   nonTerminating: marker[];
 }
 
-/** Loose decoder for `deadCode` */
-export const jDeadCode: Json.Loose<deadCode> =
+/** Decoder for `deadCode` */
+export const jDeadCode: Json.Decoder<deadCode> =
   Json.jObject({
-    unreachable: Json.jList(jMarker),
-    nonTerminating: Json.jList(jMarker),
+    unreachable: Json.jArray(jMarker),
+    nonTerminating: Json.jArray(jMarker),
   });
-
-/** Safe decoder for `deadCode` */
-export const jDeadCodeSafe: Json.Safe<deadCode> =
-  Json.jFail(jDeadCode,'DeadCode expected');
 
 /** Natural order for `deadCode` */
 export const byDeadCode: Compare.Order<deadCode> =
@@ -257,13 +239,9 @@ export enum taintStatus {
   not_tainted = 'not_tainted',
 }
 
-/** Loose decoder for `taintStatus` */
-export const jTaintStatus: Json.Loose<taintStatus> = Json.jEnum(taintStatus);
-
-/** Safe decoder for `taintStatus` */
-export const jTaintStatusSafe: Json.Safe<taintStatus> =
-  Json.jFail(Json.jEnum(taintStatus),
-    'plugins.eva.general.taintStatus expected');
+/** Decoder for `taintStatus` */
+export const jTaintStatus: Json.Decoder<taintStatus> =
+  Json.jEnum(taintStatus);
 
 /** Natural order for `taintStatus` */
 export const byTaintStatus: Compare.Order<taintStatus> =
@@ -273,7 +251,7 @@ const taintStatusTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.general.taintStatusTags',
   input:  Json.jNull,
-  output: Json.jList(jTag),
+  output: Json.jArray(jTag),
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -289,17 +267,13 @@ export interface propertiesData {
   taint: taintStatus;
 }
 
-/** Loose decoder for `propertiesData` */
-export const jPropertiesData: Json.Loose<propertiesData> =
+/** Decoder for `propertiesData` */
+export const jPropertiesData: Json.Decoder<propertiesData> =
   Json.jObject({
-    key: Json.jFail(Json.jKey<'#property'>('#property'),'#property expected'),
-    priority: Json.jFail(Json.jBoolean,'Boolean expected'),
-    taint: jTaintStatusSafe,
+    key: Json.jKey<'#property'>('#property'),
+    priority: Json.jBoolean,
+    taint: jTaintStatus,
   });
-
-/** Safe decoder for `propertiesData` */
-export const jPropertiesDataSafe: Json.Safe<propertiesData> =
-  Json.jFail(jPropertiesData,'PropertiesData expected');
 
 /** Natural order for `propertiesData` */
 export const byPropertiesData: Compare.Order<propertiesData> =
@@ -334,10 +308,10 @@ const fetchProperties_internal: Server.GetRequest<
   name:   'plugins.eva.general.fetchProperties',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jFail(Json.jNumber,'Number expected'),
-            updated: Json.jList(jPropertiesData),
-            removed: Json.jList(Json.jKey<'#property'>('#property')),
-            reload: Json.jFail(Json.jBoolean,'Boolean expected'),
+            pending: Json.jNumber,
+            updated: Json.jArray(jPropertiesData),
+            removed: Json.jArray(Json.jKey<'#property'>('#property')),
+            reload: Json.jBoolean,
           }),
   signals: [],
 };
@@ -383,14 +357,9 @@ export enum alarmCategory {
   other = 'other',
 }
 
-/** Loose decoder for `alarmCategory` */
-export const jAlarmCategory: Json.Loose<alarmCategory> =
+/** Decoder for `alarmCategory` */
+export const jAlarmCategory: Json.Decoder<alarmCategory> =
   Json.jEnum(alarmCategory);
-
-/** Safe decoder for `alarmCategory` */
-export const jAlarmCategorySafe: Json.Safe<alarmCategory> =
-  Json.jFail(Json.jEnum(alarmCategory),
-    'plugins.eva.general.alarmCategory expected');
 
 /** Natural order for `alarmCategory` */
 export const byAlarmCategory: Compare.Order<alarmCategory> =
@@ -400,7 +369,7 @@ const alarmCategoryTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.general.alarmCategoryTags',
   input:  Json.jNull,
-  output: Json.jList(jTag),
+  output: Json.jArray(jTag),
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -410,17 +379,13 @@ export const alarmCategoryTags: Server.GetRequest<null,tag[]>= alarmCategoryTags
 export type statusesEntry =
   { valid: number, unknown: number, invalid: number };
 
-/** Loose decoder for `statusesEntry` */
-export const jStatusesEntry: Json.Loose<statusesEntry> =
+/** Decoder for `statusesEntry` */
+export const jStatusesEntry: Json.Decoder<statusesEntry> =
   Json.jObject({
-    valid: Json.jFail(Json.jNumber,'Number expected'),
-    unknown: Json.jFail(Json.jNumber,'Number expected'),
-    invalid: Json.jFail(Json.jNumber,'Number expected'),
+    valid: Json.jNumber,
+    unknown: Json.jNumber,
+    invalid: Json.jNumber,
   });
-
-/** Safe decoder for `statusesEntry` */
-export const jStatusesEntrySafe: Json.Safe<statusesEntry> =
-  Json.jFail(jStatusesEntry,'StatusesEntry expected');
 
 /** Natural order for `statusesEntry` */
 export const byStatusesEntry: Compare.Order<statusesEntry> =
@@ -434,16 +399,9 @@ export const byStatusesEntry: Compare.Order<statusesEntry> =
 /** Alarm count for each alarm category. */
 export type alarmEntry = { category: alarmCategory, count: number };
 
-/** Loose decoder for `alarmEntry` */
-export const jAlarmEntry: Json.Loose<alarmEntry> =
-  Json.jObject({
-    category: jAlarmCategorySafe,
-    count: Json.jFail(Json.jNumber,'Number expected'),
-  });
-
-/** Safe decoder for `alarmEntry` */
-export const jAlarmEntrySafe: Json.Safe<alarmEntry> =
-  Json.jFail(jAlarmEntry,'AlarmEntry expected');
+/** Decoder for `alarmEntry` */
+export const jAlarmEntry: Json.Decoder<alarmEntry> =
+  Json.jObject({ category: jAlarmCategory, count: Json.jNumber,});
 
 /** Natural order for `alarmEntry` */
 export const byAlarmEntry: Compare.Order<alarmEntry> =
@@ -463,40 +421,27 @@ export type programStatsType =
     alarmsStatuses: statusesEntry, assertionsStatuses: statusesEntry,
     precondsStatuses: statusesEntry };
 
-/** Loose decoder for `programStatsType` */
-export const jProgramStatsType: Json.Loose<programStatsType> =
+/** Decoder for `programStatsType` */
+export const jProgramStatsType: Json.Decoder<programStatsType> =
   Json.jObject({
-    progFunCoverage: Json.jFail(
-                       Json.jObject({
-                         reachable: Json.jFail(Json.jNumber,
-                                      'Number expected'),
-                         dead: Json.jFail(Json.jNumber,'Number expected'),
-                       }),'Record expected'),
-    progStmtCoverage: Json.jFail(
-                        Json.jObject({
-                          reachable: Json.jFail(Json.jNumber,
-                                       'Number expected'),
-                          dead: Json.jFail(Json.jNumber,'Number expected'),
-                        }),'Record expected'),
-    progAlarms: Json.jList(jAlarmEntry),
-    evaEvents: Json.jFail(
-                 Json.jObject({
-                   errors: Json.jFail(Json.jNumber,'Number expected'),
-                   warnings: Json.jFail(Json.jNumber,'Number expected'),
-                 }),'Record expected'),
-    kernelEvents: Json.jFail(
-                    Json.jObject({
-                      errors: Json.jFail(Json.jNumber,'Number expected'),
-                      warnings: Json.jFail(Json.jNumber,'Number expected'),
-                    }),'Record expected'),
-    alarmsStatuses: jStatusesEntrySafe,
-    assertionsStatuses: jStatusesEntrySafe,
-    precondsStatuses: jStatusesEntrySafe,
+    progFunCoverage: Json.jObject({
+                       reachable: Json.jNumber,
+                       dead: Json.jNumber,
+                     }),
+    progStmtCoverage: Json.jObject({
+                        reachable: Json.jNumber,
+                        dead: Json.jNumber,
+                      }),
+    progAlarms: Json.jArray(jAlarmEntry),
+    evaEvents: Json.jObject({ errors: Json.jNumber, warnings: Json.jNumber,}),
+    kernelEvents: Json.jObject({
+                    errors: Json.jNumber,
+                    warnings: Json.jNumber,
+                  }),
+    alarmsStatuses: jStatusesEntry,
+    assertionsStatuses: jStatusesEntry,
+    precondsStatuses: jStatusesEntry,
   });
-
-/** Safe decoder for `programStatsType` */
-export const jProgramStatsTypeSafe: Json.Safe<programStatsType> =
-  Json.jFail(jProgramStatsType,'ProgramStatsType expected');
 
 /** Natural order for `programStatsType` */
 export const byProgramStatsType: Compare.Order<programStatsType> =
@@ -569,22 +514,14 @@ export interface functionStatsData {
   alarmStatuses: statusesEntry;
 }
 
-/** Loose decoder for `functionStatsData` */
-export const jFunctionStatsData: Json.Loose<functionStatsData> =
+/** Decoder for `functionStatsData` */
+export const jFunctionStatsData: Json.Decoder<functionStatsData> =
   Json.jObject({
-    key: Json.jFail(Json.jKey<'#fundec'>('#fundec'),'#fundec expected'),
-    coverage: Json.jFail(
-                Json.jObject({
-                  reachable: Json.jFail(Json.jNumber,'Number expected'),
-                  dead: Json.jFail(Json.jNumber,'Number expected'),
-                }),'Record expected'),
-    alarmCount: Json.jList(jAlarmEntry),
-    alarmStatuses: jStatusesEntrySafe,
+    key: Json.jKey<'#fundec'>('#fundec'),
+    coverage: Json.jObject({ reachable: Json.jNumber, dead: Json.jNumber,}),
+    alarmCount: Json.jArray(jAlarmEntry),
+    alarmStatuses: jStatusesEntry,
   });
-
-/** Safe decoder for `functionStatsData` */
-export const jFunctionStatsDataSafe: Json.Safe<functionStatsData> =
-  Json.jFail(jFunctionStatsData,'FunctionStatsData expected');
 
 /** Natural order for `functionStatsData` */
 export const byFunctionStatsData: Compare.Order<functionStatsData> =
@@ -626,10 +563,10 @@ const fetchFunctionStats_internal: Server.GetRequest<
   name:   'plugins.eva.general.fetchFunctionStats',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jFail(Json.jNumber,'Number expected'),
-            updated: Json.jList(jFunctionStatsData),
-            removed: Json.jList(Json.jKey<'#fundec'>('#fundec')),
-            reload: Json.jFail(Json.jBoolean,'Boolean expected'),
+            pending: Json.jNumber,
+            updated: Json.jArray(jFunctionStatsData),
+            removed: Json.jArray(Json.jKey<'#fundec'>('#fundec')),
+            reload: Json.jBoolean,
           }),
   signals: [],
 };
@@ -663,18 +600,9 @@ const getStates_internal: Server.GetRequest<
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.general.getStates',
-  input:  Json.jTry(
-            Json.jPair(
-              jMarkerSafe,
-              Json.jFail(Json.jBoolean,'Boolean expected'),
-            )),
-  output: Json.jList(
-            Json.jTry(
-              Json.jTriple(
-                Json.jFail(Json.jString,'String expected'),
-                Json.jFail(Json.jString,'String expected'),
-                Json.jFail(Json.jString,'String expected'),
-              ))),
+  input:  Json.jPair( jMarker, Json.jBoolean,),
+  output: Json.jArray(
+            Json.jTriple( Json.jString, Json.jString, Json.jString,)),
   signals: [],
 };
 /** Get the domain states about the given marker */

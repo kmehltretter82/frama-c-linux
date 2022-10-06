@@ -29,6 +29,7 @@ import _ from 'lodash';
 import CodeMirror from 'codemirror/lib/codemirror';
 
 import * as Dome from 'dome';
+import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import { TitleBar } from 'ivette';
 import { IconButton } from 'dome/controls/buttons';
@@ -241,7 +242,7 @@ export default function ASTview(): JSX.Element {
   }, [buffer, theMarker]);
 
   function onHover(markerId?: string): void {
-    const marker = Ast.jMarker(markerId);
+    const marker = Json.jOption(Ast.jMarker)(markerId);
     const fct = selection?.current?.fct;
     States.setHovered(marker ? { fct, marker } : undefined);
   }

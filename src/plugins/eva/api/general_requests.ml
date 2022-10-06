@@ -509,7 +509,7 @@ end
 module Alarms =
 struct
   type t = (AlarmCategory.t * int) list
-  let jtype = Package.Jlist AlarmEntry.jtype
+  let jtype = Package.Jarray AlarmEntry.jtype
   let to_json x = `List (List.map AlarmEntry.to_json x)
 end
 
