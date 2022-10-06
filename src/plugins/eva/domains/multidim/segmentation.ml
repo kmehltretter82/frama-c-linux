@@ -30,7 +30,7 @@ let no_oracle = fun _exp -> Int_val.top
 (* Composition operator for compare function *)
 
 let (<?>) c lcmp =
-  if c = 0 then 0 else Lazy.force lcmp
+  if c <> 0 then c else Lazy.force lcmp
 
 
 (* ------------------------------------------------------------------------ *)
