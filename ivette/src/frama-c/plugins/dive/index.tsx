@@ -136,14 +136,18 @@ class Dive {
     this.cy.on('click', 'node', (event) => this.clickNode(event.target));
     this.cy.on('double-click', '$node > node', // compound nodes
       (event) => this.doubleClickNode(event.target));
+
+    // Set zoom limits
     const panzoomDefaults = {
       minZoom: this.cy.minZoom(),
       maxZoom: this.cy.maxZoom(),
     };
     (this.cy as CytoscapeExtended).panzoom(panzoomDefaults);
 
+    // Default layout
     this.layout = 'dagre';
 
+    // Contextual menu
     if (!this.headless) {
       this.cy.scratch('cxtmenu')?.destroy?.(); // Remove previous menu
       this.cy.scratch('cxtmenu', (this.cy as CytoscapeExtended).cxtmenu({
@@ -151,6 +155,30 @@ class Dive {
         commands: (node: Cytoscape.NodeSingular) => this.onCxtMenu(node),
       }));
     }
+
+    // Node width hack
+    const padding = 10;
+    const min = 50;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    if (this.cy.style() && !this.headless) {
+      const canvas = document.querySelector('canvas[data-id="layer2-node"]');
+      if (canvas instanceof HTMLCanvasElement) {
+        const context = canvas.getContext('2d');
+        if (context) {
+          (this.cy.style() as any).selector('node').style('width',
+            (node: any) => {
+            const fStyle = node.pstyle('font-style').strValue;
+            const weight = node.pstyle('font-weight').strValue;
+            const size = node.pstyle('font-size').pfValue;
+            const family = node.pstyle('font-family').strValue;
+            context.font = `${fStyle} ${weight} ${size}px ${family}`;
+            const width = context.measureText(node.data('label')).width;
+            return `${Math.max(min, width + padding)}px`;
+          });
+        }
+      }
+    }
+    /* eslint-enable @typescript-eslint/no-explicit-any */
 
     this.refresh();
   }
@@ -219,6 +247,7 @@ class Dive {
     if (!container)
       return [];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const ref = (node as any).popperRef();
     const common = {
       getReferenceClientRect: ref.getBoundingClientRect,
