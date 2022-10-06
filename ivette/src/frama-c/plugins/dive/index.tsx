@@ -124,6 +124,9 @@ class Dive {
     this.headless = this.cy.container() === null;
     this.cy.elements().remove();
 
+    this.cy.minZoom(1e-1);
+    this.cy.maxZoom(1.0);
+
     // Remove previous listeners
     this.cy.off('click');
     this.cy.off('double-click');
@@ -133,7 +136,11 @@ class Dive {
     this.cy.on('click', 'node', (event) => this.clickNode(event.target));
     this.cy.on('double-click', '$node > node', // compound nodes
       (event) => this.doubleClickNode(event.target));
-    (this.cy as CytoscapeExtended).panzoom({});
+    const panzoomDefaults = {
+      minZoom: this.cy.minZoom(),
+      maxZoom: this.cy.maxZoom(),
+    };
+    (this.cy as CytoscapeExtended).panzoom(panzoomDefaults);
 
     this.layout = 'cose-bilkent';
 
