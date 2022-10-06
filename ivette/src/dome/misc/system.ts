@@ -26,7 +26,6 @@
 */
 
 /* eslint-disable max-len */
-/* eslint-disable no-console */
 
 // --------------------------------------------------------------------------
 // --- Evolved Spawn Process
@@ -37,6 +36,38 @@ import Emitter from 'events';
 import Exec from 'child_process';
 import fspath from 'path';
 import fs from 'fs';
+
+// --------------------------------------------------------------------------
+// --- Logging
+// --------------------------------------------------------------------------
+
+/** Development mode flag */
+export const DEVEL = process.env.NODE_ENV !== 'production';
+
+export class Debug {
+  moduleName: string;
+  constructor(moduleName: string) {
+    this.moduleName = moduleName;
+  }
+
+  /* eslint-disable no-console */
+
+  log(...args: unknown[]): void {
+    if (DEVEL) console.log(`[${this.moduleName}]`, ...args);
+  }
+
+  warn(...args: unknown[]): void {
+    if (DEVEL) console.warn(`[${this.moduleName}]`, ...args);
+  }
+
+  error(...args: unknown[]): void {
+    if (DEVEL) console.error(`[${this.moduleName}]`, ...args);
+  }
+
+  /* eslint-enable no-console */
+}
+
+const D = new Debug('dome');
 
 // --------------------------------------------------------------------------
 // --- Platform Specificities
@@ -55,7 +86,7 @@ switch (process.platform) {
   case 'sunos':
     thePlatform = 'linux'; break;
   default:
-    console.warn(`Unkwnon '${process.platform}' (fallback to 'linux')`);
+    D.warn(`Unknown '${process.platform}' (fallback to 'linux')`);
     thePlatform = 'linux'; break;
 }
 
@@ -71,13 +102,6 @@ switch (process.platform) {
    emission of a warning.
 */
 export const platform = thePlatform;
-
-// --------------------------------------------------------------------------
-// --- Logging
-// --------------------------------------------------------------------------
-
-/** Development mode flag */
-export const DEVEL = process.env.NODE_ENV !== 'production';
 
 // --------------------------------------------------------------------------
 // --- System Emitter
@@ -107,7 +131,7 @@ export function atExit(callback: Callback): void {
 export function doExit(): void {
   exitJobs.forEach((fn) => {
     try { fn(); }
-    catch (err) { console.error('[Dome] atExit:', err); }
+    catch (err) { D.error('atExit:', err); }
   });
   exitJobs.length = 0;
 }
@@ -399,7 +423,7 @@ async function rmDirRec(path: string): Promise<void> {
       return;
     }
   } catch (err) {
-    if (DEVEL) console.warn('[Dome.rmDirRec]', err);
+    D.warn(err);
   }
 }
 
@@ -444,7 +468,7 @@ atExit(() => {
   childprocess.forEach((process, pid) => {
     try { process.kill(); }
     catch (err) {
-      if (DEVEL) console.warn('[Dome.atExit] killing process', pid, err);
+      D.warn('killing process', pid, err);
     }
   });
 });
@@ -481,7 +505,7 @@ function pipeTee(std: Readable, fd: number): void {
   if (!fd) return;
   const out = fs.createWriteStream('<ignored>', { fd, encoding: 'utf-8' });
   out.on('error', (err) => {
-    console.warn('[Dome] can not pipe:', err);
+    D.warn('can not pipe:', err);
     std.unpipe(out);
   });
   std.pipe(out);

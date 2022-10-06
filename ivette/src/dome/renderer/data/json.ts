@@ -32,7 +32,9 @@
    @module dome/data/json
 */
 
-import { DEVEL } from 'dome/system';
+import { Debug } from 'dome/system';
+
+const D = new Debug('Dome.json');
 
 export type json =
   undefined | null | boolean | number | string |
@@ -52,7 +54,7 @@ export function parse(text: string, noError = false): json {
     try {
       return JSON.parse(text);
     } catch (err) {
-      if (DEVEL) console.error('[Dome.json] Invalid format:', err);
+      D.error('Invalid format:', err);
       return undefined;
     }
   } else
@@ -225,7 +227,7 @@ export function jCatch<A>(fn: Loose<A>, fallBack: A): Safe<A> {
     try {
       return fn(js) ?? fallBack;
     } catch (err) {
-      if (DEVEL) console.warn('[Dome.json]', err);
+      D.warn(err);
       return fallBack;
     }
   };
@@ -240,7 +242,7 @@ export function jTry<A>(fn: Loose<A>, defaultValue?: A): Loose<A> {
     try {
       return fn(js) ?? defaultValue;
     } catch (err) {
-      if (DEVEL) console.warn('[Dome.json]', err);
+      D.warn(err);
       return defaultValue;
     }
   };

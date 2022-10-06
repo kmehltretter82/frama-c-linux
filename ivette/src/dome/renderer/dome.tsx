@@ -75,8 +75,8 @@ function setContextAppNode(): HTMLElement | null {
 // --- Helpers
 // --------------------------------------------------------------------------
 
-/** Configured to be `'true'` when in development mode. */
-export const { DEVEL } = System;
+/** DEVEL is configured to be `'true'` when in development mode. */
+export const { DEVEL, Debug } = System;
 
 export type PlatformKind = 'linux' | 'macos' | 'windows';
 
@@ -812,33 +812,6 @@ export function useGlobalSettings<A extends Json.json>(
     globalKey, decoder, Json.identity, defaultValue,
   );
   return Settings.useGlobalSettings(G);
-}
-
-// --------------------------------------------------------------------------
-// --- Pretty Printing (Browser Console)
-// --------------------------------------------------------------------------
-
-export class Debug {
-  moduleName: string;
-  constructor(moduleName: string) {
-    this.moduleName = moduleName;
-  }
-
-  /* eslint-disable no-console */
-
-  log(...args: any): void {
-    if (DEVEL) console.log(`[${this.moduleName}]`, ...args);
-  }
-
-  warn(...args: any): void {
-    if (DEVEL) console.warn(`[${this.moduleName}]`, ...args);
-  }
-
-  error(...args: any): void {
-    if (DEVEL) console.error(`[${this.moduleName}]`, ...args);
-  }
-
-  /* eslint-enable no-console */
 }
 
 // --------------------------------------------------------------------------
