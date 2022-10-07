@@ -47,7 +47,18 @@ let log2scale x limit =
   assert (limit > 0.);
   Float.(logscale (log x) (log limit))
 
-let interval_range l u limit =
+let cardinal_range cardinal limit =
+  let s = log2scale (Integer.to_float cardinal) (Integer.to_float limit) in
+  if s > 98 then Wide else Normal s
+
+let integer_range cardinal ikind =
+  let _, limit = ikind_limits ikind in
+  cardinal_range cardinal limit
+
+let float_range fkind l u =
+  let limit = fkind_limits fkind
+  and l = Fval.F.to_float l
+  and u = Fval.F.to_float u in
   let range =
     if (l < 0.0) = (u < 0.0) then (* if bounds have same sign *)
       u -. l
@@ -57,33 +68,12 @@ let interval_range l u limit =
   let s = log2scale range limit in
   if s > 98 then Wide else Normal s
 
-let integer_range ikind l u =
-  let _, limit = ikind_limits ikind
-  and l = Integer.to_float l
-  and u = Integer.to_float u in
-  interval_range l u (Integer.to_float limit)
-
-let float_range fkind l u =
-  let limit = fkind_limits fkind
-  and l = Fval.F.to_float l
-  and u = Fval.F.to_float u in
-  interval_range l u limit
-
-let default_range n =
-  Normal (logscale (Integer.to_float n) 100.)
-
 let evaluate cvalue typ =
   let cardinal = Cvalue.V.cardinal cvalue in
   match typ, cardinal with
   | _, Some card when Integer.is_zero card -> Empty
   | _, Some card when Integer.is_one card -> Singleton
-  | Cil_types.TInt (ikind,_), _ ->
-    begin match Ival.min_and_max (Cvalue.V.project_ival cvalue) with
-      | Some l, Some u -> integer_range ikind l u
-      | _, _ -> Wide
-      | exception Cvalue.V.Not_based_on_null -> Wide
-      | exception Abstract_interp.Error_Bottom -> Empty
-    end
+  | Cil_types.TInt (ikind,_), Some cardinal -> integer_range cardinal ikind
   | Cil_types.TFloat (fkind,_), _ ->
     begin match Ival.min_and_max_float (Cvalue.V.project_ival cvalue) with
       | Some (l, u), _can_be_nan -> float_range fkind l u
@@ -91,15 +81,8 @@ let evaluate cvalue typ =
       | exception Cvalue.V.Not_based_on_null -> Wide
       | exception Abstract_interp.Error_Bottom -> Empty
     end
-  | _, Some cardinal ->
-    default_range cardinal
-  | _, None ->
-    try
-      let size = Integer.of_int (Cil.bitsSizeOf typ) in
-      if Integer.(le size sixteen)
-      then default_range (Integer.two_power size)
-      else Wide
-    with Cil.SizeOfError _ -> Empty
+  | _, Some cardinal -> cardinal_range cardinal (Integer.of_int 100) (* arbitrary limit for pointers *)
+  | _, None -> Wide
 
 let upper_bound r1 r2 =
   match r1, r2 with
