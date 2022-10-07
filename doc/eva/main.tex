@@ -6653,15 +6653,14 @@ value is saved in \texttt{old}'') and has been called with a null pointer.
 In this case, the message can be safely ignored.
 
 \paragraph{Cannot evaluate ACSL term, unsupported ACSL construct: [...]}
-This message can be emitted as a warning, or as a simple feedback message.
-In the latter case, this is just a notification concerning the fact that
-an analyzed specification is ``too complex'' for \Eva{} to currently interpret
-it, but unnecessary for the soundness of the analysis (otherwise it would have
-been emitted as a warning).
+This message indicates that a specification is ``too complex'' for \Eva{} to
+currently interpret it, and is ignored by the analysis:
+\Eva{} cannot prove the specification, nor use it to improve its analysis.
+However, this has no impact on the soundness of the analysis.
 This often arrives when using Frama-C's libc specifications for functions in
 \texttt{string.h}, because these functions include a logical axiomatization
-that is useful for the \textsf{WP} plug-in. In this context, and without
-the warning, they can be safely ignored.
+that is useful for the \textsf{WP} plug-in.
+In this context, they can be safely ignored.
 
 \end{document}
 
