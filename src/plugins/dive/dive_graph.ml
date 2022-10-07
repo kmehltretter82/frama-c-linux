@@ -37,6 +37,7 @@ let new_node
   node_hidden = false;
   node_values = None;
   node_range = Empty;
+  node_taint = None;
   node_writes_computation = NotDone;
   node_reads_computation = NotDone;
   node_writes_stmts = [];
@@ -123,12 +124,21 @@ let edges g =
   fold_edges_e (fun d acc -> d ::acc) g []
 
 
-let update_node_values node new_values typ =
-  let join n = Cvalue.V.join n new_values in
-  node.node_values <-
-    Some (Option.fold ~some:join ~none:new_values node.node_values);
+let update_node_values node ~typ ~cvalue ~taint =
+  let join_taint t1 t2 =
+    let open Eva.Results in
+    match t1, t2 with
+    | Direct, _ | _, Direct -> Direct
+    | Indirect, _ | _, Indirect -> Indirect
+    | Untainted, Untainted -> Untainted
+  in
+  node.node_values <- Some (
+      Option.fold ~some:(Cvalue.V.join cvalue) ~none:cvalue node.node_values);
   node.node_range <-
-    Node_range.(upper_bound node.node_range (evaluate new_values typ))
+    Node_range.(upper_bound node.node_range (evaluate cvalue typ));
+  Option.iter (fun taint ->
+      node.node_taint <- Some (
+          Option.fold ~some:(join_taint taint) ~none:taint node.node_taint)) taint
 
 let find_independant_nodes g roots =
   let module Dfs = Graph.Traverse.Dfs (struct
@@ -325,6 +335,11 @@ struct
     | Partial _ -> `String "partial"
     | NotDone -> `String "no"
 
+  let output_taint = function
+    | Eva.Results.Direct -> `String "direct"
+    | Indirect ->  `String "inddirect"
+    | Untainted ->  `String "untainted"
+
   let output_node node =
     let label = Pretty_utils.to_string Node_kind.pretty node.node_kind in
     `Assoc ([
@@ -345,6 +360,10 @@ struct
             let typ = Cil.typeOfLval lval in
             let str = Pretty_utils.to_string Cil_printer.pp_typ typ in
             [("type", `String str)]
+        end @
+        begin match node.node_taint with
+          | None -> []
+          | Some t -> [("taint", output_taint t)]
         end)
 
   let output_dep (n1,dep,n2) =

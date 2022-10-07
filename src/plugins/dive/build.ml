@@ -103,6 +103,10 @@ struct
   let to_callstacks stmt =
     before stmt |> callstacks
 
+  let is_tainted kinstr lval =
+    let zone = to_zone kinstr lval in
+    before_kinstr kinstr |> is_tainted zone |> Result.to_option
+
   let studia_direct_effect = function
     | e, { Studia.Writes.direct = true } -> Some e
     | _ -> None
@@ -139,8 +143,9 @@ end
 
 let update_node_values node kinstr lval =
   let typ = Cil.typeOfLval lval
-  and cvalue = Eval.to_cvalue kinstr lval in
-  Graph.update_node_values node cvalue typ
+  and cvalue = Eval.to_cvalue kinstr lval
+  and taint = Eval.is_tainted kinstr lval in
+  Graph.update_node_values node ~typ ~cvalue ~taint
 
 
 (* --- Locations handling --- *)

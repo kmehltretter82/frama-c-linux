@@ -53,6 +53,7 @@ type node = {
   mutable node_hidden : bool;
   mutable node_values : Cvalue.V.t option;
   mutable node_range : node_range;
+  mutable node_taint : Eva.Results.taint option;
   mutable node_writes_computation : computation;
   mutable node_reads_computation : computation;
   mutable node_writes_stmts : Cil_types.stmt list;

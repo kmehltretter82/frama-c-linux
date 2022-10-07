@@ -200,7 +200,9 @@ struct
       "writes", Jarray Kernel_ast.KfMarker.jtype;
       "values", Joption Jstring;
       "range", Junion [ Jnumber ; Jstring ];
-      "type", Joption Jstring
+      "type", Joption Jstring;
+      "taint", Joption (Junion [
+          Jtag "direct"; Jtag "indirect"; Jtag "untainted"])
     ])
 end
 
