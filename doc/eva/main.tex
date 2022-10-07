@@ -501,7 +501,8 @@ missing function definitions by using the command:
 frama-c -metrics *.c
 \end{listing-nonumber}
 This command computes, among other pieces of information,
-a list of missing functions (under the listing ``Undefined functions'')
+a list of missing functions
+(under the listing ``Undefined and unspecified functions'')
 using a syntactic analysis produced by the \textsf{Metrics} plugin.
 It is not exactly equivalent to
 grepping the log of \Eva{} because it lists
@@ -509,9 +510,9 @@ all the functions that are missing, while the log of
 \Eva{} only cites the functions that would have
 been necessary to an analysis. When
 analyzing a small part of a large codebase, the latter list
-may be much shorter than the former. 
-In this case, relying on the information displayed by \lstinline|-metrics|
-means spending time hunting for functions that are not actually
+may be much shorter than the former, in which case
+relying on the information displayed by \lstinline|-metrics| would
+mean spending time hunting for functions that are not actually
 necessary.
 
 By default, \textsf{Metrics} does not list functions from the standard C
@@ -519,15 +520,16 @@ library. This can be done by adding option \verb|-metrics-libc|, which would
 produce something similar to:
 
 \begin{logs}
-Undefined functions (90)
+Specified-only functions (94)
 =======================
 [...]
-memcpy (21 calls); memmove (0 call); memset (27 calls); pclose (0 call);
-perror (0 call); popen (0 call); printf_va_1 (1 call); putc (0 call);
+memcpy (21 calls); (...) memset (27 calls); (...) printf_va_1 (1 call);
 \end{logs}
-Besides \verb|printf_va_1|, only functions \verb|memcpy| and \verb|memset|
-are called. These functions are already specified in the Frama-C libc. However,
-when running \Eva{}, they result in an output similar to the following:
+
+The fact that these functions are marked as {\em Specified-only}
+means that \Eva{} will use their ACSL specifications (which are already present
+in Frama-C's libc) instead of their code (which is absent). When running \Eva{},
+some of these functions result in an output similar to the following:
 
 \begin{logs}
 [eva] FRAMAC_SHARE/libc/string.h:118:
@@ -538,12 +540,12 @@ Note that this message is {\em not} a warning (it does not begin with the word
 ``Warning'') neither an alarm (it is not prefixed with \verb|[eva:alarm]|). It
 is an informative message related to Frama-C's libc specifications that can be
 safely ignored\footnote{For the interested reader:
-  some of the more thorough ACSL specifications in Frama-C's
-  \texttt{<string.h>} are useful for plugins such as \textsf{WP},
-  but are not yet fully interpreted by \Eva{}. Instead, \Eva{} has builtins to
-  correctly interpret these libc functions without only relying on their
-  specification.}
-and will likely disappear in future Frama-C releases.
+some of the more thorough ACSL specifications in Frama-C's
+\texttt{<string.h>} are useful for plugins such as \textsf{WP},
+but are not yet fully interpreted by \Eva{}. Besides, \Eva{} has builtins which
+improve precision and efficiency of the analysis of such functions, beyond what
+ACSL specifications can provide.} and will likely disappear in future Frama-C
+releases.
 
 \subsection{Interpreting the output of the analysis}
 
@@ -1118,7 +1120,7 @@ The latter condition is harder than the former.
 Observing results (with the GUI or observation functions
 described in section \ref{buitins_observation}) can help to iterate towards
 a solution. Be creative. The continuation of this tutorial can be found online
-at \url{http://blog.frama-c.com/index.php?tag/skein}\footnote{Note that some
+at \url{https://frama-c.com/category/skein/}\footnote{Note that some
   messages and options have changed since the tutorial was posted. Using an
   older Frama-C version may be necessary to obtain similar results.}
 ; read available posts in chronological order.
@@ -6649,6 +6651,16 @@ legitimate occurrence of this message is when a function has an
 optional outgoing parameter (i.e., ``if \texttt{old} is non-NULL, the previous
 value is saved in \texttt{old}'') and has been called with a null pointer.
 In this case, the message can be safely ignored.
+
+\paragraph{Cannot evaluate ACSL term, unsupported ACSL construct: [...]}
+This message indicates that a specification is ``too complex'' for \Eva{} to
+currently interpret it, and is ignored by the analysis:
+\Eva{} cannot prove the specification, nor use it to improve its analysis.
+However, this has no impact on the soundness of the analysis.
+This often arrives when using Frama-C's libc specifications for functions in
+\texttt{string.h}, because these functions include a logical axiomatization
+that is useful for the \textsf{WP} plug-in.
+In this context, they can be safely ignored.
 
 \end{document}
 
