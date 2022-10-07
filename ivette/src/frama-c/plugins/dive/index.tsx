@@ -306,28 +306,23 @@ class Dive {
     let newNodes = this.cy.collection();
 
     for (const node of data.nodes) {
-      let stops = undefined;
+      const data : { [k: string]: unknown } = { ...node};
       if (typeof node.range === 'number')
-        stops = `0% ${node.range}% ${node.range}% 100%`;
+        data.stops = `0% ${node.range}% ${node.range}% 100%`;
 
       let ele = this.cy.$id(node.id.toString());
       if (ele.nonempty()) {
         ele.removeData();
-        ele.data(node);
+        ele.data(data);
         ele.neighborhood('edge').remove();
       }
       else {
-        let parent = null;
         if (node.locality.callstack)
-          parent = this.referenceCallstack(node.locality.callstack)?.id();
+          data.parent = this.referenceCallstack(node.locality.callstack)?.id();
         else
-          parent = this.referenceFile(node.locality.file).id();
+          data.parent = this.referenceFile(node.locality.file).id();
 
-        ele = this.cy.add({
-          group: 'nodes',
-          data: { ...(node as { [k: string]: unknown }), stops, parent },
-          classes: 'new',
-        });
+        ele = this.cy.add({group: 'nodes', data, classes: 'new'});
         this.addTips(ele);
         newNodes = ele.union(newNodes);
       }
