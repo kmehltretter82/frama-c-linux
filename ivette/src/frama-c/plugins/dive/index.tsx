@@ -286,19 +286,25 @@ class Dive {
 
   addTips(node: Cytoscape.NodeSingular): void {
     let timeout: NodeJS.Timeout;
-    let tips: Tippy.Instance[];
+    let tips: Tippy.Instance[] | null = null;
 
-    // Create tips lazily
     node.on('mouseover', () => {
-      if (tips === undefined)
+      if (tips === null) {
         tips = this.createTips(node);
+        tips.forEach((tip) => tip.props.onHidden = (() => tip.destroy()));
+      }
       clearTimeout(timeout);
-      timeout = setTimeout(() => tips?.forEach((tip) => { tip.show(); }), 200);
+      timeout = setTimeout(() => tips?.forEach((tip) => {
+        tip.show();
+      }), 200);
     });
 
     node.on('mouseout', () => {
       clearTimeout(timeout);
-      timeout = setTimeout(() => tips?.forEach((tip) => { tip.hide(); }), 1000);
+      timeout = setTimeout(() => {
+        tips?.forEach((tip) => tip.hide());
+        tips = null; // Force rebuilding tips in case they changed
+      }, 1000);
     });
   }
 
