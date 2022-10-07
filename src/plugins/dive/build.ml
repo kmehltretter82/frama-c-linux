@@ -513,7 +513,11 @@ let build_node_reads context node =
   and build_args_deps callstack zone stmt args callee_kf =
     let callstack = Callstack.push (callee_kf,stmt) callstack in
     let formals = Kernel_function.get_formals callee_kf in
-    List.iter2 (build_arg_dep callstack stmt zone) args formals
+    try
+      List.iter2 (build_arg_dep callstack stmt zone) args formals
+    (* Invalid_argument happens for Frama_C_show_each which does not have
+       any formal but can have any arguments. *)
+    with Invalid_argument _ -> ()
 
   and build_arg_dep callstack stmt zone arg formal =
     if exp_contains_read zone stmt arg then
