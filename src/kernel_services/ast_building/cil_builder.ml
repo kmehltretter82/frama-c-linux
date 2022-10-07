@@ -785,7 +785,9 @@ struct
     | Sequence of stmt' list
     | Block of stmt' list
     | GhostSection of stmt'
-    | If of exp' * stmt' list * stmt' list
+    | If of exp' * block * block
+
+  and block = stmt' list * Cil_types.attributes
 
   type instr = [ `instr of instr' ]
   type stmt = [ instr | `stmt of stmt' ]
@@ -801,8 +803,8 @@ struct
     | #instr as instr -> Instr (harden_instr instr)
     | `stmt stmt -> stmt
 
-  let harden_stmt_list l =
-    List.map harden_stmt l
+  let harden_block l attributes : block =
+    List.map harden_stmt l, attributes
 
   (* Build *)
 
@@ -820,8 +822,16 @@ struct
   let block l = `stmt (Block (List.map harden_stmt l))
   let ghost s = `stmt (GhostSection (harden_stmt s))
 
-  let if_ cond ~then_ ~else_ =
-    `stmt (If (harden_exp cond, harden_stmt_list then_, harden_stmt_list else_))
+  let if_ ?(ghost_else=false) cond ~then_ ~else_ =
+    let else_attributes =
+      if ghost_else
+      then [Cil_types.Attr (Cil.frama_c_ghost_else,[])]
+      else []
+    in
+    `stmt (If (
+        harden_exp cond,
+        harden_block then_ [],
+        harden_block else_ else_attributes))
 
   let local' ?(ghost=false) ?init typ name =
     let var = NewVar (Scope.new_id (), name, typ) in
@@ -918,9 +928,10 @@ struct
       ),
       scope
     | Sequence s | Block s ->
-      Cil_types.Block (build_block ~scope ~loc ~ghost ~fundec s), scope
+      Cil_types.Block (build_block ~scope ~loc ~ghost ~fundec (s,[])), scope
     | (CilStmt _)  as s | GhostSection s ->
-      Cil_types.Block (build_block ~scope ~loc ~ghost:true ~fundec [s]), scope
+      let ghost = true in
+      Cil_types.Block (build_block ~scope ~loc ~ghost ~fundec ([s],[])), scope
 
   and build_stmtlist_rev ~scope ~loc ~ghost ~block ~fundec acc l =
     let add_one (acc,scope) stmt =
@@ -950,11 +961,12 @@ struct
       in
       Cil.mkStmt ~ghost stmtkind, scope
 
-  and build_block ~scope ~loc ~ghost ~fundec l =
+  and build_block ~scope ~loc ~ghost ~fundec (l, attributes) =
     let block = Cil.mkBlock [] in
     let bstmts, _scope =
       build_stmtlist_rev ~scope ~loc ~ghost ~block:(Some block) ~fundec [] l
     in
+    block.battrs <- attributes;
     block.bstmts <- List.rev bstmts;
     block
 
@@ -1011,7 +1023,11 @@ struct
   and scope_type =
     | Block
     | IfThen of {ifthen_exp: Cil_types.exp}
-    | IfThenElse of {ifthenelse_exp: Cil_types.exp; then_block: Cil_types.block}
+    | IfThenElse of {
+        ifthenelse_exp: Cil_types.exp;
+        then_block: Cil_types.block;
+        ghost_else: bool;
+      }
     | Switch of {switch_exp: Cil_types.exp}
     | Function of {fundec: Cil_types.fundec}
 
@@ -1059,7 +1075,9 @@ struct
       Cil_types.Block block
     | IfThen { ifthen_exp } ->
       Cil_types.If (ifthen_exp, block, Cil.mkBlock [], b.loc)
-    | IfThenElse { ifthenelse_exp; then_block } ->
+    | IfThenElse { ifthenelse_exp; then_block; ghost_else } ->
+      if ghost_else then
+        block.battrs <- [Cil_types.Attr (Cil.frama_c_ghost_else,[])];
       Cil_types.If (ifthenelse_exp, then_block, block, b.loc)
     | Switch { switch_exp } ->
       let open Cil_types in
@@ -1233,11 +1251,11 @@ struct
     let ifthen_exp = cil_exp ~loc exp in
     push (new_block ~loc (IfThen {ifthen_exp}))
 
-  let open_else () =
+  let open_else ?(ghost=false) () =
     let b = pop () in
     let ifthenelse_exp = extract_ifthen_block b in
     let then_block = build_block b in
-    push (new_block (IfThenElse {ifthenelse_exp; then_block}))
+    push (new_block (IfThenElse {ifthenelse_exp; then_block; ghost_else=ghost}))
 
   let close () =
     let above = pop () in

@@ -262,7 +262,8 @@ sig
   val block : [< stmt] list -> [> stmt]
   val sequence : [< stmt] list -> [> stmt] (* does not generate block *)
   val ghost : [< stmt] -> [> stmt]
-  val if_ : [< exp] -> then_:[< stmt] list -> else_:[< stmt] list -> [> stmt]
+  val if_ : ?ghost_else:bool ->
+    [< exp] -> then_:[< stmt] list -> else_:[< stmt] list -> [> stmt]
 
   (* Conversion to Cil *)
 
@@ -335,7 +336,7 @@ sig
   val open_if :
     ?loc:Cil_types.location -> ?into:Cil_types.fundec ->
     [< exp] -> unit
-  val open_else : unit -> unit
+  val open_else : ?ghost:bool -> unit -> unit
   val close : unit -> unit
   val finish_block : unit -> Cil_types.block
   val finish_instr_list : ?scope:Cil_types.block -> unit -> Cil_types.instr list
