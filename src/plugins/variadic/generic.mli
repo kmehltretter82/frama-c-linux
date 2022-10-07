@@ -30,12 +30,9 @@ val translate_type : Cil_types.typ -> Cil_types.typ
 val add_vpar : Cil_types.varinfo -> unit
 
 (* Translation of va_* builtins *)
-val translate_va_builtin : Cil_types.fundec -> Cil_types.instr ->
-  Cil_types.instr list
+val translate_va_builtin :
+  Cil_types.fundec -> Cil_types.instr -> Cil_types.instr list
 
 (* Generic translation of calls *)
-val translate_call : fundec:Cil_types.fundec -> ghost:bool ->
-  Cil_types.block -> Cil_types.location ->
-  (Cil_types.exp -> Cil_types.exp list -> Cil_types.instr) ->
-  Cil_types.exp -> Cil_types.exp list ->
-  Cil_types.instr list
+val translate_call :
+  builder:Builder.t -> Cil_types.exp -> Cil_types.exp list -> unit

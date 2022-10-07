@@ -136,7 +136,10 @@ let translate_va_builtin caller inst =
 
 (* Translation of calls to variadic functions *)
 
-let translate_call ~fundec ~ghost block loc mk_call callee pars =
+let translate_call ~builder callee pars =
+  let module Build = (val builder : Builder.S) in
+  Build.start_translation ();
+
   (* Log translation *)
   Self.result ~current:true ~level:2
     "Generic translation of call to variadic function.";
@@ -148,10 +151,6 @@ let translate_call ~fundec ~ghost block loc mk_call callee pars =
   let variadic_size = (List.length r_exps) - (List.length g_params) in
   let v_exps, g_exps = List.break variadic_size r_exps in
 
-  (* Start build *)
-  let module Build = Cil_builder.Stateful (struct let loc = loc end) in
-  Build.open_block ~into:fundec ~ghost ();
-
   (* Create temporary variables to hold parameters *)
   let add_var i e =
     let name = "__va_arg" ^ string_of_int i in
@@ -161,14 +160,13 @@ let translate_call ~fundec ~ghost block loc mk_call callee pars =
 
   (* Build an array to store addresses *)
   let init = match vis with (* C standard forbids arrays of size 0 *)
-    | [] -> [Build.of_init (Cil.makeZeroInit ~loc Cil.voidPtrType)]
+    | [] -> [Build.(of_init (Cil.makeZeroInit ~loc Cil.voidPtrType))]
     | l -> List.map Build.addr l
   in
   let ty = Build.(array (ptr void) ~size:(List.length init)) in
   let vargs = Build.(local ty "__va_args" ~init) in
 
   (* Translate the call *)
-  let new_arg = Build.(cil_exp ~loc (cast' (vpar_typ []) (addr vargs))) in
-  let new_args = (s_exps @ [new_arg] @ g_exps) in
-  Build.of_instr (mk_call callee new_args);
-  Build.finish_instr_list ~scope:block ()
+  let new_arg = Build.(cast' (vpar_typ []) (addr vargs)) in
+  let new_args = Build.(of_exp_list s_exps @ [new_arg] @ of_exp_list g_exps) in
+  Build.(translated_call (of_exp callee) new_args)

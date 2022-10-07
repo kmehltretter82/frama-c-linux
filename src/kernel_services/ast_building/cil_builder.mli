@@ -57,6 +57,8 @@ sig
 
   val ptr : ('v,'s) typ -> ('v,'v) typ
   val array : ?size:int -> ('v,'s) typ -> ('v,'s list) typ
+  val structure :
+    Cil_types.compinfo -> (Cil_types.fieldinfo -> 'a -> 'v) -> ('v, 'a) typ
 
   (* Attributes *)
   val attribute : ('v,'s) typ -> string -> Cil_types.attrparam list
@@ -122,6 +124,7 @@ sig
 
   val of_exp : Cil_types.exp -> [> exp]
   val of_exp_copy : Cil_types.exp -> [> exp]
+  val of_exp_list : Cil_types.exp list -> [> exp] list
   val unop : Cil_types.unop -> [< exp] -> [> exp]
   val neg : [< exp] -> [> exp]
   val lognot : [< exp] -> [> exp]
@@ -177,7 +180,6 @@ sig
   val compound : Cil_types.typ -> init list -> [> init]
   val values : (init,'values) typ -> 'values -> init
 
-
   (* Redefined operators *)
 
   val (+) : [< exp] -> [< exp] -> [> exp]
@@ -194,6 +196,7 @@ sig
   val (==) : [< exp] -> [< exp] -> [> exp]
   val (!=) : [< exp] -> [< exp] -> [> exp]
   val (--) : [< exp] -> [< exp] -> [> exp]
+  val (.@[]) : [< lval] -> [< exp] -> [> exp] (* C index operator [] *)
 
   (* Export CIL objects from built expressions *)
 
@@ -203,6 +206,7 @@ sig
   exception NotAPredicate of exp
   exception NotAFunction of Cil_types.logic_info
   exception Typing_error of string
+  exception OutOfScope of string
 
   val cil_logic_label : label -> Cil_types.logic_label
   val cil_constant : [< const] -> Cil_types.constant
@@ -244,18 +248,38 @@ sig
   val incr : [< lval] -> [> instr]
   val call : [< lval | `none] -> [< exp] -> [< exp] list -> [> instr]
 
+  val local : ?ghost:bool -> ?init:'v -> (init,'v) typ -> string ->
+    [> var] * [> instr]
+  val local' : ?ghost:bool -> ?init:init -> Cil_types.typ -> string ->
+    [> var] * [> instr]
+  val local_copy : ?ghost:bool -> ?suffix:string -> [< var] ->
+    [> var] * [> instr]
+
   (* Statements *)
   val of_stmtkind : Cil_types.stmtkind -> [> stmt]
   val of_stmt : Cil_types.stmt -> [> stmt]
   val of_stmts : Cil_types.stmt list -> [> stmt]
   val block : [< stmt] list -> [> stmt]
+  val sequence : [< stmt] list -> [> stmt] (* does not generate block *)
   val ghost : [< stmt] -> [> stmt]
+  val if_ : ?ghost_else:bool ->
+    [< exp] -> then_:[< stmt] list -> else_:[< stmt] list -> [> stmt]
 
-  val cil_instr : loc:Cil_types.location -> instr -> Cil_types.instr
-  val cil_stmtkind : loc:Cil_types.location -> stmt -> Cil_types.stmtkind
-  val cil_stmt : loc:Cil_types.location -> stmt -> Cil_types.stmt
+  (* Conversion to Cil *)
+
+  (* for the three following function into is mandatory if the built ast
+     contains locals declarations *)
+  val cil_instr : ?into:Cil_types.fundec ->
+    loc:Cil_types.location -> instr -> Cil_types.instr
+  val cil_stmtkind : ?into:Cil_types.fundec ->
+    loc:Cil_types.location -> stmt -> Cil_types.stmtkind
+  val cil_stmt : ?into:Cil_types.fundec ->
+    loc:Cil_types.location -> stmt -> Cil_types.stmt
 
   (* Operators *)
+  val (let+) : var * stmt -> (var -> stmt list) -> stmt list
+  val (and+) : var -> var -> var * var
+
   val (:=) : [< lval] -> [< exp] -> [> instr] (* assign *)
   val (+=) : [< lval] -> [< exp] -> [> instr]
   val (-=) : [< lval] -> [< exp] -> [> instr]
@@ -264,19 +288,23 @@ end
 
 (* --- Stateful builder --- *)
 
-exception WrongContext of string
+exception BuildError of string
 
-module type T =
-sig
-  val loc : Cil_types.location
-end
-
-module Stateful (Location : T) :
+module Stateful () :
 sig
   include module type of Exp
+    with type ('v,'s) typ = ('v,'s) Type.typ
+     and type const' = Exp.const'
+     and type var' = Exp.var'
+     and type lval' = Exp.lval'
+     and type exp' = Exp.exp'
+     and type init' = Exp.init'
+     and type label = Exp.label
 
   (* Functions *)
-  val open_function : ?ghost:bool -> ?vorig_name:string -> string -> [> var]
+  val open_function :
+    ?loc:Cil_types.location -> ?ghost:bool -> ?vorig_name:string ->
+    string -> [> var]
   val set_return_type : ('s,'v) typ -> unit
   val set_return_type' : Cil_types.typ -> unit
   val add_attribute : Cil_types.attribute -> unit
@@ -296,11 +324,19 @@ sig
   val of_stmtkind : Cil_types.stmtkind -> unit
   val of_stmt : Cil_types.stmt -> unit
   val of_stmts : Cil_types.stmt list -> unit
-  val open_block : ?into:Cil_types.fundec -> ?ghost:bool -> unit -> unit
-  val open_ghost : ?into:Cil_types.fundec -> unit -> unit
-  val open_switch : ?into:Cil_types.fundec -> [< exp] -> unit
-  val open_if : ?into:Cil_types.fundec -> [< exp] -> unit
-  val open_else : unit -> unit
+  val open_block :
+    ?loc:Cil_types.location -> ?into:Cil_types.fundec -> ?ghost:bool ->
+    unit -> unit
+  val open_ghost :
+    ?loc:Cil_types.location -> ?into:Cil_types.fundec ->
+    unit -> unit
+  val open_switch :
+    ?loc:Cil_types.location -> ?into:Cil_types.fundec ->
+    [< exp] -> unit
+  val open_if :
+    ?loc:Cil_types.location -> ?into:Cil_types.fundec ->
+    [< exp] -> unit
+  val open_else : ?ghost:bool -> unit -> unit
   val close : unit -> unit
   val finish_block : unit -> Cil_types.block
   val finish_instr_list : ?scope:Cil_types.block -> unit -> Cil_types.instr list
