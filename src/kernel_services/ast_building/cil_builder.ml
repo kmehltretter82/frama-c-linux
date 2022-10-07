@@ -82,7 +82,7 @@ struct
     | _, _ -> raise NotACType
 
   let structure compinfo f =
-    Record f,Ctype (TComp (compinfo, []))
+    Record f, Ctype (TComp (compinfo, []))
 
   (* Attrbutes *)
 
@@ -433,7 +433,7 @@ struct
         field, harden_init init
       in
       `init (StructInit (t, List.map2 field_init (Option.get comp.cfields) l ))
-    | _ -> assert false (* TODO: handle error *)
+    | _ -> invalid_arg "compound: type must be a C array, struct or union"
 
   let rec values : type a. (init, a) typ -> a -> [> init] =
     fun ty x ->
@@ -445,7 +445,10 @@ struct
         field, harden_init (f field x)
       in
       `init (StructInit (t, List.map field_init (Option.get comp.cfields)))
-    | Record _, _ -> assert false
+    | Record _, _ ->
+      (* invariant: Record initializers can only be associated with C structures
+         or unions.  *)
+      assert false
     | _, _ -> raise NotACType
 
   (* Operators *)
