@@ -343,8 +343,18 @@ let build_node_writes context node =
       in
       Cil.treat_constructor_as_func as_func dest f args k loc
     | Local_init (vi, AssignInit init, _)  ->
-      List.to_seq (EnumLvals.in_init vi init) |>
-      Seq.flat_map (build_lval_deps callstack stmt Data)
+      let lvals = EnumLvals.in_init vi init in
+      if lvals <> [] then
+        List.to_seq lvals |>
+        Seq.flat_map (build_lval_deps callstack stmt Data)
+      else
+        begin match init with
+          | CompoundInit _ -> Seq.empty (* Do not generate nodes for Compounds for now *)
+          | SingleInit exp ->
+            let kinstr = Kstmt stmt in
+            let dst = build_const context callstack exp in
+            Seq.return (Graph.create_dependency graph kinstr dst Data node)
+        end
     | Asm _ | Skip _ | Code_annot _ -> Seq.empty (* Cases not returned by Studia *)
 
   and build_arg_deps callstack : deps_builder * stmt list =
