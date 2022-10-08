@@ -74,27 +74,28 @@
     }
   },
   {
-    "selector": ".function",
+    "selector": ".function, .file",
     "style": {
       "shape": "rectangle",
-      "background-color": "#bbb",
+      "text-outline-width": 1,
+      "font-size": "11px",
       "background-opacity" : 0.4,
       "text-valign" : "top",
       "text-halign" : "center",
-      "padding" : "10px",
+      "padding" : "18px",
       "border-width": 1
+    }
+  },
+  {
+    "selector": ".function",
+    "style": {
+      "background-color": "#bbb"
     }
   },
   {
     "selector": ".file",
     "style": {
-      "shape": "rectangle",
-      "background-color": "#ddd",
-      "background-opacity" : 0.4,
-      "text-valign" : "top",
-      "text-halign" : "center",
-      "padding" : "10px",
-      "border-width": 1
+      "background-color": "#ddd"
     }
   },
   {
