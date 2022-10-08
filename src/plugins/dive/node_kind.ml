@@ -70,6 +70,10 @@ struct
       Datatype.Int.compare i1 i2
     | String _, _ -> 1
     | _, String _ -> -1
+    | Const (e1), Const(e2) ->
+      Cil_datatype.Exp.compare e1 e2
+    | Const _, _ -> 1
+    | _, Const _ -> -1
     | Error s1, Error s2 ->
       Datatype.String.compare s1 s2
 
@@ -86,6 +90,7 @@ struct
       Stmt.equal stmt1 stmt2 && Alarms.equal alarm1 alarm2
     | AbsoluteMemory, AbsoluteMemory -> true
     | String (i,_), String (j,_) -> Datatype.Int.equal i j
+    | Const (e1), Const(e2) -> Cil_datatype.Exp.equal e1 e2
     | Error s1, Error s2 -> Datatype.String.equal s1 s2
     | _ -> false
 
@@ -102,6 +107,7 @@ struct
       Hashtbl.hash (5, Stmt.hash stmt, Alarms.hash alarm)
     | AbsoluteMemory -> 6
     | String (i, _) -> Hashtbl.hash (7, i)
+    | Const (e) -> Hashtbl.hash (7, Cil_datatype.Exp.hash e)
     | Error s -> Hashtbl.hash (8, s)
 end
 
@@ -110,15 +116,15 @@ include Datatype.Make (DatatypeInput)
 
 let get_base = function
   | Scalar (vi,_,_) | Composite (vi) -> Some vi
-  | Scattered _ | Unknown _ | Alarm _ | AbsoluteMemory | String _ | Error _ ->
-    None
+  | Scattered _ | Unknown _ | Alarm _ | AbsoluteMemory
+  | String _ | Const _ | Error _ -> None
 
 let to_lval = function
   | Scalar (vi,_typ,offset) -> Some (Cil_types.Var vi, offset)
   | Composite (vi) -> Some (Cil_types.Var vi, Cil_types.NoOffset)
   | Scattered (lval,_) -> Some lval
   | Unknown (lval,_) -> Some lval
-  | Alarm (_,_) | AbsoluteMemory | String _ | Error _ -> None
+  | Alarm (_,_) | AbsoluteMemory | String _ | Const _ | Error _ -> None
 
 let pretty fmt = function
   | (Scalar _ | Composite _ | Scattered _ | Unknown _) as kind ->
@@ -131,5 +137,7 @@ let pretty fmt = function
     Format.fprintf fmt "%S" s
   | String (_, CSWstring s) ->
     Format.fprintf fmt "L\"%s\"" (Escape.escape_wstring s)
+  | Const (e) ->
+    Format.fprintf fmt "%a" Cil_printer.pp_exp e
   | Error s ->
     Format.fprintf fmt "%s" s

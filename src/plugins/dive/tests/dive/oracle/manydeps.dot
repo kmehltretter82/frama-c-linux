@@ -12,12 +12,13 @@ digraph G {
   cp12 [label=<t10>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
         style="filled", ];
   cp14 [label=<__retres>, shape=box, style="bold", ];
-  cp15 [label=<*(pt[x])>, shape=parallelogram, fillcolor="#AACCFF",
+  cp15 [label=<0>, shape=ellipse, ];
+  cp17 [label=<*(pt[x])>, shape=parallelogram, fillcolor="#AACCFF",
         color="#88AAFF", style="filled,dotted", ];
   
   subgraph cluster_cs_1 { label=<many_writes>; cp12;cp10;cp8;cp6;cp4;cp2;
      };
-  subgraph cluster_cs_2 { label=<many_values>; cp15;cp14;
+  subgraph cluster_cs_2 { label=<many_values>; cp17;cp15;cp14;
      };
   
   cp2 -> cp2 [style="bold", ];
@@ -26,6 +27,7 @@ digraph G {
   cp8 -> cp2;
   cp10 -> cp2;
   cp12 -> cp2;
-  cp15 -> cp14;
+  cp15 -> cp14 [style="bold", ];
+  cp17 -> cp14;
   
   }

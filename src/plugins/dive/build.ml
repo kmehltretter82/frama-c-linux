@@ -265,6 +265,9 @@ let build_lval context callstack kinstr lval =
   update_node_values node kinstr lval;
   node
 
+let build_const context callstack exp =
+  add_or_update_node context callstack (Const exp)
+
 let build_alarm context callstack stmt alarm =
   let node_kind = Alarm (stmt,alarm) in
   let node_locality = build_node_locality callstack node_kind in
@@ -367,8 +370,14 @@ let build_node_writes context node =
     Seq.append callee_deps return_deps
 
   and build_exp_deps callstack stmt kind exp : deps_builder =
-    List.to_seq (EnumLvals.in_exp exp) |>
-    Seq.flat_map (build_lval_deps callstack stmt kind)
+    let lvals = EnumLvals.in_exp exp in
+    if lvals <> [] then
+      List.to_seq lvals |>
+      Seq.flat_map (build_lval_deps callstack stmt kind)
+    else
+      let kinstr = Kstmt stmt in
+      let dst = build_const context callstack exp in
+      Seq.return (Graph.create_dependency graph kinstr dst kind node)
 
   and build_lval_deps callstack stmt kind lval : deps_builder =
     let kinstr = Kstmt stmt in
@@ -397,7 +406,7 @@ let build_node_writes context node =
     build_scattered_deps callstack kinstr lval
   | Alarm (stmt,alarm) ->
     build_alarm_deps callstack stmt alarm
-  | Unknown _ | AbsoluteMemory | String _ | Error _ ->
+  | Unknown _ | AbsoluteMemory | String _ | Const _ | Error _ ->
     Seq.empty
 
 
@@ -512,7 +521,7 @@ let build_node_reads context node =
     build_reads_deps callstack Kglobal (Cil_types.Var vi, Cil_types.NoOffset)
   | Scattered (_lval,kinstr) ->
     build_kinstr_deps callstack None kinstr
-  | Alarm _ | Unknown _ | AbsoluteMemory | String _ | Error _ ->
+  | Alarm _ | Unknown _ | AbsoluteMemory | Const _ | String _ | Error _ ->
     Seq.empty
 
 

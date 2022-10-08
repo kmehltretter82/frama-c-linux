@@ -28,6 +28,7 @@ type node_kind =
   | Alarm of Cil_types.stmt * Alarms.alarm
   | AbsoluteMemory
   | String of int * Base.cstring
+  | Const of Cil_types.exp
   | Error of string
 
 type callstack = Callstack.t

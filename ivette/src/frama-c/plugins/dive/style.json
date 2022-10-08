@@ -142,6 +142,15 @@
     }
   },
   {
+    "selector": "node[kind='const']",
+    "style": {
+      "shape": "ellipse",
+      "background-color": "#bbb",
+      "border-width": "1px",
+      "border-style": "dashed"
+    }
+  },
+  {
     "selector": "node[kind='alarm']",
     "style": {
       "shape": "octagon",
