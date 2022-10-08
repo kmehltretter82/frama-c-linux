@@ -231,7 +231,9 @@ let build_node_locality callstack node_kind =
 
 let find_compatible_callstacks stmt callstack =
   let kf = Kernel_function.find_englobing_kf stmt in
-  if callstack <> [] && Kernel_function.equal kf (Callstack.top_kf callstack)
+  if callstack = [] (* Globals variables *)
+  then [Callstack.init kf] (* Default *)
+  else if Kernel_function.equal kf (Callstack.top_kf callstack)
   then
     (* slight improvement which only work when there is no recursion
        and which is only usefull because you currently can't have
@@ -242,7 +244,12 @@ let find_compatible_callstacks stmt callstack =
     (* Keep only callstacks which are a compatible with the current one *)
     let callstacks = Eval.to_callstacks stmt in
     (* TODO: missing callstacks filtered by memexec *)
-    Callstack.filter_truncate callstacks callstack
+    let make_compatible cs =
+      Callstack.truncate_to_sub cs callstack |>
+      Option.value ~default:(Callstack.init kf)
+    in
+    let result = List.map make_compatible callstacks in
+    List.sort_uniq Callstack.compare result (* Remove duplicates *)
 
 
 (* --- Graph building --- *)
