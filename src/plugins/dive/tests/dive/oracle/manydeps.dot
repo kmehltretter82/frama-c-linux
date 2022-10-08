@@ -11,7 +11,8 @@ digraph G {
         style="filled", ];
   cp12 [label=<t10>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
         style="filled", ];
-  cp14 [label=<__retres>, shape=box, style="bold", ];
+  cp14 [label=<__retres>, shape=box, fillcolor="#AACCFF", color="#88AAFF",
+        style="filled,bold", ];
   cp15 [label=<0>, shape=ellipse, ];
   cp17 [label=<*(pt[x])>, shape=parallelogram, fillcolor="#AACCFF",
         color="#88AAFF", style="filled,dotted", ];
