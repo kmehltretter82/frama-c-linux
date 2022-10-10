@@ -28,14 +28,6 @@ open Cil_types
 
 
 (* TODO: change the call convention --> exp at the end *)
-val binop:
-  loc:location -> binop -> exp -> exp -> Env.t -> kernel_function ->
-  term option ->
-  exp * Env.t
-(** Applies [binop] to the given expressions. The optional term
-    indicates whether the comparison has a correspondance in the logic. *)
-
-(* TODO: change the call convention --> exp at the end *)
 val cmp:
   loc:location -> binop -> exp -> exp -> Env.t -> kernel_function ->
   term option ->

@@ -47,30 +47,6 @@ let cmp ~loc bop e1 e2 env kf t_opt =
   in
   Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
 
-let new_var_and_init ~loc ?scope ?name env kf t_opt mk_stmts =
-  Env.new_var
-    ~loc
-    ?scope
-    ?name
-    env
-    kf
-    t_opt
-    (Gmp_types.Q.t ())
-    (fun v e -> Gmp.init ~loc e :: mk_stmts v e)
-
-let binop ~loc bop e1 e2 env kf t_opt =
-  let name = Gmp.Q.name_arith_bop bop in
-  (* TODO: [t1_opt] and [t2_opt] could be provided when creating [e1] and
-     [e2] *)
-  let e1, env = Gmp_gen.Q.create ~loc None env kf e1 in
-  let e2, env = Gmp_gen.Q.create ~loc None env kf e2 in
-  let mk_stmts _ e = [ Smart_stmt.rtl_call ~loc
-                         ~prefix:""
-                         name
-                         [ e; e1; e2 ] ] in
-  let name = Misc.name_of_binop bop in
-  let _, e, env = new_var_and_init ~loc ~name env kf t_opt mk_stmts in
-  e, env
 
 (*
 Local Variables:
