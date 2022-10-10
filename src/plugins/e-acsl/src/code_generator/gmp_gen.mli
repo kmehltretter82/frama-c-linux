@@ -15,9 +15,14 @@ module Z : sig
   val binop:
     loc:location -> term option -> binop -> Env.t -> kernel_function ->
     exp -> exp -> exp * Env.t
-    (** Applies [binop] to the given expressions. The optional term
-        indicates whether the comparison has a correspondance in the logic. *)
+  (** Applies [binop] to the given expressions. The optional term
+      indicates whether the comparison has a correspondance in the logic. *)
 
+  val cmp:
+    loc:location -> string -> term option -> binop ->  Env.t ->
+    kernel_function -> exp -> exp -> exp * Env.t
+    (** Compares two expressions according to the given [binop]. The optional term
+        indicates whether the comparison has a correspondance in the logic. *)
 
 end
 

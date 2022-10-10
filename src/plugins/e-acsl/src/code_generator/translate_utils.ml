@@ -205,22 +205,7 @@ let comparison_to_exp
         match ity with
         | C_integer _ | C_float _ | Nan ->
           Cil.mkBinOp ~loc bop e1 e2, env
-        | Gmpz ->
-          let _, e, env = Env.new_var
-              ~loc
-              env
-              kf
-              t_opt
-              ~name
-              Cil.intType
-              (fun v _ ->
-                 [ Smart_stmt.rtl_call ~loc
-                     ~result:(Cil.var v)
-                     ~prefix:""
-                     "__gmpz_cmp"
-                     [ e1; e2 ] ])
-          in
-          Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
+        | Gmpz -> Gmp_gen.Z.cmp ~loc name t_opt bop env kf e1 e2
         | Rational -> Gmp_gen.Q.cmp ~loc t_opt bop env kf e1 e2
         | Real -> Error.not_yet "comparison involving real numbers"
       end
