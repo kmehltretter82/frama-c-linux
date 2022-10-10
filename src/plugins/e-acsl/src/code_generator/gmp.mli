@@ -48,6 +48,14 @@ module Z : sig
 
 end
 
+module Q : sig
+
+  val name_arith_bop: binop -> string
+  (** [name_of_mpz_arith_bop bop] returns the name of the GMP function on integer
+      corresponding to the [bop] arithmetic operation. *)
+
+end
+
 val normalize_str: string -> string
 (** Normalize the string so that it fits the representation used by the
     underlying real library. For example, "0.1" is a real number in ACSL

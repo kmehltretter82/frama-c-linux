@@ -111,16 +111,8 @@ let new_var_and_init ~loc ?scope ?name env kf t_opt mk_stmts =
     (Gmp_types.Q.t ())
     (fun v e -> Gmp.init ~loc e :: mk_stmts v e)
 
-let name_arith_bop = function
-  | PlusA -> "__gmpq_add"
-  | MinusA -> "__gmpq_sub"
-  | Mult -> "__gmpq_mul"
-  | Div -> "__gmpq_div"
-  | Mod | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
-  | Shiftlt | Shiftrt | PlusPI | MinusPI | MinusPP -> assert false
-
 let binop ~loc bop e1 e2 env kf t_opt =
-  let name = name_arith_bop bop in
+  let name = Gmp.Q.name_arith_bop bop in
   (* TODO: [t1_opt] and [t2_opt] could be provided when creating [e1] and
      [e2] *)
   let e1, env = Gmp_gen.Q.create ~loc None env kf e1 in

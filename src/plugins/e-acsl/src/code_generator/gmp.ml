@@ -159,6 +159,14 @@ module Z = struct
 end
 
 module Q = struct
+  let name_arith_bop = function
+    | PlusA -> "__gmpq_add"
+    | MinusA -> "__gmpq_sub"
+    | Mult -> "__gmpq_mul"
+    | Div -> "__gmpq_div"
+    | Mod | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
+    | Shiftlt | Shiftrt | PlusPI | MinusPI | MinusPP -> assert false
+
   exception Not_a_decimal of string
   exception Is_a_float
 
