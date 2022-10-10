@@ -143,7 +143,9 @@ eva-default-tests:
 eva-domains:
   <<: *eva_template
   <<: *eva_domains
-  when: manual
+  only:
+    variables:
+      - $CI_MERGE_REQUEST_LABELS == "Eva"
 
 eva-domains-nightly:
   <<: *eva_template
