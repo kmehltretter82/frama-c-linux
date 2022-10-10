@@ -132,12 +132,6 @@ let jcall names fmt id =
   try Format.pp_print_string fmt (Pkg.IdMap.find id names)
   with Not_found -> Self.abort "Undefined identifier '%a'" Pkg.pp_ident id
 
-let jtry ~safe pp fmt d =
-  if safe then
-    pp fmt d
-  else
-    Format.fprintf fmt "@[<hov 2>Json.jTry(@,%a)@]" pp d
-
 let jenum names fmt id = Format.fprintf fmt "Json.jEnum(%a)" (jcall names) id
 
 let junion ~jtype ~make fmt jts =
@@ -199,10 +193,6 @@ let rec makeDecoder ?self ~names fmt js =
     junion ~jtype ~make fmt jts
   | Jrecord jfs -> jrecord ~make fmt jfs
   | Jtuple jts -> jtuple ~make fmt jts
-
-let makeLooseNeedSafe = function
-  | Pkg.Jtuple _ | Pkg.Jarray _ -> true
-  | _ -> false
 
 
 (* -------------------------------------------------------------------------- *)
