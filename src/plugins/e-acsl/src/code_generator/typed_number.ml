@@ -90,7 +90,7 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
         e, env
       else if Gmp_types.Q.is_t ty || strnum = Str_R then
         (* R --> C type or the real is represented by a string *)
-        Rational.add_cast ~loc ?name e env kf ctx
+        Gmp_gen.Q.add_cast ~loc ?name env kf ctx e
       else
         (* C type --> another C type *)
         Cil.mkCastT ~force:false ~oldt:ty ~newt:ctx e, env

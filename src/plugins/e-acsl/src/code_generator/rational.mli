@@ -26,12 +26,6 @@
 
 open Cil_types
 
-(* TODO: change the call convention *)
-val add_cast:
-  loc:location -> ?name:string -> exp -> Env.t -> kernel_function -> typ ->
-  exp * Env.t
-(** Assumes that the given exp is of real type and casts it into
-    the given typ *)
 
 (* TODO: change the call convention --> exp at the end *)
 val binop:
