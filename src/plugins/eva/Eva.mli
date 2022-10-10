@@ -685,6 +685,18 @@ module Logic_inout: sig
     result: Cil_types.varinfo option ->
     Cvalue.Model.t -> Cil_types.assigns -> Locations.Zone.t
 
+  (** Zones of an lvalue term of an assigns clause. *)
+  type tlval_zones = {
+    under: Locations.Zone.t; (** Under-approximation of the memory zone. *)
+    over: Locations.Zone.t;  (** Over-approximation of the memory zone. *)
+    deps: Locations.Zone.t;  (** Dependencies needed to evaluate the address. *)
+  }
+
+  (** Evaluation of the memory zones and dependencies of an lvalue term from an
+      assigns clause, in the given cvalue state for a read or write access. *)
+  val assigns_tlval_to_zones:
+    Cvalue.Model.t -> Locations.access -> Cil_types.term -> tlval_zones option
+
   (** Evaluate the assigns clauses of the given function in its given pre-state,
       and compare them with the given froms (computed by the from plugin).
       Emits warnings if needed, and sets statuses to the assigns clauses. *)

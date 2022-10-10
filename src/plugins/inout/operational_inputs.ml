@@ -121,41 +121,35 @@ let eval_assigns kf state assigns =
     in
     let out_term = out.it_content in
     let outputs_under, outputs_over, deps =
-      try
-        if Logic_const.(is_result out_term || is_exit_status out_term)
-        then (Zone.bottom, Zone.bottom, Zone.bottom)
-        else
-          let loc_out_under, loc_out_over, deps =
-            !Db.Properties.Interp.loc_to_loc_under_over ~result:None state out_term
-          in
-          (enumerate_valid_bits_under Write loc_out_under,
-           enumerate_valid_bits Write loc_out_over,
-           clean_deps deps)
-      with Db.Properties.Interp.No_conversion ->
-        Inout_parameters.warning ~current:true ~once:true
-          "failed to interpret assigns clause '%a'" Printer.pp_term out_term;
-        (Zone.bottom, Zone.top, Zone.top)
+      if Logic_const.(is_result out_term || is_exit_status out_term)
+      then (Zone.bottom, Zone.bottom, Zone.bottom)
+      else
+        let output = Eva.Logic_inout.assigns_tlval_to_zones state Write out_term in
+        match output with
+        | Some output -> output.under, output.over, clean_deps output.deps
+        | None ->
+          Inout_parameters.warning ~current:true ~once:true
+            "failed to interpret assigns clause '%a'" Printer.pp_term out_term;
+          (Zone.bottom, Zone.top, Zone.top)
     in
     (* Compute all inputs as a zone *)
     let inputs =
-      try
-        match froms with
-        | FromAny -> Zone.top
-        | From l ->
-          let aux acc { it_content = from } =
-            let _, loc, deps =
-              !Db.Properties.Interp.loc_to_loc_under_over ~result:None state from
-            in
-            let acc = Zone.join (clean_deps deps) acc in
-            let z = enumerate_valid_bits Read loc in
-            Zone.join z acc
-          in
-          List.fold_left aux deps l
-      with Db.Properties.Interp.No_conversion ->
-        Inout_parameters.warning ~current:true ~once:true
-          "failed to interpret inputs in assigns clause '%a'"
-          Printer.pp_from asgn;
-        Zone.top
+      match froms with
+      | FromAny -> Zone.top
+      | From l ->
+        let aux acc { it_content = from } =
+          let inputs = Eva.Logic_inout.assigns_tlval_to_zones state Read from in
+          match inputs with
+          | Some inputs ->
+            let acc = Zone.join (clean_deps inputs.deps) acc in
+            Zone.join inputs.over acc
+          | _ ->
+            Inout_parameters.warning ~current:true ~once:true
+              "failed to interpret inputs in assigns clause '%a'"
+              Printer.pp_from asgn;
+            Zone.top
+        in
+        List.fold_left aux deps l
     in
     (* Fuse all outputs. An output is sure if it was certainly
        overwritten (i.e. is in the left part of an assign clause,

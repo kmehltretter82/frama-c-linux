@@ -365,7 +365,7 @@
 [from] Function cast_address:
   NO EFFECTS
 [from] Function f:
-  NULL[100..200] FROM \nothing (and SELF)
+  NO EFFECTS
 [from] Function gm_f1:
   \result FROM \nothing
 [from] Function gm_f2:
@@ -375,7 +375,7 @@
   NULL[100..200] FROM NULL[100..200] (and SELF)
   p_gm_null FROM \nothing
 [from] Function invalid_assigns_imprecise:
-  NULL[100..200] FROM \nothing (and SELF)
+  NO EFFECTS
 [from] Function many_writes:
   NO EFFECTS
 [from] Function memset:
@@ -414,7 +414,7 @@
 [from] call to Frama_C_dump_each at imprecise.c:78 (by garbled_mix_null):
   \result FROM \nothing
 [from] call to f at imprecise.c:11 (by invalid_assigns_imprecise):
-  NULL[100..200] FROM \nothing (and SELF)
+  NO EFFECTS
 [from] call to memset at imprecise.c:51 (by abstract_structs):
   v3.[bits 0 to ..] FROM c (and SELF)
   \result FROM s
@@ -424,7 +424,7 @@
 [from] call to Frama_C_dump_each at imprecise.c:21 (by write_garbled):
   \result FROM \nothing
 [from] call to invalid_assigns_imprecise at imprecise.c:144 (by main):
-  NULL[100..200] FROM \nothing (and SELF)
+  NO EFFECTS
 [from] call to write_garbled at imprecise.c:145 (by main):
   NULL[100..200] FROM \nothing (and SELF)
 [from] call to abstract_structs at imprecise.c:146 (by main):
@@ -902,7 +902,7 @@
 [from] Function cast_address:
   NO EFFECTS
 [from] Function f:
-  NULL[100..200] FROM \nothing (and SELF)
+  NO EFFECTS
 [from] Function gm_f1:
   \result FROM \nothing
 [from] Function gm_f2:
@@ -912,7 +912,7 @@
   NULL[100..200] FROM NULL[100..200] (and SELF)
   p_gm_null FROM \nothing
 [from] Function invalid_assigns_imprecise:
-  NULL[100..200] FROM \nothing (and SELF)
+  NO EFFECTS
 [from] Function many_writes:
   NO EFFECTS
 [from] Function memset:
@@ -951,7 +951,7 @@
 [from] call to Frama_C_dump_each at imprecise.c:78 (by garbled_mix_null):
   \result FROM \nothing
 [from] call to f at imprecise.c:11 (by invalid_assigns_imprecise):
-  NULL[100..200] FROM \nothing (and SELF)
+  NO EFFECTS
 [from] call to memset at imprecise.c:51 (by abstract_structs):
   v3.[bits 0 to ..] FROM c (and SELF)
   \result FROM s
@@ -961,7 +961,7 @@
 [from] call to Frama_C_dump_each at imprecise.c:21 (by write_garbled):
   \result FROM \nothing
 [from] call to invalid_assigns_imprecise at imprecise.c:144 (by main):
-  NULL[100..200] FROM \nothing (and SELF)
+  NO EFFECTS
 [from] call to write_garbled at imprecise.c:145 (by main):
   NULL[100..200] FROM \nothing (and SELF)
 [from] call to abstract_structs at imprecise.c:146 (by main):

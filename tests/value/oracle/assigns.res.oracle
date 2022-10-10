@@ -626,12 +626,8 @@
 [from] Done for function main2
 [from] Computing for function main4
 [from] Computing for function f_main4_1 <-main4
-[kernel] assigns.i:104: 
-  more than 200(1000) dependencies to update. Approximating.
 [from] Done for function f_main4_1
 [from] Computing for function f_main4_2 <-main4
-[kernel] assigns.i:105: 
-  more than 200(1000) dependencies to update. Approximating.
 [from] Done for function f_main4_2
 [from] Done for function main4
 [from] Computing for function main

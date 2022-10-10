@@ -116,5 +116,11 @@ val eval_predicate :
     Returns None on either an evaluation error or on unsupported construct. *)
 val predicate_deps: eval_env -> Cil_types.predicate -> logic_deps option
 
+(** [tlval_deps env t] computes the logic dependencies needed to evaluate the
+    address of lvalue term [t] in the given evaluation environment [env].
+    @raises LogicEvalError on evaluation errors, unsupported constructs, or
+    if [t] is not an lvalue term. *)
+val tlval_deps: eval_env -> Cil_types.term -> logic_deps
+
 val reduce_by_predicate :
   eval_env -> bool -> predicate -> eval_env

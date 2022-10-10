@@ -2773,6 +2773,9 @@ let eval_tlval_as_zone ~alarm_mode access env t =
   in
   over
 
+let tlval_deps env t = (eval_term_as_lval ~alarm_mode:Ignore env t).ldeps
+
+
 let () =
   (* TODO: deprecate loc_to_loc, move loc_to_locs into Value *)
   Db.Properties.Interp.loc_to_loc :=
