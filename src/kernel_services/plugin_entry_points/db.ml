@@ -674,38 +674,13 @@ module Value = struct
 end
 
 module From = struct
-
   exception Not_lval
 
-  let access = mk_fun "From.access"
   let find_deps_no_transitivity = mk_fun "From.find_deps_no_transitivity"
   let find_deps_no_transitivity_state =
     mk_fun "From.find_deps_no_transitivity_state"
   let find_deps_term_no_transitivity_state =
     mk_fun "From.find_deps_term_no_transitivity_state"
-  let compute = mk_fun "From.compute"
-  let compute_all = mk_fun "From.compute_all"
-  let compute_all_calldeps = mk_fun "From.compute_all_calldeps"
-  let is_computed = mk_fun "From.is_computed"
-  let pretty = mk_fun "From.pretty"
-  let get = mk_fun "From.get"
-  let self = ref State.dummy
-  let display = mk_fun "From.display"
-
-  module Record_From_Callbacks =
-    Hook.Build
-      (struct
-        type t =
-          (Kernel_function.t Stack.t) *
-          Function_Froms.Memory.t Stmt.Hashtbl.t *
-          (Kernel_function.t * Function_Froms.Memory.t) list
-            Stmt.Hashtbl.t
-      end)
-
-  module Callwise = struct
-    let iter = mk_fun "From.Callwise.iter"
-    let find = mk_fun "From.Callwise.find"
-  end
 end
 
 (* ************************************************************************* *)
