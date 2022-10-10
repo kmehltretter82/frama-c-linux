@@ -22,16 +22,25 @@
 
 open Cil_types
 
-val self : State.t
+(** {3 Analysis} *)
+
 val is_computed : kernel_function -> bool
 val compute : kernel_function -> unit
 val compute_all : unit -> unit
-val compute_all_calldeps : unit -> unit
+
 val get : Cil_types.kernel_function -> Function_Froms.froms
 val access : Locations.Zone.t -> Function_Froms.Memory.t -> Locations.Zone.t
+
+val self : State.t
+
+(** {3 Pretty-printing} *)
+
 val pretty : Format.formatter -> kernel_function -> unit
 val display : Format.formatter -> unit
 
+(** {3 Callsite-wise analysis} *)
+
+val compute_all_calldeps : unit -> unit
 module Callwise : sig
   val iter : (Cil_types.kinstr -> Function_Froms.froms -> unit) -> unit
   val find : Cil_types.kinstr -> Function_Froms.froms
