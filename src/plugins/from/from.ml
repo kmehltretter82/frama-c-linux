@@ -26,9 +26,6 @@ let compute_all = Functionwise.compute_all
 let is_computed = Functionwise.is_computed
 let get = Functionwise.get
 let pretty = Functionwise.pretty
-let find_deps_no_transitivity = Functionwise.find_deps_no_transitivity
-let find_deps_no_transitivity_state =
-  Functionwise.find_deps_no_transitivity_state
 
 let access zone mem = Function_Froms.Memory.find mem zone
 

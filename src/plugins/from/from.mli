@@ -31,8 +31,6 @@ val get : Cil_types.kernel_function -> Function_Froms.froms
 val access : Locations.Zone.t -> Function_Froms.Memory.t -> Locations.Zone.t
 val pretty : Format.formatter -> kernel_function -> unit
 val display : Format.formatter -> unit
-val find_deps_no_transitivity : stmt -> exp -> Locations.Zone.t
-val find_deps_no_transitivity_state : Cvalue.Model.t -> exp -> Locations.Zone.t
 
 module Callwise : sig
   val iter : (Cil_types.kinstr -> Function_Froms.froms -> unit) -> unit

@@ -621,7 +621,7 @@ let get_lval_infos lval stmt =
     Use the state at ki (before assign)
     and returns the new state (after assign). *)
 let process_asgn pdg state stmt lval exp =
-  let r_dpds = From.find_deps_no_transitivity stmt exp in
+  let r_dpds = Eva.Results.(before stmt |> expr_deps exp) in
   let r_decl = Cil.extract_varinfos_from_exp exp in
   let (l_loc, exact, l_dpds, l_decl) = get_lval_infos lval stmt in
   let key = Key.stmt_key stmt in
@@ -636,7 +636,7 @@ let process_asgn pdg state stmt lval exp =
 (** Add a PDG node and its dependencies for each explicit call argument. *)
 let process_args pdg st stmt argl =
   let process_one_arg arg =
-    let dpds = From.find_deps_no_transitivity stmt arg in
+    let dpds = Eva.Results.(before stmt |> expr_deps arg) in
     let decl_dpds = Cil.extract_varinfos_from_exp arg in
     (dpds, decl_dpds)
   in let arg_dpds = List.map process_one_arg argl in
@@ -763,7 +763,7 @@ let process_call pdg state stmt lvaloption funcexp argl _loc =
  * and register the statements that are control-dependent on it.
 *)
 let process_condition ctrl_dpds_infos pdg state stmt condition =
-  let loc_cond = From.find_deps_no_transitivity stmt condition in
+  let loc_cond = Eva.Results.(before stmt |> expr_deps condition) in
   let decls_cond = Cil.extract_varinfos_from_exp condition in
 
   let controlled_stmts = CtrlDpds.get_if_controlled_stmts ctrl_dpds_infos stmt in
@@ -819,7 +819,7 @@ let process_return _current_function pdg state stmt ret_exp =
   let last_state =
     match ret_exp with
     | Some exp ->
-      let loc_exp = From.find_deps_no_transitivity stmt exp in
+      let loc_exp = Eva.Results.(before stmt |> expr_deps exp) in
       let decls_exp =  Cil.extract_varinfos_from_exp exp in
       add_retres pdg state stmt loc_exp decls_exp
     | None ->

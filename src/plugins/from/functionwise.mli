@@ -31,5 +31,3 @@ val compute_all : unit -> unit
 val is_computed : kernel_function -> bool
 val get : Cil_types.kernel_function -> Function_Froms.froms
 val pretty : Format.formatter -> kernel_function -> unit
-val find_deps_no_transitivity : stmt -> exp -> Locations.Zone.t
-val find_deps_no_transitivity_state : Cvalue.Model.t -> exp -> Locations.Zone.t

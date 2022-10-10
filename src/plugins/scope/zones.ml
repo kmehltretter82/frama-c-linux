@@ -40,7 +40,7 @@ module Data = struct
   let diff = Locations.Zone.diff (* over-approx *)
   let pretty fmt z = Format.fprintf fmt "@[<h 1>%a@]" Locations.Zone.pretty z
 
-  let exp_zone stmt exp = From.find_deps_no_transitivity stmt exp
+  let exp_zone stmt exp = Eva.Results.(before stmt |> expr_deps exp)
 end
 
 module Ctx = struct

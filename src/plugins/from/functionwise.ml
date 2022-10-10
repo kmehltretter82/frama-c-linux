@@ -110,12 +110,6 @@ let get = To_Use.memo
 let pretty fmt v =
   Function_Froms.pretty_with_type (Kernel_function.get_type v) fmt (get v)
 
-let find_deps_no_transitivity stmt expr =
-  Eva.Results.(before stmt |> expr_deps expr)
-
-let find_deps_no_transitivity_state state expr =
-  Eva.Results.(in_cvalue_state state |> expr_deps expr)
-
 (*
 Local Variables:
 compile-command: "make -C ../../.."
