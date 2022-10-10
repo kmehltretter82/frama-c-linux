@@ -28,22 +28,9 @@ type strnum =
   | C_number      (* integers and floats included *)
 
 let add_cast ~loc ?name env kf ctx strnum t_opt e =
-  let mk_mpz e =
-    let _, e, env =
-      Env.new_var
-        ~loc
-        ?name
-        env
-        kf
-        t_opt
-        (Gmp_types.Z.t ())
-        (fun lv v -> [ Gmp.init_set ~loc (Cil.var lv) v e ])
-    in
-    e, env
-  in
   let e, env = match strnum with
-    | Str_Z -> mk_mpz e
-    | Str_R -> Rational.create ~loc ?name e env kf t_opt
+    | Str_Z -> Gmp_gen.Z.create ~loc ?name t_opt env kf e
+    | Str_R -> Gmp_gen.Q.create ~loc ?name t_opt env kf e
     | C_number -> e, env
   in
   match ctx with
@@ -71,13 +58,13 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
           else
             e
         in
-        mk_mpz e
+        Gmp_gen.Z.create ~loc ?name t_opt env kf e
     | _, false ->
       if Gmp_types.Q.is_t ctx then
         if Gmp_types.Q.is_t (Cil.typeOf e) then (* R --> R *)
           e, env
         else (* C integer or Z --> R *)
-          Rational.create ~loc ?name e env kf t_opt
+          Gmp_gen.Q.create ~loc ?name t_opt env kf e
       else if Gmp_types.Z.is_t ty || strnum = Str_Z then
         (* Z --> C type or the integer is represented by a string:
            anyway, it fits into a C integer: convert it *)

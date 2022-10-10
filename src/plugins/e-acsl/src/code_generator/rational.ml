@@ -22,25 +22,6 @@
 
 open Cil_types
 
-let create ~loc ?name e env kf t_opt =
-  let ty = Cil.typeOf e in
-  if Gmp_types.Q.is_t ty then
-    e, env
-  else
-    let _, e, env =
-      Env.new_var
-        ~loc
-        ?name
-        env
-        kf
-        t_opt
-        (Gmp_types.Q.t ())
-        (fun vi vi_e ->
-           [ Gmp.init ~loc vi_e ;
-             Gmp.affect ~loc (Cil.var vi) vi_e e ])
-    in
-    e, env
-
 exception Not_a_decimal of string
 exception Is_a_float
 
@@ -180,8 +161,8 @@ let cmp ~loc bop e1 e2 env kf t_opt =
   let name = Misc.name_of_binop bop in
   (* TODO: [t1_opt] and [t2_opt] could be provided when creating [e1] and
      [e2] *)
-  let e1, env = create ~loc e1 env kf None in
-  let e2, env = create ~loc e2 env kf None in
+  let e1, env = Gmp_gen.Q.create ~loc None env kf e1 in
+  let e2, env = Gmp_gen.Q.create ~loc None env kf e2 in
   let _, e, env =
     Env.new_var
       ~loc
@@ -222,8 +203,8 @@ let binop ~loc bop e1 e2 env kf t_opt =
   let name = name_arith_bop bop in
   (* TODO: [t1_opt] and [t2_opt] could be provided when creating [e1] and
      [e2] *)
-  let e1, env = create ~loc e1 env kf None in
-  let e2, env = create ~loc e2 env kf None in
+  let e1, env = Gmp_gen.Q.create ~loc None env kf e1 in
+  let e2, env = Gmp_gen.Q.create ~loc None env kf e2 in
   let mk_stmts _ e = [ Smart_stmt.rtl_call ~loc
                          ~prefix:""
                          name

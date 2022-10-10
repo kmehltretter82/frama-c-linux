@@ -26,13 +26,6 @@
 
 open Cil_types
 
-(* TODO: change the call convention *)
-val create:
-  loc:location -> ?name:string -> exp -> Env.t -> kernel_function ->
-  term option ->
-  exp * Env.t
-(** Create a real *)
-
 val normalize_str: string -> string
 (** Normalize the string so that it fits the representation used by the
     underlying real library. For example, "0.1" is a real number in ACSL
