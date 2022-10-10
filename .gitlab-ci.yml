@@ -144,8 +144,10 @@ eva-domains:
   <<: *eva_template
   <<: *eva_domains
   only:
+    refs:
+      - merge_requests
     variables:
-      - $CI_MERGE_REQUEST_LABELS == "Eva"
+      - $CI_MERGE_REQUEST_LABELS =~ /.*,?Eva,?.*/
 
 eva-domains-nightly:
   <<: *eva_template
