@@ -80,6 +80,10 @@ let page chapter ~title ?(descr=[]) ?readme ~filename () =
       chapter ; title ; descr ; readme ;
       sections=[] ;
     } in
+    begin match chapter with
+      | `Kernel | `Protocol -> ()
+      | `Plugin p -> plugins := p :: !plugins
+    end ;
     pages := Pages.add path page !pages ; page
 
 let static () = []
@@ -239,7 +243,7 @@ let table_of_contents () =
   List.concat
     (List.map
        (fun p -> table_of_chapter (`Plugin p))
-       (List.sort String.compare !plugins))
+       (List.sort_uniq String.compare !plugins))
 
 module Cmap = Map.Make
     (struct
