@@ -94,7 +94,11 @@ build: [
 install: [
   [make "PREFIX=%{prefix}%" "MANDIR=%{mandir}%" "install"]
   [make "PREFIX=%{prefix}%" "-C" "doc" "install"] {with-doc}
-  [make "PREFIX=%{prefix}%" "-f" "ivette/makefile.install"]
+  [make "PREFIX=%{prefix}%" "-f" "ivette/makefile.install" "install"]
+]
+
+remove: [
+  [make "PREFIX=%{prefix}%" "-f" "ivette/makefile.install" "uninstall"]
 ]
 
 run-test: [
