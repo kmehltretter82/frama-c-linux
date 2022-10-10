@@ -24,16 +24,7 @@ open Cil_types
 
 val compute_term_deps: (stmt -> term -> Locations.Zone.t option) ref
 
-type ctx = {
-  site: ctx_site;
-  before: bool option;
-  kf: Kernel_function.t
-}
-
-and ctx_site =
-  | FunctionContract
-  | StatementContract of stmt
-  | StatementAnnotation of stmt
+type ctx
 
 val mk_ctx_func_contrat: ?before:bool -> kernel_function -> ctx
 (** To build an interpretation context relative to function
