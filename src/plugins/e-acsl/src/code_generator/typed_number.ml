@@ -68,26 +68,7 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
       else if Gmp_types.Z.is_t ty || strnum = Str_Z then
         (* Z --> C type or the integer is represented by a string:
            anyway, it fits into a C integer: convert it *)
-        let fname, new_ty =
-          if Cil.isSignedInteger ctx then "__gmpz_get_si", Cil.longType
-          else "__gmpz_get_ui", Cil.ulongType
-        in
-        let _, e, env =
-          Env.new_var
-            ~loc
-            ?name
-            env
-            kf
-            None
-            new_ty
-            (fun v _ ->
-               [ Smart_stmt.rtl_call ~loc
-                   ~result:(Cil.var v)
-                   ~prefix:""
-                   fname
-                   [ e ] ])
-        in
-        e, env
+        Gmp_gen.Z.add_cast ~loc ?name env kf ctx e
       else if Gmp_types.Q.is_t ty || strnum = Str_R then
         (* R --> C type or the real is represented by a string *)
         Gmp_gen.Q.add_cast ~loc ?name env kf ctx e

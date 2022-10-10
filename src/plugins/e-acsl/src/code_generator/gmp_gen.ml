@@ -11,6 +11,28 @@ module Z = struct
         (fun lv v -> [ Gmp.init_set ~loc (Cil.var lv) v e ])
     in
     e, env
+
+  let add_cast ~loc ?name env kf ty e =
+    let fname, new_ty =
+      if Cil.isSignedInteger ty then "__gmpz_get_si", Cil.longType
+      else "__gmpz_get_ui", Cil.ulongType
+    in
+    let _, e, env =
+      Env.new_var
+        ~loc
+        ?name
+        env
+        kf
+        None
+        new_ty
+        (fun v _ ->
+           [ Smart_stmt.rtl_call ~loc
+               ~result:(Cil.var v)
+               ~prefix:""
+               fname
+               [ e ] ])
+    in
+    e, env
 end
 
 module Q = struct

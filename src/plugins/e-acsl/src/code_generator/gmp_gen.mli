@@ -4,7 +4,14 @@ module Z : sig
   val create:
     loc:location -> ?name:string -> term option ->  Env.t -> kernel_function ->
     exp -> exp * Env.t
-    (** Create an integer *)
+  (** Create an integer *)
+
+  val add_cast:
+    loc:location -> ?name:string -> Env.t -> kernel_function -> typ -> exp ->
+    exp * Env.t
+    (** Assumes that the given exp is of integer type and casts it into
+        the given typ *)
+
 end
 
 
