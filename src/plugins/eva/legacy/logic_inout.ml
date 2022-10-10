@@ -31,16 +31,19 @@ let predicate_deps ~pre ~here predicate =
   let logic_deps = Eval_terms.predicate_deps env predicate in
   Option.map join_logic_deps logic_deps
 
-let term_deps stmt t =
+let term_deps state t =
   try
-    let state = Results.(before stmt |> get_cvalue_model) in
     let env = Eval_terms.env_only_here state in
     let r = Eval_terms.eval_term ~alarm_mode:Eval_terms.Ignore env t in
     let zone = join_logic_deps r.Eval_terms.ldeps in
     Some zone
   with Eval_terms.LogicEvalError _ -> None
 
-let () = Logic_interp.To_zone.compute_term_deps := term_deps
+let compute_term_deps stmt t =
+  let state = Results.(before stmt |> get_cvalue_model) in
+  term_deps state t
+
+let () = Logic_interp.To_zone.compute_term_deps := compute_term_deps
 
 let valid_behaviors kf state =
   let funspec = Annotations.funspec kf in
