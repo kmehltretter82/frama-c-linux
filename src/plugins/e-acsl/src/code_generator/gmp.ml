@@ -38,7 +38,7 @@ let apply_on_var ~loc funname e =
   Smart_stmt.rtl_call ~loc ~prefix funname [ e ]
 
 let init ~loc e = apply_on_var "init" ~loc e
-let clear ~loc e = apply_on_var "clear" ~loc e
+let clear loc e = apply_on_var "clear" ~loc e
 
 exception Longlong of ikind
 
@@ -156,6 +156,17 @@ module Z = struct
         "Operation '%a' either not arithmetic or not supported on GMP integers"
         Printer.pp_binop bop
 
+  let new_var_and_mpz_init ~loc ?scope ?name env kf t mk_stmts =
+    Env.new_var
+      ~loc
+      ?scope
+      ?name
+      env
+      kf
+      t
+      (Gmp_types.Z.t ())
+      (fun v e -> init ~loc e :: mk_stmts v e)
+
 end
 
 module Q = struct
@@ -250,6 +261,9 @@ module Q = struct
 end
 
 let normalize_str = Q.normalize_str
+
+let () =
+  Env.gmp_clear_ref := clear
 
 (*
 Local Variables:

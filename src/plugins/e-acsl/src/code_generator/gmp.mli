@@ -32,7 +32,7 @@ val init_set: loc:location -> lval -> exp -> exp -> stmt
     or [mpq_init_set*(v, e)] with the good function 'set'
     according to the type of [e] *)
 
-val clear: loc:location -> exp -> stmt
+val clear: location -> exp -> stmt
 (** build stmt [mpz_clear(v)] or [mpq_clear(v)] depending on typ of [v] *)
 
 val affect: loc:location -> lval -> exp -> exp -> stmt
@@ -45,6 +45,14 @@ module Z : sig
   val name_arith_bop: binop -> string
   (** [name_of_mpz_arith_bop bop] returns the name of the GMP function on integer
       corresponding to the [bop] arithmetic operation. *)
+
+  val new_var_and_mpz_init:
+    loc:location -> ?scope:Varname.scope -> ?name:string ->
+    Env.t -> kernel_function -> term option ->
+    (varinfo -> exp (* the var as exp *) -> stmt list) ->
+    varinfo * exp * Env.t
+    (** Same as [Env.new_var], but dedicated to mpz_t variables initialized by
+        {!Mpz.init}. *)
 
 end
 

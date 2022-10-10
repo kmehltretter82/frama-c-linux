@@ -26,6 +26,13 @@ open Analyses_types
 open Contract_types
 module Error = Translation_error
 
+
+(**************************************************************************)
+(********************** Forward references ********************************)
+(**************************************************************************)
+let gmp_clear_ref : (location -> exp -> stmt) ref =
+  Extlib.mk_fun "gmp_clear"
+
 type localized_scope =
   | LGlobal
   | LFunction of kernel_function
@@ -231,7 +238,7 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
       (*      Options.feedback "memoizing %a for term %a"
               Varinfo.pretty v (fun fmt t -> match t with None -> Format.fprintf fmt
               "NONE" | Some t -> Term.pretty fmt t) t;*)
-      { clear_stmts = Gmp.clear ~loc e :: tbl.clear_stmts;
+      { clear_stmts = !gmp_clear_ref loc e :: tbl.clear_stmts;
         new_exps = match t with
           | None -> tbl.new_exps
           | Some t -> Term.Map.add t (v, e) tbl.new_exps }
@@ -283,17 +290,6 @@ let new_var ~loc ?(scope=Varname.Block) ?name env kf t ty mk_stmts =
   match scope with
   | Varname.Global | Varname.Function -> memo env.global_mp_tbl
   | Varname.Block -> memo local_env.mp_tbl
-
-let new_var_and_mpz_init ~loc ?scope ?name env kf t mk_stmts =
-  new_var
-    ~loc
-    ?scope
-    ?name
-    env
-    kf
-    t
-    (Gmp_types.Z.t ())
-    (fun v e -> Gmp.init ~loc e :: mk_stmts v e)
 
 let rtl_call_to_new_var ~loc ?scope ?name env kf t ty func_name args =
   let _, exp, env =
