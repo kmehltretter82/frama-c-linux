@@ -186,7 +186,7 @@ let () =
 let iter = Tbl.iter
 let find = Tbl.find
 
-let force_compute_all_calldeps () =
+let compute_all_calldeps () =
   if not (Tbl.is_computed ()) then begin
     if Eva.Analysis.is_computed () then
       Project.clear

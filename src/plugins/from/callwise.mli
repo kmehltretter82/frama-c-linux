@@ -24,6 +24,6 @@
     while the value analysis runs, and the results are usually much more
     precise than the functionwise results. *)
 
-val force_compute_all_calldeps : unit -> unit
+val compute_all_calldeps : unit -> unit
 val iter : (Cil_types.kinstr -> Function_Froms.froms -> unit) -> unit
 val find : Cil_types.kinstr -> Function_Froms.froms

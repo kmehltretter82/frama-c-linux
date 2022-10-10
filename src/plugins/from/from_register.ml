@@ -154,7 +154,7 @@ let main () =
   if From_parameters.ForceCallDeps.get () then
     From_parameters.ForceCallDeps.output
       (fun () ->
-         Callwise.force_compute_all_calldeps ();
+         Callwise.compute_all_calldeps ();
          if not_quiet then print_calldeps ();
       )
 

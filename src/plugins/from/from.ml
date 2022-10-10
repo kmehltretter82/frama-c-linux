@@ -34,7 +34,7 @@ let access zone mem = Function_Froms.Memory.find mem zone
 
 let display fmt = From_register.display (Some fmt)
 
-let force_compute_all_calldeps = Callwise.force_compute_all_calldeps
+let compute_all_calldeps = Callwise.compute_all_calldeps
 module Callwise = struct
   let iter = Callwise.iter
   let find = Callwise.find

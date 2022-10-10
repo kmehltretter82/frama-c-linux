@@ -26,7 +26,7 @@ val self : State.t
 val is_computed : kernel_function -> bool
 val compute : kernel_function -> unit
 val compute_all : unit -> unit
-val force_compute_all_calldeps : unit -> unit
+val compute_all_calldeps : unit -> unit
 val get : Cil_types.kernel_function -> Function_Froms.froms
 val access : Locations.Zone.t -> Function_Froms.Memory.t -> Locations.Zone.t
 val pretty : Format.formatter -> kernel_function -> unit
