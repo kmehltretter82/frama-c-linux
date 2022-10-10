@@ -22,11 +22,6 @@
 
 open Cil_types
 
-
-let cast_to_z ~loc:_ ?name:_ e _env =
-  assert (Gmp_types.Q.is_t (Cil.typeOf e));
-  Error.not_yet "reals: cast from R to Z"
-
 let add_cast ~loc ?name e env kf ty =
   (* TODO: The best solution would actually be to directly write all the needed
      functions as C builtins then just call them here depending on the situation

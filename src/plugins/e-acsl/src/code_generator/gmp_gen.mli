@@ -12,5 +12,9 @@ module Q : sig
   val create:
     loc:location -> ?name:string -> term option ->  Env.t -> kernel_function ->
     exp -> exp * Env.t
-    (** Create a real *)
+  (** Create a real *)
+
+  val cast_to_z: loc:location -> ?name:string -> Env.t -> exp -> exp * Env.t
+  (** Assumes that the given exp is of real type and casts it into Z *)
+
 end

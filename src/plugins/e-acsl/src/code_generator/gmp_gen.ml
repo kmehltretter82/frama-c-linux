@@ -32,4 +32,8 @@ module Q = struct
                Gmp.affect ~loc (Cil.var vi) vi_e e ])
       in
       e, env
+
+  let cast_to_z ~loc:_ ?name:_ _env e =
+    assert (Gmp_types.Q.is_t (Cil.typeOf e));
+    Error.not_yet "reals: cast from R to Z"
 end

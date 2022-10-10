@@ -45,7 +45,7 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
     | false, true ->
       if Gmp_types.Q.is_t ty then
         (* R --> Z *)
-        Rational.cast_to_z ~loc ?name e env
+        Gmp_gen.Q.cast_to_z ~loc ?name env e
       else
         (* C integer --> Z *)
         let e =

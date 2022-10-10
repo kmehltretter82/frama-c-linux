@@ -27,10 +27,6 @@
 open Cil_types
 
 (* TODO: change the call convention *)
-val cast_to_z: loc:location -> ?name:string -> exp -> Env.t -> exp * Env.t
-(** Assumes that the given exp is of real type and casts it into Z *)
-
-(* TODO: change the call convention *)
 val add_cast:
   loc:location -> ?name:string -> exp -> Env.t -> kernel_function -> typ ->
   exp * Env.t
