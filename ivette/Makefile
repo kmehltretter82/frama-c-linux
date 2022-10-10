@@ -31,13 +31,16 @@ DOME_CUSTOM_ENTRIES= yes
 COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
-.PHONY: all app dev pkg doc serve dist lint fixlint checkcase
+# --------------------------------------------------------------------------
+# --- Ivette Compilation
+# --------------------------------------------------------------------------
+
+.PHONY: all app dev lint checkcase tsc
 
 all: pkg lint app
 
 app: dome-app
 dev: dome-dev
-dist: dist-dir dome-dist
 
 lint: dome-pkg dome-templ checkcase
 	@echo "[Ivette] running typechecker & linter"
@@ -69,8 +72,22 @@ help::
 	@echo "  - PREFIX: used to customize installation path"
 
 # --------------------------------------------------------------------------
+# --- Ivette Distribution
+# --------------------------------------------------------------------------
+
+.PHONY: dist dist-dir
+
+dist-dir:
+	@echo "Cleaning dist"
+	@rm -fr dist
+
+dist: dist-dir dome-dist
+
+# --------------------------------------------------------------------------
 # --- Ivette Package Loader
 # --------------------------------------------------------------------------
+
+.PHONY: pkg
 
 LOADER=src/renderer/loader.ts
 SANDBOX=src/renderer/sandbox.ts
@@ -158,6 +175,8 @@ include $(DOME)/template/makefile
 # --- Ivette Installation
 # --------------------------------------------------------------------------
 
+.PHONY: install
+
 BINDIR=$(PREFIX)/bin
 LIBDIR=$(PREFIX)/lib
 
@@ -189,8 +208,7 @@ endif
 
 IVETTE_DIST=$(wildcard dist/linux-unpacked dist/mac dist/mac-arm64)
 
-ifdef LIBDIR
-ifdef BINDIR
+ifdef PREFIX
 ifeq ($(IVETTE_DIST),dist/linux-unpacked)
 
 install:
@@ -217,15 +235,19 @@ install:
 	@exit 1
 
 endif
-endif
+else
+
+install:
+	@echo "PREFIX not defined"
+	@exit 1
+
 endif
 
 # --------------------------------------------------------------------------
 # --- Ivette Un-Installation
 # --------------------------------------------------------------------------
 
-ifdef LIBDIR
-ifdef BINDIR
+ifdef PREFIX
 
 uninstall:
 	@echo "Uninstall Ivette"
@@ -234,7 +256,6 @@ uninstall:
 	@rm -fr $(LIBDIR)/ivette
 	@rm -f $(BINDIR)/ivette
 
-endif
 endif
 
 # --------------------------------------------------------------------------
