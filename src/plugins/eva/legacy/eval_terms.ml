@@ -2774,31 +2774,3 @@ let eval_tlval_as_zone ~alarm_mode access env t =
   over
 
 let tlval_deps env t = (eval_term_as_lval ~alarm_mode:Ignore env t).ldeps
-
-
-[@@@alert "-db_deprecated"]
-let () =
-  (* TODO: deprecate loc_to_loc, move loc_to_locs into Value *)
-  Db.Properties.Interp.loc_to_loc :=
-    (fun ~result state t ->
-       let env = env_post_f ~pre:state ~post:state ~result () in
-       try eval_tlval_as_location ~alarm_mode:Ignore env t
-       with LogicEvalError _ -> raise Logic_to_c.No_conversion
-    );
-  (* TODO: specify better evaluation environment *)
-  Db.Properties.Interp.loc_to_loc_under_over :=
-    (fun ~result state t ->
-       let env = env_post_f ~pre:state ~post:state ~result () in
-       try
-         let r= eval_term_as_lval ~alarm_mode:Ignore env t in
-         let s = Eval_typ.sizeof_lval_typ r.etype in
-         make_loc r.eunder s, make_loc r.eover s, deps_at lbl_here r.ldeps
-       with LogicEvalError _ -> raise Logic_to_c.No_conversion
-    );
-
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)
