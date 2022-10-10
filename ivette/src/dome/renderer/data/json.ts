@@ -331,8 +331,8 @@ export function jArray<A>(fn: Decoder<A>): Decoder<A[]> {
 
 /**
     Apply the decoder on each item of a JSON array, discarding
-    all JsonError exceptions from decoded items. The decoded JSON must still be an array,
-    otherwise a JsonError is raised.
+    all JsonError exceptions from decoded items. The decoded JSON must still be
+    an array, otherwise a JsonError is raised.
   */
 export function jList<A>(fn: Decoder<A>): Decoder<A[]> {
   return (js: json) => {
