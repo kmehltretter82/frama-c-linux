@@ -33,6 +33,19 @@ module Z = struct
                [ e ] ])
     in
     e, env
+
+  let binop ~loc t_opt bop env kf e1 e2 =
+    let name = Gmp.Z.name_arith_bop bop in
+    let mk_stmts _ e = [ Smart_stmt.rtl_call ~loc
+                           ~prefix:""
+                           name
+                           [ e; e1; e2 ] ] in
+    let name = Misc.name_of_binop bop in
+    let _, e, env =
+      Env.new_var_and_mpz_init ~loc ~name env kf t_opt mk_stmts
+    in
+    e,env
+
 end
 
 module Q = struct

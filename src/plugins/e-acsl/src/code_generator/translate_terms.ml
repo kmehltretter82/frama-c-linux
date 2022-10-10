@@ -350,15 +350,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     let e1, adata, env = to_exp ~adata kf env t1 in
     let e2, adata, env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
-      let name = Gmp.Z.name_arith_bop bop in
-      let mk_stmts _ e = [ Smart_stmt.rtl_call ~loc
-                             ~prefix:""
-                             name
-                             [ e; e1; e2 ] ] in
-      let name = Misc.name_of_binop bop in
-      let _, e, env =
-        Env.new_var_and_mpz_init ~loc ~name env kf (Some t) mk_stmts
-      in
+      let e, env = Gmp_gen.Z.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Typed_number.C_number, ""
     else if Gmp_types.Q.is_t ty then
       let e, env = Gmp_gen.Q.binop ~loc (Some t) bop env kf e1 e2 in
