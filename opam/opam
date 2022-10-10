@@ -139,5 +139,6 @@ depopts: [
 ]
 
 post-messages: [
+  "Ivette finalization: run ivette once with a network connection"
   "Why3 provers setup: rm -f ~/.why3.conf ; why3 config detect"
 ]
