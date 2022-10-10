@@ -206,7 +206,7 @@ let comparison_to_exp
         | C_integer _ | C_float _ | Nan ->
           Cil.mkBinOp ~loc bop e1 e2, env
         | Gmpz -> Gmp_gen.Z.cmp ~loc name t_opt bop env kf e1 e2
-        | Rational -> Gmp_gen.Q.cmp ~loc t_opt bop env kf e1 e2
+        | Rational -> Gmp_gen.Q.cmp ~loc name t_opt bop env kf e1 e2
         | Real -> Error.not_yet "comparison involving real numbers"
       end
     | _, _ ->

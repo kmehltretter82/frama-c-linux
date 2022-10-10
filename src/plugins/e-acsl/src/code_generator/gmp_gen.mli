@@ -49,8 +49,8 @@ module Q : sig
       indicates whether the comparison has a correspondance in the logic. *)
 
   val cmp:
-    loc:location -> term option -> binop ->  Env.t -> kernel_function ->
-    exp -> exp -> exp * Env.t
+    loc:location -> string -> term option -> binop ->  Env.t ->
+    kernel_function -> exp -> exp -> exp * Env.t
     (** Compares two expressions according to the given [binop]. The optional term
         indicates whether the comparison has a correspondance in the logic. *)
 
