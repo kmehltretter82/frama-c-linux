@@ -98,11 +98,11 @@ let publish ~page ?name ?(index=[]) ~title
   List.iter (fun entry -> entries := (entry , href) :: !entries) index ;
   page.sections <- section :: page.sections ; href
 
-let protocole ~title ~readme:filename =
+let protocol ~title ~readme:filename =
   let readme = Printf.sprintf "%s/server/%s" (Fc_config.datadir :> string) filename in
   ignore (page `Protocol ~title ~readme ~filename ())
 
-let () = protocole ~title:"Architecture" ~readme:"server.md"
+let () = protocol ~title:"Architecture" ~readme:"server.md"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Package Publication                                                --- *)

@@ -52,7 +52,7 @@ module BatchOutputDir = Senv.Empty_string
          directory."
     end)
 
-let () = Server_doc.protocole ~title:"Batch Protocol" ~readme:"server_batch.md"
+let () = Server_doc.protocol ~title:"Batch Protocol" ~readme:"server_batch.md"
 
 
 (* -------------------------------------------------------------------------- *)

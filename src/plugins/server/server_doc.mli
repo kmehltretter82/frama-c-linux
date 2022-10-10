@@ -64,8 +64,8 @@ val publish :
   ?generated:(unit -> Markdown.elements) ->
   unit -> Markdown.href
 
-(** Publish a protocole. *)
-val protocole : title:string -> readme:string -> unit
+(** Publish a protocol. *)
+val protocol : title:string -> readme:string -> unit
 
 (** Publish a package. *)
 val package : Package.packageInfo -> unit

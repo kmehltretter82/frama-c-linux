@@ -50,7 +50,7 @@ module SocketSize = Senv.Int
       let help = "Control the size of socket buffers (in ko, default 256)."
     end)
 
-let _ = Server_doc.protocole
+let _ = Server_doc.protocol
     ~title:"Unix Socket Protocol"
     ~readme:"server_socket.md"
 
