@@ -474,7 +474,7 @@ let get_or_raise (info_data_opt, info_decl) = match info_data_opt with
   | None ->
     (* TODO: maybe we can know how to use [info_decl] ? *)
     SlicingParameters.not_yet_implemented
-      "%s" !Logic_interp.To_zone.not_yet_implemented
+      "%s" !Logic_deps.not_yet_implemented
   | Some info_data -> info_data, info_decl
 
 (** Registered as a slicing selection function:

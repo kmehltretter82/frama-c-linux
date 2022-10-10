@@ -260,7 +260,7 @@ module Visibility (SliceName : sig
         SlicingParameters.debug ~level:2
           "[SlicingTransform.Visibility.annotation_visible] \
            not implemented -> invisible"; false
-      | Logic_interp.To_zone.NYI msg ->
+      | Logic_deps.NYI msg ->
         SlicingParameters.warning ~current:true ~once:true
           "Dropping unsupported ACSL annotation";
         SlicingParameters.debug ~level:2

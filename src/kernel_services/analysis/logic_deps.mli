@@ -94,6 +94,7 @@ val code_annot_filter:
     of the term result? *)
 val to_result_from_pred: predicate -> bool
 
-(** The follow declarations are kept for compatibility and should not be used *)
+(** The following declarations are kept for compatibility and should not be
+    used *)
 exception NYI of string
 val not_yet_implemented: string ref
