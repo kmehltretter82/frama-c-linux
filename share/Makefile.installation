@@ -29,7 +29,7 @@
 
 help::
 	@echo "Installation configuration variables"
-	@echo "  - INSTALLDIR: used to customize installation path"
+	@echo "  - PREFIX: used to customize installation path"
 	@echo "  - MANDIR: used to customize man files installation path"
 
 ################################
@@ -37,11 +37,11 @@ help::
 
 # Set this variable to request a specific installation directory
 # Default: Dune installs in the Opam directory
-INSTALLDIR?=
+PREFIX?=
 
 # Set this variable to request a specific man installation directory
 # Default: the manuals are installed in the installation directory transmitted
-# to Dune (so either in Opam or in INSTALLDIR)
+# to Dune (so either in Opam or in PREFIX)
 MANDIR?=
 
 ifeq (${MANDIR},)
@@ -56,19 +56,19 @@ endif
 .PHONY: install uninstall
 
 install:
-ifeq ($(INSTALLDIR),)
+ifeq ($(PREFIX),)
 	dune install ${MANDIR_OPT}
 else
-	@echo "Installing to prefix: ${INSTALLDIR}"
-	dune install --prefix ${INSTALLDIR} ${MANDIR_OPT}
+	@echo "Installing to prefix: ${PREFIX}"
+	dune install --prefix ${PREFIX} ${MANDIR_OPT}
 	@echo 'DO NOT FORGET TO EXPAND YOUR OCAMLPATH VARIABLE:'
-	@echo '  export OCAMLPATH="${INSTALLDIR}/lib:$$OCAMLPATH"'
+	@echo '  export OCAMLPATH="${PREFIX}/lib:$$OCAMLPATH"'
 endif
 
 uninstall:
-ifeq ($(INSTALLDIR),)
+ifeq ($(PREFIX),)
 	dune uninstall ${MANDIR_OPT}
 else
-	@echo "Uninstalling from prefix: ${INSTALLDIR}"
-	dune uninstall --prefix ${INSTALLDIR} ${MANDIR_OPT}
+	@echo "Uninstalling from prefix: ${PREFIX}"
+	dune uninstall --prefix ${PREFIX} ${MANDIR_OPT}
 endif

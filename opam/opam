@@ -92,7 +92,7 @@ build: [
 ]
 
 install: [
-  [make "INSTALLDIR=%{prefix}%" "MANDIR=%{mandir}%" "install"]
+  [make "PREFIX=%{prefix}%" "MANDIR=%{mandir}%" "install"]
   [make "PREFIX=%{prefix}%" "-C" "doc" "install"] {with-doc}
 ]
 
