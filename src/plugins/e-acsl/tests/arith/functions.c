@@ -46,6 +46,11 @@ int glob = 5;
 // Test functions returning a rational
 /*@ logic real over(real a, real b) = a/b; */
 
+//Test function using a global variable (they elaborate to functions
+//with labels)
+int z = 8;
+/*@ logic integer f3 (integer y) = z+y; */
+
 int main(void) {
   int x = 1, y = 2;
   /*@ assert p1(x, y); */;
@@ -82,7 +87,8 @@ int main(void) {
 
   /*@ assert over(1., 2.) == 0.5; */;
 
-  // not yet supported
   /*@ assert p_here(27); */;
   /*@ assert f_here(27) == 27; */;
+
+  /*@ assert f3(5) == 13; */;
 }
