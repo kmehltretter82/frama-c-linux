@@ -24,16 +24,8 @@
 
 (* [TODO ARCHI]: change the call convention in the whole module *)
 
-open Cil_types
 
 
-(* TODO: change the call convention --> exp at the end *)
-val cmp:
-  loc:location -> binop -> exp -> exp -> Env.t -> kernel_function ->
-  term option ->
-  exp * Env.t
-(** Compares two expressions according to the given [binop]. The optional term
-    indicates whether the comparison has a correspondance in the logic. *)
 
 (*
 Local Variables:

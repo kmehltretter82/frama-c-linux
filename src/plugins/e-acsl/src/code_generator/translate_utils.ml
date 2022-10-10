@@ -221,7 +221,7 @@ let comparison_to_exp
                      [ e1; e2 ] ])
           in
           Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
-        | Rational -> Rational.cmp ~loc bop e1 e2 env kf t_opt
+        | Rational -> Gmp_gen.Q.cmp ~loc t_opt bop env kf e1 e2
         | Real -> Error.not_yet "comparison involving real numbers"
       end
     | _, _ ->

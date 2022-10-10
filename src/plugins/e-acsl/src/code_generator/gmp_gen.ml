@@ -146,4 +146,28 @@ module Q = struct
     let _, e, env = new_var_and_init ~loc ~name env kf t_opt mk_stmts in
     e, env
 
+  let cmp ~loc t_opt bop env kf e1 e2 =
+    let fname = "__gmpq_cmp" in
+    let name = Misc.name_of_binop bop in
+    (* TODO: [t1_opt] and [t2_opt] could be provided when creating [e1] and
+       [e2] *)
+    let e1, env = create ~loc None env kf e1 in
+    let e2, env = create ~loc None env kf e2 in
+    let _, e, env =
+      Env.new_var
+        ~loc
+        env
+        kf
+        t_opt
+        ~name
+        Cil.intType
+        (fun v _ ->
+           [ Smart_stmt.rtl_call ~loc
+               ~result:(Cil.var v)
+               ~prefix:""
+               fname
+               [ e1; e2 ] ])
+    in
+    Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
+
 end
