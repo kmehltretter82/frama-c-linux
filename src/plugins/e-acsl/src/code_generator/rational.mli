@@ -26,13 +26,6 @@
 
 open Cil_types
 
-val normalize_str: string -> string
-(** Normalize the string so that it fits the representation used by the
-    underlying real library. For example, "0.1" is a real number in ACSL
-    whereas it is considered as a double by [libgmp] because it is written in
-    decimal expansion. In order to make [libgmp] consider it to be a rational,
-    it must be converted into "1/10". *)
-
 (* TODO: change the call convention *)
 val cast_to_z: loc:location -> ?name:string -> exp -> Env.t -> exp * Env.t
 (** Assumes that the given exp is of real type and casts it into Z *)

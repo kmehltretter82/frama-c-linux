@@ -154,6 +154,92 @@ let init_set ~loc lv ev e =
   else
     mpz_init_set ""
 
+
+module Q = struct
+  exception Not_a_decimal of string
+  exception Is_a_float
+
+  (* The possible float suffixes (ISO C 6.4.4.2) are lLfF.
+     dD is a GNU extension accepted by Frama-C (only!) in the logic *)
+  let float_suffixes = [ 'f'; 'F'; 'l'; 'L'; 'd'; 'D' ]
+
+  (* Computes the fractional representation of a decimal number.
+     Does NOT perform reduction.
+     Example: [dec_to_frac "43.567"] evaluates to ["43567/1000"]
+     Complexity: Linear
+     Original Author: Frédéric Recoules
+
+     It iterates **once** over [str] during which three cases are distinguished,
+     example for "43.567":
+     Case1: pre: no '.' has been found yet ==> copy current char into buf
+      buf: | 4 |   |   |   |   |   |   |   |   |   |   |   |
+           | 4 | 3 |   |   |   |   |   |   |   |   |   |   |
+     Case2: mid: current char is '.' ==> put "/1" into buf at [(length str) - 1]
+      buf: | 4 | 3 |   |   |   | / | 1 |   |   |   |   |   |
+     Case3: post: a '.' was found ==> put current char in numerator AND '0' in den
+      buf: | 4 | 3 | 5 |   |   | / | 1 | 0 |   |   |   |   |
+           | 4 | 3 | 5 | 6 |   | / | 1 | 0 | 0 |   |   |   |
+           | 4 | 3 | 5 | 6 | 7 | / | 1 | 0 | 0 | 0 |   |   | *)
+  let decimal_to_fractional str =
+    let rec post str len buf len' i =
+      if i = len then
+        Bytes.sub_string buf 0 len'
+      else
+        match String.unsafe_get str i with
+        | c when '0' <= c && c <= '9' ->
+          Bytes.unsafe_set buf (i - 1) c;
+          Bytes.unsafe_set buf len' '0';
+          post str len buf (len' + 1) (i + 1)
+        | c when List.mem c float_suffixes ->
+          (* [JS] a suffix denoting a C type is possible *)
+          assert (i = len - 1);
+          raise Is_a_float
+        | _ ->
+          raise (Not_a_decimal str)
+    in
+    let mid buf len =
+      Bytes.unsafe_set buf (len - 1) '/';
+      Bytes.unsafe_set buf len '1'
+    in
+    let rec pre str len buf i =
+      if i = len then
+        str
+      else
+        match String.unsafe_get str i with
+        | '.' ->
+          mid buf len;
+          post str len buf (len + 1) (i + 1)
+        | c when '0' <= c && c <= '9' ->
+          Bytes.unsafe_set buf i c;
+          pre str len buf (i + 1)
+        | c when List.mem c float_suffixes ->
+          (* [JS] a suffix denoting a C type is possible *)
+          assert (i = len - 1);
+          raise Is_a_float
+        | _ ->
+          raise (Not_a_decimal str)
+    in
+    let strlen = String.length str in
+    let buflen =
+      (* The fractional representation is at most twice as lengthy
+         as the decimal one. *)
+      2 * strlen
+    in
+    try pre str strlen (Bytes.create buflen) 0
+    with Is_a_float -> str (* just left it unchanged *)
+
+  (* ACSL considers strings written in decimal expansion to be reals.
+     Yet GMPQ considers them to be double:
+     they MUST be converted into fractional representation. *)
+  let normalize_str str =
+    try
+      decimal_to_fractional str
+    with Invalid_argument _ ->
+      Error.not_yet "number not written in decimal expansion"
+end
+
+let normalize_str = Q.normalize_str
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."
