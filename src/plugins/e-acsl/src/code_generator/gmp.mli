@@ -24,10 +24,6 @@
 
 open Cil_types
 
-val name_of_mpz_arith_bop: binop -> string
-(** [name_of_mpz_arith_bop bop] returns the name of the GMP function on integer
-    corresponding to the [bop] arithmetic operation. *)
-
 val init: loc:location -> exp -> stmt
 (** build stmt [mpz_init(v)] or [mpq_init(v)] depending on typ of [v] *)
 
@@ -43,6 +39,14 @@ val affect: loc:location -> lval -> exp -> exp -> stmt
 (** [affect x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_set*(e)]
     or [mpq_set*(e)] with the good function 'set'
     according to the type of [e] *)
+
+module Z : sig
+
+  val name_arith_bop: binop -> string
+  (** [name_of_mpz_arith_bop bop] returns the name of the GMP function on integer
+      corresponding to the [bop] arithmetic operation. *)
+
+end
 
 val normalize_str: string -> string
 (** Normalize the string so that it fits the representation used by the

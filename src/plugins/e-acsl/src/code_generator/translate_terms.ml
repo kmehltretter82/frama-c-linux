@@ -115,7 +115,7 @@ let affect_binop ~loc var_as_varinfo var_as_exp binop exp_type exp1 exp2 =
          "__gmpz_cmp"
          [exp1; exp2]
      | Some e ->
-       let name = Gmp.name_of_mpz_arith_bop binop in
+       let name = Gmp.Z.name_arith_bop binop in
        Smart_stmt.rtl_call
          ~loc ~prefix:"" name [e; exp1; exp2])
   else if Gmp_types.Q.is_t exp_type then
@@ -350,7 +350,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     let e1, adata, env = to_exp ~adata kf env t1 in
     let e2, adata, env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
-      let name = Gmp.name_of_mpz_arith_bop bop in
+      let name = Gmp.Z.name_arith_bop bop in
       let mk_stmts _ e = [ Smart_stmt.rtl_call ~loc
                              ~prefix:""
                              name
@@ -384,7 +384,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
          RTE should do this automatically. *)
       let ctx = Typing.get_number_ty ~logic_env t in
       let t = Some t in
-      let name = Gmp.name_of_mpz_arith_bop bop in
+      let name = Gmp.Z.name_arith_bop bop in
       (* [TODO] can now do better since the type system got some info about
          possible values of [t2] *)
       (* guarding divisions and modulos *)
@@ -560,7 +560,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
 
       (* Create the shift instruction *)
       let mk_shift_instr result_e =
-        let name = Gmp.name_of_mpz_arith_bop bop in
+        let name = Gmp.Z.name_arith_bop bop in
         Smart_stmt.rtl_call ~loc
           ~prefix:""
           name
@@ -691,7 +691,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     let e2, adata, env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
       let mk_stmts _v e =
-        let name = Gmp.name_of_mpz_arith_bop bop in
+        let name = Gmp.Z.name_arith_bop bop in
         let instr = Smart_stmt.rtl_call ~loc ~prefix:"" name [ e; e1; e2 ] in
         [ instr ]
       in
