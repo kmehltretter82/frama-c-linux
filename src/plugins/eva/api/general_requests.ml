@@ -162,8 +162,8 @@ let () = Request.register ~package
 (* ----- Register Eva information ------------------------------------------- *)
 
 let term_lval_to_lval tlval =
-  try !Db.Properties.Interp.term_lval_to_lval ~result:None tlval
-  with Db.Properties.Interp.No_conversion -> raise Not_found
+  try Logic_to_c.term_lval_to_lval tlval
+  with Logic_to_c.No_conversion -> raise Not_found
 
 let print_value fmt loc =
   let is_scalar = Cil.isScalarType in
