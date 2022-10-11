@@ -35,10 +35,10 @@ open Automaton_ast
 exception Empty_automaton
 
 (* ************************************************************************* *)
-(** {2 LTL/Promela primitives} *)
+(** {2 Automaton primitives} *)
 (* ************************************************************************* *)
 
-(** Here are some operations used for generation of LTL AST or Promela AST. *)
+(** Here are some operations used for generation of automaton AST. *)
 
 module Aorai_state: Datatype.S_with_collections with type t = Automaton_ast.state
 

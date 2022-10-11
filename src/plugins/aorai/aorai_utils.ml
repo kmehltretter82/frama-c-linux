@@ -1103,7 +1103,7 @@ let getInitialState () =
 (** This function computes all newly introduced globals (variables, enumeration structure, invariants, etc. *)
 let initGlobals root complete =
   mk_global_comment "//****************";
-  mk_global_comment "//* BEGIN Primitives generated for LTL verification";
+  mk_global_comment "//* BEGIN Primitives generated for Aorai verification";
   mk_global_comment "//* ";
   mk_global_comment "//* ";
   mk_global_comment "//* Some constants";
@@ -1168,7 +1168,7 @@ let initGlobals root complete =
      in
      Annotations.add_global Aorai_option.emitter annot);
   mk_global_comment "//* ";
-  mk_global_comment "//* END Primitives generated for LTL verification";
+  mk_global_comment "//* END Primitives generated for Aorai verification";
   mk_global_comment "//****************";
 
   flush_globals ()

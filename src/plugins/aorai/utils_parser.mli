@@ -23,7 +23,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** utilities for parsing automata and LTL formulas *)
+(** utilities for parsing automaton's formulas *)
 
 (** returns the position corresponding to the
     current character in the lexbuf. *)
