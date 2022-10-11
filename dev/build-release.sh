@@ -27,7 +27,7 @@
 # Thus, it expects to be run from the root of the Frama-C directory and that
 # some CI artifacts are available. Namely:
 #   - 'frama-c.tar.gz'
-#   - 'api' directory (with api archive inside)
+#   - 'api' directory (with api archives inside)
 #   - 'manuals' directory (with all manuals incl. acsl + version text files)
 # Availability of the files is checked when the script starts. The script also
 # checks that:
@@ -144,9 +144,14 @@ prepare_file $TARGZ_BASE
 
 show_step "Searching for a Frama-C API archive"
 
-TARGZ_API="$API_DIR/frama-c-api.tar.gz"
+API_FILES=(
+  frama-c
+  frama-c-server
+)
 
-prepare_file $TARGZ_API
+for file in "${API_FILES[@]}"; do
+  prepare_file "$API_DIR/$file-api.tar.gz"
+done
 
 show_step "Searching for manuals"
 
@@ -206,31 +211,39 @@ function version_name {
   fi
 }
 
-# For the 2 next functions
+# For the 3 next functions
 # $1 : name
 # $2 : extension
 
-function copy_normal {
+function copy_manual_normal {
   cp "$MANUALS_DIR/$1.$2" "$MANS_TARGET_DIR/$(generic_name "$1").$2"
   cp "$MANUALS_DIR/$1.$2" "$MANS_TARGET_DIR/$(version_name "$1").$2"
 }
 
-function copy_e_acsl {
+function copy_manual_e_acsl {
   EACSL_TARGET_DIR="$MANS_TARGET_DIR/e-acsl"
   cp "$MANUALS_DIR/$1.$2" "$EACSL_TARGET_DIR/$(generic_name "$1").$2"
   cp "$MANUALS_DIR/$1.$2" "$EACSL_TARGET_DIR/$(version_name "$1").$2"
 }
 
+function copy_api {
+  cp "$API_DIR/$1-api.$2" "$MANS_TARGET_DIR/$1-api.$2"
+  cp "$API_DIR/$1-api.$2" "$MANS_TARGET_DIR/$1-$VERSION_AND_CODENAME-api.$2"
+}
+
 function copy_files {
   for manual in "${MANUALS[@]}"; do
     if [[ $manual =~ ^e-acsl.*$ ]]; then
-      copy_e_acsl "$manual" "pdf"
+      copy_manual_e_acsl "$manual" "pdf"
     else
-      copy_normal "$manual" "pdf"
+      copy_manual_normal "$manual" "pdf"
     fi
   done
   for companion in "${COMPANIONS[@]}"; do
-    copy_normal "$companion" "tar.gz"
+    copy_manual_normal "$companion" "tar.gz"
+  done
+  for api in "${API_FILES[@]}"; do
+    copy_api "$file" "tar.gz"
   done
 
   # Eva has an old manual name that might be in use:
@@ -238,8 +251,6 @@ function copy_files {
 
   cp $TARGZ_BASE "$GZ_TARGET_DIR/$TARGZ_VERSION"
   cp $TARGZ_BASE "$GZ_TARGET_DIR/$TARGZ_GENERIC"
-
-  cp $TARGZ_API "$MANS_TARGET_DIR/frama-c-$VERSION_AND_CODENAME-api.tar.gz"
 }
 
 ##########################################################################
@@ -304,7 +315,7 @@ sed 's/\(\#.*\)/##\1/' $CHANGES >> $WIKI_PAGE
 echo "Wiki page built"
 
 ##########################################################################
-# Make wiki
+# Make release
 
 show_step "Building release json file"
 
@@ -320,6 +331,11 @@ cat >$JSON_DATA <<EOL
       {
         "name": "API Documentation",
         "url": "https://frama-c.com/download/frama-c-$VERSION_AND_CODENAME-api.tar.gz",
+        "link_type":"other"
+      },
+      {
+        "name": "Server API Documentation",
+        "url": "https://frama-c.com/download/frama-c-server-$VERSION_AND_CODENAME-api.tar.gz",
         "link_type":"other"
       },
       {
@@ -446,6 +462,8 @@ releases:
       help_link: /download/hello-$VERSION_AND_CODENAME.tar.gz
     - name: API Documentation
       link: /download/frama-c-$VERSION_AND_CODENAME-api.tar.gz
+    - name: Server API Documentation
+      link: /download/frama-c-server-$VERSION_AND_CODENAME-api.tar.gz
     - name: ACSL $ACSL_VERSION ($CODENAME implementation)
       link: /download/acsl-implementation-$VERSION_AND_CODENAME.pdf
   - name: Plug-in Manuals
