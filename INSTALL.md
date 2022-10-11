@@ -312,7 +312,7 @@ Arch Linux: `pikaur -S frama-c`
         opam install --deps-only frama-c
 
    If not using [opam](http://opam.ocaml.org/), you will need to install
-   the Frama-C dependencies by yourself. The `opam/opam` file in the Frama-C
+   the Frama-C dependencies by yourself. The `opam` file in the Frama-C
    .tar.gz lists the required dependencies (e.g. `ocamlfind`, `ocamlgraph`,
    `zarith`, etc.). A few of these dependencies are optional, only required
    for the graphical interface: `lablgtk`, `conf-gnomecanvas` and
@@ -334,7 +334,7 @@ Arch Linux: `pikaur -S frama-c`
 
 #### Frama-C Requirements
 
-See the `opam/opam` file, section `depends`, for compatible OCaml versions and
+See the `opam` file, section `depends`, for compatible OCaml versions and
 required dependencies (except for those related to `lablgtk`, which are
 required for the GUI but otherwise optional).
 

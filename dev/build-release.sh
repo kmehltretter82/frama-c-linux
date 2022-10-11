@@ -264,7 +264,7 @@ OPAM_FC_DIR="$OPAM_DIR/packages/frama-c/frama-c.$VERSION"
 mkdir -p $OPAM_DIR
 mkdir -p $OPAM_FC_DIR
 
-cat opam/opam | grep -v "^version\:" | grep -v "^name\:" > $OPAM_FC_DIR/opam
+cat opam | grep -v "^version\:" | grep -v "^name\:" > $OPAM_FC_DIR/opam
 cat >>$OPAM_FC_DIR/opam << EOL
 
 url {
