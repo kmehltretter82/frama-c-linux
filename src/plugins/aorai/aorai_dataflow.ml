@@ -162,8 +162,7 @@ module Call_state =
     (struct
       let name = "Data_for_aorai.Call_state"
       let dependencies =
-        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
-          Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Deterministic.self ]
       let size = 17
     end)
 
@@ -196,8 +195,7 @@ module Return_state =
     (struct
       let name = "Data_for_aorai.Return_state"
       let dependencies =
-        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
-          Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Deterministic.self ]
       let size = 17
     end)
 
@@ -675,8 +673,7 @@ module Pre_state =
     (struct
       let name = "Aorai_dataflow.Pre_state"
       let dependencies =
-        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
-          Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Deterministic.self ]
       let size = 17
     end)
 
@@ -695,8 +692,7 @@ module Post_state =
     (struct
       let name = "Aorai_dataflow.Post_state"
       let dependencies =
-        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
-          Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Deterministic.self ]
       let size = 17
     end)
 
@@ -712,8 +708,7 @@ module Init_loop_state =
     (struct
       let name = "Aorai_dataflow.Init_loop_state"
       let dependencies =
-        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
-          Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Deterministic.self ]
       let size = 17
     end)
 
@@ -729,8 +724,7 @@ module Invariant_loop_state =
     (struct
       let name = "Aorai_dataflow.Invariant_loop_state"
       let dependencies =
-        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
-          Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Deterministic.self ]
       let size = 17
     end)
 

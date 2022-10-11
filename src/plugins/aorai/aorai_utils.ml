@@ -91,11 +91,7 @@ let find_enum, set_enum =
         let dependencies = (* TODO: projectify the automata
                               and depend on it.
                            *)
-          [ Ast.self;
-            Aorai_option.Ltl_File.self;
-            Aorai_option.Buchi.self;
-            Aorai_option.Ya.self
-          ]
+          [ Ast.self; Aorai_option.Ya.self ]
       end)
   in
   (fun n ->

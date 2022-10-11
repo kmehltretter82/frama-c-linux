@@ -225,9 +225,7 @@ module Automaton =
     (Datatype.Option(Aorai_automaton))
     (struct
       let name = "Data_for_aorai.Automaton"
-      let dependencies =
-        [ Aorai_option.Ltl_File.self; Aorai_option.Buchi.self;
-          Aorai_option.Ya.self ]
+      let dependencies = [ Aorai_option.Ya.self ]
       let default () = None
     end)
 
@@ -288,9 +286,7 @@ module AuxVariables =
     (Cil_datatype.Varinfo)
     (struct
       let name = "Data_for_aorai.AuxVariables"
-      let dependencies =
-        [ Aorai_option.Ltl_File.self; Aorai_option.Buchi.self;
-          Aorai_option.Ya.self; Ast.self ]
+      let dependencies = [ Aorai_option.Ya.self; Ast.self ]
     end)
 
 module AbstractLogicInfo =
@@ -298,9 +294,7 @@ module AbstractLogicInfo =
     (Cil_datatype.Logic_info)
     (struct
       let name = "Data_for_aorai.AbstractLogicInfo"
-      let dependencies =
-        [ Aorai_option.Ltl_File.self; Aorai_option.Buchi.self;
-          Aorai_option.Ya.self; Ast.self ]
+      let dependencies = [ Aorai_option.Ya.self; Ast.self ]
     end)
 
 class change_var vi1 vi2 =
@@ -978,9 +972,7 @@ module Reject_state =
   State_builder.Option_ref(Aorai_state)
     (struct
       let name = "Data_for_aorai.Reject_state"
-      let dependencies =
-        [ Aorai_option.Ltl_File.self; Aorai_option.Buchi.self;
-          Aorai_option.Ya.self]
+      let dependencies = [ Aorai_option.Ya.self]
     end)
 
 let get_reject_state () =
@@ -1692,8 +1684,7 @@ module Aux_varinfos =
     (struct
       let name = "Data_for_aorai.Aux_varinfos"
       let dependencies =
-        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
-          Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Deterministic.self ]
       let size = 13
     end)
 
@@ -1709,8 +1700,7 @@ module Paraminfos =
     (struct
       let name = "Data_for_aorai.Paraminfos"
       let dependencies =
-        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
-          Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Deterministic.self ]
       let size = 13
     end)
 
@@ -2036,8 +2026,7 @@ module Pre_state =
     (struct
       let name = "Data_for_aorai.Pre_state"
       let dependencies =
-        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
-          Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Deterministic.self ]
       let size = 17
     end)
 
@@ -2065,8 +2054,7 @@ module Post_state =
     (struct
       let name = "Data_for_aorai.Post_state"
       let dependencies =
-        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
-          Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Deterministic.self ]
       let size = 17
     end)
 
@@ -2089,8 +2077,7 @@ module Loop_init_state =
     (struct
       let name = "Data_for_aorai.Loop_init_state"
       let dependencies =
-        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
-          Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Deterministic.self ]
       let size = 17
     end)
 
@@ -2113,8 +2100,7 @@ module Loop_invariant_state =
     (struct
       let name = "Data_for_aorai.Loop_invariant_state"
       let dependencies =
-        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Ltl_File.self;
-          Aorai_option.To_Buchi.self; Aorai_option.Deterministic.self ]
+        [ Ast.self; Aorai_option.Ya.self; Aorai_option.Deterministic.self ]
       let size = 17
     end)
 
