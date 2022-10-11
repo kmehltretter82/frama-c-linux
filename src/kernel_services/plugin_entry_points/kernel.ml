@@ -869,10 +869,9 @@ module LoadModule =
       let module_name = "LoadModule"
       let arg_name = "SPEC,..."
       let help = "Dynamically load modules. \
-                  Each <SPEC> can be an OCaml source or object file, with \
+                  Each <SPEC> can be object file, with \
                   or without extension, or a Findlib package. \
-                  Loading order is preserved and \
-                  additional dependencies can be listed in *.depend files."
+                  Loading order is preserved, but after plugins and libraries."
     end)
 
 let () = Parameter_customize.set_group saveload
