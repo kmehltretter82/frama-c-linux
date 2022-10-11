@@ -23,11 +23,18 @@
 
 PACKAGE="frama-c-scripts"
 
+CMD="init"
 
 THIS_SCRIPT="$0"
 Usage () {
-    echo "Usage: $(basename ${THIS_SCRIPT}) <script-dir> [<modules>]"
-    echo "  Build a script library to be used by Frama-C kernel"
+    echo "Usage: $(basename ${THIS_SCRIPT}) [<CMD>] <script-dir> [<modules>]"
+    echo "  Build a script library to be used by Frama-C kernel."
+    echo ""
+    echo "Commands:"
+    echo "- init: generates dune files (default command)"
+    echo "- build: performs the compilation of the script libraries via \"dune build @install\""
+    echo "- install: performs the installation of the script libraries via \"dune install\""
+    echo ""
     echo "Arguments"
     echo "  <script-dir>: directory that contents the script files:"
     echo "                - the basename of this directory fixes the name of the script library: ${PACKAGE}.<basename>"
@@ -42,6 +49,14 @@ Error () {
     Usage
     exit 1
 }
+
+###############
+# Command line processing
+
+case "$1" in
+    "init"|"build"|"install") CMD="$1"; shift;;
+    *) ;;
+esac
 
 [ "$1" != "" ] || Error "Missing argument: no script directory"
 [ "$1" != "-h" ] || Usage
@@ -93,7 +108,7 @@ GenerateFile () {
     if [ -e "$2" ]; then
         echo "$1 file exists already: $2"
     else
-        echo "- Generate $1 file: $2"
+        echo "- Creating $1 file: $2"
         $1 | while read p; do
             echo "$p" >> "$2"
         done
@@ -112,28 +127,56 @@ esac
 
 ###############
 
+EchoDuneCmd() {
+    if [ "${DUNE_PROJECT_DIR}" = "." ]; then
+        echo "  > $@"
+    else
+        echo "  > (cd ${DUNE_PROJECT_DIR} && $@)"
+    fi
+}
+
+DuneBuild() {
+    echo ""
+    echo "- Compiling the script library \"${PACKAGE}.${SCRIPT_NAME}\" via \"dune build @install\" command..."
+    dune build @install
+    [ "$?" = "0" ] || Error "the compilation fails!"
+}
+
+DuneInstall() {
+    echo ""
+    echo "- Install the script library \"${PACKAGE}.${SCRIPT_NAME}\" via \"dune install\" command..."
+    dune install
+}
+
+###############
+
 [ "$(basename "${DUNE_FILE}")" = "dune" ] || Error "Wrong basename for a dune file: ${DUNE_FILE}"
 [ "$(basename "${DUNE_PROJECT}")" = "dune-project" ] || Error "Wrong basename for a dune-project file: ${DUNE_PROJECT}"
 
-GenerateFile Dune "${DUNE_FILE}"
 GenerateFile DuneProject "${DUNE_PROJECT}"
+GenerateFile Dune "${DUNE_FILE}"
 
-EchoDuneCmd()
-if [ "${DUNE_PROJECT_DIR}" = "." ]; then
-    echo "  > $@"
+if [ "$CMD" = "init" ]; then
+    echo ""
+    echo "To compile the all scripts defined inside this 'dune project' \"${PACKAGE}\", runs the following command:"
+    EchoDuneCmd "dune build @install"
 else
-    echo "  > (cd ${DUNE_PROJECT_DIR} && $@)"
+    DuneBuild
 fi
-
-echo "To compile the all scripts defined inside this 'dune project' \"${PACKAGE}\", runs the following command:"
-EchoDuneCmd "dune build @install"
-echo "So, the script libraries, are installed into the local '_build' directory."
-echo "That also generate the 'opam' file \"${PACKAGE}.opam\" allowing a global installation of all script libraries."
+echo ""
+echo "So, the script libraries, are compiled and installed into the local '_build' directory."
+echo "That also create or update the 'opam' file \"${PACKAGE}.opam\" allowing a global installation of all script libraries."
 echo ""
 echo "To load this script library from Frama-C, runs the following command:"
 EchoDuneCmd "dune exec -- frama-c -load-library ${PACKAGE}.${SCRIPT_NAME} ..."
+
+if [ "$CMD" = "install" ]; then
+    DuneInstall
+else
+    echo ""
+    echo "All libraries of this 'dune project' \"${PACKAGE}\" can also be installed via 'dune' using from the generated 'opam' file: \"${PACKAGE}.opam\""
+    EchoDuneCmd "dune install"
+fi
 echo ""
-echo "All libraries of this 'dune project' \"${PACKAGE}\" can also be installed via 'dune' using from the generated 'opam' file: \"${PACKAGE}.opam\""
-EchoDuneCmd "dune install"
 echo "Then, this script library can directly be loaded by Frama-C from the following command:"
 echo "  > frama-c -load-library ${PACKAGE}.${SCRIPT_NAME} ..."
