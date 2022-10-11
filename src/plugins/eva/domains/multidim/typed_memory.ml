@@ -33,7 +33,7 @@ module Bound = Segmentation.Bound
 (* Composition operator for compare function *)
 
 let (<?>) c lcmp =
-  if c = 0 then 0 else Lazy.force lcmp
+  if c <> 0 then c else Lazy.force lcmp
 
 (* Types compatibility *)
 
