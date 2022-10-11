@@ -144,7 +144,7 @@ depopts: [
 
 post-messages: [
   "****** Frama-C/WP **************************************"
-  "This plug-in requires at least one external provers."
+  "This plug-in requires one or more external prover(s)."
   "Recommended provers are:"
   "- Alt-Ergo (https://alt-ergo.ocamlpro.com)"
   "- CVC4     (https://cvc4.github.io)"
@@ -157,4 +157,5 @@ post-messages: [
   "- install NVM (https://github.com/nvm-sh/nvm)"
   "- run 'nvm use 16'"
   "- run 'npm install --global yarn'"
+  "On macOS, run 'ivette' after OPAM removal."
 ]

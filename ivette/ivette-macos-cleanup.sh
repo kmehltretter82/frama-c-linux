@@ -1,3 +1,4 @@
+#!/bin/zsh
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -20,27 +21,7 @@
 #                                                                        #
 ##########################################################################
 
-# --------------------------------------------------------------------------
-# --- OPAM Installation
-# --------------------------------------------------------------------------
-
-.PHONY: install uninstall
-
-install:
-	@echo "Installing Ivette…"
-	@mkdir -p $(PREFIX)/bin
-	@install ivette/ivette-opam.sh $(PREFIX)/bin/ivette
-	@mkdir -p $(PREFIX)/lib/frama-c
-	@tar zcf $(PREFIX)/lib/frama-c/ivette.tgz ivette
-	@echo "Done"
-
-uninstall:
-	@echo "Removing Ivette…"
-	@rm -f $(PREFIX)/bin/ivette
-	@rm -f $(PREFIX)/lib/frama-c/ivette.tgz
-	@if test -d /Applications/Ivette.app ;\
-	 then \
-	 mkdir -p $(PREFIX)/bin; \
-	 install ivette/ivette-macos-cleanup.sh $(PREFIX)/bin/ivette; \
-	 fi
-	@echo "Done"
+echo "Finalizing Ivette Removal…"
+rm -fr /Applications/Ivette.app
+rm -f $0
+echo "Done."
