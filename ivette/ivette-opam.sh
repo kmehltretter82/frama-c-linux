@@ -33,13 +33,13 @@ PWD=`pwd`
 function InstallHelp()
 {
     echo "Ivette Requirements:"
-    echo "  - node v16.* (not v17 and higher)"
-    echo "  - yarn v1.0+ (higher is ok)"
+    echo "  - node v16"
+    echo "  - yarn (any version)"
     echo "Recommanded Installation:"
     echo "  - install nvm (https://github.com/nvm-sh/nvm)"
-    echo "  - run `nvm use 16`"
-    echo "  - run `npm install --global yarn`"
-    echo "  - run `ivette`"
+    echo "  - run 'nvm use 16'"
+    echo "  - run 'npm install --global yarn'"
+    echo "  - run 'ivette'"
 }
 
 # --------------------------------------------------------------------------
