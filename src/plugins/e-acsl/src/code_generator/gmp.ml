@@ -260,8 +260,6 @@ module Q = struct
       Error.not_yet "number not written in decimal expansion"
 end
 
-let normalize_str = Q.normalize_str
-
 let () =
   Env.gmp_clear_ref := clear
 

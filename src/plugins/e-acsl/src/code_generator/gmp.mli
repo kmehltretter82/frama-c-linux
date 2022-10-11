@@ -62,14 +62,15 @@ module Q : sig
   (** [name_of_mpz_arith_bop bop] returns the name of the GMP function on integer
       corresponding to the [bop] arithmetic operation. *)
 
+  val normalize_str: string -> string
+  (** Normalize the string so that it fits the representation used by the
+      underlying real library. For example, "0.1" is a real number in ACSL
+      whereas it is considered as a double by [libgmp] because it is written in
+      decimal expansion. In order to make [libgmp] consider it to be a rational,
+      it must be converted into "1/10". *)
+
 end
 
-val normalize_str: string -> string
-(** Normalize the string so that it fits the representation used by the
-    underlying real library. For example, "0.1" is a real number in ACSL
-    whereas it is considered as a double by [libgmp] because it is written in
-    decimal expansion. In order to make [libgmp] consider it to be a rational,
-    it must be converted into "1/10". *)
 
 
 (*

@@ -47,7 +47,7 @@ let translate_rte_exp_ref
 
 let constant_to_exp ~loc env t c =
   let mk_real s =
-    let s = Gmp.normalize_str s in
+    let s = Gmp.Q.normalize_str s in
     Cil.mkString ~loc s, Typed_number.Str_R
   in
   match c with
