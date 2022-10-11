@@ -42,7 +42,7 @@ module Z = struct
                            [ e; e1; e2 ] ] in
     let name = Misc.name_of_binop bop in
     let _, e, env =
-      Gmp.Z.new_var_and_mpz_init ~loc ~name env kf t_opt mk_stmts
+      Gmp.Z.new_var ~loc ~name env kf t_opt mk_stmts
     in
     e,env
 

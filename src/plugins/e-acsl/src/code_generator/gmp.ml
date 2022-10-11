@@ -156,7 +156,7 @@ module Z = struct
         "Operation '%a' either not arithmetic or not supported on GMP integers"
         Printer.pp_binop bop
 
-  let new_var_and_mpz_init ~loc ?scope ?name env kf t mk_stmts =
+  let new_var ~loc ?scope ?name env kf t mk_stmts =
     Env.new_var
       ~loc
       ?scope

@@ -46,7 +46,7 @@ module Z : sig
   (** [name_of_mpz_arith_bop bop] returns the name of the GMP function on integer
       corresponding to the [bop] arithmetic operation. *)
 
-  val new_var_and_mpz_init:
+  val new_var:
     loc:location -> ?scope:Varname.scope -> ?name:string ->
     Env.t -> kernel_function -> term option ->
     (varinfo -> exp (* the var as exp *) -> stmt list) ->

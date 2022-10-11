@@ -304,7 +304,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         | LNot -> assert false
       in
       let _, e, env =
-        Gmp.Z.new_var_and_mpz_init
+        Gmp.Z.new_var
           ~loc
           env
           kf
@@ -416,7 +416,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         [ cond; instr ]
       in
       let name = Misc.name_of_binop bop in
-      let _, e, env = Gmp.Z.new_var_and_mpz_init ~loc ~name env kf t mk_stmts in
+      let _, e, env = Gmp.Z.new_var ~loc ~name env kf t mk_stmts in
       e, adata, env, Typed_number.C_number, ""
     else if Gmp_types.Q.is_t ty then
       let e2, adata, env = t2_to_exp adata env in
@@ -560,7 +560,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
       in
 
       (* Put t in an option to use with Translate_utils.comparison_to_exp and
-         Env.new_var_and_mpz_init *)
+         Gmp.Z.new_var *)
       let t = Some t in
 
       (* TODO: let RTE generate the undef behaviors assertions *)
@@ -625,7 +625,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         | Some e1_guard -> [ e1_guard; shift_instr ]
       in
       let name = bop_name in
-      let _, e, env = Gmp.Z.new_var_and_mpz_init ~loc ~name env kf t mk_stmts in
+      let _, e, env = Gmp.Z.new_var ~loc ~name env kf t mk_stmts in
       e, adata, env, Typed_number.C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
@@ -689,7 +689,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
       in
       let name = Misc.name_of_binop bop in
       let t = Some t in
-      let _, e, env = Gmp.Z.new_var_and_mpz_init ~loc ~name env kf t mk_stmts in
+      let _, e, env = Gmp.Z.new_var ~loc ~name env kf t mk_stmts in
       e, adata, env, Typed_number.C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
