@@ -29,6 +29,20 @@ echo "Building Ivette"
 PWD=`pwd`
 
 # --------------------------------------------------------------------------
+
+function InstallHelp()
+{
+    echo "Ivette Requirements:"
+    echo "  - node v16.* (not v17 and higher)"
+    echo "  - yarn v1.0+ (higher is ok)"
+    echo "Recommanded Installation:"
+    echo "  - install nvm (https://github.com/nvm-sh/nvm)"
+    echo "  - run `nvm use 16`"
+    echo "  - run `npm install --global yarn`"
+    echo "  - run `ivette`"
+}
+
+# --------------------------------------------------------------------------
 echo "[1/3] Configuring"
 # --------------------------------------------------------------------------
 
@@ -39,8 +53,22 @@ case $NODEJS in
         ;;
     *)
         echo "Ivette requires node version 16 to be installed."
-        echo "Tip: install nvm and run 'nvm use 16'"
+        echo
+        InstallHelp
         exit 1 ;;
+esac
+
+YARNJS=`yarn --version`
+case $YARNJS in
+    1.*)
+        echo " - node $YARNJS found"
+        ;;
+    *)
+        echo "Ivette requires yarn to be installed."
+        echo
+        InstallHelp
+        exit 1
+        ;;
 esac
 
 SELF=`dirname $0`
