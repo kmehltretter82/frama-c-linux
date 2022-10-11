@@ -143,7 +143,11 @@ eva-default-tests:
 eva-domains:
   <<: *eva_template
   <<: *eva_domains
-  when: manual
+  only:
+    variables:
+      - $CI_COMMIT_BRANCH =~ /.*[-_\/.][Ee]va[-_\/.].*/
+      - $CI_COMMIT_BRANCH =~ /^[Ee]va[-_\/.].*/
+      - $CI_COMMIT_BRANCH =~ /.*[-_\/.][Ee]va$/
 
 eva-domains-nightly:
   <<: *eva_template
