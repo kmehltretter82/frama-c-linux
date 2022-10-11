@@ -27,7 +27,7 @@ CMD="init"
 
 THIS_SCRIPT="$0"
 Usage () {
-    echo "Usage: $(basename ${THIS_SCRIPT}) [<CMD>] <script-dir> [<modules>]"
+    echo "Usage: $(basename ${THIS_SCRIPT}) [<command>] [options] <script-dir> [<modules>]"
     echo "  Build a script library to be used by Frama-C kernel."
     echo ""
     echo "Commands:"
@@ -35,7 +35,12 @@ Usage () {
     echo "- build: performs the compilation of the script libraries via \"dune build @install\""
     echo "- install: performs the installation of the script libraries via \"dune install\""
     echo ""
-    echo "Arguments"
+    echo "Options:"
+    echo "  -help: prints usage information"
+    echo "  -package-name <name>: set the <name> of the package of the libraries (defaults to \"${PACKAGE}\")."
+    echo "                        note: once the dune-project file has been created, don't set another name."
+    echo ""
+    echo "Arguments:"
     echo "  <script-dir>: directory that contents the script files:"
     echo "                - the basename of this directory fixes the name of the script library: ${PACKAGE}.<basename>"
     echo "                - a 'dune' file is created (if it does not exists before) into this directory"
@@ -58,10 +63,17 @@ case "$1" in
     *) ;;
 esac
 
+while [ "$1" != "" ]; do
+    case "$1" in
+        "-package-name") shift ; PACKAGE="$1";;
+        "-h"|"-help"|"--help") Usage; exit 0;;
+        *) break ;;
+    esac
+    shift
+done
+
+[ "$PACKAGE" != "" ] || Error "Missing option value: no package name"
 [ "$1" != "" ] || Error "Missing argument: no script directory"
-[ "$1" != "-h" ] || Usage
-[ "$1" != "-help" ] || Usage
-[ "$1" != "--help" ] || Usage
 
 SCRIPT_DIR="$1"
 shift
