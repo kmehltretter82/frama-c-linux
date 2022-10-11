@@ -24,7 +24,7 @@
 (**************************************************************************)
 
 open Cil_types
-open Promelaast
+open Automaton_ast
 
 (** Given a transition a function and a function status (call or return)
     it returns if the cross condition can be satisfied
@@ -105,13 +105,13 @@ val aorai_assigns:
     crossed.
 *)
 val force_transition:
-  Cil_types.location -> kernel_function -> Promelaast.funcStatus ->
+  Cil_types.location -> kernel_function -> Automaton_ast.funcStatus ->
   Data_for_aorai.state -> Cil_types.identified_predicate list
 
 (** return list of preconditions for the given auxiliary function
     (f_pre_func or f_post_func). *)
 val auto_func_preconditions:
-  Cil_types.location -> kernel_function -> Promelaast.funcStatus ->
+  Cil_types.location -> kernel_function -> Automaton_ast.funcStatus ->
   Data_for_aorai.state -> Cil_types.identified_predicate list
 
 (** auto_func_behaviors f st (st_status, tr_status)
@@ -120,7 +120,7 @@ val auto_func_preconditions:
     @since Nitrogen-20111001
 *)
 val auto_func_behaviors:
-  Cil_types.location -> kernel_function -> Promelaast.funcStatus ->
+  Cil_types.location -> kernel_function -> Automaton_ast.funcStatus ->
   Data_for_aorai.state -> Cil_types.funbehavior list
 
 (** [auto_func_block current_kf loc f status st res]
@@ -138,7 +138,7 @@ val auto_func_behaviors:
 *)
 val auto_func_block:
   Kernel_function.t ->
-  Cil_types.location -> kernel_function -> Promelaast.funcStatus ->
+  Cil_types.location -> kernel_function -> Automaton_ast.funcStatus ->
   Data_for_aorai.state -> Cil_types.varinfo option ->
   Cil_datatype.Varinfo.Set.t * Cil_types.block * Cil_types.varinfo list
 
@@ -163,7 +163,7 @@ val possible_states_preds:
 *)
 val update_to_pred:
   start: Cil_types.logic_label ->
-  pre_state:Promelaast.state -> post_state:Promelaast.state ->
+  pre_state:Automaton_ast.state -> post_state:Automaton_ast.state ->
   Cil_types.term -> Data_for_aorai.Intervals.t -> predicate
 
 (** for a given starting and ending state, returns the post-conditions
@@ -173,7 +173,7 @@ val update_to_pred:
 *)
 val action_to_pred:
   start:Cil_types.logic_label ->
-  pre_state:Promelaast.state -> post_state:Promelaast.state ->
+  pre_state:Automaton_ast.state -> post_state:Automaton_ast.state ->
   Data_for_aorai.Vals.t -> predicate list
 
 (** All actions that might have been performed on aux variables from the

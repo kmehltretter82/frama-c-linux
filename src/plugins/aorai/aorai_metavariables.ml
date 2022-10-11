@@ -24,7 +24,7 @@
 (**************************************************************************)
 
 open Cil_types
-open Promelaast
+open Automaton_ast
 
 let dkey = Aorai_option.register_category "check-metavar"
 
@@ -36,14 +36,14 @@ let pretty_set fmt set =
   Pretty_utils.pp_list ~sep:", " Cil_printer.pp_varinfo fmt l
 
 let pretty_state fmt st =
-  Format.pp_print_string fmt st.Promelaast.name
+  Format.pp_print_string fmt st.Automaton_ast.name
 
 let pretty_trans fmt tr =
   Format.fprintf fmt "from %a to %a:@\n{ @[%a@] } %a"
     pretty_state tr.start
     pretty_state tr.stop
-    Promelaoutput.Typed.print_condition tr.cross
-    Promelaoutput.Typed.print_actionl tr.actions
+    Pretty_automaton.Typed.print_condition tr.cross
+    Pretty_automaton.Typed.print_actionl tr.actions
 
 
 module type InitAnalysisParam =
@@ -62,7 +62,7 @@ struct
   let top = InitializedSet VarSet.empty
 
   let init v =
-    if v.Promelaast.init = Bool3.True then top else Bottom
+    if v.Automaton_ast.init = Bool3.True then top else Bottom
 
   let direction = Graph.Fixpoint.Forward
 

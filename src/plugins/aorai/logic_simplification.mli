@@ -23,9 +23,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Basic simplification over {!Promelaast.typed_condition} *)
+(** Basic simplification over {!Automaton_ast.typed_condition} *)
 
-open Promelaast
+open Automaton_ast
 
 (** {2 smart constructors for typed conditions} *)
 val tand: typed_condition -> typed_condition -> typed_condition
@@ -38,23 +38,23 @@ val tnot: typed_condition -> typed_condition
 (** Given a condition, this function does some logical simplifications
     and returns an equivalent DNF form together with the simplified version *)
 val simplifyCond:
-  Promelaast.typed_condition ->
-  Promelaast.typed_condition *(Promelaast.typed_condition list list)
+  Automaton_ast.typed_condition ->
+  Automaton_ast.typed_condition *(Automaton_ast.typed_condition list list)
 
 (** Given a transition list, this function returns the same transition list with
     simplifyCond done on each cross condition. Uncrossable transition are
     removed. *)
 val simplifyTrans:
-  Promelaast.typed_trans list ->
-  (Promelaast.typed_trans list)*
-  (Promelaast.typed_condition list list list)
+  Automaton_ast.typed_trans list ->
+  (Automaton_ast.typed_trans list)*
+  (Automaton_ast.typed_condition list list list)
 
 val dnfToCond :
-  (Promelaast.typed_condition list list) -> Promelaast.typed_condition
+  (Automaton_ast.typed_condition list list) -> Automaton_ast.typed_condition
 
 val simplifyDNFwrtCtx :
-  Promelaast.typed_condition list list -> Cil_types.kernel_function ->
-  Promelaast.funcStatus -> Promelaast.typed_condition
+  Automaton_ast.typed_condition list list -> Cil_types.kernel_function ->
+  Automaton_ast.funcStatus -> Automaton_ast.typed_condition
 
 (*
 Local Variables:

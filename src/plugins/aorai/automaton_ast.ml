@@ -23,7 +23,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** The abstract tree of promela representation. Such tree is used by promela
+(** The abstract tree of Ya representation. Such tree is used by
     parser/lexer before its translation into Data_for_aorai module. *)
 
 type expression =
@@ -57,7 +57,7 @@ and seq_elt = {
 
 and sequence = seq_elt list
 
-(** Promela parsed abstract syntax trees. Either a sequence of event or the
+(** Ya parsed abstract syntax trees. Either a sequence of event or the
     otherwise keyword. A single condition is expressed with a singleton
     having an empty nested sequence and min_rep and max_rep being equal to one.
 *)

@@ -25,9 +25,6 @@
 
 include Plugin.S
 
-module Ltl_File: Parameter_sig.Filepath
-module To_Buchi: Parameter_sig.Filepath
-module Buchi: Parameter_sig.Filepath
 module Ya: Parameter_sig.Filepath
 module Dot: Parameter_sig.Bool
 module DotSeparatedLabels: Parameter_sig.Bool
@@ -52,7 +49,6 @@ module Deterministic: State_builder.Ref with type data = bool
 module InstrumentationHistory: Parameter_sig.Int
 
 val is_on : unit -> bool
-val promela_file: unit -> Filepath.Normalized.t
 val advance_abstract_interpretation: unit -> bool
 
 val emitter: Emitter.t

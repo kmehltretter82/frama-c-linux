@@ -47,11 +47,11 @@ let show_non_det_state fmt state =
     first_print := false;
     Format.fprintf fmt "%s%s"
       (if sure then "" else "(?)")
-      s.Promelaast.name
+      s.Automaton_ast.name
   in
   let print_one s =
     (* TODO: sync Data_for_aorai.get_state_var with current project*)
-    let vi = Data_for_aorai.get_varinfo s.Promelaast.name in
+    let vi = Data_for_aorai.get_varinfo s.Automaton_ast.name in
     let e = Cil.evar vi in
     let cvalue =
       Eva.Results.(in_cvalue_state state |> eval_exp e |> as_cvalue)

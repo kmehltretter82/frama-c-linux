@@ -1,2 +1,0 @@
-ENABLED_IF: %{bin-available:ltl2ba}
-STDOPT:

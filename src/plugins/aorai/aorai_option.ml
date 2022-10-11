@@ -30,38 +30,6 @@ include Plugin.Register
       let help = "verification of behavioral properties (experimental)"
     end)
 
-module Ltl_File =
-  Filepath
-    (struct
-      let option_name = "-aorai-ltl"
-      let arg_name = ""
-      let file_kind = "ltl"
-      let existence = Fc_Filepath.Must_exist
-      let help = "specifies file name for LTL property"
-    end)
-
-module To_Buchi =
-  Filepath
-    (struct
-      let option_name = "-aorai-to-buchi"
-      let arg_name = "f"
-      let file_kind = "Promela"
-      let existence = Fc_Filepath.Indifferent
-      let help =
-        "only generates the buchi automata (in Promela language) in file <s>"
-    end)
-
-module Buchi =
-  Filepath
-    (struct
-      let option_name = "-aorai-buchi"
-      let arg_name = "f"
-      let file_kind = "Promela"
-      let existence = Fc_Filepath.Must_exist
-      let help = "considers the property described by the buchi automata \
-                  (in Promela language) from file <f>."
-    end)
-
 module Ya =
   Filepath
     (struct
@@ -168,12 +136,7 @@ module InstrumentationHistory =
     end)
 
 
-let is_on () =
-  not (Ltl_File.is_default () && To_Buchi.is_default () &&
-       Buchi.is_default ()    && Ya.is_default () )
-
-let promela_file () =
-  if not (Buchi.is_empty ()) then Buchi.get () else To_Buchi.get ()
+let is_on () = not (Ya.is_default())
 
 let advance_abstract_interpretation () =
   not (AbstractInterpretationOff.get ()) && not (AbstractInterpretation.get ())
@@ -183,8 +146,7 @@ let emitter =
     "Aorai"
     [ Emitter.Code_annot; Emitter.Funspec; Emitter.Global_annot ]
     ~correctness:
-      [ Ltl_File.parameter; To_Buchi.parameter; Buchi.parameter;
-        Ya.parameter; Axiomatization.parameter;
+      [ Ya.parameter; Axiomatization.parameter;
         ConsiderAcceptance.parameter;
         AutomataSimplification.parameter ]
     ~tuning:

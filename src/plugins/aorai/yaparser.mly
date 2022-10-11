@@ -29,7 +29,7 @@
 %{
 open Cil_types
 open Logic_ptree
-open Promelaast
+open Automaton_ast
 open Bool3
 
 type options =
@@ -145,7 +145,7 @@ let build_automaton options metavariables trans =
       (Pretty_utils.pp_list ~sep:"," Format.pp_print_string) undefined_states;
   auto
 
-type pre_cond = Behavior of string | Pre of Promelaast.condition
+type pre_cond = Behavior of string | Pre of Automaton_ast.condition
 
 
 %}
@@ -168,7 +168,7 @@ type pre_cond = Behavior of string | Pre of Promelaast.condition
 %left DOT RARROW
 %left LSQUARE
 
-%type <Promelaast.parsed_automaton> main
+%type <Automaton_ast.parsed_automaton> main
 %start main
 %%
 

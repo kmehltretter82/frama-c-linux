@@ -23,8 +23,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type state = Promelaast.state
-type transition = Promelaast.typed_trans
+type state = Automaton_ast.state
+type transition = Automaton_ast.typed_trans
 type edge = state * transition * state
 
 include Graph.Sig.I
@@ -34,7 +34,7 @@ include Graph.Sig.I
    and type E.label = transition
    and type edge := edge
 
-val of_automaton : Promelaast.typed_automaton -> t
+val of_automaton : Automaton_ast.typed_automaton -> t
 
 val states : t -> state list
 val init_states : t -> state list

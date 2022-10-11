@@ -23,6 +23,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val checkInitialization : Promelaast.typed_automaton -> unit
+val checkInitialization : Automaton_ast.typed_automaton -> unit
 
-val checkSingleAssignment : Promelaast.typed_automaton -> unit
+val checkSingleAssignment : Automaton_ast.typed_automaton -> unit
