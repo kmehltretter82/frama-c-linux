@@ -59,7 +59,15 @@ SCRIPT_LIBS=""
 
 DuneProject () {
     echo "(lang dune 3.0)"
-    echo "(package (name ${PACKAGE}))"
+    echo "(generate_opam_files true)"
+    echo "(name ${PACKAGE})"
+    echo "(maintainers \"anonymous\")"
+    echo "(package (name ${PACKAGE})"
+    echo "  (depends"
+    echo "    (\"frama-c\" (>= 26.0))"
+    echo "  )"
+    echo " (tags (\"Frama-C scripts\"))"
+    echo ")"
 }
 
 Dune () {
@@ -120,6 +128,12 @@ fi
 echo "To compile the all scripts defined inside this 'dune project' \"${PACKAGE}\", runs the following command:"
 EchoDuneCmd "dune build @install"
 echo "So, the script libraries, are installed into the local '_build' directory."
+echo "That also generate the 'opam' file \"${PACKAGE}.opam\" allowing a global installation of all script libraries."
 echo ""
 echo "To load this script library from Frama-C, runs the following command:"
 EchoDuneCmd "dune exec -- frama-c -load-library ${PACKAGE}.${SCRIPT_NAME} ..."
+echo ""
+echo "All libraries of this 'dune project' \"${PACKAGE}\" can also be installed via 'dune' using from the generated 'opam' file: \"${PACKAGE}.opam\""
+EchoDuneCmd "dune install"
+echo "Then, this script library can directly be loaded by Frama-C from the following command:"
+echo "  > frama-c -load-library ${PACKAGE}.${SCRIPT_NAME} ..."
