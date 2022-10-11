@@ -868,11 +868,24 @@ module LoadModule =
       let option_name = "-load-module"
       let module_name = "LoadModule"
       let arg_name = "SPEC,..."
-      let help = "Dynamically load modules and scripts. \
+      let help = "Dynamically load modules. \
                   Each <SPEC> can be an OCaml source or object file, with \
                   or without extension, or a Findlib package. \
                   Loading order is preserved and \
                   additional dependencies can be listed in *.depend files."
+    end)
+
+let () = Parameter_customize.set_group saveload
+let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
+let () = Parameter_customize.do_not_projectify ()
+module LoadLibrary =
+  String_list
+    (struct
+      let option_name = "-load-library"
+      let module_name = "LoadLibrary"
+      let arg_name = "<libname,..."
+      let help = "Dynamically load libraries. \
+                  Loading order is preserved, but the load is done between the plugins and the modules."
     end)
 
 let () = Parameter_customize.set_group saveload
@@ -903,6 +916,7 @@ let bootstrap_loader () =
   begin
     if AutoLoadPlugins.get () then Dynamic.load_plugin_path () ;
     List.iter Dynamic.load_plugin (LoadPlugin.get()) ;
+    Dynamic.load_packages (LoadLibrary.get()) ;
     List.iter Dynamic.load_module (LoadModule.get()) ;
   end
 

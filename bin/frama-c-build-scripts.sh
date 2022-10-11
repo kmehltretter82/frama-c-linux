@@ -110,12 +110,16 @@ esac
 GenerateFile Dune "${DUNE_FILE}"
 GenerateFile DuneProject "${DUNE_PROJECT}"
 
-echo "To compile the scripts, runs the following command:"
+EchoDuneCmd()
 if [ "${DUNE_PROJECT_DIR}" = "." ]; then
-    echo "  dune build @install"
+    echo "  > $@"
 else
-    echo "  (cd ${DUNE_PROJECT_DIR} && dune build)"
+    echo "  > (cd ${DUNE_PROJECT_DIR} && $@)"
 fi
-echo "So, the script, is installed into the local '_build' directory."
-echo "To load the script from Frama-C, runs the following command:"
-echo "  frama-c -load-module $(realpath ${DUNE_PROJECT_DIR}/_build/install/default/lib/${PACKAGE}/${SCRIPT_NAME})/${SCRIPT_NAME} ..."
+
+echo "To compile the all scripts defined inside this 'dune project' \"${PACKAGE}\", runs the following command:"
+EchoDuneCmd "dune build @install"
+echo "So, the script libraries, are installed into the local '_build' directory."
+echo ""
+echo "To load this script library from Frama-C, runs the following command:"
+EchoDuneCmd "dune exec -- frama-c -load-library ${PACKAGE}.${SCRIPT_NAME} ..."
