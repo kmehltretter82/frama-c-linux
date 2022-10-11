@@ -118,10 +118,7 @@ module Q : sig
     (** Compares two expressions according to the given [binop]. The optional term
         indicates whether the comparison has a correspondance in the logic. *)
 
-
 end
-
-
 
 (*
 Local Variables:
