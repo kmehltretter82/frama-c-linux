@@ -27,15 +27,17 @@
 .PHONY: install uninstall
 
 install:
-	@echo "Installing Ivette (OPAM)"
-	mkdir -p $(PREFIX)/bin
-	install ivette/ivette-opam.sh $(PREFIX)/bin/ivette
-	mkdir -p $(PREFIX)/lib/frama-c
-	tar zcf $(PREFIX)/lib/frama-c/ivette.tgz ivette
+	@echo "Installing Ivette…"
+	@mkdir -p $(PREFIX)/bin
+	@install ivette/ivette-opam.sh $(PREFIX)/bin/ivette
+	@mkdir -p $(PREFIX)/lib/frama-c
+	@tar zcf $(PREFIX)/lib/frama-c/ivette.tgz ivette
+	@echo "Done"
 
 uninstall:
-	@echo "Removing Ivette"
+	@echo "Removing Ivette…"
 	@rm -f $(PREFIX)/bin/ivette
 	@rm -f $(PREFIX)/lib/frama-c/ivette.tgz
 	@rm -fr $(PREFIX)/lib/ivette     # linux
 	@rm -fr /Applications/Ivette.app # macOS
+	@echo "Done"

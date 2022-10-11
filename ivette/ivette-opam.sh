@@ -21,6 +21,10 @@
 #                                                                        #
 ##########################################################################
 
+# --------------------------------------------------------------------------
+# ---  Ivette bootstrapper for OPAM installation
+# --------------------------------------------------------------------------
+
 echo "Building Ivette"
 PWD=`pwd`
 
@@ -55,7 +59,7 @@ fi
 echo "[2/3] Compiling Ivette"
 # --------------------------------------------------------------------------
 
-TMPDIR=`mktemp -d -t ivette`
+TMPDIR=`mktemp -d`
 cd $TMPDIR
 tar zxf $PREFIX/lib/frama-c/ivette.tgz
 cd ivette
