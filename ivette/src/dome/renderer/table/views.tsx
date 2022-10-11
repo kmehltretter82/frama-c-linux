@@ -298,7 +298,7 @@ type TableSettings = {
   visible?: Json.dict<boolean>;
 };
 
-const jTableSettings = Json.jObject({
+const jTableSettings = Json.jObject<TableSettings>({
   resize: Json.jDict(Json.jNumber),
   visible: Json.jDict(Json.jBoolean),
 });
@@ -450,7 +450,7 @@ class TableState<Key, Row> {
       const { visible } = this;
       resize.clear();
       visible.clear();
-      const theSettings: undefined | TableSettings =
+      const theSettings =
         Settings.getWindowSettings(settings, jTableSettings, undefined);
       if (theSettings) {
         forEach(theSettings.resize, (cw, cid) => {

@@ -42,15 +42,11 @@ import { bySource } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jSource } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jSourceSafe } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { source } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { jTag } from 'frama-c/kernel/api/data';
-//@ts-ignore
-import { jTagSafe } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { tag } from 'frama-c/kernel/api/data';
 
@@ -126,12 +122,8 @@ export enum propKind {
   extension = 'extension',
 }
 
-/** Loose decoder for `propKind` */
-export const jPropKind: Json.Loose<propKind> = Json.jEnum(propKind);
-
-/** Safe decoder for `propKind` */
-export const jPropKindSafe: Json.Safe<propKind> =
-  Json.jFail(Json.jEnum(propKind),'kernel.properties.propKind expected');
+/** Decoder for `propKind` */
+export const jPropKind: Json.Decoder<propKind> = Json.jEnum(propKind);
 
 /** Natural order for `propKind` */
 export const byPropKind: Compare.Order<propKind> = Compare.byEnum(propKind);
@@ -140,7 +132,7 @@ const propKindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.properties.propKindTags',
   input:  Json.jNull,
-  output: Json.jList(jTag),
+  output: Json.jArray(jTag),
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -172,12 +164,8 @@ export enum propStatus {
   unknown_but_dead = 'unknown_but_dead',
 }
 
-/** Loose decoder for `propStatus` */
-export const jPropStatus: Json.Loose<propStatus> = Json.jEnum(propStatus);
-
-/** Safe decoder for `propStatus` */
-export const jPropStatusSafe: Json.Safe<propStatus> =
-  Json.jFail(Json.jEnum(propStatus),'kernel.properties.propStatus expected');
+/** Decoder for `propStatus` */
+export const jPropStatus: Json.Decoder<propStatus> = Json.jEnum(propStatus);
 
 /** Natural order for `propStatus` */
 export const byPropStatus: Compare.Order<propStatus> =
@@ -187,7 +175,7 @@ const propStatusTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.properties.propStatusTags',
   input:  Json.jNull,
-  output: Json.jList(jTag),
+  output: Json.jArray(jTag),
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -233,12 +221,8 @@ export enum alarms {
   bool_value = 'bool_value',
 }
 
-/** Loose decoder for `alarms` */
-export const jAlarms: Json.Loose<alarms> = Json.jEnum(alarms);
-
-/** Safe decoder for `alarms` */
-export const jAlarmsSafe: Json.Safe<alarms> =
-  Json.jFail(Json.jEnum(alarms),'kernel.properties.alarms expected');
+/** Decoder for `alarms` */
+export const jAlarms: Json.Decoder<alarms> = Json.jEnum(alarms);
 
 /** Natural order for `alarms` */
 export const byAlarms: Compare.Order<alarms> = Compare.byEnum(alarms);
@@ -247,7 +231,7 @@ const alarmsTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.properties.alarmsTags',
   input:  Json.jNull,
-  output: Json.jList(jTag),
+  output: Json.jArray(jTag),
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -279,25 +263,21 @@ export interface statusData {
   predicate?: string;
 }
 
-/** Loose decoder for `statusData` */
-export const jStatusData: Json.Loose<statusData> =
+/** Decoder for `statusData` */
+export const jStatusData: Json.Decoder<statusData> =
   Json.jObject({
-    key: Json.jFail(Json.jKey<'#property'>('#property'),'#property expected'),
-    descr: Json.jFail(Json.jString,'String expected'),
-    kind: jPropKindSafe,
-    names: Json.jList(Json.jString),
-    status: jPropStatusSafe,
-    fct: Json.jKey<'#fct'>('#fct'),
-    kinstr: Json.jKey<'#stmt'>('#stmt'),
-    source: jSourceSafe,
-    alarm: Json.jString,
-    alarm_descr: Json.jString,
-    predicate: Json.jString,
+    key: Json.jKey<'#property'>('#property'),
+    descr: Json.jString,
+    kind: jPropKind,
+    names: Json.jArray(Json.jString),
+    status: jPropStatus,
+    fct: Json.jOption(Json.jKey<'#fct'>('#fct')),
+    kinstr: Json.jOption(Json.jKey<'#stmt'>('#stmt')),
+    source: jSource,
+    alarm: Json.jOption(Json.jString),
+    alarm_descr: Json.jOption(Json.jString),
+    predicate: Json.jOption(Json.jString),
   });
-
-/** Safe decoder for `statusData` */
-export const jStatusDataSafe: Json.Safe<statusData> =
-  Json.jFail(jStatusData,'StatusData expected');
 
 /** Natural order for `statusData` */
 export const byStatusData: Compare.Order<statusData> =
@@ -343,10 +323,10 @@ const fetchStatus_internal: Server.GetRequest<
   name:   'kernel.properties.fetchStatus',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jFail(Json.jNumber,'Number expected'),
-            updated: Json.jList(jStatusData),
-            removed: Json.jList(Json.jKey<'#property'>('#property')),
-            reload: Json.jFail(Json.jBoolean,'Boolean expected'),
+            pending: Json.jNumber,
+            updated: Json.jArray(jStatusData),
+            removed: Json.jArray(Json.jKey<'#property'>('#property')),
+            reload: Json.jBoolean,
           }),
   signals: [],
 };

@@ -39,7 +39,6 @@ type jtype =
   | Jindex of string (** kind of an integer used for indexing *)
   | Joption of jtype
   | Jdict of jtype (** dictionaries *)
-  | Jlist of jtype (** order does not matter *)
   | Jarray of jtype (** order matters *)
   | Jtuple of jtype list
   | Junion of jtype list
@@ -85,8 +84,7 @@ type declKindInfo =
   | D_value of jtype
   | D_state of jtype
   | D_array of arrayInfo
-  | D_safe of ident * jtype (* safe decoder *)
-  | D_loose of ident * jtype (* loose decoder *)
+  | D_decoder of ident * jtype
   | D_order of ident * jtype (* natural ordering *)
 
 type declInfo = {
@@ -127,10 +125,8 @@ sig
   val data : ident -> ident
   val fetch : ident -> ident
   val reload : ident -> ident
-  val safe : ident -> ident
-  val loose : ident -> ident
   val order : ident -> ident
-  val decode : safe:bool -> ident -> ident
+  val decode : ident -> ident
 end
 
 (* -------------------------------------------------------------------------- *)

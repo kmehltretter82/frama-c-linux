@@ -42,8 +42,6 @@ import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jMarkerSafe } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { marker } from 'frama-c/kernel/api/ast';
 
 /** Statements that read or write a location. */
@@ -54,26 +52,12 @@ export interface effects {
   indirect: [ Json.key<'#fct'>, marker ][];
 }
 
-/** Loose decoder for `effects` */
-export const jEffects: Json.Loose<effects> =
+/** Decoder for `effects` */
+export const jEffects: Json.Decoder<effects> =
   Json.jObject({
-    direct: Json.jList(
-              Json.jTry(
-                Json.jPair(
-                  Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
-                  jMarkerSafe,
-                ))),
-    indirect: Json.jList(
-                Json.jTry(
-                  Json.jPair(
-                    Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
-                    jMarkerSafe,
-                  ))),
+    direct: Json.jArray(Json.jPair( Json.jKey<'#fct'>('#fct'), jMarker,)),
+    indirect: Json.jArray(Json.jPair( Json.jKey<'#fct'>('#fct'), jMarker,)),
   });
-
-/** Safe decoder for `effects` */
-export const jEffectsSafe: Json.Safe<effects> =
-  Json.jFail(jEffects,'Effects expected');
 
 /** Natural order for `effects` */
 export const byEffects: Compare.Order<effects> =

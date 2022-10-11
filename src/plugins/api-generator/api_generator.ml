@@ -108,7 +108,7 @@ let makeJtype ?self ~names =
       Pretty_utils.pp_list ~pre:"@[<hov 0>" ~sep:" |@ " ~suf:"@]" protect fmt js
     | Jrecord fjs ->
       Pretty_utils.pp_list ~pre:"@[<hov 2>{ " ~sep:",@ " ~suf:"@ }@]" field fmt fjs
-    | Jarray js | Jlist js -> Format.fprintf fmt "%a[]" protect js
+    | Jarray js -> Format.fprintf fmt "%a[]" protect js
   and protect fmt js = match js with
     | Junion _ | Joption _ -> Format.fprintf fmt "@[<hov 2>(%a)@]" pp js
     | _ -> pp fmt js
@@ -132,39 +132,27 @@ let jcall names fmt id =
   try Format.pp_print_string fmt (Pkg.IdMap.find id names)
   with Not_found -> Self.abort "Undefined identifier '%a'" Pkg.pp_ident id
 
-let jsafe ~safe msg pp fmt d =
-  if safe then
-    Format.fprintf fmt "@[<hov 2>Json.jFail(@,%a,@,'%s expected')@]" pp d msg
-  else
-    pp fmt d
-
-let jtry ~safe pp fmt d =
-  if safe then
-    pp fmt d
-  else
-    Format.fprintf fmt "@[<hov 2>Json.jTry(@,%a)@]" pp d
-
 let jenum names fmt id = Format.fprintf fmt "Json.jEnum(%a)" (jcall names) id
 
-let junion ~jtype ~makeLoose fmt jts =
+let junion ~jtype ~make fmt jts =
   begin
     Format.fprintf fmt "@[<hv 0>@[<hv 2>Json.jUnion<%a>("
       jtype (Pkg.Junion jts) ;
     List.iter
-      (fun js -> Format.fprintf fmt "@ @[<hov 2>%a@]," makeLoose js) jts ;
+      (fun js -> Format.fprintf fmt "@ @[<hov 2>%a@]," make js) jts ;
     Format.fprintf fmt "@]@,)@]" ;
   end
 
-let jrecord ~makeSafe fmt jts =
+let jrecord ~make fmt jts =
   begin
     Format.fprintf fmt "@[<hv 0>@[<hv 2>Json.jObject({" ;
     List.iter
       (fun (fd,js) ->
-         Format.fprintf fmt "@ @[<hov 2>%s: %a@]," fd makeSafe js) jts ;
+         Format.fprintf fmt "@ @[<hov 2>%s: %a@]," fd make js) jts ;
     Format.fprintf fmt "@]@,})@]" ;
   end
 
-let jtuple ~makeSafe fmt jts =
+let jtuple ~make fmt jts =
   begin
     let name = match List.length jts with
       | 2 -> "jPair"
@@ -175,58 +163,37 @@ let jtuple ~makeSafe fmt jts =
     in
     Format.fprintf fmt "@[<hv 0>@[<hv 2>Json.%s(" name ;
     List.iter
-      (fun js -> Format.fprintf fmt "@ @[<hov 2>%a@]," makeSafe js) jts ;
+      (fun js -> Format.fprintf fmt "@ @[<hov 2>%a@]," make js) jts ;
     Format.fprintf fmt "@]@,)@]" ;
   end
 
-let rec makeDecoder ~safe ?self ~names fmt js =
+let rec makeDecoder ?self ~names fmt js =
   let open Pkg in
-  let makeSafe = makeDecoder ?self ~names ~safe:true in
-  let makeLoose = makeDecoder ?self ~names ~safe:false in
+  let make = makeDecoder ?self ~names in
   match js with
   | Jany -> jprim fmt "jAny"
   | Jnull -> jprim fmt "jNull"
-  | Jboolean -> jsafe ~safe "Boolean" jprim fmt "jBoolean"
-  | Jnumber -> jsafe ~safe "Number" jprim fmt "jNumber"
-  | Jstring | Jalpha -> jsafe ~safe "String" jprim fmt "jString"
+  | Jboolean -> jprim fmt "jBoolean"
+  | Jnumber -> jprim fmt "jNumber"
+  | Jstring | Jalpha -> jprim fmt "jString"
   | Jtag a -> Format.fprintf fmt "Json.jTag(\"%s\")" a
-  | Jkey kd -> jsafe ~safe ("#" ^ kd) jkey fmt kd
-  | Jindex kd -> jsafe ~safe ("#" ^ kd) jindex fmt kd
-  | Jdata id -> jcall names fmt (Pkg.Derived.decode ~safe id)
-  | Jenum id -> jsafe ~safe (Pkg.name_of_ident id) (jenum names) fmt id
-  | Jself -> jcall names fmt (Pkg.Derived.decode ~safe (getSelf self))
-  | Joption js -> makeLoose fmt js
+  | Jkey kd -> jkey fmt kd
+  | Jindex kd -> jindex fmt kd
+  | Jdata id -> jcall names fmt (Pkg.Derived.decode id)
+  | Jenum id -> jenum names fmt id
+  | Jself -> jcall names fmt (Pkg.Derived.decode (getSelf self))
+  | Joption js ->
+    Format.fprintf fmt "@[<hov 2>Json.jOption(@,%a)@]" make js
   | Jdict js ->
-    Format.fprintf fmt "@[<hov 2>Json.jDict(@,%a)@]" makeLoose js
-  | Jlist js ->
-    Format.fprintf fmt "@[<hov 2>Json.jList(@,%a)@]" makeLoose js
+    Format.fprintf fmt "@[<hov 2>Json.jDict(@,%a)@]" make js
   | Jarray js ->
-    if safe
-    then Format.fprintf fmt "@[<hov 2>Json.jArray(%a)@]" makeSafe js
-    else Format.fprintf fmt "@[<hov 2>Json.jTry(jArray(%a))@]" makeSafe js
+    Format.fprintf fmt "@[<hov 2>Json.jArray(@,%a)@]" make js
   | Junion jts ->
     let jtype = makeJtype ?self ~names in
-    jsafe ~safe "Union" (junion ~jtype ~makeLoose) fmt jts
-  | Jrecord jfs -> jsafe ~safe "Record" (jrecord ~makeSafe) fmt jfs
-  | Jtuple jts -> jtry ~safe (jtuple ~makeSafe) fmt jts
+    junion ~jtype ~make fmt jts
+  | Jrecord jfs -> jrecord ~make fmt jfs
+  | Jtuple jts -> jtuple ~make fmt jts
 
-let makeLooseNeedSafe = function
-  | Pkg.Jtuple _ | Pkg.Jarray _ -> true
-  | _ -> false
-
-let makeRootDecoder ~safe ~self ~names fmt js =
-  let open Pkg in
-  match js with
-  | Joption _ | Jdict _ | Jlist _ when safe ->
-    jcall names fmt (Pkg.Derived.loose self)
-  | Jtuple _ | Jarray _ when not safe ->
-    Format.fprintf fmt "Json.jTry(%a)"
-      (jcall names) (Pkg.Derived.safe self)
-  | Junion _ | Jrecord _ when safe ->
-    Format.fprintf fmt "Json.jFail(%a,'%s expected')"
-      (jcall names) (Pkg.Derived.loose self)
-      (String.capitalize_ascii self.name)
-  | _ -> makeDecoder ~safe ~self ~names fmt js
 
 (* -------------------------------------------------------------------------- *)
 (* --- Parameter Decoder                                                  --- *)
@@ -254,7 +221,7 @@ let makeOrder ~self ~names fmt js =
       Format.fprintf fmt "@[<hov 2>Compare.defined(@,%a)@]" pp js
     | Jenum id ->
       Format.fprintf fmt "@[<hov 2>Compare.byEnum(@,%a)@]" (jcall names) id
-    | Jlist js | Jarray js ->
+    | Jarray js ->
       Format.fprintf fmt "@[<hov 2>Compare.array(@,%a)@]" pp js
     | Jtuple jts ->
       let name = match List.length jts with
@@ -341,7 +308,7 @@ let makeDeclaration fmt names d =
     let prefix = String.capitalize_ascii (String.lowercase_ascii kind) in
     let input = typeOfParam rq.rq_input in
     let output = typeOfParam rq.rq_output in
-    let makeParam fmt js = makeDecoder ~safe:false ~names fmt js in
+    let makeParam fmt js = makeDecoder ~names fmt js in
     Format.fprintf fmt
       "@[<hv 2>const %s_internal: Server.%sRequest<@,%a,@,%a@,>@] = {@\n"
       self.name prefix jtype input jtype output ;
@@ -416,19 +383,12 @@ let makeDeclaration fmt names d =
       "@[<hv 2>export const %s: State.Array<@,%a,@,%a@,>@] = %s_internal;@\n"
       self.name jtype jkey jtype jrow self.name ;
 
-  | D_safe(id,js) ->
+  | D_decoder(id,js) ->
     makeDescr fmt d.d_descr ;
     Format.fprintf fmt
-      "@[<hov 2>@[<hv 0>export const %s: Json.Safe<@,%a@,>@] =@ %a;@]\n"
+      "@[<hov 2>@[<hv 0>export const %s: Json.Decoder<@,%a@,>@] =@ %a;@]\n"
       self.name (jcall names) id
-      (makeRecursive (makeRootDecoder ~safe:true ~self:id ~names)) js
-
-  | D_loose(id,js) ->
-    makeDescr fmt d.d_descr ;
-    Format.fprintf fmt
-      "@[<hov 2>@[<hv 0>export const %s: Json.Loose<@,%a@,>@] =@ %a;@]\n"
-      self.name (jcall names) id
-      (makeRecursive (makeRootDecoder ~safe:false ~self:id ~names)) js
+      (makeRecursive (makeDecoder ~self:id ~names)) js
 
   | D_order(id,js) ->
     makeDescr fmt d.d_descr ;
@@ -449,8 +409,6 @@ type ranking = {
 
 let depends d =
   match d.Pkg.d_kind with
-  | D_loose(id,t) when makeLooseNeedSafe t -> [Pkg.Derived.safe id]
-  | D_safe(id,t) when not (makeLooseNeedSafe t) -> [Pkg.Derived.loose id]
   | D_value _ ->
     let id = d.d_ident in
     [
@@ -469,8 +427,7 @@ let depends d =
     let data = Pkg.Derived.data id in
     [
       data ;
-      Pkg.Derived.loose data ;
-      Pkg.Derived.safe data ;
+      Pkg.Derived.decode data ;
       Pkg.Derived.order data ;
       Pkg.Derived.signal id ;
       Pkg.Derived.reload id ;

@@ -268,13 +268,13 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
   const { settings, shape, setShape, views: libViews } = props;
   const [local, setLocal] = Settings.useWindowSettings<CustomViewsSettings>(
     settings,
-    Json.identity as Json.Loose<CustomViewsSettings & Json.json>, // Clearly abusive conversion, a real decoder is needed
+    Json.identity as Json.Decoder<CustomViewsSettings & Json.json>, // Clearly abusive conversion, a real decoder is needed
     {},
   );
   const [customs, setCustoms] =
     Settings.useLocalStorage<{ [id: string]: View }>(
       'frama-c.labview',
-      Json.identity as Json.Loose<{ [id: string]: View } & Json.json>, // Clearly abusive conversion, a real decoder is needed
+      Json.identity as Json.Decoder<{ [id: string]: View } & Json.json>, // Clearly abusive conversion, a real decoder is needed
       {},
     );
   const [edited, setEdited] = React.useState<string>();

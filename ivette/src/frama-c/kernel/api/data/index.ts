@@ -41,12 +41,8 @@ import * as State from 'frama-c/states';
 /** Markdown (inlined) text. */
 export type markdown = string;
 
-/** Loose decoder for `markdown` */
-export const jMarkdown: Json.Loose<markdown> = Json.jString;
-
-/** Safe decoder for `markdown` */
-export const jMarkdownSafe: Json.Safe<markdown> =
-  Json.jFail(Json.jString,'String expected');
+/** Decoder for `markdown` */
+export const jMarkdown: Json.Decoder<markdown> = Json.jString;
 
 /** Natural order for `markdown` */
 export const byMarkdown: Compare.Order<markdown> = Compare.string;
@@ -54,17 +50,13 @@ export const byMarkdown: Compare.Order<markdown> = Compare.string;
 /** Rich text format uses `[tag; …text ]` to apply the tag `tag` to the enclosed text. Empty tag `""` can also used to simply group text together. */
 export type text = null | string | text[];
 
-/** Loose decoder for `text` */
-export const jText: Json.Loose<text> =
+/** Decoder for `text` */
+export const jText: Json.Decoder<text> =
   (_x: any) => Json.jUnion<null | string | text[]>(
                  Json.jNull,
                  Json.jString,
-                 Json.jList(jText),
+                 Json.jArray(jText),
                )(_x);
-
-/** Safe decoder for `text` */
-export const jTextSafe: Json.Safe<text> =
-  (_x: any) => Json.jFail(jText,'Text expected')(_x);
 
 /** Natural order for `text` */
 export const byText: Compare.Order<text> =
@@ -73,16 +65,9 @@ export const byText: Compare.Order<text> =
 /** Enum Tag Description */
 export type tag = { name: string, label: markdown, descr: markdown };
 
-/** Loose decoder for `tag` */
-export const jTag: Json.Loose<tag> =
-  Json.jObject({
-    name: Json.jFail(Json.jString,'String expected'),
-    label: jMarkdownSafe,
-    descr: jMarkdownSafe,
-  });
-
-/** Safe decoder for `tag` */
-export const jTagSafe: Json.Safe<tag> = Json.jFail(jTag,'Tag expected');
+/** Decoder for `tag` */
+export const jTag: Json.Decoder<tag> =
+  Json.jObject({ name: Json.jString, label: jMarkdown, descr: jMarkdown,});
 
 /** Natural order for `tag` */
 export const byTag: Compare.Order<tag> =

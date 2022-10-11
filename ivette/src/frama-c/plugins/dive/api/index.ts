@@ -44,11 +44,7 @@ import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jLocation } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jLocationSafe } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { jMarkerSafe } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { location } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -62,13 +58,12 @@ export interface range {
   forward?: number;
 }
 
-/** Loose decoder for `range` */
-export const jRange: Json.Loose<range> =
-  Json.jObject({ backward: Json.jNumber, forward: Json.jNumber,});
-
-/** Safe decoder for `range` */
-export const jRangeSafe: Json.Safe<range> =
-  Json.jFail(jRange,'Range expected');
+/** Decoder for `range` */
+export const jRange: Json.Decoder<range> =
+  Json.jObject({
+    backward: Json.jOption(Json.jNumber),
+    forward: Json.jOption(Json.jNumber),
+  });
 
 /** Natural order for `range` */
 export const byRange: Compare.Order<range> =
@@ -86,13 +81,9 @@ export interface explorationWindow {
   horizon: range;
 }
 
-/** Loose decoder for `explorationWindow` */
-export const jExplorationWindow: Json.Loose<explorationWindow> =
-  Json.jObject({ perception: jRangeSafe, horizon: jRangeSafe,});
-
-/** Safe decoder for `explorationWindow` */
-export const jExplorationWindowSafe: Json.Safe<explorationWindow> =
-  Json.jFail(jExplorationWindow,'ExplorationWindow expected');
+/** Decoder for `explorationWindow` */
+export const jExplorationWindow: Json.Decoder<explorationWindow> =
+  Json.jObject({ perception: jRange, horizon: jRange,});
 
 /** Natural order for `explorationWindow` */
 export const byExplorationWindow: Compare.Order<explorationWindow> =
@@ -105,12 +96,8 @@ export const byExplorationWindow: Compare.Order<explorationWindow> =
 /** A node identifier in the graph */
 export type nodeId = number;
 
-/** Loose decoder for `nodeId` */
-export const jNodeId: Json.Loose<nodeId> = Json.jNumber;
-
-/** Safe decoder for `nodeId` */
-export const jNodeIdSafe: Json.Safe<nodeId> =
-  Json.jFail(Json.jNumber,'Number expected');
+/** Decoder for `nodeId` */
+export const jNodeId: Json.Decoder<nodeId> = Json.jNumber;
 
 /** Natural order for `nodeId` */
 export const byNodeId: Compare.Order<nodeId> = Compare.number;
@@ -118,18 +105,12 @@ export const byNodeId: Compare.Order<nodeId> = Compare.number;
 /** A callsite */
 export type callsite = { fun: string, instr: number | string };
 
-/** Loose decoder for `callsite` */
-export const jCallsite: Json.Loose<callsite> =
+/** Decoder for `callsite` */
+export const jCallsite: Json.Decoder<callsite> =
   Json.jObject({
-    fun: Json.jFail(Json.jString,'String expected'),
-    instr: Json.jFail(
-             Json.jUnion<number | string>( Json.jNumber, Json.jString,),
-             'Union expected'),
+    fun: Json.jString,
+    instr: Json.jUnion<number | string>( Json.jNumber, Json.jString,),
   });
-
-/** Safe decoder for `callsite` */
-export const jCallsiteSafe: Json.Safe<callsite> =
-  Json.jFail(jCallsite,'Callsite expected');
 
 /** Natural order for `callsite` */
 export const byCallsite: Compare.Order<callsite> =
@@ -142,12 +123,8 @@ export const byCallsite: Compare.Order<callsite> =
 /** The callstack context for a node */
 export type callstack = callsite[];
 
-/** Safe decoder for `callstack` */
-export const jCallstackSafe: Json.Safe<callstack> =
-  Json.jArray(jCallsiteSafe);
-
-/** Loose decoder for `callstack` */
-export const jCallstack: Json.Loose<callstack> = Json.jTry(jCallstackSafe);
+/** Decoder for `callstack` */
+export const jCallstack: Json.Decoder<callstack> = Json.jArray(jCallsite);
 
 /** Natural order for `callstack` */
 export const byCallstack: Compare.Order<callstack> =
@@ -156,16 +133,9 @@ export const byCallstack: Compare.Order<callstack> =
 /** The description of a node locality */
 export type nodeLocality = { file: string, callstack?: callstack };
 
-/** Loose decoder for `nodeLocality` */
-export const jNodeLocality: Json.Loose<nodeLocality> =
-  Json.jObject({
-    file: Json.jFail(Json.jString,'String expected'),
-    callstack: jCallstack,
-  });
-
-/** Safe decoder for `nodeLocality` */
-export const jNodeLocalitySafe: Json.Safe<nodeLocality> =
-  Json.jFail(jNodeLocality,'NodeLocality expected');
+/** Decoder for `nodeLocality` */
+export const jNodeLocality: Json.Decoder<nodeLocality> =
+  Json.jObject({ file: Json.jString, callstack: Json.jOption(jCallstack),});
 
 /** Natural order for `nodeLocality` */
 export const byNodeLocality: Compare.Order<nodeLocality> =
@@ -182,26 +152,21 @@ export type node =
     writes: location[], values?: string, range: number | string,
     type?: string };
 
-/** Loose decoder for `node` */
-export const jNode: Json.Loose<node> =
+/** Decoder for `node` */
+export const jNode: Json.Decoder<node> =
   Json.jObject({
-    id: jNodeIdSafe,
-    label: Json.jFail(Json.jString,'String expected'),
-    kind: Json.jFail(Json.jString,'String expected'),
-    locality: jNodeLocalitySafe,
-    is_root: Json.jFail(Json.jBoolean,'Boolean expected'),
-    backward_explored: Json.jFail(Json.jString,'String expected'),
-    forward_explored: Json.jFail(Json.jString,'String expected'),
-    writes: Json.jArray(jLocationSafe),
-    values: Json.jString,
-    range: Json.jFail(
-             Json.jUnion<number | string>( Json.jNumber, Json.jString,),
-             'Union expected'),
-    type: Json.jString,
+    id: jNodeId,
+    label: Json.jString,
+    kind: Json.jString,
+    locality: jNodeLocality,
+    is_root: Json.jBoolean,
+    backward_explored: Json.jString,
+    forward_explored: Json.jString,
+    writes: Json.jArray(jLocation),
+    values: Json.jOption(Json.jString),
+    range: Json.jUnion<number | string>( Json.jNumber, Json.jString,),
+    type: Json.jOption(Json.jString),
   });
-
-/** Safe decoder for `node` */
-export const jNodeSafe: Json.Safe<node> = Json.jFail(jNode,'Node expected');
 
 /** Natural order for `node` */
 export const byNode: Compare.Order<node> =
@@ -227,19 +192,15 @@ export const byNode: Compare.Order<node> =
 export type dependency =
   { id: number, src: nodeId, dst: nodeId, kind: string, origins: location[] };
 
-/** Loose decoder for `dependency` */
-export const jDependency: Json.Loose<dependency> =
+/** Decoder for `dependency` */
+export const jDependency: Json.Decoder<dependency> =
   Json.jObject({
-    id: Json.jFail(Json.jNumber,'Number expected'),
-    src: jNodeIdSafe,
-    dst: jNodeIdSafe,
-    kind: Json.jFail(Json.jString,'String expected'),
-    origins: Json.jArray(jLocationSafe),
+    id: Json.jNumber,
+    src: jNodeId,
+    dst: jNodeId,
+    kind: Json.jString,
+    origins: Json.jArray(jLocation),
   });
-
-/** Safe decoder for `dependency` */
-export const jDependencySafe: Json.Safe<dependency> =
-  Json.jFail(jDependency,'Dependency expected');
 
 /** Natural order for `dependency` */
 export const byDependency: Compare.Order<dependency> =
@@ -256,16 +217,9 @@ export const byDependency: Compare.Order<dependency> =
 /** The whole graph being built */
 export type graphData = { nodes: node[], deps: dependency[] };
 
-/** Loose decoder for `graphData` */
-export const jGraphData: Json.Loose<graphData> =
-  Json.jObject({
-    nodes: Json.jArray(jNodeSafe),
-    deps: Json.jArray(jDependencySafe),
-  });
-
-/** Safe decoder for `graphData` */
-export const jGraphDataSafe: Json.Safe<graphData> =
-  Json.jFail(jGraphData,'GraphData expected');
+/** Decoder for `graphData` */
+export const jGraphData: Json.Decoder<graphData> =
+  Json.jObject({ nodes: Json.jArray(jNode), deps: Json.jArray(jDependency),});
 
 /** Natural order for `graphData` */
 export const byGraphData: Compare.Order<graphData> =
@@ -280,21 +234,16 @@ export type diffData =
   { root?: nodeId, add: { nodes: node[], deps: dependency[] }, sub: nodeId[]
     };
 
-/** Loose decoder for `diffData` */
-export const jDiffData: Json.Loose<diffData> =
+/** Decoder for `diffData` */
+export const jDiffData: Json.Decoder<diffData> =
   Json.jObject({
-    root: jNodeId,
-    add: Json.jFail(
-           Json.jObject({
-             nodes: Json.jArray(jNodeSafe),
-             deps: Json.jArray(jDependencySafe),
-           }),'Record expected'),
-    sub: Json.jArray(jNodeIdSafe),
+    root: Json.jOption(jNodeId),
+    add: Json.jObject({
+           nodes: Json.jArray(jNode),
+           deps: Json.jArray(jDependency),
+         }),
+    sub: Json.jArray(jNodeId),
   });
-
-/** Safe decoder for `diffData` */
-export const jDiffDataSafe: Json.Safe<diffData> =
-  Json.jFail(jDiffData,'DiffData expected');
 
 /** Natural order for `diffData` */
 export const byDiffData: Compare.Order<diffData> =

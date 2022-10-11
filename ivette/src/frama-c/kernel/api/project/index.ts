@@ -42,17 +42,13 @@ import * as State from 'frama-c/states';
 export type projectInfo =
   { id: Json.key<'#project'>, name: string, current: boolean };
 
-/** Loose decoder for `projectInfo` */
-export const jProjectInfo: Json.Loose<projectInfo> =
+/** Decoder for `projectInfo` */
+export const jProjectInfo: Json.Decoder<projectInfo> =
   Json.jObject({
-    id: Json.jFail(Json.jKey<'#project'>('#project'),'#project expected'),
-    name: Json.jFail(Json.jString,'String expected'),
-    current: Json.jFail(Json.jBoolean,'Boolean expected'),
+    id: Json.jKey<'#project'>('#project'),
+    name: Json.jString,
+    current: Json.jBoolean,
   });
-
-/** Safe decoder for `projectInfo` */
-export const jProjectInfoSafe: Json.Safe<projectInfo> =
-  Json.jFail(jProjectInfo,'ProjectInfo expected');
 
 /** Natural order for `projectInfo` */
 export const byProjectInfo: Compare.Order<projectInfo> =
@@ -67,18 +63,13 @@ export const byProjectInfo: Compare.Order<projectInfo> =
 export type projectRequest =
   { project: Json.key<'#project'>, request: string, data: Json.json };
 
-/** Loose decoder for `projectRequest` */
-export const jProjectRequest: Json.Loose<projectRequest> =
+/** Decoder for `projectRequest` */
+export const jProjectRequest: Json.Decoder<projectRequest> =
   Json.jObject({
-    project: Json.jFail(Json.jKey<'#project'>('#project'),
-               '#project expected'),
-    request: Json.jFail(Json.jString,'String expected'),
+    project: Json.jKey<'#project'>('#project'),
+    request: Json.jString,
     data: Json.jAny,
   });
-
-/** Safe decoder for `projectRequest` */
-export const jProjectRequestSafe: Json.Safe<projectRequest> =
-  Json.jFail(jProjectRequest,'ProjectRequest expected');
 
 /** Natural order for `projectRequest` */
 export const byProjectRequest: Compare.Order<projectRequest> =
@@ -113,7 +104,7 @@ const getList_internal: Server.GetRequest<null,projectInfo[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.project.getList',
   input:  Json.jNull,
-  output: Json.jList(jProjectInfo),
+  output: Json.jArray(jProjectInfo),
   signals: [],
 };
 /** Returns the list of all projects */

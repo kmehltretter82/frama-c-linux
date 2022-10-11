@@ -208,7 +208,7 @@ module Jcalls : Request.Output with type t = callstack = struct
 
   type t = callstack
 
-  let jtype = Package.(Jlist (Jrecord [
+  let jtype = Package.(Jarray (Jrecord [
       "callee" , Jkf.jtype ;
       "caller" , Joption Jkf.jtype ;
       "stmt" , Joption Jstmt.jtype ;

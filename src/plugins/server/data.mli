@@ -99,7 +99,6 @@ module Joption(A : S) : S with type t = A.t option
 module Jpair(A : S)(B : S) : S with type t = A.t * B.t
 module Jtriple(A : S)(B : S)(C : S) : S with type t = A.t * B.t * C.t
 module Jlist(A : S) : S with type t = A.t list
-module Jalist(A : S) : S with type t = A.t list
 module Jarray(A : S) : S with type t = A.t array
 
 (* -------------------------------------------------------------------------- *)

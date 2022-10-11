@@ -730,9 +730,9 @@ export interface Request<Kd extends RqKind, In, Out> {
   /** The request full name. */
   name: string;
   /** Encoder of input parameters. */
-  input: Json.Loose<In>;
+  input: Json.Decoder<In>;
   /** Decoder of output parameters. */
-  output: Json.Loose<Out>;
+  output: Json.Decoder<Out>;
   /** Signals the request depends on */
   signals: Array<Signal>;
 }

@@ -44,11 +44,7 @@ import { byText } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { jTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { jTagSafe } from 'frama-c/kernel/api/data';
-//@ts-ignore
 import { jText } from 'frama-c/kernel/api/data';
-//@ts-ignore
-import { jTextSafe } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { tag } from 'frama-c/kernel/api/data';
 //@ts-ignore
@@ -73,18 +69,14 @@ export const changed: Server.Signal = {
 export type source =
   { dir: string, base: string, file: string, line: number };
 
-/** Loose decoder for `source` */
-export const jSource: Json.Loose<source> =
+/** Decoder for `source` */
+export const jSource: Json.Decoder<source> =
   Json.jObject({
-    dir: Json.jFail(Json.jString,'String expected'),
-    base: Json.jFail(Json.jString,'String expected'),
-    file: Json.jFail(Json.jString,'String expected'),
-    line: Json.jFail(Json.jNumber,'Number expected'),
+    dir: Json.jString,
+    base: Json.jString,
+    file: Json.jString,
+    line: Json.jNumber,
   });
-
-/** Safe decoder for `source` */
-export const jSourceSafe: Json.Safe<source> =
-  Json.jFail(jSource,'Source expected');
 
 /** Natural order for `source` */
 export const bySource: Compare.Order<source> =
@@ -114,12 +106,8 @@ export enum markerKind {
   property = 'property',
 }
 
-/** Loose decoder for `markerKind` */
-export const jMarkerKind: Json.Loose<markerKind> = Json.jEnum(markerKind);
-
-/** Safe decoder for `markerKind` */
-export const jMarkerKindSafe: Json.Safe<markerKind> =
-  Json.jFail(Json.jEnum(markerKind),'kernel.ast.markerKind expected');
+/** Decoder for `markerKind` */
+export const jMarkerKind: Json.Decoder<markerKind> = Json.jEnum(markerKind);
 
 /** Natural order for `markerKind` */
 export const byMarkerKind: Compare.Order<markerKind> =
@@ -129,7 +117,7 @@ const markerKindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.markerKindTags',
   input:  Json.jNull,
-  output: Json.jList(jTag),
+  output: Json.jArray(jTag),
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -145,12 +133,8 @@ export enum markerVar {
   function = 'function',
 }
 
-/** Loose decoder for `markerVar` */
-export const jMarkerVar: Json.Loose<markerVar> = Json.jEnum(markerVar);
-
-/** Safe decoder for `markerVar` */
-export const jMarkerVarSafe: Json.Safe<markerVar> =
-  Json.jFail(Json.jEnum(markerVar),'kernel.ast.markerVar expected');
+/** Decoder for `markerVar` */
+export const jMarkerVar: Json.Decoder<markerVar> = Json.jEnum(markerVar);
 
 /** Natural order for `markerVar` */
 export const byMarkerVar: Compare.Order<markerVar> =
@@ -160,7 +144,7 @@ const markerVarTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.markerVarTags',
   input:  Json.jNull,
-  output: Json.jList(jTag),
+  output: Json.jArray(jTag),
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -182,20 +166,16 @@ export interface markerInfoData {
   sloc: source;
 }
 
-/** Loose decoder for `markerInfoData` */
-export const jMarkerInfoData: Json.Loose<markerInfoData> =
+/** Decoder for `markerInfoData` */
+export const jMarkerInfoData: Json.Decoder<markerInfoData> =
   Json.jObject({
-    key: Json.jFail(Json.jString,'String expected'),
-    kind: jMarkerKindSafe,
-    var: jMarkerVarSafe,
-    name: Json.jFail(Json.jString,'String expected'),
-    descr: Json.jFail(Json.jString,'String expected'),
-    sloc: jSourceSafe,
+    key: Json.jString,
+    kind: jMarkerKind,
+    var: jMarkerVar,
+    name: Json.jString,
+    descr: Json.jString,
+    sloc: jSource,
   });
-
-/** Safe decoder for `markerInfoData` */
-export const jMarkerInfoDataSafe: Json.Safe<markerInfoData> =
-  Json.jFail(jMarkerInfoData,'MarkerInfoData expected');
 
 /** Natural order for `markerInfoData` */
 export const byMarkerInfoData: Compare.Order<markerInfoData> =
@@ -234,10 +214,10 @@ const fetchMarkerInfo_internal: Server.GetRequest<
   name:   'kernel.ast.fetchMarkerInfo',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jFail(Json.jNumber,'Number expected'),
-            updated: Json.jList(jMarkerInfoData),
-            removed: Json.jList(Json.jString),
-            reload: Json.jFail(Json.jBoolean,'Boolean expected'),
+            pending: Json.jNumber,
+            updated: Json.jArray(jMarkerInfoData),
+            removed: Json.jArray(Json.jString),
+            reload: Json.jBoolean,
           }),
   signals: [],
 };
@@ -265,8 +245,8 @@ export type marker =
   Json.key<'#expr'> | Json.key<'#term'> | Json.key<'#global'> |
   Json.key<'#property'>;
 
-/** Loose decoder for `marker` */
-export const jMarker: Json.Loose<marker> =
+/** Decoder for `marker` */
+export const jMarker: Json.Decoder<marker> =
   Json.jUnion<Json.key<'#stmt'> | Json.key<'#decl'> | Json.key<'#lval'> |
               Json.key<'#expr'> | Json.key<'#term'> | Json.key<'#global'> |
               Json.key<'#property'>>(
@@ -279,10 +259,6 @@ export const jMarker: Json.Loose<marker> =
     Json.jKey<'#property'>('#property'),
   );
 
-/** Safe decoder for `marker` */
-export const jMarkerSafe: Json.Safe<marker> =
-  Json.jFail(jMarker,'Marker expected');
-
 /** Natural order for `marker` */
 export const byMarker: Compare.Order<marker> = Compare.structural;
 
@@ -294,16 +270,9 @@ export interface location {
   marker: marker;
 }
 
-/** Loose decoder for `location` */
-export const jLocation: Json.Loose<location> =
-  Json.jObject({
-    fct: Json.jFail(Json.jKey<'#fct'>('#fct'),'#fct expected'),
-    marker: jMarkerSafe,
-  });
-
-/** Safe decoder for `location` */
-export const jLocationSafe: Json.Safe<location> =
-  Json.jFail(jLocation,'Location expected');
+/** Decoder for `location` */
+export const jLocation: Json.Decoder<location> =
+  Json.jObject({ fct: Json.jKey<'#fct'>('#fct'), marker: jMarker,});
 
 /** Natural order for `location` */
 export const byLocation: Compare.Order<location> =
@@ -321,7 +290,7 @@ const getMainFunction_internal: Server.GetRequest<
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getMainFunction',
   input:  Json.jNull,
-  output: Json.jKey<'#fct'>('#fct'),
+  output: Json.jOption(Json.jKey<'#fct'>('#fct')),
   signals: [],
 };
 /** Get the current 'main' function. */
@@ -335,7 +304,7 @@ const getFunctions_internal: Server.GetRequest<null,Json.key<'#fct'>[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getFunctions',
   input:  Json.jNull,
-  output: Json.jList(Json.jKey<'#fct'>('#fct')),
+  output: Json.jArray(Json.jKey<'#fct'>('#fct')),
   signals: [],
 };
 /** Collect all functions in the AST */
@@ -371,23 +340,18 @@ export interface functionsData {
   sloc: source;
 }
 
-/** Loose decoder for `functionsData` */
-export const jFunctionsData: Json.Loose<functionsData> =
+/** Decoder for `functionsData` */
+export const jFunctionsData: Json.Decoder<functionsData> =
   Json.jObject({
-    key: Json.jFail(Json.jKey<'#functions'>('#functions'),
-           '#functions expected'),
-    name: Json.jFail(Json.jString,'String expected'),
-    signature: Json.jFail(Json.jString,'String expected'),
-    main: Json.jBoolean,
-    defined: Json.jBoolean,
-    stdlib: Json.jBoolean,
-    builtin: Json.jBoolean,
-    sloc: jSourceSafe,
+    key: Json.jKey<'#functions'>('#functions'),
+    name: Json.jString,
+    signature: Json.jString,
+    main: Json.jOption(Json.jBoolean),
+    defined: Json.jOption(Json.jBoolean),
+    stdlib: Json.jOption(Json.jBoolean),
+    builtin: Json.jOption(Json.jBoolean),
+    sloc: jSource,
   });
-
-/** Safe decoder for `functionsData` */
-export const jFunctionsDataSafe: Json.Safe<functionsData> =
-  Json.jFail(jFunctionsData,'FunctionsData expected');
 
 /** Natural order for `functionsData` */
 export const byFunctionsData: Compare.Order<functionsData> =
@@ -429,10 +393,10 @@ const fetchFunctions_internal: Server.GetRequest<
   name:   'kernel.ast.fetchFunctions',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jFail(Json.jNumber,'Number expected'),
-            updated: Json.jList(jFunctionsData),
-            removed: Json.jList(Json.jKey<'#functions'>('#functions')),
-            reload: Json.jFail(Json.jBoolean,'Boolean expected'),
+            pending: Json.jNumber,
+            updated: Json.jArray(jFunctionsData),
+            removed: Json.jArray(Json.jKey<'#functions'>('#functions')),
+            reload: Json.jBoolean,
           }),
   signals: [],
 };
@@ -466,14 +430,14 @@ const getInformation_internal: Server.GetRequest<
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getInformation',
-  input:  jMarker,
-  output: Json.jList(
+  input:  Json.jOption(jMarker),
+  output: Json.jArray(
             Json.jObject({
-              id: Json.jFail(Json.jString,'String expected'),
-              label: Json.jFail(Json.jString,'String expected'),
-              descr: Json.jFail(Json.jString,'String expected'),
-              title: Json.jFail(Json.jString,'String expected'),
-              text: jTextSafe,
+              id: Json.jString,
+              label: Json.jString,
+              descr: Json.jString,
+              title: Json.jString,
+              text: jText,
             })),
   signals: [ { name: 'kernel.ast.getInformationUpdate' } ],
 };
@@ -490,13 +454,11 @@ const getMarkerAt_internal: Server.GetRequest<
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getMarkerAt',
-  input:  Json.jTry(
-            Json.jTriple(
-              Json.jFail(Json.jString,'String expected'),
-              Json.jFail(Json.jNumber,'Number expected'),
-              Json.jFail(Json.jNumber,'Number expected'),
-            )),
-  output: Json.jTry(Json.jPair( Json.jKey<'#fct'>('#fct'), jMarker,)),
+  input:  Json.jTriple( Json.jString, Json.jNumber, Json.jNumber,),
+  output: Json.jPair(
+            Json.jOption(Json.jKey<'#fct'>('#fct')),
+            Json.jOption(jMarker),
+          ),
   signals: [],
 };
 /** Returns the marker and function at a source file position, if any. Input: file path, line and column. */
@@ -509,7 +471,7 @@ const getFiles_internal: Server.GetRequest<null,string[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getFiles',
   input:  Json.jNull,
-  output: Json.jList(Json.jString),
+  output: Json.jArray(Json.jString),
   signals: [],
 };
 /** Get the currently analyzed source file names */
@@ -518,7 +480,7 @@ export const getFiles: Server.GetRequest<null,string[]>= getFiles_internal;
 const setFiles_internal: Server.SetRequest<string[],null> = {
   kind: Server.RqKind.SET,
   name:   'kernel.ast.setFiles',
-  input:  Json.jList(Json.jString),
+  input:  Json.jArray(Json.jString),
   output: Json.jNull,
   signals: [],
 };
@@ -533,16 +495,9 @@ export interface markerFromTermInput {
   term: string;
 }
 
-/** Loose decoder for `markerFromTermInput` */
-export const jMarkerFromTermInput: Json.Loose<markerFromTermInput> =
-  Json.jObject({
-    atStmt: jMarkerSafe,
-    term: Json.jFail(Json.jString,'String expected'),
-  });
-
-/** Safe decoder for `markerFromTermInput` */
-export const jMarkerFromTermInputSafe: Json.Safe<markerFromTermInput> =
-  Json.jFail(jMarkerFromTermInput,'MarkerFromTermInput expected');
+/** Decoder for `markerFromTermInput` */
+export const jMarkerFromTermInput: Json.Decoder<markerFromTermInput> =
+  Json.jObject({ atStmt: jMarker, term: Json.jString,});
 
 /** Natural order for `markerFromTermInput` */
 export const byMarkerFromTermInput: Compare.Order<markerFromTermInput> =
@@ -560,7 +515,7 @@ const markerFromTerm_internal: Server.GetRequest<
   kind: Server.RqKind.GET,
   name:   'kernel.ast.markerFromTerm',
   input:  jMarkerFromTermInput,
-  output: jMarker,
+  output: Json.jOption(jMarker),
   signals: [],
 };
 /** Build a marker from an ACSL term. */
