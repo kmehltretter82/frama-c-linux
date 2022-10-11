@@ -395,7 +395,7 @@ module Q = struct
     | _ ->
       Error.not_yet "R to <typ>"
 
-  let new_var_and_init ~loc ?scope ?name env kf t_opt mk_stmts =
+  let new_var ~loc ?scope ?name env kf t_opt mk_stmts =
     Env.new_var
       ~loc
       ?scope
@@ -417,7 +417,7 @@ module Q = struct
                            name
                            [ e; e1; e2 ] ] in
     let name = Misc.name_of_binop bop in
-    let _, e, env = new_var_and_init ~loc ~name env kf t_opt mk_stmts in
+    let _, e, env = new_var ~loc ~name env kf t_opt mk_stmts in
     e, env
 
   let cmp ~loc name t_opt bop env kf e1 e2 =
