@@ -29,7 +29,7 @@ open Logic_utils
 open Data_for_aorai
 open Cil_types
 open Cil_datatype
-open Promelaast
+open Automaton_ast
 open Bool3
 
 let func_body_dkey = Aorai_option.register_category "func-body"
@@ -70,8 +70,8 @@ let isCrossable tr func st =
   Aorai_option.debug ~level:2 "Function %a %s-state, \
                                transition %s -> %s is%s possible" Kernel_function.pretty func
     (if st=Call then "pre" else "post")
-    tr.start.Promelaast.name
-    tr.stop.Promelaast.name
+    tr.start.Automaton_ast.name
+    tr.stop.Automaton_ast.name
     (if res then "" else " NOT");
   res
 
@@ -374,9 +374,9 @@ let crosscond_to_pred cross curr_f curr_status =
            Logic_const.pands
              (List.map Logic_const.pred_of_id_pred b.b_assumes))
       in
-      check_current_event f Promelaast.Call pred
+      check_current_event f Automaton_ast.Call pred
     | TReturn f ->
-      check_current_event f Promelaast.Return (Bool3.True, ptrue)
+      check_current_event f Automaton_ast.Return (Bool3.True, ptrue)
 
     (* Other expressions are left unchanged *)
     | TTrue -> (Bool3.True, ptrue)
@@ -598,18 +598,18 @@ let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
          [], [], Cil_datatype.Varinfo.Set.empty, Cil.one ~loc
        | Some _ -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc)
     | TCall (f,None) ->
-      if check_current_event f Promelaast.Call then
+      if check_current_event f Automaton_ast.Call then
         [], [], Cil_datatype.Varinfo.Set.empty, Cil.one ~loc
       else
         [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc
     | TCall (f, Some bhv) ->
-      if check_current_event f Promelaast.Call then begin
+      if check_current_event f Automaton_ast.Call then begin
         let res, stmt, new_kf = mk_behavior_call generated_kf f bhv in
         [ stmt ], [res], new_kf, Cil.evar res
       end else
         [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc
     | TReturn f ->
-      if check_current_event f Promelaast.Return then
+      if check_current_event f Automaton_ast.Return then
         [], [], Cil_datatype.Varinfo.Set.empty, Cil.one ~loc
       else
         [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc
@@ -894,7 +894,7 @@ let mk_global_states_init root =
   let (states,_ as auto) = Data_for_aorai.getGraph () in
   let states = List.sort Data_for_aorai.Aorai_state.compare states in
   let is_possible_init state =
-    state.Promelaast.init = Bool3.True &&
+    state.Automaton_ast.init = Bool3.True &&
     (let trans = Path_analysis.get_transitions_of_state state auto in
      List.exists (fun tr -> isCrossableAtInit tr root) trans)
   in
@@ -1000,8 +1000,8 @@ let pred_of_condition subst subst_res label cond =
     in
     Logic_const.pand (mk_func_event f, prel(Req,curr,call))
   in
-  let mk_func_start f = mk_func_status f Promelaast.Call in
-  let mk_func_return f = mk_func_status f Promelaast.Return in
+  let mk_func_start f = mk_func_status f Automaton_ast.Call in
+  let mk_func_return f = mk_func_status f Automaton_ast.Return in
   let rec aux kf is_or = function
     | TOr(c1,c2) ->
       let kf, c1 = aux kf true c1 in
@@ -1069,7 +1069,7 @@ let mk_deterministic_lemma () =
     let trans = Path_analysis.get_transitions_of_state state automaton in
     let prop = Extlib.product_fold disjoint_guards ptrue trans trans in
     let prop = Logic_const.toplevel_predicate ~kind:Check prop in
-    let name = state.Promelaast.name ^ "_deterministic_trans" in
+    let name = state.Automaton_ast.name ^ "_deterministic_trans" in
     let lemma =
       Dlemma (name, [label],[],prop,[],Cil_datatype.Location.unknown)
     in
@@ -1080,7 +1080,7 @@ let mk_deterministic_lemma () =
 let make_enum_states () =
   let state_list =fst (Data_for_aorai.getGraph()) in
   let state_list =
-    List.map (fun x -> (x.Promelaast.name, x.Promelaast.nums)) state_list
+    List.map (fun x -> (x.Automaton_ast.name, x.Automaton_ast.nums)) state_list
   in
   let enum = mk_global_c_enum_type_tagged states state_list in
   let mapping =
@@ -1097,7 +1097,7 @@ let make_enum_states () =
 let getInitialState () =
   let loc = Cil_datatype.Location.unknown in
   let states = fst (Data_for_aorai.getGraph()) in
-  let s = List.find (fun x -> x.Promelaast.init = Bool3.True) states in
+  let s = List.find (fun x -> x.Automaton_ast.init = Bool3.True) states in
   Cil.new_exp ~loc (Const (CEnum (find_enum s.nums)))
 
 (** This function computes all newly introduced globals (variables, enumeration structure, invariants, etc. *)
@@ -1269,7 +1269,7 @@ let action_assigns trans =
 
 let get_reachable_trans state st auto current_state =
   match st with
-  | Promelaast.Call ->
+  | Automaton_ast.Call ->
     (try
        let reach = Data_for_aorai.Aorai_state.Map.find state current_state in
        let treat_one_state end_state _ l =
@@ -1277,7 +1277,7 @@ let get_reachable_trans state st auto current_state =
        in
        Data_for_aorai.Aorai_state.Map.fold treat_one_state reach []
      with Not_found -> [])
-  | Promelaast.Return ->
+  | Automaton_ast.Return ->
     let treat_one_state end_state (_,last,_) l =
       if Data_for_aorai.Aorai_state.Set.mem state last then
         Path_analysis.get_edges state end_state auto @ l
@@ -1290,14 +1290,14 @@ let get_reachable_trans state st auto current_state =
 
 let get_reachable_trans_to state st auto current_state =
   match st with
-  | Promelaast.Call ->
+  | Automaton_ast.Call ->
     let treat_one_start start map acc =
       if Data_for_aorai.Aorai_state.Map.mem state map then
         Path_analysis.get_edges start state auto @ acc
       else acc
     in
     Data_for_aorai.Aorai_state.Map.fold treat_one_start current_state []
-  | Promelaast.Return ->
+  | Automaton_ast.Return ->
     let treat_one_state _ map acc =
       try
         let (_,last,_) = Data_for_aorai.Aorai_state.Map.find state map in
@@ -1339,7 +1339,7 @@ let force_transition loc f st current_state =
       in has_crossable_trans, crossable_non_reject
     in
     let cond, crossable_non_reject =
-      List.fold_left add_one_trans (Promelaast.TFalse, false) reachable_trans
+      List.fold_left add_one_trans (Automaton_ast.TFalse, false) reachable_trans
     in
     let cond = fst (Logic_simplification.simplifyCond cond) in
     let cond = crosscond_to_pred cond f st in
@@ -1362,10 +1362,10 @@ let force_transition loc f st current_state =
       let possible_states =
         (* reject_state must not be the only possible state *)
         match st with
-        | Promelaast.Return ->
+        | Automaton_ast.Return ->
           if Data_for_aorai.is_reject_state state then possible_states
           else  Logic_const.por ~loc (possible_states,start)
-        | Promelaast.Call ->
+        | Automaton_ast.Call ->
           if crossable_non_reject then
             Logic_const.por ~loc (possible_states, start)
           else possible_states
@@ -1699,9 +1699,9 @@ let mk_unchanged_aux_vars_bhvs loc f st status =
 
 let mk_behavior ~loc auto kf e status state =
   Aorai_option.debug "analysis of state %s (%d)"
-    state.Promelaast.name state.nums;
+    state.Automaton_ast.name state.nums;
   if is_reachable state status then begin
-    Aorai_option.debug "state %s is reachable" state.Promelaast.name;
+    Aorai_option.debug "state %s is reachable" state.Automaton_ast.name;
     let my_trans = get_accessible_transitions auto state status in
     let rec treat_trans
         ((in_assumes, out_assumes, assigns, action_bhvs) as acc) l =
@@ -1813,7 +1813,7 @@ let mk_behavior ~loc auto kf e status state =
       else begin
         let behavior_in =
           Cil.mk_behavior
-            ~name:(Printf.sprintf "buch_state_%s_in" state.Promelaast.name)
+            ~name:(Printf.sprintf "buch_state_%s_in" state.Automaton_ast.name)
             ~assumes:[Logic_const.new_predicate in_assumes]
             ~post_cond:
               [Normal, Logic_const.new_predicate (is_state_pred state)]
@@ -1846,7 +1846,7 @@ let mk_behavior ~loc auto kf e status state =
         in
         let behavior_out =
           Cil.mk_behavior
-            ~name:(Printf.sprintf "buch_state_%s_out" state.Promelaast.name)
+            ~name:(Printf.sprintf "buch_state_%s_out" state.Automaton_ast.name)
             ~assumes:[Logic_const.new_predicate out_assumes]
             ~post_cond ()
         in behavior_out :: behaviors
@@ -1854,9 +1854,9 @@ let mk_behavior ~loc auto kf e status state =
     in
     assigns, behaviors
   end else begin
-    Aorai_option.debug "state %s is not reachable" state.Promelaast.name;
+    Aorai_option.debug "state %s is not reachable" state.Automaton_ast.name;
     (* We know that we'll never end up in this state. *)
-    let name = Printf.sprintf "buch_state_%s_out" state.Promelaast.name in
+    let name = Printf.sprintf "buch_state_%s_out" state.Automaton_ast.name in
     let post_cond =
       match state.multi_state with
       | None -> []
@@ -1879,8 +1879,8 @@ let mk_behavior ~loc auto kf e status state =
 let auto_func_behaviors loc f st state =
   let call_or_ret =
     match st with
-    | Promelaast.Call -> "call"
-    | Promelaast.Return -> "return"
+    | Automaton_ast.Call -> "call"
+    | Automaton_ast.Return -> "return"
   in
   Aorai_option.debug
     "func behavior for %a (%s)" Kernel_function.pretty f call_or_ret;
@@ -2145,8 +2145,8 @@ let auto_func_block generated_kf loc f st status res =
   let dkey = func_body_dkey in
   let call_or_ret =
     match st with
-    | Promelaast.Call -> "call"
-    | Promelaast.Return -> "return"
+    | Automaton_ast.Call -> "call"
+    | Automaton_ast.Return -> "return"
   in
   Aorai_option.debug
     ~dkey "func code for %a (%s)" Kernel_function.pretty f call_or_ret;
@@ -2229,11 +2229,11 @@ let get_preds_wrt_params_reachable_states state f status =
 
 let get_preds_pre_wrt_params f =
   let pre = Data_for_aorai.get_kf_init_state f in
-  get_preds_wrt_params_reachable_states pre f Promelaast.Call
+  get_preds_wrt_params_reachable_states pre f Automaton_ast.Call
 
 let get_preds_post_bc_wrt_params f =
   let post = Data_for_aorai.get_kf_return_state f in
-  get_preds_wrt_params_reachable_states post f Promelaast.Return
+  get_preds_wrt_params_reachable_states post f Automaton_ast.Return
 
 let treat_val loc base range pred =
   let add term =

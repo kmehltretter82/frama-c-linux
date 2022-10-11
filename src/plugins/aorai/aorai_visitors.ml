@@ -23,7 +23,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Promelaast
+open Automaton_ast
 open Extlib
 open Logic_const
 open Cil_types
@@ -87,7 +87,7 @@ let mk_pre_fct_block kf_pre kf =
   mk_auto_fct_block
     kf_pre
     kf
-    Promelaast.Call
+    Automaton_ast.Call
     (Data_for_aorai.get_kf_init_state kf)
     None
 
@@ -95,7 +95,7 @@ let mk_post_fct_block kf_post kf res =
   mk_auto_fct_block
     kf_post
     kf
-    Promelaast.Return
+    Automaton_ast.Return
     (Data_for_aorai.get_kf_return_state kf)
     res
 
@@ -325,7 +325,7 @@ let get_action_post_cond kf ?init_trans return_states =
       Aorai_option.debug ~dkey
         "Getting action post-conditions for %a, from state %s to state %s@\n%a"
         Kernel_function.pretty kf
-        pre_state.Promelaast.name post_state.Promelaast.name
+        pre_state.Automaton_ast.name post_state.Automaton_ast.name
         (Pretty_utils.pp_list ~sep:"@\n" Printer.pp_predicate)
         post_conds;
       post_conds @ acc
@@ -387,7 +387,7 @@ let possible_start kf (start,int) =
   let trans = Path_analysis.get_edges start int auto in
   let treat_one_trans cond tr =
     Logic_const.por
-      (cond, Aorai_utils.crosscond_to_pred tr.cross kf Promelaast.Call)
+      (cond, Aorai_utils.crosscond_to_pred tr.cross kf Automaton_ast.Call)
   in
   let cond =
     if Data_for_aorai.isObservableFunction kf then
@@ -425,7 +425,7 @@ let neg_trans kf trans =
               TTrue same_start
           in
           let cond = fst (Logic_simplification.simplifyCond cond) in
-          Aorai_utils.crosscond_to_pred cond kf Promelaast.Call
+          Aorai_utils.crosscond_to_pred cond kf Automaton_ast.Call
         end else Logic_const.pfalse
       in
       let cond =
@@ -651,11 +651,11 @@ class visit_adding_pre_post_from_buch treatloops =
     Aorai_utils.auto_func_behaviors loc kf status auto_state
   in
   let mk_pre_fct_spec kf =
-    mk_auto_fct_spec kf Promelaast.Call (Data_for_aorai.get_kf_init_state kf)
+    mk_auto_fct_spec kf Automaton_ast.Call (Data_for_aorai.get_kf_init_state kf)
   in
   let mk_post_fct_spec kf =
     mk_auto_fct_spec kf
-      Promelaast.Return (Data_for_aorai.get_kf_return_state kf)
+      Automaton_ast.Return (Data_for_aorai.get_kf_return_state kf)
   in
   let needs_post kf =
     let loc = Kernel_function.get_location kf in
@@ -844,7 +844,7 @@ class visit_adding_pre_post_from_buch treatloops =
               Logic_const.term
                 (TConst
                    (Logic_utils.constant_to_lconstant
-                      (Data_for_aorai.op_status_to_cenum Promelaast.Return)))
+                      (Data_for_aorai.op_status_to_cenum Automaton_ast.Return)))
                 (Ctype Cil.intType)))
       in
       let called_post_2 =
@@ -894,7 +894,7 @@ class visit_adding_pre_post_from_buch treatloops =
          let requires =
            if Data_for_aorai.isObservableFunction my_kf then
              Aorai_utils.auto_func_preconditions
-               loc my_kf Promelaast.Call my_state
+               loc my_kf Automaton_ast.Call my_state
              @ requires
            else requires
          in

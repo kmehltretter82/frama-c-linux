@@ -23,7 +23,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Promelaast
+open Automaton_ast
 
 type 'a printer = Format.formatter -> 'a -> unit
 

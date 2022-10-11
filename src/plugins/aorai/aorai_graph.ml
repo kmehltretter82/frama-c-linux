@@ -23,10 +23,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Promelaast
+open Automaton_ast
 
-type state = Promelaast.state
-type transition = Promelaast.typed_trans
+type state = Automaton_ast.state
+type transition = Automaton_ast.typed_trans
 
 module Vertex =
 struct
@@ -64,7 +64,7 @@ let filter_states f g =
   fold_vertex (fun v acc -> if f v then v :: acc else acc) g []
 
 let init_states g =
-  filter_states (fun v -> v.Promelaast.init = Bool3.True) g
+  filter_states (fun v -> v.Automaton_ast.init = Bool3.True) g
 
 let edges g =
   fold_edges_e (fun e acc -> e :: acc) g []

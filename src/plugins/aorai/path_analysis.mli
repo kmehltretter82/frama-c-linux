@@ -25,16 +25,16 @@
 
 (** [get_edges s1 s2 g] retrieves all edges in [g] between [s1] and [s2]. *)
 val get_edges:
-  Promelaast.state -> Promelaast.state -> ('c,'a) Promelaast.graph
-  -> ('c, 'a) Promelaast.trans list
+  Automaton_ast.state -> Automaton_ast.state -> ('c,'a) Automaton_ast.graph
+  -> ('c, 'a) Automaton_ast.trans list
 
 (** retrieve all edges starting at the given node. *)
 val get_transitions_of_state:
-  Promelaast.state -> ('c,'a) Promelaast.graph -> ('c,'a) Promelaast.trans list
+  Automaton_ast.state -> ('c,'a) Automaton_ast.graph -> ('c,'a) Automaton_ast.trans list
 
 (** return the initial states of the graph. *)
-val get_init_states: ('c, 'a) Promelaast.graph -> Promelaast.state list
+val get_init_states: ('c, 'a) Automaton_ast.graph -> Automaton_ast.state list
 
 (** [true] iff there's at most one path between the two states in the graph. *)
 val at_most_one_path:
-  ('c, 'a) Promelaast.graph -> Promelaast.state -> Promelaast.state -> bool
+  ('c, 'a) Automaton_ast.graph -> Automaton_ast.state -> Automaton_ast.state -> bool

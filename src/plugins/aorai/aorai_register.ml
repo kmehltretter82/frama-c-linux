@@ -84,7 +84,7 @@ let output () =
   (* Dot file *)
   if (Aorai_option.Dot.get()) then
     begin
-      Promelaoutput.Typed.output_dot_automata (Data_for_aorai.getAutomata ())
+      Pretty_automaton.Typed.output_dot_automata (Data_for_aorai.getAutomata ())
         (!dot_file:>string);
       printverb "Generating dot file    : done\n"
     end

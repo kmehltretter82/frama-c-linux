@@ -26,7 +26,7 @@
 open Cil_types
 open Logic_ptree
 open Aorai_option
-open Promelaast
+open Automaton_ast
 open Bool3
 open Format
 

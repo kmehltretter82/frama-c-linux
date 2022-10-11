@@ -28,7 +28,7 @@
 
 open Dataflow2
 open Data_for_aorai
-open Promelaast
+open Automaton_ast
 open Cil_types
 
 let forward_dkey = Aorai_option.register_category "dataflow:forward"
@@ -267,7 +267,7 @@ let make_start_transition ?(is_main=false) kf init_states =
     if is_main then
       Aorai_utils.isCrossableAtInit
     else
-      (fun trans kf -> Aorai_utils.isCrossable trans kf Promelaast.Call)
+      (fun trans kf -> Aorai_utils.isCrossable trans kf Automaton_ast.Call)
   in
   let treat_one_state state acc =
     if Data_for_aorai.isObservableFunction kf then begin
@@ -316,7 +316,7 @@ let make_return_transition kf state =
       let my_trans = Path_analysis.get_transitions_of_state state auto in
       let last = Data_for_aorai.Aorai_state.Set.singleton state in
       let treat_one_trans acc trans =
-        if Aorai_utils.isCrossable trans kf Promelaast.Return then begin
+        if Aorai_utils.isCrossable trans kf Automaton_ast.Return then begin
           let my_bindings = actions_to_range trans.actions in
           let new_bindings =
             compose_actions bindings (last, last, my_bindings)
@@ -651,7 +651,7 @@ let compute_forward () =
   let start =
     List.fold_left
       (fun acc s ->
-         match s.Promelaast.init with
+         match s.Automaton_ast.init with
          | Bool3.True -> Data_for_aorai.Aorai_state.Set.add s acc
          | _ -> acc)
       Data_for_aorai.Aorai_state.Set.empty
@@ -862,7 +862,7 @@ let filter_return_states kf states =
           Data_for_aorai.Aorai_state.Map.find start_state states
         in
         let crossable tr =
-          Aorai_utils.isCrossable tr kf Promelaast.Return &&
+          Aorai_utils.isCrossable tr kf Automaton_ast.Return &&
           Data_for_aorai.Aorai_state.Map.mem tr.stop return_states
         in
         List.exists crossable trans

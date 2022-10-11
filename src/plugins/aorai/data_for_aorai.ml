@@ -26,7 +26,7 @@
 open Logic_ptree
 open Cil
 open Cil_types
-open Promelaast
+open Automaton_ast
 open Logic_simplification
 
 exception Empty_automaton
@@ -36,7 +36,7 @@ let typing_dkey = Aorai_option.register_category "type-automaton"
 module Aorai_state =
   Datatype.Make_with_collections(
   struct
-    type t = Promelaast.state
+    type t = Automaton_ast.state
     let structural_descr = Structural_descr.t_abstract
     let reprs = [ { nums = -1; name = ""; multi_state = None;
                     acceptation = Bool3.False; init = Bool3.False
@@ -56,7 +56,7 @@ module Aorai_typed_trans =
   Datatype.Make_with_collections(
   struct
     let name = "Aorai_typed_trans"
-    type t = Promelaast.typed_trans
+    type t = Automaton_ast.typed_trans
     let structural_descr = Structural_descr.t_abstract
     let reprs = [ { numt = -1; start = List.hd (Aorai_state.reprs);
                     stop = List.hd (Aorai_state.reprs);
@@ -66,7 +66,7 @@ module Aorai_typed_trans =
     let rehash = Datatype.identity
     let compare x y = Datatype.Int.compare x.numt y.numt
     let copy = Datatype.identity
-    let pretty = Promelaoutput.Typed.print_transition
+    let pretty = Pretty_automaton.Typed.print_transition
     let mem_project = Datatype.never_any_project
   end)
 
@@ -75,7 +75,7 @@ module Aorai_automaton =
   struct
     include Datatype.Serializable_undefined
     let name = "Aorai_automaton"
-    type t = Promelaast.typed_automaton
+    type t = Automaton_ast.typed_automaton
     let structural_descr = Structural_descr.t_abstract
     let reprs = [ { states = Aorai_state.reprs;
                     trans = Aorai_typed_trans.reprs;
@@ -435,14 +435,14 @@ let print_eps f fmt = function
 let print_eps_trans fmt tr =
   Format.fprintf fmt "%s -> %s:@[%a%a@]"
     tr.start.name tr.stop.name
-    (print_eps Promelaoutput.Typed.print_condition) tr.cross
-    Promelaoutput.Typed.print_actionl tr.actions
+    (print_eps Pretty_automaton.Typed.print_condition) tr.cross
+    Pretty_automaton.Typed.print_actionl tr.actions
 
 type current_event =
   | ECall of
       kernel_function
       * Cil_types.logic_var Cil_datatype.Varinfo.Hashtbl.t
-      * (typed_condition eps,typed_action) Promelaast.trans
+      * (typed_condition eps,typed_action) Automaton_ast.trans
   | EReturn of kernel_function
   | ECOR of kernel_function
   | ENone (* None found yet *)
@@ -1041,7 +1041,7 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
       | _ -> new_intermediate_state ()
     in
     Aorai_option.debug ~dkey "Examining single elt:@\n%s -> %s:@[%a@]"
-      curr_start.name my_end.name Promelaoutput.Parsed.print_seq_elt elt;
+      curr_start.name my_end.name Pretty_automaton.Parsed.print_seq_elt elt;
     let guard_exit_loop env current counter =
       if is_opt then TTrue
       else
@@ -1327,7 +1327,7 @@ let type_trans auto metaenv env tr =
   Aorai_option.debug ~dkey
     "Analyzing transition %s -> %s: %a (needs pebble: %B)"
     tr.start.name tr.stop.name
-    Promelaoutput.Parsed.print_guard
+    Pretty_automaton.Parsed.print_guard
     tr.cross needs_pebble;
   match tr.cross with
   | Seq seq ->
@@ -1418,7 +1418,7 @@ let add_reject_trans auto intermediate_states =
     | _ ->
       Aorai_option.debug ~dkey:typing_dkey
         "Adding default transition %s -> %s: %a"
-        st.name reject_state.name Promelaoutput.Typed.print_condition cond;
+        st.name reject_state.name Pretty_automaton.Typed.print_condition cond;
       states, new_trans st reject_state cond [] :: trans
   in
   List.fold_left treat_one_state auto intermediate_states
@@ -1468,21 +1468,21 @@ let add_default_trans (states, transitions as auto) otherwise =
         (fun acc c ->
            let cond = c.cross in
            Aorai_option.debug ~dkey "considering trans %s -> %s: %a"
-             c.start.name c.stop.name Promelaoutput.Typed.print_condition cond;
+             c.start.name c.stop.name Pretty_automaton.Typed.print_condition cond;
            let neg = tnot cond in
            Aorai_option.debug ~dkey "negation: %a"
-             Promelaoutput.Typed.print_condition neg;
+             Pretty_automaton.Typed.print_condition neg;
            Aorai_option.debug ~dkey "acc: %a"
-             Promelaoutput.Typed.print_condition acc;
+             Pretty_automaton.Typed.print_condition acc;
            let res = tand acc (tnot cond) in
            Aorai_option.debug ~dkey "partial result: %a"
-             Promelaoutput.Typed.print_condition res;
+             Pretty_automaton.Typed.print_condition res;
            res)
         TTrue
         my_trans
     in
     Aorai_option.debug ~dkey "resulting transition: %a"
-      Promelaoutput.Typed.print_condition cond;
+      Pretty_automaton.Typed.print_condition cond;
     let cond,_ = Logic_simplification.simplifyCond cond in
     let new_trans = new_trans st tr.stop cond [] in
     new_trans::acc
@@ -1536,7 +1536,7 @@ let type_cond_auto auto =
   in
   let auto = { original_auto with states ; trans } in
   if Aorai_option.is_debug_key_enabled typing_dkey then
-    Promelaoutput.Typed.output_dot_automata auto "aorai_debug_typed.dot";
+    Pretty_automaton.Typed.output_dot_automata auto "aorai_debug_typed.dot";
   let (_,trans) =
     List.fold_left
       (fun (i,l as acc) t ->
@@ -1621,7 +1621,7 @@ let setAutomata auto =
   check_states "typed automaton";
   check_observables auto;
   if Aorai_option.is_debug_key_enabled typing_dkey then
-    Promelaoutput.Typed.output_dot_automata auto "aorai_debug_reduced.dot";
+    Pretty_automaton.Typed.output_dot_automata auto "aorai_debug_reduced.dot";
   if (Array.length !cond_of_parametrizedTransitions) <
      (getNumberOfTransitions  ())
   then
@@ -1950,18 +1950,18 @@ let pretty_end_state start fmt tbl =
     (fun stop (fst,last, actions) ->
        Format.fprintf fmt
          "Possible path from %s to %s@\n  Initial trans:@\n"
-         start.Promelaast.name stop.Promelaast.name;
+         start.Automaton_ast.name stop.Automaton_ast.name;
        Aorai_state.Set.iter
          (fun state ->
             Format.fprintf fmt "    %s -> %s@\n"
-              start.Promelaast.name
-              state.Promelaast.name)
+              start.Automaton_ast.name
+              state.Automaton_ast.name)
          fst;
        Format.fprintf fmt "  Final trans:@\n";
        Aorai_state.Set.iter
          (fun state ->
             Format.fprintf fmt "    %s -> %s@\n"
-              state.Promelaast.name stop.Promelaast.name)
+              state.Automaton_ast.name stop.Automaton_ast.name)
          last;
        Format.fprintf fmt "  Related actions:@\n";
        Cil_datatype.Term.Map.iter
@@ -2178,7 +2178,7 @@ let removeUnusedTransitionsAndStates () =
   (* Step 2 : computation of translation tables *)
   let state_list =
     List.sort
-      (fun x y -> Datatype.String.compare x.Promelaast.name y.Promelaast.name)
+      (fun x y -> Datatype.String.compare x.Automaton_ast.name y.Automaton_ast.name)
       (Aorai_state.Set.elements reached_states)
   in
   let (_, translate_table) =
@@ -2301,7 +2301,7 @@ let func_to_cenum func =
 let op_status_to_cenum status =
   try
     let ei = Hashtbl.find used_enuminfo listStatus in
-    let name = if status = Promelaast.Call then callStatus else termStatus in
+    let name = if status = Automaton_ast.Call then callStatus else termStatus in
     let rec search = function
       | {einame=n} as ei ::_ when n=name -> CEnum ei
       | _::l -> search l

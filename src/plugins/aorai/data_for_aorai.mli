@@ -24,7 +24,7 @@
 (**************************************************************************)
 
 open Cil_types
-open Promelaast
+open Automaton_ast
 
 (** Module of data management used in all the plugin Aorai. Operations
     are mainly accessors for data. The use of this module is mainly done
@@ -40,10 +40,10 @@ exception Empty_automaton
 
 (** Here are some operations used for generation of LTL AST or Promela AST. *)
 
-module Aorai_state: Datatype.S_with_collections with type t = Promelaast.state
+module Aorai_state: Datatype.S_with_collections with type t = Automaton_ast.state
 
 module Aorai_typed_trans:
-  Datatype.S_with_collections with type t = Promelaast.typed_trans
+  Datatype.S_with_collections with type t = Automaton_ast.typed_trans
 
 (** Initializes some tables according to data from Cil AST. *)
 val setCData : unit -> unit
@@ -204,7 +204,7 @@ val new_state: string -> state
 val new_trans: state -> state -> 'c -> 'a list -> ('c,'a) trans
 
 (** Return the buchi automata as stored after parsing *)
-val getAutomata : unit -> Promelaast.typed_automaton
+val getAutomata : unit -> Automaton_ast.typed_automaton
 
 (** Return only the graph part of the automata *)
 val getGraph : unit -> state list * typed_trans list
@@ -212,7 +212,7 @@ val getGraph : unit -> state list * typed_trans list
 (** Type-checks the parsed automaton and stores the result.
     This might introduce new global variables in case of sequences.
 *)
-val setAutomata: Promelaast.parsed_automaton -> unit
+val setAutomata: Automaton_ast.parsed_automaton -> unit
 
 (** return the number of transitions of the automata *)
 val getNumberOfTransitions : unit -> int
@@ -237,7 +237,7 @@ val isObservableFunction : Cil_types.kernel_function -> bool
 (** returns the state of given index.
     @since Nitrogen-20111001
 *)
-val getState: int -> Promelaast.state
+val getState: int -> Automaton_ast.state
 
 val getStateName : int -> string
 
@@ -254,7 +254,7 @@ val get_reject_state: unit -> state
 (** returns the transition having the corresponding id.
     @raise Not_found if this is not the case.
 *)
-val getTransition: int -> Promelaast.typed_trans
+val getTransition: int -> Automaton_ast.typed_trans
 
 (* ************************************************************************* *)
 (**{b Variables information} Usually it seems very useful to access to varinfo
@@ -293,7 +293,7 @@ val set_returninfo : string -> Cil_types.varinfo -> unit
 val get_returninfo : string -> Cil_types.varinfo
 
 (** Given the representation of an auxiliary counter
-    (found in a {!Promelaast.Counter_incr}), returns the maximal value
+    (found in a {!Automaton_ast.Counter_incr}), returns the maximal value
     that it can take according to the automaton.
 *)
 val find_max_value: Cil_types.term -> Cil_types.term option
@@ -425,7 +425,7 @@ val status_enum_type: unit -> Cil_types.typ
 val func_to_cenum : string -> Cil_types.constant
 
 (** Given the name of a C operation status (Call or Return), this function returns the associated cenum structure. *)
-val op_status_to_cenum : Promelaast.funcStatus -> Cil_types.constant
+val op_status_to_cenum : Automaton_ast.funcStatus -> Cil_types.constant
 
 
 (** Given the name of a function, it return the name of the associated element in the operation list. *)

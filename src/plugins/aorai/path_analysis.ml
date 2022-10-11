@@ -23,7 +23,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Promelaast
+open Automaton_ast
 
 let voisins (_,trans_l) st =
   List.fold_left
