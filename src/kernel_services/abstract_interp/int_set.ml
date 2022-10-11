@@ -211,7 +211,7 @@ let to_seq ?(increasing=true) =
           Seq.Cons (x, aux (i-1))
         else Seq.Nil
       in
-      aux (Array.length a -1)
+      aux (Array.length a - 1)
 
 (* ------------------------------- Set or top ------------------------------- *)
 
