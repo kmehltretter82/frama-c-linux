@@ -28,7 +28,12 @@
 
 .PHONY: server-doc-md server-doc-html server-doc
 
+ifeq (NO_BUILD_FRAMAC,yes)
+# Make sure that Frama-C is not rebuilt essentially for CI purpose
+server-doc-md:
+else
 server-doc-md: all
+endif
 	$(PRINT) 'Generating Markdown server documentation'
 	@rm -fr doc/server
 	@mkdir -p doc/server
