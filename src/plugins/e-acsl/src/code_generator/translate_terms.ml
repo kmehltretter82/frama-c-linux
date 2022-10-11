@@ -350,10 +350,10 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     let e1, adata, env = to_exp ~adata kf env t1 in
     let e2, adata, env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
-      let e, env = Gmp_gen.Z.binop ~loc (Some t) bop env kf e1 e2 in
+      let e, env = Gmp.Z.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Typed_number.C_number, ""
     else if Gmp_types.Q.is_t ty then
-      let e, env = Gmp_gen.Q.binop ~loc (Some t) bop env kf e1 e2 in
+      let e, env = Gmp.Q.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Typed_number.C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
@@ -420,7 +420,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
       e, adata, env, Typed_number.C_number, ""
     else if Gmp_types.Q.is_t ty then
       let e2, adata, env = t2_to_exp adata env in
-      let e, env = Gmp_gen.Q.binop ~loc (Some t) bop env kf e1 e2 in
+      let e, env = Gmp.Q.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Typed_number.C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);

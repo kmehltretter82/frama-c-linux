@@ -29,8 +29,8 @@ type strnum =
 
 let add_cast ~loc ?name env kf ctx strnum t_opt e =
   let e, env = match strnum with
-    | Str_Z -> Gmp_gen.Z.create ~loc ?name t_opt env kf e
-    | Str_R -> Gmp_gen.Q.create ~loc ?name t_opt env kf e
+    | Str_Z -> Gmp.Z.create ~loc ?name t_opt env kf e
+    | Str_R -> Gmp.Q.create ~loc ?name t_opt env kf e
     | C_number -> e, env
   in
   match ctx with
@@ -45,7 +45,7 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
     | false, true ->
       if Gmp_types.Q.is_t ty then
         (* R --> Z *)
-        Gmp_gen.Q.cast_to_z ~loc ?name env e
+        Gmp.Q.cast_to_z ~loc ?name env e
       else
         (* C integer --> Z *)
         let e =
@@ -58,20 +58,20 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
           else
             e
         in
-        Gmp_gen.Z.create ~loc ?name t_opt env kf e
+        Gmp.Z.create ~loc ?name t_opt env kf e
     | _, false ->
       if Gmp_types.Q.is_t ctx then
         if Gmp_types.Q.is_t (Cil.typeOf e) then (* R --> R *)
           e, env
         else (* C integer or Z --> R *)
-          Gmp_gen.Q.create ~loc ?name t_opt env kf e
+          Gmp.Q.create ~loc ?name t_opt env kf e
       else if Gmp_types.Z.is_t ty || strnum = Str_Z then
         (* Z --> C type or the integer is represented by a string:
            anyway, it fits into a C integer: convert it *)
-        Gmp_gen.Z.add_cast ~loc ?name env kf ctx e
+        Gmp.Z.add_cast ~loc ?name env kf ctx e
       else if Gmp_types.Q.is_t ty || strnum = Str_R then
         (* R --> C type or the real is represented by a string *)
-        Gmp_gen.Q.add_cast ~loc ?name env kf ctx e
+        Gmp.Q.add_cast ~loc ?name env kf ctx e
       else
         (* C type --> another C type *)
         Cil.mkCastT ~force:false ~oldt:ty ~newt:ctx e, env
