@@ -143,6 +143,19 @@ depopts: [
 ]
 
 post-messages: [
-  "Ivette finalization: run ivette once with a network connection"
-  "Why3 provers setup: rm -f ~/.why3.conf ; why3 config detect"
+  "* Frama-C/WP *"
+  "    This plug-in requires at least one external provers."
+  "    Recommended provers are:"
+  "     - Alt-Ergo (https://alt-ergo.ocamlpro.com)"
+  "     - CVC4     (https://cvc4.github.io)"
+  "     - Z3       (https://github.com/Z3Prover/z3)"
+  "    Use 'why3 config detect' to update prover installation."
+  "* Ivette (new Frama-C GUI) *"
+  "    To finalize installation, you shall"
+  "    run 'ivette' once with a network connection."
+  "    Once finalized, 'ivette' will work offline."
+  "    Node v16 and Yarn will be required."
+  "     - install NVM (https://github.com/nvm-sh/nvm)"
+  "     - run 'nvm use 16'"
+  "     - run 'npm install --global yarn'"
 ]
