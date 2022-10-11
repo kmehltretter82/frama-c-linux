@@ -144,10 +144,8 @@ eva-domains:
   <<: *eva_template
   <<: *eva_domains
   only:
-    refs:
-      - merge_requests
     variables:
-      - $CI_MERGE_REQUEST_LABELS =~ /.*,?Eva,?.*/
+      - $CI_COMMIT_BRANCH =~ /.*[-_/.][Ee]va[-_/.].*|^[Ee]va[-_/.].*|.*[-_/.][Ee]va$/
 
 eva-domains-nightly:
   <<: *eva_template
