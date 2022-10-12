@@ -1244,17 +1244,21 @@ let basic_command_string command =
     else "ulimit -t " ^ command.timeout ^ " && " ^ toplevel
   in raw_command
 
+let pp_plugin_name fmt s =
+  Format.fprintf fmt "frama-c-%s" s
+
+let pp_plugin_as_lib fmt s =
+  Format.fprintf fmt "%a.core" pp_plugin_name s
+
 let pp_list fmt l = List.iter (Format.fprintf fmt " %S") l
 module Fmt = struct
-  let framac_plugin fmt s =
-    Format.fprintf fmt "frama-c-%s.core" s
-  let plugin_as_package fmt s =
+  let pp_plugin_as_package fmt s =
     let base =
       if String.contains s '.' then
         String.sub s 0 (String.index s '.')
       else s
     in
-    Format.fprintf fmt "frama-c-%s" base
+    Format.fprintf fmt "%a" pp_plugin_name base
   let quote pr fmt s = Format.fprintf fmt "%S" (Format.asprintf "%a" pr s)
   let list pr fmt l = List.iter (fun s -> Format.fprintf fmt " %a" pr s) l
   let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a}" pr s
@@ -1287,14 +1291,14 @@ let update_enabled_if ~enabled_if deps =
   (* code similar to pp_enabled_if_content *)
   Option.iter (fun cond -> enabled_if := StringSet.add cond !enabled_if) deps.enabled_if;
   List.iter (fun lib ->
-      let cond = Format.asprintf "%a" Fmt.(var_libavailable framac_plugin) lib in
+      let cond = Format.asprintf "%a" Fmt.(var_libavailable pp_plugin_as_lib) lib in
       enabled_if := StringSet.add cond !enabled_if)
     (list_of_deps deps.load_plugin)
 
 let pp_enabled_if_content fmt deps =
   Format.fprintf fmt "(and %s%a)"
     (Option.value ~default:"true" deps.enabled_if)
-    Fmt.(list (var_libavailable framac_plugin)) (list_of_deps deps.load_plugin)
+    Fmt.(list (var_libavailable pp_plugin_as_lib)) (list_of_deps deps.load_plugin)
 
 let pp_enabled_if fmt deps =
   Format.fprintf fmt "%s(enabled_if %a)"
@@ -1308,7 +1312,7 @@ let pp_command_deps fmt command =
     (* from DEPS: LIBS: and MODULE: directives *)
     pp_list_deps (list_of_deps command.deps.deps_cmd)
     (* from PLUGIN directives *)
-    Fmt.(list (package_as_deps (quote plugin_as_package))) (list_of_deps command.deps.load_plugin)
+    Fmt.(list (package_as_deps (quote pp_plugin_as_package))) (list_of_deps command.deps.load_plugin)
 
 let show_cmd =
   let regexp_read = Str.regexp "%{read:\\([^}]+\\)}" in
@@ -1670,7 +1674,7 @@ let update_modules ~file ~modules deps =
   let load_module = list_of_deps deps.load_module in
   if load_module <> [] then begin
     let plugin_libs = StringSet.union
-        (StringSet.of_list (List.map (Format.sprintf "frama-c-%s.core") (list_of_deps deps.load_plugin)))
+        (StringSet.of_list (List.map (Format.asprintf "%a" pp_plugin_as_lib) (list_of_deps deps.load_plugin)))
         (StringSet.of_list (List.map (fun s -> Filename.remove_extension_opt [".cmxs"; ".cma"; ".ml"]  (Filename.basename s))
                               (list_of_deps deps.load_libs)))
     in
