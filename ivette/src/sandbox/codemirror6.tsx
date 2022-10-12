@@ -3,6 +3,7 @@ import Dictionary from 'lodash';
 import { cpp } from '@codemirror/lang-cpp';
 import { Facet, StateField, StateEffect } from '@codemirror/state';
 import { EditorState, Extension, RangeSet } from '@codemirror/state';
+import { RangeSetBuilder } from '@codemirror/state';
 import { EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
 import { DOMEventHandlers, GutterMarker, gutter } from '@codemirror/view';
 import { Decoration, DecorationSet, drawSelection } from '@codemirror/view';
@@ -16,6 +17,7 @@ import * as States from 'frama-c/states';
 import type { key } from 'dome/data/json';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { text } from 'frama-c/kernel/api/data';
+import { CompactModel } from 'dome/table/arrays';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Properties from 'frama-c/kernel/api/properties';
 import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
@@ -204,6 +206,12 @@ async function extractCodeData(fct?: string): Promise<CodeData> {
 //  Plugin decorating hovered and selected elements
 // -----------------------------------------------------------------------------
 
+type UpdateSelection = (a: States.SelectionActions) => void;
+const UpdateSelectionFacet = stateFacet<UpdateSelection>(() => { return; });
+
+type UpdateHovered = (h: States.Hovered) => void;
+const UpdateHoveredFacet = stateFacet<UpdateHovered>(() => { return ; });
+
 // The different kind of decorations used in this plugin.
 const hoveredClass = Decoration.mark({ class: 'cm-hovered-code' });
 const selectedClass = Decoration.mark({ class: 'cm-selected-code' });
@@ -244,14 +252,14 @@ const CodeDecorationPlugin: Plugin<CodeDecorationState> = {
   update: (state, update) => {
     if (!update.selectionSet) return state;
     const { fct, tree } = update.state.facet(CodeDataFacet);
+    const updateSelection = update.state.facet(UpdateSelectionFacet);
     const selected = [];
-    const meta = update.state.selection.ranges.length > 1;
     for (const selection of update.state.selection.ranges) {
       const covering = coveringNode(tree, selection.from);
       if (!covering || !covering.id) continue;
       selected.push(covering);
       const marker = Ast.jMarker(covering.id);
-      States.setSelection({ fct: fct, marker }, meta);
+      updateSelection({ location: { fct: fct, marker } });
     }
     return computeDecorations({ ...state, selected });
   },
@@ -262,12 +270,13 @@ const CodeDecorationPlugin: Plugin<CodeDecorationState> = {
   eventHandlers: {
     mousemove: (state, event, view) => {
       const { fct, tree } = view.state.facet(CodeDataFacet);
+      const updateHovered = view.state.facet(UpdateHoveredFacet);
       const coords = { x: event.clientX, y: event.clientY };
       const position = view.posAtCoords(coords); if (!position) return state;
       const hovered = coveringNode(tree, position);
       if (!hovered || !hovered.id) return state;
       const marker = Ast.jMarker(hovered.id);
-      States.setHovered(marker ? { fct, marker } : undefined);
+      updateHovered(marker ? { fct, marker } : undefined);
       return computeDecorations({ ...state, hovered });
     }
   }
@@ -377,15 +386,15 @@ function getBulletColor(status: States.Tag): string {
 const PropertiesFacet = stateFacet<Properties.statusData[]>([]);
 const StatusDictFacet = stateFacet<Map<string, States.Tag>>(new Map());
 
-type RangesGutterMarkers = [Range, GutterMarker][];
+type RangesGutterMarkers = RangeSet<GutterMarker>;
 
 function computeRangesGuttersMarkers(state: EditorState): RangesGutterMarkers {
   const { ranges } = state.facet(CodeDataFacet);
   const statusDict = state.facet(StatusDictFacet);
   const properties = state.facet(PropertiesFacet);
-  const rangesGutterMarkers: RangesGutterMarkers = [];
+  const rangesGutterMarkers = [];
   for (const data of properties) {
-    const marker = ranges.get(data.key); if (!marker) continue;
+    const range  = ranges.get(data.key); if (!range) continue;
     const status = statusDict.get(data.status);
     const bullet = document.createElement('div');
     bullet.innerHTML = '◉'
@@ -395,9 +404,9 @@ function computeRangesGuttersMarkers(state: EditorState): RangesGutterMarkers {
       if (status.descr) bullet.title = status.descr;
     }
     const tag = new class extends GutterMarker { toDOM() { return bullet; } };
-    rangesGutterMarkers.push([marker, tag]);
+    rangesGutterMarkers.push({ from: range.from, to: range.to, value: tag });
   }
-  return rangesGutterMarkers;
+  return RangeSet.of(rangesGutterMarkers, true);
 }
 
 const RangesGutterMarkers = StateField.define<RangesGutterMarkers>({
@@ -412,10 +421,15 @@ const PropertiesExtension: Extension = gutter({
   class: 'cm-bullet',
   markers: (view) => {
     const ranges = view.state.field(RangesGutterMarkers);
-    const res = RangeSet.of(ranges.map(([r, bullet]) => {
-      return bullet.range(view.lineBlockAt(r.from).from);
-    }), true);
-    return res;
+    const builder: RangeSetBuilder<GutterMarker> = new RangeSetBuilder();
+    console.log('Coucou');
+    view.visibleRanges.forEach(({ from, to }) => {
+      ranges.between(from, to, (from, _, bullet) => {
+        const range = bullet.range(view.lineBlockAt(from).from);
+        builder.add(range.from, range.to, range.value);
+      });
+    });
+    return builder.finish();
   },
 });
 
@@ -491,12 +505,10 @@ async function functionCallers(functionName: string): Promise<Caller[]> {
 //  Context menu plugin
 // -----------------------------------------------------------------------------
 
-type UpdateSelection = (a: States.SelectionActions) => void;
-type GetMarkerInfoData = (key: string) => Ast.markerInfoData | undefined;
+type MarkersInfos = CompactModel<string, Ast.markerInfoData> | undefined;
 
 const CallersFacet = stateFacet<Caller[]>([]);
-const UpdateSelectionFacet = stateFacet<UpdateSelection>(() => { return; });
-const GetMarkerInfoDataFacet = stateFacet<GetMarkerInfoData>(() => undefined);
+const MarkersInfoFacet = stateFacet<MarkersInfos>(undefined);
 
 const ContextMenuPlugin: Plugin<void> = {
   create: () => { return; },
@@ -505,14 +517,14 @@ const ContextMenuPlugin: Plugin<void> = {
       const { tree } = view.state.facet(CodeDataFacet);
       const locations = view.state.facet(CallersFacet);
       const updateSelection = view.state.facet(UpdateSelectionFacet);
-      const getMarkerInfoData = view.state.facet(GetMarkerInfoDataFacet);
+      const markersInfo = view.state.facet(MarkersInfoFacet);
+      if (!markersInfo) return;
       const coords = { x: event.clientX, y: event.clientY };
       const position = view.posAtCoords(coords); if (!position) return;
       const node = coveringNode(tree, position);
       if (!node || !node.id) return;
       const items: Dome.PopupMenuItem[] = [];
-      console.log(getMarkerInfoData);
-      const info = getMarkerInfoData(node.id);
+      const info = markersInfo.getData(node.id);
       if (info?.var === 'function') {
         if (info.kind === 'declaration') {
           const callers = Dictionary.groupBy(locations, e => e.fct);
@@ -573,11 +585,14 @@ const HighlightPlugin = syntaxHighlighting(HighlightStyle.define([
 function Editor(): JSX.Element {
 
   // State infos used to decide which function to print.
-  const printed = React.useRef<string | undefined>();
+  // const printed = React.useRef<string | undefined>();
   const [selection, updateSelection] = States.useSelection();
-  const fct = selection?.current?.fct;
+  const [_, updateHovered] = States.useHovered();
+  // const fct = selection?.current?.fct;
 
-  // Sync arrays for properties and context menus.
+  // Sync arrays for properties and context menus. As they do not change once
+  // the analysis is completed, we only have to update the corresponding facets
+  // during the initialization.
   const properties = States.useSyncArray(Properties.status).getArray();
   const statusDict = States.useTags(Properties.propStatusTags);
   const markersInfo = States.useSyncArray(Ast.markerInfo);
@@ -585,27 +600,26 @@ function Editor(): JSX.Element {
   // Necessary extensions for our needs.
   const [baseExtensions] = React.useState<Extension[]>(() => {
     return [
-      drawSelection(),
-      EditorState.allowMultipleSelections.of(true),
-      HighlightPlugin,
-      cpp(),
+      // drawSelection(),
+      // EditorState.allowMultipleSelections.of(true),
+      HighlightPlugin, cpp(),
 
-      CodeDataFacet.of(emptyCodeData),
-      buildExtension(CodeDecorationPlugin),
+      // CodeDataFacet.of(emptyCodeData),
+      // UpdateHoveredFacet.of(updateHovered),
+      // buildExtension(CodeDecorationPlugin),
 
-      DeadCodeFacet.of(noDeadCode),
-      DeadCodeRanges.extension,
-      buildExtension(DeadCodePlugin),
+      // DeadCodeFacet.of(noDeadCode),
+      // DeadCodeRanges.extension,
+      // buildExtension(DeadCodePlugin),
 
-      PropertiesFacet.of([]),
-      StatusDictFacet.of(new Map()),
-      RangesGutterMarkers.extension,
-      gutterTheme, PropertiesExtension,
+      PropertiesFacet.of(properties),
+      StatusDictFacet.of(statusDict),
+      // RangesGutterMarkers.extension,
+      // gutterTheme, PropertiesExtension,
 
-      CallersFacet.of([]),
-      UpdateSelectionFacet.of(updateSelection),
-      GetMarkerInfoDataFacet.of(markersInfo.getData),
-      buildExtension(ContextMenuPlugin),
+      // CallersFacet.of([]),
+      MarkersInfoFacet.of(markersInfo),
+      // buildExtension(ContextMenuPlugin),
     ];
   });
 
@@ -618,32 +632,61 @@ function Editor(): JSX.Element {
     editor.current = new EditorView({ state, parent: parent.current });
   }, [parent, baseExtensions]);
 
+  const selectionCallback = React.useCallback(async () => {
+    const fct = selection?.current?.fct; if (!fct) return;
+    const view = editor.current; if (!view) return;
+    const data = await extractCodeData(fct);
+    const changes = { from: 0, to: view.state.doc.length, insert: data.code };
+    view.dispatch({ changes, selection: { anchor: 0 } });
+  }, [editor, selection]);
+
+  React.useEffect(() => { selectionCallback(); }, [selectionCallback]);
+
+  // Updating CodeMirror when the <updateSelection> callback is changed.
+  React.useEffect(() => {
+    console.log('updateSelection');
+    const updateSelectionFacet = UpdateSelectionFacet.of(updateSelection);
+    const effects = StateEffect.appendConfig.of(updateSelectionFacet);
+    editor.current?.dispatch({ effects });
+  }, [editor, updateSelection]);
+
+  // Updating CodeMirror when the <updateHovered> callback is changed.
+  React.useEffect(() => {
+    console.log('updateHovered');
+    const updateHoveredFacet = UpdateHoveredFacet.of(updateHovered);
+    const effects = StateEffect.appendConfig.of(updateHoveredFacet);
+    editor.current?.dispatch({ effects });
+  }, [editor, updateHovered]);
+
+  /*
   // Callback function called when the focused function changes.
   const focusCallback = React.useCallback(async () => {
     const view = editor.current; if (!view) return;
     const data = await extractCodeData(fct);
-    const deadCode = await Server.send(Eva.getDeadCode, fct);
-    const locations = await functionCallers(fct ?? '');
-    const code = CodeDataFacet.of(data);
-    const dead = DeadCodeFacet.of(deadCode);
-    const propertiesFacet = PropertiesFacet.of(properties);
-    const statusDictFacet = StatusDictFacet.of(statusDict);
-    const callersFacet = CallersFacet.of(locations);
-    const getMarkerInfoData = GetMarkerInfoDataFacet.of(markersInfo.getData);
+    // const deadCode = await Server.send(Eva.getDeadCode, fct);
+    // const locations = await functionCallers(fct ?? '');
+    // const code = CodeDataFacet.of(data);
+    // const dead = DeadCodeFacet.of(deadCode);
+    // const propertiesFacet = PropertiesFacet.of(properties);
+    // const statusDictFacet = StatusDictFacet.of(statusDict);
+    // const callersFacet = CallersFacet.of(locations);
+    // const markersInfoFacet = MarkersInfoFacet.of(markersInfo);
+    // const updateSelectionFacet = UpdateSelectionFacet.of(updateSelection);
     printed.current = fct;
     view.dispatch({
       changes: { from: 0, to: view.state.doc.length, insert: data.code },
       selection: { anchor: 0 },
-      effects: [
-        StateEffect.appendConfig.of(code),
-        StateEffect.appendConfig.of(dead),
-        StateEffect.appendConfig.of(propertiesFacet),
-        StateEffect.appendConfig.of(statusDictFacet),
-        StateEffect.appendConfig.of(callersFacet),
-        StateEffect.appendConfig.of(getMarkerInfoData),
-      ]
+      // effects: [
+        // StateEffect.appendConfig.of(code),
+        // StateEffect.appendConfig.of(dead),
+        // StateEffect.appendConfig.of(propertiesFacet),
+        // StateEffect.appendConfig.of(statusDictFacet),
+        // StateEffect.appendConfig.of(callersFacet),
+        // StateEffect.appendConfig.of(markersInfoFacet),
+        // StateEffect.appendConfig.of(updateSelectionFacet),
+      // ]
     });
-  }, [editor, fct, properties, statusDict]);
+  }, [editor, fct, properties, statusDict, markersInfo, updateSelection]);
 
   // Update the component when the focused function changes.
   React.useEffect(() => {
@@ -651,6 +694,7 @@ function Editor(): JSX.Element {
     Server.onSignal(Ast.changed, focusCallback);
     return () => { Server.offSignal(Ast.changed, focusCallback); };
   });
+  */
 
   return <div className='cm-global-box' ref={parent} />;
 }
