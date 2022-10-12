@@ -21,44 +21,17 @@
 (**************************************************************************)
 
 (* ************************************************************************** *)
-(** {2 Generic code} *)
-(* ************************************************************************** *)
-
-let warn_rte warn exn =
-  if warn then
-    Options.warning "@[@[cannot run RTE:@ %s.@]@ \
-                     Ignoring potential runtime errors in annotations."
-      (Printexc.to_string exn)
-
-(* ************************************************************************** *)
 (** {2 Exported code} *)
 (* ************************************************************************** *)
 
-open Cil_datatype
+let stmt ?warn:_ kf stmt =
+  RteGen.Visit.get_annotations_stmt kf stmt
 
-let stmt ?(warn=true) =
-  try
-    Dynamic.get
-      ~plugin:"RteGen"
-      "stmt_annotations"
-      (Datatype.func2 Kernel_function.ty Stmt.ty
-         (let module L = Datatype.List(Code_annotation) in L.ty))
-  with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
-    ->
-    warn_rte warn exn;
-    fun _ _ -> []
+let exp ?warn:_ kf stmt e =
+  RteGen.Visit.get_annotations_exp kf stmt e
 
-let exp ?(warn=true) =
-  try
-    Dynamic.get
-      ~plugin:"RteGen"
-      "exp_annotations"
-      (Datatype.func3 Kernel_function.ty Stmt.ty Exp.ty
-         (let module L = Datatype.List(Code_annotation) in L.ty))
-  with Failure _ | Dynamic.Unbound_value _ | Dynamic.Incompatible_type _ as exn
-    ->
-    warn_rte warn exn;
-    fun _ _ _ -> []
+let get_state_selection_with_dependencies () =
+  State_selection.with_dependencies RteGen.Api.self
 
 (*
 Local Variables:
