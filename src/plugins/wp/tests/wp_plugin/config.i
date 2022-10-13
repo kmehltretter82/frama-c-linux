@@ -3,6 +3,6 @@
 */
 
 /* run.config_qualif
-   CMD: %{dep:@PTEST_DIR@/config.sh}
+   CMD: ./%{dep:config.sh}
    OPT:
 */
