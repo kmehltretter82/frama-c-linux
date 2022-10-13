@@ -146,6 +146,8 @@ module Location_Bytes : sig
       one offset cannot be enumerated. *)
 
   val to_seq_i : t -> (Base.t * Ival.t) Seq.t
+  (** Builds a sequence of all bases (with their offsets) of the location.
+      @raise Error_Top in the cases [Top _]. *)
 
   val cached_fold:
     cache_name:string ->

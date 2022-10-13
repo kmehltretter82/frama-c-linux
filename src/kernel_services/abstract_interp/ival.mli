@@ -216,9 +216,10 @@ val fold_int_bounds: (t -> 'a -> 'a) -> t -> 'a -> 'a
     in the corresponding direction(s). *)
 
 val to_int_seq: t -> Integer.t Seq.t
-(** Builds a sequence of integer values of the ival in increasing order. The
-    Raise {!Abstract_interp.Error_Top} if the argument is a float or a
-    potentially infinite integer. *)
+(** Builds a sequence of integer values of the ival in increasing order.
+    The resulting sequence might be infinite.
+    @raise {!Abstract_interp.Error_Top} if the argument is a floating-point
+    interval or an infinite integer interval. *)
 
 (** Subdivisions into two intervals *)
 val subdivide: size:Integer.t -> t -> t * t
