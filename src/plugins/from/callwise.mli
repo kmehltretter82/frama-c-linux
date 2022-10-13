@@ -22,7 +22,8 @@
 
 (** Computation of callwise functional dependencies. The results are computed
     while the value analysis runs, and the results are usually much more
-    precise than the functionwise results.
+    precise than the functionwise results. *)
 
-    Nothing is exported here, the API can be found in the
-    Db.From.Callwise module *)
+val compute_all_calldeps : unit -> unit
+val iter : (Cil_types.kinstr -> Function_Froms.froms -> unit) -> unit
+val find : Cil_types.kinstr -> Function_Froms.froms

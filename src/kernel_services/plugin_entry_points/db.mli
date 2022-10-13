@@ -513,20 +513,6 @@ module From : sig
   *)
   exception Not_lval
 
-  val compute_all : (unit -> unit) ref
-  val compute_all_calldeps : (unit -> unit) ref
-
-  val compute : (kernel_function -> unit) ref
-
-  val is_computed: (kernel_function -> bool) ref
-  (** Check whether the from analysis has been performed for the given
-      function.
-      @return true iff the analysis has been performed *)
-
-  val get : (kernel_function -> Function_Froms.t) ref
-  val access : (Locations.Zone.t -> Function_Froms.Memory.t
-                -> Locations.Zone.t) ref
-
   val find_deps_no_transitivity : (stmt -> exp -> Locations.Zone.t) ref
 
   val find_deps_no_transitivity_state :
@@ -536,29 +522,10 @@ module From : sig
   val find_deps_term_no_transitivity_state :
     (Cvalue.Model.t -> term -> Value_types.logic_dependencies) ref
 
-  val self: State.t ref
-
-  (** {3 Pretty printing} *)
-
-  val pretty : (Format.formatter -> kernel_function -> unit) ref
-  val display : (Format.formatter -> unit) ref
-
-  (** {3 Callback} *)
-
-  module Record_From_Callbacks:
-    Hook.Iter_hook with type param =
-                          Kernel_function.t Stack.t *
-                          Function_Froms.Memory.t Stmt.Hashtbl.t *
-                          (Kernel_function.t * Function_Froms.Memory.t) list
-                            Stmt.Hashtbl.t
-
-  (** {3 Access to callwise-stored data} *)
-
-  module Callwise : sig
-    val iter : ((kinstr -> Function_Froms.t -> unit) -> unit) ref
-    val find : (kinstr -> Function_Froms.t) ref
-  end
 end
+[@@alert db_deprecated
+    "Db.From is deprecated and will be removed in a future version \
+     of Frama-C. Please use the From module or the Eva API instead."]
 
 (* ************************************************************************* *)
 (** {2 Properties} *)

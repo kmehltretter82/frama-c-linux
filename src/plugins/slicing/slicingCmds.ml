@@ -86,10 +86,10 @@ struct
     in
     let call_process lv f args _loc =
       (* returns  [Zone.t read] by [lv, f, args], [Zone.t written] by [lv] *)
-      let read_zone = !Db.From.find_deps_no_transitivity stmt f in
+      let read_zone = Eva.Results.(before stmt |> expr_deps f) in
       let add_args arg inputs =
-        Locations.Zone.join inputs
-          (!Db.From.find_deps_no_transitivity stmt arg) in
+        Locations.Zone.join inputs Eva.Results.(before stmt |> expr_deps arg)
+      in
       let read_zone = List.fold_right add_args args read_zone in
       let read_zone,write_zone =
         match lv with
@@ -101,16 +101,16 @@ struct
     | Switch (exp,_,_,_)
     | If (exp,_,_,_) ->
       (* returns  [Zone.t read] by condition [exp], [Zone.bottom] *)
-      !Db.From.find_deps_no_transitivity stmt exp, Locations.Zone.bottom
+      Eva.Results.(before stmt |> expr_deps exp), Locations.Zone.bottom
     | Instr (Set (lv,exp,_)) ->
       (* returns  [Zone.t read] by [exp, lv], [Zone.t written] by [lv] *)
-      let read_zone = !Db.From.find_deps_no_transitivity stmt exp in
+      let read_zone = Eva.Results.(before stmt |> expr_deps exp) in
       lval_process read_zone stmt lv
     | Instr (Local_init (v, AssignInit i, _)) ->
       let rec collect zone i =
         match i with
         | SingleInit e ->
-          Locations.Zone.join zone (!Db.From.find_deps_no_transitivity stmt e)
+          Locations.Zone.join zone Eva.Results.(before stmt |> expr_deps e)
         | CompoundInit (_,l) ->
           List.fold_left
             (fun acc (_,i) -> collect acc i) zone l

@@ -20,5 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Registration of the From plugin in Frama-C main loop.
-    Nothing is exported in this module *)
+(** Registration of the From plugin in Frama-C main loop. *)
+
+val display : Format.formatter option -> unit

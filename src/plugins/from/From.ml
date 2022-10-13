@@ -20,14 +20,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Computation of functional dependencies. In this module, the results are
-    computed from the synthetic results of the value analysis. *)
+let self = Functionwise.self
+let compute = Functionwise.compute
+let compute_all = Functionwise.compute_all
+let is_computed = Functionwise.is_computed
+let get = Functionwise.get
+let pretty = Functionwise.pretty
 
-open Cil_types
+let access zone mem = Function_Froms.Memory.find mem zone
 
-val self : State.t
-val compute : kernel_function -> unit
-val compute_all : unit -> unit
-val is_computed : kernel_function -> bool
-val get : Cil_types.kernel_function -> Function_Froms.froms
-val pretty : Format.formatter -> kernel_function -> unit
+let display fmt = From_register.display (Some fmt)
+
+let compute_all_calldeps = Callwise.compute_all_calldeps
+module Callwise = struct
+  let iter = Callwise.iter
+  let find = Callwise.find
+end

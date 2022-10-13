@@ -183,22 +183,17 @@ let () =
   Eva.Cvalue_callbacks.register_call_hook call_for_individual_froms;
   Eva.Cvalue_callbacks.register_call_results_hook record_for_individual_froms
 
+let iter = Tbl.iter
+let find = Tbl.find
 
-let force_compute_all_calldeps ()=
-  if Eva.Analysis.is_computed () then
-    Project.clear
-      ~selection:(State_selection.with_dependencies Eva.Analysis.self)
-      ();
-  Eva.Analysis.compute ()
-
-(* Registration for call-wise from *)
-let () =
-  Db.register_guarded_compute
-    Tbl.is_computed
-    Db.From.compute_all_calldeps
-    force_compute_all_calldeps;
-  Db.From.Callwise.iter := Tbl.iter;
-  Db.From.Callwise.find := Tbl.find
+let compute_all_calldeps () =
+  if not (Tbl.is_computed ()) then begin
+    if Eva.Analysis.is_computed () then
+      Project.clear
+        ~selection:(State_selection.with_dependencies Eva.Analysis.self)
+        ();
+    Eva.Analysis.compute ()
+  end
 
 (*
 Local Variables:

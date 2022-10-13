@@ -40,7 +40,7 @@ module Data = struct
   let diff = Locations.Zone.diff (* over-approx *)
   let pretty fmt z = Format.fprintf fmt "@[<h 1>%a@]" Locations.Zone.pretty z
 
-  let exp_zone stmt exp = !Db.From.find_deps_no_transitivity stmt exp
+  let exp_zone stmt exp = Eva.Results.(before stmt |> expr_deps exp)
 end
 
 module Ctx = struct
@@ -160,12 +160,12 @@ let process_call data_after stmt lvaloption funcexp args _loc =
   in
   let used, data =
     try
-      let froms = !Db.From.Callwise.find (Kstmt stmt) in
+      let froms = From.Callwise.find (Kstmt stmt) in
       process_one_call data_after stmt lvaloption froms
     with Not_found -> (* don't have callwise (-calldeps option) *)
       let do_call acc kf =
         (* notice that we use the same old data for each possible call *)
-        (process_one_call data_after stmt lvaloption (!Db.From.get kf))::acc
+        (process_one_call data_after stmt lvaloption (From.get kf))::acc
       in
       let l = List.fold_left do_call [] called_functions in
       (* in l, we have one result for each possible function called *)
