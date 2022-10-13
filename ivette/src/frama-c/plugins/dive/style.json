@@ -9,7 +9,6 @@
       "text-outline-width": 2,
       "text-outline-color": "#666",
       "text-valign" : "center",
-      "width": "label",
       "padding" : "6px",
       "border-width": 1,
       "text-wrap" : "wrap"

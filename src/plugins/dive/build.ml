@@ -513,7 +513,10 @@ let build_node_reads context node =
   and build_args_deps callstack zone stmt args callee_kf =
     let callstack = Callstack.push (callee_kf,stmt) callstack in
     let formals = Kernel_function.get_formals callee_kf in
-    List.iter2 (build_arg_dep callstack stmt zone) args formals
+    (* For Frama_C_show_each and functions called through pointers, there may
+       be more arguments than formal parameters declared. *)
+    let used_args = Extlib.list_first_n (List.length formals) args in
+    List.iter2 (build_arg_dep callstack stmt zone) used_args formals
 
   and build_arg_dep callstack stmt zone arg formal =
     if exp_contains_read zone stmt arg then

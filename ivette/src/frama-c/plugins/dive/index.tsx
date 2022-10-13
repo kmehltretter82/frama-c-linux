@@ -124,6 +124,9 @@ class Dive {
     this.headless = this.cy.container() === null;
     this.cy.elements().remove();
 
+    this.cy.minZoom(1e-1);
+    this.cy.maxZoom(1.0);
+
     // Remove previous listeners
     this.cy.off('click');
     this.cy.off('double-click');
@@ -133,10 +136,18 @@ class Dive {
     this.cy.on('click', 'node', (event) => this.clickNode(event.target));
     this.cy.on('double-click', '$node > node', // compound nodes
       (event) => this.doubleClickNode(event.target));
-    (this.cy as CytoscapeExtended).panzoom({});
 
-    this.layout = 'cose-bilkent';
+    // Set zoom limits
+    const panzoomDefaults = {
+      minZoom: this.cy.minZoom(),
+      maxZoom: this.cy.maxZoom(),
+    };
+    (this.cy as CytoscapeExtended).panzoom(panzoomDefaults);
 
+    // Default layout
+    this.layout = 'dagre';
+
+    // Contextual menu
     if (!this.headless) {
       this.cy.scratch('cxtmenu')?.destroy?.(); // Remove previous menu
       this.cy.scratch('cxtmenu', (this.cy as CytoscapeExtended).cxtmenu({
@@ -144,6 +155,30 @@ class Dive {
         commands: (node: Cytoscape.NodeSingular) => this.onCxtMenu(node),
       }));
     }
+
+    // Node width hack
+    const padding = 10;
+    const min = 50;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    if (this.cy.style() && !this.headless) {
+      const canvas = document.querySelector('canvas[data-id="layer2-node"]');
+      if (canvas instanceof HTMLCanvasElement) {
+        const context = canvas.getContext('2d');
+        if (context) {
+          (this.cy.style() as any).selector('node').style('width',
+            (node: any) => {
+            const fStyle = node.pstyle('font-style').strValue;
+            const weight = node.pstyle('font-weight').strValue;
+            const size = node.pstyle('font-size').pfValue;
+            const family = node.pstyle('font-family').strValue;
+            context.font = `${fStyle} ${weight} ${size}px ${family}`;
+            const width = context.measureText(node.data('label')).width;
+            return `${Math.max(min, width + padding)}px`;
+          });
+        }
+      }
+    }
+    /* eslint-enable @typescript-eslint/no-explicit-any */
 
     this.refresh();
   }
@@ -212,23 +247,15 @@ class Dive {
     if (!container)
       return [];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ref = (node as any).popperRef();
     const common = {
+      getReferenceClientRect: ref.getBoundingClientRect,
       interactive: true,
-      multiple: true,
       animation: 'shift-away',
       duration: 500,
       trigger: 'manual',
       appendTo: document.body,
-      lazy: false,
-      // Cytoscape extensions are not typed yet
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onCreate: (instance: any) => {
-        const { popperInstance } = instance;
-        if (popperInstance) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          popperInstance.reference = (node as any).popperRef();
-        }
-      },
     };
 
     const tips = [];
@@ -238,8 +265,7 @@ class Dive {
         ...common,
         content: node.data().values,
         placement: 'top',
-        //distance: 10,
-        offset: [10, 10],
+        offset: [0, 20],
         arrow: true,
       }));
     }
@@ -249,8 +275,7 @@ class Dive {
         ...common,
         content: node.data().type,
         placement: 'bottom',
-        //distance: 20,
-        offset: [20, 20],
+        offset: [0, 20],
         theme: 'light-border',
         arrow: false,
       }));
@@ -261,19 +286,25 @@ class Dive {
 
   addTips(node: Cytoscape.NodeSingular): void {
     let timeout: NodeJS.Timeout;
-    let tips: Tippy.Instance[];
+    let tips: Tippy.Instance[] | null = null;
 
-    // Create tips lazily
     node.on('mouseover', () => {
-      if (tips === undefined)
+      if (tips === null) {
         tips = this.createTips(node);
+        tips.forEach((tip) => tip.props.onHidden = (() => tip.destroy()));
+      }
       clearTimeout(timeout);
-      timeout = setTimeout(() => tips?.forEach((tip) => { tip.show(); }), 200);
+      timeout = setTimeout(() => tips?.forEach((tip) => {
+        tip.show();
+      }), 200);
     });
 
     node.on('mouseout', () => {
       clearTimeout(timeout);
-      timeout = setTimeout(() => tips?.forEach((tip) => { tip.hide(); }), 1000);
+      timeout = setTimeout(() => {
+        tips?.forEach((tip) => tip.hide());
+        tips = null; // Force rebuilding tips in case they changed
+      }, 1000);
     });
   }
 
@@ -281,28 +312,23 @@ class Dive {
     let newNodes = this.cy.collection();
 
     for (const node of data.nodes) {
-      let stops = undefined;
+      const data : { [k: string]: unknown } = { ...node};
       if (typeof node.range === 'number')
-        stops = `0% ${node.range}% ${node.range}% 100%`;
+        data.stops = `0% ${node.range}% ${node.range}% 100%`;
 
       let ele = this.cy.$id(node.id.toString());
       if (ele.nonempty()) {
         ele.removeData();
-        ele.data(node);
+        ele.data(data);
         ele.neighborhood('edge').remove();
       }
       else {
-        let parent = null;
         if (node.locality.callstack)
-          parent = this.referenceCallstack(node.locality.callstack)?.id();
+          data.parent = this.referenceCallstack(node.locality.callstack)?.id();
         else
-          parent = this.referenceFile(node.locality.file).id();
+          data.parent = this.referenceFile(node.locality.file).id();
 
-        ele = this.cy.add({
-          group: 'nodes',
-          data: { ...(node as { [k: string]: unknown }), stops, parent },
-          classes: 'new',
-        });
+        ele = this.cy.add({group: 'nodes', data, classes: 'new'});
         this.addTips(ele);
         newNodes = ele.union(newNodes);
       }
