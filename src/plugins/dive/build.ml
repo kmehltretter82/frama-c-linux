@@ -42,8 +42,18 @@ struct
       inherit Visitor.frama_c_inplace
       val mutable acc = []
       method get_acc = acc
-      method! vlval lval = acc <- lval :: acc; Cil.SkipChildren
+      method! vexpr expr =
+        match expr.enode with
+        | Lval lval -> acc <- lval :: acc; Cil.SkipChildren
+        | UnOp _ | BinOp _ | CastE _ -> Cil.DoChildren
+        | _ -> Cil.SkipChildren
     end
+
+  (* Returns a list of lvalues required to compute the address of [lval]. *)
+  let in_lval lval =
+    let vis = visitor () in
+    ignore (Visitor.visitFramacLval (vis :> Visitor.frama_c_inplace) lval);
+    List.rev vis#get_acc
 
   let in_exp exp =
     let vis = visitor () in
@@ -64,7 +74,8 @@ struct
       Option.fold ~none:[] ~some:in_exp opt_e1 @ in_exp e2
     | Differing_blocks (e1,e2) ->
       in_exp e1 @ in_exp e2
-    | Memory_access _ | Not_separated _ | Overlap _
+    | Memory_access (lval, _) -> in_lval lval
+    | Not_separated _ | Overlap _
     | Uninitialized _ | Dangling _ | Uninitialized_union _ -> []
     | Invalid_bool lv -> [lv]
 end
