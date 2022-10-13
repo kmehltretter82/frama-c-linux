@@ -548,7 +548,7 @@ let explore_forward ~depth context root =
   and explore_node n =
     if n.node_reads_computation <> Done && should_explore n root then begin
       let deps_builder =
-        match n.node_writes_computation with
+        match n.node_reads_computation with
         | Done -> Seq.empty
         | Partial builder -> builder
         | NotDone -> build_node_reads context n
