@@ -74,8 +74,8 @@ let get_stmt sid = fst (Kernel_function.find_from_sid sid)
 
 (** build the [zone] which represents [data] before [kinst] *)
 let get_zones str_data (stmt, kf) =
-  let lval_term = !Db.Properties.Interp.term_lval kf str_data in
-  let lval = !Db.Properties.Interp.term_lval_to_lval ~result:None lval_term in
+  let lval_term = Logic_parse_string.term_lval kf str_data in
+  let lval = Logic_to_c.term_lval_to_lval lval_term in
   let loc = Eva.Results.(before stmt |> eval_address lval |> as_location) in
   Locations.(enumerate_valid_bits Read loc)
 ;;
