@@ -60,7 +60,7 @@ The intended usage is as follows:
 \begin{enumerate}
 \item The user identifies a C code base on which they would like to run
   Frama-C;
-\item The user cofigures the initial analysis
+\item The user configures the initial analysis
   (see Section~\ref{sec:necessary-build-information} below);
 \item The user edits and runs the generated Makefile, adjusting the
   analysis as needed and re-running \texttt{fcmake}\footnote{\texttt{fcmake}
@@ -97,15 +97,20 @@ The standard way of setting up a new analysis is via these steps:
 
 \begin{enumerate}
 \item create a \texttt{.frama-c} directory in the root of the code repository
-  (all \FramaC-related files will be stored inside it);
-\item copy the {\em analysis template}, a Makefile located in
+  (all \FramaC-related files will be stored inside it).
+\item copy the {\em analysis template} in the \texttt{.frama-c} directory.
+  This template is a Makefile located in
   \texttt{FRAMAC\_LIB/analysis-scripts/template.mk}\footnote{See
   Section~\ref{sec:env-variables} for details about \texttt{FRAMAC\_LIB}.}.
-  This Makefile is usually renamed as \texttt{GNUmakefile} inside
-  \texttt{.frama-c}.
-\item open the \texttt{GNUmakefile} and fill in the required information:
-  architecture, list of sources, preprocessing flags (both {\em include}
-  directories for headers and {\em macro definitions}).
+  It is usually renamed as \texttt{GNUmakefile}.
+\item open this Makefile and fill in the required information:
+  \begin{itemize}
+    \item the architecture in the \texttt{MACHDEP} variable.
+    \item the preprocessing flags in the \texttt{CPPFLAGS} variable.
+    \item the list of sources in the \texttt{main.parse} target.
+    \item the function to analyze, if different from \texttt{main}, by
+    adding \texttt{-main <function>} to the \texttt{FCFLAGS} variable.
+  \end{itemize}
 \end{enumerate}
 
 A project without this information is incomplete; an alternative
