@@ -1,0 +1,23 @@
+\chapter{\acsl extensions}
+\label{cha:acsl-extensions}
+\section{Handling indirect calls with \texttt{calls}}
+\label{acsl:calls}
+
+In order to help plug-ins support indirect calls (i.e. calls through
+a function pointer), an \acsl extension is provided. It is introduced
+by keyword \lstinline|calls| and can be placed before
+a statement with an indirect call to give the list of
+functions that may be the target of the call. As an example,
+\begin{ccode}
+/*@ calls f1, f2, ... , fn */
+*f(args);
+\end{ccode}
+indicates that the pointer \lstinline|f| can point to any one of
+\lstinline|f1|, \lstinline|f2|, ..., \lstinline|fn|.
+
+It is in particular used by the WP plug-in (see \cite{wp} for more information).
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "userman"
+%%% End:

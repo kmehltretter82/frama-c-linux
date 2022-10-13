@@ -1043,11 +1043,11 @@ weakest precondition calculus.
 \subsubsection{ACSL extension \texttt{@calls}}
 \label{acsl:calls}
 
-The handling of functions pointers is done via the ACSL code annotation
-extension \verb+@calls+. For each call to a function pointer \verb+fp+
-in the instruction or block under the annotation \verb+calls f1,\ldots,fn+,
-\verb+fp+ is required to belongs to the set \verb+f1,\ldots,fn+ and
-a case analysis is performed with the contract of each provided function.
+Frama-C provides an ACSL extension \texttt{@calls} that can be written
+before an indirect call to indicate which functions can be the target
+of the pointer (see \cite{userman} for more information). Upon encountering
+such annotation, WP will perform a case analysis with the contract of
+each provided function.
 
 For example:
 
