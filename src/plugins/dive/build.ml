@@ -183,10 +183,9 @@ let build_node_kind ~is_folded_base lval kinstr =
     (* Build a scalar node even if kinstr is dead *)
     Scalar (vi, Cil.typeOfLval lval, offset)
   | Mem _, _ ->
-    match
-      enumerate_cells ~is_folded_base lval kinstr |> Seq.take 2 |> List.of_seq
-    with
-    | [node_kind] -> node_kind
+    let cells_seq = enumerate_cells ~is_folded_base lval kinstr in
+    match cells_seq () with
+    | Seq.Cons (node_kind, seq) when Seq.is_empty seq -> node_kind
     | _ -> Scattered (lval, kinstr)
 
 let default_node_locality callstack =

@@ -62,17 +62,10 @@ module Seq = struct
     | Nil -> ys ()
     | Cons (x, xt) -> Cons (x, append xt ys)
 
-  let take n xs =
-    if n < 0 then invalid_arg "Seq.take";
-    let rec aux n xs =
-      if n = 0
-      then empty
-      else fun () ->
-        match xs () with
-        | Nil -> Nil
-        | Cons (x, xs) -> Cons (x, aux (n-1) xs)
-    in
-    aux n xs
+  let is_empty xs =
+    match xs () with
+    | Nil -> true
+    | Cons _ -> false
 
   let drop n xs =
     if n < 0
