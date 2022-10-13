@@ -46,6 +46,10 @@ val merge: results -> results -> results
 val change_callstacks:
   (Value_types.callstack -> Value_types.callstack) -> results -> results
 
+val eval_tlval_as_location :
+  ?result:Cil_types.varinfo ->
+  Cvalue.Model.t ->  Cil_types.term -> Locations.location
+
 [@@@ api_end]
 
 (*
