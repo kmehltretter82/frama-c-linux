@@ -85,6 +85,7 @@ val fold: ?increasing:bool -> (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
 val map: (Integer.t -> Integer.t) -> t -> t
 val filter: (Integer.t -> bool) -> t -> t or_bottom
 val map_reduce: (Integer.t -> 'a) -> ('a -> 'a -> 'a) -> t -> 'a
+val to_seq: ?increasing:bool -> t -> Integer.t Seq.t
 
 (** Sets whose cardinal exceeds a certain limit must be converted into
     intervals. Functions that make sets grow returns either a set small enough,

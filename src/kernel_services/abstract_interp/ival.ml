@@ -418,6 +418,11 @@ let fold_enum f v acc =
   | Float _ -> raise Error_Top
   | Int _ -> fold_int (fun x acc -> f (inject_singleton x) acc) v acc
 
+let to_int_seq = function
+  | Bottom -> Seq.empty
+  | Float _ -> raise Error_Top
+  | Int i -> Int_val.to_seq i
+
 let is_included t1 t2 =
   (t1 == t2) ||
   match t1, t2 with

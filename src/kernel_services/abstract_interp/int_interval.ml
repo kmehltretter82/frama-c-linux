@@ -427,6 +427,23 @@ let fold_int ?(increasing=true) f t acc =
 let fold_enum f v acc =
   fold_int (fun x acc -> f (inject_singleton x) acc) v acc
 
+let to_seq ?(increasing=true) t =
+  let start, is_before_last =
+    match t.min, t.max with
+    | Some l, Some u -> if increasing then l, Integer.ge u else u, Integer.le l
+    | Some l, None when increasing -> l, fun _ -> true (* Infinite sequence *)
+    | None, Some u when not increasing -> u, fun _ -> true (* Infinite sequence *)
+    | _ -> raise Error_Top
+  in
+  let next = if increasing then Integer.add else Integer.sub in
+  let rec aux i () =
+    if is_before_last i
+    then Seq.Cons (i, aux (next i t.modu))
+    else Seq.Nil
+  in
+  aux start
+
+
 (* ------------------------------ Arithmetics ------------------------------- *)
 
 let opt_map2 f m1 m2 =

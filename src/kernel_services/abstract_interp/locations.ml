@@ -95,7 +95,9 @@ module Location_Bytes = struct
     | Top _ -> raise Error_Top
     | Map m -> MapLattice.fold f m acc
   let fold_topset_ok = fold
-
+  let to_seq_i = function
+    | Top _ -> raise Error_Top
+    | Map m -> MapLattice.to_seq m
   let inject_ival i = inject Base.null i
 
   let inject_float f =

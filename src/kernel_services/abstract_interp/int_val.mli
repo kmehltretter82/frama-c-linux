@@ -189,3 +189,10 @@ val complement_under: size:int -> signed:bool -> t -> t or_bottom
     by default. If [increasing] is set to false, iterate by decreasing order.
     @raise Abstract_interp.Error_Top if the abstraction is unbounded. *)
 val fold_int: ?increasing:bool -> (Integer.t -> 'a -> 'a) -> t -> 'a -> 'a
+
+(** Builds a sequence of all integers represented by an abstraction, in
+    increasing order (resp. decreasing order if [increasing] is set to false).
+    The sequence might be infinite.
+    @raise Abstract_interp.Error_Top if the abstraction has no lower bound
+    (or no upper bound in decreasing order). *)
+val to_seq: ?increasing:bool -> t -> Integer.t Seq.t

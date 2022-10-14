@@ -44,9 +44,20 @@ module List: sig
 end
 
 module Seq: sig
-  (** since 4.14.0 *)
-  val mapi: (int -> 'a -> 'b) -> 'a Seq.t -> 'b Seq.t
+  open Stdlib.Seq
 
   (** since 4.14.0 *)
-  val unzip : ('a * 'b) Seq.t -> 'a Seq.t * 'b Seq.t
+  val is_empty: 'a t -> bool
+
+  (** since 4.14.0 *)
+  val mapi: (int -> 'a -> 'b) -> 'a t -> 'b t
+
+  (** since 4.14.0 *)
+  val unzip : ('a * 'b) t -> 'a t * 'b t
+
+  (** since 4.11.0 *)
+  val append : 'a t -> 'a t -> 'a t
+
+  (** since 4.14.0 *)
+  val drop : int -> 'a t -> 'a t
 end
