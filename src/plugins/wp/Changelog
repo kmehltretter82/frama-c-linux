@@ -24,6 +24,8 @@
 Plugin WP <next-release>
 ########################
 
+- WP          [2022-10-14] 'calls' ACSL extension moved into the kernel;
+                           option -wp-dynamic marked as obsolete
 - WP          [2022-09-16] Upgrade to Why3 1.5.1
 - Cmd         [2022-07-29] Improves the WP JSON report provided by
                            -wp-report-json

@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Kernel    [2022-10-14] 'calls' ACSL extension is now registered in the
+              kernel and not WP
 -   Kernel    [2022-10-05] Support for ghost VLA and calls to builtins with
               ghost arguments.
 -   Eva       [2022-09-16] Numerors now needs MLMPFR 4.1.0+bugfix2
