@@ -488,11 +488,11 @@ module DynCall =
 let () =
   Cmdline.run_after_configuring_stage
     (fun () ->
-      if DynCall.is_set () then
-        warning ~current:false
-          "Option -wp-dynamic is obsolete and will be removed \
-           at some point in the future. @@calls annotations are now handled \
-           directly in the kernel")
+       if DynCall.is_set () then
+         warning ~current:false
+           "Option -wp-dynamic is obsolete and will be removed \
+            at some point in the future. @@calls annotations are now handled \
+            directly in the kernel")
 
 let () = Parameter_customize.set_group wp_strategy
 module PrecondWeakening =
