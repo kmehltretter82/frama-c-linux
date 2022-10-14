@@ -82,8 +82,10 @@ type 'vertex edge = {
   edge_loc : location;
 }
 
+let dummy_kf = List.hd (Cil_datatype.Kf.reprs)
+
 let dummy_vertex = {
-  vertex_kf = Kernel_function.dummy ();
+  vertex_kf = dummy_kf;
   vertex_key = -1;
   vertex_start_of = None;
   vertex_info = NoneInfo;
@@ -91,7 +93,7 @@ let dummy_vertex = {
 }
 
 let dummy_edge = {
-  edge_kf = Kernel_function.dummy ();
+  edge_kf = dummy_kf;
   edge_key = -1;
   edge_kinstr = Kglobal;
   edge_transition = Skip;
