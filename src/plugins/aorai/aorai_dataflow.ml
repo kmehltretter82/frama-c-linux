@@ -493,10 +493,22 @@ module Computer(I: Init) = struct
     match i with
     | Call (_,{ enode = Lval(Var v,NoOffset) },args,_) ->
       do_call s v args d
-    | Call (_,e,_,_) ->
-      Aorai_option.not_yet_implemented
-        ~source:(fst e.eloc)
-        "Indirect call to %a is not handled yet" Printer.pp_exp e
+    | Call (_,e,args,_) ->
+      (match Dyncall.get s with
+       | Some (_,l) ->
+         let (state,loops) = d in
+         let state' =
+           List.fold_left
+             (fun acc f ->
+                let s,_ = do_call s (Kernel_function.get_vi f) args d in
+                Data_for_aorai.merge_state acc s)
+             state l
+         in
+         (state',loops)
+       | None ->
+         Aorai_option.not_yet_implemented
+           ~source:(fst e.eloc)
+           "Indirect call to %a is not handled yet" Printer.pp_exp e)
     | Local_init (v, ConsInit(f,args,kind),_) ->
       let args =
         match kind with
@@ -812,13 +824,29 @@ struct
         Done Data_for_aorai.Aorai_state.Map.empty
     end
 
+  let do_call_merge res s f state =
+    match res, do_call s f state with
+    | Dataflow2.Default, r -> r
+    | r, Dataflow2.Default -> r
+    | Done r1, Done r2 -> Done (Data_for_aorai.merge_state r1 r2)
+    | _ ->
+      Aorai_option.fatal
+        "Unexpected result of backward dataflow on function call"
+
   let doInstr s instr state =
     match instr with
     | Call (_,{ enode = Lval(Var f,NoOffset) },_,_) -> do_call s f state
     | Call (_,e,_,_) ->
-      Aorai_option.not_yet_implemented
-        ~source:(fst e.eloc)
-        "Indirect call to %a is not handled yet" Printer.pp_exp e
+      (match Dyncall.get s with
+       | Some (_,l) ->
+         List.fold_left
+           (fun acc kf ->
+              do_call_merge acc s (Kernel_function.get_vi kf) state)
+           Dataflow2.Default l
+       | None ->
+         Aorai_option.not_yet_implemented
+           ~source:(fst e.eloc)
+           "Indirect call to %a is not handled yet" Printer.pp_exp e)
     | Local_init (_,ConsInit(f,_,_),_) -> do_call s f state
     | Local_init (_,AssignInit _,_)
     | Set _ | Asm _ | Skip _ | Code_annot _ -> Dataflow2.Default

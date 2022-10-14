@@ -476,11 +476,23 @@ module SplitMax =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
+let () = Parameter_customize.is_invisible ()
 module DynCall =
   True(struct
     let option_name = "-wp-dynamic"
     let help = "Handle dynamic calls with specific annotations."
   end)
+
+(* NOT use DynCall.add_set_hook: it won't work for the positive version of
+   the option, as the default is already true. *)
+let () =
+  Cmdline.run_after_configuring_stage
+    (fun () ->
+       if DynCall.is_set () then
+         warning ~current:false
+           "Option -wp-dynamic is obsolete and will be removed \
+            at some point in the future. @@calls annotations are now handled \
+            directly in the kernel")
 
 let () = Parameter_customize.set_group wp_strategy
 module PrecondWeakening =

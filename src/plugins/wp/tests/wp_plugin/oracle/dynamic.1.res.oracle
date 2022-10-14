@@ -1,15 +1,15 @@
 # frama-c -wp -wp-no-let [...]
 [kernel] Parsing dynamic.i (no preprocessing)
 [wp] Running WP plugin...
-[wp:calls] Computing dynamic calls.
-[wp] dynamic.i:32: Calls f1 f2
-[wp] dynamic.i:46: Calls g
-[wp] dynamic.i:67: Calls h1 h2
-[wp] dynamic.i:80: Calls (for bhv1) h1 h2 h0
-[wp] dynamic.i:80: Calls (for bhv0) h1 h2 h0
-[wp] dynamic.i:89: Calls h1
-[wp] dynamic.i:102: Calls unreachable_g
-[wp:calls] Dynamic call(s): 6.
+[kernel:dyncalls] Computing dynamic calls.
+[kernel:dyncalls] dynamic.i:32: Calls  f1 f2
+[kernel:dyncalls] dynamic.i:46: Calls  g
+[kernel:dyncalls] dynamic.i:67: Calls  h1 h2
+[kernel:dyncalls] dynamic.i:80: Calls (for bhv1) h1 h2 h0
+[kernel:dyncalls] dynamic.i:80: Calls (for bhv0) h1 h2 h0
+[kernel:dyncalls] dynamic.i:89: Calls  h1
+[kernel:dyncalls] dynamic.i:102: Calls  unreachable_g
+[kernel:dyncalls] Dynamic call(s): 6.
 [wp] Warning: Missing RTE guards
 
 Goal Call point g in 'guarded_call' at instruction (file dynamic.i, line 46):
