@@ -1,3 +1,0 @@
-void mean(int *p, int* q) {
-  if (*p >= *q) ... else ...
-  A = 0; }
