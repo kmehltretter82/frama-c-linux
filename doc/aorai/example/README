@@ -10,25 +10,24 @@ This directory contains 2 examples:
 ----------
 
   * example.c - program to check
-  * example.ltl - LTL formula to use
+  * example.ya - YA automaton
   * example_annot.c - example of generated file
 
 1.2) Usage
 ----------
 
-Each of the two following commands generate the example_annot.c file: 
+The following commands generates the example_annot.c file:
 
      frama-c example.c -aorai-automata example.ya
-  or
-     frama-c example.c -aorai-ltl example.ltl
 
-The generation process gives two warning, since an operation is never called in the code.
+The generation process gives two warnings, since an operation is never called in the code.
 
-Files example.ya and example.ltl are the description of the same property in two syntax.
+File example.ya is the automaton that describes the sequences of function calls that are allowed for the program.
 
-In order to decide if the original program is correct wrt the property, it is sufficient to establish than the generated C is valid. For instance, with the Jessie plugin:
+In order to decide if the original program is correct wrt this automaton, it is sufficient to establish than the generated C is valid with respect to the generated ACSL annotations.
+For instance, with the WP plugin:
 
-     frama-c example_annot.c  -jessie  -jessie-why-opt="-fast-wp"
+     frama-c example_annot.c -wp
 
 2) Example 2 (with a loop)
 ==========================
@@ -37,7 +36,7 @@ In order to decide if the original program is correct wrt the property, it is su
 ----------
 
   * example_loop.c - program to check
-  * example_loop.ltl - LTL formula to use
+  * example_loop.ya - YA automaton
   * example_loop_annot.c - example of generated file
 
 2.2) Usage
@@ -45,11 +44,9 @@ In order to decide if the original program is correct wrt the property, it is su
 
 The following command generates the example_loop_annot.c file: 
 
-     frama-c example_loop.c -aorai-ltl example_loop.ltl
+     frama-c example_loop.c -aorai-automaton example_loop.ya
 
 
-In order to decide if the original program is correct wrt the property, it is sufficient to establish than the generated C is valid. For instance, with the Jessie plugin:
+In order to decide if the original program is correct wrt the property, it is sufficient to establish than the generated C is valid. For instance, with the WP plugin:
 
-     frama-c example_loop_annot.c  -jessie  -jessie-why-opt="-fast-wp"
-
-
+     frama-c example_loop_annot.c  -wp
