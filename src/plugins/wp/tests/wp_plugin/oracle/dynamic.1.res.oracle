@@ -2,13 +2,13 @@
 [kernel] Parsing dynamic.i (no preprocessing)
 [wp] Running WP plugin...
 [kernel:dyncalls] Computing dynamic calls.
-[kernel:dyncalls] dynamic.i:32: Calls (for default!) f1 f2
-[kernel:dyncalls] dynamic.i:46: Calls (for default!) g
-[kernel:dyncalls] dynamic.i:67: Calls (for default!) h1 h2
-[kernel:dyncalls] dynamic.i:80: Calls  h1 h2 h0
-[kernel:dyncalls] dynamic.i:80: Calls  h1 h2 h0
-[kernel:dyncalls] dynamic.i:89: Calls (for default!) h1
-[kernel:dyncalls] dynamic.i:102: Calls (for default!) unreachable_g
+[kernel:dyncalls] dynamic.i:32: Calls  f1 f2
+[kernel:dyncalls] dynamic.i:46: Calls  g
+[kernel:dyncalls] dynamic.i:67: Calls  h1 h2
+[kernel:dyncalls] dynamic.i:80: Calls (for bhv1) h1 h2 h0
+[kernel:dyncalls] dynamic.i:80: Calls (for bhv0) h1 h2 h0
+[kernel:dyncalls] dynamic.i:89: Calls  h1
+[kernel:dyncalls] dynamic.i:102: Calls  unreachable_g
 [kernel:dyncalls] Dynamic call(s): 6.
 [wp] Warning: Missing RTE guards
 

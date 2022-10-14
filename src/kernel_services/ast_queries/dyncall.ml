@@ -150,7 +150,7 @@ class dyncall =
             let dkey = Kernel.dkey_dyncalls in
             Kernel.feedback ~source ~dkey
               "@[<hov 2>Calls %s%a@]"
-              (if Cil.default_behavior_name = bhv then "(for " ^ bhv ^ ")"
+              (if Cil.default_behavior_name <> bhv then "(for " ^ bhv ^ ")"
                else "")
               pp_calls kfs
           in
