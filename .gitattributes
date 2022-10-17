@@ -10,7 +10,6 @@ Changelog merge=union
 ################
 
 /CLA.pdf export-ignore
-/ivette/ivette.icns export-ignore
 /share/libc/*.pdf export-ignore
 /doc/** export-ignore
 /doc/code -export-ignore
