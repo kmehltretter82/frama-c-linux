@@ -157,5 +157,4 @@ post-messages: [
   "- install NVM (https://github.com/nvm-sh/nvm)"
   "- run 'nvm use 16'"
   "- run 'npm install --global yarn'"
-  "On macOS, run 'ivette' after OPAM removal."
 ]

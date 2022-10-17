@@ -213,19 +213,27 @@ ifeq ($(IVETTE_DIST),dist/linux-unpacked)
 
 install:
 	@echo "Installing Ivette (Linux)"
-	@rm -fr $(LIBDIR)/ivette
+	@mkdir -p $(LIBDIR)/frama-c
+	@rm -fr $(LIBDIR)/frama-c/ivette
+	@mv $(IVETTE_DIST) $(LIBDIR)/frama-c/ivette
+	@mkdir -p $(BINDIR)
 	@rm -f $(BINDIR)/ivette
-	@mv $(IVETTE_DIST) $(LIBDIR)/ivette
-	@ln -s $(LIBDIR)/ivette/ivette $(BINDIR)/ivette
+	@ln -s $(LIBDIR)/frama-c/ivette/ivette $(BINDIR)/ivette
 
 else ifeq ($(IVETTE_DIST:-arm64=),dist/mac)
 
 install:
 	@echo "Installing Ivette (macOS)"
-	@rm -fr /Applications/Ivette.app
-	@mv $(IVETTE_DIST)/Ivette.app /Applications/
+	@mkdir -p $(LIBDIR)/frama-c
+	@rm -fr $(LIBDIR)/frama-c/Ivette.app
+	@mv $(IVETTE_DIST)/Ivette.app $(LIBDIR)/frama-c/
+	@cp ivette-macos.sh dist/ivette.sh
+	@echo "exec open -na $(LIBDIR)/frama-c/Ivette.app --args\\" >> dist/ivette.sh
+	@echo "  --command $(BINDIR)/frama-c\\" >> dist/ivette.sh
+	@echo "  --working \$$PWD \$$*" >> dist/ivette.sh
+	@mkdir -p $(BINDIR)
+	@install dist/ivette.sh $(BINDIR)/ivette
 	@rm -fr $(IVETTE_DIST)
-	@install ivette-macos.sh $(BINDIR)/ivette
 
 else
 
@@ -251,9 +259,8 @@ ifdef PREFIX
 
 uninstall:
 	@echo "Uninstall Ivette"
-	@rm -fr dist
-	@rm -fr /Applications/Ivette.app
-	@rm -fr $(LIBDIR)/ivette
+	@rm -fr $(LIBDIR)/frama-c/Ivette.app
+	@rm -f $(LIBDIR)/frama-c/ivette.tgz
 	@rm -f $(BINDIR)/ivette
 
 endif

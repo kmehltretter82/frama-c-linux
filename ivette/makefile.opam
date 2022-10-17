@@ -35,8 +35,5 @@ install:
 uninstall:
 	rm -f $(PREFIX)/bin/ivette
 	rm -f $(PREFIX)/lib/frama-c/ivette.tgz
-	if test -d /Applications/Ivette.app ;\
-	 then \
-	 mkdir -p $(PREFIX)/bin; \
-	 install ivette/ivette-macos-cleanup.sh $(PREFIX)/bin/ivette; \
-	 fi
+	rm -fr $(PREFIX)/lib/frama-c/Ivette.app
+	rm -fr $(PREFIX)/lib/frama-c/ivette
