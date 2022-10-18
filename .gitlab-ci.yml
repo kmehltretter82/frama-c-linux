@@ -211,6 +211,7 @@ api-doc: # Note: the Nix store avoids rebuilding
   artifacts:
     paths:
       - api/frama-c-api.tar.gz
+      - api/frama-c-server-api.tar.gz
     expire_in: 7 days
 
 # Build distribution tarball

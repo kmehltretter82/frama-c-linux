@@ -108,6 +108,12 @@ PTEST_USE_WP_CACHE:=yes
 include share/Makefile.testing
 
 ###############################################################################
+# Server Documentation
+################################
+
+include share/Makefile.serverdoc
+
+###############################################################################
 
 # Code prettyfication and lint
 include share/Makefile.linting

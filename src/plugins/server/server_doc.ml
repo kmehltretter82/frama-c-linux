@@ -80,6 +80,10 @@ let page chapter ~title ?(descr=[]) ?readme ~filename () =
       chapter ; title ; descr ; readme ;
       sections=[] ;
     } in
+    begin match chapter with
+      | `Kernel | `Protocol -> ()
+      | `Plugin p -> plugins := p :: !plugins
+    end ;
     pages := Pages.add path page !pages ; page
 
 let static () = []
@@ -94,11 +98,11 @@ let publish ~page ?name ?(index=[]) ~title
   List.iter (fun entry -> entries := (entry , href) :: !entries) index ;
   page.sections <- section :: page.sections ; href
 
-let protocole ~title ~readme:filename =
+let protocol ~title ~readme:filename =
   let readme = Printf.sprintf "%s/server/%s" (Fc_config.datadir :> string) filename in
   ignore (page `Protocol ~title ~readme ~filename ())
 
-let () = protocole ~title:"Architecture" ~readme:"server.md"
+let () = protocol ~title:"Architecture" ~readme:"server.md"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Package Publication                                                --- *)
@@ -239,7 +243,7 @@ let table_of_contents () =
   List.concat
     (List.map
        (fun p -> table_of_chapter (`Plugin p))
-       (List.sort String.compare !plugins))
+       (List.sort_uniq String.compare !plugins))
 
 module Cmap = Map.Make
     (struct
