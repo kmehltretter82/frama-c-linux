@@ -108,15 +108,19 @@ PTEST_USE_WP_CACHE:=yes
 include share/Makefile.testing
 
 ###############################################################################
-# Server Documentation
+# Linters
 ################################
-
-include share/Makefile.serverdoc
 
 ###############################################################################
 
 # Code prettyfication and lint
 include share/Makefile.linting
+
+###############################################################################
+# Frama-C Documentation
+################################
+
+include share/Makefile.documentation
 
 ###############################################################################
 # Local Variables:
