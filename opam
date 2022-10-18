@@ -94,7 +94,6 @@ build: [
 install: [
   [make "PREFIX=%{prefix}%" "MANDIR=%{mandir}%" "install"]
   [make "PREFIX=%{prefix}%" "-C" "doc" "install"] {with-doc}
-  [make "PREFIX=%{prefix}%" "-f" "ivette/makefile.opam" "install"]
 ]
 
 remove: [

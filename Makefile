@@ -74,6 +74,7 @@ help::
 ################################
 
 include share/Makefile.installation
+include ivette/Makefile.installation
 
 ###############################################################################
 # HEADER MANAGEMENT
