@@ -52,15 +52,20 @@ endif
 
 install::
 ifndef PREFIX
-	@echo "Warning: cannot install Frama-C: no PREFIX defined, nor OPAM."
+	@echo "Warning: cannot install Frama-C: no PREFIX defined"
+	@echo "  (recommendation: include FRAMAC/share/Makefile.common)"
 	@exit 1
 else
 ifeq ($(PREFIX),$(OPAM_SWITCH_PREFIX))
 	@echo "Installing Frama-C to current Opam switch"
+	@echo "  (copying and relocating files...)"
 	dune install ${MANDIR_OPT} 2> /dev/null
+	@echo "  (done)"
 else
 	@echo "Installing Frama-C to ${PREFIX}"
+	@echo "  (copying and relocating files...)"
 	dune install --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+	@echo "  (done)"
 	@echo 'DO NOT FORGET TO EXPAND YOUR OCAMLPATH VARIABLE:'
 	@echo '  export OCAMLPATH="${PREFIX}/lib:$$OCAMLPATH"'
 endif
