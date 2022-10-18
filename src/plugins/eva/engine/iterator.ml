@@ -504,7 +504,7 @@ module Make_Dataflow
     let sources = List.map process_source (G.pred_e graph v) in
     (* Add initial source *)
     let sources =
-      if v <> automaton.entry_point
+      if not (Interpreted_automata.Vertex.equal v automaton.entry_point)
       then sources
       else get_initial_flow () :: sources
     in
