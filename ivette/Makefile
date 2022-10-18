@@ -261,6 +261,7 @@ uninstall:
 	@echo "Uninstall Ivette"
 	@rm -fr $(LIBDIR)/frama-c/Ivette.app
 	@rm -f $(LIBDIR)/frama-c/ivette.tgz
+	@rm -f $(LIBDIR)/frama-c/ivette
 	@rm -f $(BINDIR)/ivette
 
 endif
