@@ -97,7 +97,7 @@ install: [
 ]
 
 remove: [
-  [make "PREFIX=%{prefix}%" "-f" "ivette/makefile.opam" "uninstall"]
+  [make "PREFIX=%{prefix}%" "-f" "ivette/Makefile.installation" "uninstall"]
 ]
 
 run-test: [

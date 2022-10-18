@@ -24,32 +24,24 @@
 # --- OPAM Installation
 # --------------------------------------------------------------------------
 
-ifeq ($(INSTALLDIR),)
-IVETTE_PREFIX=$(OPAM_SWITCH_PREFIX)
-else
-IVETTE_PREFIX=$(INSTALLDIR)
-endif
-
-ifeq ($(IVETTE_PREFIX),)
-
+ifndef PREFIX
+then
 install::
 	@echo "Warning: not target for Ivette"
 	@echo "  (no INSTALLDIR, nor OPAM_SWITCH_PREFIX)"
-
 else
-
 install::
-	@echo "Installing Ivette to ${IVETTE_PREFIX}"
-	@mkdir -p ${IVETTE_PREFIX}/bin
-	@install ivette/ivette-bootstrap.sh ${IVETTE_PREFIX}/bin/ivette
-	@mkdir -p ${IVETTE_PREFIX}/lib/frama-c
-	@tar zcf ${IVETTE_PREFIX}/lib/frama-c/ivette.tgz ivette
+	@echo "Installing Ivette to ${PREFIX}"
+	@mkdir -p ${PREFIX}/bin
+	@install ivette/ivette-bootstrap.sh ${PREFIX}/bin/ivette
+	@mkdir -p ${PREFIX}/lib/frama-c
+	@tar zcf ${PREFIX}/lib/frama-c/ivette.tgz ivette
 
 uninstall::
 	@echo "Removing Ivette"
-	@rm -f ${IVETTE_PREFIX}/bin/ivette
-	@rm -f ${IVETTE_PREFIX}/lib/frama-c/ivette.tgz
-	@rm -fr ${IVETTE_PREFIX}/lib/frama-c/Ivette.app
-	@rm -fr ${IVETTE_PREFIX}/lib/frama-c/ivette
+	@rm -f ${PREFIX}/bin/ivette
+	@rm -f ${PREFIX}/lib/frama-c/ivette.tgz
+	@rm -fr ${PREFIX}/lib/frama-c/Ivette.app
+	@rm -fr ${PREFIX}/lib/frama-c/ivette
 
 endif
