@@ -185,8 +185,6 @@
 (libc/memory.h as libc/memory.h)
 (libc/monetary.h as libc/monetary.h)
 (libc/mqueue.h as libc/mqueue.h)
-(libc/n1336.pdf as libc/n1336.pdf)
-(libc/n1362.pdf as libc/n1362.pdf)
 (libc/ndbm.h as libc/ndbm.h)
 (libc/net/if.h as libc/net/if.h)
 (libc/netdb.c as libc/netdb.c)

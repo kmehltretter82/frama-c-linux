@@ -23,3 +23,9 @@
 /*.icns header_spec=.ignore
 /*.lock header_spec=.ignore
 
+################
+# DISTRIBUTION #
+################
+
+/tests export-ignore
+/doc export-ignore

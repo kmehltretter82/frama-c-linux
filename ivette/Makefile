@@ -98,15 +98,6 @@ $(SANDBOX): $(SANDBOXES) ./sandboxer.js ./Makefile
 	@chmod -f a-w $@
 
 # --------------------------------------------------------------------------
-# --- Frama-C Source Distrib
-# --------------------------------------------------------------------------
-
-.PHONY: update-distrib-files
-
-update-distrib-files:
-	./distrib.sh
-
-# --------------------------------------------------------------------------
 # --- Frama-C API
 # --------------------------------------------------------------------------
 
@@ -173,6 +164,28 @@ LIBDIR=$(PREFIX)/lib
 dist-dir:
 	@echo "Cleaning dist"
 	@rm -fr dist
+
+UNAME=$(shell uname)
+
+ifeq ($(UNAME),Darwin)
+
+dome-dist: ivette.icns
+ivette.icns: frama-c-icon.png
+	rm -fr ivette.iconset
+	mkdir ivette.iconset
+	sips -z 16 16     frama-c-icon.png --out "ivette.iconset/icon_16x16.png"
+	sips -z 32 32     frama-c-icon.png --out "ivette.iconset/icon_16x16@2x.png"
+	sips -z 32 32     frama-c-icon.png --out "ivette.iconset/icon_32x32.png"
+	sips -z 64 64     frama-c-icon.png --out "ivette.iconset/icon_32x32@2x.png"
+	sips -z 128 128   frama-c-icon.png --out "ivette.iconset/icon_128x128.png"
+	sips -z 256 256   frama-c-icon.png --out "ivette.iconset/icon_128x128@2x.png"
+	sips -z 256 256   frama-c-icon.png --out "ivette.iconset/icon_256x256.png"
+	sips -z 512 512   frama-c-icon.png --out "ivette.iconset/icon_256x256@2x.png"
+	sips -z 512 512   frama-c-icon.png --out "ivette.iconset/icon_512x512.png"
+	iconutil -c icns ivette.iconset
+	rm -fr ivette.iconset
+
+endif
 
 IVETTE_DIST=$(wildcard dist/linux-unpacked dist/mac dist/mac-arm64)
 
