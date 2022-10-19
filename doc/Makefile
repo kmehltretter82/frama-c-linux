@@ -28,7 +28,7 @@ MAKECONFIG_DIR=$(FRAMAC_SRC)/share
 
 include $(FRAMAC_SRC)/share/Makefile.common
 
-FRAMAC_DOCDIR ?= $(DOCDIR)/frama-c
+FRAMAC_DOCDIR ?= $(PREFIX)/share/doc/frama-c
 
 .PHONY: .force
 
@@ -217,6 +217,5 @@ endif
 
 help::
 	@echo "Documentation installation configuration variable"
-	@echo "  - PREFIX: documentation will be in PREFIX/share/doc/frama-c"
-	@echo "  - DOCDIR: (overrides previous variable) documentation will be in DOCDIR/frama-c"
-	@echo "  - FRAMAC_DOCDIR: (overrides previous variable) documentation will be in FRAMAC_DOCDIR"
+	@echo "  - PREFIX: by default, documentation will be generated in PREFIX/share/doc/frama-c"
+	@echo "  - FRAMAC_DOCDIR: if set, documentation will be in FRAMAC_DOCDIR"

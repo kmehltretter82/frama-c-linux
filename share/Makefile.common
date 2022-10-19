@@ -50,16 +50,16 @@ DUNE_BUILD_OPTS+=--display $(DUNE_DISPLAY)
 PLATFORM:=$(shell uname -s)
 
 #############
-# Locations #
+# Install   #
 #############
 
-# Note that Dune rules do NOT use these variables.
-# They are used by other Makefiles
-#   - Ivette (PREFIX)
-#   - Manuals (DOCDIR)
-
-PREFIX ?= /usr/local
-DOCDIR ?= $(PREFIX)/share/doc
+ifndef PREFIX
+ifdef OPAM_SWITCH_PREFIX
+PREFIX=$(OPAM_SWITCH_PREFIX)
+else
+PREFIX=/usr/local
+endif
+endif
 
 #############
 # Verbosing #

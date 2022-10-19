@@ -110,7 +110,7 @@ stdenvNoCC.mkDerivation rec {
   '';
 
   installFlags = [
-    "INSTALLDIR=$(out)"
+    "PREFIX=$(out)"
   ];
 
   # Simpler for our test target

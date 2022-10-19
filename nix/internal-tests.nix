@@ -133,7 +133,7 @@ stdenvNoCC.mkDerivation rec {
   '';
 
   installFlags = [
-    "INSTALLDIR=$(out)"
+    "PREFIX=$(out)"
   ];
 
   meta = {

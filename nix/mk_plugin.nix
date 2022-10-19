@@ -112,7 +112,7 @@ stdenv.mkDerivation {
   '';
 
   installFlags = [
-    "INSTALLDIR=$(out)"
+    "PREFIX=$(out)"
   ];
 
   postInstall = if install-opam then ''
