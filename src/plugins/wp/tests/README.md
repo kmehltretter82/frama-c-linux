@@ -19,7 +19,8 @@ See section "Advanced Cache Management".
 ## WP Tests Recipes
 
 When using the `./bin/test.sh` test wrapper, you don't need to configure the
-environment variables mentioned below: the script automatically manages them for you.
+environment variables mentioned in section "Advanced Cache Management":
+the script automatically manages them for you.
 
 Before executing WP tests in qualif configuration, you shall initiate the WP-cache.
 This is done automatically by:
@@ -57,3 +58,19 @@ _every_ run of `frama-c -wp` might then use it by default. Be careful if you do 
 
 However, it is _highly_ recommended for frama-c developers to export the
 `FRAMAC_WP_QUALIF` variable in their default shell setup.
+
+If you want to manually run WP tests (using neither `./test.sh`
+nor `make tests`, since the latter already sets some environment variables
+for you), you need to set:
+
+- `FRAMAC_WP_CACHEDIR` to the directory containing a git clone of `wp-cache`;
+- `FRAMAC_WP_CACHE` to one of the following values:
+
+    - `offline`: a cache miss results in goal failure, with "cache miss" as
+                 the cause of failure;
+    - `update`: a cache miss results in calling the solver, getting the
+                result, and updating the global cache with this new value.
+
+  If you are just re-running tests, mode `offline` is the fastest.
+  If you want to update oracles with changes to proof obligations, mode
+  `update` is necessary.
