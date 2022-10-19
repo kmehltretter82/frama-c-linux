@@ -24,6 +24,14 @@
 # --- OPAM Installation
 # --------------------------------------------------------------------------
 
+FILTER= \
+	--exclude-vcs \
+	--exclude "doc" \
+	--exclude "dist" \
+	--exclude "tests" \
+	--exclude "_build" \
+	--exclude "node_modules" \
+
 ifndef PREFIX
 then
 install::
@@ -35,7 +43,7 @@ install::
 	@mkdir -p ${PREFIX}/bin
 	@install ivette/ivette-bootstrap.sh ${PREFIX}/bin/ivette
 	@mkdir -p ${PREFIX}/lib/frama-c
-	@tar zcf ${PREFIX}/lib/frama-c/ivette.tgz ivette
+	@tar zcf ${PREFIX}/lib/frama-c/ivette.tgz ${FILTER} ivette
 
 uninstall::
 	@echo "Removing Ivette"
