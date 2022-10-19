@@ -28,7 +28,7 @@ ifndef PREFIX
 then
 install::
 	@echo "Warning: not target for Ivette"
-	@echo "  (no INSTALLDIR, nor OPAM_SWITCH_PREFIX)"
+	@echo "  (no PREFIX, nor OPAM_SWITCH_PREFIX)"
 else
 install::
 	@echo "Installing Ivette to ${PREFIX}"
