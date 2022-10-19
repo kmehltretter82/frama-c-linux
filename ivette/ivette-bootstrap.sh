@@ -61,7 +61,7 @@ esac
 YARNJS=`yarn --version`
 case $YARNJS in
     1.*)
-        echo " - node $YARNJS found"
+        echo " - yarn $YARNJS found"
         ;;
     *)
         echo "Ivette requires yarn to be installed."
@@ -117,6 +117,9 @@ rm -f $PREFIX/lib/frama-c/ivette.tgz
 # --------------------------------------------------------------------------
 echo "Launching Ivette..."
 # --------------------------------------------------------------------------
+echo "Temp dir: $TMPDIR"
+echo "PREFIX dir: $PREFIX"
+echo "Current dir: $PWD"
 exec $PREFIX/bin/ivette $*
 
 # --------------------------------------------------------------------------
