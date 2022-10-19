@@ -5,7 +5,7 @@ NB: frama-c-gui can be compiled against either lablgtk3 or lablgtk2. However, gt
 is deprecated on most distributions, and it can be difficult to install the appropriate
 support libraries (notably gtksourceview). lablgtk3 should be preferred.
 
-- OCaml 4.08.1
+- OCaml 4.11.1
 - alt-ergo.2.2.0 (for wp, optional)
 - apron.v0.9.13 (for eva, optional)
 - coq.8.13.0 (for wp, optional)

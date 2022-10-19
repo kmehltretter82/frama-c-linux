@@ -15,7 +15,7 @@ stages:
 
 default:
   interruptible: true
-  tags: [ nix ]
+  tags: [ nix-v2 ]
 
 ################################################################################
 ### VARIABLES
@@ -75,6 +75,14 @@ check-release:
   only:
     variables:
       - $RELEASE == "yes"
+
+# Observed: when several shell with same dependencies are started, deadlock may
+#           occur when building these dependencies. We build these dependencies
+#           before running the rest of the pipeline to avoid that.
+prepare-shell-checkers:
+  stage: prepare
+  script:
+    - ./nix/shell-checkers.sh "true"
 
 ################################################################################
 ### BUILD
@@ -185,16 +193,17 @@ external-plugins:
   parallel:
     matrix:
       - PLUGIN: [
-          "ACSL-importer",
-          "Caveat-importer",
+          "acsl-importer",
+          "caveat-importer",
           "context-from-precondition",
           "frama-clang",
           "genassigns",
           "linea-cabs",
           "meta",
+          "minimal",
           "mthread",
           "security",
-          "Volatile"
+          "volatile"
         ]
 
 ################################################################################
@@ -318,22 +327,36 @@ internal_nightly:
 
 # OCaml versions
 
+.build_template: &ocaml_always_additional_versions_template
+  parallel:
+    matrix:
+      - OCAML: ["4.14"]
+
+.build_template: &ocaml_manual_additional_versions_template
+  parallel:
+    matrix:
+      - OCAML: ["4.12", "4.13"]
+  when: manual
+
 .build_template: &ocaml_versions_template
   stage: compatibility
   script:
     - ./nix/build-proxy.sh default-config-tests
-  parallel:
-    matrix:
-      - OCAML: ["4.13"]
 
 ocaml-versions:
   <<: *ocaml_versions_template
+  <<: *ocaml_always_additional_versions_template
   # in schedules, each OCAML is tested in its own complete pipeline
   except:
     - schedules
 
+ocaml-versions-more:
+  <<: *ocaml_versions_template
+  <<: *ocaml_manual_additional_versions_template
+
 ocaml-versions-nightly:
   <<: *ocaml_versions_template
+  <<: *ocaml_always_additional_versions_template
   # we still check them for the publisher pipeline job
   only:
     variables:
