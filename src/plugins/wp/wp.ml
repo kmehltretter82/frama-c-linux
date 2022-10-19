@@ -25,8 +25,8 @@
 (* -------------------------------------------------------------------------- *)
 (** {1 High-Level External API}
 
-   The following modules are the recommanded entry points for using WP
-   programmatically. They are meant to be relatively stable over time.
+    The following modules are the recommanded entry points for using WP
+    programmatically. They are meant to be relatively stable over time.
 
 *)
 (* -------------------------------------------------------------------------- *)
@@ -43,11 +43,11 @@ module Wp_parameters = Wp_parameters
 (* -------------------------------------------------------------------------- *)
 (** {1 Advanced Usage API}
 
-   The following modules entry points for using WP advanced features,
-   such as proof obligation manipulation, tactics and strategies.
-   These modules might expose internal features of WP that are subject
-   to change. Developpers using this API are encouraged to contact us
-   for a roadmap information and further collaboration.
+    The following modules entry points for using WP advanced features,
+    such as proof obligation manipulation, tactics and strategies.
+    These modules might expose internal features of WP that are subject
+    to change. Developpers using this API are encouraged to contact us
+    for a roadmap information and further collaboration.
 *)
 (* -------------------------------------------------------------------------- *)
 
@@ -78,9 +78,9 @@ module Register = Register
 (* -------------------------------------------------------------------------- *)
 (** {1 Low-Level Internal API}
 
-   The following modules are _not_ intended to be used externally. The target
-   audience is WP plug-in developpers. However, developpers interested in
-   such low-level features are encouraged to contact us for more informations.
+    The following modules are _not_ intended to be used externally. The target
+    audience is WP plug-in developpers. However, developpers interested in
+    such low-level features are encouraged to contact us for more informations.
 *)
 (* -------------------------------------------------------------------------- *)
 
