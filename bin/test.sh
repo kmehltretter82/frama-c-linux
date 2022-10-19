@@ -34,7 +34,7 @@ DUNE_ALIAS=
 DUNE_OPT=
 DUNE_LOG=./.test-errors.log
 ALIAS_NAME=ptests
-CACHEDIR=$(pwd -P)/.wp-cache
+LOCAL_WP_CACHE=$(pwd -P)/.wp-cache
 FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
 TEST_DIRS="tests/* src/plugins/*/tests/* src/kernel_internals/parsing/tests"
@@ -56,7 +56,7 @@ function Usage
     echo "  <DIR>     all tests in <DIR>"
     echo "  <FILE>    single test file <FILE>"
     echo ""
-    echo "  -a|--all            run all tests"
+    echo "  -a|--all            run all tests (default behavior)"
     echo "  -d|--default        run tests from default config only"
     echo "  -c|--config <name>  run tests from specified config only"
     echo ""
@@ -67,9 +67,8 @@ function Usage
     echo "  -r|--clean          clean (remove all) test results (includes -p)"
     echo "  -p|--ptests         prepare (all) dune files"
     echo "  -w|--wp-cache       prepare (pull) WP-cache"
-    echo "  -u|--wp-update      update (pull+add) WP-cache"
     echo "  -l|--logs           print output of tests (single file, no diff)"
-    echo "  -k|--commit         commit results as oracles (single file, no diff)"
+    echo "  -u|--update         run tests and update oracles (and WP-cache)"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
     echo "  -h|--help           print this help"
@@ -77,15 +76,11 @@ function Usage
     echo "VARIABLES"
     echo ""
     echo "  FRAMAC_WP_CACHE"
-    echo "    Management mode of wp-cache ($FRAMAC_WP_CACHE)"
+    echo "    Management mode of wp-cache (default is offline or update when -u)"
     echo ""
     echo "  FRAMAC_WP_QUALIF"
     echo "  FRAMAC_WP_CACHEDIR"
-    echo "    Absolute path to wp-cache directory ($FRAMAC_WP_CACHEDIR)"
-    if [ ! -d $FRAMAC_WP_CACHEDIR ]; then
-        echo "    About to clone from $FRAMAC_WP_CACHE_GIT"
-    fi
-    echo "    Please, always push to master branch"
+    echo "    Absolute path to wp-cache directory (git clone locally by default)"
     echo ""
 }
 
@@ -142,7 +137,11 @@ function RequiredTools
 function SetEnv
 {
     if [ "$FRAMAC_WP_CACHE" = "" ]; then
-        export FRAMAC_WP_CACHE=offline
+        if [ "$UPDATE" = "yes" ]; then
+            export FRAMAC_WP_CACHE=update
+        else
+            export FRAMAC_WP_CACHE=offline
+        fi
         Echo "Set FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
     fi
 
@@ -150,7 +149,7 @@ function SetEnv
         export FRAMAC_WP_CACHEDIR="$FRAMAC_WP_QUALIF"
         Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
     elif [ "$FRAMAC_WP_CACHEDIR" = "" ]; then
-        export FRAMAC_WP_CACHEDIR="$CACHEDIR"
+        export FRAMAC_WP_CACHEDIR="$LOCAL_WP_CACHE"
         Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
     fi
 
@@ -363,9 +362,8 @@ do
         "-w"|"--wp-cache")
             PullCache
             ;;
-        "-u"|"--wp-update")
-            PullCache
-            FRAMAC_WP_CACHE=update
+        "-u"|"--update")
+            DUNE_OPT+="--auto-promote"
             UPDATE=yes
             ;;
         "-v"|"--verbose")
