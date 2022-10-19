@@ -180,10 +180,6 @@ include $(DOME)/template/makefile
 BINDIR=$(PREFIX)/bin
 LIBDIR=$(PREFIX)/lib
 
-dist-dir:
-	@echo "Cleaning dist"
-	@rm -fr dist
-
 UNAME=$(shell uname)
 
 ifeq ($(UNAME),Darwin)
