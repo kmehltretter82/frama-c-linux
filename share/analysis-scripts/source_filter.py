@@ -42,32 +42,33 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+from typing import Optional
 
 # warnings about missing commands are disabled during testing
 emit_warns = os.getenv("PTESTS_TESTING") is None
 
-# Cache for get_command
-cached_commands = {}
+# Cache for get_command.
+cached_commands : dict[str, Optional[Path]] = {}
 
 
-def resource_path(relative_path):
+def resource_path(relative_path) -> str:
     """Get absolute path to resource; only used by the pyinstaller standalone distribution"""
     base_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_path, relative_path)
 
 
-def get_command(command, env_var_name):
+def get_command(command: str, env_var_name: str) -> Optional[Path]:
     """Returns a Path to the command; priority goes to the environment variable,
     then in the PATH, then in the resource directory (for a pyinstaller binary)."""
     if command in cached_commands:
         return cached_commands[command]
-    p = os.getenv(env_var_name)
-    if p:
-        p = Path(p)
+    cmd = os.getenv(env_var_name)
+    if cmd:
+        p = Path(cmd)
     else:
-        p = shutil.which(command)
-        if p:
-            p = Path(p)
+        cmd = shutil.which(command)
+        if cmd:
+            p = Path(cmd)
         else:
             p = Path(resource_path(command))
             if not p.exists():
@@ -81,7 +82,7 @@ def get_command(command, env_var_name):
     return p
 
 
-def run_and_check(command_and_args, input_data):
+def run_and_check(command_and_args: list[str], input_data: str) -> str:
     try:
         return subprocess.check_output(
             command_and_args,
@@ -94,25 +95,25 @@ def run_and_check(command_and_args, input_data):
         sys.exit(f"error running command: {command_and_args}\n{e}")
 
 
-def filter_with_scc(input_data):
+def filter_with_scc(input_data: str) -> str:
     scc = get_command("scc", "SCC")
     if scc:
-        return run_and_check([scc, "-k"], input_data)
+        return run_and_check([str(scc), "-k"], input_data)
     else:
         return input_data
 
 
-def filter_with_astyle(input_data):
+def filter_with_astyle(input_data: str) -> str:
     astyle = get_command("astyle", "ASTYLE")
     if astyle:
         return run_and_check(
-            [astyle, "--keep-one-line-blocks", "--keep-one-line-statements"], input_data
+            [str(astyle), "--keep-one-line-blocks", "--keep-one-line-statements"], input_data
         )
     else:
         return input_data
 
 
-def open_and_filter(filename, apply_filters):
+def open_and_filter(filename: str, apply_filters: bool) -> str:
     # we ignore encoding errors and use ASCII to avoid issues when
     # opening files with different encodings (UTF-8, ISO-8859, etc)
     with open(filename, "r", encoding="ascii", errors="ignore") as f:
