@@ -150,7 +150,7 @@ Recommended provers are:
 Use 'why3 config detect' to configure new provers.
  "
 "Ivette is a new GUI for Frama-C, currently in development.
-Run 'ivette' once (online) to finalize installation.
+Run 'ivette' once to finalize installation (requires an internet connection).
 Once finalized, 'ivette' will work offline.
 Finalization also requires Node v16 and Yarn:
 - install NVM (https://github.com/nvm-sh/nvm)
