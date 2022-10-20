@@ -167,13 +167,6 @@ dome-reboot:
 ifeq ("$(DOME)",".")
 .gitignore:
 	@cp -f $(DOME)/template/git-ignore $@
-else
-.gitignore: $(DOME)/template/update.sh $(DOME)/template/git-ignore
-	@((tail -r $(DOME)/template/git-ignore | tail -n +3 | tail -r) || head -n -3 $(DOME)/template/git-ignore)  > $(DOME)/template/git-ignore.local
-	@echo "/$(DOME)" >> $(DOME)/template/git-ignore.local
-	@tail -2 $(DOME)/template/git-ignore >> $(DOME)/template/git-ignore.local
-	@$^.local $@
-	@rm -f $(DOME)/template/git-ignore.local
 endif
 
 .babelrc: $(DOME)/template/update.sh $(DOME)/template/babelrc.json

@@ -31,13 +31,16 @@ DOME_CUSTOM_ENTRIES= yes
 COPYRIGHT=CEA LIST / LSL
 # --------------------------------------------------------------------------
 
-.PHONY: all app dev pkg doc serve dist lint fixlint checkcase
+# --------------------------------------------------------------------------
+# --- Ivette Compilation
+# --------------------------------------------------------------------------
+
+.PHONY: all app dev lint checkcase tsc
 
 all: pkg lint app
 
 app: dome-app
 dev: dome-dev
-dist: dist-dir dome-dist
 
 lint: dome-pkg dome-templ checkcase
 	@echo "[Ivette] running typechecker & linter"
@@ -69,8 +72,22 @@ help::
 	@echo "  - PREFIX: used to customize installation path"
 
 # --------------------------------------------------------------------------
+# --- Ivette Distribution
+# --------------------------------------------------------------------------
+
+.PHONY: dist dist-dir
+
+dist-dir:
+	@echo "Cleaning dist"
+	@rm -fr dist
+
+dist: dist-dir dome-dist
+
+# --------------------------------------------------------------------------
 # --- Ivette Package Loader
 # --------------------------------------------------------------------------
+
+.PHONY: pkg
 
 LOADER=src/renderer/loader.ts
 SANDBOX=src/renderer/sandbox.ts
@@ -158,12 +175,10 @@ include $(DOME)/template/makefile
 # --- Ivette Installation
 # --------------------------------------------------------------------------
 
+.PHONY: install
+
 BINDIR=$(PREFIX)/bin
 LIBDIR=$(PREFIX)/lib
-
-dist-dir:
-	@echo "Cleaning dist"
-	@rm -fr dist
 
 UNAME=$(shell uname)
 
@@ -189,25 +204,32 @@ endif
 
 IVETTE_DIST=$(wildcard dist/linux-unpacked dist/mac dist/mac-arm64)
 
-ifdef LIBDIR
-ifdef BINDIR
+ifdef PREFIX
 ifeq ($(IVETTE_DIST),dist/linux-unpacked)
 
 install:
 	@echo "Installing Ivette (Linux)"
-	@rm -fr $(LIBDIR)/ivette
+	@mkdir -p $(LIBDIR)/frama-c
+	@rm -fr $(LIBDIR)/frama-c/ivette
+	@mv $(IVETTE_DIST) $(LIBDIR)/frama-c/ivette
+	@mkdir -p $(BINDIR)
 	@rm -f $(BINDIR)/ivette
-	@mv $(IVETTE_DIST) $(LIBDIR)/ivette
-	@ln -s $(LIBDIR)/ivette/ivette $(BINDIR)/ivette
+	@ln -s $(LIBDIR)/frama-c/ivette/ivette $(BINDIR)/ivette
 
 else ifeq ($(IVETTE_DIST:-arm64=),dist/mac)
 
 install:
 	@echo "Installing Ivette (macOS)"
-	@rm -fr /Applications/Ivette.app
-	@mv $(IVETTE_DIST)/Ivette.app /Applications/
+	@mkdir -p $(LIBDIR)/frama-c
+	@rm -fr $(LIBDIR)/frama-c/Ivette.app
+	@mv $(IVETTE_DIST)/Ivette.app $(LIBDIR)/frama-c/
+	@cp ivette-macos.sh dist/ivette.sh
+	@echo "exec open -na $(LIBDIR)/frama-c/Ivette.app --args\\" >> dist/ivette.sh
+	@echo "  --command $(BINDIR)/frama-c\\" >> dist/ivette.sh
+	@echo "  --working \$$PWD \$$*" >> dist/ivette.sh
+	@mkdir -p $(BINDIR)
+	@install dist/ivette.sh $(BINDIR)/ivette
 	@rm -fr $(IVETTE_DIST)
-	@install ivette-macos.sh $(BINDIR)/ivette
 
 else
 
@@ -217,24 +239,27 @@ install:
 	@exit 1
 
 endif
-endif
+else
+
+install:
+	@echo "PREFIX not defined"
+	@exit 1
+
 endif
 
 # --------------------------------------------------------------------------
 # --- Ivette Un-Installation
 # --------------------------------------------------------------------------
 
-ifdef LIBDIR
-ifdef BINDIR
+ifdef PREFIX
 
 uninstall:
 	@echo "Uninstall Ivette"
-	@rm -fr dist
-	@rm -fr /Applications/Ivette.app
-	@rm -fr $(LIBDIR)/ivette
-	@rm -f $(BINDIR)/ivette
+	@rm -f  $(BINDIR)/ivette
+	@rm -f  $(LIBDIR)/frama-c/ivette.tgz
+	@rm -fr $(LIBDIR)/frama-c/Ivette.app
+	@rm -fr $(LIBDIR)/frama-c/ivette
 
-endif
 endif
 
 # --------------------------------------------------------------------------

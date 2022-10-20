@@ -816,7 +816,7 @@ case "${STEP}" in
     9)
         step 9 "GENERATE OPAM FILE"
         assert_out_dir
-        cat opam/opam | grep -v "^version\:" | grep -v "^name\:" > $OUT_DIR/opam
+        cat opam | grep -v "^version\:" | grep -v "^name\:" > $OUT_DIR/opam
         echo >> "$OUT_DIR/opam"
         echo "url {" >> "$OUT_DIR/opam"
         echo "  src: \"https://git.frama-c.com/pub/frama-c/-/wikis/downloads/$TARGZ_FILENAME\"" >> "$OUT_DIR/opam"

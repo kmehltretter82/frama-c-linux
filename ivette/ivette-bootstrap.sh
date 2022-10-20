@@ -22,60 +22,101 @@
 ##########################################################################
 
 # --------------------------------------------------------------------------
-# ---  Compute mode
+# ---  Ivette bootstrapper for OPAM installation
 # --------------------------------------------------------------------------
 
-OPT=""
-LOG=""
+echo "Building Ivette"
+USERCWD=`pwd`
 
-case $1 in
-    "--dev"|"-D")
-        OPT="--dev"
-        LOG=".dome-pkg-dev"
-        shift
-        ;;
-    "--app"|"-A")
-        OPT=""
-        LOG=".dome-pkg-app"
-        shift
+# --------------------------------------------------------------------------
+
+function InstallHelp()
+{
+    echo "Ivette Requirements:"
+    echo "  - node v16"
+    echo "  - yarn (any version)"
+    echo "Recommanded Installation:"
+    echo "  - install nvm (https://github.com/nvm-sh/nvm)"
+    echo "  - run 'nvm use 16'"
+    echo "  - run 'npm install --global yarn'"
+    echo "  - run 'ivette'"
+}
+
+# --------------------------------------------------------------------------
+echo "[1/3] Configuring"
+# --------------------------------------------------------------------------
+
+NODEJS=`node --version`
+case $NODEJS in
+    v16.*)
+        echo " - node $NODEJS found"
         ;;
     *)
-        echo "Require --dev or --app option"
+        echo "Ivette requires node version 16 to be installed."
+        echo
+        InstallHelp
+        exit 1 ;;
+esac
+
+YARNJS=`yarn --version`
+case $YARNJS in
+    1.*)
+        echo " - yarn $YARNJS found"
+        ;;
+    *)
+        echo "Ivette requires yarn to be installed."
+        echo
+        InstallHelp
         exit 1
         ;;
 esac
 
-# --------------------------------------------------------------------------
-# ---  Check for Updates
-# --------------------------------------------------------------------------
+SELF=`dirname $0`
+cd $SELF/..
+PREFIX=`pwd`
 
-rm -f $LOG.tmp
-echo $* > $LOG.tmp
-
-if [ -f $LOG.lock ]
+if [ -f $PREFIX/lib/frama-c/ivette.tgz ]
 then
-    diff $LOG.tmp $LOG.lock
-    if [ $? -eq 0 ]
-    then
-        rm -f $LOG.tmp
-        echo "Packages are up-to-date."
-        exit 0
-    fi
-fi
-
-# --------------------------------------------------------------------------
-# ---  Updates Packages
-# --------------------------------------------------------------------------
-
-echo "yarn add $OPT $*"
-yarn add $OPT $*
-
-if [ $? -eq 0 ]
-then
-    mv -f $LOG.tmp $LOG.lock
+    echo " - prefix $PREFIX"
 else
-    echo "Package installation failed."
+    echo "Ivette archive not found ($PREFIX)"
     exit 1
 fi
+
+# --------------------------------------------------------------------------
+echo "[2/3] Compiling Ivette"
+# --------------------------------------------------------------------------
+
+TMPDIR=`mktemp -d`
+cd $TMPDIR
+tar zxf $PREFIX/lib/frama-c/ivette.tgz
+cd ivette
+make dist
+if [ "$?" != "0" ]
+then
+    echo "Compilation Failed"
+    rm -fr $TMPDIR
+    exit 2
+fi
+
+# --------------------------------------------------------------------------
+echo "[3/3] Finalizing Installation"
+# --------------------------------------------------------------------------
+
+make PREFIX=$PREFIX install
+if [ "$?" != "0" ]
+then
+    echo "Installation Failed"
+    rm -fr $TMPDIR
+    exit 3
+fi
+cd $USERCWD
+rm -fr $TMPDIR
+rm -f $PREFIX/lib/frama-c/ivette.tgz
+
+# --------------------------------------------------------------------------
+echo "Launching Ivette..."
+# --------------------------------------------------------------------------
+exec $PREFIX/bin/ivette $*
 
 # --------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-#!/bin/zsh
+#! /usr/bin/env bash
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -20,5 +20,3 @@
 #  for more details (enclosed in the file licenses/LGPLv2.1).            #
 #                                                                        #
 ##########################################################################
-
-exec open -na /Applications/Ivette.app --args --working $PWD $*

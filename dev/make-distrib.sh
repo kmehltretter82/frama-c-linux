@@ -53,7 +53,7 @@ FRAMAC_TAR="$FRAMAC.tar"
 ################################################################################
 # Check Opam file
 
-OPAM_VERSION=$(cat opam/opam | grep "^version" | sed 's/version: \"\(.*\)\"/\1/')
+OPAM_VERSION=$(cat opam | grep "^version" | sed 's/version: \"\(.*\)\"/\1/')
 
 if [ "$VERSION" != "$OPAM_VERSION" ]; then
   echo "VERSION ($VERSION) and OPAM_VERSION ($OPAM_VERSION) differ"
