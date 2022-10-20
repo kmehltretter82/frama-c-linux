@@ -22,6 +22,19 @@
 
 ##########################################################################
 #                                                                        #
+# Frama-C Documentation targets                                          #
+#                                                                        #
+##########################################################################
+
+.PHONY: doc
+
+doc:
+	dune build @doc
+	@echo "Generated Documentation:"
+	@echo "   file:///$(PWD)/_build/default/_doc/_html/index.html"
+
+##########################################################################
+#                                                                        #
 # Generate Documentation for Server Requests and Protocols.              #
 #                                                                        #
 ##########################################################################
