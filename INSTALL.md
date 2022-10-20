@@ -377,7 +377,7 @@ dune build @ptests_config
 
 Type `make install` (depending on the installation directory, this may require
 superuser privileges. The installation directory is chosen through the variable
-`INSTALLDIR`). This is a shortcut for:
+`PREFIX`). This is a shortcut for:
 
 ```
 dune install
