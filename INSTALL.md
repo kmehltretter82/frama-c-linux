@@ -357,7 +357,7 @@ Typing `make` builds in development mode, this is a shortcut for:
 dune build @install
 ```
 
-Typing `make RELEASE=yes` builds in release mode, this is shortcut for:
+Typing `make RELEASE=yes` builds in release mode, this is a shortcut for:
 ```
 dune build @install --release --promote-install-files=false
 ```
@@ -370,7 +370,7 @@ Basic tests can be executed using:
 
 ```
 make run-ptests
-dune build @ptests_config
+make default-tests
 ```
 
 #### Installation
@@ -388,6 +388,12 @@ dune install
 For plugin developers, the API documentation of the Frama-C kernel and
 distributed plugins is available in the `_build/default/_doc/_html` directory
 after running:
+
+```
+make doc
+```
+
+or:
 
 ```
 dune build @doc
