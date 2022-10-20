@@ -47,9 +47,9 @@ install::
 
 uninstall::
 	@echo "Removing Ivette"
-	@rm -f ${PREFIX}/bin/ivette
-	@rm -f ${PREFIX}/lib/frama-c/ivette.tgz
+	@rm -f  ${PREFIX}/bin/ivette
+	@rm -f  ${PREFIX}/lib/frama-c/ivette.tgz
 	@rm -fr ${PREFIX}/lib/frama-c/Ivette.app
 	@rm -fr ${PREFIX}/lib/frama-c/ivette
-
+	
 endif

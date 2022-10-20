@@ -255,10 +255,10 @@ ifdef PREFIX
 
 uninstall:
 	@echo "Uninstall Ivette"
+	@rm -f  $(BINDIR)/ivette
+	@rm -f  $(LIBDIR)/frama-c/ivette.tgz
 	@rm -fr $(LIBDIR)/frama-c/Ivette.app
-	@rm -f $(LIBDIR)/frama-c/ivette.tgz
-	@rm -f $(LIBDIR)/frama-c/ivette
-	@rm -f $(BINDIR)/ivette
+	@rm -fr $(LIBDIR)/frama-c/ivette
 
 endif
 
