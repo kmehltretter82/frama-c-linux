@@ -20,6 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Rte = struct
+  type status_accessor =
+    string
+    * (Cil_types.kernel_function -> bool -> unit)
+    * (Cil_types.kernel_function -> bool)
+  let get_all_status: (unit -> status_accessor list) option ref = ref None
+  let register_get_all_status getter = get_all_status := Some getter
+end
+
 open Design
 open Cil_types
 open Property_status
@@ -220,6 +229,10 @@ struct
     checks := chk :: !checks;
     chk
 
+  let hint_rte hint =
+    if Option.is_some !Rte.get_all_status then hint
+    else hint ^ " (but RteGen plugin is inactive)"
+
   let onlyCurrent = add ~name:"Current function" ~default:false
       ~hint:"Only show properties related to current function" ()
 
@@ -248,7 +261,7 @@ struct
   (* Function called when RTEs are enabled or disabled. *)
   let set_rte = ref (fun _b -> ())
   let rte = add ~set:(fun b -> !set_rte b) ~name:"RTEs"
-      ~hint:"Show runtime errors" ()
+      ~hint:(hint_rte "Show runtime errors") ()
   let invariant = add ~name:"Invariant"
       ~hint:"Show loop invariants" ()
   let variant = add ~name:"Variant"
@@ -273,9 +286,9 @@ struct
       ~hint:"Show 'reachable' hypotheses" ()
 
   let rteNotGenerated = add ~default:false ~name:"Non generated"
-      ~hint:"Show RTEs assertions that remain to generate" ()
+      ~hint:(hint_rte "Show RTEs assertions that remain to generate") ()
   let rteGenerated = add ~default:false ~name:"Generated"
-      ~hint:"Show RTEs assertions that have been generated" ()
+      ~hint:(hint_rte "Show RTEs assertions that have been generated") ()
 
   let valid = add ~name:"Valid"
       ~hint:"Show properties that are proven valid" ()
@@ -408,7 +421,7 @@ open Refreshers
 
 (* Process the rte statuses for the given kf, and add the result in the
    accumulator. Filter the statuses according to user-selected filters*)
-let aux_rte kf acc (name, _, rte_status_get: Db.RteGen.status_accessor) =
+let aux_rte kf acc (name, _, rte_status_get: Rte.status_accessor) =
   let st = rte_status_get kf in
   match st, rteGenerated.get (), rteNotGenerated.get () with
   | true, true, _
@@ -705,7 +718,10 @@ let make_panel (main_ui:main_window_extension_points) =
          ) main_ui#file_tree#selected_globals)
     in
 
-    let rte_get_all_statuses = !Db.RteGen.get_all_status () in
+    let rte_get_all_statuses = match !Rte.get_all_status with
+      | None -> []
+      | Some registered_getter -> registered_getter ()
+    in
     (* All non-filtered RTE statuses for a given function *)
     let rte_kf kf = List.fold_left (aux_rte kf) [] rte_get_all_statuses in
     (* Add RTE statuses for all functions. We cannot simply iterate over

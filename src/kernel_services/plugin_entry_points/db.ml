@@ -839,30 +839,6 @@ module Security = struct
   let self = ref State.dummy
 end
 
-module RteGen = struct
-  type status_accessor =
-    string * (kernel_function -> bool -> unit) * (kernel_function -> bool)
-  let compute = mk_fun "RteGen.compute"
-  let annotate_kf = mk_fun "RteGen.annotate_kf"
-  let self = ref State.dummy
-  let do_all_rte = mk_fun "RteGen.do_all_rte"
-  let do_rte = mk_fun "RteGen.do_rte"
-  let get_all_status = mk_fun "RteGen.get_all_status"
-  let get_signedOv_status = mk_fun "RteGen.get_signedOv_status"
-  let get_divMod_status = mk_fun "RteGen.get_divMod_status"
-  let get_initialized_status = mk_fun "RteGen.get_initialized_status"
-  let get_signed_downCast_status = mk_fun "RteGen.get_signed_downCast_status"
-  let get_memAccess_status = mk_fun "RteGen.get_memAccess_status"
-  let get_pointerCall_status = mk_fun "RteGen.get_pointerCall_status"
-  let get_unsignedOv_status = mk_fun "RteGen.get_unsignedOv_status"
-  let get_unsignedDownCast_status = mk_fun "RteGen.get_unsignedDownCast_status"
-  let get_pointer_downcast_status = mk_fun "RteGen.get_pointer_downcast_status"
-  let get_float_to_int_status = mk_fun "RteGen.get_float_to_int_status"
-  let get_finite_float_status = mk_fun "RteGen.get_finite_float_status"
-  let get_pointer_value_status = mk_fun "RteGen.get_pointer_value_status"
-  let get_bool_value_status = mk_fun "RteGen.get_bool_value_status"
-end
-
 module PostdominatorsTypes = struct
   exception Top
 

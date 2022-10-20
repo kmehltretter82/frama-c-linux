@@ -20,6 +20,18 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(rule
+ (alias frama-c-configure)
+ (deps (universe))
+ (action (progn
+          (echo "Slicing GUI:" %{lib-available:frama-c-slicing.gui} "\n")
+          (echo "  - Frama-C GUI:" %{lib-available:frama-c.gui} "\n")
+          (echo "  - Slicing:" %{lib-available:frama-c-slicing.core} "\n")
+
+  )
+  )
+)
+
 ( library
   (name slicing_gui)
   (public_name frama-c-slicing.gui)

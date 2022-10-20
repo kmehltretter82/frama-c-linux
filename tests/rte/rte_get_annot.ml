@@ -48,7 +48,7 @@ let show_rte_of_kf kf =
 let main () =
   Ast.compute () ;
   Kernel.SignedOverflow.on ();
-  let do_rte = !Db.RteGen.do_rte in
+  let do_rte = RteGen.Api.do_rte in
   Globals.Functions.iter (fun kf -> do_rte kf);
   print () ;
   Globals.Functions.iter show_rte_of_kf

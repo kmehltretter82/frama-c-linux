@@ -754,48 +754,6 @@ module Postdominators: PostdominatorsTypes.Sig
     @see <../postdominators/index.html> internal documentation. *)
 module PostdominatorsValue: PostdominatorsTypes.Sig
 
-(** Runtime Error Annotation Generation plugin.
-    @see <../rte/index.html> internal documentation. *)
-module RteGen : sig
-  (** Same result as having [-rte] on the command line*)
-  val compute : (unit -> unit) ref
-
-  (** Generates RTE for a single function. Uses the status of the various
-      RTE options do decide which kinds of annotations must be generated.
-  *)
-  val annotate_kf : (kernel_function -> unit) ref
-
-  (** Generates all possible RTE for a given function. *)
-  val do_all_rte : (kernel_function -> unit) ref
-
-  (** Generates all possible RTE except pre-conditions for a given function. *)
-  val do_rte : (kernel_function -> unit) ref
-
-  val self: State.t ref
-  type status_accessor =
-    string (* name *)
-    * (kernel_function -> bool -> unit) (* for each kf and each kind of
-                                           annotation, set/unset the fact
-                                           that there has been generated *)
-    * (kernel_function -> bool) (* is this kind of annotation generated in
-                                   kf? *)
-  val get_all_status : (unit -> status_accessor list) ref
-  val get_divMod_status : (unit -> status_accessor) ref
-  val get_initialized_status: (unit -> status_accessor) ref
-  val get_memAccess_status : (unit -> status_accessor) ref
-  val get_pointerCall_status: (unit -> status_accessor) ref
-  val get_signedOv_status : (unit -> status_accessor) ref
-  val get_signed_downCast_status : (unit -> status_accessor) ref
-  val get_unsignedOv_status : (unit -> status_accessor) ref
-  val get_unsignedDownCast_status : (unit -> status_accessor) ref
-  val get_pointer_downcast_status : (unit -> status_accessor) ref
-  val get_float_to_int_status : (unit -> status_accessor) ref
-  val get_finite_float_status : (unit -> status_accessor) ref
-  val get_pointer_value_status : (unit -> status_accessor) ref
-  val get_bool_value_status : (unit -> status_accessor) ref
-end
-
-
 (** Security analysis.
     @see <../security/index.html> internal documentation. *)
 module Security : sig
