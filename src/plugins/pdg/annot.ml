@@ -76,13 +76,13 @@ let find_nodes_for_function_contract pdg f_interpret =
 
 let find_fun_precond_nodes (pdg:PdgTypes.Pdg.t) p =
   let f_interpret kf =
-    let f_ctx = Logic_deps.mk_ctx_func_contrat ~before:true kf in
+    let f_ctx = Logic_deps.mk_ctx_func_contract ~before:true kf in
     Logic_deps.from_pred p f_ctx
   in find_nodes_for_function_contract pdg f_interpret
 
 let find_fun_postcond_nodes pdg p =
   let f_interpret kf =
-    let f_ctx = Logic_deps.mk_ctx_func_contrat ~before:false kf in
+    let f_ctx = Logic_deps.mk_ctx_func_contract ~before:false kf in
     Logic_deps.from_pred p f_ctx
   in let nodes,deps = find_nodes_for_function_contract pdg f_interpret
   in let nodes =
@@ -97,7 +97,7 @@ let find_fun_postcond_nodes pdg p =
 
 let find_fun_variant_nodes pdg t =
   let f_interpret kf =
-    let f_ctx = Logic_deps.mk_ctx_func_contrat ~before:true kf in
+    let f_ctx = Logic_deps.mk_ctx_func_contract ~before:true kf in
     Logic_deps.from_term t f_ctx
   in find_nodes_for_function_contract pdg f_interpret
 

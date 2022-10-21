@@ -26,11 +26,11 @@ val compute_term_deps: (stmt -> term -> Locations.Zone.t option) ref
 
 type ctx
 
-val mk_ctx_func_contrat: ?before:bool -> kernel_function -> ctx
+val mk_ctx_func_contract: ?before:bool -> kernel_function -> ctx
 (** To build an interpretation context relative to function
     contracts. *)
 
-val mk_ctx_stmt_contrat: ?before:bool -> kernel_function -> stmt -> ctx
+val mk_ctx_stmt_contract: ?before:bool -> kernel_function -> stmt -> ctx
 (** To build an interpretation context relative to statement
     contracts. *)
 

@@ -47,10 +47,10 @@ type t = {before:bool ; ki:stmt ; zone:Locations.Zone.t}
 type zone_info = (t list) option
 type decl = {var: Varinfo.Set.t ; lbl: Logic_label.Set.t}
 
-let mk_ctx_func_contrat ?before kf =
+let mk_ctx_func_contract ?before kf =
   { before; site=FunctionContract; kf }
 
-let mk_ctx_stmt_contrat ?before kf stmt =
+let mk_ctx_stmt_contract ?before kf stmt =
   { before; site=StatementContract stmt; kf }
 
 let mk_ctx_stmt_annot kf stmt =
