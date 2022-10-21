@@ -148,7 +148,6 @@ endif
 .PHONY: dome-templ dome-reboot
 
 DOME_MK_TEMPLATES= \
-	.gitignore \
 	.babelrc \
 	webpack.main.js \
 	webpack.renderer.js \
@@ -163,11 +162,6 @@ dome-reboot:
 	$(MAKE) dome-templ dome-pkg
 
 # Templated files
-
-ifeq ("$(DOME)",".")
-.gitignore:
-	@cp -f $(DOME)/template/git-ignore $@
-endif
 
 .babelrc: $(DOME)/template/update.sh $(DOME)/template/babelrc.json
 	@$^ $@
