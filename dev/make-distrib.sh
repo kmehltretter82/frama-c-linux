@@ -174,7 +174,11 @@ fi
 echo $VERSION_SAFE > $TMP_DIR/$FRAMAC/VERSION
 echo $VERSION_CODENAME > $TMP_DIR/$FRAMAC/VERSION_CODENAME
 
-tar czf $FRAMAC_TAR.gz -C $TMP_DIR $FRAMAC
+DATE="$(date +%F)"
+
+tar czf $FRAMAC_TAR.gz -C $TMP_DIR $FRAMAC \
+  --numeric-owner --owner=0 --group=0 --sort=name --mode='a+rw' \
+  --mtime="$DATE Z"
 
 if [[ "$CI_LINK" == "yes" ]]; then
   ln $FRAMAC_TAR.gz "frama-c.tar.gz"
