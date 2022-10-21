@@ -109,7 +109,7 @@ run-test: [
 
 # Please keep depends and depopts sorted by package name
 depends: [
-  "dune" { >= "3.2.0" }
+  "dune" { (>= "3.2.0" & os!="macos") | (>= "3.5.0" & os="macos") }
   "dune-configurator"
   "dune-private-libs"
   "dune-site"
