@@ -201,6 +201,7 @@ let example_msg =
      STDOPT: +<extra>    @[<v 0># Defines a sub-test and append the extra to the current option.@]@  \
      STDOPT: #<extra>    @[<v 0># Defines a sub-test and prepend the extra to the current option.@]@  \
      PLUGIN: <plugin>... @[<v 0># Adds a dependency and set the macro @@PTEST_PLUGIN@@ defining the '-load-plugins' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
+     LIBRARY: <pkg.lib>... @[<v 0># Adds a dependency and set the macro @@PTEST_LIBRARY@@ defining the '-load-library' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
      CMXS: <module>...   @[<v 0># Defines dune targets without dependency to tests so use '-load-module %%{dep:<module>.cmxs}' into the test options.@]@  \
      MODULE: <module>... @[<v 0># Adds a dependency and adds the corresponding '-load-module' option into the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
      SCRIPT: <module>... @[alias 'MODULE' directive.@]@  \
@@ -238,7 +239,7 @@ let example_msg =
      @]@ \
      @[<v 1>\
      Other macros can only be used in test commands (CMD and EXECNOW directives):@  \
-     @@PTEST_LOAD_OPTIONS@@ # The current list of options related to PLUGIN, MODULE, SCRIPT and LIBS to load.@  \
+     @@PTEST_LOAD_OPTIONS@@ # The current list of options related to PLUGIN, LIBRARY, MODULE, SCRIPT and LIBS to load.@  \
      @@PTEST_OPTIONS@@  # The current list of options related to OPT and STDOPT directives (for CMD directives).@  \
      @@frama-c-exe@@    # Shortcut defined as follow: %s@  \
      @@frama-c@@        # Shortcut defined as follow: %s@  \
@@ -589,6 +590,7 @@ module Macros = struct
         "PTEST_MODULE", "";
         "PTEST_SCRIPT", "";
         "PTEST_PLUGIN", "";
+        "PTEST_LIBRARY", "";
         "PTEST_ENABLED_IF", "true";
       ] empty
 
@@ -597,6 +599,7 @@ end
 module StringSet = Set.Make(String)
 type deps =  {
   load_plugin: string list option;
+  load_library: string list option;
   load_libs: string list option;
   load_module: string list option;
   deps_cmd: string list option;
@@ -637,6 +640,7 @@ type config =
     dc_deps : string list option ; (** deps *)
     dc_enabled_if : string option ; (** enabled if condition *)
     dc_plugin : string list option; (** only plugins to load *)
+    dc_library : string list option; (** additional libraries to load *)
     dc_module : string list option; (** module to load *)
     dc_macros: Macros.t; (** existing macros. *)
     dc_default_toplevel   : string;
@@ -714,6 +718,7 @@ end = struct
         logs=[];
         bins=[];
         deps={ load_plugin=None;
+               load_library=None;
                load_libs=None;
                load_module=None;
                deps_cmd=None;
@@ -731,6 +736,7 @@ end = struct
       dc_deps = None;
       dc_enabled_if = None;
       dc_plugin = None;
+      dc_library = None;
       dc_module = None;
       dc_filter = None ;
       dc_exit_code = None;
@@ -812,13 +818,14 @@ end = struct
       (* preserve options ordering *)
       List.fold_right (fun x s -> s ^ " " ^ x) opts ""
 
-  let deps_of_config ?(deps={load_module=None;load_libs=None;load_plugin=None;deps_cmd=None;enabled_if=None}) config =
+  let deps_of_config ?(deps={load_module=None;load_library=None;load_libs=None;load_plugin=None;deps_cmd=None;enabled_if=None}) config =
     let select ~prev ~config = match config with
       | None -> prev
       | _ -> config
     in
     { load_module = select ~prev:deps.load_module ~config:config.dc_module;
       load_plugin = select ~prev:deps.load_plugin ~config:config.dc_plugin;
+      load_library = select ~prev:deps.load_library ~config:config.dc_library;
       load_libs= select ~prev:deps.load_libs ~config:config.dc_libs;
       deps_cmd = select ~prev:deps.deps_cmd ~config:config.dc_deps;
       enabled_if = select ~prev:deps.enabled_if ~config:config.dc_enabled_if
@@ -877,11 +884,15 @@ end = struct
       dc_libs = Some l;
       dc_macros = Macros.add_list ["PTEST_LIBS", s] current.dc_macros }
 
-  let config_plugin ~drop:_ ~file ~dir:_ s current =
+  let config_gen var_name =
+    fun ~drop:_ ~file ~dir:_ s current ->
     let s = Macros.expand ~file current.dc_macros s in
     let l = split_list s in
     { current with dc_plugin = Some l ;
-                   dc_macros = Macros.add_list ["PTEST_PLUGIN", s] current.dc_macros }
+                   dc_macros = Macros.add_list [var_name, s] current.dc_macros }
+
+  let config_plugin = config_gen "PTEST_PLUGIN"
+  let config_library = config_gen "PTEST_LIBRARY"
 
   let config_module macro_name ~drop:_ ~file ~dir:_ s current =
     let s = Macros.expand ~file current.dc_macros s in
@@ -1024,6 +1035,7 @@ end = struct
       "MODULE", config_module "PTEST_MODULE";
       "SCRIPT", config_module "PTEST_SCRIPT";
       "PLUGIN", config_plugin;
+      "LIBRARY", config_library;
 
       "LOG",
       (fun ~drop:_ ~file ~dir:_ s current ->
@@ -1210,9 +1222,10 @@ let basic_command_string command =
       | l -> Printf.sprintf "%s=%s" opt (String.concat "," l)
     in
     let opt_plugin = load_option "-load-plugin" command.deps.load_plugin in
+    let opt_library = load_option "-load-library" command.deps.load_library in
     let opt_libs = load_option "-load-module" command.deps.load_libs in
     let opt_modules =  load_option "-load-module" command.deps.load_module in
-    String.concat " " [opt_plugin; opt_libs; opt_modules]
+    String.concat " " [opt_plugin; opt_library; opt_libs; opt_modules]
   in
   let macros = (* set expanded macros that can be used into CMD directives *)
     Macros.add_list [
@@ -1259,6 +1272,13 @@ module Fmt = struct
       else s
     in
     Format.fprintf fmt "%a" pp_plugin_name base
+  let pp_library_as_package fmt s =
+    let base =
+      if String.contains s '.' then
+        String.sub s 0 (String.index s '.')
+      else s
+    in
+    Format.fprintf fmt "%s" base
   let quote pr fmt s = Format.fprintf fmt "%S" (Format.asprintf "%a" pr s)
   let list pr fmt l = List.iter (fun s -> Format.fprintf fmt " %a" pr s) l
   let var_libavailable pr fmt s = Format.fprintf fmt "%%{lib-available:%a}" pr s
@@ -1290,15 +1310,21 @@ let pp_list_deps fmt l =
 let update_enabled_if ~enabled_if deps =
   (* code similar to pp_enabled_if_content *)
   Option.iter (fun cond -> enabled_if := StringSet.add cond !enabled_if) deps.enabled_if;
-  List.iter (fun lib ->
-      let cond = Format.asprintf "%a" Fmt.(var_libavailable pp_plugin_as_lib) lib in
-      enabled_if := StringSet.add cond !enabled_if)
-    (list_of_deps deps.load_plugin)
+  let iter_enabled_if pp lib =
+    let cond = Format.asprintf "%a" Fmt.(var_libavailable pp) lib in
+    enabled_if := StringSet.add cond !enabled_if
+  in
+  List.iter (iter_enabled_if pp_plugin_as_lib)
+    (list_of_deps deps.load_plugin);
+  List.iter (iter_enabled_if Format.pp_print_string)
+    (list_of_deps deps.load_library)
 
 let pp_enabled_if_content fmt deps =
-  Format.fprintf fmt "(and %s%a)"
+  Format.fprintf fmt "(and %s%a%a)"
     (Option.value ~default:"true" deps.enabled_if)
     Fmt.(list (var_libavailable pp_plugin_as_lib)) (list_of_deps deps.load_plugin)
+    Fmt.(list (var_libavailable Format.pp_print_string))
+    (list_of_deps deps.load_library)
 
 let pp_enabled_if fmt deps =
   Format.fprintf fmt "%s(enabled_if %a)"
@@ -1306,13 +1332,16 @@ let pp_enabled_if fmt deps =
     pp_enabled_if_content deps
 
 let pp_command_deps fmt command =
-  Format.fprintf fmt "%S %a (package frama-c) %a"
+  Format.fprintf fmt "%S %a (package frama-c) %a %a"
     (* the test file *)
     command.file
     (* from DEPS: LIBS: and MODULE: directives *)
     pp_list_deps (list_of_deps command.deps.deps_cmd)
     (* from PLUGIN directives *)
     Fmt.(list (package_as_deps (quote pp_plugin_as_package))) (list_of_deps command.deps.load_plugin)
+    (* from LIBRARY directives *)
+    Fmt.(list (package_as_deps (quote pp_library_as_package)))
+    (list_of_deps command.deps.load_library)
 
 let show_cmd =
   let regexp_read = Str.regexp "%{read:\\([^}]+\\)}" in
@@ -1662,10 +1691,11 @@ let deps_command ~file macros deps =
   let subst = Macros.expand_list ~file macros in
   let enabled_if = Macros.expand_enabled_if ~file macros deps.enabled_if in
   let load_plugin = Option.map subst deps.load_plugin in
+  let load_library = Option.map subst deps.load_library in
   let load_module = Option.map subst deps.load_module in
   let load_libs = Option.map (fun libs -> List.map (fun s -> s^".cmxs") (subst libs)) deps.load_libs in
   let deps_cmd = Option.map subst deps.deps_cmd in
-  { enabled_if; load_plugin; load_module; load_libs;
+  { enabled_if; load_plugin; load_library; load_module; load_libs;
     (* Merge LIBS: MODULE: and DEPS: directives as a dependency to files *)
     deps_cmd = Some ((list_of_deps load_libs) @ (list_of_deps load_module) @ (list_of_deps deps_cmd));
   }
@@ -1673,10 +1703,11 @@ let deps_command ~file macros deps =
 let update_modules ~file ~modules deps =
   let load_module = list_of_deps deps.load_module in
   if load_module <> [] then begin
-    let plugin_libs = StringSet.union
-        (StringSet.of_list (List.map (Format.asprintf "%a" pp_plugin_as_lib) (list_of_deps deps.load_plugin)))
-        (StringSet.of_list (List.map (fun s -> Filename.remove_extension_opt [".cmxs"; ".cma"; ".ml"]  (Filename.basename s))
-                              (list_of_deps deps.load_libs)))
+    let plugin_libs = List.fold_left (fun acc e -> StringSet.union acc (StringSet.of_list e)) StringSet.empty
+        [(List.map (Format.asprintf "%a" pp_plugin_as_lib) (list_of_deps deps.load_plugin));
+         (List.map (Format.asprintf "%s") (list_of_deps deps.load_library));
+         (List.map (fun s -> Filename.remove_extension_opt [".cmxs"; ".cma"; ".ml"]  (Filename.basename s))
+            (list_of_deps deps.load_libs))]
     in
     List.iter (fun cmxs ->
         let cmxs = Filename.remove_extension_opt [".cmxs"; ".cmo"; ".ml"] cmxs in
