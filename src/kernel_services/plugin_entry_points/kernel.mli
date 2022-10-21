@@ -372,6 +372,11 @@ module LoadState: Parameter_sig.Filepath
 module LoadModule: Parameter_sig.String_list
 (** Behavior of option "-load-module" *)
 
+module LoadLibrary: Parameter_sig.String_list
+(** Behavior of option "-load-library"
+    @since Frama-C+dev
+*)
+
 module AutoLoadPlugins: Parameter_sig.Bool
 (** Behavior of option "-autoload-plugins" *)
 

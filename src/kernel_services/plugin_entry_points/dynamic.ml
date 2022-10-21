@@ -133,7 +133,7 @@ let load_module m =
   let base,ext = split_ext m in
   match ext with
   | ".ml" ->
-    Klog.error "Script loading as been deprecated in favor of the command frama-c-init-plugin"
+    Klog.error "Script loading as been deprecated in favor of the load of script libraries (see shell script `frama-c-build-scripts.sh` to build such a script library that can be loaded via the Frama-C option `-load-library`)."
   | _ ->
     begin
       (* load object or compile script or find package *)
