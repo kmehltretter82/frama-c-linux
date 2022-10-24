@@ -94,7 +94,7 @@ module Call_info = struct
     let list = ref [] in
     iter (fun elt ->
         let ci = get_ci elt in
-        if total_duration current_time ci	> threshold
+        if total_duration current_time ci > threshold
         then list := elt::!list);
     let sorted_list = List.fast_sort
         (fun elt1 elt2 -> (cmp current_time) (get_ci elt1) (get_ci elt2)) !list

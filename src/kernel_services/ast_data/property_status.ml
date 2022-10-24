@@ -1142,43 +1142,43 @@ module Consolidation = struct
            consolidate_of_local_when_cycle ppt
            (* [JS 2011/11/04] use the following code (to be tested) as soon as WP uses the
               new function [legal_dependency_cycle] *)
-           (*	  match e with
-             | Not_yet -> assert false
-             | Single e ->
-             if Valid_cycles.mem e path then
-             consolidate_of_local_when_cycle ppt
-             else
-             Kernel.fatal
-             "illegal dependency cycle for emitter %a"
-             Usable_emitter.pretty e
-             | Several ->
-             (* cycle because the proof of [ppt] with emitter [E1] depends
-             on another [ppt'] which is proven with another emitter [E2]
-             by using [ppt] itself: it is not inconsistent by itself, but we
-             cannot use it as a proof. *)
-             consolidate ppt
-             (fun _ ->
-             Unknown
-             (Usable_emitter.Map.add
-             usable_kernel_emitter
-             (Usable_emitter.Map.add
-             usable_kernel_emitter
-             (List.fold_left
-             (fun acc p -> Property.Set.add p acc)
-             Property.Set.empty
-             path)
-             Usable_emitter.Map.empty)
-             Usable_emitter.Map.empty))*)
+           (* match e with
+              | Not_yet -> assert false
+              | Single e ->
+              if Valid_cycles.mem e path then
+              consolidate_of_local_when_cycle ppt
+              else
+              Kernel.fatal
+              "illegal dependency cycle for emitter %a"
+              Usable_emitter.pretty e
+              | Several ->
+              (* cycle because the proof of [ppt] with emitter [E1] depends
+              on another [ppt'] which is proven with another emitter [E2]
+              by using [ppt] itself: it is not inconsistent by itself, but we
+              cannot use it as a proof. *)
+              consolidate ppt
+              (fun _ ->
+              Unknown
+              (Usable_emitter.Map.add
+              usable_kernel_emitter
+              (Usable_emitter.Map.add
+              usable_kernel_emitter
+              (List.fold_left
+              (fun acc p -> Property.Set.add p acc)
+              Property.Set.empty
+              path)
+              Usable_emitter.Map.empty)
+              Usable_emitter.Map.empty))*)
          end else begin
            Property.Hashtbl.add visited_ppt ppt ();
            consolidate ppt (consolidated_emitters ppt e (ppt :: path))
            (* [JS 2011/11/04] think about that when uncommenting the code above *)
-           (*	  try
-             (* was previously added during its own calculus
-             in case of inconsistent mutual dependency *)
-             Consolidated_status.find ppt
-             with Not_found ->*)
-           (*	    consolidated_status*)
+           (* try
+              (* was previously added during its own calculus
+              in case of inconsistent mutual dependency *)
+              Consolidated_status.find ppt
+              with Not_found ->*)
+           (* consolidated_status*)
          end)
       ppt
 
@@ -1432,15 +1432,15 @@ module Consolidation_graph = struct
              (distinct_tuning_parameters emitter)
              g
          in
-         (*	let g =
-           (* adding the correctness parameters *)
-           Datatype.String.Set.fold
-           (fun p g ->
-           let s = get_parameter_string ~tuning:false emitter p in
-           G.add_edge g v_e (Correctness_parameter s); g)
-           (distinct_correctness_parameters emitter)
-           g
-           in*)
+         (* let g =
+            (* adding the correctness parameters *)
+            Datatype.String.Set.fold
+            (fun p g ->
+            let s = get_parameter_string ~tuning:false emitter p in
+            G.add_edge g v_e (Correctness_parameter s); g)
+            (distinct_correctness_parameters emitter)
+            g
+            in*)
          (* adding the hypotheses *)
          let g, truncated =
            List.fold_left

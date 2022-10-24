@@ -1086,7 +1086,7 @@ void print_heap_shadows(uintptr_t addr) {
   DLOG(" | === Block Shadow ======================================\n");
   DLOG(" | Access addr:    %a\n", addr);
   DLOG(" | Block Shadow:   %a\n", block_shadow);
-  DLOG(" | Init	 Shadow:   %a\n", init_shadow);
+  DLOG(" | Init  Shadow:   %a\n", init_shadow);
   DLOG(" | Segments:       %lu\n", segments);
   DLOG(" | Actual size:    %lu bytes\n", alloc_size);
   DLOG(" | Tracked Length: %lu bytes\n", length);
