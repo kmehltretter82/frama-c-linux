@@ -1,25 +1,18 @@
 The following set of packages is known to be a working configuration for
-compiling Frama-C+dev, on a machine with gcc <= 9[^gcc-10]
+compiling Frama-C+dev.
 
-NB: frama-c-gui can be compiled against either lablgtk3 or lablgtk2. However, gtk2 itself
-is deprecated on most distributions, and it can be difficult to install the appropriate
-support libraries (notably gtksourceview). lablgtk3 should be preferred.
-
-- OCaml 4.11.1
-- alt-ergo.2.2.0 (for wp, optional)
+- OCaml 4.13.1
+- alt-ergo-free.2.2.0 (for wp, optional)
 - apron.v0.9.13 (for eva, optional)
-- coq.8.13.0 (for wp, optional)
-- lablgtk3.3.1.1 + lablgtk3-sourceview3.3.1.1 | lablgtk.2.18.11
-- mlmpfr.4.1.0-bugfix2 (for eva, optional)
-- ocamlfind.1.8.1
-- ocamlgraph.1.8.8
-- ppx_deriving_yojson.3.6.1 (for mdr, optional)
-- ppx_import.1.9.1
+- dune.3.4.1
+- dune-site.3.4.1
+- lablgtk3.3.1.2
+- lablgtk3-sourceview3.3.1.2
+- mlmpfr.4.1.0+bugfix2 (for eva, optional)
+- ocamlfind.1.9.5
+- ocamlgraph.2.0.0
+- ppx_deriving_yojson.3.7.0
+- ppx_import.1.10.0
 - why3.1.5.1
 - yojson.1.7.0
 - zarith.1.12
-
-[^gcc-10]: As mentioned in this [OCaml PR](https://github.com/ocaml/ocaml/issues/9144)
-gcc 10 changed its default linking conventions to make them more stringent,
-resulting in various linking issues. In particular, only OCaml >= 4.10 can be
-linked against gcc-10.
