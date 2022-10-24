@@ -797,7 +797,7 @@ module Make (Input: Input) = struct
              end;
              add_focus_all_callstacks menu icon;
              add_unfocus_callstacks menu icon;
-             (* Popup the menu only if something as been added *)
+             (* Popup the menu only if something has been added *)
              if Lazy.is_val menu then
                let time = GtkMain.Main.get_current_event_time () in
                (!!menu)#popup ~button:3 ~time

@@ -133,7 +133,7 @@ let load_module m =
   let base,ext = split_ext m in
   match ext with
   | ".ml" ->
-    Klog.error "Script loading as been deprecated in favor of the load of script libraries (see shell script `frama-c-build-scripts.sh` to build such a script library that can be loaded via the Frama-C option `-load-library`)."
+    Klog.error "Script loading has been deprecated in favor of the load of script libraries (see shell script `frama-c-build-scripts.sh` to build such a script library that can be loaded via the Frama-C option `-load-library`)."
   | _ ->
     begin
       (* load object or compile script or find package *)
@@ -142,7 +142,7 @@ let load_module m =
       | None ->
         match is_file base ".ml" with
         | Some _ ->
-          Klog.error "Script loading as been deprecated in favor of the command frama-c-init-plugin"
+          Klog.error "Script loading has been deprecated in favor of the command frama-c-init-plugin"
         | None ->
           if is_package m && Dune_site_plugins.V1.available m then load_packages [m]
           else
