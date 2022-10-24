@@ -12,6 +12,7 @@
 # Frama-C build
 , apron
 , camlzip
+, camomile
 , dune_3
 , dune-configurator
 , dune-site
@@ -25,6 +26,7 @@
 , ocaml
 , ocamlgraph
 , ocamlgraph_gtk
+, ocp-indent
 , ppx_deriving
 , ppx_deriving_yojson
 , ppx_import
@@ -63,6 +65,7 @@ stdenvNoCC.mkDerivation rec {
   buildInputs = [
     apron
     camlzip
+    camomile
     dune_3
     dune-configurator
     dune-site
@@ -77,6 +80,7 @@ stdenvNoCC.mkDerivation rec {
     ocaml
     ocamlgraph
     ocamlgraph_gtk
+    ocp-indent
     ppx_deriving
     ppx_deriving_yojson
     ppx_import
