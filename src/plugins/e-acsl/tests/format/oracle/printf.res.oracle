@@ -21,7 +21,10 @@
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
 [e-acsl] FRAMAC_SHARE/libc/string.h:367: Warning: 
-  E-ACSL construct `predicates with labels' is not yet supported.
+  no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:281: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:368: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
@@ -39,7 +42,8 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:173: Warning: 
-  E-ACSL construct `predicates with labels' is not yet supported.
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:176: Warning: 
   E-ACSL construct `datacons' is not yet supported. Ignoring annotation.
@@ -56,7 +60,8 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:180: Warning: 
-  E-ACSL construct `predicates with labels' is not yet supported.
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:181: Warning: 
   E-ACSL construct
@@ -66,7 +71,8 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:141: Warning: 
-  E-ACSL construct `predicates with labels' is not yet supported.
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:141: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.

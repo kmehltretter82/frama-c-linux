@@ -37,14 +37,19 @@ int glob = 5;
 /*@ logic double f2(double x) = (double)(1/x); */ /* handle in MR !226 */
 
 // To test not_yet:
-/*@ predicate p_notyet{L}(integer x) = x > 0; */
-/*@ logic integer f_notyet{L}(integer x) = x; */
+/*@ predicate p_here{L}(integer x) = x > 0; */
+/*@ logic integer f_here{L}(integer x) = x; */
 
 // Test sums inside functions
 /*@ logic integer f_sum (integer x) = \sum(1,x,\lambda integer y; 1); */
 
 // Test functions returning a rational
 /*@ logic real over(real a, real b) = a/b; */
+
+//Test function using a global variable (they elaborate to functions
+//with labels)
+int z = 8;
+/*@ logic integer f3 (integer y) = z+y; */
 
 int main(void) {
   int x = 1, y = 2;
@@ -82,7 +87,8 @@ int main(void) {
 
   /*@ assert over(1., 2.) == 0.5; */;
 
-  // not yet supported
-  /* /\*@ assert p_notyet(27); *\/ ; */
-  /* /\*@ assert f_notyet(27) == 27; *\/ ; */
+  /*@ assert p_here(27); */;
+  /*@ assert f_here(27) == 27; */;
+
+  /*@ assert f3(5) == 13; */;
 }
