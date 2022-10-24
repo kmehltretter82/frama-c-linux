@@ -609,7 +609,7 @@ let get_prop_scope_at_stmt kf stmt annot =
   let s, m = get_prop_scope_at_stmt ~warn:true kf stmt annot in
   s, list_proven m
 
-(* Currently lazy, because we need to define it after Value as been registered
+(* Currently lazy, because we need to define it after Value has been registered
    in Db *)
 let emitter = lazy (
   let conv = List.map Typed_parameter.get in
