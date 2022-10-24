@@ -20,14 +20,25 @@ Open Source Release <next-release>
 
 -   Kernel    [2022-10-14] 'calls' ACSL extension is now registered in the
               kernel and not WP
+o!  From      [2022-10-13] Removed Db.From API: use the From API instead.
+-*  Eva       [2022-10-10] Fixes a crash on recursive functions with an ACSL
+              specification without assigns clause.
 -   Kernel    [2022-10-05] Support for ghost VLA and calls to builtins with
               ghost arguments.
 -   Eva       [2022-09-16] Numerors now needs MLMPFR 4.1.0+bugfix2
+o!  Eva       [2022-09-07] Deprecate Db.Value API: use the new Eva API instead.
 -   Kernel    [2022-09-07] Improve error message for invalid options -D/-I/-U.
 o!  Configure [2022-07-28] Removed autoconf and configure
 o!  Makefile  [2022-07-11] Removed Makefile, Frama-C is now built using Dune 3.x
 o!  Pdg       [2022-07-01] Removed from Db. Use proper Pdg API instead.
+-   Eva       [2022-06-17] Improved precision: arguments of calls interpreted by
+-             an Eva builtin or with an ACSL specification can now be reduced in
+-             the caller. This is especially useful on C asserts.
+-*  Eva       [2022-06-06] Fixes a possible crash when -eva-subdivide-non-linear
+              and relational domains are enabled.
 -!  Kernel    [2022-06-06] Remove journalisation.
+-   Eva       [2022-05-11] Avoid false alarms of partially overlapping lvalue
+              assignments when writing a struct array from itself.
 
 ####################################
 Open Source Release 25.0 (Manganese)
