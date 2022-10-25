@@ -339,7 +339,7 @@ struct
 
   let output_taint = function
     | Eva.Results.Direct -> `String "direct"
-    | Indirect ->  `String "inddirect"
+    | Indirect ->  `String "indirect"
     | Untainted ->  `String "untainted"
 
   let output_node node =

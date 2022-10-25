@@ -70,7 +70,7 @@ struct
       Datatype.Int.compare i1 i2
     | String _, _ -> 1
     | _, String _ -> -1
-    | Const (e1), Const(e2) ->
+    | Const e1, Const e2 ->
       Cil_datatype.Exp.compare e1 e2
     | Const _, _ -> 1
     | _, Const _ -> -1
@@ -90,7 +90,7 @@ struct
       Stmt.equal stmt1 stmt2 && Alarms.equal alarm1 alarm2
     | AbsoluteMemory, AbsoluteMemory -> true
     | String (i,_), String (j,_) -> Datatype.Int.equal i j
-    | Const (e1), Const(e2) -> Cil_datatype.Exp.equal e1 e2
+    | Const e1, Const e2 -> Cil_datatype.Exp.equal e1 e2
     | Error s1, Error s2 -> Datatype.String.equal s1 s2
     | _ -> false
 
@@ -107,8 +107,8 @@ struct
       Hashtbl.hash (5, Stmt.hash stmt, Alarms.hash alarm)
     | AbsoluteMemory -> 6
     | String (i, _) -> Hashtbl.hash (7, i)
-    | Const (e) -> Hashtbl.hash (7, Cil_datatype.Exp.hash e)
-    | Error s -> Hashtbl.hash (8, s)
+    | Const e -> Hashtbl.hash (8, Cil_datatype.Exp.hash e)
+    | Error s -> Hashtbl.hash (9, s)
 end
 
 include Datatype.Make (DatatypeInput)
@@ -137,7 +137,7 @@ let pretty fmt = function
     Format.fprintf fmt "%S" s
   | String (_, CSWstring s) ->
     Format.fprintf fmt "L\"%s\"" (Escape.escape_wstring s)
-  | Const (e) ->
+  | Const e ->
     Format.fprintf fmt "%a" Cil_printer.pp_exp e
   | Error s ->
     Format.fprintf fmt "%s" s
