@@ -61,6 +61,11 @@ import SYS, * as System from 'dome/system';
 import { URL } from 'url';
 import * as Menubar from './menubar';
 
+// The __static path is provided by webpack at execution time, but the static
+// type system is not aware of that for now. This is a workaround to avoid
+// an error during compilation.
+declare const __static: string;
+
 // --------------------------------------------------------------------------
 // --- System Helpers
 // --------------------------------------------------------------------------
@@ -388,6 +393,7 @@ function createBrowserWindow(
   const options: BrowserWindowConstructorOptions = {
     show: false,
     backgroundColor: '#f0f0f0',
+    icon: path.join(__static, 'icon.png'),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,

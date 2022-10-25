@@ -1,5 +1,5 @@
 {
-  productName: "Ivette",
-  mac: { icon: "ivette.icns" },
-  linux: { icon: "frama-c-icon.png" }
+  "productName": "Ivette",
+  "mac": { "icon": "icon.icns" },
+  "linux": { "icon": "icon.png" }
 }
