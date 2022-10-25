@@ -223,6 +223,39 @@ void pub301 () {
   }
 }
 
+#define MAX 20
+
+void arrays () {
+  int a[MAX], t[MAX];
+  /*@ loop unroll MAX; */ // Unroll to ensure array initialization.
+  for (int i = 0; i < MAX; i++) {
+    a[i] = undet;
+  }
+
+  int x = Frama_C_interval(1, MAX);
+  for (int j = x - 1; j >= 0; j--) {
+    // Need the relation j <= x-1 to prove that index x-1-j >= 0.
+    t[j] = a[x - 1 - j];
+  }
+
+  int y = Frama_C_interval(0, MAX-1);
+  int index = (MAX-1) - y;
+  for (int j = y; j < MAX; j++) {
+    // Need the relation index + j == MAX-1 to prove index >= 0.
+    t[index] = a[j];
+    index --;
+  }
+
+  // Same with a floating-point variable f instead of x.
+  float f = Frama_C_float_interval(0., (float)(MAX-1));
+  index = (MAX-1) - (int)f;
+  for (int j = (int)f; j < MAX; j++) {
+    // Need the relation index + j == MAX-1 to prove index >= 0.
+    t[index] = a[j];
+    index --;
+  }
+}
+
 void main () {
   demo ();
   integer_types ();
@@ -234,4 +267,5 @@ void main () {
   interprocedural ();
   dump ();
   pub301 ();
+  arrays ();
 }
