@@ -219,9 +219,20 @@ let check_ml_indent ~update file =
 
 (* C/H *)
 
+let clang_format_available = ref None
+let clang_format_available () =
+  match !clang_format_available with
+  | None ->
+    clang_format_available :=
+      Some (0 = Sys.command "clang-format --version > /dev/null") ;
+    Option.get !clang_format_available
+  | Some available -> available
+
 let check_c_indent ~update file =
-  let opt = if update then "-i" else "--dry-run -Werror" in
-  0 = Sys.command (Printf.sprintf "clang-format %s \"%s\"" opt file)
+  if not @@ clang_format_available () then true
+  else
+    let opt = if update then "-i" else "--dry-run -Werror" in
+    0 = Sys.command (Printf.sprintf "clang-format %s \"%s\"" opt file)
 
 exception Bad_ext
 
@@ -309,6 +320,8 @@ and print_usage () =
 (* Main *)
 
 let () =
+  if not @@ clang_format_available () then
+    Printf.eprintf "clang-format unavailable, I will not check C files" ;
   Arg.parse
     (Arg.align (sort argspec))
     (fun s -> Printf.eprintf "Unknown argument: %s" s)
