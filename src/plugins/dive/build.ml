@@ -87,9 +87,10 @@ module Eval =
 struct
   open Eva.Results
 
-  let rq kinstr =
-    match kinstr with
-    | Kglobal -> at_start
+  let at_start_of = at_start_of
+  let after = after
+  let after_kinstr = function
+    | Kglobal -> at_start (* After global initialization *)
     | Kstmt stmt -> after stmt
 
   let to_kf_list kinstr callee =
@@ -146,28 +147,14 @@ end
 
 (* --- Precision evaluation --- *)
 
-let kf_contains_kinstr kf = function
-  | Kglobal -> false
-  | Kstmt stmt -> Kernel_function.(equal (find_englobing_kf stmt) kf)
-
 (* For folded bases, lval may be strictly included in the node zone *)
-let update_node_values node ?(lval=Node_kind.to_lval node.node_kind) kinstr =
+let update_node_values node ?(lval=Node_kind.to_lval node.node_kind) rq =
   match lval with
   | None -> () (* can't evaluate node *)
   | Some lval ->
-    (* Evaluate parameters inside their functions rather than at call sites. *)
-    let request =
-      match lval with
-      | (Var vi,_) when vi.vformal ->
-        let kf = Option.get (Kernel_function.find_defining_kf vi) in
-        if kf_contains_kinstr kf kinstr
-        then Eval.rq kinstr
-        else Eva.Results.at_start_of kf
-      | _ -> Eval.rq kinstr
-    in
     let typ = Cil.typeOfLval lval
-    and cvalue = Eval.to_cvalue request lval
-    and taint = Eval.is_tainted request lval in
+    and cvalue = Eval.to_cvalue rq lval
+    and taint = Eval.is_tainted rq lval in
     Graph.update_node_values node ~typ ~cvalue ~taint
 
 
@@ -292,7 +279,7 @@ let build_var context callstack varinfo =
 
 let build_lval context callstack kinstr lval =
   let node = build_node context callstack lval kinstr in
-  update_node_values ~lval:(Some lval) node kinstr;
+  update_node_values ~lval:(Some lval) node (Eval.after_kinstr kinstr);
   node
 
 let build_const context callstack exp =
@@ -316,16 +303,16 @@ let build_node_writes context node =
     let add_deps = function
       | { skind=Instr instr } as stmt ->
         (* Update the values at the light of new discovered write *)
-        update_node_values node (Kstmt stmt);
+        update_node_values node (Eval.after stmt);
         (* Add dependencies for each callstack *)
         List.to_seq (find_compatible_callstacks stmt callstack) |>
         Seq.flat_map (fun cs -> build_instr_deps cs stmt instr)
       | _ -> assert false (* Studia invariant *)
     in
     let writes = Eval.writes kinstr lval in
-    let args_seq, callee_stmts = build_arg_deps callstack in
+    let args_seq, call_stmts = build_arg_deps callstack in
     let compare = Cil_datatype.Stmt_Id.compare in
-    node.node_writes_stmts <- List.sort_uniq compare (writes @ callee_stmts);
+    node.node_writes_stmts <- List.sort_uniq compare (writes @ call_stmts);
     Seq.append args_seq (Seq.flat_map add_deps (List.to_seq writes))
 
   and build_alarm_deps callstack stmt alarm : deps_builder =
@@ -377,6 +364,8 @@ let build_node_writes context node =
         | _ ->
           assert false (* Callsites can only be Call or ConsInit *)
       in
+      (* Evaluate the parameter values at the start of its defining function *)
+      update_node_values node (Eval.at_start_of kf);
       Seq.flat_map add_deps (List.to_seq callsites), List.map fst callsites
     | _ -> Seq.empty, []
 
@@ -433,7 +422,7 @@ let build_node_writes context node =
   and build_scattered_deps callstack kinstr lval : deps_builder =
     let add_cell node_kind =
       let node' = add_or_update_node context callstack node_kind in
-      update_node_values node kinstr;
+      update_node_values node (Eval.after_kinstr kinstr);
       Graph.create_dependency graph kinstr node' Composition node
     in
     enumerate_cells ~is_folded_base lval kinstr |> Seq.map add_cell
