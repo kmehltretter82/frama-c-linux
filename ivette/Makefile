@@ -184,21 +184,21 @@ UNAME=$(shell uname)
 
 ifeq ($(UNAME),Darwin)
 
-dome-dist: ivette.icns
-ivette.icns: frama-c-icon.png
-	rm -fr ivette.iconset
-	mkdir ivette.iconset
-	sips -z 16 16     frama-c-icon.png --out "ivette.iconset/icon_16x16.png"
-	sips -z 32 32     frama-c-icon.png --out "ivette.iconset/icon_16x16@2x.png"
-	sips -z 32 32     frama-c-icon.png --out "ivette.iconset/icon_32x32.png"
-	sips -z 64 64     frama-c-icon.png --out "ivette.iconset/icon_32x32@2x.png"
-	sips -z 128 128   frama-c-icon.png --out "ivette.iconset/icon_128x128.png"
-	sips -z 256 256   frama-c-icon.png --out "ivette.iconset/icon_128x128@2x.png"
-	sips -z 256 256   frama-c-icon.png --out "ivette.iconset/icon_256x256.png"
-	sips -z 512 512   frama-c-icon.png --out "ivette.iconset/icon_256x256@2x.png"
-	sips -z 512 512   frama-c-icon.png --out "ivette.iconset/icon_512x512.png"
-	iconutil -c icns ivette.iconset
-	rm -fr ivette.iconset
+dome-dist: icon.icns
+icon.icns: static/icon.png
+	rm -fr icon.iconset
+	mkdir icon.iconset
+	sips -z 16 16    static/icon.png --out "icon.iconset/icon_16x16.png"
+	sips -z 32 32    static/icon.png --out "icon.iconset/icon_16x16@2x.png"
+	sips -z 32 32    static/icon.png --out "icon.iconset/icon_32x32.png"
+	sips -z 64 64    static/icon.png --out "icon.iconset/icon_32x32@2x.png"
+	sips -z 128 128  static/icon.png --out "icon.iconset/icon_128x128.png"
+	sips -z 256 256  static/icon.png --out "icon.iconset/icon_128x128@2x.png"
+	sips -z 256 256  static/icon.png --out "icon.iconset/icon_256x256.png"
+	sips -z 512 512  static/icon.png --out "icon.iconset/icon_256x256@2x.png"
+	sips -z 512 512  static/icon.png --out "icon.iconset/icon_512x512.png"
+	iconutil -c icns icon.iconset
+	rm -fr icon.iconset
 
 endif
 

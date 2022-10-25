@@ -1,5 +1,5 @@
 {
   "productName": "Ivette",
-  "mac": { "icon": "ivette.icns" },
+  "mac": { "icon": "icon.icns" },
   "linux": { "icon": "icon.png" }
 }
