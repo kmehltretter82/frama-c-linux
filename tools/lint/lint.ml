@@ -172,16 +172,26 @@ let check_eoleof ~update content =
    been removed and the printer changed so that it prints into a buffer and not
    a file.
 *)
+
+let global_config = ref None
+let config () =
+  match !global_config with
+  | None ->
+    let config, syntaxes, dlink = IndentConfig.local_default () in
+    IndentLoader.load ~debug:false dlink ;
+    Approx_lexer.disable_extensions ();
+    List.iter
+      (fun stx ->
+         try Approx_lexer.enable_extension stx
+         with IndentExtend.Syntax_not_found name ->
+           Format.eprintf "Warning: unknown syntax extension %S@." name)
+      syntaxes ;
+    global_config := Some config ;
+    config
+  | Some config -> config
+
 let ocp_indent channel =
-  let config, syntaxes, dlink = IndentConfig.local_default () in
-  IndentLoader.load ~debug:false dlink ;
-  Approx_lexer.disable_extensions ();
-  List.iter
-    (fun stx ->
-       try Approx_lexer.enable_extension stx
-       with IndentExtend.Syntax_not_found name ->
-         Format.eprintf "Warning: unknown syntax extension %S@." name)
-    syntaxes ;
+  let config = config () in
   let buffer = Buffer.create 0 in
   let out = IndentPrinter.{
       debug = false; config = config; indent_empty = false; adaptive = true;
