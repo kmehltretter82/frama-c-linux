@@ -1394,7 +1394,7 @@ module Domain = struct
     let join_oct = Octagons.internal_join ~cache ~symmetric ~idempotent ~decide
     and join_itv = Intervals.internal_join ~cache ~symmetric ~idempotent ~decide
     and join_rel = Relations.union in
-    fun ~current_input ~previous_output ->
+    fun kf ~current_input ~previous_output ->
       let current_input = kill previous_output.modified current_input in
       (* We use [add_diamond] to add each relation from the previous output
          into the current input, in order to benefit from the (partial)
@@ -1409,7 +1409,15 @@ module Domain = struct
         in
         let state = { current_input with intervals } in
         let add_diamond variables diamond acc =
-          Bottom.non_bottom (add_diamond acc variables diamond)
+          match add_diamond acc variables diamond with
+          | `Value state -> state
+          | `Bottom ->
+            Self.failure ~current:true ~once:true
+              "Octagon domain: the use of the memexec cache for function %a
+              unexpectedly led to bottom, which could be a bug. The analysis
+              continues by ignoring the relations leading to bottom."
+              Kernel_function.pretty kf;
+            acc
         in
         Octagons.fold add_diamond previous_output.octagons state
       else
@@ -1418,11 +1426,11 @@ module Domain = struct
           relations = join_rel previous_output.relations current_input.relations;
           modified = current_input.modified }
 
-  let reuse _kf _bases ~current_input ~previous_output =
+  let reuse kf _bases ~current_input ~previous_output =
     if intraprocedural ()
     then previous_output
     else
-      let t = interprocedural_reuse ~current_input ~previous_output in
+      let t = interprocedural_reuse kf ~current_input ~previous_output in
       check "reuse result" t
 
 
