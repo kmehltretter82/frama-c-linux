@@ -27,6 +27,7 @@ o!  From      [2022-10-13] Removed Db.From API: use the From API instead.
               specification without assigns clause.
 -   Kernel    [2022-10-05] Support for ghost VLA and calls to builtins with
               ghost arguments.
+-   Kernel    [2022-10-03] -version prints a newline, -print-version does not.
 -   Ivette    [2022-09-30] After a taint Eva analysis, the taint status of
               lvalues and expressions is shown in the Inspector component.
 -   Eva       [2022-09-16] Numerors now needs MLMPFR 4.1.0+bugfix2
