@@ -388,6 +388,7 @@ function createBrowserWindow(
   const options: BrowserWindowConstructorOptions = {
     show: false,
     backgroundColor: '#f0f0f0',
+    icon: path.join(__static, 'icon.png'),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
