@@ -327,8 +327,7 @@ let build_node_writes context node =
     Seq.append args_seq (Seq.flat_map add_deps (List.to_seq writes))
 
   and build_alarm_deps callstack stmt alarm : deps_builder =
-    List.to_seq (EnumLvals.in_alarm alarm) |>
-    Seq.flat_map (build_lval_deps callstack stmt Data)
+    build_lvals_deps callstack stmt Data (EnumLvals.in_alarm alarm)
 
   and build_instr_deps callstack stmt instr : deps_builder =
     (* Add dependencies found in the instruction *)
@@ -344,17 +343,12 @@ let build_node_writes context node =
       Cil.treat_constructor_as_func as_func dest f args k loc
     | Local_init (vi, AssignInit init, _)  ->
       let lvals = EnumLvals.in_init vi init in
-      if lvals <> [] then
-        List.to_seq lvals |>
-        Seq.flat_map (build_lval_deps callstack stmt Data)
-      else
-        begin match init with
-          | CompoundInit _ -> Seq.empty (* Do not generate nodes for Compounds for now *)
-          | SingleInit exp ->
-            let kinstr = Kstmt stmt in
-            let dst = build_const context callstack exp in
-            Seq.return (Graph.create_dependency graph kinstr dst Data node)
-        end
+      let exp =
+        match init with
+        | CompoundInit _ -> None (* Do not generate nodes for Compounds for now *)
+        | SingleInit exp -> Some exp
+      in
+      build_lvals_deps callstack stmt Data ?exp lvals
     | Asm _ | Skip _ | Code_annot _ -> Seq.empty (* Cases not returned by Studia *)
 
   and build_arg_deps callstack : deps_builder * stmt list =
@@ -414,17 +408,24 @@ let build_node_writes context node =
 
   and build_exp_deps callstack stmt kind exp : deps_builder =
     let lvals = EnumLvals.in_exp exp in
+    build_lvals_deps callstack stmt kind ~exp lvals
+
+  and build_lvals_deps callstack stmt kind ?exp lvals : deps_builder =
     if lvals <> [] then
       List.to_seq lvals |>
       Seq.flat_map (build_lval_deps callstack stmt kind)
     else
-      let kinstr = Kstmt stmt in
-      let dst = build_const context callstack exp in
-      Seq.return (Graph.create_dependency graph kinstr dst kind node)
+      Option.fold exp ~none:Seq.empty
+        ~some:(build_const_deps callstack stmt kind)
 
   and build_lval_deps callstack stmt kind lval : deps_builder =
     let kinstr = Kstmt stmt in
     let dst = build_lval context callstack kinstr lval in
+    Seq.return (Graph.create_dependency graph kinstr dst kind node)
+
+  and build_const_deps callstack stmt kind exp : deps_builder =
+    let kinstr = Kstmt stmt in
+    let dst = build_const context callstack exp in
     Seq.return (Graph.create_dependency graph kinstr dst kind node)
 
   and build_scattered_deps callstack kinstr lval : deps_builder =
