@@ -119,6 +119,16 @@ export function getWorkingDir(): string { return System.getWorkingDir(); }
 /** Current process ID.. */
 export function getPID(): number { return System.getPID(); }
 
+// The __static path is provided by webpack at execution time, but the static
+// type system is not aware of that for now. This is a workaround to avoid
+// an error during compilation.
+declare const __static: string;
+
+/** Path to application static resources. */
+export function getStatic(file?: string): string {
+  return file ? System.join(__static, file) : __static;
+}
+
 // --------------------------------------------------------------------------
 // --- Application Emitter
 // --------------------------------------------------------------------------
