@@ -96,8 +96,8 @@ struct
     before_kinstr kinstr |> eval_callee callee |>
     Result.value ~default:[]
 
-  let to_cvalue kinstr lval =
-    rq kinstr |> eval_lval lval |> as_cvalue
+  let to_cvalue request lval =
+    eval_lval lval request |> as_cvalue
 
   let to_location kinstr lval =
     before_kinstr kinstr |> eval_address lval |> as_location
@@ -108,9 +108,9 @@ struct
   let to_callstacks stmt =
     before stmt |> callstacks
 
-  let is_tainted kinstr lval =
-    let zone = to_zone kinstr lval in
-    rq kinstr |> is_tainted zone |> Result.to_option
+  let is_tainted request lval =
+    let zone = eval_address lval request |> as_zone in
+    is_tainted zone request |> Result.to_option
 
   let studia_direct_effect = function
     | e, { Studia.Writes.direct = true } -> Some e
@@ -146,26 +146,28 @@ end
 
 (* --- Precision evaluation --- *)
 
+let kf_contains_kinstr kf = function
+  | Kglobal -> false
+  | Kstmt stmt -> Kernel_function.(equal (find_englobing_kf stmt) kf)
+
 (* For folded bases, lval may be strictly included in the node zone *)
 let update_node_values node ?(lval=Node_kind.to_lval node.node_kind) kinstr =
   match lval with
   | None -> () (* can't evaluate node *)
   | Some lval ->
-    (* Evaluate parameters inside functions instead that at call point *)
-    let kinstr =
+    (* Evaluate parameters inside their functions rather than at call sites. *)
+    let request =
       match lval with
       | (Var vi,_) when vi.vformal ->
         let kf = Option.get (Kernel_function.find_defining_kf vi) in
-        begin try
-            Kstmt (Kernel_function.find_first_stmt kf)
-          with
-            Kernel_function.No_Statement -> kinstr
-        end
-      | _ -> kinstr
+        if kf_contains_kinstr kf kinstr
+        then Eval.rq kinstr
+        else Eva.Results.at_start_of kf
+      | _ -> Eval.rq kinstr
     in
     let typ = Cil.typeOfLval lval
-    and cvalue = Eval.to_cvalue kinstr lval
-    and taint = Eval.is_tainted kinstr lval in
+    and cvalue = Eval.to_cvalue request lval
+    and taint = Eval.is_tainted request lval in
     Graph.update_node_values node ~typ ~cvalue ~taint
 
 
