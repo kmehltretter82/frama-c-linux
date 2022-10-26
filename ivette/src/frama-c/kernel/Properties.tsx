@@ -262,7 +262,7 @@ const renderTaint: Renderer<States.Tag> =
     let color = 'black';
     switch (taint.name) {
       case 'not_tainted': id = 'DROP.EMPTY'; color = '#00B900'; break;
-      case 'direct_taint': id = 'DROP.FILLED'; color = '#FF8300'; break;
+      case 'direct_taint': id = 'DROP.FILLED'; color = '#882288'; break;
       case 'indirect_taint': id = 'DROP.FILLED'; color = '#73BBBB'; break;
       case 'error': id = 'HELP'; break;
       case 'not_applicable': id = 'MINUS'; break;

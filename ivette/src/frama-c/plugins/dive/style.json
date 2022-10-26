@@ -177,17 +177,17 @@
   {
     "selector": "node[taint='direct']",
     "style": {
-      "underlay-color": "#afa",
+      "underlay-color": "#882288",
       "underlay-padding": "14px",
-      "underlay-opacity": 1.0
+      "underlay-opacity": 0.4
     }
   },
   {
     "selector": "node[taint='indirect']",
     "style": {
-      "underlay-color": "#afa",
+      "underlay-color": "#73BBBB",
       "underlay-padding": "14px",
-      "underlay-opacity": 0.5
+      "underlay-opacity": 0.8
     }
   },
   {
