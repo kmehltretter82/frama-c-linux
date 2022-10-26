@@ -49,9 +49,9 @@
 #   looks at unstaged files
 # - make <lint-target>.before-commit-a
 #   looks at unstaged and staged files
-# - make <lint-target>.before-commit-a--ammend
+# - make <lint-target>.before-commit-a--amend
 #   looks at unstaged, staged and previously committed files
-# - make <lint-target>.before-commit--ammend
+# - make <lint-target>.before-commit--amend
 #   looks at staged and previously committed files and checks that there is no unstaged files
 # - make <lint-target>.before-commit
 #   looks at staged files and checks that there is no unstaged files
@@ -276,15 +276,15 @@ $(eval $(call LINT.file-list-filter-with-git-diff,before-commit,--cached HEAD,LI
 
 $(eval $(call LINT.file-list-filter-with-git-diff,before-commit-a,HEAD,))
 
-#### rules for make <lint-target>.before-commit-a--ammend
+#### rules for make <lint-target>.before-commit-a--amend
 ##   looks at unstaged, staged and previously committed files
 
-$(eval $(call LINT.file-list-filter-with-git-diff,before-commit-a--ammend,HEAD~1,))
+$(eval $(call LINT.file-list-filter-with-git-diff,before-commit-a--amend,HEAD~1,))
 
 #### rules for make <lint-target>.before-commit--amend
 ##   looks at staged and previously committed files and checks that there is no unstaged files
 
-$(eval $(call LINT.file-list-filter-with-git-diff,before-commit--ammend,HEAD~1,LINT.checked-unstaged-ok))
+$(eval $(call LINT.file-list-filter-with-git-diff,before-commit--amend,HEAD~1,LINT.checked-unstaged-ok))
 
 #### rules for make <lint-target>.previous-commit
 ## looks at files of the last commit and checks that there is no staged nor unstaged files
