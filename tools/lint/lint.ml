@@ -288,11 +288,15 @@ let check ~verbose ~update file params =
       close_out out_chan
     end ;
     (* Indentation *)
-    if params.indent then
-      if not @@ check_indent ~update file then begin
-        Printf.eprintf "Bad indentation for %s\n" file ;
-        res := false
-      end ;
+    try
+      if params.indent then
+        if not @@ check_indent ~update file then begin
+          Printf.eprintf "Bad indentation for %s\n" file ;
+          res := false
+        end ;
+    with Bad_ext ->
+      Printf.eprintf "Don't know how to (check) indent %s\n" file ;
+      res := false
   end
 
 (**************************************************************************)
