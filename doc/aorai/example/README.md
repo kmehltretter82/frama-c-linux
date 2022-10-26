@@ -44,7 +44,7 @@ frama-c example.c -aorai-automata example.ya -then-last -wp
 The following command generates the `example_loop_annot.c` file
 
 ```sh
-frama-c example_loop.c -aorai-automata example_loop.ya -then-last -ocode example_loop_annot.c` file
+frama-c example_loop.c -aorai-automata example_loop.ya -then-last -ocode example_loop_annot.c file
 ```
 
 In order to decide if the original program is correct wrt the property, it is sufficient to establish than the generated C is valid. For instance, with the WP plugin:
