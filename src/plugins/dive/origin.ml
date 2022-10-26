@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2022                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,34 +22,25 @@
 
 open Dive_types
 
-include Graph.Sig.G
-  with type V.t = node
-   and type E.t = node * dependency * node
+type t = dependency_origin
 
-module Node : Datatype.S_with_collections with type t = node
+let (<?>) c lcmp =
+  if c <> 0 then c else Lazy.force lcmp
 
-module Dependency : Graph.Sig.COMPARABLE with type t = dependency
+let compare o1 o2 =
+  match o1, o2 with
+  | Stmt s1, Stmt s2 -> Cil_datatype.Stmt.compare s1 s2
+  | Stmt _, _ -> 1
+  | _, Stmt _ -> -1
+  | GlobalInit v1, GlobalInit v2 -> Cil_datatype.Varinfo.compare v1 v2
+  | GlobalInit _, _ -> 1
+  | _, GlobalInit _ -> -1
+  | FormalAssign (v1, _kf1, s1), FormalAssign (v2, _kf2, s2) ->
+    Cil_datatype.Varinfo.compare v1 v2 <?>
+    (* if formals are equal, the defining kfs must also be equal *)
+    lazy (Cil_datatype.Stmt.compare s1 s2)
 
-val create : ?size:int -> unit -> t
-
-val create_node :
-  node_kind:node_kind ->
-  node_locality:node_locality -> t -> node
-
-val remove_node : t -> node -> unit
-
-val update_node_values : node ->
-  typ:Cil_types.typ -> cvalue:Cvalue.V.t -> taint:Eva.Results.taint option ->
-  unit
-
-val create_dependency : t -> origin:dependency_origin -> kind:dependency_kind ->
-  node -> node -> node * dependency * node
-
-val remove_dependency : t -> node * dependency * node -> unit
-val remove_dependencies : t -> node -> unit
-
-val find_independant_nodes : t -> node list -> node list
-val bfs : ?iter_succ:((node -> unit) -> t -> node -> unit) -> ?limit:int ->
-  t -> node list -> node list
-
-val output_to_dot : out_channel -> t -> unit
+let to_kinstr = function
+  | Stmt stmt -> Cil_types.Kstmt stmt
+  | GlobalInit _vi -> Kglobal
+  | FormalAssign (_vi,_kf,stmt) -> Kstmt stmt

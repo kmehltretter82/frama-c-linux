@@ -57,6 +57,15 @@ end
 (* --- Data types                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
+let stmt_to_location stmt =
+  let kf = Kernel_function.find_englobing_kf stmt in
+  (kf, Printer_tag.PStmtStart (kf, stmt))
+
+let origin_to_location = function
+  | Dive_types.Stmt s -> Some (stmt_to_location s)
+  | GlobalInit _ -> None
+  | FormalAssign (_vi, _kf, s) -> Some (stmt_to_location s)
+
 module Range : Data.S with type t = int option range =
 struct
   include Record ()
@@ -282,10 +291,6 @@ struct
 
   include (val publish "node")
 
-  let stmt_to_location stmt =
-    let kf = Kernel_function.find_englobing_kf stmt in
-    (kf, Printer_tag.PStmtStart (kf, stmt))
-
   let node_type node =
     match Node_kind.to_lval node.node_kind with
     | None -> None
@@ -336,7 +341,7 @@ struct
     set src n1.node_key |>
     set dst n2.node_key |>
     set dkind  (dep_kind dep.dependency_kind) |>
-    set origins (List.map Node.stmt_to_location dep.dependency_origins) |>
+    set origins (List.filter_map origin_to_location dep.dependency_origins) |>
     to_json
 end
 

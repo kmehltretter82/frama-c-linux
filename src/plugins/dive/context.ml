@@ -183,8 +183,8 @@ let remove_node context node =
   NodeTable.remove context.node_table node_ref;
   context.remove_hook (Node node)
 
-let add_dep context ki src kind dest =
-  let edge = Graph.create_dependency context.graph ki src kind dest in
+let add_dep context ~origin ~kind src dest =
+  let edge = Graph.create_dependency context.graph ~origin ~kind src dest in
   context.update_hook (Edge edge)
 
 let remove_dep context edge =

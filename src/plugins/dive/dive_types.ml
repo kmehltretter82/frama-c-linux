@@ -23,7 +23,7 @@
 type node_kind =
   | Scalar of Cil_types.varinfo * Cil_types.typ * Cil_types.offset
   | Composite of Cil_types.varinfo
-  | Scattered of Cil_types.lval * Cil_types.kinstr
+  | Scattered of Cil_types.lval * Cil_types.stmt
   | Unknown of Cil_types.lval * Cil_types.kinstr
   | Alarm of Cil_types.stmt * Alarms.alarm
   | AbsoluteMemory
@@ -62,10 +62,18 @@ type node = {
 
 type dependency_kind = Callee | Data | Address | Control | Composition
 
+type dependency_origin =
+  | Stmt of Cil_types.stmt
+  | GlobalInit of Cil_types.varinfo
+  | FormalAssign of
+      Cil_types.varinfo *
+      Cil_types.kernel_function * (* defining function *)
+      Cil_types.stmt (* calling statement *)
+
 type dependency = {
   dependency_key : int;
   dependency_kind : dependency_kind;
-  mutable dependency_origins : Cil_types.stmt list;
+  mutable dependency_origins : dependency_origin list;
 }
 
 type graph_diff = {
