@@ -87,12 +87,18 @@ module Eval =
 struct
   open Eva.Results
 
+  let at_start_of = at_start_of
+  let after = after
+  let after_kinstr = function
+    | Kglobal -> at_start (* After global initialization *)
+    | Kstmt stmt -> after stmt
+
   let to_kf_list kinstr callee =
     before_kinstr kinstr |> eval_callee callee |>
     Result.value ~default:[]
 
-  let to_cvalue kinstr lval =
-    before_kinstr kinstr |> eval_lval lval |> as_cvalue
+  let to_cvalue request lval =
+    eval_lval lval request |> as_cvalue
 
   let to_location kinstr lval =
     before_kinstr kinstr |> eval_address lval |> as_location
@@ -102,6 +108,10 @@ struct
 
   let to_callstacks stmt =
     before stmt |> callstacks
+
+  let is_tainted request lval =
+    let zone = eval_address lval request |> as_zone in
+    is_tainted zone request |> Result.to_option
 
   let studia_direct_effect = function
     | e, { Studia.Writes.direct = true } -> Some e
@@ -137,10 +147,15 @@ end
 
 (* --- Precision evaluation --- *)
 
-let update_node_values node kinstr lval =
-  let typ = Cil.typeOfLval lval
-  and cvalue = Eval.to_cvalue kinstr lval in
-  Graph.update_node_values node cvalue typ
+(* For folded bases, lval may be strictly included in the node zone *)
+let update_node_values node ?(lval=Node_kind.to_lval node.node_kind) rq =
+  match lval with
+  | None -> () (* can't evaluate node *)
+  | Some lval ->
+    let typ = Cil.typeOfLval lval
+    and cvalue = Eval.to_cvalue rq lval
+    and taint = Eval.is_tainted rq lval in
+    Graph.update_node_values node ~typ ~cvalue ~taint
 
 
 (* --- Locations handling --- *)
@@ -226,7 +241,9 @@ let build_node_locality callstack node_kind =
 
 let find_compatible_callstacks stmt callstack =
   let kf = Kernel_function.find_englobing_kf stmt in
-  if callstack <> [] && Kernel_function.equal kf (Callstack.top_kf callstack)
+  if callstack = [] (* Globals variables *)
+  then [Callstack.init kf] (* Default *)
+  else if Kernel_function.equal kf (Callstack.top_kf callstack)
   then
     (* slight improvement which only work when there is no recursion
        and which is only usefull because you currently can't have
@@ -237,7 +254,12 @@ let find_compatible_callstacks stmt callstack =
     (* Keep only callstacks which are a compatible with the current one *)
     let callstacks = Eval.to_callstacks stmt in
     (* TODO: missing callstacks filtered by memexec *)
-    Callstack.filter_truncate callstacks callstack
+    let make_compatible cs =
+      Callstack.truncate_to_sub cs callstack |>
+      Option.value ~default:(Callstack.init kf)
+    in
+    let result = List.map make_compatible callstacks in
+    List.sort_uniq Callstack.compare result (* Remove duplicates *)
 
 
 (* --- Graph building --- *)
@@ -257,8 +279,11 @@ let build_var context callstack varinfo =
 
 let build_lval context callstack kinstr lval =
   let node = build_node context callstack lval kinstr in
-  update_node_values node kinstr lval;
+  update_node_values ~lval:(Some lval) node (Eval.after_kinstr kinstr);
   node
+
+let build_const context callstack exp =
+  add_or_update_node context callstack (Const exp)
 
 let build_alarm context callstack stmt alarm =
   let node_kind = Alarm (stmt,alarm) in
@@ -277,21 +302,25 @@ let build_node_writes context node =
   let rec build_write_deps callstack kinstr lval : deps_builder =
     let add_deps = function
       | { skind=Instr instr } as stmt ->
+        (* Update the values at the light of new discovered write *)
+        update_node_values node (Eval.after stmt);
+        (* Add dependencies for each callstack *)
         List.to_seq (find_compatible_callstacks stmt callstack) |>
         Seq.flat_map (fun cs -> build_instr_deps cs stmt instr)
       | _ -> assert false (* Studia invariant *)
     in
     let writes = Eval.writes kinstr lval in
-    let args_seq, callee_stmts = build_arg_deps callstack in
+    let args_seq, call_stmts = build_arg_deps callstack in
     let compare = Cil_datatype.Stmt_Id.compare in
-    node.node_writes_stmts <- List.sort_uniq compare (writes @ callee_stmts);
+    node.node_writes_stmts <- List.sort_uniq compare (writes @ call_stmts);
     Seq.append args_seq (Seq.flat_map add_deps (List.to_seq writes))
 
   and build_alarm_deps callstack stmt alarm : deps_builder =
-    List.to_seq (EnumLvals.in_alarm alarm) |>
-    Seq.flat_map (build_lval_deps callstack stmt Data)
+    build_lvals_deps callstack stmt Data (EnumLvals.in_alarm alarm)
 
-  and build_instr_deps callstack stmt : Cil_types.instr -> deps_builder = function
+  and build_instr_deps callstack stmt instr : deps_builder =
+    (* Add dependencies found in the instruction *)
+    match instr with
     | Set (_, exp, _) ->
       build_exp_deps callstack stmt Data exp
     | Call (_, callee, args, _) ->
@@ -302,8 +331,13 @@ let build_node_writes context node =
       in
       Cil.treat_constructor_as_func as_func dest f args k loc
     | Local_init (vi, AssignInit init, _)  ->
-      List.to_seq (EnumLvals.in_init vi init) |>
-      Seq.flat_map (build_lval_deps callstack stmt Data)
+      let lvals = EnumLvals.in_init vi init in
+      let exp =
+        match init with
+        | CompoundInit _ -> None (* Do not generate nodes for Compounds for now *)
+        | SingleInit exp -> Some exp
+      in
+      build_lvals_deps callstack stmt Data ?exp lvals
     | Asm _ | Skip _ | Code_annot _ -> Seq.empty (* Cases not returned by Studia *)
 
   and build_arg_deps callstack : deps_builder * stmt list =
@@ -330,6 +364,8 @@ let build_node_writes context node =
         | _ ->
           assert false (* Callsites can only be Call or ConsInit *)
       in
+      (* Evaluate the parameter values at the start of its defining function *)
+      update_node_values node (Eval.at_start_of kf);
       Seq.flat_map add_deps (List.to_seq callsites), List.map fst callsites
     | _ -> Seq.empty, []
 
@@ -362,21 +398,31 @@ let build_node_writes context node =
     Seq.append callee_deps return_deps
 
   and build_exp_deps callstack stmt kind exp : deps_builder =
-    List.to_seq (EnumLvals.in_exp exp) |>
-    Seq.flat_map (build_lval_deps callstack stmt kind)
+    let lvals = EnumLvals.in_exp exp in
+    build_lvals_deps callstack stmt kind ~exp lvals
+
+  and build_lvals_deps callstack stmt kind ?exp lvals : deps_builder =
+    if lvals <> [] then
+      List.to_seq lvals |>
+      Seq.flat_map (build_lval_deps callstack stmt kind)
+    else
+      Option.fold exp ~none:Seq.empty
+        ~some:(build_const_deps callstack stmt kind)
 
   and build_lval_deps callstack stmt kind lval : deps_builder =
     let kinstr = Kstmt stmt in
     let dst = build_lval context callstack kinstr lval in
     Seq.return (Graph.create_dependency graph kinstr dst kind node)
 
+  and build_const_deps callstack stmt kind exp : deps_builder =
+    let kinstr = Kstmt stmt in
+    let dst = build_const context callstack exp in
+    Seq.return (Graph.create_dependency graph kinstr dst kind node)
+
   and build_scattered_deps callstack kinstr lval : deps_builder =
     let add_cell node_kind =
       let node' = add_or_update_node context callstack node_kind in
-      begin match Node_kind.to_lval node_kind with
-        | Some lval' -> update_node_values node kinstr lval';
-        | _ -> ()
-      end;
+      update_node_values node (Eval.after_kinstr kinstr);
       Graph.create_dependency graph kinstr node' Composition node
     in
     enumerate_cells ~is_folded_base lval kinstr |> Seq.map add_cell
@@ -392,7 +438,7 @@ let build_node_writes context node =
     build_scattered_deps callstack kinstr lval
   | Alarm (stmt,alarm) ->
     build_alarm_deps callstack stmt alarm
-  | Unknown _ | AbsoluteMemory | String _ | Error _ ->
+  | Unknown _ | AbsoluteMemory | String _ | Const _ | Error _ ->
     Seq.empty
 
 
@@ -507,7 +553,7 @@ let build_node_reads context node =
     build_reads_deps callstack Kglobal (Cil_types.Var vi, Cil_types.NoOffset)
   | Scattered (_lval,kinstr) ->
     build_kinstr_deps callstack None kinstr
-  | Alarm _ | Unknown _ | AbsoluteMemory | String _ | Error _ ->
+  | Alarm _ | Unknown _ | AbsoluteMemory | Const _ | String _ | Error _ ->
     Seq.empty
 
 

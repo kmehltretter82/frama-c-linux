@@ -45,47 +45,57 @@
       "curve-style": "bezier",
       "target-arrow-shape": "vee",
       "target-arrow-color": "#888",
-      "arrow-scale": 2.0
+      "arrow-scale": 2.0,
+      "z-compound-depth": "top"
     }
   },
   {
     "selector": "edge.multiple-selection",
     "style": {
       "overlay-color": "#aaa",
-      "overlay-padding": "10px",
+      "overlay-padding": "4px",
       "overlay-opacity": 0.4
     }
   },
   {
-    "selector": "edge.selection, :selected",
+    "selector": "edge.selection",
     "style": {
       "overlay-color": "#8bf",
-      "overlay-padding": "10px",
+      "overlay-padding": "4px",
       "overlay-opacity": 0.4
+    }
+  },
+  {
+    "selector": ":selected",
+    "style": {
+      "overlay-color": "#8bf",
+      "overlay-padding": "8px",
+      "overlay-opacity": 0.4
+    }
+  },
+  {
+    "selector": ".function, .file",
+    "style": {
+      "shape": "rectangle",
+      "text-outline-width": 1,
+      "font-size": "11px",
+      "background-opacity" : 0.4,
+      "text-valign" : "top",
+      "text-halign" : "center",
+      "padding" : "18px",
+      "border-width": 1
     }
   },
   {
     "selector": ".function",
     "style": {
-      "shape": "rectangle",
-      "background-color": "#bbb",
-      "background-opacity" : 0.4,
-      "text-valign" : "top",
-      "text-halign" : "center",
-      "padding" : "10px",
-      "border-width": 1
+      "background-color": "#bbb"
     }
   },
   {
     "selector": ".file",
     "style": {
-      "shape": "rectangle",
-      "background-color": "#ddd",
-      "background-opacity" : 0.4,
-      "text-valign" : "top",
-      "text-halign" : "center",
-      "padding" : "10px",
-      "border-width": 1
+      "background-color": "#ddd"
     }
   },
   {
@@ -133,6 +143,15 @@
     }
   },
   {
+    "selector": "node[kind='const']",
+    "style": {
+      "shape": "ellipse",
+      "background-color": "#bbb",
+      "border-width": "1px",
+      "border-style": "dashed"
+    }
+  },
+  {
     "selector": "node[kind='alarm']",
     "style": {
       "shape": "octagon",
@@ -153,6 +172,22 @@
       "ghost-offset-x": "6px",
       "ghost-offset-y": "6px",
       "ghost-opacity": "0.7"
+    }
+  },
+  {
+    "selector": "node[taint='direct']",
+    "style": {
+      "underlay-color": "#882288",
+      "underlay-padding": "14px",
+      "underlay-opacity": 0.4
+    }
+  },
+  {
+    "selector": "node[taint='indirect']",
+    "style": {
+      "underlay-color": "#73BBBB",
+      "underlay-padding": "14px",
+      "underlay-opacity": 0.8
     }
   },
   {

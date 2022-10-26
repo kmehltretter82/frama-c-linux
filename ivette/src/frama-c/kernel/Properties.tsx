@@ -262,8 +262,8 @@ const renderTaint: Renderer<States.Tag> =
     let color = 'black';
     switch (taint.name) {
       case 'not_tainted': id = 'DROP.EMPTY'; color = '#00B900'; break;
-      case 'data_tainted': id = 'DROP.FILLED'; color = '#FF8300'; break;
-      case 'control_tainted': id = 'DROP.FILLED'; color = '#73BBBB'; break;
+      case 'direct_taint': id = 'DROP.FILLED'; color = '#882288'; break;
+      case 'indirect_taint': id = 'DROP.FILLED'; color = '#73BBBB'; break;
       case 'error': id = 'HELP'; break;
       case 'not_applicable': id = 'MINUS'; break;
       default:
@@ -304,8 +304,8 @@ const byStatus =
 const byTaint =
   Compare.option(
     Compare.byRank(
-      'data_tainted',
-      'control_tainted',
+      'direct_taint',
+      'indirect_taint',
       'not_tainted',
       'error',
       'not_applicable',

@@ -28,6 +28,7 @@ type node_kind =
   | Alarm of Cil_types.stmt * Alarms.alarm
   | AbsoluteMemory
   | String of int * Base.cstring
+  | Const of Cil_types.exp
   | Error of string
 
 type callstack = Callstack.t
@@ -53,6 +54,7 @@ type node = {
   mutable node_hidden : bool;
   mutable node_values : Cvalue.V.t option;
   mutable node_range : node_range;
+  mutable node_taint : Eva.Results.taint option;
   mutable node_writes_computation : computation;
   mutable node_reads_computation : computation;
   mutable node_writes_stmts : Cil_types.stmt list;

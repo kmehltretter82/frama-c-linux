@@ -69,18 +69,7 @@ let truncate_to_sub full_cs sub_cs =
     | [] -> None
     | (s :: t) as cs ->
       if is_prefix sub_cs cs
-      then Some (List.rev acc @ sub_cs)
+      then Some (List.rev_append acc sub_cs)
       else aux (s :: acc) t
   in
   aux [] full_cs
-
-let list_filter_map f l =
-  let aux acc x =
-    match f x with
-    | None -> acc
-    | Some y -> y :: acc
-  in
-  List.rev (List.fold_left aux [] l)
-
-let filter_truncate l sub_cs =
-  list_filter_map (fun cs -> truncate_to_sub cs sub_cs) l

@@ -150,7 +150,7 @@ export type node =
   { id: nodeId, label: string, kind: string, locality: nodeLocality,
     is_root: boolean, backward_explored: string, forward_explored: string,
     writes: location[], values?: string, range: number | string,
-    type?: string };
+    type?: string, taint?: "direct" | "indirect" | "untainted" };
 
 /** Decoder for `node` */
 export const jNode: Json.Decoder<node> =
@@ -166,6 +166,12 @@ export const jNode: Json.Decoder<node> =
     values: Json.jOption(Json.jString),
     range: Json.jUnion<number | string>( Json.jNumber, Json.jString,),
     type: Json.jOption(Json.jString),
+    taint: Json.jOption(
+             Json.jUnion<"direct" | "indirect" | "untainted">(
+               Json.jTag("direct"),
+               Json.jTag("indirect"),
+               Json.jTag("untainted"),
+             )),
   });
 
 /** Natural order for `node` */
@@ -174,7 +180,7 @@ export const byNode: Compare.Order<node> =
     <{ id: nodeId, label: string, kind: string, locality: nodeLocality,
        is_root: boolean, backward_explored: string, forward_explored: string,
        writes: location[], values?: string, range: number | string,
-       type?: string }>({
+       type?: string, taint?: "direct" | "indirect" | "untainted" }>({
     id: byNodeId,
     label: Compare.string,
     kind: Compare.string,
@@ -186,6 +192,7 @@ export const byNode: Compare.Order<node> =
     values: Compare.defined(Compare.string),
     range: Compare.structural,
     type: Compare.defined(Compare.string),
+    taint: Compare.defined(Compare.structural),
   });
 
 /** The dependency between two nodes */
