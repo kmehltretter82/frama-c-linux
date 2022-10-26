@@ -884,15 +884,17 @@ end = struct
       dc_libs = Some l;
       dc_macros = Macros.add_list ["PTEST_LIBS", s] current.dc_macros }
 
-  let config_gen var_name =
+  let config_gen var_name update_field =
     fun ~drop:_ ~file ~dir:_ s current ->
     let s = Macros.expand ~file current.dc_macros s in
     let l = split_list s in
-    { current with dc_plugin = Some l ;
-                   dc_macros = Macros.add_list [var_name, s] current.dc_macros }
+    let current = update_field current (Some l) in
+    { current with dc_macros = Macros.add_list [var_name, s] current.dc_macros }
 
-  let config_plugin = config_gen "PTEST_PLUGIN"
-  let config_library = config_gen "PTEST_LIBRARY"
+  let config_plugin =
+    config_gen "PTEST_PLUGIN" (fun c dc_plugin->{ c with dc_plugin })
+  let config_library =
+    config_gen "PTEST_LIBRARY" (fun c dc_library -> { c with dc_library })
 
   let config_module macro_name ~drop:_ ~file ~dir:_ s current =
     let s = Macros.expand ~file current.dc_macros s in
