@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Eva       [2022-10-25] The octagon domain can infer relations on the integer
+              conversion of floating-point variables.
 -   Kernel    [2022-10-14] 'calls' ACSL extension is now registered in the
               kernel and not WP
 o!  From      [2022-10-13] Removed Db.From API: use the From API instead.
