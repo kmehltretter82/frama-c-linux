@@ -351,12 +351,11 @@ let build_node_writes context node =
     match Node_kind.get_base node.node_kind with
     | Some vi when vi.vglob ->
       let initinfo = Globals.Vars.find vi in
-      let seq = match initinfo.init with
-        | None -> Seq.empty
-        | Some init ->
-          build_init_deps callstack ~origin:(GlobalInit (vi)) vi init
+      let init = match initinfo.init with
+        | None -> SingleInit (Cil.zero ~loc:vi.vdecl)
+        | Some init -> init
       in
-      seq, []
+      build_init_deps callstack ~origin:(GlobalInit (vi)) vi init, []
     (* TODO refine formal dependency computation for non-scalar formals *)
     | Some vi when vi.vformal ->
       let kf = Option.get (Kernel_function.find_defining_kf vi) in
