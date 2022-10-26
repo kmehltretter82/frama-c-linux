@@ -1,8 +1,6 @@
 import React from 'react';
 import Dictionary from 'lodash';
-import { cpp } from '@codemirror/lang-cpp';
-import { RangeSetBuilder } from '@codemirror/state';
-import { Facet, StateField, StateEffect } from '@codemirror/state';
+import { Facet, StateEffect } from '@codemirror/state';
 import { EditorState, Extension, RangeSet } from '@codemirror/state';
 import { Decoration, DecorationSet } from '@codemirror/view';
 import { EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
@@ -10,6 +8,11 @@ import { DOMEventHandlers, GutterMarker, gutter } from '@codemirror/view';
 
 import { tags } from '@lezer/highlight';
 import { syntaxHighlighting, HighlightStyle } from '@codemirror/language';
+
+import { parser } from '@lezer/cpp';
+import { SyntaxNode } from '@lezer/common';
+import { foldGutter, foldNodeProp } from '@codemirror/language';
+import { LRLanguage, LanguageSupport } from "@codemirror/language"
 
 import * as Dome from 'dome';
 import * as Server from 'frama-c/server';
@@ -110,9 +113,9 @@ function stateFacet<I>(e: I): Facet<I, I> {
 interface Range { from: number, to: number }
 
 // Test if a range is contained by another.
-function isBetween(inside: Range, outside: Range): boolean {
-  return outside.from <= inside.from && inside.to <= outside.to;
-}
+// function isBetween(inside: Range, outside: Range): boolean {
+//   return outside.from <= inside.from && inside.to <= outside.to;
+// }
 
 // The code is given by the server has a tree but implemented with arrays and
 // without information on the ranges of each element. It will be converted in a
@@ -334,64 +337,29 @@ const CodeDecorationPlugin: Plugin<CodeDecorationState> = {
 const unreachableClass = Decoration.mark({ class: 'cm-dead-code' });
 const nonTerminatingClass = Decoration.mark({ class: 'cm-non-term-code' });
 
-// As we want to avoid converting the dead code information given by the server
-// to ranges at each update, we use a StateField to store the converted view of
-// those information. This StateField is only computed when the document
-// changes. To implement this, we first need a type to represent the dead code
-// information as ranges.
-type DeadCodeRanges = { unreachable: Range[], nonTerminating: Range[] };
-
-// Then, we need a helper function that computes the ranges from the editor
-// state. It retrieves the needed facets and does the conversion into ranges.
-function computeDeadCodeRanges(state: EditorState): DeadCodeRanges {
-  const { dead, ranges } = state.facet(CodeDataFacet);
-  const unreachable: Range[] = [];
-  dead.unreachable.forEach(marker => {
-    const r = ranges.get(marker); if (!r) return;
-    unreachable.push(r);
-  });
-  const nonTerminating: Range[] = [];
-  dead.nonTerminating.forEach(marker => {
-    const r = ranges.get(marker); if (!r) return;
-    nonTerminating.push(r);
-  });
-  return { unreachable, nonTerminating };
-}
-
-// Finally, we can define the dead code ranges StateField.
-const DeadCodeRanges = StateField.define<DeadCodeRanges>({
-  create: (state) => computeDeadCodeRanges(state),
-  update: (ranges, transaction) => {
-    if (!transaction.docChanged) return ranges
-    return computeDeadCodeRanges(transaction.state);
-  },
-});
-
-// Internal state of the plugin. The <unreachable> and <nonTerminating> fields
-// are used as cache to avoid converting over and over dead markers to ranges.
-interface DeadCodeState { decorations: DecorationSet }
-
-// Plugin declaration.
-const DeadCodePlugin: Plugin<DeadCodeState> = {
-
-  create: () => ({ decorations: RangeSet.empty }),
-
-  decorations: (state) => state.decorations,
-
-  // TODO: Do stuff only for relevant events.
+// The plugin itself. The decorations are recomputed only once each time the
+// selected function is changed.
+const DeadCodePlugin: Plugin<DecorationSet> = {
+  create: () => RangeSet.empty,
+  decorations: (state) => state,
   update: (state, update) => {
-    const deadCode = update.state.field(DeadCodeRanges);
-    const visible = update.view.visibleRanges;
-    const keep = (i: Range): boolean => visible.some(o => isBetween(i, o));
-    const unreachable = deadCode.unreachable.filter(keep)
-      .map(r => unreachableClass.range(r.from, r.to));
-    const nonTerm = deadCode.nonTerminating.filter(keep)
-      .map(r => nonTerminatingClass.range(r.from, r.to));
-    const decorations = RangeSet.of(unreachable.concat(nonTerm), true);
-    return { ...state, decorations };
+    if (!update.docChanged) return state;
+    const { dead, ranges } = update.state.facet(CodeDataFacet);
+    const unreachable = [];
+    for (const marker of dead.unreachable) {
+      const r = ranges.get(marker); if (!r) continue;
+      const range = unreachableClass.range(r.from, r.to);
+      unreachable.push(range);
+    }
+    const nonTerm = [];
+    for (const marker of dead.nonTerminating) {
+      const r = ranges.get(marker); if (!r) continue;
+      const range = nonTerminatingClass.range(r.from, r.to);
+      nonTerm.push(range);
+    }
+    return RangeSet.of(unreachable.concat(nonTerm), true);
   },
-
-};
+}
 
 
 
@@ -417,63 +385,82 @@ function getBulletColor(status: States.Tag): string {
   }
 }
 
-// This extension need information on the properties. Those facets add those
-// information in the CodeMirror internal state.
-const PropertiesFacet = stateFacet<Properties.statusData[]>([]);
-const StatusDictFacet = stateFacet<Map<string, States.Tag>>(new Map());
-
-type RangesGutterMarkers = RangeSet<GutterMarker>;
-
-function computeRangesGuttersMarkers(state: EditorState): RangesGutterMarkers {
-  const { ranges } = state.facet(CodeDataFacet);
-  const statusDict = state.facet(StatusDictFacet);
-  const properties = state.facet(PropertiesFacet);
-  const rangesGutterMarkers = [];
-  for (const data of properties) {
-    const range  = ranges.get(data.key); if (!range) continue;
-    const status = statusDict.get(data.status);
-    const bullet = document.createElement('div');
-    bullet.innerHTML = '◉'
+// Property bullet gutter marker.
+class PropertyBullet extends GutterMarker {
+  readonly bullet: HTMLDivElement;
+  toDOM() { return this.bullet; }
+  constructor(status?: States.Tag) {
+    super();
+    this.bullet = document.createElement('div');
+    this.bullet.innerHTML = '◉'
     if (status) {
-      bullet.style.color = getBulletColor(status);
-      bullet.style.textAlign = 'center';
-      if (status.descr) bullet.title = status.descr;
+      this.bullet.style.color = getBulletColor(status);
+      this.bullet.style.textAlign = 'center';
+      if (status.descr) this.bullet.title = status.descr;
     }
-    const tag = new class extends GutterMarker { toDOM() { return bullet; } };
-    rangesGutterMarkers.push({ from: range.from, to: range.to, value: tag });
   }
-  return RangeSet.of(rangesGutterMarkers, true);
 }
-
-const RangesGutterMarkers = StateField.define<RangesGutterMarkers>({
-  create: (state) => computeRangesGuttersMarkers(state),
-  update: (markers, transaction) => {
-    if (!transaction.docChanged) return markers;
-    return computeRangesGuttersMarkers(transaction.state);
-  }
-});
-
-const PropertiesExtension: Extension = gutter({
-  class: 'cm-bullet',
-  markers: (view) => {
-    const ranges = view.state.field(RangesGutterMarkers);
-    const builder: RangeSetBuilder<GutterMarker> = new RangeSetBuilder();
-    view.visibleRanges.forEach(({ from, to }) => {
-      ranges.between(from, to, (from, _, bullet) => {
-        const range = bullet.range(view.lineBlockAt(from).from);
-        builder.add(range.from, range.to, range.value);
-      });
-    });
-    return builder.finish();
-  },
-});
 
 // Extension modifying the default gutter theme.
 const gutterTheme: Extension = EditorView.baseTheme({
   '.cm-gutters': {
-    borderRight: '1px solid var(--code-bullet)',
-    width: '2.0em',
+    // borderRight: '1px solid var(--code-bullet)',
+    borderRight: '0px',
+    width: '2.15em',
     background: 'var(--background-report)',
+  }
+});
+
+// This extension need information on the property's tags. This facets add those
+// information in the CodeMirror internal state.
+const StatusDictFacet = stateFacet<Map<string, States.Tag>>(new Map());
+
+// To improve performances, we build a map from markers to status data.
+type PropertiesMap = Map<string, Properties.statusData>;
+const PropertiesFacet = Facet.define<Properties.statusData[], PropertiesMap>({
+  combine: (properties) => {
+    if (properties.length === 0) return new Map();
+    const res: PropertiesMap = new Map();
+    properties[properties.length - 1].forEach(p => res.set(p.key, p));
+    return res;
+  }
+});
+
+// Find the head nodes contained in a given range or only starting in it but
+// with an id.
+function containedNodes(tree: Tree, range: Range): Tree[] {
+  if (range.from <= tree.from && tree.from <= range.to && tree.id)
+    return [ { ...tree, children: [] } ];
+  return tree.children.map((child) => containedNodes(child, range)).flat();
+}
+
+// Returns all the ids contained in a tree.
+function getIds(tree: Tree): string[] {
+  return (tree.id ? [tree.id] : []).concat(tree.children.map(getIds).flat());
+}
+
+// The properties gutter extension itself. For each line, it recovers the
+// relevant markers in the code tree, retrieves the corresponding properties and
+// builds the bullets.
+const PropertiesExtension: Extension = gutter({
+  class: 'cm-bullet',
+  lineMarker(view, line) {
+    const { tree } = view.state.facet(CodeDataFacet);
+    const statusDict = view.state.facet(StatusDictFacet);
+    const propertiesMap = view.state.facet(PropertiesFacet);
+    const lineRange = { from: line.from, to: line.from + line.length };
+    const nodes = containedNodes(tree, lineRange);
+    let property: Properties.statusData | undefined = undefined;
+    for (const node of nodes) {
+      for (const id of getIds(node)) {
+        property = propertiesMap.get(id);
+        if (property) break;
+      }
+      if (property) break;
+    }
+    if (!property) return null;
+    const status = statusDict.get(property.status);
+    return new PropertyBullet(status);
   }
 });
 
@@ -577,7 +564,7 @@ const ContextMenuPlugin: Plugin<void> = {
 
 
 // -----------------------------------------------------------------------------
-//  Code highlighting
+//  Code highlighting and parsing
 // -----------------------------------------------------------------------------
 
 const HighlightPlugin = syntaxHighlighting(HighlightStyle.define([
@@ -587,6 +574,21 @@ const HighlightPlugin = syntaxHighlighting(HighlightStyle.define([
   { tag: tags.controlKeyword, class: 'cm-keyword' },
   { tag: tags.definition(tags.variableName) , class: 'cm-def' },
 ]));
+
+/// A language provider based on the [Lezer C++ parser]
+// (https://github.com/lezer-parser/cpp), extended with
+/// highlighting and folding information.
+const comment = (t: SyntaxNode): Range => ({ from: t.from + 2, to: t.to - 2});
+const folder = foldNodeProp.add({ BlockComment: comment });
+const stringPrefixes = [ "L", "u", "U", "u8", "LR", "UR", "uR", "u8R", "R" ];
+const cppLanguage = LRLanguage.define({
+  parser: parser.configure({ props: [ folder ] }),
+  languageData: {
+    commentTokens: { line: "//", block: { open: "/*", close: "*/" } },
+    indentOnInput: /^\s*(?:case |default:|\{|\})$/,
+    closeBrackets: { stringPrefixes },
+  }
+});
 
 
 
@@ -598,24 +600,24 @@ const HighlightPlugin = syntaxHighlighting(HighlightStyle.define([
 const baseExtensions: Extension[] = [
   // drawSelection(),
   // EditorState.allowMultipleSelections.of(true),
-  HighlightPlugin, cpp(),
 
   UpdateHoveredFacet.of(() => { return; }),
   UpdateSelectionFacet.of(() => { return; }),
 
   CodeDataFacet.of(emptyCodeData),
   buildExtension(CodeDecorationPlugin),
-
-  DeadCodeRanges.extension,
   buildExtension(DeadCodePlugin),
 
   PropertiesFacet.of([]),
   StatusDictFacet.of(new Map()),
-  RangesGutterMarkers.extension,
   gutterTheme, PropertiesExtension,
 
   GetMarkerDataFacet.of(() => undefined),
   buildExtension(ContextMenuPlugin),
+
+  foldGutter(),
+  HighlightPlugin,
+  new LanguageSupport(cppLanguage),
 ];
 
 function Editor(): JSX.Element {
