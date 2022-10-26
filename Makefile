@@ -81,7 +81,7 @@ include ivette/Makefile.installation
 ################################
 
 # HDRCK is internal
-FRAMAC_HDRCK:=headers/hdrck.exe
+FRAMAC_HDRCK:=tools/hdrck/hdrck.exe
 
 # Part that can be shared for external plugins
 include share/Makefile.headers
