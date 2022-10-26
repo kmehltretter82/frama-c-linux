@@ -42,7 +42,7 @@ let ask_for_lval (main_ui:Design.main_window_extension_points) kf =
   match txt with None | Some "" -> None
                | Some txt ->
                  try
-                   let term_lval = !Db.Properties.Interp.term_lval kf txt in
+                   let term_lval = Logic_parse_string.term_lval kf txt in
                    Some (txt, term_lval)
                  with e ->
                    main_ui#error "[ask for lval] '%s' invalid expression: %s@."

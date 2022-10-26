@@ -331,16 +331,16 @@ module Select (Eval: Eval) = struct
           if txt = "NULL" then
             select_null main_ui loc
           else
-            let term = !Db.Properties.Interp.term ~env kf txt in
+            let term = Logic_parse_string.term ~env kf txt in
             match term.term_node with
             | TLval _ | TStartOf _ -> select_tlv main_ui loc term
             | _ -> select_term main_ui loc term
         end
       | Pred ->
-        let pred = !Db.Properties.Interp.predicate ~env kf txt in
+        let pred = Logic_parse_string.predicate ~env kf txt in
         select_predicate main_ui loc pred
     with
-    | Logic_interp.Error (_, mess) ->
+    | Logic_parse_string.Error (_, mess) ->
       main_ui#error "Invalid %a: %s" pp_term_or_pred tp mess
     | Parsing.Parse_error ->
       main_ui#error "Invalid %a: Parse error" pp_term_or_pred tp

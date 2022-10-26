@@ -55,9 +55,9 @@ let ask_for_lval (main_ui:Design.main_window_extension_points) kf =
   match txt with None | Some "" -> None
                | Some txt ->
                  try
-                   let term_lval = !Db.Properties.Interp.term_lval kf txt in
+                   let term_lval = Logic_parse_string.term_lval kf txt in
                    let lval =
-                     !Db.Properties.Interp.term_lval_to_lval ~result:None term_lval
+                     Logic_to_c.term_lval_to_lval term_lval
                    in
                    Some (txt, lval)
                  with e ->
@@ -77,9 +77,7 @@ let get_lval_opt main_ui kf_opt localizable =
     Some (lv_txt, lv)
   | PTermLval (Some _kf, Kstmt _stmt, _, tlv) -> begin
       try
-        let lv =
-          !Db.Properties.Interp.term_lval_to_lval ~result:None tlv
-        in
+        let lv = Logic_to_c.term_lval_to_lval tlv in
         let lv_txt = Format.asprintf "%a" Printer.pp_term_lval tlv in
         Some (lv_txt, lv)
       with Invalid_argument _ -> None

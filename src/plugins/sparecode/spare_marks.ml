@@ -314,7 +314,7 @@ class annot_visitor ~filter pdg = object (self)
           to_select <- add_nodes_and_undef_to_select true info to_select
         with
           Not_found -> () (* unreachable *)
-        | Logic_interp.To_zone.NYI _ ->
+        | Logic_deps.NYI _ ->
           Sparecode_params.warning ~current:true ~once:true
             "Dropping annotation";
           ()

@@ -625,6 +625,26 @@ let is_plain_pointer_type t =
 let is_array_type = plain_or_set is_plain_array_type
 let is_pointer_type = plain_or_set is_plain_pointer_type
 
+module type S =
+sig
+  val type_of_field:
+    location -> string -> Cil_types.logic_type ->
+    (term_offset * Cil_types.logic_type)
+  val mk_cast:
+    ?explicit:bool -> Cil_types.term -> Cil_types.logic_type -> Cil_types.term
+  val term : Lenv.t -> Logic_ptree.lexpr -> term
+  val predicate : Lenv.t -> Logic_ptree.lexpr -> predicate
+  val code_annot :
+    Cil_types.location -> string list ->
+    Cil_types.logic_type -> Logic_ptree.code_annot -> code_annotation
+  val type_annot : location -> Logic_ptree.type_annot -> logic_info
+  val model_annot : location -> Logic_ptree.model_annot -> model_info
+  val annot : Logic_ptree.decl -> global_annotation
+  val funspec :
+    string list ->
+    varinfo -> (varinfo list) option -> typ -> Logic_ptree.spec -> funspec
+end
+
 module Make
     (C:
      sig

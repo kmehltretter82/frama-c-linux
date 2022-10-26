@@ -22,38 +22,38 @@
 
 open Cil_types
 
-val is_non_terminating_instr: stmt -> bool
-(** Returns [true] iff there exists executions of the statement that does
-    not always fail/loop (for function calls). Must be called *only* on
-    statements that are instructions. *)
+exception No_conversion
 
-(** {2 Results} *)
+val logic_type_to_typ : logic_type -> typ
+val logic_var_to_var : logic_var -> varinfo
 
-[@@@ api_start]
+val loc_lval_to_lval : ?result:varinfo -> term_lval -> lval list
+val loc_lhost_to_lhost : ?result:varinfo -> term_lhost -> lhost list
+val loc_offset_to_offset : ?result:varinfo -> term_offset -> offset list
 
-(** Internal temporary API: please do not use it, as it should be removed in a
-    future version. *)
+val loc_to_exp : ?result:varinfo -> term -> exp list
+(** @return a list of C expressions.
+    @raise No_conversion if the argument is not a valid set of
+    expressions. *)
 
-type results
+val loc_to_lval : ?result:varinfo -> term -> lval list
+(** @return a list of C locations.
+    @raise No_conversion if the argument is not a valid set of
+    left values. *)
 
-val get_results: unit -> results
-val set_results: results -> unit
-val merge: results -> results -> results
+val loc_to_offset : ?result:varinfo -> term -> offset list
+(** @return a list of C offset provided the term denotes locations who
+    have all the same base address.
+    @raise No_conversion if the given term does not match the precondition *)
 
-(** Change the callstacks for the results for which this is meaningful.
-    For technical reasons, the top of the callstack must currently
-    be preserved. *)
-val change_callstacks:
-  (Value_types.callstack -> Value_types.callstack) -> results -> results
+val term_lval_to_lval : ?result:varinfo -> term_lval -> lval
+(** @raise No_conversion if the argument is not a left value. *)
 
-val eval_tlval_as_location :
-  ?result:Cil_types.varinfo ->
-  Cvalue.Model.t ->  Cil_types.term -> Locations.location
+val term_to_lval : ?result:varinfo -> term -> lval
+(** @raise No_conversion if the argument is not a left value. *)
 
-[@@@ api_end]
+val term_to_exp : ?result:varinfo -> term -> exp
+(** @raise No_conversion if the argument is not a valid expression. *)
 
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)
+val term_offset_to_offset : ?result:varinfo -> term_offset -> offset
+(** @raise No_conversion if the argument is not a valid offset. *)

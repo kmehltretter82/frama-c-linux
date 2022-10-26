@@ -263,6 +263,10 @@ let merge r1 r2 =
   { main; before_states; after_states; kf_initial_states;
     initial_state; initial_args; alarms; statuses; kf_callers }
 
+let eval_tlval_as_location ?result state term =
+  let env = Eval_terms.env_post_f ~pre:state ~post:state ~result () in
+  try Eval_terms.eval_tlval_as_location ~alarm_mode:Ignore env term
+  with Eval_terms.LogicEvalError _ -> raise Logic_to_c.No_conversion
 
 (*
 Local Variables:

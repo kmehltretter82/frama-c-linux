@@ -147,52 +147,8 @@ type typing_context = {
   *)
 }
 
-module Make
-    (C :
-     sig
-       val is_loop: unit -> bool
-       (** whether the annotation we want to type is contained in a loop.
-           Only useful when creating objects of type [code_annotation]. *)
 
-       val anonCompFieldName : string
-       val conditionalConversion : typ -> typ -> typ
-       val find_macro : string -> Logic_ptree.lexpr
-       val find_var : ?label:string -> string -> logic_var
-       (** see corresponding field in {!Logic_typing.typing_context}. *)
-
-       val find_enum_tag : string -> exp * typ
-       val find_type : type_namespace -> string -> typ
-       val find_comp_field: compinfo -> string -> offset
-       val find_label : string -> stmt ref
-
-       val remove_logic_function : string -> unit
-       val remove_logic_info: logic_info -> unit
-       val remove_logic_type: string -> unit
-       val remove_logic_ctor: string -> unit
-
-       val add_logic_function: logic_info -> unit
-       val add_logic_type: string -> logic_type_info -> unit
-       val add_logic_ctor: string -> logic_ctor_info -> unit
-
-       val find_all_logic_functions : string -> Cil_types.logic_info list
-       val find_logic_type: string -> logic_type_info
-       val find_logic_ctor: string -> logic_ctor_info
-
-       (** What to do when we have a term of type Integer in a context
-           expecting a C integral type.
-           @raise Failure to reject such conversion
-           @since Nitrogen-20111001
-       *)
-       val integral_cast: Cil_types.typ -> Cil_types.term -> Cil_types.term
-
-       (** raises an error at the given location and with the given message.
-           @since Magnesium-20151001 *)
-       val error: location -> ('a,Format.formatter,unit, 'b) format4 -> 'a
-
-       (** see {!Logic_typing.typing_context}. *)
-       val on_error: ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
-
-     end) :
+module type S =
 sig
 
   (** @since Nitrogen-20111001 *)
@@ -244,6 +200,54 @@ sig
     varinfo -> (varinfo list) option -> typ -> Logic_ptree.spec -> funspec
 
 end
+
+module Make
+    (C :
+     sig
+       val is_loop: unit -> bool
+       (** whether the annotation we want to type is contained in a loop.
+           Only useful when creating objects of type [code_annotation]. *)
+
+       val anonCompFieldName : string
+       val conditionalConversion : typ -> typ -> typ
+       val find_macro : string -> Logic_ptree.lexpr
+       val find_var : ?label:string -> string -> logic_var
+       (** see corresponding field in {!Logic_typing.typing_context}. *)
+
+       val find_enum_tag : string -> exp * typ
+       val find_type : type_namespace -> string -> typ
+       val find_comp_field: compinfo -> string -> offset
+       val find_label : string -> stmt ref
+
+       val remove_logic_function : string -> unit
+       val remove_logic_info: logic_info -> unit
+       val remove_logic_type: string -> unit
+       val remove_logic_ctor: string -> unit
+
+       val add_logic_function: logic_info -> unit
+       val add_logic_type: string -> logic_type_info -> unit
+       val add_logic_ctor: string -> logic_ctor_info -> unit
+
+       val find_all_logic_functions : string -> Cil_types.logic_info list
+       val find_logic_type: string -> logic_type_info
+       val find_logic_ctor: string -> logic_ctor_info
+
+       (** What to do when we have a term of type Integer in a context
+           expecting a C integral type.
+           @raise Failure to reject such conversion
+           @since Nitrogen-20111001
+       *)
+       val integral_cast: Cil_types.typ -> Cil_types.term -> Cil_types.term
+
+       (** raises an error at the given location and with the given message.
+           @since Magnesium-20151001 *)
+       val error: location -> ('a,Format.formatter,unit, 'b) format4 -> 'a
+
+       (** see {!Logic_typing.typing_context}. *)
+       val on_error: ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
+
+     end) : S
+
 
 (** append the Old and Post labels in the environment *)
 val append_old_and_post_labels: Lenv.t -> Lenv.t
