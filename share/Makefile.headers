@@ -123,10 +123,10 @@ endif
 ## HDRCK
 
 HDRCK.HAS_GIT:=$(shell git rev-parse --is-inside-work-tree 2> /dev/null)
+HDRCK.ENABLED=yes
 ifneq ($(HDRCK.HAS_GIT),true)
 ifeq ($(HDRCK_FILES_INPUT),)
-$(error "Cannot check or make headers: not a Git repository, \
-         you should specify HDRCK_FILES_INPUT")
+HDRCK.ENABLED=no
 endif
 endif
 
@@ -136,6 +136,8 @@ else
 HDRCK.COLLECT=cat $(HDRCK_FILES_INPUT)
 endif
 
+ifeq ($(HDRCK.ENABLED),yes)
+
 .PHONY: check-headers
 check-headers:
 	$(HDRCK.COLLECT) | $(HDRCK.CMD) $(HDRCK.OPTS) $(HDRCK_EXTRA)
@@ -143,6 +145,20 @@ check-headers:
 .PHONY: headers
 headers:
 	$(HDRCK.COLLECT) | $(HDRCK.CMD) -update $(HDRCK.OPTS) $(HDRCK_EXTRA)
+
+else
+
+.PHONY: check-headers
+check-headers:
+	$(error "Cannot check-headers: not a Git repository, \
+	   			 you should specify HDRCK_FILES_INPUT")
+
+.PHONY: headers
+headers:
+	$(error "Cannot make headers: not a Git repository, \
+	   			 you should specify HDRCK_FILES_INPUT")
+
+endif
 
 #################################
 

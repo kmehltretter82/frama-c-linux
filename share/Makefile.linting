@@ -56,10 +56,10 @@ endif
 ## LINT
 
 LINTCK.HAS_GIT:=$(shell git rev-parse --is-inside-work-tree 2> /dev/null)
+LINTCK.ENABLED=yes
 ifneq ($(LINTCK.HAS_GIT),true)
 ifeq ($(LINTCK_FILES_INPUT),)
-$(error "Cannot lint: not a Git repository, \
-				 you should specify LINTCK_FILES_INPUT")
+LINTCK.ENABLED=no
 endif
 endif
 
@@ -69,6 +69,8 @@ else
 LINTCK.COLLECT=cat $(LINTCK_FILES_INPUT)
 endif
 
+ifeq ($(LINTCK.ENABLED),yes)
+
 .PHONY: lint
 lint:
 	$(LINTCK.COLLECT) | $(LINTCK.CMD) $(LINTCK_EXTRA)
@@ -76,6 +78,20 @@ lint:
 .PHONY: fix-lint
 fix-lint:
 	$(LINTCK.COLLECT) | $(LINTCK.CMD) -u $(LINTCK_EXTRA)
+
+else
+
+.PHONY: lint
+lint:
+	$(error "Cannot lint: not a Git repository, \
+	   			 you should specify LINTCK_FILES_INPUT")
+
+.PHONY: fix-lint
+fix-lint:
+	$(error "Cannot fix-lint: not a Git repository, \
+	   			 you should specify LINTCK_FILES_INPUT")
+
+endif
 
 ##########################################################################
 
