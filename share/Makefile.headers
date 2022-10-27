@@ -74,7 +74,7 @@ DUNE ?= dune
 ifneq ($(IN_FRAMAC),yes)
 HDRCK.CMD:= $(HDRCK)
 else
-HDRCK.CMD:= $(DUNE) exec --root $(FRAMAC_HDRCK_SRC) -- $(HDRCK)
+HDRCK.CMD:= $(DUNE) exec --no-print-directory --root $(FRAMAC_HDRCK_SRC) -- $(HDRCK)
 endif
 
 HDRCK.OPTS:= --stdin -z -spec-format 3-zeros

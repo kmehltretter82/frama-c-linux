@@ -25,22 +25,33 @@
 # - cp ./dev/git-hooks/pre-commit.sh .git/hooks/pre-commit
 # - (cd .git/hooks/ && ln -s ../../dev/git-hooks/pre-commit.sh pre-commit)
 
-# Note:
-# - that checks the unstaged version of the files and these files are
-#   only commited with a `git commit -a` command.
-# - so, a `git commit` command may  checks the wrong version of a file.
-
 echo "Pre-commit Hook..."
 
-# Extract the files that have both an unstaged version and a staged one.
-UNSTAGED="git diff --name-status"
-STAGED="git diff --name-status --cached"
-(($UNSTAGED ; $STAGED) | sed "s:^.::" | sort -u) | diff - <(($UNSTAGED ; $STAGED) | sed "s:^.::" | sort)
-if [ "$?" != "0" ]; then
-    echo "WARNING: These previous files are both unstaged and in the index."
-    echo "         They will be verified only for a 'git commit -a' command."
+STAGED=$(git diff --diff-filter ACMR --name-only --cached | sort)
+UNSTAGED=$(git diff --diff-filter DMR --name-only | sort)
+
+INTER=$(comm -12 <(ls $STAGED) <(ls $UNSTAGED))
+
+if [ "$INTER" != "" ];
+then
+    echo "Cannot validate commit."
+    echo "The following staged files have been modified, renamed or deleted."
+    for file in $INTER ; do
+        echo "- $file"
+    done
+    exit 1
 fi
 
-# Verifies the current version of the files
-make lint.before-commit-a || exit 1
-make check-headers.before-commit-a || exit 1
+STAGED=$(echo $STAGED | tr '\n' ' ')
+
+TMP=$(mktemp)
+
+cleanup () {
+  rm "$TMP"
+}
+trap cleanup exit
+
+git check-attr -za $STAGED > "$TMP"
+make lint LINTCK_FILES_INPUT="$TMP" || exit 1
+git check-attr -z header_spec $STAGED > "$TMP"
+make check-headers HDRCK_FILES_INPUT="$TMP" HDRCK_EXTRA="-quiet" || exit 1

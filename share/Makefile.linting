@@ -49,7 +49,7 @@ DUNE ?= dune
 ifneq ($(IN_FRAMAC),yes)
 LINTCK.CMD:= $(LINTCK)
 else
-LINTCK.CMD:= $(DUNE) exec --root $(FRAMAC_LINTCK_SRC) -- $(LINTCK)
+LINTCK.CMD:= $(DUNE) exec --no-print-directory --root $(FRAMAC_LINTCK_SRC) -- $(LINTCK)
 endif
 
 ##########################################################################
