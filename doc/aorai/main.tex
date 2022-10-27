@@ -6,6 +6,7 @@
 
 \usetikzlibrary{fit}
 \usetikzlibrary{shapes.geometric}
+\usetikzlibrary{positioning}
 
 \usepackage{graphicx}
 \usepackage{xspace}
@@ -1096,8 +1097,9 @@ current active states, since it knows each previous active states.
 
     \node[xshift=10ex,anchor=west,align=center,font=\itshape] (prog) at (annot.east) {Annotated C\\ program};
 
-    \node[draw,yshift=-4em] (wp) at (prog) {\bf WP plugin};
+    \node[draw,below=2em of prog] (wp) {\bf WP plugin};
     \node[draw,yshift=-4em] (provers) at (wp) {\bf Provers};
+    \node[draw,below right=2em and 1ex of prog] (eva) {\bf Eva plugin};
 
     \node (ya2) at (ya -| buchi) {};
 
@@ -1108,6 +1110,7 @@ current active states, since it knows each previous active states.
     \draw[->] (annot) -- (prog);
     \draw[->] (prog) -- (wp);
     \draw[->] (wp) -- (provers);
+    \draw[->] (prog) -- (eva);
     \draw[->] (ya) -| (buchi);
     \draw[->] (buchi) -- (annot);
 
