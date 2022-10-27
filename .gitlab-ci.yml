@@ -21,7 +21,7 @@ default:
 ### VARIABLES
 
 variables:
-  DEFAULT: "master"
+  DEFAULT: "stable/iron"
   OCAML: "4.11"
   PUBLISH: "no"
   RELEASE: "no"
