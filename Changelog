@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ##################################
 
+###############################
+Open Source Release 26.0 (Iron)
+###############################
+
 -   Ivette    [2022-10-26] After an Eva analysis with taint, the taint status of
               lvalues is shown in the Inspector component and in Dive graphs.
 -   Eva       [2022-10-25] The octagon domain can infer relations on the integer

@@ -25,6 +25,10 @@
 Plugin E-ACSL <next-release>
 ############################
 
+#########################
+Plugin E-ACSL 26.0 (Iron)
+#########################
+
 -* E-ACSL       [2022-11-08] Fix clashing name when a function with contract and a
                 logic function have the same name (frama-c/eacsl#204)
 - E-ACSL        [2022-11-08] Add support for functions returning a rational
