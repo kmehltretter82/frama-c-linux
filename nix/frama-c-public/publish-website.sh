@@ -49,10 +49,11 @@ PUB_WEBSITE_DIR="pub-website"
 SRC_WEBSITE_DIR="website"
 
 VERSION="$(cat VERSION)"
+VERSION_SAFE="$(cat VERSION | sed 's/~/-/')"
 CODENAME="$(cat VERSION_CODENAME)"
 LOWER_CODENAME="$(echo "$CODENAME" | tr '[:upper:]' '[:lower:]')"
 
-BRANCH="release/$VERSION-$LOWER_CODENAME"
+BRANCH="release/$VERSION_SAFE-$LOWER_CODENAME"
 
 echo "$FRAMA_CI_BOT_SSH_PRIVATE" | base64 -d > nix/frama-c-public/id_ed25519
 chmod 400 nix/frama-c-public/id_ed25519
