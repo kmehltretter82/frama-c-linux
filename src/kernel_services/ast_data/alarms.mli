@@ -110,7 +110,7 @@ val to_seq:
   (Emitter.t * kernel_function * stmt * int * alarm * code_annotation) Seq.t
 (** Returns the sequence of all alarms and the associated annotations at some
     program point
-    @since Frama-C+dev *)
+    @since 26.0-Iron *)
 
 val find: code_annotation -> alarm option
 (** @return the alarm corresponding to the given assertion, if any.

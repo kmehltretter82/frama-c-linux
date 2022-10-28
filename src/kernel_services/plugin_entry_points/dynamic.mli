@@ -35,7 +35,7 @@ val register:
     [name], the type [ty] and the plug-in [plugin].
     @raise Type.AlreadyExists if [name] already exists. In other words you
     cannot register a value with the same name twice.
-    @before Frama-C+dev there was a labeled argument [journalized], that has
+    @before 26.0-Iron there was a labeled argument [journalized], that has
             been removed when Journalization has been removed.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 

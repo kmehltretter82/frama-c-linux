@@ -43,7 +43,7 @@ val possible_value_of_integral_const: constant -> Integer.t option
     [None] if the expression is not a constant expression or does not
     evaluate to an integer constant.
 
-    @before Frama-C+dev the function only returned [Some v] when the
+    @before 26.0-Iron the function only returned [Some v] when the
     expression was an integer literal (i.e. [Const c]).
 *)
 val possible_value_of_integral_expr: exp -> Integer.t option
@@ -59,7 +59,7 @@ val value_of_integral_const: constant -> Integer.t
     an integer constant expression. If unsure, use
     {!possible_value_of_integral_expr}.
 
-    @before Frama-C+dev the function would fail if the expression was not an
+    @before 26.0-Iron the function would fail if the expression was not an
     integer literal (see {!possible_value_of_integral_expr}).
 *)
 val value_of_integral_expr: exp -> Integer.t
@@ -67,7 +67,7 @@ val value_of_integral_expr: exp -> Integer.t
 (** [true] iff the expression is a constant expression that evaluates to
     a null pointer, i.e. 0 or a cast to 0.
 
-    @before Frama-C+dev the function would return [false] as soon as the
+    @before 26.0-Iron the function would return [false] as soon as the
     expression was not an integer literal (possibly casted).
 *)
 val is_null_expr: exp -> bool
@@ -78,7 +78,7 @@ val is_null_expr: exp -> bool
     {b Warning:} note that for the purpose of this function [&x] is {i not} a
     constant expression, hence the function will return [false] in this case.
 
-    @before Frama-C+dev the function would return [false] as soon as
+    @before 26.0-Iron the function would return [false] as soon as
     the expression was not an integer literal (possibly casted).
 *)
 val is_non_null_expr: exp -> bool

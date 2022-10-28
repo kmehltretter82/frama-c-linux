@@ -374,7 +374,7 @@ module LoadModule: Parameter_sig.String_list
 
 module LoadLibrary: Parameter_sig.String_list
 (** Behavior of option "-load-library"
-    @since Frama-C+dev
+    @since 26.0-Iron
 *)
 
 module AutoLoadPlugins: Parameter_sig.Bool
