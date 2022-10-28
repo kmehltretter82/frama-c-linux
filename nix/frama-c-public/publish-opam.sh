@@ -48,6 +48,9 @@ CODENAME="$(cat VERSION_CODENAME)"
 
 BRANCH="frama-c.$VERSION"
 
+echo "$FRAMA_CI_BOT_SSH_PRIVATE" | base64 -d > nix/frama-c-public/id_ed25519
+chmod 400 nix/frama-c-public/id_ed25519
+
 if ! git clone $PUB_OPAM_GIT $PUB_OPAM_DIR
 then
   echo "Failed to clone website directory"

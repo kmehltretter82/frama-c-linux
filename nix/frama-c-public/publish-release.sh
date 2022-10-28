@@ -35,6 +35,9 @@
 
 TAG="$(git describe --tag)"
 
+echo "$FRAMA_CI_BOT_SSH_PRIVATE" | base64 -d > nix/frama-c-public/id_ed25519
+chmod 400 nix/frama-c-public/id_ed25519
+
 if [[ $TAG =~ .*-beta$ ]] ; then
   git push "git@git.frama-c.com:pub/frama-c.git" "$TAG"
 else

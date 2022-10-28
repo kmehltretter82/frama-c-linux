@@ -54,6 +54,9 @@ LOWER_CODENAME="$(echo "$CODENAME" | tr '[:upper:]' '[:lower:]')"
 
 BRANCH="release/$VERSION-$LOWER_CODENAME"
 
+echo "$FRAMA_CI_BOT_SSH_PRIVATE" | base64 -d > nix/frama-c-public/id_ed25519
+chmod 400 nix/frama-c-public/id_ed25519
+
 if ! git clone $PUB_WEBSITE_GIT $PUB_WEBSITE_DIR
 then
   echo "Failed to clone website directory"
