@@ -49,8 +49,8 @@ o!  Pdg       [2022-07-01] Removed from Db. Use proper Pdg API instead.
 -   Ivette    [2022-06-20] In the AST component, the user can fold/unfold ACSL
               specifications, and preconditions are now shown at call sites.
 -   Eva       [2022-06-17] Improved precision: arguments of calls interpreted by
--             an Eva builtin or with an ACSL specification can now be reduced in
--             the caller. This is especially useful on C asserts.
+              an Eva builtin or with an ACSL specification can now be reduced in
+              the caller. This is especially useful on C asserts.
 -*  Eva       [2022-06-06] Fixes a possible crash when -eva-subdivide-non-linear
               and relational domains are enabled.
 -!  Kernel    [2022-06-06] Remove journalisation.
