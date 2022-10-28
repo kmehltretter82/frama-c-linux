@@ -81,7 +81,7 @@ FRAMAC_COM_DOWNLOAD="https://www.frama-c.com/download"
 show_step "Checking version"
 
 VERSION="$(cat VERSION)"
-VERSION_SAFE="${VERSION/~/-}"
+VERSION_SAFE="$(cat VERSION | sed 's/~/-/')"
 VERSION_MODIFIER=$(sed VERSION -e s/[0-9.]*\\\(.*\\\)/\\1/)
 VERSION_MAJOR=$(sed VERSION -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
 VERSION_MINOR=$(sed VERSION -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
@@ -105,7 +105,7 @@ fi
 
 if [ "$VERSION_SAFE" != "$TAG" ]; then
   echo "The current commit is not tagged with the current version:"
-  echo "Frama-C Version: $VERSION"
+  echo "Frama-C Version: $VERSION_SAFE"
   echo "Frama-C Tag    : $TAG"
   echo_red "Aborting"
   exit 2
