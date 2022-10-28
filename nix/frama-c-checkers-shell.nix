@@ -2,6 +2,7 @@
 , stdenv
 , clang_10
 , frama-c-hdrck
+, frama-c-lint
 , git
 , git-lfs
 , gnumake
@@ -13,6 +14,7 @@ stdenv.mkDerivation rec {
   buildInputs = [
     clang_10
     frama-c-hdrck
+    frama-c-lint
     git
     git-lfs
     gnumake

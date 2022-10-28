@@ -1,5 +1,6 @@
 { lib
 , fetchFromGitHub
+, findlib
 , buildDunePackage
 , cmdliner
 }:
@@ -18,7 +19,7 @@ buildDunePackage rec {
   minimumOCamlVersion = "4.02";
   useDune2 = true;
 
-  buildInputs = [ cmdliner ];
+  buildInputs = [ cmdliner findlib ];
 
   meta = with lib; {
     homepage = http://typerex.ocamlpro.com/ocp-indent.html;
