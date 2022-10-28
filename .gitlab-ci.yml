@@ -70,7 +70,7 @@ check-release:
     [[ "$PUBLISH" == "no" ]] &&
     [[ "$DEFAULT" == "$CI_COMMIT_BRANCH" ]] &&
     [[ "$DEFAULT" == "stable/$(cat VERSION_CODENAME | tr '[:upper:]' '[:lower:]')" ]] &&
-    [[ "$(git describe --tag)" == "$(cat VERSION | sed 's/~/-/')" ]]
+    [[ "$(git describe --tag)" == "$(cat VERSION | sed 's/~/-/')" ]] &&
     [[ "$(cat VERSION)" == "$(cat opam | grep "^version" | sed 's/version: \"\(.*\)\"/\1/')" ]]
   only:
     variables:
