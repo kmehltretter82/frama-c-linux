@@ -434,13 +434,19 @@ src-distrib-tests:
     variables:
       - $RELEASE == "yes"
 
-src-distrib-tests-long:
+src-distrib-tests-scheduled:
   <<: *src_distrib_tests_template
   # The Opam target may affect this job
   timeout: 2h
   only:
     refs:
       - schedules
+
+src-distrib-tests-release:
+  <<: *src_distrib_tests_template
+  # The Opam target may affect this job
+  timeout: 2h
+  only:
     variables:
       - $RELEASE == "yes"
 
