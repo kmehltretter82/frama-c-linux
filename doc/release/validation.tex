@@ -201,8 +201,8 @@ expected format is:
 It should only list main changes, that will be displayed on the event section
 of the website and the wiki page.
 
-Create the version commit, tag it using \texttt{git tag \$(cat VERSION | sed -e "s/~/-/")}
-and push it (e.g. via \texttt{git push origin \$(cat VERSION | sed -e "s/~/-/")}).
+Create the version commit, tag it using \texttt{git tag \$(cat VERSION | sed -e "s/\textasciitilde /-/")}
+and push it (e.g. via \texttt{git push origin \$(cat VERSION | sed -e "s/\textasciitilde/-/")}).
 
 %%%Local Variables:
 %%%TeX-master: "release"
