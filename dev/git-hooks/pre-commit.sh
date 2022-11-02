@@ -30,16 +30,25 @@ echo "Pre-commit Hook..."
 STAGED=$(git diff --diff-filter ACMR --name-only --cached | sort)
 UNSTAGED=$(git diff --diff-filter DMR --name-only | sort)
 
-INTER=$(comm -12 <(ls $STAGED) <(ls $UNSTAGED))
-
-if [ "$INTER" != "" ];
+if [ "$STAGED" = "" ];
 then
-    echo "Cannot validate commit."
-    echo "The following staged files have been modified, renamed or deleted."
-    for file in $INTER ; do
+  echo "Empty commit, nothing to do"
+  exit 0
+fi
+
+if [ "$UNSTAGED" != "" ];
+then
+  INTER=$(comm -12 <(ls $STAGED) <(ls $UNSTAGED))
+
+  if [ "$INTER" != "" ];
+  then
+      echo "Cannot validate commit."
+      echo "The following staged files have been modified, renamed or deleted."
+      for file in $INTER ; do
         echo "- $file"
-    done
-    exit 1
+      done
+      exit 1
+  fi
 fi
 
 STAGED=$(echo $STAGED | tr '\n' ' ')
