@@ -871,13 +871,6 @@ end = struct
       dc_enabled_if = Some s;
       dc_macros = Macros.add_list ["PTEST_ENABLED_IF", s] current.dc_macros }
 
-  let config_deps ~drop:_ ~file ~dir:_ s current =
-    let s = Macros.expand ~file current.dc_macros s in
-    let l = split_list s in
-    { current with
-      dc_deps = Some l;
-      dc_macros = Macros.add_list ["PTEST_DEPS", s] current.dc_macros }
-
   let config_libs ~drop:_ ~file ~dir:_ s current =
     let s = Macros.expand ~file current.dc_macros s in
     let l = List.map (fun s -> Filename.remove_extension_opt [ ".cmxs" ; ".cma" ; ".ml" ] s) (split_list s) in
@@ -892,8 +885,12 @@ end = struct
     let current = update_field current (Some l) in
     { current with dc_macros = Macros.add_list [var_name, s] current.dc_macros }
 
+  let config_deps =
+    config_gen "PTEST_DEPS" (fun c dc_deps -> { c with dc_deps })
+
   let config_plugin =
-    config_gen "PTEST_PLUGIN" (fun c dc_plugin->{ c with dc_plugin })
+    config_gen "PTEST_PLUGIN" (fun c dc_plugin -> { c with dc_plugin })
+
   let config_library =
     config_gen "PTEST_LIBRARY" (fun c dc_library -> { c with dc_library })
 
@@ -905,7 +902,7 @@ end = struct
       dc_macros = Macros.add_list [macro_name, s] current.dc_macros }
 
   let config_macro ~drop:_ ~file ~dir s current =
-    (* note: the expansion is donly done into the definition *)
+    (* note: the expansion is only done into the definition *)
     let regex = Str.regexp "[ \t]*\\([^ \t@]+\\)\\([ \t]+\\(.*\\)\\|$\\)" in
     if Str.string_match regex s 0 then begin
       let name = Str.matched_group 1 s in
