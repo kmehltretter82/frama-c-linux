@@ -44,9 +44,10 @@ PUB_OPAM_DIR="pub-opam-repository"
 SRC_OPAM_DIR="opam-repository"
 
 VERSION="$(cat VERSION)"
+VERSION_SAFE="$(cat VERSION | sed 's/~/-/')"
 CODENAME="$(cat VERSION_CODENAME)"
 
-BRANCH="frama-c.$VERSION"
+BRANCH="frama-c.$VERSION_SAFE"
 
 echo "$FRAMA_CI_BOT_SSH_PRIVATE" | base64 -d > nix/frama-c-public/id_ed25519
 chmod 400 nix/frama-c-public/id_ed25519
