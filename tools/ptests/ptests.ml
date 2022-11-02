@@ -231,6 +231,7 @@ let example_msg =
      @@PTEST_ORACLE@@          # Basename of the current oracle file (macro only usable in FILTER directives).@  \
      @@PTEST_DEFAULT_OPTIONS@@ # The default option list: %s@  \
      @@PTEST_LIBS@@            # The current list of modules defined by the LIBS directive.@  \
+     @@PTEST_LIBRARY@@         # The current list of modules defined by the LIBRARY directive.@  \
      @@PTEST_DEPS@@            # The current list of dependencies defined by the DEPS directive.@  \
      @@PTEST_ENABLED_IF@@      # The current value of ENABLED_IF directive.@  \
      @@PTEST_MODULE@@          # The current list of modules defined by the MODULE directive.@  \
