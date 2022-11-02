@@ -71,23 +71,23 @@ endif
 
 ifeq ($(LINTCK.ENABLED),yes)
 
-.PHONY: lint
-lint:
+.PHONY: check-lint
+check-lint:
 	$(LINTCK.COLLECT) | $(LINTCK.CMD) $(LINTCK_EXTRA)
 
-.PHONY: fix-lint
-fix-lint:
+.PHONY: lint
+lint:
 	$(LINTCK.COLLECT) | $(LINTCK.CMD) -u $(LINTCK_EXTRA)
 
 else
 
-.PHONY: lint
-lint:
+.PHONY: check-lint
+check-lint:
 	$(error "Cannot lint: not a Git repository, \
 	   			 you should specify LINTCK_FILES_INPUT")
 
-.PHONY: fix-lint
-fix-lint:
+.PHONY: lint
+lint:
 	$(error "Cannot fix-lint: not a Git repository, \
 	   			 you should specify LINTCK_FILES_INPUT")
 
