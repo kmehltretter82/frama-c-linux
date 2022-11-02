@@ -112,15 +112,15 @@ if [ "$VERSION_SAFE" != "$TAG" ]; then
 fi
 
 if test -n "$VERSION_MODIFIER"; then
-  FINAL=no
+  FINAL_RELEASE=no
 else
-  FINAL=yes
+  FINAL_RELEASE=yes
 fi
 
 echo "Ready to build release: Frama-C $VERSION - $CODENAME"
 echo "MAJOR: $VERSION_MAJOR"
 echo "MINOR: $VERSION_MINOR"
-echo "FINAL: $FINAL"
+echo "FINAL: $FINAL_RELEASE"
 
 ##########################################################################
 # Check input files
@@ -216,18 +216,24 @@ function version_name {
 # $2 : extension
 
 function copy_manual_normal {
-  cp "$MANUALS_DIR/$1.$2" "$MANS_TARGET_DIR/$(generic_name "$1").$2"
+  if [ "$FINAL_RELEASE" = "yes" ]; then
+    cp "$MANUALS_DIR/$1.$2" "$MANS_TARGET_DIR/$(generic_name "$1").$2"
+  fi
   cp "$MANUALS_DIR/$1.$2" "$MANS_TARGET_DIR/$(version_name "$1").$2"
 }
 
 function copy_manual_e_acsl {
   EACSL_TARGET_DIR="$MANS_TARGET_DIR/e-acsl"
-  cp "$MANUALS_DIR/$1.$2" "$EACSL_TARGET_DIR/$(generic_name "$1").$2"
+  if [ "$FINAL_RELEASE" = "yes" ]; then
+    cp "$MANUALS_DIR/$1.$2" "$EACSL_TARGET_DIR/$(generic_name "$1").$2"
+  fi
   cp "$MANUALS_DIR/$1.$2" "$EACSL_TARGET_DIR/$(version_name "$1").$2"
 }
 
 function copy_api {
-  cp "$API_DIR/$1-api.$2" "$MANS_TARGET_DIR/$1-api.$2"
+  if [ "$FINAL_RELEASE" = "yes" ]; then
+    cp "$API_DIR/$1-api.$2" "$MANS_TARGET_DIR/$1-api.$2"
+  fi
   cp "$API_DIR/$1-api.$2" "$MANS_TARGET_DIR/$1-$VERSION_AND_CODENAME-api.$2"
 }
 
@@ -243,14 +249,18 @@ function copy_files {
     copy_manual_normal "$companion" "tar.gz"
   done
   for api in "${API_FILES[@]}"; do
-    copy_api "$file" "tar.gz"
+    copy_api "$api" "tar.gz"
   done
 
   # Eva has an old manual name that might be in use:
-  cp "$MANS_TARGET_DIR/frama-c-eva-manual.pdf" "$MANS_TARGET_DIR/frama-c-value-analysis.pdf"
+  if [ "$FINAL_RELEASE" = "yes" ]; then
+    cp "$MANS_TARGET_DIR/frama-c-eva-manual.pdf" "$MANS_TARGET_DIR/frama-c-value-analysis.pdf"
+  fi
 
   cp $TARGZ_BASE "$GZ_TARGET_DIR/$TARGZ_VERSION"
-  cp $TARGZ_BASE "$GZ_TARGET_DIR/$TARGZ_GENERIC"
+  if [ "$FINAL_RELEASE" = "yes" ]; then
+    cp $TARGZ_BASE "$GZ_TARGET_DIR/$TARGZ_GENERIC"
+  fi
 }
 
 ##########################################################################
@@ -436,7 +446,8 @@ VERSION_WEBPAGE="$WEBSITE_DIR/_fc-versions/$LOWER_CODENAME.md"
 if [ "$FINAL_RELEASE" = "no" ]; then
   ACSL_OR_BETA="beta: true"
 else
-  ACSL_OR_BETA="acsl: $ACSL_VERSION"
+  ACSL_VERSION_WEBSITE="$(echo $ACSL_VERSION | sed -n 's/1.\([0-9][0-9]\)/\1/p')"
+  ACSL_OR_BETA="acsl: $ACSL_VERSION_WEBSITE"
 fi
 
 cat >$VERSION_WEBPAGE <<EOL
@@ -473,16 +484,16 @@ releases:
       link: /download/aorai-manual-$VERSION_AND_CODENAME.pdf
       help: Aoraï example
       help_link: /download/aorai-example-$VERSION_AND_CODENAME.tar.gz
-    - name: Metrics manual"
-      link: /download/metrics-manual-$VERSION_AND_CODENAME.pdf"
-    - name: Rte manual"
-      link: /download/rte-manual-$VERSION_AND_CODENAME.pdf"
-    - name: Eva manual"
-      link: /download/eva-manual-$VERSION_AND_CODENAME.pdf"
-    - name: WP manual"
-      link: /download/wp-manual-$VERSION_AND_CODENAME.pdf"
-    - name: E-ACSL manual"
-      link: /download/e-acsl/e-acsl-manual-$VERSION_AND_CODENAME.pdf"
+    - name: Metrics manual
+      link: /download/metrics-manual-$VERSION_AND_CODENAME.pdf
+    - name: Rte manual
+      link: /download/rte-manual-$VERSION_AND_CODENAME.pdf
+    - name: Eva manual
+      link: /download/eva-manual-$VERSION_AND_CODENAME.pdf
+    - name: WP manual
+      link: /download/wp-manual-$VERSION_AND_CODENAME.pdf
+    - name: E-ACSL manual
+      link: /download/e-acsl/e-acsl-manual-$VERSION_AND_CODENAME.pdf
 ---
 EOL
 
