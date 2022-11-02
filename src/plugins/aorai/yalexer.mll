@@ -37,6 +37,8 @@ let string = ([^ '"' '\\']|'\\'_)*
 rule token = parse
     [' ' '\t' ]       { token lexbuf }     (* skip blanks *)
   | '\n'              { Utils_parser.newline lexbuf; token lexbuf }
+  | "/*"              { comment lexbuf ; token lexbuf }
+  | "//"              { onelinecomment lexbuf ; token lexbuf }
   | ['0'-'9']+ as lxm { INT(lxm) }
   | "CALL"            { CALL_OF }
   | "RETURN"          { RETURN_OF }
@@ -82,3 +84,12 @@ rule token = parse
   | eof               { EOF }
   | ":="              { AFF }
   | _                 { Utils_parser.unknown_token lexbuf }
+
+and comment = parse
+  |  "*/"       {  }
+  | eof         { Utils_parser.unterminated_comment lexbuf }
+  | _           { comment lexbuf }
+
+and onelinecomment = parse
+  | '\n'|eof    {  }
+  | _           { onelinecomment lexbuf }

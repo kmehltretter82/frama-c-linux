@@ -9,6 +9,9 @@ $y2 : int;
 
 Error : { 0 == 1 } -> Error;
 
+/* In these states, the program is waiting for a status indicating that
+   data can be read */
+
 Wait1 :
   { CALL(input_status) } -> StatusReq1
 | { CALL(input_data) } -> Error
@@ -43,6 +46,8 @@ Wait5 :
 | { CALL(output) } -> Error
 | other -> Wait5
 ;
+
+// The status have been requested, waiting for response
 
 StatusReq1 :
   { input_status().\result & 1 == 0 } -> Wait1
@@ -81,6 +86,8 @@ StatusError :
 | other -> StatusError
 ;
 
+// Ok status have been received, data can be read
+
 StatusOk1 :
   { CALL(input_status) } -> StatusReq1
 | { CALL(input_data) } -> DataReq1
@@ -116,6 +123,8 @@ StatusOk5 :
 | other -> StatusOk5
 ;
 
+// Data have been requested
+
 DataReqE :
   { RETURN(input_data) } -> Wait1
 ;
@@ -149,6 +158,8 @@ DataReq5 :
 | { input_data().\result & 192 == 192 } -> Wait1
 | { input_data().\result & 128 == 0 } $y2 := \result; -> Complete
 ;
+
+/* The sequence of 5 bytes read is complete */
 
 Complete :
   { CALL(output) && output().x == $x1 + 128 * $x2 && output().y == $y1 + 128 * $y2 } -> Wait1
