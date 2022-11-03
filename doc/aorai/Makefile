@@ -28,10 +28,9 @@
 DWNLDDIR=../manuals
 DOCNAME=aorai-manual.pdf
 ARCHIVENAME=aorai-example
-EXAMPLES=example.c example.ltl example.ya \
-         example_loop.c example_loop.ltl \
-         example_loop2.c example_loop2.ya \
-         README
+EXAMPLES=example.c example.ya \
+         example_loop.c example_loop.ya \
+         README.md
 
 BNF=ya_file.bnf basic_ya.bnf extended_ya.bnf ya_variables.bnf
 

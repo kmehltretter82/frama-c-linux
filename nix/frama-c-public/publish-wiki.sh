@@ -48,6 +48,9 @@ VERSION="$(cat VERSION)"
 CODENAME="$(cat VERSION_CODENAME)"
 LOWER_CODENAME="$(echo "$CODENAME" | tr '[:upper:]' '[:lower:]')"
 
+echo "$FRAMA_CI_BOT_SSH_PRIVATE" | base64 -d > nix/frama-c-public/id_ed25519
+chmod 400 nix/frama-c-public/id_ed25519
+
 if ! git clone $PUB_WIKI_GIT pub-wiki
 then
   echo "Failed to clone wiki directory"

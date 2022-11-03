@@ -1485,7 +1485,7 @@ val isWFGhostType : typ -> bool
 val typeAddGhost : typ -> typ
 (** Add the ghost attribute to a type (does nothing if the type is alreay ghost)
     @return the ghost qualified original type
-    @since Frama-C+dev *)
+    @since 26.0-Iron *)
 
 (* ************************************************************************* *)
 (** {2 The visitor} *)

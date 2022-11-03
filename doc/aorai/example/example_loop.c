@@ -1,45 +1,15 @@
-int cpt=3;
-//@ global invariant inv_cpt : 0<=cpt<=3;
+int f() {}
 
-int status=0;
-//@ global invariant inv_status : 0<=status<=1;
+int g() {}
 
-
-/*@ requires \true;
-  @ behavior a :
-  @  ensures 0<=\result<=1;
-*/
-int commit_trans() {
-  return 1;
-}
-
-/*@ requires \true;
-  @ behavior a :
-  @  ensures 0<=\result<=1;
-*/
-int init_trans() {
-  return 1;
-}
-
-/*@ requires \true;
-  @ behavior a :
-  @  ensures 0<=\result<=1;
-*/
-int main(){
-  cpt=3;
-  status=0;
-  /*@ loop invariant i : 
-    @      0<=status<=1
-    @   && 0<=cpt<=3
-    @   && (cpt==0 ==> status==0);
-   */
-  while (cpt>0) {
-    status=init_trans();
-    if (status && (status=commit_trans())) goto label_ok;
-    cpt--;
+int main(int c) {
+  if (c<0) { c = 0; }
+  if (c>5) { c = 5; }
+  /*@ assert 0<=c<=5; */
+  while (c) {
+    f();
+    g();
+    c--;
   }
   return 0;
-
- label_ok: 
-  return 1;
 }

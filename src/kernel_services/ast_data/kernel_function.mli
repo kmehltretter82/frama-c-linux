@@ -252,7 +252,7 @@ val has_definition : t -> bool
 
 val is_ghost : t -> bool
 (** @return [true] iff the given kernel function is ghost
-    @since Frama-C+dev *)
+    @since 26.0-Iron *)
 
 (* ************************************************************************* *)
 (** {2 Membership of variables} *)

@@ -31,7 +31,7 @@
 
 (** Values associated to each datatype.
     Some others are provided directly in module {!Type}.
-    @before Frama-C+dev there was additional fields only used for Journalization
+    @before 26.0-Iron there was additional fields only used for Journalization
             that has been removed.
 *)
 type 'a t = private
@@ -52,7 +52,7 @@ module type Ty = sig
 end
 
 (** All values associated to a datatype, excepted [copy].
-    @before Frama-C+dev there was several additional values only used for
+    @before 26.0-Iron there was several additional values only used for
             Journalization that has been removed.
 *)
 module type S_no_copy = sig
@@ -137,7 +137,7 @@ val never_any_project: (Project_skeleton.t -> bool) -> 'a -> bool
 (** Sub-signature of {!S}.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 
-    @before Frama-C+dev there was several additional values only used for
+    @before 26.0-Iron there was several additional values only used for
             Journalization that has been removed.
 *)
 module type Undefined = sig
@@ -176,7 +176,7 @@ module Serializable_undefined: Undefined
     Values to implement in order to get a datatype.
     Feel free to use easy builders (see above) for easy implementation.
 
-    @before Frama-C+dev there was several additional values only used for
+    @before 26.0-Iron there was several additional values only used for
             Journalization that has been removed.
 *)
 module type Make_input = sig
@@ -363,7 +363,7 @@ end
 (** Functor for polymorphic types with only 1 type variable.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 
-    @before Frama-C+dev the functor had several additional values only used for
+    @before 26.0-Iron the functor had several additional values only used for
             Journalization that has been removed.
 *)
 module Polymorphic
@@ -390,7 +390,7 @@ end
 (** Functor for polymorphic types with 2 type variables.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 
-    @before Frama-C+dev the functor had several additional values only used for
+    @before 26.0-Iron the functor had several additional values only used for
             Journalization that has been removed.
 *)
 module Polymorphic2
@@ -423,7 +423,7 @@ end
 (** Functor for polymorphic types with 3 type variables.
     @since Oxygen-20120901
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
-    @before Frama-C+dev the functor had several additional values only used for
+    @before 26.0-Iron the functor had several additional values only used for
             Journalization that has been removed.
 *)
 module Polymorphic3
@@ -464,7 +464,7 @@ end
 (** Functor for polymorphic types with 4 type variables.
     @since Oxygen-20120901
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
-    @before Frama-C+dev the functor had several additional values only used for
+    @before 26.0-Iron the functor had several additional values only used for
             Journalization that has been removed.
 *)
 module Polymorphic4
