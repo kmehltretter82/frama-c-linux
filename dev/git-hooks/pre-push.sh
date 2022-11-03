@@ -21,14 +21,14 @@
 #                                                                        #
 ##########################################################################
 
-# Examples of installation of this pre-push hook (client side):
-# - cp ./dev/git-hooks/pre-push.sh .git/hooks/pre-push
+# Example of installation of this pre-push hook (client side):
 # - (cd .git/hooks/ && ln -s ../../dev/git-hooks/pre-push.sh pre-push)
+# Note: if you decide to copy the file, the `SCRIPT_DIR` variable must be
+# fixed accordingly.
 
 echo "Pre-push Hook..."
 
 STAGED=$(git diff --diff-filter ACMR --name-only --cached origin/$(git rev-parse --abbrev-ref HEAD) | sort)
-UNSTAGED=$(git diff --diff-filter DMR --name-only | sort)
 
 if [ "$STAGED" = "" ];
 then
@@ -36,31 +36,5 @@ then
   exit 0
 fi
 
-if [ "$UNSTAGED" != "" ];
-then
-  INTER=$(comm -12 <(ls $STAGED) <(ls $UNSTAGED))
-
-  if [ "$INTER" != "" ];
-  then
-      echo "Cannot validate push."
-      echo "The following staged files have been modified, renamed or deleted."
-      for file in $INTER ; do
-        echo "- $file"
-      done
-      exit 1
-  fi
-fi
-
-STAGED=$(echo $STAGED | tr '\n' ' ')
-
-TMP=$(mktemp)
-
-cleanup () {
-  rm "$TMP"
-}
-trap cleanup exit
-
-git check-attr -za $STAGED > "$TMP"
-make lint LINTCK_FILES_INPUT="$TMP" || exit 1
-git check-attr -z header_spec $STAGED > "$TMP"
-make check-headers HDRCK_FILES_INPUT="$TMP" HDRCK_EXTRA="-quiet" || exit 1
+SCRIPT_DIR=$(dirname -- "$( readlink -f -- "$0"; )")
+"$SCRIPT_DIR/../check-files.sh" -p || exit 1
