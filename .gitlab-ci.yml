@@ -434,13 +434,19 @@ src-distrib-tests:
     variables:
       - $RELEASE == "yes"
 
-src-distrib-tests-long:
+src-distrib-tests-scheduled:
   <<: *src_distrib_tests_template
   # The Opam target may affect this job
   timeout: 2h
   only:
     refs:
       - schedules
+
+src-distrib-tests-release:
+  <<: *src_distrib_tests_template
+  # The Opam target may affect this job
+  timeout: 2h
+  only:
     variables:
       - $RELEASE == "yes"
 
@@ -468,8 +474,9 @@ release-branch:
 
 release-create:
   stage: release
+  <<: *prepare_ssh_template
   script:
-    - nix-shell -p curl --run './nix/frama-c-public/publish-release.sh'
+    - nix-shell -p git git-lfs coreutils openssh curl --run './nix/frama-c-public/publish-release.sh'
   needs:
     - release-branch
     - release-content
@@ -483,7 +490,7 @@ release-opam:
   stage: release
   <<: *prepare_ssh_template
   script:
-    - nix-shell -p openssh --run './nix/frama-c-public/publish-opam.sh'
+    - nix-shell -p git git-lfs coreutils openssh --run './nix/frama-c-public/publish-opam.sh'
   only:
     variables:
       - $RELEASE == "yes"
@@ -493,7 +500,7 @@ release-website:
   stage: release
   <<: *prepare_ssh_template
   script:
-    - nix-shell -p openssh --run './nix/frama-c-public/publish-website.sh'
+    - nix-shell -p git git-lfs coreutils openssh --run './nix/frama-c-public/publish-website.sh'
   only:
     variables:
       - $RELEASE == "yes"
@@ -503,7 +510,7 @@ release-wiki:
   stage: release
   <<: *prepare_ssh_template
   script:
-    - nix-shell -p openssh --run './nix/frama-c-public/publish-wiki.sh'
+    - nix-shell -p git git-lfs coreutils openssh --run './nix/frama-c-public/publish-wiki.sh'
   only:
     variables:
       - $RELEASE == "yes"
