@@ -41,8 +41,8 @@
   (libraries
     frama-c.kernel frama-c.gui frama-c-callgraph.core
     (select graph.ml from
-      (ocamlgraph.dgraph -> graph.dgraph.ml)
-      (ocamlgraph_gtk -> graph.gtk.ml)
+      (!lablgtk3-sourceview3 ocamlgraph.dgraph -> graph.dgraph.ml)
+      (!lablgtk3-sourceview3 ocamlgraph_gtk -> graph.gtk.ml)
     )
   )
 )
