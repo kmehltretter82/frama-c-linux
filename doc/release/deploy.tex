@@ -159,43 +159,48 @@ Just update the \texttt{VERSION} file in \texttt{master}, by adding \texttt{"+de
 \textbf{Note:} you need access to the \texttt{framac} Docker Hub account to be
 able to upload the image.
 
-Make sure that \texttt{devel\_tools/docker/Makefile} is up-to-date:
+Copy the \texttt{.tar.gz} archive to the \texttt{dev/docker} directory.
 
-\begin{itemize}
-\item changes to \texttt{reference-configuration.md} must have been ported
-  to the corresponding \texttt{Dockerfile.dev} entry inside the
-  \texttt{Makefile}.
-\end{itemize}
-
-Copy the \texttt{.tar.gz} archive to the \texttt{devel\_tools/docker} directory.
-
-Run \texttt{make release}. It should decompress the archive, build and test
-the Frama-C Docker image.
+Run:
+\begin{lstlisting}
+make FRAMAC_ARCHIVE=<the_archive> custom.debian
+\end{lstlisting}
+It should decompress the archive, build and test the Frama-C Docker image.
 
 If the local tests do not work, check that the OCaml version and package
 dependencies are all up-to-date.
 
-If the image is built succesfully, you can also try building the GUI image
-(\texttt{make release-gui}) and the stripped image
-(\texttt{make release-stripped}).
+If the image is built succesfully, you can also try building the GUI image and
+the stripped image:
+\begin{lstlisting}
+make FRAMAC_ARCHIVE=<the_archive> custom-gui.debian
+make FRAMAC_ARCHIVE=<the_archive> custom-stripped.debian
+\end{lstlisting}
 
-If you want to upload these images to the Docker Hub, you can re-tag them, e.g.
+If you want to upload these images to the Docker Hub, you can re-tag them and
+upload them, e.g.
 
 \begin{lstlisting}
-docker tag framac/frama-c:release framac/frama-c:<VERSION>
+make -C \
+  TAG="framac/frama-c:custom.debian" \
+  AS="framac/frama-c:<VERSION>" \
+  push
+
+make -C \
+  TAG="framac/frama-c:custom-stripped.debian" \
+  AS="framac/frama-c:<VERSION>-stripped" \
+  push
+
+make -C \
+  TAG="framac/frama-c:custom-gui.debian" \
+  AS="framac/frama-c-gui:<VERSION>" \
+  push
 \end{lstlisting}
 
 Where \texttt{<VERSION>} is the release number, possibly with a suffix, but
 {\em without} characters such as \texttt{+}. For instance, you can use
 \texttt{23.1-beta} for a beta release.
 
-Then upload the renamed image(s) with:
-
-\begin{lstlisting}
-docker push framac/frama-c:<VERSION>
-docker push framac/frama-c-gui:<VERSION>
-docker push framac/frama-c:<VERSION>-stripped
-\end{lstlisting}
 You will need to have setup your \texttt{framac} Docker Hub account for this to work.
 
 %%% Local Variables:

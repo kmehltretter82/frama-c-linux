@@ -104,8 +104,7 @@ function push {
       -o merge_request.create \
       -o merge_request.title="Release $VERSION-$CODENAME" \
       -o merge_request.assign="$GITLAB_USER_ID"\
-      -o merge_request.draft \
-      -o ci.skip
+      -o merge_request.draft
   fi
   if [ "$?" -ne "0" ]; then
     echo "Failed to push branch"
