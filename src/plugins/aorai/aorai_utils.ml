@@ -1092,7 +1092,8 @@ let make_enum_states () =
          (id, item))
       state_list
   in
-  set_enum mapping
+  set_enum mapping;
+  enum
 
 let getInitialState () =
   let loc = Cil_datatype.Location.unknown in
@@ -1107,7 +1108,11 @@ let initGlobals root complete =
   mk_global_comment "//* ";
   mk_global_comment "//* ";
   mk_global_comment "//* Some constants";
-  if Aorai_option.Deterministic.get () then make_enum_states ();
+  let states_typ =
+    if Aorai_option.Deterministic.get ()
+    then Some (TEnum (make_enum_states (), []))
+    else None
+  in
   (* non deterministic mode uses one variable for each possible state *)
   mk_global_c_enum_type
     listOp
@@ -1121,7 +1126,7 @@ let initGlobals root complete =
   mk_global_comment "//* ";
   mk_global_comment "//* States and Trans Variables";
   if Aorai_option.Deterministic.get () then begin
-    mk_gvar_scalar ~init:(getInitialState()) curState;
+    mk_gvar_scalar ?ty:states_typ ~init:(getInitialState()) curState;
     let init = getInitialState() (* TODO a distinct initial value for history *)
     and history = Data_for_aorai.whole_history () in
     List.iter (fun name -> mk_gvar_scalar ~init name) history
