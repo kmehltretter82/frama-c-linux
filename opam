@@ -128,12 +128,6 @@ depends: [
   "ppx_deriving_yojson"
   "ppx_import"
 
-  # This is hackish but will hopefully work until we remove GTK from Frama-C
-  # GTK 2 for macos only
-  "lablgtk" { >= "2.18.8" & os="macos" }
-  "conf-gnomecanvas" { os="macos" }
-  "conf-gtksourceview" { os="macos" }
-  ("ocamlgraph" { < "2.0" & os="macos" } | "ocamlgraph_gtk" { os="macos" })
   # GTK3 for non-macos only
   "lablgtk3" { >= "3.1.0" & os!="macos" }
   "lablgtk3-sourceview3" { os!="macos" }
