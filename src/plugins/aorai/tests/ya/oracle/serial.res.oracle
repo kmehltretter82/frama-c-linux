@@ -256,8 +256,8 @@ int n = 0;
     aorai_StatesHistory_2 = aorai_StatesHistory_1;
     aorai_StatesHistory_1 = aorai_CurStates;
     if (18 == aorai_CurStates) {
-      if ((res & 15) != 1) {
-        if ((res & 1) != 0) aorai_CurStates = StatusError;
+      if ((res & 0b1111) != 1) {
+        if ((res & 0b0001) != 0) aorai_CurStates = StatusError;
         else goto __aorai_label_12;
       }
       else goto __aorai_label_12;
@@ -265,8 +265,8 @@ int n = 0;
     else {
       __aorai_label_12: ;
       if (17 == aorai_CurStates) {
-        if ((res & 15) != 1) {
-          if ((res & 1) != 0) aorai_CurStates = StatusError;
+        if ((res & 0b1111) != 1) {
+          if ((res & 0b0001) != 0) aorai_CurStates = StatusError;
           else goto __aorai_label_11;
         }
         else goto __aorai_label_11;
@@ -274,8 +274,8 @@ int n = 0;
       else {
         __aorai_label_11: ;
         if (16 == aorai_CurStates) {
-          if ((res & 15) != 1) {
-            if ((res & 1) != 0) aorai_CurStates = StatusError;
+          if ((res & 0b1111) != 1) {
+            if ((res & 0b0001) != 0) aorai_CurStates = StatusError;
             else goto __aorai_label_10;
           }
           else goto __aorai_label_10;
@@ -283,8 +283,8 @@ int n = 0;
         else {
           __aorai_label_10: ;
           if (15 == aorai_CurStates) {
-            if ((res & 15) != 1) {
-              if ((res & 1) != 0) aorai_CurStates = StatusError;
+            if ((res & 0b1111) != 1) {
+              if ((res & 0b0001) != 0) aorai_CurStates = StatusError;
               else goto __aorai_label_9;
             }
             else goto __aorai_label_9;
@@ -292,8 +292,8 @@ int n = 0;
           else {
             __aorai_label_9: ;
             if (14 == aorai_CurStates) {
-              if ((res & 15) != 1) {
-                if ((res & 1) != 0) aorai_CurStates = StatusError;
+              if ((res & 0b1111) != 1) {
+                if ((res & 0b0001) != 0) aorai_CurStates = StatusError;
                 else goto __aorai_label_8;
               }
               else goto __aorai_label_8;
@@ -301,61 +301,61 @@ int n = 0;
             else {
               __aorai_label_8: ;
               if (14 == aorai_CurStates) {
-                if ((res & 15) == 1) aorai_CurStates = StatusOk1;
+                if ((res & 0b1111) == 1) aorai_CurStates = StatusOk1;
                 else goto __aorai_label_7;
               }
               else {
                 __aorai_label_7: ;
                 if (15 == aorai_CurStates) {
-                  if ((res & 15) == 1) aorai_CurStates = StatusOk2;
+                  if ((res & 0b1111) == 1) aorai_CurStates = StatusOk2;
                   else goto __aorai_label_6;
                 }
                 else {
                   __aorai_label_6: ;
                   if (16 == aorai_CurStates) {
-                    if ((res & 15) == 1) aorai_CurStates = StatusOk3;
+                    if ((res & 0b1111) == 1) aorai_CurStates = StatusOk3;
                     else goto __aorai_label_5;
                   }
                   else {
                     __aorai_label_5: ;
                     if (17 == aorai_CurStates) {
-                      if ((res & 15) == 1) aorai_CurStates = StatusOk4;
+                      if ((res & 0b1111) == 1) aorai_CurStates = StatusOk4;
                       else goto __aorai_label_4;
                     }
                     else {
                       __aorai_label_4: ;
                       if (18 == aorai_CurStates) {
-                        if ((res & 15) == 1) aorai_CurStates = StatusOk5;
+                        if ((res & 0b1111) == 1) aorai_CurStates = StatusOk5;
                         else goto __aorai_label_3;
                       }
                       else {
                         __aorai_label_3: ;
                         if (14 == aorai_CurStates) {
-                          if ((res & 1) == 0) aorai_CurStates = Wait1;
+                          if ((res & 0b0001) == 0) aorai_CurStates = Wait1;
                           else goto __aorai_label_2;
                         }
                         else {
                           __aorai_label_2: ;
                           if (15 == aorai_CurStates) {
-                            if ((res & 1) == 0) aorai_CurStates = Wait2;
+                            if ((res & 0b0001) == 0) aorai_CurStates = Wait2;
                             else goto __aorai_label_1;
                           }
                           else {
                             __aorai_label_1: ;
                             if (16 == aorai_CurStates) {
-                              if ((res & 1) == 0) aorai_CurStates = Wait3;
+                              if ((res & 0b0001) == 0) aorai_CurStates = Wait3;
                               else goto __aorai_label_0;
                             }
                             else {
                               __aorai_label_0: ;
                               if (17 == aorai_CurStates) {
-                                if ((res & 1) == 0) aorai_CurStates = Wait4;
+                                if ((res & 0b0001) == 0) aorai_CurStates = Wait4;
                                 else goto __aorai_label;
                               }
                               else {
                                 __aorai_label: ;
                                 if (18 == aorai_CurStates) 
-                                  if ((res & 1) == 0) aorai_CurStates = Wait5;
+                                  if ((res & 0b0001) == 0) aorai_CurStates = Wait5;
                                   else aorai_CurStates = aorai_reject;
                                 else aorai_CurStates = aorai_reject;
                               }
@@ -439,7 +439,7 @@ int input_status(void)
     aorai_StatesHistory_2 = aorai_StatesHistory_1;
     aorai_StatesHistory_1 = aorai_CurStates;
     if (5 == aorai_CurStates) {
-      if ((res & 128) == 0) {
+      if ((res & 0b10000000) == 0b00000000) {
         aorai_CurStates = Complete;
         aorai_y2 = res;
       }
@@ -450,73 +450,73 @@ int input_status(void)
       if (6 == aorai_CurStates) aorai_CurStates = Wait1;
       else 
         if (5 == aorai_CurStates) {
-          if ((res & 192) == 192) aorai_CurStates = Wait1;
+          if ((res & 0b11000000) == 0b11000000) aorai_CurStates = Wait1;
           else goto __aorai_label_25;
         }
         else {
           __aorai_label_25: ;
           if (4 == aorai_CurStates) {
-            if ((res & 192) == 192) aorai_CurStates = Wait1;
+            if ((res & 0b11000000) == 0b11000000) aorai_CurStates = Wait1;
             else goto __aorai_label_24;
           }
           else {
             __aorai_label_24: ;
             if (3 == aorai_CurStates) {
-              if ((res & 192) == 192) aorai_CurStates = Wait1;
+              if ((res & 0b11000000) == 0b11000000) aorai_CurStates = Wait1;
               else goto __aorai_label_23;
             }
             else {
               __aorai_label_23: ;
               if (2 == aorai_CurStates) {
-                if ((res & 192) == 192) aorai_CurStates = Wait1;
+                if ((res & 0b11000000) == 0b11000000) aorai_CurStates = Wait1;
                 else goto __aorai_label_22;
               }
               else {
                 __aorai_label_22: ;
                 if (1 == aorai_CurStates) {
-                  if ((res & 128) == 0) aorai_CurStates = Wait1;
+                  if ((res & 0b10000000) == 0b00000000) aorai_CurStates = Wait1;
                   else goto __aorai_label_21;
                 }
                 else {
                   __aorai_label_21: ;
                   if (1 == aorai_CurStates) {
-                    if ((res & 192) == 192) aorai_CurStates = Wait1;
+                    if ((res & 0b11000000) == 0b11000000) aorai_CurStates = Wait1;
                     else goto __aorai_label_20;
                   }
                   else {
                     __aorai_label_20: ;
                     if (5 == aorai_CurStates) {
-                      if ((res & 192) == 128) aorai_CurStates = Wait2;
+                      if ((res & 0b11000000) == 0b10000000) aorai_CurStates = Wait2;
                       else goto __aorai_label_19;
                     }
                     else {
                       __aorai_label_19: ;
                       if (4 == aorai_CurStates) {
-                        if ((res & 192) == 128) aorai_CurStates = Wait2;
+                        if ((res & 0b11000000) == 0b10000000) aorai_CurStates = Wait2;
                         else goto __aorai_label_18;
                       }
                       else {
                         __aorai_label_18: ;
                         if (3 == aorai_CurStates) {
-                          if ((res & 192) == 128) aorai_CurStates = Wait2;
+                          if ((res & 0b11000000) == 0b10000000) aorai_CurStates = Wait2;
                           else goto __aorai_label_17;
                         }
                         else {
                           __aorai_label_17: ;
                           if (2 == aorai_CurStates) {
-                            if ((res & 192) == 128) aorai_CurStates = Wait2;
+                            if ((res & 0b11000000) == 0b10000000) aorai_CurStates = Wait2;
                             else goto __aorai_label_16;
                           }
                           else {
                             __aorai_label_16: ;
                             if (1 == aorai_CurStates) {
-                              if ((res & 192) == 128) aorai_CurStates = Wait2;
+                              if ((res & 0b11000000) == 0b10000000) aorai_CurStates = Wait2;
                               else goto __aorai_label_15;
                             }
                             else {
                               __aorai_label_15: ;
                               if (2 == aorai_CurStates) {
-                                if ((res & 128) == 0) {
+                                if ((res & 0b10000000) == 0b00000000) {
                                   aorai_CurStates = Wait3;
                                   aorai_x1 = res;
                                 }
@@ -525,7 +525,7 @@ int input_status(void)
                               else {
                                 __aorai_label_14: ;
                                 if (3 == aorai_CurStates) {
-                                  if ((res & 128) == 0) {
+                                  if ((res & 0b10000000) == 0b00000000) {
                                     aorai_CurStates = Wait4;
                                     aorai_x2 = res;
                                   }
@@ -534,7 +534,7 @@ int input_status(void)
                                 else {
                                   __aorai_label_13: ;
                                   if (4 == aorai_CurStates) 
-                                    if ((res & 128) == 0) {
+                                    if ((res & 0b10000000) == 0b00000000) {
                                       aorai_CurStates = Wait5;
                                       aorai_y1 = res;
                                     }
