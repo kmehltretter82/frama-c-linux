@@ -138,7 +138,6 @@ depends: [
 # use the field 'conflicts'.
 depopts: [
   "apron"
-  "coq"
   "mlmpfr"
   "zmq"
 ]
