@@ -201,7 +201,7 @@ let pretty_offsetmap typ fmt offsm =
   then Format.fprintf fmt "%s" (Unicode.emptyset_string ())
   else begin
     match Cvalue.V_Offsetmap.single_interval_value offsm with
-    | Some value -> Cvalue.V_Or_Uninitialized.pretty fmt value;
+    | Some value -> Cvalue.V_Or_Uninitialized.pretty_typ (Some typ) fmt value;
     | None ->
       Cvalue.V_Offsetmap.pretty_generic ~typ () fmt offsm;
       pretty_stitched_offsetmap fmt typ offsm
