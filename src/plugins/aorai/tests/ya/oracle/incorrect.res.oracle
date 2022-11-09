@@ -22,7 +22,7 @@ int f(void);
 
 /*@ ghost enum aorai_ListOper aorai_CurOperation; */
 /*@ ghost enum aorai_OpStatusList aorai_CurOpStatus; */
-/*@ ghost int aorai_CurStates = s0; */
+/*@ ghost enum aorai_States aorai_CurStates = s0; */
 /*@ ghost
   /@ requires \false;
      ensures aorai_CurOpStatus ≡ aorai_Called;

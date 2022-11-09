@@ -35,7 +35,7 @@ check lemma Init_deterministic_trans{L}:
      ¬(\at(aorai_CurOperation,L) ≡ op_main ∧
         \at(aorai_CurOpStatus,L) ≡ aorai_Called));
  */
-/*@ ghost int aorai_CurStates = Init; */
+/*@ ghost enum aorai_States aorai_CurStates = Init; */
 /*@ ghost
   /@ requires \false;
      ensures aorai_CurOpStatus ≡ aorai_Called;
@@ -71,9 +71,9 @@ check lemma Init_deterministic_trans{L}:
     /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
-    if (2 == aorai_CurStates) aorai_CurStates = aorai_reject;
+    if ((unsigned int)2 == aorai_CurStates) aorai_CurStates = aorai_reject;
     else 
-      if (1 == aorai_CurStates) aorai_CurStates = aorai_reject;
+      if ((unsigned int)1 == aorai_CurStates) aorai_CurStates = aorai_reject;
       else aorai_CurStates = aorai_reject;
     return;
   }
@@ -111,7 +111,7 @@ check lemma Init_deterministic_trans{L}:
     /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
-    if (2 == aorai_CurStates) aorai_CurStates = aorai_reject;
+    if ((unsigned int)2 == aorai_CurStates) aorai_CurStates = aorai_reject;
     else aorai_CurStates = aorai_reject;
     return;
   }
