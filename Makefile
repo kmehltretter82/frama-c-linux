@@ -27,16 +27,14 @@ MAKECONFIG_DIR=share
 include $(MAKECONFIG_DIR)/Makefile.common
 
 ##############################################################################
-# PTESTS SRC
+# TOOLS CONFIG
 ################################
+
+IN_FRAMAC:=yes
 
 FRAMAC_PTESTS_SRC:=tools/ptests
-
-##############################################################################
-# HDRCK SRC
-################################
-
 FRAMAC_HDRCK_SRC:=tools/hdrck
+FRAMAC_LINTCK_SRC:=tools/lint
 
 ##############################################################################
 # Frama-C
@@ -80,9 +78,6 @@ include ivette/Makefile.installation
 # HEADER MANAGEMENT
 ################################
 
-# HDRCK is internal
-FRAMAC_HDRCK:=headers/hdrck.exe
-
 # Part that can be shared for external plugins
 include share/Makefile.headers
 
@@ -111,8 +106,6 @@ include share/Makefile.testing
 ###############################################################################
 # Linters
 ################################
-
-###############################################################################
 
 # Code prettyfication and lint
 include share/Makefile.linting

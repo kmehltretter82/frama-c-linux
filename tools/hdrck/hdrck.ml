@@ -60,7 +60,7 @@ and headache_config_file = ref [] (* empty -> headache_config_file_default *)
 and headache_config_file_default = "headers/headache_config.txt"
 and exit_on_warning = ref false
 and exit_on_error = ref true (* only settable to false for debugging purposes *)
-
+and quiet = ref false
 
 type mode =
   | Check
@@ -84,7 +84,8 @@ let job_head fmt =
   Format.printf fmt
 
 let job_done () =
-  Format.printf "done@."
+  if not !quiet then
+    Format.printf "done@."
 
 let pp_job_first_line () =
   if !is_first_job_line then
@@ -258,7 +259,8 @@ let add_spec_entry (ignored_files: StringSet.t ref) (spec_tab: (string, string) 
 let read_specs spec_format (ignored_files: StringSet.t ref) (spec_tab: (string, string) Hashtbl.t) (spec_file : string option) =
   let spec_fname = match spec_file with None -> "--stdin" | Some filename -> filename in
   debug "Specification file: %s@." spec_fname ;
-  job_head "Checking format of specification file %s... @?" spec_fname;
+  if not !quiet then
+    job_head "Checking format of specification file %s... @?" spec_fname;
   let sub_dir = extract_sub_dir spec_fname in
   let add_spec, get_line =
     let add_spec_item i ~file_name ~license_name =
@@ -337,7 +339,8 @@ let get_header_files ?directories:(dirs=(get_header_dirs ())) () :
   let license_path_tbl = Hashtbl.create 23 in
   List.iter
     (fun dir ->
-       job_head "Reading license header definition files from directory %s... @?" dir;
+       if not !quiet then
+         job_head "Reading license header definition files from directory %s... @?" dir;
        if Sys.file_exists dir && Sys.is_directory dir then begin
          Array.iter
            (fun filename ->
@@ -373,7 +376,8 @@ let get_header_files ?directories:(dirs=(get_header_dirs ())) () :
    @requires ignored files have been filtered out the specifications
 *)
 let check_declared_headers specification headers =
-  job_head "Checking license specifications are defined... @?" ;
+  if not !quiet then
+    job_head "Checking license specifications are defined... @?" ;
   Hashtbl.iter
     (fun file header_type ->
        if not (Hashtbl.mem headers header_type) then begin
@@ -429,7 +433,8 @@ let check_spec_discrepancies
     if ret <> 0 && !debug_flag then extract_header orig_file template_hdr ;
     ret = 0
   in
-  job_head "Checking specification discrepancies... @?";
+  if not !quiet then
+    job_head "Checking specification discrepancies... @?";
   let n = ref 0 in
   let discrepancies = ref [] in
   Hashtbl.iter
@@ -459,7 +464,8 @@ let check_spec_discrepancies
 
 let check_forbidden_headers (forbidden_headers:StringSet.t) header_specifications (distributed_files:StringSet.t) =
   if not (StringSet.is_empty forbidden_headers) then begin
-    job_head "Checking that all distributed files have no forbidden header specification... @?";
+    if not !quiet then
+      job_head "Checking that all distributed files have no forbidden header specification... @?";
     let forbidden = ref [] in
     let n = ref 0 in
     StringSet.iter
@@ -492,7 +498,8 @@ let check_forbidden_headers (forbidden_headers:StringSet.t) header_specification
  * @param exceptions a set of files distributed but that should not be checked
 *)
 let check files_ignored header_specifications distributed_files exceptions =
-  job_head "Checking that all distributed files do exist... @?";
+  if not !quiet then
+    job_head "Checking that all distributed files do exist... @?";
   let nonexistent_files =
     StringSet.filter (fun f -> not (Sys.file_exists f)) distributed_files
   in
@@ -501,7 +508,8 @@ let check files_ignored header_specifications distributed_files exceptions =
       "@[<v 2># Non-existing files listed as distributed:@ %a@]@."
       StringSet.pp nonexistent_files;
   job_done ();
-  job_head "Checking that distributed exception files have no license header specification... @?";
+  if not !quiet then
+    job_head "Checking that distributed exception files have no license header specification... @?";
   let files_licencied =
     Hashtbl.fold
       (fun file _ set -> StringSet.add file set)
@@ -518,7 +526,8 @@ let check files_ignored header_specifications distributed_files exceptions =
       "@[<v 2># Files distributed with an header exception (even having to be ignored):@ %a@]@."
       StringSet.pp ignored_exceptions;
   job_done ();
-  job_head "Checking that other distributed files have a license header specification... @?";
+  if not !quiet then
+    job_head "Checking that other distributed files have a license header specification... @?";
   let files_to_check = StringSet.diff distributed_files exceptions in
   let files_specified = StringSet.union files_licencied files_ignored in
   let distributed_unspecified = StringSet.diff files_to_check files_specified in
@@ -527,7 +536,8 @@ let check files_ignored header_specifications distributed_files exceptions =
       "@[<v 2># Files distributed without specified header:@ %a@]@."
       StringSet.pp distributed_unspecified;
   job_done ();
-  job_head "Checking presence of source files having an header specification... @?" ;
+  if not !quiet then
+    job_head "Checking presence of source files having an header specification... @?" ;
   StringSet.iter
     (fun filename ->
        if not (Sys.file_exists filename) then
@@ -565,7 +575,8 @@ let update_headers ~config_file_opts header_specifications =
       else
         debug "%s : error updating header" filename
   in
-  job_head "Updating header files ... @?";
+  if not !quiet then
+    job_head "Updating header files ... @?";
   Hashtbl.iter
     (fun filename header_name ->
        if Sys.file_exists filename then begin
@@ -620,6 +631,8 @@ let rec argspec = [
   " print this option list and exits";
   "-debug", Arg.Set debug_flag,
   " enable debug messages";
+  "-quiet", Arg.Set quiet,
+  "disable most messages";
 
   "-forbidden-headers", Arg.String (fun set -> set_cumulative ~name:"-forbidden-headers" forbidden_headers ~set) ,
   "<license name>,... \t none of the checked files may have one of the <license name> []";
@@ -679,7 +692,8 @@ let _ =
       let ignored_files = ref StringSet.empty in
       if !from_stdin then read_specs (if !zero_stdin then Zero3 else !spec_format) ignored_files specified_files None;
       List.iter (fun f -> read_specs !spec_format ignored_files specified_files (Some f)) spec_files;
-      Format.printf "- ignored=%d@.- specified=%d@." (StringSet.cardinal !ignored_files) (Hashtbl.length specified_files);
+      if not !quiet then
+        Format.printf "- ignored=%d@.- specified=%d@." (StringSet.cardinal !ignored_files) (Hashtbl.length specified_files);
       match !mode with
       | Check ->
         let stringset_from_opt_file = function
@@ -692,7 +706,8 @@ let _ =
         in
         let distributed_files = stringset_from_opt_file distrib_file_opt in
         let header_exception_files = stringset_from_opt_file header_except_opt in
-        Format.printf "- excepted=%d@.- distributed=%d@." (StringSet.cardinal header_exception_files) (StringSet.cardinal distributed_files);
+        if not !quiet then
+          Format.printf "- excepted=%d@.- distributed=%d@." (StringSet.cardinal header_exception_files) (StringSet.cardinal distributed_files);
         check ~config_file_opts !ignored_files specified_files distributed_files header_exception_files
       | Update ->
         update_headers ~config_file_opts specified_files;

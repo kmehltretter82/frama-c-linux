@@ -28,6 +28,7 @@ let
     # Builds
     frama-c = oself.callPackage ./frama-c.nix {};
     frama-c-hdrck = oself.callPackage ./frama-c-hdrck.nix {};
+    frama-c-lint = oself.callPackage ./frama-c-lint.nix {};
     lint = oself.callPackage ./lint.nix {};
 
     # Tests

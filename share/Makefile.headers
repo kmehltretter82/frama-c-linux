@@ -28,7 +28,7 @@
 # Parameters
 
 # Must be unset (for external plugins) and set (for FRAMA-C kernel)
-FRAMAC_HDRCK?=
+IN_FRAMAC?=
 
 HDRCK?=frama-c-hdrck
 
@@ -50,21 +50,14 @@ HEADER_OPEN_SOURCE?=yes
 # - <dir>: directory containing the files to manage
 HEADER_REPO?=
 
-# Can be set to a file
-# - <file>: file containing the list of the files to manage
-HEADER_DISTRIB_FILE?=
+# Can be set to a
+# - <file> containing files to check/update and their attributes, with 0
+#   separators (like 'git ls-files -z | git check-attr --stdin -z header_spec').
+HDRCK_FILES_INPUT?=
 
 # Can be set to a file
 # - <file>: file containing the list of the files to ignore any way
 HEADER_EXCEPTIONS?=
-
-# Can be set to a file
-# - <files>: input file containing, for each file to manage, the "header_spec" attribute value
-HEADER_SPEC?=
-
-# Can be set to a file
-# - yes: save the  "header_spec" attribute specification into the file "HEADER_SPEC"
-HEADER_SAVE_SPEC?=no
 
 # Extra parameters for "frama-c-hdrck"
 HDRCK_EXTRA?=
@@ -74,82 +67,19 @@ HDRCK_EXTRA?=
 
 GIT  ?= git
 DUNE ?= dune
-TEE  ?= tee
 
 ##########################################################################
 ## Command used to execute hdrck
 
-# Note: the public name of hdrck.exe is frama-c-hdrck
-ifeq ($(FRAMAC_HDRCK),)
-
-# HDRCK is external
+ifneq ($(IN_FRAMAC),yes)
 HDRCK.CMD:= $(HDRCK)
-
 else
-
-# HDRCK is internal
-HDRCK.CMD:= $(DUNE) exec --root $(FRAMAC_HDRCK_SRC) -- $(HDRCK)
-
-$(FRAMAC_HDRCK): tools/hdrck/hdrck.ml
-	$(DUNE) build --root $(FRAMAC_HDRCK_SRC) hdrck.exe
-
+HDRCK.CMD:= $(DUNE) exec --no-print-directory --root $(FRAMAC_HDRCK_SRC) -- $(HDRCK)
 endif
 
-HDRCK.OPTS:= --stdin
+HDRCK.OPTS:= --stdin -z -spec-format 3-zeros
 
-######################################################################
-## Identifies how to get the header specification (from git/find/cat)
-## and updates HDRCK.OPTS variable
-
-HDRCK.FILE_LIST=$(GIT) ls-files -z
-HDRCK.FILE_ATTR=$(GIT) check-attr --stdin -z header_spec
-
-ifeq ($(HEADER_SPEC),)
-
-HDRCK.HAS_GIT:=$(shell git rev-parse --is-inside-work-tree 2> /dev/null)
-ifeq ($(HDRCK.HAS_GIT),true)
-
-# From git (including git work-trees)
-HDRCK.SPEC:=$(HDRCK.FILE_LIST) | $(HDRCK.FILE_ATTR)
-HDRCK.OPTS+= -z
-
-else
-
-# Note: in such a case, GIT is required...
-HDRCK.SPEC:=
-
-endif # HDRCK.HAS_GIT
-
-else # HEADER_SPEC
-
-ifeq ($(HEADER_SAVE_SPEC),yes)
-
-HDRCK.HAS_GIT:=$(shell git rev-parse --is-inside-work-tree 2> /dev/null)
-ifeq ($(HDRCK.HAS_GIT),true)
-
-# From git (including git work-trees)
-HDRCK.SPEC:= $(HDRCK.FILE_LIST) | $(HDRCK.FILE_ATTR) | $(TEE) $(HEADER_SPEC)
-HDRCK.OPTS+= -z
-
-else
-
-# Note: in such a case, GIT is required...
-HDRCK.SPEC:=
-
-endif # HDRCK.HAS_GIT
-
-else # HEADER_SAVE_SPEC
-
-# From a file
-HDRCK.SPEC:= cat $(HEADER_SPEC)
-
-# The file format can be overloaded in using the var HDRCK_EXTRA
-HDRCK.OPTS+= -spec-format 3-zeros
-
-endif # HEADER_SAVE_SPEC
-endif # HEADER_SPEC
-
-################################
+##########################################################################
 ## Updates HDRCK.OPTS variable
 
 ifneq ($(HEADER_DISTRIB_FILE),)
@@ -172,9 +102,8 @@ ifeq ($(HEADER_STRICT),yes)
 HDRCK.OPTS+= -exit-on-warning
 endif
 
-#####################################
-## Identifies where are the headers
-## and updates HDRCK.OPTS variable
+##########################################################################
+## Identifies where are the headers and updates HDRCK.OPTS variable
 
 ifeq ($(HEADER_OPEN_SOURCE),yes)
 HDRCK.OPTS+= $(addprefix -header-dirs=,$(addsuffix /open-source,$(HEADER_DIRS)))
@@ -190,133 +119,60 @@ endif
 endif
 endif
 
-#################################
+##########################################################################
+## HDRCK
 
-ifeq ($(HDRCK.SPEC),)
+HDRCK.HAS_GIT:=$(shell git rev-parse --is-inside-work-tree 2> /dev/null)
+HDRCK.ENABLED=yes
+ifneq ($(HDRCK.HAS_GIT),true)
+ifeq ($(HDRCK_FILES_INPUT),)
+HDRCK.ENABLED=no
+endif
+endif
+
+ifeq ($(HDRCK_FILES_INPUT),)
+HDRCK.COLLECT=$(GIT) ls-files -z | $(GIT) check-attr --stdin -z header_spec
+else
+HDRCK.COLLECT=cat $(HDRCK_FILES_INPUT)
+endif
+
+ifeq ($(HDRCK.ENABLED),yes)
 
 .PHONY: check-headers
-check-headers: $(FRAMAC_HDRCK)
-	$(error "Please set HEADER_SPEC variable to a file containing the header specification.")
-
+check-headers:
+	$(HDRCK.COLLECT) | $(HDRCK.CMD) $(HDRCK.OPTS) $(HDRCK_EXTRA)
 
 .PHONY: headers
-headers: $(FRAMAC_HDRCK)
-	$(error "Please set HEADER_SPEC variable to a file containing the header specification.")
+headers:
+	$(HDRCK.COLLECT) | $(HDRCK.CMD) -update $(HDRCK.OPTS) $(HDRCK_EXTRA)
+
 else
 
-ifneq ($(HDRCK.HAS_GIT),)
-
-define HDRCK.file-list-from-git-diff-info
-$(GIT) diff --name-status $(1) | $(GREP) -v "^D" | $(SED) -e "s/^[CR][0-9]\+[ \t]\+[^ \t]\+[ \t]\+//" -e "s/^[AM][ \t]*//"
-endef
-
-define HDRCK.file-list-from-git-diff
- $(call HDRCK.file-list-from-git-diff-info,$(1)) | $(TR) '\n' '\000' | $(HDRCK.FILE_ATTR)
-endef
-
-HDRCK.main-targets=check-headers headers
-define HDRCK.file-list-filter-with-git-diff
-HDRCK.$(1)-filter-targets=$$(addsuffix .$(1),$$(HDRCK.main-targets))
-.PHONY: $(LINT.$(1)-filter-targets)
-$$(HDRCK.$(1)-filter-targets):: HDRCK.SPEC=$$(call HDRCK.file-list-from-git-diff,$(2))
-$$(HDRCK.$(1)-filter-targets):: %.$(1) : $(3) %
-	@echo [HDRCK] Done: HDRCK_DIFF=\"$(2)\" make $$(basename $$@)
-	@echo [HDRCK] checked file list:
-	$$(call HDRCK.file-list-from-git-diff-info,$(2))
-endef
-
-ifneq ($(HEADER_DIFF),)
-
-$(info [HDRCK] Looking at files modified from branch/commit: '$(HEADER_DIFF)')
-HDRCK.SPEC=$(call LINT.file-list-from-git-diff,$(HEADER_DIFF))
-$(info $(HEADER.FILE_LIST))
-
-endif # $(HEADER_DIFF)
-
-#### rules for make <headers-target>.before-push
-##   looks at files modified from origin/$(git rev-parse --abbrev-ref HEAD) and checks that there is no staged nor unstaged files
-
-PHONY: HDRCK.checked-unmodified-ok
-HDRCK.checked-unmodified-ok:
-	$(eval HDRCK.checked-unmodified := $(shell $(GIT) diff --name-status HEAD | $(WC) -l))
-	if [ 0 != $(HDRCK.checked-unmodified) ]; then \
-           echo "[HDRCK] Staged or unstaged files=$(HDRCK.checked-unmodified):"; \
-            $(GIT) diff --name-status HEAD; \
-           echo "[HDRCK] Error: may check some staged or unstaged file versions" ; \
-           exit 1; \
-        fi;
-
-$(eval $(call HDRCK.file-list-filter-with-git-diff,before-push,--cached origin/$(shell git rev-parse --abbrev-ref HEAD),HDRCK.checked-unmodified-ok))
-
-#### rules for make <headers-target>.unstaged
-##   looks at unstaged files
-
-$(eval $(call HDRCK.file-list-filter-with-git-diff,unstaged, ))
-
-#### rules for make <headers-target>.before-commit
-##   looks at staged files and checks that there is no unstaged files
-
-PHONY: HDRCK.checked-unstaged-ok
-HDRCK.checked-unstaged-ok:
-	$(eval HDRCK.checked-unstaged := $(shell $(GIT) diff --name-status | $(WC) -l))
-	if [ 0 != $(HDRCK.checked-unstaged) ]; then \
-	   echo "[HDRCK] Unstaged files=$(HDRCK.checked-unstaged):"; \
-           $(GIT) diff --name-status ; \
-           echo "[HDRCK] Error: may check some unstaged version files version." ; \
-           exit 1; \
-        fi;
-
-$(eval $(call HDRCK.file-list-filter-with-git-diff,before-commit,--cached HEAD,HDRCK.checked-unstaged-ok))
-
-#### rules for make <headers-target>.before-commit-a
-## looks at unstaged and staged files
-
-$(eval $(call HDRCK.file-list-filter-with-git-diff,before-commit-a,HEAD,))
-
-#### rules for make <headers-target>.before-commit-a--ammend
-##   looks at unstaged, staged and previously committed files
-
-$(eval $(call HDRCK.file-list-filter-with-git-diff,before-commit-a--ammend,HEAD~1,))
-
-#### rules for make <headers-target>.before-commit--amend
-##   looks at staged and previously committed files and checks that there is no unstaged files
-
-$(eval $(call HDRCK.file-list-filter-with-git-diff,before-commit--ammend,HEAD~1,HDRCK.checked-unstaged-ok))
-
-#### rules for make <headers-target>.previous-commit
-## looks at files of the last commit and checks that there is no staged nor unstaged files
-
-$(eval $(call HDRCK.file-list-filter-with-git-diff,previous-commit,HEAD~1,HDRCK.checked-unmodified-ok))
-
-endif # $(HDRCK.HAS_GIT)
-
 .PHONY: check-headers
-check-headers: $(FRAMAC_HDRCK)
-	$(HDRCK.SPEC) | $(HDRCK.CMD) $(HDRCK.OPTS) $(HDRCK_EXTRA)
+check-headers:
+	$(error "Cannot check-headers: not a Git repository, \
+	   			 you should specify HDRCK_FILES_INPUT")
 
 .PHONY: headers
-headers: $(FRAMAC_HDRCK)
-	$(HDRCK.SPEC) | $(HDRCK.CMD) -update $(HDRCK.OPTS) $(HDRCK_EXTRA)
+headers:
+	$(error "Cannot make headers: not a Git repository, \
+	   			 you should specify HDRCK_FILES_INPUT")
 
-endif # $(HDRCK.SPEC)
+endif
 
 #################################
 
 .PHONY: headers.info
 headers.info:
-	echo "FRAMAC_HDRCK='$(FRAMAC_HDRCK)'"
 	echo "HEADER_OPEN_SOURCE='$(HEADER_OPEN_SOURCE)'"
 	echo "HEADER_STRICT='$(HEADER_STRICT)'"
 	echo "HEADER_DIRS='$(HEADER_STRICT)'"
-	echo "HEADER_DISTRIB_FILE='$(HEADER_DISTRIB_FILE)'"
 	echo "HEADER_EXCEPTIONS='$(HEADER_EXCEPTIONS)'"
 	echo "HEADER_REPO='$(HEADER_REPO)'"
-	echo "HEADER_SPEC='$(HEADER_SPEC)'"
+	echo "HDRCK_FILES_INPUT='$(HDRCK_FILES_INPUT)'"
 	echo "HDRCK.HAS_GIT='$(HDRCK.HAS_GIT)'"
 	echo "HDRCK.CMD='$(HDRCK.CMD)'"
-	echo "HDRCK.SPEC='$(HDRCK.SPEC)'"
 	echo "HDRCK.OPTS='$(HDRCK.OPTS)'"
-
 
 ###############################################################################
 # Local Variables:

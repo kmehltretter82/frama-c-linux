@@ -600,7 +600,7 @@ let type_of_array_elem =
 
 let rec ctype_of_array_elem t =
   match unroll_type t with
-  |	Ctype ty when isArrayType ty -> Cil.typeOf_array_elem ty
+  | Ctype ty when isArrayType ty -> Cil.typeOf_array_elem ty
   | Ltype ({lt_name = "set"},[t]) -> ctype_of_array_elem t
   | _ ->
     Kernel.fatal ~current:true "type %a is not a pointer type"
@@ -2726,7 +2726,7 @@ struct
       let ty1 = t1.term_type in
       let t2 = term env t2 in
       let ty2 = t2.term_type in
-      let binop op tr =	TBinOp (op, mk_cast t1 tr, mk_cast t2 tr),
+      let binop op tr = TBinOp (op, mk_cast t1 tr, mk_cast t2 tr),
                         logic_arithmetic_promotion tr
       in
       begin match op with

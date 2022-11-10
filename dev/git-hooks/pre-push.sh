@@ -21,20 +21,20 @@
 #                                                                        #
 ##########################################################################
 
-# Example of installation of this pre-commit hook (client side):
-# - (cd .git/hooks/ && ln -s ../../dev/git-hooks/pre-commit.sh pre-commit)
+# Example of installation of this pre-push hook (client side):
+# - (cd .git/hooks/ && ln -s ../../dev/git-hooks/pre-push.sh pre-push)
 # Note: if you decide to copy the file, the `SCRIPT_DIR` variable must be
 # fixed accordingly.
 
-echo "Pre-commit Hook..."
+echo "Pre-push Hook..."
 
-STAGED=$(git diff --diff-filter ACMR --name-only --cached | sort)
+STAGED=$(git diff --diff-filter ACMR --name-only --cached origin/$(git rev-parse --abbrev-ref HEAD) | sort)
 
 if [ "$STAGED" = "" ];
 then
-  echo "Empty commit, nothing to do"
+  echo "No diff since last push, nothing to do"
   exit 0
 fi
 
 SCRIPT_DIR=$(dirname -- "$( readlink -f -- "$0"; )")
-"$SCRIPT_DIR/../check-files.sh" -c || exit 1
+"$SCRIPT_DIR/../check-files.sh" -p || exit 1

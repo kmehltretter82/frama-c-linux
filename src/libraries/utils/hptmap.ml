@@ -999,7 +999,7 @@ struct
         | Branch(p, m, s0, s1, _) ->
           try
             let result = Hashtbl.find table t in
-            (*		Format.printf "find %s %d@." name !counter; *)
+            (* Format.printf "find %s %d@." name !counter; *)
             result
           with Not_found ->
             let result0 = traverse s0 in
@@ -1008,11 +1008,11 @@ struct
             incr counter;
             if !counter >= cache
             then begin
-              (*	    Format.printf "Clearing %s fold table@." name;*)
+              (* Format.printf "Clearing %s fold table@." name;*)
               Hashtbl.clear table;
               counter := 0;
             end;
-            (*		Format.printf "add  %s %d@." name !counter; *)
+            (* Format.printf "add  %s %d@." name !counter; *)
             Hashtbl.add table t result;
             result
       in

@@ -364,7 +364,7 @@ module rec Transfer
       | Pvalid(_, t) | Pvalid_read(_, t)
       | Pobject_pointer(_, t) | Pvalid_function t
       | Pinitialized(_, t) | Pfreeable(_, t) ->
-        (*	Options.feedback "REGISTER %a" Cil.d_term t;*)
+        (* Options.feedback "REGISTER %a" Cil.d_term t;*)
         state_ref := register_term kf !state_ref t;
         Cil.DoChildren
       | Pseparated tlist ->

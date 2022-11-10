@@ -1752,14 +1752,14 @@ class type cilVisitor = object
 
   method vfrees:
     identified_term list -> identified_term list visitAction
-  (**	@since Oxygen-20120901 *)
+  (**   @since Oxygen-20120901 *)
 
   method vallocates:
     identified_term list -> identified_term list visitAction
-  (**	@since Oxygen-20120901 *)
+  (**   @since Oxygen-20120901 *)
 
   method vallocation: allocation -> allocation visitAction
-  (**	@since Oxygen-20120901 *)
+  (**   @since Oxygen-20120901 *)
 
   method vloop_pragma: loop_pragma -> loop_pragma visitAction
   method vslice_pragma: slice_pragma -> slice_pragma visitAction
@@ -1950,18 +1950,15 @@ val visitCilFrom: cilVisitor -> from -> from
 
 val visitCilAssigns: cilVisitor -> assigns -> assigns
 
-(** @since Oxygen-20120901
-*)
+(** @since Oxygen-20120901 *)
 val visitCilFrees:
   cilVisitor -> identified_term list -> identified_term list
 
-(** @since Oxygen-20120901
-*)
+(** @since Oxygen-20120901 *)
 val visitCilAllocates:
   cilVisitor -> identified_term list -> identified_term list
 
-(** @since Oxygen-20120901
-*)
+(** @since Oxygen-20120901 *)
 val visitCilAllocation: cilVisitor -> allocation -> allocation
 
 val visitCilFunspec: cilVisitor -> funspec -> funspec

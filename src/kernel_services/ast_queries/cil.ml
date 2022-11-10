@@ -5289,7 +5289,7 @@ let rec constFoldTermNodeAtTop = function
     end
   | TSizeOfE { term_type= Ctype typ } -> constFoldTermNodeAtTop (TSizeOf typ)
   | TAlignOfE { term_type= Ctype typ }
-    -> 	constFoldTermNodeAtTop (TAlignOf typ)
+    -> constFoldTermNodeAtTop (TAlignOf typ)
   | TSizeOfE _ | TAlignOfE _ ->
     assert false (* sizeof/alignof of logic types are rejected
                     by typing anyway. *)
