@@ -14,6 +14,7 @@
 # Frama-C build
 , apron
 , camlzip
+, camomile
 , dune_3
 , dune-configurator
 , dune-site
@@ -67,6 +68,7 @@ stdenvNoCC.mkDerivation rec {
     apron
     alt-ergo
     camlzip
+    camomile
     dune_3
     dune-configurator
     dune-site
