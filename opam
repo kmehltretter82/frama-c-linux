@@ -124,6 +124,10 @@ depends: [
   "yojson" { >= "1.6.0" & < "2.0.0" }
   "zarith" { >= "1.5" }
 
+  # To be removed when frama-c-lint/hdrck are in separate opam packages
+  "camomile"
+  "ocp-indent"
+
   # PPXs
   "ppx_deriving"
   "ppx_deriving_yojson"
