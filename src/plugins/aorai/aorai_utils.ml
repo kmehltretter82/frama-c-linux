@@ -1214,9 +1214,6 @@ let extract_lval acc lv =
 let add_lval cond kf st acc =
   (* check whether the condition is always true or false and which
      variables may be read. *)
-  Format.printf "Analysing froms of %a for cond %a@."
-    Kernel_function.pretty kf
-    Data_for_aorai.Aorai_typed_trans.pretty cond;
   let rec aux cond acc =
   match cond with
   | TOr (c1,c2) ->
