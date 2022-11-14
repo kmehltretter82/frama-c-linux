@@ -1254,6 +1254,10 @@ val frama_c_mutable: string
 *)
 val frama_c_inlined: string
 
+(** [true] if the underlying left-value of the given expression is allowed to be
+    assigned to thanks to a [frama_c_init_obj] attribute. *)
+val is_initialized: exp -> bool
+
 (** [true] if the given lval is allowed to be assigned to thanks to
     a [frama_c_init_obj] or a [frama_c_mutable] attribute.
 *)

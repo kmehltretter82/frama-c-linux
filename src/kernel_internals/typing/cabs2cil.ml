@@ -6877,8 +6877,17 @@ and doExp local_env
                  (Cil.isPointerType texpected && Ast_info.is_null_expr a') ||
                  areCompatibleTypes ~context:ContravariantToplevel att texpected
                in
+               let ok2 =
+                 (* accept pointer to const type as long as the respective
+                    argument (formal) is annotated with __fc_initialized_object
+                    attribute. *)
+                 let arg_is_initialized = Cil.is_initialized a' in
+                 arg_is_initialized
+                 && Cil.isPointerType texpected
+                 && areCompatibleTypes ~context:CovariantToplevel att texpected
+               in
                let ok =
-                 if ok1 then true
+                 if ok1 || ok2 then true
                  (* special warning for void* -> any* conversions;
                     this is equivalent to option '-Wc++-compat' in GCC *)
                  else if Cil.isVoidPtrType att && Cil.isPointerType texpected

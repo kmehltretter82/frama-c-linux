@@ -73,9 +73,10 @@ void h(const int* x) {
   g(y);
 }
 
-typedef struct {
+typedef struct S {
  __attribute__((__fc_mutable)) int x;
  const int y;
+ struct S* z[3];
 } S;
 
 void build_S(
@@ -89,6 +90,22 @@ void mutable_test(const S* s) {
   s->x = 42;
   s->x++;
   s->x += 2;
+}
+
+extern void k1(S*);
+extern void k2(int*);
+
+void mutable_test_call(__attribute__((__fc_initialized_object)) const S* s) {
+  /* Although these calls would make losing the const qualifier, this is OK due
+     to the __fc_initialized_object attribute on s. */
+  k1(s);
+  k1(s->z[0]);
+  int a = 1;
+  k1(a + (s + 2));
+  k2(&(s + 2)->y);
+  /* KO: although s has the __fc_initialized_object attribute, z[0] has not (and
+     cannot) and y is const. */
+  k2(&s->z[0]->y);
 }
 
 #ifdef T8

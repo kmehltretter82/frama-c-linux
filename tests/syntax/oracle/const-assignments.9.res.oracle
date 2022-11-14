@@ -1,5 +1,7 @@
 [kernel] Parsing const-assignments.c (with preprocessing)
-[kernel] const-assignments.c:101: User Error: 
+[kernel:typing:incompatible-types-call] const-assignments.c:108: Warning: 
+  expected 'int *' but got argument of type 'int const *': & (s->z[0])->y
+[kernel] const-assignments.c:118: User Error: 
   Cannot assign to non-modifiable lval t->s.y
 [kernel] User Error: stopping on file "const-assignments.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.
