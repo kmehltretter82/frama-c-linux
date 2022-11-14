@@ -18,6 +18,11 @@ enum aorai_OpStatusList {
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_CurOpStatus, aorai_CurOperation, I;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, I, x;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, I, x;
+     assigns I \from aorai_CurOpStatus, aorai_CurOperation, I, x;
      
      behavior buch_state_I_in:
        assumes 1 ≡ I ∧ (x ≡ 1 ∨ x ≢ 1);
@@ -54,6 +59,11 @@ enum aorai_OpStatusList {
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_CurOpStatus, aorai_CurOperation, I;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, I;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, I;
+     assigns I \from aorai_CurOpStatus, aorai_CurOperation, I;
      
      behavior buch_state_I_in:
        assumes 1 ≡ I;
@@ -96,6 +106,11 @@ void f(int x)
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, I;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, I;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, I;
+     assigns I \from aorai_CurOpStatus, aorai_CurOperation, I;
      
      behavior buch_state_I_in:
        assumes 1 ≡ I;
@@ -124,6 +139,11 @@ void f(int x)
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, I;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, I;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, I;
+     assigns I \from aorai_CurOpStatus, aorai_CurOperation, I;
      
      behavior buch_state_I_in:
        assumes 1 ≡ I;

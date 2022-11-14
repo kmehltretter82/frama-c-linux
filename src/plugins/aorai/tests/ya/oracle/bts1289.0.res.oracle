@@ -18,6 +18,11 @@ enum aorai_OpStatusList {
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_a;
      assigns aorai_CurOpStatus, aorai_CurOperation, S;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, S;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, S;
+     assigns S \from aorai_CurOpStatus, aorai_CurOperation, S;
      
      behavior buch_state_S_out:
        ensures 0 ≡ S;
@@ -41,6 +46,11 @@ enum aorai_OpStatusList {
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_a;
      assigns aorai_CurOpStatus, aorai_CurOperation, S;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, S;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, S;
+     assigns S \from aorai_CurOpStatus, aorai_CurOperation, S;
      
      behavior buch_state_S_out:
        ensures 0 ≡ S;
@@ -75,6 +85,11 @@ void a(void)
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, S;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, S;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, S;
+     assigns S \from aorai_CurOpStatus, aorai_CurOperation, S;
      
      behavior buch_state_S_out:
        ensures 0 ≡ S;
@@ -98,6 +113,11 @@ void a(void)
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, S;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, S;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, S;
+     assigns S \from aorai_CurOpStatus, aorai_CurOperation, S;
      
      behavior buch_state_S_out:
        ensures 0 ≡ S;
