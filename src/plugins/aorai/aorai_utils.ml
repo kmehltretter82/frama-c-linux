@@ -1237,13 +1237,13 @@ let add_lval cond kf st acc =
      | TFalse, _ -> TTrue, acc
      | res -> res)
   | TCall (kf', _) -> (* TODO: take potential behavior into account. *)
-    if Kernel_function.equal kf' kf && st = Promelaast.Call then begin
+    if Kernel_function.equal kf' kf && st = Automaton_ast.Call then begin
       TTrue, acc
     end else begin
       TFalse, acc
     end
   | TReturn kf' ->
-    if Kernel_function.equal kf' kf && st = Promelaast.Return then
+    if Kernel_function.equal kf' kf && st = Automaton_ast.Return then
       TTrue, acc
     else
       TFalse, acc
@@ -1251,7 +1251,7 @@ let add_lval cond kf st acc =
   | TFalse -> TFalse, acc
   | TRel(_,t1,t2) -> cond, extract_lval (extract_lval acc t1) t2
   in
-  snd (aux (fst cond.cross) acc)
+  snd (aux cond.cross acc)
 
 let automaton_assigns kf st loc =
   let assigns = automaton_locations loc in
@@ -1261,7 +1261,7 @@ let automaton_assigns kf st loc =
       (fun acc tr ->
          add_lval tr kf st acc)
       Cil_datatype.Term_lval.Set.empty
-      (snd (Data_for_aorai.getAutomata()))
+       (Data_for_aorai.getAutomata()).trans
   in
   let from_vars =
     Cil_datatype.Term_lval.Set.fold
