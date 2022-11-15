@@ -10,6 +10,29 @@ presented in the blog.
 % suite\footnote{The archive for version 0.3 is available at
 % \href{http://loup-vaillant.fr/projects/monocypher/monocypher-0.3.tar.gz}.}.
 
+\begin{important}
+\textbf{Note:}
+This chapter currently describes the traditional, GTK-based graphical
+interface. Frama-C is switching to a newer GUI, {\em Ivette}, based on
+Electron. This new GUI currently offers most of the existing features for
+viewing \Eva{} results, but in a different presentation. It also includes
+some new features.
+To install Ivette, you simply need to follow the instructions displayed
+after installing the \texttt{frama-c} opam package (if using opam); if
+you have manually compiled Frama-C from source, you can enter directory
+\texttt{ivette} and run \texttt{make dist} then
+\texttt{make install PREFIX=<dir>}. Ivette will then use the Frama-C
+installed in the PATH.
+
+Ivette is currently under development. The following post from the Frama-C
+blog contains some useful information for installing it and using it
+to view \Eva{} results:
+
+\url{https://frama-c.com/2022/07/12/frama-c-25-ivette.html}
+
+The rest of this chapter concerns the ``old'' Frama-C graphical interface.
+
+\end{important}
 
 \paragraph{A caveat.}
 
