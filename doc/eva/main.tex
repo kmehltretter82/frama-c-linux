@@ -2013,7 +2013,7 @@ It contains:
 
 \begin{itemize}
 \item semantic coverage metrics, with the number of functions and
-  statements analyzed;
+  statements analyzed (see section \ref{coverage} for more details);
 \item total number of errors and warnings, pointing out potential issues that
   could jeopardize the correction of the analysis;
 \item total number of alarms emitted by the analysis, grouped by kind;
@@ -2031,6 +2031,41 @@ by the Report plugin.
 
 The summary display can be disabled by using option
 \lstinline|-eva-msg-key=-summary|.
+
+\subsection{Analysis coverage} \label{coverage}
+
+In the \Eva{} summary, the coverage indicates the number of functions whose
+body has been \emph{analyzed} by \Eva{}, out of the total number of
+\emph{defined} functions in the files given to \FramaC.
+Declared functions with no definition are ignored, as well as functions from the
+C standard library.
+
+This differs from the semantics coverage computed by the \textsf{Metrics} plugin
+with the option \lstinline|-metrics-eva-cover| : \textsf{Metrics} counts all
+functions \emph{reached} by the \Eva{} analysis, out of the total number
+of functions (defined or not) syntactically reachable from the starting point
+of the analysis.
+Functions from the C standard library are also ignored, unless option
+\lstinline|-metrics-libc| is used.
+
+When the \Eva{} analysis reaches a function \lstinline|f|,
+its body is analyzed, unless:
+\begin{itemize}
+  \item the function specification is used instead, because:
+  \begin{itemize}
+    \item the function has no definition;
+    \item the option \lstinline|-eva-use-spec f| has been set.
+  \end{itemize}
+  \item a builtin is used: \Eva{} uses internal builtins to interpret calls to
+  some standard C library functions without analyzing their body.
+  The command \lstinline|frama-c -eva-builtins-list| prints the list of
+  available \Eva{} builtins.
+  See chapter \ref{primitives} for more details.
+\end{itemize}
+
+In these three cases, the function \lstinline|f| is reached by the analysis
+(and thus counted in the \textsf{Metrics} coverage), but not analyzed
+(and thus not counted in the \Eva{} coverage).
 
 \subsection{Audit messages ({\em experimental})}
 
