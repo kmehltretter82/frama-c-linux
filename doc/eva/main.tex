@@ -2184,44 +2184,66 @@ where strong hypotheses on the underlying architecture are needed.
 
 \section{API}
 
-Both the user (through the GUI) or a Frama-C plug-in can
-request the evaluation,
-at a specific statement, of an lvalue (or an arbitrary expression).
-The variation domain thus obtained
-contains all the values that this lvalue or expression may
-have anytime an actual execution reaches the selected statement.
+After an analysis, most results inferred by \Eva{} can be examined in the
+\FramaC graphical interface (see chapter \ref{gui}), or programmatically
+accessed by another \FramaC plugin through the public \Eva{} API.
 
-In fact, from the point view of \Eva{}, the graphical interface
-that allows to observe the values of variables in the program is very much
-an ordinary Frama-C plug-in. It uses the same functions (registered
-in module \lstinline|Db.Value|) as other plug-ins that interface with
-\Eva{}.
-This API is not very well documented yet, but one early external
-plug-in author used the GUI to get a feeling of what \Eva{}
-could provide, and then used the OCaml source code of the GUI as
-a reference for obtaining this information programmatically.
+For instance, both an user (through the GUI) or a developer (through the API)
+can request the evaluation of an arbitrary lvalue or expression at a given
+statement.
+The obtained result represents all the possible values that this lvalue or
+expression may have anytime an actual execution reaches the selected statement.
 
-\subsection{\Eva{} API overview}
+\subsection{API overview}
 
-The function \lstinline|!Db.Value.access| is one of the
-functions provided to custom plug-ins.
-It takes a program point (of type \lstinline|Cil_types.kinstr|),
-the representation of
-an lvalue (of type \lstinline|Cil_types.lval|) and returns a representation
-of the possible values for the lvalue at the program point.
+The \Eva{} public API is available in the file \texttt{src/plugins/eva/Eva.mli}.
 
-Another function, \lstinline|!Db.Value.lval_to_loc|, translates the
-representation of an
-lvalue into a location (of type \lstinline|Locations.location|), which
-is the analyzer's abstract representation for a place in memory.
-The location returned by this function is free of memory accesses
-or arithmetic. The provided
-program point is used for instantiating the values of variables
-that appear in expressions
-inside the lvalue (array indices, dereferenced expressions).
-Thanks to this and similar functions, a custom plug-in may
-reason entirely in terms of abstract locations, and completely
-avoid the problems of pointers and aliasing.
+The function \lstinline|Analysis.compute| starts an analysis, and other
+functions of the \lstinline|Analysis| module inform about the status of the
+current analysis.
+
+The \lstinline|Results| module provides access to the analysis results,
+and especially to the possible values of any expressions and memory locations
+of any lvalues at each program point.
+The idea behind the \lstinline|Results| API is that requests are decomposed
+in several steps:
+\begin{enumerate}
+\item first, a \lstinline|request| is built by stating where it should be
+  evaluated: before or after a statement, at the start of a function, etc.
+\item optionally, a request may by restricted to a given callstack;
+\item then, functions \lstinline|eval_*| evaluate a variable, an lvalue or an
+  expression;
+\item finally, functions \lstinline|as_*| convert the evaluation result to a
+  usable destination type.
+\end{enumerate}
+
+For instance, the code below evaluates the expression \lstinline|expr|
+before statement \lstinline|stmt| in callstack \lstinline|cs|. The possible
+values of \lstinline|expr| are expressed as an \emph{fval}, a representation
+of a floating-point interval. If the evaluation fails, or if the possible values
+of \lstinline|expr| cannot be represented by a floating-point interval,
+\lstinline|Fval.top| is used instead.
+\begin{ocamlcode}
+before stmt |> in_callstack cs |>
+eval_exp expr |> as_fval |> default Fval.top
+\end{ocamlcode}
+
+Other useful functions exported in the \lstinline|Results| module include:
+\begin{itemize}
+  \item \lstinline|callee|, which returns the list of functions that can be
+    called at a given call statement, which is very useful for calls through
+    function pointers.
+  \item \lstinline|callers|, which returns the list of functions from which the
+    given function can be called.
+  \item \lstinline |is_reachable|, which returns whether a given statement has
+    been reached by the analysis.
+  \item \lstinline|expr_deps|, which computes an over-approximation of the
+    memory zones that must be read to evaluate the given expression.
+\end{itemize}
+
+Other modules of the \Eva{} API allows to change some parameters of the
+analysis, to add local annotations guiding the analysis, or to register
+ocaml builtins to be used by the analysis to interpret some function calls.
 
 The Frama-C Plug-in Development Guide contains more information about
 developing a custom plug-in.
