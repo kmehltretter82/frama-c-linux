@@ -804,6 +804,68 @@ itself, it needs to be doubled, {\it i.e.} \texttt{@@} will be translated as
   produced file as a dependency.
 \end{important}
 
+\subsection{Pre-defined macros for tests commands}\label{sec:ptests-macros}
+Table~\ref{tab:ptests-macros} gives the definition of the predefined macros that
+can be used in \ptests' directives.
+\begin{longtable}{|p{4.5cm}|p{10cm}|}
+\hline
+Name & Expansion \\
+\hline
+\verb|frama-c| & path to \framac executable \\
+\hline
+\verb|PTEST_CONFIG| & either the empty string or \verb|_| followed by the
+name of the current alternative configuration 
+(see section~\ref{ptests:alternative}). \\
+\hline
+\verb|PTEST_DIR| & current test suite directory \\
+\hline
+\verb|PTEST_RESULT| & current result directory \\
+\hline
+\verb|PTEST_FILE| & path to the current test file \\
+\hline
+\verb|PTEST_NAME| & basename of the current test file (without suffix) \\
+\hline
+\verb|PTEST_NUMBER| & rank of current test in the test file. There are in
+fact two independent numbering schemes: one for \verb|EXECNOW| commands and
+one for regular tests (if more than one \verb|OPT|).\\
+\hline
+\verb|PTEST_RESULT| & shorthand alias to \verb|@PTEST_DIR@/result@PTEST_CONFIG@|
+(the result directory dedicated to the tested configuration)\\
+\hline
+\verb|PTEST_ORACLE| & basename of the current oracle file (macro only usable in FILTER directives)\\
+\hline
+\verb|PTEST_MODULE| & current list of module defined by the \verb|MODULE| directive\\
+\hline
+\verb|PTEST_LIBS| & current list of module defined by the \verb|LIBS| directive\\
+\hline
+\verb|PTEST_PLUGIN| & current list of plugins defined by the \verb|PLUGIN| directive\\
+\hline
+\verb|PTEST_SCRIPT| & current list of plugins defined by the \verb|SCRIPT| directive\\
+\hline
+\verb|PTEST_DEFAULT_OPTIONS| & the default option list: \verb|-check| \verb|-no-autoload-plugins|\\
+\hline
+\verb|PTEST_LOAD_MODULE| & the \verb|-load-module| option related to the \verb|MODULE| directive\\
+\hline
+\verb|PTEST_LOAD_LIBS| & the \verb|-load-module| option related to the \verb|LIBS| directive\\
+\hline
+\verb|PTEST_LOAD_PLUGIN| & the \verb|-load-module| option related to the \verb|PLUGIN| directive\\
+\hline
+\verb|PTEST_LOAD_SCRIPT| & the \verb|-load-script| option related to the \verb|SCRIPT| directive\\
+\hline
+\verb|PTEST_LOAD_OPTIONS| & shorthand alias to \spverb|@PTEST_LOAD_PLUGIN@ @PTEST_LOAD_LIBS@ @PTEST_LOAD_MODULE@ @PTEST_LOAD_SCRIPT@|\\
+\hline
+\verb|PTEST_OPTIONS| & the current list of options related to \verb|OPT| and \verb|STDOPT| directives (for \verb|CMD| directives)\\
+\hline
+\verb|frama-c| & shortcut defined as follows: \spverb|@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@|\\
+\hline
+\verb|frama-c-cmd| & shortcut defined as follows: \spverb|@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@|\\
+\hline
+\verb|frama-c-exe| & set to the value of the \verb|TOPLEVEL_PATH| variable from \verb|./tests/ptests_config| file\\
+\hline
+\caption{Predefined macros for ptests}\label{tab:ptests-macros}
+\end{longtable}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Plug-in Migration from Makefile to Dune}\label{adv:dune-migration}
@@ -4154,6 +4216,60 @@ compiled together with \framac. However, in order to be able to compile the
 documentation with \texttt{make doc}, you must have generated the documentation
 of Frama-C's kernel (\texttt{make doc}, see above) and installed it with the
 \texttt{make install-doc-code}\codeidx{install-doc-code} command.
+
+\section{Profiling with Landmarks} \label{refman:landmarks}\codeidxdef{Landmarks}
+
+{\em Landmarks}\footnote{\url{https://github.com/LexiFi/landmarks}} is a
+library for ``quick and dirty'' profiling of OCaml programs. It allows the
+insertion of annotations in the code to enable profiling of specific parts of
+it, but also an automatic mode, in which every function call is instrumented.
+The Frama-C \texttt{configure} file is setup to enable usage of this library
+when it is available (the usual way to install it is via the \texttt{landmarks}
+opam package).
+
+For quick usage of the library:
+\begin{itemize}
+\item ensure that the \texttt{configure} script detected it
+  (there should be a line \texttt{checking for Landmarks... found});
+\item enable instrumentation {\em when compiling Frama-C's files}, that is,
+  when running \texttt{make}, by setting the environment variable
+  \verb+OCAML_LANDMARKS+. For instance, to enable automatic instrumentation
+  of every Frama-C function (note: this increases compilation time of Frama-C),
+  run:
+
+\begin{lstlisting}
+    OCAML_LANDMARKS=auto make
+\end{lstlisting}
+
+\item enable instrumentation {\em during execution} of Frama-C, again using
+  \verb+OCAML_LANDMARKS+. Note that the \texttt{auto} parameter here is
+  implicit if you enabled it on the previous step.
+  For instance, run:
+
+  \begin{lstlisting}
+    OCAML_LANDMARKS= bin/frama-c [files] [options]
+  \end{lstlisting}
+\end{itemize}
+
+Commonly used options include \verb+output=landmarks.log+ to output the result
+to a file instead of \texttt{stderr}.
+
+To instrument a single file: add \verb+[@@@landmark "auto"]+ at the beginning
+of the file.
+
+To instrument a single function: add \verb+[@landmark]+ after the \texttt{let},
+e.g.:
+
+\begin{lstlisting}
+  let[@landmark] add_visitor vis =
+\end{lstlisting}
+
+Check \url{https://github.com/LexiFi/landmarks} for its documentation.
+
+\textbf{Note:} if you intend to use \texttt{ocamlprof} (via \texttt{ocamlcp} or
+\texttt{ocamloptp}), which does not support ppx extensions, and you have
+Landmarks installed, you need to explicitly disable Landmarks during Frama-C's
+configure: \verb+./configure --disable-landmarks+.
 
 % Local Variables:
 % ispell-local-dictionary: "english"

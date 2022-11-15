@@ -27,7 +27,6 @@ SRC	= developer \
 	tutorial \
 	architecture \
 	advance \
-	refman \
 	changes
 SRC	:= $(addsuffix .tex, $(SRC))
 SRC	+= macros.sty
