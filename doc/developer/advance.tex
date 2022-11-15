@@ -36,9 +36,7 @@ Plug-in development also requires some familiarity with the Dune build system.
 
 Note that the following subsections can be read in no particular
 order: their contents are indeed quite independent from one another even if
-there are references from one chapter to another one. Pointers to
-reference manuals (Chapter~\ref{chap:refman}) are also provided for readers who
-want full details about specific parts.
+there are references from one section to another one.
 
 \section{Plug-in dependencies}\label{adv:dependencies}
 
@@ -815,7 +813,7 @@ Name & Expansion \\
 \hline
 \verb|PTEST_CONFIG| & either the empty string or \verb|_| followed by the
 name of the current alternative configuration 
-(see section~\ref{ptests:alternative}). \\
+(see section~\ref{ptests:structure}). \\
 \hline
 \verb|PTEST_DIR| & current test suite directory \\
 \hline
@@ -1990,9 +1988,6 @@ directory. The best way is to create a directory dedicated to types.
   plug-in $p$.
 \end{convention}
 
-If you add such a directory, you also have to modify \texttt{Makefile} by
-extending variable \texttt{FRAMAC\_SRC\_DIRS}\codeidx{FRAMAC\_SRC\_DIRS} (see
-Section~\ref{make:plugin}).
 \begin{example}
 Suppose you are writing a plug-in \texttt{p} which exports a specific type
 \texttt{t} corresponding to the result of the plug-in analysis. The standard way
@@ -2027,11 +2022,6 @@ At this point, part of the plug-in code is outside the plug-in
 implementation. This code should be linked before \texttt{Db}
 \codeidx{Db}\footnote{A direct consequence is that you cannot use the whole
 \framac functionalities, such as module \texttt{Db}, inside this code.}.
-
-To this effect, the files containing the external plug-in code must be added to
-the \texttt{Makefile} variable
-\texttt{PLUGIN\_TYPES\_CMO}\codeidxdef{PLUGIN\_TYPES\_CMO} (see
-Section~\ref{make:plugin}).
 
 \subsection{Dynamic Registration and Access}
 \label{adv:dynamic-registration}
@@ -4109,12 +4099,6 @@ points. The documentation of the class type
 \scodeidxdef{Design}{main\_window\_extension\_points} is accessible through the
 source documentation (see Section~\ref{adv:documentation}).
 
-The GUI plug-in code has to be put in separate files into the plug-in
-directory\index{Plug-in!Directory}. Furthermore, in the
-\texttt{Makefile}\codeidx{Makefile}, the variable
-\texttt{PLUGIN\_GUI\_CMO}\codeidx{PLUGIN\_GUI\_CMO} has to be set in order to
-compile the GUI plug-in code (see Section~\ref{make:plugin}).
-
 Besides time-consuming computations have to call the function
 \texttt{!Db.progress}\scodeidx{Db}{progress} from time to time in order to keep the GUI reactive.
 
@@ -4197,17 +4181,7 @@ required here for compilation purposes.
 \paragraph{Internal Documentation for Kernel Integrated Plug-ins}
 
 The \framac documentation generator also produces an internal plug-in
-documentation which may be useful for the plug-in developer itself. This
-internal documentation is available \emph{via} file
-\texttt{doc/code/$plugin$/index.html}\codeidx{index.html} for each plug-in
-$plugin$. You can add an introduction to this documentation into a file. This
-file has to be assigned into variable
-\texttt{PLUGIN\_INTRO}\codeidx{PLUGIN\_INTRO} of the
-\texttt{Makefile}\codeidx{Makefile} (see Section~\ref{make:plugin}).
-
-In order to ease access to this internal documentation, you have to
-manually edit the file \texttt{doc/index.html}\codeidx{index.html} in order to add
-an entry for your plug-in in the plug-in list.
+documentation which may be useful for the plug-in developer itself.
 
 \paragraph{Internal Documentation for External Plug-ins}
 
