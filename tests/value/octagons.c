@@ -177,6 +177,18 @@ void saturate () {
 int diff (int x, int y) { return x - y; }
 int neg (int x) { return -x; }
 
+struct st { int i; char c; };
+
+/* Tests interprocedural octagon domains on calls with non-integer arguments,
+   which should be ignored if they are not supported. */
+void test_non_integer_args (double d, int *p, struct st s) {
+  int a1 = *p;
+  int b1 = s.i;
+  char c1 = s.c;
+  double d1 = d;
+  Frama_C_dump_each();
+}
+
 /* Tests the propagation of octagons through function calls. */
 void interprocedural () {
   int a = Frama_C_interval(-4, 12);
@@ -199,6 +211,9 @@ void interprocedural () {
   }
   /* With the interprocedural octagons, r1, r2 and r3 must be equally precise. */
   Frama_C_show_each_equal(r1, r2, r3);
+  /* Tests a call with non-integer arguments: should not crash. */
+  struct st s = {.i = 42, .c = 5 };
+  test_non_integer_args(3.5, &a, s);
 }
 
 /* Prints the octagons state. */
