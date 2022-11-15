@@ -524,13 +524,11 @@ the test file name, plus a few other implicit options (\verb|-check|,
 \verb|-no-autoload-plugins|, \verb|-load-module|, etc).
 \end{example}
 
-Figure~\ref{fig:test-directives} shows all the directives that can be used in
+Table~\ref{fig:test-directives} shows all the directives that can be used in
 the configuration header of a test (or a test suite). Those whose name are
 underlined are the directives that {\em actually} create test cases; the others
 modify or disable test cases.
-\begin{figure}[ht]
-\begin{center}
-\begin{tabular}{|l|p{9cm}|p{4cm}|}
+\begin{longtable}{|l|p{9cm}|p{4cm}|}
 \hline
 \textbf{Name} & \textbf{Specification} & \textbf{default}\\
 \hline
@@ -628,12 +626,10 @@ and report a failure.
 & \textit{None}
 \\
 \hline
-\end{tabular}
-\end{center}
 \caption{Directives in configuration headers of test files.
   Underlined directives are the only ones which actually generate test cases.
 }\label{fig:test-directives}
-\end{figure}
+\end{longtable}
 
 In the following, we detail some aspects of several directives.
 
