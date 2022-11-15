@@ -71,6 +71,18 @@ if [ "" != "$IGNORED_FILES" ]; then
 fi
 
 ################################################################################
+
+################################################################################
+# Warn if there are uncommitted changes (will not be taken into account)
+
+GIT_STATUS="$(git status --porcelain)"
+if [ "" != "$GIT_STATUS" ]; then
+    echo "WARNING: uncommitted changes will be IGNORED when making archive:"
+    echo "$GIT_STATUS"
+fi
+
+################################################################################
+
 # Prepare archive
 
 git archive HEAD -o $FRAMAC_TAR --prefix "$FRAMAC/"
