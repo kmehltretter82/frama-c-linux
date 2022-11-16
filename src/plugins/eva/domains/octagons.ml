@@ -1265,6 +1265,7 @@ module Domain = struct
         end
       | _ -> state
 
+  (* Assigns integer [varinfo] to [expr]. *)
   let assign_variable varinfo expr assigned valuation state =
     let evaluate = evaluation_function valuation in
     (* TODO: redundant with rewrite_binop below. *)
@@ -1326,7 +1327,9 @@ module Domain = struct
         `Value (start_recursive_call recursion state)
       | None ->
         let assign_formal state { formal; concrete; avalue } =
-          state >>- assign_variable formal concrete avalue valuation
+          if Cil.isIntegralType formal.vtype
+          then state >>- assign_variable formal concrete avalue valuation
+          else state
         in
         List.fold_left assign_formal (`Value state) call.arguments
 
