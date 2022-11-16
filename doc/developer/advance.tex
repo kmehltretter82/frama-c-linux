@@ -4187,6 +4187,21 @@ documentation with \texttt{make doc}, you must have generated the documentation
 of Frama-C's kernel (\texttt{make doc}, see above) and installed it with the
 \texttt{make install-doc-code}\codeidx{install-doc-code} command.
 
+\section{Packaging}
+\label{sec:dune-packaging}
+
+If you intend to release your plug-in, a possible way is to take advantage of
+the \texttt{opam} integration within
+\texttt{dune}\footnote{\url{https://dune.readthedocs.io/en/stable/opam.html}}.
+Basically, the \index{dune-project}\texttt{dune-project} file
+(see Section~\ref{tut2:hello}) should contain a stanza
+\texttt{(generate\_opam\_files true)}, as well as a few meta-information
+(location of the sources, licence, author(s), etc.). It is also possible to
+provide these information into a file \texttt{my-plugin-package.opam.template},
+assuming \texttt{my-plugin-package} is the name of the package of the plug-in in
+the \texttt{dune-project} file. See the dune documentation for detailed information
+about the creation of the \texttt{opam} file.
+
 \section{Profiling with Landmarks} \label{refman:landmarks}\codeidxdef{Landmarks}
 
 {\em Landmarks}\footnote{\url{https://github.com/LexiFi/landmarks}} is a
@@ -4240,8 +4255,3 @@ Check \url{https://github.com/LexiFi/landmarks} for its documentation.
 \texttt{ocamloptp}), which does not support ppx extensions, and you have
 Landmarks installed, you need to explicitly disable Landmarks during Frama-C's
 configure: \verb+./configure --disable-landmarks+.
-
-% Local Variables:
-% ispell-local-dictionary: "english"
-% TeX-master: "main"
-% End:
