@@ -12,22 +12,22 @@ presented in the blog.
 
 \begin{important}
 \textbf{Note:}
-This chapter currently describes the traditional, GTK-based graphical
-interface. Frama-C is switching to a newer GUI, {\em Ivette}, based on
-Electron. This new GUI currently offers most of the existing features for
-viewing \Eva{} results, but in a different presentation. It also includes
-some new features.
-To install Ivette, you simply need to follow the instructions displayed
-after installing the \texttt{frama-c} opam package (if using opam); if
-you have manually compiled Frama-C from source, you can enter directory
-\texttt{ivette} and run \texttt{make dist} then
-\texttt{make install PREFIX=<dir>}. Ivette will then use the Frama-C
-installed in the PATH.
+This chapter describes the traditional, GTK-based graphical interface.
+Frama-C is switching to {\em Ivette}, a new GUI based on Electron.
+Ivette is currently under development, but it already offers most of the
+existing features for viewing \Eva{} results, and also includes some new
+features.
 
-Ivette is currently under development. The following post from the Frama-C
-blog contains some useful information for installing it and using it
-to view \Eva{} results:
+To install Ivette, you simply need to run \texttt{\em ivette} once after
+installing Frama-C. This requires node v16 and yarn:
+\begin{itemize}
+  \item install NVM: \url{https://github.com/nvm-sh/nvm}
+  \item run \texttt{\em nvm use 16}
+  \item run \texttt{\em npm install --global yarn}
+\end{itemize}
 
+The following post from the Frama-C blog contains some useful information
+for installing \texttt{ivette} and using it to view \Eva{} results:
 \url{https://frama-c.com/2022/07/12/frama-c-25-ivette.html}
 
 The rest of this chapter concerns the ``old'' Frama-C graphical interface.
