@@ -254,7 +254,7 @@ lint:
   variables:
     LINT_MAKEFILE: "share/Makefile.linting"
   script:
-    - ./nix/shell-checkers.sh "make -f share/Makefile.linting lint"
+    - ./nix/shell-checkers.sh "make -f share/Makefile.linting check-lint"
 
 # Manuals
 
