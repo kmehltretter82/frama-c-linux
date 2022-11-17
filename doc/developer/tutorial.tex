@@ -186,7 +186,7 @@ minimally of the following files:
 \begin{itemize}
   \item a \texttt{dune-project} file that describes the project;
   \item a \texttt{dune} file that describes the build of the project;
-  \item a \texttt{<My\_plugin>.ml} file that defines the API of the plugin
+  \item a \texttt{<my\_plugin>.ml} file that defines the API of the plugin
     (which can be empty).
 \end{itemize}
 
@@ -198,7 +198,7 @@ For example, for the Hello plugin:
 \listingname{./dune}
 \duneinput{./tutorial/hello/v1-simple/dune}
 
-\texttt{Hello.ml} is just an empty file.
+\texttt{hello.ml} is just an empty file.
 
 Then the plugin can be built using the following command:
 
@@ -225,10 +225,10 @@ Note a few details about the naming conventions:
     \texttt{frama-c-<my-plugin>}
   \item in the \texttt{dune} file, the name of:
   \begin{itemize}
-  \item the library is \texttt{My\_plugin} (it is a module name);
+  \item the library is \texttt{my\_plugin};
   \item the public name of the library is \texttt{frama-c-<my-plugin>.core}
     (dune project name core);
-  \item the name of the plugin is \texttt{my-plugin};
+  \item the name of the plugin is \texttt{<my-plugin>};
   \item the plugin must at least include the library
     \texttt{frama-c-<my-plugin>.core}.
   \end{itemize}
@@ -402,26 +402,20 @@ These new options also appear in the inline help for the hello plug-in:
 \subsection{About the plug-in build process}
 
 As mentioned before, each plug-in needs a module declaring its public API.
-In our examples, this was file \verb|Hello.ml|, which was left empty.
+In our examples, this was file \verb|hello.ml|, which was left empty.
 To make it more explicit to future users of our plug-in, it is customary to
 add a comment such as the following:
 
-\listingname{./Hello.ml}
-\ocamlinput{./tutorial/hello/v5-multiple/Hello.ml}
-
-\begin{important}
-  Note the unusual capitalization of the filename \texttt{Hello.ml}, which
-  must correspond to the name of the plug-in specified in the Dune file
-  (the \texttt{name} part inside \texttt{library}).
-\end{important}
+\listingname{./hello.ml}
+\ocamlinput{./tutorial/hello/v5-multiple/hello.ml}
 
 Note that, to avoid issues, the name of each compilation unit
 (here \texttt{hello\_world}) must be different from the plug-in name set in
-the \texttt{dune} file (here \texttt{Hello}), from any other plug-in names
+the \texttt{dune} file (here \texttt{hello}), from any other plug-in names
 (\eg \texttt{eva}, \texttt{wp}, etc.) and from any other \framac kernel
 \caml files (\eg \texttt{plugin}).
 
-The module name chosen by a plug-in (here \texttt{Hello}) is used by Dune to
+The module name chosen by a plug-in (here \texttt{hello}) is used by Dune to
 {\em pack} that plug-in; any functions declared in it become part of the
 plug-in's public API. They become accessible to other plug-ins and need to be
 maintained by the plug-in developer. Leaving it empty avoids exposing
@@ -432,7 +426,7 @@ packed module. It can be installed along with the other \framac plug-ins using
 \verb|dune install|.
 
 You can then just launch \texttt{frama-c} (without any options), and the
-\texttt{Hello} plug-in will be automatically loaded. Check it with the command
+\texttt{hello} plug-in will be automatically loaded. Check it with the command
 \verb|frama-c -hello-help|.
 
 You can uninstall it by running \verb|dune uninstall|.
@@ -735,11 +729,11 @@ This relies on \odoc and requires the plug-in to be documented following the
 
 We show here how the Hello plug-in could be slightly documented and use
 \odoc features such as @-tags and cross references. First, we modify the
-\texttt{Hello.ml} file to export all inner modules, otherwise \odoc will not
+\texttt{hello.ml} file to export all inner modules, otherwise \odoc will not
 generate documentation for them:
 
-\listingname{./Hello.ml}
-\ocamlinput{./tutorial/hello/v7-doc/Hello.ml}
+\listingname{./hello.ml}
+\ocamlinput{./tutorial/hello/v7-doc/hello.ml}
 
 Then, we add some documentation tags to our modules:
 
