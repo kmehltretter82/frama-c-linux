@@ -192,16 +192,13 @@ Note that \verb|camlp5| is not among the dependencies declared in
 Since the adoption of Dune, \framac's \texttt{Makefile}s were largely
 simplified. They are still used for some tasks, partially due to conciseness
 (\verb|make| is shorter than \verb|dune build|), partially because some tasks
-are better suited for them.
+are better suited for them. Some standards targets are defined in various
+Makefiles that are installed in \framac's shared directory.
 
-Plug-in developers usually just need to copy and paste the existing Makefile
-template and rename the opam file name (\verb|frama-c-<plugin>.opam|).
+A minimal plugin's \verb|Makefile| can thus be the following:
 
-This Makefile reuses code from other Makefiles, distributed in Frama-C's
-{\em share} directory, such as \verb|Makefile.testing|,
-\verb|Makefile.installation|, etc. Their names indicate the kinds of features
-they provide. Many are shortcuts for specific dune targets, but they also
-provide linting and copyright headers-related features.
+\listingname{Makefile}
+\makeinput{./tutorial/hello/src/Makefile}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

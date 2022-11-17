@@ -391,10 +391,18 @@ literate=%
   basicstyle=\lp@inline,%
 }
 
+\lstdefinestyle{make-basic}{%
+  language=Makefile,%
+  style=framac-code-style,%
+  basicstyle=\lp@inline,%
+}
+
 \newcommand{\ocamlinput}[2][]{\lstinputlisting[style=ocaml-basic,#1]{#2}}
 \lstnewenvironment{ocamlcode}[1][]{\lstset{style=ocaml-basic,#1}}{}
 \newcommand{\duneinput}[2][]{\lstinputlisting[style=dune-basic,#1]{#2}}
 \lstnewenvironment{dunecode}[1][]{\lstset{style=dune-basic,#1}}{}
+\newcommand{\makeinput}[2][]{\lstinputlisting[style=make-basic,#1]{#2}}
+\lstnewenvironment{makecode}[1][]{\lstset{style=make-basic,#1}}{}
 % --------------------------------------------------------------------------
 \lstdefinelanguage{Why}{%
   morekeywords={
