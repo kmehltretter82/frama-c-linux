@@ -881,6 +881,10 @@ please contact us if you need some help for migrating it.
 Previously for a plug-in named \texttt{Plugin}, only the file
 \texttt{Plugin.mli} was necessary to expose the signature of the plug-in. Now,
 one has to also provide an implementation file \texttt{Plugin.ml}.
+On the other hand, it is not necessary that it begins with a capital letter
+anymore: you can have \texttt{plugin.ml} and \texttt{plugin.mli}. If these files
+are not present, all functions included in the modules constituting the
+plug-in will be exported.
 
 For most plug-ins, the \texttt{autoconf} and \texttt{configure} will be useless.
 In particular, \framac does not provide any \texttt{autoconf} and
