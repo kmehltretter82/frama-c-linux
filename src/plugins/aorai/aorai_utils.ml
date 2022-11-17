@@ -1198,7 +1198,7 @@ let automaton_locations loc =
    FromAny) ::
   auto_state
 
-let extract_lval acc lv =
+let extract_lval acc term =
   let acc = ref acc in
   let vis =
     object
@@ -1208,7 +1208,7 @@ let extract_lval acc lv =
         DoChildren
     end
   in
-  ignore (Visitor.visitFramacTerm vis lv);
+  ignore (Visitor.visitFramacTerm vis term);
   !acc
 
 let add_lval cond kf st acc =
