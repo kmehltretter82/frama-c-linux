@@ -1252,7 +1252,7 @@ let add_lval cond kf st acc =
 
 let automaton_assigns kf st loc =
   let assigns = automaton_locations loc in
-  let from_automaton = fst (List.split (automaton_locations loc)) in
+  let from_automaton, _ = List.split assigns in
   let vars =
     List.fold_left
       (fun acc tr ->
