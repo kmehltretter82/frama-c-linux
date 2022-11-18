@@ -34,29 +34,29 @@ plug-in's documentation for installation instructions.
 \section{Loading Plug-ins}\label{sec:use-plugins}
 
 At launch, \FramaC loads all plug-ins in the
-directories indicated by \texttt{frama-c \optionuse{-}{print-plugin-path}} (see
-Section~\ref{sec:var-plugin}). \FramaC can locate plug-ins in additional
-directories by using the option \texttt{\optiondef{-}{add-path} <paths>}.
-To prevent this behavior, you can use option
+directories indicated by \texttt{frama-c \optionuse{-}{print-plugin-path}}.
+These directories contain \texttt{META} files which are used by Dune to
+automatically load these plug-ins.
+
+Like other OCaml libraries, \FramaC plug-ins can be located via the environment
+variable \texttt{OCAMLPATH}\index{OCAMLPATH}. It does not need to be set by
+default, but if you install \FramaC in a non-standard directory
+(e.g. \texttt{<PREFIX>}), you may need to add directory \texttt{<PREFIX>/lib}
+to \texttt{OCAMLPATH}.
+
+To prevent \FramaC from automatically loading any plug-ins, you can use option
 \optiondef{-}{no-autoload-plugins}.
 
 Another way to load a plug-in is to set the
 \texttt{\optiondef{-}{load-module} <files>} or
-\texttt{\optiondef{-}{load-script} <files>} options, using in both cases a
-comma-separated list of specifications, which may be one of the following:
+\texttt{\optiondef{-}{load-library} <dirs>} options.
+The former accepts either a compiled OCaml module (\texttt{.cma},
+\texttt{.cmxa}, \texttt{.cmxs}) or a library name (e.g. \texttt{frama-c-aorai}),
+while the latter accepts library names (e.g. \texttt{frama-c-aorai}).
+Both options can accept comma-separated list of names.
 
-\begin{itemize}
-\item an OCaml source file (in which case it will be compiled);
-\item an OCaml object file (\texttt{.cmo} or \texttt{.cma} if running
-  \FramaC in bytecode, or \texttt{.cmxs} if running \FramaC in native code);
-\item a Findlib package.
-\end{itemize}
-
-File extensions for source and object files may be omitted, e.g.
-\texttt{-load-script file} will search for \texttt{file.ml} and
-\texttt{file.cm*} (where \texttt{cm*} depends if \FramaC is running in
-bytecode or native code).
-
+File extensions may be omitted, e.g.
+\texttt{-load-module file} will search for \texttt{file.cm*}.
 
 \begin{important}
 In general, plug-ins must be compiled with the
