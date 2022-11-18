@@ -28,6 +28,24 @@ enum aorai_OpStatusList {
      ensures aorai_CurOperation ≡ op_isPresentRec;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
              WillDoFoo;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns End
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns Idle
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns IgnoreFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns WillDoFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
      
      behavior buch_state_End_out:
        ensures 0 ≡ End;
@@ -82,6 +100,24 @@ enum aorai_OpStatusList {
      ensures aorai_CurOperation ≡ op_isPresentRec;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
              WillDoFoo;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo, res;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo, res;
+     assigns End
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo, res;
+     assigns Idle
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo, res;
+     assigns IgnoreFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo, res;
+     assigns WillDoFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo, res;
      
      behavior buch_state_End_out:
        ensures 0 ≡ End;
@@ -206,6 +242,24 @@ int isPresentRec(int *t, int i, int max, int val)
      ensures aorai_CurOperation ≡ op_isPresent;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
              WillDoFoo;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns End
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns Idle
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns IgnoreFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns WillDoFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
      
      behavior buch_state_End_out:
        ensures 0 ≡ End;
@@ -259,6 +313,24 @@ int isPresentRec(int *t, int i, int max, int val)
      ensures aorai_CurOperation ≡ op_isPresent;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
              WillDoFoo;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo, res;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo, res;
+     assigns End
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo, res;
+     assigns Idle
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo, res;
+     assigns IgnoreFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo, res;
+     assigns WillDoFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo, res;
      
      behavior buch_state_End_in:
        assumes 1 ≡ IgnoreFoo ∧ res ≢ -1;
@@ -348,6 +420,24 @@ int isPresent(int *t, int max, int val)
      ensures aorai_CurOperation ≡ op_foo;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
              WillDoFoo;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns End
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns Idle
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns IgnoreFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns WillDoFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
      
      behavior buch_state_End_in:
        assumes 1 ≡ WillDoFoo;
@@ -398,6 +488,24 @@ int isPresent(int *t, int max, int val)
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_foo;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns End
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns Idle
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns IgnoreFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns WillDoFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
              WillDoFoo;
      
      behavior buch_state_End_in:
@@ -464,6 +572,24 @@ void foo(void)
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
              WillDoFoo;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns End
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns Idle
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns IgnoreFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns WillDoFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
      
      behavior buch_state_End_out:
        ensures 0 ≡ End;
@@ -514,6 +640,24 @@ void foo(void)
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns End
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns Idle
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns IgnoreFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
+             WillDoFoo;
+     assigns WillDoFoo
+       \from aorai_CurOpStatus, aorai_CurOperation, End, Idle, IgnoreFoo,
              WillDoFoo;
      
      behavior buch_state_End_in:

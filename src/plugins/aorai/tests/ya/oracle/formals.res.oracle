@@ -52,7 +52,9 @@ check lemma aorai_intermediate_state_2_deterministic_trans{L}:
      \at(aorai_x_0,L) ≡ 3 ∧
      (¬(\at(aorai_CurOperation,L) ≡ op_f ∧
          \at(aorai_CurOpStatus,L) ≡ aorai_Terminated) ∨
-      \at(aorai_x_0,L) ≢ 3));
+      (\at(aorai_CurOperation,L) ≡ op_f ∧
+       \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧
+       \at(aorai_x_0,L) ≢ 3)));
  */
 /*@ ghost int aorai_y = 0; */
 /*@
@@ -62,7 +64,8 @@ check lemma aorai_intermediate_state_1_deterministic_trans{L}:
      \at(aorai_y,L) ≡ 2 ∧
      (¬(\at(aorai_CurOperation,L) ≡ op_g ∧
          \at(aorai_CurOpStatus,L) ≡ aorai_Terminated) ∨
-      \at(aorai_y,L) ≢ 2));
+      (\at(aorai_CurOperation,L) ≡ op_g ∧
+       \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ \at(aorai_y,L) ≢ 2)));
  */
 /*@ ghost int aorai_x = 0; */
 /*@
@@ -72,7 +75,8 @@ check lemma aorai_intermediate_state_deterministic_trans{L}:
      \at(aorai_x,L) ≡ 1 ∧
      (¬(\at(aorai_CurOperation,L) ≡ op_f ∧
          \at(aorai_CurOpStatus,L) ≡ aorai_Terminated) ∨
-      \at(aorai_x,L) ≢ 1));
+      (\at(aorai_CurOperation,L) ≡ op_f ∧
+       \at(aorai_CurOpStatus,L) ≡ aorai_Terminated ∧ \at(aorai_x,L) ≢ 1)));
  */
 /*@ ghost
   /@ requires aorai_CurStates ≡ main_0;
@@ -81,6 +85,12 @@ check lemma aorai_intermediate_state_deterministic_trans{L}:
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_x_0, aorai_x, aorai_CurOpStatus, aorai_CurOperation,
              aorai_CurStates;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates, x;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates, x;
+     assigns aorai_CurStates
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates, x;
      
      behavior buch_state_OK_out:
        ensures aorai_CurStates ≢ OK;
@@ -166,6 +176,15 @@ check lemma aorai_intermediate_state_deterministic_trans{L}:
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates,
+             aorai_x_0, aorai_x;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates,
+             aorai_x_0, aorai_x;
+     assigns aorai_CurStates
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates,
+             aorai_x_0, aorai_x;
      
      behavior buch_state_OK_in:
        assumes
@@ -321,6 +340,12 @@ int f(int x)
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_g;
      assigns aorai_y, aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
+     assigns aorai_CurStates
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
      
      behavior buch_state_OK_in:
        assumes aorai_CurStates ≡ OK;
@@ -395,6 +420,12 @@ int f(int x)
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_g;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates, aorai_y;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates, aorai_y;
+     assigns aorai_CurStates
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates, aorai_y;
      
      behavior buch_state_OK_in:
        assumes
@@ -505,6 +536,12 @@ int g(int y)
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
+     assigns aorai_CurStates
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
      
      behavior buch_state_OK_out:
        ensures aorai_CurStates ≢ OK;
@@ -552,6 +589,12 @@ int g(int y)
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
+     assigns aorai_CurStates
+       \from aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;
      
      behavior buch_state_OK_in:
        assumes aorai_CurStates ≡ OK;

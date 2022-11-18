@@ -1198,7 +1198,80 @@ let automaton_locations loc =
    FromAny) ::
   auto_state
 
-let automaton_assigns loc = Writes (automaton_locations loc)
+let extract_lval acc term =
+  let acc = ref acc in
+  let vis =
+    object
+      inherit Visitor.frama_c_inplace
+      method! vterm_lval lv =
+        acc := Cil_datatype.Term_lval.Set.add lv !acc;
+        DoChildren
+    end
+  in
+  ignore (Visitor.visitFramacTerm vis term);
+  !acc
+
+let add_lval cond kf st acc =
+  (* check whether the condition is always true or false and which
+     variables may be read. *)
+  let rec aux cond acc =
+  match cond with
+  | TOr (c1,c2) ->
+    (match aux c1 acc with
+     | TTrue, _ -> TTrue, acc (* lazy evaluation: we don't read c2 (and
+                                don't care about variable in c1, since
+                                they do not affect result. *)
+     | TFalse, _ -> aux c2 acc
+     | _, acc -> aux c2 acc)
+  | TAnd (c1,c2) ->
+    (match aux c1 acc with
+     | TTrue, _ -> aux c2 acc
+     | TFalse, _ -> TFalse, acc
+     | _, acc -> aux c2 acc)
+  | TNot c ->
+    (match aux c acc with
+     | TTrue, _ -> TFalse, acc
+     | TFalse, _ -> TTrue, acc
+     | res -> res)
+  | TCall (kf', _) -> (* TODO: take potential behavior into account. *)
+    if Kernel_function.equal kf' kf && st = Automaton_ast.Call then begin
+      TTrue, acc
+    end else begin
+      TFalse, acc
+    end
+  | TReturn kf' ->
+    if Kernel_function.equal kf' kf && st = Automaton_ast.Return then
+      TTrue, acc
+    else
+      TFalse, acc
+  | TTrue -> TTrue, acc
+  | TFalse -> TFalse, acc
+  | TRel(_,t1,t2) -> cond, extract_lval (extract_lval acc t1) t2
+  in
+  snd (aux cond.cross acc)
+
+let automaton_assigns kf st loc =
+  let assigns = automaton_locations loc in
+  let from_automaton, _ = List.split assigns in
+  let vars =
+    List.fold_left
+      (fun acc tr ->
+         add_lval tr kf st acc)
+      Cil_datatype.Term_lval.Set.empty
+       (Data_for_aorai.getAutomata()).trans
+  in
+  let from_vars =
+    Cil_datatype.Term_lval.Set.fold
+      (fun x acc ->
+         Logic_const.new_identified_term
+           (Logic_const.term ~loc (TLval x) (Cil.typeOfTermLval x))
+         ::acc)
+      vars []
+  in
+  let refresh () =
+    List.map Logic_const.refresh_identified_term (from_automaton @ from_vars)
+  in
+  Writes (List.map (fun (x,_) -> (x, From (refresh()))) assigns)
 
 let aorai_assigns state loc =
   let merged_states =
@@ -1919,7 +1992,7 @@ let auto_func_behaviors loc f st state =
     in
     concat_assigns new_assigns assigns, new_behaviors @ behaviors
   in
-  let assigns = automaton_assigns loc in
+  let assigns = automaton_assigns f st loc in
   let assigns, behaviors = (List.fold_left mk_behavior (assigns,[]) states) in
   let global_behavior =
     Cil.mk_behavior ~requires ~post_cond ~assigns ()

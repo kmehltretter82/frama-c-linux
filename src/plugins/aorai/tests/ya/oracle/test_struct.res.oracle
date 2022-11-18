@@ -25,6 +25,14 @@ int myAge = 0;
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_increment;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, main_0;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
+     assigns S1
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
+     assigns main_0
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
      
      behavior buch_state_S1_in:
        assumes 1 ≡ S1 ∧ nobody.Age ≡ 1;
@@ -63,6 +71,14 @@ int myAge = 0;
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_increment;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, main_0;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
+     assigns S1
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
+     assigns main_0
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
      
      behavior buch_state_S1_in:
        assumes 1 ≡ S1 ∧ nobody.Age ≡ 1;
@@ -118,6 +134,14 @@ void increment(void)
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, main_0;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
+     assigns S1
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
+     assigns main_0
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
      
      behavior buch_state_S1_in:
        assumes 1 ≡ main_0 ∧ nobody.Age ≡ 0;
@@ -156,6 +180,14 @@ void increment(void)
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_main;
      assigns aorai_CurOpStatus, aorai_CurOperation, S1, main_0;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
+     assigns S1
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
+     assigns main_0
+       \from aorai_CurOpStatus, aorai_CurOperation, S1, main_0, nobody.Age;
      
      behavior buch_state_S1_in:
        assumes 1 ≡ S1 ∧ nobody.Age ≡ 1;

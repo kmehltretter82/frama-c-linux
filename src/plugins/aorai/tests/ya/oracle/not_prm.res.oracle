@@ -18,6 +18,12 @@ enum aorai_OpStatusList {
      ensures aorai_CurOpStatus ≡ aorai_Called;
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_CurOpStatus, aorai_CurOperation, S0, Sf;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, S0, Sf, x;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, S0, Sf, x;
+     assigns S0 \from aorai_CurOpStatus, aorai_CurOperation, S0, Sf, x;
+     assigns Sf \from aorai_CurOpStatus, aorai_CurOperation, S0, Sf, x;
      
      behavior buch_state_S0_out:
        ensures 0 ≡ S0;
@@ -55,6 +61,12 @@ enum aorai_OpStatusList {
      ensures aorai_CurOpStatus ≡ aorai_Terminated;
      ensures aorai_CurOperation ≡ op_f;
      assigns aorai_CurOpStatus, aorai_CurOperation, S0, Sf;
+     assigns aorai_CurOpStatus
+       \from aorai_CurOpStatus, aorai_CurOperation, S0, Sf;
+     assigns aorai_CurOperation
+       \from aorai_CurOpStatus, aorai_CurOperation, S0, Sf;
+     assigns S0 \from aorai_CurOpStatus, aorai_CurOperation, S0, Sf;
+     assigns Sf \from aorai_CurOpStatus, aorai_CurOperation, S0, Sf;
      
      behavior buch_state_S0_out:
        ensures 0 ≡ S0;
