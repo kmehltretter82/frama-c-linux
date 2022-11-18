@@ -893,6 +893,14 @@ please contact us if you need some help for migrating it.
 
 \subsection{Files organization changes}
 
+\begin{important}
+Due to the way \texttt{dune} operates, it is preferable to work on the migration
+starting from a ``clean'' directory, without compilation and tests
+(in \texttt{result} directory of the test suites) artifacts. Otherwise,
+\texttt{dune} will complain about conflicts between files being both present
+in the original source directory and the target of a compilation rule.
+\end{important}
+
 Previously for a plug-in named \texttt{Plugin}, only the file
 \texttt{Plugin.mli} was necessary to expose the signature of the plug-in. Now,
 one has to also provide an implementation file \texttt{Plugin.ml}.
