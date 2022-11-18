@@ -195,7 +195,7 @@ export default function ASTview(): JSX.Element {
         buffer.forEach((cm) => {
           markers.forEach((marker) => {
             const line = marker.find()?.from.line;
-            if (line) cm.setGutterMarker(line, 'bullet', bullet);
+            if (line !== undefined) cm.setGutterMarker(line, 'bullet', bullet);
           });
         });
       }
