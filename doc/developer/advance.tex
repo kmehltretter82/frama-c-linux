@@ -192,7 +192,7 @@ Note that \verb|camlp5| is not among the dependencies declared in
 Since the adoption of Dune, \framac's \texttt{Makefile}s were largely
 simplified. They are still used for some tasks, partially due to conciseness
 (\verb|make| is shorter than \verb|dune build|), partially because some tasks
-are better suited for them. Some standards targets are defined in various
+are better suited for them. Some standard targets are defined in various
 Makefiles that are installed in \framac's shared directory.
 
 A minimal plugin's \verb|Makefile| can thus be the following:
@@ -825,9 +825,9 @@ one for regular tests (if more than one \verb|OPT|).\\
 \hline
 \verb|PTEST_ORACLE| & basename of the current oracle file (macro only usable in FILTER directives)\\
 \hline
-\verb|PTEST_MODULE| & current list of module defined by the \verb|MODULE| directive\\
+\verb|PTEST_MODULE| & current list of modules defined by the \verb|MODULE| directive\\
 \hline
-\verb|PTEST_LIBS| & current list of module defined by the \verb|LIBS| directive\\
+\verb|PTEST_LIBS| & current list of modules defined by the \verb|LIBS| directive\\
 \hline
 \verb|PTEST_PLUGIN| & current list of plugins defined by the \verb|PLUGIN| directive\\
 \hline
@@ -4196,9 +4196,9 @@ the \texttt{opam} integration within
 \texttt{dune}\footnote{\url{https://dune.readthedocs.io/en/stable/opam.html}}.
 Basically, the \index{dune-project}\texttt{dune-project} file
 (see Section~\ref{tut2:hello}) should contain a stanza
-\texttt{(generate\_opam\_files true)}, as well as a few meta-information
+\texttt{(generate\_opam\_files true)}, as well as some meta-information
 (location of the sources, licence, author(s), etc.). It is also possible to
-provide these information into a file \texttt{my-plugin-package.opam.template},
+provide this information in a file \texttt{my-plugin-package.opam.template},
 assuming \texttt{my-plugin-package} is the name of the package of the plug-in in
 the \texttt{dune-project} file. See the dune documentation for detailed information
 about the creation of the \texttt{opam} file.
