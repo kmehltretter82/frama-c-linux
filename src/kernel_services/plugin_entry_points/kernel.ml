@@ -869,7 +869,7 @@ module LoadModule =
       let module_name = "LoadModule"
       let arg_name = "SPEC,..."
       let help = "Dynamically load modules. \
-                  Each <SPEC> can be object file, with \
+                  Each <SPEC> can be an object file, with \
                   or without extension, or a Findlib package. \
                   Loading order is preserved, but after plugins and libraries."
     end)
