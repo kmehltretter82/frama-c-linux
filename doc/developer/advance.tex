@@ -214,9 +214,12 @@ have to explicitly instruct \framac to load it through option
 
 Other Makefiles include \texttt{Makefile.documentation}, providing the
 \texttt{doc} for generating the documentation (see Section~\ref{tut2:doc}),
-and \texttt{Makefile.headers} and \texttt{Makefile.linting} which are used
-by \framac itself to manage headers and perform various syntactic checks
-(though, of course, you can reuse them at will).
+and \texttt{Makefile.linting} which is used
+by \framac itself to perform various syntactic checks through target
+\texttt{check-lint} and fix indentation issues through \texttt{lint}. If
+you want to use the same conventions as \framac itself, you'll need to
+have \texttt{ocp-indent} installed to launch these targets.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
