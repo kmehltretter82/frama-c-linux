@@ -200,6 +200,24 @@ A minimal plugin's \verb|Makefile| can thus be the following:
 \listingname{Makefile}
 \makeinput{./tutorial/hello/src/Makefile}
 
+\texttt{Makefile.testing} introduces various targets related to \framac's
+testing infrastructure (see Section~\ref{adv:ptests}). This includes notably
+\texttt{tests} to run all the tests of the plugin, after having taken care of
+generating the corresponding \texttt{dune} files.
+
+\texttt{Makefile.installation} provides two targets, \texttt{install} and
+\texttt{uninstall}. By default, installation will occur in the current
+\texttt{opam} switch, but this can be modified by using the \texttt{PREFIX}
+variable (note that if you install your plugin in a non-default place, you will
+have to explicitly instruct \framac to load it through option
+\texttt{-load-plugin}.
+
+Other Makefiles include \texttt{Makefile.documentation}, providing the
+\texttt{doc} for generating the documentation (see Section~\ref{tut2:doc}),
+and \texttt{Makefile.headers} and \texttt{Makefile.linting} which are used
+by \framac itself to manage headers and perform various syntactic checks
+(though, of course, you can reuse them at will).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Testing}\label{adv:ptests}\index{Test|bfit}

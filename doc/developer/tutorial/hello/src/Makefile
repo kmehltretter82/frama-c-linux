@@ -1,16 +1,13 @@
 FRAMAC_SHARE:=$(shell frama-c-config -print-share-path)
 
-sinclude ${FRAMAC_SHARE}/Makefile.common
+## Common definitions
 
-##########################################################################
+include ${FRAMAC_SHARE}/Makefile.common
 
-# Tests
+## Tests-related targets
 
 include ${FRAMAC_SHARE}/Makefile.testing
 
-##########################################################################
-
-# Install
+## Installation-related targets
 
 include ${FRAMAC_SHARE}/Makefile.installation
-
