@@ -308,14 +308,13 @@ the starting point of the program and globals have their initial value.
 -load *file*
 : loads the (previously saved) state contained in *file*.
 
--load-module *SPEC*
-: dynamically load OCaml plug-ins, modules and scripts. Each *SPEC* can be an
-OCaml source or object file, with or without extension, or a Findlib package.
-Loading order is preserved and additional dependencies can be listed in
-***.depend** files.
+-load-library *module*
+: dynamically load libraries. Loading order is preserved.
 
--load-script *SPEC*
-: alias for option **-load-module**.
+-load-module *SPEC*
+: dynamically load modules. Each <SPEC> can be an object file, with or without
+  extension, or a Findlib package.
+  Loading order is preserved, but after plugins and libraries.
 
 -machdep *machine*
 : uses *machine* as the current machine-dependent configuration (size of the
