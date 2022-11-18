@@ -30,16 +30,16 @@
 
 module CTypes : sig
   (** placeholder for cil types *)
-  type expr (**  expressions *)
+  type expr (*  expressions *)
 
-  type lval (** L-Values *)
-  type varinfo (** variables *)
+  type lval (* lvalues *)
+  type varinfo (* variables *)
 
-  module LSet : sig type t end (** sets of L-Values *)
+  module LSet : sig type t end (* sets of lvalues *)
 
-  type stmt (** statements *)
+  type stmt (* statements *)
   
-  type kf (** functions *)
+  type kf (* functions *)
   
 end
 
@@ -64,19 +64,20 @@ module AbstractState : sig
   (** placeholder for the abstract state *)
   type t (* abstract state of the program, will be a points-to graph with additional information *)
 
+  type ecr (* equivalence class representative *)
+  
   type summary (* summary of a function *)
 
 end
 
 
-
 (** evaluation of an expression *)
-val eval_expr : t -> CTypes.expr -> ECR.t
+val eval_expr : AbstractState.t -> CTypes.expr -> AbstractState.ecr
 
 (** abstract semantic of an instruction *)
-val do_instr : t -> CTypes.instr -> t
+val do_instr : AbstractState.t -> CTypes.stmt -> AbstractState.t
 
 (** creation of the summary of a function; first argument is the context of the declaration *)
-val make_summary : t -> CTypes.kf -> (t * summary)
+val make_summary : AbstractState.t -> CTypes.kf -> (AbstractState.t * AbstractState.summary)
 
-val fold_stmt : CTypes.kf -> CTypes.varinfo -> ECR.t -> 'a -> 'a
+val fold_stmt : CTypes.kf -> CTypes.varinfo -> AbstractState.ecr -> 'a -> 'a
