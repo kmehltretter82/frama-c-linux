@@ -1215,38 +1215,38 @@ let add_lval cond kf st acc =
   (* check whether the condition is always true or false and which
      variables may be read. *)
   let rec aux cond acc =
-  match cond with
-  | TOr (c1,c2) ->
-    (match aux c1 acc with
-     | TTrue, _ -> TTrue, acc (* lazy evaluation: we don't read c2 (and
-                                don't care about variable in c1, since
-                                they do not affect result. *)
-     | TFalse, _ -> aux c2 acc
-     | _, acc -> aux c2 acc)
-  | TAnd (c1,c2) ->
-    (match aux c1 acc with
-     | TTrue, _ -> aux c2 acc
-     | TFalse, _ -> TFalse, acc
-     | _, acc -> aux c2 acc)
-  | TNot c ->
-    (match aux c acc with
-     | TTrue, _ -> TFalse, acc
-     | TFalse, _ -> TTrue, acc
-     | res -> res)
-  | TCall (kf', _) -> (* TODO: take potential behavior into account. *)
-    if Kernel_function.equal kf' kf && st = Automaton_ast.Call then begin
-      TTrue, acc
-    end else begin
-      TFalse, acc
-    end
-  | TReturn kf' ->
-    if Kernel_function.equal kf' kf && st = Automaton_ast.Return then
-      TTrue, acc
-    else
-      TFalse, acc
-  | TTrue -> TTrue, acc
-  | TFalse -> TFalse, acc
-  | TRel(_,t1,t2) -> cond, extract_lval (extract_lval acc t1) t2
+    match cond with
+    | TOr (c1,c2) ->
+      (match aux c1 acc with
+       | TTrue, _ -> TTrue, acc (* lazy evaluation: we don't read c2 (and
+                                   don't care about variable in c1, since
+                                   they do not affect result. *)
+       | TFalse, _ -> aux c2 acc
+       | _, acc -> aux c2 acc)
+    | TAnd (c1,c2) ->
+      (match aux c1 acc with
+       | TTrue, _ -> aux c2 acc
+       | TFalse, _ -> TFalse, acc
+       | _, acc -> aux c2 acc)
+    | TNot c ->
+      (match aux c acc with
+       | TTrue, _ -> TFalse, acc
+       | TFalse, _ -> TTrue, acc
+       | res -> res)
+    | TCall (kf', _) -> (* TODO: take potential behavior into account. *)
+      if Kernel_function.equal kf' kf && st = Automaton_ast.Call then begin
+        TTrue, acc
+      end else begin
+        TFalse, acc
+      end
+    | TReturn kf' ->
+      if Kernel_function.equal kf' kf && st = Automaton_ast.Return then
+        TTrue, acc
+      else
+        TFalse, acc
+    | TTrue -> TTrue, acc
+    | TFalse -> TFalse, acc
+    | TRel(_,t1,t2) -> cond, extract_lval (extract_lval acc t1) t2
   in
   snd (aux cond.cross acc)
 
@@ -1258,7 +1258,7 @@ let automaton_assigns kf st loc =
       (fun acc tr ->
          add_lval tr kf st acc)
       Cil_datatype.Term_lval.Set.empty
-       (Data_for_aorai.getAutomata()).trans
+      (Data_for_aorai.getAutomata()).trans
   in
   let from_vars =
     Cil_datatype.Term_lval.Set.fold

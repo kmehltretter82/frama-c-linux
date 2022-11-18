@@ -314,17 +314,17 @@ let tand t1 t2 =
 
 let rec tnot t =
   match t with
-    | TTrue -> TFalse
-    | TFalse -> TTrue
-    | TNot t -> t
-    | TAnd (TCall (c,b), t) ->
-      TOr (TNot (TCall (c,b)), TAnd(TCall (c,b), tnot t))
-    | TAnd (TReturn c, t) ->
-      TOr (TNot (TReturn c), TAnd(TReturn c, tnot t))
-    | TAnd (t1,t2) -> TOr(tnot t1, tnot t2)
-    | TOr (t1,t2) -> TAnd(tnot t1, tnot t2)
-    | TRel(rel,t1,t2) -> TRel(opposite_rel rel, t1, t2)
-    | TCall _ | TReturn _ -> TNot t
+  | TTrue -> TFalse
+  | TFalse -> TTrue
+  | TNot t -> t
+  | TAnd (TCall (c,b), t) ->
+    TOr (TNot (TCall (c,b)), TAnd(TCall (c,b), tnot t))
+  | TAnd (TReturn c, t) ->
+    TOr (TNot (TReturn c), TAnd(TReturn c, tnot t))
+  | TAnd (t1,t2) -> TOr(tnot t1, tnot t2)
+  | TOr (t1,t2) -> TAnd(tnot t1, tnot t2)
+  | TRel(rel,t1,t2) -> TRel(opposite_rel rel, t1, t2)
+  | TCall _ | TReturn _ -> TNot t
 
 let tands l = List.fold_right tand l TTrue
 
