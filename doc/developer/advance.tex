@@ -1040,6 +1040,28 @@ Provided that the \lstinline{dune} files are ready. The plug-in can now be
 built using the command \texttt{dune build @install}. The file
 \lstinline{Makefile.in} can now be removed.
 
+\subsection{Installing Additional Files}
+
+If your plug-in has additional files to install besides the compiled files,
+themselves (typically, files in \texttt{share}), you can use an
+\texttt{install} stanza in the \texttt{dune} file, as in:
+
+\begin{dunecode}
+(install
+  (package frama-c-myplugin)
+  (section (site (frama-c share)))
+  (files (share/myfile as frama-c-myplugin/myfile)))
+\end{dunecode}
+
+With the stanza above, the installation of package \texttt{frama-c-myplugin}
+will copy \texttt{myfile} from the \texttt{share} directory
+of the plug-in sources into the \texttt{frama-c-myplugin} directory inside
+the \texttt{share} directory of \framac's installation. Other target sections
+are available (e.g. \texttt{bin} for installing an additional executable), see
+the \texttt{dune}
+manual\footnote{\url{https://dune.readthedocs.io/en/stable/dune-files.html\#install-1}}
+for more information.
+
 \subsection{Migrating tests}
 
 In the \texttt{test\_config*} files, the \texttt{PLUGIN} field is now mandatory
