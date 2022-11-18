@@ -2202,11 +2202,10 @@ The function \lstinline|Analysis.compute| starts an analysis, and other
 functions of the \lstinline|Analysis| module inform about the status of the
 current analysis.
 
-The \lstinline|Results| module provides access to the analysis results,
-and especially to the possible values of any expressions and memory locations
-of any lvalues at each program point.
-The idea behind the \lstinline|Results| API is that requests are decomposed
-in several steps:
+The \lstinline|Results| module provides access to the analysis results.
+In particular, it allows the evaluation of the possible values of
+arbitrary lvalues or expressions at any program point.
+Such evaluation is decomposed in several steps:
 \begin{enumerate}
 \item first, a \lstinline|request| is built by stating where it should be
   evaluated: before or after a statement, at the start of a function, etc.
