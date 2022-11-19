@@ -25,80 +25,35 @@
 
 (** Module abstract_state
 
-    implements "points-to" persistent graphs ans Steensgaard's
-   algorithm
+    implements "points-to" persistent graphs and Steensgaard's
+   algorithm (union-find)
 
     In the graph:
 
     - Edges are unlabelled.
 
-    - Vertices are labelled by equivalence classes representative
-   (ECR)
-
-    ECR are abstract states for Lval sets (pointers that may be
-   aliased)
+    - Vertices are labelled by lvalues
 
 
- *)
+    An abstract state is given by:
 
-module CType : sig
-  (** placeholder for cil types *)
-  type expr (**  expressions *)
+    - a points-to graph
 
-  type instr (** instructions *)
-
-  type varinfo (** variable *)
-  
-  type kf (** functions *)  
-end
+    - an union-find structure that encodes equivalence classes
 
 
-
-module ECR : sig
-  (** module for the equivalence class, cf Steensgaard's paper *)
-  
-
-  (*  following Steensgaard's notations *)
-  type alpha = Tau of tau  | Lambda of lambda
-
-  and tau = Bottom_T | Ref of alpha (* points-to type *)
-
-  and lambda = Bottom_L | Lam of alpha list * alpha list
-
-  
-
-  type t (* type ECR = equivalence class representant *)
+    TODO/question: can we use the equivalence relation as an equality to build the graph (not sure)
 
 
-  (* functions needed for Steensgaard's algorithm *)
-    
-  (*  TODO : do it in a procedural or a functional style ? *)
-    
-  val get_type: t -> tau
+*)
 
-  val join : t -> t -> unit (* join of ecr *)
-
-  val cjoin : t -> t -> unit (*  conditional join *)
-
-  val ecr : CType.expr -> t
-
-  val set_type : tau -> tau -> unit
-
-  val unify_T : tau -> tau -> unit
-    
-  val unify_L : lambda -> lambda -> unit
-
-  val pending : tau -> tau list
-  
-  val make_ecr : int -> tau array (* makes an array of [n] Bottom_T *)
-end
-
+open Cil_types
 
 
 (** module for vertices *)
 module V : sig
 
-  type t   (*  will have a field for ECR.t set *)                                                                 
+  type t = lval       (* lvalues *)                                                         
   val compare : t -> t -> int                                                
   val hash : t -> int                                                    
   val equal : t -> t -> bool                                                                 
@@ -109,7 +64,7 @@ module V : sig
 module G :
   sig
     type t
-    (* directed, persistant graph *)
+    (* directed, persistant ?  graph *)
 
     val add_vertex : t -> V.t -> t
 
@@ -123,27 +78,46 @@ module G :
   end
 
 
+module MGU : sig
+  (** module for the equivalence class, cf Steensgaard's paper *)
 
-(**  interface for module Alias *)
+
+  type ecr (* type ECR = equivalence class representant *)
+
   
-
-(** type for abstract states aka points-to graphs  *)
-type t = G.t
+  type t (* union find structure *)
 
 
-(** type for summary of function, to be determined *)
-type summary 
+  (* functions needed for Steensgaard's algorithm *)
+    
+  (*  TODO : do it in a procedural or a functional style ? *)
+    
+  val init : unit -> t
+  
+  val join : t -> ecr -> ecr -> t (* join of ecr *)
 
-(** initialisation *)
-  val compute : unit -> unit
+  val cjoin : t -> ecr -> ecr -> t (*  conditional join *)
 
-(** evaluation of an expression *)
-val eval_expr : t -> CType.expr -> ECR.t
+  val find : t -> exp -> ecr
 
-(** abstract semantic of an instruction *)
-val do_instr : t -> CType.instr -> t
+end
 
-(** creation of the summary of a function; first argument is the context of the declaration *)
-val make_summary : t -> CType.kf -> (t * summary)
 
-val fold_stmt : CType.kf -> CType.varinfo -> ECR.t -> 'a -> 'a
+module AbstractState : sig
+
+  type graph = G.t
+
+  type mgu = MGU.t
+
+  type t = graph * mgu (* we may need additional information *)
+
+  type summary (* summary for functions *)
+
+  (*  TODO : version impérative ? *)
+  val find : t -> exp -> V.t list
+
+  val do_stmt : t -> stmt -> t
+
+  val make_summary : t -> fundec -> t * summary
+    
+end

@@ -27,22 +27,11 @@
 
   
  *)
+open Cil_types
+    
+open Abstract_state
 
-module CTypes : sig
-  (** placeholder for cil types *)
-  type expr (*  expressions *)
-
-  type lval (* lvalues *)
-  type varinfo (* variables *)
-
-  module LSet : sig type t end (* sets of lvalues *)
-
-  type stmt (* statements *)
-  
-  type kf (* functions *)
-  
-end
-
+module LSet : sig type t end (* sets of lvalues *)
 
 (** Performes the may-alias analysis. Do it once before using other functions *)
 val compute : unit -> unit
@@ -50,34 +39,13 @@ val compute : unit -> unit
 (** Minimal API, as presented during kickoff meeting *)
 (* we changed:  type varinfo -> type lval *)
 
-val get_class_before_statement : CTypes.stmt ->  CTypes.lval -> CTypes.LSet.t
-val get_class_after_statement : CTypes.stmt ->  CTypes.lval -> CTypes.LSet.t
+val get_class_before_statement : stmt ->  lval -> LSet.t
+val get_class_after_statement : stmt ->  lval -> LSet.t
 
-val get_class_fundec: CTypes.kf ->CTypes.lval -> CTypes.LSet.t
-val get_class_fundec_stmts: CTypes.kf ->CTypes.lval -> CTypes.LSet.t list
-
-
-
-(** other useful functions *)
-
-module AbstractState : sig
-  (** placeholder for the abstract state *)
-  type t (* abstract state of the program, will be a points-to graph with additional information *)
-
-  type ecr (* equivalence class representative *)
-  
-  type summary (* summary of a function *)
-
-end
+val get_class_fundec: fundec ->lval -> LSet.t
+val get_class_fundec_stmts: fundec -> lval -> LSet.t list
 
 
-(** evaluation of an expression *)
-val eval_expr : AbstractState.t -> CTypes.expr -> AbstractState.ecr
+(** connection with Abstract_state *)
 
-(** abstract semantic of an instruction *)
-val do_instr : AbstractState.t -> CTypes.stmt -> AbstractState.t
-
-(** creation of the summary of a function; first argument is the context of the declaration *)
-val make_summary : AbstractState.t -> CTypes.kf -> (AbstractState.t * AbstractState.summary)
-
-val fold_stmt : CTypes.kf -> CTypes.varinfo -> AbstractState.ecr -> 'a -> 'a
+val concretise : MGU.ecr -> LSet.t
