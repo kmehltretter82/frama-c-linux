@@ -238,7 +238,7 @@ See also \f[B]-pp-annot\f[R].
 when on, load all the dynamic plugins found in the search path (see
 \f[B]-print-plugin-path\f[R] for more information on the default search
 path).
-Otherwise, only plugins requested by \f[B]-load-module\f[R] will be
+Otherwise, only plugins requested by \f[B]-load-plugin\f[R] will be
 loaded.
 Defaults to on.
 .TP
@@ -361,15 +361,21 @@ starting point of the program and globals have their initial value.
 -load \f[I]file\f[R]
 loads the (previously saved) state contained in \f[I]file\f[R].
 .TP
--load-library \f[I]module\f[R]
+-load-library \f[I]library_1,\&...,library_n\f[R]
 dynamically load libraries.
 Loading order is preserved.
+Libraries are loaded between plugins and modules.
 .TP
--load-module \f[I]SPEC\f[R]
+-load-module \f[I]SPEC_1,\&...,SPEC_n\f[R]
 dynamically load modules.
 Each can be an object file, with or without extension, or a Findlib
 package.
 Loading order is preserved, but after plugins and libraries.
+.TP
+-load-plugin \f[I]plugin_1,\&...,plugin_n\f[R]
+dynamically load plugins.
+Loading order is preserved.
+Plugins are loaded before libraries and modules.
 .TP
 -machdep \f[I]machine\f[R]
 uses \f[I]machine\f[R] as the current machine-dependent configuration

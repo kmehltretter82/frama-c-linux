@@ -882,9 +882,10 @@ module LoadLibrary =
     (struct
       let option_name = "-load-library"
       let module_name = "LoadLibrary"
-      let arg_name = "<libname,..."
+      let arg_name = "libname,..."
       let help = "Dynamically load libraries. \
-                  Loading order is preserved, but the load is done between the plugins and the modules."
+                  Loading order is preserved. Libraries are loaded between \
+                  plugins and modules."
     end)
 
 let () = Parameter_customize.set_group saveload
@@ -895,9 +896,10 @@ module LoadPlugin =
     (struct
       let option_name = "-load-plugin"
       let module_name = "LoadPlugin"
-      let arg_name = "SPEC,..."
-      let help = "Dynamically load plug-ins. \
-                  Loading order is preserved."
+      let arg_name = "plugin,..."
+      let help = "Dynamically load plugins. \
+                  Loading order is preserved. Plugins are loaded before \
+                  libraries and modules."
     end)
 
 let () = Parameter_customize.set_group saveload

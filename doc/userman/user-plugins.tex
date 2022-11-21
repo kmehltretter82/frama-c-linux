@@ -45,10 +45,12 @@ default, but if you install \FramaC in a non-standard directory
 to \texttt{OCAMLPATH}.
 
 To prevent \FramaC from automatically loading any plug-ins, you can use option
-\optiondef{-}{no-autoload-plugins}. Then the plugin to load can be selected using \texttt{\optiondef{-}{load-plugin} <plugin-name>} (e.g. \texttt{aorai}). Since \FramaC plugins are also OCaml libraries it is possible to use \texttt{\optiondef{-}{load-library} <library-name>} (e.g. \texttt{frama-c-aorai}). Both options can accept comma-separated list of names.
-
-File extensions may be omitted, e.g.
-\texttt{-load-module file} will search for \texttt{file.cm*}.
+\optiondef{-}{no-autoload-plugins}. Then the plugin to load can be selected
+using \texttt{\optiondef{-}{load-plugin} <plugin-name>} (e.g. \texttt{aorai}).
+Since \FramaC plugins are also OCaml libraries it is possible to use
+\texttt{\optiondef{-}{load-library} <library-name>}
+(e.g. \texttt{frama-c-aorai}).
+Both options accept comma-separated lists of names.
 
 \begin{important}
 In general, plug-ins must be compiled with the
