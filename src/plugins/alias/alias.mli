@@ -42,10 +42,13 @@ val compute : unit -> unit
 val get_class_before_statement : stmt ->  lval -> LSet.t
 val get_class_after_statement : stmt ->  lval -> LSet.t
 
-val get_class_fundec: fundec ->lval -> LSet.t
-val get_class_fundec_stmts: fundec -> lval -> LSet.t list
+val get_class_fundec: fundec -> lval -> LSet.t
+val get_class_fundec_stmts: fundec -> lval -> (stmt*LSet.t) list
 
 
+
+(* TODO ajouter une fonction pour avoir la fermeture transitive *)
+    
 (** connection with Abstract_state *)
 
 val concretise : MGU.ecr -> LSet.t

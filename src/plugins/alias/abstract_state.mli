@@ -111,7 +111,13 @@ module AbstractState : sig
 
   type t = graph * mgu (* we may need additional information *)
 
-  type summary (* summary for functions *)
+  type summary  = t * V.t list (* summary for functions : a state and a list of local variables and parameters (we may need 2 lists) *)
+
+
+  (* additional structures that we may need :
+     HTable stmt -> t 
+     HTable  fundec -> summary ?
+  *)
 
   (*  TODO : version impérative ? *)
   val find : t -> exp -> V.t list
