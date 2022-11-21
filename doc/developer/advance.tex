@@ -2299,7 +2299,7 @@ module State =
     (struct
       let size = 97
       let name = "state"
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Eva.Analysis.self ]
      end)
 let compute_info (kf,vi) = ...
 let memoize = State.memo compute_info
@@ -2391,7 +2391,7 @@ module Tbl =
     (struct
        let name = "functionwise_from"
        let size = 97
-       let dependencies = [ Db.Value.self ]
+       let dependencies = [ Eva.Analysis.self ]
      end)
 let () =
   (* performed at module initialization runtime. *)
@@ -2682,7 +2682,7 @@ consistently handle state dependencies\index{State!Dependency}.
   \scodeidx{State\_selection}{with\_dependencies}
   \sscodeidx{Db}{Value}{self}
 \begin{ocamlcode}
-let selection = State_selection.with_dependencies Db.Value.self in
+let selection = State_selection.with_dependencies Eva.Analysis.self in
 Project.clear ~selection ()
 \end{ocamlcode}
 The selection explicitly indicates that we also want to clear all the states
