@@ -150,7 +150,7 @@ platform. This tutorial focuses on specific parts of this figure.
 \end{center}
 \scodeidx{Db}{Main}\codeidx{Dynamic}\codeidx{Plugin}
 \codeidx{Project}\codeidx{Type}
-\codeidx{Makefile.dynamic}\codeidx{Design}
+\codeidx{Design}
 \index{GUI}\index{Plug-in!GUI}
 \caption{Plug-in Integration Overview.}\label{fig:overview}
 \end{figure}
@@ -224,7 +224,6 @@ Note that this behavior can be configured with Dune's option \verb|--display|.
 \end{important}
 
 Note a few details about the naming conventions:
-
 \begin{itemize}
   \item in the \texttt{dune-project} file, the name of the plugin is
     \texttt{frama-c-<my-plugin>}
@@ -359,7 +358,7 @@ Section~\ref{adv:log}.
 
 We now extend the \texttt{hello world} plug-in with new options.
 
-If the plug-in is installed (globally, with \verb|make install|, or locally,
+If the plug-in is installed (globally, with \verb|dune install|, or locally,
 with \verb|dune exec|), it will be loaded and
 executed on {\em every} invocation of \texttt{frama-c}, which is not how most
 plug-ins work. To change this behavior, we add a boolean option, set by default

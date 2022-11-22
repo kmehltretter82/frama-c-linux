@@ -677,7 +677,7 @@ In the following, we detail some aspects of several directives.
   Note that \texttt{EXECNOW} directives can also be prefixed with
   \texttt{LOG}s, but they are written in the same line, without the
   separating colon (\texttt{:}).
-\item By default, the test command (usually, \texttt|frama-c|) is expected
+\item By default, the test command (usually, \texttt{frama-c}) is expected
   to return successfully (i.e., with an exit status of 0).
   If a test is supposed to lead to an error, an \texttt{EXIT} directive must be
   used. It takes as argument an integer
@@ -917,7 +917,7 @@ In particular, \framac does not provide any \texttt{autoconf} and
 \texttt{configure} features anymore. So for most plug-ins these files will be
 entirely removed (see~\ref{adv:dune-migration:conf}). Thus, the
 \texttt{Makefile.in} does not exist anymore. A \texttt{Makefile} may be useful
-to provide some shortcuts.
+to provide some shortcuts (see Section~\ref{adv:make}).
 
 If a plugin has a graphical user-interface, it is recommended to put the related
 files into a separate directory in the directory of the plug-in
@@ -998,7 +998,7 @@ The \texttt{libraries} should be now:
      )
   )
 \end{lstlisting}
-For external binaries, the keywod is \texttt{bin-available}.
+For external binaries, the keyword is \texttt{bin-available}.
 
 In the case some file must be generated at build time, it is recommended to use
 a rule together with an action of generation. The executable itself can be
@@ -1022,7 +1022,7 @@ is now a \texttt{dune} file for the GUI, that depends on the core features of
 the plug-in and the \framac GUI. This file is to put in the \texttt{gui}
 subdirectory. Again, if there are additional dependencies, they must be
 indicated in the \texttt{libraries} field:
-\begin{lstlisting}
+\begin{dunecode}
 ( library
   (name myplugin_gui)
   (public_name frama-c-myplugin.gui)
@@ -1033,9 +1033,10 @@ indicated in the \texttt{libraries} field:
 
 (plugin (optional) (name myplugin-gui) (libraries frama-c-myplugin.gui) (site (frama-c plugins_gui)))
 \end{lstlisting}
+\end{dunecode}
 
 \subsection{Build and \texttt{Makefile.in}}
-
+\lstset{language=shell}
 Provided that the \lstinline{dune} files are ready. The plug-in can now be
 built using the command \texttt{dune build @install}. The file
 \lstinline{Makefile.in} can now be removed.
@@ -1085,7 +1086,7 @@ DEFAULT_SUITES=basic eva wp
 \end{lstlisting}
 
 For most plug-ins, these modifications should be enough so that:
-\begin{lstlisting}
+\begin{lstlisting}[language=shell]
 dune exec -- frama-c-ptests
 dune build @ptests
 \end{lstlisting}
@@ -1404,6 +1405,7 @@ be changed by using the
 \paragraph{Source Options.} By default, a message is not localized. You may
 specify a source location, either specifically or by using the current
 location of an \texttt{AST} visitor.
+\lstset{style=frama-c-style}
 \begin{itemize}
 \item[] \lstinline{~source:$s$} use the source location $s$ (see \texttt{Log.mli})
 \item[] \lstinline{~current:true} use the current source location
@@ -1905,7 +1907,7 @@ types like list and function (respectively
 \section{Plug-in Registration and Access}\label{adv:plugin-registration}
 
 In this section, we present how to register plug-ins and how to access them.
-Actually there are three different ways, but the recommended one is through a
+Actually, there are three different ways, but the recommended one is through a
 \texttt{.mli} file.
 
 Section~\ref{adv:standard-registration} indicates how to register and access a
@@ -4145,7 +4147,7 @@ accesses to the main widgets of the \framac GUI and to several plug-in extension
 points. The documentation of the class type
 \texttt{Design.main\_window\_extension\_points}%
 \scodeidxdef{Design}{main\_window\_extension\_points} is accessible through the
-source documentation (see Section~\ref{adv:documentation}).
+source documentation (see Section~\ref{tut2:doc}).
 
 Besides time-consuming computations have to call the function
 \texttt{!Db.progress}\scodeidx{Db}{progress} from time to time in order to keep the GUI reactive.
@@ -4155,7 +4157,7 @@ The GUI implementation uses
 \lablgtk~\cite{lablgtk}\index{Lablgtk}: you can use any \lablgtk-compatible
 code in your gui extension. A complete example of a GUI extension may be found in
 the plug-in \texttt{Occurrence}\index{Occurrence} (see file
-\texttt{src/plugins/occurrence/register\_gui.ml}).
+\texttt{src/plugins/occurrence/gui/register\_gui.ml}).
 
 \begin{important}
 \paragraph{Potential issues}
