@@ -799,8 +799,7 @@ let compFullName comp =
   (if comp.cstruct then "struct " else "union ") ^ comp.cname
 
 (** Different visiting actions. 'a will be instantiated with [exp], [instr],
-    etc.
-    @see Plugin Development Guide *)
+    etc. *)
 type 'a visitAction =
     SkipChildren                        (** Do not visit the children. Return
                                             the node as it is. *)
