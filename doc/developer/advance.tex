@@ -36,9 +36,7 @@ Plug-in development also requires some familiarity with the Dune build system.
 
 Note that the following subsections can be read in no particular
 order: their contents are indeed quite independent from one another even if
-there are references from one chapter to another one. Pointers to
-reference manuals (Chapter~\ref{chap:refman}) are also provided for readers who
-want full details about specific parts.
+there are references from one section to another one.
 
 \section{Plug-in dependencies}\label{adv:dependencies}
 
@@ -159,7 +157,7 @@ libraries:
 (libraries frama-c.kernel frama-c-wp.core camlp-streams zarith)
 \end{lstlisting}
 
-Its plug-in library name is \verb|frama-c-clang.core|. Its availability
+Its plug-in library name is \verb|frama-clang.core|. Its availability
 must be displayed as the ``summary'' of the configuration, written as the first
 line, with each dependency as a subitem:
 
@@ -168,7 +166,7 @@ line, with each dependency as a subitem:
  (alias frama-c-configure)
  (deps (universe))
  (action (progn
-          (echo "Clang:" %{lib-available:frama-c-clang.core} "\n")
+          (echo "Clang:" %{lib-available:frama-clang.core} "\n")
           (echo "  - zarith:" %{lib-available:zarith} "\n")
           (echo "  - camlp5:" %{lib-available:camlp5} "\n") ; for gen_ast
           (echo "  - camlp-streams:" %{lib-available:camlp-streams} "\n")
@@ -194,16 +192,34 @@ Note that \verb|camlp5| is not among the dependencies declared in
 Since the adoption of Dune, \framac's \texttt{Makefile}s were largely
 simplified. They are still used for some tasks, partially due to conciseness
 (\verb|make| is shorter than \verb|dune build|), partially because some tasks
-are better suited for them.
+are better suited for them. Some standard targets are defined in various
+Makefiles that are installed in \framac's shared directory.
 
-Plug-in developers usually just need to copy and paste the existing Makefile
-template and rename the opam file name (\verb|frama-c-<plugin>.opam|).
+A minimal plugin's \verb|Makefile| can thus be the following:
 
-This Makefile reuses code from other Makefiles, distributed in Frama-C's
-{\em share} directory, such as \verb|Makefile.testing|,
-\verb|Makefile.installation|, etc. Their names indicate the kinds of features
-they provide. Many are shortcuts for specific dune targets, but they also
-provide linting and copyright headers-related features.
+\listingname{Makefile}
+\makeinput{./tutorial/hello/src/Makefile}
+
+\texttt{Makefile.testing} introduces various targets related to \framac's
+testing infrastructure (see Section~\ref{adv:ptests}). This includes notably
+\texttt{tests} to run all the tests of the plugin, after having taken care of
+generating the corresponding \texttt{dune} files.
+
+\texttt{Makefile.installation} provides two targets, \texttt{install} and
+\texttt{uninstall}. By default, installation will occur in the current
+\texttt{opam} switch, but this can be modified by using the \texttt{PREFIX}
+variable (note that if you install your plugin in a non-default place, you will
+have to explicitly instruct \framac to load it through option
+\texttt{-load-plugin}.
+
+Other Makefiles include \texttt{Makefile.documentation}, providing the
+\texttt{doc} for generating the documentation (see Section~\ref{tut2:doc}),
+and \texttt{Makefile.linting} which is used
+by \framac itself to perform various syntactic checks through target
+\texttt{check-lint} and fix indentation issues through \texttt{lint}. If
+you want to use the same conventions as \framac itself, you'll need to
+have \texttt{ocp-indent} installed to launch these targets.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -526,13 +542,11 @@ the test file name, plus a few other implicit options (\verb|-check|,
 \verb|-no-autoload-plugins|, \verb|-load-module|, etc).
 \end{example}
 
-Figure~\ref{fig:test-directives} shows all the directives that can be used in
+Table~\ref{fig:test-directives} shows all the directives that can be used in
 the configuration header of a test (or a test suite). Those whose name are
 underlined are the directives that {\em actually} create test cases; the others
 modify or disable test cases.
-\begin{figure}[ht]
-\begin{center}
-\begin{tabular}{|l|p{9cm}|p{4cm}|}
+\begin{longtable}{|l|p{9cm}|p{4cm}|}
 \hline
 \textbf{Name} & \textbf{Specification} & \textbf{default}\\
 \hline
@@ -630,12 +644,10 @@ and report a failure.
 & \textit{None}
 \\
 \hline
-\end{tabular}
-\end{center}
 \caption{Directives in configuration headers of test files.
   Underlined directives are the only ones which actually generate test cases.
 }\label{fig:test-directives}
-\end{figure}
+\end{longtable}
 
 In the following, we detail some aspects of several directives.
 
@@ -665,7 +677,7 @@ In the following, we detail some aspects of several directives.
   Note that \texttt{EXECNOW} directives can also be prefixed with
   \texttt{LOG}s, but they are written in the same line, without the
   separating colon (\texttt{:}).
-\item By default, the test command (usually, \texttt|frama-c|) is expected
+\item By default, the test command (usually, \texttt{frama-c}) is expected
   to return successfully (i.e., with an exit status of 0).
   If a test is supposed to lead to an error, an \texttt{EXIT} directive must be
   used. It takes as argument an integer
@@ -804,6 +816,41 @@ itself, it needs to be doubled, {\it i.e.} \texttt{@@} will be translated as
   produced file as a dependency.
 \end{important}
 
+\subsection{Pre-defined macros for tests commands}\label{sec:ptests-macros}
+Table~\ref{tab:ptests-macros} gives the definition of the most important
+predefined macros that can be used in \ptests' directives.
+Refer to \texttt{frama-c-ptests --help} to have the full list.
+\begin{longtable}{|p{4.5cm}|p{10cm}|}
+\hline
+Name & Expansion \\
+\hline
+\verb|frama-c| & path to \framac executable \\
+\hline
+\verb|PTEST_CONFIG| & either the empty string or \verb|_| followed by the
+name of the current alternative configuration 
+(see section~\ref{ptests:structure}). \\
+\hline
+\verb|PTEST_DIR| & current test suite directory \\
+\hline
+\verb|PTEST_FILE| & path to the current test file \\
+\hline
+\verb|PTEST_NAME| & basename of the current test file (without suffix) \\
+\hline
+\verb|PTEST_NUMBER| & rank of current test in the test file. There are in
+fact two independent numbering schemes: one for \verb|EXECNOW| commands and
+one for regular tests (if more than one \verb|OPT|).\\
+\hline
+\verb|PTEST_RESULT| & shorthand alias to \verb|@PTEST_DIR@/result@PTEST_CONFIG@|
+(the result directory dedicated to the tested configuration)\\
+\hline
+\verb|PTEST_ORACLE| & basename of the current oracle file (macro only usable in FILTER directives)\\
+\hline
+\verb|PTEST_DEFAULT_OPTIONS| & the default option list: \verb|-check| \verb|-no-autoload-plugins|\\
+\hline
+\caption{Predefined macros for ptests}\label{tab:ptests-macros}
+\end{longtable}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Plug-in Migration from Makefile to Dune}\label{adv:dune-migration}
@@ -822,16 +869,28 @@ please contact us if you need some help for migrating it.
 
 \subsection{Files organization changes}
 
+\begin{important}
+Due to the way \texttt{dune} operates, it is preferable to work on the migration
+starting from a ``clean'' directory, without compilation and tests
+(in \texttt{result} directory of the test suites) artifacts. Otherwise,
+\texttt{dune} will complain about conflicts between files being both present
+in the original source directory and the target of a compilation rule.
+\end{important}
+
 Previously for a plug-in named \texttt{Plugin}, only the file
 \texttt{Plugin.mli} was necessary to expose the signature of the plug-in. Now,
 one has to also provide an implementation file \texttt{Plugin.ml}.
+On the other hand, it is not necessary that it begins with a capital letter
+anymore: you can have \texttt{plugin.ml} and \texttt{plugin.mli}. If these files
+are not present, all functions included in the modules constituting the
+plug-in will be exported.
 
 For most plug-ins, the \texttt{autoconf} and \texttt{configure} will be useless.
 In particular, \framac does not provide any \texttt{autoconf} and
 \texttt{configure} features anymore. So for most plug-ins these files will be
 entirely removed (see~\ref{adv:dune-migration:conf}). Thus, the
 \texttt{Makefile.in} does not exist anymore. A \texttt{Makefile} may be useful
-to provide some shortcuts.
+to provide some shortcuts (see Section~\ref{adv:make}).
 
 If a plugin has a graphical user-interface, it is recommended to put the related
 files into a separate directory in the directory of the plug-in
@@ -912,7 +971,7 @@ The \texttt{libraries} should be now:
      )
   )
 \end{lstlisting}
-For external binaries, the keywod is \texttt{bin-available}.
+For external binaries, the keyword is \texttt{bin-available}.
 
 In the case some file must be generated at build time, it is recommended to use
 a rule together with an action of generation. The executable itself can be
@@ -936,7 +995,7 @@ is now a \texttt{dune} file for the GUI, that depends on the core features of
 the plug-in and the \framac GUI. This file is to put in the \texttt{gui}
 subdirectory. Again, if there are additional dependencies, they must be
 indicated in the \texttt{libraries} field:
-\begin{lstlisting}
+\begin{dunecode}
 ( library
   (name myplugin_gui)
   (public_name frama-c-myplugin.gui)
@@ -945,14 +1004,39 @@ indicated in the \texttt{libraries} field:
   (libraries frama-c.kernel frama-c.gui frama-c-myplugin.core)
 )
 
-(plugin (optional) (name myplugin-gui) (libraries frama-c-myplugin.gui) (site (frama-c plugins_gui)))
-\end{lstlisting}
+(plugin (optional)
+  (name myplugin-gui)
+  (libraries frama-c-myplugin.gui)
+  (site (frama-c plugins_gui)))
+\end{dunecode}
 
 \subsection{Build and \texttt{Makefile.in}}
-
+\lstset{language=shell}
 Provided that the \lstinline{dune} files are ready. The plug-in can now be
 built using the command \texttt{dune build @install}. The file
 \lstinline{Makefile.in} can now be removed.
+
+\subsection{Installing Additional Files}
+
+If your plug-in has additional files to install besides the compiled files,
+themselves (typically, files in \texttt{share}), you can use an
+\texttt{install} stanza in the \texttt{dune} file, as in:
+
+\begin{dunecode}
+(install
+  (package frama-c-myplugin)
+  (section (site (frama-c share)))
+  (files (share/myfile as frama-c-myplugin/myfile)))
+\end{dunecode}
+
+With the stanza above, the installation of package \texttt{frama-c-myplugin}
+will copy \texttt{myfile} from the \texttt{share} directory
+of the plug-in sources into the \texttt{frama-c-myplugin} directory inside
+the \texttt{share} directory of \framac's installation. Other target sections
+are available (e.g. \texttt{bin} for installing an additional executable), see
+the \texttt{dune}
+manual\footnote{\url{https://dune.readthedocs.io/en/stable/dune-files.html\#install-1}}
+for more information.
 
 \subsection{Migrating tests}
 
@@ -977,7 +1061,7 @@ DEFAULT_SUITES=basic eva wp
 \end{lstlisting}
 
 For most plug-ins, these modifications should be enough so that:
-\begin{lstlisting}
+\begin{lstlisting}[language=shell]
 dune exec -- frama-c-ptests
 dune build @ptests
 \end{lstlisting}
@@ -1296,6 +1380,7 @@ be changed by using the
 \paragraph{Source Options.} By default, a message is not localized. You may
 specify a source location, either specifically or by using the current
 location of an \texttt{AST} visitor.
+\lstset{style=frama-c-style}
 \begin{itemize}
 \item[] \lstinline{~source:$s$} use the source location $s$ (see \texttt{Log.mli})
 \item[] \lstinline{~current:true} use the current source location
@@ -1797,7 +1882,7 @@ types like list and function (respectively
 \section{Plug-in Registration and Access}\label{adv:plugin-registration}
 
 In this section, we present how to register plug-ins and how to access them.
-Actually there are three different ways, but the recommended one is through a
+Actually, there are three different ways, but the recommended one is through a
 \texttt{.mli} file.
 
 Section~\ref{adv:standard-registration} indicates how to register and access a
@@ -1811,70 +1896,18 @@ Section~\ref{adv:dynamic-registration} details how to register and access a
 
 \begin{target}plug-in developers.\end{target}
 \begin{prereq}
-  Basic knowledge of \make.
+  Basic knowledge of \texttt{dune}.
 \end{prereq}
 
-Each plug-in is compiled into a module of name indicated by the variable
-\texttt{PLUGIN\_NAME}\codeidx{PLUGIN\_NAME} of its \texttt{Makefile} (say
-\texttt{Plugin\_A}. Its developer has to provide a \texttt{.mli} for this
-plug-in (following the previous example, a file \texttt{Plugin\_A.mli}). This
-\texttt{.mli} file may thus contains the API of the plug-in.
-
-Another plug-in may then access to \texttt{Plugin\_A} as it accesses any
-other \caml module, but it has to declare in its \texttt{Makefile} that it
-depends on \texttt{Plugin\_A} through the special variable
-\texttt{PLUGIN\_DEPENDENCIES}.
-
-\begin{example}
-\texttt{Plugin\_A} declares and provides access to a function \texttt{compute}
-in the following way.
-
-\listingname{File plugin\_a/my\_analysis\_a.ml}
-\begin{ocamlcode}
-let compute () = ...
-\end{ocamlcode}
-
-\listingname{File plugin\_a/Plugin\_A.mli}
-\begin{ocamlcode}
-module My_analysis_a: sig val compute: unit -> unit
-\end{ocamlcode}
-
-\codeidx{PLUGIN\_NAME}
-\codeidx{PLUGIN\_CMO}
-\codeidx{Makefile.dynamic}
-\listingname{File plugin\_a/Makefile}
-\begin{makefilecode}
-PLUGIN_NAME:=Plugin_A
-PLUGIN_CMO:=... my_analysis_a ...
-...
-include Makefile.dynamic
-\end{makefilecode}
-
-Then, \texttt{Plugin\_B} may use this function \texttt{Compute} as follows.
-
-\listingname{File plugin\_b/my\_analysis\_b.ml}
-\begin{ocamlcode}
-let compute () = ... Plugin_A.My_analysis_a.compute () ...
-\end{ocamlcode}
-
-\codeidx{PLUGIN\_NAME}
-\codeidx{PLUGIN\_CMO}
-\codeidx{PLUGIN\_DEPENDENCIES}
-\codeidx{Makefile.dynamic}
-\listingname{File plugin\_b/Makefile}
-\begin{makefilecode}
-PLUGIN_NAME:=Plugin_B
-PLUGIN_CMO:=... my_analysis_b ...
-PLUGIN_DEPENDENCIES:=Plugin_A
-...
-include Makefile.dynamic
-\end{makefilecode}
-\end{example}
+From \texttt{dune} point of view, a plug-in is simply an \ocaml library.
+In order for plugin \texttt{B} to use a function which is declared in
+the interface of plugin \texttt{A}, the \texttt{dune} file of \texttt{B} must
+contain in its \texttt{libraries} clause \texttt{frama-c-a.core}
+(see Section~\ref{adv:dependencies}), or more generally the \texttt{public\_name}
+under which \texttt{A} is declared.
 
 \subsection{Kernel-integrated Registration and Access}
 \label{adv:static-registration}
-\index{Plug-in!Kernel-integrated!Registration}
-\index{Plug-in!Kernel-integrated!Access}
 
 \begin{target}kernel-integrated plug-in developers.\end{target}
 
@@ -1883,6 +1916,12 @@ include Makefile.dynamic
   your plug-in as any standard plug-in (see
   Section~\ref{adv:dynamic-registration} for details).
 \end{prereq}
+
+\begin{important}
+This registration method is deprecated and only kept here for historical purpose.
+No new entry point should be added in the \texttt{Db}, which will be removed in
+a future version of \framac.
+\end{important}
 
 A database, called \texttt{Db}\codeidxdef{Db} (in directory
 \texttt{src/kernel\_services/plugin\_entry\_points}), groups together
@@ -1928,9 +1967,6 @@ directory. The best way is to create a directory dedicated to types.
   plug-in $p$.
 \end{convention}
 
-If you add such a directory, you also have to modify \texttt{Makefile} by
-extending variable \texttt{FRAMAC\_SRC\_DIRS}\codeidx{FRAMAC\_SRC\_DIRS} (see
-Section~\ref{make:plugin}).
 \begin{example}
 Suppose you are writing a plug-in \texttt{p} which exports a specific type
 \texttt{t} corresponding to the result of the plug-in analysis. The standard way
@@ -1949,12 +1985,6 @@ module P : sig
          @return result of the analysis. *)
 end
 \end{ocamlcode}
-
-\listingname{share/Makefile.common}
-\begin{makefilecode}
-FRAMAC_SRC_DIRS= ... plugins/p_types
-   # Extend this variable with the new directory
-\end{makefilecode}
 \end{example}
 
 This design choice has a side effect : it reveals exported types.
@@ -1966,16 +1996,16 @@ implementation. This code should be linked before \texttt{Db}
 \codeidx{Db}\footnote{A direct consequence is that you cannot use the whole
 \framac functionalities, such as module \texttt{Db}, inside this code.}.
 
-To this effect, the files containing the external plug-in code must be added to
-the \texttt{Makefile} variable
-\texttt{PLUGIN\_TYPES\_CMO}\codeidxdef{PLUGIN\_TYPES\_CMO} (see
-Section~\ref{make:plugin}).
-
 \subsection{Dynamic Registration and Access}
 \label{adv:dynamic-registration}
 \index{Plug-in!Registration}\index{Plug-in!Access}\index{Plug-in!API}
 
 \begin{target}standard plug-ins developers.\end{target}
+
+\begin{important}
+Dynamic registration is obsolete. Newer development should favor exporting
+a static API, as explained in Section~\ref{adv:standard-registration}.
+\end{important}
 
 Registration of kernel-integrated plug-ins requires to modify module
 \texttt{Db}\codeidx{Db} which belongs to the \framac kernel. Such a
@@ -2299,7 +2329,7 @@ module State =
     (struct
       let size = 97
       let name = "state"
-      let dependencies = [ Db.Value.self ]
+      let dependencies = [ Eva.Analysis.self ]
      end)
 let compute_info (kf,vi) = ...
 let memoize = State.memo compute_info
@@ -2391,7 +2421,7 @@ module Tbl =
     (struct
        let name = "functionwise_from"
        let size = 97
-       let dependencies = [ Db.Value.self ]
+       let dependencies = [ Eva.Analysis.self ]
      end)
 let () =
   (* performed at module initialization runtime. *)
@@ -2682,7 +2712,7 @@ consistently handle state dependencies\index{State!Dependency}.
   \scodeidx{State\_selection}{with\_dependencies}
   \sscodeidx{Db}{Value}{self}
 \begin{ocamlcode}
-let selection = State_selection.with_dependencies Db.Value.self in
+let selection = State_selection.with_dependencies Eva.Analysis.self in
 Project.clear ~selection ()
 \end{ocamlcode}
 The selection explicitly indicates that we also want to clear all the states
@@ -4045,13 +4075,7 @@ accesses to the main widgets of the \framac GUI and to several plug-in extension
 points. The documentation of the class type
 \texttt{Design.main\_window\_extension\_points}%
 \scodeidxdef{Design}{main\_window\_extension\_points} is accessible through the
-source documentation (see Section~\ref{adv:documentation}).
-
-The GUI plug-in code has to be put in separate files into the plug-in
-directory\index{Plug-in!Directory}. Furthermore, in the
-\texttt{Makefile}\codeidx{Makefile}, the variable
-\texttt{PLUGIN\_GUI\_CMO}\codeidx{PLUGIN\_GUI\_CMO} has to be set in order to
-compile the GUI plug-in code (see Section~\ref{make:plugin}).
+source documentation (see Section~\ref{tut2:doc}).
 
 Besides time-consuming computations have to call the function
 \texttt{!Db.progress}\scodeidx{Db}{progress} from time to time in order to keep the GUI reactive.
@@ -4061,7 +4085,7 @@ The GUI implementation uses
 \lablgtk~\cite{lablgtk}\index{Lablgtk}: you can use any \lablgtk-compatible
 code in your gui extension. A complete example of a GUI extension may be found in
 the plug-in \texttt{Occurrence}\index{Occurrence} (see file
-\texttt{src/plugins/occurrence/register\_gui.ml}).
+\texttt{src/plugins/occurrence/gui/register\_gui.ml}).
 
 \begin{important}
 \paragraph{Potential issues}
@@ -4075,87 +4099,141 @@ but it could be quite difficult to understand for an user.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Documentation}\label{adv:documentation}
-\index{Documentation|bfit}
+% \section{Documentation}\label{adv:documentation}
+% \index{Documentation|bfit}
 
-\begin{prereq}
-  Knowledge of \ocamldoc.
-\end{prereq}
+% \begin{prereq}
+%   Knowledge of \odoc.
+% \end{prereq}
 
-Here we present some hints on the way to document your plug-in. First
-Section~\ref{doc:rules} introduces a quick general overview about the
-documentation process. Next Section~\ref{doc:plugin} focuses on the
-plug-in source documentation.
+% Here we present some hints on the way to document your plug-in. First
+% Section~\ref{doc:rules} introduces a quick general overview about the
+% documentation process. Next Section~\ref{doc:plugin} focuses on the
+% plug-in source documentation.
 
-\subsection{General Overview}\label{doc:rules}
+% \subsection{General Overview}\label{doc:rules}
 
-Command \texttt{make doc}\codeidx{Makefile} produces the whole \framac source
-documentation\index{Documentation!Source} in HTML format. The generated index
-file is \texttt{doc/code/html/index.html}. A more general purpose index is
-\texttt{doc/index.html}\codeidx{index.html} (from which the previous index is
-accessible).
+% Command \texttt{make doc}\codeidx{Makefile} produces the whole \framac source
+% documentation\index{Documentation!Source} in HTML format. The generated index
+% file is \texttt{doc/code/html/index.html}. A more general purpose index is
+% \texttt{doc/index.html}\codeidx{index.html} (from which the previous index is
+% accessible).
 
-The previous command takes times. So command \texttt{make doc-kernel} only
-generates the kernel documentation\index{Documentation!Kernel} (\emph{i.e.}
-\framac without any plug-in) while \texttt{make \$(PLUGIN\_NAME)\_DOC} (by
-substituting the right value for
-\texttt{\$(PLUGIN\_NAME)})\codeidx{PLUGIN\_NAME} generates
-the documentation for a single plug-in\index{Plug-in!Documentation}%
-\index{Documentation!Plug-in|see{Plug-in Documentation}}.
+% The previous command takes times. So command \texttt{make doc-kernel} only
+% generates the kernel documentation\index{Documentation!Kernel} (\emph{i.e.}
+% \framac without any plug-in) while \texttt{make \$(PLUGIN\_NAME)\_DOC} (by
+% substituting the right value for
+% \texttt{\$(PLUGIN\_NAME)})\codeidx{PLUGIN\_NAME} generates
+% the documentation for a single plug-in\index{Plug-in!Documentation}%
+% \index{Documentation!Plug-in|see{Plug-in Documentation}}.
 
-\subsection{Source Documentation}\label{doc:plugin}
-\index{Plug-in!Documentation|bfit}
+% \subsection{Source Documentation}\label{doc:plugin}
+% \index{Plug-in!Documentation|bfit}
 
-Each plug-in should be properly documented. \framac uses \ocamldoc and so you
-can write any valid \ocamldoc comments.
+% Each plug-in should be properly documented. \framac uses \ocamldoc and so you
+% can write any valid \ocamldoc comments.
 
-\paragraph{\ocamldoc tags for \framac}\index{Documentation!Tags} The tag
-\texttt{@since version} should document any element introduced after the very
-first release, in order to easily know the required version of the \framac
-kernel or specific plug-ins. In the same way, the \framac documentation
-generator provides a custom tag \texttt{@modify version description} which
-should be used to document any element which semantics have changed since its
-introduction.
+% \paragraph{\ocamldoc tags for \framac}\index{Documentation!Tags} The tag
+% \texttt{@since version} should document any element introduced after the very
+% first release, in order to easily know the required version of the \framac
+% kernel or specific plug-ins. In the same way, the \framac documentation
+% generator provides a custom tag \texttt{@modify version description} which
+% should be used to document any element which semantics have changed since its
+% introduction.
 
-Furthermore, the special tag \texttt{@plugin developer guide} must be attached
-to each function used in this document.
+% Furthermore, the special tag \texttt{@plugin developer guide} must be attached
+% to each function used in this document.
 
-\paragraph{Plug-in API}
+% \paragraph{Plug-in API}
 
-A plug-in should export functions in its plug-in interface or through modules
-\texttt{Db}\codeidx{Db} or \texttt{Dynamic}\codeidx{Dynamic} as explained in
-Section~\ref{adv:plugin-registration}.
+% A plug-in should export functions in its plug-in interface or through modules
+% \texttt{Db}\codeidx{Db} or \texttt{Dynamic}\codeidx{Dynamic} as explained in
+% Section~\ref{adv:plugin-registration}.
 
-\begin{important}
-The interface name of a plug-in \texttt{plugin} must be \texttt{Plugin.mli}. Be
-careful to capitalization of the filename which is unusual in \caml but
-required here for compilation purposes.
-\end{important}
+% \begin{important}
+% The interface name of a plug-in \texttt{plugin} must be \texttt{Plugin.mli}. Be
+% careful to capitalization of the filename which is unusual in \caml but
+% required here for compilation purposes.
+% \end{important}
 
-\paragraph{Internal Documentation for Kernel Integrated Plug-ins}
+% \paragraph{Internal Documentation for Kernel Integrated Plug-ins}
 
-The \framac documentation generator also produces an internal plug-in
-documentation which may be useful for the plug-in developer itself. This
-internal documentation is available \emph{via} file
-\texttt{doc/code/$plugin$/index.html}\codeidx{index.html} for each plug-in
-$plugin$. You can add an introduction to this documentation into a file. This
-file has to be assigned into variable
-\texttt{PLUGIN\_INTRO}\codeidx{PLUGIN\_INTRO} of the
-\texttt{Makefile}\codeidx{Makefile} (see Section~\ref{make:plugin}).
+% The \framac documentation generator also produces an internal plug-in
+% documentation which may be useful for the plug-in developer itself.
 
-In order to ease access to this internal documentation, you have to
-manually edit the file \texttt{doc/index.html}\codeidx{index.html} in order to add
-an entry for your plug-in in the plug-in list.
+% \paragraph{Internal Documentation for External Plug-ins}
 
-\paragraph{Internal Documentation for External Plug-ins}
+% External plug-ins can be documented in the same way as plug-ins that are
+% compiled together with \framac. However, in order to be able to compile the
+% documentation with \texttt{make doc}, you must have generated the documentation
+% of Frama-C's kernel (\texttt{make doc}, see above) and installed it with the
+% \texttt{make install-doc-code}\codeidx{install-doc-code} command.
 
-External plug-ins can be documented in the same way as plug-ins that are
-compiled together with \framac. However, in order to be able to compile the
-documentation with \texttt{make doc}, you must have generated the documentation
-of Frama-C's kernel (\texttt{make doc}, see above) and installed it with the
-\texttt{make install-doc-code}\codeidx{install-doc-code} command.
+\section{Packaging}
+\label{sec:dune-packaging}
 
-% Local Variables:
-% ispell-local-dictionary: "english"
-% TeX-master: "main"
-% End:
+If you intend to release your plug-in, a possible way is to take advantage of
+the \texttt{opam} integration within
+\texttt{dune}\footnote{\url{https://dune.readthedocs.io/en/stable/opam.html}}.
+Basically, the \index{dune-project}\texttt{dune-project} file
+(see Section~\ref{tut2:hello}) should contain a stanza
+\texttt{(generate\_opam\_files true)}, as well as some meta-information
+(location of the sources, licence, author(s), etc.). It is also possible to
+provide this information in a file \texttt{my-plugin-package.opam.template},
+assuming \texttt{my-plugin-package} is the name of the package of the plug-in in
+the \texttt{dune-project} file. See the dune documentation for detailed information
+about the creation of the \texttt{opam} file.
+
+% \section{Profiling with Landmarks} \label{refman:landmarks}\codeidxdef{Landmarks}
+
+% {\em Landmarks}\footnote{\url{https://github.com/LexiFi/landmarks}} is a
+% library for ``quick and dirty'' profiling of OCaml programs. It allows the
+% insertion of annotations in the code to enable profiling of specific parts of
+% it, but also an automatic mode, in which every function call is instrumented.
+% The Frama-C \texttt{configure} file is setup to enable usage of this library
+% when it is available (the usual way to install it is via the \texttt{landmarks}
+% opam package).
+
+% For quick usage of the library:
+% \begin{itemize}
+% \item ensure that the \texttt{configure} script detected it
+%   (there should be a line \texttt{checking for Landmarks... found});
+% \item enable instrumentation {\em when compiling Frama-C's files}, that is,
+%   when running \texttt{make}, by setting the environment variable
+%   \verb+OCAML_LANDMARKS+. For instance, to enable automatic instrumentation
+%   of every Frama-C function (note: this increases compilation time of Frama-C),
+%   run:
+
+% \begin{lstlisting}
+%     OCAML_LANDMARKS=auto make
+% \end{lstlisting}
+
+% \item enable instrumentation {\em during execution} of Frama-C, again using
+%   \verb+OCAML_LANDMARKS+. Note that the \texttt{auto} parameter here is
+%   implicit if you enabled it on the previous step.
+%   For instance, run:
+
+%   \begin{lstlisting}
+%     OCAML_LANDMARKS= bin/frama-c [files] [options]
+%   \end{lstlisting}
+% \end{itemize}
+
+% Commonly used options include \verb+output=landmarks.log+ to output the result
+% to a file instead of \texttt{stderr}.
+
+% To instrument a single file: add \verb+[@@@landmark "auto"]+ at the beginning
+% of the file.
+
+% To instrument a single function: add \verb+[@landmark]+ after the \texttt{let},
+% e.g.:
+
+% \begin{lstlisting}
+%   let[@landmark] add_visitor vis =
+% \end{lstlisting}
+
+% Check \url{https://github.com/LexiFi/landmarks} for its documentation.
+
+% \textbf{Note:} if you intend to use \texttt{ocamlprof} (via \texttt{ocamlcp} or
+% \texttt{ocamloptp}), which does not support ppx extensions, and you have
+% Landmarks installed, you need to explicitly disable Landmarks during Frama-C's
+% configure: \verb+./configure --disable-landmarks+.

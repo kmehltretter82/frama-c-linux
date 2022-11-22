@@ -330,6 +330,7 @@ let do_wpo_success ~shell ~cache goal success =
       Wp_parameters.feedback ~ontty:`Silent
         "[Generated] Goal %s (%a)" (Wpo.get_gid goal) VCS.pp_prover prover
   else
+    let gui = Frama_c_very_first.Gui_init.is_gui in
     let smoke = Wpo.is_smoke_test goal in
     let gstats = Stats.results ~smoke @@ Wpo.get_results goal in
     let cstats = ProofEngine.consolidated goal in
@@ -338,7 +339,7 @@ let do_wpo_success ~shell ~cache goal success =
       global_stats := Stats.add !global_stats gstats ;
       if cstats.tactics > 0 then
         script_stats := Stats.add !script_stats cstats ;
-      if shell || not success then
+      if gui || shell || not success then
         do_report_stats ~shell ~cache goal ~smoke cstats ;
       if smoke then
         begin

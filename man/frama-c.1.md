@@ -204,7 +204,7 @@ See also **-pp-annot**.
 [-no]-autoload-plugins
 : when on, load all the dynamic plugins found in the search path
 (see **-print-plugin-path** for more information on the default search path).
-Otherwise, only plugins requested by **-load-module** will be loaded.
+Otherwise, only plugins requested by **-load-plugin** will be loaded.
 Defaults to on.
 
 -enums *repr*
@@ -308,14 +308,18 @@ the starting point of the program and globals have their initial value.
 -load *file*
 : loads the (previously saved) state contained in *file*.
 
--load-module *SPEC*
-: dynamically load OCaml plug-ins, modules and scripts. Each *SPEC* can be an
-OCaml source or object file, with or without extension, or a Findlib package.
-Loading order is preserved and additional dependencies can be listed in
-***.depend** files.
+-load-library *library_1,...,library_n*
+: dynamically load libraries. Loading order is preserved.
+  Libraries are loaded between plugins and modules.
 
--load-script *SPEC*
-: alias for option **-load-module**.
+-load-module *SPEC_1,...,SPEC_n*
+: dynamically load modules. Each <SPEC> can be an object file, with or without
+  extension, or a Findlib package.
+  Loading order is preserved, but after plugins and libraries.
+
+-load-plugin *plugin_1,...,plugin_n*
+: dynamically load plugins. Loading order is preserved.
+  Plugins are loaded before libraries and modules.
 
 -machdep *machine*
 : uses *machine* as the current machine-dependent configuration (size of the

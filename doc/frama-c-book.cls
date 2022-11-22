@@ -222,7 +222,6 @@ prefix=framacbook@,
   stringstyle=\lp@string,%
   emphstyle=\lp@ident\underbar,%
   showstringspaces=false,%
-  mathescape=true,%
   numberstyle=\lp@number,%
   xleftmargin=6ex,xrightmargin=2ex,%
   framexleftmargin=1ex,%
@@ -235,7 +234,7 @@ prefix=framacbook@,
   morecomment={[il]{//NOPP-LINE}},% invisible comment until end of line
   morecomment={[is]{//NOPP-BEGIN}{NOPP-END\^^M}},% no space after NOPP-END
   mathescape=true,
-  escapechar=`
+  escapechar=`,
 % breaklines is broken when using a inline and background
 %  breaklines,prebreak={\lstbrk},postbreak={\lstbrk},breakindent=5ex %
 }
@@ -377,9 +376,12 @@ literate=%
 ,
   style=framac-code-style,%
   morekeywords={
-    dune, flags, generate_opam_files, lang, libraries, name, optional, package,
-    plugin, public_name, site, using
+    action, alias, as, deps, dune, executable, files, flags, from,
+    generate_opam_files, install, lang, libraries, library, name, optional,
+    package, plugin, progn, public_name, rule, section, select, site,
+    targets, using
   },%
+  alsoletter=:,
   morekeywords=[2]{
     :standard
   },
@@ -391,10 +393,18 @@ literate=%
   basicstyle=\lp@inline,%
 }
 
+\lstdefinestyle{make-basic}{%
+  language=Makefile,%
+  style=framac-code-style,%
+  basicstyle=\lp@inline,%
+}
+
 \newcommand{\ocamlinput}[2][]{\lstinputlisting[style=ocaml-basic,#1]{#2}}
 \lstnewenvironment{ocamlcode}[1][]{\lstset{style=ocaml-basic,#1}}{}
 \newcommand{\duneinput}[2][]{\lstinputlisting[style=dune-basic,#1]{#2}}
 \lstnewenvironment{dunecode}[1][]{\lstset{style=dune-basic,#1}}{}
+\newcommand{\makeinput}[2][]{\lstinputlisting[style=make-basic,#1]{#2}}
+\lstnewenvironment{makecode}[1][]{\lstset{style=make-basic,#1}}{}
 % --------------------------------------------------------------------------
 \lstdefinelanguage{Why}{%
   morekeywords={
