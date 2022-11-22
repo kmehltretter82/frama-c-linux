@@ -1006,8 +1006,10 @@ indicated in the \texttt{libraries} field:
   (libraries frama-c.kernel frama-c.gui frama-c-myplugin.core)
 )
 
-(plugin (optional) (name myplugin-gui) (libraries frama-c-myplugin.gui) (site (frama-c plugins_gui)))
-\end{lstlisting}
+(plugin (optional)
+  (name myplugin-gui)
+  (libraries frama-c-myplugin.gui)
+  (site (frama-c plugins_gui)))
 \end{dunecode}
 
 \subsection{Build and \texttt{Makefile.in}}
