@@ -157,7 +157,7 @@ libraries:
 (libraries frama-c.kernel frama-c-wp.core camlp-streams zarith)
 \end{lstlisting}
 
-Its plug-in library name is \verb|frama-c-clang.core|. Its availability
+Its plug-in library name is \verb|frama-clang.core|. Its availability
 must be displayed as the ``summary'' of the configuration, written as the first
 line, with each dependency as a subitem:
 
@@ -166,7 +166,7 @@ line, with each dependency as a subitem:
  (alias frama-c-configure)
  (deps (universe))
  (action (progn
-          (echo "Clang:" %{lib-available:frama-c-clang.core} "\n")
+          (echo "Clang:" %{lib-available:frama-clang.core} "\n")
           (echo "  - zarith:" %{lib-available:zarith} "\n")
           (echo "  - camlp5:" %{lib-available:camlp5} "\n") ; for gen_ast
           (echo "  - camlp-streams:" %{lib-available:camlp-streams} "\n")
