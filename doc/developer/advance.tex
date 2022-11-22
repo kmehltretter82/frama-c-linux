@@ -817,8 +817,9 @@ itself, it needs to be doubled, {\it i.e.} \texttt{@@} will be translated as
 \end{important}
 
 \subsection{Pre-defined macros for tests commands}\label{sec:ptests-macros}
-Table~\ref{tab:ptests-macros} gives the definition of the predefined macros that
-can be used in \ptests' directives.
+Table~\ref{tab:ptests-macros} gives the definition of the most important
+predefined macros that can be used in \ptests' directives.
+Refer to \texttt{ptests --help} to have the full list.
 \begin{longtable}{|p{4.5cm}|p{10cm}|}
 \hline
 Name & Expansion \\
@@ -846,33 +847,7 @@ one for regular tests (if more than one \verb|OPT|).\\
 \hline
 \verb|PTEST_ORACLE| & basename of the current oracle file (macro only usable in FILTER directives)\\
 \hline
-\verb|PTEST_MODULE| & current list of modules defined by the \verb|MODULE| directive\\
-\hline
-\verb|PTEST_LIBS| & current list of modules defined by the \verb|LIBS| directive\\
-\hline
-\verb|PTEST_PLUGIN| & current list of plugins defined by the \verb|PLUGIN| directive\\
-\hline
-\verb|PTEST_SCRIPT| & current list of plugins defined by the \verb|SCRIPT| directive\\
-\hline
 \verb|PTEST_DEFAULT_OPTIONS| & the default option list: \verb|-check| \verb|-no-autoload-plugins|\\
-\hline
-\verb|PTEST_LOAD_MODULE| & the \verb|-load-module| option related to the \verb|MODULE| directive\\
-\hline
-\verb|PTEST_LOAD_LIBS| & the \verb|-load-module| option related to the \verb|LIBS| directive\\
-\hline
-\verb|PTEST_LOAD_PLUGIN| & the \verb|-load-module| option related to the \verb|PLUGIN| directive\\
-\hline
-\verb|PTEST_LOAD_SCRIPT| & the \verb|-load-script| option related to the \verb|SCRIPT| directive\\
-\hline
-\verb|PTEST_LOAD_OPTIONS| & shorthand alias to \spverb|@PTEST_LOAD_PLUGIN@ @PTEST_LOAD_LIBS@ @PTEST_LOAD_MODULE@ @PTEST_LOAD_SCRIPT@|\\
-\hline
-\verb|PTEST_OPTIONS| & the current list of options related to \verb|OPT| and \verb|STDOPT| directives (for \verb|CMD| directives)\\
-\hline
-\verb|frama-c| & shortcut defined as follows: \spverb|@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@ @PTEST_LOAD_OPTIONS@|\\
-\hline
-\verb|frama-c-cmd| & shortcut defined as follows: \spverb|@frama-c-exe@ @PTEST_DEFAULT_OPTIONS@|\\
-\hline
-\verb|frama-c-exe| & set to the value of the \verb|TOPLEVEL_PATH| variable from \verb|./tests/ptests_config| file\\
 \hline
 \caption{Predefined macros for ptests}\label{tab:ptests-macros}
 \end{longtable}
