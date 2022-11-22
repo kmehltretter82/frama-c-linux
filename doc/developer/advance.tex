@@ -4146,75 +4146,75 @@ but it could be quite difficult to understand for an user.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Documentation}\label{adv:documentation}
-\index{Documentation|bfit}
+% \section{Documentation}\label{adv:documentation}
+% \index{Documentation|bfit}
 
-\begin{prereq}
-  Knowledge of \ocamldoc.
-\end{prereq}
+% \begin{prereq}
+%   Knowledge of \odoc.
+% \end{prereq}
 
-Here we present some hints on the way to document your plug-in. First
-Section~\ref{doc:rules} introduces a quick general overview about the
-documentation process. Next Section~\ref{doc:plugin} focuses on the
-plug-in source documentation.
+% Here we present some hints on the way to document your plug-in. First
+% Section~\ref{doc:rules} introduces a quick general overview about the
+% documentation process. Next Section~\ref{doc:plugin} focuses on the
+% plug-in source documentation.
 
-\subsection{General Overview}\label{doc:rules}
+% \subsection{General Overview}\label{doc:rules}
 
-Command \texttt{make doc}\codeidx{Makefile} produces the whole \framac source
-documentation\index{Documentation!Source} in HTML format. The generated index
-file is \texttt{doc/code/html/index.html}. A more general purpose index is
-\texttt{doc/index.html}\codeidx{index.html} (from which the previous index is
-accessible).
+% Command \texttt{make doc}\codeidx{Makefile} produces the whole \framac source
+% documentation\index{Documentation!Source} in HTML format. The generated index
+% file is \texttt{doc/code/html/index.html}. A more general purpose index is
+% \texttt{doc/index.html}\codeidx{index.html} (from which the previous index is
+% accessible).
 
-The previous command takes times. So command \texttt{make doc-kernel} only
-generates the kernel documentation\index{Documentation!Kernel} (\emph{i.e.}
-\framac without any plug-in) while \texttt{make \$(PLUGIN\_NAME)\_DOC} (by
-substituting the right value for
-\texttt{\$(PLUGIN\_NAME)})\codeidx{PLUGIN\_NAME} generates
-the documentation for a single plug-in\index{Plug-in!Documentation}%
-\index{Documentation!Plug-in|see{Plug-in Documentation}}.
+% The previous command takes times. So command \texttt{make doc-kernel} only
+% generates the kernel documentation\index{Documentation!Kernel} (\emph{i.e.}
+% \framac without any plug-in) while \texttt{make \$(PLUGIN\_NAME)\_DOC} (by
+% substituting the right value for
+% \texttt{\$(PLUGIN\_NAME)})\codeidx{PLUGIN\_NAME} generates
+% the documentation for a single plug-in\index{Plug-in!Documentation}%
+% \index{Documentation!Plug-in|see{Plug-in Documentation}}.
 
-\subsection{Source Documentation}\label{doc:plugin}
-\index{Plug-in!Documentation|bfit}
+% \subsection{Source Documentation}\label{doc:plugin}
+% \index{Plug-in!Documentation|bfit}
 
-Each plug-in should be properly documented. \framac uses \ocamldoc and so you
-can write any valid \ocamldoc comments.
+% Each plug-in should be properly documented. \framac uses \ocamldoc and so you
+% can write any valid \ocamldoc comments.
 
-\paragraph{\ocamldoc tags for \framac}\index{Documentation!Tags} The tag
-\texttt{@since version} should document any element introduced after the very
-first release, in order to easily know the required version of the \framac
-kernel or specific plug-ins. In the same way, the \framac documentation
-generator provides a custom tag \texttt{@modify version description} which
-should be used to document any element which semantics have changed since its
-introduction.
+% \paragraph{\ocamldoc tags for \framac}\index{Documentation!Tags} The tag
+% \texttt{@since version} should document any element introduced after the very
+% first release, in order to easily know the required version of the \framac
+% kernel or specific plug-ins. In the same way, the \framac documentation
+% generator provides a custom tag \texttt{@modify version description} which
+% should be used to document any element which semantics have changed since its
+% introduction.
 
-Furthermore, the special tag \texttt{@plugin developer guide} must be attached
-to each function used in this document.
+% Furthermore, the special tag \texttt{@plugin developer guide} must be attached
+% to each function used in this document.
 
-\paragraph{Plug-in API}
+% \paragraph{Plug-in API}
 
-A plug-in should export functions in its plug-in interface or through modules
-\texttt{Db}\codeidx{Db} or \texttt{Dynamic}\codeidx{Dynamic} as explained in
-Section~\ref{adv:plugin-registration}.
+% A plug-in should export functions in its plug-in interface or through modules
+% \texttt{Db}\codeidx{Db} or \texttt{Dynamic}\codeidx{Dynamic} as explained in
+% Section~\ref{adv:plugin-registration}.
 
-\begin{important}
-The interface name of a plug-in \texttt{plugin} must be \texttt{Plugin.mli}. Be
-careful to capitalization of the filename which is unusual in \caml but
-required here for compilation purposes.
-\end{important}
+% \begin{important}
+% The interface name of a plug-in \texttt{plugin} must be \texttt{Plugin.mli}. Be
+% careful to capitalization of the filename which is unusual in \caml but
+% required here for compilation purposes.
+% \end{important}
 
-\paragraph{Internal Documentation for Kernel Integrated Plug-ins}
+% \paragraph{Internal Documentation for Kernel Integrated Plug-ins}
 
-The \framac documentation generator also produces an internal plug-in
-documentation which may be useful for the plug-in developer itself.
+% The \framac documentation generator also produces an internal plug-in
+% documentation which may be useful for the plug-in developer itself.
 
-\paragraph{Internal Documentation for External Plug-ins}
+% \paragraph{Internal Documentation for External Plug-ins}
 
-External plug-ins can be documented in the same way as plug-ins that are
-compiled together with \framac. However, in order to be able to compile the
-documentation with \texttt{make doc}, you must have generated the documentation
-of Frama-C's kernel (\texttt{make doc}, see above) and installed it with the
-\texttt{make install-doc-code}\codeidx{install-doc-code} command.
+% External plug-ins can be documented in the same way as plug-ins that are
+% compiled together with \framac. However, in order to be able to compile the
+% documentation with \texttt{make doc}, you must have generated the documentation
+% of Frama-C's kernel (\texttt{make doc}, see above) and installed it with the
+% \texttt{make install-doc-code}\codeidx{install-doc-code} command.
 
 \section{Packaging}
 \label{sec:dune-packaging}
