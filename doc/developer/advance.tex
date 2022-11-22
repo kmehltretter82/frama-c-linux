@@ -1896,70 +1896,18 @@ Section~\ref{adv:dynamic-registration} details how to register and access a
 
 \begin{target}plug-in developers.\end{target}
 \begin{prereq}
-  Basic knowledge of \make.
+  Basic knowledge of \texttt{dune}.
 \end{prereq}
 
-Each plug-in is compiled into a module of name indicated by the variable
-\texttt{PLUGIN\_NAME}\codeidx{PLUGIN\_NAME} of its \texttt{Makefile} (say
-\texttt{Plugin\_A}. Its developer has to provide a \texttt{.mli} for this
-plug-in (following the previous example, a file \texttt{Plugin\_A.mli}). This
-\texttt{.mli} file may thus contains the API of the plug-in.
-
-Another plug-in may then access to \texttt{Plugin\_A} as it accesses any
-other \caml module, but it has to declare in its \texttt{Makefile} that it
-depends on \texttt{Plugin\_A} through the special variable
-\texttt{PLUGIN\_DEPENDENCIES}.
-
-\begin{example}
-\texttt{Plugin\_A} declares and provides access to a function \texttt{compute}
-in the following way.
-
-\listingname{File plugin\_a/my\_analysis\_a.ml}
-\begin{ocamlcode}
-let compute () = ...
-\end{ocamlcode}
-
-\listingname{File plugin\_a/Plugin\_A.mli}
-\begin{ocamlcode}
-module My_analysis_a: sig val compute: unit -> unit
-\end{ocamlcode}
-
-\codeidx{PLUGIN\_NAME}
-\codeidx{PLUGIN\_CMO}
-\codeidx{Makefile.dynamic}
-\listingname{File plugin\_a/Makefile}
-\begin{makefilecode}
-PLUGIN_NAME:=Plugin_A
-PLUGIN_CMO:=... my_analysis_a ...
-...
-include Makefile.dynamic
-\end{makefilecode}
-
-Then, \texttt{Plugin\_B} may use this function \texttt{Compute} as follows.
-
-\listingname{File plugin\_b/my\_analysis\_b.ml}
-\begin{ocamlcode}
-let compute () = ... Plugin_A.My_analysis_a.compute () ...
-\end{ocamlcode}
-
-\codeidx{PLUGIN\_NAME}
-\codeidx{PLUGIN\_CMO}
-\codeidx{PLUGIN\_DEPENDENCIES}
-\codeidx{Makefile.dynamic}
-\listingname{File plugin\_b/Makefile}
-\begin{makefilecode}
-PLUGIN_NAME:=Plugin_B
-PLUGIN_CMO:=... my_analysis_b ...
-PLUGIN_DEPENDENCIES:=Plugin_A
-...
-include Makefile.dynamic
-\end{makefilecode}
-\end{example}
+From \texttt{dune} point of view, a plug-in is simply an \ocaml library.
+In order for plugin \texttt{B} to use a function which is declared in
+the interface of plugin \texttt{A}, the \texttt{dune} file of \texttt{B} must
+contain in its \texttt{libraries} clause \texttt{frama-c-a.core}
+(see Section~\ref{adv:dependencies}), or more generally the \texttt{public\_name}
+under which \texttt{A} is declared.
 
 \subsection{Kernel-integrated Registration and Access}
 \label{adv:static-registration}
-\index{Plug-in!Kernel-integrated!Registration}
-\index{Plug-in!Kernel-integrated!Access}
 
 \begin{target}kernel-integrated plug-in developers.\end{target}
 
@@ -1968,6 +1916,12 @@ include Makefile.dynamic
   your plug-in as any standard plug-in (see
   Section~\ref{adv:dynamic-registration} for details).
 \end{prereq}
+
+\begin{important}
+This registration method is deprecated and only kept here for historical purpose.
+No new entry point should be added in the \texttt{Db}, which will be removed in
+a future version of \framac.
+\end{important}
 
 A database, called \texttt{Db}\codeidxdef{Db} (in directory
 \texttt{src/kernel\_services/plugin\_entry\_points}), groups together
@@ -2031,12 +1985,6 @@ module P : sig
          @return result of the analysis. *)
 end
 \end{ocamlcode}
-
-\listingname{share/Makefile.common}
-\begin{makefilecode}
-FRAMAC_SRC_DIRS= ... plugins/p_types
-   # Extend this variable with the new directory
-\end{makefilecode}
 \end{example}
 
 This design choice has a side effect : it reveals exported types.
@@ -2053,6 +2001,11 @@ implementation. This code should be linked before \texttt{Db}
 \index{Plug-in!Registration}\index{Plug-in!Access}\index{Plug-in!API}
 
 \begin{target}standard plug-ins developers.\end{target}
+
+\begin{important}
+Dynamic registration is obsolete. Newer development should favor exporting
+a static API, as explained in Section~\ref{adv:standard-registration}.
+\end{important}
 
 Registration of kernel-integrated plug-ins requires to modify module
 \texttt{Db}\codeidx{Db} which belongs to the \framac kernel. Such a
