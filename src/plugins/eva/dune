@@ -28,7 +28,7 @@
    (echo "EVA:" %{lib-available:frama-c-eva.core} "\n")
    (echo "Numerors:" %{lib-available:frama-c-eva.numerors.core} "\n")
    (echo " - MLMPFR:" %{lib-available:mlmpfr} "\n")
-   (echo "Apron domains:" %{lib-available:frama-c-eva.apron} "\n")
+   (echo "Apron domains:" %{lib-available:frama-c-eva.apron.core} "\n")
    (echo " - apron.octMPQ:" %{lib-available:apron.octMPQ} "\n")
    (echo " - apron.boxMPQ:" %{lib-available:apron.boxMPQ} "\n")
    (echo " - apron.polkaMPQ:" %{lib-available:apron.polkaMPQ} "\n")
