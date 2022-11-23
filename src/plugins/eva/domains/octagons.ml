@@ -52,7 +52,7 @@ type kind = Integer | Float
 
 let typ_kind typ =
   match Cil.unrollType typ with
-  | TInt _ | TEnum  _ -> Integer
+  | TInt _ | TEnum  _ | TPtr _ -> Integer
   | TFloat _ -> Float
   | _ -> assert false
 
@@ -63,11 +63,12 @@ module type Variable = sig
      lvalues. *)
   val make: varinfo -> t
   val make_int: varinfo -> t
+  val make_startof: varinfo -> t
   (* Returns all variables that may have been created for a varinfo. *)
   val get_all: varinfo -> t list
   val kind: t -> kind (* The kind of the variable: integer or float. *)
   val lval: t -> lval option (* The CIL lval corresponding to the variable. *)
-  val base: t -> Base.t (* Base of the variable. *)
+  val base: t -> Base.t option (* Base of the variable. *)
   val id: t -> int (* Unique id, needed to use variables as hptmap keys. *)
 end
 
@@ -77,10 +78,12 @@ module Variable : Variable = struct
   type var =
     | Var of varinfo
     | Int of varinfo
+    | StartOf of varinfo
 
   let id = function
-    | Var vi -> 2 * vi.vid
-    | Int vi -> 2 * vi.vid + 1
+    | Var vi -> 3 * vi.vid
+    | Int vi -> 3 * vi.vid + 1
+    | StartOf vi -> 3 * vi.vid + 2
 
   module Datatype_Input = struct
     include Datatype.Undefined
@@ -93,8 +96,11 @@ module Variable : Variable = struct
       match x, y with
       | Var x, Var y
       | Int x, Int y -> Cil_datatype.Varinfo.compare x y
-      | Var _, Int _ -> -1
-      | Int _, Var _ -> 1
+      | StartOf x, StartOf y -> Cil_datatype.Varinfo.compare x y
+      | Var _, _ -> -1
+      |  _, Var _ -> 1
+      | Int _, _ -> -1
+      |  _, Int _ -> 1
 
     let equal x y = compare x y = 0
 
@@ -102,24 +108,27 @@ module Variable : Variable = struct
     let rehash = Datatype.identity
 
     let pretty fmt = function
-      | Var vi -> Printer.pp_varinfo fmt vi
+      | Var vi | StartOf vi -> Printer.pp_varinfo fmt vi
       | Int vi -> Format.fprintf fmt "(integer)%a" Printer.pp_varinfo vi
   end
 
   include Datatype.Make_with_collections (Datatype_Input)
   let make vi = Var vi
   let make_int vi = Int vi
+  let make_startof vi = StartOf vi
   let get_all vi = [ Var vi; Int vi ]
 
   let kind = function
     | Var vi -> typ_kind vi.vtype
-    | Int _ -> Integer
+    | Int _ | StartOf _ -> Integer
 
   let lval = function
     | Var vi -> Some (Cil_types.Var vi, NoOffset)
-    | Int _ -> None
+    | Int _ | StartOf _ -> None
 
-  let base = function Var vi | Int vi -> Base.of_varinfo vi
+  let base = function
+    | Var vi | Int vi -> Some (Base.of_varinfo vi)
+    | StartOf _ -> None
 end
 
 (* Pairs of related variables in an octagon.
@@ -152,6 +161,11 @@ end
 
 (* Kind of relation between two variables X and Y: X+Y or X-Y. *)
 type operation = Add | Sub
+
+let operation_of_binop = function
+  | PlusA | PlusPI -> Add
+  | MinusA | MinusPI | MinusPP -> Sub
+  | _ -> assert false
 
 (* Extended arithmetic operations over Ival.t. *)
 module Arith = struct
@@ -188,6 +202,7 @@ module Arith = struct
 
   let sub = int_or_float_operation Ival.sub_int Fval.sub
   let add = int_or_float_operation Ival.add_int Fval.add
+  let mul_integer = Ival.scale
 
   let apply = function
     | Add -> add
@@ -253,6 +268,12 @@ module Rewriting = struct
      where X is a variable and coeff an interval. *)
   type var_coeff = { var: Variable.t; sign: bool; coeff: Ival.t; }
 
+  let _pretty_var_coeff fmt var_coeff =
+    Format.fprintf fmt "%s%a - %a"
+      (if var_coeff.sign then "" else "-")
+      Variable.pretty var_coeff.var
+      Ival.pretty var_coeff.coeff
+
   (* Negates a simplified form. *)
   let neg { var; sign; coeff } =
     { var; sign = not sign; coeff = Arith.neg coeff }
@@ -264,21 +285,45 @@ module Rewriting = struct
 
   (* If a needed interval is unknown, stop the current computation and return
      an empty list. *)
-  let (>>) value f = match value with
+  let (let*) value f = match value with
     | `Top -> []
     | `Value ival -> f ival
 
   (* Apply [f typ v1 v2] if the operation [e1 op e2] does not overflow,
      where [v1] and [v2] are the intervals for [e1] and [e2], and [typ] is
      the type of [e1]. Returns the empty list otherwise. *)
-  let apply_binop f evaluate typ e1 op e2 =
-    evaluate e1 >> fun v1 ->
-    evaluate e2 >> fun v2 ->
+  let apply_binop f (evaluate : 'a -> Ival.t or_top) typ e1 op e2 =
     let kind = typ_kind (Cil.typeOf e1) in
-    let result = Arith.apply op kind v1 v2 in
-    if may_overflow typ result
-    then []
-    else f kind v1 v2
+    let v1 = evaluate e1 in
+    let v2 = evaluate e2 in
+    if Cil.isPointerType typ
+    then f kind v1 v2
+    else
+      let* v1' = v1 in
+      let* v2' = v2 in
+      let result = Arith.apply op kind v1' v2' in
+      if may_overflow typ result
+      then []
+      else f kind v1 v2
+
+  (* Evaluates offset to an interval using the evaluate function for indexes *)
+  let rec offset_to_coeff evaluate base_type offset =
+    let open Lattice_bounds.Top.Operators in
+    match offset with
+    | Cil_types.NoOffset -> `Value (Ival.zero)
+    | Field (fi, sub) ->
+      let+ sub_coeff = offset_to_coeff evaluate fi.ftype sub in
+      let byte_offset = Integer.of_int (fst (Cil.fieldBitsOffset fi) / 8) in
+      Ival.add_singleton_int byte_offset sub_coeff
+    | Index (exp, sub) ->
+      let elem_type = Cil.typeOf_array_elem base_type in
+      let* index = evaluate exp in
+      let* sub_coeff = offset_to_coeff evaluate elem_type sub in
+      let+ elem_size =
+        try `Value (Cil.bytesSizeOf elem_type)
+        with Cil.SizeOfError _ -> `Top
+      in
+      Ival.(add_int (scale (Integer.of_int elem_size) index) sub_coeff)
 
   (* Rewrites the Cil expression [expr] into the simplified form [±x-coeff],
      where [x] is a non-singleton variable and [coeff] is an interval. The
@@ -289,10 +334,10 @@ module Rewriting = struct
      function relies on an evaluation function linking each sub-expression into
      an interval, used for computing sound coefficients. The evaluation may
      return Top for some sub-expression, thus preventing the computation. *)
-  let rec rewrite evaluate expr =
+  let rec rewrite (evaluate : 'a -> Ival.t or_top) expr =
     match expr.enode with
     | Lval (Var varinfo, NoOffset) ->
-      if Cil.isIntegralType varinfo.vtype
+      if Cil.isIntegralOrPointerType varinfo.vtype
       && not (Cil.typeHasQualifier "volatile" varinfo.vtype)
       && not (is_singleton (evaluate expr))
       then
@@ -301,23 +346,38 @@ module Rewriting = struct
       else []
 
     | UnOp (Neg, e, typ) ->
-      evaluate e >> fun v ->
+      let* v = evaluate e in
       if may_overflow typ (Arith.neg v)
       then [] else List.map neg (rewrite evaluate e)
 
-    | BinOp ((PlusA | MinusA as binop), e1, e2, typ) ->
-      let op = if binop = PlusA then Add else Sub in
-      let rewrite_binop typ v1 v2 =
-        let inverse_op = if binop = PlusA then Arith.sub else Arith.add in
-        let add_v2 var =
-          { var with coeff = inverse_op typ var.coeff v2 }
+    | BinOp (PlusA | MinusA | PlusPI | MinusPI as binop, e1, e2, typ) ->
+      let op = operation_of_binop binop in
+      let rewrite_binop kind v1 v2 =
+        let left_linearized =
+          let* v2 = v2 in
+          let inverse_op = if op = Add then Arith.sub else Arith.add in
+          try
+            let v2 =
+              if Cil.isPointerType typ
+              then
+                let scale = Cil.(bytesSizeOf (typeOf_pointed typ)) in
+                Arith.mul_integer (Integer.of_int scale) v2
+              else v2
+            in
+            let add_v2 var =
+              { var with coeff = inverse_op kind var.coeff v2 }
+            in
+            List.map add_v2 (rewrite evaluate e1)
+          with Cil.SizeOfError _ -> []
+        and right_linearized =
+          let* v1 = v1 in
+          let add_v1 var =
+            let var = if op = Sub then neg var else var in
+            { var with coeff = Arith.sub kind var.coeff v1 }
+          in
+          List.map add_v1 (rewrite evaluate e2)
         in
-        let add_v1 var =
-          let var = if binop = MinusA then neg var else var in
-          { var with coeff = Arith.sub typ var.coeff v1 }
-        in
-        List.map add_v2 (rewrite evaluate e1) @
-        List.map add_v1 (rewrite evaluate e2)
+        left_linearized @ right_linearized
       in
       apply_binop rewrite_binop evaluate typ e1 op e2
 
@@ -329,17 +389,24 @@ module Rewriting = struct
       let var = Variable.make_int vi in
       [ { var; sign = true; coeff = Ival.zero } ]
 
-
     | CastE (typ, e) ->
       if Cil.(isIntegralType typ && isIntegralType (typeOf e)) then
-        evaluate e >> fun v ->
+        let* v = evaluate e in
         if may_overflow ~cast:true typ v then [] else rewrite evaluate e
-      else []
+      else if Cil.(isPointerType typ && isPointerType (typeOf e)) then
+        rewrite evaluate e
+      else
+        []
+
+    | StartOf (Var vi, offset) | AddrOf (Var vi, offset) ->
+      let var = Variable.make_startof vi in
+      let* coeff = offset_to_coeff evaluate vi.vtype offset in
+      [ { var ; sign = true; coeff = Ival.neg_int coeff }]
 
     | _ -> []
 
   (* Rewrites the operation [e1 ± e2] into equivalent octagons ±(X±Y-value). *)
-  let rewrite_binop evaluate e1 binop e2 =
+  let rewrite_binop (evaluate : 'a -> Ival.t or_top) e1 binop e2 =
     let kind = typ_kind (Cil.typeOf e1) in
     let vars1 = rewrite evaluate e1 in
     let vars2 = rewrite evaluate e2 in
@@ -386,13 +453,13 @@ module Rewriting = struct
       List.map make_octagon rewritings
     in
     match expr.enode with
-    | BinOp ((PlusA | MinusA as binop), e1, e2, typ) ->
-      let op = if binop = PlusA then Add else Sub in
+    | BinOp (PlusA | MinusA | PlusPI | MinusPI | MinusPP as binop, e1, e2, typ) ->
+      let op = operation_of_binop binop in
       let make_octagons typ _ _ = make_octagons_from_binop typ e1 op e2 ival in
       apply_binop make_octagons evaluate typ e1 op e2
     | BinOp ((Lt | Gt | Le | Ge | Eq | Ne as binop), e1, e2, _typ) ->
       let typ = Cil.typeOf e1 in
-      if not (Cil.isIntegralType typ)
+      if not (Cil.isIntegralOrPointerType typ)
       || (Ival.contains_zero ival && Ival.contains_non_zero ival)
       then []
       else
@@ -458,7 +525,7 @@ module Rewriting = struct
         then default
         else ival, overflow_alarms typ expr ival
     | BinOp ((Lt | Gt | Le | Ge | Eq as binop), e1, e2, _typ)
-      when Cil.isIntegralType (Cil.typeOf e1) ->
+      when Cil.isIntegralOrPointerType (Cil.typeOf e1) ->
       let comp = Eva_utils.conv_comp binop in
       (* Evaluate [e1 - e2] and compare the resulting interval to the interval
          for which the comparison [e1 # e2] holds. *)
@@ -843,7 +910,7 @@ module State = struct
   (* Is an octagon no more precise than the intervals inferred for the related
      variables? If so, do not save the octagon in the domain. *)
   let is_redundant intervals { variables; operation; value; } =
-    if infer_intervals
+    if infer_intervals && false
     then
       try
         let v1, v2 = Pair.get variables in
@@ -1148,7 +1215,7 @@ module Domain = struct
 
   let reduce_further state expr value =
     match expr.enode with
-    | Lval (Var x, NoOffset) when Cil.isIntegralType x.vtype ->
+    | Lval (Var x, NoOffset) when Cil.isIntegralOrPointerType x.vtype ->
       begin
         try
           let x_ival = Cvalue.V.project_ival value in
@@ -1296,7 +1363,7 @@ module Domain = struct
   let assign _kinstr left_value expr assigned valuation state =
     update valuation state >>- fun state ->
     match left_value.lval with
-    | Var varinfo, NoOffset when Cil.isIntegralType varinfo.vtype ->
+    | Var varinfo, NoOffset when Cil.isIntegralOrPointerType varinfo.vtype ->
       assign_variable varinfo expr assigned valuation state
     | _ ->
       let written_loc = Precise_locs.imprecise_location left_value.lloc in
@@ -1361,9 +1428,9 @@ module Domain = struct
     else
       let add_related_bases acc var =
         let related = Relations.find var state.relations in
-        Variable.Set.fold
-          (fun var -> Base.Hptset.add (Variable.base var))
-          related acc
+        Variable.Set.to_seq related |>
+        Seq.filter_map Variable.base |>
+        Seq.fold_left (Fun.flip Base.Hptset.add) acc
       in
       let aux base acc =
         try
@@ -1379,7 +1446,10 @@ module Domain = struct
     if intraprocedural ()
     then state
     else
-      let mem_var var = Base.Hptset.mem (Variable.base var) bases in
+      let mem_var var =
+        Option.fold ~none:false ~some:(fun base -> Base.Hptset.mem base bases)
+          (Variable.base var)
+      in
       let mem_pair pair =
         let x, y = Pair.get pair in
         mem_var x && mem_var y
