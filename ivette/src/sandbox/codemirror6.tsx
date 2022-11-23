@@ -1,6 +1,7 @@
 import React from 'react';
 import Dictionary from 'lodash';
-import { Facet, StateEffect } from '@codemirror/state';
+import { EditorSelection } from '@codemirror/state';
+import { Facet, StateEffect, StateField } from '@codemirror/state';
 import { EditorState, Extension, RangeSet } from '@codemirror/state';
 import { Decoration, DecorationSet } from '@codemirror/view';
 import { EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
@@ -12,7 +13,7 @@ import { syntaxHighlighting, HighlightStyle } from '@codemirror/language';
 import { parser } from '@lezer/cpp';
 import { SyntaxNode } from '@lezer/common';
 import { foldGutter, foldNodeProp } from '@codemirror/language';
-import { LRLanguage, LanguageSupport } from "@codemirror/language"
+import { LRLanguage, LanguageSupport } from "@codemirror/language";
 
 import * as Dome from 'dome';
 import * as Server from 'frama-c/server';
@@ -97,10 +98,18 @@ function buildExtension<S>(p: Plugin<S>): Extension {
 
 // Helper for facets that only keep tracks of server's data in the CodeMirror
 // state. Each time we have to combine different values for the facet, we
-// simply keep that last one.
+// simply keep the last one.
 function stateFacet<I>(e: I): Facet<I, I> {
-  const combine = (l: readonly I[]): I => l.length > 1 ? l[l.length - 1] : e;
+  const combine = (l: readonly I[]): I => l.length > 0 ? l[l.length - 1] : e;
   return Facet.define<I, I>({ combine });
+}
+
+// Update the <facet> with a new value in the given view.
+function useFacet<A>(view: EditorView | null, facet: Facet<A, A>, a: A): void {
+  React.useEffect(() => {
+    const effects = StateEffect.appendConfig.of(facet.of(a));
+    view?.dispatch({ effects });
+  }, [view, facet, a]);
 }
 
 
@@ -131,7 +140,7 @@ function coveringNode(tree: Tree, position: number): Tree | undefined {
     const res = coveringNode(child, position);
     if (res) return res.id ? res : tree;
   }
-  if (tree.from <= position && position <= tree.to) return tree;
+  if (tree.from <= position && position < tree.to) return tree;
   return undefined;
 }
 
@@ -238,9 +247,47 @@ async function extractCodeData(fct?: string): Promise<CodeData> {
 //  Plugin decorating hovered and selected elements
 // -----------------------------------------------------------------------------
 
+// Internal function used to compute the selected nodes in the AST. Used by the
+// <SelectedField> state field described right below.
+function selectedTrees(s: EditorState, selection?: EditorSelection): Tree[] {
+  const { tree } = s.facet(CodeDataFacet);
+  const ranges = selection ? selection.ranges : s.selection.ranges;
+  const selected: Tree[] = [];
+  for (const selection of ranges) {
+    const covering = coveringNode(tree, selection.from);
+    if (!covering || !covering.id) continue;
+    selected.push(covering);
+  }
+  return selected;
+}
+
+// The selected nodes in the AST. It is recomputed each time a selection
+// transaction is performed. We need to separate this computation from the
+// plugin itself to avoid the triggering of CodeMirror update during another
+// update.
+const SelectedField = StateField.define<Tree[]>({
+  create: selectedTrees,
+  update: (field, transaction) => {
+    const { selection, startState } = transaction;
+    if (!selection) return field;
+    const selected = selectedTrees(startState, selection);
+    const { fct } = startState.facet(CodeDataFacet);
+    const update = startState.facet(UpdateSelectionFacet);
+    for (const node of selected) {
+      const marker = Ast.jMarker(node.id);
+      update({ location: { fct, marker } });
+    }
+  return selected;
+  }
+});
+
+// This extension needs to be able to update the Ivette selection. This facet
+// add the callback in the CodeMirror internal state.
 type UpdateSelection = (a: States.SelectionActions) => void;
 const UpdateSelectionFacet = stateFacet<UpdateSelection>(() => { return; });
 
+// This extension needs to be able to update the Ivette hovered element. This
+// facet add the callback in the CodeMirror internal state.
 type UpdateHovered = (h: States.Hovered) => void;
 const UpdateHoveredFacet = stateFacet<UpdateHovered>(() => { return ; });
 
@@ -283,16 +330,7 @@ const CodeDecorationPlugin: Plugin<CodeDecorationState> = {
   // selection.
   update: (state, update) => {
     if (!update.selectionSet) return state;
-    const { fct, tree } = update.state.facet(CodeDataFacet);
-    const updateSelection = update.state.facet(UpdateSelectionFacet);
-    const selected = [];
-    for (const selection of update.state.selection.ranges) {
-      const covering = coveringNode(tree, selection.from);
-      if (!covering || !covering.id) continue;
-      selected.push(covering);
-      const marker = Ast.jMarker(covering.id);
-      updateSelection({ location: { fct, marker } });
-    }
+    const selected = update.state.field(SelectedField); 
     return computeDecorations({ ...state, selected });
   },
 
@@ -359,7 +397,7 @@ const DeadCodePlugin: Plugin<DecorationSet> = {
     }
     return RangeSet.of(unreachable.concat(nonTerm), true);
   },
-}
+};
 
 
 
@@ -388,11 +426,11 @@ function getBulletColor(status: States.Tag): string {
 // Property bullet gutter marker.
 class PropertyBullet extends GutterMarker {
   readonly bullet: HTMLDivElement;
-  toDOM() { return this.bullet; }
+  toDOM(): HTMLDivElement { return this.bullet; }
   constructor(status?: States.Tag) {
     super();
     this.bullet = document.createElement('div');
-    this.bullet.innerHTML = '◉'
+    this.bullet.innerHTML = '◉';
     if (status) {
       this.bullet.style.color = getBulletColor(status);
       this.bullet.style.textAlign = 'center';
@@ -559,7 +597,7 @@ const ContextMenuPlugin: Plugin<void> = {
       return;
     }
   }
-}
+};
 
 
 
@@ -567,6 +605,7 @@ const ContextMenuPlugin: Plugin<void> = {
 //  Code highlighting and parsing
 // -----------------------------------------------------------------------------
 
+// Plugin specifying how to highlight the code. The theme is handled by the CSS.
 const HighlightPlugin = syntaxHighlighting(HighlightStyle.define([
   { tag: tags.comment, class: 'cm-comment' },
   { tag: tags.typeName, class: 'cm-type' },
@@ -575,9 +614,9 @@ const HighlightPlugin = syntaxHighlighting(HighlightStyle.define([
   { tag: tags.definition(tags.variableName) , class: 'cm-def' },
 ]));
 
-/// A language provider based on the [Lezer C++ parser]
-// (https://github.com/lezer-parser/cpp), extended with
-/// highlighting and folding information.
+// A language provider based on the [Lezer C++ parser], extended with
+// highlighting and folding information. Only comments can be folded.
+// (Source: https://github.com/lezer-parser/cpp)
 const comment = (t: SyntaxNode): Range => ({ from: t.from + 2, to: t.to - 2});
 const folder = foldNodeProp.add({ BlockComment: comment });
 const stringPrefixes = [ "L", "u", "U", "u8", "LR", "UR", "uR", "u8R", "R" ];
@@ -598,28 +637,23 @@ const cppLanguage = LRLanguage.define({
 
 // Necessary extensions for our needs.
 const baseExtensions: Extension[] = [
-  // drawSelection(),
-  // EditorState.allowMultipleSelections.of(true),
-
+  SelectedField.extension,
   UpdateHoveredFacet.of(() => { return; }),
   UpdateSelectionFacet.of(() => { return; }),
-
   CodeDataFacet.of(emptyCodeData),
   buildExtension(CodeDecorationPlugin),
   buildExtension(DeadCodePlugin),
-
   PropertiesFacet.of([]),
   StatusDictFacet.of(new Map()),
   gutterTheme, PropertiesExtension,
-
   GetMarkerDataFacet.of(() => undefined),
   buildExtension(ContextMenuPlugin),
-
   foldGutter(),
   HighlightPlugin,
   new LanguageSupport(cppLanguage),
 ];
 
+// The component in itself.
 function Editor(): JSX.Element {
 
   // Creating the codemirror vue and binding it to the editor div.
@@ -629,50 +663,28 @@ function Editor(): JSX.Element {
     if (!parent.current) return;
     const state = EditorState.create({ extensions: baseExtensions });
     editor.current = new EditorView({ state, parent: parent.current });
-  }, [parent, baseExtensions]);
+  }, [parent]);
 
-  // Updating CodeMirror when the <updateSelection> callback is changed.
+  // Updating CodeMirror when the selection or its callback are changed.
   const [selection, updateSelection] = States.useSelection();
-  React.useEffect(() => {
-    const updateSelectionFacet = UpdateSelectionFacet.of(updateSelection);
-    const effects = StateEffect.appendConfig.of(updateSelectionFacet);
-    editor.current?.dispatch({ effects });
-  }, [editor, updateSelection]);
+  useFacet(editor.current, UpdateSelectionFacet, updateSelection);
 
   // Updating CodeMirror when the <updateHovered> callback is changed.
   const [_, updateHovered] = States.useHovered();
-  React.useEffect(() => {
-    const updateHoveredFacet = UpdateHoveredFacet.of(updateHovered);
-    const effects = StateEffect.appendConfig.of(updateHoveredFacet);
-    editor.current?.dispatch({ effects });
-  }, [editor, updateHovered]);
+  useFacet(editor.current, UpdateHoveredFacet, updateHovered);
 
   // Updating CodeMirror when the <properties> synchronized array is changed.
   const properties = States.useSyncArray(Properties.status).getArray();
-  React.useEffect(() => {
-    const propertiesFacet = PropertiesFacet.of(properties);
-    const effects = StateEffect.appendConfig.of(propertiesFacet);
-    editor.current?.dispatch({ effects });
-  }, [editor, properties]);
+  useFacet(editor.current, PropertiesFacet, properties);
 
   // Updating CodeMirror when the <propStatusTags> map is changed.
   const statusDict = States.useTags(Properties.propStatusTags);
-  React.useEffect(() => {
-    const statusDictFacet = StatusDictFacet.of(statusDict);
-    const effects = StateEffect.appendConfig.of(statusDictFacet);
-    editor.current?.dispatch({ effects });
-  }, [editor, statusDict]);
+  useFacet(editor.current, StatusDictFacet, statusDict);
 
   // Updating CodeMirror when the <markersInfo> synchronized array is changed.
-  const markersInfo = States.useSyncArray(Ast.markerInfo);
-  const getMarkerData = React.useCallback<GetMarkerData>((key) => {
-    return markersInfo.getData(key);
-  }, [markersInfo]);
-  React.useEffect(() => {
-    const getMarkerDataFacet = GetMarkerDataFacet.of(getMarkerData);
-    const effects = StateEffect.appendConfig.of(getMarkerDataFacet);
-    editor.current?.dispatch({ effects });
-  }, [editor, getMarkerData]);
+  const info = States.useSyncArray(Ast.markerInfo);
+  const getMarkerData = React.useCallback((key) => info.getData(key), [info]);
+  useFacet(editor.current, GetMarkerDataFacet, getMarkerData);
 
   // Retrieving data on currently selected function and updating CodeMirror when
   // they have changed.
@@ -687,6 +699,15 @@ function Editor(): JSX.Element {
     const effects = [ StateEffect.appendConfig.of(dataFacet) ];
     editor.current.dispatch({ changes, selection: { anchor: 0 }, effects });
   }, [editor, data]);
+
+  // Updating the CodeMirror's selected marker.
+  React.useEffect(() => {
+    const view = editor.current; if (!view || !data) return;
+    if (selection.current && selection.current.marker) {
+      const r = data.ranges.get(selection.current.marker);
+      if (r) view.dispatch({ selection: { anchor: r.from } });
+    }
+  }, [editor, data, selection]);
 
   return <div className='cm-global-box' ref={parent} />;
 }
