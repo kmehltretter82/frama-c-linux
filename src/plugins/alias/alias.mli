@@ -31,7 +31,7 @@ open Cil_types
     
 open Abstract_state
 
-module LSet : sig type t end (* sets of lvalues *)
+type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
 
 (** Performes the may-alias analysis. Do it once before using other functions *)
 val compute : unit -> unit
@@ -39,16 +39,26 @@ val compute : unit -> unit
 (** Minimal API, as presented during kickoff meeting *)
 (* we changed:  type varinfo -> type lval *)
 
-val get_class_before_statement : stmt ->  lval -> LSet.t
-val get_class_after_statement : stmt ->  lval -> LSet.t
+val get_class_before_statement : kernel_function -> stmt ->  lval -> lset
+val get_class_after_statement : kernel_function -> stmt ->  lval -> lset
 
-val get_class_fundec: fundec -> lval -> LSet.t
-val get_class_fundec_stmts: fundec -> lval -> (stmt*LSet.t) list
+val get_class_fundec: kernel_function -> lval -> lset
+val get_class_fundec_stmts: kernel_function -> lval -> (stmt*lset) list
 
-
-
-(* TODO ajouter une fonction pour avoir la fermeture transitive *)
     
 (** connection with Abstract_state *)
 
-val concretise : MGU.ecr -> LSet.t
+val concretise : MGU.ecr -> lset
+
+
+(** other functions required by MERCE *)
+  
+(* checks that two Lval have the same ECR *)
+val is_equivalent :  kernel_function -> stmt -> lval -> lval -> bool
+
+(* give the graph vertex of lval *)
+val point_to :  kernel_function -> stmt -> lval -> V.t
+
+
+(* give the graph vertex of lval and its points-to closure *)
+val point_to_closure :  kernel_function -> stmt -> lval  -> G.t
