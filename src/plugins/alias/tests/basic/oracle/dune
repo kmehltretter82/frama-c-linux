@@ -1,0 +1,3 @@
+(rule (target "test.err.oracle") (mode fallback) (action (write-file "test.err.oracle" "")))
+(rule (target "test.res.oracle") (mode fallback) (action (write-file "test.res.oracle" "")))
+

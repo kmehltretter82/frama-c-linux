@@ -1,0 +1,9 @@
+{
+  "dir": "tests/merce/result",
+  "info": "TEST #0 OF TEST FILE tests/merce/example1.c",
+  "cmd": "frama-c -check -no-autoload-plugins -add-symbolic-path=\"/home/tlegall/GIT/alias/_build/default:.\" -load-plugin=alias    example1.c > \"example1.res.log\" 2> \"example1.err.log\"",
+  "out": "example1.res.log",
+  "err": "example1.err.log",
+  "oracle_out": "../oracle/example1.res.oracle",
+  "oracle_err": "../oracle/example1.err.oracle"
+}
