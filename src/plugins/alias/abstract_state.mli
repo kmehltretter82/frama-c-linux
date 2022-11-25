@@ -46,36 +46,38 @@
 
 
 *)
+open Graph
 
 open Cil_types
 
 
 (** module for vertices *)
-module V : sig
-
-  type t = lval       (* lvalues *)                                                         
-  val compare : t -> t -> int                                                
-  val hash : t -> int                                                    
-  val equal : t -> t -> bool                                                                 
- end
+module V : Sig.VERTEX
+(* sig
+ *  
+ *   type t = lval       (\* lvalues *\)                                                         
+ *   val compare : t -> t -> int                                                
+ *   val hash : t -> int                                                    
+ *   val equal : t -> t -> bool                                                                 
+ *  end *)
 
 
 (** module for points-to graphs *)
-module G :
-  sig
-    type t
-    (* directed, persistant ?  graph *)
-
-    val add_vertex : t -> V.t -> t
-
-    val add_edge : t -> (V.t * V.t) -> t
-
-    val remove_edge : t -> (V.t * V.t) -> t
-
-    val merge_vertex : t -> V.t -> V.t -> t
-
-    (* todo add more *)
-  end
+module G : Sig.P
+  (* sig
+   *   type t
+   *   (\* directed, persistant ?  graph *\)
+   * 
+   *   val add_vertex : t -> V.t -> t
+   * 
+   *   val add_edge : t -> (V.t * V.t) -> t
+   * 
+   *   val remove_edge : t -> (V.t * V.t) -> t
+   * 
+   *   val merge_vertex : t -> V.t -> V.t -> t
+   * 
+   *   (\* todo add more *\)
+   * end *)
 
 
 module MGU : sig
