@@ -41,10 +41,9 @@
 
 \newcommand{\markdiff}[1]{{\color{blue}{#1}}}
 \newenvironment{markdiffenv}[1][]{%
-  \begin{changebar}%
   \markdiff\bgroup%
 }%
-{\egroup\end{changebar}}
+{\egroup}
 
 % true = prints remarks for the ACSL working group.
 % false = prints no remark for the distributed version of ASCL documents
@@ -90,21 +89,18 @@
 
 \newcommand{\notreviewed}[2][]{%
 \ifthenelse{\boolean{PrintRemarks}}{%
-  \begin{changebar}%
   {\highlightnotreviewed #2}%
   \ifthenelse{\equal{#1}{}}{}{\footnote{#1}}%
-  \end{changebar}%
 }%
 {}}
 
 \ifthenelse{\boolean{PrintRemarks}}{%
 \newenvironment{notreviewedenv}[1][]{%
-  \begin{changebar}%
   \highlightnotreviewed%
   \ifthenelse{\equal{#1}{}}{}{\def\myrq{#1}}%
   \bgroup}%
  {\egroup%
-  \ifthenelse{\isundefined{\myrq}}{}{\footnote{\myrq}}\end{changebar}}}%
+  \ifthenelse{\isundefined{\myrq}}{}{\footnote{\myrq}}}}%
 {\excludecomment{notreviewedenv}}
 
 %%% Commandes et environnements pour la version relative à l'implementation
@@ -115,21 +111,18 @@
 
 \newcommand{\notimplemented}[2][]{%
 \ifthenelse{\boolean{PrintImplementationRq}}{%
-  \begin{changebar}%
   {\highlightnotimplemented #2}%
   \ifthenelse{\equal{#1}{}}{}{\footnote{#1}}%
-  \end{changebar}%
 }%
 {#2}}
 
 \ifthenelse{\boolean{PrintImplementationRq}}{%
 \newenvironment{notimplementedenv}[1][]{%
-  \begin{changebar}%
   \highlightnotimplemented%
   \ifthenelse{\equal{#1}{}}{}{\def\myrq{#1}}%
   \bgroup}%
 {\egroup%
- \ifthenelse{\isundefined{\myrq}}{}{\footnote{\myrq}}\end{changebar}}}
+ \ifthenelse{\isundefined{\myrq}}{}{\footnote{\myrq}}}}
 {\excludecomment{notimplementedenv}}
 
 %%% Environnements et commandes non conditionnelles
