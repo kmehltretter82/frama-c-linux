@@ -73,6 +73,11 @@ predicate "\\is_minus_infinity"(float32) = "is_negative_infinite_f32";
 predicate "\\is_minus_infinity"(float64) = "is_negative_infinite_f64";
 logic float32 "\\round_float"(rounding_mode,real) = "round_float";
 logic float64 "\\round_double"(rounding_mode,real) = "round_double";
+type "sign" = "sign";
+ctor "\\Positive" = "Positive";
+ctor "\\Negative" = "Negative";
+logic sign "\\sign"(float32) = "sign_f32";
+logic sign "\\sign"(float64) = "sign_f64";
 
 library vset:
 type set = "set";
