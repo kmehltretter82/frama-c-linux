@@ -26,7 +26,7 @@
 (** Module abstract_state
 
     implements "points-to" persistent graphs and Steensgaard's
-   algorithm (union-find)
+    algorithm (union-find)
 
     In the graph:
 
@@ -54,30 +54,30 @@ open Cil_types
 (** module for vertices *)
 module V : Sig.VERTEX
 (* sig
- *  
- *   type t = lval       (\* lvalues *\)                                                         
- *   val compare : t -> t -> int                                                
- *   val hash : t -> int                                                    
- *   val equal : t -> t -> bool                                                                 
+ *
+ *   type t = lval       (\* lvalues *\)
+ *   val compare : t -> t -> int
+ *   val hash : t -> int
+ *   val equal : t -> t -> bool
  *  end *)
 
 
 (** module for points-to graphs *)
 module G : Sig.P
-  (* sig
-   *   type t
-   *   (\* directed, persistant ?  graph *\)
-   * 
-   *   val add_vertex : t -> V.t -> t
-   * 
-   *   val add_edge : t -> (V.t * V.t) -> t
-   * 
-   *   val remove_edge : t -> (V.t * V.t) -> t
-   * 
-   *   val merge_vertex : t -> V.t -> V.t -> t
-   * 
-   *   (\* todo add more *\)
-   * end *)
+(* sig
+ *   type t
+ *   (\* directed, persistant ?  graph *\)
+ *
+ *   val add_vertex : t -> V.t -> t
+ *
+ *   val add_edge : t -> (V.t * V.t) -> t
+ *
+ *   val remove_edge : t -> (V.t * V.t) -> t
+ *
+ *   val merge_vertex : t -> V.t -> V.t -> t
+ *
+ *   (\* todo add more *\)
+ * end *)
 
 
 module MGU : sig
@@ -86,16 +86,16 @@ module MGU : sig
 
   type ecr (* type ECR = equivalence class representant *)
 
-  
+
   type t (* union find structure *)
 
 
   (* functions needed for Steensgaard's algorithm *)
-    
+
   (*  TODO : do it in a procedural or a functional style ? *)
-    
+
   val init : unit -> t
-  
+
   val join : t -> ecr -> ecr -> t (* join of ecr *)
 
   val cjoin : t -> ecr -> ecr -> t (*  conditional join *)
@@ -117,7 +117,7 @@ module AbstractState : sig
 
 
   (* additional structures that we may need :
-     HTable stmt -> t 
+     HTable stmt -> t
      HTable  fundec -> summary ?
   *)
 
@@ -127,5 +127,5 @@ module AbstractState : sig
   val do_stmt : t -> stmt -> t
 
   val make_summary : t -> fundec -> t * summary
-    
+
 end
