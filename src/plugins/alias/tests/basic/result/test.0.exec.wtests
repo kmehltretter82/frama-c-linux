@@ -1,9 +1,0 @@
-{
-  "dir": "tests/basic/result",
-  "info": "TEST #0 OF TEST FILE tests/basic/test.i",
-  "cmd": "frama-c -check -no-autoload-plugins -add-symbolic-path=\"/home/tlegall/GIT/alias/_build/default:.\" -load-plugin=alias    test.i > \"test.res.log\" 2> \"test.err.log\"",
-  "out": "test.res.log",
-  "err": "test.err.log",
-  "oracle_out": "../oracle/test.res.oracle",
-  "oracle_err": "../oracle/test.err.oracle"
-}
