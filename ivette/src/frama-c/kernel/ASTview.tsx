@@ -203,6 +203,7 @@ export default function ASTview(): JSX.Element {
   }, [buffer, theFunction, propertyStatus, statusDict]);
 
   React.useEffect(() => {
+    setBullets();
     buffer.on('change', setBullets);
     return () => { buffer.off('change', setBullets); };
   }, [buffer, setBullets]);
