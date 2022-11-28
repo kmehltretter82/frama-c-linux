@@ -25,10 +25,10 @@
 
 (** External API of the plugin Alias
 
-  
- *)
+
+*)
 open Cil_types
-    
+
 open Abstract_state
 
 type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
@@ -45,14 +45,14 @@ val get_class_after_statement : kernel_function -> stmt ->  lval -> lset
 val get_class_fundec: kernel_function -> lval -> lset
 val get_class_fundec_stmts: kernel_function -> lval -> (stmt*lset) list
 
-    
+
 (** connection with Abstract_state *)
 
 val concretise : MGU.ecr -> lset
 
 
 (** other functions required by MERCE *)
-  
+
 (* checks that two Lval have the same ECR *)
 val is_equivalent :  kernel_function -> stmt -> lval -> lval -> bool
 
