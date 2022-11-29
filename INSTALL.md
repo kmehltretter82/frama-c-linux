@@ -109,13 +109,15 @@ own sources directly:
     # install Frama-C's dependencies
     opam install depext # only for opam < 2.1.0
     opam depext frama-c # only for opam < 2.1.0
-    opam install --deps-only frama-c
+    opam install --deps-only frama-c [--with-test]
 
     # install custom version of frama-c
     opam pin add --kind=path frama-c <dir>
 
 where `<dir>` is the root of your unpacked Frama-C archive.
-See `opam pin` for more details.
+See `opam pin` for more details. The option `--with-test` is optional and
+is necessary only if you want to be able to execute the tests available in
+the frama-c repository.
 
 If your extensions require other libraries than the ones already used
 by Frama-C, they must of course be installed as well.
@@ -372,6 +374,11 @@ Basic tests can be executed using:
 make run-ptests
 make default-tests
 ```
+
+**Beware!** If the tests fail due to JSON output, it is likely because of the
+Yojson package version. Make sure that your `opam` dependencies have been
+installed with the option `--with-test`
+(see [Installing Custom Versions of Frama-C](#installing-custom-versions-of-frama-c)).
 
 #### Installation
 
