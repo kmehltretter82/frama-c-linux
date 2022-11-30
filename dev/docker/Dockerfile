@@ -22,6 +22,7 @@ RUN /init/install.sh \
   git \
   make \
   patch \
+  tar \
   unzip \
   wget
 
