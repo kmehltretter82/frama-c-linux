@@ -199,6 +199,13 @@ let () =
     ~enable:Analysis.is_computed
     print_value
 
+let evaluate_taint expr request =
+  let (let+) = Option.bind in
+  let Results.{ data ; indirect } = Results.expr_dependencies expr request in
+  let+ data = Results.is_tainted data request |> Result.to_option in
+  let+ indirect = Results.is_tainted indirect request |> Result.to_option in
+  Some (data, indirect)
+
 let print_taint fmt marker =
   let loc = Cil_datatype.Location.unknown in
   let expr, stmt =
@@ -253,6 +260,102 @@ let () =
 let () =
   Analysis.register_computation_hook
     (fun _ -> Server.Kernel_ast.Information.update ())
+
+
+
+module LvalueTaints = struct
+  module Lval = Kernel_ast.Lval
+
+  type taints = { data: Results.taint ; indirect: Results.taint }
+  type lvalue_taints = { lval: Lval.t ; before: taints ; after: taints }
+
+  module Taint: Data.S with type t = Results.taint = struct
+    type t = Results.taint
+    let tag strs = Package.Junion (List.map (fun s -> Package.Jtag s) strs)
+    let jtype = tag [ "direct" ; "indirect" ; "untainted" ]
+    let to_json = function
+      | Results.Direct -> Json.of_string "direct"
+      | Results.Indirect -> Json.of_string "indirect"
+      | Results.Untainted -> Json.of_string "untainted"
+    let of_json json =
+      match Yojson.Basic.Util.to_string json with
+      | "direct" -> Results.Direct
+      | "indirect" -> Results.Indirect
+      | "untainted" -> Results.Untainted
+      | _ -> Data.failure "Not a valid taint status"
+  end
+
+  module Taints: Data.S with type t = taints = struct
+    type t = taints
+    let tag strs = Package.Jrecord (List.map (fun s -> (s, Taint.jtype)) strs)
+    let jtype = tag [ "data" ; "indirect" ]
+    let to_json { data ; indirect } =
+      let data = Taint.to_json data in
+      let indirect = Taint.to_json indirect in
+      `Assoc [ ("data", data) ; ("indirect", indirect) ]
+    let of_json = function
+      | `Assoc [ ("data", data) ; ("indirect", indirect) ] ->
+        { data = Taint.of_json data ; indirect = Taint.of_json indirect }
+      | _ -> Data.failure "Not a valid taints record"
+  end
+
+  module LvalueTaints: Data.S with type t = lvalue_taints = struct
+    type t = lvalue_taints
+    let jtype = Package.Jrecord [
+      ("lval", Lval.jtype) ;
+      ("before", Taints.jtype) ;
+      ("after", Taints.jtype)
+    ]
+    let to_json { lval ; before ; after } =
+      let lval = Lval.to_json lval in
+      let before = Taints.to_json before in
+      let after = Taints.to_json after in
+      `Assoc [ ("lval", lval) ; ("before", before) ; ("after", after) ]
+    let of_json = function
+      | `Assoc [ ("lval", lval) ; ("before", before) ; ("after", after) ] ->
+        let lval = Lval.of_json lval in
+        let before = Taints.of_json before in
+        let after = Taints.of_json after in
+        { lval ; before ; after }
+      | _ -> Data.failure "Not a valid lval taints"
+  end
+
+  class tainted_lvalues taints = object (self)
+    inherit Visitor.generic_frama_c_visitor
+      (Visitor_behavior.copy (Project.current ()))
+    method! vlval lval =
+      match self#current_stmt with
+      | None -> DoChildren
+      | Some stmt ->
+        let expr = Cil.new_exp ~loc:Cil_datatype.Location.unknown (Lval lval) in
+        let before = evaluate_taint expr Results.(before stmt) in
+        let after = evaluate_taint expr Results.(after stmt) in
+        let add r = Cil_datatype.Lval.Hashtbl.add taints lval (stmt, r) in
+        let is_tainted (d, i) = Results.(d != Untainted || i != Untainted) in
+        let is_tainted b a = is_tainted b || is_tainted a in
+        match before, after with
+        | Some b, Some a when is_tainted b a -> add (b, a) ; DoChildren
+        | _, _ -> DoChildren
+  end
+
+  let to_value_taints lval (stmt, ((bdir, bind), (adir, aind))) ls =
+    let before = { data = bdir ; indirect = bind } in
+    let after = { data = adir ; indirect = aind } in
+    { lval = (Kstmt stmt, lval) ; before ; after } :: ls
+
+  let tainted_lvals_of_func fundec =
+    let taints = Cil_datatype.Lval.Hashtbl.create 17 in
+    ignore (Visitor.visitFramacFunction (new tainted_lvalues taints) fundec) ;
+    Cil_datatype.Lval.Hashtbl.fold to_value_taints taints [] |> List.rev
+
+  let () = Request.register ~package ~kind:`GET ~name:"taintedLvalues"
+    ~descr:(Markdown.plain "Get the tainted lvalues of a given function")
+    ~input:(module (Kernel_ast.Fundec))
+    ~output:(module (Data.Jlist (LvalueTaints)))
+    tainted_lvals_of_func
+end
+
+
 
 (* ----- Red and tainted alarms --------------------------------------------- *)
 

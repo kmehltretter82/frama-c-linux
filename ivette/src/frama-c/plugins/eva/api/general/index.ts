@@ -219,6 +219,63 @@ const getDeadCode_internal: Server.GetRequest<Json.key<'#fct'>,deadCode> = {
 /** Get the lists of unreachable and of non terminating statements in a function */
 export const getDeadCode: Server.GetRequest<Json.key<'#fct'>,deadCode>= getDeadCode_internal;
 
+const taintedLvalues_internal: Server.GetRequest<
+  Json.key<'#fundec'>,
+  { lval: Json.key<'#lval'>,
+    before:
+        { data: "direct" | "indirect" | "untainted",
+          indirect: "direct" | "indirect" | "untainted" },
+    after:
+        { data: "direct" | "indirect" | "untainted",
+          indirect: "direct" | "indirect" | "untainted" } }[]
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.taintedLvalues',
+  input:  Json.jKey<'#fundec'>('#fundec'),
+  output: Json.jArray(
+            Json.jObject({
+              lval: Json.jKey<'#lval'>('#lval'),
+              before: Json.jObject({
+                        data: Json.jUnion<"direct" | "indirect" | "untainted">(
+                                Json.jTag("direct"),
+                                Json.jTag("indirect"),
+                                Json.jTag("untainted"),
+                              ),
+                        indirect: Json.jUnion<"direct" | "indirect" |
+                                              "untainted">(
+                                    Json.jTag("direct"),
+                                    Json.jTag("indirect"),
+                                    Json.jTag("untainted"),
+                                  ),
+                      }),
+              after: Json.jObject({
+                       data: Json.jUnion<"direct" | "indirect" | "untainted">(
+                               Json.jTag("direct"),
+                               Json.jTag("indirect"),
+                               Json.jTag("untainted"),
+                             ),
+                       indirect: Json.jUnion<"direct" | "indirect" |
+                                             "untainted">(
+                                   Json.jTag("direct"),
+                                   Json.jTag("indirect"),
+                                   Json.jTag("untainted"),
+                                 ),
+                     }),
+            })),
+  signals: [],
+};
+/** Get the tainted lvalues of a given function */
+export const taintedLvalues: Server.GetRequest<
+  Json.key<'#fundec'>,
+  { lval: Json.key<'#lval'>,
+    before:
+        { data: "direct" | "indirect" | "untainted",
+          indirect: "direct" | "indirect" | "untainted" },
+    after:
+        { data: "direct" | "indirect" | "untainted",
+          indirect: "direct" | "indirect" | "untainted" } }[]
+  >= taintedLvalues_internal;
+
 /** Taint status of logical properties */
 export enum taintStatus {
   /** **Not computed:**
