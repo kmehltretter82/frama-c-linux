@@ -47,6 +47,7 @@
     Note: this is a partial wrapper on top of [Ival.t], to which most
     functions are delegated. *)
 
+open Cil_types
 open Analyses_types
 open Analyses_datatype
 
@@ -98,13 +99,13 @@ val plus_one : ival -> ival
 (* The inference phase infers the smallest possible integer interval which the
    values of the term can fit in. *)
 
-val get_from_profile: profile:Profile.t -> Cil_types.term -> t
+val get_from_profile: profile:Profile.t -> term -> t
 (** @return the value computed by the interval inference phase
     @raise Is_a_real if the term is either a float or a real.
     @raise Not_a_number if the term does not represent any
     number.*)
 
-val get: logic_env:Logic_env.t -> Cil_types.term -> t
+val get: logic_env:Logic_env.t -> term -> t
 (** @return the value computed by the interval inference phase, same as
       [get_from_profile] but with a full-fledged logic environment instead of a
       function profile *)
@@ -114,22 +115,22 @@ val get: logic_env:Logic_env.t -> Cil_types.term -> t
 (** {2 Interval processing} *)
 (*****************************************************************************)
 
-val infer_program : Cil_types.file -> unit
+val infer_program : file -> unit
 (** compute and store the type of all the terms that will be translated
     in a program *)
 
 val preprocess_predicate :
-  logic_env:Logic_env.t -> Cil_types.predicate -> unit
+  logic_env:Logic_env.t -> predicate -> unit
 (** compute and store the type of all the terms in a code annotation *)
 
 val preprocess_code_annot :
-  logic_env:Logic_env.t -> Cil_types.code_annotation -> unit
+  logic_env:Logic_env.t -> code_annotation -> unit
 (** compute and store the type of all the terms in a code annotation *)
 
 val preprocess_term :
-  logic_env:Logic_env.t -> Cil_types.term -> unit
+  logic_env:Logic_env.t -> term -> unit
 
-val get_widened_profile : Profile.t -> Cil_types.logic_info -> Profile.t
+val get_ext_profile : Profile.t -> logic_info -> Profile.t
 
 val clear : unit -> unit
 
