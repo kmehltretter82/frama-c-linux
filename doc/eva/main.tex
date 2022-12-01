@@ -2067,6 +2067,43 @@ In these three cases, the function \lstinline|f| is reached by the analysis
 (and thus counted in the \textsf{Metrics} coverage), but not analyzed
 (and thus not counted in the \Eva{} coverage).
 
+\subsection{Profiling via {\em Flame graphs}}
+
+When running long analyses with \Eva{}, you can use option
+\texttt{-eva-flamegraph <file>} to obtain profiling information about which
+functions are taking time. This option outputs textual data to the specified
+\texttt{<file>}, which can then be read by the \texttt{flamegraph.pl} script
+developed by Brendan Egg\footnote{\url{https://www.brendangregg.com/flamegraphs.html}}.
+This script is available as a package in some Linux distributions, and it is
+also included in Frama-C's shared files. The version shipped with Frama-C can
+be run with the following command:
+
+\begin{listing}{1}
+frama-c-script flamegraph <file> [<dir>]
+\end{listing}
+
+The \texttt{<file>} argument must be the same given to option
+\texttt{-eva-flamegraph}. The \texttt{<dir>} argument is optional, but when
+specified, it stores the produced flame graph (in SVG and HTML versions)
+in that directory.
+
+Figure~\ref{fig:flamegraph} presents an example of a flame graph.
+
+\begin{figure}[hbt]
+\centering
+\includegraphics[width=0.95\textwidth]{flamegraph.png}
+\caption{Flame graph for an analysis with Eva}
+\label{fig:flamegraph}
+\end{figure}
+
+These flame graphs are interactive SVGs, which can be wrapped in an HTML page.
+It is possible to zoom and filter by name. The length of a bar is proportional
+to the time spent in that function. Note that if a function \texttt{f}
+contains several callsites for \texttt{g}, only the total aggregated time is
+displayed as a single bar \texttt{g} below \texttt{f}.
+Finally, note that \texttt{-eva-flamegraph} has a negligible cost in terms of
+execution time for the analysis.
+
 \subsection{Audit messages ({\em experimental})}
 
 Using options \lstinline|-audit-prepare| and \lstinline|-audit-check|, the
