@@ -581,7 +581,7 @@ export function useUpdate(...events: Event<any>[]): void {
   });
 }
 
-interface PromiseHook<A> {
+export interface PromiseHook<A> {
   result: A | undefined;
   error: Error | undefined;
   loading: boolean;
@@ -614,7 +614,7 @@ export function usePromise<A>(job: Promise<A>): PromiseHook<A> {
 }
 
 /* Internal type alias */
-type Serialize<A> = (a: A) => string;
+export type Serialize<A> = (a: A) => string;
 
 /**
    Hook to add a cache system to a function, allowing to reuse previous results.
