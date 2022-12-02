@@ -107,9 +107,13 @@ export class GlobalState<A> {
   /** Current state value. */
   getValue(): A { return this.value; }
 
-  /** Notify callbacks on change, using _deep_ structural comparison. */
-  setValue(value: A): void {
-    if (!isEqual(value, this.value)) {
+  /** Notify callbacks on change. By default, changed are detected
+      by using _deep_ structural comparison, using `react-fast-compare` comparison.
+      @param value the new value of the state
+      @param forced when set to `true`, notify callbacks without comparison.
+  */
+  setValue(value: A, forced = false): void {
+    if (forced || !isEqual(value, this.value)) {
       this.value = value;
       this.emitter.emit(UPDATE, value);
     }
