@@ -21,24 +21,26 @@
 (**************************************************************************)
 
 
-
-
 (** External API of the plugin Alias
 
   
- *)
+*)
+
+
+(* modules and predefined types *)
 open Cil_types
     
 open Abstract_state
 
 type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
 
-(** Performes the may-alias analysis. Do it once before using other functions *)
+
+
+(** [compute ()] performes the may-alias analysis. Must be done once before using other functions *)
 val compute : unit -> unit
 
-(** Minimal API, as presented during kickoff meeting *)
-(* we changed:  type varinfo -> type lval *)
-
+(* Minimal API, as presented during kickoff meeting *)
+(** [get_class_before_statment f s v] gives a set of alias *)
 val get_class_before_statement : kernel_function -> stmt ->  lval -> lset
 val get_class_after_statement : kernel_function -> stmt ->  lval -> lset
 
