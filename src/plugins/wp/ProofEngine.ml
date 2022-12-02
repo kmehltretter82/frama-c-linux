@@ -298,7 +298,7 @@ let mk_annot axioms goal vc =
       tags = [] ; warn = [] ;
       deps = Property.Set.empty ;
       path = Cil_datatype.Stmt.Set.empty ;
-      effect = None ;
+      source = None ;
     }
 
 let mk_formula ~main axioms sequent =

@@ -188,9 +188,9 @@ struct
   let prove_property env (p : WpPropId.pred_info) w =
     if is_selected ~goal:true env p then W.add_goal env.we p w else w
 
-  let prove_subproperty env p ?deps prop stmt source w =
+  let prove_terminates_prop env p ?deps prop stmt source w =
     if is_selected ~goal:true env p
-    then W.add_subgoal env.we ?deps p prop stmt source w
+    then W.add_terminates_subgoal env.we ?deps p prop stmt source w
     else w
 
   let on_selected_terminates env f =
@@ -261,7 +261,7 @@ struct
   and loop env a s (lc : CfgAnnot.loop_contract) : W.t_prop =
     let insert_terminates w = match env.terminates, lc.loop_terminates with
       | None, _ | _, None -> w (* no terminates goal or nothing to prove *)
-      | Some t, Some prop -> prove_subproperty env t prop s FromCode w
+      | Some t, Some prop -> prove_terminates_prop env t prop s Mcfg.Loop w
     in
     let prove_invariant env pid pred w =
       match pid with None -> w | Some pid -> prove_property env (pid, pred) w
@@ -323,9 +323,7 @@ struct
         begin fun r fct args _loc ->
           match Kf.get_called fct with
           | Some kf ->
-            call env s r kf args @@
-            call_terminates env s args @@
-            call_decreases env s args @@ w
+            call env s r kf args w
           | None ->
             WpLog.warning ~once:true "No function for constructor '%s'"
               vf.vname ;
@@ -384,9 +382,12 @@ struct
   and call_terminates env s ?kf es w : W.t_prop =
     match env.terminates with
     | Some t when is_selected ~goal:true env t && is_default_bhv env.mode ->
-      let callee_t =
+      let callee_t, kind =
         match kf with
-        | None -> None
+        | None ->
+          Wp_parameters.warning
+            "Unknown callee, considering non-terminating call" ;
+          Logic_const.pfalse, Mcfg.MissingTerminates
         | Some callee ->
           (* TODO: remove generated case when kernel support is available *)
           let generated, callee_t =
@@ -396,21 +397,21 @@ struct
             Wp_parameters.warning ~once:true
               "Missing terminates clause on call to %a, defaults to %a"
               Kernel_function.pretty callee Cil_printer.pp_predicate callee_t ;
-          Some callee_t
+          callee_t, Mcfg.Terminates
       in
-      let wt = W.call_terminates env.we s ?kf es t ?callee_t w in
-      let is_recursive = match kf with
+      let wt = W.call_terminates env.we s ~kind ?kf es t ~callee_t w in
+      let is_recursive_call = match kf with
         | None -> true
         | Some callee -> CfgInfos.in_cluster ~caller:env.mode.kf callee
       in
-      if Option.is_none env.decreases && is_recursive
+      if Option.is_none env.decreases && is_recursive_call
       then begin
         Wp_parameters.warning ~once:true
           "Missing decreases clause on recursive function %a, call must be \
            unreachable"
           Kernel_function.pretty env.mode.kf ;
         W.call_terminates
-          env.we s ?kf es t ?callee_t:(Some Logic_const.pfalse) wt
+          env.we s ~kind:MissingDecreases ?kf es t ~callee_t:Logic_const.pfalse wt
       end
       else wt
     | _ -> w
@@ -457,7 +458,7 @@ struct
       let deps = CfgInfos.terminates_deps env.mode.infos in
       let return = Kernel_function.find_return env.mode.kf in
       let prove goal env t w =
-        prove_subproperty env t ~deps goal return FromReturn w
+        prove_terminates_prop env t ~deps goal return Mcfg.Dependencies w
       in
       if not @@ Property.Set.is_empty deps then
         on_selected_terminates env (prove Logic_const.ptrue) w

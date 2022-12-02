@@ -213,7 +213,6 @@ type assigns_desc = private {
 }
 val pp_assigns_desc : Format.formatter -> assigns_desc -> unit
 
-type effect_source = FromCode | FromCall | FromReturn
 type assigns_info = prop_id * assigns_desc
 val assigns_info_id : assigns_info -> prop_id
 

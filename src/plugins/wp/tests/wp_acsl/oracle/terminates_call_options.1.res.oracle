@@ -52,7 +52,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (generated) in 'no_spec_generates_goal':
-Effect at line 33
+Loop termination at line 33
 Prove: false.
 
 ------------------------------------------------------------

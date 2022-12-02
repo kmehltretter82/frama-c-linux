@@ -85,7 +85,7 @@ sig
     warn : Warning.t list ;
     deps : Property.Set.t ;
     path : Stmt.Set.t ;
-    effect : (stmt * effect_source) option ;
+    source : (stmt * Mcfg.goal_source) option ;
   }
 
   val is_trivial : t -> bool

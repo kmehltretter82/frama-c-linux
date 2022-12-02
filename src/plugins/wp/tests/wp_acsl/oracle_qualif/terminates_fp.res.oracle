@@ -26,10 +26,10 @@
   Missing terminates clause for ht, populates 'terminates \true'
 [wp] terminates_fp.i:79: Warning: Missing 'calls' for default behavior
 [wp] terminates_fp.i:79: Warning: 
-  No terminates clause on callee (unknown function)
+  Unknown callee, considering non-terminating call
 [wp] terminates_fp.i:79: Warning: 
   Missing decreases clause on recursive function warns_recursive, call must be unreachable
-[wp] 29 goals scheduled
+[wp] 30 goals scheduled
 [wp] [Valid] typed_t_spec_call_point_gt_ht_s2 (Qed)
 [wp] [Valid] typed_t_spec_terminates (Qed)
 [wp] [Valid] typed_t_spec_in_bhv_call_point_gt_hnt_s6 (Alt-Ergo) (Cached)
@@ -58,11 +58,12 @@
 [wp] [Valid] typed_no_t_spec_cond_m_terminates_part1 (Qed)
 [wp] [Unsuccess] typed_no_t_spec_cond_m_terminates_part2 (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_no_t_spec_cond_m_terminates_part3 (Alt-Ergo) (Cached)
-[wp] [Unsuccess] typed_warns_recursive_terminates (Alt-Ergo) (Cached)
-[wp] Proved goals:   23 / 29
+[wp] [Unsuccess] typed_warns_recursive_terminates_part1 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_warns_recursive_terminates_part2 (Alt-Ergo) (Cached)
+[wp] Proved goals:   23 / 30
   Qed:            21
   Alt-Ergo:        2
-  Unsuccess:       6
+  Unsuccess:       7
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   t_spec                    2        -        2       100%
@@ -71,5 +72,5 @@
   no_t_spec_in_bhv          5        1        7      85.7%
   no_t_spec_cond            2        -        3      66.7%
   no_t_spec_cond_m          4        -        6      66.7%
-  warns_recursive           -        -        1       0.0%
+  warns_recursive           -        -        2       0.0%
 ------------------------------------------------------------

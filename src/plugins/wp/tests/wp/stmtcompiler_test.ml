@@ -47,7 +47,7 @@ let run () =
         tags = []; warn = [];
         deps = Property.Set.empty;
         path = Cil_datatype.Stmt.Set.empty;
-        effect = None;
+        source = None;
       } in
     let po = Wpo.{
         po_gid = ""; po_sid = ""; po_name = "";
