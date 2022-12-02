@@ -40,8 +40,10 @@ type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
 val compute : unit -> unit
 
 (* Minimal API, as presented during kickoff meeting *)
-(** [get_class_before_statment f s v] gives a set of alias *)
+(** [get_class_before_statment f s v] gives a set of lval aliased to [v] before statement [s] in function [f] *)
 val get_class_before_statement : kernel_function -> stmt ->  lval -> lset
+
+(** [get_class_after_statment f s v] gives a set of lval aliased to [v] after statement [s] in function [f] *)
 val get_class_after_statement : kernel_function -> stmt ->  lval -> lset
 
 val get_class_fundec: kernel_function -> lval -> lset
