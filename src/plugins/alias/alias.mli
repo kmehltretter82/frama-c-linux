@@ -36,33 +36,53 @@ type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
 
 
 
-(** [compute ()] performes the may-alias analysis. Must be done once before using other functions *)
+(** [compute ()] performs the may-alias analysis. It must be done once
+   before using other functions *)
 val compute : unit -> unit
+  
+
 
 (* Minimal API, as presented during kickoff meeting *)
-(** [get_class_before_statment f s v] gives a set of lval aliased to [v] before statement [s] in function [f] *)
+  
+(** [get_class_before_statment f s v] gives the set of lval aliased to
+   [v] before statement [s] in function [f] *)
 val get_class_before_statement : kernel_function -> stmt ->  lval -> lset
+  
 
-(** [get_class_after_statment f s v] gives a set of lval aliased to [v] after statement [s] in function [f] *)
+(** [get_class_after_statment f s v] gives the set of lval aliased to
+   [v] after statement [s] in function [f] *)
 val get_class_after_statement : kernel_function -> stmt ->  lval -> lset
 
+(** [get_class_fundec f v] gives the set of lval aliased to [v] after
+   the return statement in function [f] *)
 val get_class_fundec: kernel_function -> lval -> lset
+
+(** [get_class_fundec f v] gives the list of pairs <s,e> where e is
+   the set of lval aliased to [v] after statement <s> in function [f]
+   *)
 val get_class_fundec_stmts: kernel_function -> lval -> (stmt*lset) list
 
 
-(** connection with Abstract_state *)
 
-val concretise : MGU.ecr -> lset
+(* connection with Abstract_state.mli *)
+
+(** [concretise mgu e] returns the set of lval that are reprensented
+   by [e] in union-find structure [mgu] *)
+val concretise : MGU.t -> MGU.ecr -> lset
 
 
-(** other functions required by MERCE *)
 
-(* checks that two Lval have the same ECR *)
+(* other functions required by MERCE *)
+
+(** [is equivalent f s v1 v2] checks that two lval [v1] and [v2] have
+   the same ECR before statement [s] in function [f] *)
 val is_equivalent :  kernel_function -> stmt -> lval -> lval -> bool
 
-(* give the graph vertex of lval *)
-val point_to :  kernel_function -> stmt -> lval -> V.t
+(** [points_to f s v] gives the graph vertex of lval [v] before
+   statement [s] in function [f] *)
+val points_to :  kernel_function -> stmt -> lval -> V.t
 
 
-(* give the graph vertex of lval and its points-to closure *)
-val point_to_closure :  kernel_function -> stmt -> lval  -> G.t
+(** [points_to_closure f s v] give the graph vertex of lval [v] before
+   statement [s] in function [f] and its points-to closure *)
+val points_to_closure :  kernel_function -> stmt -> lval  -> G.t

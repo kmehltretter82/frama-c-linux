@@ -35,10 +35,10 @@ let is_equivalent  _ =
   failwith "not implemented"
 
 (* give the graph vertex of lval *)
-let point_to _ =
+let points_to _ =
   failwith "not implemented"
 
 
 (* give the graph vertex of lval and its points-to closure *)
-let point_to_closure  _ =
+let points_to_closure  _ =
   failwith "not implemented"
