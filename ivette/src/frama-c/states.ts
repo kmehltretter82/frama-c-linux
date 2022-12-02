@@ -335,7 +335,9 @@ class SyncState<A> {
 
 const syncStates = new Map<string, SyncState<unknown>>();
 
-function getSyncState<A>(h: Handler<A>): SyncState<A> {
+// Remark: use current project state
+
+function currentSyncState<A>(h: Handler<A>): SyncState<A> {
   const id = `${currentProject}@${h.name}`;
   let s = syncStates.get(id) as SyncState<A> | undefined;
   if (!s) {
@@ -355,7 +357,7 @@ Server.onShutdown(() => syncStates.clear());
 export function useSyncState<A>(
   st: State<A>,
 ): [A | undefined, (value: A) => void] {
-  const s = getSyncState(st);
+  const s = currentSyncState(st);
   Dome.useUpdate(PROJECT, s.UPDATE);
   Server.useSignal(s.handler.signal, s.update);
   return [s.getValue(), s.setValue];
@@ -363,7 +365,7 @@ export function useSyncState<A>(
 
 /** Synchronization with a (projectified) server value. */
 export function useSyncValue<A>(va: Value<A>): A | undefined {
-  const s = getSyncState(va);
+  const s = currentSyncState(va);
   Dome.useUpdate(PROJECT, s.UPDATE);
   Server.useSignal(s.handler.signal, s.update);
   return s.getValue();
@@ -373,7 +375,6 @@ export function useSyncValue<A>(va: Value<A>): A | undefined {
 // --- Synchronized Arrays
 // --------------------------------------------------------------------------
 
-// one per project
 class SyncArray<K, A> {
   handler: Array<K, A>;
   upToDate: boolean;
@@ -392,11 +393,19 @@ class SyncArray<K, A> {
   }
 
   update(): void {
-    if (!this.upToDate && Server.isRunning()) this.fetch();
+    if (
+      !this.upToDate &&
+      currentProject !== undefined &&
+      Server.isRunning()
+    ) this.fetch();
   }
 
   async fetch(): Promise<void> {
-    if (this.fetching || !Server.isRunning()) return;
+    if (
+      this.fetching ||
+      currentProject === undefined ||
+      !Server.isRunning()
+    ) return;
     try {
       this.fetching = true;
       let pending;
@@ -448,7 +457,9 @@ class SyncArray<K, A> {
 
 const syncArrays = new Map<string, SyncArray<unknown, unknown>>();
 
-function lookupSyncArray<K, A>(
+// Remark: lookup for current project
+
+function currentSyncArray<K, A>(
   array: Array<K, A>,
 ): SyncArray<K, A> {
   const id = `${currentProject}@${array.name}`;
@@ -468,7 +479,7 @@ Server.onShutdown(() => syncArrays.clear());
 
 /** Force a Synchronized Array to reload. */
 export function reloadArray<K, A>(arr: Array<K, A>): void {
-  lookupSyncArray(arr).reload();
+  currentSyncArray(arr).reload();
 }
 
 /**
@@ -485,8 +496,7 @@ export function useSyncArray<K, A>(
   sync = true,
 ): CompactModel<K, A> {
   Dome.useUpdate(PROJECT);
-  const st = lookupSyncArray(arr);
-  React.useEffect(() => st.update(), [st]);
+  const st = currentSyncArray(arr);
   Server.useSignal(arr.signal, st.fetch);
   st.update();
   useModel(st.model, sync);
@@ -499,7 +509,7 @@ export function useSyncArray<K, A>(
 export function getSyncArray<K, A>(
   arr: Array<K, A>,
 ): CompactModel<K, A> {
-  const st = lookupSyncArray(arr);
+  const st = currentSyncArray(arr);
   return st.model;
 }
 
@@ -513,7 +523,7 @@ export function onSyncArray<K, A>(
   onReload?: () => void,
   onUpdate?: () => void,
 ): Client {
-  const st = lookupSyncArray(arr);
+  const st = currentSyncArray(arr);
   return st.model.link(onReload, onUpdate);
 }
 
