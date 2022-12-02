@@ -40,7 +40,7 @@ EXAMPLE_FILE = tests/metrics/reach.c
 $(TARGET): $(STYLE_FILES) $(TEXFILES)
 
 # Hack to get nicer paths (in particular, relative ones)
-FCBIN = cd ../.. ; bin/frama-c.byte -no-unicode
+FCBIN = cd ../.. ; bin/frama-c -no-unicode
 FC = $(FCBIN) -metrics -metrics-by-function
 LOGDIR = doc/metrics
 
