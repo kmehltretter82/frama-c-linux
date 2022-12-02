@@ -22,5 +22,5 @@
 open Analyses_types
 open Cil_datatype
 
-val interv_of_typ_containing_interv : ival -> ival
+val widen : ival -> ival -> ival
 val ext_profile : ival Logic_var.Map.t -> ival Logic_var.Map.t

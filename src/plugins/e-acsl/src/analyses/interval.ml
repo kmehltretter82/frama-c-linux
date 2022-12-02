@@ -124,7 +124,7 @@ let rec fixpoint ~(infer : force:bool ->
     then
       ival
     else
-      let assumed_ival = Widening.interv_of_typ_containing_interv inferred_ival in
+      let assumed_ival = Widening.widen ival inferred_ival in
       fixpoint ~infer li args_ival t' assumed_ival
 
 (* Memoization module which retrieves the computed info of some terms *)

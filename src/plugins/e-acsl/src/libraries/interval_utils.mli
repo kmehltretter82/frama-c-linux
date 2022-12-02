@@ -49,6 +49,8 @@ val lift_arith_binop : (Ival.t -> Ival.t -> Ival.t) -> ival -> ival -> ival
 (** assume [Ival _] as argument *)
 val extract_ival :  ival -> Ival.t
 
+val ival_of_ikind: ikind -> Ival.t
+
 val interv_of_typ : typ -> ival
 (** @return the smallest interval which contains the given C type. *)
 

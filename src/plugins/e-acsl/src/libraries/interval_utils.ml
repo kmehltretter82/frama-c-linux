@@ -232,15 +232,18 @@ let interv_of_unknown_block =
      possible one which is unfortunately quite large *)
   lazy (ival Integer.zero (Bit_utils.max_byte_address ()))
 
+let ival_of_ikind ik =
+  let n = Cil.bitsSizeOf (TInt (ik, [])) in
+  let l, u =
+    if Cil.isSigned ik then Cil.min_signed_number n, Cil.max_signed_number n
+    else Integer.zero, Cil.max_unsigned_number n
+  in
+  Ival.inject_range (Some l) (Some u)
+
 (* The boolean indicates whether we have real numbers *)
 let rec interv_of_typ ty = match Cil.unrollType ty with
-  | TInt (k,_) as ty ->
-    let n = Cil.bitsSizeOf ty in
-    let l, u =
-      if Cil.isSigned k then Cil.min_signed_number n, Cil.max_signed_number n
-      else Integer.zero, Cil.max_unsigned_number n
-    in
-    ival l u
+  | TInt (k,_) ->
+    Ival (ival_of_ikind k)
   | TEnum(enuminfo, _) ->
     interv_of_typ (TInt(enuminfo.ekind, []))
   | _ when Gmp_types.Z.is_t ty ->
