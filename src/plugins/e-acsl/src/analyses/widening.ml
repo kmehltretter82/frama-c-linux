@@ -24,6 +24,10 @@ open Cil_types
 open Analyses_types
 open Interval_utils
 
+(* ********************************************************************* *)
+(* Interval Extension *)
+(* ********************************************************************* *)
+
 let interv_of_typ_containing_interv = function
   | Float _ | Rational | Real | Nan as x ->
     x
@@ -33,6 +37,13 @@ let interv_of_typ_containing_interv = function
       interv_of_typ (TInt(kind, []))
     with Cil.Not_representable ->
       top_ival
+
+let ext_profile =
+  Cil_datatype.Logic_var.Map.map interv_of_typ_containing_interv
+
+(* ********************************************************************* *)
+(* Widening *)
+(* ********************************************************************* *)
 
 let is_lower l1 l2 =
   match l1, l2 with
@@ -62,6 +73,3 @@ let widen i1 i2 =
   | Float _, Float _ | Rational, Rational | Real, Real | Nan, Nan ->
     join i1 i2
   | Ival _, _| Float _, _ | Rational, _ | Real, _ | Nan, _ -> assert false
-
-let ext_profile =
-  Cil_datatype.Logic_var.Map.map interv_of_typ_containing_interv
