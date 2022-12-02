@@ -176,7 +176,7 @@ class highlighter (main:Design.main_window_extension_points) =
   object(self)
 
     val mutable goal = None (* orange *)
-    val mutable effect = None (* blue *)
+    val mutable source = None (* blue *)
     val mutable path = PATH.empty (* yellow *)
     val mutable deps = DEPS.empty (* green *)
     val mutable current = None
@@ -184,7 +184,7 @@ class highlighter (main:Design.main_window_extension_points) =
     method private clear =
       begin
         goal <- None ;
-        effect <- None ;
+        source <- None ;
         path <- PATH.empty ;
         deps <- DEPS.empty ;
       end
@@ -212,7 +212,7 @@ class highlighter (main:Design.main_window_extension_points) =
               | GoalLemma l ->
                 deps <- lemmas l.VC_Lemma.depends
               | GoalAnnot a ->
-                effect <- a.VC_Annot.effect ;
+                source <- a.VC_Annot.source ;
                 path <- instructions a.VC_Annot.path ;
                 deps <- a.VC_Annot.deps ;
             end ;
@@ -233,7 +233,7 @@ class highlighter (main:Design.main_window_extension_points) =
       begin match loc with
         | PStmt( _ , stmt ) | PStmtStart( _ , stmt ) ->
           begin
-            match effect with
+            match source with
             | Some(s,_) when Stmt.equal stmt s ->
               apply_effect buffer start stop
             | _ ->

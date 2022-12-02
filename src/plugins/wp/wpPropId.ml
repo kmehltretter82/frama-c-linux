@@ -797,8 +797,6 @@ let select_call_pre s_call asked_pre pid =
 
 type a_kind = LoopAssigns | StmtAssigns
 
-type effect_source = FromCode | FromCall | FromReturn
-
 type assigns_desc = {
   a_label : Clabels.c_label ;
   a_stmt : Cil_types.stmt option ;

@@ -10,7 +10,7 @@
 [wp] [CFG] Goal variant_terminates : Valid (Trivial)
 [wp] terminates_formulae.i:91: Warning: 
   Missing decreases clause on recursive function no_decreases, call must be unreachable
-[wp] 17 goals scheduled
+[wp] 18 goals scheduled
 [wp] [Unsuccess] typed_base_call_terminates (Alt-Ergo) (Cached)
 [wp] [Valid] typed_call_same_terminates (Qed)
 [wp] [Unsuccess] typed_call_change_terminates (Alt-Ergo) (Cached)
@@ -27,10 +27,11 @@
 [wp] [Valid] typed_decreases_variant (Alt-Ergo) (Cached)
 [wp] [Valid] typed_general_decreases_terminates (Qed)
 [wp] [Valid] typed_general_decreases_variant (Alt-Ergo) (Cached)
-[wp] [Unsuccess] typed_no_decreases_terminates (Alt-Ergo) (Cached)
-[wp] Proved goals:   14 / 19
+[wp] [Valid] typed_no_decreases_terminates_part1 (Qed)
+[wp] [Unsuccess] typed_no_decreases_terminates_part2 (Alt-Ergo) (Cached)
+[wp] Proved goals:   15 / 20
   Terminating:     2
-  Qed:             8
+  Qed:             9
   Alt-Ergo:        4
   Unsuccess:       5
 ------------------------------------------------------------
@@ -45,5 +46,5 @@
   no_variant                1        -        2      50.0%
   decreases                 1        1        2       100%
   general_decreases         1        1        2       100%
-  no_decreases              -        -        1       0.0%
+  no_decreases              1        -        2      50.0%
 ------------------------------------------------------------

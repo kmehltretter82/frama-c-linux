@@ -310,7 +310,7 @@ struct
     warn : Warning.t list ;
     deps : Property.Set.t ;
     path : Stmt.Set.t ;
-    effect : (stmt * WpPropId.effect_source) option ;
+    source : (stmt * Mcfg.goal_source) option ;
   }
 
   let repr = {
@@ -320,28 +320,44 @@ struct
     warn = [] ;
     deps = Property.Set.empty ;
     path = Stmt.Set.empty ;
-    effect = None ;
+    source = None ;
   }
 
   let resolve ~pid vcq = GOAL.compute_proof ~pid vcq.goal == Lang.F.p_true
   let is_trivial vcq = GOAL.is_trivial vcq.goal
 
-  let pp_effect fmt = function
+  let pp_effect fmt s e =
+    let loc = fst (Stmt.loc s) in
+    let line = loc.Filepath.pos_lnum in
+    let desc = match e with
+      | Mcfg.FromCode -> "Effect"
+      | Mcfg.FromCall -> "Call Effect"
+      | Mcfg.FromReturn -> "Call Result"
+    in
+    Format.fprintf fmt "%s at line %d@\n" desc line
+
+  let pp_terminates fmt  s e =
+    let loc = fst (Stmt.loc s) in
+    let line = loc.Filepath.pos_lnum in
+    let desc = match e with
+      | Mcfg.Loop -> "Loop termination"
+      | Mcfg.Terminates -> "Call terminates"
+      | Mcfg.Decreases -> "Call decreases"
+      | Mcfg.MissingTerminates -> "Call terminates (missing terminates)"
+      | Mcfg.MissingDecreases -> "Call terminates (missing decreases)"
+      | Mcfg.Dependencies -> "Call terminates (dependencies)"
+    in
+    Format.fprintf fmt "%s at line %d@\n" desc line
+
+  let pp_source fmt = function
     | None -> ()
-    | Some(s,e) ->
-      let loc = fst (Stmt.loc s) in
-      let line = loc.Filepath.pos_lnum in
-      let desc = match e with
-        | WpPropId.FromCode -> "Effect"
-        | WpPropId.FromCall -> "Call Effect"
-        | WpPropId.FromReturn -> "Call Result"
-      in
-      Format.fprintf fmt "%s at line %d@\n" desc line
+    | Some (s, Mcfg.Effect e) -> pp_effect fmt s e
+    | Some (s, Mcfg.Terminates e) -> pp_terminates fmt s e
 
   let pretty fmt pid vc results =
     begin
       Format.fprintf fmt "@{<bf>Goal@} %a:@\n" WpPropId.pretty pid ;
-      pp_effect fmt vc.effect ;
+      pp_source fmt vc.source ;
       if vc.tags <> [] then
         begin
           Format.fprintf fmt "@[<hov 2>@{<bf>Tags@}:" ;

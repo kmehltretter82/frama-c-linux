@@ -111,7 +111,7 @@ let add_goal env (pid,pred) k =
   Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
   merge env u k
 
-let add_subgoal env (pid, _) ?deps prop stmt _source k =
+let add_terminates_subgoal env (pid, _) ?deps prop stmt _source k =
   ignore deps ;
   let u = node () in
   if Wp_parameters.debug_atleast 1 then
@@ -244,9 +244,9 @@ let call_goal_precond env _stmt kf _es ~pre k =
   Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
   merge env u k
 
-let call_terminates env _stmt ?kf _es (_gpid, prop) ?callee_t k =
+let call_terminates env _stmt ~kind ?kf _es (_gpid, prop) ~callee_t k =
+  ignore kind ;
   let u = node () in
-  let pp_opt_pred = Pretty_utils.pp_opt ~none:"FALSE" Printer.pp_predicate in
   let pp_opt_kf = Pretty_utils.pp_opt ~none:"(?)" Kernel_function.pretty in
   Format.fprintf !out "  %a [ color=red , label=\"Prove Terminates %a%t\" ] ;@."
     pretty u pp_opt_kf kf
@@ -254,7 +254,7 @@ let call_terminates env _stmt ?kf _es (_gpid, prop) ?callee_t k =
       if Wp_parameters.debug_atleast 1 then
         Format.fprintf fmt "\n@[<hov 2>Terminates if %a[%s] ==> %a[%a];@]"
           Printer.pp_predicate prop "Caller"
-          pp_opt_pred callee_t
+          Printer.pp_predicate callee_t
           pp_opt_kf kf
     end ;
   Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;

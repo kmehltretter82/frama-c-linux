@@ -15,7 +15,7 @@
 ------------------------------------------------------------
 
 Goal Termination-condition (file terminates_formulae.i, line 22) in 'base_call':
-Call Effect at line 24
+Call terminates at line 24
 Assume { (* Heap *) Type: is_sint32(a). (* Goal *) When: P_Q. }
 Prove: P_P(a).
 
@@ -25,7 +25,7 @@ Prove: P_P(a).
 ------------------------------------------------------------
 
 Goal Termination-condition (file terminates_formulae.i, line 32) in 'call_change':
-Call Effect at line 35
+Call terminates at line 35
 Assume { (* Heap *) Type: is_sint32(a). (* Goal *) When: P_P(a). }
 Prove: P_P(0).
 
@@ -35,7 +35,7 @@ Prove: P_P(0).
 ------------------------------------------------------------
 
 Goal Termination-condition (file terminates_formulae.i, line 48) in 'call_param_change':
-Call Effect at line 51
+Call terminates at line 51
 Let x = Mint_0[p].
 Assume {
   Type: is_sint32(x).
@@ -52,7 +52,7 @@ Prove: false.
 ------------------------------------------------------------
 
 Goal Termination-condition (file terminates_formulae.i, line 43) in 'call_param_same':
-Call Effect at line 45
+Call terminates at line 45
 Prove: true.
 
 ------------------------------------------------------------
@@ -61,7 +61,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (file terminates_formulae.i, line 27) in 'call_same':
-Call Effect at line 29
+Call terminates at line 29
 Prove: true.
 
 ------------------------------------------------------------
@@ -75,7 +75,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Recursion variant:
-Call Effect at line 80
+Call decreases at line 80
 Assume { Type: is_uint32(n). (* Goal *) When: P_Q. (* Then *) Have: n != 0. }
 Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
 
@@ -90,7 +90,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Recursion variant:
-Call Effect at line 86
+Call decreases at line 86
 Assume { Type: is_uint32(n). (* Goal *) When: P_Q. (* Then *) Have: n != 0. }
 Prove: P_Rel(n, to_uint32(n - 1)).
 
@@ -113,8 +113,13 @@ Prove: P_Rel(x, to_uint32(x - 1)).
   Function no_decreases
 ------------------------------------------------------------
 
-Goal Termination-condition (file terminates_formulae.i, line 89) in 'no_decreases':
-Call Effect at line 91
+Goal Termination-condition (file terminates_formulae.i, line 89) in 'no_decreases' (1/2):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Termination-condition (file terminates_formulae.i, line 89) in 'no_decreases' (2/2):
+Call terminates (missing decreases) at line 91
 Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
 Prove: !P_Q.
 
@@ -124,7 +129,7 @@ Prove: !P_Q.
 ------------------------------------------------------------
 
 Goal Termination-condition (file terminates_formulae.i, line 71) in 'no_variant':
-Effect at line 74
+Loop termination at line 74
 Prove: !P_Q.
 
 ------------------------------------------------------------

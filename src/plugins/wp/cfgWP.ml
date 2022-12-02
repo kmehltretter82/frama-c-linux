@@ -55,44 +55,84 @@ struct
 
   type target =
     | Gprop of P.t
-    | Gsource of P.t * Stmt.t * effect_source
+    | Geffect of P.t * Stmt.t * Mcfg.effect_source
+    | Gterminates of P.t * Stmt.t * Mcfg.terminates_source
     | Gposteffect of P.t
 
   module TARGET =
   struct
     type t = target
     let hsrc = function
-      | FromCode -> 1 | FromCall -> 2 | FromReturn -> 3
+      | Mcfg.FromCode -> 1 | FromCall -> 2 | FromReturn -> 3
+    let hterm = function
+      | Mcfg.Loop -> 1
+      | Terminates -> 2
+      | Decreases -> 3
+      | MissingDecreases -> 4
+      | MissingTerminates -> 5
+      | Dependencies -> 6
+
     let hash = function
       | Gprop p | Gposteffect p -> P.hash p
-      | Gsource(p,s,e) -> P.hash p * 37 + 41 * Stmt.hash s + hsrc e
+      | Geffect(p,s,e) -> P.hash p * 37 + 41 * Stmt.hash s + hsrc e
+      | Gterminates(p,s,e) -> P.hash p * 37 + 41 * Stmt.hash s + hterm e
+
     let compare g1 g2 =
       if g1 == g2 then 0 else
         match g1,g2 with
         | Gprop p1 , Gprop p2 -> P.compare p1 p2
         | Gprop _ , _ -> (-1)
         | _ , Gprop _ -> 1
-        | Gsource(p1,s1,e1) , Gsource(p2,s2,e2) ->
+        | Geffect(p1,s1,e1) , Geffect(p2,s2,e2) ->
           let c = P.compare p1 p2 in
           if c <> 0 then c else
             let c = Stmt.compare s1 s2 in
             if c <> 0 then c else
               hsrc e1 - hsrc e2
-        | Gsource _ , _ -> (-1)
-        | _ , Gsource _ -> 1
+        | Geffect _ , _ -> (-1)
+        | _ , Geffect _ -> 1
+        | Gterminates(p1,s1,e1) , Gterminates(p2,s2,e2) ->
+          let c = P.compare p1 p2 in
+          if c <> 0 then c else
+            let c = Stmt.compare s1 s2 in
+            if c <> 0 then c else
+              hterm e1 - hterm e2
+        | Gterminates _ , _ -> (-1)
+        | _ , Gterminates _ -> 1
         | Gposteffect p1 , Gposteffect p2 -> P.compare p1 p2
     let equal g1 g2 = (compare g1 g2 = 0)
-    let prop_id = function Gprop p | Gposteffect p | Gsource(p,_,_) -> p
-    let source = function Gprop _ | Gposteffect _ -> None | Gsource(_,s,e) -> Some(s,e)
+    let prop_id = function
+      | Gprop p | Gposteffect p | Geffect(p,_,_) | Gterminates(p,_,_) -> p
+    let source = function
+      | Gprop _ | Gposteffect _ -> None
+      | Geffect(_,s,e) -> Some(s, Mcfg.Effect e)
+      | Gterminates (_,s,e) -> Some(s, Mcfg.Terminates e)
     let is_smoke_test = function
       | Gprop p -> WpPropId.is_smoke_test p
-      | Gposteffect _ | Gsource _ -> false
+      | Gposteffect _ | Geffect _ | Gterminates _ -> false
+
+    let pp_terminates_source fmt = function
+      | Mcfg.Loop -> Format.fprintf fmt "Loop terminates"
+      | Terminates -> Format.fprintf fmt "Terminates"
+      | Decreases -> Format.fprintf fmt "Decreases"
+      | MissingTerminates -> Format.fprintf fmt "Missing terminates"
+      | MissingDecreases -> Format.fprintf fmt "Missing decreases"
+      | Dependencies -> Format.fprintf fmt "Terminates dependencies"
+
     let pretty fmt = function
       | Gprop p -> WpPropId.pretty fmt p
-      | Gsource(p,s,FromCode) -> Format.fprintf fmt "%a at sid:%d" WpPropId.pretty p s.sid
-      | Gsource(p,s,FromCall) -> Format.fprintf fmt "Call %a at sid:%d" WpPropId.pretty p s.sid
-      | Gsource(p,s,FromReturn) -> Format.fprintf fmt "Return %a at sid:%d" WpPropId.pretty p s.sid
+      | Geffect(p,s,FromCode) ->
+        Format.fprintf fmt "%a at sid:%d" WpPropId.pretty p s.sid
+      | Geffect(p,s,FromCall) ->
+        Format.fprintf fmt "Call %a at sid:%d" WpPropId.pretty p s.sid
+      | Geffect(p,s,FromReturn) ->
+        Format.fprintf fmt "Return %a at sid:%d" WpPropId.pretty p s.sid
       | Gposteffect p -> Format.fprintf fmt "%a post-effect" WpPropId.pretty p
+      | Gterminates(p,s,src) ->
+        Format.fprintf fmt
+          "%a %a at sid:%d"
+          pp_terminates_source src WpPropId.pretty p s.sid
+
   end
 
   (* Authorized written region from an assigns specification *)
@@ -512,7 +552,8 @@ struct
          let vcs = add_vc (Gprop gpid) ~warn goal wp.vcs in
          { wp with vcs = vcs })
 
-  let add_subgoal wenv (gpid,_) ?deps predicate stmt src wp = in_wenv wenv wp
+  let add_terminates_subgoal wenv (gpid,_) ?deps predicate stmt src wp =
+    in_wenv wenv wp
       (fun env wp ->
          let outcome = Warning.catch
              ~severe:true ~effect:"Degenerated goal"
@@ -521,7 +562,8 @@ struct
            | Warning.Result(warn,goal) -> warn,goal
            | Warning.Failed warn -> warn,F.p_false
          in
-         let vcs = add_vc (Gsource(gpid, stmt, src)) ~warn ?deps goal wp.vcs in
+         let vcs =
+           add_vc (Gterminates(gpid, stmt, src)) ~warn ?deps goal wp.vcs in
          { wp with vcs = vcs })
 
   let add_assigns wenv (gpid,ainfo) wp = in_wenv wenv wp
@@ -594,7 +636,7 @@ struct
          in
          let target = match sloc with
            | None -> Gprop e.e_pid
-           | Some stmt -> Gsource(e.e_pid,stmt,source)
+           | Some stmt -> Geffect(e.e_pid,stmt,source)
          in
          Gmap.add target group vcs
       ) effects vcs
@@ -610,7 +652,7 @@ struct
       (fun e vcs ->
          let target = match stmt with
            | None -> Gprop e.e_pid
-           | Some s -> Gsource(e.e_pid,s,FromCode)
+           | Some s -> Geffect(e.e_pid,s,FromCode)
          in
          add_vc target ?warn F.p_false vcs)
       effects vcs
@@ -1054,7 +1096,7 @@ struct
   (* --- WP RULE : call terminates                                          --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let call_terminates wenv stmt ?kf args (id, caller_t) ?callee_t wp =
+  let call_terminates wenv stmt ~kind ?kf args (id, caller_t) ~callee_t wp =
     in_wenv wenv wp
       (fun env wp ->
          let outcome = Warning.catch
@@ -1067,7 +1109,7 @@ struct
            | Warning.Result (warn, p) -> warn, p
          in
          let prove_terminates ~warn p =
-           add_vc (Gsource(id, stmt, FromCall)) ~warn (p_imply caller_t p)
+           add_vc (Gterminates(id, stmt, kind)) ~warn (p_imply caller_t p)
          in
          let sigma = L.current env in
          let outcome = Warning.catch
@@ -1081,21 +1123,13 @@ struct
            { wp with vcs = vcs }
          | Warning.Result(warn2, args) ->
            let warn = W.union warn warn2 in
-           let pp_opt_kf =
-             Pretty_utils.pp_opt
-               ~none:"(unknown function)" Kernel_function.pretty in
-           let compile_callee = function
-             | None ->
-               Warning.error
-                 "No terminates clause on callee %a"
-                 pp_opt_kf kf
-             | Some p when Logic_utils.is_same_predicate Logic_const.pfalse p ->
+           let compile_callee p =
+             if Logic_utils.is_same_predicate Logic_const.pfalse p then
                (* We intercept this particular case where call environment is
                   not necessary as it might be generated for function pointers.
                *)
                Lang.F.p_false
-
-             | Some callee_t ->
+             else
                let init = L.mem_at env Clabels.init in
                let call = L.call (Option.get kf) args in
                let call_e = L.mk_env ~here:sigma () in
@@ -1138,7 +1172,7 @@ struct
            | Warning.Result (warn, p) -> warn, p
          in
          let prove_decreases ~warn p =
-           add_vc (Gsource(id, stmt, FromCall)) ~warn (p_imply caller_t p)
+           add_vc (Gterminates(id, stmt, Decreases)) ~warn (p_imply caller_t p)
          in
          let sigma = L.current env in
          let outcome = Warning.catch
@@ -1480,7 +1514,7 @@ struct
 
   let make_vcqs target tags vc =
     let vcq = {
-      VC_Annot.effect = TARGET.source target ;
+      VC_Annot.source = TARGET.source target ;
       VC_Annot.axioms = None ;
       VC_Annot.goal = GOAL.dummy ;
       VC_Annot.tags = tags ;
@@ -1496,7 +1530,7 @@ struct
 
   let make_trivial vc =
     {
-      VC_Annot.effect = None ;
+      VC_Annot.source = None ;
       VC_Annot.axioms = None ;
       VC_Annot.goal = GOAL.trivial ;
       VC_Annot.tags = [] ;
