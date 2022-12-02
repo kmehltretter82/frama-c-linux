@@ -323,9 +323,7 @@ struct
         begin fun r fct args _loc ->
           match Kf.get_called fct with
           | Some kf ->
-            call env s r kf args @@
-            call_terminates env s args @@
-            call_decreases env s args @@ w
+            call env s r kf args w
           | None ->
             WpLog.warning ~once:true "No function for constructor '%s'"
               vf.vname ;

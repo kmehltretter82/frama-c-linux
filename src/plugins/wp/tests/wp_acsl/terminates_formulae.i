@@ -90,3 +90,13 @@ void general_decreases(unsigned n){
 void no_decreases(unsigned n){
   if(n != 0) no_decreases(n-1) ;
 }
+
+/*@ terminates P;
+    assigns \nothing;
+*/
+int local_init_P(void);
+
+//@ terminates Q ;
+void local_init_call(void){
+  int x = local_init_P();
+}
