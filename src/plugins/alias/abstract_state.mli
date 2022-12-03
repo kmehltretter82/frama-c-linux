@@ -42,7 +42,7 @@
     - an union-find structure that encodes equivalence classes
 
 
-    TODO/question: can we use the equivalence relation as an equality to build the graph (not sure)
+    TODO/question: can we use the equivalence relation as an equality to build the graph => yes)
 
 
 *)
@@ -53,54 +53,27 @@ open Cil_types
 
 (** module for vertices *)
 module V : Sig.VERTEX
-(* sig
- *
- *   type t = lval       (\* lvalues *\)
- *   val compare : t -> t -> int
- *   val hash : t -> int
- *   val equal : t -> t -> bool
- *  end *)
 
 
-(** module for points-to graphs *)
+
+(** module for points-to graphs - persistant graph *)
 module G : Sig.P
-(* sig
- *   type t
- *   (\* directed, persistant ?  graph *\)
- *
- *   val add_vertex : t -> V.t -> t
- *
- *   val add_edge : t -> (V.t * V.t) -> t
- *
- *   val remove_edge : t -> (V.t * V.t) -> t
- *
- *   val merge_vertex : t -> V.t -> V.t -> t
- *
- *   (\* todo add more *\)
- * end *)
+
 
 
 module MGU : sig
   (** module for the equivalence class, cf Steensgaard's paper *)
 
 
-  type ecr (* type ECR = equivalence class representant *)
+  type ecr = Bottom | Lval of lval (** type ECR = equivalence class representant, basically a lval or Bottom *)
 
+  (** union find structure, aka "mgu" *)
+  type t
 
-  type t (* union find structure *)
-
-
-  (* functions needed for Steensgaard's algorithm *)
-
-  (*  TODO : do it in a procedural or a functional style ? *)
-
-  val init : unit -> t
-
-  val join : t -> ecr -> ecr -> t (* join of ecr *)
-
-  val cjoin : t -> ecr -> ecr -> t (*  conditional join *)
-
-  val find : t -> exp -> ecr
+  (** pretty printer *)
+  val pp_ecr : Format.formatter -> ecr -> unit
+    
+  val pretty : Format.formatter -> t -> unit
 
 end
 
@@ -115,17 +88,30 @@ module AbstractState : sig
 
   type summary  = t * V.t list (* summary for functions : a state and a list of local variables and parameters (we may need 2 lists) *)
 
+  (** pretty printer *)
+  val pretty : Format.formatter -> t -> unit
 
-  (* additional structures that we may need :
-     HTable stmt -> t
-     HTable  fundec -> summary ?
-  *)
+  (** export the graph to a dot file *)
+  val print_dot : string -> t -> unit
 
-  (*  TODO : version impérative ? *)
-  val find : t -> exp -> V.t list
+  (* functions needed for Steensgaard's algorithm *)
 
-  val do_stmt : t -> stmt -> t
+  (** [init] creates an "empty" abstract state *)
+  val init : unit -> t
 
-  val make_summary : t -> fundec -> t * summary
+  (** join  / fusion of two ecr; returns the mgu and the new graph *)
+  val join : t -> MGU.ecr -> MGU.ecr -> t
+
+  (** same as before, but don't join if one of the ecr is Bottom *)
+  val cjoin : t -> MGU.ecr -> MGU.ecr -> t 
+
+  (** [find a e] returns the ecr corresponding to C expression [e] in abstract state [a] *)
+  val find : t -> exp -> MGU.ecr
 
 end
+
+
+
+  (* val do_stmt : t -> stmt -> t
+   * 
+   * val make_summary : t -> fundec -> t * summary *)
