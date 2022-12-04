@@ -82,9 +82,11 @@ module AbstractState : sig
 
   type graph = G.t (* graph is persistant *)
 
-  type mgu = MGU.t (* imperative structure *)
+  type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
 
-  type t = graph
+  module VMap : sig type 'a t end (* todo : proper definition of VMap *)
+
+  type t = graph * lset VMap.t
 
   type summary  = t * V.t list (* summary for functions : a state and a list of local variables and parameters (we may need 2 lists) *)
 
