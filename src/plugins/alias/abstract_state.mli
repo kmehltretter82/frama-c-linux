@@ -80,11 +80,11 @@ end
 
 module AbstractState : sig
 
-  type graph = G.t
+  type graph = G.t (* graph is persistant *)
 
-  type mgu = MGU.t
+  type mgu = MGU.t (* imperative structure *)
 
-  type t = graph * mgu (* we may need additional information *)
+  type t = graph
 
   type summary  = t * V.t list (* summary for functions : a state and a list of local variables and parameters (we may need 2 lists) *)
 
@@ -99,11 +99,12 @@ module AbstractState : sig
   (** [init] creates an "empty" abstract state *)
   val init : unit -> t
 
-  (** join  / fusion of two ecr; returns the mgu and the new graph *)
-  val join : t -> MGU.ecr -> MGU.ecr -> t
+  (** join / fusion of two ecr; returns the mgu and the new graph ;
+     first argument is the union-find struture *)
+  val join : MGU.t -> t -> MGU.ecr -> MGU.ecr -> t
 
   (** same as before, but don't join if one of the ecr is Bottom *)
-  val cjoin : t -> MGU.ecr -> MGU.ecr -> t 
+  val cjoin : MGU.t -> t -> MGU.ecr -> MGU.ecr -> t 
 
   (** [find a e] returns the ecr corresponding to C expression [e] in abstract state [a] *)
   val find : t -> exp -> MGU.ecr
