@@ -57,21 +57,21 @@ type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
 (** module for vertices *)
 module V = struct
 
-type t = int
+  type t = int
 
 
-let compare = compare 
+  let compare = compare
 
-let hash = Hashtbl.hash     
+  let hash = Hashtbl.hash
 
-let equal= (=)
+  let equal= (=)
 
-type label = int
+  type label = int
 
-let create x = x
+  let create x = x
 
-let label x = x 
-  end
+  let label x = x
+end
 
 
 
@@ -91,7 +91,7 @@ module MGU = struct
 
   type alpha = int
   type term = ecr
-    
+
   type t = {
     vars : (alpha,term) Hashtbl.t ; (* union-find variables *)
     sigma : (term,term) Hashtbl.t ; (* memoized normalization *)
@@ -100,8 +100,8 @@ module MGU = struct
 
   (** pretty printer *)
   let pp_ecr _ =
-  failwith "not implemented"
-    
+    failwith "not implemented"
+
   let pretty _ =
     failwith "not implemented"
 
@@ -125,30 +125,30 @@ module AbstractState = struct
 
   (** pretty printer *)
   let pretty _ =
-  failwith "not implemented"
+    failwith "not implemented"
 
   (** export the graph to a dot file *)
   let print_dot _ =
-  failwith "not implemented"
+    failwith "not implemented"
 
   (* functions needed for Steensgaard's algorithm *)
 
   (** [init] creates an "empty" abstract state *)
   let init _ =
-  failwith "not implemented"
+    failwith "not implemented"
 
   (** join / fusion of two ecr; returns the mgu and the new graph ;
-     first argument is the union-find struture *)
+      first argument is the union-find struture *)
   let join _ =
-  failwith "not implemented"
+    failwith "not implemented"
 
   (** same as before, but don't join if one of the ecr is Bottom *)
   let cjoin _ =
-  failwith "not implemented"
+    failwith "not implemented"
 
   (** [find a e] returns the ecr corresponding to C expression [e] in abstract state [a] *)
   let find  _ =
-  failwith "not implemented"
+    failwith "not implemented"
 
 end
 
@@ -169,7 +169,7 @@ let do_stmt _ =
 
 
 (** [make_summary mgu a f] computes the summary of a function (and the
-   next abstract state if needed) and stores the summary in
-   function_table *)
+    next abstract state if needed) and stores the summary in
+    function_table *)
 let make_summary  _ =
   failwith "not implemented"
