@@ -152,11 +152,10 @@ end
 
 (** Hashtable to store the abstract states; index it with kernel_functions too ? *)
 let stmt_table =
-  failwith "not implemented"
+  Hashtbl.create 13
 
 let function_table =
-  failwith "not implemented"
-
+  Hashtbl.create 13
 
 (** [do_stmt mgu a s] computes the next abstract state and stores it in stmt_table *)
 let do_stmt _ =
