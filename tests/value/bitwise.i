@@ -2,6 +2,7 @@
    STDOPT: +"-big-ints-hex 256"
 */
 
+
 /*@ assigns \result \from a, b;
     ensures result_a_or_b: \result == a || \result == b ;
  */
