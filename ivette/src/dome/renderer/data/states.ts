@@ -100,6 +100,7 @@ export class GlobalState<A> {
   constructor(initValue: A) {
     this.value = initValue;
     this.emitter = new Emitter();
+    this.emitter.setMaxListeners(200);
     this.getValue = this.getValue.bind(this);
     this.setValue = this.setValue.bind(this);
   }
@@ -108,7 +109,8 @@ export class GlobalState<A> {
   getValue(): A { return this.value; }
 
   /** Notify callbacks on change. By default, changed are detected
-      by using _deep_ structural comparison, using `react-fast-compare` comparison.
+      by using _deep_ structural comparison, using `react-fast-compare`
+      comparison.
       @param value the new value of the state
       @param forced when set to `true`, notify callbacks without comparison.
   */
