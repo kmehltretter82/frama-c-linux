@@ -1,10 +1,12 @@
 \documentclass[a4paper,11pt,twoside,openright,web]{frama-c-book}
 
+\usepackage{ifthen}
+%\input{fc-macros.tex}
+
 \newcommand{\framacversion}%
            {\input{../../VERSION} (\input{../../VERSION_CODENAME}\unskip)}
 %%\usepackage{microtype}
 \input{macros_modern}
-\input{./frama-c-affiliation.tex}
 %%modern \usepackage{pslatex}
 %%modern \usepackage{a4wide}
 
@@ -15,7 +17,7 @@
 
 %-----------------------------------------------
 % barre de révision (utilisée pour A FAIRE)
-%%modern \usepackage[outerbars]{changebar} 
+%%modern \usepackage[outerbars]{changebar}
 
 %\definecolor{bleu}{rgb}{0.15,0.3,0.7}
 %\definecolor{orange}{rgb}{1.00,0.50,0.00}
@@ -49,26 +51,19 @@
 %%modern \renewcommand{\labelitemi}{$\bullet$}
 \renewcommand{\labelitemii}{$\triangleright$}
 %==============================================================================
+
+\title{RTE\\\bigskip Runtime Error Annotation Generation}
+\author{Philippe Herrmann and Julien Signoles}
+
+\fcversion{\framacversion}
+
+\cclicence{by-sa}
+\copyrightstarts{2010}
+
 \begin{document}
 
-\coverpage{RTE --- Runtime Error Annotation Generation}
+\maketitle
 
-\begin{titlepage}
-\begin{flushleft}
-\includegraphics[height=14mm]{cealistlogo.jpg}
-\end{flushleft}
-\vfill
-\title{Frama-C's RTE plug-in}{for Frama-C \framacversion}
-\author{Philippe Herrmann and Julien Signoles}
-\begin{tabular}{l}
-  \fcaffiliationen
-\end{tabular}
-\vfill
-\begin{flushleft}
-  \textcopyright 2010-{\the\year} CEA LIST
-
-\end{flushleft}
-\end{titlepage}
 \input{rte.tex}
 
 \end{document}

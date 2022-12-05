@@ -2,10 +2,8 @@
 /developer.pdf
 /eu-flag.jpg
 /frama-c-book.cls
-/frama-c-cover.pdf
-/frama-c-left.pdf
-/frama-c-right.pdf
-/frama-c-affiliation.tex
+/fc-macros.tex
+/logos
 /hello_world/
 /tutorial/viewcfg/generated/
 /examples/generated/

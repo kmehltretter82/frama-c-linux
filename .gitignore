@@ -82,7 +82,6 @@ _build
 /doc/*/*.fls
 /doc/*/*.fdb_latexmk
 /doc/*/*.synctex.gz
-/doc/*/frama-c-affiliation.tex
 
 /doc/acsl/
 

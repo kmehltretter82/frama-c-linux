@@ -1,38 +1,33 @@
-\documentclass[web]{frama-c-book}
+\documentclass{frama-c-book}
 
 \usepackage{graphicx}
 \usepackage{calc}
+\usepackage{ifthen}
+\usepackage{imakeidx}
 
-\include{macros}
-\include{eacslversion}
-\input{./frama-c-affiliation.tex}
+\input{macros}
+\input{eacslversion}
 
 \makeindex
 
+\title{E-ACSL Plug-in}
+\author{Julien Signoles, Basile Desloges and Kostyantyn Vorobyov}
+
+\acknowledge{Pierre-Lo\"ic Garoche}
+\acknowledge{Jens Gerlach}
+\acknowledge{Florent Kirchner}
+\acknowledge{Nikola\"i Kosmato}
+\acknowledge{Andr\'e Maroneze}
+\acknowledge{Fonenantsoa Maurica}
+\acknowledge{Guillaume Petio}
+
+\cclicence{by-sa}
+\copyrightstarts{2013}
+
 \begin{document}
 
-\coverpage{\eacsl User Manual}
 
-\begin{titlepage}
-\begin{flushleft}
-\includegraphics[height=14mm]{cealistlogo.jpg}
-\end{flushleft}
-\vfill
-\title{\eacsl Plug-in}{Release \eacslpluginversion (\eacslplugincodename)
- \ifthenelse{\equal{\eacslpluginversion}{\fcversion}}{}{%
-   \\[1em] compatible with \framac \fcversion}}
-\author{Julien Signoles, Basile Desloges and Kostyantyn Vorobyov}
-\begin{center}
-\fcaffiliationen
-\end{center}
-\vfill
-\begin{flushleft}
-  \textcopyright 2013-2022 CEA LIST
-%%
-  %% This work has been supported by the `Hi-Lite' FUI project (FUI AAP 9).
-\end{flushleft}
-\end{titlepage}
-
+\maketitle
 \tableofcontents
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -50,9 +45,7 @@ evolve in the future.
 
 \section*{Acknowledgements}
 
-We gratefully thank the people who contributed to this document:
-Pierre-Lo\"ic Garoche, Jens Gerlach, Florent Kirchner, Nikola\"i Kosmatov,
-Andr\'e Oliveira Maroneze, Fonenantsoa Maurica, and Guillaume Petiot.
+\insertpeople
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

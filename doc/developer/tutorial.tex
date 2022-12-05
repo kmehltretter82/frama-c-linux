@@ -52,8 +52,8 @@ platform. This tutorial focuses on specific parts of this figure.
 \savebox{\designbox}{\begin{varwidth}{\textwidth}\centering Design\\(GUI extension point)\end{varwidth}}
 \newlength{\designheight}
 \setlength{\designheight}{\totalheightof{\usebox\designbox}}
-\newsavebox{\captionbox}\savebox{\captionbox}{\textbf{Caption:}}
-\newlength{\captionheight}\settototalheight{\captionheight}{\captionbox}
+\newsavebox{\capbox}\savebox{\capbox}{\textbf{Caption:}}
+\newlength{\captionheight}\settototalheight{\captionheight}{\capbox}
 \begin{tikzpicture}[remember picture,txt/.style={inner xsep=3pt}]
   \node[inner sep=0pt] (implem) {
     \tikztitleboxbig{Plug-in\\implementation}{darkgreen}{
@@ -113,7 +113,7 @@ platform. This tutorial focuses on specific parts of this figure.
    \draw[Latex-] ($(registration.west)+(-\padding,0)$) -- +(-\bigpadding,0);
 
    \node[anchor=south east,xshift=-\padding] at (registration.north west)
-   {\usebox{\captionbox}};
+   {\usebox{\capbox}};
 
    \newlength{\kernelwidth}
    \setlength{\kernelwidth}{\widthof{Dynamic}}%TODO:compute dynamically

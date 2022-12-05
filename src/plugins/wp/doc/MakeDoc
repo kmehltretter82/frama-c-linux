@@ -25,7 +25,7 @@
 # --------------------------------------------------------------------------
 FRAMAC_DOC= .make-class .make-images .make-icons VERSION VERSION_CODENAME
 # --------------------------------------------------------------------------
-FRAMAC_CLASS=frama-c-book.cls frama-c-cover.pdf frama-c-left.pdf frama-c-right.pdf frama-c-affiliation.tex
+FRAMAC_CLASS=frama-c-book.cls fc-macros.tex logos anr-logo.png
 FRAMAC_BULLETS=never_tried.png unknown.png valid_under_hyp.png surely_valid.png
 FRAMAC_IMAGES=cealistlogo.jpg
 # --------------------------------------------------------------------------
@@ -35,7 +35,7 @@ FRAMAC_TRUNK?=../../../../..
 RES_CLASS=$(addprefix $(FRAMAC_TRUNK)/doc/,$(FRAMAC_CLASS))
 .make-class: $(RES_CLASS)
 	@echo "Import Frama-C Class"
-	@cp -fv $(RES_CLASS) .
+	@cp -rfv $(RES_CLASS) .
 	@touch .make-class
 
 RES_IMAGES=$(addprefix $(FRAMAC_TRUNK)/doc/images/,$(FRAMAC_IMAGES))

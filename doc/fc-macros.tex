@@ -1,0 +1,158 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Date
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Useful for today's short date
+\def\shorttoday{\leavevmode\hbox{\the\year-\twodigits\month-\twodigits\day}}
+\def\twodigits#1{\ifnum#1<10 0\fi\the#1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Indexed Keywords
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Frama-C plug-in names (e.g., \plugin{Eva})
+\newcommand{\plugin}[1]{\textsf{#1}\xspace}
+
+% Tools (e.g., \tool{Why3})
+\newcommand{\tool}[1]{\textsf{#1}\xspace}
+
+% Languages (e.g., \lang{ACSL}, \lang{C})
+\newcommand{\lang}[1]{\textsf{#1}\xspace}
+
+% Libraries (e.g., \library{Gmp})
+\newcommand{\library}[1]{\textsf{#1}\xspace}
+
+% Benchmarks (e.g, \benchmark{SpecCPU})
+\newcommand{\benchmark}[1]{\textsf{#1}\xspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Frama-C Related Names
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\FramaC}{\tool{Frama-C}}
+\newcommand{\acsl}{\lang{ACSL}}
+\newcommand{\eacsllang}{\lang{E-ACSL}}
+
+% plug-ins
+\newcommand{\aorai}{\plugin{Aora\"i}}
+\newcommand{\cafe}{\plugin{CaFE}}
+\newcommand{\callgraph}{\plugin{Callgraph}}
+\newcommand{\constfold}{\plugin{Consfold}}
+\newcommand{\dive}{\plugin{Dive}}
+\newcommand{\dominators}{\plugin{Dominators}}
+\newcommand{\eacsl}{\plugin{E-ACSL}}
+\newcommand{\Eva}{\plugin{Eva}}
+\newcommand{\framaclang}{\plugin{Frama-Clang}}
+\newcommand{\from}{\plugin{From}}
+\newcommand{\GUI}{\plugin{GUI}}
+\newcommand{\impact}{\plugin{Impact}}
+\newcommand{\inout}{\plugin{InOut}}
+\newcommand{\instantiate}{\plugin{Instantiate}}
+\newcommand{\ltest}{\plugin{LTest}}
+\newcommand{\mdr}{\plugin{MdR}}
+\newcommand{\metacsl}{\plugin{MetAcsl}}
+\newcommand{\metrics}{\plugin{Metrics}}
+\newcommand{\nonterm}{\plugin{NonTerm}}
+\newcommand{\obfuscator}{\plugin{Obfuscator}}
+\newcommand{\occurrence}{\plugin{Occurrence}}
+\newcommand{\pathcrawler}{\plugin{PathCrawler}}
+\newcommand{\pdg}{\plugin{Pdg}}
+\newcommand{\pilat}{\plugin{Pilat}}
+\newcommand{\postdominators}{\plugin{Postdominators}}
+\newcommand{\printinterface}{\plugin{PrintInterface}}
+\newcommand{\reduction}{\plugin{Reduction}}
+\newcommand{\report}{\plugin{Report}}
+\newcommand{\rpp}{\plugin{RPP}}
+\newcommand{\rte}{\plugin{Rte}}
+\newcommand{\scope}{\plugin{Scope}}
+\newcommand{\secureflow}{\plugin{SecureFlow}}
+\newcommand{\securityslicing}{\plugin{SecuritySlicing}}
+\newcommand{\server}{\plugin{Server}}
+\newcommand{\slicing}{\plugin{Slicing}}
+\newcommand{\sparecode}{\plugin{SpareCode}}
+\newcommand{\stady}{\plugin{StaDy}}
+\newcommand{\studia}{\plugin{Studia}}
+\newcommand{\users}{\plugin{Users}}
+\newcommand{\variadic}{\plugin{Variadic}}
+\newcommand{\Wp}{\plugin{WP}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Standard Keywords
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Some programming languages
+\newcommand{\ada}{\lang{Ada}}
+\newcommand{\awk}{\lang{Awk}}
+\newcommand{\C}{\lang{C}}
+\newcommand{\coq}{\lang{Coq}}
+\newcommand{\Cpp}{\lang{C++}}
+\newcommand{\csharp}{\lang{C\#}}
+\newcommand{\dafny}{\lang{Dafny}}
+\newcommand{\dotnet}{\lang{.NET}}
+\newcommand{\eiffel}{\lang{Eiffel}}
+\newcommand{\fortran}{\lang{Fortran}}
+\newcommand{\isabelle}{\lang{Isabelle}}
+\newcommand{\java}{\lang{Java}}
+\newcommand{\javacard}{\lang{JavaCard}}
+\newcommand{\K}{\ensuremath{\mathbb{K}}}
+\newcommand{\ocaml}{\lang{OCaml}}
+\newcommand{\php}{\lang{PHP}}
+\newcommand{\python}{\lang{Python}}
+\newcommand{\smalltalk}{\lang{Smalltalk}}
+\newcommand{\spark}{\lang{Spark2014}}
+\newcommand{\vbnet}{\lang{VB.NET}}
+
+% Some modeling languages
+\newcommand{\lustre}{\lang{Lustre}}
+\newcommand{\scade}{\lang{Scade}}
+\newcommand{\simulink}{\lang{Simulink}}
+
+% Some specification languages
+\newcommand{\codecontract}{\lang{Code Contract}}
+\newcommand{\ltl}{\lang{LTL}}
+\newcommand{\jml}{\lang{JML}}
+\newcommand{\specsharp}{\lang{Spec\#}}
+\newcommand{\vcc}{\lang{VCC}}
+
+% Some libraries
+\newcommand{\cil}{\library{Cil}}
+\newcommand{\gtk}{\library{Gtk2}}
+\newcommand{\gtkt}{\library{Gtk3}}
+\newcommand{\gmp}{\library{Gmp}}
+\newcommand{\lablgtk}{\library{LablGtk2}}
+\newcommand{\lablgtkt}{\library{LablGtk3}}
+\newcommand{\libc}{\library{libc}}
+\newcommand{\libtomcrypt}{\library{LibTomCrypt}}
+
+% Some analysis and verification tools
+\newcommand{\addresssanitizer}{\tool{AddressSanitizer}}
+\newcommand{\aiT}{\tool{aiT}}
+\newcommand{\astree}{\tool{Astr\'ee}}
+\newcommand{\caduceus}{\tool{Caduceus}}
+\newcommand{\drmemory}{\tool{Dr.~Memory}}
+\newcommand{\insurepp}{\tool{Insure++}}
+\newcommand{\memcheck}{\tool{MemCheck}}
+\newcommand{\memorysanitizer}{\tool{MemorySanitizer}}
+\newcommand{\memsanitizer}{\tool{MemorySanitizer}}
+\newcommand{\openjml}{\tool{OpenJML}}
+\newcommand{\polyspace}{\tool{PolySpace}}
+\newcommand{\purify}{\tool{Purify}}
+\newcommand{\rvmatch}{\tool{RV-Match}}
+\newcommand{\stackanalyzer}{\tool{Stackanalyzer}}
+\newcommand{\threadsanitizer}{\tool{ThreadSanitizer}}
+\newcommand{\undefsanitizer}{\tool{UndefinedBehaviorSanitizer}}
+\newcommand{\valgrind}{\tool{Valgrind}}
+\newcommand{\verasco}{\tool{Verasco}}
+\newcommand{\why}{\tool{Why}}
+\newcommand{\whyt}{\tool{Why3}}
+
+% Some other tools
+\newcommand{\altergo}{\tool{Alt-Ergo}}
+\newcommand{\clang}{\tool{Clang}}
+\newcommand{\clousot}{\tool{Clousot}}
+\newcommand{\compcert}{\tool{CompCert}}
+\newcommand{\gcc}{\tool{Gcc}}
+\newcommand{\gdb}{\tool{gdb}}
+\newcommand{\git}{\tool{Git}}
+\newcommand{\llvm}{\tool{LLVM}}
+\newcommand{\opam}{\tool{opam}}

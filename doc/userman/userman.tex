@@ -1,39 +1,36 @@
 % rubber: depend ../../VERSION
-\documentclass[web]{frama-c-book}
+\documentclass{frama-c-book}
 
 \usepackage{graphicx}
 \usepackage{calc}
 \usepackage{array}
 \usepackage{longtable}
 \usepackage{hyperref}
+\usepackage{makeidx}
 
-\include{macros}
-\input{./frama-c-affiliation.tex}
+\input{fc-macros}
+\input{macros}
 
 \makeindex
 
-\begin{document}
-
-\coverpage{User Manual}
-
-\begin{titlepage}
-\begin{flushleft}
-\includegraphics[height=14mm]{cealistlogo.jpg}
-\end{flushleft}
-\vfill
-\title{Frama-C User Manual}{Release \framacversion}
+\title{Frama-C User Manual}
 \author{Loïc Correnson, Pascal Cuoq, Florent Kirchner, André
   Maroneze, Virgile Prevosto, Armand Puccetti, Julien Signoles and Boris
   Yakobowski}
-\begin{tabular}{l}
-  \fcaffiliationen
-\end{tabular}
-\vfill
-\begin{flushleft}
-  \textcopyright 2009-2022 CEA LIST
-\end{flushleft}
-\end{titlepage}
 
+\acknowledge{Patrick Baudin}
+\acknowledge{Mickaël Delahaye}
+\acknowledge{Philippe Hermann}
+\acknowledge{Benjamin Monate}
+\acknowledge{Dillon Pariente}
+
+\fcversion{\framacversion}
+\cclicence{by-sa}
+\copyrightstarts{2009}
+
+\begin{document}
+
+\maketitle
 \tableofcontents
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -48,12 +45,26 @@ content of this document corresponds to the version \framacversion, on \today, o
 
 \section*{Acknowledgements}
 
-We gratefully thank all the people who contributed to this document: Patrick
-Baudin, Mickaël Delahaye, Philippe Hermann, Benjamin Monate and Dillon Pariente.
+\insertpeople
 
-\acknowledgeANR
+\medskip
 
-\acknowledgeEU
+\acknowledgeANR{
+  the French ANR projects CAT~(ANR-05-RNTL-00301) and U3CAT~(08-SEGI-021-01)
+}
+
+\medskip
+
+\acknowledgeEU{
+  the European Union's Seventh Framework Programme (FP7/2007-2013)
+  under grant agreement N$^\circ$\,317753 (\mbox{STANCE}).\\
+  It has also received funding from the Horizon 2020 research
+  and innovation programme, under grant agreements
+  N$^\circ$\,731453~(\mbox{VESSEDIA}),
+  N$^\circ$\,824231~(\mbox{DECODER}),
+  N$^\circ$\,830892~(\mbox{SPARTA}),
+  and N$^\circ$\,883242~(\mbox{ENSURESEC})
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

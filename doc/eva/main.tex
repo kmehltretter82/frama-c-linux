@@ -1,10 +1,12 @@
-\documentclass[web]{frama-c-book}
+\documentclass{frama-c-book}
 
 \usepackage{microtype}
 \usepackage{lmodern}
 \usepackage{booktabs}
 \usepackage{calc}
 \usepackage{multirow}
+
+\input{fc-macros.tex}
 
 % Commandes pour mettre des ref dans l'index :
 \newcommand{\idb}[1]{\textbf{#1}}
@@ -23,52 +25,51 @@
 \definecolor{gris}{gray}{0.85}
 
 \makeatletter
-\newenvironment{important}%
-{\hspace{5pt plus \linewidth minus \marginparsep}%
- \begin{lrbox}{\@tempboxa}%
-   \begin{minipage}{\linewidth - 2\fboxsep}\itshape}
-{\end{minipage}\end{lrbox}\colorbox{gris}{\usebox{\@tempboxa}}}
+\newenvironment{important}{\begin{colbox}{gris}}{\end{colbox}}
 \makeatother
 
 \newcommand{\framacversion}%
            {\input{../../VERSION} (\input{../../VERSION_CODENAME}\unskip)}
 \newcommand{\isoc}{\textsf{C99}}
 
-\newcommand{\Eva}{\textsf{Eva}}
-
-\input{./frama-c-affiliation.tex}
-
 \lstset{literate=%
 {∈}{{$\in$ }}1
 }
 
+\title{The \Eva{} plug-in}
+\author{David Bühler, Pascal Cuoq and Boris Yakobowski. \\
+With Matthieu Lemerre, André Maroneze,
+Valentin Perrelle and Virgile Prevosto}
+
+\fcversion{\framacversion}
+
+\cclicence{by-sa}
+\copyrightstarts{2011}
+
 %==============================================================================
 \begin{document}
 
-\coverpage{Eva – The Evolved Value Analysis plug-in}
-
-\begin{titlepage}
-\begin{flushleft}
-\includegraphics[height=14mm]{cealistlogo.jpg}
-\end{flushleft}
-\vfill
-\title{The \Eva{} plug-in}{\framacversion}
-\author{David Bühler, Pascal Cuoq and Boris Yakobowski. \\
-  With Matthieu Lemerre, André Maroneze,
-  Valentin Perrelle and Virgile Prevosto}
-\begin{tabular}{l}
-  \fcaffiliationen
-\end{tabular}
-\vfill
-\begin{flushleft}
-  \textcopyright 2011-\the\year{} CEA LIST
-
-  This work has been supported by the ANR project U3CAT
-  (ANR-08-SEGI-021-01).
-\end{flushleft}
-\end{titlepage}
-
+\maketitle
 \tableofcontents
+
+\chapter*{Foreword}
+\markright{}
+\addcontentsline{toc}{chapter}{Foreword}
+
+This is the documentation of the \FramaC plug-in \Eva.
+
+The content of this document corresponds to the version \framacversion, released
+on \today, of \FramaC. However the development of \FramaC is still ongoing:
+features described here may still evolve in the future.
+
+\section*{Acknowledgements}
+%\addcontentsline{toc}{chapter}{Acknowledgements}
+
+\medskip
+
+\acknowledgeANR{
+the French ANR projects U3CAT~(08-SEGI-021-01)
+}
 
 \chapter{Introduction}\label{introduction}
 \vspace{2cm}
@@ -673,7 +674,7 @@ We can then Ctrl+click on the loop condition in the original source view
   can be defined via the menu {\em File - Preferences}.} centered on the loop, and
 then add the loop unroll annotation, as follows:
 
-\begin{lstlisting}
+\begin{lstlisting}[style=c]
   //@ loop unroll 4;
   for (i=0;i < WCNT; i++)
       {
@@ -2288,7 +2289,7 @@ developing a custom plug-in.
 
 \chapter{Graphical interface (GUI)}\label{gui}
 \vspace{2cm}
-\include{gui}
+\input{gui}
 
 \chapter{Limitations and specificities}\label{limitations_specificities}
 \vspace{2cm}
