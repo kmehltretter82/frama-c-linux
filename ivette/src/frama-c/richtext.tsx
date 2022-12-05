@@ -83,7 +83,7 @@ interface MarkerProps {
 
 function Marker(props: MarkerProps): JSX.Element {
   const { marker, onMarker, children } = props;
-  const onClick = (): void => {if (onMarker) onMarker(marker);};
+  const onClick = (): void => { if (onMarker) onMarker(marker); };
   return (
     <span
       className="kernel-text-marker"
@@ -109,7 +109,11 @@ export function Text(props: TextProps): JSX.Element {
       const array = marker ? text.slice(1) : text;
       const contents = React.Children.toArray(array.map(makeContents));
       if (marker) {
-        return <Marker marker={tag} onMarker={props.onMarker}>{contents}</Marker>;
+        return (
+          <Marker marker={tag} onMarker={props.onMarker}>
+            {contents}
+          </Marker>
+        );
       }
       return <>{contents}</>;
     } if (typeof text === 'string') {

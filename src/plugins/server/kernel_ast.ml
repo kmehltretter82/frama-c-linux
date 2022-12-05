@@ -336,6 +336,7 @@ struct
   let jterm = jmarker "term"
   let jglobal = jmarker "global"
   let jproperty = jmarker "property"
+  let jtyp = jmarker "type"
 
   let jtype = Data.declare ~package ~name:"marker"
       ~descr:(Md.plain "Localizable AST markers")
@@ -427,6 +428,7 @@ end
 module KfMarker = struct
   type record
   let record : record Record.signature = Record.signature ()
+
   let fct = Record.field record ~name:"fct"
       ~descr:(Md.plain "Function") (module Kf)
   let marker = Record.field record ~name:"marker"
@@ -435,6 +437,7 @@ module KfMarker = struct
   let data =
     Record.publish ~package ~name:"location"
       ~descr:(Md.plain "Location: function and marker") record
+
   module R : Record.S with type r = record = (val data)
   type t = kernel_function * Printer_tag.localizable
   let jtype = R.jtype
@@ -647,7 +650,9 @@ struct
 
   let update () = Request.emit signal
 
-  let register ~id ~label ~descr ?(title = descr) ?(enable = fun _ -> true) pretty =
+  let register ~id ~label ~descr
+      ?(title = descr)
+      ?(enable = fun _ -> true) pretty =
     let rank = incr rankId ; !rankId in
     let info = { id ; rank ; label ; descr; title ; enable ; pretty } in
     if Hashtbl.mem registry id then

@@ -46,6 +46,7 @@ sig
   val jterm : jtype
   val jglobal : jtype
   val jproperty : jtype
+  val jtyp : jtype
 
   val create : t -> string
   (** Memoized unique identifier. *)
