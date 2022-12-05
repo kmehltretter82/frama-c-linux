@@ -64,19 +64,19 @@ module MGU : sig
   type ecr = Bottom | Lval of lval (** type ECR = equivalence class representant, basically a lval or Bottom *)
 
   (** IMPERATIVE union find structure, aka "mgu"; every thime a mgu is
-     given as an argument of a function, there may be sides effects *)
+      given as an argument of a function, there may be sides effects *)
   type t
 
   (** pretty printer *)
   val pp_ecr : Format.formatter -> ecr -> unit
-    
+
   val pretty : Format.formatter -> t -> unit
 
-  
-(* connection with Abstract_state.mli *)
 
-(** [concretise mgu e] returns the set of lval that are reprensented
-   by [e] in union-find structure [mgu] *)
+  (* connection with Abstract_state.mli *)
+
+  (** [concretise mgu e] returns the set of lval that are reprensented
+      by [e] in union-find structure [mgu] *)
   val concretise : t -> ecr -> lset
 
 end
@@ -105,7 +105,7 @@ module AbstractState : sig
   val init : unit -> t
 
   (** join / fusion of two ecr; returns the mgu and the new graph ;
-     first argument is the union-find struture *)
+      first argument is the union-find struture *)
   val join : MGU.t -> t -> MGU.ecr -> MGU.ecr -> t
 
   (** same as before, but don't join if one of the ecr is Bottom *)
