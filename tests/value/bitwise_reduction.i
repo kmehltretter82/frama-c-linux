@@ -1,7 +1,7 @@
 /* run.config*
    STDOPT: +"-big-ints-hex 255"
+   STDOPT: +"-big-ints-hex 255 -machdep ppc_32"
 */
-
 
 volatile v;
 
