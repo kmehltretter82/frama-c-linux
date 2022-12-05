@@ -20,13 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
 let compute () =
   failwith "not implemented"
-    
+
 let clear () =
   failwith "not implemented"
-    
+
 let get_class_before_statement _ =
   failwith "not implemented"
 
