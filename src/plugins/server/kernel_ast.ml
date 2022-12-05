@@ -723,7 +723,7 @@ let () = Information.register
 let () = Information.register
     ~id:"kernel.ast.typesizeof"
     ~label:"Sizeof"
-    ~title:"Size of a C type"
+    ~descr:"Size of a C type"
     begin fun fmt loc ->
       match loc with
       | PType typ -> Format.fprintf fmt "%i bits" (Cil.bitsSizeOf typ)
