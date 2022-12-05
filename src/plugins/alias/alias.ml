@@ -21,13 +21,12 @@
 (**************************************************************************)
 
 
-
-type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
-
-
 let compute () =
   failwith "not implemented"
-
+    
+let clear () =
+  failwith "not implemented"
+    
 let get_class_before_statement _ =
   failwith "not implemented"
 
@@ -37,17 +36,14 @@ let get_class_after_statement _ =
 let  get_class_fundec _ =
   failwith "not implemented"
 
-let get_class_fundec_stmts _ =
-  failwith "not implemented"
-
-let concretise _ =
+let fold_fundec_stmts _ =
   failwith "not implemented"
 
 let is_equivalent  _ =
   failwith "not implemented"
 
-let points_to _ =
+let fold_points_to _ =
   failwith "not implemented"
 
-let points_to_closure  _ =
+let fold_points_to_closure  _ =
   failwith "not implemented"

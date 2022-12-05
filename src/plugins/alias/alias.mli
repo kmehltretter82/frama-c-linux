@@ -30,46 +30,36 @@
 
 open Cil_types
 
-open Abstract_state
-
-type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
-
-
+open Cil_datatype
 
 (** [compute ()] performs the may-alias analysis. It must be done once
    before using other functions *)
 val compute : unit -> unit
-  
+
+(** [clear()] clears caches and imperative structures that are used by
+   the analysis. All accumulated data will be lost *)
+val clear : unit -> unit
 
 
 (* Minimal API, as presented during kickoff meeting *)
   
 (** [get_class_before_statment f s v] gives the set of lval aliased to
    [v] before statement [s] in function [f] *)
-val get_class_before_statement : kernel_function -> stmt ->  lval -> lset
+val get_class_before_statement : kernel_function -> stmt ->  lval -> Lval.Set.t
   
 
 (** [get_class_after_statment f s v] gives the set of lval aliased to
    [v] after statement [s] in function [f] *)
-val get_class_after_statement : kernel_function -> stmt ->  lval -> lset
+val get_class_after_statement : kernel_function -> stmt ->  lval -> Lval.Set.t
 
 (** [get_class_fundec f v] gives the set of lval aliased to [v] after
    the return statement in function [f] *)
-val get_class_fundec: kernel_function -> lval -> lset
+val get_class_fundec: kernel_function -> lval -> Lval.Set.t
 
-(** [get_class_fundec f v] gives the list of pairs <s,e> where e is
+(** [fold_fundec_stmts f_fold acc f v] iters function [f_fold acc s e] on the list of pairs <s,e> where e is
    the set of lval aliased to [v] after statement <s> in function [f]
    *)
-val get_class_fundec_stmts: kernel_function -> lval -> (stmt*lset) list
-
-
-
-(* connection with Abstract_state.mli *)
-
-(** [concretise mgu e] returns the set of lval that are reprensented
-   by [e] in union-find structure [mgu] *)
-val concretise : MGU.t -> MGU.ecr -> lset
-
+val fold_fundec_stmts: ('a -> stmt -> lval -> 'a) -> 'a -> kernel_function -> lval -> 'a
 
 
 (* other functions required by MERCE *)
@@ -78,11 +68,12 @@ val concretise : MGU.t -> MGU.ecr -> lset
    the same ECR before statement [s] in function [f] *)
 val is_equivalent :  kernel_function -> stmt -> lval -> lval -> bool
 
-(** [points_to f s v] gives the graph vertex of lval [v] before
-   statement [s] in function [f] *)
-val points_to :  kernel_function -> stmt -> lval -> V.t
+(** [fold_points_to f_fold acc f s v] iters [f_fold acc setv] where
+   [setv] is the set such as lval [v] may points to any lval [v'] of
+   [setv] before statement [s] in function [f] *)
+val fold_points_to :  ('a ->  Lval.Set.t -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
 
 
-(** [points_to_closure f s v] give the graph vertex of lval [v] before
-   statement [s] in function [f] and its points-to closure *)
-val points_to_closure :  kernel_function -> stmt -> lval  -> G.t
+(** [fold_points_to_closure f_fold acc f s v] is the transitive
+   closure of the previous function [fold_points_to] *)
+val fold_points_to_closure :  ('a ->  Lval.Set.t -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
