@@ -67,7 +67,8 @@ module MGU : sig
 
   type ecr = Bottom | Lval of lval (** type ECR = equivalence class representant, basically a lval or Bottom *)
 
-  (** union find structure, aka "mgu" *)
+  (** IMPERATIVE union find structure, aka "mgu"; every thime a mgu is
+     given as an argument of a function, there may be sides effects *)
   type t
 
   (** pretty printer *)
@@ -115,6 +116,19 @@ end
 
 
 
-  (* val do_stmt : t -> stmt -> t
-   * 
-   * val make_summary : t -> fundec -> t * summary *)
+(** Main analysis functions *)
+
+(** Hashtable to store the abstract states; index it with kernel_functions too ? *)
+val stmt_table : (stmt, AbstractState.t) Hashtbl.t
+
+val function_table : (kernel_function, AbstractState.summary) Hashtbl.t
+
+
+(** [do_stmt mgu a s] computes the next abstract state and stores it in stmt_table *)
+val do_stmt : MGU.t -> AbstractState.t -> stmt -> AbstractState.t
+
+
+(** [make_summary mgu a f] computes the summary of a function (and the
+   next abstract state if needed) and stores the summary in
+   function_table *)
+val make_summary : MGU.t -> AbstractState.t -> kernel_function -> AbstractState.t * AbstractState.summary
