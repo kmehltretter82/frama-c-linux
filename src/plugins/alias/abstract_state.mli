@@ -128,7 +128,6 @@ val function_table : (kernel_function, AbstractState.summary) Hashtbl.t
 val do_stmt : MGU.t -> AbstractState.t -> stmt -> AbstractState.t
 
 
-(** [make_summary mgu a f] computes the summary of a function (and the
-   next abstract state if needed) and stores the summary in
-   function_table *)
+
+(** [make_summary mgu a f] computes the summary of a function (and the next abstract state if needed) and stores the summary in function_table *)
 val make_summary : MGU.t -> AbstractState.t -> kernel_function -> AbstractState.t * AbstractState.summary

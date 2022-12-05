@@ -35,7 +35,6 @@
   (public_name frama-c-alias.core)
   (flags -open Frama_c_kernel :standard)
   (libraries frama-c.kernel ocamlgraph)
-  (modules_without_implementation abstract_state)
 )
 
 ( plugin
