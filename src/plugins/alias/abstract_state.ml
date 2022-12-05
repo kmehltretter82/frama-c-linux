@@ -51,6 +51,9 @@ open Graph
 open Cil_types
 
 
+
+type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
+
 (** module for vertices *)
 module V = struct
 
@@ -100,7 +103,10 @@ module MGU = struct
   failwith "not implemented"
     
   let pretty _ =
-  failwith "not implemented"
+    failwith "not implemented"
+
+  let concretise  _ =
+    failwith "not implemented"
 
 end
 

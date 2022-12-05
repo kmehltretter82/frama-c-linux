@@ -22,7 +22,6 @@
 
 
 
-
 (** Module abstract_state
 
     implements "points-to" persistent graphs and Steensgaard's
@@ -50,16 +49,13 @@ open Graph
 
 open Cil_types
 
-
 (** module for vertices *)
 module V : Sig.VERTEX
-
-
 
 (** module for points-to graphs - persistant graph *)
 module G : Sig.P
 
-
+type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
 
 module MGU : sig
   (** module for the equivalence class, cf Steensgaard's paper *)
@@ -76,6 +72,13 @@ module MGU : sig
     
   val pretty : Format.formatter -> t -> unit
 
+  
+(* connection with Abstract_state.mli *)
+
+(** [concretise mgu e] returns the set of lval that are reprensented
+   by [e] in union-find structure [mgu] *)
+  val concretise : t -> ecr -> lset
+
 end
 
 
@@ -83,7 +86,6 @@ module AbstractState : sig
 
   type graph = G.t (* graph is persistant *)
 
-  type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
 
   module VMap : sig type 'a t end (* todo : proper definition of VMap *)
 
