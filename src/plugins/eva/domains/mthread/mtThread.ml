@@ -36,7 +36,7 @@ module Thread = struct
   let dummy_unhashconsed =
     let name = Name.of_string "dummy" in
     let stmt = Cil.dummyStmt in
-    let func = Kernel_function.dummy () in
+    let func = List.hd (Cil_datatype.Kf.reprs) in
     { name ; stmt ; func ; args = [] }
 
   module Thread' = Datatype.Make_with_collections (struct
