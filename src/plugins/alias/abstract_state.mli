@@ -109,7 +109,7 @@ module AbstractState : sig
   val join : MGU.t -> t -> MGU.ecr -> MGU.ecr -> t
 
   (** same as before, but don't join if one of the ecr is Bottom *)
-  val cjoin : MGU.t -> t -> MGU.ecr -> MGU.ecr -> t 
+  val cjoin : MGU.t -> t -> MGU.ecr -> MGU.ecr -> t
 
   (** [find a e] returns the ecr corresponding to C expression [e] in abstract state [a] *)
   val find : t -> exp -> MGU.ecr

@@ -60,9 +60,9 @@ module V = struct
   type t = int
 
 
-  let compare = compare 
+  let compare = compare
 
-  let hash = Hashtbl.hash     
+  let hash = Hashtbl.hash
 
   let equal= (=)
 
@@ -70,7 +70,7 @@ module V = struct
 
   let create x = x
 
-  let label x = x 
+  let label x = x
 end
 
 
