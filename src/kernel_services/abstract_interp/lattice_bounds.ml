@@ -126,6 +126,10 @@ module Bottom = struct
 
   (* Iterators *)
 
+  let bind f = function
+    | `Bottom -> `Bottom
+    | `Value v -> f v
+
   let fold ~bottom f = function
     | `Bottom -> bottom
     | `Value v -> f v
@@ -170,17 +174,11 @@ module Bottom = struct
 
   module Operators =
   struct
-    let (>>-) t f = match t with
-      | `Bottom  -> `Bottom
-      | `Value t -> f t
-
-    let (>>-:) t f = match t with
-      | `Bottom  -> `Bottom
-      | `Value t -> `Value (f t)
-
-    let (let+) = (>>-:)
+    let (>>-) x f = bind f x
+    let (>>-:) x f = map f x
+    let (let+) x f = map f x
     let (and+) = zip
-    let (let*) = (>>-)
+    let (let*) x f = bind f x
     let (and*) = zip
   end
 
@@ -249,6 +247,20 @@ struct
     | `Top, v | v, `Top -> v
     | `Value vx, `Value vy -> `Value (narrow_value vx vy)
 
+  (* Iterators *)
+
+  let bind f = function
+    | `Top -> `Top
+    | `Value v -> f v
+
+  let fold ~top f = function
+    | `Top -> top
+    | `Value v -> f v
+
+  let map f = function
+    | `Top -> `Top
+    | `Value v -> `Value (f v)
+
   (** Combination *)
 
   let zip x y =
@@ -264,18 +276,13 @@ struct
 
   (** Operators *)
 
-  module Operators = struct
-    let (>>-) t f = match t with
-      | `Top -> `Top
-      | `Value t -> f t
-
-    let (>>-:) t f = match t with
-      | `Top -> `Top
-      | `Value t -> `Value (f t)
-
-    let (let+) = (>>-:)
+  module Operators =
+  struct
+    let (>>-) x f = bind f x
+    let (>>-:) x f = map f x
+    let (let+) x f = map f x
     let (and+) = zip
-    let (let*) = (>>-)
+    let (let*) x f = bind f x
     let (and*) = zip
   end
 end
@@ -299,6 +306,23 @@ struct
     | `Bottom, _ | _, `Bottom -> `Bottom
     | `Value vx, `Value vy -> (narrow_value vx vy :> 'a t)
 
+  (* Iterators *)
+
+  let bind f = function
+    | `Top -> `Top
+    | `Bottom -> `Bottom
+    | `Value v -> f v
+
+  let fold ~top ~bottom f = function
+    | `Top -> top
+    | `Bottom -> bottom
+    | `Value v -> f v
+
+  let map f = function
+    | `Top -> `Top
+    | `Bottom -> `Bottom
+    | `Value v -> `Value (f v)
+
   (** Combination *)
 
   let zip x y =
@@ -309,20 +333,13 @@ struct
 
   (** Operators *)
 
-  module Operators = struct
-    let (>>-) t f = match t with
-      | `Top -> `Top
-      | `Bottom -> `Bottom
-      | `Value t -> f t
-
-    let (>>-:) t f = match t with
-      | `Top -> `Top
-      | `Bottom -> `Bottom
-      | `Value t -> `Value (f t)
-
-    let (let+) = (>>-:)
+  module Operators =
+  struct
+    let (>>-) x f = bind f x
+    let (>>-:) x f = map f x
+    let (let+) x f = map f x
     let (and+) = zip
-    let (let*) = (>>-)
+    let (let*) x f = bind f x
     let (and*) = zip
   end
 end
