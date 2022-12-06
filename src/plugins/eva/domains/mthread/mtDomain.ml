@@ -14,10 +14,10 @@ let current, set_current =
 module BuiltinsResults = struct
   module Lval = struct
     include State_builder.Hashcons (Eva_ast.Lval) (struct
-      let name = "Mthread.builtins.results.key"
-      let dependencies = []
-      let initial_values = []
-    end)
+        let name = "Mthread.builtins.results.key"
+        let dependencies = []
+        let initial_values = []
+      end)
     let var v = Eva_ast.Build.var v |> hashcons
   end
 
@@ -104,60 +104,60 @@ module State = struct
     }
 
   module State' = Datatype.Make_with_collections (struct
-    type t = state'
-    let name = "Mthread.state"
-    let reprs = [ default ; top ]
+      type t = state'
+      let name = "Mthread.state"
+      let reprs = [ default ; top ]
 
-    let copy state =
-      let threads  = MtThread.Register.copy state.threads in
-      let mutexes  = MtMutex.Register.copy state.mutexes in
-      let written  = Zone.copy state.memory.written in
-      let read     = Zone.copy state.memory.read in
-      let memory   = { read ; written } in
-      let standard = Value.copy state.return.standard in
-      let return   = { standard } in
-      let results  = BuiltinsResults.copy state.results in
-      { threads ; mutexes ; memory ; return ; results }
+      let copy state =
+        let threads  = MtThread.Register.copy state.threads in
+        let mutexes  = MtMutex.Register.copy state.mutexes in
+        let written  = Zone.copy state.memory.written in
+        let read     = Zone.copy state.memory.read in
+        let memory   = { read ; written } in
+        let standard = Value.copy state.return.standard in
+        let return   = { standard } in
+        let results  = BuiltinsResults.copy state.results in
+        { threads ; mutexes ; memory ; return ; results }
 
-    let structural_descr =
-      let open Structural_descr in
-      let ths = MtThread.Register.packed_descr in
-      let mxs = MtMutex.Register.packed_descr in
-      let mem = pack (t_record Zone.[| packed_descr ; packed_descr |]) in
-      let ret = pack (t_record Value.[| packed_descr |]) in
-      let results = BuiltinsResults.packed_descr in
-      t_record [| ths ; mxs ; mem ; ret ; p_bool ; results |]
+      let structural_descr =
+        let open Structural_descr in
+        let ths = MtThread.Register.packed_descr in
+        let mxs = MtMutex.Register.packed_descr in
+        let mem = pack (t_record Zone.[| packed_descr ; packed_descr |]) in
+        let ret = pack (t_record Value.[| packed_descr |]) in
+        let results = BuiltinsResults.packed_descr in
+        t_record [| ths ; mxs ; mem ; ret ; p_bool ; results |]
 
-    let pretty fmt state =
-      Format.fprintf fmt "Threads :@.  @[<v>%a@]@."
-        MtThread.Register.pretty state.threads ;
-      Format.fprintf fmt "Mutexes :@.  @[<v>%a@]@."
-        MtMutex.Register.pretty state.mutexes ;
-      Format.fprintf fmt "Memory  :@.  Read    : %a@.  Written : %a@."
-        Zone.pretty state.memory.read Zone.pretty state.memory.written ;
-      Format.fprintf fmt "Return  :@.  Standard : %a@."
-        Value.pretty state.return.standard
+      let pretty fmt state =
+        Format.fprintf fmt "Threads :@.  @[<v>%a@]@."
+          MtThread.Register.pretty state.threads ;
+        Format.fprintf fmt "Mutexes :@.  @[<v>%a@]@."
+          MtMutex.Register.pretty state.mutexes ;
+        Format.fprintf fmt "Memory  :@.  Read    : %a@.  Written : %a@."
+          Zone.pretty state.memory.read Zone.pretty state.memory.written ;
+        Format.fprintf fmt "Return  :@.  Standard : %a@."
+          Value.pretty state.return.standard
 
-    let compare_memory l r =
-      let open Locations.Zone in
-      compare l.read r.read <?> lazy (compare l.written r.written)
+      let compare_memory l r =
+        let open Locations.Zone in
+        compare l.read r.read <?> lazy (compare l.written r.written)
 
-    let compare_return l r =
-      let open Value in
-      compare l.standard r.standard
+      let compare_return l r =
+        let open Value in
+        compare l.standard r.standard
 
-    let compare l r =
-      MtThread.Register.compare l.threads r.threads
-      <?> lazy (MtMutex.Register.compare l.mutexes r.mutexes)
-      <?> lazy (compare_memory l.memory r.memory)
-      <?> lazy (compare_return l.return r.return)
-      <?> lazy (BuiltinsResults.compare l.results r.results)
+      let compare l r =
+        MtThread.Register.compare l.threads r.threads
+        <?> lazy (MtMutex.Register.compare l.mutexes r.mutexes)
+        <?> lazy (compare_memory l.memory r.memory)
+        <?> lazy (compare_return l.return r.return)
+        <?> lazy (BuiltinsResults.compare l.results r.results)
 
-    let equal l r = compare l r = 0
-    let hash = Hashtbl.hash
-    let rehash = Datatype.identity
-    let mem_project = Datatype.never_any_project
-  end)
+      let equal l r = compare l r = 0
+      let hash = Hashtbl.hash
+      let rehash = Datatype.identity
+      let mem_project = Datatype.never_any_project
+    end)
 
   module StateInfos = struct
     let name = "Mthread.state.hashconsed"

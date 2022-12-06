@@ -18,35 +18,35 @@ module Thread = struct
     { name ; stmt ; func ; args = [] }
 
   module Thread' = Datatype.Make_with_collections (struct
-    include Datatype.Serializable_undefined
-    type t = thread'
-    let name = "Mthread.thread"
-    let reprs = [ dummy_unhashconsed ]
-    let compare x y =
-      let cmp_var = Cil_datatype.Varinfo.compare in
-      let cmp_val = Value.compare in
-      let cmp_arg (ix, vx) (iy, vy) = cmp_var ix iy <?> lazy (cmp_val vx vy) in
-      Name.compare x.name y.name
-      <?> lazy (Cil_datatype.Stmt.compare x.stmt y.stmt)
-      <?> lazy (Kernel_function.compare x.func y.func)
-      <?> lazy (List.compare cmp_arg x.args y.args)
-    let equal x y = compare x y = 0
-    let hash = Hashtbl.hash
-    let pretty fmt { name ; stmt ; func ; args } =
-      let pp_sep fmt () = Format.fprintf fmt ";@ " in
-      let pp_var = Cil_datatype.Varinfo.pretty in
-      let pp_val = Value.pretty in
-      let pp fmt (var, v) = Format.fprintf fmt "%a <- %a" pp_var var pp_val v in
-      Format.fprintf fmt
-        "@[<v 2>Thread name :@ @[<hov>%a@]@]@\n\
-         @[<v 2>At statement:@ @[<hov>%a@]@]@\n\
-         @[<v 2>Executing   :@ @[<hov>%a@]@]@\n\
-         @[<v 2>With args   :@ @[<hov>%a@]@]"
-        Name.pretty name
-        Cil_datatype.Stmt.pretty stmt
-        Kernel_function.pretty func
-        Format.(pp_print_list ~pp_sep pp) args
-  end)
+      include Datatype.Serializable_undefined
+      type t = thread'
+      let name = "Mthread.thread"
+      let reprs = [ dummy_unhashconsed ]
+      let compare x y =
+        let cmp_var = Cil_datatype.Varinfo.compare in
+        let cmp_val = Value.compare in
+        let cmp_arg (ix, vx) (iy, vy) = cmp_var ix iy <?> lazy (cmp_val vx vy) in
+        Name.compare x.name y.name
+        <?> lazy (Cil_datatype.Stmt.compare x.stmt y.stmt)
+        <?> lazy (Kernel_function.compare x.func y.func)
+        <?> lazy (List.compare cmp_arg x.args y.args)
+      let equal x y = compare x y = 0
+      let hash = Hashtbl.hash
+      let pretty fmt { name ; stmt ; func ; args } =
+        let pp_sep fmt () = Format.fprintf fmt ";@ " in
+        let pp_var = Cil_datatype.Varinfo.pretty in
+        let pp_val = Value.pretty in
+        let pp fmt (var, v) = Format.fprintf fmt "%a <- %a" pp_var var pp_val v in
+        Format.fprintf fmt
+          "@[<v 2>Thread name :@ @[<hov>%a@]@]@\n\
+           @[<v 2>At statement:@ @[<hov>%a@]@]@\n\
+           @[<v 2>Executing   :@ @[<hov>%a@]@]@\n\
+           @[<v 2>With args   :@ @[<hov>%a@]@]"
+          Name.pretty name
+          Cil_datatype.Stmt.pretty stmt
+          Kernel_function.pretty func
+          Format.(pp_print_list ~pp_sep pp) args
+    end)
 
   module ThreadInfos = struct
     let name = "Mthread.thread.hashconsed"
@@ -102,29 +102,29 @@ let return_lval thread =
 type status = { running : Trilean.t ; canceled : Trilean.t }
 module Status = struct
   include Datatype.Make (struct
-    type t = status
-    let name = "Mthread.thread.status"
-    let reprs = [ { running = False ; canceled = False } ]
-    let copy = Datatype.identity
-    let rehash = Datatype.identity
-    let mem_project = Datatype.never_any_project
+      type t = status
+      let name = "Mthread.thread.status"
+      let reprs = [ { running = False ; canceled = False } ]
+      let copy = Datatype.identity
+      let rehash = Datatype.identity
+      let mem_project = Datatype.never_any_project
 
-    let structural_descr =
-      let running = Datatype.Bool.packed_descr in
-      let canceled = Trilean.packed_descr in
-      Structural_descr.t_record [| running ; canceled |]
+      let structural_descr =
+        let running = Datatype.Bool.packed_descr in
+        let canceled = Trilean.packed_descr in
+        Structural_descr.t_record [| running ; canceled |]
 
-    let pretty fmt { running ; canceled } =
-      Format.fprintf fmt "Running : %a@.Canceled : %a@."
-        Trilean.pretty running Trilean.pretty canceled
+      let pretty fmt { running ; canceled } =
+        Format.fprintf fmt "Running : %a@.Canceled : %a@."
+          Trilean.pretty running Trilean.pretty canceled
 
-    let compare l r =
-      Trilean.compare l.running r.running
-      <?> lazy (Trilean.compare l.canceled r.canceled)
+      let compare l r =
+        Trilean.compare l.running r.running
+        <?> lazy (Trilean.compare l.canceled r.canceled)
 
-    let equal l r = compare l r = 0
-    let hash t = Trilean.hash t.running + 3 * Trilean.hash t.canceled
-  end)
+      let equal l r = compare l r = 0
+      let hash t = Trilean.hash t.running + 3 * Trilean.hash t.canceled
+    end)
 
   (* let top = { running = Unknown ; canceled = Unknown } *)
 

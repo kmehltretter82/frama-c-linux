@@ -70,21 +70,21 @@ type trilean = True | False | Unknown
 
 module Trilean = struct
   include Datatype.Make_with_collections (struct
-    type t = trilean
-    let name = "Trilean"
-    let structural_descr = Structural_descr.t_abstract
-    let reprs = [ True ; False ; Unknown ]
-    let rehash = Datatype.identity
-    let copy = Datatype.identity
-    let mem_project = Datatype.never_any_project
-    let hash = function True -> 0 | False -> 1 | Unknown -> 2
-    let compare x y = compare (hash x) (hash y)
-    let equal x y = compare x y = 0
-    let pretty fmt = function
-      | True    -> Format.fprintf fmt "true"
-      | False   -> Format.fprintf fmt "false"
-      | Unknown -> Format.fprintf fmt "unknown"
-  end)
+      type t = trilean
+      let name = "Trilean"
+      let structural_descr = Structural_descr.t_abstract
+      let reprs = [ True ; False ; Unknown ]
+      let rehash = Datatype.identity
+      let copy = Datatype.identity
+      let mem_project = Datatype.never_any_project
+      let hash = function True -> 0 | False -> 1 | Unknown -> 2
+      let compare x y = compare (hash x) (hash y)
+      let equal x y = compare x y = 0
+      let pretty fmt = function
+        | True    -> Format.fprintf fmt "true"
+        | False   -> Format.fprintf fmt "false"
+        | Unknown -> Format.fprintf fmt "unknown"
+    end)
 
   let top = Unknown
   let is_unknown = function Unknown -> true | _ -> false
@@ -125,29 +125,29 @@ module Name = struct
   type name = Pointer of pointer | String of string | Null
 
   include Datatype.Make_with_collections (struct
-    include Datatype.Serializable_undefined
-    type t = name
-    let name = "Mthread_Name"
-    let reprs = [ Null ]
-    let compare x y =
-      match x, y with
-      | Null, Null -> 0
-      | Null, _ -> 1
-      | _, Null -> -1
-      | String x, String y -> String.compare x y
-      | String _, Pointer _ -> 1
-      | Pointer _, String _ -> -1
-      | Pointer (vx, ox), Pointer (vy, oy) ->
-        let (<?>) c other = if c = 0 then Lazy.force other else c in
-        Cil_datatype.Varinfo.compare vx vy <?> lazy (compare ox oy)
-    let equal = Datatype.from_compare
-    let pretty fmt = function
-      | Null -> Format.fprintf fmt "NULL"
-      | String s -> Format.pp_print_string fmt s
-      | Pointer (v, o) ->
-        Format.fprintf fmt "&%a + %i" Cil_datatype.Varinfo.pretty v o
-    let hash = Hashtbl.hash
-  end)
+      include Datatype.Serializable_undefined
+      type t = name
+      let name = "Mthread_Name"
+      let reprs = [ Null ]
+      let compare x y =
+        match x, y with
+        | Null, Null -> 0
+        | Null, _ -> 1
+        | _, Null -> -1
+        | String x, String y -> String.compare x y
+        | String _, Pointer _ -> 1
+        | Pointer _, String _ -> -1
+        | Pointer (vx, ox), Pointer (vy, oy) ->
+          let (<?>) c other = if c = 0 then Lazy.force other else c in
+          Cil_datatype.Varinfo.compare vx vy <?> lazy (compare ox oy)
+      let equal = Datatype.from_compare
+      let pretty fmt = function
+        | Null -> Format.fprintf fmt "NULL"
+        | String s -> Format.pp_print_string fmt s
+        | Pointer (v, o) ->
+          Format.fprintf fmt "&%a + %i" Cil_datatype.Varinfo.pretty v o
+      let hash = Hashtbl.hash
+    end)
 
   let of_string s = String s
 

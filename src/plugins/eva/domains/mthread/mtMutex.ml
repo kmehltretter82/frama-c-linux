@@ -10,15 +10,15 @@ module Mutex = struct
   let dummy_unhashconsed = { name = Name.of_string "dummy" }
 
   module Mutex' = Datatype.Make_with_collections (struct
-    include Datatype.Serializable_undefined
-    type t = mutex'
-    let name = "Mthread.mutex"
-    let reprs = [ dummy_unhashconsed ]
-    let compare x y = Name.compare x.name y.name
-    let equal x y = compare x y = 0
-    let hash x = Name.hash x.name
-    let pretty fmt { name } = Name.pretty fmt name
-  end)
+      include Datatype.Serializable_undefined
+      type t = mutex'
+      let name = "Mthread.mutex"
+      let reprs = [ dummy_unhashconsed ]
+      let compare x y = Name.compare x.name y.name
+      let equal x y = compare x y = 0
+      let hash x = Name.hash x.name
+      let pretty fmt { name } = Name.pretty fmt name
+    end)
 
   module MutexInfos = struct
     let name = "Mthread.mutex.hashconsed"
@@ -64,17 +64,17 @@ let to_cvalue mutex = Mutex.id mutex |> Z.of_int |> Value.inject_int
 type status = Locked | Unlocked
 module Status = struct
   include Datatype.Make (struct
-    include Datatype.Serializable_undefined
-    type t = status
-    let name = "Mthread.mutex.status"
-    let reprs = [ Locked ; Unlocked ]
-    let hash = function Locked -> 0 | Unlocked -> 1
-    let compare x y = Datatype.Int.compare (hash x) (hash y)
-    let equal x y = compare x y = 0
-    let to_string = function Locked -> "locked" | Unlocked -> "unlocked"
-    let pretty fmt status = Format.fprintf fmt "%s" (to_string status)
-  end)
-  
+      include Datatype.Serializable_undefined
+      type t = status
+      let name = "Mthread.mutex.status"
+      let reprs = [ Locked ; Unlocked ]
+      let hash = function Locked -> 0 | Unlocked -> 1
+      let compare x y = Datatype.Int.compare (hash x) (hash y)
+      let equal x y = compare x y = 0
+      let to_string = function Locked -> "locked" | Unlocked -> "unlocked"
+      let pretty fmt status = Format.fprintf fmt "%s" (to_string status)
+    end)
+
   (* There is a total order on statuses, that can be used as a partial order as
      it encodes the idea that we want to keep mutexes unlocked if we are not
      sure of their status. *)
