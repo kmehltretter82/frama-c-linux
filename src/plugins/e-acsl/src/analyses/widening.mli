@@ -20,7 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 open Analyses_types
+open Cil_types
 open Cil_datatype
 
-val widen : ival -> ival -> ival
-val ext_profile : ival Logic_var.Map.t -> ival Logic_var.Map.t
+val widen : logic_info -> ival -> ival -> ival
+val ext_profile : logic_info -> ival Logic_var.Map.t -> ival Logic_var.Map.t

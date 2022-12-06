@@ -28,23 +28,45 @@ open Interval_utils
 (* Interval Extension *)
 (* ********************************************************************* *)
 
-let interv_of_typ_containing_interv = function
+let extend_default i =
+  try
+    let kind = ikind_of_ival i in
+    interv_of_typ (TInt(kind, []))
+  with Cil.Not_representable ->
+    top_ival
+
+let extend_precise i =
+  try ignore (ikind_of_ival i); Ival i
+  with Cil.Not_representable ->
+    top_ival
+
+let chose_extend n i =
+  match n with
+  | 0 ->  extend_default i
+  | 1 -> extend_precise i
+  | n ->
+    Options.fatal "argument unsupported: %s with value %i"
+      Options.Function_arguments.name
+      n
+
+let extend_ival name i =
+  let n =
+    try Options.Function_arguments.find name
+    with Not_found -> Options.Function_arguments_base.get ()
+  in chose_extend n i
+
+let extend li = function
   | Float _ | Rational | Real | Nan as x ->
     x
   | Ival i ->
-    try
-      let kind = ikind_of_ival i in
-      interv_of_typ (TInt(kind, []))
-    with Cil.Not_representable ->
-      top_ival
+    extend_ival li.l_var_info.lv_name i
 
-let ext_profile =
-  Cil_datatype.Logic_var.Map.map interv_of_typ_containing_interv
+let ext_profile li =
+  Cil_datatype.Logic_var.Map.map (extend li)
 
 (* ********************************************************************* *)
 (* Widening *)
 (* ********************************************************************* *)
-
 let is_lower l1 l2 =
   match l1, l2 with
   | None, _ -> true
@@ -57,10 +79,14 @@ let is_higher u1 u2 =
   | Some u1, Some u2 -> Integer.compare u1 u2 >= 0
   | Some _, None -> false
 
-let widen i1 i2 =
-  match i1, i2 with
-  | Ival i1, _ when Ival.is_bottom i1 -> i2
-  | Ival i1, Ival i2 ->
+let widen_ival_naive name i1 i2 =
+  Options.feedback "hello";
+  extend_ival name (Ival.join i1 i2)
+
+let widen_ival_default i1 i2 =
+  if Ival.is_bottom i1
+  then Ival i2
+  else
     (try
        let kind = ikind_of_ival (Ival.join i1 i2) in
        let i = ival_of_ikind kind in
@@ -70,6 +96,34 @@ let widen i1 i2 =
        let umask = if is_higher u1 u2  then u1 else None in
        Ival (Ival.meet i (Ival.inject_range lmask umask))
      with Cil.Not_representable -> top_ival)
+
+let widen_ival_precise i1 i2 =
+  Options.feedback "widening: %a |> %a"
+    Ival.pretty i1
+    Ival.pretty i2;
+  let i = Ival.join i1 i2 in
+  try ignore (ikind_of_ival i); Ival i
+  with Cil.Not_representable -> top_ival
+
+let chose_widen name n i1 i2 =
+  match n with
+  | 0 -> widen_ival_naive name i1 i2
+  | 1 -> widen_ival_default i1 i2
+  | 2 -> widen_ival_precise i1 i2
+  | _ ->
+    Options.fatal "argument unsupported: %s with value %i"
+      Options.Function_arguments.name
+      n
+
+let widen_ival name i1 i2 =
+  let n =
+    try Options.Recursive_precision.find name
+    with Not_found -> Options.Recursive_precision_base.get ()
+  in chose_widen name n i1 i2
+
+let widen li i1 i2 =
+  match i1, i2 with
+  | Ival i1, Ival i2 -> widen_ival li.l_var_info.lv_name i1 i2
   | Float _, Float _ | Rational, Rational | Real, Real | Nan, Nan ->
     join i1 i2
   | Ival _, _| Float _, _ | Rational, _ | Real, _ | Nan, _ -> assert false

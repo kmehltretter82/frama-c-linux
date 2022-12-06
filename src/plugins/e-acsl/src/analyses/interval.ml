@@ -124,7 +124,7 @@ let rec fixpoint ~(infer : force:bool ->
     then
       ival
     else
-      let assumed_ival = Widening.widen ival inferred_ival in
+      let assumed_ival = Widening.widen li ival inferred_ival in
       fixpoint ~infer li args_ival t' assumed_ival
 
 (* Memoization module which retrieves the computed info of some terms *)
@@ -484,7 +484,7 @@ let rec infer ~force ~logic_env t =
                 args)
          in
          if LF_env.is_rec li then
-           let ext_profile = Widening.ext_profile profile in
+           let ext_profile = Widening.ext_profile li profile in
            Ext_profile.add profile li ext_profile;
            try LF_env.find li ext_profile
            with
@@ -773,7 +773,7 @@ and infer_predicate ~logic_env p =
     in
     (match li.l_body with
      | LBpred p when LF_env.is_rec li ->
-       let ext_profile = Widening.ext_profile profile in
+       let ext_profile = Widening.ext_profile li profile in
        Ext_profile.add profile li ext_profile;
        (try ignore (LF_env.find li ext_profile)
         with Not_found ->

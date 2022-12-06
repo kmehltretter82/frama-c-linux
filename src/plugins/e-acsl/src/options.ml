@@ -134,6 +134,70 @@ module Instrument =
                   Be aware that runtime verdicts may become partial."
     end)
 
+module Function_arguments_base =
+  Zero
+    (struct
+      let option_name = "-e-acsl-function-arguments-base"
+      let arg_name = "n"
+      let help = "precision for analysis of function arguments."
+    end)
+let () = Function_arguments_base.set_range ~min:0 ~max:1
+
+module Function_arguments =
+  String_map
+    (struct
+      include Datatype.Int
+      type key = string
+
+      let to_string ~key:_ i =
+        match i with
+        | None -> None
+        | Some i -> Some (string_of_int i)
+
+      let of_string ~key:_ ~prev: _ s =
+        match s with
+        | None -> None
+        | Some s ->  Some (int_of_string s)
+    end)
+    (struct
+      let default = Datatype.String.Map.empty
+      let option_name = "-e-acsl-function-arguments"
+      let arg_name = ""
+      let help = "precision for recursive function analysis."
+    end)
+
+module Recursive_precision_base =
+  Int
+    (struct
+      let default = 1
+      let option_name = "-e-acsl-recursive-precision-base"
+      let arg_name = "n"
+      let help = "precision for analysis of function arguments."
+    end)
+let () = Recursive_precision_base.set_range ~min:0 ~max:2
+
+module Recursive_precision =
+  String_map
+    (struct
+      include Datatype.Int
+      type key = string
+
+      let to_string ~key:_ i =
+        match i with
+        | None -> None
+        | Some i -> Some (string_of_int i)
+
+      let of_string ~key:_ ~prev: _ s =
+        match s with
+        | None -> None
+        | Some s ->  Some (int_of_string s)
+    end)
+    (struct
+      let default = Datatype.String.Map.empty
+      let option_name = "-e-acsl-recursive-precision"
+      let arg_name = ""
+      let help = "precision for recursive function analysis."
+    end)
 
 let () = Parameter_customize.set_group help
 module Version =
@@ -163,7 +227,9 @@ let parameter_states =
     Temporal_validity.self;
     Validate_format_strings.self;
     Functions.self;
-    Instrument.self ]
+    Instrument.self;
+    Function_arguments.self;
+    Recursive_precision.self ]
 
 let emitter =
   Emitter.create
@@ -176,7 +242,9 @@ let emitter =
     ~tuning:[ Gmp_only.parameter;
               Valid.parameter;
               Replace_libc_functions.parameter;
-              Full_mtracking.parameter ]
+              Full_mtracking.parameter;
+              Function_arguments.parameter;
+              Recursive_precision.parameter ]
 
 let must_visit () = Run.get ()
 
