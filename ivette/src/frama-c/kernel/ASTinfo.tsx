@@ -45,7 +45,7 @@ import { TitleBar } from 'ivette';
 import Kind = AST.markerKind;
 import Var = AST.markerVar
 
-function getMarkerKind (props: AST.markerInfoData): [string, string] {
+function getMarkerKind(props: AST.markerInfoData): [string, string] {
   switch (props.kind) {
     case Kind.declaration:
       switch (props.var) {
@@ -70,7 +70,7 @@ function getMarkerKind (props: AST.markerInfoData): [string, string] {
   }
 }
 
-function markerKind (props: AST.markerInfoData): JSX.Element {
+function markerKind(props: AST.markerInfoData): JSX.Element {
   const [label, title] = getMarkerKind(props);
   return <span className="astinfo-markerkind" title={title}>{label}</span>;
 }
@@ -83,16 +83,18 @@ interface InfoItemProps {
   label: string;
   title: string;
   text: DATA.text;
+  onMarker: (m: AST.marker) => void;
 }
 
 function InfoItem(props: InfoItemProps): JSX.Element {
+  const onMarker = (m: string) => void props.onMarker(AST.jMarker(m));
   return (
     <div className="astinfo-infos">
       <div className="dome-text-label astinfo-kind" title={props.title}>
         {props.label}
       </div>
       <div className="dome-text-cell astinfo-data" title={props.title}>
-        <Text text={props.text} />
+        <Text onMarker={onMarker} text={props.text} />
       </div>
     </div>
   );
@@ -117,6 +119,7 @@ interface InfoSectionProps {
   onHover: (hover: boolean) => void;
   onSelect: () => void;
   onRemove: () => void;
+  onMarker: (m: AST.marker) => void;
 }
 
 function MarkInfos(props: InfoSectionProps): JSX.Element {
@@ -129,21 +132,22 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
     props.selected && 'selected',
     props.hovered && 'hovered',
   );
-  const descr = markerInfo.descr ?? markerInfo.name;
   const kind = markerKind(markerInfo);
+  const name = markerInfo.name;
+  const descr = markerInfo.descr ?? `${kind} ${name}`;
   const fs = props.filter.split(':');
   const filtered = allInfos.filter((info) => !fs.some((m) => m === info.id));
   const infos = more ? allInfos : filtered;
   const hasMore = filtered.length < allInfos.length;
   const pinButton =
     (!props.pinned || props.selected) ?
-    {
-      icon: "PIN", selected: props.pinned, onClick: props.onPin,
-      title: "Pin/unpin marker information"
-    } : {
-      icon: "CIRC.CLOSE", onClick: props.onRemove,
-      title:"Remove marker information"
-    };
+      {
+        icon: "PIN", selected: props.pinned, onClick: props.onPin,
+        title: "Pin/unpin marker information"
+      } : {
+        icon: "CIRC.CLOSE", onClick: props.onRemove,
+        title: "Remove marker information"
+      };
   return (
     <div
       className={`astinfo-section ${highlight}`}
@@ -165,7 +169,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
           onClick={() => setUnfold(!unfold)}
         />
         <Code className="astinfo-markercode">
-          {kind}{descr}
+          {kind}{name}
         </Code>
         <IconButton
           style={{ display: hasMore ? undefined : 'none' }}
@@ -184,7 +188,9 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
           {...pinButton}
         />
       </div>
-      {unfold && infos.map((info) => <InfoItem key={info.id} {...info} />)}
+      {unfold && infos.map((info) => (
+        <InfoItem key={info.id} onMarker={props.onMarker} {...info} />
+      ))}
     </div>
   );
 }
@@ -196,6 +202,13 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
 type Mark = { fct: string; marker: AST.marker };
 
 const reload = new Dome.Event('frama-c.astinfo');
+
+function addMarker(s: Mark[], marker: AST.marker, fct: string): Mark[] {
+  if (s.some((m) => m.marker === marker))
+    return s;
+  else
+    return s.concat({ marker, fct });
+}
 
 class InfoMarkers {
 
@@ -219,13 +232,6 @@ class InfoMarkers {
     }
   }
 
-  addMarker(s: Mark[], marker: AST.marker, fct: string): Mark[] {
-    if (s.some((m) => m.marker === marker))
-      return s;
-    else
-      return s.concat({ marker, fct });
-  }
-
   setLocations(
     selected: States.Location | undefined,
     hovered: States.Location | undefined
@@ -240,8 +246,8 @@ class InfoMarkers {
       const m = mark.marker;
       return this.isPinned(m) || (m !== s0 && m !== h0);
     });
-    if (sm && sf) s = this.addMarker(s, sm, sf);
-    if (hm && hf) s = this.addMarker(s, hm, hf);
+    if (sm && sf) s = addMarker(s, sm, sf);
+    if (hm && hf) s = addMarker(s, hm, hf);
     this.selection = s;
     this.mSelected = sm;
     this.mHovered = hm;
@@ -299,7 +305,7 @@ export default function ASTinfo(): JSX.Element {
   Dome.useUpdate(reload);
   const markers = React.useMemo(() => new InfoMarkers(), []);
   const markerInfos = States.useSyncArray(AST.markerInfo, false);
-  const [selection] = States.useSelection();
+  const [selection, setSelection] = States.useSelection();
   const [hoveredLoc] = States.useHovered();
   const information = States.useRequest(AST.getInformation, null) ?? [];
   const [filter, setFilter] =
@@ -335,6 +341,14 @@ export default function ASTinfo(): JSX.Element {
     const onSelect = () => void States.setSelection(mark);
     const onHover =
       (h: boolean): void => States.setHovered(h ? mark : undefined);
+    const onMarker =
+      (marker: AST.marker): void => {
+        const fct = selection?.current?.fct;
+        if (fct) {
+          markers.setPinned(marker, true);
+          setSelection({ location: { fct, marker } });
+        }
+      };
     const ref = isHovered ? scrollTarget : undefined;
     const markInfo =
       <MarkInfos
@@ -346,6 +360,7 @@ export default function ASTinfo(): JSX.Element {
         filter={filter}
         hovered={isHovered}
         onPin={onPin}
+        onMarker={onMarker}
         onRemove={onRemove}
         onHover={onHover}
         onSelect={onSelect}

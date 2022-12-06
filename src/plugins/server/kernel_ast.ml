@@ -726,6 +726,20 @@ let () = Information.register
     end
 
 let () = Information.register
+    ~id:"kernel.ast.typedef"
+    ~label:"Typedef"
+    ~descr:"Type Definition"
+    begin fun fmt loc ->
+      match loc with
+      | PGlobal
+          (( GType _
+           | GCompTag _ | GCompTagDecl _
+           | GEnumTag _ | GEnumTagDecl _
+           ) as g) -> Printer.pp_global fmt g
+      | _ -> raise Not_found
+    end
+
+let () = Information.register
     ~id:"kernel.ast.typesizeof"
     ~label:"Sizeof"
     ~descr:"Size of a C type"
