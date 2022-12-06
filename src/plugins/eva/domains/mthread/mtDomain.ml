@@ -417,20 +417,21 @@ module Domain = struct
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
 
-  let post_analysis _ =
-    let pp stmt state =
-      Format.printf "At statement %a@.  @[%a@]@."
-        Cil_datatype.Stmt.pretty stmt
-        State.pretty state
-    in
-    Cache.iter pp Cache.cache
-
   let empty () = hashcons default
   let logic_assign _ _ state = state
   let initialize_variable _ _ ~initialized:_ _ state = state
   let initialize_variable_using_type _ _ state  = state
   let relate _ _ _ = Base.SetLattice.empty
   let log_category = Self.register_category "d-mthread"
+
+  let post_analysis _ =
+    let pp stmt state =
+      Self.debug ~dkey:log_category
+        "At statement %a@.  @[%a@]@."
+        Cil_datatype.Stmt.pretty stmt
+        State.pretty state
+    in
+    Cache.iter pp Cache.cache
 
   let enter_scope kind vars state =
     let state = get state in
