@@ -40,8 +40,12 @@ type localizable =
 
 let glabel = function
   | GType(tinfo,_) -> tinfo.tname
-  | GCompTag(comp, _) | GCompTagDecl(comp, _) -> comp.cname
-  | GEnumTag(enum, _) | GEnumTagDecl(enum, _) -> enum.ename
+  | GCompTag(comp, _) | GCompTagDecl(comp, _) ->
+    Printf.sprintf "%s %s"
+      (if comp.cstruct then "struct" else "union")
+      comp.cname
+  | GEnumTag(enum, _) | GEnumTagDecl(enum, _) ->
+    Printf.sprintf "enum %s" enum.ename
   | GVarDecl(vi,_) | GVar(vi, _, _)
   | GFun( { svar=vi }, _) | GFunDecl(_,vi,_) -> vi.vname
   | GPragma((Attr(a,_) | AttrAnnot a),_) -> a
@@ -58,7 +62,7 @@ let label = function
   | PTermLval _ -> "(term)"
   | PGlobal g -> glabel g
   | PIP _ -> "(property)"
-  | PType _ -> "(type)"
+  | PType ty -> Pretty_utils.to_string Printer.pp_typ ty
 
 let decl_of = function
   | GCompTag(comp,loc) -> GCompTagDecl(comp,loc)
@@ -676,13 +680,14 @@ struct
 
     method! global fmt g =
       match g with
-      (* these globals are already covered by PVDecl *)
-      | GVarDecl _ | GVar _ | GFunDecl _ | GFun _ -> super#global fmt g
-      | _ ->
-        Format.fprintf fmt "@{<%s>%a@}"
-          (Tag.create (PGlobal g))
-          super#global
-          g
+      (* these globals are already covered by the underlying parser *)
+      | GVarDecl _ | GVar _ | GFunDecl _ | GFun _
+      | GCompTag _ | GCompTagDecl _
+      | GEnumTag _ | GEnumTagDecl _
+      | GType _ ->
+        super#global fmt g
+      | GAsm _ | GPragma _ | GText _ | GAnnot _ ->
+        Format.fprintf fmt "@{<%s>%a@}" (Tag.create (PGlobal g)) super#global g
 
     method! extended fmt ext =
       let loc =
@@ -814,19 +819,29 @@ struct
       let tag = Tag.create (PStmtStart(f,s)) in
       Format.fprintf fmt "@{<%s>%a@}" tag (super#stmtkind sattr next) sk
 
+    method! ikind fmt c =
+      Format.fprintf fmt "@{<%s>%a@}"
+        (Tag.create (PType(TInt(c,[]))))
+        super#ikind c
+
+    method! fkind fmt c =
+      Format.fprintf fmt "@{<%s>%a@}"
+        (Tag.create (PType(TFloat(c,[]))))
+        super#fkind c
+
     method! compname fmt comp =
-      Format.fprintf fmt "@{<%s>%a}"
-        (Tag.create (PType (TComp (comp, []))))
+      Format.fprintf fmt "@{<%s>%a@}"
+        (Tag.create (PGlobal(Globals.Types.global Struct comp.cname)))
         super#compname comp
 
     method! enuminfo fmt enum =
       Format.fprintf fmt "@{<%s>%a@}"
-        (Tag.create (PType (TEnum (enum, []))))
+        (Tag.create (PGlobal(Globals.Types.global Enum enum.ename)))
         super#enuminfo enum
 
     method! typeinfo fmt tinfo =
       Format.fprintf fmt "@{<%s>%a@}"
-        (Tag.create (PType (TNamed (tinfo, []))))
+        (Tag.create (PGlobal(Globals.Types.global Typedef tinfo.tname)))
         super#typeinfo tinfo
 
     initializer force_brace <- true

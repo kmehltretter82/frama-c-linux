@@ -245,13 +245,13 @@ export const markerInfo: State.Array<string,markerInfoData> = markerInfo_interna
 export type marker =
   Json.key<'#stmt'> | Json.key<'#decl'> | Json.key<'#lval'> |
   Json.key<'#expr'> | Json.key<'#term'> | Json.key<'#global'> |
-  Json.key<'#property'>;
+  Json.key<'#property'> | Json.key<'#type'>;
 
 /** Decoder for `marker` */
 export const jMarker: Json.Decoder<marker> =
   Json.jUnion<Json.key<'#stmt'> | Json.key<'#decl'> | Json.key<'#lval'> |
               Json.key<'#expr'> | Json.key<'#term'> | Json.key<'#global'> |
-              Json.key<'#property'>>(
+              Json.key<'#property'> | Json.key<'#type'>>(
     Json.jKey<'#stmt'>('#stmt'),
     Json.jKey<'#decl'>('#decl'),
     Json.jKey<'#lval'>('#lval'),
@@ -259,6 +259,7 @@ export const jMarker: Json.Decoder<marker> =
     Json.jKey<'#term'>('#term'),
     Json.jKey<'#global'>('#global'),
     Json.jKey<'#property'>('#property'),
+    Json.jKey<'#type'>('#type'),
   );
 
 /** Natural order for `marker` */

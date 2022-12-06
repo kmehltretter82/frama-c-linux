@@ -1777,6 +1777,7 @@ class cil_printer () = object (self)
         fprintf fmt "%a %a;@\n"
           self#compkind comp
           self#compname comp
+
       | GVar (vi, io, l) ->
         self#line_directive ~forcefile:true fmt l;
         Format.fprintf fmt "@[<hov 2>";

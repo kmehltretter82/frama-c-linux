@@ -730,11 +730,15 @@ let () = Information.register
     ~label:"Sizeof"
     ~descr:"Size of a C type"
     begin fun fmt loc ->
-      match loc with
-      | PType typ -> Format.fprintf fmt "%i bits" (Cil.bitsSizeOf typ)
-      | _ -> raise Not_found
+      let typ =
+        match loc with
+        | PType typ -> typ
+        | PGlobal (GType(ti,_)) -> ti.ttype
+        | PGlobal (GCompTagDecl(ci,_)) -> TComp(ci,[])
+        | PGlobal (GEnumTagDecl(ei,_)) -> TEnum(ei,[])
+        | _ -> raise Not_found
+      in Format.fprintf fmt "%i bits" (Cil.bitsSizeOf typ)
     end
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Marker at a position                                               --- *)
