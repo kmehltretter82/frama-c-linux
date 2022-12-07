@@ -36,7 +36,7 @@
 
 import _ from 'lodash';
 import React from 'react';
-import { classes } from 'dome/misc/utils';
+import { classes, styles } from 'dome/misc/utils';
 import Gallery from './gallery.json';
 import './style.css';
 
@@ -84,7 +84,7 @@ export function SVG(props: SVGprops): null | JSX.Element {
       width={size}
       style={{ bottom: offset }}
       viewBox={viewBox}
-      className = {className}
+      className={className}
     >
       {title && <title>{title}</title>}
       <path d={path} fill={fill} />
@@ -100,6 +100,10 @@ export function SVG(props: SVGprops): null | JSX.Element {
 export interface IconProps extends SVGprops {
   /** Additional class name(s). */
   className?: string;
+  /** Display (default is true). */
+  display?: boolean;
+  /** Visibility (default is true). */
+  visible?: boolean;
   /** Additional DIV style. */
   style?: React.CSSProperties;
   /** Fill style property. */
@@ -115,10 +119,16 @@ export interface IconProps extends SVGprops {
 export function Icon(props: IconProps): JSX.Element {
   const {
     id, title, onClick, fill,
-    size, className = '', offset, style,
+    size, className, offset, style,
+    visible = true, display = true,
   } = props;
-  const divClass = classes('dome-xIcon', className);
-  const divStyle = fill ? { fill, ...style } : style;
+  const divClass = classes(
+    'dome-xIcon',
+    !visible && 'dome-control-hidden',
+    !display && 'dome-control-erased',
+    className
+  );
+  const divStyle = styles(fill && { fill }, style);
   return (
     <div
       className={divClass}
