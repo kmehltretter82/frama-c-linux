@@ -1,5 +1,6 @@
 /* run.config
  STDOPT: +"-machdep msvc_x86_64"
+ STDOPT: +"-machdep ppc_32"
  */
 // Note: machdep MSVC is used to avoid warnings due to
 // "non implemented long double" when testing strtold.
