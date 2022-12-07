@@ -583,9 +583,9 @@ struct
   type info = {
     id: string;
     rank: int;
-    label: string;
-    descr: string;
-    title: string;
+    label: string; (* short name *)
+    title: string; (* full title name *)
+    descr: string; (* description for information values *)
     enable: unit -> bool;
     pretty: Format.formatter -> Printer_tag.localizable -> unit
   }
@@ -598,16 +598,16 @@ struct
     let jtype = Package.(Jrecord[
         "id", Jstring ;
         "label", Jstring ;
-        "descr", Jstring ;
         "title", Jstring ;
+        "descr", Jstring ;
         "text", Jtext.jtype ;
       ])
     let of_json _ = failwith "Information.Info"
     let to_json (info,text) = `Assoc [
         "id", `String info.id ;
         "label", `String info.label ;
-        "descr", `String info.descr ;
         "title", `String info.title ;
+        "descr", `String info.descr ;
         "text", text ;
       ]
   end
@@ -650,11 +650,12 @@ struct
 
   let update () = Request.emit signal
 
-  let register ~id ~label ~descr
-      ?(title = descr)
-      ?(enable = fun _ -> true) pretty =
+  let register ~id ~label ~title
+      ?(descr = title)
+      ?(enable = fun _ -> true)
+      pretty =
     let rank = incr rankId ; !rankId in
-    let info = { id ; rank ; label ; descr; title ; enable ; pretty } in
+    let info = { id ; rank ; label ; title ; descr; enable ; pretty } in
     if Hashtbl.mem registry id then
       ( let msg = Format.sprintf
             "Server.Kernel_ast.register_info: duplicate %S" id in
@@ -681,16 +682,18 @@ let () = Request.register ~package
 let () = Information.register
     ~id:"kernel.ast.location"
     ~label:"Location"
-    ~descr:"Source file location"
+    ~title:"Source file location"
     begin fun fmt loc ->
-      let location = Printer_tag.loc_of_localizable loc in
-      Filepath.pp_pos fmt (fst location)
+      let pos = fst @@ Printer_tag.loc_of_localizable loc in
+      if Filepath.Normalized.is_empty pos.pos_path then
+        raise Not_found ;
+      Filepath.pp_pos fmt pos
     end
 
 let () = Information.register
     ~id:"kernel.ast.varinfo"
     ~label:"Var"
-    ~descr:"Variable Information"
+    ~title:"Variable Information"
     begin fun fmt loc ->
       match loc with
       | PLval (_ , _, (Var x,NoOffset)) | PVDecl(_,_,x) ->
@@ -714,7 +717,7 @@ let () = Information.register
 let () = Information.register
     ~id:"kernel.ast.typeinfo"
     ~label:"Type"
-    ~descr:"Type of C/ASCL expression"
+    ~title:"Type of C/ASCL expression"
     begin fun fmt loc ->
       let open Printer in
       match loc with
@@ -728,7 +731,7 @@ let () = Information.register
 let () = Information.register
     ~id:"kernel.ast.typedef"
     ~label:"Typedef"
-    ~descr:"Type Definition"
+    ~title:"Type Definition"
     begin fun fmt loc ->
       match loc with
       | PGlobal
@@ -742,7 +745,7 @@ let () = Information.register
 let () = Information.register
     ~id:"kernel.ast.typesizeof"
     ~label:"Sizeof"
-    ~descr:"Size of a C type"
+    ~title:"Size of a C type"
     begin fun fmt loc ->
       let typ =
         match loc with

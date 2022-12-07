@@ -128,6 +128,8 @@
 .astinfo-markerbutton {
     flex: 0 1 auto;
     margin: 0px;
+    padding-left: 4px;
+    padding-right: 4px;
     position: relative;
 }
 

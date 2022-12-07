@@ -72,16 +72,17 @@ sig
   (**
      Registers a marker information printer.
      Identifier [id] shall be unique.
-     [label] shall be very short.
-     [descr] shall succinctly describe the kind of information.
-     [title] is an optional longer explanation for the kind of information.
-     If the optional [enable] function is provided, the information printer is
-     only used when [enable ()] returns true.
-     The printer is allowed to raise [Not_found] exception when there is no
+
+     - [label] shall be very short.
+     - [title] shall succinctly describe the kind of information.
+     - [descr] optional longer description explaining the informations
+     - [enable] optional dynamical filter for enabling this information
+
+     The printer shall raise [Not_found] exception when there is no
      information for the localizable.
   *)
   val register :
-    id:string -> label:string -> descr:string -> ?title:string ->
+    id:string -> label:string -> title:string -> ?descr:string ->
     ?enable:(unit -> bool) ->
     (Format.formatter -> Printer_tag.localizable -> unit) -> unit
 

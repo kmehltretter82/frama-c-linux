@@ -429,7 +429,7 @@ export const getInformationUpdate: Server.Signal = {
 const getInformation_internal: Server.GetRequest<
   marker |
   undefined,
-  { id: string, label: string, descr: string, title: string, text: text }[]
+  { id: string, label: string, title: string, descr: string, text: text }[]
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getInformation',
@@ -438,8 +438,8 @@ const getInformation_internal: Server.GetRequest<
             Json.jObject({
               id: Json.jString,
               label: Json.jString,
-              descr: Json.jString,
               title: Json.jString,
+              descr: Json.jString,
               text: jText,
             })),
   signals: [ { name: 'kernel.ast.getInformationUpdate' } ],
@@ -448,7 +448,7 @@ const getInformation_internal: Server.GetRequest<
 export const getInformation: Server.GetRequest<
   marker |
   undefined,
-  { id: string, label: string, descr: string, title: string, text: text }[]
+  { id: string, label: string, title: string, descr: string, text: text }[]
   >= getInformation_internal;
 
 const getMarkerAt_internal: Server.GetRequest<
