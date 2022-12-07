@@ -1,8 +1,7 @@
 import React from 'react';
 import Dictionary from 'lodash';
-import { Facet, StateField } from '@codemirror/state';
-import { Annotation, AnnotationType, Transaction } from '@codemirror/state';
-import { EditorState, Extension, RangeSet } from '@codemirror/state';
+import { EditorState, StateField, Facet, Extension } from '@codemirror/state';
+import { Annotation, Transaction, RangeSet } from '@codemirror/state';
 import { Decoration, DecorationSet } from '@codemirror/view';
 import { EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
 import { DOMEventHandlers, GutterMarker, gutter } from '@codemirror/view';
@@ -56,10 +55,7 @@ export interface Data<A, S> { init: A, get: Get<A>, structure: S }
 // structure is exposed for two reasons. The first one is that it contains the
 // extension that must be added to the CodeMirror instanciation. The second one
 // is that it is needed during the Aspects creation's process.
-export interface Field<A> extends Data<A, StateField<A>> {
-  set: Set<A>,
-  annotation: AnnotationType<A>
-}
+export interface Field<A> extends Data<A, StateField<A>> { set: Set<A> }
 
 // A Field is simply declared using an initial value. However, to be able to
 // use it, you must add its extension (obtained through <field.extension>) to
@@ -75,7 +71,7 @@ export function createField<A>(init: A, equal?: Equal<A>): Field<A> {
   const get: Get<A> = (state) => state?.field(field) ?? init;
   const useSet: Set<A> = (v, a) =>
     React.useEffect(() => v?.dispatch({ annotations: annot.of(a) }), [v, a]);
-  return { init, get, set: useSet, structure: field, annotation: annot };
+  return { init, get, set: useSet, structure: field };
 }
 
 
@@ -97,32 +93,51 @@ export interface Aspect<A> extends Data<A, Facet<A, A>> { extension: Extension }
 // dependencies of an Aspect is declared through a record, giving a name to each
 // dependency.
 export type Dict = Record<string, unknown>;
-export type Dependencies<I extends Dict> =
-  { [K in keyof I]: Field<I[K]> | Aspect<I[K]> };
+export type Dependency<A> = Field<A> | Aspect<A>;
+export type Dependencies<I extends Dict> = { [K in keyof I]: Dependency<I[K]> };
+
+// Type aliases to shorten internal definitions.
+type Dep<A> = Dependency<A>;
+type Deps<I extends Dict> = Dependencies<I>;
+type Combine<Output> = (l: readonly Output[]) => Output;
+
+// Helper function used to map a function over Dependencies.
+type Mapper<I extends Dict, A> = (d: Dep<I[typeof k]>, k: string) => A;
+function mapDict<I extends Dict, A>(deps: Deps<I>, fn: Mapper<I, A>): A[] {
+  return Object.keys(deps).map((k) => fn(deps[k], k));
+}
+
+// Helper function used to transfrom a Dependencies will keeping its structure.
+type Transform<I extends Dict> = (d: Dep<I[typeof k]>, k: string) => unknown;
+function transformDict<I extends Dict>(deps: Deps<I>, tr: Transform<I>): Dict {
+  return Object.fromEntries(Object.keys(deps).map(k => [k, tr(deps[k], k)]));
+}
+
+// Helper function retrieving a dependency extension.
+function getExtension<A>(dep: Dependency<A>): Extension {
+  type Dep<A> = Dependency<A>;
+  const asExt = (d: Dep<A>): boolean => Object.keys(d).includes('extension');
+  const isAspect = (d: Dep<A>): d is Aspect<A> => asExt(d);
+  if (isAspect(dep)) return dep.extension;
+  else return dep.structure.extension;
+}
 
 // An Aspect is declared using its dependencies and a function. This function's
 // input is a record containing, for each key of the dependencies record, a
 // value of the type of the corresponding field. The function's output is a
 // value of the aspect's type.
-export function createAspect<Input extends Dict, Output>(
-  deps: Dependencies<Input>,
-  fn: (input: Input) => Output,
-): Aspect<Output> {
-  const inputInit: Dict = {};
-  for (const key in deps) inputInit[key] = deps[key].init;
-  const init = fn(inputInit as Input);
-  type Combine = (l: readonly Output[]) => Output;
-  const combine: Combine = (l) => l.length > 0 ? l[l.length - 1] : init;
-  const facet = Facet.define<Output, Output>({ combine });
-  const get: Get<Output> = (state) => state?.facet(facet) ?? init;
-  type CMDep = 'selection' | StateField<unknown> | Facet<unknown, unknown>;
-  const convertedDeps: CMDep[] = [];
-  for (const key in deps) convertedDeps.push(deps[key].structure);
-  const extension = facet.compute(convertedDeps, (state) => {
-    const input: Dict = {};
-    for (const key in deps) input[key] = deps[key].get(state);
-    return fn(input as Input);
-  });
+export function createAspect<I extends Dict, O>(
+  deps: Dependencies<I>,
+  fn: (input: I) => O,
+): Aspect<O> {
+  const init = fn(transformDict(deps, (d) => d.init) as I);
+  const enables = mapDict(deps, getExtension);
+  const combine: Combine<O> = (l) => l.length > 0 ? l[l.length - 1] : init;
+  const facet = Facet.define<O, O>({ combine, enables });
+  const get: Get<O> = (state) => state?.facet(facet) ?? init;
+  const convertedDeps = mapDict(deps, (d) => d.structure);
+  const compute: Get<O> = (s) => fn(transformDict(deps, (d) => d.get(s)) as I);
+  const extension = facet.compute(convertedDeps, compute);
   return { init, get, structure: facet, extension };
 }
 
@@ -361,16 +376,17 @@ const HoveredUpdater = EditorView.domEventHandlers({
 // Its set function takes care to update the CodeMirror displayed document.
 const Text = createTextField();
 function createTextField(): Field<text> {
-  const { get, structure, annotation } = createField<text>(null);
-  const useSet: Set<text> = (view, text) =>
+  const { get, set, structure } = createField<text>(null);
+  const useSet: Set<text> = (view, text) => {
+    set(view, text);
     React.useEffect(() => {
       const selection = { anchor: 0 };
-      const annotations = Text.annotation.of(text);
       const length = view?.state.doc.length;
       const changes = { from: 0, to: length, insert: textToString(text) };
-      view?.dispatch({ changes, annotations, selection });
+      view?.dispatch({ changes, selection });
     }, [view, text]);
-  return { init: null, get, set: useSet, structure, annotation };
+  };
+  return { init: null, get, set: useSet, structure };
 }
 
 // This aspect computes the tree representing the currently displayed function's
