@@ -16,6 +16,7 @@ import { foldGutter, foldNodeProp } from '@codemirror/language';
 import { LRLanguage, LanguageSupport } from "@codemirror/language";
 
 import * as Dome from 'dome';
+import * as Utils from 'dome/data/arrays';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import type { key } from 'dome/data/json';
@@ -83,8 +84,6 @@ export function createField<A>(init: A, equal?: Equal<A>): Field<A> {
 //  CodeMirror's Aspects
 // -----------------------------------------------------------------------------
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 // An Aspect is a data associated with an editor state and computed by combining
 // data from several fields. A typical use case is if one needs a data that
 // relies on a server side information (like a synchronized array) which must be
@@ -97,7 +96,7 @@ export interface Aspect<A> extends Data<A, Facet<A, A>> { extension: Extension }
 // An Aspect is recomputed each time its dependencies are updated. The
 // dependencies of an Aspect is declared through a record, giving a name to each
 // dependency.
-export type Dict = Record<string, any>;
+export type Dict = Record<string, unknown>;
 export type Dependencies<I extends Dict> =
   { [K in keyof I]: Field<I[K]> | Aspect<I[K]> };
 
@@ -116,8 +115,8 @@ export function createAspect<Input extends Dict, Output>(
   const combine: Combine = (l) => l.length > 0 ? l[l.length - 1] : init;
   const facet = Facet.define<Output, Output>({ combine });
   const get: Get<Output> = (state) => state?.facet(facet) ?? init;
-  type CodeMirrorDependency = 'selection' | StateField<any> | Facet<any, any>;
-  const convertedDeps: CodeMirrorDependency[] = [];
+  type CMDep = 'selection' | StateField<unknown> | Facet<unknown, unknown>;
+  const convertedDeps: CMDep[] = [];
   for (const key in deps) convertedDeps.push(deps[key].structure);
   const extension = facet.compute(convertedDeps, (state) => {
     const input: Dict = {};
@@ -126,8 +125,6 @@ export function createAspect<Input extends Dict, Output>(
   });
   return { init, get, structure: facet, extension };
 }
-
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 
 
@@ -197,7 +194,7 @@ export function buildExtension<S>(p: Plugin<S>): Extension {
 
 
 // -----------------------------------------------------------------------------
-//  Code extraction
+//  Utilitary types
 // -----------------------------------------------------------------------------
 
 // An alias type for functions and locations.
@@ -211,33 +208,36 @@ type Caller = { fct: key<'#fct'>, marker: key<'#stmt'> };
 // A range is just a pair of position in the code.
 interface Range { from: number, to: number }
 
+
+
+// -----------------------------------------------------------------------------
+//  Tree datatype definition and utiliary functions
+// -----------------------------------------------------------------------------
+
 // The code is given by the server has a tree but implemented with arrays and
 // without information on the ranges of each element. It will be converted in a
 // good old tree that carry those information.
 interface Tree extends Range { id?: string, children: Tree[] }
 
-// A dummy tree used as default value.
-const dummyTree = { from: 0, to: 0, children: [] };
+// A leaf tree with no children.
+const leaf = (from: number, to: number): Tree => ({ from, to, children: [] });
 
 // Convert an Ivette text (i.e a function's code) into a Tree, adding range
 // information to each construction.
 function textToTree(t: text): Tree | undefined {
   function aux(t: text, from: number): Tree | undefined {
-    if (Array.isArray(t)) {
-      const children = Array<Tree>(); let acc = from;
-      for (const child of t.slice(1)) {
-        const node = aux(child, acc);
-        if (node) { acc = node.to; children.push(node); }
-      }
-      if (children.length === 0) return undefined;
-      const to = children[children.length - 1].to;
-      const finalFrom = children[0].from;
-      const id = typeof t[0] === 'string' && t[0][0] === '#' ? t[0] : undefined;
-      return { id, from: finalFrom, to, children };
+    if (t === null) return undefined;
+    if (typeof t === 'string') return leaf(from, from + t.length);
+    const children: Tree[] = []; let acc = from;
+    for (const child of t.slice(1)) {
+      const node = aux(child, acc);
+      if (node) { acc = node.to; children.push(node); }
     }
-    else if (typeof t === 'string')
-      return { from, to: from + t.length, children: [] };
-    else return undefined;
+    if (children.length === 0) return undefined;
+    const to = children[children.length - 1].to;
+    const finalFrom = children[0].from;
+    const id = typeof t[0] === 'string' && t[0][0] === '#' ? t[0] : undefined;
+    return { id, from: finalFrom, to, children };
   }
   return aux(t, 0);
 }
@@ -263,14 +263,12 @@ function markersRangesOfTree(tree: Tree): Map<string, Range>{
 
 // Find the closest covering tagged node of a given position. Returns
 // undefined if there is not relevant covering node.
-function coveringNode(tree: Tree, position: number): Tree | undefined {
-  if (position < tree.from || position > tree.to) return undefined;
-  if (position === tree.from) return tree;
-  for (const child of tree.children) {
-    const res = coveringNode(child, position);
-    if (res) return res.id ? res : tree;
-  }
-  if (tree.from <= position && position < tree.to) return tree;
+function coveringNode(tree: Tree, pos: number): Tree | undefined {
+  if (pos < tree.from || pos > tree.to) return undefined;
+  if (pos === tree.from) return tree;
+  const res = Utils.first(tree.children, (c) => coveringNode(c, pos));
+  if (res) return res.id ? res : tree;
+  if (tree.from <= pos && pos < tree.to) return tree;
   return undefined;
 }
 
@@ -278,38 +276,13 @@ function coveringNode(tree: Tree, position: number): Tree | undefined {
 // does not exists in the tree.
 function findMarker(tree: Tree, marker: Marker): Tree | undefined {
   if (tree.id === marker) return tree;
-  for (const child of tree.children) {
-    const r = findMarker(child, marker);
-    if (r) return r;
-  }
-  return undefined;
-}
-
-// Server request handler returning the given function's text.
-function useFctText(fct: Fct): text {
-  const req = React.useMemo(() => Server.send(Ast.printFunction, fct), [fct]);
-  const { result } = Dome.usePromise(req);
-  return result ?? null;
-}
-
-// Server request handler returning the given function's dead code information.
-function useFctDead(fct: Fct): Eva.deadCode {
-  const req = React.useMemo(() => Server.send(Eva.getDeadCode, fct), [fct]);
-  const { result } = Dome.usePromise(req);
-  return result ?? { unreachable: [], nonTerminating: [] };
-}
-
-// Server request handler returning the given function's callers.
-function useFctCallers(fct: Fct): Caller[] {
-  const req = React.useMemo(() => Server.send(Eva.getCallers, fct), [fct]);
-  const { result = [] } = Dome.usePromise(req);
-  return result.map(([fct, marker]) => ({ fct, marker }));
+  return Utils.first(tree.children, (c) => findMarker(c, marker));
 }
 
 
 
 // -----------------------------------------------------------------------------
-//  AST View fields and aspects
+//  Selected marker representation
 // -----------------------------------------------------------------------------
 
 // This field contains the currently selected function.
@@ -317,6 +290,72 @@ const Fct = createField<Fct>(undefined);
 
 // This field contains the currently selected marker.
 const Marker = createField<Marker>(undefined);
+
+// The Ivette selection must be updated by CodeMirror plugins. This input
+// add the callback in the CodeMirror internal state.
+type UpdateSelection = (a: States.SelectionActions) => void;
+const UpdateSelection = createField<UpdateSelection>(() => { return; });
+
+// The marker field is considered as the ground truth on what is selected in the
+// CodeMirror document. To do so, we catch the mouseup event (so when the user
+// select a new part of the document) and update the Ivette selection
+// accordingly. This will update the Marker field during the next Editor
+// component's render and thus update everything else.
+const MarkerUpdater = EditorView.domEventHandlers({
+  mouseup: (_, view) => {
+    const fct = Fct.get(view.state);
+    const tree = Tree.get(view.state);
+    const update = UpdateSelection.get(view.state);
+    const main = view.state.selection.main;
+    const id = coveringNode(tree, main.from)?.id;
+    update({ location: { fct, marker: Ast.jMarker(id) } });
+  }
+});
+
+
+
+// -----------------------------------------------------------------------------
+//  Hovered marker representation
+// -----------------------------------------------------------------------------
+
+// This field contains the currently hovered marker.
+const Hovered = createField<Marker>(undefined);
+
+// The Ivette hovered element must be updated by CodeMirror plugins. This
+// field add the callback in the CodeMirror internal state.
+type UpdateHovered = (h: States.Hovered) => void;
+const UpdateHovered = createField<UpdateHovered>(() => { return ; });
+
+// The Hovered field is updated each time the mouse moves through the CodeMirror
+// document. The handlers updates the Ivette hovered information, which is then
+// reflected on the Hovered field by the Editor component itself.
+const HoveredUpdater = EditorView.domEventHandlers({
+  mousemove: (event, view) => {
+    const fct = Fct.get(view.state);
+    const tree = Tree.get(view.state);
+    const updateHovered = UpdateHovered.get(view.state);
+    const coords = { x: event.clientX, y: event.clientY };
+    const pos = view.posAtCoords(coords); if (!pos) return;
+    const hov = coveringNode(tree, pos); if (!hov) return;
+    const from = view.coordsAtPos(hov.from); if (!from) return;
+    const to = view.coordsAtPos(hov.to); if (!to) return;
+    const left = Math.min(from.left, to.left);
+    const right = Math.max(from.left, to.left);
+    const top = Math.min(from.top, to.top);
+    const bottom = Math.max(from.bottom, to.bottom);
+    const horizontallyOk = left <= coords.x && coords.x <= right;
+    const verticallyOk = top <= coords.y && coords.y <= bottom;
+    if (!horizontallyOk || !verticallyOk) return;
+    const marker = Ast.jMarker(hov?.id);
+    updateHovered(marker ? { fct, marker } : undefined);
+  }
+});
+
+
+
+// -----------------------------------------------------------------------------
+//  Function code representation, general information and data structures
+// -----------------------------------------------------------------------------
 
 // This field contains the current function's code as represented by Ivette.
 // Its set function takes care to update the CodeMirror displayed document.
@@ -334,15 +373,13 @@ function createTextField(): Field<text> {
   return { init: null, get, set: useSet, structure, annotation };
 }
 
-// The Ivette selection must be updated by CodeMirror plugins. This input
-// add the callback in the CodeMirror internal state.
-type UpdateSelection = (a: States.SelectionActions) => void;
-const UpdateSelection = createField<UpdateSelection>(() => { return; });
+// This aspect computes the tree representing the currently displayed function's
+// code, represented by the <Text> field.
+const Tree = createAspect({ t: Text }, ({ t }) => textToTree(t) ?? leaf(0, 0));
 
-// The Ivette hovered element must be updated by CodeMirror plugins. This
-// field add the callback in the CodeMirror internal state.
-type UpdateHovered = (h: States.Hovered) => void;
-const UpdateHovered = createField<UpdateHovered>(() => { return ; });
+// This aspect computes the markers ranges of the currently displayed function's
+// tree, represented by the <Tree> aspect.
+const Ranges = createAspect({ t: Tree }, ({ t }) => markersRangesOfTree(t));
 
 // This field contains the dead code information as inferred by Eva.
 const Dead = createField<Eva.deadCode>({ unreachable: [], nonTerminating: [] });
@@ -350,33 +387,54 @@ const Dead = createField<Eva.deadCode>({ unreachable: [], nonTerminating: [] });
 // This field contains all the current function's callers, as inferred by Eva.
 const Callers = createField<Caller[]>([]);
 
-// This field contains information on properties' tags.
-type StatusDict = Map<string, States.Tag>;
-const StatusDict = createField<StatusDict>(new Map());
-
-// The component needs information on markers' status data.
-type StatusDataMap = Map<string, Properties.statusData>;
-const StatusDataList = createField<Properties.statusData[]>([]);
-
 // This field contains information on markers.
 type GetMarkerData = (key: string) => Ast.markerInfoData | undefined;
 const GetMarkerData = createField<GetMarkerData>(() => undefined);
 
-// This aspect computes the tree representing the currently displayed function's
-// code, represented by the <Text> field.
-const Tree = createAspect({ t: Text }, ({ t }) => textToTree(t) ?? dummyTree);
 
-// This aspect computes the markers ranges of the currently displayed function's
-// tree, represented by the <Tree> aspect.
-const Ranges = createAspect({ t: Tree }, ({ t }) => markersRangesOfTree(t));
 
-// To improve performances, an aspect transforms the markers' status data list
-// into a map, improving accesses complexity.
-const StatusDataMap = createAspect({ list: StatusDataList }, (input) => {
-  const res: StatusDataMap = new Map();
-  input.list.forEach(p => res.set(p.key, p));
-  return res;
-});
+// -----------------------------------------------------------------------------
+//  Representation of properties' information
+// -----------------------------------------------------------------------------
+
+// This field contains information on properties' tags.
+type Tags = Map<string, States.Tag>;
+const Tags = createField<Tags>(new Map());
+
+// The component needs information on markers' status data.
+const PropertiesStatuses = createField<Properties.statusData[]>([]);
+
+// This aspect filters all properties that does not have a valid range, and
+// stores the remaining properties with their ranges.
+const PropertiesRanges = createPropertiesRange();
+interface PropertyRange extends Properties.statusData { range: Range }
+function createPropertiesRange(): Aspect<PropertyRange[]> {
+  const deps = { statuses: PropertiesStatuses, ranges: Ranges };
+  return createAspect(deps, ({ statuses, ranges }) => {
+    type R = PropertyRange | undefined;
+    const isDef = (r: R): r is PropertyRange => r !== undefined;
+    const fn = (p: Properties.statusData): R => {
+      const range = ranges.get(p.key);
+      return range && { ...p, range };
+    };
+    return statuses.map(fn).filter(isDef);
+  });
+}
+
+// This aspect computes the tag associated to each property.
+const PropertiesTags = createPropertiesTags();
+function createPropertiesTags(): Aspect<Map<string, States.Tag>> {
+  const deps = { statuses: PropertiesStatuses, tags: Tags };
+  return createAspect(deps, ({ statuses, tags }) => {
+    const res = new Map<string, States.Tag>();
+    for (const p of statuses) {
+      if (!p.status) continue;
+      const tag = tags.get(p.status);
+      if (tag) res.set(p.key, tag);
+    }
+    return res;
+  });
+}
 
 
 
@@ -388,73 +446,29 @@ const StatusDataMap = createAspect({ list: StatusDataList }, (input) => {
 const hoveredClass = Decoration.mark({ class: 'cm-hovered-code' });
 const selectedClass = Decoration.mark({ class: 'cm-selected-code' });
 
-// Internal state of the plugin.
-interface CodeDecorationState {
-  decorations: DecorationSet; // Decorations to be added to the code
-  selected?: Tree;           // Currently selected nodes
-  hovered?: Tree;             // Currently hovered node
-}
-
-// Internal function used to recompute the plugin's decorations. The function is
-// called by the plugin only when needed, i.e when the hovered or selected nodes
-// have actually changed.
-function computeDecorations(state: CodeDecorationState): CodeDecorationState {
-  const { hovered, selected } = state;
-  const range = selected && selectedClass.range(selected.from, selected.to);
-  const add = hovered && [ hoveredClass.range(hovered.from, hovered.to) ];
-  const set = range ? RangeSet.of(range) : RangeSet.empty;
-  const decorations = set.update({ add, sort: true });
-  return { ...state, decorations };
-}
-
 // Plugin declaration.
-const CodeDecorationPlugin: Plugin<CodeDecorationState> = {
+const CodeDecorationPlugin: Plugin<DecorationSet> = {
 
   // There is no decoration or hovered/selected nodes in the initial state.
-  create: () => ({ decorations: RangeSet.empty }),
+  create: () => RangeSet.empty,
 
   // We do not compute the decorations here, as it seems like CodeMirror calls
   // this method really often, which may be costly. We should actually benchmark
   // this to be sure that it is really necessary.
-  decorations: (state) => state.decorations,
+  decorations: (state) => state,
 
   // The selected nodes handling is done in this function.
-  update: (state, u) => {
+  update: (_, u) => {
     const tree = Tree.get(u.state);
-    const marker = Marker.get(u.state);
-    const selected = marker && findMarker(tree, marker);
-    return computeDecorations({ ...state, selected });
+    const selectedMarker = Marker.get(u.state);
+    const selected = selectedMarker && findMarker(tree, selectedMarker);
+    const hoveredMarker = Hovered.get(u.state);
+    const hovered = hoveredMarker && findMarker(tree, hoveredMarker);
+    const range = selected && selectedClass.range(selected.from, selected.to);
+    const add = hovered && [ hoveredClass.range(hovered.from, hovered.to) ];
+    const set = range ? RangeSet.of(range) : RangeSet.empty;
+    return set.update({ add, sort: true });
   },
-
-  // The hovered handling is done through the mousemove callback. The code is
-  // similar to the update method. It also update the global ivette's hovered
-  // element.
-  eventHandlers: {
-    mousemove: (state, event, view) => {
-      const fct = Fct.get(view.state);
-      const tree = Tree.get(view.state);
-      const updateHovered = UpdateHovered.get(view.state);
-      const backup = (): CodeDecorationState => {
-        updateHovered(undefined);
-        return computeDecorations({ ...state, hovered: undefined });
-      };
-      const coords = { x: event.clientX, y: event.clientY };
-      const pos = view.posAtCoords(coords); if (!pos) return backup();
-      const hov = coveringNode(tree, pos); if (!hov) return backup();
-      const from = view.coordsAtPos(hov.from); if (!from) return backup();
-      const to = view.coordsAtPos(hov.to); if (!to) return backup();
-      const left = Math.min(from.left, to.left);
-      const right = Math.max(from.left, to.left);
-      const top = Math.min(from.top, to.top);
-      const bottom = Math.max(from.bottom, to.bottom);
-      const horizontallyOk = left <= coords.x && coords.x <= right;
-      const verticallyOk = top <= coords.y && coords.y <= bottom;
-      if (!horizontallyOk || !verticallyOk) return backup();
-      const marker = Ast.jMarker(hov?.id);
-      updateHovered(marker ? { fct, marker } : undefined);
-      return computeDecorations({ ...state, hovered: hov });
-    }
-  }
 
 };
 
@@ -533,51 +547,26 @@ class PropertyBullet extends GutterMarker {
   }
 }
 
-// Extension modifying the default gutter theme.
-const gutterTheme: Extension = EditorView.baseTheme({
-  '.cm-gutters': {
-    borderRight: '0px',
-    width: '2.15em',
-    background: 'var(--background-report)',
-  }
-});
-
-
-// Find the head nodes contained in a given range or only starting in it but
-// with an id.
-function containedNodes(tree: Tree, range: Range): Tree[] {
-  if (range.from <= tree.from && tree.from <= range.to && tree.id)
-    return [ { ...tree, children: [] } ];
-  return tree.children.map((child) => containedNodes(child, range)).flat();
-}
-
-// Returns all the ids contained in a tree.
-function getIds(tree: Tree): string[] {
-  return (tree.id ? [tree.id] : []).concat(tree.children.map(getIds).flat());
-}
-
 // The properties gutter extension itself. For each line, it recovers the
 // relevant markers in the code tree, retrieves the corresponding properties and
 // builds the bullets.
-const PropertiesExtension: Extension = gutter({
-  class: 'cm-bullet',
-  lineMarker(view, line) {
-    const tree = Tree.get(view.state);
-    const statusDict = StatusDict.get(view.state);
-    const propertiesMap = StatusDataMap.get(view.state);
-    const lineRange = { from: line.from, to: line.from + line.length };
-    const nodes = containedNodes(tree, lineRange);
-    let property: Properties.statusData | undefined = undefined;
-    for (const node of nodes) {
-      for (const id of getIds(node)) {
-        property = propertiesMap.get(id);
-        if (property) break;
-      }
-      if (property) break;
+const PropertiesGutter: Extension = gutter({
+  class: 'cm-property-gutter',
+  lineMarker(view, block) {
+    const line = view.state.doc.lineAt(block.from);
+    const start = line.from; const end = line.from + block.length;
+    const ranges = PropertiesRanges.get(view.state);
+    const inLine = (r: Range): boolean => start <= r.from && r.to <= end;
+    function isHeader(r: Range): boolean {
+      if (!line.text.includes('requires')) return false;
+      const next = view.state.doc.line(line.number + 1);
+      return r.from <= next.from && next.to <= r.to;
     }
-    if (!property) return null;
-    const status = statusDict.get(property.status);
-    return new PropertyBullet(status);
+    const prop = ranges.find((r) => inLine(r.range) || isHeader(r.range));
+    if (!prop) return null;
+    const propTags = PropertiesTags.get(view.state);
+    const statusTag = propTags.get(prop.key);
+    return statusTag ? new PropertyBullet(statusTag) : null;
   }
 });
 
@@ -706,45 +695,66 @@ const cppLanguage = LRLanguage.define({
 
 
 // -----------------------------------------------------------------------------
-//  AST View component
+//  Server requests
 // -----------------------------------------------------------------------------
 
-const MarkerUpdater = EditorView.domEventHandlers({
-  mouseup: (_, view) => {
-    const fct = Fct.get(view.state);
-    const tree = Tree.get(view.state);
-    const update = UpdateSelection.get(view.state);
-    const main = view.state.selection.main;
-    const id = coveringNode(tree, main.from)?.id;
-    update({ location: { fct, marker: Ast.jMarker(id) } });
-  }
-});
+// Server request handler returning the given function's text.
+function useFctText(fct: Fct): text {
+  const req = React.useMemo(() => Server.send(Ast.printFunction, fct), [fct]);
+  const { result } = Dome.usePromise(req);
+  return result ?? null;
+}
+
+// Server request handler returning the given function's dead code information.
+function useFctDead(fct: Fct): Eva.deadCode {
+  const req = React.useMemo(() => Server.send(Eva.getDeadCode, fct), [fct]);
+  const { result } = Dome.usePromise(req);
+  return result ?? { unreachable: [], nonTerminating: [] };
+}
+
+// Server request handler returning the given function's callers.
+function useFctCallers(fct: Fct): Caller[] {
+  const req = React.useMemo(() => Server.send(Eva.getCallers, fct), [fct]);
+  const { result = [] } = Dome.usePromise(req);
+  return result.map(([fct, marker]) => ({ fct, marker }));
+}
+
+
+
+// -----------------------------------------------------------------------------
+//  AST View component
+// -----------------------------------------------------------------------------
 
 // Necessary extensions for our needs.
 const baseExtensions: Extension[] = [
   Fct.structure.extension,
-  Text.structure.extension,
-  MarkerUpdater, Marker.structure.extension,
+  Marker.structure.extension,
+  UpdateSelection.structure.extension,
+  MarkerUpdater,
 
-  Dead.structure.extension,
-  Callers.structure.extension,
+  Hovered.structure.extension,
+  UpdateHovered.structure.extension,
+  HoveredUpdater,
+
+  Text.structure.extension,
   Tree.extension,
   Ranges.extension,
+  Dead.structure.extension,
+  Callers.structure.extension,
+  GetMarkerData.structure.extension,
 
-  UpdateHovered.structure.extension,
-  UpdateSelection.structure.extension,
+  Tags.structure.extension,
+  PropertiesStatuses.structure.extension,
+  PropertiesRanges.extension,
+  PropertiesTags.extension,
+  PropertiesGutter,
+  foldGutter(),
+
   buildExtension(CodeDecorationPlugin),
   buildExtension(DeadCodePlugin),
-  StatusDict.structure.extension,
-  StatusDataList.structure.extension,
-  StatusDataMap.extension,
-  GetMarkerData.structure.extension,
   ContextMenu,
-  gutterTheme,
-  PropertiesExtension,
-  foldGutter(),
-  Highlight,
-  new LanguageSupport(cppLanguage),
+
+  Highlight, new LanguageSupport(cppLanguage),
 ];
 
 // The component in itself.
@@ -764,16 +774,16 @@ function Editor(): JSX.Element {
   UpdateSelection.set(editor.current, updateSelection);
 
   // Updating CodeMirror when the <updateHovered> callback is changed.
-  const [_, updateHovered] = States.useHovered();
+  const [hovered, updateHovered] = States.useHovered();
   UpdateHovered.set(editor.current, updateHovered);
 
   // Updating CodeMirror when the <properties> synchronized array is changed.
   const properties = States.useSyncArray(Properties.status).getArray();
-  StatusDataList.set(editor.current, properties);
+  PropertiesStatuses.set(editor.current, properties);
 
   // Updating CodeMirror when the <propStatusTags> map is changed.
-  const statusDict = States.useTags(Properties.propStatusTags);
-  StatusDict.set(editor.current, statusDict);
+  const tags = States.useTags(Properties.propStatusTags);
+  Tags.set(editor.current, tags);
 
   // Updating CodeMirror when the <markersInfo> synchronized array is changed.
   const info = States.useSyncArray(Ast.markerInfo);
@@ -787,6 +797,7 @@ function Editor(): JSX.Element {
   Text.set(editor.current, useFctText(fct));
   Fct.set(editor.current, fct);
   Marker.set(editor.current, marker);
+  Hovered.set(editor.current, hovered?.marker);
   Dead.set(editor.current, useFctDead(fct));
   Callers.set(editor.current, useFctCallers(fct));
 

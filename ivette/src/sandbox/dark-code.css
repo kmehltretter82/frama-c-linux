@@ -12,7 +12,13 @@
   overflow: hidden;
 }
 
-.cm-bullet {
+.cm-editor .cm-gutters {
+  border-right: 0px;
+  width: 2.15em;
+  background: var(--background-report);
+}
+
+.cm-property-gutter {
   width: 1.3em;
   background: var(--code-bullet);
 }

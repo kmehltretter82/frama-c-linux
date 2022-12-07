@@ -64,3 +64,11 @@ export function mergeArraysByKey<A, B>(
 ): (A | A & B)[] {
   return mergeArrays(a1, a2, (x1, x2) => x1.key === x2.key);
 }
+
+/** Maps a function through an array and returns the first computed value that
+    is not undefined. */
+export type Maybe<A> = A | undefined;
+export function first<X, R>(xs: X[], fn: (x: X) => Maybe<R>): Maybe<R> {
+  for (const x of xs) { const r = fn(x); if (r) return r; }
+  return undefined;
+}
