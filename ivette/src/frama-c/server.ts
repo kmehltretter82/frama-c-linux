@@ -762,13 +762,9 @@ export function send<In, Out>(
   const response: Response<Out> = new Promise<Out>((resolve, reject) => {
     const unwrap = (js: Json.json): void => {
       try {
-        const data = request.output(js);
-        if (data !== undefined)
-          resolve(data);
-        else
-          reject('Wrong response type');
+        resolve(request.output(js));
       } catch (err) {
-        reject(`Decoding Error (${err})`);
+        reject(`Invalid ${request.name} response (${err})`);
       }
     };
     pending.set(rid, { resolve: unwrap, reject });
