@@ -281,7 +281,6 @@ let read_specs spec_format (ignored_files: StringSet.t ref) (spec_tab: (string, 
     and add_spec_Sep2Line1 spec_lines =
       List.iteri
         (fun i spec_line ->
-           Format.printf "%s@." spec_line;
            match split_line_entry spec_line with
            | file_name :: "header_spec" :: [license_name] ->
              add_spec_item i ~file_name ~license_name
