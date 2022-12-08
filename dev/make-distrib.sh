@@ -104,13 +104,17 @@ done
 
 HEADER_SPEC="header-spec.txt"
 
-git ls-files -z | git check-attr --stdin -z header_spec > $HEADER_SPEC
+git ls-files |\
+git check-attr --stdin export-ignore |\
+grep -v "export-ignore: set" | awk -F ': ' '{print $1}' |\
+git check-attr --stdin header_spec > $HEADER_SPEC
 
 for plugin in $EXTERNAL_PLUGINS ; do
-  git -C $plugin ls-files -z |\
-  git -C $plugin check-attr --stdin -z header_spec |\
-  xargs --null -n3 printf "$plugin/%s\n%s\n%s\n" |\
-  tr '\n' '\0' >> $HEADER_SPEC
+  git -C $plugin ls-files |\
+  git -C $plugin check-attr --stdin export-ignore |\
+  grep -v "export-ignore: set" | awk -F ': ' '{print $1}' |\
+  git -C $plugin check-attr --stdin header_spec |\
+  xargs -n3 printf "$plugin/%s %s %s\n" >> $HEADER_SPEC
 done
 
 ################################################################################
@@ -166,9 +170,9 @@ echo $TMP_DIR
 tar xf $FRAMAC_TAR -C $TMP_DIR
 
 # Check
-$HDRCK $CHECK_HEADER_OPT -spec-format="3-zeros" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
+$HDRCK $CHECK_HEADER_OPT -spec-format="3-fields-by-line" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
 # Update
-$HDRCK -update $MAKE_HEADER_OPT -spec-format="3-zeros" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
+$HDRCK -update $MAKE_HEADER_OPT -spec-format="3-fields-by-line" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
 
 ################################################################################
 # Sanity check
