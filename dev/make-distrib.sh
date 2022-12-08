@@ -71,18 +71,6 @@ if [ "" != "$IGNORED_FILES" ]; then
 fi
 
 ################################################################################
-
-################################################################################
-# Warn if there are uncommitted changes (will not be taken into account)
-
-GIT_STATUS="$(git status --porcelain)"
-if [ "" != "$GIT_STATUS" ]; then
-    echo "WARNING: uncommitted changes will be IGNORED when making archive:"
-    echo "$GIT_STATUS"
-fi
-
-################################################################################
-
 # Prepare archive
 
 git archive HEAD -o $FRAMAC_TAR --prefix "$FRAMAC/"
@@ -90,7 +78,21 @@ git archive HEAD -o $FRAMAC_TAR --prefix "$FRAMAC/"
 PLUGINS=$(find src/plugins -mindepth 1 -maxdepth 1 -type d)
 EXTERNAL_PLUGINS=$(find src/plugins -type d -name ".git" | sed "s/\/.git//")
 
+################################################################################
+# Warn if there are uncommitted changes (will not be taken into account)
+
+GIT_STATUS="$(git status --porcelain -- $(sed 's/^./:!&/' <<< $EXTERNAL_PLUGINS))"
+if [ "" != "$GIT_STATUS" ]; then
+    echo "WARNING: uncommitted changes will be IGNORED when making archive:"
+    echo "$GIT_STATUS"
+    echo ""
+fi
+
+################################################################################
+# Add external plugin to archive
+
 for plugin in $EXTERNAL_PLUGINS ; do
+   echo "Including external plugin $(basename $plugin)"
    TAR="$(basename $plugin).tar"
    git -C $plugin archive HEAD -o $TAR --prefix "$FRAMAC/$plugin/"
    tar --concatenate --file=$FRAMAC_TAR "$plugin/$TAR"
