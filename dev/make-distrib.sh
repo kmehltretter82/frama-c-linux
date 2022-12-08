@@ -124,7 +124,7 @@ CHECK_HEADER_OPT="-header-dirs headers/open-source"
 for plugin in $PLUGINS ; do
   if [ -d "$plugin/headers/open-source" ] ; then
     CHECK_HEADER_OPT="$CHECK_HEADER_OPT -header-dirs $plugin/headers/open-source"
-  else
+  elif [ -d "$plugin/headers/close-source" ] ; then
     CHECK_HEADER_OPT="$CHECK_HEADER_OPT -header-dirs $plugin/headers/close-source"
   fi
 done
@@ -145,13 +145,15 @@ MAKE_HEADER_OPT="-header-dirs headers/$HEADER_KIND"
 # - have only close -> just use header kind, if it is open, build will fail
 # - have only open -> just use open
 for plugin in $PLUGINS ; do
-  if [ "$OPEN_SOURCE" == "yes" ] ; then
-    MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/open-source"
-  else
-    if [ ! -d "$plugin/headers/close-source" ] ; then
+  if [ -d "$plugin/headers" ] ; then
+    if [ "$OPEN_SOURCE" == "yes" ] ; then
       MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/open-source"
     else
-      MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/close-source"
+      if [ ! -d "$plugin/headers/close-source" ] ; then
+        MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/open-source"
+      else
+        MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/close-source"
+      fi
     fi
   fi
 done
