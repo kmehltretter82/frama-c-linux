@@ -1,18 +1,18 @@
 import React from 'react';
-import Dictionary from 'lodash';
+import Lodash from 'lodash';
 import { EditorState, StateField, Facet, Extension } from '@codemirror/state';
 import { Annotation, Transaction, RangeSet } from '@codemirror/state';
-import { Decoration, DecorationSet } from '@codemirror/view';
 import { EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
-import { DOMEventHandlers, GutterMarker, gutter } from '@codemirror/view';
-
-import { tags } from '@lezer/highlight';
-import { syntaxHighlighting, HighlightStyle } from '@codemirror/language';
+import { Decoration, DecorationSet } from '@codemirror/view';
+import { DOMEventMap as EventMap } from '@codemirror/view';
+import { GutterMarker, gutter } from '@codemirror/view';
 
 import { parser } from '@lezer/cpp';
+import { tags } from '@lezer/highlight';
 import { SyntaxNode } from '@lezer/common';
 import { foldGutter, foldNodeProp } from '@codemirror/language';
 import { LRLanguage, LanguageSupport } from "@codemirror/language";
+import { syntaxHighlighting, HighlightStyle } from '@codemirror/language';
 
 import * as Dome from 'dome';
 import * as Utils from 'dome/data/arrays';
@@ -32,19 +32,18 @@ import './dark-code.css';
 
 
 // -----------------------------------------------------------------------------
-//  Helper types definitions
+//  CodeMirror state's extensions types definitions
 // -----------------------------------------------------------------------------
 
+// Helper types definitions
 export type Get<A> = (state: EditorState | undefined) => A;
 export type Set<A> = (view: EditorView | null, value: A) => void;
 export type Equal<A> = (left: A, right: A) => boolean;
 export interface Data<A, S> { init: A, get: Get<A>, structure: S }
 
-
-
-// -----------------------------------------------------------------------------
-//  CodeMirror's Fields
-// -----------------------------------------------------------------------------
+// Event handlers type definition.
+export type Handler<I, E> = (i: I, v: EditorView, e: E) => void;
+export type Handlers<I> = { [e in keyof EventMap]?: Handler<I, EventMap[e]> };
 
 // A Field is a data added to the CodeMirror internal state that can be
 // modified by the outside world and used by plugins. The typical use case is
@@ -57,29 +56,6 @@ export interface Data<A, S> { init: A, get: Get<A>, structure: S }
 // is that it is needed during the Aspects creation's process.
 export interface Field<A> extends Data<A, StateField<A>> { set: Set<A> }
 
-// A Field is simply declared using an initial value. However, to be able to
-// use it, you must add its extension (obtained through <field.extension>) to
-// the CodeMirror initial configuration. If determining equality between
-// values of the given type cannot be done using (===), an equality test can be
-// provided through the optional parameters <equal>.
-export function createField<A>(init: A, equal?: Equal<A>): Field<A> {
-  const annot = Annotation.define<A>();
-  const create = (): A => init;
-  type Update<A> = (current: A, transaction: Transaction) => A;
-  const update: Update<A> = (current, tr) => tr.annotation(annot) ?? current;
-  const field = StateField.define<A>({ create, update, compare: equal });
-  const get: Get<A> = (state) => state?.field(field) ?? init;
-  const useSet: Set<A> = (v, a) =>
-    React.useEffect(() => v?.dispatch({ annotations: annot.of(a) }), [v, a]);
-  return { init, get, set: useSet, structure: field };
-}
-
-
-
-// -----------------------------------------------------------------------------
-//  CodeMirror's Aspects
-// -----------------------------------------------------------------------------
-
 // An Aspect is a data associated with an editor state and computed by combining
 // data from several fields. A typical use case is if one needs a data that
 // relies on a server side information (like a synchronized array) which must be
@@ -89,9 +65,22 @@ export function createField<A>(init: A, equal?: Equal<A>): Field<A> {
 // the CodeMirror initial configuration.
 export interface Aspect<A> extends Data<A, Facet<A, A>> { extension: Extension }
 
-// An Aspect is recomputed each time its dependencies are updated. The
-// dependencies of an Aspect is declared through a record, giving a name to each
-// dependency.
+
+
+// -----------------------------------------------------------------------------
+//  CodeMirror state's extensions dependencies
+// -----------------------------------------------------------------------------
+
+// State extensions and Aspects have to declare their dependencies, i.e. the
+// Field and Aspects they rely on to perform their computations. Dependencies
+// are declared as a record mapping names to either a Field or an Aspect. This
+// is needed to be able to give the dependencies values to the computing
+// functions in a typed manner. However, an important point to take into
+// consideration is that the extensions constructors defined below cannot
+// actually typecheck without relying on type assertions. It means that if you
+// declare an extension's dependencies after creating the extension, it will
+// crash at execution time. So please, check that every dependency is declared
+// before being used.
 export type Dict = Record<string, unknown>;
 export type Dependency<A> = Field<A> | Aspect<A>;
 export type Dependencies<I extends Dict> = { [K in keyof I]: Dependency<I[K]> };
@@ -113,6 +102,14 @@ function transformDict<I extends Dict>(deps: Deps<I>, tr: Transform<I>): Dict {
   return Object.fromEntries(Object.keys(deps).map(k => [k, tr(deps[k], k)]));
 }
 
+// Helper function retrieving the current values associated to each dependencies
+// in a given editor state. They are returned as a Dict instead of the precise
+// type because of TypeScript subtyping shenanigans that prevent us to correctly
+// type the returned record. Thus, a type assertion has to be used.
+function inputs<I extends Dict>(ds: Deps<I>, s: EditorState | undefined): Dict {
+  return transformDict(ds, (d) => d.get(s));
+}
+
 // Helper function retrieving a dependency extension.
 function getExtension<A>(dep: Dependency<A>): Extension {
   type Dep<A> = Dependency<A>;
@@ -120,6 +117,42 @@ function getExtension<A>(dep: Dependency<A>): Extension {
   const isAspect = (d: Dep<A>): d is Aspect<A> => asExt(d);
   if (isAspect(dep)) return dep.extension;
   else return dep.structure.extension;
+}
+
+
+
+// -----------------------------------------------------------------------------
+//  CodeMirror state's extensions
+// -----------------------------------------------------------------------------
+
+// Several extensions constructors are provided. Each one of them encapsulates
+// its dependencies if needed. This means that adding an extension to the
+// CodeMirror's initial configuration will also add all its dependencies'
+// extensions, and thus recursively. However, for now, there is no systemic way
+// to check that the fields at the root of the dependencies tree are updated by
+// a component. This means you have to verify, by hands, that every field is
+// updated when needed by your component. It may be possible to compute a
+// function that asks for a value for each fields in the dependencies tree and
+// does the update for you, thus forcing you to actually update every fields.
+// But it seems hard to define and harder to type.
+
+// A Field is simply declared using an initial value. However, to be able to
+// use it, you must add its extension (obtained through <field.extension>) to
+// the CodeMirror initial configuration. If determining equality between
+// values of the given type cannot be done using (===), an equality test can be
+// provided through the optional parameters <equal>. Providing an equality test
+// for complex types can help improve performances by avoiding recomputing
+// extensions depending on the field.
+export function createField<A>(init: A, equal?: Equal<A>): Field<A> {
+  const annot = Annotation.define<A>();
+  const create = (): A => init;
+  type Update<A> = (current: A, transaction: Transaction) => A;
+  const update: Update<A> = (current, tr) => tr.annotation(annot) ?? current;
+  const field = StateField.define<A>({ create, update, compare: equal });
+  const get: Get<A> = (state) => state?.field(field) ?? init;
+  const useSet: Set<A> = (v, a) =>
+    React.useEffect(() => v?.dispatch({ annotations: annot.of(a) }), [v, a]);
+  return { init, get, set: useSet, structure: field };
 }
 
 // An Aspect is declared using its dependencies and a function. This function's
@@ -130,80 +163,61 @@ export function createAspect<I extends Dict, O>(
   deps: Dependencies<I>,
   fn: (input: I) => O,
 ): Aspect<O> {
-  const init = fn(transformDict(deps, (d) => d.init) as I);
   const enables = mapDict(deps, getExtension);
+  const init = fn(transformDict(deps, (d) => d.init) as I);
   const combine: Combine<O> = (l) => l.length > 0 ? l[l.length - 1] : init;
   const facet = Facet.define<O, O>({ combine, enables });
   const get: Get<O> = (state) => state?.facet(facet) ?? init;
   const convertedDeps = mapDict(deps, (d) => d.structure);
-  const compute: Get<O> = (s) => fn(transformDict(deps, (d) => d.get(s)) as I);
+  const compute: Get<O> = (s) => fn(inputs(deps, s) as I);
   const extension = facet.compute(convertedDeps, compute);
   return { init, get, structure: facet, extension };
 }
 
-
-
-// -----------------------------------------------------------------------------
-//  Generic plugin interface
-// -----------------------------------------------------------------------------
-
-// Types declarations for event handlers. It is built on the same idea as the
-// ones from CodeMirror, but our handlers are conceived as purely functionnal.
-export type EventMap = HTMLElementEventMap;
-export type Handler<S, E> = (s: S, e: E, v: EditorView) => S | undefined;
-export type Handlers<S> = { [e in keyof EventMap]?: Handler<S, EventMap[e]> };
-
-// The plugin interface contains all necessary definition to build a CodeMirror
-// extension. However, it should be simpler to use and define for two reasons:
-//  - everything is grouped under one unique interface, instead of CodeMirror
-//    where it is divided between the PluginValue and PluginSpec interfaces.
-//  - everything is intended as purely functionnal, avoiding mutable state is
-//    always a good idea to make the code cleaner and easier to maintain.
-//
-// The interface is parameterized by the type of the plugin's internal state.
-// Each plugin's method will interact with this state, and modifies it, in a
-// functionnal manner, if needed.
-//
-// The interface's methods are as follows:
-//  - create: instanciate the plugin internal state using the current editor
-//    view. It is the only mandatory function.
-//  - update: update the plugin's state according to a CodeMirror view update.
-//  - destroy: cleanup function called when the plugin's state is destroyed.
-//    Only useful if the state's creation is effectful.
-//  - decorations: returns the decorations that should be added to the code by
-//    CodeMirror.
-//  - eventHandlers: a collection of callbacks used to react to DOM events.
-export interface Plugin<State> {
-  create: (view: EditorView) => State;
-  update?: (state: State, update: ViewUpdate) => State;
-  destroy?: (state: State) => void;
-  decorations?: (state: State) => DecorationSet;
-  eventHandlers?: Handlers<State>;
+// A Decorator is an extension that adds decorations to the CodeMirror's
+// document, i.e. it tags subpart of the document with CSS classes. See the
+// CodeMirror's documentation on Decoration for further details.
+export function createDecorator<I extends Dict>(
+  deps: Dependencies<I>,
+  fn: (inputs: I, state: EditorState) => DecorationSet
+): Extension {
+  const enables = mapDict(deps, getExtension);
+  const get = (s: EditorState): DecorationSet => fn(inputs(deps, s) as I, s);
+  class S { s: DecorationSet = RangeSet.empty; }
+  class D extends S { update(u: ViewUpdate): void { this.s = get(u.state); } }
+  const decorations = (d: D): DecorationSet => d.s;
+  return enables.concat(ViewPlugin.fromClass(D, { decorations }));
 }
 
-// Function used to convert a Plugin into a proper CodeMirror Extension.
-// It only does plumbing to match the CodeMirror API.
-export function buildExtension<S>(p: Plugin<S>): Extension {
-  const { update: up, destroy, decorations: d } = p;
-  const decorations = d && ((s: State): DecorationSet => d(s.state));
-  class State {
-    state: S;
-    constructor(view: EditorView) { this.state = p.create(view); }
-    update(v: ViewUpdate): void { if (up) this.state = up(this.state, v); }
-    destroy(): void { if (destroy) destroy(this.state); }
-  }
-  let eventHandlers: DOMEventHandlers<State> | undefined = undefined;
-  if (p.eventHandlers) {
-    eventHandlers = {};
-    for (const [event, handler] of Object.entries(p.eventHandlers)) {
-      eventHandlers[event] = function(this, event, view) {
-        const state = handler ? handler(this.state, event, view) : undefined;
-        if (state) { this.state = state; view.dispatch(); return true; }
-        return false;
-      };
-    }
-  }
-  return ViewPlugin.fromClass(State, { decorations, eventHandlers });
+// A Gutter is an extension that adds decorations (bullets or any kind of
+// symbol) in a gutter in front of document's lines. See the CodeMirror's
+// documentation on GutterMarker for further details.
+export function createGutter<I extends Dict>(
+  deps: Dependencies<I>,
+  className: string,
+  line: (inputs: I, block: Range, view: EditorView) => GutterMarker | null
+): Extension {
+  const enables = mapDict(deps, getExtension);
+  const extension = gutter({ class: className, lineMarker: (view, block) => {
+    return line(inputs(deps, view.state) as I, block, view);
+  }});
+  return enables.concat(extension);
+}
+
+// An Event Handler is an extention responsible of performing a computation each
+// time a DOM event (like <mouseup> or <contextmenu>) happens.
+export function createEventHandler<I extends Dict>(
+  deps: Dependencies<I>,
+  handlers: Handlers<I>,
+): Extension {
+  const enables = mapDict(deps, getExtension);
+  const domEventHandlers = Object.fromEntries(Object.keys(handlers).map((k) => {
+    const h = handlers[k] as Handler<I, typeof k>;
+    const fn = (e: typeof k, v: EditorView) =>
+      h(inputs(deps, v.state) as I, v, e);
+    return [k, fn];
+  }));
+  return enables.concat(EditorView.domEventHandlers(domEventHandlers));
 }
 
 
@@ -297,79 +311,7 @@ function findMarker(tree: Tree, marker: Marker): Tree | undefined {
 
 
 // -----------------------------------------------------------------------------
-//  Selected marker representation
-// -----------------------------------------------------------------------------
-
-// This field contains the currently selected function.
-const Fct = createField<Fct>(undefined);
-
-// This field contains the currently selected marker.
-const Marker = createField<Marker>(undefined);
-
-// The Ivette selection must be updated by CodeMirror plugins. This input
-// add the callback in the CodeMirror internal state.
-type UpdateSelection = (a: States.SelectionActions) => void;
-const UpdateSelection = createField<UpdateSelection>(() => { return; });
-
-// The marker field is considered as the ground truth on what is selected in the
-// CodeMirror document. To do so, we catch the mouseup event (so when the user
-// select a new part of the document) and update the Ivette selection
-// accordingly. This will update the Marker field during the next Editor
-// component's render and thus update everything else.
-const MarkerUpdater = EditorView.domEventHandlers({
-  mouseup: (_, view) => {
-    const fct = Fct.get(view.state);
-    const tree = Tree.get(view.state);
-    const update = UpdateSelection.get(view.state);
-    const main = view.state.selection.main;
-    const id = coveringNode(tree, main.from)?.id;
-    update({ location: { fct, marker: Ast.jMarker(id) } });
-  }
-});
-
-
-
-// -----------------------------------------------------------------------------
-//  Hovered marker representation
-// -----------------------------------------------------------------------------
-
-// This field contains the currently hovered marker.
-const Hovered = createField<Marker>(undefined);
-
-// The Ivette hovered element must be updated by CodeMirror plugins. This
-// field add the callback in the CodeMirror internal state.
-type UpdateHovered = (h: States.Hovered) => void;
-const UpdateHovered = createField<UpdateHovered>(() => { return ; });
-
-// The Hovered field is updated each time the mouse moves through the CodeMirror
-// document. The handlers updates the Ivette hovered information, which is then
-// reflected on the Hovered field by the Editor component itself.
-const HoveredUpdater = EditorView.domEventHandlers({
-  mousemove: (event, view) => {
-    const fct = Fct.get(view.state);
-    const tree = Tree.get(view.state);
-    const updateHovered = UpdateHovered.get(view.state);
-    const coords = { x: event.clientX, y: event.clientY };
-    const pos = view.posAtCoords(coords); if (!pos) return;
-    const hov = coveringNode(tree, pos); if (!hov) return;
-    const from = view.coordsAtPos(hov.from); if (!from) return;
-    const to = view.coordsAtPos(hov.to); if (!to) return;
-    const left = Math.min(from.left, to.left);
-    const right = Math.max(from.left, to.left);
-    const top = Math.min(from.top, to.top);
-    const bottom = Math.max(from.bottom, to.bottom);
-    const horizontallyOk = left <= coords.x && coords.x <= right;
-    const verticallyOk = top <= coords.y && coords.y <= bottom;
-    if (!horizontallyOk || !verticallyOk) return;
-    const marker = Ast.jMarker(hov?.id);
-    updateHovered(marker ? { fct, marker } : undefined);
-  }
-});
-
-
-
-// -----------------------------------------------------------------------------
-//  Function code representation, general information and data structures
+//  Function code representation
 // -----------------------------------------------------------------------------
 
 // This field contains the current function's code as represented by Ivette.
@@ -397,20 +339,128 @@ const Tree = createAspect({ t: Text }, ({ t }) => textToTree(t) ?? leaf(0, 0));
 // tree, represented by the <Tree> aspect.
 const Ranges = createAspect({ t: Tree }, ({ t }) => markersRangesOfTree(t));
 
-// This field contains the dead code information as inferred by Eva.
-const Dead = createField<Eva.deadCode>({ unreachable: [], nonTerminating: [] });
 
-// This field contains all the current function's callers, as inferred by Eva.
-const Callers = createField<Caller[]>([]);
 
-// This field contains information on markers.
-type GetMarkerData = (key: string) => Ast.markerInfoData | undefined;
-const GetMarkerData = createField<GetMarkerData>(() => undefined);
+// -----------------------------------------------------------------------------
+//  Selected marker representation
+// -----------------------------------------------------------------------------
+
+// This field contains the currently selected function.
+const Fct = createField<Fct>(undefined);
+
+// This field contains the currently selected marker.
+const Marker = createField<Marker>(undefined);
+
+// The Ivette selection must be updated by CodeMirror plugins. This input
+// add the callback in the CodeMirror internal state.
+type UpdateSelection = (a: States.SelectionActions) => void;
+const UpdateSelection = createField<UpdateSelection>(() => { return; });
+
+// The marker field is considered as the ground truth on what is selected in the
+// CodeMirror document. To do so, we catch the mouseup event (so when the user
+// select a new part of the document) and update the Ivette selection
+// accordingly. This will update the Marker field during the next Editor
+// component's render and thus update everything else.
+const MarkerUpdater = createMarkerUpdater();
+function createMarkerUpdater(): Extension {
+  const deps = { fct: Fct, tree: Tree, update: UpdateSelection };
+  return createEventHandler(deps, { mouseup: ({ fct, tree, update }, view) => {
+    const main = view.state.selection.main;
+    const id = coveringNode(tree, main.from)?.id;
+    update({ location: { fct, marker: Ast.jMarker(id) } });
+  }});
+}
 
 
 
 // -----------------------------------------------------------------------------
-//  Representation of properties' information
+//  Hovered marker representation
+// -----------------------------------------------------------------------------
+
+// This field contains the currently hovered marker.
+const Hovered = createField<Marker>(undefined);
+
+// The Ivette hovered element must be updated by CodeMirror plugins. This
+// field add the callback in the CodeMirror internal state.
+type UpdateHovered = (h: States.Hovered) => void;
+const UpdateHovered = createField<UpdateHovered>(() => { return ; });
+
+// The Hovered field is updated each time the mouse moves through the CodeMirror
+// document. The handlers updates the Ivette hovered information, which is then
+// reflected on the Hovered field by the Editor component itself.
+const HoveredUpdater = createHoveredUpdater();
+function createHoveredUpdater(): Extension {
+  const deps = { fct: Fct, tree: Tree, update: UpdateHovered };
+  return createEventHandler(deps, { mousemove: (inputs, view, event) => {
+    const { fct, tree, update: updateHovered } = inputs;
+    const coords = { x: event.clientX, y: event.clientY };
+    const pos = view.posAtCoords(coords); if (!pos) return;
+    const hov = coveringNode(tree, pos); if (!hov) return;
+    const from = view.coordsAtPos(hov.from); if (!from) return;
+    const to = view.coordsAtPos(hov.to); if (!to) return;
+    const left = Math.min(from.left, to.left);
+    const right = Math.max(from.left, to.left);
+    const top = Math.min(from.top, to.top);
+    const bottom = Math.max(from.bottom, to.bottom);
+    const horizontallyOk = left <= coords.x && coords.x <= right;
+    const verticallyOk = top <= coords.y && coords.y <= bottom;
+    if (!horizontallyOk || !verticallyOk) return;
+    const marker = Ast.jMarker(hov?.id);
+    updateHovered(marker ? { fct, marker } : undefined);
+  }});
+}
+
+
+
+// -----------------------------------------------------------------------------
+//  Plugin decorating hovered and selected elements
+// -----------------------------------------------------------------------------
+
+const CodeDecorator = createCodeDecorator();
+function createCodeDecorator(): Extension {
+  const hoveredClass = Decoration.mark({ class: 'cm-hovered-code' });
+  const selectedClass = Decoration.mark({ class: 'cm-selected-code' });
+  const deps = { tree: Tree, marker: Marker, hovered: Hovered };
+  return createDecorator(deps, ({ tree, marker: m, hovered: h }) => {
+    const selected = m && findMarker(tree, m);
+    const hovered = h && findMarker(tree, h);
+    const range = selected && selectedClass.range(selected.from, selected.to);
+    const add = hovered && [ hoveredClass.range(hovered.from, hovered.to) ];
+    const set = range ? RangeSet.of(range) : RangeSet.empty;
+    return set.update({ add, sort: true });
+  });
+}
+
+
+
+// -----------------------------------------------------------------------------
+//  Dead code decorations plugin
+// -----------------------------------------------------------------------------
+
+// This field contains the dead code information as inferred by Eva.
+const Dead = createField<Eva.deadCode>({ unreachable: [], nonTerminating: [] });
+
+const DeadCodeDecorator = createDeadCodeDecorator();
+function createDeadCodeDecorator(): Extension {
+  const uClass = Decoration.mark({ class: 'cm-dead-code' });
+  const tClass = Decoration.mark({ class: 'cm-non-term-code' });
+  const deps = { dead: Dead, ranges: Ranges };
+  return createDecorator(deps, ({ dead, ranges }) => {
+    const range = (marker: string): Range | undefined => ranges.get(marker);
+    function isDef<A>(a: A | undefined): a is A { return a !== undefined; }
+    const getRanges = (xs: string[]): Range[] => xs.map(range).filter(isDef);
+    const unreachableRanges = getRanges(dead.unreachable);
+    const unreachable = unreachableRanges.map(r => uClass.range(r.from, r.to));
+    const nonTermRanges = getRanges(dead.nonTerminating);
+    const nonTerm = nonTermRanges.map(r => tClass.range(r.from, r.to));
+    return RangeSet.of(unreachable.concat(nonTerm), true);
+  });
+}
+
+
+
+// -----------------------------------------------------------------------------
+//  Property bullets extension
 // -----------------------------------------------------------------------------
 
 // This field contains information on properties' tags.
@@ -452,83 +502,6 @@ function createPropertiesTags(): Aspect<Map<string, States.Tag>> {
   });
 }
 
-
-
-// -----------------------------------------------------------------------------
-//  Plugin decorating hovered and selected elements
-// -----------------------------------------------------------------------------
-
-// The different kind of decorations used in this plugin.
-const hoveredClass = Decoration.mark({ class: 'cm-hovered-code' });
-const selectedClass = Decoration.mark({ class: 'cm-selected-code' });
-
-// Plugin declaration.
-const CodeDecorationPlugin: Plugin<DecorationSet> = {
-
-  // There is no decoration or hovered/selected nodes in the initial state.
-  create: () => RangeSet.empty,
-
-  // We do not compute the decorations here, as it seems like CodeMirror calls
-  // this method really often, which may be costly. We should actually benchmark
-  // this to be sure that it is really necessary.
-  decorations: (state) => state,
-
-  // The selected nodes handling is done in this function.
-  update: (_, u) => {
-    const tree = Tree.get(u.state);
-    const selectedMarker = Marker.get(u.state);
-    const selected = selectedMarker && findMarker(tree, selectedMarker);
-    const hoveredMarker = Hovered.get(u.state);
-    const hovered = hoveredMarker && findMarker(tree, hoveredMarker);
-    const range = selected && selectedClass.range(selected.from, selected.to);
-    const add = hovered && [ hoveredClass.range(hovered.from, hovered.to) ];
-    const set = range ? RangeSet.of(range) : RangeSet.empty;
-    return set.update({ add, sort: true });
-  },
-
-};
-
-
-
-// -----------------------------------------------------------------------------
-//  Dead code decorations plugin
-// -----------------------------------------------------------------------------
-
-// The decorations used in this plugin.
-const unreachableClass = Decoration.mark({ class: 'cm-dead-code' });
-const nonTerminatingClass = Decoration.mark({ class: 'cm-non-term-code' });
-
-// The plugin itself. The decorations are recomputed only once each time the
-// selected function is changed.
-const DeadCodePlugin: Plugin<DecorationSet> = {
-  create: () => RangeSet.empty,
-  decorations: (state) => state,
-  update: (state, update) => {
-    if (!update.docChanged) return state;
-    const dead = Dead.get(update.state);
-    const ranges = Ranges.get(update.state);
-    const unreachable = [];
-    for (const marker of dead.unreachable) {
-      const r = ranges.get(marker); if (!r) continue;
-      const range = unreachableClass.range(r.from, r.to);
-      unreachable.push(range);
-    }
-    const nonTerm = [];
-    for (const marker of dead.nonTerminating) {
-      const r = ranges.get(marker); if (!r) continue;
-      const range = nonTerminatingClass.range(r.from, r.to);
-      nonTerm.push(range);
-    }
-    return RangeSet.of(unreachable.concat(nonTerm), true);
-  },
-};
-
-
-
-// -----------------------------------------------------------------------------
-//  Property bullets extension
-// -----------------------------------------------------------------------------
-
 // Bullet colors.
 function getBulletColor(status: States.Tag): string {
   switch (status.name) {
@@ -563,15 +536,13 @@ class PropertyBullet extends GutterMarker {
   }
 }
 
-// The properties gutter extension itself. For each line, it recovers the
-// relevant markers in the code tree, retrieves the corresponding properties and
-// builds the bullets.
-const PropertiesGutter: Extension = gutter({
-  class: 'cm-property-gutter',
-  lineMarker(view, block) {
+const PropertiesGutter = createPropertiesGutter();
+function createPropertiesGutter(): Extension {
+  const deps = { ranges: PropertiesRanges, propTags: PropertiesTags };
+  return createGutter(deps, 'cm-property-gutter', (inputs, block, view) => {
+    const { ranges, propTags } = inputs;
     const line = view.state.doc.lineAt(block.from);
-    const start = line.from; const end = line.from + block.length;
-    const ranges = PropertiesRanges.get(view.state);
+    const start = line.from; const end = line.to;
     const inLine = (r: Range): boolean => start <= r.from && r.to <= end;
     function isHeader(r: Range): boolean {
       if (!line.text.includes('requires')) return false;
@@ -580,11 +551,10 @@ const PropertiesGutter: Extension = gutter({
     }
     const prop = ranges.find((r) => inLine(r.range) || isHeader(r.range));
     if (!prop) return null;
-    const propTags = PropertiesTags.get(view.state);
     const statusTag = propTags.get(prop.key);
     return statusTag ? new PropertyBullet(statusTag) : null;
-  }
-});
+  });
+}
 
 
 
@@ -630,27 +600,34 @@ async function studia(props: StudiaProps): Promise<StudiaInfos> {
 //  Context menu
 // -----------------------------------------------------------------------------
 
-const ContextMenu = EditorView.domEventHandlers({
-  contextmenu: (event, view) => {
-    const tree = Tree.get(view.state);
-    const locations = Callers.get(view.state);
-    const updateSelection = UpdateSelection.get(view.state);
-    const getMarkerData = GetMarkerData.get(view.state);
+// This field contains all the current function's callers, as inferred by Eva.
+const Callers = createField<Caller[]>([]);
+
+// This field contains information on markers.
+type GetMarkerData = (key: string) => Ast.markerInfoData | undefined;
+const GetMarkerData = createField<GetMarkerData>(() => undefined);
+
+const ContextMenuHandler = createContextMenuHandler();
+function createContextMenuHandler(): Extension {
+  const data = { tree: Tree, locations: Callers };
+  const deps = { ...data, update: UpdateSelection, getData: GetMarkerData };
+  return createEventHandler(deps, { contextmenu: (inputs, view, event) => {
+    const { tree, locations, update, getData } = inputs;
     const coords = { x: event.clientX, y: event.clientY };
     const position = view.posAtCoords(coords); if (!position) return;
     const node = coveringNode(tree, position);
     if (!node || !node.id) return;
     const items: Dome.PopupMenuItem[] = [];
-    const info = getMarkerData(node.id);
+    const info = getData(node.id);
     if (info?.var === 'function') {
       if (info.kind === 'declaration') {
-        const callers = Dictionary.groupBy(locations, e => e.fct);
-        Dictionary.forEach(callers, (e) => {
+        const callers = Lodash.groupBy(locations, e => e.fct);
+        Lodash.forEach(callers, (e) => {
           const callerName = e[0].fct;
           const callSites = e.length > 1 ? `(${e.length} call sites)` : '';
           items.push({
             label: `Go to caller ${callerName} ` + callSites,
-            onClick: () => updateSelection({
+            onClick: () => update({
               name: `Call sites of function ${info.name}`,
               locations: locations,
               index: locations.findIndex(l => l.fct === callerName)
@@ -659,7 +636,7 @@ const ContextMenu = EditorView.domEventHandlers({
         });
       } else {
         const location = { fct: info.name };
-        const onClick = (): void => updateSelection({ location });
+        const onClick = (): void => update({ location });
         const label = `Go to definition of ${info.name}`;
         items.push({ label, onClick });
       }
@@ -667,7 +644,7 @@ const ContextMenu = EditorView.domEventHandlers({
     const enabled = info?.kind === 'lvalue' || info?.var === 'variable';
     const onClick = (kind: access): void => {
       if (info && node.id)
-        studia({ marker: node.id, info, kind }).then(updateSelection);
+        studia({ marker: node.id, info, kind }).then(update);
     };
     const reads = 'Studia: select reads';
     const writes = 'Studia: select writes';
@@ -675,8 +652,8 @@ const ContextMenu = EditorView.domEventHandlers({
     items.push({ label: writes, enabled, onClick: () => onClick('Writes') });
     if (items.length > 0) Dome.popupMenu(items);
     return;
-  }
-});
+  }});
+}
 
 
 
@@ -743,33 +720,13 @@ function useFctCallers(fct: Fct): Caller[] {
 
 // Necessary extensions for our needs.
 const baseExtensions: Extension[] = [
-  Fct.structure.extension,
-  Marker.structure.extension,
-  UpdateSelection.structure.extension,
   MarkerUpdater,
-
-  Hovered.structure.extension,
-  UpdateHovered.structure.extension,
   HoveredUpdater,
-
-  Text.structure.extension,
-  Tree.extension,
-  Ranges.extension,
-  Dead.structure.extension,
-  Callers.structure.extension,
-  GetMarkerData.structure.extension,
-
-  Tags.structure.extension,
-  PropertiesStatuses.structure.extension,
-  PropertiesRanges.extension,
-  PropertiesTags.extension,
+  CodeDecorator,
+  DeadCodeDecorator,
+  ContextMenuHandler,
   PropertiesGutter,
   foldGutter(),
-
-  buildExtension(CodeDecorationPlugin),
-  buildExtension(DeadCodePlugin),
-  ContextMenu,
-
   Highlight, new LanguageSupport(cppLanguage),
 ];
 
