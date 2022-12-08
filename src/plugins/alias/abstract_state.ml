@@ -51,7 +51,6 @@ open Graph
 open Cil_types
 
 
-
 type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
 
 (** module for vertices *)
@@ -91,7 +90,6 @@ module MGU = struct
 
   type alpha = int
   type term = ecr
-
   type t = {
     vars : (alpha,term) Hashtbl.t ; (* union-find variables *)
     sigma : (term,term) Hashtbl.t ; (* memoized normalization *)
@@ -130,7 +128,7 @@ module AbstractState = struct
   (** export the graph to a dot file *)
   let print_dot _ =
     failwith "not implemented"
-
+      
   (* functions needed for Steensgaard's algorithm *)
 
   (** [init] creates an "empty" abstract state *)
@@ -138,7 +136,7 @@ module AbstractState = struct
     failwith "not implemented"
 
   (** join / fusion of two ecr; returns the mgu and the new graph ;
-      first argument is the union-find struture *)
+     first argument is the union-find struture *)
   let join _ =
     failwith "not implemented"
 
@@ -149,7 +147,6 @@ module AbstractState = struct
   (** [find a e] returns the ecr corresponding to C expression [e] in abstract state [a] *)
   let find  _ =
     failwith "not implemented"
-
 end
 
 
@@ -169,6 +166,7 @@ let do_stmt _ =
 
 
 (** [make_summary mgu a f] computes the summary of a function (and the
+
     next abstract state if needed) and stores the summary in
     function_table *)
 let make_summary  _ =
