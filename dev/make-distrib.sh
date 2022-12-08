@@ -45,6 +45,17 @@ if [ -z ${CI_LINK+x} ]; then
   CI_LINK="no"
 fi
 
+# For macOS: use gtar if available, otherwise test if tar is BSD
+if command -v gtar &> /dev/null; then
+  TAR=gtar
+else
+  if tar --version | grep -q bsdtar; then
+    echo "GNU tar required"
+    exit 1
+  fi
+  TAR=tar
+fi
+
 VERSION_SAFE=${VERSION/~/-}
 
 FRAMAC="frama-c-$VERSION_SAFE-$VERSION_CODENAME"
@@ -93,10 +104,10 @@ fi
 
 for plugin in $EXTERNAL_PLUGINS ; do
    echo "Including external plugin $(basename $plugin)"
-   TAR="$(basename $plugin).tar"
-   git -C $plugin archive HEAD -o $TAR --prefix "$FRAMAC/$plugin/"
-   tar --concatenate --file=$FRAMAC_TAR "$plugin/$TAR"
-   rm -rf "$plugin/$TAR"
+   PLUGIN_TAR="$(basename $plugin).tar"
+   git -C $plugin archive HEAD -o $PLUGIN_TAR --prefix "$FRAMAC/$plugin/"
+   $TAR --concatenate --file=$FRAMAC_TAR "$plugin/$PLUGIN_TAR"
+   rm -rf "$plugin/$PLUGIN_TAR"
 done
 
 ################################################################################
@@ -167,7 +178,7 @@ done
 
 TMP_DIR=$(mktemp -d)
 echo $TMP_DIR
-tar xf $FRAMAC_TAR -C $TMP_DIR
+$TAR xf $FRAMAC_TAR -C $TMP_DIR
 
 # Check
 $HDRCK $CHECK_HEADER_OPT -spec-format="3-fields-by-line" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
@@ -193,7 +204,7 @@ echo $VERSION_CODENAME > $TMP_DIR/$FRAMAC/VERSION_CODENAME
 
 DATE="$(date +%F)"
 
-tar czf $FRAMAC_TAR.gz -C $TMP_DIR $FRAMAC \
+$TAR czf $FRAMAC_TAR.gz -C $TMP_DIR $FRAMAC \
   --numeric-owner --owner=0 --group=0 --sort=name --mode='a+rw' \
   --mtime="$DATE Z"
 
