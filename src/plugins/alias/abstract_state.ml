@@ -128,7 +128,7 @@ module AbstractState = struct
   (** export the graph to a dot file *)
   let print_dot _ =
     failwith "not implemented"
-      
+
   (* functions needed for Steensgaard's algorithm *)
 
   (** [init] creates an "empty" abstract state *)
@@ -136,7 +136,7 @@ module AbstractState = struct
     failwith "not implemented"
 
   (** join / fusion of two ecr; returns the mgu and the new graph ;
-     first argument is the union-find struture *)
+      first argument is the union-find struture *)
   let join _ =
     failwith "not implemented"
 
