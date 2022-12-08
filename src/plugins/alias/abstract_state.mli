@@ -48,14 +48,16 @@
 open Graph
 
 open Cil_types
+    
+open Cil_datatype
 
+module LSet = Lval.Set
+  
 (** module for vertices *)
 module V : Sig.VERTEX
 
 (** module for points-to graphs - persistant graph *)
 module G : Sig.P
-
-type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
 
 module MGU : sig
   (** module for the equivalence class, cf Steensgaard's paper *)
@@ -77,7 +79,7 @@ module MGU : sig
 
   (** [concretise mgu e] returns the set of lval that are reprensented
       by [e] in union-find structure [mgu] *)
-  val concretise : t -> ecr -> lset
+  val concretise : t -> ecr -> LSet.t
 
 end
 
@@ -89,7 +91,7 @@ module AbstractState : sig
 
   module VMap : sig type 'a t end (* todo : proper definition of VMap *)
 
-  type t = graph * lset VMap.t
+  type t = graph * LSet.t VMap.t
 
   type summary  = t * V.t list (* summary for functions : a state and a list of local variables and parameters (we may need 2 lists) *)
 

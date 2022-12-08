@@ -50,26 +50,34 @@ open Graph
 
 open Cil_types
 
+open Cil_datatype
 
-type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
+module LSet = Lval.Set
 
 (** module for vertices *)
 module V = struct
 
-  type t = int
+  type t =
+    {
+      id : int; (* id must be unique in a graph *)
+      set : LSet.t
+    }
 
+  let cmpt_v = ref (-1)
 
-  let compare = compare
+  let new_id () = incr cmpt_v; !cmpt_v
 
-  let hash = Hashtbl.hash
+  let compare x y = compare x.id y.id
 
-  let equal= (=)
+  let hash x = Hashtbl.hash x.id
 
-  type label = int
+  let equal = (=) (* todo : equal on id only ? *)
 
-  let create x = x
+  type label = LSet.t
 
-  let label x = x
+  let create s = { id = new_id () ; set = s}
+
+  let label x = x.set
 end
 
 
@@ -113,17 +121,30 @@ module AbstractState = struct
 
   type graph = G.t (* graph is persistant *)
 
-  type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
+  exception Found of V.t
+
+  let find_vertex lv g =
+    let f_iter v =
+      if LSet.mem lv (V.label v)
+      then raise (Found v)
+    in
+    try (G.iter_vertex f_iter g ; raise Not_found) with
+    | Found v -> v
+
 
   module VMap =Map.Make(V)
 
-  type t = graph * lset VMap.t
+  type t = graph * LSet.t VMap.t
 
   type summary  = t * V.t list (* summary for functions : a state and a list of local variables and parameters (we may need 2 lists) *)
 
   (** pretty printer *)
-  let pretty _ =
-    failwith "not implemented"
+  let pretty _ (x:t)=
+
+    match x with
+      (g,m) -> let s = snd(VMap.choose m) in
+      ignore(find_vertex (LSet.choose s) g); ()
+
 
   (** export the graph to a dot file *)
   let print_dot _ =
