@@ -20,23 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Graph
-
-module G = Persistent.Digraph.Concrete(Datatype.Int)
-
-type t = G.t
-
-(** a type for summaries of functions *)
-type summary = t (* final type may be different *)
-
-let stmt_table =
-  Cil_datatype.Stmt.Hashtbl.create 13
-
-let function_table =
-  Kernel_function.Hashtbl.create 13
-
-let do_stmt _ =
+let compute () =
   failwith "not implemented"
 
-let make_summary  _ =
+let clear () =
   failwith "not implemented"
+
+let get_abstract_state _ =
+   failwith "not implemented"

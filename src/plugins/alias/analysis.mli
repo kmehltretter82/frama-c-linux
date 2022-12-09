@@ -20,23 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Graph
+open Cil_types
 
-module G = Persistent.Digraph.Concrete(Datatype.Int)
+(** main analysis functions *)
+    
+(** [compute ()] performs the may-alias analysis. It must be done once
+    before using the other functions of this module *)
+val compute : unit -> unit
 
-type t = G.t
+(** [clear()] clears caches and imperative structures that are used by
+    the analysis. All accumulated data will be lost *)
+val clear : unit -> unit
 
-(** a type for summaries of functions *)
-type summary = t (* final type may be different *)
-
-let stmt_table =
-  Cil_datatype.Stmt.Hashtbl.create 13
-
-let function_table =
-  Kernel_function.Hashtbl.create 13
-
-let do_stmt _ =
-  failwith "not implemented"
-
-let make_summary  _ =
-  failwith "not implemented"
+(** [get_abstract_state f s] gets the abstract state computed after
+   statement [s] in function [f]. *)
+val get_abstract_state :  kernel_function -> stmt -> Abstract_state.t
