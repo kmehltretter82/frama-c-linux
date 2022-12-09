@@ -195,6 +195,15 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
   const hasMore = filtered.length < markerFields.length;
   const displayed = expand ? markerFields : filtered;
   const onSelected = (m: AST.marker): void => props.onChildSelected(marker, m);
+  const onFocused = (m: AST.marker | undefined): void => {
+    if (m) {
+      props.onHovered(m);
+      props.onFocused(m);
+    } else {
+      props.onHovered(marker);
+      props.onFocused(undefined);
+    }
+  };
   return (
     <div
       ref={isScrolled ? props.scroll : undefined}
@@ -241,7 +250,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
         <FieldInfo
           key={field.id}
           field={field}
-          onHovered={props.onFocused}
+          onHovered={onFocused}
           onSelected={onSelected}
         />
       ))}
@@ -306,21 +315,17 @@ export default function ASTinfo(): JSX.Element {
   // Callbacks
   const setExcluded = (fs: string[]): void =>
     setSetting(fs.join(':'));
-  const onSelected = (marker: AST.marker): void =>
+  const setSelected = (marker: AST.marker): void =>
     setSelection({ location: { fct, marker } });
-  const onHovered = (marker: AST.marker | undefined): void => {
+  const setHovered = (marker: AST.marker | undefined): void => {
     States.setHovered(marker ? { fct, marker } : undefined);
   };
-  const onFocused = (marker: AST.marker | undefined): void => {
-    onHovered(marker);
-    setFocused(marker);
-  };
-  const onPinned = (m: AST.marker): void =>
+  const setPinned = (m: AST.marker): void =>
     setMarkers(toggleMarker(markers, m));
-  const onChildSelected = (m: AST.marker, e: AST.marker): void => {
+  const setChildSelected = (m: AST.marker, e: AST.marker): void => {
     setMarkers(addMarker(markers, m));
     setFocused(undefined);
-    onSelected(e);
+    setSelected(e);
   };
   // Mark Rendering
   const renderMark = (marker: AST.marker): JSX.Element | null => {
@@ -337,11 +342,11 @@ export default function ASTinfo(): JSX.Element {
         selected={selected}
         excluded={excluded}
         marked={markers.includes(marker)}
-        onSelected={onSelected}
-        onHovered={onHovered}
-        onFocused={onFocused}
-        onPinned={onPinned}
-        onChildSelected={onChildSelected}
+        onSelected={setSelected}
+        onHovered={setHovered}
+        onFocused={setFocused}
+        onPinned={setPinned}
+        onChildSelected={setChildSelected}
       />
     );
   };
