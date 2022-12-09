@@ -1,12 +1,11 @@
 # MERCE
 
-
 GIT project for our collaboration with MERCE
 
 ## Project Members
 
-Julien (Signoles)
-Tristan
-Allan
-Loïc
+Allan Blanchard
+Loïc Correnson
+Tristan Le Gall
+Julien Signoles
 
