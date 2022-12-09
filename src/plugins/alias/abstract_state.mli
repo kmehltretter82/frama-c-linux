@@ -28,7 +28,7 @@ open Cil_types
 module G: Graph.Sig.G
 
 (** Type denothing an abstract state of the analysis. It is a graph containing
-   all aliases and points-to information. *)
+    all aliases and points-to information. *)
 type t = G.t
 
 (** Type denoting summaries of functions *)
