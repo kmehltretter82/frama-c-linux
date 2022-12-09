@@ -87,18 +87,15 @@ fi
 
 git archive HEAD -o $FRAMAC_TAR --prefix "$FRAMAC/"
 
-TAR_ACC=$FRAMAC_TAR
-
 PLUGINS=$(find src/plugins -mindepth 1 -maxdepth 1 -type d)
 EXTERNAL_PLUGINS=$(find src/plugins -type d -name ".git" | sed "s/\/.git//")
 
 for plugin in $EXTERNAL_PLUGINS ; do
    TAR="$(basename $plugin).tar"
    git -C $plugin archive HEAD -o $TAR --prefix "$FRAMAC/$plugin/"
-   TAR_ACC="$TAR_ACC $plugin/$TAR"
+   tar --concatenate --file=$FRAMAC_TAR "$plugin/$TAR"
+   rm -rf "$plugin/$TAR"
 done
-
-tar --concatenate --file=$TAR_ACC
 
 ################################################################################
 # Prepare header spec
@@ -200,5 +197,5 @@ fi
 # Cleaning
 
 rm -rf $HEADER_SPEC
-rm -rf $TAR_ACC
+rm -rf $FRAMAC_TAR
 rm -rf $TMP_DIR
