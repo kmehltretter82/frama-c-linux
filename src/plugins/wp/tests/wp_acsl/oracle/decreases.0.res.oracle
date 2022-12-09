@@ -22,7 +22,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Recursion variant:
-Call Effect at line 17
+Call decreases at line 17
 Assume { Type: is_uint32(n). (* Else *) Have: n != 0. }
 Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
 
@@ -37,7 +37,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (file decreases.i, line 37) in 'fact_i' (2/2):
-Call Effect at line 40
+Call terminates at line 40
 Assume {
   Type: is_sint32(n).
   (* Goal *)
@@ -50,7 +50,7 @@ Prove: 0 < n.
 ------------------------------------------------------------
 
 Goal Recursion variant:
-Call Effect at line 40
+Call decreases at line 40
 Assume { Type: is_sint32(n). (* Else *) Have: n != 0. }
 Prove: 0 <= n.
 
@@ -60,7 +60,7 @@ Prove: 0 <= n.
 ------------------------------------------------------------
 
 Goal Recursion variant:
-Call Effect at line 27
+Call decreases at line 27
 Assume { Type: is_uint32(n). (* Else *) Have: n != 0. }
 Prove: P_Rel(n, to_uint32(n - 1)).
 
@@ -70,7 +70,7 @@ Prove: P_Rel(n, to_uint32(n - 1)).
 ------------------------------------------------------------
 
 Goal Recursion variant:
-Call Effect at line 22
+Call decreases at line 22
 Assume { Type: is_uint32(n). (* Else *) Have: n != 0. }
 Prove: false.
 
@@ -85,7 +85,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (file decreases.i, line 43) in 'fails_fact_i' (2/2):
-Call Effect at line 46
+Call terminates at line 46
 Assume {
   Type: is_sint32(n).
   (* Goal *)
@@ -98,7 +98,7 @@ Prove: 0 <= n.
 ------------------------------------------------------------
 
 Goal Recursion variant:
-Call Effect at line 46
+Call decreases at line 46
 Assume { Type: is_sint32(n). (* Else *) Have: n != 0. }
 Prove: P_Rel(n, n - 1).
 
@@ -108,7 +108,7 @@ Prove: P_Rel(n, n - 1).
 ------------------------------------------------------------
 
 Goal Recursion variant:
-Call Effect at line 32
+Call decreases at line 32
 Assume { Type: is_uint32(n). (* Else *) Have: n != 0. }
 Prove: P_Rel(n, n).
 
@@ -118,7 +118,7 @@ Prove: P_Rel(n, n).
 ------------------------------------------------------------
 
 Goal Recursion variant:
-Call Effect at line 55
+Call decreases at line 55
 Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
 Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
 
@@ -128,14 +128,14 @@ Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
 ------------------------------------------------------------
 
 Goal Recursion variant (1/2):
-Call Effect at line 59
+Call decreases at line 59
 Assume { Type: is_uint32(x). (* Then *) Have: x != 0. }
 Prove: (0 <= x) /\ (to_uint32(x - 1) < x).
 
 ------------------------------------------------------------
 
 Goal Recursion variant (2/2):
-Call Effect at line 60
+Call decreases at line 60
 Assume { Type: is_uint32(x). (* Then *) Have: 11 <= x. }
 Prove: (0 <= x) /\ (to_uint32(x - 1) < x).
 
@@ -145,7 +145,7 @@ Prove: (0 <= x) /\ (to_uint32(x - 1) < x).
 ------------------------------------------------------------
 
 Goal Recursion variant (1/2):
-Call Effect at line 71
+Call decreases at line 71
 decreases.i:71: warning from wp:
  - Warning: Considering non decreasing call, looking for context inconsistency
    Reason: No decreases clause for missing_2
@@ -155,7 +155,7 @@ Prove: false.
 ------------------------------------------------------------
 
 Goal Recursion variant (2/2):
-Call Effect at line 72
+Call decreases at line 72
 Assume { Type: is_uint32(n). (* Then *) Have: 31 <= n. }
 Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
 
@@ -170,14 +170,14 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (file decreases.i, line 83) in 'mt1' (2/2):
-Call Effect at line 86
+Call terminates at line 86
 Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
 Prove: to_uint32(n - 1) <= 10.
 
 ------------------------------------------------------------
 
 Goal Recursion variant:
-Call Effect at line 86
+Call decreases at line 86
 Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
 Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
 
@@ -192,20 +192,20 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (file decreases.i, line 88) in 'mt2' (2/2):
-Call Effect at line 92
+Call terminates at line 92
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Recursion variant (1/2):
-Call Effect at line 91
+Call decreases at line 91
 Assume { Type: is_uint32(x). (* Then *) Have: x != 0. }
 Prove: (0 <= x) /\ (to_uint32(x - 1) < x).
 
 ------------------------------------------------------------
 
 Goal Recursion variant (2/2):
-Call Effect at line 92
+Call decreases at line 92
 Assume { Type: is_uint32(x). (* Then *) Have: 11 <= x. }
 Prove: (0 <= x) /\ (to_uint32(x - 1) < x).
 
@@ -215,7 +215,7 @@ Prove: (0 <= x) /\ (to_uint32(x - 1) < x).
 ------------------------------------------------------------
 
 Goal Recursion variant:
-Call Effect at line 105
+Call decreases at line 105
 decreases.i:105: warning from wp:
  - Warning: Considering non decreasing call, looking for context inconsistency
    Reason: On call to mw2, relation (Rel) does not match caller (Wrong)
@@ -228,7 +228,7 @@ Prove: false.
 ------------------------------------------------------------
 
 Goal Recursion variant (1/2):
-Call Effect at line 109
+Call decreases at line 109
 decreases.i:109: warning from wp:
  - Warning: Considering non decreasing call, looking for context inconsistency
    Reason: On call to mw1, relation (Wrong) does not match caller (Rel)
@@ -238,7 +238,7 @@ Prove: false.
 ------------------------------------------------------------
 
 Goal Recursion variant (2/2):
-Call Effect at line 110
+Call decreases at line 110
 Assume { Type: is_uint32(x). (* Then *) Have: 11 <= x. }
 Prove: P_Wrong(x, to_uint32(x - 1)).
 
@@ -248,7 +248,7 @@ Prove: P_Wrong(x, to_uint32(x - 1)).
 ------------------------------------------------------------
 
 Goal Recursion variant:
-Call Effect at line 123
+Call decreases at line 123
 Prove: true.
 
 ------------------------------------------------------------

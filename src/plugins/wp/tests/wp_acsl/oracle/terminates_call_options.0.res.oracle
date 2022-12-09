@@ -15,7 +15,7 @@
 ------------------------------------------------------------
 
 Goal Termination-condition (file terminates_call_options.c, line 22) in 'call_declaration':
-Call Effect at line 24
+Call terminates at line 24
 Prove: false.
 
 ------------------------------------------------------------
@@ -24,7 +24,7 @@ Prove: false.
 ------------------------------------------------------------
 
 Goal Termination-condition (file terminates_call_options.c, line 27) in 'call_definition':
-Call Effect at line 29
+Call terminates at line 29
 Prove: false.
 
 ------------------------------------------------------------
@@ -41,13 +41,13 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (file terminates_call_options.c, line 36) in 'libc_call' (1/2):
-Call Effect at line 38
+Call terminates at line 38
 Prove: false.
 
 ------------------------------------------------------------
 
 Goal Termination-condition (file terminates_call_options.c, line 36) in 'libc_call' (2/2):
-Call Effect at line 39
+Call terminates at line 39
 Prove: false.
 
 ------------------------------------------------------------

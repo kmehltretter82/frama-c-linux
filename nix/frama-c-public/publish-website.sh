@@ -64,17 +64,19 @@ then
   exit 128
 fi
 
-GIT="git -C $PUB_WEBSITE_DIR"
+cp -r $SRC_WEBSITE_DIR/* $PUB_WEBSITE_DIR
+cd $PUB_WEBSITE_DIR
 
-$GIT config user.name  "Frama-CI Bot"
-$GIT config user.email "frama-ci-bot@frama-c.com"
+git lfs install
+git config user.name  "Frama-CI Bot"
+git config user.email "frama-ci-bot@frama-c.com"
 
 function checkout {
   if git ls-remote --quiet --exit-code $PUB_WEBSITE_GIT $BRANCH
   then
-    $GIT checkout $BRANCH
+    git checkout $BRANCH
   else
-    $GIT checkout -b $BRANCH
+    git checkout -b $BRANCH
   fi
   if [ "$?" -ne "0" ]; then
     echo "Failed to checkout branch '$BRANCH', aborting"
@@ -83,7 +85,7 @@ function checkout {
 }
 
 function commit {
-  $GIT commit -F- <<EOF
+  git commit -F- <<EOF
 [release] prepare $VERSION-$LOWER_CODENAME
 
 On behalf of "$GITLAB_USER_NAME" <$GITLAB_USER_EMAIL> (@$GITLAB_USER_LOGIN)
@@ -97,9 +99,9 @@ EOF
 function push {
   if git ls-remote --quiet --exit-code $PUB_WEBSITE_GIT $BRANCH
   then
-    $GIT push
+    git push
   else
-    $GIT push \
+    git push \
       --set-upstream origin $BRANCH \
       -o merge_request.create \
       -o merge_request.title="Release $VERSION-$CODENAME" \
@@ -114,8 +116,7 @@ function push {
 
 checkout
 
-cp -r $SRC_WEBSITE_DIR/* $PUB_WEBSITE_DIR
-$GIT add -A
+git add -A
 
 commit
 push

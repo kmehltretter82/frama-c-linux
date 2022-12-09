@@ -26,7 +26,7 @@
   Missing terminates clause for ht, populates 'terminates \true'
 [wp] terminates_fp.i:79: Warning: Missing 'calls' for default behavior
 [wp] terminates_fp.i:79: Warning: 
-  No terminates clause on callee (unknown function)
+  Unknown callee, considering non-terminating call
 [wp] terminates_fp.i:79: Warning: 
   Missing decreases clause on recursive function warns_recursive, call must be unreachable
 ------------------------------------------------------------
@@ -44,7 +44,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (generated) in 'no_t_spec' (2/2):
-Call Effect at line 44
+Call terminates at line 44
 Tags: Call gnt.
 Assume { (* Heap *) Type: region(G_gnt_32) <= 0. }
 Prove: false.
@@ -65,7 +65,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (generated) in 'no_t_spec_cond' (2/2):
-Call Effect at line 64
+Call terminates at line 64
 Tags: Call hnt.
 Assume { (* Heap *) Type: region(G_hnt_37) <= 0. }
 Prove: false.
@@ -98,7 +98,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (generated) in 'no_t_spec_cond_m' (2/3):
-Call Effect at line 75
+Call terminates at line 75
 Tags: Call gt Call hnt.
 Assume { (* Heap *) Type: (region(G_gt_22) <= 0) /\ (region(G_hnt_37) <= 0).
 }
@@ -107,7 +107,7 @@ Prove: false.
 ------------------------------------------------------------
 
 Goal Termination-condition (generated) in 'no_t_spec_cond_m' (3/3):
-Call Effect at line 75
+Call terminates at line 75
 Tags: Call ht Call hnt.
 Assume { (* Heap *) Type: (region(G_hnt_37) <= 0) /\ (region(G_ht_27) <= 0).
 }
@@ -150,7 +150,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (generated) in 'no_t_spec_in_bhv' (2/2):
-Call Effect at line 58
+Call terminates at line 58
 Tags: Call gnt.
 Assume { (* Heap *) Type: region(G_gnt_32) <= 0. }
 Prove: false.
@@ -221,7 +221,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Termination-condition (generated) in 't_spec_in_bhv' (2/2):
-Call Effect at line 38
+Call terminates at line 38
 Tags: Call hnt.
 Prove: true.
 
@@ -246,8 +246,14 @@ Prove: true.
   Function warns_recursive
 ------------------------------------------------------------
 
-Goal Termination-condition (generated) in 'warns_recursive':
-Call Effect at line 79
+Goal Termination-condition (generated) in 'warns_recursive' (1/2):
+Call terminates (missing decreases) at line 79
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'warns_recursive' (2/2):
+Call terminates (missing terminates) at line 79
 Prove: false.
 
 ------------------------------------------------------------

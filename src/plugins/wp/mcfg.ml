@@ -29,6 +29,23 @@ type scope =
   | SC_Block_in
   | SC_Block_out
 
+type effect_source =
+  | FromCode
+  | FromCall
+  | FromReturn
+
+type terminates_source =
+  | Loop
+  | Terminates
+  | Decreases
+  | MissingTerminates
+  | MissingDecreases
+  | Dependencies
+
+type goal_source =
+  | Effect of effect_source
+  | Terminates of terminates_source
+
 module type Export =
 sig
   type pred
@@ -68,8 +85,10 @@ module type S = sig
   val add_hyp :
     ?for_pid:WpPropId.prop_id -> t_env -> WpPropId.pred_info -> t_prop -> t_prop
   val add_goal : t_env -> WpPropId.pred_info -> t_prop -> t_prop
-  val add_subgoal : t_env -> WpPropId.prop_id * 'a -> ?deps:Property.Set.t ->
-    predicate -> stmt -> WpPropId.effect_source -> t_prop -> t_prop
+
+  val add_terminates_subgoal :
+    t_env -> WpPropId.prop_id * 'a -> ?deps:Property.Set.t ->
+    predicate -> stmt -> terminates_source -> t_prop -> t_prop
 
   val add_assigns : t_env -> WpPropId.assigns_info -> t_prop -> t_prop
 
@@ -105,9 +124,10 @@ module type S = sig
     t_prop -> t_prop
 
   val call_terminates : t_env -> stmt ->
+    kind:terminates_source ->
     ?kf:kernel_function -> exp list ->
     WpPropId.pred_info ->
-    ?callee_t:predicate -> t_prop -> t_prop
+    callee_t:predicate -> t_prop -> t_prop
 
   val call_decreases : t_env -> stmt ->
     ?kf:kernel_function -> exp list ->

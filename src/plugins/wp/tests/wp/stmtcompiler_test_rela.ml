@@ -43,7 +43,7 @@ let run () =
         tags = []; warn = [];
         deps = Property.Set.empty;
         path = Cil_datatype.Stmt.Set.empty;
-        effect = None;
+        source = None;
       }
     in
     let funct = Kernel_function.get_definition kf in
