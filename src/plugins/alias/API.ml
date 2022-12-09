@@ -38,7 +38,7 @@ let fold_aliases_kf:
 let fold_fundec_stmts _ =
   failwith "not implemented"
 
-let is_equivalent  _ =
+let are_aliased  _ =
   failwith "not implemented"
 
 let fold_points_to _ =

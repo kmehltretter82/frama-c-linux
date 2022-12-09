@@ -30,37 +30,38 @@ open Cil_datatype
 
 (* previously get_class_before_statement *)
 (** [fold_aliases_stmt f_fold acc f s lv] folds [f_fold acc] over all
-    the aliases of the given lval [lv] right before the the given stmt
-    [s] in the given function [f]. *)
+   the aliases of the given lval [lv] right before stmt [s] in
+   function [f]. *)
 val fold_aliases_stmt: ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a
 
 (* previously get_class_after_statment *)
 (** [fold_new_aliases_stmt f_fold acc f s lv] folds [f_fold acc] over
-    all the aliases of the given lval [lv] right after the the given
-    stmt [s] in the given function [f]. *)
+   all the aliases of the given lval [lv] right after stmt [s] in
+   function [f]. *)
 val fold_new_aliases_stmt: ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a
 
 (* previously get_class_fundec *)
 (** [fold_aliases_kf f_fold acc f lv] folds [f_fold acc] over all the
-    aliases of the given lval [lv] at the end of the given function
-    [f]. *)
+    aliases of lval [lv] at the end of function [f]. *)
 val fold_aliases_kf: ('a -> lval -> 'a) -> 'a -> kernel_function -> lval -> 'a
 
-(** [fold_fundec_stmts f_fold acc f v] iters function [f_fold acc s e] on the list of pairs <s,e> where e is
-    the set of lval aliased to [v] after statement <s> in function [f]
-*)
+(** [fold_fundec_stmts f_fold acc f v] folds function [f_fold acc s e]
+   on the list of pairs <s,e> where e is the set of lval aliased to
+   [v] after statement <s> in function [f] *)
 val fold_fundec_stmts: ('a -> stmt -> lval -> 'a) -> 'a -> kernel_function -> lval -> 'a
 
-(** [is equivalent f s v1 v2] checks that two lval [v1] and [v2] have
-    the same ECR before statement [s] in function [f] *)
-val is_equivalent :  kernel_function -> stmt -> lval -> lval -> bool
+(** [are_aliased f s v1 v2] returns true if and only if the two
+   lvals [v1] and [v2] are aliased right after stmt [s] in function
+   [f]. *)
+val are_aliased: kernel_function -> stmt -> lval -> lval -> bool
+ 
 
-(** [fold_points_to f_fold acc f s v] iters [f_fold acc setv] where
-    [setv] is the set such as lval [v] may points to any lval [v'] of
-    [setv] before statement [s] in function [f] *)
+(** [fold_points_to f_fold acc f s v] folds [f_fold acc setv] where
+    [setv] is the set of lvals that are pointed to by [v] right after
+   statement [s] in function [f] *)
 val fold_points_to :  ('a ->  Lval.Set.t -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
 
 
 (** [fold_points_to_closure f_fold acc f s v] is the transitive
-    closure of the previous function [fold_points_to] *)
+    closure of function [fold_points_to] *)
 val fold_points_to_closure :  ('a ->  Lval.Set.t -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
