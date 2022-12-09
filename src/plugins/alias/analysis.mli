@@ -25,11 +25,11 @@ open Cil_types
 (** main analysis functions *)
 
 (** [compute ()] performs the may-alias analysis. It must be done once
-    before using the other functions of this module *)
+    before using the other functions of this module. *)
 val compute : unit -> unit
 
 (** [clear()] clears caches and imperative structures that are used by
-    the analysis. All accumulated data will be lost *)
+    the analysis. All accumulated data are lost. *)
 val clear : unit -> unit
 
 (** [get_abstract_state f s] gets the abstract state computed after

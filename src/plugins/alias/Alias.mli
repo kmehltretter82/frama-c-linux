@@ -20,14 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Analysis :
-sig
-  (** see file analysis.mli *)
+(** Interface for the Alias plug-in. *)
 
+module Analysis: sig
+  (** see file analysis.mli for documentation *)
   val compute : unit -> unit
-
   val clear : unit -> unit
-
 end
 
 
