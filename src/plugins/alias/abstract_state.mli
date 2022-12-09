@@ -20,34 +20,38 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
-
 (** Module abstract_state *)
-
-open Graph
 
 open Cil_types
 
-(** module for points-to graphs - persistant graph *)
-module G : Sig.P
+(** Points-to graphs datastructure. *)
+module G: Graph.Sig.G
 
-(** an abstract state is a graph containing all aliases and points-to
-    information *)
+(** Type denothing an abstract state of the analysis. It is a graph containing
+   all aliases and points-to information. *)
 type t = G.t
 
-(** a type for summaries of functions *)
+(** Type denoting summaries of functions *)
 type summary
 
-(** Hashtables to store the abstract states and summaries; *)
-val stmt_table : t Cil_datatype.Stmt.Hashtbl.t
+module type Table = sig
+  type key
+  type value
+  val find: key -> value
+  (** @raise Not_found if the key is not in the table. *)
+end
 
-val function_table : summary Kernel_function.Hashtbl.t
+(** Store the graph at each statement. *)
+module Stmt_table: Table with type key = stmt and type value = t
 
-(** [do_stmt a s] computes the next abstract state and stores it in
-    stmt_table *)
-val do_stmt : t -> stmt -> t
+(** Store the summary of each function. *)
+module Function_table:
+  Table with type key = kernel_function and type value = summary
+
+(** [do_stmt a s] computes the next state and stores it in [Stmt_table]. *)
+val do_stmt: t -> stmt -> t
 
 (** [make_summary a f] computes the summary of a function (and the
     next abstract state if needed) and stores the summary in
-    function_table *)
-val make_summary : t -> kernel_function -> t * summary
+    [Function_table]. *)
+val make_summary: t -> kernel_function -> t * summary

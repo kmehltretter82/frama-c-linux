@@ -29,11 +29,22 @@ type t = G.t
 (** a type for summaries of functions *)
 type summary = t (* final type may be different *)
 
-let stmt_table =
-  Cil_datatype.Stmt.Hashtbl.create 13
+module type Table = sig
+  type key
+  type value
+  val find: key -> value
+  (** @raise Not_found if the key is not in the table. *)
+end
 
-let function_table =
-  Kernel_function.Hashtbl.create 13
+module Make_table(H: Hashtbl.S)(V: sig type t end) = struct
+  type key = H.key
+  type value = V.t
+  let tbl = H.create 7
+  let find = H.find tbl
+end
+
+module Stmt_table = Make_table(Cil_datatype.Stmt.Hashtbl)(G)
+module Function_table = Make_table(Kernel_function.Hashtbl)(G)
 
 let do_stmt _ =
   failwith "not implemented"
