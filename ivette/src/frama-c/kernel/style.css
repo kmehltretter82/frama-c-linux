@@ -139,6 +139,10 @@
     margin-bottom: 1px ;
 }
 
+.astinfo-section.hovered .astinfo-kind {
+    color: var(--code-select);
+}
+
 .astinfo-kind {
     flex: 0 1 50px;
     text-align: center;
