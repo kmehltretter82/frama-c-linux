@@ -54,7 +54,7 @@ function toggleMarker(ms: AST.marker[], m: AST.marker): AST.marker[] {
 }
 
 function makeFilter(filter: string): string[] {
-  return filter.split('').filter((s) => s.length > 0).sort();
+  return filter.split(':').filter((s) => s.length > 0).sort();
 }
 
 // --------------------------------------------------------------------------
