@@ -63,7 +63,7 @@ module MGU : sig
   (** module for the equivalence class, cf Steensgaard's paper *)
 
 
-  type ecr = Bottom | Lval of lval (** type ECR = equivalence class representant, basically a lval or Bottom *)
+  type ecr (* = Bottom | Lval of lval *) (** type ECR = equivalence class representant, basically a lval or Bottom *)
 
   (** IMPERATIVE union find structure, aka "mgu"; every thime a mgu is
       given as an argument of a function, there may be sides effects *)
@@ -91,7 +91,7 @@ module AbstractState : sig
 
   module VMap : sig type 'a t end (* todo : proper definition of VMap *)
 
-  type t = graph * LSet.t VMap.t
+  type t (* = graph * LSet.t VMap.t *)
 
   type summary  = t * V.t list (* summary for functions : a state and a list of local variables and parameters (we may need 2 lists) *)
 

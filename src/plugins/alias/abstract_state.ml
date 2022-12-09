@@ -91,7 +91,7 @@ module MGU = struct
   (** module for the equivalence class, cf Steensgaard's paper *)
 
 
-  type ecr = Bottom | Lval of lval (** type ECR = equivalence class representant, basically a lval or Bottom *)
+  type ecr = LSet.t (* Bottom | Lval of lval *) (** type ECR = equivalence class representant, basically a lval or Bottom *)
 
   (** IMPERATIVE union find structure, aka "mgu"; every thime a mgu is
       given as an argument of a function, there may be sides effects *)
@@ -132,18 +132,15 @@ module AbstractState = struct
     | Found v -> v
 
 
-  module VMap =Map.Make(V)
+  (* module VMap =Map.Make(V) *)
 
-  type t = graph * LSet.t VMap.t
+  type t = graph (* * LSet.t VMap.t *)
 
   type summary  = t * V.t list (* summary for functions : a state and a list of local variables and parameters (we may need 2 lists) *)
 
   (** pretty printer *)
-  let pretty _ (x:t)=
+  let pretty fmt (x:t)=
 
-    match x with
-      (g,m) -> let s = snd(VMap.choose m) in
-      ignore(find_vertex (LSet.choose s) g); ()
 
 
   (** export the graph to a dot file *)
@@ -166,8 +163,12 @@ module AbstractState = struct
     failwith "not implemented"
 
   (** [find a e] returns the ecr corresponding to C expression [e] in abstract state [a] *)
-  let find  _ =
-    failwith "not implemented"
+  let find g e =
+    match e.enode with
+      Lval lv ->
+      let v = find_vertex lv g
+      in v.set
+    | _ -> raise Not_found
 end
 
 
