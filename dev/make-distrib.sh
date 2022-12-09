@@ -177,7 +177,6 @@ done
 # Headers
 
 TMP_DIR=$(mktemp -d)
-echo $TMP_DIR
 $TAR xf $FRAMAC_TAR -C $TMP_DIR
 
 # Check
