@@ -94,20 +94,23 @@ EXTERNAL_PLUGINS=$(find src/plugins -type d -name ".git" | sed "s/\/.git//")
 
 GIT_STATUS="$(git status --porcelain -- $(sed 's/^./:!&/' <<< $EXTERNAL_PLUGINS))"
 if [ "" != "$GIT_STATUS" ]; then
-    echo "WARNING: uncommitted changes will be IGNORED when making archive:"
-    echo "$GIT_STATUS"
-    echo ""
+  echo "WARNING: uncommitted changes will be IGNORED when making archive:"
+  echo "$GIT_STATUS" | sed 's/^/  /'
 fi
 
 ################################################################################
 # Add external plugin to archive
 
+if [ "" != "$EXTERNAL_PLUGINS" ]; then
+  echo "Including external plugins:"
+  echo "$EXTERNAL_PLUGINS" | sed 's/^/  /'
+fi
+
 for plugin in $EXTERNAL_PLUGINS ; do
-   echo "Including external plugin $(basename $plugin)"
-   PLUGIN_TAR="$(basename $plugin).tar"
-   git -C $plugin archive HEAD -o $PLUGIN_TAR --prefix "$FRAMAC/$plugin/"
-   $TAR --concatenate --file=$FRAMAC_TAR "$plugin/$PLUGIN_TAR"
-   rm -rf "$plugin/$PLUGIN_TAR"
+  PLUGIN_TAR="$(basename $plugin).tar"
+  git -C $plugin archive HEAD -o $PLUGIN_TAR --prefix "$FRAMAC/$plugin/"
+  $TAR --concatenate --file=$FRAMAC_TAR "$plugin/$PLUGIN_TAR"
+  rm -rf "$plugin/$PLUGIN_TAR"
 done
 
 ################################################################################
