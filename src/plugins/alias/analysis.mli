@@ -20,38 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Module abstract_state *)
-
 open Cil_types
 
-(** Points-to graphs datastructure. *)
-module G: Graph.Sig.G
+(** main analysis functions *)
 
-(** Type denothing an abstract state of the analysis. It is a graph containing
-    all aliases and points-to information. *)
-type t = G.t
+(** [compute ()] performs the may-alias analysis. It must be done once
+    before using the other functions of this module. *)
+val compute : unit -> unit
 
-(** Type denoting summaries of functions *)
-type summary
+(** [clear()] clears caches and imperative structures that are used by
+    the analysis. All accumulated data are lost. *)
+val clear : unit -> unit
 
-module type Table = sig
-  type key
-  type value
-  val find: key -> value
-  (** @raise Not_found if the key is not in the table. *)
-end
-
-(** Store the graph at each statement. *)
-module Stmt_table: Table with type key = stmt and type value = t
-
-(** Store the summary of each function. *)
-module Function_table:
-  Table with type key = kernel_function and type value = summary
-
-(** [do_stmt a s] computes the next state and stores it in [Stmt_table]. *)
-val do_stmt: t -> stmt -> t
-
-(** [make_summary a f] computes the summary of a function (and the
-    next abstract state if needed) and stores the summary in
-    [Function_table]. *)
-val make_summary: t -> kernel_function -> t * summary
+(** [get_abstract_state f s] gets the abstract state computed after
+    statement [s] in function [f]. *)
+val get_abstract_state :  kernel_function -> stmt -> Abstract_state.t

@@ -20,47 +20,34 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Graph
 
-(** External API of the plugin Alias
-  
-*)
+module G = Persistent.Digraph.Concrete(Datatype.Int)
 
+type t = G.t
 
-(* modules and predefined types *)
+(** a type for summaries of functions *)
+type summary = t (* final type may be different *)
 
-open Cil_types
+module type Table = sig
+  type key
+  type value
+  val find: key -> value
+  (** @raise Not_found if the key is not in the table. *)
+end
 
-open Abstract_state
+module Make_table(H: Hashtbl.S)(V: sig type t end) = struct
+  type key = H.key
+  type value = V.t
+  let tbl = H.create 7
+  let find = H.find tbl
+end
 
-type lset = Cil_datatype.Lval.Set.t  (* sets of lvalues *)
+module Stmt_table = Make_table(Cil_datatype.Stmt.Hashtbl)(G)
+module Function_table = Make_table(Kernel_function.Hashtbl)(G)
 
+let do_stmt _ =
+  failwith "not implemented"
 
-
-(** [compute ()] performes the may-alias analysis. Must be done once before using other functions *)
-val compute : unit -> unit
-
-(* Minimal API, as presented during kickoff meeting *)
-(** [get_class_before_statment f s v] gives a set of alias *)
-val get_class_before_statement : kernel_function -> stmt ->  lval -> lset
-val get_class_after_statement : kernel_function -> stmt ->  lval -> lset
-
-val get_class_fundec: kernel_function -> lval -> lset
-val get_class_fundec_stmts: kernel_function -> lval -> (stmt*lset) list
-
-
-(** connection with Abstract_state *)
-
-val concretise : MGU.ecr -> lset
-
-
-(** other functions required by MERCE *)
-
-(* checks that two Lval have the same ECR *)
-val is_equivalent :  kernel_function -> stmt -> lval -> lval -> bool
-
-(* give the graph vertex of lval *)
-val point_to :  kernel_function -> stmt -> lval -> V.t
-
-
-(* give the graph vertex of lval and its points-to closure *)
-val point_to_closure :  kernel_function -> stmt -> lval  -> G.t
+let make_summary  _ =
+  failwith "not implemented"

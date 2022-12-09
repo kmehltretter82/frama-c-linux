@@ -20,38 +20,28 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Module abstract_state *)
-
 open Cil_types
 
-(** Points-to graphs datastructure. *)
-module G: Graph.Sig.G
+let fold_aliases_stmt:
+  ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a =
+  function _ ->  failwith "not implemented"
 
-(** Type denothing an abstract state of the analysis. It is a graph containing
-    all aliases and points-to information. *)
-type t = G.t
+let fold_new_aliases_stmt:
+  ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a =
+  function _ -> failwith "not implemented"
 
-(** Type denoting summaries of functions *)
-type summary
+let fold_aliases_kf:
+  ('a -> lval -> 'a) -> 'a -> kernel_function -> lval -> 'a =
+  function _ -> failwith "not implemented"
 
-module type Table = sig
-  type key
-  type value
-  val find: key -> value
-  (** @raise Not_found if the key is not in the table. *)
-end
+let fold_fundec_stmts _ =
+  failwith "not implemented"
 
-(** Store the graph at each statement. *)
-module Stmt_table: Table with type key = stmt and type value = t
+let are_aliased  _ =
+  failwith "not implemented"
 
-(** Store the summary of each function. *)
-module Function_table:
-  Table with type key = kernel_function and type value = summary
+let fold_points_to _ =
+  failwith "not implemented"
 
-(** [do_stmt a s] computes the next state and stores it in [Stmt_table]. *)
-val do_stmt: t -> stmt -> t
-
-(** [make_summary a f] computes the summary of a function (and the
-    next abstract state if needed) and stores the summary in
-    [Function_table]. *)
-val make_summary: t -> kernel_function -> t * summary
+let fold_points_to_closure  _ =
+  failwith "not implemented"
