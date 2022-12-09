@@ -70,11 +70,12 @@ let derived ~package ~id jtype =
     declare ~package ~name:(Derived.order id).name
       ~descr:(Md.plain "Natural order for" @ Md.code id.name)
       (D_order(id,jtype)) ;
+    Jdata(id,jtype)
   end
 
 let declare ~package ~name ?descr jtype =
   let id = declare_id ~package ~name ?descr (D_type jtype) in
-  derived ~package ~id jtype ; Jdata id
+  derived ~package ~id jtype
 
 (* -------------------------------------------------------------------------- *)
 (* --- Option                                                             --- *)
@@ -382,8 +383,7 @@ struct
       let jtype =
         let fields = List.rev s.fields in
         let id = Package.declare_id ~package ~name ~descr (D_record fields) in
-        derived ~package ~id (Jrecord (List.map Package.field fields)) ;
-        Jdata id
+        derived ~package ~id (Jrecord (List.map Package.field fields))
       let default = s.default
       let has fd r = fd.member r
       let get fd r = fd.getter r
@@ -552,7 +552,7 @@ struct
       let jtype =
         let enums = D_enum (List.rev d.tags) in
         let id = Package.declare_id ~package ~name ~descr enums in
-        derived ~package ~id (Jenum id) ; Jdata id
+        derived ~package ~id (Jenum id)
       let of_json = of_json name d.values
       let to_json = to_json name d.lookup d.vindex
     end in

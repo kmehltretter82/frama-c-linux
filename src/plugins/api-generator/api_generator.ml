@@ -100,7 +100,7 @@ let makeJtype ?self ~names =
     | Jkey kd -> Format.fprintf fmt "Json.key<'#%s'>" kd
     | Jindex kd -> Format.fprintf fmt "Json.index<'#%s'>" kd
     | Jdict js -> Format.fprintf fmt "@[<hov 2>Json.dict<@,%a>@]" pp js
-    | Jdata id | Jenum id -> pp_ident fmt id
+    | Jdata(id,_) | Jenum id -> pp_ident fmt id
     | Joption js -> Format.fprintf fmt "%a |@ undefined" pp js
     | Jtuple js ->
       Pretty_utils.pp_list ~pre:"@[<hov 2>[ " ~sep:",@ " ~suf:"@ ]@]" pp fmt js
@@ -179,7 +179,7 @@ let rec makeDecoder ?self ~names fmt js =
   | Jtag a -> Format.fprintf fmt "Json.jTag(\"%s\")" a
   | Jkey kd -> jkey fmt kd
   | Jindex kd -> jindex fmt kd
-  | Jdata id -> jcall names fmt (Pkg.Derived.decode id)
+  | Jdata(id,_) -> jcall names fmt (Pkg.Derived.decode id)
   | Jenum id -> jenum names fmt id
   | Jself -> jcall names fmt (Pkg.Derived.decode (getSelf self))
   | Joption js ->
@@ -216,7 +216,7 @@ let makeOrder ~self ~names fmt js =
     | Jstring | Jkey _ -> Format.pp_print_string fmt "Compare.string"
     | Jboolean -> Format.pp_print_string fmt "Compare.boolean"
     | Jself -> jcall names fmt (Pkg.Derived.order self)
-    | Jdata id -> jcall names fmt (Pkg.Derived.order id)
+    | Jdata(id,_) -> jcall names fmt (Pkg.Derived.order id)
     | Joption js ->
       Format.fprintf fmt "@[<hov 2>Compare.defined(@,%a)@]" pp js
     | Jenum id ->
@@ -361,9 +361,8 @@ let makeDeclaration fmt names d =
       self.name jtype js self.name;
 
 
-  | D_array { arr_key ; arr_kind = jkey } ->
+  | D_array { arr_key ; arr_kind = jkey ; arr_rows = jrow } ->
     let data = Pkg.Derived.data self in
-    let jrow = Pkg.Jdata data in
     Format.fprintf fmt
       "@[<hv 2>const %s_internal: State.Array<@,%a,@,%a@,>@] = {@\n"
       self.name jtype jkey jtype jrow ;

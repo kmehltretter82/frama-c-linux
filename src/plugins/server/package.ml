@@ -175,8 +175,8 @@ type jtype =
   | Jtuple of jtype list
   | Junion of jtype list
   | Jrecord of (string * jtype) list
-  | Jdata of ident
   | Jenum of ident (* enum type declaration *)
+  | Jdata of ident * jtype (* underlying definition *)
   | Jself (* for (simply) recursive types *)
 
 (* -------------------------------------------------------------------------- *)
@@ -209,6 +209,7 @@ type requestInfo = {
 type arrayInfo = {
   arr_key: string;
   arr_kind: jtype;
+  arr_rows: jtype;
 }
 
 type declKindInfo =
@@ -298,7 +299,7 @@ let rec visit_jtype fn = function
   | Joption js | Jdict js  | Jarray js -> visit_jtype fn js
   | Jtuple js | Junion js -> List.iter (visit_jtype fn) js
   | Jrecord fjs -> List.iter (fun (_,js) -> visit_jtype fn js) fjs
-  | Jdata id | Jenum id ->
+  | Jdata(id,_) | Jenum id ->
     begin
       fn id ;
       fn (Derived.decode id) ;
@@ -461,7 +462,7 @@ let rec md_jtype pp = function
   | Jtag a -> litteral a
   | Jkey kd -> key kd
   | Jindex kd -> index kd
-  | Jdata id | Jenum id -> pp.ident id
+  | Jdata(id,_) | Jenum id -> pp.ident id
   | Joption js -> protect pp js @ Md.code "?"
   | Jtuple js -> Md.code "[" @ md_jlist pp "," js @ Md.code "]"
   | Junion js -> md_jlist pp "|" js
