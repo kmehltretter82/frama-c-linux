@@ -22,7 +22,7 @@
 
 
 open Cil_types
-    
+
 let fold_aliases_stmt:
   ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a =
   function _ ->  failwith "not implemented"

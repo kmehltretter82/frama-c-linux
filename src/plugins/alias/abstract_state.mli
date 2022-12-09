@@ -32,7 +32,7 @@ open Cil_types
 module G : Sig.P
 
 (** an abstract state is a graph containing all aliases and points-to
-   information *)
+    information *)
 type t = G.t
 
 (** a type for summaries of functions *)
@@ -44,10 +44,10 @@ val stmt_table : t Cil_datatype.Stmt.Hashtbl.t
 val function_table : summary Kernel_function.Hashtbl.t
 
 (** [do_stmt a s] computes the next abstract state and stores it in
-   stmt_table *)
+    stmt_table *)
 val do_stmt : t -> stmt -> t
 
 (** [make_summary a f] computes the summary of a function (and the
-   next abstract state if needed) and stores the summary in
-   function_table *)
+    next abstract state if needed) and stores the summary in
+    function_table *)
 val make_summary : t -> kernel_function -> t * summary
