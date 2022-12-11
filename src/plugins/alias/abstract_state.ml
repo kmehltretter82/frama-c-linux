@@ -22,7 +22,7 @@
 
 open Graph
 
-(* open Cil_types *)
+open Cil_types
 
 open Cil_datatype
 
@@ -49,7 +49,7 @@ module V = struct
   let equal x y = (compare x y = 0)
 
   let create s = { id = new_id () ; set = s}
-  
+
   let label x = x.set
 
 end
@@ -69,20 +69,20 @@ let pretty fmt (x:t) =
 
 let lset_to_string s =
   let buffer = Buffer.create 16 in
-  let fmt = Format.formatter_of_buffer buffer in  
+  let fmt = Format.formatter_of_buffer buffer in
   Format.fprintf fmt "%a" LSet.pretty s ;
   Buffer.contents buffer
 
 module Dot = Graphviz.Dot(struct
-   include G
-   let edge_attributes _ = []
-   let default_edge_attributes _ = []
-   let get_subgraph _ = None
-   let vertex_attributes _ = [`Shape `Box]
-   let vertex_name (v:V.t) = lset_to_string v.set
-   let default_vertex_attributes _ = []
-  let graph_attributes _ = []
-end)
+    include G
+    let edge_attributes _ = []
+    let default_edge_attributes _ = []
+    let get_subgraph _ = None
+    let vertex_attributes _ = [`Shape `Box]
+    let vertex_name (v:V.t) = lset_to_string v.set
+    let default_vertex_attributes _ = []
+    let graph_attributes _ = []
+  end)
 
 let print_dot filename (graph:t) =
   let file = open_out filename in
@@ -91,22 +91,44 @@ let print_dot filename (graph:t) =
 
 (* merge of two vertices *)
 let merge g v1 v2 =
-  let new_set = LSet.union (V.label v1) (V.label v2) in
-  let new_vertex = V.create new_set in
-  let g = G.add_vertex g new_vertex in
-  let f_fold_succ v_succ (g:t) : t=
-    G.add_edge g new_vertex v_succ
-  and f_fold_pred v_pred (g:t) :t =
-    G.add_edge g v_pred new_vertex
+  if v1 = v2
+  then g
+  else
+    let new_set = LSet.union (V.label v1) (V.label v2) in
+    let new_vertex = V.create new_set in
+    let g = G.add_vertex g new_vertex in
+    let f_fold_succ v_succ (g:t) : t=
+      G.add_edge g new_vertex v_succ
+    and f_fold_pred v_pred (g:t) :t =
+      G.add_edge g v_pred new_vertex
+    in
+    (* adds all new edges *)
+    let g = G.fold_succ f_fold_succ g v1 g in
+    let g = G.fold_succ f_fold_succ g v2 g in
+    let g = G.fold_pred f_fold_pred g v1 g in
+    let g = G.fold_pred f_fold_pred g v2 g in
+    (* remove the two old vertices *)
+    let g = G.remove_vertex g v1 in
+    G.remove_vertex g v2
+
+(* find the vertex of an lval *)
+(* TODO may be better with a map Lval -> Vertex.id *)
+exception Found of V.t
+
+let find_vertex g (lv:lval) : V.t =
+  let f_iter v =
+    if LSet.mem lv (V.label v)
+    then raise (Found v)
   in
-  (* adds all new edges *)
-  let g = G.fold_succ f_fold_succ g v1 g in
-  let g = G.fold_succ f_fold_succ g v2 g in
-  let g = G.fold_pred f_fold_pred g v1 g in
-  let g = G.fold_pred f_fold_pred g v2 g in
-  (* remove the two old vertices *)
-  let g = G.remove_vertex g v1 in
-  G.remove_vertex g v2
+  try (G.iter_vertex f_iter g ; raise Not_found) with
+  | Found v -> v
+
+let points_to g (lv:lval) : V.t list =
+  let v = find_vertex g lv in
+  G.succ g v
+
+
+(* steensgard's algorithm *)
 
 
 
@@ -136,3 +158,14 @@ let do_stmt _ =
 
 let make_summary  _ =
   failwith "not implemented"
+
+let _ =
+  let g = G.empty in
+  let v = V.create LSet.empty in
+  ignore (merge g v v);
+  let dummy_exp = {eid=0;enode= Const (CStr ""); eloc = Location.unknown} in
+  let dummy_lval = (Mem dummy_exp, NoOffset) in
+  ignore (points_to g dummy_lval);
+  (* dummy for compiling without " unused function" error *)
+  ()
+
