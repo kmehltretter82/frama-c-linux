@@ -23,9 +23,12 @@
 (** Module abstract_state *)
 
 open Cil_types
+    
+(* open Cil_datatype *)
 
 (** Points-to graphs datastructure. *)
 module G: Graph.Sig.G
+
 
 (** Type denothing an abstract state of the analysis. It is a graph containing
     all aliases and points-to information. *)
@@ -33,6 +36,7 @@ type t = G.t
 
 (** pretty printer *)
 val pretty : Format.formatter -> t -> unit
+
 
 (** dot printer *)
 val print_dot : string -> t -> unit
@@ -49,6 +53,7 @@ end
 
 (** Store the graph at each statement. *)
 module Stmt_table: Table with type key = stmt and type value = t
+
 
 (** Store the summary of each function. *)
 module Function_table:

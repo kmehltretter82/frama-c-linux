@@ -27,7 +27,7 @@ open Graph
 open Cil_datatype
 
 module LSet = Lval.Set
-                
+
 
 (** module for vertices *)
 module V = struct
@@ -51,6 +51,7 @@ module V = struct
   (* let create s = { id = new_id () ; set = s}
    * 
    * let label x = x.set *)
+
 end
 
 
@@ -83,8 +84,6 @@ module Dot = Graphviz.Dot(struct
   let graph_attributes _ = []
 end)
 
-
-
 let print_dot filename (graph:t) =
   let file = open_out filename in
   Dot.output_graph file graph;
@@ -107,6 +106,7 @@ module Make_table(H: Hashtbl.S)(V: sig type t end) = struct
   type value = V.t
   let tbl = H.create 7
   let find = H.find tbl
+
 end
 
 module Stmt_table = Make_table(Cil_datatype.Stmt.Hashtbl)(G)
