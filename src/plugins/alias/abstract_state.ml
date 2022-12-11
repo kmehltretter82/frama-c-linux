@@ -38,9 +38,9 @@ module V = struct
       set : LSet.t
     }
 
-  (* let cmpt_v = ref (-1) *)
+  let cmpt_v = ref (-1)
 
-  (* let new_id () = incr cmpt_v; !cmpt_v *)
+  let new_id () = incr cmpt_v; !cmpt_v
 
   let compare x y = Int.compare x.id y.id
 
@@ -48,9 +48,9 @@ module V = struct
 
   let equal x y = (compare x y = 0)
 
-  (* let create s = { id = new_id () ; set = s}
-   * 
-   * let label x = x.set *)
+  let create s = { id = new_id () ; set = s}
+  
+  let label x = x.set
 
 end
 
@@ -59,7 +59,7 @@ module G = Persistent.Digraph.Concrete(V)
 
 type t = G.t
 
-
+(* printing functions *)
 let pretty fmt (x:t) =
   Format.fprintf fmt "@[<hov 2>List of vertices: @.";
   G.iter_vertex (fun v -> Format.fprintf fmt "(id=%d LSet= %a)@." v.id LSet.pretty v.set) x;
@@ -88,6 +88,25 @@ let print_dot filename (graph:t) =
   let file = open_out filename in
   Dot.output_graph file graph;
   close_out file
+
+(* merge of two vertices *)
+let merge g v1 v2 =
+  let new_set = LSet.union (V.label v1) (V.label v2) in
+  let new_vertex = V.create new_set in
+  let g = G.add_vertex g new_vertex in
+  let f_fold_succ v_succ (g:t) : t=
+    G.add_edge g new_vertex v_succ
+  and f_fold_pred v_pred (g:t) :t =
+    G.add_edge g v_pred new_vertex
+  in
+  (* adds all new edges *)
+  let g = G.fold_succ f_fold_succ g v1 g in
+  let g = G.fold_succ f_fold_succ g v2 g in
+  let g = G.fold_pred f_fold_pred g v1 g in
+  let g = G.fold_pred f_fold_pred g v2 g in
+  (* remove the two old vertices *)
+  let g = G.remove_vertex g v1 in
+  G.remove_vertex g v2
 
 
 
