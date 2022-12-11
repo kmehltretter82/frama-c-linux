@@ -31,6 +31,12 @@ module G: Graph.Sig.G
     all aliases and points-to information. *)
 type t = G.t
 
+(** pretty printer *)
+val pretty : Format.formatter -> t -> unit
+
+(** dot printer *)
+val print_dot : string -> t -> unit
+
 (** Type denoting summaries of functions *)
 type summary
 

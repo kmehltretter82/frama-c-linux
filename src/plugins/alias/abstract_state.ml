@@ -22,9 +22,75 @@
 
 open Graph
 
-module G = Persistent.Digraph.Concrete(Datatype.Int)
+(* open Cil_types *)
+
+open Cil_datatype
+
+module LSet = Lval.Set
+                
+
+(** module for vertices *)
+module V = struct
+
+  type t =
+    {
+      id : Int.t; (* id must be unique in a graph *)
+      set : LSet.t
+    }
+
+  (* let cmpt_v = ref (-1) *)
+
+  (* let new_id () = incr cmpt_v; !cmpt_v *)
+
+  let compare x y = Int.compare x.id y.id
+
+  let hash x = Hashtbl.hash x.id (* toto utiliser fonction hash frama-c *)
+
+  let equal x y = (compare x y = 0)
+
+  (* let create s = { id = new_id () ; set = s}
+   * 
+   * let label x = x.set *)
+end
+
+
+module G = Persistent.Digraph.Concrete(V)
 
 type t = G.t
+
+
+let pretty fmt (x:t) =
+  Format.fprintf fmt "@[<hov 2>List of vertices: @.";
+  G.iter_vertex (fun v -> Format.fprintf fmt "(id=%d LSet= %a)@." v.id LSet.pretty v.set) x;
+  Format.fprintf fmt "@]@.@[<hov 2>List of edges: @.";
+  G.iter_edges (fun v1 v2 -> Format.fprintf fmt "(%d -> %d)@." v1.id v2.id) x;
+  Format.fprintf fmt "@]@."
+
+let lset_to_string s =
+  let buffer = Buffer.create 16 in
+  let fmt = Format.formatter_of_buffer buffer in  
+  Format.fprintf fmt "%a" LSet.pretty s ;
+  Buffer.contents buffer
+
+module Dot = Graphviz.Dot(struct
+   include G
+   let edge_attributes _ = []
+   let default_edge_attributes _ = []
+   let get_subgraph _ = None
+   let vertex_attributes _ = [`Shape `Box]
+   let vertex_name (v:V.t) = lset_to_string v.set
+   let default_vertex_attributes _ = []
+  let graph_attributes _ = []
+end)
+
+
+
+let print_dot filename (graph:t) =
+  let file = open_out filename in
+  Dot.output_graph file graph;
+  close_out file
+
+
 
 (** a type for summaries of functions *)
 type summary = t (* final type may be different *)
