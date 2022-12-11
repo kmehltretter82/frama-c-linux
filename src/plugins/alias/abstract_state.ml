@@ -28,6 +28,7 @@ open Cil_datatype
 
 module LSet = Lval.Set
 
+module LMap = Lval.Map
 
 (** module for vertices *)
 module V = struct
@@ -89,10 +90,10 @@ let print_dot filename (graph:t) =
   Dot.output_graph file graph;
   close_out file
 
-(* merge of two vertices *)
+(* merge of two vertices; returns the new vertex as well as the graph *)
 let merge g v1 v2 =
   if v1 = v2
-  then g
+  then None,g
   else
     let new_set = LSet.union (V.label v1) (V.label v2) in
     let new_vertex = V.create new_set in
@@ -109,13 +110,12 @@ let merge g v1 v2 =
     let g = G.fold_pred f_fold_pred g v2 g in
     (* remove the two old vertices *)
     let g = G.remove_vertex g v1 in
-    G.remove_vertex g v2
+    (Some new_vertex , G.remove_vertex g v2)
 
-(* find the vertex of an lval *)
-(* TODO may be better with a map Lval -> Vertex.id *)
+(* find the vertex of an lval, unefficient version *)
 exception Found of V.t
 
-let find_vertex g (lv:lval) : V.t =
+let unefficient_find_vertex g (lv:lval) : V.t =
   let f_iter v =
     if LSet.mem lv (V.label v)
     then raise (Found v)
@@ -123,12 +123,27 @@ let find_vertex g (lv:lval) : V.t =
   try (G.iter_vertex f_iter g ; raise Not_found) with
   | Found v -> v
 
-let points_to g (lv:lval) : V.t list =
-  let v = find_vertex g lv in
+(* find the vertex of an lval thanks to a map Lval -> V.t *)
+let find_vertex ?(map=LMap.empty) g lv =
+  try LMap.find lv map with
+    Not_found -> unefficient_find_vertex g lv
+
+let points_to ?(map=LMap.empty) g (lv:lval) : V.t list =
+  let v = find_vertex ~map g lv in
   G.succ g v
 
 
-(* steensgard's algorithm *)
+(** functions for steensgard's algorithm *)
+
+(* efficiency can be improved here *)
+module VSet = Set.Make(V)
+module VMap = Map.Make(V)
+
+(* helper for the algorithms ; must be given as an argument of every function, and updated with the graph *)
+type helper = {pending : VSet.t VMap.t ; lmap : V.t LMap.t}
+(* In the long term this shall be in the type t (instead of having LSet in each vertex) *)
+
+
 
 
 
@@ -165,6 +180,8 @@ let _ =
   ignore (merge g v v);
   let dummy_exp = {eid=0;enode= Const (CStr ""); eloc = Location.unknown} in
   let dummy_lval = (Mem dummy_exp, NoOffset) in
+  let h = {pending = VMap.empty ; lmap = LMap.empty } in
+  ignore (h);
   ignore (points_to g dummy_lval);
   (* dummy for compiling without " unused function" error *)
   ()
