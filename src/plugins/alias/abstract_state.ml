@@ -91,8 +91,9 @@ let print_dot filename (graph:t) =
   close_out file
 
 (* merge of two vertices; returns the new vertex as well as the graph *)
+(* TODO : optimisation = do the fusion only when needed *)
 let merge g v1 v2 =
-  if v1 = v2
+  if V.equal v1 v2
   then None,g
   else
     let new_set = LSet.union (V.label v1) (V.label v2) in
@@ -139,7 +140,10 @@ module VSet = Set.Make(V)
 module VMap = Map.Make(V)
 
 (* helper for the algorithms ; must be given as an argument of every function, and updated with the graph *)
-type helper = {pending : VSet.t VMap.t ; lmap : V.t LMap.t}
+type helper = {
+  pending : VSet.t VMap.t ; (* pending(v) is the set of vertices v' that could be aliased to v if v becomes/ is detected as a pointer *)
+  lmap : V.t LMap.t (* lmap(lv) is the vertex v corresponding to lval lv, in other words lv is in label(v) *)
+}
 (* In the long term this shall be in the type t (instead of having LSet in each vertex) *)
 
 (* functions join and unify-pointer of steensgaard's paper *)
@@ -148,7 +152,7 @@ let rec join (h:helper) (g:t) (v1:V.t) (v2:V.t) =
   then
     (h,g)
   else
-    let pt1 = G.succ g v1 in
+    let pt1 = G.succ g v1 in (* TODO ask frama-c type instead of looking in the graph *)
     let pt2 = G.succ g v2 in
     let new_v_opt,g = merge g v1 v2 in
     match new_v_opt with
@@ -183,6 +187,7 @@ let rec join (h:helper) (g:t) (v1:V.t) (v2:V.t) =
         (* join the succesors *)
         unify {pending=h.pending;lmap = m} g pt1 pt2
 
+(* [unify h f l1 l2] folds [join h g v1 v2] for all [v1] in [l1] and all [v2] in [l2] *)
 and unify (h:helper) (g:t) (l1:V.t list) (l2:V.t list) =
   match l1 with
     [] -> (h,g)
@@ -190,6 +195,7 @@ and unify (h:helper) (g:t) (l1:V.t list) (l2:V.t list) =
     let (h,g) = unify2 h g v1 l2 in
     unify h g qq l2
 
+(* [unify2 h f v1 l2] folds [join h g v1 v2] for all [v2] in [l2] *)
 and unify2  (h:helper) (g:t) (v1:V.t) (l2:V.t list) =
   match l2 with
     [] -> (h,g)
