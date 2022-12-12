@@ -60,6 +60,17 @@ module G = Persistent.Digraph.Concrete(V)
 
 type t = G.t
 
+(* efficiency can be improved here *)
+module VSet = Set.Make(V)
+module VMap = Map.Make(V)
+
+(* helper for the algorithms ; must be given as an argument of every function, and updated with the graph *)
+type helper = {
+  pending : VSet.t VMap.t ; (* pending(v) is the set of vertices v' that could be aliased to v if v becomes/ is detected as a pointer *)
+  lmap : V.t LMap.t (* lmap(lv) is the vertex v corresponding to lval lv, in other words lv is in label(v) *)
+}
+(* In the long term this shall be in the type t (instead of having LSet in each vertex) *)
+
 (* printing functions *)
 let pretty fmt (x:t) =
   Format.fprintf fmt "@[<hov 2>List of vertices: @.";
@@ -135,16 +146,6 @@ let points_to ?(map=LMap.empty) g (lv:lval) : V.t list =
 
 (** functions for steensgard's algorithm *)
 
-(* efficiency can be improved here *)
-module VSet = Set.Make(V)
-module VMap = Map.Make(V)
-
-(* helper for the algorithms ; must be given as an argument of every function, and updated with the graph *)
-type helper = {
-  pending : VSet.t VMap.t ; (* pending(v) is the set of vertices v' that could be aliased to v if v becomes/ is detected as a pointer *)
-  lmap : V.t LMap.t (* lmap(lv) is the vertex v corresponding to lval lv, in other words lv is in label(v) *)
-}
-(* In the long term this shall be in the type t (instead of having LSet in each vertex) *)
 
 (* functions join and unify-pointer of steensgaard's paper *)
 let rec join (h:helper) (g:t) (v1:V.t) (v2:V.t) =
@@ -217,6 +218,7 @@ let cjoin  (h:helper) (g:t) (v1:V.t) (v2:V.t) =
 let set_type (h:helper) (g:t) (v1:V.t) (v2:V.t) =
   let g = G.add_edge g v1 v2 in
   VSet.fold (fun vx (h,g) -> join h g v1 vx) (try VMap.find v1 h.pending with Not_found -> VSet.empty) (h,g)
+
 
 (** a type for summaries of functions *)
 type summary = t (* final type may be different *)

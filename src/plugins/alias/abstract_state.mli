@@ -24,23 +24,39 @@
 
 open Cil_types
 
-(* open Cil_datatype *)
+open Cil_datatype
 
 (** Points-to graphs datastructure. *)
 module G: Graph.Sig.G
 
-
+module LMap = Lval.Map
+                
 (** Type denothing an abstract state of the analysis. It is a graph containing
     all aliases and points-to information. *)
 type t = G.t
 
+(** helper for the algorithms ; must be given as an argument of every function, and updated with the graph *)
+type helper 
+
 (** pretty printer *)
 val pretty : Format.formatter -> t -> unit
-
 
 (** dot printer *)
 val print_dot : string -> t -> unit
 
+(** finds the vertex corresponding to a lval *)
+val find_vertex : ?map: G.V.t LMap.t -> t -> lval -> G.V.t
+
+(** finds the vertices pointed by a lval *)
+val points_to : ?map: G.V.t LMap.t -> t -> lval -> G.V.t list
+  
+(** Functions for the analysis *)
+val join : helper -> t -> G.V.t -> G.V.t -> helper * t
+                                            
+val cjoin : helper -> t -> G.V.t -> G.V.t -> helper * t
+                                             
+val set_type : helper -> t -> G.V.t -> G.V.t -> helper * t
+                                                
 (** Type denoting summaries of functions *)
 type summary
 
