@@ -45,6 +45,17 @@ if [ -z ${CI_LINK+x} ]; then
   CI_LINK="no"
 fi
 
+# For macOS: use gtar if available, otherwise test if tar is BSD
+if command -v gtar &> /dev/null; then
+  TAR=gtar
+else
+  if tar --version | grep -q bsdtar; then
+    echo "GNU tar required"
+    exit 1
+  fi
+  TAR=tar
+fi
+
 VERSION_SAFE=${VERSION/~/-}
 
 FRAMAC="frama-c-$VERSION_SAFE-$VERSION_CODENAME"
@@ -71,18 +82,6 @@ if [ "" != "$IGNORED_FILES" ]; then
 fi
 
 ################################################################################
-
-################################################################################
-# Warn if there are uncommitted changes (will not be taken into account)
-
-GIT_STATUS="$(git status --porcelain)"
-if [ "" != "$GIT_STATUS" ]; then
-    echo "WARNING: uncommitted changes will be IGNORED when making archive:"
-    echo "$GIT_STATUS"
-fi
-
-################################################################################
-
 # Prepare archive
 
 git archive HEAD -o $FRAMAC_TAR --prefix "$FRAMAC/"
@@ -90,11 +89,28 @@ git archive HEAD -o $FRAMAC_TAR --prefix "$FRAMAC/"
 PLUGINS=$(find src/plugins -mindepth 1 -maxdepth 1 -type d)
 EXTERNAL_PLUGINS=$(find src/plugins -type d -name ".git" | sed "s/\/.git//")
 
+################################################################################
+# Warn if there are uncommitted changes (will not be taken into account)
+
+GIT_STATUS="$(git status --porcelain -- $(sed 's/^./:!&/' <<< $EXTERNAL_PLUGINS))"
+if [ "" != "$GIT_STATUS" ]; then
+  echo "WARNING: uncommitted changes will be IGNORED when making archive:"
+  echo "$GIT_STATUS" | sed 's/^/  /'
+fi
+
+################################################################################
+# Add external plugin to archive
+
+if [ "" != "$EXTERNAL_PLUGINS" ]; then
+  echo "Including external plugins:"
+  echo "$EXTERNAL_PLUGINS" | sed 's/^/  /'
+fi
+
 for plugin in $EXTERNAL_PLUGINS ; do
-   TAR="$(basename $plugin).tar"
-   git -C $plugin archive HEAD -o $TAR --prefix "$FRAMAC/$plugin/"
-   tar --concatenate --file=$FRAMAC_TAR "$plugin/$TAR"
-   rm -rf "$plugin/$TAR"
+  PLUGIN_TAR="$(basename $plugin).tar"
+  git -C $plugin archive HEAD -o $PLUGIN_TAR --prefix "$FRAMAC/$plugin/"
+  $TAR --concatenate --file=$FRAMAC_TAR "$plugin/$PLUGIN_TAR"
+  rm -rf "$plugin/$PLUGIN_TAR"
 done
 
 ################################################################################
@@ -102,13 +118,17 @@ done
 
 HEADER_SPEC="header-spec.txt"
 
-git ls-files -z | git check-attr --stdin -z header_spec > $HEADER_SPEC
+git ls-files |\
+git check-attr --stdin export-ignore |\
+grep -v "export-ignore: set" | awk -F ': ' '{print $1}' |\
+git check-attr --stdin header_spec > $HEADER_SPEC
 
 for plugin in $EXTERNAL_PLUGINS ; do
-  git -C $plugin ls-files -z |\
-  git -C $plugin check-attr --stdin -z header_spec |\
-  xargs --null -n3 printf "$plugin/%s\n%s\n%s\n" |\
-  tr '\n' '\0' >> $HEADER_SPEC
+  git -C $plugin ls-files |\
+  git -C $plugin check-attr --stdin export-ignore |\
+  grep -v "export-ignore: set" | awk -F ': ' '{print $1}' |\
+  git -C $plugin check-attr --stdin header_spec |\
+  xargs -n3 printf "$plugin/%s %s %s\n" >> $HEADER_SPEC
 done
 
 ################################################################################
@@ -122,7 +142,7 @@ CHECK_HEADER_OPT="-header-dirs headers/open-source"
 for plugin in $PLUGINS ; do
   if [ -d "$plugin/headers/open-source" ] ; then
     CHECK_HEADER_OPT="$CHECK_HEADER_OPT -header-dirs $plugin/headers/open-source"
-  else
+  elif [ -d "$plugin/headers/close-source" ] ; then
     CHECK_HEADER_OPT="$CHECK_HEADER_OPT -header-dirs $plugin/headers/close-source"
   fi
 done
@@ -143,13 +163,15 @@ MAKE_HEADER_OPT="-header-dirs headers/$HEADER_KIND"
 # - have only close -> just use header kind, if it is open, build will fail
 # - have only open -> just use open
 for plugin in $PLUGINS ; do
-  if [ "$OPEN_SOURCE" == "yes" ] ; then
-    MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/open-source"
-  else
-    if [ ! -d "$plugin/headers/close-source" ] ; then
+  if [ -d "$plugin/headers" ] ; then
+    if [ "$OPEN_SOURCE" == "yes" ] ; then
       MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/open-source"
     else
-      MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/close-source"
+      if [ ! -d "$plugin/headers/close-source" ] ; then
+        MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/open-source"
+      else
+        MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/close-source"
+      fi
     fi
   fi
 done
@@ -158,13 +180,12 @@ done
 # Headers
 
 TMP_DIR=$(mktemp -d)
-echo $TMP_DIR
-tar xf $FRAMAC_TAR -C $TMP_DIR
+$TAR xf $FRAMAC_TAR -C $TMP_DIR
 
 # Check
-$HDRCK $CHECK_HEADER_OPT -spec-format="3-zeros" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
+$HDRCK $CHECK_HEADER_OPT -spec-format="3-fields-by-line" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
 # Update
-$HDRCK -update $MAKE_HEADER_OPT -spec-format="3-zeros" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
+$HDRCK -update $MAKE_HEADER_OPT -spec-format="3-fields-by-line" -C "$TMP_DIR/$FRAMAC" $HEADER_SPEC
 
 ################################################################################
 # Sanity check
@@ -185,7 +206,7 @@ echo $VERSION_CODENAME > $TMP_DIR/$FRAMAC/VERSION_CODENAME
 
 DATE="$(date +%F)"
 
-tar czf $FRAMAC_TAR.gz -C $TMP_DIR $FRAMAC \
+$TAR czf $FRAMAC_TAR.gz -C $TMP_DIR $FRAMAC \
   --numeric-owner --owner=0 --group=0 --sort=name --mode='a+rw' \
   --mtime="$DATE Z"
 
