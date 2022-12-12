@@ -132,7 +132,6 @@ let points_to ?(map=LMap.empty) g (lv:lval) : V.t list =
   let v = find_vertex ~map g lv in
   G.succ g v
 
-
 (** functions for steensgard's algorithm *)
 
 (* efficiency can be improved here *)
@@ -143,9 +142,75 @@ module VMap = Map.Make(V)
 type helper = {pending : VSet.t VMap.t ; lmap : V.t LMap.t}
 (* In the long term this shall be in the type t (instead of having LSet in each vertex) *)
 
+(* functions join and unify-pointer of steensgaard's paper *)
+let rec join (h:helper) (g:t) (v1:V.t) (v2:V.t) =
+  if not (G.mem_vertex g v1 && G.mem_vertex g v2)
+  then
+    (h,g)
+  else
+    let pt1 = G.succ g v1 in
+    let pt2 = G.succ g v2 in
+    let new_v_opt,g = merge g v1 v2 in
+    match new_v_opt with
+      None -> (h,g)
+    | Some new_v ->
+      (* update lmap *)
+      let m = LSet.fold (fun lv m -> LMap.add lv new_v m) (V.label new_v) h.lmap in
+      if pt1 = []
+      then
+        if pt2 = []
+        then
+          (* update pending *)
+          let p = VMap.add new_v (VSet.union (VMap.find v1 h.pending) (VMap.find v2 h.pending)) h.pending in
+          let p = VMap.remove v1 p in
+          let p = VMap.remove v2 p in
+          ({pending=p; lmap=m },g)
+        else
+          (* join pending v1 *)
+          VSet.fold
+            (fun v (h,g) -> join h g v new_v)
+            (try VMap.find v1 h.pending with Not_found -> VSet.empty )
+            ({pending = h.pending; lmap = m },g)
+      else
+      if pt2 = []
+      then
+        (* join pending v2 *)
+        VSet.fold
+          (fun v (h,g) -> join h g v new_v)
+          (try VMap.find v2 h.pending with Not_found -> VSet.empty )
+          ({pending = h.pending; lmap = m },g)
+      else
+        (* join the succesors *)
+        unify {pending=h.pending;lmap = m} g pt1 pt2
 
+and unify (h:helper) (g:t) (l1:V.t list) (l2:V.t list) =
+  match l1 with
+    [] -> (h,g)
+  | v1::qq ->
+    let (h,g) = unify2 h g v1 l2 in
+    unify h g qq l2
 
+and unify2  (h:helper) (g:t) (v1:V.t) (l2:V.t list) =
+  match l2 with
+    [] -> (h,g)
+  | v2::qq ->
+    let (h,g) = join h g v1 v2 in
+    unify2 h g v1 qq
 
+let cjoin  (h:helper) (g:t) (v1:V.t) (v2:V.t) =
+  let pt2=  G.succ g v2 in
+  if pt2 = []
+  then
+    let old_set = try VMap.find v2 h.pending with Not_found -> VSet.empty in
+    let new_pending = VMap.add v2 (VSet.add v2 old_set) h.pending in
+    ({pending=new_pending; lmap = h.lmap}, g)
+  else
+    join h g v1 v2
+
+(* in Steensgard's paper, this is written settype(v1,ref(v2,bot)) *)
+let set_type (h:helper) (g:t) (v1:V.t) (v2:V.t) =
+  let g = G.add_edge g v1 v2 in
+  VSet.fold (fun vx (h,g) -> join h g v1 vx) (try VMap.find v1 h.pending with Not_found -> VSet.empty) (h,g)
 
 (** a type for summaries of functions *)
 type summary = t (* final type may be different *)
@@ -175,6 +240,7 @@ let make_summary  _ =
   failwith "not implemented"
 
 let _ =
+  (* dummy for compiling without " unused function" error *)
   let g = G.empty in
   let v = V.create LSet.empty in
   ignore (merge g v v);
@@ -183,6 +249,7 @@ let _ =
   let h = {pending = VMap.empty ; lmap = LMap.empty } in
   ignore (h);
   ignore (points_to g dummy_lval);
-  (* dummy for compiling without " unused function" error *)
+  ignore (cjoin h g v v);
+  ignore (set_type h g v v);
   ()
 
