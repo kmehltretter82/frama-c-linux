@@ -77,17 +77,20 @@ export function printTextWithTags(
 
 interface MarkerProps {
   marker: string;
-  onSelected?: (marker: string) => void;
+  onSelected?: (marker: string, meta: boolean) => void;
   onHovered?: (marker: string | undefined) => void;
   children?: React.ReactNode;
 }
 
 function Marker(props: MarkerProps): JSX.Element {
   const { marker, onSelected, onHovered, children } = props;
+  const onClick = (evt: React.MouseEvent): void => {
+    onSelected && onSelected(marker, evt.altKey);
+  };
   return (
     <span
       className="kernel-text-marker"
-      onClick={() => onSelected && onSelected(marker)}
+      onClick={onClick}
       onMouseEnter={() => onHovered && onHovered(marker)}
       onMouseLeave={() => onHovered && onHovered(undefined)}
     >
@@ -98,7 +101,7 @@ function Marker(props: MarkerProps): JSX.Element {
 
 export interface TextProps {
   text: KernelData.text;
-  onSelected?: (marker: string) => void;
+  onSelected?: (marker: string, meta: boolean) => void;
   onHovered?: (marker: string | undefined) => void;
   className?: string;
 }

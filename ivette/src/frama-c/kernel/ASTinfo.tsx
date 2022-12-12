@@ -108,12 +108,14 @@ interface FieldInfo {
 
 interface FieldInfoProps {
   field: FieldInfo;
-  onSelected: (m: AST.marker) => void;
+  onSelected: (m: AST.marker, meta: boolean) => void;
   onHovered: (m: AST.marker | undefined) => void;
 }
 
 function FieldInfo(props: FieldInfoProps): JSX.Element {
-  const onSelected = (m: string) => void props.onSelected(AST.jMarker(m));
+  const onSelected = (m: string, meta: boolean): void => {
+    props.onSelected(AST.jMarker(m), meta);
+  };
   const onHovered = (m: string | undefined): void => {
     props.onHovered(m ? AST.jMarker(m) : undefined);
   };
@@ -168,10 +170,9 @@ interface InfoSectionProps {
   marked: boolean;
   excluded: string[];
   onHovered: (m: AST.marker | undefined) => void;
-  onFocused: (m: AST.marker | undefined) => void; // internal hover
-  onSelected: (m: AST.marker) => void;
+  onSelected: (m: AST.marker, meta: boolean) => void;
   onPinned: (m: AST.marker) => void;
-  onChildSelected: (m: AST.marker, e: AST.marker) => void;
+  onChildSelected: (m: AST.marker, e: AST.marker, meta: boolean) => void;
 }
 
 function MarkInfos(props: InfoSectionProps): JSX.Element {
@@ -194,14 +195,13 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
   const filtered = markerFields.filter((fd) => !excluded.includes(fd.id));
   const hasMore = filtered.length < markerFields.length;
   const displayed = expand ? markerFields : filtered;
-  const onSelected = (m: AST.marker): void => props.onChildSelected(marker, m);
-  const onFocused = (m: AST.marker | undefined): void => {
+  const onSelected = (m: AST.marker, meta: boolean): void =>
+    props.onChildSelected(marker, m, meta);
+  const onHovered = (m: AST.marker | undefined): void => {
     if (m) {
       props.onHovered(m);
-      props.onFocused(m);
     } else {
       props.onHovered(marker);
-      props.onFocused(undefined);
     }
   };
   return (
@@ -210,7 +210,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
       className={`astinfo-section ${highlight}`}
       onMouseEnter={() => props.onHovered(marker)}
       onMouseLeave={() => props.onHovered(undefined)}
-      onDoubleClick={() => props.onSelected(marker)}
+      onDoubleClick={() => props.onSelected(marker, false)}
     >
       <div
         key="MARKER"
@@ -250,7 +250,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
         <FieldInfo
           key={field.id}
           field={field}
-          onHovered={onFocused}
+          onHovered={onHovered}
           onSelected={onSelected}
         />
       ))}
@@ -293,40 +293,45 @@ function openFilter(
 const filterSettings = 'frama-c.sidebar.astinfo.filter';
 
 export default function ASTinfo(): JSX.Element {
-  // Hooks
+  // Selection Hooks
   const [markers, setMarkers] = React.useState<AST.marker[]>([]);
   const [setting, setSetting] = Dome.useStringSettings(filterSettings, '');
-  const [selection, setSelection] = States.useSelection();
+  const [selection] = States.useSelection();
   const [hovering] = States.useHovered();
-  const [focused, setFocused] = React.useState<AST.marker | undefined>();
   const allInfos = States.useSyncArray(AST.markerInfo);
   const allFields = States.useRequest(AST.getInformation, null) ?? [];
-  const scroll = React.useRef<HTMLDivElement>(null);
   const excluded = React.useMemo(() => makeFilter(setting), [setting]);
-  React.useEffect(() => {
-    scroll.current?.scrollIntoView({ block: 'nearest' });
+  // Scrolling Hooks
+  const [inside, setInside] = React.useState(false);
+  const scroll = React.useRef<HTMLDivElement>(null);
+  Dome.useEvent(States.MetaSelection, (loc: States.Location) => {
+    setMarkers(addMarker(markers, loc.marker));
   });
+  const scrollDiv = scroll.current;
+  React.useEffect(() => {
+    scrollDiv?.scrollIntoView({ block: 'nearest' });
+  }, [scrollDiv]);
   // Derived
   const fct = selection?.current?.fct;
   const selected = selection?.current?.marker;
   const hovered = hovering?.marker;
   const allMarkers = addMarker(addMarker(markers, selected), hovered);
-  const scrolled = focused === hovered ? undefined : (hovered || selected);
+  const scrolled = inside ? selected : (hovered || selected);
   // Callbacks
   const setExcluded = (fs: string[]): void =>
     setSetting(fs.join(':'));
-  const setSelected = (marker: AST.marker): void =>
-    setSelection({ location: { fct, marker } });
+  const setSelected = (marker: AST.marker, meta: boolean): void =>
+    States.setSelection({ fct, marker }, meta);
   const setHovered = (marker: AST.marker | undefined): void => {
     States.setHovered(marker ? { fct, marker } : undefined);
   };
   const setPinned = (m: AST.marker): void =>
     setMarkers(toggleMarker(markers, m));
-  const setChildSelected = (m: AST.marker, e: AST.marker): void => {
-    setMarkers(addMarker(markers, m));
-    setFocused(undefined);
-    setSelected(e);
-  };
+  const setChildSelected =
+    (m: AST.marker, e: AST.marker, meta: boolean): void => {
+      setMarkers(addMarker(markers, m));
+      setSelected(e, meta);
+    };
   // Mark Rendering
   const renderMark = (marker: AST.marker): JSX.Element | null => {
     const markerInfos = allInfos.getData(marker);
@@ -344,7 +349,6 @@ export default function ASTinfo(): JSX.Element {
         marked={markers.includes(marker)}
         onSelected={setSelected}
         onHovered={setHovered}
-        onFocused={setFocused}
         onPinned={setPinned}
         onChildSelected={setChildSelected}
       />
@@ -375,8 +379,12 @@ export default function ASTinfo(): JSX.Element {
           onClick={() => openFilter(allFields, excluded, setExcluded)}
         />
       </TitleBar>
-      <Boxes.Scroll>
+      <Boxes.Scroll
+        onMouseEnter={() => setInside(true)}
+        onMouseLeave={() => setInside(false)}
+      >
         {allMarkers.map(renderMark)}
+        <div style={{ height: 20 }} />
       </Boxes.Scroll>
     </>
   );
