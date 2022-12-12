@@ -220,6 +220,8 @@ let set_type (h:helper) (g:t) (v1:V.t) (v2:V.t) =
   VSet.fold (fun vx (h,g) -> join h g v1 vx) (try VMap.find v1 h.pending with Not_found -> VSet.empty) (h,g)
 
 
+
+
 (** a type for summaries of functions *)
 type summary = t (* final type may be different *)
 
@@ -240,6 +242,13 @@ end
 
 module Stmt_table = Make_table(Cil_datatype.Stmt.Hashtbl)(G)
 module Function_table = Make_table(Kernel_function.Hashtbl)(G)
+
+(* let do_assignment h t (lv,exp,loc) =
+ *   match (lv,exp.enode) with
+ *     ((Var v1, NoOffset), Lval lv2) -> ignore (v1,lv2)
+ *   | ((Mem e1, NoOffset), _) -> ignore (h,t,loc e1)
+ *   | _ -> failwith "not implemented" *)
+  
 
 let do_stmt _ =
   failwith "not implemented"
