@@ -247,17 +247,4 @@ let do_stmt _ =
 let make_summary  _ =
   failwith "not implemented"
 
-let _ =
-  (* dummy for compiling without " unused function" error *)
-  let g = G.empty in
-  let v = V.create LSet.empty in
-  ignore (merge g v v);
-  let dummy_exp = {eid=0;enode= Const (CStr ""); eloc = Location.unknown} in
-  let dummy_lval = (Mem dummy_exp, NoOffset) in
-  let h = {pending = VMap.empty ; lmap = LMap.empty } in
-  ignore (h);
-  ignore (points_to g dummy_lval);
-  ignore (cjoin h g v v);
-  ignore (set_type h g v v);
-  ()
 
