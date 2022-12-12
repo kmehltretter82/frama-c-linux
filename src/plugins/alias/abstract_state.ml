@@ -248,7 +248,6 @@ module Function_table = Make_table(Kernel_function.Hashtbl)(G)
  *     ((Var v1, NoOffset), Lval lv2) -> ignore (v1,lv2)
  *   | ((Mem e1, NoOffset), _) -> ignore (h,t,loc e1)
  *   | _ -> failwith "not implemented" *)
-  
 
 let do_stmt _ =
   failwith "not implemented"
