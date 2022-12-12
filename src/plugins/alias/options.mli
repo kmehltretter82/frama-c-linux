@@ -25,5 +25,5 @@
 (* -------------------------------------------------------------------------- *)
 
 include Plugin.S
-          
+
 module Enabled : Parameter_sig.Bool

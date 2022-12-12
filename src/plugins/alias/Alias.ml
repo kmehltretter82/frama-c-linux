@@ -22,3 +22,14 @@
 
 module Analysis = Analysis
 module API = API
+
+
+let main () =
+  if Options.Enabled.get() then
+    begin
+      Ast.compute ();
+      Options.feedback "Analysis complete"
+    end
+
+let () =
+  Db.Main.extend main
