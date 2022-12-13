@@ -761,10 +761,20 @@ let () = Information.register
         match loc with
         | PType typ -> typ
         | PGlobal (GType(ti,_)) -> ti.ttype
-        | PGlobal (GCompTagDecl(ci,_)) -> TComp(ci,[])
-        | PGlobal (GEnumTagDecl(ei,_)) -> TEnum(ei,[])
+        | PGlobal (GCompTagDecl(ci,_) | GCompTag(ci,_)) -> TComp(ci,[])
+        | PGlobal (GEnumTagDecl(ei,_) | GEnumTag(ei,_)) -> TEnum(ei,[])
         | _ -> raise Not_found
-      in Format.fprintf fmt "%i bits" (Cil.bitsSizeOf typ)
+      in
+      let bits = Cil.bitsSizeOf typ in
+      let bytes = bits / 8 in
+      let rbits = bits mod 8 in
+      if rbits > 0 then
+        if bytes > 0 then
+          Format.fprintf fmt "%d bytes + %d bits" bytes rbits
+        else
+          Format.fprintf fmt "%d bits" rbits
+      else
+        Format.fprintf fmt "%d bytes" bytes
     end
 
 (* -------------------------------------------------------------------------- *)
