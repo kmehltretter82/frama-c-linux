@@ -23,7 +23,7 @@
 # This file is the main makefile of Frama-C.
 
 MAKECONFIG_DIR=share
-DEVELOPER?=
+FRAMAC_DEVELOPER?=
 
 include $(MAKECONFIG_DIR)/Makefile.common
 
@@ -44,7 +44,7 @@ FRAMAC_LINTCK_SRC:=tools/lint
 .PHONY: all
 
 all::
-ifeq (${DEVELOPER},yes)
+ifeq (${FRAMAC_DEVELOPER},yes)
 	${MAKE} -C ${FRAMAC_LINTCK_SRC}
 	${MAKE} -C ${FRAMAC_HDRCK_SRC}
 endif
@@ -56,7 +56,7 @@ endif
 	dune build $(DUNE_BUILD_OPTS) @install
 
 clean:: purge-tests # to be done before a "dune" command
-ifeq (${DEVELOPER},yes)
+ifeq (${FRAMAC_DEVELOPER},yes)
 	${MAKE} -C ${FRAMAC_LINTCK_SRC} clean
 	${MAKE} -C ${FRAMAC_HDRCK_SRC} clean
 endif
@@ -81,7 +81,7 @@ help::
 include share/Makefile.installation
 include ivette/Makefile.installation
 
-ifeq (${DEVELOPER},yes)
+ifeq (${FRAMAC_DEVELOPER},yes)
 
 install::
 	${MAKE} -C ${FRAMAC_HDRCK_SRC} install
