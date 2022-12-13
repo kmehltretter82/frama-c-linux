@@ -1,0 +1,8 @@
+[kernel] Parsing generic.c (with preprocessing)
+[kernel] generic.c:50: User Error: 
+  controlling expression compatible with more than one association type in _Generic selection:
+  controlling expression: '(void (*)())0' (type: void (*)());
+  compatible types: void (*)(int ), void (*)(void)
+[kernel] User Error: stopping on file "generic.c" that has errors. Add '-kernel-msg-key pp'
+  for preprocessing command.
+[kernel] Frama-C aborted: invalid user input.
