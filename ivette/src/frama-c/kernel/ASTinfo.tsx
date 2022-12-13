@@ -202,7 +202,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
         States.setSelection({ fct, marker: m });
         break;
       case 'META':
-        States.setSelection({ fct, marker: m }, true);
+        States.setSelection({ fct, marker: m }, m !== marker);
         break;
       case 'DOUBLE':
         States.setSelection({ fct: scope, marker: m });
@@ -319,12 +319,12 @@ export default function ASTinfo(): JSX.Element {
   const allInfos = States.useSyncArray(AST.markerInfo);
   const allFields = States.useRequest(AST.getInformation, null) ?? [];
   const excluded = React.useMemo(() => makeFilter(setting), [setting]);
-  // Scrolling Hooks
-  const [inside, setInside] = React.useState(false);
-  const scroll = React.useRef<HTMLDivElement>(null);
   Dome.useEvent(States.MetaSelection, (loc: States.Location) => {
     setMarkers(addMarker(markers, loc.marker));
   });
+  // Scrolling Hooks
+  const [inside, setInside] = React.useState(false);
+  const scroll = React.useRef<HTMLDivElement>(null);
   const scrollDiv = scroll.current;
   React.useEffect(() => {
     scrollDiv?.scrollIntoView({ block: 'nearest' });
