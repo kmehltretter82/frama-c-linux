@@ -7705,6 +7705,85 @@ and doExp local_env
 
     | Cabs.EXPR_PATTERN _ -> abort_context "EXPR_PATTERN in cabs2cil input"
 
+
+    | Cabs.GENERIC (ce, assocs) ->
+      let (_, _, control_exp, control_t) = doExp local_env asconst ce AType in
+      match Cil.lvalue_conversion control_t with
+      | Error msg -> Kernel.abort ~current:true "%s" msg
+      | Ok control_t ->
+        let assocs = List.fold_left (fun acc (type_name, expr) ->
+            match type_name with
+            | None -> (* default *) (None, expr) :: acc
+            | Some (spec, dt) ->
+              let t = doOnlyType ghost spec dt in
+              if not (Cil.isCompleteType t) then
+                Kernel.abort ~current:true
+                  "generic association with incomplete type '%a'"
+                  Cil_datatype.Typ.pretty t
+              else if (Cil.isFunctionType t) then
+                Kernel.abort ~current:true
+                  "generic association with function type '%a'"
+                  Cil_datatype.Typ.pretty t
+              else if (Cil.is_variably_modified_type t) then
+                Kernel.abort ~current:true
+                  "generic association with variably modified type '%a'"
+                  Cil_datatype.Typ.pretty t
+              else begin
+                (* Check if current type is compatible with one of the previous
+                   associations. Note: this is quadratic in terms of list size.
+                *)
+                List.iter (fun (tn, _) ->
+                    match tn with
+                    | None -> ()
+                    | Some t' ->
+                      if areCompatibleTypes t t' then
+                        Kernel.abort ~current:true
+                          "multiple compatible types in _Generic selection:@ \
+                           '%a' and '%a'"
+                          Cil_printer.pp_typ t'
+                          Cil_printer.pp_typ t
+                  ) acc;
+                (Some t, expr) :: acc
+              end
+          ) [] assocs
+        in
+        let assocs = List.rev assocs in
+        let candidates =
+          List.filter (fun (type_name, _) ->
+              Option.fold ~none:false ~some:(areCompatibleTypes control_t) type_name
+            ) assocs
+        in
+        let defaults =
+          List.filter (fun (type_name, _) -> type_name = None) assocs
+        in
+        if List.length defaults > 1 then
+          Kernel.abort ~current:true
+            "multiple default clauses in _Generic selection";
+        if List.length candidates > 1 then
+          Kernel.abort ~current:true
+            "controlling expression compatible with more than one association \
+             type in _Generic selection:@ \
+             controlling expression: '%a' (type: %a);@ \
+             compatible types: %a"
+            Cil_printer.pp_exp control_exp
+            Cil_printer.pp_typ control_t
+            (Pretty_utils.pp_list ~sep:", " Cil_printer.pp_typ)
+            (List.map (fun (tn, _) -> Option.get tn) candidates)
+        else if List.length candidates == 1 then
+          doExp local_env asconst (snd (List.hd candidates)) what
+        else if List.length defaults == 0 then
+          let types =
+            List.map (fun (type_name, _) -> Option.get type_name) assocs
+          in
+          Kernel.abort ~current:true
+            "no compatible types and no default type in _Generic selection:@ \
+             controlling expression: '%a' (type: %a);@ \
+             candidate types: %a"
+            Cil_printer.pp_exp control_exp
+            Cil_printer.pp_typ control_t
+            (Pretty_utils.pp_list ~sep:", " Cil_printer.pp_typ) types;
+        else
+          doExp local_env asconst (snd (List.hd defaults)) what
   in
   (*let (_a,b,_c,_d) = result in
     Format.eprintf "doExp ~const:%b ~e:" asconst ;

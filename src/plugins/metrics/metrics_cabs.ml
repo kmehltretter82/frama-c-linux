@@ -168,7 +168,8 @@ class metricsCabsVisitor = object(self)
      | MEMBEROF _
      | MEMBEROFPTR _
      | GNU_BODY _
-     | EXPR_PATTERN _ -> ());
+     | EXPR_PATTERN _
+     | GENERIC _ -> ());
     Cil.DoChildren
 
   (* Allows to count only one control-flow branch per case lists *)

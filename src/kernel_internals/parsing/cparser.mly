@@ -337,7 +337,7 @@ let in_ghost_block ?(battrs=[]) l =
 %token<Cabs.cabsloc> THREAD THREAD_LOCAL
 %token<Cabs.cabsloc> GHOST
 
-%token<Cabs.cabsloc> SIZEOF ALIGNOF
+%token<Cabs.cabsloc> SIZEOF ALIGNOF GENERIC
 
 %token EQ PLUS_EQ MINUS_EQ STAR_EQ SLASH_EQ PERCENT_EQ
 %token AND_EQ PIPE_EQ CIRC_EQ INF_INF_EQ SUP_SUP_EQ
@@ -441,6 +441,8 @@ let in_ghost_block ?(battrs=[]) l =
  /* (* Each element is a "* <type_quals_opt>". *) */
 %type <attribute list list * cabsloc> pointer pointer_opt
 %type <Cabs.spec_elem * cabsloc> cvspec
+%type <(Cabs.spec_elem list * Cabs.decl_type) option * expression> generic_association
+%type <((Cabs.spec_elem list * Cabs.decl_type) option * expression) list> generic_association_list
 %%
 
 interpret: file { $1 }
@@ -531,6 +533,7 @@ primary_expression:                     /*(* 6.5.1. *)*/
 |		paren_comma_expression
 		        { make_expr (PAREN (smooth_expression $1)) }
 |		LPAREN block RPAREN { make_expr (GNU_BODY (fst3 $2)) }
+|  generic_selection { make_expr (GENERIC $1) }
 ;
 
 postfix_expression:                     /*(* 6.5.2 *)*/
@@ -1092,6 +1095,29 @@ static_assert_declaration:
       {
         ($3, fst $5, $1)
       }
+;
+
+generic_selection: /* ISO C11 6.5.1.1 */
+|   GENERIC LPAREN assignment_expression COMMA generic_association_list RPAREN
+      {
+        ($3, $5)
+      }
+
+generic_association_list:
+|   generic_association { [ $1 ] }
+|   generic_association COMMA generic_association_list { $1 :: $3 }
+
+generic_association:
+|   type_name COLON assignment_expression
+      {
+        let s, d = $1 in
+        (Some (s, d), $3)
+      }
+|   DEFAULT COLON assignment_expression
+      {
+        (None, $3)
+      }
+
 ;
 
 init_declarator_list:                       /* ISO 6.7 */

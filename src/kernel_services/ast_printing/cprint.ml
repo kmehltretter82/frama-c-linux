@@ -167,6 +167,7 @@ let get_operator exp =
   | MEMBEROFPTR (_, _) -> ("", 15)
   | GNU_BODY _ -> ("", 17)
   | EXPR_PATTERN _ -> ("", 16)     (* sm: not sure about this *)
+  | GENERIC _ -> ("", 18)     (* sm: not sure about this *)
 
 (*
 ** FrontC Pretty printer
@@ -345,6 +346,12 @@ and print_cast_expression fmt = function
     fprintf fmt "(@[%a@])" print_init_expression ie
   | SINGLE_INIT e -> print_expression_level cast_level fmt e
 
+and print_generic_association fmt (type_exp : (specifier * decl_type) option * expression) =
+  let type_name, exp = type_exp in
+  fprintf fmt "%a@ :@ %a"
+    (pp_opt ~none:"default" print_onlytype) type_name
+    print_expression exp
+
 and print_expression fmt (exp: expression) = print_expression_level 0 fmt exp
 
 and print_expression_level (lvl: int) fmt (exp : expression) =
@@ -402,6 +409,9 @@ and print_expression_level (lvl: int) fmt (exp : expression) =
     | GNU_BODY blk -> fprintf fmt "(@[%a@])" print_block blk
     | EXPR_PATTERN (name) -> fprintf fmt "@@expr(%s)" name
     | COMMA l -> pp_list ~sep:",@ " print_expression fmt l
+    | GENERIC (control_exp, typ_exps) ->
+      fprintf fmt "_Generic(@[%a,@ %a@])" print_expression control_exp
+        (pp_list ~sep:",@ " print_generic_association) typ_exps
   in
   if lvl >= lvl' then
     fprintf fmt "(@[%a@])" print_exp exp

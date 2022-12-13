@@ -483,6 +483,12 @@ and childrenExpression vis e =
     let b' = visitCabsBlock vis b in
     if b' != b then { e with expr_node = GNU_BODY b' } else e
   | EXPR_PATTERN _ -> e
+  | GENERIC (e, generic_assocs) ->
+    let e' = ve e in
+    let exps = List.map snd generic_assocs in
+    let exps' = List.map (fun e -> ve e) exps in
+    let assocs' = List.map2 (fun assoc exp' -> (fst assoc, exp')) generic_assocs exps' in
+    { e with expr_node = GENERIC (e', assocs') }
 
 and visitCabsInitExpression vis (ie: init_expression) : init_expression =
   doVisit vis vis#vinitexpr childrenInitExpression ie

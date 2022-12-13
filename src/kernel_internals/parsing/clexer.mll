@@ -266,8 +266,14 @@ let init_lexicon _ =
            "_Complex is currently unsupported by Frama-C.");
       ("_Generic",
        fun loc ->
-         Kernel.fatal ~source:(fst loc)
-           "_Generic is currently unsupported by Frama-C.");
+         if Kernel.C11.get () then GENERIC loc
+         else begin
+           Kernel.(
+             warning
+               ~wkey:wkey_conditional_feature
+               "_Generic is a C11 keyword, use -c11 option to enable it");
+           IDENT "_Generic"
+         end);
       ("_Imaginary",
        fun loc ->
          Kernel.fatal ~source:(fst loc)
