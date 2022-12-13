@@ -755,11 +755,12 @@ let () = Information.register
 let () = Information.register
     ~id:"kernel.ast.typesizeof"
     ~label:"Sizeof"
-    ~title:"Size of a C type"
+    ~title:"Size of a C-type or C-variable"
     begin fun fmt loc ->
       let typ =
         match loc with
         | PType typ -> typ
+        | PVDecl(_,_,vi) -> vi.vtype
         | PGlobal (GType(ti,_)) -> ti.ttype
         | PGlobal (GCompTagDecl(ci,_) | GCompTag(ci,_)) -> TComp(ci,[])
         | PGlobal (GEnumTagDecl(ei,_) | GEnumTag(ei,_)) -> TEnum(ei,[])
