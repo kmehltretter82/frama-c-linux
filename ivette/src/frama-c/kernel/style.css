@@ -90,7 +90,7 @@
 }
 
 .astinfo-section.hovered {
-    background: var(--highlighted-marker);
+    background: var(--code-hover-light);
 }
 
 .astinfo-section.selected.hovered {
@@ -137,10 +137,6 @@
     display: flex ;
     margin-top: 1px ;
     margin-bottom: 1px ;
-}
-
-.astinfo-section.hovered .astinfo-kind {
-    color: var(--code-select);
 }
 
 .astinfo-kind {
