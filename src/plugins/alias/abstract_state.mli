@@ -33,10 +33,8 @@ module LMap = Lval.Map
 
 (** Type denothing an abstract state of the analysis. It is a graph containing
     all aliases and points-to information. *)
-type t = G.t
+type t
 
-(** helper for the algorithms ; must be given as an argument of every function, and updated with the graph *)
-type helper
 
 (** pretty printer *)
 val pretty : Format.formatter -> t -> unit
@@ -45,17 +43,17 @@ val pretty : Format.formatter -> t -> unit
 val print_dot : string -> t -> unit
 
 (** finds the vertex corresponding to a lval *)
-val find_vertex : ?map: G.V.t LMap.t -> t -> lval -> G.V.t
+val find_vertex : lval -> t -> G.V.t
 
 (** finds the vertices pointed by a lval *)
-val points_to : ?map: G.V.t LMap.t -> t -> lval -> G.V.t list
+val points_to : lval -> t -> G.V.t list
 
 (** Functions for the analysis *)
-val join : helper -> t -> G.V.t -> G.V.t -> helper * t
+val join : t -> G.V.t -> G.V.t -> t
 
-val cjoin : helper -> t -> G.V.t -> G.V.t -> helper * t
+val cjoin : t -> G.V.t -> G.V.t -> t
 
-val set_type : helper -> t -> G.V.t -> G.V.t -> helper * t
+val set_type : t -> G.V.t -> G.V.t -> t
 
 (** Type denoting summaries of functions *)
 type summary
@@ -68,12 +66,12 @@ module type Table = sig
 end
 
 (** Store the graph at each statement. *)
-module Stmt_table: Table with type key = stmt and type value = t
+module Stmt_table: Table with type key = stmt and type value = G.t
 
 
 (** Store the summary of each function. *)
 module Function_table:
-  Table with type key = kernel_function and type value = summary
+  Table with type key = kernel_function and type value = G.t
 
 (** [do_stmt a s] computes the next state and stores it in [Stmt_table]. *)
 val do_stmt: t -> stmt -> t

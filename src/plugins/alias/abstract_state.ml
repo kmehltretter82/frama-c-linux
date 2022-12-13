@@ -26,198 +26,197 @@ open Cil_types
 
 open Cil_datatype
 
-module LSet = Lval.Set
 
+(* (\** module for vertices *\)
+ * module V = struct
+ *
+ *   type t =
+ *     {
+ *       id : Int.t; (\* id must be unique in a graph *\)
+ *       set : LSet.t
+ *     }
+ *
+ *   let cmpt_v = ref (-1)
+ *
+ *   let new_id () = incr cmpt_v; !cmpt_v
+ *
+ *   let compare x y = Int.compare x.id y.id
+ *
+ *   let hash x = Hashtbl.hash x.id (\* toto utiliser fonction hash frama-c *\)
+ *
+ *   let equal x y = (compare x y = 0)
+ *
+ *   let create s = { id = new_id () ; set = s}
+ *
+ *   let label x = x.set
+ *
+ * end *)
+
+
+module G = Persistent.Digraph.Concrete(Datatype.Int)
+
+module V = G.V
+
+module VSet = Datatype.Int.Set
+module VMap = Datatype.Int.Map
+
+module LSet = Lval.Set
 module LMap = Lval.Map
 
-(** module for vertices *)
-module V = struct
-
-  type t =
-    {
-      id : Int.t; (* id must be unique in a graph *)
-      set : LSet.t
-    }
-
-  let cmpt_v = ref (-1)
-
-  let new_id () = incr cmpt_v; !cmpt_v
-
-  let compare x y = Int.compare x.id y.id
-
-  let hash x = Hashtbl.hash x.id (* toto utiliser fonction hash frama-c *)
-
-  let equal x y = (compare x y = 0)
-
-  let create s = { id = new_id () ; set = s}
-
-  let label x = x.set
-
-end
 
 
-module G = Persistent.Digraph.Concrete(V)
-
-type t = G.t
-
-(* efficiency can be improved here *)
-module VSet = Set.Make(V)
-module VMap = Map.Make(V)
-
-(* helper for the algorithms ; must be given as an argument of every function, and updated with the graph *)
-type helper = {
+type t = {
+  graph : G.t;
   pending : VSet.t VMap.t ; (* pending(v) is the set of vertices v' that could be aliased to v if v becomes/ is detected as a pointer *)
-  lmap : V.t LMap.t (* lmap(lv) is the vertex v corresponding to lval lv, in other words lv is in label(v) *)
+  lmap : V.t LMap.t ; (* lmap(lv) is the vertex v corresponding to lval lv, in other words lv is in label(v) *)
+  vmap : LSet.t VMap.t (* reverse of lmap *)
 }
-(* In the long term this shall be in the type t (instead of having LSet in each vertex) *)
+
+(* find functions *)
+let find_lset (v:V.t) (x:t) =
+  try VMap.find v x.vmap
+  with Not_found -> LSet.empty
+
+(* find the vertex of an lval, unefficient version *)
+let find_vertex (lv:lval) (x:t) =
+  LMap.find lv x.lmap
+(** @raise Not_found if there is not such an lval in the graph *)
+
+let points_to(lv:lval) (x:t): V.t list =
+  let v = find_vertex lv x in
+  G.succ x.graph v
 
 (* printing functions *)
 let pretty fmt (x:t) =
   Format.fprintf fmt "@[<hov 2>List of vertices: @.";
-  G.iter_vertex (fun v -> Format.fprintf fmt "(id=%d LSet= %a)@." v.id LSet.pretty v.set) x;
+  G.iter_vertex (fun v -> Format.fprintf fmt "(id=%d LSet= %a)@." v LSet.pretty (find_lset v x)) x.graph;
   Format.fprintf fmt "@]@.@[<hov 2>List of edges: @.";
-  G.iter_edges (fun v1 v2 -> Format.fprintf fmt "(%d -> %d)@." v1.id v2.id) x;
+  G.iter_edges (fun v1 v2 -> Format.fprintf fmt "(%d -> %d)@." v1 v2) x.graph;
   Format.fprintf fmt "@]@."
 
-let lset_to_string s =
-  let buffer = Buffer.create 16 in
-  let fmt = Format.formatter_of_buffer buffer in
-  Format.fprintf fmt "%a" LSet.pretty s ;
-  Buffer.contents buffer
+(* let lset_to_string s =
+ *   let buffer = Buffer.create 16 in
+ *   let fmt = Format.formatter_of_buffer buffer in
+ *   Format.fprintf fmt "%a" LSet.pretty s ;
+ *   Buffer.contents buffer
+ *
+ * module Dot = Graphviz.Dot(struct
+ *     include G
+ *     let edge_attributes _ = []
+ *     let default_edge_attributes _ = []
+ *     let get_subgraph _ = None
+ *     let vertex_attributes _ = [`Shape `Box]
+ *     let vertex_name (v:V.t) = lset_to_string ()
+ *     let default_vertex_attributes _ = []
+ *     let graph_attributes _ = []
+ *   end) *)
 
-module Dot = Graphviz.Dot(struct
-    include G
-    let edge_attributes _ = []
-    let default_edge_attributes _ = []
-    let get_subgraph _ = None
-    let vertex_attributes _ = [`Shape `Box]
-    let vertex_name (v:V.t) = lset_to_string v.set
-    let default_vertex_attributes _ = []
-    let graph_attributes _ = []
-  end)
+let print_dot _ = (* filename (graph:t) = *)
+  failwith "not implemented"
+(* let file = open_out filename in
+ * Dot.output_graph file graph;
+ * close_out file *)
 
-let print_dot filename (graph:t) =
-  let file = open_out filename in
-  Dot.output_graph file graph;
-  close_out file
-
-(* merge of two vertices; returns the new vertex as well as the graph *)
-(* TODO : optimisation = do the fusion only when needed *)
-let merge g v1 v2 =
+(* merge of two vertices; the first vertex carries both sets, the second is removed from the graph and from lmap and vmap; however, pending is NOT updated  *)
+let merge x v1 v2 =
   if V.equal v1 v2
-  then None,g
+  then x
   else
-    let new_set = LSet.union (V.label v1) (V.label v2) in
-    let new_vertex = V.create new_set in
-    let g = G.add_vertex g new_vertex in
-    let f_fold_succ v_succ (g:t) : t=
-      G.add_edge g new_vertex v_succ
-    and f_fold_pred v_pred (g:t) :t =
-      G.add_edge g v_pred new_vertex
+    let set1 = find_lset v1 x in
+    let set2 = find_lset v2 x in
+    let new_set = LSet.union set1 set2 in
+    (* update lmap : every lval in v2 must now be associated with v1*)
+    let new_lmap = LSet.fold (fun lv2 m -> LMap.add lv2 v1 m) set2 x.lmap in
+    (* update vmap *)
+    let new_vmap = VMap.add v1 new_set (VMap.remove v2 x.vmap) in
+    (* update the graph *)
+    let f_fold_succ v_succ (g:G.t) : G.t =
+      G.add_edge g v1 v_succ
+    and f_fold_pred v_pred (g:G.t) : G.t =
+      G.add_edge g v_pred v1
     in
+    let g = x.graph in
     (* adds all new edges *)
-    let g = G.fold_succ f_fold_succ g v1 g in
     let g = G.fold_succ f_fold_succ g v2 g in
-    let g = G.fold_pred f_fold_pred g v1 g in
     let g = G.fold_pred f_fold_pred g v2 g in
-    (* remove the two old vertices *)
-    let g = G.remove_vertex g v1 in
-    (Some new_vertex , G.remove_vertex g v2)
+    (* remove v2 *)
+    let g =  G.remove_vertex g v2 in
+    {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap}
 
-(* find the vertex of an lval, unefficient version *)
-exception Found of V.t
-
-let unefficient_find_vertex g (lv:lval) : V.t =
-  let f_iter v =
-    if LSet.mem lv (V.label v)
-    then raise (Found v)
-  in
-  try (G.iter_vertex f_iter g ; raise Not_found) with
-  | Found v -> v
-
-(* find the vertex of an lval thanks to a map Lval -> V.t *)
-let find_vertex ?(map=LMap.empty) g lv =
-  try LMap.find lv map with
-    Not_found -> unefficient_find_vertex g lv
-
-let points_to ?(map=LMap.empty) g (lv:lval) : V.t list =
-  let v = find_vertex ~map g lv in
-  G.succ g v
 
 (** functions for steensgard's algorithm *)
 
 
 (* functions join and unify-pointer of steensgaard's paper *)
-let rec join (h:helper) (g:t) (v1:V.t) (v2:V.t) =
-  if not (G.mem_vertex g v1 && G.mem_vertex g v2)
+let rec join (x:t) (v1:V.t) (v2:V.t) : t =
+  if not (G.mem_vertex x.graph v1 && G.mem_vertex x.graph v2)
   then
-    (h,g)
+    x
   else
-    let pt1 = G.succ g v1 in (* TODO ask frama-c type instead of looking in the graph *)
-    let pt2 = G.succ g v2 in
-    let new_v_opt,g = merge g v1 v2 in
-    match new_v_opt with
-      None -> (h,g)
-    | Some new_v ->
-      (* update lmap *)
-      let m = LSet.fold (fun lv m -> LMap.add lv new_v m) (V.label new_v) h.lmap in
-      if pt1 = []
-      then
-        if pt2 = []
-        then
-          (* update pending *)
-          let p = VMap.add new_v (VSet.union (VMap.find v1 h.pending) (VMap.find v2 h.pending)) h.pending in
-          let p = VMap.remove v1 p in
-          let p = VMap.remove v2 p in
-          ({pending=p; lmap=m },g)
-        else
-          (* join pending v1 *)
-          VSet.fold
-            (fun v (h,g) -> join h g v new_v)
-            (try VMap.find v1 h.pending with Not_found -> VSet.empty )
-            ({pending = h.pending; lmap = m },g)
-      else
-      if pt2 = []
-      then
-        (* join pending v2 *)
+    let pt1 = G.succ x.graph v1 in (* TODO ask frama-c type instead of looking in the graph *)
+    let pt2 = G.succ x.graph v2 in
+    let x = merge x v1 v2 in
+    match (pt1, pt2) with
+      [],[] ->
+      (* update pending *)
+      let p = VMap.add v1 (VSet.union (VMap.find v1 x.pending) (VMap.find v2 x.pending)) x.pending in
+      let new_pending = VMap.remove v2 p in
+      {x with pending = new_pending }
+    | [], _ ->
+      (* join pending v1 *)
+      let x =
         VSet.fold
-          (fun v (h,g) -> join h g v new_v)
-          (try VMap.find v2 h.pending with Not_found -> VSet.empty )
-          ({pending = h.pending; lmap = m },g)
-      else
-        (* join the succesors *)
-        unify {pending=h.pending;lmap = m} g pt1 pt2
+          (fun v x -> join x v v1)
+          (try VMap.find v1 x.pending with Not_found -> VSet.empty )
+          x
+          (* update pending *)
+      in let new_pending = VMap.add v1 VSet.empty (VMap.remove v2 x.pending) in
+      {x with pending = new_pending }
+    | _, [] ->
+      (* join pending v2 *)
+      let x =
+        VSet.fold
+          (fun v x -> join x v v1)
+          (try VMap.find v2 x.pending with Not_found -> VSet.empty )
+          x
+      in let new_pending = VMap.add v1 VSet.empty (VMap.remove v2 x.pending) in
+      {x with pending = new_pending }
+    | _, _ ->
+      (* assert pending(v1) = empty and assert pending (v2) =empty *)
+      let new_pending = (VMap.remove v2 x.pending) in
+      (* join the succesors *)
+      unify {x with pending=new_pending} pt1 pt2
 
-(* [unify h f l1 l2] folds [join h g v1 v2] for all [v1] in [l1] and all [v2] in [l2] *)
-and unify (h:helper) (g:t) (l1:V.t list) (l2:V.t list) =
+(* [unify x l1 l2] folds [join x v1 v2] for all [v1] in [l1] and all [v2] in [l2] *)
+and unify (x:t) (l1:V.t list) (l2:V.t list) =
   match l1 with
-    [] -> (h,g)
+    [] -> x
   | v1::qq ->
-    let (h,g) = unify2 h g v1 l2 in
-    unify h g qq l2
+    let x = unify2 x v1 l2 in
+    unify x qq l2
 
-(* [unify2 h f v1 l2] folds [join h g v1 v2] for all [v2] in [l2] *)
-and unify2  (h:helper) (g:t) (v1:V.t) (l2:V.t list) =
+(* [unify2 x v1 l2] folds [join x v1 v2] for all [v2] in [l2] *)
+and unify2 (x:t) (v1:V.t) (l2:V.t list) =
   match l2 with
-    [] -> (h,g)
+    [] -> x
   | v2::qq ->
-    let (h,g) = join h g v1 v2 in
-    unify2 h g v1 qq
+    let x = join x v1 v2 in
+    unify2 x v1 qq
 
-let cjoin  (h:helper) (g:t) (v1:V.t) (v2:V.t) =
-  let pt2=  G.succ g v2 in
+let cjoin  (x:t) (v1:V.t) (v2:V.t) =
+  let pt2=  G.succ x.graph v2 in
   if pt2 = []
   then
-    let old_set = try VMap.find v2 h.pending with Not_found -> VSet.empty in
-    let new_pending = VMap.add v2 (VSet.add v2 old_set) h.pending in
-    ({pending=new_pending; lmap = h.lmap}, g)
+    let old_set = try VMap.find v2 x.pending with Not_found -> VSet.empty in
+    let new_pending = VMap.add v2 (VSet.add v2 old_set) x.pending in
+    {x with pending=new_pending}
   else
-    join h g v1 v2
+    join x v1 v2
 
 (* in Steensgard's paper, this is written settype(v1,ref(v2,bot)) *)
-let set_type (h:helper) (g:t) (v1:V.t) (v2:V.t) =
-  let g = G.add_edge g v1 v2 in
-  VSet.fold (fun vx (h,g) -> join h g v1 vx) (try VMap.find v1 h.pending with Not_found -> VSet.empty) (h,g)
+let set_type (x:t) (v1:V.t) (v2:V.t) =
+  let new_g = G.add_edge x.graph v1 v2 in
+  VSet.fold (fun vx x -> join x v1 vx) (try VMap.find v1 x.pending with Not_found -> VSet.empty) {x with graph = new_g}
 
 
 
@@ -232,9 +231,9 @@ module type Table = sig
   (** @raise Not_found if the key is not in the table. *)
 end
 
-module Make_table(H: Hashtbl.S)(V: sig type t end) = struct
+module Make_table(H: Hashtbl.S)(VV: sig type t end) = struct
   type key = H.key
-  type value = V.t
+  type value = VV.t
   let tbl = H.create 7
   let find = H.find tbl
 
