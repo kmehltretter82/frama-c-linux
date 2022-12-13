@@ -217,7 +217,8 @@ let kf_of_localizable loc =
   | PVDecl (kf_opt, _, _) -> kf_opt
   | PStmt (kf, _) | PStmtStart(kf,_) -> Some kf
   | PIP ip -> Property.get_kf ip
-  | PGlobal (GFun ({svar = vi}, _)) -> Some (Globals.Functions.get vi)
+  | PGlobal (GFun ({svar = vi}, _) | GFunDecl(_,vi,_)) ->
+    Some (Globals.Functions.get vi)
   | PGlobal _ -> None
   | PType _ -> None
 

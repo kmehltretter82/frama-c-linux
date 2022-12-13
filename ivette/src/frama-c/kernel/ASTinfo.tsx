@@ -31,7 +31,7 @@ import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as DATA from 'frama-c/kernel/api/data';
 import * as AST from 'frama-c/kernel/api/ast';
-import { Text } from 'frama-c/richtext';
+import { Text, Modifier } from 'frama-c/richtext';
 import { Icon } from 'dome/controls/icons';
 import { Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
@@ -89,11 +89,6 @@ function getMarkerKind(props: AST.markerInfoData): [string, string] {
   }
 }
 
-function markerKind(props: AST.markerInfoData): JSX.Element {
-  const [label, title] = getMarkerKind(props);
-  return <span className="astinfo-markerkind" title={title}>{label}</span>;
-}
-
 // --------------------------------------------------------------------------
 // --- Information Details
 // --------------------------------------------------------------------------
@@ -108,12 +103,12 @@ interface FieldInfo {
 
 interface FieldInfoProps {
   field: FieldInfo;
-  onSelected: (m: AST.marker, meta: boolean) => void;
+  onSelected: (m: AST.marker, meta: Modifier) => void;
   onHovered: (m: AST.marker | undefined) => void;
 }
 
 function FieldInfo(props: FieldInfoProps): JSX.Element {
-  const onSelected = (m: string, meta: boolean): void => {
+  const onSelected = (m: string, meta: Modifier): void => {
     props.onSelected(AST.jMarker(m), meta);
   };
   const onHovered = (m: string | undefined): void => {
@@ -161,6 +156,7 @@ function MarkButton(props: MarkButtonProps): JSX.Element {
 // --------------------------------------------------------------------------
 
 interface InfoSectionProps {
+  fct: string | undefined;
   scroll: React.RefObject<HTMLDivElement> | undefined;
   marker: AST.marker;
   markerInfos: AST.markerInfoData;
@@ -169,15 +165,15 @@ interface InfoSectionProps {
   hovered: AST.marker | undefined;
   marked: boolean;
   excluded: string[];
-  onHovered: (m: AST.marker | undefined) => void;
-  onSelected: (m: AST.marker, meta: boolean) => void;
-  onPinned: (m: AST.marker) => void;
-  onChildSelected: (m: AST.marker, e: AST.marker, meta: boolean) => void;
+  setPinned: (m: AST.marker) => void;
+  togglePinned: (m: AST.marker) => void;
 }
 
 function MarkInfos(props: InfoSectionProps): JSX.Element {
   const { marker, markerInfos } = props;
-  const { scrolled, selected, hovered, excluded } = props;
+  const { fct, scrolled, selected, hovered, excluded } = props;
+  const scope = markerInfos.scope ?? fct;
+  const foreign = !!scope && fct !== scope;
   const [unfold, setUnfold] = React.useState(true);
   const [expand, setExpand] = React.useState(false);
   const req = React.useMemo(() => Server.send(AST.getInformation, marker), [marker]);
@@ -189,28 +185,45 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
     isSelected && 'selected',
     isHovered && 'hovered',
   );
-  const kind = markerKind(markerInfos);
+  const [label, title] = getMarkerKind(markerInfos);
   const name = markerInfos.name;
-  const descr = markerInfos.descr ?? `${kind} ${name}`;
+  const descr = markerInfos.descr ?? `${label} ${name}`;
   const filtered = markerFields.filter((fd) => !excluded.includes(fd.id));
   const hasMore = filtered.length < markerFields.length;
   const displayed = expand ? markerFields : filtered;
-  const onSelected = (m: AST.marker, meta: boolean): void =>
-    props.onChildSelected(marker, m, meta);
-  const onHovered = (m: AST.marker | undefined): void => {
+  const onFoldUnfold = (evt: React.MouseEvent): void => {
+    evt.stopPropagation();
+    setUnfold(!unfold);
+  };
+  const onChildSelected = (m: AST.marker, meta: Modifier): void => {
+    props.setPinned(marker);
+    switch (meta) {
+      case 'NORMAL':
+        States.setSelection({ fct, marker: m });
+        break;
+      case 'META':
+        States.setSelection({ fct, marker: m }, true);
+        break;
+      case 'DOUBLE':
+        States.setSelection({ fct: scope, marker: m });
+        break;
+    }
+  };
+  const onChildHovered = (m: AST.marker | undefined): void => {
     if (m) {
-      props.onHovered(m);
+      States.setHovered({ fct, marker: m });
     } else {
-      props.onHovered(marker);
+      States.setHovered({ fct, marker });
     }
   };
   return (
     <div
       ref={isScrolled ? props.scroll : undefined}
       className={`astinfo-section ${highlight}`}
-      onMouseEnter={() => props.onHovered(marker)}
-      onMouseLeave={() => props.onHovered(undefined)}
-      onDoubleClick={() => props.onSelected(marker, false)}
+      onMouseEnter={() => States.setHovered({ fct, marker })}
+      onMouseLeave={() => States.setHovered(undefined)}
+      onClick={() => onChildSelected(marker, foreign ? 'DOUBLE' : 'NORMAL')}
+      onDoubleClick={() => onChildSelected(marker, 'DOUBLE')}
     >
       <div
         key="MARKER"
@@ -224,10 +237,15 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
           size={10}
           offset={-2}
           id={unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT'}
-          onClick={() => setUnfold(!unfold)}
+          onClick={onFoldUnfold}
         />
         <Code key="NAME" className="astinfo-markercode">
-          {kind} {name}
+          <span className="astinfo-markerkind" title={title}>
+            {label}
+          </span> {name}
+        </Code>
+        <Code key="SCOPE" className="" display={foreign}>
+          [in: {scope}]
         </Code>
         <MarkButton
           key="MORE"
@@ -243,15 +261,15 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
           selected={props.marked}
           display={props.marked || isSelected || !isHovered}
           title="Remove Information"
-          onClick={() => props.onPinned(marker)}
+          onClick={() => props.togglePinned(marker)}
         />
       </div>
       {unfold && displayed.map((field) => (
         <FieldInfo
           key={field.id}
           field={field}
-          onHovered={onHovered}
-          onSelected={onSelected}
+          onSelected={onChildSelected}
+          onHovered={onChildHovered}
         />
       ))}
     </div>
@@ -320,18 +338,10 @@ export default function ASTinfo(): JSX.Element {
   // Callbacks
   const setExcluded = (fs: string[]): void =>
     setSetting(fs.join(':'));
-  const setSelected = (marker: AST.marker, meta: boolean): void =>
-    States.setSelection({ fct, marker }, meta);
-  const setHovered = (marker: AST.marker | undefined): void => {
-    States.setHovered(marker ? { fct, marker } : undefined);
-  };
-  const setPinned = (m: AST.marker): void =>
-    setMarkers(toggleMarker(markers, m));
-  const setChildSelected =
-    (m: AST.marker, e: AST.marker, meta: boolean): void => {
-      setMarkers(addMarker(markers, m));
-      setSelected(e, meta);
-    };
+  const setPinned = (marker: AST.marker): void =>
+    setMarkers(addMarker(markers, marker));
+  const togglePinned = (marker: AST.marker): void =>
+    setMarkers(toggleMarker(markers, marker));
   // Mark Rendering
   const renderMark = (marker: AST.marker): JSX.Element | null => {
     const markerInfos = allInfos.getData(marker);
@@ -339,6 +349,7 @@ export default function ASTinfo(): JSX.Element {
     return (
       <MarkInfos
         key={marker}
+        fct={fct}
         scroll={scroll}
         marker={marker}
         markerInfos={markerInfos}
@@ -347,10 +358,8 @@ export default function ASTinfo(): JSX.Element {
         selected={selected}
         excluded={excluded}
         marked={markers.includes(marker)}
-        onSelected={setSelected}
-        onHovered={setHovered}
-        onPinned={setPinned}
-        onChildSelected={setChildSelected}
+        setPinned={setPinned}
+        togglePinned={togglePinned}
       />
     );
   };

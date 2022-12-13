@@ -164,6 +164,8 @@ export interface markerInfoData {
   name: string;
   /** Marker declaration or description */
   descr: string;
+  /** Function scope of the marker, if applicable */
+  scope?: string;
   /** Source location */
   sloc: source;
 }
@@ -176,6 +178,7 @@ export const jMarkerInfoData: Json.Decoder<markerInfoData> =
     var: jMarkerVar,
     name: Json.jString,
     descr: Json.jString,
+    scope: Json.jOption(Json.jString),
     sloc: jSource,
   });
 
@@ -183,12 +186,13 @@ export const jMarkerInfoData: Json.Decoder<markerInfoData> =
 export const byMarkerInfoData: Compare.Order<markerInfoData> =
   Compare.byFields
     <{ key: string, kind: markerKind, var: markerVar, name: string,
-       descr: string, sloc: source }>({
+       descr: string, scope?: string, sloc: source }>({
     key: Compare.string,
     kind: byMarkerKind,
     var: byMarkerVar,
     name: Compare.alpha,
     descr: Compare.string,
+    scope: Compare.defined(Compare.string),
     sloc: bySource,
   });
 

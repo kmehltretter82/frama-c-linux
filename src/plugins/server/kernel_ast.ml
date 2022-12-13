@@ -283,6 +283,16 @@ struct
         model
     in
     let () =
+      States.option
+        ~name:"scope"
+        ~descr:(Md.plain "Function scope of the marker, if applicable")
+        ~data:(module Jstring)
+        ~get:(fun (tag, _) ->
+            Option.map Kernel_function.get_name @@
+            Printer_tag.kf_of_localizable tag)
+        model
+    in
+    let () =
       States.column
         ~name:"sloc"
         ~descr:(Md.plain "Source location")

@@ -75,22 +75,29 @@ export function printTextWithTags(
 // --- Lightweight Text Renderer
 // --------------------------------------------------------------------------
 
-interface MarkerProps {
+export type Modifier = 'NORMAL' | 'DOUBLE' | 'META';
+
+export interface MarkerProps {
   marker: string;
-  onSelected?: (marker: string, meta: boolean) => void;
+  onSelected?: (marker: string, meta: Modifier) => void;
   onHovered?: (marker: string | undefined) => void;
   children?: React.ReactNode;
 }
 
-function Marker(props: MarkerProps): JSX.Element {
+export function Marker(props: MarkerProps): JSX.Element {
   const { marker, onSelected, onHovered, children } = props;
+  const onDoubleClick = (): void => {
+    onSelected && onSelected(marker, 'DOUBLE');
+  };
   const onClick = (evt: React.MouseEvent): void => {
-    onSelected && onSelected(marker, evt.altKey);
+    evt.stopPropagation();
+    onSelected && onSelected(marker, evt.altKey ? 'META' : 'NORMAL');
   };
   return (
     <span
       className="kernel-text-marker"
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
       onMouseEnter={() => onHovered && onHovered(marker)}
       onMouseLeave={() => onHovered && onHovered(undefined)}
     >
@@ -101,7 +108,7 @@ function Marker(props: MarkerProps): JSX.Element {
 
 export interface TextProps {
   text: KernelData.text;
-  onSelected?: (marker: string, meta: boolean) => void;
+  onSelected?: (marker: string, meta: Modifier) => void;
   onHovered?: (marker: string | undefined) => void;
   className?: string;
 }

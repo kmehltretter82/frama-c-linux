@@ -109,7 +109,7 @@ export interface IconProps extends SVGprops {
   /** Fill style property. */
   fill?: string;
   /** Click callback. */
-  onClick?: (event?: React.MouseEvent<HTMLDivElement>) => void;
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 /**
