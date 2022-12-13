@@ -23,6 +23,7 @@
 # This file is the main makefile of Frama-C.
 
 MAKECONFIG_DIR=share
+DEVELOPER?=
 
 include $(MAKECONFIG_DIR)/Makefile.common
 
@@ -42,7 +43,11 @@ FRAMAC_LINTCK_SRC:=tools/lint
 
 .PHONY: all
 
-all:
+all::
+ifeq (${DEVELOPER},yes)
+	${MAKE} -C ${FRAMAC_LINTCK_SRC}
+	${MAKE} -C ${FRAMAC_HDRCK_SRC}
+endif
 ifneq ($(DISABLED_PLUGINS),)
 	dune clean
 	rm -rf _build .merlin
@@ -51,9 +56,11 @@ endif
 	dune build $(DUNE_BUILD_OPTS) @install
 
 clean:: purge-tests # to be done before a "dune" command
+ifeq (${DEVELOPER},yes)
+	${MAKE} -C ${FRAMAC_LINTCK_SRC} clean
+	${MAKE} -C ${FRAMAC_HDRCK_SRC} clean
+endif
 	dune clean
-	dune clean --root $(FRAMAC_PTESTS_SRC)
-	dune clean --root $(FRAMAC_HDRCK_SRC)
 	rm -rf _build .merlin
 
 ##############################################################################
@@ -73,6 +80,18 @@ help::
 
 include share/Makefile.installation
 include ivette/Makefile.installation
+
+ifeq (${DEVELOPER},yes)
+
+install::
+	${MAKE} -C ${FRAMAC_HDRCK_SRC} install
+	${MAKE} -C ${FRAMAC_LINTCK_SRC} install
+
+uninstall::
+	${MAKE} -C ${FRAMAC_HDRCK_SRC} uninstall
+	${MAKE} -C ${FRAMAC_LINTCK_SRC} uninstall
+
+endif
 
 ###############################################################################
 # HEADER MANAGEMENT

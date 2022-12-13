@@ -52,17 +52,17 @@ endif
 
 install::
 ifndef PREFIX
-	@echo "Warning: cannot install Frama-C: no PREFIX defined"
+	@echo "Warning: cannot install: no PREFIX defined"
 	@echo "  (recommendation: include FRAMAC/share/Makefile.common)"
 	@exit 1
 else
 ifeq ($(PREFIX),$(OPAM_SWITCH_PREFIX))
-	@echo "Installing Frama-C to current Opam switch"
+	@echo "Installing to current Opam switch"
 	@echo "  (copying and relocating files...)"
 	dune install ${MANDIR_OPT} 2> /dev/null
 	@echo "  (done)"
 else
-	@echo "Installing Frama-C to ${PREFIX}"
+	@echo "Installing to ${PREFIX}"
 	@echo "  (copying and relocating files...)"
 	dune install --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
 	@echo "  (done)"
@@ -73,6 +73,6 @@ endif
 
 ifdef PREFIX
 uninstall::
-	@echo "Uninstalling Frama-C"
+	@echo "Uninstalling"
 	dune uninstall --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
 endif
