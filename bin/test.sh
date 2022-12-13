@@ -62,9 +62,10 @@ function Usage
     echo "OPTIONS"
     echo ""
     echo "  -r|--clean          clean (remove all) test results (includes -p)"
-    echo "  -p|--ptests         prepare (all) dune files and pull cache"
+    echo "  -p|--ptests         prepare (all) dune files"
+    echo "  -w|--wp-cache       prepare (pull) WP-cache"
+    echo "  -u|--update         run tests and update (push) WP-cache"
     echo "  -l|--logs           print output of tests (single file, no diff)"
-    echo "  -u|--update         run tests and update wp-cache"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
     echo "  -h|--help           print this help"
@@ -272,7 +273,6 @@ function Register
     done
 }
 
-
 # --------------------------------------------------------------------------
 # ---  Tests Numbering
 # --------------------------------------------------------------------------
@@ -322,16 +322,17 @@ do
             exit 0
             ;;
         "-r"|"--clean")
-            PullCache
             Head "Cleaning all tests..."
             Cmd make clean-tests
             Head "Generating dune files..."
             Cmd make run-ptests
             ;;
         "-p"|"--ptests")
-            PullCache
             Head "Generating dune files..."
             Cmd make run-ptests
+            ;;
+        "-w"|"--wp-cache")
+            PullCache
             ;;
         "-u"|"--update")
             FRAMAC_WP_CACHE=update
