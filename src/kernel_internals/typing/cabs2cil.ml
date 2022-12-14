@@ -2651,11 +2651,11 @@ exception Cannot_combine of string
    Note: we cannot force the qualifiers of oldt and t to be the same here,
    because in some cases (e.g. string literals and char pointers) it is
    allowed to have differences, while in others we want to be more strict. *)
-let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
+let rec combineTypes ?(strictReturnTypes=false) (what: combineWhat) (oldt: typ) (t: typ) : typ =
   match oldt, t with
   | TVoid olda, TVoid a -> TVoid (combineAttributes what olda a)
   (* allows ignoring a returned value *)
-  | _ , TVoid _ when what = CombineFunret -> t
+  | _ , TVoid _ when what = CombineFunret && not strictReturnTypes -> t
   | TInt (oldik, olda), TInt (ik, a) ->
     let combineIK oldk k =
       if oldk = k then oldk else
@@ -2707,7 +2707,7 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
                                (if oldci.cstruct then "struct" else "union")))
 
   | TArray (oldbt, oldsz, olda), TArray (bt, sz, a) ->
-    let newbt = combineTypes CombineOther oldbt bt in
+    let newbt = combineTypes ~strictReturnTypes CombineOther oldbt bt in
     let newsz =
       match oldsz, sz with
       | None, Some _ -> sz
@@ -2739,10 +2739,10 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
     TArray (newbt, newsz, combineAttributes what olda a)
 
   | TPtr (oldbt, olda), TPtr (bt, a) ->
-    TPtr (combineTypes CombineOther oldbt bt, combineAttributes what olda a)
+    TPtr (combineTypes ~strictReturnTypes CombineOther oldbt bt, combineAttributes what olda a)
 
   | TFun (oldrt, oldargs, oldva, olda), TFun (rt, args, va, a) ->
-    let newrt = combineTypes CombineFunret oldrt rt in
+    let newrt = combineTypes ~strictReturnTypes CombineFunret oldrt rt in
     if oldva != va then
       raise (Cannot_combine "different vararg specifiers");
     (* If one does not have arguments, believe the one with the
@@ -2779,7 +2779,7 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
                    * very important if the prototype uses different names than
                    * the function definition. *)
                   let n = if an <> "" then an else on in
-                  let t = combineTypes what ot at in
+                  let t = combineTypes ~strictReturnTypes what ot at in
                   let a = addAttributes oa aa in
                   (n, t, a))
                oldargslist argslist),
@@ -2888,8 +2888,8 @@ let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
     have_compatible_qualifiers_deep ~context t1' t2'
   | _, _ -> included_qualifiers ~context (Cil.typeAttrs t1) (Cil.typeAttrs t2)
 
-let compatibleTypes ?context t1 t2 =
-  let r = combineTypes CombineOther t1 t2 in
+let compatibleTypes ?strictReturnTypes ?context t1 t2 =
+  let r = combineTypes ?strictReturnTypes CombineOther t1 t2 in
   (* C99, 6.7.3 §9: "... to be compatible, both shall have the identically
      qualified version of a compatible type;" *)
   if not (have_compatible_qualifiers_deep ?context t1 t2) then
@@ -2897,9 +2897,9 @@ let compatibleTypes ?context t1 t2 =
   (* Note: different non-qualifier attributes will be silently dropped. *)
   r
 
-let areCompatibleTypes ?context t1 t2 =
+let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
   try
-    ignore (compatibleTypes ?context t1 t2); true
+    ignore (compatibleTypes ?strictReturnTypes ?context t1 t2); true
   with Cannot_combine _ -> false
 
 (* Specify whether the cast is from the source code *)
@@ -7736,7 +7736,7 @@ and doExp local_env
                     match tn with
                     | None -> ()
                     | Some t' ->
-                      if areCompatibleTypes t t' then
+                      if areCompatibleTypes ~strictReturnTypes:true t t' then
                         Kernel.abort ~current:true
                           "multiple compatible types in _Generic selection:@ \
                            '%a' and '%a'"
@@ -7750,7 +7750,7 @@ and doExp local_env
         let assocs = List.rev assocs in
         let candidates =
           List.filter (fun (type_name, _) ->
-              Option.fold ~none:false ~some:(areCompatibleTypes control_t) type_name
+              Option.fold ~none:false ~some:(areCompatibleTypes ~strictReturnTypes:true control_t) type_name
             ) assocs
         in
         let defaults =

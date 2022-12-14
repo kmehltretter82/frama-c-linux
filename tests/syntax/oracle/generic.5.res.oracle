@@ -1,5 +1,5 @@
 [kernel] Parsing generic.c (with preprocessing)
-[kernel] generic.c:50: User Error: 
+[kernel] generic.c:54: User Error: 
   controlling expression compatible with more than one association type in _Generic selection:
   controlling expression: '(void (*)())0' (type: void (*)());
   compatible types: void (*)(int ), void (*)(void)

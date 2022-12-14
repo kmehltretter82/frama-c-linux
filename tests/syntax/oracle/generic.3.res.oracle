@@ -1,5 +1,5 @@
 [kernel] Parsing generic.c (with preprocessing)
-[kernel] generic.c:39: User Error: 
+[kernel] generic.c:43: User Error: 
   multiple compatible types in _Generic selection:
   'my_uint' and 'unsigned int'
 [kernel] User Error: stopping on file "generic.c" that has errors. Add '-kernel-msg-key pp'

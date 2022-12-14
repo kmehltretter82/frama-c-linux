@@ -16,6 +16,10 @@
 // Some tests inspired by llvm/clang/test/Sema/generic-selection.c
 
 typedef unsigned int my_uint;
+typedef int (*fptr)(int);
+typedef void (*vfptr)(int);
+int foo(int i) { return 0; }
+void void_foo(int i) {}
 
 // Example from the C11 standard
 double cbrt(double x);
@@ -66,5 +70,6 @@ int main() {
   void p(int);
   int ok4 = _Generic(p, void(*)(int): 0, void(*)(long): 1);
   double c = cbrt(0.0f);
+  int ok5 = _Generic(foo, fptr: 0, int: 4, vfptr: 5);
   return 0;
 }

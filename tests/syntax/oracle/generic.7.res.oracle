@@ -1,5 +1,5 @@
 [kernel] Parsing generic.c (with preprocessing)
-[kernel] generic.c:61: User Error: 
+[kernel] generic.c:65: User Error: 
   no compatible types and no default type in _Generic selection:
   controlling expression: '"abc"' (type: char *);
   candidate types: char const *

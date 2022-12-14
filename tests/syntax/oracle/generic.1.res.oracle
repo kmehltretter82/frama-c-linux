@@ -1,11 +1,11 @@
 [kernel] Parsing generic.c (with preprocessing)
-[kernel] generic.c:32: 
+[kernel] generic.c:36: 
   syntax error:
-  Location: line 32, between columns 23 and 24, before or at token: )
-  30    int main() {
-  31    #ifdef NONE
-  32      int a = _Generic("abc");
+  Location: line 36, between columns 23 and 24, before or at token: )
+  34    int main() {
+  35    #ifdef NONE
+  36      int a = _Generic("abc");
         ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  33    #endif
-  34    #ifdef TOO_MANY_DEFAULTS
+  37    #endif
+  38    #ifdef TOO_MANY_DEFAULTS
 [kernel] Frama-C aborted: invalid user input.
