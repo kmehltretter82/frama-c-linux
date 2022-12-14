@@ -69,7 +69,8 @@ type t = {
   graph : G.t;
   pending : VSet.t VMap.t ; (* pending(v) is the set of vertices v' that could be aliased to v if v becomes/ is detected as a pointer *)
   lmap : V.t LMap.t ; (* lmap(lv) is the vertex v corresponding to lval lv, in other words lv is in label(v) *)
-  vmap : LSet.t VMap.t (* reverse of lmap *)
+  vmap : LSet.t VMap.t ;(* reverse of lmap *)
+  cmpt : Int.t ; (* counter to create new vertex *)
 }
 
 (* find functions *)
@@ -85,6 +86,23 @@ let find_vertex (lv:lval) (x:t) =
 let points_to(lv:lval) (x:t): V.t list =
   let v = find_vertex lv x in
   G.succ x.graph v
+
+let addr_of (lv:lval) (x:t) : V.t list =
+  let v = find_vertex lv x in
+  G.pred x.graph v
+
+let create_vertex (lv:lval) (x:t) : V.t * t =
+  let new_v = x.cmpt in
+  let new_g = G.add_vertex x.graph new_v in
+  let new_pending = VMap.add new_v VSet.empty x.pending in
+  let new_lmap = LMap.add lv new_v x.lmap in
+  let new_vmap = VMap.add new_v (LSet.singleton lv) x.vmap in
+  new_v ,
+  {graph = new_g ;
+   pending = new_pending ;
+   lmap = new_lmap ;
+   vmap = new_vmap ;
+   cmpt = x.cmpt+1}
 
 (* printing functions *)
 let pretty fmt (x:t) =
@@ -141,7 +159,7 @@ let merge x v1 v2 =
     let g = G.fold_pred f_fold_pred g v2 g in
     (* remove v2 *)
     let g =  G.remove_vertex g v2 in
-    {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap}
+    {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt}
 
 
 (** functions for steensgard's algorithm *)
@@ -219,7 +237,45 @@ let set_type (x:t) (v1:V.t) (v2:V.t) =
   VSet.fold (fun vx x -> join x v1 vx) (try VMap.find v1 x.pending with Not_found -> VSet.empty) {x with graph = new_g}
 
 
+(* assignment x = y *)
+let assignment_x_y (a:t) (x:lval) (y:lval) : t =
+  let v1 = find_vertex x a in
+  let v2 = find_vertex y a in
+  cjoin a v1 v2
 
+
+(* assignment x = &y *)
+let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t=
+  let v1 = find_vertex x a in
+  let list_v2 = addr_of y a in
+  match list_v2 with
+    [v2] ->  join a v1 v2
+  | _ ->  failwith "not implemented"
+
+
+(* assignment x = *y *)
+let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
+  let v1 = find_vertex x a in
+  let list_v2 = points_to y a in
+  match list_v2 with
+    [] -> let v2 = find_vertex y a in set_type a v2 v1
+  | [v2] -> cjoin a v1 v2
+  | _ ->  failwith "not implemented"
+
+(* assignment x = allocate(y) *)
+let assignment_x_allocate_y (a:t) (x:lval) (y:lval) : t =
+  let v1 = find_vertex x a in
+  let (v2,a) = create_vertex y a in
+  set_type a v1 v2
+
+(* assignment *x = y *)
+let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
+  let v2 = find_vertex y a in
+  let list_v1 = points_to x a in
+  match list_v1 with
+    [] ->  let v1 = find_vertex x a in set_type a v1 v2
+  |  [v1] -> cjoin a v1 v2
+  | _ ->  failwith "not implemented"
 
 (** a type for summaries of functions *)
 type summary = t (* final type may be different *)
