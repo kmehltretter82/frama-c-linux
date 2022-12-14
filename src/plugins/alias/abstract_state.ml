@@ -302,14 +302,40 @@ end
 module Stmt_table = Make_table(Cil_datatype.Stmt.Hashtbl)(G)
 module Function_table = Make_table(Kernel_function.Hashtbl)(G)
 
-(* let do_assignment h t (lv,exp,loc) =
- *   match (lv,exp.enode) with
- *     ((Var v1, NoOffset), Lval lv2) -> ignore (v1,lv2)
- *   | ((Mem e1, NoOffset), _) -> ignore (h,t,loc e1)
- *   | _ -> failwith "not implemented" *)
+let do_assignment (a:t) (lv:lval) (exp:exp) =
+  match (lv,exp.enode) with
+    ((Var v1, NoOffset), Lval (Var v2,NoOffset)) ->
+    (* case x = y *)
+    assignment_x_y a (Var v1, NoOffset) (Var v2, NoOffset)
+  | ((Var v1, NoOffset), AddrOf lv2) ->
+    (* case x = &y *)
+    assignment_x_addr_y a (Var v1, NoOffset) lv2
+  | ((Var v1, NoOffset), Lval (Mem e2, NoOffset)) ->
+    (* case x  = *y *)
+    begin
+      match e2.enode with
+        Lval lv2 -> assignment_x_ptr_y a (Var v1, NoOffset) lv2
+      |  _ -> failwith "not implemented"
+    end
+  | ((Mem e1, NoOffset), Lval lv2) ->
+    (* case *x = y *)
+    begin
+      match e1.enode with
+        Lval lv1 -> assignment_ptr_x_y a lv1 lv2
+      |  _ -> failwith "not implemented"
+    end
+  | _ -> failwith "not implemented"
 
-let do_stmt _ =
-  failwith "not implemented"
+
+let do_instr (a:t) (i:instr) =
+  match i with
+    Set(lv,exp,_) -> do_assignment a lv exp
+  | _ -> failwith "not implemented"
+
+let do_stmt (a:t) (s:stmt) =
+  match s.skind with
+  | Instr i -> do_instr a i
+  | _ -> failwith "not implemented"
 
 let make_summary  _ =
   failwith "not implemented"
