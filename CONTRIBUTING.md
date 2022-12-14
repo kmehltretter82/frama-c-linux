@@ -8,7 +8,7 @@ There are several ways to participate in the Frama-C project:
 - Asking questions and discussing at
   [StackOverflow](https://stackoverflow.com/tags/frama-c) and through
   the
-  [Frama-C-discuss mailing list](https://lists.gforge.inria.fr/mailman/listinfo/frama-c-discuss);
+  [Frama-C-discuss mailing list](https://groupes.renater.fr/sympa/info/frama-c-discuss);
 
 - Reporting bugs via
   [Gitlab issues](https://git.frama-c.com/pub/frama-c/issues);
@@ -65,9 +65,14 @@ The detailed steps to submit a contribution to Frama-C are:
   discussion and we will integrate it.
 
 7. Check for unexpected changes.
-  Use the command `make lint`
+  Use the command `make check-lint`
   in your terminal from the Frama-C root directory to detect trailing spaces,
-  tabulations or incorrect indentation (ocp-ident >= 1.7.0 is needed).
+  tabulations or incorrect indentation (ocp-ident >= 1.8.1, camomile and
+  clang-format are needed), and `make lint` to fix problems if any.
+
+  Use the command `make check-headers` in your terminal from the Frama-C root
+  directory to detect bad file license (headache is needed), and `make headers`
+  to fix them.
 
 8. Locally run the test framework of Frama-C by typing
   `make tests`
