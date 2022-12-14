@@ -73,7 +73,7 @@ let add_attr checks attr value =
   | "check-indent" -> { checks with indent = value }
   | "check-syntax" -> { checks with syntax = value }
   | "check-utf8"   -> { checks with utf8 = value }
-  | _ -> failwith (Printf.sprintf "Unknown attr %s" attr)
+  | _ -> failwith (Format.sprintf "Unknown attr %s" attr)
 
 let handled_attr s =
   s = "check-eoleof" || s = "check-indent" ||
@@ -99,7 +99,7 @@ let rec collect = function
     Hashtbl.replace table file (add_attr checks attr value) ;
     collect tl
   | [] -> ()
-  | l -> List.iter (Printf.eprintf "Could not load file list %s\n") l
+  | l -> List.iter (Format.eprintf "Could not load file list %s@.") l
 
 (**************************************************************************)
 (* Functions used to check lint *)
@@ -232,7 +232,7 @@ let check_c_indent ~update file =
   if not @@ clang_format_available () then true
   else
     let opt = if update then "-i" else "--dry-run -Werror" in
-    0 = Sys.command (Printf.sprintf "clang-format %s \"%s\"" opt file)
+    0 = Sys.command (Format.sprintf "clang-format %s \"%s\"" opt file)
 
 exception Bad_ext
 
@@ -248,7 +248,7 @@ let res = ref true
 
 let check ~verbose ~update file params =
   if verbose then
-    Printf.printf "Checking %s\n" file ;
+    Format.printf "Checking %s@." file ;
   if Sys.is_directory file then ()
   else begin
     let in_chan = open_in file in
@@ -257,7 +257,7 @@ let check ~verbose ~update file params =
     (* UTF8 *)
     if params.utf8 then
       if not @@ is_utf8 content then begin
-        Printf.eprintf "Bad encoding (not UTF8) for %s\n" file ;
+        Format.eprintf "Bad encoding (not UTF8) for %s@." file ;
         res := false
       end ;
     (* Blanks *)
@@ -267,7 +267,7 @@ let check ~verbose ~update file params =
       if update && not was_ok
       then begin rewrite := true ; new_content end
       else if not was_ok then begin
-        Printf.eprintf "%s for %s\n" message file ;
+        Format.eprintf "%s for %s@." message file ;
         res := false ; new_content
       end
       else new_content
@@ -291,11 +291,11 @@ let check ~verbose ~update file params =
     try
       if params.indent then
         if not @@ check_indent ~update file then begin
-          Printf.eprintf "Bad indentation for %s\n" file ;
+          Format.eprintf "Bad indentation for %s@." file ;
           res := false
         end ;
     with Bad_ext ->
-      Printf.eprintf "Don't know how to (check) indent %s\n" file ;
+      Format.eprintf "Don't know how to (check) indent %s@." file ;
       res := false
   end
 
@@ -319,10 +319,10 @@ let sort argspec =
 
 let () =
   if not @@ clang_format_available () then
-    Printf.eprintf "clang-format unavailable, I will not check C files" ;
+    Format.eprintf "clang-format unavailable, I will not check C files@." ;
   Arg.parse
     (Arg.align (sort argspec))
-    (fun s -> Printf.eprintf "Unknown argument: %s" s)
+    (fun s -> Format.eprintf "Unknown argument: %s" s)
     ("Usage: git ls-files -z | git check-attr --stdin -z -a | " ^ exec_name ^ " [options]");
   collect @@ lines_from_in stdin ;
   Hashtbl.iter (check ~verbose:!verbose ~update:!update) table ;
