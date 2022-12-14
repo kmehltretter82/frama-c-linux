@@ -45,8 +45,8 @@ FRAMAC_LINTCK_SRC:=tools/lint
 
 all::
 ifeq (${FRAMAC_DEVELOPER},yes)
-	${MAKE} -C ${FRAMAC_LINTCK_SRC}
-	${MAKE} -C ${FRAMAC_HDRCK_SRC}
+	dune build --no-print-directory --root ${FRAMAC_LINTCK_SRC}
+	dune build --no-print-directory --root ${FRAMAC_HDRCK_SRC}
 endif
 ifneq ($(DISABLED_PLUGINS),)
 	dune clean
@@ -57,8 +57,8 @@ endif
 
 clean:: purge-tests # to be done before a "dune" command
 ifeq (${FRAMAC_DEVELOPER},yes)
-	${MAKE} -C ${FRAMAC_LINTCK_SRC} clean
-	${MAKE} -C ${FRAMAC_HDRCK_SRC} clean
+	dune clean --no-print-directory --root ${FRAMAC_LINTCK_SRC}
+	dune clean --no-print-directory --root ${FRAMAC_HDRCK_SRC}
 endif
 	dune clean
 	rm -rf _build .merlin
@@ -78,18 +78,23 @@ help::
 # INSTALL/UNINSTALL
 ################################
 
+install:: all
+
+INSTALL_TARGET=Frama-C
 include share/Makefile.installation
 include ivette/Makefile.installation
 
 ifeq (${FRAMAC_DEVELOPER},yes)
 
 install::
-	${MAKE} -C ${FRAMAC_HDRCK_SRC} install
-	${MAKE} -C ${FRAMAC_LINTCK_SRC} install
+	@echo "Installing frama-c-hdrck and frama-c-lint"
+	dune install --root ${FRAMAC_HDRCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+	dune install --root ${FRAMAC_LINTCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
 
 uninstall::
-	${MAKE} -C ${FRAMAC_HDRCK_SRC} uninstall
-	${MAKE} -C ${FRAMAC_LINTCK_SRC} uninstall
+	@echo "Uninstalling frama-c-hdrck and frama-c-lint"
+	dune uninstall --root ${FRAMAC_HDRCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+	dune uninstall --root ${FRAMAC_LINTCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
 
 endif
 

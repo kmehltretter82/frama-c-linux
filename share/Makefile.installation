@@ -24,6 +24,8 @@
 # INSTALLATION #
 ################
 
+INSTALL_TARGET?=
+
 ################################
 ## Help
 
@@ -50,6 +52,10 @@ endif
 
 .PHONY: install uninstall
 
+ifneq ($(INSTALL_TARGET),)
+INSTALL_TARGET:="$(INSTALL_TARGET) "
+endif
+
 install::
 ifndef PREFIX
 	@echo "Warning: cannot install: no PREFIX defined"
@@ -57,15 +63,15 @@ ifndef PREFIX
 	@exit 1
 else
 ifeq ($(PREFIX),$(OPAM_SWITCH_PREFIX))
-	@echo "Installing to current Opam switch"
-	@echo "  (copying and relocating files...)"
+	@echo "Installing $(INSTALL_TARGET)to current Opam switch"
+	@echo -n "  Copying and relocating files..."
 	dune install ${MANDIR_OPT} 2> /dev/null
-	@echo "  (done)"
+	@echo " (done)"
 else
-	@echo "Installing to ${PREFIX}"
-	@echo "  (copying and relocating files...)"
+	@echo "Installing $(INSTALL_TARGET)to ${PREFIX}"
+	@echo -n " Copying and relocating files..."
 	dune install --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
-	@echo "  (done)"
+	@echo " (done)"
 	@echo 'DO NOT FORGET TO EXPAND YOUR OCAMLPATH VARIABLE:'
 	@echo '  export OCAMLPATH="${PREFIX}/lib:$$OCAMLPATH"'
 endif
@@ -73,6 +79,6 @@ endif
 
 ifdef PREFIX
 uninstall::
-	@echo "Uninstalling"
+	@echo "Uninstalling $(INSTALL_TARGET)"
 	dune uninstall --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
 endif

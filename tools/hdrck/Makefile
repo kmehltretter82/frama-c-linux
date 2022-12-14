@@ -29,6 +29,7 @@ all:
 clean:
 	dune clean --root .
 
+INSTALL_TARGET=frama-c-hdrck
 include ${FRAMAC_SHARE}/Makefile.common
 include ${FRAMAC_SHARE}/Makefile.installation
 
