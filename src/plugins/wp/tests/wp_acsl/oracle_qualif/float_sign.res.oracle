@@ -1,0 +1,14 @@
+# frama-c -wp [...]
+[kernel] Parsing float_sign.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] Warning: Missing RTE guards
+[wp] 2 goals scheduled
+[wp] [Valid] typed_d_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_f_ensures (Alt-Ergo) (Cached)
+[wp] Proved goals:    2 / 2
+  Alt-Ergo:        2
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  d                         -        1        1       100%
+  f                         -        1        1       100%
+------------------------------------------------------------

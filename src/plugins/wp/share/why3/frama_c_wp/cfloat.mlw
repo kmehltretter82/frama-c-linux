@@ -39,6 +39,7 @@ theory Cfloat
 
   type f32 = F32.t (* single precision IEEE *)
   type f64 = F64.t (* double precision IEEE *)
+  type sign = Positive | Negative
 
   (* C-Float Conversion *)
 
@@ -174,5 +175,21 @@ theory Cfloat
   function model_f64 (f:f64) : real
   function delta_f64 (f:f64) : real = abs( of_f64 f -. model_f64 f )
   function error_f64 (f:f64) : real = (delta_f64 f) /. (abs (model_f64 f))
+
+  (* Sign *)
+
+  function sign_f32 (f: f32) : sign
+
+  axiom positive_f32_sign:
+    forall f:f32. F32.is_positive f <-> sign_f32 f = Positive
+  axiom negative_f32_sign:
+    forall f:f32. F32.is_negative f <-> sign_f32 f = Negative
+
+  function sign_f64 (f: f64) : sign
+
+  axiom positive_f64_sign:
+    forall f:f64. F64.is_positive f <-> sign_f64 f = Positive
+  axiom negative_f64_sign:
+    forall f:f64. F64.is_negative f <-> sign_f64 f = Negative
 
 end

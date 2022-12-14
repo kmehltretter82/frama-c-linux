@@ -118,7 +118,11 @@ stdenvNoCC.mkDerivation rec {
     make tools/ptests/wtests.exe
   '';
 
-  wp_cache = fetchGit "git@git.frama-c.com:frama-c/wp-cache.git";
+  wp_cache = fetchGit {
+           url = "git@git.frama-c.com:frama-c/wp-cache.git" ;
+           ref = "master" ;
+           shallow = true ;
+         };
 
   doCheck = true;
   preCheck = ''
