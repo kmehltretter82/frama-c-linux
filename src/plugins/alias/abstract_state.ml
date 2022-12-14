@@ -78,18 +78,10 @@ let find_lset (v:V.t) (x:t) =
   try VMap.find v x.vmap
   with Not_found -> LSet.empty
 
-(* find the vertex of an lval, unefficient version *)
+(* find the vertex of an lval *)
 let find_vertex (lv:lval) (x:t) =
   LMap.find lv x.lmap
 (** @raise Not_found if there is not such an lval in the graph *)
-
-let points_to(lv:lval) (x:t): V.t list =
-  let v = find_vertex lv x in
-  G.succ x.graph v
-
-let addr_of (lv:lval) (x:t) : V.t list =
-  let v = find_vertex lv x in
-  G.pred x.graph v
 
 let create_vertex (lv:lval) (x:t) : V.t * t =
   let new_v = x.cmpt in
@@ -103,6 +95,18 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
    lmap = new_lmap ;
    vmap = new_vmap ;
    cmpt = x.cmpt+1}
+
+let find_or_create_vertex (lv:lval) (x:t) : V.t *t =
+  try find_vertex lv x , x with
+    Not_found -> create_vertex lv x
+
+let points_to(lv:lval) (x:t): V.t list =
+  let (v,x) = find_or_create_vertex lv x in
+  G.succ x.graph v
+
+let addr_of (lv:lval) (x:t) : V.t list =
+  let (v,x) = find_or_create_vertex lv x in
+  G.pred x.graph v
 
 (* printing functions *)
 let pretty fmt (x:t) =
@@ -239,14 +243,14 @@ let set_type (x:t) (v1:V.t) (v2:V.t) =
 
 (* assignment x = y *)
 let assignment_x_y (a:t) (x:lval) (y:lval) : t =
-  let v1 = find_vertex x a in
-  let v2 = find_vertex y a in
+  let (v1,a) = find_or_create_vertex x a in
+  let (v2,a) = find_or_create_vertex y a in
   cjoin a v1 v2
 
 
 (* assignment x = &y *)
 let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t=
-  let v1 = find_vertex x a in
+  let (v1,a) = find_or_create_vertex x a in
   let list_v2 = addr_of y a in
   match list_v2 with
     [v2] ->  join a v1 v2
@@ -255,7 +259,7 @@ let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t=
 
 (* assignment x = *y *)
 let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
-  let v1 = find_vertex x a in
+  let (v1,a) = find_or_create_vertex x a in
   let list_v2 = points_to y a in
   match list_v2 with
     [] -> let v2 = find_vertex y a in set_type a v2 v1
@@ -264,13 +268,13 @@ let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
 
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y (a:t) (x:lval) (y:lval) : t =
-  let v1 = find_vertex x a in
+  let (v1,a) = find_or_create_vertex x a in
   let (v2,a) = create_vertex y a in
   set_type a v1 v2
 
 (* assignment *x = y *)
 let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
-  let v2 = find_vertex y a in
+  let (v2,a) = find_or_create_vertex y a in
   let list_v1 = points_to x a in
   match list_v1 with
     [] ->  let v1 = find_vertex x a in set_type a v1 v2
