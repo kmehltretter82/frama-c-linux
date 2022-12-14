@@ -88,7 +88,11 @@ stdenv.mkDerivation {
 
   wp_cache =
     if has-wp-proofs
-    then fetchGit "git@git.frama-c.com:frama-c/wp-cache.git"
+    then fetchGit {
+           url = "git@git.frama-c.com:frama-c/wp-cache.git" ;
+           ref = "master" ;
+           shallow = true ;
+         }
     else "" ;
 
   doCheck = true;
