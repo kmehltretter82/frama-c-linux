@@ -77,12 +77,12 @@ module type Table = sig
 end
 
 (** Store the graph at each statement. *)
-module Stmt_table: Table with type key = stmt and type value = G.t
+module Stmt_table: Table with type key = stmt and type value = t
 
 
 (** Store the summary of each function. *)
 module Function_table:
-  Table with type key = kernel_function and type value = G.t
+  Table with type key = kernel_function and type value = summary
 
 (** [do_stmt a s] computes the next state and stores it in [Stmt_table]. *)
 val do_stmt: t -> stmt -> t

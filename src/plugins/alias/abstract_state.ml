@@ -291,16 +291,19 @@ module type Table = sig
   (** @raise Not_found if the key is not in the table. *)
 end
 
-module Make_table(H: Hashtbl.S)(VV: sig type t end) = struct
+module Make_table(H: Hashtbl.S)(VV: sig type tt end) = struct
   type key = H.key
-  type value = VV.t
+  type value = VV.tt
   let tbl = H.create 7
+  let add = H.add tbl
   let find = H.find tbl
 
 end
 
-module Stmt_table = Make_table(Cil_datatype.Stmt.Hashtbl)(G)
-module Function_table = Make_table(Kernel_function.Hashtbl)(G)
+module A = struct type tt = t end
+
+module Stmt_table = Make_table(Cil_datatype.Stmt.Hashtbl)(A)
+module Function_table = Make_table(Kernel_function.Hashtbl)(A)
 
 let do_assignment (a:t) (lv:lval) (exp:exp) =
   match (lv,exp.enode) with
@@ -333,9 +336,13 @@ let do_instr (a:t) (i:instr) =
   | _ -> failwith "not implemented"
 
 let do_stmt (a:t) (s:stmt) =
+  let new_a =
   match s.skind with
   | Instr i -> do_instr a i
   | _ -> failwith "not implemented"
+  in
+  Stmt_table.add s new_a ; new_a
+
 
 let make_summary  _ =
   failwith "not implemented"
