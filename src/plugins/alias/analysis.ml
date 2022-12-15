@@ -121,13 +121,17 @@ end
 
 module  F = Forwards(T)
 
+let doFunction (f:kernel_function) =
+  F.compute (fst (find_stmts (Kernel_function.get_definition f)))
 
 let make_summary  _ =
   failwith "not implemented"
 
 let compute () =
   Ast.compute();
-  F.compute []
+  Options.feedback "Parsing done";
+  Globals.Functions.iter doFunction;
+  Options.feedback "Functions done"
 
 let clear () =
   failwith "not implemented"

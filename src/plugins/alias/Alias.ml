@@ -27,7 +27,7 @@ module API = API
 let main () =
   if Options.Enabled.get() then
     begin
-      Ast.compute ();
+      Analysis.compute ();
       Options.feedback "Analysis complete"
     end
 
