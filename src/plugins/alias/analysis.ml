@@ -122,7 +122,8 @@ end
 module  F = Forwards(T)
 
 let doFunction (f:kernel_function) =
-  F.compute (fst (find_stmts (Kernel_function.get_definition f)))
+  if Kernel_function.has_definition f then
+    F.compute (fst (find_stmts (Kernel_function.get_definition f)))
 
 let make_summary  _ =
   failwith "not implemented"
