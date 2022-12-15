@@ -329,7 +329,6 @@ let do_assignment (a:t) (lv:lval) (exp:exp) =
     end
   | _ -> failwith "not implemented"
 
-
 let do_instr (a:t) (i:instr) =
   match i with
     Set(lv,exp,_) -> do_assignment a lv exp
@@ -337,12 +336,11 @@ let do_instr (a:t) (i:instr) =
 
 let do_stmt (a:t) (s:stmt) =
   let new_a =
-  match s.skind with
-  | Instr i -> do_instr a i
-  | _ -> failwith "not implemented"
+    match s.skind with
+    | Instr i -> do_instr a i
+    | _ -> failwith "not implemented"
   in
   Stmt_table.add s new_a ; new_a
-
 
 let make_summary  _ =
   failwith "not implemented"
