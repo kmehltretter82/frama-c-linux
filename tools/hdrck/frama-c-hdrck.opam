@@ -19,7 +19,7 @@ build: [
   "dune" "build" "-j%{jobs}%" "--release"
 ]
 install: [
-  "dune" "install" "-j%{jobs}%" "--prefix=%{predix}%"
+  "dune" "install" "-j%{jobs}%" "--prefix=%{prefix}%"
 ]
 depends: [
   "dune" { > "3.2.0" }
