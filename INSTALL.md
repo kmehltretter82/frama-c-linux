@@ -487,10 +487,10 @@ Consult their specific documentation for details.
 
 # Frama-C additional tools
 
-A few additional tools that are useless for most users might be useful for
+A few additional tools that are unnecessary for most users might be useful for
 plugin developers. These tools are:
 - `frama-c-lint`, used for checking coding conventions
-- `frama-c-hdrck`, used for checking files license header
+- `frama-c-hdrck`, used for checking file license headers
 
 They can be installed either by pinning them via Opam:
 
