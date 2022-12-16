@@ -24,5 +24,6 @@ install: [
 depends: [
   "dune" { > "3.2.0" }
   "camomile"
+  "conf-clang-format"
   "ocp-indent" { = "1.8.1" }
 ]
