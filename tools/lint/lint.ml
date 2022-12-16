@@ -306,19 +306,13 @@ let exec_name = Sys.argv.(0)
 let update = ref false
 let verbose = ref false
 
-let rec argspec = [
-  "--help", Arg.Unit print_usage, "print this option list and exits" ;
-  "-u", Arg.Set update, "update ill-formed files (does not handle UTF8 update)" ;
-  "-v", Arg.Set verbose, "verbose mode" ;
+let argspec = [
+  "-u", Arg.Set update, " update ill-formed files (does not handle UTF8 update)" ;
+  "-v", Arg.Set verbose, " verbose mode" ;
 ]
-and sort argspec =
+let sort argspec =
   List.sort (fun (name1, _, _) (name2, _, _) -> String.compare name1 name2)
     argspec
-and print_usage () =
-  Arg.usage
-    (Arg.align (sort argspec))
-    (Printf.sprintf "Usage: %s [-u]" exec_name) ;
-  exit 0
 
 (**************************************************************************)
 (* Main *)
@@ -329,7 +323,7 @@ let () =
   Arg.parse
     (Arg.align (sort argspec))
     (fun s -> Printf.eprintf "Unknown argument: %s" s)
-    "";
+    ("Usage: git ls-files -z | git check-attr --stdin -z -a | " ^ exec_name ^ " [options]");
   collect @@ lines_from_in stdin ;
   Hashtbl.iter (check ~verbose:!verbose ~update:!update) table ;
   if not !res then exit 1
