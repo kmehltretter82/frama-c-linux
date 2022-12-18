@@ -141,9 +141,9 @@ let doFunction (kf:kernel_function) =
   Options.feedback ~level:2 "entering in function %a."
     Kernel_function.pretty kf;
   if Kernel_function.has_definition kf then
-    let fundec = Kernel_function.get_definition kf in
-    let stmts, _ = Dataflow.find_stmts fundec in
-    F.compute stmts
+    let first_stmts = try [Kernel_function.find_first_stmt kf] with Kernel_function.No_Statement -> [] in
+    List.iter (fun stmt -> T.StmtStartData.add stmt (Some Abstract_state.initial_value)) first_stmts;
+    F.compute first_stmts
 
 let make_summary  _ =
   failwith "not implemented"

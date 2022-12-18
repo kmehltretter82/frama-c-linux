@@ -327,6 +327,8 @@ let union  (a1:t) (a2:t) :t =
   failwith "not implemented"
 
 
+let initial_value :t =
+  {graph = G.empty; pending = VMap.empty ; lmap = LMap.empty; vmap = VMap.empty; cmpt = 0}
 
 (** a type for summaries of functions *)
 type summary = t (* final type may be different *)

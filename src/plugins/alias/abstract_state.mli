@@ -72,5 +72,8 @@ val equal : t -> t -> bool
    then they will also be aliased/points-to in the result *)
 val union : t -> t -> t
 
+(* empty graph *)
+val initial_value : t
+
 (** Type denoting summaries of functions *)
 type summary
