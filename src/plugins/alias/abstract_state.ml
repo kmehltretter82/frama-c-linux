@@ -134,7 +134,7 @@ let pretty fmt (x:t) =
  *   end) *)
 
 let print_dot _ = (* filename (graph:t) = *)
-  failwith "not implemented"
+  failwith "print_dot not implemented"
 (* let file = open_out filename in
  * Dot.output_graph file graph;
  * close_out file *)
@@ -254,7 +254,7 @@ let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t=
   let list_v2 = addr_of y a in
   match list_v2 with
     [v2] ->  join a v1 v2
-  | _ ->  failwith "not implemented"
+  | _ ->  failwith "assignment_x_addr_y not implemented"
 
 
 (* assignment x = *y *)
@@ -264,7 +264,7 @@ let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
   match list_v2 with
     [] -> let v2 = find_vertex y a in set_type a v2 v1
   | [v2] -> cjoin a v1 v2
-  | _ ->  failwith "not implemented"
+  | _ ->  failwith "assignment_x_ptr_y not implemented"
 
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y (a:t) (x:lval) (y:lval) : t =
@@ -279,7 +279,7 @@ let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
   match list_v1 with
     [] ->  let v1 = find_vertex x a in set_type a v1 v2
   |  [v1] -> cjoin a v1 v2
-  | _ ->  failwith "not implemented"
+  | _ ->  failwith "assignment_ptr_x_y not implemented"
 
 exception Not_equal
   
@@ -324,7 +324,7 @@ let equal (a1:t) (a2:t) =
       
 let union  (a1:t) (a2:t) :t =
   ignore (a1,a2) ;
-  failwith "not implemented"
+  failwith "union not implemented"
 
 
 let initial_value :t =

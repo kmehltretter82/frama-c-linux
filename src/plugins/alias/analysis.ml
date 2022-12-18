@@ -91,16 +91,16 @@ struct
       begin
         match e2.enode with
           Lval lv2 -> Abstract_state.assignment_x_ptr_y a (Var v1, NoOffset) lv2
-        |  _ -> failwith "not implemented"
+        |  _ -> failwith " do_assignment not implemented 1"
       end
     | (Some a, (Mem e1, NoOffset), Lval lv2) ->
       (* case *x = y *)
       begin
         match e1.enode with
           Lval lv1 -> Abstract_state.assignment_ptr_x_y a lv1 lv2
-        |  _ -> failwith "not implemented"
+        |  _ -> failwith " do_assignment not implemented 2"
       end
-    | _ -> failwith "not implemented"
+    | _ -> failwith " do_assignment not implemented 3"
 
   let doInstr (s:stmt)  (i:instr) (a:t) =
     ignore s;
@@ -146,7 +146,7 @@ let doFunction (kf:kernel_function) =
     F.compute first_stmts
 
 let make_summary  _ =
-  failwith "not implemented"
+  failwith "make_summary not implemented"
 
 let compute () =
   Ast.compute();
@@ -155,7 +155,7 @@ let compute () =
   Options.feedback "Functions done"
 
 let clear () =
-  failwith "not implemented"
+  failwith "clear not implemented"
 
 let get_abstract_state _ =
-  failwith "not implemented"
+  failwith "get_abstract_state not implemented"
