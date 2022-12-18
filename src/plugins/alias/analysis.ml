@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Abstract_state
 
 module Dataflow = Dataflow2
   
@@ -41,7 +40,7 @@ module Dataflow = Dataflow2
  *
  * end *)
 
-module A = struct type t = Abstract_state.t let size = 7 end
+module A = struct type t = Abstract_state.t option let size = 7 end
 
 (* module Stmt_table = Make_table(Cil_datatype.Stmt.Hashtbl)(A)
  * module Function_table = Make_table(Kernel_function.Hashtbl)(A) *)
@@ -138,9 +137,13 @@ end
 
 module  F = Dataflow.Forwards(T)
 
-let doFunction (f:kernel_function) =
-  if Kernel_function.has_definition f then
-    F.compute (fst (find_stmts (Kernel_function.get_definition f)))
+let doFunction (kf:kernel_function) =
+  Options.feedback ~level:2 "entering in function %a."
+    Kernel_function.pretty kf;
+  if Kernel_function.has_definition kf then
+    let fundec = Kernel_function.get_definition kf in
+    let stmts, _ = Dataflow.find_stmts fundec in
+    F.compute stmts
 
 let make_summary  _ =
   failwith "not implemented"
