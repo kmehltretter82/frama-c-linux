@@ -281,6 +281,53 @@ let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
   |  [v1] -> cjoin a v1 v2
   | _ ->  failwith "not implemented"
 
+exception Not_equal
+  
+let equal (a1:t) (a2:t) =
+  (* a1 and a2 are equal iff there is an isomorphism between the two
+     graphs and their associated maps *)
+  (* we don't need to check a1.vmap and a2.vmap since they are inverse
+     maps of a1.lmap and a2.lmap. However, shall we also check pending
+     ? *)
+  if LMap.equal V.equal a1.lmap a2.lmap
+  then
+    (* then the isomorphism is the identity ; just check that the graph are the same *)
+    a1.graph = a2.graph
+    (* TODO: is there a better way to check equality between graphs ? *)
+  else
+    try
+      let card = LMap.cardinal a1.lmap in
+      if card = LMap.cardinal a2.lmap then
+        begin
+          (* builds the isomorphism between vertex numbers as an
+             Hastable Int.t -> Int.t *)
+          let iso : (V.t, V.t) Hashtbl.t = Hashtbl.create card in
+          LMap.iter
+            (fun lv v1 ->
+               let v2 : V.t = try LMap.find lv a2.lmap with Not_found -> raise Not_equal in
+               try if not (V.equal (Hashtbl.find iso v1) v2) then raise Not_equal
+               with Not_found ->
+                 Hashtbl.add iso v1 v2
+            )
+            a1.lmap;
+          (* now iso is the isomorphism between vertex numbers *)
+          let fmap v1 = try Hashtbl.find iso v1 with Not_found -> failwith "Bug in abstract_state.equal" in 
+          (* applies the isomorphism to a1.graph and checks that the result is equal to a2.graph *)
+          let g1 = G.map_vertex fmap a1.graph in
+          g1 = a2.graph
+        end
+      else
+        (* if the cardinal is different, there cannot be an isomorphism *)
+        false
+    with
+      Not_equal -> false
+      
+let union  (a1:t) (a2:t) :t =
+  ignore (a1,a2) ;
+  failwith "not implemented"
+
+
+
 (** a type for summaries of functions *)
 type summary = t (* final type may be different *)
 

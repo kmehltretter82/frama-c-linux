@@ -21,10 +21,10 @@
 (**************************************************************************)
 
 open Cil_types
-open Dataflow2
 open Abstract_state
 
-
+module Dataflow = Dataflow2
+  
 (* module type Table = sig
  *   type key
  *   type value
@@ -47,7 +47,7 @@ module A = struct type t = Abstract_state.t let size = 7 end
  * module Function_table = Make_table(Kernel_function.Hashtbl)(A) *)
 
 
-module D = StartData(A)
+module D = Dataflow.StartData(A)
 
 module T =
 struct
@@ -56,43 +56,59 @@ struct
 
   let debug = true (* TODO see options *)
 
-  type t = Abstract_state.t
+  type t = Abstract_state.t option
+             
+  module StmtStartData = D
 
   let copy x = x (* we only have persistant data *)
 
-  let pretty = Abstract_state.pretty
+  let pretty fmt state =
+    match state with
+    | None -> Format.fprintf fmt "None"
+    | Some s -> Format.fprintf fmt "%a" Abstract_state.pretty s
 
   let  computeFirstPredecessor _ a = a
 
-  let combinePredecessors _ ~old a = ignore old ; Some a
+  let combinePredecessors stmt ~old state =
+    match stmt.skind, old, state with
+    | _, _, None -> assert false
+    | _, None, Some _ -> Some state (* [old] already included in [state] *)
+    | _, Some old, Some new_ ->
+      if Abstract_state.equal old new_ then
+        None
+      else
+        Some (Some (Abstract_state.union old new_))
 
   let do_assignment (a:t) (lv:lval) (exp:exp) =
-    match (lv,exp.enode) with
-      ((Var v1, NoOffset), Lval (Var v2,NoOffset)) ->
+    match (a,lv,exp.enode) with
+      (Some a, (Var v1, NoOffset), Lval (Var v2,NoOffset)) ->
       (* case x = y *)
-      assignment_x_y a (Var v1, NoOffset) (Var v2, NoOffset)
-    | ((Var v1, NoOffset), AddrOf lv2) ->
+      Abstract_state.assignment_x_y a (Var v1, NoOffset) (Var v2, NoOffset)
+    | (Some a, (Var v1, NoOffset), AddrOf lv2) ->
       (* case x = &y *)
-      assignment_x_addr_y a (Var v1, NoOffset) lv2
-    | ((Var v1, NoOffset), Lval (Mem e2, NoOffset)) ->
+      Abstract_state.assignment_x_addr_y a (Var v1, NoOffset) lv2
+    | (Some a, (Var v1, NoOffset), Lval (Mem e2, NoOffset)) ->
       (* case x  = *y *)
       begin
         match e2.enode with
-          Lval lv2 -> assignment_x_ptr_y a (Var v1, NoOffset) lv2
+          Lval lv2 -> Abstract_state.assignment_x_ptr_y a (Var v1, NoOffset) lv2
         |  _ -> failwith "not implemented"
       end
-    | ((Mem e1, NoOffset), Lval lv2) ->
+    | (Some a, (Mem e1, NoOffset), Lval lv2) ->
       (* case *x = y *)
       begin
         match e1.enode with
-          Lval lv1 -> assignment_ptr_x_y a lv1 lv2
+          Lval lv1 -> Abstract_state.assignment_ptr_x_y a lv1 lv2
         |  _ -> failwith "not implemented"
       end
     | _ -> failwith "not implemented"
 
-  let doInstr _  (i:instr) (a:t) =
+  let doInstr (s:stmt)  (i:instr) (a:t) =
+    ignore s;
     match i with
-      Set(lv,exp,_) -> do_assignment a lv exp
+      Set(lv,exp,_) ->
+      let new_a = do_assignment a lv exp in
+      Some new_a
     | _ -> failwith "not implemented"
 
   (* let do_stmt (s:stmt) (a:t)  =
@@ -104,22 +120,23 @@ struct
    *           * Stmt_table.add s new_a ; new_a *\) *)
 
   let doGuard _ _ a =
-    GUse a, GUse a
+    Dataflow.GUse a, Dataflow.GUse a
 
   let doStmt (s:stmt) (a:t) =
+    (* let f_post (a:t) =
+     *   match a with
+     * in *)
     ignore (s,a);
-    SDefault
+    Dataflow.SDefault
   (** The (forwards) transfer function for a statement. The [(Cil.CurrentLoc.get
       ())] * is set before calling this. The default action is to do the
       instructions * in this statement, if applicable, and continue with the
       successors. *)
 
   let doEdge _ _ a = a
-
-  module StmtStartData = D
 end
 
-module  F = Forwards(T)
+module  F = Dataflow.Forwards(T)
 
 let doFunction (f:kernel_function) =
   if Kernel_function.has_definition f then

@@ -65,6 +65,12 @@ val assignment_x_allocate_y : t -> lval -> lval -> t
 
 val assignment_ptr_x_y : t -> lval -> lval -> t
 
+val equal : t -> t -> bool
+  
+(** union of two abstract values ; ensures that if 2 lval are aliased
+   in one of the two input graph (or in a points-to relationship),
+   then they will also be aliased/points-to in the result *)
+val union : t -> t -> t
 
 (** Type denoting summaries of functions *)
 type summary
