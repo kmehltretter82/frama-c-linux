@@ -1,5 +1,5 @@
 [kernel] Parsing const-assignments.c (with preprocessing)
-[kernel] const-assignments.c:33: User Error: 
+[kernel] const-assignments.c:34: User Error: 
   Cannot assign to non-modifiable lval x
 [kernel] User Error: stopping on file "const-assignments.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.

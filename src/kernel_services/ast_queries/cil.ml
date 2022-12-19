@@ -6239,23 +6239,38 @@ and is_complete_agg_member ~allowZeroSizeArrays ?last_field t =
 let isCompleteType ?allowZeroSizeArrays t =
   isCompleteType ?allowZeroSizeArrays t
 
-let is_mutable_or_initialized (host, offset) =
+let is_mutable (lhost, offset) =
   let rec aux can_mutate typ off =
     let can_mutate = can_mutate && not (isConstType typ) in
     match unrollType typ, off with
     | _, NoOffset -> can_mutate
     | _, Field (fi, off) ->
-      aux
-        (can_mutate || hasAttribute frama_c_mutable fi.fattr)
-        fi.ftype off
+      let can_mutate = can_mutate || hasAttribute frama_c_mutable fi.fattr in
+      aux can_mutate fi.ftype off
     | TArray(typ, _, _), Index(_, off) -> aux can_mutate typ off
-    | _, Index _ -> Kernel.fatal "Index on a non-array type"
+    | typ, Index _ ->
+      Kernel.fatal "Index on a non-array type '%a'" Cil_datatype.Typ.pretty typ
   in
-  match host with
-  | Mem({ enode = Lval (Var vi, NoOffset) })
-    when hasAttribute frama_c_init_obj vi.vattr -> true
-  | _ ->
-    aux false (typeOfLhost host) offset
+  aux false (typeOfLhost lhost) offset
+
+let rec is_initialized_aux on_same_obj e =
+  match e.enode with
+  | Lval (lh, _) | AddrOf (lh, _) | StartOf (lh, _) ->
+    is_initialized_lhost on_same_obj lh
+  | BinOp ((PlusPI|MinusPI), e, _, _) | CastE (_, e) ->
+    is_initialized_aux on_same_obj e
+  | _ -> false
+
+and is_initialized_lhost on_same_obj lhost =
+  match lhost with
+  | Var vi -> hasAttribute frama_c_init_obj vi.vattr
+  | Mem e -> on_same_obj && is_initialized_aux false e
+
+let is_initialized e =
+  is_initialized_aux true e
+
+let is_mutable_or_initialized lval =
+  is_mutable lval || is_initialized_lhost true (fst lval)
 
 let is_modifiable_lval lv =
   let t = typeOfLval lv in
