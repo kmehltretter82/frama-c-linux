@@ -21,6 +21,7 @@
         - [Plugin files: (in `/INSTALL_DIR/lib/frama-c/plugins`)](#plugin-files-in-install_dirlibframa-cplugins)
         - [Man files: (in `/INSTALL_DIR/share/man/man1`)](#man-files-in-install_dirsharemanman1)
 - [Installing Additional Frama-C Plugins](#installing-additional-frama-c-plugins)
+- [Frama-C additional tools](#frama-c-additional-tools)
     - [HAVE FUN WITH FRAMA-C!](#have-fun-with-frama-c)
 
 ## Installing Frama-C via opam
@@ -483,6 +484,32 @@ The standard way for installing them should be:
 
 Plugins may have their own custom installation procedures.
 Consult their specific documentation for details.
+
+# Frama-C additional tools
+
+A few additional tools that are unnecessary for most users might be useful for
+plugin developers. These tools are:
+- `frama-c-lint`, used for checking coding conventions
+- `frama-c-hdrck`, used for checking file license headers
+
+They can be installed either by pinning them via Opam:
+
+```
+opam pin tools/lint
+opam pin tools/hdrck
+```
+
+Or by compiling/installing Frama-C manually in developer mode:
+```
+FRAMAC_DEVELOPER=yes make
+FRAMAC_DEVELOPER=yes make install
+
+# Or:
+make -C tools/<the-tool>
+make -C tools/<the-tool> install
+```
+
+For convenience, `FRAMAC_DEVELOPER` can be exported globally.
 
 
 # HAVE FUN WITH FRAMA-C!

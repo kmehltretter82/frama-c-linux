@@ -23,6 +23,7 @@
 # This file is the main makefile of Frama-C.
 
 MAKECONFIG_DIR=share
+FRAMAC_DEVELOPER?=
 
 include $(MAKECONFIG_DIR)/Makefile.common
 
@@ -42,7 +43,11 @@ FRAMAC_LINTCK_SRC:=tools/lint
 
 .PHONY: all
 
-all:
+all::
+ifeq (${FRAMAC_DEVELOPER},yes)
+	dune build --no-print-directory --root ${FRAMAC_LINTCK_SRC}
+	dune build --no-print-directory --root ${FRAMAC_HDRCK_SRC}
+endif
 ifneq ($(DISABLED_PLUGINS),)
 	dune clean
 	rm -rf _build .merlin
@@ -51,9 +56,11 @@ endif
 	dune build $(DUNE_BUILD_OPTS) @install
 
 clean:: purge-tests # to be done before a "dune" command
+ifeq (${FRAMAC_DEVELOPER},yes)
+	dune clean --no-print-directory --root ${FRAMAC_LINTCK_SRC}
+	dune clean --no-print-directory --root ${FRAMAC_HDRCK_SRC}
+endif
 	dune clean
-	dune clean --root $(FRAMAC_PTESTS_SRC)
-	dune clean --root $(FRAMAC_HDRCK_SRC)
 	rm -rf _build .merlin
 
 ##############################################################################
@@ -71,8 +78,25 @@ help::
 # INSTALL/UNINSTALL
 ################################
 
+install:: all
+
+INSTALL_TARGET=Frama-C
 include share/Makefile.installation
 include ivette/Makefile.installation
+
+ifeq (${FRAMAC_DEVELOPER},yes)
+
+install::
+	@echo "Installing frama-c-hdrck and frama-c-lint"
+	dune install --root ${FRAMAC_HDRCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+	dune install --root ${FRAMAC_LINTCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+
+uninstall::
+	@echo "Uninstalling frama-c-hdrck and frama-c-lint"
+	dune uninstall --root ${FRAMAC_HDRCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+	dune uninstall --root ${FRAMAC_LINTCK_SRC} --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+
+endif
 
 ###############################################################################
 # HEADER MANAGEMENT
