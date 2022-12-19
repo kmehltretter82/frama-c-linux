@@ -141,7 +141,7 @@ let print_dot _ = (* filename (graph:t) = *)
 
 (* merge of two vertices; the first vertex carries both sets, the second is removed from the graph and from lmap and vmap; however, pending is NOT updated  *)
 let merge x v1 v2 =
-  if V.equal v1 v2
+  if (V.equal v1 v2) || not (G.mem_vertex x.graph v1) || not (G.mem_vertex x.graph v2)
   then x
   else
     let set1 = find_lset v1 x in
@@ -321,12 +321,89 @@ let equal (a1:t) (a2:t) =
         false
     with
       Not_equal -> false
+
+
+module VPairs =
+       struct
+         type t = V.t * V.t
+         let compare (x0,y0) (x1,y1) =
+           match V.compare x0 x1 with
+               0 -> V.compare y0 y1
+             | c -> c
+       end
+
+     module V2Set = Set.Make(VPairs)
       
 let union  (a1:t) (a2:t) :t =
-  ignore (a1,a2) ;
-  failwith "union not implemented"
+  (* naive algorithm :
+     1 rename any vertex in a2 (by adding a1.cmpt) to avoid any confusion between vertex of the tw graphs
+     2 merge the graph and the vmap and pending (by doing union of sets)
+     3 for any lval [lv] that are has an entry in both a1.lmap and a2.lmap, merge the two vertex a1.lmap[lv] 
+       and a2.lmap[lv]
 
+     I am not confident about this function, there are too many potential bugs and inefficiencies
+  *)
+  let f_v2 x = x + a1.cmpt in
+  (* we build the new graph, starting from a1.graph *)
+  let g = a1.graph in
+  (* add all vertex of a2 in g *)
+  let g = 
+  G.fold_vertex
+    (fun v2 g -> G.add_vertex g (f_v2 v2))
+    a2.graph
+    g
+  in
+  (* add all edges of a2 in g *)
+  let new_graph = 
+  G.fold_edges
+    (fun v2a v2b g -> G.add_edge g (f_v2 v2a) (f_v2 v2b))
+    a2.graph
+    g
+  in
+  let new_pending =
+    VMap.fold
+      (fun v2 p2 m -> VMap.add (f_v2 v2) p2 m)
+      a2.pending
+      a1.pending
+  in
+  let new_vmap = 
+    VMap.fold
+      (fun v2 lset2 m -> VMap.add (f_v2 v2) lset2 m)
+      a2.vmap
+      a1.vmap
+  in
+  (* s_acc = set of couples that should be merged in step 3 *)
+  let set_to_be_merged, new_lmap =
+  LMap.fold
+    (fun lv v2 (s_acc, m_acc) ->
+           (* if lv has an entry in a1.lmap, then add the two vertex to be merged *)
+      try let v1 = LMap.find lv a1.lmap  in (V2Set.add (v1,(f_v2 v2)) s_acc, m_acc)
+      (* WARNING : potential bug here: the invariant of lmap is broken
+         since lv shall be mapped to both v1 and (f_v2 v2); the merge
+         that are done in step 3 shall restore the invariant*)
+       with
+       (* if not, simply add the lval -> f_v2 v2 in m_acc *)
+         Not_found -> (s_acc, LMap.add lv (f_v2 v2) m_acc)
+    )
+    a2.lmap
+    (V2Set.empty, a1.lmap)
+  in
+  let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = a1.cmpt + a2.cmpt } in
+    V2Set.fold
+      (fun (v1,v2) a ->
+         let new_a = merge a v1 v2 in
+         let new_vset  =
+           try VSet.union (VMap.find v1 new_a.pending) (VMap.find v2 new_a.pending)
+           with Not_found -> failwith "bug here"
+         in
+         (* warning: exploit the fact that v1 is preserved in the merge operation *)
+         let new_pending = VMap.add v1 new_vset (VMap.remove v2 new_a.pending) in
+         { new_a with pending = new_pending }
+      )
+      set_to_be_merged
+      new_a
 
+  
 let initial_value :t =
   {graph = G.empty; pending = VMap.empty ; lmap = LMap.empty; vmap = VMap.empty; cmpt = 0}
 

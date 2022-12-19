@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Cil_datatype
 
 module Dataflow = Dataflow2
   
@@ -103,12 +104,11 @@ struct
     | _ -> failwith " do_assignment not implemented 3"
 
   let doInstr (s:stmt)  (i:instr) (a:t) =
-    ignore s;
     match i with
       Set(lv,exp,_) ->
       let new_a = do_assignment a lv exp in
       Some new_a
-    | _ -> failwith "not implemented"
+    | _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
 
   (* let do_stmt (s:stmt) (a:t)  =
    *   (\* let new_a = *\)
