@@ -79,35 +79,36 @@ struct
       else
         Some (Some (Abstract_state.union old new_))
 
-  let do_assignment (a:t) (lv:lval) (exp:exp) =
+  let do_assignment (a:t) (lv:lval) (exp:exp) : t =
     match (a,lv,exp.enode) with
       (Some a, (Var v1, NoOffset), Lval (Var v2,NoOffset)) ->
       (* case x = y *)
-      Abstract_state.assignment_x_y a (Var v1, NoOffset) (Var v2, NoOffset)
+      Some (Abstract_state.assignment_x_y a (Var v1, NoOffset) (Var v2, NoOffset))
     | (Some a, (Var v1, NoOffset), AddrOf lv2) ->
       (* case x = &y *)
-      Abstract_state.assignment_x_addr_y a (Var v1, NoOffset) lv2
+      Some (Abstract_state.assignment_x_addr_y a (Var v1, NoOffset) lv2)
     | (Some a, (Var v1, NoOffset), Lval (Mem e2, NoOffset)) ->
       (* case x  = *y *)
       begin
         match e2.enode with
-          Lval lv2 -> Abstract_state.assignment_x_ptr_y a (Var v1, NoOffset) lv2
+          Lval lv2 -> Some (Abstract_state.assignment_x_ptr_y a (Var v1, NoOffset) lv2)
         |  _ -> failwith " do_assignment not implemented 1"
       end
     | (Some a, (Mem e1, NoOffset), Lval lv2) ->
       (* case *x = y *)
       begin
         match e1.enode with
-          Lval lv1 -> Abstract_state.assignment_ptr_x_y a lv1 lv2
+          Lval lv1 -> Some (Abstract_state.assignment_ptr_x_y a lv1 lv2)
         |  _ -> failwith " do_assignment not implemented 2"
       end
+    | (None, _, _) -> None
     | _ -> failwith " do_assignment not implemented 3"
 
-  let doInstr (s:stmt)  (i:instr) (a:t) =
+  let doInstr (s:stmt)  (i:instr) (a:t) :t =
     match i with
       Set(lv,exp,_) ->
       let new_a = do_assignment a lv exp in
-      Some new_a
+      new_a
     | _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
 
   (* let do_stmt (s:stmt) (a:t)  =
