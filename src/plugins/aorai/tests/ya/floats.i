@@ -2,6 +2,7 @@
   STDOPT: -aorai-automata %{dep:@PTEST_DIR@/@PTEST_NAME@.ya} -then-last -eva
 */
 
+//@ assigns \result \from x, n;
 float square_root_aux(float x, float n) {
     float y = (x + n / x) / 2.0f;
     if (x - y > 0.001)
