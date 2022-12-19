@@ -102,7 +102,7 @@ struct
         |  _ -> failwith " do_assignment not implemented 2"
       end
     | (None, _, _) -> None
-    | _ -> failwith " do_assignment not implemented 3"
+    | _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (not implemented)" Lval.pretty lv Exp.pretty exp; a)
 
   let doInstr (s:stmt)  (i:instr) (a:t) :t =
     match i with
