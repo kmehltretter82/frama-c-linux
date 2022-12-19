@@ -24,7 +24,7 @@ open Cil_types
 open Cil_datatype
 
 module Dataflow = Dataflow2
-  
+
 (* module type Table = sig
  *   type key
  *   type value
@@ -57,7 +57,7 @@ struct
   let debug = true (* TODO see options *)
 
   type t = Abstract_state.t option
-             
+
   module StmtStartData = D
 
   let copy x = x (* we only have persistant data *)
