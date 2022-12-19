@@ -25,6 +25,7 @@ variables:
   OCAML: "4.11"
   PUBLISH: "no"
   RELEASE: "no"
+  WEEKLY: "no"
 
 ################################################################################
 ### PREPARE
@@ -397,24 +398,50 @@ opam-pin-release:
     variables:
       - $RELEASE == "yes"
 
-# TODO: Enable this rule later:
-#
-# opam-pin-minimal:
-#   variables:
-#     OPAMSOLVERTIMEOUT: "500"
-#     OPAMCRITERIA: "+count[version-lag,solution]"
-#     OPAMEXTERNALSOLVER: "builtin-0install"
-#   stage: prepare
-#   image: 'ocaml/opam:ubuntu-20.04-ocaml-$OCAML'
-#   script:
-#     - sudo ln -f /usr/bin/opam-2.1 /usr/bin/opam
-#     - opam --version
-#     - opam init --reinit -ni
-#     - opam pin . -n
-#     - opam depext frama-c --with-test
-#     - opam install --jobs 2 frama-c --with-test
-#   tags:
-#     - docker
+.build_template: &opam_pin_minimal_template
+  stage: compatibility
+  image: 'ocaml/opam:ubuntu-20.04-ocaml-$OCAML'
+  variables:
+    OPAMDOWNLOADJOBS: "1"
+    OPAMERRLOGLEN: "0"
+    OPAMSOLVERTIMEOUT: "500"
+    OPAMPRECISETRACKING: "1"
+  script:
+    - sudo ln -f /usr/bin/opam-2.1 /usr/bin/opam
+    - opam --version
+    - opam init --reinit -ni
+    - sudo apt update
+    - export OPAMCRITERIA="-removed,-count[avoid-version,changed],-count[version-lag,request],-count[version-lag,changed],-count[missing-depexts,changed],-changed"
+    - export OPAMFIXUPCRITERIA="-removed,-count[avoid-version,changed],-count[version-lag,request],-count[version-lag,changed],-count[missing-depexts,changed],-changed"
+    - export OPAMUPGRADECRITERIA="-removed,-count[avoid-version,changed],-count[version-lag,request],-count[version-lag,changed],-count[missing-depexts,changed],-changed"
+    - opam pin . -n -k path
+    - opam update --depexts
+    - opam depext frama-c
+    - export OPAMCRITERIA="+removed,+count[version-lag,solution]"
+    - export OPAMFIXUPCRITERIA="+removed,+count[version-lag,solution]"
+    - export OPAMUPGRADECRITERIA="+removed,+count[version-lag,solution]"
+    - export OPAMEXTERNALSOLVER="builtin-0install"
+    - opam update --depexts
+    - opam reinstall frama-c
+  timeout: 2h
+  tags:
+    - docker
+
+opam-pin-minimal:
+  <<: *opam_pin_minimal_template
+  except:
+    refs:
+      - schedules
+    variables:
+      - $WEEKLY == "yes"
+  when: manual
+
+opam-pin-minimal-weekly:
+  <<: *opam_pin_minimal_template
+  timeout: 2h
+  only:
+    variables:
+      - $WEEKLY == "yes"
 
 # Distrib
 
