@@ -47,7 +47,7 @@ help:
 DEPS=../../reference-configuration.md Dockerfile *.sh
 
 version=$(shell grep -o "^- OCaml [0-9.]\+" "../../reference-configuration.md" | grep -o "[0-9.]\+")
-BUILD_ARGS := --build-arg=OCAML_VERSION=$(version)
+BUILD_ARGS += --build-arg=OCAML_VERSION=$(version)
 
 %.debian: BUILD_ARGS += --build-arg=DISTRO=debian:bullseye-slim
 %.fedora: BUILD_ARGS += --build-arg=DISTRO=fedora:36
