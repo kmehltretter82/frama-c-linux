@@ -56,7 +56,12 @@ let typ_kind typ =
   | TFloat _ -> Float
   | _ -> assert false
 
-module LvalIdTable = Cil_datatype.LvalStructEq.Hashtbl
+type dependencies = {
+  direct: Base.Hptset.t;
+  indirect: Base.Hptset.t;
+}
+
+module LvalIdTable = Cil_datatype.LvalStructEq.Hashtbl (* TODO: projectify *)
 let get_lval_id =
   let table = LvalIdTable.create 127 in
   let last_id = ref 0 in
@@ -71,13 +76,11 @@ module type Variable = sig
   val make: varinfo -> t
   val make_int: varinfo -> t
   val make_startof: varinfo -> t
-  val make_lval: bases:Base.Hptset.t -> lval -> t
-  (* Returns all variables that may have been created for a varinfo. *)
-  val get_all: varinfo -> t list
+  val make_lval: lval_deps: dependencies -> lval -> t
   val kind: t -> kind (* The kind of the variable: integer or float. *)
   val lval: t -> lval option (* The CIL lval corresponding to the variable. *)
-  val bases: t -> Base.Hptset.t (* Bases that affect the variable. *)
   val id: t -> int (* Unique id, needed to use variables as hptmap keys. *)
+  val deps: t -> dependencies
 end
 
 (* Variables of the octagons. Should be extended later to also include
@@ -87,7 +90,7 @@ module Variable : Variable = struct
     | Var of varinfo
     | Int of varinfo
     | StartOf of varinfo
-    | Lval of { lval: lval ; lval_bases: Base.Hptset.t ; lval_id: int }
+    | Lval of { lval: lval ; lval_deps: dependencies ; lval_id: int }
 
   let id = function
     | Var vi -> 4 * vi.vid
@@ -131,22 +134,8 @@ module Variable : Variable = struct
   let make vi = Var vi
   let make_int vi = Int vi
   let make_startof vi = StartOf vi
-
-  module AllLvalEverCreated =
-  struct
-    open Base.Base.Hashtbl
-    let table : (var list) t = Base.Base.Hashtbl.create 127
-    let get base = try find table base with Not_found -> []
-    let add var base = replace table base (var :: get base)
-  end
-
-  let make_lval ~bases:lval_bases lval =
-    let var = Lval { lval ; lval_bases ; lval_id=get_lval_id lval } in
-    Base.Hptset.iter (AllLvalEverCreated.add var) lval_bases;
-    var
-
-  let get_all vi =
-    Var vi :: Int vi :: AllLvalEverCreated.get (Base.of_varinfo vi)
+  let make_lval ~lval_deps lval =
+    Lval { lval ; lval_deps ; lval_id=get_lval_id lval }
 
   let kind = function
     | Var vi -> typ_kind vi.vtype
@@ -158,10 +147,16 @@ module Variable : Variable = struct
     | Lval lv -> Some lv.lval
     | Int _ | StartOf _ -> None
 
-  let bases = function
-    | Var vi | Int vi -> Base.Hptset.singleton (Base.of_varinfo vi)
-    | StartOf _ -> Base.Hptset.empty
-    | Lval lv -> lv.lval_bases
+  let deps = function
+    | Var vi | Int vi ->
+      {
+        direct = Base.Hptset.singleton (Base.of_varinfo vi);
+        indirect = Base.Hptset.empty;
+      }
+    | StartOf _ ->
+      { direct = Base.Hptset.empty ; indirect = Base.Hptset.empty }
+    | Lval {lval_deps} ->
+      lval_deps
 end
 
 (* Pairs of related variables in an octagon.
@@ -189,6 +184,8 @@ module Pair = struct
 
   let fst t = fst (get t)
   let kind t = Variable.kind (fst t)
+  let variable_list t =
+    let (v1,v2) = get t in [v1 ; v2]
 end
 
 
@@ -267,6 +264,7 @@ let _pretty_octagon fmt octagon =
     (Unicode.inset_string ()) Ival.pretty octagon.value
 
 type evaluation = Cil_types.exp -> Cvalue.V.t or_top
+type environment = Cil_types.exp -> (Variable.t * Ival.t) option
 
 (* Transforms Cil expressions into mathematical octagons.
    Use Ival.t to evaluate expressions. *)
@@ -313,11 +311,6 @@ module Rewriting = struct
   let neg { var; sign; coeff } =
     { var; sign = not sign; coeff = Arith.neg coeff }
 
-  (* Is the interval computed for a variable a singleton? *)
-  let is_singleton = function
-    | `Top -> false
-    | `Value ival -> Cvalue.V.cardinal_zero_or_one ival
-
   (* If a needed interval is unknown, stop the current computation and return
      an empty list. *)
   let (let*) x f = match x with
@@ -349,58 +342,6 @@ module Rewriting = struct
       then []
       else f kind v1 v2
 
-  (* Evaluates offset to an interval using the evaluate function for indexes *)
-  let rec offset_to_coeff (evaluate : evaluation) base_type offset =
-    let open Lattice_bounds.Top.Operators in
-    match offset with
-    | Cil_types.NoOffset -> `Value (Ival.zero)
-    | Field (fi, sub) ->
-      let+ sub_coeff = offset_to_coeff evaluate fi.ftype sub in
-      let byte_offset = Integer.of_int (fst (Cil.fieldBitsOffset fi) / 8) in
-      Ival.add_singleton_int byte_offset sub_coeff
-    | Index (exp, sub) ->
-      let elem_type = Cil.typeOf_array_elem base_type in
-      let* index = project_ival (evaluate exp) in
-      let* sub_coeff = offset_to_coeff evaluate elem_type sub in
-      let+ elem_size =
-        try `Value (Cil.bytesSizeOf elem_type)
-        with Cil.SizeOfError _ -> `Top
-      in
-      Ival.(add_int (scale (Integer.of_int elem_size) index) sub_coeff)
-
-  let enumerate_bases (evaluate : evaluation) lval =
-    let open Top.Operators in
-    let rec add_lval_bases (host,offset) acc =
-      acc |> add_host_bases host >>- add_offset_bases offset
-    and add_host_bases host (acc : Base.Hptset.t): Base.Hptset.t or_top =
-      match host with
-      | Var vi ->
-        acc |> Base.Hptset.add (Base.of_varinfo vi) |> fun v -> `Value v
-      | Mem e ->
-        let* value = evaluate e in
-        acc |> Cvalue.V.fold_bases Base.Hptset.add value |> add_exp_bases e
-    and add_exp_bases exp (acc : Base.Hptset.t): Base.Hptset.t or_top =
-      match exp.enode with
-      | StartOf lv | AddrOf lv
-      | Lval lv ->
-        acc |> add_lval_bases lv
-      | UnOp (_, e, _) | CastE (_, e) ->
-        acc |> add_exp_bases e
-      | BinOp (_, e1, e2, _) ->
-        acc |> add_exp_bases e1 >>- add_exp_bases e2
-      | Const _ | SizeOf _ | AlignOf _ | SizeOfStr _ | SizeOfE _ | AlignOfE _ ->
-        `Value acc
-    and add_offset_bases offset acc =
-      match offset with
-      | NoOffset -> `Value acc
-      | Field (_,sub) ->
-        acc |> add_offset_bases sub
-      | Index (e,sub) ->
-        acc |> add_exp_bases e >>- add_offset_bases sub
-    in
-    add_lval_bases lval Base.Hptset.empty
-
-
   (* Rewrites the Cil expression [expr] into the simplified form [±x-coeff],
      where [x] is a non-singleton variable and [coeff] is an interval. The
      result follows the mathematical semantics.
@@ -410,87 +351,63 @@ module Rewriting = struct
      function relies on an evaluation function linking each sub-expression into
      an interval, used for computing sound coefficients. The evaluation may
      return Top for some sub-expression, thus preventing the computation. *)
-  let rec rewrite (evaluate : evaluation) expr =
-    match expr.enode with
-    | Lval (Var varinfo, NoOffset) ->
-      if Cil.isIntegralOrPointerType varinfo.vtype
-      && not (Cil.typeHasQualifier "volatile" varinfo.vtype)
-      && not (is_singleton (evaluate expr))
-      then
-        let var = Variable.make varinfo in
-        [ { var; sign = true; coeff = Ival.zero } ]
-      else []
-
-    | Lval lval ->
-      let* bases = enumerate_bases evaluate lval in
-      let var = Variable.make_lval ~bases lval in
-      [ { var; sign = true; coeff = Ival.zero } ]
-
-    | UnOp (Neg, e, typ) ->
-      let* v = project_ival (evaluate e) in
-      if may_overflow typ (Arith.neg v)
-      then [] else List.map neg (rewrite evaluate e)
-
-    | BinOp (PlusA | MinusA | PlusPI | MinusPI as binop, e1, e2, typ) ->
-      let op = operation_of_binop binop in
-      let rewrite_binop kind v1 v2 =
-        let left_linearized =
-          let* v2 = project_ival v2 in
-          let inverse_op = if op = Add then Arith.sub else Arith.add in
-          try
-            let v2 =
-              if Cil.isPointerType typ
-              then
-                let scale = Cil.(bytesSizeOf (typeOf_pointed typ)) in
-                Arith.mul_integer (Integer.of_int scale) v2
-              else v2
-            in
-            let add_v2 var =
-              { var with coeff = inverse_op kind var.coeff v2 }
-            in
-            List.map add_v2 (rewrite evaluate e1)
-          with Cil.SizeOfError _ -> []
-        and right_linearized =
-          let* v1 = project_ival v1 in
-          let add_v1 var =
-            let var = if op = Sub then neg var else var in
-            { var with coeff = Arith.sub kind var.coeff v1 }
-          in
-          List.map add_v1 (rewrite evaluate e2)
-        in
-        left_linearized @ right_linearized
-      in
-      apply_binop rewrite_binop evaluate typ e1 op e2
-
-    | CastE (typ, { enode = Lval (Var vi, NoOffset) })
-      when Cil.isIntegralType typ
-        && Cil.isFloatingType vi.vtype
-        && not (Cil.typeHasQualifier "volatile" vi.vtype)
-        && not (is_singleton (evaluate expr)) ->
-      let var = Variable.make_int vi in
-      [ { var; sign = true; coeff = Ival.zero } ]
-
-    | CastE (typ, e) ->
-      if Cil.(isIntegralType typ && isIntegralType (typeOf e)) then
+  let rec rewrite (evaluate : evaluation) (env : environment) expr =
+    match env expr with
+    | Some (var, ival) -> [ { var; sign = true; coeff = Ival.neg_int ival } ]
+    | None ->
+      match expr.enode with
+      | UnOp (Neg, e, typ) ->
         let* v = project_ival (evaluate e) in
-        if may_overflow ~cast:true typ v then [] else rewrite evaluate e
-      else if Cil.(isPointerType typ && isPointerType (typeOf e)) then
-        rewrite evaluate e
-      else
-        []
+        if may_overflow typ (Arith.neg v)
+        then [] else List.map neg (rewrite evaluate env e)
 
-    | StartOf (Var vi, offset) | AddrOf (Var vi, offset) ->
-      let var = Variable.make_startof vi in
-      let* coeff = offset_to_coeff evaluate vi.vtype offset in
-      [ { var ; sign = true; coeff = Ival.neg_int coeff }]
+      | BinOp (PlusA | MinusA | PlusPI | MinusPI as binop, e1, e2, typ) ->
+        let op = operation_of_binop binop in
+        let rewrite_binop kind v1 v2 =
+          let left_linearized =
+            let* v2 = project_ival v2 in
+            let inverse_op = if op = Add then Arith.sub else Arith.add in
+            try
+              let v2 =
+                if Cil.isPointerType typ
+                then
+                  let scale = Cil.(bytesSizeOf (typeOf_pointed typ)) in
+                  Arith.mul_integer (Integer.of_int scale) v2
+                else v2
+              in
+              let add_v2 var =
+                { var with coeff = inverse_op kind var.coeff v2 }
+              in
+              List.map add_v2 (rewrite evaluate env e1)
+            with Cil.SizeOfError _ -> []
+          and right_linearized =
+            let* v1 = project_ival v1 in
+            let add_v1 var =
+              let var = if op = Sub then neg var else var in
+              { var with coeff = Arith.sub kind var.coeff v1 }
+            in
+            List.map add_v1 (rewrite evaluate env e2)
+          in
+          left_linearized @ right_linearized
+        in
+        apply_binop rewrite_binop evaluate typ e1 op e2
 
-    | _ -> []
+      | CastE (typ, e) ->
+        if Cil.(isIntegralType typ && isIntegralType (typeOf e)) then
+          let* v = project_ival (evaluate e) in
+          if may_overflow ~cast:true typ v then [] else rewrite evaluate env e
+        else if Cil.(isPointerType typ && isPointerType (typeOf e)) then
+          rewrite evaluate env e
+        else
+          []
+
+      | _ -> []
 
   (* Rewrites the operation [e1 ± e2] into equivalent octagons ±(X±Y-value). *)
-  let rewrite_binop (evaluate : evaluation) e1 binop e2 =
+  let rewrite_binop (evaluate : evaluation) (env : environment) e1 binop e2 =
     let kind = typ_kind (Cil.typeOf e1) in
-    let vars1 = rewrite evaluate e1 in
-    let vars2 = rewrite evaluate e2 in
+    let vars1 = rewrite evaluate env e1 in
+    let vars2 = rewrite evaluate env e2 in
     let vars2 = if binop = Sub then List.map neg vars2 else vars2 in
     let aux acc var1 var2 =
       if Variable.equal var1.var var2.var
@@ -521,10 +438,10 @@ module Rewriting = struct
 
   (* Transforms the constraint [expr] ∈ [ival] into a list of octagonal
      constraints. *)
-  let make_octagons evaluate expr ival =
+  let make_octagons evaluate env expr ival =
     let make_octagons_from_binop kind e1 op e2 ival =
       (* equivalent octagonal forms ±(X±Y-v) for [e1 op e2]. *)
-      let rewritings = rewrite_binop evaluate e1 op e2 in
+      let rewritings = rewrite_binop evaluate env e1 op e2 in
       (* create the final octagon, knowning that [e1 op e2] ∈ [ival]. *)
       let make_octagon (sign, octagon) =
         let ival = if sign then ival else Arith.neg ival in
@@ -577,7 +494,7 @@ module Rewriting = struct
   (* Evaluates the Cil expression [expr], by rewriting it into octagonal
      constraints using [evaluate_expr] to evaluate sub-expressions, and
      then using [evaluate_octagon] to evaluate the octagons. *)
-  let evaluate_through_octagons evaluate_expr evaluate_octagon expr =
+  let evaluate_through_octagons evaluate_expr evaluate_octagon env expr =
     let evaluate_octagon acc (sign, octagon) =
       match evaluate_octagon octagon with
       | None -> acc
@@ -592,7 +509,7 @@ module Rewriting = struct
     match expr.enode with
     | BinOp ((PlusA | MinusA as binop), e1, e2, typ) ->
       let op = if binop = PlusA then Add else Sub in
-      let octagons = rewrite_binop evaluate_expr e1 op e2 in
+      let octagons = rewrite_binop evaluate_expr env e1 op e2 in
       let ival = evaluate_octagons octagons in
       if Ival.(equal top ival) then default else
         let kind = typ_kind (Cil.typeOf e1) in
@@ -613,7 +530,7 @@ module Rewriting = struct
       (* Evaluate [e1 - e2] and compare the resulting interval to the interval
          for which the comparison [e1 # e2] holds. *)
       let range = comparison_range comp in
-      let octagons = rewrite_binop evaluate_expr e1 Sub e2 in
+      let octagons = rewrite_binop evaluate_expr env e1 Sub e2 in
       let ival = evaluate_octagons octagons in
       if Ival.is_included ival range then Ival.one, Alarmset.all
       else if not (Ival.intersects ival range)
@@ -909,6 +826,77 @@ module Intervals = struct
     inter ~cache ~symmetric:false ~idempotent:true ~decide
 end
 
+
+(* -------------------------------------------------------------------------- *)
+(*                               Dependencies                                 *)
+(* -------------------------------------------------------------------------- *)
+
+module Deps = struct
+  module VSet = Variable.Set
+
+  include Hptmap.Make
+    (Base.Base)
+    (struct
+      include Datatype.Pair (VSet) (VSet)
+      let pretty_debug = pretty
+    end)
+    (Hptmap.Comp_unused)
+    (struct let v = [] end)
+    (struct let l = [Ast.self] end)
+
+  let cache_prefix = "Value.Octagons.Deps"
+
+  let inter =
+    let cache_name = cache_prefix ^ ".inter" in
+    let cache = Hptmap_sig.PersistentCache cache_name in
+    let symmetric = true in
+    let idempotent = true in
+    let decide _ (direct1,indirect1) (direct2,indirect2) =
+      let direct = VSet.inter direct1 direct2 in
+      let indirect = VSet.inter indirect1 indirect2 in
+      if VSet.is_empty direct && VSet.is_empty indirect
+      then None
+      else Some (direct, indirect)
+    in
+    inter ~cache ~symmetric ~idempotent ~decide
+
+  let union =
+    let cache_name = cache_prefix ^ ".union" in
+    let cache = Hptmap_sig.PersistentCache cache_name in
+    let symmetric = true in
+    let idempotent = true in
+    let decide _ (direct1,indirect1) (direct2,indirect2) =
+      let direct = VSet.union direct1 direct2 in
+      let indirect = VSet.union indirect1 indirect2 in
+      direct, indirect
+    in
+    join ~cache ~symmetric ~idempotent ~decide
+
+  let find_default b m =
+    try find b m
+    with Not_found -> VSet.empty, VSet.empty
+
+  let add_direct v =
+    replace (function
+      | None -> Some (VSet.singleton v, VSet.empty)
+      | Some (direct, indirect) -> Some (VSet.add v direct, indirect))
+
+  let add_indirect v =
+    replace (function
+      | None -> Some (VSet.empty, VSet.singleton v)
+      | Some (direct, indirect) -> Some (direct, VSet.add v indirect))
+
+  let add_variable m v =
+    let { direct ; indirect } = Variable.deps v in
+    m |>
+    Base.Hptset.fold (add_direct v) direct |>
+    Base.Hptset.fold (add_indirect v) indirect
+
+  let add_variables m variables =
+    List.fold_left add_variable m variables
+end
+
+
 (* -------------------------------------------------------------------------- *)
 (*                               Octagon states                               *)
 (* -------------------------------------------------------------------------- *)
@@ -922,6 +910,7 @@ module State = struct
       intervals: Intervals.t;     (* The intervals for the variables X,Y… *)
       relations: Relations.t;     (* The related variables in [octagons]. *)
       modified: Locations.Zone.t; (* The memory zone modified by a function. *)
+      deps: Deps.t;
     }
 
   include Datatype.Make_with_collections
@@ -940,7 +929,8 @@ module State = struct
           [ { octagons = Octagons.top;
               intervals = Intervals.empty;
               relations = Relations.empty;
-              modified = Zone.bottom } ]
+              modified = Zone.bottom;
+              deps = Deps.empty; } ]
 
         let compare s1 s2 =
           let c = Octagons.compare s1.octagons s2.octagons in
@@ -1008,19 +998,124 @@ module State = struct
     is_redundant intervals {variables; operation = Add; value = diamond.add} &&
     is_redundant intervals {variables; operation = Sub; value = diamond.sub}
 
+  (* Evaluates offset to an interval using the evaluate function for indexes *)
+  let rec offset_to_coeff evaluate base_type offset =
+    let open Lattice_bounds.Top.Operators in
+    match offset with
+    | Cil_types.NoOffset -> `Value (Ival.zero)
+    | Field (fi, sub) ->
+      let+ sub_coeff = offset_to_coeff evaluate fi.ftype sub in
+      let byte_offset = Integer.of_int (fst (Cil.fieldBitsOffset fi) / 8) in
+      Ival.add_singleton_int byte_offset sub_coeff
+    | Index (exp, sub) ->
+      let elem_type = Cil.typeOf_array_elem base_type in
+      let* cvalue = evaluate exp in
+      let* index =
+        try
+          `Value (Cvalue.V.project_ival cvalue)
+        with Cvalue.V.Not_based_on_null -> `Top
+      in
+      let* sub_coeff = offset_to_coeff evaluate elem_type sub in
+      let+ elem_size =
+        try `Value (Cil.bytesSizeOf elem_type)
+        with Cil.SizeOfError _ -> `Top
+      in
+      Ival.(add_int (scale (Integer.of_int elem_size) index) sub_coeff)
+
+  (* TODO: move out of OCtagons (to Cvalue ?) *)
+  let evaluate_deps evaluate lval =
+    let open Top.Operators in
+    let rec lval_bases (host,offset) =
+      let* { direct ; indirect } = host_bases host in
+      let+ indirect = add_offset_bases offset indirect in
+      { direct ; indirect }
+    and host_bases host =
+      match host with
+      | Cil_types.Var vi ->
+        let direct = Base.Hptset.singleton (Base.of_varinfo vi)
+        and indirect = Base.Hptset.empty in
+        `Value { direct ; indirect }
+      | Mem e ->
+        let* value = evaluate e in
+        let direct = Cvalue.V.get_bases value |> Base.SetLattice.project in
+        let+ indirect = add_exp_bases e Base.Hptset.empty in
+        { direct ; indirect }
+    and add_exp_bases exp acc =
+      match exp.enode with
+      | StartOf lv | AddrOf lv
+      | Lval lv ->
+        let+ { direct ; indirect } = lval_bases lv in
+        acc |> Base.Hptset.union direct |> Base.Hptset.union indirect
+      | UnOp (_, e, _) | CastE (_, e) ->
+        acc |> add_exp_bases e
+      | BinOp (_, e1, e2, _) ->
+        acc |> add_exp_bases e1 >>- add_exp_bases e2
+      | Const _ | SizeOf _ | AlignOf _ | SizeOfStr _ | SizeOfE _ | AlignOfE _ ->
+        `Value acc
+    and add_offset_bases offset acc =
+      match offset with
+      | NoOffset -> `Value acc
+      | Field (_,sub) ->
+        acc |> add_offset_bases sub
+      | Index (e,sub) ->
+        acc |> add_exp_bases e >>- add_offset_bases sub
+    in
+    lval_bases lval
+
+  let mk_variable_builder evaluate (_: t) =
+    let (let*) x f = Option.bind (Top.to_option x) f in
+    (* Is the interval computed for a variable a singleton? *)
+    let is_singleton = 
+        Top.fold ~top:false Cvalue.V.cardinal_zero_or_one
+    in
+    fun exp ->
+      match exp.enode with
+      | Lval (Var vi, NoOffset)
+        when Cil.isIntegralOrPointerType vi.vtype
+          && not (Cil.typeHasQualifier "volatile" vi.vtype)
+          && not (is_singleton (evaluate exp)) ->
+        Some (Variable.make vi, Ival.zero)
+
+      | Lval lval ->
+        let* lval_deps = evaluate_deps evaluate lval in 
+        Some (Variable.make_lval ~lval_deps lval, Ival.zero)
+
+      | CastE (typ, { enode = Lval (Var vi, NoOffset) })
+        when Cil.isIntegralType typ
+          && Cil.isFloatingType vi.vtype
+          && not (Cil.typeHasQualifier "volatile" vi.vtype)
+          && not (is_singleton (evaluate exp)) ->
+        Some (Variable.make_int vi, Ival.zero)
+
+      | StartOf (Var vi, offset) | AddrOf (Var vi, offset) ->
+        let var = Variable.make_startof vi in
+        let* coeff = offset_to_coeff evaluate vi.vtype offset in
+        Some (var, coeff)
+
+      | _ -> None
+
+  let get_all_variables_base state base =
+    let direct, indirect = Deps.find_default base state.deps in
+    Variable.Set.(union direct indirect |> elements)
+
+  let get_all_variables state vi =
+    get_all_variables_base state (Base.of_varinfo vi)
+
   (* ------------------------------ Lattice --------------------------------- *)
 
   let top =
     { octagons = Octagons.top;
       intervals = Intervals.top;
       relations = Relations.empty;
-      modified = Zone.top; }
+      modified = Zone.top;
+      deps = Deps.empty }
 
   let empty () =
     { octagons = Octagons.top;
       intervals = Intervals.top;
       relations = Relations.empty;
-      modified = Zone.bottom; }
+      modified = Zone.bottom;
+      deps = Deps.empty }
 
   let is_included t1 t2 =
     Octagons.is_included t1.octagons t2.octagons
@@ -1056,7 +1151,9 @@ module State = struct
     let state =
       { octagons; relations;
         intervals = Intervals.join t1.intervals t2.intervals;
-        modified = Zone.join t1.modified t2.modified; }
+        modified = Zone.join t1.modified t2.modified;
+        deps = Deps.union t1.deps t2.deps;
+      }
     in
     check "join" state
 
@@ -1093,7 +1190,8 @@ module State = struct
     let state =
       { octagons; relations;
         intervals = Intervals.widen t1.intervals t2.intervals;
-        modified = Zone.join t1.modified t2.modified; }
+        modified = Zone.join t1.modified t2.modified;
+        deps = Deps.union t1.deps t2.deps }
     in
     check "widen" state
 
@@ -1102,7 +1200,8 @@ module State = struct
     Intervals.narrow t1.intervals t2.intervals >>- fun intervals ->
     let relations = Relations.union t1.relations t2.relations in
     let modified = Zone.narrow t1.modified t2.modified in
-    `Value { octagons; intervals; relations; modified; }
+    let deps = Deps.inter t1.deps t2.deps in
+    `Value { octagons; intervals; relations; modified; deps }
 
   (* -------------- Transitive closure when adding an octagon --------------- *)
 
@@ -1184,7 +1283,9 @@ module State = struct
       state >>- fun state ->
       Octagons.add_octagon octagon state.octagons >>-: fun octagons ->
       let relations = Relations.relate octagon.variables state.relations in
-      { state with octagons; relations }
+      let variable_list = Pair.variable_list octagon.variables in
+      let deps = Deps.add_variables state.deps variable_list in
+      { state with octagons; relations; deps }
 
   let add_diamond state variables diamond =
     add_octagon state { variables; operation = Add; value = diamond.add }
@@ -1261,6 +1362,7 @@ module State = struct
     Variable.Set.fold aux x_related state
 end
 
+
 (* -------------------------------------------------------------------------- *)
 (*                               Octagon domain                               *)
 (* -------------------------------------------------------------------------- *)
@@ -1284,8 +1386,9 @@ module Domain = struct
       | `Value cvalue -> `Value cvalue
     in
     let evaluate_octagon octagon = Octagons.evaluate octagon state.octagons in
+    let env = mk_variable_builder evaluate_expr state in
     let ival, alarms =
-      Rewriting.evaluate_through_octagons evaluate_expr evaluate_octagon expr
+      Rewriting.evaluate_through_octagons evaluate_expr evaluate_octagon env expr
     in
     if Ival.(equal ival top)
     then top_value
@@ -1332,11 +1435,9 @@ module Domain = struct
 
 
   let kill_base base state =
-    try
-      let varinfo = Base.to_varinfo base in
-      let vars = Variable.get_all varinfo in
-      List.fold_left State.remove state vars
-    with Base.Not_a_C_variable -> state
+    let vars = get_all_variables_base state base in
+    let state = { state with deps = Deps.remove base state.deps } in
+    List.fold_left State.remove state vars
 
   let kill zone state =
     if Locations.Zone.(equal zone top)
@@ -1359,7 +1460,8 @@ module Domain = struct
   exception EBottom
 
   let infer_octagons evaluate expr ival state =
-    let octagons = Rewriting.make_octagons evaluate expr ival in
+    let env = mk_variable_builder evaluate state in
+    let octagons = Rewriting.make_octagons evaluate env expr ival in
     let add_octagon state octagon =
       match State.add_octagon state octagon with
       | `Bottom -> raise EBottom
@@ -1417,13 +1519,16 @@ module Domain = struct
   let assign_variable varinfo expr assigned valuation state =
     let evaluate = evaluation_function valuation in
     let variable = Variable.make varinfo in
+    let base = Base.of_varinfo varinfo in
     (* Remove lvals refering to the variable *)
-    let vars = Variable.get_all varinfo in
+    let direct, indirect = Deps.find_default base state.deps in
+    let vars = Variable.Set.(union direct indirect |> elements)  in
     let vars = List.filter (Fun.negate (Variable.equal variable)) vars in
     let state = List.fold_left State.remove state vars in
     (* Interpret inversible assignment if possible *)
     (* TODO: redundant with rewrite_binop below. *)
-    let vars = Rewriting.rewrite evaluate expr in
+    let env = mk_variable_builder evaluate state in
+    let vars = Rewriting.rewrite evaluate env expr in
     let equal_varinfo v = Variable.equal variable v.Rewriting.var in
     let state =
       try
@@ -1437,7 +1542,7 @@ module Domain = struct
     let left_expr = Cil.new_exp ~loc:expr.eloc enode in
     (* On the assignment X = E; if X-E can be rewritten as ±(X±Y-v),
        then the octagonal constraint [X±Y ∈ v] holds. *)
-    let octagons = Rewriting.rewrite_binop evaluate left_expr Sub expr in
+    let octagons = Rewriting.rewrite_binop evaluate env left_expr Sub expr in
     let state =
       List.fold_left
         (fun acc (_sign, octagon) ->
@@ -1463,7 +1568,7 @@ module Domain = struct
 
   let start_recursive_call recursion state =
     let vars = List.map fst recursion.substitution @ recursion.withdrawal in
-    let vars = List.flatten (List.map Variable.get_all vars) in
+    let vars = List.flatten (List.map (get_all_variables state) vars) in
     List.fold_left State.remove state vars
 
   let start_call _stmt call recursion valuation state =
@@ -1501,7 +1606,7 @@ module Domain = struct
 
   let enter_scope _kind _varinfos state = state
   let leave_scope _kf varinfos state =
-    let vars = List.flatten (List.map Variable.get_all varinfos) in
+    let vars = List.flatten (List.map (get_all_variables state) varinfos) in
     let state = List.fold_left State.remove state vars in
     check "leave_scope" state
 
@@ -1515,13 +1620,13 @@ module Domain = struct
       let add_related_bases acc var =
         let related = Relations.find var state.relations in
         Variable.Set.to_seq related |>
-        Seq.map Variable.bases |>
+        Seq.map Variable.deps |>
+        Seq.map (fun deps -> Base.Hptset.union deps.direct deps.indirect) |>
         Seq.fold_left Base.Hptset.union acc
       in
       let aux base acc =
         try
-          let varinfo = Base.to_varinfo base in
-          let variables = Variable.get_all varinfo in
+          let variables = get_all_variables_base state base in
           List.fold_left add_related_bases acc variables
         with Base.Not_a_C_variable | Not_found -> acc
       in
@@ -1533,7 +1638,9 @@ module Domain = struct
     then state
     else
       let mem_var var =
-        Base.Hptset.intersects (Variable.bases var) bases
+        let var_deps = Variable.deps var in
+        let var_bases = Base.Hptset.union var_deps.direct var_deps.indirect in
+        Base.Hptset.intersects var_bases bases
       in
       let mem_pair pair =
         let x, y = Pair.get pair in
@@ -1551,7 +1658,8 @@ module Domain = struct
     and decide _key left _right = left in
     let join_oct = Octagons.internal_join ~cache ~symmetric ~idempotent ~decide
     and join_itv = Intervals.internal_join ~cache ~symmetric ~idempotent ~decide
-    and join_rel = Relations.union in
+    and join_rel = Relations.union
+    and join_deps = Deps.union in
     fun kf ~current_input ~previous_output ->
       let current_input = kill previous_output.modified current_input in
       (* We use [add_diamond] to add each relation from the previous output
@@ -1582,7 +1690,8 @@ module Domain = struct
         { octagons = join_oct previous_output.octagons current_input.octagons;
           intervals = join_itv previous_output.intervals current_input.intervals;
           relations = join_rel previous_output.relations current_input.relations;
-          modified = current_input.modified }
+          modified = current_input.modified;
+          deps = join_deps previous_output.deps current_input.deps; }
 
   let reuse kf _bases ~current_input ~previous_output =
     if intraprocedural ()
