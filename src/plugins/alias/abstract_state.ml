@@ -96,17 +96,31 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
    vmap = new_vmap ;
    cmpt = x.cmpt+1}
 
+let create_cst_vertex (x:t) : V.t * t =
+  let new_v = x.cmpt in
+  let new_g = G.add_vertex x.graph new_v in
+  let new_pending = VMap.add new_v VSet.empty x.pending in
+  let new_lmap = x.lmap in
+  let new_vmap = VMap.add new_v LSet.empty x.vmap in
+  new_v ,
+  {graph = new_g ;
+   pending = new_pending ;
+   lmap = new_lmap ;
+   vmap = new_vmap ;
+   cmpt = x.cmpt+1}
+
+
 let find_or_create_vertex (lv:lval) (x:t) : V.t *t =
   try find_vertex lv x , x with
     Not_found -> create_vertex lv x
 
-let points_to(lv:lval) (x:t): V.t list =
+let points_to (lv:lval) (x:t): V.t list *t =
   let (v,x) = find_or_create_vertex lv x in
-  G.succ x.graph v
+  G.succ x.graph v, x
 
-let addr_of (lv:lval) (x:t) : V.t list =
+let addr_of (lv:lval) (x:t) : V.t list *t =
   let (v,x) = find_or_create_vertex lv x in
-  G.pred x.graph v
+  G.pred x.graph v, x
 
 (* printing functions *)
 let pretty fmt (x:t) =
@@ -250,8 +264,8 @@ let assignment_x_y (a:t) (x:lval) (y:lval) : t =
 
 (* assignment x = &y *)
 let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t=
-  let (v1,a) = find_or_create_vertex x a in
-  let list_v2 = addr_of y a in
+  let v1, a = find_or_create_vertex x a in
+  let list_v2, a = addr_of y a in
   match list_v2 with
     [v2] ->  join a v1 v2
   | _ ->  failwith "assignment_x_addr_y not implemented"
@@ -259,8 +273,8 @@ let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t=
 
 (* assignment x = *y *)
 let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
-  let (v1,a) = find_or_create_vertex x a in
-  let list_v2 = points_to y a in
+  let v1, a = find_or_create_vertex x a in
+  let list_v2, a = points_to y a in
   match list_v2 with
     [] -> let v2 = find_vertex y a in set_type a v2 v1
   | [v2] -> cjoin a v1 v2
@@ -274,12 +288,22 @@ let assignment_x_allocate_y (a:t) (x:lval) (y:lval) : t =
 
 (* assignment *x = y *)
 let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
-  let (v2,a) = find_or_create_vertex y a in
-  let list_v1 = points_to x a in
+  let v2, a = find_or_create_vertex y a in
+  let list_v1, a = points_to x a in
   match list_v1 with
     [] ->  let v1 = find_vertex x a in set_type a v1 v2
   |  [v1] -> cjoin a v1 v2
   | _ ->  failwith "assignment_ptr_x_y not implemented"
+
+
+(* assignment *x = cst *)
+let assignment_ptr_x_cst (a:t) (x:lval) : t =
+  let v2, a = create_cst_vertex a in
+  let list_v1, a = points_to x a in
+  match list_v1 with
+    [] ->  let v1 = find_vertex x a in set_type a v1 v2
+  |  [v1] -> cjoin a v1 v2
+  | _ ->  failwith "assignment_ptr_x_cst not implemented"
 
 exception Not_equal
 

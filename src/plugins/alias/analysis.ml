@@ -84,6 +84,10 @@ struct
       (Some a, (Var v1, NoOffset), Lval (Var v2,NoOffset)) ->
       (* case x = y *)
       Some (Abstract_state.assignment_x_y a (Var v1, NoOffset) (Var v2, NoOffset))
+    (* constant assignments : do nothing, but maybe check the type of the assigned variable ? *)
+    | (_, (Var _, NoOffset), Const _) -> a
+    | (_, (Var _, NoOffset), SizeOf _) -> a
+    | (_, (Var _, NoOffset), SizeOfE _) -> a
     | (Some a, (Var v1, NoOffset), AddrOf lv2) ->
       (* case x = &y *)
       Some (Abstract_state.assignment_x_addr_y a (Var v1, NoOffset) lv2)
@@ -100,6 +104,25 @@ struct
         match e1.enode with
           Lval lv1 -> Some (Abstract_state.assignment_ptr_x_y a lv1 lv2)
         |  _ -> failwith " do_assignment not implemented 2"
+      end
+    (* cases *x = cst *)
+    | (Some a, (Mem e1, NoOffset), Const _ ) ->
+      begin
+        match e1.enode with
+          Lval lv1 -> Some (Abstract_state.assignment_ptr_x_cst a lv1)
+        |  _ -> failwith " do_assignment not implemented 3"
+      end
+    | (Some a, (Mem e1, NoOffset), SizeOf _ ) ->
+      begin
+        match e1.enode with
+          Lval lv1 -> Some (Abstract_state.assignment_ptr_x_cst a lv1)
+        |  _ -> failwith " do_assignment not implemented 4"
+      end
+    | (Some a, (Mem e1, NoOffset), SizeOfE _ ) ->
+      begin
+        match e1.enode with
+          Lval lv1 -> Some (Abstract_state.assignment_ptr_x_cst a lv1)
+        |  _ -> failwith " do_assignment not implemented 5"
       end
     | (None, _, _) -> None
     | _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (not implemented)" Lval.pretty lv Exp.pretty exp; a)

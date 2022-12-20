@@ -45,9 +45,6 @@ val print_dot : string -> t -> unit
 (** finds the vertex corresponding to a lval *)
 val find_vertex : lval -> t -> G.V.t
 
-(** finds the vertices pointed by a lval *)
-val points_to : lval -> t -> G.V.t list
-
 (** Functions for the analysis *)
 val join : t -> G.V.t -> G.V.t -> t
 
@@ -64,6 +61,8 @@ val assignment_x_ptr_y : t -> lval -> lval -> t
 val assignment_x_allocate_y : t -> lval -> lval -> t
 
 val assignment_ptr_x_y : t -> lval -> lval -> t
+
+val assignment_ptr_x_cst : t -> lval -> t
 
 val equal : t -> t -> bool
 
