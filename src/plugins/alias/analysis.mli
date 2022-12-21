@@ -24,22 +24,22 @@ open Cil_types
 
 open Abstract_state
 
-(* module type Table = sig
- *   type key
- *   type value
- *   val find: key -> value
- *   (\** @raise Not_found if the key is not in the table. *\)
- * end
- *
- * (\** Store the graph at each statement. *\)
- * module Stmt_table: Table with type key = stmt and type value = t
- *
- *
- * (\** Store the summary of each function. *\)
- * module Function_table:
- *   Table with type key = kernel_function and type value = summary
- *
- * (\** [do_stmt a s] computes the next state and stores it in [Stmt_table]. *\)
+module type Table = sig
+  type key
+  type value
+  val find: key -> value
+  (** @raise Not_found if the key is not in the table. *)
+end
+
+(** Store the graph at each statement. *)
+module Stmt_table: Table with type key = stmt and type value = Abstract_state.t option
+
+
+(** Store the summary of each function. *)
+module Function_table:
+  Table with type key = kernel_function and type value = Abstract_state.summary option
+
+(* (\** [do_stmt a s] computes the next state and stores it in [Stmt_table]. *\)
  * val do_stmt: t -> stmt -> t *)
 
 (** [make_summary a f] computes the summary of a function (and the

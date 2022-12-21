@@ -25,26 +25,33 @@ open Cil_datatype
 
 module Dataflow = Dataflow2
 
-(* module type Table = sig
- *   type key
- *   type value
- *   val find: key -> value
- *   (\** @raise Not_found if the key is not in the table. *\)
- * end
- *
- * module Make_table(H: Hashtbl.S)(VV: sig type tt val size :int end) = struct
- *   type key = H.key
- *   type value = VV.tt
- *   let tbl = H.create VV.size
- *   let add = H.add tbl
- *   let find = H.find tbl
- *
- * end *)
+module type Table = sig
+  type key
+  type value
+  val find: key -> value
+  (** @raise Not_found if the key is not in the table. *)
+end
+
+module type InternalTable  = sig
+  include Table
+  val add : key -> value -> unit
+end
+
+
+module Make_table(H: Hashtbl.S)(V: sig type t val size :int end) : InternalTable with type key = H.key and type value = V.t = struct
+  type key = H.key
+  type value = V.t
+  let tbl = H.create V.size
+  let add = H.add tbl
+  let find = H.find tbl
+
+end
 
 module A = struct type t = Abstract_state.t option let size = 7 end
+module R = struct type t = Abstract_state.summary option let size = 7 end
 
-(* module Stmt_table = Make_table(Cil_datatype.Stmt.Hashtbl)(A)
- * module Function_table = Make_table(Kernel_function.Hashtbl)(A) *)
+module Stmt_table = Make_table(Cil_datatype.Stmt.Hashtbl)(A)
+module Function_table = Make_table(Kernel_function.Hashtbl)(R)
 
 
 module D = Dataflow.StartData(A)
@@ -127,34 +134,40 @@ struct
     | (None, _, _) -> None
     | _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (not implemented)" Lval.pretty lv Exp.pretty exp; a)
 
+  let rec do_init vi init state = match init with
+    | SingleInit e -> do_assignment state (Var vi, NoOffset) e
+    | CompoundInit(_, l) ->
+      List.fold_left (fun state (_, init) -> do_init vi init state) state l
+
+
   let doInstr (s:stmt)  (i:instr) (a:t) :t =
     match i with
       Set(lv,exp,_) ->
       let new_a = do_assignment a lv exp in
       new_a
+    | Local_init(v,AssignInit i,_) ->
+      let new_a = do_init v i a in
+      new_a
     | _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
-
-  (* let do_stmt (s:stmt) (a:t)  =
-   *   (\* let new_a = *\)
-   *   match s.skind with
-   *   | Instr i -> do_instr s i a
-   *   | _ -> failwith "not implemented"
-   *          (\* in
-   *           * Stmt_table.add s new_a ; new_a *\) *)
 
   let doGuard _ _ a =
     Dataflow.GUse a, Dataflow.GUse a
 
   let doStmt (s:stmt) (a:t) =
-    (* let f_post (a:t) =
-     *   match a with
-     * in *)
-    ignore (s,a);
-    Dataflow.SDefault
-  (** The (forwards) transfer function for a statement. The [(Cil.CurrentLoc.get
-      ())] * is set before calling this. The default action is to do the
-      instructions * in this statement, if applicable, and continue with the
-      successors. *)
+    (* let _, kf = Kernel_function.find_from_sid s.sid in
+     * let is_first = Kernel_function.is_first_stmt kf s in
+     * let is_last = Kernel_function.is_return_stmt kf s in *)
+    let new_a = match s.skind with
+        Instr i -> doInstr s i a
+      | _ -> a
+    in
+    begin match new_a with
+        None -> ()
+      | Some a -> Stmt_table.add s (Some a)
+    end;
+    Dataflow.SUse new_a
+
+
 
   let doEdge _ _ a = a
 end
@@ -177,6 +190,7 @@ let compute () =
   Options.feedback "Parsing done";
   Globals.Functions.iter doFunction;
   Options.feedback "Functions done"
+
 
 let clear () =
   failwith "clear not implemented"
