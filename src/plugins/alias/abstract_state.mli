@@ -37,7 +37,7 @@ type t
 
 
 (** pretty printer *)
-val pretty : Format.formatter -> t -> unit
+val pretty : ?debug:bool -> Format.formatter -> t -> unit
 
 (** dot printer *)
 val print_dot : string -> t -> unit

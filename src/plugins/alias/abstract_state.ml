@@ -123,12 +123,27 @@ let addr_of (lv:lval) (x:t) : V.t list *t =
   G.pred x.graph v, x
 
 (* printing functions *)
-let pretty fmt (x:t) =
+
+let print_debug fmt (x:t) =
   Format.fprintf fmt "@[<hov 2>List of vertices: @.";
   G.iter_vertex (fun v -> Format.fprintf fmt "(id=%d LSet= %a)@." v LSet.pretty (find_lset v x)) x.graph;
   Format.fprintf fmt "@]@.@[<hov 2>List of edges: @.";
   G.iter_edges (fun v1 v2 -> Format.fprintf fmt "(%d -> %d)@." v1 v2) x.graph;
+  Format.fprintf fmt "@]@.";
+  Format.fprintf fmt "@[<hov 2>Pending: @.";
+  VMap.iter (fun v vs -> Format.fprintf fmt "(id=%d pending= %a)@." v VSet.pretty vs) x.pending;
   Format.fprintf fmt "@]@."
+
+let print_aliases fmt (x:t) =
+  Format.fprintf fmt "@[<hov 2><list of may-alias>@.";
+  VMap.iter  (fun _ set_lv -> if LSet.cardinal set_lv >= 2 then Format.fprintf fmt "%a are aliased@." LSet.pretty set_lv) x.vmap;
+  Format.fprintf fmt "<end of list>@]@."
+
+let pretty ?(debug=false) =
+  if debug then
+    print_debug
+  else
+    print_aliases
 
 (* let lset_to_string s =
  *   let buffer = Buffer.create 16 in

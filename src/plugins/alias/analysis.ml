@@ -49,7 +49,7 @@ module Make_table(H: Hashtbl.S)(V: sig type t val size :int end) : InternalTable
     Format.fprintf fmt "[@[<hov 2>";
     H.iter (fun k v -> Format.fprintf fmt "(%a -> %a)@." print_key k print_value v) tbl;
     Format.fprintf fmt "@]]"
-    
+
 end
 
 module A = struct type t = Abstract_state.t option let size = 7 end
@@ -77,7 +77,7 @@ struct
   let pretty fmt state =
     match state with
     | None -> Format.fprintf fmt "None"
-    | Some s -> Format.fprintf fmt "%a" Abstract_state.pretty s
+    | Some s -> Format.fprintf fmt "%a" (Abstract_state.pretty ~debug:false) s
 
   let  computeFirstPredecessor _ a = a
 
@@ -200,7 +200,7 @@ let compute () =
     | None -> Format.fprintf fmt "<Bot>"
     | Some a -> Abstract_state.pretty fmt a
   in
-  Stmt_table.pretty Format.std_formatter Stmt.pretty  value_pretty
+  Stmt_table.pretty Format.std_formatter Stmt.pretty value_pretty
 
 
 let clear () =
