@@ -57,4 +57,572 @@
 [alias] Skipping assignment *n = *n + 1 (not implemented)
 [alias] Skipping assignment *n = *n + 1 (not implemented)
 [alias] Functions done
+[(b->t1[i] = a->t1[i]; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(idx = 0; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(b->t2[i] = a->t2[i]; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(while (idx < 10) {
+   *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
+   idx ++;
+ } -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(if (*n == 1) *n = 0; else (*n) ++; -> List of vertices: 
+
+List of edges: 
+
+)
+(i ++; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(*n = 0; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { n })
+
+List of edges: 
+(1 -> 0)
+
+)
+(b->n1 = a->n1; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(if (! (idx < 10)) break; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+((*n) ++; -> List of vertices: 
+
+List of edges: 
+
+)
+(b->n2 = a->n2; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(break; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(f1(a); -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(*(odata + idx) = (double)3 * *(idata + idx) + (double)1; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(f2(b); -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(*(odata + idx) = (double)3 * *(idata + idx) + (double)1; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(__retres = 0; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(idx ++; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(ty *tmp = x; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(swap(tmp->n2); -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(idata = (double *)malloc((unsigned long)10 * sizeof(double)); -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(return; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { n })
+(id=2 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+
+)
+(while (1) {
+   idata = tmp->t2[*(tmp->n2)];
+   odata = tmp->t1[*(tmp->n1)];
+   idx = 0;
+   while (idx < 10) {
+     {
+       double tmp_1;
+       tmp_1 = sin(*(idata + idx));
+       *(odata + idx) = 0.5 * tmp_1;
+     }
+     idx ++;
+   }
+   swap(tmp->n1);
+ } -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(idata = tmp->t2[*(tmp->n2)];
+ odata = tmp->t1[*(tmp->n1)];
+ idx = 0;
+ while (idx < 10) {
+   {
+     double tmp_1;
+     tmp_1 = sin(*(idata + idx));
+     *(odata + idx) = 0.5 * tmp_1;
+   }
+   idx ++;
+ }
+ swap(tmp->n1); -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(a = (ty *)malloc(sizeof(ty)); -> List of vertices: 
+
+List of edges: 
+
+)
+(idata = tmp->t2[*(tmp->n2)]; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(b = (ty *)malloc(sizeof(ty)); -> List of vertices: 
+
+List of edges: 
+
+)
+(odata = tmp->t1[*(tmp->n1)]; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(i = 0; -> List of vertices: 
+
+List of edges: 
+
+)
+(idx = 0; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(while (i < 2) {
+   a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
+   a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double));
+   i ++;
+ } -> List of vertices: 
+
+List of edges: 
+
+)
+(while (idx < 10) {
+   {
+     double tmp_1;
+     tmp_1 = sin(*(idata + idx));
+     *(odata + idx) = 0.5 * tmp_1;
+   }
+   idx ++;
+ } -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(return __retres; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(if (! (i < 2)) break; -> List of vertices: 
+
+List of edges: 
+
+)
+(if (! (idx < 10)) break; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(break; -> List of vertices: 
+
+List of edges: 
+
+)
+(break; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
+ a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double)); -> 
+List of vertices: 
+
+List of edges: 
+
+)
+({
+   double tmp_1;
+   tmp_1 = sin(*(idata + idx));
+   *(odata + idx) = 0.5 * tmp_1;
+ } -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double)); -> 
+List of vertices: 
+
+List of edges: 
+
+)
+(tmp_1 = sin(*(idata + idx));
+ *(odata + idx) = 0.5 * tmp_1; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double)); -> 
+List of vertices: 
+
+List of edges: 
+
+)
+(tmp_1 = sin(*(idata + idx)); -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(i ++; -> List of vertices: 
+
+List of edges: 
+
+)
+(*(odata + idx) = 0.5 * tmp_1; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(a->n1 = (int *)malloc(sizeof(int)); -> List of vertices: 
+
+List of edges: 
+
+)
+(idx ++; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(a->n2 = (int *)malloc(sizeof(int)); -> List of vertices: 
+
+List of edges: 
+
+)
+(swap(tmp->n1); -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(*(a->n1) = 1; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+
+List of edges: 
+(1 -> 0)
+
+)
+(*(a->n2) = 1; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(i = 0; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(ty *tmp = x; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(while (i < 2) {
+   b->t1[i] = a->t1[i];
+   b->t2[i] = a->t2[i];
+   i ++;
+ } -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(idata = (double *)malloc((unsigned long)10 * sizeof(double)); -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(while (1) {
+   idata = tmp->t1[*(tmp->n1)];
+   odata = tmp->t2[*(tmp->n2)];
+   idx = 0;
+   while (idx < 10) {
+     *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
+     idx ++;
+   }
+   swap(tmp->n2);
+ } -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(if (! (i < 2)) break; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(idata = tmp->t1[*(tmp->n1)];
+ odata = tmp->t2[*(tmp->n2)];
+ idx = 0;
+ while (idx < 10) {
+   *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
+   idx ++;
+ }
+ swap(tmp->n2); -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(break; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(idata = tmp->t1[*(tmp->n1)]; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
+(b->t1[i] = a->t1[i];
+ b->t2[i] = a->t2[i]; -> List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+)
+(odata = tmp->t2[*(tmp->n2)]; -> List of vertices: 
+(id=0 LSet= { tmp })
+(id=1 LSet= { x })
+
+List of edges: 
+
+)
 [alias] Analysis complete
+]
