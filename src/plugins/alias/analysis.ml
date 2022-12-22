@@ -79,6 +79,11 @@ struct
     | None -> Format.fprintf fmt "None"
     | Some s -> Format.fprintf fmt "%a" (Abstract_state.pretty ~debug:false) s
 
+  let pretty_debug fmt state =
+    match state with
+    | None -> Format.fprintf fmt "None"
+    | Some s -> Format.fprintf fmt "%a" (Abstract_state.pretty ~debug:true) s
+
   let  computeFirstPredecessor _ a = a
 
   let combinePredecessors stmt ~old state =
@@ -92,6 +97,7 @@ struct
         Some (Some (Abstract_state.union old new_))
 
   let do_assignment (a:t) (lv:lval) (exp:exp) : t =
+    Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a;
     match (a,lv,exp.enode) with
       (Some a, (Var v1, NoOffset), Lval (Var v2,NoOffset)) ->
       (* case x = y *)
@@ -122,7 +128,7 @@ struct
       begin
         match e1.enode with
           Lval lv1 -> Some (Abstract_state.assignment_ptr_x_cst a lv1)
-        |  _ -> failwith " do_assignment not implemented 3"
+        |  _ -> Options.feedback "Ingnoring assignment %a = %a (do_assignment  not implemented 3)@." Lval.pretty lv Exp.pretty exp; Some a
       end
     | (Some a, (Mem e1, NoOffset), SizeOf _ ) ->
       begin

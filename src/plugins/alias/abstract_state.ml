@@ -83,18 +83,6 @@ let find_vertex (lv:lval) (x:t) =
   LMap.find lv x.lmap
 (** @raise Not_found if there is not such an lval in the graph *)
 
-let create_vertex (lv:lval) (x:t) : V.t * t =
-  let new_v = x.cmpt in
-  let new_g = G.add_vertex x.graph new_v in
-  let new_pending = VMap.add new_v VSet.empty x.pending in
-  let new_lmap = LMap.add lv new_v x.lmap in
-  let new_vmap = VMap.add new_v (LSet.singleton lv) x.vmap in
-  new_v ,
-  {graph = new_g ;
-   pending = new_pending ;
-   lmap = new_lmap ;
-   vmap = new_vmap ;
-   cmpt = x.cmpt+1}
 
 let create_cst_vertex (x:t) : V.t * t =
   let new_v = x.cmpt in
@@ -108,6 +96,36 @@ let create_cst_vertex (x:t) : V.t * t =
    lmap = new_lmap ;
    vmap = new_vmap ;
    cmpt = x.cmpt+1}
+
+
+let create_vertex (lv:lval) (x:t) : V.t * t =
+  let new_v = x.cmpt in
+  let new_g = G.add_vertex x.graph new_v in
+  let new_pending = VMap.add new_v VSet.empty x.pending in
+  let new_lmap = LMap.add lv new_v x.lmap in
+  let new_vmap = VMap.add new_v (LSet.singleton lv) x.vmap in
+  (* if [lv] is a pointer variable, also create a vertex labelled by
+     *[lv] *)
+  let new_x =
+    {graph = new_g ;
+           pending = new_pending ;
+           lmap = new_lmap ;
+           vmap = new_vmap ;
+     cmpt = x.cmpt+1}
+  in
+  match lv with
+  | (Var v, NoOffset) ->
+    begin
+      match v.vtype with
+        TPtr _ ->
+        (* then add a blank vertex *)
+        let another_v, new_x = create_cst_vertex new_x in
+        let new_g = G.add_edge new_x.graph new_v another_v in
+        new_v, {new_x with graph= new_g}
+      | _ ->   new_v ,new_x
+    end
+  | _ ->    
+  new_v , new_x
 
 
 let find_or_create_vertex (lv:lval) (x:t) : V.t *t =
