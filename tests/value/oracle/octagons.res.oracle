@@ -218,7 +218,10 @@
   Called from octagons.c:196.
 [eva] Recording results for neg
 [eva] Done for function neg
-[eva] octagons.c:197: Reusing old results for call to neg
+[eva] computing for function neg <- interprocedural <- main.
+  Called from octagons.c:197.
+[eva] Recording results for neg
+[eva] Done for function neg
 [eva] computing for function diff <- interprocedural <- main.
   Called from octagons.c:206.
 [eva] Recording results for diff
@@ -266,6 +269,7 @@
      r1 - r3 ∈ [-16..16]
      r2 + r3 ∈ [-16..--]
      r2 - r3 ∈ [-16..16]
+     p - a ∈ {0}
      *p - a1 ∈ {0}
      s.i - b1 ∈ {0}
      s.c - c1 ∈ {0}

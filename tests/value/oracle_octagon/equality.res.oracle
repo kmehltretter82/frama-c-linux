@@ -1,6 +1,16 @@
+42,43c42,43
+< [eva:alarm] equality.c:57: Warning: 
+<   function sqrtf: precondition 'arg_positive' got status unknown.
+---
+> [eva] equality.c:57: 
+>   function sqrtf: precondition 'arg_positive' got status valid.
 75,76c75,76
 <   y ∈ [0..42] or UNINITIALIZED
 <   w ∈ [0..42] or UNINITIALIZED
 ---
 >   y ∈ [0..42]
 >   w ∈ [0..42]
+87c87
+<   res ∈ [-0. .. 3.16227769852] or UNINITIALIZED
+---
+>   res ∈ [3.74339206651e-23 .. 3.16227769852] or UNINITIALIZED

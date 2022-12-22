@@ -10,3 +10,22 @@
 <   y ∈ [2..11]
 ---
 >   y ∈ {3; 5; 7; 9; 11}
+229,232c229
+<   Frama_C_entropy_source ∈ [--..--]
+<   tainted ∈ {2; 4; 6; 8; 10}
+<   l ∈ {0}
+<   __retres ∈ {0}
+---
+>   NON TERMINATING FUNCTION
+255a253
+> [from] Non-terminating function main (no dependencies)
+284,286c282
+<   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+<   tainted FROM Frama_C_entropy_source
+<   \result FROM \nothing
+---
+>   NON TERMINATING - NO EFFECTS
+325c321
+<     Frama_C_entropy_source; tainted; l; __retres
+---
+>     Frama_C_entropy_source; tainted; l
