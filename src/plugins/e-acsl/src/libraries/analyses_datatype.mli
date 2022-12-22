@@ -56,6 +56,7 @@ module Profile: sig
   val make: logic_var list -> ival list -> t
   val is_empty: t -> bool
   val empty: t
+  val is_included: t -> t -> bool
 
 end
 
