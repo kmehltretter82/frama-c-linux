@@ -952,10 +952,12 @@ module State = struct
 
   let log_category = Self.register_category "d-octagon"
 
-  let pretty_debug fmt { octagons; intervals; relations } =
-    Format.fprintf fmt "@[<v> Octagons: %a@; Intervals: %a@; Relations: %a@]"
+  let pretty_debug fmt { octagons; intervals; relations; deps } =
+    Format.fprintf fmt
+      "@[<v> Octagons: %a@; Intervals: %a@; Relations: %a@; Dependencies: %a@.]"
       Octagons.pretty octagons Intervals.pretty intervals
       Relations.pretty relations
+      Deps.pretty deps
 
   (* Verify the internal structure of a state [t], depending on the boolean
      variable [debug]. *)
