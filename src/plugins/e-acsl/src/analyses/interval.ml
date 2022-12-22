@@ -102,31 +102,6 @@ let is_included_in_typ i typ = is_included i (interv_of_typ typ)
 (* main algorithm *)
 (* ********************************************************************* *)
 
-let rec fixpoint ~(infer : force:bool ->
-                   logic_env:Logic_env.t ->
-                   term ->
-                   ival Error.result)
-    li args_ival t' ival =
-  let get_res = Error.map (fun x -> x) in
-  let logic_env = Logic_env.make args_ival in
-  (* If the logic function has a given C type, we use this type to infer the
-     interval. Otherwise we compute this interval as a fixpoint *)
-  match li.l_type with
-  | Some (Ctype typ) ->
-    let ival = interv_of_typ typ in
-    LF_env.add li args_ival ival;
-    ignore (infer ~force:true ~logic_env t');
-    ival
-  | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
-    LF_env.replace li args_ival ival;
-    let inferred_ival = get_res (infer ~force:true ~logic_env t') in
-    if is_included inferred_ival ival
-    then
-      ival
-    else
-      let assumed_ival = Widening.widen li ival inferred_ival in
-      fixpoint ~infer li args_ival t' assumed_ival
-
 (* Memoization module which retrieves the computed info of some terms *)
 module Memo: sig
   val memo:
@@ -475,7 +450,7 @@ let rec infer ~force ~logic_env t =
                   ~logic_env:(Logic_env.make ext_profile) p;
                 Ival Ival.zero_or_one
               | LBterm t' ->
-                fixpoint ~infer li ext_profile t' (Ival Ival.bottom)
+                fixpoint li ext_profile t' (Ival Ival.bottom)
               | _ -> assert false)
          else
            let logic_env = Logic_env.make profile in
@@ -578,6 +553,28 @@ let rec infer ~force ~logic_env t =
     (Logic_env.get_profile logic_env)
     compute
     t
+
+and fixpoint li args_ival t' ival =
+  let get_res = Error.map (fun x -> x) in
+  let logic_env = Logic_env.make args_ival in
+  (* If the logic function has a given C type, we use this type to infer the
+     interval. Otherwise we compute this interval as a fixpoint *)
+  match li.l_type with
+  | Some (Ctype typ) ->
+    let ival = interv_of_typ typ in
+    LF_env.add li args_ival ival;
+    ignore (infer ~force:true ~logic_env t');
+    ival
+  | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
+    LF_env.replace li args_ival ival;
+    let inferred_ival = get_res (infer ~force:true ~logic_env t') in
+    if is_included inferred_ival ival
+    then
+      ival
+    else
+      let assumed_ival = Widening.widen li ival inferred_ival in
+      fixpoint li args_ival t' assumed_ival
+
 
 and infer_term_lval ~force ~logic_env (host, offset as tlv) =
   match offset with
