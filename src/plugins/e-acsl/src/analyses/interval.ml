@@ -441,17 +441,7 @@ let rec infer ~force ~logic_env t =
            let ext_profile = Widening.ext_profile li profile in
            Ext_profile.add profile li ext_profile;
            try LF_env.find li ext_profile
-           with
-           | Not_found ->
-             (match li.l_body with
-              | LBpred p ->
-                LF_env.add_pred li ext_profile;
-                infer_predicate
-                  ~logic_env:(Logic_env.make ext_profile) p;
-                Ival Ival.zero_or_one
-              | LBterm t' ->
-                fixpoint li ext_profile t' (Ival Ival.bottom)
-              | _ -> assert false)
+           with Not_found -> fixpoint li ext_profile
          else
            let logic_env = Logic_env.make profile in
            (match li.l_body with
@@ -554,26 +544,38 @@ let rec infer ~force ~logic_env t =
     compute
     t
 
-and fixpoint li args_ival t' ival =
+and fixpoint li args_ival =
   let get_res = Error.map (fun x -> x) in
   let logic_env = Logic_env.make args_ival in
   (* If the logic function has a given C type, we use this type to infer the
      interval. Otherwise we compute this interval as a fixpoint *)
-  match li.l_type with
-  | Some (Ctype typ) ->
-    let ival = interv_of_typ typ in
-    LF_env.add li args_ival ival;
-    ignore (infer ~force:true ~logic_env t');
-    ival
-  | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
-    LF_env.replace li args_ival ival;
-    let inferred_ival = get_res (infer ~force:true ~logic_env t') in
-    if is_included inferred_ival ival
-    then
-      ival
-    else
-      let assumed_ival = Widening.widen li ival inferred_ival in
-      fixpoint li args_ival t' assumed_ival
+  match li.l_body with
+  | LBpred p ->
+    LF_env.add_pred li args_ival;
+    infer_predicate ~logic_env p;
+    Ival (Ival.zero_or_one)
+  | LBterm t ->
+    (match li.l_type with
+     | Some (Ctype typ) ->
+       let ival = interv_of_typ typ in
+       LF_env.add li args_ival ival;
+       ignore (infer ~force:true ~logic_env t);
+       ival
+     | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
+       let ival =
+         match LF_env.find_opt li args_ival with
+         | Some ival -> ival
+         | None -> Ival Ival.bottom
+       in
+       let inferred_ival = get_res (infer ~force:true ~logic_env t) in
+       if is_included inferred_ival ival
+       then
+         ival
+       else
+         let assumed_ival = Widening.widen li ival inferred_ival in
+         LF_env.replace li args_ival assumed_ival;
+         fixpoint li args_ival)
+  | _ -> assert false
 
 
 and infer_term_lval ~force ~logic_env (host, offset as tlv) =
@@ -748,13 +750,11 @@ and infer_predicate ~logic_env p =
            args)
     in
     (match li.l_body with
-     | LBpred p when LF_env.is_rec li ->
+     | LBpred _ when LF_env.is_rec li ->
        let ext_profile = Widening.ext_profile li profile in
        Ext_profile.add profile li ext_profile;
-       (try ignore (LF_env.find li ext_profile)
-        with Not_found ->
-          LF_env.add_pred li ext_profile;
-          infer_predicate ~logic_env:(Logic_env.make ext_profile) p)
+       ignore (try LF_env.find li ext_profile
+               with Not_found -> fixpoint li ext_profile)
      | LBpred p ->
        let logic_env = Logic_env.make profile in
        ignore (infer_predicate ~logic_env p)

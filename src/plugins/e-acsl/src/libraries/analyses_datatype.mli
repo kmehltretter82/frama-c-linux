@@ -108,6 +108,8 @@ module LF_env : sig
   (** find the currently inferred interval for a call to a logic function *)
   val find : logic_info -> Profile.t -> ival
 
+  val find_opt : logic_info -> Profile.t -> ival option
+
   (** clear the table of intervals for logic function (to do between typing )
       each logic function calls *)
   val clear : unit -> unit

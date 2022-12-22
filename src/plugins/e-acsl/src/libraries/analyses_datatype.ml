@@ -428,6 +428,8 @@ module LF_env
 
   let find li profile = LFProf.Hashtbl.find tbl (li,profile)
 
+  let find_opt li profile = LFProf.Hashtbl.find_opt tbl (li,profile)
+
   let add li profile ival = LFProf.Hashtbl.add tbl (li,profile) ival
 
   let add_pred li profile =
