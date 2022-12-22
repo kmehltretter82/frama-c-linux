@@ -345,6 +345,19 @@ let rec infer ~force ~logic_env t =
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
   let get_res = Error.map (fun x -> x) in
   let t = Logic_normalizer.get_term t in
+  let ival_arith_binop = function
+    | PlusA -> Ival.add_int
+    | MinusA -> Ival.sub_int
+    | Mult -> Ival.mul
+    | Div -> Ival.div
+    | Mod -> Ival.c_rem
+    | Shiftlt -> Ival.shift_left
+    | Shiftrt -> Ival.shift_right
+    | BAnd -> Ival.bitwise_and
+    | BXor -> Ival.bitwise_xor
+    | BOr -> Ival.bitwise_or
+    | _ -> assert false
+  in
   let compute t =
     match t.term_node with
     | TConst (Integer (n, _)) -> singleton n
@@ -384,46 +397,12 @@ let rec infer ~force ~logic_env t =
       ignore (infer ~force ~logic_env t2);
       Ival Ival.zero_or_one
 
-    | TBinOp (PlusA, t1, t2) ->
+    | TBinOp ((PlusA | MinusA | Mult | Div | Mod | Shiftlt
+              | Shiftrt | BAnd | BXor | BOr) as op , t1, t2) ->
       let i1 = infer ~force ~logic_env t1 in
       let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.add_int) i1 i2
-    | TBinOp (MinusA, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.sub_int) i1 i2
-    | TBinOp (Mult, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.mul) i1 i2
-    | TBinOp (Div, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.div) i1 i2
-    | TBinOp (Mod, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.c_rem) i1 i2
-    | TBinOp (Shiftlt, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.shift_left) i1 i2
-    | TBinOp (Shiftrt, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.shift_right) i1 i2
-    | TBinOp (BAnd, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.bitwise_and) i1 i2
-    | TBinOp (BXor, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.bitwise_xor) i1 i2
-    | TBinOp (BOr, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.bitwise_or) i1 i2
+      Error.map2 (lift_arith_binop (ival_arith_binop op)) i1 i2
+
     | TCastE (ty, t) ->
       let src = infer ~force ~logic_env t in
       let dst = interv_of_typ ty in
