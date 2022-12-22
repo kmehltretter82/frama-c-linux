@@ -1585,7 +1585,7 @@ module Domain = struct
         `Value (start_recursive_call recursion state)
       | None ->
         let assign_formal state { formal; concrete; avalue } =
-          if Cil.isIntegralType formal.vtype
+          if Cil.isIntegralOrPointerType formal.vtype
           then state >>- assign_variable formal concrete avalue valuation
           else state
         in
