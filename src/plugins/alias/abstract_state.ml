@@ -73,6 +73,23 @@ type t = {
   cmpt : Int.t ; (* counter to create new vertex *)
 }
 
+
+(** invariants of type t must be true before and after each functon call *)
+let assert_invariants (x:t) : unit =
+  (* check that all vertex of the graph have entries in pending and vmap, and are integer between 0 and cmpt *)
+  let assert_vertex (v:V.t) =
+    assert (v >= 0);
+    assert (v < x.cmpt);
+    assert (VMap.mem v x.pending);
+    assert (VMap.mem v x.vmap)
+  in
+  G.iter_vertex assert_vertex x.graph;
+  let assert_lmap (lv:lval) (v:V.t) =
+    assert (G.mem_vertex x.graph v);
+    assert (LSet.mem lv (VMap.find v x.vmap))
+  in
+  LMap.iter assert_lmap x.lmap
+
 (* find functions *)
 let find_lset (v:V.t) (x:t) =
   try VMap.find v x.vmap
@@ -108,11 +125,12 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
      *[lv] *)
   let new_x =
     {graph = new_g ;
-           pending = new_pending ;
-           lmap = new_lmap ;
-           vmap = new_vmap ;
+     pending = new_pending ;
+     lmap = new_lmap ;
+     vmap = new_vmap ;
      cmpt = x.cmpt+1}
   in
+  assert_invariants new_x;
   match lv with
   | (Var v, NoOffset) ->
     begin
@@ -124,8 +142,8 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
         new_v, {new_x with graph= new_g}
       | _ ->   new_v ,new_x
     end
-  | _ ->    
-  new_v , new_x
+  | _ ->
+    new_v , new_x
 
 
 let find_or_create_vertex (lv:lval) (x:t) : V.t *t =

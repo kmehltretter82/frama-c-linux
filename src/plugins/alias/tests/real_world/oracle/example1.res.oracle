@@ -1,28 +1,268 @@
 [kernel] Parsing example1.c (with preprocessing)
 [alias] Parsing done
+State before do_assignment tmp = x : List of vertices: 
+
+List of edges: 
+
+Pending: 
+
+
+State before do_assignment tmp = x : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+
+
 [alias] Skiping idata = (double *)malloc((unsigned long)10 * sizeof(double)); (doInstr not implemented)
 [alias] Skiping idata = (double *)malloc((unsigned long)10 * sizeof(double)); (doInstr not implemented)
+State before do_assignment idata = tmp->t2[*(tmp->n2)] : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
+State before do_assignment idata = tmp->t2[*(tmp->n2)] : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
+State before do_assignment odata = tmp->t1[*(tmp->n1)] : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
+State before do_assignment odata = tmp->t1[*(tmp->n1)] : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
+State before do_assignment idx = 0 : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
+State before do_assignment idx = 0 : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skiping tmp_1 = sin(*(idata + idx)); (doInstr not implemented)
 [alias] Skiping tmp_1 = sin(*(idata + idx)); (doInstr not implemented)
+State before do_assignment *(odata + idx) = 0.5 * tmp_1 : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment *(odata + idx) = 0.5 * tmp_1 (not implemented)
+State before do_assignment *(odata + idx) = 0.5 * tmp_1 : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment *(odata + idx) = 0.5 * tmp_1 (not implemented)
+State before do_assignment idx = idx + 1 : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment idx = idx + 1 (not implemented)
+State before do_assignment idx = idx + 1 : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment idx = idx + 1 (not implemented)
 [alias] Skiping swap(tmp->n1); (doInstr not implemented)
 [alias] Skiping swap(tmp->n1); (doInstr not implemented)
+State before do_assignment tmp = x : List of vertices: 
+
+List of edges: 
+
+Pending: 
+
+
+State before do_assignment tmp = x : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+
+
 [alias] Skiping idata = (double *)malloc((unsigned long)10 * sizeof(double)); (doInstr not implemented)
 [alias] Skiping idata = (double *)malloc((unsigned long)10 * sizeof(double)); (doInstr not implemented)
+State before do_assignment idata = tmp->t1[*(tmp->n1)] : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment idata = tmp->t1[*(tmp->n1)] (not implemented)
+State before do_assignment idata = tmp->t1[*(tmp->n1)] : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment idata = tmp->t1[*(tmp->n1)] (not implemented)
+State before do_assignment odata = tmp->t2[*(tmp->n2)] : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment odata = tmp->t2[*(tmp->n2)] (not implemented)
+State before do_assignment odata = tmp->t2[*(tmp->n2)] : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment odata = tmp->t2[*(tmp->n2)] (not implemented)
+State before do_assignment idx = 0 : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
+State before do_assignment idx = 0 : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
+State before do_assignment *(odata + idx) = (double)3 * *(idata + idx) + (double)1 : 
+List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment *(odata + idx) = (double)3 * *(idata + idx) + (double)1 (not implemented)
+State before do_assignment *(odata + idx) = (double)3 * *(idata + idx) + (double)1 : 
+List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment *(odata + idx) = (double)3 * *(idata + idx) + (double)1 (not implemented)
+State before do_assignment idx = idx + 1 : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment idx = idx + 1 (not implemented)
+State before do_assignment idx = idx + 1 : List of vertices: 
+(id=0 LSet= { x; tmp })
+(id=1 LSet= {  })
+
+List of edges: 
+(0 -> 1)
+
+Pending: 
+
+
 [alias] Skipping assignment idx = idx + 1 (not implemented)
 [alias] Skiping swap(tmp->n2); (doInstr not implemented)
 [alias] Skiping swap(tmp->n2); (doInstr not implemented)
@@ -30,236 +270,520 @@
 [alias] Skiping a = (ty *)malloc(sizeof(ty)); (doInstr not implemented)
 [alias] Skiping b = (ty *)malloc(sizeof(ty)); (doInstr not implemented)
 [alias] Skiping b = (ty *)malloc(sizeof(ty)); (doInstr not implemented)
+State before do_assignment i = 0 : List of vertices: 
+
+List of edges: 
+
+Pending: 
+
+
+State before do_assignment i = 0 : List of vertices: 
+
+List of edges: 
+
+Pending: 
+
+
 [alias] Skiping a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double)); (doInstr not implemented)
 [alias] Skiping a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double)); (doInstr not implemented)
 [alias] Skiping a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double)); (doInstr not implemented)
 [alias] Skiping a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double)); (doInstr not implemented)
+State before do_assignment i = i + 1 : List of vertices: 
+
+List of edges: 
+
+Pending: 
+
+
 [alias] Skipping assignment i = i + 1 (not implemented)
+State before do_assignment i = i + 1 : List of vertices: 
+
+List of edges: 
+
+Pending: 
+
+
 [alias] Skipping assignment i = i + 1 (not implemented)
 [alias] Skiping a->n1 = (int *)malloc(sizeof(int)); (doInstr not implemented)
 [alias] Skiping a->n1 = (int *)malloc(sizeof(int)); (doInstr not implemented)
 [alias] Skiping a->n2 = (int *)malloc(sizeof(int)); (doInstr not implemented)
 [alias] Skiping a->n2 = (int *)malloc(sizeof(int)); (doInstr not implemented)
+State before do_assignment *(a->n1) = 1 : List of vertices: 
+
+List of edges: 
+
+Pending: 
+
+
+State before do_assignment *(a->n1) = 1 : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+
+List of edges: 
+(1 -> 0)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+
+
+State before do_assignment *(a->n2) = 1 : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+
+
+State before do_assignment *(a->n2) = 1 : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+
+
+State before do_assignment i = 0 : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+(id=5 pending= { 5 })
+
+
+State before do_assignment i = 0 : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+(id=5 pending= { 5 })
+
+
+State before do_assignment b->t1[i] = a->t1[i] : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+(id=5 pending= { 5 })
+
+
 [alias] Skipping assignment b->t1[i] = a->t1[i] (not implemented)
+State before do_assignment b->t1[i] = a->t1[i] : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+(id=5 pending= { 5 })
+
+
 [alias] Skipping assignment b->t1[i] = a->t1[i] (not implemented)
+State before do_assignment b->t2[i] = a->t2[i] : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+(id=5 pending= { 5 })
+
+
 [alias] Skipping assignment b->t2[i] = a->t2[i] (not implemented)
+State before do_assignment b->t2[i] = a->t2[i] : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+(id=5 pending= { 5 })
+
+
 [alias] Skipping assignment b->t2[i] = a->t2[i] (not implemented)
+State before do_assignment i = i + 1 : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+(id=5 pending= { 5 })
+
+
 [alias] Skipping assignment i = i + 1 (not implemented)
+State before do_assignment i = i + 1 : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+(id=5 pending= { 5 })
+
+
 [alias] Skipping assignment i = i + 1 (not implemented)
+State before do_assignment b->n1 = a->n1 : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+(id=5 pending= { 5 })
+
+
 [alias] Skipping assignment b->n1 = a->n1 (not implemented)
+State before do_assignment b->n1 = a->n1 : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+(id=5 pending= { 5 })
+
+
 [alias] Skipping assignment b->n1 = a->n1 (not implemented)
+State before do_assignment b->n2 = a->n2 : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+(id=5 pending= { 5 })
+
+
 [alias] Skipping assignment b->n2 = a->n2 (not implemented)
+State before do_assignment b->n2 = a->n2 : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+(id=5 pending= { 5 })
+
+
 [alias] Skipping assignment b->n2 = a->n2 (not implemented)
 [alias] Skiping f1(a); (doInstr not implemented)
 [alias] Skiping f1(a); (doInstr not implemented)
 [alias] Skiping f2(b); (doInstr not implemented)
 [alias] Skiping f2(b); (doInstr not implemented)
+State before do_assignment __retres = 0 : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+(id=5 pending= { 5 })
+
+
+State before do_assignment __retres = 0 : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { a->n1 })
+(id=2 LSet= {  })
+(id=3 LSet= {  })
+(id=4 LSet= { a->n2 })
+(id=5 LSet= {  })
+
+List of edges: 
+(1 -> 0)
+(4 -> 3)
+
+Pending: 
+(id=0 pending= {  })
+(id=1 pending= {  })
+(id=2 pending= { 2 })
+(id=3 pending= {  })
+(id=4 pending= {  })
+(id=5 pending= { 5 })
+
+
+State before do_assignment *n = 0 : List of vertices: 
+
+List of edges: 
+
+Pending: 
+
+
+State before do_assignment *n = 0 : List of vertices: 
+(id=0 LSet= {  })
+(id=1 LSet= { n })
+(id=2 LSet= {  })
+
+List of edges: 
+(1 -> 2)
+
+Pending: 
+(id=0 pending= { 0 })
+(id=1 pending= {  })
+(id=2 pending= {  })
+
+
+State before do_assignment *n = *n + 1 : List of vertices: 
+
+List of edges: 
+
+Pending: 
+
+
 [alias] Skipping assignment *n = *n + 1 (not implemented)
+State before do_assignment *n = *n + 1 : List of vertices: 
+
+List of edges: 
+
+Pending: 
+
+
 [alias] Skipping assignment *n = *n + 1 (not implemented)
 [alias] Functions done
-[(b->t1[i] = a->t1[i]; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-(id=5 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+[(b->t1[i] = a->t1[i]; -> <list of may-alias>
+<end of list>
 )
-(idx = 0; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(idx = 0; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(b->t2[i] = a->t2[i]; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-(id=5 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+(b->t2[i] = a->t2[i]; -> <list of may-alias>
+<end of list>
 )
 (while (idx < 10) {
    *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
    idx ++;
- } -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+ } -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(if (*n == 1) *n = 0; else (*n) ++; -> List of vertices: 
-
-List of edges: 
-
+(if (*n == 1) *n = 0; else (*n) ++; -> <list of may-alias>
+<end of list>
 )
-(i ++; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-(id=5 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+(i ++; -> <list of may-alias>
+<end of list>
 )
-(*n = 0; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { n })
-
-List of edges: 
-(1 -> 0)
-
+(*n = 0; -> <list of may-alias>
+<end of list>
 )
-(b->n1 = a->n1; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-(id=5 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+(b->n1 = a->n1; -> <list of may-alias>
+<end of list>
 )
-(if (! (idx < 10)) break; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(if (! (idx < 10)) break; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-((*n) ++; -> List of vertices: 
-
-List of edges: 
-
+((*n) ++; -> <list of may-alias>
+<end of list>
 )
-(b->n2 = a->n2; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-(id=5 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+(b->n2 = a->n2; -> <list of may-alias>
+<end of list>
 )
-(break; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(break; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(f1(a); -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-(id=5 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+(f1(a); -> <list of may-alias>
+<end of list>
 )
-(*(odata + idx) = (double)3 * *(idata + idx) + (double)1; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(*(odata + idx) = (double)3 * *(idata + idx) + (double)1; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(f2(b); -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-(id=5 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+(f2(b); -> <list of may-alias>
+<end of list>
 )
-(*(odata + idx) = (double)3 * *(idata + idx) + (double)1; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(*(odata + idx) = (double)3 * *(idata + idx) + (double)1; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(__retres = 0; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-(id=5 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+(__retres = 0; -> <list of may-alias>
+<end of list>
 )
-(idx ++; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(idx ++; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(ty *tmp = x; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(ty *tmp = x; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(swap(tmp->n2); -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(swap(tmp->n2); -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(idata = (double *)malloc((unsigned long)10 * sizeof(double)); -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(idata = (double *)malloc((unsigned long)10 * sizeof(double)); -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(return; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { n })
-(id=2 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-
+(return; -> <list of may-alias>
+<end of list>
 )
 (while (1) {
    idata = tmp->t2[*(tmp->n2)];
@@ -274,12 +798,9 @@ List of edges:
      idx ++;
    }
    swap(tmp->n1);
- } -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+ } -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
 (idata = tmp->t2[*(tmp->n2)];
  odata = tmp->t1[*(tmp->n1)];
@@ -292,57 +813,37 @@ List of edges:
    }
    idx ++;
  }
- swap(tmp->n1); -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+ swap(tmp->n1); -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(a = (ty *)malloc(sizeof(ty)); -> List of vertices: 
-
-List of edges: 
-
+(a = (ty *)malloc(sizeof(ty)); -> <list of may-alias>
+<end of list>
 )
-(idata = tmp->t2[*(tmp->n2)]; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(idata = tmp->t2[*(tmp->n2)]; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(b = (ty *)malloc(sizeof(ty)); -> List of vertices: 
-
-List of edges: 
-
+(b = (ty *)malloc(sizeof(ty)); -> <list of may-alias>
+<end of list>
 )
-(odata = tmp->t1[*(tmp->n1)]; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(odata = tmp->t1[*(tmp->n1)]; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(i = 0; -> List of vertices: 
-
-List of edges: 
-
+(i = 0; -> <list of may-alias>
+<end of list>
 )
-(idx = 0; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(idx = 0; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
 (while (i < 2) {
    a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
    a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double));
    i ++;
- } -> List of vertices: 
-
-List of edges: 
-
+ } -> <list of may-alias>
+<end of list>
 )
 (while (idx < 10) {
    {
@@ -351,194 +852,101 @@ List of edges:
      *(odata + idx) = 0.5 * tmp_1;
    }
    idx ++;
- } -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+ } -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(return __retres; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-(id=5 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+(return __retres; -> <list of may-alias>
+<end of list>
 )
-(if (! (i < 2)) break; -> List of vertices: 
-
-List of edges: 
-
+(if (! (i < 2)) break; -> <list of may-alias>
+<end of list>
 )
-(if (! (idx < 10)) break; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(if (! (idx < 10)) break; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(break; -> List of vertices: 
-
-List of edges: 
-
+(break; -> <list of may-alias>
+<end of list>
 )
-(break; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(break; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
 (a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
  a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double)); -> 
-List of vertices: 
-
-List of edges: 
-
+<list of may-alias>
+<end of list>
 )
 ({
    double tmp_1;
    tmp_1 = sin(*(idata + idx));
    *(odata + idx) = 0.5 * tmp_1;
- } -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+ } -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
 (a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double)); -> 
-List of vertices: 
-
-List of edges: 
-
+<list of may-alias>
+<end of list>
 )
 (tmp_1 = sin(*(idata + idx));
- *(odata + idx) = 0.5 * tmp_1; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+ *(odata + idx) = 0.5 * tmp_1; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
 (a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double)); -> 
-List of vertices: 
-
-List of edges: 
-
+<list of may-alias>
+<end of list>
 )
-(tmp_1 = sin(*(idata + idx)); -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(tmp_1 = sin(*(idata + idx)); -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(i ++; -> List of vertices: 
-
-List of edges: 
-
+(i ++; -> <list of may-alias>
+<end of list>
 )
-(*(odata + idx) = 0.5 * tmp_1; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(*(odata + idx) = 0.5 * tmp_1; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(a->n1 = (int *)malloc(sizeof(int)); -> List of vertices: 
-
-List of edges: 
-
+(a->n1 = (int *)malloc(sizeof(int)); -> <list of may-alias>
+<end of list>
 )
-(idx ++; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(idx ++; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(a->n2 = (int *)malloc(sizeof(int)); -> List of vertices: 
-
-List of edges: 
-
+(a->n2 = (int *)malloc(sizeof(int)); -> <list of may-alias>
+<end of list>
 )
-(swap(tmp->n1); -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(swap(tmp->n1); -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(*(a->n1) = 1; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-
-List of edges: 
-(1 -> 0)
-
+(*(a->n1) = 1; -> <list of may-alias>
+<end of list>
 )
-(*(a->n2) = 1; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+(*(a->n2) = 1; -> <list of may-alias>
+<end of list>
 )
-(i = 0; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-(id=5 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+(i = 0; -> <list of may-alias>
+<end of list>
 )
-(ty *tmp = x; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(ty *tmp = x; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
 (while (i < 2) {
    b->t1[i] = a->t1[i];
    b->t2[i] = a->t2[i];
    i ++;
- } -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-(id=5 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+ } -> <list of may-alias>
+<end of list>
 )
-(idata = (double *)malloc((unsigned long)10 * sizeof(double)); -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(idata = (double *)malloc((unsigned long)10 * sizeof(double)); -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
 (while (1) {
    idata = tmp->t1[*(tmp->n1)];
@@ -549,25 +957,12 @@ List of edges:
      idx ++;
    }
    swap(tmp->n2);
- } -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+ } -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(if (! (i < 2)) break; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-(id=5 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+(if (! (i < 2)) break; -> <list of may-alias>
+<end of list>
 )
 (idata = tmp->t1[*(tmp->n1)];
  odata = tmp->t2[*(tmp->n2)];
@@ -576,53 +971,24 @@ List of edges:
    *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
    idx ++;
  }
- swap(tmp->n2); -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+ swap(tmp->n2); -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
-(break; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-(id=5 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+(break; -> <list of may-alias>
+<end of list>
 )
-(idata = tmp->t1[*(tmp->n1)]; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(idata = tmp->t1[*(tmp->n1)]; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
 (b->t1[i] = a->t1[i];
- b->t2[i] = a->t2[i]; -> List of vertices: 
-(id=0 LSet= {  })
-(id=1 LSet= { a->n1 })
-(id=2 LSet= {  })
-(id=3 LSet= {  })
-(id=4 LSet= { a->n2 })
-(id=5 LSet= {  })
-
-List of edges: 
-(1 -> 0)
-(4 -> 3)
-
+ b->t2[i] = a->t2[i]; -> <list of may-alias>
+<end of list>
 )
-(odata = tmp->t2[*(tmp->n2)]; -> List of vertices: 
-(id=0 LSet= { tmp })
-(id=1 LSet= { x })
-
-List of edges: 
-
+(odata = tmp->t2[*(tmp->n2)]; -> <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
 )
 [alias] Analysis complete
 ]
