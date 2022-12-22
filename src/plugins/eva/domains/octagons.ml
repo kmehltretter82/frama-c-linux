@@ -320,11 +320,11 @@ module Rewriting = struct
   let project_ival x =
     match x with
     | `Top -> `Top
-    | `Value x -> 
+    | `Value x ->
       try
         `Value (Cvalue.V.project_ival x)
       with Cvalue.V.Not_based_on_null -> `Top
-    
+
   (* Apply [f typ v1 v2] if the operation [e1 op e2] does not overflow,
      where [v1] and [v2] are the intervals for [e1] and [e2], and [typ] is
      the type of [e1]. Returns the empty list otherwise. *)
@@ -835,14 +835,14 @@ module Deps = struct
   module VSet = Variable.Set
 
   include Hptmap.Make
-    (Base.Base)
-    (struct
-      include Datatype.Pair (VSet) (VSet)
-      let pretty_debug = pretty
-    end)
-    (Hptmap.Comp_unused)
-    (struct let v = [] end)
-    (struct let l = [Ast.self] end)
+      (Base.Base)
+      (struct
+        include Datatype.Pair (VSet) (VSet)
+        let pretty_debug = pretty
+      end)
+      (Hptmap.Comp_unused)
+      (struct let v = [] end)
+      (struct let l = [Ast.self] end)
 
   let cache_prefix = "Value.Octagons.Deps"
 
@@ -872,19 +872,21 @@ module Deps = struct
     in
     join ~cache ~symmetric ~idempotent ~decide
 
-  let find_default b m =
-    try find b m
-    with Not_found -> VSet.empty, VSet.empty
+  let get b m =
+    try
+      let direct, indirect = find b m in
+      Variable.Set.(union direct indirect |> elements)
+    with Not_found -> []
 
   let add_direct v =
     replace (function
-      | None -> Some (VSet.singleton v, VSet.empty)
-      | Some (direct, indirect) -> Some (VSet.add v direct, indirect))
+        | None -> Some (VSet.singleton v, VSet.empty)
+        | Some (direct, indirect) -> Some (VSet.add v direct, indirect))
 
   let add_indirect v =
     replace (function
-      | None -> Some (VSet.empty, VSet.singleton v)
-      | Some (direct, indirect) -> Some (direct, VSet.add v indirect))
+        | None -> Some (VSet.empty, VSet.singleton v)
+        | Some (direct, indirect) -> Some (direct, VSet.add v indirect))
 
   let add_variable m v =
     let { direct ; indirect } = Variable.deps v in
@@ -1067,8 +1069,8 @@ module State = struct
   let mk_variable_builder evaluate (_: t) =
     let (let*) x f = Option.bind (Top.to_option x) f in
     (* Is the interval computed for a variable a singleton? *)
-    let is_singleton = 
-        Top.fold ~top:false Cvalue.V.cardinal_zero_or_one
+    let is_singleton =
+      Top.fold ~top:false Cvalue.V.cardinal_zero_or_one
     in
     fun exp ->
       match exp.enode with
@@ -1079,7 +1081,7 @@ module State = struct
         Some (Variable.make vi, Ival.zero)
 
       | Lval lval ->
-        let* lval_deps = evaluate_deps evaluate lval in 
+        let* lval_deps = evaluate_deps evaluate lval in
         Some (Variable.make_lval ~lval_deps lval, Ival.zero)
 
       | CastE (typ, { enode = Lval (Var vi, NoOffset) })
@@ -1096,12 +1098,6 @@ module State = struct
 
       | _ -> None
 
-  let get_all_variables_base state base =
-    let direct, indirect = Deps.find_default base state.deps in
-    Variable.Set.(union direct indirect |> elements)
-
-  let get_all_variables state vi =
-    get_all_variables_base state (Base.of_varinfo vi)
 
   (* ------------------------------ Lattice --------------------------------- *)
 
@@ -1437,7 +1433,7 @@ module Domain = struct
 
 
   let kill_base base state =
-    let vars = get_all_variables_base state base in
+    let vars = Deps.get base state.deps in
     let state = { state with deps = Deps.remove base state.deps } in
     List.fold_left State.remove state vars
 
@@ -1523,8 +1519,7 @@ module Domain = struct
     let variable = Variable.make varinfo in
     let base = Base.of_varinfo varinfo in
     (* Remove lvals refering to the variable *)
-    let direct, indirect = Deps.find_default base state.deps in
-    let vars = Variable.Set.(union direct indirect |> elements)  in
+    let vars = Deps.get base state.deps in
     let vars = List.filter (Fun.negate (Variable.equal variable)) vars in
     let state = List.fold_left State.remove state vars in
     (* Interpret inversible assignment if possible *)
@@ -1570,7 +1565,8 @@ module Domain = struct
 
   let start_recursive_call recursion state =
     let vars = List.map fst recursion.substitution @ recursion.withdrawal in
-    let vars = List.flatten (List.map (get_all_variables state) vars) in
+    let var_deps v = Deps.get (Base.of_varinfo v) state.deps in
+    let vars = List.flatten (List.map var_deps vars) in
     List.fold_left State.remove state vars
 
   let start_call _stmt call recursion valuation state =
@@ -1608,7 +1604,8 @@ module Domain = struct
 
   let enter_scope _kind _varinfos state = state
   let leave_scope _kf varinfos state =
-    let vars = List.flatten (List.map (get_all_variables state) varinfos) in
+    let var_deps v = Deps.get (Base.of_varinfo v) state.deps in
+    let vars = List.flatten (List.map var_deps varinfos) in
     let state = List.fold_left State.remove state vars in
     check "leave_scope" state
 
@@ -1628,7 +1625,7 @@ module Domain = struct
       in
       let aux base acc =
         try
-          let variables = get_all_variables_base state base in
+          let variables = Deps.get base state.deps in
           List.fold_left add_related_bases acc variables
         with Base.Not_a_C_variable | Not_found -> acc
       in
