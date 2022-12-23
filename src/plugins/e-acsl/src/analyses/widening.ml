@@ -24,49 +24,6 @@ open Cil_types
 open Analyses_types
 open Interval_utils
 
-(* ********************************************************************* *)
-(* Interval Extension *)
-(* ********************************************************************* *)
-
-let extend_default i =
-  try
-    let kind = ikind_of_ival i in
-    interv_of_typ (TInt(kind, []))
-  with Cil.Not_representable ->
-    top_ival
-
-let extend_precise i =
-  try ignore (ikind_of_ival i); Ival i
-  with Cil.Not_representable ->
-    top_ival
-
-let chose_extend n i =
-  match n with
-  | 0 ->  extend_default i
-  | 1 -> extend_precise i
-  | n ->
-    Options.fatal "argument unsupported: %s with value %i"
-      Options.Function_arguments.name
-      n
-
-let extend_ival name i =
-  let n =
-    try Options.Function_arguments.find name
-    with Not_found -> Options.Function_arguments_base.get ()
-  in chose_extend n i
-
-let extend li = function
-  | Float _ | Rational | Real | Nan as x ->
-    x
-  | Ival i ->
-    extend_ival li.l_var_info.lv_name i
-
-let ext_profile li =
-  Cil_datatype.Logic_var.Map.map (extend li)
-
-(* ********************************************************************* *)
-(* Widening *)
-(* ********************************************************************* *)
 let is_lower l1 l2 =
   match l1, l2 with
   | None, _ -> true
@@ -79,8 +36,14 @@ let is_higher u1 u2 =
   | Some u1, Some u2 -> Integer.compare u1 u2 >= 0
   | Some _, None -> false
 
-let widen_ival_naive name i1 i2 =
-  extend_ival name (Ival.join i1 i2)
+let widen_ival_naive i1 i2 =
+  let extend_ival i =
+    try
+      let kind = ikind_of_ival i in
+      interv_of_typ (TInt(kind, []))
+    with Cil.Not_representable ->
+      top_ival
+  in extend_ival (Ival.join i1 i2)
 
 let widen_ival_default i1 i2 =
   if Ival.is_bottom i1
@@ -101,9 +64,9 @@ let widen_ival_precise i1 i2 =
   try ignore (ikind_of_ival i); Ival i
   with Cil.Not_representable -> top_ival
 
-let chose_widen name n i1 i2 =
+let chose_widen n i1 i2 =
   match n with
-  | 0 -> widen_ival_naive name i1 i2
+  | 0 -> widen_ival_naive i1 i2
   | 1 -> widen_ival_default i1 i2
   | 2 -> widen_ival_precise i1 i2
   | _ ->
@@ -111,15 +74,20 @@ let chose_widen name n i1 i2 =
       Options.Function_arguments.name
       n
 
-let widen_ival name i1 i2 =
+let widen_ival ~arg name i1 i2 =
   let n =
-    try Options.Recursive_precision.find name
-    with Not_found -> Options.Recursive_precision_base.get ()
-  in chose_widen name n i1 i2
+    if arg
+    then
+      try Options.Function_arguments.find name
+      with Not_found -> Options.Function_arguments_base.get ()
+    else
+      try Options.Recursive_precision.find name
+      with Not_found -> Options.Recursive_precision_base.get ()
+  in chose_widen n i1 i2
 
-let widen li i1 i2 =
+let widen ?(arg = false) li i1 i2 =
   match i1, i2 with
-  | Ival i1, Ival i2 -> widen_ival li.l_var_info.lv_name i1 i2
+  | Ival i1, Ival i2 -> widen_ival ~arg li.l_var_info.lv_name i1 i2
   | Float _, Float _ | Rational, Rational | Real, Real | Nan, Nan ->
     join i1 i2
   | Ival _, _| Float _, _ | Rational, _ | Real, _ | Nan, _ -> assert false
@@ -132,5 +100,5 @@ let widen_profile li profile new_profile =
          | None -> Ival Ival.bottom
          | Some i -> i
        in
-       widen li ival new_ival)
+       widen ~arg:true li ival new_ival)
     profile

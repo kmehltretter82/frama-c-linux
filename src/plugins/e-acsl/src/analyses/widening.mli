@@ -24,6 +24,5 @@ open Cil_types
 open Analyses_types
 open Analyses_datatype
 
-val widen : logic_info -> ival -> ival -> ival
-val ext_profile : logic_info -> Profile.t -> Profile.t
+val widen : ?arg:bool -> logic_info -> ival -> ival -> ival
 val widen_profile : logic_info -> Profile.t -> Profile.t -> Profile.t
