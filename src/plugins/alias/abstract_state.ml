@@ -330,9 +330,11 @@ let assignment_x_y (a:t) (x:lval) (y:lval) : t =
 let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t=
   let v1, a = find_or_create_vertex x a in
   let list_v2, a = addr_of y a in
-  match list_v2 with
-    [v2] ->  join a v1 v2
-  | _ ->  failwith "assignment_x_addr_y not implemented"
+  List.fold_left
+    (fun a_acc v2 -> join a_acc v1 v2)
+    a
+    list_v2
+(* TODO is that correct ?*)
 
 
 (* assignment x = *y *)
@@ -496,7 +498,7 @@ let initial_value :t =
   {graph = G.empty; pending = VMap.empty ; lmap = LMap.empty; vmap = VMap.empty; cmpt = 0}
 
 (** a type for summaries of functions *)
-type summary = t (* final type may be different *)
+type summary = float (* final type may be different *)
 
 
 

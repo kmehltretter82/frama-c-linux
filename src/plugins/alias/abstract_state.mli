@@ -46,13 +46,8 @@ val pretty : ?debug:bool -> Format.formatter -> t -> unit
 (** dot printer *)
 val print_dot : string -> t -> unit
 
-(** finds the vertex corresponding to a lval *)
+(** finds the vertex corresponding to a lval. May raise Not_found *)
 val find_vertex : lval -> t -> G.V.t
-
-(** finds the vertex corresponding to a lval; if not present creates
-    the corresponding node in the graph; the (maybe modifed) graph is
-    returned as well *)
-val find_or_create_vertex : lval -> t -> G.V.t * G.t
 
 (** Functions for Steensgaard's algorithm *)
 val join : t -> G.V.t -> G.V.t -> t
