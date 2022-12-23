@@ -36,10 +36,11 @@ module LMap = Lval.Map
 type t
 
 (** check all the invariants that must be true on an abstract value
-    before and after each function call *)
+    before and after each function call or transformation of the graph)  *)
 val assert_invariants : t -> unit
 
-(** pretty printer *)
+(** pretty printer; debug=true prints the graph, debug = false only
+    prints aliased variables *)
 val pretty : ?debug:bool -> Format.formatter -> t -> unit
 
 (** dot printer *)
@@ -48,13 +49,19 @@ val print_dot : string -> t -> unit
 (** finds the vertex corresponding to a lval *)
 val find_vertex : lval -> t -> G.V.t
 
-(** Functions for the analysis *)
+(** finds the vertex corresponding to a lval; if not present creates
+    the corresponding node in the graph; the (maybe modifed) graph is
+    returned as well *)
+val find_or_create_vertex : lval -> t -> G.V.t * G.t
+
+(** Functions for Steensgaard's algorithm *)
 val join : t -> G.V.t -> G.V.t -> t
 
 val cjoin : t -> G.V.t -> G.V.t -> t
 
 val set_type : t -> G.V.t -> G.V.t -> t
 
+(** transfert functions for different kinds of assignments *)
 val assignment_x_y : t -> lval -> lval -> t
 
 val assignment_x_addr_y : t -> lval -> lval -> t
@@ -67,6 +74,7 @@ val assignment_ptr_x_y : t -> lval -> lval -> t
 
 val assignment_ptr_x_cst : t -> lval -> t
 
+(** equality test *)
 val equal : t -> t -> bool
 
 (** union of two abstract values ; ensures that if 2 lval are aliased
@@ -74,7 +82,7 @@ val equal : t -> t -> bool
     then they will also be aliased/points-to in the result *)
 val union : t -> t -> t
 
-(* empty graph *)
+(** empty graph *)
 val initial_value : t
 
 (** Type denoting summaries of functions *)

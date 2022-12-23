@@ -79,10 +79,10 @@ struct
     | None -> Format.fprintf fmt "None"
     | Some s -> Format.fprintf fmt "%a" (Abstract_state.pretty ~debug:false) s
 
-  let pretty_debug fmt state =
-    match state with
-    | None -> Format.fprintf fmt "None"
-    | Some s -> Format.fprintf fmt "%a" (Abstract_state.pretty ~debug:true) s
+  (* let pretty_debug fmt state =
+   *   match state with
+   *   | None -> Format.fprintf fmt "None"
+   *   | Some s -> Format.fprintf fmt "%a" (Abstract_state.pretty ~debug:true) s *)
 
   let  computeFirstPredecessor _ a = a
 
@@ -97,7 +97,7 @@ struct
         Some (Some (Abstract_state.union old new_))
 
   let do_assignment (a:t) (lv:lval) (exp:exp) : t =
-    Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a;
+    (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)
     match (a,lv,exp.enode) with
       (Some a, (Var v1, NoOffset), Lval (Var v2,NoOffset)) ->
       (* case x = y *)

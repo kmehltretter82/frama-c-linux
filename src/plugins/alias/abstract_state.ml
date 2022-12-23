@@ -112,7 +112,7 @@ let pretty ?(debug=false) =
 
 (** invariants of type t must be true before and after each functon call *)
 let assert_invariants (x:t) : unit =
-  Format.printf "Checking invariants@.%a@." (pretty ~debug:true) x;
+  (* Format.printf "Checking invariants@.%a@." (pretty ~debug:true) x; *)
   (* check that all vertex of the graph have entries in pending and vmap, and are integer between 0 and cmpt *)
   let assert_vertex (v:V.t) =
     assert (v >= 0);
