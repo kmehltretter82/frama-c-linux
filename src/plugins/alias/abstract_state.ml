@@ -74,8 +74,45 @@ type t = {
 }
 
 
+(* find functions *)
+let find_lset (v:V.t) (x:t) =
+  try VMap.find v x.vmap
+  with Not_found -> LSet.empty
+
+(* printing functions *)
+
+let print_debug fmt (x:t) =
+  Format.fprintf fmt "@[<hov 2>List of vertices: @.";
+  G.iter_vertex (fun v -> Format.fprintf fmt "(id=%d LSet= %a)@." v LSet.pretty (find_lset v x)) x.graph;
+  Format.fprintf fmt "@]@.@[<hov 2>List of edges: @.";
+  G.iter_edges (fun v1 v2 -> Format.fprintf fmt "(%d -> %d)@." v1 v2) x.graph;
+  Format.fprintf fmt "@]@.";
+  Format.fprintf fmt "@[<hov 2>Pending: @.";
+  VMap.iter (fun v vs -> Format.fprintf fmt "(id=%d pending= %a)@." v VSet.pretty vs) x.pending;
+  Format.fprintf fmt "@]@.";
+  Format.fprintf fmt "@[<hov 2>LMap: @.";
+  LMap.iter (fun lv v -> Format.fprintf fmt "(lval=%a -> id= %d)@." Lval.pretty lv v) x.lmap;
+  Format.fprintf fmt "@]@.";
+  Format.fprintf fmt "@[<hov 2>VMap: @.";
+  VMap.iter (fun v ls -> Format.fprintf fmt "(id = %d -> lset= %a)@." v LSet.pretty ls) x.vmap;
+  Format.fprintf fmt "@]@."
+
+
+let print_aliases fmt (x:t) =
+  Format.fprintf fmt "@[<hov 2><list of may-alias>@.";
+  VMap.iter  (fun _ set_lv -> if LSet.cardinal set_lv >= 2 then Format.fprintf fmt "%a are aliased@." LSet.pretty set_lv) x.vmap;
+  Format.fprintf fmt "<end of list>@]@."
+
+let pretty ?(debug=false) =
+  if debug then
+    print_debug
+  else
+    print_aliases
+
+
 (** invariants of type t must be true before and after each functon call *)
 let assert_invariants (x:t) : unit =
+  Format.printf "Checking invariants@.%a@." (pretty ~debug:true) x;
   (* check that all vertex of the graph have entries in pending and vmap, and are integer between 0 and cmpt *)
   let assert_vertex (v:V.t) =
     assert (v >= 0);
@@ -90,10 +127,6 @@ let assert_invariants (x:t) : unit =
   in
   LMap.iter assert_lmap x.lmap
 
-(* find functions *)
-let find_lset (v:V.t) (x:t) =
-  try VMap.find v x.vmap
-  with Not_found -> LSet.empty
 
 (* find the vertex of an lval *)
 let find_vertex (lv:lval) (x:t) =
@@ -158,28 +191,7 @@ let addr_of (lv:lval) (x:t) : V.t list *t =
   let (v,x) = find_or_create_vertex lv x in
   G.pred x.graph v, x
 
-(* printing functions *)
 
-let print_debug fmt (x:t) =
-  Format.fprintf fmt "@[<hov 2>List of vertices: @.";
-  G.iter_vertex (fun v -> Format.fprintf fmt "(id=%d LSet= %a)@." v LSet.pretty (find_lset v x)) x.graph;
-  Format.fprintf fmt "@]@.@[<hov 2>List of edges: @.";
-  G.iter_edges (fun v1 v2 -> Format.fprintf fmt "(%d -> %d)@." v1 v2) x.graph;
-  Format.fprintf fmt "@]@.";
-  Format.fprintf fmt "@[<hov 2>Pending: @.";
-  VMap.iter (fun v vs -> Format.fprintf fmt "(id=%d pending= %a)@." v VSet.pretty vs) x.pending;
-  Format.fprintf fmt "@]@."
-
-let print_aliases fmt (x:t) =
-  Format.fprintf fmt "@[<hov 2><list of may-alias>@.";
-  VMap.iter  (fun _ set_lv -> if LSet.cardinal set_lv >= 2 then Format.fprintf fmt "%a are aliased@." LSet.pretty set_lv) x.vmap;
-  Format.fprintf fmt "<end of list>@]@."
-
-let pretty ?(debug=false) =
-  if debug then
-    print_debug
-  else
-    print_aliases
 
 (* let lset_to_string s =
  *   let buffer = Buffer.create 16 in
@@ -236,13 +248,14 @@ let merge x v1 v2 =
 
 (* functions join and unify-pointer of steensgaard's paper *)
 let rec join (x:t) (v1:V.t) (v2:V.t) : t =
-  if not (G.mem_vertex x.graph v1 && G.mem_vertex x.graph v2)
+  if (V.equal v1 v2) || not (G.mem_vertex x.graph v1 && G.mem_vertex x.graph v2)
   then
     x
   else
     let pt1 = G.succ x.graph v1 in (* TODO ask frama-c type instead of looking in the graph *)
     let pt2 = G.succ x.graph v2 in
     let x = merge x v1 v2 in
+    assert (not (G.mem_vertex x.graph v2));
     match (pt1, pt2) with
       [],[] ->
       (* update pending *)

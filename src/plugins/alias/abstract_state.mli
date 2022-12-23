@@ -35,6 +35,9 @@ module LMap = Lval.Map
     all aliases and points-to information. *)
 type t
 
+(** check all the invariants that must be true on an abstract value
+    before and after each function call *)
+val assert_invariants : t -> unit
 
 (** pretty printer *)
 val pretty : ?debug:bool -> Format.formatter -> t -> unit
