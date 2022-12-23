@@ -24,6 +24,7 @@
 
 open Cil_types
 open Analyses_types
+open Cil_datatype
 
 module Annotation_kind: Datatype.S with type t = annotation_kind
 
@@ -103,29 +104,58 @@ module Logic_env : sig
 end
 
 
-(** Imperative environment to perform the fixpoint algorithm for recursive
-    functions *)
+(** Imperative environment to perform fixpoint algorithm for recursive
+    functions. This environnement store four pieces of information associated
+    to every logic_info:
+    - the current profile in which the interval for the logic_info is infered.
+    - the current interval that it is infered to.
+    - a map associating to each parameter all the arguments in their profiles
+      that this parameter has been called with up until now.
+    - the depth of calls to the fixpoint algorithm associated to the logic_info.
+      When this depth reaches 0, the entry corresponding to the logic_info is
+      cleared thus avoiding unification between two independent calls to the same
+      logic function, which is unsafe.
+
+    The third argument is used so that whenever a parameter of a logic_info is
+    unified by widening with a new value, the interval inference algorithm
+    updates all the arguments that this parameter have been called with, to
+    assign the new interval to it *)
 module LF_env : sig
+
+  (** find the current profile in which a recursive function or predicate is
+      being infered *)
+  val find_profile : logic_info -> Profile.t
+
   (** find the currently inferred interval for a call to a logic function *)
-  val find : logic_info -> Profile.t -> ival
+  val find_ival : logic_info -> ival
 
-  val find_opt : logic_info -> Profile.t -> ival option
+  (** return the pair of both the results of [find_profile] and [find_ival]*)
+  val find_profile_ival : logic_info -> Profile.t * ival
 
-  (** clear the table of intervals for logic function (to do between typing )
-      each logic function calls *)
+  (** find all the arguments a recursive function or predicate has been
+      called with*)
+  val find_args : logic_info -> (Profile.t Misc.Id_term.Map.t) Logic_var.Map.t
+
+  (** clear the table of intervals for logic function *)
   val clear : unit -> unit
 
-  (** add an interval as the current one for a logic function call *)
-  val add : logic_info -> Profile.t -> ival -> unit
+  (** add [ival] as the current one for a logic function or predicate call *)
+  val add :
+    logic_env:Logic_env.t ->
+    logic_info ->
+    Profile.t ->
+    ival ->
+    term list ->
+    unit
 
-  (** add 0..1 as the current interval for a predicate call *)
-  val add_pred : logic_info -> Profile.t -> unit
+  (** decrease the counter of fixpoint depth *)
+  val decrease : logic_info -> unit
+
+  (** update the current interval for the a given logic_info *)
+  val update_ival : logic_info -> ival -> unit
 
   (** determine whether a logic function or predicate is recursive *)
   val is_rec : logic_info -> bool
-
-  (** replace the current interval for a logic function call *)
-  val replace : logic_info -> Profile.t -> ival -> unit
 end
 
 module Number_ty:  Datatype.S_with_collections

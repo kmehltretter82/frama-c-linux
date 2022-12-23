@@ -19,9 +19,11 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
-open Analyses_types
+
 open Cil_types
-open Cil_datatype
+open Analyses_types
+open Analyses_datatype
 
 val widen : logic_info -> ival -> ival -> ival
-val ext_profile : logic_info -> ival Logic_var.Map.t -> ival Logic_var.Map.t
+val ext_profile : logic_info -> Profile.t -> Profile.t
+val widen_profile : logic_info -> Profile.t -> Profile.t -> Profile.t

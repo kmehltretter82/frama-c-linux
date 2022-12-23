@@ -544,7 +544,6 @@ let rec type_term
               li.l_profile
               (List.map (Interval.get_from_profile ~profile) args)
           in
-          let new_profile = Interval.get_ext_profile new_profile li in
           Stack.push
             (fun () ->
                ignore (type_predicate ~profile:new_profile p))
@@ -578,7 +577,6 @@ let rec type_term
               li.l_profile
               (List.map (Interval.get_from_profile ~profile) args)
           in
-          let new_profile = Interval.get_ext_profile new_profile li in
           let gmp,ctx_body = match li.l_type with
             | Some (Ctype typ) ->
               false, Some (number_ty_of_typ ~post:false typ)
@@ -730,9 +728,10 @@ and number_ty_bound_variable ~profile (t1, lv, t2) =
     in mk_ctx ~use_gmp_opt:true ty
   | Ctype ty ->
     (match Cil.unrollType ty with
-     | TInt(ik, _) | TEnum({ ekind = ik}, _)-> join
-                                                 (ty_of_interv i)
-                                                 (mk_ctx ~use_gmp_opt:true (C_integer ik))
+     | TInt(ik, _) | TEnum({ ekind = ik}, _) ->
+       join
+         (ty_of_interv i)
+         (mk_ctx ~use_gmp_opt:true (C_integer ik))
      | ty ->
        Options.fatal "unexpected C type %a for quantified variable %a"
          Printer.pp_typ ty
@@ -770,7 +769,6 @@ and type_predicate ~profile p =
             li.l_profile
             (List.map (Interval.get_from_profile ~profile) args)
         in
-        let new_profile = Interval.get_ext_profile new_profile li in
         if not (Recursive_pred.is_done new_profile li)
         then
           (Recursive_pred.add new_profile li;

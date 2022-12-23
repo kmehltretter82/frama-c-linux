@@ -103,8 +103,6 @@ val preprocess_code_annot :
 val preprocess_term :
   logic_env:Logic_env.t -> term -> unit
 
-val get_ext_profile : Profile.t -> logic_info -> Profile.t
-
 val clear : unit -> unit
 
 (*

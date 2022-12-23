@@ -443,22 +443,74 @@ module Logic_env
 end
 
 (* Imperative environment to perform fixpoint algorithm for recursive
-   functions *)
+   functions. This environnement store four pieces of information associated
+   to every logic_info:
+   - the current profile in which the interval for the logic_info is infered.
+   - the current interval that it is infered to.
+   - a map associating to each parameter all the arguments in their profiles
+     that this parameter has been called with up until now.
+   - the depth of calls to the fixpoint algorithm associated to the logic_info.
+     When this depth reaches 0, the entry corresponding to the logic_info is
+     cleared thus avoiding unification between two independent calls to the same
+     logic function, which is unsafe.
+
+   The third argument is used so that whenever a parameter of a logic_info is
+   unified by widening with a new value, the interval inference algorithm
+   updates all the arguments that this parameter have been called with, to
+   assign the new interval to it *)
 module LF_env
 = struct
 
-  let tbl = LFProf.Hashtbl.create 17
+  let tbl = Logic_info.Hashtbl.create 17
 
-  let clear () = LFProf.Hashtbl.clear tbl
+  let clear () = Logic_info.Hashtbl.clear tbl
 
-  let find li profile = LFProf.Hashtbl.find tbl (li,profile)
+  let find_profile li =
+    let profile, _, _, _ = Logic_info.Hashtbl.find tbl li in profile
 
-  let find_opt li profile = LFProf.Hashtbl.find_opt tbl (li,profile)
+  let find_ival li =
+    let _, ival, _, _ = Logic_info.Hashtbl.find tbl li in ival
 
-  let add li profile ival = LFProf.Hashtbl.add tbl (li,profile) ival
+  let find_profile_ival li =
+    let profile, ival, _, _ = Logic_info.Hashtbl.find tbl li in profile, ival
 
-  let add_pred li profile =
-    LFProf.Hashtbl.add tbl (li,profile) (Ival Ival.zero_or_one)
+  let find_args li =
+    let _, _, args, _ = Logic_info.Hashtbl.find tbl li in args
+
+  let build_map ~profile li args map =
+    List.fold_left2
+      (fun map lv t ->
+         Logic_var.Map.update
+           lv
+           (fun m -> match m with
+              | Some m ->
+                Some (Misc.Id_term.Map.update t (fun _ -> Some profile) m)
+              | None -> Some (Misc.Id_term.Map.(add t profile empty)))
+           map)
+      map
+      li.l_profile
+      args
+
+  let add ~logic_env li args_ival ival args =
+    let profile = Logic_env.get_profile logic_env in
+    let map, n =
+      match Logic_info.Hashtbl.find_opt tbl li with
+      | Some (_,_,map,n) -> map, n
+      | None -> Logic_var.Map.empty, 0
+    in
+    let map = build_map ~profile li args map in
+    Logic_info.Hashtbl.replace tbl li (args_ival, ival, map, n+1)
+
+  let update_ival li ival =
+    let profile, _, args_list, n = Logic_info.Hashtbl.find tbl li in
+    Logic_info.Hashtbl.replace tbl li (profile, ival, args_list, n + 1)
+
+  let decrease li =
+    let profile, ival, args_list, n = Logic_info.Hashtbl.find tbl li in
+    if(n - 1 <= 0) then
+      Logic_info.Hashtbl.remove tbl li
+    else
+      Logic_info.Hashtbl.replace tbl li (profile, ival, args_list, n - 1)
 
   exception Recursive
 
@@ -490,8 +542,6 @@ module LF_env
        with Recursive -> true)
     | LBreads _ | LBnone -> false
     | LBinductive _ -> Error.not_yet "Inductive"
-
-  let replace li args_ival ival = LFProf.Hashtbl.replace tbl (li, args_ival) ival
 
 end
 

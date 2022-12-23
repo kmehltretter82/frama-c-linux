@@ -24,6 +24,7 @@ open Cil_types
 open Analyses_types
 open Analyses_datatype
 open Interval_utils
+open Cil_datatype
 
 (* Implements Figure 3 of J. Signoles' JFLA'15 paper "Rester statique pour
    devenir plus rapide, plus précis et plus mince".
@@ -107,6 +108,7 @@ module Memo: sig
   val memo:
     force_infer:bool -> Profile.t -> (term -> ival) -> term -> ival Error.result
   val get: Profile.t -> term -> ival Error.result
+  val replace : Profile.t -> term -> ival -> unit
   val clear: unit -> unit
 end = struct
   (* The comparison over terms is the physical equality. It cannot be the
@@ -142,6 +144,7 @@ end = struct
       val get : X.Hashtbl.key -> ival Error.result
       val memo : force_infer:bool -> (term -> ival) -> term -> X.Hashtbl.key ->
         (ival, exn) Result.t
+      val replace : X.Hashtbl.key -> ival -> unit
     end = struct
     let get k =
       try X.Hashtbl.find Tbl.tbl k
@@ -160,10 +163,14 @@ end = struct
         with Not_found ->
           let x =
             try Result.Ok (f t);
-            with Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Error exn
+            with
+              Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Error exn
           in
           X.Hashtbl.add Tbl.tbl k x;
           x
+
+    let replace x i =
+      X.Hashtbl.replace Tbl.tbl x (Ok i)
   end
 
   module Nondep = Accesses (Misc.Id_term) (struct let tbl = nondep_tbl end)
@@ -179,34 +186,41 @@ end = struct
     then Nondep.memo ~force_infer f t t
     else Dep.memo ~force_infer f t (t,profile)
 
+  let replace profile t i =
+    if Profile.is_empty profile
+    then Nondep.replace t i
+    else Dep.replace (t,profile) i
+
   let clear () =
     Options.feedback ~level:4 "clearing the typing tables";
     Misc.Id_term.Hashtbl.clear nondep_tbl;
     Id_term_in_profile.Hashtbl.clear dep_tbl
 end
 
-(* For recursive functions, it is necessary to use an extented profile to query
-   the table (because of the fixpoint algorithm). This module associates to a
-   term in a profile, the profile that should be used to query the table *)
-module Ext_profile: sig
-  val get: Profile.t -> logic_info -> Profile.t
-  val add: Profile.t -> logic_info -> Profile.t -> unit
-  val clear: unit -> unit
-end = struct
+(* When performing fixpoint algorithm on function arguments, we may want to
+   forcefully replace the interval inferred by the algorithm with a larger
+   interval
+   -[replace_args_ival] performs this operation for a given list of arguments
+   corresponding to a particular call
+   - [replace_all_args_ival] performs this operation for all arguments that have
+     been called by this function during the same recursive calls. *)
 
-  let ext_profile_tbl : Profile.t LFProf.Hashtbl.t
-    = LFProf.Hashtbl.create 97
+let replace_args_ival ~logic_env li args args_ival =
+  let profile = Logic_env.get_profile logic_env in
+  List.iter2
+    (fun x t -> Memo.replace profile t (Logic_var.Map.find x args_ival))
+    li.l_profile
+    args
 
-  let get profile li =
-    LFProf.Hashtbl.find_def ext_profile_tbl (li, profile) profile
-
-  let add profile i args_ival =
-    LFProf.Hashtbl.add ext_profile_tbl (i, profile) args_ival
-
-  let clear () =
-    Options.feedback ~level:4 "clearing the typing tables";
-    LFProf.Hashtbl.clear ext_profile_tbl
-end
+let replace_all_args_ival li args_ival =
+  let args_map = LF_env.find_args li in
+  List.iter
+    (fun x ->
+       let i = Logic_var.Map.find x args_ival in
+       (Misc.Id_term.Map.iter
+          (fun t profile -> Memo.replace profile t i)
+          (Logic_var.Map.find x args_map)))
+    li.l_profile
 
 (* ********************************************************************* *)
 (* Main functions *)
@@ -430,7 +444,7 @@ let rec infer ~force ~logic_env t =
     | Tapp (li,_,args) ->
       (match li.l_body with
        | LBpred _ | LBterm _ ->
-         let profile =
+         let call_profile =
            Profile.make
              li.l_profile
              (List.map
@@ -438,12 +452,23 @@ let rec infer ~force ~logic_env t =
                 args)
          in
          if LF_env.is_rec li then
-           let ext_profile = Widening.ext_profile li profile in
-           Ext_profile.add profile li ext_profile;
-           try LF_env.find li ext_profile
-           with Not_found -> fixpoint li ext_profile
+           try
+             let known_profile, ival = LF_env.find_profile_ival li in
+             if Profile.is_included call_profile known_profile
+             then
+               (replace_args_ival ~logic_env li args known_profile;
+                ival)
+             else
+               begin
+                 let
+                   ext_profile =
+                   Widening.widen_profile li known_profile call_profile
+                 in
+                 initiate_fixpoint ~logic_env li ext_profile args
+               end
+           with Not_found -> initiate_fixpoint ~logic_env li call_profile args
          else
-           let logic_env = Logic_env.make profile in
+           let logic_env = Logic_env.make call_profile in
            (match li.l_body with
             | LBpred p ->
               ignore (infer_predicate ~logic_env p);
@@ -544,39 +569,39 @@ let rec infer ~force ~logic_env t =
     compute
     t
 
-and fixpoint li args_ival =
-  let get_res = Error.map (fun x -> x) in
-  let logic_env = Logic_env.make args_ival in
-  (* If the logic function has a given C type, we use this type to infer the
-     interval. Otherwise we compute this interval as a fixpoint *)
-  match li.l_body with
-  | LBpred p ->
-    LF_env.add_pred li args_ival;
-    infer_predicate ~logic_env p;
-    Ival (Ival.zero_or_one)
-  | LBterm t ->
-    (match li.l_type with
-     | Some (Ctype typ) ->
-       let ival = interv_of_typ typ in
-       LF_env.add li args_ival ival;
-       ignore (infer ~force:true ~logic_env t);
-       ival
-     | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
-       let ival =
-         match LF_env.find_opt li args_ival with
-         | Some ival -> ival
-         | None -> Ival Ival.bottom
-       in
-       let inferred_ival = get_res (infer ~force:true ~logic_env t) in
-       if is_included inferred_ival ival
-       then
-         ival
-       else
-         let assumed_ival = Widening.widen li ival inferred_ival in
-         LF_env.replace li args_ival assumed_ival;
-         fixpoint li args_ival)
-  | _ -> assert false
+and initiate_fixpoint ~logic_env li args_ival args =
+  let logic_env_call = Logic_env.make args_ival in
+  let ival, pot = match li.l_body with
+    | LBpred p -> Ival (Ival.zero_or_one), PoT_pred p
+    | LBterm t ->
+      (match li.l_type with
+       | Some (Ctype typ) ->
+         interv_of_typ typ, PoT_term t
+       | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
+         Ival (Ival.bottom), PoT_term t)
+    | _ -> assert false
+  in
+  LF_env.add ~logic_env li args_ival ival args;
+  replace_all_args_ival li args_ival;
+  let res = fixpoint logic_env_call li pot in
+  LF_env.decrease li;
+  res
 
+and fixpoint logic_env li pot =
+  let get_res = Error.map (fun x -> x) in
+  let ival = LF_env.find_ival li in
+  let inferred_ival =
+    match pot with
+    | PoT_term t -> get_res (infer ~force:true ~logic_env t)
+    | PoT_pred p -> infer_predicate ~logic_env p; Ival Ival.zero_or_one
+  in
+  if is_included inferred_ival ival
+  then
+    ival
+  else
+    (LF_env.update_ival li (Widening.widen li ival inferred_ival);
+     let ival = fixpoint logic_env li pot
+     in LF_env.decrease li; ival)
 
 and infer_term_lval ~force ~logic_env (host, offset as tlv) =
   match offset with
@@ -751,10 +776,15 @@ and infer_predicate ~logic_env p =
     in
     (match li.l_body with
      | LBpred _ when LF_env.is_rec li ->
-       let ext_profile = Widening.ext_profile li profile in
-       Ext_profile.add profile li ext_profile;
-       ignore (try LF_env.find li ext_profile
-               with Not_found -> fixpoint li ext_profile)
+       (try
+          let known_profile = LF_env.find_profile li in
+          if Profile.is_included profile known_profile
+          then
+            replace_args_ival ~logic_env li args known_profile
+          else
+            let ext_profile = Widening.widen_profile li known_profile profile in
+            ignore (initiate_fixpoint ~logic_env li ext_profile args)
+        with Not_found -> ignore (initiate_fixpoint ~logic_env li profile args))
      | LBpred p ->
        let logic_env = Logic_env.make profile in
        ignore (infer_predicate ~logic_env p)
@@ -877,8 +907,6 @@ let get_from_profile ~profile t =
 let get ~logic_env =
   get_from_profile ~profile:(Logic_env.get_profile logic_env)
 
-let get_ext_profile = Ext_profile.get
-
 let joins ~logic_env terms =
   List.fold_right (fun t acc -> join (get ~logic_env t) acc) terms bottom
 
@@ -895,7 +923,6 @@ let get_ival ~logic_env t =
 
 let clear () =
   Memo.clear();
-  Ext_profile.clear();
   LF_env.clear()
 
 (*

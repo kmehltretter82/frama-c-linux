@@ -74,13 +74,12 @@ let is_lower l1 l2 =
   | Some _, None -> false
 
 let is_higher u1 u2 =
-    match u1, u2 with
+  match u1, u2 with
   | None, _ -> true
   | Some u1, Some u2 -> Integer.compare u1 u2 >= 0
   | Some _, None -> false
 
 let widen_ival_naive name i1 i2 =
-  Options.feedback "hello";
   extend_ival name (Ival.join i1 i2)
 
 let widen_ival_default i1 i2 =
@@ -98,9 +97,6 @@ let widen_ival_default i1 i2 =
      with Cil.Not_representable -> top_ival)
 
 let widen_ival_precise i1 i2 =
-  Options.feedback "widening: %a |> %a"
-    Ival.pretty i1
-    Ival.pretty i2;
   let i = Ival.join i1 i2 in
   try ignore (ikind_of_ival i); Ival i
   with Cil.Not_representable -> top_ival
@@ -127,3 +123,14 @@ let widen li i1 i2 =
   | Float _, Float _ | Rational, Rational | Real, Real | Nan, Nan ->
     join i1 i2
   | Ival _, _| Float _, _ | Rational, _ | Real, _ | Nan, _ -> assert false
+
+let widen_profile li profile new_profile =
+  Cil_datatype.Logic_var.Map.mapi
+    (fun lv ival ->
+       let new_ival =
+         match Cil_datatype.Logic_var.Map.find_opt lv new_profile with
+         | None -> Ival Ival.bottom
+         | Some i -> i
+       in
+       widen li ival new_ival)
+    profile

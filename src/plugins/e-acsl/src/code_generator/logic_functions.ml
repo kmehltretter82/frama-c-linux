@@ -507,7 +507,6 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
           Varname.get ~scope:Global (Functions.RTL.mk_gen_name fname)
         in
         let profile = Profile.make li.l_profile params_ival in
-        let profile = Interval.get_ext_profile profile li in
         let vi, e, env =
           try
             function_to_exp ~loc ?tapp gen_fname env kf li params_ty profile args

@@ -19,12 +19,13 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
-open Cil_types
-open Analyses_types
 
 (* This module serves as a library for the modules Interval and Widening, the
    functions it exports should not be used outside of those modules. Instead,
    use the functions exported in the module Interval *)
+
+open Analyses_types
+open Cil_types
 
 val is_included : ival -> ival -> bool
 val join : ival -> ival -> ival
