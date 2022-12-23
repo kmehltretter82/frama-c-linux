@@ -1,0 +1,26 @@
+[kernel] Parsing assignment2.c (with preprocessing)
+[alias] Parsing done
+[alias] Functions done
+[(*a = b; -> <list of may-alias>
+<end of list>
+)
+(*c = d; -> <list of may-alias>
+<end of list>
+)
+(a = c; -> <list of may-alias>
+{ a; c } are aliased
+{ b; d } are aliased
+<end of list>
+)
+(__retres = 0; -> <list of may-alias>
+{ a; c } are aliased
+{ b; d } are aliased
+<end of list>
+)
+(return __retres; -> <list of may-alias>
+{ a; c } are aliased
+{ b; d } are aliased
+<end of list>
+)
+[alias] Analysis complete
+]
