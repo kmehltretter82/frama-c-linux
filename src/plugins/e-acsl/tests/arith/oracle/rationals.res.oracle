@@ -15,20 +15,20 @@
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] rationals.c:13: Warning: assertion got status unknown.
 [eva:alarm] rationals.c:15: Warning: 
-  non-finite double value. assert \is_finite(__gen_e_acsl__6);
+  non-finite double value. assert \is_finite(__gen_e_acsl__5);
 [eva:alarm] rationals.c:15: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] rationals.c:15: Warning: assertion got status unknown.
 [eva:alarm] rationals.c:16: Warning: 
+  non-finite double value. assert \is_finite(__gen_e_acsl__8);
+[eva:alarm] rationals.c:16: Warning: 
   non-finite double value. assert \is_finite(__gen_e_acsl__9);
 [eva:alarm] rationals.c:16: Warning: 
-  non-finite double value. assert \is_finite(__gen_e_acsl__10);
-[eva:alarm] rationals.c:16: Warning: 
-  non-finite float value. assert \is_finite((float)__gen_e_acsl__9);
+  non-finite float value. assert \is_finite((float)__gen_e_acsl__8);
 [eva:alarm] rationals.c:16: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] rationals.c:17: Warning: 
-  non-finite double value. assert \is_finite(__gen_e_acsl__12);
+  non-finite double value. assert \is_finite(__gen_e_acsl__11);
 [eva:alarm] rationals.c:17: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] rationals.c:17: Warning: assertion got status unknown.
@@ -59,8 +59,8 @@
   function __e_acsl_assert_register_mpq: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [eva:alarm] rationals.c:5: Warning: 
-  function __e_acsl_assert_register_double: precondition data->values == \null ||
-                                                         \valid(data->values) got status unknown.
+  function __e_acsl_assert_register_mpq: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
 [eva:alarm] rationals.c:4: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] rationals.c:4: Warning: 
