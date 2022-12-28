@@ -1,25 +1,27 @@
-[kernel] Parsing assignment2.c (with preprocessing)
+[kernel] Parsing conditional1.c (with preprocessing)
 [alias] Parsing done
 [alias] Functions done
-[(*a = b; -> <list of may-alias>
+[(if (a) a = b; else a = c; -> <list of may-alias>
 <end of list>
 )
-(*c = d; -> <list of may-alias>
+(a = b; -> <list of may-alias>
+{ a; b } are aliased
 <end of list>
 )
 (a = c; -> <list of may-alias>
 { a; c } are aliased
-{ b; d } are aliased
+<end of list>
+)
+(*a = 4; -> <list of may-alias>
+{ a; b; c } are aliased
 <end of list>
 )
 (__retres = 0; -> <list of may-alias>
-{ a; c } are aliased
-{ b; d } are aliased
+{ a; b; c } are aliased
 <end of list>
 )
 (return __retres; -> <list of may-alias>
-{ a; c } are aliased
-{ b; d } are aliased
+{ a; b; c } are aliased
 <end of list>
 )
 ]

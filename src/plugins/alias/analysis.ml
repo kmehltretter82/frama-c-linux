@@ -48,7 +48,7 @@ module Make_table(H: Hashtbl.S)(V: sig type t val size :int end) : InternalTable
   let pretty fmt print_key print_value =
     Format.fprintf fmt "[@[<hov 2>";
     H.iter (fun k v -> Format.fprintf fmt "(%a -> %a)@." print_key k print_value v) tbl;
-    Format.fprintf fmt "@]]"
+    Format.fprintf fmt "@]]@."
 
 end
 
