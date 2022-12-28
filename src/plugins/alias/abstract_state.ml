@@ -179,15 +179,15 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
     new_v , new_x
 
 
-let find_or_create_vertex (lv:lval) (x:t) : V.t *t =
+let find_or_create_vertex (lv:lval) (x:t) : V.t * t =
   try find_vertex lv x , x with
     Not_found -> create_vertex lv x
 
-let points_to (lv:lval) (x:t): V.t list *t =
+let points_to (lv:lval) (x:t): V.t list * t =
   let (v,x) = find_or_create_vertex lv x in
   G.succ x.graph v, x
 
-let addr_of (lv:lval) (x:t) : V.t list *t =
+let addr_of (lv:lval) (x:t) : V.t list * t =
   let (v,x) = find_or_create_vertex lv x in
   G.pred x.graph v, x
 
@@ -218,6 +218,7 @@ let print_dot _ = (* filename (graph:t) = *)
 
 (* merge of two vertices; the first vertex carries both sets, the second is removed from the graph and from lmap and vmap; however, pending is NOT updated  *)
 let merge x v1 v2 =
+  assert_invariants x;
   if (V.equal v1 v2) || not (G.mem_vertex x.graph v1) || not (G.mem_vertex x.graph v2)
   then x
   else
@@ -248,6 +249,7 @@ let merge x v1 v2 =
 
 (* functions join and unify-pointer of steensgaard's paper *)
 let rec join (x:t) (v1:V.t) (v2:V.t) : t =
+  assert_invariants x;
   if (V.equal v1 v2) || not (G.mem_vertex x.graph v1 && G.mem_vertex x.graph v2)
   then
     x
@@ -303,7 +305,8 @@ and unify2 (x:t) (v1:V.t) (l2:V.t list) =
     let x = join x v1 v2 in
     unify2 x v1 qq
 
-let cjoin  (x:t) (v1:V.t) (v2:V.t) =
+let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
+  assert_invariants x;
   let pt2=  G.succ x.graph v2 in
   if pt2 = []
   then
@@ -314,7 +317,8 @@ let cjoin  (x:t) (v1:V.t) (v2:V.t) =
     join x v1 v2
 
 (* in Steensgard's paper, this is written settype(v1,ref(v2,bot)) *)
-let set_type (x:t) (v1:V.t) (v2:V.t) =
+let set_type (x:t) (v1:V.t) (v2:V.t) : t =
+  assert_invariants x;
   let new_g = G.add_edge x.graph v1 v2 in
   VSet.fold (fun vx x -> join x v1 vx) (try VMap.find v1 x.pending with Not_found -> VSet.empty) {x with graph = new_g}
 
@@ -327,7 +331,7 @@ let assignment_x_y (a:t) (x:lval) (y:lval) : t =
 
 
 (* assignment x = &y *)
-let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t=
+let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t =
   let v1, a = find_or_create_vertex x a in
   let list_v2, a = addr_of y a in
   List.fold_left
@@ -364,12 +368,14 @@ let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
 
 (* assignment *x = cst *)
 let assignment_ptr_x_cst (a:t) (x:lval) : t =
+  (* Format.printf "DEBUG (assignment_ptr_x_cst) on lval %a and state:@. %a @." Lval.pretty x print_debug a; *)
   let v2, a = create_cst_vertex a in
-  let list_v1, a = points_to x a in
+  let (list_v1, a) : V.t list * t = points_to x a in
   match list_v1 with
     [] ->  let v1 = find_vertex x a in set_type a v1 v2
-  |  [v1] -> cjoin a v1 v2
-  | _ ->  failwith "assignment_ptr_x_cst not implemented"
+  | _ -> let f_fold (acc:t) (v1:V.t) : t = cjoin acc v1 v2
+    in List.fold_left f_fold a list_v1
+
 
 exception Not_equal
 
