@@ -53,10 +53,13 @@ val make_summary: t -> kernel_function -> t * summary
     before using the other functions of this module. *)
 val compute : unit -> unit
 
+(** [is_computed ()] returns true iff an analysis was done previously *)
+val is_computed : unit -> bool
+
 (** [clear()] clears caches and imperative structures that are used by
     the analysis. All accumulated data are lost. *)
 val clear : unit -> unit
 
 (** [get_abstract_state f s] gets the abstract state computed after
-    statement [s] in function [f]. *)
-val get_abstract_state :  kernel_function -> stmt -> Abstract_state.t
+    statement [s] in function [f]. Returns [None] if the abstract state is bottom or not computed *)
+val get_abstract_state :  kernel_function -> stmt -> Abstract_state.t option

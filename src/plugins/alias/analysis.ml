@@ -36,6 +36,7 @@ module type InternalTable  = sig
   include Table
   val add : key -> value -> unit
   val pretty : Format.formatter -> (Format.formatter -> key -> unit) -> (Format.formatter -> value -> unit) -> unit
+  val clear : unit -> unit
 end
 
 
@@ -49,7 +50,7 @@ module Make_table(H: Hashtbl.S)(V: sig type t val size :int end) : InternalTable
     Format.fprintf fmt "[@[<hov 2>";
     H.iter (fun k v -> Format.fprintf fmt "(%a -> %a)@." print_key k print_value v) tbl;
     Format.fprintf fmt "@]]@."
-
+  let clear () = H.clear tbl
 end
 
 module A = struct type t = Abstract_state.t option let size = 7 end
@@ -196,11 +197,17 @@ let doFunction (kf:kernel_function) =
 let make_summary  _ =
   failwith "make_summary not implemented"
 
+
+let computed_flag = ref false
+
+let is_computed () = !computed_flag
+
 let compute () =
   Ast.compute();
   Options.feedback "Parsing done";
   Globals.Functions.iter doFunction;
   Options.feedback "Functions done";
+  computed_flag := true;
   let value_pretty fmt a =
     match a with
     | None -> Format.fprintf fmt "<Bot>"
@@ -210,7 +217,13 @@ let compute () =
 
 
 let clear () =
-  failwith "clear not implemented"
+  computed_flag := false;
+  Stmt_table.clear()
 
-let get_abstract_state _ =
-  failwith "get_abstract_state not implemented"
+let get_abstract_state _ stmt =
+  if is_computed ()
+  then
+    try Stmt_table.find stmt with
+      Not_found -> None
+  else
+    None
