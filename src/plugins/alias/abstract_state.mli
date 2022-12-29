@@ -30,6 +30,7 @@ open Cil_datatype
 module G: Graph.Sig.G
 
 module LMap = Lval.Map
+module LSet = Lval.Set
 
 (** Type denothing an abstract state of the analysis. It is a graph containing
     all aliases and points-to information. *)
@@ -48,6 +49,8 @@ val print_dot : string -> t -> unit
 
 (** finds the vertex corresponding to a lval. May raise Not_found *)
 val find_vertex : lval -> t -> G.V.t
+
+val find_aliases : lval -> t -> LSet.t
 
 (** Functions for Steensgaard's algorithm *)
 val join : t -> G.V.t -> G.V.t -> t

@@ -79,6 +79,10 @@ let find_lset (v:V.t) (x:t) =
   try VMap.find v x.vmap
   with Not_found -> LSet.empty
 
+let find_aliases (lv:lval) (x:t) =
+  try find_lset (LMap.find lv x.lmap) x
+  with Not_found -> LSet.empty
+
 (* printing functions *)
 
 let print_debug fmt (x:t) =
