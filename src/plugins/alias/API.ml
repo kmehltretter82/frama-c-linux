@@ -46,8 +46,12 @@ let fold_aliases_kf:
 let fold_fundec_stmts _ =
   failwith "not implemented"
 
-let are_aliased  _ =
-  failwith "not implemented"
+let are_aliased (kf: kernel_function)  (s:stmt) (lv1: lval) (lv2:lval) : bool =
+  match Analysis.get_abstract_state kf s with
+    None -> false
+  | Some state ->
+    let setv1 = Abstract_state.find_aliases lv1 state in
+    LSet.mem lv2 setv1
 
 let fold_points_to _ =
   failwith "not implemented"

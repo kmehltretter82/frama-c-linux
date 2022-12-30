@@ -97,7 +97,7 @@ struct
       else
         Some (Some (Abstract_state.union old new_))
 
-  let do_assignment (a:t) (lv:lval) (exp:exp) : t =
+  let rec do_assignment (a:t) (lv:lval) (exp:exp) : t =
     (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)
     match (a,lv,exp.enode) with
       (Some a, (Var v1, NoOffset), Lval (Var v2,NoOffset)) ->
@@ -107,6 +107,11 @@ struct
     | (_, (Var _, NoOffset), Const _) -> a
     | (_, (Var _, NoOffset), SizeOf _) -> a
     | (_, (Var _, NoOffset), SizeOfE _) -> a
+    | (_, (Var _, NoOffset), SizeOfStr _) -> a
+    | (_, (Var _, NoOffset), AlignOf _) -> a
+    | (_, (Var _, NoOffset), AlignOfE _) -> a
+    (* cast : TODO check type *)
+    | (_, _ , CastE (_,exp)) -> do_assignment a lv exp
     | (Some a, (Var v1, NoOffset), AddrOf lv2) ->
       (* case x = &y *)
       Some (Abstract_state.assignment_x_addr_y a (Var v1, NoOffset) lv2)

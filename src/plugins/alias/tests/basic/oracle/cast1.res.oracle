@@ -1,0 +1,24 @@
+[kernel] Parsing cast1.c (with preprocessing)
+[alias] Parsing done
+[alias] Functions done
+[(a = (int *)c; -> <list of may-alias>
+{ a; c } are aliased
+<end of list>
+)
+(d = (float *)b; -> <list of may-alias>
+{ a; c } are aliased
+{ b; d } are aliased
+<end of list>
+)
+(__retres = 0; -> <list of may-alias>
+{ a; c } are aliased
+{ b; d } are aliased
+<end of list>
+)
+(return __retres; -> <list of may-alias>
+{ a; c } are aliased
+{ b; d } are aliased
+<end of list>
+)
+]
+[alias] Analysis complete
