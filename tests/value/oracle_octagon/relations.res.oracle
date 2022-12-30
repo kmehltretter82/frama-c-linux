@@ -1,4 +1,13 @@
-80,81c80,82
+38,41d37
+< [eva:alarm] relations.i:46: Warning: 
+<   signed overflow. assert -2147483648 ≤ u[10] - u[11];
+< [eva:alarm] relations.i:46: Warning: 
+<   signed overflow. assert u[10] - u[11] ≤ 2147483647;
+72c68
+<   R6 ∈ [--..--]
+---
+>   R6 ∈ {0}
+80,81c76,78
 <   e ∈ [--..--]
 <   f ∈ [--..--]
 ---
