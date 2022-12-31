@@ -47,9 +47,9 @@ module Make_table(H: Hashtbl.S)(V: sig type t val size :int end) : InternalTable
   let add = H.add tbl
   let find = H.find tbl
   let pretty fmt print_key print_value =
-    Format.fprintf fmt "[@[<hov 2>";
-    H.iter (fun k v -> Format.fprintf fmt "(%a -> %a)@." print_key k print_value v) tbl;
-    Format.fprintf fmt "@]]@."
+    Format.fprintf fmt "@[<hov 2>";
+    H.iter (fun k v -> Format.fprintf fmt "After statement %a :@. @[<2>%a@] @." print_key k print_value v) tbl;
+    Format.fprintf fmt "@]@."
   let clear () = H.clear tbl
 end
 
@@ -110,6 +110,13 @@ struct
     | (_, (Var _, NoOffset), SizeOfStr _) -> a
     | (_, (Var _, NoOffset), AlignOf _) -> a
     | (_, (Var _, NoOffset), AlignOfE _) -> a
+    (* arithmetic operations: either do nothing (normal arithmetic) or returns top (pointer arithmetic) *)
+    | (Some a, (Var _, NoOffset), UnOp (_, _,tt)) ->
+       begin
+         match tt with
+           TPtr _ -> Options.warning "" ; Some (Abstract_state.make_top a)
+         | _ -> Some a 
+       end
     (* cast : TODO check type *)
     | (_, _ , CastE (_,exp)) -> do_assignment a lv exp
     | (Some a, (Var v1, NoOffset), AddrOf lv2) ->

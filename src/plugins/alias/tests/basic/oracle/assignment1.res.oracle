@@ -1,33 +1,40 @@
 [kernel] Parsing assignment1.c (with preprocessing)
 [alias] Parsing done
 [alias] Functions done
-[(a = b; -> <list of may-alias>
+After statement a = b; :
+ <list of may-alias>
 { a; b } are aliased
 <end of list>
-)
-(b = c; -> <list of may-alias>
+ 
+After statement b = c; :
+ <list of may-alias>
 { a; b; c } are aliased
 <end of list>
-)
-(*a = 4; -> <list of may-alias>
+ 
+After statement *a = 4; :
+ <list of may-alias>
 { a; b; c } are aliased
 <end of list>
-)
-(*c = e; -> <list of may-alias>
+ 
+After statement *c = e; :
+ <list of may-alias>
 { a; b; c } are aliased
 <end of list>
-)
-(a = d; -> <list of may-alias>
+ 
+After statement a = d; :
+ <list of may-alias>
 { a; b; c; d } are aliased
 <end of list>
-)
-(__retres = 0; -> <list of may-alias>
+ 
+After statement __retres = 0; :
+ <list of may-alias>
 { a; b; c; d } are aliased
 <end of list>
-)
-(return __retres; -> <list of may-alias>
+ 
+After statement return __retres; :
+ <list of may-alias>
 { a; b; c; d } are aliased
 <end of list>
-)
-]
+ 
+
 [alias] Analysis complete

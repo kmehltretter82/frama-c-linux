@@ -1,28 +1,34 @@
 [kernel] Parsing conditional1.c (with preprocessing)
 [alias] Parsing done
 [alias] Functions done
-[(if (a) a = b; else a = c; -> <list of may-alias>
+After statement if (a) a = b; else a = c; :
+ <list of may-alias>
 <end of list>
-)
-(a = b; -> <list of may-alias>
+ 
+After statement a = b; :
+ <list of may-alias>
 { a; b } are aliased
 <end of list>
-)
-(a = c; -> <list of may-alias>
+ 
+After statement a = c; :
+ <list of may-alias>
 { a; c } are aliased
 <end of list>
-)
-(*a = 4; -> <list of may-alias>
+ 
+After statement *a = 4; :
+ <list of may-alias>
 { a; b; c } are aliased
 <end of list>
-)
-(__retres = 0; -> <list of may-alias>
+ 
+After statement __retres = 0; :
+ <list of may-alias>
 { a; b; c } are aliased
 <end of list>
-)
-(return __retres; -> <list of may-alias>
+ 
+After statement return __retres; :
+ <list of may-alias>
 { a; b; c } are aliased
 <end of list>
-)
-]
+ 
+
 [alias] Analysis complete

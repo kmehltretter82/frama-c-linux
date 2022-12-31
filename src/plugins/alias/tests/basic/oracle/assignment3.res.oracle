@@ -1,17 +1,21 @@
 [kernel] Parsing assignment3.c (with preprocessing)
 [alias] Parsing done
 [alias] Functions done
-[(a = & b; -> <list of may-alias>
+After statement a = & b; :
+ <list of may-alias>
 <end of list>
-)
-(*c = b; -> <list of may-alias>
+ 
+After statement *c = b; :
+ <list of may-alias>
 <end of list>
-)
-(__retres = 0; -> <list of may-alias>
+ 
+After statement __retres = 0; :
+ <list of may-alias>
 <end of list>
-)
-(return __retres; -> <list of may-alias>
+ 
+After statement return __retres; :
+ <list of may-alias>
 <end of list>
-)
-]
+ 
+
 [alias] Analysis complete
