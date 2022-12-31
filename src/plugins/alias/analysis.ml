@@ -112,11 +112,11 @@ struct
     | (_, (Var _, NoOffset), AlignOfE _) -> a
     (* arithmetic operations: either do nothing (normal arithmetic) or returns top (pointer arithmetic) *)
     | (Some a, (Var _, NoOffset), UnOp (_, _,tt)) ->
-       begin
-         match tt with
-           TPtr _ -> Options.warning "" ; Some (Abstract_state.make_top a)
-         | _ -> Some a 
-       end
+      begin
+        match tt with
+          TPtr _ -> Options.warning "" ; Some (Abstract_state.make_top a)
+        | _ -> Some a
+      end
     (* cast : TODO check type *)
     | (_, _ , CastE (_,exp)) -> do_assignment a lv exp
     | (Some a, (Var v1, NoOffset), AddrOf lv2) ->

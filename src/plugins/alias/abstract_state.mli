@@ -84,8 +84,8 @@ val union : t -> t -> t
 val initial_value : t
 
 (** make_top merge all nodes of the graph; the resulting graph has
-   only 1 vertex, 1 edge (loop); every lval of the origial graph are
-   associated to this vertex *)
+    only 1 vertex, 1 edge (loop); every lval of the origial graph are
+    associated to this vertex *)
 val make_top : t -> t
 
 (** Type denoting summaries of functions *)
