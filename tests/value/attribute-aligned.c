@@ -91,6 +91,18 @@ static void tt(void) {
 }
 
 //--------------------------------------------------------------------
+typedef float float_aligned16 __attribute__((aligned(16))); // increase
+typedef double double_aligned1 __attribute__((aligned(1))); // reduce
+
+static void typedef_with_aligned(void) {
+  int a;
+  a = __alignof__(float_aligned16);
+  //@ check a == 16;
+  a = __alignof__(double_aligned1);
+  //@ check a == 1;
+}
+
+//--------------------------------------------------------------------
 
 int main(void)
 {
@@ -101,5 +113,6 @@ int main(void)
   rt();
   st();
   tt();
+  typedef_with_aligned();
   return 0;
 }
