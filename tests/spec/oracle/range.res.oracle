@@ -16,4 +16,10 @@ int f(struct foo *x);
     assigns *(x + (0 .. 3)) \from y->bli[0 .. 3]; */
 int g(char x[4], struct bli *y);
 
+/*@ assigns *(x + (0 .. (1 << 2) - 2));
+    assigns *(x + (0 .. (1 << 2) - 2))
+      \from \let range = (0 .. 4 - 1); *(x + range);
+ */
+int h(char x[4]);
+
 

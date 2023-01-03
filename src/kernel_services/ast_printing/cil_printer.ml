@@ -341,7 +341,8 @@ module Precedence = struct
     | Const _ -> 0                        (* Constants *)
 
   let rec getParenthLevelLogic = function
-    | Tlambda _ | Trange _ | Tlet _ -> binderLevel
+    | Trange _ -> upperLevel
+    | Tlambda _ | Tlet _ -> binderLevel
     | TBinOp(LAnd, _,_) -> and_level
     | TBinOp(LOr, _,_) -> or_level
     (* Bit operations. *)
@@ -2612,7 +2613,7 @@ class cil_printer () = object (self)
       let v = def.l_var_info in
       let args = def.l_profile in
       let pp_defn = match def.l_body with
-        | LBterm t -> fun fmt -> self#term fmt t
+        | LBterm t -> fun fmt -> term fmt t
         | LBpred p -> fun fmt -> self#predicate fmt p
         | LBnone
         | LBreads _ | LBinductive _ ->
