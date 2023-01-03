@@ -2385,17 +2385,8 @@ class cil_printer () = object (self)
 
   method private term_prec contextprec fmt e =
     let thisLevel = Precedence.getParenthLevelLogic e.term_node in
-    let needParens =
-      if thisLevel >= contextprec then
-        true
-      else if contextprec == Precedence.bitwiseLevel then
-        (* quiet down some GCC warnings *)
-        thisLevel == Precedence.additiveLevel
-        || thisLevel == Precedence.comparativeLevel
-      else
-        false
-    in
-    if needParens then fprintf fmt "@[<hov 2>(%a)@]" self#term e
+    if Precedence.needParens thisLevel contextprec then
+      fprintf fmt "@[<hov 2>(%a)@]" self#term e
     else self#term fmt e
 
   method identified_term fmt t = self#term fmt t.it_content
