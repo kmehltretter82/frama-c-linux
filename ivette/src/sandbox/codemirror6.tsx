@@ -6,6 +6,7 @@ import { EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
 import { Decoration, DecorationSet } from '@codemirror/view';
 import { DOMEventMap as EventMap } from '@codemirror/view';
 import { GutterMarker, gutter } from '@codemirror/view';
+import { showTooltip, Tooltip } from '@codemirror/view';
 
 import { parser } from '@lezer/cpp';
 import { tags } from '@lezer/highlight';
@@ -18,7 +19,7 @@ import * as Dome from 'dome';
 import * as Utils from 'dome/data/arrays';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
-import type { key } from 'dome/data/json';
+import { key } from 'dome/data/json';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { text } from 'frama-c/kernel/api/data';
 import * as Eva from 'frama-c/plugins/eva/api/general';
@@ -35,10 +36,9 @@ import './dark-code.css';
 //  CodeMirror state's extensions types definitions
 // -----------------------------------------------------------------------------
 
-// Helper types definitions
+// Helper types definitions.
 export type Get<A> = (state: EditorState | undefined) => A;
 export type Set<A> = (view: EditorView | null, value: A) => void;
-export type Equal<A> = (left: A, right: A) => boolean;
 export interface Data<A, S> { init: A, get: Get<A>, structure: S }
 
 // Event handlers type definition.
@@ -143,12 +143,12 @@ function getExtension<A>(dep: Dependency<A>): Extension {
 // provided through the optional parameters <equal>. Providing an equality test
 // for complex types can help improve performances by avoiding recomputing
 // extensions depending on the field.
-export function createField<A>(init: A, equal?: Equal<A>): Field<A> {
+export function createField<A>(init: A): Field<A> {
   const annot = Annotation.define<A>();
   const create = (): A => init;
   type Update<A> = (current: A, transaction: Transaction) => A;
   const update: Update<A> = (current, tr) => tr.annotation(annot) ?? current;
-  const field = StateField.define<A>({ create, update, compare: equal });
+  const field = StateField.define<A>({ create, update });
   const get: Get<A> = (state) => state?.field(field) ?? init;
   const useSet: Set<A> = (v, a) =>
     React.useEffect(() => v?.dispatch({ annotations: annot.of(a) }), [v, a]);
@@ -204,6 +204,23 @@ export function createGutter<I extends Dict>(
   return enables.concat(extension);
 }
 
+// A Tooltip is an extension that adds decorations as a floating DOM element
+// above or below some text. See the CodeMirror's documentation on Tooltip
+// for further details.
+export function createTooltip<I extends Dict>(
+  deps: Dependencies<I>,
+  fn: (input: I) => Tooltip | Tooltip[] | undefined,
+): Extension {
+  const { structure, extension } = createAspect(deps, fn);
+  const show = showTooltip.computeN([structure], st => {
+    const tip = st.facet(structure);
+    if (tip === undefined) return [null];
+    if ('length' in tip) return tip;
+    return [tip];
+  });
+  return [extension, show];
+}
+
 // An Event Handler is an extention responsible of performing a computation each
 // time a DOM event (like <mouseup> or <contextmenu>) happens.
 export function createEventHandler<I extends Dict>(
@@ -223,7 +240,7 @@ export function createEventHandler<I extends Dict>(
 
 
 // -----------------------------------------------------------------------------
-//  Utilitary types
+//  Utilitary types and functions
 // -----------------------------------------------------------------------------
 
 // An alias type for functions and locations.
@@ -237,6 +254,14 @@ type Caller = { fct: key<'#fct'>, marker: key<'#stmt'> };
 // A range is just a pair of position in the code.
 interface Range { from: number, to: number }
 
+// Type checking that an input is defined.
+function isDef<A>(a: A | undefined): a is A { return a !== undefined; }
+
+// Map a function over a list, removing all inputs that returned undefined.
+function mapFilter<A, B>(xs: A[], fn: (x: A) => B | undefined): B[] {
+  return xs.map(fn).filter(isDef);
+}
+
 
 
 // -----------------------------------------------------------------------------
@@ -246,29 +271,35 @@ interface Range { from: number, to: number }
 // The code is given by the server has a tree but implemented with arrays and
 // without information on the ranges of each element. It will be converted in a
 // good old tree that carry those information.
-interface Tree extends Range { id?: string, children: Tree[] }
+interface Leaf extends Range { text: string }
+interface Node extends Range { id: string, children: Tree[] }
+type Tree = Leaf | Node;
 
-// A leaf tree with no children.
-const leaf = (from: number, to: number): Tree => ({ from, to, children: [] });
+// Utility functions on trees.
+function isLeaf (t: Tree): t is Leaf { return 'text' in t; }
+function isNode (t: Tree): t is Node { return 'id' in t && 'children' in t; }
+const empty: Tree = { text: '', from: 0, to: 0 };
 
 // Convert an Ivette text (i.e a function's code) into a Tree, adding range
 // information to each construction.
 function textToTree(t: text): Tree | undefined {
-  function aux(t: text, from: number): Tree | undefined {
-    if (t === null) return undefined;
-    if (typeof t === 'string') return leaf(from, from + t.length);
+  function aux(t: text, from: number): [Tree | undefined, number] {
+    if (t === null) return [undefined, from];
+    if (typeof t === 'string') {
+      const to = from + t.length;
+      return [{ text: t, from, to }, to];
+    }
+    if (t.length < 2 || typeof t[0] !== 'string') return [undefined, from];
     const children: Tree[] = []; let acc = from;
     for (const child of t.slice(1)) {
-      const node = aux(child, acc);
-      if (node) { acc = node.to; children.push(node); }
+      const [node, to] = aux(child, acc);
+      if (node) children.push(node);
+      acc = to;
     }
-    if (children.length === 0) return undefined;
-    const to = children[children.length - 1].to;
-    const finalFrom = children[0].from;
-    const id = typeof t[0] === 'string' && t[0][0] === '#' ? t[0] : undefined;
-    return { id, from: finalFrom, to, children };
+    return [{ id: t[0], from, to: acc, children }, acc];
   }
-  return aux(t, 0);
+  const [res] = aux(t, 0);
+  return res;
 }
 
 // Convert an Ivette text into a string to be displayed.
@@ -283,7 +314,8 @@ function textToString(text: text): string {
 function markersRangesOfTree(tree: Tree): Map<string, Range>{
   const ranges: Map<string, Range> = new Map();
   const toRanges = (tree: Tree): void => {
-    if (tree.id) ranges.set(tree.id, tree);
+    if (!isNode(tree)) return;
+    ranges.set(tree.id, tree);
     for (const child of tree.children) toRanges(child);
   };
   toRanges(tree);
@@ -292,20 +324,13 @@ function markersRangesOfTree(tree: Tree): Map<string, Range>{
 
 // Find the closest covering tagged node of a given position. Returns
 // undefined if there is not relevant covering node.
-function coveringNode(tree: Tree, pos: number): Tree | undefined {
+function coveringNode(tree: Tree, pos: number): Node | undefined {
+  if (isLeaf(tree)) return undefined;
   if (pos < tree.from || pos > tree.to) return undefined;
-  if (pos === tree.from) return tree;
-  const res = Utils.first(tree.children, (c) => coveringNode(c, pos));
-  if (res) return res.id ? res : tree;
+  const child = Utils.first(tree.children, (c) => coveringNode(c, pos));
+  if (child && isNode(child)) return child;
   if (tree.from <= pos && pos < tree.to) return tree;
   return undefined;
-}
-
-// Find the subtree whose root as the given marker as id, or undefined if it
-// does not exists in the tree.
-function findMarker(tree: Tree, marker: Marker): Tree | undefined {
-  if (tree.id === marker) return tree;
-  return Utils.first(tree.children, (c) => findMarker(c, marker));
 }
 
 
@@ -333,7 +358,7 @@ function createTextField(): Field<text> {
 
 // This aspect computes the tree representing the currently displayed function's
 // code, represented by the <Text> field.
-const Tree = createAspect({ t: Text }, ({ t }) => textToTree(t) ?? leaf(0, 0));
+const Tree = createAspect({ t: Text }, ({ t }) => textToTree(t) ?? empty);
 
 // This aspect computes the markers ranges of the currently displayed function's
 // tree, represented by the <Tree> aspect.
@@ -420,10 +445,10 @@ const CodeDecorator = createCodeDecorator();
 function createCodeDecorator(): Extension {
   const hoveredClass = Decoration.mark({ class: 'cm-hovered-code' });
   const selectedClass = Decoration.mark({ class: 'cm-selected-code' });
-  const deps = { tree: Tree, marker: Marker, hovered: Hovered };
-  return createDecorator(deps, ({ tree, marker: m, hovered: h }) => {
-    const selected = m && findMarker(tree, m);
-    const hovered = h && findMarker(tree, h);
+  const deps = { ranges: Ranges, marker: Marker, hovered: Hovered };
+  return createDecorator(deps, ({ ranges, marker: m, hovered: h }) => {
+    const selected = m && ranges.get(m);
+    const hovered = h && ranges.get(h);
     const range = selected && selectedClass.range(selected.from, selected.to);
     const add = hovered && [ hoveredClass.range(hovered.from, hovered.to) ];
     const set = range ? RangeSet.of(range) : RangeSet.empty;
@@ -447,11 +472,9 @@ function createDeadCodeDecorator(): Extension {
   const deps = { dead: Dead, ranges: Ranges };
   return createDecorator(deps, ({ dead, ranges }) => {
     const range = (marker: string): Range | undefined => ranges.get(marker);
-    function isDef<A>(a: A | undefined): a is A { return a !== undefined; }
-    const getRanges = (xs: string[]): Range[] => xs.map(range).filter(isDef);
-    const unreachableRanges = getRanges(dead.unreachable);
+    const unreachableRanges = mapFilter(dead.unreachable, range);
     const unreachable = unreachableRanges.map(r => uClass.range(r.from, r.to));
-    const nonTermRanges = getRanges(dead.nonTerminating);
+    const nonTermRanges = mapFilter(dead.nonTerminating, range);
     const nonTerm = nonTermRanges.map(r => tClass.range(r.from, r.to));
     return RangeSet.of(unreachable.concat(nonTerm), true);
   });
@@ -475,16 +498,11 @@ const PropertiesStatuses = createField<Properties.statusData[]>([]);
 const PropertiesRanges = createPropertiesRange();
 interface PropertyRange extends Properties.statusData { range: Range }
 function createPropertiesRange(): Aspect<PropertyRange[]> {
-  const deps = { statuses: PropertiesStatuses, ranges: Ranges };
-  return createAspect(deps, ({ statuses, ranges }) => {
-    type R = PropertyRange | undefined;
-    const isDef = (r: R): r is PropertyRange => r !== undefined;
-    const fn = (p: Properties.statusData): R => {
-      const range = ranges.get(p.key);
-      return range && { ...p, range };
-    };
-    return statuses.map(fn).filter(isDef);
-  });
+  const deps = { props: PropertiesStatuses, ranges: Ranges };
+  return createAspect(deps, ({ props, ranges }) => mapFilter(props, (p) => {
+    const range = ranges.get(p.key);
+    return range && { ...p, range };
+  }));
 }
 
 // This aspect computes the tag associated to each property.
@@ -658,6 +676,62 @@ function createContextMenuHandler(): Extension {
 
 
 // -----------------------------------------------------------------------------
+//  Tainted lvalues
+// -----------------------------------------------------------------------------
+
+type Taints = Eva.LvalueTaints;
+const TaintedLvalues = createField<Taints[] | undefined>(undefined);
+
+function textOfTaint(taint: Eva.taintStatus): string {
+  switch (taint) {
+    case 'not_computed': return 'The taint has not been computed';
+    case 'error': return 'There was an error during the taint computation';
+    case 'not_applicable': return 'No taint for this lvalue';
+    case 'direct_taint': return 'This lvalue can be affected by an attacker';
+    case 'indirect_taint':
+      return 'This lvalue depends on path conditions that can \
+      be affected by an attacker';
+    case 'not_tainted': return 'This lvalue is safe'
+  }
+  return '';
+}
+
+const TaintedLvaluesDecorator = createTaintedLvaluesDecorator();
+function createTaintedLvaluesDecorator(): Extension {
+  const mark = Decoration.mark({ class: 'cm-tainted' });
+  const deps = { ranges: Ranges, tainted: TaintedLvalues };
+  return createDecorator(deps, ({ ranges, tainted = [] }) => {
+    const find = (t: Taints): Range | undefined => ranges.get(t.lval);
+    const marks = mapFilter(tainted, find).map(r => mark.range(r.from, r.to));
+    return RangeSet.of(marks, true);
+  });
+}
+
+const TaintTooltip = createTaintTooltip();
+function createTaintTooltip(): Extension {
+  const deps = { hovered: Hovered, ranges: Ranges, tainted: TaintedLvalues };
+  return createTooltip(deps, ({ hovered, ranges, tainted }) => {
+    const hoveredTaint = tainted?.find(t => t.lval === hovered);
+    const hoveredNode = hovered && ranges.get(hovered);
+    if (!hoveredTaint || !hoveredNode) return undefined;
+    return {
+      pos: hoveredNode.from,
+      above: true,
+      strictSide: true,
+      arrow: true,
+      create: () => {
+        const dom = document.createElement('div');
+        dom.className = 'cm-tainted-tooltip';
+        dom.textContent = textOfTaint(hoveredTaint.taint);
+        return { dom };
+      }
+    }
+  });
+}
+
+
+
+// -----------------------------------------------------------------------------
 //  Code highlighting and parsing
 // -----------------------------------------------------------------------------
 
@@ -712,6 +786,13 @@ function useFctCallers(fct: Fct): Caller[] {
   return result.map(([fct, marker]) => ({ fct, marker }));
 }
 
+// Server request handler returning the tainted lvalues.
+function useFctTaints(fct: Fct): Eva.LvalueTaints[] {
+  const req = React.useMemo(() => Server.send(Eva.taintedLvalues, fct), [fct]);
+  const { result = [] } = Dome.usePromise(req);
+  return result;
+}
+
 
 
 // -----------------------------------------------------------------------------
@@ -727,6 +808,8 @@ const baseExtensions: Extension[] = [
   ContextMenuHandler,
   PropertiesGutter,
   foldGutter(),
+  TaintedLvaluesDecorator,
+  TaintTooltip,
   Highlight, new LanguageSupport(cppLanguage),
 ];
 
@@ -773,21 +856,7 @@ function Editor(): JSX.Element {
   Hovered.set(editor.current, hovered?.marker);
   Dead.set(editor.current, useFctDead(fct));
   Callers.set(editor.current, useFctCallers(fct));
-
-  /*
-  const getTaints = Eva.taintedLvalues;
-  const taintReq = React.useMemo(() => Server.send(getTaints, fct), [fct]);
-  const { result: taints } = Dome.usePromise(taintReq);
-
-  if (taints && data) {
-    console.log('-----');
-    for (const taint of taints) {
-      const range = data.ranges.get(taint.lval);
-      console.log (taint.lval, range, taint.before, taint.after);
-    }
-    console.log('-----');
-  }
-  */
+  TaintedLvalues.set(editor.current, useFctTaints(fct));
 
   return <div className='cm-global-box' ref={parent} />;
 }

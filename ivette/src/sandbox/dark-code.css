@@ -38,6 +38,28 @@
 .cm-dead-code { color: var(--dead-code); }
 .cm-non-term-code { color: var(--dead-code); }
 
+.cm-tainted {
+  text-decoration: underline var(--warning) solid 1px;
+  text-decoration-skip-ink: none;
+  text-underline-position: under;
+}
+
+.cm-tooltip.cm-tainted-tooltip {
+  background-color: var(--background-softer);
+  color: var(--text-highlighted);
+  border: 1px solid var(--background-profound);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.cm-tooltip-above.cm-tainted-tooltip .cm-tooltip-arrow:before {
+  border-top-color: var(--background-profound);
+}
+
+.cm-tooltip-above.cm-tainted-tooltip .cm-tooltip-arrow:after {
+  border-top-color: var(--background-softer);
+}
+
 .cm-def { color: var(--codemirror-def); }
 
 .cm-comment { color: var(--codemirror-comment); }
