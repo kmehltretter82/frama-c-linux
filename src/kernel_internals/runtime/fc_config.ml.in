@@ -63,7 +63,13 @@ let preprocessor = env_or_default (fun x -> x) default_cpp
 let using_default_cpp = env_or_default (fun _ -> false) true
 
 let preprocessor_is_gnu_like =
-  env_or_default (fun _ -> false) @FRAMAC_GNU_CPP@
+  env_or_default
+    (fun _ ->
+       (* be more lenient when trying to determine if the preprocessor
+          is gnu-like: in Cygwin, for instance, CC is "<prefix>-gcc" but
+          CPP is "<prefix>-cpp", so this extra test allows proper detection. *)
+       let env = Sys.getenv "CC" ^ default_cpp_args in
+       env=default_cpp) @FRAMAC_GNU_CPP@
 
 let preprocessor_supported_arch_options = [@DEFAULT_CPP_SUPPORTED_ARCH_OPTS@]
 
