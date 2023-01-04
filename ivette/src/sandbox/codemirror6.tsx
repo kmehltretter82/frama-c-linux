@@ -198,9 +198,12 @@ export function createGutter<I extends Dict>(
   line: (inputs: I, block: Range, view: EditorView) => GutterMarker | null
 ): Extension {
   const enables = mapDict(deps, getExtension);
-  const extension = gutter({ class: className, lineMarker: (view, block) => {
-    return line(inputs(deps, view.state) as I, block, view);
-  }});
+  const extension = gutter({
+    class: className,
+    lineMarker: (view, block) => {
+      return line(inputs(deps, view.state) as I, block, view);
+    }
+  });
   return enables.concat(extension);
 }
 
@@ -230,7 +233,7 @@ export function createEventHandler<I extends Dict>(
   const enables = mapDict(deps, getExtension);
   const domEventHandlers = Object.fromEntries(Object.keys(handlers).map((k) => {
     const h = handlers[k] as Handler<I, typeof k>;
-    const fn = (e: typeof k, v: EditorView) =>
+    const fn = (e: typeof k, v: EditorView): void =>
       h(inputs(deps, v.state) as I, v, e);
     return [k, fn];
   }));
@@ -389,11 +392,13 @@ const UpdateSelection = createField<UpdateSelection>(() => { return; });
 const MarkerUpdater = createMarkerUpdater();
 function createMarkerUpdater(): Extension {
   const deps = { fct: Fct, tree: Tree, update: UpdateSelection };
-  return createEventHandler(deps, { mouseup: ({ fct, tree, update }, view) => {
-    const main = view.state.selection.main;
-    const id = coveringNode(tree, main.from)?.id;
-    update({ location: { fct, marker: Ast.jMarker(id) } });
-  }});
+  return createEventHandler(deps, {
+    mouseup: ({ fct, tree, update }, view) => {
+      const main = view.state.selection.main;
+      const id = coveringNode(tree, main.from)?.id;
+      update({ location: { fct, marker: Ast.jMarker(id) } });
+    }
+  });
 }
 
 
@@ -416,23 +421,25 @@ const UpdateHovered = createField<UpdateHovered>(() => { return ; });
 const HoveredUpdater = createHoveredUpdater();
 function createHoveredUpdater(): Extension {
   const deps = { fct: Fct, tree: Tree, update: UpdateHovered };
-  return createEventHandler(deps, { mousemove: (inputs, view, event) => {
-    const { fct, tree, update: updateHovered } = inputs;
-    const coords = { x: event.clientX, y: event.clientY };
-    const pos = view.posAtCoords(coords); if (!pos) return;
-    const hov = coveringNode(tree, pos); if (!hov) return;
-    const from = view.coordsAtPos(hov.from); if (!from) return;
-    const to = view.coordsAtPos(hov.to); if (!to) return;
-    const left = Math.min(from.left, to.left);
-    const right = Math.max(from.left, to.left);
-    const top = Math.min(from.top, to.top);
-    const bottom = Math.max(from.bottom, to.bottom);
-    const horizontallyOk = left <= coords.x && coords.x <= right;
-    const verticallyOk = top <= coords.y && coords.y <= bottom;
-    if (!horizontallyOk || !verticallyOk) return;
-    const marker = Ast.jMarker(hov?.id);
-    updateHovered(marker ? { fct, marker } : undefined);
-  }});
+  return createEventHandler(deps, {
+    mousemove: (inputs, view, event) => {
+      const { fct, tree, update: updateHovered } = inputs;
+      const coords = { x: event.clientX, y: event.clientY };
+      const pos = view.posAtCoords(coords); if (!pos) return;
+      const hov = coveringNode(tree, pos); if (!hov) return;
+      const from = view.coordsAtPos(hov.from); if (!from) return;
+      const to = view.coordsAtPos(hov.to); if (!to) return;
+      const left = Math.min(from.left, to.left);
+      const right = Math.max(from.left, to.left);
+      const top = Math.min(from.top, to.top);
+      const bottom = Math.max(from.bottom, to.bottom);
+      const horizontallyOk = left <= coords.x && coords.x <= right;
+      const verticallyOk = top <= coords.y && coords.y <= bottom;
+      if (!horizontallyOk || !verticallyOk) return;
+      const marker = Ast.jMarker(hov?.id);
+      updateHovered(marker ? { fct, marker } : undefined);
+    }
+  });
 }
 
 
@@ -629,48 +636,50 @@ const ContextMenuHandler = createContextMenuHandler();
 function createContextMenuHandler(): Extension {
   const data = { tree: Tree, locations: Callers };
   const deps = { ...data, update: UpdateSelection, getData: GetMarkerData };
-  return createEventHandler(deps, { contextmenu: (inputs, view, event) => {
-    const { tree, locations, update, getData } = inputs;
-    const coords = { x: event.clientX, y: event.clientY };
-    const position = view.posAtCoords(coords); if (!position) return;
-    const node = coveringNode(tree, position);
-    if (!node || !node.id) return;
-    const items: Dome.PopupMenuItem[] = [];
-    const info = getData(node.id);
-    if (info?.var === 'function') {
-      if (info.kind === 'declaration') {
-        const callers = Lodash.groupBy(locations, e => e.fct);
-        Lodash.forEach(callers, (e) => {
-          const callerName = e[0].fct;
-          const callSites = e.length > 1 ? `(${e.length} call sites)` : '';
-          items.push({
-            label: `Go to caller ${callerName} ` + callSites,
-            onClick: () => update({
-              name: `Call sites of function ${info.name}`,
-              locations: locations,
-              index: locations.findIndex(l => l.fct === callerName)
-            })
+  return createEventHandler(deps, {
+    contextmenu: (inputs, view, event) => {
+      const { tree, locations, update, getData } = inputs;
+      const coords = { x: event.clientX, y: event.clientY };
+      const position = view.posAtCoords(coords); if (!position) return;
+      const node = coveringNode(tree, position);
+      if (!node || !node.id) return;
+      const items: Dome.PopupMenuItem[] = [];
+      const info = getData(node.id);
+      if (info?.var === 'function') {
+        if (info.kind === 'declaration') {
+          const callers = Lodash.groupBy(locations, e => e.fct);
+          Lodash.forEach(callers, (e) => {
+            const callerName = e[0].fct;
+            const callSites = e.length > 1 ? `(${e.length} call sites)` : '';
+            items.push({
+              label: `Go to caller ${callerName} ` + callSites,
+              onClick: () => update({
+                name: `Call sites of function ${info.name}`,
+                locations: locations,
+                index: locations.findIndex(l => l.fct === callerName)
+              })
+            });
           });
-        });
-      } else {
-        const location = { fct: info.name };
-        const onClick = (): void => update({ location });
-        const label = `Go to definition of ${info.name}`;
-        items.push({ label, onClick });
+        } else {
+          const location = { fct: info.name };
+          const onClick = (): void => update({ location });
+          const label = `Go to definition of ${info.name}`;
+          items.push({ label, onClick });
+        }
       }
+      const enabled = info?.kind === 'lvalue' || info?.var === 'variable';
+      const onClick = (kind: access): void => {
+        if (info && node.id)
+          studia({ marker: node.id, info, kind }).then(update);
+      };
+      const reads = 'Studia: select reads';
+      const writes = 'Studia: select writes';
+      items.push({ label: reads, enabled, onClick: () => onClick('Reads') });
+      items.push({ label: writes, enabled, onClick: () => onClick('Writes') });
+      if (items.length > 0) Dome.popupMenu(items);
+      return;
     }
-    const enabled = info?.kind === 'lvalue' || info?.var === 'variable';
-    const onClick = (kind: access): void => {
-      if (info && node.id)
-        studia({ marker: node.id, info, kind }).then(update);
-    };
-    const reads = 'Studia: select reads';
-    const writes = 'Studia: select writes';
-    items.push({ label: reads, enabled, onClick: () => onClick('Reads') });
-    items.push({ label: writes, enabled, onClick: () => onClick('Writes') });
-    if (items.length > 0) Dome.popupMenu(items);
-    return;
-  }});
+  });
 }
 
 
@@ -691,7 +700,7 @@ function textOfTaint(taint: Eva.taintStatus): string {
     case 'indirect_taint':
       return 'This lvalue depends on path conditions that can \
       be affected by an attacker';
-    case 'not_tainted': return 'This lvalue is safe'
+    case 'not_tainted': return 'This lvalue is safe';
   }
   return '';
 }
@@ -725,7 +734,7 @@ function createTaintTooltip(): Extension {
         dom.textContent = textOfTaint(hoveredTaint.taint);
         return { dom };
       }
-    }
+    };
   });
 }
 
