@@ -20,10 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-// --------------------------------------------------------------------------
-// --- AST Source Code
-// --------------------------------------------------------------------------
-
 import React from 'react';
 import Lodash from 'lodash';
 
@@ -594,7 +590,7 @@ const baseExtensions: Editor.Extension[] = [
 
 // The component in itself.
 export default function ASTview(): JSX.Element {
-  const [view, editor] = Editor.Editor(baseExtensions);
+  const { view, component } = Editor.Editor(baseExtensions);
 
   // Updating CodeMirror when the selection or its callback are changed.
   const [selection, updateSelection] = States.useSelection();
@@ -629,7 +625,7 @@ export default function ASTview(): JSX.Element {
   Callers.set(view, useFctCallers(fct));
   TaintedLvalues.set(view, useFctTaints(fct));
 
-  return editor;
+  return component;
 }
 
 // --------------------------------------------------------------------------
