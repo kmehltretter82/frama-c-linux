@@ -13,7 +13,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
     requires
       alignment_is_a_suitable_power_of_two:
         alignment >= sizeof(void *) &&
-        ((size_t)alignment & ((size_t)alignment - 1)) == 0;
+        ((size_t)alignment & (size_t)alignment - 1) == 0;
     assigns __fc_heap_status, \result;
     assigns __fc_heap_status
       \from (indirect: alignment), size, __fc_heap_status;
@@ -367,7 +367,7 @@ int main(int argc, char const **argv)
     requires
       alignment_is_a_suitable_power_of_two:
         alignment >= sizeof(void *) &&
-        ((size_t)alignment & ((size_t)alignment - 1)) == 0;
+        ((size_t)alignment & (size_t)alignment - 1) == 0;
     assigns __fc_heap_status, \result;
     assigns __fc_heap_status
       \from (indirect: alignment), size, __fc_heap_status;
@@ -460,7 +460,7 @@ int __gen_e_acsl_posix_memalign(void **memptr, size_t alignment, size_t size)
     else __gen_e_acsl_and = 0;
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Precondition";
-    __gen_e_acsl_assert_data_2.pred_txt = "alignment >= sizeof(void *) &&\n((size_t)alignment & ((size_t)alignment - 1)) == 0";
+    __gen_e_acsl_assert_data_2.pred_txt = "alignment >= sizeof(void *) &&\n((size_t)alignment & (size_t)alignment - 1) == 0";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data_2.fct = "posix_memalign";
     __gen_e_acsl_assert_data_2.line = 703;

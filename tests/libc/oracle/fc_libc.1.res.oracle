@@ -7401,7 +7401,7 @@ int unsetenv(char const *name)
     requires
       alignment_is_a_suitable_power_of_two:
         alignment ≥ sizeof(void *) ∧
-        ((size_t)alignment & ((size_t)alignment - 1)) ≡ 0;
+        ((size_t)alignment & (size_t)alignment - 1) ≡ 0;
     assigns __fc_heap_status, \result;
     assigns __fc_heap_status
       \from (indirect: alignment), size, __fc_heap_status;
@@ -7438,7 +7438,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
   assert
   alignment_is_a_suitable_power_of_two:
     alignment ≥ sizeof(void *) ∧
-    ((size_t)alignment & ((size_t)alignment - 1)) ≡ 0;
+    ((size_t)alignment & (size_t)alignment - 1) ≡ 0;
    */
   ;
   *memptr = malloc(size);
@@ -9030,7 +9030,7 @@ int __builtin_popcountll(unsigned long long x);
 /*@ assigns \nothing; */
 void __sync_synchronize(void);
 
-/*@ logic 𝔹 bit_test(ℤ x, ℤ pos) = (x & (1 << pos)) ≢ 0;
+/*@ logic 𝔹 bit_test(ℤ x, ℤ pos) = (x & 1 << pos) ≢ 0;
 
 */
 /*@ requires valid_filename: valid_read_string(filename);
