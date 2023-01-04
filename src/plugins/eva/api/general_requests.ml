@@ -223,12 +223,12 @@ module EvaTaints = struct
     Some (data, indirect)
 
   let expr_of_marker = let open Printer_tag in function
-    | PLval (_, Kstmt stmt, lval) -> Some (expr_of_lval lval, stmt)
-    | PExp (_, Kstmt stmt, expr) -> Some (expr, stmt)
-    | PVDecl (_, Kstmt stmt, vi) -> Some (expr_of_lval (Var vi, NoOffset), stmt)
-    | PTermLval (_, Kstmt stmt, _, tlval) ->
-      Some (term_lval_to_lval tlval |> expr_of_lval, stmt)
-    | _ -> None
+      | PLval (_, Kstmt stmt, lval) -> Some (expr_of_lval lval, stmt)
+      | PExp (_, Kstmt stmt, expr) -> Some (expr, stmt)
+      | PVDecl (_, Kstmt stmt, vi) -> Some (expr_of_lval (Var vi, NoOffset), stmt)
+      | PTermLval (_, Kstmt stmt, _, tlval) ->
+        Some (term_lval_to_lval tlval |> expr_of_lval, stmt)
+      | _ -> None
 
   let of_marker marker =
     let (let+) = Option.bind in
@@ -254,7 +254,7 @@ module EvaTaints = struct
     let before, after = of_marker marker |> Option.get in
     if before = after then Format.fprintf fmt "%a" pretty before
     else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
-  
+
   let eva_taints_title =
     "Taint status:\n\
      - Direct taint: data dependency from values provided by the attacker, \
@@ -373,10 +373,10 @@ module LvalueTaints = struct
     Table.fold fn taints [] |> List.rev
 
   let () = Request.register ~package ~kind:`GET ~name:"taintedLvalues"
-    ~descr:(Markdown.plain "Get the tainted lvalues of a given function")
-    ~input:(module (Kernel_ast.Fundec))
-    ~output:(module (Data.Jlist (Status)))
-    get_tainted_lvals
+      ~descr:(Markdown.plain "Get the tainted lvalues of a given function")
+      ~input:(module (Kernel_ast.Fundec))
+      ~output:(module (Data.Jlist (Status)))
+      get_tainted_lvals
 end
 
 
