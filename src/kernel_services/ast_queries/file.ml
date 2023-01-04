@@ -132,12 +132,12 @@ let from_filename ?cpp f =
     else if cpp <> "" then begin
       if not Fc_config.preprocessor_keep_comments then
         Kernel.warning ~once:true
-          "Default pre-processor does not keep comments. Any ACSL annotation \
-           on non-pre-processed file will be discarded.";
+          "Default preprocessor does not keep comments. Any ACSL annotations \
+           on non-preprocessed files will be discarded.";
       NeedCPP (f, cpp, extra_for_this_file, is_cpp_gnu_like ())
     end else
-      Kernel.abort "No working pre-processor found. You can only analyze \
-                    pre-processed .i files."
+      Kernel.abort "No working preprocessor found. You can only analyze \
+                    preprocessed .i files."
 
 (* ************************************************************************* *)
 (** {2 Internal states} *)
@@ -501,7 +501,7 @@ let build_cpp_cmd = function
         Kernel.warning
           ~once:true
           "your preprocessor is not known to handle option `%s'. \
-           If pre-processing fails because of it, please add \
+           If preprocessing fails because of it, please add \
            -no-cpp-frama-c-compliant option to Frama-C's command-line. \
            If you do not want to see this warning again, explicitly use \
            option -cpp-frama-c-compliant."
