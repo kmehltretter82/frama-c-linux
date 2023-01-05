@@ -97,63 +97,58 @@ struct
       else
         Some (Some (Abstract_state.union old new_))
 
-  let rec do_assignment (a:t) (lv:lval) (exp:exp) : t =
+  (* type of the return of the following function *)
+  type basic_lval =  BNone | BLval of lval | BAddrOf of lval 
+    
+  (* finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). *)
+  let rec find_basic_lval (exp:exp) : basic_lval =
+    match exp.enode with
+      Lval lv -> BLval lv
+    | AddrOf lv -> BAddrOf lv
+    | CastE (_,exp) -> find_basic_lval exp
+    | UnOp (_,exp,_) -> find_basic_lval exp
+    | BinOp (_,exp1,exp2,_) ->
+      begin
+        match (find_basic_lval exp1, find_basic_lval exp2) with
+          (BNone,BNone) -> BNone
+        | (BNone, res2) -> res2
+        | (res1, BNone) -> res1
+        | _ -> failwith "find_basic_lval: 2 basic lval in a BinOp"
+      end
+    | _ -> BNone
+
+  let do_assignment (a:t) (lv:lval) (exp:exp) : t =
     (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)
-    match (a,lv,exp.enode) with
-      (Some a, (Var v1, NoOffset), Lval (Var v2,NoOffset)) ->
+    match (a,lv, find_basic_lval exp) with
+      (Some a, (Var v1, NoOffset), BLval (Var v2,NoOffset)) ->
       (* case x = y *)
       Some (Abstract_state.assignment_x_y a (Var v1, NoOffset) (Var v2, NoOffset))
     (* constant assignments : do nothing, but maybe check the type of the assigned variable ? *)
-    | (_, (Var _, NoOffset), Const _) -> a
-    | (_, (Var _, NoOffset), SizeOf _) -> a
-    | (_, (Var _, NoOffset), SizeOfE _) -> a
-    | (_, (Var _, NoOffset), SizeOfStr _) -> a
-    | (_, (Var _, NoOffset), AlignOf _) -> a
-    | (_, (Var _, NoOffset), AlignOfE _) -> a
+    | (_, (Var _, NoOffset), BNone) -> a
     (* arithmetic operations: either do nothing (normal arithmetic) or returns top (pointer arithmetic) *)
-    | (Some a, (Var _, NoOffset), UnOp (_, _,tt)) ->
-      begin
-        match tt with
-          TPtr _ -> Options.warning "" ; Some (Abstract_state.make_top a)
-        | _ -> Some a
-      end
-    (* cast : TODO check type *)
-    | (_, _ , CastE (_,exp)) -> do_assignment a lv exp
-    | (Some a, (Var v1, NoOffset), AddrOf lv2) ->
+    | (Some a, (Var v1, NoOffset), BAddrOf lv2) ->
       (* case x = &y *)
       Some (Abstract_state.assignment_x_addr_y a (Var v1, NoOffset) lv2)
-    | (Some a, (Var v1, NoOffset), Lval (Mem e2, NoOffset)) ->
+    | (Some a, (Var v1, NoOffset), BLval (Mem e2, NoOffset)) ->
       (* case x  = *y *)
       begin
         match e2.enode with
           Lval lv2 -> Some (Abstract_state.assignment_x_ptr_y a (Var v1, NoOffset) lv2)
         |  _ -> failwith " do_assignment not implemented 1"
       end
-    | (Some a, (Mem e1, NoOffset), Lval lv2) ->
+    | (Some a, (Mem e1, NoOffset), BLval lv2) ->
       (* case *x = y *)
       begin
         match e1.enode with
           Lval lv1 -> Some (Abstract_state.assignment_ptr_x_y a lv1 lv2)
-        |  _ -> failwith " do_assignment not implemented 2"
+        |  _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (BUG do_assignment 2)" Lval.pretty lv Exp.pretty exp; Some a) (* failwith " do_assignment not implemented 2" *)
       end
     (* cases *x = cst *)
-    | (Some a, (Mem e1, NoOffset), Const _ ) ->
+    | (Some a, (Mem e1, NoOffset), BNone) ->
       begin
         match e1.enode with
           Lval lv1 -> Some (Abstract_state.assignment_ptr_x_cst a lv1)
         |  _ -> Options.feedback "Ingnoring assignment %a = %a (do_assignment  not implemented 3)@." Lval.pretty lv Exp.pretty exp; Some a
-      end
-    | (Some a, (Mem e1, NoOffset), SizeOf _ ) ->
-      begin
-        match e1.enode with
-          Lval lv1 -> Some (Abstract_state.assignment_ptr_x_cst a lv1)
-        |  _ -> failwith " do_assignment not implemented 4"
-      end
-    | (Some a, (Mem e1, NoOffset), SizeOfE _ ) ->
-      begin
-        match e1.enode with
-          Lval lv1 -> Some (Abstract_state.assignment_ptr_x_cst a lv1)
-        |  _ -> failwith " do_assignment not implemented 5"
       end
     | (None, _, _) -> None
     | _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (not implemented)" Lval.pretty lv Exp.pretty exp; a)

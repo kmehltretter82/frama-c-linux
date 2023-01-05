@@ -117,19 +117,28 @@ let pretty ?(debug=false) =
 (** invariants of type t must be true before and after each functon call *)
 let assert_invariants (x:t) : unit =
   (* Format.printf "Checking invariants@.%a@." (pretty ~debug:true) x; *)
-  (* check that all vertex of the graph have entries in pending and vmap, and are integer between 0 and cmpt *)
+  (* check that all vertex of the graph have entries in pending and
+     vmap, and are integer between 0 and cmpt, and have at most 1
+     successor *)
   let assert_vertex (v:V.t) =
     assert (v >= 0);
     assert (v < x.cmpt);
     assert (VMap.mem v x.pending);
-    assert (VMap.mem v x.vmap)
+    assert (VMap.mem v x.vmap);
+    assert (List.length (G.succ x.graph v) <= 1)
   in
   G.iter_vertex assert_vertex x.graph;
   let assert_lmap (lv:lval) (v:V.t) =
     assert (G.mem_vertex x.graph v);
     assert (LSet.mem lv (VMap.find v x.vmap))
   in
-  LMap.iter assert_lmap x.lmap
+  LMap.iter assert_lmap x.lmap;
+  let assert_vmap (v:V.t) (ls:LSet.t) =
+    if LSet.is_empty ls then
+      assert (List.length (G.succ x.graph v) =0);
+    assert (LSet.fold (fun lv acc -> acc && LMap.mem lv x.lmap) ls true)
+  in
+  VMap.iter assert_vmap x.vmap
 
 
 (* find the vertex of an lval *)
@@ -389,6 +398,8 @@ let equal (a1:t) (a2:t) =
   (* we don't need to check a1.vmap and a2.vmap since they are inverse
      maps of a1.lmap and a2.lmap. However, shall we also check pending
      ? *)
+  assert_invariants a1;
+  assert_invariants a2;
   if LMap.equal V.equal a1.lmap a2.lmap
   then
     (* then the isomorphism is the identity ; just check that the graph are the same *)
@@ -415,6 +426,7 @@ let equal (a1:t) (a2:t) =
           (* applies the isomorphism to a1.graph and checks that the result is equal to a2.graph *)
           let g1 = G.map_vertex fmap a1.graph in
           g1 = a2.graph
+          (* TODO: is there a better way to check equality between graphs ? *)
         end
       else
         (* if the cardinal is different, there cannot be an isomorphism *)
