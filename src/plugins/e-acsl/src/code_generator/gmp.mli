@@ -43,7 +43,7 @@ val assign: loc:location -> lval -> exp -> exp -> stmt
 module Z : sig
 
   val name_arith_bop: binop -> string
-  (** [name_of_mpz_arith_bop bop] returns the name of the GMP function on integer
+  (** [name_of_mpz_arith_bop bop] returns the name of the GMP integer function
       corresponding to the [bop] arithmetic operation. *)
 
   val new_var:
@@ -57,7 +57,7 @@ module Z : sig
   val create:
     loc:location -> ?name:string -> term option ->  Env.t -> kernel_function ->
     exp -> exp * Env.t
-  (** Create an integer *)
+  (** Create an integer number. *)
 
   val add_cast:
     loc:location -> ?name:string -> Env.t -> kernel_function -> typ -> exp ->
@@ -74,15 +74,16 @@ module Z : sig
   val cmp:
     loc:location -> string -> term option -> binop ->  Env.t ->
     kernel_function -> exp -> exp -> exp * Env.t
-    (** Compares two expressions according to the given [binop]. The optional term
-        indicates whether the comparison has a correspondance in the logic. *)
+    (** Compares two expressions according to the given [binop]. The optional
+        term indicates whether the comparison has a correspondance in the
+        logic. *)
 
 end
 
 module Q : sig
 
   val name_arith_bop: binop -> string
-  (** [name_of_mpz_arith_bop bop] returns the name of the GMP function on integer
+  (** [name_of_mpz_arith_bop bop] returns the name of the GMP rational function
       corresponding to the [bop] arithmetic operation. *)
 
   val normalize_str: string -> string
@@ -95,7 +96,7 @@ module Q : sig
   val create:
     loc:location -> ?name:string -> term option ->  Env.t -> kernel_function ->
     exp -> exp * Env.t
-  (** Create a real *)
+  (** Create a rational number. *)
 
   val cast_to_z: loc:location -> ?name:string -> Env.t -> exp -> exp * Env.t
   (** Assumes that the given exp is of real type and casts it into Z *)
@@ -115,8 +116,9 @@ module Q : sig
   val cmp:
     loc:location -> string -> term option -> binop ->  Env.t ->
     kernel_function -> exp -> exp -> exp * Env.t
-    (** Compares two expressions according to the given [binop]. The optional term
-        indicates whether the comparison has a correspondance in the logic. *)
+    (** Compares two expressions according to the given [binop]. The optional
+       term indicates whether the comparison has a correspondance in the
+       logic. *)
 
 end
 

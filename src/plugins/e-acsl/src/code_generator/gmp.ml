@@ -130,9 +130,7 @@ let init_set ~loc lv ev e =
     mpz_init_set "__gmpz_init_set"
   else if Gmp_types.Q.is_t ty then
     Smart_stmt.block_stmt
-      (Cil.mkBlock
-         [ init ~loc ev ;
-           assign ~loc lv ev e ])
+      (Cil.mkBlock [ init ~loc ev; assign ~loc lv ev e ])
   else
     mpz_init_set ""
 
@@ -175,7 +173,7 @@ module Z = struct
         kf
         t_opt
         (Gmp_types.Z.t ())
-        (fun lv v -> [ init_set ~loc (Cil.var lv) v e ])
+        (fun vi vi_e -> [ init_set ~loc (Cil.var vi) vi_e e ])
     in
     e, env
 
@@ -208,9 +206,7 @@ module Z = struct
                            name
                            [ e; e1; e2 ] ] in
     let name = Misc.name_of_binop bop in
-    let _, e, env =
-      new_var ~loc ~name env kf t_opt mk_stmts
-    in
+    let _, e, env = new_var ~loc ~name env kf t_opt mk_stmts in
     e,env
 
   let cmp ~loc name t_opt bop env kf e1 e2 =
@@ -338,9 +334,7 @@ module Q = struct
           kf
           t_opt
           (Gmp_types.Q.t ())
-          (fun vi vi_e ->
-             [ init ~loc vi_e ;
-               assign ~loc (Cil.var vi) vi_e e ])
+          (fun vi vi_e -> [ init_set ~loc (Cil.var vi) vi_e e ])
       in
       e, env
 
@@ -349,9 +343,9 @@ module Q = struct
     Error.not_yet "reals: cast from R to Z"
 
   let add_cast ~loc ?name env kf ty e =
-    (* TODO: The best solution would actually be to directly write all the needed
-       functions as C builtins then just call them here depending on the situation
-       at hand. *)
+    (* TODO: The best solution would actually be to directly write all the
+       needed functions as C builtins then just call them here depending on the
+       situation at hand. *)
     assert (Gmp_types.Q.is_t (Cil.typeOf e));
     let get_double e env =
       let _, e, env =
@@ -379,8 +373,8 @@ module Q = struct
       get_double e env
     | TFloat(FFloat, _) ->
       (* No "get_float" in GMPQ, but fortunately, [float] \subset [double].
-         HOWEVER: going through double as intermediate step might be unsound since
-         it could cause double rounding. See: [Boldo2013, Sec 2.2]
+         HOWEVER: going through double as intermediate step might be unsound
+         since it could cause double rounding. See: [Boldo2013, Sec 2.2]
          https://hal.inria.fr/hal-00777639/document *)
       let e, env = get_double e env in
       Options.warning
@@ -410,8 +404,6 @@ module Q = struct
 
   let binop ~loc t_opt bop env kf e1 e2 =
     let name = name_arith_bop bop in
-    (* TODO: [t1_opt] and [t2_opt] could be provided when creating [e1] and
-       [e2] *)
     let e1, env = create ~loc None env kf e1 in
     let e2, env = create ~loc None env kf e2 in
     let mk_stmts _ e = [ Smart_stmt.rtl_call ~loc
@@ -424,8 +416,6 @@ module Q = struct
 
   let cmp ~loc name t_opt bop env kf e1 e2 =
     let fname = "__gmpq_cmp" in
-    (* TODO: [t1_opt] and [t2_opt] could be provided when creating [e1] and
-       [e2] *)
     let e1, env = create ~loc None env kf e1 in
     let e2, env = create ~loc None env kf e2 in
     let _, e, env =

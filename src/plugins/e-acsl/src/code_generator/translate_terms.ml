@@ -116,8 +116,7 @@ let affect_binop ~loc var_as_varinfo var_as_exp binop exp_type exp1 exp2 =
          [exp1; exp2]
      | Some e ->
        let name = Gmp.Z.name_arith_bop binop in
-       Smart_stmt.rtl_call
-         ~loc ~prefix:"" name [e; exp1; exp2])
+       Smart_stmt.rtl_call ~loc ~prefix:"" name [e; exp1; exp2])
   else if Gmp_types.Q.is_t exp_type then
     Error.not_yet "rational in affect_binop"
   else
