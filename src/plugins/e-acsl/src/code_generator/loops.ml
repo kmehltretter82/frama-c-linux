@@ -342,7 +342,10 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
           (TBinOp(Lt, tlv, t2))
           Linteger
     in
-    Typing.preprocess_term ~use_gmp_opt:false ~ctx:Typing.c_int ~logic_env guard;
+    Typing.preprocess_term
+      ~use_gmp_opt:false
+      ~ctx:Typing.c_int
+      ~logic_env guard;
     let guard_exp, _, env = term_to_exp kf (Env.push env) guard in
     let break_stmt = Smart_stmt.break ~loc:guard_exp.eloc in
     let guard_blk, env = Env.pop_and_get
@@ -368,7 +371,9 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     in
     (* generate the whole loop *)
     let next = block_to_stmt next_blk in
-    let guard_for_small_type_opt = Bound_variables.get_guard_for_small_type logic_x in
+    let guard_for_small_type_opt =
+      Bound_variables.get_guard_for_small_type logic_x
+    in
     let stmts, env = match guard_for_small_type_opt with
       | None ->
         guard :: body @ [ next ], env
