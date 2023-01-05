@@ -129,6 +129,10 @@
   background: var(--background-report);
 }
 
+.cm-editor .cm-gutters .cm-lineNumbers {
+  color: var(--disabled-text);
+}
+
 .cm-property-gutter {
   width: 1.3em;
   background: var(--code-bullet);

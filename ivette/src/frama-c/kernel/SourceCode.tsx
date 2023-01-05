@@ -42,11 +42,15 @@ import * as Path from 'path';
 import * as Settings from 'dome/data/settings';
 import * as Status from 'frama-c/kernel/Status';
 
+import { registerSandbox } from 'ivette';
+
 import CodeMirror from 'codemirror/lib/codemirror';
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/addon/dialog/dialog.css';
 import 'codemirror/addon/search/search';
 import 'codemirror/addon/search/searchcursor';
+
+import * as Editor from 'dome/text/editor';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -60,6 +64,7 @@ const D = new Dome.Debug('Source Code');
 
 // The SourceCode component, producing the GUI part showing the source code
 // corresponding to the selected function.
+// export function SourceCodeOld(): JSX.Element {
 export default function SourceCode(): JSX.Element {
 
   // Hooks
@@ -212,3 +217,45 @@ export default function SourceCode(): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
+
+const Source = Editor.createTextField<string>('', (s) => s);
+const Line = Editor.createLineField();
+
+function useFctSource(file: string): string {
+  const req = React.useMemo(() => System.readFile(file), [file]);
+  const { result } = Dome.usePromise(req);
+  return result ?? '';
+}
+
+const baseExtensions: Editor.Extension[] = [
+  Source.structure,
+  Line.structure,
+  Editor.LineNumbers,
+  Editor.LanguageHighlighter,
+];
+
+export function SourceCodeNew(): JSX.Element {
+// export default function SourceCode(): JSX.Element {
+  const { view, component } = Editor.Editor(baseExtensions);
+  const functionsData = States.useSyncArray(functions).getArray();
+  const markersInfo = States.useSyncArray(markerInfo);
+  const [selection] = States.useSelection();
+  const marker = selection?.current?.marker;
+  const fct = selection?.current?.fct;
+
+  const markerSloc = marker && markersInfo.getData(marker)?.sloc;
+  const fctSloc = fct && functionsData.find((e) => e.name === fct)?.sloc;
+  const sloc = markerSloc ?? fctSloc;
+  const file = sloc ? sloc.file : '';
+  const line = sloc ? sloc.line : 0;
+
+  Source.set(view, useFctSource(file));
+  Line.set(view, line);
+  return component;
+}
+
+registerSandbox({
+  id: 'sandbox.sourceCode',
+  label: 'SourceCode CodeMirror6',
+  children: <SourceCodeNew />,
+});

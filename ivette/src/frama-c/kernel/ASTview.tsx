@@ -139,20 +139,7 @@ function coveringNode(tree: Tree, pos: number): Node | undefined {
 
 // This field contains the current function's code as represented by Ivette.
 // Its set function takes care to update the CodeMirror displayed document.
-const Text = createTextField();
-function createTextField(): Editor.Field<text> {
-  const { get, set, structure } = Editor.createField<text>(null);
-  const useSet: Editor.Set<text> = (view, text) => {
-    set(view, text);
-    React.useEffect(() => {
-      const selection = { anchor: 0 };
-      const length = view?.state.doc.length;
-      const changes = { from: 0, to: length, insert: textToString(text) };
-      view?.dispatch({ changes, selection });
-    }, [view, text]);
-  };
-  return { init: null, get, set: useSet, structure };
-}
+const Text = Editor.createTextField<text>(null, textToString);
 
 // This aspect computes the tree representing the currently displayed function's
 // code, represented by the <Text> field.
@@ -585,6 +572,7 @@ const baseExtensions: Editor.Extension[] = [
   PropertiesGutter,
   TaintedLvaluesDecorator,
   TaintTooltip,
+  Editor.FoldGutter,
   Editor.LanguageHighlighter,
 ];
 

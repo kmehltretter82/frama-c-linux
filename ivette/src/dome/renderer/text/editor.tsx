@@ -30,6 +30,7 @@ import { DOMEventMap as EventMap } from '@codemirror/view';
 import { GutterMarker, gutter } from '@codemirror/view';
 import { showTooltip, Tooltip } from '@codemirror/view';
 import { DecorationSet } from '@codemirror/view';
+import { lineNumbers } from '@codemirror/view';
 
 export type { Extension } from '@codemirror/state';
 export { GutterMarker } from '@codemirror/view';
@@ -37,7 +38,7 @@ export { Decoration } from '@codemirror/view';
 export { RangeSet } from '@codemirror/state';
 
 import { parser } from '@lezer/cpp';
-import { tags } from '@lezer/highlight';
+import { styleTags, tags } from '@lezer/highlight';
 import { SyntaxNode } from '@lezer/common';
 import { foldGutter, foldNodeProp } from '@codemirror/language';
 import { LRLanguage, LanguageSupport } from "@codemirror/language";
@@ -278,7 +279,7 @@ const comment = (t: SyntaxNode): Range => ({ from: t.from + 2, to: t.to - 2});
 const folder = foldNodeProp.add({ BlockComment: comment });
 const stringPrefixes = [ "L", "u", "U", "u8", "LR", "UR", "uR", "u8R", "R" ];
 const cppLanguage = LRLanguage.define({
-  parser: parser.configure({ props: [ folder ] }),
+  parser: parser.configure({ props: [ styleTags({'volatile':  tags.keyword }), folder ] }),
   languageData: {
     commentTokens: { line: "//", block: { open: "/*", close: "*/" } },
     indentOnInput: /^\s*(?:case |default:|\{|\})$/,
@@ -288,10 +289,75 @@ const cppLanguage = LRLanguage.define({
 
 // This extension enables all the language highlighting features.
 export const LanguageHighlighter: Extension =
-  [foldGutter(), Highlight, new LanguageSupport(cppLanguage)];
+  [Highlight, new LanguageSupport(cppLanguage)];
 
 // -----------------------------------------------------------------------------
 
+
+
+// -----------------------------------------------------------------------------
+//  Standard extensions builders
+// -----------------------------------------------------------------------------
+
+export type ToString<A> = (text: A) => string;
+export function createTextField<A>(init: A, toString: ToString<A>): Field<A> {
+  const { get, set, structure } = createField<A>(init);
+  const useSet: Set<A> = (view, text) => {
+    set(view, text);
+    React.useEffect(() => {
+      const selection = { anchor: 0 };
+      const length = view?.state.doc.length;
+      const changes = { from: 0, to: length, insert: toString(text) };
+      view?.dispatch({ changes, selection });
+    }, [view, text]);
+  };
+  return { init, get, set: useSet, structure };
+}
+
+export const LineNumbers = createLineNumbers();
+function createLineNumbers(): Extension {
+  return lineNumbers({
+    formatNumber: (lineNo, state) => {
+      if (state.doc.length === 0) return '';
+      return lineNo.toString();
+    }
+  });
+}
+
+export const FoldGutter = createFoldGutter();
+function createFoldGutter(): Extension {
+  return foldGutter();
+}
+
+export function createLineField(): Field<number> {
+  const { get, set, structure } = createField(0);
+  const useSet: Set<number> = (view, lineNum) => {
+    set(view, lineNum);
+    React.useEffect(() => {
+      if ((view?.state.doc.lines ?? 0) < lineNum + 1) return;
+      const { from } = view?.state.doc.line(lineNum + 1) ?? { from: 0 };
+      view?.dispatch({ selection: { anchor: from }, scrollIntoView: true });
+    }, [view, lineNum]);
+  };
+  return { init: 0, get, set: useSet, structure };
+}
+
+// export interface LinesAspect extends Aspect<Range[]> { selectLine: Set<number> }
+// export function createLines<T extends string>(Text: Field<T>): LinesAspect {
+//   const aspect = createAspect({ t: Text }, ({ t }) => {
+//     const rs: Range[] = []; let from = 0;
+//     t.split('\n').forEach((l) => from = rs.push({ from, to: from + l.length }));
+//     return rs;
+//   });
+//   // const selectLine: Set<number> = (view, line) => {
+//   //   React.useEffect(() => {
+//   //     const range = aspect.get(view?.state)[line];
+//   //     const selection = { anchor: range.from };
+//   //     view?.dispatch({ selection });
+//   //   }, [view, range]);
+//   // };
+//   return { ...aspect, selectLine };
+// }
 
 
 // -----------------------------------------------------------------------------
