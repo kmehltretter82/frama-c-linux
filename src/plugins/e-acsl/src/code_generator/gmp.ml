@@ -33,7 +33,7 @@ let apply_on_var ~loc funname e =
     let ty = Cil.typeOf e in
     if Gmp_types.Z.is_t ty then "__gmpz_"
     else if Gmp_types.Q.is_t ty then "__gmpq_"
-    else assert false
+    else Options.fatal "expected GMP type instead of %a" Printer.pp_typ ty
   in
   Smart_stmt.rtl_call ~loc ~prefix funname [ e ]
 
@@ -71,15 +71,14 @@ let get_set_suffix_and_arg res_ty e =
      HOWEVER: the machdep MUST NOT be vulnerable to double rounding
      [TODO] check the statement above *)
   | C_float FLongDouble, _ -> Error.not_yet "creating gmp from long double"
-  | Gmpz, _ | Rational, _ | Real, _ | Nan, _ -> (
+  | Gmpz, _ | Rational, _ | Real, _ | Nan, _ ->
       match Cil.unrollType ty with
       | TPtr(TInt(IChar, _), _) ->
         "_str",
         (* decimal base for the number given as string *)
         [ e; Cil.integer ~loc:e.eloc 10 ]
       | _ ->
-        assert false
-    )
+        Options.fatal "expected char* instead of type %a" Printer.pp_typ ty
 
 let generic_affect ~loc fname lv ev e =
   let ty = Cil.typeOf ev in
@@ -153,7 +152,7 @@ module Z = struct
     | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr | PlusPI | MinusPI
     | MinusPP as bop ->
       Options.fatal
-        "Operation '%a' either not arithmetic or not supported on GMP integers"
+        "Operation '%a' not supported on GMP integers"
         Printer.pp_binop bop
 
   let new_var ~loc ?scope ?name env kf t mk_stmts =
@@ -240,7 +239,10 @@ module Q = struct
     | Mult -> "__gmpq_mul"
     | Div -> "__gmpq_div"
     | Mod | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr
-    | Shiftlt | Shiftrt | PlusPI | MinusPI | MinusPP -> assert false
+    | Shiftlt | Shiftrt | PlusPI | MinusPI | MinusPP as bop ->
+      Options.fatal
+        "Operation '%a' not supported on GMP rationals"
+        Printer.pp_binop bop
 
   exception Not_a_decimal of string
   exception Is_a_float
