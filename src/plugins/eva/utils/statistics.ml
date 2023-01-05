@@ -179,7 +179,7 @@ let export_as_csv_to_channel out_channel =
   List.iter (pp_stat fmt) l
 
 let export_as_csv ?filename () =
-  let filename = (filename : Filepath.Normalized.t option :> string option) in
-  let filename = Option.value ~default:"stats.json" filename in
+  let default = Parameters.StatisticsFile.get () in
+  let filename = Option.value ~default filename in
   let out_channel = open_out (filename :> string) in
   export_as_csv_to_channel out_channel
