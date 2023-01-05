@@ -363,6 +363,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       post_analysis ();
       Abstract.Dom.post_analysis final_state;
       Summary.print_summary ();
+      Statistics.export_as_csv ();
       restore_signals ()
     in
     let cleanup () =

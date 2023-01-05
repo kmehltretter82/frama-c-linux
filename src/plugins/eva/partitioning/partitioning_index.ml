@@ -20,6 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let stat_hits = Statistics.register_global_stat "partitioning-index-hits"
+let stat_misses = Statistics.register_global_stat "partitioning-index-misses"
+
+
 (** Partition of the abstract states, computed for each node by the
     dataflow analysis. *)
 module Make (Domain : Abstract.Domain.External)
@@ -85,6 +89,11 @@ module Make (Domain : Abstract.Domain.External)
         if List.exists (fun s -> Domain.is_included state s) candidates
         then false
         else (Index.add states prefix state; true)
+
+  let add state partition =
+    let r = add state partition in
+    Statistics.incr (if r then stat_misses else stat_hits) ();
+    r
 
   let iter f { states; others } =
     Index.iter (fun _k v -> f v) states;
