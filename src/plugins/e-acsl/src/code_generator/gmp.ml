@@ -80,7 +80,7 @@ let get_set_suffix_and_arg res_ty e =
       | _ ->
         Options.fatal "expected char* instead of type %a" Printer.pp_typ ty
 
-let generic_affect ~loc fname lv ev e =
+let generic_assign ~loc fname lv ev e =
   let ty = Cil.typeOf ev in
   if Gmp_types.Z.is_t ty || Gmp_types.Q.is_t ty then begin
     let suf, args = get_set_suffix_and_arg ty e in
@@ -95,13 +95,13 @@ let assign ~loc lv ev e =
     else if Gmp_types.Q.is_t ty then "__gmpq_set"
     else ""
   in
-  try generic_affect ~loc fname lv ev e
+  try generic_assign ~loc fname lv ev e
   with Longlong _ ->
     Error.not_yet "quantification over long long and requiring GMP"
 
 let init_set ~loc lv ev e =
   let mpz_init_set fname =
-    try generic_affect ~loc fname lv ev e
+    try generic_assign ~loc fname lv ev e
     with
     | Longlong IULongLong ->
       (match e.enode with
