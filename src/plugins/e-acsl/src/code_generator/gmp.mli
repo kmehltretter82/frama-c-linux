@@ -35,8 +35,8 @@ val init_set: loc:location -> lval -> exp -> exp -> stmt
 val clear: location -> exp -> stmt
 (** build stmt [mpz_clear(v)] or [mpq_clear(v)] depending on typ of [v] *)
 
-val affect: loc:location -> lval -> exp -> exp -> stmt
-(** [affect x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_set*(e)]
+val assign: loc:location -> lval -> exp -> exp -> stmt
+(** [assign x_as_lv x_as_exp e] builds stmt [x = e] or [mpz_set*(e)]
     or [mpq_set*(e)] with the good function 'set'
     according to the type of [e] *)
 

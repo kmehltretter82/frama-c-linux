@@ -89,7 +89,7 @@ let generic_affect ~loc fname lv ev e =
   end else
     Smart_stmt.assigns ~loc:e.eloc ~result:lv e
 
-let affect ~loc lv ev e =
+let assign ~loc lv ev e =
   let fname =
     let ty = Cil.typeOf ev in
     if Gmp_types.Z.is_t ty then "__gmpz_set"
@@ -133,7 +133,7 @@ let init_set ~loc lv ev e =
     Smart_stmt.block_stmt
       (Cil.mkBlock
          [ init ~loc ev ;
-           affect ~loc lv ev e ])
+           assign ~loc lv ev e ])
   else
     mpz_init_set ""
 
@@ -338,7 +338,7 @@ module Q = struct
           (Gmp_types.Q.t ())
           (fun vi vi_e ->
              [ init ~loc vi_e ;
-               affect ~loc (Cil.var vi) vi_e e ])
+               assign ~loc (Cil.var vi) vi_e e ])
       in
       e, env
 

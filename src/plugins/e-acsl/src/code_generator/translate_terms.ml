@@ -201,7 +201,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     let e_lbd, _, env = to_exp ~adata:Assert.no_data kf env lt in
     let lbd_stmt,env =
       Env.pop_and_get env
-        (Gmp.affect ~loc (Cil.var lbd_as_varinfo) lbd_as_exp e_lbd)
+        (Gmp.assign ~loc (Cil.var lbd_as_varinfo) lbd_as_exp e_lbd)
         ~global_clear:false Env.Middle
     in
     (* statement construction *)
