@@ -490,9 +490,11 @@ module type Hashtbl = sig
     ?cmp:(key -> key -> int) -> (key -> data -> 'a -> 'a) -> 'a -> 'a
   val memo: ?change:(data -> data) -> (key -> data) -> key -> data
   val find: key -> data
+  val find_opt: key -> data option
   val find_all: key -> data list
   val mem: key -> bool
   val remove: key -> unit
+  val to_seq: unit -> (key * data) Seq.t
 end
 
 module Hashtbl
@@ -548,6 +550,7 @@ struct
   let replace key v = H.replace !state key v
   let add key v = H.add !state key v
   let find key = H.find !state key
+  let find_opt key = H.find_opt !state key
   let find_all key = H.find_all !state key
   let mem key = H.mem !state key
   let remove key = H.remove !state key
@@ -555,6 +558,7 @@ struct
   let iter_sorted ?cmp f = H.iter_sorted ?cmp f !state
   let fold f acc = H.fold f !state acc
   let fold_sorted ?cmp f acc = H.fold_sorted ?cmp f !state acc
+  let to_seq () = H.to_seq !state
 
   let memo ?change f key =
     try
