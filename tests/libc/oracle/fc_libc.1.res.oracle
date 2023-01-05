@@ -9326,13 +9326,13 @@ unsigned int __atomic_exchange_4(unsigned int *mem, unsigned int val,
 unsigned long long __atomic_exchange_8(unsigned long long *mem,
                                        unsigned long long val, int model);
 
-/*@ requires validity: \valid(mem) ∧ \valid_read(expected);
+/*@ requires validity: \valid(mem) ∧ \valid(expected);
     assigns *mem, *expected, \result;
     assigns *mem
-      \from *mem, (indirect: *expected), desired, (indirect: success_model),
+      \from *mem, desired, (indirect: *expected), (indirect: success_model),
             (indirect: weak);
     assigns *expected
-      \from *expected, (indirect: *mem), desired, (indirect: failure_model),
+      \from *expected, *mem, (indirect: desired), (indirect: failure_model),
             (indirect: weak);
     assigns \result \from (indirect: *mem), (indirect: *expected);
  */
@@ -9341,13 +9341,13 @@ _Bool __atomic_compare_exchange_1(unsigned char *mem,
                                   unsigned char desired, _Bool weak,
                                   int success_model, int failure_model);
 
-/*@ requires validity: \valid(mem) ∧ \valid_read(expected);
+/*@ requires validity: \valid(mem) ∧ \valid(expected);
     assigns *mem, *expected, \result;
     assigns *mem
-      \from *mem, (indirect: *expected), desired, (indirect: success_model),
+      \from *mem, desired, (indirect: *expected), (indirect: success_model),
             (indirect: weak);
     assigns *expected
-      \from *expected, (indirect: *mem), desired, (indirect: failure_model),
+      \from *expected, *mem, (indirect: desired), (indirect: failure_model),
             (indirect: weak);
     assigns \result \from (indirect: *mem), (indirect: *expected);
  */
@@ -9356,13 +9356,13 @@ _Bool __atomic_compare_exchange_2(unsigned short *mem,
                                   unsigned short desired, _Bool weak,
                                   int success_model, int failure_model);
 
-/*@ requires validity: \valid(mem) ∧ \valid_read(expected);
+/*@ requires validity: \valid(mem) ∧ \valid(expected);
     assigns *mem, *expected, \result;
     assigns *mem
-      \from *mem, (indirect: *expected), desired, (indirect: success_model),
+      \from *mem, desired, (indirect: *expected), (indirect: success_model),
             (indirect: weak);
     assigns *expected
-      \from *expected, (indirect: *mem), desired, (indirect: failure_model),
+      \from *expected, *mem, (indirect: desired), (indirect: failure_model),
             (indirect: weak);
     assigns \result \from (indirect: *mem), (indirect: *expected);
  */
@@ -9370,13 +9370,13 @@ _Bool __atomic_compare_exchange_4(unsigned int *mem, unsigned int *expected,
                                   unsigned int desired, _Bool weak,
                                   int success_model, int failure_model);
 
-/*@ requires validity: \valid(mem) ∧ \valid_read(expected);
+/*@ requires validity: \valid(mem) ∧ \valid(expected);
     assigns *mem, *expected, \result;
     assigns *mem
-      \from *mem, (indirect: *expected), desired, (indirect: success_model),
+      \from *mem, desired, (indirect: *expected), (indirect: success_model),
             (indirect: weak);
     assigns *expected
-      \from *expected, (indirect: *mem), desired, (indirect: failure_model),
+      \from *expected, *mem, (indirect: desired), (indirect: failure_model),
             (indirect: weak);
     assigns \result \from (indirect: *mem), (indirect: *expected);
  */

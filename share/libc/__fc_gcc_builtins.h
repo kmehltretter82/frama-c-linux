@@ -339,10 +339,10 @@ __UINT32_T __atomic_exchange_4(__UINT32_T* mem, __UINT32_T val, int model);
  */
 __UINT64_T __atomic_exchange_8(__UINT64_T* mem, __UINT64_T val, int model);
 
-/*@ requires validity: \valid(mem) && \valid_read(expected);
-  assigns *mem \from *mem, indirect: *expected, desired,
+/*@ requires validity: \valid(mem) && \valid(expected);
+  assigns *mem \from *mem, desired, indirect: *expected,
           indirect: success_model, indirect: weak;
-  assigns *expected \from *expected, indirect: *mem, desired,
+  assigns *expected \from *expected, *mem, indirect: desired,
           indirect: failure_model, indirect: weak;
   assigns \result \from indirect: *mem, indirect: *expected;
 */
@@ -353,10 +353,10 @@ _Bool __atomic_compare_exchange_1(__UINT8_T* mem,
                                   int success_model,
                                   int failure_model);
 
-/*@ requires validity: \valid(mem) && \valid_read(expected);
-  assigns *mem \from *mem, indirect: *expected, desired,
+/*@ requires validity: \valid(mem) && \valid(expected);
+  assigns *mem \from *mem, desired, indirect: *expected,
           indirect: success_model, indirect: weak;
-  assigns *expected \from *expected, indirect: *mem, desired,
+  assigns *expected \from *expected, *mem, indirect: desired,
           indirect: failure_model, indirect: weak;
   assigns \result \from indirect: *mem, indirect: *expected;
 */
@@ -367,10 +367,10 @@ _Bool __atomic_compare_exchange_2(__UINT16_T* mem,
                                   int success_model,
                                   int failure_model);
 
-/*@ requires validity: \valid(mem) && \valid_read(expected);
-  assigns *mem \from *mem, indirect: *expected, desired,
+/*@ requires validity: \valid(mem) && \valid(expected);
+  assigns *mem \from *mem, desired, indirect: *expected,
           indirect: success_model, indirect: weak;
-  assigns *expected \from *expected, indirect: *mem, desired,
+  assigns *expected \from *expected, *mem, indirect: desired,
           indirect: failure_model, indirect: weak;
   assigns \result \from indirect: *mem, indirect: *expected;
 */
@@ -381,10 +381,10 @@ _Bool __atomic_compare_exchange_4(__UINT32_T* mem,
                                   int success_model,
                                   int failure_model);
 
-/*@ requires validity: \valid(mem) && \valid_read(expected);
-  assigns *mem \from *mem, indirect: *expected, desired,
+/*@ requires validity: \valid(mem) && \valid(expected);
+  assigns *mem \from *mem, desired, indirect: *expected,
           indirect: success_model, indirect: weak;
-  assigns *expected \from *expected, indirect: *mem, desired,
+  assigns *expected \from *expected, *mem, indirect: desired,
           indirect: failure_model, indirect: weak;
   assigns \result \from indirect: *mem, indirect: *expected;
 */
