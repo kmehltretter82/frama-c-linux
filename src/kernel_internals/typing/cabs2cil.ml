@@ -6723,8 +6723,8 @@ and doExp local_env
                       n
                   end
 
-                (* contrarily to the others builtins, __atomic_load and
-                   __atomic_exchange generic version do not share the same
+                (* contrarily to the other builtins, __atomic_load and
+                   __atomic_exchange generic versions do not share the same
                    signature as their specialized counterparts.
                    Hence, we'd have to change the args list as well.
                 *)
@@ -6753,10 +6753,7 @@ and doExp local_env
                       in
                       clean_up_chunk_locals c;
                       let t = typeOf_pointed t in
-                      let res =
-                        Format.sprintf "%s_%d" n (bytesSizeOf t)
-                      in
-                      Kernel.feedback "result is %s" res; res
+                      Format.sprintf "%s_%d" n (bytesSizeOf t)
                     | [] ->
                       Kernel.error ~once:true ~current:true
                         "Too few arguments for builtin %s" n;
