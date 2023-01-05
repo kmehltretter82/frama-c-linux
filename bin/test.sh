@@ -64,7 +64,7 @@ function Usage
     echo "  -r|--clean          clean (remove all) test results (includes -p)"
     echo "  -p|--ptests         prepare (all) dune files"
     echo "  -w|--wp-cache       prepare (pull) WP-cache"
-    echo "  -u|--update         run tests and update (push) WP-cache"
+    echo "  -u|--update         run tests and update (local) WP-cache"
     echo "  -l|--logs           print output of tests (single file, no diff)"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
