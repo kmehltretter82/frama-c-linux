@@ -69,5 +69,23 @@ int main() {
   //@ assert 0 <= res <= CHAR_BIT * sizeof(long);
   res = __builtin_popcountll(ULLONG_MAX);
   //@ assert 0 <= res <= CHAR_BIT * sizeof(long long);
+
+  // Atomic builtins
+  __UINT8_T u8_1, u8_2 = 42;
+  u8_1 = __atomic_load_1(&u8_2, __ATOMIC_RELAXED);
+  __UINT16_T u16_1, u16_2 = 4200;
+  __atomic_store_2(&u16_1, u16_2, __ATOMIC_ACQ_REL);
+  __UINT32_T u32_1, u32_2 = 1234567, u32_3 = 420000;
+  u32_1 = __atomic_exchange_4(&u32_2, u32_3, __ATOMIC_RELEASE);
+  __UINT64_T u64_1 = 12345678901UL, u64_2 = 42000000000UL, u64_3 = 42000000001UL;
+  r = __atomic_compare_exchange_8(&u64_1, &u64_2, u64_3, 1, __ATOMIC_SEQ_CST, __ATOMIC_ACQUIRE);
+  u8_2 = __atomic_add_fetch_1(&u8_1, u8_2, __ATOMIC_CONSUME);
+  u16_2 = __atomic_fetch_sub_2(&u16_1, u16_2, __ATOMIC_RELAXED);
+  u32_2 = __atomic_fetch_xor_4(&u32_1, u32_2, __ATOMIC_RELAXED);
+  u64_2 = __atomic_fetch_nand_8(&u64_1, u64_2, __ATOMIC_RELAXED);
+  r = __atomic_test_and_set(&u32_3, __ATOMIC_ACQUIRE);
+  __atomic_clear(&r, __ATOMIC_ACQ_REL);
+  r = __atomic_always_lock_free(sizeof(long long), 0);
+  r = __atomic_is_lock_free(sizeof(long), &u32_1);
   return 0;
 }
