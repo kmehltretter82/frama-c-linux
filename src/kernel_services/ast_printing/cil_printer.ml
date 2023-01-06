@@ -2808,7 +2808,7 @@ class cil_printer () = object (self)
       let v = def.l_var_info in
       let args = def.l_profile in
       let pp_defn = match def.l_body with
-        | LBterm t -> fun fmt -> self#term fmt t
+        | LBterm t -> fun fmt -> term fmt t
         | LBpred p -> fun fmt -> self#pred_prec_named fmt (current_level,p)
         | LBnone
         | LBreads _ | LBinductive _ ->

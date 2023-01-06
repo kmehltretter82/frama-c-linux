@@ -13,5 +13,7 @@ struct bli { baz bli; };
 /*@ assigns x[0..3] \from y->bli[0..3]; */
 int g(baz x,struct bli* y);
 
-/*@ assigns *(x + (0 .. ((1 << 2) - 2))) \from \let range = (0 .. 4-1); x[range]; */
+/*@ assigns *(x + (0 .. ((1 << 2) - 2))) \from \let range = (0 .. 4-1); x[range];
+    ensures \let range = (0 .. 4 - 1); x[range] == 0;
+ */
 int h(baz x);
