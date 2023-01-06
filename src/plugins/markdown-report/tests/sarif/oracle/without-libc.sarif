@@ -1,6 +1,5 @@
 {
-  "$schema":
-    "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
   "version": "2.1.0",
   "runs": [
     {
@@ -15,8 +14,7 @@
       },
       "invocations": [
         {
-          "commandLine":
-            "frama-c -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report -eva -eva-no-results -mdr-gen sarif -mdr-sarif-deterministic libc.c -mdr-no-print-libc -mdr-out ./without-libc.sarif.unfiltered",
+          "commandLine": "frama-c -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report -eva -eva-no-results -mdr-gen sarif -mdr-sarif-deterministic libc.c -mdr-no-print-libc -mdr-out ./without-libc.sarif.unfiltered",
           "arguments": [
             "-check", "-no-autoload-plugins",
             "-add-symbolic-path=PTEST_SESSION:.",

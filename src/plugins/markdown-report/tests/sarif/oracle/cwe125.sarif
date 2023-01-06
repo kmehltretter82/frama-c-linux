@@ -1,6 +1,5 @@
 {
-  "$schema":
-    "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
   "version": "2.1.0",
   "runs": [
     {
@@ -15,8 +14,7 @@
       },
       "invocations": [
         {
-          "commandLine":
-            "frama-c -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report cwe125.c -save ./cwe125_parse.sav",
+          "commandLine": "frama-c -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report cwe125.c -save ./cwe125_parse.sav",
           "arguments": [
             "-check", "-no-autoload-plugins",
             "-add-symbolic-path=PTEST_SESSION:.",
@@ -27,8 +25,7 @@
           "executionSuccessful": true
         },
         {
-          "commandLine":
-            "frama-c -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report -load ./cwe125_parse.sav -eva -save ./cwe125_eva.sav",
+          "commandLine": "frama-c -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report -load ./cwe125_parse.sav -eva -save ./cwe125_eva.sav",
           "arguments": [
             "-check", "-no-autoload-plugins",
             "-add-symbolic-path=PTEST_SESSION:.",
@@ -39,8 +36,7 @@
           "executionSuccessful": true
         },
         {
-          "commandLine":
-            "frama-c -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report -load ./cwe125_eva.sav -then -mdr-out ./cwe125.sarif.unfiltered -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
+          "commandLine": "frama-c -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report -load ./cwe125_eva.sav -then -mdr-out ./cwe125.sarif.unfiltered -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic",
           "arguments": [
             "-check", "-no-autoload-plugins",
             "-add-symbolic-path=PTEST_SESSION:.",
@@ -71,8 +67,7 @@
           "level": "none",
           "message": {
             "text": "mem_access.",
-            "markdown":
-              "mem_access:\n\n```acsl\nassert mem_access: \\valid_read(array + index);\n```\n\n\n\nThis alarm represents a potential Invalid pointer dereferencing."
+            "markdown": "mem_access:\n\n```acsl\nassert mem_access: \\valid_read(array + index);\n```\n\n\n\nThis alarm represents a potential Invalid pointer dereferencing."
           },
           "locations": [
             {
@@ -94,8 +89,7 @@
           "level": "error",
           "message": {
             "text": "mem_access.",
-            "markdown":
-              "mem_access:\n\n```acsl\nassert mem_access: \\valid_read(array + index);\n```\n\n\n\nThis alarm represents a potential Invalid pointer dereferencing."
+            "markdown": "mem_access:\n\n```acsl\nassert mem_access: \\valid_read(array + index);\n```\n\n\n\nThis alarm represents a potential Invalid pointer dereferencing."
           },
           "locations": [
             {

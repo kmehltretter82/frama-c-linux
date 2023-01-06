@@ -1,6 +1,5 @@
 {
-  "$schema":
-    "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
   "version": "2.1.0",
   "runs": [
     {
@@ -15,8 +14,7 @@
       },
       "invocations": [
         {
-          "commandLine":
-            "frama-c -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report -eva -eva-no-results -mdr-gen sarif -mdr-sarif-deterministic libc.c -mdr-out ./with-libc.sarif.unfiltered",
+          "commandLine": "frama-c -check -no-autoload-plugins -add-symbolic-path=PTEST_SESSION:. -load-plugin=eva,from,scope,inout,markdown-report -eva -eva-no-results -mdr-gen sarif -mdr-sarif-deterministic libc.c -mdr-out ./with-libc.sarif.unfiltered",
           "arguments": [
             "-check", "-no-autoload-plugins",
             "-add-symbolic-path=PTEST_SESSION:.",
@@ -1265,8 +1263,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *((char *)s + (0 .. n - 1)) in function bzero."
+            "text": "from clause of term *((char *)s + (0 .. n - 1)) in function bzero."
           },
           "locations": [
             {
@@ -2030,8 +2027,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *((char *)dest + (0 .. n - 1)) in function memcpy."
+            "text": "from clause of term *((char *)dest + (0 .. n - 1)) in function memcpy."
           },
           "locations": [
             {
@@ -2219,8 +2215,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *((char *)dest + (0 .. n - 1)) in function memmove."
+            "text": "from clause of term *((char *)dest + (0 .. n - 1)) in function memmove."
           },
           "locations": [
             {
@@ -2431,8 +2426,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *((char *)dest + (0 .. n - 1)) in function mempcpy."
+            "text": "from clause of term *((char *)dest + (0 .. n - 1)) in function mempcpy."
           },
           "locations": [
             {
@@ -2597,8 +2591,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *((char *)s + (0 .. n - 1)) in function memset."
+            "text": "from clause of term *((char *)s + (0 .. n - 1)) in function memset."
           },
           "locations": [
             {
@@ -2809,8 +2802,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *(dest + (0 .. strlen{Old}(src))) in function stpcpy."
+            "text": "from clause of term *(dest + (0 .. strlen{Old}(src))) in function stpcpy."
           },
           "locations": [
             {
@@ -3324,8 +3316,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *(dest +\n                      (strlen{Old}(dest) ..\n                                           strlen{Old}(dest) +\n                                           strlen{Old}(src))) in function strcat."
+            "text": "from clause of term *(dest +\n                      (strlen{Old}(dest) ..\n                                           strlen{Old}(dest) +\n                                           strlen{Old}(src))) in function strcat."
           },
           "locations": [
             {
@@ -4280,8 +4271,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *(dest + (0 .. strlen{Old}(src))) in function strcpy."
+            "text": "from clause of term *(dest + (0 .. strlen{Old}(src))) in function strcpy."
           },
           "locations": [
             {
@@ -4747,8 +4737,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term __fc_heap_status in function strdup."
+            "text": "from clause of term __fc_heap_status in function strdup."
           },
           "locations": [
             {
@@ -5172,8 +5161,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *(dest + (strlen{Old}(dest) .. n)) in function strlcat."
+            "text": "from clause of term *(dest + (strlen{Old}(dest) .. n)) in function strlcat."
           },
           "locations": [
             {
@@ -5384,8 +5372,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *(dest + (0 .. n - 1)) in function strlcpy."
+            "text": "from clause of term *(dest + (0 .. n - 1)) in function strlcpy."
           },
           "locations": [
             {
@@ -6014,8 +6001,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *(dest +\n                      (strlen{Old}(dest) ..\n                                           strlen{Old}(dest) +\n                                           strlen{Old}(src))) in function strncat."
+            "text": "from clause of term *(dest +\n                      (strlen{Old}(dest) ..\n                                           strlen{Old}(dest) +\n                                           strlen{Old}(src))) in function strncat."
           },
           "locations": [
             {
@@ -6065,8 +6051,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n)) in function strncat."
+            "text": "from clause of term *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n)) in function strncat."
           },
           "locations": [
             {
@@ -6116,8 +6101,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n)) in function strncat."
+            "text": "from clause of term *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + n)) in function strncat."
           },
           "locations": [
             {
@@ -6606,8 +6590,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *(dest + (0 .. n - 1)) in function strncpy."
+            "text": "from clause of term *(dest + (0 .. n - 1)) in function strncpy."
           },
           "locations": [
             {
@@ -6937,8 +6920,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term __fc_heap_status in function strndup."
+            "text": "from clause of term __fc_heap_status in function strndup."
           },
           "locations": [
             {
@@ -8626,8 +8608,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *(__fc_strtok_ptr + (0 ..)) in function strtok."
+            "text": "from clause of term *(__fc_strtok_ptr + (0 ..)) in function strtok."
           },
           "locations": [
             {
@@ -8777,8 +8758,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *(__fc_strtok_ptr + (0 ..)) in function strtok."
+            "text": "from clause of term *(__fc_strtok_ptr + (0 ..)) in function strtok."
           },
           "locations": [
             {
@@ -9338,8 +9318,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *(*saveptr + (0 ..)) in function strtok_r."
+            "text": "from clause of term *(*saveptr + (0 ..)) in function strtok_r."
           },
           "locations": [
             {
@@ -9489,8 +9468,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *(*saveptr + (0 ..)) in function strtok_r."
+            "text": "from clause of term *(*saveptr + (0 ..)) in function strtok_r."
           },
           "locations": [
             {
@@ -9703,8 +9681,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text":
-              "from clause of term *(dest + (0 .. n - 1)) in function strxfrm."
+            "text": "from clause of term *(dest + (0 .. n - 1)) in function strxfrm."
           },
           "locations": [
             {
