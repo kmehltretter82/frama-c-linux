@@ -97,7 +97,7 @@ module Key = Datatype.Make_with_collections (
     let name = "Statistics.Key"
     let rehash (Key (s, x)) =
       (Key (register s.name s.kind, x))
-    let reprs = []
+    let reprs = [Key ({ id = 0; name="dummy"; kind=Global }, ())]
     let equal (Key (s1,x1)) (Key (s2,x2)) =
       match s1.kind, s2.kind with
       | Global, Global -> true
@@ -130,7 +130,8 @@ module Key = Datatype.Make_with_collections (
       | Function ->
         Format.fprintf fmt "%s:%a" s.name Kernel_function.pretty x
       | Statement ->
-        Format.fprintf fmt "%s:%a" s.name Cil_datatype.Stmt.pretty x
+        let loc = Cil_datatype.Stmt.loc x in
+        Format.fprintf fmt "%s:%a" s.name Cil_datatype.Location.pretty loc
   end)
 
 
