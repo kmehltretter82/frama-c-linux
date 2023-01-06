@@ -9238,6 +9238,7 @@ int __builtin_popcountl(unsigned long x);
 int __builtin_popcountll(unsigned long long x);
 
 /*@ requires validity: \valid_read(mem);
+    requires initialization: \initialized(mem);
     ensures load_value: \result ≡ *\old(mem);
     assigns \result;
     assigns \result \from *mem, (indirect: model);
@@ -9245,6 +9246,7 @@ int __builtin_popcountll(unsigned long long x);
 unsigned char __atomic_load_1(unsigned char const *mem, int model);
 
 /*@ requires validity: \valid_read(mem);
+    requires initialization: \initialized(mem);
     ensures load_value: \result ≡ *\old(mem);
     assigns \result;
     assigns \result \from *mem, (indirect: model);
@@ -9252,6 +9254,7 @@ unsigned char __atomic_load_1(unsigned char const *mem, int model);
 unsigned short __atomic_load_2(unsigned short const *mem, int model);
 
 /*@ requires validity: \valid_read(mem);
+    requires initialization: \initialized(mem);
     ensures load_value: \result ≡ *\old(mem);
     assigns \result;
     assigns \result \from *mem, (indirect: model);
@@ -9259,6 +9262,7 @@ unsigned short __atomic_load_2(unsigned short const *mem, int model);
 unsigned int __atomic_load_4(unsigned int const *mem, int model);
 
 /*@ requires validity: \valid_read(mem);
+    requires initialization: \initialized(mem);
     ensures load_value: \result ≡ *\old(mem);
     assigns \result;
     assigns \result \from *mem, (indirect: model);
@@ -9266,6 +9270,7 @@ unsigned int __atomic_load_4(unsigned int const *mem, int model);
 unsigned long long __atomic_load_8(unsigned long long const *mem, int model);
 
 /*@ requires validity: \valid(mem);
+    ensures initialization: \initialized(\old(mem));
     ensures store_value: *\old(mem) ≡ \old(val);
     assigns *mem;
     assigns *mem \from val, (indirect: model);
@@ -9273,6 +9278,7 @@ unsigned long long __atomic_load_8(unsigned long long const *mem, int model);
 void __atomic_store_1(unsigned char *mem, unsigned char val, int model);
 
 /*@ requires validity: \valid(mem);
+    ensures initialization: \initialized(\old(mem));
     ensures store_value: *\old(mem) ≡ \old(val);
     assigns *mem;
     assigns *mem \from val, (indirect: model);
@@ -9280,6 +9286,7 @@ void __atomic_store_1(unsigned char *mem, unsigned char val, int model);
 void __atomic_store_2(unsigned short *mem, unsigned short val, int model);
 
 /*@ requires validity: \valid(mem);
+    ensures initialization: \initialized(\old(mem));
     ensures store_value: *\old(mem) ≡ \old(val);
     assigns *mem;
     assigns *mem \from val, (indirect: model);
@@ -9287,6 +9294,7 @@ void __atomic_store_2(unsigned short *mem, unsigned short val, int model);
 void __atomic_store_4(unsigned int *mem, unsigned int val, int model);
 
 /*@ requires validity: \valid(mem);
+    ensures initialization: \initialized(\old(mem));
     ensures store_value: *\old(mem) ≡ \old(val);
     assigns *mem;
     assigns *mem \from val, (indirect: model);
@@ -9295,6 +9303,7 @@ void __atomic_store_8(unsigned long long *mem, unsigned long long val,
                       int model);
 
 /*@ requires validity: \valid(mem);
+    requires initialization: \initialized(mem);
     assigns *mem, \result;
     assigns *mem \from val, (indirect: model);
     assigns \result \from *mem, (indirect: model);
@@ -9303,6 +9312,7 @@ unsigned char __atomic_exchange_1(unsigned char *mem, unsigned char val,
                                   int model);
 
 /*@ requires validity: \valid(mem);
+    requires initialization: \initialized(mem);
     assigns *mem, \result;
     assigns *mem \from val, (indirect: model);
     assigns \result \from *mem, (indirect: model);
@@ -9311,6 +9321,7 @@ unsigned short __atomic_exchange_2(unsigned short *mem, unsigned short val,
                                    int model);
 
 /*@ requires validity: \valid(mem);
+    requires initialization: \initialized(mem);
     assigns *mem, \result;
     assigns *mem \from val, (indirect: model);
     assigns \result \from *mem, (indirect: model);
@@ -9319,6 +9330,7 @@ unsigned int __atomic_exchange_4(unsigned int *mem, unsigned int val,
                                  int model);
 
 /*@ requires validity: \valid(mem);
+    requires initialization: \initialized(mem);
     assigns *mem, \result;
     assigns *mem \from val, (indirect: model);
     assigns \result \from *mem, (indirect: model);
@@ -9327,6 +9339,8 @@ unsigned long long __atomic_exchange_8(unsigned long long *mem,
                                        unsigned long long val, int model);
 
 /*@ requires validity: \valid(mem) ∧ \valid(expected);
+    requires initialization: mem: \initialized(mem);
+    requires initialization: expected: \initialized(expected);
     assigns *mem, *expected, \result;
     assigns *mem
       \from *mem, desired, (indirect: *expected), (indirect: success_model),
@@ -9342,6 +9356,8 @@ _Bool __atomic_compare_exchange_1(unsigned char *mem,
                                   int success_model, int failure_model);
 
 /*@ requires validity: \valid(mem) ∧ \valid(expected);
+    requires initialization: mem: \initialized(mem);
+    requires initialization: expected: \initialized(expected);
     assigns *mem, *expected, \result;
     assigns *mem
       \from *mem, desired, (indirect: *expected), (indirect: success_model),
@@ -9357,6 +9373,8 @@ _Bool __atomic_compare_exchange_2(unsigned short *mem,
                                   int success_model, int failure_model);
 
 /*@ requires validity: \valid(mem) ∧ \valid(expected);
+    requires initialization: mem: \initialized(mem);
+    requires initialization: expected: \initialized(expected);
     assigns *mem, *expected, \result;
     assigns *mem
       \from *mem, desired, (indirect: *expected), (indirect: success_model),
@@ -9371,6 +9389,8 @@ _Bool __atomic_compare_exchange_4(unsigned int *mem, unsigned int *expected,
                                   int success_model, int failure_model);
 
 /*@ requires validity: \valid(mem) ∧ \valid(expected);
+    requires initialization: mem: \initialized(mem);
+    requires initialization: expected: \initialized(expected);
     assigns *mem, *expected, \result;
     assigns *mem
       \from *mem, desired, (indirect: *expected), (indirect: success_model),
@@ -9386,6 +9406,7 @@ _Bool __atomic_compare_exchange_8(unsigned long long *mem,
                                   int success_model, int failure_model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9394,6 +9415,7 @@ unsigned char __atomic_add_fetch_1(unsigned char *ptr, unsigned char val,
                                    int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9402,6 +9424,7 @@ unsigned char __atomic_sub_fetch_1(unsigned char *ptr, unsigned char val,
                                    int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9410,6 +9433,7 @@ unsigned char __atomic_and_fetch_1(unsigned char *ptr, unsigned char val,
                                    int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9418,6 +9442,7 @@ unsigned char __atomic_xor_fetch_1(unsigned char *ptr, unsigned char val,
                                    int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9426,6 +9451,7 @@ unsigned char __atomic_or_fetch_1(unsigned char *ptr, unsigned char val,
                                   int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9434,6 +9460,7 @@ unsigned char __atomic_nand_fetch_1(unsigned char *ptr, unsigned char val,
                                     int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9442,6 +9469,7 @@ unsigned short __atomic_add_fetch_2(unsigned short *ptr, unsigned short val,
                                     int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9450,6 +9478,7 @@ unsigned short __atomic_sub_fetch_2(unsigned short *ptr, unsigned short val,
                                     int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9458,6 +9487,7 @@ unsigned short __atomic_and_fetch_2(unsigned short *ptr, unsigned short val,
                                     int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9466,6 +9496,7 @@ unsigned short __atomic_xor_fetch_2(unsigned short *ptr, unsigned short val,
                                     int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9474,6 +9505,7 @@ unsigned short __atomic_or_fetch_2(unsigned short *ptr, unsigned short val,
                                    int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9482,6 +9514,7 @@ unsigned short __atomic_nand_fetch_2(unsigned short *ptr, unsigned short val,
                                      int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9490,6 +9523,7 @@ unsigned int __atomic_add_fetch_4(unsigned int *ptr, unsigned int val,
                                   int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9498,6 +9532,7 @@ unsigned int __atomic_sub_fetch_4(unsigned int *ptr, unsigned int val,
                                   int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9506,6 +9541,7 @@ unsigned int __atomic_and_fetch_4(unsigned int *ptr, unsigned int val,
                                   int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9514,6 +9550,7 @@ unsigned int __atomic_xor_fetch_4(unsigned int *ptr, unsigned int val,
                                   int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9522,6 +9559,7 @@ unsigned int __atomic_or_fetch_4(unsigned int *ptr, unsigned int val,
                                  int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9530,6 +9568,7 @@ unsigned int __atomic_nand_fetch_4(unsigned int *ptr, unsigned int val,
                                    int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9538,6 +9577,7 @@ unsigned long long __atomic_add_fetch_8(unsigned long long *ptr,
                                         unsigned long long val, int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9546,6 +9586,7 @@ unsigned long long __atomic_sub_fetch_8(unsigned long long *ptr,
                                         unsigned long long val, int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9554,6 +9595,7 @@ unsigned long long __atomic_and_fetch_8(unsigned long long *ptr,
                                         unsigned long long val, int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9562,6 +9604,7 @@ unsigned long long __atomic_xor_fetch_8(unsigned long long *ptr,
                                         unsigned long long val, int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9570,6 +9613,7 @@ unsigned long long __atomic_or_fetch_8(unsigned long long *ptr,
                                        unsigned long long val, int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9578,6 +9622,7 @@ unsigned long long __atomic_nand_fetch_8(unsigned long long *ptr,
                                          unsigned long long val, int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9586,6 +9631,7 @@ unsigned char __atomic_fetch_add_1(unsigned char *ptr, unsigned char val,
                                    int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9594,6 +9640,7 @@ unsigned char __atomic_fetch_sub_1(unsigned char *ptr, unsigned char val,
                                    int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9602,6 +9649,7 @@ unsigned char __atomic_fetch_and_1(unsigned char *ptr, unsigned char val,
                                    int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9610,6 +9658,7 @@ unsigned char __atomic_fetch_xor_1(unsigned char *ptr, unsigned char val,
                                    int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9618,6 +9667,7 @@ unsigned char __atomic_fetch_or_1(unsigned char *ptr, unsigned char val,
                                   int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9626,6 +9676,7 @@ unsigned char __atomic_fetch_nand_1(unsigned char *ptr, unsigned char val,
                                     int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9634,6 +9685,7 @@ unsigned short __atomic_fetch_add_2(unsigned short *ptr, unsigned short val,
                                     int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9642,6 +9694,7 @@ unsigned short __atomic_fetch_sub_2(unsigned short *ptr, unsigned short val,
                                     int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9650,6 +9703,7 @@ unsigned short __atomic_fetch_and_2(unsigned short *ptr, unsigned short val,
                                     int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9658,6 +9712,7 @@ unsigned short __atomic_fetch_xor_2(unsigned short *ptr, unsigned short val,
                                     int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9666,6 +9721,7 @@ unsigned short __atomic_fetch_or_2(unsigned short *ptr, unsigned short val,
                                    int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9674,6 +9730,7 @@ unsigned short __atomic_fetch_nand_2(unsigned short *ptr, unsigned short val,
                                      int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9682,6 +9739,7 @@ unsigned int __atomic_fetch_add_4(unsigned int *ptr, unsigned int val,
                                   int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9690,6 +9748,7 @@ unsigned int __atomic_fetch_sub_4(unsigned int *ptr, unsigned int val,
                                   int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9698,6 +9757,7 @@ unsigned int __atomic_fetch_and_4(unsigned int *ptr, unsigned int val,
                                   int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9706,6 +9766,7 @@ unsigned int __atomic_fetch_xor_4(unsigned int *ptr, unsigned int val,
                                   int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9714,6 +9775,7 @@ unsigned int __atomic_fetch_or_4(unsigned int *ptr, unsigned int val,
                                  int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9722,6 +9784,7 @@ unsigned int __atomic_fetch_nand_4(unsigned int *ptr, unsigned int val,
                                    int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9730,6 +9793,7 @@ unsigned long long __atomic_fetch_add_8(unsigned long long *ptr,
                                         unsigned long long val, int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9738,6 +9802,7 @@ unsigned long long __atomic_fetch_sub__8(unsigned long long *ptr,
                                          unsigned long long val, int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9746,6 +9811,7 @@ unsigned long long __atomic_fetch_and_8(unsigned long long *ptr,
                                         unsigned long long val, int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9754,6 +9820,7 @@ unsigned long long __atomic_fetch_xor_8(unsigned long long *ptr,
                                         unsigned long long val, int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9762,6 +9829,7 @@ unsigned long long __atomic_fetch_or_8(unsigned long long *ptr,
                                        unsigned long long val, int model);
 
 /*@ requires validity: \valid(ptr);
+    requires initialization: \initialized(ptr);
     assigns \result, *ptr;
     assigns \result \from *ptr, val, (indirect: model);
     assigns *ptr \from *ptr, val, (indirect: model);
@@ -9796,7 +9864,7 @@ _Bool __atomic_always_lock_free(unsigned int size, void *ptr);
 /*@ assigns \result;
     assigns \result \from (indirect: size), (indirect: ptr);
  */
-_Bool __atomic_lock_free(unsigned int size, void *ptr);
+_Bool __atomic_is_lock_free(unsigned int size, void *ptr);
 
 /*@ assigns \nothing; */
 void __sync_synchronize(void);
