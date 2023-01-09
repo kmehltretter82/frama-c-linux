@@ -72,12 +72,6 @@ type t = {
   vmap : LSet.t VMap.t ;(* reverse of lmap *)
   cmpt : Int.t ; (* counter to create new vertex *)
 }
-(* NOTE on "constant vertex": a constant vertex represents an unamed
-   scalar value (type bottom in steensgaard's paper). It means that in
-   [vmap], its associated LSet is empty. In [graph], it must have no
-   successor vertex and exactly 1 predecessor (the predecessus is thus
-   not a constant vertex). By definition, constant vertex cannot be
-   associated to a lval in [lmap] *)
 
 
 (* find functions *)
@@ -105,8 +99,8 @@ let print_debug fmt (x:t) =
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "@[<hov 2>VMap: @.";
   VMap.iter (fun v ls -> Format.fprintf fmt "(id = %d -> lset= %a)@." v LSet.pretty ls) x.vmap;
-  Format.fprintf fmt "@]@."
-
+  Format.fprintf fmt "@]@.";
+  Format.fprintf fmt "cmpt: %d@." x.cmpt
 
 let print_aliases fmt (x:t) =
   Format.fprintf fmt "@[<hov 2><list of may-alias>@.";
@@ -122,7 +116,7 @@ let pretty ?(debug=false) =
 
 (** invariants of type t must be true before and after each functon call *)
 let assert_invariants (x:t) : unit =
-  (* Format.printf "Checking invariants@.%a@." (pretty ~debug:true) x; *)
+  (* Format.printf "DEBUG Checking invariants@.%a@." (pretty ~debug:true) x; *)
   (* check that all vertex of the graph have entries in pending and
      vmap, and are integer between 0 and cmpt, and have at most 1
      successor *)
@@ -139,23 +133,26 @@ let assert_invariants (x:t) : unit =
     assert (LSet.mem lv (VMap.find v x.vmap))
   in
   LMap.iter assert_lmap x.lmap;
-  let assert_vmap (v:V.t) (ls:LSet.t) =
-    if LSet.is_empty ls then
-      begin (* it is a constant vertex, so it must have no succ and exactly 1 pred *)
-        assert (List.length (G.succ x.graph v) = 0);
-        assert (List.length (G.pred x.graph v) = 1)
-      end;
+  let assert_vmap (_:V.t) (ls:LSet.t) =
+    (* if LSet.is_empty ls then
+     *   begin (\* it is a constant vertex, so it must have no succ and at least 1 pred *\)
+     *     assert (List.length (G.succ x.graph v) = 0);
+     *     assert (List.length (G.pred x.graph v) > 0);
+     *   end; *)
     assert (LSet.fold (fun lv acc -> acc && LMap.mem lv x.lmap) ls true)
   in
   VMap.iter assert_vmap x.vmap
-
-
+  
 (* find the vertex of an lval *)
 let find_vertex (lv:lval) (x:t) =
   LMap.find lv x.lmap
 (** @raise Not_found if there is not such an lval in the graph *)
 
-
+(* NOTE on "constant vertex": a constant vertex represents an unamed
+   scalar value (type bottom in steensgaard's paper), or the address
+   of a variable. It means that in [vmap], its associated LSet is
+   empty.  By definition, constant vertex cannot be associated to a
+   lval in [lmap] *)
 let create_cst_vertex (x:t) : V.t * t =
   let new_v = x.cmpt in
   let new_g = G.add_vertex x.graph new_v in
@@ -516,6 +513,38 @@ end
 
 module V2Set = Set.Make(VPairs)
 
+
+
+(* rename all vertex re-enumerate all vertex of [x] from 0 to nb_vertex -1 *)
+let rename_all_vertex (x:t) : t =
+  let new_cmpt = ref 0 in
+  let tbl_rename = Hashtbl.create (G.nb_vertex x.graph) in
+  let renamed_graph =
+    (* rename the graph and write the table *)
+  G.map_vertex 
+    (fun v -> Hashtbl.add tbl_rename v !new_cmpt ; incr new_cmpt; !new_cmpt-1)
+    x.graph
+  in
+  let r v = Hashtbl.find tbl_rename v in
+  let renamed_pending =
+    VMap.fold
+      (fun v vs acc -> VMap.add (r v) vs acc)
+      x.pending
+      VMap.empty
+  in
+  let renamed_lmap =
+    LMap.map
+      r
+      x.lmap
+  in
+  let renamed_vmap =
+    VMap.fold
+      (fun v ls acc -> VMap.add (r v) ls acc)
+      x.vmap
+      VMap.empty
+  in
+  {graph = renamed_graph; pending = renamed_pending ; lmap = renamed_lmap ; vmap = renamed_vmap ; cmpt = !new_cmpt }
+
 let union  (a1:t) (a2:t) :t =
   (* naive algorithm :
      1 rename any vertex in a2 (by adding a1.cmpt) to avoid any confusion between vertex of the tw graphs
@@ -613,6 +642,13 @@ let union  (a1:t) (a2:t) :t =
     G.fold_vertex
       clean_up_constant_successors
       new_a.graph
+      new_a
+  in
+  let new_a =
+    if new_a.cmpt > 2 * (G.nb_vertex new_a.graph) 
+    then
+      rename_all_vertex new_a
+    else
       new_a
   in
   assert_invariants new_a;
