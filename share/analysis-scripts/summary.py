@@ -31,6 +31,7 @@ import signal
 import argparse
 import uuid
 import csv
+import typing
 from pathlib import Path
 
 import frama_c_results
@@ -239,6 +240,7 @@ try:
         framac = os.path.abspath(args.repository_path)
         gitdir = framac
 
+    benchmark_tag: typing.Optional[str]
     if args.benchmark:
         benchmark_tag = str(uuid.uuid1())
         print("Running benchmarks with benchmark tag", benchmark_tag, "...")

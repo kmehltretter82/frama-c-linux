@@ -48,10 +48,10 @@ from typing import Optional
 emit_warns = os.getenv("PTESTS_TESTING") is None
 
 # Cache for get_command.
-cached_commands : dict[str, Optional[Path]] = {}
+cached_commands: dict[str, Optional[Path]] = {}
 
 
-def resource_path(relative_path) -> str:
+def resource_path(relative_path: str) -> str:
     """Get absolute path to resource; only used by the pyinstaller standalone distribution"""
     base_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_path, relative_path)

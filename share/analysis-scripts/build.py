@@ -141,11 +141,11 @@ from blug_jbdb import prettify
 # Auxiliary functions #########################################################
 
 
-def call_and_get_output(command_and_args: list[str]) -> str:
+def call_and_get_output(command: Path, args: list[str]) -> str:
     try:
-        return subprocess.check_output(command_and_args, stderr=subprocess.STDOUT).decode()
+        return subprocess.check_output([str(command)] + args, stderr=subprocess.STDOUT).decode()
     except subprocess.CalledProcessError as e:
-        sys.exit(f"error running command: {command_and_args}\n{e}")
+        sys.exit(f"error running command: {command} {args}\n{e}")
 
 
 def ask_if_overwrite(path: Path) -> None:
@@ -252,7 +252,10 @@ def find_definitions(funcname: str, filename: str) -> list[tuple[str, bool]]:
         res.append((d[2], has_args))
     return res
 
-T = TypeVar('T')
+
+T = TypeVar("T")
+
+
 def list_partition(f: Callable[[T], bool], l: list[T]) -> tuple[list[T], list[T]]:
     """Equivalent to OCaml's List.partition: returns 2 lists with the elements of l,
     partitioned according to predicate f."""
@@ -371,7 +374,7 @@ if not dot_framac_dir.is_dir():
     logging.debug("creating %s", dot_framac_dir)
     dot_framac_dir.mkdir(parents=True, exist_ok=False)
 
-fc_config = json.loads(call_and_get_output([str(framac_bin / "frama-c"), "-print-config-json"]))
+fc_config = json.loads(call_and_get_output(framac_bin / "frama-c", ["-print-config-json"]))
 lib_dir = Path(fc_config["lib_dir"])
 
 # copy fc_stubs if at least one main function has arguments

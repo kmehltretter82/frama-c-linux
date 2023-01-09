@@ -44,12 +44,12 @@ class Callgraph:
     """
 
     # maps each caller to the list of its callees
-    succs = {}
+    succs: dict[str, list[str]] = {}
 
     # maps (caller, callee) to the list of call locations
-    edges = {}
+    edges: dict[tuple[str, str], list[tuple[str, int]]] = {}
 
-    def add_edge(self, caller, callee, loc):
+    def add_edge(self, caller, callee, loc) -> None:
         if (caller, callee) in self.edges:
             # edge already exists
             self.edges[(caller, callee)].append(loc)
@@ -90,7 +90,7 @@ def compute(files):
     return cg
 
 
-def print_edge(cg, caller, called, padding="", end="\n"):
+def print_edge(cg: Callgraph, caller, called, padding="", end="\n") -> None:
     locs = cg.edges[(caller, called)]
     for (filename, line) in locs:
         print(
@@ -99,13 +99,13 @@ def print_edge(cg, caller, called, padding="", end="\n"):
         )
 
 
-def print_cg(cg):
+def print_cg(cg: Callgraph) -> None:
     for (caller, called) in cg.edges:
         print_edge(cg, caller, called)
 
 
 # note: out _must_ exist (the caller must create it if needed)
-def print_cg_dot(cg, out=sys.stdout):
+def print_cg_dot(cg: Callgraph, out=sys.stdout) -> None:
     print("digraph callgraph {", file=out)
     for (caller, called) in cg.edges:
         print(f"  {caller} -> {called};", file=out)
@@ -120,7 +120,7 @@ def print_cg_dot(cg, out=sys.stdout):
 # The difference between visited and just_visited is that the latter refers
 # to the current bfs; nodes visited in previous bfs already had their cycles
 # reported, so we do not report them multiple times.
-def cycle_bfs(cg, visited, just_visited, n):
+def cycle_bfs(cg, visited, just_visited, n) -> list[tuple[str, str]]:
     if debug:
         print(f"cycle_bfs: visited = {visited}, just_visited = {just_visited}, n = {n}")
     just_visited.add(n)
@@ -145,13 +145,13 @@ def cycle_bfs(cg, visited, just_visited, n):
     return []
 
 
-def compute_recursive_cycles(cg, acc):
+def compute_recursive_cycles(cg, acc) -> None:
     to_visit = set(cg.nodes())
     if not to_visit:  # empty graph -> no recursion
         return
-    visited = set()
+    visited: set[str] = set()
     while to_visit:
-        just_visited = set()
+        just_visited: set[str] = set()
         n = sorted(list(to_visit))[0]
         cycle = cycle_bfs(cg, visited, just_visited, n)
         visited = visited.union(just_visited)
@@ -162,14 +162,14 @@ def compute_recursive_cycles(cg, acc):
         to_visit -= visited
 
 
-def detect_recursion(cg):
+def detect_recursion(cg) -> None:
     to_visit = set(cg.nodes())
     if not to_visit:  # empty graph -> no recursion
-        return False
-    visited = set()
+        return
+    visited: set[str] = set()
     has_cycle = False
     while to_visit:
-        just_visited = set()
+        just_visited: set[str] = set()
         n = sorted(list(to_visit))[0]
         cycle = cycle_bfs(cg, visited, just_visited, n)
         visited = visited.union(just_visited)

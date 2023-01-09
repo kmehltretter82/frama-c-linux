@@ -51,11 +51,8 @@ fcmake_pwd = Path(pwd) / ".frama-c"  # pwd as seen by the Frama-C makefile
 with open(arg) as data:
     jcdb = json.load(data)
 jcdb_dir = arg.parent
-includes = set()
-defines = set()
-files = set()  # set of pairs of (file, file_for_fcmake)
+files: set[tuple[str, str]] = set()  # set of pairs of (file, file_for_fcmake)
 for entry in jcdb:
-    arg_includes = []  # before normalization
     if not "file" in entry:
         # ignore entries without a filename
         continue
@@ -81,9 +78,9 @@ print("")
 
 files_defining_main = set()
 re_main = re.compile(r"(int|void)\s+main\s*\([^)]*\)\s*\{")
-for (filename, file_for_fcmake) in files:
-    assert os.path.exists(filename), "file does not exist: %s" % filename
-    with open(filename, "r") as content_file:
+for (fname, file_for_fcmake) in files:
+    assert os.path.exists(fname), "file does not exist: %s" % fname
+    with open(fname, "r") as content_file:
         content = content_file.read()
         res = re.search(re_main, content)
         if res is not None:
