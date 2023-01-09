@@ -29,7 +29,7 @@ import * as Utils from 'dome/data/arrays';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import { key } from 'dome/data/json';
-import { TitleBar } from 'ivette';
+import * as Settings from 'dome/data/settings';
 import { IconButton } from 'dome/controls/buttons';
 import { Filler, Inset } from 'dome/frame/toolbars';
 import * as Ast from 'frama-c/kernel/api/ast';
@@ -37,6 +37,9 @@ import { text } from 'frama-c/kernel/api/data';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Properties from 'frama-c/kernel/api/properties';
 import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
+
+import { TitleBar } from 'ivette';
+import * as Preferences from 'ivette/prefs';
 
 
 
@@ -582,6 +585,7 @@ const baseExtensions: Editor.Extension[] = [
 // The component in itself.
 export default function ASTview(): JSX.Element {
   const { view, component } = Editor.Editor(baseExtensions);
+  const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
 
   // Updating CodeMirror when the selection or its callback are changed.
   const [selection, updateSelection] = States.useSelection();
@@ -616,27 +620,29 @@ export default function ASTview(): JSX.Element {
   Callers.set(view, useFctCallers(fct));
   TaintedLvalues.set(view, useFctTaints(fct));
 
-  return <>
-    <TitleBar>
-      <Filler />
-      <IconButton
-        icon='CHEVRON.CONTRACT'
-        visible={true}
-        onClick={() => Editor.foldAll(view)}
-        title='Collapse all multi-line ACSL properties'
-        className="titlebar-thin-icon"
-      />
-      <IconButton
-        icon='CHEVRON.EXPAND'
-        visible={true}
-        onClick={() => Editor.unfoldAll(view)}
-        title='Expand all multi-line ACSL properties'
-        className="titlebar-thin-icon"
-      />
-      <Inset />
-    </TitleBar>
-    {component}
-  </>;
+  return (
+    <div style={{ height: '100%', fontSize: `${fontSize}px` }}>
+      <TitleBar>
+        <Filler />
+        <IconButton
+          icon='CHEVRON.CONTRACT'
+          visible={true}
+          onClick={() => Editor.foldAll(view)}
+          title='Collapse all multi-line ACSL properties'
+          className="titlebar-thin-icon"
+        />
+        <IconButton
+          icon='CHEVRON.EXPAND'
+          visible={true}
+          onClick={() => Editor.unfoldAll(view)}
+          title='Expand all multi-line ACSL properties'
+          className="titlebar-thin-icon"
+        />
+        <Inset />
+      </TitleBar>
+      {component}
+    </div>
+  );
 }
 
 // --------------------------------------------------------------------------
