@@ -32,20 +32,17 @@ import { showTooltip, Tooltip } from '@codemirror/view';
 import { DecorationSet } from '@codemirror/view';
 import { lineNumbers } from '@codemirror/view';
 
-export type { Extension } from '@codemirror/state';
-export { GutterMarker } from '@codemirror/view';
-export { Decoration } from '@codemirror/view';
-export { RangeSet } from '@codemirror/state';
-
 import { parser } from '@lezer/cpp';
 import { tags } from '@lezer/highlight';
 import { SyntaxNode } from '@lezer/common';
 import * as Language from '@codemirror/language';
-import { foldGutter, foldNodeProp } from '@codemirror/language';
-import { LRLanguage, LanguageSupport } from "@codemirror/language";
-import { syntaxHighlighting, HighlightStyle } from '@codemirror/language';
 
 import './style.css';
+
+export type { Extension } from '@codemirror/state';
+export { GutterMarker } from '@codemirror/view';
+export { Decoration } from '@codemirror/view';
+export { RangeSet } from '@codemirror/state';
 
 
 
@@ -265,7 +262,7 @@ export function createEventHandler<I extends Dict>(
 // -----------------------------------------------------------------------------
 
 // Plugin specifying how to highlight the code. The theme is handled by the CSS.
-const Highlight = syntaxHighlighting(HighlightStyle.define([
+const Highlight = Language.syntaxHighlighting(Language.HighlightStyle.define([
   { tag: tags.comment, class: 'cm-comment' },
   { tag: tags.typeName, class: 'cm-type' },
   { tag: tags.number, class: 'cm-number' },
@@ -277,9 +274,9 @@ const Highlight = syntaxHighlighting(HighlightStyle.define([
 // highlighting and folding information. Only comments can be folded.
 // (Source: https://github.com/lezer-parser/cpp)
 const comment = (t: SyntaxNode): Range => ({ from: t.from + 2, to: t.to - 2});
-const folder = foldNodeProp.add({ BlockComment: comment });
+const folder = Language.foldNodeProp.add({ BlockComment: comment });
 const stringPrefixes = [ "L", "u", "U", "u8", "LR", "UR", "uR", "u8R", "R" ];
-const cppLanguage = LRLanguage.define({
+const cppLanguage = Language.LRLanguage.define({
   parser: parser.configure({ props: [ folder ] }),
   languageData: {
     commentTokens: { line: "//", block: { open: "/*", close: "*/" } },
@@ -290,7 +287,7 @@ const cppLanguage = LRLanguage.define({
 
 // This extension enables all the language highlighting features.
 export const LanguageHighlighter: Extension =
-  [Highlight, new LanguageSupport(cppLanguage)];
+  [Highlight, new Language.LanguageSupport(cppLanguage)];
 
 // -----------------------------------------------------------------------------
 
@@ -327,7 +324,7 @@ function createLineNumbers(): Extension {
 
 export const FoldGutter = createFoldGutter();
 function createFoldGutter(): Extension {
-  return foldGutter();
+  return Language.foldGutter();
 }
 
 export function foldAll(view: EditorView | null): void {

@@ -138,7 +138,7 @@
   background: var(--code-bullet);
 }
 
-.cm-hovered-code:hover {
+.cm-hovered-code {
   background-color: var(--code-hover);
 }
 

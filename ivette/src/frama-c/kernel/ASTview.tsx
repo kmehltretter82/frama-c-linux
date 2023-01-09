@@ -115,15 +115,22 @@ function textToString(text: text): string {
 
 // Computes, for each markers of a tree, its range. Returns the map containing
 // all those bindings.
-function markersRanges(tree: Tree): Map<string, Range>{
-  const ranges: Map<string, Range> = new Map();
+function markersRanges(tree: Tree): Map<string, Range[]>{
+  const ranges: Map<string, Range[]> = new Map();
   const toRanges = (tree: Tree): void => {
     if (!isNode(tree)) return;
-    ranges.set(tree.id, tree);
+    const trees = ranges.get(tree.id) ?? [];
+    trees.push(tree);
+    ranges.set(tree.id, trees);
     for (const child of tree.children) toRanges(child);
   };
   toRanges(tree);
   return ranges;
+}
+
+function uniqueRange(m: string, rs: Map<string, Range[]>): Range | undefined {
+  const ranges = rs.get(m);
+  return (ranges && ranges.length > 0) ? ranges[0] : undefined;
 }
 
 // Find the closest covering tagged node of a given position. Returns
@@ -226,7 +233,7 @@ function createHoveredUpdater(): Editor.Extension {
       const horizontallyOk = left <= coords.x && coords.x <= right;
       const verticallyOk = top <= coords.y && coords.y <= bottom;
       if (!horizontallyOk || !verticallyOk) return;
-      const marker = Ast.jMarker(hov?.id);
+      const marker = Ast.jMarker(hov.id);
       updateHovered(marker ? { fct, marker } : undefined);
     }
   });
@@ -244,12 +251,11 @@ function createCodeDecorator(): Editor.Extension {
   const selectedClass = Editor.Decoration.mark({ class: 'cm-selected-code' });
   const deps = { ranges: Ranges, marker: Marker, hovered: Hovered };
   return Editor.createDecorator(deps, ({ ranges, marker: m, hovered: h }) => {
-    const selected = m && ranges.get(m);
-    const hovered = h && ranges.get(h);
-    const range = selected && selectedClass.range(selected.from, selected.to);
-    const add = hovered && [ hoveredClass.range(hovered.from, hovered.to) ];
-    const set = range ? Editor.RangeSet.of(range) : Editor.RangeSet.empty;
-    return set.update({ add, sort: true });
+    const hoveredRanges = (h && ranges.get(h)) ?? [];
+    const selectedRanges = (m && ranges.get(m)) ?? [];
+    const hovered = hoveredRanges.map(r => hoveredClass.range(r.from, r.to));
+    const selected = selectedRanges.map(r => selectedClass.range(r.from, r.to));
+    return Editor.RangeSet.of(selected).update({ add: hovered, sort: true });
   });
 }
 
@@ -269,10 +275,10 @@ function createDeadCodeDecorator(): Editor.Extension {
   const tClass = Editor.Decoration.mark({ class: 'cm-non-term-code' });
   const deps = { dead: Dead, ranges: Ranges };
   return Editor.createDecorator(deps, ({ dead, ranges }) => {
-    const range = (marker: string): Range | undefined => ranges.get(marker);
-    const unreachableRanges = mapFilter(dead.unreachable, range);
+    const range = (m: string): Range[] | undefined => ranges.get(m);
+    const unreachableRanges = mapFilter(dead.unreachable, range).flat();
     const unreachable = unreachableRanges.map(r => uClass.range(r.from, r.to));
-    const nonTermRanges = mapFilter(dead.nonTerminating, range);
+    const nonTermRanges = mapFilter(dead.nonTerminating, range).flat();
     const nonTerm = nonTermRanges.map(r => tClass.range(r.from, r.to));
     return Editor.RangeSet.of(unreachable.concat(nonTerm), true);
   });
@@ -296,11 +302,11 @@ const PropertiesStatuses = Editor.createField<Properties.statusData[]>([]);
 const PropertiesRanges = createPropertiesRange();
 interface PropertyRange extends Properties.statusData { range: Range }
 function createPropertiesRange(): Editor.Aspect<PropertyRange[]> {
-  const deps = { ps: PropertiesStatuses, ranges: Ranges };
-  return Editor.createAspect(deps, ({ ps, ranges }) => mapFilter(ps, (p) => {
-    const range = ranges.get(p.key);
-    return range && { ...p, range };
-  }));
+  const deps = { properties: PropertiesStatuses, ranges: Ranges };
+  return Editor.createAspect(deps, ({ properties, ranges }) => {
+    const get = (p: Properties.statusData): Range[] => ranges.get(p.key) ?? [];
+    return properties.map(p => get(p).map(r => ({ ...p, range: r }))).flat();
+  });
 }
 
 // This aspect computes the tag associated to each property.
@@ -502,8 +508,9 @@ function createTaintedLvaluesDecorator(): Editor.Extension {
   const mark = Editor.Decoration.mark({ class: 'cm-tainted' });
   const deps = { ranges: Ranges, tainted: TaintedLvalues };
   return Editor.createDecorator(deps, ({ ranges, tainted = [] }) => {
-    const find = (t: Taints): Range | undefined => ranges.get(t.lval);
-    const marks = mapFilter(tainted, find).map(r => mark.range(r.from, r.to));
+    const find = (t: Taints): Range[] | undefined => ranges.get(t.lval);
+    const taintedRanges = mapFilter(tainted, find).flat();
+    const marks = taintedRanges.map(r => mark.range(r.from, r.to));
     return Editor.RangeSet.of(marks, true);
   });
 }
@@ -513,7 +520,7 @@ function createTaintTooltip(): Editor.Extension {
   const deps = { hovered: Hovered, ranges: Ranges, tainted: TaintedLvalues };
   return Editor.createTooltip(deps, ({ hovered, ranges, tainted }) => {
     const hoveredTaint = tainted?.find(t => t.lval === hovered);
-    const hoveredNode = hovered && ranges.get(hovered);
+    const hoveredNode = hovered && uniqueRange(hovered, ranges);
     if (!hoveredTaint || !hoveredNode) return undefined;
     return {
       pos: hoveredNode.from,
