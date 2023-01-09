@@ -178,8 +178,15 @@ let export_as_csv_to_channel out_channel =
   in
   List.iter (pp_stat fmt) l
 
-let export_as_csv ?filename () =
-  let default = Parameters.StatisticsFile.get () in
-  let filename = Option.value ~default filename in
-  let out_channel = open_out (filename :> string) in
+let export_as_csv_to_file filename =
+  let out_channel = open_out (filename : Filepath.Normalized.t :> string) in
   export_as_csv_to_channel out_channel
+
+let export_as_csv ?filename () =
+  match filename with
+  | None ->
+    if not (Parameters.StatisticsFile.is_empty ()) then
+      let filename = Parameters.StatisticsFile.get () in
+      export_as_csv_to_file filename
+  | Some filename ->
+    export_as_csv_to_file filename
