@@ -181,10 +181,12 @@ const MarkerUpdater = createMarkerUpdater();
 function createMarkerUpdater(): Editor.Extension {
   const deps = { fct: Fct, tree: Tree, update: UpdateSelection };
   return Editor.createEventHandler(deps, {
-    mouseup: ({ fct, tree, update }, view) => {
+    mouseup: ({ fct, tree, update }, view, event) => {
       const main = view.state.selection.main;
       const id = coveringNode(tree, main.from)?.id;
-      update({ location: { fct, marker: Ast.jMarker(id) } });
+      const location = { fct, marker: Ast.jMarker(id) };
+      update({ location });
+      if (event.altKey) States.MetaSelection.emit(location);
     }
   });
 }
