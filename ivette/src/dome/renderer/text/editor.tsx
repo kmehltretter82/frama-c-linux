@@ -38,8 +38,9 @@ export { Decoration } from '@codemirror/view';
 export { RangeSet } from '@codemirror/state';
 
 import { parser } from '@lezer/cpp';
-import { styleTags, tags } from '@lezer/highlight';
+import { tags } from '@lezer/highlight';
 import { SyntaxNode } from '@lezer/common';
+import * as Language from '@codemirror/language';
 import { foldGutter, foldNodeProp } from '@codemirror/language';
 import { LRLanguage, LanguageSupport } from "@codemirror/language";
 import { syntaxHighlighting, HighlightStyle } from '@codemirror/language';
@@ -279,7 +280,7 @@ const comment = (t: SyntaxNode): Range => ({ from: t.from + 2, to: t.to - 2});
 const folder = foldNodeProp.add({ BlockComment: comment });
 const stringPrefixes = [ "L", "u", "U", "u8", "LR", "UR", "uR", "u8R", "R" ];
 const cppLanguage = LRLanguage.define({
-  parser: parser.configure({ props: [ styleTags({'volatile':  tags.keyword }), folder ] }),
+  parser: parser.configure({ props: [ folder ] }),
   languageData: {
     commentTokens: { line: "//", block: { open: "/*", close: "*/" } },
     indentOnInput: /^\s*(?:case |default:|\{|\})$/,
@@ -329,6 +330,14 @@ function createFoldGutter(): Extension {
   return foldGutter();
 }
 
+export function foldAll(view: EditorView | null): void {
+  if (view !== null) Language.foldAll(view);
+}
+
+export function unfoldAll(view: EditorView | null): void {
+  if (view !== null) Language.unfoldAll(view);
+}
+
 export function createLineField(): Field<number> {
   const { get, set, structure } = createField(0);
   const useSet: Set<number> = (view, lineNum) => {
@@ -342,22 +351,6 @@ export function createLineField(): Field<number> {
   return { init: 0, get, set: useSet, structure };
 }
 
-// export interface LinesAspect extends Aspect<Range[]> { selectLine: Set<number> }
-// export function createLines<T extends string>(Text: Field<T>): LinesAspect {
-//   const aspect = createAspect({ t: Text }, ({ t }) => {
-//     const rs: Range[] = []; let from = 0;
-//     t.split('\n').forEach((l) => from = rs.push({ from, to: from + l.length }));
-//     return rs;
-//   });
-//   // const selectLine: Set<number> = (view, line) => {
-//   //   React.useEffect(() => {
-//   //     const range = aspect.get(view?.state)[line];
-//   //     const selection = { anchor: range.from };
-//   //     view?.dispatch({ selection });
-//   //   }, [view, range]);
-//   // };
-//   return { ...aspect, selectLine };
-// }
 
 
 // -----------------------------------------------------------------------------
