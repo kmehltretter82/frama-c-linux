@@ -72,6 +72,12 @@ type t = {
   vmap : LSet.t VMap.t ;(* reverse of lmap *)
   cmpt : Int.t ; (* counter to create new vertex *)
 }
+(* NOTE on "constant vertex": a constant vertex represents an unamed
+   scalar value (type bottom in steensgaard's paper). It means that in
+   [vmap], its associated LSet is empty. In [graph], it must have no
+   successor vertex and exactly 1 predecessor (the predecessus is thus
+   not a constant vertex). By definition, constant vertex cannot be
+   associated to a lval in [lmap] *)
 
 
 (* find functions *)
@@ -135,7 +141,10 @@ let assert_invariants (x:t) : unit =
   LMap.iter assert_lmap x.lmap;
   let assert_vmap (v:V.t) (ls:LSet.t) =
     if LSet.is_empty ls then
-      assert (List.length (G.succ x.graph v) =0);
+      begin (* it is a constant vertex, so it must have no succ and exactly 1 pred *)
+        assert (List.length (G.succ x.graph v) = 0);
+        assert (List.length (G.pred x.graph v) = 1)
+      end;
     assert (LSet.fold (fun lv acc -> acc && LMap.mem lv x.lmap) ls true)
   in
   VMap.iter assert_vmap x.vmap
@@ -324,6 +333,12 @@ and unify2 (x:t) (v1:V.t) (l2:V.t list) =
     let x = join x v1 v2 in
     unify2 x v1 qq
 
+(* since the recursive version of join, unify, unify2 and merge may break the invariants *)
+let join (x:t) (v1:V.t) (v2:V.t) : t =
+  assert_invariants x;
+  let res = join x v1 v2 in
+  assert_invariants res; res
+
 let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants x;
   let pt2=  G.succ x.graph v2 in
@@ -420,17 +435,17 @@ let equal (a1:t) (a2:t) =
      ? *)
   assert_invariants a1;
   assert_invariants a2;
-  if LMap.equal V.equal a1.lmap a2.lmap
-  then
-    (* then the isomorphism is the identity ; just check that the graph are the same *)
-    a1.graph = a2.graph
-    (* TODO: is there a better way to check equality between graphs ? *)
-  else
-    try
-      let card = LMap.cardinal a1.lmap in
-      if card = LMap.cardinal a2.lmap then
-        begin
-          (* builds the isomorphism between vertex numbers as an
+  try
+    let card = LMap.cardinal a1.lmap in
+    if (card = LMap.cardinal a2.lmap)
+    && G.nb_vertex a1.graph = G.nb_vertex a2.graph
+    && G.nb_edges a1.graph = G.nb_vertex a2.graph
+    (* the invariants assure that if the nb of vertex is equal, then
+       the size of pending and vmap are also equal. nb counters may be
+       different, it doesn't matter *)
+    then
+      begin
+        (* builds the isomorphism between vertex numbers as an
              Hastable Int.t -> Int.t *)
           let iso : (V.t, V.t) Hashtbl.t = Hashtbl.create card in
           LMap.iter
@@ -441,18 +456,53 @@ let equal (a1:t) (a2:t) =
                  Hashtbl.add iso v1 v2
             )
             a1.lmap;
-          (* now iso is the isomorphism between vertex numbers *)
-          let fmap v1 = try Hashtbl.find iso v1 with Not_found -> failwith "Bug in abstract_state.equal" in
-          (* applies the isomorphism to a1.graph and checks that the result is equal to a2.graph *)
-          let g1 = G.map_vertex fmap a1.graph in
-          g1 = a2.graph
-          (* TODO: is there a better way to check equality between graphs ? *)
+          (* now, iso is the isomorphism between vertex numbers. NB constant vertices are NOT in the map *)
+          (* we check, for every vertex of a1.graph, that its successors and predecessors are isomorphic *)
+          let check_vertex (v1:V.t) : unit =
+            if not (LSet.is_empty (VMap.find v1 a1.vmap))
+            then (* v1 is not a constant node, so it is an entry in iso *)
+              let v2 =
+                try
+                  Hashtbl.find iso v1
+                with
+                  Not_found -> failwith "this should not happen (broken invariant or hashtable iso)"
+              in
+              begin
+                (* we only need to check the successors; the predecessor will be checked because we iterate on all vertex *)
+                match G.succ a1.graph v1 with
+                  [] -> (* if v1 has no successor, then so must have v2 *)
+                  if List.length (G.succ a2.graph v2) > 0 then raise Not_equal
+                      
+                | [succ_v1] ->
+                  begin
+                    if LSet.is_empty (VMap.find succ_v1 a1.vmap)
+                    then
+                      (* veryfy that v2 has a successor that is also a constant vertex*)
+                      match G.succ a2.graph v2 with
+                        [succ_v2] when LSet.is_empty (VMap.find succ_v2 a2.vmap) -> ()
+                      | _ -> raise Not_equal
+                    else
+                      let succ_v2 : V.t =
+                        try
+                          Hashtbl.find iso succ_v1
+                        with
+                          Not_found -> failwith "this should not happen (broken invariant or hashtable iso)"
+                      in
+                      (* simply check for an edge between v2 and succ v_2 *)
+                      if not (G.mem_edge a2.graph v2 succ_v2) then raise Not_equal
+                  end
+                | _ -> failwith "this should not happen (broken invariant)"
+              end
+            else (* if it is a constant node, nothing to do *)
+              ()
+          in
+          G.iter_vertex check_vertex a1.graph; true          
         end
-      else
-        (* if the cardinal is different, there cannot be an isomorphism *)
-        false
-    with
-      Not_equal -> false
+    else
+      (* if the cardinal is different, there cannot be an isomorphism *)
+      false
+  with
+    Not_equal -> false
 
 
 module VPairs =
@@ -542,7 +592,7 @@ let union  (a1:t) (a2:t) :t =
   in
   (* there may be some inconsistancies with constant nodes, so we clean up *)
   let clean_up_constant_successors (v:V.t) (res_a:t) : t =
-    let l_succ = G.succ res_a.graph v in
+    let l_succ = G.succ new_a.graph v in
     if l_succ = []
     then res_a (* nothing to do *)
     else
