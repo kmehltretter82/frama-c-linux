@@ -204,7 +204,15 @@ let addr_of (lv:lval) (x:t) : V.t list * t =
   let (v,x) = find_or_create_vertex lv x in
   G.pred x.graph v, x
 
-
+let remove_cst_vertex (v:V.t) (x:t) : t =
+  assert (LSet.is_empty (VMap.find v x.vmap));
+  {
+    graph = G.remove_vertex x.graph v;
+    pending = VMap.remove v x.pending;
+    lmap = x.lmap;
+    vmap = VMap.remove v x.vmap;
+    cmpt = x.cmpt
+  }
 
 (* let lset_to_string s =
  *   let buffer = Buffer.create 16 in
@@ -231,7 +239,6 @@ let print_dot _ = (* filename (graph:t) = *)
 
 (* merge of two vertices; the first vertex carries both sets, the second is removed from the graph and from lmap and vmap; however, pending is NOT updated  *)
 let merge x v1 v2 =
-  assert_invariants x;
   if (V.equal v1 v2) || not (G.mem_vertex x.graph v1) || not (G.mem_vertex x.graph v2)
   then x
   else
@@ -262,7 +269,6 @@ let merge x v1 v2 =
 
 (* functions join and unify-pointer of steensgaard's paper *)
 let rec join (x:t) (v1:V.t) (v2:V.t) : t =
-  assert_invariants x;
   if (V.equal v1 v2) || not (G.mem_vertex x.graph v1 && G.mem_vertex x.graph v2)
   then
     x
@@ -332,12 +338,24 @@ let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
 (* in Steensgard's paper, this is written settype(v1,ref(v2,bot)) *)
 let set_type (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants x;
-  let new_g = G.add_edge x.graph v1 v2 in
+  (* if v1 points to another node, suppress current outgoing edge (and the node if it is a constant node) *)
+  let g =
+    match G.succ x.graph v1 with
+      [] -> x.graph
+    | [v2] ->
+      (* if v2 is a constant node supress it directly *)
+      if LSet.is_empty (VMap.find v2 x.vmap)
+      then G.remove_vertex x.graph v2
+      else G.remove_edge x.graph v1 v2
+    | _ -> failwith "two many outgoing edges in set_type"
+  in
+  let new_g = G.add_edge g v1 v2 in
   VSet.fold (fun vx x -> join x v1 vx) (try VMap.find v1 x.pending with Not_found -> VSet.empty) {x with graph = new_g}
 
 
 (* assignment x = y *)
 let assignment_x_y (a:t) (x:lval) (y:lval) : t =
+  assert_invariants a;
   let (v1,a) = find_or_create_vertex x a in
   let (v2,a) = find_or_create_vertex y a in
   cjoin a v1 v2
@@ -345,6 +363,7 @@ let assignment_x_y (a:t) (x:lval) (y:lval) : t =
 
 (* assignment x = &y *)
 let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t =
+  assert_invariants a;
   let v1, a = find_or_create_vertex x a in
   let list_v2, a = addr_of y a in
   List.fold_left
@@ -356,6 +375,7 @@ let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t =
 
 (* assignment x = *y *)
 let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
+  assert_invariants a;
   let v1, a = find_or_create_vertex x a in
   let list_v2, a = points_to y a in
   match list_v2 with
@@ -455,6 +475,8 @@ let union  (a1:t) (a2:t) :t =
 
      I am not confident about this function, there are too many potential bugs and inefficiencies
   *)
+  assert_invariants a1;
+  assert_invariants a2;
   let f_v2 x = x + a1.cmpt in
   (* we build the new graph, starting from a1.graph *)
   let g = a1.graph in
@@ -501,6 +523,9 @@ let union  (a1:t) (a2:t) :t =
       (V2Set.empty, a1.lmap)
   in
   let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = a1.cmpt + a2.cmpt } in
+
+  (* step 3 *)
+  let new_a =
   V2Set.fold
     (fun (v1,v2) a ->
        let new_a = merge a v1 v2 in
@@ -508,13 +533,40 @@ let union  (a1:t) (a2:t) :t =
          try VSet.union (VMap.find v1 new_a.pending) (VMap.find v2 new_a.pending)
          with Not_found -> failwith "bug here"
        in
-       (* warning: exploit the fact that v1 is preserved in the merge operation *)
+       (* warning: exploits the fact that v1 is preserved in the merge operation *)
        let new_pending = VMap.add v1 new_vset (VMap.remove v2 new_a.pending) in
        { new_a with pending = new_pending }
     )
     set_to_be_merged
     new_a
-
+  in
+  (* there may be some inconsistancies with constant nodes, so we clean up *)
+  let clean_up_constant_successors (v:V.t) (res_a:t) : t =
+    let l_succ = G.succ res_a.graph v in
+    if l_succ = []
+    then res_a (* nothing to do *)
+    else
+      (* find the only successor that is not a constant node *)
+      let true_succ =
+        List.fold_left
+          (fun res v -> if LSet.is_empty (VMap.find v res_a.vmap) then res else v)
+          (List.hd l_succ)
+          l_succ
+      in
+      (* eliminate all nodes that is not the true successor *)
+      List.fold_left
+        (fun res_a v -> if V.equal v true_succ then res_a else remove_cst_vertex v res_a)
+        res_a
+        l_succ
+  in
+  let new_a =
+    G.fold_vertex
+      clean_up_constant_successors
+      new_a.graph
+      new_a
+  in
+  assert_invariants new_a;
+  new_a
 
 let initial_value :t =
   {graph = G.empty; pending = VMap.empty ; lmap = LMap.empty; vmap = VMap.empty; cmpt = 0}
