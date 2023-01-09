@@ -545,30 +545,24 @@ function createTaintTooltip(): Editor.Extension {
 
 // Server request handler returning the given function's text.
 function useFctText(fct: Fct): text {
-  const req = React.useMemo(() => Server.send(Ast.printFunction, fct), [fct]);
-  const { result } = Dome.usePromise(req);
-  return result ?? null;
+  return States.useRequest(Ast.printFunction, fct) ?? null;
 }
 
 // Server request handler returning the given function's dead code information.
 function useFctDead(fct: Fct): Eva.deadCode {
-  const req = React.useMemo(() => Server.send(Eva.getDeadCode, fct), [fct]);
-  const { result } = Dome.usePromise(req);
-  return result ?? { unreachable: [], nonTerminating: [] };
+  const empty = { unreachable: [], nonTerminating: [] };
+  return States.useRequest(Eva.getDeadCode, fct) ?? empty;
 }
 
 // Server request handler returning the given function's callers.
 function useFctCallers(fct: Fct): Caller[] {
-  const req = React.useMemo(() => Server.send(Eva.getCallers, fct), [fct]);
-  const { result = [] } = Dome.usePromise(req);
-  return result.map(([fct, marker]) => ({ fct, marker }));
+  const callers = States.useRequest(Eva.getCallers, fct) ?? [];
+  return callers.map(([fct, marker]) => ({ fct, marker }));
 }
 
 // Server request handler returning the tainted lvalues.
 function useFctTaints(fct: Fct): Eva.LvalueTaints[] {
-  const req = React.useMemo(() => Server.send(Eva.taintedLvalues, fct), [fct]);
-  const { result = [] } = Dome.usePromise(req);
-  return result;
+  return States.useRequest(Eva.taintedLvalues, fct, { onError: [] }) ?? [];
 }
 
 
