@@ -142,7 +142,7 @@ let assert_invariants (x:t) : unit =
     assert (LSet.fold (fun lv acc -> acc && LMap.mem lv x.lmap) ls true)
   in
   VMap.iter assert_vmap x.vmap
-  
+
 (* find the vertex of an lval *)
 let find_vertex (lv:lval) (x:t) =
   LMap.find lv x.lmap
@@ -426,9 +426,9 @@ let assignment_ptr_x_cst (a:t) (x:lval) : t =
 let equal (_:t) (_:t) = true
 
 (* exception Not_equal
- * 
- * 
- * 
+ *
+ *
+ *
  * let equal (a1:t) (a2:t) =
  *   (\* a1 and a2 are equal iff there is an isomorphism between the two
  *      graphs and their associated maps *\)
@@ -475,7 +475,7 @@ let equal (_:t) (_:t) = true
  *                 match G.succ a1.graph v1 with
  *                   [] -> (\* if v1 has no successor, then so must have v2 *\)
  *                   if List.length (G.succ a2.graph v2) > 0 then raise Not_equal
- *                       
+ *
  *                 | [succ_v1] ->
  *                   begin
  *                     if LSet.is_empty (VMap.find succ_v1 a1.vmap)
@@ -499,7 +499,7 @@ let equal (_:t) (_:t) = true
  *             else (\* if it is a constant node, nothing to do *\)
  *               ()
  *           in
- *           G.iter_vertex check_vertex a1.graph; true          
+ *           G.iter_vertex check_vertex a1.graph; true
  *         end
  *     else
  *       (\* if the cardinal is different, there cannot be an isomorphism *\)
@@ -527,9 +527,9 @@ let rename_all_vertex (x:t) : t =
   let tbl_rename = Hashtbl.create (G.nb_vertex x.graph) in
   let renamed_graph =
     (* rename the graph and write the table *)
-  G.map_vertex 
-    (fun v -> Hashtbl.add tbl_rename v !new_cmpt ; incr new_cmpt; !new_cmpt-1)
-    x.graph
+    G.map_vertex
+      (fun v -> Hashtbl.add tbl_rename v !new_cmpt ; incr new_cmpt; !new_cmpt-1)
+      x.graph
   in
   let r v = Hashtbl.find tbl_rename v in
   let renamed_pending =
@@ -611,19 +611,19 @@ let union  (a1:t) (a2:t) :t =
 
   (* step 3 *)
   let new_a =
-  V2Set.fold
-    (fun (v1,v2) a ->
-       let new_a = merge a v1 v2 in
-       let new_vset  =
-         try VSet.union (VMap.find v1 new_a.pending) (VMap.find v2 new_a.pending)
-         with Not_found -> failwith "bug here"
-       in
-       (* warning: exploits the fact that v1 is preserved in the merge operation *)
-       let new_pending = VMap.add v1 new_vset (VMap.remove v2 new_a.pending) in
-       { new_a with pending = new_pending }
-    )
-    set_to_be_merged
-    new_a
+    V2Set.fold
+      (fun (v1,v2) a ->
+         let new_a = merge a v1 v2 in
+         let new_vset  =
+           try VSet.union (VMap.find v1 new_a.pending) (VMap.find v2 new_a.pending)
+           with Not_found -> failwith "bug here"
+         in
+         (* warning: exploits the fact that v1 is preserved in the merge operation *)
+         let new_pending = VMap.add v1 new_vset (VMap.remove v2 new_a.pending) in
+         { new_a with pending = new_pending }
+      )
+      set_to_be_merged
+      new_a
   in
   (* there may be some inconsistancies with constant nodes, so we clean up *)
   let clean_up_constant_successors (v:V.t) (res_a:t) : t =
@@ -651,7 +651,7 @@ let union  (a1:t) (a2:t) :t =
       new_a
   in
   let new_a =
-    if new_a.cmpt > 2 * (G.nb_vertex new_a.graph) 
+    if new_a.cmpt > 2 * (G.nb_vertex new_a.graph)
     then
       rename_all_vertex new_a
     else
