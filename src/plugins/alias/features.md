@@ -1,17 +1,20 @@
-Liste de ce qui marche
 
 
-Fait:
+
+* Liste de ce qui marche
+
+
+* Fait:
 - abstracct state
 - opérateurs de l'algorithme steensgaard
 - expressions, opérations arithmétiques
 - analyse dataflow, 
 
 
-WIP (à finir avant le 20/01):
+* WIP (à finir avant le 20/01):
 - fonctions
 - API
 
-Pas fait:
+* Pas fait:
 - tableaux/structures
 - pointeurs de fonctions

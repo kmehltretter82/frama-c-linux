@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C plug-in 'Alias' (alias).             *)
 (*                                                                        *)
-(*  Copyright (C) 2022-2022                                               *)
+(*  Copyright (C) 2022-2023                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -687,5 +687,19 @@ type summary = t
 
 let summary_of_state (x:t) = x
 
-
-
+let call (state:t) (args:lval list) (summary:summary) (formals:lval list) :t =
+  (* check that formal variables do no appear in state *)
+  List.iter
+    (fun lv -> assert (not (LMap.mem lv state.lmap)))
+    formals;
+  (* *)
+  let new_state = union state summary in
+  List.fold_left2
+    (fun acc param formal ->
+       let v_param = LMap.find param new_state.lmap in
+       let v_formal = LMap.find formal new_state.lmap in
+       join acc v_param v_formal
+    )
+    new_state
+    args
+    formals
