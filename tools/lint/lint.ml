@@ -53,14 +53,18 @@ let lines_from_in channel =
 (* Supported indent formatter *)
 
 type formatter_cmds =
-  { mutable is_available : bool option ;
-    available_cmd : string ;
+  { mutable is_available: bool option ;
+    kind: string ;
+    name: string ;
+    available_cmd: string ;
     check_cmd: string ;
     update_cmd: string (* leaves it empty if there is no updating command *)
   }
 
 let c_indent_formatter =
   { is_available = None ;
+    kind = "C";
+    name = "clang-format";
     available_cmd = "clang-format --version > /dev/null";
     check_cmd = "clang-format --dry-run -Werror" ;
     update_cmd = "clang-format -i"
@@ -68,12 +72,14 @@ let c_indent_formatter =
 
 let python_indent_formatter =
   { is_available = None ;
+    kind = "Python";
+    name = "black";
     available_cmd = "black --version > /dev/null";
     check_cmd = "black --quiet --line-length 100 --check" ;
     update_cmd = "black --quiet --line-length 100"
   }
 
-type indent_formatter = Ocp_indent | Tool of formatter_cmds
+type indent_formatter = Ocp_indent | Tool of  formatter_cmds
 
 let ml_indent_formatter = Ocp_indent
 
@@ -265,11 +271,14 @@ let check_ml_indent ~update file =
 
 (* C/H *)
 
-let is_formatter_available indent_formatter =
+let is_formatter_available ~file indent_formatter =
   match indent_formatter.is_available with
   | None ->
     let is_available = (0 = Sys.command indent_formatter.available_cmd) in
     indent_formatter.is_available <- Some is_available ;
+    if not is_available then
+      Format.eprintf "Warning: %s is unavailable for checking some %s files (i.e. %s)@."
+        indent_formatter.name indent_formatter.kind file;
     is_available
   | Some is_available -> is_available
 
@@ -287,7 +296,7 @@ let check_indent ~indent_formatter ~update file =
   in match tool with
   | Ocp_indent -> check_ml_indent ~update file
   | Tool indent_formatter ->
-    if not @@ is_formatter_available indent_formatter then true
+    if not @@ is_formatter_available ~file indent_formatter then true
     else if not update then
       0 = Sys.command (Format.sprintf "%s \"%s\"" indent_formatter.check_cmd file)
     else if indent_formatter.update_cmd <> "" then
@@ -374,10 +383,6 @@ let sort argspec =
 (* Main *)
 
 let () =
-  if not @@ is_formatter_available c_indent_formatter then
-    Format.eprintf "clang-format unavailable, I will not check C files@." ;
-  if not @@ is_formatter_available python_indent_formatter then
-    Format.eprintf "black unavailable, I will not check Python files@." ;
   Arg.parse
     (Arg.align (sort argspec))
     (fun s -> Format.eprintf "Unknown argument: %s" s)
