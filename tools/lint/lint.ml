@@ -50,11 +50,39 @@ let lines_from_in channel =
   List.rev acc
 
 (**************************************************************************)
+(* Supported indent formatter *)
+
+type formatter_cmds =
+  { mutable is_available : bool option ;
+    available_cmd : string ;
+    check_cmd: string ;
+    update_cmd: string
+  }
+
+let c_indent_formatter =
+  { is_available = None ;
+    available_cmd = "clang-format --version > /dev/null";
+    check_cmd = "clang-format --dry-run -Werror" ;
+    update_cmd = "clang-format -i"
+  }
+
+type indent_formatter = Ocp_indent | Tool of formatter_cmds
+
+let ml_indent_formatter = Ocp_indent
+
+let parse_indent_formatter = function
+  | "unset" | "set" | "default" | "" -> None
+  | "ocp-indent" -> Some ml_indent_formatter
+  | "clang-format" -> Some (Tool c_indent_formatter)
+  | s -> Format.eprintf "Unsupported tool: %s@." s ; None
+
+(**************************************************************************)
 (* Available Checks and corresponding attributes *)
 
 type checks =
   { eoleof : bool
   ; indent : bool
+  ; indent_formatter : indent_formatter option
   ; syntax : bool
   ; utf8 : bool
   }
@@ -62,22 +90,25 @@ type checks =
 let no_checks =
   { eoleof = false
   ; indent = false
+  ; indent_formatter = None (* the default one *)
   ; syntax = false
   ; utf8 = false
   }
 
 let add_attr checks attr value =
-  let value = value = "set" in
+  let is_set v = v = "set" in
   match attr with
-  | "check-eoleof" -> { checks with eoleof = value }
-  | "check-indent" -> { checks with indent = value }
-  | "check-syntax" -> { checks with syntax = value }
-  | "check-utf8"   -> { checks with utf8 = value }
+  | "check-eoleof" -> { checks with eoleof = is_set value }
+  | "check-indent" -> { checks with indent = is_set value }
+  | "check-syntax" -> { checks with syntax = is_set value }
+  | "check-utf8"   -> { checks with utf8 = is_set value }
+  | "indent-formatter" -> { checks with indent_formatter = parse_indent_formatter value }
   | _ -> failwith (Format.sprintf "Unknown attr %s" attr)
 
 let handled_attr s =
   s = "check-eoleof" || s = "check-indent" ||
-  s = "check-syntax" || s = "check-utf8"
+  s = "check-syntax" || s = "check-utf8" ||
+  s = "indent-formatter"
 
 let ignored_attr s =
   not (handled_attr s)
@@ -219,28 +250,31 @@ let check_ml_indent ~update file =
 
 (* C/H *)
 
-let clang_format_available = ref None
-let clang_format_available () =
-  match !clang_format_available with
+let is_formatter_available indent_formatter =
+  match indent_formatter.is_available with
   | None ->
-    clang_format_available :=
-      Some (0 = Sys.command "clang-format --version > /dev/null") ;
-    Option.get !clang_format_available
-  | Some available -> available
-
-let check_c_indent ~update file =
-  if not @@ clang_format_available () then true
-  else
-    let opt = if update then "-i" else "--dry-run -Werror" in
-    0 = Sys.command (Format.sprintf "clang-format %s \"%s\"" opt file)
+    let is_available = (0 = Sys.command indent_formatter.available_cmd) in
+    indent_formatter.is_available <- Some is_available ;
+    is_available
+  | Some is_available -> is_available
 
 exception Bad_ext
 
-let check_indent ~update file =
-  match Filename.extension file with
-  | ".c" | ".h" -> check_c_indent ~update file
-  | ".ml" | ".mli" -> check_ml_indent ~update file
-  | _ -> raise Bad_ext
+let check_indent ~tool ~update file =
+  let tool = match tool with
+    | Some tool -> tool
+    | None -> (* uses the default formatter *)
+      match Filename.extension file with
+      | ".c" | ".h" -> Tool c_indent_formatter
+      | ".ml" | ".mli" -> ml_indent_formatter
+      | _ -> raise Bad_ext
+  in match tool with
+  | Ocp_indent -> check_ml_indent ~update file
+  | Tool indent_formatter ->
+    if not @@ is_formatter_available indent_formatter then true
+    else
+      let cmd = if update then indent_formatter.update_cmd else indent_formatter.check_cmd in
+      0 = Sys.command (Format.sprintf "%s \"%s\"" cmd file)
 
 let res = ref true
 
@@ -249,7 +283,7 @@ let res = ref true
 let check ~verbose ~update file params =
   if verbose then
     Format.printf "Checking %s@." file ;
-  if Sys.is_directory file then ()
+  if Sys .is_directory file then ()
   else begin
     let in_chan = open_in file in
     let content = read_buffered in_chan in
@@ -290,7 +324,7 @@ let check ~verbose ~update file params =
     (* Indentation *)
     try
       if params.indent then
-        if not @@ check_indent ~update file then begin
+        if not @@ check_indent ~tool:params.indent_formatter ~update file then begin
           Format.eprintf "Bad indentation for %s@." file ;
           res := false
         end ;
@@ -318,7 +352,7 @@ let sort argspec =
 (* Main *)
 
 let () =
-  if not @@ clang_format_available () then
+  if not @@ is_formatter_available c_indent_formatter then
     Format.eprintf "clang-format unavailable, I will not check C files@." ;
   Arg.parse
     (Arg.align (sort argspec))
