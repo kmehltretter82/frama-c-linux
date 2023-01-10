@@ -66,6 +66,13 @@ let c_indent_formatter =
     update_cmd = "clang-format -i"
   }
 
+let python_indent_formatter =
+  { is_available = None ;
+    available_cmd = "black --version > /dev/null";
+    check_cmd = "black --quiet --line-length 100 --check" ;
+    update_cmd = "black --quiet --line-length 100"
+  }
+
 type indent_formatter = Ocp_indent | Tool of formatter_cmds
 
 let ml_indent_formatter = Ocp_indent
@@ -77,6 +84,7 @@ let parse_indent_formatter = function
   | "set"   -> Check None (* use the default formatter *)
   | "ocp-indent" -> Check (Some ml_indent_formatter)
   | "clang-format" -> Check (Some (Tool c_indent_formatter))
+  | "black" -> Check (Some (Tool python_indent_formatter))
   | s -> Format.eprintf "Unsupported tool: %s@." s ; NoCheck
 
 (**************************************************************************)
@@ -266,6 +274,7 @@ let check_indent ~indent_formatter ~update file =
       match Filename.extension file with
       | ".c" | ".h" -> Tool c_indent_formatter
       | ".ml" | ".mli" -> ml_indent_formatter
+      | ".py" -> Tool python_indent_formatter
       | _ -> raise Bad_ext
   in match tool with
   | Ocp_indent -> check_ml_indent ~update file
@@ -357,6 +366,8 @@ let sort argspec =
 let () =
   if not @@ is_formatter_available c_indent_formatter then
     Format.eprintf "clang-format unavailable, I will not check C files@." ;
+  if not @@ is_formatter_available python_indent_formatter then
+    Format.eprintf "black unavailable, I will not check Python files@." ;
   Arg.parse
     (Arg.align (sort argspec))
     (fun s -> Format.eprintf "Unknown argument: %s" s)

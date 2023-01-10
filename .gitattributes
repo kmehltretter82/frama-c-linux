@@ -47,6 +47,13 @@ Changelog merge=union
 # note: "check-syntax" includes already "check-eoleof"
 *.ml  check-syntax check-indent -check-eoleof
 *.mli check-syntax check-indent -check-eoleof
+*.py  check-indent check-eoleof
+
+# linting exceptions
+share/analysis-scripts/benchmark_database.py -check-indent
+share/analysis-scripts/summary.py -check-indent
+share/analysis-scripts/results_display.py -check-indent
+src/plugins/e-acsl/examples/ensuresec/**/*.py -check-indent
 
 ## Unset "-check-eoleof"
 

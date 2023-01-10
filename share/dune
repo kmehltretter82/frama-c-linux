@@ -320,7 +320,6 @@
 (analysis-scripts/fc_stubs.c as lib/analysis-scripts/fc_stubs.c)
 (analysis-scripts/list_functions.ml as lib/analysis-scripts/list_functions.ml)
 (analysis-scripts/prologue.mk as lib/analysis-scripts/prologue.mk)
-(analysis-scripts/pyproject.toml as lib/analysis-scripts/pyproject.toml)
 (analysis-scripts/readme-graph.graphml as lib/analysis-scripts/readme-graph.graphml)
 (analysis-scripts/readme-graph.svg as lib/analysis-scripts/readme-graph.svg)
 (analysis-scripts/README.md as lib/analysis-scripts/README.md)
