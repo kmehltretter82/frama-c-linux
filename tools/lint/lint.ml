@@ -56,7 +56,7 @@ type formatter_cmds =
   { mutable is_available : bool option ;
     available_cmd : string ;
     check_cmd: string ;
-    update_cmd: string
+    update_cmd: string (* leaves it empty if there is no updating command *)
   }
 
 let c_indent_formatter =
@@ -290,7 +290,9 @@ let check_indent ~indent_formatter ~update file =
     if not @@ is_formatter_available indent_formatter then true
     else if not update then
       0 = Sys.command (Format.sprintf "%s \"%s\"" indent_formatter.check_cmd file)
-    else 0 = Sys.command (Format.sprintf "%s \"%s\"" indent_formatter.update_cmd file)
+    else if indent_formatter.update_cmd <> "" then
+      0 = Sys.command (Format.sprintf "%s \"%s\"" indent_formatter.update_cmd file)
+    else true (* there no updating command *)
 
 let res = ref true
 
