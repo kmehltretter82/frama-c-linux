@@ -167,6 +167,8 @@ struct
     | Local_init(v,AssignInit i,_) ->
       let new_a = do_init v i a in
       new_a
+    | Code_annot _ -> a
+    | Skip _ -> a
     | _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
 
   let doGuard _ _ a =

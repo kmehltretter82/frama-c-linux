@@ -2,8 +2,6 @@
 [alias] Parsing done
 [alias] Skipping assignment odata[idx] = 0.5 * idata[idx] (not implemented)
 [alias] Skipping assignment odata[idx] = 0.5 * idata[idx] (not implemented)
-[alias] Skipping assignment idx = idx + 1 (not implemented)
-[alias] Skipping assignment idx = idx + 1 (not implemented)
 [alias] Functions done
 After statement while (1) {
                   idx = 0;
