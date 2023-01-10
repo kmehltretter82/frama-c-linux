@@ -27,6 +27,7 @@ GNUmakefile template): it parses the output and suggests useful commands
 whenever it can, by calling frama-c-script itself."""
 
 import argparse
+import collections
 import os
 import re
 import subprocess
@@ -79,27 +80,38 @@ output_lines = []
 cmd_list = [make_cmd, "-C", make_dir] + args
 with subprocess.Popen(cmd_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as proc:
     while True:
-        line = proc.stdout.readline()
-        if line:
-            sys.stdout.buffer.write(line)
+        assert proc.stdout is not None  # for mypy
+        line_bytes = proc.stdout.readline()
+        if line_bytes:
+            sys.stdout.buffer.write(line_bytes)
             sys.stdout.flush()
-            output_lines.append(line.decode("utf-8"))
+            output_lines.append(line_bytes.decode("utf-8"))
         else:
             break
 
-re_missing_spec = re.compile("Neither code nor (specification|[^ ]+ assigns clause) for function ([^,]+),")
+re_missing_spec = re.compile(
+    "Neither code nor (specification|[^ ]+ assigns clause) for function ([^,]+),"
+)
 re_recursive_call_start = re.compile("detected recursive call")
 re_recursive_call_stack_start = re.compile(r"^\s+stack:")
 re_recursive_call_stack_end = re.compile(r"^\[")
 
-tips = []
+
+class Tip:
+    def __init__(self, message: str, action: collections.abc.Callable):
+        self.message = message
+        self.action = action
+
+
+tips: list[Tip] = []
 
 lines = iter(output_lines)
 for line in lines:
     match = re_recursive_call_start.search(line)
     if match:
 
-        def _action():
+        def _action(callstack):
+            print(callstack)
             print(
                 "Consider patching, stubbing or adding an ACSL "
                 + "specification to the recursive call, "
@@ -123,11 +135,7 @@ for line in lines:
                     line = next(lines)
                     match = re_recursive_call_stack_end.search(line)
                 # note: this ending line can also match re_missing_spec
-                tip = {
-                    "message": "Found recursive call at:\n" + "".join(msg_lines),
-                    "action": _action,
-                }
-                tips.append(tip)
+                tips.append(Tip("Found recursive call at:", partial(_action, "".join(msg_lines))))
                 break
             except StopIteration:
                 print("** Error: did not match expected regex before EOF")
@@ -174,16 +182,13 @@ for line in lines:
             print("Could not find any files defining " + fname + ".")
             print("Find the sources defining it and add them, " + "or provide a stub.")
 
-        tip = {
-            "message": "Found function with missing "
-            + spec_kind
-            + ": "
-            + fname
-            + "\n"
-            + "   Looking for files defining it...",
-            "action": partial(_action, fname),
-        }
-        tips.append(tip)
+        tips.append(
+            Tip(
+                f"Found function with missing {spec_kind}: {fname}\n"
+                + "   Looking for files defining it...",
+                partial(_action, fname),
+            )
+        )
 
 if tips != []:
     print("")
@@ -196,6 +201,6 @@ if tips != []:
         if counter > 1:
             print("")
             print("*** recommendation #" + str(counter) + " ***")
-        print(str(counter) + ". " + tip["message"])
+        print(str(counter) + ". " + str(tip.message))
         counter += 1
-        tip["action"]()
+        tip.action()

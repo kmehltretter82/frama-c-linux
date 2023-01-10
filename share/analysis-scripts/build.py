@@ -40,6 +40,8 @@ import subprocess
 import function_finder
 import source_filter
 
+from typing import Callable, TypeVar
+
 script_dir = os.path.dirname(sys.argv[0])
 
 # Command-line parsing ########################################################
@@ -114,21 +116,21 @@ dot_framac_dir = Path(".frama-c")
 
 # Check required environment variables and commands in the PATH ###############
 
-framac_bin = os.getenv("FRAMAC_BIN")
-if not framac_bin:
+framac_bin_str = os.getenv("FRAMAC_BIN")
+if not framac_bin_str:
     sys.exit("error: FRAMAC_BIN not in environment (set by frama-c-script)")
-framac_bin = Path(framac_bin)
+framac_bin = Path(framac_bin_str)
 
 under_test = os.getenv("PTESTS_TESTING")
 
 # Prepare blug-related variables and functions ################################
 
-blug = os.getenv("BLUG")
-if not blug:
-    blug = shutil.which("blug")
-    if not blug:
+blug_str = os.getenv("BLUG")
+if not blug_str:
+    blug_str = shutil.which("blug")
+    if not blug_str:
         sys.exit("error: path to 'blug' binary must be in PATH or variable BLUG")
-blug = Path(blug)
+blug = Path(blug_str)
 blug_dir = blug.resolve().parent
 # to import blug_jbdb
 sys.path.insert(0, blug_dir.as_posix())
@@ -139,20 +141,20 @@ from blug_jbdb import prettify
 # Auxiliary functions #########################################################
 
 
-def call_and_get_output(command_and_args):
+def call_and_get_output(command: Path, args: list[str]) -> str:
     try:
-        return subprocess.check_output(command_and_args, stderr=subprocess.STDOUT).decode()
+        return subprocess.check_output([str(command)] + args, stderr=subprocess.STDOUT).decode()
     except subprocess.CalledProcessError as e:
-        sys.exit(f"error running command: {command_and_args}\n{e}")
+        sys.exit(f"error running command: {command} {args}\n{e}")
 
 
-def ask_if_overwrite(path):
+def ask_if_overwrite(path: Path) -> None:
     yn = input(f"warning: {path} already exists. Overwrite? [y/N] ")
     if yn == "" or not (yn[0] == "Y" or yn[0] == "y"):
         sys.exit("Exiting without overwriting.")
 
 
-def insert_lines_after(lines, line_pattern, new_lines):
+def insert_lines_after(lines: list[str], line_pattern: str, new_lines: list[str]) -> None:
     re_line = re.compile(line_pattern)
     for i, line in enumerate(lines):
         if re_line.search(line):
@@ -163,7 +165,7 @@ def insert_lines_after(lines, line_pattern, new_lines):
 
 
 # delete the first occurrence of [line_pattern]
-def delete_line(lines, line_pattern):
+def delete_line(lines: list[str], line_pattern: str) -> None:
     re_line = re.compile(line_pattern)
     for i, line in enumerate(lines):
         if re_line.search(line):
@@ -172,7 +174,7 @@ def delete_line(lines, line_pattern):
     sys.exit(f"error: no lines found matching pattern: {line_pattern}")
 
 
-def replace_line(lines, line_pattern, value, all_occurrences=False):
+def replace_line(lines: list[str], line_pattern: str, value: str, all_occurrences=False) -> None:
     replaced = False
     re_line = re.compile(line_pattern)
     for i, line in enumerate(lines):
@@ -187,28 +189,28 @@ def replace_line(lines, line_pattern, value, all_occurrences=False):
 
 
 # replaces '/' and '.' with '_' so that a valid target name is created
-def make_target_name(target):
-    return prettify(target).replace("/", "_").replace(".", "_")
+def make_target_name(target: Path) -> str:
+    return prettify(str(target)).replace("/", "_").replace(".", "_")
 
 
 # sources are pretty-printed relatively to the .frama-c directory, where the
 # GNUmakefile will reside
-def rel_prefix(path):
-    return path if os.path.isabs(path) else os.path.relpath(path, start=dot_framac_dir)
+def rel_prefix(path: Path) -> str:
+    return str(path) if os.path.isabs(path) else os.path.relpath(path, start=dot_framac_dir)
 
 
-def pretty_sources(sources):
+def pretty_sources(sources: list[Path]) -> list[str]:
     return [f"  {rel_prefix(source)} \\" for source in sources]
 
 
-def lines_of_file(path):
+def lines_of_file(path: Path) -> list[str]:
     return path.read_text().splitlines()
 
 
 fc_stubs_copied = False
 
 
-def copy_fc_stubs():
+def copy_fc_stubs() -> Path:
     global fc_stubs_copied
     dest = dot_framac_dir / "fc_stubs.c"
     if not fc_stubs_copied:
@@ -230,7 +232,7 @@ def copy_fc_stubs():
 # Returns pairs (line_number, has_args) for each likely definition of
 # [funcname] in [filename].
 # [has_args] is used to distinguish between main(void) and main(int, char**).
-def find_definitions(funcname, filename):
+def find_definitions(funcname: str, filename: str) -> list[tuple[str, bool]]:
     file_content = source_filter.open_and_filter(filename, not under_test)
     file_lines = file_content.splitlines(keepends=True)
     newlines = function_finder.compute_newline_offsets(file_lines)
@@ -251,20 +253,23 @@ def find_definitions(funcname, filename):
     return res
 
 
-def list_partition(f, l):
+T = TypeVar("T")
+
+
+def list_partition(f: Callable[[T], bool], l: list[T]) -> tuple[list[T], list[T]]:
     """Equivalent to OCaml's List.partition: returns 2 lists with the elements of l,
     partitioned according to predicate f."""
     l1 = []
     l2 = []
     for e in l:
-        if f(l):
+        if f(e):
             l1.append(e)
         else:
             l2.append(e)
     return l1, l2
 
 
-def pp_list(l):
+def pp_list(l: list[str]) -> list[str]:
     """Applies prettify to a list of sources/targets and sorts the result."""
     return sorted([prettify(e) for e in l])
 
@@ -342,7 +347,7 @@ if unknown_sources:
 # We also need to check if the main function uses a 'main(void)'-style
 # signature, to patch fc_stubs.c.
 
-main_definitions = {}
+main_definitions: dict[Path, list[tuple[Path, str, bool]]] = {}
 for target, sources in sources_map.items():
     main_definitions[target] = []
     for source in sources:
@@ -369,7 +374,7 @@ if not dot_framac_dir.is_dir():
     logging.debug("creating %s", dot_framac_dir)
     dot_framac_dir.mkdir(parents=True, exist_ok=False)
 
-fc_config = json.loads(call_and_get_output([framac_bin / "frama-c", "-print-config-json"]))
+fc_config = json.loads(call_and_get_output(framac_bin / "frama-c", ["-print-config-json"]))
 lib_dir = Path(fc_config["lib_dir"])
 
 # copy fc_stubs if at least one main function has arguments

@@ -172,7 +172,7 @@ with open(framac_share / "compliance" / "posix_identifiers.json", encoding="utf-
     posix_identifiers = all_data["data"]
     posix_headers = all_data["headers"]
 
-recursive_cycles = []
+recursive_cycles: list[tuple[tuple[str, int], list[tuple[str, str]]]] = []
 reported_recursive_pairs = set()
 build_callgraph.compute_recursive_cycles(cg, recursive_cycles)
 for (cycle_start_loc, cycle) in recursive_cycles:
@@ -191,8 +191,8 @@ for (cycle_start_loc, cycle) in recursive_cycles:
         pretty_cycle += f" -> {y}"
     print(f"[recursion] found recursive cycle near {filename}:{line}: {pretty_cycle}")
 
-callees = [callee for (_, callee) in list(cg.edges.keys())]
-callees = set(callees)
+callees_list = [callee for (_, callee) in list(cg.edges.keys())]
+callees = set(callees_list)
 used_headers = set()
 print(f"Estimating difficulty for {len(callees)} function calls...")
 warnings = 0

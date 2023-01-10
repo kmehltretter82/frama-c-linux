@@ -35,7 +35,7 @@ def dict_factory(cursor, row):
 
 
 class Database:
-    inserted_targets = {}
+    inserted_targets : dict[str, bool] = {}
 
     def __init__(self, benchmark_tag, benchmark_comment, gitdir, analyzer_rev, reference_rev):
         self.benchmark_tag = benchmark_tag
