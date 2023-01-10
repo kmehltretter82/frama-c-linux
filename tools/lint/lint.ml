@@ -70,27 +70,28 @@ type indent_formatter = Ocp_indent | Tool of formatter_cmds
 
 let ml_indent_formatter = Ocp_indent
 
+type indent_check = NoCheck | Check of indent_formatter option
+
 let parse_indent_formatter = function
-  | "unset" | "set" | "default" | "" -> None
-  | "ocp-indent" -> Some ml_indent_formatter
-  | "clang-format" -> Some (Tool c_indent_formatter)
-  | s -> Format.eprintf "Unsupported tool: %s@." s ; None
+  | "unset" -> NoCheck
+  | "set"   -> Check None (* use the default formatter *)
+  | "ocp-indent" -> Check (Some ml_indent_formatter)
+  | "clang-format" -> Check (Some (Tool c_indent_formatter))
+  | s -> Format.eprintf "Unsupported tool: %s@." s ; NoCheck
 
 (**************************************************************************)
 (* Available Checks and corresponding attributes *)
 
 type checks =
   { eoleof : bool
-  ; indent : bool
-  ; indent_formatter : indent_formatter option
+  ; indent : indent_check
   ; syntax : bool
   ; utf8 : bool
   }
 
 let no_checks =
   { eoleof = false
-  ; indent = false
-  ; indent_formatter = None (* the default one *)
+  ; indent = NoCheck
   ; syntax = false
   ; utf8 = false
   }
@@ -99,16 +100,14 @@ let add_attr checks attr value =
   let is_set v = v = "set" in
   match attr with
   | "check-eoleof" -> { checks with eoleof = is_set value }
-  | "check-indent" -> { checks with indent = is_set value }
+  | "check-indent" -> { checks with indent = parse_indent_formatter value }
   | "check-syntax" -> { checks with syntax = is_set value }
   | "check-utf8"   -> { checks with utf8 = is_set value }
-  | "indent-formatter" -> { checks with indent_formatter = parse_indent_formatter value }
   | _ -> failwith (Format.sprintf "Unknown attr %s" attr)
 
 let handled_attr s =
   s = "check-eoleof" || s = "check-indent" ||
-  s = "check-syntax" || s = "check-utf8" ||
-  s = "indent-formatter"
+  s = "check-syntax" || s = "check-utf8"
 
 let ignored_attr s =
   not (handled_attr s)
@@ -260,8 +259,8 @@ let is_formatter_available indent_formatter =
 
 exception Bad_ext
 
-let check_indent ~tool ~update file =
-  let tool = match tool with
+let check_indent ~indent_formatter ~update file =
+  let tool = match indent_formatter with
     | Some tool -> tool
     | None -> (* uses the default formatter *)
       match Filename.extension file with
@@ -323,11 +322,15 @@ let check ~verbose ~update file params =
     end ;
     (* Indentation *)
     try
-      if params.indent then
-        if not @@ check_indent ~tool:params.indent_formatter ~update file then begin
-          Format.eprintf "Bad indentation for %s@." file ;
-          res := false
-        end ;
+      begin
+        match params.indent with
+        | NoCheck -> ()
+        | Check indent_formatter ->
+          if not @@ check_indent ~indent_formatter ~update file then begin
+            Format.eprintf "Bad indentation for %s@." file ;
+            res := false
+          end ;
+      end ;
     with Bad_ext ->
       Format.eprintf "Don't know how to (check) indent %s@." file ;
       res := false
