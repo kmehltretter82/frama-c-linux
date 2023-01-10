@@ -3360,7 +3360,7 @@ class cil_printer () = object (self)
        | LBterm def ->
          (match li.l_labels with | [ l ] -> current_label <- l | _ -> ());
          fprintf fmt "=@]@ %a;"
-           self#term def);
+           (self#term_prec Precedence.binderLevel) def);
       fprintf fmt "@]@\n";
       current_label <- old_lab
     | Dvolatile(tsets,rvi_opt,wvi_opt,_attr, _) ->

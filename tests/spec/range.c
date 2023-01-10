@@ -1,6 +1,9 @@
 /* run.config
 OPT: -print -ocode @PTEST_NAME@_reparse.c -then @PTEST_NAME@_reparse.c -print -ocode=""
 */
+
+//@ logic set<integer>range(integer x, integer y) = (x .. y);
+
 struct foo { char bar[4]; };
 
 /*@ assigns x->bar[0..3] \from x->bar[0..3]; */
