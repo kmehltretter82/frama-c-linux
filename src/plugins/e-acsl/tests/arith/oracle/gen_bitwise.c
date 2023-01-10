@@ -612,7 +612,7 @@ void g_signed(int a, int b)
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__16));
     __gen_e_acsl_assert_data_16.blocking = 1;
     __gen_e_acsl_assert_data_16.kind = "Assertion";
-    __gen_e_acsl_assert_data_16.pred_txt = "((18446744073709551615ULL + 1) | ((-9223372036854775807LL - 1LL) - 1)) != 0";
+    __gen_e_acsl_assert_data_16.pred_txt = "(18446744073709551615ULL + 1 | (-9223372036854775807LL - 1LL) - 1) != 0";
     __gen_e_acsl_assert_data_16.file = "bitwise.c";
     __gen_e_acsl_assert_data_16.fct = "g_signed";
     __gen_e_acsl_assert_data_16.line = 49;
@@ -627,8 +627,7 @@ void g_signed(int a, int b)
   }
   /*@
   assert
-  ((18446744073709551615ULL + 1) | ((-9223372036854775807LL - 1LL) - 1)) != 0;
-   */
+  (18446744073709551615ULL + 1 | (-9223372036854775807LL - 1LL) - 1) != 0; */
   ;
   {
     __e_acsl_mpz_t __gen_e_acsl__17;
@@ -664,7 +663,7 @@ void g_signed(int a, int b)
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_bxor));
     __gen_e_acsl_assert_data_17.blocking = 1;
     __gen_e_acsl_assert_data_17.kind = "Assertion";
-    __gen_e_acsl_assert_data_17.pred_txt = "((18446744073709551615ULL + 1) & ((-9223372036854775807LL - 1LL) - 1)) !=\n((18446744073709551615ULL + 1) ^ ((-9223372036854775807LL - 1LL) - 1))";
+    __gen_e_acsl_assert_data_17.pred_txt = "(18446744073709551615ULL + 1 & (-9223372036854775807LL - 1LL) - 1) !=\n(18446744073709551615ULL + 1 ^ (-9223372036854775807LL - 1LL) - 1)";
     __gen_e_acsl_assert_data_17.file = "bitwise.c";
     __gen_e_acsl_assert_data_17.fct = "g_signed";
     __gen_e_acsl_assert_data_17.line = 50;
@@ -679,8 +678,8 @@ void g_signed(int a, int b)
   }
   /*@
   assert
-  ((18446744073709551615ULL + 1) & ((-9223372036854775807LL - 1LL) - 1)) !=
-  ((18446744073709551615ULL + 1) ^ ((-9223372036854775807LL - 1LL) - 1)); */
+  (18446744073709551615ULL + 1 & (-9223372036854775807LL - 1LL) - 1) !=
+  (18446744073709551615ULL + 1 ^ (-9223372036854775807LL - 1LL) - 1); */
   ;
   return;
 }
@@ -1084,7 +1083,7 @@ void g_unsigned(unsigned int a, unsigned int b)
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__15));
     __gen_e_acsl_assert_data_16.blocking = 1;
     __gen_e_acsl_assert_data_16.kind = "Assertion";
-    __gen_e_acsl_assert_data_16.pred_txt = "((18446744073709551615ULL + 1u) | 1u) != 0";
+    __gen_e_acsl_assert_data_16.pred_txt = "(18446744073709551615ULL + 1u | 1u) != 0";
     __gen_e_acsl_assert_data_16.file = "bitwise.c";
     __gen_e_acsl_assert_data_16.fct = "g_unsigned";
     __gen_e_acsl_assert_data_16.line = 64;
@@ -1095,7 +1094,7 @@ void g_unsigned(unsigned int a, unsigned int b)
     __gmpz_clear(__gen_e_acsl_bor);
     __gmpz_clear(__gen_e_acsl__15);
   }
-  /*@ assert ((18446744073709551615ULL + 1u) | 1u) != 0; */ ;
+  /*@ assert (18446744073709551615ULL + 1u | 1u) != 0; */ ;
   {
     __e_acsl_mpz_t __gen_e_acsl__16;
     __e_acsl_mpz_t __gen_e_acsl__17;
@@ -1123,7 +1122,7 @@ void g_unsigned(unsigned int a, unsigned int b)
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_bxor));
     __gen_e_acsl_assert_data_17.blocking = 1;
     __gen_e_acsl_assert_data_17.kind = "Assertion";
-    __gen_e_acsl_assert_data_17.pred_txt = "((18446744073709551615ULL + 1u) & 1u) !=\n((18446744073709551615ULL + 1u) ^ 1u)";
+    __gen_e_acsl_assert_data_17.pred_txt = "(18446744073709551615ULL + 1u & 1u) != (18446744073709551615ULL + 1u ^ 1u)";
     __gen_e_acsl_assert_data_17.file = "bitwise.c";
     __gen_e_acsl_assert_data_17.fct = "g_unsigned";
     __gen_e_acsl_assert_data_17.line = 65;
@@ -1136,8 +1135,8 @@ void g_unsigned(unsigned int a, unsigned int b)
   }
   /*@
   assert
-  ((18446744073709551615ULL + 1u) & 1u) !=
-  ((18446744073709551615ULL + 1u) ^ 1u); */
+  (18446744073709551615ULL + 1u & 1u) != (18446744073709551615ULL + 1u ^ 1u);
+   */
   ;
   return;
 }
