@@ -79,13 +79,15 @@ let ml_indent_formatter = Ocp_indent
 
 type indent_check = NoCheck | Check of indent_formatter option
 
-let parse_indent_formatter = function
+let parse_indent_formatter ~file ~attr ~value = match value with
   | "unset" -> NoCheck
   | "set"   -> Check None (* use the default formatter *)
   | "ocp-indent" -> Check (Some ml_indent_formatter)
   | "clang-format" -> Check (Some (Tool c_indent_formatter))
   | "black" -> Check (Some (Tool python_indent_formatter))
-  | s -> Format.eprintf "Unsupported tool: %s@." s ; NoCheck
+  | _ -> Format.eprintf "Unsupported indent formatter: %s %s=%s@."
+           file attr value;
+    NoCheck
 
 (**************************************************************************)
 (* Available Checks and corresponding attributes *)
@@ -104,14 +106,19 @@ let no_checks =
   ; utf8 = false
   }
 
-let add_attr checks attr value =
-  let is_set v = v = "set" in
+let add_attr ~file ~attr ~value checks =
+  let is_set = function
+    | "set" -> true
+    | "unset" -> false
+    | _ -> failwith (Format.sprintf "Invalid attribute value: %s %s=%s" file attr value)
+  in
   match attr with
   | "check-eoleof" -> { checks with eoleof = is_set value }
-  | "check-indent" -> { checks with indent = parse_indent_formatter value }
   | "check-syntax" -> { checks with syntax = is_set value }
   | "check-utf8"   -> { checks with utf8 = is_set value }
-  | _ -> failwith (Format.sprintf "Unknown attr %s" attr)
+  | "check-indent" -> { checks with
+                        indent = parse_indent_formatter ~file ~attr ~value }
+  | _ -> failwith (Format.sprintf "Unknown attribute: %s %s=%s" file attr value)
 
 let handled_attr s =
   s = "check-eoleof" || s = "check-indent" ||
@@ -134,10 +141,11 @@ let rec collect = function
     collect tl
   | file :: attr :: value :: tl ->
     let checks = get file in
-    Hashtbl.replace table file (add_attr checks attr value) ;
+    Hashtbl.replace table file (add_attr ~file ~attr ~value checks) ;
     collect tl
   | [] -> ()
-  | l -> List.iter (Format.eprintf "Could not load file list %s@.") l
+  | [ file ; attr ] -> Format.eprintf "Missing attribute value: %s %s=?@." file attr
+  | [ file ] -> Format.eprintf "Missing attribute name for file: %s@." file
 
 (**************************************************************************)
 (* Functions used to check lint *)
@@ -280,9 +288,9 @@ let check_indent ~indent_formatter ~update file =
   | Ocp_indent -> check_ml_indent ~update file
   | Tool indent_formatter ->
     if not @@ is_formatter_available indent_formatter then true
-    else
-      let cmd = if update then indent_formatter.update_cmd else indent_formatter.check_cmd in
-      0 = Sys.command (Format.sprintf "%s \"%s\"" cmd file)
+    else if not update then
+      0 = Sys.command (Format.sprintf "%s \"%s\"" indent_formatter.check_cmd file)
+    else 0 = Sys.command (Format.sprintf "%s \"%s\"" indent_formatter.update_cmd file)
 
 let res = ref true
 
