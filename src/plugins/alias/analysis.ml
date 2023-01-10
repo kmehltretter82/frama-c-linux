@@ -203,9 +203,28 @@ let doFunction (kf:kernel_function) =
     List.iter (fun stmt -> T.StmtStartData.add stmt (Some Abstract_state.initial_value)) first_stmts;
     F.compute first_stmts
 
-let make_summary  _ =
-  failwith "make_summary not implemented"
 
+let make_summary (state:Abstract_state.t) (kf:kernel_function) =
+  try
+    begin
+      match Function_table.find kf with
+        Some s -> (state, s)
+      | None -> failwith "not implemented"
+    end
+  with
+    Not_found ->
+    begin
+      doFunction kf;
+      let return_stmt = Kernel_function.find_return kf in
+      let final_state : Abstract_state.t option = try Stmt_table.find return_stmt with Not_found -> None in
+      let summary: Abstract_state.summary =
+        match final_state with
+          Some s -> Abstract_state.summary_of_state s
+        | None ->  Abstract_state.summary_of_state Abstract_state.initial_value
+      in
+      Function_table.add kf (Some summary);
+      (state, summary)
+    end
 
 let computed_flag = ref false
 

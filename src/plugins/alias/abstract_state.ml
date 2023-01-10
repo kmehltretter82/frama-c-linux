@@ -683,7 +683,9 @@ let make_top (x:t) : t =
     {graph = g ; pending = p ; lmap = lmap ; vmap = vmap ; cmpt = 1}
 
 (** a type for summaries of functions *)
-type summary = float (* final type may be different *)
+type summary = t
+
+let summary_of_state (x:t) = x
 
 
 

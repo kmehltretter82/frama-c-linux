@@ -90,3 +90,5 @@ val make_top : t -> t
 
 (** Type denoting summaries of functions *)
 type summary
+
+val summary_of_state : t -> summary
