@@ -7,33 +7,39 @@
   A ∈ {0}
   B ∈ {0}
 [eva] computing for function ct <- main.
-  Called from attribute-aligned.c:97.
+  Called from attribute-aligned.c:109.
 [eva] Recording results for ct
 [eva] Done for function ct
 [eva] computing for function dt <- main.
-  Called from attribute-aligned.c:98.
+  Called from attribute-aligned.c:110.
 [eva] Recording results for dt
 [eva] Done for function dt
 [eva] computing for function pt <- main.
-  Called from attribute-aligned.c:99.
+  Called from attribute-aligned.c:111.
 [eva] Recording results for pt
 [eva] Done for function pt
 [eva] computing for function qt <- main.
-  Called from attribute-aligned.c:100.
+  Called from attribute-aligned.c:112.
 [eva] Recording results for qt
 [eva] Done for function qt
 [eva] computing for function rt <- main.
-  Called from attribute-aligned.c:101.
+  Called from attribute-aligned.c:113.
 [eva] Recording results for rt
 [eva] Done for function rt
 [eva] computing for function st <- main.
-  Called from attribute-aligned.c:102.
+  Called from attribute-aligned.c:114.
 [eva] Recording results for st
 [eva] Done for function st
 [eva] computing for function tt <- main.
-  Called from attribute-aligned.c:103.
+  Called from attribute-aligned.c:115.
 [eva] Recording results for tt
 [eva] Done for function tt
+[eva] computing for function typedef_with_aligned <- main.
+  Called from attribute-aligned.c:116.
+[eva] attribute-aligned.c:100: check got status valid.
+[eva] attribute-aligned.c:102: check got status valid.
+[eva] Recording results for typedef_with_aligned
+[eva] Done for function typedef_with_aligned
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -62,6 +68,8 @@
   S ∈ {4}
   A ∈ {0}
   B ∈ {4}
+[eva:final-states] Values at end of function typedef_with_aligned:
+  a ∈ {1}
 [eva:final-states] Values at end of function main:
   S ∈ {4}
   A ∈ {0}
@@ -81,6 +89,8 @@
 [from] Done for function st
 [from] Computing for function tt
 [from] Done for function tt
+[from] Computing for function typedef_with_aligned
+[from] Done for function typedef_with_aligned
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -110,6 +120,8 @@
   S FROM \nothing
   A FROM \nothing
   B FROM \nothing
+[from] Function typedef_with_aligned:
+  NO EFFECTS
 [from] Function main:
   S FROM \nothing
   A FROM \nothing
@@ -143,6 +155,10 @@
 [inout] Out (internal) for function tt:
     S; A; B
 [inout] Inputs for function tt:
+    \nothing
+[inout] Out (internal) for function typedef_with_aligned:
+    a
+[inout] Inputs for function typedef_with_aligned:
     \nothing
 [inout] Out (internal) for function main:
     S; A; B; __retres

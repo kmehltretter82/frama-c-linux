@@ -4085,7 +4085,7 @@ let rec bytesAlignOf t =
       else
         raise (SizeOfError ("Undefined sizeof(void).", t))
   in
-  process_aligned_attribute ~may_reduce:false
+  process_aligned_attribute ~may_reduce:true
     (fun fmt -> !pp_typ_ref fmt t)
     (typeAttrs t) alignOfType
 
@@ -4165,8 +4165,11 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
      (e.g. a "packed" attribute is present).
      According to GCC's doc
      (https://gcc.gnu.org/onlinedocs/gcc/Common-Type-Attributes.html):
-     "The aligned attribute can only increase alignment.
-      Alignment can be decreased by specifying the packed attribute." *)
+     "When used on a struct, or struct member, the aligned attribute can only
+     increase the alignment; in order to decrease it, the packed attribute must
+     be specified as well. When used as part of a typedef, the aligned attribute
+     can both increase and decrease alignment, and specifying the packed
+     attribute generates a warning." *)
   match filterAttributes "aligned" attrs with
   | [] ->
     (* no __aligned__ attribute, so get the default alignment *)
