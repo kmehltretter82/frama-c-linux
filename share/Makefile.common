@@ -54,10 +54,14 @@ PLATFORM:=$(shell uname -s)
 #############
 
 ifndef PREFIX
+ifdef FRAMAC_INSTALLDIR
+PREFIX=$(FRAMAC_INSTALLDIR)
+else
 ifdef OPAM_SWITCH_PREFIX
 PREFIX=$(OPAM_SWITCH_PREFIX)
 else
 PREFIX=/usr/local
+endif
 endif
 endif
 
