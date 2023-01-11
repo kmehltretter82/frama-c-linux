@@ -300,7 +300,7 @@ let shift ~size ~signed offsm shift_direction n =
     then signed_default ~size ~size_offsm:size offsm
     else default size
   in
-  if Int.ge n size
+  if Int.lt n Int.zero || Int.ge n size
   then result (* Undefined behavior: we don't care about the result. *)
   else
     let size_copy = Int.sub size n in
