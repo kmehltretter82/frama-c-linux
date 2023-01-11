@@ -24,6 +24,7 @@
 """This script finds files containing likely declarations and definitions
 for a given function name, via heuristic syntactic matching."""
 
+from __future__ import annotations
 import os
 import sys
 

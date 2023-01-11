@@ -27,6 +27,7 @@ analysis GNUmakefile, as automatically as possible.
 NOTE: the tool used to produce such files (blug) is not yet publicly
 available."""
 
+from __future__ import annotations
 import argparse
 import json
 import logging

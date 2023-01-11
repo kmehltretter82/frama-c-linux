@@ -37,6 +37,7 @@ the efficiency of regex-based heuristics."""
 # of errors when running the filters. Note that an absent tool
 # does _not_ lead to an error.
 
+from __future__ import annotations
 import os
 from pathlib import Path
 import shutil
