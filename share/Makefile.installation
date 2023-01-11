@@ -64,12 +64,12 @@ ifndef PREFIX
 else
 ifeq ($(PREFIX),$(OPAM_SWITCH_PREFIX))
 	@echo "Installing $(INSTALL_TARGET)to current Opam switch"
-	@echo -n "  Copying and relocating files..."
+	@printf "  Copying and relocating files..."
 	dune install ${MANDIR_OPT} 2> /dev/null
 	@echo " (done)"
 else
 	@echo "Installing $(INSTALL_TARGET)to ${PREFIX}"
-	@echo -n " Copying and relocating files..."
+	@printf " Copying and relocating files..."
 	dune install --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
 	@echo " (done)"
 	@echo 'DO NOT FORGET TO EXPAND YOUR OCAMLPATH VARIABLE:'
