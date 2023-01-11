@@ -23,6 +23,23 @@
 open CamomileLibrary
 
 (**************************************************************************)
+(* Warning/Error *)
+
+let strict = ref false
+
+let res = ref true (* impact the exit value *)
+
+let warn ftext =
+  if !strict then
+    res := false ;
+  Format.eprintf "Warning: ";
+  Format.eprintf ftext
+
+let error ftext =
+  res := false ;
+  Format.eprintf ftext
+
+(**************************************************************************)
 (* Utils *)
 
 let read_buffered channel =
@@ -91,7 +108,7 @@ let parse_indent_formatter ~file ~attr ~value = match value with
   | "ocp-indent" -> Check (Some ml_indent_formatter)
   | "clang-format" -> Check (Some (Tool c_indent_formatter))
   | "black" -> Check (Some (Tool python_indent_formatter))
-  | _ -> Format.eprintf "Unsupported indent formatter: %s %s=%s@."
+  | _ -> warn "Unsupported indent formatter: %s %s=%s@."
            file attr value;
     NoCheck
 
@@ -116,7 +133,7 @@ let add_attr ~file ~attr ~value checks =
   let is_set = function
     | "set" -> true
     | "unset" -> false
-    | _ -> failwith (Format.sprintf "Invalid attribute value: %s %s=%s" file attr value)
+    | _ -> warn "Invalid attribute value: %s %s=%s" file attr value ; false
   in
   match attr with
   | "check-eoleof" -> { checks with eoleof = is_set value }
@@ -124,7 +141,8 @@ let add_attr ~file ~attr ~value checks =
   | "check-utf8"   -> { checks with utf8 = is_set value }
   | "check-indent" -> { checks with
                         indent = parse_indent_formatter ~file ~attr ~value }
-  | _ -> failwith (Format.sprintf "Unknown attribute: %s %s=%s" file attr value)
+  | _ -> warn "Unknown attribute: %s %s=%s" file attr value;
+    checks
 
 let handled_attr s =
   s = "check-eoleof" || s = "check-indent" ||
@@ -150,8 +168,8 @@ let rec collect = function
     Hashtbl.replace table file (add_attr ~file ~attr ~value checks) ;
     collect tl
   | [] -> ()
-  | [ file ; attr ] -> Format.eprintf "Missing attribute value: %s %s=?@." file attr
-  | [ file ] -> Format.eprintf "Missing attribute name for file: %s@." file
+  | [ file ; attr ] -> warn "Missing attribute value: %s %s=?@." file attr
+  | [ file ] -> warn "Missing attribute name for file: %s@." file
 
 (**************************************************************************)
 (* Functions used to check lint *)
@@ -236,7 +254,7 @@ let config () =
       (fun stx ->
          try Approx_lexer.enable_extension stx
          with IndentExtend.Syntax_not_found name ->
-           Format.eprintf "Warning: unknown syntax extension %S@." name)
+           warn "Unknown syntax extension %S@." name)
       syntaxes ;
     global_config := Some config ;
     config
@@ -277,7 +295,7 @@ let is_formatter_available ~file indent_formatter =
     let is_available = (0 = Sys.command indent_formatter.available_cmd) in
     indent_formatter.is_available <- Some is_available ;
     if not is_available then
-      Format.eprintf "Warning: %s is unavailable for checking some %s files (i.e. %s)@."
+      warn "%s is unavailable for checking indentation of some %s files (i.e. %s)@."
         indent_formatter.name indent_formatter.kind file;
     is_available
   | Some is_available -> is_available
@@ -303,8 +321,6 @@ let check_indent ~indent_formatter ~update file =
       0 = Sys.command (Format.sprintf "%s \"%s\"" indent_formatter.update_cmd file)
     else true (* there no updating command *)
 
-let res = ref true
-
 (* Main checks *)
 
 let check ~verbose ~update file params =
@@ -317,10 +333,8 @@ let check ~verbose ~update file params =
     close_in in_chan ;
     (* UTF8 *)
     if params.utf8 then
-      if not @@ is_utf8 content then begin
-        Format.eprintf "Bad encoding (not UTF8) for %s@." file ;
-        res := false
-      end ;
+      if not @@ is_utf8 content then
+        error "Bad encoding (not UTF8) for %s@." file ;
     (* Blanks *)
     let rewrite = ref false in
     let syntactic_check checker content message  =
@@ -328,8 +342,8 @@ let check ~verbose ~update file params =
       if update && not was_ok
       then begin rewrite := true ; new_content end
       else if not was_ok then begin
-        Format.eprintf "%s for %s@." message file ;
-        res := false ; new_content
+        error "%s for %s@." message file ;
+        new_content
       end
       else new_content
     in
@@ -354,14 +368,11 @@ let check ~verbose ~update file params =
         match params.indent with
         | NoCheck -> ()
         | Check indent_formatter ->
-          if not @@ check_indent ~indent_formatter ~update file then begin
-            Format.eprintf "Bad indentation for %s@." file ;
-            res := false
-          end ;
+          if not @@ check_indent ~indent_formatter ~update file then
+            error "Bad indentation for %s@." file ;
       end ;
     with Bad_ext ->
-      Format.eprintf "Don't know how to (check) indent %s@." file ;
-      res := false
+      error "Don't know how to (check) indent %s@." file
   end
 
 (**************************************************************************)
@@ -374,6 +385,7 @@ let verbose = ref false
 let argspec = [
   "-u", Arg.Set update, " update ill-formed files (does not handle UTF8 update)" ;
   "-v", Arg.Set verbose, " verbose mode" ;
+  "-s", Arg.Set strict, " considers warnings as errors for the exit value" ;
 ]
 let sort argspec =
   List.sort (fun (name1, _, _) (name2, _, _) -> String.compare name1 name2)
@@ -385,7 +397,7 @@ let sort argspec =
 let () =
   Arg.parse
     (Arg.align (sort argspec))
-    (fun s -> Format.eprintf "Unknown argument: %s" s)
+    (fun s -> warn "Unknown argument: %s@." s)
     ("Usage: git ls-files -z | git check-attr --stdin -z -a | " ^ exec_name ^ " [options]");
   collect @@ lines_from_in stdin ;
   Hashtbl.iter (check ~verbose:!verbose ~update:!update) table ;
