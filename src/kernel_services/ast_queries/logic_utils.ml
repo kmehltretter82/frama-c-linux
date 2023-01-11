@@ -242,6 +242,8 @@ let mk_cast ?loc ?(force=false) newt t =
     in
     let tres = if force then t else unroll_cast t in
     let loc = match loc with None -> t.term_loc | Some loc -> loc in
+    (* we keep newt as the cast target, as newt' might have unrolled typedefs
+       in order to remove attributes, resulting in a less user-friendly type *)
     Logic_const.term ~loc (TCastE (newt, tres)) (Ctype newt')
 
 

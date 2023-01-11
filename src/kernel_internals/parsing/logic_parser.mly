@@ -250,6 +250,7 @@
 
   let cv_const = Attr ("const", [])
   let cv_volatile = Attr ("volatile", [])
+  let cv_ghost = Attr("ghost", [])
 
   let toplevel_pred tp_kind tp_statement = { tp_kind; tp_statement }
 %}
@@ -295,7 +296,7 @@
 %token BIFF BIMPLIES STARHAT HAT HATHAT PIPE TILDE GTGT LTLT
 %token SIZEOF LAMBDA LET
 %token TYPEOF BSTYPE
-%token WITH CONST
+%token WITH CONST BSGHOST
 %token INITIALIZED DANGLING
 %token LSQUAREPIPE RSQUAREPIPE
 %token IN
@@ -765,6 +766,7 @@ logic_type:
 cv:
   CONST { cv_const }
 | VOLATILE { cv_volatile }
+| BSGHOST { cv_ghost }
 ;
 
 type_spec_cv:
@@ -1350,6 +1352,7 @@ annotation:
                             "Only one code annotation is allowed per comment"))
       }
 | full_identifier_or_typename { Aattribute_annot (loc (), $1) }
+| BSGHOST { Aattribute_annot(loc(),"\\ghost") }
 ;
 
 contract_or_code_annotation:
@@ -2035,6 +2038,7 @@ bs_keyword:
 | AT { () }
 | BASE_ADDR { () }
 | BLOCK_LENGTH { () }
+| BSGHOST { () }
 | DYNAMIC { () }
 | EMPTY { () }
 | FALSE { () }
