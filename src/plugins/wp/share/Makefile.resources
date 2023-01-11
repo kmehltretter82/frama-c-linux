@@ -51,7 +51,6 @@ WP_SHARE_SRC_CEA_RESOURCES:= \
 	$(addprefix why3/frama_c_wp/,  $(WHY3_LIBS_CEA))
 
 ALL_CEA_RESOURCES+= \
-	install.ml \
 	Makefile.resources \
 	$(WP_SHARE_SRC_CEA_RESOURCES)
 
