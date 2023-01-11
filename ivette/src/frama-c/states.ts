@@ -32,20 +32,18 @@
 
 import React from 'react';
 import * as Dome from 'dome';
-import * as Json from 'dome/data/json';
 import { Order } from 'dome/data/compare';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
+import { getCurrent, setCurrent } from 'frama-c/kernel/api/project';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from './server';
 
-const PROJECT = new Dome.Event('frama-c.project');
-class STATE extends Dome.Event {
-  constructor(id: string) {
-    super(`frama-c.state.${id}`);
-  }
-}
+/* Name of the default Frama-C project. */
+const defaultProject = 'default';
+
+const CurrentProject = new GlobalState<string>(defaultProject);
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -57,28 +55,18 @@ const D = new Dome.Debug('States');
 // --- Synchronized Current Project
 // --------------------------------------------------------------------------
 
-let currentProject: string | undefined;
-
 Server.onReady(async () => {
   try {
-    const sr: Server.GetRequest<null, { id?: string }> = {
-      kind: Server.RqKind.GET,
-      name: 'kernel.project.getCurrent',
-      input: Json.jNull,
-      output: Json.jObject({ id: Json.jString }),
-      signals: [],
-    };
-    const current: { id?: string } = await Server.send(sr, null);
-    currentProject = current.id;
-    PROJECT.emit();
+    CurrentProject.setValue(defaultProject);
+    const { id } = await Server.send(getCurrent, null);
+    CurrentProject.setValue(id);
   } catch (error) {
     D.error(`Fail to retrieve the current project. ${error}`);
   }
 });
 
 Server.onShutdown(() => {
-  currentProject = '';
-  PROJECT.emit();
+  CurrentProject.setValue(defaultProject);
 });
 
 // --------------------------------------------------------------------------
@@ -89,9 +77,9 @@ Server.onShutdown(() => {
  * Current Project (Custom React Hook).
  * @return The current project.
  */
-export function useProject(): string | undefined {
-  Dome.useUpdate(PROJECT);
-  return currentProject;
+export function useProject(): string {
+  const [s] = useGlobalState(CurrentProject);
+  return s;
 }
 
 /**
@@ -105,16 +93,9 @@ export function useProject(): string | undefined {
 export async function setProject(project: string): Promise<void> {
   if (Server.isRunning()) {
     try {
-      const sr: Server.SetRequest<string, null> = {
-        kind: Server.RqKind.SET,
-        name: 'kernel.project.setCurrent',
-        input: Json.jString,
-        output: Json.jNull,
-        signals: [],
-      };
-      await Server.send(sr, project);
-      currentProject = project;
-      PROJECT.emit();
+      await Server.send(setCurrent, project);
+      const { id } = await Server.send(getCurrent, null);
+      CurrentProject.setValue(id);
     } catch (error) {
       D.error(`Fail to set the current project. ${error}`);
     }
@@ -222,7 +203,7 @@ export function useTags(rq: GetTags): Map<string, Tag> {
 }
 
 // --------------------------------------------------------------------------
-// --- Synchronized States
+// --- Synchronized States from API
 // --------------------------------------------------------------------------
 
 export interface Value<A> {
@@ -255,7 +236,7 @@ export interface Array<K, A> {
 }
 
 // --------------------------------------------------------------------------
-// --- Handler for Synchronized St byates
+// --- Handler for Synchronized States
 // --------------------------------------------------------------------------
 
 interface Handler<A> {
@@ -265,68 +246,50 @@ interface Handler<A> {
   setter?: Server.SetRequest<A, null>;
 }
 
-// shared for all projects
-class SyncState<A> {
-  UPDATE: Dome.Event;
+enum SyncStatus { OffLine, Loading, Loaded }
+
+class SyncState<A> extends GlobalState<A | undefined> {
   handler: Handler<A>;
-  upToDate: boolean;
-  value?: A;
+  status = SyncStatus.OffLine;
 
   constructor(h: Handler<A>) {
+    super(undefined);
     this.handler = h;
-    this.UPDATE = new STATE(h.name);
-    this.upToDate = false;
-    this.value = undefined;
-    this.update = this.update.bind(this);
-    this.getValue = this.getValue.bind(this);
-    this.setValue = this.setValue.bind(this);
-    PROJECT.on(this.update);
+    this.load = this.load.bind(this);
+    this.fetch = this.fetch.bind(this);
+    this.offline = this.offline.bind(this);
+    Server.onReady(this.load);
+    Server.onShutdown(this.offline);
   }
 
-  getValue(): A | undefined {
-    const running = Server.isRunning();
-    if (!this.upToDate && running) {
-      this.update();
-    }
-    return running ? this.value : undefined;
+  signal(): Server.Signal { return this.handler.signal; }
+
+  load(): void {
+    if (this.status === SyncStatus.OffLine) this.fetch();
   }
 
-  async setValue(v: A): Promise<void> {
+  offline(): void {
+    this.status = SyncStatus.OffLine;
+    this.setValue(undefined);
+  }
+
+  async fetch(): Promise<void> {
     try {
-      this.upToDate = true;
-      this.value = v;
-      const setter = this.handler.getter;
-      if (setter) await Server.send(setter, v);
-      this.UPDATE.emit();
-    } catch (error) {
-      D.error(
-        `Fail to set value of SyncState '${this.handler.name}'.`,
-        `${error}`,
-      );
-      this.UPDATE.emit();
-    }
-  }
-
-  async update(): Promise<void> {
-    try {
-      this.upToDate = true;
       if (Server.isRunning()) {
+        this.status = SyncStatus.Loading;
         const v = await Server.send(this.handler.getter, null);
-        this.value = v;
-        this.UPDATE.emit();
-      } else if (this.value !== undefined) {
-        this.value = undefined;
-        this.UPDATE.emit();
+        this.status = SyncStatus.Loaded;
+        this.setValue(v);
       }
     } catch (error) {
       D.error(
         `Fail to update SyncState '${this.handler.name}'.`,
         `${error}`,
       );
-      this.value = undefined;
-      this.UPDATE.emit();
+      this.setValue(undefined);
     }
   }
+
 }
 
 // --------------------------------------------------------------------------
@@ -335,7 +298,12 @@ class SyncState<A> {
 
 const syncStates = new Map<string, SyncState<unknown>>();
 
-function getSyncState<A>(h: Handler<A>): SyncState<A> {
+// Remark: use current project state
+
+function lookupSyncState<A>(
+  currentProject: string,
+  h: Handler<A>
+): SyncState<A> {
   const id = `${currentProject}@${h.name}`;
   let s = syncStates.get(id) as SyncState<A> | undefined;
   if (!s) {
@@ -353,27 +321,31 @@ Server.onShutdown(() => syncStates.clear());
 
 /** Synchronization with a (projectified) server state. */
 export function useSyncState<A>(
-  st: State<A>,
+  state: State<A>,
 ): [A | undefined, (value: A) => void] {
-  const s = getSyncState(st);
-  Dome.useUpdate(PROJECT, s.UPDATE);
-  Server.useSignal(s.handler.signal, s.update);
-  return [s.getValue(), s.setValue];
+  Server.useStatus();
+  const pr = useProject();
+  const st = lookupSyncState(pr, state);
+  Server.useSignal(st.signal(), st.fetch);
+  st.load();
+  return useGlobalState(st);
 }
 
 /** Synchronization with a (projectified) server value. */
-export function useSyncValue<A>(va: Value<A>): A | undefined {
-  const s = getSyncState(va);
-  Dome.useUpdate(PROJECT, s.UPDATE);
-  Server.useSignal(s.handler.signal, s.update);
-  return s.getValue();
+export function useSyncValue<A>(value: Value<A>): A | undefined {
+  Server.useStatus();
+  const pr = useProject();
+  const st = lookupSyncState(pr, value);
+  Server.useSignal(st.signal(), st.fetch);
+  st.load();
+  const [v] = useGlobalState(st);
+  return v;
 }
 
 // --------------------------------------------------------------------------
 // --- Synchronized Arrays
 // --------------------------------------------------------------------------
 
-// one per project
 class SyncArray<K, A> {
   handler: Array<K, A>;
   upToDate: boolean;
@@ -392,11 +364,17 @@ class SyncArray<K, A> {
   }
 
   update(): void {
-    if (!this.upToDate && Server.isRunning()) this.fetch();
+    if (
+      !this.upToDate &&
+      Server.isRunning()
+    ) this.fetch();
   }
 
   async fetch(): Promise<void> {
-    if (this.fetching || !Server.isRunning()) return;
+    if (
+      this.fetching ||
+      !Server.isRunning()
+    ) return;
     try {
       this.fetching = true;
       let pending;
@@ -448,7 +426,10 @@ class SyncArray<K, A> {
 
 const syncArrays = new Map<string, SyncArray<unknown, unknown>>();
 
-function lookupSyncArray<K, A>(
+// Remark: lookup for current project
+
+function currentSyncArray<K, A>(
+  currentProject: string,
   array: Array<K, A>,
 ): SyncArray<K, A> {
   const id = `${currentProject}@${array.name}`;
@@ -468,7 +449,7 @@ Server.onShutdown(() => syncArrays.clear());
 
 /** Force a Synchronized Array to reload. */
 export function reloadArray<K, A>(arr: Array<K, A>): void {
-  lookupSyncArray(arr).reload();
+  currentSyncArray(CurrentProject.getValue(), arr).reload();
 }
 
 /**
@@ -484,9 +465,9 @@ export function useSyncArray<K, A>(
   arr: Array<K, A>,
   sync = true,
 ): CompactModel<K, A> {
-  Dome.useUpdate(PROJECT);
-  const st = lookupSyncArray(arr);
-  React.useEffect(() => st.update(), [st]);
+  Server.useStatus();
+  const pr = useProject();
+  const st = currentSyncArray(pr, arr);
   Server.useSignal(arr.signal, st.fetch);
   st.update();
   useModel(st.model, sync);
@@ -499,7 +480,8 @@ export function useSyncArray<K, A>(
 export function getSyncArray<K, A>(
   arr: Array<K, A>,
 ): CompactModel<K, A> {
-  const st = lookupSyncArray(arr);
+  const pr = CurrentProject.getValue();
+  const st = currentSyncArray(pr, arr);
   return st.model;
 }
 
@@ -513,7 +495,8 @@ export function onSyncArray<K, A>(
   onReload?: () => void,
   onUpdate?: () => void,
 ): Client {
-  const st = lookupSyncArray(arr);
+  const pr = CurrentProject.getValue();
+  const st = currentSyncArray(pr, arr);
   return st.model.link(onReload, onUpdate);
 }
 
@@ -812,9 +795,7 @@ export async function resetSelection(): Promise<void> {
   }
 }
 
-/* Select the main function when the current project changes and the selection
-   is still empty (which happens at the start of the GUI). */
-PROJECT.on(async () => {
+Server.onReady(() => {
   if (GlobalSelection.getValue() === emptySelection)
     resetSelection();
 });

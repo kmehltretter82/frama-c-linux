@@ -99,7 +99,8 @@ function freshId(): string {
   return '<dnd-crashed>';
 }
 
-interface DropZone extends DropHandler {
+/** Extended `DropZone` with an HTML element. */
+export interface DropZone extends DropHandler {
   node: HTMLElement;
 }
 
