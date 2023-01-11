@@ -26,7 +26,6 @@
 #include "ctype.c"
 #include "errno.c"
 #include "fenv.c"
-#include "getopt.c"
 #include "glob.c"
 #include "inttypes.c"
 #include "locale.c"
