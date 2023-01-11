@@ -1268,6 +1268,7 @@ let batch pconf driver ~conf ?script ~timeout ~steplimit prover task =
   in
   let steps = if with_steps then steps else None in
   let command = Why3.Whyconf.get_complete_command pconf ~with_steps in
+  Wp_parameters.debug ~dkey "Prover command %S" command ;
   let inplace = if script <> None then Some true else None in
   let call = Why3.Driver.prove_task_prepared ?old:script ?inplace
       ~command ~limit ~libdir:conf.libdir ~datadir:conf.datadir driver task in
@@ -1311,6 +1312,7 @@ let editor ~script ~merge ~conf wpo pconf driver prover task =
       Cache.clear_result ~digest:(digest wpo driver) prover task ;
       if merge then updatescript ~script driver task ;
       let command = editor_command pconf in
+      Wp_parameters.debug ~dkey "Editor command %S" command ;
       let call =
         Why3.Call_provers.call_editor
           ~command ~datadir:conf.datadir ~libdir:conf.libdir script
@@ -1342,8 +1344,16 @@ let interactive ~mode wpo pconf ~conf driver prover task =
   let time = Wp_parameters.InteractiveTimeout.get () in
   let timeout = if time <= 0 then None else Some time in
   match prepare ~mode wpo driver task with
-  | None -> Task.return VCS.unknown
+  | None ->
+    Wp_parameters.warning ~once:true ~current:false
+      "Missing script(s) for prover %a.@\n\
+       Use -wp-interactive=fix for interactive proving."
+      Why3.Whyconf.print_prover prover ;
+    Task.return VCS.unknown
   | Some (script, merge) ->
+    Wp_parameters.debug ~dkey "%s %a script %S@."
+      (if merge then "Found" else "New")
+      Why3.Whyconf.print_prover prover script ;
     match mode with
     | VCS.Batch ->
       compile ~script ~timeout ~conf wpo pconf driver prover task
