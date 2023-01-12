@@ -25,6 +25,8 @@ open Analyses_types
 open Analyses_datatype
 open Contract_types
 
+val gmp_clear_ref : (location -> exp -> stmt) ref
+
 (** Environments.
 
     Environments handle all the new C constructs (variables, statements and
@@ -53,14 +55,6 @@ val new_var:
     is [Block]).
     @return this variable as both a C variable and a C expression already
     initialized by applying it to [mk_stmts]. *)
-
-val new_var_and_mpz_init:
-  loc:location -> ?scope:Varname.scope -> ?name:string ->
-  t -> kernel_function -> term option ->
-  (varinfo -> exp (* the var as exp *) -> stmt list) ->
-  varinfo * exp * t
-(** Same as [new_var], but dedicated to mpz_t variables initialized by
-    {!Mpz.init}. *)
 
 val rtl_call_to_new_var:
   loc:location -> ?scope:Varname.scope -> ?name:string ->

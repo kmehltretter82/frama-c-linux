@@ -47,7 +47,7 @@ let translate_rte_exp_ref
 
 let constant_to_exp ~loc env t c =
   let mk_real s =
-    let s = Rational.normalize_str s in
+    let s = Gmp.Q.normalize_str s in
     Cil.mkString ~loc s, Typed_number.Str_R
   in
   match c with
@@ -115,9 +115,8 @@ let affect_binop ~loc var_as_varinfo var_as_exp binop exp_type exp1 exp2 =
          "__gmpz_cmp"
          [exp1; exp2]
      | Some e ->
-       let name = Gmp.name_of_mpz_arith_bop binop in
-       Smart_stmt.rtl_call
-         ~loc ~prefix:"" name [e; exp1; exp2])
+       let name = Gmp.Z.name_arith_bop binop in
+       Smart_stmt.rtl_call ~loc ~prefix:"" name [e; exp1; exp2])
   else if Gmp_types.Q.is_t exp_type then
     Error.not_yet "rational in affect_binop"
   else
@@ -201,7 +200,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     let e_lbd, _, env = to_exp ~adata:Assert.no_data kf env lt in
     let lbd_stmt,env =
       Env.pop_and_get env
-        (Gmp.affect ~loc (Cil.var lbd_as_varinfo) lbd_as_exp e_lbd)
+        (Gmp.assign ~loc (Cil.var lbd_as_varinfo) lbd_as_exp e_lbd)
         ~global_clear:false Env.Middle
     in
     (* statement construction *)
@@ -304,7 +303,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         | LNot -> assert false
       in
       let _, e, env =
-        Env.new_var_and_mpz_init
+        Gmp.Z.new_var
           ~loc
           env
           kf
@@ -350,18 +349,10 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     let e1, adata, env = to_exp ~adata kf env t1 in
     let e2, adata, env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
-      let name = Gmp.name_of_mpz_arith_bop bop in
-      let mk_stmts _ e = [ Smart_stmt.rtl_call ~loc
-                             ~prefix:""
-                             name
-                             [ e; e1; e2 ] ] in
-      let name = Misc.name_of_binop bop in
-      let _, e, env =
-        Env.new_var_and_mpz_init ~loc ~name env kf (Some t) mk_stmts
-      in
+      let e, env = Gmp.Z.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Typed_number.C_number, ""
     else if Gmp_types.Q.is_t ty then
-      let e, env = Rational.binop ~loc bop e1 e2 env kf (Some t) in
+      let e, env = Gmp.Q.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Typed_number.C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
@@ -384,7 +375,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
          RTE should do this automatically. *)
       let ctx = Typing.get_number_ty ~logic_env t in
       let t = Some t in
-      let name = Gmp.name_of_mpz_arith_bop bop in
+      let name = Gmp.Z.name_arith_bop bop in
       (* [TODO] can now do better since the type system got some info about
          possible values of [t2] *)
       (* guarding divisions and modulos *)
@@ -424,11 +415,11 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         [ cond; instr ]
       in
       let name = Misc.name_of_binop bop in
-      let _, e, env = Env.new_var_and_mpz_init ~loc ~name env kf t mk_stmts in
+      let _, e, env = Gmp.Z.new_var ~loc ~name env kf t mk_stmts in
       e, adata, env, Typed_number.C_number, ""
     else if Gmp_types.Q.is_t ty then
       let e2, adata, env = t2_to_exp adata env in
-      let e, env = Rational.binop ~loc bop e1 e2 env kf (Some t) in
+      let e, env = Gmp.Q.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Typed_number.C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
@@ -560,7 +551,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
 
       (* Create the shift instruction *)
       let mk_shift_instr result_e =
-        let name = Gmp.name_of_mpz_arith_bop bop in
+        let name = Gmp.Z.name_arith_bop bop in
         Smart_stmt.rtl_call ~loc
           ~prefix:""
           name
@@ -568,7 +559,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
       in
 
       (* Put t in an option to use with Translate_utils.comparison_to_exp and
-         Env.new_var_and_mpz_init *)
+         Gmp.Z.new_var *)
       let t = Some t in
 
       (* TODO: let RTE generate the undef behaviors assertions *)
@@ -633,7 +624,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         | Some e1_guard -> [ e1_guard; shift_instr ]
       in
       let name = bop_name in
-      let _, e, env = Env.new_var_and_mpz_init ~loc ~name env kf t mk_stmts in
+      let _, e, env = Gmp.Z.new_var ~loc ~name env kf t mk_stmts in
       e, adata, env, Typed_number.C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
@@ -691,13 +682,13 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     let e2, adata, env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
       let mk_stmts _v e =
-        let name = Gmp.name_of_mpz_arith_bop bop in
+        let name = Gmp.Z.name_arith_bop bop in
         let instr = Smart_stmt.rtl_call ~loc ~prefix:"" name [ e; e1; e2 ] in
         [ instr ]
       in
       let name = Misc.name_of_binop bop in
       let t = Some t in
-      let _, e, env = Env.new_var_and_mpz_init ~loc ~name env kf t mk_stmts in
+      let _, e, env = Gmp.Z.new_var ~loc ~name env kf t mk_stmts in
       e, adata, env, Typed_number.C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);

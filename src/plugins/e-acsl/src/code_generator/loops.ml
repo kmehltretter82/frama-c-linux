@@ -321,7 +321,7 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let e1, _, env = term_to_exp kf (Env.push env) t1 in
     let init_blk, env = Env.pop_and_get
         env
-        (Gmp.affect ~loc:e1.eloc lv_x x e1)
+        (Gmp.assign ~loc:e1.eloc lv_x x e1)
         ~global_clear:false
         Env.Middle
     in
@@ -342,7 +342,10 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
           (TBinOp(Lt, tlv, t2))
           Linteger
     in
-    Typing.preprocess_term ~use_gmp_opt:false ~ctx:Typing.c_int ~logic_env guard;
+    Typing.preprocess_term
+      ~use_gmp_opt:false
+      ~ctx:Typing.c_int
+      ~logic_env guard;
     let guard_exp, _, env = term_to_exp kf (Env.push env) guard in
     let break_stmt = Smart_stmt.break ~loc:guard_exp.eloc in
     let guard_blk, env = Env.pop_and_get
@@ -362,13 +365,15 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
     let incr, _, env = term_to_exp kf (Env.push env) tlv_one in
     let next_blk, env = Env.pop_and_get
         env
-        (Gmp.affect ~loc:incr.eloc lv_x x incr)
+        (Gmp.assign ~loc:incr.eloc lv_x x incr)
         ~global_clear:false
         Env.Middle
     in
     (* generate the whole loop *)
     let next = block_to_stmt next_blk in
-    let guard_for_small_type_opt = Bound_variables.get_guard_for_small_type logic_x in
+    let guard_for_small_type_opt =
+      Bound_variables.get_guard_for_small_type logic_x
+    in
     let stmts, env = match guard_for_small_type_opt with
       | None ->
         guard :: body @ [ next ], env
@@ -429,6 +434,6 @@ let rec mk_nested_loops ~loc mk_innermost_block kf env lscope_vars =
 
 (*
 Local Variables:
-compile-command: "make -C ../.."
+compile-command: "make -C ../../../../.."
 End:
 *)
