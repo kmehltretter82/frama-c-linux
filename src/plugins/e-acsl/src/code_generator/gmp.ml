@@ -72,13 +72,13 @@ let get_set_suffix_and_arg res_ty e =
      [TODO] check the statement above *)
   | C_float FLongDouble, _ -> Error.not_yet "creating gmp from long double"
   | Gmpz, _ | Rational, _ | Real, _ | Nan, _ ->
-      match Cil.unrollType ty with
-      | TPtr(TInt(IChar, _), _) ->
-        "_str",
-        (* decimal base for the number given as string *)
-        [ e; Cil.integer ~loc:e.eloc 10 ]
-      | _ ->
-        Options.fatal "expected char* instead of type %a" Printer.pp_typ ty
+    match Cil.unrollType ty with
+    | TPtr(TInt(IChar, _), _) ->
+      "_str",
+      (* decimal base for the number given as string *)
+      [ e; Cil.integer ~loc:e.eloc 10 ]
+    | _ ->
+      Options.fatal "expected char* instead of type %a" Printer.pp_typ ty
 
 let generic_assign ~loc fname lv ev e =
   let ty = Cil.typeOf ev in
