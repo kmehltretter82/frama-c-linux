@@ -82,7 +82,7 @@ let c_indent_formatter =
   { is_available = None ;
     kind = "C";
     name = "clang-format";
-    available_cmd = "clang-format --version > /dev/null";
+    available_cmd = "clang-format --version > /dev/null 2> /dev/null";
     check_cmd = "clang-format --dry-run -Werror" ;
     update_cmd = "clang-format -i"
   }
@@ -91,7 +91,7 @@ let python_indent_formatter =
   { is_available = None ;
     kind = "Python";
     name = "black";
-    available_cmd = "black --version > /dev/null";
+    available_cmd = "black --version > /dev/null 2> /dev/null";
     check_cmd = "black --quiet --line-length 100 --check" ;
     update_cmd = "black --quiet --line-length 100"
   }
