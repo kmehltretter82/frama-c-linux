@@ -1,5 +1,5 @@
 /* run.config*
-   
+
    STDOPT: #"-eva-default-loop-unroll 10"
    STDOPT: +"-main test_split -eva-partition-value k"
    STDOPT: #"-main test_loop_split -eva-partition-history 1"
@@ -109,6 +109,24 @@ void test_dynamic_split()
   Frama_C_show_each_no_split(a, b);
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void test_loop_split()
 {
   int A[N];
@@ -165,7 +183,7 @@ void test_slevel()
   for (int i = 0; i < N; i++) {
     a[i] = 42;
   }
-  
+
   //@slevel default;
   for (int i = 0; i < N; i++) {
     b[i] = 42;
@@ -188,7 +206,7 @@ void test_slevel()
     //@slevel merge;
     ; // Otherwise previous annotation is ignored
   }
-  
+
   //@slevel 0;
   ;
   //@slevel full;
@@ -207,4 +225,3 @@ void main(void)
   test_split();
   test_dynamic_split();
 }
-
