@@ -470,20 +470,24 @@ struct
       let states = function _ -> Abstract.Dom.top in
       Abstract_domain.{ states; result = None }
     in
-    let source = fst (predicate.Cil_types.pred_loc) in
-    let aux positive =
-      let+ state' =
-        Abstract.Dom.reduce_by_predicate env state predicate positive in
-      let x = Abstract.Dom.evaluate_predicate env state' predicate in
-      if x == Unknown
-      then
-        Self.warning ~source ~once:true
-          "failing to learn perfectly from split predicate";
-      if Abstract.Dom.equal state' state then raise Operation_failed;
-      let value = if positive then Integer.one else Integer.zero in
-      value, state'
-    in
-    Bottom.list_values [ aux true; aux false ]
+    match Abstract.Dom.evaluate_predicate env state predicate with
+    | True -> [ Integer.one, state ]
+    | False -> [ Integer.zero, state ]
+    | Unknown ->
+      let source = fst (predicate.Cil_types.pred_loc) in
+      let aux positive =
+        let+ state' =
+          Abstract.Dom.reduce_by_predicate env state predicate positive in
+        let x = Abstract.Dom.evaluate_predicate env state' predicate in
+        if x == Unknown
+        then
+          Self.warning ~source ~once:true
+            "failing to learn perfectly from split predicate";
+        if Abstract.Dom.equal state' state then raise Operation_failed;
+        let value = if positive then Integer.one else Integer.zero in
+        value, state'
+      in
+      Bottom.list_values [ aux true; aux false ]
 
   (* --- Applying partitioning actions onto flows --------------------------- *)
 

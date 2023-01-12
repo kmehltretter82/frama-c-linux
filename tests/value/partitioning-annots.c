@@ -1,5 +1,5 @@
 /* run.config*
-   
+
    STDOPT: #"-eva-default-loop-unroll 10"
    STDOPT: +"-main test_split -eva-partition-value k"
    STDOPT: #"-main test_loop_split -eva-partition-history 1"
@@ -109,6 +109,24 @@ void test_dynamic_split()
   Frama_C_show_each_no_split(a, b);
 }
 
+void test_dynamic_split_predicate()
+{
+  int x, y;
+  //@ dynamic_split \initialized(&x);
+  int c = nondet;
+  if (c != 1) {
+    x = 42;
+  }
+  y = 2;
+  if (c != 1)
+    x += y; // No alarm on x initialization with the dynamic partitioning.
+  else {
+    for (int i = 0; i < 32; i++)
+      x = i;
+  }
+  y = x; // No alarm on x initialization with the dynamic partitioning.
+}
+
 void test_loop_split()
 {
   int A[N];
@@ -165,7 +183,7 @@ void test_slevel()
   for (int i = 0; i < N; i++) {
     a[i] = 42;
   }
-  
+
   //@slevel default;
   for (int i = 0; i < N; i++) {
     b[i] = 42;
@@ -188,7 +206,7 @@ void test_slevel()
     //@slevel merge;
     ; // Otherwise previous annotation is ignored
   }
-  
+
   //@slevel 0;
   ;
   //@slevel full;
@@ -206,5 +224,5 @@ void main(void)
   test_unroll();
   test_split();
   test_dynamic_split();
+  test_dynamic_split_predicate();
 }
-
