@@ -476,10 +476,11 @@ struct
         Abstract.Dom.reduce_by_predicate env state predicate positive in
       let x = Abstract.Dom.evaluate_predicate env state' predicate in
       if x == Unknown
-      then
+      then begin
         Self.warning ~source ~once:true
           "failing to learn perfectly from split predicate";
-      if Abstract.Dom.equal state' state then raise Operation_failed;
+        if Abstract.Dom.equal state' state then raise Operation_failed
+      end;
       let value = if positive then Integer.one else Integer.zero in
       value, state'
     in
