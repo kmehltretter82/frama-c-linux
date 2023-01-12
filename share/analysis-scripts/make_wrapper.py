@@ -26,6 +26,7 @@
 GNUmakefile template): it parses the output and suggests useful commands
 whenever it can, by calling frama-c-script itself."""
 
+from __future__ import annotations
 import argparse
 import collections
 import os

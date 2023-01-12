@@ -25,6 +25,7 @@
 """This script uses several heuristics to try and estimate the difficulty
 of analyzing a new code base with Frama-C."""
 
+from __future__ import annotations
 import argparse
 import json
 import os
