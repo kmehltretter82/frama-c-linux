@@ -109,23 +109,23 @@ void test_dynamic_split()
   Frama_C_show_each_no_split(a, b);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void test_dynamic_split_predicate()
+{
+  int x, y;
+  //@ dynamic_split \initialized(&x);
+  int c = nondet;
+  if (c != 1) {
+    x = 42;
+  }
+  y = 2;
+  if (c != 1)
+    x += y; // No alarm on x initialization with the dynamic partitioning.
+  else {
+    for (int i = 0; i < 32; i++)
+      x = i;
+  }
+  y = x; // No alarm on x initialization with the dynamic partitioning.
+}
 
 void test_loop_split()
 {
@@ -224,4 +224,5 @@ void main(void)
   test_unroll();
   test_split();
   test_dynamic_split();
+  test_dynamic_split_predicate();
 }
