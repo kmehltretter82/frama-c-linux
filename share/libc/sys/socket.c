@@ -90,15 +90,14 @@ ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
     // non-error
     ((char*)buf)[Frama_C_interval(0, len-1)] = Frama_C_interval(0, 255);
     if (addrbuf) {
-      // simulate writing source address
-      socklen_t addrlen = *addrbuf_len > sizeof(struct sockaddr) ? *addrbuf_len : sizeof(struct sockaddr);
-      Frama_C_make_unknown((char*)addrbuf, addrlen);
+      Frama_C_make_unknown((char*)addrbuf, *addrbuf_len);
       /* From the "Linux Programmer's Manual:
          "Upon return, 'addrbuf_len' is updated to contain the actual size of
          the source address. The returned address is truncated if the buffer
          provided is too small; in this case, 'addrbuf_len' will return a value
-         greater than was supplied to the call. */
-      *addrbuf_len = addrlen;
+         greater than was supplied to the call."
+         Here we use _SS_MAXSIZE as the maximum address struct size. */
+      *addrbuf_len = Frama_C_unsigned_int_interval(0, _SS_MAXSIZE);
     }
     return Frama_C_long_interval(0, len);
   }
