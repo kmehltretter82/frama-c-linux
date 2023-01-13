@@ -26,10 +26,10 @@ import { EditorState, StateField, Facet, Extension } from '@codemirror/state';
 import { Annotation, Transaction, RangeSet } from '@codemirror/state';
 
 import { EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
+import { Decoration, DecorationSet } from '@codemirror/view';
 import { DOMEventMap as EventMap } from '@codemirror/view';
 import { GutterMarker, gutter } from '@codemirror/view';
-import { showTooltip, Tooltip } from '@codemirror/view';
-import { DecorationSet } from '@codemirror/view';
+import { Tooltip, showTooltip } from '@codemirror/view';
 import { lineNumbers } from '@codemirror/view';
 
 import { parser } from '@lezer/cpp';
@@ -51,9 +51,10 @@ export { RangeSet } from '@codemirror/state';
 // -----------------------------------------------------------------------------
 
 // Helper types definitions.
+export type View = EditorView | null;
 export type Range = { from: number, to: number };
+export type Set<A> = (view: View, value: A) => void;
 export type Get<A> = (state: EditorState | undefined) => A;
-export type Set<A> = (view: EditorView | null, value: A) => void;
 export interface Data<A, S> { init: A, get: Get<A>, structure: S }
 
 // Event handlers type definition.
@@ -94,6 +95,8 @@ export type Dict = Record<string, unknown>;
 export type Dependency<A> = Field<A> | Aspect<A>;
 export type Dependencies<I extends Dict> = { [K in keyof I]: Dependency<I[K]> };
 
+// -----------------------------------------------------------------------------
+
 
 
 // -----------------------------------------------------------------------------
@@ -104,15 +107,15 @@ export type Dependencies<I extends Dict> = { [K in keyof I]: Dependency<I[K]> };
 type Dep<A> = Dependency<A>;
 type Deps<I extends Dict> = Dependencies<I>;
 type Combine<Output> = (l: readonly Output[]) => Output;
+type Mapper<I extends Dict, A> = (d: Dep<I[typeof k]>, k: string) => A;
+type Transform<I extends Dict> = Mapper<I, unknown>;
 
 // Helper function used to map a function over Dependencies.
-type Mapper<I extends Dict, A> = (d: Dep<I[typeof k]>, k: string) => A;
 function mapDict<I extends Dict, A>(deps: Deps<I>, fn: Mapper<I, A>): A[] {
   return Object.keys(deps).map((k) => fn(deps[k], k));
 }
 
 // Helper function used to transfrom a Dependencies will keeping its structure.
-type Transform<I extends Dict> = (d: Dep<I[typeof k]>, k: string) => unknown;
 function transformDict<I extends Dict>(deps: Deps<I>, tr: Transform<I>): Dict {
   return Object.fromEntries(Object.keys(deps).map(k => [k, tr(deps[k], k)]));
 }
@@ -133,6 +136,8 @@ function getExtension<A>(dep: Dependency<A>): Extension {
   if (isAspect(dep)) return dep.extension;
   else return dep.structure.extension;
 }
+
+// -----------------------------------------------------------------------------
 
 
 
@@ -255,6 +260,8 @@ export function createEventHandler<I extends Dict>(
   return enables.concat(EditorView.domEventHandlers(domEventHandlers));
 }
 
+// -----------------------------------------------------------------------------
+
 
 
 // -----------------------------------------------------------------------------
@@ -294,14 +301,15 @@ export const LanguageHighlighter: Extension =
 
 
 // -----------------------------------------------------------------------------
-//  Standard extensions builders
+//  Standard extensions and commands
 // -----------------------------------------------------------------------------
 
+// Create a text field that updates the CodeMirror document when set.
 export type ToString<A> = (text: A) => string;
 export function createTextField<A>(init: A, toString: ToString<A>): Field<A> {
-  const { get, set, structure } = createField<A>(init);
+  const field = createField<A>(init);
   const useSet: Set<A> = (view, text) => {
-    set(view, text);
+    field.set(view, text);
     React.useEffect(() => {
       const selection = { anchor: 0 };
       const length = view?.state.doc.length;
@@ -309,9 +317,11 @@ export function createTextField<A>(init: A, toString: ToString<A>): Field<A> {
       view?.dispatch({ changes, selection });
     }, [view, text]);
   };
-  return { init, get, set: useSet, structure };
+  return { ...field, set: useSet };
 }
 
+// An extension displaying line numbers in a gutter. Does not display anything
+// if the document is empty.
 export const LineNumbers = createLineNumbers();
 function createLineNumbers(): Extension {
   return lineNumbers({
@@ -322,31 +332,47 @@ function createLineNumbers(): Extension {
   });
 }
 
+// An extension highlighting the active line.
+export const HighlightActiveLine = createHighlightActiveLine();
+function createHighlightActiveLine(): Extension {
+  const highlight = Decoration.line({ class: 'cm-active-line' });
+  return createDecorator({}, (_, state) => {
+    if (state.doc.length === 0) return RangeSet.empty;
+    const { from } = state.doc.lineAt(state.selection.main.from);
+    const deco = highlight.range(from, from);
+    return RangeSet.of(deco);
+  });
+}
+
+// An extension handling the folding of foldable nodes. For exemple, If used
+// with the language highlighter defined above, it will provides interactions
+// to fold comments only.
 export const FoldGutter = createFoldGutter();
 function createFoldGutter(): Extension {
   return Language.foldGutter();
 }
 
-export function foldAll(view: EditorView | null): void {
+// Folds all the foldable nodes of the given view.
+export function foldAll(view: View): void {
   if (view !== null) Language.foldAll(view);
 }
 
-export function unfoldAll(view: EditorView | null): void {
+// Unfolds all the foldable nodes of the given view.
+export function unfoldAll(view: View): void {
   if (view !== null) Language.unfoldAll(view);
 }
 
-export function createLineField(): Field<number> {
-  const { get, set, structure } = createField(0);
-  const useSet: Set<number> = (view, lineNum) => {
-    set(view, lineNum);
-    React.useEffect(() => {
-      if ((view?.state.doc.lines ?? 0) < lineNum + 1) return;
-      const { from } = view?.state.doc.line(lineNum + 1) ?? { from: 0 };
-      view?.dispatch({ selection: { anchor: from }, scrollIntoView: true });
-    }, [view, lineNum]);
-  };
-  return { init: 0, get, set: useSet, structure };
+// Move to the given line. The indexation starts at 1.
+export function selectLine(view: View, line: number): void {
+  if (!view || view.state.doc.lines < line) return;
+  const doc = view.state.doc;
+  const { from: here } = doc.lineAt(view.state.selection.main.from);
+  const { from: goto } = doc.line(Math.max(line, 1));
+  if (here === goto) return;
+  view.dispatch({ selection: { anchor: goto }, scrollIntoView: true });
 }
+
+// -----------------------------------------------------------------------------
 
 
 
@@ -354,11 +380,11 @@ export function createLineField(): Field<number> {
 //  Editor component
 // -----------------------------------------------------------------------------
 
-export interface Editor { view: EditorView | null; component: JSX.Element }
+export interface Editor { view: View; component: JSX.Element }
 
 export function Editor(extensions: Extension[]): Editor {
   const parent = React.useRef(null);
-  const editor = React.useRef<EditorView | null>(null);
+  const editor = React.useRef<View>(null);
   const component = <div className='cm-global-box' ref={parent} />;
   React.useEffect(() => {
     if (!parent.current) return;

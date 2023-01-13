@@ -188,4 +188,6 @@
 .cm-number { color: var(--codemirror-number); }
 .cm-keyword { color: var(--codemirror-keyword); }
 
+.cm-active-line { background-color: var(--background); }
+
 /* -------------------------------------------------------------------------- */

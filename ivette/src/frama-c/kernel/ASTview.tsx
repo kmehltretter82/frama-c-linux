@@ -66,6 +66,8 @@ function mapFilter<A, B>(xs: A[], fn: (x: A) => B | undefined): B[] {
   return xs.map(fn).filter(isDef);
 }
 
+// -----------------------------------------------------------------------------
+
 
 
 // -----------------------------------------------------------------------------
@@ -144,6 +146,8 @@ function coveringNode(tree: Tree, pos: number): Node | undefined {
   return undefined;
 }
 
+// -----------------------------------------------------------------------------
+
 
 
 // -----------------------------------------------------------------------------
@@ -161,6 +165,8 @@ const Tree = Editor.createAspect({ t: Text }, ({t}) => textToTree(t) ?? empty);
 // This aspect computes the markers ranges of the currently displayed function's
 // tree, represented by the <Tree> aspect.
 const Ranges = Editor.createAspect({ t: Tree }, ({ t }) => markersRanges(t));
+
+// -----------------------------------------------------------------------------
 
 
 
@@ -197,6 +203,21 @@ function createMarkerUpdater(): Editor.Extension {
     }
   });
 }
+
+// Scroll the selected marker into view if needed. Used for when the marker is
+// changed outside of this component.
+function scrollMarkerIntoView(view: Editor.View, marker: Marker): void {
+  if (!view || !marker) return;
+  const selection = view.state.selection.main;
+  const ranges = Ranges.get(view.state).get(marker) ?? [];
+  if (ranges.length === 0) return;
+  const exists = ranges.find((range) => range === selection);
+  if (exists) return;
+  const { from: anchor } = ranges[0];
+  view.dispatch({ selection: { anchor }, scrollIntoView: true });
+}
+
+// -----------------------------------------------------------------------------
 
 
 
@@ -239,6 +260,8 @@ function createHoveredUpdater(): Editor.Extension {
   });
 }
 
+// -----------------------------------------------------------------------------
+
 
 
 // -----------------------------------------------------------------------------
@@ -258,6 +281,8 @@ function createCodeDecorator(): Editor.Extension {
     return Editor.RangeSet.of(selected.concat(hovered), true);
   });
 }
+
+// -----------------------------------------------------------------------------
 
 
 
@@ -283,6 +308,8 @@ function createDeadCodeDecorator(): Editor.Extension {
     return Editor.RangeSet.of(unreachable.concat(nonTerm), true);
   });
 }
+
+// -----------------------------------------------------------------------------
 
 
 
@@ -379,6 +406,8 @@ function createPropertiesGutter(): Editor.Extension {
   });
 }
 
+// -----------------------------------------------------------------------------
+
 
 
 // -----------------------------------------------------------------------------
@@ -416,6 +445,8 @@ async function studia(props: StudiaProps): Promise<StudiaInfos> {
   const name = `No ${kind.toLowerCase()} of ${lval}`;
   return { name, title: '', locations: [], index: 0 };
 }
+
+// -----------------------------------------------------------------------------
 
 
 
@@ -480,6 +511,8 @@ function createContextMenuHandler(): Editor.Extension {
   });
 }
 
+// -----------------------------------------------------------------------------
+
 
 
 // -----------------------------------------------------------------------------
@@ -537,6 +570,8 @@ function createTaintTooltip(): Editor.Extension {
   });
 }
 
+// -----------------------------------------------------------------------------
+
 
 
 // -----------------------------------------------------------------------------
@@ -564,6 +599,8 @@ function useFctCallers(fct: Fct): Caller[] {
 function useFctTaints(fct: Fct): Eva.LvalueTaints[] {
   return States.useRequest(Eva.taintedLvalues, fct, { onError: [] }) ?? [];
 }
+
+// -----------------------------------------------------------------------------
 
 
 
@@ -622,6 +659,7 @@ export default function ASTview(): JSX.Element {
   Dead.set(view, useFctDead(fct));
   Callers.set(view, useFctCallers(fct));
   TaintedLvalues.set(view, useFctTaints(fct));
+  React.useEffect(() => scrollMarkerIntoView(view, marker), [view, marker]);
 
   return (
     <div style={{ height: '100%', fontSize: `${fontSize}px` }}>
@@ -648,4 +686,4 @@ export default function ASTview(): JSX.Element {
   );
 }
 
-// --------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
