@@ -69,8 +69,8 @@ let smooth_expression lst =
 let merge_string (c1,(b1,_)) (l2,(_,e2)) = c1 :: l2, (b1,e2)
 
 (* To be called only inside a grammar rule. *)
-let make_expr e =
-  { expr_loc = Cil_datatype.Location.of_lexing_loc (symbol_start_pos (), symbol_end_pos ());
+let make_expr start_end_pos e =
+  { expr_loc = Cil_datatype.Location.of_lexing_loc start_end_pos;
     expr_node = e }
 
 let currentFunctionName = ref "<outside any function>"
@@ -527,25 +527,26 @@ maybecomma:
 /* *** Expressions *** */
 
 primary_expression:                     /*(* 6.5.1. *)*/
-|		IDENT { make_expr (VARIABLE $1) }
+|		IDENT { make_expr $sloc (VARIABLE $1) }
 |        	constant {
   let (v,expr_loc) = $1 in { expr_loc; expr_node = CONSTANT v } }
 |		paren_comma_expression
-		        { make_expr (PAREN (smooth_expression $1)) }
-|		LPAREN block RPAREN { make_expr (GNU_BODY (fst3 $2)) }
+		        { make_expr $sloc (PAREN (smooth_expression $1)) }
+|		LPAREN block RPAREN { make_expr $sloc (GNU_BODY (fst3 $2)) }
 |  generic_selection { make_expr (GENERIC $1) }
 ;
 
 postfix_expression:                     /*(* 6.5.2 *)*/
 | primary_expression { $1 }
 | postfix_expression bracket_comma_expression
-      {make_expr (INDEX ($1, smooth_expression $2))}
-| postfix_expression LPAREN arguments RPAREN ghost_arguments_opt {make_expr (CALL ($1, $3, $5))}
+      { make_expr $sloc (INDEX ($1, smooth_expression $2))}
+| postfix_expression LPAREN arguments RPAREN ghost_arguments_opt
+      { make_expr $sloc (CALL ($1, $3, $5))}
 | BUILTIN_VA_ARG LPAREN expression COMMA type_name RPAREN
       { let b, d = $5 in
         let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 5, Parsing.rhs_end_pos 5) in
         let loc_f = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
-        make_expr
+        make_expr $sloc
           (CALL
              ({ expr_loc = loc_f;
                 expr_node = VARIABLE "__builtin_va_arg"},
@@ -558,7 +559,7 @@ postfix_expression:                     /*(* 6.5.2 *)*/
         let loc_f = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
         let loc1 = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 3, Parsing.rhs_end_pos 3) in
         let loc2 = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 5, Parsing.rhs_end_pos 5) in
-        make_expr
+        make_expr $sloc
           (CALL
              ({expr_loc = loc_f;
                expr_node = VARIABLE "__builtin_types_compatible_p"},
@@ -572,143 +573,143 @@ postfix_expression:                     /*(* 6.5.2 *)*/
       let builtin = { expr_loc = loc_f;
                       expr_node = VARIABLE "__builtin_offsetof" }
       in
-      make_expr (CALL (builtin, [ arg ], []))
+      make_expr $sloc (CALL (builtin, [ arg ], []))
     }
-| postfix_expression DOT id_or_typename { make_expr (MEMBEROF ($1, $3))}
-| postfix_expression ARROW id_or_typename { make_expr (MEMBEROFPTR ($1, $3)) }
-| postfix_expression PLUS_PLUS { make_expr (UNARY (POSINCR, $1)) }
-| postfix_expression MINUS_MINUS { make_expr (UNARY (POSDECR, $1)) }
+| postfix_expression DOT id_or_typename { make_expr $sloc (MEMBEROF ($1, $3))}
+| postfix_expression ARROW id_or_typename { make_expr $sloc (MEMBEROFPTR ($1, $3)) }
+| postfix_expression PLUS_PLUS { make_expr $sloc (UNARY (POSINCR, $1)) }
+| postfix_expression MINUS_MINUS { make_expr $sloc (UNARY (POSDECR, $1)) }
 /* (* We handle GCC constructor expressions *) */
 | LPAREN type_name RPAREN LBRACE initializer_list_opt RBRACE
-      { make_expr (CAST($2, COMPOUND_INIT $5)) }
+      { make_expr $sloc (CAST($2, COMPOUND_INIT $5)) }
 ;
 
 offsetof_member_designator:	/* GCC extension for __builtin_offsetof */
-|		id_or_typename { make_expr (VARIABLE $1) }
+|		id_or_typename { make_expr $sloc (VARIABLE $1) }
 |		offsetof_member_designator DOT IDENT
-			{ make_expr (MEMBEROF ($1, $3)) }
+			{ make_expr $sloc (MEMBEROF ($1, $3)) }
 |		offsetof_member_designator bracket_comma_expression
-			{ make_expr (INDEX ($1, smooth_expression $2)) }
+			{ make_expr $sloc (INDEX ($1, smooth_expression $2)) }
 ;
 
 unary_expression:   /*(* 6.5.3 *)*/
 |               postfix_expression
                         { $1 }
 |		PLUS_PLUS unary_expression
-		        {make_expr (UNARY (PREINCR, $2))}
+		        { make_expr $sloc (UNARY (PREINCR, $2))}
 |		MINUS_MINUS unary_expression
-		        {make_expr (UNARY (PREDECR, $2))}
+		        { make_expr $sloc (UNARY (PREDECR, $2))}
 |		SIZEOF unary_expression
-		        {make_expr (EXPR_SIZEOF $2)}
+		        { make_expr $sloc (EXPR_SIZEOF $2)}
 |	 	SIZEOF LPAREN type_name RPAREN
-		        {let b, d = $3 in make_expr (TYPE_SIZEOF (b, d)) }
+		        { let b, d = $3 in make_expr $sloc (TYPE_SIZEOF (b, d)) }
 |		ALIGNOF unary_expression
-		        { make_expr (EXPR_ALIGNOF $2) }
+		        { make_expr $sloc (EXPR_ALIGNOF $2) }
 |	 	ALIGNOF LPAREN type_name RPAREN
-		        {let b, d = $3 in make_expr (TYPE_ALIGNOF (b, d)) }
+		        {let b, d = $3 in make_expr $sloc (TYPE_ALIGNOF (b, d)) }
 |		PLUS cast_expression
-		        { make_expr (UNARY (PLUS, $2)) }
+		        { make_expr $sloc (UNARY (PLUS, $2)) }
 |		MINUS cast_expression
-		        { make_expr (UNARY (MINUS, $2)) }
+		        { make_expr $sloc (UNARY (MINUS, $2)) }
 |		STAR cast_expression
-		        {make_expr (UNARY (MEMOF, $2)) }
+		        { make_expr $sloc (UNARY (MEMOF, $2)) }
 |		AND cast_expression
-		        {make_expr (UNARY (ADDROF, $2))}
+		        { make_expr $sloc (UNARY (ADDROF, $2))}
 |		EXCLAM cast_expression
-		        { make_expr (UNARY (NOT, $2)) }
+		        { make_expr $sloc (UNARY (NOT, $2)) }
 |		TILDE cast_expression
-		        { make_expr (UNARY (BNOT, $2)) }
+		        { make_expr $sloc (UNARY (BNOT, $2)) }
 /* (* GCC allows to take address of a label (see COMPGOTO statement) *) */
-|               AND_AND id_or_typename_as_id { make_expr (LABELADDR $2) }
+|               AND_AND id_or_typename_as_id { make_expr $sloc (LABELADDR $2) }
 ;
 
 cast_expression:   /*(* 6.5.4 *)*/
 | unary_expression { $1 }
 | LPAREN type_name RPAREN cast_expression
-      { make_expr (CAST($2, SINGLE_INIT $4)) }
+      { make_expr $sloc (CAST($2, SINGLE_INIT $4)) }
 ;
 
 multiplicative_expression:  /*(* 6.5.5 *)*/
 | cast_expression { $1 }
 | multiplicative_expression STAR cast_expression
-      { make_expr (BINARY(MUL, $1, $3)) }
+      { make_expr $sloc (BINARY(MUL, $1, $3)) }
 | multiplicative_expression SLASH cast_expression
-      { make_expr (BINARY(DIV, $1, $3)) }
+      { make_expr $sloc (BINARY(DIV, $1, $3)) }
 | multiplicative_expression PERCENT cast_expression
-      { make_expr (BINARY(MOD, $1, $3)) }
+      { make_expr $sloc (BINARY(MOD, $1, $3)) }
 ;
 
 additive_expression:  /*(* 6.5.6 *)*/
 |               multiplicative_expression { $1 }
 |		additive_expression PLUS multiplicative_expression
-			{ make_expr (BINARY(ADD, $1, $3)) }
+			{ make_expr $sloc (BINARY(ADD, $1, $3)) }
 |		additive_expression MINUS multiplicative_expression
-			{ make_expr (BINARY(SUB, $1, $3)) }
+			{ make_expr $sloc (BINARY(SUB, $1, $3)) }
 ;
 
 shift_expression:      /*(* 6.5.7 *)*/
 |               additive_expression { $1 }
 |		shift_expression  INF_INF additive_expression
-			{make_expr (BINARY(SHL, $1, $3)) }
+			{ make_expr $sloc (BINARY(SHL, $1, $3)) }
 |		shift_expression  SUP_SUP additive_expression
-			{ make_expr (BINARY(SHR, $1, $3)) }
+			{ make_expr $sloc (BINARY(SHR, $1, $3)) }
 ;
 
 
 relational_expression:   /*(* 6.5.8 *)*/
 |               shift_expression { $1 }
 |		relational_expression INF shift_expression
-			{ make_expr (BINARY(LT, $1, $3)) }
+			{ make_expr $sloc (BINARY(LT, $1, $3)) }
 |		relational_expression SUP shift_expression
-			{ make_expr (BINARY(GT, $1, $3)) }
+			{ make_expr $sloc (BINARY(GT, $1, $3)) }
 |		relational_expression INF_EQ shift_expression
-			{ make_expr (BINARY(LE, $1, $3)) }
+			{ make_expr $sloc (BINARY(LE, $1, $3)) }
 |		relational_expression SUP_EQ shift_expression
-			{ make_expr (BINARY(GE, $1, $3)) }
+			{ make_expr $sloc (BINARY(GE, $1, $3)) }
 ;
 
 equality_expression:   /*(* 6.5.9 *)*/
 | relational_expression { $1 }
 | equality_expression EQ_EQ relational_expression
-      { make_expr (BINARY(EQ, $1, $3)) }
+      { make_expr $sloc (BINARY(EQ, $1, $3)) }
 | equality_expression EXCLAM_EQ relational_expression
-      { make_expr (BINARY(NE, $1, $3)) }
+      { make_expr $sloc (BINARY(NE, $1, $3)) }
 ;
 
 bitwise_and_expression:   /*(* 6.5.10 *)*/
 |               equality_expression { $1 }
 |		bitwise_and_expression AND equality_expression
-			{ make_expr (BINARY(BAND, $1, $3)) }
+			{ make_expr $sloc (BINARY(BAND, $1, $3)) }
 ;
 
 bitwise_xor_expression:   /*(* 6.5.11 *)*/
 |               bitwise_and_expression { $1 }
 |		bitwise_xor_expression CIRC bitwise_and_expression
-			{ make_expr (BINARY(XOR, $1, $3)) }
+			{ make_expr $sloc (BINARY(XOR, $1, $3)) }
 ;
 
 bitwise_or_expression:   /*(* 6.5.12 *)*/
 |               bitwise_xor_expression { $1 }
 |		bitwise_or_expression PIPE bitwise_xor_expression
-			{ make_expr (BINARY(BOR, $1, $3)) }
+			{ make_expr $sloc (BINARY(BOR, $1, $3)) }
 ;
 
 logical_and_expression:   /*(* 6.5.13 *)*/
 |               bitwise_or_expression { $1 }
 |		logical_and_expression AND_AND bitwise_or_expression
-			{ make_expr (BINARY(AND, $1, $3)) }
+			{ make_expr $sloc (BINARY(AND, $1, $3)) }
 ;
 
 logical_or_expression:   /*(* 6.5.14 *)*/
 |               logical_and_expression { $1 }
 |		logical_or_expression PIPE_PIPE logical_and_expression
-			{ make_expr (BINARY(OR, $1, $3)) }
+			{ make_expr $sloc (BINARY(OR, $1, $3)) }
 ;
 
 conditional_expression:    /*(* 6.5.15 *)*/
 | logical_or_expression { $1 }
 | logical_or_expression QUEST opt_expression COLON conditional_expression
-      { make_expr (QUESTION ($1, $3, $5)) }
+      { make_expr $sloc (QUESTION ($1, $3, $5)) }
 ;
 
 /*(* The C spec says that left-hand sides of assignment expressions are unary
@@ -717,27 +718,27 @@ conditional_expression:    /*(* 6.5.15 *)*/
 assignment_expression:     /*(* 6.5.16 *)*/
 |               conditional_expression { $1 }
 |		cast_expression EQ assignment_expression
-			{ make_expr (BINARY(ASSIGN, $1, $3)) }
+			{ make_expr $sloc (BINARY(ASSIGN, $1, $3)) }
 |		cast_expression PLUS_EQ assignment_expression
-			{ make_expr (BINARY(ADD_ASSIGN, $1, $3)) }
+			{ make_expr $sloc (BINARY(ADD_ASSIGN, $1, $3)) }
 |		cast_expression MINUS_EQ assignment_expression
-			{ make_expr (BINARY(SUB_ASSIGN, $1, $3)) }
+			{ make_expr $sloc (BINARY(SUB_ASSIGN, $1, $3)) }
 |		cast_expression STAR_EQ assignment_expression
-			{ make_expr (BINARY(MUL_ASSIGN, $1, $3)) }
+			{ make_expr $sloc (BINARY(MUL_ASSIGN, $1, $3)) }
 |		cast_expression SLASH_EQ assignment_expression
-			{ make_expr (BINARY(DIV_ASSIGN, $1, $3)) }
+			{ make_expr $sloc (BINARY(DIV_ASSIGN, $1, $3)) }
 |		cast_expression PERCENT_EQ assignment_expression
-			{ make_expr (BINARY(MOD_ASSIGN, $1, $3)) }
+			{ make_expr $sloc (BINARY(MOD_ASSIGN, $1, $3)) }
 |		cast_expression AND_EQ assignment_expression
-			{ make_expr (BINARY(BAND_ASSIGN, $1, $3)) }
+			{ make_expr $sloc (BINARY(BAND_ASSIGN, $1, $3)) }
 |		cast_expression PIPE_EQ assignment_expression
-			{ make_expr (BINARY(BOR_ASSIGN, $1, $3)) }
+			{ make_expr $sloc (BINARY(BOR_ASSIGN, $1, $3)) }
 |		cast_expression CIRC_EQ assignment_expression
-			{ make_expr (BINARY(XOR_ASSIGN, $1, $3)) }
+			{ make_expr $sloc (BINARY(XOR_ASSIGN, $1, $3)) }
 |		cast_expression INF_INF_EQ assignment_expression
-			{ make_expr (BINARY(SHL_ASSIGN, $1, $3)) }
+			{ make_expr $sloc (BINARY(SHL_ASSIGN, $1, $3)) }
 |		cast_expression SUP_SUP_EQ assignment_expression
-			{ make_expr (BINARY(SHR_ASSIGN, $1, $3))}
+			{ make_expr $sloc (BINARY(SHR_ASSIGN, $1, $3))}
 ;
 
 expression:           /*(* 6.5.17 *)*/
@@ -831,7 +832,7 @@ arguments:
 ;
 
 opt_expression:
-	        /* empty */ {make_expr NOTHING}
+	        /* empty */ {make_expr $sloc NOTHING}
 |	        comma_expression {smooth_expression $1 }
 ;
 
@@ -841,7 +842,7 @@ comma_expression:
 ;
 
 comma_expression_opt:
-                /* empty */         { make_expr NOTHING }
+                /* empty */         { make_expr $sloc NOTHING }
 |               comma_expression    { smooth_expression $1 }
 ;
 
@@ -1159,7 +1160,7 @@ decl_spec_wo_type:                         /* ISO 6.7 */
                                         /* ISO 6.7.4 */
 |   INLINE           { SpecInline, $1 }
 |   NORETURN         { SpecAttr
-                         (("noreturn",[make_expr (VARIABLE "c11")])), $1 }
+                         (("noreturn",[make_expr $sloc (VARIABLE "c11")])), $1 }
 |   cvspec           { $1 }
 |   attribute_nocv   { SpecAttr (fst $1), snd $1 }
 ;
@@ -1565,7 +1566,7 @@ attribute_nocv:
                                         /* ISO 6.7.3 */
 |   THREAD                              { ("__thread", []), $1 }
 |   THREAD_LOCAL                        { ("__thread",
-                                           [make_expr (VARIABLE "c11")]),
+                                           [make_expr $sloc (VARIABLE "c11")]),
                                           $1 }
 ;
 
@@ -1604,31 +1605,31 @@ just_attributes:
 /** (* PRAGMAS and ATTRIBUTES *) ***/
 pragma:
 | PRAGMA PRAGMA_EOL		        {
-    PRAGMA (make_expr (VARIABLE ("")), $1)
+    PRAGMA (make_expr $sloc (VARIABLE ("")), $1)
   }
 | PRAGMA attr PRAGMA_EOL		{ PRAGMA ($2, $1) }
 | PRAGMA attr SEMICOLON PRAGMA_EOL	{ PRAGMA ($2, $1) }
 | PRAGMA_LINE                           {
-    PRAGMA (make_expr (VARIABLE (fst $1)), snd $1)
+    PRAGMA (make_expr $sloc (VARIABLE (fst $1)), snd $1)
   }
 ;
 
 /* (* We want to allow certain strange things that occur in pragmas, so we
     * cannot use directly the language of expressions *) */
 var_attr:
-|   IDENT { make_expr (VARIABLE $1) }
-|   NAMED_TYPE { make_expr (VARIABLE $1) }
-|   DEFAULT COLON CST_INT { make_expr (VARIABLE ("default:" ^ fst $3)) }
+|   IDENT { make_expr $sloc (VARIABLE $1) }
+|   NAMED_TYPE { make_expr $sloc (VARIABLE $1) }
+|   DEFAULT COLON CST_INT { make_expr $sloc (VARIABLE ("default:" ^ fst $3)) }
       /* Const when it appears in attribute lists, is translated to aconst */
-|   CONST { make_expr (VARIABLE "aconst") }
+|   CONST { make_expr $sloc (VARIABLE "aconst") }
 /*(** GCC allows this as an attribute for functions, synonym for noreturn **)*/
-|   VOLATILE { make_expr (VARIABLE ("__noreturn__")) }
-|   CST_INT COLON CST_INT      { make_expr (VARIABLE (fst $1 ^ ":" ^ fst $3)) }
+|   VOLATILE { make_expr $sloc (VARIABLE ("__noreturn__")) }
+|   CST_INT COLON CST_INT      { make_expr $sloc (VARIABLE (fst $1 ^ ":" ^ fst $3)) }
 ;
 
 basic_attr:
-|   CST_INT { make_expr (CONSTANT(CONST_INT (fst $1))) }
-|   CST_FLOAT { make_expr (CONSTANT(CONST_FLOAT(fst $1))) }
+|   CST_INT { make_expr $sloc (CONSTANT(CONST_INT (fst $1))) }
+|   CST_FLOAT { make_expr $sloc (CONSTANT(CONST_FLOAT(fst $1))) }
 |   var_attr { $1 }
 ;
 basic_attr_list_ne:
@@ -1639,43 +1640,43 @@ basic_attr_list_ne:
 parameter_attr_list_ne:
     basic_attr_list_ne			{ $1 }
 |   basic_attr_list_ne string_constant	{
-      $1 @ [make_expr (CONSTANT(CONST_STRING (fst $2)))]
+      $1 @ [make_expr $sloc (CONSTANT(CONST_STRING (fst $2)))]
     }
 |   basic_attr_list_ne string_constant parameter_attr_list_ne {
-      $1 @ ([make_expr (CONSTANT(CONST_STRING (fst $2)))] @ $3)
+      $1 @ ([make_expr $sloc (CONSTANT(CONST_STRING (fst $2)))] @ $3)
     }
 ;
 param_attr_list_ne:
     parameter_attr_list_ne { $1 }
-|   string_constant { [make_expr (CONSTANT(CONST_STRING (fst $1)))] }
+|   string_constant { [make_expr $sloc (CONSTANT(CONST_STRING (fst $1)))] }
 ;
 primary_attr:
     basic_attr { $1 }
 |   LPAREN attr RPAREN { $2 }
-|   string_constant { make_expr (CONSTANT(CONST_STRING (fst $1))) }
+|   string_constant { make_expr $sloc (CONSTANT(CONST_STRING (fst $1))) }
 ;
 postfix_attr:
     primary_attr { $1 }
 |   id_or_typename_as_id paren_attr_list_ne {
         let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
-        make_expr (CALL({ expr_loc = loc; expr_node = VARIABLE $1}, $2,[])) }
+        make_expr $sloc (CALL({ expr_loc = loc; expr_node = VARIABLE $1}, $2,[])) }
       /* (* use a VARIABLE "" so that the parentheses are printed *) */
 |   id_or_typename_as_id LPAREN  RPAREN {
       let loc1 = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
       let loc2 = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 2, Parsing.rhs_end_pos 3) in
       let f = { expr_node = VARIABLE $1; expr_loc = loc1 } in
       let arg = { expr_node = VARIABLE ""; expr_loc = loc2 } in
-      make_expr (CALL(f, [arg],[]))
+      make_expr $sloc (CALL(f, [arg],[]))
     }
       /* (* use a VARIABLE "" so that the parameters are printed without
           * parentheses nor comma *) */
 |   basic_attr param_attr_list_ne  {
       let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
-      make_expr (CALL({ expr_node = VARIABLE ""; expr_loc = loc}, $1::$2,[])) }
+      make_expr $sloc (CALL({ expr_node = VARIABLE ""; expr_loc = loc}, $1::$2,[])) }
 
-|   postfix_attr ARROW id_or_typename   { make_expr (MEMBEROFPTR ($1, $3))}
-|   postfix_attr DOT id_or_typename     { make_expr (MEMBEROF ($1, $3)) }
-|   postfix_attr LBRACKET attr RBRACKET { make_expr (INDEX ($1, $3)) }
+|   postfix_attr ARROW id_or_typename   { make_expr $sloc (MEMBEROFPTR ($1, $3))}
+|   postfix_attr DOT id_or_typename     { make_expr $sloc (MEMBEROF ($1, $3)) }
+|   postfix_attr LBRACKET attr RBRACKET { make_expr $sloc (INDEX ($1, $3)) }
 ;
 
 /*(* Since in attributes we use both IDENT and NAMED_TYPE as indentifiers,
@@ -1683,21 +1684,21 @@ postfix_attr:
  * that their arguments be expressions, not attributes *)*/
 unary_attr:
     postfix_attr                        { $1 }
-|   SIZEOF unary_expression             { make_expr (EXPR_SIZEOF $2) }
+|   SIZEOF unary_expression             { make_expr $sloc (EXPR_SIZEOF $2) }
 |   SIZEOF LPAREN type_name RPAREN
 		                        {let b, d = $3 in
-                                         make_expr (TYPE_SIZEOF (b, d)) }
+                                         make_expr $sloc (TYPE_SIZEOF (b, d)) }
 
-|   ALIGNOF unary_expression            {make_expr (EXPR_ALIGNOF $2) }
+|   ALIGNOF unary_expression            {make_expr $sloc (EXPR_ALIGNOF $2) }
 |   ALIGNOF LPAREN type_name RPAREN     {let b, d = $3 in
-                                         make_expr (TYPE_ALIGNOF (b, d)) }
-|   PLUS cast_attr                      {make_expr (UNARY (PLUS, $2))}
-|   MINUS cast_attr                     {make_expr (UNARY (MINUS, $2)) }
-|   STAR cast_attr		        {make_expr (UNARY (MEMOF, $2)) }
+                                         make_expr $sloc (TYPE_ALIGNOF (b, d)) }
+|   PLUS cast_attr                      {make_expr $sloc (UNARY (PLUS, $2))}
+|   MINUS cast_attr                     {make_expr $sloc (UNARY (MINUS, $2)) }
+|   STAR cast_attr		        {make_expr $sloc (UNARY (MEMOF, $2)) }
 |   AND cast_attr
-	                                { make_expr (UNARY (ADDROF, $2)) }
-|   EXCLAM cast_attr    	        { make_expr (UNARY (NOT, $2)) }
-|   TILDE cast_attr                     { make_expr (UNARY (BNOT, $2)) }
+	                                { make_expr $sloc (UNARY (ADDROF, $2)) }
+|   EXCLAM cast_attr    	        { make_expr $sloc (UNARY (NOT, $2)) }
+|   TILDE cast_attr                     { make_expr $sloc (UNARY (BNOT, $2)) }
 ;
 
 cast_attr:
@@ -1706,74 +1707,74 @@ cast_attr:
 
 multiplicative_attr:
     cast_attr                           { $1 }
-|   multiplicative_attr STAR cast_attr  {make_expr (BINARY(MUL ,$1 , $3))}
-|   multiplicative_attr SLASH cast_attr	{make_expr (BINARY(DIV ,$1 , $3))}
-|   multiplicative_attr PERCENT cast_attr {make_expr (BINARY(MOD ,$1 , $3))}
+|   multiplicative_attr STAR cast_attr  {make_expr $sloc (BINARY(MUL ,$1 , $3))}
+|   multiplicative_attr SLASH cast_attr	{make_expr $sloc (BINARY(DIV ,$1 , $3))}
+|   multiplicative_attr PERCENT cast_attr {make_expr $sloc (BINARY(MOD ,$1 , $3))}
 ;
 
 
 additive_attr:
     multiplicative_attr                 { $1 }
-|   additive_attr PLUS multiplicative_attr  {make_expr (BINARY(ADD ,$1 , $3))}
-|   additive_attr MINUS multiplicative_attr {make_expr (BINARY(SUB ,$1 , $3))}
+|   additive_attr PLUS multiplicative_attr  {make_expr $sloc (BINARY(ADD ,$1 , $3))}
+|   additive_attr MINUS multiplicative_attr {make_expr $sloc (BINARY(SUB ,$1 , $3))}
 ;
 
 shift_attr:
     additive_attr                       { $1 }
-|   shift_attr INF_INF additive_attr	{make_expr (BINARY(SHL ,$1 , $3))}
-|   shift_attr SUP_SUP additive_attr	{make_expr (BINARY(SHR ,$1 , $3))}
+|   shift_attr INF_INF additive_attr	{make_expr $sloc (BINARY(SHL ,$1 , $3))}
+|   shift_attr SUP_SUP additive_attr	{make_expr $sloc (BINARY(SHR ,$1 , $3))}
 ;
 
 relational_attr:
     shift_attr                          { $1 }
-|   relational_attr INF shift_attr	{make_expr (BINARY(LT ,$1 , $3))}
-|   relational_attr SUP shift_attr	{make_expr (BINARY(GT ,$1 , $3))}
-|   relational_attr INF_EQ shift_attr	{make_expr (BINARY(LE ,$1 , $3))}
-|   relational_attr SUP_EQ shift_attr	{make_expr (BINARY(GE ,$1 , $3))}
+|   relational_attr INF shift_attr	{make_expr $sloc (BINARY(LT ,$1 , $3))}
+|   relational_attr SUP shift_attr	{make_expr $sloc (BINARY(GT ,$1 , $3))}
+|   relational_attr INF_EQ shift_attr	{make_expr $sloc (BINARY(LE ,$1 , $3))}
+|   relational_attr SUP_EQ shift_attr	{make_expr $sloc (BINARY(GE ,$1 , $3))}
 ;
 
 equality_attr:
     relational_attr                     { $1 }
-|   equality_attr EQ_EQ relational_attr	    {make_expr (BINARY(EQ ,$1 , $3))}
-|   equality_attr EXCLAM_EQ relational_attr {make_expr (BINARY(NE ,$1 , $3))}
+|   equality_attr EQ_EQ relational_attr	    {make_expr $sloc (BINARY(EQ ,$1 , $3))}
+|   equality_attr EXCLAM_EQ relational_attr {make_expr $sloc (BINARY(NE ,$1 , $3))}
 ;
 
 
 bitwise_and_attr:
     equality_attr                       { $1 }
-|   bitwise_and_attr AND equality_attr	{make_expr (BINARY(BAND ,$1 , $3))}
+|   bitwise_and_attr AND equality_attr	{make_expr $sloc (BINARY(BAND ,$1 , $3))}
 ;
 
 bitwise_xor_attr:
     bitwise_and_attr                       { $1 }
-|   bitwise_xor_attr CIRC bitwise_and_attr {make_expr (BINARY(XOR ,$1 , $3))}
+|   bitwise_xor_attr CIRC bitwise_and_attr {make_expr $sloc (BINARY(XOR ,$1 , $3))}
 ;
 
 bitwise_or_attr:
     bitwise_xor_attr                      { $1 }
-|   bitwise_or_attr PIPE bitwise_xor_attr {make_expr (BINARY(BOR ,$1 , $3))}
+|   bitwise_or_attr PIPE bitwise_xor_attr {make_expr $sloc (BINARY(BOR ,$1 , $3))}
 ;
 
 logical_and_attr:
     bitwise_or_attr                             { $1 }
 |   logical_and_attr AND_AND bitwise_or_attr
-        {make_expr (BINARY(AND ,$1 , $3))}
+        {make_expr $sloc (BINARY(AND ,$1 , $3))}
 ;
 
 logical_or_attr:
     logical_and_attr                           { $1 }
 |   logical_or_attr PIPE_PIPE logical_and_attr
-        {make_expr (BINARY(OR ,$1 , $3))}
+        {make_expr $sloc (BINARY(OR ,$1 , $3))}
 ;
 
 conditional_attr:
     logical_or_attr                        { $1 }
 |   logical_or_attr QUEST attr_test conditional_attr COLON2 conditional_attr
-    { make_expr (QUESTION($1, $4, $6)) }
+    { make_expr $sloc (QUESTION($1, $4, $6)) }
 
 assign_attr:
     conditional_attr                     { $1 }
-|   conditional_attr EQ conditional_attr { make_expr (BINARY(ASSIGN,$1,$3)) }
+|   conditional_attr EQ conditional_attr { make_expr $sloc (BINARY(ASSIGN,$1,$3)) }
 
 /* hack to avoid shift reduce conflict in attribute parsing. */
 attr_test:
