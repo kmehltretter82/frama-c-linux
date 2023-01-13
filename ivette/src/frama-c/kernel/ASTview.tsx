@@ -251,11 +251,11 @@ function createCodeDecorator(): Editor.Extension {
   const selectedClass = Editor.Decoration.mark({ class: 'cm-selected-code' });
   const deps = { ranges: Ranges, marker: Marker, hovered: Hovered };
   return Editor.createDecorator(deps, ({ ranges, marker: m, hovered: h }) => {
-    const hoveredRanges = (h && ranges.get(h)) ?? [];
-    const selectedRanges = (m && ranges.get(m)) ?? [];
+    const hoveredRanges = h ? (ranges.get(h) ?? []) : [];
+    const selectedRanges = m ? (ranges.get(m) ?? []) : [];
     const hovered = hoveredRanges.map(r => hoveredClass.range(r.from, r.to));
     const selected = selectedRanges.map(r => selectedClass.range(r.from, r.to));
-    return Editor.RangeSet.of(selected).update({ add: hovered, sort: true });
+    return Editor.RangeSet.of(selected.concat(hovered), true);
   });
 }
 
