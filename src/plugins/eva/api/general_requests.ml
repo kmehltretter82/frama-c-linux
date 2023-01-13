@@ -352,7 +352,7 @@ module LvalueTaints = struct
     let create lval taint = set lval_field lval @@ set taint_field taint default
   end
 
-  let current_project () = Visitor_behavior.copy (Project.current ())
+  let current_project () = Visitor_behavior.inplace ()
   class tainted_lvalues taints = object (self)
     inherit Visitor.generic_frama_c_visitor (current_project ())
     method! vlval lval =
