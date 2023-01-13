@@ -24,7 +24,11 @@
 (ocamllex logic_preprocess)
 (ocamllex logic_lexer)
 
-(ocamlyacc logic_parser)
+(menhir
+  (modules logic_parser)
+  ; "--fixed-exception" fixes compatibility with ocamlyacc Parsing.Parse_error
+  (flags --fixed-exception --explain --dump --comment)
+)
 
 (menhir
   (modules cparser)

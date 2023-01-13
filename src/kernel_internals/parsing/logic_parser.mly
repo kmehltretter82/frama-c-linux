@@ -30,19 +30,18 @@
   open Logic_ptree
   open Logic_utils
 
-  let loc () =
+  let loc (start_pos, end_pos) =
     Cil_datatype.Location.of_lexing_loc
-      (symbol_start_pos (), symbol_end_pos ())
-  let lexeme_start nb =
-    Cil_datatype.Position.of_lexing_pos (Parsing.rhs_start_pos nb)
-  let lexeme_end nb =
-    Cil_datatype.Position.of_lexing_pos (Parsing.rhs_end_pos nb)
-  let lexeme_loc nb = (lexeme_start nb, lexeme_end nb)
+      (start_pos, end_pos)
 
-  let info x = { lexpr_node = x; lexpr_loc = loc () }
-  let loc_info loc x = { lexpr_node = x; lexpr_loc = loc }
+  let pos pos =
+    Cil_datatype.Position.of_lexing_pos pos
+
+  let loc_info lexpr_loc x = { lexpr_node = x; lexpr_loc }
   let loc_start x = fst x.lexpr_loc
   let loc_end x = snd x.lexpr_loc
+
+  let info start_end x = loc_info (loc start_end) x
 
   (* Normalize p1 && (p2 && p3) into (p1 && p2) && p3 *)
   let rec pland p1 p2 =
@@ -59,17 +58,17 @@
         PLor(loc_info loc (plor p1 p3),p4)
       | _ -> PLor(p1,p2)
 
-  let clause_order i name1 name2 =
+  let clause_order start_end name1 name2 =
     raise
       (Not_well_formed
-         (lexeme_loc i,
+         (loc start_end,
           "wrong order of clause in contract: "
           ^ name1 ^ " after " ^ name2 ^ "."))
 
-  let missing i token next_token =
+  let missing start_end token next_token =
     raise
       (Not_well_formed
-         (lexeme_loc i,
+         (loc start_end,
           Format.asprintf "expecting '%s' before %s" token next_token))
 
   type sense_of_relation = Unknown | Disequal | Less | Greater
@@ -105,9 +104,9 @@
 
   let is_rt_type () = !rt_type
 
-  let loc_decl d = { decl_node = d; decl_loc = loc () }
+  let loc_decl start_end d = { decl_node = d; decl_loc = loc start_end }
 
-  let loc_ext d = { extended_node = d; extended_loc = loc () }
+  let loc_ext start_end d = { extended_node = d; extended_loc = loc start_end }
 
   let filter_from l = function
     | FromAny ->
@@ -168,16 +167,16 @@
       | FreeAlloc(f1,a1),FreeAlloc(f2,a2) -> FreeAlloc(f2@f1,a2@a1)
 
   (* a1 represents the assigns _after_ the current clause a2. *)
-  let concat_assigns a1 a2 =
+  let concat_assigns start_pos a1 a2 =
     match a1,a2 with
         WritesAny,a -> Writes (concat_froms [] a)
       | Writes [], [] -> a1
       | Writes [], _  | Writes _, [] ->
         raise (
-          Not_well_formed (loc(),"Mixing \\nothing and a real location"))
+          Not_well_formed (loc start_pos,"Mixing \\nothing and a real location"))
       | Writes a1, a2 -> Writes (concat_froms (concat_froms [] a2) a1)
 
-  let concat_loop_assigns_allocation annots bhvs2 a2 fa2=
+  let concat_loop_assigns_allocation start_pos annots bhvs2 a2 fa2=
     (* NB: this is supposed to merge assigns related to named behaviors, in
        case of annotation like
        for a,b: assigns x,y;
@@ -203,7 +202,7 @@
             (match both with
               | [] -> bhvs2, ca::acc
               | _ ->
-                let common_annot = AAssigns(both,concat_assigns a1 a2) in
+                let common_annot = AAssigns(both,concat_assigns start_pos a1 a2) in
                 let annots =
                   match only1 with
                     | [] -> common_annot :: acc
@@ -340,22 +339,27 @@
 %%
 
 enter_kw_c_mode:
-/* empty */ { enter_kw_c_mode () }
+| /* empty */ { enter_kw_c_mode () }
+;
 
 exit_kw_c_mode:
-/* empty */ { exit_kw_c_mode () }
+| /* empty */ { exit_kw_c_mode () }
+;
 
 enter_rt_type:
-/* empty */ { if is_rt_type () then enter_rt_type_mode () }
+| /* empty */ { if is_rt_type () then enter_rt_type_mode () }
+;
 
 exit_rt_type:
-/* empty */ { if is_rt_type () then exit_rt_type_mode () }
+| /* empty */ { if is_rt_type () then exit_rt_type_mode () }
+;
 
 begin_rt_type:
-/* empty */ { set_rt_type () }
+| /* empty */ { set_rt_type () }
 
 end_rt_type:
-/* empty */ { reset_rt_type () }
+| /* empty */ { reset_rt_type () }
+;
 
 /*** predicates and terms ***/
 
@@ -380,30 +384,30 @@ lexpr_option:
 
 lexpr:
   /* predicates */
-| lexpr IMPLIES lexpr { info (PLimplies ($1, $3)) }
-| lexpr IFF lexpr { info (PLiff ($1, $3)) }
-| lexpr OR lexpr     { info (plor $1 $3) }
-| lexpr AND lexpr    { info (pland $1 $3) }
-| lexpr HATHAT lexpr    { info (PLxor ($1, $3)) }
+| lexpr IMPLIES lexpr { info $sloc (PLimplies ($1, $3)) }
+| lexpr IFF lexpr { info $sloc (PLiff ($1, $3)) }
+| lexpr OR lexpr     { info $sloc (plor $1 $3) }
+| lexpr AND lexpr    { info $sloc (pland $1 $3) }
+| lexpr HATHAT lexpr    { info $sloc (PLxor ($1, $3)) }
 /* terms */
-| lexpr AMP lexpr { info (PLbinop ($1, Bbw_and, $3)) }
-| lexpr PIPE lexpr { info (PLbinop ($1, Bbw_or, $3)) }
-| lexpr HAT lexpr { info (PLbinop ($1, Bbw_xor, $3)) }
-| lexpr BIMPLIES lexpr { info (PLbinop (info (PLunop (Ubw_not, $1)), Bbw_or, $3)) }
-| lexpr BIFF lexpr { info (PLbinop (info (PLunop (Ubw_not, $1)), Bbw_xor, $3)) }
-| lexpr IN lexpr { info (PLapp ("\\subset", [], [info ((PLset [$1]));$3])) }
+| lexpr AMP lexpr { info $sloc (PLbinop ($1, Bbw_and, $3)) }
+| lexpr PIPE lexpr { info $sloc (PLbinop ($1, Bbw_or, $3)) }
+| lexpr HAT lexpr { info $sloc (PLbinop ($1, Bbw_xor, $3)) }
+| lexpr BIMPLIES lexpr { info $sloc (PLbinop (info $sloc (PLunop (Ubw_not, $1)), Bbw_or, $3)) }
+| lexpr BIFF lexpr { info $sloc (PLbinop (info $sloc (PLunop (Ubw_not, $1)), Bbw_xor, $3)) }
+| lexpr IN lexpr { info $sloc (PLapp ("\\subset", [], [info $sloc (PLset [$1]);$3])) }
 | lexpr QUESTION lexpr COLON2 lexpr %prec prec_question
-    { info (PLif ($1, $3, $5)) }
+    { info $sloc (PLif ($1, $3, $5)) }
 /* both terms and predicates */
-| any_identifier COLON lexpr %prec prec_named { info (PLnamed ($1, $3)) }
+| any_identifier COLON lexpr %prec prec_named { info $sloc (PLnamed ($1, $3)) }
 | string COLON lexpr %prec prec_named
       { let (iswide,str) = $1 in
         if iswide then begin
-           let l = loc () in
+           let l = loc $sloc in
            raise (Not_well_formed(l, "Wide strings are not allowed as labels."))
          end;
         let str = escape str in
-         info (PLnamed (str, $3))
+         info $sloc (PLnamed (str, $3))
        }
 | lexpr_rel { $1 }
 ;
@@ -416,24 +420,25 @@ lexpr_rel:
         let relation = loc_info loc (PLrel($1,rel,rhs)) in
         match oth_rel with
             None -> relation
-          | Some oth_relation -> info (pland relation oth_relation)
+          | Some oth_relation -> info $sloc (pland relation oth_relation)
       }
 ;
 
 lexpr_binder:
-| LET bounded_var EQUAL lexpr SEMICOLON lexpr %prec LET {info (PLlet($2,$4,$6))}
+| LET bounded_var EQUAL lexpr SEMICOLON lexpr %prec LET
+      { info $sloc (PLlet($2,$4,$6))}
 | FORALL binders SEMICOLON lexpr  %prec prec_forall
-      { info (PLforall ($2, $4)) }
+      { info $sloc (PLforall ($2, $4)) }
 | EXISTS binders SEMICOLON lexpr  %prec prec_exists
-      { info (PLexists ($2, $4)) }
+      { info $sloc (PLexists ($2, $4)) }
 | LAMBDA binders SEMICOLON lexpr  %prec prec_lambda
-      { info (PLlambda ($2,$4)) }
+      { info $sloc (PLlambda ($2,$4)) }
 ;
 
 lexpr_end_rel:
   lexpr_inner  { $1 }
 | lexpr_binder { $1 }
-| NOT lexpr_binder { info (PLnot $2) }
+| NOT lexpr_binder { info $sloc (PLnot $2) }
 ;
 
 rel_list:
@@ -455,7 +460,7 @@ rel_list:
       in
       $1,$2,sense,Some oth_rel
     else begin
-      let loc = lexeme_start 1, lexeme_end 3 in
+      let loc = loc $sloc in
       raise (Not_well_formed(loc,"Inconsistent relation chain."));
     end
   }
@@ -470,7 +475,7 @@ relation:
 | NE    { Neq }
     /* C. Marche: added to produce better error messages */
 | EQUAL {
-      let l = loc () in
+      let l = loc $sloc in
       raise
         (Not_well_formed(l,
                          "Assignment operators not allowed in annotations."))
@@ -485,114 +490,114 @@ lexpr_inner:
       else
         StringConstant content
       in
-      info (PLconstant cst)
+      info $sloc (PLconstant cst)
     }
-| NOT lexpr_inner { info (PLnot $2) }
-| TRUE { info PLtrue }
-| FALSE { info PLfalse }
-| OBJECT_POINTER opt_label_1 LPAR lexpr RPAR { info (PLobject_pointer ($2,$4)) }
-| VALID opt_label_1 LPAR lexpr RPAR { info (PLvalid ($2,$4)) }
-| VALID_READ opt_label_1 LPAR lexpr RPAR { info (PLvalid_read ($2,$4)) }
-| VALID_FUNCTION LPAR lexpr RPAR { info (PLvalid_function $3) }
+| NOT lexpr_inner { info $sloc (PLnot $2) }
+| TRUE { info $sloc PLtrue }
+| FALSE { info $sloc PLfalse }
+| OBJECT_POINTER opt_label_1 LPAR lexpr RPAR { info $sloc (PLobject_pointer ($2,$4)) }
+| VALID opt_label_1 LPAR lexpr RPAR { info $sloc (PLvalid ($2,$4)) }
+| VALID_READ opt_label_1 LPAR lexpr RPAR { info $sloc (PLvalid_read ($2,$4)) }
+| VALID_FUNCTION LPAR lexpr RPAR { info $sloc (PLvalid_function $3) }
 | VALID_INDEX opt_label_1 LPAR lexpr COMMA lexpr RPAR {
-  let source = fst (loc ()) in
+  let source = pos $symbolstartpos in
   obsolete ~source "\\valid_index(addr,idx)" ~now:"\\valid(addr+idx)";
-  info (PLvalid ($2,info (PLbinop ($4, Badd, $6)))) }
+  info $sloc (PLvalid ($2,info $sloc (PLbinop ($4, Badd, $6)))) }
 | VALID_RANGE opt_label_1 LPAR lexpr COMMA lexpr COMMA lexpr RPAR {
-  let source = fst (loc ()) in
+  let source = pos $symbolstartpos in
   obsolete "\\valid_range(addr,min,max)"
     ~source ~now:"\\valid(addr+(min..max))";
-  info (PLvalid
-          ($2,info (PLbinop ($4, Badd, (info (PLrange((Some $6),Some $8)))))))
+  info $sloc (PLvalid
+          ($2,info $sloc (PLbinop ($4, Badd, (info $sloc (PLrange((Some $6),Some $8)))))))
 }
-| INITIALIZED opt_label_1 LPAR lexpr RPAR { info (PLinitialized ($2,$4)) }
-| DANGLING opt_label_1 LPAR lexpr RPAR { info (PLdangling ($2,$4)) }
-| FRESH opt_label_2 LPAR lexpr COMMA lexpr RPAR { info (PLfresh ($2,$4, $6)) }
-| BASE_ADDR opt_label_1 LPAR lexpr RPAR { info (PLbase_addr ($2,$4)) }
-| BLOCK_LENGTH opt_label_1 LPAR lexpr RPAR { info (PLblock_length ($2,$4)) }
-| OFFSET opt_label_1 LPAR lexpr RPAR { info (PLoffset ($2,$4)) }
-| ALLOCABLE opt_label_1 LPAR lexpr RPAR { info (PLallocable ($2,$4)) }
-| FREEABLE opt_label_1 LPAR lexpr RPAR { info (PLfreeable ($2,$4)) }
+| INITIALIZED opt_label_1 LPAR lexpr RPAR { info $sloc (PLinitialized ($2,$4)) }
+| DANGLING opt_label_1 LPAR lexpr RPAR { info $sloc (PLdangling ($2,$4)) }
+| FRESH opt_label_2 LPAR lexpr COMMA lexpr RPAR { info $sloc (PLfresh ($2,$4, $6)) }
+| BASE_ADDR opt_label_1 LPAR lexpr RPAR { info $sloc (PLbase_addr ($2,$4)) }
+| BLOCK_LENGTH opt_label_1 LPAR lexpr RPAR { info $sloc (PLblock_length ($2,$4)) }
+| OFFSET opt_label_1 LPAR lexpr RPAR { info $sloc (PLoffset ($2,$4)) }
+| ALLOCABLE opt_label_1 LPAR lexpr RPAR { info $sloc (PLallocable ($2,$4)) }
+| FREEABLE opt_label_1 LPAR lexpr RPAR { info $sloc (PLfreeable ($2,$4)) }
 | ALLOCATION opt_label_1 LPAR lexpr RPAR
-  { let source = fst(loc()) in
+  { let source = pos $symbolstartpos in
     Kernel.not_yet_implemented ~source "\\allocation" }
 | AUTOMATIC {
-  let source = fst(loc()) in
+  let source = pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\automatic" }
 | DYNAMIC {
-  let source = fst(loc()) in
+  let source = pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\dynamic" }
 | REGISTER {
-  let source = fst(loc()) in
+  let source = pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\register" }
 | STATIC {
-  let source = fst(loc()) in
+  let source = pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\static" }
 | UNALLOCATED {
-  let source = fst(loc()) in
+  let source = pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "\\unallocated" }
-| NULL { info PLnull }
-| constant { info (PLconstant $1) }
-| lexpr_inner PLUS lexpr_inner { info (PLbinop ($1, Badd, $3)) }
-| lexpr_inner MINUS lexpr_inner { info (PLbinop ($1, Bsub, $3)) }
-| lexpr_inner STAR lexpr_inner { info (PLbinop ($1, Bmul, $3)) }
-| lexpr_inner SLASH lexpr_inner { info (PLbinop ($1, Bdiv, $3)) }
-| lexpr_inner PERCENT lexpr_inner { info (PLbinop ($1, Bmod, $3)) }
-| lexpr_inner STARHAT lexpr_inner  { info (PLrepeat ($1, $3)) }
-| lexpr_inner ARROW identifier_or_typename { info (PLarrow ($1, $3)) }
-| lexpr_inner DOT identifier_or_typename { info (PLdot ($1, $3)) }
-| lexpr_inner LSQUARE range RSQUARE { info (PLarrget ($1, $3)) }
-| lexpr_inner LSQUARE lexpr RSQUARE { info (PLarrget ($1, $3)) }
-| LSQUAREPIPE lexpr_list RSQUAREPIPE {info (PLlist $2) }
-| MINUS lexpr_inner %prec prec_unary_op { info (PLunop (Uminus, $2)) }
+| NULL { info $sloc PLnull }
+| constant { info $sloc (PLconstant $1) }
+| lexpr_inner PLUS lexpr_inner { info $sloc (PLbinop ($1, Badd, $3)) }
+| lexpr_inner MINUS lexpr_inner { info $sloc (PLbinop ($1, Bsub, $3)) }
+| lexpr_inner STAR lexpr_inner { info $sloc (PLbinop ($1, Bmul, $3)) }
+| lexpr_inner SLASH lexpr_inner { info $sloc (PLbinop ($1, Bdiv, $3)) }
+| lexpr_inner PERCENT lexpr_inner { info $sloc (PLbinop ($1, Bmod, $3)) }
+| lexpr_inner STARHAT lexpr_inner  { info $sloc (PLrepeat ($1, $3)) }
+| lexpr_inner ARROW identifier_or_typename { info $sloc (PLarrow ($1, $3)) }
+| lexpr_inner DOT identifier_or_typename { info $sloc (PLdot ($1, $3)) }
+| lexpr_inner LSQUARE range RSQUARE { info $sloc (PLarrget ($1, $3)) }
+| lexpr_inner LSQUARE lexpr RSQUARE { info $sloc (PLarrget ($1, $3)) }
+| LSQUAREPIPE lexpr_list RSQUAREPIPE { info $sloc (PLlist $2) }
+| MINUS lexpr_inner %prec prec_unary_op { info $sloc (PLunop (Uminus, $2)) }
 | PLUS  lexpr_inner %prec prec_unary_op { $2 }
-| TILDE lexpr_inner { info (PLunop (Ubw_not, $2)) }
-| STAR  lexpr_inner %prec prec_unary_op { info (PLunop (Ustar, $2)) }
-| AMP   lexpr_inner %prec prec_unary_op { info (PLunop (Uamp, $2)) }
-| SIZEOF LPAR lexpr RPAR { info (PLsizeofE $3) }
-| SIZEOF LPAR cast_logic_type RPAR { info (PLsizeof $3) }
-| OLD LPAR lexpr RPAR { info (PLold $3) }
-| AT LPAR lexpr COMMA label_name RPAR { info (PLat ($3, $5)) }
-| RESULT { info PLresult }
+| TILDE lexpr_inner { info $sloc (PLunop (Ubw_not, $2)) }
+| STAR  lexpr_inner %prec prec_unary_op { info $sloc (PLunop (Ustar, $2)) }
+| AMP   lexpr_inner %prec prec_unary_op { info $sloc (PLunop (Uamp, $2)) }
+| SIZEOF LPAR lexpr RPAR { info $sloc (PLsizeofE $3) }
+| SIZEOF LPAR cast_logic_type RPAR { info $sloc (PLsizeof $3) }
+| OLD LPAR lexpr RPAR { info $sloc (PLold $3) }
+| AT LPAR lexpr COMMA label_name RPAR { info $sloc (PLat ($3, $5)) }
+| RESULT { info $sloc PLresult }
 | SEPARATED LPAR ne_lexpr_list RPAR
-      { info (PLseparated $3) }
+      { info $sloc (PLseparated $3) }
 | identifier LPAR ne_lexpr_list RPAR
-      { info (PLapp ($1, [], $3)) }
+      { info $sloc (PLapp ($1, [], $3)) }
 | identifier LBRACE ne_label_args RBRACE LPAR ne_lexpr_list RPAR
-      { info (PLapp ($1, $3, $6)) }
+      { info $sloc (PLapp ($1, $3, $6)) }
 | identifier LBRACE ne_label_args RBRACE
-      { info (PLapp ($1, $3, [])) }
-| identifier  { info (PLvar $1) }
-| PI  { info (PLvar "\\pi") }
-| lexpr_inner GTGT lexpr_inner { info (PLbinop ($1, Brshift, $3))}
-| lexpr_inner LTLT lexpr_inner { info (PLbinop ($1, Blshift, $3))}
-| LPAR lexpr RPAR { info $2.lexpr_node }
-| LPAR range RPAR { info $2.lexpr_node }
+      { info $sloc (PLapp ($1, $3, [])) }
+| identifier  { info $sloc (PLvar $1) }
+| PI  { info $sloc (PLvar "\\pi") }
+| lexpr_inner GTGT lexpr_inner { info $sloc (PLbinop ($1, Brshift, $3))}
+| lexpr_inner LTLT lexpr_inner { info $sloc (PLbinop ($1, Blshift, $3))}
+| LPAR lexpr RPAR { info $sloc $2.lexpr_node }
+| LPAR range RPAR { info $sloc $2.lexpr_node }
 | LPAR cast_logic_type RPAR lexpr_inner %prec prec_cast
-      { info (PLcast ($2, $4)) }
-| TYPEOF LPAR lexpr RPAR { info (PLtypeof $3) }
-| BSTYPE LPAR type_spec RPAR { info (PLtype $3) }
-| BSTYPE LPAR type_spec stars RPAR { info (PLtype ($4 $3)) }
+      { info $sloc (PLcast ($2, $4)) }
+| TYPEOF LPAR lexpr RPAR { info $sloc (PLtypeof $3) }
+| BSTYPE LPAR type_spec RPAR { info $sloc (PLtype $3) }
+| BSTYPE LPAR type_spec stars RPAR { info $sloc (PLtype ($4 $3)) }
     /* tsets */
-| EMPTY { info PLempty }
-| BSUNION LPAR lexpr_list RPAR { info (PLunion $3) }
-| INTER LPAR lexpr_list RPAR { info (PLinter $3) }
+| EMPTY { info $sloc PLempty }
+| BSUNION LPAR lexpr_list RPAR { info $sloc (PLunion $3) }
+| INTER LPAR lexpr_list RPAR { info $sloc (PLinter $3) }
 | LBRACE lexpr_list RBRACE
-      { info (PLset ($2)) }
+      { info $sloc (PLset ($2)) }
 | LBRACE lexpr PIPE binders RBRACE
-      {info (PLcomprehension ($2,$4,None)) }
+      { info $sloc (PLcomprehension ($2,$4,None)) }
 | LBRACE lexpr PIPE binders SEMICOLON lexpr RBRACE
-      { info (PLcomprehension ($2,$4,Some $6)) }
+      { info $sloc (PLcomprehension ($2,$4,Some $6)) }
     /* Aggregated object initialization */
 | LBRACE field_init RBRACE
-      { info (PLinitField($2)) }
+      { info $sloc (PLinitField($2)) }
 | LBRACE array_init RBRACE
-      { info (PLinitIndex($2)) }
+      { info $sloc (PLinitIndex($2)) }
 | LBRACE lexpr WITH update RBRACE
       { List.fold_left
-	  (fun a (path,upd_val) -> info (PLupdate(a,path,upd_val))) $2 $4 }
+	  (fun a (path,upd_val) -> info $sloc (PLupdate(a,path,upd_val))) $2 $4 }
 /*
-| LET bounded_var EQUAL lexpr SEMICOLON lexpr %prec LET {info (PLlet($2,$4,$6))}*/
+| LET bounded_var EQUAL lexpr SEMICOLON lexpr %prec LET { info $sloc (PLlet($2,$4,$6))}*/
 ;
 
 ne_label_args:
@@ -609,7 +614,7 @@ string:
 ;
 
 range:
-| lexpr_option DOTDOT lexpr_option { info (PLrange($1,$3)) }
+| lexpr_option DOTDOT lexpr_option { info $sloc (PLrange($1,$3)) }
 ;
 
 /*** Aggregated object initialization ***/
@@ -723,7 +728,7 @@ abs_param_type_list:
 | /* empty */    { [ ] }
 | abs_param_list { $1 }
 | abs_param_list COMMA DOTDOTDOT {
-  let source = fst(loc()) in
+  let source = pos $symbolstartpos in
   Kernel.not_yet_implemented ~source "variadic C function types"
   }
 ;
@@ -942,6 +947,7 @@ full_logic_type:
 
 full_logic_rt_type:
 | enter_kw_c_mode logic_rt_type exit_kw_c_mode { $2 }
+;
 
 full_assigns:
 | enter_kw_c_mode assigns exit_kw_c_mode { $2 }
@@ -964,10 +970,10 @@ ext_global_clauses:
 ;
 
 ext_global_clause:
-| decl  { Ext_decl (loc_decl $1) }
+| decl  { Ext_decl (loc_decl $sloc $1) }
 | EXT_LET any_identifier EQUAL full_lexpr SEMICOLON { Ext_macro (false, $2, $4) }
 | GLOBAL EXT_LET any_identifier EQUAL full_lexpr SEMICOLON { Ext_macro (true, $3, $5) }
-| INCLUDE string SEMICOLON { let b,s = $2 in Ext_include(b,s, loc()) }
+| INCLUDE string SEMICOLON { let b,s = $2 in Ext_include(b,s, loc $sloc) }
 ;
 
 ext_global_specs_opt:
@@ -1026,7 +1032,7 @@ ext_fun_specs:
 
 ext_fun_spec:
 | ext_at_stmt_markup ext_stmt_loop_spec
-    { Ext_stmt($1,$2,loc()) }
+    { Ext_stmt($1,$2,loc $sloc) }
 | ext_contract_markup contract
     { let s,pos = $2 in Ext_spec (s,pos) }
 ;
@@ -1050,7 +1056,7 @@ ext_module_markup:
 ;
 
 ext_function_markup:
-| FUNCTION ext_identifier COLON { $2, loc() }
+| FUNCTION ext_identifier COLON { $2, loc $sloc }
 ;
 
 ext_contract_markup:
@@ -1094,54 +1100,54 @@ contract:
         else if $2<>None || $3<>None ||
                 behaviors<>[] || completes<>[] ||disjoints<>[]
         then behaviors
-        else raise (Not_well_formed (loc(),"Empty annotation is not allowed"))
+        else raise (Not_well_formed (loc $sloc,"Empty annotation is not allowed"))
       in
         { spec_terminates = $2;
           spec_variant = $3;
           spec_behavior = behaviors;
           spec_complete_behaviors = completes;
           spec_disjoint_behaviors = disjoints;
-        }, loc()
+        }, loc $sloc
     }
-| requires ne_terminates REQUIRES { clause_order 3 "requires" "terminates" }
+| requires ne_terminates REQUIRES { clause_order $loc($3) "requires" "terminates" }
 | requires terminates ne_decreases REQUIRES
-      { clause_order 4 "requires" "decreases" }
+      { clause_order $loc($4) "requires" "decreases" }
 | requires terminates ne_decreases TERMINATES
-      { clause_order 4 "terminates" "decreases" }
+      { clause_order $loc($4) "terminates" "decreases" }
 | requires terminates decreases ne_simple_clauses REQUIRES
-      { clause_order 5 "requires" "post-condition, assigns or allocates" }
+      { clause_order $loc($5) "requires" "post-condition, assigns or allocates" }
 | requires terminates decreases ne_simple_clauses TERMINATES
-      { clause_order 5 "terminates" "post-condition, assigns or allocates" }
+      { clause_order $loc($5) "terminates" "post-condition, assigns or allocates" }
 | requires terminates decreases ne_simple_clauses DECREASES
-      { clause_order 5 "decreases" "post-condition, assigns or allocates" }
+      { clause_order $loc($5) "decreases" "post-condition, assigns or allocates" }
 | requires terminates decreases simple_clauses ne_behaviors TERMINATES
-      { clause_order 6 "terminates" "behavior" }
+      { clause_order $loc($6) "terminates" "behavior" }
 | requires terminates decreases simple_clauses ne_behaviors DECREASES
-      { clause_order 6 "decreases" "behavior" }
+      { clause_order $loc($6) "decreases" "behavior" }
 | requires terminates decreases simple_clauses behaviors ne_complete_or_disjoint
   REQUIRES
-      { clause_order 7 "requires" "complete or disjoint" }
+      { clause_order $loc($7) "requires" "complete or disjoint" }
 | requires terminates decreases simple_clauses behaviors ne_complete_or_disjoint
   TERMINATES
-      { clause_order 7 "terminates" "complete or disjoint" }
+      { clause_order $loc($7) "terminates" "complete or disjoint" }
 | requires terminates decreases simple_clauses behaviors ne_complete_or_disjoint
   DECREASES
-      { clause_order 7 "decreases" "complete or disjoint" }
+      { clause_order $loc($7) "decreases" "complete or disjoint" }
 | requires terminates decreases simple_clauses behaviors ne_complete_or_disjoint
   BEHAVIOR
-      { clause_order 7 "behavior" "complete or disjoint" }
+      { clause_order $loc($7) "behavior" "complete or disjoint" }
 | requires terminates decreases simple_clauses behaviors ne_complete_or_disjoint
   ASSIGNS
-      { clause_order 7 "assigns" "complete or disjoint" }
+      { clause_order $loc($7) "assigns" "complete or disjoint" }
 | requires terminates decreases simple_clauses behaviors ne_complete_or_disjoint
   ALLOCATES
-      { clause_order 7 "allocates" "complete or disjoint" }
+      { clause_order $loc($7) "allocates" "complete or disjoint" }
 | requires terminates decreases simple_clauses behaviors ne_complete_or_disjoint
   FREES
-      { clause_order 7 "frees" "complete or disjoint" }
+      { clause_order $loc($7) "frees" "complete or disjoint" }
 | requires terminates decreases simple_clauses behaviors ne_complete_or_disjoint
   post_cond_kind
-      { clause_order 7 "post-condition" "complete or disjoint" }
+      { clause_order $loc($7) "post-condition" "complete or disjoint" }
 ;
 
 // use that to detect potentially missing ';' at end of clause
@@ -1180,19 +1186,19 @@ ne_requires:
 | REQUIRES full_lexpr SEMICOLON requires { toplevel_pred Assert $2::$4 }
 | CHECK_REQUIRES full_lexpr SEMICOLON requires { toplevel_pred Check $2 :: $4 }
 | ADMIT_REQUIRES full_lexpr SEMICOLON requires { toplevel_pred Admit $2 :: $4 }
-| REQUIRES full_lexpr clause_kw { missing 2 ";" $3 }
-| CHECK_REQUIRES full_lexpr clause_kw { missing 2 ";" $3 }
-| ADMIT_REQUIRES full_lexpr clause_kw { missing 2 ";" $3 }
+| REQUIRES full_lexpr clause_kw { missing $loc($2) ";" $3 }
+| CHECK_REQUIRES full_lexpr clause_kw { missing $loc($2) ";" $3 }
+| ADMIT_REQUIRES full_lexpr clause_kw { missing $loc($2) ";" $3 }
 ;
 
 terminates:
-| /* epsilon */              { None }
+| /* epsilon */ { None }
 | ne_terminates { Some $1 }
 ;
 
 ne_terminates:
 | TERMINATES full_lexpr SEMICOLON { $2 }
-| TERMINATES full_lexpr clause_kw { missing 2 ";" $3 }
+| TERMINATES full_lexpr clause_kw { missing $loc($2) ";" $3 }
 ;
 
 decreases:
@@ -1202,7 +1208,7 @@ decreases:
 
 ne_decreases:
 | DECREASES variant SEMICOLON { $2 }
-| DECREASES variant clause_kw { missing 2 ";" $3 }
+| DECREASES variant clause_kw { missing $loc($2) ";" $3 }
 ;
 
 variant:
@@ -1232,7 +1238,7 @@ ne_simple_clauses:
     }
 | ASSIGNS full_assigns SEMICOLON simple_clauses
     { let allocation,assigns,post_cond,extended = $4 in
-      let a = concat_assigns assigns $2
+      let a = concat_assigns $sloc assigns $2
       in allocation,a,post_cond,extended
     }
 | EXT_CONTRACT grammar_extension SEMICOLON simple_clauses
@@ -1240,10 +1246,10 @@ ne_simple_clauses:
       let processed = Logic_env.preprocess_extension $1 $2 in
       allocation,assigns,post_cond,($1,processed)::extended
     }
-| post_cond_kind full_lexpr clause_kw { missing 2 ";" $3 }
-| allocation clause_kw { missing 1 ";" $2 }
-| ASSIGNS full_assigns clause_kw { missing 2 ";" $3 }
-| EXT_CONTRACT ne_grammar_extension clause_kw { missing 1 ";" $3 }
+| post_cond_kind full_lexpr clause_kw { missing $loc($2) ";" $3 }
+| allocation clause_kw { missing $loc($1) ";" $2 }
+| ASSIGNS full_assigns clause_kw { missing $loc($2) ";" $3 }
+| EXT_CONTRACT ne_grammar_extension clause_kw { missing $loc($1) ";" $3 }
 ;
 
 ne_grammar_extension:
@@ -1278,21 +1284,22 @@ ne_behaviors:
             ~assumes ~requires ~post_cond ~assigns ~allocation ~extended ()
         in b::behaviors
       }
+;
 
 behavior_body:
 | assumes requires simple_clauses { $1,$2,$3 }
 | assumes ne_requires ASSUMES
-      { clause_order 3 "assumes" "requires" }
+      { clause_order $loc($3) "assumes" "requires" }
 | assumes requires ne_simple_clauses ASSUMES
-      { clause_order 4 "assumes" "assigns or post-condition" }
+      { clause_order $loc($4) "assumes" "assigns or post-condition" }
 | assumes requires ne_simple_clauses REQUIRES
-      { clause_order 4 "requires" "assigns or post-condition" }
+      { clause_order $loc($4) "requires" "assigns or post-condition" }
 ;
 
 assumes:
 | /* epsilon */ { [] }
 | ASSUMES full_lexpr SEMICOLON assumes { $2::$4 }
-| ASSUMES full_lexpr clause_kw { missing 2 ";" $3 }
+| ASSUMES full_lexpr clause_kw { missing $loc($2) ";" $3 }
 ;
 
 complete_or_disjoint:
@@ -1309,8 +1316,8 @@ ne_complete_or_disjoint:
 /* complete behaviors decreases; is valid (provided there's a behavior
    named decreases)
 */
-| COMPLETE BEHAVIORS ne_behavior_name_list clause_kw { missing 3 ";" $4 }
-| DISJOINT BEHAVIORS ne_behavior_name_list clause_kw { missing 3 ";" $4 }
+| COMPLETE BEHAVIORS ne_behavior_name_list clause_kw { missing $loc($3) ";" $4 }
+| DISJOINT BEHAVIORS ne_behavior_name_list clause_kw { missing $loc($3) ";" $4 }
 ;
 
 /*** assigns and tsets ***/
@@ -1342,23 +1349,23 @@ annotation:
       { let (b,v,p) = $1 in
         (* TODO: do better, do not lose the structure ! *)
         let l = b@v@p in
-        Aloop_annot (loc (), l) }
+        Aloop_annot (loc $sloc, l) }
 | FOR ne_behavior_name_list COLON contract_or_code_annotation
       { $4 $2 }
-| pragma_or_code_annotation { Acode_annot (loc(),$1) }
+| pragma_or_code_annotation { Acode_annot (loc $sloc,$1) }
 | pragma_or_code_annotation beg_pragma_or_code_annotation
       { raise
-          (Not_well_formed (loc(),
+          (Not_well_formed (loc $sloc,
                             "Only one code annotation is allowed per comment"))
       }
-| full_identifier_or_typename { Aattribute_annot (loc (), $1) }
+| full_identifier_or_typename { Aattribute_annot (loc $sloc, $1) }
 | BSGHOST { Aattribute_annot(loc(),"\\ghost") }
 ;
 
 contract_or_code_annotation:
 | contract
       { fun bhvs -> let s, pos = $1 in Acode_annot (pos, AStmtSpec (bhvs,s)) }
-| code_annotation { fun bhvs -> Acode_annot (loc(), ($1 bhvs)) }
+| code_annotation { fun bhvs -> Acode_annot (loc $sloc, ($1 bhvs)) }
 ;
 
 /*** loop annotations ***/
@@ -1388,7 +1395,7 @@ loop_annot_stack:
 | loop_invariant loop_annot_opt
     { let (i,fa,a,b,v,p,e) = $2 in ($1::i,fa,a,b,v,p,e) }
 | loop_effects loop_annot_opt
-    { let (i,fa,a,b,v,p,e) = $2 in (i,fa,concat_assigns a $1,b,v,p,e) }
+    { let (i,fa,a,b,v,p,e) = $2 in (i,fa,concat_assigns $sloc a $1,b,v,p,e) }
 | loop_allocation loop_annot_opt
     { let (i,fa,a,b,v,p,e) = $2 in (i,concat_allocation fa $1,a,b,v,p,e) }
 | FOR ne_behavior_name_list COLON loop_annot_stack
@@ -1396,7 +1403,7 @@ loop_annot_stack:
       let behav = $2 in
       let invs = List.map (fun i -> AInvariant(behav,true,i)) i in
       let ext = List.map (fun x -> AExtended(behav,true,x)) e in
-      let oth = concat_loop_assigns_allocation b behav a fa in
+      let oth = concat_loop_assigns_allocation $sloc b behav a fa in
       ([],FreeAllocAny,WritesAny,invs@ext@oth,v,p,[])
     }
 | loop_variant loop_annot_opt
@@ -1454,7 +1461,7 @@ loop_invariant:
 ;
 
 loop_variant:
-| LOOP VARIANT variant SEMICOLON { loc(),$3 }
+| LOOP VARIANT variant SEMICOLON { loc $sloc,$3 }
 ;
 
 /* Grammar Extensibility for plugins */
@@ -1470,11 +1477,11 @@ loop_grammar_extension:
       | Ext_code_annot (Ext_here | Ext_next_stmt) ->
         raise
           (Not_well_formed
-            (lexeme_loc 2, ext ^ " is not a loop annotation extension"))
+            (loc $loc($2), ext ^ " is not a loop annotation extension"))
       | _ -> raise Not_found
     end
   with Not_found ->
-    Kernel.fatal ~source:(lexeme_start 2)
+    Kernel.fatal ~source:(pos $startpos($2))
       "%s is not a code annotation extension. Parser got wrong lexeme." ext
 }
 ;
@@ -1489,7 +1496,7 @@ loop_pragma:
       Widen_variables $4
     else if $3 = "WIDEN_HINTS" then
       Widen_hints $4
-    else raise (Not_well_formed (loc(),"Unknown loop pragma")) }
+    else raise (Not_well_formed (loc $sloc,"Unknown loop pragma")) }
 ;
 
 /*** code annotations ***/
@@ -1540,13 +1547,13 @@ code_annotation:
         | Ext_code_annot Ext_next_loop ->
           raise
             (Not_well_formed
-               (lexeme_loc 1,
+               (loc $loc($1),
                  ext ^ " is not a loop annotation extension. It can't be used \
                          as plain code annotation extension"))
         | _ -> raise Not_found
       end
     with Not_found ->
-      Kernel.fatal ~source:(lexeme_start 1)
+      Kernel.fatal ~source:(pos $startpos($1))
         "%s is not a code annotation extension. Parser got wrong lexeme" ext
   }
 ;
@@ -1554,27 +1561,28 @@ code_annotation:
 slice_pragma:
 | SLICE PRAGMA any_identifier full_lexpr SEMICOLON
     { if $3 = "expr" then SPexpr $4
-      else raise (Not_well_formed (loc(), "Unknown slice pragma")) }
+      else raise (Not_well_formed (loc $sloc, "Unknown slice pragma")) }
 | SLICE PRAGMA any_identifier SEMICOLON
     { if $3 = "ctrl" then SPctrl
       else if $3 = "stmt" then SPstmt
-      else raise (Not_well_formed (loc(), "Unknown slice pragma")) }
+      else raise (Not_well_formed (loc $sloc, "Unknown slice pragma")) }
 ;
 
 impact_pragma:
 | IMPACT PRAGMA any_identifier full_lexpr SEMICOLON
     { if $3 = "expr" then IPexpr $4
-      else raise (Not_well_formed (loc(), "Unknown impact pragma")) }
+      else raise (Not_well_formed (loc $sloc, "Unknown impact pragma")) }
 | IMPACT PRAGMA any_identifier SEMICOLON
     { if $3 = "stmt" then IPstmt
-      else raise (Not_well_formed (loc(), "Unknown impact pragma")) }
+      else raise (Not_well_formed (loc $sloc, "Unknown impact pragma")) }
 ;
 
 /*** declarations and logical definitions ***/
 
 decl_list:
-| decl            { [loc_decl $1] }
-| decl decl_list  { (loc_decl $1) :: $2 }
+| decl            { [loc_decl $sloc $1] }
+| decl decl_list  { (loc_decl $loc($1) $1) :: $2 }
+;
 
 decl:
 | GLOBAL INVARIANT any_identifier COLON full_lexpr SEMICOLON
@@ -1608,7 +1616,7 @@ ext_decls:
 ;
 
 ext_decl_loc:
-| ext_decl { loc_ext $1 }
+| ext_decl { loc_ext $sloc $1 }
 ;
 
 volatile_opt:
@@ -1638,6 +1646,7 @@ type_annot:
 opt_semicolon:
 | /* epsilon */ { }
 | SEMICOLON { }
+;
 
 model_annot:
 | MODEL type_spec LBRACE full_parameter opt_semicolon RBRACE SEMICOLON
@@ -1718,7 +1727,7 @@ deprecated_logic_decl:
 /* OBSOLETE: logic function declaration */
 | LOGIC full_logic_rt_type poly_id opt_parameters SEMICOLON
     { let (id, labels, tvars) = $3 in
-      let source = fst (loc ()) in
+      let source = pos $symbolstartpos in
       exit_type_variables_scope ();
       obsolete  "logic declaration" ~source ~now:"an axiomatic block";
       LDlogic_reads (id, labels, tvars, $2, $4, None) }
@@ -1726,7 +1735,7 @@ deprecated_logic_decl:
 | PREDICATE poly_id opt_parameters SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
-      let source = fst (loc ()) in
+      let source = pos $symbolstartpos in
       obsolete "logic declaration" ~source ~now:"an axiomatic block";
       LDpredicate_reads (id, labels, tvars, $3, None) }
 /* OBSOLETE: type declaration */
@@ -1734,7 +1743,7 @@ deprecated_logic_decl:
     { let (id,tvars) = $2 in
       Logic_env.add_typename id;
       exit_type_variables_scope ();
-      let source = fst (loc ()) in
+      let source = pos $symbolstartpos in
       obsolete "logic type declaration" ~source ~now:"an axiomatic block";
       LDtype(id,tvars,None)
     }
@@ -1743,7 +1752,7 @@ deprecated_logic_decl:
     { let (id,_,_) = $2 in
       raise
 	(Not_well_formed
-	   (loc(),"Axiom " ^ id ^ " is declared outside of an axiomatic."))
+	   (loc $sloc,"Axiom " ^ id ^ " is declared outside of an axiomatic."))
     }
 ;
 
@@ -1781,7 +1790,7 @@ logic_decl:
 ;
 
 logic_decl_loc:
-| logic_decl { loc_decl $1 }
+| logic_decl { loc_decl $sloc $1 }
 ;
 
 
@@ -1838,15 +1847,15 @@ opt_label_1:
 | opt_label_list { match $1 with
 		     | [] -> None
 		     | l::[] -> Some l
-		     | _ -> raise (Not_well_formed (loc(),"Only one label is allowed")) }
+		     | _ -> raise (Not_well_formed (loc $sloc,"Only one label is allowed")) }
 ;
 
 opt_label_2:
 | opt_label_list { match $1 with
 		     | [] -> None
 		     | l1::l2::[] -> Some (l1,l2)
-		     | _::[] -> raise (Not_well_formed (loc(),"One label is missing"))
-		     | _ -> raise (Not_well_formed (loc(),"Only two labels are allowed")) }
+		     | _::[] -> raise (Not_well_formed (loc $sloc,"One label is missing"))
+		     | _ -> raise (Not_well_formed (loc $sloc,"Only two labels are allowed")) }
 ;
 
 opt_label_list:
@@ -1902,12 +1911,12 @@ bounded_var:
 | identifier { $1 }
 | is_acsl_typename /* Since TYPENAME cannot be accepted by lexpr rule */
     { raise
-	(Not_well_formed(loc (),
+	(Not_well_formed(loc $sloc,
 			 "Type names are not allowed as binding variable"))
     }
 | TYPENAME  /* Since TYPENAME cannot be accepted by lexpr rule */
     { raise
-	(Not_well_formed(loc (),
+	(Not_well_formed(loc $sloc,
 			 "Type names are not allowed as binding variable"))
     }
 ;
