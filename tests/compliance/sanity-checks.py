@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 # Perform some sanity checks related to the compliance JSON files
 
@@ -70,5 +70,7 @@ for (i, v) in c11_funs.items():
                 print(f"warning: C11 function {i} is not a function in POSIX, but a {id_type}")
         posix_header = posix_dict[i]["header"]
         if header != posix_header:
-            sys.exit(f"error: C11 function {i} mapped to header {header}, but in POSIX it is mapped to header {posix_header}")
+            sys.exit(
+                f"error: C11 function {i} mapped to header {header}, but in POSIX it is mapped to header {posix_header}"
+            )
 print(f"{c11_funs_path.name} checked.")

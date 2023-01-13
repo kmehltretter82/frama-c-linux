@@ -23,6 +23,23 @@
 open CamomileLibrary
 
 (**************************************************************************)
+(* Warning/Error *)
+
+let strict = ref false
+
+let res = ref true (* impact the exit value *)
+
+let warn ftext =
+  if !strict then
+    res := false ;
+  Format.eprintf "Warning: ";
+  Format.eprintf ftext
+
+let error ftext =
+  res := false ;
+  Format.eprintf ftext
+
+(**************************************************************************)
 (* Utils *)
 
 let read_buffered channel =
@@ -50,30 +67,82 @@ let lines_from_in channel =
   List.rev acc
 
 (**************************************************************************)
+(* Supported indent formatter *)
+
+type formatter_cmds =
+  { mutable is_available: bool option ;
+    kind: string ;
+    name: string ;
+    available_cmd: string ;
+    check_cmd: string ;
+    update_cmd: string (* leaves it empty if there is no updating command *)
+  }
+
+let c_indent_formatter =
+  { is_available = None ;
+    kind = "C";
+    name = "clang-format";
+    available_cmd = "clang-format --version > /dev/null 2> /dev/null";
+    check_cmd = "clang-format --dry-run -Werror" ;
+    update_cmd = "clang-format -i"
+  }
+
+let python_indent_formatter =
+  { is_available = None ;
+    kind = "Python";
+    name = "black";
+    available_cmd = "black --version > /dev/null 2> /dev/null";
+    check_cmd = "black --quiet --line-length 100 --check" ;
+    update_cmd = "black --quiet --line-length 100"
+  }
+
+type indent_formatter = Ocp_indent | Tool of  formatter_cmds
+
+let ml_indent_formatter = Ocp_indent
+
+type indent_check = NoCheck | Check of indent_formatter option
+
+let parse_indent_formatter ~file ~attr ~value = match value with
+  | "unset" -> NoCheck
+  | "set"   -> Check None (* use the default formatter *)
+  | "ocp-indent" -> Check (Some ml_indent_formatter)
+  | "clang-format" -> Check (Some (Tool c_indent_formatter))
+  | "black" -> Check (Some (Tool python_indent_formatter))
+  | _ -> warn "Unsupported indent formatter: %s %s=%s@."
+           file attr value;
+    NoCheck
+
+(**************************************************************************)
 (* Available Checks and corresponding attributes *)
 
 type checks =
   { eoleof : bool
-  ; indent : bool
+  ; indent : indent_check
   ; syntax : bool
   ; utf8 : bool
   }
 
 let no_checks =
   { eoleof = false
-  ; indent = false
+  ; indent = NoCheck
   ; syntax = false
   ; utf8 = false
   }
 
-let add_attr checks attr value =
-  let value = value = "set" in
+let add_attr ~file ~attr ~value checks =
+  let is_set = function
+    | "set" -> true
+    | "unset" -> false
+    | _ -> warn "Invalid attribute value: %s %s=%s" file attr value ; false
+  in
   match attr with
-  | "check-eoleof" -> { checks with eoleof = value }
-  | "check-indent" -> { checks with indent = value }
-  | "check-syntax" -> { checks with syntax = value }
-  | "check-utf8"   -> { checks with utf8 = value }
-  | _ -> failwith (Format.sprintf "Unknown attr %s" attr)
+  | "check-eoleof" -> { checks with eoleof = is_set value }
+  | "check-syntax" -> { checks with syntax = is_set value }
+  | "check-utf8"   -> { checks with utf8 = is_set value }
+  | "check-indent" -> { checks with
+                        indent = parse_indent_formatter ~file ~attr ~value }
+  | _ -> warn "Unknown attribute: %s %s=%s" file attr value;
+    checks
 
 let handled_attr s =
   s = "check-eoleof" || s = "check-indent" ||
@@ -96,10 +165,11 @@ let rec collect = function
     collect tl
   | file :: attr :: value :: tl ->
     let checks = get file in
-    Hashtbl.replace table file (add_attr checks attr value) ;
+    Hashtbl.replace table file (add_attr ~file ~attr ~value checks) ;
     collect tl
   | [] -> ()
-  | l -> List.iter (Format.eprintf "Could not load file list %s@.") l
+  | [ file ; attr ] -> warn "Missing attribute value: %s %s=?@." file attr
+  | [ file ] -> warn "Missing attribute name for file: %s@." file
 
 (**************************************************************************)
 (* Functions used to check lint *)
@@ -184,7 +254,7 @@ let config () =
       (fun stx ->
          try Approx_lexer.enable_extension stx
          with IndentExtend.Syntax_not_found name ->
-           Format.eprintf "Warning: unknown syntax extension %S@." name)
+           warn "Unknown syntax extension %S@." name)
       syntaxes ;
     global_config := Some config ;
     config
@@ -219,47 +289,52 @@ let check_ml_indent ~update file =
 
 (* C/H *)
 
-let clang_format_available = ref None
-let clang_format_available () =
-  match !clang_format_available with
+let is_formatter_available ~file indent_formatter =
+  match indent_formatter.is_available with
   | None ->
-    clang_format_available :=
-      Some (0 = Sys.command "clang-format --version > /dev/null") ;
-    Option.get !clang_format_available
-  | Some available -> available
-
-let check_c_indent ~update file =
-  if not @@ clang_format_available () then true
-  else
-    let opt = if update then "-i" else "--dry-run -Werror" in
-    0 = Sys.command (Format.sprintf "clang-format %s \"%s\"" opt file)
+    let is_available = (0 = Sys.command indent_formatter.available_cmd) in
+    indent_formatter.is_available <- Some is_available ;
+    if not is_available then
+      warn "%s is unavailable for checking indentation of some %s files (i.e. %s)@."
+        indent_formatter.name indent_formatter.kind file;
+    is_available
+  | Some is_available -> is_available
 
 exception Bad_ext
 
-let check_indent ~update file =
-  match Filename.extension file with
-  | ".c" | ".h" -> check_c_indent ~update file
-  | ".ml" | ".mli" -> check_ml_indent ~update file
-  | _ -> raise Bad_ext
-
-let res = ref true
+let check_indent ~indent_formatter ~update file =
+  let tool = match indent_formatter with
+    | Some tool -> tool
+    | None -> (* uses the default formatter *)
+      match Filename.extension file with
+      | ".c" | ".h" -> Tool c_indent_formatter
+      | ".ml" | ".mli" -> ml_indent_formatter
+      | ".py" -> Tool python_indent_formatter
+      | _ -> raise Bad_ext
+  in match tool with
+  | Ocp_indent -> check_ml_indent ~update file
+  | Tool indent_formatter ->
+    if not @@ is_formatter_available ~file indent_formatter then true
+    else if not update then
+      0 = Sys.command (Format.sprintf "%s \"%s\"" indent_formatter.check_cmd file)
+    else if indent_formatter.update_cmd <> "" then
+      0 = Sys.command (Format.sprintf "%s \"%s\"" indent_formatter.update_cmd file)
+    else true (* there no updating command *)
 
 (* Main checks *)
 
 let check ~verbose ~update file params =
   if verbose then
     Format.printf "Checking %s@." file ;
-  if Sys.is_directory file then ()
+  if Sys .is_directory file then ()
   else begin
     let in_chan = open_in file in
     let content = read_buffered in_chan in
     close_in in_chan ;
     (* UTF8 *)
     if params.utf8 then
-      if not @@ is_utf8 content then begin
-        Format.eprintf "Bad encoding (not UTF8) for %s@." file ;
-        res := false
-      end ;
+      if not @@ is_utf8 content then
+        error "Bad encoding (not UTF8) for %s@." file ;
     (* Blanks *)
     let rewrite = ref false in
     let syntactic_check checker content message  =
@@ -267,8 +342,8 @@ let check ~verbose ~update file params =
       if update && not was_ok
       then begin rewrite := true ; new_content end
       else if not was_ok then begin
-        Format.eprintf "%s for %s@." message file ;
-        res := false ; new_content
+        error "%s for %s@." message file ;
+        new_content
       end
       else new_content
     in
@@ -289,14 +364,15 @@ let check ~verbose ~update file params =
     end ;
     (* Indentation *)
     try
-      if params.indent then
-        if not @@ check_indent ~update file then begin
-          Format.eprintf "Bad indentation for %s@." file ;
-          res := false
-        end ;
+      begin
+        match params.indent with
+        | NoCheck -> ()
+        | Check indent_formatter ->
+          if not @@ check_indent ~indent_formatter ~update file then
+            error "Bad indentation for %s@." file ;
+      end ;
     with Bad_ext ->
-      Format.eprintf "Don't know how to (check) indent %s@." file ;
-      res := false
+      error "Don't know how to (check) indent %s@." file
   end
 
 (**************************************************************************)
@@ -309,6 +385,7 @@ let verbose = ref false
 let argspec = [
   "-u", Arg.Set update, " update ill-formed files (does not handle UTF8 update)" ;
   "-v", Arg.Set verbose, " verbose mode" ;
+  "-s", Arg.Set strict, " considers warnings as errors for the exit value" ;
 ]
 let sort argspec =
   List.sort (fun (name1, _, _) (name2, _, _) -> String.compare name1 name2)
@@ -318,11 +395,9 @@ let sort argspec =
 (* Main *)
 
 let () =
-  if not @@ clang_format_available () then
-    Format.eprintf "clang-format unavailable, I will not check C files@." ;
   Arg.parse
     (Arg.align (sort argspec))
-    (fun s -> Format.eprintf "Unknown argument: %s" s)
+    (fun s -> warn "Unknown argument: %s@." s)
     ("Usage: git ls-files -z | git check-attr --stdin -z -a | " ^ exec_name ^ " [options]");
   collect @@ lines_from_in stdin ;
   Hashtbl.iter (check ~verbose:!verbose ~update:!update) table ;
