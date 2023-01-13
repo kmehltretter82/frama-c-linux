@@ -150,8 +150,15 @@
   background-color: var(--code-select-hover);
 }
 
-.cm-dead-code { color: var(--dead-code); }
-.cm-non-term-code { color: var(--dead-code); }
+.cm-dead-code {
+  font-style: italic;
+  filter: opacity(0.7);
+}
+
+.cm-non-term-code {
+  font-style: italic;
+  filter: opacity(0.7);
+}
 
 .cm-tainted {
   text-decoration: underline var(--warning) solid 1px;
@@ -176,17 +183,9 @@
 }
 
 .cm-def { color: var(--codemirror-def); }
-
 .cm-comment { color: var(--codemirror-comment); }
-.cm-dead-code .cm-comment { color: inherit; }
-
 .cm-type { color: var(--codemirror-type); }
-.cm-dead-code .cm-type { color: inherit; }
-
 .cm-number { color: var(--codemirror-number); }
-.cm-dead-code .cm-number { color: inherit; }
-
 .cm-keyword { color: var(--codemirror-keyword); }
-.cm-dead-code .cm-keyword { color: inherit; }
 
 /* -------------------------------------------------------------------------- */
