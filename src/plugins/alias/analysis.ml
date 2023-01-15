@@ -174,20 +174,30 @@ struct
   let doGuard _ _ a =
     Dataflow.GUse a, Dataflow.GUse a
 
-  let doStmt (s:stmt) (a:t) =
+  let rec process_Stmt (s:stmt) (a:t) : t =
     (* let _, kf = Kernel_function.find_from_sid s.sid in
      * let is_first = Kernel_function.is_first_stmt kf s in
      * let is_last = Kernel_function.is_return_stmt kf s in *)
-    let new_a = match s.skind with
-        Instr i -> doInstr s i a
+    let new_a = 
+      match s.skind with
+        Instr i -> doInstr s i a 
+      | Block b -> process_Block b a
       | _ -> a
     in
     begin match new_a with
         None -> ()
       | Some a -> Stmt_table.add s (Some a)
     end;
-    Dataflow.SUse new_a
+    new_a
 
+  and process_Block b a =
+    List.fold_left
+      (fun acc s -> process_Stmt s acc)
+      a
+      b.bstmts
+
+let doStmt (s:stmt) (a:t) =      
+    Dataflow.SUse (process_Stmt s a)
 
 
   let doEdge _ _ a = a
@@ -205,9 +215,7 @@ let doFunction (kf:kernel_function) =
     let return_stmt = Kernel_function.find_return kf in
     let final_state : Abstract_state.t option = try Stmt_table.find return_stmt with Not_found -> None in
     let summary: Abstract_state.summary =
-      match final_state with
-        Some s -> Abstract_state.summary_of_state s
-      | None ->  Abstract_state.summary_of_state Abstract_state.initial_value
+      Abstract_state.summary_of_state final_state kf
     in
     Function_table.add kf (Some summary)
 

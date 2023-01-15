@@ -89,6 +89,12 @@ val initial_value : t
 val make_top : t -> t
 
 (** Type denoting summaries of functions *)
-type summary
+type summary =
+    {
+    state : t option;
+    formals: lval list;
+    return : exp option
+  }
 
-val summary_of_state : t -> summary
+
+val summary_of_state : t option -> kernel_function -> summary
