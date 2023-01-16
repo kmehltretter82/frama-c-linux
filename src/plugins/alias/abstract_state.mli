@@ -105,4 +105,4 @@ val pretty_summary :  ?debug:bool -> ?function_name:string -> Format.formatter -
 
 (** [call a res args s] computes the abstract state after the
    instruction res=f(args), with f summarized by [s] *)
-val call: t -> lval option -> lval list -> summary -> t
+val call: t -> lval option -> exp list -> summary -> t

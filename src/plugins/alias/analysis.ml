@@ -164,21 +164,20 @@ struct
         | (Some a, Some lv) -> (Options.feedback "Skipping assignment @[%a@] = malloc() (not implemented)" Lval.pretty lv; Some a)
       end
     (* general case for calls *)
-    (* | Call(res,ef,es,(loc,_)) ->
-     * let tr = match Kf.get_called ef with
-     *   | Some kf -> call env loc kf (List.map (exp env) es)
-     *   | None -> Options.abort ~source:loc
-     *               "Unsupported function pointer (skipped)"
-     * in
-     * begin
-     *   if Options.is_debug() then Format.printf "@. @. Store before unification of result @.@[%a@]" U.dump env.store;
-     *   (\* (match ef.enode with
-     *    *    Lval (Var vkf, NoOffset) -> Format.printf "Call function %s @." vkf.vname
-     *    *  | _ -> ()); *\)
-     *   match res with
-     *   | None -> ()
-     *   | Some lv -> (Shape.unify env.store loc (lval env loc lv) tr ; if Options.is_debug () then  Format.printf "@. @. Store after unification of result @.@[%a@]" U.dump env.store)
-     * end *)
+    | Call(res,ef,es,(loc,_)) ->
+      begin
+        let summary = match Kernel_function.get_called ef with
+          | Some kf -> (try Function_table.find kf with Not_found -> Options.abort ~source:loc "summary not found")
+          | None -> Options.abort ~source:loc
+                      "Unsupported function pointer (skipped)"
+        in
+        match (a, summary) with
+          (None, _) -> None
+        | (Some a, Some summary) ->
+          let new_a = Abstract_state.call a res es summary in
+          Some new_a
+        | _ -> failwith "summary not found"
+    end
     | _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
 
   let doGuard _ _ a =

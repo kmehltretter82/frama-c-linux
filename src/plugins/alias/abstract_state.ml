@@ -721,7 +721,7 @@ let pretty_summary ?(debug=false) ?(function_name="") fmt s =
   Format.fprintf fmt "@]@."
 
 
-let call (state:t) (res:lval option) (args:lval list) (summary:summary) :t =
+let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   assert_invariants state;
   let formals = summary.formals in
   let sum_state =
@@ -739,9 +739,25 @@ let call (state:t) (res:lval option) (args:lval list) (summary:summary) :t =
   (* union of formal parameters *)
   let new_state =List.fold_left2
       (fun acc param formal ->
-         let v_param = LMap.find param new_state.lmap in
-         let v_formal = LMap.find formal new_state.lmap in
-         join acc v_param v_formal
+         begin
+           match  formal,find_basic_lval param with
+             ((Var v1, NoOffset), BLval (Var v2,NoOffset)) ->
+             (* case x = y *)
+             assignment_x_y acc (Var v1, NoOffset) (Var v2, NoOffset)
+           | ((Var _, NoOffset), BNone) -> acc
+           (* constant assignments : do nothing, but maybe check the type of the assigned variable ? *)
+           | ((Var v1, NoOffset), BAddrOf lv2) ->
+             (* case x = &y *)
+             assignment_x_addr_y acc (Var v1, NoOffset) lv2
+           | ((Var v1, NoOffset), BLval (Mem e2, NoOffset)) ->
+             (* case x  = *y *)
+             begin
+               match e2.enode with
+                 Lval lv2 -> assignment_x_ptr_y acc (Var v1, NoOffset) lv2
+               |  _ -> failwith " do_assignment not implemented 1"
+             end
+           | _ -> (Format.printf "DEBUG: call function - formal variable not as we expected@."; acc)
+         end
       )
       new_state
       args
