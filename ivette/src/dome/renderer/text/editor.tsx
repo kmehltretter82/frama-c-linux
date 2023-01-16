@@ -363,13 +363,16 @@ export function unfoldAll(view: View): void {
 }
 
 // Move to the given line. The indexation starts at 1.
-export function selectLine(view: View, line: number): void {
+export function selectLine(view: View, line: number, atTop: boolean): void {
   if (!view || view.state.doc.lines < line) return;
   const doc = view.state.doc;
   const { from: here } = doc.lineAt(view.state.selection.main.from);
   const { from: goto } = doc.line(Math.max(line, 1));
   if (here === goto) return;
   view.dispatch({ selection: { anchor: goto }, scrollIntoView: true });
+  if (!atTop) return
+  const effects = EditorView.scrollIntoView(goto, { y: 'start', yMargin: 0 });
+  view.dispatch({ effects });
 }
 
 // -----------------------------------------------------------------------------

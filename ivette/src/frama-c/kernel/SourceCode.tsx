@@ -165,23 +165,31 @@ const extensions: Editor.Extension[] = [
   EventsHandler,
 ];
 
+function markerLocation(m: Ast.marker | undefined): Ast.source | undefined {
+  const markersInfo = States.useSyncArray(Ast.markerInfo);
+  if (m === undefined || m === '') return undefined;
+  return markersInfo.getData(m)?.sloc;
+}
+
+function functionLocation(fct: string | undefined): Ast.source | undefined {
+  const functionsData = States.useSyncArray(Ast.functions).getArray();
+  if (fct === undefined || fct === '') return undefined;
+  return functionsData.find((e) => e.name === fct)?.sloc;
+}
+
 // The component in itself.
 export default function SourceCode(): JSX.Element {
   const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
   const { view, Component } = Editor.Editor(extensions);
-  const functionsData = States.useSyncArray(Ast.functions).getArray();
-  const markersInfo = States.useSyncArray(Ast.markerInfo);
   const [selection, updateSelection] = States.useSelection();
   const marker = selection?.current?.marker;
   const fct = selection?.current?.fct;
+  const displayedFct = React.useRef<string | undefined>(undefined);
 
-  const markerSloc =
-    (marker && marker !== '') ? markersInfo.getData(marker)?.sloc : undefined;
-  const fctSloc = fct && functionsData.find((e) => e.name === fct)?.sloc;
-  const sloc = markerSloc ?? fctSloc;
-  const file = sloc ? sloc.file : '';
-  const line = sloc ? sloc.line : undefined;
+  const markerSloc = markerLocation(marker);
+  const fctSloc = functionLocation(fct);
+  const file = fctSloc?.file ?? '';
   const filename = Path.parse(file).base;
 
   Source.set(view, useFctSource(file));
@@ -190,8 +198,11 @@ export default function SourceCode(): JSX.Element {
   File.set(view, file);
 
   React.useEffect(() => {
-    if (line) Editor.selectLine(view, line);
-  }, [view, line]);
+    const notDisplayedFct = fct !== displayedFct.current;
+    const line = notDisplayedFct ? fctSloc?.line : markerSloc?.line;
+    if (line) Editor.selectLine(view, line, notDisplayedFct);
+    displayedFct.current = fct;
+  }, [view, markerSloc, fctSloc, displayedFct, fct]);
 
   const externalEditorTitle =
     'Open the source file in an external editor.\nA Ctrl-click '
