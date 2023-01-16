@@ -26,4 +26,11 @@
 
 include Plugin.S
 
+(** Module activation *)
 module Enabled : Parameter_sig.Bool
+
+(** Displays the table [function -> summary] at the end of the analysis *)
+module ShowFunctionTable : Parameter_sig.Bool
+
+(** Displays the table [statement -> state] at the end of the analysis *)
+module ShowStmtTable : Parameter_sig.Bool

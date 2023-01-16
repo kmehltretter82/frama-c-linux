@@ -35,7 +35,7 @@ end
 module type InternalTable  = sig
   include Table
   val add : key -> value -> unit
-  val pretty : Format.formatter -> (Format.formatter -> key -> unit) -> (Format.formatter -> value -> unit) -> unit
+  val iter : (key -> value -> unit) -> unit
   val clear : unit -> unit
 end
 
@@ -46,10 +46,8 @@ module Make_table(H: Hashtbl.S)(V: sig type t val size :int end) : InternalTable
   let tbl = H.create V.size
   let add = H.add tbl
   let find = H.find tbl
-  let pretty fmt print_key print_value =
-    Format.fprintf fmt "@[<hov 2>";
-    H.iter (fun k v -> Format.fprintf fmt "After statement %a :@. @[<2>%a@] @." print_key k print_value v) tbl;
-    Format.fprintf fmt "@]@."
+  let iter f =
+    H.iter f tbl
   let clear () = H.clear tbl
 end
 
@@ -178,9 +176,9 @@ struct
     (* let _, kf = Kernel_function.find_from_sid s.sid in
      * let is_first = Kernel_function.is_first_stmt kf s in
      * let is_last = Kernel_function.is_return_stmt kf s in *)
-    let new_a = 
+    let new_a =
       match s.skind with
-        Instr i -> doInstr s i a 
+        Instr i -> doInstr s i a
       | Block b -> process_Block b a
       | _ -> a
     in
@@ -196,7 +194,7 @@ struct
       a
       b.bstmts
 
-let doStmt (s:stmt) (a:t) =      
+  let doStmt (s:stmt) (a:t) =
     Dataflow.SUse (process_Stmt s a)
 
 
@@ -215,7 +213,7 @@ let doFunction (kf:kernel_function) =
     let return_stmt = Kernel_function.find_return kf in
     let final_state : Abstract_state.t option = try Stmt_table.find return_stmt with Not_found -> None in
     let summary: Abstract_state.summary =
-      Abstract_state.summary_of_state final_state kf
+      Abstract_state.make_summary final_state kf
     in
     Function_table.add kf (Some summary)
 
@@ -245,12 +243,29 @@ let compute () =
   Globals.Functions.iter doFunction;
   Options.feedback "Functions done";
   computed_flag := true;
-  let value_pretty fmt a =
-    match a with
-    | None -> Format.fprintf fmt "<Bot>"
-    | Some a -> Abstract_state.pretty fmt a
+  let print_stmt_table_elt fmt k v :unit =
+    let print_key = Stmt.pretty in
+    let print_value fmt v =
+      match v with
+      | None -> Format.fprintf fmt "<Bot>"
+      | Some a -> Abstract_state.pretty fmt a
+    in
+    Format.fprintf fmt "After statement %a :@.@[<hov 2> %a@]@." print_key k print_value v
   in
-  Stmt_table.pretty Format.std_formatter Stmt.pretty value_pretty
+  let print_function_table_elt fmt kf s :unit =
+    let function_name =
+      Kernel_function.get_name kf
+    in
+    match s with
+      None -> Format.printf "DEBUG: function %s -> None@." function_name
+    | Some s -> Abstract_state.pretty_summary ~function_name fmt s
+  in
+  if Options.ShowStmtTable.get() then
+    Stmt_table.iter (print_stmt_table_elt Format.std_formatter);
+  if Options.ShowFunctionTable.get() then
+    begin
+      Function_table.iter (print_function_table_elt Format.std_formatter)
+    end
 
 
 let clear () =

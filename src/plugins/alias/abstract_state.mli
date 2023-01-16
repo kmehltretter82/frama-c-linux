@@ -90,11 +90,13 @@ val make_top : t -> t
 
 (** Type denoting summaries of functions *)
 type summary =
-    {
+  {
     state : t option;
     formals: lval list;
+    locals: lval list;
     return : exp option
   }
 
+val make_summary : t option -> kernel_function -> summary
 
-val summary_of_state : t option -> kernel_function -> summary
+val pretty_summary : ?function_name:string -> Format.formatter -> summary -> unit

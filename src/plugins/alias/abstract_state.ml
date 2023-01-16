@@ -687,21 +687,37 @@ type summary =
   {
     state : t option;
     formals: lval list;
+    locals: lval list;
     return : exp option
   }
 
-let summary_of_state (s: t option) (kf: kernel_function) =
+let make_summary (s: t option) (kf: kernel_function) =
   let exp_return : exp option =
     let return_stmt = Kernel_function.find_return kf in
     match return_stmt.skind with
       Return (e, _) -> e
-    | _ -> failwith "this should not happen"    
+    | _ -> failwith "this should not happen"
   in
-    {
-      state = s;
-      formals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_formals kf);
-      return = exp_return
-    }
+  {
+    state = s;
+    formals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_formals kf);
+    locals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_locals kf);
+    return = exp_return
+  }
+
+
+let pretty_summary ?(function_name="") fmt s =
+  let print_list_lval fmt (l: lval list) =
+    List.iter (fun x -> Format.fprintf fmt "%a " Lval.pretty x) l
+  in
+  let print_option pp fmt x =
+    match x with
+    | Some x -> pp fmt x
+    | None -> Format.fprintf fmt "<None>"
+  in
+  Format.fprintf fmt "@[<hov 2>Summary of function %s: @." function_name;
+  Format.fprintf fmt "formals: %a locals : %a return expression: %a @.State: @[<hov 2>%a@] " print_list_lval s.formals print_list_lval s.locals (print_option Exp.pretty) s.return (print_option pretty) s.state;
+  Format.fprintf fmt "@]@."
 
 
 (* let call (state:t) (args:lval list) (summary:summary) (formals:lval list) :t =
@@ -730,7 +746,7 @@ let summary_of_state (s: t option) (kf: kernel_function) =
  *       (fun (acc_lmap, acc_vmap) formal ->
  *          let v = LMap.find formal new_state.lmap in
  *          let ls = VMap.find v new_state.vmap in
- *          let new_ls = LSet.remove formal ls in 
+ *          let new_ls = LSet.remove formal ls in
  *          (LMap.remove formal acc_lmap, VMap.add v new_ls acc_vmap)
  *       )
  *       (new_state.lmap, new_state.vmap)

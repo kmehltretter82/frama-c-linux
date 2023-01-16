@@ -1,2 +1,2 @@
 PLUGIN: alias
-OPT: -alias
+OPT: -alias -alias-show-stmt-table

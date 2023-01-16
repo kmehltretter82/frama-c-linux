@@ -35,5 +35,19 @@ include Plugin.Register
 module Enabled = False
     (struct
       let option_name = "-alias"
-      let help = "May-Alias Analyzer"
+      let help = "Allows May-Alias Analyzer"
+    end)
+
+
+module ShowFunctionTable = False
+    (struct
+      let option_name = "-alias-show-function-table"
+      let help = "Displays the table [function -> summary] at the end of the analysis"
+    end)
+
+
+module ShowStmtTable = False
+    (struct
+      let option_name = "-alias-show-stmt-table"
+      let help = "Displays the table [stmt -> abstract state] at the end of the analysis"
     end)
