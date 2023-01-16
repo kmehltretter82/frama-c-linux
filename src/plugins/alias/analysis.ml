@@ -167,7 +167,7 @@ struct
     | Call(res,ef,es,(loc,_)) ->
       begin
         let summary = match Kernel_function.get_called ef with
-          | Some kf -> (try Function_table.find kf with Not_found -> Options.abort ~source:loc "summary not found")
+          | Some kf -> (try Function_table.find kf with Not_found -> None)
           | None -> Options.abort ~source:loc
                       "Unsupported function pointer (skipped)"
         in
@@ -176,7 +176,7 @@ struct
         | (Some a, Some summary) ->
           let new_a = Abstract_state.call a res es summary in
           Some new_a
-        | _ -> failwith "summary not found"
+        | (Some a, None) -> (Options.feedback "Skiping @[%a@] (summary not found)" Stmt.pretty s; Some a)
     end
     | _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
 

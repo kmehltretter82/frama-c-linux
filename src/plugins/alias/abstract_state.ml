@@ -726,7 +726,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   let formals = summary.formals in
   let sum_state =
     match summary.state with
-      None -> failwith "this hould not hapen"
+      None -> failwith "this should not hapen"
     | Some s -> s
   in
   assert (List.length args = List.length formals);
