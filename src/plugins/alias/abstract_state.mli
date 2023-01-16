@@ -88,6 +88,8 @@ val initial_value : t
     associated to this vertex *)
 val make_top : t -> t
 
+
+
 (** Type denoting summaries of functions *)
 type summary =
   {
@@ -100,3 +102,7 @@ type summary =
 val make_summary : t option -> kernel_function -> summary
 
 val pretty_summary : ?function_name:string -> Format.formatter -> summary -> unit
+
+(** [call a args s] computes the abstract state after the call of a
+    function f([args]) summarized in [s] *)
+val call: t -> lval list -> summary -> t

@@ -720,39 +720,57 @@ let pretty_summary ?(function_name="") fmt s =
   Format.fprintf fmt "@]@."
 
 
-(* let call (state:t) (args:lval list) (summary:summary) (formals:lval list) :t =
- *   (\* check that formal variables do no appear in state *\)
- *   assert_invariants state;
- *   assert (List.length args = List.length formals);
- *   List.iter
- *     (fun lv -> assert (not (LMap.mem lv state.lmap)))
- *     formals;
- *   (\* union of the two graphs *\)
- *   let new_state = union state summary in
- *   (\* union of formal parameters *\)
- *   let new_state =List.fold_left2
- *     (fun acc param formal ->
- *        let v_param = LMap.find param new_state.lmap in
- *        let v_formal = LMap.find formal new_state.lmap in
- *        join acc v_param v_formal
- *     )
- *     new_state
- *     args
- *     formals
- *   in
- *   (\* erase all formals from the tables *\)
- *   let new_lmap, new_vmap =
- *     List.fold_left
- *       (fun (acc_lmap, acc_vmap) formal ->
- *          let v = LMap.find formal new_state.lmap in
- *          let ls = VMap.find v new_state.vmap in
- *          let new_ls = LSet.remove formal ls in
- *          (LMap.remove formal acc_lmap, VMap.add v new_ls acc_vmap)
- *       )
- *       (new_state.lmap, new_state.vmap)
- *       formals
- *   in
- *   let new_state = {new_state with lmap = new_lmap; vmap = new_vmap }
- *   in
- *   assert_invariants new_state;
- *   new_state *)
+let call (state:t) (args:lval list) (summary:summary) :t =
+  assert_invariants state;
+  let formals = summary.formals in
+  let sum_state =
+    match summary.state with
+      None -> failwith "this hould not hapen"
+    | Some s -> s
+  in
+  assert (List.length args = List.length formals);
+  (* check that formal variables do no appear in state *)
+  List.iter
+    (fun lv -> assert (not (LMap.mem lv state.lmap)))
+    formals;
+  (* union of the two graphs *)
+  let new_state = union state sum_state in
+  (* union of formal parameters *)
+  let new_state =List.fold_left2
+      (fun acc param formal ->
+         let v_param = LMap.find param new_state.lmap in
+         let v_formal = LMap.find formal new_state.lmap in
+         join acc v_param v_formal
+      )
+      new_state
+      args
+      formals
+  in
+  (* erase all formals from the tables *)
+  let new_lmap, new_vmap =
+    List.fold_left
+      (fun (acc_lmap, acc_vmap) formal ->
+         let v = LMap.find formal new_state.lmap in
+         let ls = VMap.find v new_state.vmap in
+         let new_ls = LSet.remove formal ls in
+         (LMap.remove formal acc_lmap, VMap.add v new_ls acc_vmap)
+      )
+      (new_state.lmap, new_state.vmap)
+      formals
+  in
+  (* same thing for all locals *)
+  let new_lmap, new_vmap =
+    List.fold_left
+      (fun (acc_lmap, acc_vmap) lval ->
+         let v = LMap.find lval new_state.lmap in
+         let ls = VMap.find v new_state.vmap in
+         let new_ls = LSet.remove lval ls in
+         (LMap.remove lval acc_lmap, VMap.add v new_ls acc_vmap)
+      )
+      (new_lmap, new_vmap)
+      summary.locals
+  in
+  let new_state = {new_state with lmap = new_lmap; vmap = new_vmap }
+  in
+  assert_invariants new_state;
+  new_state
