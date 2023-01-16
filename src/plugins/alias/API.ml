@@ -36,7 +36,7 @@ let fold_new_aliases_stmt
     LSet.fold (fun e a -> f_fold a e) set_aliases acc
 
 let fold_aliases_stmt
-  (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =
+    (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =
   (* TODO is it correct ? obviously not *)
   match s.preds with
     [] -> acc

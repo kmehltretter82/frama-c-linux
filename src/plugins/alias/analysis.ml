@@ -60,6 +60,12 @@ module Function_table = Make_table(Kernel_function.Hashtbl)(R)
 
 module D = Dataflow.StartData(A)
 
+
+(* let print_option pp fmt x =
+ *   match x with
+ *     None -> ()
+ *   | Some x -> pp fmt x *)
+
 module T =
 struct
 
@@ -167,6 +173,31 @@ struct
       new_a
     | Code_annot _ -> a
     | Skip _ -> a
+    (* special case for malloc *)
+    | Call(res,{enode=Lval (Var info, _);_},_,_) when info.vname = "malloc"  ->
+      begin
+        match (a,res) with
+          (None, _) -> None
+        | (Some a,None) -> (Options.feedback "Warning : malloc not stored (ignored)"; Some a)
+        | (Some a, Some  (Var v1, NoOffset)) -> Some (Abstract_state.assignment_x_allocate_y a  (Var v1, NoOffset))
+        | (Some a, Some lv) -> (Options.feedback "Skipping assignment @[%a@] = malloc() (not implemented)" Lval.pretty lv; Some a)
+      end
+    (* general case for calls *)
+    (* | Call(res,ef,es,(loc,_)) ->
+     * let tr = match Kf.get_called ef with
+     *   | Some kf -> call env loc kf (List.map (exp env) es)
+     *   | None -> Options.abort ~source:loc
+     *               "Unsupported function pointer (skipped)"
+     * in
+     * begin
+     *   if Options.is_debug() then Format.printf "@. @. Store before unification of result @.@[%a@]" U.dump env.store;
+     *   (\* (match ef.enode with
+     *    *    Lval (Var vkf, NoOffset) -> Format.printf "Call function %s @." vkf.vname
+     *    *  | _ -> ()); *\)
+     *   match res with
+     *   | None -> ()
+     *   | Some lv -> (Shape.unify env.store loc (lval env loc lv) tr ; if Options.is_debug () then  Format.printf "@. @. Store after unification of result @.@[%a@]" U.dump env.store)
+     * end *)
     | _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
 
   let doGuard _ _ a =

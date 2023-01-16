@@ -66,7 +66,7 @@ val assignment_x_addr_y : t -> lval -> lval -> t
 
 val assignment_x_ptr_y : t -> lval -> lval -> t
 
-val assignment_x_allocate_y : t -> lval -> lval -> t
+val assignment_x_allocate_y : t -> lval -> t
 
 val assignment_ptr_x_y : t -> lval -> lval -> t
 

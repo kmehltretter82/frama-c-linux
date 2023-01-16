@@ -396,9 +396,9 @@ let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
   | _ ->  failwith "assignment_x_ptr_y not implemented"
 
 (* assignment x = allocate(y) *)
-let assignment_x_allocate_y (a:t) (x:lval) (y:lval) : t =
+let assignment_x_allocate_y (a:t) (x:lval) : t =
   let (v1,a) = find_or_create_vertex x a in
-  let (v2,a) = create_vertex y a in
+  let (v2,a) = create_cst_vertex a in
   set_type a v1 v2
 
 (* assignment *x = y *)
