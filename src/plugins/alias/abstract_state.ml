@@ -698,10 +698,13 @@ let make_summary (s: t option) (kf: kernel_function) =
       Return (e, _) -> e
     | _ -> failwith "this should not happen"
   in
+  let list_locals = Kernel_function.get_locals kf in
+  (*remove __retres from the list*)
+  let list_locals = List.filter (fun x -> x.vname != "__retres") list_locals in
   {
     state = s;
     formals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_formals kf);
-    locals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_locals kf);
+    locals = List.map (fun v -> (Var v,NoOffset)) list_locals;
     return = exp_return
   }
 

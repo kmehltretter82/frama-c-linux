@@ -35,13 +35,17 @@ let fold_new_aliases_stmt
     let set_aliases = Abstract_state.find_aliases lv state in
     LSet.fold (fun e a -> f_fold a e) set_aliases acc
 
-let fold_aliases_stmt:
-  ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a =
-  function _ -> failwith "not implemented"
+let fold_aliases_stmt
+  (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =
+  (* TODO is it correct ? obviously not *)
+  match s.preds with
+    [] -> acc
+  | s::_ -> fold_new_aliases_stmt f_fold acc kf s lv
 
-let fold_aliases_kf:
-  ('a -> lval -> 'a) -> 'a -> kernel_function -> lval -> 'a =
-  function _ -> failwith "not implemented"
+let fold_aliases_kf
+    (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
+  let s = Kernel_function.find_return kf in
+  fold_new_aliases_stmt f_fold acc kf s lv
 
 let fold_fundec_stmts _ =
   failwith "not implemented"
