@@ -323,13 +323,13 @@ Arch Linux: `pikaur -S frama-c`
 
 2. On Linux-like distributions:
 
-        ./make RELEASE=yes && make install
+        make RELEASE=yes && make install
 
     See section *Configuration* below for options.
 
 3. On Windows+Cygwin:
 
-        ./make RELEASE=yes && make install
+        make RELEASE=yes && make install
 
 4. The binary `frama-c` (and `frama-c-gui` if you have lablgtk2) is now installed.
 
@@ -348,7 +348,7 @@ root source folder):
 1. `opam switch create frama-c ocaml-base-compiler.4.13.1`
    to create a compatible opam switch
 1. `opam pin . -n` to pin to the latest development version
-1. `opam install --deps-only` will fetch and build all
+1. `opam install --deps-only .` will fetch and build all
    relevant dependencies
 
 #### Compilation
