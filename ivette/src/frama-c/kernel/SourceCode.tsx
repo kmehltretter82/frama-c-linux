@@ -157,7 +157,7 @@ function useFctSource(file: string): string {
 // -----------------------------------------------------------------------------
 
 // Necessary extensions.
-const baseExtensions: Editor.Extension[] = [
+const extensions: Editor.Extension[] = [
   Source.structure,
   Editor.LineNumbers,
   Editor.LanguageHighlighter,
@@ -169,25 +169,29 @@ const baseExtensions: Editor.Extension[] = [
 export default function SourceCode(): JSX.Element {
   const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
-  const { view, component } = Editor.Editor(baseExtensions);
+  const { view, Component } = Editor.Editor(extensions);
   const functionsData = States.useSyncArray(Ast.functions).getArray();
   const markersInfo = States.useSyncArray(Ast.markerInfo);
   const [selection, updateSelection] = States.useSelection();
   const marker = selection?.current?.marker;
   const fct = selection?.current?.fct;
 
-  const markerSloc = marker && markersInfo.getData(marker)?.sloc;
+  const markerSloc =
+    (marker && marker !== '') ? markersInfo.getData(marker)?.sloc : undefined;
   const fctSloc = fct && functionsData.find((e) => e.name === fct)?.sloc;
   const sloc = markerSloc ?? fctSloc;
   const file = sloc ? sloc.file : '';
-  const line = sloc ? sloc.line : 0;
+  const line = sloc ? sloc.line : undefined;
   const filename = Path.parse(file).base;
 
   Source.set(view, useFctSource(file));
   UpdateSelection.set(view, updateSelection);
   Command.set(view, command);
   File.set(view, file);
-  Editor.selectLine(view, line);
+
+  React.useEffect(() => {
+    if (line) Editor.selectLine(view, line);
+  }, [view, line]);
 
   const externalEditorTitle =
     'Open the source file in an external editor.\nA Ctrl-click '
@@ -195,7 +199,7 @@ export default function SourceCode(): JSX.Element {
     + '\nThe editor used can be configured in Ivette settings.';
 
   return (
-    <div style={{ height: '100%', fontSize: `${fontSize}px` }}>
+    <>
       <Ivette.TitleBar>
         <Buttons.IconButton
           icon="DUPLICATE"
@@ -206,8 +210,8 @@ export default function SourceCode(): JSX.Element {
         <Labels.Code title={file}>{filename}</Labels.Code>
         <Boxes.Hfill />
       </Ivette.TitleBar>
-      {component}
-    </div>
+      <Component style={{ fontSize: `${fontSize}px` }} />
+    </>
   );
 }
 

@@ -243,17 +243,22 @@ function createHoveredUpdater(): Editor.Extension {
     mousemove: (inputs, view, event) => {
       const { fct, tree, update: updateHovered } = inputs;
       const coords = { x: event.clientX, y: event.clientY };
-      const pos = view.posAtCoords(coords); if (!pos) return;
-      const hov = coveringNode(tree, pos); if (!hov) return;
-      const from = view.coordsAtPos(hov.from); if (!from) return;
-      const to = view.coordsAtPos(hov.to); if (!to) return;
+      const reset = (): void => updateHovered(undefined);
+      const pos = view.posAtCoords(coords);
+      if (!pos) { reset(); return; }
+      const hov = coveringNode(tree, pos);
+      if (!hov) { reset(); return; }
+      const from = view.coordsAtPos(hov.from);
+      if (!from) { reset(); return; }
+      const to = view.coordsAtPos(hov.to);
+      if (!to) { reset(); return; }
       const left = Math.min(from.left, to.left);
       const right = Math.max(from.left, to.left);
       const top = Math.min(from.top, to.top);
       const bottom = Math.max(from.bottom, to.bottom);
       const horizontallyOk = left <= coords.x && coords.x <= right;
       const verticallyOk = top <= coords.y && coords.y <= bottom;
-      if (!horizontallyOk || !verticallyOk) return;
+      if (!horizontallyOk || !verticallyOk) { reset(); return; }
       const marker = Ast.jMarker(hov.id);
       updateHovered(marker ? { fct, marker } : undefined);
     }
@@ -609,7 +614,7 @@ function useFctTaints(fct: Fct): Eva.LvalueTaints[] {
 // -----------------------------------------------------------------------------
 
 // Necessary extensions for our needs.
-const baseExtensions: Editor.Extension[] = [
+const extensions: Editor.Extension[] = [
   MarkerUpdater,
   HoveredUpdater,
   CodeDecorator,
@@ -624,8 +629,8 @@ const baseExtensions: Editor.Extension[] = [
 
 // The component in itself.
 export default function ASTview(): JSX.Element {
-  const { view, component } = Editor.Editor(baseExtensions);
   const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
+  const { view, Component } = Editor.Editor(extensions);
 
   // Updating CodeMirror when the selection or its callback are changed.
   const [selection, updateSelection] = States.useSelection();
@@ -662,7 +667,7 @@ export default function ASTview(): JSX.Element {
   React.useEffect(() => scrollMarkerIntoView(view, marker), [view, marker]);
 
   return (
-    <div style={{ height: '100%', fontSize: `${fontSize}px` }}>
+    <>
       <TitleBar>
         <Filler />
         <IconButton
@@ -681,8 +686,8 @@ export default function ASTview(): JSX.Element {
         />
         <Inset />
       </TitleBar>
-      {component}
-    </div>
+      <Component style={{ fontSize: `${fontSize}px`}} />
+    </>
   );
 }
 

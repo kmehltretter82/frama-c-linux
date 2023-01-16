@@ -380,18 +380,22 @@ export function selectLine(view: View, line: number): void {
 //  Editor component
 // -----------------------------------------------------------------------------
 
-export interface Editor { view: View; component: JSX.Element }
+export interface EditorComponentProps { style?: React.CSSProperties }
+export type EditorComponent = (props: EditorComponentProps) => JSX.Element;
+export interface Editor { view: View; Component: EditorComponent }
 
 export function Editor(extensions: Extension[]): Editor {
   const parent = React.useRef(null);
   const editor = React.useRef<View>(null);
-  const component = <div className='cm-global-box' ref={parent} />;
+  const Component: EditorComponent = React.useCallback((props) => {
+    return <div className='cm-global-box' style={props.style} ref={parent} />;
+  }, [parent]);
   React.useEffect(() => {
     if (!parent.current) return;
     const state = EditorState.create({ extensions });
     editor.current = new EditorView({ state, parent: parent.current });
   }, [parent, extensions]);
-  return { view: editor.current, component };
+  return { view: editor.current, Component };
 }
 
 // -----------------------------------------------------------------------------

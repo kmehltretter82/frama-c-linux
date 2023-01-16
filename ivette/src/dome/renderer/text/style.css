@@ -110,8 +110,7 @@
 /* -------------------------------------------------------------------------- */
 
 .cm-global-box {
-  height: inherit;
-  width: inherit;
+  height: 100%;
   overflow: auto;
 }
 
