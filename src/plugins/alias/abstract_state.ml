@@ -771,11 +771,11 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
       begin
         let v_res  =  LMap.find res new_state.lmap in
         match find_basic_lval exp_res with
-          BLval lval_exp_res ->      
+          BLval lval_exp_res ->
           let v_exp_res =  LMap.find lval_exp_res new_state.lmap in
           join new_state v_res v_exp_res
         | _ -> new_state
-    end
+      end
     |_ -> failwith "using a function with no return improperly"
   in
   (* erase all formals from the tables/graphs *)

@@ -47,8 +47,24 @@ let fold_aliases_kf
   let s = Kernel_function.find_return kf in
   fold_new_aliases_stmt f_fold acc kf s lv
 
-let fold_fundec_stmts _ =
-  failwith "not implemented"
+let fold_fundec_stmts (f_fold: 'a -> stmt -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
+  if Kernel_function.has_definition kf
+  then
+    let f_dec = Kernel_function.get_definition kf in
+    let list_stmt = f_dec.sallstmts in
+    List.fold_left
+      (fun acc s ->
+         fold_new_aliases_stmt
+           (fun a lv -> f_fold a s lv)
+           acc
+           kf
+           s
+           lv
+      )
+      acc
+      list_stmt
+  else
+    failwith "not implemented"
 
 let are_aliased (kf: kernel_function)  (s:stmt) (lv1: lval) (lv2:lval) : bool =
   match Analysis.get_abstract_state kf s with

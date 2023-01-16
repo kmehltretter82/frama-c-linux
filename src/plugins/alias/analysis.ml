@@ -58,6 +58,7 @@ module R = struct type t = Abstract_state.summary option let size = 7 end
 module Stmt_table = Make_table(Cil_datatype.Stmt.Hashtbl)(A)
 module Function_table = Make_table(Kernel_function.Hashtbl)(R)
 
+let function_compute_ref = Extlib.mk_fun "function_compute"
 
 module D = Dataflow.StartData(A)
 
@@ -164,7 +165,7 @@ struct
         | (Some a, Some lv) -> (Options.feedback "Skipping assignment @[%a@] = malloc() (not implemented)" Lval.pretty lv; Some a)
       end
     (* general case for calls *)
-    | Call(res,ef,es,(loc,_)) ->
+    | Call(res,ef,es,(loc,_)) -> (* !function_compute_ref ef *)
       begin
         let summary = match Kernel_function.get_called ef with
           | Some kf -> (try Function_table.find kf with Not_found -> None)
@@ -177,7 +178,7 @@ struct
           let new_a = Abstract_state.call a res es summary in
           Some new_a
         | (Some a, None) -> (Options.feedback "Skiping @[%a@] (summary not found)" Stmt.pretty s; Some a)
-    end
+      end
     | _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
 
   let doGuard _ _ a =
@@ -227,6 +228,8 @@ let doFunction (kf:kernel_function) =
       Abstract_state.make_summary final_state kf
     in
     Function_table.add kf (Some summary)
+
+let () = function_compute_ref := doFunction
 
 let make_summary (state:Abstract_state.t) (kf:kernel_function) =
   try
