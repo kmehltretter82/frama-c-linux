@@ -1,5 +1,6 @@
 /* run.config*
    STDOPT: +"-big-ints-hex 256"
+   STDOPT: +"-big-ints-hex 256 -machdep ppc_32"
 */
 
 /*@ assigns \result \from a, b;

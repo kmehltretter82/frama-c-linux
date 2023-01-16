@@ -274,71 +274,61 @@ let bitwise_and = CacheAnd.merge bitwise_and
 let bitwise_xor = CacheXor.merge bitwise_xor
 
 
-(** Sign extension *)
-
-let offsm_sign_extension sign_bit size =
-  let i = match sign_bit with
-    | `Zero -> Ival.zero
-    | `One -> Ival.minus_one
-    | `ZeroOne -> Ival.(join zero minus_one)
-  in
-  let v_extend = V_Or_Uninitialized.initialized (V.inject_ival i) in
-  V_Offsetmap.create ~size v_extend ~size_v:size
-
-
 (** Shifts *)
 
-type shift = SLeft of Int.t | SRight of Int.t * bool
+type shift_direction = Left | Right
 
-(* Shift implemented as an an offsetmap copy then paste. *)
-let shift size o shift =
-  let r = default size in
-  match shift with
-  | SLeft n ->
-    if Int.lt n size then
-      let size_copy = Int.sub size n in
-      let data = basic_copy ~size:size_copy o in
-      basic_paste ~start:n ~src:data ~size_src:size_copy r
-    else r (* Guaranteed undefined behavior ; we don't care about the result. *)
-  | SRight (n, signed) ->
-    if Int.lt n size then
-      let size_copy = Int.sub size n in
-      let data = basic_copy ~start:n ~size:size_copy o in
-      let o' = basic_paste ~src:data ~size_src:size_copy r in
-      if signed then
-        let sign_bit = read_bit o (Int.pred size) in
-        if sign_bit <> `Zero then
-          (* We need to preserve the sign. Add {-1} or {0; -1} on the leftmost
-             bits *)
-          let size_ext = Int.sub size size_copy in
-          let ext = offsm_sign_extension sign_bit size_ext in
-          basic_paste ~start:size_copy ~src:ext ~size_src:size_ext o'
-        else
-          o'
-      else
-        o'
-    else r (* Guaranteed undefined behavior ; we don't care about the result. *)
+(* The value of the sign bit, expressed as a cvalue. *)
+let sign_bit size offsm =
+  let sign_bit =
+    if Cil.theMachine.theMachine.little_endian
+    then Int.pred size
+    else Int.zero
+  in
+  let sign_v = basic_find ~start:sign_bit ~size:Integer.one offsm in
+  Cvalue.V_Or_Uninitialized.get_v sign_v
 
+(* Creates an offsetmap of size [size] filled with the sign bit of [offsm]. *)
+let signed_default ~size ~size_offsm offsm =
+  let default_v = sign_bit size_offsm offsm in
+  let v = V_Or_Uninitialized.initialized default_v in
+  V_Offsetmap.create ~size ~size_v:Int.one v
+
+let shift ~size ~signed offsm shift_direction n =
+  let result =
+    if signed && shift_direction = Right
+    then signed_default ~size ~size_offsm:size offsm
+    else default size
+  in
+  if Int.lt n Int.zero || Int.ge n size
+  then result (* Undefined behavior: we don't care about the result. *)
+  else
+    let size_copy = Int.sub size n in
+    let little_endian = Cil.theMachine.theMachine.little_endian in
+    let start_copy, start_paste =
+      if (shift_direction = Left) = little_endian
+      then Int.zero, n
+      else n, Int.zero
+    in
+    let data = basic_copy ~start:start_copy ~size:size_copy offsm in
+    basic_paste ~start:start_paste ~src:data ~size_src:size_copy result
 
 (** Casts *)
 
-let cast ~old_size ~new_size ~signed o =
-  if Int.equal old_size new_size then o
+let cast ~old_size ~new_size ~signed offsm =
+  let little_endian = Cil.theMachine.theMachine.little_endian in
+  if Int.equal old_size new_size then offsm
   else if Int.lt new_size old_size then (* Truncation *)
-    basic_copy ~size:new_size o
+    let start = if little_endian then Int.zero else Int.sub old_size new_size in
+    basic_copy ~start ~size:new_size offsm
   else (* Extension *)
-  if signed then (* need to check the sign and extend accordingly *)
-    (* Original bits, extended with zeros *)
-    let r = default new_size in
-    let r_o = basic_paste ~src:o ~size_src:old_size r in
-    (* Bits of sign extension *)
-    let sign_bit = read_bit o (Int.pred old_size) in
-    let size_ext = Int.sub new_size old_size in
-    let ext = offsm_sign_extension sign_bit size_ext in
-    basic_paste ~start:old_size ~src:ext ~size_src:size_ext r_o
-  else
-    let r = default new_size in
-    basic_paste ~src:o ~size_src:old_size r
+    let result =
+      if signed
+      then signed_default ~size:new_size ~size_offsm:old_size offsm
+      else default new_size
+    in
+    let start = if little_endian then Int.zero else Int.sub new_size old_size in
+    basic_paste ~start ~src:offsm ~size_src:old_size result
 
 
 (** Binary not *)
@@ -539,9 +529,10 @@ module CvalueOffsm : Abstract.Value.Internal with type t = V.t * offsm_or_top
         try
           let i = V.project_ival v_r in
           let i = Ival.project_int i in
+          let size = size typ in
           let signed = Bit_utils.is_signed_int_enum_pointer typ in
-          let shiftn = if op = Shiftlt then SLeft i else SRight (i, signed) in
-          let o = shift (size typ) (to_offsm typ l) shiftn in
+          let dir = if op = Shiftlt then Left else Right in
+          let o = shift ~size ~signed (to_offsm typ l) dir i in
           Main_values.CVal.forward_binop typ op v_l v_r >>-: fun v ->
           v, O o
         with V.Not_based_on_null | Ival.Not_Singleton_Int ->
