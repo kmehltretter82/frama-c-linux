@@ -21,5 +21,6 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(using menhir 2.1)
 (using dune_site 0.1)
 (package (name frama-c) (sites (share share) (libexec lib) (lib plugins) (lib plugins_gui)))
