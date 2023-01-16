@@ -49,7 +49,7 @@ import * as Preferences from 'ivette/prefs';
 
 // An alias type for functions and locations.
 type Fct = string | undefined;
-type Marker = Ast.marker | undefined;
+type Marker = string | undefined;
 
 // A Caller is just a pair of the caller's key and the statement's key where the
 // call occurs.
@@ -660,7 +660,7 @@ export default function ASTview(): JSX.Element {
   Text.set(view, useFctText(fct));
   Fct.set(view, fct);
   Marker.set(view, marker);
-  Hovered.set(view, hovered?.marker);
+  Hovered.set(view, hovered?.marker ?? '');
   Dead.set(view, useFctDead(fct));
   Callers.set(view, useFctCallers(fct));
   TaintedLvalues.set(view, useFctTaints(fct));
