@@ -22,6 +22,7 @@
 
 open Cil_types
 open Cil_datatype
+open Utils
 
 module Dataflow = Dataflow2
 
@@ -100,26 +101,6 @@ struct
         None
       else
         Some (Some (Abstract_state.union old new_))
-
-  (* type of the return of the following function *)
-  type basic_lval =  BNone | BLval of lval | BAddrOf of lval
-
-  (* finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). *)
-  let rec find_basic_lval (exp:exp) : basic_lval =
-    match exp.enode with
-      Lval lv -> BLval lv
-    | AddrOf lv -> BAddrOf lv
-    | CastE (_,exp) -> find_basic_lval exp
-    | UnOp (_,exp,_) -> find_basic_lval exp
-    | BinOp (_,exp1,exp2,_) ->
-      begin
-        match (find_basic_lval exp1, find_basic_lval exp2) with
-          (BNone,BNone) -> BNone
-        | (BNone, res2) -> res2
-        | (res1, BNone) -> res1
-        | _ -> failwith "find_basic_lval: 2 basic lval in a BinOp"
-      end
-    | _ -> BNone
 
   let do_assignment (a:t) (lv:lval) (exp:exp) : t =
     (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)

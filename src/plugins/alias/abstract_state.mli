@@ -101,8 +101,8 @@ type summary =
 
 val make_summary : t option -> kernel_function -> summary
 
-val pretty_summary : ?function_name:string -> Format.formatter -> summary -> unit
+val pretty_summary :  ?debug:bool -> ?function_name:string -> Format.formatter -> summary -> unit
 
-(** [call a args s] computes the abstract state after the call of a
-    function f([args]) summarized in [s] *)
-val call: t -> lval list -> summary -> t
+(** [call a res args s] computes the abstract state after the
+   instruction res=f(args), with f summarized by [s] *)
+val call: t -> lval option -> lval list -> summary -> t

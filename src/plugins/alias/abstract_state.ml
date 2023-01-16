@@ -26,6 +26,7 @@ open Cil_types
 
 open Cil_datatype
 
+open Utils
 
 (* (\** module for vertices *\)
  * module V = struct
@@ -698,18 +699,15 @@ let make_summary (s: t option) (kf: kernel_function) =
       Return (e, _) -> e
     | _ -> failwith "this should not happen"
   in
-  let list_locals = Kernel_function.get_locals kf in
-  (*remove __retres from the list*)
-  let list_locals = List.filter (fun x -> x.vname != "__retres") list_locals in
   {
     state = s;
     formals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_formals kf);
-    locals = List.map (fun v -> (Var v,NoOffset)) list_locals;
+    locals = List.map (fun v -> (Var v,NoOffset))  (Kernel_function.get_locals kf);
     return = exp_return
   }
 
 
-let pretty_summary ?(function_name="") fmt s =
+let pretty_summary ?(debug=false) ?(function_name="") fmt s =
   let print_list_lval fmt (l: lval list) =
     List.iter (fun x -> Format.fprintf fmt "%a " Lval.pretty x) l
   in
@@ -719,11 +717,11 @@ let pretty_summary ?(function_name="") fmt s =
     | None -> Format.fprintf fmt "<None>"
   in
   Format.fprintf fmt "@[<hov 2>Summary of function %s: @." function_name;
-  Format.fprintf fmt "formals: %a locals : %a return expression: %a @.State: @[<hov 2>%a@] " print_list_lval s.formals print_list_lval s.locals (print_option Exp.pretty) s.return (print_option pretty) s.state;
+  Format.fprintf fmt "formals: %a locals : %a return expression: %a @.State: @[<hov 2>%a@] " print_list_lval s.formals print_list_lval s.locals (print_option Exp.pretty) s.return (print_option (pretty ~debug)) s.state;
   Format.fprintf fmt "@]@."
 
 
-let call (state:t) (args:lval list) (summary:summary) :t =
+let call (state:t) (res:lval option) (args:lval list) (summary:summary) :t =
   assert_invariants state;
   let formals = summary.formals in
   let sum_state =
@@ -749,7 +747,22 @@ let call (state:t) (args:lval list) (summary:summary) :t =
       args
       formals
   in
-  (* erase all formals from the tables *)
+  (* set the result *)
+  let new_state =
+    match (res, summary.return) with
+      None, _  -> new_state
+    | (Some res, Some exp_res) ->
+      begin
+        let v_res  =  LMap.find res new_state.lmap in
+        match find_basic_lval exp_res with
+          BLval lval_exp_res ->      
+          let v_exp_res =  LMap.find lval_exp_res new_state.lmap in
+          join new_state v_res v_exp_res
+        | _ -> new_state
+    end
+    |_ -> failwith "using a function with no return improperly"
+  in
+  (* erase all formals from the tables/graphs *)
   let new_lmap, new_vmap =
     List.fold_left
       (fun (acc_lmap, acc_vmap) formal ->
