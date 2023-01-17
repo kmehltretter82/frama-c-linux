@@ -50,30 +50,19 @@ module Make(H: Hashtbl.HashedType) : S with type key = H.t  = struct
 
   include Hashtbl.Make(H)
 
+  let bindings_sorted ?(cmp=Stdlib.compare) h =
+    to_seq h |> List.of_seq |> List.fast_sort (fun (k1,_) (k2,_) -> cmp k1 k2)
+
   let fold_sorted ?(cmp=Stdlib.compare) f h acc =
-    let module Aux = struct type t = key let compare = cmp end in
-    let module M = Map.Make(Aux) in
-    let add k v m =
-      try
-        let l = v :: M.find k m in
-        M.add k l m
-      with Not_found -> M.add k [v] m
-    in
-    let map = fold add h M.empty in
-    let fold_k k l acc =
-      List.fold_left (fun acc v -> f k v acc) acc (List.rev l)
-    in
-    M.fold fold_k map acc
+    let l = bindings_sorted ~cmp h in
+    List.fold_left (fun acc (k,v) -> f k v acc) acc l
 
   let iter_sorted ?cmp f h =
     fold_sorted ?cmp (fun k v () -> f k v) h ()
 
-  let fold_sorted_by_entry (type value) ~cmp f h acc =
-    let module Aux = struct type t = (key*value) let compare = cmp end in
-    let module S = Set.Make(Aux) in
-    let add k v s = S.add (k,v) s in
-    let set = fold add h S.empty in
-    S.fold (fun (k,v) -> f k v) set acc
+  let fold_sorted_by_entry ~cmp f h acc =
+    let l = to_seq h |> List.of_seq |> List.fast_sort cmp in
+    List.fold_left (fun acc (k,v) -> f k v acc) acc l
 
   let iter_sorted_by_entry ~cmp f h =
     fold_sorted_by_entry ~cmp (fun k v () -> f k v) h  ()

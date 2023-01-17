@@ -1215,6 +1215,7 @@ sig
     val after : result -> Cil_types.stmt -> state option
     val iter_vertex : (vertex -> state -> unit) -> result -> unit
     val iter_stmt : (Cil_types.stmt -> state -> unit) -> result -> unit
+    val iter_stmt_asc : (Cil_types.stmt -> state -> unit) -> result -> unit
     val to_dot_output : (Format.formatter -> state -> unit) ->
       result -> out_channel -> unit
     val to_dot_file : (Format.formatter -> state -> unit) ->
@@ -1323,6 +1324,19 @@ struct
         Option.iter (fun stmt -> f stmt s) v.vertex_start_of
       in
       States.iter f' states
+
+    let iter_stmt_asc f (_automaton,_wto,states) =
+      let filter (v,s) =
+        match v.vertex_start_of with
+        | None -> None
+        | Some stmt -> Some (stmt,s)
+      in
+      let cmp (stmt1,_) (stmt2,_) =
+        Cil_datatype.Stmt.compare stmt1 stmt2
+      in
+      States.to_seq states |> Seq.filter_map filter |>
+      List.of_seq |> List.fast_sort cmp |>
+      List.iter (fun (stmt,s) -> f stmt s)
 
     let to_dot_output pp_value (automaton,wto,states) out =
       let pp_vertex fmt v =
