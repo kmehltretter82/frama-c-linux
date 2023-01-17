@@ -155,6 +155,22 @@ let assert_invariants x =
     Assert_failure f ->  (Format.printf "DEBUG FAILED INVARIANTS@.%a@." (pretty ~debug:true) x; raise (Assert_failure f))
 
 
+(* find functions, part 2 *)
+let rec closure_find_lset (v:V.t) (x:t) =
+  match G.succ x.graph v with
+    [] -> [find_lset v x]
+  | [v_next] -> (find_lset v x)::(closure_find_lset v_next x)
+  | _ -> failwith ("this shall not happen (invariant broken)")
+
+let find_transitive_closure  (lv:lval) (x:t) =
+  assert_invariants x;
+  try
+    let v = (LMap.find lv x.lmap) in
+    closure_find_lset v x
+  with
+    Not_found -> []
+
+
 (* find the vertex of an lval *)
 let find_vertex (lv:lval) (x:t) =
   LMap.find lv x.lmap
@@ -723,7 +739,7 @@ let union  (a1:t) (a2:t) :t =
   let new_a =
     (* if new_a.cmpt > 2 * (G.nb_vertex new_a.graph)
      * then *)
-      rename_all_vertex new_a
+    rename_all_vertex new_a
     (* else
      *   new_a *)
   in
@@ -766,7 +782,7 @@ let make_summary (s: t option) (kf: kernel_function) =
     if Kernel_function.has_definition kf then
       let return_stmt = Kernel_function.find_return kf in
       match return_stmt.skind with
-      Return (e, _) -> e
+        Return (e, _) -> e
       | _ -> failwith "this should not happen"
     else
       None

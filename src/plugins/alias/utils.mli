@@ -22,9 +22,9 @@
 
 
 open Cil_types
-    
+
 (* type of the return of the following function *)
 type basic_lval =  BNone | BLval of lval | BAddrOf of lval
-                     
+
 (* finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). *)
-val find_basic_lval : exp -> basic_lval 
+val find_basic_lval : exp -> basic_lval

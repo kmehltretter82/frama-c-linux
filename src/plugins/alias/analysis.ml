@@ -187,10 +187,10 @@ struct
   let rec process_Stmt (s:stmt) (a:t) : t =
     (* register a before stmt *)
     Stmt_table.add s a;
-      match s.skind with
-        Instr i -> doInstr s i a
-      | Block b -> process_Block b a
-      | _ -> a
+    match s.skind with
+      Instr i -> doInstr s i a
+    | Block b -> process_Block b a
+    | _ -> a
 
   and process_Block b a =
     List.fold_left
@@ -214,14 +214,14 @@ let do_stmt (a: Abstract_state.t) (s:stmt) :  Abstract_state.t =
       match do_instr s i (Some a) with
         None -> failwith "problem here"
       | Some a -> a
-    end   
+    end
   | _ -> a
 
 let doFunction (kf:kernel_function) =
   Options.feedback ~level:2 "entering in function %a."
     Kernel_function.pretty kf;
   if Kernel_function.has_definition kf then
-    begin 
+    begin
       let first_stmts =
         try [Kernel_function.find_first_stmt kf]
         with Kernel_function.No_Statement -> []
@@ -241,7 +241,7 @@ let doFunction (kf:kernel_function) =
         in
         Function_table.add kf (Some summary)
     end
-  else 
+  else
     begin
       (* summary by default *)
       Options.warning "Function %a has no definition (summary empty)"
@@ -251,7 +251,7 @@ let doFunction (kf:kernel_function) =
       in
       Function_table.add kf (Some summary)
     end
-    
+
 let () = function_compute_ref := doFunction
 
 let make_summary (state:Abstract_state.t) (kf:kernel_function) =

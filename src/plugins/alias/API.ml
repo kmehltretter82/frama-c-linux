@@ -27,23 +27,22 @@ open Cil_datatype
 module LSet = Lval.Set
 
 
-let fold_new_aliases_stmt
-    (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   match Analysis.get_abstract_state kf s with
     None -> acc
   | Some state ->
     let set_aliases = Abstract_state.find_aliases lv state in
     LSet.fold (fun e a -> f_fold a e) set_aliases acc
 
-let fold_aliases_stmt
-    (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =
-  (* TODO is it correct ? obviously not *)
-  match s.preds with
-    [] -> acc
-  | s::_ -> fold_new_aliases_stmt f_fold acc kf s lv
+let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =
+  match Analysis.get_abstract_state kf s with
+    None -> acc
+  | Some state ->
+    let new_state = Analysis.do_stmt state s in
+    let set_aliases = Abstract_state.find_aliases lv new_state in
+    LSet.fold (fun e a -> f_fold a e) set_aliases acc
 
-let fold_aliases_kf
-    (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
+let fold_aliases_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
   let s = Kernel_function.find_return kf in
   fold_new_aliases_stmt f_fold acc kf s lv
 
@@ -64,17 +63,30 @@ let fold_fundec_stmts (f_fold: 'a -> stmt -> lval -> 'a) (acc: 'a) (kf:kernel_fu
       acc
       list_stmt
   else
-    failwith "not implemented"
+    Options.abort "fold_dundec_stmts: function %a has no definition" Kernel_function.pretty kf
 
-let are_aliased (kf: kernel_function)  (s:stmt) (lv1: lval) (lv2:lval) : bool =
+let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
   match Analysis.get_abstract_state kf s with
     None -> false
   | Some state ->
     let setv1 = Abstract_state.find_aliases lv1 state in
     LSet.mem lv2 setv1
 
-let fold_points_to _ =
-  failwith "not implemented"
 
-let fold_points_to_closure  _ =
-  failwith "not implemented"
+
+let fold_points_to   (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+  match Analysis.get_abstract_state kf s with
+    None -> acc
+  | Some state ->
+    let set_aliases = Abstract_state.find_aliases lv state in
+    f_fold acc set_aliases
+
+let fold_points_to_closure  (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+  match Analysis.get_abstract_state kf s with
+    None -> acc
+  | Some state ->
+    let list_closure = Abstract_state.find_transitive_closure lv state in
+    List.fold_left
+      f_fold
+      acc
+      list_closure

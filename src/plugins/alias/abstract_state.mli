@@ -52,6 +52,12 @@ val find_vertex : lval -> t -> G.V.t
 
 val find_aliases : lval -> t -> LSet.t
 
+(** find_aliases, then recursively finds other sets of lvals. We have
+    the property (if lv is in x) :
+    List.hd (find_transitive_closure lv x) = find_aliases lv x
+*)
+val find_transitive_closure : lval -> t -> LSet.t list
+
 (** Functions for Steensgaard's algorithm *)
 val join : t -> G.V.t -> G.V.t -> t
 
