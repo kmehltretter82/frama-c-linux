@@ -138,6 +138,11 @@ val fold_on_statuses:
   Property.t ->
   'a -> 'a
 
+val register_status_update_hook:
+  (emitter_with_properties -> Property.t -> emitted_status -> unit) -> unit
+(** Registers an hook to be called each time a property status is emitted.
+    @since Frama-C+dev *)
+
 (* ************************************************************************ *)
 (** {2 Consolidated status} *)
 (* ************************************************************************ *)
@@ -258,7 +263,7 @@ val register: Property.t -> unit
 (** Register the given property. It must not be already registered. *)
 
 val register_property_add_hook: (Property.t -> unit) -> unit
-(** add an hook that will be called for any newly registered property
+(** Add an hook that will be called for any newly registered property
     @since Neon-20140301 *)
 
 val remove: Property.t -> unit
@@ -266,7 +271,7 @@ val remove: Property.t -> unit
     corresponding annotation. *)
 
 val register_property_remove_hook: (Property.t -> unit) -> unit
-(** Add and hook that will be called each time a property is removed.
+(** Add an hook that will be called each time a property is removed.
     @since Neon-20140301 *)
 
 val merge: old:Property.t list  -> Property.t list -> unit

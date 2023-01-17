@@ -322,9 +322,13 @@ let is_relevant ip =
          || Cil_builtins.is_unused_builtin (Kernel_function.get_vi kf))
 
 let iter f = Property_status.iter (fun ip -> if is_relevant ip then f ip)
+
 let add_update_hook f =
   Property_status.register_property_add_hook
-    (fun ip -> if is_relevant ip then f ip)
+    (fun ip -> if is_relevant ip then f ip);
+  Property_status.register_status_update_hook
+    (fun _emitter ip _status -> if is_relevant ip then f ip)
+
 let add_remove_hook f =
   Property_status.register_property_remove_hook
     (fun ip -> if is_relevant ip then f ip)
