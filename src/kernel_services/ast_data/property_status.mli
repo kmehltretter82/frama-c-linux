@@ -263,7 +263,7 @@ val register: Property.t -> unit
 (** Register the given property. It must not be already registered. *)
 
 val register_property_add_hook: (Property.t -> unit) -> unit
-(** add an hook that will be called for any newly registered property
+(** Add an hook that will be called for any newly registered property
     @since Neon-20140301 *)
 
 val remove: Property.t -> unit
@@ -271,7 +271,7 @@ val remove: Property.t -> unit
     corresponding annotation. *)
 
 val register_property_remove_hook: (Property.t -> unit) -> unit
-(** Add and hook that will be called each time a property is removed.
+(** Add an hook that will be called each time a property is removed.
     @since Neon-20140301 *)
 
 val merge: old:Property.t list  -> Property.t list -> unit
