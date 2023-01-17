@@ -370,7 +370,7 @@ export function selectLine(view: View, line: number, atTop: boolean): void {
   const { from: goto } = doc.line(Math.max(line, 1));
   if (here === goto) return;
   view.dispatch({ selection: { anchor: goto }, scrollIntoView: true });
-  if (!atTop) return
+  if (!atTop) return;
   const effects = EditorView.scrollIntoView(goto, { y: 'start', yMargin: 0 });
   view.dispatch({ effects });
 }

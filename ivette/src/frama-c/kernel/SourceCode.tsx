@@ -165,13 +165,13 @@ const extensions: Editor.Extension[] = [
   EventsHandler,
 ];
 
-function markerLocation(m: Ast.marker | undefined): Ast.source | undefined {
+function useMarkerLocation(m: Ast.marker | undefined): Ast.source | undefined {
   const markersInfo = States.useSyncArray(Ast.markerInfo);
   if (m === undefined || m === '') return undefined;
   return markersInfo.getData(m)?.sloc;
 }
 
-function functionLocation(fct: string | undefined): Ast.source | undefined {
+function useFunctionLocation(fct: string | undefined): Ast.source | undefined {
   const functionsData = States.useSyncArray(Ast.functions).getArray();
   if (fct === undefined || fct === '') return undefined;
   return functionsData.find((e) => e.name === fct)?.sloc;
@@ -187,8 +187,8 @@ export default function SourceCode(): JSX.Element {
   const fct = selection?.current?.fct;
   const displayedFct = React.useRef<string | undefined>(undefined);
 
-  const markerSloc = markerLocation(marker);
-  const fctSloc = functionLocation(fct);
+  const markerSloc = useMarkerLocation(marker);
+  const fctSloc = useFunctionLocation(fct);
   const file = fctSloc?.file ?? '';
   const filename = Path.parse(file).base;
 
