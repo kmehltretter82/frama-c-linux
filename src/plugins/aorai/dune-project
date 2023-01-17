@@ -26,3 +26,4 @@
 
 (name frama-c-aorai)
 (using dune_site 0.1)
+(using menhir 2.1)

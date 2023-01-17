@@ -175,11 +175,11 @@ type pre_cond = Behavior of string | Pre of Automaton_ast.condition
 main : options metavars states EOF { build_automaton $1 $2 $3 }
 
 options
-  : options option { $1 @ [$2] }
-  | option         { [$1] }
+  : options an_option { $1 @ [$2] }
+  | an_option         { [$1] }
   ;
 
-option
+an_option
   : PERCENT IDENTIFIER opt_identifiers SEMI_COLON { 
     match $2 with
     | "init" -> Init $3
