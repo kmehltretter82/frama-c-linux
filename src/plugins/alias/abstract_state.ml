@@ -117,7 +117,6 @@ let pretty ?(debug=false) =
 
 (** invariants of type t must be true before and after each functon call *)
 let assert_invariants (x:t) : unit =
-  (* Format.printf "DEBUG Checking invariants@.%a@." (pretty ~debug:true) x; *)
   (* check that all vertex of the graph have entries in pending and
      vmap, and are integer between 0 and cmpt, and have at most 1
      successor *)
@@ -143,6 +142,13 @@ let assert_invariants (x:t) : unit =
     assert (LSet.fold (fun lv acc -> acc && LMap.mem lv x.lmap) ls true)
   in
   VMap.iter assert_vmap x.vmap
+
+(* for debuging *)
+let assert_invariants x =
+  try assert_invariants x
+  with
+  Assert_failure f ->  (Format.printf "DEBUG FAILED INVARIANTS@.%a@." (pretty ~debug:true) x; raise (Assert_failure f))
+
 
 (* find the vertex of an lval *)
 let find_vertex (lv:lval) (x:t) =
@@ -339,11 +345,11 @@ let join (x:t) (v1:V.t) (v2:V.t) : t =
 
 let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants x;
-  let pt2=  G.succ x.graph v2 in
+  let pt2 =  G.succ x.graph v2 in
   if pt2 = []
   then
-    let old_set = try VMap.find v2 x.pending with Not_found -> VSet.empty in
-    let new_pending = VMap.add v2 (VSet.add v2 old_set) x.pending in
+    let old_set = try VMap.find v1 x.pending with Not_found -> VSet.empty in
+    let new_pending = VMap.add v1 (VSet.add v2 old_set) x.pending in
     {x with pending=new_pending}
   else
     join x v1 v2
@@ -371,7 +377,8 @@ let assignment_x_y (a:t) (x:lval) (y:lval) : t =
   assert_invariants a;
   let (v1,a) = find_or_create_vertex x a in
   let (v2,a) = find_or_create_vertex y a in
-  cjoin a v1 v2
+  let new_a = cjoin a v1 v2 in
+  assert_invariants new_a ; new_a
 
 
 (* assignment x = &y *)
@@ -379,10 +386,12 @@ let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t =
   assert_invariants a;
   let v1, a = find_or_create_vertex x a in
   let list_v2, a = addr_of y a in
-  List.fold_left
+  let new_a = List.fold_left
     (fun a_acc v2 -> join a_acc v1 v2)
     a
     list_v2
+  in
+   assert_invariants new_a ; new_a
 (* TODO is that correct ?*)
 
 
@@ -391,38 +400,51 @@ let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
   assert_invariants a;
   let v1, a = find_or_create_vertex x a in
   let list_v2, a = points_to y a in
+  let new_a =
   match list_v2 with
     [] -> let v2 = find_vertex y a in set_type a v2 v1
   | [v2] -> cjoin a v1 v2
   | _ ->  failwith "assignment_x_ptr_y not implemented"
+  in
+   assert_invariants new_a ; new_a
 
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y (a:t) (x:lval) : t =
+  assert_invariants a;
   let (v1,a) = find_or_create_vertex x a in
   let (v2,a) = create_cst_vertex a in
-  set_type a v1 v2
+  let new_a = set_type a v1 v2 in
+   assert_invariants new_a ; new_a
 
 (* assignment *x = y *)
 let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
+  assert_invariants a;
   let v2, a = find_or_create_vertex y a in
   let list_v1, a = points_to x a in
+  let new_a =
   match list_v1 with
     [] ->  let v1 = find_vertex x a in set_type a v1 v2
   |  [v1] -> cjoin a v1 v2
   | _ ->  failwith "assignment_ptr_x_y not implemented"
+  in
+   assert_invariants new_a ; new_a
 
 
 (* assignment *x = cst *)
 let assignment_ptr_x_cst (a:t) (x:lval) : t =
+  assert_invariants a;
   (* Format.printf "DEBUG (assignment_ptr_x_cst) on lval %a and state:@. %a @." Lval.pretty x print_debug a; *)
   let v2, a = create_cst_vertex a in
   let (list_v1, a) : V.t list * t = points_to x a in
+  let new_a =
   match list_v1 with
     [] ->  let v1 = find_vertex x a in set_type a v1 v2
   | _ -> let f_fold (acc:t) (v1:V.t) : t = cjoin acc v1 v2
     in List.fold_left f_fold a list_v1
+  in
+  assert_invariants new_a ; new_a
 
-
+  
 (* we don't need to iterate on loops *)
 let equal (_:t) (_:t) = true
 
@@ -726,7 +748,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   let formals = summary.formals in
   let sum_state =
     match summary.state with
-      None -> failwith "this should not hapen"
+      None -> failwith "BUG this should not happen"
     | Some s -> s
   in
   assert (List.length args = List.length formals);
@@ -740,7 +762,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   let new_state =List.fold_left2
       (fun acc param formal ->
          begin
-           match  formal,find_basic_lval param with
+           match  formal, find_basic_lval param with
              ((Var v1, NoOffset), BLval (Var v2,NoOffset)) ->
              (* case x = y *)
              assignment_x_y acc (Var v1, NoOffset) (Var v2, NoOffset)

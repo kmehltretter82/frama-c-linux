@@ -5,24 +5,23 @@ After statement a = (int *)c; :
  <list of may-alias>
 { a; c } are aliased
 <end of list>
- 
+
 After statement d = (float *)b; :
  <list of may-alias>
 { a; c } are aliased
 { b; d } are aliased
 <end of list>
- 
+
 After statement __retres = 0; :
  <list of may-alias>
 { a; c } are aliased
 { b; d } are aliased
 <end of list>
- 
+
 After statement return __retres; :
  <list of may-alias>
 { a; c } are aliased
 { b; d } are aliased
 <end of list>
- 
 
 [alias] Analysis complete

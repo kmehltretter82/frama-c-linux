@@ -4,31 +4,30 @@
 After statement if (a) a = b; else a = c; :
  <list of may-alias>
 <end of list>
- 
+
 After statement a = b; :
  <list of may-alias>
 { a; b } are aliased
 <end of list>
- 
+
 After statement a = c; :
  <list of may-alias>
 { a; c } are aliased
 <end of list>
- 
+
 After statement *a = 4; :
  <list of may-alias>
 { a; b } are aliased
 <end of list>
- 
+
 After statement __retres = 0; :
  <list of may-alias>
 { a; b } are aliased
 <end of list>
- 
+
 After statement return __retres; :
  <list of may-alias>
 { a; b } are aliased
 <end of list>
- 
 
 [alias] Analysis complete

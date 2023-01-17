@@ -2,6 +2,7 @@
 [alias] Parsing done
 [alias] Skipping assignment odata[idx] = 0.5 * idata[idx] (not implemented)
 [alias] Skipping assignment odata[idx] = 0.5 * idata[idx] (not implemented)
+[alias] Skipping assignment odata[idx] = 0.5 * idata[idx] (not implemented)
 [alias] Functions done
 After statement while (1) {
                   idx = 0;
@@ -12,7 +13,7 @@ After statement while (1) {
                 } :
  <list of may-alias>
 <end of list>
- 
+
 After statement idx = 0;
                 while (idx < 10) {
                   odata[idx] = 0.5 * idata[idx];
@@ -20,37 +21,51 @@ After statement idx = 0;
                 } :
  <list of may-alias>
 <end of list>
- 
+
 After statement idx = 0; :
  <list of may-alias>
 <end of list>
- 
+
+After statement idx = 0; :
+ <list of may-alias>
+<end of list>
+
 After statement while (idx < 10) {
                   odata[idx] = 0.5 * idata[idx];
                   idx ++;
                 } :
  <list of may-alias>
 <end of list>
- 
+
+After statement while (idx < 10) {
+                  odata[idx] = 0.5 * idata[idx];
+                  idx ++;
+                } :
+ <list of may-alias>
+<end of list>
+
 After statement if (! (idx < 10)) break; :
  <list of may-alias>
 <end of list>
- 
+
 After statement break; :
  <list of may-alias>
 <end of list>
- 
+
 After statement odata[idx] = 0.5 * idata[idx]; :
  <list of may-alias>
 <end of list>
- 
+
 After statement odata[idx] = 0.5 * idata[idx]; :
  <list of may-alias>
 <end of list>
- 
+
+After statement odata[idx] = 0.5 * idata[idx]; :
+ <list of may-alias>
+<end of list>
+
 After statement idx ++; :
  <list of may-alias>
 <end of list>
- 
 
 [alias] Analysis complete

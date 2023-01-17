@@ -168,7 +168,8 @@ struct
     | Call(res,ef,es,(loc,_)) -> (* !function_compute_ref ef *)
       begin
         let summary = match Kernel_function.get_called ef with
-          | Some kf -> (try Function_table.find kf with Not_found -> None)
+          | Some kf -> (try Function_table.find kf
+                        with Not_found -> !function_compute_ref kf ; Function_table.find kf)
           | None -> Options.abort ~source:loc
                       "Unsupported function pointer (skipped)"
         in
@@ -219,15 +220,23 @@ let doFunction (kf:kernel_function) =
   Options.feedback ~level:2 "entering in function %a."
     Kernel_function.pretty kf;
   if Kernel_function.has_definition kf then
-    let first_stmts = try [Kernel_function.find_first_stmt kf] with Kernel_function.No_Statement -> [] in
+    let first_stmts =
+      try [Kernel_function.find_first_stmt kf]
+      with Kernel_function.No_Statement -> [] in
     List.iter (fun stmt -> T.StmtStartData.add stmt (Some Abstract_state.initial_value)) first_stmts;
     F.compute first_stmts;
-    let return_stmt = Kernel_function.find_return kf in
-    let final_state : Abstract_state.t option = try Stmt_table.find return_stmt with Not_found -> None in
-    let summary: Abstract_state.summary =
-      Abstract_state.make_summary final_state kf
-    in
-    Function_table.add kf (Some summary)
+    if not (Kernel_function.is_main kf) then
+      (* if main, do nothing *)
+      let return_stmt = Kernel_function.find_return kf in
+      let final_state : Abstract_state.t option =
+        try Stmt_table.find return_stmt
+        with
+          Not_found -> failwith "Houston, we have a problem"
+      in
+      let summary: Abstract_state.summary =
+        Abstract_state.make_summary final_state kf
+      in
+      Function_table.add kf (Some summary)
 
 let () = function_compute_ref := doFunction
 
