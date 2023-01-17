@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C plug-in 'Alias' (alias).             *)
 (*                                                                        *)
-(*  Copyright (C) 2022-2022                                               *)
+(*  Copyright (C) 2022-2023                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -52,6 +52,12 @@ val find_vertex : lval -> t -> G.V.t
 
 val find_aliases : lval -> t -> LSet.t
 
+(** find_aliases, then recursively finds other sets of lvals. We have
+    the property (if lv is in x) :
+    List.hd (find_transitive_closure lv x) = find_aliases lv x
+*)
+val find_transitive_closure : lval -> t -> LSet.t list
+
 (** Functions for Steensgaard's algorithm *)
 val join : t -> G.V.t -> G.V.t -> t
 
@@ -66,7 +72,7 @@ val assignment_x_addr_y : t -> lval -> lval -> t
 
 val assignment_x_ptr_y : t -> lval -> lval -> t
 
-val assignment_x_allocate_y : t -> lval -> lval -> t
+val assignment_x_allocate_y : t -> lval -> t
 
 val assignment_ptr_x_y : t -> lval -> lval -> t
 
@@ -88,7 +94,21 @@ val initial_value : t
     associated to this vertex *)
 val make_top : t -> t
 
-(** Type denoting summaries of functions *)
-type summary
 
-val summary_of_state : t -> summary
+
+(** Type denoting summaries of functions *)
+type summary =
+  {
+    state : t option;
+    formals: lval list;
+    locals: lval list;
+    return : exp option
+  }
+
+val make_summary : t option -> kernel_function -> summary
+
+val pretty_summary :  ?debug:bool -> ?function_name:string -> Format.formatter -> summary -> unit
+
+(** [call a res args s] computes the abstract state after the
+    instruction res=f(args), with f summarized by [s] *)
+val call: t -> lval option -> exp list -> summary -> t

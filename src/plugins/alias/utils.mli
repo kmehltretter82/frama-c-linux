@@ -20,34 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Plugin Registration                                                --- *)
-(* -------------------------------------------------------------------------- *)
 
-include Plugin.Register
-    (struct
-      let name = "Alias"
-      let help = "Light May-Alias Analyzer"
-      let shortname = "alias"
-    end)
+open Cil_types
 
+(* type of the return of the following function *)
+type basic_lval =  BNone | BLval of lval | BAddrOf of lval
 
-module Enabled = False
-    (struct
-      let option_name = "-alias"
-      let help = "Allows May-Alias Analyzer"
-    end)
-
-
-module ShowFunctionTable = False
-    (struct
-      let option_name = "-alias-show-function-table"
-      let help = "Displays the table [function -> summary] at the end of the analysis"
-    end)
-
-
-module ShowStmtTable = False
-    (struct
-      let option_name = "-alias-show-stmt-table"
-      let help = "Displays the table [stmt -> abstract state] at the end of the analysis"
-    end)
+(* finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). *)
+val find_basic_lval : exp -> basic_lval

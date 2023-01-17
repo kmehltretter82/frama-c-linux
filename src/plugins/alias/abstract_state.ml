@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C plug-in 'Alias' (alias).             *)
 (*                                                                        *)
-(*  Copyright (C) 2022-2022                                               *)
+(*  Copyright (C) 2022-2023                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,6 +26,7 @@ open Cil_types
 
 open Cil_datatype
 
+open Utils
 
 (* (\** module for vertices *\)
  * module V = struct
@@ -116,7 +117,6 @@ let pretty ?(debug=false) =
 
 (** invariants of type t must be true before and after each functon call *)
 let assert_invariants (x:t) : unit =
-  (* Format.printf "DEBUG Checking invariants@.%a@." (pretty ~debug:true) x; *)
   (* check that all vertex of the graph have entries in pending and
      vmap, and are integer between 0 and cmpt, and have at most 1
      successor *)
@@ -128,6 +128,11 @@ let assert_invariants (x:t) : unit =
     assert (List.length (G.succ x.graph v) <= 1)
   in
   G.iter_vertex assert_vertex x.graph;
+  let assert_edge v1 v2 =
+    assert (G.mem_vertex x.graph v1);
+    assert (G.mem_vertex x.graph v2)
+  in
+  G.iter_edges assert_edge x.graph;
   let assert_lmap (lv:lval) (v:V.t) =
     assert (G.mem_vertex x.graph v);
     assert (LSet.mem lv (VMap.find v x.vmap))
@@ -142,6 +147,29 @@ let assert_invariants (x:t) : unit =
     assert (LSet.fold (fun lv acc -> acc && LMap.mem lv x.lmap) ls true)
   in
   VMap.iter assert_vmap x.vmap
+
+(* for debuging *)
+let assert_invariants x =
+  try assert_invariants x
+  with
+    Assert_failure f ->  (Format.printf "DEBUG FAILED INVARIANTS@.%a@." (pretty ~debug:true) x; raise (Assert_failure f))
+
+
+(* find functions, part 2 *)
+let rec closure_find_lset (v:V.t) (x:t) =
+  match G.succ x.graph v with
+    [] -> [find_lset v x]
+  | [v_next] -> (find_lset v x)::(closure_find_lset v_next x)
+  | _ -> failwith ("this shall not happen (invariant broken)")
+
+let find_transitive_closure  (lv:lval) (x:t) =
+  assert_invariants x;
+  try
+    let v = (LMap.find lv x.lmap) in
+    closure_find_lset v x
+  with
+    Not_found -> []
+
 
 (* find the vertex of an lval *)
 let find_vertex (lv:lval) (x:t) =
@@ -219,6 +247,21 @@ let remove_cst_vertex (v:V.t) (x:t) : t =
     vmap = VMap.remove v x.vmap;
     cmpt = x.cmpt
   }
+
+(* remove a lval from a graph*)
+let remove_lval (x:t)  (lv:lval) :t =
+  assert_invariants x;
+  let new_x =
+    try
+      let v = LMap.find lv x.lmap in
+      let setv= VMap.find v x.vmap in
+      let new_lmap = LMap.remove lv x.lmap in
+      let new_vmap = VMap.add v (LSet.remove lv setv) x.vmap in
+      {x with lmap = new_lmap; vmap = new_vmap}
+    with
+      Not_found -> x
+  in
+  assert_invariants new_x; new_x
 
 (* let lset_to_string s =
  *   let buffer = Buffer.create 16 in
@@ -332,17 +375,18 @@ and unify2 (x:t) (v1:V.t) (l2:V.t list) =
 
 (* since the recursive version of join, unify, unify2 and merge may break the invariants *)
 let join (x:t) (v1:V.t) (v2:V.t) : t =
+  (* Options.feedback ~level:2 "GRAPH BEFORE JOIN(v_%d,v_%d) @.%a@." v1 v2 (pretty ~debug:true) x; *)
   assert_invariants x;
   let res = join x v1 v2 in
   assert_invariants res; res
 
 let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants x;
-  let pt2=  G.succ x.graph v2 in
+  let pt2 =  G.succ x.graph v2 in
   if pt2 = []
   then
-    let old_set = try VMap.find v2 x.pending with Not_found -> VSet.empty in
-    let new_pending = VMap.add v2 (VSet.add v2 old_set) x.pending in
+    let old_set = try VMap.find v1 x.pending with Not_found -> VSet.empty in
+    let new_pending = VMap.add v1 (VSet.add v2 old_set) x.pending in
     {x with pending=new_pending}
   else
     join x v1 v2
@@ -370,7 +414,8 @@ let assignment_x_y (a:t) (x:lval) (y:lval) : t =
   assert_invariants a;
   let (v1,a) = find_or_create_vertex x a in
   let (v2,a) = find_or_create_vertex y a in
-  cjoin a v1 v2
+  let new_a = cjoin a v1 v2 in
+  assert_invariants new_a ; new_a
 
 
 (* assignment x = &y *)
@@ -378,10 +423,12 @@ let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t =
   assert_invariants a;
   let v1, a = find_or_create_vertex x a in
   let list_v2, a = addr_of y a in
-  List.fold_left
-    (fun a_acc v2 -> join a_acc v1 v2)
-    a
-    list_v2
+  let new_a = List.fold_left
+      (fun a_acc v2 -> join a_acc v1 v2)
+      a
+      list_v2
+  in
+  assert_invariants new_a ; new_a
 (* TODO is that correct ?*)
 
 
@@ -390,36 +437,49 @@ let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
   assert_invariants a;
   let v1, a = find_or_create_vertex x a in
   let list_v2, a = points_to y a in
-  match list_v2 with
-    [] -> let v2 = find_vertex y a in set_type a v2 v1
-  | [v2] -> cjoin a v1 v2
-  | _ ->  failwith "assignment_x_ptr_y not implemented"
+  let new_a =
+    match list_v2 with
+      [] -> let v2 = find_vertex y a in set_type a v2 v1
+    | [v2] -> cjoin a v1 v2
+    | _ ->  failwith "assignment_x_ptr_y not implemented"
+  in
+  assert_invariants new_a ; new_a
 
 (* assignment x = allocate(y) *)
-let assignment_x_allocate_y (a:t) (x:lval) (y:lval) : t =
+let assignment_x_allocate_y (a:t) (x:lval) : t =
+  assert_invariants a;
   let (v1,a) = find_or_create_vertex x a in
-  let (v2,a) = create_vertex y a in
-  set_type a v1 v2
+  let (v2,a) = create_cst_vertex a in
+  let new_a = set_type a v1 v2 in
+  assert_invariants new_a ; new_a
 
 (* assignment *x = y *)
 let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
+  assert_invariants a;
   let v2, a = find_or_create_vertex y a in
   let list_v1, a = points_to x a in
-  match list_v1 with
-    [] ->  let v1 = find_vertex x a in set_type a v1 v2
-  |  [v1] -> cjoin a v1 v2
-  | _ ->  failwith "assignment_ptr_x_y not implemented"
+  let new_a =
+    match list_v1 with
+      [] ->  let v1 = find_vertex x a in set_type a v1 v2
+    |  [v1] -> cjoin a v1 v2
+    | _ ->  failwith "assignment_ptr_x_y not implemented"
+  in
+  assert_invariants new_a ; new_a
 
 
 (* assignment *x = cst *)
 let assignment_ptr_x_cst (a:t) (x:lval) : t =
+  assert_invariants a;
   (* Format.printf "DEBUG (assignment_ptr_x_cst) on lval %a and state:@. %a @." Lval.pretty x print_debug a; *)
   let v2, a = create_cst_vertex a in
   let (list_v1, a) : V.t list * t = points_to x a in
-  match list_v1 with
-    [] ->  let v1 = find_vertex x a in set_type a v1 v2
-  | _ -> let f_fold (acc:t) (v1:V.t) : t = cjoin acc v1 v2
-    in List.fold_left f_fold a list_v1
+  let new_a =
+    match list_v1 with
+      [] ->  let v1 = find_vertex x a in set_type a v1 v2
+    | _ -> let f_fold (acc:t) (v1:V.t) : t = cjoin acc v1 v2
+      in List.fold_left f_fold a list_v1
+  in
+  assert_invariants new_a ; new_a
 
 
 (* we don't need to iterate on loops *)
@@ -523,18 +583,32 @@ module V2Set = Set.Make(VPairs)
 
 (* rename all vertex re-enumerate all vertex of [x] from 0 to nb_vertex -1 *)
 let rename_all_vertex (x:t) : t =
+  assert_invariants x;
   let new_cmpt = ref 0 in
   let tbl_rename = Hashtbl.create (G.nb_vertex x.graph) in
+  (* fill the table *)
+  G.iter_vertex  (fun v -> Hashtbl.add tbl_rename v !new_cmpt ; incr new_cmpt) x.graph;
+  let r v =
+    try
+      Hashtbl.find tbl_rename v
+    with
+      Not_found -> Format.printf "DEBUG FAILED RENAME (%d not found) @.%a@." v (pretty ~debug:true) x; raise Not_found
+  in
   let renamed_graph =
     (* rename the graph and write the table *)
     G.map_vertex
-      (fun v -> Hashtbl.add tbl_rename v !new_cmpt ; incr new_cmpt; !new_cmpt-1)
+      r
       x.graph
   in
-  let r v = Hashtbl.find tbl_rename v in
+
   let renamed_pending =
     VMap.fold
-      (fun v vs acc -> VMap.add (r v) vs acc)
+      (fun v vs acc ->
+         if G.mem_vertex x.graph v
+         then VMap.add (r v) vs acc
+         (* if it is not a vertex, then it is an aritfact of the map *)
+         else acc
+      )
       x.pending
       VMap.empty
   in
@@ -545,11 +619,20 @@ let rename_all_vertex (x:t) : t =
   in
   let renamed_vmap =
     VMap.fold
-      (fun v ls acc -> VMap.add (r v) ls acc)
+      (fun v ls acc ->
+         if G.mem_vertex x.graph v
+         then
+           VMap.add (r v) ls acc
+         else
+           acc
+      )
       x.vmap
       VMap.empty
   in
-  {graph = renamed_graph; pending = renamed_pending ; lmap = renamed_lmap ; vmap = renamed_vmap ; cmpt = !new_cmpt }
+  let new_x =
+    {graph = renamed_graph; pending = renamed_pending ; lmap = renamed_lmap ; vmap = renamed_vmap ; cmpt = !new_cmpt }
+  in
+  assert_invariants new_x; new_x
 
 let union  (a1:t) (a2:t) :t =
   (* naive algorithm :
@@ -634,7 +717,10 @@ let union  (a1:t) (a2:t) :t =
       (* find the only successor that is not a constant node *)
       let true_succ =
         List.fold_left
-          (fun res v -> if LSet.is_empty (VMap.find v res_a.vmap) then res else v)
+          (fun res v ->
+             if LSet.is_empty (VMap.find v res_a.vmap)
+             then res
+             else v)
           (List.hd l_succ)
           l_succ
       in
@@ -651,11 +737,11 @@ let union  (a1:t) (a2:t) :t =
       new_a
   in
   let new_a =
-    if new_a.cmpt > 2 * (G.nb_vertex new_a.graph)
-    then
-      rename_all_vertex new_a
-    else
-      new_a
+    (* if new_a.cmpt > 2 * (G.nb_vertex new_a.graph)
+     * then *)
+    rename_all_vertex new_a
+    (* else
+     *   new_a *)
   in
   assert_invariants new_a;
   new_a
@@ -683,9 +769,110 @@ let make_top (x:t) : t =
     {graph = g ; pending = p ; lmap = lmap ; vmap = vmap ; cmpt = 1}
 
 (** a type for summaries of functions *)
-type summary = t
+type summary =
+  {
+    state : t option;
+    formals: lval list;
+    locals: lval list;
+    return : exp option
+  }
 
-let summary_of_state (x:t) = x
+let make_summary (s: t option) (kf: kernel_function) =
+  let exp_return : exp option =
+    if Kernel_function.has_definition kf then
+      let return_stmt = Kernel_function.find_return kf in
+      match return_stmt.skind with
+        Return (e, _) -> e
+      | _ -> failwith "this should not happen"
+    else
+      None
+  in
+  {
+    state = s;
+    formals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_formals kf);
+    locals = List.map (fun v -> (Var v,NoOffset))  (Kernel_function.get_locals kf);
+    return = exp_return
+  }
 
 
+let pretty_summary ?(debug=false) ?(function_name="") fmt s =
+  let print_list_lval fmt (l: lval list) =
+    List.iter (fun x -> Format.fprintf fmt "%a " Lval.pretty x) l
+  in
+  let print_option pp fmt x =
+    match x with
+    | Some x -> pp fmt x
+    | None -> Format.fprintf fmt "<None>"
+  in
+  Format.fprintf fmt "@[<hov 2>Summary of function %s: @." function_name;
+  Format.fprintf fmt "formals: %a locals : %a return expression: %a @.State: @[<hov 2>%a@] " print_list_lval s.formals print_list_lval s.locals (print_option Exp.pretty) s.return (print_option (pretty ~debug)) s.state;
+  Format.fprintf fmt "@]@."
 
+
+let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
+  assert_invariants state;
+  let formals = summary.formals in
+  let sum_state =
+    match summary.state with
+      None -> failwith "BUG this should not happen"
+    | Some s -> s
+  in
+  assert (List.length args = List.length formals);
+  (* check that formal variables do no appear in state *)
+  List.iter
+    (fun lv -> assert (not (LMap.mem lv state.lmap)))
+    formals;
+  (* union of the two graphs *)
+  let new_state = union state sum_state in
+  (* union of formal parameters *)
+  let new_state =
+    List.fold_left2
+      (fun acc param formal ->
+         begin
+           match  formal, find_basic_lval param with
+             ((Var v1, NoOffset), BLval (Var v2,NoOffset)) ->
+             (* case x = y *)
+             assignment_x_y acc (Var v1, NoOffset) (Var v2, NoOffset)
+           | ((Var _, NoOffset), BNone) -> acc
+           (* constant assignments : do nothing, but maybe check the type of the assigned variable ? *)
+           | ((Var v1, NoOffset), BAddrOf lv2) ->
+             (* case x = &y *)
+             assignment_x_addr_y acc (Var v1, NoOffset) lv2
+           | ((Var v1, NoOffset), BLval (Mem e2, NoOffset)) ->
+             (* case x  = *y *)
+             begin
+               match e2.enode with
+                 Lval lv2 -> assignment_x_ptr_y acc (Var v1, NoOffset) lv2
+               |  _ -> (Options.feedback "In a function call, parameter (@[%a@] <- @[%a@]) is ignored)" Lval.pretty formal Exp.pretty param; acc)
+             end
+           | _ -> (Options.feedback "DEBUG: call function - formal variable not as we expected@."; acc)
+         end
+      )
+      new_state
+      args
+      formals
+  in
+  (* set the result *)
+  let new_state =
+    match (res, summary.return) with
+      None, _  -> new_state
+    | (Some res, Some exp_res) ->
+      begin
+        let v_res,new_state  = find_or_create_vertex res new_state in
+        match find_basic_lval exp_res with
+          BLval lval_exp_res ->
+          let v_exp_res =  LMap.find lval_exp_res new_state.lmap in
+          join new_state v_res v_exp_res
+        | _ -> new_state
+      end
+    | (Some _, None) -> (Options.warning "a function with no return is employed in an assignment" ; new_state)
+  in
+  (* erase all formals and all locals from the tables/graphs *)
+  let new_state =
+    List.fold_left
+      remove_lval
+      new_state
+      (summary.formals@summary.locals)
+  in
+  assert_invariants new_state;
+  new_state

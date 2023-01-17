@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C plug-in 'Alias' (alias).             *)
 (*                                                                        *)
-(*  Copyright (C) 2022-2022                                               *)
+(*  Copyright (C) 2022-2023                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,4 +26,11 @@
 
 include Plugin.S
 
+(** Module activation *)
 module Enabled : Parameter_sig.Bool
+
+(** Displays the table [function -> summary] at the end of the analysis *)
+module ShowFunctionTable : Parameter_sig.Bool
+
+(** Displays the table [statement -> state] at the end of the analysis *)
+module ShowStmtTable : Parameter_sig.Bool

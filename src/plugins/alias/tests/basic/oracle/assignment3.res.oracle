@@ -4,18 +4,17 @@
 After statement a = & b; :
  <list of may-alias>
 <end of list>
- 
+
 After statement *c = b; :
  <list of may-alias>
 <end of list>
- 
+
 After statement __retres = 0; :
  <list of may-alias>
 <end of list>
- 
+
 After statement return __retres; :
  <list of may-alias>
 <end of list>
- 
 
 [alias] Analysis complete

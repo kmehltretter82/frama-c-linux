@@ -5,36 +5,35 @@ After statement a = b; :
  <list of may-alias>
 { a; b } are aliased
 <end of list>
- 
+
 After statement b = c; :
  <list of may-alias>
 { a; b; c } are aliased
 <end of list>
- 
+
 After statement *a = 4; :
  <list of may-alias>
 { a; b; c } are aliased
 <end of list>
- 
+
 After statement *c = e; :
  <list of may-alias>
 { a; b; c } are aliased
 <end of list>
- 
+
 After statement a = d; :
  <list of may-alias>
 { a; b; c; d } are aliased
 <end of list>
- 
+
 After statement __retres = 0; :
  <list of may-alias>
 { a; b; c; d } are aliased
 <end of list>
- 
+
 After statement return __retres; :
  <list of may-alias>
 { a; b; c; d } are aliased
 <end of list>
- 
 
 [alias] Analysis complete
