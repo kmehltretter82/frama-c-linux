@@ -128,6 +128,11 @@ let assert_invariants (x:t) : unit =
     assert (List.length (G.succ x.graph v) <= 1)
   in
   G.iter_vertex assert_vertex x.graph;
+  let assert_edge v1 v2 =
+    assert (G.mem_vertex x.graph v1);
+    assert (G.mem_vertex x.graph v2)
+  in
+  G.iter_edges assert_edge x.graph;
   let assert_lmap (lv:lval) (v:V.t) =
     assert (G.mem_vertex x.graph v);
     assert (LSet.mem lv (VMap.find v x.vmap))
@@ -147,7 +152,7 @@ let assert_invariants (x:t) : unit =
 let assert_invariants x =
   try assert_invariants x
   with
-  Assert_failure f ->  (Format.printf "DEBUG FAILED INVARIANTS@.%a@." (pretty ~debug:true) x; raise (Assert_failure f))
+    Assert_failure f ->  (Format.printf "DEBUG FAILED INVARIANTS@.%a@." (pretty ~debug:true) x; raise (Assert_failure f))
 
 
 (* find the vertex of an lval *)
@@ -226,6 +231,21 @@ let remove_cst_vertex (v:V.t) (x:t) : t =
     vmap = VMap.remove v x.vmap;
     cmpt = x.cmpt
   }
+
+(* remove a lval from a graph*)
+let remove_lval (x:t)  (lv:lval) :t =
+  assert_invariants x;
+  let new_x =
+    try
+      let v = LMap.find lv x.lmap in
+      let setv= VMap.find v x.vmap in
+      let new_lmap = LMap.remove lv x.lmap in
+      let new_vmap = VMap.add v (LSet.remove lv setv) x.vmap in
+      {x with lmap = new_lmap; vmap = new_vmap}
+    with
+      Not_found -> x
+  in
+  assert_invariants new_x; new_x
 
 (* let lset_to_string s =
  *   let buffer = Buffer.create 16 in
@@ -339,6 +359,7 @@ and unify2 (x:t) (v1:V.t) (l2:V.t list) =
 
 (* since the recursive version of join, unify, unify2 and merge may break the invariants *)
 let join (x:t) (v1:V.t) (v2:V.t) : t =
+  (* Options.feedback ~level:2 "GRAPH BEFORE JOIN(v_%d,v_%d) @.%a@." v1 v2 (pretty ~debug:true) x; *)
   assert_invariants x;
   let res = join x v1 v2 in
   assert_invariants res; res
@@ -387,11 +408,11 @@ let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t =
   let v1, a = find_or_create_vertex x a in
   let list_v2, a = addr_of y a in
   let new_a = List.fold_left
-    (fun a_acc v2 -> join a_acc v1 v2)
-    a
-    list_v2
+      (fun a_acc v2 -> join a_acc v1 v2)
+      a
+      list_v2
   in
-   assert_invariants new_a ; new_a
+  assert_invariants new_a ; new_a
 (* TODO is that correct ?*)
 
 
@@ -401,12 +422,12 @@ let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
   let v1, a = find_or_create_vertex x a in
   let list_v2, a = points_to y a in
   let new_a =
-  match list_v2 with
-    [] -> let v2 = find_vertex y a in set_type a v2 v1
-  | [v2] -> cjoin a v1 v2
-  | _ ->  failwith "assignment_x_ptr_y not implemented"
+    match list_v2 with
+      [] -> let v2 = find_vertex y a in set_type a v2 v1
+    | [v2] -> cjoin a v1 v2
+    | _ ->  failwith "assignment_x_ptr_y not implemented"
   in
-   assert_invariants new_a ; new_a
+  assert_invariants new_a ; new_a
 
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y (a:t) (x:lval) : t =
@@ -414,7 +435,7 @@ let assignment_x_allocate_y (a:t) (x:lval) : t =
   let (v1,a) = find_or_create_vertex x a in
   let (v2,a) = create_cst_vertex a in
   let new_a = set_type a v1 v2 in
-   assert_invariants new_a ; new_a
+  assert_invariants new_a ; new_a
 
 (* assignment *x = y *)
 let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
@@ -422,12 +443,12 @@ let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
   let v2, a = find_or_create_vertex y a in
   let list_v1, a = points_to x a in
   let new_a =
-  match list_v1 with
-    [] ->  let v1 = find_vertex x a in set_type a v1 v2
-  |  [v1] -> cjoin a v1 v2
-  | _ ->  failwith "assignment_ptr_x_y not implemented"
+    match list_v1 with
+      [] ->  let v1 = find_vertex x a in set_type a v1 v2
+    |  [v1] -> cjoin a v1 v2
+    | _ ->  failwith "assignment_ptr_x_y not implemented"
   in
-   assert_invariants new_a ; new_a
+  assert_invariants new_a ; new_a
 
 
 (* assignment *x = cst *)
@@ -437,14 +458,14 @@ let assignment_ptr_x_cst (a:t) (x:lval) : t =
   let v2, a = create_cst_vertex a in
   let (list_v1, a) : V.t list * t = points_to x a in
   let new_a =
-  match list_v1 with
-    [] ->  let v1 = find_vertex x a in set_type a v1 v2
-  | _ -> let f_fold (acc:t) (v1:V.t) : t = cjoin acc v1 v2
-    in List.fold_left f_fold a list_v1
+    match list_v1 with
+      [] ->  let v1 = find_vertex x a in set_type a v1 v2
+    | _ -> let f_fold (acc:t) (v1:V.t) : t = cjoin acc v1 v2
+      in List.fold_left f_fold a list_v1
   in
   assert_invariants new_a ; new_a
 
-  
+
 (* we don't need to iterate on loops *)
 let equal (_:t) (_:t) = true
 
@@ -546,15 +567,19 @@ module V2Set = Set.Make(VPairs)
 
 (* rename all vertex re-enumerate all vertex of [x] from 0 to nb_vertex -1 *)
 let rename_all_vertex (x:t) : t =
+  assert_invariants x;
   let new_cmpt = ref 0 in
   let tbl_rename = Hashtbl.create (G.nb_vertex x.graph) in
+  (* fill the table *)
+  G.iter_vertex  (fun v -> Hashtbl.add tbl_rename v !new_cmpt ; incr new_cmpt) x.graph;
+  let r v = Hashtbl.find tbl_rename v in
   let renamed_graph =
     (* rename the graph and write the table *)
     G.map_vertex
-      (fun v -> Hashtbl.add tbl_rename v !new_cmpt ; incr new_cmpt; !new_cmpt-1)
+      r
       x.graph
   in
-  let r v = Hashtbl.find tbl_rename v in
+
   let renamed_pending =
     VMap.fold
       (fun v vs acc -> VMap.add (r v) vs acc)
@@ -572,7 +597,10 @@ let rename_all_vertex (x:t) : t =
       x.vmap
       VMap.empty
   in
-  {graph = renamed_graph; pending = renamed_pending ; lmap = renamed_lmap ; vmap = renamed_vmap ; cmpt = !new_cmpt }
+  let new_x =
+    {graph = renamed_graph; pending = renamed_pending ; lmap = renamed_lmap ; vmap = renamed_vmap ; cmpt = !new_cmpt }
+  in
+  assert_invariants new_x; new_x
 
 let union  (a1:t) (a2:t) :t =
   (* naive algorithm :
@@ -800,31 +828,12 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
       end
     |_ -> failwith "using a function with no return improperly"
   in
-  (* erase all formals from the tables/graphs *)
-  let new_lmap, new_vmap =
+  (* erase all formals and all locals from the tables/graphs *)
+  let new_state =
     List.fold_left
-      (fun (acc_lmap, acc_vmap) formal ->
-         let v = LMap.find formal new_state.lmap in
-         let ls = VMap.find v new_state.vmap in
-         let new_ls = LSet.remove formal ls in
-         (LMap.remove formal acc_lmap, VMap.add v new_ls acc_vmap)
-      )
-      (new_state.lmap, new_state.vmap)
-      formals
-  in
-  (* same thing for all locals *)
-  let new_lmap, new_vmap =
-    List.fold_left
-      (fun (acc_lmap, acc_vmap) lval ->
-         let v = LMap.find lval new_state.lmap in
-         let ls = VMap.find v new_state.vmap in
-         let new_ls = LSet.remove lval ls in
-         (LMap.remove lval acc_lmap, VMap.add v new_ls acc_vmap)
-      )
-      (new_lmap, new_vmap)
-      summary.locals
-  in
-  let new_state = {new_state with lmap = new_lmap; vmap = new_vmap }
+      remove_lval
+      new_state
+      (summary.formals@summary.locals)
   in
   assert_invariants new_state;
   new_state
