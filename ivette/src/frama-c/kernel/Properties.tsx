@@ -206,7 +206,7 @@ function filterEva(p: Property): boolean {
       case 'not_tainted':
       case 'not_applicable':
         return !filter('eva.data_tainted_only') &&
-               !filter('eva.ctrl_tainted_only');
+          !filter('eva.ctrl_tainted_only');
       case 'direct_taint':
         return !(filter('eva.ctrl_tainted_only'));
       case 'indirect_taint':
@@ -333,7 +333,7 @@ const byColumn: Arrays.ByColumns<Property> = {
 };
 
 class PropertyModel
-  extends Arrays.CompactModel<Json.key<'#property'>, Property> {
+  extends Arrays.CompactModel<Json.key<'#marker'>, Property> {
 
   private filterFun?: string;
 

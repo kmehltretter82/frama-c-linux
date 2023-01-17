@@ -34,7 +34,7 @@ import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
 import { TitleBar } from 'ivette';
-import { markerInfo } from 'frama-c/kernel/api/ast';
+import { markerAttributes } from 'frama-c/kernel/api/ast';
 
 // --------------------------------------------------------------------------
 // --- Locations Panel
@@ -51,7 +51,7 @@ export default function LocationsTable(): JSX.Element {
   ), []);
   const multipleSelections = selection?.multiple;
   const numberOfSelections = multipleSelections?.allSelections?.length;
-  const markersInfo = States.useSyncArray(markerInfo);
+  const markersInfo = States.useSyncArray(markerAttributes);
 
   // Renderer for statement markers.
   const renderMarker: Renderer<string> =

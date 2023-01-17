@@ -99,22 +99,19 @@ export interface CallSite {
   /** Function */
   kf: Json.key<'#fct'>;
   /** Statement */
-  stmt: Json.key<'#stmt'>;
+  stmt: marker;
 }
 
 /** Decoder for `CallSite` */
 export const jCallSite: Json.Decoder<CallSite> =
-  Json.jObject({
-    kf: Json.jKey<'#fct'>('#fct'),
-    stmt: Json.jKey<'#stmt'>('#stmt'),
-  });
+  Json.jObject({ kf: Json.jKey<'#fct'>('#fct'), stmt: jMarker,});
 
 /** Natural order for `CallSite` */
 export const byCallSite: Compare.Order<CallSite> =
   Compare.byFields
-    <{ kf: Json.key<'#fct'>, stmt: Json.key<'#stmt'> }>({
+    <{ kf: Json.key<'#fct'>, stmt: marker }>({
     kf: Compare.string,
-    stmt: Compare.string,
+    stmt: byMarker,
   });
 
 const getCallers_internal: Server.GetRequest<Json.key<'#fct'>,CallSite[]> = {
@@ -273,20 +270,20 @@ export const taintStatusTags: Server.GetRequest<null,tag[]>= taintStatusTags_int
 /** Lvalue taint status */
 export interface LvalueTaints {
   /** tainted lvalue */
-  lval: Json.key<'#lval'>;
+  lval: marker;
   /** taint status */
   taint: taintStatus;
 }
 
 /** Decoder for `LvalueTaints` */
 export const jLvalueTaints: Json.Decoder<LvalueTaints> =
-  Json.jObject({ lval: Json.jKey<'#lval'>('#lval'), taint: jTaintStatus,});
+  Json.jObject({ lval: jMarker, taint: jTaintStatus,});
 
 /** Natural order for `LvalueTaints` */
 export const byLvalueTaints: Compare.Order<LvalueTaints> =
   Compare.byFields
-    <{ lval: Json.key<'#lval'>, taint: taintStatus }>({
-    lval: Compare.string,
+    <{ lval: marker, taint: taintStatus }>({
+    lval: byMarker,
     taint: byTaintStatus,
   });
 
@@ -309,7 +306,7 @@ export const taintedLvalues: Server.GetRequest<
 /** Data for array rows [`properties`](#properties)  */
 export interface propertiesData {
   /** Entry identifier. */
-  key: Json.key<'#property'>;
+  key: marker;
   /** Is the property invalid in some context of the analysis? */
   priority: boolean;
   /** Is the property tainted according to the Eva taint domain? */
@@ -318,17 +315,14 @@ export interface propertiesData {
 
 /** Decoder for `propertiesData` */
 export const jPropertiesData: Json.Decoder<propertiesData> =
-  Json.jObject({
-    key: Json.jKey<'#property'>('#property'),
-    priority: Json.jBoolean,
-    taint: jTaintStatus,
+  Json.jObject({ key: jMarker, priority: Json.jBoolean, taint: jTaintStatus,
   });
 
 /** Natural order for `propertiesData` */
 export const byPropertiesData: Compare.Order<propertiesData> =
   Compare.byFields
-    <{ key: Json.key<'#property'>, priority: boolean, taint: taintStatus }>({
-    key: Compare.string,
+    <{ key: marker, priority: boolean, taint: taintStatus }>({
+    key: byMarker,
     priority: Compare.boolean,
     taint: byTaintStatus,
   });
@@ -350,8 +344,8 @@ export const reloadProperties: Server.GetRequest<null,null>= reloadProperties_in
 
 const fetchProperties_internal: Server.GetRequest<
   number,
-  { pending: number, updated: propertiesData[],
-    removed: Json.key<'#property'>[], reload: boolean }
+  { pending: number, updated: propertiesData[], removed: marker[],
+    reload: boolean }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.general.fetchProperties',
@@ -359,7 +353,7 @@ const fetchProperties_internal: Server.GetRequest<
   output: Json.jObject({
             pending: Json.jNumber,
             updated: Json.jArray(jPropertiesData),
-            removed: Json.jArray(Json.jKey<'#property'>('#property')),
+            removed: Json.jArray(jMarker),
             reload: Json.jBoolean,
           }),
   signals: [],
@@ -367,11 +361,11 @@ const fetchProperties_internal: Server.GetRequest<
 /** Data fetcher for array [`properties`](#properties)  */
 export const fetchProperties: Server.GetRequest<
   number,
-  { pending: number, updated: propertiesData[],
-    removed: Json.key<'#property'>[], reload: boolean }
+  { pending: number, updated: propertiesData[], removed: marker[],
+    reload: boolean }
   >= fetchProperties_internal;
 
-const properties_internal: State.Array<Json.key<'#property'>,propertiesData> = {
+const properties_internal: State.Array<marker,propertiesData> = {
   name: 'plugins.eva.general.properties',
   getkey: ((d:propertiesData) => d.key),
   signal: signalProperties,
@@ -380,7 +374,7 @@ const properties_internal: State.Array<Json.key<'#property'>,propertiesData> = {
   order: byPropertiesData,
 };
 /** Status of Registered Properties */
-export const properties: State.Array<Json.key<'#property'>,propertiesData> = properties_internal;
+export const properties: State.Array<marker,propertiesData> = properties_internal;
 
 /** The alarms are counted after being grouped by these categories */
 export enum alarmCategory {

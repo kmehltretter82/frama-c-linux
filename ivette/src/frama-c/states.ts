@@ -792,6 +792,37 @@ export async function resetSelection(): Promise<void> {
   }
 }
 
+// --------------------------------------------------------------------------
+// --- Markers
+// --------------------------------------------------------------------------
+
+export type attributes = Ast.markerAttributesData;
+
+export const defaultMarker: attributes = {
+  key: '',
+  labelKind: '',
+  titleKind: '',
+  name: '',
+  descr: '',
+  isLval: false,
+  isFunDecl: false,
+  isFun: false,
+  sloc: { dir: '', base: '', file: '', line: 0 },
+};
+
+/** Access the marker attributes from AST. */
+export function useMarker(marker: Ast.marker | undefined): attributes {
+  const marks = useSyncArray(Ast.markerAttributes);
+  if (marker === undefined) return defaultMarker;
+  const attrs = marks.getData(marker);
+  if (attrs === undefined) return defaultMarker;
+  return attrs;
+}
+
+// --------------------------------------------------------------------------
+// --- General Synchro
+// --------------------------------------------------------------------------
+
 Server.onReady(() => {
   if (GlobalSelection.getValue() === emptySelection)
     resetSelection();

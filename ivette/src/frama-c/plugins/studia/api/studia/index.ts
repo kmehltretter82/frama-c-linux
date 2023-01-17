@@ -68,24 +68,24 @@ export const byEffects: Compare.Order<effects> =
     indirect: Compare.array(Compare.pair(Compare.string,byMarker,)),
   });
 
-const getReadsLval_internal: Server.GetRequest<Json.key<'#lval'>,effects> = {
+const getReadsLval_internal: Server.GetRequest<marker,effects> = {
   kind: Server.RqKind.GET,
   name:   'plugins.studia.studia.getReadsLval',
-  input:  Json.jKey<'#lval'>('#lval'),
+  input:  jMarker,
   output: jEffects,
   signals: [],
 };
 /** Get the list of statements that read a lval. */
-export const getReadsLval: Server.GetRequest<Json.key<'#lval'>,effects>= getReadsLval_internal;
+export const getReadsLval: Server.GetRequest<marker,effects>= getReadsLval_internal;
 
-const getWritesLval_internal: Server.GetRequest<Json.key<'#lval'>,effects> = {
+const getWritesLval_internal: Server.GetRequest<marker,effects> = {
   kind: Server.RqKind.GET,
   name:   'plugins.studia.studia.getWritesLval',
-  input:  Json.jKey<'#lval'>('#lval'),
+  input:  jMarker,
   output: jEffects,
   signals: [],
 };
 /** Get the list of statements that write a lval. */
-export const getWritesLval: Server.GetRequest<Json.key<'#lval'>,effects>= getWritesLval_internal;
+export const getWritesLval: Server.GetRequest<marker,effects>= getWritesLval_internal;
 
 /* ------------------------------------- */

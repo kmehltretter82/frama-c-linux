@@ -338,8 +338,8 @@ let array =
     ~package
     ~name:"status"
     ~descr:(Md.plain "Status of Registered Properties")
-    ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
-    ~keyType:Kernel_ast.Marker.jproperty
+    ~key:(fun ip -> Kernel_ast.Marker.tag (PIP ip))
+    ~keyType:Kernel_ast.Marker.jtype
     ~iter
     ~add_update_hook
     ~add_remove_hook

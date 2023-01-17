@@ -24,37 +24,28 @@
 (** Ast Data *)
 (* -------------------------------------------------------------------------- *)
 
-open Package
 open Cil_types
 
-module Position : Data.S with type t = Filepath.position
-
-module Kf : Data.S with type t = kernel_function
-module Fundec : Data.S with type t = fundec
-module Ki : Data.S with type t = kinstr
-module Stmt : Data.S with type t = stmt
-module Lval : Data.S with type t = kinstr * lval
 
 module Marker :
 sig
   include Data.S with type t = Printer_tag.localizable
 
-  val jstmt : jtype
-  val jdecl : jtype
-  val jlval : jtype
-  val jexpr : jtype
-  val jterm : jtype
-  val jglobal : jtype
-  val jproperty : jtype
-  val jtyp : jtype
-
-  val create : t -> string
+  val tag : t -> string
   (** Memoized unique identifier. *)
 
-  val lookup : string -> t
-  (** Get back the localizable, if any. *)
+  val find : string -> t
+  (** Get back the localizable, if any.
+      @raises Not_found if marker is not defined yet *)
+
 end
 
+module Position : Data.S with type t = Filepath.position
+module Kf : Data.S with type t = kernel_function
+module Fundec : Data.S with type t = fundec
+module Ki : Data.S with type t = kinstr
+module Stmt : Data.S with type t = stmt
+module Lval : Data.S with type t = kinstr * lval
 module KfMarker : Data.S with type t = kernel_function * Printer_tag.localizable
 
 (* -------------------------------------------------------------------------- *)
