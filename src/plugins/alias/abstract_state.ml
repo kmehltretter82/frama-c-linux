@@ -572,7 +572,12 @@ let rename_all_vertex (x:t) : t =
   let tbl_rename = Hashtbl.create (G.nb_vertex x.graph) in
   (* fill the table *)
   G.iter_vertex  (fun v -> Hashtbl.add tbl_rename v !new_cmpt ; incr new_cmpt) x.graph;
-  let r v = Hashtbl.find tbl_rename v in
+  let r v =
+    try
+      Hashtbl.find tbl_rename v
+    with
+      Not_found -> Format.printf "DEBUG FAILED RENAME (%d not found) @.%a@." v (pretty ~debug:true) x; raise Not_found
+  in
   let renamed_graph =
     (* rename the graph and write the table *)
     G.map_vertex
@@ -582,7 +587,12 @@ let rename_all_vertex (x:t) : t =
 
   let renamed_pending =
     VMap.fold
-      (fun v vs acc -> VMap.add (r v) vs acc)
+      (fun v vs acc ->
+         if G.mem_vertex x.graph v
+         then VMap.add (r v) vs acc
+         (* if it is not a vertex, then it is an aritfact of the map *)
+         else acc
+      )
       x.pending
       VMap.empty
   in
@@ -593,7 +603,13 @@ let rename_all_vertex (x:t) : t =
   in
   let renamed_vmap =
     VMap.fold
-      (fun v ls acc -> VMap.add (r v) ls acc)
+      (fun v ls acc ->
+         if G.mem_vertex x.graph v
+         then
+           VMap.add (r v) ls acc
+         else
+           acc
+      )
       x.vmap
       VMap.empty
   in
@@ -685,7 +701,10 @@ let union  (a1:t) (a2:t) :t =
       (* find the only successor that is not a constant node *)
       let true_succ =
         List.fold_left
-          (fun res v -> if LSet.is_empty (VMap.find v res_a.vmap) then res else v)
+          (fun res v ->
+             if LSet.is_empty (VMap.find v res_a.vmap)
+             then res
+             else v)
           (List.hd l_succ)
           l_succ
       in
@@ -702,11 +721,11 @@ let union  (a1:t) (a2:t) :t =
       new_a
   in
   let new_a =
-    if new_a.cmpt > 2 * (G.nb_vertex new_a.graph)
-    then
+    (* if new_a.cmpt > 2 * (G.nb_vertex new_a.graph)
+     * then *)
       rename_all_vertex new_a
-    else
-      new_a
+    (* else
+     *   new_a *)
   in
   assert_invariants new_a;
   new_a
@@ -744,10 +763,13 @@ type summary =
 
 let make_summary (s: t option) (kf: kernel_function) =
   let exp_return : exp option =
-    let return_stmt = Kernel_function.find_return kf in
-    match return_stmt.skind with
+    if Kernel_function.has_definition kf then
+      let return_stmt = Kernel_function.find_return kf in
+      match return_stmt.skind with
       Return (e, _) -> e
-    | _ -> failwith "this should not happen"
+      | _ -> failwith "this should not happen"
+    else
+      None
   in
   {
     state = s;
@@ -787,7 +809,8 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   (* union of the two graphs *)
   let new_state = union state sum_state in
   (* union of formal parameters *)
-  let new_state =List.fold_left2
+  let new_state =
+    List.fold_left2
       (fun acc param formal ->
          begin
            match  formal, find_basic_lval param with
@@ -804,9 +827,9 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
              begin
                match e2.enode with
                  Lval lv2 -> assignment_x_ptr_y acc (Var v1, NoOffset) lv2
-               |  _ -> failwith " do_assignment not implemented 1"
+               |  _ -> (Options.feedback "In a function call, parameter (@[%a@] <- @[%a@]) is ignored)" Lval.pretty formal Exp.pretty param; acc)
              end
-           | _ -> (Format.printf "DEBUG: call function - formal variable not as we expected@."; acc)
+           | _ -> (Options.feedback "DEBUG: call function - formal variable not as we expected@."; acc)
          end
       )
       new_state
@@ -819,14 +842,14 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
       None, _  -> new_state
     | (Some res, Some exp_res) ->
       begin
-        let v_res  =  LMap.find res new_state.lmap in
+        let v_res,new_state  = find_or_create_vertex res new_state in
         match find_basic_lval exp_res with
           BLval lval_exp_res ->
           let v_exp_res =  LMap.find lval_exp_res new_state.lmap in
           join new_state v_res v_exp_res
         | _ -> new_state
       end
-    |_ -> failwith "using a function with no return improperly"
+    | (Some _, None) -> (Options.warning "a function with no return is employed in an assignment" ; new_state)
   in
   (* erase all formals and all locals from the tables/graphs *)
   let new_state =
