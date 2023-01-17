@@ -348,7 +348,9 @@ sig
     val iter_stmt : (Cil_types.stmt -> state -> unit) -> result -> unit
 
     (** Same as [iter_stmt] but guarantee that the iteration will always
-        be in the same increasing order of statements sid *)
+        be in the same increasing order of statements sid.
+
+        @since Frama-C+dev *)
     val iter_stmt_asc : (Cil_types.stmt -> state -> unit) -> result -> unit
 
     (** Output result to the given channel. Must be supplied with a pretty
