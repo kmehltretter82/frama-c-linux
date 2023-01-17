@@ -392,6 +392,13 @@ module Register_hook = Hook.Build (struct type t = Property.t end)
 
 let register_property_add_hook = Register_hook.extend
 
+module Status_hook = Hook.Build
+    (struct type t = emitter_with_properties * Property.t * emitted_status end)
+
+let register_status_update_hook f =
+  Status_hook.extend
+    (fun (emitter, property, status) -> f emitter property status)
+
 let rec register ppt =
   Kernel.debug ~dkey:Kernel.dkey_prop_status_reg
     "REGISTERING %a in %a"
@@ -486,6 +493,7 @@ and unsafe_emit_and_get e ~hyps ~auto ppt ?(distinct=false) s =
             add { emitter with properties = [ reach_ppt ] } s
           | _ :: _ -> Kernel.fatal "Emitter %a proves invalidity of %a under \
                                     hypotheses: unsound!" Emitter.pretty e Property.pretty ppt));
+      Status_hook.apply (emitter, ppt, s);
       s
     in
     (try

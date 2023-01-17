@@ -138,6 +138,11 @@ val fold_on_statuses:
   Property.t ->
   'a -> 'a
 
+val register_status_update_hook:
+  (emitter_with_properties -> Property.t -> emitted_status -> unit) -> unit
+(** Registers an hook to be called each time a property status is emitted.
+    @since Frama-C+dev *)
+
 (* ************************************************************************ *)
 (** {2 Consolidated status} *)
 (* ************************************************************************ *)
