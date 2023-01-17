@@ -40,10 +40,7 @@ import { getCurrent, setCurrent } from 'frama-c/kernel/api/project';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from './server';
 
-/* Name of the default Frama-C project. */
-const defaultProject = 'default';
-
-const CurrentProject = new GlobalState<string>(defaultProject);
+const CurrentProject = new GlobalState<string>("");
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -57,7 +54,7 @@ const D = new Dome.Debug('States');
 
 Server.onReady(async () => {
   try {
-    CurrentProject.setValue(defaultProject);
+    CurrentProject.setValue("");
     const { id } = await Server.send(getCurrent, null);
     CurrentProject.setValue(id);
   } catch (error) {
@@ -66,7 +63,7 @@ Server.onReady(async () => {
 });
 
 Server.onShutdown(() => {
-  CurrentProject.setValue(defaultProject);
+  CurrentProject.setValue("");
 });
 
 // --------------------------------------------------------------------------
@@ -146,7 +143,7 @@ export function useRequest<In, Out>(
   };
 
   async function trigger(): Promise<void> {
-    if (project && rq && params !== undefined) {
+    if (project !== "" && rq && params !== undefined) {
       try {
         update(options.pending);
         const r = await Server.send(rq, params);
