@@ -62,11 +62,87 @@ let function_compute_ref = Extlib.mk_fun "function_compute"
 
 module D = Dataflow.StartData(A)
 
+let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
+  (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)
+  match (a,lv, find_basic_lval exp) with
+    (Some a, (Var v1, NoOffset), BLval (Var v2,NoOffset)) ->
+    (* case x = y *)
+    Some (Abstract_state.assignment_x_y a (Var v1, NoOffset) (Var v2, NoOffset))
+  (* constant assignments : do nothing, but maybe check the type of the assigned variable ? *)
+  | (_, (Var _, NoOffset), BNone) -> a
+  (* arithmetic operations: either do nothing (normal arithmetic) or returns top (pointer arithmetic) *)
+  | (Some a, (Var v1, NoOffset), BAddrOf lv2) ->
+    (* case x = &y *)
+    Some (Abstract_state.assignment_x_addr_y a (Var v1, NoOffset) lv2)
+  | (Some a, (Var v1, NoOffset), BLval (Mem e2, NoOffset)) ->
+    (* case x  = *y *)
+    begin
+      match e2.enode with
+        Lval lv2 -> Some (Abstract_state.assignment_x_ptr_y a (Var v1, NoOffset) lv2)
+      |  _ -> failwith " do_assignment not implemented 1"
+    end
+  | (Some a, (Mem e1, NoOffset), BLval lv2) ->
+    (* case *x = y *)
+    begin
+      match e1.enode with
+        Lval lv1 -> Some (Abstract_state.assignment_ptr_x_y a lv1 lv2)
+      |  _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (BUG do_assignment 2)" Lval.pretty lv Exp.pretty exp; Some a) (* failwith " do_assignment not implemented 2" *)
+    end
+  (* cases *x = cst *)
+  | (Some a, (Mem e1, NoOffset), BNone) ->
+    begin
+      match e1.enode with
+        Lval lv1 -> Some (Abstract_state.assignment_ptr_x_cst a lv1)
+      |  _ -> Options.feedback "Ingnoring assignment %a = %a (do_assignment  not implemented 3)@." Lval.pretty lv Exp.pretty exp; Some a
+    end
+  | (None, _, _) -> None
+  | _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (not implemented)" Lval.pretty lv Exp.pretty exp; a)
 
-(* let print_option pp fmt x =
- *   match x with
- *     None -> ()
- *   | Some x -> pp fmt x *)
+let rec do_init vi init state = match init with
+  | SingleInit e -> do_assignment state (Var vi, NoOffset) e
+  | CompoundInit(_, l) ->
+    List.fold_left (fun state (_, init) -> do_init vi init state) state l
+
+
+let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
+  match i with
+    Set(lv,exp,_) ->
+    let new_a = do_assignment a lv exp in
+    new_a
+  | Local_init(v,AssignInit i,_) ->
+    let new_a = do_init v i a in
+    new_a
+  | Code_annot _ -> a
+  | Skip _ -> a
+  (* special case for malloc *)
+  | Call(res,{enode=Lval (Var info, _);_},_,_) when info.vname = "malloc"  ->
+    begin
+      match (a,res) with
+        (None, _) -> None
+      | (Some a,None) -> (Options.feedback "Warning : malloc not stored (ignored)"; Some a)
+      | (Some a, Some  (Var v1, NoOffset)) -> Some (Abstract_state.assignment_x_allocate_y a  (Var v1, NoOffset))
+      | (Some a, Some lv) -> (Options.feedback "Skipping assignment @[%a@] = malloc() (not implemented)" Lval.pretty lv; Some a)
+    end
+  (* general case for calls *)
+  | Call(res,ef,es,(loc,_)) -> (* !function_compute_ref ef *)
+    begin
+      let summary = match Kernel_function.get_called ef with
+        | Some kf -> (try Function_table.find kf
+                      with Not_found -> !function_compute_ref kf ; Function_table.find kf)
+        | None -> Options.abort ~source:loc
+                    "Unsupported function pointer (skipped)"
+      in
+      match (a, summary) with
+        (None, _) -> None
+      | (Some a, Some summary) ->
+        let new_a = Abstract_state.call a res es summary in
+        Some new_a
+      | (Some a, None) -> (Options.feedback "Skiping @[%a@] (summary not found)" Stmt.pretty s; Some a)
+    end
+  | _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
+
+
+
 
 module T =
 struct
@@ -103,84 +179,7 @@ struct
       else
         Some (Some (Abstract_state.union old new_))
 
-  let do_assignment (a:t) (lv:lval) (exp:exp) : t =
-    (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)
-    match (a,lv, find_basic_lval exp) with
-      (Some a, (Var v1, NoOffset), BLval (Var v2,NoOffset)) ->
-      (* case x = y *)
-      Some (Abstract_state.assignment_x_y a (Var v1, NoOffset) (Var v2, NoOffset))
-    (* constant assignments : do nothing, but maybe check the type of the assigned variable ? *)
-    | (_, (Var _, NoOffset), BNone) -> a
-    (* arithmetic operations: either do nothing (normal arithmetic) or returns top (pointer arithmetic) *)
-    | (Some a, (Var v1, NoOffset), BAddrOf lv2) ->
-      (* case x = &y *)
-      Some (Abstract_state.assignment_x_addr_y a (Var v1, NoOffset) lv2)
-    | (Some a, (Var v1, NoOffset), BLval (Mem e2, NoOffset)) ->
-      (* case x  = *y *)
-      begin
-        match e2.enode with
-          Lval lv2 -> Some (Abstract_state.assignment_x_ptr_y a (Var v1, NoOffset) lv2)
-        |  _ -> failwith " do_assignment not implemented 1"
-      end
-    | (Some a, (Mem e1, NoOffset), BLval lv2) ->
-      (* case *x = y *)
-      begin
-        match e1.enode with
-          Lval lv1 -> Some (Abstract_state.assignment_ptr_x_y a lv1 lv2)
-        |  _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (BUG do_assignment 2)" Lval.pretty lv Exp.pretty exp; Some a) (* failwith " do_assignment not implemented 2" *)
-      end
-    (* cases *x = cst *)
-    | (Some a, (Mem e1, NoOffset), BNone) ->
-      begin
-        match e1.enode with
-          Lval lv1 -> Some (Abstract_state.assignment_ptr_x_cst a lv1)
-        |  _ -> Options.feedback "Ingnoring assignment %a = %a (do_assignment  not implemented 3)@." Lval.pretty lv Exp.pretty exp; Some a
-      end
-    | (None, _, _) -> None
-    | _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (not implemented)" Lval.pretty lv Exp.pretty exp; a)
-
-  let rec do_init vi init state = match init with
-    | SingleInit e -> do_assignment state (Var vi, NoOffset) e
-    | CompoundInit(_, l) ->
-      List.fold_left (fun state (_, init) -> do_init vi init state) state l
-
-
-  let doInstr (s:stmt)  (i:instr) (a:t) :t =
-    match i with
-      Set(lv,exp,_) ->
-      let new_a = do_assignment a lv exp in
-      new_a
-    | Local_init(v,AssignInit i,_) ->
-      let new_a = do_init v i a in
-      new_a
-    | Code_annot _ -> a
-    | Skip _ -> a
-    (* special case for malloc *)
-    | Call(res,{enode=Lval (Var info, _);_},_,_) when info.vname = "malloc"  ->
-      begin
-        match (a,res) with
-          (None, _) -> None
-        | (Some a,None) -> (Options.feedback "Warning : malloc not stored (ignored)"; Some a)
-        | (Some a, Some  (Var v1, NoOffset)) -> Some (Abstract_state.assignment_x_allocate_y a  (Var v1, NoOffset))
-        | (Some a, Some lv) -> (Options.feedback "Skipping assignment @[%a@] = malloc() (not implemented)" Lval.pretty lv; Some a)
-      end
-    (* general case for calls *)
-    | Call(res,ef,es,(loc,_)) -> (* !function_compute_ref ef *)
-      begin
-        let summary = match Kernel_function.get_called ef with
-          | Some kf -> (try Function_table.find kf
-                        with Not_found -> !function_compute_ref kf ; Function_table.find kf)
-          | None -> Options.abort ~source:loc
-                      "Unsupported function pointer (skipped)"
-        in
-        match (a, summary) with
-          (None, _) -> None
-        | (Some a, Some summary) ->
-          let new_a = Abstract_state.call a res es summary in
-          Some new_a
-        | (Some a, None) -> (Options.feedback "Skiping @[%a@] (summary not found)" Stmt.pretty s; Some a)
-      end
-    | _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
+  let doInstr = do_instr
 
   let doGuard _ _ a =
     Dataflow.GUse a, Dataflow.GUse a
@@ -215,6 +214,16 @@ struct
 end
 
 module  F = Dataflow.Forwards(T)
+
+let do_stmt (a: Abstract_state.t) (s:stmt) :  Abstract_state.t =
+  match s.skind with
+    Instr i ->
+    begin
+      match do_instr s i (Some a) with
+        None -> failwith "problem here"
+      | Some a -> a
+    end   
+  | _ -> a
 
 let doFunction (kf:kernel_function) =
   Options.feedback ~level:2 "entering in function %a."

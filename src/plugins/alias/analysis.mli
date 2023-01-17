@@ -39,8 +39,8 @@ module Stmt_table: Table with type key = stmt and type value = Abstract_state.t 
 module Function_table:
   Table with type key = kernel_function and type value = Abstract_state.summary option
 
-(* (\** [do_stmt a s] computes the next state and stores it in [Stmt_table]. *\)
- * val do_stmt: t -> stmt -> t *)
+(** [do_stmt a s] computes the abstract state after statement s  *)
+val do_stmt: t -> stmt -> t
 
 (** [make_summary a f] computes the summary of a function (and the
     next abstract state if needed) and stores the summary in
