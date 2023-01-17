@@ -1332,7 +1332,7 @@ struct
         | Some stmt -> Some (stmt,s)
       in
       let cmp (stmt1,_) (stmt2,_) =
-        stmt1.sid - stmt2.sid
+        Cil_datatype.Stmt.compare stmt1 stmt2
       in
       States.to_seq states |> Seq.filter_map filter |>
       List.of_seq |> List.fast_sort cmp |>
