@@ -23,6 +23,7 @@
 , lablgtk3
 , lablgtk3-sourceview3
 , ltl2ba
+, menhir
 , menhirLib
 , mlmpfr
 , ocaml
@@ -78,6 +79,7 @@ stdenvNoCC.mkDerivation rec {
     lablgtk3
     lablgtk3-sourceview3
     ltl2ba
+    menhir
     menhirLib
     mlmpfr
     ocaml
