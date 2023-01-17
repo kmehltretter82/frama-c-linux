@@ -31,6 +31,7 @@ __PUSH_FC_STDLIB
 #include "__fc_define_pid_t.h"
 #include "__fc_define_uid_and_gid.h"
 #include "__fc_define_pthread_types.h"
+#include "errno.h"
 
 __BEGIN_DECLS
 
@@ -242,6 +243,16 @@ extern int sigaction(int signum, const struct sigaction *restrict act,
 */
 extern int sigprocmask(int how, const sigset_t * restrict set,
                        sigset_t *restrict oldset);
+
+/*@ // missing: assigns 'current signal mask'
+    // missing: assigns \result from 'possible thread interruption'
+    // missing: terminates 'only when interrupted'
+  requires valid_mask_or_null: sigmask == \null || \valid_read(sigmask);
+  assigns __fc_errno, \result \from indirect:sigmask;
+  ensures result_means_interrupted: \result == -1;
+  ensures errno_set: __fc_errno == EINTR;
+*/
+extern int sigsuspend(const sigset_t *sigmask);
 
 /*@ // missing: errno may be set to EINVAL, EPERM, ESRCH
     // missing: assigns 'other processes' \from 'other processes'

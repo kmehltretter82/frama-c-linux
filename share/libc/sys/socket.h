@@ -66,6 +66,17 @@ struct msghdr {
   int            msg_flags;
 };
 
+// POSIX requires these as macros; early uses of these macros (e.g. when
+// computing the size of arrays) prevent us from leaving them undefined and
+// using a function prototype. The following definitions are based on the
+// Linux version of the GNU libc.
+#define CMSG_DATA(cmsg) ((unsigned char *) ((struct cmsghdr *) (cmsg) + 1))
+#define CMSG_ALIGN(len) (((len) + sizeof (size_t) - 1) \
+                     & (size_t) ~(sizeof (size_t) - 1))
+#define CMSG_SPACE(len) (CMSG_ALIGN (len) \
+                       + CMSG_ALIGN (sizeof (struct cmsghdr)))
+#define CMSG_LEN(len)   (CMSG_ALIGN (sizeof (struct cmsghdr)) + (len))
+
 // POSIX.1-2008 requires these to be defined as macros, but we have no body
 // for them, so we declare them as prototypes as well.
 #ifndef CMSG_FIRSTHDR
@@ -75,22 +86,6 @@ extern struct cmsghdr *CMSG_FIRSTHDR(struct msghdr *msgh);
 #ifndef CMSG_NXTHDR
 extern struct cmsghdr *CMSG_NXTHDR(struct msghdr *msgh, struct cmsghdr *cmsg);
 # define CMSG_NXTHDR(h, c) CMSG_NXTHDR(h, c)
-#endif
-#ifndef CMSG_ALIGN
-extern size_t CMSG_ALIGN(size_t length);
-# define CMSG_ALIGN(l) CMSG_ALIGN(l)
-#endif
-#ifndef CMSG_SPACE
-extern size_t CMSG_SPACE(size_t length);
-# define CMSG_SPACE(l) CMSG_SPACE(l)
-#endif
-#ifndef CMSG_LEN
-extern size_t CMSG_LEN(size_t length);
-# define CMSG_LEN(l) CMSG_LEN(l)
-#endif
-#ifndef CMSG_DATA
-extern unsigned char *CMSG_DATA(struct cmsghdr *cmsg);
-# define CMSG_DATA(c) CMSG_DATA(c)
 #endif
 
 /* Socket types. */
@@ -295,6 +290,12 @@ struct __fc_sockfds_type { int x; };
 
 // __fc_sockfds represents the state of open socket descriptors.
 //@ ghost volatile int __fc_open_sock_fds;
+
+struct linger {
+  int l_onoff;
+  int l_linger;
+};
+
 // TODO: Model the state of some functions more precisely.
 
 /*@

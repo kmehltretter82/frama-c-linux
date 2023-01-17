@@ -59,6 +59,11 @@ typedef unsigned char u_char;
 #define __u_char_defined
 #endif
 
+// Non-POSIX
+#ifndef caddr_t
+typedef char *caddr_t;
+#endif
+
 __END_DECLS
 __POP_FC_STDLIB
 #endif

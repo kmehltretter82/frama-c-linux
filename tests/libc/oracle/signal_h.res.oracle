@@ -126,7 +126,7 @@
   function sigaction: precondition 'valid_read_act_or_null' got status valid.
 [eva] signal_h.c:48: 
   function sigaction: precondition 'separation,separated_acts' got status valid.
-[eva] FRAMAC_SHARE/libc/signal.h:222: 
+[eva] FRAMAC_SHARE/libc/signal.h:223: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic coercion struct sigaction -> set<struct sigaction>
 [eva] Done for function sigaction
 [eva] computing for function sigaction <- main.
@@ -143,10 +143,19 @@
   Completely invalid destination for assigns clause *oldact. Ignoring.
 [eva] Done for function sigaction
 [eva] signal_h.c:55: assertion 'valid_nsig' got status valid.
+[eva] computing for function sigsuspend <- main.
+  Called from signal_h.c:59.
+[eva] using specification for function sigsuspend
+[eva] signal_h.c:59: 
+  function sigsuspend: precondition 'valid_mask_or_null' got status valid.
+[eva] Done for function sigsuspend
+[eva] signal_h.c:60: assertion 'sigsuspend_errno_eintr' got status valid.
+[eva] signal_h.c:61: assertion 'sigsuspend_return' got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
+  __fc_errno ∈ [--..--]
   __fc_sigaction[0]{.sa_handler; .sa_sigaction} ∈ {0}
                 [0]{.sa_mask; .sa_flags} ∈ [--..--]
                 [1]{.sa_handler; .sa_sigaction} ∈ {0}

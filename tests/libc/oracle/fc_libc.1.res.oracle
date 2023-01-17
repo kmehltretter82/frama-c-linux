@@ -4465,6 +4465,15 @@ extern int sigaction(int signum, struct sigaction const * restrict act,
 extern int sigprocmask(int how, sigset_t const * restrict set,
                        sigset_t * restrict oldset);
 
+/*@ requires valid_mask_or_null: sigmask ≡ \null ∨ \valid_read(sigmask);
+    ensures result_means_interrupted: \result ≡ -1;
+    ensures errno_set: __fc_errno ≡ 4;
+    assigns __fc_errno, \result;
+    assigns __fc_errno \from (indirect: sigmask);
+    assigns \result \from (indirect: sigmask);
+ */
+extern int sigsuspend(sigset_t const *sigmask);
+
 /*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result;
     assigns \result \from (indirect: pid), (indirect: sig);
