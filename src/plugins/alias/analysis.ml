@@ -185,20 +185,12 @@ struct
     Dataflow.GUse a, Dataflow.GUse a
 
   let rec process_Stmt (s:stmt) (a:t) : t =
-    (* let _, kf = Kernel_function.find_from_sid s.sid in
-     * let is_first = Kernel_function.is_first_stmt kf s in
-     * let is_last = Kernel_function.is_return_stmt kf s in *)
-    let new_a =
+    (* register a before stmt *)
+    Stmt_table.add s a;
       match s.skind with
         Instr i -> doInstr s i a
       | Block b -> process_Block b a
       | _ -> a
-    in
-    begin match new_a with
-        None -> ()
-      | Some a -> Stmt_table.add s (Some a)
-    end;
-    new_a
 
   and process_Block b a =
     List.fold_left
@@ -295,7 +287,7 @@ let compute () =
       | None -> Format.fprintf fmt "<Bot>"
       | Some a -> Abstract_state.pretty fmt a
     in
-    Format.fprintf fmt "After statement %a :@.@[<hov 2> %a@]@." print_key k print_value v
+    Format.fprintf fmt "Before statement %a :@.@[<hov 2> %a@]@." print_key k print_value v
   in
   let print_function_table_elt fmt kf s :unit =
     let function_name =
