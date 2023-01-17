@@ -2,7 +2,7 @@ Liste de ce qui marche
 
 
 Fait:
-- abstracct state
+- abstract state
 - opérateurs de l'algorithme steensgaard
 - expressions, opérations arithmétiques
 - analyse dataflow, 
