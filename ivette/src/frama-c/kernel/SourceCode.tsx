@@ -45,6 +45,10 @@ import * as Preferences from 'ivette/prefs';
 //  Utilitary types and functions
 // -----------------------------------------------------------------------------
 
+// An alias type for functions and locations.
+type Fct = string | undefined;
+type Marker = string | undefined;
+
 // Recovering the cursor position as a line and a column.
 interface Position { line: number, column: number }
 function getCursorPosition(view: Editor.View): Position {
@@ -61,15 +65,12 @@ function setError(text: string): void {
 }
 
 // Function launching the external editor at the currently selected position.
-interface LaunchEditorProps { view: Editor.View, file: string, command: string }
-async function launchEditor(props: LaunchEditorProps): Promise<void> {
-  const { view, file, command } = props;
-  if (!view || file === '') return;
-  const { line: l, column: c } = getCursorPosition(view);
-  const args = command
+async function editor(file: string, pos: Position, cmd: string): Promise<void> {
+  if (file === '') return;
+  const args = cmd
     .replace('%s', file)
-    .replace('%n', l.toString())
-    .replace('%c', c.toString())
+    .replace('%n', pos.line.toString())
+    .replace('%c', pos.column.toString())
     .split(' ');
   const prog = args.shift(); if (!prog) return;
   const text = `An error has occured when opening the external editor ${prog}`;
@@ -93,10 +94,14 @@ const UpdateSelection = Editor.createField<UpdateSelection>(() => { return; });
 const Source = Editor.createTextField<string>('', (s) => s);
 const File = Editor.createField<string>('');
 
-// const Line = Editor.createLineField();
-
 // This field contains the command use to start the external editor.
 const Command = Editor.createField<string>('');
+
+// This field contains the currently selected function.
+const Fct = Editor.createField<Fct>(undefined);
+
+// This field contains the currently selected marker.
+const Marker = Editor.createField<Marker>(undefined);
 
 // -----------------------------------------------------------------------------
 
@@ -115,20 +120,20 @@ function createEventsHandler(): Editor.Extension {
   return Editor.createEventHandler(deps, {
     contextmenu: ({ file, command }, view) => {
       if (file === '') return;
-      const launch = (): Promise<void> => launchEditor({ view, file, command });
       const label = 'Open file in an external editor';
-      Dome.popupMenu([ { label, onClick: launch } ]);
+      const pos = getCursorPosition(view);
+      Dome.popupMenu([ { label, onClick: () => editor(file, pos, command) } ]);
     },
     mouseup: ({ file, command, update }, view, event) => {
       if (file === '') return;
-      const { line, column } = getCursorPosition(view);
+      const pos = getCursorPosition(view);
       Server
-        .send(Ast.getMarkerAt, [file, line, column])
+        .send(Ast.getMarkerAt, [file, pos.line, pos.column])
         .then(([fct, marker]) => {
           if (fct || marker) update({ location: { fct, marker } });
         })
         .catch(() => setError('Failed to request to Frama-C server'));
-      if (event.ctrlKey) launchEditor({ view, file, command });
+      if (event.ctrlKey) editor(file, pos, command);
     },
   });
 }
@@ -158,7 +163,8 @@ function useFctSource(file: string): string {
 
 // Necessary extensions.
 const extensions: Editor.Extension[] = [
-  Source.structure,
+  Source,
+  Editor.Selection,
   Editor.LineNumbers,
   Editor.LanguageHighlighter,
   Editor.HighlightActiveLine,
@@ -182,7 +188,7 @@ export default function SourceCode(): JSX.Element {
   const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
   const { view, Component } = Editor.Editor(extensions);
-  const [selection, updateSelection] = States.useSelection();
+  const [selection, update] = States.useSelection();
   const marker = selection?.current?.marker;
   const fct = selection?.current?.fct;
   const displayedFct = React.useRef<string | undefined>(undefined);
@@ -191,11 +197,13 @@ export default function SourceCode(): JSX.Element {
   const fctSloc = useFunctionLocation(fct);
   const file = fctSloc?.file ?? '';
   const filename = Path.parse(file).base;
+  const pos = getCursorPosition(view);
+  const source = useFctSource(file);
 
-  Source.set(view, useFctSource(file));
-  UpdateSelection.set(view, updateSelection);
-  Command.set(view, command);
-  File.set(view, file);
+  React.useEffect(() => Source.set(view, source), [view, source]);
+  React.useEffect(() => UpdateSelection.set(view, update), [view, update]);
+  React.useEffect(() => Command.set(view, command), [view, command]);
+  React.useEffect(() => File.set(view, file), [view, file]);
 
   React.useEffect(() => {
     const notDisplayedFct = fct !== displayedFct.current;
@@ -215,7 +223,7 @@ export default function SourceCode(): JSX.Element {
         <Buttons.IconButton
           icon="DUPLICATE"
           visible={file !== ''}
-          onClick={() => launchEditor({ view, file, command })}
+          onClick={() => editor(file, pos, command)}
           title={externalEditorTitle}
         />
         <Labels.Code title={file}>{filename}</Labels.Code>
