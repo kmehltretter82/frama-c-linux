@@ -67,8 +67,9 @@ The detailed steps to submit a contribution to Frama-C are:
 7. Check for unexpected changes.
   Use the command `make check-lint`
   in your terminal from the Frama-C root directory to detect trailing spaces,
-  tabulations or incorrect indentation (ocp-ident >= 1.8.1, camomile and
-  clang-format are needed), and `make lint` to fix problems if any.
+  tabulations or incorrect indentation (ocp-ident >= 1.8.1, camomile,
+  clang-format and black (Python linter) are needed), and `make lint` to fix
+  problems if any.
 
   Use the command `make check-headers` in your terminal from the Frama-C root
   directory to detect bad file license (headache is needed), and `make headers`
@@ -149,6 +150,11 @@ Coding conventions
 
 - Use [ocp-indent](https://github.com/OCamlPro/ocp-indent), v1.8.1
   to indent OCaml source files;
+
+- Use [black](https://pypi.org/project/black/) to indent Python source files;
+
+- Use [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to indent C
+  files (mostly for E-ACSL, and possibly tests);
 
 - Avoid trailing whitespaces;
 
