@@ -49,26 +49,27 @@ Changelog merge=union
 *.mli check-syntax check-indent -check-eoleof
 *.py  check-indent
 *.c   check-indent
+*.h   check-indent
 
 ## Unset "-check-indent"
 
 # Unchecked C files
 
-tests/**/*.c -check-indent
-src/plugins/*/tests/**/*.c -check-indent
+tests/**/*.[ch] -check-indent
+src/plugins/*/tests/**/*.[ch] -check-indent
 
-doc/aorai/**/*.c  -check-indent
-doc/developer/**/*.c -check-indent
-doc/eva/**/*.c -check-indent
-doc/rte/**/*.c -check-indent
-share/**/*.c -check-indent
+doc/aorai/**/*.[ch]  -check-indent
+doc/developer/**/*.[ch] -check-indent
+doc/eva/**/*.[ch] -check-indent
+doc/rte/**/*.[ch] -check-indent
+share/**/*.[ch] -check-indent
 
-src/plugins/wp/doc/**/*.c -check-indent
-src/plugins/e-acsl/doc/**/*.c -check-indent
-src/plugins/e-acsl/examples/**/*.c -check-indent
+src/plugins/wp/doc/**/*.[ch] -check-indent
+src/plugins/e-acsl/doc/**/*.[ch] -check-indent
+src/plugins/e-acsl/examples/**/*.[ch] -check-indent
 
 # Don't check it because it takes too much time
-src/plugins/e-acsl/contrib/libdlmalloc/dlmalloc.c -check-indent
+src/plugins/e-acsl/contrib/libdlmalloc/dlmalloc.[ch] -check-indent
 
 # Unchecked python files
 
