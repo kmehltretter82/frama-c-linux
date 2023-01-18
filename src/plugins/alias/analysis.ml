@@ -234,7 +234,7 @@ let doFunction (kf:kernel_function) =
         let final_state : Abstract_state.t option =
           try Stmt_table.find return_stmt
           with
-            Not_found -> failwith "Houston, we have a problem"
+            Not_found -> Options.abort "Houston, we have a problem: %a has no return statement" Kernel_function.pretty kf
         in
         let summary: Abstract_state.summary =
           Abstract_state.make_summary final_state kf
@@ -244,8 +244,8 @@ let doFunction (kf:kernel_function) =
   else
     begin
       (* summary by default *)
-      Options.warning "Function %a has no definition (summary empty)"
-        Kernel_function.pretty kf;
+      (* Options.warning "Function %a has no definition (summary empty)"
+       *   Kernel_function.pretty kf; *)
       let summary: Abstract_state.summary =
         Abstract_state.make_summary (Some Abstract_state.initial_value) kf
       in

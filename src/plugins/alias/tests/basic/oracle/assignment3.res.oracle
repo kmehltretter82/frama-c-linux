@@ -1,19 +1,19 @@
 [kernel] Parsing assignment3.c (with preprocessing)
 [alias] Parsing done
 [alias] Functions done
-After statement a = & b; :
+Before statement a = & b; :
  <list of may-alias>
 <end of list>
 
-After statement *c = b; :
+Before statement *c = b; :
  <list of may-alias>
 <end of list>
 
-After statement __retres = 0; :
+Before statement __retres = 0; :
  <list of may-alias>
 <end of list>
 
-After statement return __retres; :
+Before statement return __retres; :
  <list of may-alias>
 <end of list>
 

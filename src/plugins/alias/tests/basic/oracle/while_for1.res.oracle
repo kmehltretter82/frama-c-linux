@@ -4,67 +4,67 @@
 [alias] Skipping assignment odata[idx] = 0.5 * idata[idx] (not implemented)
 [alias] Skipping assignment odata[idx] = 0.5 * idata[idx] (not implemented)
 [alias] Functions done
-After statement while (1) {
-                  idx = 0;
-                  while (idx < 10) {
-                    odata[idx] = 0.5 * idata[idx];
-                    idx ++;
-                  }
-                } :
+Before statement while (1) {
+                   idx = 0;
+                   while (idx < 10) {
+                     odata[idx] = 0.5 * idata[idx];
+                     idx ++;
+                   }
+                 } :
  <list of may-alias>
 <end of list>
 
-After statement idx = 0;
-                while (idx < 10) {
-                  odata[idx] = 0.5 * idata[idx];
-                  idx ++;
-                } :
+Before statement idx = 0;
+                 while (idx < 10) {
+                   odata[idx] = 0.5 * idata[idx];
+                   idx ++;
+                 } :
  <list of may-alias>
 <end of list>
 
-After statement idx = 0; :
+Before statement idx = 0; :
  <list of may-alias>
 <end of list>
 
-After statement idx = 0; :
+Before statement idx = 0; :
  <list of may-alias>
 <end of list>
 
-After statement while (idx < 10) {
-                  odata[idx] = 0.5 * idata[idx];
-                  idx ++;
-                } :
+Before statement while (idx < 10) {
+                   odata[idx] = 0.5 * idata[idx];
+                   idx ++;
+                 } :
  <list of may-alias>
 <end of list>
 
-After statement while (idx < 10) {
-                  odata[idx] = 0.5 * idata[idx];
-                  idx ++;
-                } :
+Before statement while (idx < 10) {
+                   odata[idx] = 0.5 * idata[idx];
+                   idx ++;
+                 } :
  <list of may-alias>
 <end of list>
 
-After statement if (! (idx < 10)) break; :
+Before statement if (! (idx < 10)) break; :
  <list of may-alias>
 <end of list>
 
-After statement break; :
+Before statement break; :
  <list of may-alias>
 <end of list>
 
-After statement odata[idx] = 0.5 * idata[idx]; :
+Before statement odata[idx] = 0.5 * idata[idx]; :
  <list of may-alias>
 <end of list>
 
-After statement odata[idx] = 0.5 * idata[idx]; :
+Before statement odata[idx] = 0.5 * idata[idx]; :
  <list of may-alias>
 <end of list>
 
-After statement odata[idx] = 0.5 * idata[idx]; :
+Before statement odata[idx] = 0.5 * idata[idx]; :
  <list of may-alias>
 <end of list>
 
-After statement idx ++; :
+Before statement idx ++; :
  <list of may-alias>
 <end of list>
 

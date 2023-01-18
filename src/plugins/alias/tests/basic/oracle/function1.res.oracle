@@ -1,44 +1,48 @@
 [kernel] Parsing function1.c (with preprocessing)
 [alias] Parsing done
-[alias] Skiping swap(a,b); (summary not found)
-[alias] Skiping swap(a,b); (summary not found)
-[alias] Skiping swap(c,d); (summary not found)
-[alias] Skiping swap(c,d); (summary not found)
 [alias] Functions done
-After statement z = x; :
+Before statement z = x; :
+ <list of may-alias>
+<end of list>
+
+Before statement z = x; :
+ <list of may-alias>
+<end of list>
+
+Before statement x = y; :
  <list of may-alias>
 { x; z } are aliased
 <end of list>
 
-After statement x = y; :
+Before statement y = z; :
  <list of may-alias>
 { x; y; z } are aliased
 <end of list>
 
-After statement y = z; :
+Before statement swap(a,b); :
+ <list of may-alias>
+<end of list>
+
+Before statement swap(c,d); :
+ <list of may-alias>
+{ a; b } are aliased
+<end of list>
+
+Before statement __retres = 0; :
+ <list of may-alias>
+{ a; b } are aliased
+{ c; d } are aliased
+<end of list>
+
+Before statement return; :
  <list of may-alias>
 { x; y; z } are aliased
 <end of list>
 
-After statement swap(a,b); :
+Before statement return __retres; :
  <list of may-alias>
-<end of list>
-
-After statement swap(c,d); :
- <list of may-alias>
-<end of list>
-
-After statement __retres = 0; :
- <list of may-alias>
-<end of list>
-
-After statement return; :
- <list of may-alias>
-{ x; y; z } are aliased
-<end of list>
-
-After statement return __retres; :
- <list of may-alias>
+{ a; b } are aliased
+{ c; d } are aliased
 <end of list>
 
 [alias] Analysis complete
