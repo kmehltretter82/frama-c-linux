@@ -24,6 +24,9 @@
 Plugin WP <next-release>
 ########################
 
+- WP          [2023-02-03] new option -wp-why3-extra-config for providing
+                           additional Why3 configuration files
+
 #####################
 Plugin WP 26.0 (Iron)
 #####################
