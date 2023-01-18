@@ -8,7 +8,7 @@ Before statement a = & b; :
  <list of may-alias>
 <end of list>
 
-Before statement *c = b; :
+Before statement c = & b; :
  <list of may-alias>
 <end of list>
 

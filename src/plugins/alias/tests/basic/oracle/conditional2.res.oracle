@@ -1,42 +1,42 @@
-[kernel] Parsing function2.c (with preprocessing)
-[kernel:typing:implicit-function-declaration] function2.c:4: Warning: 
-  Calling undeclared function malloc. Old style K&R code?
+[kernel] Parsing conditional2.c (with preprocessing)
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
   <list of may-alias>
+  { a; b } are aliased
   <end of list>
 [alias] Functions done
-Before statement tmp = malloc(size); :
+Before statement b = (void *)(& c); :
  <list of may-alias>
 <end of list>
 
-Before statement tmp = malloc(size); :
+Before statement c = (void *)(& d); :
  <list of may-alias>
 <end of list>
 
-Before statement int *res = (int *)tmp; :
+Before statement d = (void *)(& e); :
  <list of may-alias>
 <end of list>
 
-Before statement return res; :
- <list of may-alias>
-{ res; tmp } are aliased
-<end of list>
-
-Before statement a = my_malloc(2); :
+Before statement if (a) a = b; else a = c; :
  <list of may-alias>
 <end of list>
 
-Before statement b = my_malloc(3); :
+Before statement a = b; :
+ <list of may-alias>
+<end of list>
+
+Before statement a = c; :
  <list of may-alias>
 <end of list>
 
 Before statement __retres = 0; :
  <list of may-alias>
+{ a; b } are aliased
 <end of list>
 
 Before statement return __retres; :
  <list of may-alias>
+{ a; b } are aliased
 <end of list>
 
 [alias] Analysis complete

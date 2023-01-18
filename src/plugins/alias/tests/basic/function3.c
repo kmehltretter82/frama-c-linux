@@ -10,10 +10,6 @@ void *f1(int *x, int* y)
   return (void *) 0;
 }
 
-
-
-
-
 int main(void)
 {
   int *a, *b, *c, *d;

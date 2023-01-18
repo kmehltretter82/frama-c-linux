@@ -1,49 +1,54 @@
 [kernel] Parsing while_for1.c (with preprocessing)
+[kernel:typing:implicit-function-declaration] while_for1.c:7: Warning: 
+  Calling undeclared function malloc. Old style K&R code?
 [alias] Parsing done
-[alias] Skipping assignment odata[idx] = 0.5 * idata[idx] (not implemented)
-[alias] Skipping assignment odata[idx] = 0.5 * idata[idx] (not implemented)
-[alias] Skipping assignment odata[idx] = 0.5 * idata[idx] (not implemented)
-[alias] Warning: DEBUG return stmt of main not in table
-[alias] Warning: Analysis is continuing but will not be sound
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   <end of list>
 [alias] Functions done
-Before statement while (1) {
-                   idx = 0;
+Before statement int *s = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement {
+                   int idx = 0;
                    while (idx < 10) {
-                     odata[idx] = 0.5 * idata[idx];
+                     {
+                       int tmp;
+                       tmp = malloc(idx);
+                       s = (int *)tmp;
+                     }
                      idx ++;
                    }
                  } :
  <list of may-alias>
 <end of list>
 
-Before statement idx = 0;
-                 while (idx < 10) {
-                   odata[idx] = 0.5 * idata[idx];
-                   idx ++;
-                 } :
+Before statement int idx = 0; :
  <list of may-alias>
 <end of list>
 
-Before statement idx = 0; :
- <list of may-alias>
-<end of list>
-
-Before statement idx = 0; :
+Before statement int idx = 0; :
  <list of may-alias>
 <end of list>
 
 Before statement while (idx < 10) {
-                   odata[idx] = 0.5 * idata[idx];
+                   {
+                     int tmp;
+                     tmp = malloc(idx);
+                     s = (int *)tmp;
+                   }
                    idx ++;
                  } :
  <list of may-alias>
 <end of list>
 
 Before statement while (idx < 10) {
-                   odata[idx] = 0.5 * idata[idx];
+                   {
+                     int tmp;
+                     tmp = malloc(idx);
+                     s = (int *)tmp;
+                   }
                    idx ++;
                  } :
  <list of may-alias>
@@ -57,19 +62,42 @@ Before statement break; :
  <list of may-alias>
 <end of list>
 
-Before statement odata[idx] = 0.5 * idata[idx]; :
+Before statement {
+                   int tmp;
+                   tmp = malloc(idx);
+                   s = (int *)tmp;
+                 } :
  <list of may-alias>
 <end of list>
 
-Before statement odata[idx] = 0.5 * idata[idx]; :
+Before statement tmp = malloc(idx);
+                 s = (int *)tmp; :
  <list of may-alias>
 <end of list>
 
-Before statement odata[idx] = 0.5 * idata[idx]; :
+Before statement tmp = malloc(idx);
+                 s = (int *)tmp; :
+ <list of may-alias>
+<end of list>
+
+Before statement tmp = malloc(idx); :
+ <list of may-alias>
+<end of list>
+
+Before statement s = (int *)tmp; :
  <list of may-alias>
 <end of list>
 
 Before statement idx ++; :
+ <list of may-alias>
+{ s; tmp } are aliased
+<end of list>
+
+Before statement __retres = 0; :
+ <list of may-alias>
+<end of list>
+
+Before statement return __retres; :
  <list of may-alias>
 <end of list>
 

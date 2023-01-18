@@ -2,15 +2,9 @@
 
 int main ()
 {
-  double idata [10];
-  double odata [10];
-  int idx;
-
-  while (1) {
-
-    for (idx = 0; idx < 10; idx++) {
-      odata[idx] = 0.5*idata[idx];
-    }
+  int* s = 0;
+  for (int idx = 0; idx < 10; idx++) {
+    s = malloc(idx);
   }
   return 0;
 }

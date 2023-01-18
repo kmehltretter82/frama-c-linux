@@ -5,9 +5,6 @@ int* my_malloc(int size) {
   return res;
 }
 
-
-
-
 int main(void)
 {
   int *a, *b;
