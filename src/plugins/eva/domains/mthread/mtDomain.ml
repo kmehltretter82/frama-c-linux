@@ -148,7 +148,7 @@ module State = struct
         let mem = pack (t_record Zone.[| packed_descr ; packed_descr |]) in
         let ret = pack (t_record Value.[| packed_descr |]) in
         let results = BuiltinsResults.packed_descr in
-        t_record [| ths ; mxs ; mem ; ret ; p_bool ; results |]
+        t_record [| ths ; mxs ; mem ; ret ; results |]
 
       let pretty fmt state =
         Format.fprintf fmt "Threads :@.  @[<v>%a@]@."
