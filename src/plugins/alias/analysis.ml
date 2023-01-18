@@ -222,24 +222,44 @@ let doFunction (kf:kernel_function) =
     Kernel_function.pretty kf;
   if Kernel_function.has_definition kf then
     begin
+      (* let print_key = Stmt.pretty in *)
+      let print_value fmt v =
+        match v with
+        | None -> Format.fprintf fmt "<Bot>"
+        | Some a -> Abstract_state.pretty fmt a
+      in
       let first_stmts =
         try [Kernel_function.find_first_stmt kf]
         with Kernel_function.No_Statement -> []
       in
       List.iter (fun stmt -> T.StmtStartData.add stmt (Some Abstract_state.initial_value)) first_stmts;
       F.compute first_stmts;
+      let return_stmt = Kernel_function.find_return kf in
+      let final_state : Abstract_state.t option =
+        try Stmt_table.find return_stmt
+        with
+          Not_found ->
+          begin
+            (* let f_dec = Kernel_function.get_definition kf in *)
+            Options.warning "DEBUG return stmt of %a not in table" Kernel_function.pretty kf;
+            (* List.iter
+             *   (fun k -> let v = try Stmt_table.find k with Not_found -> (Format.printf "%a is missing" print_key k ; None) in
+             *       Options.feedback "Before statement %a :@.@[<hov 2> %a@]@." print_key k print_value v
+             *   )
+             *   f_dec.sallstmts; *)
+            Options.warning "Analysis is continuing but will not be sound";
+            Some (Abstract_state.initial_value)
+          end
+      in
       if not (Kernel_function.is_main kf) then
         (* if main, do nothing *)
-        let return_stmt = Kernel_function.find_return kf in
-        let final_state : Abstract_state.t option =
-          try Stmt_table.find return_stmt
-          with
-            Not_found -> Options.abort "Houston, we have a problem: %a has no return statement" Kernel_function.pretty kf
-        in
         let summary: Abstract_state.summary =
           Abstract_state.make_summary final_state kf
         in
         Function_table.add kf (Some summary)
+      else
+        (* if main, print the last abstract state *)
+        Options.feedback "May-aliases at the end of function main:@.%a@." print_value final_state
     end
   else
     begin

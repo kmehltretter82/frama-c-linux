@@ -1,5 +1,9 @@
 [kernel] Parsing conditional1.c (with preprocessing)
 [alias] Parsing done
+[alias] May-aliases at the end of function main:
+  <list of may-alias>
+  { a; b } are aliased
+  <end of list>
 [alias] Functions done
 Before statement if (a) a = b; else a = c; :
  <list of may-alias>

@@ -1,5 +1,8 @@
 [kernel] Parsing assignment3.c (with preprocessing)
 [alias] Parsing done
+[alias] May-aliases at the end of function main:
+  <list of may-alias>
+  <end of list>
 [alias] Functions done
 Before statement a = & b; :
  <list of may-alias>
