@@ -23,7 +23,6 @@
 module Analysis = Analysis
 module API = API
 
-
 let main () =
   if Options.Enabled.get() then
     begin

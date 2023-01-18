@@ -43,9 +43,9 @@ val fold_new_aliases_stmt:
 val fold_aliases_kf:
   ('a -> lval -> 'a) -> 'a -> kernel_function -> lval -> 'a
 
-(** [fold_fundec_stmts f acc kf v] folds function [f acc s e] on the list of
-    pairs [s, e] where e is the set of lval aliased to [v] before statement [s] in
-    function [kf]. *)
+(** [fold_fundec_stmts f acc kf v] folds [f acc s e] on the list of
+    pairs [s, e] where [e] is the set of lval aliased to [v] after statement [s]
+    in function [kf]. *)
 val fold_fundec_stmts:
   ('a -> stmt -> lval -> 'a) -> 'a -> kernel_function -> lval -> 'a
 

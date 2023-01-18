@@ -1,15 +1,11 @@
 
-
-
 * Liste de ce qui marche
 
-
 * Fait:
-- abstracct state
+- abstract state
 - opérateurs de l'algorithme steensgaard
 - expressions, opérations arithmétiques
-- analyse dataflow, 
-
+- analyse dataflow,
 
 * WIP (à finir avant le 20/01):
 - fonctions
