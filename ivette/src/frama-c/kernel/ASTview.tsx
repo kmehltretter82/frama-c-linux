@@ -149,27 +149,6 @@ function coveringNode(tree: Tree, pos: number): Node | undefined {
 // -----------------------------------------------------------------------------
 
 
-/*
-function useViewState() {
-  const [selection, updateSelection] = States.useSelection();
-  const [hovered, updateHovered] = States.useHovered();
-  const selected = selection?.current?.marker;
-  const fct = selection?.current?.fct;
-
-  const text = States.useRequest(Ast.printFunction, fct) ?? null;
-  const tree = React.useMemo(() => textToTree(text) ?? empty, [text]);
-  const ranges = React.useMemo(() => markersRanges(tree), [tree]);
-  const code = React.useMemo(() => textToString(text), [text]);
-
-  const emptyDead = { unreachable: [], nonTerminating: [] };
-  const dead = States.useRequest(Eva.getDeadCode, fct) ?? emptyDead;
-  const tags = States.useTags(Properties.propStatusTags);
-  const propertiesStatuses = States.useSyncArray(Properties.status).getArray();
-
-
-}
-*/
-
 
 // -----------------------------------------------------------------------------
 //  Function code representation
@@ -225,38 +204,20 @@ function createMarkerUpdater(): Editor.Extension {
   });
 }
 
-const MarkerScroller = Editor.createUpdater((update) => {
-  console.log(update);
-  const a = Marker.annotation;
-  const markers = mapFilter(update.transactions, (tr) => tr.annotation(a));
-  if (markers.length !== 1) return;
-  const marker = markers[0];
-  const selection = update.state.selection.main;
-  const ranges = Ranges.get(update.state).get(marker) ?? [];
-  if (ranges.length !== 1) { console.log(ranges); return; }
-  if (ranges[0] === selection) return;
-  const { from: anchor } = ranges[0];
-  update.view.dispatch({ selection: { anchor }, scrollIntoView: true });
-});
-
-
-/*
-// Scroll the selected marker into view if needed. Used for when the marker is
-// changed outside of this component.
-function scrollMarkerIntoView(view: Editor.View, marker: Marker): void {
-  if (!view || !marker) return;
-  const selection = view.state.selection.main;
-  console.log('-- Marker: ', marker);
-  const ranges = Ranges.get(view.state).get(marker) ?? [];
-  console.log('-- Ranges: ', ranges);
-  if (ranges.length === 0) return;
-  const exists = ranges.find((range) => range === selection);
-  console.log('-- Exists: ', exists);
-  if (exists) return;
-  const { from: anchor } = ranges[0];
-  view.dispatch({ selection: { anchor }, scrollIntoView: true });
+// A View updater that scrolls the selected marker into view. It is needed to
+// handle Marker's updates from the outside world, as they do not change the
+// cursor position inside CodeMirror.
+const MarkerScroller = createMarkerScroller();
+function createMarkerScroller(): Editor.Extension {
+  const deps = { marker: Marker, ranges: Ranges };
+  return Editor.createViewUpdater(deps, ({ marker, ranges }, view) => {
+    if (!view || !marker) return;
+    const markerRanges = ranges.get(marker) ?? [];
+    if (markerRanges.length !== 1) return;
+    const { from: anchor } = markerRanges[0];
+    view.dispatch({ selection: { anchor }, scrollIntoView: true });
+  });
 }
-*/
 
 // -----------------------------------------------------------------------------
 
@@ -660,7 +621,7 @@ function useFctTaints(fct: Fct): Eva.LvalueTaints[] {
 // Necessary extensions for our needs.
 const extensions: Editor.Extension[] = [
   MarkerUpdater,
-  // MarkerScroller,
+  MarkerScroller,
   HoveredUpdater,
   CodeDecorator,
   DeadCodeDecorator,
@@ -670,7 +631,6 @@ const extensions: Editor.Extension[] = [
   TaintTooltip,
   Editor.FoldGutter,
   Editor.LanguageHighlighter,
-  Editor.TransactionExtenderTest,
 ];
 
 // The component in itself.
@@ -708,15 +668,12 @@ export default function ASTview(): JSX.Element {
   // they have changed.
   const text = useFctText(fct);
   React.useEffect(() => Text.set(view, text), [view, text]);
-  // const dead = useFctDead(fct);
-  // React.useEffect(() => Dead.set(view, dead), [view, dead]);
-  // const callers = useFctCallers(fct);
-  // React.useEffect(() => Callers.set(view, callers), [view, callers]);
-  // const taints = useFctTaints(fct);
-  // React.useEffect(() => TaintedLvalues.set(view, taints), [view, taints]);
-
-  // Scrolling the selected marker into view if needed.
-  // React.useEffect(() => scrollMarkerIntoView(view, marker), [view, marker]);
+  const dead = useFctDead(fct);
+  React.useEffect(() => Dead.set(view, dead), [view, dead]);
+  const callers = useFctCallers(fct);
+  React.useEffect(() => Callers.set(view, callers), [view, callers]);
+  const taints = useFctTaints(fct);
+  React.useEffect(() => TaintedLvalues.set(view, taints), [view, taints]);
 
   return (
     <>

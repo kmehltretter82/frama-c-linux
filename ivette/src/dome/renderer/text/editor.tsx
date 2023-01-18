@@ -24,7 +24,7 @@ import React from 'react';
 
 import { EditorState, StateField, Facet, Extension } from '@codemirror/state';
 import { Annotation, Transaction, RangeSet } from '@codemirror/state';
-import { EditorSelection, AnnotationType } from '@codemirror/state';
+import { EditorSelection } from '@codemirror/state';
 
 import { EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
 import { Decoration, DecorationSet } from '@codemirror/view';
@@ -56,8 +56,10 @@ export type View = EditorView | null;
 export type Range = { from: number, to: number };
 export type Set<A> = (view: View, value: A) => void;
 export type Get<A> = (state: EditorState | undefined) => A;
-export interface Structure<S> { structure: S, extension: Extension }
-export interface Data<A, S> extends Structure<S> { init: A, get: Get<A> }
+export type IsUpdated = (update: ViewUpdate) => boolean;
+export interface Struct<S> { structure: S, extension: Extension }
+export interface Value<A> { init: A, get: Get<A> }
+export interface Data<A, S> extends Value<A>, Struct<S> { isUpdated: IsUpdated }
 
 // Event handlers type definition.
 export type Handler<I, E> = (i: I, v: EditorView, e: E) => void;
@@ -72,7 +74,7 @@ export type Handlers<I> = { [e in keyof EventMap]?: Handler<I, EventMap[e]> };
 // structure is exposed for two reasons. The first one is that it contains the
 // extension that must be added to the CodeMirror instanciation. The second one
 // is that it is needed during the Aspects creation's process.
-export interface Field<A> extends Data<A, StateField<A>> { set: Set<A>, annotation: AnnotationType<A> }
+export interface Field<A> extends Data<A, StateField<A>> { set: Set<A> }
 
 // An Aspect is a data associated with an editor state and computed by combining
 // data from several fields. A typical use case is if one needs a data that
@@ -109,16 +111,23 @@ export type Dependencies<I extends Dict> = { [K in keyof I]: Dependency<I[K]> };
 type Dep<A> = Dependency<A>;
 type Deps<I extends Dict> = Dependencies<I>;
 type Combine<Output> = (l: readonly Output[]) => Output;
+type Pred<I extends Dict> = (d: Dep<I[typeof k]>, k: string) => boolean;
 type Mapper<I extends Dict, A> = (d: Dep<I[typeof k]>, k: string) => A;
 type Transform<I extends Dict> = Mapper<I, unknown>;
 
 // Helper function used to map a function over Dependencies.
-function mapDict<I extends Dict, A>(deps: Deps<I>, fn: Mapper<I, A>): A[] {
+function mapDeps<I extends Dict, A>(deps: Deps<I>, fn: Mapper<I, A>): A[] {
   return Object.keys(deps).map((k) => fn(deps[k], k));
 }
 
+// Helper function used to check if at least one depencency satisfied a
+// given predicate.
+function existsDeps<I extends Dict>(deps: Deps<I>, fn: Pred<I>): boolean {
+  return Object.keys(deps).find((k) => fn(deps[k], k)) != undefined;
+}
+
 // Helper function used to transfrom a Dependencies will keeping its structure.
-function transformDict<I extends Dict>(deps: Deps<I>, tr: Transform<I>): Dict {
+function transformDeps<I extends Dict>(deps: Deps<I>, tr: Transform<I>): Dict {
   return Object.fromEntries(Object.keys(deps).map(k => [k, tr(deps[k], k)]));
 }
 
@@ -127,7 +136,7 @@ function transformDict<I extends Dict>(deps: Deps<I>, tr: Transform<I>): Dict {
 // type because of TypeScript subtyping shenanigans that prevent us to correctly
 // type the returned record. Thus, a type assertion has to be used.
 function inputs<I extends Dict>(ds: Deps<I>, s: EditorState | undefined): Dict {
-  return transformDict(ds, (d) => d.get(s));
+  return transformDeps(ds, (d) => d.get(s));
 }
 
 // -----------------------------------------------------------------------------
@@ -164,7 +173,9 @@ export function createField<A>(init: A): Field<A> {
   const field = StateField.define<A>({ create, update });
   const get: Get<A> = (state) => state?.field(field) ?? init;
   const set: Set<A> = (v, a) => v?.dispatch({ annotations: annot.of(a) });
-  return { init, get, set, structure: field, extension: field, annotation: annot };
+  const isUpdated: IsUpdated = (update) =>
+    update.transactions.find((tr) => tr.annotation(annot)) != undefined;
+  return { init, get, set, structure: field, extension: field, isUpdated };
 }
 
 // An Aspect is declared using its dependencies and a function. This function's
@@ -175,15 +186,17 @@ export function createAspect<I extends Dict, O>(
   deps: Dependencies<I>,
   fn: (input: I) => O,
 ): Aspect<O> {
-  const enables = mapDict(deps, (d) => d.extension);
-  const init = fn(transformDict(deps, (d) => d.init) as I);
+  const enables = mapDeps(deps, (d) => d.extension);
+  const init = fn(transformDeps(deps, (d) => d.init) as I);
   const combine: Combine<O> = (l) => l.length > 0 ? l[l.length - 1] : init;
   const facet = Facet.define<O, O>({ combine, enables });
   const get: Get<O> = (state) => state?.facet(facet) ?? init;
-  const convertedDeps = mapDict(deps, (d) => d.structure);
+  const convertedDeps = mapDeps(deps, (d) => d.structure);
   const compute: Get<O> = (s) => fn(inputs(deps, s) as I);
   const extension = facet.compute(convertedDeps, compute);
-  return { init, get, structure: facet, extension };
+  const isUpdated: IsUpdated = (update) =>
+    existsDeps(deps, (d) => d.isUpdated(update));
+  return { init, get, structure: facet, extension, isUpdated };
 }
 
 // A Decorator is an extension that adds decorations to the CodeMirror's
@@ -193,7 +206,7 @@ export function createDecorator<I extends Dict>(
   deps: Dependencies<I>,
   fn: (inputs: I, state: EditorState) => DecorationSet
 ): Extension {
-  const enables = mapDict(deps, (d) => d.extension);
+  const enables = mapDeps(deps, (d) => d.extension);
   const get = (s: EditorState): DecorationSet => fn(inputs(deps, s) as I, s);
   class S { s: DecorationSet = RangeSet.empty; }
   class D extends S { update(u: ViewUpdate): void { this.s = get(u.state); } }
@@ -209,9 +222,10 @@ export function createGutter<I extends Dict>(
   className: string,
   line: (inputs: I, block: Range, view: EditorView) => GutterMarker | null
 ): Extension {
-  const enables = mapDict(deps, (d) => d.extension);
+  const enables = mapDeps(deps, (d) => d.extension);
   const extension = gutter({
     class: className,
+    lineMarkerChange: (u) => existsDeps(deps, (d) => d.isUpdated(u)),
     lineMarker: (view, block) => {
       return line(inputs(deps, view.state) as I, block, view);
     }
@@ -242,7 +256,7 @@ export function createEventHandler<I extends Dict>(
   deps: Dependencies<I>,
   handlers: Handlers<I>,
 ): Extension {
-  const enables = mapDict(deps, (d) => d.extension);
+  const enables = mapDeps(deps, (d) => d.extension);
   const domEventHandlers = Object.fromEntries(Object.keys(handlers).map((k) => {
     const h = handlers[k] as Handler<I, typeof k>;
     const fn = (e: typeof k, v: EditorView): void =>
@@ -252,8 +266,20 @@ export function createEventHandler<I extends Dict>(
   return enables.concat(EditorView.domEventHandlers(domEventHandlers));
 }
 
-export function createUpdater(fn: (update: ViewUpdate) => void): Extension {
-  return EditorView.updateListener.of(fn);
+// A View updater is an extension that allows to modify the view each time a
+// depencency is updated. For example, one could use this to change the cursor
+// position when a Data is updated by the outside world.
+export function createViewUpdater<I extends Dict>(
+  deps: Dependencies<I>,
+  fn: (input: I, view: View) => void,
+): Extension {
+  return EditorView.updateListener.of((u) => {
+    if(!existsDeps(deps, (d) =>  d.isUpdated(u))) return;
+    const get = (b: boolean): EditorState => b ? u.state : u.startState;
+    const state: <X>(d: Dep<X>) => EditorState = (d) => get(d.isUpdated(u));
+    const inputs = transformDeps(deps, (d) => d.get(state(d))) as I;
+    fn(inputs, u.view);
+  });
 }
 
 // -----------------------------------------------------------------------------
@@ -318,6 +344,8 @@ function createSelectionField(): Field<EditorSelection> {
 export type ToString<A> = (text: A) => string;
 export function createTextField<A>(init: A, toString: ToString<A>): Field<A> {
   const field = createField<A>(init);
+  const isUpdated: IsUpdated = (u) =>
+    field.isUpdated(u) && u.startState.doc.length !== 0;
   const set: Set<A> = (view, text) => {
     field.set(view, text);
     const selection = { anchor: 0 };
@@ -325,7 +353,7 @@ export function createTextField<A>(init: A, toString: ToString<A>): Field<A> {
     const changes = { from: 0, to: length, insert: toString(text) };
     view?.dispatch({ changes, selection });
   };
-  return { ...field, set };
+  return { ...field, set, isUpdated };
 }
 
 // An extension displaying line numbers in a gutter. Does not display anything
@@ -381,14 +409,6 @@ export function selectLine(view: View, line: number, atTop: boolean): void {
   if (!atTop) return;
   const effects = EditorView.scrollIntoView(goto, { y: 'start', yMargin: 0 });
   view.dispatch({ effects });
-}
-
-export const TransactionExtenderTest = createTest();
-function createTest(): Extension {
-  return EditorState.transactionExtender.of((transaction) => {
-    console.log(transaction);
-    return null;
-  });
 }
 
 // -----------------------------------------------------------------------------
