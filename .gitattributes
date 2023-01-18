@@ -47,9 +47,31 @@ Changelog merge=union
 # note: "check-syntax" includes already "check-eoleof"
 *.ml  check-syntax check-indent -check-eoleof
 *.mli check-syntax check-indent -check-eoleof
-*.py  check-indent check-eoleof
+*.py  check-indent
+*.c   check-indent
 
-# linting exceptions
+## Unset "-check-indent"
+
+# Unchecked C files
+
+tests/**/*.c -check-indent
+src/plugins/*/tests/**/*.c -check-indent
+
+doc/aorai/**/*.c  -check-indent
+doc/developer/**/*.c -check-indent
+doc/eva/**/*.c -check-indent
+doc/rte/**/*.c -check-indent
+share/**/*.c -check-indent
+
+src/plugins/wp/doc/**/*.c -check-indent
+src/plugins/e-acsl/doc/**/*.c -check-indent
+src/plugins/e-acsl/examples/**/*.c -check-indent
+
+# Don't check it because it takes too much time
+src/plugins/e-acsl/contrib/libdlmalloc/dlmalloc.c -check-indent
+
+# Unchecked python files
+
 share/analysis-scripts/benchmark_database.py -check-indent
 share/analysis-scripts/summary.py -check-indent
 share/analysis-scripts/results_display.py -check-indent
@@ -69,8 +91,6 @@ src/plugins/e-acsl/examples/ensuresec/**/*.py -check-indent
 /src/plugins/wp/doc/coqdoc/coqdoc.sty -check-utf8
 /src/plugins/wp/doc/manual/wp_logicvar.tex -check-utf8
 /src/plugins/wp/doc/manual/wp_store.tex -check-utf8
-
-# Don't check symbolic links (that gives an error)
 
 ## Unset all: "-check-syntax -check-indent -check-eoleof -check-utf8"
 
