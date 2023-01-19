@@ -5,19 +5,19 @@
   { a; b } are aliased
   <end of list>
 [alias] Functions done
-Before statement b = (void *)(& c); :
+Before statement b = & c; :
  <list of may-alias>
 <end of list>
 
-Before statement c = (void *)(& d); :
+Before statement c = & d; :
  <list of may-alias>
 <end of list>
 
-Before statement d = (void *)(& e); :
+Before statement d = & e; :
  <list of may-alias>
 <end of list>
 
-Before statement if (a) a = b; else a = c; :
+Before statement if (a) a = b; else a = & c; :
  <list of may-alias>
 <end of list>
 
@@ -25,7 +25,7 @@ Before statement a = b; :
  <list of may-alias>
 <end of list>
 
-Before statement a = c; :
+Before statement a = & c; :
  <list of may-alias>
 <end of list>
 
