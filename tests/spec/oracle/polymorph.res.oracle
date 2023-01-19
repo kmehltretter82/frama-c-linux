@@ -1,7 +1,8 @@
 [kernel] Parsing polymorph.c (with preprocessing)
 [kernel] polymorph.c:1: Warning: 
   parsing obsolete ACSL construct 'logic type declaration'. 'an axiomatic block' should be used instead.
-[kernel:annot-error] polymorph.c:4: Warning: unexpected token 'a'
+[kernel] polymorph.c:4: Warning: 
+  parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
 [kernel] polymorph.c:6: Warning: 
   parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
 [kernel] polymorph.c:8: Warning: 
@@ -10,6 +11,8 @@
   parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
 [kernel] polymorph.c:13: Warning: 
   parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
+[kernel:annot-error] polymorph.c:4: Warning: 
+  no such type a. Ignoring global annotation
 [kernel:annot-error] polymorph.c:13: Warning: 
   some type variable appears only in the return type. All type variables need to occur also in the parameters types.. Ignoring global annotation
 [kernel:annot-error] polymorph.c:22: Warning: 
