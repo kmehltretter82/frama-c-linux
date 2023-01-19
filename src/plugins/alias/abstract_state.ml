@@ -423,13 +423,18 @@ let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t =
   assert_invariants a;
   let v1, a = find_or_create_vertex x a in
   let list_v2, a = addr_of y a in
-  let new_a = List.fold_left
-      (fun a_acc v2 -> join a_acc v1 v2)
-      a
-      list_v2
+  let new_a =
+    if list_v2 = []
+    then
+      let v2, a = find_or_create_vertex y a in
+      set_type a v1 v2
+    else
+      List.fold_left
+        (fun a_acc v2 -> join a_acc v1 v2)
+        a
+        list_v2
   in
   assert_invariants new_a ; new_a
-(* TODO is that correct ?*)
 
 
 (* assignment x = *y *)
