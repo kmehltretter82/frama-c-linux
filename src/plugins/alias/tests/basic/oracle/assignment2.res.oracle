@@ -6,6 +6,22 @@
   { b; d } are aliased
   <end of list>
 [alias] Functions done
+Before statement int **a = (int **)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int *b = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int **c = (int **)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int *d = (int *)0; :
+ <list of may-alias>
+<end of list>
+
 Before statement *a = b; :
  <list of may-alias>
 <end of list>

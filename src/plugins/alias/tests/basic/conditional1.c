@@ -1,8 +1,9 @@
 // conditional cfg
+// { a; b; c } are aliased
 
 int main () {
 
-  int *a, *b, *c;
+  int *a=0, *b=0, *c=0;
   if (a) {
     a = b;
   }

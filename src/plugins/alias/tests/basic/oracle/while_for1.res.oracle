@@ -1,5 +1,5 @@
 [kernel] Parsing while_for1.c (with preprocessing)
-[kernel:typing:implicit-function-declaration] while_for1.c:7: Warning: 
+[kernel:typing:implicit-function-declaration] while_for1.c:8: Warning: 
   Calling undeclared function malloc. Old style K&R code?
 [alias] Parsing done
 [alias] May-aliases at the end of function main:

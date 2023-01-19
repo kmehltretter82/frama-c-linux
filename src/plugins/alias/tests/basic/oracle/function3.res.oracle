@@ -6,6 +6,11 @@
   { c; d } are aliased
   <end of list>
 [alias] Functions done
+Before statement return __retres; :
+ <list of may-alias>
+{ x; y; tmp } are aliased
+<end of list>
+
 Before statement int *tmp = x; :
  <list of may-alias>
 <end of list>
@@ -17,6 +22,12 @@ Before statement while (1) {
                  } :
  <list of may-alias>
 { x; tmp } are aliased
+<end of list>
+
+Before statement return __retres; :
+ <list of may-alias>
+{ a; b } are aliased
+{ c; d } are aliased
 <end of list>
 
 Before statement x = y;
@@ -61,6 +72,22 @@ Before statement __retres = (void *)0; :
 { x; y; tmp } are aliased
 <end of list>
 
+Before statement int *a = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int *b = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int *c = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int *d = (int *)0; :
+ <list of may-alias>
+<end of list>
+
 Before statement f1(a,b); :
  <list of may-alias>
 <end of list>
@@ -71,17 +98,6 @@ Before statement f1(c,d); :
 <end of list>
 
 Before statement __retres = 0; :
- <list of may-alias>
-{ a; b } are aliased
-{ c; d } are aliased
-<end of list>
-
-Before statement return __retres; :
- <list of may-alias>
-{ x; y; tmp } are aliased
-<end of list>
-
-Before statement return __retres; :
  <list of may-alias>
 { a; b } are aliased
 { c; d } are aliased

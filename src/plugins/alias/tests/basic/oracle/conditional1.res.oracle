@@ -5,6 +5,18 @@
   { a; b } are aliased
   <end of list>
 [alias] Functions done
+Before statement int *a = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int *b = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int *c = (int *)0; :
+ <list of may-alias>
+<end of list>
+
 Before statement if (a) a = b; else a = c; :
  <list of may-alias>
 <end of list>

@@ -1,4 +1,5 @@
-// control structure and arrays
+// for loop
+// no alias
 
 int main ()
 {

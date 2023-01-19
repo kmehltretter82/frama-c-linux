@@ -1,0 +1,129 @@
+[kernel] Parsing while_for3.c (with preprocessing)
+[alias] Parsing done
+[alias] May-aliases at the end of function main:
+  <list of may-alias>
+  <end of list>
+[alias] Functions done
+Before statement __retres = 0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int *a = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement return __retres; :
+ <list of may-alias>
+<end of list>
+
+Before statement int *b = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int *c = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement {
+                   int i = 0;
+                   while (i < 10) {
+                     a = b;
+                     goto __Cont;
+                     a = c;
+                     __Cont: i ++;
+                   }
+                 } :
+ <list of may-alias>
+<end of list>
+
+Before statement int i = 0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int i = 0; :
+ <list of may-alias>
+<end of list>
+
+Before statement while (i < 10) {
+                   a = b;
+                   goto __Cont;
+                   a = c;
+                   __Cont: i ++;
+                 } :
+ <list of may-alias>
+<end of list>
+
+Before statement while (i < 10) {
+                   a = b;
+                   goto __Cont;
+                   a = c;
+                   __Cont: i ++;
+                 } :
+ <list of may-alias>
+<end of list>
+
+Before statement if (! (i < 10)) break; :
+ <list of may-alias>
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+<end of list>
+
+Before statement a = b;
+                 goto __Cont;
+                 a = c; :
+ <list of may-alias>
+<end of list>
+
+Before statement a = b;
+                 goto __Cont; :
+ <list of may-alias>
+{ a; b; c } are aliased
+<end of list>
+
+Before statement a = b;
+                 goto __Cont; :
+ <list of may-alias>
+<end of list>
+
+Before statement a = b; :
+ <list of may-alias>
+{ a; b; c } are aliased
+<end of list>
+
+Before statement a = b; :
+ <list of may-alias>
+{ a; b; c } are aliased
+<end of list>
+
+Before statement a = b; :
+ <list of may-alias>
+<end of list>
+
+Before statement goto __Cont; :
+ <list of may-alias>
+{ a; b; c } are aliased
+<end of list>
+
+Before statement goto __Cont; :
+ <list of may-alias>
+{ a; b; c } are aliased
+<end of list>
+
+Before statement goto __Cont; :
+ <list of may-alias>
+{ a; b } are aliased
+<end of list>
+
+Before statement a = c; :
+ <list of may-alias>
+{ a; b } are aliased
+<end of list>
+
+Before statement __Cont: i ++; :
+ <list of may-alias>
+{ a; b; c } are aliased
+<end of list>
+
+[alias] Analysis complete
