@@ -1393,9 +1393,9 @@ class cil_printer () = object (self)
         if cut && not inline && not braces then pp_print_cut fmt ();
         self#next_stmt Cil.invalidStmt fmt s
       | s_cur :: (s_next :: _ as tail) ->
-        Format.fprintf fmt "%a@ %a"
-          (self#next_stmt s_next) s_cur
-          (iterblock ~cut:false) tail
+        Format.fprintf fmt "%a@ "
+          (self#next_stmt s_next) s_cur;
+        (iterblock[@tailcall]) ~cut:false fmt tail
     in
     let stmts = blk.bstmts in
     if stmts = [] && not braces then fprintf fmt ";"
