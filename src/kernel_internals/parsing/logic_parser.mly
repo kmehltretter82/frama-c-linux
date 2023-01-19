@@ -96,14 +96,6 @@
     let l = Stack.pop type_variables_stack in
     List.iter Logic_env.remove_typename l
 
-  let rt_type = ref false
-
-  let set_rt_type () = rt_type:= true
-
-  let reset_rt_type () = rt_type:=false
-
-  let is_rt_type () = !rt_type
-
   let loc_decl start_end d = { decl_node = d; decl_loc = loc start_end }
 
   let loc_ext start_end d = { extended_node = d; extended_loc = loc start_end }
@@ -338,29 +330,6 @@
 
 %%
 
-enter_kw_c_mode:
-| /* empty */ { enter_kw_c_mode () }
-;
-
-exit_kw_c_mode:
-| /* empty */ { exit_kw_c_mode () }
-;
-
-enter_rt_type:
-| /* empty */ { if is_rt_type () then enter_rt_type_mode () }
-;
-
-exit_rt_type:
-| /* empty */ { if is_rt_type () then exit_rt_type_mode () }
-;
-
-begin_rt_type:
-| /* empty */ { set_rt_type () }
-
-end_rt_type:
-| /* empty */ { reset_rt_type () }
-;
-
 /*** predicates and terms ***/
 
 lexpr_list:
@@ -374,7 +343,7 @@ ne_lexpr_list:
 ;
 
 lexpr_eof:
-| full_lexpr EOF { $1 }
+| lexpr EOF { $1 }
 ;
 
 lexpr_option:
@@ -544,8 +513,8 @@ lexpr_inner:
 | lexpr_inner SLASH lexpr_inner { info $sloc (PLbinop ($1, Bdiv, $3)) }
 | lexpr_inner PERCENT lexpr_inner { info $sloc (PLbinop ($1, Bmod, $3)) }
 | lexpr_inner STARHAT lexpr_inner  { info $sloc (PLrepeat ($1, $3)) }
-| lexpr_inner ARROW identifier_or_typename { info $sloc (PLarrow ($1, $3)) }
-| lexpr_inner DOT identifier_or_typename { info $sloc (PLdot ($1, $3)) }
+| lexpr_inner ARROW identifier_or_typename_full { info $sloc (PLarrow ($1, $3)) }
+| lexpr_inner DOT identifier_or_typename_full { info $sloc (PLdot ($1, $3)) }
 | lexpr_inner LSQUARE range RSQUARE { info $sloc (PLarrget ($1, $3)) }
 | lexpr_inner LSQUARE lexpr RSQUARE { info $sloc (PLarrget ($1, $3)) }
 | LSQUAREPIPE lexpr_list RSQUAREPIPE { info $sloc (PLlist $2) }
@@ -561,13 +530,13 @@ lexpr_inner:
 | RESULT { info $sloc PLresult }
 | SEPARATED LPAR ne_lexpr_list RPAR
       { info $sloc (PLseparated $3) }
-| identifier LPAR ne_lexpr_list RPAR
+| full_identifier LPAR ne_lexpr_list RPAR
       { info $sloc (PLapp ($1, [], $3)) }
-| identifier LBRACE ne_label_args RBRACE LPAR ne_lexpr_list RPAR
+| full_identifier LBRACE ne_label_args RBRACE LPAR ne_lexpr_list RPAR
       { info $sloc (PLapp ($1, $3, $6)) }
-| identifier LBRACE ne_label_args RBRACE
+| full_identifier LBRACE ne_label_args RBRACE
       { info $sloc (PLapp ($1, $3, [])) }
-| identifier  { info $sloc (PLvar $1) }
+| full_identifier  { info $sloc (PLvar $1) }
 | PI  { info $sloc (PLvar "\\pi") }
 | lexpr_inner GTGT lexpr_inner { info $sloc (PLbinop ($1, Brshift, $3))}
 | lexpr_inner LTLT lexpr_inner { info $sloc (PLbinop ($1, Blshift, $3))}
@@ -576,8 +545,8 @@ lexpr_inner:
 | LPAR cast_logic_type RPAR lexpr_inner %prec prec_cast
       { info $sloc (PLcast ($2, $4)) }
 | TYPEOF LPAR lexpr RPAR { info $sloc (PLtypeof $3) }
-| BSTYPE LPAR type_spec RPAR { info $sloc (PLtype $3) }
-| BSTYPE LPAR type_spec stars RPAR { info $sloc (PLtype ($4 $3)) }
+| BSTYPE LPAR type_spec(typename) RPAR { info $sloc (PLtype $3) }
+| BSTYPE LPAR type_spec(typename) stars RPAR { info $sloc (PLtype ($4 $3)) }
     /* tsets */
 | EMPTY { info $sloc PLempty }
 | BSUNION LPAR lexpr_list RPAR { info $sloc (PLunion $3) }
@@ -601,8 +570,8 @@ lexpr_inner:
 ;
 
 ne_label_args:
-| identifier_or_typename { [ $1 ] }
-| identifier_or_typename COMMA ne_label_args { $1 :: $3 }
+| identifier_or_typename_full { [ $1 ] }
+| identifier_or_typename_full COMMA ne_label_args { $1 :: $3 }
 
 string:
 | STRING_LITERAL { $1 }
@@ -620,7 +589,7 @@ range:
 /*** Aggregated object initialization ***/
 
 field_path_elt:
-| DOT identifier_or_typename { $2 }
+| DOT identifier_or_typename_full { $2 }
 ;
 field_init_elt:
 | field_path_elt EQUAL lexpr { ($1, $3) }
@@ -686,7 +655,7 @@ binders_reentrance:
 ;
 
 decl_spec:
-| type_spec var_spec { ($1, let (modif, name) = $2 in (modif $1, name))  }
+| type_spec(typename) var_spec { ($1, let (modif, name) = $2 in (modif $1, name))  }
 ;
 
 var_spec:
@@ -745,28 +714,29 @@ abs_param:
 | logic_type { $1 }
 ;
 
-/*** restricted type expressions ***/
-
-id_as_typename:
-| identifier { LTnamed($1, []) }
-;
-
 ne_parameters:
 | parameter { [$1] }
 | parameter COMMA ne_parameters { $1 :: $3 }
 ;
 
 parameter:
-| type_spec var_spec { let (modif, name) = $2 in (modif $1, name)}
-| id_as_typename var_spec { let (modif, name) = $2 in (modif $1, name) }
+| type_spec(identifier_or_typename) var_spec
+  { let (modif, name) = $2 in (modif $1, name)}
 ;
 
 
 /*** type expressions ***/
 
-logic_type:
-| type_spec abs_spec_option { $2 $1 }
+logic_type_gen(tname):
+| type_spec(tname) abs_spec_option { $2 $1 }
 ;
+
+typename:
+| name = TYPENAME { name }
+/* TODO treat the case of an ACSL keyword that is also a typedef */
+;
+
+logic_type: logic_type_gen(typename) { $1 }
 
 cv:
   CONST { cv_const }
@@ -774,21 +744,20 @@ cv:
 | BSGHOST { cv_ghost }
 ;
 
-type_spec_cv:
-     type_spec cv_after { $2 $1 }
-|    cv type_spec_cv { LTattribute ($2, $1) }
+type_spec_cv(tname):
+     type_spec(tname) cv_after { $2 $1 }
+|    cv type_spec_cv(tname) { LTattribute ($2, $1) }
 
 cv_after:
   /* empty */ { fun t -> t }
 | cv cv_after { fun t -> $2 (LTattribute (t,$1)) }
 
 cast_logic_type:
- | type_spec_cv abs_spec_cv_option { $2 $1 }
+ | type_spec_cv(TYPENAME) abs_spec_cv_option { $2 $1 }
 ;
 
 logic_rt_type:
-| id_as_typename { $1 }
-| begin_rt_type logic_type end_rt_type { $2 }
+| logic_type_gen(identifier_or_typename) { $1 }
 ;
 
 abs_spec_option:
@@ -854,7 +823,7 @@ tabs:
     }
 ;
 
-type_spec:
+type_spec(tname):
 | INTEGER        { LTinteger }
 | REAL           { LTreal }
 | BOOLEAN        { LTnamed (Utf8_logic.boolean,[]) }
@@ -894,63 +863,23 @@ type_spec:
 | FLOAT             { LTfloat FFloat }
 | DOUBLE            { LTfloat FDouble }
 | LONG DOUBLE       { LTfloat FLongDouble }
-| STRUCT exit_rt_type identifier_or_typename { LTstruct $3 }
-| ENUM   exit_rt_type identifier_or_typename { LTenum $3 }
-| UNION  exit_rt_type identifier_or_typename  { LTunion $3 }
-| TYPENAME          { LTnamed ($1,[]) }
-| TYPENAME LT enter_rt_type  ne_logic_type_list GT exit_rt_type
-      { LTnamed($1,$4) }
+| STRUCT id = identifier_or_typename_full { LTstruct id }
+| ENUM id = identifier_or_typename_full { LTenum id }
+| UNION id = identifier_or_typename_full  { LTunion id }
+| name = tname          { LTnamed (name,[]) }
+| name = tname LT prms = ne_logic_type_list(tname) GT { LTnamed(name,prms) }
 ;
 
-ne_logic_type_list:
-| logic_type                          { [$1] }
-| logic_type COMMA enter_rt_type ne_logic_type_list { $1 :: $4 }
+ne_logic_type_list(tname):
+| l = separated_nonempty_list(COMMA,logic_type_gen(tname)) { l }
 ;
 
 /*** from annotations ***/
 
-full_lexpr:
-| enter_kw_c_mode lexpr exit_kw_c_mode { $2 }
-;
-
 full_identifier:
-| enter_kw_c_mode identifier exit_kw_c_mode { $2 }
-;
-
-full_identifier_or_typename:
-| enter_kw_c_mode identifier_or_typename exit_kw_c_mode { $2 }
-;
-
-full_parameters:
-| enter_kw_c_mode ne_parameters exit_kw_c_mode { $2 }
-;
-
-full_parameter:
-| enter_kw_c_mode parameter exit_kw_c_mode { $2 }
-;
-
-full_zones:
-| enter_kw_c_mode zones exit_kw_c_mode  { $2 }
-;
-
-full_ne_zones:
-| enter_kw_c_mode ne_zones exit_kw_c_mode { $2 }
-;
-
-full_ne_lexpr_list:
-enter_kw_c_mode ne_lexpr_list exit_kw_c_mode { $2 }
-;
-
-full_logic_type:
-| enter_kw_c_mode logic_type exit_kw_c_mode { $2 }
-;
-
-full_logic_rt_type:
-| enter_kw_c_mode logic_rt_type exit_kw_c_mode { $2 }
-;
-
-full_assigns:
-| enter_kw_c_mode assigns exit_kw_c_mode { $2 }
+| id = identifier { id }
+| CHECK { "check" }
+| id = EXT_CODE_ANNOT { id }
 ;
 
 /*** ACSL extension for external spec file ***/
@@ -971,8 +900,8 @@ ext_global_clauses:
 
 ext_global_clause:
 | decl  { Ext_decl (loc_decl $sloc $1) }
-| EXT_LET any_identifier EQUAL full_lexpr SEMICOLON { Ext_macro (false, $2, $4) }
-| GLOBAL EXT_LET any_identifier EQUAL full_lexpr SEMICOLON { Ext_macro (true, $3, $5) }
+| EXT_LET any_identifier EQUAL lexpr SEMICOLON { Ext_macro (false, $2, $4) }
+| GLOBAL EXT_LET any_identifier EQUAL lexpr SEMICOLON { Ext_macro (true, $3, $5) }
 | INCLUDE string SEMICOLON { let b,s = $2 in Ext_include(b,s, loc $sloc) }
 ;
 
@@ -1183,12 +1112,12 @@ requires:
 ;
 
 ne_requires:
-| REQUIRES full_lexpr SEMICOLON requires { toplevel_pred Assert $2::$4 }
-| CHECK_REQUIRES full_lexpr SEMICOLON requires { toplevel_pred Check $2 :: $4 }
-| ADMIT_REQUIRES full_lexpr SEMICOLON requires { toplevel_pred Admit $2 :: $4 }
-| REQUIRES full_lexpr clause_kw { missing $loc($2) ";" $3 }
-| CHECK_REQUIRES full_lexpr clause_kw { missing $loc($2) ";" $3 }
-| ADMIT_REQUIRES full_lexpr clause_kw { missing $loc($2) ";" $3 }
+| REQUIRES lexpr SEMICOLON requires { toplevel_pred Assert $2::$4 }
+| CHECK_REQUIRES lexpr SEMICOLON requires { toplevel_pred Check $2 :: $4 }
+| ADMIT_REQUIRES lexpr SEMICOLON requires { toplevel_pred Admit $2 :: $4 }
+| REQUIRES lexpr clause_kw { missing $loc($2) ";" $3 }
+| CHECK_REQUIRES lexpr clause_kw { missing $loc($2) ";" $3 }
+| ADMIT_REQUIRES lexpr clause_kw { missing $loc($2) ";" $3 }
 ;
 
 terminates:
@@ -1197,8 +1126,8 @@ terminates:
 ;
 
 ne_terminates:
-| TERMINATES full_lexpr SEMICOLON { $2 }
-| TERMINATES full_lexpr clause_kw { missing $loc($2) ";" $3 }
+| TERMINATES lexpr SEMICOLON { $2 }
+| TERMINATES lexpr clause_kw { missing $loc($2) ";" $3 }
 ;
 
 decreases:
@@ -1212,8 +1141,8 @@ ne_decreases:
 ;
 
 variant:
-| full_lexpr FOR any_identifier { ($1, Some $3) }
-| full_lexpr                    { ($1, None) }
+| lexpr FOR any_identifier { ($1, Some $3) }
+| lexpr                    { ($1, None) }
 ;
 
 simple_clauses:
@@ -1222,11 +1151,11 @@ simple_clauses:
 ;
 
 allocation:
-| ALLOCATES full_zones { FreeAlloc([],$2) }
-| FREES full_zones { FreeAlloc($2,[]) }
+| ALLOCATES zones { FreeAlloc([],$2) }
+| FREES zones { FreeAlloc($2,[]) }
 
 ne_simple_clauses:
-| post_cond_kind full_lexpr SEMICOLON simple_clauses
+| post_cond_kind lexpr SEMICOLON simple_clauses
     { let tp_kind, kind = $1 in
       let allocation,assigns,post_cond,extended = $4 in
       allocation,assigns,
@@ -1236,31 +1165,27 @@ ne_simple_clauses:
       let a = concat_allocation allocation $1 in
       a,assigns,post_cond,extended
     }
-| ASSIGNS full_assigns SEMICOLON simple_clauses
+| ASSIGNS assigns SEMICOLON simple_clauses
     { let allocation,assigns,post_cond,extended = $4 in
       let a = concat_assigns $sloc assigns $2
       in allocation,a,post_cond,extended
     }
-| EXT_CONTRACT grammar_extension SEMICOLON simple_clauses
+| EXT_CONTRACT extension_content SEMICOLON simple_clauses
     { let allocation,assigns,post_cond,extended = $4 in
       let processed = Logic_env.preprocess_extension $1 $2 in
       allocation,assigns,post_cond,($1,processed)::extended
     }
-| post_cond_kind full_lexpr clause_kw { missing $loc($2) ";" $3 }
+| post_cond_kind lexpr clause_kw { missing $loc($2) ";" $3 }
 | allocation clause_kw { missing $loc($1) ";" $2 }
-| ASSIGNS full_assigns clause_kw { missing $loc($2) ";" $3 }
+| ASSIGNS assigns clause_kw { missing $loc($2) ";" $3 }
 | EXT_CONTRACT ne_grammar_extension clause_kw { missing $loc($1) ";" $3 }
 ;
 
 ne_grammar_extension:
-| full_zones { $1 }
+| zones { $1 }
 ;
 
 /* possibly empty list of terms, for ACSL extensions registered by plugins. */
-grammar_extension:
-| enter_kw_c_mode extension_content exit_kw_c_mode { $2 }
-;
-
 extension_content:
 | /* epsilon */ { [] }
 | zones { $1 }
@@ -1298,8 +1223,8 @@ behavior_body:
 
 assumes:
 | /* epsilon */ { [] }
-| ASSUMES full_lexpr SEMICOLON assumes { $2::$4 }
-| ASSUMES full_lexpr clause_kw { missing $loc($2) ";" $3 }
+| ASSUMES lexpr SEMICOLON assumes { $2::$4 }
+| ASSUMES lexpr clause_kw { missing $loc($2) ";" $3 }
 ;
 
 complete_or_disjoint:
@@ -1358,7 +1283,7 @@ annotation:
           (Not_well_formed (loc $sloc,
                             "Only one code annotation is allowed per comment"))
       }
-| full_identifier_or_typename { Aattribute_annot (loc $sloc, $1) }
+| identifier { Aattribute_annot (loc $sloc, $1) }
 | BSGHOST { Aattribute_annot(loc(),"\\ghost") }
 ;
 
@@ -1447,7 +1372,7 @@ loop_annot_opt:
 ;
 
 loop_effects:
-| LOOP ASSIGNS full_assigns SEMICOLON { $3 }
+| LOOP ASSIGNS assigns SEMICOLON { $3 }
 ;
 
 loop_allocation:
@@ -1455,9 +1380,9 @@ loop_allocation:
 ;
 
 loop_invariant:
-| LOOP INVARIANT full_lexpr SEMICOLON { toplevel_pred Assert $3 }
-| CHECK_LOOP INVARIANT full_lexpr SEMICOLON { toplevel_pred Check $3 }
-| ADMIT_LOOP INVARIANT full_lexpr SEMICOLON { toplevel_pred Admit $3 }
+| LOOP INVARIANT lexpr SEMICOLON { toplevel_pred Assert $3 }
+| CHECK_LOOP INVARIANT lexpr SEMICOLON { toplevel_pred Check $3 }
+| ADMIT_LOOP INVARIANT lexpr SEMICOLON { toplevel_pred Admit $3 }
 ;
 
 loop_variant:
@@ -1466,7 +1391,7 @@ loop_variant:
 
 /* Grammar Extensibility for plugins */
 loop_grammar_extension:
-| LOOP EXT_CODE_ANNOT grammar_extension SEMICOLON {
+| LOOP EXT_CODE_ANNOT extension_content SEMICOLON {
   let open Cil_types in
   let ext = $2 in
   try
@@ -1487,7 +1412,7 @@ loop_grammar_extension:
 ;
 
 loop_pragma:
-| LOOP PRAGMA any_identifier full_ne_lexpr_list SEMICOLON
+| LOOP PRAGMA any_identifier ne_lexpr_list SEMICOLON
   { if $3 = "UNROLL_LOOP" || $3 = "UNROLL" then
       (if $3 <> "UNROLL" then
 	 Format.eprintf "Warning: use of deprecated keyword '%s'.\nShould use 'UNROLL' instead.@." $3;
@@ -1523,19 +1448,19 @@ pragma_or_code_annotation:
 ;
 
 code_annotation:
-| ASSERT full_lexpr SEMICOLON
+| ASSERT lexpr SEMICOLON
   { fun bhvs -> AAssert (bhvs,toplevel_pred Assert $2) }
-| CHECK full_lexpr SEMICOLON
+| CHECK lexpr SEMICOLON
   { fun bhvs -> AAssert (bhvs,toplevel_pred Check $2) }
-| ADMIT full_lexpr SEMICOLON
+| ADMIT lexpr SEMICOLON
   { fun bhvs -> AAssert (bhvs,toplevel_pred Admit $2) }
-| INVARIANT full_lexpr SEMICOLON
+| INVARIANT lexpr SEMICOLON
   { fun bhvs -> AInvariant (bhvs,false,toplevel_pred Assert $2) }
-| CHECK_INVARIANT full_lexpr SEMICOLON
+| CHECK_INVARIANT lexpr SEMICOLON
   { fun bhvs -> AInvariant (bhvs,false,toplevel_pred Check $2) }
-| ADMIT_INVARIANT full_lexpr SEMICOLON
+| ADMIT_INVARIANT lexpr SEMICOLON
   { fun bhvs -> AInvariant (bhvs,false,toplevel_pred Admit $2) }
-| EXT_CODE_ANNOT grammar_extension SEMICOLON
+| EXT_CODE_ANNOT extension_content SEMICOLON
   { fun bhvs ->
     let open Cil_types in
     let ext = $1 in
@@ -1559,7 +1484,7 @@ code_annotation:
 ;
 
 slice_pragma:
-| SLICE PRAGMA any_identifier full_lexpr SEMICOLON
+| SLICE PRAGMA any_identifier lexpr SEMICOLON
     { if $3 = "expr" then SPexpr $4
       else raise (Not_well_formed (loc $sloc, "Unknown slice pragma")) }
 | SLICE PRAGMA any_identifier SEMICOLON
@@ -1569,7 +1494,7 @@ slice_pragma:
 ;
 
 impact_pragma:
-| IMPACT PRAGMA any_identifier full_lexpr SEMICOLON
+| IMPACT PRAGMA any_identifier lexpr SEMICOLON
     { if $3 = "expr" then IPexpr $4
       else raise (Not_well_formed (loc $sloc, "Unknown impact pragma")) }
 | IMPACT PRAGMA any_identifier SEMICOLON
@@ -1585,9 +1510,9 @@ decl_list:
 ;
 
 decl:
-| GLOBAL INVARIANT any_identifier COLON full_lexpr SEMICOLON
+| GLOBAL INVARIANT any_identifier COLON lexpr SEMICOLON
     { LDinvariant ($3, $5) }
-| VOLATILE full_ne_zones volatile_opt SEMICOLON { LDvolatile ($2, $3) }
+| VOLATILE ne_zones volatile_opt SEMICOLON { LDvolatile ($2, $3) }
 | type_annot {LDtype_annot $1}
 | model_annot {LDmodel_annot $1}
 | logic_def  { $1 }
@@ -1596,7 +1521,7 @@ decl:
 ;
 
 ext_decl:
-| EXT_GLOBAL grammar_extension SEMICOLON {
+| EXT_GLOBAL extension_content SEMICOLON {
      let processed = Logic_env.preprocess_extension $1 $2 in
      Ext_lexpr($1, processed)
    }
@@ -1638,8 +1563,8 @@ volatile_opt:
 ;
 
 type_annot:
-| TYPE INVARIANT any_identifier LPAR full_parameter RPAR EQUAL
-    full_lexpr SEMICOLON
+| TYPE INVARIANT any_identifier LPAR parameter RPAR EQUAL
+    lexpr SEMICOLON
   { let typ,name = $5 in{ inv_name = $3; this_name = name; this_type = typ; inv = $8; } }
 ;
 
@@ -1649,7 +1574,7 @@ opt_semicolon:
 ;
 
 model_annot:
-| MODEL type_spec LBRACE full_parameter opt_semicolon RBRACE SEMICOLON
+| MODEL type_spec(typename) LBRACE parameter opt_semicolon RBRACE SEMICOLON
   { let typ,name = $4 in
     { model_for_type = $2; model_name = name; model_type = typ; }
   }
@@ -1683,17 +1608,17 @@ opt_parameters:
 ;
 
 parameters:
-| LPAR full_parameters RPAR { $2 }
+| LPAR ne_parameters RPAR { $2 }
 ;
 
 logic_def:
 /* logic function definition */
-| LOGIC full_logic_rt_type poly_id opt_parameters EQUAL full_lexpr SEMICOLON
+| LOGIC logic_rt_type poly_id opt_parameters EQUAL lexpr SEMICOLON
     { let (id, labels, tvars) = $3 in
       exit_type_variables_scope ();
       LDlogic_def (id, labels, tvars, $2, $4, $6) }
 /* predicate definition */
-| PREDICATE poly_id opt_parameters EQUAL full_lexpr SEMICOLON
+| PREDICATE poly_id opt_parameters EQUAL lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
       LDpredicate_def (id, labels, tvars, $3, $5) }
@@ -1702,15 +1627,15 @@ logic_def:
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
       LDinductive_def(id, labels, tvars, $3, $5) }
-| LEMMA poly_id COLON full_lexpr SEMICOLON
+| LEMMA poly_id COLON lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
       LDlemma (id, labels, tvars, toplevel_pred Assert $4) }
-| CHECK_LEMMA poly_id COLON full_lexpr SEMICOLON
+| CHECK_LEMMA poly_id COLON lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
       LDlemma (id, labels, tvars, toplevel_pred Check $4) }
-| ADMIT_LEMMA poly_id COLON full_lexpr SEMICOLON
+| ADMIT_LEMMA poly_id COLON lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
       LDlemma (id, labels, tvars, toplevel_pred Admit $4) }
@@ -1725,7 +1650,7 @@ logic_def:
 
 deprecated_logic_decl:
 /* OBSOLETE: logic function declaration */
-| LOGIC full_logic_rt_type poly_id opt_parameters SEMICOLON
+| LOGIC logic_rt_type poly_id opt_parameters SEMICOLON
     { let (id, labels, tvars) = $3 in
       let source = pos $symbolstartpos in
       exit_type_variables_scope ();
@@ -1748,7 +1673,7 @@ deprecated_logic_decl:
       LDtype(id,tvars,None)
     }
 /* OBSOLETE: axiom */
-| AXIOM poly_id COLON full_lexpr SEMICOLON
+| AXIOM poly_id COLON lexpr SEMICOLON
     { let (id,_,_) = $2 in
       raise
 	(Not_well_formed
@@ -1767,7 +1692,7 @@ logic_decls:
 logic_decl:
 | logic_def  { $1 }
 /* logic function declaration */
-| LOGIC full_logic_rt_type poly_id opt_parameters reads_clause SEMICOLON
+| LOGIC logic_rt_type poly_id opt_parameters reads_clause SEMICOLON
     { let (id, labels, tvars) = $3 in
       exit_type_variables_scope ();
       LDlogic_reads (id, labels, tvars, $2, $4, $5) }
@@ -1783,7 +1708,7 @@ logic_decl:
       exit_type_variables_scope ();
       LDtype(id,tvars,None) }
 /* axiom */
-| AXIOM poly_id COLON full_lexpr SEMICOLON
+| AXIOM poly_id COLON lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
       LDlemma (id, labels, tvars, toplevel_pred Admit $4) }
@@ -1796,12 +1721,12 @@ logic_decl_loc:
 
 reads_clause:
 | /* epsilon */ { None }
-| READS full_zones { Some $2 }
+| READS zones { Some $2 }
 ;
 
 typedef:
 | ne_datacons_list { TDsum $1 }
-| full_logic_type { TDsyn $1 }
+| logic_type { TDsyn $1 }
 ;
 
 datacons_list:
@@ -1820,13 +1745,13 @@ datacons:
 ;
 
 ne_type_list:
-| full_logic_type { [$1] }
-| full_logic_type COMMA ne_type_list { $1::$3 }
+| logic_type { [$1] }
+| logic_type COMMA ne_type_list { $1::$3 }
 
 indcases:
 | /* epsilon */
     { [] }
-| CASE poly_id COLON full_lexpr SEMICOLON indcases
+| CASE poly_id COLON lexpr SEMICOLON indcases
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
       (id,labels,tvars,$4)::$6 }
@@ -1883,19 +1808,20 @@ behavior_name:
 ;
 
 any_identifier:
-| identifier_or_typename { $1 }
+| identifier { $1 }
+| is_acsl_typename { $1 }
+| TYPENAME { $1 }
 | keyword { $1 }
 ;
 
-identifier_or_typename: /* allowed as C field names */
-| is_acsl_typename  { $1 }
+identifier_or_typename:
 | TYPENAME { $1 } /* followed by the same list than 'identifier' */
-| IDENTIFIER { $1 }
-/* token list used inside acsl clauses: */
-| BEHAVIORS  { "behaviors" }
-| LABEL      { "label" }
-| READS      { "reads" }
-| WRITES     { "writes" }
+| full_identifier { $1 }
+
+
+identifier_or_typename_full: /* allowed as C field names */
+| is_acsl_typename  { $1 }
+| identifier_or_typename { $1 }
 ;
 
 identifier: /* part included into 'identifier_or_typename', but duplicated to avoid parsing conflicts */
