@@ -675,12 +675,12 @@ constant:
 
 array_size:
 | INT_CONSTANT { ASinteger $1 }
-| identifier { ASidentifier $1 }
+| full_identifier { ASidentifier $1 }
 | /* empty */ { ASnone }
 ;
 
 var_spec_bis:
-| identifier     { ((fun x -> x),(fun x -> x), $1) }
+| full_identifier     { ((fun x -> x),(fun x -> x), $1) }
 | var_spec_bis LSQUARE array_size RSQUARE
       { let (outer, inner, name) = $1 in
           (outer, (fun x -> inner (LTarray (x,$3))), name)
@@ -1138,9 +1138,6 @@ clause_kw:
 | FREES {"frees"}
 | COMPLETE {"complete"}
 | DISJOINT {"disjoint"}
-/* often, we'll be in c_kw_mode, where these keywords are
-   recognized as identifiers... */
-| IDENTIFIER { $1 }
 | EXT_CONTRACT { $1 }
 | EOF { "end of annotation" }
 ;
@@ -1873,7 +1870,7 @@ identifier: /* part included into 'identifier_or_typename', but duplicated to av
 ;
 
 bounded_var:
-| identifier { $1 }
+| full_identifier { $1 }
 | is_acsl_typename /* Since TYPENAME cannot be accepted by lexpr rule */
     { raise
 	(Not_well_formed(loc $sloc,
