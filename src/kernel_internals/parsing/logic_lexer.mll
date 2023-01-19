@@ -103,127 +103,113 @@
 
   let identifier, is_acsl_keyword =
     let all_kw = Hashtbl.create 37 in
-    let c_kw = Hashtbl.create 37 in
     let type_kw = Hashtbl.create 3 in
     List.iter
-      (fun (i,t,flag) ->
-         Hashtbl.add all_kw i t;
-         if flag then Hashtbl.add c_kw i t
-      )
+      (fun (i,t) -> Hashtbl.add all_kw i t;)
       [
-        "admit", (fun _ -> ADMIT), false;
-        "allocates", (fun _ -> ALLOCATES), false;
-        "assert", (fun _ -> ASSERT), false;
-        "assigns", (fun _ -> ASSIGNS), false;
-        "assumes", (fun _ -> ASSUMES), false;
-        "at", (fun _ -> EXT_AT), false;
+        "admit", (fun _ -> ADMIT);
+        "allocates", (fun _ -> ALLOCATES);
+        "assert", (fun _ -> ASSERT);
+        "assigns", (fun _ -> ASSIGNS);
+        "assumes", (fun _ -> ASSUMES);
+        "at", (fun _ -> EXT_AT);
         (* ACSL extension for external spec file *)
-        "axiom", (fun _ -> AXIOM), false;
-        "axiomatic", (fun _ -> AXIOMATIC), false;
-        "behavior", (fun _ -> BEHAVIOR), false;
-        "behaviors", (fun _ -> BEHAVIORS), false;
-        "_Bool", (fun _ -> BOOL), true;
-        "breaks", (fun _ -> BREAKS), false;
-        "case", (fun _ -> CASE), true;
-        "char", (fun _ -> CHAR), true;
-        "check", (fun _ -> CHECK), false;
-        "complete", (fun _ -> COMPLETE), false;
-        "const", (fun _ -> CONST), true;
-        "continues", (fun _ -> CONTINUES), false;
-        "contract", (fun _ -> CONTRACT), false;
+        "axiom", (fun _ -> AXIOM);
+        "axiomatic", (fun _ -> AXIOMATIC);
+        "behavior", (fun _ -> BEHAVIOR);
+        "behaviors", (fun _ -> BEHAVIORS);
+        "_Bool", (fun _ -> BOOL);
+        "breaks", (fun _ -> BREAKS);
+        "case", (fun _ -> CASE);
+        "char", (fun _ -> CHAR);
+        "check", (fun _ -> CHECK);
+        "complete", (fun _ -> COMPLETE);
+        "const", (fun _ -> CONST);
+        "continues", (fun _ -> CONTINUES);
+        "contract", (fun _ -> CONTRACT);
         (* ACSL extension for external spec file *)
-        "decreases", (fun _ -> DECREASES), false;
-        "disjoint", (fun _ -> DISJOINT), false;
-        "double", (fun _ -> DOUBLE), true;
-        "else", (fun _ -> ELSE), true;
-        "ensures", (fun _ -> ENSURES), false ;
-        "enum", (fun _ -> ENUM), true;
-        "exits", (fun _ -> EXITS), false;
-        "frees", (fun _ -> FREES), false;
-        "function", (fun _ -> FUNCTION), false;
+        "decreases", (fun _ -> DECREASES);
+        "disjoint", (fun _ -> DISJOINT);
+        "double", (fun _ -> DOUBLE);
+        "else", (fun _ -> ELSE);
+        "ensures", (fun _ -> ENSURES);
+        "enum", (fun _ -> ENUM);
+        "exits", (fun _ -> EXITS);
+        "frees", (fun _ -> FREES);
+        "function", (fun _ -> FUNCTION);
         (* ACSL extension for external spec file *)
-        "float", (fun _ -> FLOAT), true;
-        "for", (fun _ -> FOR), true;
-        "global", (fun _ -> GLOBAL), false;
-        "if", (fun _ -> IF), true;
-	"impact", (fun _ -> IMPACT), false;
-	"inductive", (fun _ -> INDUCTIVE), false;
-	"include", (fun _ -> INCLUDE), false;
+        "float", (fun _ -> FLOAT);
+        "for", (fun _ -> FOR);
+        "global", (fun _ -> GLOBAL);
+        "if", (fun _ -> IF);
+	"impact", (fun _ -> IMPACT);
+	"inductive", (fun _ -> INDUCTIVE);
+	"include", (fun _ -> INCLUDE);
         (* ACSL extension for external spec file *)
-        "int", (fun _ -> INT), true;
-        "invariant", (fun _ -> INVARIANT), false;
-        "label", (fun _ -> LABEL), false;
-        "lemma", (fun _ -> LEMMA), false;
-        "let", (fun _ -> EXT_LET), false;
+        "int", (fun _ -> INT);
+        "invariant", (fun _ -> INVARIANT);
+        "label", (fun _ -> LABEL);
+        "lemma", (fun _ -> LEMMA);
+        "let", (fun _ -> EXT_LET);
         (* ACSL extension for external spec file *)
-        "logic", (fun _ -> LOGIC), false;
-        "long", (fun _ -> LONG), true;
-        "loop", (fun _ -> LOOP), false;
-        "model", (fun _ -> MODEL), false;
+        "logic", (fun _ -> LOGIC);
+        "long", (fun _ -> LONG);
+        "loop", (fun _ -> LOOP);
+        "model", (fun _ -> MODEL);
         (* ACSL extension for model fields *)
-        "module", (fun _ -> MODULE), false;
+        "module", (fun _ -> MODULE);
         (* ACSL extension for external spec file *)
-        "pragma", (fun _ -> PRAGMA), false;
-        "predicate", (fun _ -> PREDICATE), false;
-        "reads", (fun _ -> READS), true;
-        (* treated specifically in the parser to
-           avoid issue in volatile clause. *)
-        "requires", (fun _ -> REQUIRES), false;
-        "returns", (fun _ -> RETURNS), false;
-        "short", (fun _ -> SHORT), true;
-        "signed", (fun _ -> SIGNED), true;
-        "sizeof", (fun _ -> SIZEOF), true;
-        "slice", (fun _ -> SLICE), false;
-        "struct", (fun _ -> STRUCT), true;
-        "terminates", (fun _ -> TERMINATES), false;
-        "type", (fun _ -> TYPE), false;
-        "union", (fun _ -> UNION), true;
-        "unsigned", (fun _ -> UNSIGNED), true;
-        "variant", (fun _ -> VARIANT), false;
-        "void", (fun _ -> VOID), true;
-        "volatile", (fun _ -> VOLATILE), true;
-        "writes", (fun _ -> WRITES), true;
-        (* treated specifically in the parser to
-           avoid issue in volatile clause. *)
+        "pragma", (fun _ -> PRAGMA);
+        "predicate", (fun _ -> PREDICATE);
+        "reads", (fun _ -> READS);
+        "requires", (fun _ -> REQUIRES);
+        "returns", (fun _ -> RETURNS);
+        "short", (fun _ -> SHORT);
+        "signed", (fun _ -> SIGNED);
+        "sizeof", (fun _ -> SIZEOF);
+        "slice", (fun _ -> SLICE);
+        "struct", (fun _ -> STRUCT);
+        "terminates", (fun _ -> TERMINATES);
+        "type", (fun _ -> TYPE);
+        "union", (fun _ -> UNION);
+        "unsigned", (fun _ -> UNSIGNED);
+        "variant", (fun _ -> VARIANT);
+        "void", (fun _ -> VOID);
+        "volatile", (fun _ -> VOLATILE);
+        "writes", (fun _ -> WRITES);
         "__FC_FILENAME__",
         (fun loc ->
            let filename =
              Filepath.(Normalized.to_pretty_string (fst loc).pos_path)
            in
-           STRING_LITERAL (false,filename)),
-        true;
+           STRING_LITERAL (false,filename));
       ];
     List.iter (fun (x, y) -> Hashtbl.add type_kw x y)
       ["integer", INTEGER; "real", REAL; "boolean", BOOLEAN; ];
     (fun s loc ->
       try
-        (Hashtbl.find (if Logic_utils.is_kw_c_mode () then c_kw else all_kw) s)
+        (Hashtbl.find all_kw s)
         loc
       with Not_found ->
         let res =
-          if not (Logic_utils.is_kw_c_mode ()) then begin
-            match Logic_env.extension_category s with
-            | exception Not_found -> None
-            | Cil_types.Ext_contract -> Some (EXT_CONTRACT s)
-            | Cil_types.Ext_global ->
-              begin
-                match Logic_env.is_extension_block s with
-                | false -> Some (EXT_GLOBAL s)
-                | true -> Some (EXT_GLOBAL_BLOCK s)
-              end
-            | Cil_types.Ext_code_annot _ -> Some (EXT_CODE_ANNOT s)
-          end
-          else None
+          match Logic_env.extension_category s with
+          | exception Not_found -> None
+          | Cil_types.Ext_contract -> Some (EXT_CONTRACT s)
+          | Cil_types.Ext_global ->
+            begin
+              match Logic_env.is_extension_block s with
+              | false -> Some (EXT_GLOBAL s)
+              | true -> Some (EXT_GLOBAL_BLOCK s)
+            end
+          | Cil_types.Ext_code_annot _ -> Some (EXT_CODE_ANNOT s)
         in
         match res with
         | None ->
-        if Logic_env.typename_status s then TYPENAME s
-        else
-          (try
-             Hashtbl.find type_kw s
-           with Not_found ->
-             if Logic_utils.is_rt_type_mode () then TYPENAME s
-               else IDENTIFIER s)
+          if Logic_env.typename_status s then TYPENAME s
+          else
+            (try
+               Hashtbl.find type_kw s
+             with Not_found -> IDENTIFIER s)
         | Some lex -> lex
     ),
     (fun s -> Hashtbl.mem all_kw s || Hashtbl.mem type_kw s)
@@ -555,8 +541,7 @@ and comment = parse
     dest_lexbuf.lex_abs_pos <- src_pos.pos_cnum
 
   let parse_from_position f (pos, s : Filepath.position * string) =
-    let finally _ = Logic_utils.exit_kw_c_mode () in
-    let output = Kernel.logwith finally ~wkey:Kernel.wkey_annot_error
+    let output = Kernel.warning ~wkey:Kernel.wkey_annot_error
     in
     let lb = from_string s in
     set_initial_position lb (Cil_datatype.Position.to_lexing_pos pos);

@@ -2362,38 +2362,6 @@ class complete_types =
 
 let complete_types f = Cil.visitCilFile (new complete_types) f
 
-(* ************************************************************************* *)
-(** {2 Parsing utilities} *)
-(* ************************************************************************* *)
-
-(** Hack to allow typedefs whose names are ACSL keywords: the state of the
-    lexer depends on the parser rule. See logic_lexer.mll and
-    logic_parser.mly for more details. *)
-
-(**
-   - false => keywords are all ACSL keywords
-   - true => only C keywords are recognized as such.
-     (other remains plain identifiers/typenames)
-*)
-let kw_c_mode = ref false
-
-let enter_kw_c_mode () = kw_c_mode := true
-
-let exit_kw_c_mode () = kw_c_mode := false
-
-let is_kw_c_mode () = !kw_c_mode
-
-let rt_type_mode = ref false
-
-(** enter a mode where any identifier is considered a type name. Needed for
-    for return type of a logic function, as the list of admissible variables
-    will be known afterwards. *)
-let enter_rt_type_mode () = rt_type_mode:=true
-
-let exit_rt_type_mode () = rt_type_mode:=false
-
-let is_rt_type_mode () = !rt_type_mode
-
 let pointer_comparable ?loc t1 t2 =
   let preds = Logic_env.find_all_logic_functions "\\pointer_comparable" in
   let cfct_ptr = TPtr (TFun(Cil.voidType,None,false,[]),[]) in
