@@ -874,12 +874,51 @@ ne_logic_type_list(tname):
 | l = separated_nonempty_list(COMMA,logic_type_gen(tname)) { l }
 ;
 
-/*** from annotations ***/
-
 full_identifier:
 | id = identifier { id }
+| ADMIT { "admit" }
+| ALLOCATES { "allocates" }
+| ASSERT { "assert" }
+| ASSIGNS { "assigns" }
+| ASSUMES { "assumes" }
+| EXT_AT { "at" }
+| AXIOM { "axiom" }
+| AXIOMATIC { "axiomatic" }
+| BEHAVIOR { "behavior" }
+| BREAKS { "breaks" }
 | CHECK { "check" }
+| COMPLETE { "complete" }
+| CONTINUES { "continues" }
+| CONTRACT { "contract" }
+| DECREASES { "decreases" }
+| DISJOINT { "disjoint" }
+| ENSURES { "ensures" }
+| EXITS { "exits" }
+| FREES { "frees" }
+| FUNCTION { "function" }
+| GLOBAL { "global" }
+| IMPACT { "impact" }
+| INDUCTIVE { "inductive" }
+| INCLUDE { "include" }
+| INVARIANT { "invariant" }
+| LEMMA { "lemma" }
+| EXT_LET { "let" }
+| LOGIC { "logic" }
+| LOOP { "loop" }
+| MODEL { "model" }
+| MODULE { "module" }
+| PRAGMA { "pragma" }
+| PREDICATE { "predicate" }
+| REQUIRES { "requires" }
+| RETURNS { "returns" }
+| SLICE { "slice" }
+| TERMINATES { "terminates" }
+| TYPE { "type" }
+| VARIANT { "variant" }
 | id = EXT_CODE_ANNOT { id }
+| id = EXT_CONTRACT { id }
+| id = EXT_GLOBAL { id }
+| id = EXT_GLOBAL_BLOCK { id }
 ;
 
 /*** ACSL extension for external spec file ***/
@@ -1815,7 +1854,7 @@ any_identifier:
 ;
 
 identifier_or_typename:
-| TYPENAME { $1 } /* followed by the same list than 'identifier' */
+| TYPENAME { $1 }
 | full_identifier { $1 }
 
 
