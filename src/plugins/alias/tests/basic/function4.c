@@ -1,4 +1,5 @@
-
+// funxtion with address agument
+// { a; b } are aliased
 
 int * addr(int* x)
 {
@@ -7,7 +8,7 @@ int * addr(int* x)
 
 int main(void)
 {
-  int *a, *b, c;
+  int *a=0, *b=0, c=0;
   a = addr(&c);
   b = &c;
   return 0;

@@ -9,6 +9,18 @@ Before statement return x; :
  <list of may-alias>
 <end of list>
 
+Before statement int *a = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int *b = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int c = 0; :
+ <list of may-alias>
+<end of list>
+
 Before statement a = addr(& c); :
  <list of may-alias>
 <end of list>
