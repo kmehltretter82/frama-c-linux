@@ -24,6 +24,7 @@
 
 open Cil_types
 open Cil_datatype
+(* NB : do the analysis BEFORE using any of those functions *)
 
 (* previously get_class_before_statement *)
 (** [fold_aliases_stmt f acc kf s lv] folds [f acc] over all the aliases of the

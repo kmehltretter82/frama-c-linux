@@ -26,8 +26,14 @@ open Cil_datatype
 
 module LSet = Lval.Set
 
+let check_computed () =
+  if not (Analysis.is_computed ())
+  then
+    Options.abort "Static analysis must be called before any function of the API can be called"
+
 
 let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+  check_computed ();
   match Analysis.get_abstract_state kf s with
     None -> acc
   | Some state ->
@@ -35,6 +41,7 @@ let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function
     LSet.fold (fun e a -> f_fold a e) set_aliases acc
 
 let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =
+  check_computed ();
   match Analysis.get_abstract_state kf s with
     None -> acc
   | Some state ->
@@ -43,10 +50,12 @@ let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_functi
     LSet.fold (fun e a -> f_fold a e) set_aliases acc
 
 let fold_aliases_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
+  check_computed ();
   let s = Kernel_function.find_return kf in
   fold_new_aliases_stmt f_fold acc kf s lv
 
 let fold_fundec_stmts (f_fold: 'a -> stmt -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
+  check_computed ();
   if Kernel_function.has_definition kf
   then
     let f_dec = Kernel_function.get_definition kf in
@@ -66,6 +75,7 @@ let fold_fundec_stmts (f_fold: 'a -> stmt -> lval -> 'a) (acc: 'a) (kf:kernel_fu
     Options.abort "fold_dundec_stmts: function %a has no definition" Kernel_function.pretty kf
 
 let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
+  check_computed ();
   match Analysis.get_abstract_state kf s with
     None -> false
   | Some state ->
@@ -75,6 +85,7 @@ let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
 
 
 let fold_points_to   (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+  check_computed ();
   match Analysis.get_abstract_state kf s with
     None -> acc
   | Some state ->
@@ -82,6 +93,7 @@ let fold_points_to   (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_fun
     f_fold acc set_aliases
 
 let fold_points_to_closure  (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+  check_computed ();
   match Analysis.get_abstract_state kf s with
     None -> acc
   | Some state ->
