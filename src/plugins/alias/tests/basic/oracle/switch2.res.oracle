@@ -1,0 +1,65 @@
+[kernel] Parsing switch2.c (with preprocessing)
+[alias] Parsing done
+[alias] May-aliases at the end of function main:
+  <list of may-alias>
+  <end of list>
+[alias] Functions done
+Before statement int *a = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int *b = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int *c = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int *d = (int *)0; :
+ <list of may-alias>
+<end of list>
+
+Before statement int e = 0; :
+ <list of may-alias>
+<end of list>
+
+Before statement switch (e) {
+                   case 1: *a = e;
+                   break;
+                   case 2: *b = e;
+                   break;
+                   default: *c = e;
+                 } :
+ <list of may-alias>
+<end of list>
+
+Before statement case 1: *a = e; :
+ <list of may-alias>
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+<end of list>
+
+Before statement case 2: *b = e; :
+ <list of may-alias>
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+<end of list>
+
+Before statement default: *c = e; :
+ <list of may-alias>
+<end of list>
+
+Before statement __retres = 0; :
+ <list of may-alias>
+<end of list>
+
+Before statement return __retres; :
+ <list of may-alias>
+<end of list>
+
+[alias] Analysis complete
