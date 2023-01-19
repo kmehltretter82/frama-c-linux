@@ -1,59 +1,133 @@
 [kernel] Parsing example1.c (with preprocessing)
 [alias] Parsing done
+[alias] Skiping while (1) {
+            idata = tmp->t2[*(tmp->n2)];
+            odata = tmp->t1[*(tmp->n1)];
+            idx = 0;
+            while (idx < 10) {
+              {
+                double tmp_1;
+                tmp_1 = sin(*(idata + idx));
+                *(odata + idx) = 0.5 * tmp_1;
+              }
+              idx ++;
+            }
+            swap(tmp->n1);
+          } (doStmt not implemented)
 [alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
 [alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
+[alias] Skiping while (idx < 10) {
+            {
+              double tmp_1;
+              tmp_1 = sin(*(idata + idx));
+              *(odata + idx) = 0.5 * tmp_1;
+            }
+            idx ++;
+          } (doStmt not implemented)
+[alias] Skiping if (*n == 1) *n = 0; else (*n) ++; (doStmt not implemented)
+[alias] Skiping return; (doStmt not implemented)
 [alias] DEBUG: call function - formal variable not as we expected
 [alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
 [alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
 [alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
 [alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
+[alias] Skiping while (idx < 10) {
+            {
+              double tmp_1;
+              tmp_1 = sin(*(idata + idx));
+              *(odata + idx) = 0.5 * tmp_1;
+            }
+            idx ++;
+          } (doStmt not implemented)
+[alias] Skiping if (! (idx < 10)) break; (doStmt not implemented)
+[alias] Skiping tmp_1 = sin(*(idata + idx));
+          *(odata + idx) = 0.5 * tmp_1; (doStmt not implemented)
+[alias] Skiping tmp_1 = sin(*(idata + idx));
+          *(odata + idx) = 0.5 * tmp_1; (doStmt not implemented)
 [alias] In a function call, parameter (x <- *(idata + idx)) is ignored)
 [alias] Warning: a function with no return is employed in an assignment
 [alias] In a function call, parameter (x <- *(idata + idx)) is ignored)
 [alias] Warning: a function with no return is employed in an assignment
 [alias] Skipping assignment *(odata + idx) = 0.5 * tmp_1 (BUG do_assignment 2)
 [alias] Skipping assignment *(odata + idx) = 0.5 * tmp_1 (BUG do_assignment 2)
+[alias] Skiping break; (doStmt not implemented)
 [alias] DEBUG: call function - formal variable not as we expected
 [alias] DEBUG: call function - formal variable not as we expected
 [alias] Warning: DEBUG return stmt of f1 not in table
 [alias] Warning: Analysis is continuing but will not be sound
+[alias] Skiping while (1) {
+            idata = tmp->t1[*(tmp->n1)];
+            odata = tmp->t2[*(tmp->n2)];
+            idx = 0;
+            while (idx < 10) {
+              *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
+              idx ++;
+            }
+            swap(tmp->n2);
+          } (doStmt not implemented)
 [alias] Skipping assignment idata = tmp->t1[*(tmp->n1)] (not implemented)
 [alias] Skipping assignment odata = tmp->t2[*(tmp->n2)] (not implemented)
+[alias] Skiping while (idx < 10) {
+            *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
+            idx ++;
+          } (doStmt not implemented)
 [alias] DEBUG: call function - formal variable not as we expected
 [alias] Skipping assignment idata = tmp->t1[*(tmp->n1)] (not implemented)
 [alias] Skipping assignment idata = tmp->t1[*(tmp->n1)] (not implemented)
 [alias] Skipping assignment odata = tmp->t2[*(tmp->n2)] (not implemented)
 [alias] Skipping assignment odata = tmp->t2[*(tmp->n2)] (not implemented)
+[alias] Skiping while (idx < 10) {
+            *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
+            idx ++;
+          } (doStmt not implemented)
+[alias] Skiping if (! (idx < 10)) break; (doStmt not implemented)
 [alias] Skipping assignment *(odata + idx) = (double)3 * *(idata + idx) + (double)1 (BUG do_assignment 2)
 [alias] Skipping assignment *(odata + idx) = (double)3 * *(idata + idx) + (double)1 (BUG do_assignment 2)
 [alias] Skipping assignment *(odata + idx) = (double)3 * *(idata + idx) + (double)1 (BUG do_assignment 2)
+[alias] Skiping break; (doStmt not implemented)
 [alias] DEBUG: call function - formal variable not as we expected
 [alias] DEBUG: call function - formal variable not as we expected
 [alias] Warning: DEBUG return stmt of f2 not in table
 [alias] Warning: Analysis is continuing but will not be sound
+[alias] Skiping while (i < 2) {
+            a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
+            a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double));
+            i ++;
+          } (doStmt not implemented)
+[alias] Skiping if (! (i < 2)) break; (doStmt not implemented)
 [alias] Skipping assignment a->t1[i] = malloc() (not implemented)
 [alias] Skipping assignment a->t2[i] = malloc() (not implemented)
 [alias] Skipping assignment a->t1[i] = malloc() (not implemented)
 [alias] Skipping assignment a->t1[i] = malloc() (not implemented)
 [alias] Skipping assignment a->t2[i] = malloc() (not implemented)
 [alias] Skipping assignment a->t2[i] = malloc() (not implemented)
+[alias] Skiping break; (doStmt not implemented)
 [alias] Skipping assignment a->n1 = malloc() (not implemented)
 [alias] Skipping assignment a->n1 = malloc() (not implemented)
 [alias] Skipping assignment a->n2 = malloc() (not implemented)
 [alias] Skipping assignment a->n2 = malloc() (not implemented)
+[alias] Skiping while (i < 2) {
+            b->t1[i] = a->t1[i];
+            b->t2[i] = a->t2[i];
+            i ++;
+          } (doStmt not implemented)
+[alias] Skiping if (! (i < 2)) break; (doStmt not implemented)
 [alias] Skipping assignment b->t1[i] = a->t1[i] (not implemented)
 [alias] Skipping assignment b->t2[i] = a->t2[i] (not implemented)
 [alias] Skipping assignment b->t1[i] = a->t1[i] (not implemented)
 [alias] Skipping assignment b->t1[i] = a->t1[i] (not implemented)
 [alias] Skipping assignment b->t2[i] = a->t2[i] (not implemented)
 [alias] Skipping assignment b->t2[i] = a->t2[i] (not implemented)
+[alias] Skiping break; (doStmt not implemented)
 [alias] Skipping assignment b->n1 = a->n1 (not implemented)
 [alias] Skipping assignment b->n1 = a->n1 (not implemented)
 [alias] Skipping assignment b->n2 = a->n2 (not implemented)
 [alias] Skipping assignment b->n2 = a->n2 (not implemented)
+[alias] Skiping return __retres; (doStmt not implemented)
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   <end of list>
+[alias] Skiping if (*n == 1) *n = 0; else (*n) ++; (doStmt not implemented)
 [alias] Functions done
 Before statement b->t1[i] = a->t1[i]; :
  <list of may-alias>

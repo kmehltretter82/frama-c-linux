@@ -2,6 +2,8 @@
 [kernel:typing:implicit-function-declaration] function2.c:5: Warning: 
   Calling undeclared function malloc. Old style K&R code?
 [alias] Parsing done
+[alias] Skiping return res; (doStmt not implemented)
+[alias] Skiping return __retres; (doStmt not implemented)
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   <end of list>

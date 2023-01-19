@@ -1,5 +1,14 @@
 [kernel] Parsing function3.c (with preprocessing)
 [alias] Parsing done
+[alias] Skiping while (1) {
+            x = y;
+            y = tmp;
+            break;
+          } (doStmt not implemented)
+[alias] Skiping break; (doStmt not implemented)
+[alias] Skiping break; (doStmt not implemented)
+[alias] Skiping return __retres; (doStmt not implemented)
+[alias] Skiping return __retres; (doStmt not implemented)
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   { a; b } are aliased

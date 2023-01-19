@@ -190,7 +190,7 @@ struct
     match s.skind with
       Instr i -> doInstr s i a
     | Block b -> process_Block b a
-    | _ -> a
+    | _ -> (Options.feedback "Skiping @[%a@] (doStmt not implemented)" Stmt.pretty s; a)
 
   and process_Block b a =
     List.fold_left
