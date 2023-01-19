@@ -27,7 +27,7 @@
 (menhir
   (modules logic_parser)
   ; "--fixed-exception" fixes compatibility with ocamlyacc Parsing.Parse_error
-  (flags --fixed-exception --explain --dump --comment)
+  (flags :standard --fixed-exception --explain --dump --comment)
 )
 
 (menhir
