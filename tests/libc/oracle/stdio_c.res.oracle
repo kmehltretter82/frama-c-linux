@@ -302,15 +302,11 @@
 [eva] Done for function fgetc
 [eva] Recording results for getchar
 [eva] Done for function getchar
-[eva:alarm] stdio_c.c:47: Warning: check 'must_be_unknown' got status unknown.
-[eva:alarm] stdio_c.c:48: Warning: check 'must_be_unknown' got status unknown.
-[eva:alarm] stdio_c.c:49: Warning: assertion got status unknown.
-[eva] stdio_c.c:50: Reusing old results for call to fgetc
-[eva:alarm] stdio_c.c:51: Warning: check 'must_be_unknown' got status unknown.
-[eva:alarm] stdio_c.c:52: Warning: check 'must_be_unknown' got status unknown.
-[eva:alarm] stdio_c.c:53: Warning: assertion got status unknown.
+[eva] stdio_c.c:47: Frama_C_show_each_getchar: [-1..255]
+[eva] stdio_c.c:48: Reusing old results for call to fgetc
+[eva] stdio_c.c:49: Frama_C_show_each_fgetc: [-1..255]
 [eva] computing for function fgets <- main.
-  Called from stdio_c.c:55.
+  Called from stdio_c.c:51.
 [eva] computing for function Frama_C_interval <- fgets <- main.
   Called from FRAMAC_SHARE/libc/stdio.c:136.
 [eva] FRAMAC_SHARE/libc/stdio.c:136: 
@@ -360,7 +356,7 @@
   out of bounds write. assert \valid(s + i);
 [eva] Recording results for fgets
 [eva] Done for function fgets
-[eva:alarm] stdio_c.c:57: Warning: 
+[eva:alarm] stdio_c.c:53: Warning: 
   assertion 'at_least_one_char' got status unknown.
 [eva] Recording results for main
 [eva] done for function main
@@ -421,7 +417,7 @@
   len ∈ [0..2147483647]
   total_len ∈ [--..--]
   read ∈ {-1} or UNINITIALIZED
-  c ∈ [-1..127]
+  c ∈ [-1..255]
   buf[0..8] ∈ [--..--] or UNINITIALIZED
      [9] ∈ {0} or UNINITIALIZED
   r_1 ∈ {{ NULL ; &buf[0] }}

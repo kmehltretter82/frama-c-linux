@@ -8590,23 +8590,25 @@ int opterr = 1;
 int getopt(int argc, char * const *argv, char const *optstring)
 {
   int __retres;
-  int tmp_0;
-  size_t tmp;
-  int tmp_2;
-  char tmp_1;
+  int tmp_1;
+  size_t tmp_0;
+  int tmp_3;
+  unsigned char tmp_2;
   if (argc == 0) {
     __retres = -1;
     goto return_label;
   }
-  optind = Frama_C_interval(1,argc - 1);
-  tmp = strlen((char const *)*(argv + optind));
-  tmp_0 = Frama_C_interval(0,(int)(tmp - (size_t)1));
-  ;
+  int nondet_ind = Frama_C_interval(1,argc - 1);
+  tmp_0 = strlen((char const *)*(argv + nondet_ind));
+  tmp_1 = Frama_C_interval(0,(int)tmp_0);
+  int nondet_indlen = tmp_1;
   optarg = (char *)Frama_C_nondet_ptr((void *)0,
-                                      (void *)(*(argv + optind) + tmp_0));
-  tmp_1 = Frama_C_char_interval((char)(-128),(char)127);
-  tmp_2 = Frama_C_nondet(-1,(int)tmp_1);
-  __retres = tmp_2;
+                                      (void *)(*(argv + nondet_ind) + (
+                                               nondet_indlen - 1)));
+  optind = Frama_C_interval(1,argc + 1);
+  tmp_2 = Frama_C_unsigned_char_interval((unsigned char)0,(unsigned char)255);
+  tmp_3 = Frama_C_nondet(-1,(int)tmp_2);
+  __retres = tmp_3;
   return_label: return __retres;
 }
 

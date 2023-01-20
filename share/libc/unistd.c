@@ -35,9 +35,11 @@ int getopt(int argc, char * const argv[], const char *optstring) {
   if (argc == 0) {
     return -1;
   }
-  optind = Frama_C_interval(1, argc - 1);
-  optarg = Frama_C_nondet_ptr(0, &argv[optind][Frama_C_interval(0, strlen(argv[optind])-1)]);
-  return Frama_C_nondet(-1, Frama_C_char_interval(CHAR_MIN, CHAR_MAX));
+  int nondet_ind = Frama_C_interval(1, argc - 1);
+  int nondet_indlen = Frama_C_interval(0, strlen(argv[nondet_ind]));
+  optarg = Frama_C_nondet_ptr(0, &argv[nondet_ind][nondet_indlen-1]);
+  optind = Frama_C_interval(1, argc + 1);
+  return Frama_C_nondet(-1, Frama_C_unsigned_char_interval(0, UCHAR_MAX));
 }
 
 __POP_FC_STDLIB
