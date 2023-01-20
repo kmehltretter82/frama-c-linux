@@ -91,7 +91,7 @@ type memory = { read : Zone.t ; written : Zone.t }
 type return = { standard : Value.t }
 
 module State = struct
-  type state' =
+  type state =
     { threads : MtThread.Register.t
     ; mutexes : MtMutex.Register.t
     ; memory  : memory
@@ -115,8 +115,8 @@ module State = struct
     ; results = BuiltinsResults.top
     }
 
-  module State' = Datatype.Make_with_collections (struct
-      type t = state'
+  include Datatype.Make_with_collections (struct
+      type t = state
       let name = "Mthread.state"
       let reprs = [ default ; top ]
 
@@ -171,18 +171,10 @@ module State = struct
       let mem_project = Datatype.never_any_project
     end)
 
-  module StateInfos = struct
-    let name = "Mthread.state.hashconsed"
-    let dependencies = []
-    let initial_values = State'.reprs
-  end
-
-  include State_builder.Hashcons (State') (StateInfos)
-
-  let threads t = let { threads } = get t in threads
-  let mutexes t = let { mutexes } = get t in mutexes
-  let memory t = let { memory } = get t in memory
-  let return t = let { return } = get t in return
+  let threads t = t.threads
+  let mutexes t = t.mutexes
+  let memory t = t.memory
+  let return t = t.return
 end
 
 
@@ -198,10 +190,7 @@ let reset state =
 module Datatype_with_Lattice = struct
   include State
 
-  let top = hashcons top
-
   let is_included l r =
-    let l = get l and r = get r in
     MtThread.Register.is_included l.threads r.threads
     && MtMutex.Register.is_included l.mutexes r.mutexes
     && Zone.is_included l.memory.read r.memory.read
@@ -210,7 +199,6 @@ module Datatype_with_Lattice = struct
     && BuiltinsResults.is_included l.results r.results
 
   let join l r =
-    let l = get l and r = get r in
     let threads = MtThread.Register.join l.threads r.threads in
     let mutexes = MtMutex.Register.join l.mutexes r.mutexes in
     let read = Zone.join l.memory.read r.memory.read in
@@ -219,10 +207,9 @@ module Datatype_with_Lattice = struct
     let standard = Value.join l.return.standard r.return.standard in
     let return = { standard } in
     let results = BuiltinsResults.join l.results r.results in
-    hashcons { threads ; mutexes ; memory ; return ; results }
+    { threads ; mutexes ; memory ; return ; results }
 
   let widen _ _ pre post =
-    let pre = get pre and post = get post in
     let threads = MtThread.Register.join pre.threads post.threads in
     let mutexes = MtMutex.Register.join pre.mutexes post.mutexes in
     let read = Locations.Zone.join pre.memory.read post.memory.read in
@@ -231,11 +218,10 @@ module Datatype_with_Lattice = struct
     let standard = Value.widen pre.return.standard post.return.standard in
     let return = { standard } in
     let results = BuiltinsResults.join pre.results post.results in
-    hashcons { threads ; mutexes ; memory ; return ; results }
+    { threads ; mutexes ; memory ; return ; results }
 
   let narrow l r =
     let open Lattice_bounds.Bottom.Operators in
-    let l = get l and r = get r in
     let threads = MtThread.Register.narrow l.threads r.threads in
     let mutexes = MtMutex.Register.narrow l.mutexes r.mutexes in
     let read = Zone.narrow l.memory.read r.memory.read in
@@ -244,7 +230,7 @@ module Datatype_with_Lattice = struct
     let standard = Value.narrow l.return.standard r.return.standard in
     let return = { standard } in
     let+ results = BuiltinsResults.narrow l.results r.results in
-    hashcons { threads ; mutexes ; memory ; return ; results }
+    { threads ; mutexes ; memory ; return ; results }
 end
 
 
@@ -256,7 +242,6 @@ module Cache = struct
   let copy () = copy cache
   let reset () = reset cache
   let merge l r =
-    let l = get l and r = get r in
     let threads = MtThread.Register.narrow l.threads r.threads in
     let mutexes = MtMutex.Register.narrow l.mutexes r.mutexes in
     let read = Zone.join l.memory.read r.memory.read in
@@ -265,7 +250,7 @@ module Cache = struct
     let standard = Value.join l.return.standard r.return.standard in
     let return = { standard } in
     let results = BuiltinsResults.join l.results r.results in
-    hashcons { threads ; mutexes ; memory ; return ; results }
+    { threads ; mutexes ; memory ; return ; results }
   let add stmt state =
     match find_opt cache stmt with
     | None -> add cache stmt state
@@ -278,7 +263,7 @@ end
 module Queries = struct
   let extract_expr ~oracle:_ _ _ _ = `Value (Value.top, None), Alarmset.all
   let extract_lval ~oracle:_ _ state lval _ =
-    let State.{ results } = State.get state in
+    let State.{ results } = state in
     let value =
       match lval.node with
       | Var var, NoOffset -> BuiltinsResults.read var results
@@ -294,7 +279,7 @@ module Transfer = struct
 
   module Builtins = Datatype.String.Hashtbl
   type builtin =
-    elt -> Cil_types.stmt -> (Value.t * exp) list -> (elt * Value.t) Result.t
+    t -> Cil_types.stmt -> (Value.t * exp) list -> (t * Value.t) Result.t
   let builtins : builtin Builtins.t = Builtins.create 17
   let find_builtin name = Builtins.find_opt builtins name
   let add_builtin name f = Builtins.add builtins name f
@@ -351,27 +336,27 @@ module Transfer = struct
     match kinstr with
     | Cil_types.Kglobal -> `Value state
     | Kstmt stmt ->
-      let { memory ; return } as state = reset state in
+      let { memory ; return } = reset state in
       let return = assign_return lval (Eval.value_assigned assigned) return in
       let memory = assign_memory lval exp valuation memory in
-      let state = hashcons { state with memory ; return } in
+      let state = { state with memory ; return } in
       Cache.save stmt state
 
   let assume stmt exp _ valuation state =
     let to_loc = loc_of_lval valuation in
-    let { memory } as state = reset state in
+    let { memory } = reset state in
     let read_zone = Eva_ast.zone_of_exp to_loc exp |> keep_globals_only in
     let read = Locations.Zone.join memory.read read_zone in
-    let state = hashcons { state with memory = { memory with read } } in
+    let state = { state with memory = { memory with read } } in
     Cache.save stmt state
 
   let start_call stmt call _ valuation state =
-    let { memory } as state = reset state in
+    let { memory } = reset state in
     let var = Eva_ast.Build.var in
     let assign varinfo exp = assign_memory (var varinfo) exp valuation in
     let f s { formal ; concrete } = assign formal concrete s in
     let memory = List.fold_left f memory call.arguments in
-    let state = hashcons { state with memory } in
+    let state = { state with memory } in
     Cache.save stmt state
 
   let map_non_bottom f xs =
@@ -382,7 +367,7 @@ module Transfer = struct
   let finalize_call stmt call _ ~pre:_ ~post =
     let name = Kernel_function.get_name call.kf in
     match find_builtin name with
-    | None -> Cache.save stmt (hashcons post)
+    | None -> Cache.save stmt post
     | Some f ->
       let open Lattice_bounds.Bottom.Operators in
       let extract_arg arg = arg.concrete, arg.avalue in
@@ -392,14 +377,13 @@ module Transfer = struct
       let error = (post, Value.top) in
       let (state, ret) = f post stmt params |> Result.log ~error in
       let results = BuiltinsResults.write call.return ret state.results in
-      hashcons { state with results } |> Cache.save stmt
+      { state with results } |> Cache.save stmt
 
 end
 
 
 
 module Domain = struct
-  type state = State.t
   type value = Value.t
   type location = Precise_locs.precise_location
   type origin = unit
@@ -412,7 +396,7 @@ module Domain = struct
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
 
-  let empty () = hashcons default
+  let empty () = default
   let logic_assign _ _ state = state
   let initialize_variable _ _ ~initialized:_ _ state = state
   let initialize_variable_using_type _ _ state  = state
@@ -429,14 +413,12 @@ module Domain = struct
     Cache.iter pp Cache.cache
 
   let enter_scope kind vars state =
-    let state = get state in
     let results = BuiltinsResults.enter_scope kind vars state.results in
-    hashcons { state with results }
+    { state with results }
 
   let leave_scope kf vars state =
-    let state = get state in
     let results = BuiltinsResults.leave_scope kf vars state.results in
-    hashcons { state with results }
+    { state with results }
 
   let build_args name func formals params =
     let zip formal (param, _) = (formal, param) in
