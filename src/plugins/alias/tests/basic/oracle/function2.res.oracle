@@ -1,6 +1,4 @@
 [kernel] Parsing function2.c (with preprocessing)
-[kernel:typing:implicit-function-declaration] function2.c:5: Warning: 
-  Calling undeclared function malloc. Old style K&R code?
 [alias] Parsing done
 [alias] Skiping return res; (doStmt not implemented)
 [alias] Skiping return __retres; (doStmt not implemented)
@@ -8,21 +6,20 @@
   <list of may-alias>
   <end of list>
 [alias] Functions done
-Before statement tmp = malloc(size); :
+Before statement int *res = (int *)0; :
  <list of may-alias>
 <end of list>
 
-Before statement tmp = malloc(size); :
+Before statement int *res = (int *)0; :
  <list of may-alias>
 <end of list>
 
-Before statement int *res = (int *)tmp; :
+Before statement res = (int *)malloc((size_t)size); :
  <list of may-alias>
 <end of list>
 
 Before statement return res; :
  <list of may-alias>
-{ res; tmp } are aliased
 <end of list>
 
 Before statement int *a = (int *)0; :

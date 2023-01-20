@@ -1,8 +1,10 @@
 // malloc
 // no alias
+#include <stdlib.h>
 
 int* my_malloc(int size) {
-  int* res= malloc(size);
+  int* res=0;
+  res = malloc(size);
   return res;
 }
 

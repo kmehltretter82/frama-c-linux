@@ -51,8 +51,12 @@ let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_functi
 
 let fold_aliases_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
   check_computed ();
-  let s = Kernel_function.find_return kf in
-  fold_new_aliases_stmt f_fold acc kf s lv
+  if Kernel_function.has_definition kf
+  then
+    let s = Kernel_function.find_return kf in
+    fold_new_aliases_stmt f_fold acc kf s lv
+  else
+    Options.abort "fold_aliases_kf: function %a has no definition" Kernel_function.pretty kf
 
 let fold_fundec_stmts (f_fold: 'a -> stmt -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
   check_computed ();
@@ -81,8 +85,6 @@ let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
   | Some state ->
     let setv1 = Abstract_state.find_aliases lv1 state in
     LSet.mem lv2 setv1
-
-
 
 let fold_points_to   (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();

@@ -866,8 +866,13 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
         let v_res,new_state  = find_or_create_vertex res new_state in
         match find_basic_lval exp_res with
           BLval lval_exp_res ->
-          let v_exp_res =  LMap.find lval_exp_res new_state.lmap in
-          join new_state v_res v_exp_res
+          begin
+            try
+              let v_exp_res =  LMap.find lval_exp_res new_state.lmap in
+              join new_state v_res v_exp_res
+            with
+              Not_found -> (Options.feedback ~level:2 "result expression %a does not appear in the summary of the called function (ressult not assigned)" Lval.pretty lval_exp_res; new_state)
+          end
         | _ -> new_state
       end
     | (Some _, None) -> (Options.warning "a function with no return is employed in an assignment" ; new_state)
