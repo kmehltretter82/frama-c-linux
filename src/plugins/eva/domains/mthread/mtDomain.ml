@@ -34,20 +34,11 @@ let current, set_current =
 
 
 module BuiltinsResults = struct
-  module Lval = struct
-    include State_builder.Hashcons (Eva_ast.Lval) (struct
-        let name = "Mthread.builtins.results.key"
-        let dependencies = []
-        let initial_values = []
-      end)
-    let var v = Eva_ast.Build.var v |> hashcons
-  end
-
   module Info = struct
     let initial_values = [ ]
-    let dependencies = [ ]
+    let dependencies = [ Ast.self ]
   end
-  include Hptmap.Make (Lval) (Value) (Info)
+  include Hptmap.Make (Cil_datatype.Varinfo_Id) (Value) (Info)
   let cache_name s = Hptmap_sig.PersistentCache (name ^ "." ^ s)
 
   let top = empty
@@ -76,22 +67,21 @@ module BuiltinsResults = struct
     match kind with
     | Global | Formal _ | Local _ -> returns
     | Result _ ->
-      let write returns var = add (Lval.var var) Value.top returns in
+      let write returns var = add var Value.top returns in
       List.fold_left write returns vars
 
   let leave_scope _ vars returns =
-    let remove returns var = remove (Lval.var var) returns in
+    let remove returns var = remove var returns in
     List.fold_left remove returns vars
 
   let write return value returns =
     match return with
     | None -> returns
-    | Some return ->
-      let lval = Lval.var return in
-      if mem lval returns then add lval value returns else returns
+    | Some var ->
+      if mem var returns then add var value returns else returns
 
-  let read return returns =
-    try find (Lval.hashcons return) returns
+  let read var returns =
+    try find var returns
     with Not_found -> Value.top
 end
 
@@ -289,7 +279,12 @@ module Queries = struct
   let extract_expr ~oracle:_ _ _ _ = `Value (Value.top, None), Alarmset.all
   let extract_lval ~oracle:_ _ state lval _ =
     let State.{ results } = State.get state in
-    `Value (BuiltinsResults.read lval results, None), Alarmset.all
+    let value =
+      match lval.node with
+      | Var var, NoOffset -> BuiltinsResults.read var results
+      | _ -> Value.top
+    in
+    `Value (value, None), Alarmset.all
 end
 
 
