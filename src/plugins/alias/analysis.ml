@@ -103,6 +103,14 @@ let rec do_init vi init state = match init with
   | CompoundInit(_, l) ->
     List.fold_left (fun state (_, init) -> do_init vi init state) state l
 
+let list_instr_warnings : stmt list ref = ref []
+
+let feedback_only_once s =
+  if not (List.mem s !list_instr_warnings) then
+    begin
+      list_instr_warnings := s::!list_instr_warnings;
+      Options.feedback "Skiping @[%a@] (summary not found)" Stmt.pretty s
+    end
 
 let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   match i with
@@ -137,7 +145,7 @@ let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t 
       | (Some a, Some summary) ->
         let new_a = Abstract_state.call a res es summary in
         Some new_a
-      | (Some a, None) -> (Options.feedback "Skiping @[%a@] (summary not found)" Stmt.pretty s; Some a)
+      | (Some a, None) -> (feedback_only_once s; Some a)
     end
   | _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
 
