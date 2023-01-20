@@ -55,7 +55,9 @@ module BuiltinsResults = struct
   let narrow =
     let cache = cache_name "narrow" in
     let decide _ = Value.narrow in
-    fun l r -> `Value (join ~cache ~symmetric:true ~idempotent:true ~decide l r)
+    join ~cache ~symmetric:true ~idempotent:true ~decide
+
+  let narrow l r = `Value (narrow l r)
 
   let join =
     let cache = cache_name "join" in

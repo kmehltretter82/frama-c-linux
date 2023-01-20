@@ -350,12 +350,12 @@ module Register (Key : Key_sig) (Status : Status_sig) = struct
   let narrow =
     let cache = cache_name "narrow" in
     let decide _ x y = Status.join x y in
-    fun x y -> join ~cache ~symmetric:true ~idempotent:true ~decide x y
+    join ~cache ~symmetric:true ~idempotent:true ~decide
 
   (* Join of two registers. It only keeps keys registered on both sides and
      their statuses are joined. *)
   let join =
     let cache = cache_name "join" in
     let decide _ x y = Some (Status.join x y) in
-    fun x y -> inter ~cache ~symmetric:true ~idempotent:true ~decide x y
+    inter ~cache ~symmetric:true ~idempotent:true ~decide
 end
