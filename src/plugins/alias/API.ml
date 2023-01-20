@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C plug-in 'Alias' (alias).             *)
 (*                                                                        *)
-(*  Copyright (C) 2022-2022                                               *)
+(*  Copyright (C) 2022-2023                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,26 +22,85 @@
 
 open Cil_types
 
-let fold_aliases_stmt:
-  ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a =
-  function _ ->  failwith "not implemented"
+open Cil_datatype
 
-let fold_new_aliases_stmt:
-  ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a =
-  function _ -> failwith "not implemented"
+module LSet = Lval.Set
 
-let fold_aliases_kf:
-  ('a -> lval -> 'a) -> 'a -> kernel_function -> lval -> 'a =
-  function _ -> failwith "not implemented"
+let check_computed () =
+  if not (Analysis.is_computed ())
+  then
+    Options.abort "Static analysis must be called before any function of the API can be called"
 
-let fold_fundec_stmts _ =
-  failwith "not implemented"
 
-let are_aliased  _ =
-  failwith "not implemented"
+let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+  check_computed ();
+  match Analysis.get_abstract_state kf s with
+    None -> acc
+  | Some state ->
+    let set_aliases = Abstract_state.find_aliases lv state in
+    LSet.fold (fun e a -> f_fold a e) set_aliases acc
 
-let fold_points_to _ =
-  failwith "not implemented"
+let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =
+  check_computed ();
+  match Analysis.get_abstract_state kf s with
+    None -> acc
+  | Some state ->
+    let new_state = Analysis.do_stmt state s in
+    let set_aliases = Abstract_state.find_aliases lv new_state in
+    LSet.fold (fun e a -> f_fold a e) set_aliases acc
 
-let fold_points_to_closure  _ =
-  failwith "not implemented"
+let fold_aliases_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
+  check_computed ();
+  if Kernel_function.has_definition kf
+  then
+    let s = Kernel_function.find_return kf in
+    fold_new_aliases_stmt f_fold acc kf s lv
+  else
+    Options.abort "fold_aliases_kf: function %a has no definition" Kernel_function.pretty kf
+
+let fold_fundec_stmts (f_fold: 'a -> stmt -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
+  check_computed ();
+  if Kernel_function.has_definition kf
+  then
+    let f_dec = Kernel_function.get_definition kf in
+    let list_stmt = f_dec.sallstmts in
+    List.fold_left
+      (fun acc s ->
+         fold_new_aliases_stmt
+           (fun a lv -> f_fold a s lv)
+           acc
+           kf
+           s
+           lv
+      )
+      acc
+      list_stmt
+  else
+    Options.abort "fold_dundec_stmts: function %a has no definition" Kernel_function.pretty kf
+
+let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
+  check_computed ();
+  match Analysis.get_abstract_state kf s with
+    None -> false
+  | Some state ->
+    let setv1 = Abstract_state.find_aliases lv1 state in
+    LSet.mem lv2 setv1
+
+let fold_points_to   (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+  check_computed ();
+  match Analysis.get_abstract_state kf s with
+    None -> acc
+  | Some state ->
+    let set_aliases = Abstract_state.find_aliases lv state in
+    f_fold acc set_aliases
+
+let fold_points_to_closure  (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+  check_computed ();
+  match Analysis.get_abstract_state kf s with
+    None -> acc
+  | Some state ->
+    let list_closure = Abstract_state.find_transitive_closure lv state in
+    List.fold_left
+      f_fold
+      acc
+      list_closure

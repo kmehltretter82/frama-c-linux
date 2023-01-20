@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of the Frama-C plug-in 'Alias' (alias).             *)
 (*                                                                        *)
-(*  Copyright (C) 2022-2022                                               *)
+(*  Copyright (C) 2022-2023                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,11 +20,343 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+open Cil_datatype
+open Utils
+
+module Dataflow = Dataflow2
+
+module type Table = sig
+  type key
+  type value
+  val find: key -> value
+  (** @raise Not_found if the key is not in the table. *)
+end
+
+module type InternalTable  = sig
+  include Table
+  val add : key -> value -> unit
+  val iter : (key -> value -> unit) -> unit
+  val clear : unit -> unit
+end
+
+
+module Make_table(H: Hashtbl.S)(V: sig type t val size :int end) : InternalTable with type key = H.key and type value = V.t = struct
+  type key = H.key
+  type value = V.t
+  let tbl = H.create V.size
+  let add = H.add tbl
+  let find = H.find tbl
+  let iter f =
+    H.iter f tbl
+  let clear () = H.clear tbl
+end
+
+module A = struct type t = Abstract_state.t option let size = 7 end
+module R = struct type t = Abstract_state.summary option let size = 7 end
+
+module Stmt_table = Make_table(Cil_datatype.Stmt.Hashtbl)(A)
+module Function_table = Make_table(Kernel_function.Hashtbl)(R)
+
+let function_compute_ref = Extlib.mk_fun "function_compute"
+
+
+(* functions from abtract_state, exended to options *)
+let union a1 a2 =
+  match a1,a2 with
+    None, None -> None
+  | None, _ -> a2
+  | _, None -> a1
+  | Some a1, Some a2 -> Some (Abstract_state.union a1 a2)
+
+module D = Dataflow.StartData(A)
+
+let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
+  (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)
+  match (a,lv, find_basic_lval exp) with
+    (Some a, (Var v1, NoOffset), BLval (Var v2,NoOffset)) ->
+    (* case x = y *)
+    Some (Abstract_state.assignment_x_y a (Var v1, NoOffset) (Var v2, NoOffset))
+  (* constant assignments : do nothing, but maybe check the type of the assigned variable ? *)
+  | (_, (Var _, NoOffset), BNone) -> a
+  (* arithmetic operations: either do nothing (normal arithmetic) or returns top (pointer arithmetic) *)
+  | (Some a, (Var v1, NoOffset), BAddrOf lv2) ->
+    (* case x = &y *)
+    Some (Abstract_state.assignment_x_addr_y a (Var v1, NoOffset) lv2)
+  | (Some a, (Var v1, NoOffset), BLval (Mem e2, NoOffset)) ->
+    (* case x  = *y *)
+    begin
+      match e2.enode with
+        Lval lv2 -> Some (Abstract_state.assignment_x_ptr_y a (Var v1, NoOffset) lv2)
+      |  _ -> failwith " do_assignment not implemented 1"
+    end
+  | (Some a, (Mem e1, NoOffset), BLval lv2) ->
+    (* case *x = y *)
+    begin
+      match e1.enode with
+        Lval lv1 -> Some (Abstract_state.assignment_ptr_x_y a lv1 lv2)
+      |  _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (BUG do_assignment 2)" Lval.pretty lv Exp.pretty exp; Some a) (* failwith " do_assignment not implemented 2" *)
+    end
+  (* cases *x = cst *)
+  | (Some a, (Mem e1, NoOffset), BNone) ->
+    begin
+      match e1.enode with
+        Lval lv1 -> Some (Abstract_state.assignment_ptr_x_cst a lv1)
+      |  _ -> Options.feedback "Ingnoring assignment %a = %a (do_assignment  not implemented 3)@." Lval.pretty lv Exp.pretty exp; Some a
+    end
+  | (None, _, _) -> None
+  | _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (not implemented)" Lval.pretty lv Exp.pretty exp; a)
+
+let rec do_init vi init state = match init with
+  | SingleInit e -> do_assignment state (Var vi, NoOffset) e
+  | CompoundInit(_, l) ->
+    List.fold_left (fun state (_, init) -> do_init vi init state) state l
+
+let list_instr_warnings : stmt list ref = ref []
+
+let feedback_only_once s =
+  if not (List.mem s !list_instr_warnings) then
+    begin
+      list_instr_warnings := s::!list_instr_warnings;
+      Options.feedback "Skiping @[%a@] (summary not found)" Stmt.pretty s
+    end
+
+let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
+  match i with
+    Set(lv,exp,_) ->
+    let new_a = do_assignment a lv exp in
+    new_a
+  | Local_init(v,AssignInit i,_) ->
+    let new_a = do_init v i a in
+    new_a
+  | Code_annot _ -> a
+  | Skip _ -> a
+  (* special case for malloc *)
+  | Call(res,{enode=Lval (Var info, _);_},_,_) when info.vname = "malloc"  ->
+    begin
+      match (a,res) with
+        (None, _) -> None
+      | (Some a,None) -> (Options.feedback "Warning : malloc not stored (ignored)"; Some a)
+      | (Some a, Some  (Var v1, NoOffset)) -> Some (Abstract_state.assignment_x_allocate_y a  (Var v1, NoOffset))
+      | (Some a, Some lv) -> (Options.feedback "Skipping assignment @[%a@] = malloc() (not implemented)" Lval.pretty lv; Some a)
+    end
+  (* general case for calls *)
+  | Call(res,ef,es,(loc,_)) -> (* !function_compute_ref ef *)
+    begin
+      let summary = match Kernel_function.get_called ef with
+        | Some kf -> (try Function_table.find kf
+                      with Not_found -> !function_compute_ref kf ; Function_table.find kf)
+        | None -> Options.abort ~source:loc
+                    "Unsupported function pointer (skipped)"
+      in
+      match (a, summary) with
+        (None, _) -> None
+      | (Some a, Some summary) ->
+        let new_a = Abstract_state.call a res es summary in
+        Some new_a
+      | (Some a, None) -> (feedback_only_once s; Some a)
+    end
+  | _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
+
+
+
+
+module T =
+struct
+
+  let name = "alias"
+
+  let debug = true (* TODO see options *)
+
+  type t = Abstract_state.t option
+
+  module StmtStartData = D
+
+  let copy x = x (* we only have persistant data *)
+
+  let pretty fmt state =
+    match state with
+    | None -> Format.fprintf fmt "None"
+    | Some s -> Format.fprintf fmt "%a" (Abstract_state.pretty ~debug:false) s
+
+  (* let pretty_debug fmt state =
+   *   match state with
+   *   | None -> Format.fprintf fmt "None"
+   *   | Some s -> Format.fprintf fmt "%a" (Abstract_state.pretty ~debug:true) s *)
+
+  let  computeFirstPredecessor _ a = a
+
+  let combinePredecessors stmt ~old state =
+    match stmt.skind, old, state with
+    | _, _, None -> assert false
+    | _, None, Some _ -> Some state (* [old] already included in [state] *)
+    | _, Some old, Some new_ ->
+      if Abstract_state.equal old new_ then
+        None
+      else
+        Some (Some (Abstract_state.union old new_))
+
+  let doInstr = do_instr
+
+  let doGuard _ _ a =
+    Dataflow.GUse a, Dataflow.GUse a
+
+  let rec process_Stmt (s:stmt) (a:t) : t =
+    (* register a before stmt *)
+    Stmt_table.add s a;
+    match s.skind with
+      Instr i -> doInstr s i a
+    | Block b -> process_block b a
+    | If (_,b1, b2, _ ) ->
+      let a1 = process_block b1 a
+      and a2 = process_block b2 a
+      in
+      union a1 a2
+    | Loop (_,b,_,_,_) -> process_block b a
+    | Return _ -> a
+    | _ -> (Options.feedback "Skiping @[%a@] (doStmt not implemented)" Stmt.pretty s; a)
+
+  and process_block b a =
+    List.fold_left
+      (fun acc s -> process_Stmt s acc)
+      a
+      b.bstmts
+
+  let doStmt (s:stmt) (a:t) =
+    Dataflow.SUse (process_Stmt s a)
+
+
+  let doEdge _ _ a = a
+end
+
+module  F = Dataflow.Forwards(T)
+
+let do_stmt (a: Abstract_state.t) (s:stmt) :  Abstract_state.t =
+  match s.skind with
+    Instr i ->
+    begin
+      match do_instr s i (Some a) with
+        None -> failwith "problem here"
+      | Some a -> a
+    end
+  | _ -> a
+
+let doFunction (kf:kernel_function) =
+  Options.feedback ~level:2 "entering in function %a."
+    Kernel_function.pretty kf;
+  if Kernel_function.has_definition kf then
+    begin
+      (* let print_key = Stmt.pretty in *)
+      let print_value fmt v =
+        match v with
+        | None -> Format.fprintf fmt "<Bot>"
+        | Some a -> Abstract_state.pretty fmt a
+      in
+      let first_stmts =
+        try [Kernel_function.find_first_stmt kf]
+        with Kernel_function.No_Statement -> []
+      in
+      List.iter (fun stmt -> T.StmtStartData.add stmt (Some Abstract_state.initial_value)) first_stmts;
+      F.compute first_stmts;
+      let return_stmt = Kernel_function.find_return kf in
+      let final_state : Abstract_state.t option =
+        try Stmt_table.find return_stmt
+        with
+          Not_found ->
+          begin
+            (* let f_dec = Kernel_function.get_definition kf in *)
+            Options.warning "DEBUG return stmt of %a not in table" Kernel_function.pretty kf;
+            (* List.iter
+             *   (fun k -> let v = try Stmt_table.find k with Not_found -> (Format.printf "%a is missing" print_key k ; None) in
+             *       Options.feedback "Before statement %a :@.@[<hov 2> %a@]@." print_key k print_value v
+             *   )
+             *   f_dec.sallstmts; *)
+            Options.warning "Analysis is continuing but will not be sound";
+            Some (Abstract_state.initial_value)
+          end
+      in
+      if not (Kernel_function.is_main kf) then
+        (* if main, do nothing *)
+        let summary: Abstract_state.summary =
+          Abstract_state.make_summary final_state kf
+        in
+        Function_table.add kf (Some summary)
+      else
+        (* if main, print the last abstract state *)
+        Options.feedback "May-aliases at the end of function main:@.%a@." print_value final_state
+    end
+  else
+    begin
+      (* summary by default *)
+      (* Options.warning "Function %a has no definition (summary empty)"
+       *   Kernel_function.pretty kf; *)
+      let summary: Abstract_state.summary =
+        Abstract_state.make_summary (Some Abstract_state.initial_value) kf
+      in
+      Function_table.add kf (Some summary)
+    end
+
+let () = function_compute_ref := doFunction
+
+let make_summary (state:Abstract_state.t) (kf:kernel_function) =
+  try
+    begin
+      match Function_table.find kf with
+        Some s -> (state, s)
+      | None -> failwith "not implemented"
+    end
+  with
+    Not_found ->
+    begin
+      doFunction kf;
+      match Function_table.find kf with
+        Some s -> (state, s)
+      | None -> failwith "not implemented"
+    end
+
+let computed_flag = ref false
+
+let is_computed () = !computed_flag
+
 let compute () =
-  failwith "not implemented"
+  Ast.compute();
+  Options.feedback "Parsing done";
+  Globals.Functions.iter doFunction;
+  Options.feedback "Functions done";
+  computed_flag := true;
+  let print_stmt_table_elt fmt k v :unit =
+    let print_key = Stmt.pretty in
+    let print_value fmt v =
+      match v with
+      | None -> Format.fprintf fmt "<Bot>"
+      | Some a -> Abstract_state.pretty fmt a
+    in
+    Format.fprintf fmt "Before statement %a :@.@[<hov 2> %a@]@." print_key k print_value v
+  in
+  let print_function_table_elt fmt kf s :unit =
+    let function_name =
+      Kernel_function.get_name kf
+    in
+    match s with
+      None -> Format.printf "DEBUG: function %s -> None@." function_name
+    | Some s -> Abstract_state.pretty_summary ~function_name fmt s
+  in
+  if Options.ShowStmtTable.get() then
+    Stmt_table.iter (print_stmt_table_elt Format.std_formatter);
+  if Options.ShowFunctionTable.get() then
+    begin
+      Function_table.iter (print_function_table_elt Format.std_formatter)
+    end
+
 
 let clear () =
-  failwith "not implemented"
+  computed_flag := false;
+  Stmt_table.clear()
 
-let get_abstract_state _ =
-  failwith "not implemented"
+let get_abstract_state _ stmt =
+  if is_computed ()
+  then
+    try Stmt_table.find stmt with
+      Not_found -> None
+  else
+    None
