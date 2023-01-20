@@ -60,6 +60,15 @@ module Function_table = Make_table(Kernel_function.Hashtbl)(R)
 
 let function_compute_ref = Extlib.mk_fun "function_compute"
 
+
+(* functions from abtract_state, exended to options *)
+let union a1 a2 =
+  match a1,a2 with
+    None, None -> None
+  | None, _ -> a2
+  | _, None -> a1
+  | Some a1, Some a2 -> Some (Abstract_state.union a1 a2)
+
 module D = Dataflow.StartData(A)
 
 let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
@@ -197,10 +206,16 @@ struct
     Stmt_table.add s a;
     match s.skind with
       Instr i -> doInstr s i a
-    | Block b -> process_Block b a
+    | Block b -> process_block b a
+    | If (_,b1, b2, _ ) ->
+      let a1 = process_block b1 a
+      and a2 = process_block b2 a
+      in
+      union a1 a2
+    | Loop (_,b,_,_,_) -> process_block b a
     | _ -> a (* Options.feedback "Skiping @[%a@] (doStmt not implemented)" Stmt.pretty s; a *)
 
-  and process_Block b a =
+  and process_block b a =
     List.fold_left
       (fun acc s -> process_Stmt s acc)
       a

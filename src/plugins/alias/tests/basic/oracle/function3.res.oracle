@@ -34,7 +34,19 @@ Before statement x = y;
                  y = tmp;
                  break; :
  <list of may-alias>
+{ x; y; tmp } are aliased
+<end of list>
+
+Before statement x = y;
+                 y = tmp;
+                 break; :
+ <list of may-alias>
 { x; tmp } are aliased
+<end of list>
+
+Before statement x = y; :
+ <list of may-alias>
+{ x; y; tmp } are aliased
 <end of list>
 
 Before statement x = y; :
@@ -53,6 +65,16 @@ Before statement y = tmp; :
 <end of list>
 
 Before statement y = tmp; :
+ <list of may-alias>
+{ x; y; tmp } are aliased
+<end of list>
+
+Before statement y = tmp; :
+ <list of may-alias>
+{ x; y; tmp } are aliased
+<end of list>
+
+Before statement break; :
  <list of may-alias>
 { x; y; tmp } are aliased
 <end of list>

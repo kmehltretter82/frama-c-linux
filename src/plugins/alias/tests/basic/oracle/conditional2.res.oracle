@@ -23,6 +23,16 @@ Before statement if (a) a = b; else a = & c; :
 
 Before statement a = b; :
  <list of may-alias>
+{ a; b } are aliased
+<end of list>
+
+Before statement a = b; :
+ <list of may-alias>
+<end of list>
+
+Before statement a = & c; :
+ <list of may-alias>
+{ a; b } are aliased
 <end of list>
 
 Before statement a = & c; :

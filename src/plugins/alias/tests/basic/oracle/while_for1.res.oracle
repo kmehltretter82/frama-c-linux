@@ -58,6 +58,26 @@ Before statement if (! (idx < 10)) break; :
  <list of may-alias>
 <end of list>
 
+Before statement if (! (idx < 10)) break; :
+ <list of may-alias>
+<end of list>
+
+Before statement if (! (idx < 10)) break; :
+ <list of may-alias>
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+<end of list>
+
 Before statement break; :
  <list of may-alias>
 <end of list>
@@ -67,6 +87,32 @@ Before statement {
                    tmp = malloc(idx);
                    s = (int *)tmp;
                  } :
+ <list of may-alias>
+<end of list>
+
+Before statement {
+                   int tmp;
+                   tmp = malloc(idx);
+                   s = (int *)tmp;
+                 } :
+ <list of may-alias>
+<end of list>
+
+Before statement {
+                   int tmp;
+                   tmp = malloc(idx);
+                   s = (int *)tmp;
+                 } :
+ <list of may-alias>
+<end of list>
+
+Before statement tmp = malloc(idx);
+                 s = (int *)tmp; :
+ <list of may-alias>
+<end of list>
+
+Before statement tmp = malloc(idx);
+                 s = (int *)tmp; :
  <list of may-alias>
 <end of list>
 
@@ -91,6 +137,14 @@ Before statement s = (int *)tmp; :
 Before statement idx ++; :
  <list of may-alias>
 { s; tmp } are aliased
+<end of list>
+
+Before statement idx ++; :
+ <list of may-alias>
+<end of list>
+
+Before statement idx ++; :
+ <list of may-alias>
 <end of list>
 
 Before statement __retres = 0; :

@@ -32,6 +32,12 @@ Before statement while (1) {
 Before statement a = b;
                  break; :
  <list of may-alias>
+{ a; b } are aliased
+<end of list>
+
+Before statement a = b;
+                 break; :
+ <list of may-alias>
 <end of list>
 
 Before statement a = b; :
@@ -41,6 +47,16 @@ Before statement a = b; :
 
 Before statement a = b; :
  <list of may-alias>
+{ a; b } are aliased
+<end of list>
+
+Before statement a = b; :
+ <list of may-alias>
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+{ a; b } are aliased
 <end of list>
 
 Before statement break; :
@@ -58,6 +74,13 @@ Before statement while (1) {
                    a = c;
                    break;
                  } :
+ <list of may-alias>
+{ a; b } are aliased
+<end of list>
+
+Before statement break;
+                 a = c;
+                 break; :
  <list of may-alias>
 { a; b } are aliased
 <end of list>
