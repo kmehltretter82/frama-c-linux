@@ -47,18 +47,20 @@ val pretty : ?debug:bool -> Format.formatter -> t -> unit
 (** dot printer *)
 val print_dot : string -> t -> unit
 
-(** finds the vertex corresponding to a lval. May raise Not_found *)
+(** finds the vertex corresponding to a lval. May raise @Not_found *)
 val find_vertex : lval -> t -> G.V.t
 
+(** same as previous function, but return a set of lval. Cannot raise
+    an exception but may return an empty set *)
 val find_aliases : lval -> t -> LSet.t
 
 (** find_aliases, then recursively finds other sets of lvals. We have
-    the property (if lv is in x) :
+    the property (if lval [lv] is in abstract state [x]) :
     List.hd (find_transitive_closure lv x) = find_aliases lv x
 *)
 val find_transitive_closure : lval -> t -> LSet.t list
 
-(** Functions for Steensgaard's algorithm *)
+(** Functions for Steensgaard's algorithm, see the paper *)
 val join : t -> G.V.t -> G.V.t -> t
 
 val cjoin : t -> G.V.t -> G.V.t -> t
@@ -78,7 +80,7 @@ val assignment_ptr_x_y : t -> lval -> lval -> t
 
 val assignment_ptr_x_cst : t -> lval -> t
 
-(** equality test *)
+(** equality test; currently, always returns true (to be fixed later) *)
 val equal : t -> t -> bool
 
 (** union of two abstract values ; ensures that if 2 lval are aliased
@@ -105,8 +107,10 @@ type summary =
     return : exp option
   }
 
+(** creates a sumary from a state and a function *)
 val make_summary : t option -> kernel_function -> summary
 
+(** pretty printer *)
 val pretty_summary :  ?debug:bool -> ?function_name:string -> Format.formatter -> summary -> unit
 
 (** [call a res args s] computes the abstract state after the

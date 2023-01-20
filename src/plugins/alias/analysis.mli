@@ -39,7 +39,8 @@ module Stmt_table: Table with type key = stmt and type value = Abstract_state.t 
 module Function_table:
   Table with type key = kernel_function and type value = Abstract_state.summary option
 
-(** [do_stmt a s] computes the abstract state after statement s  *)
+(** [do_stmt a s] computes the abstract state after statement s. This
+    function does NOT store the result in Stmt_table.  *)
 val do_stmt: t -> stmt -> t
 
 (** [make_summary a f] computes the summary of a function (and the
@@ -50,7 +51,7 @@ val make_summary: t -> kernel_function -> t * summary
 (** main analysis functions *)
 
 (** [compute ()] performs the may-alias analysis. It must be done once
-    before using the other functions of this module. *)
+    before using functions defined in API.ml *)
 val compute : unit -> unit
 
 (** [is_computed ()] returns true iff an analysis was done previously *)
@@ -61,5 +62,6 @@ val is_computed : unit -> bool
 val clear : unit -> unit
 
 (** [get_abstract_state f s] gets the abstract state computed after
-    statement [s] in function [f]. Returns [None] if the abstract state is bottom or not computed *)
+    statement [s] in function [f]. Uses Stmt_table. Returns [None] if
+    the abstract state is bottom or not computed *)
 val get_abstract_state :  kernel_function -> stmt -> Abstract_state.t option
