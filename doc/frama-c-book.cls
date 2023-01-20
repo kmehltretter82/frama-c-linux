@@ -110,6 +110,7 @@
 \newcommand{\addlogo}[1]{
   \listadd{\@logos}{#1}
 }
+\addlogo{\cealogo} % add it by default
 
 \newcommand{\insertlogos}{{
   \def\listsep{\def\listsep{\hspace{2em}}}%
