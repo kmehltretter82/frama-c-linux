@@ -1,7 +1,5 @@
 [kernel] Parsing conditional2.c (with preprocessing)
 [alias] Parsing done
-[alias] Skiping if (a) a = b; else a = & c; (doStmt not implemented)
-[alias] Skiping return __retres; (doStmt not implemented)
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   { a; b } are aliased
