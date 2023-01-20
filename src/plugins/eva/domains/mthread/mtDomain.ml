@@ -166,7 +166,20 @@ module State = struct
         <?> lazy (BuiltinsResults.compare l.results r.results)
 
       let equal l r = compare l r = 0
-      let hash = Hashtbl.hash
+
+      let hash_memory t =
+        Hashtbl.hash (Locations.Zone.hash t.read, Locations.Zone.hash t.written)
+
+      let hash_return t =
+        Value.hash t.standard
+
+      let hash t =
+        Hashtbl.hash (
+          MtThread.Register.hash t.threads,
+          MtMutex.Register.hash t.mutexes,
+          hash_memory t.memory,
+          hash_return t.return,
+          BuiltinsResults.hash t.results)
       let rehash = Datatype.identity
       let mem_project = Datatype.never_any_project
     end)
