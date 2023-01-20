@@ -2,6 +2,18 @@
 [kernel:typing:implicit-function-declaration] while_for1.c:8: Warning: 
   Calling undeclared function malloc. Old style K&R code?
 [alias] Parsing done
+[alias] Skiping break; (doStmt not implemented)
+[alias] Skiping tmp = malloc(idx);
+          s = (int *)tmp; (doStmt not implemented)
+[alias] Skiping break; (doStmt not implemented)
+[alias] Skiping tmp = malloc(idx);
+          s = (int *)tmp; (doStmt not implemented)
+[alias] Skiping break; (doStmt not implemented)
+[alias] Skiping tmp = malloc(idx);
+          s = (int *)tmp; (doStmt not implemented)
+[alias] Skiping tmp = malloc(idx);
+          s = (int *)tmp; (doStmt not implemented)
+[alias] Skiping break; (doStmt not implemented)
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   <end of list>

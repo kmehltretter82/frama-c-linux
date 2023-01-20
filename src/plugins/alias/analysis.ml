@@ -213,7 +213,8 @@ struct
       in
       union a1 a2
     | Loop (_,b,_,_,_) -> process_block b a
-    | _ -> a (* Options.feedback "Skiping @[%a@] (doStmt not implemented)" Stmt.pretty s; a *)
+    | Return _ -> a
+    | _ -> (Options.feedback "Skiping @[%a@] (doStmt not implemented)" Stmt.pretty s; a)
 
   and process_block b a =
     List.fold_left
