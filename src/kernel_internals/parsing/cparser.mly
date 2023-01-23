@@ -1102,6 +1102,11 @@ generic_selection: /* ISO C11 6.5.1.1 */
       {
         ($3, $5)
       }
+|   GENERIC LPAREN assignment_expression RPAREN
+      {
+        Errorloc.parse_error
+          "_Generic requires at least one generic association";
+      }
 
 generic_association_list:
 |   generic_association { [ $1 ] }

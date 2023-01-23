@@ -167,7 +167,7 @@ let get_operator exp =
   | MEMBEROFPTR (_, _) -> ("", 15)
   | GNU_BODY _ -> ("", 17)
   | EXPR_PATTERN _ -> ("", 16)     (* sm: not sure about this *)
-  | GENERIC _ -> ("", 18)     (* sm: not sure about this *)
+  | GENERIC _ -> ("", 16)
 
 (*
 ** FrontC Pretty printer

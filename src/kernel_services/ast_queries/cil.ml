@@ -6255,15 +6255,15 @@ let pointer_decay t =
    an incomplete type and does not have array type, the behavior is undefined.
 *)
 let lvalue_conversion (t : typ) : (typ, string) result =
-  let t' = pointer_decay t in
-  if not (isCompleteType t') && not (isArrayType t) then
+  if not (isCompleteType t) && not (isArrayType t) then
     Error (Format.asprintf
              "Invalid lvalue conversion of incomplete non-array type %a"
              !pp_typ_ref t)
   else
+    let t' = pointer_decay t in
     (* NOTE: remove atomicity when it will be supported by Frama-C.
              also, note that currently 'ghost' is removed. *)
-    Ok (type_remove_qualifier_attributes_deep t)
+    Ok (type_remove_qualifier_attributes_deep t')
 
 let rec is_variably_modified_type (t : typ) : bool =
   match unrollType t with
@@ -6274,11 +6274,10 @@ let rec is_variably_modified_type (t : typ) : bool =
         if not (isConstant s) then true
         else is_variably_modified_type t'
     end
-  | TComp(ci, _) -> begin
-      match ci.cfields with
-      | None -> false
-      | Some fi -> List.exists (fun fi -> is_variably_modified_type fi.ftype) fi
-    end
+  | TComp _ ->
+    (* GCC supports VLA fields as an extension; if we ever support it,
+       add extra code here to take them into account *)
+    false
   | TVoid _ | TInt _ | TEnum _ | TFloat _
   | TPtr _ | TFun _ | TNamed _ | TBuiltin_va_list _ -> false
 
