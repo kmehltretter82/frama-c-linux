@@ -40,16 +40,20 @@ install::
 else
 install::
 	@echo "Installing Ivette to ${PREFIX}"
-	@mkdir -p ${PREFIX}/bin
-	@install ivette/ivette-bootstrap.sh ${PREFIX}/bin/ivette
-	@mkdir -p ${PREFIX}/lib/frama-c
-	@tar zcf ${PREFIX}/lib/frama-c/ivette.tgz ${FILTER} ivette
+	@mkdir -p "${PREFIX}/bin"
+	@install ivette/ivette-bootstrap.sh "${PREFIX}/bin/ivette"
+	@mkdir -p "${PREFIX}/lib/frama-c"
+ifeq ($(OS),Windows_NT)
+	@tar zcf "$$(cygpath ${PREFIX}/lib/frama-c/ivette.tgz)" ${FILTER} ivette
+else
+	@tar zcf "${PREFIX}/lib/frama-c/ivette.tgz" ${FILTER} ivette
+endif
 
 uninstall::
 	@echo "Removing Ivette"
-	@rm -f  ${PREFIX}/bin/ivette
-	@rm -f  ${PREFIX}/lib/frama-c/ivette.tgz
-	@rm -fr ${PREFIX}/lib/frama-c/Ivette.app
-	@rm -fr ${PREFIX}/lib/frama-c/ivette
+	@rm -f  "${PREFIX}/bin/ivette"
+	@rm -f  "${PREFIX}/lib/frama-c/ivette.tgz"
+	@rm -fr "${PREFIX}/lib/frama-c/Ivette.app"
+	@rm -fr "${PREFIX}/lib/frama-c/ivette"
 	
 endif
