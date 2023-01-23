@@ -29,8 +29,12 @@ module Callgraph = struct
 
   let iter_in_rev_order f =
     let fallback = Globals.Functions.iter in
-    let typ = Datatype.(func (func Kernel_function.ty unit) unit) in
-    get ~plugin "iter_in_rev_order" typ ~fallback f
+    (* callgraph is too slow on programs with too many callsites. *)
+    if Function_calls.nb_callsites () > 20000
+    then fallback f
+    else
+      let typ = Datatype.(func (func Kernel_function.ty unit) unit) in
+      get ~plugin "iter_in_rev_order" typ ~fallback f
 
   let accept_base kf v =
     let fallback _ _ = true in

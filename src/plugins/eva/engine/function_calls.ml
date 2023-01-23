@@ -80,6 +80,13 @@ let callsites kf =
     List.map (fun (kf, set) -> kf, StmtSet.elements set) calls
   with Not_found -> []
 
+let nb_callsites () =
+  CallersTable.fold
+    (fun _kf callers count ->
+       Kernel_function.Map.fold
+         (fun _caller callsites count -> count + StmtSet.cardinal callsites)
+         callers count)
+    0
 
 type analysis_target =
   [ `Builtin of string * Builtins.builtin * cacheable * funspec
