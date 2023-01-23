@@ -147,7 +147,7 @@ Coding conventions
 ==================
 
 - Use [ocp-indent](https://github.com/OCamlPro/ocp-indent), v1.8.1
-  to indent OCaml source files;
+  to indent OCaml source files (available from `opam`);
 
 - Use [black](https://pypi.org/project/black/) to indent Python source files;
 
