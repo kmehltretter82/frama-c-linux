@@ -1,0 +1,66 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of Frama-C.                                         *)
+(*                                                                        *)
+(*  Copyright (C) 2007-2023                                               *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+[@@@ api_start]
+(* A call is identified by the function called and the call statement *)
+type call = Cil_types.kernel_function * Cil_types.stmt
+
+module Call : Datatype.S with type t = call
+
+(** [callstack] is used to describe the analysis context when analysing a
+    function. It contains the thread, the entry point and the list of
+    calls from the entry point.
+
+    This type is very likely to change in the future. Never use this type
+    directly, prefer the use of the following functions when possible. *)
+
+type callstack = private {
+  thread: int; (* An identifier of the thread's callstack *)
+  entry_point: Cil_types.kernel_function; (* The first function in the callstack *)
+  stack: call list;
+}
+
+include Datatype.S with type t = callstack
+
+
+(* Constructors *)
+val init : ?thread:int -> Cil_types.kernel_function -> t
+val of_legacy : Value_types.callstack -> t
+
+(* Stack manipulation *)
+val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t
+val pop : t -> (Cil_types.kernel_function * Cil_types.stmt * t) option
+val top : t -> (Cil_types.kernel_function * Cil_types.stmt) option
+val top_kf : t -> Cil_types.kernel_function
+val top_callsite : t -> Cil_types.stmt option
+
+(* Conversion *)
+
+(** This function is likely to be removed in future versions*)
+val to_legacy : t -> Value_types.callstack
+
+(** Gives the list of kf in the callstack from the entry point to the top of the callstack (i.e. reverse order of the call stack). *)
+val to_kf_list : t -> Cil_types.kernel_function list
+
+(** Gives the list of call statements from the bottom to the top of the callstack (i.e. reverse order of the call stack). *)
+val to_stmt_list : t -> Cil_types.stmt list
+[@@@ api_end]
