@@ -23,6 +23,6 @@
 (executable
  (public_name frama-c-lint)
  (name lint)
- (modules lint)
- (libraries unix camomile ocp-indent.lexer ocp-indent.lib ocp-indent.dynlink)
+ (modules lint UTF8)
+ (libraries unix ocp-indent.lexer ocp-indent.lib ocp-indent.dynlink)
 )
