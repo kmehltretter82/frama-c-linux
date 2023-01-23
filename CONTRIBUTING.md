@@ -56,11 +56,9 @@ The detailed steps to submit a contribution to Frama-C are:
   the [coding conventions](#coding-conventions);
 
 6. (Optional) Locally add non-regression test cases to the appropriate
-  subdirectory in `./tests/`. The `hello` tutorial in the
-  [plug-in developer manual](http://frama-c.com/download/frama-c-plugin-development-guide.pdf)
-  provides an example of the use of the dedicated `ptests`
-  tool used by Frama-C developers. The full documentation for `ptests` is also
-  present later in the same manual.
+  subdirectory in `./tests/` or `./src/plugins/<plugin>/tests/`.
+  Consult the [plug-in developer manual](http://frama-c.com/download/frama-c-plugin-development-guide.pdf)
+  for details on how to run tests inside Frama-C.
   You can also provide the non-regression test case in the Gitlab issue
   discussion and we will integrate it.
 
@@ -118,7 +116,7 @@ plug-ins as documented in the
 [Plug-In development guide](http://frama-c.com/download/frama-c-plugin-development-guide.pdf).
 Such plug-ins normally do not require changes to the Frama-C source code and can
 be developed completely independently, for instance in a separate Git
-repository as exemplified by the [Hello plug-in](https://github.com/Frama-C/frama-c-hello).
+repository.
 
 However, to make it easier for your users to compile and use your plug-in, even
 as newer releases are made available, we recommend the following workflow:
