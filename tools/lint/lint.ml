@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open CamomileLibrary
-
 (**************************************************************************)
 (* Warning/Error *)
 
@@ -173,12 +171,6 @@ let rec collect = function
 
 (**************************************************************************)
 (* Functions used to check lint *)
-
-(* UTF8 *)
-
-let is_utf8 content =
-  try UTF8.validate (Bytes.to_string content) ; true
-  with UTF8.Malformed_code -> false
 
 (* Syntax *)
 
@@ -333,8 +325,8 @@ let check ~verbose ~update file params =
     close_in in_chan ;
     (* UTF8 *)
     if params.utf8 then
-      if not @@ is_utf8 content then
-        error "Bad encoding (not UTF8) for %s@." file ;
+      Option.iter (fun (line,p,i) -> error "Bad encoding (not UTF8) for %s:%i:%i@." file line (i-p))
+        (UTF8.validate (Bytes.to_string content))  ;
     (* Blanks *)
     let rewrite = ref false in
     let syntactic_check checker content message  =

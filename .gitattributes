@@ -346,6 +346,8 @@ README* header_spec=.ignore
 /src/libraries/utils/utf8_logic.ml header_spec=CEA_INRIA_LGPL
 /src/libraries/utils/utf8_logic.mli header_spec=CEA_INRIA_LGPL
 
+/tools/lint/UTF8.ml header_spec=MODIFIED_CAMOMILE
+
 #########################
 # HEADER_SPEC: CEA_LGPL #
 #########################
