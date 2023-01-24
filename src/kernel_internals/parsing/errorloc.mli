@@ -59,7 +59,8 @@ val setCurrentFile: string -> unit
 val setCurrentLine: int -> unit
 
 (** Call this function to start parsing. *)
-val startParsing: string -> Lexing.lexbuf
+val startParsing:
+  string -> (Lexing.lexbuf -> 'a) -> Lexing.lexbuf * (Lexing.lexbuf -> 'a)
 
 val finishParsing: unit -> unit (** Call this function to finish parsing and
                                     close the input channel *)

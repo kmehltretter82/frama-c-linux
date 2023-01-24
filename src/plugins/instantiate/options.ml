@@ -36,6 +36,7 @@ module Enabled = False
       let help = ""
     end)
 
+let () = Parameter_customize.argument_may_be_fundecl()
 module Kfs =
   Kernel_function_set
     (struct

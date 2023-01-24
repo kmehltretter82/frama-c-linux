@@ -49,8 +49,9 @@ let parse_to_cabs (path : Datatype.Filepath.t) =
   try
     Kernel.feedback ~level:2 "Parsing %a" Datatype.Filepath.pretty path;
     Errorloc.clear_errors () ;
-    let lexbuf = Clexer.init ~filename:(path :> string) in
-    let cabs = Cparser.file Clexer.initial lexbuf in
+    let lexbuf, lexer =
+      Clexer.init ~filename:(path :> string) Clexer.initial in
+    let cabs = Cparser.file lexer lexbuf in
     (* Cprint.print_defs cabs;*)
     Clexer.finish ();
     if Errorloc.had_errors () then begin

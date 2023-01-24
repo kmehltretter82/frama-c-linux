@@ -43,7 +43,10 @@
 
 (** The C Lexer. *)
 
-val init: filename:string -> Lexing.lexbuf
+val init:
+  filename:string -> (Lexing.lexbuf -> 'a) ->
+  Lexing.lexbuf * (Lexing.lexbuf -> 'a)
+
 val finish: unit -> unit
 
 val initial: Lexing.lexbuf -> Cparser.token
