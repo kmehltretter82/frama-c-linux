@@ -26,7 +26,23 @@
 
 open Cil_types
 
+(** Represented by a Json record with file, dir, basename, line *)
+module Position : Data.S with type t = Filepath.position
 
+(** Json key representing a function name *)
+val jFunction : Package.jtype
+
+(** Represented by the function name as [jFunction]. *)
+module Function : Data.S with type t = kernel_function
+
+(** Represented by the function name as [jFunction]. *)
+module Fundec : Data.S with type t = fundec
+
+(* -------------------------------------------------------------------------- *)
+(** Ast Markers *)
+(* -------------------------------------------------------------------------- *)
+
+(** Exported as Json string with their unique tag. *)
 module Marker :
 sig
   include Data.S with type t = Printer_tag.localizable
@@ -40,13 +56,26 @@ sig
 
 end
 
-module Position : Data.S with type t = Filepath.position
-module Kf : Data.S with type t = kernel_function
-module Fundec : Data.S with type t = fundec
-module Ki : Data.S with type t = kinstr
+(* -------------------------------------------------------------------------- *)
+(** Ast Markers of Specific Kinds *)
+(* -------------------------------------------------------------------------- *)
+
+(** Markers that are l-values. *)
+module Lval :
+sig
+  include Data.S with type t = kinstr * lval
+  val mem : Marker.t -> bool
+  val find : Marker.t -> t
+end
+
+(** Markers that are statements. *)
 module Stmt : Data.S with type t = stmt
-module Lval : Data.S with type t = kinstr * lval
-module KfMarker : Data.S with type t = kernel_function * Printer_tag.localizable
+
+(** Optional markers interpreted as kinstr. *)
+module Kinstr : Data.S with type t = kinstr
+
+(** Represented as a Json record with function name and marker tag. *)
+module Location : Data.S with type t = Function.t * Marker.t
 
 (* -------------------------------------------------------------------------- *)
 (** Ast Printer *)

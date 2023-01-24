@@ -160,7 +160,7 @@ let () = States.option model ~name:"marker"
 
 let () = States.option model ~name:"fct"
     ~descr:(Md.plain "Function containing the message position (if any)")
-    ~data:(module Kernel_ast.Kf)
+    ~data:(module Kernel_ast.Function)
     ~get:getFunction
 
 let iter f = ignore (Messages.fold (fun i evt -> f (evt, i); succ i) 0)

@@ -93,6 +93,39 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Functions                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+let jFunction = Data.declare ~package ~name:"fct"
+    ~descr:(Md.plain "Function names")
+    (Pkg.Jkey "fct")
+
+module Function =
+struct
+  type t = kernel_function
+  let jtype = jFunction
+  let to_json kf =
+    `String (Kernel_function.get_name kf)
+  let of_json js =
+    let fn = Js.to_string js in
+    try Globals.Functions.find_by_name fn
+    with Not_found -> Data.failure "Undefined function '%s'" fn
+end
+
+module Fundec =
+struct
+  type t = fundec
+  let jtype = jFunction
+  let to_json fundec =
+    `String fundec.svar.vname
+  let of_json js =
+    let fn = Js.to_string js in
+    try Kernel_function.get_definition (Globals.Functions.find_by_name fn)
+    with Not_found | Kernel_function.No_Definition ->
+      Data.failure "Undefined function definition '%s'" fn
+end
+
+(* -------------------------------------------------------------------------- *)
 (* ---  Printers                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -219,7 +252,7 @@ struct
     | _ -> Data.failure "not a stmt marker"
 end
 
-module Ki =
+module Kinstr =
 struct
   type t = kinstr
   let jtype = Pkg.Joption Marker.jtype
@@ -231,57 +264,24 @@ struct
     | js -> Kstmt (Stmt.of_json js)
 end
 
-module Kf =
+(* -------------------------------------------------------------------------- *)
+(* --- Record for (Kf * Marker)                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Location =
 struct
-  type t = kernel_function
-  let jtype = Pkg.Jkey "fct"
-  let to_json kf =
-    `String (Kernel_function.get_name kf)
+  type t = Function.t * Marker.t
+  let jtype = Data.declare
+      ~package ~name:"location"
+      ~descr:(Md.plain "Location: function and marker")
+      (Jrecord ["fct", Function.jtype; "marker", Marker.jtype])
+  let to_json (kf, loc) = `Assoc [
+      "fct", Function.to_json kf ;
+      "marker", Marker.to_json loc ;
+    ]
   let of_json js =
-    let key = Js.to_string js in
-    try Globals.Functions.find_by_name key
-    with Not_found -> Data.failure "Undefined function '%s'" key
-end
-
-module Fundec =
-struct
-  type t = fundec
-  let jtype = Pkg.Jkey "fundec"
-  let to_json fundec =
-    `String fundec.svar.vname
-  let of_json js =
-    let key = Js.to_string js in
-    try Kernel_function.get_definition (Globals.Functions.find_by_name key)
-    with Not_found | Kernel_function.No_Definition ->
-      Data.failure "Undefined function definition '%s'" key
-end
-
-module KfMarker = struct
-  type record
-  let record : record Record.signature = Record.signature ()
-
-  let fct = Record.field record ~name:"fct"
-      ~descr:(Md.plain "Function") (module Kf)
-  let marker = Record.field record ~name:"marker"
-      ~descr:(Md.plain "Marker") (module Marker)
-
-  let data =
-    Record.publish ~package ~name:"location"
-      ~descr:(Md.plain "Location: function and marker") record
-
-  module R : Record.S with type r = record = (val data)
-  type t = kernel_function * Printer_tag.localizable
-  let jtype = R.jtype
-
-  let to_json (kf, loc) =
-    R.default |>
-    R.set fct kf |>
-    R.set marker loc |>
-    R.to_json
-
-  let of_json json =
-    let r = R.of_json json in
-    R.get fct r, R.get marker r
+    Json.field "fct" js |> Function.of_json,
+    Json.field "marker" js |> Marker.of_json
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -315,17 +315,15 @@ struct
       | PGlobal _ -> if short then "Decl" else "Declaration"
       | PType _ -> "Type"
 
-  let kf tag =
+  let is_function tag =
     match varinfo_of_localizable tag with
-    | Some vi -> Globals.Functions.get vi
-    | None -> raise Not_found
+    | Some vi -> Globals.Functions.mem vi
+    | None -> false
 
-  let fundecl = function
-    | PGlobal (GVar (vi, _, _) | GVarDecl (vi, _)) -> Globals.Functions.get vi
-    | _ -> raise Not_found
-
-  let is_kf tag = try let _ = kf tag in true with Not_found -> false
-  let is_fundecl tag = try let _ = fundecl tag in true with Not_found -> false
+  let is_fundecl = function
+    | PGlobal (GFun _ | GFunDecl _) -> true
+    | PGlobal (GVar (vi, _, _) | GVarDecl (vi, _)) -> Globals.Functions.mem vi
+    | _ -> false
 
   let scope tag =
     Option.map Kernel_function.get_name @@ Printer_tag.kf_of_localizable tag
@@ -351,7 +349,7 @@ struct
   let () =
     States.column
       ~name:"name"
-      ~descr:(Md.plain "Marker short name")
+      ~descr:(Md.plain "Marker short name  or identifier when relevant.")
       ~data:(module Jalpha)
       ~get:(fun (tag, _) -> Printer_tag.label tag)
       model
@@ -371,20 +369,21 @@ struct
       ~data:(module Jbool)
       ~get:(fun (tag, _) -> Lval.mem tag)
       model
+
   let () =
     States.column
-      ~name:"isFunDecl"
-      ~descr:(Md.plain "Whether it is a function declaration or definition")
+      ~name:"isFunction"
+      ~descr:(Md.plain "Whether it is a function symbol")
       ~data:(module Jbool)
-      ~get:(fun (tag, _) -> is_fundecl tag)
+      ~get:(fun (tag, _) -> is_function tag)
       model
 
   let () =
     States.column
-      ~name:"isFun"
-      ~descr:(Md.plain "Whether it is a function symbol")
+      ~name:"isFunDecl"
+      ~descr:(Md.plain "Whether it is a function declaration")
       ~data:(module Jbool)
-      ~get:(fun (tag, _) -> is_kf tag)
+      ~get:(fun (tag, _) -> is_fundecl tag)
       model
 
   let () =
@@ -407,7 +406,9 @@ struct
       ~package
       ~name:"markerAttributes"
       ~descr:(Md.plain "Marker attributes")
-      ~key:snd ~keyType:Jstring
+      ~key:snd
+      ~keyName:"marker"
+      ~keyType:Marker.jtype
       ~iter:Marker.iter
       ~add_reload_hook:ast_update_hook
       model
@@ -423,7 +424,7 @@ end
 let () = Request.register ~package
     ~kind:`GET ~name:"getMainFunction"
     ~descr:(Md.plain "Get the current 'main' function.")
-    ~input:(module Junit) ~output:(module Joption (Kf))
+    ~input:(module Junit) ~output:(module Joption(Function))
     begin fun () ->
       try Some (fst (Globals.entry_point ()))
       with Globals.No_such_entry_point _ -> None
@@ -432,7 +433,7 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`GET ~name:"getFunctions"
     ~descr:(Md.plain "Collect all functions in the AST")
-    ~input:(module Junit) ~output:(module Jlist(Kf))
+    ~input:(module Junit) ~output:(module Jlist(Function))
     begin fun () ->
       let pool = ref [] in
       Globals.Functions.iter (fun kf -> pool := kf :: !pool) ;
@@ -442,7 +443,7 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`GET ~name:"printFunction"
     ~descr:(Md.plain "Print the AST of a function")
-    ~input:(module Kf) ~output:(module Jtext)
+    ~input:(module Function) ~output:(module Jtext)
     begin fun kf ->
       let libc = Kernel.PrintLibc.get () in
       try
@@ -756,7 +757,7 @@ let () =
   Request.register
     ~package ~descr ~kind:`GET ~name:"getMarkerAt"
     ~input:(module Jtriple (Jstring) (Jint) (Jint))
-    ~output:(module Jpair (Joption (Kf)) (Joption (Marker)))
+    ~output:(module Jpair (Joption (Function)) (Joption (Marker)))
     get_kf_marker
 
 (* -------------------------------------------------------------------------- *)
@@ -852,7 +853,7 @@ let () =
           TermHash.add cache entry m
     end
 
-(* request to parse a new marker from ACSL term *)
+(* request to parse a new marker from C expression or l-value *)
 let () =
   let module Md = Markdown in
   let s = Request.signature ~output:(module Data.Joption(Marker)) () in
@@ -863,8 +864,8 @@ let () =
       ~descr:(Md.plain "ACSL term to parse")
       (module Data.Jstring) in
   Request.register_sig ~package s
-    ~kind:`GET ~name:"parseTerm"
-    ~descr:(Md.plain "Parse an ACSL Term and returns the associated marker")
+    ~kind:`GET ~name:"parseExpr"
+    ~descr:(Md.plain "Parse a C expression and returns the associated marker")
     begin fun rq () ->
       match Printer_tag.ki_of_localizable @@ get_marker rq with
       | Kglobal -> failwith "No statement at selection point"
@@ -876,6 +877,7 @@ let () =
           let entry = (stmt, term) in
           let cache = TERMCACHE.get () in
           try Some (TermHash.find cache entry) with Not_found ->
+          try
             let marker =
               match Logic_to_c.term_to_exp term with
               | { enode = Lval lv } ->
@@ -883,6 +885,8 @@ let () =
               | exp ->
                 Printer_tag.PExp(Some kf, Kstmt stmt, exp)
             in TermHash.add cache entry marker ; Some marker
+          with Logic_to_c.No_conversion ->
+            failwith "Not a C-expression"
     end
 
 (* -------------------------------------------------------------------------- *)

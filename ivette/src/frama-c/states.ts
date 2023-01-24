@@ -799,14 +799,14 @@ export async function resetSelection(): Promise<void> {
 export type attributes = Ast.markerAttributesData;
 
 export const defaultMarker: attributes = {
-  key: '',
+  marker: Ast.jMarker(''),
   labelKind: '',
   titleKind: '',
   name: '',
   descr: '',
   isLval: false,
   isFunDecl: false,
-  isFun: false,
+  isFunction: false,
   sloc: { dir: '', base: '', file: '', line: 0 },
 };
 

@@ -481,8 +481,9 @@ function createContextMenuHandler(): Editor.Extension {
       const items: Dome.PopupMenuItem[] = [];
       const attrs = getData(node.id);
       if (attrs?.isFunDecl) {
-        const groupedCallers = Lodash.groupBy(callers, e => e.kf);
-        const locations = callers.map((l) => ({ fct: l.kf, marker: l.stmt }));
+        const groupedCallers = Lodash.groupBy(callers, (cs) => cs.kf);
+        const locations =
+          callers.map(({ kf, stmt }) => ({ fct: kf, marker: stmt }));
         Lodash.forEach(groupedCallers, (e) => {
           const callerName = e[0].kf;
           const callSites = e.length > 1 ? `(${e.length} call sites)` : '';
@@ -495,7 +496,7 @@ function createContextMenuHandler(): Editor.Extension {
             })
           });
         });
-      } else if (attrs?.isFun) {
+      } else if (attrs?.isFunction) {
         const location = { fct: attrs.name };
         const onClick = (): void => update({ location });
         const label = `Go to definition of ${attrs.name}`;

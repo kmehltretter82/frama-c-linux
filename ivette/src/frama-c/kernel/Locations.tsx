@@ -27,14 +27,13 @@
 import React from 'react';
 import * as States from 'frama-c/states';
 
-import * as Json from 'dome/data/json';
 import { CompactModel } from 'dome/table/arrays';
 import { Table, Column, Renderer } from 'dome/table/views';
 import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
 import { TitleBar } from 'ivette';
-import { markerAttributes } from 'frama-c/kernel/api/ast';
+import { markerAttributes, jMarker } from 'frama-c/kernel/api/ast';
 
 // --------------------------------------------------------------------------
 // --- Locations Panel
@@ -56,8 +55,8 @@ export default function LocationsTable(): JSX.Element {
   // Renderer for statement markers.
   const renderMarker: Renderer<string> =
     (loc: string) => {
-      const markerId = (loc as Json.key<'#markerInfo'>);
-      const info = markersInfo.getData(markerId);
+      const marker = jMarker(loc);
+      const info = markersInfo.getData(marker);
       const sloc = info?.sloc;
       const position = `${sloc?.base}:${sloc?.line}`;
       return <Label label={position} title={info?.descr} />;
