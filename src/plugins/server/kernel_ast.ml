@@ -794,10 +794,23 @@ let () =
 (* --- Build a marker from an ACSL term                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module StmtTerm = Datatype.Pair(Cil_datatype.Stmt)(Cil_datatype.Term)
-module Cache = Hashtbl.Make(StmtTerm)
-
-let cache : Printer_tag.localizable Cache.t = Cache.create 0
+module TermAt = Datatype.Pair(Cil_datatype.Stmt)(Cil_datatype.Term)
+module TermHash = Hashtbl.Make(TermAt)
+module TERMHASH : Datatype.S with type t = Marker.t TermHash.t =
+  Datatype.Make
+    (struct
+      type t = Marker.t TermHash.t
+      include Datatype.Undefined
+      let reprs = [TermHash.create 0]
+      let name = "Server.Kernel_ast.TermHash"
+      let mem_project = Datatype.never_any_project
+    end)
+module TERMCACHE = State_builder.Ref(TERMHASH)
+    (struct
+      let name = "Server.Kernel_ast.TermCache"
+      let default () = TermHash.create 0
+      let dependencies = []
+    end)
 
 let parse_term kf text =
   let env =
@@ -830,10 +843,13 @@ let parseable_marker =
 (* pre-fill the cache with known markers *)
 let () =
   Marker.hook
-    begin fun (loc,_) ->
-      match parseable_marker loc with
+    begin fun (m,_) ->
+      match parseable_marker m with
       | None -> ()
-      | Some entry -> Cache.add cache entry loc
+      | Some entry ->
+        let cache = TERMCACHE.get () in
+        if not (TermHash.mem cache entry) then
+          TermHash.add cache entry m
     end
 
 (* request to parse a new marker from ACSL term *)
@@ -851,21 +867,22 @@ let () =
     ~descr:(Md.plain "Parse an ACSL Term and returns the associated marker")
     begin fun rq () ->
       match Printer_tag.ki_of_localizable @@ get_marker rq with
-      | Kglobal -> None
+      | Kglobal -> failwith "No statement at selection point"
       | Kstmt stmt ->
         let kf = Kernel_function.find_englobing_kf stmt in
         match parse_term kf @@ get_term rq with
         | Error msg -> failwith msg
         | Ok term ->
           let entry = (stmt, term) in
-          try Some (Cache.find cache entry) with Not_found ->
-            let tag =
+          let cache = TERMCACHE.get () in
+          try Some (TermHash.find cache entry) with Not_found ->
+            let marker =
               match Logic_to_c.term_to_exp term with
               | { enode = Lval lv } ->
                 Printer_tag.PLval(Some kf, Kstmt stmt, lv)
               | exp ->
                 Printer_tag.PExp(Some kf, Kstmt stmt, exp)
-            in Cache.add cache entry tag ; Some tag
+            in TermHash.add cache entry marker ; Some marker
     end
 
 (* -------------------------------------------------------------------------- *)
