@@ -1239,23 +1239,28 @@ let call_prover_task ~timeout ~steps ~conf prover call =
 (* --- Batch Prover                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let digest wpo drv prover task =
+let digest_task wpo drv ?script prover task =
   let file = Wpo.DISK.file_goal
       ~pid:wpo.Wpo.po_pid
       ~model:wpo.Wpo.po_model
       ~prover:(VCS.Why3 prover) in
-  let _ = Command.print_file file
+  begin
+    Command.print_file file
       begin fun fmt ->
         Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
           (Why3Provers.ident_why3 prover) ;
-        Why3.Driver.print_task_prepared drv fmt task ;
-      end
-  in Digest.file file |> Digest.to_hex
+        let old = Option.map open_in script in
+        let _ = Why3.Driver.print_task_prepared ?old drv fmt task in
+        Option.iter close_in old ;
+      end ;
+    Digest.file file |> Digest.to_hex
+  end
 
-let batch pconf driver ~conf ?script ~timeout ~steplimit prover task =
+let run_batch pconf driver ~conf ?script ~timeout ~steplimit prover task =
   let steps = match steplimit with Some 0 -> None | _ -> steplimit in
   let limit =
-    let memlimit = Why3.Whyconf.memlimit (Why3.Whyconf.get_main (Why3Provers.config ())) in
+    let config = Why3.Whyconf.get_main @@ Why3Provers.config () in
+    let memlimit = Why3.Whyconf.memlimit config in
     let def = Why3.Call_provers.empty_limit in
     { Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
       Why3.Call_provers.limit_steps = Why3.Opt.get_def def.limit_time steps;
@@ -1268,6 +1273,7 @@ let batch pconf driver ~conf ?script ~timeout ~steplimit prover task =
   in
   let steps = if with_steps then steps else None in
   let command = Why3.Whyconf.get_complete_command pconf ~with_steps in
+  Wp_parameters.debug ~dkey "Prover command %S" command ;
   let inplace = if script <> None then Some true else None in
   let call = Why3.Driver.prove_task_prepared ?old:script ?inplace
       ~command ~limit ~libdir:conf.libdir ~datadir:conf.datadir driver task in
@@ -1304,13 +1310,13 @@ let updatescript ~script driver task =
   let d_new = Digest.file script in
   if String.equal d_new d_old then Extlib.safe_remove backup
 
-let editor ~script ~merge ~conf wpo pconf driver prover task =
+let editor ~script ~merge ~conf pconf driver task =
   Task.sync editor_mutex
     begin fun () ->
       Wp_parameters.feedback ~ontty:`Transient "Editing %S..." script ;
-      Cache.clear_result ~digest:(digest wpo driver) prover task ;
       if merge then updatescript ~script driver task ;
       let command = editor_command pconf in
+      Wp_parameters.debug ~dkey "Editor command %S" command ;
       let call =
         Why3.Call_provers.call_editor
           ~command ~datadir:conf.datadir ~libdir:conf.libdir script
@@ -1319,8 +1325,8 @@ let editor ~script ~merge ~conf wpo pconf driver prover task =
     end
 
 let compile ~script ~timeout ~conf wpo pconf driver prover task =
-  let digest = digest wpo driver in
-  let runner = batch ~conf pconf driver ~script in
+  let digest = digest_task wpo driver ~script in
+  let runner = run_batch ~conf pconf driver ~script in
   Cache.get_result ~digest ~runner ~timeout ~steplimit:None prover task
 
 let prepare ~mode wpo driver task =
@@ -1342,8 +1348,16 @@ let interactive ~mode wpo pconf ~conf driver prover task =
   let time = Wp_parameters.InteractiveTimeout.get () in
   let timeout = if time <= 0 then None else Some time in
   match prepare ~mode wpo driver task with
-  | None -> Task.return VCS.unknown
+  | None ->
+    Wp_parameters.warning ~once:true ~current:false
+      "Missing script(s) for prover %a.@\n\
+       Use -wp-interactive=fix for interactive proving."
+      Why3.Whyconf.print_prover prover ;
+    Task.return VCS.unknown
   | Some (script, merge) ->
+    Wp_parameters.debug ~dkey "%s %a script %S@."
+      (if merge then "Found" else "New")
+      Why3.Whyconf.print_prover prover script ;
     match mode with
     | VCS.Batch ->
       compile ~script ~timeout ~conf wpo pconf driver prover task
@@ -1352,13 +1366,13 @@ let interactive ~mode wpo pconf ~conf driver prover task =
       compile ~script ~timeout ~conf wpo pconf driver prover task
     | VCS.Edit ->
       let open Task in
-      editor ~script ~merge ~conf wpo pconf driver prover task >>= fun _ ->
+      editor ~script ~merge ~conf pconf driver task >>= fun _ ->
       compile ~script ~timeout ~conf wpo pconf driver prover task
     | VCS.Fix ->
       let open Task in
       compile ~script ~timeout ~conf wpo pconf driver prover task >>= fun r ->
       if VCS.is_valid r then return r else
-        editor ~script ~merge ~conf wpo pconf driver prover task >>= fun _ ->
+        editor ~script ~merge ~conf pconf driver task >>= fun _ ->
         compile ~script ~timeout ~conf wpo pconf driver prover task
     | VCS.FixUpdate ->
       let open Task in
@@ -1366,7 +1380,7 @@ let interactive ~mode wpo pconf ~conf driver prover task =
       compile ~script ~timeout ~conf wpo pconf driver prover task >>= fun r ->
       if VCS.is_valid r then return r else
         let merge = false in
-        editor ~script ~merge ~conf wpo pconf driver prover task >>= fun _ ->
+        editor ~script ~merge ~conf pconf driver task >>= fun _ ->
         compile ~script ~timeout ~conf wpo pconf driver prover task
 
 (* -------------------------------------------------------------------------- *)
@@ -1394,8 +1408,8 @@ let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ~prover wpo () =
         interactive ~mode wpo pconf ~conf drv prover task
       else
         Cache.get_result
-          ~digest:(digest wpo drv)
-          ~runner:(batch ~conf pconf drv ?script:None)
+          ~digest:(digest_task wpo drv)
+          ~runner:(run_batch ~conf pconf drv ?script:None)
           ~timeout ~steplimit prover task
   with exn ->
     if Wp_parameters.has_dkey dkey_api then

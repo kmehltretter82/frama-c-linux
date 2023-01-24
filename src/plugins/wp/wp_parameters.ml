@@ -1092,7 +1092,7 @@ module OutputDir =
 (* --- Output Dir                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let dkey = register_category "prover"
+let dkey = register_category "output"
 
 let has_out () = OutputDir.get() <> ""
 
