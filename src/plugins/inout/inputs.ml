@@ -155,12 +155,12 @@ let get_external =
   Externals.memo
     (fun kf ->
        Zone.filter_base
-         (Callgraph.Uses.accept_base ~with_formals:false ~with_locals:false kf)
+         (Eva.Logic_inout.accept_base ~formals:false ~locals:false kf)
          (get_internal kf))
 
 let get_with_formals kf =
   Zone.filter_base
-    (Callgraph.Uses.accept_base ~with_formals:true ~with_locals:false kf)
+    (Eva.Logic_inout.accept_base ~formals:true ~locals:false kf)
     (get_internal kf)
 
 let compute_external kf = ignore (get_external kf)

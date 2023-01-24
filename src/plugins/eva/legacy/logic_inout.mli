@@ -73,4 +73,12 @@ val assigns_tlval_to_zones:
 val verify_assigns:
   Cil_types.kernel_function -> pre:Cvalue.Model.t -> Function_Froms.froms -> unit
 
+
+(** [accept_base ~formals ~locals kf b] returns [true] if and only if [b] is:
+    - a global
+    - a formal or local of one of the callers of [kf]
+    - a formal or local of [kf] and the corresponding argument is [true]. *)
+val accept_base:
+  formals:bool -> locals:bool -> Kernel_function.t -> Base.t -> bool
+
 [@@@ api_end]

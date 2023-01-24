@@ -27,10 +27,6 @@ module Callgraph: sig
       callees to callers. If callgraph is missing or if the number of callsites
       is too big, the order is unspecified. *)
   val iter_in_rev_order: (Kernel_function.t -> unit) -> unit
-
-  (** Returns [true] if [base] is a global, or a formal or local of either [kf]
-      or one of its callers. If callgraph is missing, always returns true. *)
-  val accept_base: Kernel_function.t -> Base.t -> bool
 end
 
 module Scope: sig

@@ -94,7 +94,7 @@ let join_and_is_included smaller larger =
 
 let externalize_zone ~with_formals kf =
   Zone.filter_base
-    (Callgraph.Uses.accept_base ~with_formals ~with_locals:false kf)
+    (Eva.Logic_inout.accept_base ~formals:with_formals ~locals:false kf)
 
 (* This code evaluates an assigns, computing in particular a sound approximation
    of sure outputs. For an assigns [locs_out \from locs_from], the process

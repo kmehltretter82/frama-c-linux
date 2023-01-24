@@ -50,14 +50,17 @@ module To_Use = struct
   let get_from_call kf _ = memo kf
 
   let keep_base kf = (* Eta-expansion required *)
-    Callgraph.Uses.accept_base ~with_formals:false ~with_locals:false kf
+    Eva.Logic_inout.accept_base ~formals:false ~locals:false kf
 
   let cleanup kf froms =
     if Function_Froms.Memory.is_bottom froms.Function_Froms.deps_table
     then froms
     else
+      let accept_base =
+        Eva.Logic_inout.accept_base ~formals:true ~locals:false kf
+      in
       let f b intervs =
-        if Callgraph.Uses.accept_base ~with_formals:true ~with_locals:false kf b
+        if accept_base b
         then Zone.inject b intervs
         else Zone.bottom
       in
