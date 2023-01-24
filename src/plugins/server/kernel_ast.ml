@@ -794,19 +794,25 @@ let () =
 (* --- Build a marker from an ACSL term                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let logic_environment () =
-  let open Logic_typing in
-  Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
-
 module StmtTerm = Datatype.Pair(Cil_datatype.Stmt)(Cil_datatype.Term)
 module Cache = Hashtbl.Make(StmtTerm)
 
 let cache : Printer_tag.localizable Cache.t = Cache.create 0
 
+let parse_term kf text =
+  let env =
+    let open Logic_typing in
+    Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
+  in
+  try Ok (Logic_parse_string.term ~env kf text)
+  with
+  | Logic_parse_string.Error(_,msg) -> Error msg
+  | Parsing.Parse_error -> Error "Parse error"
+
 let reparse_term kf stmt text =
-  let env = logic_environment () in
-  try Some (stmt,Logic_parse_string.term ~env kf text)
-  with Logic_parse_string.Error _ | Parsing.Parse_error -> None
+  match parse_term kf text with
+  | Ok t -> Some (stmt,t)
+  | Error _ -> None
 
 let parseable_marker =
   let open Printer_tag in
@@ -848,17 +854,18 @@ let () =
       | Kglobal -> None
       | Kstmt stmt ->
         let kf = Kernel_function.find_englobing_kf stmt in
-        let env = logic_environment () in
-        let term = Logic_parse_string.term ~env kf @@ get_term rq in
-        let entry = (stmt, term) in
-        try Some (Cache.find cache entry) with Not_found ->
-          let tag =
-            match Logic_to_c.term_to_exp term with
-        | { enode = Lval lv } ->
-          Printer_tag.PLval(Some kf, Kstmt stmt, lv)
-        | exp ->
-          Printer_tag.PExp(Some kf, Kstmt stmt, exp)
-          in Cache.add cache entry tag ; Some tag
+        match parse_term kf @@ get_term rq with
+        | Error msg -> failwith msg
+        | Ok term ->
+          let entry = (stmt, term) in
+          try Some (Cache.find cache entry) with Not_found ->
+            let tag =
+              match Logic_to_c.term_to_exp term with
+              | { enode = Lval lv } ->
+                Printer_tag.PLval(Some kf, Kstmt stmt, lv)
+              | exp ->
+                Printer_tag.PExp(Some kf, Kstmt stmt, exp)
+            in Cache.add cache entry tag ; Some tag
     end
 
 (* -------------------------------------------------------------------------- *)
