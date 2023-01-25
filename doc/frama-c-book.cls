@@ -306,7 +306,7 @@
 % --------------------------------------------------------------------------
 
 \titleformat{\chapter}[display]
-  {\sc\Huge}
+  {\sc\huge}
   {\filleft\fontsize{50}{0}\selectfont\thechapter}
   {-1.1em}
   {\filright}
