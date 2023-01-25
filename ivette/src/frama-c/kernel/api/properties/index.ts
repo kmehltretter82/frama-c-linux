@@ -38,9 +38,17 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
+import { byFct } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { bySource } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { fct } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { fctDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { jFct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -48,13 +56,19 @@ import { jSource } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { marker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
+import { markerDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { source } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { sourceDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { jTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { tag } from 'frama-c/kernel/api/data';
+//@ts-ignore
+import { tagDefault } from 'frama-c/kernel/api/data';
 
 /** Property Kinds */
 export enum propKind {
@@ -134,6 +148,9 @@ export const jPropKind: Json.Decoder<propKind> = Json.jEnum(propKind);
 /** Natural order for `propKind` */
 export const byPropKind: Compare.Order<propKind> = Compare.byEnum(propKind);
 
+/** Default value for `propKind` */
+export const propKindDefault: propKind = propKind.behavior;
+
 const propKindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.properties.propKindTags',
@@ -176,6 +193,9 @@ export const jPropStatus: Json.Decoder<propStatus> = Json.jEnum(propStatus);
 /** Natural order for `propStatus` */
 export const byPropStatus: Compare.Order<propStatus> =
   Compare.byEnum(propStatus);
+
+/** Default value for `propStatus` */
+export const propStatusDefault: propStatus = propStatus.unknown;
 
 const propStatusTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
@@ -231,6 +251,9 @@ export const jAlarms: Json.Decoder<alarms> = Json.jEnum(alarms);
 /** Natural order for `alarms` */
 export const byAlarms: Compare.Order<alarms> = Compare.byEnum(alarms);
 
+/** Default value for `alarms` */
+export const alarmsDefault: alarms = alarms.division_by_zero;
+
 const alarmsTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.properties.alarmsTags',
@@ -254,7 +277,7 @@ export interface statusData {
   /** Status */
   status: propStatus;
   /** Function */
-  fct?: Json.key<'#fct'>;
+  fct?: fct;
   /** Instruction */
   kinstr?: marker;
   /** Position */
@@ -275,7 +298,7 @@ export const jStatusData: Json.Decoder<statusData> =
     kind: jPropKind,
     names: Json.jArray(Json.jString),
     status: jPropStatus,
-    fct: Json.jOption(Json.jKey<'#fct'>('#fct')),
+    fct: Json.jOption(jFct),
     kinstr: Json.jOption(jMarker),
     source: jSource,
     alarm: Json.jOption(Json.jString),
@@ -287,15 +310,14 @@ export const jStatusData: Json.Decoder<statusData> =
 export const byStatusData: Compare.Order<statusData> =
   Compare.byFields
     <{ key: marker, descr: string, kind: propKind, names: string[],
-       status: propStatus, fct?: Json.key<'#fct'>, kinstr?: marker,
-       source: source, alarm?: string, alarm_descr?: string,
-       predicate?: string }>({
+       status: propStatus, fct?: fct, kinstr?: marker, source: source,
+       alarm?: string, alarm_descr?: string, predicate?: string }>({
     key: byMarker,
     descr: Compare.string,
     kind: byPropKind,
     names: Compare.array(Compare.string),
     status: byPropStatus,
-    fct: Compare.defined(Compare.string),
+    fct: Compare.defined(byFct),
     kinstr: Compare.defined(byMarker),
     source: bySource,
     alarm: Compare.defined(Compare.string),
@@ -351,5 +373,12 @@ const status_internal: State.Array<marker,statusData> = {
 };
 /** Status of Registered Properties */
 export const status: State.Array<marker,statusData> = status_internal;
+
+/** Default value for `statusData` */
+export const statusDataDefault: statusData =
+  { key: markerDefault, descr: '', kind: propKindDefault, names: [],
+    status: propStatusDefault, fct: undefined, kinstr: undefined,
+    source: sourceDefault, alarm: undefined, alarm_descr: undefined,
+    predicate: undefined };
 
 /* ------------------------------------- */

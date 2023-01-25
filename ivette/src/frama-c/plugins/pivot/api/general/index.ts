@@ -49,6 +49,9 @@ export const jTableStateType: Json.Decoder<tableStateType> =
 export const byTableStateType: Compare.Order<tableStateType> =
   Compare.array(Compare.array(Compare.string));
 
+/** Default value for `tableStateType` */
+export const tableStateTypeDefault: tableStateType = [];
+
 /** Signal for state [`pivotState`](#pivotstate)  */
 export const signalPivotState: Server.Signal = {
   name: 'plugins.pivot.general.signalPivotState',

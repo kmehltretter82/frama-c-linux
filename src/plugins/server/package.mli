@@ -43,8 +43,8 @@ type jtype =
   | Jtuple of jtype list
   | Junion of jtype list
   | Jrecord of (string * jtype) list
-  | Jenum of ident (* enum type declaration *)
-  | Jdata of ident * jtype (* underlying definition *)
+  | Jenum of ident * string list (* type and tags *)
+  | Jdata of ident * jtype (* type and definition *)
   | Jself (* for (simply) recursive types *)
 
 type fieldInfo = {
@@ -87,6 +87,7 @@ type declKindInfo =
   | D_array of arrayInfo
   | D_decoder of ident * jtype
   | D_order of ident * jtype (* natural ordering *)
+  | D_default of ident * jtype (* default value *)
 
 type declInfo = {
   d_ident : ident;
@@ -124,6 +125,7 @@ sig
   val getter : ident -> ident
   val setter : ident -> ident
   val data : ident -> ident
+  val default : ident -> ident
   val fetch : ident -> ident
   val reload : ident -> ident
   val order : ident -> ident

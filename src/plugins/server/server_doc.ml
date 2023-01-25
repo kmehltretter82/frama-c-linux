@@ -138,7 +138,7 @@ let kind_of_decl = function
   | D_request { rq_kind=`GET } -> "GET"
   | D_request { rq_kind=`SET } -> "SET"
   | D_request { rq_kind=`EXEC } -> "EXEC"
-  | D_decoder _ | D_order _ -> assert false
+  | D_decoder _ | D_order _ | D_default _ -> assert false
 
 let pp_for ?decl names =
   let self =
@@ -169,7 +169,7 @@ let md_signals signals =
 
 let descr_of_decl names decl =
   match decl.d_kind with
-  | D_decoder _ | D_order _ -> assert false
+  | D_decoder _ | D_order _ | D_default _ -> assert false
   | D_signal -> []
   | D_state _ -> [] (* TBC *)
   | D_value _ -> [] (* TBC *)

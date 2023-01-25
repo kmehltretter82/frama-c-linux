@@ -175,8 +175,8 @@ type jtype =
   | Jtuple of jtype list
   | Junion of jtype list
   | Jrecord of (string * jtype) list
-  | Jenum of ident (* enum type declaration *)
-  | Jdata of ident * jtype (* underlying definition *)
+  | Jenum of ident * string list (* type and tags *)
+  | Jdata of ident * jtype (* type and definition *)
   | Jself (* for (simply) recursive types *)
 
 (* -------------------------------------------------------------------------- *)
@@ -223,6 +223,7 @@ type declKindInfo =
   | D_array of arrayInfo (* key kind *)
   | D_decoder of ident * jtype
   | D_order of ident * jtype (* natural ordering *)
+  | D_default of ident * jtype (* default value *)
 
 type declInfo = {
   d_ident : ident;
@@ -274,6 +275,7 @@ struct
   let getter id = derived ~prefix:"get" id
   let setter id = derived ~prefix:"set" id
   let data id = derived ~suffix:"Data" id
+  let default id = derived ~suffix:"Default" id
   let fetch id = derived ~prefix:"fetch" id
   let reload id = derived ~prefix:"reload" id
   let order id = derived ~prefix:"by" id
@@ -299,9 +301,10 @@ let rec visit_jtype fn = function
   | Joption js | Jdict js  | Jarray js -> visit_jtype fn js
   | Jtuple js | Junion js -> List.iter (visit_jtype fn) js
   | Jrecord fjs -> List.iter (fun (_,js) -> visit_jtype fn js) fjs
-  | Jdata(id,_) | Jenum id ->
+  | Jdata(id,_) | Jenum(id,_) ->
     begin
       fn id ;
+      fn (Derived.default id) ;
       fn (Derived.decode id) ;
       fn (Derived.order id) ;
     end
@@ -318,7 +321,8 @@ let visit_request f { rq_input ; rq_output } =
 let visit_dkind f = function
   | D_signal | D_enum _ | D_array _ -> ()
   | D_type js | D_state js | D_value js -> visit_jtype f js
-  | D_decoder (id,js) | D_order(id,js) -> f id ; visit_jtype f js
+  | D_decoder (id,js) | D_order(id,js) | D_default(id,js)
+    -> f id ; visit_jtype f js
   | D_record fds -> List.iter (visit_field f) fds
   | D_request rq -> visit_request f rq
 
@@ -462,14 +466,13 @@ let rec md_jtype pp = function
   | Jtag a -> litteral a
   | Jkey kd -> key kd
   | Jindex kd -> index kd
-  | Jdata(id,_) | Jenum id -> pp.ident id
+  | Jdata(id,_) | Jenum(id,_) -> pp.ident id
   | Joption js -> protect pp js @ Md.code "?"
   | Jtuple js -> Md.code "[" @ md_jlist pp "," js @ Md.code "]"
   | Junion js -> md_jlist pp "|" js
   | Jarray js -> protect pp js @ Md.code "[]"
   | Jrecord fjs -> Md.code "{" @ fields pp fjs @ Md.code "}"
-  | Jdict js ->
-    Md.code "{[key]:" @ md_jtype pp js @ Md.code "}"
+  | Jdict js -> Md.code "{[key]:" @ md_jtype pp js @ Md.code "}"
 
 and md_jlist pp sep js =
   Md.glue ~sep:(Md.plain sep)  (List.map (md_jtype pp) js)

@@ -798,24 +798,12 @@ export async function resetSelection(): Promise<void> {
 
 export type attributes = Ast.markerAttributesData;
 
-export const defaultMarker: attributes = {
-  marker: Ast.jMarker(''),
-  labelKind: '',
-  titleKind: '',
-  name: '',
-  descr: '',
-  isLval: false,
-  isFunDecl: false,
-  isFunction: false,
-  sloc: { dir: '', base: '', file: '', line: 0 },
-};
-
 /** Access the marker attributes from AST. */
 export function useMarker(marker: Ast.marker | undefined): attributes {
   const marks = useSyncArray(Ast.markerAttributes);
-  if (marker === undefined) return defaultMarker;
+  if (marker === undefined) return Ast.markerAttributesDataDefault;
   const attrs = marks.getData(marker);
-  if (attrs === undefined) return defaultMarker;
+  if (attrs === undefined) return Ast.markerAttributesDataDefault;
   return attrs;
 }
 

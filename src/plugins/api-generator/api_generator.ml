@@ -100,7 +100,7 @@ let makeJtype ?self ~names =
     | Jkey kd -> Format.fprintf fmt "Json.key<'#%s'>" kd
     | Jindex kd -> Format.fprintf fmt "Json.index<'#%s'>" kd
     | Jdict js -> Format.fprintf fmt "@[<hov 2>Json.dict<@,%a>@]" pp js
-    | Jdata(id,_) | Jenum id -> pp_ident fmt id
+    | Jdata(id,_) | Jenum(id,_) -> pp_ident fmt id
     | Joption js -> Format.fprintf fmt "%a |@ undefined" pp js
     | Jtuple js ->
       Pretty_utils.pp_list ~pre:"@[<hov 2>[ " ~sep:",@ " ~suf:"@ ]@]" pp fmt js
@@ -180,7 +180,7 @@ let rec makeDecoder ?self ~names fmt js =
   | Jkey kd -> jkey fmt kd
   | Jindex kd -> jindex fmt kd
   | Jdata(id,_) -> jcall names fmt (Pkg.Derived.decode id)
-  | Jenum id -> jenum names fmt id
+  | Jenum(id,_) -> jenum names fmt id
   | Jself -> jcall names fmt (Pkg.Derived.decode (getSelf self))
   | Joption js ->
     Format.fprintf fmt "@[<hov 2>Json.jOption(@,%a)@]" make js
@@ -219,7 +219,7 @@ let makeOrder ~self ~names fmt js =
     | Jdata(id,_) -> jcall names fmt (Pkg.Derived.order id)
     | Joption js ->
       Format.fprintf fmt "@[<hov 2>Compare.defined(@,%a)@]" pp js
-    | Jenum id ->
+    | Jenum(id,_) ->
       Format.fprintf fmt "@[<hov 2>Compare.byEnum(@,%a)@]" (jcall names) id
     | Jarray js ->
       Format.fprintf fmt "@[<hov 2>Compare.array(@,%a)@]" pp js
@@ -249,6 +249,49 @@ let makeOrder ~self ~names fmt js =
   in pp fmt js
 
 (* -------------------------------------------------------------------------- *)
+(* --- Jtype Order                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+let rec atomic js =
+  let open Pkg in
+  match js with
+  | Junion js -> List.exists atomic js
+  | Jany | Jnull | Jnumber | Jboolean | Jstring | Jalpha
+  | Jtag _ | Jkey _ | Jindex _ | Jdict _ | Joption _ | Jarray _ | Jenum _
+    -> true
+  | Jself | Jtuple _ | Jrecord _ | Jdata _
+    -> false
+
+let makeDefault ~names fmt js =
+  let open Pkg in
+  let rec pp fmt = function
+    | Junion [] -> failwith "empty union type"
+    | Jenum(_,[]) -> failwith "empty enum type"
+    | Jself -> failwith "recursive default value"
+    | Jany | Jnull -> Format.pp_print_string fmt "null"
+    | Jnumber -> Format.pp_print_string fmt "0"
+    | Jboolean -> Format.pp_print_string fmt "false"
+    | Jstring | Jalpha -> Format.pp_print_string fmt "''"
+    | Jtag a -> Format.fprintf fmt "\"%s\"" a
+    | Jkey kd -> Format.fprintf fmt "%a('')" jkey kd
+    | Jindex kd -> Format.fprintf fmt "%a(-1)" jindex kd
+    | Jdict _ -> Format.fprintf fmt "{}"
+    | Jarray _ -> Format.fprintf fmt "[]"
+    | Joption _ -> Format.fprintf fmt "undefined"
+    | Jtuple js ->
+      Pretty_utils.pp_list ~pre:"@[<hov 2>[ " ~sep:",@ " ~suf:"@ ]@]"
+        pp fmt js
+    | Jrecord js ->
+      Pretty_utils.pp_list ~pre:"@[<hov 2>{ " ~sep:",@ " ~suf:"@ }@]"
+        pp_field fmt js
+    | Junion js ->
+      (try pp fmt (List.find atomic js) with Not_found -> pp fmt (List.hd js))
+    | Jdata(id,_) -> jcall names fmt (Pkg.Derived.default id)
+    | Jenum(id,tag::_) -> Format.fprintf fmt "%a.%s" (jcall names) id tag
+  and pp_field fmt (fd,js) = Format.fprintf fmt "%s: %a" fd pp js
+  in pp fmt js
+
+(* -------------------------------------------------------------------------- *)
 (* --- Declaration Generator                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -271,7 +314,7 @@ let makeDeclaration fmt names d =
 
   | D_type js ->
     makeDescr fmt d.d_descr ;
-    Format.fprintf fmt "@[<hv 2>export type %s =@ %a;@]@\n" self.name jtype js
+    Format.fprintf fmt "@[<hv 2>export type %s =@ %a;@]@\n" self.name jtype js ;
 
   | D_record fjs ->
     makeDescr fmt d.d_descr ;
@@ -396,6 +439,12 @@ let makeDeclaration fmt names d =
       self.name (jcall names) id
       (makeRecursive2 (makeOrder ~self:id ~names)) js
 
+  | D_default(id,js) ->
+    makeDescr fmt d.d_descr ;
+    Format.fprintf fmt
+      "@[<hov 2>@[<hv 0>export const %s:@ %a@] =@ %a;@]\n"
+      self.name (jcall names) id (makeDefault ~names) js
+
 (* -------------------------------------------------------------------------- *)
 (* --- Declaration Ranking                                                --- *)
 (* -------------------------------------------------------------------------- *)
@@ -412,14 +461,14 @@ let depends d =
     let id = d.d_ident in
     [
       Pkg.Derived.signal id;
-      Pkg.Derived.getter id
+      Pkg.Derived.getter id;
     ]
   | D_state _ ->
     let id = d.d_ident in
     [
       Pkg.Derived.signal id;
       Pkg.Derived.getter id;
-      Pkg.Derived.setter id
+      Pkg.Derived.setter id;
     ]
   | D_array _ ->
     let id = d.d_ident in

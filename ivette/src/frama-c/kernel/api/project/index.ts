@@ -59,6 +59,10 @@ export const byProjectInfo: Compare.Order<projectInfo> =
     current: Compare.boolean,
   });
 
+/** Default value for `projectInfo` */
+export const projectInfoDefault: projectInfo =
+  { id: Json.jKey<'#project'>('#project')(''), name: '', current: false };
+
 /** Request to be executed on the specified project. */
 export type projectRequest =
   { project: Json.key<'#project'>, request: string, data: Json.json };
@@ -79,6 +83,10 @@ export const byProjectRequest: Compare.Order<projectRequest> =
     request: Compare.string,
     data: Compare.structural,
   });
+
+/** Default value for `projectRequest` */
+export const projectRequestDefault: projectRequest =
+  { project: Json.jKey<'#project'>('#project')(''), request: '', data: null };
 
 const getCurrent_internal: Server.GetRequest<null,projectInfo> = {
   kind: Server.RqKind.GET,

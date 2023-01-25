@@ -38,9 +38,17 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
+import { byFct } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { bySource } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { fct } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { fctDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { jFct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -48,13 +56,19 @@ import { jSource } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { marker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
+import { markerDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { source } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { sourceDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { jTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { tag } from 'frama-c/kernel/api/data';
+//@ts-ignore
+import { tagDefault } from 'frama-c/kernel/api/data';
 
 const getConfig_internal: Server.GetRequest<
   null,
@@ -118,6 +132,9 @@ export const jLogkind: Json.Decoder<logkind> = Json.jEnum(logkind);
 /** Natural order for `logkind` */
 export const byLogkind: Compare.Order<logkind> = Compare.byEnum(logkind);
 
+/** Default value for `logkind` */
+export const logkindDefault: logkind = logkind.ERROR;
+
 const logkindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.services.logkindTags',
@@ -145,7 +162,7 @@ export interface messageData {
   /** Marker at the message position (if any) */
   marker?: marker;
   /** Function containing the message position (if any) */
-  fct?: Json.key<'#fct'>;
+  fct?: fct;
 }
 
 /** Decoder for `messageData` */
@@ -158,7 +175,7 @@ export const jMessageData: Json.Decoder<messageData> =
     category: Json.jOption(Json.jString),
     source: Json.jOption(jSource),
     marker: Json.jOption(jMarker),
-    fct: Json.jOption(Json.jKey<'#fct'>('#fct')),
+    fct: Json.jOption(jFct),
   });
 
 /** Natural order for `messageData` */
@@ -166,7 +183,7 @@ export const byMessageData: Compare.Order<messageData> =
   Compare.byFields
     <{ key: Json.key<'#message'>, kind: logkind, plugin: string,
        message: string, category?: string, source?: source, marker?: marker,
-       fct?: Json.key<'#fct'> }>({
+       fct?: fct }>({
     key: Compare.string,
     kind: byLogkind,
     plugin: Compare.alpha,
@@ -174,7 +191,7 @@ export const byMessageData: Compare.Order<messageData> =
     category: Compare.defined(Compare.string),
     source: Compare.defined(bySource),
     marker: Compare.defined(byMarker),
-    fct: Compare.defined(Compare.string),
+    fct: Compare.defined(byFct),
   });
 
 /** Signal for array [`message`](#message)  */
@@ -226,6 +243,12 @@ const message_internal: State.Array<Json.key<'#message'>,messageData> = {
 /** Log messages */
 export const message: State.Array<Json.key<'#message'>,messageData> = message_internal;
 
+/** Default value for `messageData` */
+export const messageDataDefault: messageData =
+  { key: Json.jKey<'#message'>('#message')(''), kind: logkindDefault,
+    plugin: '', message: '', category: undefined, source: undefined,
+    marker: undefined, fct: undefined };
+
 /** Message event record. */
 export interface log {
   /** Message kind */
@@ -261,6 +284,11 @@ export const byLog: Compare.Order<log> =
     category: Compare.defined(Compare.string),
     source: Compare.defined(bySource),
   });
+
+/** Default value for `log` */
+export const logDefault: log =
+  { kind: logkindDefault, plugin: '', message: '', category: undefined,
+    source: undefined };
 
 const setLogs_internal: Server.SetRequest<boolean,null> = {
   kind: Server.RqKind.SET,
