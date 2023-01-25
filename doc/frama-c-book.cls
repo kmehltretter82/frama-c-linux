@@ -410,7 +410,7 @@
 
 \newcommand{\lstbrk}{\mbox{$\color{blue}\scriptstyle\cdots$}}
 
-\def\lp@basic{\ifmmode\normalfont\mathtt\mdseries\small\else\normalfont\ttfamily\mdseries\normalsize\fi}
+\def\lp@basic{\ifmmode\normalfont\mathtt\mdseries\small\else\normalfont\ttfamily\mdseries\small\fi}
 \def\lp@inline{\ifmmode\normalfont\mathtt\scriptstyle\else\normalfont\ttfamily\mdseries\normalsize\fi}
 \def\lp@keyword{}
 \def\lp@special{\color{frama-c-dark-orange}}
