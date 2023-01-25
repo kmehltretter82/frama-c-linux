@@ -65,7 +65,7 @@ function setError(text: string): void {
 }
 
 // Function launching the external editor at the currently selected position.
-async function editor(file: string, pos: Position, cmd: string): Promise<void> {
+async function edit(file: string, pos: Position, cmd: string): Promise<void> {
   if (file === '') return;
   const args = cmd
     .replace('%s', file)
@@ -122,7 +122,7 @@ function createEventsHandler(): Editor.Extension {
       if (file === '') return;
       const label = 'Open file in an external editor';
       const pos = getCursorPosition(view);
-      Dome.popupMenu([ { label, onClick: () => editor(file, pos, command) } ]);
+      Dome.popupMenu([ { label, onClick: () => edit(file, pos, command) } ]);
     },
     mouseup: ({ file, command, update }, view, event) => {
       if (file === '') return;
@@ -133,7 +133,7 @@ function createEventsHandler(): Editor.Extension {
           if (fct || marker) update({ location: { fct, marker } });
         })
         .catch(() => setError('Failed to request to Frama-C server'));
-      if (event.ctrlKey) editor(file, pos, command);
+      if (event.ctrlKey) edit(file, pos, command);
     },
   });
 }
@@ -223,7 +223,7 @@ export default function SourceCode(): JSX.Element {
         <Buttons.IconButton
           icon="DUPLICATE"
           visible={file !== ''}
-          onClick={() => editor(file, pos, command)}
+          onClick={() => edit(file, pos, command)}
           title={externalEditorTitle}
         />
         <Labels.Code title={file}>{filename}</Labels.Code>
