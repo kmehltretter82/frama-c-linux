@@ -312,6 +312,7 @@ and cabsexp =
   | MEMBEROFPTR of expression * string
   | GNU_BODY of block
   | EXPR_PATTERN of string     (* pattern variable, and name *)
+  | GENERIC of (expression * (((specifier * decl_type) option * expression) list))
 
 and constant =
   | CONST_INT of string   (* the textual representation *)

@@ -3,7 +3,6 @@
    STDOPT: #"-cpp-extra-args=-DALIGNAS"
    STDOPT: #"-cpp-extra-args=-DALIGNOF"
    STDOPT: #"-cpp-extra-args=-DCOMPLEX"
-   STDOPT: #"-cpp-extra-args=-DGENERIC"
    STDOPT: #"-cpp-extra-args=-DIMAGINARY"
 */
 
@@ -20,10 +19,6 @@ int main(void) {
 
 #ifdef COMPLEX
   double _Complex c = 1;
-#endif
-
-#ifdef GENERIC
-  int generic = _Generic('0', char: 1, int: 2, default: 0);
 #endif
 
 #ifdef IMAGINARY

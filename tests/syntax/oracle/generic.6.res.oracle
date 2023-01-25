@@ -1,0 +1,6 @@
+[kernel] Parsing generic.c (with preprocessing)
+[kernel] generic.c:59: User Error: 
+  generic association with incomplete type 'void'
+[kernel] User Error: stopping on file "generic.c" that has errors. Add '-kernel-msg-key pp'
+  for preprocessing command.
+[kernel] Frama-C aborted: invalid user input.

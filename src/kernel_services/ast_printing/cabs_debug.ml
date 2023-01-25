@@ -363,6 +363,19 @@ and pp_exp_node fmt = function
     fprintf fmt "MEMBEROFPTR(%a,%s)" pp_exp exp s
   |   GNU_BODY bl -> fprintf fmt "GNU_BODY %a" pp_block bl
   |   EXPR_PATTERN s -> fprintf fmt "EXPR_PATTERN %s" s
+  |   GENERIC (exp, generic_assoc_list) ->
+    fprintf fmt "GENERIC(%a,%a)"
+      pp_exp exp
+      pp_generic_assoc_list generic_assoc_list
+
+and pp_generic_assoc_list fmt l =
+  List.iter (fun (typ_name, exp) ->
+      let pp_typ fmt = function
+        | None -> fprintf fmt "default"
+        | Some (spec, dt) ->
+          fprintf fmt "(%a, %a)" pp_spec spec pp_decl_type dt
+      in
+      fprintf fmt ",@ %a: %a" pp_typ typ_name pp_exp exp) l
 
 and pp_init_exp fmt = function
   |     NO_INIT -> fprintf fmt "NO_INIT"

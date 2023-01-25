@@ -2651,11 +2651,11 @@ exception Cannot_combine of string
    Note: we cannot force the qualifiers of oldt and t to be the same here,
    because in some cases (e.g. string literals and char pointers) it is
    allowed to have differences, while in others we want to be more strict. *)
-let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
+let rec combineTypes ?(strictReturnTypes=false) (what: combineWhat) (oldt: typ) (t: typ) : typ =
   match oldt, t with
   | TVoid olda, TVoid a -> TVoid (combineAttributes what olda a)
   (* allows ignoring a returned value *)
-  | _ , TVoid _ when what = CombineFunret -> t
+  | _ , TVoid _ when what = CombineFunret && not strictReturnTypes -> t
   | TInt (oldik, olda), TInt (ik, a) ->
     let combineIK oldk k =
       if oldk = k then oldk else
@@ -2707,7 +2707,7 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
                                (if oldci.cstruct then "struct" else "union")))
 
   | TArray (oldbt, oldsz, olda), TArray (bt, sz, a) ->
-    let newbt = combineTypes CombineOther oldbt bt in
+    let newbt = combineTypes ~strictReturnTypes CombineOther oldbt bt in
     let newsz =
       match oldsz, sz with
       | None, Some _ -> sz
@@ -2739,10 +2739,10 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
     TArray (newbt, newsz, combineAttributes what olda a)
 
   | TPtr (oldbt, olda), TPtr (bt, a) ->
-    TPtr (combineTypes CombineOther oldbt bt, combineAttributes what olda a)
+    TPtr (combineTypes ~strictReturnTypes CombineOther oldbt bt, combineAttributes what olda a)
 
   | TFun (oldrt, oldargs, oldva, olda), TFun (rt, args, va, a) ->
-    let newrt = combineTypes CombineFunret oldrt rt in
+    let newrt = combineTypes ~strictReturnTypes CombineFunret oldrt rt in
     if oldva != va then
       raise (Cannot_combine "different vararg specifiers");
     (* If one does not have arguments, believe the one with the
@@ -2779,7 +2779,7 @@ let rec combineTypes (what: combineWhat) (oldt: typ) (t: typ) : typ =
                    * very important if the prototype uses different names than
                    * the function definition. *)
                   let n = if an <> "" then an else on in
-                  let t = combineTypes what ot at in
+                  let t = combineTypes ~strictReturnTypes what ot at in
                   let a = addAttributes oa aa in
                   (n, t, a))
                oldargslist argslist),
@@ -2888,8 +2888,8 @@ let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
     have_compatible_qualifiers_deep ~context t1' t2'
   | _, _ -> included_qualifiers ~context (Cil.typeAttrs t1) (Cil.typeAttrs t2)
 
-let compatibleTypes ?context t1 t2 =
-  let r = combineTypes CombineOther t1 t2 in
+let compatibleTypes ?strictReturnTypes ?context t1 t2 =
+  let r = combineTypes ?strictReturnTypes CombineOther t1 t2 in
   (* C99, 6.7.3 §9: "... to be compatible, both shall have the identically
      qualified version of a compatible type;" *)
   if not (have_compatible_qualifiers_deep ?context t1 t2) then
@@ -2897,9 +2897,9 @@ let compatibleTypes ?context t1 t2 =
   (* Note: different non-qualifier attributes will be silently dropped. *)
   r
 
-let areCompatibleTypes ?context t1 t2 =
+let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
   try
-    ignore (compatibleTypes ?context t1 t2); true
+    ignore (compatibleTypes ?strictReturnTypes ?context t1 t2); true
   with Cannot_combine _ -> false
 
 (* Specify whether the cast is from the source code *)
@@ -7705,6 +7705,91 @@ and doExp local_env
 
     | Cabs.EXPR_PATTERN _ -> abort_context "EXPR_PATTERN in cabs2cil input"
 
+
+    | Cabs.GENERIC (ce, assocs) ->
+      let (_, _, control_exp, control_t) = doExp local_env asconst ce AType in
+      match Cil.lvalue_conversion control_t with
+      | Error msg -> Kernel.abort ~current:true "%s" msg
+      | Ok control_t ->
+        let has_default, assocs =
+          List.fold_left (fun (has_default, acc) (type_name, expr) ->
+              match type_name with
+              | None -> (* default *)
+                if has_default then
+                  Kernel.abort ~current:true
+                    "multiple default clauses in _Generic selection";
+                true, ((None, expr) :: acc)
+              | Some (spec, dt) ->
+                let t = doOnlyType ghost spec dt in
+                if not (Cil.isCompleteType t) then
+                  Kernel.abort ~current:true
+                    "generic association with incomplete type '%a'"
+                    Cil_datatype.Typ.pretty t
+                else if (Cil.isFunctionType t) then
+                  Kernel.abort ~current:true
+                    "generic association with function type '%a'"
+                    Cil_datatype.Typ.pretty t
+                else if (Cil.is_variably_modified_type t) then
+                  Kernel.abort ~current:true
+                    "generic association with variably modified type '%a'"
+                    Cil_datatype.Typ.pretty t
+                else begin
+                  (* Check if current type is compatible with one of the
+                     previous associations. Note: this is quadratic in terms of
+                     list size.
+                  *)
+                  List.iter (fun (tn, _) ->
+                      match tn with
+                      | None -> ()
+                      | Some t' ->
+                        if areCompatibleTypes ~strictReturnTypes:true t t' then
+                          Kernel.abort ~current:true
+                            "multiple compatible types in _Generic selection:@ \
+                             '%a' and '%a'"
+                            Cil_printer.pp_typ t'
+                            Cil_printer.pp_typ t
+                    ) acc;
+                  has_default, (Some t, expr) :: acc
+                end
+            ) (false, []) assocs
+        in
+        let candidates = (* note: assocs only includes non-default candidates *)
+          List.filter (fun (type_name, _) ->
+              Option.fold
+                ~none:false
+                ~some:(areCompatibleTypes ~strictReturnTypes:true control_t)
+                type_name
+            ) assocs
+        in
+        if List.length candidates > 1 then
+          Kernel.abort ~current:true
+            "controlling expression compatible with more than one association \
+             type in _Generic selection:@ \
+             controlling expression: '%a' (type: %a);@ \
+             compatible types: %a"
+            Cil_printer.pp_exp control_exp
+            Cil_printer.pp_typ control_t
+            (Pretty_utils.pp_list ~sep:", " Cil_printer.pp_typ)
+            (List.map (fun (tn, _) -> Option.get tn) candidates)
+        else if List.length candidates == 1 then
+          doExp local_env asconst (snd (List.hd candidates)) what
+        else if not has_default then
+          let types =
+            List.map (fun (type_name, _) -> Option.get type_name) assocs
+          in
+          Kernel.abort ~current:true
+            "no compatible types and no default type in _Generic selection:@ \
+             controlling expression: '%a' (type: %a);@ \
+             candidate types: %a"
+            Cil_printer.pp_exp control_exp
+            Cil_printer.pp_typ control_t
+            (Pretty_utils.pp_list ~sep:", " Cil_printer.pp_typ) types;
+        else
+          let default_type =
+            (* This list is guaranteed non-empty, since has_default is 'true' *)
+            snd List.(hd (filter (fun (typ_name, _) -> typ_name = None) assocs))
+          in
+          doExp local_env asconst default_type what
   in
   (*let (_a,b,_c,_d) = result in
     Format.eprintf "doExp ~const:%b ~e:" asconst ;

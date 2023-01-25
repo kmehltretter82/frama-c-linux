@@ -6242,6 +6242,45 @@ and is_complete_agg_member ~allowZeroSizeArrays ?last_field t =
 let isCompleteType ?allowZeroSizeArrays t =
   isCompleteType ?allowZeroSizeArrays t
 
+let pointer_decay t =
+  match unrollType t with
+  | TArray (typ, _, _) -> TPtr(typ, [])
+  | TFun _ as typ -> TPtr(typ, [])
+  | t -> t
+
+(* C11 6.3.2.1:  If the lvalue has qualified type, the value has the
+   unqualified version of the type of the lvalue; additionally, if the lvalue
+   has atomic type, the value has the non-atomic version of the type of the
+   lvalue; otherwise, the value has the type of the lvalue. If the lvalue has
+   an incomplete type and does not have array type, the behavior is undefined.
+*)
+let lvalue_conversion (t : typ) : (typ, string) result =
+  if not (isCompleteType t) && not (isArrayType t) then
+    Error (Format.asprintf
+             "Invalid lvalue conversion of incomplete non-array type %a"
+             !pp_typ_ref t)
+  else
+    let t' = pointer_decay t in
+    (* NOTE: remove atomicity when it will be supported by Frama-C.
+             also, note that currently 'ghost' is removed. *)
+    Ok (type_remove_qualifier_attributes_deep t')
+
+let rec is_variably_modified_type (t : typ) : bool =
+  match unrollType t with
+  | TArray(t', osize, _) -> begin
+      match osize with
+      | None -> is_variably_modified_type t'
+      | Some s ->
+        if not (isConstant s) then true
+        else is_variably_modified_type t'
+    end
+  | TComp _ ->
+    (* GCC supports VLA fields as an extension; if we ever support it,
+       add extra code here to take them into account *)
+    false
+  | TVoid _ | TInt _ | TEnum _ | TFloat _
+  | TPtr _ | TFun _ | TNamed _ | TBuiltin_va_list _ -> false
+
 let is_mutable (lhost, offset) =
   let rec aux can_mutate typ off =
     let can_mutate = can_mutate && not (isConstType typ) in

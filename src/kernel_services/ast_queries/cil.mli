@@ -433,6 +433,18 @@ val compFullName: compinfo -> string
 *)
 val isCompleteType: ?allowZeroSizeArrays:bool -> typ -> bool
 
+(** Performs lvalue-conversion on the type and returns the converted type,
+    or Error if the type is incomplete and not an array type.
+
+    @since Frama-C+dev
+*)
+val lvalue_conversion: typ -> (typ, string) result
+
+(** [true] iff the given type is variably modified, i.e., an array
+    with variable size (VLA), or a composite type containing such an array.
+*)
+val is_variably_modified_type: typ -> bool
+
 (** [true] iff the given type is a [struct] whose last field is a flexible
     array member. When in gcc mode, a zero-sized array is identified with a
     FAM for this purpose.
