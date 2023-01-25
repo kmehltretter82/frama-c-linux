@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ##################################
 
+-!  Kernel    [2023-01-25] Add support for C11's _Generic. Modifies Cabs AST.
+
 ###############################
 Open Source Release 26.0 (Iron)
 ###############################
