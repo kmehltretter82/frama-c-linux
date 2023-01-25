@@ -331,8 +331,8 @@ function createSelectionField(): Field<EditorSelection> {
   const cursor = EditorSelection.cursor(0);
   const field = createField<EditorSelection>(EditorSelection.create([cursor]));
   const set: Set<EditorSelection> = (view, selection) => {
-    field.set(view, selection);
     view?.dispatch({ selection });
+    field.set(view, selection);
   }
   const updater = EditorView.updateListener.of((update) => {
     if (update.selectionSet) field.set(update.view, update.state.selection);
@@ -344,16 +344,14 @@ function createSelectionField(): Field<EditorSelection> {
 export type ToString<A> = (text: A) => string;
 export function createTextField<A>(init: A, toString: ToString<A>): Field<A> {
   const field = createField<A>(init);
-  const isUpdated: IsUpdated = (u) =>
-    field.isUpdated(u) && u.startState.doc.length !== 0;
   const set: Set<A> = (view, text) => {
-    field.set(view, text);
     const selection = { anchor: 0 };
     const length = view?.state.doc.length;
     const changes = { from: 0, to: length, insert: toString(text) };
     view?.dispatch({ changes, selection });
+    field.set(view, text);
   };
-  return { ...field, set, isUpdated };
+  return { ...field, set };
 }
 
 // An extension displaying line numbers in a gutter. Does not display anything
