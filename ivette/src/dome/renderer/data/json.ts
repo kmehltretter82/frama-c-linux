@@ -49,7 +49,7 @@ export type jobject = { [key: string]: json };
 
 class JsonError extends Error {
   expected = '';
-  constructor(expected : string, given : json) {
+  constructor(expected: string, given: json) {
     super(`expected ${expected} but given ${given}`);
     this.name = this.constructor.name;
     this.expected = expected;
@@ -124,10 +124,10 @@ export function identity<A>(v: A): A { return v; }
 export const jNull: Decoder<null> = (js: json) => {
   if (js === null) {
     return null;
-   }
-   else {
+  }
+  else {
     throw new JsonError("null", js);
-   }
+  }
 };
 
 /** Identity. */
@@ -159,7 +159,7 @@ export const jInt: Decoder<number> = (js: json) => {
     return js;
   }
   else {
-    throw new JsonError("integer", js); 
+    throw new JsonError("integer", js);
   }
 };
 
@@ -174,7 +174,7 @@ export const jBoolean: Decoder<boolean> = (js: json) => {
     return js;
   }
   else {
-    throw new JsonError("boolean", js); 
+    throw new JsonError("boolean", js);
   }
 };
 
@@ -190,14 +190,14 @@ export const jFalse: Decoder<boolean> = (js: json) => (
 
 /** Primitive JSON string or throws JsonError. */
 export const jString: Decoder<string> = (js: json) => {
-    if (typeof js === 'string') {
-      return js;
-    }
-    else {
-      throw new JsonError("string", js); 
-    }
-  };
-  
+  if (typeof js === 'string') {
+    return js;
+  }
+  else {
+    throw new JsonError("string", js);
+  }
+};
+
 
 /** JSON constant.
     Capture the tag or throw JsonError.
@@ -210,13 +210,13 @@ export function jTag<A>(tg: A): Decoder<A> {
       return tg;
     }
     else {
-      throw new JsonError(`"${tg}"`, js); 
+      throw new JsonError(`"${tg}"`, js);
     }
-   };
+  };
 }
 
 /**
-   Lookup tags in a dictionary, throw JsonError if the tag is not found. 
+   Lookup tags in a dictionary, throw JsonError if the tag is not found.
    Can be used directly for enum types, eg. `jEnum(myEnumType)`.
  */
 export function jEnum<A>(d: { [tag: string]: A }): Decoder<A> {
@@ -255,7 +255,7 @@ export function jTags<A extends string | number>(...values: A[]): Decoder<A> {
    JSON input.
  */
 export function jOption<A>(fn: Decoder<A>, defaultValue?: A)
-    : Decoder<A | undefined> {
+  : Decoder<A | undefined> {
   return (js: json) => (
     js === undefined || js === null ? defaultValue : fn(js)
   );
@@ -349,7 +349,7 @@ export function jList<A>(fn: Decoder<A>): Decoder<A[]> {
           else {
             throw err;
           }
-        }  
+        }
       }
       return buffer;
     }
@@ -446,7 +446,7 @@ export function jTuple5<A, B, C, D, E>(
    Optional fields in `A` can use jOption
 */
 export type Props<A> = {
-  [P in (keyof A & string)] : Decoder<A[P]>;
+  [P in (keyof A & string)]: Decoder<A[P]>;
 };
 
 /**
@@ -456,7 +456,7 @@ export type Props<A> = {
 export function jObject<A extends object>(decoders: Props<A>): Decoder<A> {
   return (js: json) => {
     if (js !== null && typeof js === 'object' && !Array.isArray(js)) {
-      const buffer : Partial<A> = {};
+      const buffer: Partial<A> = {};
       for (const k of Object.keys(decoders) as (keyof A & string)[]) {
         buffer[k] = decoders[k](js[k]);
       }
@@ -543,24 +543,24 @@ export type index<K> = phantom<K, number>;
 
 /** Decoder for `key<K>` strings. */
 export function jKey<K>(kd: K): Decoder<key<K>> {
-  return (js: json)  => {
+  return (js: json) => {
     if (typeof js === 'string') {
       return forge(kd, js);
     }
     else {
-      throw new JsonError(`key<${kd}>`, js); 
+      throw new JsonError(`key<${kd}>`, js);
     }
   };
 }
 
 /** Decoder for `index<K>` numbers. */
 export function jIndex<K>(kd: K): Decoder<index<K>> {
-  return (js: json)  => {
+  return (js: json) => {
     if (typeof js === 'number') {
       return forge(kd, js);
     }
     else {
-      throw new JsonError(`index<${kd}>`, js); 
+      throw new JsonError(`index<${kd}>`, js);
     }
   };
 }
