@@ -69,9 +69,9 @@ let smooth_expression lst =
 let merge_string (c1,(b1,_)) (l2,(_,e2)) = c1 :: l2, (b1,e2)
 
 (* To be called only inside a grammar rule. *)
-let make_expr start_end_pos e =
-  { expr_loc = Cil_datatype.Location.of_lexing_loc start_end_pos;
-    expr_node = e }
+let make_expr start_end_pos expr_node =
+  let expr_loc = Cil_datatype.Location.of_lexing_loc start_end_pos in
+  { expr_loc; expr_node }
 
 let currentFunctionName = ref "<outside any function>"
 
@@ -494,7 +494,7 @@ global:
     * scope it looks too much like a function call  *) */
 | IDENT LPAREN old_parameter_list_ne RPAREN old_pardef_list SEMICOLON
     {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
+      let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
       (* Convert pardecl to new style *)
       let pardecl, isva = doOldParDecl $3 $5 in
       (* Make the function declarator *)
@@ -503,7 +503,7 @@ global:
            ["FC_OLDSTYLEPROTO",[]], loc), NO_INIT)]
     }
 | IDENT LPAREN RPAREN SEMICOLON {
-  let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
+  let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
   doDeclaration None loc []
     [(($1, PROTO(JUSTBASE,[],[],false),
        ["FC_OLDSTYLEPROTO",[]], loc), NO_INIT)]
@@ -533,7 +533,7 @@ primary_expression:                     /*(* 6.5.1. *)*/
 |		paren_comma_expression
 		        { make_expr $sloc (PAREN (smooth_expression $1)) }
 |		LPAREN block RPAREN { make_expr $sloc (GNU_BODY (fst3 $2)) }
-|  generic_selection { make_expr (GENERIC $1) }
+|  generic_selection { make_expr $sloc (GENERIC $1) }
 ;
 
 postfix_expression:                     /*(* 6.5.2 *)*/
@@ -544,8 +544,8 @@ postfix_expression:                     /*(* 6.5.2 *)*/
       { make_expr $sloc (CALL ($1, $3, $5))}
 | BUILTIN_VA_ARG LPAREN expression COMMA type_name RPAREN
       { let b, d = $5 in
-        let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 5, Parsing.rhs_end_pos 5) in
-        let loc_f = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
+        let loc = Cil_datatype.Location.of_lexing_loc $loc($5) in
+        let loc_f = Cil_datatype.Location.of_lexing_loc $loc($1) in
         make_expr $sloc
           (CALL
              ({ expr_loc = loc_f;
@@ -556,9 +556,9 @@ postfix_expression:                     /*(* 6.5.2 *)*/
 | BUILTIN_TYPES_COMPAT LPAREN type_name COMMA type_name RPAREN
       { let b1,d1 = $3 in
         let b2,d2 = $5 in
-        let loc_f = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
-        let loc1 = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 3, Parsing.rhs_end_pos 3) in
-        let loc2 = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 5, Parsing.rhs_end_pos 5) in
+        let loc_f = Cil_datatype.Location.of_lexing_loc $loc($1) in
+        let loc1 = Cil_datatype.Location.of_lexing_loc $loc($3) in
+        let loc2 = Cil_datatype.Location.of_lexing_loc $loc($5) in
         make_expr $sloc
           (CALL
              ({expr_loc = loc_f;
@@ -568,7 +568,7 @@ postfix_expression:                     /*(* 6.5.2 *)*/
       }
 | BUILTIN_OFFSETOF LPAREN type_name COMMA offsetof_member_designator RPAREN
     {
-      let loc_f = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
+      let loc_f = Cil_datatype.Location.of_lexing_loc $loc($1) in
       let arg = transformOffsetOf $3 $5 in
       let builtin = { expr_loc = loc_f;
                       expr_node = VARIABLE "__builtin_offsetof" }
@@ -913,7 +913,7 @@ annotated_statement:
 
 else_part:
 /* empty */ {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       no_ghost_stmt (NOP loc)
     }
     %prec if_no_else /* To attach the next else to the current if */
@@ -924,7 +924,7 @@ else_part:
     %prec ghost_else_no_else /* To force the non ghost else to be attached to the current if */
 |   LGHOST_ELSE annotated_statement RGHOST ELSE annotated_statement
     {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       Kernel.warning ~wkey:Kernel.wkey_ghost_bad_use ~source:(fst loc)
         "Invalid ghost else ignored@." ;
       in_block $5
@@ -942,94 +942,93 @@ statement:
         | None -> bs
       }
 |   comma_expression SEMICOLON
-	  { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+	  { let loc = Cil_datatype.Location.of_lexing_loc $sloc in
             no_ghost [COMPUTATION (smooth_expression $1,loc)]}
 |   block { let (x,y,z) = $1 in no_ghost [BLOCK (x, y, z)]}
 |   IF paren_comma_expression annotated_statement else_part
-        { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+        { let loc = Cil_datatype.Location.of_lexing_loc $sloc in
           no_ghost [IF (smooth_expression $2,
                        in_block $3, $4, loc)]}
 |   SWITCH paren_comma_expression annotated_statement
-        { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+        { let loc = Cil_datatype.Location.of_lexing_loc $sloc in
           no_ghost [SWITCH (smooth_expression $2, in_block $3, loc)]}
 |   opt_loop_annotations
     WHILE paren_comma_expression annotated_statement
-    { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 2, Parsing.symbol_end_pos ()) in
+    { let loc = Cil_datatype.Location.of_lexing_loc $loc($2) in
       no_ghost [WHILE ($1, smooth_expression $3, in_block $4, loc)] }
 |   opt_loop_annotations
     DO annotated_statement WHILE paren_comma_expression SEMICOLON
-    { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 2, Parsing.symbol_end_pos ()) in
+    { let loc = Cil_datatype.Location.of_lexing_loc $loc($2) in
       no_ghost [DOWHILE ($1, smooth_expression $5, in_block $3, loc)]}
 |   opt_loop_annotations
     FOR LPAREN for_clause opt_expression
     SEMICOLON opt_expression RPAREN annotated_statement
-    { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 2, Parsing.symbol_end_pos ()) in
+    { let loc = Cil_datatype.Location.of_lexing_loc $loc($2) in
       no_ghost [FOR ($1, $4, $5, $7, in_block $9, loc)]}
 |   id_or_typename_as_id COLON  attribute_nocv_list annotated_statement
 	{(* The only attribute that should appear here
             is "unused". For now, we drop this on the
             floor, since unused labels are usually
             removed anyways by Rmtmps. *)
-          let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 2) in
+          let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
           match $4 with
           | [] -> (* should not happen if grammar is written correctly *)
             parse_error "empty statement after label"
           | s :: others -> no_ghost [LABEL($1,s,loc)] @ others }
 
 |   CASE expression COLON annotated_statement
-	    { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.rhs_end_pos 3) in
+	    { let loc = Cil_datatype.Location.of_lexing_loc $sloc in
               no_ghost [CASE ($2, in_block $4, loc)]}
 |   CASE expression ELLIPSIS expression COLON annotated_statement
-	    { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.rhs_end_pos 5) in
+	    { let loc = Cil_datatype.Location.of_lexing_loc $sloc in
               no_ghost [CASERANGE ($2, $4, in_block $6, loc)]}
 |   DEFAULT COLON annotated_statement
-        { let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos(), Parsing.symbol_end_pos ()) in
+        { let loc = Cil_datatype.Location.of_lexing_loc $sloc in
               no_ghost [DEFAULT (in_block $3, loc)]}
 |   RETURN SEMICOLON {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       no_ghost [RETURN ({ expr_loc = loc; expr_node = NOTHING}, loc)]
     }
 |   RETURN comma_expression SEMICOLON {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       no_ghost [RETURN (smooth_expression $2, loc)]
     }
 |   BREAK SEMICOLON     {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       no_ghost [BREAK loc]
     }
 |   CONTINUE SEMICOLON	 {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       no_ghost [CONTINUE loc]
     }
 |   GOTO id_or_typename_as_id SEMICOLON {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       no_ghost [GOTO ($2, loc)]
     }
 |   GOTO STAR comma_expression SEMICOLON {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       no_ghost [COMPGOTO (smooth_expression $3, loc) ]
     }
 |   ASM GOTO asmattr LPAREN asmtemplate asmoutputs RPAREN SEMICOLON {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+      let loc = Cil_datatype.Location.of_lexing_loc $loc in
       no_ghost [ASM ($3, mk_asm_templates $5, $6, loc)]
     }
 |   ASM asmattr LPAREN asmtemplate asmoutputs RPAREN SEMICOLON {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       no_ghost [ASM ($2, mk_asm_templates $4, $5, loc)]
     }
 |   MSASM   { no_ghost [ASM ([], [fst $1], None, snd $1)]}
 |   TRY block EXCEPT paren_comma_expression block {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
-      let loc_e = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 4, Parsing.rhs_end_pos 4) in
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       let b, _, _ = $2 in
       let h, _, _ = $5 in
       if not !Cprint.msvcMode then
         Errorloc.parse_error "try/except in GCC code";
       no_ghost
-        [TRY_EXCEPT (b, {expr_loc = loc_e; expr_node = COMMA $4}, h, loc)]
+        [TRY_EXCEPT (b, make_expr $loc($4) (COMMA $4), h, loc)]
     }
 |   TRY block FINALLY block {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()) in
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       let b, _, _ = $2 in
       let h, _, _ = $4 in
       if not !Cprint.msvcMode then
@@ -1232,7 +1231,7 @@ type_spec:   /* ISO 6.7.2 */
 |   ENUM   just_attributes                LBRACE enum_list maybecomma RBRACE
                                                    { Tenum   ("", Some $4, $2), $1 }
 |   NAMED_TYPE      {
-      (Tnamed $1, Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos()))
+      (Tnamed $1, Cil_datatype.Location.of_lexing_loc $sloc)
       }
 |   TYPEOF LPAREN expression RPAREN     { TtypeofE $3, $1 }
 |   TYPEOF LPAREN type_name RPAREN      { let s, d = $3 in
@@ -1285,11 +1284,11 @@ enum_list: /* (* ISO 6.7.2.2 *) */
 ;
 enumerator:
     IDENT			{
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (), Parsing.symbol_end_pos()) in
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       ($1, { expr_node = NOTHING; expr_loc = loc }, loc)
     }
 |   IDENT EQ expression		{
-      ($1, $3, Cil_datatype.Location.of_lexing_loc (Parsing.symbol_start_pos (),Parsing.symbol_end_pos()))
+      ($1, $3, Cil_datatype.Location.of_lexing_loc $sloc)
     }
 ;
 
@@ -1492,7 +1491,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 | IDENT parameter_list_startscope rest_par_list RPAREN ghost_parameter_opt
     { let (params, isva) = $3 in
       let ghost = $5 in
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
+      let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
       let fdec =
         ($1, PROTO(JUSTBASE, params, ghost, isva), [], loc) in
       announceFunctionName fdec;
@@ -1504,7 +1503,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 | IDENT LPAREN old_parameter_list_ne RPAREN old_pardef_list
     { (* Convert pardecl to new style *)
       let pardecl, isva = doOldParDecl $3 $5 in
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
+      let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
       (* Make the function declarator *)
       let fdec = ($1, PROTO(JUSTBASE, pardecl,[],isva), [], loc) in
       announceFunctionName fdec;
@@ -1513,7 +1512,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
     }
 | IDENT LPAREN RPAREN ghost_parameter_opt
   {
-    let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_start_pos 1) in
+    let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
     let fdec = ($1, PROTO(JUSTBASE,[],$4,false),[],loc) in
     announceFunctionName fdec;
     (loc, [SpecType Tint], fdec)
@@ -1530,7 +1529,7 @@ cvspec:
     {
       let annot, loc = $1 in
       if String.compare annot "\\ghost" = 0 then begin
-        let start = Parsing.symbol_start_pos () in
+        let start = $startpos in
         let source = Cil_datatype.Position.of_lexing_pos start in
         Errorloc.parse_error ~source "Use of \\ghost out of ghost code"
       end else
@@ -1550,7 +1549,7 @@ attributes_with_asm:
     /* empty */                         { [] }
 |   attribute attributes_with_asm       { fst $1 :: $2 }
 |   ASM LPAREN string_constant RPAREN attributes {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 3, Parsing.rhs_end_pos 3) in
+      let loc = Cil_datatype.Location.of_lexing_loc $loc($3) in
       ("__asm__",
        [{ expr_node = CONSTANT(CONST_STRING (fst $3)); expr_loc = loc}])
       :: $5
@@ -1658,12 +1657,12 @@ primary_attr:
 postfix_attr:
     primary_attr { $1 }
 |   id_or_typename_as_id paren_attr_list_ne {
-        let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
+        let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
         make_expr $sloc (CALL({ expr_loc = loc; expr_node = VARIABLE $1}, $2,[])) }
       /* (* use a VARIABLE "" so that the parentheses are printed *) */
 |   id_or_typename_as_id LPAREN  RPAREN {
-      let loc1 = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
-      let loc2 = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 2, Parsing.rhs_end_pos 3) in
+      let loc1 = Cil_datatype.Location.of_lexing_loc $loc($1) in
+      let loc2 = Cil_datatype.Location.of_lexing_loc $loc($2) in
       let f = { expr_node = VARIABLE $1; expr_loc = loc1 } in
       let arg = { expr_node = VARIABLE ""; expr_loc = loc2 } in
       make_expr $sloc (CALL(f, [arg],[]))
@@ -1671,7 +1670,7 @@ postfix_attr:
       /* (* use a VARIABLE "" so that the parameters are printed without
           * parentheses nor comma *) */
 |   basic_attr param_attr_list_ne  {
-      let loc = Cil_datatype.Location.of_lexing_loc (Parsing.rhs_start_pos 1, Parsing.rhs_end_pos 1) in
+      let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
       make_expr $sloc (CALL({ expr_node = VARIABLE ""; expr_loc = loc}, $1::$2,[])) }
 
 |   postfix_attr ARROW id_or_typename   { make_expr $sloc (MEMBEROFPTR ($1, $3))}
