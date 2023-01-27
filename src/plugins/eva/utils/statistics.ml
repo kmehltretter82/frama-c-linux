@@ -23,9 +23,9 @@
 (* Statistics are stored in a dictonary, implemented as an hashtable from
    keys to integers.
 
-   [Key] is the representation of the dictionnary keys: a registered
-   ['a t] statistic accompagnied by the function or the statement the stat is
-   about
+   [Key] is the representation of the dictionnary keys: a couple of a registered
+   statistic (type ['a t]) accompagnied by the function or the statement the stat
+   is about (type ['a])
 
    Statistics must be registered before usage. The registry keeps track of the
    registered statistics and allow the reloading of projects by matching the
@@ -48,7 +48,7 @@ type 'a t = {
 
 (* --- Registry --- *)
 
-type registered_stat = Registered : 'a t -> registered_stat
+type registered_stat = Registered : 'a t -> registered_stat [@@unboxed]
 
 let kind_to_string : type a. a kind -> string = function
   | Global -> "global"
@@ -60,8 +60,9 @@ let last_id = ref 0
 
 let register (type a) (name : string) (kind : a kind) : a t =
   try
+    (* If the stat is already registered, return the previous one *)
     let Registered stat = Hashtbl.find registry name in
-    match stat.kind, kind with
+    match stat.kind, kind with (* equality must be ensured to return the right type of stat *)
     | Global, Global -> stat
     | Function, Function -> stat
     | Statement, Statement -> stat
@@ -70,6 +71,7 @@ let register (type a) (name : string) (kind : a kind) : a t =
         "%s statistic \"%s\" was already registered with as a %s statistic"
         name (kind_to_string kind) (kind_to_string stat.kind)
   with Not_found ->
+    (* Otherwise, create a new record for the stat *)
     incr last_id;
     let stat = { id = !last_id; name; kind } in
     Hashtbl.add registry name (Registered stat);
@@ -153,6 +155,7 @@ module State =
 let set (type a) (stat : a t) (x : a) value =
   let k = Key (stat,x) in
   State.replace k value
+
 let update (type a) (stat : a t) (x : a) (f : int -> int) =
   let k = Key (stat,x) in
   State.replace k (f (State.find_opt k |> Option.value ~default:0))
