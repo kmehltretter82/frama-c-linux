@@ -2,9 +2,9 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 1995-2022                                               */
+/*  Copyright (C) 1995-2023                                               */
 /*    Free Software Foundation, Inc.                                      */
-/*  Copyright (C) 2021-2022                                               */
+/*  Copyright (C) 2021-2023                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
