@@ -28,19 +28,24 @@ theory Vlist
 
   use int.Int
   use int.ComputerDivision
+  use list.Append
+  use list.NthNoOpt
+  use option.Option
+
+  use export list.List
+  use export list.Length
 
   (* -------------------------------------------------------------------- *)
   (* --- Classical Lists for Alt-Ergo                                 --- *)
   (* -------------------------------------------------------------------- *)
 
-  type list 'a
-
-  function nil : list 'a
-  function cons 'a (list 'a) : list 'a
-  function concat (list 'a) (list 'a) : list 'a
-  function repeat (list 'a) int : list 'a
-  function length (list 'a) : int
-  function nth (list 'a) int : 'a
+  function nil : list 'a = Nil
+  function cons (x: 'a) (xs: list 'a) : list 'a = Cons x xs
+  function concat (xs: list 'a) (ys: list 'a) : list 'a = xs ++ ys
+  let rec function repeat (xs: list 'a) (n: int) : list 'a
+    variant {n} =
+    if (n <= 0) then Nil else xs ++ repeat xs (n - 1)
+  function nth (xs: list 'a) (n: int) : 'a = NthNoOpt.nth n xs
 
   function elt (x:'a) : list 'a  = cons x nil
 
@@ -48,21 +53,21 @@ theory Vlist
   (* --- length                                                       --- *)
   (* -------------------------------------------------------------------- *)
 
-  axiom length_pos : forall w:list 'a. (Int.(<=) 0 (length w))
+  lemma length_pos : forall w:list 'a. (Int.(<=) 0 (length w))
 
-  axiom length_nil : length (nil: list 'a) = 0
+  lemma length_nil : length (nil: list 'a) = 0
 
-  axiom length_nil_bis : forall w:list 'a. length w = 0 -> w = nil
+  lemma length_nil_bis : forall w:list 'a. length w = 0 -> w = nil
 
-  axiom length_cons :
+  lemma length_cons :
     forall x:'a, w:list 'a [length (cons x w)].
       length (cons x w) = (Int.(+) 1 (length w))
 
-  axiom length_concat :
+  lemma length_concat :
     forall u,v:list 'a [length (concat u v)].
       length (concat u v) = (Int.(+) (length u) (length v))
 
-  axiom length_repeat : 
+  lemma length_repeat :
     forall w:list 'a, n:int [length (repeat w n)].
       (Int.(<=) 0 n) -> length (repeat w n) = (Int.( * ) n (length w))
 
@@ -70,16 +75,16 @@ theory Vlist
   (* --- nth                                                          --- *)
   (* -------------------------------------------------------------------- *)
 
-  axiom nth_cons: 
+  lemma nth_cons:
     forall k:int, x:'a, w:list 'a [nth (cons x w) k].
-      nth (cons x w) k = if k = 0 then x else nth w (k-1)
+      0 <= k -> nth (cons x w) k = if k = 0 then x else nth w (k-1)
 
-  axiom nth_concat: 
+  lemma nth_concat:
     forall u,v:list 'a, k:int [nth (concat u v) k].
-      nth (concat u v) k = if k < length u then nth u k 
+      0 <= k -> nth (concat u v) k = if k < length u then nth u k
                                            else nth v (Int.(-) k (length u))
 
-  axiom nth_repeat: 
+  lemma nth_repeat:
     forall n,k:int, w:list 'a [nth (repeat w n) k].
       0 <= k < (Int.( * ) n (length w)) -> (Int.(<) 0 (length w)) ->
       nth (repeat w n) k = nth w (mod k (length w))
@@ -92,7 +97,7 @@ theory Vlist
     length u = length v &&
     forall i:int. 0 <= i < length u -> nth u i = nth v i
 
-  axiom extensionality:
+  lemma extensionality:
     forall u,v:list 'a. vlist_eq u v -> u = v
 
   (* -------------------------------------------------------------------- *)
