@@ -46,7 +46,7 @@
 (***** Handling parsing errors ********)
 type parseinfo = {
   lexbuf : Lexing.lexbuf;
-  positions: (Lexing.position * Lexing.position) MenhirLib.ErrorReports.buffer;
+  menhir_pos: (Lexing.position * Lexing.position) MenhirLib.ErrorReports.buffer;
   mutable current_working_directory : string option;
 }
 
@@ -54,57 +54,59 @@ let current = ref None
 
 let startParsing fname lexer =
   (* We only support one open file at a time *)
-  if Option.is_some !current then begin
+  match !current with
+  | Some { lexbuf } ->
     Kernel.fatal
       "[Errorloc.startParsing] supports only one open file: \
        You want to open %S and %S is still open"
-      fname (Lexing.lexeme_start_p (Option.get !current).lexbuf).Lexing.pos_fname
-  end;
-  let scan_references = Kernel.EagerLoadSources.get () in
-  match Parse_env.open_source ~scan_references fname with
-  | Error msg -> Kernel.fatal "%s" msg
-  | Ok in_str ->
-    let lexbuf = Lexing.from_string in_str in
-    let positions, lexer = MenhirLib.ErrorReports.wrap lexer in
-    let filename = Filepath.normalize fname in
-    let i = { lexbuf; positions; current_working_directory = None } in
-    (* Initialize lexer buffer. *)
-    lexbuf.Lexing.lex_curr_p <-
-      { Lexing.pos_fname = filename;
-        Lexing.pos_lnum  = 1;
-        Lexing.pos_bol   = 0;
-        Lexing.pos_cnum  = 0
-      };
-    current := Some i;
-    lexbuf, lexer
+      fname (Lexing.lexeme_start_p lexbuf).Lexing.pos_fname
+  | None ->
+    let scan_references = Kernel.EagerLoadSources.get () in
+    match Parse_env.open_source ~scan_references fname with
+    | Error msg -> Kernel.fatal "%s" msg
+    | Ok in_str ->
+      let lexbuf = Lexing.from_string in_str in
+      let menhir_pos, lexer = MenhirLib.ErrorReports.wrap lexer in
+      let filename = Filepath.normalize fname in
+      let i = { lexbuf; menhir_pos; current_working_directory = None } in
+      (* Initialize lexer buffer. *)
+      lexbuf.Lexing.lex_curr_p <-
+        { Lexing.pos_fname = filename;
+          Lexing.pos_lnum  = 1;
+          Lexing.pos_bol   = 0;
+          Lexing.pos_cnum  = 0
+        };
+      current := Some i;
+      lexbuf, lexer
 
 let finishParsing () =
-  let i = !current in
-  assert (Option.is_some i);
-  current := None
+  match !current with
+  | None -> Kernel.fatal "Errorloc.finishParsing called while lexbuf is empty"
+  | Some _ -> current := None
 
 (* Call this function to announce a new line *)
 let newline () =
   Lexing.new_line (Option.get !current).lexbuf
 
 let setCurrentLine (i: int) =
-  let lexbuf = (Option.get !current).lexbuf in
-  let pos = lexbuf.Lexing.lex_curr_p in
-  lexbuf.Lexing.lex_curr_p <-
+  let current = Option.get !current in
+  let pos = current.lexbuf.Lexing.lex_curr_p in
+  current.lexbuf.Lexing.lex_curr_p <-
     { pos with
       Lexing.pos_lnum = i;
       Lexing.pos_bol = pos.Lexing.pos_cnum;
     }
 
 let setCurrentWorkingDirectory s =
-  (Option.get !current).current_working_directory <- Some s
+  let current = Option.get !current in
+  current.current_working_directory <- Some s
 
 let setCurrentFile n =
-  let curr = Option.get !current in
-  let base_name = curr.current_working_directory in
+  let current = Option.get !current in
+  let base_name = current.current_working_directory in
   let n = Filepath.normalize ?base_name n in
-  let pos = curr.lexbuf.Lexing.lex_curr_p in
-  curr.lexbuf.Lexing.lex_curr_p <- { pos with Lexing.pos_fname = n }
+  let pos = current.lexbuf.Lexing.lex_curr_p in
+  current.lexbuf.Lexing.lex_curr_p <- { pos with Lexing.pos_fname = n }
 
 (* Prints the [pos.pos_lnum]-th line from file [pos.pos_fname],
    plus up to [ctx] lines before and after [pos.pos_lnum] (if they exist),
@@ -192,17 +194,12 @@ let pp_pos fmt pos =
 
 let pp_location fmt (pos_start, pos_end) =
   if pos_start.Filepath.pos_path = pos_end.Filepath.pos_path then
-    if pos_start.Filepath.pos_lnum = pos_end.Filepath.pos_lnum then begin
+    if pos_start.Filepath.pos_lnum = pos_end.Filepath.pos_lnum then
       (* single file, single line *)
-      let start_char=pos_start.Filepath.pos_cnum - pos_start.Filepath.pos_bol in
-      let end_char =pos_end.Filepath.pos_cnum - pos_end.Filepath.pos_bol in
-      if start_char = end_char then
-        Format.fprintf fmt "Location: line %d, column %d"
-          pos_start.Filepath.pos_lnum start_char
-      else
-        Format.fprintf fmt "Location: line %d, between columns %d and %d"
-          pos_start.Filepath.pos_lnum start_char end_char
-    end
+      Format.fprintf fmt "Location: line %d, between columns %d and %d"
+        pos_start.Filepath.pos_lnum
+        (pos_start.Filepath.pos_cnum - pos_start.Filepath.pos_bol)
+        (pos_end.Filepath.pos_cnum - pos_end.Filepath.pos_bol)
     else
       (* single file, multiple lines *)
       Format.fprintf fmt "Location: between lines %d and %d"
@@ -212,53 +209,40 @@ let pp_location fmt (pos_start, pos_end) =
       pp_pos pos_start pp_pos pos_end
 
 let parse_error ?source msg =
-  let curr = Option.get !current in
-  let next_pos =
-    try Some (MenhirLib.ErrorReports.last curr.positions) with _ -> None
+  let current = Option.get !current in
+  let last_pos =
+    match source with
+    | None ->
+      Cil_datatype.Position.of_lexing_pos current.lexbuf.Lexing.lex_curr_p
+    | Some s -> s
   in
-  let source =
-    match source, next_pos with
-    | None, None ->
-      Cil_datatype.Position.of_lexing_pos curr.lexbuf.lex_curr_p
-    | None, Some (start_pos,_) ->
-      Cil_datatype.Position.of_lexing_pos start_pos
-    | Some source, _ -> source
+  let _ =
+    MenhirLib.ErrorReports.last current.menhir_pos
   in
-  let start_pos =
-    try Some (MenhirLib.ErrorReports.last curr.positions) with _ -> None
+  let first_pos_start, _ =
+    MenhirLib.ErrorReports.last current.menhir_pos
   in
-  let pretty_token alone fmt token =
+  let start_pos = Cil_datatype.Position.of_lexing_pos first_pos_start in
+  let pretty_token fmt token =
     (* prints more detailed information around the erroneous token;
        due to the fact that some tokens are normalized (e.g. single-line ACSL
        comments), we blacklist them to avoid confusing the user *)
-    let blacklist = ["*/";""] in
+    let blacklist = ["*/"] in
     if List.mem token blacklist then ()
     else
-      Format.fprintf fmt "%sbefore or at token: %s"
-        (if alone then "" else ", ") token
+      Format.fprintf fmt ", before or at token: %s" token
   in
-  match start_pos with
-  | None ->
-    Pretty_utils.ksfprintf (fun str ->
-        Kernel.feedback ~source "%s:@." str ~append:(fun fmt ->
-            Format.fprintf fmt "%a\n"
-              (pretty_token true) (Lexing.lexeme curr.lexbuf);
-            Format.fprintf fmt "%a@."
-              (pp_context_from_file ?start_line:None ~ctx:2) source);
-        raise (Log.AbortError "kernel"))
-      msg
-  | Some (start_pos, _) ->
-    let start_pos = Cil_datatype.Position.of_lexing_pos start_pos in
     Pretty_utils.ksfprintf (fun str ->
         Kernel.feedback ~source:start_pos "%s:@." str
           ~append:(fun fmt ->
               Format.fprintf fmt "%a%a\n"
-                pp_location (start_pos, source)
-                (pretty_token false) (Lexing.lexeme curr.lexbuf);
+                pp_location (start_pos, last_pos)
+                pretty_token (Lexing.lexeme current.lexbuf);
               Format.fprintf fmt "%a@."
-                (pp_context_from_file ~start_line:start_pos.Filepath.pos_lnum ~ctx:2) source);
+                (pp_context_from_file ~start_line:start_pos.Filepath.pos_lnum ~ctx:2) last_pos);
         raise (Log.AbortError "kernel"))
       msg
+
 
 (* More parsing support functions: line, file, char count *)
 let currentLoc () =
