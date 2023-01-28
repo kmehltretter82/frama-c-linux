@@ -122,17 +122,21 @@ let applyPointer (ptspecs: attribute list list) (dt: decl_type)
   in
   loop ptspecs
 
+let register_symbol_class nl =
+  let add =
+    if !Lexerhack.is_typedef() then !Lexerhack.add_type
+    else !Lexerhack.add_identifier
+  in
+  List.iter (fun ((n, _, _, _), _) -> add n) nl;
+  !Lexerhack.reset_typedef()
+
 let doDeclaration logic_spec (loc: cabsloc) (specs: spec_elem list) (nl: init_name list)  =
   if isTypedef specs then begin
-    (* Tell the lexer about the new type names *)
-    List.iter (fun ((n, _, _, _), _) -> !Lexerhack.add_type n) nl;
     TYPEDEF ((specs, List.map (fun (n, _) -> n) nl), loc)
   end else
     if nl = [] then
       ONLYTYPEDEF (specs, loc)
     else begin
-      (* Tell the lexer about the new variable names *)
-      List.iter (fun ((n, _, _, _), _) -> !Lexerhack.add_identifier n) nl;
       !Lexerhack.push_context ();
       List.iter
         (fun ((_,t,_,_),_) ->
@@ -1122,7 +1126,11 @@ generic_association:
 
 ;
 
-init_declarator_list:                       /* ISO 6.7 */
+init_declarator_list:
+  decl_and_init_decl_attr_list { register_symbol_class $1; $1 }
+;
+
+decl_and_init_decl_attr_list:
     init_declarator                              { [$1] }
 |   init_declarator COMMA init_declarator_attr_list   { $1 :: $3 }
 
@@ -1148,7 +1156,7 @@ init_declarator:                             /* ISO 6.7 */
 
 decl_spec_wo_type:                         /* ISO 6.7 */
                                         /* ISO 6.7.1 */
-|   TYPEDEF          { SpecTypedef, $1  }
+|   TYPEDEF          { !Lexerhack.set_typedef(); SpecTypedef, $1  }
 |   EXTERN           { SpecStorage EXTERN, $1 }
 |   STATIC           { SpecStorage STATIC, $1 }
 |   AUTO             { SpecStorage AUTO, $1 }

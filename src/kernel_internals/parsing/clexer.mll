@@ -280,7 +280,6 @@ let init_lexicon _ =
            "_Imaginary is currently unsupported by Frama-C.");
      ]
 
-
 let is_c_keyword s = Hashtbl.mem lexicon s
 
 (* Mark an identifier as a type name. The old mapping is preserved and will
@@ -291,6 +290,14 @@ let add_type name =
   Logic_env.add_typename name
 
 let context : string list list ref = ref [ [] ]
+
+let typedef_decl = ref false
+
+let is_typedef () = !typedef_decl
+
+let set_typedef () = typedef_decl := true
+
+let reset_typedef () = typedef_decl := false
 
 let push_context _ = context := []::!context
 
@@ -532,8 +539,10 @@ let () =
   Lexerhack.add_type := add_type;
   Lexerhack.push_context := push_context;
   Lexerhack.pop_context := pop_context;
-  Lexerhack.add_identifier := add_identifier
-
+  Lexerhack.add_identifier := add_identifier;
+  Lexerhack.is_typedef := is_typedef;
+  Lexerhack.set_typedef := set_typedef;
+  Lexerhack.reset_typedef := reset_typedef
 }
 
 let decdigit = ['0'-'9']
