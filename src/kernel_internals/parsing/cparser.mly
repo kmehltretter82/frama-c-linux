@@ -1077,11 +1077,28 @@ declaration:                                /* ISO 6.7.*/
     decl_spec_list init_declarator_list SEMICOLON
       { doDeclaration None ((snd $1)) (fst $1) $2 }
 |   decl_spec_list SEMICOLON
-      { doDeclaration None ((snd $1)) (fst $1) [] }
+      { if !Lexerhack.is_typedef () then begin
+          let source =
+            Cil_datatype.Position.of_lexing_pos $startpos($1)
+          in
+          Kernel.warning ~source ~wkey:Kernel.wkey_unnamed_typedef
+            "typedef without a name"
+        end;
+        !Lexerhack.reset_typedef();
+        doDeclaration None ((snd $1)) (fst $1) []
+      }
 |   SPEC decl_spec_list init_declarator_list SEMICOLON
           { doDeclaration (Some $1) ((snd $2)) (fst $2) $3 }
 |   SPEC decl_spec_list SEMICOLON
-      { doDeclaration (Some $1) ((snd $2)) (fst $2) [] }
+      { if !Lexerhack.is_typedef () then begin
+          let source =
+            Cil_datatype.Position.of_lexing_pos $startpos($2)
+          in
+          Kernel.warning ~source ~wkey:Kernel.wkey_unnamed_typedef
+            "typedef without a name"
+        end;
+        !Lexerhack.reset_typedef();
+        doDeclaration (Some $1) ((snd $2)) (fst $2) [] }
 |   static_assert_declaration
       { let (e, m, loc) = $1 in STATIC_ASSERT (e, m, loc) }
 ;
