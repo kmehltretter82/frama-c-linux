@@ -21,6 +21,9 @@
 \RequirePackage{microtype}
 \RequirePackage{etoolbox}
 
+\RequirePackage{tikz}
+\usetikzlibrary{fadings}
+
 % Do I keep it there:
 \RequirePackage{babel}
 \RequirePackage[T1]{fontenc}
@@ -148,6 +151,15 @@
   \newgeometry{top=1cm, bottom=1cm, right=1cm,left=1cm}
   \thispagestyle{empty}
   \noindent\includegraphics{logos/frama-c.png}
+
+  \tikzfading[name=fade right,left color=transparent!0, right color=transparent!80]
+  \tikz[remember picture,overlay]{
+    \node[inner sep=0pt,anchor=south,yshift=35mm] (named) at (current page.south){
+      \includegraphics[width=\paperwidth]{frama-c-guy}
+    };
+    \fill[white,path fading=fade right]
+      (named.south west) rectangle (named.north east);
+  }
 
   \vspace{12em}
   \begin{center}
