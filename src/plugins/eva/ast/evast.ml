@@ -74,7 +74,6 @@ and unop = Neg | BNot | LNot
 and binop =
   | PlusA
   | PlusPI
-  | IndexPI
   | MinusA
   | MinusPI
   | MinusPP
