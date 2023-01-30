@@ -22,7 +22,28 @@
 
 open Evast
 
-let typeOf e =
+let rec type_of_offset basetyp = function
+  | NoOffset -> basetyp
+  | Index (_, o) ->
+    type_of_offset (Cil.typeOf_array_elem basetyp) o
+  | Field (fi, o) ->
+    let base_attrs = Cil.filter_qualifier_attributes (Cil.typeAttrs basetyp) in
+    let base_attrs =
+      if Cil.hasAttribute Cil.frama_c_mutable fi.fattr then
+        Cil.dropAttribute "const" base_attrs
+      else
+        base_attrs
+    in
+    type_of_offset (Cil.typeAddAttributes base_attrs fi.ftype) o
+
+let type_of_exp e =
   match e.origin with
   | Exp exp -> Cil.typeOf exp
   | Term _ -> assert false
+
+let type_of_lval (host, offset) =
+  let basetyp = match host with
+    | Var vi -> vi.vtype
+    | Mem addr -> Cil.typeOf_pointed (type_of_exp addr)
+  in
+  type_of_offset basetyp offset

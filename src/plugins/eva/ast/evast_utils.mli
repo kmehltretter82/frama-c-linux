@@ -24,4 +24,5 @@
 
 open Evast
 
-val typeOf: exp -> typ
+val type_of_exp : exp -> typ
+val type_of_lval : lval -> typ
