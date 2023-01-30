@@ -20,76 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Eva AST. *)
-
-type cil =
-  | Exp of Cil_types.exp
-  | Term of Cil_types.identified_term
-
-type exp =
-  { node: exp_node;
-    origin: cil }
-
-and exp_node =
-  | Const      of constant
-  | Lval       of lval
-  | SizeOf     of typ
-  | SizeOfE    of exp
-  | SizeOfStr  of string
-  | AlignOf    of typ
-  | AlignOfE   of exp
-  | UnOp       of unop * exp * typ
-  | BinOp      of binop * exp * exp * typ
-  | CastE      of typ * exp
-  | AddrOf     of lval
-  | StartOf    of lval
-
-(** Literal constants *)
-and constant =
-  | CInt64 of Integer.t * ikind * string option
-  | CStr of string
-  | CWStr of int64 list
-  | CChr of char
-  | CReal of float * fkind * string option
-  | CEnum of enumitem
-
-and lval = lhost * offset
-
-and lhost =
-  | Var of Cil_types.varinfo
-  | Mem of exp
-
-and offset =
-  | NoOffset
-  | Field of Cil_types.fieldinfo * offset
-  | Index of exp * offset
-
-and typ = Cil_types.typ
-and ikind = Cil_types.ikind
-and fkind = Cil_types.fkind
-and enumitem = Cil_types.enumitem
-
-and unop = Neg | BNot | LNot
-
-and binop =
-  | PlusA
-  | PlusPI
-  | MinusA
-  | MinusPI
-  | MinusPP
-  | Mult
-  | Div
-  | Mod
-  | Shiftlt
-  | Shiftrt
-  | Lt
-  | Gt
-  | Le
-  | Ge
-  | Eq
-  | Ne
-  | BAnd
-  | BXor
-  | BOr
-  | LAnd
-  | LOr
+module Lhost : Datatype.S_with_collections with type t = Evast.lhost
+module Offset : Datatype.S_with_collections with type t = Evast.offset
+module Lval : Datatype.S_with_collections with type t = Evast.lval
+module Exp : Datatype.S_with_collections with type t = Evast.exp
+module Constant : Datatype.S_with_collections with type t = Evast.constant
