@@ -430,7 +430,7 @@
 \def\lp@string{\color{frama-c-dark-green}} \def\lp@ident{}
 \def\lp@number{\rmfamily\tiny\color{lstnum}\noncopynumber}
 
-\lstdefinestyle{frama-c-style}{%
+\lstdefinestyle{frama-c-basic-style}{%
   captionpos=b,%
   columns=flexible,%
   basicstyle=\lp@inline,%
@@ -448,28 +448,22 @@
   framerule=1pt,%
   rulecolor=\color{frama-c-orange!60},%
   backgroundcolor=\color{frama-c-bronze!10},%
+  literate={\ }{\ }1,
+  % ^~~~~  Without this, spaces starting a line does not have the right size ...
+}
+
+\lstdefinestyle{frama-c-style}{%
+  style=frama-c-basic-style,%
   moredelim={*[s]{/*@}{*/}},%
   moredelim={*[l]{//@}},%
   morecomment={[il]{//NOPP-LINE}},% invisible comment until end of line
   morecomment={[is]{//NOPP-BEGIN}{NOPP-END\^^M}},% no space after NOPP-END
   mathescape=true,
-  escapechar=`,
-  literate={\ }{\ }1
-  % ^~~~~  Without this, spaces starting a line does not have the right size ...
 }
 
 % Code styles
 % --------------------------------------------------------------------------
 
-\lstdefinestyle{framac-code-style}{%
-  basicstyle=\lp@inline,%
-  keywordstyle=[1]\sffamily\color{lstmodule},%
-  keywordstyle=[2]\sffamily\color{lstspecial},%
-  keywordstyle=[3]\sffamily\bfseries,%
-  identifierstyle=\rmfamily,%
-  stringstyle=\ttfamily\color{frama-c-orange},%
-  commentstyle=\rmfamily\bfseries\color{lsttxt},%
-}
 \lstdefinestyle{framac-shell-style}{%
   mathescape=false,%
   basicstyle=\lp@basic,%
@@ -529,20 +523,19 @@
 % --------------------------------------------------------------------------
 
 \lstdefinestyle{framac-code}%
-{language={[ANSI]C},alsolanguage=ACSL,style=framac-code-style,basicstyle=\lp@basic}
+{language={[ANSI]C},alsolanguage=ACSL,style=frama-c-style,basicstyle=\lp@basic}
 
 \newcommand{\cinput}[2][]%
 {\lstinputlisting[
     language={[ANSI]C},
     alsolanguage=ACSL,
-    style=framac-code-style,basicstyle=
-    \lp@basic,#1]{#2}
+    style=frama-c-style,#1]{#2}
 }
 \newcommand{\cinline}[1]%
 {\lstinline[style=framac-code]{#1}}
 
 \lstnewenvironment{ccode}[1][]%
-{\lstset{language={[ANSI]C},alsolanguage=ACSL,style=framac-code-style,basicstyle=\lp@basic,#1}}{}
+{\lstset{language={[ANSI]C},alsolanguage=ACSL,style=frama-c-style,basicstyle=\lp@basic,#1}}{}
 
 % Configure
 % --------------------------------------------------------------------------
@@ -566,7 +559,7 @@
     {à}{{\`a}}1%
     {é}{{\'e}}1%
   ,
-  style=framac-code-style,%
+  style=frama-c-style,%
   morekeywords={
     action, alias, as, deps, dune, executable, files, flags, from,
     generate_opam_files, install, lang, libraries, library, name, optional,
@@ -582,7 +575,7 @@
 
 \lstdefinestyle{dune-basic}{%
   language=Dune,%
-  style=framac-code-style,%
+  style=frama-c-basic-style,%
   basicstyle=\lp@inline,%
 }
 
@@ -614,7 +607,7 @@
 
 \lstdefinestyle{make-basic}{%
   language=Makefile,%
-  style=framac-code-style,%
+  style=frama-c-basic-style,%
   basicstyle=\lp@inline,%
 }
 
@@ -631,7 +624,7 @@
 % --------------------------------------------------------------------------
 
 \lstdefinelanguage{Ocaml}[Objective]{Caml}{%
-  style=framac-code-style,%
+  style=frama-c-basic-style,%
   deletekeywords={when,module,struct,sig,begin,end},%
   morekeywords=[2]{failwith,raise,when},%
   morekeywords=[3]{module,struct,sig,begin,end},%
@@ -702,7 +695,7 @@
 
 \lstdefinestyle{why-style}{%
   language=Why,%
-  style=framac-code-style,%
+  style=frama-c-basic-style,%
   basicstyle=\lp@inline,%
 }
 
