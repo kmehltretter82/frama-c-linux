@@ -858,8 +858,8 @@ bracket_comma_expression:
 
 /*** statements ***/
 block: /* ISO 6.8.2 */
-    block_begin local_labels block_attrs block_element_list RBRACE
-      {!Lexerhack.pop_context();
+    block_begin local_labels block_attrs block_content RBRACE
+      {
        { blabels = $2;
          battrs = $3;
          bstmts = $4 },
@@ -875,6 +875,8 @@ block_attrs:
 |  BLOCKATTRIBUTE paren_attr_list_ne
                                         { [("__blockattribute__", $2)] }
 ;
+
+block_content: block_element_list { !Lexerhack.pop_context(); $1 }
 
 /* statements and declarations in a block, in any order (for C99 support) */
 block_element_list:
