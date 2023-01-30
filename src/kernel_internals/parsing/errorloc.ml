@@ -195,11 +195,17 @@ let pp_pos fmt pos =
 let pp_location fmt (pos_start, pos_end) =
   if pos_start.Filepath.pos_path = pos_end.Filepath.pos_path then
     if pos_start.Filepath.pos_lnum = pos_end.Filepath.pos_lnum then
-      (* single file, single line *)
-      Format.fprintf fmt "Location: line %d, between columns %d and %d"
-        pos_start.Filepath.pos_lnum
-        (pos_start.Filepath.pos_cnum - pos_start.Filepath.pos_bol)
-        (pos_end.Filepath.pos_cnum - pos_end.Filepath.pos_bol)
+      if pos_start.Filepath.pos_cnum = pos_end.Filepath.pos_cnum then
+        (* same location, do not print twice. *)
+        Format.fprintf fmt "Location: line %d, at column %d"
+          pos_start.Filepath.pos_lnum
+          (pos_start.Filepath.pos_cnum - pos_start.Filepath.pos_bol)
+      else
+        (* single file, single line *)
+        Format.fprintf fmt "Location: line %d, between columns %d and %d"
+          pos_start.Filepath.pos_lnum
+          (pos_start.Filepath.pos_cnum - pos_start.Filepath.pos_bol)
+          (pos_end.Filepath.pos_cnum - pos_end.Filepath.pos_bol)
     else
       (* single file, multiple lines *)
       Format.fprintf fmt "Location: between lines %d and %d"
@@ -216,13 +222,22 @@ let parse_error ?source msg =
       Cil_datatype.Position.of_lexing_pos current.lexbuf.Lexing.lex_curr_p
     | Some s -> s
   in
+  (* there are case when we are called before menhir has requested at
+     lest two tokens, ending up in an assertion failure. Unfortunately,
+     ErrorReports API does not allow us to check wether the buffer is
+     empty or not. 
+  *)
+  let convert (pos1, pos2) =
+    Cil_datatype.Position.(of_lexing_pos pos1, of_lexing_pos pos2)
+  in
   let _ =
-    MenhirLib.ErrorReports.last current.menhir_pos
+    try convert (MenhirLib.ErrorReports.last current.menhir_pos)
+    with _ -> last_pos,last_pos
   in
-  let first_pos_start, _ =
-    MenhirLib.ErrorReports.last current.menhir_pos
+  let start_pos, _ =
+    try convert (MenhirLib.ErrorReports.last current.menhir_pos)
+    with _ -> last_pos, last_pos
   in
-  let start_pos = Cil_datatype.Position.of_lexing_pos first_pos_start in
   let pretty_token fmt token =
     (* prints more detailed information around the erroneous token;
        due to the fact that some tokens are normalized (e.g. single-line ACSL
