@@ -60,7 +60,7 @@
   {\fcaffiliationfr}
   {\cealist, Université Paris-Saclay\\ Laboratoire de Sûreté et Sécurité des Logiciels\xspace}
 
-\newcommand{\cealogo}{logos/cea_tech_list.jpg}
+\newcommand{\cealogo}{logos/cea_tech_list.png}
 
 % --------------------------------------------------------------------------
 % LICENSE commands
