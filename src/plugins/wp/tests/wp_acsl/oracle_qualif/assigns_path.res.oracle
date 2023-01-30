@@ -1,5 +1,7 @@
 # frama-c -wp [...]
 [kernel] Parsing assigns_path.i (no preprocessing)
+[kernel:parser:unnamed-typedef] assigns_path.i:1: Warning: 
+  typedef without a name
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 9 goals scheduled

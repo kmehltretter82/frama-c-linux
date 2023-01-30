@@ -1,4 +1,5 @@
 [kernel] Parsing enum.i (no preprocessing)
+[kernel:parser:unnamed-typedef] enum.i:5: Warning: typedef without a name
 [eva] Analyzing a complete application starting at f
 [eva] Computing initial state
 [eva] Initial state computed

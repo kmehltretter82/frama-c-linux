@@ -1,5 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing bts_2079.i (no preprocessing)
+[kernel:parser:unnamed-typedef] bts_2079.i:7: Warning: typedef without a name
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
