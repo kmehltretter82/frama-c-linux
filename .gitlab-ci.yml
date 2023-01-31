@@ -416,13 +416,13 @@ opam-pin-release:
     - export OPAMUPGRADECRITERIA="-removed,-count[avoid-version,changed],-count[version-lag,request],-count[version-lag,changed],-count[missing-depexts,changed],-changed"
     - opam pin . -n -k path
     - opam update --depexts
-    - opam depext frama-c
+    - opam depext --jobs 2 frama-c
     - export OPAMCRITERIA="+removed,+count[version-lag,solution]"
     - export OPAMFIXUPCRITERIA="+removed,+count[version-lag,solution]"
     - export OPAMUPGRADECRITERIA="+removed,+count[version-lag,solution]"
     - export OPAMEXTERNALSOLVER="builtin-0install"
     - opam update --depexts
-    - opam reinstall frama-c
+    - opam reinstall --jobs 2 frama-c
   timeout: 2h
   tags:
     - docker
