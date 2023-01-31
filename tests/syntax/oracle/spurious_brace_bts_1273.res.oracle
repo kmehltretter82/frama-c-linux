@@ -1,7 +1,7 @@
 [kernel] Parsing spurious_brace_bts_1273.i (no preprocessing)
 [kernel] spurious_brace_bts_1273.i:8: 
   syntax error:
-  Location: line 8, column 0, before or at token: }
+  Location: line 8, between columns 0 and 1, before or at token: }
   6     void foo() {
   7     }
   8     }
