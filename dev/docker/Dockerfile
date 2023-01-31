@@ -114,13 +114,20 @@ if [ "${from_archive}" != "git" ]; then \
   (cd /frama-c && rm -f * && git clone --depth 1 https://git.frama-c.com/pub/frama-c.git .) \
 ; fi
 
-RUN cd /frama-c && ./dev/disable-plugins.sh gui && make clean && make && make install
+# E-ACSL (incompatible with musl-libc) is disabled on Alpine
+RUN cd /frama-c && ./dev/disable-plugins.sh gui $([ -e /etc/alpine-release ] && echo "e-acsl") && make clean && make && make install
 
 ## Run quick sanity checks
+## Note: E-ACSL tests are disabled on Alpine
 RUN \
 printf "int g;\n//@assigns g;\nvoid f(){g = 1;}\nint main() {f(); return g;}" > /tmp/simple.c && \
 frama-c -eva -wp -report /tmp/simple.c && \
-rm -f /tmp/simple.c
+rm -f /tmp/simple.c && \
+echo "int main() { /*@ assert 1 + 2 == 2; */ return 0; }" > /tmp/test-eacsl.c && \
+[ -e /etc/alpine-release ] || \
+ (cd /tmp && e-acsl-gcc.sh -c test-eacsl.c && \
+ ./a.out.e-acsl 2>&1 | grep -q "Assertion failed" && \
+ rm -f ./a.out* test-eacsl.c)
 
 ## Cleanup
 RUN \
@@ -149,7 +156,7 @@ ARG OCAML_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN /init/install.sh adwaita-icon-theme font-noto gdk-pixbuf
-RUN cd /frama-c && ./dev/disable-plugins.sh none && make clean && make && make install
+RUN cd /frama-c && ./dev/disable-plugins.sh $([ -e /etc/alpine-release ] && echo "e-acsl" || echo "none") && make clean && make && make install
 
 ## Sanity check
 RUN which frama-c-gui
@@ -329,4 +336,9 @@ RUN why3 config detect
 RUN \
 printf "int g;\n//@assigns g;\nvoid f(){g = 1;}\nint main() {f(); return g;}" > /tmp/simple.c && \
 frama-c -val -wp -report /tmp/simple.c && \
-rm -f /tmp/simple.c
+rm -f /tmp/simple.c && \
+echo "int main() { /*@ assert 1 + 2 == 2; */ return 0; }" > /tmp/test-eacsl.c && \
+[ -e /etc/alpine-release ] || \
+ (cd /tmp && e-acsl-gcc.sh -c test-eacsl.c && \
+ ./a.out.e-acsl 2>&1 | grep -q "Assertion failed" && \
+ rm -f ./a.out* test-eacsl.c)
