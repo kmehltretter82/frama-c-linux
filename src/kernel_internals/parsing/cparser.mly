@@ -957,17 +957,20 @@ statement:
           no_ghost [SWITCH (smooth_expression $2, in_block $3, loc)]}
 |   opt_loop_annotations
     WHILE paren_comma_expression annotated_statement
-    { let loc = Cil_datatype.Location.of_lexing_loc $loc($2) in
-      no_ghost [WHILE ($1, smooth_expression $3, in_block $4, loc)] }
+    { let first = Cil_datatype.Position.of_lexing_pos $startpos($2) in
+      let last = Cil_datatype.Position.of_lexing_pos $endpos in
+      no_ghost [WHILE ($1, smooth_expression $3, in_block $4, (first,last))] }
 |   opt_loop_annotations
     DO annotated_statement WHILE paren_comma_expression SEMICOLON
-    { let loc = Cil_datatype.Location.of_lexing_loc $loc($2) in
-      no_ghost [DOWHILE ($1, smooth_expression $5, in_block $3, loc)]}
+    { let first = Cil_datatype.Position.of_lexing_pos $startpos($2) in
+      let last = Cil_datatype.Position.of_lexing_pos $endpos in
+      no_ghost [DOWHILE ($1, smooth_expression $5, in_block $3, (first,last))]}
 |   opt_loop_annotations
     FOR LPAREN for_clause opt_expression
     SEMICOLON opt_expression RPAREN annotated_statement
-    { let loc = Cil_datatype.Location.of_lexing_loc $loc($2) in
-      no_ghost [FOR ($1, $4, $5, $7, in_block $9, loc)]}
+    { let first = Cil_datatype.Position.of_lexing_pos $startpos($2) in
+      let last = Cil_datatype.Position.of_lexing_pos $endpos in
+      no_ghost [FOR ($1, $4, $5, $7, in_block $9, (first,last))]}
 |   id_or_typename_as_id COLON  attribute_nocv_list annotated_statement
 	{(* The only attribute that should appear here
             is "unused". For now, we drop this on the
@@ -1686,7 +1689,10 @@ postfix_attr:
       /* (* use a VARIABLE "" so that the parentheses are printed *) */
 |   id_or_typename_as_id LPAREN  RPAREN {
       let loc1 = Cil_datatype.Location.of_lexing_loc $loc($1) in
-      let loc2 = Cil_datatype.Location.of_lexing_loc $loc($2) in
+      let loc2 =
+        Cil_datatype.Position.of_lexing_pos $startpos($2),
+        Cil_datatype.Position.of_lexing_pos $endpos($3)
+      in
       let f = { expr_node = VARIABLE $1; expr_loc = loc1 } in
       let arg = { expr_node = VARIABLE ""; expr_loc = loc2 } in
       make_expr $sloc (CALL(f, [arg],[]))
