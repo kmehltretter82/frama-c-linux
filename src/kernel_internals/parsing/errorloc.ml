@@ -259,16 +259,16 @@ let parse_error ?source msg =
     else
       Format.fprintf fmt ", before or at token: %s" token
   in
-    Pretty_utils.ksfprintf (fun str ->
-        Kernel.feedback ~source:start_pos "%s:@." str
-          ~append:(fun fmt ->
-              Format.fprintf fmt "%a%a\n"
-                pp_location (start_pos, last_pos)
-                pretty_token (Lexing.lexeme current.lexbuf);
-              Format.fprintf fmt "%a@."
-                (pp_context_from_file ~start_line:start_pos.Filepath.pos_lnum ~ctx:2) last_pos);
-        raise (Log.AbortError "kernel"))
-      msg
+  Pretty_utils.ksfprintf (fun str ->
+      Kernel.feedback ~source:start_pos "%s:@." str
+        ~append:(fun fmt ->
+            Format.fprintf fmt "%a%a\n"
+              pp_location (start_pos, last_pos)
+              pretty_token (Lexing.lexeme current.lexbuf);
+            Format.fprintf fmt "%a@."
+              (pp_context_from_file ~start_line:start_pos.Filepath.pos_lnum ~ctx:2) last_pos);
+      raise (Log.AbortError "kernel"))
+    msg
 
 
 (* More parsing support functions: line, file, char count *)

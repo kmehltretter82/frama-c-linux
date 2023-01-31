@@ -82,7 +82,7 @@ val pp_location: Format.formatter -> Cil_types.location -> unit
     delayed until the end of the current parsing phase. Functions that
     intend to ultimately fail should call {!clear_errors} when they
     start, and check {!had_errors} when they end;
- *)
+*)
 val parse_error:
   ?source:Filepath.position -> ('a, Format.formatter, unit, 'b) format4 -> 'a
 
