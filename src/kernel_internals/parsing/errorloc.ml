@@ -197,7 +197,7 @@ let pp_location fmt (pos_start, pos_end) =
     if pos_start.Filepath.pos_lnum = pos_end.Filepath.pos_lnum then
       if pos_start.Filepath.pos_cnum = pos_end.Filepath.pos_cnum then
         (* same location, do not print twice. *)
-        Format.fprintf fmt "Location: line %d, at column %d"
+        Format.fprintf fmt "Location: line %d, column %d"
           pos_start.Filepath.pos_lnum
           (pos_start.Filepath.pos_cnum - pos_start.Filepath.pos_bol)
       else
