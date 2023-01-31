@@ -18,7 +18,7 @@ int f1(int x);
 /*@ ensures \result == x-1; assigns \nothing; */
 int f2(int x);
 
-typedef struct S {
+struct S {
   int param ;
   int (*f)(int) ;
 } ;

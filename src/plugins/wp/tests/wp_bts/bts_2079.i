@@ -4,14 +4,14 @@
 
 /*@ axiomatic S { predicate S(integer k); } */
 
-typedef struct S { int f[40]; } ;
+struct S { int f[40]; } ;
 
 struct S a[3] ;
 struct S *p;
 int *q;
 int *r;
 
-/*@ 
+/*@
   ensures Obs:P: S((p+k)-p);
   ensures Obs:Q: S((q+k)-q);
   ensures Obs:R: S((r+k)-q);

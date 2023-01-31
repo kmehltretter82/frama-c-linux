@@ -1,4 +1,4 @@
-typedef struct S { int n ; int a[4]; } ;
+struct S { int n ; int a[4]; } ;
 
 struct S p ;
 
