@@ -1,6 +1,5 @@
 # frama-c -wp [...]
 [kernel] Parsing dynamic.i (no preprocessing)
-[kernel:parser:unnamed-typedef] dynamic.i:21: Warning: typedef without a name
 [wp] Running WP plugin...
 [kernel:dyncalls] Computing dynamic calls.
 [kernel:dyncalls] dynamic.i:32: Calls  f1 f2

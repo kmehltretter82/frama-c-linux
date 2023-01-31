@@ -1,6 +1,5 @@
 # frama-c -wp [...]
 [kernel] Parsing caveat.i (no preprocessing)
-[kernel:parser:unnamed-typedef] caveat.i:10: Warning: typedef without a name
 [kernel] caveat.i:41: Warning: 
   parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
 [wp] Running WP plugin...
