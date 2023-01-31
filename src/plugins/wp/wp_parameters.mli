@@ -128,7 +128,7 @@ module Cache: Parameter_sig.String
 module CacheEnv: Parameter_sig.Bool
 module CacheDir: Parameter_sig.String
 module CachePrint: Parameter_sig.Bool
-module Drivers: Parameter_sig.String_list
+module Drivers: Parameter_sig.Filepath_list
 module Timeout: Parameter_sig.Int
 module Memlimit: Parameter_sig.Int
 module FctTimeout:

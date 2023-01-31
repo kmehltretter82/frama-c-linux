@@ -454,17 +454,16 @@ and bal = parse
 
   let load_file ?(ontty=`Transient) file =
     try
-      let path = Datatype.Filepath.of_string file in
       Wp_parameters.feedback ~dkey:dkey_driver ~ontty "Loading driver '%a'"
-        Datatype.Filepath.pretty path;
-      let driver_dir = Filename.dirname file in
-      let inc = open_in file in
+        Datatype.Filepath.pretty file;
+      let driver_dir = Filepath.dirname file in
+      let inc = open_in (file :> string) in
       let lex = Lexing.from_channel inc in
-      let position = { lex.Lexing.lex_curr_p with Lexing.pos_fname = file } in
+      let position = { lex.Lexing.lex_curr_p with Lexing.pos_fname = (file :> string) } in
       let input = { current = tok lex ; position = position ; lexbuf = lex } in
       try
         lex.Lexing.lex_curr_p <- position ;
-	parse ~driver_dir "qed" input ;
+	parse ~driver_dir:(driver_dir :> string) "qed" input ;
 	close_in inc
       with Failure msg ->
 	close_in inc ;
@@ -475,16 +474,16 @@ and bal = parse
     with exn ->
       Wp_parameters.abort
         ~current:false
-        "Error in driver '%s': %s" file (Printexc.to_string exn)
+        "Error in driver '%a': %s" Filepath.Normalized.pretty file (Printexc.to_string exn)
 
-  let loaded : (string list, driver) Hashtbl.t =Hashtbl.create 10
+  let loaded : (Filepath.Normalized.t list, driver) Hashtbl.t =Hashtbl.create 10
   let load_driver () =
     let drivers = Wp_parameters.Drivers.get () in
     begin try
         Hashtbl.find loaded drivers
       with Not_found ->
-        let driver_basename file =
-        let base = Filename.basename file in
+        let driver_basename (file : Filepath.Normalized.t) =
+        let base = Filename.basename (file :> string) in
         try Filename.chop_extension base
         with Invalid_argument _ -> base in
         let drvs = List.map driver_basename drivers in
@@ -492,13 +491,13 @@ and bal = parse
         let descr = String.concat "," drvs in
         let includes =
           let directories =
-            [(Wp_parameters.Share.get_dir ~mode:`Must_exist "." :> string)]
+            [Wp_parameters.Share.get_dir ~mode:`Must_exist "."]
           in
           if Wp_parameters.has_dkey dkey then
             Wp_parameters.debug ~dkey "Included directories:%t"
               (fun fmt ->
                  List.iter
-                   (fun d -> Format.fprintf fmt "@\n - '%s'" d)
+                   (fun d -> Format.fprintf fmt "@\n - '%a'" Filepath.Normalized.pretty d)
                    directories
               );
           directories
@@ -506,14 +505,14 @@ and bal = parse
         let configure ()=
           let drivers =
             List.map (fun file ->
-                if Sys.file_exists file
-                then Filepath.normalize file
+                if Filepath.exists file
+                then file
                 else LogicBuiltins.find_lib file)
               drivers in
           let default = Wp_parameters.Share.get_file ~mode:`Must_exist "wp.driver" in
           let feedback = Wp_parameters.Share.is_set () in
           let ontty = if feedback then `Message else `Transient in
-          load_file ~ontty (default :> string);
+          load_file ~ontty default;
           List.iter load_file drivers
         in
         let driver = LogicBuiltins.new_driver ~id ~descr ~includes ~configure () in

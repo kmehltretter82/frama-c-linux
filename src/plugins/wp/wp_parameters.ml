@@ -860,10 +860,12 @@ let () = on_reset Tactics.clear
 
 let () = Parameter_customize.set_group wp_prover
 module Drivers =
-  String_list
+  Filepath_list
     (struct
       let option_name = "-wp-driver"
       let arg_name = "file,..."
+      let file_kind = "WP library"
+      let existence = Fc_Filepath.Must_exist
       let help = "Load drivers for linking to external libraries"
     end)
 
