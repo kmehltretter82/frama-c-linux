@@ -225,18 +225,30 @@ let parse_error ?source msg =
   (* there are case when we are called before menhir has requested at
      lest two tokens, ending up in an assertion failure. Unfortunately,
      ErrorReports API does not allow us to check wether the buffer is
-     empty or not. 
+     empty or not.
   *)
-  let convert (pos1, pos2) =
-    Cil_datatype.Position.(of_lexing_pos pos1, of_lexing_pos pos2)
-  in
   let _ =
-    try convert (MenhirLib.ErrorReports.last current.menhir_pos)
-    with _ -> last_pos,last_pos
+    try
+      Cil_datatype.Position.of_lexing_pos
+        (fst (MenhirLib.ErrorReports.last current.menhir_pos))
+    with _ -> last_pos
   in
-  let start_pos, _ =
-    try convert (MenhirLib.ErrorReports.last current.menhir_pos)
-    with _ -> last_pos, last_pos
+  let start_pos =
+    try
+      let pos,_ =
+        Cil_datatype.Location.of_lexing_loc
+          (MenhirLib.ErrorReports.last current.menhir_pos)
+      in
+      if Cil_datatype.Position.compare pos last_pos <= 0 then pos
+      else
+        (* during interaction between C and ACSL parser, it might happen,
+           at least as long as we haven't completed the move to menhir for
+           ACSL, that the start_pos seen by menhir is after the current position
+           of the (shared) lexbuf. This would lead to confusing error message,
+           so we drop the one from menhir.
+        *)
+        last_pos
+    with _ -> last_pos
   in
   let pretty_token fmt token =
     (* prints more detailed information around the erroneous token;
