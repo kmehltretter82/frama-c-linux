@@ -325,7 +325,7 @@ Arch Linux: `pikaur -S frama-c`
 
         make RELEASE=yes && make install
 
-    See section *Configuration* below for options.
+    See section *Installation* below for options.
 
 3. On Windows+Cygwin:
 
@@ -390,6 +390,9 @@ superuser privileges. The installation directory is chosen through the variable
 ```
 dune install
 ```
+
+The Makefile (and dune) supports the `DESTDIR` variable, that can be used to
+configure the location of the installation.
 
 #### API Documentation
 

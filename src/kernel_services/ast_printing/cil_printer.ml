@@ -341,7 +341,8 @@ module Precedence = struct
     | Const _ -> 0                        (* Constants *)
 
   let rec getParenthLevelLogic = function
-    | Tlambda _ | Trange _ | Tlet _ -> binderLevel
+    | Trange _ -> upperLevel
+    | Tlambda _ | Tlet _ -> binderLevel
     | TBinOp(LAnd, _,_) -> and_level
     | TBinOp(LOr, _,_) -> or_level
     (* Bit operations. *)
@@ -2384,17 +2385,8 @@ class cil_printer () = object (self)
 
   method private term_prec contextprec fmt e =
     let thisLevel = Precedence.getParenthLevelLogic e.term_node in
-    let needParens =
-      if thisLevel >= contextprec then
-        true
-      else if contextprec == Precedence.bitwiseLevel then
-        (* quiet down some GCC warnings *)
-        thisLevel == Precedence.additiveLevel
-        || thisLevel == Precedence.comparativeLevel
-      else
-        false
-    in
-    if needParens then fprintf fmt "@[<hov 2>(%a)@]" self#term e
+    if Precedence.needParens thisLevel contextprec then
+      fprintf fmt "@[<hov 2>(%a)@]" self#term e
     else self#term fmt e
 
   method identified_term fmt t = self#term fmt t.it_content
@@ -2612,7 +2604,7 @@ class cil_printer () = object (self)
       let v = def.l_var_info in
       let args = def.l_profile in
       let pp_defn = match def.l_body with
-        | LBterm t -> fun fmt -> self#term fmt t
+        | LBterm t -> fun fmt -> term fmt t
         | LBpred p -> fun fmt -> self#predicate fmt p
         | LBnone
         | LBreads _ | LBinductive _ ->
@@ -2816,7 +2808,7 @@ class cil_printer () = object (self)
       let v = def.l_var_info in
       let args = def.l_profile in
       let pp_defn = match def.l_body with
-        | LBterm t -> fun fmt -> self#term fmt t
+        | LBterm t -> fun fmt -> term fmt t
         | LBpred p -> fun fmt -> self#pred_prec_named fmt (current_level,p)
         | LBnone
         | LBreads _ | LBinductive _ ->
@@ -3368,7 +3360,7 @@ class cil_printer () = object (self)
        | LBterm def ->
          (match li.l_labels with | [ l ] -> current_label <- l | _ -> ());
          fprintf fmt "=@]@ %a;"
-           self#term def);
+           (self#term_prec Precedence.binderLevel) def);
       fprintf fmt "@]@\n";
       current_label <- old_lab
     | Dvolatile(tsets,rvi_opt,wvi_opt,_attr, _) ->
