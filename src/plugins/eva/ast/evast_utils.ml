@@ -47,3 +47,17 @@ let type_of_lval (host, offset) =
     | Mem addr -> Cil.typeOf_pointed (type_of_exp addr)
   in
   type_of_offset basetyp offset
+
+let origin_exp e =
+  match e.origin with
+  | Exp exp -> exp
+  | Term _ -> invalid_arg "origin is not an expression"
+
+let [@tail_mod_cons] rec origin_offset = function
+  | NoOffset -> Cil_types.NoOffset
+  | Index (e, o) -> Cil_types.Index (origin_exp e, origin_offset o)
+  | Field (fi, o) -> Cil_types.Field (fi, origin_offset o)
+
+let origin_lval = function
+  | Var v, o -> Cil_types.Var v, origin_offset o
+  | Mem e, o -> Cil_types.Mem (origin_exp e), origin_offset o

@@ -26,3 +26,8 @@ open Evast
 
 val type_of_exp : exp -> typ
 val type_of_lval : lval -> typ
+
+(* These functions are given here as a temporary stub and should not be used *)
+val origin_exp : exp -> Cil_types.exp
+val origin_lval : lval -> Cil_types.lval
+val origin_offset : offset -> Cil_types.offset
