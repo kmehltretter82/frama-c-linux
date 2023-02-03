@@ -56,6 +56,9 @@ ifndef PREFIX
 	@echo "  (recommendation: include FRAMAC/share/Makefile.common)"
 	@exit 1
 else
+ifeq ($(patsubst ~%,,$(PREFIX)),)
+$(error "PREFIX cannot start with '~'; use $$HOME instead")
+endif
 ifeq ($(PREFIX),$(OPAM_SWITCH_PREFIX))
 	@echo "Installing Frama-C to current Opam switch"
 	@echo "  (copying and relocating files...)"
