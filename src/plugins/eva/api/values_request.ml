@@ -40,7 +40,6 @@ let package =
     ~plugin:"eva"
     ~name:"values"
     ~title:"Eva Values"
-    ~readme:"eva.md"
     ()
 
 type probe =

@@ -24,8 +24,7 @@ open Server
 open Cil_types
 
 let package =
-  Package.package ~plugin:"studia" ~name:"studia" ~title:"Studia"
-    ~readme:"studia.md" ()
+  Package.package ~plugin:"studia" ~name:"studia" ~title:"Studia" ()
 
 type effects =
   { direct: stmt list;

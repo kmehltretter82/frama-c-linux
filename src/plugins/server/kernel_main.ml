@@ -29,8 +29,10 @@ module Senv = Server_parameters
 (* --- Frama-C Kernel Services                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let package = Pkg.package ~name:"services"
-    ~title:"Kernel Services" ~readme:"kernel.md" ()
+let package = Pkg.package
+    ~name:"services"
+    ~title:"Kernel Services"
+    ~readme:"kernel.md" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Config                                                             --- *)
