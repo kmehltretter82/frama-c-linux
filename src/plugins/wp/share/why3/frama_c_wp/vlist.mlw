@@ -149,11 +149,12 @@ theory Vlist
     forall k: int, w: list 'a.
       0 < k && k < length w - 1 -> nth (tail w) (k - 1) = nth w k
 
-  axiom nth_concat:
-    forall u v: list 'a, k: int.
-      0 <= k -> nth (concat u v) k = if k < length u
-                  then nth u k
-                  else nth v (Int.(-) k (length u))
+  let rec lemma nth_concat (u v: list 'a) (k: int)
+    requires { 0 <= k < length u + length v }
+    variant  { k }
+    ensures  { nth (concat u v) k =
+                 if k < length u then nth u k else nth v (k - length u) }
+  = if 0 < k && 0 < length u then nth_concat (tail u) v (k - 1)
 
   axiom nth_repeat:
     forall n,k:int, w:list 'a [nth (repeat w n) k].
@@ -168,23 +169,11 @@ theory Vlist
     length u = length v &&
     forall i:int. 0 <= i < length u -> nth u i = nth v i
 
-  lemma vlist_eq_length: forall u v: list 'a. vlist_eq u v -> length u = length v
-
-  lemma vlist_eq_nth: forall u v: list 'a.
-    vlist_eq u v -> forall i: int. 0 <= i < length u -> nth u i = nth v i
-
-  lemma vlist_eq_nil_left: forall w: list 'a. vlist_eq Nil w -> w = Nil
-
-  lemma vlist_eq_nil_right: forall w: list 'a. vlist_eq w Nil -> w = Nil
-
-  lemma vlist_eq_cons_left: forall u v: list 'a. u <> Nil && vlist_eq u v -> v <> Nil
-
-  lemma vlist_eq_cons_right: forall u v: list 'a. v <> Nil && vlist_eq u v -> u <> Nil
-
-  lemma vlist_eq_head: forall u v:list 'a. u <> Nil && vlist_eq u v -> head u = head v
-
-  axiom extensionality:
-    forall u,v:list 'a. vlist_eq u v -> u = v
+  let rec lemma extensionality (u v: list 'a)
+    requires {vlist_eq u v}
+    variant {length u}
+    ensures {u = v}
+  = match u, v with Cons _ x, Cons _ y -> extensionality x y | _ -> () end
 
   (* -------------------------------------------------------------------- *)
   (* --- neutral elements                                             --- *)
