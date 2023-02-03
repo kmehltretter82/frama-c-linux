@@ -2,7 +2,7 @@
   
   STDOPT: #"-main f"
 */
-typedef enum counter {ZERO,ONE,TWO,LAST=TWO};
+enum counter {ZERO,ONE,TWO,LAST=TWO};
 
 int t [LAST + 1] = { 1 };
 int u [TWO + 1] = { 2 };
