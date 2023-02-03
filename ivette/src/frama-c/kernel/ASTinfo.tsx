@@ -260,7 +260,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
           icon="PIN"
           selected={props.marked}
           display={props.marked || isSelected || !isHovered}
-          title="Remove Information"
+          title={(props.marked ? "Unpin" : "Pin") + " marker information"}
           onClick={() => props.togglePinned(marker)}
         />
       </div>
