@@ -26,7 +26,8 @@
 
 let cfg = lazy
   begin
-    try Why3.Whyconf.init_config None
+    let extra_config = Wp_parameters.Why3ExtraConfig.get () in
+    try Why3.Whyconf.init_config ~extra_config None
     with exn ->
       Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
   end
@@ -41,8 +42,12 @@ let configure =
   begin fun () ->
     if !todo then
       begin
-        let args = Array.of_list ("why3"::Wp_parameters.Why3Flags.get ()) in
+        let commands = "why3"::Wp_parameters.Why3Flags.get () in
+        let args = Array.of_list commands in
         begin try
+            (* Ensure that an error message generating directly by why3 is
+               reported as coming from Why3, not from Frama-C. *)
+            Why3.Getopt.commands := commands;
             Why3.Getopt.parse_all
               (Why3.Debug.Args.[desc_debug;desc_debug_all;desc_debug_list])
               (fun opt -> raise (Arg.Bad ("unknown option: " ^ opt)))
