@@ -28,7 +28,6 @@ let package =
     ~plugin:"eva"
     ~name:"general"
     ~title:"Eva General Services"
-    ~readme:"eva.md"
     ()
 
 module ComputationState = struct

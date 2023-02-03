@@ -383,9 +383,9 @@ let resolve_readme ~plugin = function
     let file =
       match plugin with
       | Kernel ->
-        Printf.sprintf "%s/server/%s" (Fc_config.datadir:>string) readme
+        Printf.sprintf "src/plugins/server/doc/%s" readme
       | Plugin name ->
-        Printf.sprintf "%s/%s/server/%s" (Fc_config.datadir:>string) name readme
+        Printf.sprintf "src/plugins/%s/doc/%s" name readme
     in Some file
 
 (* -------------------------------------------------------------------------- *)

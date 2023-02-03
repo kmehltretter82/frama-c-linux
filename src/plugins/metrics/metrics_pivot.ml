@@ -503,7 +503,6 @@ let package =
     ~plugin:"pivot"
     ~name:"general"
     ~title:"Pivot Table Services"
-    ~readme:"pivot.md"
     ()
 
 module TableState = struct
