@@ -29,7 +29,8 @@ theory Vlist
   use int.Int
   use int.ComputerDivision
   use list.Append
-  use list.NthNoOpt
+  use list.HdTl
+  use list.Nth
   use option.Option
 
   use export list.List
@@ -40,14 +41,64 @@ theory Vlist
   (* -------------------------------------------------------------------- *)
 
   function nil : list 'a = Nil
+  
   function cons (x: 'a) (xs: list 'a) : list 'a = Cons x xs
+  
+  let function head (l: list 'a) : 'a
+    requires {l <> Nil} ensures {hd l = Some result}
+  = match l with Nil -> absurd | Cons h _ -> h end
+  
+  let function tail (l: list 'a) : list 'a
+    requires {l <> Nil} ensures {tl l = Some result}
+  = match l with Nil -> absurd | Cons _ t -> t end
+  
   function concat (xs: list 'a) (ys: list 'a) : list 'a = xs ++ ys
+  
   let rec function repeat (xs: list 'a) (n: int) : list 'a
     variant {n} =
     if (n <= 0) then Nil else xs ++ repeat xs (n - 1)
-  function nth (xs: list 'a) (n: int) : 'a = NthNoOpt.nth n xs
+  
+  let rec function nth (l: list 'a) (n: int): 'a
+    requires {l <> Nil}
+    requires {0 <= n}
+    requires {n < length l}
+    variant {n}
+    ensures {Nth.nth n l = Some result}
+  = match l with Nil -> absurd | Cons x r ->
+    if n = 0 then x else nth r (n - 1)
+  end
 
   function elt (x:'a) : list 'a  = cons x nil
+
+  (* -------------------------------------------------------------------- *)
+  (* --- cons                                                         --- *)
+  (* -------------------------------------------------------------------- *)
+
+  lemma head_cons: forall x: 'a, r: list 'a. head (cons x r) = x
+
+  lemma tail_cons: forall x: 'a, r: list 'a. tail (cons x r) = r
+
+  lemma head_tail: forall w [@induction]: list 'a.
+    w <> Nil -> w = cons (head w) (tail w)
+
+  (* -------------------------------------------------------------------- *)
+  (* --- concat                                                       --- *)
+  (* -------------------------------------------------------------------- *)
+  
+  lemma concat_nil_left: forall w: list 'a. concat Nil w = w
+  
+  lemma concat_nil_right: forall w: list 'a. concat w Nil = w
+  
+  lemma concat_cons: forall u v: list 'a, x: 'a.
+    concat (cons x u) v = cons x (concat u v)
+
+  let lemma head_concat (u v: list 'a)
+    requires {u <> Nil}
+    ensures {head (concat u v) = head u}
+  = match u with Nil -> absurd | Cons _ _ -> () end
+  
+  lemma concat_tail:
+    forall u v: list 'a. u <> Nil -> concat (tail u) v = tail (concat u v)
 
   (* -------------------------------------------------------------------- *)
   (* --- length                                                       --- *)
@@ -59,17 +110,27 @@ theory Vlist
 
   lemma length_nil_bis : forall w:list 'a. length w = 0 -> w = nil
 
+  lemma length_not_nil : forall w:list 'a. w <> Nil -> 0 < length w
+
   lemma length_cons :
     forall x:'a, w:list 'a [length (cons x w)].
       length (cons x w) = (Int.(+) 1 (length w))
+
+  lemma length_tail:
+    forall w: list 'a.
+      w <> Nil -> length (tail w) = length w - 1
+
+  lemma singleton_tail: forall w: list 'a. length w = 1 -> tail w = Nil
 
   lemma length_concat :
     forall u,v:list 'a [length (concat u v)].
       length (concat u v) = (Int.(+) (length u) (length v))
 
-  axiom length_repeat :
-    forall w:list 'a, n:int [length (repeat w n)].
-      (Int.(<=) 0 n) -> length (repeat w n) = (Int.( * ) n (length w))
+  let rec lemma length_repeat (w: list 'a) (n: int)
+    requires {0 <= n}
+    variant {n}
+    ensures {length (repeat w n) = (Int.( * ) n (length w))}
+  = if 0 < n then length_repeat w (n - 1)
 
   (* -------------------------------------------------------------------- *)
   (* --- nth                                                          --- *)
@@ -77,12 +138,22 @@ theory Vlist
 
   lemma nth_cons:
     forall k:int, x:'a, w:list 'a [nth (cons x w) k].
-      0 <= k -> nth (cons x w) k = if k = 0 then x else nth w (k-1)
+      0 <= k && k <= length w -> nth (cons x w) k = if k = 0 then x else nth w (k-1)
+
+  let lemma nth_head (w: list 'a)
+    requires {w <> Nil}
+    ensures {nth w 0 = head w}
+  = match w with Nil -> absurd | Cons _ _ -> () end
+
+  lemma nth_tail:
+    forall k: int, w: list 'a.
+      0 < k && k < length w - 1 -> nth (tail w) (k - 1) = nth w k
 
   axiom nth_concat:
-    forall u,v:list 'a, k:int [nth (concat u v) k].
-      0 <= k -> nth (concat u v) k = if k < length u then nth u k
-                                           else nth v (Int.(-) k (length u))
+    forall u v: list 'a, k: int.
+      0 <= k -> nth (concat u v) k = if k < length u
+                  then nth u k
+                  else nth v (Int.(-) k (length u))
 
   axiom nth_repeat:
     forall n,k:int, w:list 'a [nth (repeat w n) k].
@@ -96,6 +167,21 @@ theory Vlist
   predicate vlist_eq (u : list 'a) (v : list 'a) =
     length u = length v &&
     forall i:int. 0 <= i < length u -> nth u i = nth v i
+
+  lemma vlist_eq_length: forall u v: list 'a. vlist_eq u v -> length u = length v
+
+  lemma vlist_eq_nth: forall u v: list 'a.
+    vlist_eq u v -> forall i: int. 0 <= i < length u -> nth u i = nth v i
+
+  lemma vlist_eq_nil_left: forall w: list 'a. vlist_eq Nil w -> w = Nil
+
+  lemma vlist_eq_nil_right: forall w: list 'a. vlist_eq w Nil -> w = Nil
+
+  lemma vlist_eq_cons_left: forall u v: list 'a. u <> Nil && vlist_eq u v -> v <> Nil
+
+  lemma vlist_eq_cons_right: forall u v: list 'a. v <> Nil && vlist_eq u v -> u <> Nil
+
+  lemma vlist_eq_head: forall u v:list 'a. u <> Nil && vlist_eq u v -> head u = head v
 
   axiom extensionality:
     forall u,v:list 'a. vlist_eq u v -> u = v
