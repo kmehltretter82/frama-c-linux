@@ -116,14 +116,7 @@ module S : Datatype.S_with_collections with type t = po
 module Index : Map.OrderedType with type t = index
 module Gmap : Map.S with type key = index
 
-(** Dynamically exported
-    @since Nitrogen-20111001
-*)
 val get_gid: t -> string
-
-(** Dynamically exported
-    @since Oxygen-20120901
-*)
 val get_property: t -> Property.t
 val get_index : t -> index
 val get_label : t -> string
@@ -221,15 +214,7 @@ val iter :
   ?on_goal:(t -> unit) ->
   unit -> unit
 
-(** Dynamically exported.
-    @since Nitrogen-20111001
-*)
 val iter_on_goals: (t -> unit) -> unit
-
-(** All POs related to a given property.
-    Dynamically exported
-    @since Oxygen-20120901
-*)
 val goals_of_property: Property.t -> t list
 
 val bar : string
@@ -246,9 +231,6 @@ val pp_logfile : Format.formatter -> t -> prover -> unit
 val pp_axiomatics : Format.formatter -> string option -> unit
 val pp_function : Format.formatter -> Kernel_function.t -> string option -> unit
 val pp_goal_flow : Format.formatter -> t -> unit
-
-(** Dynamically exported. *)
-val prover_of_name : string -> prover option
 
 (* -------------------------------------------------------------------------- *)
 (* --- Generators                                                         --- *)

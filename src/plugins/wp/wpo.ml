@@ -504,17 +504,8 @@ let () = Type.set_ml_name ResultType.ty (Some "Wpo.result")
 (* --- Getters                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let get_gid =
-  Dynamic.register
-    ~plugin:"Wp" "Wpo.get_gid"
-    (Datatype.func WpoType.ty Datatype.string)
-    (fun g -> g.po_gid)
-
-let get_property =
-  Dynamic.register
-    ~plugin:"Wp" "Wpo.get_property"
-    (Datatype.func WpoType.ty Property.ty)
-    (fun g -> WpPropId.property_of_id g.po_pid)
+let get_gid g = g.po_gid
+let get_property g = WpPropId.property_of_id g.po_pid
 
 let qed_time wpo =
   match wpo.po_formula with
@@ -944,10 +935,7 @@ let iter ?ip ?index ?on_axiomatics ?on_behavior ?on_goal () =
       with Not_found -> ()
     end
 
-let iter_on_goals =
-  Dynamic.register ~plugin:"Wp" "Wpo.iter_on_goals"
-    (Datatype.func (Datatype.func WpoType.ty Datatype.unit) Datatype.unit)
-    (fun on_goal -> iter ~on_goal ())
+let iter_on_goals f = iter ~on_goal:f ()
 
 let goals_of_property prop =
   let system = SYSTEM.get () in
@@ -956,16 +944,6 @@ let goals_of_property prop =
     with Not_found -> WPOset.empty
   in
   WPOset.elements poset
-
-let goals_of_property =
-  Dynamic.register ~plugin:"Wp" "Wpo.goals_of_property"
-    (Datatype.func Property.ty (Datatype.list WpoType.ty))
-    goals_of_property
-
-let prover_of_name =
-  Dynamic.register ~plugin:"Wp" "Wpo.prover_of_name"
-    (Datatype.func Datatype.string (Datatype.option ProverType.ty))
-    VCS.parse_prover
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover and Files                                                   --- *)
@@ -976,15 +954,6 @@ let get_model w = w.po_model
 let get_logfile w prover result =
   let model = get_model w in
   DISK.cache_log ~pid:w.po_pid ~model ~prover ~result
-
-let _ignore =
-  Dynamic.register ~plugin:"Wp" "Wpo.file_for_log_proof"
-    (Datatype.func2
-       WpoType.ty ProverType.ty
-       (Datatype.pair Datatype.string Datatype.string))
-    (fun w p ->
-       (DISK.file_logout ~pid:w.po_pid ~model:(get_model w) ~prover:p,
-        DISK.file_logerr ~pid:w.po_pid ~model:(get_model w) ~prover:p))
 
 let pp_logfile fmt w prover =
   let model = get_model w in
