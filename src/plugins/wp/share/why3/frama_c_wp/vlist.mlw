@@ -230,15 +230,23 @@ theory Vlist
   lemma rw_repeat_one:
     forall w:list 'a [repeat w 1]. repeat w 1 = w
 
-  axiom eq_repeat_concat:
+  let rec lemma repeat_more (w: list 'a) (n: int)
+    requires {0 <= n}
+    variant {n}
+    ensures {repeat w (n + 1) = concat (repeat w n) w}
+  = if 0 < n then repeat_more w (n - 1)
+
+  let rec lemma rw_repeat_concat (p q: int) (w: list 'a)
+    requires {0 <= p}
+    requires {0 <= q}
+    variant {p}
+    ensures {repeat w (Int.(+) p q) = concat (repeat w p) (repeat w q)}
+  = if 0 < p then rw_repeat_concat (p - 1) q w
+
+  lemma eq_repeat_concat:
     forall p,q:int, w:list 'a.
       0 <= p -> 0 <= q ->
       vlist_eq (repeat w (Int.(+) p q)) (concat (repeat w p) (repeat w q))
-
-  lemma rw_repeat_concat:
-    forall p,q:int, w:list 'a.
-      0 <= p -> 0 <= q ->
-      repeat w (Int.(+) p q) = concat (repeat w p) (repeat w q)
 
   lemma rw_repeat_after:
     forall p:int, w:list 'a.
