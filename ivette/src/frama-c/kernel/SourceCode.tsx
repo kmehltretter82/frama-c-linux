@@ -31,6 +31,8 @@ import * as Labels from 'dome/controls/labels';
 import * as Settings from 'dome/data/settings';
 import * as Buttons from 'dome/controls/buttons';
 
+import { Selection, Document } from 'dome/text/editor';
+
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Status from 'frama-c/kernel/Status';
@@ -44,10 +46,6 @@ import * as Preferences from 'ivette/prefs';
 // -----------------------------------------------------------------------------
 //  Utilitary types and functions
 // -----------------------------------------------------------------------------
-
-// An alias type for functions and locations.
-type Fct = string | undefined;
-type Marker = string | undefined;
 
 // Recovering the cursor position as a line and a column.
 interface Position { line: number, column: number }
@@ -97,25 +95,94 @@ const File = Editor.createField<string>('');
 // This field contains the command use to start the external editor.
 const Command = Editor.createField<string>('');
 
-// This field contains the currently selected function.
-const Fct = Editor.createField<Fct>(undefined);
+// These field contains a callback that returns the source of a location.
+type GetSource = (loc: States.Location) => Ast.source | undefined;
+const GetSource = Editor.createField<GetSource>(() => undefined);
 
-// This field contains the currently selected marker.
-const Marker = Editor.createField<Marker>(undefined);
+// We keep track of the cursor location (i.e the location that is under the
+// current CodeMirror cursor) and the ivette location (i.e the locations as
+// seen by the outside world). Keeping track of both of them together force
+// their update in one dispatch, which prevents strange bugs.
+interface Locations { cursor?: States.Location, ivette: States.Location }
+
+// The Locations field. When given Locations, it will update the cursor field if
+// and only if the new cursor location is not undefined. It simplifies the
+// update in the SourceCode component itself.
+const Locations = createLocationsField();
+function createLocationsField(): Editor.Field<Locations> {
+  const noField = { cursor: undefined, ivette: {} };
+  const field = Editor.createField<Locations>(noField);
+  const set: Editor.Set<Locations> = (view, toBe) => {
+    const hasBeen = field.get(view?.state); 
+    const cursor = toBe.cursor ?? hasBeen.cursor;
+    field.set(view, { cursor, ivette: toBe.ivette });
+  };
+  return { ...field, set };
+}
 
 // -----------------------------------------------------------------------------
 
 
 
 // -----------------------------------------------------------------------------
-//  Context menu and source interactions
+//  Synchronisation with the outside world
 // -----------------------------------------------------------------------------
 
-// This events handler takes care of the context menu, of the selection in the
-// source code (updating the global Ivette's selection) and of the meta
-// selection (with the ctrl modificator) to launch the external editor.
-const EventsHandler = createEventsHandler();
-function createEventsHandler(): Editor.Extension {
+// Update the outside world when the user click somewhere in the source code.
+const SyncOnUserSelection = createSyncOnUserSelection();
+function createSyncOnUserSelection(): Editor.Extension {
+  const actions = { cmd: Command, update: UpdateSelection };
+  const deps = { file: File, selection: Selection, doc: Document, ...actions };
+  return Editor.createEventHandler(deps, {
+    mouseup: async ({ file, cmd, update }, view, event) => {
+      if (!view || file === '') { console.log(view, file); return; }
+      const pos = getCursorPosition(view);
+      const cursor = [file, pos.line, pos.column];
+      try {
+        const [fct, marker] = await Server.send(Ast.getMarkerAt, cursor);
+        if (fct || marker) {
+          // The forced reload should NOT be necessary but... It is...
+          await Server.send(Ast.reloadMarkerInfo, null);
+          const location = { fct, marker };
+          update({ location });
+          Locations.set(view, { cursor: location, ivette: location });
+        }
+      } catch {
+        setError('Failure');
+      }
+      if (event.ctrlKey) edit(file, pos, cmd);
+    }
+  });
+}
+
+// Update the cursor position when the outside world changes the selected
+// location.
+const SyncOnOutsideSelection = createSyncOnOutsideSelection();
+function createSyncOnOutsideSelection(): Editor.Extension {
+  const deps = { locations: Locations, get: GetSource };
+  return Editor.createViewUpdater(deps, ({ locations, get }, view) => {
+    const { cursor, ivette } = locations;
+    if (ivette === undefined || ivette === cursor) return;
+    const source = get(ivette); if (!source) return;
+    console.log(ivette, cursor, source);
+    const newFct = ivette.fct !== cursor?.fct && ivette.marker === undefined;
+    const onTop = cursor === undefined || newFct
+    Locations.set(view, { cursor: ivette, ivette });
+    Editor.selectLine(view, source.line, onTop);
+  });
+}
+
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+//  Context menu
+// -----------------------------------------------------------------------------
+
+// This events handler takes care of the context menu.
+const ContextMenu = createContextMenu();
+function createContextMenu(): Editor.Extension {
   const deps = { file: File, command: Command, update: UpdateSelection };
   return Editor.createEventHandler(deps, {
     contextmenu: ({ file, command }, view) => {
@@ -123,17 +190,6 @@ function createEventsHandler(): Editor.Extension {
       const label = 'Open file in an external editor';
       const pos = getCursorPosition(view);
       Dome.popupMenu([ { label, onClick: () => edit(file, pos, command) } ]);
-    },
-    mouseup: ({ file, command, update }, view, event) => {
-      if (file === '') return;
-      const pos = getCursorPosition(view);
-      Server
-        .send(Ast.getMarkerAt, [file, pos.line, pos.column])
-        .then(([fct, marker]) => {
-          if (fct || marker) update({ location: { fct, marker } });
-        })
-        .catch(() => setError('Failed to request to Frama-C server'));
-      if (event.ctrlKey) edit(file, pos, command);
     },
   });
 }
@@ -153,6 +209,22 @@ function useFctSource(file: string): string {
   return result ?? '';
 }
 
+// Build a callback that retrieves a location's source information.
+function useSourceGetter(): GetSource {
+  const markersInfo = States.useSyncArray(Ast.markerInfo);
+  const functionsData = States.useSyncArray(Ast.functions).getArray();
+  return React.useCallback(({ fct, marker }) => {
+    console.log('*** ', fct, marker);
+    const markerSloc = (marker !== undefined && marker !== '') ?
+      markersInfo.getData(marker)?.sloc : undefined;
+    console.log('*** ', markerSloc);
+    const fctSloc = (fct !== undefined && fct !== '') ?
+      functionsData.find((e) => e.name === fct)?.sloc : undefined;
+    console.log('*** ', fctSloc);
+    return markerSloc ?? fctSloc;
+  }, [markersInfo, functionsData]);
+}
+
 // -----------------------------------------------------------------------------
 
 
@@ -168,20 +240,11 @@ const extensions: Editor.Extension[] = [
   Editor.LineNumbers,
   Editor.LanguageHighlighter,
   Editor.HighlightActiveLine,
-  EventsHandler,
+  SyncOnUserSelection,
+  SyncOnOutsideSelection,
+  ContextMenu,
+  Locations.structure,
 ];
-
-function useMarkerLocation(m: Ast.marker | undefined): Ast.source | undefined {
-  const markersInfo = States.useSyncArray(Ast.markerInfo);
-  if (m === undefined || m === '') return undefined;
-  return markersInfo.getData(m)?.sloc;
-}
-
-function useFunctionLocation(fct: string | undefined): Ast.source | undefined {
-  const functionsData = States.useSyncArray(Ast.functions).getArray();
-  if (fct === undefined || fct === '') return undefined;
-  return functionsData.find((e) => e.name === fct)?.sloc;
-}
 
 // The component in itself.
 export default function SourceCode(): JSX.Element {
@@ -189,28 +252,19 @@ export default function SourceCode(): JSX.Element {
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
   const { view, Component } = Editor.Editor(extensions);
   const [selection, update] = States.useSelection();
-  const marker = selection?.current?.marker;
-  const fct = selection?.current?.fct;
-  const displayedFct = React.useRef<string | undefined>(undefined);
-
-  const markerSloc = useMarkerLocation(marker);
-  const fctSloc = useFunctionLocation(fct);
-  const file = fctSloc?.file ?? '';
+  const loc = selection?.current ?? {};
+  const getSource = useSourceGetter();
+  const file = getSource(loc)?.file ?? '';
   const filename = Path.parse(file).base;
   const pos = getCursorPosition(view);
   const source = useFctSource(file);
 
-  React.useEffect(() => Source.set(view, source), [view, source]);
   React.useEffect(() => UpdateSelection.set(view, update), [view, update]);
-  React.useEffect(() => Command.set(view, command), [view, command]);
+  React.useEffect(() => GetSource.set(view, getSource), [view, getSource]);
   React.useEffect(() => File.set(view, file), [view, file]);
-
-  React.useEffect(() => {
-    const notDisplayedFct = fct !== displayedFct.current;
-    const line = notDisplayedFct ? fctSloc?.line : markerSloc?.line;
-    if (line) Editor.selectLine(view, line, notDisplayedFct);
-    displayedFct.current = fct;
-  }, [view, markerSloc, fctSloc, displayedFct, fct]);
+  React.useEffect(() => Source.set(view, source), [view, source]);
+  React.useEffect(() => Command.set(view, command), [view, command]);
+  React.useEffect(() => Locations.set(view, { ivette: loc }), [view, loc]);
 
   const externalEditorTitle =
     'Open the source file in an external editor.\nA Ctrl-click '

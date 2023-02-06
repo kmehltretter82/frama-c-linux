@@ -24,7 +24,7 @@ import React from 'react';
 
 import { EditorState, StateField, Facet, Extension } from '@codemirror/state';
 import { Annotation, Transaction, RangeSet } from '@codemirror/state';
-import { EditorSelection } from '@codemirror/state';
+import { EditorSelection, Text } from '@codemirror/state';
 
 import { EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
 import { Decoration, DecorationSet } from '@codemirror/view';
@@ -273,13 +273,15 @@ export function createViewUpdater<I extends Dict>(
   deps: Dependencies<I>,
   fn: (input: I, view: View) => void,
 ): Extension {
-  return EditorView.updateListener.of((u) => {
+  const enables = mapDeps(deps, (d) => d.extension);
+  const listener = EditorView.updateListener.of((u) => {
     if(!existsDeps(deps, (d) =>  d.isUpdated(u))) return;
     const get = (b: boolean): EditorState => b ? u.state : u.startState;
     const state: <X>(d: Dep<X>) => EditorState = (d) => get(d.isUpdated(u));
     const inputs = transformDeps(deps, (d) => d.get(state(d))) as I;
     fn(inputs, u.view);
   });
+  return enables.concat(listener);
 }
 
 // -----------------------------------------------------------------------------
@@ -336,6 +338,22 @@ function createSelectionField(): Field<EditorSelection> {
   }
   const updater = EditorView.updateListener.of((update) => {
     if (update.selectionSet) field.set(update.view, update.state.selection);
+  });
+  return { ...field, set, extension: [field.extension, updater] };
+}
+
+export const Document = createDocumentField();
+function createDocumentField(): Field<Text> {
+  const field = createField<Text>(Text.empty);
+  const set: Set<Text> = (view, text) => {
+    const selection = { anchor: 0 };
+    const length = view?.state.doc.length;
+    const changes = { from: 0, to: length, insert: text };
+    view?.dispatch({ changes, selection });
+    field.set(view, text);
+  }
+  const updater = EditorView.updateListener.of((update) => {
+    if (update.docChanged) field.set(update.view, update.state.doc);
   });
   return { ...field, set, extension: [field.extension, updater] };
 }
