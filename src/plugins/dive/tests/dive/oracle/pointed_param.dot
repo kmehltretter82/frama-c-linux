@@ -11,8 +11,7 @@ digraph G {
        style="filled", ];
   cp11 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
         style="filled", ];
-  cp13 [label=<x>, shape=box, fillcolor="#FFBBBB", color="#FF0000",
-        style="filled,dotted", ];
+  cp13 [label=<x>, shape=box, style="dotted", ];
   
   subgraph cluster_cs_1 { label=<main>; cp13;cp3;cp2;
     subgraph cluster_cs_2 { label=<f>; cp11;cp5;
