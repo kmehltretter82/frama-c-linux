@@ -51,10 +51,6 @@ import * as Preferences from 'ivette/prefs';
 type Fct = string | undefined;
 type Marker = string | undefined;
 
-// A Caller is just a pair of the caller's key and the statement's key where the
-// call occurs.
-type Caller = { fct: key<'#fct'>, marker: key<'#stmt'> };
-
 // A range is just a pair of position in the code.
 type Range = Editor.Range;
 
@@ -462,7 +458,7 @@ async function studia(props: StudiaProps): Promise<StudiaInfos> {
 // -----------------------------------------------------------------------------
 
 // This field contains all the current function's callers, as inferred by Eva.
-const Callers = Editor.createField<Caller[]>([]);
+const Callers = Editor.createField<Eva.CallSite[]>([]);
 
 // This field contains information on markers.
 type GetMarkerData = (key: string) => Ast.markerInfoData | undefined;
@@ -470,11 +466,11 @@ const GetMarkerData = Editor.createField<GetMarkerData>(() => undefined);
 
 const ContextMenuHandler = createContextMenuHandler();
 function createContextMenuHandler(): Editor.Extension {
-  const data = { tree: Tree, locations: Callers };
+  const data = { tree: Tree, callers: Callers };
   const deps = { ...data, update: UpdateSelection, getData: GetMarkerData };
   return Editor.createEventHandler(deps, {
     contextmenu: (inputs, view, event) => {
-      const { tree, locations, update, getData } = inputs;
+      const { tree, callers, update, getData } = inputs;
       const coords = { x: event.clientX, y: event.clientY };
       const position = view.posAtCoords(coords); if (!position) return;
       const node = coveringNode(tree, position);
@@ -483,9 +479,10 @@ function createContextMenuHandler(): Editor.Extension {
       const info = getData(node.id);
       if (info?.var === 'function') {
         if (info.kind === 'declaration') {
-          const callers = Lodash.groupBy(locations, e => e.fct);
-          Lodash.forEach(callers, (e) => {
-            const callerName = e[0].fct;
+          const groupedCallers = Lodash.groupBy(callers, e => e.kf);
+          const locations = callers.map((l) => ({ fct: l.kf, marker: l.stmt }));
+          Lodash.forEach(groupedCallers, (e) => {
+            const callerName = e[0].kf;
             const callSites = e.length > 1 ? `(${e.length} call sites)` : '';
             items.push({
               label: `Go to caller ${callerName} ` + callSites,
@@ -597,12 +594,8 @@ function useFctDead(fct: Fct): Eva.deadCode {
 }
 
 // Server request handler returning the given function's callers.
-function useFctCallers(fct: Fct): Caller[] {
-  const callers = States.useRequest(Eva.getCallers, fct) ?? [];
-  const res = React.useMemo(() => {
-    return callers.map(([fct, marker]) => ({ fct, marker }))
-  }, [callers]);
-  return res;
+function useFctCallers(fct: Fct): Eva.CallSite[] {
+  return States.useRequest(Eva.getCallers, fct) ?? [];
 }
 
 // Server request handler returning the tainted lvalues.

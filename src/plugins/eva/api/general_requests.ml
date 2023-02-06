@@ -57,17 +57,37 @@ let _computation_signal =
     ~add_hook:Analysis.register_computation_hook
     ()
 
-module CallSite = Data.Jpair (Kernel_ast.Kf) (Kernel_ast.Stmt)
 
-let callers kf =
-  let list = Results.callsites kf in
-  List.concat (List.map (fun (kf, l) -> List.map (fun s -> kf, s) l) list)
 
-let () = Request.register ~package
-    ~kind:`GET ~name:"getCallers"
-    ~descr:(Markdown.plain "Get the list of call site of a function")
-    ~input:(module Kernel_ast.Kf) ~output:(module Data.Jlist (CallSite))
-    callers
+(* ----- Callsites ---------------------------------------------------------- *)
+
+module CallSite = struct
+  open Data
+  type callsite
+  let record: callsite Record.signature = Record.signature ()
+
+  let kf_field = Record.field record ~name:"kf"
+      ~descr:(Markdown.plain "Function") (module Kernel_ast.Kf)
+
+  let stmt_field = Record.field record ~name:"stmt"
+      ~descr:(Markdown.plain "Statement") (module Kernel_ast.Stmt)
+
+  let data = Record.publish ~package ~name:"CallSite"
+      ~descr:(Markdown.plain "CallSite") record
+
+  module R : Record.S with type r = callsite = (val data)
+
+  let convert (kf, stmts) = stmts |> List.map @@ fun stmt ->
+    R.default |> R.set kf_field kf |> R.set stmt_field stmt
+
+  let callers kf = Results.callsites kf |> List.map convert |> List.concat
+
+  let () = Request.register ~package
+      ~kind:`GET ~name:"getCallers"
+      ~descr:(Markdown.plain "Get the list of call site of a function")
+      ~input:(module Kernel_ast.Kf) ~output:(module Data.Jlist (R))
+      callers
+end
 
 
 

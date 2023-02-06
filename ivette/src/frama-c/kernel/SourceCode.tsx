@@ -135,7 +135,7 @@ function createSyncOnUserSelection(): Editor.Extension {
   const deps = { file: File, selection: Selection, doc: Document, ...actions };
   return Editor.createEventHandler(deps, {
     mouseup: async ({ file, cmd, update }, view, event) => {
-      if (!view || file === '') { console.log(view, file); return; }
+      if (!view || file === '') return;
       const pos = getCursorPosition(view);
       const cursor = [file, pos.line, pos.column];
       try {
@@ -164,9 +164,8 @@ function createSyncOnOutsideSelection(): Editor.Extension {
     const { cursor, ivette } = locations;
     if (ivette === undefined || ivette === cursor) return;
     const source = get(ivette); if (!source) return;
-    console.log(ivette, cursor, source);
     const newFct = ivette.fct !== cursor?.fct && ivette.marker === undefined;
-    const onTop = cursor === undefined || newFct
+    const onTop = cursor === undefined || newFct;
     Locations.set(view, { cursor: ivette, ivette });
     Editor.selectLine(view, source.line, onTop);
   });
@@ -214,13 +213,10 @@ function useSourceGetter(): GetSource {
   const markersInfo = States.useSyncArray(Ast.markerInfo);
   const functionsData = States.useSyncArray(Ast.functions).getArray();
   return React.useCallback(({ fct, marker }) => {
-    console.log('*** ', fct, marker);
     const markerSloc = (marker !== undefined && marker !== '') ?
       markersInfo.getData(marker)?.sloc : undefined;
-    console.log('*** ', markerSloc);
     const fctSloc = (fct !== undefined && fct !== '') ?
       functionsData.find((e) => e.name === fct)?.sloc : undefined;
-    console.log('*** ', fctSloc);
     return markerSloc ?? fctSloc;
   }, [markersInfo, functionsData]);
 }
@@ -252,7 +248,7 @@ export default function SourceCode(): JSX.Element {
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
   const { view, Component } = Editor.Editor(extensions);
   const [selection, update] = States.useSelection();
-  const loc = selection?.current ?? {};
+  const loc = React.useMemo(() => selection?.current ?? {}, [selection]);
   const getSource = useSourceGetter();
   const file = getSource(loc)?.file ?? '';
   const filename = Path.parse(file).base;

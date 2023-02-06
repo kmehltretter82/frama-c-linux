@@ -94,25 +94,38 @@ const computationState_internal: State.Value<computationStateType> = {
 /** The current computation state of the analysis. */
 export const computationState: State.Value<computationStateType> = computationState_internal;
 
-const getCallers_internal: Server.GetRequest<
-  Json.key<'#fct'>,
-  [ Json.key<'#fct'>, Json.key<'#stmt'> ][]
-  > = {
+/** CallSite */
+export interface CallSite {
+  /** Function */
+  kf: Json.key<'#fct'>;
+  /** Statement */
+  stmt: Json.key<'#stmt'>;
+}
+
+/** Decoder for `CallSite` */
+export const jCallSite: Json.Decoder<CallSite> =
+  Json.jObject({
+    kf: Json.jKey<'#fct'>('#fct'),
+    stmt: Json.jKey<'#stmt'>('#stmt'),
+  });
+
+/** Natural order for `CallSite` */
+export const byCallSite: Compare.Order<CallSite> =
+  Compare.byFields
+    <{ kf: Json.key<'#fct'>, stmt: Json.key<'#stmt'> }>({
+    kf: Compare.string,
+    stmt: Compare.string,
+  });
+
+const getCallers_internal: Server.GetRequest<Json.key<'#fct'>,CallSite[]> = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.general.getCallers',
   input:  Json.jKey<'#fct'>('#fct'),
-  output: Json.jArray(
-            Json.jPair(
-              Json.jKey<'#fct'>('#fct'),
-              Json.jKey<'#stmt'>('#stmt'),
-            )),
+  output: Json.jArray(jCallSite),
   signals: [],
 };
 /** Get the list of call site of a function */
-export const getCallers: Server.GetRequest<
-  Json.key<'#fct'>,
-  [ Json.key<'#fct'>, Json.key<'#stmt'> ][]
-  >= getCallers_internal;
+export const getCallers: Server.GetRequest<Json.key<'#fct'>,CallSite[]>= getCallers_internal;
 
 /** Data for array rows [`functions`](#functions)  */
 export interface functionsData {

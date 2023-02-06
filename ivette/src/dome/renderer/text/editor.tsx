@@ -83,7 +83,7 @@ export interface Field<A> extends Data<A, StateField<A>> { set: Set<A> }
 // information of CodeMirror) is changed. An Aspect exposes a getter that
 // handles all React's hooks shenanigans and an extension that must be added to
 // the CodeMirror initial configuration.
-export interface Aspect<A> extends Data<A, Facet<A, A>> {}
+export type Aspect<A> = Data<A, Facet<A, A>>;
 
 // State extensions and Aspects have to declare their dependencies, i.e. the
 // Field and Aspects they rely on to perform their computations. Dependencies
@@ -123,7 +123,7 @@ function mapDeps<I extends Dict, A>(deps: Deps<I>, fn: Mapper<I, A>): A[] {
 // Helper function used to check if at least one depencency satisfied a
 // given predicate.
 function existsDeps<I extends Dict>(deps: Deps<I>, fn: Pred<I>): boolean {
-  return Object.keys(deps).find((k) => fn(deps[k], k)) != undefined;
+  return Object.keys(deps).find((k) => fn(deps[k], k)) !== undefined;
 }
 
 // Helper function used to transfrom a Dependencies will keeping its structure.
@@ -174,7 +174,7 @@ export function createField<A>(init: A): Field<A> {
   const get: Get<A> = (state) => state?.field(field) ?? init;
   const set: Set<A> = (v, a) => v?.dispatch({ annotations: annot.of(a) });
   const isUpdated: IsUpdated = (update) =>
-    update.transactions.find((tr) => tr.annotation(annot)) != undefined;
+    update.transactions.find((tr) => tr.annotation(annot)) !== undefined;
   return { init, get, set, structure: field, extension: field, isUpdated };
 }
 
@@ -335,7 +335,7 @@ function createSelectionField(): Field<EditorSelection> {
   const set: Set<EditorSelection> = (view, selection) => {
     view?.dispatch({ selection });
     field.set(view, selection);
-  }
+  };
   const updater = EditorView.updateListener.of((update) => {
     if (update.selectionSet) field.set(update.view, update.state.selection);
   });
@@ -351,7 +351,7 @@ function createDocumentField(): Field<Text> {
     const changes = { from: 0, to: length, insert: text };
     view?.dispatch({ changes, selection });
     field.set(view, text);
-  }
+  };
   const updater = EditorView.updateListener.of((update) => {
     if (update.docChanged) field.set(update.view, update.state.doc);
   });
