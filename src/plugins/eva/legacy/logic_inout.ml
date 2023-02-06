@@ -290,3 +290,40 @@ let verify_assigns kf ~pre froms =
   in
   let ab = Active_behaviors.create eval_predicate funspec in
   check_fct_assigns kf ab ~pre_state:pre froms
+
+(* -------------------------------------------------------------------------- *)
+(* --- Utilitary function for Inout and From plugins                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+let compute_all_callers kf =
+  let rec add_callers kf acc =
+    List.fold_left add_kf acc (Function_calls.callers kf)
+  and add_kf acc kf =
+    if Kernel_function.Hptset.mem kf acc
+    then acc
+    else add_callers kf (Kernel_function.Hptset.add kf acc)
+  in
+  add_callers kf (Kernel_function.Hptset.empty)
+
+let is_local_or_formal_of_caller callers base =
+  match Kernel_function.find_defining_kf (Base.to_varinfo base) with
+  | Some kf -> Kernel_function.Hptset.mem kf callers
+  | None | exception Base.Not_a_C_variable -> false
+
+let is_formal kf base =
+  match kf.fundec with
+  | Definition (fundec, _) -> Base.is_formal base fundec
+  | Declaration (_, vi, _, _) -> Base.is_formal_of_prototype base vi
+
+let is_local kf base =
+  match kf.fundec with
+  | Definition (fundec, _) -> Base.is_local base fundec
+  | Declaration _ -> false
+
+let accept_base ~formals ~locals kf =
+  let all_callers = compute_all_callers kf in
+  fun base ->
+    Base.is_global base
+    || (formals && is_formal kf base)
+    || (locals && is_local kf base)
+    || is_local_or_formal_of_caller all_callers base

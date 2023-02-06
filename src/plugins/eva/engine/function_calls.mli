@@ -60,6 +60,9 @@ val callers : Cil_types.kernel_function -> Cil_types.kernel_function list
     of callsites (the call statements) inside. *)
 val callsites: kernel_function -> (kernel_function * stmt list) list
 
+(** Returns the number of callsites that have been analyzed. *)
+val nb_callsites: unit -> int
+
 
 type results = Complete | Partial | NoResults
 type analysis_status =

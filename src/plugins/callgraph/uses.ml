@@ -101,38 +101,6 @@ let iter_on_aux iter_dir f kf =
 let iter_on_callers = iter_on_aux Cg.G.iter_pred
 let iter_on_callees = iter_on_aux Cg.G.iter_succ
 
-let is_local_or_formal_of_caller v kf =
-  try
-    iter_on_callers
-      (fun caller ->
-         if Base.is_formal_or_local v (Kernel_function.get_definition caller)
-         then raise Exit)
-      kf;
-    false
-  with Exit ->
-    true
-
-let accept_base ~with_formals ~with_locals kf v =
-  let open Cil_types in
-  Base.is_global v
-  ||
-  (match with_formals, with_locals, kf.fundec with
-   | false, false, _ | false, _, Declaration _ -> false
-   | true,  false, Definition (fundec,_) -> Base.is_formal v fundec
-   | false, true, Definition (fundec, _) -> Base.is_local v fundec
-   | true,  true, Definition (fundec, _) -> Base.is_formal_or_local v fundec
-   | true , _, Declaration (_, vd, _, _) -> Base.is_formal_of_prototype v vd)
-  || is_local_or_formal_of_caller v kf
-
-let _accept_base =
-  Dynamic.register
-    ~comment:"Returns [true] if the given base is a global, \
-              or a formal or local of either [kf] or one of its callers"
-    ~plugin:Options.name
-    "accept_base"
-    Datatype.(func2 Kernel_function.ty Base.ty bool)
-    (fun kf b -> accept_base ~with_formals:true ~with_locals:true kf b)
-
 let nb_calls () =
   let g = Cg.get () in
   (* [g] contains bidirectional edges (from caller to callee and

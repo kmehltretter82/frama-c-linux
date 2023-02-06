@@ -232,7 +232,7 @@ and setup_precondition_proxy called_kf precondition =
     Kernel.debug "Setting up syntactic call-preconditions for precondition \
                   of %a" Kernel_function.pretty called_kf;
     let call_preconditions =
-      List.map
+      List.rev_map
         (fun (_,stmt) -> precondition_at_call called_kf precondition stmt)
         (Kernel_function.find_syntactic_callsites called_kf)
     in

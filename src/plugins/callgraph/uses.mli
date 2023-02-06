@@ -38,17 +38,6 @@ val iter_on_callees : (Kernel_function.t -> unit) -> Kernel_function.t -> unit
 (** Iterate over all the callees of a given function in a (reverse) depth-first
     way. Do nothing if the function is not in the callgraph. *)
 
-val accept_base :
-  with_formals:bool ->
-  with_locals:bool ->
-  Kernel_function.t ->
-  Base.t ->
-  bool
-(** [accept_base formals locals kf b] returns [true] if and only if [b] is
-    - a global
-    - a formal or local of one of the callers of [kf]
-    - a formal or local of [kf] and the corresponding argument is [true]. *)
-
 val nb_calls: unit -> int
 (** @return the number of function calls in the whole callgraph. It is not
     (necessarily) equal to the number of graph edges (depending on the

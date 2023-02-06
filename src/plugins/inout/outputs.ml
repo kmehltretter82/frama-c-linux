@@ -117,7 +117,7 @@ class virtual do_it_ = object(self)
 
   method clean_kf_result kf r =
     Zone.filter_base
-      (Callgraph.Uses.accept_base ~with_formals:true ~with_locals:true kf)
+      (Eva.Logic_inout.accept_base ~formals:true ~locals:true kf)
       r
 
   method compute_funspec kf =
@@ -141,7 +141,7 @@ let get_internal = Analysis.kernel_function
 
 let externalize kf x =
   Zone.filter_base
-    (Callgraph.Uses.accept_base ~with_formals:false ~with_locals:false kf)
+    (Eva.Logic_inout.accept_base ~formals:false ~locals:false kf)
     x
 
 module Externals =
