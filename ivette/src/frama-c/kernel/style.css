@@ -90,7 +90,7 @@
 }
 
 .astinfo-section.hovered {
-    background: var(--code-hover-light);
+    background: var(--code-hover);
 }
 
 .astinfo-section.selected.hovered {
