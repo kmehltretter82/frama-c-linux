@@ -109,7 +109,8 @@ let rec reset_node n =
   if Wpo.is_tactic n.goal then Wpo.remove n.goal ;
   match n.script with
   | Opened | Script _ -> ()
-  | Tactic(_,children) -> iter_all reset_node children
+  | Tactic(_,children) ->
+    n.script <- Opened ; iter_all reset_node children
 
 let reset_root = function None -> () | Some n -> reset_node n
 
@@ -123,7 +124,7 @@ let reset t =
     t.saved <- false ;
   end
 
-let remove w = if PROOFS.mem w then reset (PROOFS.get w)
+let clear w = if PROOFS.mem w then reset (PROOFS.get w)
 
 let saved t = t.saved
 let set_saved t s = t.saved <- s
@@ -195,6 +196,7 @@ let main t = t.main
 let head t = match t.head with
   | None -> t.main
   | Some n -> n.goal
+let tree n = proof ~main:n.tree
 let goal n = n.goal
 let stats n = n.stats
 let tree_context t = Wpo.get_context t.main
@@ -279,20 +281,18 @@ let rec forward t =
         forward t ;
       end
 
+let remove t node =
+  begin
+    Wpo.clear_results node.goal ;
+    t.head <- node.parent ;
+    if t.head = None then t.root <- None ;
+    reset_node node ;
+  end
+
 let cancel t =
   match t.head with
   | None -> ()
-  | Some node ->
-    begin
-      Wpo.clear_results node.goal ;
-      match node.script with
-      | Opened ->
-        t.head <- node.parent ;
-        if t.head = None then t.root <- None ;
-      | Tactic _ | Script _ ->
-        (*TODO: save the current script *)
-        node.script <- Opened ;
-    end
+  | Some node -> remove t node
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sub-Goal                                                           --- *)

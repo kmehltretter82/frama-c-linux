@@ -325,4 +325,54 @@ export const getProofState: Server.GetRequest<
     parents: Json.index<'#node'>[], current: Json.index<'#node'> }
   >= getProofState_internal;
 
+const goToRoot_internal: Server.SetRequest<goal,null> = {
+  kind: Server.RqKind.SET,
+  name:   'plugins.wp.goToRoot',
+  input:  jGoal,
+  output: Json.jNull,
+  signals: [],
+};
+/** Go to root of proof tree */
+export const goToRoot: Server.SetRequest<goal,null>= goToRoot_internal;
+
+const goToPending_internal: Server.SetRequest<[ goal, number ],null> = {
+  kind: Server.RqKind.SET,
+  name:   'plugins.wp.goToPending',
+  input:  Json.jPair( jGoal, Json.jNumber,),
+  output: Json.jNull,
+  signals: [],
+};
+/** Go to k-th pending node of proof tree */
+export const goToPending: Server.SetRequest<[ goal, number ],null>= goToPending_internal;
+
+const goForward_internal: Server.SetRequest<goal,null> = {
+  kind: Server.RqKind.SET,
+  name:   'plugins.wp.goForward',
+  input:  jGoal,
+  output: Json.jNull,
+  signals: [],
+};
+/** Forward to next pending node */
+export const goForward: Server.SetRequest<goal,null>= goForward_internal;
+
+const goToNode_internal: Server.SetRequest<Json.index<'#node'>,null> = {
+  kind: Server.RqKind.SET,
+  name:   'plugins.wp.goToNode',
+  input:  Json.jIndex<'#node'>('#node'),
+  output: Json.jNull,
+  signals: [],
+};
+/** Set current node of associated proof tree */
+export const goToNode: Server.SetRequest<Json.index<'#node'>,null>= goToNode_internal;
+
+const removeNode_internal: Server.SetRequest<Json.index<'#node'>,null> = {
+  kind: Server.RqKind.SET,
+  name:   'plugins.wp.removeNode',
+  input:  Json.jIndex<'#node'>('#node'),
+  output: Json.jNull,
+  signals: [],
+};
+/** Forward to next pending node */
+export const removeNode: Server.SetRequest<Json.index<'#node'>,null>= removeNode_internal;
+
 /* ------------------------------------- */

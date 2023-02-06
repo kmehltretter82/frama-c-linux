@@ -52,7 +52,7 @@ module INDEX = State_builder.Ref
       let default () = Hashtbl.create 0
     end)
 
-module WPO : D.S with type t = Wpo.t =
+module Goal : D.S with type t = Wpo.t =
 struct
   type t = Wpo.t
   let jtype = D.declare ~package ~name:"goal"
@@ -146,7 +146,7 @@ let () = R.register ~package ~kind:`GET ~name:"getAvailableProvers"
        Why3Provers.provers ())
 
 (* -------------------------------------------------------------------------- *)
-(* --- WPO Array                                                          --- *)
+(* --- Goal Array                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
 let gmodel : Wpo.t S.model = S.model ()
@@ -261,10 +261,10 @@ let () = R.register ~package ~kind:`SET ~name:"cancelProofTasks"
 let proofStatus = R.signal ~package ~name:"proofStatus"
     ~descr:(Md.plain "Proof Status has changed")
 
-module NODE = D.Index(Map.Make(ProofEngine.Node))(struct let name = "node" end)
+module Node = D.Index(Map.Make(ProofEngine.Node))(struct let name = "node" end)
 
 let () =
-  let snode = R.signature ~input:(module NODE) () in
+  let snode = R.signature ~input:(module Node) () in
   let set_title = R.result snode ~name:"result"
       ~descr:(Md.plain "Proof node title") (module D.Jstring) in
   let set_proved = R.result snode ~name:"proved"
@@ -292,11 +292,11 @@ let () =
 (* -------------------------------------------------------------------------- *)
 
 let () =
-  let state = R.signature ~input:(module WPO) () in
+  let state = R.signature ~input:(module Goal) () in
   let set_current = R.result state ~name:"current"
-      ~descr:(Md.plain "Current proof node.") (module NODE) in
+      ~descr:(Md.plain "Current proof node.") (module Node) in
   let set_parents = R.result state ~name:"parents"
-      ~descr:(Md.plain "Proof node parents.") (module D.Jlist(NODE)) in
+      ~descr:(Md.plain "Proof node parents.") (module D.Jlist(Node)) in
   let set_pending = R.result state ~name:"pending"
       ~descr:(Md.plain "Pending proof nodes.") (module D.Jint) in
   let set_index = R.result state ~name:"index"
@@ -310,7 +310,7 @@ let () =
       (module D.Jstring) in
   let set_children = R.result state ~name:"children"
       ~descr:(Md.plain "Proof node tactic children (id any)")
-      (module D.Jlist(D.Jpair(D.Jstring)(NODE))) in
+      (module D.Jlist(D.Jpair(D.Jstring)(Node))) in
   R.register_sig ~package
     ~kind:`GET ~name:"getProofState"
     ~descr:(Md.plain "Current Proof Status of a Goal") state
@@ -335,6 +335,55 @@ let () =
       set_results rq (Wpo.get_results (ProofEngine.goal current)) ;
       set_tactic rq tactic ;
       set_children rq (ProofEngine.children current) ;
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Proof Tree Management                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () = R.register ~package ~kind:`SET ~name:"goToRoot"
+    ~descr:(Md.plain "Go to root of proof tree")
+    ~input:(module Goal) ~output:(module D.Junit)
+    begin fun goal ->
+      let tree = ProofEngine.proof ~main:goal in
+      ProofEngine.goto tree `Main ;
+      R.emit proofStatus ;
+    end
+
+let () = R.register ~package ~kind:`SET ~name:"goToPending"
+    ~descr:(Md.plain "Go to k-th pending node of proof tree")
+    ~input:(module D.Jpair(Goal)(D.Jint)) ~output:(module D.Junit)
+    begin fun (goal,index) ->
+      let tree = ProofEngine.proof ~main:goal in
+      ProofEngine.goto tree (`Leaf index) ;
+      R.emit proofStatus ;
+    end
+
+let () = R.register ~package ~kind:`SET ~name:"goForward"
+    ~descr:(Md.plain "Forward to next pending node")
+    ~input:(module Goal) ~output:(module D.Junit)
+    begin fun goal ->
+      let tree = ProofEngine.proof ~main:goal in
+      ProofEngine.forward tree ;
+      R.emit proofStatus ;
+    end
+
+let () = R.register ~package ~kind:`SET ~name:"goToNode"
+    ~descr:(Md.plain "Set current node of associated proof tree")
+    ~input:(module Node) ~output:(module D.Junit)
+    begin fun node ->
+      let tree = ProofEngine.tree node in
+      ProofEngine.goto tree (`Node node) ;
+      R.emit proofStatus ;
+    end
+
+let () = R.register ~package ~kind:`SET ~name:"removeNode"
+    ~descr:(Md.plain "Forward to next pending node")
+    ~input:(module Node) ~output:(module D.Junit)
+    begin fun node ->
+      let tree = ProofEngine.tree node in
+      ProofEngine.remove tree node ;
+      R.emit proofStatus ;
     end
 
 (* -------------------------------------------------------------------------- *)
