@@ -232,6 +232,9 @@ val launch : server -> unit
 val cancel_all : server -> unit
 (** Cancel all scheduled tasks *)
 
+val get_procs : server -> int
+(** Maximum number of running process *)
+
 val set_procs : server -> int -> unit
 (** Adjusts the maximum number of running process. *)
 
@@ -247,9 +250,17 @@ val on_server_stop     : server -> (unit -> unit) -> unit
 val on_server_wait     : server -> (unit -> unit) -> unit
 (** On-wait server callback (all tasks are scheduled) *)
 
-val scheduled  : server -> int (** Number of scheduled process *)
+val terminated : server -> int
+(** Number of terminated process *)
 
-val terminated : server -> int (** Number of terminated process *)
+val remaining : server -> int
+(** Number of remaining process *)
+
+val scheduled  : server -> int
+(** Total number of scheduled process *)
+
+val running : server -> int
+(** Number of active process *)
 
 val waiting : server -> int option
 (** All task scheduled and server is waiting for termination *)

@@ -230,4 +230,40 @@ const goals_internal: State.Array<Json.key<'#wpo'>,goalsData> = {
 /** Generated Goals */
 export const goals: State.Array<Json.key<'#wpo'>,goalsData> = goals_internal;
 
+/** Proof Server Activity */
+export const serverActivity: Server.Signal = {
+  name: 'plugins.wp.serverActivity',
+};
+
+const getScheduledTasks_internal: Server.GetRequest<
+  null,
+  { todo: number, done: number, active: number, procs: number }
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.wp.getScheduledTasks',
+  input:  Json.jNull,
+  output: Json.jObject({
+            todo: Json.jNumber,
+            done: Json.jNumber,
+            active: Json.jNumber,
+            procs: Json.jNumber,
+          }),
+  signals: [ { name: 'plugins.wp.serverActivity' } ],
+};
+/** scheduled tasks in proof server. */
+export const getScheduledTasks: Server.GetRequest<
+  null,
+  { todo: number, done: number, active: number, procs: number }
+  >= getScheduledTasks_internal;
+
+const cancelProofTasks_internal: Server.SetRequest<null,null> = {
+  kind: Server.RqKind.SET,
+  name:   'plugins.wp.cancelProofTasks',
+  input:  Json.jNull,
+  output: Json.jNull,
+  signals: [],
+};
+/** Cancel all scheduled proof tasks. */
+export const cancelProofTasks: Server.SetRequest<null,null>= cancelProofTasks_internal;
+
 /* ------------------------------------- */

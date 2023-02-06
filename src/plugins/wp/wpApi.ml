@@ -216,3 +216,48 @@ let _garray = S.register_array ~package ~name:"goals"
     gmodel
 
 (* -------------------------------------------------------------------------- *)
+(* --- Proof Server                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let serverActivity = R.signal ~package
+    ~name:"serverActivity"
+    ~descr:(Md.plain "Proof Server Activity")
+
+let () =
+  let server_sig = R.signature ~input:(module D.Junit) () in
+  let set_procs = R.result server_sig
+      ~name:"procs" ~descr:(Md.plain "Max parallel jobs") (module D.Jint) in
+  let set_active = R.result server_sig
+      ~name:"active" ~descr:(Md.plain "Active jobs") (module D.Jint) in
+  let set_done = R.result server_sig
+      ~name:"done" ~descr:(Md.plain "Finished jobs") (module D.Jint) in
+  let set_todo = R.result server_sig
+      ~name:"todo" ~descr:(Md.plain "Remaining jobs") (module D.Jint) in
+  R.register_sig ~package ~kind:`GET ~name:"getScheduledTasks"
+    ~descr:(Md.plain "scheduled tasks in proof server.")
+    ~signals:[serverActivity]
+    server_sig
+    begin
+      let monitored = ref false in
+      fun rq () ->
+        let server = ProverTask.server () in
+        if not !monitored then
+          begin
+            monitored := true ;
+            let signal () = R.emit serverActivity in
+            Task.on_server_activity server signal ;
+            Task.on_server_start server signal ;
+            Task.on_server_stop server signal ;
+          end ;
+        set_procs rq (Task.get_procs server) ;
+        set_active rq (Task.running server) ;
+        set_done rq (Task.terminated server) ;
+        set_todo rq (Task.remaining server) ;
+    end
+
+let () = R.register ~package ~kind:`SET ~name:"cancelProofTasks"
+    ~descr:(Md.plain "Cancel all scheduled proof tasks.")
+    ~input:(module D.Junit) ~output:(module D.Junit)
+    (fun () -> let server = ProverTask.server () in Task.cancel_all server)
+
+(* -------------------------------------------------------------------------- *)
