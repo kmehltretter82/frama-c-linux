@@ -46,6 +46,8 @@ type node_range =
 
 type computation = NotDone | Partial of (unit Seq.t) | Done
 
+type origin = Studia.Writes.t
+
 type node = {
   node_key : int;
   node_kind : node_kind;
@@ -57,23 +59,15 @@ type node = {
   mutable node_taint : Eva.Results.taint option;
   mutable node_writes_computation : computation;
   mutable node_reads_computation : computation;
-  mutable node_writes_stmts : Cil_types.stmt list;
+  mutable node_writes : origin list;
 }
 
 type dependency_kind = Callee | Data | Address | Control | Composition
 
-type dependency_origin =
-  | Stmt of Cil_types.stmt
-  | GlobalInit of Cil_types.varinfo
-  | FormalAssign of
-      Cil_types.varinfo *
-      Cil_types.kernel_function * (* defining function *)
-      Cil_types.stmt (* calling statement *)
-
 type dependency = {
   dependency_key : int;
   dependency_kind : dependency_kind;
-  mutable dependency_origins : dependency_origin list;
+  mutable dependency_origins : origin list;
 }
 
 type graph_diff = {

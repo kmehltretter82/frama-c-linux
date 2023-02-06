@@ -199,6 +199,5 @@ let update_node_values context node ~typ ~cvalue ~taint =
   notify_node_update context node
 
 let set_node_writes context node writes =
-  let compare = Cil_datatype.Stmt_Id.compare in
-  node.node_writes_stmts <- List.sort_uniq compare writes;
+  node.node_writes <- List.sort_uniq Studia.Writes.compare writes;
   notify_node_update context node

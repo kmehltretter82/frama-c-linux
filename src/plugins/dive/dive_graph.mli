@@ -42,7 +42,7 @@ val update_node_values : node ->
   typ:Cil_types.typ -> cvalue:Cvalue.V.t -> taint:Eva.Results.taint option ->
   unit
 
-val create_dependency : t -> origin:dependency_origin -> kind:dependency_kind ->
+val create_dependency : t -> origin:origin -> kind:dependency_kind ->
   node -> node -> node * dependency * node
 
 val remove_dependency : t -> node * dependency * node -> unit

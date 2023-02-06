@@ -40,7 +40,7 @@ let new_node
   node_taint = None;
   node_writes_computation = NotDone;
   node_reads_computation = NotDone;
-  node_writes_stmts = [];
+  node_writes = [];
 }
 
 module Node = Datatype.Make_with_collections
@@ -103,7 +103,7 @@ let create_dependency g ~origin ~kind v1  v2 =
   in
   (* Add origin *)
   let add_uniq l x =
-    List.sort_uniq Origin.compare (x :: l)
+    List.sort_uniq Studia.Writes.compare (x :: l)
   in
   e.dependency_origins <- add_uniq e.dependency_origins origin;
   (v1,e,v2)

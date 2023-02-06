@@ -49,14 +49,14 @@ val show : t -> Cil_types.varinfo -> unit
 
 val add_node : t -> node_kind:node_kind -> node_locality:node_locality -> node
 val remove_node : t -> node -> unit
-val add_dep : t -> origin:dependency_origin -> kind:dependency_kind -> 
+val add_dep : t -> origin:origin -> kind:dependency_kind ->
   node -> node -> unit
 val remove_node_deps : t -> node -> unit
 
 val update_node_values : t -> node ->
   typ:Cil_types.typ ->
   cvalue:Locations.Location_Bytes.t -> taint:Eva.Results.taint option -> unit
-val set_node_writes : t -> node -> Cil_types.stmt list -> unit
+val set_node_writes : t -> node -> origin list -> unit
 
 val set_update_hook : t -> (element -> unit) -> unit
 val set_remove_hook : t -> (element -> unit) -> unit
