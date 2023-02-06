@@ -138,7 +138,7 @@ theory Vlist
 
   lemma nth_cons:
     forall k:int, x:'a, w:list 'a [nth (cons x w) k].
-      0 <= k && k <= length w -> nth (cons x w) k = if k = 0 then x else nth w (k-1)
+      0 <= k <= length w -> nth (cons x w) k = if k = 0 then x else nth w (k-1)
 
   let lemma nth_head (w: list 'a)
     requires {w <> Nil}
@@ -147,7 +147,7 @@ theory Vlist
 
   lemma nth_tail:
     forall k: int, w: list 'a.
-      0 < k && k < length w - 1 -> nth (tail w) (k - 1) = nth w k
+      0 < k < length w - 1 -> nth (tail w) (k - 1) = nth w k
 
   let rec lemma nth_concat (u v: list 'a) (k: int)
     requires { 0 <= k < length u + length v }
