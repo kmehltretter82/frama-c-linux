@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2022                                                */
+/*   Copyright (C) 2007-2023                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -113,6 +113,16 @@ export const byStats: Compare.Order<stats> =
     proved: Compare.number,
     total: Compare.number,
   });
+
+const getAvailableProvers_internal: Server.GetRequest<null,prover[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.wp.getAvailableProvers',
+  input:  Json.jNull,
+  output: Json.jArray(jProver),
+  signals: [],
+};
+/** Returns the list of configured provers from why3 */
+export const getAvailableProvers: Server.GetRequest<null,prover[]>= getAvailableProvers_internal;
 
 /** Data for array rows [`goals`](#goals)  */
 export interface goalsData {

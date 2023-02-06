@@ -137,6 +137,14 @@ struct
     ]
 end
 
+let () = R.register ~package ~kind:`GET ~name:"getAvailableProvers"
+    ~descr:(Md.plain "Returns the list of configured provers from why3")
+    ~input:(module D.Junit) ~output:(module D.Jlist(PROVER))
+    (fun () ->
+       List.map (fun p -> VCS.Why3 p) @@
+       List.filter Why3Provers.is_mainstream @@
+       Why3Provers.provers ())
+
 (* -------------------------------------------------------------------------- *)
 (* --- WPO Array                                                          --- *)
 (* -------------------------------------------------------------------------- *)
