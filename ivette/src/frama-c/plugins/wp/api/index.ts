@@ -144,8 +144,6 @@ export interface goalsData {
   passed: boolean;
   /** Verdict Details */
   stats: stats;
-  /** Prover Results */
-  results: [ prover, result ][];
 }
 
 /** Decoder for `goalsData` */
@@ -160,7 +158,6 @@ export const jGoalsData: Json.Decoder<goalsData> =
     smoke: Json.jBoolean,
     passed: Json.jBoolean,
     stats: jStats,
-    results: Json.jArray(Json.jPair( jProver, jResult,)),
   });
 
 /** Natural order for `goalsData` */
@@ -168,7 +165,7 @@ export const byGoalsData: Compare.Order<goalsData> =
   Compare.byFields
     <{ wpo: Json.key<'#wpo'>, property: marker, name: string,
        fct?: Json.key<'#fct'>, bhv?: string, thy?: string, smoke: boolean,
-       passed: boolean, stats: stats, results: [ prover, result ][] }>({
+       passed: boolean, stats: stats }>({
     wpo: Compare.string,
     property: byMarker,
     name: Compare.string,
@@ -178,7 +175,6 @@ export const byGoalsData: Compare.Order<goalsData> =
     smoke: Compare.boolean,
     passed: Compare.boolean,
     stats: byStats,
-    results: Compare.array(Compare.pair(byProver,byResult,)),
   });
 
 /** Signal for array [`goals`](#goals)  */
@@ -265,5 +261,68 @@ const cancelProofTasks_internal: Server.SetRequest<null,null> = {
 };
 /** Cancel all scheduled proof tasks. */
 export const cancelProofTasks: Server.SetRequest<null,null>= cancelProofTasks_internal;
+
+/** Proof Status has changed */
+export const proofStatus: Server.Signal = {
+  name: 'plugins.wp.proofStatus',
+};
+
+const getNodeInfos_internal: Server.GetRequest<
+  Json.index<'#node'>,
+  { stats: string, size: number, pending: number, proved: boolean,
+    result: string }
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.wp.getNodeInfos',
+  input:  Json.jIndex<'#node'>('#node'),
+  output: Json.jObject({
+            stats: Json.jString,
+            size: Json.jNumber,
+            pending: Json.jNumber,
+            proved: Json.jBoolean,
+            result: Json.jString,
+          }),
+  signals: [ { name: 'plugins.wp.proofStatus' },
+             { name: 'plugins.wp.signalGoals' } ],
+};
+/** Proof node information */
+export const getNodeInfos: Server.GetRequest<
+  Json.index<'#node'>,
+  { stats: string, size: number, pending: number, proved: boolean,
+    result: string }
+  >= getNodeInfos_internal;
+
+const getProofState_internal: Server.GetRequest<
+  goal,
+  { children: [ string, Json.index<'#node'> ][], tactic: string,
+    results: [ prover, result ][], index: number, pending: number,
+    parents: Json.index<'#node'>[], current: Json.index<'#node'> }
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.wp.getProofState',
+  input:  jGoal,
+  output: Json.jObject({
+            children: Json.jArray(
+                        Json.jPair(
+                          Json.jString,
+                          Json.jIndex<'#node'>('#node'),
+                        )),
+            tactic: Json.jString,
+            results: Json.jArray(Json.jPair( jProver, jResult,)),
+            index: Json.jNumber,
+            pending: Json.jNumber,
+            parents: Json.jArray(Json.jIndex<'#node'>('#node')),
+            current: Json.jIndex<'#node'>('#node'),
+          }),
+  signals: [ { name: 'plugins.wp.proofStatus' },
+             { name: 'plugins.wp.signalGoals' } ],
+};
+/** Current Proof Status of a Goal */
+export const getProofState: Server.GetRequest<
+  goal,
+  { children: [ string, Json.index<'#node'> ][], tactic: string,
+    results: [ prover, result ][], index: number, pending: number,
+    parents: Json.index<'#node'>[], current: Json.index<'#node'> }
+  >= getProofState_internal;
 
 /* ------------------------------------- */

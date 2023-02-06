@@ -39,6 +39,15 @@ and script =
   | Script of ProofScript.jscript (* to replay *)
   | Tactic of ProofScript.jtactic * (string * node) list (* played *)
 
+module Node =
+struct
+  type t = node
+  let hash t = Wpo.S.hash t.goal
+  let equal a b = Wpo.S.equal a.goal b.goal
+  let compare a b = Wpo.S.compare a.goal b.goal
+  let pretty fmt a = Wpo.S.pretty fmt a.goal
+end
+
 type tree = {
   main : Wpo.t ; (* Main goal to be proved. *)
   mutable pool : Lang.F.pool option ; (* Global pool variable *)
@@ -343,6 +352,11 @@ let mk_root ~tree =
   tree.root <- root ;
   tree.head <- root ;
   node
+
+let root tree =
+  match tree.root with
+  | Some node -> node
+  | None -> mk_root ~tree
 
 (* -------------------------------------------------------------------------- *)
 (* --- Forking                                                            --- *)

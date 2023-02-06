@@ -47,7 +47,7 @@ module INDEX = State_builder.Ref
          let mem_project = Datatype.never_any_project
        end))
     (struct
-      let name = "WpAPpi.INDEX"
+      let name = "WpApi.INDEX"
       let dependencies = [ Ast.self ]
       let default () = Hashtbl.create 0
     end)
@@ -198,13 +198,7 @@ let () = S.column gmodel ~name:"stats"
     ~descr:(Md.plain "Verdict Details")
     ~data:(module STATS) ~get:get_stats
 
-(*TODO: remove this field! *)
-let () = S.column gmodel ~name:"results"
-    ~descr:(Md.plain "Prover Results")
-    ~data:(module D.Jlist(D.Jpair(PROVER)(RESULT)))
-    ~get:Wpo.get_results
-
-let _garray = S.register_array ~package ~name:"goals"
+let garray = S.register_array ~package ~name:"goals"
     ~descr:(Md.plain "Generated Goals")
     ~key:(fun g -> g.Wpo.po_gid)
     ~keyName:"wpo"
@@ -259,5 +253,88 @@ let () = R.register ~package ~kind:`SET ~name:"cancelProofTasks"
     ~descr:(Md.plain "Cancel all scheduled proof tasks.")
     ~input:(module D.Junit) ~output:(module D.Junit)
     (fun () -> let server = ProverTask.server () in Task.cancel_all server)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Proof Node                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let proofStatus = R.signal ~package ~name:"proofStatus"
+    ~descr:(Md.plain "Proof Status has changed")
+
+module NODE = D.Index(Map.Make(ProofEngine.Node))(struct let name = "node" end)
+
+let () =
+  let snode = R.signature ~input:(module NODE) () in
+  let set_title = R.result snode ~name:"result"
+      ~descr:(Md.plain "Proof node title") (module D.Jstring) in
+  let set_proved = R.result snode ~name:"proved"
+      ~descr:(Md.plain "Proof node complete") (module D.Jbool) in
+  let set_pending = R.result snode ~name:"pending"
+      ~descr:(Md.plain "Pending children") (module D.Jint) in
+  let set_size = R.result snode ~name:"size"
+      ~descr:(Md.plain "Proof size") (module D.Jint) in
+  let set_stats = R.result snode ~name:"stats"
+      ~descr:(Md.plain "Node statistics") (module D.Jstring) in
+  R.register_sig ~package ~kind:`GET ~name:"getNodeInfos"
+    ~descr:(Md.plain "Proof node information") snode
+    ~signals:[proofStatus;S.signal garray]
+    begin fun rq node ->
+      set_title rq (ProofEngine.title node) ;
+      set_proved rq (ProofEngine.proved node) ;
+      set_pending rq (ProofEngine.pending node) ;
+      let s = ProofEngine.stats node in
+      set_size rq (Stats.proofs s) ;
+      set_stats rq (Pretty_utils.to_string Stats.pretty s) ;
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Proof Tree                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  let state = R.signature ~input:(module WPO) () in
+  let set_current = R.result state ~name:"current"
+      ~descr:(Md.plain "Current proof node.") (module NODE) in
+  let set_parents = R.result state ~name:"parents"
+      ~descr:(Md.plain "Proof node parents.") (module D.Jlist(NODE)) in
+  let set_pending = R.result state ~name:"pending"
+      ~descr:(Md.plain "Pending proof nodes.") (module D.Jint) in
+  let set_index = R.result state ~name:"index"
+      ~descr:(Md.plain "Current node index among pending nodes (else -1)")
+      (module D.Jint) in
+  let set_results = R.result state ~name:"results"
+      ~descr:(Md.plain "Prover results for current node")
+      (module D.Jlist(D.Jpair(PROVER)(RESULT))) in
+  let set_tactic = R.result state ~name:"tactic"
+      ~descr:(Md.plain "Proof node tactic header (if any)")
+      (module D.Jstring) in
+  let set_children = R.result state ~name:"children"
+      ~descr:(Md.plain "Proof node tactic children (id any)")
+      (module D.Jlist(D.Jpair(D.Jstring)(NODE))) in
+  R.register_sig ~package
+    ~kind:`GET ~name:"getProofState"
+    ~descr:(Md.plain "Current Proof Status of a Goal") state
+    ~signals:[proofStatus;S.signal garray]
+    begin fun rq wpo ->
+      let tree = ProofEngine.proof ~main:wpo in
+      let current,index =
+        match ProofEngine.current tree with
+        | `Main -> ProofEngine.root tree,-1
+        | `Internal node -> node,-1
+        | `Leaf(idx,node) -> node,idx in
+      let rec parents node = match ProofEngine.parent node with
+        | None -> []
+        | Some p -> p::parents p in
+      let tactic = match ProofEngine.tactical current with
+        | None -> ""
+        | Some { header } -> header in
+      set_current rq current ;
+      set_parents rq (parents current) ;
+      set_index rq index ;
+      set_pending rq (ProofEngine.pending current) ;
+      set_results rq (Wpo.get_results (ProofEngine.goal current)) ;
+      set_tactic rq tactic ;
+      set_children rq (ProofEngine.children current) ;
+    end
 
 (* -------------------------------------------------------------------------- *)
