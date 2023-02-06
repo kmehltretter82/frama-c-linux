@@ -156,11 +156,6 @@ theory Vlist
                  if k < length u then nth u k else nth v (k - length u) }
   = if 0 < k && 0 < length u then nth_concat (tail u) v (k - 1)
 
-  axiom nth_repeat:
-    forall n,k:int, w:list 'a [nth (repeat w n) k].
-      0 <= k < (Int.( * ) n (length w)) -> (Int.(<) 0 (length w)) ->
-      nth (repeat w n) k = nth w (mod k (length w))
-
   (* -------------------------------------------------------------------- *)
   (* --- equality of Lists                                            --- *)
   (* -------------------------------------------------------------------- *)
@@ -255,6 +250,25 @@ theory Vlist
   lemma rw_repeat_before:
     forall p:int, w:list 'a.
       0 <= p -> concat w (repeat w p) = repeat w (Int.(+) p 1)
+
+  let rec lemma nth_repeat (w: list 'a) (n k: int)
+    requires { 0 <= k < n * length w }
+    variant  { n }
+    ensures  { nth (repeat w n) k = nth w (mod k (length w)) }
+  =
+    if n <= 0 then absurd
+    else if n = 1 then ()
+    else
+      if k < length w
+      then begin
+        assert { (n - 1) * length w >= 1 * length w };
+        nth_repeat w (n - 1) k
+      end
+      else begin
+        let lw = length w in
+          nth_repeat w (n - 1) (k - lw);
+          assert { mod (lw * 1 + (k - lw)) lw = mod (k - lw) lw };
+      end
 
 (*--- To avoid exponential blowup of use of repeat_after by alt-ergo ---*)
 
