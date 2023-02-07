@@ -1,0 +1,5 @@
+[kernel:typing:incompatible-types-call] unexpected_arguments.c:13: Warning: 
+  expected '__builtin_va_list' but got argument of type 'char **': a
+[variadic] unexpected_arguments.c:10: Declaration of variadic function f.
+[variadic] User Error: Unexpected arguments to va_arg
+[kernel] Plug-in variadic aborted: invalid user input.
