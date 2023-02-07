@@ -222,9 +222,9 @@ let parse_error ?source msg =
       Cil_datatype.Position.of_lexing_pos current.lexbuf.Lexing.lex_curr_p
     | Some s -> s
   in
-  (* there are case when we are called before menhir has requested at
-     lest two tokens, ending up in an assertion failure. Unfortunately,
-     ErrorReports API does not allow us to check wether the buffer is
+  (* there are cases when we are called before menhir has requested at
+     least two tokens, ending up in an assertion failure. Unfortunately,
+     ErrorReports API does not allow us to check whether the buffer is
      empty or not.
   *)
   let () =
@@ -241,7 +241,7 @@ let parse_error ?source msg =
         (* during interaction between C and ACSL parser, it might happen,
            at least as long as we haven't completed the move to menhir for
            ACSL, that the start_pos seen by menhir is after the current position
-           of the (shared) lexbuf. This would lead to confusing error message,
+           of the (shared) lexbuf. This would lead to confusing error messages,
            so we drop the one from menhir.
         *)
         last_pos

@@ -79,7 +79,7 @@ val pp_context_from_file:
 val pp_location: Format.formatter -> Cil_types.location -> unit
 
 (** Emits the corresponding error message with some location information.
-    If given, [source] will be treated at the last position of the offending
+    If given, [source] will be treated as the last position of the offending
     expression that led to the error. It defaults to the current position of
     the lexbuf currently in use (i.e. {!startParsing} must have been called
     before that, and no {!finishParsing} call must have been done in between).
