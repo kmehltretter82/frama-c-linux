@@ -29,9 +29,7 @@ digraph G {
      };
   subgraph cluster_cs_4 { label=<f>; cp15;
      };
-  subgraph cluster_file_1 { label=<callstack_global.i>; cp11;
-     };
-  subgraph cluster_file_2 { label=<>; cp17;
+  subgraph cluster_file_1 { label=<callstack_global.i>; cp17;cp11;
      };
   
   cp3 -> cp2;

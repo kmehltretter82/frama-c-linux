@@ -11,9 +11,7 @@ digraph G {
   
   subgraph cluster_cs_1 { label=<main>; cp7;cp5;cp2;
      };
-  subgraph cluster_file_1 { label=<global.i>; cp3;
-     };
-  subgraph cluster_file_2 { label=<>; cp9;
+  subgraph cluster_file_1 { label=<global.i>; cp9;cp3;
      };
   
   cp3 -> cp2;

@@ -42,9 +42,7 @@ digraph G {
     subgraph cluster_cs_4 { label=<f>; cp32;cp27;
        };
      };
-  subgraph cluster_file_1 { label=<various.i>; cp9;
-     };
-  subgraph cluster_file_2 { label=<>; cp11;
+  subgraph cluster_file_1 { label=<various.i>; cp11;cp9;
      };
   
   cp2 -> cp3;
