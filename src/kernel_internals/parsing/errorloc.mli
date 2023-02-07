@@ -78,10 +78,12 @@ val pp_context_from_file:
     @since 22.0-Titanium *)
 val pp_location: Format.formatter -> Cil_types.location -> unit
 
-(** Parse errors are usually fatal, but their reporting is sometimes
-    delayed until the end of the current parsing phase. Functions that
-    intend to ultimately fail should call {!clear_errors} when they
-    start, and check {!had_errors} when they end;
+(** Emits the corresponding error message with some location information.
+    If given, [source] will be treated at the last position of the offending
+    expression that led to the error. It defaults to the current position of
+    the lexbuf currently in use (i.e. {!startParsing} must have been called
+    before that, and no {!finishParsing} call must have been done in between).
+    The start position will be inferred from menhir's error reporting mecanisms.
 *)
 val parse_error:
   ?source:Filepath.position -> ('a, Format.formatter, unit, 'b) format4 -> 'a
@@ -89,4 +91,10 @@ val parse_error:
 val had_errors : unit -> bool
 (** Has an error been raised since the last call to {!clear_errors}? *)
 
+(** Parse errors are usually fatal, but their reporting is sometimes
+    delayed until the end of the current parsing phase. Functions that
+    intend to ultimately fail should call {!clear_errors} when they
+    start, and check {!had_errors} when they end, then call {!parse_error}
+    if needed.
+*)
 val clear_errors : unit -> unit
