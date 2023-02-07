@@ -227,11 +227,8 @@ let parse_error ?source msg =
      ErrorReports API does not allow us to check wether the buffer is
      empty or not.
   *)
-  let _ =
-    try
-      Cil_datatype.Position.of_lexing_pos
-        (fst (MenhirLib.ErrorReports.last current.menhir_pos))
-    with _ -> last_pos
+  let () =
+    try ignore (MenhirLib.ErrorReports.last current.menhir_pos) with _ -> ()
   in
   let start_pos =
     try
