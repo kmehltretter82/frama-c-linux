@@ -282,17 +282,17 @@
 
 % \acknowledgeprogram{<flag image file>}{<text inside box>}
 \newcommand{\acknowledgeprogram}[2]{
-  \noindent\fbox{
-    \begin{minipage}{.97\textwidth}
-      \begin{minipage}{1.2cm}
-        \includegraphics[width=\linewidth]{#1}
-      \end{minipage}
-      \hfill
-      \begin{minipage}{0.9\textwidth}
-        This project has received funding from #2.
-      \end{minipage}
-    \end{minipage}
-  }
+  \noindent\fbox{%
+    \parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{%
+      \begin{minipage}{1.2cm}%
+        \includegraphics[width=\textwidth]{#1}%
+      \end{minipage}%
+      \hfill%
+      \begin{minipage}{0.9\textwidth}%
+        This project has received funding from #2.%
+      \end{minipage}%
+    }%
+  }%
 }
 
 \newcommand{\acknowledgeANR}[1]{
@@ -488,7 +488,7 @@
 	breaklines=false,
 	classoffset=1,
 	morekeywords={admit,allocates,assert,assigns,assumes,axiom,axiomatic,behavior,
-	  behaviors,boolean,breaks,check,complete,continues,data,decreases,disjoint,
+	  behaviors,boolean,breaks,calls,check,complete,continues,data,decreases,disjoint,
 		ensures,exits,frees,ghost,global,inductive,integer,invariant,lemma,logic,loop,
 	  model,predicate,reads,real,requires,sizeof,strong,struct,terminates,
 	  %returns,
@@ -586,8 +586,8 @@
 % Logs
 % --------------------------------------------------------------------------
 
-\lstdefinelanguage{Logs}[]{csh}{%
-  identifierstyle=\lp@basic,%
+\lstdefinelanguage{Logs}[]{}{%
+  style=frama-c-basic-style,
   backgroundcolor=
 }
 
