@@ -81,7 +81,7 @@ let translate_va_builtin caller inst =
   let translate_va_start () =
     let va_list = match args with
       | [{enode=Lval va_list}] -> va_list
-      | _ -> Self.fatal "Unexpected arguments to va_start"
+      | _ -> Self.abort "Unexpected arguments to va_start"
     and varg =
       try Extlib.last (Cil.getFormalsDecl caller.svar)
       with Invalid_argument _ ->
@@ -93,7 +93,7 @@ let translate_va_builtin caller inst =
   let translate_va_copy () =
     let dest, src = match args with
       | [{enode=Lval dest}; src] -> dest, src
-      | _ -> Self.fatal "Unexpected arguments to va_copy"
+      | _ -> Self.abort "Unexpected arguments to va_copy"
     in
     [ Set (dest, src, loc) ]
   in
@@ -103,7 +103,7 @@ let translate_va_builtin caller inst =
       | [{enode=Lval va_list};
          {enode=SizeOf ty};
          {enode=CastE(_, {enode=AddrOf lv})}] -> va_list, ty, lv
-      | _ -> Self.fatal "Unexpected arguments to va_arg"
+      | _ -> Self.abort "Unexpected arguments to va_arg"
     in
     (* Check validity of type *)
     if Cil.isIntegralType ty then begin
