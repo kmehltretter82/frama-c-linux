@@ -9,7 +9,6 @@ let
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
     ocp-indent = oself.callPackage ./ocp-indent.nix {};
     psmt2-frontend = oself.callPackage ./psmt2-frontend.nix {};
-    yojson = oself.callPackage ./yojson.nix {};
     why3 = oself.callPackage ./why3.nix {};
 
     # Helpers
