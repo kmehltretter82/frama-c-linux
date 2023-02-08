@@ -382,7 +382,7 @@
   \end{center}
 }
 
-\newenvironment{warning}{\begin{colbox}{frama-c-dark-orange!30}}{\end{colbox}}
+\newenvironment{important}{\begin{colbox}{frama-c-dark-orange!30}}{\end{colbox}}
 \newenvironment{information}{\begin{colbox}{frama-c-green!30}}{\end{colbox}}
 
 % --------------------------------------------------------------------------
