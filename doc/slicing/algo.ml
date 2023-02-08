@@ -18,5 +18,6 @@ and
   let new_ff = H.replace_stmt_mark ff stmt new_m in
   let elems = H.get_elems stmt stmt_elems in
   let (_, other_elems) = List.partition (fun elem -> elem = e) elems in
-  let mark_spare_elem e ff = mark_rec_pdg_elem pdg stmt_elems H.spare_mark e ff in
+  let mark_spare_elem e ff =
+    mark_rec_pdg_elem pdg stmt_elems H.spare_mark e ff in
   List.fold_right mark_spare_elem other_elems new_ff
