@@ -3,7 +3,7 @@
   _Generic is a C11 keyword, use -c11 option to enable it
 [kernel] generic.c:67: 
   syntax error:
-  Location: line 67, between columns 25 and 28, before or at token: char
+  Location: line 67, between columns 28 and 32, before or at token: char
   65      int a = _Generic("abc", char const *: 0);
   66    #endif
   67      int ok1 = _Generic("abc", char*: 0);

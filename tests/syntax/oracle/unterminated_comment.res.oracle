@@ -1,0 +1,8 @@
+[kernel] Parsing unterminated_comment.i (no preprocessing)
+[kernel] Warning: end of file reached before line 6
+[kernel] unterminated_comment.i:6: 
+  Unterminated C comment:
+  Location: line 6, column 0, before or at token: 
+  4     */
+  5     /* foo
+[kernel] Frama-C aborted: invalid user input.

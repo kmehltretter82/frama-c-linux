@@ -7,7 +7,7 @@
    DONTRUN:
 */
 
-typedef struct S { int f ; int g ; } ;
+struct S { int f ; int g ; } ;
 
 /*@
   ensures a->f == \old(a->f)+1 ;

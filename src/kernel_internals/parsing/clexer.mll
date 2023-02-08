@@ -280,7 +280,6 @@ let init_lexicon _ =
            "_Imaginary is currently unsupported by Frama-C.");
      ]
 
-
 let is_c_keyword s = Hashtbl.mem lexicon s
 
 (* Mark an identifier as a type name. The old mapping is preserved and will
@@ -291,6 +290,14 @@ let add_type name =
   Logic_env.add_typename name
 
 let context : string list list ref = ref [ [] ]
+
+let typedef_decl = ref false
+
+let is_typedef () = !typedef_decl
+
+let set_typedef () = typedef_decl := true
+
+let reset_typedef () = typedef_decl := false
 
 let push_context _ = context := []::!context
 
@@ -334,14 +341,9 @@ let scan_ident id =
 *)
 
 
-let init ~(filename: string) : Lexing.lexbuf =
+let init ~filename lexer =
   init_lexicon ();
-  (* Initialize the pointer in Errormsg *)
-  Lexerhack.add_type := add_type;
-  Lexerhack.push_context := push_context;
-  Lexerhack.pop_context := pop_context;
-  Lexerhack.add_identifier := add_identifier;
-  E.startParsing filename
+  E.startParsing filename lexer
 
 
 let finish () =
@@ -514,9 +516,6 @@ let make_annot ~one_line default lexbuf s =
   match Logic_lexer.annot (start, s) with
   | Some (stop, token) ->
     lexbuf.Lexing.lex_curr_p <- Cil_datatype.Position.to_lexing_pos stop;
-    (* The filename has already been normalized, so we must reuse it "as is". *)
-    E.setCurrentFile (stop.Filepath.pos_path :> string);
-    E.setCurrentLine stop.Filepath.pos_lnum;
     if one_line then E.newline ();
     (match token with
      | Logic_ptree.Adecl d -> DECL d
@@ -530,6 +529,20 @@ let make_annot ~one_line default lexbuf s =
   | None -> (* error occured and annotation is discarded. Find a normal token. *)
     default lexbuf
 
+let parse_error lexbuf msg =
+  let loc = lexbuf.Lexing.lex_curr_p in
+  let source = Cil_datatype.Position.of_lexing_pos loc in
+  E.parse_error ~source msg
+
+let () =
+  (* Initialize the pointer in Errormsg *)
+  Lexerhack.add_type := add_type;
+  Lexerhack.push_context := push_context;
+  Lexerhack.pop_context := pop_context;
+  Lexerhack.add_identifier := add_identifier;
+  Lexerhack.is_typedef := is_typedef;
+  Lexerhack.set_typedef := set_typedef;
+  Lexerhack.reset_typedef := reset_typedef
 }
 
 let decdigit = ['0'-'9']
@@ -641,9 +654,7 @@ rule initial = parse
     { if is_ghost_code () || is_oneline_ghost () then begin
         GHOST (currentLoc())
       end else begin
-        let start = Lexing.lexeme_start_p lexbuf in
-        let source = Cil_datatype.Position.of_lexing_pos start in
-        E.parse_error ~source "Use of \\ghost out of ghost code"
+        parse_error lexbuf "Use of \\ghost out of ghost code"
       end
     }
 
@@ -734,7 +745,7 @@ rule initial = parse
          enter_ghost_annot();
          annot_lex initial annot_first_token lexbuf
        end else
-         E.parse_error "This kind of annotation is valid only inside ghost code"
+         parse_error lexbuf "This kind of annotation is valid only inside ghost code"
      else begin
        lexbuf.Lexing.lex_curr_pos <- lexbuf.Lexing.lex_curr_pos - 1;
        SLASH
@@ -790,7 +801,7 @@ rule initial = parse
   }
 |               _ as c
   { if is_ghost_code() && c = '@' then initial lexbuf
-    else E.parse_error "Invalid symbol"
+    else parse_error lexbuf "Invalid symbol"
   }
 and might_end_ghost = parse
   | '/' { exit_ghost_code(); RGHOST }
@@ -798,7 +809,7 @@ and might_end_ghost = parse
 
 and comment buffer = parse
   |  "*/"       {  }
-  | eof         { E.parse_error "Unterminated C comment" }
+  | eof         { parse_error lexbuf "Unterminated C comment" }
   | _           { lex_comment comment buffer lexbuf }
 
 and onelinecomment buffer = parse
@@ -883,7 +894,7 @@ and str = parse
 |	hex_escape	{lex_hex_escape str lexbuf}
 |	oct_escape	{lex_oct_escape str lexbuf}
 |	escape		{lex_simple_escape str lexbuf}
-|       eof             {E.parse_error "unterminated string" }
+|       eof             {parse_error lexbuf "unterminated string" }
 |	_		{lex_unescaped str lexbuf}
 
 and chr =  parse
@@ -891,7 +902,7 @@ and chr =  parse
 |	hex_escape	{lex_hex_escape chr lexbuf}
 |	oct_escape	{lex_oct_escape chr lexbuf}
 |	escape		{lex_simple_escape chr lexbuf}
-|       eof             { E.parse_error "unterminated char" }
+|       eof             {parse_error lexbuf "unterminated char" }
 |	_		{lex_unescaped chr lexbuf}
 
 and msasm = parse
@@ -917,7 +928,7 @@ and msasmnobrace = parse
 
 and annot_first_token = parse
   | "ghost" ((blank| '\\'?'\n' | ghost_comments)* as comments) "else" {
-      if is_oneline_ghost () then E.parse_error "nested ghost code";
+      if is_oneline_ghost () then parse_error lexbuf "nested ghost code";
       Buffer.clear buf;
       let loc = currentLoc () in
       do_ghost_else_comments true comments ;
@@ -925,7 +936,7 @@ and annot_first_token = parse
       LGHOST_ELSE (loc)
     }
   | "ghost" {
-      if is_oneline_ghost () then E.parse_error "nested ghost code";
+      if is_oneline_ghost () then parse_error lexbuf "nested ghost code";
       Buffer.clear buf;
       enter_ghost_code ();
       LGHOST
@@ -935,10 +946,10 @@ and annot_first_token = parse
   | "" { annot_token lexbuf }
 and annot_token = parse
   | "*/" { if is_ghost_annot () then
-             E.parse_error "Ghost multi-line annotation not terminated";
+             parse_error lexbuf "Ghost multi-line annotation not terminated";
            let s = Buffer.contents buf in
            make_annot ~one_line:false initial lexbuf s }
-  | eof  { E.parse_error "Unterminated annotation" }
+  | eof  { parse_error lexbuf "Unterminated annotation" }
   | '\n' {E.newline(); Buffer.add_char buf '\n'; annot_token lexbuf }
   | _ as c { if is_ghost_annot () && c = !annot_char then
                might_end_ghost_annot lexbuf
@@ -951,18 +962,18 @@ and might_end_ghost_annot = parse
 and annot_one_line = parse
   | "ghost" ((blank|"\\\n")+ as comments) "else" {
       do_ghost_else_comments false comments ;
-      if is_oneline_ghost () then E.parse_error "nested ghost code";
+      if is_oneline_ghost () then parse_error lexbuf "nested ghost code";
       enter_oneline_ghost (); LGHOST_ELSE (currentLoc ())
   }
   | "ghost" {
-      if is_oneline_ghost () then E.parse_error "nested ghost code";
+      if is_oneline_ghost () then parse_error lexbuf "nested ghost code";
       enter_oneline_ghost (); LGHOST
     }
   | ' '|'@'|'\t'|'\r' as c { Buffer.add_char buf c; annot_one_line lexbuf }
   | "" { annot_one_line_logic lexbuf }
 and annot_one_line_logic = parse
   | '\n' { make_annot ~one_line:true initial lexbuf (Buffer.contents buf) }
-  | eof { E.parse_error "Invalid C file: should end with a newline" }
+  | eof { parse_error lexbuf "Invalid C file: should end with a newline" }
   | _ as c { Buffer.add_char buf c; annot_one_line_logic lexbuf }
 
 {

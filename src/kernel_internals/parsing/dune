@@ -23,9 +23,11 @@
 (ocamllex clexer)
 (ocamllex logic_preprocess)
 (ocamllex logic_lexer)
-(ocamlyacc cparser)
-(rule
- (targets logic_parser.ml logic_parser.mli logic_parser.output)
- (deps logic_parser.mly)
- (action (run %{bin:ocamlyacc} -v  %{deps}))
+
+(ocamlyacc logic_parser)
+
+(menhir
+  (modules cparser)
+  ; "--fixed-exception" fixes compatibility with ocamlyacc Parsing.Parse_error
+  (flags --fixed-exception --explain --dump --comment)
 )

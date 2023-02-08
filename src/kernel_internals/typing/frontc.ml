@@ -49,14 +49,14 @@ let parse_to_cabs (path : Datatype.Filepath.t) =
   try
     Kernel.feedback ~level:2 "Parsing %a" Datatype.Filepath.pretty path;
     Errorloc.clear_errors () ;
-    let lexbuf = Clexer.init ~filename:(path :> string) in
-    let cabs = Cparser.file Clexer.initial lexbuf in
+    let lexbuf, lexer =
+      Clexer.init ~filename:(path :> string) Clexer.initial in
+    let cabs = Cparser.file lexer lexbuf in
     (* Cprint.print_defs cabs;*)
     Clexer.finish ();
     if Errorloc.had_errors () then begin
-      Kernel.debug "There were parsing errors in %a"
-        Datatype.Filepath.pretty path;
-      raise Parsing.Parse_error
+      Kernel.abort "There were parsing errors in %a"
+        Datatype.Filepath.pretty path
     end;
 
     (path, cabs)
@@ -65,8 +65,7 @@ let parse_to_cabs (path : Datatype.Filepath.t) =
     Clexer.finish () ;
     Kernel.abort "Cannot open %a : %s" Datatype.Filepath.pretty path msg ;
   | Parsing.Parse_error ->
-    Clexer.finish ();
-    raise Parsing.Parse_error ;
+    Errorloc.parse_error "syntax error"
 
 module Syntactic_transformations = Hook.Fold(struct type t = Cabs.file end)
 let add_syntactic_transformation = Syntactic_transformations.extend

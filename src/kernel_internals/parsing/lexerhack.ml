@@ -55,3 +55,9 @@ let push_context: (unit -> unit) ref =
 
 let pop_context: (unit -> unit) ref =
   ref (fun _ -> Kernel.fatal "You called an uninitialized pop_context")
+
+let is_typedef: (unit -> bool) ref = Extlib.mk_fun "is_typedef"
+
+let reset_typedef: (unit -> unit) ref = Extlib.mk_fun "reset_typedef"
+
+let set_typedef: (unit -> unit) ref = Extlib.mk_fun "set_typedef"

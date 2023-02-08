@@ -45,3 +45,7 @@ val add_identifier: (string -> unit) ref
 val add_type: (string -> unit) ref
 val push_context: (unit -> unit) ref
 val pop_context: (unit -> unit) ref
+
+val is_typedef: (unit -> bool) ref
+val reset_typedef: (unit -> unit) ref
+val set_typedef: (unit -> unit) ref
