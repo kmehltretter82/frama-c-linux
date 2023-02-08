@@ -1320,7 +1320,7 @@ annotation:
                             "Only one code annotation is allowed per comment"))
       }
 | identifier { Aattribute_annot (loc $sloc, $1) }
-| BSGHOST { Aattribute_annot(loc(),"\\ghost") }
+| BSGHOST { Aattribute_annot(loc $sloc,"\\ghost") }
 ;
 
 contract_or_code_annotation:
