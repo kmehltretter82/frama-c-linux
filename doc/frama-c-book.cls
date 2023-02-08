@@ -312,6 +312,7 @@
 \fancyhead[L]{\vspace{1.25em}\raggedleft\rightmark\vspace{-1.25em}}
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0pt}
+\setlength{\headheight}{24pt}
 
 % --------------------------------------------------------------------------
 % Chapters
