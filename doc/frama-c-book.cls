@@ -373,7 +373,7 @@
 \newenvironment{colbox}[1]{%
   \newcommand\colboxcolor{#1}%
   \begin{lrbox}{\fcsavebox}%
-  \begin{minipage}{\dimexpr\columnwidth-2\fboxsep\relax}
+  \begin{minipage}{\dimexpr\linewidth-2\fboxsep\relax}
   \itshape
 }{%
   \end{minipage}\end{lrbox}%
