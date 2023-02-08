@@ -1105,7 +1105,7 @@ if [ -n "$OPTION_COMPILE" ]; then
   # by a user
   if [ -n "$OPTION_INSTRUMENT" ]; then
     if [ -z "$OPTION_INSTRUMENTED_ONLY" ]; then
-      ($OPTION_ECHO; $CC $CPPFLAGS $CFLAGS "$@" -o "$OUTPUT_EXEC" $LDFLAGS);
+      ($OPTION_ECHO; $CC $CFLAGS $CPPFLAGS "$@" -o "$OUTPUT_EXEC" $LDFLAGS);
       error "fail to compile/link un-instrumented code" $?;
     fi
   # If $OPTION_INSTRUMENT is unset then the sources are assumed to be already
