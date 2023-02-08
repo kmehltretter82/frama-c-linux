@@ -32,21 +32,26 @@ Plugin E-ACSL <next-release>
 Plugin E-ACSL 26.0 (Iron)
 #########################
 
--* E-ACSL       [2022-11-08] Fix clashing name when a function with contract and a
-                logic function have the same name (frama-c/eacsl#204)
-- E-ACSL        [2022-11-08] Add support for functions returning a rational
--* E-ACSL       [2022-11-08] Fix assign clause and result as extra argument for functions
-                returning a structure (frama-c/frama-c#1139)
-- E-ACSL        [2022-19-07] Improve typing precision of variables appearing in comparisons
--* E-ACSL       [2022-09-08] Fix typing of recursive predicates (frama-c/e-acsl#198)
--* E-ACSL       [2022-17-06] Fix wrong cast from pointer to integer (frama-c/frama-c#1119)
+-* E-ACSL       [2022-11-08] Fix clashing name when a function with contract
+	        and a logic function have the same name (frama-c/eacsl#204).
+- E-ACSL        [2022-11-08] Add support for functions returning a rational.
+-* E-ACSL       [2022-11-08] Fix assign clause and result as extra argument for
+	        functions returning a structure (frama-c/frama-c#1139).
+- E-ACSL        [2022-19-07] Improve typing precision of variables appearing in
+	        comparisons.
+-* E-ACSL       [2022-09-08] Fix typing of recursive predicates
+	        (frama-c/e-acsl#198).
+-* E-ACSL       [2022-17-06] Fix wrong cast from pointer to integer
+	        (frama-c/frama-c#1119).
 
 ##############################
 Plugin E-ACSL 25.0 (Manganese)
 ##############################
 
--* E-ACSL       [2022-23-05] Fix crash for quantifications over enum types (frama-c/e-acsl#199)
--*  E-ACSL      [2022-06-09] Fix wrong cast of pointer to integer (frama-c/frama-c#1119)
+-* E-ACSL       [2022-23-05] Fix crash for quantifications over enum types
+	        (frama-c/e-acsl#199).
+-*  E-ACSL      [2022-06-09] Fix wrong cast of pointer to integer
+	        (frama-c/frama-c#1119).
 -  E-ACSL       [2022-03-04] Improve translation of `\at()` terms and
                 predicates (frama-c/e-acsl#108).
 -* E-ACSL       [2022-03-01] Fix normalization of global annotations that
