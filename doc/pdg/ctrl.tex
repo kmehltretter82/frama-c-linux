@@ -209,7 +209,7 @@ uniquement les dépendances directes ou d'inclure les dépendances indirectes.
   indirecte, comme on pouvait s'y attendre, car Z dépend de \n{a}, et Z1 et Z2
   dépendent de Z.
 &
-\includegraphics[width=0.3\textwidth]{ctrl-dpds}
+\includegraphics[width=4cm]{ctrl-dpds}
 \end{tabular}
 \end{exemple}
 
@@ -370,7 +370,7 @@ ou si elles doivent être présentes dans le programme réduit.\\
 L'exemple simple suivant, tiré de \cite{Choi94}, met en évidence ce problème~:
 
 \begin{exemple}
-\begin{tabular}{m{4cm}m{5cm}}
+\begin{tabular}{m{5cm}m{5cm}}
 \begin{clisting}
 1 : <entry>
 2 : if (Q) goto 5;
@@ -381,7 +381,7 @@ L'exemple simple suivant, tiré de \cite{Choi94}, met en évidence ce problème~
 7 : <exit>
 \end{clisting}
 &
-\includegraphics[width=0.5\textwidth]{ex-goto}
+\includegraphics[width=5cm]{ex-goto}
 \end{tabular}
 
 \begin{tabular}{p{5cm} p{7cm}}
@@ -484,7 +484,7 @@ Examinons les différents cas~:
     personne ne dépend donc de \n{g},
   \item si \n{l} postdomine \n{s}, \n{s} dépend de \n{g}, ainsi que tous les postdominateurs
     de \n{s} qui ne postdomine pas \n{l},
-  \item si \n{l} ne postdomine pas \n{s}, 
+  \item si \n{l} ne postdomine pas \n{s},
   tous les \n{a} qui postdominent \n{s}, mais pas \n{l} ou l'inverse, dépendent de \n{g}.
 \end{enumerate}
 
@@ -512,7 +512,7 @@ autres points du graphe. Or, comme l'explique très bien \cite{ranganath04new},
 cette hypothèse ne tient plus dans les programmes contenant
 des boucles infinies ou des \verbtt{exit} (ou même des exceptions,
 mais pour le langage C, nous n'avons pas le problème).
-Cet article présente également avec beaucoup de détails 
+Cet article présente également avec beaucoup de détails
 différents types de dépendances et des algorithmes pour les calculer,
 mais il s'avère probablement trop complexe pour ce que l'on souhaite faire.\\
 
@@ -530,7 +530,7 @@ La question qui se pose est de savoir s'il faut ajouter des dépendances de
 contrôle sur les instructions qui, potentiellement, ne terminent pas.
 
 \begin{exemple}
-    \begin{tabular}{p{4.5cm}p{\linewidth-5.5cm}}
+    \begin{tabular}{p{5.5cm}p{\dimexpr\linewidth-6.5cm}}
 \begin{clisting}
 while (f(x) > 0) x++;
 L: y = 3;
