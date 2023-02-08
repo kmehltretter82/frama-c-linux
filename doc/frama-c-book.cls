@@ -1,7 +1,18 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{frama-c-book}
-
 \LoadClass[a4paper]{report}
+
+\RequirePackage{kvoptions}
+\SetupKeyvalOptions{
+  family=framacbook,
+  prefix=framacbook@,
+}
+\DeclareStringOption[english]{lang}
+\ProcessKeyvalOptions*
+
+\PassOptionsToPackage{\framacbook@lang}{babel}
+
+\RequirePackage{babel}
 
 \RequirePackage[
   left=.125\paperwidth,
@@ -25,7 +36,7 @@
 \usetikzlibrary{fadings}
 
 % Do I keep it there:
-\RequirePackage{babel}
+
 \RequirePackage[T1]{fontenc}
 \RequirePackage[utf8]{inputenc}
 \RequirePackage{amssymb}
