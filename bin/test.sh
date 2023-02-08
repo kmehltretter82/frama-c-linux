@@ -35,7 +35,7 @@ DUNE_LOG=./.test-errors.log
 CACHEDIR=$(pwd -P)/.wp-cache
 FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
-TEST_DIRS="tests/* src/plugins/*/tests/*"
+TEST_DIRS="tests/* src/plugins/*/tests/* src/kernel_internals/parsing/tests"
 
 # --------------------------------------------------------------------------
 # ---  Help Message

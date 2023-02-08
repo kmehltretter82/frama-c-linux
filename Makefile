@@ -129,7 +129,8 @@ FRAMAC_WTESTS:=$(FRAMAC_PTESTS_SRC)/wtests.exe
 PTEST_ALL_DIRS:=tests $(wildcard src/plugins/*/tests)
 
 # Test aliasing definition allowing ./configure --disable-<plugin>
-PTEST_ALIASES:=@tests/ptests @src/plugins/ptests
+PTEST_ALIASES:=@tests/ptests @src/plugins/ptests \
+  @src/kernel_internals/parsing/tests/ptests
 
 # WP tests need WP cache
 PTEST_USE_WP_CACHE:=yes
