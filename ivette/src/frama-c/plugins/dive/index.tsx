@@ -307,7 +307,7 @@ class Dive {
       timeout = setTimeout(() => {
         tips?.forEach((tip) => tip.hide());
         tips = null; // Force rebuilding tips in case they changed
-      }, 1000);
+      }, 0);
     });
   }
 
