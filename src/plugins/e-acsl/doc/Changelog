@@ -25,6 +25,9 @@
 Plugin E-ACSL <next-release>
 ############################
 
+-! e-acsl-gcc   [2023-02-08] arguments to options -e/--cpp-flags now overload
+	        the default values set by e-acsl-gcc instead of being ignored.
+
 #########################
 Plugin E-ACSL 26.0 (Iron)
 #########################
