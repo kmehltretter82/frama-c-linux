@@ -428,7 +428,8 @@
 \def\lp@keyword{}
 \def\lp@special{\color{frama-c-dark-orange}}
 \def\lp@comment{\normalfont\ttfamily\mdseries}
-\def\lp@string{\color{frama-c-dark-green}} \def\lp@ident{}
+\def\lp@string{\color{frama-c-dark-green}}
+\def\lp@ident{}
 \def\lp@number{\rmfamily\tiny\color{lstnum}\noncopynumber}
 
 \lstdefinestyle{frama-c-basic-style}{%
@@ -465,7 +466,7 @@
 % Code styles
 % --------------------------------------------------------------------------
 
-\lstdefinestyle{framac-shell-style}{%
+\lstdefinestyle{frama-c-shell-style}{%
   mathescape=false,%
   basicstyle=\lp@basic,%
   keywordstyle=\sffamily\bfseries,%
@@ -542,7 +543,7 @@
 % --------------------------------------------------------------------------
 
 \lstdefinelanguage{Configure}[]{csh}{%
-  style=framac-shell-style,%
+  style=frama-c-shell-style,%
   morekeywords={fi},%
 }
 
@@ -551,6 +552,24 @@
 
 \lstnewenvironment{configurecode}[1][]%
 {\lstset{language=Configure,#1}}{}
+
+% Commands
+% --------------------------------------------------------------------------
+
+\lstdefinelanguage{frama-c-commands}[]{}{%
+  mathescape=false,%
+  alsoletter=-,%
+  keywords={frama-c},%
+  classoffset=1,%
+  morekeywords={-load,-then,-then-last,-then-on,-then-replace,-save},%
+  classoffset=0,%
+  morestring=[b]{'},
+  morestring=[b]{"},
+  literate={\\\$}{\$}1%
+}
+
+\lstnewenvironment{frama-c-commands}[1][]
+{\lstset{style=frama-c-basic-style,language=frama-c-commands,#1}}{}
 
 % Dune
 % --------------------------------------------------------------------------
@@ -602,7 +621,7 @@
 % --------------------------------------------------------------------------
 
 \lstdefinelanguage{Makefile}[]{make}{%
-  style=framac-shell-style,%
+  style=frama-c-shell-style,%
   morekeywords={include},%
 }
 
