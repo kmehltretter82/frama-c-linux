@@ -156,7 +156,7 @@ let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t 
         Some new_a
       | (Some a, None) -> (feedback_only_once s; Some a)
     end
-  | _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
+  | Asm _ | Local_init _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
 
 
 
@@ -186,12 +186,12 @@ struct
 
   let  computeFirstPredecessor _ a = a
 
-  let combinePredecessors stmt ~old state =
-    match stmt.skind, old, state with
-    | _, _, None -> assert false
-    | _, None, Some _ -> Some state (* [old] already included in [state] *)
-    | _, Some old, Some new_ ->
-      if Abstract_state.equal old new_ then
+  let combinePredecessors _stmt ~old state =
+    match old, state with
+    | _, None -> assert false
+    | None, Some _ -> Some state (* [old] already included in [state] *)
+    | Some old, Some new_ ->
+      if Abstract_state.is_included new_ old then
         None
       else
         Some (Some (Abstract_state.union old new_))
@@ -214,7 +214,9 @@ struct
       union a1 a2
     | Loop (_,b,_,_,_) -> process_block b a
     | Return _ -> a
-    | _ -> (Options.feedback "Skiping @[%a@] (doStmt not implemented)" Stmt.pretty s; a)
+    | Break _ | Goto _ | Switch _ | Continue _ | UnspecifiedSequence _
+    | Throw _ | TryCatch _ | TryFinally _
+    | TryExcept _ -> (Options.feedback "Skiping @[%a@] (doStmt not implemented)" Stmt.pretty s; a)
 
   and process_block b a =
     List.fold_left

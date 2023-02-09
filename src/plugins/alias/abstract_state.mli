@@ -83,6 +83,14 @@ val assignment_ptr_x_cst : t -> lval -> t
 (** equality test; currently, always returns true (to be fixed later) *)
 val equal : t -> t -> bool
 
+
+(** inclusion test; [is_included a1 a2] tests if, for any lvl present
+   in a1 (associated to a vertex v1), that it is also present in a2
+   (associated to a vertex v2) and that set(succ(v1) is included in
+   set(succ(v2)) *)
+val is_included : t -> t -> bool
+
+
 (** union of two abstract values ; ensures that if 2 lval are aliased
     in one of the two input graph (or in a points-to relationship),
     then they will also be aliased/points-to in the result *)

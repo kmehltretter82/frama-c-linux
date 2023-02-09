@@ -499,24 +499,40 @@ let assignment_ptr_x_cst (a:t) (x:lval) : t =
 (* we don't need to iterate on loops *)
 let equal (_:t) (_:t) = true
 
-(* exception Not_equal
- *
- *
- *
- * let equal (a1:t) (a2:t) =
- *   (\* a1 and a2 are equal iff there is an isomorphism between the two
- *      graphs and their associated maps *\)
- *   (\* we don't need to check a1.vmap and a2.vmap since they are inverse
- *      maps of a1.lmap and a2.lmap. However, shall we also check pending
- *      ? *\)
+exception Not_included
+
+let is_included (a1:t) (a2:t) =
+  (* tests if a1 is included in a2, at least as the nodes with lval *)  
+  assert_invariants a1;
+  assert_invariants a2;
+  (* Format.printf "DEBUG testing equal @.%a@. AND à.%a@. END DEBUG@." (pretty ~debug:true) a1 (pretty ~debug:true) a2; *)
+  try
+    let iter_lmap (lv:lval) (v1:V.t): unit =
+      let v2 : V.t = try LMap.find lv a2.lmap with Not_found -> raise Not_included in
+      match G.succ a1.graph v1, G.succ a2.graph v2 with
+        [], _ -> ()
+      | [_], [] -> raise Not_included
+      | [v1p], [v2p] ->
+        if LSet.subset (VMap.find v1p a1.vmap) (VMap.find v2p a2.vmap)
+        then
+          ()
+        else
+          raise Not_included
+      | _ -> failwith "this should not hapen (invariant broken)"
+    in
+    LMap.iter iter_lmap a1.lmap; true
+  with
+    Not_included -> false
+      
+(* let equal (a1:t) (a2:t) =
  *   assert_invariants a1;
  *   assert_invariants a2;
- *   Format.printf "DEBUG testing equality @.%a@. AND à.%a@. END DEBUG@." (pretty ~debug:true) a1 (pretty ~debug:true) a2;
+ *   Format.printf "DEBUG testing equal @.%a@. AND à.%a@. END DEBUG@." (pretty ~debug:true) a1 (pretty ~debug:true) a2;
  *   try
  *     let card = LMap.cardinal a1.lmap in
  *     if (card = LMap.cardinal a2.lmap)
  *     && G.nb_vertex a1.graph = G.nb_vertex a2.graph
- *     && G.nb_edges a1.graph = G.nb_vertex a2.graph
+ *     && G.nb_edges a1.graph = G.nb_edges a2.graph
  *     (\* the invariants assure that if the nb of vertex is equal, then
  *        the size of pending and vmap are also equal. nb counters may be
  *        different, it doesn't matter *\)
@@ -549,7 +565,7 @@ let equal (_:t) (_:t) = true
  *                 match G.succ a1.graph v1 with
  *                   [] -> (\* if v1 has no successor, then so must have v2 *\)
  *                   if List.length (G.succ a2.graph v2) > 0 then raise Not_equal
- *
+ * 
  *                 | [succ_v1] ->
  *                   begin
  *                     if LSet.is_empty (VMap.find succ_v1 a1.vmap)

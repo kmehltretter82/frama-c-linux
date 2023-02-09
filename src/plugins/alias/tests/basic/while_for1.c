@@ -1,5 +1,6 @@
 // for loop
 // no alias
+#include <stdlib.h>
 
 int main ()
 {
