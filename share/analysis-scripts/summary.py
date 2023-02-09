@@ -126,7 +126,6 @@ def smart_rename(target):
     target = re.sub("main\.eva$", "", target)
     target = re.sub("\.eva$", "", target)
     target = re.sub("\.frama-c/", "", target)
-    target = re.sub("qds/frama-c", "qds", target)
     return target
 
 
