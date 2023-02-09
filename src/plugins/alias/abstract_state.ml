@@ -263,29 +263,38 @@ let remove_lval (x:t)  (lv:lval) :t =
   in
   assert_invariants new_x; new_x
 
-(* let lset_to_string s =
- *   let buffer = Buffer.create 16 in
- *   let fmt = Format.formatter_of_buffer buffer in
- *   Format.fprintf fmt "%a" LSet.pretty s ;
- *   Buffer.contents buffer
- *
- * module Dot = Graphviz.Dot(struct
- *     include G
- *     let edge_attributes _ = []
- *     let default_edge_attributes _ = []
- *     let get_subgraph _ = None
- *     let vertex_attributes _ = [`Shape `Box]
- *     let vertex_name (v:V.t) = lset_to_string ()
- *     let default_vertex_attributes _ = []
- *     let graph_attributes _ = []
- *   end) *)
 
-let print_dot _ = (* filename (graph:t) = *)
-  failwith "print_dot not implemented"
-(* let file = open_out filename in
- * Dot.output_graph file graph;
- * close_out file *)
 
+let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
+
+
+let lset_to_string s =
+  let buffer = Buffer.create 16 in
+  let fmt = Format.formatter_of_buffer buffer in
+  Format.fprintf fmt "%a" LSet.pretty s ;
+  Buffer.contents buffer
+
+module Dot = Graphviz.Dot(struct
+    include G
+    let edge_attributes _ = []
+    let default_edge_attributes _ = []
+    let get_subgraph _ = None
+    let vertex_attributes _ = [`Shape `Box]
+    let vertex_name (v:V.t) =
+      let lset = !find_vertex_name_ref v in
+      lset_to_string lset
+    let default_vertex_attributes _ = []
+    let graph_attributes _ = []
+  end)
+
+let print_dot filename (a:t) =
+  let file = open_out filename in
+  find_vertex_name_ref :=
+    (fun v -> find_lset v a
+    );
+  Dot.output_graph file a.graph;
+  close_out file
+    
 (* merge of two vertices; the first vertex carries both sets, the second is removed from the graph and from lmap and vmap; however, pending is NOT updated  *)
 let merge x v1 v2 =
   if (V.equal v1 v2) || not (G.mem_vertex x.graph v1) || not (G.mem_vertex x.graph v2)
