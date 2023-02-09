@@ -29,6 +29,59 @@ Please contact the \FramaC team if you require a thorough evaluation of the
 standards cited here, or of different ones. This reference is provided on a
 best-effort basis.
 
+\section{Unsupported C99 and C11 Features}
+
+The table below lists features of the C99 standard (ISO/IEC 9899:1999) which
+are currently unsupported by \FramaC. Please contact the \FramaC team if you
+would like them be to supported.
+
+\begin{longtable}{m{0.25\textwidth} m{0.70\textwidth}}
+  \caption{Unsupported C99 features}\\
+  \cellcolor{white}\textbf{{\em Feature}} & \cellcolor{white}\textbf{{\em Details}} \\
+  \hline
+  \endhead
+  \endfoot
+  \label{tab:unsupported-c99-features}%
+  Complex/Imaginary types & \verb|_Complex|/\verb|_Imaginary| types are
+  not natively supported in OCaml. Lack of user demand led to the absence of
+  their implementation in Frama-C. \\
+  Nested VLAs & Nested variable-length arrays (VLAs), that is,
+  \verb|int t[a][a]| where \verb|a| is not a compile-time constant,
+  are currently unsupported.
+  VLAs with a single variable dimension are supported. \\
+  Floating-point environment & Some prototypes and stubs are available in the
+  \texttt{fenv.h} and \texttt{fenv.c} files provided in \FramaC's standard
+  library (Section~\ref{sec:libc}), but they are incomplete.
+\end{longtable}
+
+The table below lists features of the C11 standard (ISO/IEC 9899:2011) which
+are currently unsupported by \FramaC. Please contact the \FramaC team if you
+would like them be to supported.
+
+\begin{longtable}{m{0.25\textwidth} m{0.70\textwidth}}
+  \caption{Unsupported C11 features}\\
+  \cellcolor{white}\textbf{{\em Feature}} & \cellcolor{white}\textbf{{\em Details}} \\
+  \hline
+  \endhead
+  \endfoot
+  \label{tab:unsupported-c11-features}%
+  \verb|_Alignas| / \verb|_Alignof| & Currently not supported by the \FramaC
+  kernel. Also, ACSL does not currently include alignment-related predicates. \\
+  \verb|_Atomic| & Currently unsupported (ignored) by the Frama-C kernel. \\
+  Unicode & \verb|u/U| character constants, \verb|u8/u/U| string literals, and
+  \verb|\u| escape sequences are currently unsupported by the lexer.
+  \textbf{Note}: in a few cases, such as ACSL specifications, some \verb|\u|
+  escape sequences are allowed (e.g. for ACSL symbols such as $\in$,
+  $\mathbb{Z}$, etc). \\
+  Complex/Imaginary types & As in C99
+  (see Table~\ref{tab:unsupported-c99-features}). Note that C11 made complex
+  types optional (they were required in C99). \\
+  Nested VLAs & As in C99
+  (see Table~\ref{tab:unsupported-c99-features}). Note that C11 made
+  variable-length types optional (they were required in C99).
+\end{longtable}
+
+
 \section{Frama-C Options Related to C Undefined Behaviors}
 
 This section lists several \FramaC options affecting (either enabling or
