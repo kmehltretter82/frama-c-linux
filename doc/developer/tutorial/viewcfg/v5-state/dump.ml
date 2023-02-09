@@ -5,7 +5,7 @@ let dump_to_string fundec =
     (fundec.svar.vorig_name);
   ignore
     (Visitor.visitFramacFunction
-      (new Visit.print_cfg Format.str_formatter) fundec);
+       (new Visit.print_cfg Format.str_formatter) fundec);
   Format.flush_str_formatter ()
 
 module Cfg_graph_state = State_builder.Hashtbl
