@@ -72,7 +72,7 @@ at \url{https://dune.readthedocs.io/en/stable/concepts.html\#library-deps}}.
 As is often the case, examples are very instructive; here is an example of
 mandatory dependencies from the \textsf{Dive} plug-in's \verb|dune| file:
 
-\begin{lstlisting}
+\begin{lstlisting}[language=Dune]
 (library
   [...]
   (libraries frama-c.kernel frama-c-studia.core frama-c-server.core)
@@ -113,12 +113,12 @@ Optional dependencies can be detected and disabled in different ways:
 Here is an example of \verb|select| from the \textsf{Aoraï} plug-in,
 which defines an optional dependency on the \textsf{Eva} plug-in:
 
-\begin{lstlisting}
+\begin{lstlisting}[language=Dune]
 (libraries [...]
  (select aorai_eva_analysis.ml from
   (frama-c-eva.core -> aorai_eva_analysis.enabled.ml)
   (  -> aorai_eva_analysis.disabled.ml)
- )
+ ))
 \end{lstlisting}
 
 In the example above, \textsf{Aoraï} defines two files:
@@ -153,7 +153,7 @@ via the \verb|%{lib-available:<lib>}| special variable.
 Here is an example from \textsf{Frama-Clang}, which requires the following
 libraries:
 
-\begin{lstlisting}
+\begin{lstlisting}[language=Dune]
 (libraries frama-c.kernel frama-c-wp.core camlp-streams zarith)
 \end{lstlisting}
 
@@ -161,7 +161,7 @@ Its plug-in library name is \verb|frama-clang.core|. Its availability
 must be displayed as the ``summary'' of the configuration, written as the first
 line, with each dependency as a subitem:
 
-\begin{lstlisting}
+\begin{lstlisting}[language=Dune]
 (rule
  (alias frama-c-configure)
  (deps (universe))
@@ -285,7 +285,7 @@ If you simply want to re-run all tests for your plug-in, run \verb|make tests|.
 This is the file structure of the \verb|tests| directory, where \framac
 plug-ins are expected to place their tests:
 
-\begin{lstlisting}
+\begin{lstlisting}[language={}]
 <plug-in directory>
 +- tests
    +- ptests_config
@@ -911,10 +911,11 @@ explain how to add more information to this file to handle some common cases.
 ( rule
   (alias frama-c-configure)
   (deps (universe))
-  (action ( progn
-            (echo "MyPlugin:" %{lib-available:frama-c-myplugin.core} "\n")
-            (echo " - Frama-C:" %{lib-available:frama-c.kernel} "\n")
-          )
+  (action
+    ( progn
+        (echo "MyPlugin:" %{lib-available:frama-c-myplugin.core} "\n")
+        (echo " - Frama-C:" %{lib-available:frama-c.kernel} "\n")
+    )
   )
 )
 
@@ -928,7 +929,8 @@ explain how to add more information to this file to handle some common cases.
 
 ( plugin
   (optional)
-  (name myplugin) (libraries frama-c-myplugin.core) (site (frama-c plugins))
+  (name myplugin)
+    (libraries frama-c-myplugin.core) (site (frama-c plugins))
 )
 \end{lstlisting}
 
@@ -1000,7 +1002,9 @@ indicated in the \texttt{libraries} field:
   (name myplugin_gui)
   (public_name frama-c-myplugin.gui)
   (optional)
-  (flags -open Frama_c_kernel -open Frama_c_gui -open MyPlugin :standard)
+  (flags -open Frama_c_kernel
+         -open Frama_c_gui
+         -open MyPlugin :standard)
   (libraries frama-c.kernel frama-c.gui frama-c-myplugin.core)
 )
 
@@ -1061,10 +1065,10 @@ DEFAULT_SUITES=basic eva wp
 \end{lstlisting}
 
 For most plug-ins, these modifications should be enough so that:
-\begin{lstlisting}[language=shell]
+\begin{logs}
 dune exec -- frama-c-ptests
 dune build @ptests
-\end{lstlisting}
+\end{logs}
 behaves in expected way.
 
 For more advanced usage of \texttt{ptests} please refer to Section~\ref{adv:ptests}.
@@ -2255,10 +2259,10 @@ Kernel.feedback "%B" (Eva.Analysis.is_computed ()); (* false *)
 \end{ocamlcode}
 As the value analysis has been automatically reset when setting the entry point,
 the above code outputs
-\begin{shell}
+\begin{logs}
 [kernel] true
 [kernel] false
-\end{shell}
+\end{logs}
 \end{example}
 \end{itemize}
 
@@ -2648,11 +2652,11 @@ with Project.IOError _ ->
   Kernel.abort "error while loading"
 \end{ocamlcode}
 displays
-\begin{shell}
+\begin{logs}
 [kernel] false
 [kernel] true
 [kernel] false
-\end{shell}
+\end{logs}
 This example shows that the value analysis has been computed only in project
 \texttt{foo} and not in project \texttt{old}.
 \end{example}
@@ -2688,11 +2692,11 @@ with Project.IOError _ ->
   exit 1
 \end{ocamlcode}
 It displays
-\begin{shell}
+\begin{logs}
 false
 true
 false
-\end{shell}
+\end{logs}
 \end{example}
 
 \subsection{Selections}\label{proj:selection}\index{Selection|bfit}

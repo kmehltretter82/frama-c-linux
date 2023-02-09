@@ -26,20 +26,21 @@ class non_zero_divisor prj = object (self)
       let denom = Visitor.visitFramacExpr self#frama_c_plain_copy denom in
       let logic_denom = Logic_utils.expr_to_term ~coerce:false denom in
       let assertion = Logic_const.prel (Rneq, logic_denom, Cil.lzero ()) in
-      (* At this point, we have built the assertion we want to insert. It remains
-         to attach it to the correct statement. The cil visitor maintains the
-         information of which statement and function are currently visited in
-         the [current_stmt] and [current_kf] methods, which return None when
-         outside of a statement or a function , e.g. when visiting a global
-         declaration. Here, it necessarily returns [Some]. *)
+      (* At this point, we have built the assertion we want to insert. It
+         remains to attach it to the correct statement. The cil visitor
+         maintains the information of which statement and function are
+         currently visited in the [current_stmt] and [current_kf] methods,
+         which return None when outside of a statement or a function , e.g.
+         when visiting a global declaration. Here, it necessarily returns
+         [Some]. *)
       let stmt = match self#current_kinstr with
         | Kglobal -> assert false
         | Kstmt s -> s
       in
       let kf = Option.get self#current_kf in
-      (* The above statement and function are related to the original project. We
-         need to attach the new assertion to the corresponding statement and
-         function of the new project. Cil provides functions to convert a
+      (* The above statement and function are related to the original project.
+         We need to attach the new assertion to the corresponding statement
+         and function of the new project. Cil provides functions to convert a
          statement (function) of the original project to the corresponding
          one of the new project. *)
       let new_stmt = Visitor_behavior.Get.stmt self#behavior stmt in
