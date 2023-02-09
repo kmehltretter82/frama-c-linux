@@ -19,7 +19,7 @@ There are several ways to participate in the Frama-C project:
 - [Developing external plug-ins](#developing-external-plug-ins)
   and sharing it with us through a Gitlab merge request;
 
-- Joining the [Frama-C team](http://frama-c.com/about.html) (as an intern, a PhD
+- Joining the [Frama-C team](https://frama-c.com/about.html) (as an intern, a PhD
   student, a postdoctoral researcher, or a research engineer).
 
 We give below some guidelines in order to ease the submission of a merge request
@@ -57,7 +57,7 @@ The detailed steps to submit a contribution to Frama-C are:
 
 6. (Optional) Locally add non-regression test cases to the appropriate
   subdirectory in `./tests/` or `./src/plugins/<plugin>/tests/`.
-  Consult the [plug-in developer manual](http://frama-c.com/download/frama-c-plugin-development-guide.pdf)
+  Consult the [plug-in developer manual](https://frama-c.com/download/frama-c-plugin-development-guide.pdf)
   for details on how to run tests inside Frama-C.
   You can also provide the non-regression test case in the Gitlab issue
   discussion and we will integrate it.
@@ -65,7 +65,7 @@ The detailed steps to submit a contribution to Frama-C are:
 7. Check for unexpected changes.
   Use the command `make check-lint`
   in your terminal from the Frama-C root directory to detect trailing spaces,
-  tabulations or incorrect indentation (ocp-indent = 1.8.1, camomile,
+  tabulations or incorrect indentation (ocp-indent = 1.8.2, camomile,
   clang-format and black (Python linter) are needed), and `make lint` to fix
   problems if any.
 
@@ -113,7 +113,7 @@ Developing external plug-ins
 
 Frama-C is a modular platform for which it is possible to develop external
 plug-ins as documented in the
-[Plug-In development guide](http://frama-c.com/download/frama-c-plugin-development-guide.pdf).
+[Plug-In development guide](https://frama-c.com/download/frama-c-plugin-development-guide.pdf).
 Such plug-ins normally do not require changes to the Frama-C source code and can
 be developed completely independently, for instance in a separate Git
 repository.
@@ -122,17 +122,17 @@ However, to make it easier for your users to compile and use your plug-in, even
 as newer releases are made available, we recommend the following workflow:
 
 1. Write your external plug-in as indicated in the
-  [Plug-In development guide](http://frama-c.com/download/frama-c-plugin-development-guide.pdf);
+  [Plug-In development guide](https://frama-c.com/download/frama-c-plugin-development-guide.pdf);
 
 2. Create an `opam` package by
-  [pinning your local plug-in](http://opam.ocaml.org/doc/Packaging.html#Opam-pin) and
-  [editing the `opam` file](http://opam.ocaml.org/doc/Packaging.html#The-quot-opam-quot-file).
+  [pinning your local plug-in](https://opam.ocaml.org/doc/Packaging.html#Opam-pin) and
+  [editing the `opam` file](https://opam.ocaml.org/doc/Packaging.html#The-quot-opam-quot-file).
   You can have a look at the
   [`opam` file of the Hello plug-in](https://github.com/Frama-C/frama-c-hello/blob/master/opam)
   if necessary.
 
 3. Optionally
-  [publish your plug-in](http://opam.ocaml.org/doc/Packaging.html#Publishing)
+  [publish your plug-in](https://opam.ocaml.org/doc/Packaging.html#Publishing)
   in the official OPAM packages repository.
 
 4. Announce your contribution to the Frama-C ecosystem on the

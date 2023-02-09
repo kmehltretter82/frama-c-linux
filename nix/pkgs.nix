@@ -4,13 +4,10 @@ let
     # External Packages
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
     camlp5 = oself.callPackage ./camlp5.nix {};
-    camlzip = oself.callPackage ./camlzip.nix {};
     headache = oself.callPackage ./headache.nix {};
     menhirLib = oself.callPackage ./menhirLib.nix {};
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
-    ocp-indent = oself.callPackage ./ocp-indent.nix {};
     psmt2-frontend = oself.callPackage ./psmt2-frontend.nix {};
-    yojson = oself.callPackage ./yojson.nix {};
     why3 = oself.callPackage ./why3.nix {};
 
     # Helpers
@@ -68,7 +65,6 @@ let
     ) super.ocaml-ng;
     inherit (super.callPackage sources."gitignore.nix" {}) gitignoreSource;
     why3 = throw "don't use pkgs.why3 but ocaml-ng.ocamlPackages_4_XX.why3";
-    camlzip = throw "don't use pkgs.camlzip but ocaml-ng.ocamlPackages_4_XX.camlzip";
     framac = throw "don't use pkgs.framac but ocaml-ng.ocamlPackages_4_XX.frama-c";
     frama-c = throw "don't use pkgs.framac but ocaml-ng.ocamlPackages_4_XX.frama-c";
   };
