@@ -23,23 +23,16 @@
 open Eval
 
 module type Conversion = sig
-  type extended_value
-  type extended_location
-  type internal_value
-  type internal_location
-
-  val extend_val : internal_value -> extended_value
-  val restrict_val : extended_value -> internal_value
-
-  val extend_loc : internal_location -> extended_location
-  val restrict_loc : extended_location -> internal_location
+  type extended
+  type internal
+  val extend: internal -> extended
+  val restrict: extended -> internal
 end
-
 
 module Make
     (Domain: Abstract_domain.Leaf)
-    (Convert : Conversion with type internal_value := Domain.value
-                           and type internal_location := Domain.location)
+    (Val: Conversion with type internal := Domain.value)
+    (Loc: Conversion with type internal := Domain.location)
 = struct
 
   include (Domain : Datatype.S_with_collections with type t = Domain.t)
@@ -49,38 +42,38 @@ module Make
 
   let log_category = Domain.log_category
 
-  type value = Convert.extended_value
-  type location = Convert.extended_location
+  type value = Val.extended
+  type location = Loc.extended
   type origin = Domain.origin
 
   let extract_expr ~oracle context state exp =
-    let oracle exp = oracle exp >>=: Convert.restrict_val in
+    let oracle exp = oracle exp >>=: Val.restrict in
     Domain.extract_expr ~oracle context state exp >>=: fun (value, origin) ->
-    Convert.extend_val value, origin
+    Val.extend value, origin
 
   let extract_lval ~oracle context state lval typ loc =
-    let oracle exp = oracle exp >>=: Convert.restrict_val in
-    let loc = Convert.restrict_loc loc in
+    let oracle exp = oracle exp >>=: Val.restrict in
+    let loc = Loc.restrict loc in
     Domain.extract_lval ~oracle context state lval typ loc
     >>=: fun (value, origin) ->
-    Convert.extend_val value, origin
+    Val.extend value, origin
 
   let backward_location state lval typ loc value =
     Domain.backward_location
-      state lval typ (Convert.restrict_loc loc) (Convert.restrict_val value)
+      state lval typ (Loc.restrict loc) (Val.restrict value)
     >>-: fun (loc, value) ->
-    Convert.extend_loc loc, Convert.extend_val value
+    Loc.extend loc, Val.extend value
 
   let reduce_further state expr value =
-    let list = Domain.reduce_further state expr (Convert.restrict_val value) in
-    List.map (fun (e, v) -> e, Convert.extend_val v) list
+    let list = Domain.reduce_further state expr (Val.restrict value) in
+    List.map (fun (e, v) -> e, Val.extend v) list
 
 
-  let lift_left left = { left with lloc = Convert.restrict_loc left.lloc }
+  let lift_left left = { left with lloc = Loc.restrict left.lloc }
   let lift_flagged_value value =
-    { value with v = value.v >>-: Convert.restrict_val }
+    { value with v = value.v >>-: Val.restrict }
   let lift_assigned = function
-    | Assign value -> Assign (Convert.restrict_val value)
+    | Assign value -> Assign (Val.restrict value)
     | Copy (lval, value) -> Copy (lift_left lval, lift_flagged_value value)
 
   let lift_argument arg = { arg with avalue = lift_assigned arg.avalue }
@@ -98,7 +91,7 @@ module Make
       | `Top -> `Top
     in
     let lift_record r = { r with value = lift_flagged_value r.value } in
-    let lift_loc_record r = { r with loc = Convert.restrict_loc r.loc } in
+    let lift_loc_record r = { r with loc = Loc.restrict r.loc } in
     let open Abstract_domain in
     let find expr = valuation.find expr >>> lift_record in
     let find_loc lval = valuation.find_loc lval >>> lift_loc_record in
@@ -126,7 +119,7 @@ module Make
   let show_expr valuation = Domain.show_expr (lift_valuation valuation)
 
   let lift_logic_dep dep =
-    let location = Option.map Convert.restrict_loc dep.location in
+    let location = Option.map Loc.restrict dep.location in
     { dep with location }
 
   let lift_logic_assigns = function
@@ -135,7 +128,7 @@ module Make
 
   let logic_assign assigns location state =
     let assigns = Option.map (fun (a, s) -> lift_logic_assigns a, s) assigns in
-    Domain.logic_assign assigns (Convert.restrict_loc location) state
+    Domain.logic_assign assigns (Loc.restrict location) state
 
   let evaluate_predicate = Domain.evaluate_predicate
   let reduce_by_predicate = Domain.reduce_by_predicate
@@ -150,7 +143,7 @@ module Make
 
   let empty = Domain.empty
   let initialize_variable lval loc ~initialized init_value state =
-    let loc = Convert.restrict_loc loc in
+    let loc = Loc.restrict loc in
     Domain.initialize_variable lval loc ~initialized init_value state
   let initialize_variable_using_type = Domain.initialize_variable_using_type
 

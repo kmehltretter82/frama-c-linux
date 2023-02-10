@@ -20,25 +20,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module type Conversion = sig
-  type extended
-  type internal
-  val extend: internal -> extended
-  val restrict: extended -> internal
-end
-
-module Make
-    (Domain: Abstract_domain.Leaf)
-    (Val: Conversion with type internal := Domain.value)
-    (Loc: Conversion with type internal := Domain.location)
-  : Abstract.Domain.Internal with type state = Domain.state
-                              and type value = Val.extended
-                              and type location = Loc.extended
-                              and type origin = Domain.origin
+module Make (Left : Abstract_location.S) (Right : Abstract_location.S) :
+  Abstract_location.S
+    with type value = Left.value * Right.value
+     and type location = Left.location * Right.location
+     and type offset = Left.offset * Right.offset
 
 
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)
+
+module Same_value
+    (Value: Abstract_value.S)
+    (Left: Abstract_location.S with type value = Value.t)
+    (Right: Abstract_location.S with type value = Value.t)
+  : Abstract.Location.Internal
+      with type value = Value.t
+       and type location = Left.location * Right.location
+       and type offset = Left.offset * Right.offset
