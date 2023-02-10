@@ -1,0 +1,279 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of WP plug-in of Frama-C.                           *)
+(*                                                                        *)
+(*  Copyright (C) 2007-2023                                               *)
+(*    CEA (Commissariat a l'energie atomique et aux energies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+open Conditions
+open Lang.F
+module F = Lang.F
+module Env = Plang.Env
+module Imap = Qed.Intmap
+
+type v_fold = [ `Auto | `Visible | `Hidden ]
+type v_term = [ v_fold | `Shared | `Name of string ]
+
+type part = Term | Goal | Step of step
+
+[@@@ warning "-32"]
+
+let pp_part fmt = function
+  | Term -> Format.fprintf fmt "Term"
+  | Goal -> Format.fprintf fmt "Goal"
+  | Step s -> Format.fprintf fmt "Step #%d" s.id
+
+let pp_term fmt e = Format.fprintf fmt "E%03d" (F.QED.id e)
+
+let pp_target fmt = function
+  | None -> Format.pp_print_string fmt "-"
+  | Some e -> Format.fprintf fmt "T%03d" (F.QED.id e)
+
+let pp_fold fmt u = Format.pp_print_string fmt
+    ( match u with `Auto -> "auto" | `Fold -> "fold" | `Unfold -> "unfold" )
+
+[@@@ warning "+32"]
+
+(* -------------------------------------------------------------------------- *)
+(* --- Focus                                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+class autofocus =
+  object(self)
+
+    val mutable autofocus = true
+
+    (* Term Visibility (forced by user) *)
+    val mutable vterm : v_term Tmap.t = Tmap.empty
+
+    (* Step Visibility (forced by user) *)
+    val mutable vstep : v_fold Imap.t = Imap.empty
+
+    (* Focused Terms ; lastly selected at head *)
+    val mutable focusring = []
+    val mutable target = F.e_true
+
+    (* Memoization of focused terms and steps occurrence *)
+    val mutable occurs_term : bool Tmap.t = Tmap.empty
+    val mutable occurs_step : bool Imap.t = Imap.empty
+
+    (* Currently displayed sequent *)
+    val mutable sequent : Conditions.sequent option = None
+
+    method clear =
+      begin
+        sequent <- None ;
+        self#reset ;
+      end
+
+    method reset =
+      begin
+        focusring <- [] ;
+        vterm <- Tmap.empty ;
+        vstep <- Imap.empty ;
+        self#clear_cache ;
+      end
+
+    method private clear_cache =
+      begin
+        occurs_term <- Tmap.empty ;
+        occurs_step <- Imap.empty ;
+      end
+
+    method private clear_steps =
+      occurs_step <- Imap.empty
+
+    (* --- Environment --- *)
+
+    method env =
+      let env = Env.create () in
+      Tmap.iter
+        (fun t v -> match v with
+           | `Auto -> ()
+           | `Hidden -> Env.define env "..." t
+           | `Visible -> Env.unfold env t
+           | `Shared ->
+             let base = F.basename t in
+             let sanitizer = Plang.sanitizer in
+             Env.define env (Env.fresh env ~sanitizer base) t
+           | `Name x ->
+             Env.define env x t)
+        vterm ; env
+
+    (* --- Term Occurrence --- *)
+
+    method private occurs_term e =
+      try Tmap.find e occurs_term
+      with Not_found ->
+        let occurs =
+          try
+            if List.memq e focusring then raise Exit ;
+            if e != F.e_true && e == target then raise Exit ;
+            F.lc_iter (fun e -> if self#occurs_term e then raise Exit) e ;
+            false
+          with Exit -> true
+        in occurs_term <- Tmap.add e occurs occurs_term ; occurs
+
+    method private occurs_seq seq =
+      try
+        Conditions.iter
+          (fun s -> if self#occurs_step s then raise Exit) seq ;
+        false
+      with Exit -> true
+
+    method private occurs_state s =
+      try
+        Mstate.iter
+          (fun _m v -> if self#occurs_term v then raise Exit) s ;
+        false
+      with Exit -> true
+
+    method private occurs_step step =
+      try step.id < 0 (* defensive *) || Imap.find step.id occurs_step
+      with Not_found ->
+        let occurs =
+          match step.condition with
+          | When _ -> true
+          | State s -> self#occurs_state s
+          | Init p | Have p | Type p | Core p ->
+            self#occurs_term (F.e_prop p)
+          | Branch(p,sa,sb) ->
+            self#occurs_term (F.e_prop p)
+            || self#occurs_seq sa
+            || self#occurs_seq sb
+          | Either cs ->
+            List.exists self#occurs_seq cs
+        in occurs_step <- Imap.add step.id occurs occurs_step ; occurs
+
+    (* --- Term Visibility --- *)
+
+    method set_term t = function
+      | `Auto ->
+        if Tmap.mem t vterm then
+          (vterm <- Tmap.remove t vterm ; self#clear_cache)
+      | v ->
+        let same =
+          try v = Tmap.find t vterm
+          with Not_found -> false in
+        if not same then
+          (vterm <- Tmap.add t v vterm ; self#clear_cache)
+
+    method get_term t = try Tmap.find t vterm with Not_found -> `Auto
+
+    method set_target e = target <- e
+    method clear_target = target <- F.e_true
+
+    method focus ~extend e =
+      if F.lc_closed e then
+        begin
+          let ring = if extend
+            then (List.filter (fun e0 -> e0 != e) focusring)
+            else [] in
+          focusring <- e :: ring ;
+          self#clear_cache ;
+        end
+
+    method unfocus e =
+      begin
+        focusring <- List.filter (fun e0 -> e0 != e) focusring ;
+        self#clear_cache ;
+      end
+
+    method unfocus_last =
+      begin match focusring with
+        | [] -> ()
+        | _::es -> focusring <- es ; self#clear_cache
+      end
+
+    method is_selected e = match focusring with e0::_ -> e0 == e | [] -> false
+    method is_focused e = List.memq e focusring
+    method is_visible e = if autofocus then self#occurs_term e else true
+    method is_targeted e = autofocus && self#occurs_term e
+
+    method set_autofocus flag =
+      autofocus <- flag ;
+      if flag then self#clear_cache else self#reset
+
+    method get_autofocus = autofocus
+
+    method is_autofocused =
+      autofocus && Tmap.is_empty vterm
+
+    (* --- Sequent Management --- *)
+
+    method set_step s = function
+      | `Auto ->
+        if Imap.mem s.id vstep then
+          (vstep <- Imap.remove s.id vstep ; self#clear_steps)
+      | v ->
+        let same =
+          try v = Imap.find s.id vstep
+          with Not_found -> false in
+        if not same then
+          (vstep <- Imap.add s.id v vstep ; self#clear_steps)
+
+    method get_step s =
+      try Imap.find s.id vstep
+      with Not_found -> `Auto
+
+    method is_visible_step (s : step) =
+      match self#get_step s with
+      | `Auto -> if autofocus then self#occurs_step s else true
+      | `Visible -> true
+      | `Hidden -> false
+
+    method locate a =
+      match sequent with
+      | None -> Tactical.Empty
+      | Some (hs,goal) ->
+        if F.is_subterm a (F.e_prop goal)
+        then Tactical.(Inside(Goal goal,a))
+        else
+          let pool = ref Tactical.Empty in
+          let rec lookup_sequence a hs =
+            Conditions.iter
+              (fun step ->
+                 match step.condition with
+                 | (Have p | When p | Branch(p,_,_))
+                   when F.is_subterm a (F.e_prop p) ->
+                   pool := Tactical.(Inside(Step step,a)) ;
+                   raise Exit
+                 | Branch(_,sa,sb) ->
+                   lookup_sequence a sa ;
+                   lookup_sequence a sb ;
+                 | Either cs ->
+                   List.iter (lookup_sequence a) cs
+                 | State _ | Type _ | Init _ | Have _ | When _ | Core _ -> ()
+              ) hs in
+          (try lookup_sequence a hs with Exit -> ()) ;
+          !pool
+
+    (* ---- Global ----- *)
+
+    method set_sequent (s : sequent) =
+      let updated = match sequent with None -> true | Some s0 -> s0 != s in
+      if updated then
+        begin
+          sequent <- Some s ;
+          Conditions.index s ;
+          vstep <- Imap.empty ;
+          self#clear_cache ;
+        end ;
+      updated
+
+  end

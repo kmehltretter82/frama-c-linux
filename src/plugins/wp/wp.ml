@@ -231,6 +231,7 @@ module Plang = Plang
 module Rformat = Rformat
 module Stats = Stats
 module WpReport = WpReport
+module WpTip = WpTip
 
 (** {2 EVA Proxy} *)
 
