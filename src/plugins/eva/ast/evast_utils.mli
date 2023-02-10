@@ -35,3 +35,10 @@ val origin_offset : offset -> Cil_types.offset
 (* [rewrite f exp] rewrites [exp] by calling [f ~descent node] on root exp. [f]
    can call [descent e] to rewrite recursively subexpressions of [e]. *)
 val rewrite : (descend:(exp -> exp) -> exp -> exp) -> exp -> exp
+
+(** Computes the height of an expression, that is the maximum number of nested
+    operations in this expression. *)
+val height_exp : exp -> int
+
+(** Computes the height of an lvalue. *)
+val height_lval : lval -> int

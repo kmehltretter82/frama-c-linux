@@ -24,6 +24,8 @@ open Evast
 
 type typ = Cil_types.typ
 
+(* --- Type of --- *)
+
 let rec type_of_offset (basetyp : typ) : offset -> typ = function
   | NoOffset -> basetyp
   | Index (_, o) ->
@@ -66,6 +68,8 @@ and type_of_exp (exp : exp) =
     | _ ->  assert false
 
 
+(* --- Origins --- *)
+
 let origin_exp e =
   match e.origin with
   | Exp exp -> exp
@@ -79,6 +83,9 @@ let [@tail_mod_cons] rec origin_offset = function
 let origin_lval = function
   | Var v, o -> Cil_types.Var v, origin_offset o
   | Mem e, o -> Cil_types.Mem (origin_exp e), origin_offset o
+
+
+(* --- Rewriting --- *)
 
 let rewrite f exp =
   let rec rewrite_exp exp =
@@ -135,3 +142,26 @@ let rewrite f exp =
       if e != e' || o' != o then Index (e', o') else offset
   in
   rewrite_exp exp
+
+
+(* --- Heights --- *)
+
+let rec height_exp exp =
+  match exp.node with
+  | Const _ | SizeOf _ | SizeOfStr _ | AlignOf _ -> 0
+  | Lval lv | AddrOf lv | StartOf lv  -> height_lval lv + 1
+  | UnOp (_,e,_) | CastE (_, e) | SizeOfE e | AlignOfE e
+    -> height_exp e + 1
+  | BinOp (_,e1,e2,_) -> max (height_exp e1) (height_exp e2) + 1
+
+and height_lval (host, offset) =
+  let h1 = match host with
+    | Var _ -> 0
+    | Mem e -> height_exp e + 1
+  in
+  max h1 (height_offset offset) + 1
+
+and height_offset = function
+  | NoOffset  -> 0
+  | Field (_,r) -> height_offset r + 1
+  | Index (e,r) -> max (height_exp e) (height_offset r) + 1
