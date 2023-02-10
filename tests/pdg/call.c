@@ -1,9 +1,9 @@
 /* run.config
-   
+   LOG: call.f.dot call.g.dot
    STDOPT: +"-lib-entry -main g -pdg -pdg-dot ./call "
 */
 
-/* Ne pas modifier : exemple utilisé dans le rapport. */
+/* Ne pas modifier : exemple utilisé dans le manuel du PDG. */
 
 /*BDOC*/
 struct {int a; int b; } G;

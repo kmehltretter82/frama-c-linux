@@ -30,7 +30,7 @@ include ../MakeLaTeXModern
 
 DWNLDDIR=../manuals
 DOCNAME=pdg-documentation-fr.pdf
-TEST_DIR=../../tests/pdg/
+TEST_DIR=../../tests/pdg
 
 BIB_FILE = ../slicing/bib-slicing.bib
 main.bbl : $(BIB_FILE)
@@ -56,13 +56,12 @@ GENERATED+=call-f.pdf call-g.pdf
 	fig2dev -L pdf $< $@
 
 GENERATED+=call-f.dot call-g.dot
-call-%.dot : $(TEST_DIR)/call.%.dot
+call-%.dot : $(TEST_DIR)/oracle/call.%.dot
 	cp $< $@
 
 call-%.dot :
 	@echo
-	@echo "ERROR : $@ not found : you should run PDG tests to have it"
-	@echo "  Run : cd ../.. ; make pdg_tests ; cd - "
+	@echo "ERROR : $@ not found : this file cannot be generated from an oracle of the PDD test 'tests/pdg/call.c'"
 	@echo
 	exit 1
 
