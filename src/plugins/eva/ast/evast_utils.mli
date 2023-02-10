@@ -31,3 +31,7 @@ val type_of_lval : lval -> typ
 val origin_exp : exp -> Cil_types.exp
 val origin_lval : lval -> Cil_types.lval
 val origin_offset : offset -> Cil_types.offset
+
+(* [rewrite f exp] rewrites [exp] by calling [f ~descent node] on root exp. [f]
+   can call [descent e] to rewrite recursively subexpressions of [e]. *)
+val rewrite : (descend:(exp -> exp) -> exp -> exp) -> exp -> exp

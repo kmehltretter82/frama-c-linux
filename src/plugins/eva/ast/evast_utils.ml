@@ -61,3 +61,59 @@ let [@tail_mod_cons] rec origin_offset = function
 let origin_lval = function
   | Var v, o -> Cil_types.Var v, origin_offset o
   | Mem e, o -> Cil_types.Mem (origin_exp e), origin_offset o
+
+let rewrite f exp =
+  let rec rewrite_exp exp =
+    f ~descend exp
+  and descend exp =
+    let replace_if condition node =
+      if condition then Evast_builder.mk node else exp
+    in
+    match exp.node with
+    | Lval (lh, o as lv) ->
+      let (lh', o' as lv') = rewrite_lval lv in
+      replace_if (lh' != lh || o' != o) (Lval lv')
+    | AddrOf (lh, o as lv) ->
+      let (lh', o' as lv') = rewrite_lval lv in
+      replace_if (lh' != lh || o' != o) (AddrOf lv')
+    | StartOf (lh, o as lv) ->
+      let (lh', o' as lv') = rewrite_lval lv in
+      replace_if (lh' != lh || o' != o) (StartOf lv')
+    | UnOp (op, e, t) ->
+      let e' = rewrite_exp e in
+      replace_if (e' != e) (UnOp (op, e', t))
+    | BinOp (op, e1, e2, t) ->
+      let e1' = rewrite_exp e1
+      and e2' = rewrite_exp e2 in
+      replace_if (e1' != e1 || e2' != e2) (BinOp (op, e1', e2', t))
+    | CastE (t, e) ->
+      let e' = rewrite_exp e in
+      replace_if (e' != e) (CastE (t, e'))
+    | SizeOfE e ->
+      let e' = rewrite_exp e in
+      replace_if (e' != e)  (SizeOfE e')
+    | AlignOfE e ->
+      let e' = rewrite_exp e in
+      replace_if (e' != e) (AlignOfE e')
+    | SizeOf _ | Const _ | SizeOfStr _ | AlignOf _ ->
+      exp
+  and rewrite_lval (lhost, offset) =
+    rewrite_lhost lhost, rewrite_offset offset
+  and rewrite_lhost lhost =
+    match lhost with
+    | Var _ -> lhost
+    | Mem e ->
+      let e' = rewrite_exp e in
+      if e' != e then Mem e' else lhost
+  and rewrite_offset offset =
+    match offset with
+    | NoOffset -> offset
+    | Field (fi, o) ->
+      let o' = rewrite_offset o in
+      if o' != o then Field (fi, o') else offset
+    | Index (e, o) ->
+      let e' = rewrite_exp e
+      and o' = rewrite_offset o in
+      if e != e' || o' != o then Index (e', o') else offset
+  in
+  rewrite_exp exp
