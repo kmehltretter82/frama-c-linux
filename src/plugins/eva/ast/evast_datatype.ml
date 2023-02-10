@@ -31,8 +31,11 @@ let compare_origin o1 o2 =
   match o1, o2 with
   | Exp e1, Exp e2 -> Int.compare e1.eid e2.eid
   | Term t1, Term t2 -> Int.compare t1.it_id t2.it_id
-  | Exp _, Term _ -> 1
-  | Term _, Exp _ -> -1
+  | Built, Built -> 0
+  | Exp _, _ -> 1
+  | _, Exp _ -> -1
+  | Term _, _ -> 1
+  | _, Term _ -> -1
 
 (* Prototype modules for Evast types *)
 

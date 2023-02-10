@@ -90,3 +90,6 @@ and translate_offset = function
     Field (fieldinfo, translate_offset offset)
 
 and translate_lval (host, offset) = translate_host host, translate_offset offset
+
+let mk node =
+  { node ; origin = Built }

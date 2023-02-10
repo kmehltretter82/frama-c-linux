@@ -39,7 +39,7 @@ let rec type_of_offset basetyp = function
 let type_of_exp e =
   match e.origin with
   | Exp exp -> Cil.typeOf exp
-  | Term _ -> assert false
+  | Built | Term _ -> assert false (* TODO *)
 
 let type_of_lval (host, offset) =
   let basetyp = match host with
@@ -51,7 +51,7 @@ let type_of_lval (host, offset) =
 let origin_exp e =
   match e.origin with
   | Exp exp -> exp
-  | Term _ -> invalid_arg "origin is not an expression"
+  | Built | Term _ -> invalid_arg "origin is not an expression"
 
 let [@tail_mod_cons] rec origin_offset = function
   | NoOffset -> Cil_types.NoOffset

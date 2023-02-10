@@ -22,3 +22,5 @@
 
 val translate_expr: Cil_types.exp -> Evast.exp
 val translate_lval: Cil_types.lval -> Evast.lval
+
+val mk: Evast.exp_node -> Evast.exp (* Does not assign origin. Should not be used. *)

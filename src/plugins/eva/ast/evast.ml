@@ -22,13 +22,14 @@
 
 (** Eva AST. *)
 
-type cil =
+type origin =
   | Exp of Cil_types.exp
   | Term of Cil_types.identified_term
+  | Built (* Not present in the original source code *)
 
 type exp =
   { node: exp_node;
-    origin: cil }
+    origin: origin }
 
 and exp_node =
   | Const      of constant
