@@ -22,7 +22,7 @@
 
 open Conditions
 open Lang.F
-open WpTip
+open Ptip
 module F = Lang.F
 module Env = Plang.Env
 module Imap = Qed.Intmap
