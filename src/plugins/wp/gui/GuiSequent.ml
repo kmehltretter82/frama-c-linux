@@ -26,52 +26,7 @@ open WpTip
 module F = Lang.F
 module Env = Plang.Env
 module Imap = Qed.Intmap
-type 'a printer = 'a Qed.Plib.printer
-
-(* -------------------------------------------------------------------------- *)
-(* --- Term Engine                                                        --- *)
-(* -------------------------------------------------------------------------- *)
-
-class type term_selection =
-  object
-    method is_focused : term -> bool
-    method is_visible : term -> bool
-    method is_targeted : term -> bool
-  end
-
-class plang
-    ~(term : term Wtext.marker)
-    ~(focus : term Wtext.marker)
-    ~(target : term Wtext.marker)
-    (autofocus : term_selection)
-  =
-  object(self)
-    inherit Pcond.state as super
-
-    method! shareable e = autofocus#is_targeted e || super#shareable e
-
-    val mutable tgt = F.e_true
-    method set_target t = tgt <- t
-    method clear_target = tgt <- F.e_true
-
-    method private wrap pp fmt e =
-      if e != F.e_true && e == tgt then
-        target#wrap pp fmt e
-      else
-      if autofocus#is_focused e then
-        focus#wrap pp fmt e
-      else
-      if F.lc_closed e then
-        term#wrap pp fmt e
-      else
-        pp fmt e
-
-    method! pp_at fmt lbl = Format.fprintf fmt "@{<wp:label>@@%a@}" super#pp_label lbl
-    method! pp_label fmt lbl = Format.fprintf fmt "@{<wp:label>%a@}" super#pp_label lbl
-    method! pp_var fmt x = Format.fprintf fmt "@{<wp:var>%s@}" x
-    method! pp_flow fmt e = self#wrap super#pp_flow fmt e
-    method! pp_atom fmt e = self#wrap super#pp_atom fmt e
-  end
+type 'a printer = Format.formatter -> 'a -> unit
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sequent Engine                                                     --- *)
@@ -200,13 +155,11 @@ class focused (wtext : Wtext.text) =
   let terms : term Wtext.marker = wtext#marker in
   let focus : term Wtext.marker = wtext#marker in
   let button : (unit -> unit) Wtext.marker = wtext#marker in
-  let target_term : term Wtext.marker = wtext#marker in
+  let target : term Wtext.marker = wtext#marker in
   let target_part : part Wtext.marker = wtext#marker in
   let autofocus = new autofocus in
-  let term_selection = (autofocus :> term_selection) in
   let step_selection = (autofocus :> step_selection) in
-  let plang = new plang ~term:terms ~focus:focus ~target:target_term
-    term_selection in
+  let plang = new plang ~terms ~focus ~target ~autofocus in
   let pcond = new pcond ~part:parts ~target:target_part
     step_selection (plang :> Pcond.state) in
   let popup = new Widget.popup () in
@@ -236,7 +189,7 @@ class focused (wtext : Wtext.text) =
         button#set_hover [`BACKGROUND "orange" ];
         button#on_click (fun (_,_,cb) -> cb ()) ;
         target_part#set_style [`BACKGROUND "orange"] ;
-        target_term#set_style [`BACKGROUND "orange"] ;
+        target#set_style [`BACKGROUND "orange"] ;
         parts#on_click self#on_part ;
         parts#on_right_click self#on_popup_part ;
         terms#on_click (self#on_term ~extend:false) ;
@@ -245,9 +198,9 @@ class focused (wtext : Wtext.text) =
         focus#on_click self#on_select ;
         focus#on_right_click self#on_popup_term ;
         target_part#on_right_click self#on_popup_part ;
-        target_term#on_right_click self#on_popup_term ;
+        target#on_right_click self#on_popup_term ;
         target_part#on_add (fun (p,q,_) -> self#added_zone p q) ;
-        target_term#on_add (fun (p,q,_) -> self#added_zone p q) ;
+        target#on_add (fun (p,q,_) -> self#added_zone p q) ;
       end
 
     method reset =

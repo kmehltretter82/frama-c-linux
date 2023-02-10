@@ -24,6 +24,8 @@ open Conditions
 module F = Lang.F
 module Env = Plang.Env
 
+type 'a printer = Format.formatter -> 'a -> unit
+
 (* -------------------------------------------------------------------------- *)
 (* --- Autofocus                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -58,5 +60,34 @@ class autofocus :
     method locate : F.term -> Tactical.selection
     method set_sequent : sequent -> bool
   end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Term Engine                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+class type term_marker =
+  object
+    method wrap : F.term printer -> F.term printer
+  end
+
+class type term_selection =
+  object
+    method is_focused : F.term -> bool
+    method is_visible : F.term -> bool
+    method is_targeted : F.term -> bool
+  end
+
+class plang :
+    terms:#term_marker ->
+    focus:#term_marker ->
+    target:#term_marker ->
+    autofocus:#term_selection ->
+    object
+      inherit Pcond.state
+      method set_target : F.term -> unit
+      method clear_target : unit
+    end
+
+(* -------------------------------------------------------------------------- *)
 
 (* -------------------------------------------------------------------------- *)

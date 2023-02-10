@@ -25,6 +25,7 @@ open Lang.F
 module F = Lang.F
 module Env = Plang.Env
 module Imap = Qed.Intmap
+type 'a printer = Format.formatter -> 'a -> unit
 
 type v_fold = [ `Auto | `Visible | `Hidden ]
 type v_term = [ v_fold | `Shared | `Name of string ]
@@ -277,3 +278,58 @@ class autofocus =
       updated
 
   end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Term Engine                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+class type term_marker =
+  object
+    method wrap : term printer -> term printer
+  end
+
+class type term_selection =
+  object
+    method is_focused : term -> bool
+    method is_visible : term -> bool
+    method is_targeted : term -> bool
+  end
+
+class plang
+    ~(terms : #term_marker)
+    ~(focus : #term_marker)
+    ~(target : #term_marker)
+    ~(autofocus : #term_selection)
+  =
+  object(self)
+    inherit Pcond.state as super
+
+    method! shareable e = autofocus#is_targeted e || super#shareable e
+
+    val mutable tgt = F.e_true
+    method set_target t = tgt <- t
+    method clear_target = tgt <- F.e_true
+
+    method private wrap pp fmt e =
+      if e != F.e_true && e == tgt then
+        target#wrap pp fmt e
+      else
+      if autofocus#is_focused e then
+        focus#wrap pp fmt e
+      else
+      if F.lc_closed e then
+        terms#wrap pp fmt e
+      else
+        pp fmt e
+
+    method! pp_at fmt lbl =
+      Format.fprintf fmt "@{<wp:label>@@%a@}" super#pp_label lbl
+    method! pp_label fmt lbl =
+      Format.fprintf fmt "@{<wp:label>%a@}" super#pp_label lbl
+    method! pp_var fmt x =
+      Format.fprintf fmt "@{<wp:var>%s@}" x
+    method! pp_flow fmt e = self#wrap super#pp_flow fmt e
+    method! pp_atom fmt e = self#wrap super#pp_atom fmt e
+  end
+
+(* -------------------------------------------------------------------------- *)

@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 open Lang.F
-type 'a printer = 'a Qed.Plib.printer
+type 'a printer = Format.formatter -> 'a -> unit
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sequent Pretty-Printer                                             --- *)
