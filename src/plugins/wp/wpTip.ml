@@ -283,7 +283,7 @@ class autofocus =
 (* --- Term Engine                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-class type term_marker =
+class type term_wraper =
   object
     method wrap : term printer -> term printer
   end
@@ -296,9 +296,9 @@ class type term_selection =
   end
 
 class plang
-    ~(terms : #term_marker)
-    ~(focus : #term_marker)
-    ~(target : #term_marker)
+    ~(terms : #term_wraper)
+    ~(focus : #term_wraper)
+    ~(target : #term_wraper)
     ~(autofocus : #term_selection)
   =
   object(self)
@@ -330,6 +330,114 @@ class plang
       Format.fprintf fmt "@{<wp:var>%s@}" x
     method! pp_flow fmt e = self#wrap super#pp_flow fmt e
     method! pp_atom fmt e = self#wrap super#pp_atom fmt e
+  end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Sequent Engine                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+class type part_marker =
+  object
+    method wrap : part printer -> part printer
+    method mark : 'a. part -> 'a printer -> 'a printer
+  end
+
+class type step_selection =
+  object
+    method is_visible : F.term -> bool
+    method is_visible_step : step -> bool
+  end
+
+class pcond
+    ~(parts : #part_marker)
+    ~(target : #part_marker)
+    ~(autofocus : #step_selection)
+    ~(plang : #Pcond.state) =
+  object(self)
+    inherit Pcond.seqengine plang as super
+
+    (* All displayed entries *)
+    val mutable domain = Vars.empty
+    val mutable ellipsed = false
+    val mutable tgt : part = Term (* empty *)
+
+    method set_target p = tgt <- p
+
+    (* Step Visibility Management *)
+
+    method visible step =
+      autofocus#is_visible_step step ||
+      match tgt with
+      | Term | Goal -> false
+      | Step s -> s.id = step.id
+
+    method private domain seq =
+      Conditions.iter
+        (fun step ->
+           if self#visible step && not (Vars.subset step.vars domain)
+           then
+             begin
+               match step.condition with
+               | State _ -> ()
+               | Have p | Init p | Core p | When p | Type p ->
+                 domain <- Vars.union (F.varsp p) domain
+               | Branch(p,a,b) ->
+                 domain <- Vars.union (F.varsp p) domain ;
+                 self#domain a ; self#domain b
+               | Either cs -> List.iter self#domain cs
+             end
+        ) seq
+
+    (* local-variable marking ; not hover/clickable marks *)
+    method! mark (m : F.marks) s = if self#visible s then super#mark m s
+
+    method! pp_step fmt step =
+      if self#visible step then
+        begin
+          ellipsed <- false ;
+          match tgt with
+          | Step { condition = State _ } -> super#pp_step fmt step
+          | Step s when s == step ->
+            target#mark (Step step) super#pp_step fmt step
+          | _ ->
+            parts#mark (Step step) super#pp_step fmt step
+        end
+      else
+        ( if not ellipsed then Format.fprintf fmt "@ [...]" ; ellipsed <- true )
+
+    method! pp_goal fmt goal =
+      match tgt with
+      | Goal ->
+        target#mark Goal super#pp_goal fmt goal
+      | _ ->
+        parts#mark Goal super#pp_goal fmt goal
+
+    method! pp_block ~clause fmt seq =
+      try
+        Conditions.iter
+          (fun step ->
+             if self#visible step then
+               raise Exit)
+          seq ;
+        Format.fprintf fmt "@ %a { ... }" self#pp_clause clause
+      with Exit ->
+        begin
+          ellipsed <- false ;
+          super#pp_block ~clause fmt seq ;
+          ellipsed <- false ;
+        end
+
+    (* Global Call *)
+
+    method! set_sequence hyps =
+      domain <- Vars.empty ;
+      super#set_sequence hyps ;
+      if self#get_state then
+        begin
+          self#domain hyps ;
+          plang#set_domain domain ;
+        end
+
   end
 
 (* -------------------------------------------------------------------------- *)

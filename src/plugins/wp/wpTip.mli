@@ -65,7 +65,7 @@ class autofocus :
 (* --- Term Engine                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-class type term_marker =
+class type term_wraper =
   object
     method wrap : F.term printer -> F.term printer
   end
@@ -78,9 +78,9 @@ class type term_selection =
   end
 
 class plang :
-    terms:#term_marker ->
-    focus:#term_marker ->
-    target:#term_marker ->
+    terms:#term_wraper ->
+    focus:#term_wraper ->
+    target:#term_wraper ->
     autofocus:#term_selection ->
     object
       inherit Pcond.state
@@ -89,5 +89,30 @@ class plang :
     end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Sequent Engine                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+class type part_marker =
+  object
+    method wrap : part printer -> part printer
+    method mark : 'a. part -> 'a printer -> 'a printer
+  end
+
+class type step_selection =
+  object
+    method is_visible : F.term -> bool
+    method is_visible_step : step -> bool
+  end
+
+class pcond :
+    parts:#part_marker ->
+    target:#part_marker ->
+    autofocus:#step_selection ->
+    plang:#Pcond.state ->
+  object
+    inherit Pcond.seqengine
+    method visible : step -> bool
+    method set_target : part -> unit
+  end
 
 (* -------------------------------------------------------------------------- *)

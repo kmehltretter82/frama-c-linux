@@ -29,122 +29,6 @@ module Imap = Qed.Intmap
 type 'a printer = Format.formatter -> 'a -> unit
 
 (* -------------------------------------------------------------------------- *)
-(* --- Sequent Engine                                                     --- *)
-(* -------------------------------------------------------------------------- *)
-
-class type step_selection =
-  object
-    method is_visible : term -> bool
-    method is_visible_step : step -> bool
-  end
-
-class pcond
-    ~(part : part Wtext.marker)
-    ~(target : part Wtext.marker)
-    (focus : step_selection)
-    (plang : Pcond.state) =
-  object(self)
-    inherit Pcond.seqengine plang as super
-
-    (* All displayed entries *)
-    val mutable domain = Vars.empty
-    val mutable ellipsed = false
-    val mutable parts : part Wtext.entry list = []
-    val mutable tgt : part = Term (* empty *)
-
-    (* Register displayed entries *)
-    initializer part#on_add (fun entry -> parts <- entry :: parts)
-
-    method set_target p = tgt <- p
-
-    method part p q =
-      try
-        let (_,_,part) =
-          List.find
-            (fun (a,b,_) -> a <= p && q <= b)
-            (List.rev parts)
-        in part (* find the tightest step, which was added first *)
-      with Not_found -> Term
-
-    (* Step Visibility Management *)
-
-    method visible step =
-      focus#is_visible_step step ||
-      match tgt with
-      | Term | Goal -> false
-      | Step s -> s.id = step.id
-
-    method private domain seq =
-      Conditions.iter
-        (fun step ->
-           if self#visible step && not (Vars.subset step.vars domain)
-           then
-             begin
-               match step.condition with
-               | State _ -> ()
-               | Have p | Init p | Core p | When p | Type p ->
-                 domain <- Vars.union (F.varsp p) domain
-               | Branch(p,a,b) ->
-                 domain <- Vars.union (F.varsp p) domain ;
-                 self#domain a ; self#domain b
-               | Either cs -> List.iter self#domain cs
-             end
-        ) seq
-
-    (* local-variable marking ; not hover/clickable marks *)
-    method! mark (m : F.marks) s = if self#visible s then super#mark m s
-
-    method! pp_step fmt step =
-      if self#visible step then
-        begin
-          ellipsed <- false ;
-          match tgt with
-          | Step { condition = State _ } -> super#pp_step fmt step
-          | Step s when s == step ->
-            target#mark (Step step) super#pp_step fmt step
-          | _ ->
-            part#mark (Step step) super#pp_step fmt step
-        end
-      else
-        ( if not ellipsed then Format.fprintf fmt "@ [...]" ; ellipsed <- true )
-
-    method! pp_goal fmt goal =
-      match tgt with
-      | Goal ->
-        target#mark Goal super#pp_goal fmt goal
-      | _ ->
-        part#mark Goal super#pp_goal fmt goal
-
-    method! pp_block ~clause fmt seq =
-      try
-        Conditions.iter
-          (fun step ->
-             if self#visible step then
-               raise Exit)
-          seq ;
-        Format.fprintf fmt "@ %a { ... }" self#pp_clause clause
-      with Exit ->
-        begin
-          ellipsed <- false ;
-          super#pp_block ~clause fmt seq ;
-          ellipsed <- false ;
-        end
-
-    (* Global Call *)
-
-    method! set_sequence hyps =
-      parts <- [] ;
-      domain <- Vars.empty ;
-      super#set_sequence hyps ;
-      if self#get_state then
-        begin
-          self#domain hyps ;
-          plang#set_domain domain ;
-        end
-
-  end
-
-(* -------------------------------------------------------------------------- *)
 (* --- Printer                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -158,10 +42,8 @@ class focused (wtext : Wtext.text) =
   let target : term Wtext.marker = wtext#marker in
   let target_part : part Wtext.marker = wtext#marker in
   let autofocus = new autofocus in
-  let step_selection = (autofocus :> step_selection) in
   let plang = new plang ~terms ~focus ~target ~autofocus in
-  let pcond = new pcond ~part:parts ~target:target_part
-    step_selection (plang :> Pcond.state) in
+  let pcond = new pcond ~parts ~target:target_part ~autofocus ~plang in
   let popup = new Widget.popup () in
   object(self)
     val mutable demon = []
@@ -170,6 +52,7 @@ class focused (wtext : Wtext.text) =
     val mutable selected_term = None
     val mutable selected_part = Term
     val mutable targeted = []
+    val mutable allparts : part Wtext.entry list = []
 
     initializer
       begin
@@ -201,6 +84,8 @@ class focused (wtext : Wtext.text) =
         target#on_right_click self#on_popup_term ;
         target_part#on_add (fun (p,q,_) -> self#added_zone p q) ;
         target#on_add (fun (p,q,_) -> self#added_zone p q) ;
+        parts#on_add (fun entry -> allparts <- entry :: allparts)
+
       end
 
     method reset =
@@ -209,12 +94,21 @@ class focused (wtext : Wtext.text) =
       targeted <- [] ;
       autofocus#reset
 
+    method private part p q =
+      try
+        let (_,_,part) =
+          List.find
+            (fun (a,b,_) -> a <= p && q <= b)
+            (List.rev allparts)
+        in part (* find the tightest step, which was added first *)
+      with Not_found -> Term
+
     method private added_zone p q = targeted <- (p,q) :: targeted
     method private target_zone =
       try
         List.find
           (fun (p,q) ->
-             match selected_part , pcond#part p q with
+             match selected_part , self#part p q with
              | Goal , Goal -> true
              | Step s , Step s' -> s.id = s'.id
              | _ -> false
@@ -353,7 +247,7 @@ class focused (wtext : Wtext.text) =
       if F.lc_closed e then (* defensive *)
         begin
           selected_term <- Some e ;
-          selected_part <- pcond#part p q ;
+          selected_part <- self#part p q ;
           autofocus#focus ~extend e ;
           self#selected ;
         end
@@ -362,7 +256,7 @@ class focused (wtext : Wtext.text) =
       if F.lc_closed e then (* defensive *)
         begin
           selected_term <- Some e ;
-          selected_part <- pcond#part p q ;
+          selected_part <- self#part p q ;
           self#selected ;
         end
 
@@ -378,7 +272,7 @@ class focused (wtext : Wtext.text) =
       if F.lc_closed e then (* defensive *)
         begin
           selected_term <- Some e;
-          selected_part <- pcond#part p q ;
+          selected_part <- self#part p q ;
           self#popup ;
         end
 
@@ -402,6 +296,7 @@ class focused (wtext : Wtext.text) =
 
     method pp_sequent s fmt =
       sequent <- s ;
+      allparts <- [] ;
       if autofocus#set_sequent s then
         begin
           selected_term <- None ;
