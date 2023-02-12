@@ -22,20 +22,11 @@
 
 open Evast
 
-(* Comparison helpers *)
+(* Comparison helper *)
 
 let (<?>) c lcmp =
   if c <> 0 then c else Lazy.force lcmp
 
-let compare_origin o1 o2 =
-  match o1, o2 with
-  | Exp e1, Exp e2 -> Int.compare e1.eid e2.eid
-  | Term t1, Term t2 -> Int.compare t1.it_id t2.it_id
-  | Built, Built -> 0
-  | Exp _, _ -> 1
-  | _, Exp _ -> -1
-  | Term _, _ -> 1
-  | _, Term _ -> -1
 
 (* Prototype modules for Evast types *)
 
@@ -103,8 +94,7 @@ struct
 
     let rec compare e1 e2 =
       match e1.node, e2.node with
-      | Const (CStr _), Const (CStr _) | Const (CWStr _), Const (CWStr _) ->
-        compare_origin e1.origin e2.origin
+      | Const (CString b1 ), Const (CString b2) -> Base.compare b1 b2
       | Const c1, Const c2 -> Constant.compare c1 c2
       | Const _, _ -> 1
       | _, Const _ -> -1
@@ -177,26 +167,23 @@ struct
         Integer.compare v1 v2 <?>
         lazy (Extlib.compare_basic k1 k2) <?>
         lazy (Option.compare String.compare s1 s2)
-      | CStr s1, CStr s2 -> String.compare s1 s2
-      | CWStr s1, CWStr s2 ->
-        Transitioning.List.compare Int64.compare s1 s2
+      | CString b1, CString b2 -> Base.compare b1 b2
       | CChr c1, CChr c2 -> Char.compare c1 c2
       | CReal (f1, k1, s1), CReal (f2, k2, s2) ->
         Float.compare f1 f2 <?>
         lazy (Extlib.compare_basic k1 k2) <?>
         lazy (Option.compare String.compare s1 s2)
       | CEnum e1, CEnum e2 -> Cil_datatype.Enumitem.compare e1 e2
-      | (CInt64 _, (CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _)) -> 1
-      | (CStr _, (CWStr _ | CChr _ | CReal _ | CEnum _)) -> 1
-      | (CWStr _, (CChr _ | CReal _ | CEnum _)) -> 1
+      | (CInt64 _, (CString _ | CChr _ | CReal _ | CEnum _)) -> 1
+      | (CString _, (CChr _ | CReal _ | CEnum _)) -> 1
       | (CChr _, (CReal _ | CEnum _)) -> 1
       | (CReal _, CEnum _) -> 1
-      | (CStr _ | CWStr _ | CChr _ | CReal _ | CEnum _),
-        (CInt64 _ | CStr _ | CWStr _ | CChr _ | CReal _) -> -1
+      | (CString _ | CChr _ | CReal _ | CEnum _),
+        (CInt64 _ | CString _ | CChr _ | CReal _) -> -1
 
     let hash c =
       match c with
-      | CStr _ | CWStr _ | CChr _ -> Hashtbl.hash (1, c)
+      | CString _ | CChr _ -> Hashtbl.hash (1, c)
       | CReal (fn, fk, _) -> Hashtbl.hash (2, fn, fk)
       | CInt64 (n, k, _) -> Hashtbl.hash (3, n, k )
       | CEnum ei -> Hashtbl.hash (4, ei)

@@ -51,9 +51,8 @@ let translate_binop = function
   | Cil_types.LOr -> LOr
 
 let translate_constant = function
+  | Cil_types.CStr _ | Cil_types.CWStr _ -> assert false (* Handled at higher level by translate_expr *)
   | Cil_types.CInt64 (cst, ikind, str) -> CInt64 (cst, ikind, str)
-  | Cil_types.CStr str -> CStr str
-  | Cil_types.CWStr wstr -> CWStr wstr
   | Cil_types.CChr chr -> CChr chr
   | Cil_types.CReal (float, fkind, str) -> CReal (float, fkind, str)
   | Cil_types.CEnum enum -> CEnum enum
@@ -61,6 +60,8 @@ let translate_constant = function
 
 let rec translate_expr e =
   let node = match e.Cil_types.enode with
+    | Cil_types.Const (Cil_types.CStr _ | Cil_types.CWStr _) ->
+      Const (CString (Base.of_string_exp e))
     | Cil_types.Const cst -> Const (translate_constant cst)
     | Cil_types.Lval lval -> Lval (translate_lval lval)
     | Cil_types.SizeOf typ -> SizeOf typ

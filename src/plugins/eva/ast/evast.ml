@@ -48,8 +48,7 @@ and exp_node =
 (** Literal constants *)
 and constant =
   | CInt64 of Integer.t * ikind * string option
-  | CStr of string
-  | CWStr of int64 list
+  | CString of Base.t (* Base must be String *)
   | CChr of char
   | CReal of float * fkind * string option
   | CEnum of enumitem

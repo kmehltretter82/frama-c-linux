@@ -40,22 +40,17 @@ let rec type_of_offset (basetyp : typ) : offset -> typ = function
     in
     type_of_offset (Cil.typeAddAttributes base_attrs fi.ftype) o
 
-let rec type_of_lval (host, offset) =
+let rec type_of_lval (host, offset : lval) : typ =
   let basetyp = match host with
     | Var vi -> vi.vtype
     | Mem addr -> Cil.typeOf_pointed (type_of_exp addr)
   in
   type_of_offset basetyp offset
 
-and type_of_exp (exp : exp) =
+and type_of_exp (exp : exp) : typ =
   match exp.node with (* TODO: rely more on Cil by storing the Frama-C infered type on Evast const nodes ? *)
-  | Const (CInt64 (_, ik, _)) -> Cil_types.TInt (ik, [])
-  | Const (CChr _) -> Cil.intType
-  | Const (CStr _s) -> Cil.theMachine.stringLiteralType
-  | Const (CWStr _s) -> TPtr (Cil.theMachine.wcharType, [])
-  | Const (CReal (_, fk, _)) -> TFloat (fk, [])
-  | Const (CEnum {eival=e}) -> Cil.typeOf e
-  | Lval (lv) -> Cil.type_remove_qualifier_attributes (type_of_lval lv)
+  | Const c -> type_of_const c
+  | Lval lv -> Cil.type_remove_qualifier_attributes (type_of_lval lv)
   | SizeOf _ | SizeOfE _ | SizeOfStr _ -> Cil.theMachine.typeOfSizeOf
   | AlignOf _ | AlignOfE _ -> Cil.theMachine.typeOfSizeOf
   | UnOp (_, _, t) -> t
@@ -66,6 +61,15 @@ and type_of_exp (exp : exp) =
     match Cil.unrollType (type_of_lval lv) with
     | TArray (t,_,attrs) -> TPtr(t, attrs)
     | _ ->  assert false
+
+and type_of_const : constant -> typ = function
+  | CInt64 (_, ik, _) -> Cil_types.TInt (ik, [])
+  | CChr _ -> Cil.intType
+  | CString (String (_, Base.CSString _)) -> Cil.theMachine.stringLiteralType
+  | CString (String (_, Base.CSWstring _)) -> TPtr (Cil.theMachine.wcharType, [])
+  | CString (_) -> assert false (* it must be a String base*)
+  | CReal (_, fk, _) -> TFloat (fk, [])
+  | CEnum {eival=e} -> Cil.typeOf e
 
 
 (* --- Origins --- *)

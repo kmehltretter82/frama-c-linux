@@ -43,6 +43,9 @@ struct
     | Const _ -> 0
 end
 
+let pp_string fmt s =
+  Format.fprintf fmt "\"%s\"" (Escape.escape_string s)
+
 let rec pp_lval fmt lval =
   let precedence = Precedence.lval_level lval in
   match lval with
@@ -89,7 +92,7 @@ and pp_exp fmt exp =
   | SizeOfE e ->
     Format.fprintf fmt "sizeof(%a)" pp_exp e
   | SizeOfStr s ->
-    Format.fprintf fmt "sizeof(%a)" pp_constant (CStr s)
+    Format.fprintf fmt "sizeof(%a)" pp_string s
   | AlignOf t ->
     Format.fprintf fmt "__alignof__(%a)" Printer.pp_typ t
   | AlignOfE e ->
@@ -104,6 +107,7 @@ and pp_exp' ~precedence fmt exp =
     Format.fprintf fmt "(%a)" pp_exp exp
   else
     pp_exp fmt exp
+
 and pp_unop fmt u =
   let s = match u with
     | Neg -> "-"
@@ -136,19 +140,17 @@ and pp_binop fmt b =
   Format.fprintf fmt "%s" s
 
 and pp_constant fmt = function
-  | CInt64(_, _, Some s) ->
+  | CInt64 (_, _, Some s) ->
     Format.fprintf fmt "%s" s
   | CInt64 (i, _, _) ->
     Integer.pretty fmt i
-  | CStr(s) ->
-    Format.fprintf fmt "\"%s\"" (Escape.escape_string s)
-  | CWStr(s) ->
-    Format.fprintf fmt "L\"%s\"" (Escape.escape_wstring s)
-  | CChr(c) ->
+  | CString base ->
+    Base.pretty fmt base
+  | CChr c ->
     Format.fprintf fmt "'%s'" (Escape.escape_char c)
-  | CReal(_, _, Some s) ->
+  | CReal (_, _, Some s) ->
     Format.fprintf fmt "%s" s
-  | CReal(f, _, None) ->
+  | CReal (f, _, None) ->
     Floating_point.pretty fmt f
   | CEnum { einame } ->
     Format.fprintf fmt "%s" einame
