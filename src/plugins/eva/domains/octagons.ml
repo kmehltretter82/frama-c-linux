@@ -56,9 +56,9 @@ let typ_kind typ =
   | TFloat _ -> Float
   | _ -> assert false
 
-type dependencies = {
-  direct: Base.Hptset.t;
-  indirect: Base.Hptset.t;
+type dependencies = Eva_utils.deps = {
+  data: Locations.Zone.t;
+  indirect: Locations.Zone.t;
 }
 
 (* Abstract interface for the variables used by the octagons. *)
@@ -145,11 +145,11 @@ module Variable : Variable = struct
   let deps = function
     | Var vi | Int vi ->
       {
-        direct = Base.Hptset.singleton (Base.of_varinfo vi);
-        indirect = Base.Hptset.empty;
+        data = Locations.zone_of_varinfo vi;
+        indirect = Locations.Zone.bottom;
       }
     | StartOf _ ->
-      { direct = Base.Hptset.empty ; indirect = Base.Hptset.empty }
+      { data = Locations.Zone.bottom ; indirect = Locations.Zone.bottom }
     | Lval {lval_deps} ->
       lval_deps
 end
@@ -867,11 +867,31 @@ module Deps = struct
     in
     join ~cache ~symmetric ~idempotent ~decide
 
-  let get b m =
-    try
-      let direct, indirect = find b m in
-      Variable.Set.(union direct indirect |> elements)
-    with Not_found -> []
+  let find b m =
+    try find b m
+    with Not_found -> VSet.empty, VSet.empty
+
+  let find_list b m =
+    let direct, indirect = find b m in
+    VSet.union direct indirect |> VSet.elements
+
+  let get zone m =
+    let filter ~direct zone v =
+      let deps = Variable.deps v in
+      let v_zone = if direct then deps.data else deps.indirect in
+      Locations.Zone.intersects v_zone zone
+    in
+    let get_at_base b intervals (data_acc, indirect_acc) =
+      let data, indirect = find b m in
+      let zone = Locations.Zone.inject b intervals in
+      VSet.union data_acc (VSet.filter (filter ~direct:true zone) data),
+      VSet.union indirect_acc (VSet.filter (filter ~direct:false zone) indirect)
+    in
+    Locations.Zone.fold_topset_ok get_at_base zone (VSet.empty, VSet.empty)
+
+  let get_list zone m =
+    let direct, indirect = get zone m in
+    VSet.union direct indirect |> VSet.elements
 
   let add_direct v =
     replace (function
@@ -883,10 +903,15 @@ module Deps = struct
         | None -> Some (VSet.empty, VSet.singleton v)
         | Some (direct, indirect) -> Some (direct, VSet.add v indirect))
 
+  let to_bases deps =
+    let { data ; indirect } = deps in
+    Base.SetLattice.project (Locations.Zone.get_bases data),
+    Base.SetLattice.project (Locations.Zone.get_bases indirect)
+
   let add_variable m v =
-    let { direct ; indirect } = Variable.deps v in
+    let data, indirect = to_bases (Variable.deps v) in
     m |>
-    Base.Hptset.fold (add_direct v) direct |>
+    Base.Hptset.fold (add_direct v) data |>
     Base.Hptset.fold (add_indirect v) indirect
 
   let add_variables m variables =
@@ -1021,46 +1046,6 @@ module State = struct
       in
       Ival.(add_int (scale (Integer.of_int elem_size) index) sub_coeff)
 
-  (* TODO: move out of OCtagons (to Cvalue ?) *)
-  let evaluate_deps evaluate lval =
-    let open Top.Operators in
-    let rec lval_bases (host,offset) =
-      let* { direct ; indirect } = host_bases host in
-      let+ indirect = add_offset_bases offset indirect in
-      { direct ; indirect }
-    and host_bases host =
-      match host with
-      | Cil_types.Var vi ->
-        let direct = Base.Hptset.singleton (Base.of_varinfo vi)
-        and indirect = Base.Hptset.empty in
-        `Value { direct ; indirect }
-      | Mem e ->
-        let* value = evaluate e in
-        let direct = Cvalue.V.get_bases value |> Base.SetLattice.project in
-        let+ indirect = add_exp_bases e Base.Hptset.empty in
-        { direct ; indirect }
-    and add_exp_bases exp acc =
-      match exp.enode with
-      | StartOf lv | AddrOf lv
-      | Lval lv ->
-        let+ { direct ; indirect } = lval_bases lv in
-        acc |> Base.Hptset.union direct |> Base.Hptset.union indirect
-      | UnOp (_, e, _) | CastE (_, e) ->
-        acc |> add_exp_bases e
-      | BinOp (_, e1, e2, _) ->
-        acc |> add_exp_bases e1 >>- add_exp_bases e2
-      | Const _ | SizeOf _ | AlignOf _ | SizeOfStr _ | SizeOfE _ | AlignOfE _ ->
-        `Value acc
-    and add_offset_bases offset acc =
-      match offset with
-      | NoOffset -> `Value acc
-      | Field (_,sub) ->
-        acc |> add_offset_bases sub
-      | Index (e,sub) ->
-        acc |> add_exp_bases e >>- add_offset_bases sub
-    in
-    lval_bases lval
-
   let mk_variable_builder evaluate (_: t) =
     let (let*) x f = Option.bind (Top.to_option x) f in
     (* Is the interval computed for a variable a singleton? *)
@@ -1076,7 +1061,18 @@ module State = struct
         Some (Variable.make vi, Ival.zero)
 
       | Lval lval ->
-        let* lval_deps = evaluate_deps evaluate lval in
+        let find_loc lval =
+          match evaluate (Eva_utils.lval_to_exp lval) with
+          | `Top -> Precise_locs.loc_top
+          | `Value v ->
+            let bits = Locations.loc_bytes_to_loc_bits v in
+            let bits = Precise_locs.inject_location_bits bits in
+            let typ = Cil.typeOfLval lval in
+            let size = Cil.bitsSizeOf typ in
+            let size = Int_Base.inject (Integer.of_int size) in
+            Precise_locs.make_precise_loc bits ~size
+        in
+        let lval_deps = Eva_utils.deps_of_lval find_loc lval in
         Some (Variable.make_lval ~lval_deps lval, Ival.zero)
 
       | CastE (typ, { enode = Lval (Var vi, NoOffset) })
@@ -1428,7 +1424,7 @@ module Domain = struct
 
 
   let kill_base base state =
-    let vars = Deps.get base state.deps in
+    let vars = Deps.find_list base state.deps in
     let state = { state with deps = Deps.remove base state.deps } in
     List.fold_left State.remove state vars
 
@@ -1437,7 +1433,8 @@ module Domain = struct
     then top
     else
       let modified = Locations.Zone.join state.modified zone in
-      let state = Zone.fold_bases kill_base zone state in
+      let vars = Deps.get_list zone state.deps in
+      let state = List.fold_left State.remove state vars in
       { state with modified }
 
   (* Evaluation function of expressions to ival, from a [valuation]. *)
@@ -1514,7 +1511,7 @@ module Domain = struct
     let variable = Variable.make varinfo in
     let base = Base.of_varinfo varinfo in
     (* Remove lvals refering to the variable *)
-    let vars = Deps.get base state.deps in
+    let vars = Deps.find_list base state.deps in
     let vars = List.filter (Fun.negate (Variable.equal variable)) vars in
     let state = List.fold_left State.remove state vars in
     (* Interpret inversible assignment if possible *)
@@ -1560,7 +1557,7 @@ module Domain = struct
 
   let start_recursive_call recursion state =
     let vars = List.map fst recursion.substitution @ recursion.withdrawal in
-    let var_deps v = Deps.get (Base.of_varinfo v) state.deps in
+    let var_deps v = Deps.find_list (Base.of_varinfo v) state.deps in
     let vars = List.flatten (List.map var_deps vars) in
     List.fold_left State.remove state vars
 
@@ -1599,8 +1596,8 @@ module Domain = struct
 
   let enter_scope _kind _varinfos state = state
   let leave_scope _kf varinfos state =
-    let var_deps v = Deps.get (Base.of_varinfo v) state.deps in
-    let vars = List.flatten (List.map var_deps varinfos) in
+    let var_deps v = Deps.find_list (Base.of_varinfo v) state.deps in
+    let vars = List.concat_map var_deps varinfos in
     let state = List.fold_left State.remove state vars in
     check "leave_scope" state
 
@@ -1615,12 +1612,13 @@ module Domain = struct
         let related = Relations.find var state.relations in
         Variable.Set.to_seq related |>
         Seq.map Variable.deps |>
-        Seq.map (fun deps -> Base.Hptset.union deps.direct deps.indirect) |>
+        Seq.map Deps.to_bases |>
+        Seq.map (fun (data, indirect) -> Base.Hptset.union data indirect) |>
         Seq.fold_left Base.Hptset.union acc
       in
       let aux base acc =
         try
-          let variables = Deps.get base state.deps in
+          let variables = Deps.find_list base state.deps in
           List.fold_left add_related_bases acc variables
         with Base.Not_a_C_variable | Not_found -> acc
       in
@@ -1632,8 +1630,8 @@ module Domain = struct
     then state
     else
       let mem_var var =
-        let var_deps = Variable.deps var in
-        let var_bases = Base.Hptset.union var_deps.direct var_deps.indirect in
+        let data, indirect = Deps.to_bases (Variable.deps var) in
+        let var_bases = Base.Hptset.union data indirect in
         Base.Hptset.intersects var_bases bases
       in
       let mem_pair pair =

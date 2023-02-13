@@ -122,6 +122,10 @@ val deps_of_expr:
 (** Given a function computing the location of lvalues, computes the memory
     dependencies of an expression. *)
 
+val deps_of_lval: (lval -> Precise_locs.precise_location) -> lval -> deps
+(** Given a function computing the location of lvalues, computes the memory
+    dependencies of an lvalue. *)
+
 (** Computes the height of an expression, that is the maximum number of nested
     operations in this expression. *)
 val height_expr: exp -> int
