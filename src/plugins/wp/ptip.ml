@@ -283,7 +283,7 @@ class autofocus =
 (* --- Term Engine                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-class type term_wraper =
+class type term_wrapper =
   object
     method wrap : term printer -> term printer
   end
@@ -296,9 +296,9 @@ class type term_selection =
   end
 
 class plang
-    ~(terms : #term_wraper)
-    ~(focus : #term_wraper)
-    ~(target : #term_wraper)
+    ~(terms : #term_wrapper)
+    ~(focus : #term_wrapper)
+    ~(target : #term_wrapper)
     ~(autofocus : #term_selection)
   =
   object(self)
