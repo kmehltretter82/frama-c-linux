@@ -61,13 +61,6 @@ type dependencies = {
   indirect: Base.Hptset.t;
 }
 
-module LvalIdTable = Cil_datatype.LvalStructEq.Hashtbl (* TODO: projectify *)
-let get_lval_id =
-  let table = LvalIdTable.create 127 in
-  let last_id = ref 0 in
-  fun lval ->
-    LvalIdTable.memo table lval (fun _ -> incr last_id; !last_id)
-
 (* Abstract interface for the variables used by the octagons. *)
 module type Variable = sig
   include Datatype.S_with_collections
@@ -86,17 +79,19 @@ end
 (* Variables of the octagons. Should be extended later to also include
    symbolic lvalues. *)
 module Variable : Variable = struct
+  module HCE = Hcexprs.HCE
+
   type var =
     | Var of varinfo
     | Int of varinfo
     | StartOf of varinfo
-    | Lval of { lval: lval ; lval_deps: dependencies ; lval_id: int }
+    | Lval of { lval: HCE.t ; lval_deps: dependencies }
 
   let id = function
     | Var vi -> 4 * vi.vid
     | Int vi -> 4 * vi.vid + 1
     | StartOf vi -> 4 * vi.vid + 2
-    | Lval {lval_id} -> 4 * lval_id + 3
+    | Lval {lval} -> 4 * HCE.id lval + 3
 
   module Datatype_Input = struct
     include Datatype.Undefined
@@ -110,7 +105,7 @@ module Variable : Variable = struct
       | Var x, Var y
       | Int x, Int y -> Cil_datatype.Varinfo.compare x y
       | StartOf x, StartOf y -> Cil_datatype.Varinfo.compare x y
-      | Lval x, Lval y -> x.lval_id - y.lval_id
+      | Lval {lval=x}, Lval {lval=y} -> HCE.compare x y
       | Var _, _ -> -1
       |  _, Var _ -> 1
       | Int _, _ -> -1
@@ -126,7 +121,7 @@ module Variable : Variable = struct
     let pretty fmt = function
       | Var vi | StartOf vi -> Printer.pp_varinfo fmt vi
       | Int vi -> Format.fprintf fmt "(integer)%a" Printer.pp_varinfo vi
-      | Lval lv -> Printer.pp_lval fmt lv.lval
+      | Lval {lval} -> HCE.pretty fmt lval
 
   end
 
@@ -135,16 +130,16 @@ module Variable : Variable = struct
   let make_int vi = Int vi
   let make_startof vi = StartOf vi
   let make_lval ~lval_deps lval =
-    Lval { lval ; lval_deps ; lval_id=get_lval_id lval }
+    Lval { lval=HCE.of_lval lval ; lval_deps }
 
   let kind = function
     | Var vi -> typ_kind vi.vtype
     | Int _ | StartOf _ -> Integer
-    | Lval lv -> typ_kind (Cil.typeOfLval lv.lval)
+    | Lval {lval} -> typ_kind (HCE.type_of lval)
 
   let lval = function
     | Var vi -> Some (Cil_types.Var vi, NoOffset)
-    | Lval lv -> Some lv.lval
+    | Lval {lval} -> HCE.to_lval lval
     | Int _ | StartOf _ -> None
 
   let deps = function

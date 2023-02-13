@@ -55,7 +55,7 @@ module HCE: sig
   val to_exp: t -> exp
   val to_lval: t -> lval option
   val is_lval: t -> bool
-
+  val type_of: t -> typ
 
   (** Replaces all occurrences of the lvalue [late] by the expression [heir].
       @raise NonExchangeable if the replacement is not feasible. *)
