@@ -30,6 +30,7 @@ standards cited here, or of different ones. This reference is provided on a
 best-effort basis.
 
 \section{Unsupported C99 and C11 Features}
+\label{sec:unsupported-iso-c-features}
 
 The table below lists features of the C99 standard (ISO/IEC 9899:1999) which
 are currently unsupported by \FramaC. Please contact the \FramaC team if you
@@ -108,6 +109,11 @@ cases, we simply refer to the related section in the ISO C standard.
   \endhead
   \endfoot
   \label{tab:undefined-unspecified-behaviors}%
+  \texttt{-eva-initialization-padding-globals} & Controls UnsB related to {\em DD.10} for the initialization status of padding in global variables. \\
+  \texttt{-eva-warn-pointer-subtraction} & Toggles warnings related to UB {\em CC.48}. \\
+  \texttt{-eva-warn-undefined-pointer-comparison} & Toggles warnings related to pointer comparisons (related to UB {\em CC.53}). \\
+  \texttt{-initialized-padding-locals} & Toggles UnsB related to {\em DD.10} for local variables. \\
+  \texttt{-unspecified-access} & Enables reporting of some instances of UB {\em CC.35}. \\
   \texttt{-warn-invalid-bool} & Toggles reporting of UB {\em CC.12} when applied to values of type \texttt{\_Bool}. \\
   \texttt{-warn-invalid-pointer} & Toggles reporting of UBs {\em CC.46} and {\em CC.62}. \\
   \texttt{-warn-left-shift-negative} & Toggles reporting of UB {\em CC.52}. \\
@@ -117,10 +123,6 @@ cases, we simply refer to the related section in the ISO C standard.
   \texttt{-warn-signed-overflow} & Toggles reporting of UB {\em CC.36} for operations on signed types (except when converting from a wider to a narrower type). \\
   \texttt{-warn-unsigned-downcast} & Toggles reporting of UB {\em CC.36} for unsigned types, when converting from a wider to a narrower type. \\
   \texttt{-warn-unsigned-overflow} & Toggles reporting of a situation similar to UB {\em CC.36}, for operations on {\em unsigned} types, even though they are allowed by C11. \\
-  \texttt{-initialized-padding-locals} & Toggles UnsB related to {\em DD.10} for local variables. \\
-  \texttt{-eva-initialization-padding-globals} & Controls UnsB related to {\em DD.10} for the initialization status of padding in global variables. \\
-  \texttt{-eva-warn-pointer-subtraction} & Toggles warnings related to UB {\em CC.48}. \\
-  \texttt{-eva-warn-undefined-pointer-comparison} & Toggles warnings related to pointer comparisons (related to UB {\em CC.53}). \\
 \end{longtable}
 
 % disable the hyphenation ugly hack
