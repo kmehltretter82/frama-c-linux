@@ -739,8 +739,14 @@ struct
   let lookup () = STATE.get ()
   let clear () = Hashtbl.clear (lookup())
 
-  let get = A.id
   let find id = Hashtbl.find (lookup()) id
+
+  let get x =
+    let tag = A.id x in
+    let hash = lookup () in
+    if not (Hashtbl.mem hash tag) then
+      Hashtbl.add hash tag x ;
+    tag
 
   include
     (struct
