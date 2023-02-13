@@ -215,8 +215,6 @@ export enum alarms {
   is_nan = 'is_nan',
   /** Pointer to a function with non-compatible type */
   function_pointer = 'function_pointer',
-  /** Uninitialized memory read of union */
-  initialization_of_union = 'initialization_of_union',
   /** Trap representation of a _Bool lvalue */
   bool_value = 'bool_value',
 }

@@ -63,12 +63,11 @@ type alarm =
   | Is_nan_or_infinite of exp * fkind
   | Is_nan of exp * fkind
   | Function_pointer of exp * exp list option
-  | Uninitialized_union of lval list
   | Invalid_bool of lval
 
 (* If you add one constructor to this type, make sure to add a dummy value
    in the 'reprs' value below, and increase 'nb_alarms' *)
-let nb_alarm_constructors = 18
+let nb_alarm_constructors = 17
 
 module D =
   Datatype.Make_with_collections
@@ -96,7 +95,6 @@ module D =
           Is_nan_or_infinite (e, FFloat);
           Is_nan (e, FFloat);
           Function_pointer (e, None);
-          Uninitialized_union [ lv ];
           Invalid_bool lv;
         ]
 
@@ -117,8 +115,7 @@ module D =
         | Differing_blocks _ -> 13
         | Dangling _ -> 14
         | Function_pointer _ -> 15
-        | Uninitialized_union _ -> 16
-        | Invalid_bool _ -> 17
+        | Invalid_bool _ -> 16
 
       let () = (* Lightweight checks *)
         for i = 0 to nb_alarm_constructors - 1 do
@@ -170,17 +167,6 @@ module D =
           let n = Lval.compare lv11 lv21 in
           if n = 0 then Lval.compare lv12 lv22 else n
         | Uninitialized lv1, Uninitialized lv2 -> Lval.compare lv1 lv2
-        | Uninitialized_union llv1, Uninitialized_union llv2 ->
-          let len1 = List.length llv1 in
-          let len2 = List.length llv2 in
-          begin
-            match compare len1 len2 with
-            | 0 -> List.fold_left2 (fun acc lv1 lv2 ->
-                if acc <> 0 then acc
-                else Lval.compare lv1 lv2
-              ) 0 llv1 llv2
-            | _ -> assert false
-          end
         | Dangling lv1, Dangling lv2 -> Lval.compare lv1 lv2
         | Differing_blocks (e11, e12), Differing_blocks (e21, e22) ->
           let n = Exp.compare e11 e21 in
@@ -196,7 +182,7 @@ module D =
               Overflow _ | Not_separated _ | Overlap _ | Uninitialized _ |
               Dangling _ | Is_nan_or_infinite _ | Is_nan _ | Float_to_int _ |
               Differing_blocks _ | Function_pointer _ |
-              Uninitialized_union _  | Invalid_bool _)
+              Invalid_bool _)
           ->
           let n = nb a1 - nb a2 in
           assert (n <> 0);
@@ -234,8 +220,6 @@ module D =
         | Uninitialized lv -> Hashtbl.hash (nb a, Lval.hash lv)
         | Dangling lv -> Hashtbl.hash (nb a, Lval.hash lv)
         | Function_pointer (e, _) -> Hashtbl.hash (nb a, Exp.hash e)
-        | Uninitialized_union llv ->
-          Hashtbl.hash (nb a, List.map Lval.hash llv)
         | Invalid_bool lv -> Hashtbl.hash (nb a, Lval.hash lv)
 
       let structural_descr = Structural_descr.t_abstract
@@ -300,10 +284,6 @@ module D =
           Format.fprintf fmt "Unspecified(@[%a@])" Lval.pretty lv
         | Function_pointer (e, _) ->
           Format.fprintf fmt "Function_pointer(@[%a@])" Exp.pretty e
-        | Uninitialized_union llv ->
-          Format.fprintf fmt "Uninitialized_union(@[[%a]@])"
-            (Format.pp_print_list ~pp_sep:(fun fmt () -> Format.fprintf fmt "; ") Lval.pretty)
-            llv
         | Invalid_bool lv ->
           Format.fprintf fmt "Invalid_bool(@[%a@])" Lval.pretty lv
 
@@ -412,7 +392,6 @@ let get_name = function
   | Is_nan _ -> "is_nan"
   | Float_to_int _ -> "float_to_int"
   | Function_pointer _ -> "function_pointer"
-  | Uninitialized_union _ -> "initialization_of_union"
   | Invalid_bool _ -> "bool_value"
 
 let get_short_name = function
@@ -436,7 +415,6 @@ let get_description = function
   | Is_nan _ -> "NaN floating-point value"
   | Float_to_int _ -> "Overflow in float to int conversion"
   | Function_pointer _ -> "Pointer to a function with non-compatible type"
-  | Uninitialized_union _ -> "Uninitialized memory read of union"
   | Invalid_bool _ -> "Trap representation of a _Bool lvalue"
 
 
@@ -655,19 +633,6 @@ let create_predicate ?(loc=Location.unknown) alarm =
       in
       let t = Logic_utils.expr_to_term e in
       Logic_const.(pvalid_function ~loc t)
-
-    | Uninitialized_union llv ->
-      (* \initialized(lv_1) || ... || \initialized(lv_n) *)
-      let make_lval_predicate lv =
-        let e = Cil.mkAddrOrStartOf ~loc lv in
-        let t = Logic_utils.expr_to_term e in
-        Logic_const.pinitialized ~loc (Logic_const.here_label, t)
-      in
-      List.fold_left (fun acc lv ->
-          Logic_const.por ~loc (acc, make_lval_predicate lv)
-        )
-        (make_lval_predicate (List.hd llv))
-        (List.tl llv)
 
     | Invalid_bool lv ->
       let e = Cil.new_exp ~loc (Lval lv) in

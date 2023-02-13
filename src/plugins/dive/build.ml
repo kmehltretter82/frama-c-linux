@@ -76,7 +76,7 @@ struct
       in_exp e1 @ in_exp e2
     | Memory_access (lval, _) -> in_lval lval
     | Not_separated _ | Overlap _
-    | Uninitialized _ | Dangling _ | Uninitialized_union _ -> []
+    | Uninitialized _ | Dangling _ -> []
     | Invalid_bool lv -> [lv]
 end
 
