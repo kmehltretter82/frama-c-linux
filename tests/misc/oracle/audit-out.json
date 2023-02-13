@@ -67,7 +67,7 @@
         "typing:int-conversion", "typing:no-proto"
       ],
       "disabled": [
-        "CERT:EXP:10", "acsl-float-compare", "file:not-found",
+        "CERT:EXP:10", "acsl-float-compare", "c11", "file:not-found",
         "ghost:already-ghost", "parser:decimal-float", "transient-block"
       ]
     }

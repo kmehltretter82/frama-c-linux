@@ -1,6 +1,4 @@
 [kernel] Parsing anonymous_field.i (no preprocessing)
-[kernel] anonymous_field.i:1: Warning: 
-  unnamed fields are a C11 extension (use -c11 to avoid this warning)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
