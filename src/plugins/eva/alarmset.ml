@@ -366,9 +366,6 @@ let emit_alarm kinstr alarm (status:status) =
   | Alarms.Function_pointer _ ->
     register_alarm  "pointer to function with incompatible type"
 
-  | Alarms.Uninitialized_union _ ->
-    register_alarm "accessing uninitialized union"
-
   | Alarms.Invalid_bool _ ->
     register_alarm "trap representation of a _Bool lvalue"
 
@@ -398,8 +395,6 @@ let height_alarm = let open Eva_utils in function
         | _ -> false
       in
       if trivial then height_expr e else height_expr e + 1
-    | Alarms.Uninitialized_union llv ->
-      List.fold_left max 0 (List.map height_lval llv)
 
 let cmp a1 a2 =
   Datatype.Int.compare (height_alarm (fst a1)) (height_alarm (fst a2))
@@ -456,7 +451,6 @@ let warn_alarm warn_mode = function
   | Alarms.Not_separated _
   | Alarms.Overlap _
   | Alarms.Function_pointer _
-  | Alarms.Uninitialized_union _
   | Alarms.Invalid_bool _
     -> warn_mode.others ()
 

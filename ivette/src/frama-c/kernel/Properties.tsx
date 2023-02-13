@@ -97,7 +97,6 @@ const DEFAULTS: { [key: string]: boolean } = {
   'alarms.special_float': true,
   'alarms.float_to_int': true,
   'alarms.function_pointer': true,
-  'alarms.union_initialization': true,
   'alarms.bool_value': true,
   'eva.priority_only': false,
   'eva.data_tainted_only': false,
@@ -192,8 +191,6 @@ function filterAlarm(alarm: string | undefined): boolean {
       case 'is_nan': return filter('alarms.special_float');
       case 'float_to_int': return filter('alarms.float_to_int');
       case 'function_pointer': return filter('alarms.function_pointer');
-      case 'initialization_of_union':
-        return filter('alarms.union_initialization');
       case 'bool_value': return filter('alarms.bool_value');
       default: return false;
     }
@@ -466,7 +463,6 @@ function PropertyFilter(): JSX.Element {
         <CheckField label="Differing blocks" path="alarms.differing_blocks" />
         <CheckField label="Separations" path="alarms.separation" />
         <CheckField label="Overlaps" path="alarms.overlap" />
-        <CheckField label="Initialization of unions" path="alarms.union_initialization" />
       </Section>
       <Section label="Eva">
         <CheckField
