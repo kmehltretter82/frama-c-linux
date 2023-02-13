@@ -153,24 +153,12 @@ let init_lexicon _ =
          end);
       ("_Noreturn",
        fun loc ->
-         if Kernel.C11.get () then NORETURN loc
-         else begin
-           Kernel.(
-             warning
-               ~wkey:wkey_conditional_feature
-               "_Noreturn is a C11 keyword, use -c11 option to enable it");
-           IDENT "_Noreturn"
-         end);
+         Kernel.(warning ~wkey:wkey_c11 "_Noreturn is a C11 keyword");
+         NORETURN loc);
       ("_Static_assert",
        fun loc ->
-         if Kernel.C11.get () then STATIC_ASSERT loc
-         else begin
-           Kernel.(
-             warning
-               ~wkey:wkey_conditional_feature
-               "_Static_assert is a C11 keyword, use -c11 option to enable it");
-           IDENT "_Static_assert"
-         end);
+         Kernel.(warning ~wkey:wkey_c11 "_Static_assert is a C11 keyword");
+         STATIC_ASSERT loc);
       ("__attribute__", fun loc -> ATTRIBUTE loc);
       ("__attribute", fun loc -> ATTRIBUTE loc);
       ("__blockattribute__", fun _ -> BLOCKATTRIBUTE);
@@ -218,14 +206,8 @@ let init_lexicon _ =
       ("__builtin_offsetof", fun loc -> BUILTIN_OFFSETOF loc);
       ("_Thread_local",
        fun loc ->
-         if Kernel.C11.get () then THREAD_LOCAL loc
-         else begin
-           Kernel.(
-             warning
-               ~wkey:wkey_conditional_feature
-               "_Thread_local is a C11 keyword, use -c11 option to enable it");
-           IDENT "_Thread_local"
-         end);
+         Kernel.(warning ~wkey:wkey_c11 "_Thread_local is a C11 keyword");
+         THREAD_LOCAL loc);
       (* We recognize __thread for GCC machdeps *)
       ("__thread",
        fun loc ->
@@ -266,14 +248,8 @@ let init_lexicon _ =
            "_Complex is currently unsupported by Frama-C.");
       ("_Generic",
        fun loc ->
-         if Kernel.C11.get () then GENERIC loc
-         else begin
-           Kernel.(
-             warning
-               ~wkey:wkey_conditional_feature
-               "_Generic is a C11 keyword, use -c11 option to enable it");
-           IDENT "_Generic"
-         end);
+         Kernel.(warning ~wkey:wkey_c11 "_Generic is a C11 keyword");
+         GENERIC loc);
       ("_Imaginary",
        fun loc ->
          Kernel.fatal ~source:(fst loc)

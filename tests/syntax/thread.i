@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-machdep gcc_x86_32 -c11"
+   STDOPT: +"-machdep gcc_x86_32"
  */
 
 __thread int a;

@@ -214,6 +214,9 @@ let wkey_unnamed_typedef = register_warn_category "parser:unnamed-typedef"
 let wkey_file_not_found = register_warn_category "file:not-found"
 let () = set_warn_status wkey_file_not_found Log.Wfeedback
 
+let wkey_c11 = register_warn_category "c11"
+let () = set_warn_status wkey_c11 Log.Winactive
+
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
 (* ************************************************************************* *)
@@ -1202,9 +1205,16 @@ let () = Parameter_customize.do_not_reset_on_copy ()
 module C11 =
   False(struct
     let option_name = "-c11"
-    let help = "allow C11 constructs (experimental; partial support only)"
+    let help = "[DEPRECATED: Use -kernel-warn-key c11 for warnings about usage \
+                of some C11 constructions.] \
+                This option currently has no effect."
     let module_name = "C11"
   end)
+let () = C11.add_update_hook
+    (fun _old _new -> warning "Option -c11 is deprecated and has no effect. \
+                               (enabled by default). \
+                               Use -kernel-warn-key c11 for warnings about \
+                               usage of some C11 constructions.")
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
