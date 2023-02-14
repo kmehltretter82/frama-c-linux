@@ -112,7 +112,6 @@ module Location = struct
     | Last value -> Value.leaf value
     | hd :: tl -> Value.node (Value.leaf hd) (outline tl)
 
-
   type ('v, 'l) location =
     (module Abstract_location.S with type value = 'v and type location = 'l)
 
@@ -122,38 +121,34 @@ module Location = struct
     val dependencies : value dependencies
   end
 
-  type ('v, 'l) registered =
-    (module Registered with type location = 'l and type value = 'v)
+  type 'l registered = (module Registered with type location = 'l)
 
-  let register : type v l. l key -> (v, l) location -> v dependencies -> (v, l) registered =
-    fun key (module Input) dependencies ->
+  type ('v, 'l) register =
+    { key: 'l key
+    ; location : ('v, 'l) location
+    ; dependencies : 'v dependencies
+    }
+
+  let register : type v l. (v, l) register -> l registered =
+    fun { key ; location ; dependencies } ->
       (module struct
-        include Input
+        include (val location)
         let key = key
         let dependencies = dependencies
       end)
 
   module type Structured = Abstract.Location.Internal
   module type Interactive = Abstract.Location.External
-  type 'v structured = (module Structured with type value = 'v)
+  type structured = (module Structured)
   type interactive = (module Interactive)
 
   module type Abstraction = sig
     type value
-    type location
     module Value : Value.Interactive with type t = value
-    module Location : Structured
-      with type value = value and type location = location
+    module Location : Structured with type value = value
   end
 
-  type ('v, 'l) abstraction =
-    (module Abstraction with type value = 'v and type location = 'l)
-
-  (* let test : type v l. (v, l) registered -> (v, l) abstraction = *)
-
-  
-
-
+  type 'v abstraction = (module Abstraction with type value = 'v)
 
   let leaf : type l. l registered -> l structure = fun (module Registered) ->
     Abstract.Location.Leaf (Registered.key, (module Registered))
@@ -177,19 +172,17 @@ module Location = struct
       end)
     end : Interactive)
 
-  type 'v abstraction = (module Abstraction with type value = 'v)
-
   let add : type v l. l registered -> v abstraction -> v abstraction =
     fun (module Registered) (module Abstraction) ->
       let dependencies = outline Registered.dependencies in
       let dec_eq = Abstract.Value.eq_structure in
-      let structured : v structured =
+      let structured : (module Structured with type value = v) =
         match dec_eq dependencies Abstraction.Value.structure with
         | Some Eq ->
           (module struct
             include Registered
             let structure = leaf (module Registered)
-          end : Structured with type value = v)
+          end)
         | None ->
           let module From = struct
             type value = Registered.value
@@ -198,7 +191,7 @@ module Location = struct
           let module Converter = Value.Converter (From) (Abstraction.Value) in
           (module Location_lift.Make (Registered) (Converter))
       in
-      let location : v structured =
+      let location : (module Structured with type value = v) =
         let open Locations_product in
         let module Val = Abstraction.Value in
         let module Loc = Abstraction.Location in
@@ -220,7 +213,7 @@ module Location = struct
 
     let structure =
       let module Registered = (val From.registered) in
-      let module Location = (val Registered.location) in
+      let module Location = Registered in
       Abstract.Location.Leaf (Registered.key, (module Location))
 
     let rec set : type l. l structure -> l -> extended -> extended = function
@@ -241,142 +234,6 @@ module Location = struct
     let extend l = replace l To.top
     let restrict = get structure
   end
-
-
-  include Abstract.Location
-  type internal = (module Internal)
-  type ('v, 'l) input =
-    (module Abstract_location.Leaf with type value = 'v and type location = 'l)
-
-  module type Registered = sig
-    type values
-    type location
-    val values: values Value.registered
-    val location: (values, location) input
-  end
-
-  type 'l registered = (module Registered with type location = 'l)
-
-  type ('v, 'l) abstraction =
-    { dependencies: 'v Value.registered ; location: ('v, 'l) input }
-
-  let register: type v l. (v, l) abstraction -> l registered =
-    fun abstraction ->
-      let module Location = struct
-        type values = v
-        type location = l
-        let values = abstraction.dependencies
-        let location = abstraction.location
-      end in
-      (module Location)
-
-  let dec_eq : type a b. a structure -> b registered -> (a, b) dec_eq =
-    fun structure (module R) ->
-      let module L = (val R.location) in
-      match structure with
-      | Leaf (key, _) -> eq_type key L.key
-      | _ -> None
-
-  let void_loc () =
-    Self.fatal "Cannot register a location module from a Void structure."
-
-  let open_abstraction (module Loc : Internal) =
-    (module struct
-      include Loc
-      include Structure.Open (Abstract.Location) (struct
-        include Loc
-        type t = location
-      end)
-    end : External)
-
-  let add_leaf : type l. l key -> l data -> internal -> internal =
-    fun key data locs ->
-      let module Locs = (val open_abstraction locs) in
-      if not (Locs.mem key) then
-        (module struct
-          include Locations_product.Make (Locs) (val data)
-          let structure = Node (Locs.structure, Leaf (key, data))
-        end)
-      else locs
-
-  let rec add_structure : type l. l structure -> internal -> internal =
-    fun structure locs ->
-      match structure with
-      | Option (s, _) -> add_structure s locs
-      | Leaf (key, v) -> add_leaf key v locs
-      | Node (s1, s2) -> add_structure s1 locs |> add_structure s2
-      | Unit -> locs
-      | Void -> void_loc ()
-
-  module type Struct = sig type l val s : l registered end
-
-  module Convert (Loc: External) (Struct: Struct) = struct
-    type extended = Loc.location
-
-    let structure =
-      let module Registered = (val Struct.s) in
-      let module L = (val Registered.location) in
-      Leaf (L.key, (module L))
-
-    let replace =
-      let rec set: type l. l structure -> l -> extended -> extended = function
-        | Leaf (key, _) -> Loc.set key
-        | Node (s1, s2) ->
-          let set1 = set s1 and set2 = set s2 in
-          fun (l1, l2) loc -> set1 l1 (set2 l2 loc)
-        | Option (s, default) -> fun l -> set s (Option.value ~default l)
-        | Unit -> fun () loc -> loc
-        | Void -> void_loc ()
-      in
-      set structure
-
-    let extend l = replace l Loc.top
-
-    let restrict =
-      let rec get: type l. l structure -> extended -> l = function
-        | Leaf (key, _) -> Option.get (Loc.get key)
-        | Node (s1, s2) ->
-          let get1 = get s1 and get2 = get s2 in
-          fun l -> get1 l, get2 l
-        | Option (s, _) -> fun l -> Some (get s l)
-        | Unit -> fun _ -> ()
-        | Void -> void_loc ()
-      in
-      get structure
-  end
-
-  module type Acc = sig
-    module Val : Abstract.Value.External
-    module Loc : Abstract.Location.Internal with type value = Val.t
-  end
-
-  let add : type v l. (v, l) abstraction -> (module Acc) -> (module Acc) =
-    fun abstraction (module Acc) ->
-      let module Location = (val abstraction.location) in
-      let location =
-        match Value.dec_eq Acc.Val.structure abstraction.dependencies with
-        | Some Eq ->
-          (module struct
-            include Location
-            let structure = Leaf (Location.key, (module Location))
-          end : Internal with type value = Acc.Val.t)
-        | None ->
-          let module Convert = Value.Convert (Acc.Val) (struct
-            type v = Location.value
-            let s = abstraction.dependencies
-          end) in
-          (module Location_lift.Make (Location) (Convert))
-      in
-      let location =
-        let open Locations_product in
-        match Acc.Loc.structure with
-        | Unit -> location
-        | _ -> (module Same_value (Acc.Val) (val location) (Acc.Loc))
-      in
-      (module struct
-        module Val = Acc.Val
-        module Loc = (val location)
-      end)
 end
 
 
