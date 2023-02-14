@@ -106,32 +106,32 @@ let print_debug fmt (x:t) =
 let print_aliases fmt (x:t) =
   let iter_vmap v set_lv =
     if G.mem_vertex x.graph v then
-      let set_lv =
-        match G.succ x.graph v with
-          [] -> LSet.empty
-        | [_] -> set_lv
-        | _ -> failwith "this should not happen"
-      in
-      let set_pred = ref LSet.empty in
-      G.iter_pred
-        (fun v -> set_pred := LSet.union !set_pred (VMap.find v x.vmap))
-        x.graph
-        v;
-      if LSet.cardinal set_lv + LSet.cardinal !set_pred >= 2
-      then
-        Format.fprintf fmt "{%a%a} are aliased@."
-          (fun fmt s ->
-             LSet.iter
-               (fun lv -> Format.fprintf fmt "%a; " Lval.pretty lv)
-               s
-          )
-          set_lv
-          (fun fmt s ->
-             LSet.iter
-               (fun lv -> Format.fprintf fmt "*%a; " Lval.pretty lv)
-               s
-          )
-          !set_pred
+      match G.succ x.graph v with
+        [] -> ()
+      | [_] ->
+        begin
+          let set_pred = ref LSet.empty in
+          G.iter_pred
+            (fun v -> set_pred := LSet.union !set_pred (VMap.find v x.vmap))
+            x.graph
+            v;
+          if LSet.cardinal set_lv + LSet.cardinal !set_pred >= 2
+          then
+            Format.fprintf fmt "{%a%a} are aliased@."
+              (fun fmt s ->
+                 LSet.iter
+                   (fun lv -> Format.fprintf fmt "%a; " Lval.pretty lv)
+                   s
+              )
+              set_lv
+              (fun fmt s ->
+                 LSet.iter
+                   (fun lv -> Format.fprintf fmt "*%a; " Lval.pretty lv)
+                   s
+              )
+              !set_pred
+        end
+      | _ -> failwith "this should not happen"
   in
   Format.fprintf fmt "@[<hov 2><list of may-alias>@.";
   VMap.iter iter_vmap x.vmap;

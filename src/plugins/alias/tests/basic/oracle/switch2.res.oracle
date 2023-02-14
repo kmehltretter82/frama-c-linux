@@ -12,7 +12,6 @@
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   {a; b; c; d; } are aliased
-  {*a; *b; *c; *d; } are aliased
   <end of list>
 [alias] Functions done
 Before statement int *a = (int *)0; :
@@ -52,7 +51,6 @@ Before statement case 1: a = d; :
 Before statement break; :
  <list of may-alias>
 {a; d; } are aliased
-{*a; *d; } are aliased
 <end of list>
 
 Before statement case 2: b = d; :
@@ -62,7 +60,6 @@ Before statement case 2: b = d; :
 Before statement break; :
  <list of may-alias>
 {b; d; } are aliased
-{*b; *d; } are aliased
 <end of list>
 
 Before statement default: c = d; :
@@ -72,13 +69,11 @@ Before statement default: c = d; :
 Before statement __retres = 0; :
  <list of may-alias>
 {a; b; c; d; } are aliased
-{*a; *b; *c; *d; } are aliased
 <end of list>
 
 Before statement return __retres; :
  <list of may-alias>
 {a; b; c; d; } are aliased
-{*a; *b; *c; *d; } are aliased
 <end of list>
 
 [alias] Analysis complete
