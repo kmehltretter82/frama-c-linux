@@ -5,13 +5,16 @@
 [alias] Skiping break; (doStmt not implemented)
 [alias] May-aliases at the end of function main:
   <list of may-alias>
-  { a; b } are aliased
-  { c; d } are aliased
+  {a; b; } are aliased
+  {*a; *b; } are aliased
+  {c; d; } are aliased
+  {*c; *d; } are aliased
   <end of list>
 [alias] Functions done
 Before statement return __retres; :
  <list of may-alias>
-{ x; y; tmp } are aliased
+{x; y; tmp; } are aliased
+{*x; *y; *tmp; } are aliased
 <end of list>
 
 Before statement int *tmp = x; :
@@ -24,77 +27,92 @@ Before statement while (1) {
                    break;
                  } :
  <list of may-alias>
-{ x; tmp } are aliased
+{x; tmp; } are aliased
+{*x; *tmp; } are aliased
 <end of list>
 
 Before statement return __retres; :
  <list of may-alias>
-{ a; b } are aliased
-{ c; d } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
+{c; d; } are aliased
+{*c; *d; } are aliased
 <end of list>
 
 Before statement x = y;
                  y = tmp;
                  break; :
  <list of may-alias>
-{ x; y; tmp } are aliased
+{x; y; tmp; } are aliased
+{*x; *y; *tmp; } are aliased
 <end of list>
 
 Before statement x = y;
                  y = tmp;
                  break; :
  <list of may-alias>
-{ x; tmp } are aliased
+{x; tmp; } are aliased
+{*x; *tmp; } are aliased
 <end of list>
 
 Before statement x = y; :
  <list of may-alias>
-{ x; y; tmp } are aliased
+{x; y; tmp; } are aliased
+{*x; *y; *tmp; } are aliased
 <end of list>
 
 Before statement x = y; :
  <list of may-alias>
-{ x; y; tmp } are aliased
+{x; y; tmp; } are aliased
+{*x; *y; *tmp; } are aliased
 <end of list>
 
 Before statement x = y; :
  <list of may-alias>
-{ x; tmp } are aliased
+{x; tmp; } are aliased
+{*x; *tmp; } are aliased
 <end of list>
 
 Before statement y = tmp; :
  <list of may-alias>
-{ x; y; tmp } are aliased
+{x; y; tmp; } are aliased
+{*x; *y; *tmp; } are aliased
 <end of list>
 
 Before statement y = tmp; :
  <list of may-alias>
-{ x; y; tmp } are aliased
+{x; y; tmp; } are aliased
+{*x; *y; *tmp; } are aliased
 <end of list>
 
 Before statement y = tmp; :
  <list of may-alias>
-{ x; y; tmp } are aliased
+{x; y; tmp; } are aliased
+{*x; *y; *tmp; } are aliased
 <end of list>
 
 Before statement break; :
  <list of may-alias>
-{ x; y; tmp } are aliased
+{x; y; tmp; } are aliased
+{*x; *y; *tmp; } are aliased
 <end of list>
 
 Before statement break; :
  <list of may-alias>
-{ x; y; tmp } are aliased
+{x; y; tmp; } are aliased
+{*x; *y; *tmp; } are aliased
 <end of list>
 
 Before statement break; :
  <list of may-alias>
-{ x; y; tmp } are aliased
+{x; y; tmp; } are aliased
+{*x; *y; *tmp; } are aliased
 <end of list>
 
 Before statement __retres = (void *)0; :
  <list of may-alias>
-{ x; y; tmp } are aliased
+{x; y; tmp; } are aliased
+{*x; *y; *tmp; } are aliased
 <end of list>
 
 Before statement int *a = (int *)0; :
@@ -119,13 +137,16 @@ Before statement f1(a,b); :
 
 Before statement f1(c,d); :
  <list of may-alias>
-{ a; b } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
 <end of list>
 
 Before statement __retres = 0; :
  <list of may-alias>
-{ a; b } are aliased
-{ c; d } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
+{c; d; } are aliased
+{*c; *d; } are aliased
 <end of list>
 
 [alias] Analysis complete

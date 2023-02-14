@@ -1,18 +1,8 @@
 [kernel] Parsing while_for1.c (with preprocessing)
-[kernel:typing:implicit-function-declaration] while_for1.c:8: Warning: 
-  Calling undeclared function malloc. Old style K&R code?
 [alias] Parsing done
 [alias] Skiping break; (doStmt not implemented)
-[alias] Skiping tmp = malloc(idx);
-          s = (int *)tmp; (doStmt not implemented)
 [alias] Skiping break; (doStmt not implemented)
-[alias] Skiping tmp = malloc(idx);
-          s = (int *)tmp; (doStmt not implemented)
 [alias] Skiping break; (doStmt not implemented)
-[alias] Skiping tmp = malloc(idx);
-          s = (int *)tmp; (doStmt not implemented)
-[alias] Skiping tmp = malloc(idx);
-          s = (int *)tmp; (doStmt not implemented)
 [alias] Skiping break; (doStmt not implemented)
 [alias] May-aliases at the end of function main:
   <list of may-alias>
@@ -25,11 +15,7 @@ Before statement int *s = (int *)0; :
 Before statement {
                    int idx = 0;
                    while (idx < 10) {
-                     {
-                       int tmp;
-                       tmp = malloc(idx);
-                       s = (int *)tmp;
-                     }
+                     s = (int *)malloc((size_t)idx);
                      idx ++;
                    }
                  } :
@@ -45,22 +31,14 @@ Before statement int idx = 0; :
 <end of list>
 
 Before statement while (idx < 10) {
-                   {
-                     int tmp;
-                     tmp = malloc(idx);
-                     s = (int *)tmp;
-                   }
+                   s = (int *)malloc((size_t)idx);
                    idx ++;
                  } :
  <list of may-alias>
 <end of list>
 
 Before statement while (idx < 10) {
-                   {
-                     int tmp;
-                     tmp = malloc(idx);
-                     s = (int *)tmp;
-                   }
+                   s = (int *)malloc((size_t)idx);
                    idx ++;
                  } :
  <list of may-alias>
@@ -94,61 +72,36 @@ Before statement break; :
  <list of may-alias>
 <end of list>
 
-Before statement {
-                   int tmp;
-                   tmp = malloc(idx);
-                   s = (int *)tmp;
-                 } :
+Before statement s = (int *)malloc((size_t)idx); :
  <list of may-alias>
 <end of list>
 
-Before statement {
-                   int tmp;
-                   tmp = malloc(idx);
-                   s = (int *)tmp;
-                 } :
+Before statement s = (int *)malloc((size_t)idx); :
  <list of may-alias>
 <end of list>
 
-Before statement {
-                   int tmp;
-                   tmp = malloc(idx);
-                   s = (int *)tmp;
-                 } :
+Before statement s = (int *)malloc((size_t)idx); :
  <list of may-alias>
 <end of list>
 
-Before statement tmp = malloc(idx);
-                 s = (int *)tmp; :
+Before statement s = (int *)malloc((size_t)idx); :
  <list of may-alias>
 <end of list>
 
-Before statement tmp = malloc(idx);
-                 s = (int *)tmp; :
+Before statement s = (int *)malloc((size_t)idx); :
  <list of may-alias>
 <end of list>
 
-Before statement tmp = malloc(idx);
-                 s = (int *)tmp; :
+Before statement s = (int *)malloc((size_t)idx); :
  <list of may-alias>
 <end of list>
 
-Before statement tmp = malloc(idx);
-                 s = (int *)tmp; :
- <list of may-alias>
-<end of list>
-
-Before statement tmp = malloc(idx); :
- <list of may-alias>
-<end of list>
-
-Before statement s = (int *)tmp; :
+Before statement s = (int *)malloc((size_t)idx); :
  <list of may-alias>
 <end of list>
 
 Before statement idx ++; :
  <list of may-alias>
-{ s; tmp } are aliased
 <end of list>
 
 Before statement idx ++; :

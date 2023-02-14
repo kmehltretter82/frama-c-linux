@@ -1,7 +1,8 @@
 // function with no return
 //  { a; b } are aliased
+//  { *a; *b } are aliased
 //  { c; d } are aliased
-
+//  { *c; *d } are aliased
 
 
 void swap(int *x, int* y) {

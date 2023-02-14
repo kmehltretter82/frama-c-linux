@@ -2,8 +2,10 @@
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
   <list of may-alias>
-  { a; b } are aliased
-  { c; d } are aliased
+  {a; b; } are aliased
+  {*a; *b; } are aliased
+  {c; d; } are aliased
+  {*c; *d; } are aliased
   <end of list>
 [alias] Functions done
 Before statement int *z = (int *)0; :
@@ -12,8 +14,10 @@ Before statement int *z = (int *)0; :
 
 Before statement return __retres; :
  <list of may-alias>
-{ a; b } are aliased
-{ c; d } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
+{c; d; } are aliased
+{*c; *d; } are aliased
 <end of list>
 
 Before statement int *z = (int *)0; :
@@ -26,12 +30,14 @@ Before statement z = x; :
 
 Before statement x = y; :
  <list of may-alias>
-{ x; z } are aliased
+{x; z; } are aliased
+{*x; *z; } are aliased
 <end of list>
 
 Before statement y = z; :
  <list of may-alias>
-{ x; y; z } are aliased
+{x; y; z; } are aliased
+{*x; *y; *z; } are aliased
 <end of list>
 
 Before statement int *a = (int *)0; :
@@ -56,18 +62,22 @@ Before statement swap(a,b); :
 
 Before statement swap(c,d); :
  <list of may-alias>
-{ a; b } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
 <end of list>
 
 Before statement __retres = 0; :
  <list of may-alias>
-{ a; b } are aliased
-{ c; d } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
+{c; d; } are aliased
+{*c; *d; } are aliased
 <end of list>
 
 Before statement return; :
  <list of may-alias>
-{ x; y; z } are aliased
+{x; y; z; } are aliased
+{*x; *y; *z; } are aliased
 <end of list>
 
 [alias] Analysis complete

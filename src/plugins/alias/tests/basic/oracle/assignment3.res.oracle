@@ -2,7 +2,8 @@
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
   <list of may-alias>
-  { a; c } are aliased
+  {a; c; } are aliased
+  {*a; *c; } are aliased
   <end of list>
 [alias] Functions done
 Before statement int *a = (int *)0; :
@@ -27,12 +28,14 @@ Before statement c = & b; :
 
 Before statement __retres = 0; :
  <list of may-alias>
-{ a; c } are aliased
+{a; c; } are aliased
+{*a; *c; } are aliased
 <end of list>
 
 Before statement return __retres; :
  <list of may-alias>
-{ a; c } are aliased
+{a; c; } are aliased
+{*a; *c; } are aliased
 <end of list>
 
 [alias] Analysis complete
