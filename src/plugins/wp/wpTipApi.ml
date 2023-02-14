@@ -67,7 +67,7 @@ let wrap tag pp fmt x =
     Format.pp_close_stag fmt () ;
   end
 
-let () =
+class printer () =
   let terms : Ptip.term_wrapper =
     object
       method wrap pp fmt t = wrap (Term.get t) pp fmt t
@@ -89,9 +89,52 @@ let () =
   let autofocus = new Ptip.autofocus in
   let plang = new Ptip.plang ~terms ~focus ~target ~autofocus in
   let pcond = new Ptip.pcond ~parts ~target:parts ~autofocus ~plang in
-  (*TODO*)
-  ignore pcond
+  object
+    initializer ignore pcond
+  end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Printer Registry                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+module PRINTER = State_builder.Ref
+    (Datatype.Make
+       (struct
+         include Datatype.Undefined
+         type t = (string,printer) Hashtbl.t
+         let name = "WpTipApi.PRINTER.Datatype"
+         let reprs = [ Hashtbl.create 0 ]
+         let mem_project = Datatype.never_any_project
+       end))
+    (struct
+      let name = "WpApi.PRINTER"
+      let dependencies = [ Ast.self ]
+      let default () = Hashtbl.create 0
+    end)
+
+let printer (node : ProofEngine.node) : printer =
+  let registry = PRINTER.get () in
+  let wpo = ProofEngine.goal node in
+  try Hashtbl.find registry wpo.po_gid with Not_found ->
+    let pp = new printer () in
+    Hashtbl.add registry wpo.po_gid pp ; pp
+
+(* -------------------------------------------------------------------------- *)
+(* --- Printer Hooks                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () = Wpo.add_removed_hook
+    (fun wpo ->
+       let registry = PRINTER.get () in
+       Hashtbl.remove registry wpo.po_gid)
+
+let () = Wpo.add_cleared_hook
+    (fun () ->
+       let registry = PRINTER.get () in
+       Hashtbl.clear registry)
 
 let () = (*TODO*) ignore package
+let () = (*TODO*) ignore printer
+
 
 (* -------------------------------------------------------------------------- *)
