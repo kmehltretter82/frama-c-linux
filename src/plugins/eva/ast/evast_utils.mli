@@ -27,14 +27,18 @@ open Evast
 val type_of_exp : exp -> typ
 val type_of_lval : lval -> typ
 
-(* These functions are given here as a temporary stub and should not be used *)
+(** These functions are given here as a temporary stub and should not be used *)
 val origin_exp : exp -> Cil_types.exp
 val origin_lval : lval -> Cil_types.lval
 val origin_offset : offset -> Cil_types.offset
 
-(* [rewrite f exp] rewrites [exp] by calling [f ~descent node] on root exp. [f]
-   can call [descent e] to rewrite recursively subexpressions of [e]. *)
+(** [rewrite f exp] rewrites [exp] by calling [f ~descent node] on root exp. [f]
+    can call [descent e] to rewrite recursively subexpressions of [e]. *)
 val rewrite : (descend:(exp -> exp) -> exp -> exp) -> exp -> exp
+
+(** [cost_fold exp] will only replace expressions which originates from Cil
+    by calling Cil.constFold on them *)
+val const_fold : exp -> exp
 
 (** Computes the height of an expression, that is the maximum number of nested
     operations in this expression. *)
@@ -42,3 +46,13 @@ val height_exp : exp -> int
 
 (** Computes the height of an lvalue. *)
 val height_lval : lval -> int
+
+(** Inverse a relation, op must be a comparison operator *)
+val invert_relation : binop -> binop
+
+(** [exp_contains_volatile e] (resp. [lval_contains_volatile lv] is true
+    whenever one l-value contained inside the expression [e] (resp. the lvalue
+    [lv]) has volatile qualifier. Relational analyses should not learn
+    anything on such values. *)
+val exp_contains_volatile : exp -> bool
+val lval_contains_volatile : lval -> bool

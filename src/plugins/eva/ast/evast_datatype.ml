@@ -166,12 +166,15 @@ struct
       | CInt64 (v1,k1,s1), CInt64(v2,k2,s2) ->
         Integer.compare v1 v2 <?>
         lazy (Extlib.compare_basic k1 k2) <?>
+        (* this last comparison is probably not useful ; maybe remove from AST *)
         lazy (Option.compare String.compare s1 s2)
       | CString b1, CString b2 -> Base.compare b1 b2
       | CChr c1, CChr c2 -> Char.compare c1 c2
       | CReal (f1, k1, s1), CReal (f2, k2, s2) ->
         Float.compare f1 f2 <?>
         lazy (Extlib.compare_basic k1 k2) <?>
+        (* The string representation is used when option
+           -eva-all-rounding-modes-constants is enabled *)
         lazy (Option.compare String.compare s1 s2)
       | CEnum e1, CEnum e2 -> Cil_datatype.Enumitem.compare e1 e2
       | (CInt64 _, (CString _ | CChr _ | CReal _ | CEnum _)) -> 1

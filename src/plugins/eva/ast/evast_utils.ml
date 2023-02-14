@@ -147,6 +147,17 @@ let rewrite f exp =
   in
   rewrite_exp exp
 
+let const_fold exp =
+  let f ~descend exp =
+    match exp.origin with
+    | Exp e ->
+      let e' = Cil.constFold true e in
+      Evast_builder.translate_expr e'
+    | _ ->
+      descend exp
+  in
+  rewrite f exp
+
 
 (* --- Heights --- *)
 
@@ -169,3 +180,36 @@ and height_offset = function
   | NoOffset  -> 0
   | Field (_,r) -> height_offset r + 1
   | Index (e,r) -> max (height_exp e) (height_offset r) + 1
+
+
+(* --- Relation inversion --- *)
+
+let invert_relation : Evast.binop -> Evast.binop = function
+  | Gt -> Le
+  | Lt -> Ge
+  | Le -> Gt
+  | Ge -> Lt
+  | Eq -> Ne
+  | Ne -> Eq
+  | _ -> assert false
+
+
+(* --- Volatiles lookup --- *)
+
+let rec exp_contains_volatile (exp : exp) : bool =
+  match exp.node with
+  | Lval lv | AddrOf lv | StartOf lv  -> lval_contains_volatile lv
+  | UnOp (_, e, _) | CastE (_, e) -> exp_contains_volatile e
+  | BinOp (_, e1, e2, _) -> exp_contains_volatile e1 || exp_contains_volatile e2
+  | _ -> false
+and lval_contains_volatile (lhost, offset as lval : lval) : bool =
+  Cil.isVolatileType (type_of_lval lval) ||
+  lhost_contains_volatile lhost ||
+  offset_contains_volatile offset
+and lhost_contains_volatile : lhost -> bool = function
+  | Var _ -> false
+  | Mem e -> exp_contains_volatile e
+and offset_contains_volatile : offset -> bool = function
+  | NoOffset -> false
+  | Field (_, o) -> offset_contains_volatile o
+  | Index (e, o) -> offset_contains_volatile o || exp_contains_volatile e
