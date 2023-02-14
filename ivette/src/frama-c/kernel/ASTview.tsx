@@ -20,123 +20,341 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-// --------------------------------------------------------------------------
-// --- AST Source Code
-// --------------------------------------------------------------------------
-
 import React from 'react';
-import _ from 'lodash';
-import CodeMirror from 'codemirror/lib/codemirror';
+import Lodash from 'lodash';
 
 import * as Dome from 'dome';
-import * as Json from 'dome/data/json';
-import * as Settings from 'dome/data/settings';
-import { TitleBar } from 'ivette';
-import { IconButton } from 'dome/controls/buttons';
-import type { key } from 'dome/data/json';
-import { RichTextBuffer } from 'dome/text/buffers';
-import { Text } from 'dome/text/editors';
-import { Filler, Inset } from 'dome/frame/toolbars';
-
-import * as Preferences from 'ivette/prefs';
-
+import * as Editor from 'dome/text/editor';
+import * as Utils from 'dome/data/arrays';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
-import * as RichText from 'frama-c/richtext';
+import { key } from 'dome/data/json';
+import * as Settings from 'dome/data/settings';
+import { IconButton } from 'dome/controls/buttons';
+import { Filler, Inset } from 'dome/frame/toolbars';
 import * as Ast from 'frama-c/kernel/api/ast';
+import { text } from 'frama-c/kernel/api/data';
+import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Properties from 'frama-c/kernel/api/properties';
-import { getCallers, getDeadCode } from 'frama-c/plugins/eva/api/general';
 import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
 
-// --------------------------------------------------------------------------
-// --- Pretty Printing (Browser Console)
-// --------------------------------------------------------------------------
+import { TitleBar } from 'ivette';
+import * as Preferences from 'ivette/prefs';
 
-const D = new Dome.Debug('AST View');
 
-// --------------------------------------------------------------------------
-// --- Rich Text Printer
-// --------------------------------------------------------------------------
 
-async function loadAST(
-  buffer: RichTextBuffer, theFunction?: string, theMarker?: string,
-): Promise<void> {
-  buffer.clear();
-  if (theFunction) {
-    buffer.log('// Loading', theFunction, '…');
-    (async () => {
-      try {
-        const data = await Server.send(Ast.printFunction, theFunction);
-        buffer.clear();
-        if (!data) {
-          buffer.log('// No code for function', theFunction);
-        }
-        RichText.printTextWithTags(buffer, data);
-        if (theMarker)
-          buffer.scroll(theMarker);
-      } catch (err) {
-        D.error(
-          `Fail to retrieve the AST of function '${theFunction}' ` +
-          `and marker '${theMarker}':`, err,
-        );
-      }
-    })();
+// -----------------------------------------------------------------------------
+//  Utilitary types and functions
+// -----------------------------------------------------------------------------
+
+// An alias type for functions and locations.
+type Fct = string | undefined;
+type Marker = string | undefined;
+
+// A range is just a pair of position in the code.
+type Range = Editor.Range;
+
+// Type checking that an input is defined.
+function isDef<A>(a: A | undefined): a is A { return a !== undefined; }
+
+// Map a function over a list, removing all inputs that returned undefined.
+function mapFilter<A, B>(xs: readonly A[], fn: (x: A) => B | undefined): B[] {
+  return xs.map(fn).filter(isDef);
+}
+
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+//  Tree datatype definition and utiliary functions
+// -----------------------------------------------------------------------------
+
+// The code is given by the server has a tree but implemented with arrays and
+// without information on the ranges of each element. It will be converted in a
+// good old tree that carry those information.
+interface Leaf extends Range { text: string }
+interface Node extends Range { id: string, children: Tree[] }
+type Tree = Leaf | Node;
+
+// Utility functions on trees.
+function isLeaf (t: Tree): t is Leaf { return 'text' in t; }
+function isNode (t: Tree): t is Node { return 'id' in t && 'children' in t; }
+const empty: Tree = { text: '', from: 0, to: 0 };
+
+// Convert an Ivette text (i.e a function's code) into a Tree, adding range
+// information to each construction.
+function textToTree(t: text): Tree | undefined {
+  function aux(t: text, from: number): [Tree | undefined, number] {
+    if (t === null) return [undefined, from];
+    if (typeof t === 'string') {
+      const to = from + t.length;
+      return [{ text: t, from, to }, to];
+    }
+    if (t.length < 2 || typeof t[0] !== 'string') return [undefined, from];
+    const children: Tree[] = []; let acc = from;
+    for (const child of t.slice(1)) {
+      const [node, to] = aux(child, acc);
+      if (node) children.push(node);
+      acc = to;
+    }
+    return [{ id: t[0], from, to: acc, children }, acc];
   }
+  const [res] = aux(t, 0);
+  return res;
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Function Callers                                                   ---*/
-/* --------------------------------------------------------------------------*/
-
-type Caller = { fct: key<'#fct'>, marker: key<'#stmt'> };
-
-async function functionCallers(functionName: string): Promise<Caller[]> {
-  try {
-    const data = await Server.send(getCallers, functionName);
-    const locations = data.map(([fct, marker]) => ({ fct, marker }));
-    return locations;
-  } catch (err) {
-    D.error(`Fail to retrieve callers of function '${functionName}':`, err);
-    return [];
-  }
+// Convert an Ivette text into a string to be displayed.
+function textToString(text: text): string {
+  if (Array.isArray(text)) return text.slice(1).map(textToString).join('');
+  else if (typeof text === 'string') return text;
+  else return '';
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Studia Access                                                      ---*/
-/* --------------------------------------------------------------------------*/
-
-type access = 'Reads' | 'Writes';
-interface StudiaInfos {
-  name: string,
-  title: string,
-  locations: { fct: key<'#fct'>, marker: Ast.marker }[],
-  index: number,
+// Computes, for each markers of a tree, its range. Returns the map containing
+// all those bindings.
+function markersRanges(tree: Tree): Map<string, Range[]>{
+  const ranges: Map<string, Range[]> = new Map();
+  const toRanges = (tree: Tree): void => {
+    if (!isNode(tree)) return;
+    const trees = ranges.get(tree.id) ?? [];
+    trees.push(tree);
+    ranges.set(tree.id, trees);
+    for (const child of tree.children) toRanges(child);
+  };
+  toRanges(tree);
+  return ranges;
 }
 
-async function studia(
-  marker: string,
-  info: Ast.markerInfoData,
-  kind: access,
-): Promise<StudiaInfos> {
-  const request = kind === 'Reads' ? getReadsLval : getWritesLval;
-  const data = await Server.send(request, marker);
-  const locations = data.direct.map(([f, m]) => ({ fct: f, marker: m }));
-  const lval = info.name;
-  if (locations.length > 0) {
-    const name = `${kind} of ${lval}`;
-    const acc = (kind === 'Reads') ? 'accessing' : 'modifying';
-    const title =
-      `List of statements ${acc} the memory location pointed by ${lval}.`;
-    return { name, title, locations, index: 0 };
-  }
-  const name = `No ${kind.toLowerCase()} of ${lval}`;
-  return { name, title: '', locations: [], index: 0 };
+function uniqueRange(m: string, rs: Map<string, Range[]>): Range | undefined {
+  const ranges = rs.get(m);
+  return (ranges && ranges.length > 0) ? ranges[0] : undefined;
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Property Bullets                                                   ---*/
-/* --------------------------------------------------------------------------*/
+// Find the closest covering tagged node of a given position. Returns
+// undefined if there is not relevant covering node.
+function coveringNode(tree: Tree, pos: number): Node | undefined {
+  if (isLeaf(tree)) return undefined;
+  if (pos < tree.from || pos > tree.to) return undefined;
+  const child = Utils.first(tree.children, (c) => coveringNode(c, pos));
+  if (child && isNode(child)) return child;
+  if (tree.from <= pos && pos < tree.to) return tree;
+  return undefined;
+}
 
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+//  Function code representation
+// -----------------------------------------------------------------------------
+
+// This field contains the current function's code as represented by Ivette.
+// Its set function takes care to update the CodeMirror displayed document.
+const Text = Editor.createTextField<text>(null, textToString);
+
+// This aspect computes the tree representing the currently displayed function's
+// code, represented by the <Text> field.
+const Tree = Editor.createAspect({ t: Text }, ({t}) => textToTree(t) ?? empty);
+
+// This aspect computes the markers ranges of the currently displayed function's
+// tree, represented by the <Tree> aspect.
+const Ranges = Editor.createAspect({ t: Tree }, ({ t }) => markersRanges(t));
+
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+//  Selected marker representation
+// -----------------------------------------------------------------------------
+
+// This field contains the currently selected function.
+const Fct = Editor.createField<Fct>(undefined);
+
+// This field contains the currently selected marker.
+const Marker = Editor.createField<Marker>(undefined);
+
+// The Ivette selection must be updated by CodeMirror plugins. This input
+// add the callback in the CodeMirror internal state.
+type UpdateSelection = (a: States.SelectionActions) => void;
+const UpdateSelection = Editor.createField<UpdateSelection>(() => { return; });
+
+// The marker field is considered as the ground truth on what is selected in the
+// CodeMirror document. To do so, we catch the mouseup event (so when the user
+// select a new part of the document) and update the Ivette selection
+// accordingly. This will update the Marker field during the next Editor
+// component's render and thus update everything else.
+const MarkerUpdater = createMarkerUpdater();
+function createMarkerUpdater(): Editor.Extension {
+  const deps = { fct: Fct, tree: Tree, update: UpdateSelection };
+  return Editor.createEventHandler(deps, {
+    mouseup: ({ fct, tree, update }, view, event) => {
+      const main = view.state.selection.main;
+      const id = coveringNode(tree, main.from)?.id;
+      const location = { fct, marker: Ast.jMarker(id) };
+      update({ location });
+      if (event.altKey) States.MetaSelection.emit(location);
+    }
+  });
+}
+
+// A View updater that scrolls the selected marker into view. It is needed to
+// handle Marker's updates from the outside world, as they do not change the
+// cursor position inside CodeMirror.
+const MarkerScroller = createMarkerScroller();
+function createMarkerScroller(): Editor.Extension {
+  const deps = { marker: Marker, ranges: Ranges };
+  return Editor.createViewUpdater(deps, ({ marker, ranges }, view) => {
+    if (!view || !marker) return;
+    const markerRanges = ranges.get(marker) ?? [];
+    if (markerRanges.length !== 1) return;
+    const { from: anchor } = markerRanges[0];
+    view.dispatch({ selection: { anchor }, scrollIntoView: true });
+  });
+}
+
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+//  Hovered marker representation
+// -----------------------------------------------------------------------------
+
+// This field contains the currently hovered marker.
+const Hovered = Editor.createField<Marker>(undefined);
+
+// The Ivette hovered element must be updated by CodeMirror plugins. This
+// field add the callback in the CodeMirror internal state.
+type UpdateHovered = (h: States.Hovered) => void;
+const UpdateHovered = Editor.createField<UpdateHovered>(() => { return ; });
+
+// The Hovered field is updated each time the mouse moves through the CodeMirror
+// document. The handlers updates the Ivette hovered information, which is then
+// reflected on the Hovered field by the Editor component itself.
+const HoveredUpdater = createHoveredUpdater();
+function createHoveredUpdater(): Editor.Extension {
+  const deps = { fct: Fct, tree: Tree, update: UpdateHovered };
+  return Editor.createEventHandler(deps, {
+    mousemove: (inputs, view, event) => {
+      const { fct, tree, update: updateHovered } = inputs;
+      const coords = { x: event.clientX, y: event.clientY };
+      const reset = (): void => updateHovered(undefined);
+      const pos = view.posAtCoords(coords);
+      if (!pos) { reset(); return; }
+      const hov = coveringNode(tree, pos);
+      if (!hov) { reset(); return; }
+      const from = view.coordsAtPos(hov.from);
+      if (!from) { reset(); return; }
+      const to = view.coordsAtPos(hov.to);
+      if (!to) { reset(); return; }
+      const left = Math.min(from.left, to.left);
+      const right = Math.max(from.left, to.left);
+      const top = Math.min(from.top, to.top);
+      const bottom = Math.max(from.bottom, to.bottom);
+      const horizontallyOk = left <= coords.x && coords.x <= right;
+      const verticallyOk = top <= coords.y && coords.y <= bottom;
+      if (!horizontallyOk || !verticallyOk) { reset(); return; }
+      const marker = Ast.jMarker(hov.id);
+      updateHovered(marker ? { fct, marker } : undefined);
+    }
+  });
+}
+
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+//  Plugin decorating hovered and selected elements
+// -----------------------------------------------------------------------------
+
+const CodeDecorator = createCodeDecorator();
+function createCodeDecorator(): Editor.Extension {
+  const hoveredClass = Editor.Decoration.mark({ class: 'cm-hovered-code' });
+  const selectedClass = Editor.Decoration.mark({ class: 'cm-selected-code' });
+  const deps = { ranges: Ranges, marker: Marker, hovered: Hovered };
+  return Editor.createDecorator(deps, ({ ranges, marker: m, hovered: h }) => {
+    const hoveredRanges = h ? (ranges.get(h) ?? []) : [];
+    const selectedRanges = m ? (ranges.get(m) ?? []) : [];
+    const hovered = hoveredRanges.map(r => hoveredClass.range(r.from, r.to));
+    const selected = selectedRanges.map(r => selectedClass.range(r.from, r.to));
+    return Editor.RangeSet.of(selected.concat(hovered), true);
+  });
+}
+
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+//  Dead code decorations plugin
+// -----------------------------------------------------------------------------
+
+// This field contains the dead code information as inferred by Eva.
+const emptyDeadCode = { unreachable: [], nonTerminating: [] };
+const Dead = Editor.createField<Eva.deadCode>(emptyDeadCode);
+
+const DeadCodeDecorator = createDeadCodeDecorator();
+function createDeadCodeDecorator(): Editor.Extension {
+  const uClass = Editor.Decoration.mark({ class: 'cm-dead-code' });
+  const tClass = Editor.Decoration.mark({ class: 'cm-non-term-code' });
+  const deps = { dead: Dead, ranges: Ranges };
+  return Editor.createDecorator(deps, ({ dead, ranges }) => {
+    const range = (m: string): Range[] | undefined => ranges.get(m);
+    const unreachableRanges = mapFilter(dead.unreachable, range).flat();
+    const unreachable = unreachableRanges.map(r => uClass.range(r.from, r.to));
+    const nonTermRanges = mapFilter(dead.nonTerminating, range).flat();
+    const nonTerm = nonTermRanges.map(r => tClass.range(r.from, r.to));
+    return Editor.RangeSet.of(unreachable.concat(nonTerm), true);
+  });
+}
+
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+//  Property bullets extension
+// -----------------------------------------------------------------------------
+
+// This field contains information on properties' tags.
+type Tags = Map<string, States.Tag>;
+const Tags = Editor.createField<Tags>(new Map());
+
+// The component needs information on markers' status data.
+const PropertiesStatuses = Editor.createField<Properties.statusData[]>([]);
+
+// This aspect filters all properties that does not have a valid range, and
+// stores the remaining properties with their ranges.
+const PropertiesRanges = createPropertiesRange();
+interface PropertyRange extends Properties.statusData { range: Range }
+function createPropertiesRange(): Editor.Aspect<PropertyRange[]> {
+  const deps = { properties: PropertiesStatuses, ranges: Ranges };
+  return Editor.createAspect(deps, ({ properties, ranges }) => {
+    const get = (p: Properties.statusData): Range[] => ranges.get(p.key) ?? [];
+    return properties.map(p => get(p).map(r => ({ ...p, range: r }))).flat();
+  });
+}
+
+// This aspect computes the tag associated to each property.
+const PropertiesTags = createPropertiesTags();
+function createPropertiesTags(): Editor.Aspect<Map<string, States.Tag>> {
+  const deps = { statuses: PropertiesStatuses, tags: Tags };
+  return Editor.createAspect(deps, ({ statuses, tags }) => {
+    const res = new Map<string, States.Tag>();
+    for (const p of statuses) {
+      if (!p.status) continue;
+      const tag = tags.get(p.status);
+      if (tag) res.set(p.key, tag);
+    }
+    return res;
+  });
+}
+
+// Bullet colors.
 function getBulletColor(status: States.Tag): string {
   switch (status.name) {
     case 'unknown': return '#FF8300';
@@ -154,187 +372,302 @@ function getBulletColor(status: States.Tag): string {
   }
 }
 
-function makeBullet(status: States.Tag): HTMLDivElement {
-  const marker = document.createElement('div');
-  marker.style.color = getBulletColor(status);
-  marker.style.textAlign = 'center';
-  if (status.descr)
-    marker.title = status.descr;
-  marker.innerHTML = '◉';
-  return marker;
+// Property bullet gutter marker.
+class PropertyBullet extends Editor.GutterMarker {
+  readonly bullet: HTMLDivElement;
+  toDOM(): HTMLDivElement { return this.bullet; }
+  constructor(status?: States.Tag) {
+    super();
+    this.bullet = document.createElement('div');
+    this.bullet.innerHTML = '◉';
+    if (status) {
+      this.bullet.style.color = getBulletColor(status);
+      this.bullet.style.textAlign = 'center';
+      if (status.descr) this.bullet.title = status.descr;
+    }
+  }
 }
 
-// --------------------------------------------------------------------------
-// --- AST Printer
-// --------------------------------------------------------------------------
-
-export default function ASTview(): JSX.Element {
-
-  // Hooks
-  const buffer = React.useMemo(() => new RichTextBuffer(), []);
-  const printed = React.useRef<string | undefined>();
-  const [selection, updateSelection] = States.useSelection();
-  const [hoveredLoc] = States.useHovered();
-  const multipleSelections = selection?.multiple.allSelections;
-  const theFunction = selection?.current?.fct;
-  const theMarker = selection?.current?.marker;
-  const hovered = hoveredLoc?.marker;
-  const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
-
-  const markersInfo = States.useSyncArray(Ast.markerInfo);
-  const deadCode = States.useRequest(getDeadCode, theFunction);
-  const propertyStatus = States.useSyncArray(Properties.status).getArray();
-  const statusDict = States.useTags(Properties.propStatusTags);
-
-  const setBullets = React.useCallback(() => {
-    propertyStatus.forEach((prop) => {
-      const status = statusDict.get(prop.status);
-      if (theFunction && prop.fct === theFunction && status) {
-        const bullet = makeBullet(status);
-        const markers = buffer.findTextMarker(prop.key);
-        buffer.forEach((cm) => {
-          markers.forEach((marker) => {
-            const line = marker.find()?.from.line;
-            if (line !== undefined) cm.setGutterMarker(line, 'bullet', bullet);
-          });
-        });
-      }
-    });
-  }, [buffer, theFunction, propertyStatus, statusDict]);
-
-  React.useEffect(() => {
-    setBullets();
-    buffer.on('change', setBullets);
-    return () => { buffer.off('change', setBullets); };
-  }, [buffer, setBullets]);
-
-  const reload = React.useCallback(async () => {
-    printed.current = theFunction;
-    loadAST(buffer, theFunction, theMarker);
-  }, [buffer, theFunction, theMarker]);
-
-  // Hook: async loading
-  React.useEffect(() => { if (printed.current !== theFunction) reload(); });
-
-  // Also reload the buffer when the AST is recomputed.
-  React.useEffect(() => {
-    Server.onSignal(Ast.changed, reload);
-    return () => { Server.offSignal(Ast.changed, reload); };
+const PropertiesGutter = createPropertiesGutter();
+function createPropertiesGutter(): Editor.Extension {
+  const deps = { ranges: PropertiesRanges, propTags: PropertiesTags };
+  const cls = 'cm-property-gutter';
+  return Editor.createGutter(deps, cls, (inputs, block, view) => {
+    const { ranges, propTags } = inputs;
+    const line = view.state.doc.lineAt(block.from);
+    const start = line.from; const end = line.to;
+    const inLine = (r: Range): boolean => start <= r.from && r.to <= end;
+    function isHeader(r: Range): boolean {
+      if (!line.text.includes('requires')) return false;
+      const next = view.state.doc.line(line.number + 1);
+      return r.from <= next.from && next.to <= r.to;
+    }
+    const prop = ranges.find((r) => inLine(r.range) || isHeader(r.range));
+    if (!prop) return null;
+    const statusTag = propTags.get(prop.key);
+    return statusTag ? new PropertyBullet(statusTag) : null;
   });
+}
 
-  React.useEffect(() => {
-    const decorator = (marker: string): string | undefined => {
-      if (multipleSelections?.some((location) => location?.marker === marker))
-        return 'highlighted-marker';
-      if (deadCode?.unreachable?.some((m) => m === marker))
-        return 'dead-code';
-      if (deadCode?.nonTerminating?.some((m) => m === marker))
-        return 'non-terminating';
-      if (marker === hovered)
-        return 'hovered-marker';
-      return undefined;
-    };
-    buffer.setDecorator(decorator);
-  }, [buffer, multipleSelections, hovered, deadCode]);
+// -----------------------------------------------------------------------------
 
-  // Hook: marker scrolling
-  React.useEffect(() => {
-    if (theMarker) buffer.scroll(theMarker);
-  }, [buffer, theMarker]);
 
-  function onHover(markerId?: string): void {
-    const marker = Json.jOption(Ast.jMarker)(markerId);
-    const fct = selection?.current?.fct;
-    States.setHovered(marker ? { fct, marker } : undefined);
+
+// -----------------------------------------------------------------------------
+//  Studia access
+// -----------------------------------------------------------------------------
+
+type access = 'Reads' | 'Writes';
+
+interface StudiaProps {
+  marker: string,
+  info: Ast.markerInfoData,
+  kind: access,
+}
+
+interface StudiaInfos {
+  name: string,
+  title: string,
+  locations: { fct: key<'#fct'>, marker: Ast.marker }[],
+  index: number,
+}
+
+async function studia(props: StudiaProps): Promise<StudiaInfos> {
+  const { marker, info, kind } = props;
+  const request = kind === 'Reads' ? getReadsLval : getWritesLval;
+  const data = await Server.send(request, marker);
+  const locations = data.direct.map(([f, m]) => ({ fct: f, marker: m }));
+  const lval = info.name;
+  if (locations.length > 0) {
+    const name = `${kind} of ${lval}`;
+    const acc = (kind === 'Reads') ? 'accessing' : 'modifying';
+    const title =
+      `List of statements ${acc} the memory location pointed by ${lval}.`;
+    return { name, title, locations, index: 0 };
   }
+  const name = `No ${kind.toLowerCase()} of ${lval}`;
+  return { name, title: '', locations: [], index: 0 };
+}
 
-  function onSelection(markerId: string, meta = false): void {
-    const fct = selection?.current?.fct;
-    const location = { fct, marker: Ast.jMarker(markerId) };
-    updateSelection({ location });
-    if (meta) States.MetaSelection.emit(location);
-  }
+// -----------------------------------------------------------------------------
 
-  async function onContextMenu(markerId: string): Promise<void> {
-    const items = [];
-    const selectedMarkerInfo = markersInfo.getData(markerId);
-    if (selectedMarkerInfo?.var === 'function') {
-      if (selectedMarkerInfo.kind === 'declaration') {
-        const name = selectedMarkerInfo?.name;
-        if (name) {
-          const locations = await functionCallers(name);
-          const locationsByFunction = _.groupBy(locations, (e) => e.fct);
-          _.forEach(locationsByFunction,
-            (e) => {
-              const callerName = e[0].fct;
-              items.push({
-                label:
-                  `Go to caller ${callerName} ` +
-                  `${e.length > 1 ? `(${e.length} call sites)` : ''}`,
-                onClick: () => updateSelection({
-                  name: `Call sites of function ${name}`,
-                  locations,
-                  index: locations.findIndex((l) => l.fct === callerName),
-                }),
-              });
+
+
+// -----------------------------------------------------------------------------
+//  Context menu
+// -----------------------------------------------------------------------------
+
+// This field contains all the current function's callers, as inferred by Eva.
+const Callers = Editor.createField<Eva.CallSite[]>([]);
+
+// This field contains information on markers.
+type GetMarkerData = (key: string) => Ast.markerInfoData | undefined;
+const GetMarkerData = Editor.createField<GetMarkerData>(() => undefined);
+
+const ContextMenuHandler = createContextMenuHandler();
+function createContextMenuHandler(): Editor.Extension {
+  const data = { tree: Tree, callers: Callers };
+  const deps = { ...data, update: UpdateSelection, getData: GetMarkerData };
+  return Editor.createEventHandler(deps, {
+    contextmenu: (inputs, view, event) => {
+      const { tree, callers, update, getData } = inputs;
+      const coords = { x: event.clientX, y: event.clientY };
+      const position = view.posAtCoords(coords); if (!position) return;
+      const node = coveringNode(tree, position);
+      if (!node || !node.id) return;
+      const items: Dome.PopupMenuItem[] = [];
+      const info = getData(node.id);
+      if (info?.var === 'function') {
+        if (info.kind === 'declaration') {
+          const groupedCallers = Lodash.groupBy(callers, e => e.kf);
+          const locations = callers.map((l) => ({ fct: l.kf, marker: l.stmt }));
+          Lodash.forEach(groupedCallers, (e) => {
+            const callerName = e[0].kf;
+            const callSites = e.length > 1 ? `(${e.length} call sites)` : '';
+            items.push({
+              label: `Go to caller ${callerName} ` + callSites,
+              onClick: () => update({
+                name: `Call sites of function ${info.name}`,
+                locations: locations,
+                index: locations.findIndex(l => l.fct === callerName)
+              })
             });
+          });
+        } else {
+          const location = { fct: info.name };
+          const onClick = (): void => update({ location });
+          const label = `Go to definition of ${info.name}`;
+          items.push({ label, onClick });
         }
-      } else {
-        items.push({
-          label: `Go to definition of ${selectedMarkerInfo.name}`,
-          onClick: () => {
-            const location = { fct: selectedMarkerInfo.name };
-            updateSelection({ location });
-          },
-        });
       }
+      const enabled = info?.kind === 'lvalue' || info?.var === 'variable';
+      const onClick = (kind: access): void => {
+        if (info && node.id)
+          studia({ marker: node.id, info, kind }).then(update);
+      };
+      const reads = 'Studia: select reads';
+      const writes = 'Studia: select writes';
+      items.push({ label: reads, enabled, onClick: () => onClick('Reads') });
+      items.push({ label: writes, enabled, onClick: () => onClick('Writes') });
+      if (items.length > 0) Dome.popupMenu(items);
+      return;
     }
-    const enabled = selectedMarkerInfo?.kind === 'lvalue'
-      || selectedMarkerInfo?.var === 'variable';
-    function onClick(kind: access): void {
-      if (selectedMarkerInfo)
-        studia(
-          markerId,
-          selectedMarkerInfo,
-          kind,
-        ).then(updateSelection);
-    }
-    items.push({
-      label: 'Studia: select writes',
-      enabled,
-      onClick: () => onClick('Writes'),
-    });
-    items.push({
-      label: 'Studia: select reads',
-      enabled,
-      onClick: () => onClick('Reads'),
-    });
-    if (items.length > 0)
-      Dome.popupMenu(items);
-  }
-
-  const foldAll = (): void => buffer.forEach(CodeMirror.commands.foldAll);
-  const unfoldAll = (): void => buffer.forEach(CodeMirror.commands.unfoldAll);
-
-  const defaultFold = React.useCallback((): void => {
-    buffer.forEach((cm) => { CodeMirror.commands.unfoldAll(cm); });
-  }, [buffer]);
-
-  React.useEffect(() => {
-    buffer.on('change', defaultFold);
-    return () => { buffer.off('change', defaultFold); };
   });
+}
 
-  const foldOptions: CodeMirror.FoldOptions = {
-    rangeFinder: (cm, pos) => {
-      const range = CodeMirror.fold.comment(cm, pos);
-      /* Allows folding multi-line comments only. */
-      if (!range || range.from.line === range.to.line) return undefined;
-      return range;
-    }
-  };
+// -----------------------------------------------------------------------------
 
-  // Component
+
+
+// -----------------------------------------------------------------------------
+//  Tainted lvalues
+// -----------------------------------------------------------------------------
+
+type Taints = Eva.LvalueTaints;
+const TaintedLvalues = Editor.createField<Taints[] | undefined>(undefined);
+
+function textOfTaint(taint: Eva.taintStatus): string {
+  switch (taint) {
+    case 'not_computed': return 'The taint has not been computed';
+    case 'error': return 'There was an error during the taint computation';
+    case 'not_applicable': return 'No taint for this lvalue';
+    case 'direct_taint': return 'This lvalue can be affected by an attacker';
+    case 'indirect_taint':
+      return 'This lvalue depends on path conditions that can \
+      be affected by an attacker';
+    case 'not_tainted': return 'This lvalue is safe';
+  }
+  return '';
+}
+
+const TaintedLvaluesDecorator = createTaintedLvaluesDecorator();
+function createTaintedLvaluesDecorator(): Editor.Extension {
+  const mark = Editor.Decoration.mark({ class: 'cm-tainted' });
+  const deps = { ranges: Ranges, tainted: TaintedLvalues };
+  return Editor.createDecorator(deps, ({ ranges, tainted = [] }) => {
+    const find = (t: Taints): Range[] | undefined => ranges.get(t.lval);
+    const taintedRanges = mapFilter(tainted, find).flat();
+    const marks = taintedRanges.map(r => mark.range(r.from, r.to));
+    return Editor.RangeSet.of(marks, true);
+  });
+}
+
+const TaintTooltip = createTaintTooltip();
+function createTaintTooltip(): Editor.Extension {
+  const deps = { hovered: Hovered, ranges: Ranges, tainted: TaintedLvalues };
+  return Editor.createTooltip(deps, ({ hovered, ranges, tainted }) => {
+    const hoveredTaint = tainted?.find(t => t.lval === hovered);
+    const hoveredNode = hovered && uniqueRange(hovered, ranges);
+    if (!hoveredTaint || !hoveredNode) return undefined;
+    return {
+      pos: hoveredNode.from,
+      above: true,
+      strictSide: true,
+      arrow: true,
+      create: () => {
+        const dom = document.createElement('div');
+        dom.className = 'cm-tainted-tooltip';
+        dom.textContent = textOfTaint(hoveredTaint.taint);
+        return { dom };
+      }
+    };
+  });
+}
+
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+//  Server requests
+// -----------------------------------------------------------------------------
+
+// Server request handler returning the given function's text.
+function useFctText(fct: Fct): text {
+  return States.useRequest(Ast.printFunction, fct) ?? null;
+}
+
+// Server request handler returning the given function's dead code information.
+function useFctDead(fct: Fct): Eva.deadCode {
+  const empty = { unreachable: [], nonTerminating: [] };
+  return States.useRequest(Eva.getDeadCode, fct) ?? empty;
+}
+
+// Server request handler returning the given function's callers.
+function useFctCallers(fct: Fct): Eva.CallSite[] {
+  return States.useRequest(Eva.getCallers, fct) ?? [];
+}
+
+// Server request handler returning the tainted lvalues.
+function useFctTaints(fct: Fct): Eva.LvalueTaints[] {
+  return States.useRequest(Eva.taintedLvalues, fct, { onError: [] }) ?? [];
+}
+
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+//  AST View component
+// -----------------------------------------------------------------------------
+
+// Necessary extensions for our needs.
+const extensions: Editor.Extension[] = [
+  MarkerUpdater,
+  MarkerScroller,
+  HoveredUpdater,
+  CodeDecorator,
+  DeadCodeDecorator,
+  ContextMenuHandler,
+  PropertiesGutter,
+  TaintedLvaluesDecorator,
+  TaintTooltip,
+  Editor.FoldGutter,
+  Editor.LanguageHighlighter,
+];
+
+// The component in itself.
+export default function ASTview(): JSX.Element {
+  const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
+  const { view, Component } = Editor.Editor(extensions);
+
+  // Updating CodeMirror when the selection or its callback are changed.
+  const [selection, setSel] = States.useSelection();
+  React.useEffect(() => UpdateSelection.set(view, setSel), [view, setSel]);
+  const fct = selection?.current?.fct;
+  React.useEffect(() => Fct.set(view, fct), [view, fct]);
+  const marker = selection?.current?.marker;
+  React.useEffect(() => Marker.set(view, marker), [view, marker]);
+
+  // Updating CodeMirror when the <updateHovered> callback is changed.
+  const [hov, setHov] = States.useHovered();
+  React.useEffect(() => UpdateHovered.set(view, setHov), [view, setHov]);
+  React.useEffect(() => Hovered.set(view, hov?.marker ?? ''), [view, hov]);
+
+  // Updating CodeMirror when the <properties> synchronized array is changed.
+  const props = States.useSyncArray(Properties.status).getArray();
+  React.useEffect(() => PropertiesStatuses.set(view, props), [view, props]);
+
+  // Updating CodeMirror when the <propStatusTags> map is changed.
+  const tags = States.useTags(Properties.propStatusTags);
+  React.useEffect(() => Tags.set(view, tags), [view, tags]);
+
+  // Updating CodeMirror when the <markersInfo> synchronized array is changed.
+  const info = States.useSyncArray(Ast.markerInfo);
+  const getData = React.useCallback((key) => info.getData(key), [info]);
+  React.useEffect(() => GetMarkerData.set(view, getData), [view, getData]);
+
+  // Retrieving data on currently selected function and updating CodeMirror when
+  // they have changed.
+  const text = useFctText(fct);
+  React.useEffect(() => Text.set(view, text), [view, text]);
+  const dead = useFctDead(fct);
+  React.useEffect(() => Dead.set(view, dead), [view, dead]);
+  const callers = useFctCallers(fct);
+  React.useEffect(() => Callers.set(view, callers), [view, callers]);
+  const taints = useFctTaints(fct);
+  React.useEffect(() => TaintedLvalues.set(view, taints), [view, taints]);
+
   return (
     <>
       <TitleBar>
@@ -342,35 +675,22 @@ export default function ASTview(): JSX.Element {
         <IconButton
           icon='CHEVRON.CONTRACT'
           visible={true}
-          onClick={foldAll}
+          onClick={() => Editor.foldAll(view)}
           title='Collapse all multi-line ACSL properties'
           className="titlebar-thin-icon"
         />
         <IconButton
           icon='CHEVRON.EXPAND'
           visible={true}
-          onClick={unfoldAll}
+          onClick={() => Editor.unfoldAll(view)}
           title='Expand all multi-line ACSL properties'
           className="titlebar-thin-icon"
         />
         <Inset />
       </TitleBar>
-      <Text
-        buffer={buffer}
-        mode="text/x-csrc"
-        fontSize={fontSize}
-        selection={theMarker}
-        onHover={onHover}
-        onSelection={onSelection}
-        onContextMenu={onContextMenu}
-        foldGutter={true}
-        foldOptions={foldOptions}
-        gutters={['bullet', 'CodeMirror-foldgutter']}
-        readOnly
-      />
+      <Component style={{ fontSize: `${fontSize}px`}} />
     </>
   );
-
 }
 
-// --------------------------------------------------------------------------
+// -----------------------------------------------------------------------------

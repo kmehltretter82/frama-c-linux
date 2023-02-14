@@ -100,5 +100,11 @@
     --eva-alarms-true: green;
     --eva-alarms-false: #fb4e4a;
     --eva-alarms-unknown: darkorange;
+
+    --codemirror-comment: #aa5500;
+    --codemirror-type: #008855;
+    --codemirror-number: #116644;
+    --codemirror-keyword: #770088;
+    --codemirror-def: #0000ff;
   }
 }

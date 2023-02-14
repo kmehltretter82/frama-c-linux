@@ -106,3 +106,87 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Styling CodeMirror 6 editor                                        --- */
+/* -------------------------------------------------------------------------- */
+
+.cm-global-box {
+  height: 100%;
+  overflow: auto;
+}
+
+.cm-editor {
+  background-color: var(--background-report);
+  color: var(--text);
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.cm-editor .cm-gutters {
+  border-right: 0px;
+  width: 2.15em;
+  background: var(--background-report);
+}
+
+.cm-editor .cm-gutters .cm-lineNumbers {
+  color: var(--disabled-text);
+}
+
+.cm-property-gutter {
+  width: 1.3em;
+  background: var(--code-bullet);
+}
+
+.cm-hovered-code {
+  background-color: var(--code-hover);
+}
+
+.cm-selected-code {
+  background-color: var(--code-select);
+}
+
+.cm-selected-code:hover {
+  background-color: var(--code-select-hover);
+}
+
+.cm-dead-code {
+  font-style: italic;
+  filter: opacity(0.7);
+}
+
+.cm-non-term-code {
+  font-style: italic;
+  filter: opacity(0.7);
+}
+
+.cm-tainted {
+  text-decoration: underline var(--warning) solid 1px;
+  text-decoration-skip-ink: none;
+  text-underline-position: under;
+}
+
+.cm-tooltip.cm-tainted-tooltip {
+  background-color: var(--background-softer);
+  color: var(--text-highlighted);
+  border: 1px solid var(--background-profound);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.cm-tooltip-above.cm-tainted-tooltip .cm-tooltip-arrow:before {
+  border-top-color: var(--background-profound);
+}
+
+.cm-tooltip-above.cm-tainted-tooltip .cm-tooltip-arrow:after {
+  border-top-color: var(--background-softer);
+}
+
+.cm-def { color: var(--codemirror-def); }
+.cm-comment { color: var(--codemirror-comment); }
+.cm-type { color: var(--codemirror-type); }
+.cm-number { color: var(--codemirror-number); }
+.cm-keyword { color: var(--codemirror-keyword); }
+
+.cm-active-line { background-color: var(--background); }
+
+/* -------------------------------------------------------------------------- */

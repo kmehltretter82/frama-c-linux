@@ -57,17 +57,39 @@ let _computation_signal =
     ~add_hook:Analysis.register_computation_hook
     ()
 
-module CallSite = Data.Jpair (Kernel_ast.Kf) (Kernel_ast.Stmt)
 
-let callers kf =
-  let list = Results.callsites kf in
-  List.concat (List.map (fun (kf, l) -> List.map (fun s -> kf, s) l) list)
 
-let () = Request.register ~package
-    ~kind:`GET ~name:"getCallers"
-    ~descr:(Markdown.plain "Get the list of call site of a function")
-    ~input:(module Kernel_ast.Kf) ~output:(module Data.Jlist (CallSite))
-    callers
+(* ----- Callsites ---------------------------------------------------------- *)
+
+module CallSite = struct
+  open Data
+  type callsite
+  let record: callsite Record.signature = Record.signature ()
+
+  let kf_field = Record.field record ~name:"kf"
+      ~descr:(Markdown.plain "Function") (module Kernel_ast.Kf)
+
+  let stmt_field = Record.field record ~name:"stmt"
+      ~descr:(Markdown.plain "Statement") (module Kernel_ast.Stmt)
+
+  let data = Record.publish ~package ~name:"CallSite"
+      ~descr:(Markdown.plain "CallSite") record
+
+  module R : Record.S with type r = callsite = (val data)
+
+  let convert (kf, stmts) = stmts |> List.map @@ fun stmt ->
+    R.default |> R.set kf_field kf |> R.set stmt_field stmt
+
+  let callers kf = Results.callsites kf |> List.map convert |> List.concat
+
+  let () = Request.register ~package
+      ~kind:`GET ~name:"getCallers"
+      ~descr:(Markdown.plain "Get the list of call site of a function")
+      ~input:(module Kernel_ast.Kf) ~output:(module Data.Jlist (R))
+      callers
+end
+
+
 
 (* ----- Functions ---------------------------------------------------------- *)
 
@@ -93,6 +115,8 @@ struct
           Analysis.register_computation_hook (fun _ -> f () ))
 end
 
+
+
 (* ----- Dead code: unreachable and non-terminating statements -------------- *)
 
 type dead_code =
@@ -109,6 +133,7 @@ module DeadCode = struct
   let unreachable = Record.field record ~name:"unreachable"
       ~descr:(Markdown.plain "List of unreachable statements.")
       (module Data.Jlist (Kernel_ast.Marker))
+
   let non_terminating = Record.field record ~name:"nonTerminating"
       ~descr:(Markdown.plain "List of reachable but non terminating statements.")
       (module Data.Jlist (Kernel_ast.Marker))
@@ -159,7 +184,9 @@ let () = Request.register ~package
     ~output:(module DeadCode)
     dead_code
 
-(* ----- Register Eva information ------------------------------------------- *)
+
+
+(* ----- Register Eva values information ------------------------------------ *)
 
 let term_lval_to_lval tlval =
   try Logic_to_c.term_lval_to_lval tlval
@@ -199,64 +226,79 @@ let () =
     ~enable:Analysis.is_computed
     print_value
 
-let print_taint fmt marker =
-  let loc = Cil_datatype.Location.unknown in
-  let expr, stmt =
-    match marker with
-    | Printer_tag.PLval (_kf, Kstmt stmt, lval) ->
-      Cil.new_exp ~loc (Lval lval), stmt
-    | Printer_tag.PExp (_kf, Kstmt stmt, expr) -> expr, stmt
-    | PVDecl (_kf, Kstmt stmt, vi) ->
-      Cil.new_exp ~loc (Lval (Var vi, NoOffset)), stmt
-    | PTermLval (_kf, Kstmt stmt, _ip, tlval) ->
-      let lval = term_lval_to_lval tlval in
-      Cil.new_exp ~loc (Lval lval), stmt
-    | _ -> raise Not_found
-  in
-  let evaluate_taint request =
-    let deps = Results.expr_dependencies expr request in
-    Result.get_ok (Results.is_tainted deps.data request),
-    Result.get_ok (Results.is_tainted deps.indirect request)
-  in
-  let before = evaluate_taint Results.(before stmt) in
-  let after = evaluate_taint Results.(after stmt) in
-  let str_taint = function
-    | Results.Untainted -> "untainted"
+
+
+(* ----- Register Eva taints information ------------------------------------ *)
+
+let expr_of_lval v = Cil.new_exp ~loc:Cil_datatype.Location.unknown (Lval v)
+
+module EvaTaints = struct
+  open Results
+
+  let evaluate expr request =
+    let (let+) = Option.bind in
+    let { data ; indirect } = expr_dependencies expr request in
+    let+ data = is_tainted data request |> Result.to_option in
+    let+ indirect = is_tainted indirect request |> Result.to_option in
+    Some (data, indirect)
+
+  let expr_of_marker = let open Printer_tag in function
+      | PLval (_, Kstmt stmt, lval) -> Some (expr_of_lval lval, stmt)
+      | PExp (_, Kstmt stmt, expr) -> Some (expr, stmt)
+      | PVDecl (_, Kstmt stmt, vi) -> Some (expr_of_lval (Var vi, NoOffset), stmt)
+      | PTermLval (_, Kstmt stmt, _, tlval) ->
+        Some (term_lval_to_lval tlval |> expr_of_lval, stmt)
+      | _ -> None
+
+  let of_marker marker =
+    let (let+) = Option.bind in
+    let+ expr, stmt = expr_of_marker marker in
+    let+ before = evaluate expr (before stmt) in
+    let+ after  = evaluate expr (after  stmt) in
+    Some (before, after)
+
+  let to_string = function
+    | Untainted -> "untainted"
     | Direct -> "direct taint"
     | Indirect -> "indirect taint"
-  in
-  let pretty fmt = let open Results in function
-      | taint, Untainted -> Format.fprintf fmt "%s" (str_taint taint)
-      | t1, t2 ->
-        Format.fprintf fmt
-          "%s to the value, %s %s to values used to compute lvalues addresses"
-          (str_taint t1) (if t1 = Untainted then "but" else "and") (str_taint t2)
-  in
-  if before = after
-  then Format.fprintf fmt "%a" pretty before
-  else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
 
-let () =
-  let enable () = Analysis.is_computed () && Taint_domain.Store.is_computed () in
-  let title =
+  let pretty fmt = function
+    | taint, Untainted -> Format.fprintf fmt "%s" (to_string taint)
+    | data, indirect ->
+      let sep = match data with Untainted -> "but" | _ -> "and" in
+      Format.fprintf fmt
+        "%s to the value, %s %s to values used to compute lvalues adresses"
+        (to_string data) sep (to_string indirect)
+
+  let print_taint fmt marker =
+    let before, after = of_marker marker |> Option.get in
+    if before = after then Format.fprintf fmt "%a" pretty before
+    else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
+
+  let eva_taints_title =
     "Taint status:\n\
      - Direct taint: data dependency from values provided by the attacker, \
      meaning that the attacker may be able to alter this value\n\
      - Indirect taint: the attacker cannot directly alter this value, but he \
      may be able to impact the path by which its value is computed.\n\
      - Untainted: cannot be modified by the attacker."
-  in
-  Server.Kernel_ast.Information.register
-    ~id:"eva.taint" ~label:"Taint" ~descr: "Taint status according to Eva"
-    ~title ~enable print_taint
 
-let () =
-  Analysis.register_computation_hook
-    (fun _ -> Server.Kernel_ast.Information.update ())
+  let () =
+    let taint_computed = Taint_domain.Store.is_computed in
+    let enable () = Analysis.is_computed () && taint_computed () in
+    Server.Kernel_ast.Information.register
+      ~id:"eva.taint" ~label:"Taint" ~descr: "Taint status according to Eva"
+      ~title:eva_taints_title ~enable print_taint
 
-(* ----- Red and tainted alarms --------------------------------------------- *)
+  let update = Server.Kernel_ast.Information.update
+  let () = Analysis.register_computation_hook (fun _ -> update ())
+end
 
-module Taint = struct
+
+
+(* ----- Taint statuses ----------------------------------------------------- *)
+
+module TaintStatus = struct
   open Server.Data
 
   type taint = Results.taint = Direct | Indirect | Untainted
@@ -271,49 +313,98 @@ module Taint = struct
       ~value dictionary
 
   let tag_not_computed =
-    tag (Error NotComputed) "not_computed" ""
-      "Not computed" "the Eva taint domain has not been enabled, \
-                      or the Eva analysis has not been run"
+    tag (Error NotComputed) "not_computed" "" "Not computed"
+      "the Eva taint domain has not been enabled, \
+       or the Eva analysis has not been run"
 
   let tag_error =
-    tag (Error LogicError) "error" "Error"
-      "Error" "the memory zone on which this property depends \
-               could not be computed"
+    tag (Error LogicError) "error" "Error" "Error"
+      "the memory zone on which this property depends could not be computed"
 
   let tag_not_applicable =
-    tag (Error Irrelevant) "not_applicable" "—"
-      "Not applicable" "no taint for this kind of property"
+    tag (Error Irrelevant) "not_applicable" "—" "Not applicable"
+      "no taint for this kind of property"
 
   let tag_direct_taint =
-    tag (Ok Direct) "direct_taint" "Tainted (direct)"
-      "Direct taint"
+    tag (Ok Direct) "direct_taint" "Tainted (direct)" "Direct taint"
       "this property is related to a memory location that can be affected \
        by an attacker"
 
   let tag_indirect_taint =
-    tag (Ok Indirect) "indirect_taint" "Tainted (indirect)"
-      "Indirect taint"
+    tag (Ok Indirect) "indirect_taint" "Tainted (indirect)" "Indirect taint"
       "this property is related to a memory location whose assignment depends \
        on path conditions that can be affected by an attacker"
 
   let tag_untainted =
-    tag (Ok Untainted) "not_tainted" "Untainted"
-      "Untainted property" "this property is safe"
+    tag (Ok Untainted) "not_tainted" "Untainted" "Untainted property"
+      "this property is safe"
 
-  let () = Enum.set_lookup dictionary
-      begin function
-        | Error NotComputed -> tag_not_computed
-        | Error Irrelevant -> tag_not_applicable
-        | Error LogicError -> tag_error
-        | Ok Direct -> tag_direct_taint
-        | Ok Indirect -> tag_indirect_taint
-        | Ok Untainted -> tag_untainted
-      end
+  let () = Enum.set_lookup dictionary @@ function
+    | Error NotComputed -> tag_not_computed
+    | Error Irrelevant -> tag_not_applicable
+    | Error LogicError -> tag_error
+    | Ok Direct -> tag_direct_taint
+    | Ok Indirect -> tag_indirect_taint
+    | Ok Untainted -> tag_untainted
 
   let data = Request.dictionary ~package ~name:"taintStatus"
       ~descr:(Markdown.plain "Taint status of logical properties") dictionary
 
   include (val data : S with type t = (taint, error) result)
+end
+
+
+
+(* ----- Tainted lvalues ---------------------------------------------------- *)
+
+module LvalueTaints = struct
+  module Table = Cil_datatype.Lval.Hashtbl
+
+  module Status = struct
+    type record
+    let record: record Data.Record.signature = Data.Record.signature ()
+    let field name d = Data.Record.field record ~name ~descr:(Markdown.plain d)
+    let lval_field = field "lval" "tainted lvalue" (module Kernel_ast.Lval)
+    let taint_field = field "taint" "taint status" (module TaintStatus)
+    let name, descr = "LvalueTaints", Markdown.plain "Lvalue taint status"
+    let publication = Data.Record.publish record ~package ~name ~descr
+    include (val publication: Data.Record.S with type r = record)
+    let create lval taint = set lval_field lval @@ set taint_field taint default
+  end
+
+  let current_project () = Visitor_behavior.inplace ()
+  class tainted_lvalues taints = object (self)
+    inherit Visitor.generic_frama_c_visitor (current_project ())
+    method! vlval lval =
+      let expr = expr_of_lval lval in
+      match self#current_stmt with
+      | None -> DoChildren
+      | Some stmt ->
+        match Results.after stmt |> EvaTaints.evaluate expr with
+        | Some (Results.Untainted, _) -> DoChildren
+        | Some (t, _) -> Table.add taints lval (Kstmt stmt, t) ; DoChildren
+        | None -> DoChildren
+  end
+
+  let get_tainted_lvals fundec =
+    let taints = Table.create 17 in
+    Visitor.visitFramacFunction (new tainted_lvalues taints) fundec |> ignore ;
+    let fn lval (ki, taint) acc = Status.create (ki, lval) (Ok taint) :: acc in
+    Table.fold fn taints [] |> List.rev
+
+  let () = Request.register ~package ~kind:`GET ~name:"taintedLvalues"
+      ~descr:(Markdown.plain "Get the tainted lvalues of a given function")
+      ~input:(module (Kernel_ast.Fundec))
+      ~output:(module (Data.Jlist (Status)))
+      get_tainted_lvals
+end
+
+
+
+(* ----- Red and tainted alarms --------------------------------------------- *)
+
+module PropertiesData = struct
+  open TaintStatus
 
   let zone_of_predicate kinstr predicate =
     let state = Results.(before_kinstr kinstr |> get_cvalue_model) in
@@ -336,40 +427,39 @@ module Taint = struct
     | _ -> Error Irrelevant
 
   let is_tainted_property ip =
-    if not (Analysis.is_computed () && Taint_domain.Store.is_computed ())
-    then Error NotComputed
-    else
+    if Analysis.is_computed () && Taint_domain.Store.is_computed () then
       let (let+) = Result.bind in
       let kinstr = Property.get_kinstr ip in
       let+ predicate = get_predicate ip in
       let+ zone = zone_of_predicate kinstr predicate in
       let result = Results.(before_kinstr kinstr |> is_tainted zone) in
       Result.map_error (fun _ -> NotComputed) result
+    else Error NotComputed
+
+  let () =
+    let model = States.model () in
+    let descr = "Is the property invalid in some context of the analysis?" in
+    States.column model
+      ~name:"priority"
+      ~descr:(Markdown.plain descr)
+      ~data:(module Data.Jbool)
+      ~get:Red_statuses.is_red ;
+    let descr = "Is the property tainted according to the Eva taint domain?" in
+    States.column model
+      ~name:"taint"
+      ~descr:(Markdown.plain descr)
+      ~data:(module TaintStatus)
+      ~get:is_tainted_property ;
+    ignore @@ States.register_array
+      ~package
+      ~name:"properties"
+      ~descr:(Markdown.plain "Status of Registered Properties")
+      ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
+      ~keyType:Kernel_ast.Marker.jproperty
+      ~iter:Property_status.iter
+      model
 end
 
-let model = States.model ()
-
-let () = States.column model ~name:"priority"
-    ~descr:(Markdown.plain "Is the property invalid in some context \
-                            of the analysis?")
-    ~data:(module Data.Jbool)
-    ~get:(fun ip -> Red_statuses.is_red ip)
-
-let () = States.column model ~name:"taint"
-    ~descr:(Markdown.plain "Is the property tainted according to \
-                            the Eva taint domain?")
-    ~data:(module Taint)
-    ~get:(fun ip -> Taint.is_tainted_property ip)
-
-let _array =
-  States.register_array
-    ~package
-    ~name:"properties"
-    ~descr:(Markdown.plain "Status of Registered Properties")
-    ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
-    ~keyType:Kernel_ast.Marker.jproperty
-    ~iter:Property_status.iter
-    model
 
 
 (* ----- Analysis statistics ------------------------------------------------ *)
@@ -579,6 +669,7 @@ let _array =
     ~iter:(fun f -> FunctionStats.iter (fun fundec s -> f (fundec,s)))
     ~add_update_hook:FunctionStats.register_hook
     model
+
 
 
 (* ----- Domains states ----------------------------------------------------- *)

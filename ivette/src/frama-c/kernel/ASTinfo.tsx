@@ -27,6 +27,7 @@
 import React from 'react';
 import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
+import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as DATA from 'frama-c/kernel/api/data';
 import * as AST from 'frama-c/kernel/api/ast';
@@ -120,9 +121,9 @@ interface InfoSectionProps {
 function MarkInfos(props: InfoSectionProps): JSX.Element {
   const [unfold, setUnfold] = React.useState(true);
   const [more, setMore] = React.useState(false);
-  const { marker, markerInfo } = props;
-  const allInfos: ASTinfos[] =
-    States.useRequest(AST.getInformation, marker) ?? [];
+  const { marker: m, markerInfo } = props;
+  const req = React.useMemo(() => Server.send(AST.getInformation, m), [m]);
+  const { result: allInfos = [] } = Dome.usePromise(req);
   const highlight = classes(
     props.selected && 'selected',
     props.hovered && 'hovered',

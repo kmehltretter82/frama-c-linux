@@ -20,195 +20,268 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-// --------------------------------------------------------------------------
-// --- Source Code
-// --------------------------------------------------------------------------
-
 import React from 'react';
-import * as Server from 'frama-c/server';
-import * as States from 'frama-c/states';
+import * as Path from 'path';
 
 import * as Dome from 'dome';
 import * as System from 'dome/system';
-import { RichTextBuffer } from 'dome/text/buffers';
-import { Text } from 'dome/text/editors';
-import { TitleBar } from 'ivette';
-import * as Preferences from 'ivette/prefs';
-import { functions, markerInfo, getMarkerAt } from 'frama-c/kernel/api/ast';
-import { Code } from 'dome/controls/labels';
-import { Hfill } from 'dome/layout/boxes';
-import { IconButton } from 'dome/controls/buttons';
-import * as Path from 'path';
+import * as Boxes from 'dome/layout/boxes';
+import * as Editor from 'dome/text/editor';
+import * as Labels from 'dome/controls/labels';
 import * as Settings from 'dome/data/settings';
+import * as Buttons from 'dome/controls/buttons';
+
+import { Selection, Document } from 'dome/text/editor';
+
+import * as Server from 'frama-c/server';
+import * as States from 'frama-c/states';
 import * as Status from 'frama-c/kernel/Status';
+import * as Ast from 'frama-c/kernel/api/ast';
 
-import CodeMirror from 'codemirror/lib/codemirror';
-import 'codemirror/addon/selection/active-line';
-import 'codemirror/addon/dialog/dialog.css';
-import 'codemirror/addon/search/search';
-import 'codemirror/addon/search/searchcursor';
+import * as Ivette from 'ivette';
+import * as Preferences from 'ivette/prefs';
 
-// --------------------------------------------------------------------------
-// --- Pretty Printing (Browser Console)
-// --------------------------------------------------------------------------
 
-const D = new Dome.Debug('Source Code');
 
-// --------------------------------------------------------------------------
-// --- Source Code Printer
-// --------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+//  Utilitary types and functions
+// -----------------------------------------------------------------------------
 
-// The SourceCode component, producing the GUI part showing the source code
-// corresponding to the selected function.
-export default function SourceCode(): JSX.Element {
+// Recovering the cursor position as a line and a column.
+interface Position { line: number, column: number }
+function getCursorPosition(view: Editor.View): Position {
+  const pos = view?.state.selection.main;
+  if (!view || !pos) return { line: 1, column: 1 };
+  const line = view.state.doc.lineAt(pos.from).number;
+  const column = (pos.goalColumn ?? 0) + 1;
+  return { line, column };
+}
 
-  // Hooks
-  const [buffer] = React.useState(() => new RichTextBuffer());
-  const [selection, updateSelection] = States.useSelection();
-  const theFunction = selection?.current?.fct;
-  const theMarker = selection?.current?.marker;
-  const markersInfo = States.useSyncArray(markerInfo);
-  const functionsData = States.useSyncArray(functions).getArray();
+// Error messages.
+function setError(text: string): void {
+  Status.setMessage({ text, kind: 'error' });
+}
 
-  // Retrieving the file name and the line number from the selection and the
-  // synchronized tables.
-  const sloc =
-    (theMarker && markersInfo.getData(theMarker)?.sloc) ??
-    (theFunction && functionsData.find((e) => e.name === theFunction)?.sloc);
-  const file = sloc ? sloc.file : '';
-  const line = sloc ? sloc.line : 0;
-  const filename = Path.parse(file).base;
+// Function launching the external editor at the currently selected position.
+async function edit(file: string, pos: Position, cmd: string): Promise<void> {
+  if (file === '') return;
+  const args = cmd
+    .replace('%s', file)
+    .replace('%n', pos.line.toString())
+    .replace('%c', pos.column.toString())
+    .split(' ');
+  const prog = args.shift(); if (!prog) return;
+  const text = `An error has occured when opening the external editor ${prog}`;
+  System.spawn(prog, args).catch(() => setError(text));
+}
 
-  // Global Font Size
-  const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
+// -----------------------------------------------------------------------------
 
-  // Updating the buffer content.
-  const text = React.useMemo(async () => {
-    const onError = (): string => {
-      if (file)
-        D.error(`Fail to load source code file ${file}`);
-      return '';
-    };
-    return System.readFile(file).catch(onError);
-  }, [file]);
-  const { result } = Dome.usePromise(text);
-  React.useEffect(() => buffer.setValue(result), [buffer, result]);
 
-  /* Last location selected by a click in the source code. */
-  const selected: React.MutableRefObject<undefined | States.Location> =
-    React.useRef();
 
-  /* Updates the cursor position according to the current [selection], except
-     when the [selection] is changed according to a click in the source code,
-     in which case the cursor should stay exactly where the user clicked. */
-  React.useEffect(() => {
-    if (selected.current && selected?.current === selection?.current)
-      selected.current = undefined;
-    else
-      buffer.setCursorOnTop(line);
-  }, [buffer, selection, line, result]);
+// -----------------------------------------------------------------------------
+//  Fields declarations
+// -----------------------------------------------------------------------------
 
-  /* CodeMirror types used to bind callbacks to extraKeys. */
-  type position = CodeMirror.Position;
-  type editor = CodeMirror.Editor;
+// The Ivette selection must be updated by the CodeMirror plugin. This field
+// adds the callback in the CodeMirror internal state.
+type UpdateSelection = (a: States.SelectionActions) => void;
+const UpdateSelection = Editor.createField<UpdateSelection>(() => { return; });
 
-  const selectCallback = React.useCallback(
-    async function select(editor: editor, event: MouseEvent) {
-      const pos = editor.coordsChar({ left: event.x, top: event.y });
-      if (file === '' || !pos) return;
-      const arg = [file, pos.line + 1, pos.ch + 1];
-      Server
-        .send(getMarkerAt, arg)
-        .then(([fct, marker]) => {
-          if (fct || marker) {
-            const location = { fct, marker } as States.Location;
-            selected.current = location;
-            updateSelection({ location });
-          }
-        })
-        .catch((err) => {
-          D.error(`Failed to get marker from source file position: ${err}`);
-          Status.setMessage({
-            text: 'Failed request to Frama-C server',
-            kind: 'error',
-          });
-        });
+// Those fields contain the source code and the file name.
+const Source = Editor.createTextField<string>('', (s) => s);
+const File = Editor.createField<string>('');
+
+// This field contains the command use to start the external editor.
+const Command = Editor.createField<string>('');
+
+// These field contains a callback that returns the source of a location.
+type GetSource = (loc: States.Location) => Ast.source | undefined;
+const GetSource = Editor.createField<GetSource>(() => undefined);
+
+// We keep track of the cursor location (i.e the location that is under the
+// current CodeMirror cursor) and the ivette location (i.e the locations as
+// seen by the outside world). Keeping track of both of them together force
+// their update in one dispatch, which prevents strange bugs.
+interface Locations { cursor?: States.Location, ivette: States.Location }
+
+// The Locations field. When given Locations, it will update the cursor field if
+// and only if the new cursor location is not undefined. It simplifies the
+// update in the SourceCode component itself.
+const Locations = createLocationsField();
+function createLocationsField(): Editor.Field<Locations> {
+  const noField = { cursor: undefined, ivette: {} };
+  const field = Editor.createField<Locations>(noField);
+  const set: Editor.Set<Locations> = (view, toBe) => {
+    const hasBeen = field.get(view?.state); 
+    const cursor = toBe.cursor ?? hasBeen.cursor;
+    field.set(view, { cursor, ivette: toBe.ivette });
+  };
+  return { ...field, set };
+}
+
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+//  Synchronisation with the outside world
+// -----------------------------------------------------------------------------
+
+// Update the outside world when the user click somewhere in the source code.
+const SyncOnUserSelection = createSyncOnUserSelection();
+function createSyncOnUserSelection(): Editor.Extension {
+  const actions = { cmd: Command, update: UpdateSelection };
+  const deps = { file: File, selection: Selection, doc: Document, ...actions };
+  return Editor.createEventHandler(deps, {
+    mouseup: async ({ file, cmd, update }, view, event) => {
+      if (!view || file === '') return;
+      const pos = getCursorPosition(view);
+      const cursor = [file, pos.line, pos.column];
+      try {
+        const [fct, marker] = await Server.send(Ast.getMarkerAt, cursor);
+        if (fct || marker) {
+          // The forced reload should NOT be necessary but... It is...
+          await Server.send(Ast.reloadMarkerInfo, null);
+          const location = { fct, marker };
+          update({ location });
+          Locations.set(view, { cursor: location, ivette: location });
+        }
+      } catch {
+        setError('Failure');
+      }
+      if (event.ctrlKey) edit(file, pos, cmd);
+    }
+  });
+}
+
+// Update the cursor position when the outside world changes the selected
+// location.
+const SyncOnOutsideSelection = createSyncOnOutsideSelection();
+function createSyncOnOutsideSelection(): Editor.Extension {
+  const deps = { locations: Locations, get: GetSource };
+  return Editor.createViewUpdater(deps, ({ locations, get }, view) => {
+    const { cursor, ivette } = locations;
+    if (ivette === undefined || ivette === cursor) return;
+    const source = get(ivette); if (!source) return;
+    const newFct = ivette.fct !== cursor?.fct && ivette.marker === undefined;
+    const onTop = cursor === undefined || newFct;
+    Locations.set(view, { cursor: ivette, ivette });
+    Editor.selectLine(view, source.line, onTop);
+  });
+}
+
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+//  Context menu
+// -----------------------------------------------------------------------------
+
+// This events handler takes care of the context menu.
+const ContextMenu = createContextMenu();
+function createContextMenu(): Editor.Extension {
+  const deps = { file: File, command: Command, update: UpdateSelection };
+  return Editor.createEventHandler(deps, {
+    contextmenu: ({ file, command }, view) => {
+      if (file === '') return;
+      const label = 'Open file in an external editor';
+      const pos = getCursorPosition(view);
+      Dome.popupMenu([ { label, onClick: () => edit(file, pos, command) } ]);
     },
-    [file, updateSelection],
-  );
+  });
+}
 
-  React.useEffect(() => {
-    buffer.forEach((cm) => cm.on('mousedown', selectCallback));
-    return () => buffer.forEach((cm) => cm.off('mousedown', selectCallback));
-  }, [buffer, selectCallback]);
+// -----------------------------------------------------------------------------
 
+
+
+// -----------------------------------------------------------------------------
+//  Server requests
+// -----------------------------------------------------------------------------
+
+// Server request handler returning the source code.
+function useFctSource(file: string): string {
+  const req = React.useMemo(() => System.readFile(file), [file]);
+  const { result } = Dome.usePromise(req);
+  return result ?? '';
+}
+
+// Build a callback that retrieves a location's source information.
+function useSourceGetter(): GetSource {
+  const markersInfo = States.useSyncArray(Ast.markerInfo);
+  const functionsData = States.useSyncArray(Ast.functions).getArray();
+  return React.useCallback(({ fct, marker }) => {
+    const markerSloc = (marker !== undefined && marker !== '') ?
+      markersInfo.getData(marker)?.sloc : undefined;
+    const fctSloc = (fct !== undefined && fct !== '') ?
+      functionsData.find((e) => e.name === fct)?.sloc : undefined;
+    return markerSloc ?? fctSloc;
+  }, [markersInfo, functionsData]);
+}
+
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
+//  Source Code component
+// -----------------------------------------------------------------------------
+
+// Necessary extensions.
+const extensions: Editor.Extension[] = [
+  Source,
+  Editor.Selection,
+  Editor.LineNumbers,
+  Editor.LanguageHighlighter,
+  Editor.HighlightActiveLine,
+  SyncOnUserSelection,
+  SyncOnOutsideSelection,
+  ContextMenu,
+  Locations.structure,
+];
+
+// The component in itself.
+export default function SourceCode(): JSX.Element {
+  const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
-  async function launchEditor(_?: editor, pos?: position): Promise<void> {
-    if (file !== '') {
-      const selectedLine = pos ? (pos.line + 1).toString() : '1';
-      const selectedChar = pos ? (pos.ch + 1).toString() : '1';
-      const cmd = command
-        .replace('%s', file)
-        .replace('%n', selectedLine)
-        .replace('%c', selectedChar);
-      const args = cmd.split(' ');
-      const prog = args.shift();
-      if (prog) System.spawn(prog, args).catch(() => {
-        Status.setMessage({
-          text: `An error has occured when opening the external editor ${prog}`,
-          kind: 'error',
-        });
-      });
-    }
-  }
+  const { view, Component } = Editor.Editor(extensions);
+  const [selection, update] = States.useSelection();
+  const loc = React.useMemo(() => selection?.current ?? {}, [selection]);
+  const getSource = useSourceGetter();
+  const file = getSource(loc)?.file ?? '';
+  const filename = Path.parse(file).base;
+  const pos = getCursorPosition(view);
+  const source = useFctSource(file);
 
-  async function contextMenu(editor?: editor, pos?: position): Promise<void> {
-    if (file !== '') {
-      const items = [
-        {
-          label: 'Open file in an external editor',
-          onClick: () => launchEditor(editor, pos),
-        },
-      ];
-      Dome.popupMenu(items);
-    }
-  }
+  React.useEffect(() => UpdateSelection.set(view, update), [view, update]);
+  React.useEffect(() => GetSource.set(view, getSource), [view, getSource]);
+  React.useEffect(() => File.set(view, file), [view, file]);
+  React.useEffect(() => Source.set(view, source), [view, source]);
+  React.useEffect(() => Command.set(view, command), [view, command]);
+  React.useEffect(() => Locations.set(view, { ivette: loc }), [view, loc]);
 
   const externalEditorTitle =
     'Open the source file in an external editor.\nA Ctrl-click '
     + 'in the source code opens the editor at the selected location.'
     + '\nThe editor used can be configured in Ivette settings.';
 
-  // Building the React component.
   return (
     <>
-      <TitleBar>
-        <IconButton
+      <Ivette.TitleBar>
+        <Buttons.IconButton
           icon="DUPLICATE"
           visible={file !== ''}
-          onClick={launchEditor}
+          onClick={() => edit(file, pos, command)}
           title={externalEditorTitle}
         />
-        <Code title={file}>{filename}</Code>
-        <Hfill />
-      </TitleBar>
-      <Text
-        buffer={buffer}
-        mode="text/x-csrc"
-        fontSize={fontSize}
-        selection={theMarker}
-        lineNumbers={!!theFunction}
-        styleActiveLine={!!theFunction}
-        extraKeys={{
-          'Alt-F': 'findPersistent',
-          'Ctrl-LeftClick': launchEditor as (_: CodeMirror.Editor) => void,
-          RightClick: contextMenu as (_: CodeMirror.Editor) => void,
-        }}
-        readOnly
-      />
+        <Labels.Code title={file}>{filename}</Labels.Code>
+        <Boxes.Hfill />
+      </Ivette.TitleBar>
+      <Component style={{ fontSize: `${fontSize}px` }} />
     </>
   );
-
 }
 
-// --------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
