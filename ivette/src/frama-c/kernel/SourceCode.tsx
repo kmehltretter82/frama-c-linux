@@ -52,9 +52,9 @@ interface Position { line: number, column: number }
 function getCursorPosition(view: Editor.View): Position {
   const pos = view?.state.selection.main;
   if (!view || !pos) return { line: 1, column: 1 };
-  const line = view.state.doc.lineAt(pos.from).number;
-  const column = (pos.goalColumn ?? 0) + 1;
-  return { line, column };
+  const line = view.state.doc.lineAt(pos.from);
+  const column = pos.from - line.from + 1;
+  return { line: line.number, column };
 }
 
 // Error messages.
@@ -113,7 +113,7 @@ function createLocationsField(): Editor.Field<Locations> {
   const noField = { cursor: undefined, ivette: {} };
   const field = Editor.createField<Locations>(noField);
   const set: Editor.Set<Locations> = (view, toBe) => {
-    const hasBeen = field.get(view?.state); 
+    const hasBeen = field.get(view?.state);
     const cursor = toBe.cursor ?? hasBeen.cursor;
     field.set(view, { cursor, ivette: toBe.ivette });
   };
