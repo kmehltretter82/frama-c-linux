@@ -29,6 +29,60 @@ Please contact the \FramaC team if you require a thorough evaluation of the
 standards cited here, or of different ones. This reference is provided on a
 best-effort basis.
 
+\section{Unsupported C99 and C11 Features}
+\label{sec:unsupported-iso-c-features}
+
+The table below lists features of the C99 standard (ISO/IEC 9899:1999) which
+are currently unsupported by \FramaC. Please contact the \FramaC team if you
+would like them be to supported.
+
+\begin{longtable}{m{0.25\textwidth} m{0.70\textwidth}}
+  \caption{Unsupported C99 features}\\
+  \cellcolor{white}\textbf{{\em Feature}} & \cellcolor{white}\textbf{{\em Details}} \\
+  \hline
+  \endhead
+  \endfoot
+  \label{tab:unsupported-c99-features}%
+  Complex/Imaginary types & \verb|_Complex|/\verb|_Imaginary| types are
+  not natively supported in OCaml. Lack of user demand led to the absence of
+  their implementation in Frama-C. \\
+  Nested VLAs & Nested variable-length arrays (VLAs), that is,
+  \verb|int t[a][a]| where \verb|a| is not a compile-time constant,
+  are currently unsupported.
+  VLAs with a single variable dimension are supported. \\
+  Floating-point environment & Some prototypes and stubs are available in the
+  \texttt{fenv.h} and \texttt{fenv.c} files provided in \FramaC's standard
+  library (Section~\ref{sec:libc}), but they are incomplete.
+\end{longtable}
+
+The table below lists features of the C11 standard (ISO/IEC 9899:2011) which
+are currently unsupported by \FramaC. Please contact the \FramaC team if you
+would like them be to supported.
+
+\begin{longtable}{m{0.25\textwidth} m{0.70\textwidth}}
+  \caption{Unsupported C11 features}\\
+  \cellcolor{white}\textbf{{\em Feature}} & \cellcolor{white}\textbf{{\em Details}} \\
+  \hline
+  \endhead
+  \endfoot
+  \label{tab:unsupported-c11-features}%
+  \verb|_Alignas| / \verb|_Alignof| & Currently not supported by the \FramaC
+  kernel. Also, ACSL does not currently include alignment-related predicates. \\
+  \verb|_Atomic| & Currently unsupported (ignored) by the Frama-C kernel. \\
+  Unicode & \verb|u/U| character constants, \verb|u8/u/U| string literals, and
+  \verb|\u| escape sequences are currently unsupported by the lexer.
+  \textbf{Note}: in a few cases, such as ACSL specifications, some \verb|\u|
+  escape sequences are allowed (e.g. for ACSL symbols such as $\in$,
+  $\mathbb{Z}$, etc). \\
+  Complex/Imaginary types & As in C99
+  (see Table~\ref{tab:unsupported-c99-features}). Note that C11 made complex
+  types optional (they were required in C99). \\
+  Nested VLAs & As in C99
+  (see Table~\ref{tab:unsupported-c99-features}). Note that C11 made
+  variable-length types optional (they were required in C99).
+\end{longtable}
+
+
 \section{Frama-C Options Related to C Undefined Behaviors}
 
 This section lists several \FramaC options affecting (either enabling or
@@ -55,6 +109,11 @@ cases, we simply refer to the related section in the ISO C standard.
   \endhead
   \endfoot
   \label{tab:undefined-unspecified-behaviors}%
+  \texttt{-eva-initialization-padding-globals} & Controls UnsB related to {\em DD.10} for the initialization status of padding in global variables. \\
+  \texttt{-eva-warn-pointer-subtraction} & Toggles warnings related to UB {\em CC.48}. \\
+  \texttt{-eva-warn-undefined-pointer-comparison} & Toggles warnings related to pointer comparisons (related to UB {\em CC.53}). \\
+  \texttt{-initialized-padding-locals} & Toggles UnsB related to {\em DD.10} for local variables. \\
+  \texttt{-unspecified-access} & Enables reporting of some instances of UB {\em CC.35}. \\
   \texttt{-warn-invalid-bool} & Toggles reporting of UB {\em CC.12} when applied to values of type \texttt{\_Bool}. \\
   \texttt{-warn-invalid-pointer} & Toggles reporting of UBs {\em CC.46} and {\em CC.62}. \\
   \texttt{-warn-left-shift-negative} & Toggles reporting of UB {\em CC.52}. \\
@@ -64,10 +123,6 @@ cases, we simply refer to the related section in the ISO C standard.
   \texttt{-warn-signed-overflow} & Toggles reporting of UB {\em CC.36} for operations on signed types (except when converting from a wider to a narrower type). \\
   \texttt{-warn-unsigned-downcast} & Toggles reporting of UB {\em CC.36} for unsigned types, when converting from a wider to a narrower type. \\
   \texttt{-warn-unsigned-overflow} & Toggles reporting of a situation similar to UB {\em CC.36}, for operations on {\em unsigned} types, even though they are allowed by C11. \\
-  \texttt{-initialized-padding-locals} & Toggles UnsB related to {\em DD.10} for local variables. \\
-  \texttt{-eva-initialization-padding-globals} & Controls UnsB related to {\em DD.10} for the initialization status of padding in global variables. \\
-  \texttt{-eva-warn-pointer-subtraction} & Toggles warnings related to UB {\em CC.48}. \\
-  \texttt{-eva-warn-undefined-pointer-comparison} & Toggles warnings related to pointer comparisons (related to UB {\em CC.53}). \\
 \end{longtable}
 
 % disable the hyphenation ugly hack
@@ -78,7 +133,7 @@ cases, we simply refer to the related section in the ISO C standard.
 This section presents the correspondence between runtime execution (RTE) alarms
 emitted by the Eva plugin and C undefined behaviors.
 
-\begin{longtable}{>{\raggedright}m{0.26\textwidth} >{\raggedright\arraybackslash}m{0.28\textwidth} >{\raggedright\arraybackslash}m{0.4\textwidth}}
+\begin{longtable}{>{\raggedright}m{0.20\textwidth} >{\raggedright\arraybackslash}m{0.26\textwidth} >{\raggedright\arraybackslash}m{0.46\textwidth}}
   \caption{%
     Correspondence between \FramaC's runtime error categories and C's undefined behaviors.
   }\\
@@ -93,7 +148,7 @@ emitted by the Eva plugin and C undefined behaviors.
   division\_by\_zero & {\em CC.45} & \\
   float\_to\_int & {\em CC.17} & \\
   function\_pointer & {\em CC.26}, {\em CC.41} & \\
-  freeable & {\em CC.179} & This is not an RTE category, but an alarm related to an ACSL precondition \\
+  freeable & {\em CC.179} & This is not an RTE category, but an alarm related to an ACSL precondition. \\
   index\_bound & {\em CC.49} & \\
   initialization & {\em CC.11}, {\em CC.21}, {\em CC.180} & \\
   mem\_access & {\em CC.33}, {\em CC.43}, {\em CC.47}, {\em CC.62}, {\em CC.64}, {\em CC.176} (among others) & Alignment issues are currently not reported by Frama-C. \\
@@ -107,7 +162,7 @@ emitted by the Eva plugin and C undefined behaviors.
   overlap & {\em CC.54} & {\em CC.100} is handled by \FramaC's libc ACSL specifications. \\
   pointer\_value & {\em CC.46}, {\em CC.62} & \\
   ptr\_comparison & {\em CC.53} & \\
-  separation & {\em CC.35} & \\
+  separation & & Related to ACSL memory separation hypotheses. \\
   shift & {\em CC.51}, {\em CC.52} & \\
   special\_float & & Non-finite floating-point values are not UB, but can be optionally considered as undesirable. \\
 \end{longtable}
