@@ -1,5 +1,12 @@
 [kernel] Parsing cast1.c (with preprocessing)
 [alias] Parsing done
+[alias] ANALYSING int *a = (int *)0;
+[alias] ANALYSING int *b = (int *)0;
+[alias] ANALYSING float *c = (float *)0;
+[alias] ANALYSING float *d = (float *)0;
+[alias] ANALYSING a = (int *)c;
+[alias] ANALYSING d = (float *)b;
+[alias] ANALYSING __retres = 0;
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   {a; c; } are aliased

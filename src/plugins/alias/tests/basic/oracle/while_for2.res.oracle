@@ -1,15 +1,10 @@
 [kernel] Parsing while_for2.c (with preprocessing)
 [alias] Parsing done
-[alias] Skiping break; (doStmt not implemented)
-[alias] Skiping break; (doStmt not implemented)
-[alias] Skiping break; (doStmt not implemented)
-[alias] Skiping break;
-          a = c;
-          break; (doStmt not implemented)
-[alias] Skiping break;
-          a = c;
-          break; (doStmt not implemented)
-[alias] Skiping break; (doStmt not implemented)
+[alias] ANALYSING int *a = (int *)0;
+[alias] ANALYSING int *b = (int *)0;
+[alias] ANALYSING int *c = (int *)0;
+[alias] ANALYSING a = b;
+[alias] ANALYSING __retres = 0;
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   {a; b; } are aliased
@@ -44,41 +39,10 @@ Before statement while (1) {
 Before statement a = b;
                  break; :
  <list of may-alias>
-{a; b; } are aliased
-{*a; *b; } are aliased
-<end of list>
-
-Before statement a = b;
-                 break; :
- <list of may-alias>
 <end of list>
 
 Before statement a = b; :
  <list of may-alias>
-{a; b; } are aliased
-{*a; *b; } are aliased
-<end of list>
-
-Before statement a = b; :
- <list of may-alias>
-{a; b; } are aliased
-{*a; *b; } are aliased
-<end of list>
-
-Before statement a = b; :
- <list of may-alias>
-<end of list>
-
-Before statement break; :
- <list of may-alias>
-{a; b; } are aliased
-{*a; *b; } are aliased
-<end of list>
-
-Before statement break; :
- <list of may-alias>
-{a; b; } are aliased
-{*a; *b; } are aliased
 <end of list>
 
 Before statement break; :
@@ -92,14 +56,6 @@ Before statement while (1) {
                    a = c;
                    break;
                  } :
- <list of may-alias>
-{a; b; } are aliased
-{*a; *b; } are aliased
-<end of list>
-
-Before statement break;
-                 a = c;
-                 break; :
  <list of may-alias>
 {a; b; } are aliased
 {*a; *b; } are aliased
