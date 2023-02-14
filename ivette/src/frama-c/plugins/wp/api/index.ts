@@ -144,6 +144,10 @@ export interface goalsData {
   passed: boolean;
   /** Verdict Details */
   stats: stats;
+  /** Script File */
+  script?: string;
+  /** Saved Script */
+  saved: boolean;
 }
 
 /** Decoder for `goalsData` */
@@ -158,6 +162,8 @@ export const jGoalsData: Json.Decoder<goalsData> =
     smoke: Json.jBoolean,
     passed: Json.jBoolean,
     stats: jStats,
+    script: Json.jOption(Json.jString),
+    saved: Json.jBoolean,
   });
 
 /** Natural order for `goalsData` */
@@ -165,7 +171,7 @@ export const byGoalsData: Compare.Order<goalsData> =
   Compare.byFields
     <{ wpo: Json.key<'#wpo'>, property: marker, name: string,
        fct?: Json.key<'#fct'>, bhv?: string, thy?: string, smoke: boolean,
-       passed: boolean, stats: stats }>({
+       passed: boolean, stats: stats, script?: string, saved: boolean }>({
     wpo: Compare.string,
     property: byMarker,
     name: Compare.string,
@@ -175,6 +181,8 @@ export const byGoalsData: Compare.Order<goalsData> =
     smoke: Compare.boolean,
     passed: Compare.boolean,
     stats: byStats,
+    script: Compare.defined(Compare.string),
+    saved: Compare.boolean,
   });
 
 /** Signal for array [`goals`](#goals)  */
@@ -246,7 +254,7 @@ const getScheduledTasks_internal: Server.GetRequest<
           }),
   signals: [ { name: 'plugins.wp.serverActivity' } ],
 };
-/** scheduled tasks in proof server. */
+/** Scheduled tasks in proof server */
 export const getScheduledTasks: Server.GetRequest<
   null,
   { todo: number, done: number, active: number, procs: number }
@@ -259,7 +267,7 @@ const cancelProofTasks_internal: Server.SetRequest<null,null> = {
   output: Json.jNull,
   signals: [],
 };
-/** Cancel all scheduled proof tasks. */
+/** Cancel all scheduled proof tasks */
 export const cancelProofTasks: Server.SetRequest<null,null>= cancelProofTasks_internal;
 
 /** Proof Status has changed */
@@ -325,6 +333,16 @@ export const getProofState: Server.GetRequest<
     parents: Json.index<'#node'>[], current: Json.index<'#node'> }
   >= getProofState_internal;
 
+const goForward_internal: Server.SetRequest<goal,null> = {
+  kind: Server.RqKind.SET,
+  name:   'plugins.wp.goForward',
+  input:  jGoal,
+  output: Json.jNull,
+  signals: [],
+};
+/** Go to to first pending node, or root if none */
+export const goForward: Server.SetRequest<goal,null>= goForward_internal;
+
 const goToRoot_internal: Server.SetRequest<goal,null> = {
   kind: Server.RqKind.SET,
   name:   'plugins.wp.goToRoot',
@@ -335,25 +353,15 @@ const goToRoot_internal: Server.SetRequest<goal,null> = {
 /** Go to root of proof tree */
 export const goToRoot: Server.SetRequest<goal,null>= goToRoot_internal;
 
-const goToPending_internal: Server.SetRequest<[ goal, number ],null> = {
+const goToIndex_internal: Server.SetRequest<[ goal, number ],null> = {
   kind: Server.RqKind.SET,
-  name:   'plugins.wp.goToPending',
+  name:   'plugins.wp.goToIndex',
   input:  Json.jPair( jGoal, Json.jNumber,),
   output: Json.jNull,
   signals: [],
 };
 /** Go to k-th pending node of proof tree */
-export const goToPending: Server.SetRequest<[ goal, number ],null>= goToPending_internal;
-
-const goForward_internal: Server.SetRequest<goal,null> = {
-  kind: Server.RqKind.SET,
-  name:   'plugins.wp.goForward',
-  input:  jGoal,
-  output: Json.jNull,
-  signals: [],
-};
-/** Forward to next pending node */
-export const goForward: Server.SetRequest<goal,null>= goForward_internal;
+export const goToIndex: Server.SetRequest<[ goal, number ],null>= goToIndex_internal;
 
 const goToNode_internal: Server.SetRequest<Json.index<'#node'>,null> = {
   kind: Server.RqKind.SET,
@@ -372,7 +380,7 @@ const removeNode_internal: Server.SetRequest<Json.index<'#node'>,null> = {
   output: Json.jNull,
   signals: [],
 };
-/** Forward to next pending node */
+/** Remove node from tree and go to parent */
 export const removeNode: Server.SetRequest<Json.index<'#node'>,null>= removeNode_internal;
 
 /* ------------------------------------- */

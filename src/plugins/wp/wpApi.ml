@@ -146,7 +146,7 @@ let () = R.register ~package ~kind:`GET ~name:"getAvailableProvers"
        Why3Provers.provers ())
 
 (* -------------------------------------------------------------------------- *)
-(* --- Goal Array                                                          --- *)
+(* --- Goal Array                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
 let gmodel : Wpo.t S.model = S.model ()
@@ -178,13 +178,13 @@ let () = S.column gmodel ~name:"fct"
     ~descr:(Md.plain "Associated function, if any")
     ~data:(module D.Joption(AST.Kf)) ~get:get_kf
 
-let () = S.column gmodel ~name:"bhv"
+let () = S.option gmodel ~name:"bhv"
     ~descr:(Md.plain "Associated behavior, if any")
-    ~data:(module D.Joption(D.Jstring)) ~get:get_bhv
+    ~data:(module D.Jstring) ~get:get_bhv
 
-let () = S.column gmodel ~name:"thy"
+let () = S.option gmodel ~name:"thy"
     ~descr:(Md.plain "Associated axiomatic, if any")
-    ~data:(module D.Joption(D.Jstring)) ~get:get_thy
+    ~data:(module D.Jstring) ~get:get_thy
 
 let () = S.column gmodel ~name:"smoke"
     ~descr:(Md.plain "Smoke Test Goal")
@@ -197,6 +197,19 @@ let () = S.column gmodel ~name:"passed"
 let () = S.column gmodel ~name:"stats"
     ~descr:(Md.plain "Verdict Details")
     ~data:(module STATS) ~get:get_stats
+
+let () = S.option gmodel ~name:"script"
+    ~descr:(Md.plain "Script File")
+    ~data:(module D.Jstring)
+    ~get:(fun wpo ->
+        match ProofSession.get wpo with
+        | NoScript -> None
+        | Script a | Deprecated a -> Some a)
+
+let () = S.column gmodel ~name:"saved"
+    ~descr:(Md.plain "Saved Script")
+    ~data:(module D.Jbool)
+    ~get:(fun wpo -> ProofEngine.get wpo = `Saved)
 
 let garray = S.register_array ~package ~name:"goals"
     ~descr:(Md.plain "Generated Goals")
@@ -220,15 +233,15 @@ let serverActivity = R.signal ~package
 let () =
   let server_sig = R.signature ~input:(module D.Junit) () in
   let set_procs = R.result server_sig
-      ~name:"procs" ~descr:(Md.plain "Max parallel jobs") (module D.Jint) in
+      ~name:"procs" ~descr:(Md.plain "Max parallel tasks") (module D.Jint) in
   let set_active = R.result server_sig
-      ~name:"active" ~descr:(Md.plain "Active jobs") (module D.Jint) in
+      ~name:"active" ~descr:(Md.plain "Active tasks") (module D.Jint) in
   let set_done = R.result server_sig
-      ~name:"done" ~descr:(Md.plain "Finished jobs") (module D.Jint) in
+      ~name:"done" ~descr:(Md.plain "Finished tasks") (module D.Jint) in
   let set_todo = R.result server_sig
       ~name:"todo" ~descr:(Md.plain "Remaining jobs") (module D.Jint) in
   R.register_sig ~package ~kind:`GET ~name:"getScheduledTasks"
-    ~descr:(Md.plain "scheduled tasks in proof server.")
+    ~descr:(Md.plain "Scheduled tasks in proof server")
     ~signals:[serverActivity]
     server_sig
     begin
@@ -250,7 +263,7 @@ let () =
     end
 
 let () = R.register ~package ~kind:`SET ~name:"cancelProofTasks"
-    ~descr:(Md.plain "Cancel all scheduled proof tasks.")
+    ~descr:(Md.plain "Cancel all scheduled proof tasks")
     ~input:(module D.Junit) ~output:(module D.Junit)
     (fun () -> let server = ProverTask.server () in Task.cancel_all server)
 
@@ -294,11 +307,11 @@ let () =
 let () =
   let state = R.signature ~input:(module Goal) () in
   let set_current = R.result state ~name:"current"
-      ~descr:(Md.plain "Current proof node.") (module Node) in
+      ~descr:(Md.plain "Current proof node") (module Node) in
   let set_parents = R.result state ~name:"parents"
-      ~descr:(Md.plain "Proof node parents.") (module D.Jlist(Node)) in
+      ~descr:(Md.plain "Proof node parents") (module D.Jlist(Node)) in
   let set_pending = R.result state ~name:"pending"
-      ~descr:(Md.plain "Pending proof nodes.") (module D.Jint) in
+      ~descr:(Md.plain "Pending proof nodes") (module D.Jint) in
   let set_index = R.result state ~name:"index"
       ~descr:(Md.plain "Current node index among pending nodes (else -1)")
       (module D.Jint) in
@@ -341,6 +354,15 @@ let () =
 (* --- Proof Tree Management                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
+let () = R.register ~package ~kind:`SET ~name:"goForward"
+    ~descr:(Md.plain "Go to to first pending node, or root if none")
+    ~input:(module Goal) ~output:(module D.Junit)
+    begin fun goal ->
+      let tree = ProofEngine.proof ~main:goal in
+      ProofEngine.forward tree ;
+      R.emit proofStatus ;
+    end
+
 let () = R.register ~package ~kind:`SET ~name:"goToRoot"
     ~descr:(Md.plain "Go to root of proof tree")
     ~input:(module Goal) ~output:(module D.Junit)
@@ -350,21 +372,12 @@ let () = R.register ~package ~kind:`SET ~name:"goToRoot"
       R.emit proofStatus ;
     end
 
-let () = R.register ~package ~kind:`SET ~name:"goToPending"
+let () = R.register ~package ~kind:`SET ~name:"goToIndex"
     ~descr:(Md.plain "Go to k-th pending node of proof tree")
     ~input:(module D.Jpair(Goal)(D.Jint)) ~output:(module D.Junit)
     begin fun (goal,index) ->
       let tree = ProofEngine.proof ~main:goal in
       ProofEngine.goto tree (`Leaf index) ;
-      R.emit proofStatus ;
-    end
-
-let () = R.register ~package ~kind:`SET ~name:"goForward"
-    ~descr:(Md.plain "Forward to next pending node")
-    ~input:(module Goal) ~output:(module D.Junit)
-    begin fun goal ->
-      let tree = ProofEngine.proof ~main:goal in
-      ProofEngine.forward tree ;
       R.emit proofStatus ;
     end
 
@@ -378,7 +391,7 @@ let () = R.register ~package ~kind:`SET ~name:"goToNode"
     end
 
 let () = R.register ~package ~kind:`SET ~name:"removeNode"
-    ~descr:(Md.plain "Forward to next pending node")
+    ~descr:(Md.plain "Remove node from tree and go to parent")
     ~input:(module Node) ~output:(module D.Junit)
     begin fun node ->
       let tree = ProofEngine.tree node in
