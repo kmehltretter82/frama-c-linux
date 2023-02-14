@@ -8,6 +8,7 @@ Prerequisites:
 - A C11-compatible (cross-)compiler (with support for _Generic),
   or a (cross-)compiler having __builtin_types_compatible_p
 
+- A (cross-)compiler supporting _Static_assert
 - A (cross-)compiler supporting _Alignof or alignof
 
 - objdump
@@ -29,98 +30,40 @@ cases and output warnings, but without preventing compilation of the rest.
 """
 
 import argparse
+import json
 from pathlib import Path
 import re
 import subprocess
 import sys
-
-re_symbol_name = re.compile("^[0-9a-fA-F]+ <([^>]+)>: *$")
-
-# Parsing objdump's format is not trivial: some versions print results as:
-#   <offset>: 01 02 03 04           <assembly>
-# That is, bytes separated by single spaces, then several spaces, then assembly;
-# while other versions (e.g. for mips) print several bytes together:
-#   <offset>: 01020304           <assembly>
-# So we simply take all hexadecimal characters until the end of the line,
-# and then split as soon as 2 consecutive spaces are found.
-# Otherwise, we might end up considering instructions such as 'add' as part
-# of the data.
-# Unfortunately, objdump does not contain an option to display the data bytes
-# themselves _without_ the disassembled data.
-re_symbol_data = re.compile("^ *[0-9a-fA-F]+:[ \t]+([0-9a-fA-F ]+)")
+import warnings
 
 parser = argparse.ArgumentParser(prog="make_machdep")
 parser.add_argument("-v", "--verbose", action="store_true")
+parser.add_argument("-o", default=sys.stdout,type=argparse.Filetype('w'),dest="dest_file")
 parser.add_argument("--compiler")
 parser.add_argument("--compiler-version")
 parser.add_argument("--cpp-arch-flags", nargs="+", default=[], help="architecture-specific flags needed for preprocessing, e.g. '-m32'")
 parser.add_argument("--compiler-flags", nargs="+", default=["-c"], help="flags to be given to the compiler (other than those set by --cpp-arch-flags); by default, '-c'")
-parser.add_argument("--objdump", action="store", help="objdump command to use", default="objdump")
+parser.add_argument("--check", action="store_true")
 args, other_args = parser.parse_known_args()
 
 def print_machdep(machdep):
-    print("open Cil_types")
-    print("")
-    print("let machdep : mach = {")
-    for f, v in machdep.items():
-        if isinstance(v, str):
-            print(f"  {f} = \"{v}\";")
-        elif isinstance(v, bool):
-            print(f"  {f} = {'true' if v else 'false'};")
-        elif isinstance(v, list):
-            l = ", ".join([f'"{e}"' for e in v])
-            print(f"  {f} = [{l}];")
-        else:
-            print(f"  {f} = {v};")
+    json.dump(machdep,args.dest_file,indent=4,sort_keys=True)
 
-    print("}")
+fc_share=subprocess.run("frama-c-config -print-share-path",capture_output=True).output
 
-def decode_object_file(objfile, section=".data"):
-    command = [args.objdump, "-j" + section, "-d", str(objfile)]
-    if args.verbose:
-        print(f"[INFO] running command: {' '.join(command)}")
-    proc = subprocess.run(command, capture_output=True)
-    if proc.returncode != 0:
-        # Special case where objdump _may_ fail: section other than '.data'
-        if section != ".data":
-            return [], None
-        print(f"error: command returned non-zero ({proc.returncode}): {' '.join(command)}")
-        if args.verbose:
-            print(proc.stderr.decode("utf-8"))
-        sys.exit(1)
-    symbols = {}
-    cur_symbol = None
-    underscore_name = None
-    for line in proc.stdout.decode("utf-8").split("\n"):
-        m = re_symbol_name.match(line)
-        if m:
-            #print(f"found symbol: [{m.group(1)}]")
-            cur_symbol = m.group(1)
-            continue
-        m = re_symbol_data.match(line)
-        if m:
-            #print(f"found data: {m.group(1)}")
-            if not cur_symbol:
-                # This can happen when objdump decides to print more than one
-                # line from the starting offset
-                continue
-                #sys.exit(f"error: found data without symbol")
-            octet_string = m.group(1)
-            if "  " in octet_string:
-                [octet_string, _rest] = octet_string.split("  ", maxsplit=1)
-            octet_string = octet_string.replace(" ", "")
-            octets = []
-            for i in range(0, len(octet_string) // 2):
-                octets.append(int(octet_string[2*i:2*i+2], 16))
-            # We assume all values fit in 1 byte (sizeof and alignof);
-            # for the literal string, the first byte is enough.
-            # We profit from having the symbol name to fill a special machdep field.
-            underscore_name = cur_symbol.startswith("_")
-            s = cur_symbol.strip("_") # Normalize symbol names
-            symbols[s] = octets[0]
-            cur_symbol = None
-            continue
-    return symbols, underscore_name
+def check_machdep(machdep):
+    try:
+        from jsonschema import validate, ValidationError
+        with open(fc_share+"/machdeps/machdep-schema.json", "r") as schema:
+            validate(machdep, json.load(schema))
+    except ImportError:
+        warnings.warn("jsonschema is not available: no validation will be performed")
+    except OSError:
+        warnings.warn("error opening machdep-schema.json: no validation will be performed")
+    except ValidationError:
+        warnings.warn("machdep object is not conforming to machdep schema")
+
 
 # This must remain synchronized with cil_types.ml's 'mach' type
 machdep = {
@@ -161,10 +104,24 @@ machdep = {
 compilation_command = other_args + args.compiler_flags
 
 source_files = [
+    ("sizeof_short.i", "number"),
+    ("sizeof_int.i", "number"),
+    ("sizeof_long.i", "number"),
+    ("sizeof_longlong.i", "number"),
+    ("sizeof_ptr.i", "number"),
+    ("sizeof_float.i", "number"),
+    ("sizeof_double.i", "number"),
+    ("sizeof_longdouble.i", "number"),
+    ("sizeof_void.i", "number"),
+    ("sizeof_fun.i", "number"),
     ("sizeof_alignof_standard.c", "number"),
-    ("sizeof_void.c", "number"),
-    ("sizeof_fun.c", "number"),
-    ("sizeof_longdouble.c", "number"),
+    ("alignof_short.c", "number"),
+    ("alignof_int.c", "number"),
+    ("alignof_long.c", "number"),
+    ("alignof_longlong.c", "number"),
+    ("alignof_ptr.c", "number"),
+    ("alignof_float.c", "number"),
+    ("alignof_double.c", "number"),
     ("alignof_longdouble.c", "number"),
     ("alignof_fun.c", "number"),
     ("alignof_str.c", "number"),

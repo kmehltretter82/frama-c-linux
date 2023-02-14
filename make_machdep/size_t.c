@@ -1,6 +1,5 @@
-#include "make_machdep_common.h"
 #include <stddef.h>
-#define TEST_TYPE size_t
+#include "make_machdep_common.h"
 
-TEST_TYPE_MAYBE_(unsigned int, unsigned_int);
-TEST_TYPE_MAYBE_(unsigned long, unsigned_long);
+_Static_assert(!COMPATIBLE(unsigned int, size_t), "size_t is unsigned int");
+_Static_assert(!COMPATIBLE(unsigned long, size_t), "size_t is unsigned long");
