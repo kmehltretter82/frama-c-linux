@@ -323,7 +323,7 @@ let print_dot filename (a:t) =
     );
   Dot.output_graph file a.graph;
   close_out file
-    
+
 (* merge of two vertices; the first vertex carries both sets, the second is removed from the graph and from lmap and vmap; however, pending is NOT updated  *)
 let merge x v1 v2 =
   if (V.equal v1 v2) || not (G.mem_vertex x.graph v1) || not (G.mem_vertex x.graph v2)
@@ -531,7 +531,7 @@ let equal (_:t) (_:t) = true
 exception Not_included
 
 let is_included (a1:t) (a2:t) =
-  (* tests if a1 is included in a2, at least as the nodes with lval *)  
+  (* tests if a1 is included in a2, at least as the nodes with lval *)
   assert_invariants a1;
   assert_invariants a2;
   (* Format.printf "DEBUG testing equal @.%a@. AND à.%a@. END DEBUG@." (pretty ~debug:true) a1 (pretty ~debug:true) a2; *)
@@ -552,7 +552,7 @@ let is_included (a1:t) (a2:t) =
     LMap.iter iter_lmap a1.lmap; true
   with
     Not_included -> false
-      
+
 (* let equal (a1:t) (a2:t) =
  *   assert_invariants a1;
  *   assert_invariants a2;
@@ -594,7 +594,7 @@ let is_included (a1:t) (a2:t) =
  *                 match G.succ a1.graph v1 with
  *                   [] -> (\* if v1 has no successor, then so must have v2 *\)
  *                   if List.length (G.succ a2.graph v2) > 0 then raise Not_equal
- * 
+ *
  *                 | [succ_v1] ->
  *                   begin
  *                     if LSet.is_empty (VMap.find succ_v1 a1.vmap)

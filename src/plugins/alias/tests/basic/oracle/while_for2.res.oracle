@@ -12,12 +12,14 @@
 [alias] Skiping break; (doStmt not implemented)
 [alias] May-aliases at the end of function main:
   <list of may-alias>
-  { a; b } are aliased
+  {a; b; } are aliased
+  {*a; *b; } are aliased
   <end of list>
 [alias] Functions done
 Before statement return __retres; :
  <list of may-alias>
-{ a; b } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
 <end of list>
 
 Before statement int *a = (int *)0; :
@@ -42,7 +44,8 @@ Before statement while (1) {
 Before statement a = b;
                  break; :
  <list of may-alias>
-{ a; b } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
 <end of list>
 
 Before statement a = b;
@@ -52,12 +55,14 @@ Before statement a = b;
 
 Before statement a = b; :
  <list of may-alias>
-{ a; b } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
 <end of list>
 
 Before statement a = b; :
  <list of may-alias>
-{ a; b } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
 <end of list>
 
 Before statement a = b; :
@@ -66,17 +71,20 @@ Before statement a = b; :
 
 Before statement break; :
  <list of may-alias>
-{ a; b } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
 <end of list>
 
 Before statement break; :
  <list of may-alias>
-{ a; b } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
 <end of list>
 
 Before statement break; :
  <list of may-alias>
-{ a; b } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
 <end of list>
 
 Before statement while (1) {
@@ -85,31 +93,36 @@ Before statement while (1) {
                    break;
                  } :
  <list of may-alias>
-{ a; b } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
 <end of list>
 
 Before statement break;
                  a = c;
                  break; :
  <list of may-alias>
-{ a; b } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
 <end of list>
 
 Before statement break;
                  a = c;
                  break; :
  <list of may-alias>
-{ a; b } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
 <end of list>
 
 Before statement break; :
  <list of may-alias>
-{ a; b } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
 <end of list>
 
 Before statement __retres = 0; :
  <list of may-alias>
-{ a; b } are aliased
+{a; b; } are aliased
+{*a; *b; } are aliased
 <end of list>
 
 [alias] Analysis complete

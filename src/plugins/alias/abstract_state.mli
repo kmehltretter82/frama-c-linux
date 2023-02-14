@@ -85,9 +85,9 @@ val equal : t -> t -> bool
 
 
 (** inclusion test; [is_included a1 a2] tests if, for any lvl present
-   in a1 (associated to a vertex v1), that it is also present in a2
-   (associated to a vertex v2) and that set(succ(v1) is included in
-   set(succ(v2)) *)
+    in a1 (associated to a vertex v1), that it is also present in a2
+    (associated to a vertex v2) and that set(succ(v1) is included in
+    set(succ(v2)) *)
 val is_included : t -> t -> bool
 
 

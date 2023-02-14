@@ -174,10 +174,11 @@ struct
 
   let copy x = x (* we only have persistant data *)
 
-  let pretty fmt state =
-    match state with
-    | None -> Format.fprintf fmt "None"
-    | Some s -> Format.fprintf fmt "%a" (Abstract_state.pretty ~debug:false) s
+
+  let pretty fmt a =
+    match a with
+      None -> Format.fprintf fmt "<No abstract state>"
+    | Some a -> Abstract_state.pretty fmt a
 
   (* let pretty_debug fmt state =
    *   match state with
@@ -202,6 +203,7 @@ struct
     Dataflow.GUse a, Dataflow.GUse a
 
   let rec process_Stmt (s:stmt) (a:t) : t =
+    (* Format.printf "DEBUG: process_smt <%a>@. Abstract state:@.@[%a@]@." Cil_types_debug.pp_stmt s pretty_debug a; *)
     (* register a before stmt *)
     Stmt_table.add s a;
     match s.skind with
@@ -214,7 +216,10 @@ struct
       union a1 a2
     | Loop (_,b,_,_,_) -> process_block b a
     | Return _ -> a
-    | Break _ | Goto _ | Switch _ | Continue _ | UnspecifiedSequence _
+    | Switch (_,b,ls,_) ->
+      let a =process_block b a in (* TODO : is it correct ?*)
+      List.fold_left (fun acc s -> process_Stmt s acc) a ls
+    | Break _ | Goto _ | Continue _ | UnspecifiedSequence _
     | Throw _ | TryCatch _ | TryFinally _
     | TryExcept _ -> (Options.feedback "Skiping @[%a@] (doStmt not implemented)" Stmt.pretty s; a)
 
