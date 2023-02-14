@@ -37,7 +37,7 @@ module type InternalTable  = sig
   include Table
   val add : key -> value -> unit
   val iter : (key -> value -> unit) -> unit
-(*  val clear : unit -> unit*)
+  (*  val clear : unit -> unit*)
 end
 
 
@@ -49,7 +49,7 @@ module Make_table(H: Hashtbl.S)(V: sig type t val size :int end) : InternalTable
   let find = H.find tbl
   let iter f =
     H.iter f tbl
-(* let clear () = H.clear tbl*)
+    (* let clear () = H.clear tbl*)
 end
 
 module A = struct type t = Abstract_state.t option let size = 7 end
@@ -61,15 +61,23 @@ module Function_table = Make_table(Kernel_function.Hashtbl)(R)
 let function_compute_ref = Extlib.mk_fun "function_compute"
 
 
-(* functions from abtract_state, exended to options *)
-let _union a1 a2 =
-  match a1,a2 with
-    None, None -> None
-  | None, _ -> a2
-  | _, None -> a1
-  | Some a1, Some a2 -> Some (Abstract_state.union a1 a2)
+(* (\* functions from abtract_state, exended to options *\)
+ * let _union a1 a2 =
+ *   match a1,a2 with
+ *     None, None -> None
+ *   | None, _ -> a2
+ *   | _, None -> a1
+ *   | Some a1, Some a2 -> Some (Abstract_state.union a1 a2) *)
 
 module D = Dataflow.StartData(A)
+
+module Stmt_table = struct
+  include D
+  type key = stmt
+  type value = data
+end
+
+
 
 let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
   (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)
@@ -122,7 +130,7 @@ let feedback_only_once s =
     end
 
 let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
-Options.feedback "ANALYSING %a" Printer.pp_stmt s;
+  Options.feedback "ANALYSING %a" Printer.pp_stmt s;
   match i with
     Set(lv,exp,_) ->
     let new_a = do_assignment a lv exp in
@@ -171,7 +179,7 @@ struct
 
   type t = Abstract_state.t option
 
-  module StmtStartData = D
+  module StmtStartData = Stmt_table
 
   let copy x = x (* we only have persistant data *)
 
@@ -203,38 +211,7 @@ struct
   let doGuard _ _ a =
     Dataflow.GUse a, Dataflow.GUse a
 
-let doStmt _ _ = Dataflow.SDefault
-(*
-  let rec process_Stmt (s:stmt) (a:t) : t =
-    (* Format.printf "DEBUG: process_smt <%a>@. Abstract state:@.@[%a@]@." Cil_types_debug.pp_stmt s pretty_debug a; *)
-    (* register a before stmt *)
-    Stmt_table.add s a;
-    match s.skind with
-      Instr i -> doInstr s i a
-    | Block b -> process_block b a
-    | If (_,b1, b2, _ ) ->
-      let a1 = process_block b1 a
-      and a2 = process_block b2 a
-      in
-      union a1 a2
-    | Loop (_,b,_,_,_) -> process_block b a
-    | Return _ -> a
-    | Switch (_,b,ls,_) ->
-      let a =process_block b a in (* TODO : is it correct ?*)
-      List.fold_left (fun acc s -> process_Stmt s acc) a ls
-    | Break _ | Goto _ | Continue _ | UnspecifiedSequence _
-    | Throw _ | TryCatch _ | TryFinally _
-    | TryExcept _ -> (Options.feedback "Skiping @[%a@] (doStmt not implemented)" Stmt.pretty s; a)
-
-  and process_block b a =
-    List.fold_left
-      (fun acc s -> process_Stmt s acc)
-      a
-      b.bstmts
-
-  let doStmt (s:stmt) (a:t) =
-    Dataflow.SUse (process_Stmt s a)
-*)
+  let doStmt _ _ = Dataflow.SDefault
 
   let doEdge _ _ a = a
 end
@@ -270,14 +247,14 @@ let doFunction (kf:kernel_function) =
       F.compute first_stmts;
       let return_stmt = Kernel_function.find_return kf in
       let final_state : Abstract_state.t option =
-        try (*Stmt_table.find return_stmt*)D.find return_stmt
+        try Stmt_table.find return_stmt
         with
           Not_found ->
           begin
             (* let f_dec = Kernel_function.get_definition kf in *)
             Options.warning "DEBUG return stmt of %a not in table" Kernel_function.pretty kf;
             (* List.iter
-             *   (fun k -> let v = try (*Stmt_table*)D.find k with Not_found -> (Format.printf "%a is missing" print_key k ; None) in
+             *   (fun k -> let v = try (*Stmt_table*)Stmt_table.find k with Not_found -> (Format.printf "%a is missing" print_key k ; None) in
              *       Options.feedback "Before statement %a :@.@[<hov 2> %a@]@." print_key k print_value v
              *   )
              *   f_dec.sallstmts; *)
@@ -352,7 +329,7 @@ let compute () =
     | Some s -> Abstract_state.pretty_summary ~function_name fmt s
   in
   if Options.ShowStmtTable.get() then
-    (*Stmt_table*)D.iter (print_stmt_table_elt Format.std_formatter);
+    Stmt_table.iter (print_stmt_table_elt Format.std_formatter);
   if Options.ShowFunctionTable.get() then
     begin
       Function_table.iter (print_function_table_elt Format.std_formatter)
@@ -361,18 +338,13 @@ let compute () =
 
 let clear () =
   computed_flag := false;
-  (*Stmt_table*)D.clear()
+  (*Stmt_table*)Stmt_table.clear()
 
 let get_abstract_state _ stmt =
   if is_computed ()
   then
-    try (*Stmt_table*)D.find stmt with
+    try Stmt_table.find stmt with
       Not_found -> None
   else
     None
 
-module Stmt_table = struct
-include D
-type key = stmt
-type value = data
-end

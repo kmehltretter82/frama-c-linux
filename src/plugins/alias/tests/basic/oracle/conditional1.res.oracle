@@ -1,5 +1,12 @@
 [kernel] Parsing conditional1.c (with preprocessing)
 [alias] Parsing done
+[alias] ANALYSING int *a = (int *)0;
+[alias] ANALYSING int *b = (int *)0;
+[alias] ANALYSING int *c = (int *)0;
+[alias] ANALYSING a = b;
+[alias] ANALYSING a = c;
+[alias] ANALYSING *a = 4;
+[alias] ANALYSING __retres = 0;
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   {a; b; c; } are aliased
@@ -24,18 +31,6 @@ Before statement if (a) a = b; else a = c; :
 
 Before statement a = b; :
  <list of may-alias>
-{a; b; c; } are aliased
-{*a; *b; *c; } are aliased
-<end of list>
-
-Before statement a = b; :
- <list of may-alias>
-<end of list>
-
-Before statement a = c; :
- <list of may-alias>
-{a; b; c; } are aliased
-{*a; *b; *c; } are aliased
 <end of list>
 
 Before statement a = c; :

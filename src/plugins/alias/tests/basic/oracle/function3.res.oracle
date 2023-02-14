@@ -1,8 +1,16 @@
 [kernel] Parsing function3.c (with preprocessing)
 [alias] Parsing done
-[alias] Skiping break; (doStmt not implemented)
-[alias] Skiping break; (doStmt not implemented)
-[alias] Skiping break; (doStmt not implemented)
+[alias] ANALYSING int *tmp = x;
+[alias] ANALYSING x = y;
+[alias] ANALYSING y = tmp;
+[alias] ANALYSING __retres = (void *)0;
+[alias] ANALYSING int *a = (int *)0;
+[alias] ANALYSING int *b = (int *)0;
+[alias] ANALYSING int *c = (int *)0;
+[alias] ANALYSING int *d = (int *)0;
+[alias] ANALYSING f1(a,b);
+[alias] ANALYSING f1(c,d);
+[alias] ANALYSING __retres = 0;
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   {a; b; } are aliased
@@ -43,28 +51,8 @@ Before statement x = y;
                  y = tmp;
                  break; :
  <list of may-alias>
-{x; y; tmp; } are aliased
-{*x; *y; *tmp; } are aliased
-<end of list>
-
-Before statement x = y;
-                 y = tmp;
-                 break; :
- <list of may-alias>
 {x; tmp; } are aliased
 {*x; *tmp; } are aliased
-<end of list>
-
-Before statement x = y; :
- <list of may-alias>
-{x; y; tmp; } are aliased
-{*x; *y; *tmp; } are aliased
-<end of list>
-
-Before statement x = y; :
- <list of may-alias>
-{x; y; tmp; } are aliased
-{*x; *y; *tmp; } are aliased
 <end of list>
 
 Before statement x = y; :
@@ -74,30 +62,6 @@ Before statement x = y; :
 <end of list>
 
 Before statement y = tmp; :
- <list of may-alias>
-{x; y; tmp; } are aliased
-{*x; *y; *tmp; } are aliased
-<end of list>
-
-Before statement y = tmp; :
- <list of may-alias>
-{x; y; tmp; } are aliased
-{*x; *y; *tmp; } are aliased
-<end of list>
-
-Before statement y = tmp; :
- <list of may-alias>
-{x; y; tmp; } are aliased
-{*x; *y; *tmp; } are aliased
-<end of list>
-
-Before statement break; :
- <list of may-alias>
-{x; y; tmp; } are aliased
-{*x; *y; *tmp; } are aliased
-<end of list>
-
-Before statement break; :
  <list of may-alias>
 {x; y; tmp; } are aliased
 {*x; *y; *tmp; } are aliased

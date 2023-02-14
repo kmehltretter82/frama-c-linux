@@ -1,9 +1,13 @@
 [kernel] Parsing switch1.c (with preprocessing)
 [alias] Parsing done
-[alias] Skiping break; (doStmt not implemented)
-[alias] Skiping break; (doStmt not implemented)
-[alias] Skiping break; (doStmt not implemented)
-[alias] Skiping break; (doStmt not implemented)
+[alias] ANALYSING int *a = (int *)0;
+[alias] ANALYSING int *b = (int *)0;
+[alias] ANALYSING int *c = (int *)0;
+[alias] ANALYSING int *d = (int *)0;
+[alias] ANALYSING int e = 0;
+[alias] ANALYSING case 1: a = d;
+[alias] ANALYSING case 2: b = d;
+[alias] ANALYSING __retres = 0;
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   {a; b; d; } are aliased
@@ -41,24 +45,6 @@ Before statement switch (e) {
 
 Before statement case 1: a = d; :
  <list of may-alias>
-{a; b; d; } are aliased
-{*a; *b; *d; } are aliased
-<end of list>
-
-Before statement case 1: a = d; :
- <list of may-alias>
-{a; b; d; } are aliased
-{*a; *b; *d; } are aliased
-<end of list>
-
-Before statement case 1: a = d; :
- <list of may-alias>
-<end of list>
-
-Before statement break; :
- <list of may-alias>
-{a; b; d; } are aliased
-{*a; *b; *d; } are aliased
 <end of list>
 
 Before statement break; :
@@ -69,32 +55,12 @@ Before statement break; :
 
 Before statement case 2: b = d; :
  <list of may-alias>
-{a; b; d; } are aliased
-{*a; *b; *d; } are aliased
-<end of list>
-
-Before statement case 2: b = d; :
- <list of may-alias>
-{a; b; d; } are aliased
-{*a; *b; *d; } are aliased
-<end of list>
-
-Before statement case 2: b = d; :
- <list of may-alias>
-{a; d; } are aliased
-{*a; *d; } are aliased
 <end of list>
 
 Before statement break; :
  <list of may-alias>
-{a; b; d; } are aliased
-{*a; *b; *d; } are aliased
-<end of list>
-
-Before statement break; :
- <list of may-alias>
-{a; b; d; } are aliased
-{*a; *b; *d; } are aliased
+{b; d; } are aliased
+{*b; *d; } are aliased
 <end of list>
 
 Before statement __retres = 0; :
