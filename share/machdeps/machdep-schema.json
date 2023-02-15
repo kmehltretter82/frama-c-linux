@@ -12,7 +12,7 @@
             "type" : "string"
         },
         "cpp_arch_flags": {
-            "description": "argument to be given to compiler when this machdep is selected",
+            "description": "arguments to be given to the compiler when this machdep is selected (e.g. '-m32')",
             "type" : "string"
         },
         "sizeof_short": {
@@ -48,15 +48,15 @@
             "type": "integer"
         },
         "sizeof_void": {
-            "description": "size of 'void' type. Negative if unsupported",
+            "description": "(non-standard) size of 'void' type. Negative if unsupported",
             "type": "integer"
         },
         "sizeof_fun": {
-            "description": "size of a function type. Negative if unsupported",
+            "description": "(non-standard) size of a function type. Negative if unsupported",
             "type": "integer"
         },
         "size_t": {
-            "description": "type of sizeof e",
+            "description": "type of 'sizeof e'",
             "type": "string"
         },
         "wchar_t": {
@@ -104,11 +104,11 @@
             "type": "integer"
         },
         "alignof_void": {
-            "description": "alignment of 'void' type. Negative if unsupported",
+            "description": "(non-standard) alignment of 'void' type. Negative if unsupported",
             "type": "integer"
         },
         "alignof_fun": {
-            "description": "alignment of a function type. Negative if unsupported",
+            "description": "(non-standard) alignment of a function type. Negative if unsupported",
             "type": "integer"
         },
         "char_is_unsigned": {
@@ -120,7 +120,7 @@
             "type" : "boolean"
         },
         "alignof_aligned": {
-            "description": "alignement of a type with aligned attribute",
+            "description": "alignment of a type with 'aligned' attribute",
             "type" : "integer"
         }
     }
