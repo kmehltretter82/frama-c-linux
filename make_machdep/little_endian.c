@@ -22,9 +22,9 @@
 
 #if defined(__BYTE_ORDER__)
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-__attribute__((section(".data"))) unsigned char little_endian = 0xf4;
+_Static_assert(0,"little_endian is False");
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-__attribute__((section(".data"))) unsigned char little_endian = 0x15;
+_Static_assert(0,"little_endian is True");
 #else
 #error Unexpected __BYTE_ORDER__
 #endif
