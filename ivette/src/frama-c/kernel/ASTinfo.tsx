@@ -176,7 +176,8 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
   const foreign = !!scope && fct !== scope;
   const [unfold, setUnfold] = React.useState(true);
   const [expand, setExpand] = React.useState(false);
-  const req = React.useMemo(() => Server.send(AST.getInformation, marker), [marker]);
+  const req = React.useMemo(() =>
+    Server.send(AST.getInformation, marker), [marker]);
   const { result: markerFields = [] } = Dome.usePromise(req);
   const isScrolled = marker === scrolled;
   const isHovered = marker === hovered;
