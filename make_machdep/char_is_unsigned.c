@@ -1,4 +1,2 @@
-#include "make_machdep_common.h"
-
-__attribute__((section(".data")))
-unsigned char char_is_unsigned = (char)-1 >= 0 ? 0x15 : 0xf4;
+_Static_assert((char)-1 >= 0 ? 1 : 0, "char_is_unsigned is False");
+_Static_assert((char)-1 >= 0 ? 0 : 1, "char_is_unsigned is True");
