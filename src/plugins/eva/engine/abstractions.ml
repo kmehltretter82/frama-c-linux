@@ -22,43 +22,68 @@
 
 
 
-type ('a, 'b) dec_eq = ('a, 'b) Structure.eq option
-
-
-
 (* --- Values abstraction --------------------------------------------------- *)
 
 module Value = struct
-  type 'v value = (module Abstract_value.S with type t = 'v)
   type 'v structure = 'v Abstract.Value.structure
   type 'v key = 'v Abstract.Value.key
-  type 'v registered = 'v key * 'v value
-  let register (type v) (k : v key) (v : v value) : v registered = (k, v)
+  let dec_eq = Abstract.Value.eq_structure
 
+  type 'v value = (module Abstract_value.S with type t = 'v)
+
+
+  (* Value registration *)
+  type 'v register = { key : 'v key ; value : 'v value }
+  type 'v registered = 'v key * 'v value
+  let register : type v. v register -> v registered =
+    fun { key ; value } -> (key, value)
+
+
+  (* When registering a location or a domain, the user has to declare its
+     values dependencies, i.e the values it uses during its computations. To
+     simplify the abstraction build and the dependencies declaration, they
+     are handled as a simple list. Arguably not so simple as it is
+     heterogenous, but it is still a list. *)
+  type 'v dependencies =
+    | Last : 'v registered -> 'v dependencies
+    | (::) : 'a registered * 'b dependencies -> ('a * 'b) dependencies
+
+  (* When building the abstraction, we will need to compare the dependencies
+     structure with the structured values. *)
+  let rec outline : type v. v dependencies -> v structure = function
+    | Last (key, value) -> Abstract.Value.Leaf (key, value)
+    | (k, v) :: tl -> Abstract.Value.(Node (Leaf (k, v), outline tl))
+
+  (* Folding over values dependencies *)
+  type 'a folder = { folder : 'v. 'v registered -> 'a -> 'a }
+  let rec fold : type v. 'a folder -> v dependencies -> 'a -> 'a =
+    fun { folder } dependencies acc ->
+      match dependencies with
+      | Last registered -> folder registered acc
+      | hd :: tl -> fold { folder } tl (folder hd acc)
+
+
+  (* The value abstraction build consists of accumulating registered values
+     into a structured value and then adding the needed operators, thus making
+     it interactive. *)
   module type Structured = Abstract.Value.Internal
   module type Interactive = Abstract.Value.External
   type structured = (module Structured)
   type interactive = (module Interactive)
 
-  let void_value () =
-    Self.fatal "Cannot register a value module from a Void structure."
+  (* Making a structured value interactive simply consists of adding the
+     needed operations using the Structure.Open functor.*)
+  let make_interactive : structured -> interactive =
+    fun (module Structured) ->
+      (module struct
+        include Structured
+        include Structure.Open (Abstract.Value) (Structured)
+      end)
 
-  let eq_type = Abstract.Value.eq_type
-  let dec_eq : type a b. a registered -> b structure -> (a, b) dec_eq =
-    fun (key, _) -> function Leaf (key', _) -> eq_type key key' | _ -> None
-
-  let make_interactive (module Structured : Structured) =
-    (module struct
-      include Structured
-      include Structure.Open (Abstract.Value) (Structured)
-    end : Interactive)
-
-  let leaf : type v. v registered -> v structure =
-    fun (key, value) -> Abstract.Value.Leaf (key, value)
-
-  let node : type a b. a structure -> b structure -> (a * b) structure =
-    fun a b -> Abstract.Value.Node (a, b)
-
+  (* Adding a registered value into a structured one consists of deciding if
+     a product is needed (which comes down to checking if the registered
+     value key we want to add is not in the structure), computing it, and
+     updating the structure. *)
   let add : type v. v registered -> structured -> structured =
     fun (key, input) structured ->
       let open Abstract.Value in
@@ -66,15 +91,37 @@ module Value = struct
       if not (Interactive.mem key) then
         (module struct
           include Value_product.Make (Interactive) (val input)
-          let structure = node Interactive.structure (leaf (key, input))
+          let structure =
+            let open Abstract.Value in
+            Node (Interactive.structure, Leaf (key, input))
         end)
       else structured
 
+  (* The minimal value abstraction to use. It contains the CValue abstraction,
+     configured depending of the bitwise *)
+  let init (is_bitwise : bool) : structured =
+    if not is_bitwise then
+      (module struct
+        include Main_values.CVal
+        let structure = Abstract.Value.Leaf (key, (module Main_values.CVal))
+      end)
+    else (module Offsm_value.CvalueOffsm)
+
+
+  (* When building the complete abstraction, we need to trick locations and
+     domains into thinking that their value dependencies are there, even if
+     the structured value type is not the good one. This is done through a
+     lift that requires conversion operations to interact with the subpart
+     of the structured value that matters for the location or the domain.
+     This functor is responsible of building such conversion operations. *)
   module type From = sig type value val structure : value structure end
   module Converter (From : From) (To : Interactive) = struct
     type internal = From.value
     type extended = To.t
     let structure = From.structure
+
+    let void_value () =
+      Self.fatal "Cannot register a value module from a Void structure."
 
     let rec set : type v. v structure -> v -> extended -> extended = function
       | Leaf (key, _) -> To.set key
@@ -103,118 +150,165 @@ end
 module Location = struct
   type 'l structure = 'l Abstract.Location.structure
   type 'l key = 'l Abstract.Location.key
-
-  type 'v dependencies =
-    | Last : 'v Value.registered -> 'v dependencies
-    | (::) : 'a Value.registered * 'b dependencies -> ('a * 'b) dependencies
-
-  let rec outline : type v. v dependencies -> v Value.structure = function
-    | Last value -> Value.leaf value
-    | hd :: tl -> Value.node (Value.leaf hd) (outline tl)
+  let dec_eq = Abstract.Location.eq_structure
 
   type ('v, 'l) location =
     (module Abstract_location.S with type value = 'v and type location = 'l)
 
-  module type Registered = sig
-    include Abstract_location.S
-    val key : location key
-    val dependencies : value dependencies
-  end
 
-  type 'l registered = (module Registered with type location = 'l)
-
+  (* When registering a location, we also need its key and its values
+     dependencies. *)
   type ('v, 'l) register =
     { key: 'l key
     ; location : ('v, 'l) location
-    ; dependencies : 'v dependencies
+    ; dependencies : 'v Value.dependencies
     }
 
+  (* A registered location is simply a location with its key and its values
+     dependencies. *)
+  module type Registered = sig
+    include Abstract_location.S
+    val key : location key
+    val structure : location structure
+    val dependencies : value Value.dependencies
+  end
+  type 'l registered = (module Registered with type location = 'l)
+
+  (* Location registration. *)
   let register : type v l. (v, l) register -> l registered =
     fun { key ; location ; dependencies } ->
       (module struct
-        include (val location)
+        module Location = (val location)
+        include Location
         let key = key
+        let structure = Abstract.Location.Leaf (key, (module Location))
         let dependencies = dependencies
       end)
 
-  module type Structured = Abstract.Location.Internal
-  module type Interactive = Abstract.Location.External
-  type structured = (module Structured)
-  type interactive = (module Interactive)
 
-  module type Abstraction = sig
+  (* When registering a domain, the user has to declare its locations
+     dependencies, i.e the locations it uses during its computations. As
+     for the values, they are handled as a simple heterogenous list. *)
+  type 'l dependencies =
+    | Last : 'l registered -> 'l dependencies
+    | (::) : 'a registered * 'b dependencies -> ('a * 'b) dependencies
+
+  (* When building the abstraction, we will need to compare dependencies
+     with the structured locations. *)
+  let rec outline : type l. l dependencies -> l structure = function
+    | Last (module R) -> R.structure
+    | (module R) :: tl -> Abstract.Location.Node (R.structure, outline tl)
+
+  (* Folding over locations dependencies *)
+  type 'a folder = { folder : 'v. 'v registered -> 'a -> 'a }
+  let rec fold : type v. 'a folder -> v dependencies -> 'a -> 'a =
+    fun { folder } dependencies acc ->
+      match dependencies with
+      | Last registered -> folder registered acc
+      | hd :: tl -> fold { folder } tl (folder hd acc)
+
+
+  (* As for the value abstraction, building the location abstraction consists
+     of structuring the needed registered locations and then adding the needed
+     operators to make it interactive. However, a structured location is not
+     as simple as a structured value, as it needs to keep track of the value
+     abstraction it is based on. This value is supposed to be the complete
+     aggregation of all the values that are needed by the requested domains. *)
+  module type Structured = sig
     type value
     module Value : Value.Interactive with type t = value
-    module Location : Structured with type value = value
+    module Location : Abstract.Location.Internal with type value = value
   end
 
-  type 'v abstraction = (module Abstraction with type value = 'v)
+  (* An interactive location is however quite simple, it is simply a location
+     with the needed operators. *)
+  module type Interactive = Abstract.Location.External
 
-  let leaf : type l. l registered -> l structure = fun (module Registered) ->
-    Abstract.Location.Leaf (Registered.key, (module Registered))
+  (* We expose the type of the structured value we are based on to statically
+     ensure that we do not temper with it. *)
+  type 'v structured = (module Structured with type value = 'v)
+  type 'v interactive = (module Interactive with type value = 'v)
 
-  let node : type a b. a structure -> b structure -> (a * b) structure =
-    fun a b -> Abstract.Location.Node (a, b)
+  let init : type v. (module Value.Interactive with type t = v) -> v structured =
+    fun (module Interactive) ->
+      let module CVal = Main_values.CVal in
+      let leaf = Abstract.Value.Leaf (CVal.key, (module CVal)) in
+      let module From = struct type value = CVal.t let structure = leaf end in
+      let module Converter = Value.Converter (From) (Interactive) in
+      let module Loc = Location_lift.Make (Main_locations.PLoc) (Converter) in
+      (module struct
+        type value = v
+        module Value = Interactive
+        module Location = Loc
+      end)
 
-  let void_location () =
-    Self.fatal "Cannot register a location module from a Void structure."
 
-  let eq_type = Abstract.Location.eq_type
-  let dec_eq : type a b. a registered -> b structure -> (a, b) dec_eq =
-    fun (module R) -> function Leaf (key', _) -> eq_type R.key key' | _ -> None
-
+  (* Making a structured value interactive simply consists of adding the
+     needed operations using the Structure.Open functor.*)
   let make_interactive (module Structured : Structured) =
     (module struct
-      include Structured
+      include Structured.Location
       include Structure.Open (Abstract.Location) (struct
-        include Structured
+        include Structured.Location
         type t = location
       end)
     end : Interactive)
 
-  let add : type v l. l registered -> v abstraction -> v abstraction =
-    fun (module Registered) (module Abstraction) ->
-      let dependencies = outline Registered.dependencies in
-      let dec_eq = Abstract.Value.eq_structure in
-      let structured : (module Structured with type value = v) =
-        match dec_eq dependencies Abstraction.Value.structure with
+  (* Adding a registered location into a structured one is done in three steps:
+     1. Computing the values dependencies structure.
+     2. Computing the registered location structure. This steps starts by
+        checking if the dependencies are the same as the structured value. If
+        it is the case, there is pretty much nothing to do. If not, we have to
+        lift the location to make it use the structured value.
+     3. Computing the new location abstraction. It simply consists of a
+        reduced product with the structured location, except if the last one is
+        Unit. In that case, we simply use the registered location. *)
+  let add : type v l. l registered -> v structured -> v structured =
+    fun (module Registered) (module Structured) ->
+      let dependencies = Value.outline Registered.dependencies in
+      let registered : (module Abstract.Location.Internal with type value = v) =
+        match Value.dec_eq dependencies Structured.Value.structure with
         | Some Eq ->
           (module struct
             include Registered
-            let structure = leaf (module Registered)
+            let structure = Registered.structure
           end)
         | None ->
           let module From = struct
             type value = Registered.value
             let structure = dependencies
           end in
-          let module Converter = Value.Converter (From) (Abstraction.Value) in
+          let module Converter = Value.Converter (From) (Structured.Value) in
           (module Location_lift.Make (Registered) (Converter))
       in
-      let location : (module Structured with type value = v) =
+      let location : (module Abstract.Location.Internal with type value = v) =
         let open Locations_product in
-        let module Val = Abstraction.Value in
-        let module Loc = Abstraction.Location in
-        match Abstraction.Location.structure with
-        | Unit -> structured
-        | _ -> (module Same_value (Val) (val structured) (Loc))
+        let module Val = Structured.Value in
+        let module Loc = Structured.Location in
+        match Structured.Location.structure with
+        | Unit -> registered
+        | _ -> (module Same_value (Val) (val registered) (Loc))
       in
       (module struct
-        type value = Abstraction.value
-        module Value = Abstraction.Value
+        type value = Structured.value
+        module Value = Structured.Value
         module Location = (val location)
       end)
 
-
-  module type From = sig type location val registered : location registered end
+  (* When building the complete abstraction, we need to trick domains into
+     thinking that their locations dependencies are there, even if the
+     structured location type is not the good one. This is done through a
+     lift that requires conversion operations to interact with the subpart
+     of the structured location that matters for the domains. This functor is
+     responsible of building such conversion operations. *)
+  module type From = sig type location val structure : location structure end
   module Converter (From : From) (To : Interactive) = struct
     type internal = From.location
     type extended = To.location
+    let structure = From.structure
 
-    let structure =
-      let module Registered = (val From.registered) in
-      let module Location = Registered in
-      Abstract.Location.Leaf (Registered.key, (module Location))
+    let void_location () =
+      Self.fatal "Cannot register a location module from a Void structure."
 
     let rec set : type l. l structure -> l -> extended -> extended = function
       | Leaf (key, _) -> To.set key
@@ -238,52 +332,246 @@ end
 
 
 
-
-
-
-
+(* --- Domains abstraction -------------------------------------------------- *)
 
 module Domain = struct
-  type ('v, 'l) leaf_domain =
-    (module Abstract_domain.Leaf with type value = 'v and type location = 'l)
-  
-  module type Functor_value = sig
-    type l
-    module Make (V: Abstract.Value.External) :
-      (Abstract_domain.Leaf with type value = V.t and type location = l)
+  type 's structure = 's Abstract.Domain.structure
+  type 's key = 's Abstract.Domain.key
+  module type S = Abstract_domain.S
+
+
+  (* Registration of leaf domains, i.e simple domain with a fixed value. *)
+  module Leaf = struct
+    type ('v, 'l, 's) domain =
+      (module S with type value = 'v and type location = 'l and type state = 's)
+
+    (* We need the values and locations dependendies to register a domain. *)
+    type ('v, 'l, 's) register =
+      { key : 's key
+      ; domain : ('v, 'l, 's) domain
+      ; values : 'v Value.dependencies
+      ; locations : 'l Location.dependencies
+      }
+
+    (* As for the locations, a registered domain is a simple module that
+       contains all the information given during the register along with
+       the domain structure (which is a leaf). *)
+    module type Registered = sig
+      include Abstract_domain.S
+      val key : state key
+      val structure : state structure
+      val values : value Value.dependencies
+      val locations : location Location.dependencies
+    end
+
+    (* Registration procedure. *)
+    type 's registered = (module Registered with type state = 's)
+    let register : type v l s. (v, l, s) register -> s registered =
+      fun { key ; domain ; values ; locations } ->
+        (module struct
+          module Domain = (val domain)
+          include Domain
+          let key = key
+          let structure = Abstract.Domain.Leaf (key, (module Domain))
+          let values = values
+          let locations = locations
+        end)
   end
 
-  type ('v, 'l) t =
-    | Domain : ('v, 'l) leaf_domain -> ('v, 'l) t
-    | FunctorValue : (module Functor_value with type l = 'l) -> (_, 'l) t
 
-  module type Registered = sig
-    type values
-    type locations
-    val values : values Value.structure
-    val locations : locations Location.structure
-    val domain : (values, locations) t
+  (* Registration of a functor domain, i.e a domain that can be built on top of
+     any value. *)
+  module Functor = struct
+
+    (* A functor domain is declared as an existantiel. This module type has to
+       be read as: there exists a type <location> such as, given any Value, we
+       can build a domain using this Value and relying on a Location of type
+       <location>. *)
+    module type Domain = sig
+      type location
+      module Make (V : Value.Interactive) :
+        Abstract_domain.Leaf with type value = V.t and type location = location
+    end
+    type 'l domain = (module Domain with type location = 'l)
+
+    (* As a functor domain can be instanciated for any value, we only need
+       locations dependencies to register it. *)
+    type 'l register =
+      { domain : 'l domain
+      ; locations : 'l Location.dependencies
+      }
+
+    (* Once registered, a functor domain builds a domain along with its
+       structure and its key. *)
+    module type RegisteredLeaf = sig
+      include Abstract.Domain.Internal
+      val key : state key
+    end
+
+    (* A registered functor domain contains its locations dependencies and a
+       functor that builds a domain along its structure and its key. *)
+    module type Registered = sig
+      type location
+      val locations : location Location.dependencies
+      module Make (V : Value.Interactive) :
+        RegisteredLeaf with type value = V.t and type location = location
+    end
+
+    (* Registration procedure. *)
+    type registered = (module Registered)
+    let register : type l. l register -> registered =
+      fun { domain ; locations } ->
+        let module Domain = (val domain) in
+        (module struct
+          type location = Domain.location
+          let locations = locations
+          module Make (V : Value.Interactive) = struct
+            module Result = Domain.Make (V)
+            include Result
+            let structure = Abstract.Domain.Leaf (key, (module Result))
+          end
+        end)
   end
 
-  type ('v, 'l) registered =
-    (module Registered with type values = 'v and type locations = 'l)
 
-  type ('v, 'l) dependencies =
-    { values: 'v Value.structure ; locations: 'l Location.structure }
+  (* To simplify the domain registration procedure, we provide common types.
+     However, the code above is still useful to prove some properties, mainly
+     that we do not temper with the dependencies. *)
+  type register =
+    | Domain : ('v, 'l, 's) Leaf.register -> register
+    | Functor : 'l Functor.register -> register
 
-  type ('v, 'l) abstraction =
-    { dependencies: ('v, 'l) dependencies ; domain: ('v, 'l) t }
+  type registered =
+    | RegisteredDomain  : 's Leaf.registered -> registered
+    | RegisteredFunctor : Functor.registered -> registered
 
-  let register : type v l. (v, l) abstraction -> (v, l) registered =
-    fun abstraction ->
-      (module struct
-        type values = v
-        type locations = l
-        let values = abstraction.dependencies.values
-        let locations = abstraction.dependencies.locations
-        let domain = abstraction.domain
-      end)
+  let register = function
+    | Domain register -> RegisteredDomain (Leaf.register register)
+    | Functor register -> RegisteredFunctor (Functor.register register)
+
+
+  (* Building the domain abstraction consists of structuring the requested
+     registered domains. To do so, we need to keep track of the values and
+     locations abstraction on which the structured domain will rely. Those
+     abstractions are supposed to be the complete aggregations of all the
+     values (resp locations) that are needed by the requested domains. *)
+  module type Structured = sig
+    type value
+    type location
+    module Value : Value.Interactive with type t = value
+    module Location : Location.Interactive
+      with type value = value and type location = location
+    module Domain : Abstract.Domain.Internal
+      with type value = value and type location = location
+  end
+
+  type ('v, 'l) structured =
+    (module Structured with type value = 'v and type location = 'l)
+
+
+  (* Internal type used for intermediate results of the add procedure. *)
+  type ('v, 'l) structured_domain =
+    (module Abstract.Domain.Internal with type value = 'v and type location = 'l)
+
+  (* Utility function used to create an identity converter. *)
+  module type Typ = sig type t end
+  let conversion_id (type t) (module T: Typ with type t = t) =
+    (module struct
+      type extended = T.t
+      type internal = T.t
+      let extend x = x
+      let restrict x = x
+    end: Domain_lift.Conversion with type extended = t and type internal = t)
+
+
+  (* Adding a registered domain into a structured one consists of performing a
+     lifting of the registered one if needed before performing the product,
+     configuring the name and restricting the domain depending of the mode. *)
+  let add (type v l) dname mode registered (structured : (v, l) structured) =
+    let module Structured = (val structured) in
+    let module Loc = Structured.Location in
+    let module Val = Structured.Value in
+    let module Dom = Structured.Domain in
+    let domain : (v, l) structured_domain =
+      match registered with
+      | RegisteredFunctor (module Functor) ->
+        let locs = Location.outline Functor.locations in
+        let eq_loc = Location.dec_eq locs Loc.structure in
+        let module D = Functor.Make (Val) in
+        begin match eq_loc with
+          | Some Eq -> (module D)
+          | None ->
+            let module Val = (val conversion_id (module Val)) in
+            let module From = struct include D let structure = locs end in
+            let module Loc = Location.Converter (From) (Loc) in
+            (module Domain_lift.Make (D) (Val) (Loc))
+        end
+      | RegisteredDomain (module D) ->
+        let loc_deps = Location.outline D.locations in
+        let val_deps = Value.outline D.values in
+        let eq_loc = Location.dec_eq loc_deps Loc.structure in
+        let eq_val = Value.dec_eq val_deps Val.structure in
+        begin match eq_val, eq_loc with
+          | Some Eq, Some Eq -> (module D)
+          | Some Eq, None ->
+            let module Val = (val conversion_id (module Val)) in
+            let module From = struct include D let structure = loc_deps end in
+            let module Loc = Location.Converter (From) (Loc) in
+            (module Domain_lift.Make (D) (Val) (Loc))
+          | None, Some Eq ->
+            let module From = struct include D let structure = val_deps end in
+            let module Val = Value.Converter (From) (Val) in
+            let module LocTyp = struct type t = Loc.location end in
+            let module Loc = (val conversion_id (module LocTyp)) in
+            (module Domain_lift.Make (D) (Val) (Loc))
+          | _, _ ->
+            let module From = struct include D let structure = val_deps end in
+            let module Val = Value.Converter (From) (Val) in
+            let module From = struct include D let structure = loc_deps end in
+            let module Loc = Location.Converter (From) (Loc) in
+            (module Domain_lift.Make (D) (Val) (Loc))
+        end
+    in
+    (* Set the name of the domain. *)
+    let module Domain = struct
+      include (val domain)
+      module Store = struct
+        include Store
+        let register_global_state storage state =
+          let no_results = Parameters.NoResultsDomains.mem dname in
+          register_global_state (storage && not no_results) state
+      end
+    end in
+    (* Restricts the domain according to [mode]. *)
+    let domain : (v, l) structured_domain =
+      match mode with
+      | None -> (module Domain)
+      | Some kf_modes ->
+        let module Scope = struct let functions = kf_modes end in
+        (module Domain_builder.Restrict (Val) (Domain) (Scope))
+    in
+    let domain : (v, l) structured_domain =
+      match Abstract.Domain.(eq_structure Structured.Domain.structure Unit) with
+      | Some Eq -> domain
+      | None ->
+        (* The new [domain] becomes the left leaf of the domain product, and will
+           be processed before the domains from [Acc.Dom] during the analysis. *)
+        (module Domain_product.Make (Val) ((val domain)) (Dom))
+    in
+    (module struct
+      include Structured
+      module Domain = (val domain)
+    end : Structured with type value = v and type location = l)
+
+
+        
+    
+
+
+
+
 end
+
 
 
 
@@ -325,6 +613,8 @@ type 't with_info =
 
 type flag = Flag: ('v, 'l) abstraction with_info -> flag
 
+
+type ('a, 'b) dec_eq = ('a, 'b) Structure.eq option
 
 
 
