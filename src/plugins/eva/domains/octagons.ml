@@ -1060,7 +1060,8 @@ module State = struct
           && not (is_singleton (evaluate exp)) ->
         Some (Variable.make vi, Ival.zero)
 
-      | Lval lval ->
+      | Lval lval
+        when not (Eval_typ.lval_contains_volatile lval) ->
         let find_loc lval =
           match evaluate (Eva_utils.lval_to_exp lval) with
           | `Top -> Precise_locs.loc_top
@@ -1421,12 +1422,6 @@ module Domain = struct
         with Cvalue.V.Not_based_on_null -> []
       end
     | _ -> []
-
-
-  let kill_base base state =
-    let vars = Deps.find_list base state.deps in
-    let state = { state with deps = Deps.remove base state.deps } in
-    List.fold_left State.remove state vars
 
   let kill zone state =
     if Locations.Zone.(equal zone top)
