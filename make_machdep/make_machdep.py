@@ -60,23 +60,37 @@ import warnings
 
 parser = argparse.ArgumentParser(prog="make_machdep")
 parser.add_argument("-v", "--verbose", action="store_true")
-parser.add_argument("-o", default=sys.stdout,type=argparse.Filetype('w'),dest="dest_file")
+parser.add_argument("-o", default=sys.stdout, type=argparse.Filetype("w"), dest="dest_file")
 parser.add_argument("--compiler")
 parser.add_argument("--compiler-version")
-parser.add_argument("--cpp-arch-flags", nargs="+", default=[], help="architecture-specific flags needed for preprocessing, e.g. '-m32'")
-parser.add_argument("--compiler-flags", nargs="+", default=["-c"], help="flags to be given to the compiler (other than those set by --cpp-arch-flags); by default, '-c'")
+parser.add_argument(
+    "--cpp-arch-flags",
+    nargs="+",
+    default=[],
+    help="architecture-specific flags needed for preprocessing, e.g. '-m32'",
+)
+parser.add_argument(
+    "--compiler-flags",
+    nargs="+",
+    default=["-c"],
+    help="flags to be given to the compiler (other than those set by --cpp-arch-flags); by default, '-c'",
+)
 parser.add_argument("--check", action="store_true")
 args, other_args = parser.parse_known_args()
 
-def print_machdep(machdep):
-    json.dump(machdep,args.dest_file,indent=4,sort_keys=True)
 
-fc_share=subprocess.run("frama-c-config -print-share-path",capture_output=True).output
+def print_machdep(machdep):
+    json.dump(machdep, args.dest_file, indent=4, sort_keys=True)
+
+
+fc_share = subprocess.run("frama-c-config -print-share-path", capture_output=True).output
+
 
 def check_machdep(machdep):
     try:
         from jsonschema import validate, ValidationError
-        with open(fc_share+"/machdeps/machdep-schema.json", "r") as schema:
+
+        with open(fc_share + "/machdeps/machdep-schema.json", "r") as schema:
             validate(machdep, json.load(schema))
     except ImportError:
         warnings.warn("jsonschema is not available: no validation will be performed")
@@ -198,7 +212,9 @@ for (f, typ) in source_files:
                         print(f"[INFO] setting const_string_literals to false")
                     machdep["const_string_literals"] = False
                 else:
-                    print(f"WARNING: could not find const_string_literals in any of the expected sections, skipping")
+                    print(
+                        f"WARNING: could not find const_string_literals in any of the expected sections, skipping"
+                    )
         continue
     symbols, underscore_name = decode_object_file(objfile)
     if machdep["underscore_name"] is None:
@@ -220,10 +236,12 @@ for (f, typ) in source_files:
             if name in machdep:
                 if value == 0x15:
                     bvalue = True
-                elif value == 0xf4:
+                elif value == 0xF4:
                     bvalue = False
                 else:
-                    print(f"WARNING: unexpected value '{value} for boolean '{name}' in '{objfile}', ignoring")
+                    print(
+                        f"WARNING: unexpected value '{value} for boolean '{name}' in '{objfile}', ignoring"
+                    )
                     continue
                 if args.verbose:
                     print(f"[INFO] setting {name} to {bvalue}")
@@ -236,11 +254,13 @@ for (f, typ) in source_files:
             if not ("_IS_" in name):
                 print(f"WARNING: unexpected symbol '{name}' in '{objfile}', ignoring")
                 continue
-            if value == 0xf4:
+            if value == 0xF4:
                 # Symbol found with 'false' => incompatible type, ignore
                 continue
             elif value != 0x15:
-                print(f"WARNING: unexpected value '{value}' for symbol '{name}' in '{objfile}', ignoring")
+                print(
+                    f"WARNING: unexpected value '{value}' for symbol '{name}' in '{objfile}', ignoring"
+                )
                 continue
             [name, original_type] = name.split("_IS_")
             original_type = original_type.replace("_", " ")
@@ -249,7 +269,9 @@ for (f, typ) in source_files:
                     print(f"[INFO] setting {name} to {original_type}")
                 machdep[name] = original_type
             else:
-                print(f"WARNING: unexpected symbol '{name}' (expected '{name}' in machdep) in '{objfile}', ignoring")
+                print(
+                    f"WARNING: unexpected symbol '{name}' (expected '{name}' in machdep) in '{objfile}', ignoring"
+                )
                 continue
     else:
         sys.exit(f"AssertionError: f {f} typ {typ}")
@@ -266,7 +288,9 @@ else:
     compiler_version_command = compilation_command + ["--version"]
     proc = subprocess.run(compiler_version_command, capture_output=True)
     if proc.returncode != 0:
-        print(f"WARNING: option '--version' unsupported by compiler; re-run this script with --compiler and --compiler-version")
+        print(
+            f"WARNING: option '--version' unsupported by compiler; re-run this script with --compiler and --compiler-version"
+        )
         if args.verbose:
             print(proc.stderr.decode("utf-8"))
     else:
