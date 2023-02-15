@@ -126,8 +126,6 @@ machdep = {
     "alignof_str": None,
     "alignof_fun": None,
     "char_is_unsigned": None,
-    "underscore_name": None,
-    "const_string_literals": None,
     "little_endian": None,
     "alignof_aligned": None,
     "has__builtin_va_list": None,
@@ -166,7 +164,6 @@ source_files = [
     ("ptrdiff_t.c", "type"),
     ("char_is_unsigned.c", "bool"),
     ("little_endian.c", "bool"),
-    ("const_string_literals.c", "const_string_literals"),
     ("has__builtin_va_list.c", "has__builtin_va_list"),
 ]
 
