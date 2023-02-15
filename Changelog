@@ -20,6 +20,11 @@ Open Source Release <next-release>
 
 -   Logic     [2023-01-16] Accept \ghost attribute in logic annotations (##2638)
 -   Logic     [2023-01-10] Fix issue in pretty-printing ranges (##2639)
+###############################
+Open Source Release 26.1 (Iron)
+###############################
+
+-   Logic     [2023-01-16] Accept '\ghost' attribute in logic annotations
 
 ###############################
 Open Source Release 26.0 (Iron)
