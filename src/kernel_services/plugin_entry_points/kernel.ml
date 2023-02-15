@@ -156,6 +156,8 @@ let wkey_conditional_feature =
 
 let wkey_drop_unused = register_warn_category "linker:drop-conflicting-unused"
 
+let wkey_linker_weak = register_warn_category "linker:weak"
+
 let wkey_implicit_conv_void_ptr =
   register_warn_category "typing:implicit-conv-void-ptr"
 
