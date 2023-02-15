@@ -266,6 +266,7 @@ README* header_spec=.ignore
 /share/win32_installer.iss header_spec=.ignore
 /share/win32_manual_installation_step.txt header_spec=.ignore
 /share/compliance/*.json header_spec=.ignore
+/share/machdeps/machdep-schema.json header_spec=.ignore
 
 /tests/**/* header_spec=.ignore
 
