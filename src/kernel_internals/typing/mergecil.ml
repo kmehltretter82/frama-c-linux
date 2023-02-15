@@ -1564,6 +1564,17 @@ let ignore_vi vi =
 
 let is_ignored_vi vi = Cil_datatype.Varinfo.Set.mem vi !ignored_vi
 
+let remove_function_statics fdec =
+  let statics =
+    Cil_datatype.Varinfo.Set.of_list (Ast_info.Function.get_statics fdec)
+  in
+  theFile :=
+    List.filter (fun g ->
+        match g with
+        | GVar (vi, _, _) -> not (Cil_datatype.Varinfo.Set.mem vi statics)
+        | _ -> true
+      ) !theFile
+
 let oneFilePass1 (f:file) : unit =
   H.add fileNames !currentFidx f.fileName;
   Kernel.feedback ~dkey:Kernel.dkey_linker
@@ -2828,6 +2839,7 @@ let oneFilePass2 (f: file) =
               (mergePushGlobal g');
               (H.add emittedFunDefn fdec'.svar.vname (fdec', l, curSum))
             | Some (_prevFun, prevLoc, prevSum) ->
+              (* previous was found *)
               (* restore old binding for vi, as we are about to drop
                  the new definition and its formals.
               *)
@@ -2836,7 +2848,8 @@ let oneFilePass2 (f: file) =
                  Some l from getFormalsDecl
                  in case of a defined function. *)
               Cil.setFormals fdec (Option.get defn_formals);
-              (* previous was found *)
+              (* Remove static variables (avoids dangling globals in the AST *)
+              remove_function_statics fdec';
               if (curSum = prevSum) then
                 Kernel.warning ~current:true
                   "dropping duplicate def'n of func %s at %a in favor of \
