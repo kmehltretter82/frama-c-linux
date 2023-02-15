@@ -2876,8 +2876,14 @@ let oneFilePass2 (f: file) =
               "Looking for previous definition of inline %s(%d)"
               origname !currentFidx;
           end;
-          try
-            let oldinode = H.find inlineBodies printout in
+          let finalize_process_varinfo () =
+            if debugInlines then Kernel.debug " Not found";
+            H.add inlineBodies printout inode;
+            mergePushGlobal g'
+          in
+          match H.find_opt inlineBodies printout with
+          | None -> finalize_process_varinfo ()
+          | Some oldinode ->
             if debugInlines then
               Kernel.debug "  Matches %s(%d)"
                 oldinode.nname oldinode.nfidx;
@@ -2892,7 +2898,7 @@ let oneFilePass2 (f: file) =
                   "Inline function %s because \
                    it is used before it is defined"
                   fdec'.svar.vname;
-                raise Not_found
+                finalize_process_varinfo ()
               end
             end;
             let _ = union oldinode inode in
@@ -2901,11 +2907,6 @@ let oneFilePass2 (f: file) =
              * we can find the replacement name. *)
             fdec'.svar.vname <- origname;
             () (* Drop this definition *)
-          with Not_found -> begin
-              if debugInlines then Kernel.debug " Not found";
-              H.add inlineBodies printout inode;
-              mergePushGlobal g'
-            end
         end else begin
           (* either the function is not inline, or we're not attempting to
            * merge inlines *)
