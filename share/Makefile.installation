@@ -62,15 +62,18 @@ ifndef PREFIX
 	@echo "  (recommendation: include FRAMAC/share/Makefile.common)"
 	@exit 1
 else
+ifeq ($(patsubst ~%,,$(PREFIX)),)
+$(error "PREFIX cannot start with '~'; use $$HOME instead")
+endif
 ifeq ($(PREFIX),$(OPAM_SWITCH_PREFIX))
 	@echo "Installing $(INSTALL_TARGET)to current Opam switch"
 	@printf "  Copying and relocating files..."
-	dune install ${MANDIR_OPT} 2> /dev/null
+	dune install --root . ${MANDIR_OPT} 2> /dev/null
 	@echo " (done)"
 else
 	@echo "Installing $(INSTALL_TARGET)to ${PREFIX}"
 	@printf " Copying and relocating files..."
-	dune install --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+	dune install --root . --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
 	@echo " (done)"
 	@echo 'DO NOT FORGET TO EXPAND YOUR OCAMLPATH VARIABLE:'
 	@echo '  export OCAMLPATH="${PREFIX}/lib:$$OCAMLPATH"'
@@ -80,5 +83,5 @@ endif
 ifdef PREFIX
 uninstall::
 	@echo "Uninstalling $(INSTALL_TARGET)"
-	dune uninstall --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+	dune uninstall --root . --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
 endif
