@@ -104,6 +104,8 @@ export enum markerKind {
   term = 'term',
   /** Property */
   property = 'property',
+  /** Type */
+  type = 'type',
 }
 
 /** Decoder for `markerKind` */
@@ -162,6 +164,8 @@ export interface markerInfoData {
   name: string;
   /** Marker declaration or description */
   descr: string;
+  /** Function scope of the marker, if applicable */
+  scope?: string;
   /** Source location */
   sloc: source;
 }
@@ -174,6 +178,7 @@ export const jMarkerInfoData: Json.Decoder<markerInfoData> =
     var: jMarkerVar,
     name: Json.jString,
     descr: Json.jString,
+    scope: Json.jOption(Json.jString),
     sloc: jSource,
   });
 
@@ -181,12 +186,13 @@ export const jMarkerInfoData: Json.Decoder<markerInfoData> =
 export const byMarkerInfoData: Compare.Order<markerInfoData> =
   Compare.byFields
     <{ key: string, kind: markerKind, var: markerVar, name: string,
-       descr: string, sloc: source }>({
+       descr: string, scope?: string, sloc: source }>({
     key: Compare.string,
     kind: byMarkerKind,
     var: byMarkerVar,
     name: Compare.alpha,
     descr: Compare.string,
+    scope: Compare.defined(Compare.string),
     sloc: bySource,
   });
 
@@ -243,13 +249,13 @@ export const markerInfo: State.Array<string,markerInfoData> = markerInfo_interna
 export type marker =
   Json.key<'#stmt'> | Json.key<'#decl'> | Json.key<'#lval'> |
   Json.key<'#expr'> | Json.key<'#term'> | Json.key<'#global'> |
-  Json.key<'#property'>;
+  Json.key<'#property'> | Json.key<'#type'>;
 
 /** Decoder for `marker` */
 export const jMarker: Json.Decoder<marker> =
   Json.jUnion<Json.key<'#stmt'> | Json.key<'#decl'> | Json.key<'#lval'> |
               Json.key<'#expr'> | Json.key<'#term'> | Json.key<'#global'> |
-              Json.key<'#property'>>(
+              Json.key<'#property'> | Json.key<'#type'>>(
     Json.jKey<'#stmt'>('#stmt'),
     Json.jKey<'#decl'>('#decl'),
     Json.jKey<'#lval'>('#lval'),
@@ -257,6 +263,7 @@ export const jMarker: Json.Decoder<marker> =
     Json.jKey<'#term'>('#term'),
     Json.jKey<'#global'>('#global'),
     Json.jKey<'#property'>('#property'),
+    Json.jKey<'#type'>('#type'),
   );
 
 /** Natural order for `marker` */
@@ -426,7 +433,7 @@ export const getInformationUpdate: Server.Signal = {
 const getInformation_internal: Server.GetRequest<
   marker |
   undefined,
-  { id: string, label: string, descr: string, title: string, text: text }[]
+  { id: string, label: string, title: string, descr: string, text: text }[]
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getInformation',
@@ -435,8 +442,8 @@ const getInformation_internal: Server.GetRequest<
             Json.jObject({
               id: Json.jString,
               label: Json.jString,
-              descr: Json.jString,
               title: Json.jString,
+              descr: Json.jString,
               text: jText,
             })),
   signals: [ { name: 'kernel.ast.getInformationUpdate' } ],
@@ -445,7 +452,7 @@ const getInformation_internal: Server.GetRequest<
 export const getInformation: Server.GetRequest<
   marker |
   undefined,
-  { id: string, label: string, descr: string, title: string, text: text }[]
+  { id: string, label: string, title: string, descr: string, text: text }[]
   >= getInformation_internal;
 
 const getMarkerAt_internal: Server.GetRequest<

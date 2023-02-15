@@ -185,7 +185,7 @@ let make_panel (main_ui:main_window_extension_points) =
     (fun (_, {ip}) _col ->
        (* Same code is found in Design, in the callback for the
           warning_manager *)
-       ignore (main_ui#scroll (Pretty_source.PIP ip));
+       ignore (main_ui#scroll (Printer_tag.PIP ip));
        main_ui#view_original (Property.location ip)
     );
   let tab_label = (GMisc.label ~text:"Red Alarms" ())#coerce in

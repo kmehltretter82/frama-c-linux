@@ -75,50 +75,70 @@ export function printTextWithTags(
 // --- Lightweight Text Renderer
 // --------------------------------------------------------------------------
 
-interface MarkerProps {
+export type Modifier = 'NORMAL' | 'DOUBLE' | 'META';
+
+export interface MarkerProps {
   marker: string;
-  onMarker?: (marker: string) => void;
+  onSelected?: (marker: string, meta: Modifier) => void;
+  onHovered?: (marker: string | undefined) => void;
   children?: React.ReactNode;
 }
 
-function Marker(props: MarkerProps): JSX.Element {
-  const { marker, onMarker, children } = props;
-  const onClick = (): void => { if (onMarker) onMarker(marker); };
+export function Marker(props: MarkerProps): JSX.Element {
+  const { marker, onSelected, onHovered, children } = props;
+  const onDoubleClick = (): void => {
+    onSelected && onSelected(marker, 'DOUBLE');
+  };
+  const onClick = (evt: React.MouseEvent): void => {
+    evt.stopPropagation();
+    onSelected && onSelected(marker, evt.altKey ? 'META' : 'NORMAL');
+  };
   return (
     <span
       className="kernel-text-marker"
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
+      onMouseEnter={() => onHovered && onHovered(marker)}
+      onMouseLeave={() => onHovered && onHovered(undefined)}
     >
       {children}
     </span>
   );
 }
 
-function makeContents(text: KernelData.text): React.ReactNode {
-  if (Array.isArray(text)) {
-    const tag = text[0];
-    const marker = tag && typeof (tag) === 'string';
-    const array = marker ? text.slice(1) : text;
-    const contents = React.Children.toArray(array.map(makeContents));
-    if (marker) {
-      return <Marker marker={tag}>{contents}</Marker>;
-    }
-    return <>{contents}</>;
-  } if (typeof text === 'string') {
-    return text;
-  }
-  D.error('Unexpected text', text);
-  return null;
-}
-
 export interface TextProps {
   text: KernelData.text;
-  onMarker?: (marker: string) => void;
+  onSelected?: (marker: string, meta: Modifier) => void;
+  onHovered?: (marker: string | undefined) => void;
   className?: string;
 }
 
 export function Text(props: TextProps): JSX.Element {
   const className = classes('kernel-text', 'dome-text-code', props.className);
+  function makeContents(text: KernelData.text): React.ReactNode {
+    if (Array.isArray(text)) {
+      const tag = text[0];
+      const marker = tag && typeof (tag) === 'string';
+      const array = marker ? text.slice(1) : text;
+      const contents = React.Children.toArray(array.map(makeContents));
+      if (marker) {
+        return (
+          <Marker
+            marker={tag}
+            onSelected={props.onSelected}
+            onHovered={props.onHovered}
+          >
+            {contents}
+          </Marker>
+        );
+      }
+      return <>{contents}</>;
+    } if (typeof text === 'string') {
+      return text;
+    }
+    D.error('Unexpected text', text);
+    return null;
+  }
   return <div className={className}>{makeContents(props.text)}</div>;
 }
 

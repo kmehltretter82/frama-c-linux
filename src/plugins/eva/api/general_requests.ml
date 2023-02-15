@@ -222,7 +222,7 @@ let () =
   Server.Kernel_ast.Information.register
     ~id:"eva.value"
     ~label:"Value"
-    ~descr:"Possible values inferred by Eva"
+    ~title:"Possible values inferred by Eva"
     ~enable:Analysis.is_computed
     print_value
 
@@ -275,7 +275,7 @@ module EvaTaints = struct
     if before = after then Format.fprintf fmt "%a" pretty before
     else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
 
-  let eva_taints_title =
+  let eva_taints_descr =
     "Taint status:\n\
      - Direct taint: data dependency from values provided by the attacker, \
      meaning that the attacker may be able to alter this value\n\
@@ -287,8 +287,8 @@ module EvaTaints = struct
     let taint_computed = Taint_domain.Store.is_computed in
     let enable () = Analysis.is_computed () && taint_computed () in
     Server.Kernel_ast.Information.register
-      ~id:"eva.taint" ~label:"Taint" ~descr: "Taint status according to Eva"
-      ~title:eva_taints_title ~enable print_taint
+      ~id:"eva.taint" ~label:"Taint" ~title: "Taint status according to Eva"
+      ~descr:eva_taints_descr ~enable print_taint
 
   let update = Server.Kernel_ast.Information.update
   let () = Analysis.register_computation_hook (fun _ -> update ())

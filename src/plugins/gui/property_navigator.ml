@@ -579,7 +579,7 @@ let make_panel (main_ui:main_window_extension_points) =
        if not currently_selected then
          begin match model#custom_get_iter path with
            | Some {MODEL.finfo={ip = ip;}} ->
-             ignore (main_ui#scroll (Pretty_source.PIP ip));
+             ignore (main_ui#scroll (Printer_tag.PIP ip));
              (* Note: the code below generates double scrolling:
                 the previous call to main_ui#scroll causes the original source
                 viewer to scroll to the beginning of the function, and then
@@ -783,11 +783,11 @@ let make_panel (main_ui:main_window_extension_points) =
    Aka. "bullets" in left margin *)
 let highlighter (buffer:reactive_buffer) localizable ~start ~stop =
   match localizable with
-  | Pretty_source.PIP ppt ->
+  | Printer_tag.PIP ppt ->
     if Property.has_status ppt then
       Design.Feedback.mark
         buffer#buffer ~offset:start (Property_status.Feedback.get ppt)
-  | Pretty_source.PStmt(_,({ skind=Instr(Call _| Local_init (_, ConsInit _, _)) } as stmt)) ->
+  | PStmt(_,({ skind=Instr(Call _| Local_init (_, ConsInit _, _)) } as stmt)) ->
     let kfs = Statuses_by_call.all_functions_with_preconditions stmt in
     (* We separate the consolidated statuses of the preconditions inside
        guarded behaviors from those outside. For guarded behaviors, since we
@@ -841,11 +841,8 @@ let highlighter (buffer:reactive_buffer) localizable ~start ~stop =
       in
       Design.Feedback.mark buffer#buffer ~call_site:stmt ~offset validity
 
-  | Pretty_source.PStmt _ | Pretty_source.PStmtStart _
-  | Pretty_source.PGlobal _| Pretty_source.PVDecl _
-  | Pretty_source.PTermLval _| Pretty_source.PLval _
-  | Pretty_source.PExp _ -> ()
-
+  | PStmt _ | PStmtStart _ | PGlobal _| PVDecl _ | PTermLval _| PLval _
+  | PExp _ | PType _ -> ()
 
 
 let extend (main_ui:main_window_extension_points) =

@@ -163,6 +163,12 @@ class type extensible_printer_type = object
   method ikind: Format.formatter -> ikind -> unit
   method fkind: Format.formatter -> fkind -> unit
 
+  method compkind: Format.formatter -> compinfo -> unit
+  method compname: Format.formatter -> compinfo -> unit
+  method compinfo: Format.formatter -> compinfo -> unit
+  method enuminfo: Format.formatter -> enuminfo -> unit
+  method typeinfo: Format.formatter -> typeinfo -> unit
+
   method typ:
     ?fundecl:varinfo ->
     (Format.formatter -> unit) option -> Format.formatter -> typ -> unit

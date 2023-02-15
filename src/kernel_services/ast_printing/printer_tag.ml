@@ -36,11 +36,16 @@ type localizable =
   | PVDecl of (kernel_function option * kinstr * varinfo)
   | PGlobal of global
   | PIP of Property.t
+  | PType of typ
 
 let glabel = function
   | GType(tinfo,_) -> tinfo.tname
-  | GCompTag(comp, _) | GCompTagDecl(comp, _) -> comp.cname
-  | GEnumTag(enum, _) | GEnumTagDecl(enum, _) -> enum.ename
+  | GCompTag(comp, _) | GCompTagDecl(comp, _) ->
+    Printf.sprintf "%s %s"
+      (if comp.cstruct then "struct" else "union")
+      comp.cname
+  | GEnumTag(enum, _) | GEnumTagDecl(enum, _) ->
+    Printf.sprintf "enum %s" enum.ename
   | GVarDecl(vi,_) | GVar(vi, _, _)
   | GFun( { svar=vi }, _) | GFunDecl(_,vi,_) -> vi.vname
   | GPragma((Attr(a,_) | AttrAnnot a),_) -> a
@@ -57,6 +62,7 @@ let label = function
   | PTermLval _ -> "(term)"
   | PGlobal g -> glabel g
   | PIP _ -> "(property)"
+  | PType ty -> Pretty_utils.to_string Printer.pp_typ ty
 
 let decl_of = function
   | GCompTag(comp,loc) -> GCompTagDecl(comp,loc)
@@ -79,6 +85,7 @@ let pretty fmt = function
   | PGlobal g -> Printer.pp_global fmt (decl_of g)
   | PStmt(_,stmt) | PStmtStart (_, stmt) ->
     Printer.(without_annot pp_stmt) fmt stmt
+  | PType t -> Printer.pp_typ fmt t
 
 let pp_ki_loc fmt ki =
   match ki with
@@ -108,6 +115,8 @@ let pp_debug fmt = function
     Format.fprintf fmt "LocalizableGlobal %a" Printer.pp_global g
   | PIP ip ->
     Format.fprintf fmt "LocalizableIP %a" Description.pp_property ip
+  | PType typ ->
+    Format.fprintf fmt "LocalizableType %a" Printer.pp_typ typ
 
 module Localizable =
   Datatype.Make_with_collections
@@ -136,6 +145,8 @@ module Localizable =
           Hashtbl.hash( 6, Property.hash ip )
         | PGlobal g ->
           Hashtbl.hash( 7, Global.hash g )
+        | PType t ->
+          Hashtbl.hash( 8, Typ.hash t )
 
       let equal l1 l2 = match l1,l2 with
         | PStmt (_,ki1), PStmt (_,ki2) -> ki1.sid = ki2.sid
@@ -151,8 +162,9 @@ module Localizable =
         | PExp (_,_,e1), PExp(_,_,e2) -> Exp.equal e1 e2
         | PIP ip1, PIP ip2 -> Property.equal ip1 ip2
         | PGlobal g1, PGlobal g2 -> Global.equal g1 g2
+        | PType t1, PType t2 -> Typ.equal t1 t2
         | (PStmt _ | PStmtStart _ | PLval _ | PExp _ | PTermLval _ | PVDecl _
-          | PIP _ | PGlobal _), _
+          | PIP _ | PGlobal _ | PType _), _
           ->  false
 
       let compare l1 l2 = match l1,l2 with
@@ -184,6 +196,9 @@ module Localizable =
         | PIP p1 , PIP p2 -> Property.compare p1 p2
         | PIP _ , _ -> (-1)
         | _ , PIP _ -> 1
+        | PType t1, PType t2 -> Typ.compare t1 t2
+        | PType _, _ -> (-1)
+        | _, PType _ -> 1
         | PGlobal g1 , PGlobal g2 -> Global.compare g1 g2
 
       let pretty = pretty (* defined above *)
@@ -202,8 +217,10 @@ let kf_of_localizable loc =
   | PVDecl (kf_opt, _, _) -> kf_opt
   | PStmt (kf, _) | PStmtStart(kf,_) -> Some kf
   | PIP ip -> Property.get_kf ip
-  | PGlobal (GFun ({svar = vi}, _)) -> Some (Globals.Functions.get vi)
+  | PGlobal (GFun ({svar = vi}, _) | GFunDecl(_,vi,_)) ->
+    Some (Globals.Functions.get vi)
   | PGlobal _ -> None
+  | PType _ -> None
 
 let ki_of_localizable loc = match loc with
   | PLval (_, ki, _)
@@ -213,6 +230,7 @@ let ki_of_localizable loc = match loc with
   | PStmt (_, st) | PStmtStart(_, st) -> Kstmt st
   | PIP ip -> Property.get_kinstr ip
   | PGlobal _ -> Kglobal
+  | PType _ -> Kglobal
 
 let varinfo_of_localizable = function
   | PLval (_, _, (Var vi, NoOffset)) -> Some vi
@@ -244,7 +262,7 @@ let loc_of_localizable = function
     (match kf_of_localizable localize with
      | None -> Location.unknown
      | Some kf -> Kernel_function.get_location kf)
-
+  | PType _ -> Location.unknown
 
 (* -------------------------------------------------------------------------- *)
 (* --- Helper for Globals                                                 --- *)
@@ -663,13 +681,14 @@ struct
 
     method! global fmt g =
       match g with
-      (* these globals are already covered by PVDecl *)
-      | GVarDecl _ | GVar _ | GFunDecl _ | GFun _ -> super#global fmt g
-      | _ ->
-        Format.fprintf fmt "@{<%s>%a@}"
-          (Tag.create (PGlobal g))
-          super#global
-          g
+      (* these globals are already covered by the underlying parser *)
+      | GVarDecl _ | GVar _ | GFunDecl _ | GFun _
+      | GCompTag _ | GCompTagDecl _
+      | GEnumTag _ | GEnumTagDecl _
+      | GType _ ->
+        super#global fmt g
+      | GAsm _ | GPragma _ | GText _ | GAnnot _ ->
+        Format.fprintf fmt "@{<%s>%a@}" (Tag.create (PGlobal g)) super#global g
 
     method! extended fmt ext =
       let loc =
@@ -800,6 +819,31 @@ struct
       let f = Option.get self#current_kf in
       let tag = Tag.create (PStmtStart(f,s)) in
       Format.fprintf fmt "@{<%s>%a@}" tag (super#stmtkind sattr next) sk
+
+    method! ikind fmt c =
+      Format.fprintf fmt "@{<%s>%a@}"
+        (Tag.create (PType(TInt(c,[]))))
+        super#ikind c
+
+    method! fkind fmt c =
+      Format.fprintf fmt "@{<%s>%a@}"
+        (Tag.create (PType(TFloat(c,[]))))
+        super#fkind c
+
+    method! compname fmt comp =
+      Format.fprintf fmt "@{<%s>%a@}"
+        (Tag.create (PGlobal(Globals.Types.global Struct comp.cname)))
+        super#compname comp
+
+    method! enuminfo fmt enum =
+      Format.fprintf fmt "@{<%s>%a@}"
+        (Tag.create (PGlobal(Globals.Types.global Enum enum.ename)))
+        super#enuminfo enum
+
+    method! typeinfo fmt tinfo =
+      Format.fprintf fmt "@{<%s>%a@}"
+        (Tag.create (PGlobal(Globals.Types.global Typedef tinfo.tname)))
+        super#typeinfo tinfo
 
     initializer force_brace <- true
 

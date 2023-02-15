@@ -47,8 +47,9 @@ let get_term kf term =
 let key_of_localizable =
   let open Printer_tag in
   function
-  | PStmt _ | PStmtStart _ | PTermLval _ | PVDecl _ | PGlobal _ | PIP _ -> None
-  | PLval (_, Kglobal, _) | PExp (_, Kglobal, _) -> None
+  | PStmt _ | PStmtStart _ | PTermLval _ | PVDecl _ | PGlobal _ | PIP _
+  | PType _ | PLval (_, Kglobal, _) | PExp (_, Kglobal, _)
+    -> None
   | PLval (kf, Kstmt stmt, lval) ->
     let str = Format.asprintf "%a" Cil_datatype.Lval.pretty lval in
     Option.(bind kf (fun kf -> get_term kf str) |> map (fun t -> (stmt, t)))
@@ -144,6 +145,7 @@ module MarkerKind = struct
   let glob = kind "global"
   let term = kind "term"
   let prop = kind "property"
+  let typ = kind "type"
 
   let () =
     Enum.set_lookup
@@ -158,7 +160,8 @@ module MarkerKind = struct
          | PExp _ -> expr
          | PTermLval _ -> term
          | PGlobal _ -> glob
-         | PIP _ -> prop)
+         | PIP _ -> prop
+         | PType _ -> typ)
 
   let data =
     Request.dictionary
@@ -196,7 +199,7 @@ module MarkerVar = struct
            if Cil.isFunctionType vi.vtype then fct else var
          | PGlobal (GFun _ | GFunDecl _) -> fct
          | PLval _ | PStmt _ | PStmtStart _
-         | PExp _ | PTermLval _ | PGlobal _ | PIP _ -> none)
+         | PExp _ | PTermLval _ | PGlobal _ | PIP _ | PType _ -> none)
 
   let data =
     Request.dictionary
@@ -280,6 +283,16 @@ struct
         model
     in
     let () =
+      States.option
+        ~name:"scope"
+        ~descr:(Md.plain "Function scope of the marker, if applicable")
+        ~data:(module Jstring)
+        ~get:(fun (tag, _) ->
+            Option.map Kernel_function.get_name @@
+            Printer_tag.kf_of_localizable tag)
+        model
+    in
+    let () =
       States.column
         ~name:"sloc"
         ~descr:(Md.plain "Source location")
@@ -304,6 +317,7 @@ struct
     | PTermLval _ -> Printf.sprintf "#t%d" (incr kid ; !kid)
     | PGlobal _ -> Printf.sprintf "#g%d" (incr kid ; !kid)
     | PIP _ -> Printf.sprintf "#p%d" (incr kid ; !kid)
+    | PType _ -> Printf.sprintf "#y%d" (incr kid ; !kid)
 
   let create loc =
     let add_cache key = Cache.add cache key loc in
@@ -332,6 +346,7 @@ struct
   let jterm = jmarker "term"
   let jglobal = jmarker "global"
   let jproperty = jmarker "property"
+  let jtyp = jmarker "type"
 
   let jtype = Data.declare ~package ~name:"marker"
       ~descr:(Md.plain "Localizable AST markers")
@@ -423,6 +438,7 @@ end
 module KfMarker = struct
   type record
   let record : record Record.signature = Record.signature ()
+
   let fct = Record.field record ~name:"fct"
       ~descr:(Md.plain "Function") (module Kf)
   let marker = Record.field record ~name:"marker"
@@ -431,6 +447,7 @@ module KfMarker = struct
   let data =
     Record.publish ~package ~name:"location"
       ~descr:(Md.plain "Location: function and marker") record
+
   module R : Record.S with type r = record = (val data)
   type t = kernel_function * Printer_tag.localizable
   let jtype = R.jtype
@@ -576,9 +593,9 @@ struct
   type info = {
     id: string;
     rank: int;
-    label: string;
-    descr: string;
-    title: string;
+    label: string; (* short name *)
+    title: string; (* full title name *)
+    descr: string; (* description for information values *)
     enable: unit -> bool;
     pretty: Format.formatter -> Printer_tag.localizable -> unit
   }
@@ -591,16 +608,16 @@ struct
     let jtype = Package.(Jrecord[
         "id", Jstring ;
         "label", Jstring ;
-        "descr", Jstring ;
         "title", Jstring ;
+        "descr", Jstring ;
         "text", Jtext.jtype ;
       ])
     let of_json _ = failwith "Information.Info"
     let to_json (info,text) = `Assoc [
         "id", `String info.id ;
         "label", `String info.label ;
-        "descr", `String info.descr ;
         "title", `String info.title ;
+        "descr", `String info.descr ;
         "text", text ;
       ]
   end
@@ -643,9 +660,12 @@ struct
 
   let update () = Request.emit signal
 
-  let register ~id ~label ~descr ?(title = descr) ?(enable = fun _ -> true) pretty =
+  let register ~id ~label ~title
+      ?(descr = title)
+      ?(enable = fun _ -> true)
+      pretty =
     let rank = incr rankId ; !rankId in
-    let info = { id ; rank ; label ; descr; title ; enable ; pretty } in
+    let info = { id ; rank ; label ; title ; descr; enable ; pretty } in
     if Hashtbl.mem registry id then
       ( let msg = Format.sprintf
             "Server.Kernel_ast.register_info: duplicate %S" id in
@@ -672,16 +692,18 @@ let () = Request.register ~package
 let () = Information.register
     ~id:"kernel.ast.location"
     ~label:"Location"
-    ~descr:"Source file location"
+    ~title:"Source file location"
     begin fun fmt loc ->
-      let location = Printer_tag.loc_of_localizable loc in
-      Filepath.pp_pos fmt (fst location)
+      let pos = fst @@ Printer_tag.loc_of_localizable loc in
+      if Filepath.Normalized.is_empty pos.pos_path then
+        raise Not_found ;
+      Filepath.pp_pos fmt pos
     end
 
 let () = Information.register
     ~id:"kernel.ast.varinfo"
     ~label:"Var"
-    ~descr:"Variable Information"
+    ~title:"Variable Information"
     begin fun fmt loc ->
       match loc with
       | PLval (_ , _, (Var x,NoOffset)) | PVDecl(_,_,x) ->
@@ -705,7 +727,7 @@ let () = Information.register
 let () = Information.register
     ~id:"kernel.ast.typeinfo"
     ~label:"Type"
-    ~descr:"Type of C/ASCL expression"
+    ~title:"Type of C/ASCL expression"
     begin fun fmt loc ->
       let open Printer in
       match loc with
@@ -714,6 +736,46 @@ let () = Information.register
       | PTermLval(_,_,_,lv) -> pp_logic_type fmt (Cil.typeOfTermLval lv)
       | PVDecl (_,_,vi) -> pp_typ fmt vi.vtype
       | _ -> raise Not_found
+    end
+
+let () = Information.register
+    ~id:"kernel.ast.typedef"
+    ~label:"Typedef"
+    ~title:"Type Definition"
+    begin fun fmt loc ->
+      match loc with
+      | PGlobal
+          (( GType _
+           | GCompTag _ | GCompTagDecl _
+           | GEnumTag _ | GEnumTagDecl _
+           ) as g) -> Printer.pp_global fmt g
+      | _ -> raise Not_found
+    end
+
+let () = Information.register
+    ~id:"kernel.ast.typesizeof"
+    ~label:"Sizeof"
+    ~title:"Size of a C-type or C-variable"
+    begin fun fmt loc ->
+      let typ =
+        match loc with
+        | PType typ -> typ
+        | PVDecl(_,_,vi) -> vi.vtype
+        | PGlobal (GType(ti,_)) -> ti.ttype
+        | PGlobal (GCompTagDecl(ci,_) | GCompTag(ci,_)) -> TComp(ci,[])
+        | PGlobal (GEnumTagDecl(ei,_) | GEnumTag(ei,_)) -> TEnum(ei,[])
+        | _ -> raise Not_found
+      in
+      let bits = Cil.bitsSizeOf typ in
+      let bytes = bits / 8 in
+      let rbits = bits mod 8 in
+      if rbits > 0 then
+        if bytes > 0 then
+          Format.fprintf fmt "%d bytes + %d bits" bytes rbits
+        else
+          Format.fprintf fmt "%d bits" rbits
+      else
+        Format.fprintf fmt "%d bytes" bytes
     end
 
 (* -------------------------------------------------------------------------- *)

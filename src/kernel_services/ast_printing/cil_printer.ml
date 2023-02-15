@@ -1256,8 +1256,6 @@ class cil_printer () = object (self)
     | Case (e, _) -> fprintf fmt "@[%a %a:@]" self#pp_keyword "case" self#exp e
     | Default _ -> fprintf fmt "@[%a:@]" self#pp_keyword "default"
 
-  method compinfo fmt x = fprintf fmt "compinfo:%a" pp_print_bool x.cstruct
-
   method builtin_logic_info fmt bli =
     fprintf fmt "%a" self#varname bli.bl_name
 
@@ -1748,7 +1746,7 @@ class cil_printer () = object (self)
             (TInt(enum.ekind,[]));
         fprintf fmt "%a@[ %a {@\n%a@]@\n}%a;@\n"
           self#pp_keyword "enum"
-          self#varname enum.ename
+          self#enuminfo enum
           (Pretty_utils.pp_list ~sep:",@\n"
              (fun fmt item ->
                 fprintf fmt "%a = %a"
@@ -1761,17 +1759,15 @@ class cil_printer () = object (self)
         self#line_directive fmt l;
         fprintf fmt "%a %a;@\n"
           self#pp_keyword "enum"
-          self#varname enum.ename
+          self#enuminfo enum
 
       | GCompTag (comp, l) -> (* This is a definition of a tag *)
-        let n = comp.cname in
-        let su = if comp.cstruct then "struct" else "union" in
         let sto_mod, rest_attr = Cil.separateStorageModifiers comp.cattr in
         self#line_directive ~forcefile:true fmt l;
         fprintf fmt "@[<3>%a%a %a {@\n%a@]@\n}%a;@\n"
-          self#pp_keyword su
+          self#compkind comp
           self#attributes sto_mod
-          self#varname n
+          self#compname comp
           (Pretty_utils.pp_list ~sep:"@\n" self#fieldinfo)
           (Option.value ~default:[] comp.cfields)
           self#attributes rest_attr
@@ -1779,8 +1775,9 @@ class cil_printer () = object (self)
       | GCompTagDecl (comp, l) -> (* This is a declaration of a tag *)
         self#line_directive fmt l;
         fprintf fmt "%a %a;@\n"
-          self#pp_keyword (if comp.cstruct then "struct" else "union")
-          self#varname comp.cname
+          self#compkind comp
+          self#compname comp
+
       | GVar (vi, io, l) ->
         self#line_directive ~forcefile:true fmt l;
         Format.fprintf fmt "@[<hov 2>";
@@ -1942,6 +1939,21 @@ class cil_printer () = object (self)
          if Cil.msvcMode () then "unsigned __int64" else "unsigned long long"
       )
 
+  method compkind fmt ci =
+    self#pp_keyword fmt (if ci.cstruct then "struct" else "union")
+
+  method compname fmt ci =
+    self#varname fmt ci.cname
+
+  method compinfo fmt ci =
+    fprintf fmt "%a %a" self#compkind ci self#compname ci
+
+  method enuminfo fmt enum =
+    self#varname fmt enum.ename
+
+  method typeinfo fmt tinfo =
+    self#varname fmt tinfo.tname
+
   method typ ?fundecl nameOpt
       fmt (t:typ) =
     let pname fmt space = match nameOpt with
@@ -1968,16 +1980,15 @@ class cil_printer () = object (self)
 
     | TComp (comp, a) -> (* A reference to a struct *)
       fprintf fmt
-        "%a %a%a%a"
-        self#pp_keyword (if comp.cstruct then "struct" else "union")
-        self#varname comp.cname
+        "%a%a%a"
+        self#compinfo comp
         self#attributes a
         pname true
 
     | TEnum (enum, a) ->
       fprintf fmt "%a %a%a%a"
         self#pp_keyword "enum"
-        self#varname enum.ename
+        self#enuminfo enum
         self#attributes a
         pname true
 
@@ -2111,7 +2122,7 @@ class cil_printer () = object (self)
 
     | TNamed (t, a) ->
       fprintf fmt "%a%a%a"
-        self#varname t.tname
+        self#typeinfo t
         self#attributes a
         pname true
 
@@ -2341,8 +2352,7 @@ class cil_printer () = object (self)
          has 7 wide characters and the later has 3. *)
     | LChr(c) -> fprintf fmt "'%s'" (Escape.escape_char c)
     | LReal(r) -> fprintf fmt "%s" r.r_literal
-    | LEnum {einame = s} -> self#varname fmt s
-
+    | LEnum e -> self#varname fmt e.einame
 
   method logic_type name fmt =
     let pname = match name with

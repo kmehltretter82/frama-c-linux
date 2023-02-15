@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Pretty_source
+open Printer_tag
 open Cil_types
 open Cil_datatype
 
@@ -66,13 +66,13 @@ let ask_for_lval (main_ui:Design.main_window_extension_points) kf =
                    None
 
 let get_annot_opt localizable = match localizable with
-  | Pretty_source.PIP(Property.(IPCodeAnnot {ica_ca})) -> Some ica_ca
+  | PIP(Property.(IPCodeAnnot {ica_ca})) -> Some ica_ca
   | _ -> None
 
 (** [kf_opt] is used if we want to ask the lval to the user in a popup *)
 let get_lval_opt main_ui kf_opt localizable =
   match localizable with
-  | Pretty_source.PLval (Some _kf, (Kstmt _stmt), lv) ->
+  | PLval (Some _kf, (Kstmt _stmt), lv) ->
     let lv_txt = Format.asprintf "%a" Printer.pp_lval lv in
     Some (lv_txt, lv)
   | PTermLval (Some _kf, Kstmt _stmt, _, tlv) -> begin
@@ -463,7 +463,7 @@ let highlighter (buffer:Design.reactive_buffer) localizable ~start ~stop =
     | PIP (Property.(IPCodeAnnot {ica_ca})) ->
       put_tag (Pscope.tag_annot ica_ca)
     | PStmtStart _ | PExp _
-    | PVDecl _ | PTermLval _ | PLval _ | PGlobal _ | PIP _ -> ()
+    | PVDecl _ | PTermLval _ | PLval _ | PGlobal _ | PIP _ | PType _ -> ()
   with Not_found -> ()
 
 let check_value (main_ui:Design.main_window_extension_points) =

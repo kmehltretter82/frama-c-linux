@@ -26,7 +26,7 @@
 
 open Cil_types
 open Cil_datatype
-open Pretty_source
+open Printer_tag
 open Wpo
 
 type selection =
@@ -68,7 +68,7 @@ let selection_of_localizable = function
     end
   | PVDecl (Some kf,_,{vglob=true}) -> S_fun kf
   | PIP ip -> S_prop ip
-  | PVDecl _ | PLval _ | PExp _ | PTermLval _ | PGlobal _ -> S_none
+  | PVDecl _ | PLval _ | PExp _ | PTermLval _ | PGlobal _ | PType _ -> S_none
 
 let kind_of_property = function
   | Property.IPLemma _ -> "lemma"
@@ -250,7 +250,7 @@ class highlighter (main:Design.main_window_extension_points) =
                 apply_depend buffer start stop
           end
         | PGlobal _
-        | PVDecl _ | PTermLval _ | PLval _ | PExp _ -> ()
+        | PVDecl _ | PTermLval _ | PLval _ | PExp _ | PType _ -> ()
       end
 
   end
