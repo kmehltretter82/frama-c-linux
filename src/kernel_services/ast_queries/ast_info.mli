@@ -230,6 +230,10 @@ module Function: sig
   val get_vi: cil_function -> varinfo
   val get_name: cil_function -> string
   val get_id: cil_function -> int
+
+  val get_statics: fundec -> varinfo list
+  (** @since Frama-C+dev *)
+
 end
 
 (* ************************************************************************** *)
