@@ -1,3 +1,1 @@
-#include "make_machdep_common.h"
-
-unsigned char sizeof_void = sizeof(void);
+_Static_assert(sizeof(void)!=1,"sizeof_void is 1");
