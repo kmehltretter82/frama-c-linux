@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ##################################
 
+-   Logic     [2023-01-16] Accept '\ghost' attribute in logic annotations
+
 ###############################
 Open Source Release 26.0 (Iron)
 ###############################

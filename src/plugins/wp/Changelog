@@ -24,6 +24,9 @@
 Plugin WP <next-release>
 ########################
 
+- WP          [2022-12-02] Fixes 'terminates' goals generation when some
+                           'terminates' or 'decreases' clauses are missing.
+
 #####################
 Plugin WP 26.0 (Iron)
 #####################
