@@ -26,6 +26,11 @@ Plugin WP <next-release>
 
 - WP          [2023-02-03] new option -wp-why3-extra-config for providing
                            additional Why3 configuration files
+
+#####################
+Plugin WP 26.1 (Iron)
+#####################
+
 - WP          [2022-12-02] Fixes 'terminates' goals generation when some
                            'terminates' or 'decreases' clauses are missing.
 

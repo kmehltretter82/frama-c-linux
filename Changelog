@@ -19,6 +19,11 @@ Open Source Release <next-release>
 ##################################
 
 -!  Kernel    [2023-01-25] Add support for C11's _Generic. Modifies Cabs AST.
+
+###############################
+Open Source Release 26.1 (Iron)
+###############################
+
 -   Logic     [2023-01-16] Accept \ghost attribute in logic annotations (##2638)
 -   Logic     [2023-01-10] Fix issue in pretty-printing ranges (##2639)
 
