@@ -122,6 +122,10 @@
         "alignof_aligned": {
             "description": "alignment of a type with 'aligned' attribute",
             "type" : "integer"
+        },
+        "has__builtin_va_list" : {
+            "description": "Whether '__builtin_va_list' is a known type",
+            "type" : "boolean"
         }
     }
 }
