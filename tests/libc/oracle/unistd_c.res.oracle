@@ -47,17 +47,17 @@
 [eva:final-states] Values at end of function getopt:
   Frama_C_entropy_source ∈ [--..--]
   optarg ∈
-        {{ NULL ; "-this" + {-1; 0; 1; 2; 3; 4} ;
-           "is a" + {-1; 0; 1; 2; 3; 4} ; "Test0" + {-1; 0; 1; 2; 3; 4} }}
+        {{ NULL ; "-this" + {0; 1; 2; 3; 4} ; "is a" + {0; 1; 2; 3; 4} ;
+           "Test0" + {0; 1; 2; 3; 4} }}
   optind ∈ {1; 2; 3; 4; 5}
   nondet_ind ∈ {1; 2; 3}
-  nondet_indlen ∈ {0; 1; 2; 3; 4; 5}
+  nondet_indlen ∈ {0; 1; 2; 3; 4}
   __retres ∈ [-1..255]
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
   optarg ∈
-        {{ NULL ; "-this" + {-1; 0; 1; 2; 3; 4} ;
-           "is a" + {-1; 0; 1; 2; 3; 4} ; "Test0" + {-1; 0; 1; 2; 3; 4} }}
+        {{ NULL ; "-this" + {0; 1; 2; 3; 4} ; "is a" + {0; 1; 2; 3; 4} ;
+           "Test0" + {0; 1; 2; 3; 4} }}
   optind ∈ {1; 2; 3; 4; 5}
   argc ∈ {4}
   argv[0] ∈ {{ "program_name" }}
