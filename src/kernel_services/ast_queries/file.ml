@@ -606,14 +606,14 @@ let parse_cabs cpp_command = function
     if not (Sys.file_exists (f:>string)) then
       Kernel.abort "file %a does not exist."
         Filepath.Normalized.pretty f;
-    try
-      Kernel.feedback "Parsing %a (external front-end)"
-        Datatype.Filepath.pretty f;
-      Hashtbl.find check_suffixes suf (f:>string)
-    with Not_found ->
-      Kernel.abort
-        "could not find a suitable plugin for parsing %a."
-        Filepath.Normalized.pretty f
+    Kernel.feedback "Parsing %a (external front-end)"
+      Datatype.Filepath.pretty f;
+    (match Hashtbl.find_opt check_suffixes suf with
+     | Some parse -> parse (f:>string)
+     | None ->
+       Kernel.abort
+         "could not find a suitable plugin for parsing %a."
+         Filepath.Normalized.pretty f)
 
 let to_cil_cabs cpp_cmds_and_args f =
   try
