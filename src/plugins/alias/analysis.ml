@@ -103,7 +103,7 @@ let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_sta
     begin
       match e1.enode with
         Lval lv1 -> Some (Abstract_state.assignment_ptr_x_y a lv1 lv2)
-      |  _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (BUG do_assignment 2)" Lval.pretty lv Exp.pretty exp; Some a) (* failwith " do_assignment not implemented 2" *)
+      |  _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (BUG do_assignment 2)" Lval.pretty lv Exp.pretty exp; Some a) 
     end
   (* cases *x = cst *)
   | (Some a, (Mem e1, NoOffset), BNone) ->
@@ -130,7 +130,7 @@ let feedback_only_once s =
     end
 
 let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
-  Options.feedback "ANALYSING %a" Printer.pp_stmt s;
+  (* Options.feedback "ANALYSING %a" Printer.pp_stmt s; *)
   match i with
     Set(lv,exp,_) ->
     let new_a = do_assignment a lv exp in
