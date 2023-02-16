@@ -28,7 +28,11 @@ let add_destructor (_, l as acc) var =
   | [] -> acc
   | [ attr ] ->
     let mk_call f e args =
-      let kf = Globals.Functions.find_by_name f in
+      let kf =
+        try Globals.Functions.find_by_name f
+        with Not_found ->
+          Kernel.fatal "Destructor function %s does not exist" f
+      in
       let e =
         match Globals.Functions.get_params kf with
         | vi :: _ ->
