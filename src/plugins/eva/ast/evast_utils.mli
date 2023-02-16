@@ -34,7 +34,9 @@ val origin_offset : offset -> Cil_types.offset
 
 (** [rewrite f exp] rewrites [exp] by calling [f ~descent node] on root exp. [f]
     can call [descent e] to rewrite recursively subexpressions of [e]. *)
-val rewrite : (descend:(exp -> exp) -> exp -> exp) -> exp -> exp
+val rewrite_exp : (descend:(exp -> exp) -> exp -> exp) -> exp -> exp
+
+val rewrite_lval : (descend:(exp -> exp) -> exp -> exp) -> lval -> lval
 
 (** [cost_fold exp] will only replace expressions which originates from Cil
     by calling Cil.constFold on them *)
