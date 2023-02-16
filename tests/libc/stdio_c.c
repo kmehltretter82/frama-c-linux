@@ -43,5 +43,15 @@ int main() {
     //@ assert r <= 3;
   }
 
+  int c = getchar();
+  Frama_C_show_each_getchar(c);
+  c = fgetc(stdin);
+  Frama_C_show_each_fgetc(c);
+  char buf[10];
+  char *r = fgets(buf, 10, stdin);
+  if (r) {
+    //@ assert at_least_one_char: \initialized(&buf[0]);
+  }
+
   return 0;
 }

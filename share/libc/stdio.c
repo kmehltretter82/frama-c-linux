@@ -132,6 +132,72 @@ int asprintf(char **strp, const char *fmt, ...) {
   return len;
 }
 
+char *fgets(char *restrict s, int size, FILE *restrict stream) {
+  if (Frama_C_interval(0, 1)) {
+    // error
+    int possible_errors[] = {
+      EAGAIN,
+      EBADF,
+      EINTR,
+      EIO,
+      EOVERFLOW,
+      ENOMEM,
+      ENXIO,
+    };
+    errno = possible_errors[Frama_C_interval(0, sizeof(possible_errors)/sizeof(int)-1)];
+    return 0;
+  }
+  int i = 0;
+  for (; i < size-1; i++) {
+    // Emulate reading a character from stream; either a "normal" character,
+    // or EOF
+    if (Frama_C_interval(0, 1)) {
+      // Encountered an EOF: 0-terminate the string and return
+      s[i] = 0;
+      return s;
+    }
+    // Otherwise, encountered a "normal" character
+    char c = Frama_C_interval(CHAR_MIN, CHAR_MAX);
+    s[i] = c;
+    if (c == '\n') {
+      // in case of a newline, store it, then 0-terminate, then return
+      s[i+1] = 0;
+      return s;
+    }
+  }
+  // 0-terminate the string after the last written character
+  s[i] = 0;
+  return s;
+}
+
+int fgetc(FILE *restrict stream) {
+  if (Frama_C_interval(0, 1)) {
+    // error
+    int possible_errors[] = {
+      EAGAIN,
+      EBADF,
+      EINTR,
+      EIO,
+      EOVERFLOW,
+      ENOMEM,
+      ENXIO,
+    };
+    errno = possible_errors[Frama_C_interval(0, sizeof(possible_errors)/sizeof(int)-1)];
+    return EOF;
+  }
+  // From the POSIX manpage: "the fgetc() function shall obtain the next byte as
+  //                          an unsigned char converted to an int (...) or EOF"
+  if (Frama_C_interval(0, 1)) {
+    return EOF;
+  } else {
+    return Frama_C_unsigned_char_interval(0, UCHAR_MAX);
+  }
+}
+
+int getchar() {
+  return fgetc(__fc_stdin);
+}
+
 // TODO: this stub does not ensure that, when fclose is called on the
 // stream, the memory allocated here will be freed.
 // (there is currently no metadata field in FILE for this information).

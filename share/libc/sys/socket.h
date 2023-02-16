@@ -42,8 +42,12 @@ typedef __UINT_LEAST32_T socklen_t;
 #include "../__fc_define_ssize_t.h"
 #include "../features.h"
 
+// Non-POSIX; value taken from Linux implementation
+#define _SS_MAXSIZE 128
+
 struct sockaddr_storage {
   sa_family_t   ss_family;
+  char __sa_data[_SS_MAXSIZE - sizeof(sa_family_t)]; /* non-POSIX */
 };
 
 #include "./uio.h"
