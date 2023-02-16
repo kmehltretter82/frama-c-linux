@@ -1,12 +1,5 @@
 [kernel] Parsing while_for1.c (with preprocessing)
 [alias] Parsing done
-[alias] ANALYSING int *s = (int *)0;
-[alias] ANALYSING int idx = 0;
-[alias] ANALYSING s = (int *)malloc((size_t)idx);
-[alias] ANALYSING idx ++;
-[alias] ANALYSING s = (int *)malloc((size_t)idx);
-[alias] ANALYSING idx ++;
-[alias] ANALYSING __retres = 0;
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   <end of list>

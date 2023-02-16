@@ -1,16 +1,5 @@
 [kernel] Parsing function3.c (with preprocessing)
 [alias] Parsing done
-[alias] ANALYSING int *tmp = x;
-[alias] ANALYSING x = y;
-[alias] ANALYSING y = tmp;
-[alias] ANALYSING __retres = (void *)0;
-[alias] ANALYSING int *a = (int *)0;
-[alias] ANALYSING int *b = (int *)0;
-[alias] ANALYSING int *c = (int *)0;
-[alias] ANALYSING int *d = (int *)0;
-[alias] ANALYSING f1(a,b);
-[alias] ANALYSING f1(c,d);
-[alias] ANALYSING __retres = 0;
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   {a; b; } are aliased

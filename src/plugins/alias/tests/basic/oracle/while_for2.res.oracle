@@ -1,10 +1,5 @@
 [kernel] Parsing while_for2.c (with preprocessing)
 [alias] Parsing done
-[alias] ANALYSING int *a = (int *)0;
-[alias] ANALYSING int *b = (int *)0;
-[alias] ANALYSING int *c = (int *)0;
-[alias] ANALYSING a = b;
-[alias] ANALYSING __retres = 0;
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   {a; b; } are aliased

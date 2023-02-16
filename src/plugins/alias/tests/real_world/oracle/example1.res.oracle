@@ -1,102 +1,43 @@
 [kernel] Parsing example1.c (with preprocessing)
 [alias] Parsing done
-[alias] ANALYSING ty *tmp = x;
-[alias] ANALYSING idata = (double *)malloc((unsigned long)10 * sizeof(double));
-[alias] ANALYSING idata = tmp->t2[*(tmp->n2)];
 [alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
-[alias] ANALYSING odata = tmp->t1[*(tmp->n1)];
 [alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
-[alias] ANALYSING idx = 0;
-[alias] ANALYSING tmp_1 = sin(*(idata + idx));
 [alias] In a function call, parameter (x <- *(idata + idx)) is ignored)
 [alias] Warning: a function with no return is employed in an assignment
-[alias] ANALYSING *(odata + idx) = 0.5 * tmp_1;
 [alias] Skipping assignment *(odata + idx) = 0.5 * tmp_1 (BUG do_assignment 2)
-[alias] ANALYSING idx ++;
-[alias] ANALYSING tmp_1 = sin(*(idata + idx));
 [alias] In a function call, parameter (x <- *(idata + idx)) is ignored)
 [alias] Warning: a function with no return is employed in an assignment
-[alias] ANALYSING *(odata + idx) = 0.5 * tmp_1;
 [alias] Skipping assignment *(odata + idx) = 0.5 * tmp_1 (BUG do_assignment 2)
-[alias] ANALYSING idx ++;
-[alias] ANALYSING swap(tmp->n1);
-[alias] ANALYSING *n = 0;
-[alias] ANALYSING (*n) ++;
 [alias] DEBUG: call function - formal variable not as we expected
-[alias] ANALYSING idata = tmp->t2[*(tmp->n2)];
 [alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
-[alias] ANALYSING odata = tmp->t1[*(tmp->n1)];
 [alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
-[alias] ANALYSING idx = 0;
-[alias] ANALYSING tmp_1 = sin(*(idata + idx));
 [alias] In a function call, parameter (x <- *(idata + idx)) is ignored)
 [alias] Warning: a function with no return is employed in an assignment
-[alias] ANALYSING *(odata + idx) = 0.5 * tmp_1;
 [alias] Skipping assignment *(odata + idx) = 0.5 * tmp_1 (BUG do_assignment 2)
-[alias] ANALYSING idx ++;
-[alias] ANALYSING swap(tmp->n1);
 [alias] DEBUG: call function - formal variable not as we expected
 [alias] Warning: DEBUG return stmt of f1 not in table
 [alias] Warning: Analysis is continuing but will not be sound
-[alias] ANALYSING ty *tmp = x;
-[alias] ANALYSING idata = (double *)malloc((unsigned long)10 * sizeof(double));
-[alias] ANALYSING idata = tmp->t1[*(tmp->n1)];
 [alias] Skipping assignment idata = tmp->t1[*(tmp->n1)] (not implemented)
-[alias] ANALYSING odata = tmp->t2[*(tmp->n2)];
 [alias] Skipping assignment odata = tmp->t2[*(tmp->n2)] (not implemented)
-[alias] ANALYSING idx = 0;
-[alias] ANALYSING *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
 [alias] Skipping assignment *(odata + idx) = (double)3 * *(idata + idx) + (double)1 (BUG do_assignment 2)
-[alias] ANALYSING idx ++;
-[alias] ANALYSING *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
 [alias] Skipping assignment *(odata + idx) = (double)3 * *(idata + idx) + (double)1 (BUG do_assignment 2)
-[alias] ANALYSING idx ++;
-[alias] ANALYSING swap(tmp->n2);
 [alias] DEBUG: call function - formal variable not as we expected
-[alias] ANALYSING idata = tmp->t1[*(tmp->n1)];
 [alias] Skipping assignment idata = tmp->t1[*(tmp->n1)] (not implemented)
-[alias] ANALYSING odata = tmp->t2[*(tmp->n2)];
 [alias] Skipping assignment odata = tmp->t2[*(tmp->n2)] (not implemented)
-[alias] ANALYSING idx = 0;
-[alias] ANALYSING *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
 [alias] Skipping assignment *(odata + idx) = (double)3 * *(idata + idx) + (double)1 (BUG do_assignment 2)
-[alias] ANALYSING idx ++;
-[alias] ANALYSING swap(tmp->n2);
 [alias] DEBUG: call function - formal variable not as we expected
 [alias] Warning: DEBUG return stmt of f2 not in table
 [alias] Warning: Analysis is continuing but will not be sound
-[alias] ANALYSING a = (ty *)malloc(sizeof(ty));
-[alias] ANALYSING b = (ty *)malloc(sizeof(ty));
-[alias] ANALYSING i = 0;
-[alias] ANALYSING a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
 [alias] Skipping assignment a->t1[i] = malloc() (not implemented)
-[alias] ANALYSING a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double));
 [alias] Skipping assignment a->t2[i] = malloc() (not implemented)
-[alias] ANALYSING i ++;
-[alias] ANALYSING a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
 [alias] Skipping assignment a->t1[i] = malloc() (not implemented)
-[alias] ANALYSING a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double));
 [alias] Skipping assignment a->t2[i] = malloc() (not implemented)
-[alias] ANALYSING i ++;
-[alias] ANALYSING a->n1 = (int *)malloc(sizeof(int));
 [alias] Skipping assignment a->n1 = malloc() (not implemented)
-[alias] ANALYSING a->n2 = (int *)malloc(sizeof(int));
 [alias] Skipping assignment a->n2 = malloc() (not implemented)
-[alias] ANALYSING *(a->n1) = 1;
-[alias] ANALYSING *(a->n2) = 1;
-[alias] ANALYSING i = 0;
-[alias] ANALYSING b->t1[i] = a->t1[i];
 [alias] Skipping assignment b->t1[i] = a->t1[i] (not implemented)
-[alias] ANALYSING b->t2[i] = a->t2[i];
 [alias] Skipping assignment b->t2[i] = a->t2[i] (not implemented)
-[alias] ANALYSING i ++;
-[alias] ANALYSING b->n1 = a->n1;
 [alias] Skipping assignment b->n1 = a->n1 (not implemented)
-[alias] ANALYSING b->n2 = a->n2;
 [alias] Skipping assignment b->n2 = a->n2 (not implemented)
-[alias] ANALYSING f1(a);
-[alias] ANALYSING f2(b);
-[alias] ANALYSING __retres = 0;
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   <end of list>
