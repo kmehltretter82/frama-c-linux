@@ -103,7 +103,7 @@ let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_sta
     begin
       match e1.enode with
         Lval lv1 -> Some (Abstract_state.assignment_ptr_x_y a lv1 lv2)
-      |  _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (BUG do_assignment 2)" Lval.pretty lv Exp.pretty exp; Some a) 
+      |  _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (BUG do_assignment 2)" Lval.pretty lv Exp.pretty exp; Some a)
     end
   (* cases *x = cst *)
   | (Some a, (Mem e1, NoOffset), BNone) ->

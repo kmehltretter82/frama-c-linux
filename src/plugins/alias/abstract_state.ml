@@ -297,11 +297,10 @@ let remove_lval (x:t)  (lv:lval) :t =
 let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
 
 
-let lset_to_string s =
-  let buffer = Buffer.create 16 in
-  let fmt = Format.formatter_of_buffer buffer in
-  Format.fprintf fmt "%a" LSet.pretty s ;
-  Buffer.contents buffer
+let lset_to_string (s: LSet.t) : string =
+  let fmt = Format.str_formatter in
+  Format.fprintf fmt "\"%a\"" LSet.pretty s;
+  Format.flush_str_formatter ()
 
 module Dot = Graphviz.Dot(struct
     include G
@@ -311,7 +310,9 @@ module Dot = Graphviz.Dot(struct
     let vertex_attributes _ = [`Shape `Box]
     let vertex_name (v:V.t) =
       let lset = !find_vertex_name_ref v in
-      lset_to_string lset
+      let v_name = lset_to_string lset in
+      Format.printf "Vertex %d set %s@." v v_name;
+      v_name
     let default_vertex_attributes _ = []
     let graph_attributes _ = []
   end)
