@@ -27,8 +27,8 @@ let main () =
   if Options.Enabled.get() then
     begin
       Analysis.compute ();
-      Options.feedback "Analysis complete"
+      Options.feedback "Analysis complete";
     end
-
+    
 let () =
   Db.Main.extend main
