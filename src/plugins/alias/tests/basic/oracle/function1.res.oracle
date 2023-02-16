@@ -1,22 +1,10 @@
 [kernel] Parsing function1.c (with preprocessing)
 [alias] Parsing done
-[alias] ANALYSING int *a = (int *)0;
-[alias] ANALYSING int *b = (int *)0;
-[alias] ANALYSING int *c = (int *)0;
-[alias] ANALYSING int *d = (int *)0;
-[alias] ANALYSING swap(a,b);
-[alias] ANALYSING int *z = (int *)0;
-[alias] ANALYSING z = x;
-[alias] ANALYSING x = y;
-[alias] ANALYSING y = z;
-[alias] ANALYSING swap(c,d);
-[alias] ANALYSING __retres = 0;
 [alias] May-aliases at the end of function main:
   <list of may-alias>
   {a; b; } are aliased
   {c; d; } are aliased
   <end of list>
-[alias] ANALYSING int *z = (int *)0;
 [alias] Functions done
 Before statement int *z = (int *)0; :
  <list of may-alias>
