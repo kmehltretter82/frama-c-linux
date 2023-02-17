@@ -33,13 +33,19 @@ import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
 import { TitleBar } from 'ivette';
-import { markerAttributes, jMarker } from 'frama-c/kernel/api/ast';
+import { marker, jMarker } from 'frama-c/kernel/api/ast';
 
 // --------------------------------------------------------------------------
 // --- Locations Panel
 // --------------------------------------------------------------------------
 
 type LocationId = States.Location & { id: number };
+
+function SourceLoc(props: { marker: marker }): JSX.Element {
+  const { sloc, descr } = States.useMarker(props.marker);
+  const position = `${sloc?.base}:${sloc?.line}`;
+  return <Label label={position} title={descr} />;
+}
 
 export default function LocationsTable(): JSX.Element {
 
@@ -50,17 +56,11 @@ export default function LocationsTable(): JSX.Element {
   ), []);
   const multipleSelections = selection?.multiple;
   const numberOfSelections = multipleSelections?.allSelections?.length;
-  const markersInfo = States.useSyncArray(markerAttributes);
 
   // Renderer for statement markers.
-  const renderMarker: Renderer<string> =
-    (loc: string) => {
-      const marker = jMarker(loc);
-      const info = markersInfo.getData(marker);
-      const sloc = info?.sloc;
-      const position = `${sloc?.base}:${sloc?.line}`;
-      return <Label label={position} title={info?.descr} />;
-    };
+  const renderMarker: Renderer<string> = (loc: string) => (
+    <SourceLoc marker={jMarker(loc)} />
+  );
 
   // Updates [[model]] with the current multiple selections.
   React.useEffect(() => {

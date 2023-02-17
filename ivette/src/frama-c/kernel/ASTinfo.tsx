@@ -127,7 +127,6 @@ interface InfoSectionProps {
   fct: string | undefined;
   scroll: React.RefObject<HTMLDivElement> | undefined;
   marker: AST.marker;
-  attrs: AST.markerAttributesData;
   scrolled: AST.marker | undefined;
   selected: AST.marker | undefined;
   hovered: AST.marker | undefined;
@@ -138,8 +137,8 @@ interface InfoSectionProps {
 }
 
 function MarkInfos(props: InfoSectionProps): JSX.Element {
-  const { marker, attrs } = props;
-  const { fct, scrolled, selected, hovered, excluded } = props;
+  const { marker, fct, scrolled, selected, hovered, excluded } = props;
+  const attrs = States.useMarker(marker);
   const scope = attrs.scope ?? fct;
   const foreign = !!scope && fct !== scope;
   const [unfold, setUnfold] = React.useState(true);
@@ -283,7 +282,6 @@ export default function ASTinfo(): JSX.Element {
   const [setting, setSetting] = Dome.useStringSettings(filterSettings, '');
   const [selection] = States.useSelection();
   const [hovering] = States.useHovered();
-  const attributes = States.useSyncArray(AST.markerAttributes);
   const allFields = States.useRequest(AST.getInformation, null) ?? [];
   const excluded = React.useMemo(() => makeFilter(setting), [setting]);
   Dome.useEvent(States.MetaSelection, (loc: States.Location) => {
@@ -311,15 +309,12 @@ export default function ASTinfo(): JSX.Element {
     setMarkers(toggleMarker(markers, marker));
   // Mark Rendering
   const renderMark = (marker: AST.marker): JSX.Element | null => {
-    const attrs = attributes.getData(marker);
-    if (!attrs) return null;
     return (
       <MarkInfos
         key={marker}
         fct={fct}
         scroll={scroll}
         marker={marker}
-        attrs={attrs}
         scrolled={scrolled}
         hovered={hovered}
         selected={selected}
