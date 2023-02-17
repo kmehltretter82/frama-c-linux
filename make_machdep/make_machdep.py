@@ -58,10 +58,12 @@ import subprocess
 import sys
 import warnings
 
+my_path = Path(sys.argv[0]).parent
+
 parser = argparse.ArgumentParser(prog="make_machdep")
 parser.add_argument("-v", "--verbose", action="store_true")
-parser.add_argument("-o", default=sys.stdout, type=argparse.Filetype("w"), dest="dest_file")
-parser.add_argument("--compiler")
+parser.add_argument("-o", default=sys.stdout, type=argparse.FileType("w"), dest="dest_file")
+parser.add_argument("--compiler", default="cc", help="which compiler to use. Default is 'cc'")
 parser.add_argument("--compiler-version")
 parser.add_argument(
     "--cpp-arch-flags",
@@ -83,7 +85,7 @@ def print_machdep(machdep):
     json.dump(machdep, args.dest_file, indent=4, sort_keys=True)
 
 
-fc_share = subprocess.run("frama-c-config -print-share-path", capture_output=True).output
+fc_share = subprocess.run(["frama-c-config", "-print-share-path"], capture_output=True).stdout
 
 
 def check_machdep(machdep):
@@ -134,7 +136,7 @@ machdep = {
     "version": None,
 }
 
-compilation_command = other_args + args.compiler_flags
+compilation_command = [args.compiler] + args.cpp_arch_flags + args.compiler_flags
 
 source_files = [
     ("sizeof_short.c", "number"),
@@ -171,13 +173,22 @@ source_files = [
 def find_value(name, typ, output):
     if typ == "bool":
         expected = "(True|False)"
-        conversion = lambda x: x == "True"
+
+        def conversion(x):
+            return x == "True"
+
     elif typ == "number":
         expected = "([0-9]+)"
-        conversion = lambda x: int(x)
+
+        def conversion(x):
+            return int(x)
+
     elif typ == "type":
         expected = "([a-zA-Z_]+)"
-        conversion = lambda x: x
+
+        def conversion(x):
+            return x
+
     else:
         warnings.warn(f"unexpected type '{typ}' for field '{name}', skipping")
         return
@@ -185,9 +196,9 @@ def find_value(name, typ, output):
     res = re.search(msg, output)
     if res:
         if name in machdep:
+            value = conversion(res.group(1))
             if args.verbose:
                 print(f"[INFO] setting {name} to {value}")
-            value = conversion(res.group(1))
             machdep[name] = value
         else:
             warnings.warn(f"unexpected symbol '{name}', ignoring")
@@ -198,7 +209,7 @@ def find_value(name, typ, output):
 
 
 for (f, typ) in source_files:
-    p = Path(f)
+    p = my_path / f
     cmd = compilation_command + [str(p)]
     if args.verbose:
         print(f"[INFO] running command: {' '.join(cmd)}")
@@ -212,7 +223,7 @@ for (f, typ) in source_files:
         # if compilation succeeds, we have a problem
         warnings.warn(f"WARNING: could not identify value of '{p.stem}', skipping")
         continue
-    find_value(p.stem, typ, proc.stderr)
+    find_value(p.stem, typ, proc.stderr.decode())
 
 missing_fields = [f for [f, v] in machdep.items() if v is None]
 
