@@ -137,16 +137,16 @@ machdep = {
 compilation_command = other_args + args.compiler_flags
 
 source_files = [
-    ("sizeof_short.i", "number"),
-    ("sizeof_int.i", "number"),
-    ("sizeof_long.i", "number"),
-    ("sizeof_longlong.i", "number"),
-    ("sizeof_ptr.i", "number"),
-    ("sizeof_float.i", "number"),
-    ("sizeof_double.i", "number"),
-    ("sizeof_longdouble.i", "number"),
-    ("sizeof_void.i", "number"),
-    ("sizeof_fun.i", "number"),
+    ("sizeof_short.c", "number"),
+    ("sizeof_int.c", "number"),
+    ("sizeof_long.c", "number"),
+    ("sizeof_longlong.c", "number"),
+    ("sizeof_ptr.c", "number"),
+    ("sizeof_float.c", "number"),
+    ("sizeof_double.c", "number"),
+    ("sizeof_longdouble.c", "number"),
+    ("sizeof_void.c", "number"),
+    ("sizeof_fun.c", "number"),
     ("sizeof_alignof_standard.c", "number"),
     ("alignof_short.c", "number"),
     ("alignof_int.c", "number"),
@@ -167,6 +167,36 @@ source_files = [
     ("has__builtin_va_list.c", "has__builtin_va_list"),
 ]
 
+
+def find_value(name, typ, output):
+    if typ == "bool":
+        expected = "(True|False)"
+        conversion = lambda x: x == "True"
+    elif typ == "number":
+        expected = "([0-9]+)"
+        conversion = lambda x: int(x)
+    elif typ == "type":
+        expected = "([a-zA-Z_]+)"
+        conversion = lambda x: x
+    else:
+        warnings.warn(f"unexpected type '{typ}' for field '{name}', skipping")
+        return
+    msg = re.compile(name + " is " + expected)
+    res = re.search(msg, output)
+    if res:
+        if name in machdep:
+            if args.verbose:
+                print(f"[INFO] setting {name} to {value}")
+            value = conversion(res.group(1))
+            machdep[name] = value
+        else:
+            warnings.warn(f"unexpected symbol '{name}', ignoring")
+    else:
+        warnings.warn(f"cannot find value of field '{name}', skipping")
+        if args.verbose:
+            print(f"compiler output is:{output}")
+
+
 for (f, typ) in source_files:
     p = Path(f)
     cmd = compilation_command + [str(p)]
@@ -177,137 +207,12 @@ for (f, typ) in source_files:
         # Special case: compilation success determines presence or absence
         machdep["has__builtin_va_list"] = proc.returncode == 0
         continue
-    if proc.returncode != 0:
-        print(f"WARNING: error during compilation of '{p}', skipping")
-        if args.verbose:
-            print(proc.stderr.decode("utf-8"))
+    if proc.returncode == 0:
+        # all tests should fail on an appropriate _Static_assert
+        # if compilation succeeds, we have a problem
+        warnings.warn(f"WARNING: could not identify value of '{p.stem}', skipping")
         continue
-    objfile = p.with_suffix(".o")
-    if not objfile.exists():
-        print(f"WARNING: could not find expected '{objfile}', skipping")
-        continue
-    if typ == "const_string_literals":
-        # Special case: try decoding different sections to find read-only object
-        # Try ".rodata" section (ELF)
-        symbols, _underscore_name = decode_object_file(objfile, section=".rodata")
-        if ".rodata" in symbols and symbols[".rodata"] == 0x25:
-            if args.verbose:
-                print(f"[INFO] setting const_string_literals to true")
-            machdep["const_string_literals"] = True
-        else:
-            # Try ".rdata" section (COFF)
-            symbols, _underscore_name = decode_object_file(objfile, section=".rdata")
-            if ".rdata" in symbols and symbols[".rdata"] == 0x25:
-                if args.verbose:
-                    print(f"[INFO] setting const_string_literals to true")
-                machdep["const_string_literals"] = True
-            else:
-                symbols, _underscore_name = decode_object_file(objfile)
-                if "const_string_literals" in symbols and symbols["const_string_literals"] == 0x25:
-                    # Found symbol in .data section => not const
-                    if args.verbose:
-                        print(f"[INFO] setting const_string_literals to false")
-                    machdep["const_string_literals"] = False
-                else:
-                    print(
-                        f"WARNING: could not find const_string_literals in any of the expected sections, skipping"
-                    )
-        continue
-    symbols, underscore_name = decode_object_file(objfile)
-    if machdep["underscore_name"] is None:
-        machdep["underscore_name"] = underscore_name
-    if not symbols:
-        print(f"WARNING: no symbols found in {objfile}")
-        continue
-    if typ == "number":
-        for name, value in symbols.items():
-            if name in machdep:
-                if args.verbose:
-                    print(f"[INFO] setting {name} to {value}")
-                machdep[name] = value
-            else:
-                print(f"WARNING: unexpected symbol '{name}' in '{objfile}', ignoring")
-                continue
-    elif typ == "bool":
-        for name, value in symbols.items():
-            if name in machdep:
-                if value == 0x15:
-                    bvalue = True
-                elif value == 0xF4:
-                    bvalue = False
-                else:
-                    print(
-                        f"WARNING: unexpected value '{value} for boolean '{name}' in '{objfile}', ignoring"
-                    )
-                    continue
-                if args.verbose:
-                    print(f"[INFO] setting {name} to {bvalue}")
-                machdep[name] = bvalue
-            else:
-                print(f"WARNING: unexpected symbol '{name}' in '{objfile}', ignoring")
-                continue
-    elif typ == "type":
-        for name, value in symbols.items():
-            if not ("_IS_" in name):
-                print(f"WARNING: unexpected symbol '{name}' in '{objfile}', ignoring")
-                continue
-            if value == 0xF4:
-                # Symbol found with 'false' => incompatible type, ignore
-                continue
-            elif value != 0x15:
-                print(
-                    f"WARNING: unexpected value '{value}' for symbol '{name}' in '{objfile}', ignoring"
-                )
-                continue
-            [name, original_type] = name.split("_IS_")
-            original_type = original_type.replace("_", " ")
-            if name in machdep:
-                if args.verbose:
-                    print(f"[INFO] setting {name} to {original_type}")
-                machdep[name] = original_type
-            else:
-                print(
-                    f"WARNING: unexpected symbol '{name}' (expected '{name}' in machdep) in '{objfile}', ignoring"
-                )
-                continue
-    else:
-        sys.exit(f"AssertionError: f {f} typ {typ}")
-
-# Special fields
-
-machdep["cpp_arch_flags"] = args.cpp_arch_flags
-
-if args.compiler and args.compiler_version:
-    machdep["compiler"] = args.compiler.lower()
-    machdep["version"] = args.compiler_version
-else:
-    # Try to obtain version number from option '--version'
-    compiler_version_command = compilation_command + ["--version"]
-    proc = subprocess.run(compiler_version_command, capture_output=True)
-    if proc.returncode != 0:
-        print(
-            f"WARNING: option '--version' unsupported by compiler; re-run this script with --compiler and --compiler-version"
-        )
-        if args.verbose:
-            print(proc.stderr.decode("utf-8"))
-    else:
-        version_line = proc.stdout.decode("utf-8").split("\n")[0]
-        if args.compiler:
-            machdep["compiler"] = args.compiler.lower()
-        else:
-            if "gcc" in version_line.lower():
-                machdep["compiler"] = "gcc"
-            elif "clang" in version_line.lower():
-                print(f"Note: clang is considered as a 'gcc'-type compiler for machdep purposes")
-                machdep["compiler"] = "gcc"
-            elif "msvc" in version_line.lower():
-                machdep["compiler"] = "msvc"
-            else:
-                machdep["compiler"] = compilation_command[0]
-        if args.compiler_version:
-            machdep["version"] = args.compiler_version
-        else:
-            machdep["version"] = version_line
+    find_value(p.stem, typ, proc.stderr)
 
 missing_fields = [f for [f, v] in machdep.items() if v is None]
 

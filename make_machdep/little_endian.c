@@ -22,9 +22,9 @@
 
 #if defined(__BYTE_ORDER__)
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-_Static_assert(0,"little_endian is False");
+_Static_assert(0, "little_endian is False");
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-_Static_assert(0,"little_endian is True");
+_Static_assert(0, "little_endian is True");
 #else
 #error Unexpected __BYTE_ORDER__
 #endif
