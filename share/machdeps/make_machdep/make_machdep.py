@@ -88,20 +88,18 @@ args, other_args = parser.parse_known_args()
 def print_machdep(machdep):
     json.dump(machdep, args.dest_file, indent=4, sort_keys=True)
 
-
-fc_share = subprocess.run(["frama-c-config", "-print-share-path"], capture_output=True).stdout
-
-
 def check_machdep(machdep):
     try:
         from jsonschema import validate, ValidationError
 
-        with open(fc_share + "/machdeps/machdep-schema.json", "r") as schema:
+        schema_filename = my_path.parent / "machdep-schema.json"
+
+        with open(schema_filename, "r") as schema:
             validate(machdep, json.load(schema))
     except ImportError:
         warnings.warn("jsonschema is not available: no validation will be performed")
     except OSError:
-        warnings.warn("error opening machdep-schema.json: no validation will be performed")
+        warnings.warn(f"error opening {schema_filename}: no validation will be performed")
     except ValidationError:
         warnings.warn("machdep object is not conforming to machdep schema")
 
@@ -242,5 +240,8 @@ missing_fields = [f for [f, v] in machdep.items() if v is None]
 if missing_fields:
     print("WARNING: the following fields are missing from the machdep definition:")
     print(", ".join(missing_fields))
+
+if args.check:
+    check_machdep(machdep)
 
 print_machdep(machdep)
