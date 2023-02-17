@@ -284,7 +284,7 @@ libraries, so it is well suited to this analysis.
 After extracting the archive \lstinline|skein_NIST_CD_010509.zip|,
 listing the files in\\
 \lstinline|NIST/CD/Reference_Implementation| shows:
-\begin{listing}{1}
+\begin{listing-nonumber}
 SHA3api_ref.c
 SHA3api_ref.h
 brg_endian.h
@@ -295,7 +295,7 @@ skein_block.c
 skein_debug.c
 skein_debug.h
 skein_port.h
-\end{listing}
+\end{listing-nonumber}
 
 The most natural place to go next is the file \lstinline|skein.h|,
 since its name hints that this is the header with the
@@ -336,10 +336,10 @@ use string-printing functions, hence the \lstinline|for| loop at lines 17-18.
 
 With luck, the compilation goes smoothly and we obtain
 a hash value:
-\begin{shell}
+\begin{frama-c-commands}
 gcc *.c
 ./a.out
-\end{shell}
+\end{frama-c-commands}
 
 \begin{logs}
 215
@@ -362,9 +362,9 @@ gcc *.c
 Let us now see how \Eva{} works on the same example.
 \Eva{} can be launched with the following command.
 The analysis should not take more than a few seconds:
-\begin{listing-nonumber}
-frama-c -eva main_1.c >log
-\end{listing-nonumber}
+\begin{frama-c-commands}
+frama-c -eva main_1.c > log
+\end{frama-c-commands}
 
 Frama-C has its own model of the target platform (the default target is
 a little-endian 64-bit platform). It also uses the host system's preprocessor.
@@ -383,7 +383,7 @@ Frama-C's target platform with your host header files by systematically adding
 the option \verb|-machdep x86_32| to all commands in
 this tutorial.
 
-The ``\lstinline|>log|'' part of the command sends all
+The ``\lstinline|> log|'' part of the command sends all
 the messages emitted by Frama-C into a file named
 ``\lstinline|log|''. \Eva{} is verbose for a number of reasons that
 will become clearer later in this tutorial.
@@ -426,9 +426,9 @@ something else to look for in the log file is the list of functions for
 which the source code is missing. \Eva{} requires
 either a body or a specification for each function it analyzes.
 
-\begin{listing-nonumber}
+\begin{frama-c-commands}
 grep "Neither code nor specification" log
-\end{listing-nonumber}
+\end{frama-c-commands}
 
 This should match lines indicating functions that are both undefined
 (without source) and that have no specification in Frama-C's standard library.
@@ -466,16 +466,16 @@ on the fly and then used, but results are likely to be unsatisfactory.
 
 To fix the issue, we only need to give Frama-C all of the C sources in
 the directory:
-\begin{listing-nonumber}
-frama-c -eva *.c >log
-\end{listing-nonumber}
+\begin{frama-c-commands}
+frama-c -eva *.c > log
+\end{frama-c-commands}
 
 No further warnings about missing functions are emitted. We can now focus on
 functions without bodies:
-\begin{listing-nonumber}
+\begin{shell}
 grep "using specification for function" log
 [eva] using specification for function printf_va_1
-\end{listing-nonumber}
+\end{shell}
 This \verb|printf_va_1| function is not present directly in the source code;
 it is a specialization of a call to the variadic function \verb|printf|. This
 specialization is performed by the \textsf{Variadic} plugin\footnote{The
@@ -493,9 +493,9 @@ transformations performed by the \textsf{Variadic} plugin.
 
 It is also possible to obtain a list of
 missing function definitions by using the command:
-\begin{listing-nonumber}
+\begin{frama-c-commands}
 frama-c -metrics *.c
-\end{listing-nonumber}
+\end{frama-c-commands}
 This command computes, among other pieces of information,
 a list of missing functions
 (under the listing ``Undefined and unspecified functions'')
@@ -669,14 +669,14 @@ We can then Ctrl+click on the loop condition in the original source view
   can be defined via the menu {\em File - Preferences}.} centered on the loop, and
 then add the loop unroll annotation, as follows:
 
-\begin{lstlisting}[style=c]
+\begin{listing-nonumber}
   //@ loop unroll 4;
   for (i=0;i < WCNT; i++)
       {
       ks[i]     = ctx->X[i];
       ks[WCNT] ^= ctx->X[i];            /* compute overall parity */
       }
-\end{lstlisting}
+\end{listing-nonumber}
 
 The value 4 is sufficient to completely unroll the loop, even though \verb|i|
 ranges from 0 to 4 (5 values in total). One way to confirm the unrolling is
@@ -740,9 +740,9 @@ requiring a new parametrization.
 In our example, we can quickly try a few values of \verb|-eva-precision|,
 such as 1, 2 and 3:
 
-\begin{shell}
-frama-c -eva-precision 3 -eva *.c >log
-\end{shell}
+\begin{frama-c-commands}
+frama-c -eva-precision 3 -eva *.c > log
+\end{frama-c-commands}
 
 Now, the analysis goes rather far without finding any alarm,
 but when it is almost done (after the analysis of function
@@ -764,9 +764,9 @@ In this case, we can afford to spend some time looking at it in more detail.
 
 Instead of running \verb|frama-c|, let us use \verb|frama-c-gui|:
 
-\begin{shell}
-frama-c-gui -eva-precision 3 -eva *.c >log
-\end{shell}
+\begin{frama-c-commands}
+frama-c-gui -eva-precision 3 -eva *.c > log
+\end{frama-c-commands}
 
 The GUI allows the user to navigate the source code, to inspect the sets of
 values inferred by the analysis and to get
@@ -919,9 +919,9 @@ that comes from the Frama-C distribution and which
 defines \lstinline|Frama_C_interval|. Running Frama-C on this
 file (without \verb|main_1.c| in the same directory, to avoid having two
 definitions for \verb|main|):
-\begin{shell}
-frama-c -eva-precision 3 -eva *.c >log 2>&1
-\end{shell}
+\begin{frama-c-commands}
+frama-c -eva-precision 3 -eva *.c > log 2>&1
+\end{frama-c-commands}
 
 This time, the absence of actual alarms is starting to be really interesting:
 it means that it is formally excluded that the functions
@@ -1006,9 +1006,9 @@ Keeping the convenient function \lstinline|do_Skein_256| for modeling the
 sequence, let us now compute the functional dependencies of each function.
 Functional dependencies list, for each output location,
 the input locations that influence the final contents of this output location:
-\begin{shell}
+\begin{frama-c-commands}
 frama-c -eva *.c -eva-precision 3 -deps
-\end{shell}
+\end{frama-c-commands}
 \begin{logs}
 Function Skein_256_Init:
   skein_context.h.hashBitLen FROM ctx; hashBitLen
@@ -1036,8 +1036,9 @@ Function Skein_256_Final:
   skein_context.h.bCnt FROM skein_context.h.hashBitLen; ctx (and SELF)
                .h.T[0] FROM skein_context.h{.hashBitLen; .bCnt; .T[0]; }; ctx
                .h.T[1] FROM skein_context{.h.hashBitLen; .h.T[1]; }; ctx
-               {.X[0..3]; .b[0..15]; } FROM msg[0..79]; skein_context;
-                                            ctx; Skein_Swap64_ONE[bits 0 to 7] (and SELF)
+               {.X[0..3]; .b[0..15]; } FROM msg[0..79]; skein_context; ctx;
+                                            Skein_Swap64_ONE[bits 0 to 7]
+                                            (and SELF)
                .b[16..31] FROM skein_context.h.bCnt; ctx (and SELF)
   \result FROM \nothing
 \end{logs}
@@ -1344,7 +1345,7 @@ previously written as a single write that modified the whole set of
 bits exactly.
 
 An example of a program leading to a misaligned read is the following:
-\listinginput{1}{examples/misa.c}
+\csource{examples/misa.c}
 The value returned by the function \lstinline|main| is\\
 \lstinline|{{ garbled mix of &{ x; y } (origin: Misaligned { misa.c:6 }) }}|.\\
 The analyzer is by default configured for a 64-bit architecture,
@@ -1381,9 +1382,12 @@ alignments are fused together. In the example below,
 the memory states from
 the then branch and from the else branch contain in the array
 \lstinline|t| some 32-bit addresses with incompatible alignments.
-\listinginput{1}{examples/merge.c}
-The value returned by function \lstinline|main| is\\
-\lstinline|{{ garbled mix of &{ x; y } (origin: Merge { merge.c:10 }) }}|.
+\csource{examples/merge.c}
+The value returned by function \lstinline|main| is:
+
+\begin{logs}
+{{ garbled mix of &{ x; y } (origin: Merge { merge.c:10 }) }}
+\end{logs}
 
 \subsubsection{Well value}
 
@@ -1403,10 +1407,12 @@ The origin \lstinline$Arithmetic L$
 indicates that arithmetic operations
 take place without the analyzer being able to represent the result
 precisely.
-\listinginput{1}{examples/ari.c}
-In this example, the return value for \lstinline|f| is\\
-\lstinline|{{ garbled mix of &{ x; y } (origin: Arithmetic { ari.c:4 }) }}|.
+\csource{examples/ari.c}
+In this example, the return value for \lstinline|f| is:
 
+\begin{logs}
+{{ garbled mix of &{ x; y } (origin: Arithmetic { ari.c:4 }) }}
+\end{logs}
 
 \section{What is checked by \Eva{}}\label{obligations}
 
@@ -1435,7 +1441,7 @@ a dereferenced pointer is valid, it emits an alarm that expresses
 that the pointer needs to be valid at that point. Likewise, direct
 array accesses that may be invalid are flagged.
 
-\listinginput{1}{examples/alarms/invalid.c}
+\csource{examples/alarms/invalid.c}
 In the above example, the analysis is not able to guarantee that
 the memory accesses \lstinline|t[i]| and \lstinline|*p| are valid,
 so it emits a proof obligation for each:
@@ -1494,7 +1500,7 @@ This may happen on:
 In the example below, the first increment of the pointer \lstinline|p| is valid,
 although the resulting pointer should not be dereferenced. The second increment
 leads to an invalid alarm when option \lstinline|-warn-invalid-pointer| is on.
-\listinginput{1}{examples/alarms/pointer_arith.c}
+\csource{examples/alarms/pointer_arith.c}
 \begin{logs}
   [eva:alarm] pointer_arith.c:4: Warning:
     invalid pointer creation. assert \object_pointer(p + 1);
@@ -1504,7 +1510,7 @@ In the same way, in the example below, the first conversion at line~5
 does not generate an alarm, but the second conversion leads to an invalid alarm
 with option \lstinline|-warn-invalid-pointer|.
 
-\listinginput{1}{examples/alarms/pointer_conversion.c}
+\csource{examples/alarms/pointer_conversion.c}
 \begin{logs}
   [eva:alarm] pointer_arith.c:6: Warning:
     invalid pointer creation. assert \object_pointer((char *)(a + 2));
@@ -1527,15 +1533,15 @@ property that the divisor is different from zero when it continues
 the analysis after this point.
 The property expressed by an alarm may also not be taken into account
 when it is not easy to do so.
-\listinginput{1}{examples/alarms/div.c}
+\csource{examples/alarms/div.c}
 \begin{logs}
-div.c:4: ... division by zero. assert (int)(x*y) != 0;
-div.c:5: ... division by zero. assert x != 0;
+div.c:4: ... division by zero. assert (int)(x*y) $\not\equiv$ 0;
+div.c:5: ... division by zero. assert x $\not\equiv$ 0;
 \end{logs}
 In the above example, there is no way for the analyzer
 to guarantee that \lstinline|x*y| is not null, so it emits
 an alarm at line 4. In theory, it could avoid emitting
-the alarm \lstinline|x != 0| at line 5
+the alarm \lstinline|x $\not\equiv$ 0| at line 5
 because this property is a consequence of the property emitted
 as an alarm at line 4. Redundant alarms happen -- even in cases
 simpler than this one. Do not be surprised by them.
@@ -1549,9 +1555,9 @@ indeed, processors are often built in a way that such an
 operation does not produce the \lstinline|0| or \lstinline|-1|
 result that could have been expected. Here is an example
 of program with such an issue, and the resulting alarm:
-\listinginput{1}{examples/alarms/shift.c}
+\csource{examples/alarms/shift.c}
 \begin{logs}
-shift.c:4: ... invalid RHS operand for shift. assert 0 <= c < 32;
+shift.c:4: ... invalid RHS operand for shift. assert 0 $\le$ c < 32;
 \end{logs}
 
 \Eva{} also detects shifts on negative integers.
@@ -1564,9 +1570,10 @@ and does not lead to an alarm by default.
 However, the option \lstinline|-warn-right-shift-negative| can be used to
 enable such alarms.
 
-\listinginput{1}{examples/alarms/lshift.c}
+\csource{examples/alarms/lshift.c}
 \begin{logs}
-[eva:alarm] lshift.c:4: Warning: invalid LHS operand for left shift. assert 0 <= x;
+[eva:alarm] lshift.c:4: Warning:
+  invalid LHS operand for left shift. assert 0 $\le$ x;
 \end{logs}
 
 \subsubsection{Overflow in integer arithmetic}
@@ -1609,7 +1616,7 @@ or unsigned downcasts that may exceed the destination range.
 An alarm is emitted when a floating-point value appears to exceed the
 range of the integer type it is converted to.
 
-\listinginput{1}{examples/alarms/ov_float_int.c}
+\csource{examples/alarms/ov_float_int.c}
 \begin{logs}
 ...
 [eva:alarm] ov_float_int.c:6: Warning: overflow in conversion from floating-point
@@ -1628,10 +1635,10 @@ with a finite interval representing the result obtained
 if excluding these possibilities. This interval, like
 any other result, may be over-approximated. An example of this
 first kind of alarm can be seen in the following example.
-\listinginput{1}{examples/alarms/double_op_res.c}
-\begin{shell}
+\csource{examples/alarms/double_op_res.c}
+\begin{frama-c-commands}
 frama-c -eva -main sum double_op_res.c
-\end{shell}
+\end{frama-c-commands}
 \begin{logs}
 [eva:alarm] double_op_res.c:3: Warning: non-finite double value.
     assert \is_finite((double)(a+b));
@@ -1646,10 +1653,10 @@ from \lstinline|int*| to \lstinline|float*|.  The emitted alarm
 excludes the possibility of the bit sequence used as a the
 argument representing \lstinline|NaN|, an infinite, or an address.
 See the example below.
-\listinginput{1}{examples/alarms/double_op_arg.c}
-\begin{shell}
+\csource{examples/alarms/double_op_arg.c}
+\begin{frama-c-commands}
 frama-c -eva double_op_arg.c
-\end{shell}
+\end{frama-c-commands}
 \begin{logs}
 [eva:alarm] double_op_arg.c:7: Warning: non-finite float value.
     assert \is_finite(bits.f);
@@ -1674,14 +1681,16 @@ value of a local variable that has not been initialized, or
 if it appears to manipulate the address of a local variable outside
 of the scope of said variable. Both issues occur in the following
 example:
-\listinginput{1}{examples/alarms/uninitialized.c}
+\csource{examples/alarms/uninitialized.c}
 \Eva{} emits alarms for lines 5
 (variable \lstinline|r| may be uninitialized)
 and 13 (a dangling pointer to local variable \lstinline|t| is used).
 \begin{logs}
-uninitialized.c:5: ... accessing uninitialized left-value. assert \initialized(&r);
-uninitialized.c:13: ... accessing left-value that contains escaping addresses.
-                  assert !\dangling(&p);
+uninitialized.c:5: ...
+  accessing uninitialized left-value. assert \initialized(&r);
+uninitialized.c:13: ...
+  accessing left-value that contains escaping addresses.
+  assert !\dangling(&p);
 \end{logs}
 
 By default, \Eva{} emits an alarm as soon as a value that may be uninitialized
@@ -1719,13 +1728,13 @@ the values 0 and 1, but any other value might be a trap representation, that is,
 an object representation that does not represent a valid value of the type.
 Trap representations can be created through unions or pointer casts.
 
-\listinginput{1}{examples/alarms/invalid_bool.c}
-\begin{shell}
+\csource{examples/alarms/invalid_bool.c}
+\begin{frama-c-commands}
 frama-c -eva invalid_bool.c
-\end{shell}
+\end{frama-c-commands}
 \begin{logs}
-  [eva:alarm] invalid_bool.c:5: Warning:
-    trap representation of a _Bool lvalue. assert ub.b == 0 \/ ub.b == 1;
+  [eva:alarm] invalid_bool.c:4: Warning:
+    trap representation of a _Bool lvalue. assert ub.b $\equiv$ 0 $\vee$ ub.b $\equiv$ 1;
 \end{logs}
 
 The option \lstinline|-no-warn-invalid-bool| can be used to disable alarms
@@ -1749,7 +1758,7 @@ accordingly to the emitted alarm. For instance, for the
 quantity \lstinline|&x+2| must be reliably comparable to 0, the
 analysis assumes that the result of the comparison is 1. The
 consequences are visible when analyzing the following example:
-\listinginput{1}{examples/alarms/pointer_comparison.c}
+\csource{examples/alarms/pointer_comparison.c}
 \Eva{} finds that this program does not terminate.
 This seems incorrect because an actual execution will terminate
 on most architectures.
@@ -1796,22 +1805,23 @@ the example \lstinline|y = *p + x++;|, the post-increment is defined
 as long as \lstinline|*p| does not have any bits in common with
 \lstinline|x|.
 
-\listinginput{1}{examples/alarms/se.c}
-\begin{shell}
+\csource{examples/alarms/se.c}
+\begin{frama-c-commands}
 frama-c -eva se.c -unspecified-access
-\end{shell}
+\end{frama-c-commands}
 With option \verb|-unspecified-access|, three warnings are emitted during
 parsing. Each of these only mean that an expression with side-effects
 will require checking after the Abstract Syntax Tree has been elaborated.
 For instance, the first of these warnings is:
 \begin{logs}
-[kernel] se.c:5: Warning: Unspecified sequence with side effect:
-                  /*  <-  */
-                  tmp = x;
-                  /* x <-  */
-                  x ++;
-                  /* y <- x tmp */
-                  y = x + tmp;
+[kernel] se.c:5: Warning:
+  Unspecified sequence with side effect:
+  /*  <-  */
+  tmp = x;
+  /* x <-  */
+  x ++;
+  /* y <- x tmp */
+  y = x + tmp;
 \end{logs}
 
 Then \Eva{} is run on the program.
@@ -1850,7 +1860,7 @@ These limitations will be addressed in a future version.
 Vaguely related to, but different from, undefined side-effects in expressions,
 \Eva{} warns about the following program:
 
-\listinginput{1}{examples/alarms/overlap.c}
+\csource{examples/alarms/overlap.c}
 
 The programmer thought implementation-defined behavior was invoked
 in the above program, using an union to type-pun between structs S and T.
@@ -1898,7 +1908,7 @@ if it can give some meaning to the call. This is meant to account
 for frequent misconceptions on type compatibility (e.g. \lstinline|void *|
 and \lstinline|int *| are \emph{not} compatible).
 
-\listinginput{1}{examples/alarms/valid_function.c}
+\csource{examples/alarms/valid_function.c}
 
 \begin{logs}
 [eva:alarm] valid_function.c:9: Warning:
@@ -2074,9 +2084,9 @@ Brendan Egg\footnote{\url{https://www.brendangregg.com/flamegraphs.html}}.
 This script is available as a package in some Linux distributions; it is
 also included in Frama-C and can be run with the following command:
 
-\begin{listing}{1}
+\begin{frama-c-commands}
 frama-c-script flamegraph <file> [<dir>]
-\end{listing}
+\end{frama-c-commands}
 
 This command generates the flame graph from \texttt{<file>},
 which must be the same given to option \texttt{-eva-flamegraph},
@@ -2164,10 +2174,10 @@ In the case of the slicer, this is really the only definition that makes
 sense. Consider the following code snippet:
 
 \begin{listing}{1}
-  x = a;
-  y = *p;
-  x = x+1;
-  // slice for the value of x here.
+x = a;
+y = *p;
+x = x+1;
+// slice for the value of x here.
 \end{listing}
 
 This piece of program is begging for its second line to be removed, but
@@ -2373,7 +2383,7 @@ introduce approximations when analyzing a loop.
 
 Let us assume, in the following lines, that the function \lstinline|c|
 is unknown:
-\listinginput{1}{examples/boucles.c}
+\csource{examples/boucles.c}
 
 The \Eva{} plug-in could provide the best possible sets of values
 if the user explicitly instructed it to study step by step each
@@ -2396,7 +2406,7 @@ call site. In the following example, the body of \lstinline|f| is analyzed again
 at each analysis of the body of the loop. The result of the analysis
 is as precise as the result obtained for the example in section \ref{boucles}.
 
-\listinginput{1}{examples/fonctions.c}
+\csource{examples/fonctions.c}
 
 Calls to variadic functions are handled by the \textsf{Variadic} plug-in, which
 translates calls to variadic functions into semantically-equivalent calls,
@@ -2697,7 +2707,7 @@ that the analyzed code fits in this hypothesis. On the following example,
 it generates a proof obligation meaning that ``the comparison
 on line 8 is safe only if \lstinline|p| is a valid address or if the base address
 of \lstinline|p| is the same as that of \lstinline|&x|''.
-\listinginput{1}{examples/bases.c}
+\csource{examples/bases.c}
 
 It is mandatory to check this proof obligation.  When analyzing this
 example, the analysis infers that the loop never terminates (because
@@ -2787,7 +2797,7 @@ real execution. Currently, \Eva{} is not designed to prove
 the termination of loops or similar liveness properties.
 For instance,
 the following program does not terminate:
-\listinginput{1}{examples/termination.c}
+\csource{examples/termination.c}
 If this program is analyzed
 with the default options of \Eva{}, the analysis finds
 that every time execution reaches the end of \lstinline|main|, the value
@@ -2932,9 +2942,9 @@ lists options that affect all plug-ins. Option
 not documented in this manual.
 
 Example:
-\begin{shell}
+\begin{frama-c-commands}
 frama-c -eva-help
-\end{shell}
+\end{frama-c-commands}
 \begin{logs}
 $\dots$
 -eva-slevel <n>     superpose up to <n> states when unrolling control flow.
@@ -2972,22 +2982,22 @@ option \lstinline|-cpp-command <cmd>|.
 If the patterns \lstinline|%1| and \lstinline|%2| do not appear
 in the text of the
 command, Frama-C invokes the preprocessor in the following way:
-\begin{shell}
+\begin{frama-c-commands}
 <cmd> -o <outputfile> <inputfile>
-\end{shell}
+\end{frama-c-commands}
 
 In the cases where it is not possible to invoke the preprocessor with
 this syntax, it is possible to use the
 patterns \lstinline|%1| and \lstinline|%2|
 in the command's text as place-holders for the input file (respectively,
 the output file). Here are some examples of use of this option:
-\begin{shell}
+\begin{frama-c-commands}
 frama-c-gui -eva -cpp-command 'gcc -C -E -I. -x c' file1.src file2.i
 frama-c-gui -eva -cpp-command 'gcc -C -E -I. -o %2 %1' file1.c file2.i
 frama-c-gui -eva -cpp-command 'copy %1 %2'  file1.c file2.i
 frama-c-gui -eva -cpp-command 'cat %1 > %2' file1.c file2.i
 frama-c-gui -eva -cpp-command 'CL.exe /C /E %1 > %2' file1.c file2.i
-\end{shell}
+\end{frama-c-commands}
 
 \subsection{Activating \Eva{}}
 
@@ -3014,10 +3024,10 @@ back into memory for visualization or further computations.
 \medskip
 
 Example :
-\begin{shell}
+\begin{frama-c-commands}
 frama-c -eva -deps -out -save result.sav file1.c file2.c
 frama-c-gui -load result.sav
-\end{shell}
+\end{frama-c-commands}
 
 \begin{important}
   There is no specific extension for Frama-C saved files; the usual
@@ -3078,12 +3088,10 @@ these locations are allocated only up to a fixed depth.
 
 Example: for an application written for the POSIX interface, the
 prototype of \lstinline|main| is:
-\lstinputlisting[linerange={1-1}]
-  {examples/parametrizing/simple-main.c}
+\cwithrange{1-1}{examples/parametrizing/simple-main.c}
 The types of arguments \lstinline|argc| and \lstinline|argv|
 translate into the following initial values:
-\lstinputlisting[linerange={10-16}]
-  {examples/parametrizing/simple-main.log}
+\logwithrange{10-16}{examples/parametrizing/simple-main.log}
 
 This is generally not what is wanted, but then again, embedded applications
 are generally not written against the POSIX interface. If the analyzed
@@ -3190,8 +3198,7 @@ also decided by the value of option \lstinline|-eva-context-width|.
 Example: with the default value \lstinline|2| for option
 \lstinline|-eva-context-width|, the declaration \lstinline|int *(t[5]);|
 causes the following array to be allocated:
-\lstinputlisting[linerange={10-15}]
-  {examples/parametrizing/context-width.log}
+\logwithrange{10-15}{examples/parametrizing/context-width.log}
 
 Note that for both arrays of pointers and pointers to pointers,
 using option \lstinline|-eva-context-width 1| corresponds to a very strong
@@ -3202,11 +3209,10 @@ option \lstinline|-eva-context-width| in special cases, and use at least
 
 \subsubsection{Depth of the generated tree}
 
-For variables of a type pointer to pointers, the analyzer limits the depth up
+For variables of type pointer to pointers, the analyzer limits the depth up
 to which initial chained structures are generated.
 This is necessary for recursive types such as follows.
-\lstinputlisting[linerange={1-1}]
-  {examples/parametrizing/context-depth.c}
+\cwithrange{1-1}{examples/parametrizing/context-depth.c}
 This limit may also be observed for non-recursive types if they are deep enough.
 
 Option \lstinline|-eva-context-depth| allows to specify this limit.
@@ -3214,13 +3220,10 @@ The default value is 2. This number is the depth at which
 additional variables named \lstinline|S_...| are allocated, so
 two is plenty for most programs.
 
-For instance, here is the initial state displayed by \Eva{}
+For instance, here is part of the initial state displayed by \Eva{}
 in \lstinline|-lib-entry| mode if a global variable \lstinline|s|
-has type \lstinline|struct S| defined above:
-\lstinputlisting[linerange={6-13}]
-  {examples/parametrizing/context-depth.1.log}
-\lstinputlisting[linerange={17-20},breaklines=true]
-  {examples/parametrizing/context-depth.1.log}
+has the type \lstinline|struct S| defined above:
+\logwithrange{6-17}{examples/parametrizing/context-depth.1.log}
 
 In this case, if variable \lstinline|s| is the only one which
 is automatically allocated, it makes sense to set the option
@@ -3234,8 +3237,7 @@ Below are the initial contents for a variable \lstinline|s| of type \lstinline|s
 with options \lstinline|-eva-context-width 1|
 \lstinline|-eva-context-depth 1|:
 
-\lstinputlisting[linerange={6-16}]
-  {examples/parametrizing/context-depth.2.log}
+\logwithrange{6-16}{examples/parametrizing/context-depth.2.log}
 
 \subsubsection{The possibility of invalid pointers}
 
@@ -3269,8 +3271,7 @@ a variable \lstinline|s| of
 type \lstinline|struct S| receives  the following initial contents,
 modeling a chained list of length exactly 3:
 
-\lstinputlisting[linerange={6-11}]
-  {examples/parametrizing/context-depth.3.log}
+\logwithrange{6-11}{examples/parametrizing/context-depth.3.log}
 
 \subsection{State of the IEEE 754 environment}
 
@@ -3390,13 +3391,11 @@ access occurs in the analyzed program, the intention is that the
 accessed address should be inside the array. If it can not determine that
 this is the case, it emits an \lstinline|out of bounds index|
 alarm. This leads to an alarm on the following example:
-\lstinputlisting[numbers=left]
-  {examples/parametrizing/out-of-bound.c}
+\csource{examples/parametrizing/out-of-bound.c}
 \Eva{} assumes that writing \lstinline|t[0][...]|, the programmer
 intended the memory access to be inside \lstinline|t[0]|. Consequently,
 it emits an alarm:
-\lstinputlisting[linerange={8-8},breaklines=true]
-  {examples/parametrizing/out-of-bound.log}
+\logwithrange{8-8}{examples/parametrizing/out-of-bound.log}
 The option \lstinline|-unsafe-arrays| tells \Eva{} to warn
 only if the address as computed using its modeling of pointer arithmetics
 is invalid. With the option, \Eva{} does not warn about line 4
@@ -3484,7 +3483,7 @@ On the example below, analyzed with \lstinline|-eva-unroll-recursive-calls 10|:
   recursive call.
 \end{itemize}
 
-\lstinputlisting{examples/parametrizing/recursion-simple.c}
+\csource{examples/parametrizing/recursion-simple.c}
 
 With option \lstinline|-eva-unroll-recursive-calls|,
 the analysis of a recursive function can thus be complete and sound,
@@ -3495,7 +3494,7 @@ recursive function.
 However, even when the number of recursive calls is bounded in practice,
 the \Eva{} analysis might be too imprecise to be complete.
 
-\lstinputlisting{examples/parametrizing/recursion-imprecise.c}
+\csource{examples/parametrizing/recursion-imprecise.c}
 
 The above example presents a recursive function \lstinline|mod3|, which
 computes the congruence modulo 3 in up to three recursive calls.
@@ -3504,8 +3503,7 @@ in the general case and will instead rely on the \lstinline|mod3| specification,
 as it cannot reduce the new argument value of the recursive calls, as shown
 by the successive values printed by the \lstinline|Frama_C_show_each| directive:
 
-\lstinputlisting[linerange={12-19}]
-                {examples/parametrizing/recursion-imprecise.log}
+\logwithrange{12-19}{examples/parametrizing/recursion-imprecise.log}
 
 Finally, note that the unrolling of a very large number of recursive calls can
 considerably slow down the analysis.
@@ -3638,7 +3636,7 @@ Such annotations must be placed just before the loop (i.e. before the
 \lstinline|while|, \lstinline|for| or \lstinline|do| introducing the loop),
 and one annotation is required per loop, including nested ones. For instance:
 
-\lstinputlisting{examples/parametrizing/loop-unroll-const.c}
+\csource{examples/parametrizing/loop-unroll-const.c}
 
 The annotations above will ensure
 that \Eva{} will unroll the loops and keep the analysis precise; otherwise,
@@ -3654,7 +3652,7 @@ the acceptability of the annotation depends on the precision of the analyzer.
 Note that there are interesting cases of non-constant expressions for
 unrolling annotations. The example below shows a function with two nested loops.
 
-\lstinputlisting{examples/parametrizing/loop-unroll-nested.c}
+\csource{examples/parametrizing/loop-unroll-nested.c}
 
 The number of iterations of the outer loop is constant while the number of
 iterations of the inner loop depends on the current iteration of the outer
@@ -3672,11 +3670,9 @@ While it is sometimes useful to unroll only the first iterations, the usual
 objective is full unrolling; for this reason, the user is informed whenever
 the specified unrolling value is insufficient to unroll the loop entirely:
 
-\begin{minipage}{\linewidth}% prevents page break in listing
-\lstinputlisting{examples/parametrizing/loop-unroll-insuf.c}
-\end{minipage}
+\csource{examples/parametrizing/loop-unroll-insuf.c}
 
-\lstinputlisting[linerange={7-7}]
+\logwithrange{7-7}
   {examples/parametrizing/loop-unroll-insuf.log}
 
 The message can be deactived via \lstinline|-eva-warn-key loop-unroll=inactive|.
@@ -3711,13 +3707,11 @@ in order to unroll a loop completely.
 For instance, the
 nested simple loops in the following example require the
 option \lstinline|-eva-slevel 55| in order to be completely unrolled:
-\lstinputlisting[numbers=left]
-  {examples/parametrizing/slevel.c}
+\csource{examples/parametrizing/slevel.c}
 
 When the loops are sufficiently unrolled, the result obtained for the
 contents of array \lstinline|t| are the optimally precise:
-\lstinputlisting[linerange={14-14}]
-  {examples/parametrizing/slevel.1.log}
+\logwithrange{14-14}{examples/parametrizing/slevel.1.log}
 
 The number to pass the option \lstinline|-eva-slevel|  is of the magnitude of
 the number of values for \lstinline|i| (the 6 integers between 0 and 5)
@@ -3726,8 +3720,7 @@ integers comprised between 0 and 10). If a value much lower than
 this is passed, the result of the initialization of array \lstinline|t|
 will only be precise for the first cells. The option \lstinline|-eva-slevel 28|
 gives for instance the following result for array \lstinline|t|:
-\lstinputlisting[linerange={15-16}]
-  {examples/parametrizing/slevel.2.log}
+\logwithrange{15-16}{examples/parametrizing/slevel.2.log}
 
 In this result, the effects of the first iterations of the loops
 (for the whole of \lstinline|t[0]|, the whole of \lstinline|t[1]| and the first
@@ -3809,24 +3802,23 @@ to indicate the analyzer should use preferably the values $e_1,\ldots,e_m$
 when widening the sets of values attached to variable $v$.
 
 Example:
-\lstinputlisting[numbers=left]
-  {examples/parametrizing/widen-hints.c}
+\csource{examples/parametrizing/widen-hints.c}
 
 $e_1,\ldots,e_m$ (the hint \emph{thresholds}) must evaluate to compilation-time
 constants. They may contain numeric expressions and reference preprocessor
 macros and \lstinline|const int| variables.
 Note that several hints can be added to a single statement, as follows:
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   /*@ widen_hints x, 10, 20, 30;
       widen_hints y, 5, 25; */
-\end{lstlisting}
+\end{listing-nonumber}
 
 The user may also annotate a loop with
 \lstinline|//@ loop widen_hints $v$, $e_1,\ldots,e_m$ ;|,
 in which case $v$ may reference loop iteration variables.
 
-Adding label \lstinline|global| before the variable name, as in
+Adding a \lstinline|global| label before the variable name, as in
 \lstinline|//@ loop widen_hints global:n, $e_1,\ldots,e_m$ ;|,
 makes the annotation affect all loops in all functions, including
 those from other compilation units. It is useful for referencing variables
@@ -3872,8 +3864,7 @@ which serves the same purpose but has a few differences:
 \end{itemize}
 
 Example:
-\lstinputlisting[numbers=left]
-  {examples/parametrizing/pragma-widen-hints.c}
+\csource{examples/parametrizing/pragma-widen-hints.c}
 
 \subsubsection{Loop invariants}
 
@@ -3931,9 +3922,9 @@ the technique above does not unroll the loop; thus the overall results
 are less precise, but the analysis can be faster.
 
 Notice that, in the function above, a more precise loop invariant would be
-\begin{listing}{5}
+\begin{listing-nonumber}
 /*@ loop invariant p < &t[c-1]; */
-\end{listing}
+\end{listing-nonumber}
 However, this annotation cannot be effectively used by \Eva{}
 if the value for \lstinline+c+ is imprecise, which is the case in our
 example. As a consequence, the analysis cannot prove this improved invariant.
@@ -3993,7 +3984,7 @@ inside a function by using \lstinline|split| annotations.  These annotations
 must be given an expression whose values correspond to the cases that need to be
 enumerated. The example below shows a use of this annotation.
 
-\lstinputlisting{examples/parametrizing/split-array.c}
+\csource{examples/parametrizing/split-array.c}
 
 The \lstinline|split| instructs \Eva{} to enumerate all the possible
 values of \lstinline|i| and to continue the analysis separately for
@@ -4003,14 +3994,13 @@ evaluated by \Eva{} as a singleton in each case, which enables the use of a
 the function can be exactly computed as the set of three possible values instead
 of an imprecise interval.
 
-\lstinputlisting[linerange={25-26}]
-  {examples/parametrizing/split-array.log}
+\logwithrange{25-26}{examples/parametrizing/split-array.log}
 
 A \lstinline|split| annotation can be used on any expression that evaluates to a
 {\it small} number of integer values. In particular, the expression can be a C
 comparison like in the following example.
 
-\lstinputlisting{examples/parametrizing/split-fabs.c}
+\csource{examples/parametrizing/split-fabs.c}
 
 This example requires the equality domain (enabled with option
 \lstinline|-eva-domains equality|, see section \ref{sec:symbolic-equalities}) to
@@ -4058,14 +4048,14 @@ of \lstinline|i|, so that the accesses to the values of \lstinline|t| are exact.
 With such partitioning, the values of \lstinline|t[i]|, \lstinline|t[i+1]| and
 \lstinline|r| are computed separately for each possible value of \lstinline|i|.
 
-\lstinputlisting{examples/parametrizing/static-split.c}
+\csource{examples/parametrizing/static-split.c}
 
 To be precise on this first example, we need a static split on \lstinline|i|, as
 the value of \lstinline|i| is set to 0 before the computation of \lstinline|r|,
 but the values of \lstinline|x| and \lstinline|y| depend on the previous value
 of \lstinline|i|.
 
-\lstinputlisting{examples/parametrizing/dynamic-split.c}
+\csource{examples/parametrizing/dynamic-split.c}
 
 In this second example, the value of \lstinline|r| is computed at each
 loop iteration and depends on the current value of \lstinline|i|, which
@@ -4134,21 +4124,18 @@ Above the user-set limit, the sets are represented as intervals
 with periodicity information, which can cause approximations.
 
 Example:
-\lstinputlisting[numbers=left]
-  {examples/parametrizing/ilevel.c}
+\csource{examples/parametrizing/ilevel.c}
 
 With the default limit of 8 elements for sets of integers, the
 analysis of the program shows a correct but approximated result:
 
-\lstinputlisting[linerange={23-23}]
-  {examples/parametrizing/ilevel.1.log}
+\logwithrange{23-23}{examples/parametrizing/ilevel.1.log}
 
 Studying the program, the user may decide to improve the precision of
 the result by adding \verb|-eva-ilevel 16| to the command line. The
 analysis result then becomes:
 
-\lstinputlisting[linerange={23-23}]
-  {examples/parametrizing/ilevel.2.log}
+\logwithrange{23-23}{examples/parametrizing/ilevel.2.log}
 
 \subsection{Maximum number of precise items in arrays}
 
@@ -4159,10 +4146,10 @@ it may be very costly to update each array element individually.
 Instead, if the range of indices to be accessed is larger than {\em plevel},
 some approximations are made and a message is emitted:
 
-\begin{lstlisting}
+\begin{listing-log}
 [kernel] arrays.c:32:
   more than 200(300) elements to enumerate. Approximating.
-\end{lstlisting}
+\end{listing-log}
 
 This message means that the array to be updated had 300 elements, and
 \verb|-eva-plevel| was set to 200 (the default value). In this case, it
@@ -4170,9 +4157,9 @@ might be reasonable to increase the plevel to 300, especially if some alarms
 could be caused by the imprecision. In other cases, however, there is little
 hope of obtaining a reasonable bound:
 
-\begin{lstlisting}
+\begin{listing-log}
 more than 200(0x20000000) elements to enumerate. Approximating.
-\end{lstlisting}
+\end{listing-log}
 
 In some cases, lowering the plevel can improve performance, but it is rarely
 a significant factor. Most of the time, this option has little impact in the
@@ -4312,14 +4299,14 @@ from conditions (e.g. \texttt{if (x == y+1)}), or assignments
 be used when one of the expressions involved occurs later in the program.
 
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   int y = x+1;
   // the equality y == x + 1 is inferred
   if (y <= 2) {
     // Thanks to the equality, x <= 1 is deduced
   }
 }
-\end{lstlisting}
+\end{listing-nonumber}
 
 This domain should be activated by default. Indeed, the normalisation
 done by \FramaC for expressions with side-effects introduces temporary
@@ -4350,7 +4337,7 @@ Three global modes are available:
 Activating option \texttt{-eva-domains symbolic-locations} instructs
 \Eva{} to perform a special analysis for \emph{reused left-values}.
 
-\begin{lstlisting}
+\begin{listing-nonumber}
 int t[10];
 
 extern unsigned int u[10];
@@ -4361,7 +4348,7 @@ void main(unsigned int i) {
     t[u[i]] = 2;
   }
 }
-\end{lstlisting}
+\end{listing-nonumber}
 On this code, \Eva{} cannot represent precisely \lstinline+u[i]+, and
 ``learns'' nothing from the condition \lstinline+u[i] < 8+. Hence, \Eva{}
 emits an alarm on the line \lstinline|t[u[i]] = 2|, as it cannot prove
@@ -4388,7 +4375,7 @@ Inequality Invariants''}
 \cite{DBLP:conf/cav/Venet12}.
 
 
-\begin{lstlisting}
+\begin{listing-nonumber}
 int y = 3;
 int t[100];
 int *p = &t[0];
@@ -4397,7 +4384,7 @@ for (int i=0; i<100; i++) {
   y += 2; // y == 2*i + 5 holds. In particular, y <= 203
   *p++ = i; // all accesses are in bound
 }
-\end{lstlisting}
+\end{listing-nonumber}
 
 This domain should be activated for programs in which finite loops
 increase multiple variables simultaneously, in an affine way. It
@@ -4405,7 +4392,7 @@ is \emph{not} useful if the loop is fully unrolled by syntactic or
 semantic means, or if the relation between
 variables is not affine (e.g. computing a square).
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   if (x++ <= 10) { ... }
 
 // Transformed into
@@ -4414,7 +4401,7 @@ variables is not affine (e.g. computing a square).
   x++;
   if (tmp <= 10) { // Nothing is learnt on x without the
                    // domain of equalities }
-\end{lstlisting}
+\end{listing-nonumber}
 
 Currently, the analysis is intra-procedural only: no information
 flows from the caller to the callee, or in the reverse direction.
@@ -4430,7 +4417,7 @@ this means that gauges can be inferred easily for \emph{signed}
 variables, but less so for \emph{unsigned} ones. Indeed, the affine
 relations inferred by the domain are no longer true once the
 variable exceeds e.g. \texttt{INT\_MAX} and wraps. Code such as
-\begin{lstlisting}
+\begin{listing-nonumber}
 unsigned int x = ...;
 int y = ...;
 
@@ -4438,7 +4425,7 @@ while (--x > 0) {
   y++;
   [...]
 }
-\end{lstlisting}
+\end{listing-nonumber}
  cannot be analyzed precisely, because the relation between \texttt{x}
 and \texttt{y} is not affine.
 
@@ -4456,7 +4443,7 @@ the possible values of $X$ from a reduction of the possible values of $Y$.
 
 The following code is a minimal working example that illustrates
 the precision improvement provided by the octagon domain.
-\begin{lstlisting}
+\begin{listing-nonumber}
 void main (int y) {
   int k = Frama_C_interval(0, 10);
   int x = y - k;               // y - x $\in$ [0..10]
@@ -4465,7 +4452,7 @@ void main (int y) {
   if (y > 15)
     t = x;                     // t $\in$ [6..$\infty$]
 }
-\end{lstlisting}
+\end{listing-nonumber}
 
 
 Currently, the octagon domain is fast but has two strong limitations:
@@ -4552,13 +4539,13 @@ domain.
         to find a suitable segmentation for the analysis. For instance, in
         the following example, the annotation instructs the analyzer to use
         3 segments for the analysis of the loop.
-\begin{lstlisting}[language=C]
+\begin{listing-nonumber}
 int t[20] = {0};
 //@ array_partition t, 0, i, i+1, 20;
 for (int i = 0; i < 20; i++) {
   ...
 }
-\end{lstlisting}
+\end{listing-nonumber}
         When the annotation is encountered, the current array partition is
         replaced by the given one, and the introduced segment bounds are kept
         as long as possible. When a subsequent array access uses an index than
@@ -4578,7 +4565,7 @@ This is mostly useful for programs that use bitwise operators: \verb+&+,
 \verb+|+, \verb+^+ and \verb+~+, especially with bit-masks constants.
 The following program is analyzed more precisely thanks to the bitwise
 domain (with \lstinline+-eva-slevel 2+).
-\begin{lstlisting}
+\begin{listing-nonumber}
 int isTopBit(unsigned something)
 {
   //@ assert something >= 0x80000000 || something < 0x80000000;
@@ -4586,7 +4573,7 @@ int isTopBit(unsigned something)
   something ^= topBitOnly;
   if (something & 0x80000000) // More precision on this conditional { ... }
 }
-\end{lstlisting}
+\end{listing-nonumber}
 
 The current analysis is fully inter-procedural. All variables (including
 aggregates and arrays) are handled. However, for conciseness, the domain tries
@@ -4644,18 +4631,18 @@ These directives are hypotheses of the taint analysis, and thus have no logical
 status. The specified set of lvalues becomes tainted just after the code
 annotation, or at the return of the function with the \texttt{taints} clause.
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   int r = write(buf, n);
   //@ taint r, buf[0..n];
-\end{lstlisting}
+\end{listing-nonumber}
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   /*@ requires \valid(buf + (0..n));
       assigns \result, *p, buf[0..n];
       ensures 0 <= \result < n;
       taints \result, buf[0..n]; */
       int write(char *buf, int n);
-\end{lstlisting}
+\end{listing-nonumber}
 
 The taint is then propagated during the Eva analysis, which computes an
 over-approximation of the set of tainted locations at each program point.
@@ -4666,7 +4653,7 @@ Indeed, the domain only infers over-approximations of the tainted locations:
 while locations in the over-approximations \emph{may be} tainted,
 all other locations are proven to be safe.
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   void fun(int a, int b, int t) {
     //@ taint t;
     int x = a + t;
@@ -4674,16 +4661,16 @@ all other locations are proven to be safe.
     //@ assert \tainted(x);   // UNKNOWN
     //@ assert !\tainted(y);  // TRUE
   }
-\end{lstlisting}
+\end{listing-nonumber}
 
 The \lstinline|\tainted| predicate can also be used to reduce the
 over-approximation of the tainted locations, by asserting that some values are
 not tainted anymore.
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   /*@ ensures !\tainted(*p); */
   void sanitize(int *p);
-\end{lstlisting}
+\end{listing-nonumber}
 
 
 \subsection{Numerors}
@@ -4826,7 +4813,7 @@ of this function. In the example below, the dependency of
 \lstinline|double_assign| is \lstinline|a FROM c|.
 The variable \lstinline|b| is not a functional input because the final value
 of \lstinline|a| depends only on \lstinline|c|.
-\listinginput{1}{examples/double_assign.c}
+\csource{examples/double_assign.c}
 
 The dependencies of a function may also be listed as \lstinline|NO EFFECTS|.
 This means that the function has no effects when it terminates. There
@@ -4911,7 +4898,7 @@ are guaranteed to have been over-written when the function terminates;
 the latter is a by-product of the computation of operational
 inputs that someone may find useful someday.
 
-\listinginput{1}{examples/op_inputs.c}
+\csource{examples/op_inputs.c}
 
 This example, when analyzed with the options \lstinline|-inout -lib-entry -main op|,
 is found to have on termination the operational
@@ -5005,11 +4992,11 @@ ensure that the property $P$ holds.
 
 Let us consider for instance the following function.
 
-\listinginput{1}{examples/reduction.c}
+\csource{examples/reduction.c}
 
-\begin{shell}
+\begin{frama-c-commands}
 frama-c -eva -eva-slevel 12 -lib-entry -main f reduction.c
-\end{shell}
+\end{frama-c-commands}
 
 \Eva{} emits the following two warnings:
 \begin{logs}
@@ -5041,11 +5028,11 @@ in that point of the program.
 This treatment often improves the precision of the analysis. It can be used with tautological assertions
 to provide hints to the analyzer, as shown in the following example.
 
-\listinginput{1}{examples/sq.c}
+\csource{examples/sq.c}
 
-\begin{shell}
+\begin{frama-c-commands}
 frama-c -eva -eva-slevel 2 sq.c
-\end{shell}
+\end{frama-c-commands}
 
 The analysis finds the result
 of this computation to be in \lstinline|[0..100]|. Without the
@@ -5080,7 +5067,7 @@ not taken into account at all.
 \smallskip
 
 The two functions below illustrate both of these limitations:
-\listinginput{1}{examples/annotations_2.c}
+\csource{examples/annotations_2.c}
 
 If the analyzer is launched with
 options \lstinline|-lib-entry -main generalization|,
@@ -5332,47 +5319,47 @@ int succ(int x);
   would stop the evaluation (the postcondition of \lstinline|f| is
   false if \lstinline|p| is not assigned).
 
-  \begin{listing}{1}
-    int y; int *p;
-    /*@ ensures p == &y; */
-    void f(void);
-    void main(void){ f(); }
-  \end{listing}
+\begin{listing}{1}
+int y; int *p;
+/*@ ensures p == &y; */
+void f(void);
+void main(void){ f(); }
+\end{listing}
 
   Similarly, forgetting the \lstinline|\from| clause in the contract
   for \lstinline|g| would stop the evaluation (without knowing where
   the value of \lstinline|p| comes from, \Eva{} assumes that
   it points to a constant address).
 
-  \begin{listing}{1}
-    int y; int *p;
-  /*@  assigns p \from q;
+\begin{listing}{1}
+int y; int *p;
+/*@  assigns p \from q;
      ensures p == &y; */
 void g(int *q);
 void main(void){ g(&y); }
-  \end{listing}
+\end{listing}
 
   A tricky example
   is the specification of a function that needs to return the address of
   a global variable.
-  \begin{listing}{1}
+\begin{listing}{1}
 int x;
 
 void *addr_x(); // Returns (void*)&x;
-  \end{listing}
+\end{listing}
 
 The specification \lstinline|assigns \result \from &x;| is unfortunately
 incorrect, as \lstinline|\from| clauses can only contain lvalues. Instead,
 the following workaround can be used:
 
-  \begin{listing}{1}
+\begin{listing}{1}
 int x;
 int * const __p_x = &x;
 
 /*@ assigns \result \from __p_x;
     ensures \result == &x; */
 void *addr_x();
-  \end{listing}
+\end{listing}
 
 \end{description}
 
@@ -5475,7 +5462,7 @@ immediate. However, for a few functions --such as string-related
 ones-- you must also duplicate the definitions of the logic predicates
 used to write the preconditions, as shown below:
 %
-\begin{lstlisting}
+\begin{listing-nonumber}
 #define __PUSH_FC_STDLIB #pragma fc_stdlib(push,__FILE__)
 #define __POP_FC_STDLIB #pragma fc_stdlib(pop)
 
@@ -5495,7 +5482,7 @@ __POP_FC_STDLIB
 /*@ requires valid_read_string(str);
     assigns \result \from str[0..]; */
 size_t strlen(const char * str);
-\end{lstlisting}
+\end{listing-nonumber}
 
 
 \subsection{{\tt malloc}, {\tt calloc}, {\tt realloc} and {\tt free} functions}
@@ -5549,10 +5536,10 @@ For instance, the following annotation ensures that the call to
 \lstinline|calloc| below will use the \lstinline|fresh| builtin,
 regardless of the value of option \lstinline|-eva-alloc-builtin|:
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   /*@ eva_allocate fresh; */
   part = (char*)calloc(plen + 1, sizeof(*part));
-\end{lstlisting}
+\end{listing-nonumber}
 
 Other calls to \lstinline|calloc| will be unaffected by this annotation.
 
@@ -5617,13 +5604,13 @@ The implementation of these functions might change in future versions
 of Frama-C, but their types and their behavior will stay the same.
 
 Example of use of the functions introducing non-determinism:
-\listinginput{1}{examples/nondet.c}
+\csource{examples/nondet.c}
 
 With the command below, the obtained result for
 variable \lstinline|X| is \lstinline|[-45..150],0%3|.
-\begin{shell}
+\begin{frama-c-commands}
 frama-c -eva ex_nondet.c .../share/libc/__fc_builtin.c
-\end{shell}
+\end{frama-c-commands}
 The inclusion of \lstinline|.../share/libc/__fc_builtin.c| is only required
 when using the functions \lstinline|Frama_C_float_interval| and
 \lstinline|Frama_C_double_interval|. Otherwise, including the file
@@ -5994,7 +5981,7 @@ For these reasons, \lstinline|-ulevel| is seldom used nowadays.
 The answers to these questions are ``yes'' and ``yes''.
 Consider the following example:
 
-\listinginput{1}{examples/vraie_al.c}
+\csource{examples/vraie_al.c}
 
 When analyzing this example, \Eva{} does not emit an
 alarm on line 6. This is perfectly correct, since no error occurs at
@@ -6025,7 +6012,7 @@ the case of a false alarm. Deciding whether the first alarm is a true
 or a false one is the responsibility of the user.
 This situation
 happens in the following example:
-\listinginput{1}{examples/false_al.c}
+\csource{examples/false_al.c}
 
 Analyzing this example with the default options produces:
 \begin{logs}
@@ -6169,11 +6156,11 @@ Multiline annotations are then closed with \texttt{*/}.
 Function contracts are specified in a {\em single} annotation.
 This is {\em forbidden}:
 
-\begin{lstlisting}
+\begin{listing-nonumber}
 //@ requires a != 0; // error: this annotation is not attached to the function
 //@ ensures \result > 0;
 int f(int a);
-\end{lstlisting}
+\end{listing-nonumber}
 
 Function contracts with several clauses are equivalent to a logical
 \textbf{and} (\&\&) between them.
@@ -6259,10 +6246,10 @@ preconditions.
 In the following code, we check that \texttt{malloc} did not return a null
 pointer:
 
-\begin{lstlisting}
-  int *p = malloc(4 * sizeof(int));
-  //@ assert p != \null;
-\end{lstlisting}
+\begin{listing-nonumber}
+int *p = malloc(4 * sizeof(int));
+//@ assert p != \null;
+\end{listing-nonumber}
 
 If \Eva{} was called with option \texttt{-eva-no-alloc-returns-null},
 the assertion will be always true; otherwise, an alarm will be emitted,
@@ -6270,10 +6257,10 @@ and only the states where \texttt{p} is non-null will continue.
 
 Another example:
 
-\begin{lstlisting}
+\begin{listing-nonumber}
 unsigned long long r = a << 32;
 //@ assert r >= INT_MAX + 1 && r < LLONG_MAX;
-\end{lstlisting}
+\end{listing-nonumber}
 
 Here, we see why ACSL numbers are mathematical integers by default; otherwise,
 the expression \texttt{INT\_MAX + 1} might overflow, so we would need to use
@@ -6282,7 +6269,7 @@ casts, making the expression harder to read and more error-prone.
 Here is an example of a function annotation (some predicates will be detailed
 later):
 
-\begin{lstlisting}
+\begin{listing-nonumber}
 /*@
   requires \is_finite(x) && \valid(exp);
   ensures \is_finite(\result);
@@ -6290,7 +6277,7 @@ later):
   assigns \result, *exp \from x;
  */
 double frexp(double x, int *exp);
-\end{lstlisting}
+\end{listing-nonumber}
 
 This is a simplified version of the actual contract in \FramaC's standard
 library, in \texttt{math.h}. Function \texttt{frexp} converts a floating-point
@@ -6347,7 +6334,7 @@ A simplified version of the \texttt{strcat} specification in \FramaC's libc
 is presented below. As a reminder, \verb+strcat(d, s)+ appends the string
 \texttt{s} at the end of string \texttt{d}.
 
-\begin{lstlisting}
+\begin{listing-nonumber}
 /*@ requires valid_read_string(src);
   @ requires valid_read_string(dest);
   @ requires \valid(dest+(strlen(dest)..strlen(dest)+strlen(src)));
@@ -6357,7 +6344,7 @@ is presented below. As a reminder, \verb+strcat(d, s)+ appends the string
   @ assigns \result \from dest;
   @*/
 char *strcat(char *dest, const char *src);
-\end{lstlisting}
+\end{listing-nonumber}
 
 Let us read this specification carefully:
 
@@ -6401,7 +6388,7 @@ never specify that the bytes in the range
 
 Finally, here is an example using the \verb+\initialized+ predicate:
 
-\begin{lstlisting}
+\begin{listing-nonumber}
 volatile time_t __fc_time;
 
 /*@
@@ -6410,7 +6397,7 @@ volatile time_t __fc_time;
   ensures \initialized(timer);
 */
 void time(time_t *timer);
-\end{lstlisting}
+\end{listing-nonumber}
 
 This is a simple version of the libc's \texttt{time} function, which
 initializes the \texttt{timer} pointer with the value of the current system
@@ -6436,9 +6423,9 @@ qualifier in C.
 The \texttt{strncpy} function requires source and destination to be
 non-overlapping. For a call to \verb+strncpy(d, s, n)+, this can be written as:
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   \separated(d + (0 .. n-1), s + (0 .. n-1));
-\end{lstlisting}
+\end{listing-nonumber}
 
 Note that range operators are used to ensure that {\em all} bytes are
 non-overlapping; \verb+\separated(d, s)+ would have been incorrect, since it
@@ -6464,9 +6451,9 @@ and (optionally) stores the pointer to the string {\em after} the conversion in
 Therefore, we know that \texttt{*endptr} is {\em somewhere} inside the
 \texttt{ptr} buffer. In ACSL, we can write this as:
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   ensures \subset(*endptr, ptr+(0..));
-\end{lstlisting}
+\end{listing-nonumber}
 
 This style of writing allows \Eva{} to reduce the values of \texttt{*endptr},
 avoiding the creation of {\em garbled mix}.
@@ -6484,7 +6471,7 @@ To help deal with such cases, ACSL has function {\em behaviors}, which allow
 splitting such sets of states, as in the following example of a floating-point
 \texttt{abs} (absolute value) function:
 
-\begin{lstlisting}
+\begin{listing-nonumber}
 /*@
   assigns \result \from x;
   behavior normal:
@@ -6502,7 +6489,7 @@ splitting such sets of states, as in the following example of a floating-point
   disjoint behaviors;
 */
 double fabs(double x);
-\end{lstlisting}
+\end{listing-nonumber}
 
 This is (or was) the actual, full specification of the function in \FramaC's
 standard library. It contains 3 behaviors, separated according to the
@@ -6632,13 +6619,13 @@ An unfortunate combination of preprocessing and parsing of logical annotations
 can lead to unexpected parsing errors. Consider the following code using
 a range operator:
 
-\begin{lstlisting}
+\begin{listing-nonumber}
 #define N 10
 int main(void) {
   int a[N] = {0};
   //@ assert 0 \in a[0..N-1];
 }
-\end{lstlisting}
+\end{listing-nonumber}
 
 Parsing the above code fails with
 \texttt{[kernel:annot-error] unbound logic variable N}.
@@ -6660,9 +6647,9 @@ When a clause has names, they are used instead of printing the whole predicate.
 
 You can add several names by juxtaposing them, e.g.:
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   ensures exp_ok: initialization: \initialized(exp);
-\end{lstlisting}
+\end{listing-nonumber}
 
 The above clause has two names: \verb+exp_ok+ and \verb+initialization+.
 
@@ -6694,15 +6681,15 @@ disjunctions instead of non-contiguous intervals. The canonical example
 is the suppression of a 0 from the middle of a interval; instead of writing
 this:
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   ensures nonzero_result: \result != 0;
-\end{lstlisting}
+\end{listing-nonumber}
 
 It is often preferable to write this:
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   ensures nonzero_result: \result > 0 || \result < 0;
-\end{lstlisting}
+\end{listing-nonumber}
 
 In the first case, unless the sign domain (option \texttt{-eva-domains sign})
 is enabled, there is little chance that \Eva{} will produce an interval without
@@ -6725,15 +6712,15 @@ Pointer arithmetics in ACSL require non-void pointers. For instance,
 in the \texttt{memcpy} function, which accepts \texttt{void} pointers
 (instead of \texttt{char} pointers), the following is invalid:
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   assigns dest[0..n - 1] \from src[0..n-1];
-\end{lstlisting}
+\end{listing-nonumber}
 
 You need to explicitly cast the pointers to \texttt{char*}, as in:
 
-\begin{lstlisting}
+\begin{listing-nonumber}
   assigns ((char*)dest)[0..n - 1] \from ((char*)src)[0..n-1];
-\end{lstlisting}
+\end{listing-nonumber}
 
 \paragraph{Completely invalid destination for assigns clause <A>. Ignoring.}
 This is not an error {\em per se}, but often associated with an incorrect

@@ -505,6 +505,8 @@
     ensures,exits,frees,ghost,global,import,inductive,integer,invariant,lemma,
     logic,loop,model,module,predicate,reads,real,requires,sizeof,strong,struct,
     terminates,returns,type,union,variant,
+    dynamic_split,merge,pragma,slevel,split,taints,taint,unroll,widen_hints,
+    \\tainted,
     Here,LoopCurrent,LoopEntry,Pre,Post,Old,
     \\Cons,\\Down,\\NearestAway,\\NearestEven,\\Nil,\\ToZero,\\Up,
     \\at,\\allocable,\\allocation,\\automatic,\\base_addr,\\block_length,\\dangling,
@@ -533,6 +535,21 @@
 {\lstset{style=c-basic,numbers=left,stepnumber=#1,firstnumber=#2}}{}
 \lstnewenvironment{listing-nonumber}%
 {\lstset{style=c,numbers=none,basicstyle=\lp@basic}}{}
+
+% Commands used mainly by Eva manual
+
+\newcommand{\logwithrange}[2]%
+{\lstinputlisting[breaklines=true,basicstyle=\ttfamily\small,linerange=#1]{#2}}
+
+\newcommand{\cwithrange}[2]%
+{\lstinputlisting[style=c-basic,numbers=left,linerange=#1]{#2}}
+
+\newcommand{\csource}[1]%
+{\lstinputlisting[style=c-basic,numbers=left]{#1}}
+
+\lstnewenvironment{listing-log}%
+{\lstset{numbers=none,basicstyle=\lp@basic}}{}
+
 
 % ACSL + C (developers)
 % --------------------------------------------------------------------------
@@ -572,7 +589,7 @@
 \lstdefinelanguage{frama-c-commands}[]{}{%
   mathescape=false,%
   alsoletter=-,%
-  keywords={frama-c},%
+  keywords={frama-c,frama-c-gui,frama-c-script},%
   classoffset=1,%
   morekeywords={-load,-then,-then-last,-then-on,-then-replace,-save},%
   classoffset=0,%
