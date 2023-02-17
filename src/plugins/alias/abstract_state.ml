@@ -258,7 +258,7 @@ let rec find_or_create_vertex (lv:lval) (x:t) =
   | (Mem e, NoOffset) ->
     begin
       match e.enode with
-        Const _ -> failwith "Not implemented "
+        Const _ -> failwith "Not implemented1 "
       | Lval lv1 ->
         let v1,x = find_or_create_vertex lv1 x in
         begin
@@ -269,21 +269,22 @@ let rec find_or_create_vertex (lv:lval) (x:t) =
           | [v] -> v,x
           | _ -> failwith "invariant violated"
         end
-      | SizeOf  _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> failwith "Not implemented "
+      | SizeOf  _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> failwith "Not implemented2 "
 
-      | UnOp  _ | BinOp _  -> failwith "Not implemented "
-                                
+      | UnOp  _ | BinOp _  -> failwith "Not implemented3 "
+
       | CastE (_,e) -> find_or_create_vertex (Mem e, NoOffset) x
       | AddrOf lv -> find_or_create_vertex lv x
       | StartOf lv ->  find_or_create_vertex lv x
     end
-  | _ -> failwith "Not implemented "
+  (* TODO !!! do offset *)
+  | (y,_) -> find_or_create_vertex (y, NoOffset) x (* simply ignores offset *)
 
 
 let find_vertex lv x =
   let v,x1 = find_or_create_vertex lv x in
   if x == x1
-    (* if x has not been modified, then the vertex was found, not created *)
+  (* if x has not been modified, then the vertex was found, not created *)
   then v
   else raise Not_found
 
