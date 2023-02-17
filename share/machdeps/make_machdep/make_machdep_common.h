@@ -39,6 +39,6 @@
 #define mkstr(s) #s
 
 #define TEST_TYPE_COMPATIBLE(T1, T2)                                           \
-  _Static_assert(!COMPATIBLE(T1, T2), "" mkstr(T2) " is " #T1);
+  _Static_assert(!COMPATIBLE(T1, T2), "" mkstr(T2) " is '" #T1 "'");
 
 #define TEST_TYPE_IS(type) TEST_TYPE_COMPATIBLE(type, TEST_TYPE)

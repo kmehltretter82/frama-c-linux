@@ -23,5 +23,8 @@
 #include "make_machdep_common.h"
 #include <stddef.h>
 
-_Static_assert(!COMPATIBLE(unsigned int, size_t), "size_t is unsigned int");
-_Static_assert(!COMPATIBLE(unsigned long, size_t), "size_t is unsigned long");
+#define TEST_TYPE size_t
+
+TEST_TYPE_IS(unsigned int)
+TEST_TYPE_IS(unsigned long)
+TEST_TYPE_IS(unsigned long long)

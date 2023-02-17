@@ -191,7 +191,7 @@ def find_value(name, typ, output):
             return int(x)
 
     elif typ == "type":
-        expected = "([a-zA-Z_]+)"
+        expected = "'([^']+)'"
 
         def conversion(x):
             return x
