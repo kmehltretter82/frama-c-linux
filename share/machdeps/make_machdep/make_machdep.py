@@ -67,26 +67,32 @@ parser.add_argument("--compiler", default="cc", help="which compiler to use; def
 parser.add_argument(
     "--compiler-version",
     default="--version",
-    help="option to pass to the compiler to obtain its version; default is --version"
+    help="option to pass to the compiler to obtain its version; default is --version",
 )
 parser.add_argument(
     "--cpp-arch-flags",
     nargs="+",
-    default=[],
+    action="extend",
     help="architecture-specific flags needed for preprocessing, e.g. '-m32'",
 )
 parser.add_argument(
     "--compiler-flags",
     nargs="+",
-    default=["-c"],
+    action="extend",
+    type=str,
     help="flags to be given to the compiler (other than those set by --cpp-arch-flags); default is '-c'",
 )
 parser.add_argument("--check", action="store_true")
+
 args, other_args = parser.parse_known_args()
+
+if not args.compiler_flags:
+    args.compiler_flags = ["-c"]
 
 
 def print_machdep(machdep):
     json.dump(machdep, args.dest_file, indent=4, sort_keys=True)
+
 
 def check_machdep(machdep):
     try:
@@ -232,7 +238,7 @@ version_output = subprocess.run(
 version = version_output.stdout.splitlines()[0]
 
 machdep["compiler"] = args.compiler
-machdep["cpp_arch_flags"] = ' '.join(args.cpp_arch_flags)
+machdep["cpp_arch_flags"] = " ".join(args.cpp_arch_flags)
 machdep["version"] = version
 
 missing_fields = [f for [f, v] in machdep.items() if v is None]
