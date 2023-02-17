@@ -200,10 +200,6 @@ let find_transitive_closure  (lv:lval) (x:t) =
     Not_found -> []
 
 
-(* find the vertex of an lval *)
-let find_vertex (lv:lval) (x:t) =
-  LMap.find lv x.lmap
-(** @raise Not_found if there is not such an lval in the graph *)
 
 (* NOTE on "constant vertex": a constant vertex represents an unamed
    scalar value (type bottom in steensgaard's paper), or the address
@@ -255,9 +251,41 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
     new_v , new_x
 
 
-let find_or_create_vertex (lv:lval) (x:t) : V.t * t =
-  try find_vertex lv x , x with
-    Not_found -> create_vertex lv x
+(* find the vertex of an lval *)
+let rec find_or_create_vertex (lv:lval) (x:t) =
+  match lv with
+    ( Var _, NoOffset) -> (try (LMap.find lv x.lmap, x) with  Not_found -> create_vertex lv x)
+  | (Mem e, NoOffset) ->
+    begin
+      match e.enode with
+        Const _ -> failwith "Not implemented "
+      | Lval lv1 ->
+        let v1,x = find_or_create_vertex lv1 x in
+        begin
+          match G.succ x.graph v1 with
+            [] ->
+            let v,new_x = create_vertex lv x in
+            v, {new_x with graph= G.add_edge new_x.graph v1 v}
+          | [v] -> v,x
+          | _ -> failwith "invariant violated"
+        end
+      | SizeOf  _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> failwith "Not implemented "
+
+      | UnOp  _ | BinOp _  -> failwith "Not implemented "
+                                
+      | CastE (_,e) -> find_or_create_vertex (Mem e, NoOffset) x
+      | AddrOf lv -> find_or_create_vertex lv x
+      | StartOf lv ->  find_or_create_vertex lv x
+    end
+  | _ -> failwith "Not implemented "
+
+
+let find_vertex lv x =
+  let v,x1 = find_or_create_vertex lv x in
+  if x == x1
+    (* if x has not been modified, then the vertex was found, not created *)
+  then v
+  else raise Not_found
 
 let points_to (lv:lval) (x:t): V.t list * t =
   let (v,x) = find_or_create_vertex lv x in
