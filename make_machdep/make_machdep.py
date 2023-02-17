@@ -63,8 +63,12 @@ my_path = Path(sys.argv[0]).parent
 parser = argparse.ArgumentParser(prog="make_machdep")
 parser.add_argument("-v", "--verbose", action="store_true")
 parser.add_argument("-o", default=sys.stdout, type=argparse.FileType("w"), dest="dest_file")
-parser.add_argument("--compiler", default="cc", help="which compiler to use. Default is 'cc'")
-parser.add_argument("--compiler-version")
+parser.add_argument("--compiler", default="cc", help="which compiler to use; default is 'cc'")
+parser.add_argument(
+    "--compiler-version",
+    default="--version",
+    help="option to pass to the compiler to obtain its version; default is --version"
+)
 parser.add_argument(
     "--cpp-arch-flags",
     nargs="+",
@@ -75,7 +79,7 @@ parser.add_argument(
     "--compiler-flags",
     nargs="+",
     default=["-c"],
-    help="flags to be given to the compiler (other than those set by --cpp-arch-flags); by default, '-c'",
+    help="flags to be given to the compiler (other than those set by --cpp-arch-flags); default is '-c'",
 )
 parser.add_argument("--check", action="store_true")
 args, other_args = parser.parse_known_args()
@@ -224,6 +228,15 @@ for (f, typ) in source_files:
         warnings.warn(f"WARNING: could not identify value of '{p.stem}', skipping")
         continue
     find_value(p.stem, typ, proc.stderr.decode())
+
+version_output = subprocess.run(
+    [args.compiler, args.compiler_version], capture_output=True, text=True
+)
+version = version_output.stdout.splitlines()[0]
+
+machdep["compiler"] = args.compiler
+machdep["cpp_arch_flags"] = ' '.join(args.cpp_arch_flags)
+machdep["version"] = version
 
 missing_fields = [f for [f, v] in machdep.items() if v is None]
 
