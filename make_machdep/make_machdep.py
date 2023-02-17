@@ -153,7 +153,6 @@ source_files = [
     ("sizeof_longdouble.c", "number"),
     ("sizeof_void.c", "number"),
     ("sizeof_fun.c", "number"),
-    ("sizeof_alignof_standard.c", "number"),
     ("alignof_short.c", "number"),
     ("alignof_int.c", "number"),
     ("alignof_long.c", "number"),
