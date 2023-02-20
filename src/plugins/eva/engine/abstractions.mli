@@ -20,6 +20,134 @@
 (*                                                                        *)
 (**************************************************************************)
 
+
+
+module Value : sig
+  type 'v key = 'v Abstract.Value.key
+  type 'v value = (module Abstract_value.S with type t = 'v)
+
+  type 'v registered
+  type 'v register = { key : 'v key ; value : 'v value }
+  val register : 'v register -> 'v registered
+
+  type 'v dependencies =
+    | Last : 'v registered -> 'v dependencies
+    | (::) : 'a registered * 'b dependencies -> ('a * 'b) dependencies
+end
+
+
+
+module Location : sig
+  type 'l key = 'l Abstract.Location.key
+  type ('v, 'l) location =
+    (module Abstract_location.S with type value = 'v and type location = 'l)
+
+  type 'l registered
+  type ('v, 'l) register =
+    { key : 'l key
+    ; location : ('v, 'l) location
+    ; dependencies : 'v Value.dependencies
+    }
+
+  val register : ('v, 'l) register -> 'l registered
+
+  type 'l dependencies =
+    | Last : 'l registered -> 'l dependencies
+    | (::) : 'a registered * 'b dependencies -> ('a * 'b) dependencies
+end
+
+
+
+module Domain : sig
+  type 's key = 's Abstract.Domain.key
+
+  module Leaf : sig
+    type ('v, 'l, 's) domain =
+      (module Abstract_domain.S
+        with type value = 'v and type location = 'l and type state = 's)
+    
+    type ('v, 'l, 's) register =
+      { key : 's key
+      ; domain : ('v, 'l, 's) domain
+      ; values : 'v Value.dependencies
+      ; locations : 'l Location.dependencies
+      }
+  end
+
+  module Functor : sig
+    module type Domain = sig
+      type location
+      module Make (V : Abstract.Value.External) : sig
+        include Abstract_domain.S
+          with type value = V.t and type location = location
+        val key : state key
+      end
+    end
+
+    type 'l domain = (module Domain with type location = 'l)
+    
+    type 'l register =
+      { domain : 'l domain
+      ; locations : 'l Location.dependencies
+      }
+  end
+
+  type registered
+  type register =
+    | Domain : ('v, 'l, 's) Leaf.register -> register
+    | Functor : 'l Functor.register -> register
+
+  val register :
+    name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
+    register -> registered
+  
+  val dynamic_register :
+    name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
+    (unit -> register) -> unit
+end
+
+
+
+module Reducer : sig
+  module type S = sig
+    include Abstract.Value.External
+    val reduce : t -> t
+  end
+
+  type 'a key = 'a Value.key
+  type ('a, 'b) reducer = 'a -> 'b -> 'a * 'b
+
+  val register : 'a key -> 'b key -> ('a, 'b) reducer -> unit
+end
+
+
+
+module type S = sig
+  module Val : Reducer.S
+  module Loc : Abstract.Location.External with type value = Val.t
+  module Dom : Abstract.Domain.External
+    with type value = Val.t and type location = Loc.location
+end
+
+module Hooks : sig
+  type hook = (module S) -> (module S)
+  val register : hook -> unit
+end
+
+module type Eva = sig
+  include S
+  module Eval: Evaluation.S
+    with type state = Dom.t
+     and type value = Val.t
+     and type loc = Loc.location
+     and type origin = Dom.origin
+end
+
+module Default : S
+
+
+(*
+
 (** Registration and building of the analysis abstractions. *)
 
 (** {2 Registration of abstractions.} *)
@@ -179,3 +307,5 @@ val make: Config.t -> (module S)
 
 module Legacy : S
 module Default : S
+
+*)
