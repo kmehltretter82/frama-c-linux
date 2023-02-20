@@ -378,12 +378,12 @@ module LvalueTaints = struct
     method! vlval lval =
       let expr = expr_of_lval lval in
       match self#current_stmt with
-      | None -> DoChildren
+      | None -> Cil.DoChildren
       | Some stmt ->
         match Results.after stmt |> EvaTaints.evaluate expr with
         | Some (Results.Untainted, _) -> DoChildren
-        | Some (t, _) -> Table.add taints lval (Kstmt stmt, t) ; DoChildren
-        | None -> DoChildren
+        | Some (t, _) -> Table.add taints lval (Kstmt stmt, t) ; Cil.DoChildren
+        | None -> Cil.DoChildren
   end
 
   let get_tainted_lvals fundec =
