@@ -20,6 +20,37 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type tool_cmds =
+  { kind: string ;
+    extensions: string list ;
+    name: string ;
+    available_cmd: string ; (* leaves it empty to set it as unavailable *)
+    check_cmd: string ; (* leaves it empty if there is no check command *)
+    update_cmd: string (* leaves it empty if there is no updating command *)
+  }
+
+(**************************************************************************)
+(** The only part to modify for adding a new external formatters *)
+
+(** Supported indent formatters *)
+let external_formatters = [
+  { kind = "C";
+    extensions = [ ".c" ; ".h" ];
+    name = "clang-format";
+    available_cmd = "clang-format --version > /dev/null 2> /dev/null";
+    check_cmd = "clang-format --dry-run -Werror" ;
+    update_cmd = "clang-format -i"
+  }
+  ;
+  { kind = "Python";
+    extensions = [ ".py" ];
+    name = "black";
+    available_cmd = "black --version > /dev/null 2> /dev/null";
+    check_cmd = "black --quiet --line-length 100 --check" ;
+    update_cmd = "black --quiet --line-length 100"
+  }
+]
+
 (**************************************************************************)
 (* Warning/Error *)
 
@@ -65,36 +96,31 @@ let lines_from_in channel =
   List.rev acc
 
 (**************************************************************************)
-(* Supported indent formatter *)
-
-type formatter_cmds =
+type available_tools =
   { mutable is_available: bool option ;
-    kind: string ;
-    name: string ;
-    available_cmd: string ;
-    check_cmd: string ;
-    update_cmd: string (* leaves it empty if there is no updating command *)
+    tool_cmds: tool_cmds
   }
 
-let c_indent_formatter =
-  { is_available = None ;
-    kind = "C";
-    name = "clang-format";
-    available_cmd = "clang-format --version > /dev/null 2> /dev/null";
-    check_cmd = "clang-format --dry-run -Werror" ;
-    update_cmd = "clang-format -i"
-  }
+type indent_formatter = Ocp_indent | Tool of available_tools
 
-let python_indent_formatter =
-  { is_available = None ;
-    kind = "Python";
-    name = "black";
-    available_cmd = "black --version > /dev/null 2> /dev/null";
-    check_cmd = "black --quiet --line-length 100 --check" ;
-    update_cmd = "black --quiet --line-length 100"
-  }
+(* from formatter name *)
+let external_tbl = Hashtbl.create 13
 
-type indent_formatter = Ocp_indent | Tool of  formatter_cmds
+(* from file extension *)
+let default_tbl = Hashtbl.create 13
+
+let updates_tbl external_tools =
+  List.iter (fun formatter ->
+      let tool = Tool { is_available = None; tool_cmds = formatter } in
+      List.iter (fun extension ->
+          Hashtbl.add default_tbl extension tool)
+        formatter.extensions;
+      Hashtbl.add external_tbl formatter.name tool)
+    external_tools
+
+let () = updates_tbl external_formatters
+
+(************************)
 
 let ml_indent_formatter = Ocp_indent
 
@@ -104,11 +130,13 @@ let parse_indent_formatter ~file ~attr ~value = match value with
   | "unset" -> NoCheck
   | "set"   -> Check None (* use the default formatter *)
   | "ocp-indent" -> Check (Some ml_indent_formatter)
-  | "clang-format" -> Check (Some (Tool c_indent_formatter))
-  | "black" -> Check (Some (Tool python_indent_formatter))
-  | _ -> warn "Unsupported indent formatter: %s %s=%s@."
-           file attr value;
-    NoCheck
+  | _ ->
+    match Hashtbl.find_opt external_tbl value with
+    | None ->
+      warn "Unsupported indent formatter: %s %s=%s@."
+        file attr value;
+      NoCheck
+    | res -> Check res
 
 (**************************************************************************)
 (* Available Checks and corresponding attributes *)
@@ -284,11 +312,13 @@ let check_ml_indent ~update file =
 let is_formatter_available ~file indent_formatter =
   match indent_formatter.is_available with
   | None ->
-    let is_available = (0 = Sys.command indent_formatter.available_cmd) in
+    let is_available =
+      let cmd = indent_formatter.tool_cmds.available_cmd in
+      (cmd <> "") && (0 = Sys.command cmd) in
     indent_formatter.is_available <- Some is_available ;
     if not is_available then
       warn "%s is unavailable for checking indentation of some %s files (i.e. %s)@."
-        indent_formatter.name indent_formatter.kind file;
+        indent_formatter.tool_cmds.name indent_formatter.tool_cmds.kind file;
     is_available
   | Some is_available -> is_available
 
@@ -299,19 +329,21 @@ let check_indent ~indent_formatter ~update file =
     | Some tool -> tool
     | None -> (* uses the default formatter *)
       match Filename.extension file with
-      | ".c" | ".h" -> Tool c_indent_formatter
       | ".ml" | ".mli" -> ml_indent_formatter
-      | ".py" -> Tool python_indent_formatter
-      | _ -> raise Bad_ext
+      | extension -> match Hashtbl.find_opt default_tbl extension with
+        | None -> raise Bad_ext
+        | Some tool -> tool
   in match tool with
   | Ocp_indent -> check_ml_indent ~update file
   | Tool indent_formatter ->
+    let do_cmd cmd =
+      (cmd = "") || (0 = Sys.command (Format.sprintf "%s \"%s\"" cmd file))
+    in
     if not @@ is_formatter_available ~file indent_formatter then true
     else if not update then
-      0 = Sys.command (Format.sprintf "%s \"%s\"" indent_formatter.check_cmd file)
-    else if indent_formatter.update_cmd <> "" then
-      0 = Sys.command (Format.sprintf "%s \"%s\"" indent_formatter.update_cmd file)
-    else true (* there no updating command *)
+      do_cmd indent_formatter.tool_cmds.check_cmd
+    else
+      do_cmd indent_formatter.tool_cmds.update_cmd
 
 (* Main checks *)
 
@@ -375,9 +407,9 @@ let update = ref false
 let verbose = ref false
 
 let argspec = [
-  "-u", Arg.Set update, " update ill-formed files (does not handle UTF8 update)" ;
-  "-v", Arg.Set verbose, " verbose mode" ;
-  "-s", Arg.Set strict, " considers warnings as errors for the exit value" ;
+  "-u", Arg.Set update, " Update ill-formed files (does not handle UTF8 update)" ;
+  "-v", Arg.Set verbose, " Verbose mode" ;
+  "-s", Arg.Set strict, " Considers warnings as errors for the exit value" ;
 ]
 let sort argspec =
   List.sort (fun (name1, _, _) (name2, _, _) -> String.compare name1 name2)
@@ -391,6 +423,7 @@ let () =
     (Arg.align (sort argspec))
     (fun s -> warn "Unknown argument: %s@." s)
     ("Usage: git ls-files -z | git check-attr --stdin -z -a | " ^ exec_name ^ " [options]");
+  updates_tbl external_formatters ;
   collect @@ lines_from_in stdin ;
   Hashtbl.iter (check ~verbose:!verbose ~update:!update) table ;
   if not !res then exit 1
