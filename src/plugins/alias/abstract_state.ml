@@ -72,6 +72,7 @@ type t = {
   lmap : V.t LMap.t ; (* lmap(lv) is the vertex v corresponding to lval lv, in other words lv is in label(v) *)
   vmap : LSet.t VMap.t ;(* reverse of lmap *)
   cmpt : Int.t ; (* counter to create new vertex *)
+  collapsed : LSet.t (* arrays that are collapsed du to non-constant accesses *)
 }
 
 
@@ -101,7 +102,8 @@ let print_debug fmt (x:t) =
   Format.fprintf fmt "@[<hov 2>VMap: @.";
   VMap.iter (fun v ls -> Format.fprintf fmt "(id = %d -> lset= %a)@." v LSet.pretty ls) x.vmap;
   Format.fprintf fmt "@]@.";
-  Format.fprintf fmt "cmpt: %d@." x.cmpt
+  Format.fprintf fmt "cmpt: %d@." x.cmpt;
+  Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty x.collapsed
 
 let print_aliases fmt (x:t) =
   let iter_vmap v set_lv =
@@ -135,6 +137,7 @@ let print_aliases fmt (x:t) =
   in
   Format.fprintf fmt "@[<hov 2><list of may-alias>@.";
   VMap.iter iter_vmap x.vmap;
+  Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty x.collapsed;
   Format.fprintf fmt "<end of list>@]@."
 
 let pretty ?(debug=false) =
@@ -176,6 +179,7 @@ let assert_invariants (x:t) : unit =
     assert (LSet.fold (fun lv acc -> acc && LMap.mem lv x.lmap) ls true)
   in
   VMap.iter assert_vmap x.vmap
+(* TODO : check collapsed *) 
 
 (* for debuging *)
 let assert_invariants x =
@@ -213,11 +217,14 @@ let create_cst_vertex (x:t) : V.t * t =
   let new_lmap = x.lmap in
   let new_vmap = VMap.add new_v LSet.empty x.vmap in
   new_v ,
-  {graph = new_g ;
-   pending = new_pending ;
-   lmap = new_lmap ;
-   vmap = new_vmap ;
-   cmpt = x.cmpt+1}
+  {
+    graph = new_g ;
+    pending = new_pending ;
+    lmap = new_lmap ;
+    vmap = new_vmap ;
+    cmpt = x.cmpt+1 ;
+    collapsed = x.collapsed
+  }
 
 
 let create_vertex (lv:lval) (x:t) : V.t * t =
@@ -229,11 +236,14 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
   (* if [lv] is a pointer variable, also create a vertex labelled by
      *[lv] *)
   let new_x =
-    {graph = new_g ;
-     pending = new_pending ;
-     lmap = new_lmap ;
-     vmap = new_vmap ;
-     cmpt = x.cmpt+1}
+    {
+      graph = new_g ;
+      pending = new_pending ;
+      lmap = new_lmap ;
+      vmap = new_vmap ;
+      cmpt = x.cmpt+1 ;
+      collapsed = x.collapsed
+    }
   in
   assert_invariants new_x;
   match lv with
@@ -250,9 +260,38 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
   | _ ->
     new_v , new_x
 
+(* transforms the offset (and the graph) in case of an variable index:
+   
 
+*)
+(* let is_collapsed lv x =
+ *   LSet.mem lv x.collapsed
+ * 
+ * let rec manage_offset (o:offset) (x:t) : offset * t =
+ *   match o with
+ *   | NoOffset -> o,x
+ *   | Field (f,o) ->
+ *     let o, x = manage_offset o x in
+ *     Field(f,o), x
+ *   | Index _ ->
+ *     o,x *)
+    (* TODO
+    let host = fst lv in
+    if (is_collapsed host x)
+    then
+      (* return the collapsed lvap*)
+      (host,Index(Cil.mone ~loc:location,location)) , x
+    else
+    if Cil.isConstant exp then
+      begin
+ 
+      ignore exp; lv,x
+    end
+*)
+    
 (* find the vertex of an lval *)
-let rec find_or_create_vertex (lv:lval) (x:t) =
+let rec find_or_create_vertex (lv:lval) (x:t) : V.t * t =
+  (* let lv,x = manage_offset lv x in *)
   match lv with
     ( Var _, NoOffset) -> (try (LMap.find lv x.lmap, x) with  Not_found -> create_vertex lv x)
   | (Mem e, NoOffset) ->
@@ -303,7 +342,8 @@ let remove_cst_vertex (v:V.t) (x:t) : t =
     pending = VMap.remove v x.pending;
     lmap = x.lmap;
     vmap = VMap.remove v x.vmap;
-    cmpt = x.cmpt
+    cmpt = x.cmpt;
+    collapsed = x.collapsed
   }
 
 (* remove a lval from a graph*)
@@ -378,7 +418,7 @@ let merge x v1 v2 =
     let g = G.fold_pred f_fold_pred g v2 g in
     (* remove v2 *)
     let g =  G.remove_vertex g v2 in
-    {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt}
+    {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt ; collapsed = x.collapsed}
 
 
 (** functions for steensgard's algorithm *)
@@ -719,7 +759,7 @@ let rename_all_vertex (x:t) : t =
       VMap.empty
   in
   let new_x =
-    {graph = renamed_graph; pending = renamed_pending ; lmap = renamed_lmap ; vmap = renamed_vmap ; cmpt = !new_cmpt }
+    {graph = renamed_graph; pending = renamed_pending ; lmap = renamed_lmap ; vmap = renamed_vmap ; cmpt = !new_cmpt ; collapsed = x.collapsed}
   in
   assert_invariants new_x; new_x
 
@@ -763,6 +803,9 @@ let union  (a1:t) (a2:t) :t =
       a2.vmap
       a1.vmap
   in
+  let new_collapsed =
+    LSet.union a1.collapsed a2.collapsed
+  in
   (* s_acc = set of couples that should be merged in step 3 *)
   let set_to_be_merged, new_lmap =
     LMap.fold
@@ -779,7 +822,7 @@ let union  (a1:t) (a2:t) :t =
       a2.lmap
       (V2Set.empty, a1.lmap)
   in
-  let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = a1.cmpt + a2.cmpt } in
+  let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = a1.cmpt + a2.cmpt ; collapsed = new_collapsed } in
 
   (* step 3 *)
   let new_a =
@@ -836,7 +879,7 @@ let union  (a1:t) (a2:t) :t =
   new_a
 
 let initial_value :t =
-  {graph = G.empty; pending = VMap.empty ; lmap = LMap.empty; vmap = VMap.empty; cmpt = 0}
+  {graph = G.empty; pending = VMap.empty ; lmap = LMap.empty; vmap = VMap.empty; cmpt = 0; collapsed = LSet.empty}
 
 
 let make_top (x:t) : t =
@@ -855,7 +898,7 @@ let make_top (x:t) : t =
       VMap.add 0 !set_lv VMap.empty
     in
     let p = VMap.add 0 VSet.empty VMap.empty in
-    {graph = g ; pending = p ; lmap = lmap ; vmap = vmap ; cmpt = 1}
+    {graph = g ; pending = p ; lmap = lmap ; vmap = vmap ; cmpt = 1; collapsed = x.collapsed}
 
 (** a type for summaries of functions *)
 type summary =
