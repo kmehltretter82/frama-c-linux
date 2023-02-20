@@ -28,6 +28,7 @@ type tool_cmds =
     check_cmd: string ; (* leaves it empty if there is no check command *)
     update_cmd: string (* leaves it empty if there is no updating command *)
   }
+[@@deriving yojson]
 
 (**************************************************************************)
 (** The only part to modify for adding a new external formatters *)
@@ -113,12 +114,27 @@ let updates_tbl external_tools =
   List.iter (fun formatter ->
       let tool = Tool { is_available = None; tool_cmds = formatter } in
       List.iter (fun extension ->
-          Hashtbl.add default_tbl extension tool)
+          Hashtbl.replace default_tbl extension tool)
         formatter.extensions;
       Hashtbl.add external_tbl formatter.name tool)
     external_tools
 
 let () = updates_tbl external_formatters
+
+type tools = tool_cmds list
+[@@deriving yojson]
+
+let parse_config config_file =
+  if config_file <> "" then
+    let config_tools =
+      try
+        tools_of_yojson (Yojson.Safe.from_file config_file)
+      with Yojson.Json_error txt ->
+        Error txt
+    in match config_tools with
+    | Result.Ok external_tools -> updates_tbl external_tools
+    | Result.Error txt ->
+      warn "Parse error:%s:%s" config_file txt
 
 (************************)
 
@@ -405,11 +421,15 @@ let check ~verbose ~update file params =
 let exec_name = Sys.argv.(0)
 let update = ref false
 let verbose = ref false
+let config_file = ref ""
+let extract_config = ref false
 
 let argspec = [
   "-u", Arg.Set update, " Update ill-formed files (does not handle UTF8 update)" ;
   "-v", Arg.Set verbose, " Verbose mode" ;
   "-s", Arg.Set strict, " Considers warnings as errors for the exit value" ;
+  "-c", Arg.String (fun s -> config_file := s), "<config-file> Reads the JSON configuration file (allows to overload the default configuration)" ;
+  "-e", Arg.Set extract_config, " Print default JSON configuration" ;
 ]
 let sort argspec =
   List.sort (fun (name1, _, _) (name2, _, _) -> String.compare name1 name2)
@@ -423,7 +443,13 @@ let () =
     (Arg.align (sort argspec))
     (fun s -> warn "Unknown argument: %s@." s)
     ("Usage: git ls-files -z | git check-attr --stdin -z -a | " ^ exec_name ^ " [options]");
-  updates_tbl external_formatters ;
-  collect @@ lines_from_in stdin ;
-  Hashtbl.iter (check ~verbose:!verbose ~update:!update) table ;
-  if not !res then exit 1
+  if !extract_config then
+    Format.printf "Default JSON configuration:@.%a@."
+      (Yojson.Safe.pretty_print ~std:false) (tools_to_yojson external_formatters)
+  else begin
+    updates_tbl external_formatters ;
+    parse_config !config_file;
+    collect @@ lines_from_in stdin ;
+    Hashtbl.iter (check ~verbose:!verbose ~update:!update) table ;
+    if not !res then exit 1
+  end
