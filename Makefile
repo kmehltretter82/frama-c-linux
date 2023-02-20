@@ -43,6 +43,12 @@ FRAMAC_LINTCK_SRC:=tools/lint
 
 .PHONY: all
 
+ifneq (${DUNE_WS},)
+  WORKSPACE_OPT:=--workspace dev/dune-workspace.${DUNE_WS}
+else
+  WORKSPACE_OPT:=
+endif
+
 all::
 ifeq (${FRAMAC_DEVELOPER},yes)
 	dune build --no-print-directory --root ${FRAMAC_LINTCK_SRC}
@@ -53,7 +59,7 @@ ifneq ($(DISABLED_PLUGINS),)
 	rm -rf _build .merlin
 	./dev/disable-plugins.sh ${DISABLED_PLUGINS}
 endif
-	dune build $(DUNE_BUILD_OPTS) @install
+	dune build ${WORKSPACE_OPT} ${DUNE_BUILD_OPTS} @install
 
 clean:: purge-tests # to be done before a "dune" command
 ifeq (${FRAMAC_DEVELOPER},yes)
