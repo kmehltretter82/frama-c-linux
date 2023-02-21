@@ -1889,8 +1889,6 @@ type mach = {
   alignof_str: int;       (* Alignment of strings *)
   alignof_fun: int;       (* Alignment of function. Negative if unsupported. *)
   char_is_unsigned: bool; (* Whether "char" is unsigned *)
-  underscore_name: bool;  (* If assembly names have leading underscore *)
-  const_string_literals: bool; (* Whether string literals have const chars *)
   little_endian: bool; (* whether the machine is little endian *)
   alignof_aligned: int (* Alignment of a type with aligned attribute *);
   has__builtin_va_list: bool (* Whether [__builtin_va_list] is a known type *);

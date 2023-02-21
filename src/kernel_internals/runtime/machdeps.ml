@@ -75,9 +75,7 @@ let x86_16 = {
   (* I don't know if attribute aligned is supported by any 16bits
      compiler. *)
   char_is_unsigned = false;
-  const_string_literals = true;
   little_endian = true;
-  underscore_name = true ;
   has__builtin_va_list = true;
 }
 
@@ -115,9 +113,7 @@ let x86_32 = {
   alignof_fun = -1;
   alignof_aligned= 16;
   char_is_unsigned = false;
-  const_string_literals = true;
   little_endian = true;
-  underscore_name = false ;
   has__builtin_va_list = true;
 }
 
@@ -155,9 +151,7 @@ let x86_64 = {
   alignof_fun = -1;
   alignof_aligned= 16;
   char_is_unsigned = false;
-  const_string_literals = true;
   little_endian = true;
-  underscore_name = false ;
   has__builtin_va_list = true;
 }
 
@@ -195,9 +189,7 @@ let ppc_32 = {
   alignof_fun = 4;
   alignof_aligned= 16;
   char_is_unsigned = false;
-  const_string_literals = true;
   little_endian = false;
-  underscore_name = false ;
   has__builtin_va_list = true;
 }
 
@@ -232,8 +224,6 @@ let msvc_x86_64 = {
   alignof_aligned= 1; (* MSVC does not seem to have an 'align' attribute
                          equivalent to GCC's *)
   char_is_unsigned = false;
-  const_string_literals = true;
   little_endian = true;
-  underscore_name = false ;
   has__builtin_va_list = false;
 }

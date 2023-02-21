@@ -267,10 +267,6 @@ let print_machdep fmt (m : Cil_types.mach) =
       (if m.char_is_unsigned then "unsigned" else "signed");
     Format.fprintf fmt "   machine is %s endian@\n"
       (if m.little_endian then "little" else "big") ;
-    Format.fprintf fmt "   strings are %s chars@\n"
-      (if m.const_string_literals then "const" else "writable") ;
-    Format.fprintf fmt "   assembly names %s leading '_'@\n"
-      (if m.underscore_name then "have" else "have no") ;
     Format.fprintf fmt "   compiler %s builtin __va_list@\n"
       (if m.has__builtin_va_list then "has" else "has not") ;
   end
@@ -386,7 +382,11 @@ let get_machdep () =
       if is_default_machdep m then default_machdep_file m
       else Filepath.Normalized.of_string ~existence:Must_exist m
     in
-    mach_of_yojson (Yojson.Safe.from_file (file:>string))
+    try
+      mach_of_yojson (Yojson.Safe.from_file (file:>string))
+    with
+      Ppx_yojson_conv_lib.Yojson_conv.Of_yojson_error(exn,_) ->
+      Kernel.fatal "Error during machdep parsing: %s" (Printexc.to_string exn)
 
 let list_available_machdeps () =
   CustomMachdeps.fold (fun m _ acc -> m :: acc) (default_machdeps ())
