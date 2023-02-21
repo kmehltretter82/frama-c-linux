@@ -42,9 +42,9 @@ module Make
     (Domain : Queries with type value = Value.t
                        and type location = Loc.location)
   : Evaluation_sig.S with type state = Domain.state
-       and type value = Value.t
-       and type origin = Domain.origin
-       and type loc = Loc.location
+                      and type value = Value.t
+                      and type origin = Domain.origin
+                      and type loc = Loc.location
 
 (*
 Local Variables:

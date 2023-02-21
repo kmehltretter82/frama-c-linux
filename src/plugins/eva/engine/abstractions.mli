@@ -65,7 +65,7 @@ module Domain : sig
     type ('v, 'l, 's) domain =
       (module Abstract_domain.S
         with type value = 'v and type location = 'l and type state = 's)
-    
+
     type ('v, 'l, 's) register =
       { key : 's key
       ; domain : ('v, 'l, 's) domain
@@ -85,7 +85,7 @@ module Domain : sig
     end
 
     type 'l domain = (module Domain with type location = 'l)
-    
+
     type 'l register =
       { domain : 'l domain
       ; locations : 'l Location.dependencies
@@ -100,7 +100,7 @@ module Domain : sig
   val register :
     name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
     register -> registered
-  
+
   val dynamic_register :
     name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
     (unit -> register) -> unit

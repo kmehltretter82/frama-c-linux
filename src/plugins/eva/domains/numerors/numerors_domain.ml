@@ -163,7 +163,7 @@ let () =
     ; locations = Last Main_locations.PLoc.registered
     }
     (* { values = Single (module Numerors_value); *)
-      (* domain = Domain (module Domain); } *)
+    (* domain = Domain (module Domain); } *)
   in
   let reduced_product = Main_values.CVal.key, Numerors_value.key, reduce_error in
   ignore (register ~name ~descr ~experimental abstraction);

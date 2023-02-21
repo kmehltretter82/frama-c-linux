@@ -87,7 +87,7 @@ module Make
   let no_offset = Left.no_offset, Right.no_offset
 
   let forward_field typ info (l, r) =
-    Left.forward_field typ info l, Right.forward_field typ info r 
+    Left.forward_field typ info l, Right.forward_field typ info r
 
   let forward_variable typ varinfo (l, r) =
     let* l = Left.forward_variable  typ varinfo l in
@@ -110,7 +110,7 @@ module Make
   let to_value (l, r) = Value.join (Left.to_value l) (Right.to_value r)
 
   let forward_index typ v (l, r) =
-    Left.forward_index typ v l, Right.forward_index typ v r 
+    Left.forward_index typ v l, Right.forward_index typ v r
 
   let forward_pointer typ v (lo, ro) =
     let* l = Left.forward_pointer  typ v lo in

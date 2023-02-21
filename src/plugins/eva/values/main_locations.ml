@@ -240,9 +240,9 @@ module PLoc = struct
   include Location
   let key = Structure.Key_Location.create_key "precise_locs"
   let registered = Abstractions.Location.register
-    { key ; location = (module Location)
-    ; dependencies = Last Main_values.CVal.registered
-    }
+      { key ; location = (module Location)
+      ; dependencies = Last Main_values.CVal.registered
+      }
 end
 
 (*
