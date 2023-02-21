@@ -23,8 +23,15 @@
 open Eval
 
 
-module Common (Left: Abstract_location.S) (Right: Abstract_location.S) = struct
-  (* TODO: maybe wrong if left and right use the same offset *)
+
+module Make
+    (Value: Abstract_value.S)
+    (Left: Abstract.Location.Internal with type value = Value.t)
+    (Right: Abstract.Location.Internal with type value = Value.t)
+= struct
+  type value = Value.t
+  let structure = Abstract.Location.Node (Left.structure, Right.structure)
+
   type offset = Left.offset * Right.offset
   type location = Left.location * Right.location
 
@@ -48,17 +55,34 @@ module Common (Left: Abstract_location.S) (Right: Abstract_location.S) = struct
   let replace_base subst (l, r) =
     Left.replace_base subst l, Right.replace_base subst r
 
-  let assume_no_overlap ~partial (l, r) (l', r') =
-    let left  = Left.assume_no_overlap  ~partial l l' in
-    let right = Right.assume_no_overlap ~partial r r' in
-    (* TODO: don't known how to combine *)
-    assert false
+  (* Intersects the truth values [t1] and [t2] coming from [assume_] functions
+     from both abstract values. [v1] and [v2] are the initial values leading to
+     these truth values, that may be reduced by the assumption. [combine]
+     combines values from both abstract values into values of the product. *)
+  let narrow_any_truth combine (v1, t1) (v2, t2) = match t1, t2 with
+    | `Unreachable, _ | _, `Unreachable
+    | (`True | `TrueReduced _), `False
+    | `False, (`True | `TrueReduced _) -> `Unreachable
+    | `False, _ | _, `False -> `False
+    | `Unknown v1, `Unknown v2 -> `Unknown (combine v1 v2)
+    | (`Unknown v1 | `TrueReduced v1), `True -> `TrueReduced (combine v1 v2)
+    | `True, (`Unknown v2 | `TrueReduced v2) -> `TrueReduced (combine v1 v2)
+    | (`Unknown v1 | `TrueReduced v1),
+      (`Unknown v2 | `TrueReduced v2) -> `TrueReduced (combine v1 v2)
+    | `True, `True -> `True
+
+  let narrow_truth = narrow_any_truth (fun left right -> left, right)
+
+  let assume_no_overlap ~partial (l1, r1) (l2, r2) =
+    let l_truth = Left.assume_no_overlap  ~partial l1 l2 in
+    let r_truth = Right.assume_no_overlap ~partial r1 r2 in
+    let combine (l1, l2) (r1, r2) = (l1, r1), (l2, r2) in
+    narrow_any_truth combine ((l1, l2), l_truth) ((r1, r2), r_truth)
 
   let assume_valid_location ~for_writing ~bitfield (l, r) =
-    let left  = Left.assume_valid_location  ~for_writing ~bitfield l in
-    let right = Right.assume_valid_location ~for_writing ~bitfield r in
-    (* TODO: don't known how to combine *)
-    assert false
+    let l_truth = Left.assume_valid_location  ~for_writing ~bitfield l in
+    let r_truth = Right.assume_valid_location ~for_writing ~bitfield r in
+    narrow_truth (l, l_truth) (r, r_truth)
 
   let no_offset = Left.no_offset, Right.no_offset
 
@@ -81,44 +105,6 @@ module Common (Left: Abstract_location.S) (Right: Abstract_location.S) = struct
     let* lo = Left.backward_field  typ info lo in
     let* ro = Right.backward_field typ info ro in
     `Value (lo, ro)
-end
-
-
-
-module Make (Left: Abstract_location.S) (Right: Abstract_location.S) = struct
-  include Common (Left) (Right)
-  type value = Left.value * Right.value
-
-  let to_value (l, r) = Left.to_value l, Right.to_value r
-
-  let forward_index typ (lv, rv) (l, r) =
-    Left.forward_index typ lv l, Right.forward_index typ rv r 
-
-  let forward_pointer typ (lv, rv) (lo, ro) =
-    let* l = Left.forward_pointer  typ lv lo in
-    let* r = Right.forward_pointer typ rv ro in
-    `Value (l, r)
-
-  let backward_pointer (lv, rv) (lo, ro) (l, r) =
-    let* (lv, lo) = Left.backward_pointer  lv lo l in
-    let* (rv, ro) = Right.backward_pointer rv ro r in
-    `Value ((lv, rv), (lo, ro))
-
-  let backward_index typ ~index:(li, ri) ~remaining:(lrem, rrem) (lo, ro) =
-    let* (lv, lo) = Left.backward_index  typ ~index:li ~remaining:lrem lo in
-    let* (rv, ro) = Right.backward_index typ ~index:ri ~remaining:rrem ro in
-    `Value ((lv, rv), (lo, ro))
-end
-
-
-
-module Same_value
-    (Value: Abstract_value.S)
-    (Left: Abstract_location.S with type value = Value.t)
-    (Right: Abstract_location.S with type value = Value.t)
-= struct
-  include Common (Left) (Right)
-  type value = Value.t
 
   (* TODO: ??? *)
   let to_value (l, r) = Value.join (Left.to_value l) (Right.to_value r)

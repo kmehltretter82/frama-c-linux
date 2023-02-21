@@ -23,11 +23,19 @@
 (** Main numeric values of Eva. *)
 
 (** Abstract values built over Cvalue.V *)
-module CVal : Abstract_value.Leaf with type t = Cvalue.V.t
+module CVal : sig
+  include Abstract_value.S with type t = Cvalue.V.t
+  val key : t Abstract_value.key
+  val registered : t Abstractions.Value.registered
+end
 
 (** Dummy interval: no forward nor backward propagations.
     [None] is top. *)
-module Interval : Abstract_value.Leaf with type t = Ival.t option
+module Interval : sig
+  include Abstract_value.S with type t = Ival.t option
+  val key : t Abstract_value.key
+  val registered : t Abstractions.Value.registered
+end
 
 (*
 Local Variables:

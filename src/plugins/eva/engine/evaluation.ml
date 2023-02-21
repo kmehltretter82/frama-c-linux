@@ -183,36 +183,6 @@ let exp_alarm_signed_converted_downcast =
        let signed_exp = Cil.new_exp ~loc:exp.eloc (CastE (signed_typ, exp)) in
        signed_exp)
 
-module type S = sig
-  type state
-  type value
-  type origin
-  type loc
-  module Valuation : Valuation with type value = value
-                                and type origin = origin
-                                and type loc = loc
-  val to_domain_valuation:
-    Valuation.t -> (value, loc, origin) Abstract_domain.valuation
-  val evaluate :
-    ?valuation:Valuation.t -> ?reduction:bool -> ?subdivnb:int ->
-    state -> exp -> (Valuation.t * value) evaluated
-  val copy_lvalue :
-    ?valuation:Valuation.t -> ?subdivnb:int ->
-    state -> lval -> (Valuation.t * value flagged_value) evaluated
-  val lvaluate :
-    ?valuation:Valuation.t -> ?subdivnb:int -> for_writing:bool ->
-    state -> lval -> (Valuation.t * loc * typ) evaluated
-  val reduce:
-    ?valuation:Valuation.t -> state -> exp -> bool -> Valuation.t evaluated
-  val assume:
-    ?valuation:Valuation.t -> state -> exp -> value -> Valuation.t or_bottom
-  val eval_function_exp:
-    ?subdivnb:int -> exp -> ?args:exp list -> state ->
-    (Kernel_function.t * Valuation.t) list evaluated
-  val interpret_truth:
-    alarm:(unit -> Alarms.t) -> 'a -> 'a Abstract_value.truth -> 'a evaluated
-end
-
 let return t = `Value t, Alarmset.none
 
 (* Intersects [alarms] with the only possible alarms from the dereference of
@@ -1689,6 +1659,15 @@ module Make
           Bottom.bot_of_list list, alarms
       end
     | _ -> assert false
+end
+
+module type Eva = sig
+  include Abstractions.S
+  module Eval : Evaluation_sig.S
+    with type state = Dom.t
+     and type value = Val.t
+     and type loc = Loc.location
+     and type origin = Dom.origin
 end
 
 

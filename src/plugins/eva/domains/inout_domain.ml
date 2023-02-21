@@ -267,6 +267,16 @@ module D
   let extract_lval ~oracle:_ _context _state _lv _typ _locs = top_query
 end
 
+let registered =
+  let name = "inout" and priority = 5 and experimental = true in
+  let descr = "Infers the inputs and outputs of each function." in
+  Abstractions.Domain.register ~name ~priority ~experimental ~descr @@ Domain
+    { key = D.key ; domain = (module D)
+    ; values = Last Main_values.CVal.registered
+    ; locations = Last Main_locations.PLoc.registered
+    }
+
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

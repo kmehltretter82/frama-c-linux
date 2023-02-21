@@ -27,7 +27,7 @@ val signal_abort: unit -> unit
 
 module Computer
     (* Abstractions with the evaluator. *)
-    (Abstract: Abstractions.Eva)
+    (Abstract: Abstractions.S_with_evaluation)
     (* Set of states of abstract domain. *)
     (States : Powerset.S with type state = Abstract.Dom.t)
     (* Transfer functions for statement on the abstract domain. *)

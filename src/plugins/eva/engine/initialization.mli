@@ -45,8 +45,8 @@ end
 
 module Make
     (Domain: Abstract.Domain.External)
-    (Eva: Evaluation.S with type state = Domain.state
-                        and type loc = Domain.location)
+    (Eva: Evaluation_sig.S with type state = Domain.state
+                            and type loc = Domain.location)
     (Transfer: Transfer_stmt.S with type state = Domain.t)
   : S with type state := Domain.t
 

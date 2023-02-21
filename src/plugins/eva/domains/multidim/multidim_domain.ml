@@ -941,15 +941,16 @@ let multidim_hook (module Abstract: Abstractions.S) : (module Abstractions.S) =
     end)
 
 (* Registers the domain. *)
-let flag =
+let registered =
   let name = "multidim"
   and descr = "Improve the precision over arrays of structures \
                or multidimensional arrays."
   and experimental = true
-  and abstraction =
-    Abstractions.{ values = Single (module Main_values.CVal);
-                   domain = Domain (module Domain); }
   in
-  Abstractions.register ~name ~descr ~experimental abstraction
+  Abstractions.Domain.register ~name ~descr ~experimental @@ Domain
+    { key = Domain.key ; domain = (module Domain)
+    ; values = Last Main_values.CVal.registered
+    ; locations = Last Main_locations.PLoc.registered
+    }
 
-let () = Abstractions.register_hook multidim_hook
+let () = Abstractions.Hooks.register multidim_hook

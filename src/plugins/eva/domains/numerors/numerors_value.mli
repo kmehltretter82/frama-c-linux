@@ -20,7 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Abstract_value.Leaf
+include Abstract_value.S
+val key : t Abstract_value.key
+val registered : t Abstractions.Value.registered
 
 val pretty_debug : t Pretty_utils.formatter
 

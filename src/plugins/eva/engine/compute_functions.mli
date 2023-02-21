@@ -25,7 +25,7 @@
 open Cil_types
 open Eval
 
-module Make (Abstract: Abstractions.Eva)
+module Make (Abstract: Abstractions.S_with_evaluation)
   : sig
 
     (** Compute a call to the main function. *)

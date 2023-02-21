@@ -108,6 +108,15 @@ end
 
 
 
+module Config : sig
+  type t
+  val equal : t -> t -> bool
+  val singleton : string -> Domain.registered -> t
+  val configure : unit -> t
+end
+
+
+
 module Reducer : sig
   module type S = sig
     include Abstract.Value.External
@@ -129,21 +138,22 @@ module type S = sig
     with type value = Val.t and type location = Loc.location
 end
 
-module Hooks : sig
-  type hook = (module S) -> (module S)
-  val register : hook -> unit
-end
-
-module type Eva = sig
+module type S_with_evaluation = sig
   include S
-  module Eval: Evaluation.S
+  module Eval : Evaluation_sig.S
     with type state = Dom.t
      and type value = Val.t
      and type loc = Loc.location
      and type origin = Dom.origin
 end
 
-module Default : S
+module Hooks : sig
+  type hook = (module S) -> (module S)
+  val register : hook -> unit
+end
+
+(* module Default : S *)
+val make : Config.t -> (module S)
 
 
 (*

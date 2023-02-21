@@ -1260,6 +1260,16 @@ module D = struct
         then project_of_cfg return_exp state
 end
 
+let registered =
+  let name = "traces" and priority = 2 and experimental = true in
+  let descr =
+    "Builds an over-approximation of all the traces that lead to a statement."
+  in
+  Abstractions.Domain.register ~name ~priority ~descr ~experimental @@ Domain
+    { key = D.key ; domain = (module D)
+    ; values = Last Main_values.CVal.registered
+    ; locations = Last Main_locations.PLoc.registered
+    }
 
 (*
 Local Variables:

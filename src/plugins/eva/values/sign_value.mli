@@ -28,6 +28,7 @@ type signs = {
   neg: bool;  (** true: maybe negative, false: never negative *)
 }
 
-include Abstract_value.Leaf with type t = signs
-
+include Abstract_value.S with type t = signs
+val key : t Abstract_value.key
 val pretty_debug: t Pretty_utils.formatter
+val registered : t Abstractions.Value.registered

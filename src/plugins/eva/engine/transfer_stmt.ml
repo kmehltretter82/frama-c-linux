@@ -114,12 +114,13 @@ let substitution_visitor table = object
     | Some vi -> Cil.ChangeTo vi
 end
 
-module Make (Abstract: Abstractions.Eva) = struct
+module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   module Value = Abstract.Val
   module Location = Abstract.Loc
   module Domain = Abstract.Dom
   module Eval = Abstract.Eval
+  include Cvalue_domain.Getters (Domain)
 
   type state = Domain.t
   type value = Value.t
@@ -633,7 +634,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* For non scalar expressions, prints the offsetmap of the cvalue domain. *)
   let show_offsm =
-    match Domain.get_cvalue, Location.get Main_locations.PLoc.key with
+    match get_cvalue, Location.get Main_locations.PLoc.key with
     | None, _ | _, None ->
       fun fmt _ _ _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
     | Some get_cvalue, Some get_ploc ->
@@ -729,7 +730,7 @@ module Make (Abstract: Abstractions.Eva) = struct
      {Cvalue_transfer.start_call}. *)
   let apply_cvalue_callback kf ki_call state =
     let stack_with_call = (kf, ki_call) :: Eva_utils.call_stack () in
-    let cvalue_state = Domain.get_cvalue_or_top state in
+    let cvalue_state = get_cvalue_or_top state in
     Db.Value.Call_Value_Callbacks.apply (cvalue_state, stack_with_call);
     let kind = `Builtin None in
     Cvalue_callbacks.apply_call_hooks stack_with_call kf kind cvalue_state

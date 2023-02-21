@@ -585,6 +585,18 @@ end
 let () = Db.Value.display := (fun fmt kf -> State.display ~fmt kf)
 
 
+let registered =
+  let name = "cvalue" and priority = 9 in
+  let descr =
+    "Main analysis domain, enabled by default. Should not be disabled."
+  in
+  Abstractions.Domain.register ~name ~priority ~descr @@ Domain
+    { key = State.key ; domain = (module State)
+    ; values = Last Main_values.CVal.registered
+    ; locations = Last Main_locations.PLoc.registered
+    }
+
+
 type prefix = Hptmap.prefix
 module Subpart = struct
   type t = Model.subtree
@@ -597,6 +609,23 @@ let distinct_subpart (a, _) (b, _) =
     try Model.comp_prefixes a b; None
     with Model.Found_prefix (p, s1, s2) -> Some (p, s1, s2)
 let find_subpart (s, _) prefix = Model.find_prefix s prefix
+
+
+module Getters (Dom : Abstract.Domain.External) = struct
+  let get_cvalue =
+    match Dom.get State.key with
+    | None -> None
+    | Some get -> Some (fun s -> fst (get s))
+
+  let get_cvalue_or_top =
+    match Dom.get State.key with
+    | None -> fun _ -> Cvalue.Model.top
+    | Some get -> fun s -> fst (get s)
+
+  let get_cvalue_or_bottom = function
+    | `Bottom -> Cvalue.Model.bottom
+    | `Value state -> get_cvalue_or_top state
+end
 
 (*
 Local Variables:

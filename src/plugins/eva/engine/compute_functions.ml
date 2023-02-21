@@ -141,7 +141,7 @@ let register_signal_handler () =
   let restore_sigint = register_handler Sys.sigint interrupt in
   fun () -> restore_sigusr1 (); restore_sigint ()
 
-module Make (Abstract: Abstractions.Eva) = struct
+module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   module PowersetDomain = Powerset.Make (Abstract.Dom)
 
@@ -153,6 +153,8 @@ module Make (Abstract: Abstractions.Eva) = struct
   module Computer =
     Iterator.Computer
       (Abstract) (PowersetDomain) (Transfer) (Init) (Logic) (Spec)
+
+  include Cvalue_domain.Getters (Abstract.Dom)
 
   let initial_state = Init.initial_state
 
@@ -185,7 +187,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       in
       call_result
     | Some (states, i) ->
-      let cvalue = Abstract.Dom.get_cvalue_or_top init_state in
+      let cvalue = get_cvalue_or_top init_state in
       Cvalue_callbacks.apply_call_hooks call.callstack call.kf `Memexec cvalue;
       (* Evaluate the preconditions of kf, to update the statuses
          at this call. *)
@@ -240,7 +242,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         "@[computing for function %a.@\nCalled from %a.@]"
         Value_types.Callstack.pretty_short call.callstack
         Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc kinstr);
-    let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
+    let cvalue_state = get_cvalue_or_top state in
     let compute, kind =
       match target with
       | `Def (fundec, save_results) ->
@@ -290,7 +292,7 @@ module Make (Abstract: Abstractions.Eva) = struct
     in
     Locations.Location_Bytes.do_track_garbled_mix true;
     let final_state = join_states states in
-    let cvalue_state = Abstract.Dom.get_cvalue_or_top state in
+    let cvalue_state = get_cvalue_or_top state in
     match final_state with
     | `Bottom ->
       let kind = `Spec spec in
@@ -299,7 +301,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       Transfer.{states; cacheable; builtin=true}
     | `Value final_state ->
       let cvalue_call = get_cvalue_call call in
-      let post = Abstract.Dom.get_cvalue_or_top final_state in
+      let post = get_cvalue_or_top final_state in
       let cvalue_states =
         Builtins.apply_builtin builtin cvalue_call ~pre:cvalue_state ~post
       in
@@ -344,7 +346,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   let store_initial_state kf init_state =
     Abstract.Dom.Store.register_initial_state (Eva_utils.call_stack ()) init_state;
-    let cvalue_state = Abstract.Dom.get_cvalue_or_top init_state in
+    let cvalue_state = get_cvalue_or_top init_state in
     Db.Value.Call_Value_Callbacks.apply (cvalue_state, [kf, Kglobal])
 
   let compute kf init_state =

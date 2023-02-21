@@ -27,6 +27,8 @@ module State : Abstract_domain.Leaf
    and type location = Main_locations.PLoc.location
    and type state = Cvalue.Model.t * Locals_scoping.clobbered_set
 
+val registered : Abstractions.Domain.registered
+
 (** Specific functions for partitioning optimizations.  *)
 
 type prefix
@@ -35,6 +37,13 @@ val distinct_subpart :
   State.t -> State.t -> (prefix * Subpart.t * Subpart.t) option
 val find_subpart : State.t -> prefix -> Subpart.t option
 
+(** Special getters. *)
+
+module Getters (Dom : Abstract.Domain.External) : sig
+  val get_cvalue : (Dom.t -> Cvalue.Model.t) option
+  val get_cvalue_or_top : Dom.t -> Cvalue.Model.t
+  val get_cvalue_or_bottom : Dom.t Lattice_bounds.or_bottom -> Cvalue.Model.t
+end
 
 
 (*

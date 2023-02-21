@@ -92,8 +92,8 @@ module Domain : sig
                                 and type 'a data := 'a data
 
     (** Special accessors for the main cvalue domain. *)
-    val get_cvalue: (t -> Cvalue.Model.t) option
-    val get_cvalue_or_top: t -> Cvalue.Model.t
-    val get_cvalue_or_bottom: t Lattice_bounds.or_bottom -> Cvalue.Model.t
+    (* val get_cvalue: (t -> Cvalue.Model.t) option *)
+    (* val get_cvalue_or_top: t -> Cvalue.Model.t *)
+    (* val get_cvalue_or_bottom: t Lattice_bounds.or_bottom -> Cvalue.Model.t *)
   end
 end

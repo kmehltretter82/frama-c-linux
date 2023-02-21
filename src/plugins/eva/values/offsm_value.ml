@@ -369,116 +369,114 @@ module Datatype_Offsm_or_top = Datatype.Make_with_collections(struct
   end)
 
 
-module Offsm : Abstract_value.Leaf with type t = offsm_or_top = struct
-  include Datatype_Offsm_or_top
+module Offsm = struct
+  module Value : Abstract_value.S with type t = offsm_or_top = struct
+    include Datatype_Offsm_or_top
+
+    let pretty_typ typ fmt = function
+      | Top as o -> pretty fmt o
+      | O o ->
+        Format.fprintf fmt "O @[%a@]"
+          (V_Offsetmap.pretty_generic ?typ ()) o
+
+    let top = Top
+
+    let is_included o1 o2 = match o1, o2 with
+      | _, Top -> true
+      | O o1, O o2 -> V_Offsetmap.is_included o1 o2
+      | Top, O _ -> false
+
+    let join o1 o2 = match o1, o2 with
+      | Top, _ | _, Top -> Top
+      | O o1, O o2 -> O (V_Offsetmap.join o1 o2)
+
+    let narrow o1 o2 = match o1, o2 with
+      | Top, o | o, Top -> `Value o
+      | O o1, O o2 ->
+        V_Offsetmap.narrow_reinterpret o1 o2 >>-: (fun o -> O o)
+
+    (* Simple values cannot be injected because we do not known their type
+       (hence size in bits *)
+    let zero = Top
+    let one = Top
+    let top_int = Top
+
+    let inject_int typ i =
+      try
+        let size = Integer.of_int (Cil.bitsSizeOf typ) in
+        O (inject ~size (V.inject_int i))
+      with Cil.SizeOfError _ -> Top
+
+    let assume_non_zero v = `Unknown v
+    let assume_bounded _ _ v = `Unknown v
+    let assume_not_nan ~assume_finite:_ _ v = `Unknown v
+    let assume_pointer v = `Unknown v
+    let assume_comparable _ v1 v2 = `Unknown (v1, v2)
+
+    let constant e _c =
+      if store_redundant then
+        match Cil.constFoldToInt e with
+        | Some i -> inject_int (Cil.typeOf e) i
+        | None -> Top
+      else Top
+
+    let resolve_functions _ = `Top, true (* TODO: extract value *)
+    let replace_base substitution = function
+      | Top -> Top
+      | O offsm ->
+        let f v = snd (Cvalue.V_Or_Uninitialized.replace_base substitution v) in
+        O (Cvalue.V_Offsetmap.map_on_values f offsm)
+
+    let forward_unop _typ op o =
+      let o' = match o, op with
+        | Top, _ | _, (Neg | LNot) -> Top
+        | O o, BNot -> O (bnot o)
+      in
+      `Value o'
+
+    let forward_binop _typ op o1 o2 =
+      let o' =
+        match o1, o2, op with
+        | O _o1, O _o2, (Shiftlt | Shiftrt) ->
+          (* It is inconvenient to handle shift here, because we need a
+             constant for o2 *)
+          Top
+        | O o1, O o2, BAnd -> O (bitwise_and o1 o2)
+        | O o1, O o2, BOr -> O (bitwise_or o1 o2)
+        | O o1, O o2, BXor -> O (bitwise_xor o1 o2)
+        | _ -> Top
+      in
+      `Value o'
+
+    let backward_binop ~input_type:_ ~resulting_type:_ _op ~left:_ ~right:_ ~result:_ =
+      `Value (None, None)
+
+    let backward_unop ~typ_arg:_ _unop ~arg:_ ~res:_ = `Value None
+
+    let backward_cast ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ =
+      `Value None
+
+    let rewrap_integer _range o = o
+
+    let forward_cast ~src_type ~dst_type o =
+      let open Eval_typ in
+      match o, src_type, dst_type with
+      | O o, (TSInt src | TSPtr src), (TSInt dst | TSPtr dst) ->
+        let old_size = Int.of_int src.i_bits in
+        let new_size = Int.of_int dst.i_bits in
+        let signed = src.i_signed in
+        `Value (O (cast ~old_size ~new_size ~signed o))
+      | _ -> `Value Top
+  end
 
   let key = Structure.Key_Value.create_key "offsetmap_value"
-
-  let pretty_typ typ fmt = function
-    | Top as o -> pretty fmt o
-    | O o ->
-      Format.fprintf fmt "O @[%a@]"
-        (V_Offsetmap.pretty_generic ?typ ()) o
-
-  let top = Top
-
-  let is_included o1 o2 = match o1, o2 with
-    | _, Top -> true
-    | O o1, O o2 -> V_Offsetmap.is_included o1 o2
-    | Top, O _ -> false
-
-  let join o1 o2 = match o1, o2 with
-    | Top, _ | _, Top -> Top
-    | O o1, O o2 -> O (V_Offsetmap.join o1 o2)
-
-  let narrow o1 o2 = match o1, o2 with
-    | Top, o | o, Top -> `Value o
-    | O o1, O o2 ->
-      V_Offsetmap.narrow_reinterpret o1 o2 >>-: (fun o -> O o)
-
-  (* Simple values cannot be injected because we do not known their type
-     (hence size in bits *)
-  let zero = Top
-  let one = Top
-  let top_int = Top
-
-  let inject_int typ i =
-    try
-      let size = Integer.of_int (Cil.bitsSizeOf typ) in
-      O (inject ~size (V.inject_int i))
-    with Cil.SizeOfError _ -> Top
-
-  let assume_non_zero v = `Unknown v
-  let assume_bounded _ _ v = `Unknown v
-  let assume_not_nan ~assume_finite:_ _ v = `Unknown v
-  let assume_pointer v = `Unknown v
-  let assume_comparable _ v1 v2 = `Unknown (v1, v2)
-
-  let constant e _c =
-    if store_redundant then
-      match Cil.constFoldToInt e with
-      | Some i -> inject_int (Cil.typeOf e) i
-      | None -> Top
-    else Top
-
-  let resolve_functions _ = `Top, true (* TODO: extract value *)
-  let replace_base substitution = function
-    | Top -> Top
-    | O offsm ->
-      let f v = snd (Cvalue.V_Or_Uninitialized.replace_base substitution v) in
-      O (Cvalue.V_Offsetmap.map_on_values f offsm)
-
-  let forward_unop _typ op o =
-    let o' = match o, op with
-      | Top, _ | _, (Neg | LNot) -> Top
-      | O o, BNot -> O (bnot o)
-    in
-    `Value o'
-
-  let forward_binop _typ op o1 o2 =
-    let o' =
-      match o1, o2, op with
-      | O _o1, O _o2, (Shiftlt | Shiftrt) ->
-        (* It is inconvenient to handle shift here, because we need a
-           constant for o2 *)
-        Top
-      | O o1, O o2, BAnd -> O (bitwise_and o1 o2)
-      | O o1, O o2, BOr -> O (bitwise_or o1 o2)
-      | O o1, O o2, BXor -> O (bitwise_xor o1 o2)
-      | _ -> Top
-    in
-    `Value o'
-
-  let backward_binop ~input_type:_ ~resulting_type:_ _op ~left:_ ~right:_ ~result:_ =
-    `Value (None, None)
-
-  let backward_unop ~typ_arg:_ _unop ~arg:_ ~res:_ = `Value None
-
-  let backward_cast ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ =
-    `Value None
-
-  let rewrap_integer _range o = o
-
-  let forward_cast ~src_type ~dst_type o =
-    let open Eval_typ in
-    match o, src_type, dst_type with
-    | O o, (TSInt src | TSPtr src), (TSInt dst | TSPtr dst) ->
-      let old_size = Int.of_int src.i_bits in
-      let new_size = Int.of_int dst.i_bits in
-      let signed = src.i_signed in
-      `Value (O (cast ~old_size ~new_size ~signed o))
-    | _ -> `Value Top
-
+  let registered = Abstractions.Value.register { key ; value = (module Value) }
+  include Value
 end
 
 
-module CvalueOffsm : Abstract.Value.Internal with type t = V.t * offsm_or_top
-= struct
-  include Value_product.Make (Main_values.CVal) (Offsm)
-
-  let structure =
-    Abstract.Value.(Node (Leaf (Main_values.CVal.key, (module Main_values.CVal)),
-                          Leaf (Offsm.key, (module Offsm))))
+module CvalueOffsm = struct
+  type t = Main_values.CVal.t * Offsm.t
 
   let size typ = Integer.of_int (Cil.bitsSizeOf typ)
 
@@ -507,37 +505,60 @@ module CvalueOffsm : Abstract.Value.Internal with type t = V.t * offsm_or_top
       let v = V.narrow v v_o in
       if V.is_bottom v then `Bottom else `Value (v, o)
 
-  let forward_unop typ op p =
-    match op with
-    | BNot ->
-      let p' = strengthen_offsm typ p in
-      forward_unop typ op p' >>- fun p'' ->
-      strengthen_v typ p''
-    | _ -> forward_unop typ op p
+  let () = Abstractions.Hooks.register @@ fun (module Abstraction) ->
+    let module Value = struct
+      include Abstraction.Val
+      let (let*) = (>>-)
 
-  let forward_binop typ op l r =
-    match op with
-    | BAnd | BOr | BXor ->
-      let l = strengthen_offsm typ l in
-      let r = strengthen_offsm typ r in
-      forward_binop typ op l r >>- fun p ->
-      strengthen_v typ p
-    | Shiftlt | Shiftrt ->
-      let (v_r, _) = r in
-      let (v_l, _) = l in
-      begin
-        try
-          let i = V.project_ival v_r in
-          let i = Ival.project_int i in
-          let size = size typ in
-          let signed = Bit_utils.is_signed_int_enum_pointer typ in
-          let dir = if op = Shiftlt then Left else Right in
-          let o = shift ~size ~signed (to_offsm typ l) dir i in
-          Main_values.CVal.forward_binop typ op v_l v_r >>-: fun v ->
-          v, O o
-        with V.Not_based_on_null | Ival.Not_Singleton_Int ->
-          forward_binop typ op l r
-      end
-    | _ -> forward_binop typ op l r
+      let get_product =
+        match get Main_values.CVal.key, get Offsm.key with
+        | Some cval, Some offsm -> Some (fun p -> (cval p, offsm p))
+        | _, _ -> None
 
+      let set_product =
+        let set_cval = set Main_values.CVal.key in
+        let set_offsm = set Offsm.key in
+        fun (cval, offsm) p -> set_cval cval p |> set_offsm offsm
+
+      let forward_unop =
+        match get_product with
+        | None -> Abstraction.Val.forward_unop
+        | Some get_product -> fun typ op p ->
+          let p' = set_product (strengthen_offsm typ (get_product p)) p in
+          let* p'' = Abstraction.Val.forward_unop typ op p' in
+          let* reduced = strengthen_v typ (get_product p'') in
+          `Value (set_product reduced p'')
+
+      let forward_binop =
+        match get_product with
+        | None -> Abstraction.Val.forward_binop
+        | Some get_product -> fun typ op l r ->
+          match op with
+          | BAnd | BOr | BXor ->
+            let l' = set_product (strengthen_offsm typ (get_product l)) l in
+            let r' = set_product (strengthen_offsm typ (get_product r)) r in
+            let* p = Abstraction.Val.forward_binop typ op l' r' in
+            let* reduced = strengthen_v typ (get_product p) in
+            `Value (set_product reduced p)
+          | Shiftlt | Shiftrt ->
+            let l' = get_product l in
+            let (r_val, _) = get_product r in
+            let* p = Abstraction.Val.forward_binop typ op l r in
+            begin
+              try
+                let i = V.project_ival r_val |> Ival.project_int in
+                let size = size typ in
+                let signed = Bit_utils.is_signed_int_enum_pointer typ in
+                let dir = if op = Shiftlt then Left else Right in
+                let offsm = shift ~size ~signed (to_offsm typ l') dir i in
+                let (v, _) = get_product p in
+                `Value (set_product (v, O offsm) p)
+              with V.Not_based_on_null | Ival.Not_Singleton_Int -> `Value p
+            end
+          | _ -> Abstraction.Val.forward_binop typ op l r
+    end in
+    (module struct
+      include Abstraction
+      module Val = Value
+    end)
 end

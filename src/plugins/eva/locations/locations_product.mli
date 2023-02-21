@@ -20,18 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Make (Left : Abstract_location.S) (Right : Abstract_location.S) :
-  Abstract_location.S
-    with type value = Left.value * Right.value
-     and type location = Left.location * Right.location
-     and type offset = Left.offset * Right.offset
-
-
-
-module Same_value
+module Make
     (Value: Abstract_value.S)
-    (Left: Abstract_location.S with type value = Value.t)
-    (Right: Abstract_location.S with type value = Value.t)
+    (Left: Abstract.Location.Internal with type value = Value.t)
+    (Right: Abstract.Location.Internal with type value = Value.t)
   : Abstract.Location.Internal
       with type value = Value.t
        and type location = Left.location * Right.location

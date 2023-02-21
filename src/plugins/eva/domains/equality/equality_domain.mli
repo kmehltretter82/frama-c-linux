@@ -42,3 +42,5 @@ module Make (Value : Abstract.Value.External) : sig
 
   val pretty_debug : Format.formatter -> t -> unit
 end
+
+val registered : Abstractions.Domain.registered

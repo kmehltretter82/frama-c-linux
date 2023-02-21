@@ -45,7 +45,7 @@ let blocks_share_locals b1 b2 =
   | _, _ -> false
 
 module Make_Dataflow
-    (Abstract : Abstractions.Eva)
+    (Abstract : Abstractions.S_with_evaluation)
     (States : Powerset.S with type state = Abstract.Dom.t)
     (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
     (Init: Initialization.S with type state := Abstract.Dom.t)
@@ -63,6 +63,7 @@ module Make_Dataflow
 = struct
 
   module Domain = Abstract.Dom
+  include Cvalue_domain.Getters (Domain)
 
   (* --- Analysis parameters --- *)
 
@@ -441,7 +442,7 @@ module Make_Dataflow
       edge_info.fireable <- true;
     flow
 
-  let gather_cvalues states = match Domain.get_cvalue with
+  let gather_cvalues states = match get_cvalue with
     | Some get -> List.map get states
     | None -> []
 
@@ -681,7 +682,7 @@ module Make_Dataflow
         then VertexTable.memo merged_states v get_smashed_store
         else `Bottom
     and lift_to_cvalues table =
-      StmtTable.map (fun _ s -> Domain.get_cvalue_or_top s) (Lazy.force table)
+      StmtTable.map (fun _ s -> get_cvalue_or_top s) (Lazy.force table)
     in
     let merged_pre_states = lazy
       (StmtTable.map' (fun s (v,_) -> get_merged_states ~all:true s v) automaton.stmt_table)
@@ -696,7 +697,7 @@ module Make_Dataflow
       (StmtTable.map (fun _stmt (v,_) ->
            let store = get_vertex_store v in
            let states = Partitioning.expanded store in
-           List.map (fun (_k,x) -> Domain.get_cvalue_or_top x) states)
+           List.map (fun (_k,x) -> get_cvalue_or_top x) states)
           automaton.stmt_table)
     in
     let merged_pre_cvalues = lazy (lift_to_cvalues merged_pre_states)
@@ -744,7 +745,7 @@ end
 
 
 module Computer
-    (Abstract : Abstractions.Eva)
+    (Abstract : Abstractions.S_with_evaluation)
     (States : Powerset.S with type state = Abstract.Dom.t)
     (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
     (Init: Initialization.S with type state := Abstract.Dom.t)

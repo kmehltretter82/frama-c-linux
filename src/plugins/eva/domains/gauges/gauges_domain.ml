@@ -1288,3 +1288,15 @@ module D : Abstract_domain.Leaf
   let top = G.empty (* must not be used, not neutral w.r.t. join (because
                        join crashes...)!! *)
 end
+
+let registered =
+  let name = "gauges" and priority = 6 in
+  let descr =
+    "Infers linear inequalities between the variables modified within a loop \
+     and a special loop counter."
+  in
+  Abstractions.Domain.register ~name ~priority ~descr @@ Domain
+    { key = D.key ; domain = (module D)
+    ; values = Last Main_values.CVal.registered
+    ; locations = Last Main_locations.PLoc.registered
+    }
