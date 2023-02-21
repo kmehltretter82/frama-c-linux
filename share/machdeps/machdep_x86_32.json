@@ -12,7 +12,9 @@
     "alignof_str": 1,
     "char_is_unsigned": false,
     "compiler": "generic",
-    "cpp_arch_flags": "-m32",
+    "cpp_arch_flags": [
+        "-m32"
+    ],
     "has__builtin_va_list": true,
     "little_endian": true,
     "ptrdiff_t": "int",

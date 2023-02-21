@@ -12,7 +12,11 @@
     "alignof_str": 1,
     "char_is_unsigned": false,
     "compiler": "clang",
-    "cpp_arch_flags": "-target powerpc-apple-darwin -mcpu=603",
+    "cpp_arch_flags": [
+        "-target",
+        "powerpc-apple-darwin",
+        "-mcpu=603"
+    ],
     "has__builtin_va_list": false,
     "little_endian": false,
     "ptrdiff_t": "int",

@@ -12,8 +12,10 @@
     "alignof_str": 1,
     "char_is_unsigned": false,
     "compiler": "gcc",
-    "cpp_arch_flags": "-m64",
-    "has__builtin_va_list": false,
+    "cpp_arch_flags": [
+        "-m64"
+    ],
+    "has__builtin_va_list": true,
     "little_endian": true,
     "ptrdiff_t": "long",
     "size_t": "unsigned long",

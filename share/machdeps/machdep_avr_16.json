@@ -12,7 +12,11 @@
     "alignof_str": 1,
     "char_is_unsigned": false,
     "compiler": "clang",
-    "cpp_arch_flags": "-target avr -m16",
+    "cpp_arch_flags": [
+        "-target",
+        "avr",
+        "-m16"
+    ],
     "has__builtin_va_list": true,
     "little_endian": true,
     "ptrdiff_t": "int",

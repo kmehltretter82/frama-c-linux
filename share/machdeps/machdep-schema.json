@@ -13,7 +13,8 @@
         },
         "cpp_arch_flags": {
             "description": "arguments to be given to the compiler when this machdep is selected (e.g. '-m32')",
-            "type" : "string"
+            "type" : "array",
+            "items" : { "type": "string" }
         },
         "sizeof_short": {
             "description": "size of 'short' type",

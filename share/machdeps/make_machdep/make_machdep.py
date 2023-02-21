@@ -69,6 +69,17 @@ parser.add_argument(
     default="--version",
     help="option to pass to the compiler to obtain its version; default is --version",
 )
+
+parser.add_argument(
+    "--from-file",
+    help="reads compiler and arch flags from existing json file. Use -i to update it in place"
+)
+parser.add_argument(
+    "-i", "--in-place",
+    action="store_true",
+    help="when reading compiler config from json, update the file in place. unused otherwise"
+)
+
 parser.add_argument(
     "--cpp-arch-flags",
     nargs="+",
@@ -90,9 +101,22 @@ if not args.compiler_flags:
     args.compiler_flags = ["-c"]
 
 
-def print_machdep(machdep):
-    json.dump(machdep, args.dest_file, indent=4, sort_keys=True)
+if args.from_file:
+    orig_file = open(args.from_file,"r")
+    orig_machdep = json.load(orig_file)
+    orig_file.close()
+    if not "compiler" in orig_machdep or not "cpp_arch_flags" in orig_machdep:
+        raise Exception("Missing fields in json file")
+    args.compiler = orig_machdep["compiler"]
+    if isinstance(orig_machdep["cpp_arch_flags"],list):
+        args.cpp_arch_flags = orig_machdep["cpp_arch_flags"]
+    else: # old version of the schema used a single string
+        args.cpp_arch_flags = orig_machdep["cpp_arch_flags"].split()
 
+def print_machdep(machdep):
+    if args.in_place:
+        args.dest_file = open(args.from_file,"w")
+    json.dump(machdep, args.dest_file, indent=4, sort_keys=True)
 
 def check_machdep(machdep):
     try:
@@ -238,7 +262,7 @@ version_output = subprocess.run(
 version = version_output.stdout.splitlines()[0]
 
 machdep["compiler"] = args.compiler
-machdep["cpp_arch_flags"] = " ".join(args.cpp_arch_flags)
+machdep["cpp_arch_flags"] = args.cpp_arch_flags
 machdep["version"] = version
 
 missing_fields = [f for [f, v] in machdep.items() if v is None]
