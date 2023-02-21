@@ -368,8 +368,6 @@ let set_machdep () =
 
 let () = Cmdline.run_after_configuring_stage set_machdep
 
-open Ppx_yojson_conv_lib.Yojson_conv.Primitives
-
 type mach = [%import: Cil_types.mach] [@@deriving of_yojson]
 
 (* Local to this module. Use Cil.theMachine.theMachine outside *)
@@ -382,11 +380,12 @@ let get_machdep () =
       if is_default_machdep m then default_machdep_file m
       else Filepath.Normalized.of_string ~existence:Must_exist m
     in
-    try
+    match
       mach_of_yojson (Yojson.Safe.from_file (file:>string))
     with
-      Ppx_yojson_conv_lib.Yojson_conv.Of_yojson_error(exn,_) ->
-      Kernel.fatal "Error during machdep parsing: %s" (Printexc.to_string exn)
+    | Ok machdep -> machdep
+    | Error s ->
+      Kernel.fatal "Error during machdep parsing: %s" s
 
 let list_available_machdeps () =
   CustomMachdeps.fold (fun m _ acc -> m :: acc) (default_machdeps ())

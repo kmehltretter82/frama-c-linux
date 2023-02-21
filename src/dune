@@ -37,7 +37,7 @@
           (echo "  - dune-site.plugins:" %{lib-available:dune-site.plugins} "\n")
           (echo "  - ppx_import:" %{lib-available:ppx_import} "\n")
           (echo "  - ppx_deriving.eq:" %{lib-available:ppx_deriving.eq} "\n")
-          (echo "  - ppx_yojson_conv:" %{lib-available:ppx_yojson_conv} "\n")
+          (echo "  - ppx_deriving_yojson:" %{lib-available:ppx_deriving_yojson} "\n")
   )
   )
 )
@@ -49,7 +49,7 @@
   (flags :standard -w -9)
   (libraries frama-c.init str unix zarith ocamlgraph dynlink bytes yojson menhirLib dune-site dune-site.plugins)
   (instrumentation (backend landmarks))
-  (preprocess (staged_pps ppx_import ppx_deriving.eq ppx_yojson_conv))
+  (preprocess (staged_pps ppx_import ppx_deriving.eq ppx_deriving_yojson))
 )
 
 (generate_sites_module (module config_data) (sites frama-c) (plugins (frama-c plugins) (frama-c plugins_gui)))
