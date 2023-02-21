@@ -286,17 +286,6 @@ module DatatypeMachdep = Datatype.Make_with_collections(struct
     let copy = Datatype.identity
   end)
 
-let default_machdeps =
-  [ "x86_16", Machdeps.x86_16;
-    "x86_32", Machdeps.x86_32;
-    "x86_64", Machdeps.x86_64;
-    "gcc_x86_16", Machdeps.gcc_x86_16;
-    "gcc_x86_32", Machdeps.gcc_x86_32;
-    "gcc_x86_64", Machdeps.gcc_x86_64;
-    "ppc_32", Machdeps.ppc_32;
-    "msvc_x86_64", Machdeps.msvc_x86_64;
-  ]
-
 let regexp_existing_machdep_macro = Str.regexp "-D[ ]*__FC_MACHDEP_"
 
 let existing_machdep_macro () =
@@ -321,27 +310,48 @@ let machdep_macro = function
       "machdep %s has no registered macro. Using %s for pre-processing" s res;
     res
 
-module Machdeps =
+module CustomMachdeps =
   State_builder.Hashtbl(Datatype.String.Hashtbl)(DatatypeMachdep)
     (struct
-      let name = " File.Machdeps"
+      let name = " File.CustomMachdeps"
       let size = 5
       let dependencies = []
     end)
 
-let mem_machdep s = Machdeps.mem s || List.mem_assoc s default_machdeps
+let machdep_dir () = Kernel.Share.get_dir ~mode:`Must_exist "machdeps"
+
+let regexp_machdep = Str.regexp "^machdep_\\([^.]*\\).json$"
+
+let default_machdep_file machdep =
+  let filename = "machdep_" ^ machdep ^ ".json" in
+  Filepath.Normalized.concat (machdep_dir()) filename
+
+let is_default_machdep machdep =
+  Filepath.Normalized.is_file (default_machdep_file machdep)
+
+let mem_machdep s =
+  CustomMachdeps.mem s || is_default_machdep s || Sys.file_exists s
 
 let new_machdep s m =
   try
-    let cm = Machdeps.find s in
+    let cm = CustomMachdeps.find s in
     if not (cm = m) then
       Kernel.abort "trying to register incompatible machdeps under name `%s'" s
   with Not_found ->
-    Machdeps.add s m
+    CustomMachdeps.add s m
+
+let default_machdeps () =
+  Array.fold_right
+    (fun s acc ->
+       if Str.string_match regexp_machdep s 0 then
+         Str.matched_group 1 s :: acc
+       else acc)
+    (Sys.readdir (machdep_dir() :> string))
+    []
 
 let pretty_machdeps fmt =
-  Machdeps.iter (fun x _ -> Format.fprintf fmt "@ %s" x);
-  List.iter (fun (x, _) -> Format.fprintf fmt "@ %s" x) default_machdeps
+  CustomMachdeps.iter (fun x _ -> Format.fprintf fmt "@ %s" x);
+  List.iter (fun s -> Format.fprintf fmt "@ %s" s) (default_machdeps())
 
 let machdep_help () =
   let m = Kernel.Machdep.get () in
@@ -362,19 +372,24 @@ let set_machdep () =
 
 let () = Cmdline.run_after_configuring_stage set_machdep
 
+open Ppx_yojson_conv_lib.Yojson_conv.Primitives
+
+type mach = [%import: Cil_types.mach] [@@deriving of_yojson]
+
 (* Local to this module. Use Cil.theMachine.theMachine outside *)
 let get_machdep () =
   let m = Kernel.Machdep.get () in
   try
-    Machdeps.find m
+    CustomMachdeps.find m
   with Not_found ->
-  try
-    List.assoc m default_machdeps
-  with Not_found -> (* Should not happen given the checks above *)
-    Kernel.fatal "Machdep %s not registered" m
+    let file =
+      if is_default_machdep m then default_machdep_file m
+      else Filepath.Normalized.of_string ~existence:Must_exist m
+    in
+    mach_of_yojson (Yojson.Safe.from_file (file:>string))
 
 let list_available_machdeps () =
-  Machdeps.fold (fun m _ acc -> m :: acc) (List.map fst default_machdeps)
+  CustomMachdeps.fold (fun m _ acc -> m :: acc) (default_machdeps ())
 
 let pretty_machdep ?fmt ?machdep () =
   let machine = match machdep with None -> get_machdep () | Some m -> m in
