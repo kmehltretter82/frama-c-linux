@@ -117,9 +117,6 @@
 #define __FC_INTMAX_MAX 9223372036854775807LL
 #define __FC_UINTMAX_MAX 18446744073709551615ULL
 
-// Linux usually defines wchar_t as a signed int, but this is not required
-#define __WCHAR_T int
-
 /* stdio.h */
 #define __FC_BUFSIZ 8192
 #define __FC_EOF (-1)

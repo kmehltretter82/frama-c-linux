@@ -38,6 +38,7 @@
 #define __CHAR_BIT 8
 #define __PTRDIFF_T int
 #define __SIZE_T unsigned int
+#define __WCHAR_T long
 #define __FC_INT_MIN (-2147483647 - 1)
 #define __FC_INT_MAX 2147483647
 #define __FC_UINT_MAX 4294967295U
@@ -130,6 +131,7 @@
 #define __CHAR_BIT 8
 #define __PTRDIFF_T long
 #define __SIZE_T unsigned long
+#define __WCHAR_T int
 #define __FC_INT_MIN (-2147483647 - 1)
 #define __FC_INT_MAX 2147483647
 #define __FC_UINT_MAX 4294967295U
@@ -231,6 +233,7 @@
 #define __CHAR_BIT 8
 #define __PTRDIFF_T long
 #define __SIZE_T unsigned int
+#define __WCHAR_T int
 #define __FC_INT_MIN (-32768)
 #define __FC_INT_MAX 32767
 #define __FC_UINT_MAX 65535U
@@ -335,6 +338,7 @@
 #define __CHAR_BIT 8
 #define __PTRDIFF_T int
 #define __SIZE_T unsigned int
+#define __WCHAR_T int
 #define __FC_INT_MIN (-2147483647 - 1)
 #define __FC_INT_MAX 2147483647
 #define __FC_UINT_MAX 4294967295U
