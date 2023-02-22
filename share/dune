@@ -339,6 +339,7 @@
   (machdeps/machdep_gcc_x86_16.json as share/machdeps/machdep_gcc_x86_16.json)
   (machdeps/machdep_gcc_x86_32.json as share/machdeps/machdep_gcc_x86_32.json)
   (machdeps/machdep_gcc_x86_64.json as share/machdeps/machdep_gcc_x86_64.json)
+  (machdeps/machdep_msvc_x86_64.json as share/machdeps/machdep_msvc_x86_64.json)
   (machdeps/machdep_ppc_32.json as share/machdeps/machdep_ppc_32.json))
 )
 
