@@ -6722,6 +6722,43 @@ and doExp local_env
                         "Too few arguments for builtin %s" n;
                       n
                   end
+
+                (* contrarily to the other builtins, __atomic_load and
+                   __atomic_exchange generic versions do not share the same
+                   signature as their specialized counterparts.
+                   Hence, we'd have to change the args list as well.
+                *)
+                | "__atomic_load" | "__atomic_exchange" ->
+                  Kernel.error ~once:true ~current:true
+                    "Generic %s is not yet supported" n;
+                  n
+                (* for store and compare_exchange, the generic version is also
+                   able to handle types of arbitrary size, via an external
+                   function that takes the size of the type as argument as well.
+                   Here too, we'd need to change the args list to support that.
+                *)
+                | "__atomic_store" | "__atomic_compare_exchange"
+                | "__atomic_add_fetch"
+                | "__atomic_sub_fetch" | "__atomic_and_fetch"
+                | "__atomic_xor_fetch" | "__atomic_or_fetch"
+                | "__atomic_nand_fetch" | "__atomic_fetch_add"
+                | "__atomic_fetch_sub" | "__atomic_fetch_and"
+                | "__atomic_fetch_xor" | "__atomic_fetch_or"
+                | "__atomic_fetch_nand" ->
+                  begin
+                    match args with
+                    | a1 :: _ ->
+                      let _,c,_,t =
+                        doExp (no_paren_local_env local_env) CNoConst a1 AType
+                      in
+                      clean_up_chunk_locals c;
+                      let t = typeOf_pointed t in
+                      Format.sprintf "%s_%d" n (bytesSizeOf t)
+                    | [] ->
+                      Kernel.error ~once:true ~current:true
+                        "Too few arguments for builtin %s" n;
+                      n
+                  end
                 | _ -> n
               in
               let vi, _ = lookupVar ghost n in

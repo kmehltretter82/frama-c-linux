@@ -149,15 +149,110 @@
 [eva] using specification for function __builtin_popcountll
 [eva] Done for function __builtin_popcountll
 [eva] more_gcc_builtins.c:71: assertion got status valid.
+[eva] computing for function __atomic_load_1 <- main.
+  Called from more_gcc_builtins.c:75.
+[eva] using specification for function __atomic_load_1
+[eva] more_gcc_builtins.c:75: 
+  function __atomic_load_1: precondition 'validity' got status valid.
+[eva] more_gcc_builtins.c:75: 
+  function __atomic_load_1: precondition 'initialization' got status valid.
+[eva] Done for function __atomic_load_1
+[eva] computing for function __atomic_store_2 <- main.
+  Called from more_gcc_builtins.c:77.
+[eva] using specification for function __atomic_store_2
+[eva] more_gcc_builtins.c:77: 
+  function __atomic_store_2: precondition 'validity' got status valid.
+[eva] Done for function __atomic_store_2
+[eva] computing for function __atomic_exchange_4 <- main.
+  Called from more_gcc_builtins.c:79.
+[eva] using specification for function __atomic_exchange_4
+[eva] more_gcc_builtins.c:79: 
+  function __atomic_exchange_4: precondition 'validity' got status valid.
+[eva] more_gcc_builtins.c:79: 
+  function __atomic_exchange_4: precondition 'initialization' got status valid.
+[eva] Done for function __atomic_exchange_4
+[eva] computing for function __atomic_compare_exchange_8 <- main.
+  Called from more_gcc_builtins.c:81.
+[eva] using specification for function __atomic_compare_exchange_8
+[eva] more_gcc_builtins.c:81: 
+  function __atomic_compare_exchange_8: precondition 'validity' got status valid.
+[eva] more_gcc_builtins.c:81: 
+  function __atomic_compare_exchange_8: precondition 'initialization,mem' got status valid.
+[eva] more_gcc_builtins.c:81: 
+  function __atomic_compare_exchange_8: precondition 'initialization,expected' got status valid.
+[eva] Done for function __atomic_compare_exchange_8
+[eva] computing for function __atomic_add_fetch_1 <- main.
+  Called from more_gcc_builtins.c:82.
+[eva] using specification for function __atomic_add_fetch_1
+[eva] more_gcc_builtins.c:82: 
+  function __atomic_add_fetch_1: precondition 'validity' got status valid.
+[eva] more_gcc_builtins.c:82: 
+  function __atomic_add_fetch_1: precondition 'initialization' got status valid.
+[eva] Done for function __atomic_add_fetch_1
+[eva] computing for function __atomic_fetch_sub_2 <- main.
+  Called from more_gcc_builtins.c:83.
+[eva] using specification for function __atomic_fetch_sub_2
+[eva] more_gcc_builtins.c:83: 
+  function __atomic_fetch_sub_2: precondition 'validity' got status valid.
+[eva] more_gcc_builtins.c:83: 
+  function __atomic_fetch_sub_2: precondition 'initialization' got status valid.
+[eva] Done for function __atomic_fetch_sub_2
+[eva] computing for function __atomic_fetch_xor_4 <- main.
+  Called from more_gcc_builtins.c:84.
+[eva] using specification for function __atomic_fetch_xor_4
+[eva] more_gcc_builtins.c:84: 
+  function __atomic_fetch_xor_4: precondition 'validity' got status valid.
+[eva] more_gcc_builtins.c:84: 
+  function __atomic_fetch_xor_4: precondition 'initialization' got status valid.
+[eva] Done for function __atomic_fetch_xor_4
+[eva] computing for function __atomic_fetch_nand_8 <- main.
+  Called from more_gcc_builtins.c:85.
+[eva] using specification for function __atomic_fetch_nand_8
+[eva] more_gcc_builtins.c:85: 
+  function __atomic_fetch_nand_8: precondition 'validity' got status valid.
+[eva] more_gcc_builtins.c:85: 
+  function __atomic_fetch_nand_8: precondition 'initialization' got status valid.
+[eva] Done for function __atomic_fetch_nand_8
+[eva] computing for function __atomic_test_and_set <- main.
+  Called from more_gcc_builtins.c:86.
+[eva] using specification for function __atomic_test_and_set
+[eva] more_gcc_builtins.c:86: 
+  function __atomic_test_and_set: precondition 'validity' got status valid.
+[eva] Done for function __atomic_test_and_set
+[eva] computing for function __atomic_clear <- main.
+  Called from more_gcc_builtins.c:87.
+[eva] using specification for function __atomic_clear
+[eva] more_gcc_builtins.c:87: 
+  function __atomic_clear: precondition 'validity' got status valid.
+[eva] Done for function __atomic_clear
+[eva] computing for function __atomic_always_lock_free <- main.
+  Called from more_gcc_builtins.c:88.
+[eva] using specification for function __atomic_always_lock_free
+[eva] Done for function __atomic_always_lock_free
+[eva] computing for function __atomic_is_lock_free <- main.
+  Called from more_gcc_builtins.c:89.
+[eva] using specification for function __atomic_is_lock_free
+[eva] Done for function __atomic_is_lock_free
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   res ∈ [0..64]
-  r ∈ {1}
+  r ∈ [--..--]
   lres ∈ {2147483647}
   llres ∈ {-9223372036854775808}
   ures ∈ {8}
   ulres ∈ {8}
   ullres ∈ {18446744073709551612}
+  u8_1 ∈ [--..--]
+  u8_2 ∈ [--..--]
+  u16_1 ∈ [--..--]
+  u16_2 ∈ [--..--]
+  u32_1 ∈ [--..--]
+  u32_2 ∈ [--..--]
+  u32_3[bits 0 to 7] ∈ [--..--]
+       [bits 8 to 31]# ∈ {420000}%32, bits 8 to 31 
+  u64_1 ∈ [--..--]
+  u64_2 ∈ [--..--]
+  u64_3 ∈ {42000000001}
   __retres ∈ {0}

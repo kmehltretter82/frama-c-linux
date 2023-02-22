@@ -1337,10 +1337,14 @@
 --------------------------------------------------------------------------------
 
 [ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 220)
-            assigns *stream;
+            assigns *stream, \result;
             Unverifiable but considered Valid.
 [ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 220)
-            assigns *stream \from *(format + (..)), arg;
+            assigns *stream \from *(format + (..)), (indirect: arg);
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 221)
+            assigns \result
+              \from (indirect: *(format + (..))), (indirect: arg);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             default behavior
@@ -1350,10 +1354,10 @@
 --- Properties of Function 'vfscanf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 225)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 227)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 225)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 227)
             assigns *stream \from *(format + (..)), *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1364,10 +1368,10 @@
 --- Properties of Function 'vprintf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 231)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 233)
             assigns *__fc_stdout;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 231)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 233)
             assigns *__fc_stdout \from arg;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1378,10 +1382,10 @@
 --- Properties of Function 'vscanf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 235)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 237)
             assigns *__fc_stdin;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 235)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 237)
             assigns *__fc_stdin \from *(format + (..));
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1392,10 +1396,10 @@
 --- Properties of Function 'vsnprintf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 240)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 242)
             assigns *(s + (0 .. n - 1));
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 240)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 242)
             assigns *(s + (0 .. n - 1)) \from *(format + (..)), arg;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1406,10 +1410,10 @@
 --- Properties of Function 'vsprintf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 246)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 248)
             assigns *(s + (0 ..));
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 246)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 248)
             assigns *(s + (0 ..)) \from *(format + (..)), arg;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1424,13 +1428,13 @@
             ensures
             result_uchar_or_eof: (0 ≤ \result ≤ 255) ∨ \result ≡ -1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 259)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 261)
             assigns *stream, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 259)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 261)
             assigns *stream \from *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 260)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 262)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1455,14 +1459,14 @@
             terminated_string_on_success:
               \result ≢ \null ⇒ valid_string(\old(s))
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 268)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 270)
             assigns *(s + (0 .. size - 1)), \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 268)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 270)
             assigns *(s + (0 .. size - 1))
               \from (indirect: size), (indirect: *stream);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 269)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 271)
             assigns \result \from s, (indirect: size), (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1473,13 +1477,13 @@
 --- Properties of Function 'fputc'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 282)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 284)
             assigns *stream, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 282)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 284)
             assigns *stream \from c, *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 283)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 285)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1490,13 +1494,13 @@
 --- Properties of Function 'fputs'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 289)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 291)
             assigns *stream, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 289)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 291)
             assigns *stream \from *(s + (0 .. strlen{Old}(s))), *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 290)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 292)
             assigns \result
               \from (indirect: *(s + (0 .. strlen{Old}(s)))),
                     (indirect: *stream);
@@ -1509,13 +1513,13 @@
 --- Properties of Function 'getc'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 297)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 299)
             assigns \result, *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 297)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 299)
             assigns \result \from *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 297)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 299)
             assigns *stream \from *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1526,13 +1530,13 @@
 --- Properties of Function 'getchar'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 302)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 304)
             assigns \result, *__fc_stdin;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 302)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 304)
             assigns \result \from *__fc_stdin;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 302)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 304)
             assigns *__fc_stdin \from *__fc_stdin;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1547,16 +1551,16 @@
             ensures
             result_null_or_same: \result ≡ \old(s) ∨ \result ≡ \null
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 315)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 317)
             assigns *(s + (0 .. gets_length{Old})), \result, *__fc_stdin;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 315)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 317)
             assigns *(s + (0 .. gets_length{Old})) \from *__fc_stdin;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 316)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 318)
             assigns \result \from s, *__fc_stdin;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 317)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 319)
             assigns *__fc_stdin \from *__fc_stdin;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1567,13 +1571,13 @@
 --- Properties of Function 'putc'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 324)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 326)
             assigns *stream, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 324)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 326)
             assigns *stream \from c, *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 325)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 327)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1584,13 +1588,13 @@
 --- Properties of Function 'putchar'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 330)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 332)
             assigns *__fc_stdout, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 330)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 332)
             assigns *__fc_stdout \from c, *__fc_stdout;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 331)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 333)
             assigns \result \from (indirect: *__fc_stdout);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1601,14 +1605,14 @@
 --- Properties of Function 'puts'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 337)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 339)
             assigns *__fc_stdout, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 337)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 339)
             assigns *__fc_stdout
               \from *(s + (0 .. strlen{Old}(s))), *__fc_stdout;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 338)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 340)
             assigns \result
               \from (indirect: *(s + (0 .. strlen{Old}(s)))),
                     (indirect: *__fc_stdout);
@@ -1625,13 +1629,13 @@
             ensures
             result_ok_or_error: \result ≡ \old(c) ∨ \result ≡ -1
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 344)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 346)
             assigns *stream, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 344)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 346)
             assigns *stream \from (indirect: c);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 345)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 347)
             assigns \result \from (indirect: c), (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1651,19 +1655,19 @@
               \initialized((char *)\old(ptr) +
                            (0 .. \result * \old(size) - 1))
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 353)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 355)
             assigns *((char *)ptr + (0 .. nmemb * size - 1)), *stream,
                     \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 353)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 355)
             assigns *((char *)ptr + (0 .. nmemb * size - 1))
               \from (indirect: size), (indirect: nmemb), (indirect: *stream);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 353)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 355)
             assigns *stream
               \from (indirect: size), (indirect: nmemb), (indirect: *stream);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 355)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 357)
             assigns \result \from size, (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1677,14 +1681,14 @@
 [ Extern  ] Post-condition 'size_written'
             ensures size_written: \result ≤ \old(nmemb)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 366)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 368)
             assigns *stream, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 366)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 368)
             assigns *stream
               \from (indirect: *((char *)ptr + (0 .. nmemb * size - 1)));
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 366)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 368)
             assigns \result
               \from (indirect: *((char *)ptr + (0 .. nmemb * size - 1)));
             Unverifiable but considered Valid.
@@ -1699,13 +1703,13 @@
 [ Extern  ] Post-condition 'initialization,pos'
             ensures initialization: pos: \initialized(\old(pos))
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 377)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 379)
             assigns \result, *pos;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 377)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 379)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 377)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 379)
             assigns *pos \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1721,19 +1725,19 @@
             errno_set:
               __fc_errno ∈ {11, 9, 27, 4, 22, 5, 28, 75, 32, 29, 6}
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 386)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 388)
             assigns *stream, \result, __fc_errno;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 386)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 388)
             assigns *stream
               \from *stream, (indirect: offset), (indirect: whence);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 387)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 389)
             assigns \result
               \from (indirect: *stream), (indirect: offset),
                     (indirect: whence);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 387)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 389)
             assigns __fc_errno
               \from (indirect: *stream), (indirect: offset),
                     (indirect: whence);
@@ -1751,19 +1755,19 @@
             errno_set:
               __fc_errno ∈ {11, 9, 27, 4, 22, 5, 28, 75, 32, 29, 6}
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 397)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 399)
             assigns *stream, \result, __fc_errno;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 397)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 399)
             assigns *stream
               \from *stream, (indirect: offset), (indirect: whence);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 398)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 400)
             assigns \result
               \from (indirect: *stream), (indirect: offset),
                     (indirect: whence);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 398)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 400)
             assigns __fc_errno
               \from (indirect: *stream), (indirect: offset),
                     (indirect: whence);
@@ -1780,16 +1784,16 @@
             ensures
             errno_set: __fc_errno ∈ {11, 9, 27, 4, 5, 28, 32, 29, 6}
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 409)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 411)
             assigns *stream, \result, __fc_errno;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 409)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 411)
             assigns *stream \from *pos;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 410)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 412)
             assigns \result \from (indirect: *stream), (indirect: *pos);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 411)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 413)
             assigns __fc_errno
               \from __fc_errno, (indirect: *stream), (indirect: *pos);
             Unverifiable but considered Valid.
@@ -1810,13 +1814,13 @@
 [ Extern  ] Post-condition 'errno_set'
             ensures errno_set: __fc_errno ∈ {9, 75, 29}
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 419)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 421)
             assigns \result, __fc_errno;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 419)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 421)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 419)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 421)
             assigns __fc_errno \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1836,13 +1840,13 @@
 [ Extern  ] Post-condition 'errno_set'
             ensures errno_set: __fc_errno ∈ {9, 75, 29}
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 428)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 430)
             assigns \result, __fc_errno;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 428)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 430)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 428)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 430)
             assigns __fc_errno \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1853,10 +1857,10 @@
 --- Properties of Function 'rewind'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 437)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 439)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 437)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 439)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1867,10 +1871,10 @@
 --- Properties of Function 'clearerr'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 443)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 445)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 443)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 445)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1884,7 +1888,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 449)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 451)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1898,7 +1902,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 455)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 457)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1909,10 +1913,10 @@
 --- Properties of Function 'flockfile'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 461)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 463)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 461)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 463)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1923,10 +1927,10 @@
 --- Properties of Function 'funlockfile'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 467)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 469)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 467)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 469)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1937,13 +1941,13 @@
 --- Properties of Function 'ftrylockfile'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 473)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 475)
             assigns \result, *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 473)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 475)
             assigns \result \from \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 473)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 475)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1957,7 +1961,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 479)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 481)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -1968,10 +1972,10 @@
 --- Properties of Function 'perror'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 485)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 487)
             assigns __fc_stdout;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 485)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 487)
             assigns __fc_stdout
               \from __fc_errno, *(s + (0 .. strlen{Old}(s)));
             Unverifiable but considered Valid.
@@ -1983,13 +1987,13 @@
 --- Properties of Function 'getc_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 491)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 493)
             assigns \result, *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 491)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 493)
             assigns \result \from *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 491)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 493)
             assigns *stream \from *stream;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2003,7 +2007,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 496)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 498)
             assigns \result \from *__fc_stdin;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2014,13 +2018,13 @@
 --- Properties of Function 'putc_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 502)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 504)
             assigns *stream, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 502)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 504)
             assigns *stream \from c;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 503)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 505)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2031,13 +2035,13 @@
 --- Properties of Function 'putchar_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 508)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 510)
             assigns *__fc_stdout, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 508)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 510)
             assigns *__fc_stdout \from c;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 509)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 511)
             assigns \result \from (indirect: *__fc_stdout);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2048,10 +2052,10 @@
 --- Properties of Function 'clearerr_unlocked'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 515)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 517)
             assigns *stream;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 515)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 517)
             assigns *stream \from \nothing;
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2065,7 +2069,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 521)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 523)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2079,7 +2083,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 527)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 529)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2093,7 +2097,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 533)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 535)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2111,14 +2115,14 @@
               (\subset(\result, &__fc_fopen[0 .. 16 - 1]) ∧
                is_open_pipe(\result))
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 560)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 562)
             assigns \result, __fc_fopen[0 ..];
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 560)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 562)
             assigns \result
               \from (indirect: *command), (indirect: *type), __fc_p_fopen;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 562)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 564)
             assigns __fc_fopen[0 ..]
               \from (indirect: *command), (indirect: *type), __fc_fopen[0 ..];
             Unverifiable but considered Valid.
@@ -2136,7 +2140,7 @@
 [ Extern  ] Assigns nothing
             assigns \nothing;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 574)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 576)
             assigns \result \from (indirect: *stream);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
@@ -2157,15 +2161,15 @@
             errno_set:
               __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ∈ {22, 24, 12}
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 590)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 592)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 590)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 592)
             assigns __fc_errno
               \from (indirect: buf), (indirect: size),
                     (indirect: *(mode + (0 .. strlen{Old}(mode))));
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 592)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 594)
             assigns \result
               \from __fc_p_fopen, (indirect: buf), (indirect: size),
                     (indirect: *(mode + (0 .. strlen{Old}(mode))));
@@ -2173,7 +2177,7 @@
 [  Valid  ] Default behavior
             default behavior
             by Frama-C kernel.
-[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 599) 
+[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 601) 
             allocates \old(buf);
             Unverifiable but considered Valid.
 
@@ -2185,25 +2189,25 @@
             ensures
             result_error_or_written_byes: \result ≡ -1 ∨ \result ≥ 0
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 611)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 613)
             assigns __fc_heap_status, \result, *strp;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 611)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 613)
             assigns __fc_heap_status
               \from (indirect: *(fmt + (0 ..))), __fc_heap_status;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 612)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 614)
             assigns \result
               \from (indirect: *(fmt + (0 ..))), (indirect: __fc_heap_status);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 613)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 615)
             assigns *strp
               \from *(fmt + (0 ..)), (indirect: __fc_heap_status);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             default behavior
             by Frama-C kernel.
-[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 616) 
+[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 618) 
             allocates *\old(strp);
             Unverifiable but considered Valid.
 
@@ -4256,7 +4260,7 @@
 --------------------------------------------------------------------------------
    194 Completely validated
     16 Locally validated
-   569 Considered valid
+   570 Considered valid
     56 To be validated
-   835 Total
+   836 Total
 --------------------------------------------------------------------------------

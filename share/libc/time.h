@@ -158,7 +158,9 @@ extern struct tm *localtime(const time_t *timer);
   requires valid_tm: \valid_read(tm);
   assigns s[0 .. max-1] \from indirect:max, indirect:format[0..], indirect:*tm;
   assigns \result \from indirect:max, indirect:format[0..], indirect:*tm;
-  ensures result_bounded: \result <= max;
+  ensures result_bounded: \result < max;
+  ensures result_valid_string: \result > 0 ==> valid_string(s);
+  ensures result_length: \result > 0 ==> s[\result] == 0;
  */
 extern size_t strftime(char * restrict s,
                        size_t max,

@@ -66,7 +66,7 @@
   outstr[0..199] ∈ [--..--] or UNINITIALIZED
   t ∈ [--..--]
   tmp ∈ {{ NULL ; &__fc_time_tm }}
-  res ∈ [0..200] or UNINITIALIZED
+  res ∈ [0..199] or UNINITIALIZED
 [eva:final-states] Values at end of function main:
   __fc_ctime[0..25] ∈ [--..--]
   __fc_time_tm ∈ [--..--]
