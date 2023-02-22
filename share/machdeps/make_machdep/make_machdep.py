@@ -72,12 +72,13 @@ parser.add_argument(
 
 parser.add_argument(
     "--from-file",
-    help="reads compiler and arch flags from existing json file. Use -i to update it in place"
+    help="reads compiler and arch flags from existing json file. Use -i to update it in place",
 )
 parser.add_argument(
-    "-i", "--in-place",
+    "-i",
+    "--in-place",
     action="store_true",
-    help="when reading compiler config from json, update the file in place. unused otherwise"
+    help="when reading compiler config from json, update the file in place. unused otherwise",
 )
 
 parser.add_argument(
@@ -102,21 +103,25 @@ if not args.compiler_flags:
 
 
 if args.from_file:
-    orig_file = open(args.from_file,"r")
+    orig_file = open(args.from_file, "r")
     orig_machdep = json.load(orig_file)
     orig_file.close()
     if not "compiler" in orig_machdep or not "cpp_arch_flags" in orig_machdep:
         raise Exception("Missing fields in json file")
     args.compiler = orig_machdep["compiler"]
-    if isinstance(orig_machdep["cpp_arch_flags"],list):
+    if isinstance(orig_machdep["cpp_arch_flags"], list):
         args.cpp_arch_flags = orig_machdep["cpp_arch_flags"]
-    else: # old version of the schema used a single string
+    else:  # old version of the schema used a single string
         args.cpp_arch_flags = orig_machdep["cpp_arch_flags"].split()
+
 
 def print_machdep(machdep):
     if args.in_place:
-        args.dest_file = open(args.from_file,"w")
+        args.dest_file = open(args.from_file, "w")
     json.dump(machdep, args.dest_file, indent=4, sort_keys=True)
+    # Python does not end the dump with a newline by itself
+    args.dest_file.write("\n")
+
 
 def check_machdep(machdep):
     try:
