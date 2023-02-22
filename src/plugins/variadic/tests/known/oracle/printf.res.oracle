@@ -617,8 +617,8 @@ int main(void)
   size_t z;
   ptrdiff_t t;
   char *string = (char *)"Hello world !\n";
-  wchar_t *wstring = L"H" "e" "l" "l" "o" " " "w" "o" "r" "l" "d" " " "!"
-    "\\n" ;
+  wchar_t *wstring = (wchar_t *)L"H" "e" "l" "l" "o" " " "w" "o" "r" "l" "d"
+    " " "!" "\\n" ;
   char c = (char)'4';
   unsigned char uhh = (unsigned char)42;
   unsigned short uh = (unsigned short)42;
