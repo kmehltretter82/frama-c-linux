@@ -245,6 +245,7 @@ for (f, typ) in source_files:
     if args.verbose:
         print(f"[INFO] running command: {' '.join(cmd)}")
     proc = subprocess.run(cmd, capture_output=True)
+    Path(f).with_suffix(".o").unlink(missing_ok=True)
     if typ == "has__builtin_va_list":
         # Special case: compilation success determines presence or absence
         machdep["has__builtin_va_list"] = proc.returncode == 0
