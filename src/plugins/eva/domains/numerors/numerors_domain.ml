@@ -164,6 +164,6 @@ let registered =
     }
 
 let () =
-  let reduced_product = Main_values.CVal.key, Numerors_value.key, reduce_error in
-  register_value_reduction reduced_product;
-  register_hook reduce_cast
+  let open Abstractions in
+  Reducer.register Main_values.CVal.key Numerors_Value.key reduce_error ;
+  Hooks.register reduce_cast
