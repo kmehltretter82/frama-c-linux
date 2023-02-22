@@ -122,7 +122,7 @@ let createMachine () = (* Contain dummy values *)
     theMachine = Machdeps.x86_64;
     lowerConstants = false(*true*);
     insertImplicitCasts = true;
-    stringLiteralType = charPtrType;
+    stringLiteralType = charConstPtrType;
     upointKind = IChar;
     upointType = voidType;
     wcharKind = IChar;
@@ -3686,7 +3686,9 @@ let rec typeOf (e: exp) : typ =
    * have SizeOfStr for that *)
   | Const(CStr _s) -> theMachine.stringLiteralType
 
-  | Const(CWStr _s) -> TPtr(theMachine.wcharType,[])
+  | Const(CWStr _s) ->
+    let typ = typeAddAttributes [Attr("const",[])] theMachine.wcharType in
+    TPtr(typ,[])
 
   | Const(CReal (_, fk, _)) -> TFloat(fk, [])
 
