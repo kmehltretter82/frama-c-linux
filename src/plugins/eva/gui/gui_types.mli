@@ -99,7 +99,7 @@ module type S = sig
 end
 
 (** The types below depend on the abstract values currently available. *)
-module Make (V : Abstractions.Value) : sig
+module Make (V : Abstract.Value.External) : sig
   include S with type value := V.t
 
   val get_cvalue : (V.t -> Main_values.CVal.t) option

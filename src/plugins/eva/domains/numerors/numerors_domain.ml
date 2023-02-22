@@ -157,7 +157,7 @@ let registered =
     "Infers ranges for the absolute and relative errors \
      in floating-point computations. No support of loops."
   in
-  Abstractions.Domain.register ~name ~experiment ~descr @@ Domain
+  Abstractions.Domain.register ~name ~experimental ~descr @@ Domain
     { key = Domain.key ; domain = (module Domain)
     ; values = Last Numerors_Value.registered
     ; locations = Last Main_locations.PLoc.registered
