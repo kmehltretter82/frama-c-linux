@@ -30,9 +30,7 @@ let mach =
     alignof_fun = 1;
     alignof_aligned= 16;
     char_is_unsigned = false;
-    const_string_literals = true;
     little_endian = true;
-    underscore_name = false ;
     has__builtin_va_list = true;
   }
 
