@@ -284,8 +284,11 @@ struct
   let findReplacement pathcomp eq fidx name =
     let dkey = Kernel.dkey_linker_find in
     Kernel.debug ~dkey "findReplacement for %a(%d)" H.output name fidx;
-    try
-      let nd = Heq.find eq (fidx, name) in
+    match Heq.find_opt eq (fidx, name) with
+    | None ->
+      Kernel.debug ~dkey "not found in the map";
+      None
+    | Some nd ->
       if nd.nrep == nd then begin
         Kernel.debug ~dkey "is a representative";
         None (* No replacement if this is the representative of its class *)
@@ -295,19 +298,18 @@ struct
           Kernel.abort "find does not return the representative" ;
         Kernel.debug ~dkey "RES = %a(%d)" H.output rep.nname rep.nfidx;
         Some (rep.ndata, rep.nfidx)
-    with Not_found -> begin
-        Kernel.debug ~dkey "not found in the map";
-        None
-      end
 
   (* Make a node if one does not already exist. Otherwise return the
    * representative *)
   let getNode eq syn fidx name data l =
     let dkey = Kernel.dkey_linker_find in
     Kernel.debug ~dkey "getNode(%a(%d), %a)" H.output name fidx d_nloc l;
-    try
-      let res = Heq.find eq (fidx, name) in
-
+    match Heq.find_opt eq (fidx, name) with
+    | None ->
+      let res = mkSelfNode eq syn fidx name data l in
+      Kernel.debug ~dkey "made a new one";
+      res
+    | Some res ->
       (match res.nloc, l with
        (* Maybe we have a better location now *)
          None, Some _ -> res.nloc <- l
@@ -321,11 +323,6 @@ struct
        | _, _ -> ());
       Kernel.debug ~dkey "node already found";
       find false res (* No path compression *)
-    with Not_found -> begin
-        let res = mkSelfNode eq syn fidx name data l in
-        Kernel.debug ~dkey "made a new one";
-        res
-      end
 
   let doMergeSynonyms syn compare =
     Hsyn.iter
@@ -1683,8 +1680,12 @@ let oneFilePass1 (f:file) : unit =
     let vinode =
       PlainMerging.mkSelfNode vEq vSyn !currentFidx vi.vname vi (Some l)
     in
-    try
-      let oldvinode = PlainMerging.find true (H.find vEnv vi.vname) in
+    match H.find_opt vEnv vi.vname with
+    | None ->
+      (* Not present in the previous files. Remember it for later  *)
+      H.add vEnv vi.vname vinode
+    | Some oldvi ->
+      let oldvinode = PlainMerging.find true oldvi in
       let oldloc, _ =
         match oldvinode.nloc with
           None ->  (Kernel.fatal "old variable is undefined")
@@ -1777,9 +1778,6 @@ let oneFilePass1 (f:file) : unit =
       newrep.ndata.vstorage <- newstorage;
       newrep.ndata.vattr <- addAttributes oldvi.vattr vi.vattr;
       newrep.ndata.vdecl <- newdecl
-    with Not_found ->
-      (* Not present in the previous files. Remember it for later  *)
-      H.add vEnv vi.vname vinode
   in
   List.iter
     (function
@@ -2730,9 +2728,12 @@ let oneFilePass2 (f: file) =
 
         let emitIt:bool =
           (not mergeGlobals) ||
-          try
-            let _prevVar, prevInitOpt, prevLoc =
-              (H.find emittedVarDefn vi'.vname) in
+          match H.find_opt emittedVarDefn vi'.vname with
+          | None ->
+            (* no previous definition *)
+            H.add emittedVarDefn vi'.vname (vi', init.init, l);
+            true (* emit it *)
+          | Some (_prevVar, prevInitOpt, prevLoc) ->
             (* previously defined; same initializer? *)
             if (equalInitOpts prevInitOpt init.init)
             then (
@@ -2748,11 +2749,6 @@ let oneFilePass2 (f: file) =
                 Cil_printer.pp_location l Cil_printer.pp_location prevLoc;
               false
             )
-          with Not_found -> begin
-              (* no previous definition *)
-              H.add emittedVarDefn vi'.vname (vi', init.init, l);
-              true (* emit it *)
-            end
         in
 
         if emitIt then
@@ -2880,8 +2876,14 @@ let oneFilePass2 (f: file) =
               "Looking for previous definition of inline %s(%d)"
               origname !currentFidx;
           end;
-          try
-            let oldinode = H.find inlineBodies printout in
+          let finalize_process_varinfo () =
+            if debugInlines then Kernel.debug " Not found";
+            H.add inlineBodies printout inode;
+            mergePushGlobal g'
+          in
+          match H.find_opt inlineBodies printout with
+          | None -> finalize_process_varinfo ()
+          | Some oldinode ->
             if debugInlines then
               Kernel.debug "  Matches %s(%d)"
                 oldinode.nname oldinode.nfidx;
@@ -2896,7 +2898,7 @@ let oneFilePass2 (f: file) =
                   "Inline function %s because \
                    it is used before it is defined"
                   fdec'.svar.vname;
-                raise Not_found
+                finalize_process_varinfo ()
               end
             end;
             let _ = union oldinode inode in
@@ -2905,11 +2907,6 @@ let oneFilePass2 (f: file) =
              * we can find the replacement name. *)
             fdec'.svar.vname <- origname;
             () (* Drop this definition *)
-          with Not_found -> begin
-              if debugInlines then Kernel.debug " Not found";
-              H.add inlineBodies printout inode;
-              mergePushGlobal g'
-            end
         end else begin
           (* either the function is not inline, or we're not attempting to
            * merge inlines *)
@@ -2921,10 +2918,12 @@ let oneFilePass2 (f: file) =
              * consider dropping it if a same-named function has already
              * been put into the merged file *)
             let curSum = (functionChecksum fdec') in
-            try
-              let _prevFun, prevLoc, prevSum =
-                (H.find emittedFunDefn fdec'.svar.vname)
-              in
+            match H.find_opt emittedFunDefn fdec'.svar.vname with
+            | None ->
+              (* there was no previous definition *)
+              (mergePushGlobal g');
+              (H.add emittedFunDefn fdec'.svar.vname (fdec', l, curSum))
+            | Some (_prevFun, prevLoc, prevSum) ->
               (* restore old binding for vi, as we are about to drop
                  the new definition and its formals.
               *)
@@ -2952,11 +2951,6 @@ let oneFilePass2 (f: file) =
                   curSum
                   Cil_printer.pp_location prevLoc
                   prevSum Cil_printer.pp_location prevLoc
-              end
-            with Not_found -> begin
-                (* there was no previous definition *)
-                (mergePushGlobal g');
-                (H.add emittedFunDefn fdec'.svar.vname (fdec', l, curSum))
               end
           end else begin
             (* not attempting to merge global functions, or it was static
@@ -3171,10 +3165,13 @@ let global_merge_spec g =
   in
   match g with
   | GFun(fdec,loc) ->
-    (try
-       Kernel.debug ~dkey:Kernel.dkey_linker
-         "Merging global definition %a" Cil_printer.pp_global g;
-       let specs = Cil_datatype.Varinfo.Hashtbl.find spec_to_merge fdec.svar in
+    Kernel.debug ~dkey:Kernel.dkey_linker
+      "Merging global definition %a" Cil_printer.pp_global g;
+    (match Cil_datatype.Varinfo.Hashtbl.find_opt spec_to_merge fdec.svar with
+     | None ->
+       Kernel.debug ~dkey:Kernel.dkey_linker "No spec_to_merge";
+       rename fdec.svar fdec.sspec
+     | Some specs ->
        List.iter
          (fun s ->
             Kernel.debug ~dkey:Kernel.dkey_linker
@@ -3188,14 +3185,17 @@ let global_merge_spec g =
        Cil.CurrentLoc.set loc;
        rename fdec.svar fdec.sspec;
        merge_specs fdec.sspec specs
-     with Not_found ->
-       Kernel.debug ~dkey:Kernel.dkey_linker "No spec_to_merge";
-       rename fdec.svar fdec.sspec)
+    )
   | GFunDecl(spec,v,loc) ->
     Kernel.debug ~dkey:Kernel.dkey_linker
       "Merging global declaration %a" Cil_printer.pp_global g;
-    (try
-       let specs = Cil_datatype.Varinfo.Hashtbl.find spec_to_merge v in
+    (match Cil_datatype.Varinfo.Hashtbl.find_opt spec_to_merge v with
+     | None ->
+       Kernel.debug ~dkey:Kernel.dkey_linker "No spec_to_merge for declaration" ;
+       rename v spec;
+       Kernel.debug ~dkey:Kernel.dkey_linker
+         "Renamed to %a" Cil_printer.pp_funspec spec ;
+     | Some specs ->
        List.iter
          (fun s ->
             Kernel.debug ~dkey:Kernel.dkey_linker
@@ -3213,11 +3213,6 @@ let global_merge_spec g =
        merge_specs spec specs;
        Kernel.debug ~dkey:Kernel.dkey_linker
          "Merged into %a" Cil_printer.pp_funspec spec ;
-     with Not_found ->
-       Kernel.debug ~dkey:Kernel.dkey_linker "No spec_to_merge for declaration" ;
-       rename v spec;
-       Kernel.debug ~dkey:Kernel.dkey_linker
-         "Renamed to %a" Cil_printer.pp_funspec spec ;
     )
   | _ -> ()
 
