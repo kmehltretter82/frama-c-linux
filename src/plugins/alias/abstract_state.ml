@@ -72,7 +72,7 @@ type t = {
   lmap : V.t LMap.t ; (* lmap(lv) is the vertex v corresponding to lval lv, in other words lv is in label(v) *)
   vmap : LSet.t VMap.t ;(* reverse of lmap *)
   cmpt : Int.t ; (* counter to create new vertex *)
-  collapsed : LSet.t (* arrays that are collapsed du to non-constant accesses *)
+  collapsed : VSet.t (* arrays that are collapsed because of non-constant accesses. All aliased arrays are collapsed *)
 }
 
 
@@ -103,7 +103,8 @@ let print_debug fmt (x:t) =
   VMap.iter (fun v ls -> Format.fprintf fmt "(id = %d -> lset= %a)@." v LSet.pretty ls) x.vmap;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "cmpt: %d@." x.cmpt;
-  Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty x.collapsed
+  let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
+  Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval
 
 let print_aliases fmt (x:t) =
   let iter_vmap v set_lv =
@@ -137,7 +138,8 @@ let print_aliases fmt (x:t) =
   in
   Format.fprintf fmt "@[<hov 2><list of may-alias>@.";
   VMap.iter iter_vmap x.vmap;
-  Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty x.collapsed;
+   let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
+  Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval;
   Format.fprintf fmt "<end of list>@]@."
 
 let pretty ?(debug=false) =
@@ -804,7 +806,7 @@ let union  (a1:t) (a2:t) :t =
       a1.vmap
   in
   let new_collapsed =
-    LSet.union a1.collapsed a2.collapsed
+    VSet.union a1.collapsed a2.collapsed
   in
   (* s_acc = set of couples that should be merged in step 3 *)
   let set_to_be_merged, new_lmap =
@@ -879,7 +881,7 @@ let union  (a1:t) (a2:t) :t =
   new_a
 
 let initial_value :t =
-  {graph = G.empty; pending = VMap.empty ; lmap = LMap.empty; vmap = VMap.empty; cmpt = 0; collapsed = LSet.empty}
+  {graph = G.empty; pending = VMap.empty ; lmap = LMap.empty; vmap = VMap.empty; cmpt = 0; collapsed = VSet.empty}
 
 
 let make_top (x:t) : t =
