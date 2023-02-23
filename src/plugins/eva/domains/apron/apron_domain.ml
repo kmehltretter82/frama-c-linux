@@ -731,6 +731,32 @@ let polka_loose = make "polka-loose" (module Apron_Polka_Loose)
 let polka_strict = make "polka-strict" (module Apron_Polka_Strict)
 let polka_equality = make "polka-equality" (module Apron_Polka_Equalities)
 
+(* When the value abstraction contains both a cvalue and an interval
+   component (coming currently from an Apron domain), reduce them from each
+   other. If the Cvalue is not a scalar do nothing, because we do not
+   currently use Apron for pointer offsets. *)
+let reduce_apron_itv cvalue ival =
+  match ival with
+  | None -> begin
+      try cvalue, Some (Cvalue.V.project_ival cvalue)
+      with Cvalue.V.Not_based_on_null -> cvalue, ival
+    end
+  | Some ival ->
+    try
+      let ival' = Cvalue.V.project_ival cvalue in
+      if Ival.is_int ival'
+      then
+        let reduced_ival = Ival.narrow ival ival' in
+        let cvalue = Cvalue.V.inject_ival reduced_ival in
+        cvalue, Some reduced_ival
+      else cvalue, Some ival
+    with Cvalue.V.Not_based_on_null -> cvalue, Some ival
+
+let () =
+  Abstractions.Reducer.register
+    Main_values.CVal.key Main_values.Interval.key reduce_apron_itv
+
+
 (*
 Local Variables:
 compile-command: "make -C ../../../../.. -j"
