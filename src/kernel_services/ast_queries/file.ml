@@ -316,10 +316,10 @@ module CustomMachdeps =
 
 let machdep_dir () = Kernel.Share.get_dir ~mode:`Must_exist "machdeps"
 
-let regexp_machdep = Str.regexp "^machdep_\\([^.]*\\).json$"
+let regexp_machdep = Str.regexp "^machdep_\\([^.]*\\).yaml$"
 
 let default_machdep_file machdep =
-  let filename = "machdep_" ^ machdep ^ ".json" in
+  let filename = "machdep_" ^ machdep ^ ".yaml" in
   Filepath.Normalized.concat (machdep_dir()) filename
 
 let is_default_machdep machdep =
@@ -368,7 +368,7 @@ let set_machdep () =
 
 let () = Cmdline.run_after_configuring_stage set_machdep
 
-type mach = [%import: Cil_types.mach] [@@deriving of_yojson]
+type mach = [%import: Cil_types.mach] [@@deriving yaml]
 
 (* Local to this module. Use Cil.theMachine.theMachine outside *)
 let get_machdep () =
@@ -380,11 +380,14 @@ let get_machdep () =
       if is_default_machdep m then default_machdep_file m
       else Filepath.Normalized.of_string ~existence:Must_exist m
     in
-    match
-      mach_of_yojson (Yojson.Safe.from_file (file:>string))
-    with
+    let res =
+      Result.bind
+        (Yaml_unix.of_file (Fpath.v (file:>string)))
+        mach_of_yaml
+    in
+    match res with
     | Ok machdep -> machdep
-    | Error s ->
+    | Error (`Msg s) ->
       Kernel.fatal "Error during machdep parsing: %s" s
 
 let list_available_machdeps () =

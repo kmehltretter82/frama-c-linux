@@ -1,0 +1,193 @@
+# Schema for use with kwalify tool https://pykwalify.readthedocs.io/
+
+alignof_aligned:
+
+  # alignment of a type with 'aligned' attribute
+
+  type: integer
+
+alignof_double:
+
+  # alignment of 'double' type
+
+  type: integer
+
+alignof_float:
+
+  # alignment of 'float' type
+
+  type: integer
+
+alignof_fun:
+
+  # (non-standard) alignment of a function type. Negative if unsupported
+
+  type: integer
+
+alignof_int:
+
+  #  alignment of 'int' type
+
+  type: integer
+
+alignof_long:
+
+  #  alignment of 'long' type
+
+  type: integer
+
+alignof_longdouble:
+
+  #  alignment of 'long double' type
+
+  type: integer
+
+alignof_longlong:
+
+  #  alignment of 'long long' type
+
+  type: integer
+
+alignof_ptr:
+
+  #  alignment of 'void*' type
+
+  type: integer
+
+alignof_short:
+
+  #  alignment of 'short' type
+
+  type: integer
+
+alignof_string:
+
+  #  alignment of string
+
+  type: integer
+
+alignof_void:
+
+  #  (non-standard) alignment of 'void' type. Negative if unsupported
+
+  type: integer
+
+char_is_unsigned:
+
+  #  whether 'char' is unsigned
+
+  type: boolean
+
+compiler:
+
+  #  compiler being used
+
+  type: string
+
+cpp_arch_flags:
+
+  # arguments to be given to the compiler when this machdep is selected
+
+  # (e.g. '-m32')
+
+  type: list
+
+  items:
+
+    - type: string
+
+has__builtin_va_list:
+
+  #  Whether '__builtin_va_list' is a known type
+
+  type: boolean
+
+little_endian:
+
+  #  whether the architecture is little-endian
+
+  type: boolean
+
+ptr_diff_t:
+
+  #  definition of 'ptrdiff_t'
+
+  type: string
+
+size_t:
+
+  #  type of 'sizeof e'
+
+  type: string
+
+sizeof_double:
+
+  #  size of 'double' type
+
+  type: integer
+
+sizeof_float:
+
+  #  size of 'float' type
+
+  type: integer
+
+sizeof_fun:
+
+  #  (non-standard) size of a function type. Negative if unsupported
+
+  type: integer
+
+sizeof_int:
+
+  #  size of 'int' type
+
+  type: integer
+
+sizeof_long:
+
+  #  size of 'long' type
+
+  type: integer
+
+sizeof_longdouble:
+
+  #  size of 'long double' type
+
+  type: integer
+
+sizeof_longlong:
+
+  #  size of 'long long' type
+
+  type: integer
+
+sizeof_ptr:
+
+  #  size of 'void*' type
+
+  type: integer
+
+sizeof_short:
+
+  #  size of 'short' type
+
+  type: integer
+
+sizeof_void:
+
+  #  (non-standard) size of 'void' type. Negative if unsupported
+
+  type: integer
+
+version:
+
+  #  information on this machdep
+
+  type: string
+
+wchar_t:
+
+  #  definition of 'wchar_t'
+
+  type: string

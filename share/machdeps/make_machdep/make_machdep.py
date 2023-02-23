@@ -22,35 +22,24 @@
 ##########################################################################
 
 """
-Produces a machdep.ml file for a given architecture.
+Produces a machdep.yaml file for a given architecture.
 
 Prerequisites:
 
 - A C11-compatible (cross-)compiler (with support for _Generic),
-  or a (cross-)compiler having __builtin_types_compatible_p
-
 - A (cross-)compiler supporting _Static_assert
 - A (cross-)compiler supporting _Alignof or alignof
 
-- objdump
+This script tries to compile several source files to extract the
+information we need in terms of sizeof, alignof and representation
+of the various types defined by the standard (e.g. size_t, wchar_t, ...)
 
-This script tries to compile several source files into object files,
-then uses objdump to extract information from the compilation.
-
-We want to obtain values produced by the compiler.
-In an ideal scenario, we are able to execute the binary, so we can just use
-printf(). However, when cross-compiling, we may be unable to run the program.
-Even worse, we may lack a proper runtime, and thus simply obtaining an
-executable may be impossible.
-However, we don't really need it: having an object file (with symbols) is
-usually enough.
-
-Compilation is split in several files because, for non-standard constructions,
-some compilers (e.g. CompCert) may fail to parse them. We must detect these
-cases and output warnings, but without preventing compilation of the rest.
+In case some values are not identified, the YAML format can be edited
+by hand afterwards.
 """
 
 import argparse
+import yaml
 import json
 from pathlib import Path
 import re
@@ -72,13 +61,13 @@ parser.add_argument(
 
 parser.add_argument(
     "--from-file",
-    help="reads compiler and arch flags from existing json file. Use -i to update it in place",
+    help="reads compiler and arch flags from existing yaml file. Use -i to update it in place",
 )
 parser.add_argument(
     "-i",
     "--in-place",
     action="store_true",
-    help="when reading compiler config from json, update the file in place. unused otherwise",
+    help="when reading compiler config from yaml, update the file in place. unused otherwise",
 )
 
 parser.add_argument(
@@ -104,10 +93,10 @@ if not args.compiler_flags:
 
 if args.from_file:
     orig_file = open(args.from_file, "r")
-    orig_machdep = json.load(orig_file)
+    orig_machdep = yaml.safe_load(orig_file)
     orig_file.close()
     if not "compiler" in orig_machdep or not "cpp_arch_flags" in orig_machdep:
-        raise Exception("Missing fields in json file")
+        raise Exception("Missing fields in yaml file")
     args.compiler = orig_machdep["compiler"]
     if isinstance(orig_machdep["cpp_arch_flags"], list):
         args.cpp_arch_flags = orig_machdep["cpp_arch_flags"]
@@ -118,7 +107,7 @@ if args.from_file:
 def print_machdep(machdep):
     if args.in_place:
         args.dest_file = open(args.from_file, "w")
-    json.dump(machdep, args.dest_file, indent=4, sort_keys=True)
+    yaml.dump(machdep, args.dest_file, indent=4, sort_keys=True)
     # Python does not end the dump with a newline by itself
     args.dest_file.write("\n")
 
