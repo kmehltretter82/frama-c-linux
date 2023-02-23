@@ -34,19 +34,23 @@
 [alias] Skipping assignment b->n2 = a->n2 (not implemented)
 [alias] May-aliases at the end of function main:
   <list of may-alias>
+  collapsed arrays: {  }
   <end of list>
 [alias] Functions done
 Before statement b->t1[i] = a->t1[i]; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement idx = 0; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement b->t2[i] = a->t2[i]; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement while (idx < 10) {
@@ -55,89 +59,109 @@ Before statement while (idx < 10) {
                  } :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement if (*n == 1) *n = 0; else (*n) ++; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement i ++; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement if (*n == 1) *n = 0; else (*n) ++; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement b->n1 = a->n1; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement if (! (idx < 10)) break; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement *n = 0; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement b->n2 = a->n2; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement break; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement (*n) ++; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement f1(a); :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement *(odata + idx) = (double)3 * *(idata + idx) + (double)1; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement f2(b); :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement *(odata + idx) = (double)3 * *(idata + idx) + (double)1; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement __retres = 0; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement idx ++; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement ty *tmp = x; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement swap(tmp->n2); :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement idata = (double *)malloc((unsigned long)10 * sizeof(double)); :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement return; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement while (1) {
@@ -156,6 +180,7 @@ Before statement while (1) {
                  } :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement idata = tmp->t2[*(tmp->n2)];
@@ -172,33 +197,40 @@ Before statement idata = tmp->t2[*(tmp->n2)];
                  swap(tmp->n1); :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement a = (ty *)malloc(sizeof(ty)); :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement idata = tmp->t2[*(tmp->n2)]; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement b = (ty *)malloc(sizeof(ty)); :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement odata = tmp->t1[*(tmp->n1)]; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement i = 0; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement idx = 0; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement while (i < 2) {
@@ -207,6 +239,7 @@ Before statement while (i < 2) {
                    i ++;
                  } :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement while (idx < 10) {
@@ -219,33 +252,40 @@ Before statement while (idx < 10) {
                  } :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement return __retres; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement if (! (i < 2)) break; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement if (! (idx < 10)) break; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement break; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement break; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
                  a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double)); :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement {
@@ -255,68 +295,83 @@ Before statement {
                  } :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double)); :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement tmp_1 = sin(*(idata + idx));
                  *(odata + idx) = 0.5 * tmp_1; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double)); :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement tmp_1 = sin(*(idata + idx)); :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement i ++; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement *(odata + idx) = 0.5 * tmp_1; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement a->n1 = (int *)malloc(sizeof(int)); :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement idx ++; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement a->n2 = (int *)malloc(sizeof(int)); :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement swap(tmp->n1); :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement *(a->n1) = 1; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement *(a->n2) = 1; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement i = 0; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement ty *tmp = x; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement while (i < 2) {
@@ -325,11 +380,13 @@ Before statement while (i < 2) {
                    i ++;
                  } :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement idata = (double *)malloc((unsigned long)10 * sizeof(double)); :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement while (1) {
@@ -344,10 +401,12 @@ Before statement while (1) {
                  } :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement if (! (i < 2)) break; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement idata = tmp->t1[*(tmp->n1)];
@@ -360,25 +419,30 @@ Before statement idata = tmp->t1[*(tmp->n1)];
                  swap(tmp->n2); :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement break; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement idata = tmp->t1[*(tmp->n1)]; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement b->t1[i] = a->t1[i];
                  b->t2[i] = a->t2[i]; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement odata = tmp->t2[*(tmp->n2)]; :
  <list of may-alias>
 {x; tmp; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 [alias] Analysis complete

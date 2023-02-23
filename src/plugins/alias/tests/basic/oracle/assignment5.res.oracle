@@ -4,49 +4,59 @@
   <list of may-alias>
   {b; *a; } are aliased
   {c; d; *b; } are aliased
+  collapsed arrays: {  }
   <end of list>
 [alias] Functions done
 Before statement int ***a = (int ***)0; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement int **b = (int **)0; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement int *c = (int *)0; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement int *d = (int *)0; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement *a = b; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement *b = c; :
  <list of may-alias>
 {b; *a; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement d = *(*a); :
  <list of may-alias>
 {c; *b; } are aliased
 {b; *a; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement __retres = 0; :
  <list of may-alias>
 {b; *a; } are aliased
 {c; d; *b; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement return __retres; :
  <list of may-alias>
 {b; *a; } are aliased
 {c; d; *b; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 [alias] Analysis complete

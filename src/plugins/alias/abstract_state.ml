@@ -138,7 +138,7 @@ let print_aliases fmt (x:t) =
   in
   Format.fprintf fmt "@[<hov 2><list of may-alias>@.";
   VMap.iter iter_vmap x.vmap;
-   let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
+  let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
   Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval;
   Format.fprintf fmt "<end of list>@]@."
 
@@ -181,7 +181,7 @@ let assert_invariants (x:t) : unit =
     assert (LSet.fold (fun lv acc -> acc && LMap.mem lv x.lmap) ls true)
   in
   VMap.iter assert_vmap x.vmap
-(* TODO : check collapsed *) 
+(* TODO : check collapsed *)
 
 (* for debuging *)
 let assert_invariants x =
@@ -263,12 +263,12 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
     new_v , new_x
 
 (* transforms the offset (and the graph) in case of an variable index:
-   
+
 
 *)
 (* let is_collapsed lv x =
  *   LSet.mem lv x.collapsed
- * 
+ *
  * let rec manage_offset (o:offset) (x:t) : offset * t =
  *   match o with
  *   | NoOffset -> o,x
@@ -277,20 +277,20 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
  *     Field(f,o), x
  *   | Index _ ->
  *     o,x *)
-    (* TODO
-    let host = fst lv in
-    if (is_collapsed host x)
-    then
-      (* return the collapsed lvap*)
-      (host,Index(Cil.mone ~loc:location,location)) , x
-    else
-    if Cil.isConstant exp then
-      begin
- 
-      ignore exp; lv,x
-    end
+(* TODO
+   let host = fst lv in
+   if (is_collapsed host x)
+   then
+   (* return the collapsed lvap*)
+   (host,Index(Cil.mone ~loc:location,location)) , x
+   else
+   if Cil.isConstant exp then
+   begin
+
+   ignore exp; lv,x
+   end
 *)
-    
+
 (* find the vertex of an lval *)
 let rec find_or_create_vertex (lv:lval) (x:t) : V.t * t =
   (* let lv,x = manage_offset lv x in *)
@@ -408,6 +408,14 @@ let merge x v1 v2 =
     let new_lmap = LSet.fold (fun lv2 m -> LMap.add lv2 v1 m) set2 x.lmap in
     (* update vmap *)
     let new_vmap = VMap.add v1 new_set (VMap.remove v2 x.vmap) in
+    (* update collapse *)
+    let new_collapsed =
+      if VSet.mem v2 x.collapsed
+      then
+        VSet.add v1 (VSet.remove v2 x.collapsed)
+      else
+        x.collapsed
+    in
     (* update the graph *)
     let f_fold_succ v_succ (g:G.t) : G.t =
       G.add_edge g v1 v_succ
@@ -420,7 +428,7 @@ let merge x v1 v2 =
     let g = G.fold_pred f_fold_pred g v2 g in
     (* remove v2 *)
     let g =  G.remove_vertex g v2 in
-    {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt ; collapsed = x.collapsed}
+    {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt ; collapsed = new_collapsed}
 
 
 (** functions for steensgard's algorithm *)

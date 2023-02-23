@@ -5,39 +5,46 @@
   {d; *c; } are aliased
   {a; b; } are aliased
   {c; *a; *b; } are aliased
+  collapsed arrays: {  }
   <end of list>
 [alias] Functions done
 Before statement b = & c; :
  <list of may-alias>
+collapsed arrays: {  }
 <end of list>
 
 Before statement c = & d; :
  <list of may-alias>
 {c; *b; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement d = & e; :
  <list of may-alias>
 {c; *b; } are aliased
 {d; *c; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement if (a) a = b; else a = & c; :
  <list of may-alias>
 {c; *b; } are aliased
 {d; *c; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement a = b; :
  <list of may-alias>
 {c; *b; } are aliased
 {d; *c; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement a = & c; :
  <list of may-alias>
 {c; *b; } are aliased
 {d; *c; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement __retres = 0; :
@@ -45,6 +52,7 @@ Before statement __retres = 0; :
 {d; *c; } are aliased
 {a; b; } are aliased
 {c; *a; *b; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 Before statement return __retres; :
@@ -52,6 +60,7 @@ Before statement return __retres; :
 {d; *c; } are aliased
 {a; b; } are aliased
 {c; *a; *b; } are aliased
+collapsed arrays: {  }
 <end of list>
 
 [alias] Analysis complete
