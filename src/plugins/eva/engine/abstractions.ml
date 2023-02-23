@@ -65,7 +65,8 @@ module Value = struct
 
   (* The value abstraction build consists of accumulating registered values
      into a structured value and then adding the needed operators, thus making
-     it interactive. *)
+     it interactive. A [Unit] structured abstraction is used for the initial
+     state and is discarded as soon as a real value abstraction is added. *)
   module type Structured = Abstract.Value.Internal
   module type Interactive = Abstract.Value.External
   type 'a or_unit = Unit | Value of 'a
@@ -102,10 +103,12 @@ module Value = struct
       end)
     | _ -> structured
 
-  (* The minimal value abstraction to use. It contains the CValue abstraction,
-     configured depending of the bitwise *)
+  (* The minimal value abstraction to use. *)
   let init : structured = Unit
 
+  (* During the complete abstraction build, we need to verify that there is at
+     least one value in the computed abstraction.
+     TODO: better error handling. *)
   let assert_not_unit = function
     | Unit -> Self.fatal "The built value cannot be unit."
     | Value interactive -> interactive
@@ -209,6 +212,7 @@ module Location = struct
     | Last registered -> folder registered acc
     | hd :: tl -> fold { folder } tl (folder hd acc)
 
+  (* Folding over the values dependencies of some locations dependencies. *)
   let rec fold_values : type v. 'a Value.folder -> v dependencies -> 'a -> 'a =
     fun folder dependencies acc ->
     match dependencies with
@@ -232,7 +236,9 @@ module Location = struct
   module type Interactive = Abstract.Location.External
 
   (* We expose the type of the structured value we are based on to statically
-     ensure that we do not temper with it. *)
+     ensure that we do not temper with it. As for the value abstractions, a
+     [Unit] structured abstraction is used for the initial state and is
+     discarded as soon as a location is added. *)
   type ('u, 'l) or_unit = Unit of 'u | Location of 'l
   type 'v value = (module Value.Interactive with type t = 'v)
   type 'v structured_module = (module Structured with type value = 'v)
@@ -243,6 +249,9 @@ module Location = struct
   (* Initial location builder *)
   let init (value : 'v value) : 'v structured = Unit value
 
+  (* During the complete abstraction build, we need to verify that there is at
+     least one location in the computed abstraction.
+     TODO: better error handling. *)
   let assert_not_unit = function
     | Unit _ -> Self.fatal "The built location cannot be unit."
     | Location interactive -> interactive
@@ -261,20 +270,19 @@ module Location = struct
           end)
       end)
 
+  (* Retrieves the value contained in a structured location. *)
   let get_value : type v. v structured -> v value = function
     | Unit value -> value
     | Location (module S) -> (module S.Value)
 
 
   (* Adding a registered location into a structured one is done in three steps:
-     1. Computing the values dependencies structure.
-     2. Computing the registered location structure. This steps starts by
-        checking if the dependencies are the same as the structured value. If
-        it is the case, there is pretty much nothing to do. If not, we have to
-        lift the location to make it use the structured value.
-     3. Computing the new location abstraction. It simply consists of a
-        reduced product with the structured location, except if the last one is
-        Unit. In that case, we simply use the registered location. *)
+     1. Lifting the location abstraction we want to add to match the value
+        abstraction contained in the structured abstraction.
+     2. Combine the given location abstraction with the one contained in the
+        structured abstraction. It comes down to decide if a reduced product is
+        needed.
+     3. Rebuild a structured abstraction with the new location abstraction. *)
   let add : type v l. l registered -> v structured -> v structured =
     fun (module Registered) structured ->
     let deps = Value.outline Registered.dependencies in
@@ -453,6 +461,8 @@ module Domain = struct
     | RegisteredDomain  : 's Leaf.registered -> registered
     | RegisteredFunctor : Functor.registered -> registered
 
+  (* Registered domain are saved in mutable lists along with there information,
+     i.e. there name, there experimental and there priority flags. *)
   type 't with_info =
     { name : string
     ; experimental : bool
@@ -460,20 +470,27 @@ module Domain = struct
     ; abstraction : 't
     }
 
+  (* The configuration of an analysis contains a set of domains along with their
+     mode. *)
   type 't with_mode = 't * Domain_mode.t option
 
 
+  (* Mutable lists containing statically and dynamically registered domains. *)
   let static_domains = ref []
   let dynamic_domains = ref []
 
+  (* Helper function used to register the parameters of a domain. *)
   let register_domain_option ~name ~experimental ~descr =
     let descr = if experimental then "Experimental. " ^ descr else descr in
     Parameters.register_domain ~name ~descr
 
+  (* Helper function used to dispatch the registration process to the good
+     registration process depending of the domain kind. *)
   let register_abstraction = function
     | Domain register -> RegisteredDomain (Leaf.register register)
     | Functor register -> RegisteredFunctor (Functor.register register)
 
+  (* Registration of a static domain. *)
   let register ~name ~descr ?(experimental=false) ?(priority=0) register =
     register_domain_option ~name ~descr ~experimental ;
     let abstraction = register_abstraction register in
@@ -481,6 +498,7 @@ module Domain = struct
     static_domains := registered :: !static_domains ;
     abstraction
 
+  (* Registration of a dynamic domain. *)
   let dynamic_register ~name ~descr ?(experimental=false) ?(priority=0) make =
     register_domain_option ~name ~descr ~experimental ;
     let make () = make () |> register_abstraction in
@@ -503,20 +521,25 @@ module Domain = struct
       with type value = value and type location = location
   end
 
+  (* As for the value and location abstractions, a [Unit] structured domain is
+     used for the initial state. *)
   type ('v, 'l, 's) or_unit = Unit of 'v * 'l | State of 's
   type 'v value = (module Value.Interactive with type t = 'v)
   type ('v, 'l) location =
     (module Location.Interactive with type value = 'v and type location = 'l)
   type ('v, 'l) structured_module =
     (module Structured with type value = 'v and type location = 'l)
-
   type ('v, 'l) structured =
     ('v value, ('v, 'l) location, ('v, 'l) structured_module) or_unit
 
+  (* Recovers the value and location abstractions of a structured domain. *)
   let get : type v l. (v, l) structured -> v value * (v, l) location = function
     | Unit (value, location) -> (value, location)
     | State (module S) -> ((module S.Value), (module S.Location))
 
+  (* During the complete abstraction build, we need to verify that there is at
+     least one domain in the computed abstraction.
+     TODO: better error handling. *)
   let assert_not_unit = function
     | Unit _ -> Self.fatal "The built domain cannot be unit."
     | State structured -> structured
@@ -708,11 +731,6 @@ end
 (* --- Value reduced product ----------------------------------------------- *)
 
 module Reducer = struct
-  module type S = sig
-    include Abstract.Value.External
-    val reduce : t -> t
-  end
-
   type 'a key = 'a Value.key
   type ('a, 'b) reducer = 'a -> 'b -> 'a * 'b
   type action = Action : 'a key * 'b key * ('a, 'b) reducer -> action
@@ -721,6 +739,11 @@ module Reducer = struct
 
   let register left right reducer =
     actions := (Action (left, right, reducer)) :: !actions
+
+  module type Value = sig
+    include Abstract.Value.External
+    val reduce : t -> t
+  end
 
   module Make (Value : Abstract.Value.External) = struct
     include Value
@@ -745,7 +768,7 @@ end
 (* --- Finalizing abstractions build ---------------------------------------- *)
 
 module type S = sig
-  module Val : Reducer.S
+  module Val : Reducer.Value
   module Loc : Abstract.Location.External with type value = Val.t
   module Dom : Abstract.Domain.External
     with type value = Val.t and type location = Loc.location
@@ -780,5 +803,3 @@ let make config =
   let abstractions = Config.elements config |> Domain.build in
   let abstractions = (module Open (val abstractions) : S) in
   Hooks.apply abstractions
-
-(* module Default = (val make (Config.configure ())) *)
