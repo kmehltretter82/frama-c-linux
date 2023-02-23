@@ -1212,7 +1212,6 @@ module C11 =
   end)
 let () = C11.add_update_hook
     (fun _old _new -> warning "Option -c11 is deprecated and has no effect. \
-                               (enabled by default). \
                                Use -kernel-warn-key c11 for warnings about \
                                usage of some C11 constructions.")
 
