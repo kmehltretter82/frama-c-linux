@@ -14,6 +14,7 @@ compiler: generic
 cpp_arch_flags:
 - -m64
 has__builtin_va_list: true
+intptr_t: long
 little_endian: true
 ptrdiff_t: long
 size_t: unsigned long
@@ -27,5 +28,7 @@ sizeof_longlong: 8
 sizeof_ptr: 8
 sizeof_short: 2
 sizeof_void: -1
+uintptr_t: unsigned long
 version: clang version 15.0.7
 wchar_t: int
+wint_t: unsigned int

@@ -16,6 +16,7 @@ cpp_arch_flags:
 - powerpc-apple-linux
 - -mcpu=603
 has__builtin_va_list: true
+intptr_t: int
 little_endian: false
 ptrdiff_t: int
 size_t: unsigned int
@@ -29,5 +30,8 @@ sizeof_longlong: 8
 sizeof_ptr: 4
 sizeof_short: 2
 sizeof_void: 1
+uintptr_t: unsigned int
 version: clang version 15.0.7
 wchar_t: int
+wint_t: unsigned int
+

@@ -111,15 +111,17 @@ def print_machdep(machdep):
     # Python does not end the dump with a newline by itself
     args.dest_file.write("\n")
 
+def make_schema():
+    schema_filename = my_path.parent / "machdep-schema.yaml"
+    with open(schema_filename, "r") as schema:
+        return yaml.safe_load(schema)
+
+schema = make_schema()
 
 def check_machdep(machdep):
     try:
         from jsonschema import validate, ValidationError
-
-        schema_filename = my_path.parent / "machdep-schema.json"
-
-        with open(schema_filename, "r") as schema:
-            validate(machdep, json.load(schema))
+        validate(machdep,schema)
     except ImportError:
         warnings.warn("jsonschema is not available: no validation will be performed")
     except OSError:
@@ -127,40 +129,13 @@ def check_machdep(machdep):
     except ValidationError:
         warnings.warn("machdep object is not conforming to machdep schema")
 
+def make_machdep():
+    machdep = { }
+    for key in schema.keys():
+        machdep[key] = None
+    return machdep
 
-# This must remain synchronized with cil_types.ml's 'mach' type
-machdep = {
-    "sizeof_short": None,
-    "sizeof_int": None,
-    "sizeof_long": None,
-    "sizeof_longlong": None,
-    "sizeof_ptr": None,
-    "sizeof_float": None,
-    "sizeof_double": None,
-    "sizeof_longdouble": None,
-    "sizeof_void": None,
-    "sizeof_fun": None,
-    "size_t": None,
-    "wchar_t": None,
-    "ptrdiff_t": None,
-    "alignof_short": None,
-    "alignof_int": None,
-    "alignof_long": None,
-    "alignof_longlong": None,
-    "alignof_ptr": None,
-    "alignof_float": None,
-    "alignof_double": None,
-    "alignof_longdouble": None,
-    "alignof_str": None,
-    "alignof_fun": None,
-    "char_is_unsigned": None,
-    "little_endian": None,
-    "alignof_aligned": None,
-    "has__builtin_va_list": None,
-    "compiler": None,
-    "cpp_arch_flags": None,
-    "version": None,
-}
+machdep = make_machdep()
 
 compilation_command = [args.compiler] + args.cpp_arch_flags + args.compiler_flags
 
@@ -189,6 +164,9 @@ source_files = [
     ("size_t.c", "type"),
     ("wchar_t.c", "type"),
     ("ptrdiff_t.c", "type"),
+    ("intptr_t.c", "type"),
+    ("uintptr_t.c", "type"),
+    ("wint_t.c", "type"),
     ("char_is_unsigned.c", "bool"),
     ("little_endian.c", "bool"),
     ("has__builtin_va_list.c", "has__builtin_va_list"),

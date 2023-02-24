@@ -14,6 +14,7 @@ compiler: gcc
 cpp_arch_flags:
 - -m32
 has__builtin_va_list: true
+intptr_t: int
 little_endian: true
 ptrdiff_t: int
 size_t: unsigned int
@@ -27,5 +28,7 @@ sizeof_longlong: 8
 sizeof_ptr: 4
 sizeof_short: 2
 sizeof_void: 1
+uintptr_t: unsigned int
 version: gcc (GCC) 12.2.1 20230201
 wchar_t: long
+wint_t: unsigned int

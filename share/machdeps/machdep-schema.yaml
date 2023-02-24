@@ -60,15 +60,9 @@ alignof_short:
 
   type: integer
 
-alignof_string:
+alignof_str:
 
   description:  alignment of string
-
-  type: integer
-
-alignof_void:
-
-  description:  (non-standard) alignment of 'void' type. Negative if unsupported
 
   type: integer
 
@@ -102,13 +96,18 @@ has__builtin_va_list:
 
   type: boolean
 
+intptr_t:
+  description: definition of 'intptr_t'
+
+  type: string
+
 little_endian:
 
   description:  whether the architecture is little-endian
 
   type: boolean
 
-ptr_diff_t:
+ptrdiff_t:
 
   description:  definition of 'ptrdiff_t'
 
@@ -180,6 +179,12 @@ sizeof_void:
 
   type: integer
 
+uintptr_t:
+
+  description: definition of 'uintptr_t'
+
+  type: string
+
 version:
 
   description:  information on this machdep
@@ -189,5 +194,11 @@ version:
 wchar_t:
 
   description:  definition of 'wchar_t'
+
+  type: string
+
+wint_t:
+
+  description: definition of 'wint_t'
 
   type: string

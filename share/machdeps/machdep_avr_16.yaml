@@ -16,6 +16,7 @@ cpp_arch_flags:
 - avr
 - -m16
 has__builtin_va_list: true
+intptr_t: int
 little_endian: true
 ptrdiff_t: int
 size_t: unsigned int
@@ -29,5 +30,8 @@ sizeof_longlong: 8
 sizeof_ptr: 2
 sizeof_short: 2
 sizeof_void: 1
+uintptr_t: unsigned int
 version: clang version 15.0.7
 wchar_t: int
+wint_t: int
+

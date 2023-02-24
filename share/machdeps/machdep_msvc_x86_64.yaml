@@ -14,6 +14,7 @@ compiler: msvc
 cpp_arch_flags:
 - -m64
 has__builtin_va_list: false
+intptr_t: signed long long
 little_endian: true
 ptrdiff_t: long long
 size_t: unsigned long long
@@ -27,5 +28,7 @@ sizeof_longlong: 8
 sizeof_ptr: 8
 sizeof_short: 2
 sizeof_void: 0
+uintptr_t: unsigned long long
 version: MSVC - X86-64bits mode
 wchar_t: unsigned short
+wint_t: unsigned short
