@@ -20940,7 +20940,7 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "valid_nptr." },
+          "message": { "text": "valid_string_nptr." },
           "locations": [
             {
               "physicalLocation": {
@@ -20950,10 +20950,10 @@
                 },
                 "region": {
                   "startLine": 98,
-                  "startColumn": 23,
+                  "startColumn": 30,
                   "endLine": 98,
-                  "endColumn": 40,
-                  "byteLength": 17
+                  "endColumn": 53,
+                  "byteLength": 23
                 }
               }
             }
@@ -21435,7 +21435,7 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "valid_nptr." },
+          "message": { "text": "valid_string_nptr." },
           "locations": [
             {
               "physicalLocation": {
@@ -21445,10 +21445,10 @@
                 },
                 "region": {
                   "startLine": 120,
-                  "startColumn": 23,
+                  "startColumn": 30,
                   "endLine": 120,
-                  "endColumn": 40,
-                  "byteLength": 17
+                  "endColumn": 53,
+                  "byteLength": 23
                 }
               }
             }
@@ -23281,7 +23281,7 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "valid_nptr." },
+          "message": { "text": "valid_string_nptr." },
           "locations": [
             {
               "physicalLocation": {
@@ -23291,10 +23291,10 @@
                 },
                 "region": {
                   "startLine": 165,
-                  "startColumn": 23,
+                  "startColumn": 30,
                   "endLine": 165,
-                  "endColumn": 40,
-                  "byteLength": 17
+                  "endColumn": 53,
+                  "byteLength": 23
                 }
               }
             }
@@ -23799,7 +23799,7 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "valid_nptr." },
+          "message": { "text": "valid_string_nptr." },
           "locations": [
             {
               "physicalLocation": {
@@ -23809,10 +23809,10 @@
                 },
                 "region": {
                   "startLine": 142,
-                  "startColumn": 23,
+                  "startColumn": 30,
                   "endLine": 142,
-                  "endColumn": 40,
-                  "byteLength": 17
+                  "endColumn": 53,
+                  "byteLength": 23
                 }
               }
             }
@@ -24294,7 +24294,7 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "valid_nptr." },
+          "message": { "text": "valid_string_nptr." },
           "locations": [
             {
               "physicalLocation": {
@@ -24304,10 +24304,10 @@
                 },
                 "region": {
                   "startLine": 190,
-                  "startColumn": 23,
+                  "startColumn": 30,
                   "endLine": 190,
-                  "endColumn": 40,
-                  "byteLength": 17
+                  "endColumn": 53,
+                  "byteLength": 23
                 }
               }
             }
@@ -24812,7 +24812,7 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "valid_nptr." },
+          "message": { "text": "valid_string_nptr." },
           "locations": [
             {
               "physicalLocation": {
@@ -24822,10 +24822,10 @@
                 },
                 "region": {
                   "startLine": 215,
-                  "startColumn": 23,
+                  "startColumn": 30,
                   "endLine": 215,
-                  "endColumn": 40,
-                  "byteLength": 17
+                  "endColumn": 53,
+                  "byteLength": 23
                 }
               }
             }
@@ -25330,7 +25330,7 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "valid_nptr." },
+          "message": { "text": "valid_string_nptr." },
           "locations": [
             {
               "physicalLocation": {
@@ -25340,10 +25340,10 @@
                 },
                 "region": {
                   "startLine": 240,
-                  "startColumn": 23,
+                  "startColumn": 30,
                   "endLine": 240,
-                  "endColumn": 40,
-                  "byteLength": 17
+                  "endColumn": 53,
+                  "byteLength": 23
                 }
               }
             }

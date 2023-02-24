@@ -95,7 +95,7 @@ extern long long int atoll(const char *nptr);
 /* See ISO C: 7.20.1.3 to complete these specifications */
 
 /*@
-  requires valid_nptr: \valid_read(nptr); // cannot be precise, valid_read_string too strong
+  requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
   assigns \result \from indirect:nptr, indirect:nptr[0 ..];
   assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr;
@@ -117,7 +117,7 @@ extern double strtod(const char * restrict nptr,
      char ** restrict endptr);
 
 /*@
-  requires valid_nptr: \valid_read(nptr); // cannot be precise, valid_read_string too strong
+  requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
   assigns \result \from indirect:nptr, indirect:nptr[0 ..];
   assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr;
@@ -139,7 +139,7 @@ extern float strtof(const char * restrict nptr,
      char ** restrict endptr);
 
 /*@
-  requires valid_nptr: \valid_read(nptr); // cannot be precise, valid_read_string too strong
+  requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
   assigns \result \from indirect:nptr, indirect:nptr[0 ..];
   assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr;
@@ -162,7 +162,7 @@ extern long double strtold(const char * restrict nptr,
 
 /* TODO: See ISO C 7.20.1.4 to complete these specifications */
 /*@
-  requires valid_nptr: \valid_read(nptr); // cannot be precise, valid_read_string too strong
+  requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
   requires base_range: base == 0 || 2 <= base <= 36;
   assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
@@ -187,7 +187,7 @@ extern long int strtol(
      int base);
 
 /*@
-  requires valid_nptr: \valid_read(nptr); // cannot be precise, valid_read_string too strong
+  requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
   requires base_range: base == 0 || 2 <= base <= 36;
   assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
@@ -212,7 +212,7 @@ extern long long int strtoll(
      int base);
 
 /*@
-  requires valid_nptr: \valid_read(nptr); // cannot be precise, valid_read_string too strong
+  requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
   requires base_range: base == 0 || 2 <= base <= 36;
   assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
@@ -237,7 +237,7 @@ extern unsigned long int strtoul(
      int base);
 
 /*@
-  requires valid_nptr: \valid_read(nptr); // cannot be precise, valid_read_string too strong
+  requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
   requires base_range: base == 0 || 2 <= base <= 36;
   assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
