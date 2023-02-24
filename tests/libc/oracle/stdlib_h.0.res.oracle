@@ -18,8 +18,8 @@
 [eva] Done for function strtol
 [eva] computing for function strtol <- main.
   Called from stdlib_h.c:22.
-[eva:alarm] stdlib_h.c:22: Warning: 
-  function strtol: precondition 'valid_nptr' got status unknown.
+[eva] stdlib_h.c:22: 
+  function strtol: precondition 'valid_nptr' got status valid.
 [eva] stdlib_h.c:22: 
   function strtol: precondition 'separation' got status valid.
 [eva] stdlib_h.c:22: 
@@ -29,8 +29,8 @@
 [eva] Done for function strtol
 [eva] computing for function strtol <- main.
   Called from stdlib_h.c:23.
-[eva:alarm] stdlib_h.c:23: Warning: 
-  function strtol: precondition 'valid_nptr' got status unknown.
+[eva] stdlib_h.c:23: 
+  function strtol: precondition 'valid_nptr' got status valid.
 [eva] stdlib_h.c:23: 
   function strtol: precondition 'separation' got status valid.
 [eva] stdlib_h.c:23: 
@@ -59,8 +59,8 @@
 [eva] Done for function strtoll
 [eva] computing for function strtoll <- main.
   Called from stdlib_h.c:29.
-[eva:alarm] stdlib_h.c:29: Warning: 
-  function strtoll: precondition 'valid_nptr' got status unknown.
+[eva] stdlib_h.c:29: 
+  function strtoll: precondition 'valid_nptr' got status valid.
 [eva] stdlib_h.c:29: 
   function strtoll: precondition 'separation' got status valid.
 [eva] stdlib_h.c:29: 
@@ -70,8 +70,8 @@
 [eva] Done for function strtoll
 [eva] computing for function strtoll <- main.
   Called from stdlib_h.c:30.
-[eva:alarm] stdlib_h.c:30: Warning: 
-  function strtoll: precondition 'valid_nptr' got status unknown.
+[eva] stdlib_h.c:30: 
+  function strtoll: precondition 'valid_nptr' got status valid.
 [eva] stdlib_h.c:30: 
   function strtoll: precondition 'separation' got status valid.
 [eva] stdlib_h.c:30: 
@@ -91,8 +91,8 @@
 [eva] Done for function strtoul
 [eva] computing for function strtoul <- main.
   Called from stdlib_h.c:35.
-[eva:alarm] stdlib_h.c:35: Warning: 
-  function strtoul: precondition 'valid_nptr' got status unknown.
+[eva] stdlib_h.c:35: 
+  function strtoul: precondition 'valid_nptr' got status valid.
 [eva] stdlib_h.c:35: 
   function strtoul: precondition 'separation' got status valid.
 [eva] stdlib_h.c:35: 
@@ -102,8 +102,8 @@
 [eva] Done for function strtoul
 [eva] computing for function strtoul <- main.
   Called from stdlib_h.c:36.
-[eva:alarm] stdlib_h.c:36: Warning: 
-  function strtoul: precondition 'valid_nptr' got status unknown.
+[eva] stdlib_h.c:36: 
+  function strtoul: precondition 'valid_nptr' got status valid.
 [eva] stdlib_h.c:36: 
   function strtoul: precondition 'separation' got status valid.
 [eva] stdlib_h.c:36: 
@@ -123,8 +123,8 @@
 [eva] Done for function strtoull
 [eva] computing for function strtoull <- main.
   Called from stdlib_h.c:41.
-[eva:alarm] stdlib_h.c:41: Warning: 
-  function strtoull: precondition 'valid_nptr' got status unknown.
+[eva] stdlib_h.c:41: 
+  function strtoull: precondition 'valid_nptr' got status valid.
 [eva] stdlib_h.c:41: 
   function strtoull: precondition 'separation' got status valid.
 [eva] stdlib_h.c:41: 
@@ -134,8 +134,8 @@
 [eva] Done for function strtoull
 [eva] computing for function strtoull <- main.
   Called from stdlib_h.c:42.
-[eva:alarm] stdlib_h.c:42: Warning: 
-  function strtoull: precondition 'valid_nptr' got status unknown.
+[eva] stdlib_h.c:42: 
+  function strtoull: precondition 'valid_nptr' got status valid.
 [eva] stdlib_h.c:42: 
   function strtoull: precondition 'separation' got status valid.
 [eva] stdlib_h.c:42: 
@@ -153,8 +153,8 @@
 [eva] Done for function strtod
 [eva] computing for function strtod <- main.
   Called from stdlib_h.c:48.
-[eva:alarm] stdlib_h.c:48: Warning: 
-  function strtod: precondition 'valid_nptr' got status unknown.
+[eva] stdlib_h.c:48: 
+  function strtod: precondition 'valid_nptr' got status valid.
 [eva] stdlib_h.c:48: 
   function strtod: precondition 'separation' got status valid.
 [eva] stdlib_h.c:48: 
@@ -162,8 +162,8 @@
 [eva] Done for function strtod
 [eva] computing for function strtod <- main.
   Called from stdlib_h.c:49.
-[eva:alarm] stdlib_h.c:49: Warning: 
-  function strtod: precondition 'valid_nptr' got status unknown.
+[eva] stdlib_h.c:49: 
+  function strtod: precondition 'valid_nptr' got status valid.
 [eva] stdlib_h.c:49: 
   function strtod: precondition 'separation' got status valid.
 [eva] Done for function strtod
@@ -179,8 +179,8 @@
 [eva] Done for function strtold
 [eva] computing for function strtold <- main.
   Called from stdlib_h.c:54.
-[eva:alarm] stdlib_h.c:54: Warning: 
-  function strtold: precondition 'valid_nptr' got status unknown.
+[eva] stdlib_h.c:54: 
+  function strtold: precondition 'valid_nptr' got status valid.
 [eva] stdlib_h.c:54: 
   function strtold: precondition 'separation' got status valid.
 [eva] stdlib_h.c:54: 
@@ -188,8 +188,8 @@
 [eva] Done for function strtold
 [eva] computing for function strtold <- main.
   Called from stdlib_h.c:55.
-[eva:alarm] stdlib_h.c:55: Warning: 
-  function strtold: precondition 'valid_nptr' got status unknown.
+[eva] stdlib_h.c:55: 
+  function strtold: precondition 'valid_nptr' got status valid.
 [eva] stdlib_h.c:55: 
   function strtold: precondition 'separation' got status valid.
 [eva] Done for function strtold
@@ -205,8 +205,8 @@
 [eva] Done for function strtof
 [eva] computing for function strtof <- main.
   Called from stdlib_h.c:60.
-[eva:alarm] stdlib_h.c:60: Warning: 
-  function strtof: precondition 'valid_nptr' got status unknown.
+[eva] stdlib_h.c:60: 
+  function strtof: precondition 'valid_nptr' got status valid.
 [eva] stdlib_h.c:60: 
   function strtof: precondition 'separation' got status valid.
 [eva] stdlib_h.c:60: 
@@ -214,8 +214,8 @@
 [eva] Done for function strtof
 [eva] computing for function strtof <- main.
   Called from stdlib_h.c:61.
-[eva:alarm] stdlib_h.c:61: Warning: 
-  function strtof: precondition 'valid_nptr' got status unknown.
+[eva] stdlib_h.c:61: 
+  function strtof: precondition 'valid_nptr' got status valid.
 [eva] stdlib_h.c:61: 
   function strtof: precondition 'separation' got status valid.
 [eva] Done for function strtof

@@ -943,7 +943,7 @@ extern long long atoll(char const *nptr);
       assumes nonnull_endptr: endptr ≢ \null;
       requires valid_endptr: \valid(endptr);
       ensures initialization: \initialized(\old(endptr));
-      ensures valid_endptr: \valid_read(\old(endptr));
+      ensures valid_endptr_content: \valid_read(*\old(endptr));
       ensures position_subset: \subset(*\old(endptr), \old(nptr) + (0 ..));
       assigns \result, *endptr;
       assigns \result \from (indirect: nptr), (indirect: *(nptr + (0 ..)));
@@ -971,7 +971,7 @@ extern double strtod(char const * restrict nptr, char ** restrict endptr);
       assumes nonnull_endptr: endptr ≢ \null;
       requires valid_endptr: \valid(endptr);
       ensures initialization: \initialized(\old(endptr));
-      ensures valid_endptr: \valid_read(\old(endptr));
+      ensures valid_endptr_content: \valid_read(*\old(endptr));
       ensures position_subset: \subset(*\old(endptr), \old(nptr) + (0 ..));
       assigns \result, *endptr;
       assigns \result \from (indirect: nptr), (indirect: *(nptr + (0 ..)));
@@ -999,7 +999,7 @@ extern float strtof(char const * restrict nptr, char ** restrict endptr);
       assumes nonnull_endptr: endptr ≢ \null;
       requires valid_endptr: \valid(endptr);
       ensures initialization: \initialized(\old(endptr));
-      ensures valid_endptr: \valid_read(\old(endptr));
+      ensures valid_endptr_content: \valid_read(*\old(endptr));
       ensures position_subset: \subset(*\old(endptr), \old(nptr) + (0 ..));
       assigns \result, *endptr;
       assigns \result \from (indirect: nptr), (indirect: *(nptr + (0 ..)));
@@ -1033,7 +1033,7 @@ extern long double strtold(char const * restrict nptr,
       assumes nonnull_endptr: endptr ≢ \null;
       requires valid_endptr: \valid(endptr);
       ensures initialization: \initialized(\old(endptr));
-      ensures valid_endptr: \valid_read(\old(endptr));
+      ensures valid_endptr_content: \valid_read(*\old(endptr));
       ensures position_subset: \subset(*\old(endptr), \old(nptr) + (0 ..));
       assigns \result, *endptr;
       assigns \result
@@ -1070,7 +1070,7 @@ extern long strtol(char const * restrict nptr, char ** restrict endptr,
       assumes nonnull_endptr: endptr ≢ \null;
       requires valid_endptr: \valid(endptr);
       ensures initialization: \initialized(\old(endptr));
-      ensures valid_endptr: \valid_read(\old(endptr));
+      ensures valid_endptr_content: \valid_read(*\old(endptr));
       ensures position_subset: \subset(*\old(endptr), \old(nptr) + (0 ..));
       assigns \result, *endptr;
       assigns \result
@@ -1107,7 +1107,7 @@ extern long long strtoll(char const * restrict nptr, char ** restrict endptr,
       assumes nonnull_endptr: endptr ≢ \null;
       requires valid_endptr: \valid(endptr);
       ensures initialization: \initialized(\old(endptr));
-      ensures valid_endptr: \valid_read(\old(endptr));
+      ensures valid_endptr_content: \valid_read(*\old(endptr));
       ensures position_subset: \subset(*\old(endptr), \old(nptr) + (0 ..));
       assigns \result, *endptr;
       assigns \result
@@ -1144,7 +1144,7 @@ extern unsigned long strtoul(char const * restrict nptr,
       assumes nonnull_endptr: endptr ≢ \null;
       requires valid_endptr: \valid(endptr);
       ensures initialization: \initialized(\old(endptr));
-      ensures valid_endptr: \valid_read(\old(endptr));
+      ensures valid_endptr_content: \valid_read(*\old(endptr));
       ensures position_subset: \subset(*\old(endptr), \old(nptr) + (0 ..));
       assigns \result, *endptr;
       assigns \result

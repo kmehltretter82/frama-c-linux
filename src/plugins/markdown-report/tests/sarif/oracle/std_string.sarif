@@ -21078,7 +21078,7 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "valid_endptr." },
+          "message": { "text": "valid_endptr_content." },
           "locations": [
             {
               "physicalLocation": {
@@ -21088,10 +21088,10 @@
                 },
                 "region": {
                   "startLine": 111,
-                  "startColumn": 26,
+                  "startColumn": 34,
                   "endLine": 111,
-                  "endColumn": 45,
-                  "byteLength": 19
+                  "endColumn": 54,
+                  "byteLength": 20
                 }
               }
             }
@@ -21573,7 +21573,7 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "valid_endptr." },
+          "message": { "text": "valid_endptr_content." },
           "locations": [
             {
               "physicalLocation": {
@@ -21583,10 +21583,10 @@
                 },
                 "region": {
                   "startLine": 133,
-                  "startColumn": 26,
+                  "startColumn": 34,
                   "endLine": 133,
-                  "endColumn": 45,
-                  "byteLength": 19
+                  "endColumn": 54,
+                  "byteLength": 20
                 }
               }
             }
@@ -23442,7 +23442,7 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "valid_endptr." },
+          "message": { "text": "valid_endptr_content." },
           "locations": [
             {
               "physicalLocation": {
@@ -23452,10 +23452,10 @@
                 },
                 "region": {
                   "startLine": 179,
-                  "startColumn": 26,
+                  "startColumn": 34,
                   "endLine": 179,
-                  "endColumn": 45,
-                  "byteLength": 19
+                  "endColumn": 54,
+                  "byteLength": 20
                 }
               }
             }
@@ -23937,7 +23937,7 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "valid_endptr." },
+          "message": { "text": "valid_endptr_content." },
           "locations": [
             {
               "physicalLocation": {
@@ -23947,10 +23947,10 @@
                 },
                 "region": {
                   "startLine": 155,
-                  "startColumn": 26,
+                  "startColumn": 34,
                   "endLine": 155,
-                  "endColumn": 45,
-                  "byteLength": 19
+                  "endColumn": 54,
+                  "byteLength": 20
                 }
               }
             }
@@ -24455,7 +24455,7 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "valid_endptr." },
+          "message": { "text": "valid_endptr_content." },
           "locations": [
             {
               "physicalLocation": {
@@ -24465,10 +24465,10 @@
                 },
                 "region": {
                   "startLine": 204,
-                  "startColumn": 26,
+                  "startColumn": 34,
                   "endLine": 204,
-                  "endColumn": 45,
-                  "byteLength": 19
+                  "endColumn": 54,
+                  "byteLength": 20
                 }
               }
             }
@@ -24973,7 +24973,7 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "valid_endptr." },
+          "message": { "text": "valid_endptr_content." },
           "locations": [
             {
               "physicalLocation": {
@@ -24983,10 +24983,10 @@
                 },
                 "region": {
                   "startLine": 229,
-                  "startColumn": 26,
+                  "startColumn": 34,
                   "endLine": 229,
-                  "endColumn": 45,
-                  "byteLength": 19
+                  "endColumn": 54,
+                  "byteLength": 20
                 }
               }
             }
@@ -25491,7 +25491,7 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
-          "message": { "text": "valid_endptr." },
+          "message": { "text": "valid_endptr_content." },
           "locations": [
             {
               "physicalLocation": {
@@ -25501,10 +25501,10 @@
                 },
                 "region": {
                   "startLine": 254,
-                  "startColumn": 26,
+                  "startColumn": 34,
                   "endLine": 254,
-                  "endColumn": 45,
-                  "byteLength": 19
+                  "endColumn": 54,
+                  "byteLength": 20
                 }
               }
             }

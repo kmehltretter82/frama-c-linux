@@ -108,7 +108,7 @@ extern long long int atoll(const char *nptr);
     assigns \result \from indirect:nptr, indirect:nptr[0 ..];
     assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr;
     ensures initialization: \initialized(endptr);
-    ensures valid_endptr: \valid_read(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
     ensures position_subset: \subset(*endptr, nptr + (0 ..));
   complete behaviors;
   disjoint behaviors;
@@ -130,7 +130,7 @@ extern double strtod(const char * restrict nptr,
     assigns \result \from indirect:nptr, indirect:nptr[0 ..];
     assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr;
     ensures initialization: \initialized(endptr);
-    ensures valid_endptr: \valid_read(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
     ensures position_subset: \subset(*endptr, nptr + (0 ..));
   complete behaviors;
   disjoint behaviors;
@@ -152,7 +152,7 @@ extern float strtof(const char * restrict nptr,
     assigns \result \from indirect:nptr, indirect:nptr[0 ..];
     assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr;
     ensures initialization: \initialized(endptr);
-    ensures valid_endptr: \valid_read(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
     ensures position_subset: \subset(*endptr, nptr + (0 ..));
   complete behaviors;
   disjoint behaviors;
@@ -176,7 +176,7 @@ extern long double strtold(const char * restrict nptr,
     assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
     assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr, indirect:base;
     ensures initialization: \initialized(endptr);
-    ensures valid_endptr: \valid_read(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
     ensures position_subset: \subset(*endptr, nptr + (0 ..));
   complete behaviors;
   disjoint behaviors;
@@ -201,7 +201,7 @@ extern long int strtol(
     assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
     assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr, indirect:base;
     ensures initialization: \initialized(endptr);
-    ensures valid_endptr: \valid_read(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
     ensures position_subset: \subset(*endptr, nptr + (0 ..));
   complete behaviors;
   disjoint behaviors;
@@ -226,7 +226,7 @@ extern long long int strtoll(
     assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
     assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr, indirect:base;
     ensures initialization: \initialized(endptr);
-    ensures valid_endptr: \valid_read(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
     ensures position_subset: \subset(*endptr, nptr + (0 ..));
   complete behaviors;
   disjoint behaviors;
@@ -251,7 +251,7 @@ extern unsigned long int strtoul(
     assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
     assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr, indirect:base;
     ensures initialization: \initialized(endptr);
-    ensures valid_endptr: \valid_read(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
     ensures position_subset: \subset(*endptr, nptr + (0 ..));
   complete behaviors;
   disjoint behaviors;
