@@ -291,12 +291,12 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
    end
 *)
 
-(* find the vertex of an lval *)
-let rec find_or_create_vertex (lv:lval) (x:t) : V.t * t =
-  (* let lv,x = manage_offset lv x in *)
-  match lv with
-    ( Var _, NoOffset) -> (try (LMap.find lv x.lmap, x) with  Not_found -> create_vertex lv x)
-  | (Mem e, NoOffset) ->
+
+let rec find_host (hs:lhost) (x:t) : V.t * t =
+  let lv = (hs, NoOffset) in
+  match hs with
+    Var _ ->  (try (LMap.find lv x.lmap, x) with  Not_found -> create_vertex lv x)
+  | Mem e ->
     begin
       match e.enode with
         Const _ -> failwith "Not implemented1 "
@@ -318,9 +318,19 @@ let rec find_or_create_vertex (lv:lval) (x:t) : V.t * t =
       | AddrOf lv -> find_or_create_vertex lv x
       | StartOf lv ->  find_or_create_vertex lv x
     end
-  (* TODO !!! do offset *)
-  | (y,_) -> find_or_create_vertex (y, NoOffset) x (* simply ignores offset *)
 
+
+(* find the vertex of an lval *)
+and find_or_create_vertex (lv:lval) (x:t) : V.t * t =
+  try  (LMap.find lv x.lmap, x)
+  with
+    Not_found ->
+    begin
+      match lv with
+        (hs, NoOffset) -> find_host hs x
+      (* TODO !!! do offset *)
+      | (hs,_) -> find_or_create_vertex (hs, NoOffset) x (* simply ignores offset *)
+    end
 
 let find_vertex lv x =
   let v,x1 = find_or_create_vertex lv x in
