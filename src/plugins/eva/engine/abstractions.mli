@@ -182,7 +182,7 @@ end
     configuration can either be built from a given domain along with its
     name or can be built based on the command line parameters. The first
     approach relies on the [singleton] function and is mainly used to
-    build a default abstraction during the engine initialization. The 
+    build a default abstraction during the engine initialization. The
     second one relies on the [configure] function. *)
 module Config : sig
   type t
