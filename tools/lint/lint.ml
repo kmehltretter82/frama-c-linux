@@ -134,7 +134,7 @@ let parse_config config_file =
     in match config_tools with
     | Result.Ok external_tools -> updates_tbl external_tools
     | Result.Error txt ->
-      warn "Parse error:%s:%s" config_file txt
+      warn "Parse error:%s:%s@." config_file txt
 
 (************************)
 
@@ -145,13 +145,15 @@ type indent_check = NoCheck | Check of indent_formatter option
 let parse_indent_formatter ~file ~attr ~value = match value with
   | "unset" -> NoCheck
   | "set"   -> Check None (* use the default formatter *)
-  | "ocp-indent" -> Check (Some ml_indent_formatter)
   | _ ->
     match Hashtbl.find_opt external_tbl value with
     | None ->
-      warn "Unsupported indent formatter: %s %s=%s@."
-        file attr value;
-      NoCheck
+      if value = "ocp-indent" then
+        (* "ocp-indent" is not overloaded: using the built-in configuration *)
+        Check (Some ml_indent_formatter)
+      else (warn "Unsupported indent formatter: %s %s=%s@."
+              file attr value;
+            NoCheck)
     | res -> Check res
 
 (**************************************************************************)
@@ -175,7 +177,7 @@ let add_attr ~file ~attr ~value checks =
   let is_set = function
     | "set" -> true
     | "unset" -> false
-    | _ -> warn "Invalid attribute value: %s %s=%s" file attr value ; false
+    | _ -> warn "Invalid attribute value: %s %s=%s@." file attr value ; false
   in
   match attr with
   | "check-eoleof" -> { checks with eoleof = is_set value }
@@ -183,7 +185,7 @@ let add_attr ~file ~attr ~value checks =
   | "check-utf8"   -> { checks with utf8 = is_set value }
   | "check-indent" -> { checks with
                         indent = parse_indent_formatter ~file ~attr ~value }
-  | _ -> warn "Unknown attribute: %s %s=%s" file attr value;
+  | _ -> warn "Unknown attribute: %s %s=%s@." file attr value;
     checks
 
 let handled_attr s =
@@ -344,11 +346,12 @@ let check_indent ~indent_formatter ~update file =
   let tool = match indent_formatter with
     | Some tool -> tool
     | None -> (* uses the default formatter *)
-      match Filename.extension file with
-      | ".ml" | ".mli" -> ml_indent_formatter
-      | extension -> match Hashtbl.find_opt default_tbl extension with
-        | None -> raise Bad_ext
-        | Some tool -> tool
+      let extension = Filename.extension file in
+      match Hashtbl.find_opt default_tbl extension with
+      | Some tool -> tool
+      | None -> match extension with
+        | ".ml" | ".mli" -> ml_indent_formatter
+        | _ -> raise Bad_ext
   in match tool with
   | Ocp_indent -> check_ml_indent ~update file
   | Tool indent_formatter ->
@@ -419,6 +422,13 @@ let check ~verbose ~update file params =
 (* Options *)
 
 let exec_name = Sys.argv.(0)
+
+let version= "1.0"
+
+let version () =
+  Format.printf "%s version %s@." (Filename.basename exec_name) version;
+  exit 0
+
 let update = ref false
 let verbose = ref false
 let config_file = ref ""
@@ -428,8 +438,9 @@ let argspec = [
   "-u", Arg.Set update, " Update ill-formed files (does not handle UTF8 update)" ;
   "-v", Arg.Set verbose, " Verbose mode" ;
   "-s", Arg.Set strict, " Considers warnings as errors for the exit value" ;
-  "-c", Arg.String (fun s -> config_file := s), "<config-file> Reads the JSON configuration file (allows to overload the default configuration)" ;
-  "-e", Arg.Set extract_config, " Print default JSON configuration" ;
+  "-c", Arg.String (fun s -> config_file := s), "<json-config-file> Reads the JSON configuration file (allows to overload the default configuration)" ;
+  "-e", Arg.Set extract_config, " Prints default JSON configuration" ;
+  "--version", Arg.Unit version, " Prints tool version" ;
 ]
 let sort argspec =
   List.sort (fun (name1, _, _) (name2, _, _) -> String.compare name1 name2)
@@ -442,7 +453,10 @@ let () =
   Arg.parse
     (Arg.align (sort argspec))
     (fun s -> warn "Unknown argument: %s@." s)
-    ("Usage: git ls-files -z | git check-attr --stdin -z -a | " ^ exec_name ^ " [options]");
+    ("Usage: git ls-files -z | git check-attr --stdin -z -a | " ^ exec_name ^ " [options]\n"
+     ^"\nChecks or updates files in relation to lint constraints specified by these git attributes:\n"
+     ^"  check-eoleof, check-syntax, check-utf8 and check-indent.\n"
+     ^"\nOptions:");
   if !extract_config then
     Format.printf "Default JSON configuration:@.%a@."
       (Yojson.Safe.pretty_print ~std:false) (tools_to_yojson external_formatters)
