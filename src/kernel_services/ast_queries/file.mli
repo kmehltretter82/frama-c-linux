@@ -62,15 +62,6 @@ val new_machdep: string -> Cil_types.mach -> unit
     @raise Invalid_argument if the given name already exists
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
-val machdep_macro: string -> string
-(** [machdep_macro machine] returns the name of a macro __FC_MACHDEP_XXX so
-    that the preprocessor can select std lib definition consistent with
-    the selected machdep. This function will emit a warning if [machine] is
-    not known by default by the kernel and return __FC_MACHDEP_MACHINE in that
-    case.
-    @since Magnesium-20151001 (exported in the API)
-*)
-
 val list_available_machdeps: unit -> string list
 (** [list_available_machdeps ()] gives the list of the names of available
     machdeps, starting with the ones added with new_machdep and ending with

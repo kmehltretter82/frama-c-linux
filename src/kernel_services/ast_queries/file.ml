@@ -23,7 +23,6 @@
 open Cil_types
 open Cil
 open Visitor
-open Cil_datatype
 
 type cpp_opt_kind = Gnu | Not_gnu | Unknown
 
@@ -271,30 +270,6 @@ let print_machdep fmt (m : Cil_types.mach) =
       (if m.has__builtin_va_list then "has" else "has not") ;
   end
 
-let regexp_existing_machdep_macro = Str.regexp "-D[ ]*__FC_MACHDEP_"
-
-let existing_machdep_macro () =
-  let extra = String.concat " " (Kernel.CppExtraArgs.get ()) in
-  try
-    ignore (Str.search_forward regexp_existing_machdep_macro extra 0);
-    true
-  with Not_found -> false
-
-let machdep_macro = function
-  | "x86_16"                -> "__FC_MACHDEP_X86_16"
-  | "gcc_x86_16"            -> "__FC_MACHDEP_GCC_X86_16"
-  | "x86_32"                -> "__FC_MACHDEP_X86_32"
-  | "gcc_x86_32"            -> "__FC_MACHDEP_GCC_X86_32"
-  | "x86_64"                -> "__FC_MACHDEP_X86_64"
-  | "gcc_x86_64"            -> "__FC_MACHDEP_GCC_X86_64"
-  | "ppc_32"                -> "__FC_MACHDEP_PPC_32"
-  | "msvc_x86_64"           -> "__FC_MACHDEP_MSVC_X86_64"
-  | s ->
-    let res = "__FC_MACHDEP_" ^ (String.uppercase_ascii s) in
-    Kernel.warning ~once:true
-      "machdep %s has no registered macro. Using %s for pre-processing" s res;
-    res
-
 module CustomMachdeps =
   State_builder.Hashtbl(Datatype.String.Hashtbl)(Cil_datatype.Machdep)
     (struct
@@ -469,15 +444,14 @@ let build_cpp_cmd = function
     (* Hypothesis: the preprocessor is POSIX compliant,
        hence understands -I and -D. *)
     let fc_include_args =
-      if Kernel.FramaCStdLib.get () then [(Fc_config.framac_libc:>string)]
+      if Kernel.FramaCStdLib.get () then
+        begin
+          let machdep_dir = Machdep.generate_machdep_header (get_machdep()) in
+          [(machdep_dir:>string); (Fc_config.framac_libc:>string)]
+        end
       else []
     in
-    let fc_define_args =
-      if not (existing_machdep_macro ())
-      then [machdep_macro (Kernel.Machdep.get ())]
-      else []
-    in
-    let fc_define_args = "__FRAMAC__" :: fc_define_args in
+    let fc_define_args = ["__FRAMAC__"] in
     (* Hypothesis: the preprocessor does support the arch-related
        options tested when 'configure' was run. *)
     let required_cpp_arch_args = (get_machdep ()).cpp_arch_flags in
@@ -919,7 +893,7 @@ let cleanup file =
   let visitor = object(self)
     inherit Visitor.frama_c_inplace
 
-    val mutable keep_stmt = Stmt.Set.empty
+    val mutable keep_stmt = Cil_datatype.Stmt.Set.empty
 
     val mutable changed = false
 
@@ -933,9 +907,9 @@ let cleanup file =
 
     method! vstmt_aux st =
       self#remove_lexical_annotations st;
-      let loc = Stmt.loc st in
+      let loc = Cil_datatype.Stmt.loc st in
       if Annotations.has_code_annot st || st.labels <> [] || st.sattr <> [] then
-        keep_stmt <- Stmt.Set.add st keep_stmt;
+        keep_stmt <- Cil_datatype.Stmt.Set.add st keep_stmt;
       match st.skind with
       | Block b ->
         (* queue is flushed afterwards*)
@@ -951,8 +925,9 @@ let cleanup file =
         b.bstmts <-
           List.filter
             (fun x ->
-               not (Cil.is_skip x.skind) || Stmt.Set.mem x keep_stmt ||
-               ( changed <- true; false) (* don't try this at home, kids...*)
+              not (Cil.is_skip x.skind)
+              || Cil_datatype.Stmt.Set.mem x keep_stmt
+              || (changed <- true; false)
             )
             b.bstmts;
         (* Now that annotations are in the table, we do not need to
@@ -1268,7 +1243,7 @@ let find_logic_info_decl li =
          | GAnnot (ga,_) ->
            if
              List.exists
-               (fun li' -> Logic_info.equal li li')
+               (fun li' -> Cil_datatype.Logic_info.equal li li')
                (extract_logic_infos ga)
            then raise (F.Found g)
          | _ -> ())
@@ -1290,12 +1265,12 @@ class reorder_ast: Visitor.frama_c_visitor =
   in
   object(self)
     inherit Visitor.frama_c_inplace
-    val mutable known_enuminfo = Enuminfo.Set.empty
-    val mutable known_compinfo = Compinfo.Set.empty
-    val mutable known_typeinfo = Typeinfo.Set.empty
-    val mutable known_var = Varinfo.Set.empty
-    val mutable known_logic_info = Logic_info.Set.empty
-    val mutable local_logic_info = Logic_info.Set.empty
+    val mutable known_enuminfo = Cil_datatype.Enuminfo.Set.empty
+    val mutable known_compinfo = Cil_datatype.Compinfo.Set.empty
+    val mutable known_typeinfo = Cil_datatype.Typeinfo.Set.empty
+    val mutable known_var = Cil_datatype.Varinfo.Set.empty
+    val mutable known_logic_info = Cil_datatype.Logic_info.Set.empty
+    val mutable local_logic_info = Cil_datatype.Logic_info.Set.empty
 
     (* globals that have to be declared before current declaration. *)
     val mutable needed_decls = []
@@ -1312,19 +1287,19 @@ class reorder_ast: Visitor.frama_c_visitor =
     val logic_info_deps = Global_annotation_graph.create ()
 
     method private add_known_enuminfo ei =
-      known_enuminfo <- Enuminfo.Set.add ei known_enuminfo
+      known_enuminfo <- Cil_datatype.Enuminfo.Set.add ei known_enuminfo
 
     method private add_known_compinfo ci =
-      known_compinfo <- Compinfo.Set.add ci known_compinfo
+      known_compinfo <- Cil_datatype.Compinfo.Set.add ci known_compinfo
 
     method private add_known_type ty =
-      known_typeinfo <- Typeinfo.Set.add ty known_typeinfo
+      known_typeinfo <- Cil_datatype.Typeinfo.Set.add ty known_typeinfo
 
     method private add_known_var vi =
-      known_var <- Varinfo.Set.add vi known_var
+      known_var <- Cil_datatype.Varinfo.Set.add vi known_var
 
     method private add_known_logic_info li =
-      known_logic_info <- Logic_info.Set.add li known_logic_info
+      known_logic_info <- Cil_datatype.Logic_info.Set.add li known_logic_info
 
     method private add_needed_decl g =
       needed_decls <- g :: needed_decls
@@ -1402,8 +1377,8 @@ class reorder_ast: Visitor.frama_c_visitor =
                   (Daxiomatic
                      (unique_name_recursive_axiomatic (),
                       entries, attr,
-                      Location.unknown),
-                   Location.unknown))::res)
+                      Cil_datatype.Location.unknown),
+                   Cil_datatype.Location.unknown))::res)
             entries []
         end else begin
           Global_annotation_graph.fold
@@ -1428,7 +1403,7 @@ class reorder_ast: Visitor.frama_c_visitor =
 
        | TNamed (ty,_) ->
          let g = find_typeinfo ty in
-         if not (Typeinfo.Set.mem ty known_typeinfo) then begin
+         if not (Cil_datatype.Typeinfo.Set.mem ty known_typeinfo) then begin
            self#add_needed_decl g;
            Stack.push g typedefs;
            Stack.push true subvisit;
@@ -1446,19 +1421,19 @@ class reorder_ast: Visitor.frama_c_visitor =
                    ty.tname)
              typedefs
        | TComp(ci,_) ->
-         if not (Compinfo.Set.mem ci known_compinfo) then begin
-           self#add_needed_decl (GCompTagDecl (ci,Location.unknown));
+         if not (Cil_datatype.Compinfo.Set.mem ci known_compinfo) then begin
+           self#add_needed_decl(GCompTagDecl(ci,Cil_datatype.Location.unknown));
            self#add_known_compinfo ci
          end
        | TEnum(ei,_) ->
-         if not (Enuminfo.Set.mem ei known_enuminfo) then begin
-           self#add_needed_decl (GEnumTagDecl (ei, Location.unknown));
+         if not (Cil_datatype.Enuminfo.Set.mem ei known_enuminfo) then begin
+           self#add_needed_decl(GEnumTagDecl(ei,Cil_datatype.Location.unknown));
            self#add_known_enuminfo ei
          end);
       DoChildren
 
     method! vvrbl vi =
-      if vi.vglob && not (Varinfo.Set.mem vi known_var) then begin
+      if vi.vglob && not (Cil_datatype.Varinfo.Set.mem vi known_var) then begin
         if Cil.isFunctionType vi.vtype then
           self#add_needed_decl (GFunDecl (Cil.empty_funspec(),vi,vi.vdecl))
         else
@@ -1471,7 +1446,7 @@ class reorder_ast: Visitor.frama_c_visitor =
       if not (Logic_env.is_builtin_logic_function lv.l_var_info.lv_name) then
         begin
           let g = find_logic_info_decl lv in
-          if not (Logic_info.Set.mem lv known_logic_info) then begin
+          if not(Cil_datatype.Logic_info.Set.mem lv known_logic_info) then begin
             self#add_annot_depend g;
             Stack.push true subvisit;
             (* visit will also push g in needed_annot. *)
@@ -1483,13 +1458,13 @@ class reorder_ast: Visitor.frama_c_visitor =
         end
 
     method private add_local_logic_info li =
-      local_logic_info <- Logic_info.Set.add li local_logic_info
+      local_logic_info <- Cil_datatype.Logic_info.Set.add li local_logic_info
 
     method private remove_local_logic_info li =
-      local_logic_info <- Logic_info.Set.remove li local_logic_info
+      local_logic_info <- Cil_datatype.Logic_info.Set.remove li local_logic_info
 
     method private is_local_logic_info li =
-      Logic_info.Set.mem li local_logic_info
+      Cil_datatype.Logic_info.Set.mem li local_logic_info
 
     method! vlogic_var_use lv =
       let logic_infos = Annotations.logic_info_of_global lv.lv_name in
@@ -1547,48 +1522,53 @@ class reorder_ast: Visitor.frama_c_visitor =
 
 module Remove_spurious = struct
   type env =
-    { typeinfos: Typeinfo.Set.t;
-      compinfos: Compinfo.Set.t;
-      enuminfos: Enuminfo.Set.t;
-      varinfos: Varinfo.Set.t;
-      logic_infos: Logic_info.Set.t;
+    { typeinfos: Cil_datatype.Typeinfo.Set.t;
+      compinfos: Cil_datatype.Compinfo.Set.t;
+      enuminfos: Cil_datatype.Enuminfo.Set.t;
+      varinfos: Cil_datatype.Varinfo.Set.t;
+      logic_infos: Cil_datatype.Logic_info.Set.t;
       kept: global list;
     }
 
   let treat_one_global acc g =
     match g with
-    | GType (ty,_) when Typeinfo.Set.mem ty acc.typeinfos -> acc
+    | GType (ty,_) when Cil_datatype.Typeinfo.Set.mem ty acc.typeinfos -> acc
     | GType (ty,_) ->
       { acc with
-        typeinfos = Typeinfo.Set.add ty acc.typeinfos;
+        typeinfos = Cil_datatype.Typeinfo.Set.add ty acc.typeinfos;
         kept = g :: acc.kept }
     | GCompTag _ -> { acc with kept = g :: acc.kept }
-    | GCompTagDecl(ci,_) when Compinfo.Set.mem ci acc.compinfos -> acc
+    | GCompTagDecl(ci,_)
+        when Cil_datatype.Compinfo.Set.mem ci acc.compinfos -> acc
     | GCompTagDecl(ci,_) ->
       { acc with
-        compinfos = Compinfo.Set.add ci acc.compinfos;
+        compinfos = Cil_datatype.Compinfo.Set.add ci acc.compinfos;
         kept = g :: acc.kept }
     | GEnumTag _ -> { acc with kept = g :: acc.kept }
-    | GEnumTagDecl(ei,_) when Enuminfo.Set.mem ei acc.enuminfos -> acc
+    | GEnumTagDecl(ei,_)
+        when Cil_datatype.Enuminfo.Set.mem ei acc.enuminfos -> acc
     | GEnumTagDecl(ei,_) ->
       { acc with
-        enuminfos = Enuminfo.Set.add ei acc.enuminfos;
+        enuminfos = Cil_datatype.Enuminfo.Set.add ei acc.enuminfos;
         kept = g :: acc.kept }
     | GVarDecl(vi,_) | GFunDecl (_, vi, _)
-      when Varinfo.Set.mem vi acc.varinfos -> acc
+        when Cil_datatype.Varinfo.Set.mem vi acc.varinfos -> acc
     | GVarDecl(vi,_) ->
       { acc with
-        varinfos = Varinfo.Set.add vi acc.varinfos;
+        varinfos = Cil_datatype.Varinfo.Set.add vi acc.varinfos;
         kept = g :: acc.kept }
     | GVar _ | GFun _ | GFunDecl _ -> { acc with kept = g :: acc.kept }
     | GAsm _ | GPragma _ | GText _ -> { acc with kept = g :: acc.kept }
     | GAnnot (a,_) ->
       let lis = extract_logic_infos a in
-      if List.exists (fun x -> Logic_info.Set.mem x acc.logic_infos) lis
+      if List.exists
+           (fun x -> Cil_datatype.Logic_info.Set.mem x acc.logic_infos)
+           lis
       then acc
       else begin
         let known_li =
-          List.fold_left (Fun.flip Logic_info.Set.add) acc.logic_infos lis
+          List.fold_left
+            (Fun.flip Cil_datatype.Logic_info.Set.add) acc.logic_infos lis
         in
         { acc with
           kept = g::acc.kept;
@@ -1597,11 +1577,11 @@ module Remove_spurious = struct
       end
 
   let empty =
-    { typeinfos = Typeinfo.Set.empty;
-      compinfos = Compinfo.Set.empty;
-      enuminfos = Enuminfo.Set.empty;
-      varinfos = Varinfo.Set.empty;
-      logic_infos = Logic_info.Set.empty;
+    { typeinfos = Cil_datatype.Typeinfo.Set.empty;
+      compinfos = Cil_datatype.Compinfo.Set.empty;
+      enuminfos = Cil_datatype.Enuminfo.Set.empty;
+      varinfos = Cil_datatype.Varinfo.Set.empty;
+      logic_infos = Cil_datatype.Logic_info.Set.empty;
       kept = [];
     }
 
