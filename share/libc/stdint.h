@@ -96,8 +96,8 @@ typedef __UINTPTR_T uintptr_t;
 #endif
 
 /* ISO C: 7.18.1.5 */
-typedef __INT_MAX_T intmax_t;
-typedef __UINT_MAX_T uintmax_t;
+typedef __INTMAX_T intmax_t;
+typedef __UINTMAX_T uintmax_t;
 
 /* ISO C: 7.18.2.1 */
 #define INT8_MIN (-128)
