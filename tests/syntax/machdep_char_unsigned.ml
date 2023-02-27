@@ -30,7 +30,10 @@ let md = {
   little_endian = true;
   size_t = "unsigned int";
   wchar_t = "int";
+  intptr_t = "int";
+  uintptr_t = "unsigned int";
   ptrdiff_t = "int";
+  wint_t = "long";
   has__builtin_va_list = true;
 }
 

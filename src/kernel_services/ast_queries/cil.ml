@@ -119,7 +119,7 @@ type theMachine =
 
 let createMachine () = (* Contain dummy values *)
   { useLogicalOperators = false;
-    theMachine = Machdeps.x86_64;
+    theMachine = List.hd Cil_datatype.Machdep.reprs;
     lowerConstants = false(*true*);
     insertImplicitCasts = true;
     stringLiteralType = charConstPtrType;

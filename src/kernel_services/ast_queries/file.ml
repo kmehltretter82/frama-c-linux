@@ -271,17 +271,6 @@ let print_machdep fmt (m : Cil_types.mach) =
       (if m.has__builtin_va_list then "has" else "has not") ;
   end
 
-module DatatypeMachdep = Datatype.Make_with_collections(struct
-    include Datatype.Serializable_undefined
-    let reprs = [Machdeps.x86_32]
-    let name = "File.Machdep"
-    type t = Cil_types.mach
-    let compare : t -> t -> int = Stdlib.compare
-    let equal : t -> t -> bool = (=)
-    let hash : t -> int = Hashtbl.hash
-    let copy = Datatype.identity
-  end)
-
 let regexp_existing_machdep_macro = Str.regexp "-D[ ]*__FC_MACHDEP_"
 
 let existing_machdep_macro () =
@@ -307,7 +296,7 @@ let machdep_macro = function
     res
 
 module CustomMachdeps =
-  State_builder.Hashtbl(Datatype.String.Hashtbl)(DatatypeMachdep)
+  State_builder.Hashtbl(Datatype.String.Hashtbl)(Cil_datatype.Machdep)
     (struct
       let name = " File.CustomMachdeps"
       let size = 5

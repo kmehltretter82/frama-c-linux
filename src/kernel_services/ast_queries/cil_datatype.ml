@@ -2627,6 +2627,55 @@ module Syntactic_scope =
             Location.pretty (Stmt.loc s) Stmt.pretty s
     end)
 
+let dummy_machdep =
+  {
+    sizeof_short = 2;
+    sizeof_int = 4;
+    sizeof_long = 8;
+    sizeof_longlong = 8;
+    sizeof_ptr = 8;
+    sizeof_float = 4;
+    sizeof_double = 8;
+    sizeof_longdouble = 16;
+    sizeof_void = -1;
+    sizeof_fun = -1;
+    size_t = "unsigned long";
+    wchar_t = "int";
+    ptrdiff_t = "long";
+    intptr_t = "long";       (* Type of "intptr_t" *)
+    uintptr_t = "unsigned long";      (* Type of "uintptr_t" *)
+    wint_t = "int";
+    alignof_short = 2;
+    alignof_int = 4;
+    alignof_long = 8;
+    alignof_longlong = 8;
+    alignof_ptr = 8;
+    alignof_float = 4;
+    alignof_double = 8;
+    alignof_longdouble = 16;
+    alignof_str = 1;
+    alignof_fun = -1;
+    char_is_unsigned = true;
+    little_endian = true;
+    alignof_aligned = 16;
+    has__builtin_va_list = true;
+    compiler = "none";
+    cpp_arch_flags = [];
+    version = "N/A";
+  }
+
+module Machdep = Datatype.Make_with_collections(struct
+    include Datatype.Serializable_undefined
+    let reprs = [dummy_machdep]
+    let name = "Machdep"
+    type t = Cil_types.mach
+    let compare : t -> t -> int = Stdlib.compare
+    let equal : t -> t -> bool = (=)
+    let hash : t -> int = Hashtbl.hash
+    let copy = Datatype.identity
+  end)
+
+
 (* -------------------------------------------------------------------------- *)
 (* --- Internal                                                           --- *)
 (* -------------------------------------------------------------------------- *)
