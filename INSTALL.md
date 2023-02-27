@@ -236,44 +236,53 @@ We highly recommend to rely on it for the installation of Frama-C.
 1. Install *required* general macOS tools for OCaml:
 
     ```shell
-    brew install autoconf pkg-config opam
+    brew install opam
     ```
 
-   Do not forget to `opam init` and ``eval `opam config env` `` for a proper
+   Do not forget to `opam init` and `eval $(opam env)` for a proper
    opam installation (if not already done before).
 
 2. Set up a compatible OCaml version (replace `<version>` with the version
-   indicated in the 'recommended working configuration' section):
+   indicated in the [reference configuration](#reference-configuration)):
 
     ```shell
     opam switch create <version>
     ```
 
-3. Install *required* dependencies for Frama-C:
-
-    ```shell
-    brew install gmp gtk+ gtksourceview libgnomecanvas
-    ```
-
-    The graphical libraries require additional manual configuration of your
-    bash profile. Consult this [issue](https://github.com/ocaml/opam-repository/issues/13709) on opam
-    for details. A known working configuration is:
-
-    ```shell
-    export PKG_CONFIG_PATH=/usr/local/opt/libffi/lib/pkgconfig:/usr/local/opt/libxml2/lib/pkgconfig:/usr/local/lib/pkgconfig
-    ```
-
-4. Install *recommended* dependencies for Frama-C:
-
-    ```shell
-    brew install graphviz
-    ```
-
-5. Install Frama-C:
+3. Install Frama-C:
 
     ```shell
     opam install frama-c
     ```
+
+   Opam may ask for the administrator password to handle required system
+   dependencies.
+
+   **It is likely that, at this point, opam will fail due to some Homebrew
+   packages and pkg-config.** The error messages should indicate what you need
+   to do, e.g.:
+
+    ```shell
+    For pkg-config to find zlib you may need to set:
+      export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
+    ```
+
+    After setting such environment variables, re-running `opam install frama-c`
+    should work. If you still have issues, try manually installing the required
+    packages (via `brew install <package>`) and then re-installing Frama-C.
+    **Note**: opam packages prefixed with `conf-` only check if the
+    corresponding system package is findable. If you cannot install some
+    `conf-` package, the solution will likely involve Homebrew and/or setting
+    environment variables, not opam.
+
+4. Install the new Frama-C graphical interface (Ivette).
+
+   **The traditional GTK-based Frama-C GUI no longer works on macOS!**
+
+   You need to use Ivette, the new Frama-C graphical interface.
+   Instructions on installing and running it are presented by opam when
+   the `frama-c` package is installed. Follow them to get Ivette running.
+
 
 ## Installing Frama-C via your Linux distribution (Debian/Ubuntu/Fedora)
 
