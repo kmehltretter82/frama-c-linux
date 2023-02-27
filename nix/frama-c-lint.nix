@@ -6,6 +6,8 @@
 , gitignoreSource
 , ocaml
 , ocp-indent
+, ppx_deriving_yojson
+, yojson
 } :
 
 stdenv.mkDerivation rec {
@@ -24,6 +26,8 @@ stdenv.mkDerivation rec {
     findlib
     ocaml
     ocp-indent
+    ppx_deriving_yojson
+    yojson
   ];
 
   configurePhase = ''

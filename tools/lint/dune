@@ -24,5 +24,6 @@
  (public_name frama-c-lint)
  (name lint)
  (modules lint UTF8)
- (libraries unix ocp-indent.lexer ocp-indent.lib ocp-indent.dynlink)
+ (preprocess (pps ppx_deriving_yojson))
+ (libraries unix yojson ocp-indent.lexer ocp-indent.lib ocp-indent.dynlink)
 )
