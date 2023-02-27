@@ -58,8 +58,67 @@ void symbolic () {
   }
 }
 
+void test_join () {
+  int a, b, c, r;
+  int *p;
+  int x = Frama_C_interval(0, 32);
+  int y = 0;
+  if (rand) {
+    p = &a;
+    *p = x;
+    y = *p + 10;
+  }
+  else {
+    p = rand ? &b : &c;
+    *p = x;
+    y = *p + 10;
+  }
+  /* The equalities *p == x and y == *p+1 hold. */
+  if (x < 10) {
+    r = *p;
+    Frama_C_show_each_precise_0_9(r); // 0 <= r1 <= 9
+  }
+  if (rand) {
+    a = 17; // The equality *p == x does not hold anymore.
+    if (x < 10) {
+      r = *p;
+      Frama_C_show_each_imprecise_0_17(r);
+    }
+    return;
+  }
+  if (rand) {
+    b = 21; // The equality *p == x does not hold anymore.
+    if (x < 10) {
+      r = *p;
+      Frama_C_show_each_imprecise_0_21(r);
+    }
+    return;
+  }
+  if (*p < 10) {
+    r = y;
+    Frama_C_show_each_10_19(r); // Precise with the symbolic locations domain.
+  }
+  if (rand) {
+    a = -9; // The equality y == *p+10 does not hold anymore.
+    if (*p < 10) {
+      r = y;
+      Frama_C_show_each_10_42(r);
+    }
+    return;
+  }
+  if (rand) {
+    b = -10; // The equality y == *p+10 does not hold anymore.
+    if (*p < 10) {
+      r = y;
+      Frama_C_show_each_10_42(r);
+    }
+    return;
+  }
+}
+
 void main () {
   replace_lvalue ();
   assign_by_copy ();
   symbolic ();
+  test_join ();
 }
