@@ -23,7 +23,7 @@
 /* --- Generated Frama-C Server API --- */
 
 /**
-   WP Plugin
+   WP Main Services
    @packageDocumentation
    @module frama-c/plugins/wp/api
 */
@@ -269,118 +269,5 @@ const cancelProofTasks_internal: Server.SetRequest<null,null> = {
 };
 /** Cancel all scheduled proof tasks */
 export const cancelProofTasks: Server.SetRequest<null,null>= cancelProofTasks_internal;
-
-/** Proof Status has changed */
-export const proofStatus: Server.Signal = {
-  name: 'plugins.wp.proofStatus',
-};
-
-const getNodeInfos_internal: Server.GetRequest<
-  Json.index<'#node'>,
-  { stats: string, size: number, pending: number, proved: boolean,
-    result: string }
-  > = {
-  kind: Server.RqKind.GET,
-  name:   'plugins.wp.getNodeInfos',
-  input:  Json.jIndex<'#node'>('#node'),
-  output: Json.jObject({
-            stats: Json.jString,
-            size: Json.jNumber,
-            pending: Json.jNumber,
-            proved: Json.jBoolean,
-            result: Json.jString,
-          }),
-  signals: [ { name: 'plugins.wp.proofStatus' },
-             { name: 'plugins.wp.signalGoals' } ],
-};
-/** Proof node information */
-export const getNodeInfos: Server.GetRequest<
-  Json.index<'#node'>,
-  { stats: string, size: number, pending: number, proved: boolean,
-    result: string }
-  >= getNodeInfos_internal;
-
-const getProofState_internal: Server.GetRequest<
-  goal,
-  { children: [ string, Json.index<'#node'> ][], tactic: string,
-    results: [ prover, result ][], index: number, pending: number,
-    parents: Json.index<'#node'>[], current: Json.index<'#node'> }
-  > = {
-  kind: Server.RqKind.GET,
-  name:   'plugins.wp.getProofState',
-  input:  jGoal,
-  output: Json.jObject({
-            children: Json.jArray(
-                        Json.jPair(
-                          Json.jString,
-                          Json.jIndex<'#node'>('#node'),
-                        )),
-            tactic: Json.jString,
-            results: Json.jArray(Json.jPair( jProver, jResult,)),
-            index: Json.jNumber,
-            pending: Json.jNumber,
-            parents: Json.jArray(Json.jIndex<'#node'>('#node')),
-            current: Json.jIndex<'#node'>('#node'),
-          }),
-  signals: [ { name: 'plugins.wp.proofStatus' },
-             { name: 'plugins.wp.signalGoals' } ],
-};
-/** Current Proof Status of a Goal */
-export const getProofState: Server.GetRequest<
-  goal,
-  { children: [ string, Json.index<'#node'> ][], tactic: string,
-    results: [ prover, result ][], index: number, pending: number,
-    parents: Json.index<'#node'>[], current: Json.index<'#node'> }
-  >= getProofState_internal;
-
-const goForward_internal: Server.SetRequest<goal,null> = {
-  kind: Server.RqKind.SET,
-  name:   'plugins.wp.goForward',
-  input:  jGoal,
-  output: Json.jNull,
-  signals: [],
-};
-/** Go to to first pending node, or root if none */
-export const goForward: Server.SetRequest<goal,null>= goForward_internal;
-
-const goToRoot_internal: Server.SetRequest<goal,null> = {
-  kind: Server.RqKind.SET,
-  name:   'plugins.wp.goToRoot',
-  input:  jGoal,
-  output: Json.jNull,
-  signals: [],
-};
-/** Go to root of proof tree */
-export const goToRoot: Server.SetRequest<goal,null>= goToRoot_internal;
-
-const goToIndex_internal: Server.SetRequest<[ goal, number ],null> = {
-  kind: Server.RqKind.SET,
-  name:   'plugins.wp.goToIndex',
-  input:  Json.jPair( jGoal, Json.jNumber,),
-  output: Json.jNull,
-  signals: [],
-};
-/** Go to k-th pending node of proof tree */
-export const goToIndex: Server.SetRequest<[ goal, number ],null>= goToIndex_internal;
-
-const goToNode_internal: Server.SetRequest<Json.index<'#node'>,null> = {
-  kind: Server.RqKind.SET,
-  name:   'plugins.wp.goToNode',
-  input:  Json.jIndex<'#node'>('#node'),
-  output: Json.jNull,
-  signals: [],
-};
-/** Set current node of associated proof tree */
-export const goToNode: Server.SetRequest<Json.index<'#node'>,null>= goToNode_internal;
-
-const removeNode_internal: Server.SetRequest<Json.index<'#node'>,null> = {
-  kind: Server.RqKind.SET,
-  name:   'plugins.wp.removeNode',
-  input:  Json.jIndex<'#node'>('#node'),
-  output: Json.jNull,
-  signals: [],
-};
-/** Remove node from tree and go to parent */
-export const removeNode: Server.SetRequest<Json.index<'#node'>,null>= removeNode_internal;
 
 /* ------------------------------------- */

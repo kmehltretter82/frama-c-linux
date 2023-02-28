@@ -31,7 +31,7 @@ module S = Server.States
 module Md = Markdown
 module AST = Server.Kernel_ast
 
-let package = P.package ~plugin:"wp" ~title:"WP Plugin" ()
+let package = P.package ~plugin:"wp" ~title:"WP Main Services" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- WPO Index                                                          --- *)
@@ -69,7 +69,7 @@ end
 (* --- VCS Provers                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-module PROVER =
+module Prover =
 struct
   type t = VCS.prover
   let jtype = D.declare ~package ~name:"prover"
@@ -81,7 +81,7 @@ struct
     | None -> D.failure "Unknown prover name"
 end
 
-module RESULT =
+module Result =
 struct
   type t = VCS.result
   let jtype = D.declare ~package ~name:"result"
@@ -139,7 +139,7 @@ end
 
 let () = R.register ~package ~kind:`GET ~name:"getAvailableProvers"
     ~descr:(Md.plain "Returns the list of configured provers from why3")
-    ~input:(module D.Junit) ~output:(module D.Jlist(PROVER))
+    ~input:(module D.Junit) ~output:(module D.Jlist(Prover))
     (fun () ->
        List.map (fun p -> VCS.Why3 p) @@
        List.filter Why3Provers.is_mainstream @@
@@ -211,7 +211,7 @@ let () = S.column gmodel ~name:"saved"
     ~data:(module D.Jbool)
     ~get:(fun wpo -> ProofEngine.get wpo = `Saved)
 
-let garray = S.register_array ~package ~name:"goals"
+let _ = S.register_array ~package ~name:"goals"
     ~descr:(Md.plain "Generated Goals")
     ~key:(fun g -> g.Wpo.po_gid)
     ~keyName:"wpo"
@@ -266,137 +266,5 @@ let () = R.register ~package ~kind:`SET ~name:"cancelProofTasks"
     ~descr:(Md.plain "Cancel all scheduled proof tasks")
     ~input:(module D.Junit) ~output:(module D.Junit)
     (fun () -> let server = ProverTask.server () in Task.cancel_all server)
-
-(* -------------------------------------------------------------------------- *)
-(* --- Proof Node                                                         --- *)
-(* -------------------------------------------------------------------------- *)
-
-let proofStatus = R.signal ~package ~name:"proofStatus"
-    ~descr:(Md.plain "Proof Status has changed")
-
-module Node = D.Index(Map.Make(ProofEngine.Node))(struct let name = "node" end)
-
-let () =
-  let snode = R.signature ~input:(module Node) () in
-  let set_title = R.result snode ~name:"result"
-      ~descr:(Md.plain "Proof node title") (module D.Jstring) in
-  let set_proved = R.result snode ~name:"proved"
-      ~descr:(Md.plain "Proof node complete") (module D.Jbool) in
-  let set_pending = R.result snode ~name:"pending"
-      ~descr:(Md.plain "Pending children") (module D.Jint) in
-  let set_size = R.result snode ~name:"size"
-      ~descr:(Md.plain "Proof size") (module D.Jint) in
-  let set_stats = R.result snode ~name:"stats"
-      ~descr:(Md.plain "Node statistics") (module D.Jstring) in
-  R.register_sig ~package ~kind:`GET ~name:"getNodeInfos"
-    ~descr:(Md.plain "Proof node information") snode
-    ~signals:[proofStatus;S.signal garray]
-    begin fun rq node ->
-      set_title rq (ProofEngine.title node) ;
-      set_proved rq (ProofEngine.proved node) ;
-      set_pending rq (ProofEngine.pending node) ;
-      let s = ProofEngine.stats node in
-      set_size rq (Stats.proofs s) ;
-      set_stats rq (Pretty_utils.to_string Stats.pretty s) ;
-    end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Proof Tree                                                         --- *)
-(* -------------------------------------------------------------------------- *)
-
-let () =
-  let state = R.signature ~input:(module Goal) () in
-  let set_current = R.result state ~name:"current"
-      ~descr:(Md.plain "Current proof node") (module Node) in
-  let set_parents = R.result state ~name:"parents"
-      ~descr:(Md.plain "Proof node parents") (module D.Jlist(Node)) in
-  let set_pending = R.result state ~name:"pending"
-      ~descr:(Md.plain "Pending proof nodes") (module D.Jint) in
-  let set_index = R.result state ~name:"index"
-      ~descr:(Md.plain "Current node index among pending nodes (else -1)")
-      (module D.Jint) in
-  let set_results = R.result state ~name:"results"
-      ~descr:(Md.plain "Prover results for current node")
-      (module D.Jlist(D.Jpair(PROVER)(RESULT))) in
-  let set_tactic = R.result state ~name:"tactic"
-      ~descr:(Md.plain "Proof node tactic header (if any)")
-      (module D.Jstring) in
-  let set_children = R.result state ~name:"children"
-      ~descr:(Md.plain "Proof node tactic children (id any)")
-      (module D.Jlist(D.Jpair(D.Jstring)(Node))) in
-  R.register_sig ~package
-    ~kind:`GET ~name:"getProofState"
-    ~descr:(Md.plain "Current Proof Status of a Goal") state
-    ~signals:[proofStatus;S.signal garray]
-    begin fun rq wpo ->
-      let tree = ProofEngine.proof ~main:wpo in
-      let current,index =
-        match ProofEngine.current tree with
-        | `Main -> ProofEngine.root tree,-1
-        | `Internal node -> node,-1
-        | `Leaf(idx,node) -> node,idx in
-      let rec parents node = match ProofEngine.parent node with
-        | None -> []
-        | Some p -> p::parents p in
-      let tactic = match ProofEngine.tactical current with
-        | None -> ""
-        | Some { header } -> header in
-      set_current rq current ;
-      set_parents rq (parents current) ;
-      set_index rq index ;
-      set_pending rq (ProofEngine.pending current) ;
-      set_results rq (Wpo.get_results (ProofEngine.goal current)) ;
-      set_tactic rq tactic ;
-      set_children rq (ProofEngine.children current) ;
-    end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Proof Tree Management                                              --- *)
-(* -------------------------------------------------------------------------- *)
-
-let () = R.register ~package ~kind:`SET ~name:"goForward"
-    ~descr:(Md.plain "Go to to first pending node, or root if none")
-    ~input:(module Goal) ~output:(module D.Junit)
-    begin fun goal ->
-      let tree = ProofEngine.proof ~main:goal in
-      ProofEngine.forward tree ;
-      R.emit proofStatus ;
-    end
-
-let () = R.register ~package ~kind:`SET ~name:"goToRoot"
-    ~descr:(Md.plain "Go to root of proof tree")
-    ~input:(module Goal) ~output:(module D.Junit)
-    begin fun goal ->
-      let tree = ProofEngine.proof ~main:goal in
-      ProofEngine.goto tree `Main ;
-      R.emit proofStatus ;
-    end
-
-let () = R.register ~package ~kind:`SET ~name:"goToIndex"
-    ~descr:(Md.plain "Go to k-th pending node of proof tree")
-    ~input:(module D.Jpair(Goal)(D.Jint)) ~output:(module D.Junit)
-    begin fun (goal,index) ->
-      let tree = ProofEngine.proof ~main:goal in
-      ProofEngine.goto tree (`Leaf index) ;
-      R.emit proofStatus ;
-    end
-
-let () = R.register ~package ~kind:`SET ~name:"goToNode"
-    ~descr:(Md.plain "Set current node of associated proof tree")
-    ~input:(module Node) ~output:(module D.Junit)
-    begin fun node ->
-      let tree = ProofEngine.tree node in
-      ProofEngine.goto tree (`Node node) ;
-      R.emit proofStatus ;
-    end
-
-let () = R.register ~package ~kind:`SET ~name:"removeNode"
-    ~descr:(Md.plain "Remove node from tree and go to parent")
-    ~input:(module Node) ~output:(module D.Junit)
-    begin fun node ->
-      let tree = ProofEngine.tree node in
-      ProofEngine.remove tree node ;
-      R.emit proofStatus ;
-    end
 
 (* -------------------------------------------------------------------------- *)

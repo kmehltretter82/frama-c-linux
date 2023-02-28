@@ -26,7 +26,8 @@
 
 val package : Server.Package.package
 
+module Prover : Server.Data.S with type t = VCS.prover
+module Result : Server.Data.S with type t = VCS.result
 module Goal : Server.Data.S with type t = Wpo.t
-module Node : Server.Data.S with type t = ProofEngine.node
 
 (* -------------------------------------------------------------------------- *)
