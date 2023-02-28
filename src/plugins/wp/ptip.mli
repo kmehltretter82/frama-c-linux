@@ -152,8 +152,9 @@ class pseq :
     method pp_term : F.term printer
     method pp_pred : F.pred printer
     method pp_selection : Tactical.selection printer
-    method pp_sequent : Conditions.sequent -> Format.formatter -> unit
-    method goal : Wpo.t -> Format.formatter -> unit
+
+    method pp_sequent : Conditions.sequent printer
+    method pp_goal : Wpo.t printer
   end
 
 (* -------------------------------------------------------------------------- *)

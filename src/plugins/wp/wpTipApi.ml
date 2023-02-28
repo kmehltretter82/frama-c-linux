@@ -67,7 +67,7 @@ let wrap tag pp fmt x =
     Format.pp_close_stag fmt () ;
   end
 
-class printer () =
+class printer () : Ptip.pseq =
   let terms : Ptip.term_wrapper =
     object
       method wrap pp fmt t = wrap (Term.get t) pp fmt t
@@ -89,9 +89,7 @@ class printer () =
   let autofocus = new Ptip.autofocus in
   let plang = new Ptip.plang ~terms ~focus ~target ~autofocus in
   let pcond = new Ptip.pcond ~parts ~target:parts ~autofocus ~plang in
-  object
-    initializer ignore pcond
-  end
+  Ptip.pseq ~autofocus ~plang ~pcond
 
 (* -------------------------------------------------------------------------- *)
 (* --- Printer Registry                                                   --- *)
@@ -112,17 +110,6 @@ module PRINTER = State_builder.Ref
       let default () = Hashtbl.create 0
     end)
 
-let printer (node : ProofEngine.node) : printer =
-  let registry = PRINTER.get () in
-  let wpo = ProofEngine.goal node in
-  try Hashtbl.find registry wpo.po_gid with Not_found ->
-    let pp = new printer () in
-    Hashtbl.add registry wpo.po_gid pp ; pp
-
-(* -------------------------------------------------------------------------- *)
-(* --- Printer Hooks                                                      --- *)
-(* -------------------------------------------------------------------------- *)
-
 let () = Wpo.add_removed_hook
     (fun wpo ->
        let registry = PRINTER.get () in
@@ -133,8 +120,16 @@ let () = Wpo.add_cleared_hook
        let registry = PRINTER.get () in
        Hashtbl.clear registry)
 
+let printer (node : ProofEngine.node) : printer =
+  let registry = PRINTER.get () in
+  let wpo = ProofEngine.goal node in
+  try Hashtbl.find registry wpo.po_gid with Not_found ->
+    let pp = new printer () in
+    Hashtbl.add registry wpo.po_gid pp ; pp
+
+(* -------------------------------------------------------------------------- *)
+
 let () = (*TODO*) ignore package
 let () = (*TODO*) ignore printer
-
 
 (* -------------------------------------------------------------------------- *)

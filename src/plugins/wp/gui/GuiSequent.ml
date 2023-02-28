@@ -192,10 +192,10 @@ class focused (wtext : Wtext.text) =
         self#popup ;
       end
 
-    method! pp_sequent s fmt =
+    method! pp_sequent fmt s =
       allparts <- [] ;
       targeted <- [] ;
-      super#pp_sequent s fmt ;
+      super#pp_sequent fmt s ;
       let p,q = self#target_zone in
       if p > 0 && q > p then
         (Wutil.later (fun () -> wtext#select ~scroll:true p q))

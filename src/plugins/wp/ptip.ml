@@ -560,7 +560,7 @@ class pseq
 
     method sequent = sequent
 
-    method pp_sequent s fmt =
+    method pp_sequent fmt s =
       sequent <- s ;
       if autofocus#set_sequent s then
         begin
@@ -571,17 +571,17 @@ class pseq
       if pcond#get_state then Env.set_indexed_vars env ;
       pcond#pp_esequent env fmt s
 
-    method goal w fmt =
+    method pp_goal fmt w =
       let open Wpo in
       match w.po_formula with
       | GoalLemma _ ->
         Format.fprintf fmt "@\n@{<wp:clause>Lemma@} %a:@\n" Wpo.pp_title w ;
         let _,sequent = Wpo.compute w in
-        self#pp_sequent sequent fmt
+        self#pp_sequent fmt sequent
       | GoalAnnot _ ->
         Format.fprintf fmt "@\n@{<wp:clause>Goal@} %a:@\n" Wpo.pp_title w ;
         let _,sequent = Wpo.compute w in
-        self#pp_sequent sequent fmt
+        self#pp_sequent fmt sequent
 
   end
 

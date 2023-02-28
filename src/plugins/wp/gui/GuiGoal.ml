@@ -553,7 +553,7 @@ class pane (gprovers : GuiConfig.provers) =
             text#hrule ;
             scripter#tree proof ;
             text#hrule ;
-            text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
+            text#printf "%a@." printer#pp_goal (ProofEngine.head proof) ;
             text#printf "@{<bf>Goal id:@}  %s@." main.po_gid ;
             text#printf "@{<bf>Short id:@} %s@." main.po_sid ;
             text#hrule ;
@@ -569,7 +569,7 @@ class pane (gprovers : GuiConfig.provers) =
               self#update in
             text#printf "%t@." (composer#print cc ~quit) ;
             text#hrule ;
-            text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
+            text#printf "%a@." printer#pp_goal (ProofEngine.head proof) ;
           end ()
       | Browser(proof,cc,tgt) ->
         on_proof_context proof
@@ -581,7 +581,7 @@ class pane (gprovers : GuiConfig.provers) =
               self#update in
             text#printf "%t@." (browser#print cc ~quit) ;
             text#hrule ;
-            text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
+            text#printf "%a@." printer#pp_goal (ProofEngine.head proof) ;
           end ()
       | Forking _ -> ()
 
