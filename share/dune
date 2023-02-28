@@ -133,8 +133,6 @@
 (libc/__fc_inet.h as libc/__fc_inet.h)
 (libc/__fc_integer.h as libc/__fc_integer.h)
 (libc/__fc_libc.h as libc/__fc_libc.h)
-(libc/__fc_machdep.h as libc/__fc_machdep.h)
-(libc/__fc_machdep_linux_shared.h as libc/__fc_machdep_linux_shared.h)
 (libc/__fc_runtime.c as libc/__fc_runtime.c)
 (libc/__fc_select.h as libc/__fc_select.h)
 (libc/__fc_string_axiomatic.h as libc/__fc_string_axiomatic.h)
