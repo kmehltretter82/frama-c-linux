@@ -38,6 +38,7 @@
   (public_name frama-c-inout.core)
   (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel frama-c-callgraph.core frama-c-eva.core frama-c-from.core)
+  (instrumentation (backend landmarks))
 )
 
 (plugin (optional) (name inout) (libraries frama-c-inout.core) (site (frama-c plugins)))

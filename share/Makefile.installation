@@ -52,6 +52,12 @@ endif
 
 .PHONY: install uninstall
 
+ifneq (${DUNE_WS},)
+  WORKSPACE_OPT:=--workspace dev/dune-workspace.${DUNE_WS}
+else
+  WORKSPACE_OPT:=
+endif
+
 ifneq ($(INSTALL_TARGET),)
 INSTALL_TARGET:="$(INSTALL_TARGET) "
 endif
@@ -68,12 +74,12 @@ endif
 ifeq ($(PREFIX),$(OPAM_SWITCH_PREFIX))
 	@echo "Installing $(INSTALL_TARGET)to current Opam switch"
 	@printf "  Copying and relocating files..."
-	dune install --root . ${MANDIR_OPT} 2> /dev/null
+	dune install ${WORKSPACE_OPT} --root . ${MANDIR_OPT} 2> /dev/null
 	@echo " (done)"
 else
 	@echo "Installing $(INSTALL_TARGET)to ${PREFIX}"
 	@printf " Copying and relocating files..."
-	dune install --root . --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
+	dune install ${WORKSPACE_OPT} --root . --prefix ${PREFIX} ${MANDIR_OPT} 2> /dev/null
 	@echo " (done)"
 	@echo 'DO NOT FORGET TO EXPAND YOUR OCAMLPATH VARIABLE:'
 	@echo '  export OCAMLPATH="${PREFIX}/lib:$$OCAMLPATH"'

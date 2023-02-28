@@ -44,6 +44,7 @@
    (  -> aorai_eva_analysis.disabled.ml)
   )
  )
+ (instrumentation (backend landmarks))
 )
 
 (ocamllex yalexer)

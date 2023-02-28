@@ -198,6 +198,8 @@ README* header_spec=.ignore
 
 /bin/sed_get_* header_spec=.ignore
 
+/dev/dune-workspace.* header_spec=.ignore
+
 /dev/docker/*.sh header_spec=.ignore
 /dev/docker/Dockerfile header_spec=.ignore
 
