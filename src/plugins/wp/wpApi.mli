@@ -26,4 +26,7 @@
 
 val package : Server.Package.package
 
+module Goal : Server.Data.S with type t = Wpo.t
+module Node : Server.Data.S with type t = ProofEngine.node
+
 (* -------------------------------------------------------------------------- *)

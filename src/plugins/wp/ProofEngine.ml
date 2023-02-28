@@ -198,6 +198,7 @@ let head t = match t.head with
   | Some n -> n.goal
 let tree n = proof ~main:n.tree
 let goal n = n.goal
+
 let stats n = n.stats
 let tree_context t = Wpo.get_context t.main
 let node_context n = Wpo.get_context n.goal

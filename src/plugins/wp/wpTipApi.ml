@@ -31,7 +31,6 @@ module S = Server.States
 module Md = Markdown
 module AST = Server.Kernel_ast
 
-let () = ignore WpApi.package
 let package = P.package ~plugin:"wp" ~name:"tip"
     ~title:"WP Interactive Prover" ()
 
@@ -120,16 +119,59 @@ let () = Wpo.add_cleared_hook
        let registry = PRINTER.get () in
        Hashtbl.clear registry)
 
-let printer (node : ProofEngine.node) : printer =
+let printer (wpo : Wpo.t) : printer =
   let registry = PRINTER.get () in
-  let wpo = ProofEngine.goal node in
   try Hashtbl.find registry wpo.po_gid with Not_found ->
     let pp = new printer () in
     Hashtbl.add registry wpo.po_gid pp ; pp
 
 (* -------------------------------------------------------------------------- *)
+(* --- Printer Requests                                                   --- *)
+(* -------------------------------------------------------------------------- *)
 
-let () = (*TODO*) ignore package
-let () = (*TODO*) ignore printer
+let signal = R.signal ~package ~name:"sequent" ~descr:(Md.plain "Updated TIP")
+
+let flags (type a) tags : a R.input =
+  (module struct
+    type t = a
+    let jtype = P.Junion (List.map (fun (tg,_) -> P.Jtag tg) tags)
+    let of_json js = List.assoc (Json.string js) tags
+  end)
+
+let iformat : Plang.iformat R.input =
+  flags [ "dec", `Dec ; "hex", `Hex ; "bin", `Bin ]
+
+let rformat : Plang.rformat R.input =
+  flags [ "ratio", `Ratio ; "float", `Float ; "double", `Double ]
+
+let () =
+  let printSequent = R.signature ~output:(module D.Jtext) () in
+  let get_node = R.param printSequent ~name:"node"
+      ~descr:(Md.plain "Proof Node") (module WpApi.Node) in
+  let get_indent = R.param_opt printSequent ~name:"indent"
+      ~descr:(Md.plain "Number of identation spaces") (module D.Jint) in
+  let get_margin = R.param_opt printSequent ~name:"margin"
+      ~descr:(Md.plain "Maximial text width") (module D.Jint) in
+  let get_iformat = R.param_opt printSequent ~name:"iformat"
+      ~descr:(Md.plain "Integer constants format") iformat in
+  let get_rformat = R.param_opt printSequent ~name:"rformat"
+      ~descr:(Md.plain "Real constants format") rformat in
+  R.register_sig ~package
+    ~kind:`EXEC
+    ~name:"printSequent"
+    ~descr:(Md.plain "Pretty-print the associated node  in its current state")
+    ~signals:[signal] printSequent
+    begin fun rq () ->
+      let node = get_node rq in
+      let indent = get_indent rq in
+      let margin = get_margin rq in
+      let tree = ProofEngine.tree node in
+      let main = ProofEngine.main tree in
+      let goal = ProofEngine.goal node in
+      let pp = printer main in
+      Option.iter pp#set_iformat (get_iformat rq) ;
+      Option.iter pp#set_rformat (get_rformat rq) ;
+      D.jpretty ?indent ?margin pp#pp_goal goal
+    end
 
 (* -------------------------------------------------------------------------- *)
