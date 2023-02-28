@@ -444,14 +444,145 @@ class pcond
 (* --- Sequent Engine                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
+type target = part * F.term option
+type focus = [ `Transient | `Select | `Focus | `Extend | `Reset ]
+
 class pseq
   ~(autofocus:#autofocus)
   ~(plang:#plang)
   ~(pcond:#pcond) =
-  object
-    initializer ignore autofocus
-    initializer ignore plang
-    initializer ignore pcond
+  object(self)
+    val mutable demon = []
+    val mutable sequent = Conditions.empty , F.p_true
+    val mutable selected_term = None
+    val mutable selected_part = Term
+
+    method reset =
+      selected_term <- None ;
+      selected_part <- Term ;
+      autofocus#reset
+
+    method get_focus_mode = autofocus#get_autofocus
+    method set_focus_mode = autofocus#set_autofocus
+
+    method get_state_mode = pcond#get_state
+    method set_state_mode = pcond#set_state
+
+    method set_iformat = plang#set_iformat
+    method get_iformat = plang#get_iformat
+
+    method set_rformat = plang#set_rformat
+    method get_rformat = plang#get_rformat
+
+    method selected =
+      begin
+        self#set_target self#selection ;
+        List.iter (fun f -> f ()) demon ;
+      end
+
+    method on_selection f =
+      demon <- demon @ [f]
+
+
+    method selection =
+      let inside clause t =
+        if F.p_bool t == Tactical.head clause
+        then Tactical.(Clause clause)
+        else Tactical.(Inside(clause,t))
+      in
+      match selected_part , selected_term with
+      | Term , None -> Tactical.Empty
+      | Goal , None -> Tactical.(Clause(Goal(snd sequent)))
+      | Step s , None -> Tactical.(Clause(Step s))
+      | Term , Some t -> autofocus#locate t
+      | Goal , Some t -> inside Tactical.(Goal (snd sequent)) t
+      | Step s , Some t -> inside Tactical.(Step s) t
+
+    method target = selected_part, selected_term
+
+    method unselect =
+      begin
+        let p = selected_part in selected_part <- Term ;
+        let t = selected_term in selected_term <- None ;
+        autofocus#unfocus_last ;
+        p,t
+      end
+
+    method restore ~(focus:focus) (p,t) =
+      begin
+        selected_part <- p ;
+        selected_term <- t ;
+        let selected =
+          match focus with
+          | `Transient -> false
+          | `Select -> true
+          | `Focus -> Option.iter (autofocus#focus ~extend:false) t ; true
+          | `Extend -> Option.iter (autofocus#focus ~extend:true) t ; true
+          | `Reset -> autofocus#reset ; true
+        in if selected then self#selected
+      end
+
+    method set_target tgt =
+      match tgt with
+      | Tactical.Empty | Tactical.Compose _ | Tactical.Multi _ ->
+        begin
+          pcond#set_target Term ;
+          plang#clear_target ;
+          autofocus#clear_target ;
+        end
+      | Tactical.Inside (_,t) ->
+        begin
+          pcond#set_target Term ;
+          plang#set_target t ;
+          autofocus#set_target t ;
+        end
+      | Tactical.Clause (Tactical.Goal _) ->
+        begin
+          pcond#set_target Goal ;
+          plang#clear_target ;
+          autofocus#clear_target ;
+        end
+      | Tactical.Clause (Tactical.Step s) ->
+        begin
+          pcond#set_target (Step s) ;
+          plang#clear_target ;
+          autofocus#clear_target ;
+        end
+
+    method pp_term fmt e = plang#pp_sort fmt e
+    method pp_pred fmt p = plang#pp_pred fmt p
+
+    method pp_selection fmt = function
+      | Tactical.Empty -> Format.fprintf fmt " - "
+      | Tactical.Compose(Tactical.Range(a,b)) ->
+        Format.fprintf fmt "%d..%d" a b
+      | sel -> self#pp_term fmt (Tactical.selected sel)
+
+    method sequent = sequent
+
+    method pp_sequent s fmt =
+      sequent <- s ;
+      if autofocus#set_sequent s then
+        begin
+          selected_term <- None ;
+          selected_part <- Term ;
+        end ;
+      let env = autofocus#env in
+      if pcond#get_state then Env.set_indexed_vars env ;
+      pcond#pp_esequent env fmt s
+
+    method goal w fmt =
+      let open Wpo in
+      match w.po_formula with
+      | GoalLemma _ ->
+        Format.fprintf fmt "@\n@{<wp:clause>Lemma@} %a:@\n" Wpo.pp_title w ;
+        let _,sequent = Wpo.compute w in
+        self#pp_sequent sequent fmt
+      | GoalAnnot _ ->
+        Format.fprintf fmt "@\n@{<wp:clause>Goal@} %a:@\n" Wpo.pp_title w ;
+        let _,sequent = Wpo.compute w in
+        self#pp_sequent sequent fmt
+
   end
 
 (* -------------------------------------------------------------------------- *)

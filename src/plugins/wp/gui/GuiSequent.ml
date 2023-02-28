@@ -26,13 +26,10 @@ open Ptip
 module F = Lang.F
 module Env = Plang.Env
 module Imap = Qed.Intmap
-type 'a printer = Format.formatter -> 'a -> unit
 
 (* -------------------------------------------------------------------------- *)
 (* --- Printer                                                            --- *)
 (* -------------------------------------------------------------------------- *)
-
-type target = part * F.term option
 
 class focused (wtext : Wtext.text) =
   let parts : part Wtext.marker = wtext#marker in
@@ -46,11 +43,8 @@ class focused (wtext : Wtext.text) =
   let pcond = new pcond ~parts ~target:target_part ~autofocus ~plang in
   let popup = new Widget.popup () in
   object(self)
-    val mutable demon = []
+    inherit pseq ~autofocus ~plang ~pcond as super
     val mutable items = []
-    val mutable sequent = Conditions.empty , F.p_true
-    val mutable selected_term = None
-    val mutable selected_part = Term
     val mutable targeted = []
     val mutable allparts : part Wtext.entry list = []
 
@@ -88,11 +82,7 @@ class focused (wtext : Wtext.text) =
 
       end
 
-    method reset =
-      selected_term <- None ;
-      selected_part <- Term ;
-      targeted <- [] ;
-      autofocus#reset
+    method! reset = super#reset ; targeted <- []
 
     method private part p q =
       try
@@ -106,6 +96,7 @@ class focused (wtext : Wtext.text) =
     method private added_zone p q = targeted <- (p,q) :: targeted
     method private target_zone =
       try
+        let selected_part, _ = self#target in
         List.find
           (fun (p,q) ->
              match selected_part , self#part p q with
@@ -114,27 +105,6 @@ class focused (wtext : Wtext.text) =
              | _ -> false
           ) targeted
       with Not_found -> 0,0
-
-    method get_focus_mode = autofocus#get_autofocus
-    method set_focus_mode = autofocus#set_autofocus
-
-    method get_state_mode = pcond#get_state
-    method set_state_mode = pcond#set_state
-
-    method set_iformat = plang#set_iformat
-    method get_iformat = plang#get_iformat
-
-    method set_rformat = plang#set_rformat
-    method get_rformat = plang#get_rformat
-
-    method selected =
-      begin
-        self#set_target self#selection ;
-        List.iter (fun f -> f ()) demon ;
-      end
-
-    method on_selection f =
-      demon <- demon @ [f]
 
     method on_popup (f : Widget.popup -> unit) =
       items <- items @ [f]
@@ -178,149 +148,57 @@ class focused (wtext : Wtext.text) =
     method popup =
       begin
         popup#clear ;
-        begin match selected_term with
+        let part , term = self#target in
+        begin match term with
           | Some e -> self#popup_term e
-          | None -> self#popup_part selected_part
+          | None -> self#popup_part part
         end ;
         popup#add_separator ;
         List.iter (fun f -> f popup) items ;
         popup#run () ;
       end
 
-    method selection =
-      let inside clause t =
-        if F.p_bool t == Tactical.head clause
-        then Tactical.(Clause clause)
-        else Tactical.(Inside(clause,t))
-      in
-      match selected_part , selected_term with
-      | Term , None -> Tactical.Empty
-      | Goal , None -> Tactical.(Clause(Goal(snd sequent)))
-      | Step s , None -> Tactical.(Clause(Step s))
-      | Term , Some t -> autofocus#locate t
-      | Goal , Some t -> inside Tactical.(Goal (snd sequent)) t
-      | Step s , Some t -> inside Tactical.(Step s) t
-
-    method unselect =
-      begin
-        let p = selected_part in selected_part <- Term ;
-        let t = selected_term in selected_term <- None ;
-        autofocus#unfocus_last ;
-        p,t
-      end
-
-    method restore (p,t) =
-      begin
-        selected_part <- p ;
-        selected_term <- t ;
-        self#set_target self#selection ;
-      end
-
-    method set_target tgt =
-      match tgt with
-      | Tactical.Empty | Tactical.Compose _ | Tactical.Multi _ ->
-        begin
-          pcond#set_target Term ;
-          plang#clear_target ;
-          autofocus#clear_target ;
-        end
-      | Tactical.Inside (_,t) ->
-        begin
-          pcond#set_target Term ;
-          plang#set_target t ;
-          autofocus#set_target t ;
-        end
-      | Tactical.Clause (Tactical.Goal _) ->
-        begin
-          pcond#set_target Goal ;
-          plang#clear_target ;
-          autofocus#clear_target ;
-        end
-      | Tactical.Clause (Tactical.Step s) ->
-        begin
-          pcond#set_target (Step s) ;
-          plang#clear_target ;
-          autofocus#clear_target ;
-        end
-
     method private on_term ~extend (p,q,e) =
       if F.lc_closed e then (* defensive *)
         begin
-          selected_term <- Some e ;
-          selected_part <- self#part p q ;
-          autofocus#focus ~extend e ;
-          self#selected ;
+          let part = self#part p q in
+          let focus = if extend then `Extend else `Focus in
+          self#restore ~focus (part,Some e)
         end
 
     method private on_select (p,q,e) =
       if F.lc_closed e then (* defensive *)
         begin
-          selected_term <- Some e ;
-          selected_part <- self#part p q ;
-          self#selected ;
+          let part = self#part p q in
+          self#restore ~focus:`Select (part,Some e) ;
         end
 
     method private on_part (_,_,part) =
       begin
-        selected_term <- None ;
-        selected_part <- part ;
-        autofocus#reset ;
-        self#selected ;
+        self#restore ~focus:`Reset (part,None)
       end
 
     method private on_popup_term (p,q,e) =
       if F.lc_closed e then (* defensive *)
         begin
-          selected_term <- Some e;
-          selected_part <- self#part p q ;
+          let part = self#part p q in
+          self#restore ~focus:`Transient (part,Some e) ;
           self#popup ;
         end
 
     method private on_popup_part (_,_,part) =
       begin
-        selected_term <- None ;
-        selected_part <- part ;
+        self#restore ~focus:`Transient (part,None) ;
         self#popup ;
       end
 
-    method pp_term fmt e = plang#pp_sort fmt e
-    method pp_pred fmt p = plang#pp_pred fmt p
-
-    method pp_selection fmt = function
-      | Tactical.Empty -> Format.fprintf fmt " - "
-      | Tactical.Compose(Tactical.Range(a,b)) ->
-        Format.fprintf fmt "%d..%d" a b
-      | sel -> self#pp_term fmt (Tactical.selected sel)
-
-    method sequent = sequent
-
-    method pp_sequent s fmt =
-      sequent <- s ;
+    method! pp_sequent s fmt =
       allparts <- [] ;
-      if autofocus#set_sequent s then
-        begin
-          selected_term <- None ;
-          selected_part <- Term ;
-        end ;
       targeted <- [] ;
-      let env = autofocus#env in
-      if pcond#get_state then Env.set_indexed_vars env ;
-      pcond#pp_esequent env fmt s ;
+      super#pp_sequent s fmt ;
       let p,q = self#target_zone in
       if p > 0 && q > p then
         (Wutil.later (fun () -> wtext#select ~scroll:true p q))
-
-    method goal w fmt =
-      let open Wpo in
-      match w.po_formula with
-      | GoalLemma _ ->
-        Format.fprintf fmt "@\n@{<wp:clause>Lemma@} %a:@\n" Wpo.pp_title w ;
-        let _,sequent = Wpo.compute w in
-        self#pp_sequent sequent fmt
-      | GoalAnnot _ ->
-        Format.fprintf fmt "@\n@{<wp:clause>Goal@} %a:@\n" Wpo.pp_title w ;
-        let _,sequent = Wpo.compute w in
-        self#pp_sequent sequent fmt
 
     method button ~title ~callback fmt =
       let pp_title fmt title = Format.fprintf fmt " %s " title in

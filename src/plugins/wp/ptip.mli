@@ -119,13 +119,41 @@ class pcond :
 (* --- Sequent Engine                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
+type target = part * F.term option
+type focus = [ `Transient | `Select | `Focus | `Extend | `Reset ]
+
 class pseq :
   autofocus:#autofocus ->
-  planf:#plang ->
+  plang:#plang ->
   pcond:#pcond ->
   object
-    
-  end
+    method reset : unit
+    method get_focus_mode : bool
+    method set_focus_mode : bool -> unit
+    method get_state_mode : bool
+    method set_state_mode : bool -> unit
 
+    method get_iformat : Plang.iformat
+    method set_iformat : Plang.iformat -> unit
+
+    method get_rformat : Plang.rformat
+    method set_rformat : Plang.rformat -> unit
+
+    method selected : unit
+    method target : target
+    method unselect : target
+    method restore : focus:focus -> target -> unit
+    method on_selection : (unit -> unit) -> unit
+
+    method sequent : Conditions.sequent
+    method selection : Tactical.selection
+    method set_target : Tactical.selection -> unit
+
+    method pp_term : F.term printer
+    method pp_pred : F.pred printer
+    method pp_selection : Tactical.selection printer
+    method pp_sequent : Conditions.sequent -> Format.formatter -> unit
+    method goal : Wpo.t -> Format.formatter -> unit
+  end
 
 (* -------------------------------------------------------------------------- *)

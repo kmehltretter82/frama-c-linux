@@ -24,8 +24,8 @@ type state =
   | Empty
   | Proof of ProofEngine.tree
   | Forking of ProofEngine.tree * ProofEngine.fork * Task.pool
-  | Composer of ProofEngine.tree * GuiTactic.composer * GuiSequent.target
-  | Browser of ProofEngine.tree * GuiTactic.browser * GuiSequent.target
+  | Composer of ProofEngine.tree * GuiTactic.composer * Ptip.target
+  | Browser of ProofEngine.tree * GuiTactic.browser * Ptip.target
 
 let on_proof_context proof job data =
   let ctxt = ProofEngine.tree_context proof in
@@ -565,7 +565,7 @@ class pane (gprovers : GuiConfig.provers) =
             text#clear ;
             let quit () =
               state <- Proof proof ;
-              printer#restore tgt ;
+              printer#restore ~focus:`Select tgt ;
               self#update in
             text#printf "%t@." (composer#print cc ~quit) ;
             text#hrule ;
@@ -577,7 +577,7 @@ class pane (gprovers : GuiConfig.provers) =
             text#clear ;
             let quit () =
               state <- Proof proof ;
-              printer#restore tgt ;
+              printer#restore ~focus:`Select tgt ;
               self#update in
             text#printf "%t@." (browser#print cc ~quit) ;
             text#hrule ;
