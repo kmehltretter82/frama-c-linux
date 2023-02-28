@@ -262,7 +262,7 @@ module EvaTaints = struct
     | Direct -> "direct taint"
     | Indirect -> "indirect taint"
 
-  let pretty fmt = function
+  let pp fmt = function
     | taint, Untainted -> Format.fprintf fmt "%s" (to_string taint)
     | data, indirect ->
       let sep = match data with Untainted -> "but" | _ -> "and" in
@@ -271,9 +271,12 @@ module EvaTaints = struct
         (to_string data) sep (to_string indirect)
 
   let print_taint fmt marker =
-    let before, after = of_marker marker |> Option.get in
-    if before = after then Format.fprintf fmt "%a" pretty before
-    else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
+    match of_marker marker with
+    | None -> raise Not_found
+    | Some (before, after) ->
+      if before = after
+      then Format.fprintf fmt "%a" pp before
+      else Format.fprintf fmt "Before: %a@\nAfter: %a" pp before pp after
 
   let eva_taints_descr =
     "Taint status:\n\
