@@ -53,6 +53,7 @@ sig
   val dummy : t
   val trivial : t
   val is_trivial : t -> bool
+  val is_computed : t -> bool
   val make : Conditions.sequent -> t
   val compute : pid:WpPropId.prop_id -> t -> unit
   val compute_proof : pid:WpPropId.prop_id -> t -> F.pred
@@ -161,6 +162,8 @@ val add_removed_hook : (t -> unit) -> unit
 val add_cleared_hook : (unit -> unit) -> unit
 (** Register a hook when the entire table is cleared. *)
 
+val modified : t -> unit
+val computed : t -> bool
 val compute : t -> Definitions.axioms option * Conditions.sequent
 
 (** Warning: Prover results are stored as they are from prover output,
