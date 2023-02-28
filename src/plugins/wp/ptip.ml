@@ -215,7 +215,7 @@ class autofocus =
     method is_autofocused =
       autofocus && Tmap.is_empty vterm
 
-    (* --- Sequent Management --- *)
+    (* --- Hypotheses Management --- *)
 
     method set_step s = function
       | `Auto ->
@@ -333,7 +333,7 @@ class plang
   end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Sequent Engine                                                     --- *)
+(* --- Condition Engine                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
 class type part_marker =
@@ -438,6 +438,20 @@ class pcond
           plang#set_domain domain ;
         end
 
+  end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Sequent Engine                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+class pseq
+  ~(autofocus:#autofocus)
+  ~(plang:#plang)
+  ~(pcond:#pcond) =
+  object
+    initializer ignore autofocus
+    initializer ignore plang
+    initializer ignore pcond
   end
 
 (* -------------------------------------------------------------------------- *)
