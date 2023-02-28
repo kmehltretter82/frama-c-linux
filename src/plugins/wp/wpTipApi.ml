@@ -119,30 +119,35 @@ let () = Wpo.add_cleared_hook
        let registry = PRINTER.get () in
        Hashtbl.clear registry)
 
-let printer (wpo : Wpo.t) : printer =
+let lookup_printer (node : ProofEngine.node) : printer =
+  let tree = ProofEngine.tree node in
+  let wpo = ProofEngine.main tree in
   let registry = PRINTER.get () in
   try Hashtbl.find registry wpo.po_gid with Not_found ->
     let pp = new printer () in
     Hashtbl.add registry wpo.po_gid pp ; pp
 
 (* -------------------------------------------------------------------------- *)
-(* --- Printer Requests                                                   --- *)
+(* --- PrintSequent Request                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
 let signal = R.signal ~package ~name:"sequent" ~descr:(Md.plain "Updated TIP")
 
-let flags (type a) tags : a R.input =
+let flags (type a) ~name ~descr tags : a R.input =
   (module struct
     type t = a
-    let jtype = P.Junion (List.map (fun (tg,_) -> P.Jtag tg) tags)
+    let jtype = D.declare ~package ~name ~descr
+      (P.Junion (List.map (fun (tg,_) -> P.Jtag tg) tags))
     let of_json js = List.assoc (Json.string js) tags
   end)
 
 let iformat : Plang.iformat R.input =
-  flags [ "dec", `Dec ; "hex", `Hex ; "bin", `Bin ]
+  flags ~name:"iformat" ~descr:(Md.plain "Integer constants format")
+    [ "dec", `Dec ; "hex", `Hex ; "bin", `Bin ]
 
 let rformat : Plang.rformat R.input =
-  flags [ "ratio", `Ratio ; "float", `Float ; "double", `Double ]
+  flags ~name:"rformat" ~descr:(Md.plain "Real constants format")
+    [ "ratio", `Ratio ; "float", `Float ; "double", `Double ]
 
 let () =
   let printSequent = R.signature ~output:(module D.Jtext) () in
@@ -156,22 +161,67 @@ let () =
       ~descr:(Md.plain "Integer constants format") iformat in
   let get_rformat = R.param_opt printSequent ~name:"rformat"
       ~descr:(Md.plain "Real constants format") rformat in
+  let get_autofocus = R.param_opt printSequent ~name:"autofocus"
+      ~descr:(Md.plain "Auto-focus mode") (module D.Jbool) in
+  let get_unmangled = R.param_opt printSequent ~name:"unmangled"
+      ~descr:(Md.plain "Unmangled memory model") (module D.Jbool) in
   R.register_sig ~package
     ~kind:`EXEC
     ~name:"printSequent"
-    ~descr:(Md.plain "Pretty-print the associated node  in its current state")
+    ~descr:(Md.plain "Pretty-print the associated node")
     ~signals:[signal] printSequent
     begin fun rq () ->
       let node = get_node rq in
+      let pp = lookup_printer node in
       let indent = get_indent rq in
       let margin = get_margin rq in
-      let tree = ProofEngine.tree node in
-      let main = ProofEngine.main tree in
-      let goal = ProofEngine.goal node in
-      let pp = printer main in
       Option.iter pp#set_iformat (get_iformat rq) ;
       Option.iter pp#set_rformat (get_rformat rq) ;
-      D.jpretty ?indent ?margin pp#pp_goal goal
+      Option.iter pp#set_focus_mode (get_autofocus rq) ;
+      Option.iter pp#set_unmangled (get_unmangled rq) ;
+      D.jpretty ?indent ?margin pp#pp_goal (ProofEngine.goal node)
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Selection Requests                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  R.register ~package
+    ~kind:`SET
+    ~name:"clearSelection"
+    ~descr:(Md.plain "Reset node selection")
+    ~input:(module WpApi.Node)
+    ~output:(module D.Junit)
+    begin fun node ->
+      let pp = lookup_printer node in
+      pp#reset ; R.emit signal
+    end
+
+let () =
+  let setSelection = R.signature ~output:(module D.Junit) () in
+  let get_node = R.param setSelection ~name:"node"
+      ~descr:(Md.plain "Proof Node") (module WpApi.Node) in
+  let get_part = R.param setSelection ~name:"part"
+      ~descr:(Md.plain "Selected part") (module Part) in
+  let get_term = R.param setSelection ~name:"term"
+      ~descr:(Md.plain "Selected term") (module D.Joption(Term)) in
+  let get_extend = R.param setSelection ~name:"extend"
+      ~descr:(Md.plain "Extending selection mode")
+      ~default:false (module D.Jbool) in
+  R.register_sig ~package
+    ~kind:`SET
+    ~name:"setSelection"
+    ~descr:(Md.plain "Set node selection")
+    setSelection
+    begin fun rq () ->
+      let node = get_node rq in
+      let part = get_part rq in
+      let term = get_term rq in
+      let extend = get_extend rq in
+      let pp = lookup_printer node in
+      pp#restore ~focus:(if extend then `Extend else `Select) (part,term) ;
+      R.emit signal
     end
 
 (* -------------------------------------------------------------------------- *)

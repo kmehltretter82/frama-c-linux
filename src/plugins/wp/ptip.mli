@@ -132,6 +132,7 @@ class pseq :
     method set_focus_mode : bool -> unit
     method get_state_mode : bool
     method set_state_mode : bool -> unit
+    method set_unmangled : bool -> unit
 
     method get_iformat : Plang.iformat
     method set_iformat : Plang.iformat -> unit

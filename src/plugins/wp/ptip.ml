@@ -467,6 +467,7 @@ class pseq
 
     method get_state_mode = pcond#get_state
     method set_state_mode = pcond#set_state
+    method set_unmangled m = pcond#set_state (not m)
 
     method set_iformat = plang#set_iformat
     method get_iformat = plang#get_iformat
