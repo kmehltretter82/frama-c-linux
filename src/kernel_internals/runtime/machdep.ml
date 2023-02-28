@@ -189,19 +189,19 @@ let gen_all_defines fmt mach =
   gen_define_string fmt "__UINTPTR_T" mach.uintptr_t;
   gen_define_string fmt "__PTRDIFF_T" mach.ptrdiff_t;
   gen_define_string fmt "__WINT_T" mach.wint_t;
-  (* gen_define_string fmt "__SSIZE_T" mach.ssize_t; *)
+  gen_define_string fmt "__SSIZE_T" mach.ssize_t;
   gen_intlike_max fmt "__FC_SIZE" mach.size_t mach;
   gen_intlike_min fmt "__FC_INTPTR" mach.intptr_t mach;
   gen_intlike_max fmt "__FC_INTPTR" mach.intptr_t mach;
   gen_intlike_max fmt "__FC_UINTPTR" mach.uintptr_t mach;
   gen_intlike_min fmt "__FC_WCHAR" mach.wchar_t mach;
   gen_intlike_max fmt "__FC_WCHAR" mach.wchar_t mach;
-  (* TODO: __SSIZE_MAX *)
+  gen_intlike_max fmt "__SSIZE_MAX" mach.ssize_t mach;
   gen_intlike_min fmt "__FC_PTRDIFF" mach.ptrdiff_t mach;
   gen_intlike_max fmt "__FC_PTRDIFF" mach.ptrdiff_t mach;
   gen_intlike_min fmt "__FC_WINT" mach.wint_t mach;
   gen_intlike_max fmt "__FC_WINT" mach.wint_t mach;
-  (* TODO: __FC_WEOF *)
+  gen_define_string fmt "__FC_WEOF" mach.weof;
   (* NB: Frama-C's inttypes.h is assuming that intptr_t and uintptr_t have the
      same rank when it comes to define PRI.?PTR macros. *)
   gen_define_literal_string fmt "__PRIPTR_PREFIX"

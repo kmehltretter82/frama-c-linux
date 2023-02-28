@@ -28,7 +28,9 @@ sizeof_longlong: 8
 sizeof_ptr: 4
 sizeof_short: 2
 sizeof_void: 1
+ssize_t: int
 uintptr_t: unsigned long
 version: none
 wchar_t: int
+weof: (0xffffffffUL)
 wint_t: unsigned long

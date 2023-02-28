@@ -1,4 +1,3 @@
-
 open Cil_types
 
 let md = {
@@ -29,12 +28,14 @@ let md = {
   char_is_unsigned = true;
   little_endian = true;
   size_t = "unsigned int";
+  ssize_t = "int";
   wchar_t = "int";
   intptr_t = "int";
   uintptr_t = "unsigned int";
   ptrdiff_t = "int";
   wint_t = "long";
   has__builtin_va_list = true;
+  weof = "(-1L)"
 }
 
 let () =

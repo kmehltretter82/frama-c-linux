@@ -1876,6 +1876,7 @@ type mach = {
   sizeof_void: int;       (* Size of "void" *)
   sizeof_fun: int;        (* Size of function. Negative if unsupported. *)
   size_t: string;         (* Type of "sizeof(T)" *)
+  ssize_t: string;        (* representation of ssize_t *)
   wchar_t: string;        (* Type of "wchar_t" *)
   ptrdiff_t: string;      (* Type of "ptrdiff_t" *)
   intptr_t: string;       (* Type of "intptr_t" *)
@@ -1900,6 +1901,7 @@ type mach = {
   cpp_arch_flags: string list;  (* Architecture-specific flags to be given to
                                    the preprocessor (if supported) *)
   version: string;        (* Information on this machdep *)
+  weof: string; (* expansion of WEOF macro *)
 }
 
 (*

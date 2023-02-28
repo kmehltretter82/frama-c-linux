@@ -2640,6 +2640,7 @@ let dummy_machdep =
     sizeof_void = -1;
     sizeof_fun = -1;
     size_t = "unsigned long";
+    ssize_t = "long";
     wchar_t = "int";
     ptrdiff_t = "long";
     intptr_t = "long";       (* Type of "intptr_t" *)
@@ -2662,6 +2663,7 @@ let dummy_machdep =
     compiler = "none";
     cpp_arch_flags = [];
     version = "N/A";
+    weof = "(-1)"
   }
 
 module Machdep = Datatype.Make_with_collections(struct

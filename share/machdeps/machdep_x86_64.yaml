@@ -28,7 +28,9 @@ sizeof_longlong: 8
 sizeof_ptr: 8
 sizeof_short: 2
 sizeof_void: -1
+ssize_t: long
 uintptr_t: unsigned long
-version: clang version 15.0.7
+version: gcc (GCC) 12.2.1 20230201
 wchar_t: int
+weof: (0xffffffffu)
 wint_t: unsigned int

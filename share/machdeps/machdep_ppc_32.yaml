@@ -30,8 +30,9 @@ sizeof_longlong: 8
 sizeof_ptr: 4
 sizeof_short: 2
 sizeof_void: 1
+ssize_t: int
 uintptr_t: unsigned int
 version: clang version 15.0.7
 wchar_t: int
+weof: (0xffffffffu)
 wint_t: unsigned int
-

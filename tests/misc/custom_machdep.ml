@@ -16,6 +16,7 @@ let mach =
     sizeof_void      = 1;
     sizeof_fun       = 1;
     size_t = "unsigned long";
+    ssize_t = "long";
     intptr_t = "long";
     uintptr_t = "unsigned long";
     wint_t = "int";
@@ -35,6 +36,7 @@ let mach =
     char_is_unsigned = false;
     little_endian = true;
     has__builtin_va_list = true;
+    weof = "(-1)";
   }
 
 let mach2 = { mach with compiler = "baz" }

@@ -29,5 +29,7 @@ sizeof_longlong: 8
 sizeof_ptr: 4
 sizeof_short: 2
 sizeof_void: 1
+ssize_t: long
 version: foo
 wchar_t: int
+weof: (-1)

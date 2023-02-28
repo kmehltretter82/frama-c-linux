@@ -108,8 +108,6 @@ def print_machdep(machdep):
     if args.in_place:
         args.dest_file = open(args.from_file, "w")
     yaml.dump(machdep, args.dest_file, indent=4, sort_keys=True)
-    # Python does not end the dump with a newline by itself
-    args.dest_file.write("\n")
 
 def make_schema():
     schema_filename = my_path.parent / "machdep-schema.yaml"
@@ -162,6 +160,7 @@ source_files = [
     ("alignof_str.c", "number"),
     ("alignof_aligned.c", "number"),
     ("size_t.c", "type"),
+    ("ssize_t.c", "type"),
     ("wchar_t.c", "type"),
     ("ptrdiff_t.c", "type"),
     ("intptr_t.c", "type"),
@@ -170,6 +169,7 @@ source_files = [
     ("char_is_unsigned.c", "bool"),
     ("little_endian.c", "bool"),
     ("has__builtin_va_list.c", "has__builtin_va_list"),
+    ("weof.c", "macro"),
 ]
 
 
@@ -191,7 +191,6 @@ def find_value(name, typ, output):
 
         def conversion(x):
             return x
-
     else:
         warnings.warn(f"unexpected type '{typ}' for field '{name}', skipping")
         return
@@ -210,14 +209,47 @@ def find_value(name, typ, output):
         if args.verbose:
             print(f"compiler output is:{output}")
 
+def cleanup_cpp(output):
+    lines = output.splitlines()
+    macro = filter(lambda s: s != '' and s[0] != '#', lines)
+    macro = map(lambda s: s.strip(),macro)
+    return ' '.join(macro)
+
+def find_macro_value(name,output):
+    msg = re.compile(name + "_is = ([^;]+);")
+    res = re.search(msg,output)
+    if res:
+        if name in machdep:
+            value = res.group(1).strip()
+            if args.verbose:
+                print(f"[INFO] setting {name} to {value}")
+            machdep[name] = value
+        else:
+            warnings.warn(f"unexpected symbol '{name}', ignoring")
+    else:
+        warnings.warn(f"cannot find value of field '{name}', skipping")
+        if args.verbose:
+            print(f"compiler output is:{output}")
 
 for (f, typ) in source_files:
     p = my_path / f
     cmd = compilation_command + [str(p)]
+    if typ == "macro":
+        # We're just interested in expanding a macro,
+        # treatment is a bit different than the rest.
+        cmd = cmd + ["-E"]
     if args.verbose:
         print(f"[INFO] running command: {' '.join(cmd)}")
     proc = subprocess.run(cmd, capture_output=True)
     Path(f).with_suffix(".o").unlink(missing_ok=True)
+    if typ == "macro":
+        if proc.returncode != 0:
+            warnings.warn(f"error in determining value of '{p,stem}', skipping")
+            if args.verbose:
+                print(f"compiler output is:{proc.stderr.decode()}")
+            continue
+        find_macro_value(p.stem,cleanup_cpp(proc.stdout.decode()))
+        continue
     if typ == "has__builtin_va_list":
         # Special case: compilation success determines presence or absence
         machdep["has__builtin_va_list"] = proc.returncode == 0
