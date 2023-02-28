@@ -847,22 +847,26 @@ end
 
 module MarkerTermOutput = Data.Joption (Marker)
 
-let build_marker =
-  Option.map @@ fun input ->
+let build_marker input =
   let env =
     let open Logic_typing in
     Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
   in
-  let kf = Kernel_function.find_englobing_kf input.atStmt in
-  let term = Logic_parse_string.term ~env kf input.term in
-  let exp = Logic_to_c.term_to_exp term in
-  Printer_tag.PExp (Some kf, Kstmt input.atStmt, exp)
+  try
+    let kf = Kernel_function.find_englobing_kf input.atStmt in
+    let term = Logic_parse_string.term ~env kf input.term in
+    let exp = Logic_to_c.term_to_exp term in
+    Some (Printer_tag.PExp (Some kf, Kstmt input.atStmt, exp))
+  with Not_found
+     | Logic_parse_string.Error _
+     | Logic_parse_string.Unbound _
+     | Logic_to_c.No_conversion -> None (* TODO: return an error message. *)
 
 let descr = "Build a marker from an ACSL term."
 
 let () = Request.register ~package
     ~kind:`GET ~name:"markerFromTerm" ~descr:(Markdown.plain descr)
     ~input:(module MarkerTermInput) ~output:(module MarkerTermOutput)
-    build_marker
+    (fun input -> Option.bind input build_marker)
 
 (**************************************************************************)
