@@ -766,7 +766,10 @@ let () = Information.register
         | PGlobal (GEnumTagDecl(ei,_) | GEnumTag(ei,_)) -> TEnum(ei,[])
         | _ -> raise Not_found
       in
-      let bits = Cil.bitsSizeOf typ in
+      let bits =
+        try Cil.bitsSizeOf typ
+        with Cil.SizeOfError _ -> raise Not_found
+      in
       let bytes = bits / 8 in
       let rbits = bits mod 8 in
       if rbits > 0 then
