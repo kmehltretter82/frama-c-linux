@@ -373,11 +373,12 @@ let check_indent ~indent_formatter ~update file =
 
 (* Main checks *)
 
-let check ~verbose ~update file params =
+let check ~count ~verbose ~update file params =
   if verbose then
     Format.printf "Checking %s@." file ;
   if Sys .is_directory file then ()
   else begin
+    incr count;
     let in_chan = open_in file in
     let content = read_buffered in_chan in
     close_in in_chan ;
@@ -469,6 +470,8 @@ let () =
     updates_tbl external_formatters ;
     parse_config !config_file;
     collect @@ lines_from_in stdin ;
-    Hashtbl.iter (check ~verbose:!verbose ~update:!update) table ;
+    let count = ref 0 in
+    Hashtbl.iter (check ~count ~verbose:!verbose ~update:!update) table ;
+    Format.printf "Lint %d file(s)@." !count;
     if not !res then exit 1
   end
