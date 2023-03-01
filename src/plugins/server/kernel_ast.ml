@@ -795,68 +795,24 @@ let () =
 (* --- Build a marker from an ACSL term                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module TermAt = Datatype.Pair(Cil_datatype.Stmt)(Cil_datatype.Term)
-module TermHash = Hashtbl.Make(TermAt)
-module TERMHASH : Datatype.S with type t = Marker.t TermHash.t =
-  Datatype.Make
-    (struct
-      type t = Marker.t TermHash.t
-      include Datatype.Undefined
-      let reprs = [TermHash.create 0]
-      let name = "Server.Kernel_ast.TermHash"
-      let mem_project = Datatype.never_any_project
-    end)
-module TERMCACHE = State_builder.Ref(TERMHASH)
-    (struct
-      let name = "Server.Kernel_ast.TermCache"
-      let default () = TermHash.create 0
-      let dependencies = []
-    end)
-
-let parse_term kf text =
+let build_marker ~stmt ~term =
   let env =
     let open Logic_typing in
     Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
   in
-  try Ok (Logic_parse_string.term ~env kf text)
-  with
-  | Logic_parse_string.Error(_,msg) -> Error msg
-  | Parsing.Parse_error -> Error "Parse error"
+  try
+    let kf = Kernel_function.find_englobing_kf stmt in
+    let term = Logic_parse_string.term ~env kf term in
+    let exp = Logic_to_c.term_to_exp term in
+    Some (Printer_tag.PExp (Some kf, Kstmt stmt, exp))
+  with Not_found
+     | Logic_parse_string.Error _
+     | Logic_parse_string.Unbound _
+     | Logic_to_c.No_conversion -> None (* TODO: return an error message. *)
 
-let reparse_term kf stmt text =
-  match parse_term kf text with
-  | Ok t -> Some (stmt,t)
-  | Error _ -> None
-
-let parseable_marker =
-  let open Printer_tag in
-  function
-  | PStmt _ | PStmtStart _ | PTermLval _ | PVDecl _ | PGlobal _ | PIP _
-  | PLval (None, _, _) | PExp (None, _, _)
-  | PLval (_, Kglobal, _) | PExp (_, Kglobal, _)
-  | PType _
-    -> None
-  | PLval (Some kf, Kstmt stmt, lval) ->
-    reparse_term kf stmt @@ Format.asprintf "%a" Cil_datatype.Lval.pretty lval
-  | PExp (Some kf, Kstmt stmt, exp) ->
-    reparse_term kf stmt @@ Format.asprintf "%a" Cil_datatype.Exp.pretty exp
-
-(* pre-fill the cache with known markers *)
-let () =
-  Marker.hook
-    begin fun (m,_) ->
-      match parseable_marker m with
-      | None -> ()
-      | Some entry ->
-        let cache = TERMCACHE.get () in
-        if not (TermHash.mem cache entry) then
-          TermHash.add cache entry m
-    end
-
-(* request to parse a new marker from C expression or l-value *)
 let () =
   let module Md = Markdown in
-  let s = Request.signature ~output:(module Data.Joption(Marker)) () in
+  let s = Request.signature ~output:(module Marker) () in
   let get_marker = Request.param s ~name:"stmt"
       ~descr:(Md.plain "Marker position from where to localize the term")
       (module Marker) in
@@ -868,25 +824,11 @@ let () =
     ~descr:(Md.plain "Parse a C expression and returns the associated marker")
     begin fun rq () ->
       match Printer_tag.ki_of_localizable @@ get_marker rq with
-      | Kglobal -> failwith "No statement at selection point"
+      | Kglobal -> Data.failure "No statement at selection point"
       | Kstmt stmt ->
-        let kf = Kernel_function.find_englobing_kf stmt in
-        match parse_term kf @@ get_term rq with
-        | Error msg -> failwith msg
-        | Ok term ->
-          let entry = (stmt, term) in
-          let cache = TERMCACHE.get () in
-          try Some (TermHash.find cache entry) with Not_found ->
-          try
-            let marker =
-              match Logic_to_c.term_to_exp term with
-              | { enode = Lval lv } ->
-                Printer_tag.PLval(Some kf, Kstmt stmt, lv)
-              | exp ->
-                Printer_tag.PExp(Some kf, Kstmt stmt, exp)
-            in TermHash.add cache entry marker ; Some marker
-          with Logic_to_c.No_conversion ->
-            failwith "Not a C-expression"
+        match build_marker ~stmt ~term:(get_term rq) with
+        | None -> Data.failure "Invalid expression"
+        | Some tag -> tag
     end
 
 (* -------------------------------------------------------------------------- *)

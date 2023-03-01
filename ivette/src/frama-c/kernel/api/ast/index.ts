@@ -445,20 +445,18 @@ export const setFiles: Server.SetRequest<string[],null>= setFiles_internal;
 
 const parseExpr_internal: Server.GetRequest<
   { term: string, stmt: marker },
-  marker |
-  undefined
+  marker
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.parseExpr',
   input:  Json.jObject({ term: Json.jString, stmt: jMarker,}),
-  output: Json.jOption(jMarker),
+  output: jMarker,
   signals: [],
 };
 /** Parse a C expression and returns the associated marker */
 export const parseExpr: Server.GetRequest<
   { term: string, stmt: marker },
-  marker |
-  undefined
+  marker
   >= parseExpr_internal;
 
 /* ------------------------------------- */
