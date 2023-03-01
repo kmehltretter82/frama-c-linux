@@ -205,8 +205,8 @@ let create_cst_vertex (x:t) : V.t * t =
     collapsed = x.collapsed
   }
 
-(* find all the aliases of lv1 in x *)
-let find_all_aliases (lv1:lval) (x:t) =
+(* find all the aliases of lv1 in x, for create_vertex *)
+let find_all_aliases (lv1:lval) (x:t) : LSet.t =
   (* define here since it should not be use outside this function *)
   let rec list_of_offset (o: offset) : (offset*offset) list = 
     match o with
@@ -260,9 +260,15 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
   let new_v = x.cmpt in
   let new_g = G.add_vertex x.graph new_v in
   let new_pending = VMap.add new_v VSet.empty x.pending in 
-  
-  let new_lmap = LMap.add lv new_v x.lmap in
-  let new_vmap = VMap.add new_v (LSet.singleton lv) x.vmap in
+  let set_of_aliases = find_all_aliases lv x in
+  (* add all these aliases *)
+  let new_lmap =
+    LSet.fold
+      (fun lv acc -> LMap.add lv new_v acc)
+      set_of_aliases
+      x.lmap
+  in
+  let new_vmap = VMap.add new_v set_of_aliases x.vmap in
 
   let new_x =
     {
@@ -379,7 +385,7 @@ let rec normalize_index (e:exp) : exp * bool =
   | _ -> e, false
 
 (* returns true if the offset is OK (no needs to collapse) *)
-let normalize_offset (lv1:lval) : lval * bool =
+let _normalize_offset (lv1:lval) : lval * bool =
   let lv, off = Cil.removeOffsetLval lv1 in
   match off with
     Index (e,NoOffset) ->
@@ -542,7 +548,7 @@ let merge x v1 v2 =
 
 
 (* merge all nodes of an array a to a[0] *)    
-let collapse (lv1:lval) (x:t) : t =
+let _collapse (lv1:lval) (x:t) : t =
   let lv, off = Cil.removeOffsetLval lv1 in
   match off with
   (* the lval is suposed to have no offset *)
