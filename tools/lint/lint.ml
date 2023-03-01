@@ -21,12 +21,12 @@
 (**************************************************************************)
 
 type tool_cmds =
-  { kind: string ;
-    extensions: string list ;
+  { kind: (string [@default "Misc"]) ;
+    extensions: (string list [@default []]);
     name: string ;
-    available_cmd: string ; (* leaves it empty to set it as unavailable *)
-    check_cmd: string ; (* leaves it empty if there is no check command *)
-    update_cmd: string (* leaves it empty if there is no updating command *)
+    available_cmd: (string [@default ""]) ; (* leaves it empty to set it as unavailable *)
+    check_cmd: (string [@default ""]) ; (* leaves it empty if there is no check command *)
+    update_cmd: (string [@default ""]) (* leaves it empty if there is no updating command *)
   }
 [@@deriving yojson]
 
@@ -327,15 +327,25 @@ let check_ml_indent ~update file =
 
 (* C/H *)
 
+(* returns true if the string command is empty *)
+let cmd_result ~file cmd =
+  (cmd = "") || (0 = Sys.command (Format.sprintf "%s \"%s\"" cmd file))
+
 let is_formatter_available ~file indent_formatter =
   match indent_formatter.is_available with
   | None ->
-    let is_available =
-      let cmd = indent_formatter.tool_cmds.available_cmd in
-      (cmd <> "") && (0 = Sys.command cmd) in
-    indent_formatter.is_available <- Some is_available ;
-    if not is_available then
-      warn "%s is unavailable for checking indentation of some %s files (i.e. %s)@."
+    let is_enabled =
+      (indent_formatter.tool_cmds.update_cmd <> "") ||
+      (indent_formatter.tool_cmds.check_cmd <> "")
+    in
+    let is_available = is_enabled && (cmd_result ~file indent_formatter.tool_cmds.available_cmd) in
+    indent_formatter.is_available <- Some is_available;
+    if not is_enabled then
+      (* [check_cmd] and [update_cmd] fields are empty *)
+      warn "%s is disabled for checking/updating indentation of some %s files (i.e. %s)@."
+        indent_formatter.tool_cmds.name indent_formatter.tool_cmds.kind file
+    else if not is_available then
+      warn "%s is unavailable for checking/updating indentation of some %s files (i.e. %s)@."
         indent_formatter.tool_cmds.name indent_formatter.tool_cmds.kind file;
     is_available
   | Some is_available -> is_available
@@ -355,14 +365,11 @@ let check_indent ~indent_formatter ~update file =
   in match tool with
   | Ocp_indent -> check_ml_indent ~update file
   | Tool indent_formatter ->
-    let do_cmd cmd =
-      (cmd = "") || (0 = Sys.command (Format.sprintf "%s \"%s\"" cmd file))
-    in
     if not @@ is_formatter_available ~file indent_formatter then true
     else if not update then
-      do_cmd indent_formatter.tool_cmds.check_cmd
+      cmd_result ~file indent_formatter.tool_cmds.check_cmd
     else
-      do_cmd indent_formatter.tool_cmds.update_cmd
+      cmd_result ~file indent_formatter.tool_cmds.update_cmd
 
 (* Main checks *)
 
@@ -423,8 +430,8 @@ let check ~verbose ~update file params =
 
 let exec_name = Sys.argv.(0)
 
-let version= "1.0"
-
+let version = "1.0"
+  
 let version () =
   Format.printf "%s version %s@." (Filename.basename exec_name) version;
   exit 0
