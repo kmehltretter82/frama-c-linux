@@ -28,32 +28,6 @@ open Cil_datatype
 
 open Utils
 
-(* (\** module for vertices *\)
- * module V = struct
- *
- *   type t =
- *     {
- *       id : Int.t; (\* id must be unique in a graph *\)
- *       set : LSet.t
- *     }
- *
- *   let cmpt_v = ref (-1)
- *
- *   let new_id () = incr cmpt_v; !cmpt_v
- *
- *   let compare x y = Int.compare x.id y.id
- *
- *   let hash x = Hashtbl.hash x.id (\* toto utiliser fonction hash frama-c *\)
- *
- *   let equal x y = (compare x y = 0)
- *
- *   let create s = { id = new_id () ; set = s}
- *
- *   let label x = x.set
- *
- * end *)
-
-
 module G = Persistent.Digraph.Concrete(Datatype.Int)
 
 module V = G.V
@@ -64,7 +38,10 @@ module VMap = Datatype.Int.Map
 module LSet = Lval.Set
 module LMap = Lval.Map
 
-
+module type S =
+sig
+  
+end
 
 type t = {
   graph : G.t;
@@ -228,15 +205,65 @@ let create_cst_vertex (x:t) : V.t * t =
     collapsed = x.collapsed
   }
 
+(* find all the aliases of lv1 in x *)
+let find_all_aliases (lv1:lval) (x:t) =
+  (* define here since it should not be use outside this function *)
+  let rec list_of_offset (o: offset) : (offset*offset) list = 
+    match o with
+      NoOffset -> [NoOffset,NoOffset]
+    | Index(e,ofs) ->
+      let li =
+        List.map
+          (fun (o1,o2) -> (Index(e,o1),o2))
+          (list_of_offset ofs)
+      in
+      (NoOffset,ofs)::li
+    | Field(f, ofs) ->
+      let li =
+        List.map
+          (fun (o1,o2) -> (Field(f,o1),o2))
+          (list_of_offset ofs)
+      in
+      (NoOffset,ofs)::li
+  in
 
+  let lv, off = Cil.removeOffsetLval lv1 in
+  let list_of_lval_to_be_searched : (lval*offset) list =
+    List.map
+      (fun (o1,o2) -> (Cil.addOffsetLval o1 lv,o2))
+      (list_of_offset off)
+  in
+  (* for each lval, find the set of aliases *)
+  let f_map (lv,o) =
+    try (VMap.find (LMap.find lv x.lmap) x.vmap, o)
+    with
+      Not_found -> (LSet.empty,o)
+  in
+  let list_of_aliases : (LSet.t*offset) list =
+    List.map f_map list_of_lval_to_be_searched
+  in
+  (*  for each lval of the Lset, add the offset and add it to the resulting set *)
+  let f_fold_left (acc:LSet.t) (ls,o) =
+    LSet.fold
+      (fun lv acc -> let lv = Cil.addOffsetLval o lv in LSet.add lv acc)
+      ls
+      acc
+  in
+  List.fold_left
+    f_fold_left
+    (LSet.singleton lv1)
+    list_of_aliases
+
+
+    
 let create_vertex (lv:lval) (x:t) : V.t * t =
   let new_v = x.cmpt in
   let new_g = G.add_vertex x.graph new_v in
-  let new_pending = VMap.add new_v VSet.empty x.pending in
+  let new_pending = VMap.add new_v VSet.empty x.pending in 
+  
   let new_lmap = LMap.add lv new_v x.lmap in
   let new_vmap = VMap.add new_v (LSet.singleton lv) x.vmap in
-  (* if [lv] is a pointer variable, also create a vertex labelled by
-     *[lv] *)
+
   let new_x =
     {
       graph = new_g ;
@@ -291,6 +318,79 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
    end
 *)
 
+(* (\* Replace all trailing array subscripts of an lval with zero indices. *\)
+ * let rec shift_offsets lv loc =
+ *   let lv, off = Cil.removeOffsetLval lv in
+ *   match off with
+ *   | Index _ ->
+ *     let lv = shift_offsets lv loc in
+ *     (\* since the offset has been removed at the start of the function, add a new
+ *        0 offset to preserve the type of the lvalue. *\)
+ *     Cil.addOffsetLval (Index (Cil.zero ~loc, NoOffset)) lv
+ *   | NoOffset | Field _ -> Cil.addOffsetLval off lv
+ * 
+ * let rec ptr_base ~loc exp =
+ *   match exp.enode with
+ *   | BinOp(op, lhs, _, _) ->
+ *     (match op with
+ *      (\* Pointer arithmetic: split pointer and integer parts *\)
+ *      | MinusPI | PlusPI -> ptr_base ~loc lhs
+ *      (\* Other arithmetic: treat the whole expression as pointer address *\)
+ *      | MinusPP | PlusA | MinusA | Mult | Div | Mod
+ *      | BAnd | BXor | BOr | Shiftlt | Shiftrt
+ *      | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr -> exp)
+ *   (\* AddressOf: if it is an addressof array then replace all trailing offsets
+ *      with zero offsets to get the base. *\)
+ *   | AddrOf lv -> Cil.mkAddrOf ~loc (shift_offsets lv loc)
+ *   (\* StartOf already points to the start of an array, return exp directly *\)
+ *   | StartOf _ -> exp
+ *   (\* Cast: strip cast and continue, then recast to original type. *\)
+ *   | CastE _ ->
+ *     let exp, casts = strip_casts exp in
+ *     let base = ptr_base ~loc exp in
+ *     add_casts casts base
+ *   | Const _ | Lval _ | UnOp _ -> exp
+ *   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
+ *     -> assert false
+ * 
+ * let ptr_base_and_base_addr ~loc e =
+ *   let rec ptr_base_addr ~loc base =
+ *     match base.enode with
+ *     | AddrOf _ | StartOf _ | Const _ -> Cil.zero ~loc
+ *     | Lval lv -> Cil.mkAddrOrStartOf ~loc lv
+ *     | CastE _ -> ptr_base_addr ~loc (Cil.stripCasts base)
+ *     | _ -> assert false
+ *   in
+ *   let base = ptr_base ~loc e in
+ *   let base_addr  = ptr_base_addr ~loc base in
+ *   base, base_addr *)
+
+(* returns a[0] *)
+let first_index (lv:lval) : lval =
+  let loc = Location.unknown in
+  let lv, _ = Cil.removeOffsetLval lv in
+  Cil.addOffsetLval (Index (Cil.zero ~loc, NoOffset)) lv
+
+(* returns true if the index is OK (no needs to collapse) *)
+let rec normalize_index (e:exp) : exp * bool =
+  match e.enode with
+    Const _ -> e, true
+  | CastE _ -> normalize_index (Cil.stripCasts e)
+  | _ -> e, false
+
+(* returns true if the offset is OK (no needs to collapse) *)
+let normalize_offset (lv1:lval) : lval * bool =
+  let lv, off = Cil.removeOffsetLval lv1 in
+  match off with
+    Index (e,NoOffset) ->
+    begin
+      match normalize_index e with
+        (e,true) ->  Cil.addOffsetLval (Index (e, NoOffset)) lv, true
+      | (_,false) ->
+        first_index lv, false
+    end
+  | Index _ | NoOffset | Field _ -> lv1, true
+  
 
 let rec find_host (hs:lhost) (x:t) : V.t * t =
   let lv = (hs, NoOffset) in
@@ -314,7 +414,7 @@ let rec find_host (hs:lhost) (x:t) : V.t * t =
 
       | UnOp  _ | BinOp _  -> failwith "Not implemented3 "
 
-      | CastE (_,e) -> find_or_create_vertex (Mem e, NoOffset) x
+      | CastE _ -> find_or_create_vertex (Mem (Cil.stripCasts e), NoOffset) x
       | AddrOf lv -> find_or_create_vertex lv x
       | StartOf lv ->  find_or_create_vertex lv x
     end
@@ -439,6 +539,36 @@ let merge x v1 v2 =
     (* remove v2 *)
     let g =  G.remove_vertex g v2 in
     {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt ; collapsed = new_collapsed}
+
+
+(* merge all nodes of an array a to a[0] *)    
+let collapse (lv1:lval) (x:t) : t =
+  let lv, off = Cil.removeOffsetLval lv1 in
+  match off with
+  (* the lval is suposed to have no offset *)
+    NoOffset ->
+    let lv0 =  first_index lv in
+    let v0, x = find_or_create_vertex lv0 x in
+    (* merge all nodes that are indexed with v0 *)
+    let f_fold lvx vx acc =
+      let lvx, off = Cil.removeOffsetLval lvx in
+      if Lval.equal lvx lv
+      then
+        match off with
+          Index _ ->
+          let acc = merge acc v0 vx in
+          let p = VMap.add v0 (VSet.union (VMap.find v0 acc.pending) (VMap.find vx acc.pending)) acc.pending in
+          let new_pending = VMap.remove vx p in
+          {acc with pending = new_pending }
+        | NoOffset | Field _ -> acc
+      else
+        acc
+    in
+    LMap.fold f_fold x.lmap x
+  | Index _ | Field _ -> assert false
+
+
+(* let collapse_node (v:) x:t *)
 
 
 (** functions for steensgard's algorithm *)

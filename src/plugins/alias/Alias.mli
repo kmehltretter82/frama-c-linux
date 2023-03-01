@@ -22,6 +22,8 @@
 
 (** Interface for the Alias plug-in. *)
 
+module Abstract_state : Abstract_state.S
+
 module Analysis: sig
   (** see file analysis.mli for documentation *)
   val compute : unit -> unit

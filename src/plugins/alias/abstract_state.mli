@@ -32,6 +32,11 @@ module G: Graph.Sig.G
 module LMap = Lval.Map
 module LSet = Lval.Set
 
+module type S =
+sig
+  
+end
+
 (** Type denothing an abstract state of the analysis. It is a graph containing
     all aliases and points-to information. *)
 type t
