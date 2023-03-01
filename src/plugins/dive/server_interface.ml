@@ -43,11 +43,7 @@ let get_context =
         context := Some c;
         c
       else
-        begin
-          Self.error ~once:true
-            "A prior Eva analysis is required to build the graphs.";
-          Server.Data.failure "Eva analysis not computed"
-        end
+        Server.Data.failure "Eva analysis not computed"
 
 
 let global_window = ref {
