@@ -37,6 +37,8 @@ let mach =
     little_endian = true;
     has__builtin_va_list = true;
     weof = "(-1)";
+    wordsize = "24";
+    posix_version = "200809L";
   }
 
 let mach2 = { mach with compiler = "baz" }

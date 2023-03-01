@@ -2663,7 +2663,9 @@ let dummy_machdep =
     compiler = "none";
     cpp_arch_flags = [];
     version = "N/A";
-    weof = "(-1)"
+    weof = "(-1)";
+    wordsize = "64";
+    posix_version = "";
   }
 
 module Machdep = Datatype.Make_with_collections(struct

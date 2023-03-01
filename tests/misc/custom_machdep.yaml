@@ -33,3 +33,5 @@ ssize_t: long
 version: foo
 wchar_t: int
 weof: (-1)
+wordsize: '24'
+posix_version: '200809L'

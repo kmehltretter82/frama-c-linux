@@ -16,6 +16,7 @@ cpp_arch_flags:
 has__builtin_va_list: true
 intptr_t: int
 little_endian: true
+posix_version: 200809L
 ptrdiff_t: int
 size_t: unsigned int
 sizeof_double: 8
@@ -34,3 +35,4 @@ version: gcc (GCC) 12.2.1 20230201
 wchar_t: long
 weof: (0xffffffffu)
 wint_t: unsigned int
+wordsize: '32'

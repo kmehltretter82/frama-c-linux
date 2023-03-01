@@ -170,6 +170,8 @@ source_files = [
     ("little_endian.c", "bool"),
     ("has__builtin_va_list.c", "has__builtin_va_list"),
     ("weof.c", "macro"),
+    ("wordsize.c", "macro"),
+    ("posix_version.c", "macro"),
 ]
 
 
@@ -227,7 +229,9 @@ def find_macro_value(name,output):
         else:
             warnings.warn(f"unexpected symbol '{name}', ignoring")
     else:
-        warnings.warn(f"cannot find value of field '{name}', skipping")
+        warnings.warn(f"cannot find value of field '{name}', treating as empty")
+        if name in machdep:
+            machdep[name] = ''
         if args.verbose:
             print(f"compiler output is:{output}")
 
@@ -244,9 +248,12 @@ for (f, typ) in source_files:
     Path(f).with_suffix(".o").unlink(missing_ok=True)
     if typ == "macro":
         if proc.returncode != 0:
-            warnings.warn(f"error in determining value of '{p,stem}', skipping")
+            warnings.warn(f"error in determining value of '{p,stem}', treating as empty")
             if args.verbose:
                 print(f"compiler output is:{proc.stderr.decode()}")
+            name = p.stem
+            if name in machdep:
+                machdep[name] = ''
             continue
         find_macro_value(p.stem,cleanup_cpp(proc.stdout.decode()))
         continue

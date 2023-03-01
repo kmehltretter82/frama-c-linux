@@ -34,3 +34,5 @@ version: MSVC - X86-64bits mode
 wchar_t: unsigned short
 weof: (0xffffU)
 wint_t: unsigned short
+wordsize: '64'
+posix_version: ''

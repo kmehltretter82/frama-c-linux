@@ -107,6 +107,11 @@ little_endian:
 
   type: boolean
 
+posix_version:
+  description: |
+    value of the macro '_POSIX_VERSION'
+    leave empty for non-POSIX systems
+
 ptrdiff_t:
 
   description:  definition of 'ptrdiff_t'
@@ -212,5 +217,11 @@ weof:
 wint_t:
 
   description: definition of 'wint_t'
+
+  type: string
+
+wordsize:
+
+  description: value of "__WORDSIZE" macro
 
   type: string

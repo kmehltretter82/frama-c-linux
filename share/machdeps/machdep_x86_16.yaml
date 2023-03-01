@@ -34,3 +34,5 @@ version: none
 wchar_t: int
 weof: (0xffffffffUL)
 wint_t: unsigned long
+wordsize: '16'
+posix_version: '200809L'

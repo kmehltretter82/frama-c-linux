@@ -1901,7 +1901,9 @@ type mach = {
   cpp_arch_flags: string list;  (* Architecture-specific flags to be given to
                                    the preprocessor (if supported) *)
   version: string;        (* Information on this machdep *)
-  weof: string; (* expansion of WEOF macro *)
+  weof: string; (* expansion of WEOF macro, empty if undefined *)
+  wordsize: string; (* expansion of __WORDSIZE macro, empty if undefined *)
+  posix_version: string; (* expansion of _POSIX_VERSION macro, empty if undefined *)
 }
 
 (*

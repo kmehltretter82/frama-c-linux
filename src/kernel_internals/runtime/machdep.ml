@@ -11,6 +11,10 @@ let gen_define_string fmt macro def =
 let gen_define_literal_string fmt macro def =
   gen_define fmt macro Format.pp_print_string ("\"" ^ def ^ "\"")
 
+let gen_define_macro fmt macro def =
+  if def = "" then gen_undef fmt macro
+  else gen_define_string fmt macro def
+
 let gen_define_int fmt macro def = gen_define fmt macro Format.pp_print_int def
 
 let gen_byte_order fmt mach =
@@ -201,13 +205,13 @@ let gen_all_defines fmt mach =
   gen_intlike_max fmt "__FC_PTRDIFF" mach.ptrdiff_t mach;
   gen_intlike_min fmt "__FC_WINT" mach.wint_t mach;
   gen_intlike_max fmt "__FC_WINT" mach.wint_t mach;
-  gen_define_string fmt "__FC_WEOF" mach.weof;
+  gen_define_macro fmt "__FC_WEOF" mach.weof;
   (* NB: Frama-C's inttypes.h is assuming that intptr_t and uintptr_t have the
      same rank when it comes to define PRI.?PTR macros. *)
   gen_define_literal_string fmt "__PRIPTR_PREFIX"
     (List.assoc (no_signedness mach.intptr_t) pp_of_kind);
-
-  (* TODO: __FC_POSIX_VERSION *)
+  gen_define_macro fmt "__FC_WORDSIZE" mach.wordsize;
+  gen_define_macro fmt "__FC_POSIX_VERSION" mach.posix_version;
   (* TODO: __FC_HOST_NAME_MAX *)
   (* TODO: __FC_TTY_NAME_MAX *)
   (* TODO: __FC_SIG_ATOMIC_MIN *)
@@ -224,7 +228,6 @@ let gen_all_defines fmt mach =
   (* TODO: __FC_TIME_T *)
   (* TODO: __FC_NSIG *)
   (* TODO: __FC__NSIG *)
-  (* TODO: __WORDSIZE *)
   (* TODO: gcc builtins *)
 
   Format.fprintf fmt "#endif // __FC_MACHDEP@\n"
