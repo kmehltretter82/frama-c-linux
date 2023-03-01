@@ -925,9 +925,9 @@ let cleanup file =
         b.bstmts <-
           List.filter
             (fun x ->
-              not (Cil.is_skip x.skind)
-              || Cil_datatype.Stmt.Set.mem x keep_stmt
-              || (changed <- true; false)
+               not (Cil.is_skip x.skind)
+               || Cil_datatype.Stmt.Set.mem x keep_stmt
+               || (changed <- true; false)
             )
             b.bstmts;
         (* Now that annotations are in the table, we do not need to
@@ -1539,20 +1539,20 @@ module Remove_spurious = struct
         kept = g :: acc.kept }
     | GCompTag _ -> { acc with kept = g :: acc.kept }
     | GCompTagDecl(ci,_)
-        when Cil_datatype.Compinfo.Set.mem ci acc.compinfos -> acc
+      when Cil_datatype.Compinfo.Set.mem ci acc.compinfos -> acc
     | GCompTagDecl(ci,_) ->
       { acc with
         compinfos = Cil_datatype.Compinfo.Set.add ci acc.compinfos;
         kept = g :: acc.kept }
     | GEnumTag _ -> { acc with kept = g :: acc.kept }
     | GEnumTagDecl(ei,_)
-        when Cil_datatype.Enuminfo.Set.mem ei acc.enuminfos -> acc
+      when Cil_datatype.Enuminfo.Set.mem ei acc.enuminfos -> acc
     | GEnumTagDecl(ei,_) ->
       { acc with
         enuminfos = Cil_datatype.Enuminfo.Set.add ei acc.enuminfos;
         kept = g :: acc.kept }
     | GVarDecl(vi,_) | GFunDecl (_, vi, _)
-        when Cil_datatype.Varinfo.Set.mem vi acc.varinfos -> acc
+      when Cil_datatype.Varinfo.Set.mem vi acc.varinfos -> acc
     | GVarDecl(vi,_) ->
       { acc with
         varinfos = Cil_datatype.Varinfo.Set.add vi acc.varinfos;
@@ -1562,8 +1562,8 @@ module Remove_spurious = struct
     | GAnnot (a,_) ->
       let lis = extract_logic_infos a in
       if List.exists
-           (fun x -> Cil_datatype.Logic_info.Set.mem x acc.logic_infos)
-           lis
+          (fun x -> Cil_datatype.Logic_info.Set.mem x acc.logic_infos)
+          lis
       then acc
       else begin
         let known_li =

@@ -109,17 +109,21 @@ def print_machdep(machdep):
         args.dest_file = open(args.from_file, "w")
     yaml.dump(machdep, args.dest_file, indent=4, sort_keys=True)
 
+
 def make_schema():
     schema_filename = my_path.parent / "machdep-schema.yaml"
     with open(schema_filename, "r") as schema:
         return yaml.safe_load(schema)
 
+
 schema = make_schema()
+
 
 def check_machdep(machdep):
     try:
         from jsonschema import validate, ValidationError
-        validate(machdep,schema)
+
+        validate(machdep, schema)
     except ImportError:
         warnings.warn("jsonschema is not available: no validation will be performed")
     except OSError:
@@ -127,11 +131,13 @@ def check_machdep(machdep):
     except ValidationError:
         warnings.warn("machdep object is not conforming to machdep schema")
 
+
 def make_machdep():
-    machdep = { }
+    machdep = {}
     for key in schema.keys():
         machdep[key] = None
     return machdep
+
 
 machdep = make_machdep()
 
@@ -193,6 +199,7 @@ def find_value(name, typ, output):
 
         def conversion(x):
             return x
+
     else:
         warnings.warn(f"unexpected type '{typ}' for field '{name}', skipping")
         return
@@ -211,15 +218,17 @@ def find_value(name, typ, output):
         if args.verbose:
             print(f"compiler output is:{output}")
 
+
 def cleanup_cpp(output):
     lines = output.splitlines()
-    macro = filter(lambda s: s != '' and s[0] != '#', lines)
-    macro = map(lambda s: s.strip(),macro)
-    return ' '.join(macro)
+    macro = filter(lambda s: s != "" and s[0] != "#", lines)
+    macro = map(lambda s: s.strip(), macro)
+    return " ".join(macro)
 
-def find_macro_value(name,output):
+
+def find_macro_value(name, output):
     msg = re.compile(name + "_is = ([^;]+);")
-    res = re.search(msg,output)
+    res = re.search(msg, output)
     if res:
         if name in machdep:
             value = res.group(1).strip()
@@ -231,9 +240,10 @@ def find_macro_value(name,output):
     else:
         warnings.warn(f"cannot find value of field '{name}', treating as empty")
         if name in machdep:
-            machdep[name] = ''
+            machdep[name] = ""
         if args.verbose:
             print(f"compiler output is:{output}")
+
 
 for (f, typ) in source_files:
     p = my_path / f
@@ -253,9 +263,9 @@ for (f, typ) in source_files:
                 print(f"compiler output is:{proc.stderr.decode()}")
             name = p.stem
             if name in machdep:
-                machdep[name] = ''
+                machdep[name] = ""
             continue
-        find_macro_value(p.stem,cleanup_cpp(proc.stdout.decode()))
+        find_macro_value(p.stem, cleanup_cpp(proc.stdout.decode()))
         continue
     if typ == "has__builtin_va_list":
         # Special case: compilation success determines presence or absence
