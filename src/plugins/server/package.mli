@@ -33,19 +33,19 @@ type jtype =
   | Jboolean
   | Jnumber
   | Jstring
-  | Jalpha (* string primarily compared without case *)
-  | Jtag of string (* single constant string *)
-  | Jkey of string (* kind of a string used for indexing *)
-  | Jindex of string (* kind of an integer used for indexing *)
+  | Jalpha (** string primarily compared without case *)
+  | Jtag of string (** single constant string *)
+  | Jkey of string (** kind of a string used for indexing *)
+  | Jindex of string (** kind of an integer used for indexing *)
   | Joption of jtype
-  | Jdict of jtype (* dictionaries *)
-  | Jarray of jtype (* order matters *)
+  | Jdict of jtype (** dictionaries *)
+  | Jarray of jtype (** order matters *)
   | Jtuple of jtype list
   | Junion of jtype list
   | Jrecord of (string * jtype) list
-  | Jenum of ident * string list (* type and tags *)
-  | Jdata of ident * jtype (* type and definition *)
-  | Jself (* for (simply) recursive types *)
+  | Jenum of ident * string list (** type and tags *)
+  | Jdata of ident * jtype (** type and definition *)
+  | Jself (** for (simply) recursive types *)
 
 type fieldInfo = {
   fd_name: string;
