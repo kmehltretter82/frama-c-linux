@@ -29,37 +29,6 @@ open Cil_types
 let package = Pkg.package ~title:"Ast Services" ~name:"ast" ~readme:"ast.md" ()
 
 (* -------------------------------------------------------------------------- *)
-(* --- Marker Cache System                                                --- *)
-(* -------------------------------------------------------------------------- *)
-
-let logic_environment () =
-  let open Logic_typing in
-  Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
-
-module Key = Datatype.Pair(Cil_datatype.Stmt)(Cil_datatype.Term)
-module Cache = Hashtbl.Make(Key)
-
-let get_term kf term =
-  let env = logic_environment () in
-  try Some (Logic_parse_string.term ~env kf term)
-  with Logic_parse_string.Error _ | Parsing.Parse_error -> None
-
-let key_of_localizable =
-  let open Printer_tag in
-  function
-  | PStmt _ | PStmtStart _ | PTermLval _ | PVDecl _ | PGlobal _ | PIP _
-  | PType _ | PLval (_, Kglobal, _) | PExp (_, Kglobal, _)
-    -> None
-  | PLval (kf, Kstmt stmt, lval) ->
-    let str = Format.asprintf "%a" Cil_datatype.Lval.pretty lval in
-    Option.(bind kf (fun kf -> get_term kf str) |> map (fun t -> (stmt, t)))
-  | PExp (kf, Kstmt stmt, exp) ->
-    let str = Format.asprintf "%a" Cil_datatype.Exp.pretty exp in
-    Option.(bind kf (fun kf -> get_term kf str) |> map (fun t -> (stmt, t)))
-
-let cache = Cache.create 10
-
-(* -------------------------------------------------------------------------- *)
 (* --- Compute Ast                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -320,8 +289,6 @@ struct
     | PType _ -> Printf.sprintf "#y%d" (incr kid ; !kid)
 
   let create loc =
-    let add_cache key = Cache.add cache key loc in
-    key_of_localizable loc |> Option.iter add_cache;
     let { tags ; locs } = STATE.get () in
     try Localizable.Hashtbl.find tags loc
     with Not_found ->
@@ -766,7 +733,10 @@ let () = Information.register
         | PGlobal (GEnumTagDecl(ei,_) | GEnumTag(ei,_)) -> TEnum(ei,[])
         | _ -> raise Not_found
       in
-      let bits = Cil.bitsSizeOf typ in
+      let bits =
+        try Cil.bitsSizeOf typ
+        with Cil.SizeOfError _ -> raise Not_found
+      in
       let bytes = bits / 8 in
       let rbits = bits mod 8 in
       if rbits > 0 then
@@ -877,24 +847,26 @@ end
 
 module MarkerTermOutput = Data.Joption (Marker)
 
-let build_marker =
-  Option.map @@ fun input ->
-  let env = logic_environment () in
-  let kf = Kernel_function.find_englobing_kf input.atStmt in
-  let term = Logic_parse_string.term ~env kf input.term in
-  let key = (input.atStmt, term) in
-  match Cache.find_opt cache key with
-  | Some tag -> tag
-  | None ->
+let build_marker input =
+  let env =
+    let open Logic_typing in
+    Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
+  in
+  try
+    let kf = Kernel_function.find_englobing_kf input.atStmt in
+    let term = Logic_parse_string.term ~env kf input.term in
     let exp = Logic_to_c.term_to_exp term in
-    let tag = Printer_tag.PExp (Some kf, Kstmt input.atStmt, exp) in
-    Cache.add cache key tag ; tag
+    Some (Printer_tag.PExp (Some kf, Kstmt input.atStmt, exp))
+  with Not_found
+     | Logic_parse_string.Error _
+     | Logic_parse_string.Unbound _
+     | Logic_to_c.No_conversion -> None (* TODO: return an error message. *)
 
 let descr = "Build a marker from an ACSL term."
 
 let () = Request.register ~package
     ~kind:`GET ~name:"markerFromTerm" ~descr:(Markdown.plain descr)
     ~input:(module MarkerTermInput) ~output:(module MarkerTermOutput)
-    build_marker
+    (fun input -> Option.bind input build_marker)
 
 (**************************************************************************)
