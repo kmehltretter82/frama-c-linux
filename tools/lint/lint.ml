@@ -430,10 +430,8 @@ let check ~verbose ~update file params =
 
 let exec_name = Sys.argv.(0)
 
-let version = "1.0"
-  
 let version () =
-  Format.printf "%s version %s@." (Filename.basename exec_name) version;
+  Format.printf "%s version %s@." (Filename.basename exec_name) Version.version;
   exit 0
 
 let update = ref false
