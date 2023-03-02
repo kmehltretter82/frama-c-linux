@@ -78,15 +78,15 @@ class type term_selection =
   end
 
 class plang :
-    terms:#term_wrapper ->
-    focus:#term_wrapper ->
-    target:#term_wrapper ->
-    autofocus:#term_selection ->
-    object
-      inherit Pcond.state
-      method set_target : F.term -> unit
-      method clear_target : unit
-    end
+  terms:#term_wrapper ->
+  focus:#term_wrapper ->
+  target:#term_wrapper ->
+  autofocus:#term_selection ->
+  object
+    inherit Pcond.state
+    method set_target : F.term -> unit
+    method clear_target : unit
+  end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Condition Engine                                                   --- *)
@@ -105,10 +105,10 @@ class type step_selection =
   end
 
 class pcond :
-    parts:#part_marker ->
-    target:#part_marker ->
-    autofocus:#step_selection ->
-    plang:#Pcond.state ->
+  parts:#part_marker ->
+  target:#part_marker ->
+  autofocus:#step_selection ->
+  plang:#Pcond.state ->
   object
     inherit Pcond.seqengine
     method visible : step -> bool

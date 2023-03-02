@@ -448,9 +448,9 @@ type target = part * F.term option
 type focus = [ `Transient | `Select | `Focus | `Extend | `Reset ]
 
 class pseq
-  ~(autofocus:#autofocus)
-  ~(plang:#plang)
-  ~(pcond:#pcond) =
+    ~(autofocus:#autofocus)
+    ~(plang:#plang)
+    ~(pcond:#pcond) =
   object(self)
     val mutable demon = []
     val mutable sequent = Conditions.empty , F.p_true

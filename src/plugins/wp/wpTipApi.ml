@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2022                                               *)
+(*  Copyright (C) 2007-2023                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -271,7 +271,7 @@ let flags (type a) ~name ~descr tags : a R.input =
   (module struct
     type t = a
     let jtype = D.declare ~package ~name ~descr
-      (P.Junion (List.map (fun (tg,_) -> P.Jtag tg) tags))
+        (P.Junion (List.map (fun (tg,_) -> P.Jtag tg) tags))
     let of_json js = List.assoc (Json.string js) tags
   end)
 
