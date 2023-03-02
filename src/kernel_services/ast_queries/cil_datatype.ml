@@ -2666,6 +2666,14 @@ let dummy_machdep =
     weof = "(-1)";
     wordsize = "64";
     posix_version = "";
+    bufsiz = "255";
+    eof = "(-1)";
+    fopen_max = "255";
+    filename_max = "4095";
+    l_tmpnam = "63";
+    tmp_max = "1024";
+    rand_max = "0xFFFFFFFE";
+    mb_cur_max = "16";
   }
 
 module Machdep = Datatype.Make_with_collections(struct

@@ -66,6 +66,12 @@ alignof_str:
 
   type: integer
 
+bufsiz:
+
+  description: value of 'BUFSIZ' macro
+
+  type: string
+
 char_is_unsigned:
 
   description:  whether 'char' is unsigned
@@ -90,6 +96,24 @@ cpp_arch_flags:
 
     - type: string
 
+eof:
+
+  description: value of 'EOF' macro
+
+  type: string
+
+filename_max:
+
+  description: value of 'FILENAME_MAX' macro
+
+  type: string
+
+fopen_max:
+
+  description: value of 'FOPEN_MAX' macro
+
+  type: string
+
 has__builtin_va_list:
 
   description:  Whether '__builtin_va_list' is a known type
@@ -101,11 +125,23 @@ intptr_t:
 
   type: string
 
+l_tmpnam:
+
+  description: value of 'L_tmpnam' macro
+
+  type: string
+
 little_endian:
 
   description:  whether the architecture is little-endian
 
   type: boolean
+
+mb_cur_max:
+
+  description: expansion of 'MB_CUR_MAX' macro
+
+  type: string
 
 posix_version:
   description: |
@@ -115,6 +151,12 @@ posix_version:
 ptrdiff_t:
 
   description:  definition of 'ptrdiff_t'
+
+  type: string
+
+rand_max:
+
+  description: expansion of 'RAND_MAX' macro
 
   type: string
 
@@ -187,6 +229,12 @@ sizeof_void:
 ssize_t:
 
   description: definition of 'ssize_t' (POSIX standard type)
+
+  type: string
+
+tmp_max:
+
+  description: value of 'TMP_MAX' macro
 
   type: string
 

@@ -36,3 +36,14 @@ weof: (0xffffU)
 wint_t: unsigned short
 wordsize: '64'
 posix_version: ''
+# NB: except for l_tmpnam, the corresponding macro are not defined in the old
+# __fc_machdep.h in the MSVC_X86_64 section. The values below have thus been 
+# taken from gnu
+bufsiz: '8192'
+eof: '(-1)'
+fopen_max: '16'
+filename_max: '2048'
+l_tmpnam: '20'
+tmp_max: '0xFFFFFFFF'
+rand_max: 32767
+mb_cur_max: '((size_t)16)'

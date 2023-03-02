@@ -178,6 +178,8 @@ source_files = [
     ("weof.c", "macro"),
     ("wordsize.c", "macro"),
     ("posix_version.c", "macro"),
+    ("stdio_macros.c", "macro"),
+    ("stdlib_macros.c", "macro"),
 ]
 
 
@@ -226,23 +228,19 @@ def cleanup_cpp(output):
     return " ".join(macro)
 
 
-def find_macro_value(name, output):
-    msg = re.compile(name + "_is = ([^;]+);")
-    res = re.search(msg, output)
-    if res:
+def find_macros_value(output):
+    msg = re.compile("(\w+)_is = ([^;]+);")
+    for res in re.finditer(msg, output):
+        name = res.group(1)
         if name in machdep:
-            value = res.group(1).strip()
+            value = res.group(2).strip()
             if args.verbose:
                 print(f"[INFO] setting {name} to {value}")
             machdep[name] = value
         else:
             warnings.warn(f"unexpected symbol '{name}', ignoring")
-    else:
-        warnings.warn(f"cannot find value of field '{name}', treating as empty")
-        if name in machdep:
-            machdep[name] = ""
-        if args.verbose:
-            print(f"compiler output is:{output}")
+    if args.verbose:
+        print(f"compiler output is:{output}")
 
 
 for (f, typ) in source_files:
@@ -258,14 +256,14 @@ for (f, typ) in source_files:
     Path(f).with_suffix(".o").unlink(missing_ok=True)
     if typ == "macro":
         if proc.returncode != 0:
-            warnings.warn(f"error in determining value of '{p,stem}', treating as empty")
+            warnings.warn(f"error in preprocessing value '{p}', some values won't be filled")
             if args.verbose:
                 print(f"compiler output is:{proc.stderr.decode()}")
             name = p.stem
             if name in machdep:
                 machdep[name] = ""
             continue
-        find_macro_value(p.stem, cleanup_cpp(proc.stdout.decode()))
+        find_macros_value(cleanup_cpp(proc.stdout.decode()))
         continue
     if typ == "has__builtin_va_list":
         # Special case: compilation success determines presence or absence

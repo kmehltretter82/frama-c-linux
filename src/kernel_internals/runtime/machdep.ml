@@ -234,18 +234,16 @@ let gen_all_defines fmt mach =
     (List.assoc (no_signedness mach.intptr_t) pp_of_kind);
   gen_define_macro fmt "__FC_WORDSIZE" mach.wordsize;
   gen_define_macro fmt "__FC_POSIX_VERSION" mach.posix_version;
-  (* TODO: __FC_HOST_NAME_MAX *)
-  (* TODO: __FC_TTY_NAME_MAX *)
   (* TODO: __FC_SIG_ATOMIC_MIN *)
   (* TODO: __FC_SIG_ATOMIC_MAX *)
-  (* TODO: __FC_BUFSIZ *)
-  (* TODO: __FC_EOF *)
-  (* TODO: __FC_FOPEN_MAX *)
-  (* TODO: __FC_FILENAME_MAX *)
-  (* TODO: __FC_L_tmpnam *)
-  (* TODO: __FC_TMP_MAX *)
-  (* TODO: __FC_RAND_MAX *)
-  (* TODO: __FC_MB_CUR_MAX *)
+  gen_define_macro fmt "__FC_BUFSIZ" mach.bufsiz;
+  gen_define_macro fmt "__FC_EOF" mach.eof;
+  gen_define_macro fmt "__FC_FOPEN_MAX" mach.fopen_max;
+  gen_define_macro fmt "__FC_FILENAME_MAX" mach.filename_max;
+  gen_define_macro fmt "__FC_L_tmpnam" mach.l_tmpnam;
+  gen_define_macro fmt "__FC_TMP_MAX" mach.tmp_max;
+  gen_define_macro fmt "__FC_RAND_MAX" mach.rand_max;
+  gen_define_macro fmt "__FC_MB_CUR_MAX" mach.mb_cur_max;
   (* TODO: __FC_E*, errno enumeration *)
   (* TODO: __FC_TIME_T *)
   (* TODO: __FC_NSIG *)

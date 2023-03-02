@@ -1904,6 +1904,15 @@ type mach = {
   weof: string; (* expansion of WEOF macro, empty if undefined *)
   wordsize: string; (* expansion of __WORDSIZE macro, empty if undefined *)
   posix_version: string; (* expansion of _POSIX_VERSION macro, empty if undefined *)
+  bufsiz: string; (* expansion of BUFSIZ macro *)
+  eof: string; (* expansion of EOF macro *)
+  fopen_max: string; (* expansion of FOPEN_MAX macro *)
+  filename_max: string; (* expansion of FILENAME_MAX macro *)
+  l_tmpnam: string; (* expansion of L_tmpnam macro *)
+  tmp_max: string; (* expansion of TMP_MAX macro *)
+  rand_max: string; (* expansion of RAND_MAX macro *)
+  mb_cur_max: string; (* expansion of MB_CUR_MAX macro *)
+
 }
 
 (*

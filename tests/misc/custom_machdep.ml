@@ -39,6 +39,14 @@ let mach =
     weof = "(-1)";
     wordsize = "24";
     posix_version = "200809L";
+    bufsiz = "255";
+    eof = "(-1)";
+    fopen_max = "128";
+    filename_max = "1023";
+    l_tmpnam = "255";
+    tmp_max = "4095";
+    rand_max = "0xFFFFFFFE";
+    mb_cur_max = "16";
   }
 
 let mach2 = { mach with compiler = "baz" }

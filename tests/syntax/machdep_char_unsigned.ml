@@ -38,6 +38,14 @@ let md = {
   weof = "(-1L)";
   wordsize = "16";
   posix_version = "";
+  bufsiz = "8192";
+  eof = "(-1)";
+  fopen_max = "16";
+  filename_max = "2048";
+  l_tmpnam = "2048";
+  tmp_max = "0xFFFFFFFF";
+  rand_max = "0xFFFFFFFE";
+  mb_cur_max = "16";
 }
 
 let () =

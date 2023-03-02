@@ -9,17 +9,24 @@ alignof_longlong: 8
 alignof_ptr: 4
 alignof_short: 2
 alignof_str: 1
+bufsiz: '8192'
 char_is_unsigned: true
 compiler: clang
 cpp_arch_flags:
 - -target
 - powerpc-apple-linux
 - -mcpu=603
+eof: (-1)
+filename_max: '4096'
+fopen_max: '16'
 has__builtin_va_list: true
 intptr_t: int
+l_tmpnam: '20'
 little_endian: false
+mb_cur_max: ((size_t)16)
 posix_version: 200809L
 ptrdiff_t: int
+rand_max: '2147483647'
 size_t: unsigned int
 sizeof_double: 8
 sizeof_float: 4
@@ -32,6 +39,7 @@ sizeof_ptr: 4
 sizeof_short: 2
 sizeof_void: 1
 ssize_t: int
+tmp_max: '238328'
 uintptr_t: unsigned int
 version: clang version 15.0.7
 wchar_t: int
