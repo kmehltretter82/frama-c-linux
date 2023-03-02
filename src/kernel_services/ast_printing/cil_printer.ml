@@ -1441,6 +1441,16 @@ class cil_printer () = object (self)
       fprintf fmt "@[@<0>\n@<0>%s@<0> @<0>%d@<0> @<0>%s@]@\n"
         directive (fst l).Filepath.pos_lnum filename
 
+  (* Print a recovered while condition from Loop *)
+  method pp_while ~stmt ~cond fmt =
+    begin
+      Stack.push stmt current_stmt;
+      fprintf fmt "%a (%a)"
+        self#pp_keyword "while"
+        self#exp cond ;
+      ignore (Stack.pop current_stmt);
+    end
+
   method stmtkind sattr (next: stmt) fmt = function
     | UnspecifiedSequence seq ->
       let ctxt =
@@ -1601,7 +1611,7 @@ class cil_printer () = object (self)
               when self#may_be_skipped h-> skipEmpty rest
             | x -> x
           in
-          let term, bodystmts =
+          let stmt, cond, bodystmts =
             (* Bill McCloskey: Do not remove the If if it has labels *)
             match skipEmpty b.bstmts with
             | { skind = If(e,tb,fb,_) } as to_skip :: rest
@@ -1609,18 +1619,17 @@ class cil_printer () = object (self)
                 && self#may_be_skipped to_skip ->
               (match skipEmpty tb.bstmts, skipEmpty fb.bstmts with
                | [], [ { skind = Break _ } as s ] when self#may_be_skipped s ->
-                 e, rest
+                 to_skip, e, rest
                | [], [ { skind = Goto(sref, _) } as s ]
                  when self#may_be_skipped s
                    && Cil_datatype.Stmt.equal !sref next ->
-                 e, rest
+                 to_skip, e, rest
                | [ { skind = Break _ } as s ], [] when self#may_be_skipped s ->
-                 Cil.dummy_exp (UnOp(LNot, e, Cil.intType)), rest
+                 to_skip, Cil.dummy_exp (UnOp(LNot, e, Cil.intType)), rest
                | [ { skind = Goto(sref, _) } as s ], []
                  when self#may_be_skipped s
                    && Cil_datatype.Stmt.equal !sref next ->
-                 Cil.dummy_exp (UnOp(LNot, e, Cil.intType)), rest
-
+                 to_skip, Cil.dummy_exp (UnOp(LNot, e, Cil.intType)), rest
                | _ -> raise Not_found)
             | _ -> raise Not_found
           in
@@ -1628,10 +1637,9 @@ class cil_printer () = object (self)
               [{ skind=Block b} as s ] when self#may_be_skipped s -> b
             | _ -> { b with bstmts = bodystmts }
           in
-          Format.fprintf fmt "%a@[<v 2>%a (%a) %t%a@]"
+          Format.fprintf fmt "%a@[<v 2>%t %t%a@]"
             (fun fmt -> self#line_directive fmt) l
-            self#pp_keyword "while"
-            self#exp term
+            (self#pp_while ~stmt ~cond)
             pp_sattr
             (self#unboxed_block Other) b;
         with Not_found ->
