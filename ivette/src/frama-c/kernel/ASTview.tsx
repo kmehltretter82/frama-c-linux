@@ -330,6 +330,8 @@ const PropertiesStatuses = Editor.createField<Properties.statusData[]>([]);
 // Recovers all the properties nodes in a tree.
 function getPropertiesNodes(tree: Tree): Node[] {
   if (isLeaf(tree)) return [];
+  /* Must be consistent with the id chosen by the Frama-C server for property
+     markers. Ideally, this test should not depend on markers id syntax. */
   if (tree.id.startsWith('#p')) return [tree];
   return tree.children.map(getPropertiesNodes).flat();
 }
@@ -342,8 +344,10 @@ function createPropertiesNodes() : Editor.Aspect<Property[]> {
   return Editor.createAspect(deps, ({ tree, tags, statuses }) => {
     const nodes = getPropertiesNodes(tree);
     return mapFilter(nodes, (n) => {
-      const s = statuses.find((s) => s.key === n.id); if (!s) return undefined;
-      const tag = tags.get(s.status); if (!tag) return undefined;
+      const s = statuses.find((s) => s.key === n.id);
+      if (!s) return undefined;
+      const tag = tags.get(s.status);
+      if (!tag) return undefined;
       return { ...n, tag };
     });
   });
