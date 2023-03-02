@@ -25,11 +25,12 @@ import * as Path from 'path';
 
 import * as Dome from 'dome';
 import * as System from 'dome/system';
-import * as Boxes from 'dome/layout/boxes';
 import * as Editor from 'dome/text/editor';
 import * as Labels from 'dome/controls/labels';
 import * as Settings from 'dome/data/settings';
 import * as Buttons from 'dome/controls/buttons';
+import * as Dialogs from 'dome/dialogs';
+import * as Toolbars from 'dome/frame/toolbars';
 
 import { Selection, Document } from 'dome/text/editor';
 
@@ -232,6 +233,8 @@ function useSourceGetter(): GetSource {
 // Necessary extensions.
 const extensions: Editor.Extension[] = [
   Source,
+  Editor.Search,
+  Editor.ReadOnly,
   Editor.Selection,
   Editor.LineNumbers,
   Editor.LanguageHighlighter,
@@ -263,9 +266,22 @@ export default function SourceCode(): JSX.Element {
   React.useEffect(() => Locations.set(view, { ivette: loc }), [view, loc]);
 
   const externalEditorTitle =
-    'Open the source file in an external editor.\nA Ctrl-click '
-    + 'in the source code opens the editor at the selected location.'
-    + '\nThe editor used can be configured in Ivette settings.';
+    'Open the source file in an external editor.';
+
+  const shortcuts =
+    'Ctrl+click: open file in an external editor at the selected location.\n'
+    + 'Alt+f: search for text or regexp.\n'
+    + 'Alt+g: go to line.';
+
+  const shortcutsTitle = 'Useful shortcuts:\n' + shortcuts;
+
+  async function displayShortcuts(): Promise<void> {
+    await Dialogs.showMessageBox({
+      buttons: [{label:"Ok"}],
+      details: shortcuts,
+      message: 'Useful shortcuts'
+    });
+  }
 
   return (
     <>
@@ -277,7 +293,13 @@ export default function SourceCode(): JSX.Element {
           title={externalEditorTitle}
         />
         <Labels.Code title={file}>{filename}</Labels.Code>
-        <Boxes.Hfill />
+        <Toolbars.Filler />
+        <Buttons.IconButton
+          icon="HELP"
+          onClick={displayShortcuts}
+          title={shortcutsTitle}
+        />
+        <Toolbars.Inset/>
       </Ivette.TitleBar>
       <Component style={{ fontSize: `${fontSize}px` }} />
     </>
