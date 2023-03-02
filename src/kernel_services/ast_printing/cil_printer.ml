@@ -1442,12 +1442,15 @@ class cil_printer () = object (self)
         directive (fst l).Filepath.pos_lnum filename
 
   (* Print a recovered while condition from Loop *)
-  method pp_while ~stmt ~cond fmt =
+  method pp_while fmt cond =
+    fprintf fmt "%a (%a)"
+      self#pp_keyword "while"
+      self#exp cond
+
+  method private stacked_while ~stmt ~cond fmt =
     begin
       Stack.push stmt current_stmt;
-      fprintf fmt "%a (%a)"
-        self#pp_keyword "while"
-        self#exp cond ;
+      self#pp_while fmt cond;
       ignore (Stack.pop current_stmt);
     end
 
@@ -1639,7 +1642,7 @@ class cil_printer () = object (self)
           in
           Format.fprintf fmt "%a@[<v 2>%t %t%a@]"
             (fun fmt -> self#line_directive fmt) l
-            (self#pp_while ~stmt ~cond)
+            (self#stacked_while ~stmt ~cond)
             pp_sattr
             (self#unboxed_block Other) b;
         with Not_found ->
