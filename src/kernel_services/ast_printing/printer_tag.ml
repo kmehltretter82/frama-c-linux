@@ -584,7 +584,7 @@ struct
 
     method! pp_while ~stmt ~cond fmt =
       Format.fprintf fmt "@{<%s>%t@}"
-        (Tag.create (PStmt(Option.get self#current_kf,stmt)))
+        (Tag.create (PStmtStart(Option.get self#current_kf,stmt)))
         (super#pp_while ~stmt ~cond)
 
     method! next_stmt next fmt current =
