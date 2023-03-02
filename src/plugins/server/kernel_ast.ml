@@ -748,6 +748,19 @@ let () = Information.register
         Format.fprintf fmt "%d bytes" bytes
     end
 
+let () = Information.register
+    ~id:"kernel.ast.marker"
+    ~label:"Marker"
+    ~title:"Ivette marker (for debugging)"
+    ~enable:(fun _ -> Server_parameters.debug_atleast 1)
+    begin fun fmt loc ->
+      let tag = Marker.create_tag loc in
+      Format.fprintf fmt "%S" tag
+    end
+
+let () = Server_parameters.Debug.add_hook_on_update
+    (fun _ -> Information.update ())
+
 (* -------------------------------------------------------------------------- *)
 (* --- Marker at a position                                               --- *)
 (* -------------------------------------------------------------------------- *)
