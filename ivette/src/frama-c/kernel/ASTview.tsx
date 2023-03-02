@@ -394,6 +394,8 @@ function createPropertiesGutter(): Editor.Extension {
   return Editor.createGutter(deps, cls, (inputs, block, view) => {
     const { properties } = inputs;
     const doc = view.state.doc;
+    // Should not be needed, but we can't properly handle dependencies for
+    // gutters, so sometimes the property nodes do not match the document.
     const valids = properties.filter((p) => p.from <= doc.length);
     const line = doc.lineAt(block.from);
     const prop = valids.find((p) => line.from === doc.lineAt(p.from).from);
