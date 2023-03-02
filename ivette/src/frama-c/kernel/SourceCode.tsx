@@ -232,6 +232,8 @@ function useSourceGetter(): GetSource {
 // Necessary extensions.
 const extensions: Editor.Extension[] = [
   Source,
+  Editor.Search,
+  Editor.ReadOnly,
   Editor.Selection,
   Editor.LineNumbers,
   Editor.LanguageHighlighter,

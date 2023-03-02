@@ -617,6 +617,7 @@ const extensions: Editor.Extension[] = [
   PropertiesGutter,
   TaintedLvaluesDecorator,
   TaintTooltip,
+  Editor.ReadOnly,
   Editor.FoldGutter,
   Editor.LanguageHighlighter,
 ];
