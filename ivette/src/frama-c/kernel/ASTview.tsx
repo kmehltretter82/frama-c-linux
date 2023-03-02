@@ -327,30 +327,29 @@ const Tags = Editor.createField<Tags>(new Map());
 // The component needs information on markers' status data.
 const PropertiesStatuses = Editor.createField<Properties.statusData[]>([]);
 
-// This aspect filters all properties that does not have a valid range, and
-// stores the remaining properties with their ranges.
-const PropertiesRanges = createPropertiesRange();
-interface PropertyRange extends Properties.statusData { range: Range }
-function createPropertiesRange(): Editor.Aspect<PropertyRange[]> {
-  const deps = { properties: PropertiesStatuses, ranges: Ranges };
-  return Editor.createAspect(deps, ({ properties, ranges }) => {
-    const get = (p: Properties.statusData): Range[] => ranges.get(p.key) ?? [];
-    return properties.map(p => get(p).map(r => ({ ...p, range: r }))).flat();
-  });
+// Recovers all the properties nodes in a tree.
+function getPropertiesNodes(tree: Tree): Node[] {
+  if (isLeaf(tree)) return [];
+  /* Must be consistent with the id chosen by the Frama-C server for property
+     markers. Ideally, this test should not depend on markers id syntax. */
+  if (tree.id.startsWith('#p')) return [tree];
+  return tree.children.map(getPropertiesNodes).flat();
 }
 
-// This aspect computes the tag associated to each property.
-const PropertiesTags = createPropertiesTags();
-function createPropertiesTags(): Editor.Aspect<Map<string, States.Tag>> {
-  const deps = { statuses: PropertiesStatuses, tags: Tags };
-  return Editor.createAspect(deps, ({ statuses, tags }) => {
-    const res = new Map<string, States.Tag>();
-    for (const p of statuses) {
-      if (!p.status) continue;
-      const tag = tags.get(p.status);
-      if (tag) res.set(p.key, tag);
-    }
-    return res;
+// This aspect contains all the properties nodes, along with their tags.
+interface Property extends Node { tag: States.Tag }
+const PropertiesNodes = createPropertiesNodes();
+function createPropertiesNodes() : Editor.Aspect<Property[]> {
+  const deps = { tree: Tree, tags: Tags, statuses: PropertiesStatuses };
+  return Editor.createAspect(deps, ({ tree, tags, statuses }) => {
+    const nodes = getPropertiesNodes(tree);
+    return mapFilter(nodes, (n) => {
+      const s = statuses.find((s) => s.key === n.id);
+      if (!s) return undefined;
+      const tag = tags.get(s.status);
+      if (!tag) return undefined;
+      return { ...n, tag };
+    });
   });
 }
 
@@ -390,22 +389,18 @@ class PropertyBullet extends Editor.GutterMarker {
 
 const PropertiesGutter = createPropertiesGutter();
 function createPropertiesGutter(): Editor.Extension {
-  const deps = { ranges: PropertiesRanges, propTags: PropertiesTags };
+  const deps = { properties: PropertiesNodes };
   const cls = 'cm-property-gutter';
   return Editor.createGutter(deps, cls, (inputs, block, view) => {
-    const { ranges, propTags } = inputs;
-    const line = view.state.doc.lineAt(block.from);
-    const start = line.from; const end = line.to;
-    const inLine = (r: Range): boolean => start <= r.from && r.to <= end;
-    function isHeader(r: Range): boolean {
-      if (!line.text.includes('requires')) return false;
-      const next = view.state.doc.line(line.number + 1);
-      return r.from <= next.from && next.to <= r.to;
-    }
-    const prop = ranges.find((r) => inLine(r.range) || isHeader(r.range));
-    if (!prop) return null;
-    const statusTag = propTags.get(prop.key);
-    return statusTag ? new PropertyBullet(statusTag) : null;
+    const { properties } = inputs;
+    const doc = view.state.doc;
+    // Should not be needed, but we can't properly handle dependencies for
+    // gutters, so sometimes the property nodes do not match the document.
+    const valids = properties.filter((p) => p.from <= doc.length);
+    const line = doc.lineAt(block.from);
+    const prop = valids.find((p) => line.from === doc.lineAt(p.from).from);
+    const res = prop ? new PropertyBullet(prop.tag) : null;
+    return res;
   });
 }
 
