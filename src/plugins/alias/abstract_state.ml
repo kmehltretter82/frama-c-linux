@@ -149,14 +149,46 @@ module LLMap =
              mo
         )
         m
-        
+
+
+    (* specialized functions *)
+    let rec is_sub_offset o1 o2 =
+      match (o1,o2) with
+        NoOffset, _ -> true
+      | Index (e1,o1), Index(e2,o2) when Exp.equal e1 e2 -> is_sub_offset o1 o2
+      | Field (f1,o1), Field(f2,o2) when Fieldinfo.equal f1 f2 ->  is_sub_offset o1 o2
+      | _ -> false
+
+    (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 = lv+o1 *)
+    let _find_lower_offsets (lv:lval) (m:t) : V.t LMap.t =
+      let lv, off = Cil.removeOffsetLval lv in
+      let mo = try LMap.find lv m with Not_found -> OMap.empty in
+      let f_filter o _v = is_sub_offset off o in
+      let mo = OMap.filter f_filter mo in
+      OMap.fold
+        (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
+        mo
+        LMap.empty
+
+    (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 + o1 = lv *)
+    let _find_upper_offsets (lv:lval) (m:t) : V.t LMap.t =
+      let lv, off = Cil.removeOffsetLval lv in
+      let mo = try LMap.find lv m with Not_found -> OMap.empty in
+      let f_filter o _v = is_sub_offset o off in
+      let mo = OMap.filter f_filter mo in
+      OMap.fold
+        (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
+        mo
+        LMap.empty
+
+    
   end
 
 
 
 module type S =
 sig
-  
+  (* TODO *)
 end
 
 type t = {
@@ -501,7 +533,6 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
 (* returns a[0] *)
 let first_index (lv:lval) : lval =
   let loc = Location.unknown in
-  let lv, _ = Cil.removeOffsetLval lv in
   Cil.addOffsetLval (Index (Cil.zero ~loc, NoOffset)) lv
 
 (* returns true if the index is OK (no needs to collapse) *)
@@ -511,19 +542,46 @@ let rec normalize_index (e:exp) : exp * bool =
   | CastE _ -> normalize_index (Cil.stripCasts e)
   | _ -> e, false
 
-(* returns true if the offset is OK (no needs to collapse) *)
-let _normalize_offset (lv1:lval) : lval * bool =
+
+let list_arrays_to_be_collapsed = ref []
+
+let is_collapsed (lv:lval) (x:t) =
+  try
+    let v = LLMap.find lv x.lmap in
+    VSet.mem v x.collapsed
+  with Not_found -> false
+
+(* warning, this function has a side effect on list_arrays_to_be_collapsed *)  
+let _normalize_lval (x:t) (lv1:lval) : lval =
   let lv, off = Cil.removeOffsetLval lv1 in
-  match off with
-    Index (e,NoOffset) ->
-    begin
-      match normalize_index e with
-        (e,true) ->  Cil.addOffsetLval (Index (e, NoOffset)) lv, true
-      | (_,false) ->
-        first_index lv, false
-    end
-  | Index _ | NoOffset | Field _ -> lv1, true
-  
+  list_arrays_to_be_collapsed := [];
+  let loc = Location.unknown in
+  let rec normalize_offset (lvx:lval) (o:offset) : offset =
+    match o with
+      NoOffset -> NoOffset
+    | Field (f, ofs) ->
+      let lvx = Cil.addOffsetLval (Field(f,NoOffset)) lvx in
+      Field (f,normalize_offset lvx ofs)
+    | Index (e, ofs) ->
+      if is_collapsed lvx x
+      then
+        let lvx = first_index lvx in
+        Index(Cil.zero ~loc, normalize_offset lvx ofs)
+      else
+        let e, b = normalize_index e in
+        if not b
+        then (* then we need to collapse lvx *)
+          begin
+            list_arrays_to_be_collapsed := lvx::!list_arrays_to_be_collapsed;
+            let lvx = first_index lvx in
+            Index(Cil.zero ~loc, normalize_offset lvx ofs)
+          end
+        else
+          let lvx = Cil.addOffsetLval (Index(e,NoOffset)) lvx in
+          Index(e, normalize_offset lvx ofs)
+  in
+  let off = normalize_offset lv off in
+  Cil.addOffsetLval off lv
 
 let rec find_host (hs:lhost) (x:t) : V.t * t =
   let lv = (hs, NoOffset) in
