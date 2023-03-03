@@ -1,7 +1,7 @@
 /* run.config
  EXIT: 1
    STDOPT:
-   STDOPT: #"-c11"
+
 */ // Note: redefinition of local typedefs is currently unsupported
 typedef int myint;
 typedef int myint; //valid in C11 only

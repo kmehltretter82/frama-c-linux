@@ -327,9 +327,6 @@ To ignore this disabling \pragmadef{UNROLL} pragma and force unrolling, the opti
 
 Passing a negative argument to \texttt{-ulevel} will disable unrolling, even
 in case of \texttt{UNROLL} pragma.
-
-\item \optiondef{-}{c11} allows the use of some C11 constructs. Currently
-supported are typedefs redefinition.
 \end{description}
 
 \section{Incremental parsing} (experimental)\label{sec:incremental-parsing}
@@ -411,8 +408,11 @@ standard library. They are described below.
 \section{Compiler and language extensions}\label{sec:extensions}
 
 \FramaC's default behavior is to be fairly strict concerning language features.
-By default, most non-C99 compiler extensions are not accepted, similarly to
-when compiling a program with \verb+gcc -std=c99 -pedantic -pedantic-errors+.
+By default, most C99 and C11 features are accepted\footnote{For more details
+about C99/C11 feature support, see
+Section~\ref{sec:unsupported-iso-c-features}.}, but most non-ISO C compiler
+extensions are not accepted, similarly to when compiling a program with
+\verb+gcc -std=c11 -pedantic -pedantic-errors+.
 
 However, depending on the machine architecture (see option
 \optiondef{-}{machdep}, in Section~\ref{sec:normalize}),
@@ -421,23 +421,12 @@ For instance, trying to parse a program containing an empty initializer,
 such as \verb+int c[10] = {};+ will result in the following error message:
 
 \begin{verbatim}
-[kernel] user error: empty initializers only allowed for GCC/MSVC
+[kernel] user error: empty initializers only allowed for GCC/MSVC; see option
+ -machdep or run 'frama-c -machdep help' for the list of available machdeps
 \end{verbatim}
 
 This means that using a GCC or MSVC machdep (e.g., \verb+-machdep gcc_x86_32+)
 will allow the language extension to be accepted by \FramaC.
-
-Alternatively, some C11 extensions are supported via option \verb+-c11+.
-For instance, the following program is invalid in C99 but valid in C11
-(typedef redefinition): \lstinline|typedef int a; typedef int a;|
-
-The error message given by \FramaC when trying to parse this program will
-indicate the option needed to allow the file to be parsed:
-
-\begin{verbatim}
-[kernel] user error: redefinition of type 'a' in the same scope is only
-         allowed in C11 (option -c11).
-\end{verbatim}
 
 \section{Standard library (libc)}\label{sec:libc}
 

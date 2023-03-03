@@ -1,5 +1,5 @@
 /*run.config
-  STDOPT: #"-c11"
+  STDOPT:
 */
 
 #include <stdnoreturn.h>

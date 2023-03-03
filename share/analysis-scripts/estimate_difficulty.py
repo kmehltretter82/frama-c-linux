@@ -315,7 +315,6 @@ c11_unsupported = [
     "_Alignas",
     "_Alignof",
     "_Complex",
-    "_Generic",
     "_Imaginary",
     "alignas",
     "alignof",  # stdalign.h may use these symbols

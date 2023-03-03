@@ -1,5 +1,5 @@
 ---
-title: 'FRAMA-C(1) 2023-02-01'
+title: 'FRAMA-C(1) 2023-02-13'
 header-includes:
 - |
   ```{=man}
@@ -141,10 +141,6 @@ syntax. Defaults to yes.
 
 [-no]-asm-contracts-auto-validate
 : automatically marks contracts generated from asm as valid. Defaults to no.
-
--c11
-: enables (partial) C11 compatibility, e.g. typedef redefinitions.
-Defaults to no.
 
 [-no]-collapse-call-cast
 : allows implicit cast between the value returned by a function and the lvalue
