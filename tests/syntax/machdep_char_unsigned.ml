@@ -34,6 +34,7 @@ let md = {
   uintptr_t = "unsigned int";
   ptrdiff_t = "int";
   wint_t = "long";
+  sig_atomic_t = "int";
   has__builtin_va_list = true;
   weof = "(-1L)";
   wordsize = "16";

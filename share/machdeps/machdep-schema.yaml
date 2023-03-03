@@ -160,6 +160,12 @@ rand_max:
 
   type: string
 
+sig_atomic_t:
+
+  description: representation of 'sig_atomic_t' (defined in signal.h)
+
+  type: string
+
 size_t:
 
   description:  type of 'sizeof e'

@@ -35,9 +35,8 @@ __PUSH_FC_STDLIB
 
 __BEGIN_DECLS
 
-/* TODO: put sig_atomic_t in machdep */
 #ifndef __sig_atomic_t_defined
-typedef volatile int sig_atomic_t;
+typedef volatile __FC_SIG_ATOMIC_T sig_atomic_t;
 #define __sig_atomic_t_defined
 #endif
 

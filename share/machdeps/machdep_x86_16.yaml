@@ -17,6 +17,7 @@ has__builtin_va_list: true
 intptr_t: long
 little_endian: true
 ptrdiff_t: int
+sig_atomic_t: int
 size_t: unsigned int
 sizeof_double: 8
 sizeof_float: 4

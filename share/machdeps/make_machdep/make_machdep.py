@@ -172,6 +172,7 @@ source_files = [
     ("intptr_t.c", "type"),
     ("uintptr_t.c", "type"),
     ("wint_t.c", "type"),
+    ("sig_atomic_t.c", "type"),
     ("char_is_unsigned.c", "bool"),
     ("little_endian.c", "bool"),
     ("has__builtin_va_list.c", "has__builtin_va_list"),
