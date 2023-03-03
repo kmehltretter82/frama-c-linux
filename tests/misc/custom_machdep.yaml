@@ -46,3 +46,7 @@ mb_cur_max: 16
 sig_atomic_t: int
 time_t: long
 nsig: ''
+errno:
+  edom: "33"
+  eilseq: "84"
+  erange": "34"

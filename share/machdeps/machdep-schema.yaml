@@ -102,6 +102,22 @@ eof:
 
   type: string
 
+errno:
+
+  description: all error macros defined in errno.h
+
+  type: list
+
+  items:
+
+    type: object
+    name:
+      description: macro name (lowercase)
+      type: string
+    value:
+      description: actual value
+      type: string
+
 filename_max:
 
   description: value of 'FILENAME_MAX' macro

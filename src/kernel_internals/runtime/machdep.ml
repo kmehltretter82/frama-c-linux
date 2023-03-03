@@ -25,6 +25,9 @@ open Cil_types
 let gen_define fmt macro pp def =
   Format.fprintf fmt "#define %s %a@\n" macro pp def
 
+let gen_include fmt file =
+  Format.fprintf fmt "#include <%s>@\n" file
+
 let gen_undef fmt macro = Format.fprintf fmt "#undef %s@\n" macro
 
 let gen_define_string fmt macro def =
@@ -248,7 +251,9 @@ let gen_all_defines fmt mach =
   (* TODO: __FC_E*, errno enumeration *)
   gen_define_macro fmt "__FC_TIME_T" mach.time_t;
   gen_define_macro fmt "__FC_NSIG" mach.nsig;
-  (* TODO: gcc builtins *)
+  (* NB: should we use Cil.gccMode() here? *)
+  if mach.compiler = "gcc" then
+    gen_include fmt "__fc_gcc_builtins.h";
 
   Format.fprintf fmt "#endif // __FC_MACHDEP@\n"
 

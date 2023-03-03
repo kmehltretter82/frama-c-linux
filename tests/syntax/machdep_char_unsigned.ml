@@ -48,7 +48,12 @@ let md = {
   tmp_max = "0xFFFFFFFF";
   rand_max = "0xFFFFFFFE";
   mb_cur_max = "16";
-  nsig = 64;
+  nsig = "64";
+  errno = [
+    "edom", "33";
+    "eilseq", "84";
+    "erange", "34";
+  ];
 }
 
 let () =

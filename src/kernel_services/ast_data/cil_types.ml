@@ -1915,7 +1915,7 @@ type mach = {
   rand_max: string; (* expansion of RAND_MAX macro *)
   mb_cur_max: string; (* expansion of MB_CUR_MAX macro *)
   nsig: string; (* expansion of non-standard NSIG macro, empty if undefined *)
-
+  errno: (string * string) list; (* list of macros defining errors in errno.h*)
 }
 
 (*

@@ -2677,6 +2677,11 @@ let dummy_machdep =
     rand_max = "0xFFFFFFFE";
     mb_cur_max = "16";
     nsig = "";
+    errno = [
+      "edom", "33";
+      "eilseq", "84";
+      "erange", "34";
+    ];
   }
 
 module Machdep = Datatype.Make_with_collections(struct

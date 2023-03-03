@@ -138,7 +138,6 @@ def make_machdep():
         machdep[key] = None
     return machdep
 
-
 machdep = make_machdep()
 
 compilation_command = [args.compiler] + args.cpp_arch_flags + args.compiler_flags
@@ -183,6 +182,7 @@ source_files = [
     ("stdio_macros.c", "macro"),
     ("stdlib_macros.c", "macro"),
     ("nsig.c", "macro"),
+    ("errno.c", "macrolist"),
 ]
 
 
@@ -231,17 +231,23 @@ def cleanup_cpp(output):
     return " ".join(macro)
 
 
-def find_macros_value(output):
+def find_macros_value(output,is_list=False,entry=None):
     msg = re.compile("(\w+)_is = ([^;]+);")
+    if is_list:
+        assert(entry)
+        machdep[entry] = {}
     for res in re.finditer(msg, output):
         name = res.group(1)
-        if name in machdep:
-            value = res.group(2).strip()
-            if args.verbose:
-                print(f"[INFO] setting {name} to {value}")
-            machdep[name] = value
+        value = res.group(2).strip()
+        if is_list:
+            machdep[entry][name] = value
         else:
-            warnings.warn(f"unexpected symbol '{name}', ignoring")
+            if name in machdep.keys():
+                if args.verbose:
+                    print(f"[INFO] setting {name} to {value}")
+                machdep[name] = value
+            else:
+                warnings.warn(f"unexpected symbol '{name}', ignoring")
     if args.verbose:
         print(f"compiler output is:{output}")
 
@@ -249,7 +255,7 @@ def find_macros_value(output):
 for (f, typ) in source_files:
     p = my_path / f
     cmd = compilation_command + [str(p)]
-    if typ == "macro":
+    if typ == "macro" or typ == "macrolist":
         # We're just interested in expanding a macro,
         # treatment is a bit different than the rest.
         cmd = cmd + ["-E"]
@@ -267,6 +273,17 @@ for (f, typ) in source_files:
                 machdep[name] = ""
             continue
         find_macros_value(cleanup_cpp(proc.stdout.decode()))
+        continue
+    if typ == "macrolist":
+        name = p.stem
+        if proc.returncode != 0:
+            warnings.warn(f"error in preprocessing value '{p}', some value might not be filled")
+            if args.verbose:
+                print(f"compiler output is:{proc.stderr.decode()}")
+            if name in machdep:
+                machdep[name] = {}
+            continue
+        find_macros_value(cleanup_cpp(proc.stdout.decode()),is_list=True,entry=name)
         continue
     if typ == "has__builtin_va_list":
         # Special case: compilation success determines presence or absence

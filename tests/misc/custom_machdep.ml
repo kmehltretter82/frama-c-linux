@@ -50,6 +50,11 @@ let mach =
     rand_max = "0xFFFFFFFE";
     mb_cur_max = "16";
     nsig = "";
+    errno = [
+      "edom", "33";
+      "eilseq", "84";
+      "erange", "34";
+    ];
   }
 
 let mach2 = { mach with compiler = "baz" }
