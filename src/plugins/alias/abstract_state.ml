@@ -171,7 +171,7 @@ module LLMap =
         LMap.empty
 
     (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 + o1 = lv *)
-    let _find_upper_offsets (lv:lval) (m:t) : V.t LMap.t =
+    let find_upper_offsets (lv:lval) (m:t) : V.t LMap.t =
       let lv, off = Cil.removeOffsetLval lv in
       let mo = try LMap.find lv m with Not_found -> OMap.empty in
       let f_filter o _v = is_sub_offset o off in
@@ -180,8 +180,7 @@ module LLMap =
         (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
         mo
         LMap.empty
-
-    
+        
   end
 
 
@@ -308,7 +307,7 @@ let assert_invariants (x:t) : unit =
   VMap.iter assert_vmap x.vmap
 (* TODO : check collapsed *)
 
-(* for debuging *)
+(* for debuging, remove this function before last deliverable *)
 let assert_invariants x =
   try assert_invariants x
   with
@@ -329,7 +328,7 @@ let find_transitive_closure  (lv:lval) (x:t) =
     closure_find_lset v x
   with
     Not_found -> []
-
+(* TODO : what about offsets ? *)
 
 
 (* NOTE on "constant vertex": a constant vertex represents an unamed
@@ -454,35 +453,6 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
   | _ ->
     new_v , new_x
 
-(* transforms the offset (and the graph) in case of an variable index:
-
-
-*)
-(* let is_collapsed lv x =
- *   LSet.mem lv x.collapsed
- *
- * let rec manage_offset (o:offset) (x:t) : offset * t =
- *   match o with
- *   | NoOffset -> o,x
- *   | Field (f,o) ->
- *     let o, x = manage_offset o x in
- *     Field(f,o), x
- *   | Index _ ->
- *     o,x *)
-(* TODO
-   let host = fst lv in
-   if (is_collapsed host x)
-   then
-   (* return the collapsed lvap*)
-   (host,Index(Cil.mone ~loc:location,location)) , x
-   else
-   if Cil.isConstant exp then
-   begin
-
-   ignore exp; lv,x
-   end
-*)
-
 (* (\* Replace all trailing array subscripts of an lval with zero indices. *\)
  * let rec shift_offsets lv loc =
  *   let lv, off = Cil.removeOffsetLval lv in
@@ -583,9 +553,24 @@ let _normalize_lval (x:t) (lv1:lval) : lval =
   let off = normalize_offset lv off in
   Cil.addOffsetLval off lv
 
-let rec find_host (hs:lhost) (x:t) : V.t * t =
-  let lv = (hs, NoOffset) in
-  match hs with
+
+let diff_offset (lv1:lval) (lv2:lval) =
+  let rec f_diff_offset o1 o2 =
+    match o1, o2 with
+      NoOffset, _ -> o2
+    | Field (_,o1), Field(_,o2) -> f_diff_offset o1 o2
+    | Index (_,o1), Index(_,o2) -> f_diff_offset o1 o2
+    | _ -> assert false
+  in
+  let _, o1 = Cil.removeOffsetLval lv1
+  and _, o2 = Cil.removeOffsetLval lv2
+  in
+  assert (LLMap.is_sub_offset o1 o2);
+  f_diff_offset o1 o2
+
+  
+let rec find_or_create_lval (lv:lval) (x:t) : V.t * t =
+  match fst lv with
     Var _ ->  (try (LLMap.find lv x.lmap, x) with  Not_found -> create_vertex lv x)
   | Mem e ->
     begin
@@ -617,12 +602,49 @@ and find_or_create_vertex (lv:lval) (x:t) : V.t * t =
   with
     Not_found ->
     begin
-      match lv with
-        (hs, NoOffset) -> find_host hs x
-      (* TODO !!! do offset *)
-      | (hs,_) -> find_or_create_vertex (hs, NoOffset) x (* simply ignores offset *)
+      (* try to find if an alias already exists in x *)
+      let map_predecessors :V.t LMap.t =  LLMap.find_upper_offsets lv x.lmap in
+      (* for any predecessor, find all its aliases and then look for potential existing vertex *)
+      let f_fold_lmap lvx vx acc =
+        let set_aliases = VMap.find vx x.vmap in
+        if LSet.cardinal set_aliases > 1
+        then
+          let off = diff_offset lvx lv in
+          let f_fold_lset lvs acc =
+            try
+              let lvs = Cil.addOffsetLval off lvs in
+              VSet.add (LLMap.find lvs x.lmap) acc
+            with
+              Not_found -> acc
+          in
+          LSet.fold
+            f_fold_lset
+            set_aliases
+            acc
+        else
+          acc
+      in
+      let vset_res =
+        LMap.fold
+          f_fold_lmap
+          map_predecessors          
+          VSet.empty
+      in
+      if VSet.is_empty vset_res
+      then find_or_create_lval lv x
+      else
+        begin
+          assert (VSet.cardinal vset_res = 1);
+          let v_res = VSet.choose vset_res in
+          (* vertex found, update the tables *)
+          let new_lmap = LLMap.add lv v_res x.lmap in
+          let new_vmap = VMap.add v_res (LSet.add lv (VMap.find v_res x.vmap)) x.vmap in
+          v_res, {x with lmap = new_lmap; vmap = new_vmap}
+        end
     end
 
+
+(* TODO is there a better way to do it ? *)
 let find_vertex lv x =
   let v,x1 = find_or_create_vertex lv x in
   if x == x1
