@@ -59,16 +59,6 @@ export const byTactic: Compare.Order<tactic> =
     title: Compare.string,
   });
 
-const getTactics_internal: Server.GetRequest<null,tactic[]> = {
-  kind: Server.RqKind.GET,
-  name:   'plugins.wp.tac.getTactics',
-  input:  Json.jNull,
-  output: Json.jArray(jTactic),
-  signals: [],
-};
-/** List of registered tactics */
-export const getTactics: Server.GetRequest<null,tactic[]>= getTactics_internal;
-
 /** Parameter kind */
 export type kind =
   "checkbox" | "spinner" | "selector" | "editor" | "browser";
@@ -118,7 +108,7 @@ export interface parameter {
   title: string;
   /** Enabled parameter */
   enabled: boolean;
-  /** Value (identifier of number) */
+  /** Value (with respect to kind) */
   value: Json.json;
   /** Minimum range value (spinner only) */
   vmin?: number;
@@ -167,6 +157,16 @@ export const byParameter: Compare.Order<parameter> =
 export const configured: Server.Signal = {
   name: 'plugins.wp.tac.configured',
 };
+
+const getTactics_internal: Server.GetRequest<null,tactic[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.wp.tac.getTactics',
+  input:  Json.jNull,
+  output: Json.jArray(jTactic),
+  signals: [],
+};
+/** List of registered tactics */
+export const getTactics: Server.GetRequest<null,tactic[]>= getTactics_internal;
 
 const getParameters_internal: Server.GetRequest<
   Json.key<'#tactic'>,

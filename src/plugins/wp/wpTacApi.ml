@@ -55,16 +55,6 @@ struct
     ]
 end
 
-let () = R.register ~package ~kind:`GET
-    ~name:"getTactics"
-    ~descr:(Md.plain "List of registered tactics")
-    ~input:(module D.Junit)
-    ~output:(module D.Jlist(TacInfo))
-    (fun () ->
-       let pool = ref [] in
-       Tactical.iter (fun t -> pool := t :: !pool) ;
-       List.rev !pool)
-
 module TacticId = D.Static(Map.Make(String))
     (struct let name = "tactic" end)
 
@@ -149,7 +139,7 @@ struct
       ~default:true (module D.Jbool)
 
   let value = field record ~name:"value"
-      ~descr:(Md.plain "Value (identifier of number)")
+      ~descr:(Md.plain "Value (with respect to kind)")
       (module D.Jany)
 
   let vmin = option record ~name:"vmin"
@@ -271,6 +261,16 @@ end
 
 let configured = R.signal ~package ~name:"configured"
     ~descr:(Md.plain "Tactical configuration modified")
+
+let () = R.register ~package ~kind:`GET
+    ~name:"getTactics"
+    ~descr:(Md.plain "List of registered tactics")
+    ~input:(module D.Junit)
+    ~output:(module D.Jlist(TacInfo))
+    (fun () ->
+       let pool = ref [] in
+       Tactical.iter (fun t -> pool := t :: !pool) ;
+       List.rev !pool)
 
 let () = R.register ~package ~kind:`GET
     ~name:"getParameters"
