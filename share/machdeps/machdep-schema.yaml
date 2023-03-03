@@ -238,6 +238,12 @@ ssize_t:
 
   type: string
 
+time_t:
+
+  description: definition of 'time_t' (in time.h)
+
+  type: string
+
 tmp_max:
 
   description: value of 'TMP_MAX' macro

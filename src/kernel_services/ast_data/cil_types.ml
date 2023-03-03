@@ -1883,6 +1883,7 @@ type mach = {
   uintptr_t: string;      (* Type of "uintptr_t" *)
   wint_t: string;          (* Type of "wint_t" *)
   sig_atomic_t: string;   (* Type of "sig_atomic_t" *)
+  time_t: string;          (* Type of "time_t" *)
   alignof_short: int;     (* Alignment of "short" *)
   alignof_int: int;       (* Alignment of "int" *)
   alignof_long: int;      (* Alignment of "long" *)

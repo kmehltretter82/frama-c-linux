@@ -2647,6 +2647,7 @@ let dummy_machdep =
     uintptr_t = "unsigned long";      (* Type of "uintptr_t" *)
     wint_t = "int";
     sig_atomic_t = "int";
+    time_t = "long";
     alignof_short = 2;
     alignof_int = 4;
     alignof_long = 8;

@@ -35,6 +35,7 @@ let md = {
   ptrdiff_t = "int";
   wint_t = "long";
   sig_atomic_t = "int";
+  time_t = "long";
   has__builtin_va_list = true;
   weof = "(-1L)";
   wordsize = "16";

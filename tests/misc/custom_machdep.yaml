@@ -44,3 +44,4 @@ tmp_max: '255'
 rand_max: '0xFFFFFE'
 mb_cur_max: 16
 sig_atomic_t: int
+time_t: long

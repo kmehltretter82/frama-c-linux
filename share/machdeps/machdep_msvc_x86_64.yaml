@@ -31,6 +31,7 @@ sizeof_ptr: 8
 sizeof_short: 2
 sizeof_void: 0
 ssize_t: long long
+time_t: long long
 uintptr_t: unsigned long long
 version: MSVC - X86-64bits mode
 wchar_t: unsigned short

@@ -38,6 +38,7 @@ sizeof_ptr: 4
 sizeof_short: 2
 sizeof_void: -1
 ssize_t: int
+time_t: long
 tmp_max: '238328'
 uintptr_t: unsigned int
 version: gcc (GCC) 12.2.1 20230201

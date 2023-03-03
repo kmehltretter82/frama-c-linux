@@ -246,7 +246,7 @@ let gen_all_defines fmt mach =
   gen_define_macro fmt "__FC_RAND_MAX" mach.rand_max;
   gen_define_macro fmt "__FC_MB_CUR_MAX" mach.mb_cur_max;
   (* TODO: __FC_E*, errno enumeration *)
-  (* TODO: __FC_TIME_T *)
+  gen_define_macro fmt "__FC_TIME_T" mach.time_t;
   (* TODO: __FC_NSIG *)
   (* TODO: __FC__NSIG *)
   (* TODO: gcc builtins *)

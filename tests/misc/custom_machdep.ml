@@ -23,6 +23,7 @@ let mach =
     wchar_t = "int";
     ptrdiff_t = "int";
     sig_atomic_t = "int";
+    time_t = "long";
     alignof_short = 2;
     alignof_int = 3;
     alignof_long = 4;
