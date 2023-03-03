@@ -240,6 +240,12 @@ let jpretty = Jbuffer.to_json
 
 type 'a data = (module S with type t = 'a)
 
+let data_of_json (type a) (d : a data) (js : json) : a =
+  let module M : S with type t = a = (val d) in M.of_json js
+
+let data_to_json (type a) (d : a data) (v : a) : json =
+  let module M : S with type t = a = (val d) in M.to_json v
+
 let junit : unit data = (module Junit)
 let jany : json data = (module Jany)
 let jbool : bool data = (module Jbool)

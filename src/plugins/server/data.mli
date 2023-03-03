@@ -122,6 +122,9 @@ val jalist : 'a data -> 'a list data
 val jarray : 'a data -> 'a array data
 val joption : 'a data -> 'a option data
 
+val data_of_json : 'a data -> json -> 'a
+val data_to_json : 'a data -> 'a -> json
+
 (**
    Declare the derived names for the provided type.
    Shall not be used directely.
