@@ -99,6 +99,7 @@ type parameter =
 val ident : 'a field -> string
 val default : 'a field -> 'a
 val signature : 'a field -> 'a named
+val param : parameter -> string
 
 val checkbox :
   id:string -> title:string -> descr:string ->
@@ -254,8 +255,9 @@ val register : #tactical -> unit
 val export : #tactical -> tactical
 (** Register and returns the tactical *)
 
-val lookup : id:string -> tactical
 val iter : (tactical -> unit) -> unit
+val lookup : id:string -> tactical
+val lookup_param : tactical -> id:string -> parameter
 
 val add_composer : #composer -> unit
 val iter_composer : (composer -> unit) -> unit

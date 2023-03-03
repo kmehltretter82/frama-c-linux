@@ -69,6 +69,23 @@ const getTactics_internal: Server.GetRequest<null,tactic[]> = {
 /** List of registered tactics */
 export const getTactics: Server.GetRequest<null,tactic[]>= getTactics_internal;
 
+/** Parameter kind */
+export type kind =
+  "checkbox" | "spinner" | "selector" | "editor" | "browser";
+
+/** Decoder for `kind` */
+export const jKind: Json.Decoder<kind> =
+  Json.jUnion<"checkbox" | "spinner" | "selector" | "editor" | "browser">(
+    Json.jTag("checkbox"),
+    Json.jTag("spinner"),
+    Json.jTag("selector"),
+    Json.jTag("editor"),
+    Json.jTag("browser"),
+  );
+
+/** Natural order for `kind` */
+export const byKind: Compare.Order<kind> = Compare.structural;
+
 /** Parameter option value */
 export type value = { id: Json.key<'#value'>, label: string, title: string };
 
@@ -89,38 +106,39 @@ export const byValue: Compare.Order<value> =
     title: Compare.string,
   });
 
-/** Parameter kind */
-export type kind =
-  "checkbox" | "spinner" | "selector" | "editor" | "browser";
-
-/** Decoder for `kind` */
-export const jKind: Json.Decoder<kind> =
-  Json.jUnion<"checkbox" | "spinner" | "selector" | "editor" | "browser">(
-    Json.jTag("checkbox"),
-    Json.jTag("spinner"),
-    Json.jTag("selector"),
-    Json.jTag("editor"),
-    Json.jTag("browser"),
-  );
-
-/** Natural order for `kind` */
-export const byKind: Compare.Order<kind> = Compare.structural;
-
-/** TIP Tactic Information */
-export type parameter =
-  { kind: kind, id: Json.key<'#param'>, label: string, title: string,
-    value: Json.json, enabled: boolean, vmin?: number, vmax?: number,
-    vstep?: number, vlist?: value[] };
+/** Parameter configuration */
+export interface parameter {
+  /** Parameter identifier */
+  id: Json.key<'#param'>;
+  /** Parameter kind */
+  kind: kind;
+  /** Short name */
+  label: string;
+  /** Description */
+  title: string;
+  /** Enabled parameter */
+  enabled: boolean;
+  /** Value (identifier of number) */
+  value: Json.json;
+  /** Minimum range value (spinner only) */
+  vmin?: number;
+  /** Maximum range value (spinner only) */
+  vmax?: number;
+  /** Range step (spinner only) */
+  vstep?: number;
+  /** List of options (selector only) */
+  vlist?: value[];
+}
 
 /** Decoder for `parameter` */
 export const jParameter: Json.Decoder<parameter> =
   Json.jObject({
-    kind: jKind,
     id: Json.jKey<'#param'>('#param'),
+    kind: jKind,
     label: Json.jString,
     title: Json.jString,
-    value: Json.jAny,
     enabled: Json.jBoolean,
+    value: Json.jAny,
     vmin: Json.jOption(Json.jNumber),
     vmax: Json.jOption(Json.jNumber),
     vstep: Json.jOption(Json.jNumber),
@@ -130,15 +148,15 @@ export const jParameter: Json.Decoder<parameter> =
 /** Natural order for `parameter` */
 export const byParameter: Compare.Order<parameter> =
   Compare.byFields
-    <{ kind: kind, id: Json.key<'#param'>, label: string, title: string,
-       value: Json.json, enabled: boolean, vmin?: number, vmax?: number,
+    <{ id: Json.key<'#param'>, kind: kind, label: string, title: string,
+       enabled: boolean, value: Json.json, vmin?: number, vmax?: number,
        vstep?: number, vlist?: value[] }>({
-    kind: byKind,
     id: Compare.string,
+    kind: byKind,
     label: Compare.string,
     title: Compare.string,
-    value: Compare.structural,
     enabled: Compare.boolean,
+    value: Compare.structural,
     vmin: Compare.defined(Compare.number),
     vmax: Compare.defined(Compare.number),
     vstep: Compare.defined(Compare.number),
@@ -165,5 +183,27 @@ export const getParameters: Server.GetRequest<
   Json.key<'#tactic'>,
   parameter[]
   >= getParameters_internal;
+
+const setParameter_internal: Server.SetRequest<
+  { value: Json.json, param: Json.key<'#param'>, tactic: Json.key<'#tactic'>
+    },
+  null
+  > = {
+  kind: Server.RqKind.SET,
+  name:   'plugins.wp.tac.setParameter',
+  input:  Json.jObject({
+            value: Json.jAny,
+            param: Json.jKey<'#param'>('#param'),
+            tactic: Json.jKey<'#tactic'>('#tactic'),
+          }),
+  output: Json.jNull,
+  signals: [],
+};
+/** Configure tactical parameter */
+export const setParameter: Server.SetRequest<
+  { value: Json.json, param: Json.key<'#param'>, tactic: Json.key<'#tactic'>
+    },
+  null
+  >= setParameter_internal;
 
 /* ------------------------------------- */

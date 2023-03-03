@@ -280,6 +280,14 @@ type parameter =
   | Selector : 'a field * 'a named list * ('a -> 'a -> bool) -> parameter
   | Search : 'a named option field * 'a browser * (string -> 'a) -> parameter
 
+let param = function
+  | Checkbox{ vid }
+  | Spinner({vid},_)
+  | Composer({vid},_)
+  | Selector({vid},_,_)
+  | Search({vid},_,_)
+    -> vid
+
 let checkbox ~id ~title ~descr ?(default=false) () =
   let fd = field ~id ~title ~descr ~default in
   fd , Checkbox fd
@@ -448,6 +456,8 @@ let register t =
 let export t = register t ; (t :> t)
 let iter f = Tmap.iter (fun _id t -> f t) !tacticals
 let lookup ~id = Tmap.find id !tacticals
+let lookup_param tactic ~id =
+  List.find (fun p -> param p = id) tactic#params
 
 (* -------------------------------------------------------------------------- *)
 (* --- Default Composers                                                  --- *)

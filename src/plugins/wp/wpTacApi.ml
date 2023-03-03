@@ -69,25 +69,41 @@ module TacticId = D.Static(Map.Make(String))
     (struct let name = "tactic" end)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Tactical Kind                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Jkind =
+struct
+  include D.Jstring
+  let jtype = D.declare ~package
+      ~name:"kind" ~descr:(Md.plain "Parameter kind")
+      (Junion [Jtag "checkbox"; Jtag "spinner"; Jtag "selector";
+               Jtag "editor"; Jtag "browser"])
+end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Named Value Encoding                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let jvalue = D.declare ~package
-    ~name:"value" ~descr:(Md.plain "Parameter option value")
-    (Jrecord ["id",Jkey "value"; "label",Jstring; "title",Jstring])
+type value = V: 'a Tactical.named -> value
 
-let js_named (a : _ Tactical.named) = [
-  "id", `String a.vid ;
-  "label", `String a.title ;
-  "title", `String a.descr ;
-]
+module Jvalue =
+struct
+  type t = value
+  let jtype = D.declare ~package
+      ~name:"value" ~descr:(Md.plain "Parameter option value")
+      (Jrecord ["id",Jkey "value"; "label",Jstring; "title",Jstring])
+  let of_json _ = D.failure "not implemented"
+  let to_json (V a) = `Assoc [
+      "id", `String a.vid ;
+      "label", `String a.title ;
+      "title", `String a.descr ;
+    ]
+end
 
-let js_option fd js = function None -> [] | Some v -> [fd,js v]
+let jvalues vlist = List.map (fun v -> V v) vlist
 
-let js_values (xs : _ Tactical.named list) : D.json =
-  `List (List.map (fun x -> `Assoc (js_named x)) xs)
-
-let data_options (type a)
+let joptions (type a)
     (values : a Tactical.named list)
     (equal : a -> a -> bool)
   : a D.data =
@@ -110,13 +126,53 @@ let data_options (type a)
 
 module Jparam = (val D.jkey ~kind:"param")
 
-let jkind = D.declare ~package
-    ~name:"kind" ~descr:(Md.plain "Parameter kind")
-    (Junion [Jtag "checkbox";
-             Jtag "spinner";
-             Jtag "selector";
-             Jtag "editor";
-             Jtag "browser"])
+module Jparameter =
+struct
+  open D.Record
+  type record
+  let record : record signature = signature ()
+
+  let id = field record ~name:"id"
+      ~descr:(Md.plain "Parameter identifier") (module Jparam)
+
+  let kind = field record ~name:"kind"
+      ~descr:(Md.plain "Parameter kind") (module Jkind)
+
+  let label = field record ~name:"label"
+      ~descr:(Md.plain "Short name") (module D.Jstring)
+
+  let title = field record ~name:"title"
+      ~descr:(Md.plain "Description") (module D.Jstring)
+
+  let enabled = field record ~name:"enabled"
+      ~descr:(Md.plain "Enabled parameter")
+      ~default:true (module D.Jbool)
+
+  let value = field record ~name:"value"
+      ~descr:(Md.plain "Value (identifier of number)")
+      (module D.Jany)
+
+  let vmin = option record ~name:"vmin"
+      ~descr:(Md.plain "Minimum range value (spinner only)")
+      (module D.Jint)
+
+  let vmax = option record ~name:"vmax"
+      ~descr:(Md.plain "Maximum range value (spinner only)")
+      (module D.Jint)
+
+  let vstep = option record ~name:"vstep"
+      ~descr:(Md.plain "Range step (spinner only)")
+      (module D.Jint)
+
+  let vlist = option record ~name:"vlist"
+      ~descr:(Md.plain "List of options (selector only)")
+      (module D.Jlist(Jvalue))
+
+  include (val publish ~package
+              ~name:"parameter"
+              ~descr:(Md.plain "Parameter configuration")
+              record)
+end
 
 class parameter
     ~(tactic : Tactical.t)
@@ -158,19 +214,20 @@ class parameter
         if vmax <> None then p_vmax <- vmax ;
       end
 
-    method export : D.json = `Assoc
-        begin
-          [ "kind", `String kind ;
-            "id", `String fd.vid ;
-            "label", `String p_label ;
-            "title", `String p_title ;
-            "value", tactic#get_field field |> D.data_to_json data ;
-            "enabled", `Bool p_enabled ]
-          @ js_option "vmin" Json.of_int p_vmin
-          @ js_option "vmax" Json.of_int p_vmax
-          @ js_option "vstep" Json.of_int p_vstep
-          @ js_option "vlist" js_values options
-        end
+    method export : D.json =
+      let module J = Jparameter in
+      J.default
+      |> J.set J.id fd.vid
+      |> J.set J.kind kind
+      |> J.set J.label p_label
+      |> J.set J.title p_title
+      |> J.set J.value (tactic#get_field field |> D.data_to_json data)
+      |> J.set J.enabled p_enabled
+      |> J.set J.vmin p_vmin
+      |> J.set J.vmax p_vmax
+      |> J.set J.vstep p_vstep
+      |> J.set J.vlist (Option.map jvalues options)
+      |> J.to_json
 
   end
 
@@ -178,13 +235,7 @@ module Phash = Hashtbl.Make
     (struct
       open Tactical
       type t = tactical * parameter
-      let id = function
-        | Checkbox fd -> ident fd
-        | Spinner(fd,_) -> ident fd
-        | Composer(fd,_) -> ident fd
-        | Selector(fd,_,_) -> ident fd
-        | Search(fd,_,_) -> ident fd
-      let hash (t,p) = Hashtbl.hash (t#id ^ "::" ^ id p)
+      let hash (t,p) = Hashtbl.hash (t#id ^ "::" ^ Tactical.param p)
       let equal (ta,pa) (tb,pb) = (ta == tb) && (pa == pb)
     end)
 
@@ -201,28 +252,15 @@ let parameter tactic param : parameter =
       | Spinner(field,range) ->
         new parameter ~tactic ~field ~kind:"spinner" ~data:D.jint ~range ()
       | Selector(field,options,equal) ->
-        let data = data_options options equal in
+        let data = joptions options equal in
         new parameter ~tactic ~field ~kind:"selector" ~data ~options ()
       | _ -> assert false
     in Phash.add parameters id prm ; prm
 
-module ParamInfo : D.S with type t = parameter =
+module ParameterConfig : D.S with type t = parameter =
 struct
   type t = parameter
-  let jtype = D.declare ~package ~name:"parameter"
-      ~descr:(Md.plain "TIP Tactic Information")
-      (P.Jrecord [
-          "kind", jkind;
-          "id", Jparam.jtype;
-          "label", Jstring;
-          "title", Jstring;
-          "value", Jany;
-          "enabled", Jboolean;
-          "vmin", Joption Jnumber;
-          "vmax", Joption Jnumber;
-          "vstep", Joption Jnumber;
-          "vlist", Joption (Jarray jvalue);
-        ])
+  let jtype = Jparameter.jtype
   let of_json _ = D.failure "not implemented"
   let to_json (p : parameter) = p#export
 end
@@ -238,10 +276,29 @@ let () = R.register ~package ~kind:`GET
     ~name:"getParameters"
     ~descr:(Md.plain "Return tactical current parameters")
     ~input:(module Jtactic)
-    ~output:(module D.Jlist(ParamInfo))
+    ~output:(module D.Jlist(ParameterConfig))
     ~signals:[configured]
     (fun id ->
        let tactic = Tactical.lookup ~id in
        List.map (parameter tactic) tactic#params)
+
+let () =
+  let setParameter = R.signature ~output:(module D.Junit) () in
+  let get_tactic = R.param setParameter ~name:"tactic"
+      ~descr:(Md.plain "Tactic to configure") (module Jtactic) in
+  let get_param = R.param setParameter ~name:"param"
+      ~descr:(Md.plain "Parameter to configure") (module Jparam) in
+  let get_value = R.param setParameter ~name:"value"
+      ~descr:(Md.plain "New parameter value") (module D.Jany) in
+  R.register_sig ~package ~kind:`SET
+    ~name:"setParameter"
+    ~descr:(Md.plain "Configure tactical parameter")
+    setParameter
+    begin fun rq () ->
+      let tactic = Tactical.lookup ~id:(get_tactic rq) in
+      let param = Tactical.lookup_param tactic ~id:(get_param rq) in
+      let p = parameter tactic param in
+      p#import (get_value rq)
+    end
 
 (* -------------------------------------------------------------------------- *)
