@@ -176,6 +176,9 @@ const Fct = Editor.createField<Fct>(undefined);
 // This field contains the currently selected marker.
 const Marker = Editor.createField<Marker>(undefined);
 
+// This field contains the current multiple selection.
+const Multiple = Editor.createField<Marker[]>([]);
+
 // The Ivette selection must be updated by CodeMirror plugins. This input
 // add the callback in the CodeMirror internal state.
 type UpdateSelection = (a: States.SelectionActions) => void;
@@ -275,13 +278,19 @@ const CodeDecorator = createCodeDecorator();
 function createCodeDecorator(): Editor.Extension {
   const hoveredClass = Editor.Decoration.mark({ class: 'cm-hovered-code' });
   const selectedClass = Editor.Decoration.mark({ class: 'cm-selected-code' });
-  const deps = { ranges: Ranges, marker: Marker, hovered: Hovered };
-  return Editor.createDecorator(deps, ({ ranges, marker: m, hovered: h }) => {
+  const multipleClass = Editor.Decoration.mark({ class: 'cm-multiple-code' });
+  const selections = { marker: Marker, multiple: Multiple, hovered: Hovered };
+  const deps = { ranges: Ranges, ...selections };
+  return Editor.createDecorator(deps, (props) => {
+    const { ranges, marker: m, hovered: h, multiple: ms } = props;
+    const multRanges = mapFilter(ms.filter(isDef), (m) => ranges.get(m)).flat();
     const hoveredRanges = h ? (ranges.get(h) ?? []) : [];
     const selectedRanges = m ? (ranges.get(m) ?? []) : [];
-    const hovered = hoveredRanges.map(r => hoveredClass.range(r.from, r.to));
+    const hovered  = hoveredRanges.map(r =>  hoveredClass.range(r.from, r.to));
     const selected = selectedRanges.map(r => selectedClass.range(r.from, r.to));
-    return Editor.RangeSet.of(selected.concat(hovered), true);
+    const multiple = multRanges.map(r => multipleClass.range(r.from, r.to));
+    const decorations = selected.concat(hovered, multiple);
+    return Editor.RangeSet.of(decorations, true);
   });
 }
 
@@ -634,6 +643,8 @@ export default function ASTview(): JSX.Element {
   React.useEffect(() => Fct.set(view, fct), [view, fct]);
   const marker = selection?.current?.marker;
   React.useEffect(() => Marker.set(view, marker), [view, marker]);
+  const multiple = selection?.multiple.allSelections.map(l => l.marker);
+  React.useEffect(() => Multiple.set(view, multiple), [view, multiple]);
 
   // Updating CodeMirror when the <updateHovered> callback is changed.
   const [hov, setHov] = States.useHovered();
