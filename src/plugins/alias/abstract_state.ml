@@ -180,6 +180,25 @@ module LLMap =
         (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
         mo
         LMap.empty
+
+    let rec is_indexed_offset o1 o2 =
+      match (o1,o2) with
+        NoOffset, Index(_,NoOffset) -> true
+      | Index (e1,o1), Index(e2,o2) when Exp.equal e1 e2 -> is_indexed_offset o1 o2
+      | Field (f1,o1), Field(f2,o2) when Fieldinfo.equal f1 f2 ->  is_indexed_offset o1 o2
+      | _ -> false
+    
+    (* finds all the lval lv1 apearing in [m] such as there exists an index c  such as lv1 = lv[c] *)
+    let find_indexed_offsets (lv:lval) (m:t) : V.t LMap.t =
+      let lv, off = Cil.removeOffsetLval lv in
+      let mo = try LMap.find lv m with Not_found -> OMap.empty in
+      let f_filter o _v = is_indexed_offset off o in
+      let mo = OMap.filter f_filter mo in
+      OMap.fold
+        (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
+        mo
+        LMap.empty
+    
         
   end
 
@@ -726,38 +745,44 @@ let merge x v1 v2 =
 
 
 (* merge all nodes of an array a to a[0] *)    
-let _collapse (lv1:lval) (x:t) : t =
-  let lv, off = Cil.removeOffsetLval lv1 in
-  match off with
-  (* the lval is suposed to have no offset *)
-    NoOffset ->
-    let lv0 =  first_index lv in
-    let v0, x = find_or_create_vertex lv0 x in
-    (* merge all nodes that are indexed with v0 *)
-    let f_fold lvx vx acc =
-      let lvx, off = Cil.removeOffsetLval lvx in
-      if Lval.equal lvx lv
-      then
-        match off with
-          Index _ ->
-          let acc = merge acc v0 vx in
-          let p = VMap.add v0 (VSet.union (VMap.find v0 acc.pending) (VMap.find vx acc.pending)) acc.pending in
-          let new_pending = VMap.remove vx p in
-          {acc with pending = new_pending }
-        | NoOffset | Field _ -> acc
-      else
-        acc
-    in
-    LLMap.fold f_fold x.lmap x
-  | Index _ | Field _ -> assert false
+let collapse (lv:lval) (x:t) : t =
+  let v, x = find_or_create_vertex lv x in
+  let lv0 = first_index lv in
+  let v0, x = find_or_create_vertex lv0 x in
+  let map_to_be_collapsed = LLMap.find_indexed_offsets lv x.lmap in
+  (* merge all nodes that are indexed with v0 *)
+  let f_fold _lvx vx acc =
+    let acc = merge acc v0 vx in
+    let p = VMap.add v0 (VSet.union (VMap.find v0 acc.pending) (VMap.find vx acc.pending)) acc.pending in
+    let new_pending = VMap.remove vx p in
+    {acc with pending = new_pending }
+  in
+  LMap.fold f_fold map_to_be_collapsed {x with collapsed = VSet.add v x.collapsed }
+ 
 
+let collapse_node (v:V.t) (x:t) : t =
+  let ls = try VMap.find v x.vmap with Not_found -> LSet.empty in
+  LSet.fold
+    (fun lv acc -> collapse lv acc)
+    ls
+    x
 
-(* let collapse_node (v:) x:t *)
+(* has a side effect on list_arrays_to_be_collapsed *)
+let _collapse_graph (x:t) : t =
+  let res =
+    List.fold_left
+      (fun acc lv ->
+         let v,acc = find_or_create_vertex lv acc in
+         collapse_node v acc)
+      x
+    !list_arrays_to_be_collapsed
+  in
+  list_arrays_to_be_collapsed := []; res
+
 
 
 (** .dot printing functions*)
 let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
-
 
 let lset_to_string (s: LSet.t) : string =
   let fmt = Format.str_formatter in
