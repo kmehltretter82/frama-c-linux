@@ -2676,6 +2676,7 @@ let dummy_machdep =
     tmp_max = "1024";
     rand_max = "0xFFFFFFFE";
     mb_cur_max = "16";
+    nsig = "";
   }
 
 module Machdep = Datatype.Make_with_collections(struct

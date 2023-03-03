@@ -247,8 +247,7 @@ let gen_all_defines fmt mach =
   gen_define_macro fmt "__FC_MB_CUR_MAX" mach.mb_cur_max;
   (* TODO: __FC_E*, errno enumeration *)
   gen_define_macro fmt "__FC_TIME_T" mach.time_t;
-  (* TODO: __FC_NSIG *)
-  (* TODO: __FC__NSIG *)
+  gen_define_macro fmt "__FC_NSIG" mach.nsig;
   (* TODO: gcc builtins *)
 
   Format.fprintf fmt "#endif // __FC_MACHDEP@\n"

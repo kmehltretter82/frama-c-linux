@@ -143,6 +143,12 @@ mb_cur_max:
 
   type: string
 
+nsig:
+
+  description: number of possible signals (non standard macro, empty if undefined)
+
+  type: string
+
 posix_version:
   description: |
     value of the macro '_POSIX_VERSION'

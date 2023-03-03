@@ -16,6 +16,7 @@ cpp_arch_flags:
 has__builtin_va_list: false
 intptr_t: signed long long
 little_endian: true
+nsig: 23
 ptrdiff_t: long long
 # NB: wasn't defined at all in old __fc_machdep.h
 sig_atomic_t: int

@@ -182,6 +182,7 @@ source_files = [
     ("posix_version.c", "macro"),
     ("stdio_macros.c", "macro"),
     ("stdlib_macros.c", "macro"),
+    ("nsig.c", "macro"),
 ]
 
 

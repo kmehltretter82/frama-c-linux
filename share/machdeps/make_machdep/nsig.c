@@ -20,15 +20,10 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_SIGSET_T
-#define __FC_DEFINE_SIGSET_T
-#include "features.h"
-__PUSH_FC_STDLIB
-__BEGIN_DECLS
-#ifndef __sigset_t_defined
-typedef unsigned long sigset_t;
-#define __sigset_t_defined
-#endif
-__END_DECLS
-__POP_FC_STDLIB
+#include <signal.h>
+
+#if defined(NSIG)
+int nsig_is = NSIG;
+#elif defined(_NSIG);
+int nsig_is = _NSIG;
 #endif

@@ -49,6 +49,7 @@ let mach =
     tmp_max = "4095";
     rand_max = "0xFFFFFFFE";
     mb_cur_max = "16";
+    nsig = "";
   }
 
 let mach2 = { mach with compiler = "baz" }

@@ -102,9 +102,16 @@ extern void __fc_sig_err(int);
 #define SIGRTMIN 32
 #define SIGRTMAX 64
 
+/* Non-standard macros (depending on the OS, the name has an underscore or not)
+   supposed to be the number of distinct signals that may be raised.
+   Upcoming POSIX standard seems to allow for a NSIG_MAX macro in limits.h that
+   would have roughly the same usage as NSIG (NSIG_MAX would be the maximal value
+   that a signal can have, i.e. NSIG-1 if we start at 0 and don't leave holes. If
+   this ever becomes supported, we might use this macro instead
+*/
+#ifdef __FC_NSIG
 #define NSIG __FC_NSIG
-#ifdef __FC__NSIG
-#define _NSIG __FC__NSIG
+#define _NSIG __FC_NSIG
 #endif
 
 #define SA_NOCLDSTOP	0x00000001

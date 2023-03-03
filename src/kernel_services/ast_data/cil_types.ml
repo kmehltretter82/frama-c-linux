@@ -1914,6 +1914,7 @@ type mach = {
   tmp_max: string; (* expansion of TMP_MAX macro *)
   rand_max: string; (* expansion of RAND_MAX macro *)
   mb_cur_max: string; (* expansion of MB_CUR_MAX macro *)
+  nsig: string; (* expansion of non-standard NSIG macro, empty if undefined *)
 
 }
 
