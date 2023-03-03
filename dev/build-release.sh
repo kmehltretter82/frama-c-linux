@@ -356,8 +356,8 @@ cat >$JSON_DATA <<EOL
     ]
   },
 EOL
-  echo "  \"description\": \"# Main changes since $PREVIOUS $PREVIOUS_NAME\n$(cat "$CHANGES" | sed -z 's/\n/\\n/g' | sed 's/\(\#.*\)/#\1/')\"" >> $JSON_DATA
-  echo "}" >> $JSON_DATA
+echo "  \"description\": \"# Main changes since $PREVIOUS $PREVIOUS_NAME\n$(cat "$CHANGES" | sed -z 's/\\/\\\\/g' | sed -z 's/\n/\\n/g' | sed -z 's/\(\#.*\)/#\1/')\"" >> $JSON_DATA
+echo "}" >> $JSON_DATA
 
 echo "Release data file built"
 
