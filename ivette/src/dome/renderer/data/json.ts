@@ -47,12 +47,53 @@ export type jobject = { [key: string]: json };
    Stores a string telling what was expected and a json of what have been
    given */
 
-class JsonError extends Error {
-  expected = '';
-  constructor(expected : string, given : json) {
-    super(`expected ${expected} but given ${given}`);
+export class JsonError extends Error {
+  given: json;
+
+  constructor(given: json) {
+    super("wrong json data type");
     this.name = this.constructor.name;
+    this.given = given;
+  }
+}
+
+class JsonTypeError extends JsonError {
+  expected: string;
+
+  constructor(expected: string, given: json) {
+    super(given);
     this.expected = expected;
+  }
+
+  toString(): string {
+    return `expected ${this.expected} but given ${JSON.stringify(this.given)}`;
+  }
+}
+
+class JsonUnionError extends JsonError {
+  #errors: JsonError[];
+
+  constructor(errors: JsonError[], given: json) {
+    super(given);
+    this.#errors = errors;
+  }
+
+  get errors(): JsonTypeError[] {
+    let errorsDeep: JsonTypeError[] = [];
+    this.#errors.forEach(e => {
+      if (e instanceof JsonTypeError) {
+        errorsDeep.push(e);
+      }
+      else if (e instanceof JsonUnionError) {
+        errorsDeep = errorsDeep.concat(e.errors);
+      }
+    });
+    return errorsDeep;
+  }
+
+  toString(): string {
+    return 'none of the union options are valid.\n' +
+      this.errors.map((e) => `  - ${e}`).join('\n');
   }
 }
 
@@ -126,7 +167,7 @@ export const jNull: Decoder<null> = (js: json) => {
     return null;
    }
    else {
-    throw new JsonError("null", js);
+    throw new JsonTypeError("null", js);
    }
 };
 
@@ -139,7 +180,7 @@ export const jObj: Decoder<jobject> = (js: json) => {
     return js;
   }
   else {
-    throw new JsonError("object", js);
+    throw new JsonTypeError("object", js);
   }
 };
 
@@ -149,7 +190,7 @@ export const jNumber: Decoder<number> = (js: json) => {
     return js;
   }
   else {
-    throw new JsonError("object", js);
+    throw new JsonTypeError("number", js);
   }
 };
 
@@ -159,7 +200,7 @@ export const jInt: Decoder<number> = (js: json) => {
     return js;
   }
   else {
-    throw new JsonError("integer", js); 
+    throw new JsonTypeError("integer", js); 
   }
 };
 
@@ -174,7 +215,7 @@ export const jBoolean: Decoder<boolean> = (js: json) => {
     return js;
   }
   else {
-    throw new JsonError("boolean", js); 
+    throw new JsonTypeError("boolean", js); 
   }
 };
 
@@ -194,7 +235,7 @@ export const jString: Decoder<string> = (js: json) => {
       return js;
     }
     else {
-      throw new JsonError("string", js); 
+      throw new JsonTypeError("string", js); 
     }
   };
   
@@ -210,7 +251,7 @@ export function jTag<A>(tg: A): Decoder<A> {
       return tg;
     }
     else {
-      throw new JsonError(`"${tg}"`, js); 
+      throw new JsonTypeError(`"${tg}"`, js); 
     }
    };
 }
@@ -226,7 +267,7 @@ export function jEnum<A>(d: { [tag: string]: A }): Decoder<A> {
     }
     else {
       const tags = Object.keys(d).map((tg) => `"${tg}"`);
-      throw new JsonError(tags.join(' | '), js);
+      throw new JsonTypeError(tags.join(' | '), js);
     }
   };
 }
@@ -245,7 +286,7 @@ export function jTags<A extends string | number>(...values: A[]): Decoder<A> {
     }
     else {
       const tags = values.map((tg) => typeof tg === 'string' ? `"${tg}"` : tg);
-      throw new JsonError(tags.join(' | '), js);
+      throw new JsonTypeError(tags.join(' | '), js);
     }
   };
 }
@@ -293,7 +334,7 @@ export function jMap<A>(fn: Decoder<A>): Decoder<Map<string, A>> {
       return m;
     }
     else {
-      throw new JsonError('object', js);
+      throw new JsonTypeError('object', js);
     }
   };
 }
@@ -324,7 +365,7 @@ export function jArray<A>(fn: Decoder<A>): Decoder<A[]> {
       return js.map(fn);
     }
     else {
-      throw new JsonError('array', js);
+      throw new JsonTypeError('array', js);
     }
   };
 }
@@ -354,7 +395,7 @@ export function jList<A>(fn: Decoder<A>): Decoder<A[]> {
       return buffer;
     }
     else {
-      throw new JsonError('array', js);
+      throw new JsonTypeError('array', js);
     }
   };
 }
@@ -385,7 +426,7 @@ export function jPair<A, B>(
       return [fa(js[0]) as A, fb(js[1]) as B];
     }
     else {
-      throw new JsonError('[A, B]', js);
+      throw new JsonTypeError('[A, B]', js);
     }
   };
 }
@@ -401,7 +442,7 @@ export function jTriple<A, B, C>(
       return [fa(js[0]), fb(js[1]), fc(js[2])];
     }
     else {
-      throw new JsonError('[A, B, C]', js);
+      throw new JsonTypeError('[A, B, C]', js);
     }
   };
 }
@@ -418,7 +459,7 @@ export function jTuple4<A, B, C, D>(
       return [fa(js[0]), fb(js[1]), fc(js[2]), fd(js[3])];
     }
     else {
-      throw new JsonError('[A, B, C, D]', js);
+      throw new JsonTypeError('[A, B, C, D]', js);
     }
   };
 }
@@ -436,7 +477,7 @@ export function jTuple5<A, B, C, D, E>(
       return [fa(js[0]), fb(js[1]), fc(js[2]), fd(js[3]), fe(js[4])];
     }
     else {
-      throw new JsonError('[A, B, C, D, E]', js);
+      throw new JsonTypeError('[A, B, C, D, E]', js);
     }
   };
 }
@@ -463,7 +504,7 @@ export function jObject<A extends object>(decoders: Props<A>): Decoder<A> {
       return buffer as A; // All fields should be present
     }
     else {
-      throw new JsonError('object', js);
+      throw new JsonTypeError('object', js);
     }
   };
 }
@@ -473,14 +514,14 @@ export function jObject<A extends object>(decoders: Props<A>): Decoder<A> {
  */
 export function jUnion<A>(...cases: Decoder<A>[]): Decoder<A> {
   return (js: json) => {
-    const errors = [];
+    const errors: JsonError[] = [];
     for (const fv of cases) {
       try {
         return fv(js);
       }
       catch (err) {
         if (err instanceof JsonError) {
-          errors.push(err.expected);
+          errors.push(err);
           continue;
         }
         else {
@@ -488,7 +529,7 @@ export function jUnion<A>(...cases: Decoder<A>[]): Decoder<A> {
         }
       }
     }
-    throw new JsonError(errors.join(' or '), js);
+    throw new JsonUnionError(errors, js);
   };
 }
 
@@ -548,7 +589,7 @@ export function jKey<K>(kd: K): Decoder<key<K>> {
       return forge(kd, js);
     }
     else {
-      throw new JsonError(`key<${kd}>`, js); 
+      throw new JsonTypeError(`key<${kd}>`, js); 
     }
   };
 }
@@ -560,7 +601,7 @@ export function jIndex<K>(kd: K): Decoder<index<K>> {
       return forge(kd, js);
     }
     else {
-      throw new JsonError(`index<${kd}>`, js); 
+      throw new JsonTypeError(`index<${kd}>`, js); 
     }
   };
 }
