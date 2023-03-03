@@ -69,58 +69,58 @@ export const proofStatus: Server.Signal = {
 
 const getNodeInfos_internal: Server.GetRequest<
   Json.index<'#node'>,
-  { stats: string, size: number, pending: number, proved: boolean,
-    result: string }
+  { result: string, proved: boolean, pending: number, size: number,
+    stats: string }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.wp.tip.getNodeInfos',
   input:  Json.jIndex<'#node'>('#node'),
   output: Json.jObject({
-            stats: Json.jString,
-            size: Json.jNumber,
-            pending: Json.jNumber,
-            proved: Json.jBoolean,
             result: Json.jString,
+            proved: Json.jBoolean,
+            pending: Json.jNumber,
+            size: Json.jNumber,
+            stats: Json.jString,
           }),
   signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
 };
 /** Proof node information */
 export const getNodeInfos: Server.GetRequest<
   Json.index<'#node'>,
-  { stats: string, size: number, pending: number, proved: boolean,
-    result: string }
+  { result: string, proved: boolean, pending: number, size: number,
+    stats: string }
   >= getNodeInfos_internal;
 
 const getProofState_internal: Server.GetRequest<
   goal,
-  { children: [ string, Json.index<'#node'> ][], tactic: string,
-    results: [ prover, result ][], index: number, pending: number,
-    parents: Json.index<'#node'>[], current: Json.index<'#node'> }
+  { current: Json.index<'#node'>, parents: Json.index<'#node'>[],
+    pending: number, index: number, results: [ prover, result ][],
+    tactic: string, children: [ string, Json.index<'#node'> ][] }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.wp.tip.getProofState',
   input:  jGoal,
   output: Json.jObject({
+            current: Json.jIndex<'#node'>('#node'),
+            parents: Json.jArray(Json.jIndex<'#node'>('#node')),
+            pending: Json.jNumber,
+            index: Json.jNumber,
+            results: Json.jArray(Json.jPair( jProver, jResult,)),
+            tactic: Json.jString,
             children: Json.jArray(
                         Json.jPair(
                           Json.jString,
                           Json.jIndex<'#node'>('#node'),
                         )),
-            tactic: Json.jString,
-            results: Json.jArray(Json.jPair( jProver, jResult,)),
-            index: Json.jNumber,
-            pending: Json.jNumber,
-            parents: Json.jArray(Json.jIndex<'#node'>('#node')),
-            current: Json.jIndex<'#node'>('#node'),
           }),
   signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
 };
 /** Current Proof Status of a Goal */
 export const getProofState: Server.GetRequest<
   goal,
-  { children: [ string, Json.index<'#node'> ][], tactic: string,
-    results: [ prover, result ][], index: number, pending: number,
-    parents: Json.index<'#node'>[], current: Json.index<'#node'> }
+  { current: Json.index<'#node'>, parents: Json.index<'#node'>[],
+    pending: number, index: number, results: [ prover, result ][],
+    tactic: string, children: [ string, Json.index<'#node'> ][] }
   >= getProofState_internal;
 
 const goForward_internal: Server.SetRequest<goal,null> = {
@@ -207,30 +207,30 @@ export const jRformat: Json.Decoder<rformat> =
 export const byRformat: Compare.Order<rformat> = Compare.structural;
 
 const printSequent_internal: Server.ExecRequest<
-  { unmangled?: boolean, autofocus?: boolean, rformat?: rformat,
-    iformat?: iformat, margin?: number, indent?: number,
-    node: Json.index<'#node'> },
+  { node: Json.index<'#node'>, indent?: number, margin?: number,
+    iformat?: iformat, rformat?: rformat, autofocus?: boolean,
+    unmangled?: boolean },
   text
   > = {
   kind: Server.RqKind.EXEC,
   name:   'plugins.wp.tip.printSequent',
   input:  Json.jObject({
-            unmangled: Json.jOption(Json.jBoolean),
-            autofocus: Json.jOption(Json.jBoolean),
-            rformat: Json.jOption(jRformat),
-            iformat: Json.jOption(jIformat),
-            margin: Json.jOption(Json.jNumber),
-            indent: Json.jOption(Json.jNumber),
             node: Json.jIndex<'#node'>('#node'),
+            indent: Json.jOption(Json.jNumber),
+            margin: Json.jOption(Json.jNumber),
+            iformat: Json.jOption(jIformat),
+            rformat: Json.jOption(jRformat),
+            autofocus: Json.jOption(Json.jBoolean),
+            unmangled: Json.jOption(Json.jBoolean),
           }),
   output: jText,
   signals: [ { name: 'plugins.wp.tip.printStatus' } ],
 };
 /** Pretty-print the associated node */
 export const printSequent: Server.ExecRequest<
-  { unmangled?: boolean, autofocus?: boolean, rformat?: rformat,
-    iformat?: iformat, margin?: number, indent?: number,
-    node: Json.index<'#node'> },
+  { node: Json.index<'#node'>, indent?: number, margin?: number,
+    iformat?: iformat, rformat?: rformat, autofocus?: boolean,
+    unmangled?: boolean },
   text
   >= printSequent_internal;
 
@@ -245,25 +245,25 @@ const clearSelection_internal: Server.SetRequest<Json.index<'#node'>,null> = {
 export const clearSelection: Server.SetRequest<Json.index<'#node'>,null>= clearSelection_internal;
 
 const setSelection_internal: Server.SetRequest<
-  { extend?: boolean, term?: Json.key<'#term'>, part?: Json.key<'#part'>,
-    node: Json.index<'#node'> },
+  { node: Json.index<'#node'>, part?: Json.key<'#part'>,
+    term?: Json.key<'#term'>, extend?: boolean },
   null
   > = {
   kind: Server.RqKind.SET,
   name:   'plugins.wp.tip.setSelection',
   input:  Json.jObject({
-            extend: Json.jOption(Json.jBoolean),
-            term: Json.jOption(Json.jKey<'#term'>('#term')),
-            part: Json.jOption(Json.jKey<'#part'>('#part')),
             node: Json.jIndex<'#node'>('#node'),
+            part: Json.jOption(Json.jKey<'#part'>('#part')),
+            term: Json.jOption(Json.jKey<'#term'>('#term')),
+            extend: Json.jOption(Json.jBoolean),
           }),
   output: Json.jNull,
   signals: [],
 };
 /** Set node selection */
 export const setSelection: Server.SetRequest<
-  { extend?: boolean, term?: Json.key<'#term'>, part?: Json.key<'#part'>,
-    node: Json.index<'#node'> },
+  { node: Json.index<'#node'>, part?: Json.key<'#part'>,
+    term?: Json.key<'#term'>, extend?: boolean },
   null
   >= setSelection_internal;
 

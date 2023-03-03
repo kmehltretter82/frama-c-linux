@@ -185,23 +185,23 @@ export const getParameters: Server.GetRequest<
   >= getParameters_internal;
 
 const setParameter_internal: Server.SetRequest<
-  { value: Json.json, param: Json.key<'#param'>, tactic: Json.key<'#tactic'>
+  { tactic: Json.key<'#tactic'>, param: Json.key<'#param'>, value: Json.json
     },
   null
   > = {
   kind: Server.RqKind.SET,
   name:   'plugins.wp.tac.setParameter',
   input:  Json.jObject({
-            value: Json.jAny,
-            param: Json.jKey<'#param'>('#param'),
             tactic: Json.jKey<'#tactic'>('#tactic'),
+            param: Json.jKey<'#param'>('#param'),
+            value: Json.jAny,
           }),
   output: Json.jNull,
   signals: [],
 };
 /** Configure tactical parameter */
 export const setParameter: Server.SetRequest<
-  { value: Json.json, param: Json.key<'#param'>, tactic: Json.key<'#tactic'>
+  { tactic: Json.key<'#tactic'>, param: Json.key<'#param'>, value: Json.json
     },
   null
   >= setParameter_internal;

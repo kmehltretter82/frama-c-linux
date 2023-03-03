@@ -167,25 +167,25 @@ export const reloadFunctions: Server.GetRequest<null,null>= reloadFunctions_inte
 
 const fetchFunctions_internal: Server.GetRequest<
   number,
-  { pending: number, updated: functionsData[],
-    removed: Json.key<'#functions'>[], reload: boolean }
+  { reload: boolean, removed: Json.key<'#functions'>[],
+    updated: functionsData[], pending: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.general.fetchFunctions',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jNumber,
-            updated: Json.jArray(jFunctionsData),
-            removed: Json.jArray(Json.jKey<'#functions'>('#functions')),
             reload: Json.jBoolean,
+            removed: Json.jArray(Json.jKey<'#functions'>('#functions')),
+            updated: Json.jArray(jFunctionsData),
+            pending: Json.jNumber,
           }),
   signals: [],
 };
 /** Data fetcher for array [`functions`](#functions)  */
 export const fetchFunctions: Server.GetRequest<
   number,
-  { pending: number, updated: functionsData[],
-    removed: Json.key<'#functions'>[], reload: boolean }
+  { reload: boolean, removed: Json.key<'#functions'>[],
+    updated: functionsData[], pending: number }
   >= fetchFunctions_internal;
 
 const functions_internal: State.Array<Json.key<'#functions'>,functionsData> = {
@@ -350,25 +350,25 @@ export const reloadProperties: Server.GetRequest<null,null>= reloadProperties_in
 
 const fetchProperties_internal: Server.GetRequest<
   number,
-  { pending: number, updated: propertiesData[],
-    removed: Json.key<'#property'>[], reload: boolean }
+  { reload: boolean, removed: Json.key<'#property'>[],
+    updated: propertiesData[], pending: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.general.fetchProperties',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jNumber,
-            updated: Json.jArray(jPropertiesData),
-            removed: Json.jArray(Json.jKey<'#property'>('#property')),
             reload: Json.jBoolean,
+            removed: Json.jArray(Json.jKey<'#property'>('#property')),
+            updated: Json.jArray(jPropertiesData),
+            pending: Json.jNumber,
           }),
   signals: [],
 };
 /** Data fetcher for array [`properties`](#properties)  */
 export const fetchProperties: Server.GetRequest<
   number,
-  { pending: number, updated: propertiesData[],
-    removed: Json.key<'#property'>[], reload: boolean }
+  { reload: boolean, removed: Json.key<'#property'>[],
+    updated: propertiesData[], pending: number }
   >= fetchProperties_internal;
 
 const properties_internal: State.Array<Json.key<'#property'>,propertiesData> = {
@@ -605,25 +605,25 @@ export const reloadFunctionStats: Server.GetRequest<null,null>= reloadFunctionSt
 
 const fetchFunctionStats_internal: Server.GetRequest<
   number,
-  { pending: number, updated: functionStatsData[],
-    removed: Json.key<'#fundec'>[], reload: boolean }
+  { reload: boolean, removed: Json.key<'#fundec'>[],
+    updated: functionStatsData[], pending: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.general.fetchFunctionStats',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jNumber,
-            updated: Json.jArray(jFunctionStatsData),
-            removed: Json.jArray(Json.jKey<'#fundec'>('#fundec')),
             reload: Json.jBoolean,
+            removed: Json.jArray(Json.jKey<'#fundec'>('#fundec')),
+            updated: Json.jArray(jFunctionStatsData),
+            pending: Json.jNumber,
           }),
   signals: [],
 };
 /** Data fetcher for array [`functionStats`](#functionstats)  */
 export const fetchFunctionStats: Server.GetRequest<
   number,
-  { pending: number, updated: functionStatsData[],
-    removed: Json.key<'#fundec'>[], reload: boolean }
+  { reload: boolean, removed: Json.key<'#fundec'>[],
+    updated: functionStatsData[], pending: number }
   >= fetchFunctionStats_internal;
 
 const functionStats_internal: State.Array<

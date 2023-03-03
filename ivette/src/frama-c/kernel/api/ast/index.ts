@@ -213,25 +213,25 @@ export const reloadMarkerInfo: Server.GetRequest<null,null>= reloadMarkerInfo_in
 
 const fetchMarkerInfo_internal: Server.GetRequest<
   number,
-  { pending: number, updated: markerInfoData[], removed: string[],
-    reload: boolean }
+  { reload: boolean, removed: string[], updated: markerInfoData[],
+    pending: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.fetchMarkerInfo',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jNumber,
-            updated: Json.jArray(jMarkerInfoData),
-            removed: Json.jArray(Json.jString),
             reload: Json.jBoolean,
+            removed: Json.jArray(Json.jString),
+            updated: Json.jArray(jMarkerInfoData),
+            pending: Json.jNumber,
           }),
   signals: [],
 };
 /** Data fetcher for array [`markerInfo`](#markerinfo)  */
 export const fetchMarkerInfo: Server.GetRequest<
   number,
-  { pending: number, updated: markerInfoData[], removed: string[],
-    reload: boolean }
+  { reload: boolean, removed: string[], updated: markerInfoData[],
+    pending: number }
   >= fetchMarkerInfo_internal;
 
 const markerInfo_internal: State.Array<string,markerInfoData> = {
@@ -393,25 +393,25 @@ export const reloadFunctions: Server.GetRequest<null,null>= reloadFunctions_inte
 
 const fetchFunctions_internal: Server.GetRequest<
   number,
-  { pending: number, updated: functionsData[],
-    removed: Json.key<'#functions'>[], reload: boolean }
+  { reload: boolean, removed: Json.key<'#functions'>[],
+    updated: functionsData[], pending: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.fetchFunctions',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jNumber,
-            updated: Json.jArray(jFunctionsData),
-            removed: Json.jArray(Json.jKey<'#functions'>('#functions')),
             reload: Json.jBoolean,
+            removed: Json.jArray(Json.jKey<'#functions'>('#functions')),
+            updated: Json.jArray(jFunctionsData),
+            pending: Json.jNumber,
           }),
   signals: [],
 };
 /** Data fetcher for array [`functions`](#functions)  */
 export const fetchFunctions: Server.GetRequest<
   number,
-  { pending: number, updated: functionsData[],
-    removed: Json.key<'#functions'>[], reload: boolean }
+  { reload: boolean, removed: Json.key<'#functions'>[],
+    updated: functionsData[], pending: number }
   >= fetchFunctions_internal;
 
 const functions_internal: State.Array<Json.key<'#functions'>,functionsData> = {

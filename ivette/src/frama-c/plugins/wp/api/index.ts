@@ -202,25 +202,25 @@ export const reloadGoals: Server.GetRequest<null,null>= reloadGoals_internal;
 
 const fetchGoals_internal: Server.GetRequest<
   number,
-  { pending: number, updated: goalsData[], removed: Json.key<'#wpo'>[],
-    reload: boolean }
+  { reload: boolean, removed: Json.key<'#wpo'>[], updated: goalsData[],
+    pending: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.wp.fetchGoals',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jNumber,
-            updated: Json.jArray(jGoalsData),
-            removed: Json.jArray(Json.jKey<'#wpo'>('#wpo')),
             reload: Json.jBoolean,
+            removed: Json.jArray(Json.jKey<'#wpo'>('#wpo')),
+            updated: Json.jArray(jGoalsData),
+            pending: Json.jNumber,
           }),
   signals: [],
 };
 /** Data fetcher for array [`goals`](#goals)  */
 export const fetchGoals: Server.GetRequest<
   number,
-  { pending: number, updated: goalsData[], removed: Json.key<'#wpo'>[],
-    reload: boolean }
+  { reload: boolean, removed: Json.key<'#wpo'>[], updated: goalsData[],
+    pending: number }
   >= fetchGoals_internal;
 
 const goals_internal: State.Array<Json.key<'#wpo'>,goalsData> = {
@@ -241,23 +241,23 @@ export const serverActivity: Server.Signal = {
 
 const getScheduledTasks_internal: Server.GetRequest<
   null,
-  { todo: number, done: number, active: number, procs: number }
+  { procs: number, active: number, done: number, todo: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.wp.getScheduledTasks',
   input:  Json.jNull,
   output: Json.jObject({
-            todo: Json.jNumber,
-            done: Json.jNumber,
-            active: Json.jNumber,
             procs: Json.jNumber,
+            active: Json.jNumber,
+            done: Json.jNumber,
+            todo: Json.jNumber,
           }),
   signals: [ { name: 'plugins.wp.serverActivity' } ],
 };
 /** Scheduled tasks in proof server */
 export const getScheduledTasks: Server.GetRequest<
   null,
-  { todo: number, done: number, active: number, procs: number }
+  { procs: number, active: number, done: number, todo: number }
   >= getScheduledTasks_internal;
 
 const cancelProofTasks_internal: Server.SetRequest<null,null> = {

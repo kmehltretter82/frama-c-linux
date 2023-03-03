@@ -103,14 +103,14 @@ let rq_input (type a) (input : a rq_input) : paramInfo =
   match input with
   | Pnone -> assert false
   | Pdata d -> let module D = (val d) in P_value D.jtype
-  | Pfields fds -> P_named fds
+  | Pfields fds -> P_named (List.rev fds)
 
 (* json output syntax *)
 let rq_output (type b) (output : b rq_output) : paramInfo =
   match output with
   | Rnone -> assert false
   | Rdata d -> let module D = (val d) in P_value D.jtype
-  | Rfields fds -> P_named fds
+  | Rfields fds -> P_named (List.rev fds)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Multi-Parameters Requests                                          --- *)

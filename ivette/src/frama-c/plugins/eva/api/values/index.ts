@@ -94,44 +94,44 @@ export const getCallstackInfo: Server.GetRequest<
 
 const getStmtInfo_internal: Server.GetRequest<
   Json.key<'#stmt'>,
-  { rank: number, fct: Json.key<'#fct'> }
+  { fct: Json.key<'#fct'>, rank: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getStmtInfo',
   input:  Json.jKey<'#stmt'>('#stmt'),
-  output: Json.jObject({ rank: Json.jNumber, fct: Json.jKey<'#fct'>('#fct'),
+  output: Json.jObject({ fct: Json.jKey<'#fct'>('#fct'), rank: Json.jNumber,
           }),
   signals: [],
 };
 /** Stmt Information */
 export const getStmtInfo: Server.GetRequest<
   Json.key<'#stmt'>,
-  { rank: number, fct: Json.key<'#fct'> }
+  { fct: Json.key<'#fct'>, rank: number }
   >= getStmtInfo_internal;
 
 const getProbeInfo_internal: Server.GetRequest<
   marker,
-  { condition: boolean, effects: boolean, rank: number,
-    stmt?: Json.key<'#stmt'>, code?: string, evaluable: boolean }
+  { evaluable: boolean, code?: string, stmt?: Json.key<'#stmt'>,
+    rank: number, effects: boolean, condition: boolean }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getProbeInfo',
   input:  jMarker,
   output: Json.jObject({
-            condition: Json.jBoolean,
-            effects: Json.jBoolean,
-            rank: Json.jNumber,
-            stmt: Json.jOption(Json.jKey<'#stmt'>('#stmt')),
-            code: Json.jOption(Json.jString),
             evaluable: Json.jBoolean,
+            code: Json.jOption(Json.jString),
+            stmt: Json.jOption(Json.jKey<'#stmt'>('#stmt')),
+            rank: Json.jNumber,
+            effects: Json.jBoolean,
+            condition: Json.jBoolean,
           }),
   signals: [],
 };
 /** Probe informations */
 export const getProbeInfo: Server.GetRequest<
   marker,
-  { condition: boolean, effects: boolean, rank: number,
-    stmt?: Json.key<'#stmt'>, code?: string, evaluable: boolean }
+  { evaluable: boolean, code?: string, stmt?: Json.key<'#stmt'>,
+    rank: number, effects: boolean, condition: boolean }
   >= getProbeInfo_internal;
 
 /** Evaluation of an expression or lvalue */
@@ -171,29 +171,29 @@ export const byEvaluation: Compare.Order<evaluation> =
   });
 
 const getValues_internal: Server.GetRequest<
-  { callstack?: callstack, target: marker },
-  { vElse?: evaluation, vThen?: evaluation, vAfter?: evaluation,
-    vBefore?: evaluation }
+  { target: marker, callstack?: callstack },
+  { vBefore?: evaluation, vAfter?: evaluation, vThen?: evaluation,
+    vElse?: evaluation }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getValues',
   input:  Json.jObject({
-            callstack: Json.jOption(jCallstack),
             target: jMarker,
+            callstack: Json.jOption(jCallstack),
           }),
   output: Json.jObject({
-            vElse: Json.jOption(jEvaluation),
-            vThen: Json.jOption(jEvaluation),
-            vAfter: Json.jOption(jEvaluation),
             vBefore: Json.jOption(jEvaluation),
+            vAfter: Json.jOption(jEvaluation),
+            vThen: Json.jOption(jEvaluation),
+            vElse: Json.jOption(jEvaluation),
           }),
   signals: [],
 };
 /** Abstract values for the given marker */
 export const getValues: Server.GetRequest<
-  { callstack?: callstack, target: marker },
-  { vElse?: evaluation, vThen?: evaluation, vAfter?: evaluation,
-    vBefore?: evaluation }
+  { target: marker, callstack?: callstack },
+  { vBefore?: evaluation, vAfter?: evaluation, vThen?: evaluation,
+    vElse?: evaluation }
   >= getValues_internal;
 
 /* ------------------------------------- */
