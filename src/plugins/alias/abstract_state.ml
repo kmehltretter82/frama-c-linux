@@ -541,7 +541,7 @@ let is_collapsed (lv:lval) (x:t) =
   with Not_found -> false
 
 (* warning, this function has a side effect on list_arrays_to_be_collapsed *)  
-let _normalize_lval (x:t) (lv1:lval) : lval =
+let normalize_lval (x:t) (lv1:lval) : lval =
   let lv, off = Cil.removeOffsetLval lv1 in
   list_arrays_to_be_collapsed := [];
   let loc = Location.unknown in
@@ -768,7 +768,7 @@ let collapse_node (v:V.t) (x:t) : t =
     x
 
 (* has a side effect on list_arrays_to_be_collapsed *)
-let _collapse_graph (x:t) : t =
+let collapse_graph (x:t) : t =
   let res =
     List.fold_left
       (fun acc lv ->
@@ -779,6 +779,20 @@ let _collapse_graph (x:t) : t =
   in
   list_arrays_to_be_collapsed := []; res
 
+
+
+
+
+let normalize_lval (lv:lval) (x:t) : lval * t =
+  let new_lv = normalize_lval x lv in
+  let new_x =
+    if !list_arrays_to_be_collapsed != []
+    then
+      collapse_graph x
+    else
+      x
+  in (* now, list_arrays_to_be_collapsed = [] *)
+  new_lv, new_x
 
 
 (** .dot printing functions*)
@@ -913,6 +927,8 @@ let set_type (x:t) (v1:V.t) (v2:V.t) : t =
 (* assignment x = y *)
 let assignment_x_y (a:t) (x:lval) (y:lval) : t =
   assert_invariants a;
+  let x,a = normalize_lval x a in
+  let y,a = normalize_lval y a in
   let (v1,a) = find_or_create_vertex x a in
   let (v2,a) = find_or_create_vertex y a in
   let new_a = cjoin a v1 v2 in
@@ -922,6 +938,8 @@ let assignment_x_y (a:t) (x:lval) (y:lval) : t =
 (* assignment x = &y *)
 let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t =
   assert_invariants a;
+  let x,a = normalize_lval x a in
+  let y,a = normalize_lval y a in
   let v1, a = find_or_create_vertex x a in
   let list_v2, a = addr_of y a in
   let new_a =
@@ -941,6 +959,8 @@ let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t =
 (* assignment x = *y *)
 let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
   assert_invariants a;
+  let x,a = normalize_lval x a in
+  let y,a = normalize_lval y a in
   let v1, a = find_or_create_vertex x a in
   let list_v2, a = points_to y a in
   let new_a =
@@ -954,6 +974,7 @@ let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y (a:t) (x:lval) : t =
   assert_invariants a;
+  let x,a = normalize_lval x a in
   let (v1,a) = find_or_create_vertex x a in
   let (v2,a) = create_cst_vertex a in
   let new_a = set_type a v1 v2 in
@@ -976,6 +997,7 @@ let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
 (* assignment *x = cst *)
 let assignment_ptr_x_cst (a:t) (x:lval) : t =
   assert_invariants a;
+  let x,a = normalize_lval x a in
   (* Format.printf "DEBUG (assignment_ptr_x_cst) on lval %a and state:@. %a @." Lval.pretty x print_debug a; *)
   let v2, a = create_cst_vertex a in
   let (list_v1, a) : V.t list * t = points_to x a in

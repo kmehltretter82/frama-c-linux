@@ -127,5 +127,5 @@ val make_summary : t option -> kernel_function -> summary
 val pretty_summary :  ?debug:bool -> ?function_name:string -> Format.formatter -> summary -> unit
 
 (** [call a res args s] computes the abstract state after the
-    instruction res=f(args), with f summarized by [s] *)
+    instruction res=f(args), with f summarized by [s]. [a] is the abstract state before the call *)
 val call: t -> lval option -> exp list -> summary -> t
