@@ -168,7 +168,7 @@ class menu_manager ?packing (_:Gtk_helper.host) =
             | None, Some sep ->
               max
                 0
-                (Gtk_compat.get_toolbar_index toolbar (sep:>GButton.tool_item))
+                (toolbar#get_item_index (sep:>GButton.tool_item)#as_tool_item)
             | Some p, _ -> p)
       in
       let toolbar_packing w =

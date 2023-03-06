@@ -25,9 +25,6 @@
  (deps (universe))
  (action (progn
           (echo "GUI:" %{lib-available:frama-c.gui} "\n")
-          (echo "  - lablgtk2:" %{lib-available:lablgtk2} "\n")
-          (echo "  - lablgtk2.gnomecanvas:" %{lib-available:lablgtk2.gnomecanvas} "\n")
-          (echo "  - lablgtk2.sourceview2:" %{lib-available:lablgtk2.sourceview2} "\n")
           (echo "  - lablgtk3:" %{lib-available:lablgtk3} "\n")
           (echo "  - lablgtk3-sourceview3:" %{lib-available:lablgtk3-sourceview3} "\n")
           ; From a GUI hook registered by RteGen.
@@ -42,44 +39,6 @@
   (name frama_c_gui)
   (public_name frama-c.gui)
   (optional)
-  (modules
-        wutil wutil_once widget wbox wfile wpane wpalette wtext wtable
-        gui_parameters
-        gtk_helper gtk_form
-        source_viewer pretty_source source_manager book_manager
-        warning_manager
-        filetree
-        launcher
-        menu_manager
-        history
-        gui_printers
-        design
-        analyses_manager file_manager project_manager
-        help_manager
-        property_navigator GSourceView gtk_compat
-        dgraph_helper
-)
   (flags -open Frama_c_kernel -linkall :standard -w -9)
-  (libraries frama-c.init.gui frama-c.kernel
-   (select gtk_compat.ml from
-      (lablgtk3 lablgtk3-sourceview3 -> gtk_compat.3.ml)
-      (lablgtk2 lablgtk2.gnomecanvas lablgtk2.sourceview2 -> gtk_compat.2.ml)
-   )
-   (select GSourceView.ml from
-      (lablgtk3 lablgtk3-sourceview3 -> GSourceView.3.ml)
-      (lablgtk2 lablgtk2.gnomecanvas lablgtk2.sourceview2 -> GSourceView.2.ml)
-   )
-   (select GSourceView.mli from
-      (lablgtk3 lablgtk3-sourceview3 -> GSourceView.3.mli)
-      (lablgtk2 lablgtk2.gnomecanvas lablgtk2.sourceview2 -> GSourceView.2.mli)
-   )
-   (select dgraph_helper.ml from
-      (!lablgtk3-sourceview3 ocamlgraph.dgraph -> dgraph_helper.yes.ml)
-      ( -> dgraph_helper.no.ml)
-   )
-   (select debug_manager.ml from
-      (!lablgtk3-sourceview3 ocamlgraph.dgraph -> debug_manager.ok.ml)
-      ( -> debug_manager.ko.ml)
-   )
-)
+  (libraries frama-c.init.gui frama-c.kernel lablgtk3 lablgtk3-sourceview3)
 )

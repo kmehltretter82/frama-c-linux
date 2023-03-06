@@ -564,16 +564,6 @@ let make_panel (main_ui:main_window_extension_points) =
       ~headers_visible:true
       ~packing:sc#add ()
   in
-  ignore
-    (view#connect#row_activated
-       ~callback:(fun path _col ->
-           match model#custom_get_iter path with
-           | Some { MODEL.finfo = { ip = ip } } ->
-             let format_graph ppf =
-               Consolidation_graph.dump (Consolidation_graph.get ip) ppf in
-             Dgraph_helper.graph_window_through_dot
-               ~parent:main_ui#main_window ~title:"Dependencies" format_graph
-           | None -> ()));
   view#selection#set_select_function
     (fun path currently_selected ->
        if not currently_selected then
