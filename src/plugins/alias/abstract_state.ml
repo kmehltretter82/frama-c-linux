@@ -40,167 +40,167 @@ module LMap = Lval.Map
 
 (* like LMap, but organized with offset and specialized functions *)
 module LLMap =
-  struct
-    module OMap = Offset.Map
-    (* each t is a map (lhost,NoOffset) -> offset -> V.t *)
-    type t = (V.t OMap.t) LMap.t
+struct
+  module OMap = Offset.Map
+  (* each t is a map (lhost,NoOffset) -> offset -> V.t *)
+  type t = (V.t OMap.t) LMap.t
 
-    let empty : t = LMap.empty
+  let empty : t = LMap.empty
 
-    let mem (lv:lval) (m:t) =
-      let lv, off = Cil.removeOffsetLval lv in
-      try
-        OMap.mem off (LMap.find lv m)
-      with
-        Not_found -> false
-        
-    let find (lv:lval) (m:t) : V.t =
-      let lv, off = Cil.removeOffsetLval lv in
-      OMap.find off (LMap.find lv m)
+  let mem (lv:lval) (m:t) =
+    let lv, off = Cil.removeOffsetLval lv in
+    try
+      OMap.mem off (LMap.find lv m)
+    with
+      Not_found -> false
 
-    let add (lv:lval) (v:V.t) (m:t) :t  =
-      let lv, off = Cil.removeOffsetLval lv in
-      let mo = try LMap.find lv m with Not_found -> OMap.empty in
-      LMap.add lv (OMap.add off v mo) m
+  let find (lv:lval) (m:t) : V.t =
+    let lv, off = Cil.removeOffsetLval lv in
+    OMap.find off (LMap.find lv m)
 
-    let remove (lv:lval) (m:t) :t =
-      let lv, off = Cil.removeOffsetLval lv in
-      let mo = try LMap.find lv m with Not_found -> OMap.empty in
-      let res = OMap.remove off mo in
-      if OMap.is_empty res
-      then
-        LMap.remove lv m
-      else
-        LMap.add lv res m
-    
-    let _from_lmap (lm: V.t LMap.t) : t =
-      LMap.fold
-        (fun lv v acc -> add lv v acc)
-        lm
-        LMap.empty
-        
-    let _to_lmap (m:t) : V.t LMap.t =
-      LMap.fold
-        (fun lv mo acc ->
-           OMap.fold
-             (fun o v acc ->
-                let lv = Cil.addOffsetLval o lv in
-                LMap.add lv v acc
-             )
-             mo
-             acc
-        )
-        m
-        LMap.empty      
-    
-    let iter (f_iter: lval -> V.t -> unit) (m:t) : unit =
-      LMap.iter
-        (fun lv mo ->
-           OMap.iter
-             (fun o v ->
-                let lv = Cil.addOffsetLval o lv in
-                f_iter lv v
-             )
-             mo
-        )
-        m
+  let add (lv:lval) (v:V.t) (m:t) :t  =
+    let lv, off = Cil.removeOffsetLval lv in
+    let mo = try LMap.find lv m with Not_found -> OMap.empty in
+    LMap.add lv (OMap.add off v mo) m
 
-    let fold (f_fold: lval -> V.t -> 'a -> 'a ) (m:t) (init:'a) : 'a =
-      LMap.fold
-        (fun lv mo acc ->
-           OMap.fold
-             (fun o v acc ->
-                let lv = Cil.addOffsetLval o lv in
-                f_fold lv v acc
-             )
-             mo
-             acc
-        )
-        m
-        init
+  let remove (lv:lval) (m:t) :t =
+    let lv, off = Cil.removeOffsetLval lv in
+    let mo = try LMap.find lv m with Not_found -> OMap.empty in
+    let res = OMap.remove off mo in
+    if OMap.is_empty res
+    then
+      LMap.remove lv m
+    else
+      LMap.add lv res m
 
-    let map (f_map: V.t -> V.t ) (m:t) : 'a =
-      LMap.map
-        (fun mo ->
-           OMap.map
-             f_map
-             mo
-          )
-        m
+  let _from_lmap (lm: V.t LMap.t) : t =
+    LMap.fold
+      (fun lv v acc -> add lv v acc)
+      lm
+      LMap.empty
 
-    let mapi (f_mapi: lval -> V.t -> V.t ) (m:t) : 'a =
-      LMap.mapi
-        (fun lv mo ->
-           OMap.mapi
-             (fun o v ->
-                let lv = Cil.addOffsetLval o lv in
-                f_mapi lv v
-             )
-             mo
-          )
-        m
-    
-    
-    let pretty fmt (m:t) =
-      LMap.iter
-        (fun lv mo ->
-           OMap.iter
-             (fun o v -> let lv =  Cil.addOffsetLval o lv in Format.fprintf fmt "(lval=%a -> id= %d)@." Lval.pretty lv v)
-             mo
-        )
-        m
+  let _to_lmap (m:t) : V.t LMap.t =
+    LMap.fold
+      (fun lv mo acc ->
+         OMap.fold
+           (fun o v acc ->
+              let lv = Cil.addOffsetLval o lv in
+              LMap.add lv v acc
+           )
+           mo
+           acc
+      )
+      m
+      LMap.empty
+
+  let iter (f_iter: lval -> V.t -> unit) (m:t) : unit =
+    LMap.iter
+      (fun lv mo ->
+         OMap.iter
+           (fun o v ->
+              let lv = Cil.addOffsetLval o lv in
+              f_iter lv v
+           )
+           mo
+      )
+      m
+
+  let fold (f_fold: lval -> V.t -> 'a -> 'a ) (m:t) (init:'a) : 'a =
+    LMap.fold
+      (fun lv mo acc ->
+         OMap.fold
+           (fun o v acc ->
+              let lv = Cil.addOffsetLval o lv in
+              f_fold lv v acc
+           )
+           mo
+           acc
+      )
+      m
+      init
+
+  let map (f_map: V.t -> V.t ) (m:t) : 'a =
+    LMap.map
+      (fun mo ->
+         OMap.map
+           f_map
+           mo
+      )
+      m
+
+  let mapi (f_mapi: lval -> V.t -> V.t ) (m:t) : 'a =
+    LMap.mapi
+      (fun lv mo ->
+         OMap.mapi
+           (fun o v ->
+              let lv = Cil.addOffsetLval o lv in
+              f_mapi lv v
+           )
+           mo
+      )
+      m
 
 
-    (* specialized functions *)
-    let rec is_sub_offset o1 o2 =
-      match (o1,o2) with
-        NoOffset, _ -> true
-      | Index (e1,o1), Index(e2,o2) when Exp.equal e1 e2 -> is_sub_offset o1 o2
-      | Field (f1,o1), Field(f2,o2) when Fieldinfo.equal f1 f2 ->  is_sub_offset o1 o2
-      | _ -> false
+  let pretty fmt (m:t) =
+    LMap.iter
+      (fun lv mo ->
+         OMap.iter
+           (fun o v -> let lv =  Cil.addOffsetLval o lv in Format.fprintf fmt "(lval=%a -> id= %d)@." Lval.pretty lv v)
+           mo
+      )
+      m
 
-    (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 = lv+o1 *)
-    let _find_lower_offsets (lv:lval) (m:t) : V.t LMap.t =
-      let lv, off = Cil.removeOffsetLval lv in
-      let mo = try LMap.find lv m with Not_found -> OMap.empty in
-      let f_filter o _v = is_sub_offset off o in
-      let mo = OMap.filter f_filter mo in
-      OMap.fold
-        (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
-        mo
-        LMap.empty
 
-    (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 + o1 = lv *)
-    let find_upper_offsets (lv:lval) (m:t) : V.t LMap.t =
-      let lv, off = Cil.removeOffsetLval lv in
-      let mo = try LMap.find lv m with Not_found -> OMap.empty in
-      let f_filter o _v = is_sub_offset o off in
-      let mo = OMap.filter f_filter mo in
-      OMap.fold
-        (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
-        mo
-        LMap.empty
+  (* specialized functions *)
+  let rec is_sub_offset o1 o2 =
+    match (o1,o2) with
+      NoOffset, _ -> true
+    | Index (e1,o1), Index(e2,o2) when Exp.equal e1 e2 -> is_sub_offset o1 o2
+    | Field (f1,o1), Field(f2,o2) when Fieldinfo.equal f1 f2 ->  is_sub_offset o1 o2
+    | _ -> false
 
-    let rec is_indexed_offset o1 o2 =
-      match (o1,o2) with
-        NoOffset, Index(_,NoOffset) -> true
-      | Index (e1,o1), Index(e2,o2) when Exp.equal e1 e2 -> is_indexed_offset o1 o2
-      | Field (f1,o1), Field(f2,o2) when Fieldinfo.equal f1 f2 ->  is_indexed_offset o1 o2
-      | _ -> false
-    
-    (* finds all the lval lv1 apearing in [m] such as there exists an index c  such as lv1 = lv[c] *)
-    let find_indexed_offsets (lv:lval) (m:t) : V.t LMap.t =
-      let lv, off = Cil.removeOffsetLval lv in
-      let mo = try LMap.find lv m with Not_found -> OMap.empty in
-      let f_filter o _v = is_indexed_offset off o in
-      let mo = OMap.filter f_filter mo in
-      OMap.fold
-        (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
-        mo
-        LMap.empty
-    
-        
-  end
+  (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 = lv+o1 *)
+  let _find_lower_offsets (lv:lval) (m:t) : V.t LMap.t =
+    let lv, off = Cil.removeOffsetLval lv in
+    let mo = try LMap.find lv m with Not_found -> OMap.empty in
+    let f_filter o _v = is_sub_offset off o in
+    let mo = OMap.filter f_filter mo in
+    OMap.fold
+      (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
+      mo
+      LMap.empty
+
+  (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 + o1 = lv *)
+  let find_upper_offsets (lv:lval) (m:t) : V.t LMap.t =
+    let lv, off = Cil.removeOffsetLval lv in
+    let mo = try LMap.find lv m with Not_found -> OMap.empty in
+    let f_filter o _v = is_sub_offset o off in
+    let mo = OMap.filter f_filter mo in
+    OMap.fold
+      (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
+      mo
+      LMap.empty
+
+  let rec is_indexed_offset o1 o2 =
+    match (o1,o2) with
+      NoOffset, Index(_,NoOffset) -> true
+    | Index (e1,o1), Index(e2,o2) when Exp.equal e1 e2 -> is_indexed_offset o1 o2
+    | Field (f1,o1), Field(f2,o2) when Fieldinfo.equal f1 f2 ->  is_indexed_offset o1 o2
+    | _ -> false
+
+  (* finds all the lval lv1 apearing in [m] such as there exists an index c  such as lv1 = lv[c] *)
+  let find_indexed_offsets (lv:lval) (m:t) : V.t LMap.t =
+    let lv, off = Cil.removeOffsetLval lv in
+    let mo = try LMap.find lv m with Not_found -> OMap.empty in
+    let f_filter o _v = is_indexed_offset off o in
+    let mo = OMap.filter f_filter mo in
+    OMap.fold
+      (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
+      mo
+      LMap.empty
+
+
+end
 
 
 
@@ -375,7 +375,7 @@ let create_cst_vertex (x:t) : V.t * t =
 (* returns the list of all possible "prefix" of a lval lv1, i.e. each
    pair (lv,o) such as AddoffsetLval o lv = lv1 *)
 let decompose_lval (lv1: lval) : (lval*offset) list =
-  let rec list_of_offset (o: offset) : (offset*offset) list = 
+  let rec list_of_offset (o: offset) : (offset*offset) list =
     match o with
       NoOffset -> [NoOffset,NoOffset]
     | Index(e,ofs) ->
@@ -392,21 +392,21 @@ let decompose_lval (lv1: lval) : (lval*offset) list =
           (list_of_offset ofs)
       in
       (NoOffset,ofs)::li
-in
+  in
   let lv, off = Cil.removeOffsetLval lv1 in
-    List.map
-      (fun (o1,o2) -> (Cil.addOffsetLval o1 lv,o2))
-      (list_of_offset off)
+  List.map
+    (fun (o1,o2) -> (Cil.addOffsetLval o1 lv,o2))
+    (list_of_offset off)
 
 (* returns the list of prefixes of lv1 that belong to ls *)
 let _prefix_in_set (lv1:lval) (ls:LSet.t) : (lval*offset) list =
   let li = decompose_lval lv1 in
   List.filter (fun (lv,_) ->LSet.mem lv ls) li
 
- 
+
 (* find all the aliases of lv1 in x, for create_vertex *)
 let find_all_aliases (lv1:lval) (x:t) : LSet.t =
- 
+
   let list_of_lval_to_be_searched : (lval*offset) list =
     decompose_lval lv1
   in
@@ -483,7 +483,7 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
  *        0 offset to preserve the type of the lvalue. *\)
  *     Cil.addOffsetLval (Index (Cil.zero ~loc, NoOffset)) lv
  *   | NoOffset | Field _ -> Cil.addOffsetLval off lv
- * 
+ *
  * let rec ptr_base ~loc exp =
  *   match exp.enode with
  *   | BinOp(op, lhs, _, _) ->
@@ -507,7 +507,7 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
  *   | Const _ | Lval _ | UnOp _ -> exp
  *   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
  *     -> assert false
- * 
+ *
  * let ptr_base_and_base_addr ~loc e =
  *   let rec ptr_base_addr ~loc base =
  *     match base.enode with
@@ -541,7 +541,7 @@ let is_collapsed (lv:lval) (x:t) =
     VSet.mem v x.collapsed
   with Not_found -> false
 
-(* warning, this function has a side effect on list_arrays_to_be_collapsed *)  
+(* warning, this function has a side effect on list_arrays_to_be_collapsed *)
 let normalize_lval (x:t) (lv1:lval) : lval =
   let lv, off = Cil.removeOffsetLval lv1 in
   list_arrays_to_be_collapsed := [];
@@ -588,7 +588,7 @@ let diff_offset (lv1:lval) (lv2:lval) =
   assert (LLMap.is_sub_offset o1 o2);
   f_diff_offset o1 o2
 
-  
+
 let rec find_or_create_lval (lv:lval) (x:t) : V.t * t =
   match fst lv with
     Var _ ->  (try (LLMap.find lv x.lmap, x) with  Not_found -> create_vertex lv x)
@@ -647,7 +647,7 @@ and find_or_create_vertex (lv:lval) (x:t) : V.t * t =
       let vset_res =
         LMap.fold
           f_fold_lmap
-          map_predecessors          
+          map_predecessors
           VSet.empty
       in
       if VSet.is_empty vset_res
@@ -706,8 +706,8 @@ let remove_lval (x:t)  (lv:lval) :t =
   in
   assert_invariants new_x; new_x
 
- 
-  
+
+
 (* merge of two vertices; the first vertex carries both sets, the second is removed from the graph and from lmap and vmap; however, pending is NOT updated  *)
 let merge x v1 v2 =
   if (V.equal v1 v2) || not (G.mem_vertex x.graph v1) || not (G.mem_vertex x.graph v2)
@@ -716,7 +716,7 @@ let merge x v1 v2 =
     let set1 = find_lset v1 x in
     let set2 = find_lset v2 x in
     (* because of the offset, check if one of the *)
-    
+
     let new_set = LSet.union set1 set2 in
     (* update lmap : every lval in v2 must now be associated with v1*)
     let new_lmap = LSet.fold (fun lv2 m -> LLMap.add lv2 v1 m) set2 x.lmap in
@@ -745,7 +745,7 @@ let merge x v1 v2 =
     {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt ; collapsed = new_collapsed}
 
 
-(* merge all nodes of an array a to a[0] *)    
+(* merge all nodes of an array a to a[0] *)
 let collapse (lv:lval) (x:t) : t =
   let v, x = find_or_create_vertex lv x in
   let lv0 = first_index lv in
@@ -759,7 +759,7 @@ let collapse (lv:lval) (x:t) : t =
     {acc with pending = new_pending }
   in
   LMap.fold f_fold map_to_be_collapsed {x with collapsed = VSet.add v x.collapsed }
- 
+
 
 let collapse_node (v:V.t) (x:t) : t =
   let ls = try VMap.find v x.vmap with Not_found -> LSet.empty in
@@ -776,7 +776,7 @@ let collapse_graph (x:t) : t =
          let v,acc = find_or_create_vertex lv acc in
          collapse_node v acc)
       x
-    !list_arrays_to_be_collapsed
+      !list_arrays_to_be_collapsed
   in
   list_arrays_to_be_collapsed := []; res
 

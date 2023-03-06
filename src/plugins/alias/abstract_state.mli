@@ -34,7 +34,7 @@ module LSet = Lval.Set
 
 module type S =
 sig
-  
+
 end
 
 (** Type denothing an abstract state of the analysis. It is a graph containing

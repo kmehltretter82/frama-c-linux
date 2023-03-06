@@ -4,18 +4,15 @@
   <list of may-alias>
   {a; b; } are aliased
   {c; d; } are aliased
-  collapsed arrays: {  }
   <end of list>
 [alias] Functions done
 Before statement return __retres; :
  <list of may-alias>
 {x; y; tmp; } are aliased
-collapsed arrays: {  }
 <end of list>
 
 Before statement int *tmp = x; :
  <list of may-alias>
-collapsed arrays: {  }
 <end of list>
 
 Before statement while (1) {
@@ -25,14 +22,12 @@ Before statement while (1) {
                  } :
  <list of may-alias>
 {x; tmp; } are aliased
-collapsed arrays: {  }
 <end of list>
 
 Before statement return __retres; :
  <list of may-alias>
 {a; b; } are aliased
 {c; d; } are aliased
-collapsed arrays: {  }
 <end of list>
 
 Before statement x = y;
@@ -40,69 +35,57 @@ Before statement x = y;
                  break; :
  <list of may-alias>
 {x; tmp; } are aliased
-collapsed arrays: {  }
 <end of list>
 
 Before statement x = y; :
  <list of may-alias>
 {x; tmp; } are aliased
-collapsed arrays: {  }
 <end of list>
 
 Before statement y = tmp; :
  <list of may-alias>
 {x; y; tmp; } are aliased
-collapsed arrays: {  }
 <end of list>
 
 Before statement break; :
  <list of may-alias>
 {x; y; tmp; } are aliased
-collapsed arrays: {  }
 <end of list>
 
 Before statement __retres = (void *)0; :
  <list of may-alias>
 {x; y; tmp; } are aliased
-collapsed arrays: {  }
 <end of list>
 
 Before statement int *a = (int *)0; :
  <list of may-alias>
-collapsed arrays: {  }
 <end of list>
 
 Before statement int *b = (int *)0; :
  <list of may-alias>
-collapsed arrays: {  }
 <end of list>
 
 Before statement int *c = (int *)0; :
  <list of may-alias>
-collapsed arrays: {  }
 <end of list>
 
 Before statement int *d = (int *)0; :
  <list of may-alias>
-collapsed arrays: {  }
 <end of list>
 
 Before statement f1(a,b); :
  <list of may-alias>
-collapsed arrays: {  }
 <end of list>
 
 Before statement f1(c,d); :
  <list of may-alias>
 {a; b; } are aliased
-collapsed arrays: {  }
 <end of list>
 
 Before statement __retres = 0; :
  <list of may-alias>
 {a; b; } are aliased
 {c; d; } are aliased
-collapsed arrays: {  }
 <end of list>
 
 [alias] Analysis complete
