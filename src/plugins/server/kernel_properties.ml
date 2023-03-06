@@ -323,16 +323,6 @@ let is_relevant ip =
 
 let iter f = Property_status.iter (fun ip -> if is_relevant ip then f ip)
 
-let add_update_hook f =
-  Property_status.register_property_add_hook
-    (fun ip -> if is_relevant ip then f ip);
-  Property_status.register_status_update_hook
-    (fun _emitter ip _status -> if is_relevant ip then f ip)
-
-let add_remove_hook f =
-  Property_status.register_property_remove_hook
-    (fun ip -> if is_relevant ip then f ip)
-
 let array =
   States.register_array
     ~package
@@ -341,10 +331,21 @@ let array =
     ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
     ~keyType:Kernel_ast.Marker.jproperty
     ~iter
-    ~add_update_hook
-    ~add_remove_hook
     model
 
 let reload () = States.reload array
+
+(* Reloads the whole array when a property is added, removed or when its status
+   changes. As a property can be a logical consequence of other properties, a
+   property change can impact the logical status of any other property: a full
+   reload is needed. *)
+let () =
+  Property_status.register_property_add_hook
+    (fun _ip -> reload ());
+  Property_status.register_status_update_hook
+    (fun _emitter _ip _status -> reload ());
+  Property_status.register_property_remove_hook
+    (fun _ip -> reload ())
+
 
 (* -------------------------------------------------------------------------- *)
