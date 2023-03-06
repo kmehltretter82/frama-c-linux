@@ -582,12 +582,12 @@ struct
             pp_by_kf fmt ips_all_kfs
       | _ -> ()
 
-    method! pp_while fmt cond =
+    method! pp_while_head fmt cond =
       let kf = Option.get self#current_kf in
       let stmt = Option.get self#current_stmt in
       Format.fprintf fmt "@{<%s>%a@}"
         (Tag.create (PStmtStart(kf,stmt)))
-        super#pp_while cond
+        super#pp_while_head cond
 
     method! next_stmt next fmt current =
       if Tag.unfold current

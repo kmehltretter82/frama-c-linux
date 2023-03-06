@@ -312,11 +312,11 @@ class type extensible_printer_type = object
   (** {3 Modifying pretty-printer behavior}                              *)
   (* ******************************************************************* *)
 
-  method pp_while: Format.formatter -> exp -> unit
-  (** Prints the recovered [while (cond)] exit condition of a loop. The current
-      stmt is expected to be positionned to the original AST statement
-      containing the breaking condition (which is not printed at all). *)
-
+  method pp_while_head: Format.formatter -> exp -> unit
+  (** Prints the recovered [while (cond)] exit condition of a loop. Note: this
+      method will be called in a context where 'current_stmt' is tied to the
+      original AST conditional statement that exits the loop, as expected. *)
+    
   method pp_keyword: Format.formatter -> string -> unit
   (** All C99 keywords except types "char", "int", "long", "signed",
       "short", "unsigned", "void" and "_XXX" (like "_Bool") **)
