@@ -71,17 +71,17 @@ FC_CL_MSG_FUTURE="Open Source Release <next-release>"
 FC_CL_MSG_NEXT="Open Source Release $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)"
 FC_CL_LIN="###############################################################################"
 
-sed -i -z "s/\($FC_CL_LIN\n$FC_CL_MSG_FUTURE\n\)/\1$FC_CL_LIN\n\n$FC_CL_LIN\n$FC_CL_MSG_NEXT\n/g" Changelog
+sed -i "s/\($FC_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$FC_CL_MSG_NEXT/g" Changelog
 
 EA_CL_MSG_FUTURE="Plugin E-ACSL <next-release>"
 EA_CL_MSG_NEXT="Plugin E-ACSL $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)"
 
-sed -i -z "s/\($FC_CL_LIN\n$EA_CL_MSG_FUTURE\n\)/\1$FC_CL_LIN\n\n$FC_CL_LIN\n$EA_CL_MSG_NEXT\n/g" src/plugins/e-acsl/doc/Changelog
+sed -i "s/\($EA_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$EA_CL_MSG_NEXT/g" src/plugins/e-acsl/doc/Changelog
 
 WP_CL_MSG_FUTURE="Plugin WP <next-release>"
 WP_CL_MSG_NEXT="Plugin WP $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)"
 
-sed -i -z "s/\($FC_CL_LIN\n$WP_CL_MSG_FUTURE\n\)/\1$FC_CL_LIN\n\n$FC_CL_LIN\n$WP_CL_MSG_NEXT\n/g" src/plugins/wp/Changelog
+sed -i "s/\($WP_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$WP_CL_MSG_NEXT/g" src/plugins/wp/Changelog
 
 # API doc
 find src -name '*.ml*' -exec sed -i -e "s/Frama-C+dev/${NEXT}-${NEXT_CODENAME}/gI" '{}' ';'
