@@ -648,13 +648,12 @@ class pane (gprovers : GuiConfig.provers) =
       | Proof proof ->
         Wutil.later
           begin fun () ->
-            let title = tactic#title in
             try
-              let tactic = ProofScript.jtactic ~title tactic selection in
+              let tactic = ProofScript.jtactic tactic selection in
               let anchor = ProofEngine.anchor proof () in
               self#fork proof (ProofEngine.fork proof ~anchor tactic process)
             with Exit | Not_found | Invalid_argument _ ->
-              text#printf "Application of tactic '%s' failed." title
+              text#printf "Application of tactic '%s' failed." tactic#title
           end
 
     method private search proof = function

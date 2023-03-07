@@ -283,9 +283,9 @@ type jtactic = {
   select : Json.t ;
 }
 
-let jtactic ~title (tac : tactical) (sel : selection) =
+let jtactic (tac : tactical) (sel : selection) =
   {
-    header = title ;
+    header = tac#title ;
     tactic = tac#id ;
     params = json_of_parameters tac ;
     select = json_of_selection sel ;

@@ -54,7 +54,7 @@ val has_proof : jscript -> bool
 val decode : Json.t -> jscript
 val encode : jscript -> Json.t
 
-val jtactic : title:string -> tactical -> selection -> jtactic
+val jtactic : tactical -> selection -> jtactic
 val configure : jtactic -> sequent -> (tactical * selection) option
 
 (** Json Codecs *)
