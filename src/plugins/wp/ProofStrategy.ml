@@ -163,8 +163,8 @@ let rec parse_tactic ctxt penv ~tactic ~select ~lookup ~params ~children ~defaul
       let strategy = parse_name ctxt ~kind:"Strategy" strategy in
       let children = (prefix,strategy)::children in
       cc ~select ~lookup ~params ~children ~default ps
-    | PLapp("\\default",[],[strategy]) ->
-      if default <> None then ctxt.error loc "Duplicate \\default parameter" ;
+    | PLapp("\\children",[],[strategy]) ->
+      if default <> None then ctxt.error loc "Duplicate \\children parameter" ;
       let default = Some (parse_name ctxt ~kind:"Strategy" strategy) in
       cc ~select ~lookup ~params ~children ~default ps
     | _ -> ctxt.error loc "Tactic parameter expected"
@@ -241,12 +241,18 @@ let rec parse_hints ctxt names p =
   | PLvar value | PLapp(value,[],[]) -> names, { loc ; value }
   | _ -> ctxt.error loc "Invalid proof specification"
 
-let parse_proofs ~kind ~mem ~add ctxt _loc ps =
+let parse_proofs ~kind ~mem ~add ?check ctxt _loc ps =
   List.iter
     (fun p ->
        let names, st = parse_hints ctxt [] p in
        List.iter
          (fun name ->
+            Option.iter
+              begin fun f ->
+                if not (f name.value) then
+                  ctxt.error name.loc
+                    "Invalid %s name '%s'" kind name.value
+              end check ;
             if mem name.value then
               ctxt.error name.loc
                 "Duplicate proof for %s '%s'" kind name.value ;
@@ -267,6 +273,7 @@ let () = Acsl_extension.register_global "prove_lemma" (
 let () = Acsl_extension.register_global "prove_function" (
     parse_proofs
       ~kind:"function"
+      ~check:Globals.Functions.mem_name
       ~mem:FunctionProofs.mem
       ~add:FunctionProofs.add
   ) false
