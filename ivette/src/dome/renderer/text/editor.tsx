@@ -31,7 +31,8 @@ import { Decoration, DecorationSet } from '@codemirror/view';
 import { DOMEventMap as EventMap } from '@codemirror/view';
 import { GutterMarker, gutter } from '@codemirror/view';
 import { Tooltip, showTooltip } from '@codemirror/view';
-import { lineNumbers } from '@codemirror/view';
+import { lineNumbers, keymap } from '@codemirror/view';
+import { searchKeymap, search, openSearchPanel } from '@codemirror/search';
 
 import { parser } from '@lezer/cpp';
 import { tags } from '@lezer/highlight';
@@ -327,6 +328,12 @@ export const LanguageHighlighter: Extension =
 // -----------------------------------------------------------------------------
 //  Standard extensions and commands
 // -----------------------------------------------------------------------------
+
+export const ReadOnly = EditorState.readOnly.of(true);
+
+const SearchAlternativeKey = [{ key: 'Alt-f', run: openSearchPanel }];
+const SearchKeymap = searchKeymap.slice(1).concat(SearchAlternativeKey);
+export const Search : Extension = [ search(), keymap.of(SearchKeymap) ];
 
 export const Selection = createSelectionField();
 function createSelectionField(): Field<EditorSelection> {

@@ -1074,7 +1074,7 @@ let newAlphaName
         end
         else raise Not_found
       in
-      if not (Kernel.C11.get () && kind = "type") then
+      if kind <> "type" then
         (* in C11, typedefs can be redefined under some conditions (which are
            checked in doTypedef); this test catches other kinds of errors, such
            as redefined enumeration constants *)
@@ -5594,11 +5594,8 @@ and makeCompType ghost (isstruct: bool)
         if n = missingFieldName then begin
           match unrollType ftype with
           | TComp _ -> begin
-              if not (Kernel.C11.get ()) then
-                Kernel.warning ~once:true ~current:true
-                  "unnamed fields are a C11 extension \
-                   (use %s to avoid this warning)"
-                  Kernel.C11.name;
+              Kernel.warning ~wkey:Kernel.wkey_c11 ~once:true ~current:true
+                "unnamed fields are a C11 extension";
               incr anonCompFieldNameId;
               anonCompFieldName ^ (string_of_int !anonCompFieldNameId)
             end
@@ -9885,10 +9882,10 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                  Previous declaration was at %a"
                 n Cil_datatype.Location.pretty oldloc
             in
-            let error_c11_redefinition () =
-              Kernel.error ~current:true
-                "redefinition of type '%s' in the same scope is only allowed in C11 \
-                 (option %s).@ Previous declaration was at %a" n Kernel.C11.name
+            let warn_c11_redefinition () =
+              Kernel.warning ~wkey:Kernel.wkey_c11 ~current:true
+                "redefinition of type '%s' in the same scope is only allowed \
+                 in C11.@ Previous declaration was at %a" n
                 Cil_datatype.Location.pretty oldloc
             in
             (* Tested with GCC+Clang: redefinition of compatible types in same scope:
@@ -9915,7 +9912,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                         error_conflicting_types ()
                       else
                         (* redeclaration in same scope valid only in C11 *)
-                      if not (Kernel.C11.get ()) then error_c11_redefinition ()
+                        warn_c11_redefinition ()
                     | _ -> (* because of the compatibility test, this should not happen *)
                       Kernel.fatal ~current:true "typeinfo.ttype (%a) should be TComp"
                         Cil_datatype.Typ.pretty typeinfo.ttype
@@ -9923,7 +9920,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                 | TEnum _ -> (* GCC/Clang: "conflicting types" *)
                   error_conflicting_types ()
                 | _ -> (* redeclaration in same scope valid only in C11 *)
-                  if not (Kernel.C11.get ()) then error_c11_redefinition ()
+                  warn_c11_redefinition ()
               end
           end
         else if declared_in_current_scope ~ghost n then

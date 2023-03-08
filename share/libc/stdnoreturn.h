@@ -24,8 +24,5 @@
 
 // 'noreturn' is an attribute in C++
 #ifndef __cpluscplus
-// Note that Frama-C still requires the '-c11' command-line option to parse
-// the _Noreturn keyword. Mere inclusion of this header without the option
-// will not work.
 #define noreturn _Noreturn
 #endif

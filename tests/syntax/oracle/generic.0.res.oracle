@@ -1,13 +1,6 @@
 [kernel] Parsing generic.c (with preprocessing)
-[kernel:parser:conditional-feature] Warning: 
-  _Generic is a C11 keyword, use -c11 option to enable it
-[kernel] generic.c:67: 
-  syntax error:
-  Location: line 67, between columns 28 and 32, before or at token: char
-  65      int a = _Generic("abc", char const *: 0);
-  66    #endif
-  67      int ok1 = _Generic("abc", char*: 0);
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  68      int ok2 = _Generic(1.0, float: 1, double: 0);
-  69      int ok3 = _Generic(1L, short: 1, unsigned int: 2, int: 3, long: 0, unsigned long: 5);
+[kernel:c11] Warning: _Generic is a C11 keyword
+[kernel] User Error: warning c11 treated as fatal error.
+[kernel] User Error: stopping on file "generic.c" that has errors. Add '-kernel-msg-key pp'
+  for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

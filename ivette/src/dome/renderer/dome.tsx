@@ -600,15 +600,13 @@ export function usePromise<A>(job: Promise<A>): PromiseHook<A> {
   const [error, setError] = React.useState<Error | undefined>();
   const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
-    let cancel = false;
-    const doCancel = (): boolean => {
-      if (!cancel) setLoading(false);
-      return cancel;
-    };
-    const onResult = (x: A): void => { if (!doCancel()) setResult(x); };
-    const onError = (e: Error): void => { if (!doCancel()) setError(e); };
+    let c = false;
+    const set = (x?: A, e?: Error): void => { setResult(x); setError(e); };
+    const doCancel = (): boolean => { if (!c) setLoading(false); return c; };
+    const onResult = (x: A): void => { if (!doCancel()) set(x, undefined);};
+    const onError = (e: Error): void => { if (!doCancel()) set(undefined, e); };
     job.then(onResult, onError);
-    return () => { cancel = true; };
+    return () => { c = true; };
   }, [job]);
   return { result, error, loading };
 }

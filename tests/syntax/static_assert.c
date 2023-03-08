@@ -1,7 +1,7 @@
 /* run.config
-   STDOPT: #"-c11"
+   STDOPT: #""
    EXIT: 1
-   STDOPT: #"-c11 -cpp-extra-args=-DFAIL"
+   STDOPT: #"-cpp-extra-args=-DFAIL"
 */
 
 _Static_assert(1, "string");

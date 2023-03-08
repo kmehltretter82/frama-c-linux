@@ -27,18 +27,23 @@ open Cil_types
 (** The kind of object that can be selected in the source viewer. *)
 type localizable =
   | PStmt of (kernel_function * stmt)
+  (** Full statement (with attributes, annotations, etc.) *)
   | PStmtStart of (kernel_function * stmt)
+  (** Naked statement (only skind, without attributes, annotations, etc.) *)
   | PLval of (kernel_function option * kinstr * lval)
+  (** L-Values *)
   | PExp of (kernel_function option * kinstr * exp)
+  (** Non l-value expressions *)
   | PTermLval of (kernel_function option * kinstr * Property.t * term_lval)
+  (** Term l-values inside properties *)
   | PVDecl of (kernel_function option * kinstr * varinfo)
   (** Declaration and definition of variables and function. Check the type
       of the varinfo to distinguish between the various possibilities.
       If the varinfo is a global or a local, the kernel_function is the
       one in which the variable is declared. The [kinstr] argument is given
       for local variables with an explicit initializer. *)
-  | PGlobal of global (** all globals but variable declarations and function
-                          definitions. *)
+  | PGlobal of global
+  (** Global definitions except global variables and functions. *)
   | PIP of Property.t
   | PType of typ
 

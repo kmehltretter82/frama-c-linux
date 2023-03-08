@@ -423,7 +423,7 @@ Options:
   -E         pass additional arguments to the Frama-C preprocessor
              (e.g. -E \"-Iinclude -DMACRO=1\")
   -F         pass additional options to the Frama-C command line
-             (e.g. -F -c11)
+             (e.g. -F -unspecified-access)
   -o <file>  output the generated code to <file> [a.out.frama.c]
   -O <file>  output the generated executables to <file> [a.out, a.out.e-acsl]
   -M         maximize memory-related instrumentation

@@ -1,6 +1,6 @@
 /* run.config
-STDOPT: #"-c11"
-STDOPT: #"-no-frama-c-stdlib -no-pp-annot -c11"
+STDOPT:
+STDOPT: #"-no-frama-c-stdlib -no-pp-annot"
 */
 
 /* The defines and typedefs below avoid issues with Musl: without them,

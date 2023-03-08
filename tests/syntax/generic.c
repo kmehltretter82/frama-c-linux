@@ -1,16 +1,16 @@
 /* run.config
    EXIT: 1
-   STDOPT:
-   STDOPT: #"-c11 -cpp-extra-args=-DNONE"
-   STDOPT: #"-c11 -cpp-extra-args=-DTOO_MANY_DEFAULTS"
-   STDOPT: #"-c11 -cpp-extra-args=-DTOO_MANY_COMPATIBLE"
-   STDOPT: #"-c11 -cpp-extra-args=-DTOO_MANY_COMPATIBLE2"
-   STDOPT: #"-c11 -cpp-extra-args=-DTOO_MANY_COMPATIBLE3"
-   STDOPT: #"-c11 -cpp-extra-args=-DINCOMPLETE_TYPE"
-   STDOPT: #"-c11 -cpp-extra-args=-DINCOMPATIBLE_QUALIFIED_TYPE"
-   STDOPT: #"-c11 -cpp-extra-args=-DFUNCTION_TYPE"
+   STDOPT: #"-kernel-warn-key=c11=abort"
+   STDOPT: #"-cpp-extra-args=-DNONE"
+   STDOPT: #"-cpp-extra-args=-DTOO_MANY_DEFAULTS"
+   STDOPT: #"-cpp-extra-args=-DTOO_MANY_COMPATIBLE"
+   STDOPT: #"-cpp-extra-args=-DTOO_MANY_COMPATIBLE2"
+   STDOPT: #"-cpp-extra-args=-DTOO_MANY_COMPATIBLE3"
+   STDOPT: #"-cpp-extra-args=-DINCOMPLETE_TYPE"
+   STDOPT: #"-cpp-extra-args=-DINCOMPATIBLE_QUALIFIED_TYPE"
+   STDOPT: #"-cpp-extra-args=-DFUNCTION_TYPE"
    EXIT: 0
-   STDOPT: #"-c11"
+   STDOPT:
 */
 
 // Some tests inspired by llvm/clang/test/Sema/generic-selection.c

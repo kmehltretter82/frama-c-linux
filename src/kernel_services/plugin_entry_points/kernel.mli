@@ -211,6 +211,9 @@ val wkey_unnamed_typedef: warn_category
 val wkey_file_not_found: warn_category
 (** Warnings related to missing files during preprocessing/parsing. *)
 
+val wkey_c11: warn_category
+(** Warnings related to usage of C11-specific constructions. *)
+
 (* ************************************************************************* *)
 (** {2 Functors for late option registration}                                *)
 (** Kernel_function-related options cannot be registered in this module:

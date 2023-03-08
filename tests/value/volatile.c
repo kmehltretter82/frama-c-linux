@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-no-deps -no-input -no-out -eva-initialization-padding-globals maybe -c11"
+   STDOPT: +"-no-deps -no-input -no-out -eva-initialization-padding-globals maybe"
 */
 
 int volatile G = 1;

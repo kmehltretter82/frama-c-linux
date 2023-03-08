@@ -60,6 +60,7 @@
     "codemirror": "^5.65.2",
     "@codemirror/view": "6.2.3",
     "@codemirror/state": "6.1.1",
+    "@codemirror/search": "6.2.3",
     "@codemirror/language": "6.2.1",
     "@codemirror/commands": "6.1.0",
     "@codemirror/lang-cpp": "6.0.1",
