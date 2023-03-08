@@ -189,7 +189,7 @@ function createContextMenu(): Editor.Extension {
       if (file === '') return;
       const label = 'Open file in an external editor';
       const pos = getCursorPosition(view);
-      Dome.popupMenu([{ label, onClick: () => edit(file, pos, command) }]);
+      Dome.popupMenu([ { label, onClick: () => edit(file, pos, command) } ]);
     },
   });
 }

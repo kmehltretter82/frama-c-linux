@@ -26,8 +26,8 @@
 (setq company-tooltip-align-annotations t)
 
 ;; formats the buffer before saving
-;; (strongly recommanded to please es-linter)
-(add-hook 'before-save-hook 'tide-format-before-save)
+;; (not recommanded because of conflicts with other editors)
+;; (add-hook 'before-save-hook 'tide-format-before-save)
 
 ;; Setup Tide for typescript
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
