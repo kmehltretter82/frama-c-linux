@@ -865,9 +865,41 @@ struct
     let idempotent = true in
     let decide _ v1 v2 = Some (Deps.join v1 v2) in
     inter ~cache ~symmetric ~idempotent ~decide
-  
+
   let find_opt (v: Variable.t) (m: t) =
     try Some (find v m) with Not_found -> None
+
+  module Tree =
+  struct
+    type 'a tree = Empty | Leaf of 'a | Node of 'a tree * 'a tree
+
+    let rec fold f t acc =
+      match t with
+      | Empty -> acc
+      | Leaf v -> f v acc
+      | Node (t1, t2) -> fold f t2 (fold f t1 acc)
+  end
+
+  let keys =
+    let open Tree in
+    let cache_name = cache_prefix ^ ".keys" in
+    let temporary = false in
+    let f k _ = Leaf k in
+    let joiner t1 t2 = Node (t1, t2) in
+    let empty = Empty in
+    cached_fold ~cache_name ~temporary ~f ~joiner ~empty
+
+  let diff_keys =
+    let open Tree in
+    let cache_name = cache_prefix ^ ".diff_keys" in
+    let cache = Hptmap_sig.PersistentCache cache_name in
+    let empty_left _ = Empty in
+    let empty_right t = keys t in
+    let both _ _ _ = Empty in
+    let join t1 t2 = Node (t1, t2) in
+    let empty = Empty in
+    fold2_join_heterogeneous
+      ~cache ~empty_left ~empty_right ~both ~join ~empty
 end
 
 module BaseToVariables = struct
@@ -945,15 +977,6 @@ module Deps = struct
 
   let empty = VariableToDeps.empty, BaseToVariables.empty
 
-  let join (m1, i1: t) (m2, i2: t) =
-    VariableToDeps.join m1 m2, BaseToVariables.join i1 i2
-
-  let narrow (m1, i1: t) (m2, i2: t) =
-    VariableToDeps.narrow m1 m2, BaseToVariables.narrow i1 i2
-
-  let is_included (m1, _: t) (m2, _: t) =
-    VariableToDeps.is_included m1 m2
-
   let intersects_base (_m, i: t) base =
     let data, indirect = BaseToVariables.find base i in
     VSet.union data indirect |> VSet.elements
@@ -963,9 +986,13 @@ module Deps = struct
 
   let intersects_zone (m, i: t) zone =
     let filter ~direct zone v =
-      let deps = VariableToDeps.find v m in
-      let v_zone = if direct then deps.data else deps.indirect in
-      Locations.Zone.intersects v_zone zone
+      try
+        let deps = VariableToDeps.find v m in
+        let v_zone = if direct then deps.data else deps.indirect in
+        Locations.Zone.intersects v_zone zone
+      with Not_found ->
+        Self.abort "can not find %a for intersection with %a in@.%a"
+          Variable.pretty v Locations.Zone.pretty zone pretty (m,i)
     in
     let get_at_base b intervals (data_acc, indirect_acc) =
       let data, indirect = BaseToVariables.find b i in
@@ -977,22 +1004,24 @@ module Deps = struct
       Locations.Zone.fold_topset_ok get_at_base zone (VSet.empty, VSet.empty)
     in
     VSet.union data indirect |> VSet.elements
-  
-  let add var deps (m, i: t) =
+
+  let add var deps (m, i: t): t =
     let m = VariableToDeps.add var deps m
-    and i = i |>
+    and i =
+      i |>
       Locations.Zone.fold_topset_ok
         (fun b _ -> BaseToVariables.add_direct var b) deps.data |>
       Locations.Zone.fold_topset_ok
         (fun b _ -> BaseToVariables.add_indirect var b) deps.indirect
     in (m,i)
 
-  let remove var ((m, i) as d: t) =
+  let remove (var: Variable.t) ((m, i) as d: t): t =
     match VariableToDeps.find_opt var m with
     | None -> d (* The variable was not registered *)
     | Some deps ->
       let m = VariableToDeps.remove var m
-      and i = i |> 
+      and i =
+        i |>
         Locations.Zone.fold_topset_ok
           (fun b _ -> BaseToVariables.remove_direct var b) deps.data |>
         Locations.Zone.fold_topset_ok
@@ -1006,6 +1035,22 @@ module Deps = struct
     (get_var_deps d var).data |>
     Locations.Zone.get_bases |>
     Base.SetLattice.project
+
+  let diff_keys (m1, _: t) (m2, _: t) =
+    VariableToDeps.diff_keys m1 m2
+
+  let join (d1: t) (d2: t) =
+    let fold = VariableToDeps.Tree.fold in
+    let (m1, i1) = fold remove (diff_keys d1 d2) d1
+    and (m2, i2) = fold remove (diff_keys d2 d1) d2 in
+    VariableToDeps.join m1 m2, BaseToVariables.join i1 i2
+
+  let narrow (m1, i1: t) (m2, i2: t) =
+    VariableToDeps.narrow m1 m2, BaseToVariables.narrow i1 i2
+
+  let is_included (m1, _: t) (m2, _: t) =
+    VariableToDeps.is_included m1 m2
+
 end
 
 
@@ -1458,7 +1503,7 @@ module Domain = struct
     | `Bottom -> `Top (* should not happen *)
     | `Value (Cvalue.V.Top _) -> `Top
     | `Value cvalue -> `Value cvalue
-      
+
   let evaluator_from_valuation valuation =
     let eval_exp expr =
       match valuation.Abstract_domain.find expr with
