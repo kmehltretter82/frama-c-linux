@@ -266,7 +266,18 @@ let find_compatible_callstacks stmt callstack =
 
 let add_or_update_node context callstack node_kind =
   let node_locality = build_node_locality callstack node_kind in
-  Context.add_node context ~node_kind ~node_locality
+  let node = Context.add_node context ~node_kind ~node_locality in
+  begin match node_kind with (* Some nodes don't have read or write deps *)
+    | Alarm _ ->
+      node.node_reads_computation <- Done
+    | Unknown _ | Const _ | String _ ->
+      node.node_writes_computation <- Done
+    | Error _ ->
+      node.node_reads_computation <- Done;
+      node.node_writes_computation <- Done
+    | _ -> ()
+  end;
+  node
 
 let build_node context callstack lval kinstr =
   let is_folded_base = Context.is_folded context in
