@@ -108,8 +108,9 @@ type 'a server = {
   q_in : 'a pending Queue.t ; (* queue of pending `EXEC and `GET jobs *)
   q_out : 'a response Queue.t ; (* queue of pending responses *)
   mutable daemon : Db.daemon option ; (* Db.yield daemon *)
-  mutable s_active : Signals.t ; (* signals the client is listening to *)
-  mutable s_signal : Signals.t ; (* emitted signals since last synchro *)
+  mutable s_listen : Signals.t ; (* signals the client is listening to *)
+  mutable s_emitted : Signals.t ; (* emitted signals enqueued *)
+  mutable s_pending : Signals.t ; (* emitted signals not enqueued yet *)
   mutable shutdown : bool ; (* server has been asked to shut down *)
   mutable running : 'a running ; (* server running state *)
   mutable cmdline : bool option ; (* cmdline signal management *)
@@ -254,12 +255,18 @@ let process_request (server : 'a server) (request : 'a request) : unit =
     end
   | `SigOn sg ->
     begin
-      server.s_active <- Signals.add sg server.s_active ;
+      server.s_listen <- Signals.add sg server.s_listen ;
+      if Signals.mem sg server.s_pending then
+        begin
+          server.s_emitted <- Signals.add sg server.s_emitted ;
+          server.s_pending <- Signals.remove sg server.s_pending ;
+          Queue.push (`Signal sg) server.q_out ;
+        end ;
       notify sg true ;
     end
   | `SigOff sg ->
     begin
-      server.s_active <- Signals.remove sg server.s_active ;
+      server.s_listen <- Signals.remove sg server.s_listen ;
       notify sg false ;
     end
   | `Kill id ->
@@ -307,7 +314,7 @@ let communicate server =
     pool := List.rev !pool ;
     Queue.clear server.q_out ;
     server.cmdline <- None ;
-    server.s_signal <- Signals.empty ;
+    server.s_emitted <- Signals.empty ;
     Senv.debug ~level:2 "response(s) callback" ;
     if Senv.debug_atleast 2 then
       List.iter (Senv.debug "%a" (pp_response server.pretty)) !pool ;
@@ -324,11 +331,16 @@ let do_yield server () =
   ignore ( communicate server )
 
 let do_signal server s =
-  if Signals.mem s server.s_active && not (Signals.mem s server.s_signal) then
+  if Signals.mem s server.s_listen then
     begin
-      server.s_signal <- Signals.add s server.s_signal ;
-      Queue.push (`Signal s) server.q_out ;
+      if not (Signals.mem s server.s_emitted) then
+        begin
+          server.s_emitted <- Signals.add s server.s_emitted ;
+          Queue.push (`Signal s) server.q_out ;
+        end
     end
+  else
+    server.s_pending <- Signals.add s server.s_pending
 
 (* -------------------------------------------------------------------------- *)
 (* --- One Step Process                                                   --- *)
@@ -380,8 +392,9 @@ let create ~pretty ?(equal=(=)) ~fetch () =
     fetch ; polling ; equal ; pretty ;
     q_in = Queue.create () ;
     q_out = Queue.create () ;
-    s_active = Signals.empty ;
-    s_signal = Signals.empty ;
+    s_listen = Signals.empty ;
+    s_emitted = Signals.empty ;
+    s_pending = Signals.empty ;
     daemon = None ;
     running = Idle ;
     cmdline = None ;

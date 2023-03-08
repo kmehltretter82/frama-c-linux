@@ -32,10 +32,15 @@ export interface CoverageProps {
   coverage: Coverage;
 }
 
-
 export function percent(coverage: Coverage): string {
-  const q = coverage.reachable / (coverage.reachable + coverage.dead);
-  return `${(q * 100).toFixed(1)}%`;
+  const n = coverage.reachable + coverage.dead;
+  if (n > 0) {
+    const r = coverage.reachable;
+    if (r > 0) {
+      const q = r / n;
+      return `${(q * 100).toFixed(1)}%`;
+    } else return '0%';
+  } else return 'n/a';
 }
 
 export default function CoverageMeter(props: CoverageProps): JSX.Element {

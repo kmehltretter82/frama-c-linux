@@ -36,11 +36,8 @@ import { Order } from 'dome/data/compare';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
-import { getCurrent, setCurrent } from 'frama-c/kernel/api/project';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from './server';
-
-const CurrentProject = new GlobalState<string>("");
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -49,61 +46,10 @@ const CurrentProject = new GlobalState<string>("");
 const D = new Dome.Debug('States');
 
 // --------------------------------------------------------------------------
-// --- Synchronized Current Project
-// --------------------------------------------------------------------------
-
-Server.onReady(async () => {
-  try {
-    CurrentProject.setValue("");
-    const { id } = await Server.send(getCurrent, null);
-    CurrentProject.setValue(id);
-  } catch (error) {
-    D.error(`Fail to retrieve the current project. ${error}`);
-  }
-});
-
-Server.onShutdown(() => {
-  CurrentProject.setValue("");
-});
-
-// --------------------------------------------------------------------------
-// --- Project API
-// --------------------------------------------------------------------------
-
-/**
- * Current Project (Custom React Hook).
- * @return The current project.
- */
-export function useProject(): string {
-  const [s] = useGlobalState(CurrentProject);
-  return s;
-}
-
-/**
- * Update Current Project.
- *
- * Make all states switching to their projectified value.
- *
- * Emits `PROJECT`.
- * @param project The project identifier.
- */
-export async function setProject(project: string): Promise<void> {
-  if (Server.isRunning()) {
-    try {
-      await Server.send(setCurrent, project);
-      const { id } = await Server.send(getCurrent, null);
-      CurrentProject.setValue(id);
-    } catch (error) {
-      D.error(`Fail to set the current project. ${error}`);
-    }
-  }
-}
-
-// --------------------------------------------------------------------------
 // --- Cached GET Requests
 // --------------------------------------------------------------------------
 
-/** Options to tweak the behavior of `useReques()`. Null values means
+/** Options to tweak the behavior of `useRequest()`. Null values means
     keeping the last result. */
 export interface UseRequestOptions<A> {
   /** Returned value in case where the server goes offline. */
@@ -131,39 +77,47 @@ export function useRequest<In, Out>(
   params: In | undefined,
   options: UseRequestOptions<Out> = {},
 ): Out | undefined {
-  const state = React.useRef<string>();
-  const project = useProject();
-  const [response, setResponse] =
-    React.useState<Out | undefined>(options.offline ?? undefined);
-  const footprint =
-    project ? JSON.stringify([project, rq.name, params]) : undefined;
-
-  const update = (opt: Out | undefined | null): void => {
+  const initial = options.offline ?? undefined;
+  const [response, setResponse] = React.useState<Out | undefined>(initial);
+  const updateResponse = (opt: Out | undefined | null): void => {
     if (opt !== null) setResponse(opt);
   };
 
+  // Fetch Request
   async function trigger(): Promise<void> {
-    if (project !== "" && rq && params !== undefined) {
+    if (Server.isRunning() && params !== undefined) {
       try {
-        update(options.pending);
+        updateResponse(options.pending);
         const r = await Server.send(rq, params);
-        update(r);
+        updateResponse(r);
       } catch (error) {
         D.error(`Fail in useRequest '${rq.name}'. ${error}`);
-        update(options.onError);
+        updateResponse(options.onError);
       }
     } else {
-      update(options.offline);
+      updateResponse(options.offline);
     }
   }
 
+  // Server & Cache Management
+  Server.useStatus();
+  const cached = React.useRef('');
   React.useEffect(() => {
-    if (state.current !== footprint) {
-      state.current = footprint;
-      trigger();
+    if (Server.isRunning()) {
+      const footprint = JSON.stringify([rq.name, params]);
+      if (cached.current !== footprint) {
+        cached.current = footprint;
+        trigger();
+      }
+    } else {
+      if (cached.current !== '') {
+        cached.current = '';
+        updateResponse(options.offline);
+      }
     }
   });
 
+  // Signal Management
   const signals = rq.signals.concat(options.onSignals ?? []);
   React.useEffect(() => {
     signals.forEach((s) => Server.onSignal(s, trigger));
@@ -252,17 +206,14 @@ class SyncState<A> extends GlobalState<A | undefined> {
   constructor(h: Handler<A>) {
     super(undefined);
     this.handler = h;
-    this.load = this.load.bind(this);
     this.fetch = this.fetch.bind(this);
-    this.offline = this.offline.bind(this);
-    Server.onReady(this.load);
-    Server.onShutdown(this.offline);
   }
 
   signal(): Server.Signal { return this.handler.signal; }
 
-  load(): void {
-    if (this.status === SyncStatus.OffLine) this.fetch();
+  online(): void {
+    if (Server.isRunning() && this.status === SyncStatus.OffLine)
+      this.fetch();
   }
 
   offline(): void {
@@ -295,22 +246,19 @@ class SyncState<A> extends GlobalState<A | undefined> {
 
 const syncStates = new Map<string, SyncState<unknown>>();
 
-// Remark: use current project state
-
-function lookupSyncState<A>(
-  currentProject: string,
-  h: Handler<A>
-): SyncState<A> {
-  const id = `${currentProject}@${h.name}`;
-  let s = syncStates.get(id) as SyncState<A> | undefined;
+function lookupSyncState<A>(h: Handler<A>): SyncState<A> {
+  let s = syncStates.get(h.name) as SyncState<A> | undefined;
   if (!s) {
     s = new SyncState(h);
-    syncStates.set(id, s);
+    syncStates.set(h.name, s);
   }
   return s;
 }
 
-Server.onShutdown(() => syncStates.clear());
+Server.onShutdown(() => {
+  syncStates.forEach((st) => st.offline());
+  syncStates.clear();
+});
 
 // --------------------------------------------------------------------------
 // --- Synchronized State Hooks
@@ -321,20 +269,18 @@ export function useSyncState<A>(
   state: State<A>,
 ): [A | undefined, (value: A) => void] {
   Server.useStatus();
-  const pr = useProject();
-  const st = lookupSyncState(pr, state);
+  const st = lookupSyncState(state);
   Server.useSignal(st.signal(), st.fetch);
-  st.load();
+  st.online();
   return useGlobalState(st);
 }
 
 /** Synchronization with a (projectified) server value. */
 export function useSyncValue<A>(value: Value<A>): A | undefined {
   Server.useStatus();
-  const pr = useProject();
-  const st = lookupSyncState(pr, value);
+  const st = lookupSyncState(value);
   Server.useSignal(st.signal(), st.fetch);
-  st.load();
+  st.online();
   const [v] = useGlobalState(st);
   return v;
 }
@@ -357,21 +303,20 @@ class SyncArray<K, A> {
     this.model.setNaturalOrder(h.order);
     this.fetch = this.fetch.bind(this);
     this.reload = this.reload.bind(this);
-    this.update = this.update.bind(this);
   }
 
-  update(): void {
-    if (
-      !this.upToDate &&
-      Server.isRunning()
-    ) this.fetch();
+  online(): void {
+    if (!this.upToDate && Server.isRunning())
+      this.fetch();
+  }
+
+  offline(): void {
+    this.upToDate = false;
+    this.model.clear();
   }
 
   async fetch(): Promise<void> {
-    if (
-      this.fetching ||
-      !Server.isRunning()
-    ) return;
+    if (this.fetching || !Server.isRunning()) return;
     try {
       this.fetching = true;
       let pending;
@@ -425,20 +370,19 @@ const syncArrays = new Map<string, SyncArray<unknown, unknown>>();
 
 // Remark: lookup for current project
 
-function currentSyncArray<K, A>(
-  currentProject: string,
-  array: Array<K, A>,
-): SyncArray<K, A> {
-  const id = `${currentProject}@${array.name}`;
-  let st = syncArrays.get(id) as SyncArray<K, A> | undefined;
+function currentSyncArray<K, A>(array: Array<K, A>): SyncArray<K, A> {
+  let st = syncArrays.get(array.name) as SyncArray<K, A> | undefined;
   if (!st) {
     st = new SyncArray(array);
-    syncArrays.set(id, st as SyncArray<unknown, unknown>);
+    syncArrays.set(array.name, st as SyncArray<unknown, unknown>);
   }
   return st;
 }
 
-Server.onShutdown(() => syncArrays.clear());
+Server.onShutdown(() => {
+  syncArrays.forEach((st) => st.offline());
+  syncArrays.clear();
+});
 
 // --------------------------------------------------------------------------
 // --- Synchronized Array Hooks
@@ -446,7 +390,7 @@ Server.onShutdown(() => syncArrays.clear());
 
 /** Force a Synchronized Array to reload. */
 export function reloadArray<K, A>(arr: Array<K, A>): void {
-  currentSyncArray(CurrentProject.getValue(), arr).reload();
+  currentSyncArray(arr).reload();
 }
 
 /**
@@ -463,10 +407,9 @@ export function useSyncArray<K, A>(
   sync = true,
 ): CompactModel<K, A> {
   Server.useStatus();
-  const pr = useProject();
-  const st = currentSyncArray(pr, arr);
+  const st = currentSyncArray(arr);
   Server.useSignal(arr.signal, st.fetch);
-  st.update();
+  st.online();
   useModel(st.model, sync);
   return st.model;
 }
@@ -477,8 +420,7 @@ export function useSyncArray<K, A>(
 export function getSyncArray<K, A>(
   arr: Array<K, A>,
 ): CompactModel<K, A> {
-  const pr = CurrentProject.getValue();
-  const st = currentSyncArray(pr, arr);
+  const st = currentSyncArray(arr);
   return st.model;
 }
 
@@ -492,8 +434,7 @@ export function onSyncArray<K, A>(
   onReload?: () => void,
   onUpdate?: () => void,
 ): Client {
-  const pr = CurrentProject.getValue();
-  const st = currentSyncArray(pr, arr);
+  const st = currentSyncArray(arr);
   return st.model.link(onReload, onUpdate);
 }
 

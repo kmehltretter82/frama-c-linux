@@ -61,6 +61,7 @@ end
 (* --- Project Requests                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
+(*
 module ProjectRequest =
 struct
 
@@ -90,11 +91,13 @@ struct
     | None -> failwith (Printf.sprintf "Request '%s' undefined" request)
 
 end
+*)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Project Requests                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
+(*
 let () = Request.register ~package
     ~kind:`GET ~name:"getCurrent"
     ~descr:(Md.plain "Returns the current project")
@@ -106,6 +109,7 @@ let () = Request.register ~package
     ~descr:(Md.plain "Switches the current project")
     ~input:(module ProjectId) ~output:(module Junit)
     (fun pid -> Project.(set_current (from_unique_name pid)))
+*)
 
 let () = Request.register ~package
     ~kind:`GET ~name:"getList"
@@ -113,6 +117,7 @@ let () = Request.register ~package
     ~input:(module Junit) ~output:(module Jlist(ProjectInfo))
     (fun () -> Project.fold_on_projects (fun ids p -> p :: ids) [])
 
+(*
 let () = Request.register ~package
     ~kind:`GET ~name:"getOn"
     ~descr:(Md.plain "Execute a GET request within the given project")
@@ -130,6 +135,7 @@ let () = Request.register ~package
     ~descr:(Md.plain "Execute an EXEC request within the given project")
     ~input:(module ProjectRequest) ~output:(module Jany)
     (ProjectRequest.process `EXEC)
+*)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Project Management                                                 --- *)
