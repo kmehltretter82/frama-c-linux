@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(**  This is a collection of functions for other files of the plugin. 
+(**  This is a collection of functions for other files of the plugin.
      /!\ Caution when re-using them /!\
 *)
 
@@ -37,14 +37,16 @@ module LMap = Lval.Map
 (** type of the return of the following function *)
 type basic_lval =  BNone | BLval of lval | BAddrOf of lval | BIndex of basic_lval * exp
 
-(** finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). *)
+exception Double_lval of basic_lval * basic_lval
+
+(** finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). Raise Double_lval if two basic lval appear *)
 val find_basic_lval : exp -> basic_lval
 
 (** convert an index basic_lval into a lval *)
 val convert_bindex : basic_lval -> lval
 
 (** returns the list of all possible "prefix" of a lval lv1, i.e. each
-   pair (lv,o) such as AddoffsetLval o lv = lv1 *)
+    pair (lv,o) such as AddoffsetLval o lv = lv1 *)
 val  decompose_lval : lval -> (lval*offset) list
 
 

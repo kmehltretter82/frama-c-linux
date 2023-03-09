@@ -23,7 +23,7 @@
 open Graph
 
 open Cil_types
-    
+
 open Cil_datatype
 
 open Utils
@@ -560,9 +560,9 @@ let rec find_or_create_lval (lv:lval) (x:t) : V.t * t =
       | BIndex _ as e ->
         let lv= convert_bindex e in
         (try (LLMap.find lv x.lmap, x) with  Not_found -> create_vertex lv x)
-      
+
       (* | SizeOf  _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> failwith "Not implemented2 "
-       * 
+       *
        * | UnOp  _  -> failwith "Not implemented3"
        * | BinOp (PlusPI, exp1, exp2, _ ) ->
        *   let off2 = Index(exp2, NoOffset) in
@@ -574,7 +574,7 @@ let rec find_or_create_lval (lv:lval) (x:t) : V.t * t =
        *   end
        * | BinOp _-> (Format.printf "DEBUG: Mem (%a)@." Printer.pp_exp e ; failwith "Not implemented5")
        * | CastE _ -> find_or_create_vertex (Mem (Cil.stripCasts e), snd lv) x
-       * | AddrOf lv -> 
+       * | AddrOf lv ->
        * | StartOf lv ->  find_or_create_vertex lv x *)
     end
 

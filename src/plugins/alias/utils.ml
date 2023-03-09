@@ -34,6 +34,8 @@ module LMap = Lval.Map
 (* type of the return of the following function *)
 type basic_lval =  BNone | BLval of lval | BAddrOf of lval | BIndex of basic_lval * exp
 
+exception Double_lval of basic_lval * basic_lval
+
 (* finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). *)
 let rec find_basic_lval (exp:exp) : basic_lval =
   match exp.enode with
@@ -45,11 +47,14 @@ let rec find_basic_lval (exp:exp) : basic_lval =
   | BinOp (PlusPI,exp1,exp2,_) -> BIndex (find_basic_lval exp1,exp2)
   | BinOp (_,exp1,exp2,_) ->
     begin
-      match (find_basic_lval exp1, find_basic_lval exp2) with
+      let e1 = find_basic_lval exp1
+      and e2 = find_basic_lval exp2
+      in
+      match (e1, e2) with
         (BNone,BNone) -> BNone
       | (BNone, res2) -> res2
       | (res1, BNone) -> res1
-      | _ -> failwith "find_basic_lval: 2 basic lval in a BinOp"
+      | _ -> raise (Double_lval (e1, e2))
     end
   | _ -> BNone
 
