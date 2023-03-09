@@ -338,9 +338,10 @@ let yaml_dict_to_list = function
       Result.(
         bind acc
           (fun l ->
-             bind
-               (Yaml.Util.to_string v)
-               (fun s -> Ok ((k,s) :: l))))
+            match Yaml.Util.to_string v with
+              | Ok s -> Ok((k,s) :: l)
+              | Error (`Msg s) ->
+                  Error (`Msg ("Unexpected value for key " ^ k ^ ": " ^ s))))
     in
     List.fold_left make_one (Ok []) l
   | _ -> Error (`Msg "Unexpected YAML value instead of dictionary of strings")

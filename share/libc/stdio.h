@@ -621,7 +621,5 @@ int asprintf(char **strp, const char *fmt, ...);
 
 __END_DECLS
 
-#define IOV_MAX 1024
-
 __POP_FC_STDLIB
 #endif
