@@ -274,24 +274,37 @@ function createHoveredUpdater(): Editor.Extension {
 //  Plugin decorating hovered and selected elements
 // -----------------------------------------------------------------------------
 
-const CodeDecorator = createCodeDecorator();
-function createCodeDecorator(): Editor.Extension {
-  const hoveredClass = Editor.Decoration.mark({ class: 'cm-hovered-code' });
-  const selectedClass = Editor.Decoration.mark({ class: 'cm-selected-code' });
-  const multipleClass = Editor.Decoration.mark({ class: 'cm-multiple-code' });
-  const selections = { marker: Marker, multiple: Multiple, hovered: Hovered };
-  const deps = { ranges: Ranges, ...selections };
-  return Editor.createDecorator(deps, (props) => {
-    const { ranges, marker: m, hovered: h, multiple: ms } = props;
-    const multRanges = mapFilter(ms.filter(isDef), (m) => ranges.get(m)).flat();
-    const hoveredRanges = h ? (ranges.get(h) ?? []) : [];
-    const selectedRanges = m ? (ranges.get(m) ?? []) : [];
-    const hovered  = hoveredRanges.map(r =>  hoveredClass.range(r.from, r.to));
-    const selected = selectedRanges.map(r => selectedClass.range(r.from, r.to));
-    const multiple = multRanges.map(r => multipleClass.range(r.from, r.to));
-    const decorations = selected.concat(hovered, multiple);
-    return Editor.RangeSet.of(decorations, true);
+const HoveredDecorator = createHoveredDecorator();
+function createHoveredDecorator(): Editor.Extension {
+  const cls = Editor.Decoration.mark({ class: 'cm-hovered-code' });
+  const deps = { ranges: Ranges, hovered: Hovered };
+  const extension = Editor.createDecorator(deps, ({ ranges, hovered }) => {
+    const hoveredRanges = hovered ? (ranges.get(hovered) ?? []) : [];
+    return Editor.RangeSet.of(hoveredRanges.map(r => cls.range(r.from, r.to)));
   });
+  return Editor.setPriority(extension, 'highest');
+}
+
+const MarkerDecorator = createMarkerDecorator();
+function createMarkerDecorator(): Editor.Extension {
+  const cls = Editor.Decoration.mark({ class: 'cm-selected-code' });
+  const deps = { ranges: Ranges, marker: Marker };
+  const extension = Editor.createDecorator(deps, ({ ranges, marker }) => {
+    const selectedRanges = marker ? (ranges.get(marker) ?? []) : [];
+    return Editor.RangeSet.of(selectedRanges.map(r => cls.range(r.from, r.to)));
+  });
+  return Editor.setPriority(extension, 'high');
+}
+
+const MultipleDecorator = createMultipleDecorator();
+function createMultipleDecorator(): Editor.Extension {
+  const cls = Editor.Decoration.mark({ class: 'cm-multiple-code' });
+  const deps = { ranges: Ranges, multiple: Multiple };
+  const extension = Editor.createDecorator(deps, ({ ranges, multiple: ms }) => {
+    const multRanges = mapFilter(ms.filter(isDef), (m) => ranges.get(m)).flat();
+    return Editor.RangeSet.of(multRanges.map(r => cls.range(r.from, r.to)));
+  });
+  return Editor.setPriority(extension, 'default');
 }
 
 // -----------------------------------------------------------------------------
@@ -620,7 +633,9 @@ const extensions: Editor.Extension[] = [
   MarkerUpdater,
   MarkerScroller,
   HoveredUpdater,
-  CodeDecorator,
+  HoveredDecorator,
+  MarkerDecorator,
+  MultipleDecorator,
   DeadCodeDecorator,
   ContextMenuHandler,
   PropertiesGutter,
