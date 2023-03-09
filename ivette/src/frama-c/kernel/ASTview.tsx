@@ -322,18 +322,68 @@ function createMultipleDecorator(): Editor.Extension {
 const emptyDeadCode = { unreachable: [], nonTerminating: [] };
 const Dead = Editor.createField<Eva.deadCode>(emptyDeadCode);
 
+const UnreachableRanges = createUnreachableRanges();
+function createUnreachableRanges(): Editor.Aspect<Editor.Range[]> {
+  const deps = { dead: Dead, ranges: Ranges };
+  return Editor.createAspect(deps, ({ dead, ranges }) => {
+    return mapFilter(dead.unreachable, m => ranges.get(m)).flat();
+  });
+}
+
+const NonTerminatingRanges = createNonTerminatingRanges();
+function createNonTerminatingRanges(): Editor.Aspect<Editor.Range[]> {
+  const deps = { dead: Dead, ranges: Ranges };
+  return Editor.createAspect(deps, ({ dead, ranges }) => {
+    return mapFilter(dead.nonTerminating, m => ranges.get(m)).flat();
+  });
+}
+
 const DeadCodeDecorator = createDeadCodeDecorator();
 function createDeadCodeDecorator(): Editor.Extension {
-  const uClass = Editor.Decoration.mark({ class: 'cm-dead-code' });
-  const tClass = Editor.Decoration.mark({ class: 'cm-non-term-code' });
-  const deps = { dead: Dead, ranges: Ranges };
-  return Editor.createDecorator(deps, ({ dead, ranges }) => {
-    const range = (m: string): Range[] | undefined => ranges.get(m);
-    const unreachableRanges = mapFilter(dead.unreachable, range).flat();
-    const unreachable = unreachableRanges.map(r => uClass.range(r.from, r.to));
-    const nonTermRanges = mapFilter(dead.nonTerminating, range).flat();
-    const nonTerm = nonTermRanges.map(r => tClass.range(r.from, r.to));
-    return Editor.RangeSet.of(unreachable.concat(nonTerm), true);
+  const uCls = Editor.Decoration.mark({ class: 'cm-dead-code' });
+  const tCls = Editor.Decoration.mark({ class: 'cm-non-term-code' });
+  const deps = { unreach: UnreachableRanges, nonTerm: NonTerminatingRanges };
+  return Editor.createDecorator(deps, ({ unreach, nonTerm }) => {
+    const unreachable = unreach.map(r => uCls.range(r.from, r.to));
+    const nonTerminating = nonTerm.map(r => tCls.range(r.from, r.to));
+    return Editor.RangeSet.of(unreachable.concat(nonTerminating), true);
+  });
+}
+
+type DeadCodeKind = 'unreachable' | 'non terminating';
+class DeadCodeGutterMarker extends Editor.GutterMarker {
+  readonly element: HTMLDivElement;
+  toDOM(): HTMLDivElement { return this.element; }
+  constructor(kind: DeadCodeKind) {
+    super();
+    const color = kind === 'unreachable' ? 'dead-code' : 'non-terminating';
+    this.element = document.createElement('div');
+    this.element.innerHTML = 'a';
+    this.element.title = `This code is ${kind}`;
+    this.element.style.width = '4px';
+    this.element.style.color = `var(--${color})`;
+    this.element.style.borderRight = `4px solid var(--${color})`;
+  }
+}
+
+const DeadCodeGutter = createDeadCodeGutter();
+function createDeadCodeGutter(): Editor.Extension {
+  const deps = { unreach: UnreachableRanges, nonTerm: NonTerminatingRanges };
+  const cls = 'cm-deadcode-gutter';
+  return Editor.createGutter(deps, cls, (props, block, view) => {
+    const doc = view.state.doc;
+    const line = doc.lineAt(block.from);
+    const unreachable = props.unreach
+      .filter(r => r.from <= doc.length)
+      .map(r => ({ from: doc.lineAt(r.from).from, to: doc.lineAt(r.to).to }))
+      .find(r => r.from <= line.from && line.to <= r.to);
+    if (unreachable) return new DeadCodeGutterMarker('unreachable');
+    const nonTerm = props.nonTerm
+      .filter(r => r.from <= doc.length)
+      .map(r => ({ from: doc.lineAt(r.from).from, to: doc.lineAt(r.to).to }))
+      .find(r => r.from <= line.from && line.to <= r.to);
+    if (nonTerm) return new DeadCodeGutterMarker('non terminating');
+    return null;
   });
 }
 
@@ -641,6 +691,7 @@ const extensions: Editor.Extension[] = [
   DeadCodeDecorator,
   ContextMenuHandler,
   PropertiesGutter,
+  DeadCodeGutter,
   TaintedLvaluesDecorator,
   TaintTooltip,
   Editor.ReadOnly,
