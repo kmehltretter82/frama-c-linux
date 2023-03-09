@@ -321,7 +321,22 @@ let is_relevant ip =
     not (Ast_info.is_frama_c_builtin (Kernel_function.get_name kf)
          || Cil_builtins.is_unused_builtin (Kernel_function.get_vi kf))
 
-let iter f = Property_status.iter (fun ip -> if is_relevant ip then f ip)
+let iter f =
+  Property_status.iter (fun ip -> if is_relevant ip then f ip)
+
+(* Must reload the entire table when status changed: property dependencies
+   are not taken into account when status are updated. *)
+let add_reload_hook (f : unit -> unit) : unit =
+  Property_status.register_status_update_hook
+    (fun _emitter _ip _status -> f())
+
+let add_update_hook (f : Property.t -> unit) : unit =
+  Property_status.register_property_add_hook
+    (fun ip -> if is_relevant ip then f ip)
+
+let add_remove_hook (f : Property.t -> unit) : unit =
+  Property_status.register_property_remove_hook
+    (fun ip -> if is_relevant ip then f ip)
 
 let array =
   States.register_array
@@ -331,21 +346,11 @@ let array =
     ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
     ~keyType:Kernel_ast.Marker.jproperty
     ~iter
+    ~add_reload_hook
+    ~add_remove_hook
+    ~add_update_hook
     model
 
 let reload () = States.reload array
-
-(* Reloads the whole array when a property is added, removed or when its status
-   changes. As a property can be a logical consequence of other properties, a
-   property change can impact the logical status of any other property: a full
-   reload is needed. *)
-let () =
-  Property_status.register_property_add_hook
-    (fun _ip -> reload ());
-  Property_status.register_status_update_hook
-    (fun _emitter _ip _status -> reload ());
-  Property_status.register_property_remove_hook
-    (fun _ip -> reload ())
-
 
 (* -------------------------------------------------------------------------- *)
