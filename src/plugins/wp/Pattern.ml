@@ -22,17 +22,15 @@
 
 open Logic_typing
 open Logic_ptree
-open Lang.F
-
-[@@@ warning "-32-37" ] (*TODO*)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Pattern Engine                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-type pvar = { vloc : location ; vname : string ; mutable vtau : tau option }
+type 'a loc = { loc : location ; value : 'a }
 
-type ast = { loc : location ; node : node ; mutable tau : tau option }
+type pvar = string loc
+type ast = node loc
 and node =
   | Any
   | Pvar of pvar
@@ -40,8 +38,7 @@ and node =
   | Range of int * int
   | Int of Integer.t
   | Bool of bool
-
-let node ~loc ?tau node = { loc ; node ; tau }
+  | Call of string * ast list
 
 module Vmap = Map.Make(String)
 
@@ -60,34 +57,45 @@ type value = ast
 
 let context typing = { typing ; value = false ; pvars = Vmap.empty }
 
+let pint ctxt ~loc a =
+  try int_of_string a
+  with _ -> ctxt.typing.error loc "Invalid int %S" a
+
+let pinteger ctxt ~loc a =
+  try Integer.of_string a
+  with _ -> ctxt.typing.error loc "Invalid integer %S" a
+
 let pvar ctxt ~loc x =
   try Vmap.find x ctxt.pvars with Not_found ->
-    let pv = { vloc = loc ; vname = x ; vtau = None } in
-    ctxt.pvars <- Vmap.add x pv ctxt.pvars ; pv
+    if ctxt.value then
+      ctxt.typing.error loc "Unknown pattern variable '%s'" x
+    else
+      let pv = { loc ; value = x } in
+      ctxt.pvars <- Vmap.add x pv ctxt.pvars ; pv
 
 let pbound ctxt p =
   let loc = p.lexpr_loc in
   match p.lexpr_node with
-  | PLconstant (IntConstant a) ->
-    (try int_of_string a
-     with Invalid_argument _ -> ctxt.typing.error loc "Invalid bound %S" a)
+  | PLconstant (IntConstant a) -> pint ctxt ~loc a
   | _ -> ctxt.typing.error loc "Invalid bound (int expected)"
 
 let rec parse ctxt p =
   let loc = p.lexpr_loc in
   match p.lexpr_node with
-  | PLvar "_" -> node ~loc Any
-  | PLvar x -> node ~loc (Pvar (pvar ctxt ~loc x))
+  | PLvar "_" when ctxt.value -> { loc ; value = Any }
+  | PLvar x -> { loc ; value = Pvar (pvar ctxt ~loc x) }
   | PLnamed(x,p) ->
     let pv = pvar ctxt ~loc x in
     let pn = parse ctxt p in
-    node ~loc (Named(pv,pn))
-  | PLapp("\\true",[],[]) -> node ~loc ~tau:Bool (Bool true)
-  | PLapp("\\false",[],[]) -> node ~loc ~tau:Bool (Bool false)
+    { loc ; value = Named(pv,pn) }
+  | PLapp("\\true",[],[]) -> { loc ; value = Bool true }
+  | PLapp("\\false",[],[]) -> { loc ; value = Bool false }
   | PLconstant (IntConstant n) ->
-    node ~loc ~tau:Int (Int (Integer.of_string n))
+    { loc ; value = Int (pinteger ctxt ~loc n) }
   | PLrange(Some a,Some b) when ctxt.value ->
-    node ~loc ~tau:Int (Range(pbound ctxt a,pbound ctxt b))
+    { loc ; value = Range(pbound ctxt a,pbound ctxt b) }
+  | PLapp(lf,[],ps) ->
+    { loc ; value = Call(lf,List.map (parse ctxt) ps) }
   | _ ->
     ctxt.typing.error loc
       (if ctxt.value then "Invalid value" else "Invalid pattern")
