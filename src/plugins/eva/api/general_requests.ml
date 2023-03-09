@@ -453,6 +453,11 @@ module PropertiesData = struct
       ~descr:(Markdown.plain descr)
       ~data:(module TaintStatus)
       ~get:is_tainted_property ;
+    let add_reload_hook hook =
+      Analysis.register_computation_hook ~on:Computed (fun _ -> hook ())
+    and add_update_hook hook =
+      Red_statuses.register_hook (function Prop p -> hook p | Alarm _ -> ())
+    in
     ignore @@ States.register_array
       ~package
       ~name:"properties"
@@ -460,6 +465,8 @@ module PropertiesData = struct
       ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
       ~keyType:Kernel_ast.Marker.jproperty
       ~iter:Property_status.iter
+      ~add_update_hook
+      ~add_reload_hook
       model
 end
 

@@ -67,6 +67,11 @@ module RedStatusesTable =
       let dependencies = [ Self.state ]
     end)
 
+module Hook = Hook.Build (AlarmOrProp)
+
+let register_hook f =
+  Hook.extend f
+
 let add_red_ap kinstr ap =
   let current_map =
     try RedStatusesTable.find kinstr
@@ -78,7 +83,8 @@ let add_red_ap kinstr ap =
   in
   let new_callstacks = Callstacks.add (Eva_utils.call_stack ()) callstacks in
   let new_map = AlarmOrProp.Map.add ap new_callstacks current_map in
-  RedStatusesTable.replace kinstr new_map
+  RedStatusesTable.replace kinstr new_map;
+  Hook.apply ap
 
 let add_red_alarm ki a = add_red_ap ki (Alarm a)
 
