@@ -24,13 +24,10 @@
 
 open Cil_types
 
-open Cil_datatype
+open Utils
 
 (** Points-to graphs datastructure. *)
 module G: Graph.Sig.G
-
-module LMap = Lval.Map
-module LSet = Lval.Set
 
 module type S =
 sig

@@ -20,14 +20,36 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(**  This is a collection of functions for other files of the plugin. 
+     /!\ Caution when re-using them /!\
+*)
 
 open Cil_types
 
-(* type of the return of the following function *)
+open Cil_datatype
+
+module VSet = Datatype.Int.Set
+module VMap = Datatype.Int.Map
+
+module LSet = Lval.Set
+module LMap = Lval.Map
+
+(** type of the return of the following function *)
 type basic_lval =  BNone | BLval of lval | BAddrOf of lval | BIndex of basic_lval * exp
 
-(* finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). *)
+(** finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). *)
 val find_basic_lval : exp -> basic_lval
 
-(* convert an index basic_lval into a lval *)
+(** convert an index basic_lval into a lval *)
 val convert_bindex : basic_lval -> lval
+
+(** returns the list of all possible "prefix" of a lval lv1, i.e. each
+   pair (lv,o) such as AddoffsetLval o lv = lv1 *)
+val  decompose_lval : lval -> (lval*offset) list
+
+
+(** [first_index a] returns a[0] *)
+val first_index : lval -> lval
+
+(** returns true if the index is OK (no needs to collapse) *)
+val normalize_index : exp -> exp * bool

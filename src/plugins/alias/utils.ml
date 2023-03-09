@@ -22,6 +22,15 @@
 
 open Cil_types
 
+open Cil_datatype
+
+module VSet = Datatype.Int.Set
+module VMap = Datatype.Int.Map
+
+module LSet = Lval.Set
+module LMap = Lval.Map
+
+
 (* type of the return of the following function *)
 type basic_lval =  BNone | BLval of lval | BAddrOf of lval | BIndex of basic_lval * exp
 
@@ -55,3 +64,50 @@ let rec convert_bindex (blv: basic_lval) : lval =
     let lv1,off1 = Cil.removeOffsetLval lv1 in
     let lv2 = Cil.addOffsetLval (Index(exp,off1)) lv1 in
     lv2
+
+
+
+let decompose_lval (lv1: lval) : (lval*offset) list =
+  let rec list_of_offset (o: offset) : (offset*offset) list =
+    match o with
+      NoOffset -> [NoOffset,NoOffset]
+    | Index(e,ofs) ->
+      let li =
+        List.map
+          (fun (o1,o2) -> (Index(e,o1),o2))
+          (list_of_offset ofs)
+      in
+      (NoOffset,ofs)::li
+    | Field(f, ofs) ->
+      let li =
+        List.map
+          (fun (o1,o2) -> (Field(f,o1),o2))
+          (list_of_offset ofs)
+      in
+      (NoOffset,ofs)::li
+  in
+  let lv, off = Cil.removeOffsetLval lv1 in
+  List.map
+    (fun (o1,o2) -> (Cil.addOffsetLval o1 lv,o2))
+    (list_of_offset off)
+
+(* (\* returns the list of prefixes of lv1 that belong to ls *\)
+ * let prefix_in_set (lv1:lval) (ls:LSet.t) : (lval*offset) list =
+ *   let li = decompose_lval lv1 in
+ *   List.filter (fun (lv,_) ->LSet.mem lv ls) li *)
+
+
+
+
+(* [first_index a] returns a[0] *)
+let first_index (lv:lval) : lval =
+  let loc = Location.unknown in
+  Cil.addOffsetLval (Index (Cil.zero ~loc, NoOffset)) lv
+
+(* returns true if the index is OK (no needs to collapse) *)
+let rec normalize_index (e:exp) : exp * bool =
+  match e.enode with
+    Const _ -> e, true
+  | CastE _ -> normalize_index (Cil.stripCasts e)
+  | _ -> e, false
+

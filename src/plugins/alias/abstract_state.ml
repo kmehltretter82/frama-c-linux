@@ -23,7 +23,7 @@
 open Graph
 
 open Cil_types
-
+    
 open Cil_datatype
 
 open Utils
@@ -31,12 +31,6 @@ open Utils
 module G = Persistent.Digraph.Concrete(Datatype.Int)
 
 module V = G.V
-
-module VSet = Datatype.Int.Set
-module VMap = Datatype.Int.Map
-
-module LSet = Lval.Set
-module LMap = Lval.Map
 
 (* like LMap, but organized with offset and specialized functions *)
 module LLMap =
@@ -370,37 +364,6 @@ let create_cst_vertex (x:t) : V.t * t =
     collapsed = x.collapsed
   }
 
-(* returns the list of all possible "prefix" of a lval lv1, i.e. each
-   pair (lv,o) such as AddoffsetLval o lv = lv1 *)
-let decompose_lval (lv1: lval) : (lval*offset) list =
-  let rec list_of_offset (o: offset) : (offset*offset) list =
-    match o with
-      NoOffset -> [NoOffset,NoOffset]
-    | Index(e,ofs) ->
-      let li =
-        List.map
-          (fun (o1,o2) -> (Index(e,o1),o2))
-          (list_of_offset ofs)
-      in
-      (NoOffset,ofs)::li
-    | Field(f, ofs) ->
-      let li =
-        List.map
-          (fun (o1,o2) -> (Field(f,o1),o2))
-          (list_of_offset ofs)
-      in
-      (NoOffset,ofs)::li
-  in
-  let lv, off = Cil.removeOffsetLval lv1 in
-  List.map
-    (fun (o1,o2) -> (Cil.addOffsetLval o1 lv,o2))
-    (list_of_offset off)
-
-(* returns the list of prefixes of lv1 that belong to ls *)
-let _prefix_in_set (lv1:lval) (ls:LSet.t) : (lval*offset) list =
-  let li = decompose_lval lv1 in
-  List.filter (fun (lv,_) ->LSet.mem lv ls) li
-
 
 (* find all the aliases of lv1 in x, for create_vertex *)
 let find_all_aliases (lv1:lval) (x:t) : LSet.t =
@@ -517,19 +480,6 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
  *   let base = ptr_base ~loc e in
  *   let base_addr  = ptr_base_addr ~loc base in
  *   base, base_addr *)
-
-(* returns a[0] *)
-let first_index (lv:lval) : lval =
-  let loc = Location.unknown in
-  Cil.addOffsetLval (Index (Cil.zero ~loc, NoOffset)) lv
-
-(* returns true if the index is OK (no needs to collapse) *)
-let rec normalize_index (e:exp) : exp * bool =
-  match e.enode with
-    Const _ -> e, true
-  | CastE _ -> normalize_index (Cil.stripCasts e)
-  | _ -> e, false
-
 
 let list_arrays_to_be_collapsed = ref []
 
@@ -792,8 +742,6 @@ let collapse_graph (x:t) : t =
       !list_arrays_to_be_collapsed
   in
   list_arrays_to_be_collapsed := []; res
-
-
 
 
 
