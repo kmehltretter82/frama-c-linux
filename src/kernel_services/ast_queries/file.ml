@@ -332,7 +332,71 @@ let set_machdep () =
 
 let () = Cmdline.run_after_configuring_stage set_machdep
 
-type mach = [%import: Cil_types.mach] [@@deriving yaml]
+let yaml_dict_to_list = function
+  | `O l ->
+    let make_one acc (k,v) =
+      Result.(
+        bind acc
+          (fun l ->
+             bind
+               (Yaml.Util.to_string v)
+               (fun s -> Ok ((k,s) :: l))))
+    in
+    List.fold_left make_one (Ok []) l
+  | _ -> Error (`Msg "Unexpected YAML value instead of dictionary of strings")
+
+type mach = Cil_types.mach = {
+  sizeof_short: int;
+  sizeof_int: int;
+  sizeof_long: int ;
+  sizeof_longlong: int;
+  sizeof_ptr: int;
+  sizeof_float: int;
+  sizeof_double: int;
+  sizeof_longdouble: int;
+  sizeof_void: int;
+  sizeof_fun: int;
+  size_t: string;
+  ssize_t: string;
+  wchar_t: string;
+  ptrdiff_t: string;
+  intptr_t: string;
+  uintptr_t: string;
+  wint_t: string;
+  sig_atomic_t: string;
+  time_t: string;
+  alignof_short: int;
+  alignof_int: int;
+  alignof_long: int;
+  alignof_longlong: int;
+  alignof_ptr: int;
+  alignof_float: int;
+  alignof_double: int;
+  alignof_longdouble: int;
+  alignof_str: int;
+  alignof_fun: int;
+  char_is_unsigned: bool;
+  little_endian: bool;
+  alignof_aligned: int;
+  has__builtin_va_list: bool;
+  compiler: string;
+  cpp_arch_flags: string list;
+  version: string;
+  weof: string;
+  wordsize: string;
+  posix_version: string;
+  bufsiz: string;
+  eof: string;
+  fopen_max: string;
+  filename_max: string;
+  l_tmpnam: string;
+  tmp_max: string;
+  rand_max: string;
+  mb_cur_max: string;
+  nsig: string;
+  errno: (string * string) list [@of_yaml yaml_dict_to_list];
+}
+[@@deriving yaml]
 
 (* Local to this module. Use Cil.theMachine.theMachine outside *)
 let get_machdep () =
