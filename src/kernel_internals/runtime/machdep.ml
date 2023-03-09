@@ -197,6 +197,9 @@ let gen_intlike_max fmt name repr mach =
 let gen_char_bit fmt _mach =
   gen_define_int fmt "__CHAR_BIT" 8
 
+let gen_define_errno_macro fmt (name, v) =
+  gen_define_string fmt ("__FC_" ^ (String.uppercase_ascii name)) v
+
 let gen_all_defines fmt mach =
   Format.fprintf fmt "/* Machdep-specific info for Frama-C's libc */@\n";
   Format.fprintf fmt "#ifndef __FC_MACHDEP@\n#define __FC_MACHDEP@\n";
@@ -248,7 +251,7 @@ let gen_all_defines fmt mach =
   gen_define_macro fmt "__FC_TMP_MAX" mach.tmp_max;
   gen_define_macro fmt "__FC_RAND_MAX" mach.rand_max;
   gen_define_macro fmt "__FC_MB_CUR_MAX" mach.mb_cur_max;
-  (* TODO: __FC_E*, errno enumeration *)
+  List.iter (gen_define_errno_macro fmt) mach.errno;
   gen_define_macro fmt "__FC_TIME_T" mach.time_t;
   gen_define_macro fmt "__FC_NSIG" mach.nsig;
   (* NB: should we use Cil.gccMode() here? *)
