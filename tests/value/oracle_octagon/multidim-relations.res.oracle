@@ -12,3 +12,7 @@
 > [kernel] multidim-relations.c:21: 
 25a25
 > [eva] Recording results for init_array
+45d44
+< [eva] Recording results for use_array
+47a47
+> [eva] Recording results for use_array

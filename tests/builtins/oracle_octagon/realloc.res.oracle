@@ -1,0 +1,4 @@
+627a628,630
+> [eva] realloc.c:152: Call to builtin realloc
+> [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
+> [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
