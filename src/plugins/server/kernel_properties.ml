@@ -321,15 +321,20 @@ let is_relevant ip =
     not (Ast_info.is_frama_c_builtin (Kernel_function.get_name kf)
          || Cil_builtins.is_unused_builtin (Kernel_function.get_vi kf))
 
-let iter f = Property_status.iter (fun ip -> if is_relevant ip then f ip)
+let iter f =
+  Property_status.iter (fun ip -> if is_relevant ip then f ip)
 
-let add_update_hook f =
-  Property_status.register_property_add_hook
-    (fun ip -> if is_relevant ip then f ip);
+(* Must reload the entire table when status changed: property dependencies
+   are not taken into account when status are updated. *)
+let add_reload_hook (f : unit -> unit) : unit =
   Property_status.register_status_update_hook
-    (fun _emitter ip _status -> if is_relevant ip then f ip)
+    (fun _emitter _ip _status -> f())
 
-let add_remove_hook f =
+let add_update_hook (f : Property.t -> unit) : unit =
+  Property_status.register_property_add_hook
+    (fun ip -> if is_relevant ip then f ip)
+
+let add_remove_hook (f : Property.t -> unit) : unit =
   Property_status.register_property_remove_hook
     (fun ip -> if is_relevant ip then f ip)
 
@@ -341,8 +346,9 @@ let array =
     ~key:(fun ip -> Kernel_ast.Marker.tag (PIP ip))
     ~keyType:Kernel_ast.Marker.jtype
     ~iter
-    ~add_update_hook
+    ~add_reload_hook
     ~add_remove_hook
+    ~add_update_hook
     model
 
 let reload () = States.reload array

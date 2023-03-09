@@ -764,7 +764,13 @@ export function send<In, Out>(
       try {
         resolve(request.output(js));
       } catch (err) {
-        reject(`Invalid ${request.name} response (${err})`);
+        const message = `Invalid ${request.name} response: ${err}`;
+        if (err instanceof Json.JsonError) {
+          reject(`${message}\nThe whole response was:\n${Json.stringify(js)}`);
+        }
+        else {
+          reject(message);
+        }
       }
     };
     pending.set(rid, { resolve: unwrap, reject });
