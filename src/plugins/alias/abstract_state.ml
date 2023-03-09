@@ -202,8 +202,6 @@ struct
 
 end
 
-
-
 module type S =
 sig
   (* TODO *)
@@ -594,9 +592,9 @@ let rec find_or_create_lval (lv:lval) (x:t) : V.t * t =
     Var _ ->  (try (LLMap.find lv x.lmap, x) with  Not_found -> create_vertex lv x)
   | Mem e ->
     begin
-      match e.enode with
-        Const _ -> failwith "Not implemented1 "
-      | Lval lv1 ->
+      match find_basic_lval e with
+        BNone -> failwith "Not implemented1 "
+      | BLval lv1 ->
         let v1,x = find_or_create_vertex lv1 x in
         begin
           match G.succ x.graph v1 with
@@ -606,13 +604,28 @@ let rec find_or_create_lval (lv:lval) (x:t) : V.t * t =
           | [v] -> v,x
           | _ -> failwith "invariant violated"
         end
-      | SizeOf  _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> failwith "Not implemented2 "
-
-      | UnOp  _ | BinOp _  -> failwith "Not implemented3 "
-
-      | CastE _ -> find_or_create_vertex (Mem (Cil.stripCasts e), NoOffset) x
-      | AddrOf lv -> find_or_create_vertex lv x
-      | StartOf lv ->  find_or_create_vertex lv x
+      | BAddrOf lv1 ->
+        let lv2 = Cil.addOffsetLval (snd lv) lv1 in
+        find_or_create_vertex lv2 x
+      | BIndex _ as e ->
+        let lv= convert_bindex e in
+        (try (LLMap.find lv x.lmap, x) with  Not_found -> create_vertex lv x)
+      
+      (* | SizeOf  _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> failwith "Not implemented2 "
+       * 
+       * | UnOp  _  -> failwith "Not implemented3"
+       * | BinOp (PlusPI, exp1, exp2, _ ) ->
+       *   let off2 = Index(exp2, NoOffset) in
+       *   begin
+       *     match exp1.enode with
+       *       Lval lv1 -> let lv2 = Cil.addOffsetLval off2 lv1 in
+       *       find_or_create_vertex (Cil.addOffsetLval (snd lv) lv2) x
+       *     | _ -> (Format.printf "DEBUG: Mem (%a)@." Printer.pp_exp e ; failwith "Not implemented4")
+       *   end
+       * | BinOp _-> (Format.printf "DEBUG: Mem (%a)@." Printer.pp_exp e ; failwith "Not implemented5")
+       * | CastE _ -> find_or_create_vertex (Mem (Cil.stripCasts e), snd lv) x
+       * | AddrOf lv -> 
+       * | StartOf lv ->  find_or_create_vertex lv x *)
     end
 
 

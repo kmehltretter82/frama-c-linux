@@ -24,7 +24,10 @@
 open Cil_types
 
 (* type of the return of the following function *)
-type basic_lval =  BNone | BLval of lval | BAddrOf of lval
+type basic_lval =  BNone | BLval of lval | BAddrOf of lval | BIndex of basic_lval * exp
 
 (* finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). *)
 val find_basic_lval : exp -> basic_lval
+
+(* convert an index basic_lval into a lval *)
+val convert_bindex : basic_lval -> lval

@@ -23,15 +23,17 @@
 open Cil_types
 
 (* type of the return of the following function *)
-type basic_lval =  BNone | BLval of lval | BAddrOf of lval
+type basic_lval =  BNone | BLval of lval | BAddrOf of lval | BIndex of basic_lval * exp
 
 (* finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). *)
 let rec find_basic_lval (exp:exp) : basic_lval =
   match exp.enode with
     Lval lv -> BLval lv
   | AddrOf lv -> BAddrOf lv
-  | CastE (_,exp) -> find_basic_lval exp
+  | StartOf lv -> BAddrOf lv
+  | CastE _ -> find_basic_lval (Cil.stripCasts exp)
   | UnOp (_,exp,_) -> find_basic_lval exp
+  | BinOp (PlusPI,exp1,exp2,_) -> BIndex (find_basic_lval exp1,exp2)
   | BinOp (_,exp1,exp2,_) ->
     begin
       match (find_basic_lval exp1, find_basic_lval exp2) with
@@ -41,3 +43,15 @@ let rec find_basic_lval (exp:exp) : basic_lval =
       | _ -> failwith "find_basic_lval: 2 basic lval in a BinOp"
     end
   | _ -> BNone
+
+
+let rec convert_bindex (blv: basic_lval) : lval =
+  match blv with
+    BNone -> failwith "problem here"
+  | BLval lv -> lv
+  | BAddrOf _ -> failwith "this should not be allowed"
+  | BIndex (blv1, exp) ->
+    let lv1 = convert_bindex blv1 in
+    let lv1,off1 = Cil.removeOffsetLval lv1 in
+    let lv2 = Cil.addOffsetLval (Index(exp,off1)) lv1 in
+    lv2
