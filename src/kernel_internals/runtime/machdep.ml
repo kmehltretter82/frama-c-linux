@@ -171,8 +171,8 @@ let gen_va_list_repr fmt mach =
 
 let gen_char_unsigned_flag fmt mach =
   let macro = "__CHAR_UNSIGNED__" in
-  if mach.char_is_unsigned then gen_undef fmt macro
-  else gen_define_string fmt macro "1"
+  if mach.char_is_unsigned then gen_define_string fmt macro "1"
+  else gen_undef fmt macro
 
 let gen_sizeof_std fmt mach =
   gen_sizeof fmt "SHORT" mach.sizeof_short;
