@@ -38,7 +38,23 @@ and node =
   | Range of int * int
   | Int of Integer.t
   | Bool of bool
+  | Assoc of assoc * ast list
+  | Binop of ast * binop * ast
   | Call of string * ast list
+  | Times of Integer.t * ast
+  | List of ast list
+  | Field of ast * string
+  | Get of ast * ast
+  | Set of ast * ast * ast
+and assoc = [ `Add | `Mul ]
+and binop = [ `Div | `Mod | `Repeat | `Eq | `Lt | `Le | `Ne ]
+
+let assoc op a b =
+  let unroll = function Assoc(f,xs) when f = op -> xs | _ -> [a]
+  in {
+    loc = fst a.loc, snd b.loc ;
+    value = Assoc(op,unroll a.value @ unroll b.value) ;
+  }
 
 module Vmap = Map.Make(String)
 
@@ -88,17 +104,57 @@ let rec parse ctxt p =
     let pv = pvar ctxt ~loc x in
     let pn = parse ctxt p in
     { loc ; value = Named(pv,pn) }
-  | PLapp("\\true",[],[]) -> { loc ; value = Bool true }
-  | PLapp("\\false",[],[]) -> { loc ; value = Bool false }
+  | PLtrue -> { loc ; value = Bool true }
+  | PLfalse -> { loc ; value = Bool false }
   | PLconstant (IntConstant n) ->
     { loc ; value = Int (pinteger ctxt ~loc n) }
   | PLrange(Some a,Some b) when ctxt.value ->
     { loc ; value = Range(pbound ctxt a,pbound ctxt b) }
   | PLapp(lf,[],ps) ->
     { loc ; value = Call(lf,List.map (parse ctxt) ps) }
+  | PLunop(Uminus,a) ->
+    let a = parse ctxt a in
+    { loc = a.loc ; value = Times(Integer.minus_one,a) }
+  | PLbinop(a,Bmul,b) ->
+    let a = parse ctxt a in
+    let b = parse ctxt b in
+    begin
+      match a.value with
+      | Int k -> { loc ; value = Times(k,b) }
+      | _ -> assoc `Mul a b
+    end
+  | PLbinop(a,Bsub,b) ->
+    let a = parse ctxt a in
+    let b = parse ctxt b in
+    let b = { loc = b.loc ; value = Times(Integer.minus_one,b) } in
+    assoc `Add a b
+  | PLbinop(a,Badd,b) -> assoc `Add (parse ctxt a) (parse ctxt b)
+  | PLbinop(a,Bdiv,b) -> parse_binop ctxt ~loc `Div a b
+  | PLbinop(a,Bmod,b) -> parse_binop ctxt ~loc `Mod a b
+  | PLrel(a,Lt,b) -> parse_binop ctxt ~loc `Lt a b
+  | PLrel(a,Le,b) -> parse_binop ctxt ~loc `Le a b
+  | PLrel(a,Gt,b) -> parse_binop ctxt ~loc `Lt b a
+  | PLrel(a,Ge,b) -> parse_binop ctxt ~loc `Le b a
+  | PLrel(a,Eq,b) -> parse_binop ctxt ~loc `Eq a b
+  | PLrel(a,Neq,b) -> parse_binop ctxt ~loc `Ne a b
+  | PLempty -> { loc ; value = List [] }
+  | PLlist ps -> { loc ; value = List (List.map (parse ctxt) ps) }
+  | PLrepeat(p,n) -> parse_binop ctxt ~loc `Repeat p n
+  | PLdot(a,fd) -> { loc ; value = Field(parse ctxt a,fd) }
+  | PLarrget(a,b) ->
+    begin
+      match b.lexpr_node with
+      | PLarrget(k,v) ->
+        { loc ; value = Set(parse ctxt a,parse ctxt k,parse ctxt v) }
+      | _ ->
+        { loc ; value = Get(parse ctxt a,parse ctxt b) }
+    end
   | _ ->
     ctxt.typing.error loc
       (if ctxt.value then "Invalid value" else "Invalid pattern")
+
+and parse_binop ctxt ~loc op a b =
+  { loc ; value = Binop(parse ctxt a,op,parse ctxt b) }
 
 let pa_pattern ctxt p = ctxt.value <- false ; parse ctxt p
 let pa_value ctxt p = ctxt.value <- true ; parse ctxt p
