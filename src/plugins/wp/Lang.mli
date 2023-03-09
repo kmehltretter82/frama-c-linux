@@ -70,14 +70,14 @@ and tau = (field,adt) Logic.datatype
 
 type t_builtin = E_mdt of mdt | E_poly of (tau list -> tau)
 
-type lfun =
+type lfun = private
   | ACSL of Cil_types.logic_info (** Registered in Definition.t,
                                      only  *)
   | CTOR of Cil_types.logic_ctor_info (** Not registered in Definition.t
                                           directly converted/printed *)
-  | Model of model (** *)
+  | FUN of lsymbol (** External or Generated logic symbol *)
 
-and model = {
+and lsymbol = {
   m_category : lfun category ;
   m_params : sort list ;
   m_result : sort ;
@@ -107,6 +107,11 @@ val atype : logic_type_info -> tau list -> tau
 val adt : logic_type_info -> adt (** Must not be a builtin *)
 
 type balance = Nary | Left | Right
+
+val on_lfun : (lfun -> unit) -> unit
+
+val acsl : logic_info -> lfun
+val ctor : logic_ctor_info -> lfun
 
 val extern_s :
   library:library ->
@@ -196,6 +201,8 @@ val parameters : (lfun -> sort list) -> unit
 
 val name_of_lfun : lfun -> string
 val name_of_field : field -> string
+val context_of_lfun : lfun -> WpContext.context option
+(** LFuns are unique by name and context *)
 
 val is_coloring_lfun : lfun -> bool
 

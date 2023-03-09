@@ -692,7 +692,7 @@ struct
     | TDataCons(c,ts) ->
       let es = List.map (val_of_term env) ts in
       let r = match LogicBuiltins.ctor c with
-        | ACSLDEF -> e_fun (CTOR c) es
+        | ACSLDEF -> e_fun (Lang.ctor c) es
         | HACK phi -> phi es
         | LFUN f -> e_fun f es ~result:(Lang.tau_of_ltype t.term_type)
       in Vexp r
