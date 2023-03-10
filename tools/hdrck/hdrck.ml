@@ -60,7 +60,7 @@ and headache_config_file = ref [] (* empty -> headache_config_file_default *)
 and headache_config_file_default = "headers/headache_config.txt"
 and exit_on_warning = ref false
 and exit_on_error = ref true (* only settable to false for debugging purposes *)
-and quiet = ref false
+and quiet = ref true
 
 type mode =
   | Check
@@ -632,6 +632,8 @@ let rec argspec = [
   " enable debug messages";
   "-quiet", Arg.Set quiet,
   "disable most messages";
+  "-verbose", Arg.Unit (fun () -> quiet := false),
+  "print some informative messages";
 
   "-forbidden-headers", Arg.String (fun set -> set_cumulative ~name:"-forbidden-headers" forbidden_headers ~set) ,
   "<license name>,... \t none of the checked files may have one of the <license name> []";
