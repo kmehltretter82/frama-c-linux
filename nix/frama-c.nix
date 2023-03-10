@@ -110,7 +110,7 @@ stdenvNoCC.mkDerivation rec {
   dune_opt = if release_mode then "--release" else "" ;
 
   buildPhase = ''
-    dune build -j2 --display short $release_mode @install
+    dune build -j2 --display short --error-reporting=twice $release_mode @install
     make tools/ptests/ptests.exe
     make tools/ptests/wtests.exe
   '';
