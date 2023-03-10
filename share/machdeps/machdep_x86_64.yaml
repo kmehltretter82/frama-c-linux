@@ -142,6 +142,7 @@ has__builtin_va_list: true
 intptr_t: long
 l_tmpnam: '20'
 little_endian: true
+machdep_name: machdep_x86_64
 mb_cur_max: ((size_t) 16 )
 nsig: (64 + 1)
 posix_version: 200809L

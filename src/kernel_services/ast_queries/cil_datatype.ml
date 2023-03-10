@@ -2682,6 +2682,7 @@ let dummy_machdep =
       "eilseq", "84";
       "erange", "34";
     ];
+    machdep_name = "dummy";
   }
 
 module Machdep = Datatype.Make_with_collections(struct

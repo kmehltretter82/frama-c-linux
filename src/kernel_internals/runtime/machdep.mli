@@ -22,8 +22,12 @@
 
 (** Managing machine-dependent information. *)
 
-(** generates a [__fc_machdep.h] file in a temp directory and returns the
-    directory name. The generated header contains all [#define] directives
+
+(** Prints on the given formatter all [#define] directives
     required by [share/libc/features.h] and other system-dependent headers.
 *)
+val gen_all_defines: Format.formatter -> Cil_types.mach -> unit
+
+(** generates a [__fc_machdep.h] file in a temp directory and returns the
+    directory name, to be added to the search path for preprocessing stdlib *)
 val generate_machdep_header: Cil_types.mach -> Filepath.Normalized.t

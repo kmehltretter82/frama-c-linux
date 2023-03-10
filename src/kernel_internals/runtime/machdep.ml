@@ -49,6 +49,7 @@ let gen_byte_order fmt mach =
 let no_signedness s =
   let s = Option.value  ~default:s (Extlib.string_del_prefix "signed" s) in
   let s = Option.value  ~default:s (Extlib.string_del_prefix "unsigned" s) in
+  let s = String.trim s in
   if s = "" then "int" else s
 
 let suff_of_kind =
@@ -123,8 +124,10 @@ let std_type_name mach =
     "unsigned", ("UINT", false);
     "unsigned int", ("UINT", false);
     "long", ("LONG", true);
+    "signed long", ("LONG", true);
     "unsigned long", ("ULONG", false);
     "long long", ("LLONG", true);
+    "signed long long", ("LLONG" ,true);
     "unsigned long long", ("ULLONG", false)
   ]
 
@@ -203,6 +206,7 @@ let gen_define_errno_macro fmt (name, v) =
 let gen_all_defines fmt mach =
   Format.fprintf fmt "/* Machdep-specific info for Frama-C's libc */@\n";
   Format.fprintf fmt "#ifndef __FC_MACHDEP@\n#define __FC_MACHDEP@\n";
+  gen_define_int fmt ("__FC_" ^ (String.uppercase_ascii mach.machdep_name)) 1;
   gen_byte_order fmt mach;
   gen_fixed_size_family fmt 8 mach;
   gen_fixed_size_family fmt 16 mach;
@@ -228,7 +232,7 @@ let gen_all_defines fmt mach =
   gen_intlike_max fmt "__FC_UINTPTR" mach.uintptr_t mach;
   gen_intlike_min fmt "__FC_WCHAR" mach.wchar_t mach;
   gen_intlike_max fmt "__FC_WCHAR" mach.wchar_t mach;
-  gen_intlike_max fmt "__SSIZE_MAX" mach.ssize_t mach;
+  gen_intlike_max fmt "__SSIZE" mach.ssize_t mach;
   gen_intlike_min fmt "__FC_PTRDIFF" mach.ptrdiff_t mach;
   gen_intlike_max fmt "__FC_PTRDIFF" mach.ptrdiff_t mach;
   gen_intlike_min fmt "__FC_WINT" mach.wint_t mach;

@@ -42,11 +42,12 @@ filename_max: '1023'
 l_tmpnam: '255'
 tmp_max: '255'
 rand_max: '0xFFFFFE'
-mb_cur_max: 16
+mb_cur_max: '16'
 sig_atomic_t: int
 time_t: long
 nsig: ''
 errno:
   edom: "33"
   eilseq: "84"
-  erange": "34"
+  erange: "34"
+machdep_name: custom_machdep

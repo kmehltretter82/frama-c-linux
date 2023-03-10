@@ -96,7 +96,7 @@ errno:
 has__builtin_va_list: false
 intptr_t: signed long long
 little_endian: true
-nsig: 23
+nsig: '23'
 ptrdiff_t: long long
 # NB: wasn't defined at all in old __fc_machdep.h
 sig_atomic_t: int
@@ -129,5 +129,6 @@ fopen_max: '16'
 filename_max: '2048'
 l_tmpnam: '20'
 tmp_max: '0xFFFFFFFF'
-rand_max: 32767
+rand_max: '32767'
 mb_cur_max: '((size_t)16)'
+machdep_name: machdep_msvc_x86_64

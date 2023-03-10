@@ -153,6 +153,14 @@ little_endian:
 
   type: boolean
 
+machdep_name:
+
+  description: |
+    name of the machdep. Will be used to define a macro allowing
+    to know during preprocessing which machdep has been selected.
+
+  type: string
+
 mb_cur_max:
 
   description: expansion of 'MB_CUR_MAX' macro

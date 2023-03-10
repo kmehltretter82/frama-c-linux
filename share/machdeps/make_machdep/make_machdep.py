@@ -51,7 +51,7 @@ my_path = Path(sys.argv[0]).parent
 
 parser = argparse.ArgumentParser(prog="make_machdep")
 parser.add_argument("-v", "--verbose", action="store_true")
-parser.add_argument("-o", default=sys.stdout, type=argparse.FileType("w"), dest="dest_file")
+parser.add_argument("-o", type=argparse.FileType("w"), dest="dest_file")
 parser.add_argument("--compiler", default="cc", help="which compiler to use; default is 'cc'")
 parser.add_argument(
     "--compiler-version",
@@ -83,32 +83,21 @@ parser.add_argument(
     type=str,
     help="flags to be given to the compiler (other than those set by --cpp-arch-flags); default is '-c'",
 )
-parser.add_argument("--check", action="store_true")
+parser.add_argument(
+    "--check",
+    action="store_true",
+    help="checks that the generated machdep is conforming to the schema"
+)
+parser.add_argument(
+    "--check-only",
+    action="store_true",
+    help="must be used in conjunction with --from-file to check that the provided input file is conforming to the schema"
+)
 
 args, other_args = parser.parse_known_args()
 
 if not args.compiler_flags:
     args.compiler_flags = ["-c"]
-
-
-if args.from_file:
-    orig_file = open(args.from_file, "r")
-    orig_machdep = yaml.safe_load(orig_file)
-    orig_file.close()
-    if not "compiler" in orig_machdep or not "cpp_arch_flags" in orig_machdep:
-        raise Exception("Missing fields in yaml file")
-    args.compiler = orig_machdep["compiler"]
-    if isinstance(orig_machdep["cpp_arch_flags"], list):
-        args.cpp_arch_flags = orig_machdep["cpp_arch_flags"]
-    else:  # old version of the schema used a single string
-        args.cpp_arch_flags = orig_machdep["cpp_arch_flags"].split()
-
-
-def print_machdep(machdep):
-    if args.in_place:
-        args.dest_file = open(args.from_file, "w")
-    yaml.dump(machdep, args.dest_file, indent=4, sort_keys=True)
-
 
 def make_schema():
     schema_filename = my_path.parent / "machdep-schema.yaml"
@@ -124,13 +113,40 @@ def check_machdep(machdep):
         from jsonschema import validate, ValidationError
 
         validate(machdep, schema)
+        return True
     except ImportError:
         warnings.warn("jsonschema is not available: no validation will be performed")
+        return True
     except OSError:
         warnings.warn(f"error opening {schema_filename}: no validation will be performed")
+        return True
     except ValidationError:
         warnings.warn("machdep object is not conforming to machdep schema")
+        return False
 
+if args.from_file:
+    orig_file = open(args.from_file, "r")
+    orig_machdep = yaml.safe_load(orig_file)
+    orig_file.close()
+    if args.check_only:
+        if check_machdep(orig_machdep):
+            exit(0)
+        else:
+            exit(1)
+    if not "compiler" in orig_machdep or not "cpp_arch_flags" in orig_machdep:
+        raise Exception("Missing fields in yaml file")
+    args.compiler = orig_machdep["compiler"]
+    if isinstance(orig_machdep["cpp_arch_flags"], list):
+        args.cpp_arch_flags = orig_machdep["cpp_arch_flags"]
+    else:  # old version of the schema used a single string
+        args.cpp_arch_flags = orig_machdep["cpp_arch_flags"].split()
+
+def print_machdep(machdep):
+    if args.from_file and args.in_place:
+        args.dest_file = open(args.from_file, "w")
+    elif args.dest_file is None:
+        args.dest_file = sys.stdout
+    yaml.dump(machdep, args.dest_file, indent=4, sort_keys=True)
 
 def make_machdep():
     machdep = {}
@@ -251,7 +267,6 @@ def find_macros_value(output,is_list=False,entry=None):
     if args.verbose:
         print(f"compiler output is:{output}")
 
-
 for (f, typ) in source_files:
     p = my_path / f
     cmd = compilation_command + [str(p)]
@@ -304,14 +319,17 @@ version = version_output.stdout.splitlines()[0]
 machdep["compiler"] = args.compiler
 machdep["cpp_arch_flags"] = args.cpp_arch_flags
 machdep["version"] = version
+if args.from_file and args.in_place:
+    machdep["machdep_name"] = Path(args.from_file).stem
+elif args.dest_file:
+    machdep["machdep_name"] = Path(args.dest_file.name).stem
+else:
+    machdep["machdep_name"] = "anonymous_machdep"
 
 missing_fields = [f for [f, v] in machdep.items() if v is None]
 
 if missing_fields:
     print("WARNING: the following fields are missing from the machdep definition:")
     print(", ".join(missing_fields))
-
-if args.check:
-    check_machdep(machdep)
 
 print_machdep(machdep)

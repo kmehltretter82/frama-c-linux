@@ -396,6 +396,7 @@ type mach = Cil_types.mach = {
   mb_cur_max: string;
   nsig: string;
   errno: (string * string) list [@of_yaml yaml_dict_to_list];
+  machdep_name: string;
 }
 [@@deriving yaml]
 
@@ -418,6 +419,14 @@ let get_machdep () =
     | Ok machdep -> machdep
     | Error (`Msg s) ->
       Kernel.fatal "Error during machdep parsing: %s" s
+
+let print_machdep_header () =
+  if Kernel.PrintMachdepHeader.get () then begin
+      Machdep.gen_all_defines Format.std_formatter (get_machdep());
+      raise Cmdline.Exit
+    end else Cmdline.nop
+
+let () = Cmdline.run_after_exiting_stage print_machdep_header
 
 let list_available_machdeps () =
   CustomMachdeps.fold (fun m _ acc -> m :: acc) (default_machdeps ())

@@ -19,8 +19,9 @@
 #  for more details (enclosed in the file licenses/LGPLv2.1).            #
 #                                                                        #
 ##########################################################################
+MANUAL_MACHDEPS=machdep_gcc_x86_16.yaml machdep_msvc_x86_64.yaml
 
-update-all: machdep_*.yaml
+update-all: machdep_*.yaml $(MANUAL_MACHDEPS:%=.%.validated)
 
 machdep_avr_16.yaml \
 machdep_gcc_x86_32.yaml \
@@ -35,8 +36,10 @@ machdep_%.yaml: machdep_gcc_%.yaml Makefile
              -e 's/sizeof_void: .*/sizeof_void: -1/' \
              -e 's/alignof_fun: .*/alignof_fun: -1/' \
              -e 's/compiler: .*/compiler: generic/' \
+             -e 's/machdep_name: *machdep_gcc_\([[:alnum:]]*\)/machdep_name: machdep_\1/' \
              $< > $@
 
-machdep_gcc_x86_16.yaml machdep_msvc_x86_64.yaml: %.yaml: machdep-schema.yaml
-	@echo "$@ is newer than $< and must be updated manually"
-	@exit 1
+.%.validated: % machdep-schema.yaml
+	@echo "Checking $*"
+	@./make_machdep/make_machdep.py --from-file $* --check-only
+	@touch $@

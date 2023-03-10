@@ -55,6 +55,7 @@ let mach =
       "eilseq", "84";
       "erange", "34";
     ];
+    machdep_name = "custom_machdep";
   }
 
 let mach2 = { mach with compiler = "baz" }

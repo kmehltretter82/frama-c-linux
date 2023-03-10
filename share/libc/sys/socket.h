@@ -25,7 +25,7 @@
 #include "../features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
-#include "../__fc_machdep.h"
+#include "__fc_machdep.h"
 
 #include "../errno.h"
 

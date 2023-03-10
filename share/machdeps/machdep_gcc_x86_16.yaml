@@ -168,3 +168,4 @@ l_tmpnam: '2048'
 tmp_max: '0xFFFFFFFF'
 rand_max: '32767'
 mb_cur_max: '((size_t)16)'
+machdep_name: machdep_gcc_x86_16
