@@ -8,6 +8,7 @@ let
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
     why3 = oself.callPackage ./why3.nix {};
     yaml = oself.callPackage ./yaml.nix {};
+    ppx_deriving_yaml = oself.callPackage ./ppx_deriving_yaml.nix {};
     # Helpers
     mk_tests = oself.callPackage ./mk_tests.nix {};
     mk_plugin = oself.callPackage ./mk_plugin.nix {};
