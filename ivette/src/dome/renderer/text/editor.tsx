@@ -24,7 +24,7 @@ import React from 'react';
 
 import { EditorState, StateField, Facet, Extension } from '@codemirror/state';
 import { Annotation, Transaction, RangeSet } from '@codemirror/state';
-import { EditorSelection, Text } from '@codemirror/state';
+import { EditorSelection, Text, Prec } from '@codemirror/state';
 
 import { EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
 import { Decoration, DecorationSet } from '@codemirror/view';
@@ -283,6 +283,17 @@ export function createViewUpdater<I extends Dict>(
     fn(inputs, u.view);
   });
   return enables.concat(listener);
+}
+
+export type Priority = 'lowest' | 'low' | 'default' | 'high' | 'highest';
+export function setPriority(extension: Extension, p: Priority): Extension {
+  switch(p) {
+    case 'lowest': return Prec.lowest(extension);
+    case 'low': return Prec.low(extension);
+    case 'default': return Prec.default(extension);
+    case 'high': return Prec.high(extension);
+    case 'highest': return Prec.highest(extension);
+  }
 }
 
 // -----------------------------------------------------------------------------
