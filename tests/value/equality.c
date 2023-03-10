@@ -73,7 +73,7 @@ void test_join () {
     *p = x;
     y = *p + 10;
   }
-  /* The equalities *p == x and y == *p+1 hold. */
+  /* The equalities *p == x and y == *p + 10 hold. */
   if (x < 10) {
     r = *p;
     Frama_C_show_each_precise_0_9(r); // 0 <= r1 <= 9
