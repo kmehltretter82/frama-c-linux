@@ -29,39 +29,63 @@ open Utils
 (** Points-to graphs datastructure. *)
 module G: Graph.Sig.G
 
+(** external signature *)
 module type S =
 sig
 
-end
-
-(** Type denothing an abstract state of the analysis. It is a graph containing
+  (** Type denothing an abstract state of the analysis. It is a graph containing
     all aliases and points-to information. *)
-type t
+  type t
 
-(** check all the invariants that must be true on an abstract value
+  (** access to the points-to graph *)
+  val get_graph: t -> G.t
+
+  (** set of lvals stored in a vertex *)
+  val get_lval_set : G.V.t -> t -> LSet.t
+
+  (** check all the invariants that must be true on an abstract value
     before and after each function call or transformation of the graph)  *)
-val assert_invariants : t -> unit
+  val assert_invariants : t -> unit
 
-(** pretty printer; debug=true prints the graph, debug = false only
-    prints aliased variables *)
-val pretty : ?debug:bool -> Format.formatter -> t -> unit
+  (** pretty printer; debug=true prints the graph, debug = false only
+     prints aliased variables *)
+  val pretty : ?debug:bool -> Format.formatter -> t -> unit
 
 (** dot printer *)
-val print_dot : string -> t -> unit
+  val print_dot : string -> t -> unit
 
-(** finds the vertex corresponding to a lval. May raise @Not_found *)
-val find_vertex : lval -> t -> G.V.t
+  (** finds the vertex corresponding to a lval. May raise @Not_found
+     *)
+  val find_vertex : lval -> t -> G.V.t
 
-(** same as previous function, but return a set of lval. Cannot raise
-    an exception but may return an empty set *)
-val find_aliases : lval -> t -> LSet.t
+  (** same as previous function, but return a set of lval. Cannot
+     raise an exception but may return an empty set *)
+  val find_aliases : lval -> t -> LSet.t
 
-(** find_aliases, then recursively finds other sets of lvals. We have
-    the property (if lval [lv] is in abstract state [x]) :
-    List.hd (find_transitive_closure lv x) = find_aliases lv x
-*)
-val find_transitive_closure : lval -> t -> LSet.t list
+  (** find_aliases, then recursively finds other sets of lvals. We
+     have the property (if lval [lv] is in abstract state [x]) :
+     List.hd (find_transitive_closure lv x) = find_aliases lv x *)
+  val find_transitive_closure : lval -> t -> LSet.t list
 
+
+  (** Type denoting summaries of functions *)
+  type summary
+
+  (** creates a sumary from a state and a function *)
+  val make_summary : t option -> kernel_function -> summary
+
+  (** pretty printer *)
+  val pretty_summary :  ?debug:bool -> ?function_name:string -> Format.formatter -> summary -> unit
+
+  (** [call a res args s] computes the abstract state after the
+      instruction res=f(args), with f summarized by [s]. [a] is the abstract state before the call *)
+  val call: t -> lval option -> exp list -> summary -> t
+
+end
+
+
+include S
+    
 (** Functions for Steensgaard's algorithm, see the paper *)
 val join : t -> G.V.t -> G.V.t -> t
 
@@ -108,21 +132,3 @@ val make_top : t -> t
 
 
 
-(** Type denoting summaries of functions *)
-type summary =
-  {
-    state : t option;
-    formals: lval list;
-    locals: lval list;
-    return : exp option
-  }
-
-(** creates a sumary from a state and a function *)
-val make_summary : t option -> kernel_function -> summary
-
-(** pretty printer *)
-val pretty_summary :  ?debug:bool -> ?function_name:string -> Format.formatter -> summary -> unit
-
-(** [call a res args s] computes the abstract state after the
-    instruction res=f(args), with f summarized by [s]. [a] is the abstract state before the call *)
-val call: t -> lval option -> exp list -> summary -> t
