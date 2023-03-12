@@ -66,7 +66,22 @@ sig
      have the property (if lval [lv] is in abstract state [x]) :
      List.hd (find_transitive_closure lv x) = find_aliases lv x *)
   val find_transitive_closure : lval -> t -> LSet.t list
+  
+  (** inclusion test; [is_included a1 a2] tests if, for any lvl
+     present in a1 (associated to a vertex v1), that it is also
+     present in a2 (associated to a vertex v2) and that set(succ(v1)
+     is included in set(succ(v2)) *)
+  val is_included : t -> t -> bool
 
+
+  (** union of two abstract values ; ensures that if 2 lval are
+     aliased in one of the two input graph (or in a points-to
+     relationship), then they will also be aliased/points-to in the
+     result *)
+  val union : t -> t -> t
+
+  (** empty graph *)
+  val initial_value : t
 
   (** Type denoting summaries of functions *)
   type summary
@@ -110,20 +125,6 @@ val assignment_ptr_x_cst : t -> lval -> t
 val equal : t -> t -> bool
 
 
-(** inclusion test; [is_included a1 a2] tests if, for any lvl present
-    in a1 (associated to a vertex v1), that it is also present in a2
-    (associated to a vertex v2) and that set(succ(v1) is included in
-    set(succ(v2)) *)
-val is_included : t -> t -> bool
-
-
-(** union of two abstract values ; ensures that if 2 lval are aliased
-    in one of the two input graph (or in a points-to relationship),
-    then they will also be aliased/points-to in the result *)
-val union : t -> t -> t
-
-(** empty graph *)
-val initial_value : t
 
 (** make_top merge all nodes of the graph; the resulting graph has
     only 1 vertex, 1 edge (loop); every lval of the origial graph are

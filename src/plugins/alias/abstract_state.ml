@@ -199,52 +199,37 @@ end
 module type S =
 sig
   
-  (** Type denothing an abstract state of the analysis. It is a graph containing
-    all aliases and points-to information. *)
+  (* see .mli for coments *)
   type t
 
-  (** access to the points-to graph *)
   val get_graph: t -> G.t
 
-  (** set of lvals stored in a vertex *)
   val get_lval_set : G.V.t -> t -> LSet.t
 
-  (** check all the invariants that must be true on an abstract value
-    before and after each function call or transformation of the graph)  *)
   val assert_invariants : t -> unit
 
-  (** pretty printer; debug=true prints the graph, debug = false only
-     prints aliased variables *)
   val pretty : ?debug:bool -> Format.formatter -> t -> unit
 
-(** dot printer *)
   val print_dot : string -> t -> unit
 
-  (** finds the vertex corresponding to a lval. May raise @Not_found
-     *)
   val find_vertex : lval -> t -> G.V.t
 
-  (** same as previous function, but return a set of lval. Cannot
-     raise an exception but may return an empty set *)
   val find_aliases : lval -> t -> LSet.t
 
-  (** find_aliases, then recursively finds other sets of lvals. We
-     have the property (if lval [lv] is in abstract state [x]) :
-     List.hd (find_transitive_closure lv x) = find_aliases lv x *)
   val find_transitive_closure : lval -> t -> LSet.t list
 
+  val is_included : t -> t -> bool
 
-  (** Type denoting summaries of functions *)
+  val union : t -> t -> t
+
+  val initial_value : t
+    
   type summary
 
-  (** creates a sumary from a state and a function *)
   val make_summary : t option -> kernel_function -> summary
 
-  (** pretty printer *)
   val pretty_summary :  ?debug:bool -> ?function_name:string -> Format.formatter -> summary -> unit
 
-  (** [call a res args s] computes the abstract state after the
-      instruction res=f(args), with f summarized by [s]. [a] is the abstract state before the call *)
   val call: t -> lval option -> exp list -> summary -> t
 
 end
@@ -269,7 +254,8 @@ let find_aliases (lv:lval) (x:t) =
   with Not_found -> LSet.empty
 
 let get_graph (x:t) = x.graph
-                        
+
+(* renamed for the interface *)
 let get_lval_set = find_lset
 
 
@@ -362,15 +348,26 @@ let assert_invariants (x:t) : unit =
   in
   LLMap.iter assert_lmap x.lmap;
   let assert_vmap (_:V.t) (ls:LSet.t) =
-    (* if LSet.is_empty ls then
-     *   begin (\* it is a constant vertex, so it must have no succ and at least 1 pred *\)
-     *     assert (List.length (G.succ x.graph v) = 0);
-     *     assert (List.length (G.pred x.graph v) > 0);
-     *   end; *)
     assert (LSet.fold (fun lv acc -> acc && LLMap.mem lv x.lmap) ls true)
   in
-  VMap.iter assert_vmap x.vmap
-(* TODO : check collapsed *)
+  VMap.iter assert_vmap x.vmap;
+  let assert_collapsed (v:V.t) =
+    assert (G.mem_vertex x.graph v);
+    match G.succ x.graph v with
+      [v'] ->
+      begin
+        let set_v = find_lset v x in
+        let set_v' = find_lset v' x in
+        (* check that for each lvl lv of v, lv[0] belongs to succ(v) *)
+        LSet.iter
+          (fun lv ->
+             assert (LSet.mem (first_index lv) set_v')
+          )
+          set_v
+      end
+    | _ -> assert false
+  in
+  VSet.iter assert_collapsed x.collapsed
 
 (* for debuging, remove this function before last deliverable *)
 let assert_invariants x =
