@@ -592,7 +592,7 @@ let rec find_or_create_lval (lv:lval) (x:t) : V.t * t =
     Var _ ->  (try (LLMap.find lv x.lmap, x) with  Not_found -> create_vertex lv x)
   | Mem e ->
     begin
-      match find_basic_lval e with
+      match convert_blval (find_basic_lval e) with
         BNone -> failwith "Not implemented1 "
       | BLval lv1 ->
         let v1,x = find_or_create_vertex lv1 x in
@@ -607,9 +607,7 @@ let rec find_or_create_lval (lv:lval) (x:t) : V.t * t =
       | BAddrOf lv1 ->
         let lv2 = Cil.addOffsetLval (snd lv) lv1 in
         find_or_create_vertex lv2 x
-      | BIndex _ as e ->
-        let lv= convert_bindex e in
-        (try (LLMap.find lv x.lmap, x) with  Not_found -> create_vertex lv x)
+      | BIndex _  -> failwith "this should not happen"
     end
 
 

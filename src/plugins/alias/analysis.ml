@@ -81,7 +81,8 @@ end
 
 let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
   (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)
-  let arg = try find_basic_lval exp with
+  let arg =
+    try convert_blval (find_basic_lval exp) with
     Double_lval(_,_,t) when is_scalar_type t -> BNone
   in
   match (a,lv, arg) with
@@ -117,7 +118,7 @@ let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_sta
         Lval lv1 ->
         let lv1 = Cil.addOffsetLval o1 lv1 in
         Some (Abstract_state.assignment_ptr_x_cst a lv1)
-      |  _ -> Options.feedback "Ingnoring assignment %a = %a (do_assignment  not implemented 3)@." Lval.pretty lv Exp.pretty exp; Some a
+      |  _ -> Options.feedback "Ignoring assignment %a = %a (do_assignment  not implemented 3)@." Lval.pretty lv Exp.pretty exp; Some a
     end
   | (None, _, _) -> None
   | _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (not implemented)" Lval.pretty lv Exp.pretty exp; a)

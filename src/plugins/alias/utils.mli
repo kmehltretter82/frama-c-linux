@@ -42,8 +42,8 @@ exception Double_lval of basic_lval * basic_lval * typ
 (** finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). Raise Double_lval if two basic lval appear *)
 val find_basic_lval : exp -> basic_lval
 
-(** convert an index basic_lval into a lval *)
-val convert_bindex : basic_lval -> lval
+(** convert an index basic_lval into a basic_lval *)
+val convert_blval : basic_lval -> basic_lval
 
 (** returns the list of all possible "prefix" of a lval lv1, i.e. each
     pair (lv,o) such as AddoffsetLval o lv = lv1 *)

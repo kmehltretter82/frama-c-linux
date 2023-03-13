@@ -71,7 +71,10 @@ let rec convert_bindex (blv: basic_lval) : lval =
     let lv2 = Cil.addOffsetLval (Index(exp,off1)) lv1 in
     lv2
 
-
+let convert_blval (blv: basic_lval) : basic_lval =
+  match blv with
+    BIndex _ -> BLval (convert_bindex blv)
+  | _ -> blv
 
 let decompose_lval (lv1: lval) : (lval*offset) list =
   let rec list_of_offset (o: offset) : (offset*offset) list =
