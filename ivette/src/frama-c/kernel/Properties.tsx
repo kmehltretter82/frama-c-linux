@@ -606,7 +606,7 @@ function populateModel(
   evaps: EvapsModel
 ): void {
   model.removeAllData();
-  props.getArray().forEach((prop) => {
+  props.forEach((prop) => {
     const { key } = prop;
     const eva = evaps.getData(key);
     model.setData(key,{ ...eva, ...prop });
