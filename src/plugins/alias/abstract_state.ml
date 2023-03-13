@@ -1372,11 +1372,18 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
     List.fold_left2
       (fun acc param formal ->
          begin
-           match  formal, find_basic_lval param with
+           let acc, arg =
+             try acc, find_basic_lval param with
+               Double_lval (_e1,_e2,t) when is_scalar_type t ->
+               acc, BNone
+             | Double_lval(_e1,_e2,_) -> failwith "pointer arithmetic"
+                 
+           in
+           match  formal, arg  with
              ((Var v1, o1), BLval (Var v2,o2)) ->
              (* case x = y *)
              assignment_x_y acc (Var v1, o1) (Var v2, o2)
-           | ((Var _, NoOffset), BNone) -> acc
+           | ((Var _, _), BNone) -> acc
            (* constant assignments : do nothing, but maybe check the type of the assigned variable ? *)
            | ((Var v1, o1), BAddrOf lv2) ->
              (* case x = &y *)

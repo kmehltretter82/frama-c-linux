@@ -35,7 +35,7 @@ module LMap = Lval.Map
 type basic_lval =  BNone | BLval of lval | BAddrOf of lval | BIndex of basic_lval * exp
 
 (* type of the result of the BinOp that raise this exception *)
-exception Double_lval of typ
+exception Double_lval of basic_lval * basic_lval * typ
 
 (* finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). *)
 let rec find_basic_lval (exp:exp) : basic_lval =
@@ -55,7 +55,7 @@ let rec find_basic_lval (exp:exp) : basic_lval =
         (BNone,BNone) -> BNone
       | (BNone, res2) -> res2
       | (res1, BNone) -> res1
-      | _ -> raise (Double_lval t)
+      | _ -> raise (Double_lval (e1,e2,t))
     end
   | _ -> BNone
 
@@ -117,3 +117,9 @@ let rec normalize_index (e:exp) : exp * bool =
   | CastE _ -> normalize_index (Cil.stripCasts e)
   | _ -> e, false
 
+
+let is_scalar_type (t:typ) =
+  match Cil.unrollType t with
+    TFloat _ | TInt _ -> true
+  (* | TNamed (t,_) -> is_scalar t.ttype *)
+  | _ -> false
