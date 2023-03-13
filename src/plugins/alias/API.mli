@@ -73,10 +73,13 @@ module Abstract_state : Abstract_state.S
 
 (** [get_state_before_stmt f s] gets the abstract state computed after
     statement [s] in function [f]. Returns [None] if
-    the abstract state is bottom or not computed *)
+    the abstract state is bottom or not computed. *)
 val get_state_before_stmt :  kernel_function -> stmt -> Abstract_state.t option
 
-(** [get_summary f] gets the summary off unction [f]. Returns [None] if
-    the summary is bottom or not computed *)
-val get_summary :  kernel_function -> Abstract_state.summary option
 
+(** [call_function a f Some(res) args] computes the abstract state
+   after the instruction res=f(args) where res is a lval. [a] is the
+   abstract state before the call. If function [f] returns no value,
+   use [call_function a f None args] instead. Returns [None] if
+    the abstract state [a] is bottom or not computed. *)
+val call_function: Abstract_state.t -> kernel_function -> lval option -> exp list -> Abstract_state.t option

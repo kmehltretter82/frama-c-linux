@@ -220,18 +220,6 @@ sig
 
   val is_included : t -> t -> bool
 
-  val union : t -> t -> t
-
-  val initial_value : t
-
-  type summary
-
-  val make_summary : t option -> kernel_function -> summary
-
-  val pretty_summary :  ?debug:bool -> ?function_name:string -> Format.formatter -> summary -> unit
-
-  val call: t -> lval option -> exp list -> summary -> t
-
 end
 
 type t = {

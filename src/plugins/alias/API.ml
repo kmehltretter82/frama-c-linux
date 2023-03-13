@@ -110,5 +110,8 @@ let fold_points_to_closure  (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: ker
 
 let get_state_before_stmt = Analysis.get_state_before_stmt
 
-let get_summary = Analysis.get_summary
+let call_function a f res args =
+  match Analysis.get_summary f with
+    None -> None
+  | Some su -> Some(Abstract_state.call a res args su)
 

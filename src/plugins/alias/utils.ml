@@ -45,7 +45,7 @@ let rec find_basic_lval (exp:exp) : basic_lval =
   | StartOf lv -> BAddrOf lv
   | CastE _ -> find_basic_lval (Cil.stripCasts exp)
   | UnOp (_,exp,_) -> find_basic_lval exp
-  | BinOp (PlusPI,exp1,exp2,_) -> BIndex (find_basic_lval exp1,exp2)
+  | BinOp (PlusPI,exp1,exp2,_) | BinOp(MinusPI ,exp1,exp2,_) -> BIndex (find_basic_lval exp1,exp2)
   | BinOp (_,exp1,exp2,t) ->
     begin
       let e1 = find_basic_lval exp1

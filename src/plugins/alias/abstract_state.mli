@@ -73,27 +73,7 @@ sig
       get_lval_set(succ(v1) is included in get_lval_set(succ(v2)) *)
   val is_included : t -> t -> bool
 
-  (** union of two abstract values ; ensures that if 2 lval are
-      aliased in one of the two input graph (or in a points-to
-      relationship), then they will also be aliased/points-to in the
-      result *)
-  val union : t -> t -> t
 
-  (** empty graph *)
-  val initial_value : t
-
-  (** Type denoting summaries of functions *)
-  type summary
-
-  (** creates a sumary from a state and a function *)
-  val make_summary : t option -> kernel_function -> summary
-
-  (** pretty printer *)
-  val pretty_summary :  ?debug:bool -> ?function_name:string -> Format.formatter -> summary -> unit
-
-  (** [call a res args s] computes the abstract state after the
-      instruction res=f(args), with f summarized by [s]. [a] is the abstract state before the call *)
-  val call: t -> lval option -> exp list -> summary -> t
 
 end
 
@@ -131,4 +111,24 @@ val equal : t -> t -> bool
 val make_top : t -> t
 
 
+  (** union of two abstract values ; ensures that if 2 lval are
+      aliased in one of the two input graph (or in a points-to
+      relationship), then they will also be aliased/points-to in the
+      result *)
+  val union : t -> t -> t
 
+  (** empty graph *)
+  val initial_value : t
+
+  (** Type denoting summaries of functions *)
+  type summary
+
+  (** creates a summary from a state and a function *)
+  val make_summary : t option -> kernel_function -> summary
+
+  (** pretty printer *)
+  val pretty_summary :  ?debug:bool -> ?function_name:string -> Format.formatter -> summary -> unit
+
+  (** [call a res args s] computes the abstract state after the
+      instruction res=f(args), with f summarized by [s]. [a] is the abstract state before the call *)
+  val call: t -> lval option -> exp list -> summary -> t
