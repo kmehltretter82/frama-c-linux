@@ -5,11 +5,11 @@
 [eva:initial-state] Values of globals at initialization
   rand ∈ [--..--]
 [eva] computing for function replace_lvalue <- main.
-  Called from equality.c:62.
+  Called from equality.c:120.
 [eva] Recording results for replace_lvalue
 [eva] Done for function replace_lvalue
 [eva] computing for function assign_by_copy <- main.
-  Called from equality.c:63.
+  Called from equality.c:121.
 [eva] computing for function Frama_C_interval <- assign_by_copy <- main.
   Called from equality.c:40.
 [eva] using specification for function Frama_C_interval
@@ -21,7 +21,7 @@
 [eva] Recording results for assign_by_copy
 [eva] Done for function assign_by_copy
 [eva] computing for function symbolic <- main.
-  Called from equality.c:64.
+  Called from equality.c:122.
 [eva] computing for function Frama_C_float_interval <- symbolic <- main.
   Called from equality.c:52.
 [eva] using specification for function Frama_C_float_interval
@@ -43,6 +43,29 @@
   function sqrtf: precondition 'arg_positive' got status unknown.
 [eva] Recording results for symbolic
 [eva] Done for function symbolic
+[eva] computing for function test_join <- main.
+  Called from equality.c:123.
+[eva] computing for function Frama_C_interval <- test_join <- main.
+  Called from equality.c:64.
+[eva] equality.c:64: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] equality.c:79: Frama_C_show_each_precise_0_9: [0..9]
+[eva:alarm] equality.c:84: Warning: 
+  accessing uninitialized left-value. assert \initialized(p);
+[eva] equality.c:85: Frama_C_show_each_imprecise_0_17: [0..32]
+[eva:alarm] equality.c:92: Warning: 
+  accessing uninitialized left-value. assert \initialized(p);
+[eva] equality.c:93: Frama_C_show_each_imprecise_0_21: [0..32]
+[eva] equality.c:99: Frama_C_show_each_10_19: [10..42]
+[eva:alarm] equality.c:103: Warning: 
+  accessing uninitialized left-value. assert \initialized(p);
+[eva] equality.c:105: Frama_C_show_each_10_42: [10..42]
+[eva:alarm] equality.c:111: Warning: 
+  accessing uninitialized left-value. assert \initialized(p);
+[eva] equality.c:113: Frama_C_show_each_10_42: [10..42]
+[eva] Recording results for test_join
+[eva] Done for function test_join
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -62,6 +85,15 @@
   g ∈ [-0. .. 10.]
   tmp ∈ [-10. .. 0.]
   res ∈ [-0. .. 3.16227769852] or UNINITIALIZED
+[eva:final-states] Values at end of function test_join:
+  Frama_C_entropy_source ∈ [--..--]
+  a ∈ [-9..32] or UNINITIALIZED
+  b ∈ [-10..32] or UNINITIALIZED
+  c ∈ [0..32] or UNINITIALIZED
+  r ∈ [0..42] or UNINITIALIZED
+  p ∈ {{ &a ; &b ; &c }}
+  x ∈ [0..32]
+  y ∈ [10..42]
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
 [from] Computing for function assign_by_copy
@@ -76,6 +108,8 @@
 [from] Computing for function sqrtf <-symbolic
 [from] Done for function sqrtf
 [from] Done for function symbolic
+[from] Computing for function test_join
+[from] Done for function test_join
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -94,6 +128,8 @@
   \result FROM x
 [from] Function symbolic:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+[from] Function test_join:
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function main:
   Frama_C_entropy_source FROM Frama_C_entropy_source; rand (and SELF)
 [from] ====== END OF DEPENDENCIES ======
@@ -109,6 +145,10 @@
     Frama_C_entropy_source; f; g; tmp; res
 [inout] Inputs for function symbolic:
     Frama_C_entropy_source
+[inout] Out (internal) for function test_join:
+    Frama_C_entropy_source; a; b; c; r; p; x; y
+[inout] Inputs for function test_join:
+    Frama_C_entropy_source; rand
 [inout] Out (internal) for function main:
     Frama_C_entropy_source
 [inout] Inputs for function main:

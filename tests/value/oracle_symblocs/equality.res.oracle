@@ -4,7 +4,11 @@
 ---
 > [eva] equality.c:57: 
 >   function sqrtf: precondition 'arg_positive' got status valid.
-64c64
+60c60
+< [eva] equality.c:99: Frama_C_show_each_10_19: [10..42]
+---
+> [eva] equality.c:99: Frama_C_show_each_10_19: [10..19]
+87c87
 <   res ∈ [-0. .. 3.16227769852] or UNINITIALIZED
 ---
 >   res ∈ [3.74339206651e-23 .. 3.16227769852] or UNINITIALIZED
