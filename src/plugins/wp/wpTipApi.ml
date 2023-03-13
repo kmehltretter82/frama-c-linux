@@ -227,6 +227,9 @@ class printer () : Ptip.pseq =
 (* --- Printer Registry                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
+let printStatus = R.signal ~package ~name:"printStatus"
+    ~descr:(Md.plain "Updated TIP printer")
+
 module PRINTER = State_builder.Ref
     (Datatype.Make
        (struct
@@ -263,9 +266,6 @@ let lookup_printer (node : ProofEngine.node) : printer =
 (* -------------------------------------------------------------------------- *)
 (* --- PrintSequent Request                                               --- *)
 (* -------------------------------------------------------------------------- *)
-
-let printStatus = R.signal ~package ~name:"printStatus"
-    ~descr:(Md.plain "Updated TIP printer")
 
 let flags (type a) ~name ~descr tags : a R.input =
   (module struct

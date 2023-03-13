@@ -38,27 +38,6 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 
-/** TIP Tactic Information */
-export type tactic =
-  { id: Json.key<'#tactic'>, label: string, title: string };
-
-/** Decoder for `tactic` */
-export const jTactic: Json.Decoder<tactic> =
-  Json.jObject({
-    id: Json.jKey<'#tactic'>('#tactic'),
-    label: Json.jString,
-    title: Json.jString,
-  });
-
-/** Natural order for `tactic` */
-export const byTactic: Compare.Order<tactic> =
-  Compare.byFields
-    <{ id: Json.key<'#tactic'>, label: string, title: string }>({
-    id: Compare.string,
-    label: Compare.string,
-    title: Compare.string,
-  });
-
 /** Parameter kind */
 export type kind =
   "checkbox" | "spinner" | "selector" | "editor" | "browser";
@@ -157,16 +136,6 @@ export const byParameter: Compare.Order<parameter> =
 export const configured: Server.Signal = {
   name: 'plugins.wp.tac.configured',
 };
-
-const getTactics_internal: Server.GetRequest<null,tactic[]> = {
-  kind: Server.RqKind.GET,
-  name:   'plugins.wp.tac.getTactics',
-  input:  Json.jNull,
-  output: Json.jArray(jTactic),
-  signals: [],
-};
-/** List of registered tactics */
-export const getTactics: Server.GetRequest<null,tactic[]>= getTactics_internal;
 
 const getParameters_internal: Server.GetRequest<
   Json.key<'#tactic'>,
