@@ -1375,7 +1375,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
            let acc, arg =
              try acc, find_basic_lval param with
                Double_lval (_e1,_e2,t) when is_scalar_type t ->
-               acc, BNone
+               acc, BNone (* TODO: est-ce correct ? *)
              | Double_lval(_e1,_e2,_) -> failwith "pointer arithmetic"          
            in
            match  formal, arg  with

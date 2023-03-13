@@ -81,7 +81,10 @@ end
 
 let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
   (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)
-  match (a,lv, find_basic_lval exp) with
+  let arg = try find_basic_lval exp with
+    Double_lval(_,_,t) when is_scalar_type t -> BNone
+  in
+  match (a,lv, arg) with
     (Some a, (Var v1, o1), BLval (Var v2, o2)) ->
     (* case x = y *)
     Some (Abstract_state.assignment_x_y a (Var v1, o1) (Var v2, o2))
