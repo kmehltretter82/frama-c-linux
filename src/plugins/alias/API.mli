@@ -73,7 +73,7 @@ module Abstract_state : Abstract_state.S
 
 (** [get_state_before_stmt f s] gets the abstract state computed after
     statement [s] in function [f]. Returns [None] if
-    the abstract state is bottom or not computed *)                          
+    the abstract state is bottom or not computed *)
 val get_state_before_stmt :  kernel_function -> stmt -> Abstract_state.t option
 
 (** [get_summary f] gets the summary off unction [f]. Returns [None] if

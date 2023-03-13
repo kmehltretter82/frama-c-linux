@@ -37,7 +37,7 @@ module LMap = Lval.Map
 (** type of the return of the following function *)
 type basic_lval =  BNone | BLval of lval | BAddrOf of lval | BIndex of basic_lval * exp
 
-exception Double_lval of basic_lval * basic_lval
+exception Double_lval of typ
 
 (** finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). Raise Double_lval if two basic lval appear *)
 val find_basic_lval : exp -> basic_lval

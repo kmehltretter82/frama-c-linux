@@ -198,7 +198,7 @@ end
 
 module type S =
 sig
-  
+
   (* see .mli for coments *)
   type t
 
@@ -223,7 +223,7 @@ sig
   val union : t -> t -> t
 
   val initial_value : t
-    
+
   type summary
 
   val make_summary : t option -> kernel_function -> summary
@@ -610,22 +610,6 @@ let rec find_or_create_lval (lv:lval) (x:t) : V.t * t =
       | BIndex _ as e ->
         let lv= convert_bindex e in
         (try (LLMap.find lv x.lmap, x) with  Not_found -> create_vertex lv x)
-
-      (* | SizeOf  _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> failwith "Not implemented2 "
-       *
-       * | UnOp  _  -> failwith "Not implemented3"
-       * | BinOp (PlusPI, exp1, exp2, _ ) ->
-       *   let off2 = Index(exp2, NoOffset) in
-       *   begin
-       *     match exp1.enode with
-       *       Lval lv1 -> let lv2 = Cil.addOffsetLval off2 lv1 in
-       *       find_or_create_vertex (Cil.addOffsetLval (snd lv) lv2) x
-       *     | _ -> (Format.printf "DEBUG: Mem (%a)@." Printer.pp_exp e ; failwith "Not implemented4")
-       *   end
-       * | BinOp _-> (Format.printf "DEBUG: Mem (%a)@." Printer.pp_exp e ; failwith "Not implemented5")
-       * | CastE _ -> find_or_create_vertex (Mem (Cil.stripCasts e), snd lv) x
-       * | AddrOf lv ->
-       * | StartOf lv ->  find_or_create_vertex lv x *)
     end
 
 
@@ -1389,19 +1373,19 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
       (fun acc param formal ->
          begin
            match  formal, find_basic_lval param with
-             ((Var v1, NoOffset), BLval (Var v2,NoOffset)) ->
+             ((Var v1, o1), BLval (Var v2,o2)) ->
              (* case x = y *)
-             assignment_x_y acc (Var v1, NoOffset) (Var v2, NoOffset)
+             assignment_x_y acc (Var v1, o1) (Var v2, o2)
            | ((Var _, NoOffset), BNone) -> acc
            (* constant assignments : do nothing, but maybe check the type of the assigned variable ? *)
-           | ((Var v1, NoOffset), BAddrOf lv2) ->
+           | ((Var v1, o1), BAddrOf lv2) ->
              (* case x = &y *)
-             assignment_x_addr_y acc (Var v1, NoOffset) lv2
-           | ((Var v1, NoOffset), BLval (Mem e2, NoOffset)) ->
+             assignment_x_addr_y acc (Var v1, o1) lv2
+           | ((Var v1, o1), BLval (Mem e2, _)) ->
              (* case x  = *y *)
              begin
                match e2.enode with
-                 Lval lv2 -> assignment_x_ptr_y acc (Var v1, NoOffset) lv2
+                 Lval lv2 -> assignment_x_ptr_y acc (Var v1, o1) lv2
                |  _ -> (Options.feedback "In a function call, parameter (@[%a@] <- @[%a@]) is ignored)" Lval.pretty formal Exp.pretty param; acc)
              end
            | _ -> (Options.feedback "DEBUG: call function - formal variable not as we expected@."; acc)

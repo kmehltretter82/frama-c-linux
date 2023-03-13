@@ -34,7 +34,7 @@ module type S =
 sig
 
   (** Type denothing an abstract state of the analysis. It is a graph containing
-    all aliases and points-to information. *)
+      all aliases and points-to information. *)
   type t
 
   (** access to the points-to graph *)
@@ -44,39 +44,39 @@ sig
   val get_lval_set : G.V.t -> t -> LSet.t
 
   (** check all the invariants that must be true on an abstract value
-    before and after each function call or transformation of the graph)  *)
+      before and after each function call or transformation of the graph)  *)
   val assert_invariants : t -> unit
 
   (** pretty printer; debug=true prints the graph, debug = false only
-     prints aliased variables *)
+      prints aliased variables *)
   val pretty : ?debug:bool -> Format.formatter -> t -> unit
 
   (** dot printer; first argument is a file name *)
   val print_dot : string -> t -> unit
 
   (** finds the vertex corresponding to a lval. May raise @Not_found
-     *)
+  *)
   val find_vertex : lval -> t -> G.V.t
 
   (** same as previous function, but return a set of lval. Cannot
-     raise an exception but may return an empty set *)
+      raise an exception but may return an empty set *)
   val find_aliases : lval -> t -> LSet.t
 
   (** find_aliases, then recursively finds other sets of lvals. We
-     have the property (if lval [lv] is in abstract state [x]) :
-     List.hd (find_transitive_closure lv x) = find_aliases lv x *)
+      have the property (if lval [lv] is in abstract state [x]) :
+      List.hd (find_transitive_closure lv x) = find_aliases lv x *)
   val find_transitive_closure : lval -> t -> LSet.t list
-  
+
   (** inclusion test; [is_included a1 a2] tests if, for any lvl
-     present in a1 (associated to a vertex v1), that it is also
-     present in a2 (associated to a vertex v2) and that
-     get_lval_set(succ(v1) is included in get_lval_set(succ(v2)) *)
+      present in a1 (associated to a vertex v1), that it is also
+      present in a2 (associated to a vertex v2) and that
+      get_lval_set(succ(v1) is included in get_lval_set(succ(v2)) *)
   val is_included : t -> t -> bool
 
   (** union of two abstract values ; ensures that if 2 lval are
-     aliased in one of the two input graph (or in a points-to
-     relationship), then they will also be aliased/points-to in the
-     result *)
+      aliased in one of the two input graph (or in a points-to
+      relationship), then they will also be aliased/points-to in the
+      result *)
   val union : t -> t -> t
 
   (** empty graph *)
@@ -99,7 +99,7 @@ end
 
 
 include S
-    
+
 (** Functions for Steensgaard's algorithm, see the paper *)
 val join : t -> G.V.t -> G.V.t -> t
 
