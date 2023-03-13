@@ -83,7 +83,7 @@ stdenv.mkDerivation {
   '';
   buildPhase = ''
     runHook preBuild
-    dune build -j2 --display short @install
+    dune build -j2 --display short --error-reporting=twice @install
   '';
 
   wp_cache =

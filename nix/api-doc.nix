@@ -19,7 +19,7 @@ stdenv.mkDerivation rec {
   ];
 
   buildPhase = ''
-    dune build -j1 @doc
+    dune build -j1 --error-reporting=twice @doc
     cp -r _build/default/_doc/_html frama-c-api
     echo ".dummy" > excluded
     tar czf frama-c-api.tar.gz -X excluded frama-c-api
