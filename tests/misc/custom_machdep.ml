@@ -54,6 +54,20 @@ let mach =
       "edom", "33";
       "eilseq", "84";
       "erange", "34";
+      "eintr", "35";
+      "eagain", "36";
+      "ebadf", "37";
+      "efbig", "38";
+      "einval", "39";
+      "eio", "40";
+      "enospc", "41";
+      "eoverflow", "42";
+      "epipe", "43";
+      "espipe", "44";
+      "enxio", "45";
+      "emfile", "46";
+      "enomem", "47";
+      "enotsup", "48";
     ];
     machdep_name = "custom_machdep";
   }

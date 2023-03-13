@@ -19,7 +19,7 @@
 int main(void)
 {
   int __retres;
-  __retres = (int)2147483647;
+  __retres = 8388607;
   return __retres;
 }
 
