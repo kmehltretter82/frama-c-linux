@@ -65,3 +65,18 @@ val fold_points_to:
     [fold_points_to]. *)
 val fold_points_to_closure:
   ('a ->  Lval.Set.t -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
+
+
+(** direct access to the abstract state. See Abstract_state.mli *)
+
+module Abstract_state : Abstract_state.S
+
+(** [get_state_before_stmt f s] gets the abstract state computed after
+    statement [s] in function [f]. Returns [None] if
+    the abstract state is bottom or not computed *)                          
+val get_state_before_stmt :  kernel_function -> stmt -> Abstract_state.t option
+
+(** [get_summary f] gets the summary off unction [f]. Returns [None] if
+    the summary is bottom or not computed *)
+val get_summary :  kernel_function -> Abstract_state.summary option
+

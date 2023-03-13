@@ -61,7 +61,8 @@ val is_computed : unit -> bool
     the analysis. All accumulated data are lost. *)
 val clear : unit -> unit
 
-(** [get_abstract_state f s] gets the abstract state computed after
-    statement [s] in function [f]. Uses Stmt_table. Returns [None] if
-    the abstract state is bottom or not computed *)
-val get_abstract_state :  kernel_function -> stmt -> Abstract_state.t option
+(** see API.mli *)
+val get_state_before_stmt :  kernel_function -> stmt -> Abstract_state.t option
+
+(** see API.mli *)
+val get_summary : kernel_function -> Abstract_state.summary option

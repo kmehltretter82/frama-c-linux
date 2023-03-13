@@ -51,7 +51,7 @@ sig
      prints aliased variables *)
   val pretty : ?debug:bool -> Format.formatter -> t -> unit
 
-(** dot printer *)
+  (** dot printer; first argument is a file name *)
   val print_dot : string -> t -> unit
 
   (** finds the vertex corresponding to a lval. May raise @Not_found
@@ -69,10 +69,9 @@ sig
   
   (** inclusion test; [is_included a1 a2] tests if, for any lvl
      present in a1 (associated to a vertex v1), that it is also
-     present in a2 (associated to a vertex v2) and that set(succ(v1)
-     is included in set(succ(v2)) *)
+     present in a2 (associated to a vertex v2) and that
+     get_lval_set(succ(v1) is included in get_lval_set(succ(v2)) *)
   val is_included : t -> t -> bool
-
 
   (** union of two abstract values ; ensures that if 2 lval are
      aliased in one of the two input graph (or in a points-to

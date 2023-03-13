@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Abstract_state = Abstract_state
 
 module Analysis = Analysis
 

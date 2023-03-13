@@ -355,7 +355,7 @@ let clear () =
   computed_flag := false;
   (*Stmt_table*)Stmt_table.clear()
 
-let get_abstract_state _ stmt =
+let get_state_before_stmt _kf stmt =
   if is_computed ()
   then
     try Stmt_table.find stmt with
@@ -363,3 +363,10 @@ let get_abstract_state _ stmt =
   else
     None
 
+let get_summary kf =
+  if is_computed ()
+  then
+    try Function_table.find kf with
+      Not_found -> None
+  else
+    None
