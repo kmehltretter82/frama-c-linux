@@ -251,8 +251,6 @@ build-distrib-tarball:
 
 header-check:
   stage: distrib
-  variables:
-    FRAMAC_HDRCK: ""
   script:
     - ./nix/shell-checkers.sh "make -f share/Makefile.headers check-headers"
 
@@ -260,8 +258,6 @@ header-check:
 
 lint:
   stage: distrib
-  variables:
-    LINT_MAKEFILE: "share/Makefile.linting"
   script:
     - ./nix/shell-checkers.sh "make -f share/Makefile.linting check-lint"
 
