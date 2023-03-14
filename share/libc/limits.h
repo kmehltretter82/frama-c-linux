@@ -169,11 +169,12 @@
 
 /* Maximum length of a host name (not including the terminating null)
    as returned from the gethostname() function.
-   Note: Mac OS does not define this constant. 
+   Note: Mac OS does not define this constant, and Linux use a strictly smaller
+   one than what POSIX mandate
 */
 #ifdef __FC_HOST_NAME_MAX
 #  if __FC_HOST_NAME_MAX >= 0
-     _Static_assert(__FC_HOST_NAME_MAX >=_POSIX_HOST_NAME_MAX, "__FC_HOST_NAME_MAX is too small (" expand(__FC_HOST_NAME_MAX) "): minimal value is " expand(_POSIX_HOST_NAME_MAX));
+     // _Static_assert(__FC_HOST_NAME_MAX >=_POSIX_HOST_NAME_MAX, "__FC_HOST_NAME_MAX is too small (" expand(__FC_HOST_NAME_MAX) "): minimal value is " expand(_POSIX_HOST_NAME_MAX));
 #    define HOST_NAME_MAX __FC_HOST_NAME_MAX
 #  else
 #    undef HOST_NAME_MAX
