@@ -32,6 +32,8 @@ FILTER= \
 	--exclude "_build" \
 	--exclude "node_modules" \
 
+OS?=
+
 ifndef PREFIX
 then
 install::
@@ -56,5 +58,5 @@ uninstall::
 	@rm -f  "${FULLPREFIX}/lib/frama-c/ivette.tgz"
 	@rm -fr "${FULLPREFIX}/lib/frama-c/Ivette.app"
 	@rm -fr "${FULLPREFIX}/lib/frama-c/ivette"
-	
+
 endif
