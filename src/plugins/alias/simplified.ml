@@ -20,42 +20,59 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(**  This is a collection of functions for other files of the plugin.
-     /!\ Caution when re-using them /!\
-*)
-
 open Cil_types
 
 open Cil_datatype
 
-module VSet = Datatype.Int.Set
-module VMap = Datatype.Int.Map
+module Simplified_lval =
+struct
+  include Lval
 
-(* module Lval = Simplified.Simplified_lval *)
-module LSet = Lval.Set
-module LMap = Lval.Map
+  let nul_exp=
+    let loc = Location.unknown in
+    Cil.zero ~loc
 
-(** type of the return of the following function *)
-type basic_lval =  BNone | BLval of lval | BAddrOf of lval | BIndex of basic_lval * exp
+  exception IsExp of exp
+  
+  let rec simplify_lval (h,o) =
+    (simplify_host h, simplify_offset o)
+    
+  and simplify_host h =
+    match h with
+      Var _ -> h
+    | Mem e -> Mem (simplify_exp e)
+                 
+  and simplify_offset o =
+    match o with
+      NoOffset -> NoOffset
+    | Field(f,o) -> Field(f, simplify_offset o)
+    | Index(_e,o) -> Index(nul_exp, simplify_offset o)
 
-exception Double_lval of basic_lval * basic_lval * typ
+  and simplify_exp e =
+    try
+      let simplified_enode =
+        match e.enode with
+        | Lval lv -> Lval (simplify_lval lv)
+        | AddrOf lv -> AddrOf (simplify_lval lv)
+        | StartOf lv -> StartOf (simplify_lval lv)
+        | BinOp(PlusPI,e1,_,t) | BinOp(MinusPI,e1,_,t) -> BinOp(PlusPI,simplify_exp e1,nul_exp,t)
+        | CastE(_,e) -> raise (IsExp (simplify_exp e))
+        | _ -> raise (IsExp nul_exp)                            
+      in
+      {e with enode=simplified_enode}
+    with
+    IsExp e -> e
+end
+  
 
-(** finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). Raise Double_lval if two basic lval appear *)
-val find_basic_lval : exp -> basic_lval
-
-(** convert an index basic_lval into a basic_lval *)
-val convert_blval : basic_lval -> basic_lval
-
-(** returns the list of all possible "prefix" of a lval lv1, i.e. each
-    pair (lv,o) such as AddoffsetLval o lv = lv1 *)
-val  decompose_lval : lval -> (lval*offset) list
-
-
-(** [first_index a] returns a[0] *)
-val first_index : lval -> lval
-
-(** returns true if the index is OK (no needs to collapse) *)
-val normalize_index : exp -> exp * bool
-
-(** returns true if the type is scalar (int/float) *)
-val is_scalar_type : typ -> bool
+(* module Simplified_exp =
+ * struct
+ *   type simplified_exp =
+ *       BNone (\* anything that is not a lval or an adress *\)
+ *     | BLVal of lval (\* a simplified lval*\)
+ *     | BAddrOf of lval
+ * 
+ * 
+ * 
+ *   
+ * end *)

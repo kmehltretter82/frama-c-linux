@@ -183,7 +183,7 @@ struct
     | _ -> false
 
   (* finds all the lval lv1 apearing in [m] such as there exists an index c  such as lv1 = lv[c] *)
-  let find_indexed_offsets (lv:lval) (m:t) : V.t LMap.t =
+  let _find_indexed_offsets (lv:lval) (m:t) : V.t LMap.t =
     let lv, off = Cil.removeOffsetLval lv in
     let mo = try LMap.find lv m with Not_found -> OMap.empty in
     let f_filter o _v = is_indexed_offset off o in
@@ -228,7 +228,7 @@ type t = {
   lmap : LLMap.t ; (* lmap(lv) is a table [offset->v] where the vertex v corresponding to lval (lv+offset), in other words (lv+offset) is in label(v) *)
   vmap : LSet.t VMap.t ;(* reverse of lmap *)
   cmpt : Int.t ; (* counter to create new vertex *)
-  collapsed : VSet.t (* arrays that are collapsed because of non-constant accesses. All aliased arrays are collapsed *)
+  (* collapsed : VSet.t (\* arrays that are collapsed because of non-constant accesses. All aliased arrays are collapsed *\) *)
 }
 
 
@@ -264,9 +264,9 @@ let print_debug fmt (x:t) =
   Format.fprintf fmt "@[<hov 2>VMap: @.";
   VMap.iter (fun v ls -> Format.fprintf fmt "(id = %d -> lset= %a)@." v LSet.pretty ls) x.vmap;
   Format.fprintf fmt "@]@.";
-  Format.fprintf fmt "cmpt: %d@." x.cmpt;
-  let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
-  Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval
+  Format.fprintf fmt "cmpt: %d@." x.cmpt
+  (* let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
+   * Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval *)
 
 let print_aliases fmt (x:t) =
   let iter_vmap v set_lv =
@@ -300,10 +300,10 @@ let print_aliases fmt (x:t) =
   in
   Format.fprintf fmt "@[<hov 2><list of may-alias>@.";
   VMap.iter iter_vmap x.vmap;
-  Format.fprintf fmt "<end of list>@]@.";
-  let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
-  if not (LSet.is_empty collapsed_lval) then
-    Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval
+  Format.fprintf fmt "<end of list>@]@."(* ;
+   * let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
+   * if not (LSet.is_empty collapsed_lval) then
+   *   Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval *)
 
 let pretty ?(debug=false) =
   if debug then
@@ -338,24 +338,24 @@ let assert_invariants (x:t) : unit =
   let assert_vmap (_:V.t) (ls:LSet.t) =
     assert (LSet.fold (fun lv acc -> acc && LLMap.mem lv x.lmap) ls true)
   in
-  VMap.iter assert_vmap x.vmap;
-  let assert_collapsed (v:V.t) =
-    assert (G.mem_vertex x.graph v);
-    match G.succ x.graph v with
-      [v'] ->
-      begin
-        let set_v = find_lset v x in
-        let set_v' = find_lset v' x in
-        (* check that for each lvl lv of v, lv[0] belongs to succ(v) *)
-        LSet.iter
-          (fun lv ->
-             assert (LSet.mem (first_index lv) set_v')
-          )
-          set_v
-      end
-    | _ -> assert false
-  in
-  VSet.iter assert_collapsed x.collapsed
+  VMap.iter assert_vmap x.vmap(* ;
+   * let assert_collapsed (v:V.t) =
+   *   assert (G.mem_vertex x.graph v);
+   *   match G.succ x.graph v with
+   *     [v'] ->
+   *     begin
+   *       let set_v = find_lset v x in
+   *       let set_v' = find_lset v' x in
+   *       (\* check that for each lvl lv of v, lv[0] belongs to succ(v) *\)
+   *       LSet.iter
+   *         (fun lv ->
+   *            assert (LSet.mem (first_index lv) set_v')
+   *         )
+   *         set_v
+   *     end
+   *   | _ -> assert false
+   * in
+   * VSet.iter assert_collapsed x.collapsed *)
 
 (* for debuging, remove this function before last deliverable *)
 let assert_invariants x =
@@ -398,8 +398,8 @@ let create_cst_vertex (x:t) : V.t * t =
     pending = new_pending ;
     lmap = new_lmap ;
     vmap = new_vmap ;
-    cmpt = x.cmpt+1 ;
-    collapsed = x.collapsed
+    cmpt = x.cmpt+1(*  ;
+     * collapsed = x.collapsed *)
   }
 
 
@@ -453,8 +453,8 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
       pending = new_pending ;
       lmap = new_lmap ;
       vmap = new_vmap ;
-      cmpt = x.cmpt+1 ;
-      collapsed = x.collapsed
+      cmpt = x.cmpt+1 (* ;
+       * collapsed = x.collapsed *)
     }
   in
   assert_invariants new_x;
@@ -519,45 +519,45 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
  *   let base_addr  = ptr_base_addr ~loc base in
  *   base, base_addr *)
 
-let list_arrays_to_be_collapsed = ref []
+(* let list_arrays_to_be_collapsed = ref [] *)
 
-let is_collapsed (lv:lval) (x:t) =
-  try
-    let v = LLMap.find lv x.lmap in
-    VSet.mem v x.collapsed
-  with Not_found -> false
+(* let is_collapsed (lv:lval) (x:t) =
+ *   try
+ *     let v = LLMap.find lv x.lmap in
+ *     VSet.mem v x.collapsed
+ *   with Not_found -> false *)
 
-(* warning, this function has a side effect on list_arrays_to_be_collapsed *)
-let normalize_lval (x:t) (lv1:lval) : lval =
-  let lv, off = Cil.removeOffsetLval lv1 in
-  list_arrays_to_be_collapsed := [];
-  let loc = Location.unknown in
-  let rec normalize_offset (lvx:lval) (o:offset) : offset =
-    match o with
-      NoOffset -> NoOffset
-    | Field (f, ofs) ->
-      let lvx = Cil.addOffsetLval (Field(f,NoOffset)) lvx in
-      Field (f,normalize_offset lvx ofs)
-    | Index (e, ofs) ->
-      if is_collapsed lvx x
-      then
-        let lvx = first_index lvx in
-        Index(Cil.zero ~loc, normalize_offset lvx ofs)
-      else
-        let e, b = normalize_index e in
-        if not b
-        then (* then we need to collapse lvx *)
-          begin
-            list_arrays_to_be_collapsed := lvx::!list_arrays_to_be_collapsed;
-            let lvx = first_index lvx in
-            Index(Cil.zero ~loc, normalize_offset lvx ofs)
-          end
-        else
-          let lvx = Cil.addOffsetLval (Index(e,NoOffset)) lvx in
-          Index(e, normalize_offset lvx ofs)
-  in
-  let off = normalize_offset lv off in
-  Cil.addOffsetLval off lv
+(* (\* warning, this function has a side effect on list_arrays_to_be_collapsed *\)
+ * let normalize_lval (x:t) (lv1:lval) : lval =
+ *   let lv, off = Cil.removeOffsetLval lv1 in
+ *   list_arrays_to_be_collapsed := [];
+ *   let loc = Location.unknown in
+ *   let rec normalize_offset (lvx:lval) (o:offset) : offset =
+ *     match o with
+ *       NoOffset -> NoOffset
+ *     | Field (f, ofs) ->
+ *       let lvx = Cil.addOffsetLval (Field(f,NoOffset)) lvx in
+ *       Field (f,normalize_offset lvx ofs)
+ *     | Index (e, ofs) ->
+ *       if is_collapsed lvx x
+ *       then
+ *         let lvx = first_index lvx in
+ *         Index(Cil.zero ~loc, normalize_offset lvx ofs)
+ *       else
+ *         let e, b = normalize_index e in
+ *         if not b
+ *         then (\* then we need to collapse lvx *\)
+ *           begin
+ *             list_arrays_to_be_collapsed := lvx::!list_arrays_to_be_collapsed;
+ *             let lvx = first_index lvx in
+ *             Index(Cil.zero ~loc, normalize_offset lvx ofs)
+ *           end
+ *         else
+ *           let lvx = Cil.addOffsetLval (Index(e,NoOffset)) lvx in
+ *           Index(e, normalize_offset lvx ofs)
+ *   in
+ *   let off = normalize_offset lv off in
+ *   Cil.addOffsetLval off lv *)
 
 
 let diff_offset (lv1:lval) (lv2:lval) =
@@ -670,8 +670,8 @@ let remove_cst_vertex (v:V.t) (x:t) : t =
     pending = VMap.remove v x.pending;
     lmap = x.lmap;
     vmap = VMap.remove v x.vmap;
-    cmpt = x.cmpt;
-    collapsed = x.collapsed
+    cmpt = x.cmpt(* ;
+     * collapsed = x.collapsed *)
   }
 
 (* remove a lval from a graph*)
@@ -706,13 +706,13 @@ let merge x v1 v2 =
     (* update vmap *)
     let new_vmap = VMap.add v1 new_set (VMap.remove v2 x.vmap) in
     (* update collapse *)
-    let new_collapsed =
-      if VSet.mem v2 x.collapsed
-      then
-        VSet.add v1 (VSet.remove v2 x.collapsed)
-      else
-        x.collapsed
-    in
+    (* let new_collapsed =
+     *   if VSet.mem v2 x.collapsed
+     *   then
+     *     VSet.add v1 (VSet.remove v2 x.collapsed)
+     *   else
+     *     x.collapsed
+     * in *)
     (* update the graph *)
     let f_fold_succ v_succ (g:G.t) : G.t =
       G.add_edge g v1 v_succ
@@ -725,57 +725,58 @@ let merge x v1 v2 =
     let g = G.fold_pred f_fold_pred g v2 g in
     (* remove v2 *)
     let g =  G.remove_vertex g v2 in
-    {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt ; collapsed = new_collapsed}
+    {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt (* ; collapsed = new_collapsed *)}
 
 
-(* merge all nodes of an array a to a[0] *)
-let collapse (lv:lval) (x:t) : t =
-  let v, x = find_or_create_vertex lv x in
-  let lv0 = first_index lv in
-  let v0, x = find_or_create_vertex lv0 x in
-  let map_to_be_collapsed = LLMap.find_indexed_offsets lv x.lmap in
-  (* merge all nodes that are indexed with v0 *)
-  let f_fold _lvx vx acc =
-    let acc = merge acc v0 vx in
-    let p = VMap.add v0 (VSet.union (VMap.find v0 acc.pending) (VMap.find vx acc.pending)) acc.pending in
-    let new_pending = VMap.remove vx p in
-    {acc with pending = new_pending }
-  in
-  LMap.fold f_fold map_to_be_collapsed {x with collapsed = VSet.add v x.collapsed }
+(* (\* merge all nodes of an array a to a[0] *\)
+ * let collapse (lv:lval) (x:t) : t =
+ *   let v, x = find_or_create_vertex lv x in
+ *   let lv0 = first_index lv in
+ *   let v0, x = find_or_create_vertex lv0 x in
+ *   let map_to_be_collapsed = LLMap.find_indexed_offsets lv x.lmap in
+ *   (\* merge all nodes that are indexed with v0 *\)
+ *   let f_fold _lvx vx acc =
+ *     let acc = merge acc v0 vx in
+ *     let p = VMap.add v0 (VSet.union (VMap.find v0 acc.pending) (VMap.find vx acc.pending)) acc.pending in
+ *     let new_pending = VMap.remove vx p in
+ *     {acc with pending = new_pending }
+ *   in
+ *   LMap.fold f_fold map_to_be_collapsed {x with collapsed = VSet.add v x.collapsed } *)
 
 
-let collapse_node (v:V.t) (x:t) : t =
-  let ls = try VMap.find v x.vmap with Not_found -> LSet.empty in
-  LSet.fold
-    (fun lv acc -> collapse lv acc)
-    ls
-    x
+(* let collapse_node (v:V.t) (x:t) : t =
+ *   let ls = try VMap.find v x.vmap with Not_found -> LSet.empty in
+ *   LSet.fold
+ *     (fun lv acc -> collapse lv acc)
+ *     ls
+ *     x *)
 
-(* has a side effect on list_arrays_to_be_collapsed *)
-let collapse_graph (x:t) : t =
-  let res =
-    List.fold_left
-      (fun acc lv ->
-         let v,acc = find_or_create_vertex lv acc in
-         collapse_node v acc)
-      x
-      !list_arrays_to_be_collapsed
-  in
-  list_arrays_to_be_collapsed := []; res
+(* (\* has a side effect on list_arrays_to_be_collapsed *\)
+ * let collapse_graph (x:t) : t =
+ *   let res =
+ *     List.fold_left
+ *       (fun acc lv ->
+ *          let v,acc = find_or_create_vertex lv acc in
+ *          collapse_node v acc)
+ *       x
+ *       !list_arrays_to_be_collapsed
+ *   in
+ *   list_arrays_to_be_collapsed := []; res *)
 
 
 
-let normalize_lval (lv:lval) (x:t) : lval * t =
-  let new_lv = normalize_lval x lv in
-  let new_x =
-    if !list_arrays_to_be_collapsed != []
-    then
-      collapse_graph x
-    else
-      x
-  in (* now, list_arrays_to_be_collapsed = [] *)
-  new_lv, new_x
+(* let normalize_lval (lv:lval) (x:t) : lval * t =
+ *   let new_lv = normalize_lval x lv in
+ *   let new_x =
+ *     if !list_arrays_to_be_collapsed != []
+ *     then
+ *       collapse_graph x
+ *     else
+ *       x
+ *   in (\* now, list_arrays_to_be_collapsed = [] *\)
+ *   new_lv, new_x *)
 
+let normalize_lval lv x = (lv,x)
 
 (** .dot printing functions*)
 let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
@@ -1156,7 +1157,7 @@ let rename_all_vertex (x:t) : t =
       VMap.empty
   in
   let new_x =
-    {graph = renamed_graph; pending = renamed_pending ; lmap = renamed_lmap ; vmap = renamed_vmap ; cmpt = !new_cmpt ; collapsed = x.collapsed}
+    {graph = renamed_graph; pending = renamed_pending ; lmap = renamed_lmap ; vmap = renamed_vmap ; cmpt = !new_cmpt (* ; collapsed = x.collapsed *)}
   in
   assert_invariants new_x; new_x
 
@@ -1200,9 +1201,9 @@ let union  (a1:t) (a2:t) :t =
       a2.vmap
       a1.vmap
   in
-  let new_collapsed =
-    VSet.union a1.collapsed a2.collapsed
-  in
+  (* let new_collapsed =
+   *   VSet.union a1.collapsed a2.collapsed
+   * in *)
   (* s_acc = set of couples that should be merged in step 3 *)
   let set_to_be_merged, new_lmap =
     LLMap.fold
@@ -1219,7 +1220,7 @@ let union  (a1:t) (a2:t) :t =
       a2.lmap
       (V2Set.empty, a1.lmap)
   in
-  let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = a1.cmpt + a2.cmpt ; collapsed = new_collapsed } in
+  let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = a1.cmpt + a2.cmpt (* ; collapsed = new_collapsed  *)} in
 
   (* step 3 *)
   let new_a =
@@ -1276,7 +1277,7 @@ let union  (a1:t) (a2:t) :t =
   new_a
 
 let initial_value :t =
-  {graph = G.empty; pending = VMap.empty ; lmap = LLMap.empty; vmap = VMap.empty; cmpt = 0; collapsed = VSet.empty}
+  {graph = G.empty; pending = VMap.empty ; lmap = LLMap.empty; vmap = VMap.empty; cmpt = 0(* ; collapsed = VSet.empty *)}
 
 
 let make_top (x:t) : t =
@@ -1295,7 +1296,7 @@ let make_top (x:t) : t =
       VMap.add 0 !set_lv VMap.empty
     in
     let p = VMap.add 0 VSet.empty VMap.empty in
-    {graph = g ; pending = p ; lmap = lmap ; vmap = vmap ; cmpt = 1; collapsed = x.collapsed}
+    {graph = g ; pending = p ; lmap = lmap ; vmap = vmap ; cmpt = 1(* ; collapsed = x.collapsed *)}
 
 (** a type for summaries of functions *)
 type summary =

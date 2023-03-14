@@ -20,42 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(**  This is a collection of functions for other files of the plugin.
-     /!\ Caution when re-using them /!\
-*)
-
 open Cil_types
 
 open Cil_datatype
 
-module VSet = Datatype.Int.Set
-module VMap = Datatype.Int.Map
 
-(* module Lval = Simplified.Simplified_lval *)
-module LSet = Lval.Set
-module LMap = Lval.Map
-
-(** type of the return of the following function *)
-type basic_lval =  BNone | BLval of lval | BAddrOf of lval | BIndex of basic_lval * exp
-
-exception Double_lval of basic_lval * basic_lval * typ
-
-(** finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). Raise Double_lval if two basic lval appear *)
-val find_basic_lval : exp -> basic_lval
-
-(** convert an index basic_lval into a basic_lval *)
-val convert_blval : basic_lval -> basic_lval
-
-(** returns the list of all possible "prefix" of a lval lv1, i.e. each
-    pair (lv,o) such as AddoffsetLval o lv = lv1 *)
-val  decompose_lval : lval -> (lval*offset) list
-
-
-(** [first_index a] returns a[0] *)
-val first_index : lval -> lval
-
-(** returns true if the index is OK (no needs to collapse) *)
-val normalize_index : exp -> exp * bool
-
-(** returns true if the type is scalar (int/float) *)
-val is_scalar_type : typ -> bool
+module Simplified_lval:
+sig
+  include S_with_collections_pretty with type t = lval
+                                           
+  val simplify_lval: lval -> lval
+end
