@@ -46,9 +46,9 @@ import { Space } from 'dome/frame/toolbars';
 
 import '@fortawesome/fontawesome-free/js/all';
 
+import EvaReady from 'frama-c/plugins/eva/EvaReady';
 import style from './style.json';
 import layouts from './layouts.json';
-
 
 const Debug = new Dome.Debug('dive');
 
@@ -654,11 +654,13 @@ function GraphView(): JSX.Element {
           title="Clear the graph"
         />
       </Ivette.TitleBar>
-      <CytoscapeComponent
-        stylesheet={style}
-        cy={setCy}
-        style={{ width: '100%', height: '100%' }}
-      />
+      <EvaReady>
+        <CytoscapeComponent
+            stylesheet={style}
+            cy={setCy}
+            style={{ width: '100%', height: '100%' }}
+          />
+      </EvaReady>
     </>
   );
 

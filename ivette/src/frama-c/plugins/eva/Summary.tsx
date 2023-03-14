@@ -20,9 +20,7 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-// React & Dome
 import React from 'react';
-import { LED } from 'dome/controls/displays';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
 import * as Eva from 'frama-c/plugins/eva/api/general';
@@ -30,6 +28,7 @@ import * as Eva from 'frama-c/plugins/eva/api/general';
 import CoverageMeter, { percent } from './CoverageMeter';
 
 import './style_summary.css';
+import EvaReady from './EvaReady';
 
 function CoverageTable(data: Eva.programStatsType): JSX.Element {
   const { progFunCoverage: functions, progStmtCoverage: statements } = data;
@@ -200,48 +199,34 @@ function Statuses(data: Eva.programStatsType): JSX.Element {
 export function EvaSummary(): JSX.Element {
   const alarmCategories = States.useTags(Eva.alarmCategoryTags);
   const data = States.useSyncValue(Eva.programStats);
-  const state = States.useSyncValue(Eva.computationState);
 
-  if (state === 'not_computed')
-    return (
-      <div className="eva-summary-status">
-        No Eva analysis has been run yet.
+  if (!data || !alarmCategories)
+    return (<></>); /* Should not happen if Eva analysis has been computed */
+
+  return (
+    <div className="eva-summary-box">
+      <div className="eva-summary">
+        <h1>Analysis Summary</h1>
+        <h2>Coverage</h2>
+        {CoverageTable(data)}
+        <h2>Errors</h2>
+        {Errors(data)}
+        <h2>Alarms</h2>
+        {Alarms(data, alarmCategories)}
+        <h2>Statuses</h2>
+        {Statuses(data)}
       </div>
-    );
-
-  if (state === 'computing')
-    return (
-      <div className="eva-summary-status">
-        <LED status="active" blink />
-        Eva analysis in progress…
-      </div>
-    );
-
-  if (state === 'computed' && data && alarmCategories)
-    return (
-      <div className="eva-summary-box">
-        <div className="eva-summary">
-          <h1>Analysis Summary</h1>
-          <h2>Coverage</h2>
-          {CoverageTable(data)}
-          <h2>Errors</h2>
-          {Errors(data)}
-          <h2>Alarms</h2>
-          {Alarms(data, alarmCategories)}
-          <h2>Statuses</h2>
-          {Statuses(data)}
-        </div>
-      </div>
-    );
-
-  return (<></>);
+    </div>
+  );
 }
 
 function EvaSummaryComponent(): JSX.Element {
   return (
     <>
       <Ivette.TitleBar />
-      <EvaSummary />
+      <EvaReady>
+        <EvaSummary />
+      </EvaReady>
     </>
   );
 }
