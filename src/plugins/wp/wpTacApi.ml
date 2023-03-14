@@ -38,19 +38,46 @@ let package = P.package ~plugin:"wp" ~name:"tac"
 (* --- Tacticals                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Jtactic = (val D.jkey ~kind:"tactic")
+module Jtactic : D.S with type t = Tactical.t =
+struct
+  type t = Tactical.t
+  let jtype = P.Jkey "tactic"
+  let to_json (t : Tactical.t) = `String t#id
+  let of_json (js : Json.t) = Tactical.lookup ~id:(js |> Json.string)
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tactical Kind                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Jkind =
+module Jkind : D.S with type t = string =
 struct
   include D.Jstring
   let jtype = D.declare ~package
       ~name:"kind" ~descr:(Md.plain "Parameter kind")
       (Junion [Jtag "checkbox"; Jtag "spinner"; Jtag "selector";
                Jtag "editor"; Jtag "browser"])
+end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Tactical Status                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Jstatus : R.Output with type t = Tactical.status =
+struct
+  type t = Tactical.status
+  let jtype = D.declare ~package
+      ~name:"status" ~descr:(Md.plain "Tactical status")
+      (Junion [
+          Jtag "NotApplicable";
+          Jtag "NotConfigured";
+          Jtag "Applicable";
+        ])
+  let to_json (s : Tactical.status) =
+    match s with
+    | Not_applicable -> `String "NotApplicable"
+    | Not_configured -> `String "NotConfigured"
+    | Applicable _ -> `String "Applicable"
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -164,6 +191,8 @@ class parameter
     val mutable p_enabled = true
     initializer self#reset
 
+    method id = Tactical.ident field
+
     method reset =
       begin
         p_label <- fd.title ;
@@ -237,7 +266,7 @@ class configurator (tactic : Tactical.tactical) =
     val mutable isgui = false
     val mutable status = Tactical.Not_applicable
 
-    (* Reset *)
+    (* Basics *)
 
     method reset =
       begin
@@ -249,7 +278,9 @@ class configurator (tactic : Tactical.tactical) =
         List.iter (fun p -> p#reset) parameters ;
       end
 
+    method id = tactic#id
     method params = parameters
+    method lookup ~pid = List.find (fun p -> p#id = pid) parameters
 
     (* Feedback Interface *)
 
@@ -279,13 +310,15 @@ class configurator (tactic : Tactical.tactical) =
       ignore range ;
       ignore filter ;
       let id = Tactical.ident field in
-      List.iter (fun (p : parameter) ->
+      List.iter
+        (fun (p : parameter) ->
           p#update ~id ?enabled ?title ?tooltip ?vmin ?vmax ()
         ) parameters
 
     (* Processing *)
 
-    method process ~pool ~selection ~interactive () =
+    method status = status
+    method private select ~interactive pool selection =
       try
         local <- Some pool ;
         error <- None ;
@@ -302,77 +335,91 @@ class configurator (tactic : Tactical.tactical) =
         error <- Some (Printf.sprintf "Error (%s)" (Printexc.to_string exn));
         raise exn
 
-  end
+    method configure ~interactive node selection =
+      let tree = ProofEngine.tree node in
+      let pool = ProofEngine.pool tree in
+      let ctxt = ProofEngine.tree_context tree in
+      WpContext.on_context ctxt (self#select ~interactive pool) selection
+
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tactical Parameter Management                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-(*TODO: DEPRECTATED *)
+(* indexed by tactical Id. *)
+let index : (string,configurator) Hashtbl.t = Hashtbl.create 0
 
-let () = ignore (fun t -> new configurator t)
-
-module Phash = Hashtbl.Make
-    (struct
-      open Tactical
-      type t = Project.t * tactical * parameter
-      let hash (prj,t,p) =
-        Hashtbl.hash
-          (Printf.sprintf "%s::%s::%s"
-             (Project.get_unique_name prj)
-             t#id (Tactical.param p))
-      let equal (prja,ta,pa) (prjb,tb,pb) =
-        Project.equal prja prjb && (ta == tb) && (pa == pb)
-    end)
-
-let parameters : parameter Phash.t = Phash.create 0
-
-let parameter tactic param : parameter =
-  let id = Project.current(),tactic,param in
-  try Phash.find parameters id
+let configurator tactic =
+  let id = tactic#id in
+  try Hashtbl.find index id
   with Not_found ->
-    let prm : parameter =
-      match param with
-      | Checkbox field ->
-        new parameter ~tactic ~field ~kind:"checkbox" ~data:D.jbool ()
-      | Spinner(field,range) ->
-        new parameter ~tactic ~field ~kind:"spinner" ~data:D.jint ~range ()
-      | Selector(field,options,equal) ->
-        let data = joptions options equal in
-        new parameter ~tactic ~field ~kind:"selector" ~data ~options ()
-      | _ -> assert false
-    in Phash.add parameters id prm ; prm
+    let cfg = new configurator tactic in
+    Hashtbl.add index id cfg ; cfg
 
-let configured = R.signal ~package ~name:"configured"
-    ~descr:(Md.plain "Tactical configuration modified")
+let iter f = Tactical.iter (fun t -> f @@ configurator t)
 
-let () = R.register ~package ~kind:`GET
-    ~name:"getParameters"
-    ~descr:(Md.plain "Return tactical current parameters")
-    ~input:(module Jtactic)
-    ~output:(module D.Jlist(ParameterConfig))
-    ~signals:[configured]
-    (fun id ->
-       let tactic = Tactical.lookup ~id in
-       List.map (parameter tactic) tactic#params)
+let tactics =
+  let model : configurator S.model = S.model () in
+  S.column model ~name:"label" ~descr:(Md.plain "Tactic name")
+    ~data:(module D.Jstring) ~get:(fun cfg -> cfg#get_title) ;
+  S.column model ~name:"title" ~descr:(Md.plain "Tactic description")
+    ~data:(module D.Jstring) ~get:(fun cfg -> cfg#get_descr) ;
+  S.option model ~name:"error" ~descr:(Md.plain "Tactic error")
+    ~data:(module D.Jstring) ~get:(fun cfg -> cfg#get_error) ;
+  S.column model ~name:"status" ~descr:(Md.plain "Tactic status")
+    ~data:(module Jstatus) ~get:(fun cfg -> cfg#status) ;
+  S.column model ~name:"params" ~descr:(Md.plain "Configuration parameters")
+    ~data:(module D.Jlist(ParameterConfig))
+    ~get:(fun cfg -> cfg#params) ;
+  S.register_array
+    ~package
+    ~name:"tactical"
+    ~descr:(Md.plain "Tactical Configurations")
+    ~key:(fun cfg -> cfg#id)
+    ~keyName:"id"
+    ~keyType:Jtactic.jtype
+    ~iter model
+
+let () =
+  let configureTactics = R.signature ~output:(module D.Junit) () in
+  let get_node = R.param configureTactics ~name:"node"
+      ~descr:(Md.plain "Proof node target") (module WpTipApi.Node) in
+  R.register_sig ~package ~kind:`EXEC
+    ~name:"configureTactics"
+    ~descr:(Md.plain "Configure all tactics")
+    configureTactics
+    begin fun rq () ->
+      let node = get_node rq in
+      iter (fun cfg ->
+          cfg#configure ~interactive:true node (*TODO*) Tactical.Empty ;
+        ) ;
+      S.reload tactics ;
+    end
 
 let () =
   let setParameter = R.signature ~output:(module D.Junit) () in
+  let get_node = R.param setParameter ~name:"node"
+      ~descr:(Md.plain "Proof node target") (module WpTipApi.Node) in
   let get_tactic = R.param setParameter ~name:"tactic"
       ~descr:(Md.plain "Tactic to configure") (module Jtactic) in
   let get_param = R.param setParameter ~name:"param"
       ~descr:(Md.plain "Parameter to configure") (module Jparam) in
   let get_value = R.param setParameter ~name:"value"
       ~descr:(Md.plain "New parameter value") (module D.Jany) in
-  R.register_sig ~package ~kind:`SET
+  R.register_sig ~package ~kind:`EXEC
     ~name:"setParameter"
     ~descr:(Md.plain "Configure tactical parameter")
     setParameter
     begin fun rq () ->
-      let tactic = Tactical.lookup ~id:(get_tactic rq) in
-      let param = Tactical.lookup_param tactic ~id:(get_param rq) in
-      let p = parameter tactic param in
-      p#import (get_value rq)
+      let node = get_node rq in
+      let tac = get_tactic rq in
+      let pid = get_param rq in
+      let cfg = configurator tac in
+      let prm = cfg#lookup ~pid in
+      prm#import (get_value rq) ;
+      cfg#configure ~interactive:true node (*TODO*) Tactical.Empty ;
+      S.update tactics cfg ;
     end
 
 (* -------------------------------------------------------------------------- *)
