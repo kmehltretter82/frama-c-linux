@@ -85,6 +85,14 @@ prepare-shell-checkers:
   script:
     - ./nix/shell-checkers.sh "true"
 
+prepare-wp-cache:
+  stage: prepare
+  script:
+    - ./nix/wp-cache.nix.sh
+  artifacts:
+    paths:
+      - ./nix/wp-cache.nix
+
 ################################################################################
 ### BUILD
 

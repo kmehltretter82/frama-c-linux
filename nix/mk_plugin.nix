@@ -44,6 +44,7 @@
 , alt-ergo
 , frama-c
 , time
+, wp-cache
 }:
 
 { plugin-name
@@ -88,11 +89,7 @@ stdenv.mkDerivation {
 
   wp_cache =
     if has-wp-proofs
-    then fetchGit {
-           url = "git@git.frama-c.com:frama-c/wp-cache.git" ;
-           ref = "master" ;
-           shallow = true ;
-         }
+    then wp-cache.src
     else "" ;
 
   doCheck = true;
