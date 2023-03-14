@@ -135,6 +135,10 @@ errno:
     exdev: '18'
     exfull: '54'
 has__builtin_va_list: true
+int_fast8_t: signed char
+int_fast16_t: signed int
+int_fast32_t: long
+int_fast64_t: long long
 intptr_t: long
 little_endian: true
 nsig: '65'
@@ -153,6 +157,10 @@ sizeof_short: 2
 sizeof_void: -1
 ssize_t: int
 time_t: long
+uint_fast8_t: unsigned char
+uint_fast16_t: unsigned int
+uint_fast32_t: unsigned long
+uint_fast64_t: unsigned long long
 uintptr_t: unsigned long
 version: none
 wchar_t: int

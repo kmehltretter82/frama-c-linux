@@ -363,6 +363,14 @@ type mach = Cil_types.mach = {
   ptrdiff_t: string;
   intptr_t: string;
   uintptr_t: string;
+  int_fast8_t: string;
+  int_fast16_t: string;
+  int_fast32_t: string;
+  int_fast64_t: string;
+  uint_fast8_t: string;
+  uint_fast16_t: string;
+  uint_fast32_t: string;
+  uint_fast64_t: string;
   wint_t: string;
   sig_atomic_t: string;
   time_t: string;

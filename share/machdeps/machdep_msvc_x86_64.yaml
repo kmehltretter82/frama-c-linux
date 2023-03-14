@@ -94,6 +94,10 @@ errno:
     eownerdead: '133'
     enotrecoverable: '127'
 has__builtin_va_list: false
+int_fast8_t: signed char
+int_fast16_t: signed int
+int_fast32_t: signed int
+int_fast64_t: signed long long
 intptr_t: signed long long
 little_endian: true
 nsig: '23'
@@ -113,6 +117,10 @@ sizeof_short: 2
 sizeof_void: 0
 ssize_t: long long
 time_t: long long
+uint_fast8_t: unsigned char
+uint_fast16_t: unsigned int
+uint_fast32_t: unsigned int
+uint_fast64_t: unsigned long long
 uintptr_t: unsigned long long
 version: MSVC - X86-64bits mode
 wchar_t: unsigned short

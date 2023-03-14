@@ -136,6 +136,30 @@ has__builtin_va_list:
 
   type: boolean
 
+int_fast8_t:
+
+  description: definition of 'int_fast8_t'
+
+  type: string
+
+int_fast16_t:
+
+  description: definition of 'int_fast16_t'
+
+  type: string
+
+int_fast32_t:
+
+  description: definition of 'int_fast32_t'
+
+  type: string
+
+int_fast64_t:
+
+  description: definition of 'int_fast64_t'
+
+  type: string
+
 intptr_t:
   description: definition of 'intptr_t'
 
@@ -277,6 +301,30 @@ time_t:
 tmp_max:
 
   description: value of 'TMP_MAX' macro
+
+  type: string
+
+uint_fast8_t:
+
+  description: definition of 'uint_fast8_t'
+
+  type: string
+
+uint_fast16_t:
+
+  description: definition of 'uint_fast16_t'
+
+  type: string
+
+uint_fast32_t:
+
+  description: definition of 'uint_fast32_t'
+
+  type: string
+
+uint_fast64_t:
+
+  description: definition of 'uint_fast64_t'
 
   type: string
 

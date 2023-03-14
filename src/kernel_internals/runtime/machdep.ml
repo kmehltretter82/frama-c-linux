@@ -148,8 +148,7 @@ let gen_fixed_size_family fmt bitsize mach =
   | Some (exact_size, kind) ->
     if size = exact_size then
       gen_int_type_family fmt (string_of_int bitsize) bitsize kind;
-    gen_int_type_family fmt ("_LEAST" ^ string_of_int bitsize) bitsize kind;
-    gen_int_type_family fmt ("_FAST" ^ string_of_int bitsize) bitsize kind
+    gen_int_type_family fmt ("_LEAST" ^ string_of_int bitsize) bitsize kind
 
 let gen_max_size_int fmt mach =
   gen_int_type_family fmt "MAX" (8 * mach.sizeof_longlong) "long long"
@@ -194,6 +193,16 @@ let gen_intlike_max fmt name repr mach =
   let repr_name, _ = List.assoc repr (std_type_name mach) in
   gen_define_string fmt macro ("__FC_" ^ repr_name ^ "_MAX")
 
+let gen_fast_int fmt bitsize signed repr mach =
+  let name = Format.sprintf "_FAST%d" bitsize in
+  let full_name =
+    Format.sprintf "__%sINT%s" (if signed then "" else "U") name
+  in
+  gen_define_string fmt (full_name ^ "_T") repr;
+  if signed then gen_intlike_min fmt full_name repr mach;
+  gen_intlike_max fmt full_name repr mach;
+  if signed then gen_define_printing_prefix fmt name (no_signedness repr)
+
 (* assuming all archs have an 8-bit char. In any case, if we end up dealing
    with something else at some point, machdep will not be the only place were
    changes will be required. *)
@@ -212,6 +221,14 @@ let gen_all_defines fmt mach =
   gen_fixed_size_family fmt 16 mach;
   gen_fixed_size_family fmt 32 mach;
   gen_fixed_size_family fmt 64 mach;
+  gen_fast_int fmt 8 true mach.int_fast8_t mach;
+  gen_fast_int fmt 16 true mach.int_fast16_t mach;
+  gen_fast_int fmt 32 true mach.int_fast32_t mach;
+  gen_fast_int fmt 64 true mach.int_fast64_t mach;
+  gen_fast_int fmt 8 false mach.uint_fast8_t mach;
+  gen_fast_int fmt 16 false mach.uint_fast16_t mach;
+  gen_fast_int fmt 32 false mach.uint_fast32_t mach;
+  gen_fast_int fmt 64 false mach.uint_fast64_t mach;
   gen_max_size_int fmt mach;
   gen_std_min_max fmt mach;
   gen_va_list_repr fmt mach;
