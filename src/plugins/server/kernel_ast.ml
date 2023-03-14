@@ -321,8 +321,7 @@ struct
     | None -> false
 
   let is_fundecl = function
-    | PGlobal (GFun _ | GFunDecl _) -> true
-    | PGlobal (GVar (vi, _, _) | GVarDecl (vi, _)) -> Globals.Functions.mem vi
+    | PVDecl(Some _,Kglobal,vi) -> vi.vglob && Globals.Functions.mem vi
     | _ -> false
 
   let scope tag =
