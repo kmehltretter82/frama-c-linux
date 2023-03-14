@@ -243,7 +243,7 @@ const configureTactics_internal: Server.ExecRequest<
   name:   'plugins.wp.tac.configureTactics',
   input:  Json.jObject({ node: Json.jIndex<'#node'>('#node'),}),
   output: Json.jNull,
-  signals: [],
+  signals: [ { name: 'plugins.wp.tip.printStatus' } ],
 };
 /** Configure all tactics */
 export const configureTactics: Server.ExecRequest<

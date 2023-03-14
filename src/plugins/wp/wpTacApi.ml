@@ -312,7 +312,7 @@ class configurator (tactic : Tactical.tactical) =
       let id = Tactical.ident field in
       List.iter
         (fun (p : parameter) ->
-          p#update ~id ?enabled ?title ?tooltip ?vmin ?vmax ()
+           p#update ~id ?enabled ?title ?tooltip ?vmin ?vmax ()
         ) parameters
 
     (* Processing *)
@@ -341,10 +341,10 @@ class configurator (tactic : Tactical.tactical) =
       let ctxt = ProofEngine.tree_context tree in
       WpContext.on_context ctxt (self#select ~interactive pool) selection
 
-end
+  end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Tactical Parameter Management                                      --- *)
+(* --- Tactical Status                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
 (* indexed by tactical Id. *)
@@ -381,6 +381,10 @@ let tactics =
     ~keyType:Jtactic.jtype
     ~iter model
 
+(* -------------------------------------------------------------------------- *)
+(* --- Tactical Target Configuration                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
 let () =
   let configureTactics = R.signature ~output:(module D.Junit) () in
   let get_node = R.param configureTactics ~name:"node"
@@ -388,14 +392,21 @@ let () =
   R.register_sig ~package ~kind:`EXEC
     ~name:"configureTactics"
     ~descr:(Md.plain "Configure all tactics")
+    ~signals:[WpTipApi.printStatus]
     configureTactics
     begin fun rq () ->
       let node = get_node rq in
+      (*TODO: use current selection or known script to configure *)
+      let selection = WpTipApi.selection node in
       iter (fun cfg ->
-          cfg#configure ~interactive:true node (*TODO*) Tactical.Empty ;
+          cfg#configure ~interactive:true node selection
         ) ;
       S.reload tactics ;
     end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Tactical Parameter Configuration                                   --- *)
+(* -------------------------------------------------------------------------- *)
 
 let () =
   let setParameter = R.signature ~output:(module D.Junit) () in
@@ -417,8 +428,9 @@ let () =
       let pid = get_param rq in
       let cfg = configurator tac in
       let prm = cfg#lookup ~pid in
+      let selection = WpTipApi.selection node in
       prm#import (get_value rq) ;
-      cfg#configure ~interactive:true node (*TODO*) Tactical.Empty ;
+      cfg#configure ~interactive:true node selection ;
       S.update tactics cfg ;
     end
 

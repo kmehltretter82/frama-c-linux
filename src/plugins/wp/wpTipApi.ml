@@ -274,6 +274,10 @@ let lookup_printer (node : ProofEngine.node) : printer =
     let pp = new printer () in
     Hashtbl.add registry wpo.po_gid pp ; pp
 
+let selection node =
+  let pp = lookup_printer node in
+  pp#selection
+
 (* -------------------------------------------------------------------------- *)
 (* --- PrintSequent Request                                               --- *)
 (* -------------------------------------------------------------------------- *)
@@ -366,7 +370,7 @@ let () =
       let extend = get_extend rq in
       let pp = lookup_printer node in
       let part = to_part (fst pp#sequent) part in
-      pp#restore ~focus:(if extend then `Extend else `Select) (part,term) ;
+      pp#restore ~focus:(if extend then `Extend else `Focus) (part,term) ;
       R.emit printStatus
     end
 

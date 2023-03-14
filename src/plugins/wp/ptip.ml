@@ -517,7 +517,7 @@ class pseq
           | `Transient -> false
           | `Select -> true
           | `Focus -> Option.iter (autofocus#focus ~extend:false) t ; true
-          | `Extend -> Option.iter (autofocus#focus ~extend:true) t ; true
+          | `Extend -> Option.iter (autofocus#focus ~extend:true) t ; false
           | `Reset -> autofocus#reset ; true
         in if selected then self#selected
       end
