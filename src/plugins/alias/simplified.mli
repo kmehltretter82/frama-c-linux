@@ -22,12 +22,37 @@
 
 open Cil_types
 
-open Cil_datatype
-
 
 module Simplified_lval:
 sig
-  include S_with_collections_pretty with type t = lval
-                                           
-  val simplify_lval: lval -> lval
+  type t
+    
+  val compare: t -> t -> int
+    
+  val from_lval: lval -> t
+
+  val from_exp: exp -> t
+
+  val pretty: Format.formatter -> t -> unit
+
+  val pp_debug : Format.formatter -> t -> unit
+end
+
+module Simplified_lmap:
+sig
+  include Map.S with type key = Simplified_lval.t
+                                  
+  val pretty: (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
+    
+  val pp_debug : (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit                              
+end
+
+module Simplified_lset:
+sig
+  include Set.S with type elt = Simplified_lval.t
+
+  val pretty: Format.formatter -> t -> unit
+    
+  val pp_debug : Format.formatter -> t -> unit
+    
 end
