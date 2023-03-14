@@ -55,6 +55,20 @@ export const jKind: Json.Decoder<kind> =
 /** Natural order for `kind` */
 export const byKind: Compare.Order<kind> = Compare.structural;
 
+/** Tactical status */
+export type status = "NotApplicable" | "NotConfigured" | "Applicable";
+
+/** Decoder for `status` */
+export const jStatus: Json.Decoder<status> =
+  Json.jUnion<"NotApplicable" | "NotConfigured" | "Applicable">(
+    Json.jTag("NotApplicable"),
+    Json.jTag("NotConfigured"),
+    Json.jTag("Applicable"),
+  );
+
+/** Natural order for `status` */
+export const byStatus: Compare.Order<status> = Compare.structural;
+
 /** Parameter option value */
 export type value = { id: Json.key<'#value'>, label: string, title: string };
 
@@ -132,35 +146,120 @@ export const byParameter: Compare.Order<parameter> =
     vlist: Compare.defined(Compare.array(byValue)),
   });
 
-/** Tactical configuration modified */
-export const configured: Server.Signal = {
-  name: 'plugins.wp.tac.configured',
+/** Data for array rows [`tactical`](#tactical)  */
+export interface tacticalData {
+  /** Entry identifier. */
+  id: Json.key<'#tactic'>;
+  /** Tactic name */
+  label: string;
+  /** Tactic description */
+  title: string;
+  /** Tactic error */
+  error?: string;
+  /** Tactic status */
+  status: status;
+  /** Configuration parameters */
+  params: parameter[];
+}
+
+/** Decoder for `tacticalData` */
+export const jTacticalData: Json.Decoder<tacticalData> =
+  Json.jObject({
+    id: Json.jKey<'#tactic'>('#tactic'),
+    label: Json.jString,
+    title: Json.jString,
+    error: Json.jOption(Json.jString),
+    status: jStatus,
+    params: Json.jArray(jParameter),
+  });
+
+/** Natural order for `tacticalData` */
+export const byTacticalData: Compare.Order<tacticalData> =
+  Compare.byFields
+    <{ id: Json.key<'#tactic'>, label: string, title: string, error?: string,
+       status: status, params: parameter[] }>({
+    id: Compare.string,
+    label: Compare.string,
+    title: Compare.string,
+    error: Compare.defined(Compare.string),
+    status: byStatus,
+    params: Compare.array(byParameter),
+  });
+
+/** Signal for array [`tactical`](#tactical)  */
+export const signalTactical: Server.Signal = {
+  name: 'plugins.wp.tac.signalTactical',
 };
 
-const getParameters_internal: Server.GetRequest<
-  Json.key<'#tactic'>,
-  parameter[]
+const reloadTactical_internal: Server.GetRequest<null,null> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.wp.tac.reloadTactical',
+  input:  Json.jNull,
+  output: Json.jNull,
+  signals: [],
+};
+/** Force full reload for array [`tactical`](#tactical)  */
+export const reloadTactical: Server.GetRequest<null,null>= reloadTactical_internal;
+
+const fetchTactical_internal: Server.GetRequest<
+  number,
+  { reload: boolean, removed: Json.key<'#tactic'>[], updated: tacticalData[],
+    pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.wp.tac.getParameters',
-  input:  Json.jKey<'#tactic'>('#tactic'),
-  output: Json.jArray(jParameter),
-  signals: [ { name: 'plugins.wp.tac.configured' } ],
+  name:   'plugins.wp.tac.fetchTactical',
+  input:  Json.jNumber,
+  output: Json.jObject({
+            reload: Json.jBoolean,
+            removed: Json.jArray(Json.jKey<'#tactic'>('#tactic')),
+            updated: Json.jArray(jTacticalData),
+            pending: Json.jNumber,
+          }),
+  signals: [],
 };
-/** Return tactical current parameters */
-export const getParameters: Server.GetRequest<
-  Json.key<'#tactic'>,
-  parameter[]
-  >= getParameters_internal;
+/** Data fetcher for array [`tactical`](#tactical)  */
+export const fetchTactical: Server.GetRequest<
+  number,
+  { reload: boolean, removed: Json.key<'#tactic'>[], updated: tacticalData[],
+    pending: number }
+  >= fetchTactical_internal;
 
-const setParameter_internal: Server.SetRequest<
-  { tactic: Json.key<'#tactic'>, param: Json.key<'#param'>, value: Json.json
-    },
+const tactical_internal: State.Array<Json.key<'#tactic'>,tacticalData> = {
+  name: 'plugins.wp.tac.tactical',
+  getkey: ((d:tacticalData) => d.id),
+  signal: signalTactical,
+  fetch: fetchTactical,
+  reload: reloadTactical,
+  order: byTacticalData,
+};
+/** Tactical Configurations */
+export const tactical: State.Array<Json.key<'#tactic'>,tacticalData> = tactical_internal;
+
+const configureTactics_internal: Server.ExecRequest<
+  { node: Json.index<'#node'> },
   null
   > = {
-  kind: Server.RqKind.SET,
+  kind: Server.RqKind.EXEC,
+  name:   'plugins.wp.tac.configureTactics',
+  input:  Json.jObject({ node: Json.jIndex<'#node'>('#node'),}),
+  output: Json.jNull,
+  signals: [],
+};
+/** Configure all tactics */
+export const configureTactics: Server.ExecRequest<
+  { node: Json.index<'#node'> },
+  null
+  >= configureTactics_internal;
+
+const setParameter_internal: Server.ExecRequest<
+  { node: Json.index<'#node'>, tactic: Json.key<'#tactic'>,
+    param: Json.key<'#param'>, value: Json.json },
+  null
+  > = {
+  kind: Server.RqKind.EXEC,
   name:   'plugins.wp.tac.setParameter',
   input:  Json.jObject({
+            node: Json.jIndex<'#node'>('#node'),
             tactic: Json.jKey<'#tactic'>('#tactic'),
             param: Json.jKey<'#param'>('#param'),
             value: Json.jAny,
@@ -169,9 +268,9 @@ const setParameter_internal: Server.SetRequest<
   signals: [],
 };
 /** Configure tactical parameter */
-export const setParameter: Server.SetRequest<
-  { tactic: Json.key<'#tactic'>, param: Json.key<'#param'>, value: Json.json
-    },
+export const setParameter: Server.ExecRequest<
+  { node: Json.index<'#node'>, tactic: Json.key<'#tactic'>,
+    param: Json.key<'#param'>, value: Json.json },
   null
   >= setParameter_internal;
 

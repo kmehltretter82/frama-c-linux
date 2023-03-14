@@ -180,13 +180,24 @@ module Term = D.Tagged
 
 module Part = D.Tagged
     (struct
-      type t = Ptip.part
-      let id (p : t) = match p with
-        | Term -> "#term"
-        | Goal -> "#goal"
-        | Step s -> Printf.sprintf "#s%d" s.id
+      type t = [ `Term | `Goal | `Step of int ]
+      let id = function
+        | `Term -> "#term"
+        | `Goal -> "#goal"
+        | `Step k -> Printf.sprintf "#s%d" k
     end)
     (struct let name = "part" end)
+
+let of_part = function
+  | Ptip.Term -> "#term"
+  | Ptip.Goal -> "#goal"
+  | Ptip.Step s -> Printf.sprintf "#s%d" s.id
+
+let to_part sequent = function
+  | `Term -> Ptip.Term
+  | `Goal -> Ptip.Goal
+  | `Step k ->
+    try Ptip.Step (Conditions.step_at sequent k) with Not_found -> Ptip.Term
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sequent Printer                                                    --- *)
@@ -214,9 +225,9 @@ class printer () : Ptip.pseq =
     end in
   let parts : Ptip.part_marker =
     object
-      method wrap pp fmt p = wrap (Part.get p) pp fmt p
+      method wrap pp fmt p = wrap (of_part p) pp fmt p
       method mark : 'a. Ptip.part -> 'a Ptip.printer -> 'a Ptip.printer
-        = fun p pp fmt x -> wrap (Part.get p) pp fmt x
+        = fun p pp fmt x -> wrap (of_part p) pp fmt x
     end in
   let autofocus = new Ptip.autofocus in
   let plang = new Ptip.plang ~terms ~focus ~target ~autofocus in
@@ -336,9 +347,8 @@ let () =
   let setSelection = R.signature ~output:(module D.Junit) () in
   let get_node = R.param setSelection ~name:"node"
       ~descr:(Md.plain "Proof Node") (module Node) in
-  let get_part = R.param setSelection ~name:"part"
-      ~descr:(Md.plain "Selected part")
-      ~default:Ptip.Term (module Part) in
+  let get_part = R.param setSelection ~name:"part" ~default:`Term
+      ~descr:(Md.plain "Selected part") (module Part) in
   let get_term = R.param_opt setSelection ~name:"term"
       ~descr:(Md.plain "Selected term") (module Term) in
   let get_extend = R.param setSelection ~name:"extend"
@@ -355,6 +365,7 @@ let () =
       let term = get_term rq in
       let extend = get_extend rq in
       let pp = lookup_printer node in
+      let part = to_part (fst pp#sequent) part in
       pp#restore ~focus:(if extend then `Extend else `Select) (part,term) ;
       R.emit printStatus
     end

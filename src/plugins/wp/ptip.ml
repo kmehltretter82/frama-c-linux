@@ -484,7 +484,6 @@ class pseq
     method on_selection f =
       demon <- demon @ [f]
 
-
     method selection =
       let inside clause t =
         if F.p_bool t == Tactical.head clause
