@@ -83,13 +83,11 @@ type env = {
 
 type lemma = Definitions.dlemma Tactical.named
 
-let find thm =
-  try Some (named (Definitions.find_name thm))
-  with Not_found -> None
+let find thm = named (Definitions.find_name thm)
 
 let search,psearch =
   Tactical.search ~id:"lemma" ~title:"Lemma" ~descr:"Lemma to Instantiate"
-    ~browse ~find:Definitions.find_name ()
+    ~browse ~find ()
 
 
 let fresh pool { l_forall ; l_lemma } =
@@ -157,7 +155,7 @@ let strategy ?(priority=1.0) ?(at = Tactical.int 0) lemma values =
   Strategy.{
     priority ; tactical ; selection = at ;
     arguments =
-      arg search (find lemma) ::
+      arg search (try Some (find lemma) with Not_found -> None) ::
       TacInstance.wrap TacInstance.fields values ;
   }
 

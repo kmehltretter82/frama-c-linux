@@ -40,16 +40,16 @@ import * as State from 'frama-c/states';
 
 /** Parameter kind */
 export type kind =
-  "checkbox" | "spinner" | "selector" | "editor" | "browser";
+  "checkbox" | "spinner" | "selector" | "browser" | "editor";
 
 /** Decoder for `kind` */
 export const jKind: Json.Decoder<kind> =
-  Json.jUnion<"checkbox" | "spinner" | "selector" | "editor" | "browser">(
+  Json.jUnion<"checkbox" | "spinner" | "selector" | "browser" | "editor">(
     Json.jTag("checkbox"),
     Json.jTag("spinner"),
     Json.jTag("selector"),
-    Json.jTag("editor"),
     Json.jTag("browser"),
+    Json.jTag("editor"),
   );
 
 /** Natural order for `kind` */

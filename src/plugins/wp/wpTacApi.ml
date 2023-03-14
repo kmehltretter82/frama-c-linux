@@ -55,8 +55,13 @@ struct
   include D.Jstring
   let jtype = D.declare ~package
       ~name:"kind" ~descr:(Md.plain "Parameter kind")
-      (Junion [Jtag "checkbox"; Jtag "spinner"; Jtag "selector";
-               Jtag "editor"; Jtag "browser"])
+      (Junion [
+          Jtag "checkbox";
+          Jtag "spinner";
+          Jtag "selector";
+          Jtag "browser";
+          Jtag "editor";
+        ])
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -118,6 +123,54 @@ let joptions (type a)
       try (List.find (fun v -> v.Tactical.vid = id) values).value
       with Not_found -> D.failure "Incorrect value"
   end in (module M : (D.S with type t = a))
+
+let jbrowser (type a) (find : a Tactical.finder)
+  : a Tactical.named option D.data =
+  let module M =
+  struct
+    type t = a Tactical.named option
+    let jtype = P.Jstring
+    let to_json = function
+      | None -> `String ""
+      | Some Tactical.{ vid } -> `String vid
+    let of_json js =
+      let id = Json.string js in
+      try Some (find id) with Not_found -> None
+  end in (module M : (D.S with type t = a Tactical.named option))
+
+(* -------------------------------------------------------------------------- *)
+(* --- Selection Data                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Jselection : D.S with type t = Tactical.selection =
+struct
+  type t = Tactical.selection
+  let jtype = D.Jtext.jtype
+  let rec pp fmt = function
+    | Tactical.Empty -> Format.fprintf fmt ""
+    | Clause (Goal _) ->
+      Format.fprintf fmt "@{<#goal>Goal@}"
+    | Clause (Step s) ->
+      Format.fprintf fmt "@{<#s%d>Hyp. #%d@}" s.id s.id
+    | Inside (Goal _,t) ->
+      let id = Lang.F.QED.id t in
+      Format.fprintf fmt "@{<#goal>@{<#e%d>\"#%d\"@}@}" id id
+    | Inside (Step s,t) ->
+      let id = Lang.F.QED.id t in
+      Format.fprintf fmt "@{<#s%d>@{<#e%d>\"#%d\"@}@}" s.id id id
+    | Compose cc -> pc fmt cc
+    | Multi _ -> ()
+  and pc fmt = function
+    | Tactical.Cint k -> Integer.pretty fmt k
+    | Range(a,b) -> Format.fprintf fmt "%d..%d" a b
+    | Code(_,f,[]) -> Format.fprintf fmt "%s()" f
+    | Code(_,f,x::xs) ->
+      Format.fprintf fmt "@[<hov 2>%s(%a" f pp x ;
+      List.iter (Format.fprintf fmt ",@ %a" pp) xs ;
+      Format.fprintf fmt ")@]"
+  let to_json s = D.jpretty pp s
+  let of_json _ = Tactical.Empty
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tactic Parameters & Fields                                         --- *)
@@ -242,7 +295,11 @@ let make tactic (param : Tactical.parameter) : parameter =
   | Selector(field,options,equal) ->
     let data = joptions options equal in
     new parameter ~tactic ~field ~kind:"selector" ~data ~options ()
-  | _ -> assert false
+  | Search(field,_,find) ->
+    let data = jbrowser find in
+    new parameter ~tactic ~field ~kind:"browser" ~data ()
+  | Composer(field,_) ->
+    new parameter ~tactic ~field ~kind:"editor" ~data:(module Jselection) ()
 
 module ParameterConfig : D.S with type t = parameter =
 struct

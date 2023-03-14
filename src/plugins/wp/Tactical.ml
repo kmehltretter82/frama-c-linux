@@ -243,6 +243,7 @@ type 'a named = { title : string ; descr : string ; vid : string ; value : 'a }
 type 'a range = { vmin : 'a option ; vmax : 'a option ; vstep : 'a }
 type 'a field = 'a named (* value is the default *)
 type 'a browser = ('a named -> unit) -> selection -> unit
+type 'a finder = string -> 'a named
 
 let field ~id ~title ~descr ~default : 'a field =
   if id = "" then raise (Invalid_argument "Tactical.field") ;
@@ -278,7 +279,7 @@ type parameter =
   | Spinner  of int field * int range
   | Composer of selection field * (Lang.F.term -> bool)
   | Selector : 'a field * 'a named list * ('a -> 'a -> bool) -> parameter
-  | Search : 'a named option field * 'a browser * (string -> 'a) -> parameter
+  | Search : 'a named option field * 'a browser * 'a finder -> parameter
 
 let param = function
   | Checkbox{ vid }
