@@ -13,6 +13,6 @@ compiling Frama-C+dev.
 - ocamlgraph.2.0.0
 - ppx_deriving_yojson.3.7.0
 - ppx_import.1.10.0
-- why3.1.5.1
+- why3.1.6.0
 - yojson.2.0.2
 - zarith.1.12
