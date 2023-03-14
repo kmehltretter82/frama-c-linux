@@ -53,7 +53,7 @@ module Deps = struct
   let empty = HCEToZone.empty, BaseToHCESet.empty
 
   let join (m1, i1) (m2, i2) =
-    HCEToZone.inter m1 m2, BaseToHCESet.inter i1 i2
+    HCEToZone.inter m1 m2, BaseToHCESet.union i1 i2
 
   let is_included (m1, _) (m2, _) =
     HCEToZone.is_included m1 m2

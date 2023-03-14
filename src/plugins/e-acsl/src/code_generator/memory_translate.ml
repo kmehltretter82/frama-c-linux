@@ -195,7 +195,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
     | Trange(Some n1, Some n2) ->
       n1, n2
     | Trange(None, _) | Trange(_, None) ->
-      Options.abort "unbounded ranges are not part of E-ACSL"
+      Options.abort ~current:true "unbounded ranges are not part of E-ACSL"
     | _ ->
       assert false
   in
