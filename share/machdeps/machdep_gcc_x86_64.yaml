@@ -139,6 +139,7 @@ errno:
 filename_max: '4096'
 fopen_max: '16'
 has__builtin_va_list: true
+host_name_max: '64'
 int_fast16_t: long
 int_fast32_t: long
 int_fast64_t: long
@@ -149,6 +150,7 @@ little_endian: true
 machdep_name: machdep_gcc_x86_64
 mb_cur_max: ((size_t) 16 )
 nsig: (64 + 1)
+path_max: '4096'
 posix_version: 200809L
 ptrdiff_t: long
 rand_max: '2147483647'
@@ -167,6 +169,7 @@ sizeof_void: 1
 ssize_t: long
 time_t: long
 tmp_max: '238328'
+tty_name_max: '32'
 uint_fast16_t: unsigned long
 uint_fast32_t: unsigned long
 uint_fast64_t: unsigned long

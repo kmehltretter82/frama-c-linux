@@ -203,6 +203,7 @@ source_files = [
     ("weof.c", "macro"),
     ("wordsize.c", "macro"),
     ("posix_version.c", "macro"),
+    ("limits_macros.c", "macro"),
     ("stdio_macros.c", "macro"),
     ("stdlib_macros.c", "macro"),
     ("nsig.c", "macro"),

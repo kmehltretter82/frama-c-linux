@@ -272,6 +272,9 @@ let gen_all_defines fmt mach =
   gen_define_macro fmt "__FC_TMP_MAX" mach.tmp_max;
   gen_define_macro fmt "__FC_RAND_MAX" mach.rand_max;
   gen_define_macro fmt "__FC_MB_CUR_MAX" mach.mb_cur_max;
+  gen_define_macro fmt "__FC_PATH_MAX" mach.path_max;
+  gen_define_macro fmt "__FC_HOST_NAME_MAX" mach.host_name_max;
+  gen_define_macro fmt "__FC_TTY_NAME_MAX" mach.tty_name_max;
   List.iter (gen_define_errno_macro fmt) mach.errno;
   gen_define_macro fmt "__FC_TIME_T" mach.time_t;
   gen_define_macro fmt "__FC_NSIG" mach.nsig;

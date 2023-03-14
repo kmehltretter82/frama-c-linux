@@ -398,7 +398,10 @@ type mach = Cil_types.mach = {
   eof: string;
   fopen_max: string;
   filename_max: string;
+  host_name_max: string;
+  tty_name_max: string;
   l_tmpnam: string;
+  path_max: string;
   tmp_max: string;
   rand_max: string;
   mb_cur_max: string;

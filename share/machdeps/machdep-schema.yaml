@@ -136,6 +136,12 @@ has__builtin_va_list:
 
   type: boolean
 
+host_name_max:
+
+  description: expansion of 'HOST_NAME_MAX' POSIX macro
+
+  type: string
+
 int_fast8_t:
 
   description: definition of 'int_fast8_t'
@@ -194,6 +200,12 @@ mb_cur_max:
 nsig:
 
   description: number of possible signals (non standard macro, empty if undefined)
+
+  type: string
+
+path_max:
+
+  description: expansion of 'PATH_MAX' POSIX macro
 
   type: string
 
@@ -301,6 +313,12 @@ time_t:
 tmp_max:
 
   description: value of 'TMP_MAX' macro
+
+  type: string
+
+tty_name_max:
+
+  description: value of 'TTY_NAME_MAX' POSIX macro
 
   type: string
 
