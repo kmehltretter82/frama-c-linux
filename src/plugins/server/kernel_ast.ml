@@ -244,7 +244,7 @@ struct
   let jtype = Marker.jtype
   let to_json st =
     let kf = Kernel_function.find_englobing_kf st in
-    Marker.to_json (PStmt(kf,st))
+    Marker.to_json (PStmtStart(kf,st))
   let of_json js =
     let open Printer_tag in
     match Marker.of_json js with

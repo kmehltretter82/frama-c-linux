@@ -270,7 +270,9 @@ let ouptput_to_dot out_channel g =
 
 module JsonPrinter =
 struct
-  let output_stmt = Server.Kernel_ast.Stmt.to_json
+  let output_stmt stmt =
+    let kf = Kernel_function.find_englobing_kf stmt in
+    Server.Kernel_ast.Location.to_json (kf, PStmtStart (kf, stmt))
 
   let output_kinstr = function
     | Cil_types.Kglobal -> `String "global"
