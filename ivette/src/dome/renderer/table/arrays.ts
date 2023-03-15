@@ -449,6 +449,11 @@ export class ArrayModel<Key, Row>
     return arr;
   }
 
+  /** Iterate over the non-filtered and non-sorted entries. */
+  forEach(fn: (row: Row) => void): void {
+    this.index.forEach((p) => { fn(p.row); });
+  }
+
 }
 
 // --------------------------------------------------------------------------
