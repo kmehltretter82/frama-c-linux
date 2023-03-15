@@ -25,17 +25,26 @@ open Cil_types
 
 module Simplified_lval:
 sig
-  type t
-    
+  type t = 
+      BNone (* anything that is not an adress or a lval *)
+    | BLval of lval (* lval *)
+    | BAddrOf of lval (* address *)
+           
   val compare: t -> t -> int
-    
+
+  (* result stored in cache *)
   val from_lval: lval -> t
 
+  (* result stored in cache *)
   val from_exp: exp -> t
 
   val pretty: Format.formatter -> t -> unit
 
   val pp_debug : Format.formatter -> t -> unit
+
+  val removeOffsetLval : t -> t * offset
+
+  val addOffsetLval : offset -> t -> t
 end
 
 module Simplified_lmap:
@@ -56,3 +65,9 @@ sig
   val pp_debug : Format.formatter -> t -> unit
     
 end
+
+
+val  decompose_lval : Simplified_lval.t -> (Simplified_lval.t*offset) list
+
+(** clear the two caches *)
+val clear_cache : unit -> unit

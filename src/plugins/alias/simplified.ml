@@ -28,10 +28,28 @@ let nul_exp=
   let loc = Location.unknown in
   Cil.zero ~loc
 
+
+module HL = Lval.Hashtbl
+
+module HE = Exp.Hashtbl
+
+let cached_lval = HL.create 23
+
+let cached_exp = HE.create 37
+    
+let clear_cache () =
+  HL.clear cached_lval;
+  HE.clear cached_exp
+
 exception IsExp of exp
   
 let rec simplify_lval (h,o) =
-  (simplify_host h, simplify_offset o)
+  try HL.find cached_lval (h,o) with
+    Not_found ->
+    let res = (simplify_host h, simplify_offset o)
+    in
+    HL.add cached_lval (h,o) res;
+    res
   
 and simplify_host h =
   match h with
@@ -46,23 +64,30 @@ and simplify_offset o =
 
 and simplify_exp e =
   try
-    let simplified_enode =
-      match e.enode with
-      | Lval lv -> Lval (simplify_lval lv)
-      | AddrOf lv | StartOf lv -> AddrOf (simplify_lval lv)
-      | BinOp(PlusPI,e1,_,_) | BinOp(MinusPI,e1,_,_) ->
-        begin
-          match (simplify_exp e1).enode with
-            Lval (h,o) -> Lval (h,Index(nul_exp,o))
-          | AddrOf lv -> Lval lv
-          | _ -> failwith "simplify_exp not implemented"
-        end
-      | CastE(_,e) -> raise (IsExp (simplify_exp e))
-      | _ -> raise (IsExp nul_exp)                            
+    HE.find cached_exp e with
+    Not_found ->
+    let res =
+      try
+        let simplified_enode =
+          match e.enode with
+          | Lval lv -> Lval (simplify_lval lv)
+          | AddrOf lv | StartOf lv -> AddrOf (simplify_lval lv)
+          | BinOp(PlusPI,e1,_,_) | BinOp(MinusPI,e1,_,_) ->
+            begin
+              match (simplify_exp e1).enode with
+                Lval (h,o) -> Lval (h,Index(nul_exp,o))
+              | AddrOf lv -> Lval lv
+              | _ -> failwith "simplify_exp not implemented"
+            end
+          | CastE(_,e) -> raise (IsExp (simplify_exp e))
+          | _ -> raise (IsExp nul_exp)                            
+        in
+        {e with enode=simplified_enode}
+      with
+        IsExp e -> e
     in
-    {e with enode=simplified_enode}
-  with
-    IsExp e -> e
+    HE.add cached_exp e res;
+    res 
 
 
 module Simplified_lval =
@@ -101,6 +126,18 @@ struct
   let pretty = print Lval.pretty
 
   let pp_debug = print Printer.pp_lval
+
+  let removeOffsetLval x =
+    match x with
+      BNone -> BNone, NoOffset
+    | BLval lv -> let lv,o = Cil.removeOffsetLval lv in BLval lv, o
+    | BAddrOf lv -> let lv,o = Cil.removeOffsetLval lv in BAddrOf lv, o
+
+    let addOffsetLval o x =
+    match x with
+      BNone -> BNone
+    | BLval lv -> let lv = Cil.addOffsetLval o lv in BLval lv
+    | BAddrOf lv -> let lv = Cil.addOffsetLval o lv in BAddrOf lv
 end
   
 
@@ -151,3 +188,28 @@ struct
 
   let pp_debug fmt s = print Simplified_lval.pp_debug fmt s
 end
+
+
+let decompose_lval (lv1: Simplified_lval.t) : (Simplified_lval.t*offset) list =
+  let rec list_of_offset (o: offset) : (offset*offset) list =
+    match o with
+      NoOffset -> [NoOffset,NoOffset]
+    | Index(e,ofs) ->
+      let li =
+        List.map
+          (fun (o1,o2) -> (Index(e,o1),o2))
+          (list_of_offset ofs)
+      in
+      (NoOffset,ofs)::li
+    | Field(f, ofs) ->
+      let li =
+        List.map
+          (fun (o1,o2) -> (Field(f,o1),o2))
+          (list_of_offset ofs)
+      in
+      (NoOffset,ofs)::li
+  in
+  let lv, off = Simplified_lval.removeOffsetLval lv1 in
+  List.map
+    (fun (o1,o2) -> (Simplified_lval.addOffsetLval o1 lv,o2))
+    (list_of_offset off)
