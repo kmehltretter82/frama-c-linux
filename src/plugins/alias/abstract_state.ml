@@ -26,7 +26,14 @@ open Cil_types
 
 open Cil_datatype
 
-open Utils
+open Simplified
+
+module VSet = Datatype.Int.Set
+module VMap = Datatype.Int.Map
+
+module Lval = Simplified.Simplified_lval
+module LSet = Simplified.Simplified_lset
+module LMap = Simplified.Simplified_lmap
 
 module G = Persistent.Digraph.Concrete(Datatype.Int)
 
@@ -41,24 +48,24 @@ struct
 
   let empty : t = LMap.empty
 
-  let mem (lv:lval) (m:t) =
-    let lv, off = Cil.removeOffsetLval lv in
+  let mem (lv:Lval.t) (m:t) =
+    let lv, off = Lval.removeOffsetLval lv in
     try
       OMap.mem off (LMap.find lv m)
     with
       Not_found -> false
 
-  let find (lv:lval) (m:t) : V.t =
-    let lv, off = Cil.removeOffsetLval lv in
+  let find (lv:Lval.t) (m:t) : V.t =
+    let lv, off = Lval.removeOffsetLval lv in
     OMap.find off (LMap.find lv m)
 
-  let add (lv:lval) (v:V.t) (m:t) :t  =
-    let lv, off = Cil.removeOffsetLval lv in
+  let add (lv:Lval.t) (v:V.t) (m:t) :t  =
+    let lv, off = Lval.removeOffsetLval lv in
     let mo = try LMap.find lv m with Not_found -> OMap.empty in
     LMap.add lv (OMap.add off v mo) m
 
-  let remove (lv:lval) (m:t) :t =
-    let lv, off = Cil.removeOffsetLval lv in
+  let remove (lv:Lval.t) (m:t) :t =
+    let lv, off = Lval.removeOffsetLval lv in
     let mo = try LMap.find lv m with Not_found -> OMap.empty in
     let res = OMap.remove off mo in
     if OMap.is_empty res
@@ -78,7 +85,7 @@ struct
       (fun lv mo acc ->
          OMap.fold
            (fun o v acc ->
-              let lv = Cil.addOffsetLval o lv in
+              let lv = Lval.addOffsetLval o lv in
               LMap.add lv v acc
            )
            mo
@@ -87,24 +94,24 @@ struct
       m
       LMap.empty
 
-  let iter (f_iter: lval -> V.t -> unit) (m:t) : unit =
+  let iter (f_iter: Lval.t -> V.t -> unit) (m:t) : unit =
     LMap.iter
       (fun lv mo ->
          OMap.iter
            (fun o v ->
-              let lv = Cil.addOffsetLval o lv in
+              let lv = Lval.addOffsetLval o lv in
               f_iter lv v
            )
            mo
       )
       m
 
-  let fold (f_fold: lval -> V.t -> 'a -> 'a ) (m:t) (init:'a) : 'a =
+  let fold (f_fold: Lval.t -> V.t -> 'a -> 'a ) (m:t) (init:'a) : 'a =
     LMap.fold
       (fun lv mo acc ->
          OMap.fold
            (fun o v acc ->
-              let lv = Cil.addOffsetLval o lv in
+              let lv = Lval.addOffsetLval o lv in
               f_fold lv v acc
            )
            mo
@@ -122,12 +129,12 @@ struct
       )
       m
 
-  let mapi (f_mapi: lval -> V.t -> V.t ) (m:t) : 'a =
+  let mapi (f_mapi: Lval.t -> V.t -> V.t ) (m:t) : 'a =
     LMap.mapi
       (fun lv mo ->
          OMap.mapi
            (fun o v ->
-              let lv = Cil.addOffsetLval o lv in
+              let lv = Lval.addOffsetLval o lv in
               f_mapi lv v
            )
            mo
@@ -139,7 +146,7 @@ struct
     LMap.iter
       (fun lv mo ->
          OMap.iter
-           (fun o v -> let lv =  Cil.addOffsetLval o lv in Format.fprintf fmt "(lval=%a -> id= %d)@." Lval.pretty lv v)
+           (fun o v -> let lv =  Lval.addOffsetLval o lv in Format.fprintf fmt "(lval=%a -> id= %d)@." Lval.pretty lv v)
            mo
       )
       m
@@ -154,24 +161,24 @@ struct
     | _ -> false
 
   (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 = lv+o1 *)
-  let _find_lower_offsets (lv:lval) (m:t) : V.t LMap.t =
-    let lv, off = Cil.removeOffsetLval lv in
+  let _find_lower_offsets (lv:Lval.t) (m:t) : V.t LMap.t =
+    let lv, off = Lval.removeOffsetLval lv in
     let mo = try LMap.find lv m with Not_found -> OMap.empty in
     let f_filter o _v = is_sub_offset off o in
     let mo = OMap.filter f_filter mo in
     OMap.fold
-      (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
+      (fun o v acc -> let lv = Lval.addOffsetLval o lv in LMap.add lv v acc)
       mo
       LMap.empty
 
   (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 + o1 = lv *)
-  let find_upper_offsets (lv:lval) (m:t) : V.t LMap.t =
-    let lv, off = Cil.removeOffsetLval lv in
+  let find_upper_offsets (lv:Lval.t) (m:t) : V.t LMap.t =
+    let lv, off = Lval.removeOffsetLval lv in
     let mo = try LMap.find lv m with Not_found -> OMap.empty in
     let f_filter o _v = is_sub_offset o off in
     let mo = OMap.filter f_filter mo in
     OMap.fold
-      (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
+      (fun o v acc -> let lv = Lval.addOffsetLval o lv in LMap.add lv v acc)
       mo
       LMap.empty
 
@@ -183,13 +190,13 @@ struct
     | _ -> false
 
   (* finds all the lval lv1 apearing in [m] such as there exists an index c  such as lv1 = lv[c] *)
-  let _find_indexed_offsets (lv:lval) (m:t) : V.t LMap.t =
-    let lv, off = Cil.removeOffsetLval lv in
+  let _find_indexed_offsets (lv:Lval.t) (m:t) : V.t LMap.t =
+    let lv, off = Lval.removeOffsetLval lv in
     let mo = try LMap.find lv m with Not_found -> OMap.empty in
     let f_filter o _v = is_indexed_offset off o in
     let mo = OMap.filter f_filter mo in
     OMap.fold
-      (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
+      (fun o v acc -> let lv = Lval.addOffsetLval o lv in LMap.add lv v acc)
       mo
       LMap.empty
 
@@ -205,8 +212,6 @@ sig
   val get_graph: t -> G.t
 
   val get_lval_set : G.V.t -> t -> LSet.t
-
-  val assert_invariants : t -> unit
 
   val pretty : ?debug:bool -> Format.formatter -> t -> unit
 
@@ -238,6 +243,7 @@ let find_lset (v:V.t) (x:t) =
   with Not_found -> LSet.empty
 
 let find_aliases (lv:lval) (x:t) =
+  let lv : Lval.t = Lval.from_lval lv in
   try find_lset (LLMap.find lv x.lmap) x
   with Not_found -> LSet.empty
 
@@ -330,7 +336,7 @@ let assert_invariants (x:t) : unit =
     assert (G.mem_vertex x.graph v2)
   in
   G.iter_edges assert_edge x.graph;
-  let assert_lmap (lv:lval) (v:V.t) =
+  let assert_lmap (lv:Lval.t) (v:V.t) =
     assert (G.mem_vertex x.graph v);
     assert (LSet.mem lv (VMap.find v x.vmap))
   in
@@ -372,6 +378,7 @@ let rec closure_find_lset (v:V.t) (x:t) =
   | _ -> failwith ("this shall not happen (invariant broken)")
 
 let find_transitive_closure  (lv:lval) (x:t) =
+  let lv: Lval.t = Lval.from_lval lv in
   assert_invariants x;
   try
     let v = (LLMap.find lv x.lmap) in
@@ -379,6 +386,27 @@ let find_transitive_closure  (lv:lval) (x:t) =
   with
     Not_found -> []
 (* TODO : what about offsets ? *)
+
+
+(* find the vertex corresponding to lv+o in x, where lv is in v *)
+let redirect_offset (v:V.t) (o:offset) (x:t) : V.t option =
+  let setv = find_lset v x in
+  let res = ref None in
+  LSet.iter
+    (fun lv ->
+       let lv = Lval.addOffsetLval o lv in
+       try
+         begin
+           let v1 = LLMap.find lv x.lmap in
+           match !res with
+             Some v2 -> assert (V.equal v1 v2)
+           | None -> res := Some v1
+         end
+       with
+         Not_found -> ()
+    )
+    setv;
+  !res
 
 
 (* NOTE on "constant vertex": a constant vertex represents an unamed
@@ -404,9 +432,9 @@ let create_cst_vertex (x:t) : V.t * t =
 
 
 (* find all the aliases of lv1 in x, for create_vertex *)
-let find_all_aliases (lv1:lval) (x:t) : LSet.t =
+let find_all_aliases (lv1: Lval.t) (x: t) : LSet.t =
 
-  let list_of_lval_to_be_searched : (lval*offset) list =
+  let list_of_lval_to_be_searched : (Lval.t*offset) list =
     decompose_lval lv1
   in
   (* for each lval, find the set of aliases *)
@@ -421,7 +449,7 @@ let find_all_aliases (lv1:lval) (x:t) : LSet.t =
   (*  for each lval of the Lset, add the offset and add it to the resulting set *)
   let f_fold_left (acc:LSet.t) (ls,o) =
     LSet.fold
-      (fun lv acc -> let lv = Cil.addOffsetLval o lv in LSet.add lv acc)
+      (fun lv acc -> let lv = Lval.addOffsetLval o lv in LSet.add lv acc)
       ls
       acc
   in
@@ -432,7 +460,8 @@ let find_all_aliases (lv1:lval) (x:t) : LSet.t =
 
 
 (* returns the new vertex and the new graph *)
-let create_vertex (lv:lval) (x:t) : V.t * t =
+(* only for function find_or_create vertex *)
+let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   let new_v = x.cmpt in
   let new_g = G.add_vertex x.graph new_v in
   let new_pending = VMap.add new_v VSet.empty x.pending in
@@ -459,11 +488,11 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
   in
   assert_invariants new_x;
   match lv with
-  | (Var v, NoOffset) ->
+  | BLval (Var v, NoOffset) ->
     begin
       match v.vtype with
         TPtr _ ->
-        (* then add a blank vertex *)
+        (* then add a constant vertex *)
         let another_v, new_x = create_cst_vertex new_x in
         let new_g = G.add_edge new_x.graph new_v another_v in
         new_v, {new_x with graph= new_g}
@@ -472,16 +501,23 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
   | _ ->
     new_v , new_x
 
+(* only for function find_or_create_vertex *)
+let create_vertex_addr (lv:lval) (v:V.t) (x:t) : V.t *t =
+  let va, x = create_vertex_simple (BAddrOf lv) x in
+  let new_g =  G.add_edge x.graph va v in
+  va, { x with graph=new_g}
+
+
 (* (\* Replace all trailing array subscripts of an lval with zero indices. *\)
  * let rec shift_offsets lv loc =
- *   let lv, off = Cil.removeOffsetLval lv in
+ *   let lv, off = Lval.removeOffsetLval lv in
  *   match off with
  *   | Index _ ->
  *     let lv = shift_offsets lv loc in
  *     (\* since the offset has been removed at the start of the function, add a new
  *        0 offset to preserve the type of the lvalue. *\)
- *     Cil.addOffsetLval (Index (Cil.zero ~loc, NoOffset)) lv
- *   | NoOffset | Field _ -> Cil.addOffsetLval off lv
+ *     Lval.addOffsetLval (Index (Cil.zero ~loc, NoOffset)) lv
+ *   | NoOffset | Field _ -> Lval.addOffsetLval off lv
  *
  * let rec ptr_base ~loc exp =
  *   match exp.enode with
@@ -521,22 +557,22 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
 
 (* let list_arrays_to_be_collapsed = ref [] *)
 
-(* let is_collapsed (lv:lval) (x:t) =
+(* let is_collapsed (lv:Lval.t) (x:t) =
  *   try
  *     let v = LLMap.find lv x.lmap in
  *     VSet.mem v x.collapsed
  *   with Not_found -> false *)
 
 (* (\* warning, this function has a side effect on list_arrays_to_be_collapsed *\)
- * let normalize_lval (x:t) (lv1:lval) : lval =
- *   let lv, off = Cil.removeOffsetLval lv1 in
+ * let normalize_lval (x:t) (lv1:Lval.t) : lval =
+ *   let lv, off = Lval.removeOffsetLval lv1 in
  *   list_arrays_to_be_collapsed := [];
  *   let loc = Location.unknown in
- *   let rec normalize_offset (lvx:lval) (o:offset) : offset =
+ *   let rec normalize_offset (lvx:Lval.t) (o:offset) : offset =
  *     match o with
  *       NoOffset -> NoOffset
  *     | Field (f, ofs) ->
- *       let lvx = Cil.addOffsetLval (Field(f,NoOffset)) lvx in
+ *       let lvx = Lval.addOffsetLval (Field(f,NoOffset)) lvx in
  *       Field (f,normalize_offset lvx ofs)
  *     | Index (e, ofs) ->
  *       if is_collapsed lvx x
@@ -553,14 +589,14 @@ let create_vertex (lv:lval) (x:t) : V.t * t =
  *             Index(Cil.zero ~loc, normalize_offset lvx ofs)
  *           end
  *         else
- *           let lvx = Cil.addOffsetLval (Index(e,NoOffset)) lvx in
+ *           let lvx = Lval.addOffsetLval (Index(e,NoOffset)) lvx in
  *           Index(e, normalize_offset lvx ofs)
  *   in
  *   let off = normalize_offset lv off in
- *   Cil.addOffsetLval off lv *)
+ *   Lval.addOffsetLval off lv *)
 
 
-let diff_offset (lv1:lval) (lv2:lval) =
+let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
   let rec f_diff_offset o1 o2 =
     match o1, o2 with
       NoOffset, _ -> o2
@@ -568,39 +604,45 @@ let diff_offset (lv1:lval) (lv2:lval) =
     | Index (_,o1), Index(_,o2) -> f_diff_offset o1 o2
     | _ -> assert false
   in
-  let _, o1 = Cil.removeOffsetLval lv1
-  and _, o2 = Cil.removeOffsetLval lv2
+  let _, o1 = Lval.removeOffsetLval lv1
+  and _, o2 = Lval.removeOffsetLval lv2
   in
   assert (LLMap.is_sub_offset o1 o2);
   f_diff_offset o1 o2
-
-
-let rec find_or_create_lval (lv:lval) (x:t) : V.t * t =
-  match fst lv with
-    Var _ ->  (try (LLMap.find lv x.lmap, x) with  Not_found -> create_vertex lv x)
-  | Mem e ->
+ 
+(* create_vertex_lval shall only be called by find_or_create_vertex *)
+(* creates a new vertex for a lval, assuming it is not already present
+   in the graph. If it is present, there will be bugs *)
+let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
+  match blv with
+    BNone -> failwith "this should not happen"
+  | BLval lv ->
     begin
-      match convert_blval (find_basic_lval e) with
-        BNone -> failwith "Not implemented1 "
-      | BLval lv1 ->
-        let v1,x = find_or_create_vertex lv1 x in
+      match lv with 
+        (Mem e, NoOffset) ->
         begin
-          match G.succ x.graph v1 with
-            [] ->
-            let v,new_x = create_vertex lv x in
-            v, {new_x with graph= G.add_edge new_x.graph v1 v}
-          | [v] -> v,x
-          | _ -> failwith "invariant violated"
+          (* first find the vertex corresponding to e *)
+          match Lval.from_exp e with
+            BNone -> failwith "This should not happen "
+          | BLval lv1 ->
+            (* find the vertex *)
+            let v1, x = find_or_create_vertex (BLval lv1) x in
+            (* then creates a vertex for bvl *)
+            let v2, x = create_vertex_simple blv x in
+            (* finally add a points to arc between v1 and v2 *)
+            let new_graph = G.add_edge x.graph v1 v2 in
+            v2, {x with graph = new_graph }
+           
+          | BAddrOf _ -> failwith "*(&x) not allowed"
         end
-      | BAddrOf lv1 ->
-        let lv2 = Cil.addOffsetLval (snd lv) lv1 in
-        find_or_create_vertex lv2 x
-      | BIndex _  -> failwith "this should not happen"
+      | _ -> create_vertex_simple blv x
     end
-
-
+  | BAddrOf lv ->
+    let v1, x = find_or_create_vertex (BLval lv) x in
+    create_vertex_addr lv v1 x
+    
 (* find the vertex of an lval *)
-and find_or_create_vertex (lv:lval) (x:t) : V.t * t =
+and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
   try  (LLMap.find lv x.lmap, x)
   with
     Not_found ->
@@ -615,7 +657,7 @@ and find_or_create_vertex (lv:lval) (x:t) : V.t * t =
           let off = diff_offset lvx lv in
           let f_fold_lset lvs acc =
             try
-              let lvs = Cil.addOffsetLval off lvs in
+              let lvs = Lval.addOffsetLval off lvs in
               VSet.add (LLMap.find lvs x.lmap) acc
             with
               Not_found -> acc
@@ -655,11 +697,11 @@ let find_vertex lv x =
   then v
   else raise Not_found
 
-let points_to (lv:lval) (x:t): V.t list * t =
+let points_to (lv:Lval.t) (x:t): V.t list * t =
   let (v,x) = find_or_create_vertex lv x in
   G.succ x.graph v, x
 
-let addr_of (lv:lval) (x:t) : V.t list * t =
+let addr_of (lv:Lval.t) (x:t) : V.t list * t =
   let (v,x) = find_or_create_vertex lv x in
   G.pred x.graph v, x
 
@@ -675,7 +717,7 @@ let remove_cst_vertex (v:V.t) (x:t) : t =
   }
 
 (* remove a lval from a graph*)
-let remove_lval (x:t)  (lv:lval) :t =
+let remove_lval (x:t)  (lv:Lval.t) :t =
   assert_invariants x;
   let new_x =
     try
@@ -729,7 +771,7 @@ let merge x v1 v2 =
 
 
 (* (\* merge all nodes of an array a to a[0] *\)
- * let collapse (lv:lval) (x:t) : t =
+ * let collapse (lv:Lval.t) (x:t) : t =
  *   let v, x = find_or_create_vertex lv x in
  *   let lv0 = first_index lv in
  *   let v0, x = find_or_create_vertex lv0 x in
@@ -765,7 +807,7 @@ let merge x v1 v2 =
 
 
 
-(* let normalize_lval (lv:lval) (x:t) : lval * t =
+(* let normalize_lval (lv:Lval.t) (x:t) : lval * t =
  *   let new_lv = normalize_lval x lv in
  *   let new_x =
  *     if !list_arrays_to_be_collapsed != []
@@ -776,7 +818,7 @@ let merge x v1 v2 =
  *   in (\* now, list_arrays_to_be_collapsed = [] *\)
  *   new_lv, new_x *)
 
-let normalize_lval lv x = (lv,x)
+let normalize_lval lv x = (Lval.from_lval lv,x)
 
 (** .dot printing functions*)
 let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
@@ -908,7 +950,7 @@ let set_type (x:t) (v1:V.t) (v2:V.t) : t =
 
 
 (* assignment x = y *)
-let assignment_x_y (a:t) (x:lval) (y:lval) : t =
+let assignment_x_y (a:t) (x:Lval.t) (y:Lval.t) : t =
   assert_invariants a;
   let x,a = normalize_lval x a in
   let y,a = normalize_lval y a in
@@ -919,7 +961,7 @@ let assignment_x_y (a:t) (x:lval) (y:lval) : t =
 
 
 (* assignment x = &y *)
-let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t =
+let assignment_x_addr_y (a:t) (x:Lval.t) (y:Lval.t) : t =
   assert_invariants a;
   let x,a = normalize_lval x a in
   let y,a = normalize_lval y a in
@@ -940,7 +982,7 @@ let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t =
 
 
 (* assignment x = *y *)
-let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
+let assignment_x_ptr_y (a:t) (x:Lval.t) (y:Lval.t) : t =
   assert_invariants a;
   let x,a = normalize_lval x a in
   let y,a = normalize_lval y a in
@@ -955,7 +997,7 @@ let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
   assert_invariants new_a ; new_a
 
 (* assignment x = allocate(y) *)
-let assignment_x_allocate_y (a:t) (x:lval) : t =
+let assignment_x_allocate_y (a:t) (x:Lval.t) : t =
   assert_invariants a;
   let x,a = normalize_lval x a in
   let (v1,a) = find_or_create_vertex x a in
@@ -964,7 +1006,7 @@ let assignment_x_allocate_y (a:t) (x:lval) : t =
   assert_invariants new_a ; new_a
 
 (* assignment *x = y *)
-let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
+let assignment_ptr_x_y (a:t) (x:Lval.t) (y:Lval.t) : t =
   assert_invariants a;
   let v2, a = find_or_create_vertex y a in
   let list_v1, a = points_to x a in
@@ -978,7 +1020,7 @@ let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
 
 
 (* assignment *x = cst *)
-let assignment_ptr_x_cst (a:t) (x:lval) : t =
+let assignment_ptr_x_cst (a:t) (x:Lval.t) : t =
   assert_invariants a;
   let x,a = normalize_lval x a in
   (* Format.printf "DEBUG (assignment_ptr_x_cst) on lval %a and state:@. %a @." Lval.pretty x print_debug a; *)
@@ -1004,7 +1046,7 @@ let is_included (a1:t) (a2:t) =
   assert_invariants a2;
   (* Format.printf "DEBUG testing equal @.%a@. AND à.%a@. END DEBUG@." (pretty ~debug:true) a1 (pretty ~debug:true) a2; *)
   try
-    let iter_lmap (lv:lval) (v1:V.t): unit =
+    let iter_lmap (lv:Lval.t) (v1:V.t): unit =
       let v2 : V.t = try LLMap.find lv a2.lmap with Not_found -> raise Not_included in
       match G.succ a1.graph v1, G.succ a2.graph v2 with
         [], _ -> ()
@@ -1326,7 +1368,7 @@ let make_summary (s: t option) (kf: kernel_function) =
 
 
 let pretty_summary ?(debug=false) ?(function_name="") fmt s =
-  let print_list_lval fmt (l: lval list) =
+  let print_list_lval fmt (l: Lval.t list) =
     List.iter (fun x -> Format.fprintf fmt "%a " Lval.pretty x) l
   in
   let print_option pp fmt x =
@@ -1339,7 +1381,7 @@ let pretty_summary ?(debug=false) ?(function_name="") fmt s =
   Format.fprintf fmt "@]@."
 
 
-let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
+let call (state:t) (res:Lval.t option) (args:exp list) (summary:summary) :t =
   assert_invariants state;
   let formals = summary.formals in
   let sum_state =

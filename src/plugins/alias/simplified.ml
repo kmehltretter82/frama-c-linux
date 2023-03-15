@@ -90,12 +90,14 @@ and simplify_exp e =
     res 
 
 
-module Simplified_lval =
-struct
-  type t =
-      BNone 
+type simplified_lval =
+     BNone 
     | BLval of lval
     | BAddrOf of lval
+
+module Simplified_lval =
+struct
+  type t = simplified_lval 
 
   let from_lval lv =
     BLval (simplify_lval lv)

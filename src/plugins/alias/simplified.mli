@@ -22,14 +22,15 @@
 
 open Cil_types
 
-
-module Simplified_lval:
-sig
-  type t = 
+type simplified_lval =
       BNone (* anything that is not an adress or a lval *)
     | BLval of lval (* lval *)
     | BAddrOf of lval (* address *)
-           
+
+module Simplified_lval:
+sig
+  type t = simplified_lval
+            
   val compare: t -> t -> int
 
   (* result stored in cache *)

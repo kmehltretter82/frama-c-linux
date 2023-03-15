@@ -27,9 +27,9 @@ open Cil_datatype
 module VSet = Datatype.Int.Set
 module VMap = Datatype.Int.Map
 
-(* module Lval = Simplified.Simplified_lval *)
-module LSet = Lval.Set
-module LMap = Lval.Map
+module Lval = Simplified.Simplified_lval
+module LSet = Simplified.Simplified_lset
+module LMap = Simplified.Simplified_lmap
 
 
 (* type of the return of the following function *)

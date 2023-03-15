@@ -24,7 +24,7 @@ open Cil_types
 
 open Cil_datatype
 
-module LSet = Lval.Set
+module LSet = Simplified.Simplified_lset
 
 module Abstract_state = Abstract_state
 

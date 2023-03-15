@@ -26,25 +26,14 @@
 
 open Cil_types
 
-open Cil_datatype
+(* open Cil_datatype *)
 
 module VSet = Datatype.Int.Set
 module VMap = Datatype.Int.Map
 
-(* module Lval = Simplified.Simplified_lval *)
-module LSet = Lval.Set
-module LMap = Lval.Map
-
-(** type of the return of the following function *)
-type basic_lval =  BNone | BLval of lval | BAddrOf of lval | BIndex of basic_lval * exp
-
-exception Double_lval of basic_lval * basic_lval * typ
-
-(** finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). Raise Double_lval if two basic lval appear *)
-val find_basic_lval : exp -> basic_lval
-
-(** convert an index basic_lval into a basic_lval *)
-val convert_blval : basic_lval -> basic_lval
+module Lval = Simplified.Simplified_lval
+module LSet = Simplified.Simplified_lset
+module LMap = Simplified.Simplified_lmap
 
 (** returns the list of all possible "prefix" of a lval lv1, i.e. each
     pair (lv,o) such as AddoffsetLval o lv = lv1 *)

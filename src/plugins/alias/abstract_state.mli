@@ -24,7 +24,13 @@
 
 open Cil_types
 
-open Utils
+module VSet = Datatype.Int.Set
+module VMap = Datatype.Int.Map
+
+(** NB : type Lval.t is not the same as type lval !! *)
+module Lval = Simplified.Simplified_lval
+module LSet = Simplified.Simplified_lset
+module LMap = Simplified.Simplified_lmap
 
 (** Points-to graphs datastructure. *)
 module G: Graph.Sig.G
@@ -43,9 +49,6 @@ sig
   (** set of lvals stored in a vertex *)
   val get_lval_set : G.V.t -> t -> LSet.t
 
-  (** check all the invariants that must be true on an abstract value
-      before and after each function call or transformation of the graph)  *)
-  val assert_invariants : t -> unit
 
   (** pretty printer; debug=true prints the graph, debug = false only
       prints aliased variables *)
@@ -73,12 +76,14 @@ sig
       get_lval_set(succ(v1) is included in get_lval_set(succ(v2)) *)
   val is_included : t -> t -> bool
 
-
-
 end
 
 
 include S
+
+  (** check all the invariants that must be true on an abstract value
+      before and after each function call or transformation of the graph)  *)
+  val assert_invariants : t -> unit
 
 (** Functions for Steensgaard's algorithm, see the paper *)
 val join : t -> G.V.t -> G.V.t -> t
