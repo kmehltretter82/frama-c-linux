@@ -246,20 +246,26 @@ class autofocus =
         then Tactical.(Inside(Goal goal,a))
         else
           let pool = ref Tactical.Empty in
+          let lookup_pred s a p =
+            if F.is_subterm a (F.e_prop p) then
+              begin
+                pool := Tactical.(Inside(Step s,a));
+                raise Exit;
+              end in
           let rec lookup_sequence a hs =
+            (*TODO: staged iter *)
             Conditions.iter
               (fun step ->
                  match step.condition with
-                 | (Have p | When p | Branch(p,_,_))
-                   when F.is_subterm a (F.e_prop p) ->
-                   pool := Tactical.(Inside(Step step,a)) ;
-                   raise Exit
-                 | Branch(_,sa,sb) ->
+                 | (Type p | Init p | Have p | When p | Core p)
+                   -> lookup_pred step a p
+                 | Branch(p,sa,sb) ->
+                   lookup_pred step a p ;
                    lookup_sequence a sa ;
                    lookup_sequence a sb ;
                  | Either cs ->
                    List.iter (lookup_sequence a) cs
-                 | State _ | Type _ | Init _ | Have _ | When _ | Core _ -> ()
+                 | State _ -> ()
               ) hs in
           (try lookup_sequence a hs with Exit -> ()) ;
           !pool
@@ -484,13 +490,13 @@ class pseq
     method on_selection f =
       demon <- demon @ [f]
 
-    method selection =
+    method private convert part term =
       let inside clause t =
         if F.p_bool t == Tactical.head clause
         then Tactical.(Clause clause)
         else Tactical.(Inside(clause,t))
       in
-      match selected_part , selected_term with
+      match part , term with
       | Term , None -> Tactical.Empty
       | Goal , None -> Tactical.(Clause(Goal(snd sequent)))
       | Step s , None -> Tactical.(Clause(Step s))
@@ -499,13 +505,14 @@ class pseq
       | Step s , Some t -> inside Tactical.(Step s) t
 
     method target = selected_part, selected_term
+    method resolve (p,t) = self#convert p t
+    method selection = self#convert selected_part selected_term
 
     method unselect =
       begin
         let p = selected_part in selected_part <- Term ;
         let t = selected_term in selected_term <- None ;
-        autofocus#unfocus_last ;
-        p,t
+        autofocus#unfocus_last ; p,t
       end
 
     method restore ~(focus:focus) (p,t) =

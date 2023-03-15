@@ -144,6 +144,7 @@ class pseq :
     method target : target
     method unselect : target
     method restore : focus:focus -> target -> unit
+    method resolve : target -> Tactical.selection
     method on_selection : (unit -> unit) -> unit
 
     method sequent : Conditions.sequent
