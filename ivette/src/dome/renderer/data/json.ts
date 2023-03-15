@@ -253,11 +253,11 @@ export function jTag<A>(tg: A): Decoder<A> {
     else {
       throw new JsonTypeError(`"${tg}"`, js); 
     }
-   };
+  };
 }
 
 /**
-   Lookup tags in a dictionary, throw JsonError if the tag is not found. 
+   Lookup tags in a dictionary, throw JsonError if the tag is not found.
    Can be used directly for enum types, eg. `jEnum(myEnumType)`.
  */
 export function jEnum<A>(d: { [tag: string]: A }): Decoder<A> {
@@ -296,7 +296,7 @@ export function jTags<A extends string | number>(...values: A[]): Decoder<A> {
    JSON input.
  */
 export function jOption<A>(fn: Decoder<A>, defaultValue?: A)
-    : Decoder<A | undefined> {
+  : Decoder<A | undefined> {
   return (js: json) => (
     js === undefined || js === null ? defaultValue : fn(js)
   );
@@ -390,7 +390,7 @@ export function jList<A>(fn: Decoder<A>): Decoder<A[]> {
           else {
             throw err;
           }
-        }  
+        }
       }
       return buffer;
     }
@@ -487,7 +487,7 @@ export function jTuple5<A, B, C, D, E>(
    Optional fields in `A` can use jOption
 */
 export type Props<A> = {
-  [P in (keyof A & string)] : Decoder<A[P]>;
+  [P in (keyof A & string)]: Decoder<A[P]>;
 };
 
 /**
@@ -497,7 +497,7 @@ export type Props<A> = {
 export function jObject<A extends object>(decoders: Props<A>): Decoder<A> {
   return (js: json) => {
     if (js !== null && typeof js === 'object' && !Array.isArray(js)) {
-      const buffer : Partial<A> = {};
+      const buffer: Partial<A> = {};
       for (const k of Object.keys(decoders) as (keyof A & string)[]) {
         buffer[k] = decoders[k](js[k]);
       }
@@ -584,7 +584,7 @@ export type index<K> = phantom<K, number>;
 
 /** Decoder for `key<K>` strings. */
 export function jKey<K>(kd: K): Decoder<key<K>> {
-  return (js: json)  => {
+  return (js: json) => {
     if (typeof js === 'string') {
       return forge(kd, js);
     }
@@ -596,7 +596,7 @@ export function jKey<K>(kd: K): Decoder<key<K>> {
 
 /** Decoder for `index<K>` numbers. */
 export function jIndex<K>(kd: K): Decoder<index<K>> {
-  return (js: json)  => {
+  return (js: json) => {
     if (typeof js === 'number') {
       return forge(kd, js);
     }

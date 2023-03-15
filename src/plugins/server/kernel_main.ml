@@ -29,8 +29,10 @@ module Senv = Server_parameters
 (* --- Frama-C Kernel Services                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let package = Pkg.package ~name:"services"
-    ~title:"Kernel Services" ~readme:"kernel.md" ()
+let package = Pkg.package
+    ~name:"services"
+    ~title:"Kernel Services"
+    ~readme:"kernel.md" ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Config                                                             --- *)
@@ -160,7 +162,7 @@ let () = States.option model ~name:"marker"
 
 let () = States.option model ~name:"fct"
     ~descr:(Md.plain "Function containing the message position (if any)")
-    ~data:(module Kernel_ast.Kf)
+    ~data:(module Kernel_ast.Function)
     ~get:getFunction
 
 let iter f = ignore (Messages.fold (fun i evt -> f (evt, i); succ i) 0)

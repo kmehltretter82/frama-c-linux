@@ -59,6 +59,10 @@ export const byProjectInfo: Compare.Order<projectInfo> =
     current: Compare.boolean,
   });
 
+/** Default value for `projectInfo` */
+export const projectInfoDefault: projectInfo =
+  { id: Json.jKey<'#project'>('#project')(''), name: '', current: false };
+
 const getList_internal: Server.GetRequest<null,projectInfo[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.project.getList',

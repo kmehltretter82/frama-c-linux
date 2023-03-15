@@ -193,7 +193,7 @@ struct
       "is_root", Jboolean;
       "backward_explored", Jstring;
       "forward_explored", Jstring;
-      "writes", Jarray Kernel_ast.KfMarker.jtype;
+      "writes", Jarray Kernel_ast.Location.jtype;
       "values", Joption Jstring;
       "range", Junion [ Jnumber ; Jstring ];
       "type", Joption Jstring;
@@ -211,7 +211,7 @@ struct
       "src", NodeId.jtype ;
       "dst", NodeId.jtype ;
       "kind", Jstring ;
-      "origins", Jarray Kernel_ast.KfMarker.jtype
+      "origins", Jarray Kernel_ast.Location.jtype
     ])
 end
 

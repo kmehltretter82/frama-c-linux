@@ -126,7 +126,7 @@ val joption : 'a data -> 'a option data
    Declare the derived names for the provided type.
    Shall not be used directely.
 *)
-val derived : package:package -> id:ident -> jtype -> unit
+val derived : package:package -> id:ident -> jtype -> jtype
 
 (**
    Declare a new type and returns its alias.

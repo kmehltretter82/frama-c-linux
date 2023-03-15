@@ -28,7 +28,6 @@ let package =
     ~plugin:"eva"
     ~name:"general"
     ~title:"Eva General Services"
-    ~readme:"eva.md"
     ()
 
 module ComputationState = struct
@@ -57,39 +56,35 @@ let _computation_signal =
     ~add_hook:Analysis.register_computation_hook
     ()
 
-
-
 (* ----- Callsites ---------------------------------------------------------- *)
 
-module CallSite = struct
-  open Data
-  type callsite
-  let record: callsite Record.signature = Record.signature ()
-
-  let kf_field = Record.field record ~name:"kf"
-      ~descr:(Markdown.plain "Function") (module Kernel_ast.Kf)
-
-  let stmt_field = Record.field record ~name:"stmt"
-      ~descr:(Markdown.plain "Statement") (module Kernel_ast.Stmt)
-
-  let data = Record.publish ~package ~name:"CallSite"
-      ~descr:(Markdown.plain "CallSite") record
-
-  module R : Record.S with type r = callsite = (val data)
-
-  let convert (kf, stmts) = stmts |> List.map @@ fun stmt ->
-    R.default |> R.set kf_field kf |> R.set stmt_field stmt
-
-  let callers kf = Results.callsites kf |> List.map convert |> List.concat
-
-  let () = Request.register ~package
-      ~kind:`GET ~name:"getCallers"
-      ~descr:(Markdown.plain "Get the list of call site of a function")
-      ~input:(module Kernel_ast.Kf) ~output:(module Data.Jlist (R))
-      callers
+module CallSite =
+struct
+  type t = kernel_function * stmt
+  let jtype = Data.declare ~package ~name:"CallSite"
+      ~descr:(Markdown.plain "Call site, combining function and stmt")
+      (Jrecord [
+          "kf", Kernel_ast.Function.jtype;
+          "stmt", Kernel_ast.Stmt.jtype;
+        ])
+  let to_json (kf,stmt) = `Assoc [
+      "kf", Kernel_ast.Function.to_json kf;
+      "stmt", Kernel_ast.Stmt.to_json stmt;
+    ]
+  let of_json js =
+    Json.field "fct" js |> Kernel_ast.Function.of_json,
+    Json.field "stmt" js |> Kernel_ast.Stmt.of_json
 end
 
+let callers kf =
+  let list = Results.callsites kf in
+  List.concat (List.map (fun (kf, l) -> List.map (fun s -> kf, s) l) list)
 
+let () = Request.register ~package
+    ~kind:`GET ~name:"getCallers"
+    ~descr:(Markdown.plain "Get the list of call site of a function")
+    ~input:(module Kernel_ast.Function) ~output:(module Data.Jlist (CallSite))
+    callers
 
 (* ----- Functions ---------------------------------------------------------- *)
 
@@ -180,7 +175,7 @@ let () = Request.register ~package
     ~kind:`GET ~name:"getDeadCode"
     ~descr:(Markdown.plain "Get the lists of unreachable and of non terminating \
                             statements in a function")
-    ~input:(module Kernel_ast.Kf)
+    ~input:(module Kernel_ast.Function)
     ~output:(module DeadCode)
     dead_code
 
@@ -462,8 +457,8 @@ module PropertiesData = struct
       ~package
       ~name:"properties"
       ~descr:(Markdown.plain "Status of Registered Properties")
-      ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
-      ~keyType:Kernel_ast.Marker.jproperty
+      ~key:(fun ip -> Kernel_ast.Marker.tag (PIP ip))
+      ~keyType:Kernel_ast.Marker.jtype
       ~iter:Property_status.iter
       ~add_update_hook
       ~add_reload_hook

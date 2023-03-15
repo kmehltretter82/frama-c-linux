@@ -215,16 +215,13 @@ interface StmtProps {
   short?: boolean;
 }
 
-function Stmt(props: StmtProps): JSX.Element {
-  const markersInfo = States.useSyncArray(Ast.markerInfo);
+function Stmt(props: StmtProps): JSX.Element | null {
   const { stmt, marker, short } = props;
-  if (!stmt || !marker) return <></>;
-  const line = markersInfo.getData(marker)?.sloc?.line;
-  const filename = markersInfo.getData(marker)?.sloc?.base;
-  const title = markersInfo.getData(stmt)?.descr;
-  const text = short ? `@L${line}` : `@${filename}:${line}`;
+  const { descr, sloc: { base, line } } = States.useMarker(marker);
+  if (!stmt || !marker) return null;
+  const label = short ? `@L${line}` : `@${base}:${line}`;
   const className = 'dome-text-cell eva-stmt';
-  return <span className={className} title={title}>{text}</span>;
+  return <span className={className} title={descr}>{label}</span>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -373,7 +370,7 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
         onClick={() => removeProbe()}
       />
     </div>;
-  
+
   return (
     <th
       ref={ref}
@@ -935,8 +932,8 @@ function useEvaluationMode(props: EvaluationModeProps): void {
     const shortcut = System.platform === 'macos' ? 'Cmd+E' : 'Ctrl+E';
     const onEnter = (pattern: string): void => {
       const marker = selection?.current?.marker;
-      const data = { atStmt: marker, term: pattern };
-      Server.send(Ast.markerFromTerm, data).then(addProbe).catch(handleError);
+      const data = { stmt: marker, term: pattern };
+      Server.send(Ast.parseExpr, data).then(addProbe).catch(handleError);
     };
     const evalMode = {
       label: 'Evaluation',

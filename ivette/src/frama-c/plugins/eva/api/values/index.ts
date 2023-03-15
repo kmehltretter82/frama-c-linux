@@ -38,11 +38,21 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
+import { byFct } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { fct } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { fctDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { jFct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { marker } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { markerDefault } from 'frama-c/kernel/api/ast';
 
 /** Emitted when EVA results has changed */
 export const changed: Server.Signal = {
@@ -58,6 +68,10 @@ export const jCallstack: Json.Decoder<callstack> =
 /** Natural order for `callstack` */
 export const byCallstack: Compare.Order<callstack> = Compare.number;
 
+/** Default value for `callstack` */
+export const callstackDefault: callstack =
+  Json.jIndex<'#eva-callstack-id'>('#eva-callstack-id')(-1);
+
 const getCallstacks_internal: Server.GetRequest<marker[],callstack[]> = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getCallstacks',
@@ -70,17 +84,16 @@ export const getCallstacks: Server.GetRequest<marker[],callstack[]>= getCallstac
 
 const getCallstackInfo_internal: Server.GetRequest<
   callstack,
-  { callee: Json.key<'#fct'>, caller?: Json.key<'#fct'>,
-    stmt?: Json.key<'#stmt'>, rank?: number }[]
+  { callee: fct, caller?: fct, stmt?: marker, rank?: number }[]
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getCallstackInfo',
   input:  jCallstack,
   output: Json.jArray(
             Json.jObject({
-              callee: Json.jKey<'#fct'>('#fct'),
-              caller: Json.jOption(Json.jKey<'#fct'>('#fct')),
-              stmt: Json.jOption(Json.jKey<'#stmt'>('#stmt')),
+              callee: jFct,
+              caller: Json.jOption(jFct),
+              stmt: Json.jOption(jMarker),
               rank: Json.jOption(Json.jNumber),
             })),
   signals: [],
@@ -88,31 +101,29 @@ const getCallstackInfo_internal: Server.GetRequest<
 /** Callstack Description */
 export const getCallstackInfo: Server.GetRequest<
   callstack,
-  { callee: Json.key<'#fct'>, caller?: Json.key<'#fct'>,
-    stmt?: Json.key<'#stmt'>, rank?: number }[]
+  { callee: fct, caller?: fct, stmt?: marker, rank?: number }[]
   >= getCallstackInfo_internal;
 
 const getStmtInfo_internal: Server.GetRequest<
-  Json.key<'#stmt'>,
-  { rank: number, fct: Json.key<'#fct'> }
+  marker,
+  { rank: number, fct: fct }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getStmtInfo',
-  input:  Json.jKey<'#stmt'>('#stmt'),
-  output: Json.jObject({ rank: Json.jNumber, fct: Json.jKey<'#fct'>('#fct'),
-          }),
+  input:  jMarker,
+  output: Json.jObject({ rank: Json.jNumber, fct: jFct,}),
   signals: [],
 };
 /** Stmt Information */
 export const getStmtInfo: Server.GetRequest<
-  Json.key<'#stmt'>,
-  { rank: number, fct: Json.key<'#fct'> }
+  marker,
+  { rank: number, fct: fct }
   >= getStmtInfo_internal;
 
 const getProbeInfo_internal: Server.GetRequest<
   marker,
-  { condition: boolean, effects: boolean, rank: number,
-    stmt?: Json.key<'#stmt'>, code?: string, evaluable: boolean }
+  { condition: boolean, effects: boolean, rank: number, stmt?: marker,
+    code?: string, evaluable: boolean }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getProbeInfo',
@@ -121,7 +132,7 @@ const getProbeInfo_internal: Server.GetRequest<
             condition: Json.jBoolean,
             effects: Json.jBoolean,
             rank: Json.jNumber,
-            stmt: Json.jOption(Json.jKey<'#stmt'>('#stmt')),
+            stmt: Json.jOption(jMarker),
             code: Json.jOption(Json.jString),
             evaluable: Json.jBoolean,
           }),
@@ -130,8 +141,8 @@ const getProbeInfo_internal: Server.GetRequest<
 /** Probe informations */
 export const getProbeInfo: Server.GetRequest<
   marker,
-  { condition: boolean, effects: boolean, rank: number,
-    stmt?: Json.key<'#stmt'>, code?: string, evaluable: boolean }
+  { condition: boolean, effects: boolean, rank: number, stmt?: marker,
+    code?: string, evaluable: boolean }
   >= getProbeInfo_internal;
 
 /** Evaluation of an expression or lvalue */
@@ -169,6 +180,10 @@ export const byEvaluation: Compare.Order<evaluation> =
     alarms: Compare.array(Compare.pair(Compare.structural,Compare.string,)),
     pointedVars: Compare.array(Compare.pair(Compare.string,byMarker,)),
   });
+
+/** Default value for `evaluation` */
+export const evaluationDefault: evaluation =
+  { value: '', alarms: [], pointedVars: [] };
 
 const getValues_internal: Server.GetRequest<
   { callstack?: callstack, target: marker },

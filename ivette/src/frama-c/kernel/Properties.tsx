@@ -46,7 +46,7 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as Properties from 'frama-c/kernel/api/properties';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 
-type PropKey = Json.key<'#property'>;
+type PropKey = Json.key<'#marker'>;
 type Property =
   Properties.statusData |
   (Properties.statusData & Eva.propertiesData) ;

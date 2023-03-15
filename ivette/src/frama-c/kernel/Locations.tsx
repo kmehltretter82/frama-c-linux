@@ -27,20 +27,25 @@
 import React from 'react';
 import * as States from 'frama-c/states';
 
-import * as Json from 'dome/data/json';
 import { CompactModel } from 'dome/table/arrays';
 import { Table, Column, Renderer } from 'dome/table/views';
 import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
 import { TitleBar } from 'ivette';
-import { markerInfo } from 'frama-c/kernel/api/ast';
+import { marker, jMarker } from 'frama-c/kernel/api/ast';
 
 // --------------------------------------------------------------------------
 // --- Locations Panel
 // --------------------------------------------------------------------------
 
 type LocationId = States.Location & { id: number };
+
+function SourceLoc(props: { marker: marker }): JSX.Element {
+  const { sloc, descr } = States.useMarker(props.marker);
+  const position = `${sloc?.base}:${sloc?.line}`;
+  return <Label label={position} title={descr} />;
+}
 
 export default function LocationsTable(): JSX.Element {
 
@@ -51,17 +56,11 @@ export default function LocationsTable(): JSX.Element {
   ), []);
   const multipleSelections = selection?.multiple;
   const numberOfSelections = multipleSelections?.allSelections?.length;
-  const markersInfo = States.useSyncArray(markerInfo);
 
   // Renderer for statement markers.
-  const renderMarker: Renderer<string> =
-    (loc: string) => {
-      const markerId = (loc as Json.key<'#markerInfo'>);
-      const info = markersInfo.getData(markerId);
-      const sloc = info?.sloc;
-      const position = `${sloc?.base}:${sloc?.line}`;
-      return <Label label={position} title={info?.descr} />;
-    };
+  const renderMarker: Renderer<string> = (loc: string) => (
+    <SourceLoc marker={jMarker(loc)} />
+  );
 
   // Updates [[model]] with the current multiple selections.
   React.useEffect(() => {

@@ -99,7 +99,7 @@ let publish ~page ?name ?(index=[]) ~title
   page.sections <- section :: page.sections ; href
 
 let protocol ~title ~readme:filename =
-  let readme = Printf.sprintf "%s/server/%s" (Fc_config.datadir :> string) filename in
+  let readme = Printf.sprintf "src/plugins/server/doc/%s"  filename in
   ignore (page `Protocol ~title ~readme ~filename ())
 
 let () = protocol ~title:"Architecture" ~readme:"server.md"
@@ -111,7 +111,9 @@ let () = protocol ~title:"Architecture" ~readme:"server.md"
 let href_of_ident names id =
   let chapter = match id.plugin with
     | Kernel -> `Kernel | Plugin p -> `Plugin p in
-  let filename = String.concat "_" id.package ^ ".md" in
+  let filename =
+    if id.package = [] then "index.md" else
+      String.concat "_" id.package ^ ".md" in
   let page = snd @@ path_for chapter filename in
   let text = try IdMap.find id names with Not_found -> id.name in
   Md.link ~text:(Md.code text) ~page ~name:id.name ()
@@ -119,7 +121,9 @@ let href_of_ident names id =
 let page_of_package pkg =
   let chapter = match pkg.p_plugin with
     | Kernel -> `Kernel | Plugin p -> `Plugin p in
-  let filename = String.concat "_" pkg.p_package ^ ".md" in
+  let filename =
+    if pkg.p_package = [] then "index.md" else
+      String.concat "_" pkg.p_package ^ ".md" in
   try
     let _,path = path_for chapter filename in
     Pages.find path !pages
@@ -138,7 +142,7 @@ let kind_of_decl = function
   | D_request { rq_kind=`GET } -> "GET"
   | D_request { rq_kind=`SET } -> "SET"
   | D_request { rq_kind=`EXEC } -> "EXEC"
-  | D_decoder _ | D_order _ -> assert false
+  | D_decoder _ | D_order _ | D_default _ -> assert false
 
 let pp_for ?decl names =
   let self =
@@ -169,7 +173,7 @@ let md_signals signals =
 
 let descr_of_decl names decl =
   match decl.d_kind with
-  | D_decoder _ | D_order _ -> assert false
+  | D_decoder _ | D_order _ | D_default _ -> assert false
   | D_signal -> []
   | D_state _ -> [] (* TBC *)
   | D_value _ -> [] (* TBC *)
@@ -195,12 +199,11 @@ let descr_of_decl names decl =
 
 let declaration page names decl =
   match decl.d_kind with
-  | D_decoder _ | D_order _ -> ()
+  | D_decoder _ | D_order _ | D_default _ -> ()
   | _ ->
     let name = decl.d_ident.name in
     let fullname = name_of_ident decl.d_ident in
     let kind = kind_of_decl decl.d_kind in
-    (* let title = Printf.sprintf "`%s` %s" kind fullname in *)
     let title = Printf.sprintf "%s (`%s`)" fullname kind in
     let index = [ title ] in
     let contents = Markdown.par decl.d_descr in
@@ -344,8 +347,10 @@ let dump ~root ?(meta=true) () =
            | Some file ->
              if Sys.file_exists file
              then Markdown.rawfile file @ page.descr
-             else (Senv.warning "Can not find %S file" file ;
-                   Markdown.section ~title page.descr)
+             else (
+               Senv.warning "Can not find %S file" file ;
+               Markdown.section ~title page.descr
+             )
          in
          let body = Markdown.subsections page.descr (build [] page.sections) in
          pp_one_page ~root ~page:path ~title (intro @ body) ;

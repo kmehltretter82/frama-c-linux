@@ -233,10 +233,13 @@ let ki_of_localizable loc = match loc with
   | PType _ -> Kglobal
 
 let varinfo_of_localizable = function
-  | PLval (_, _, (Var vi, NoOffset)) -> Some vi
-  | PVDecl (_, _, vi) -> Some vi
-  | PGlobal (GVar (vi, _, _) | GVarDecl (vi, _)
-            | GFunDecl (_, vi, _) | GFun ({svar = vi }, _)) -> Some vi
+  | PVDecl (_, _, vi)
+  | PLval (_, _, (Var vi, NoOffset))
+  | PTermLval (_, _, _, (TVar { lv_origin = Some vi }, TNoOffset))
+  | PGlobal (
+      GVar (vi, _, _) | GVarDecl (vi, _) |
+      GFun ({svar = vi },_) | GFunDecl (_, vi, _)
+    ) -> Some vi
   | _ -> None
 
 let typ_of_localizable = function
@@ -490,16 +493,16 @@ let loc_to_localizable ?(precise_col=false) loc =
 (* --- Printer API                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-module type TAG =
+module type INFO =
 sig
-  val create : localizable -> string
+  val tag : localizable -> string
   val unfold : stmt -> bool
 end
 
 (* We delay the creation of the class to execution time, so that all
    pretty-printer extensions get properly registered (as we want to inherit
    from them). The only known solution is to use a functor *)
-module BUILD(Tag : TAG)(X: Printer.PrinterClass) : Printer.PrinterClass =
+module BUILD(Info : INFO)(X: Printer.PrinterClass) : Printer.PrinterClass =
 struct
 
   class printer : Printer.extensible_printer = object(self)
@@ -586,14 +589,14 @@ struct
       let kf = Option.get self#current_kf in
       let stmt = Option.get self#current_stmt in
       Format.fprintf fmt "@{<%s>%a@}"
-        (Tag.create (PStmtStart(kf,stmt)))
+        (Info.tag (PStmtStart(kf,stmt)))
         super#pp_while_head cond
 
     method! next_stmt next fmt current =
-      if Tag.unfold current
+      if Info.unfold current
       then self#preconditions_at_call fmt current;
       Format.fprintf fmt "@{<%s>%a@}"
-        (Tag.create (PStmt (Option.get self#current_kf,current)))
+        (Info.tag (PStmt (Option.get self#current_kf,current)))
         (super#next_stmt next) current
 
     method! lval fmt lv =
@@ -602,7 +605,7 @@ struct
       (* Do not highlight the lvals in initializers. *)
       | Kstmt _ as ki ->
         Format.fprintf fmt "@{<%s>"
-          (Tag.create (PLval (self#current_kf,ki,lv)));
+          (Info.tag (PLval (self#current_kf,ki,lv)));
         (match lv with
          | Var vi, (Field _| Index _ as o) ->
            (* Small hack to be able to click on the arrays themselves
@@ -622,7 +625,7 @@ struct
         self#lval fmt lv
       | _ ->
         Format.fprintf fmt "@{<%s>"
-          (Tag.create (PExp (self#current_kf,self#current_kinstr,e)));
+          (Info.tag (PExp (self#current_kf,self#current_kinstr,e)));
         super#exp fmt e;
         Format.fprintf fmt "@}"
 
@@ -638,7 +641,7 @@ struct
           super#term_lval fmt lv
         | Some ip ->
           Format.fprintf fmt "@{<%s>"
-            (Tag.create
+            (Info.tag
                (PTermLval (self#current_kf, self#current_kinstr, ip, lv)));
           (match lv with
            | TVar vi, (TField _| TIndex _ as o) ->
@@ -651,12 +654,12 @@ struct
 
     method! vdecl fmt vi =
       Format.fprintf fmt "@{<%s>%a@}"
-        (Tag.create (PVDecl (self#current_kf, self#current_kinstr, vi)))
+        (Info.tag (PVDecl (self#current_kf, self#current_kinstr, vi)))
         super#vdecl vi
 
     method private tag_property p =
       current_property <- Some p;
-      Tag.create (PIP p)
+      Info.tag (PIP p)
 
     method! code_annotation fmt ca =
       match ca.annot_content with
@@ -694,7 +697,7 @@ struct
       | GType _ ->
         super#global fmt g
       | GAsm _ | GPragma _ | GText _ | GAnnot _ ->
-        Format.fprintf fmt "@{<%s>%a@}" (Tag.create (PGlobal g)) super#global g
+        Format.fprintf fmt "@{<%s>%a@}" (Info.tag (PGlobal g)) super#global g
 
     method! extended fmt ext =
       let loc =
@@ -799,14 +802,14 @@ struct
                self#current_behavior_or_loop from)
         in
         Format.fprintf fmt "@{<%s>%a@}"
-          (Tag.create (PIP ip)) (super#from s) from
+          (Info.tag (PIP ip)) (super#from s) from
 
     method! global_annotation fmt a =
       match Property.ip_of_global_annotation_single a with
       | None -> super#global_annotation fmt a
       | Some ip ->
         Format.fprintf fmt "@{<%s>%a@}"
-          (Tag.create (PIP ip)) super#global_annotation a
+          (Info.tag (PIP ip)) super#global_annotation a
 
     method! allocation ~isloop fmt a =
       match
@@ -816,39 +819,39 @@ struct
         None -> super#allocation ~isloop fmt a
       | Some ip ->
         Format.fprintf fmt "@{<%s>%a@}"
-          (Tag.create (PIP ip)) (super#allocation ~isloop) a;
+          (Info.tag (PIP ip)) (super#allocation ~isloop) a;
 
     method! stmtkind sattr next fmt sk =
       (* Special tag denoting the start of the statement, WITHOUT any ACSL
          assertion/statement contract, etc. *)
       let s = Option.get self#current_stmt in
       let f = Option.get self#current_kf in
-      let tag = Tag.create (PStmtStart(f,s)) in
+      let tag = Info.tag (PStmtStart(f,s)) in
       Format.fprintf fmt "@{<%s>%a@}" tag (super#stmtkind sattr next) sk
 
     method! ikind fmt c =
       Format.fprintf fmt "@{<%s>%a@}"
-        (Tag.create (PType(TInt(c,[]))))
+        (Info.tag (PType(TInt(c,[]))))
         super#ikind c
 
     method! fkind fmt c =
       Format.fprintf fmt "@{<%s>%a@}"
-        (Tag.create (PType(TFloat(c,[]))))
+        (Info.tag (PType(TFloat(c,[]))))
         super#fkind c
 
     method! compname fmt comp =
       Format.fprintf fmt "@{<%s>%a@}"
-        (Tag.create (PGlobal(Globals.Types.global Struct comp.cname)))
+        (Info.tag (PGlobal(Globals.Types.global Struct comp.cname)))
         super#compname comp
 
     method! enuminfo fmt enum =
       Format.fprintf fmt "@{<%s>%a@}"
-        (Tag.create (PGlobal(Globals.Types.global Enum enum.ename)))
+        (Info.tag (PGlobal(Globals.Types.global Enum enum.ename)))
         super#enuminfo enum
 
     method! typeinfo fmt tinfo =
       Format.fprintf fmt "@{<%s>%a@}"
-        (Tag.create (PGlobal(Globals.Types.global Typedef tinfo.tname)))
+        (Info.tag (PGlobal(Globals.Types.global Typedef tinfo.tname)))
         super#typeinfo tinfo
 
     initializer force_brace <- true
@@ -858,7 +861,7 @@ end
 
 module type Tag =
 sig
-  val create : localizable -> string
+  val tag : localizable -> string
 end
 
 module type S_pp =
@@ -877,11 +880,11 @@ struct
   let printer () =
     let pp = Printer.current_printer () in
     let module PP = (val pp: Printer.PrinterClass) in
-    let module TAG = struct
-      let create = T.create
+    let module INFO = struct
+      let tag = T.tag
       let unfold s = !unfold s
     end in
-    let module TagPrinterClass = BUILD(TAG)(PP) in
+    let module TagPrinterClass = BUILD(INFO)(PP) in
     new TagPrinterClass.printer
 
   let with_unfold_precond unfolder f fmt x =
