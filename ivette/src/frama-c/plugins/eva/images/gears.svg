@@ -24,7 +24,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     <style type="text/css"><![CDATA[
 .machine {
     width: 60vmin;
-    fill: #606060; }
+    fill: #a0a0a0; }
 
 .small-shadow, .medium-shadow, .large-shadow {
 fill: rgba(0, 0, 0, 0.15); }

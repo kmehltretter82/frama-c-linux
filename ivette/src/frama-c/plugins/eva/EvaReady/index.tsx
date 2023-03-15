@@ -44,12 +44,12 @@ const EvaReady: React.FC = ({children}) => {
         </div>
       );
     }
-    
+
     case 'computing':
       return (
         <div className="eva-status eva-status-computing">
-          <img src={gearsIcon} className="eva-status-icon" />
           <span>Eva analysis in progress…</span>
+          <img src={gearsIcon} className="eva-status-icon" />
         </div>
       );
     
