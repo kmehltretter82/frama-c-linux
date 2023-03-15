@@ -799,7 +799,7 @@ let rec infer ~force ~logic_env t =
       let i2 = infer ~force ~logic_env n2 in
       Error.map2 join i1 i2
     | Trange(None, _) | Trange(_, None) ->
-      Options.abort "unbounded ranges are not part of E-ACSl"
+      Options.abort ~current:true "unbounded ranges are not part of E-ACSl"
 
     | Tlet (li,t) ->
       let li_t = Misc.term_of_li li in

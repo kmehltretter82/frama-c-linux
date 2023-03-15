@@ -73,7 +73,8 @@ if [ "$MODE" = "all" ]; then
     make $LINT || exit 1
   fi
   if [ $DO_HDRCK = "yes" ] ; then
-    make $HDRCK HDRCK_EXTRA="-quiet" || exit 1
+    # Don't define HDRCK_EXTRA, that is required by external plugins
+    make $HDRCK || exit 1
   fi
 else
   STAGED=$(git diff --diff-filter ACMR --name-only --cached $REFERENCE | sort)
@@ -105,16 +106,17 @@ else
   TMP=$(mktemp)
 
   cleanup () {
-    rm "$TMP"
+    rm -f "$TMP"
   }
   trap cleanup exit
 
-  git check-attr -za $STAGED > "$TMP"
   if [ $DO_LINT = "yes" ] ; then
+    git check-attr -za $STAGED > "$TMP"
     make $LINT LINTCK_FILES_INPUT="$TMP" || exit 1
   fi
-  git check-attr -z header_spec $STAGED > "$TMP"
   if [ $DO_HDRCK = "yes" ] ; then
-    make $HDRCK HDRCK_FILES_INPUT="$TMP" HDRCK_EXTRA="-quiet" || exit 1
+    git check-attr -z header_spec $STAGED > "$TMP"
+    # Don't define HDRCK_EXTRA, that is required by external plugins
+    make $HDRCK HDRCK_FILES_INPUT="$TMP" || exit 1
   fi
 fi

@@ -30,6 +30,11 @@ variables:
 ################################################################################
 ### PREPARE
 
+check-makefile:
+  stage: prepare
+  script:
+    - ./nix/shell-checkers.sh "make --warn-undefined-variables help > /dev/null 2> errors && [[ "$(cat errors)" == "" ]]"
+
 check-no-old-frama-c:
   stage: prepare
   script:

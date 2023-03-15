@@ -25,7 +25,7 @@
 // --------------------------------------------------------------------------
 
 import _ from 'lodash';
-import React, { useEffect } from 'react';
+import React from 'react';
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import * as States from 'frama-c/states';
@@ -36,7 +36,6 @@ import { Icon } from 'dome/controls/icons';
 import { IconButton, Checkbox } from 'dome/controls/buttons';
 import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
-import * as ArrayUtils from 'dome/data/arrays';
 import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
 import { TitleBar } from 'ivette';
 import { Scroll, Folder } from 'dome/layout/boxes';
@@ -44,11 +43,13 @@ import { Scroll, Folder } from 'dome/layout/boxes';
 import { RSplit } from 'dome/layout/splitters';
 
 import * as Ast from 'frama-c/kernel/api/ast';
-import { statusData } from 'frama-c/kernel/api/properties';
 import * as Properties from 'frama-c/kernel/api/properties';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 
-type Property = statusData | (statusData & Eva.propertiesData)
+type PropKey = Json.key<'#marker'>;
+type Property =
+  Properties.statusData |
+  (Properties.statusData & Eva.propertiesData) ;
 
 // --------------------------------------------------------------------------
 // --- Filters
@@ -206,7 +207,7 @@ function filterEva(p: Property): boolean {
       case 'not_tainted':
       case 'not_applicable':
         return !filter('eva.data_tainted_only') &&
-          !filter('eva.ctrl_tainted_only');
+               !filter('eva.ctrl_tainted_only');
       case 'direct_taint':
         return !(filter('eva.ctrl_tainted_only'));
       case 'indirect_taint':
@@ -332,8 +333,7 @@ const byColumn: Arrays.ByColumns<Property> = {
   file: Compare.byFields<Property>({ source: byFile }),
 };
 
-class PropertyModel
-  extends Arrays.CompactModel<Json.key<'#marker'>, Property> {
+class PropertyModel extends Arrays.CompactModel<PropKey, Property> {
 
   private filterFun?: string;
 
@@ -597,19 +597,34 @@ function FilterRatio({ model }: { model: PropertyModel }): JSX.Element {
 // --- Properties Table
 // -------------------------------------------------------------------------
 
+type PropsModel = Arrays.CompactModel<PropKey,Properties.statusData>;
+type EvapsModel = Arrays.CompactModel<PropKey,Eva.propertiesData>;
+
+function populateModel(
+  model: PropertyModel,
+  props: PropsModel,
+  evaps: EvapsModel
+): void {
+  model.removeAllData();
+  props.forEach((prop) => {
+    const { key } = prop;
+    const eva = evaps.getData(key);
+    model.setData(key,{ ...eva, ...prop });
+  });
+  model.reload();
+}
+
 export default function RenderProperties(): JSX.Element {
 
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
-  const kernelData = States.useSyncArray(Properties.status).getArray();
-  const evaData = States.useSyncArray(Eva.properties).getArray();
-
-  useEffect(() => {
-    model.removeAllData();
-    const data = ArrayUtils.mergeArraysByKey(kernelData, evaData);
-    model.updateData(data);
-    model.reload();
-  }, [model, kernelData, evaData]);
+  const props = States.useSyncArray(Properties.status);
+  const evaps = States.useSyncArray(Eva.properties);
+  const pstamp = Models.useModel(props);
+  const estamp = Models.useModel(evaps);
+  React.useEffect(() => {
+    populateModel(model,props,evaps);
+  },[model,props,evaps,pstamp,estamp]);
 
   const [selection, updateSelection] = States.useSelection();
 

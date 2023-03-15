@@ -231,8 +231,8 @@ let assert_nan = function
   | C_float _
   | Gmpz
   | Rational
-  | Real -> Options.abort "got a number type where NaN was expected"
-
+  | Real ->
+    Options.abort ~current:true "got a number type where NaN was expected"
 
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
@@ -679,7 +679,7 @@ let rec type_term
     | Tcomprehension (_,_,_) -> Error.not_yet "tset comprehension"
 
     | Trange(None, _) | Trange(_, None) ->
-      Options.abort "unbounded ranges are not part of E-ACSl"
+      Options.abort ~current:true "unbounded ranges are not part of E-ACSl"
     | Trange(Some n1, Some n2) ->
       ignore (type_term ~use_gmp_opt ~profile n1);
       ignore (type_term ~use_gmp_opt ~profile n2);

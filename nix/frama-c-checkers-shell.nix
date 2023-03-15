@@ -8,6 +8,7 @@
 , git-lfs
 , gnumake
 , headache
+, jq
 , ocp-indent
 } :
 stdenv.mkDerivation rec {
@@ -21,6 +22,7 @@ stdenv.mkDerivation rec {
     git-lfs
     gnumake
     headache
+    jq
     ocp-indent
   ];
 }

@@ -179,6 +179,9 @@ const Fct = Editor.createField<Fct>(undefined);
 // This field contains the currently selected marker.
 const Marker = Editor.createField<Marker>(undefined);
 
+// This field contains the current multiple selection.
+const Multiple = Editor.createField<Marker[]>([]);
+
 // The Ivette selection must be updated by CodeMirror plugins. This input
 // add the callback in the CodeMirror internal state.
 type UpdateSelection = (a: States.SelectionActions) => void;
@@ -274,18 +277,37 @@ function createHoveredUpdater(): Editor.Extension {
 //  Plugin decorating hovered and selected elements
 // -----------------------------------------------------------------------------
 
-const CodeDecorator = createCodeDecorator();
-function createCodeDecorator(): Editor.Extension {
-  const hoveredClass = Editor.Decoration.mark({ class: 'cm-hovered-code' });
-  const selectedClass = Editor.Decoration.mark({ class: 'cm-selected-code' });
-  const deps = { ranges: Ranges, marker: Marker, hovered: Hovered };
-  return Editor.createDecorator(deps, ({ ranges, marker: m, hovered: h }) => {
-    const hoveredRanges = h ? (ranges.get(h) ?? []) : [];
-    const selectedRanges = m ? (ranges.get(m) ?? []) : [];
-    const hovered = hoveredRanges.map(r => hoveredClass.range(r.from, r.to));
-    const selected = selectedRanges.map(r => selectedClass.range(r.from, r.to));
-    return Editor.RangeSet.of(selected.concat(hovered), true);
+const HoveredDecorator = createHoveredDecorator();
+function createHoveredDecorator(): Editor.Extension {
+  const cls = Editor.Decoration.mark({ class: 'cm-hovered-code' });
+  const deps = { ranges: Ranges, hovered: Hovered };
+  const extension = Editor.createDecorator(deps, ({ ranges, hovered }) => {
+    const hoveredRanges = hovered ? (ranges.get(hovered) ?? []) : [];
+    return Editor.RangeSet.of(hoveredRanges.map(r => cls.range(r.from, r.to)));
   });
+  return Editor.setPriority(extension, 'highest');
+}
+
+const MarkerDecorator = createMarkerDecorator();
+function createMarkerDecorator(): Editor.Extension {
+  const cls = Editor.Decoration.mark({ class: 'cm-selected-code' });
+  const deps = { ranges: Ranges, marker: Marker };
+  const extension = Editor.createDecorator(deps, ({ ranges, marker }) => {
+    const selectedRanges = marker ? (ranges.get(marker) ?? []) : [];
+    return Editor.RangeSet.of(selectedRanges.map(r => cls.range(r.from, r.to)));
+  });
+  return Editor.setPriority(extension, 'high');
+}
+
+const MultipleDecorator = createMultipleDecorator();
+function createMultipleDecorator(): Editor.Extension {
+  const cls = Editor.Decoration.mark({ class: 'cm-multiple-code' });
+  const deps = { ranges: Ranges, multiple: Multiple };
+  const extension = Editor.createDecorator(deps, ({ ranges, multiple: ms }) => {
+    const multRanges = mapFilter(ms.filter(isDef), (m) => ranges.get(m)).flat();
+    return Editor.RangeSet.of(multRanges.map(r => cls.range(r.from, r.to)));
+  });
+  return Editor.setPriority(extension, 'default');
 }
 
 // -----------------------------------------------------------------------------
@@ -613,7 +635,9 @@ const extensions: Editor.Extension[] = [
   MarkerUpdater,
   MarkerScroller,
   HoveredUpdater,
-  CodeDecorator,
+  HoveredDecorator,
+  MarkerDecorator,
+  MultipleDecorator,
   DeadCodeDecorator,
   ContextMenuHandler,
   PropertiesGutter,
@@ -636,6 +660,8 @@ export default function ASTview(): JSX.Element {
   React.useEffect(() => Fct.set(view, fct), [view, fct]);
   const marker = selection?.current?.marker;
   React.useEffect(() => Marker.set(view, marker), [view, marker]);
+  const multiple = selection?.multiple.allSelections.map(l => l.marker);
+  React.useEffect(() => Multiple.set(view, multiple), [view, multiple]);
 
   // Updating CodeMirror when the <updateHovered> callback is changed.
   const [hov, setHov] = States.useHovered();
