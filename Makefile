@@ -125,8 +125,9 @@ FRAMAC_PTESTS:=$(FRAMAC_PTESTS_SRC)/ptests.exe
 # WTESTS is internal
 FRAMAC_WTESTS:=$(FRAMAC_PTESTS_SRC)/wtests.exe
 
-# Frama-C also have ptest directories in plugins, so we do not use default
-PTEST_ALL_DIRS:=tests $(wildcard src/plugins/*/tests)
+# Frama-C also has ptest directories in plugins, so we do not use default
+PTEST_ALL_DIRS:=tests $(wildcard src/plugins/*/tests) \
+  src/kernel_internals/parsing/tests
 
 # Test aliasing definition allowing ./configure --disable-<plugin>
 PTEST_ALIASES:=@tests/ptests @src/plugins/ptests \
