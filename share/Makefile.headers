@@ -62,6 +62,10 @@ HEADER_EXCEPTIONS?=
 # Extra parameters for "frama-c-hdrck"
 HDRCK_EXTRA?=
 
+# Can be set to a file
+# - <file>: file containing the header specification for distributed files
+HEADER_DISTRIB_FILE?=
+
 ##########################################################################
 ## Tools
 

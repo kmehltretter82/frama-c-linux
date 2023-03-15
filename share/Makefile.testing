@@ -40,6 +40,12 @@ PTEST_DEPS?=
 PTEST_USE_WP_CACHE?=no
 # Defines the related dune targets
 PTEST_ALIASES?=$(addsuffix /ptests,$(addprefix @,$(PTEST_DIRS)))
+# Ptests command
+FRAMAC_PTEST?=
+# Wtests command
+FRAMAC_WTEST?=
+
+FRAMAC_WP_QUALIF?=
 
 ifneq ($(FRAMAC_WP_QUALIF),)
 FRAMAC_WP_CACHEDIR=$(FRAMAC_WP_QUALIF)

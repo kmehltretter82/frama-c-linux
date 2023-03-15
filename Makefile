@@ -43,11 +43,15 @@ FRAMAC_LINTCK_SRC:=tools/lint
 
 .PHONY: all
 
+DUNE_WS?=
+
 ifneq (${DUNE_WS},)
   WORKSPACE_OPT:=--workspace dev/dune-workspace.${DUNE_WS}
 else
   WORKSPACE_OPT:=
 endif
+
+DISABLED_PLUGINS?=
 
 all::
 ifeq (${FRAMAC_DEVELOPER},yes)
