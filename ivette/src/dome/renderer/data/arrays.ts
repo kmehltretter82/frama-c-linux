@@ -48,21 +48,18 @@ export function insertAt<A>(ls: A[], id: A, k: number): A[] {
 export type Indexed = { key: unknown; }
 
 /** Merges elements of the second array into matching elements of the first.
+    The function passed as parameter is used to extract the key from both a1 and
+    a2. Elements of a1 are merged with an element of a2 with a matching key if
+    one exists.
     The length and order of the first array is preserved. Elements of the second
     array matching no element of the first are ignored. */
-export function mergeArrays<A, B>(
+export function merge<K, A extends K, B extends K>(
   a1: A[],
   a2: B[],
-  match: (x1: A, x2: B) => boolean): (A | (A & B))[] {
-  return a1.map(x1 => ({...x1, ...(a2.find(x2 => match(x1, x2)))}));
-}
-
-/** Same as mergeArrays, using the `key` field to match between array items. */
-export function mergeArraysByKey<A, B>(
-  a1: (A & Indexed)[],
-  a2: (B & Indexed)[]
-): (A | A & B)[] {
-  return mergeArrays(a1, a2, (x1, x2) => x1.key === x2.key);
+  f: (x : K) => unknown,
+): (A & (object | B))[] {
+  const dict = new Map(a2.map(x2 => [f(x2), x2])); // maps f(x2) to x2
+  return a1.map(x1 => ({...x1, ...(dict.get(f(x1)))}));
 }
 
 /** Maps a function through an array and returns the first computed value that
