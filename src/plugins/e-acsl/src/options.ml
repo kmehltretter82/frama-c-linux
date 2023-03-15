@@ -134,16 +134,16 @@ module Instrument =
                   Be aware that runtime verdicts may become partial."
     end)
 
-module Function_arguments_base =
+module Widening_arguments_base =
   Zero
     (struct
-      let option_name = "-e-acsl-function-arguments-base"
+      let option_name = "-e-acsl-widening-arguments-base"
       let arg_name = "n"
-      let help = "precision for analysis of function arguments."
+      let help = "widening strategy for arguments of recursive functions."
     end)
-let () = Function_arguments_base.set_range ~min:0 ~max:1
+let () = Widening_arguments_base.set_range ~min:0 ~max:2
 
-module Function_arguments =
+module Widening_arguments =
   String_map
     (struct
       include Datatype.Int
@@ -161,22 +161,23 @@ module Function_arguments =
     end)
     (struct
       let default = Datatype.String.Map.empty
-      let option_name = "-e-acsl-function-arguments"
+      let option_name = "-e-acsl-widening-arguments"
       let arg_name = ""
-      let help = "precision for recursive function analysis."
+      let help = "widening strategy for arguments of functions on a case by case \
+                  basis."
     end)
 
-module Recursive_precision_base =
+module Widening_output_base =
   Int
     (struct
       let default = 1
-      let option_name = "-e-acsl-recursive-precision-base"
+      let option_name = "-e-acsl-widening-output-base"
       let arg_name = "n"
-      let help = "precision for analysis of function arguments."
+      let help = "wideining strategy for output of recursive functions."
     end)
-let () = Recursive_precision_base.set_range ~min:0 ~max:2
+let () = Widening_output_base.set_range ~min:0 ~max:2
 
-module Recursive_precision =
+module Widening_output =
   String_map
     (struct
       include Datatype.Int
@@ -194,9 +195,10 @@ module Recursive_precision =
     end)
     (struct
       let default = Datatype.String.Map.empty
-      let option_name = "-e-acsl-recursive-precision"
+      let option_name = "-e-acsl-widening-output"
       let arg_name = ""
-      let help = "precision for recursive function analysis."
+      let help = "widening strategy for output of recursive functions on a case
+		  by case basis."
     end)
 
 let () = Parameter_customize.set_group help
@@ -228,8 +230,10 @@ let parameter_states =
     Validate_format_strings.self;
     Functions.self;
     Instrument.self;
-    Function_arguments.self;
-    Recursive_precision.self ]
+    Widening_arguments_base.self;
+    Widening_arguments.self;
+    Widening_output.self;
+    Widening_output_base.self ]
 
 let emitter =
   Emitter.create
@@ -243,8 +247,10 @@ let emitter =
               Valid.parameter;
               Replace_libc_functions.parameter;
               Full_mtracking.parameter;
-              Function_arguments.parameter;
-              Recursive_precision.parameter ]
+	      Widening_output_base.parameter;
+	      Widening_arguments.parameter;
+	      Widening_output_base.parameter;
+              Widening_output.parameter ]
 
 let must_visit () = Run.get ()
 

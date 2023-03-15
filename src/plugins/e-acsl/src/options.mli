@@ -37,11 +37,11 @@ module Concurrency: Parameter_sig.Bool
 module Functions: Parameter_sig.Kernel_function_set
 module Instrument: Parameter_sig.Kernel_function_set
 
-module Function_arguments_base: Parameter_sig.Int
-module Function_arguments: Parameter_sig.Map
+module Widening_arguments_base: Parameter_sig.Int
+module Widening_arguments: Parameter_sig.Map
   with type key = string and type value = int
-module Recursive_precision_base: Parameter_sig.Int
-module Recursive_precision: Parameter_sig.Map
+module Widening_output_base: Parameter_sig.Int
+module Widening_output: Parameter_sig.Map
   with type key = string and type value = int
 
 val parameter_states: State.t list

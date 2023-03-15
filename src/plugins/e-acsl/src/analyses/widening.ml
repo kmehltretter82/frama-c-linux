@@ -71,18 +71,18 @@ let chose_widen n i1 i2 =
   | 2 -> widen_ival_precise i1 i2
   | _ ->
     Options.fatal "argument unsupported: %s with value %i"
-      Options.Function_arguments.name
+      Options.Widening_arguments.name
       n
 
 let widen_ival ~arg name i1 i2 =
   let n =
     if arg
     then
-      try Options.Function_arguments.find name
-      with Not_found -> Options.Function_arguments_base.get ()
+      try Options.Widening_arguments.find name
+      with Not_found -> Options.Widening_arguments_base.get ()
     else
-      try Options.Recursive_precision.find name
-      with Not_found -> Options.Recursive_precision_base.get ()
+      try Options.Widening_output.find name
+      with Not_found -> Options.Widening_output_base.get ()
   in chose_widen n i1 i2
 
 let widen ?(arg = false) li i1 i2 =
