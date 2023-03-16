@@ -161,6 +161,7 @@ module SmokeDeadcode: Parameter_sig.Bool
 module SmokeDeadcall: Parameter_sig.Bool
 module SmokeDeadlocalinit: Parameter_sig.Bool
 module SmokeDeadloop: Parameter_sig.Bool
+module CounterExample: Parameter_sig.Bool
 
 (** {2 Getters} *)
 

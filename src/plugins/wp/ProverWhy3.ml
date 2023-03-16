@@ -1065,7 +1065,29 @@ class visitor (ctx:context) c =
 
 let goal_id = (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "wp_goal"))
 
-let prove_goal ~id ~title ~name ?axioms t =
+let add_model_trace ce_terms cnv t =
+  let open Why3 in
+  if Bag.is_empty ce_terms then t else
+    let t = Task.add_meta t Driver.meta_get_counterexmp [Theory.MAstr ""] in
+    let id = ref (-1) in
+    let create_id ty =
+      let attr = Ident.create_model_trace_attr (Printf.sprintf "ce%i" !id) in
+      let attrs = Ident.Sattr.singleton attr in
+      Term.create_lsymbol (Ident.id_fresh ~attrs "A") [] ty
+    in
+    let fold t term =
+      let term' = of_term' cnv term in
+      let id = create_id term'.t_ty in
+      let t = Task.add_param_decl t id in
+      let eq_id = Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "ce_eq") in
+      let eq = Term.t_equ (Term.t_app id [] term'.t_ty) term' in
+      let decl = Why3.Decl.create_prop_decl Paxiom eq_id eq in
+      let t = Task.add_decl t decl in
+      t
+    in
+    Bag.fold_left fold t ce_terms
+
+let prove_goal ~id ~title ~name ?axioms ?(ce_terms=Bag.empty) t =
   (* Format.printf "why3_of_qed start@."; *)
   let goal = Definitions.cluster ~id ~title () in
   let ctx = empty_context name in
@@ -1089,16 +1111,19 @@ let prove_goal ~id ~title ~name ?axioms t =
     Wp_parameters.debug ~dkey:Wp_parameters.cat_print_generated "%a"
       Why3.Pretty.print_theory th_tmp
   end;
-  th, decl
+  let t = None in
+  let t = Why3.Task.use_export t th in
+  let t =
+    if Wp_parameters.CounterExample.get ()
+    then add_model_trace ce_terms cnv t 
+    else t in
+  Why3.Task.add_decl t decl
 
-let prove_prop ?axioms ~pid prop =
+let prove_prop ?ce_terms ?axioms ~pid prop =
   let id = WpPropId.get_propid pid in
   let title = Pretty_utils.to_string WpPropId.pretty pid in
   let name = "WP" in
-  let th, decl = prove_goal ?axioms ~id ~title ~name prop in
-  let t = None in
-  let t = Why3.Task.use_export t th in
-  Why3.Task.add_decl t decl
+  prove_goal ?axioms ?ce_terms ~id ~title ~name prop
 
 let task_of_wpo wpo =
   let pid = wpo.Wpo.po_pid in
@@ -1108,13 +1133,13 @@ let task_of_wpo wpo =
     let axioms = v.Wpo.VC_Annot.axioms in
     let prop = Wpo.GOAL.compute_proof ~pid v.Wpo.VC_Annot.goal in
     (* Format.printf "Goal: %a@." Lang.F.pp_pred prop; *)
-    prove_prop ~pid prop ?axioms
+    prove_prop ~pid prop ?axioms ~ce_terms:v.ce_terms
   | Wpo.GoalLemma v ->
     let lemma = v.Wpo.VC_Lemma.lemma in
     let depends = v.Wpo.VC_Lemma.depends in
     let prop = Lang.F.p_forall lemma.l_forall lemma.l_lemma in
     let axioms = Some(lemma.l_cluster,depends) in
-    prove_prop ~pid prop ?axioms
+    prove_prop ~pid prop ?axioms ~ce_terms:v.ce_terms
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Task                                                        --- *)
