@@ -306,6 +306,9 @@ struct
         ce_terms = vc.ce_terms ;
       }
 
+  let add_ce_terms ce_terms vc =
+    { vc with ce_terms = Bag.concat vc.ce_terms ce_terms }
+
   (* -------------------------------------------------------------------------- *)
   (* --- Branching                                                          --- *)
   (* -------------------------------------------------------------------------- *)
@@ -1447,7 +1450,18 @@ struct
     let post = L.current env in
     let pre = M.alloc post xs in
     let hs = M.scope { pre ; post } scope xs in
+    let val_of vi =
+      match M.load post (Ctypes.object_of vi.vtype) @@ M.cvar vi with
+      | Loc l -> M.pointer_val l
+      | Val t -> t
+    in
+    let ce_terms = if scope = Enter then
+        Bag.list @@ List.map val_of xs
+      else
+        Bag.empty
+    in
     let vcs = gmap (assume_vc ~descr hs) wp.vcs in
+    let vcs = gmap (add_ce_terms ce_terms) vcs in
     { wp with sigma = Some pre ; vcs = vcs }
 
   let scope wenv xs sc wp = in_wenv wenv wp
