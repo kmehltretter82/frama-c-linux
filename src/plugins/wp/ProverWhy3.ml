@@ -1183,6 +1183,14 @@ type prover_call = {
   mutable killed : bool ;
 }
 
+let print_model (res:Why3.Call_provers.prover_result) =
+  if Wp_parameters.CounterExample.get () then
+    List.iter (fun (res,model) ->
+        Format.printf "model %a: %a@." Why3.Call_provers.print_prover_answer
+          res (Why3.Model_parser.print_model ~filter_similar:false ~print_attrs:true) model
+      )
+      res.pr_models
+
 let ping_prover_call ~config p =
   match Why3.Call_provers.query_call p.call with
   | NoUpdates
@@ -1217,7 +1225,7 @@ let ping_prover_call ~config p =
       | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Invalid
       | OutOfMemory -> VCS.failed "out of memory"
       | StepLimitExceeded -> VCS.result ?steps:p.steps VCS.Stepout
-      | Unknown _ -> VCS.unknown
+      | Unknown _ -> print_model pr; VCS.unknown
       | _ when p.interrupted -> VCS.timeout p.timeout
       | Failure s -> VCS.failed s
       | HighFailure ->
