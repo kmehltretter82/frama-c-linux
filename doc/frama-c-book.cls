@@ -588,8 +588,8 @@
 
 \lstdefinelanguage{frama-c-commands}[]{}{%
   mathescape=false,%
-  alsoletter=-,%
-  keywords={frama-c,frama-c-gui,frama-c-script},%
+  alsoletter=-.,%
+  keywords={e-acsl-gcc.sh,frama-c,frama-c-gui,frama-c-script},%
   classoffset=1,%
   morekeywords={-load,-then,-then-last,-then-on,-then-replace,-save},%
   classoffset=0,%
@@ -638,7 +638,9 @@
 
 \lstdefinelanguage{Logs}[]{}{%
   style=frama-c-basic-style,
-  backgroundcolor=
+  mathescape=false,
+  backgroundcolor=,
+  literate={\\\$}{\$}1
 }
 
 \newcommand{\logsinput}[1]%

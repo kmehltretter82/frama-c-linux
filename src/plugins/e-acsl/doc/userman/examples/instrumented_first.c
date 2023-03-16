@@ -1,5 +1,5 @@
-\begin{shell}
-\$ frama-c -e-acsl first.i -then-last -print
+\begin{logs}
+$ frama-c -e-acsl first.i -then-last -print
 [kernel] Parsing first.i (no preprocessing)
 [e-acsl] beginning translation.
 [kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
@@ -69,4 +69,4 @@ int main(void)
   __retres = 0;
   return __retres;
 }
-\end{shell}
+\end{logs}
