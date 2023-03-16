@@ -37,13 +37,7 @@ let is_higher u1 u2 =
   | Some _, None -> false
 
 let widen_ival_naive i1 i2 =
-  let extend_ival i =
-    try
-      let kind = ikind_of_ival i in
-      interv_of_typ (TInt(kind, []))
-    with Cil.Not_representable ->
-      top_ival
-  in extend_ival (Ival.join i1 i2)
+  if Ival.is_bottom i1 then Ival i2 else top_ival
 
 let widen_ival_default i1 i2 =
   if Ival.is_bottom i1

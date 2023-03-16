@@ -199,7 +199,7 @@ module Widening_output =
       let option_name = "-e-acsl-widening-output"
       let arg_name = ""
       let help = "widening strategy for output of recursive functions on a case
-		  by case basis."
+      by case basis."
     end)
 
 let () = Parameter_customize.set_group help
@@ -248,9 +248,9 @@ let emitter =
               Valid.parameter;
               Replace_libc_functions.parameter;
               Full_mtracking.parameter;
-	      Widening_output_base.parameter;
-	      Widening_arguments.parameter;
-	      Widening_output_base.parameter;
+              Widening_output_base.parameter;
+              Widening_arguments.parameter;
+              Widening_output_base.parameter;
               Widening_output.parameter ]
 
 let must_visit () = Run.get ()
