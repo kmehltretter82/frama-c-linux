@@ -491,20 +491,6 @@ class simplify_const_lval: (varinfo -> init option) -> Cil.cilVisitor
     @since Neon-20140301 *)
 val complete_types: file -> unit
 
-(** {2 Parsing hackery} *)
-(** Values that control the various modes of the parser and lexer for logic.
-    Use with care.
-*)
-
-val kw_c_mode : bool ref
-val enter_kw_c_mode : unit -> unit
-val exit_kw_c_mode : unit -> unit
-val is_kw_c_mode : unit -> bool
-val rt_type_mode : bool ref
-val enter_rt_type_mode : unit -> unit
-val exit_rt_type_mode : unit -> unit
-val is_rt_type_mode : unit -> bool
-
 (*
 Local Variables:
 compile-command: "make -C ../../.."

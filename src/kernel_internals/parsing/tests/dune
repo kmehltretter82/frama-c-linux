@@ -28,11 +28,11 @@
 )
 
 (rule
- (alias run-coding-tests)
+ (alias run-kernel-tests)
  (deps ../logic_parser.mly)
  (action  (run %{dep:./check_logic_parser.exe})))
 
 (alias
-  (deps (alias run-coding-tests) )
+  (deps (alias run-kernel-tests) )
   (name ptests)
 )

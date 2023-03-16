@@ -73,12 +73,21 @@ let add_tokens s =
   in add_token s
 
 let wildcard_rules =
-  [ "bs_keyword"; "wildcard"; "keyword"; "c_keyword";
-    "non_logic_keyword"; "acsl_c_keyword"; "is_ext_spec";
+  [ "acsl_c_keyword";
+    "any_identifier";
+    "bs_keyword";
+    "c_keyword";
+    "identifier";
+    "identifier_or_typename";
+    "is_acsl_decl_or_code_annot";
+    "is_acsl_other";
+    "is_acsl_spec";
     "is_acsl_typename";
-    "is_acsl_spec"; "is_acsl_decl_or_code_annot";
-    "is_acsl_other"; "post_cond";
-    "identifier_or_typename"
+    "is_ext_spec";
+    "keyword";
+    "non_logic_keyword";
+    "post_cond";
+    "wildcard";
   ]
 
 let find_rule_name s =
