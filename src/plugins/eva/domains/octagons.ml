@@ -61,6 +61,8 @@ type dependencies = Eva_utils.deps = {
   indirect: Locations.Zone.t;
 }
 
+type evaluator = Cil_types.exp -> Cvalue.V.t or_top
+
 (* Abstract interface for the variables used by the octagons. *)
 module type Variable = sig
   include Datatype.S_with_collections
@@ -69,11 +71,12 @@ module type Variable = sig
   val make: varinfo -> t
   val make_int: varinfo -> t
   val make_startof: varinfo -> t
-  val make_lval: lval_deps: dependencies -> lval -> t
+  val make_lval: lval -> t
   val kind: t -> kind (* The kind of the variable: integer or float. *)
   val lval: t -> lval option (* The CIL lval corresponding to the variable. *)
   val id: t -> int (* Unique id, needed to use variables as hptmap keys. *)
-  val deps: t -> dependencies
+  val deps: eval_loc:(Cil_types.lval -> Precise_locs.precise_location) ->
+    t -> dependencies
 end
 
 (* Variables of the octagons. Should be extended later to also include
@@ -85,13 +88,13 @@ module Variable : Variable = struct
     | Var of varinfo
     | Int of varinfo
     | StartOf of varinfo
-    | Lval of { lval: HCE.t ; lval_deps: dependencies }
+    | Lval of HCE.t
 
   let id = function
     | Var vi -> 4 * vi.vid
     | Int vi -> 4 * vi.vid + 1
     | StartOf vi -> 4 * vi.vid + 2
-    | Lval {lval} -> 4 * HCE.id lval + 3
+    | Lval lval -> 4 * HCE.id lval + 3
 
   module Datatype_Input = struct
     include Datatype.Undefined
@@ -105,7 +108,7 @@ module Variable : Variable = struct
       | Var x, Var y
       | Int x, Int y -> Cil_datatype.Varinfo.compare x y
       | StartOf x, StartOf y -> Cil_datatype.Varinfo.compare x y
-      | Lval {lval=x}, Lval {lval=y} -> HCE.compare x y
+      | Lval x, Lval y -> HCE.compare x y
       | Var _, _ -> -1
       |  _, Var _ -> 1
       | Int _, _ -> -1
@@ -121,7 +124,7 @@ module Variable : Variable = struct
     let pretty fmt = function
       | Var vi | StartOf vi -> Printer.pp_varinfo fmt vi
       | Int vi -> Format.fprintf fmt "(integer)%a" Printer.pp_varinfo vi
-      | Lval {lval} -> HCE.pretty fmt lval
+      | Lval lval -> HCE.pretty fmt lval
 
   end
 
@@ -129,20 +132,19 @@ module Variable : Variable = struct
   let make vi = Var vi
   let make_int vi = Int vi
   let make_startof vi = StartOf vi
-  let make_lval ~lval_deps lval =
-    Lval { lval=HCE.of_lval lval ; lval_deps }
+  let make_lval lval = Lval (HCE.of_lval lval)
 
   let kind = function
     | Var vi -> typ_kind vi.vtype
     | Int _ | StartOf _ -> Integer
-    | Lval {lval} -> typ_kind (HCE.type_of lval)
+    | Lval lval -> typ_kind (HCE.type_of lval)
 
   let lval = function
     | Var vi -> Some (Cil_types.Var vi, NoOffset)
-    | Lval {lval} -> HCE.to_lval lval
+    | Lval lval -> HCE.to_lval lval
     | Int _ | StartOf _ -> None
 
-  let deps = function
+  let deps ~eval_loc = function
     | Var vi | Int vi ->
       {
         data = Locations.zone_of_varinfo vi;
@@ -150,8 +152,8 @@ module Variable : Variable = struct
       }
     | StartOf _ ->
       { data = Locations.Zone.bottom ; indirect = Locations.Zone.bottom }
-    | Lval {lval_deps} ->
-      lval_deps
+    | Lval lval ->
+      Eva_utils.deps_of_lval eval_loc (Option.get (HCE.to_lval lval))
 end
 
 (* Pairs of related variables in an octagon.
@@ -258,7 +260,6 @@ let _pretty_octagon fmt octagon =
     Variable.pretty x op Variable.pretty y
     (Unicode.inset_string ()) Ival.pretty octagon.value
 
-type evaluation = Cil_types.exp -> Cvalue.V.t or_top
 type environment = Cil_types.exp -> (Variable.t * Ival.t) option
 
 (* Transforms Cil expressions into mathematical octagons.
@@ -323,10 +324,10 @@ module Rewriting = struct
   (* Apply [f typ v1 v2] if the operation [e1 op e2] does not overflow,
      where [v1] and [v2] are the intervals for [e1] and [e2], and [typ] is
      the type of [e1]. Returns the empty list otherwise. *)
-  let apply_binop f (evaluate : evaluation) typ e1 op e2 =
+  let apply_binop f (eval : evaluator) typ e1 op e2 =
     let kind = typ_kind (Cil.typeOf e1) in
-    let v1 = evaluate e1 in
-    let v2 = evaluate e2 in
+    let v1 = eval e1 in
+    let v2 = eval e2 in
     if Cil.isPointerType typ
     then f kind v1 v2
     else
@@ -346,15 +347,15 @@ module Rewriting = struct
      function relies on an evaluation function linking each sub-expression into
      an interval, used for computing sound coefficients. The evaluation may
      return Top for some sub-expression, thus preventing the computation. *)
-  let rec rewrite (evaluate : evaluation) (env : environment) expr =
+  let rec rewrite (eval : evaluator) (env : environment) expr =
     match env expr with
     | Some (var, ival) -> [ { var; sign = true; coeff = Ival.neg_int ival } ]
     | None ->
       match expr.enode with
       | UnOp (Neg, e, typ) ->
-        let* v = project_ival (evaluate e) in
+        let* v = project_ival (eval e) in
         if may_overflow typ (Arith.neg v)
-        then [] else List.map neg (rewrite evaluate env e)
+        then [] else List.map neg (rewrite eval env e)
 
       | BinOp (PlusA | MinusA | PlusPI | MinusPI as binop, e1, e2, typ) ->
         let op = operation_of_binop binop in
@@ -373,7 +374,7 @@ module Rewriting = struct
               let add_v2 var =
                 { var with coeff = inverse_op kind var.coeff v2 }
               in
-              List.map add_v2 (rewrite evaluate env e1)
+              List.map add_v2 (rewrite eval env e1)
             with Cil.SizeOfError _ -> []
           and right_linearized =
             let* v1 = project_ival v1 in
@@ -381,28 +382,28 @@ module Rewriting = struct
               let var = if op = Sub then neg var else var in
               { var with coeff = Arith.sub kind var.coeff v1 }
             in
-            List.map add_v1 (rewrite evaluate env e2)
+            List.map add_v1 (rewrite eval env e2)
           in
           left_linearized @ right_linearized
         in
-        apply_binop rewrite_binop evaluate typ e1 op e2
+        apply_binop rewrite_binop eval typ e1 op e2
 
       | CastE (typ, e) ->
         if Cil.(isIntegralType typ && isIntegralType (typeOf e)) then
-          let* v = project_ival (evaluate e) in
-          if may_overflow ~cast:true typ v then [] else rewrite evaluate env e
+          let* v = project_ival (eval e) in
+          if may_overflow ~cast:true typ v then [] else rewrite eval env e
         else if Cil.(isPointerType typ && isPointerType (typeOf e)) then
-          rewrite evaluate env e
+          rewrite eval env e
         else
           []
 
       | _ -> []
 
   (* Rewrites the operation [e1 ± e2] into equivalent octagons ±(X±Y-value). *)
-  let rewrite_binop (evaluate : evaluation) (env : environment) e1 binop e2 =
+  let rewrite_binop (eval : evaluator) (env : environment) e1 binop e2 =
     let kind = typ_kind (Cil.typeOf e1) in
-    let vars1 = rewrite evaluate env e1 in
-    let vars2 = rewrite evaluate env e2 in
+    let vars1 = rewrite eval env e1 in
+    let vars2 = rewrite eval env e2 in
     let vars2 = if binop = Sub then List.map neg vars2 else vars2 in
     let aux acc var1 var2 =
       if Variable.equal var1.var var2.var
@@ -489,7 +490,7 @@ module Rewriting = struct
   (* Evaluates the Cil expression [expr], by rewriting it into octagonal
      constraints using [evaluate_expr] to evaluate sub-expressions, and
      then using [evaluate_octagon] to evaluate the octagons. *)
-  let evaluate_through_octagons evaluate_expr evaluate_octagon env expr =
+  let evaluate_through_octagons (eval : evaluator) evaluate_octagon env expr =
     let evaluate_octagon acc (sign, octagon) =
       match evaluate_octagon octagon with
       | None -> acc
@@ -504,13 +505,13 @@ module Rewriting = struct
     match expr.enode with
     | BinOp ((PlusA | MinusA as binop), e1, e2, typ) ->
       let op = if binop = PlusA then Add else Sub in
-      let octagons = rewrite_binop evaluate_expr env e1 op e2 in
+      let octagons = rewrite_binop eval env e1 op e2 in
       let ival = evaluate_octagons octagons in
       if Ival.(equal top ival) then default else
         let kind = typ_kind (Cil.typeOf e1) in
         let ival2 =
           match
-            project_ival (evaluate_expr e1), project_ival (evaluate_expr e2)
+            project_ival (eval e1), project_ival (eval e2)
           with
           | `Value v1, `Value v2 -> Arith.apply op kind v1 v2
           | _, _ -> Ival.top
@@ -525,7 +526,7 @@ module Rewriting = struct
       (* Evaluate [e1 - e2] and compare the resulting interval to the interval
          for which the comparison [e1 # e2] holds. *)
       let range = comparison_range comp in
-      let octagons = rewrite_binop evaluate_expr env e1 Sub e2 in
+      let octagons = rewrite_binop eval env e1 Sub e2 in
       let ival = evaluate_octagons octagons in
       if Ival.is_included ival range then Ival.one, Alarmset.all
       else if not (Ival.intersects ival range)
@@ -826,72 +827,87 @@ end
 (*                               Dependencies                                 *)
 (* -------------------------------------------------------------------------- *)
 
-module Deps = struct
+module VariableToDeps =
+struct
+  module Deps =
+  struct
+    include Function_Froms.Deps
+    let pretty_debug = pretty_precise
+  end
+
+  let cache_prefix = "Eva.Octagons.VariableToDeps"
+
+  include Hptmap.Make(Variable)(Deps)(Hptmap.Comp_unused)
+      (struct let v = [] end)(struct let l = [Ast.self] end)
+
+  let is_included: t -> t -> bool =
+    let cache_name = cache_prefix ^ ".is_included" in
+    let decide_fst _b _v1 = true in
+    let decide_snd _b _v2 = false in
+    let decide_both _ v1 v2 = Deps.is_included v1 v2 in
+    let decide_fast s t = if s == t then PTrue else PUnknown in
+    binary_predicate
+      (Hptmap_sig.PersistentCache cache_name) UniversalPredicate
+      ~decide_fast ~decide_fst ~decide_snd ~decide_both
+
+  let narrow: t -> t -> t =
+    let cache_name = cache_prefix ^ ".narrow" in
+    let cache = Hptmap_sig.PersistentCache cache_name in
+    let symmetric = true in
+    let idempotent = true in
+    let decide _ v1 v2 = Deps.narrow v1 v2 in
+    join ~cache ~symmetric ~idempotent ~decide
+
+  let join: t -> t -> t =
+    let cache_name = cache_prefix ^ ".join" in
+    let cache = Hptmap_sig.PersistentCache cache_name in
+    let symmetric = true in
+    let idempotent = true in
+    let decide _ v1 v2 = Some (Deps.join v1 v2) in
+    inter ~cache ~symmetric ~idempotent ~decide
+  
+  let find_opt (v: Variable.t) (m: t) =
+    try Some (find v m) with Not_found -> None
+end
+
+module BaseToVariables = struct
   module VSet = Variable.Set
+  module VSetPair =
+  struct
+    include Datatype.Pair (VSet) (VSet)
+    let pretty_debug = pretty
+    let is_empty (s,t) = VSet.is_empty s && VSet.is_empty t
+    let inter (s1,t1) (s2,t2) = VSet.inter s1 s2, VSet.inter t1 t2
+    let union (s1,t1) (s2,t2) = VSet.union s1 s2, VSet.union t1 t2
+  end
 
-  include Hptmap.Make
-      (Base.Base)
-      (struct
-        include Datatype.Pair (VSet) (VSet)
-        let pretty_debug = pretty
-      end)
-      (Hptmap.Comp_unused)
-      (struct let v = [] end)
-      (struct let l = [Ast.self] end)
+  include Hptmap.Make (Base.Base) (VSetPair) (Hptmap.Comp_unused)
+      (struct let v = [] end)(struct let l = [Ast.self] end)
 
-  let cache_prefix = "Value.Octagons.Deps"
+  let cache_prefix = "Eva.Octagons.BaseToVariables"
 
-  let inter =
+  let narrow =
     let cache_name = cache_prefix ^ ".inter" in
     let cache = Hptmap_sig.PersistentCache cache_name in
     let symmetric = true in
     let idempotent = true in
-    let decide _ (direct1,indirect1) (direct2,indirect2) =
-      let direct = VSet.inter direct1 direct2 in
-      let indirect = VSet.inter indirect1 indirect2 in
-      if VSet.is_empty direct && VSet.is_empty indirect
-      then None
-      else Some (direct, indirect)
+    let decide _ v1 v2 =
+      let v = VSetPair.inter v1 v2 in
+      if VSetPair.is_empty v then None else Some v
     in
     inter ~cache ~symmetric ~idempotent ~decide
 
-  let union =
+  let join =
     let cache_name = cache_prefix ^ ".union" in
     let cache = Hptmap_sig.PersistentCache cache_name in
     let symmetric = true in
     let idempotent = true in
-    let decide _ (direct1,indirect1) (direct2,indirect2) =
-      let direct = VSet.union direct1 direct2 in
-      let indirect = VSet.union indirect1 indirect2 in
-      direct, indirect
-    in
+    let decide _ v1 v2 = VSetPair.union v1 v2 in
     join ~cache ~symmetric ~idempotent ~decide
 
   let find b m =
     try find b m
     with Not_found -> VSet.empty, VSet.empty
-
-  let find_list b m =
-    let direct, indirect = find b m in
-    VSet.union direct indirect |> VSet.elements
-
-  let get zone m =
-    let filter ~direct zone v =
-      let deps = Variable.deps v in
-      let v_zone = if direct then deps.data else deps.indirect in
-      Locations.Zone.intersects v_zone zone
-    in
-    let get_at_base b intervals (data_acc, indirect_acc) =
-      let data, indirect = find b m in
-      let zone = Locations.Zone.inject b intervals in
-      VSet.union data_acc (VSet.filter (filter ~direct:true zone) data),
-      VSet.union indirect_acc (VSet.filter (filter ~direct:false zone) indirect)
-    in
-    Locations.Zone.fold_topset_ok get_at_base zone (VSet.empty, VSet.empty)
-
-  let get_list zone m =
-    let direct, indirect = get zone m in
-    VSet.union direct indirect |> VSet.elements
 
   let add_direct v =
     replace (function
@@ -903,19 +919,93 @@ module Deps = struct
         | None -> Some (VSet.empty, VSet.singleton v)
         | Some (direct, indirect) -> Some (direct, VSet.add v indirect))
 
-  let to_bases deps =
-    let { data ; indirect } = deps in
-    Base.SetLattice.project (Locations.Zone.get_bases data),
-    Base.SetLattice.project (Locations.Zone.get_bases indirect)
+  let remove_direct v =
+    replace (function
+        | None -> None
+        | Some (direct, indirect) ->
+          let direct = VSet.remove v direct in
+          if VSet.is_empty direct && VSet.is_empty indirect
+          then None
+          else Some (direct, indirect))
 
-  let add_variable m v =
-    let data, indirect = to_bases (Variable.deps v) in
-    m |>
-    Base.Hptset.fold (add_direct v) data |>
-    Base.Hptset.fold (add_indirect v) indirect
+  let remove_indirect v =
+    replace (function
+        | None -> None
+        | Some (direct, indirect) ->
+          let direct = VSet.remove v direct in
+          if VSet.is_empty direct && VSet.is_empty indirect
+          then None
+          else Some (direct, indirect))
+end
 
-  let add_variables m variables =
-    List.fold_left add_variable m variables
+module Deps = struct
+  module VSet = Variable.Set
+
+  include Datatype.Pair (VariableToDeps) (BaseToVariables)
+
+  let empty = VariableToDeps.empty, BaseToVariables.empty
+
+  let join (m1, i1: t) (m2, i2: t) =
+    VariableToDeps.join m1 m2, BaseToVariables.join i1 i2
+
+  let narrow (m1, i1: t) (m2, i2: t) =
+    VariableToDeps.narrow m1 m2, BaseToVariables.narrow i1 i2
+
+  let is_included (m1, _: t) (m2, _: t) =
+    VariableToDeps.is_included m1 m2
+
+  let intersects_base (_m, i: t) base =
+    let data, indirect = BaseToVariables.find base i in
+    VSet.union data indirect |> VSet.elements
+
+  let intersects_var (d: t) (vi: Cil_types.varinfo) =
+    intersects_base d (Base.of_varinfo vi)
+
+  let intersects_zone (m, i: t) zone =
+    let filter ~direct zone v =
+      let deps = VariableToDeps.find v m in
+      let v_zone = if direct then deps.data else deps.indirect in
+      Locations.Zone.intersects v_zone zone
+    in
+    let get_at_base b intervals (data_acc, indirect_acc) =
+      let data, indirect = BaseToVariables.find b i in
+      let zone = Locations.Zone.inject b intervals in
+      VSet.union data_acc (VSet.filter (filter ~direct:true zone) data),
+      VSet.union indirect_acc (VSet.filter (filter ~direct:false zone) indirect)
+    in
+    let data, indirect =
+      Locations.Zone.fold_topset_ok get_at_base zone (VSet.empty, VSet.empty)
+    in
+    VSet.union data indirect |> VSet.elements
+  
+  let add var deps (m, i: t) =
+    let m = VariableToDeps.add var deps m
+    and i = i |>
+      Locations.Zone.fold_topset_ok
+        (fun b _ -> BaseToVariables.add_direct var b) deps.data |>
+      Locations.Zone.fold_topset_ok
+        (fun b _ -> BaseToVariables.add_indirect var b) deps.indirect
+    in (m,i)
+
+  let remove var ((m, i) as d: t) =
+    match VariableToDeps.find_opt var m with
+    | None -> d (* The variable was not registered *)
+    | Some deps ->
+      let m = VariableToDeps.remove var m
+      and i = i |> 
+        Locations.Zone.fold_topset_ok
+          (fun b _ -> BaseToVariables.remove_direct var b) deps.data |>
+        Locations.Zone.fold_topset_ok
+          (fun b _ -> BaseToVariables.remove_indirect var b) deps.indirect
+      in (m, i)
+
+  let get_var_deps (m, _: t) (var: Variable.t) =
+    VariableToDeps.find var m
+
+  let get_var_bases (d: t) (var: Variable.t) =
+    (get_var_deps d var).data |>
+    Locations.Zone.get_bases |>
+    Base.SetLattice.project
 end
 
 
@@ -1023,30 +1113,30 @@ module State = struct
     is_redundant intervals {variables; operation = Sub; value = diamond.sub}
 
   (* Evaluates offset to an interval using the evaluate function for indexes *)
-  let rec offset_to_coeff evaluate base_type offset =
+  let rec offset_to_coeff (eval : evaluator) base_type offset =
     let open Lattice_bounds.Top.Operators in
     match offset with
     | Cil_types.NoOffset -> `Value (Ival.zero)
     | Field (fi, sub) ->
-      let+ sub_coeff = offset_to_coeff evaluate fi.ftype sub in
+      let+ sub_coeff = offset_to_coeff eval fi.ftype sub in
       let byte_offset = Integer.of_int (fst (Cil.fieldBitsOffset fi) / 8) in
       Ival.add_singleton_int byte_offset sub_coeff
     | Index (exp, sub) ->
       let elem_type = Cil.typeOf_array_elem base_type in
-      let* cvalue = evaluate exp in
+      let* cvalue = eval exp in
       let* index =
         try
           `Value (Cvalue.V.project_ival cvalue)
         with Cvalue.V.Not_based_on_null -> `Top
       in
-      let* sub_coeff = offset_to_coeff evaluate elem_type sub in
+      let* sub_coeff = offset_to_coeff eval elem_type sub in
       let+ elem_size =
         try `Value (Cil.bytesSizeOf elem_type)
         with Cil.SizeOfError _ -> `Top
       in
       Ival.(add_int (scale (Integer.of_int elem_size) index) sub_coeff)
 
-  let mk_variable_builder evaluate (_: t) =
+  let mk_variable_builder (eval : evaluator) (_: t) =
     let (let*) x f = Option.bind (Top.to_option x) f in
     (* Is the interval computed for a variable a singleton? *)
     let is_singleton =
@@ -1057,35 +1147,23 @@ module State = struct
       | Lval (Var vi, NoOffset)
         when Cil.isIntegralOrPointerType vi.vtype
           && not (Cil.typeHasQualifier "volatile" vi.vtype)
-          && not (is_singleton (evaluate exp)) ->
+          && not (is_singleton (eval exp)) ->
         Some (Variable.make vi, Ival.zero)
 
       | Lval lval
         when not (Eval_typ.lval_contains_volatile lval) ->
-        let find_loc lval =
-          match evaluate (Eva_utils.lval_to_exp lval) with
-          | `Top -> Precise_locs.loc_top
-          | `Value v ->
-            let bits = Locations.loc_bytes_to_loc_bits v in
-            let bits = Precise_locs.inject_location_bits bits in
-            let typ = Cil.typeOfLval lval in
-            let size = Cil.bitsSizeOf typ in
-            let size = Int_Base.inject (Integer.of_int size) in
-            Precise_locs.make_precise_loc bits ~size
-        in
-        let lval_deps = Eva_utils.deps_of_lval find_loc lval in
-        Some (Variable.make_lval ~lval_deps lval, Ival.zero)
+        Some (Variable.make_lval lval, Ival.zero)
 
       | CastE (typ, { enode = Lval (Var vi, NoOffset) })
         when Cil.isIntegralType typ
           && Cil.isFloatingType vi.vtype
           && not (Cil.typeHasQualifier "volatile" vi.vtype)
-          && not (is_singleton (evaluate exp)) ->
+          && not (is_singleton (eval exp)) ->
         Some (Variable.make_int vi, Ival.zero)
 
       | StartOf (Var vi, offset) | AddrOf (Var vi, offset) ->
         let var = Variable.make_startof vi in
-        let* coeff = offset_to_coeff evaluate vi.vtype offset in
+        let* coeff = offset_to_coeff eval vi.vtype offset in
         Some (var, coeff)
 
       | _ -> None
@@ -1111,6 +1189,7 @@ module State = struct
     Octagons.is_included t1.octagons t2.octagons
     && Intervals.is_included t1.intervals t2.intervals
     && Zone.is_included t1.modified t2.modified
+    && Deps.is_included t1.deps t2.deps
 
   let join t1 t2 =
     let octagons =
@@ -1142,7 +1221,7 @@ module State = struct
       { octagons; relations;
         intervals = Intervals.join t1.intervals t2.intervals;
         modified = Zone.join t1.modified t2.modified;
-        deps = Deps.union t1.deps t2.deps;
+        deps = Deps.join t1.deps t2.deps;
       }
     in
     check "join" state
@@ -1181,7 +1260,7 @@ module State = struct
       { octagons; relations;
         intervals = Intervals.widen t1.intervals t2.intervals;
         modified = Zone.join t1.modified t2.modified;
-        deps = Deps.union t1.deps t2.deps }
+        deps = Deps.join t1.deps t2.deps }
     in
     check "widen" state
 
@@ -1190,7 +1269,7 @@ module State = struct
     Intervals.narrow t1.intervals t2.intervals >>- fun intervals ->
     let relations = Relations.union t1.relations t2.relations in
     let modified = Zone.narrow t1.modified t2.modified in
-    let deps = Deps.inter t1.deps t2.deps in
+    let deps = Deps.narrow t1.deps t2.deps in
     `Value { octagons; intervals; relations; modified; deps }
 
   (* -------------- Transitive closure when adding an octagon --------------- *)
@@ -1253,7 +1332,7 @@ module State = struct
       Variable.Set.fold aux y_related (`Value state)
     with Not_found -> `Value state
 
-  let add_octagon state octagon =
+  let add_octagon eval_deps state octagon =
     if Ival.(equal top octagon.value) || is_redundant state.intervals octagon
     then `Value state
     else
@@ -1274,13 +1353,16 @@ module State = struct
       Octagons.add_octagon octagon state.octagons >>-: fun octagons ->
       let relations = Relations.relate octagon.variables state.relations in
       let variable_list = Pair.variable_list octagon.variables in
-      let deps = Deps.add_variables state.deps variable_list in
+      let add_var_deps deps v =
+        Deps.add v (eval_deps v) deps
+      in
+      let deps = List.fold_left add_var_deps state.deps variable_list in
       { state with octagons; relations; deps }
 
-  let add_diamond state variables diamond =
-    add_octagon state { variables; operation = Add; value = diamond.add }
+  let add_diamond eval_deps state variables diamond =
+    add_octagon eval_deps state { variables; operation = Add; value = diamond.add }
     >>- fun state ->
-    add_octagon state { variables; operation = Sub; value = diamond.sub }
+    add_octagon eval_deps state { variables; operation = Sub; value = diamond.sub }
 
   let remove state x =
     let intervals = Intervals.remove x state.intervals in
@@ -1299,7 +1381,8 @@ module State = struct
       in
       let state = Variable.Set.fold remove_one relations state in
       let relations = Relations.remove x state.relations in
-      { state with relations }
+      let deps = Deps.remove x state.deps in
+      { state with relations; deps }
     with Not_found -> state
 
   let related_octagons state x =
@@ -1368,17 +1451,43 @@ module Domain = struct
 
   let top_value = `Value (Cvalue.V.top, None), Alarmset.all
 
-  let extract_expr ~oracle _context state expr =
-    let evaluate_expr expr =
-      match fst (oracle expr) with
-      | `Bottom -> `Top (* should not happen *)
-      | `Value (Cvalue.V.Top _) -> `Top
-      | `Value cvalue -> `Value cvalue
+  (* Evaluator building. *)
+
+  let evaluator_from_oracle oracle = fun expr ->
+    match fst (oracle expr) with
+    | `Bottom -> `Top (* should not happen *)
+    | `Value (Cvalue.V.Top _) -> `Top
+    | `Value cvalue -> `Value cvalue
+      
+  let evaluator_from_valuation valuation =
+    let eval_exp expr =
+      match valuation.Abstract_domain.find expr with
+      | `Top -> `Top
+      | `Value record ->
+        match record.Eval.value.v with
+        | `Bottom -> `Top (* TODO: why this keeps happening? *)
+        | `Value (Cvalue.V.Top _) -> `Top
+        | `Value cvalue -> `Value cvalue
     in
+    let eval_loc lval =
+      match valuation.Abstract_domain.find_loc lval with
+      | `Top -> Precise_locs.loc_top
+      | `Value record -> record.loc
+    in
+    let eval_deps var =
+      Variable.deps ~eval_loc var
+    in
+    eval_exp, eval_deps
+
+
+  (* Domain functions *)
+
+  let extract_expr ~oracle _context state expr =
+    let eval = evaluator_from_oracle oracle in
     let evaluate_octagon octagon = Octagons.evaluate octagon state.octagons in
-    let env = mk_variable_builder evaluate_expr state in
+    let env = mk_variable_builder eval state in
     let ival, alarms =
-      Rewriting.evaluate_through_octagons evaluate_expr evaluate_octagon env expr
+      Rewriting.evaluate_through_octagons eval evaluate_octagon env expr
     in
     if Ival.(equal ival top)
     then top_value
@@ -1428,27 +1537,19 @@ module Domain = struct
     then top
     else
       let modified = Locations.Zone.join state.modified zone in
-      let vars = Deps.get_list zone state.deps in
+      let vars = Deps.intersects_zone state.deps zone in
       let state = List.fold_left State.remove state vars in
       { state with modified }
 
-  (* Evaluation function of expressions to ival, from a [valuation]. *)
-  let evaluation_function valuation = fun expr ->
-    match valuation.Abstract_domain.find expr with
-    | `Top -> `Top
-    | `Value record ->
-      match record.Eval.value.v with
-      | `Bottom -> `Top (* TODO: why this keeps happening? *)
-      | `Value (Cvalue.V.Top _) -> `Top
-      | `Value cvalue -> `Value cvalue
 
   exception EBottom
 
-  let infer_octagons evaluate expr ival state =
-    let env = mk_variable_builder evaluate state in
-    let octagons = Rewriting.make_octagons evaluate env expr ival in
+  let infer_octagons valuation expr ival state =
+    let eval_exp, eval_deps = evaluator_from_valuation valuation in
+    let env = mk_variable_builder eval_exp state in
+    let octagons = Rewriting.make_octagons eval_exp env expr ival in
     let add_octagon state octagon =
-      match State.add_octagon state octagon with
+      match State.add_octagon eval_deps state octagon with
       | `Bottom -> raise EBottom
       | `Value state -> state
     in
@@ -1467,7 +1568,6 @@ module Domain = struct
       | _ -> state
 
   let update valuation state =
-    let evaluate = evaluation_function valuation in
     let aux expr record state =
       let value = record.Eval.value in
       match record.reductness, value.v, value.initialized, value.escaping with
@@ -1475,7 +1575,7 @@ module Domain = struct
         begin
           try
             let ival = Cvalue.V.project_ival cvalue in
-            let state = infer_octagons evaluate expr ival state in
+            let state = infer_octagons valuation expr ival state in
             infer_interval expr ival state
           with Cvalue.V.Not_based_on_null -> state
         end
@@ -1502,17 +1602,16 @@ module Domain = struct
 
   (* Assigns integer [varinfo] to [expr]. *)
   let assign_variable varinfo expr assigned valuation state =
-    let evaluate = evaluation_function valuation in
+    let eval_exp, eval_deps = evaluator_from_valuation valuation in
     let variable = Variable.make varinfo in
-    let base = Base.of_varinfo varinfo in
     (* Remove lvals refering to the variable *)
-    let vars = Deps.find_list base state.deps in
+    let vars = Deps.intersects_var state.deps varinfo in
     let vars = List.filter (Fun.negate (Variable.equal variable)) vars in
     let state = List.fold_left State.remove state vars in
     (* Interpret inversible assignment if possible *)
     (* TODO: redundant with rewrite_binop below. *)
-    let env = mk_variable_builder evaluate state in
-    let vars = Rewriting.rewrite evaluate env expr in
+    let env = mk_variable_builder eval_exp state in
+    let vars = Rewriting.rewrite eval_exp env expr in
     let equal_varinfo v = Variable.equal variable v.Rewriting.var in
     let state =
       try
@@ -1526,11 +1625,11 @@ module Domain = struct
     let left_expr = Cil.new_exp ~loc:expr.eloc enode in
     (* On the assignment X = E; if X-E can be rewritten as ±(X±Y-v),
        then the octagonal constraint [X±Y ∈ v] holds. *)
-    let octagons = Rewriting.rewrite_binop evaluate env left_expr Sub expr in
+    let octagons = Rewriting.rewrite_binop eval_exp env left_expr Sub expr in
     let state =
       List.fold_left
         (fun acc (_sign, octagon) ->
-           acc >>- fun state -> State.add_octagon state octagon)
+           acc >>- fun state -> State.add_octagon eval_deps state octagon)
         (`Value state) octagons
     in
     state >>-: check "precise assign"
@@ -1552,7 +1651,7 @@ module Domain = struct
 
   let start_recursive_call recursion state =
     let vars = List.map fst recursion.substitution @ recursion.withdrawal in
-    let var_deps v = Deps.find_list (Base.of_varinfo v) state.deps in
+    let var_deps v = Deps.intersects_var state.deps v in
     let vars = List.flatten (List.map var_deps vars) in
     List.fold_left State.remove state vars
 
@@ -1581,7 +1680,8 @@ module Domain = struct
     then `Value (kill post.modified pre)
     else
       let modified = Locations.Zone.join post.modified pre.modified in
-      `Value { post with modified }
+      let deps = Deps.narrow post.deps pre.deps in
+      `Value { post with deps; modified }
 
   let logic_assign _logic_assign location state =
     let loc = Precise_locs.imprecise_location location in
@@ -1591,7 +1691,7 @@ module Domain = struct
 
   let enter_scope _kind _varinfos state = state
   let leave_scope _kf varinfos state =
-    let var_deps v = Deps.find_list (Base.of_varinfo v) state.deps in
+    let var_deps v = Deps.intersects_var state.deps v in
     let vars = List.concat_map var_deps varinfos in
     let state = List.fold_left State.remove state vars in
     check "leave_scope" state
@@ -1606,14 +1706,12 @@ module Domain = struct
       let add_related_bases acc var =
         let related = Relations.find var state.relations in
         Variable.Set.to_seq related |>
-        Seq.map Variable.deps |>
-        Seq.map Deps.to_bases |>
-        Seq.map (fun (data, indirect) -> Base.Hptset.union data indirect) |>
+        Seq.map (Deps.get_var_bases state.deps) |>
         Seq.fold_left Base.Hptset.union acc
       in
       let aux base acc =
         try
-          let variables = Deps.find_list base state.deps in
+          let variables = Deps.intersects_base state.deps base in
           List.fold_left add_related_bases acc variables
         with Base.Not_a_C_variable | Not_found -> acc
       in
@@ -1625,9 +1723,8 @@ module Domain = struct
     then state
     else
       let mem_var var =
-        let data, indirect = Deps.to_bases (Variable.deps var) in
-        let var_bases = Base.Hptset.union data indirect in
-        Base.Hptset.intersects var_bases bases
+        let bases' = Deps.get_var_bases state.deps var in
+        Base.Hptset.intersects bases' bases
       in
       let mem_pair pair =
         let x, y = Pair.get pair in
@@ -1646,7 +1743,7 @@ module Domain = struct
     let join_oct = Octagons.internal_join ~cache ~symmetric ~idempotent ~decide
     and join_itv = Intervals.internal_join ~cache ~symmetric ~idempotent ~decide
     and join_rel = Relations.union
-    and join_deps = Deps.union in
+    and join_deps = Deps.join in
     fun kf ~current_input ~previous_output ->
       let current_input = kill previous_output.modified current_input in
       (* We use [add_diamond] to add each relation from the previous output
@@ -1661,8 +1758,9 @@ module Domain = struct
           join_itv previous_output.intervals current_input.intervals
         in
         let state = { current_input with intervals } in
+        let eval_deps = Deps.get_var_deps state.deps in
         let add_diamond variables diamond acc =
-          match add_diamond acc variables diamond with
+          match add_diamond eval_deps acc variables diamond with
           | `Value state -> state
           | `Bottom ->
             Self.failure ~current:true ~once:true
@@ -1686,9 +1784,6 @@ module Domain = struct
     else
       let t = interprocedural_reuse kf ~current_input ~previous_output in
       check "reuse result" t
-
-
-
 end
 
 include Domain
