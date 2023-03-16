@@ -10,6 +10,7 @@ C files, UTF8 for all text files, newline at EOF, no trailing whitespaces.
 maintainer: "allan.blanchard@cea.fr"
 authors: [
   "Allan Blanchard"
+  "Patrick Baudin"
 ]
 homepage: "https://frama-c.com/"
 license: "LGPL-2.1-only"
