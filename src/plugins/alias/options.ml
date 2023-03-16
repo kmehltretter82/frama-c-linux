@@ -51,3 +51,12 @@ module ShowStmtTable = False
       let option_name = "-alias-show-stmt-table"
       let help = "Displays the table [stmt -> abstract state] at the end of the analysis"
     end)
+
+
+module Dot_output =
+  Empty_string
+    (struct
+      let option_name = "-alias-dot-output"
+      let arg_name = "f"
+      let help = "Displays the final abstract state in Dot File <f>"
+    end)

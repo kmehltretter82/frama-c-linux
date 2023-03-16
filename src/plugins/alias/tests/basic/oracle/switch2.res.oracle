@@ -1,16 +1,8 @@
 [kernel] Parsing switch2.c (with preprocessing)
 [alias] Parsing done
-[alias] Skiping switch (e) {
-            case 1: *a = e;
-            break;
-            case 2: *b = e;
-            break;
-            default: *c = e;
-          } (doStmt not implemented)
-[alias] Skiping break; (doStmt not implemented)
-[alias] Skiping break; (doStmt not implemented)
 [alias] May-aliases at the end of function main:
   <list of may-alias>
+  {a; b; c; d; } are aliased
   <end of list>
 [alias] Functions done
 Before statement int *a = (int *)0; :
@@ -34,41 +26,45 @@ Before statement int e = 0; :
 <end of list>
 
 Before statement switch (e) {
-                   case 1: *a = e;
+                   case 1: a = d;
                    break;
-                   case 2: *b = e;
+                   case 2: b = d;
                    break;
-                   default: *c = e;
+                   default: c = d;
                  } :
  <list of may-alias>
 <end of list>
 
-Before statement case 1: *a = e; :
+Before statement case 1: a = d; :
  <list of may-alias>
 <end of list>
 
 Before statement break; :
  <list of may-alias>
+{a; d; } are aliased
 <end of list>
 
-Before statement case 2: *b = e; :
+Before statement case 2: b = d; :
  <list of may-alias>
 <end of list>
 
 Before statement break; :
  <list of may-alias>
+{b; d; } are aliased
 <end of list>
 
-Before statement default: *c = e; :
+Before statement default: c = d; :
  <list of may-alias>
 <end of list>
 
 Before statement __retres = 0; :
  <list of may-alias>
+{a; b; c; d; } are aliased
 <end of list>
 
 Before statement return __retres; :
  <list of may-alias>
+{a; b; c; d; } are aliased
 <end of list>
 
 [alias] Analysis complete

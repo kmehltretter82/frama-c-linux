@@ -104,8 +104,37 @@ let print_debug fmt (x:t) =
   Format.fprintf fmt "cmpt: %d@." x.cmpt
 
 let print_aliases fmt (x:t) =
+  let iter_vmap v set_lv =
+    if G.mem_vertex x.graph v then
+      match G.succ x.graph v with
+        [] -> ()
+      | [_] ->
+        begin
+          let set_pred = ref LSet.empty in
+          G.iter_pred
+            (fun v -> set_pred := LSet.union !set_pred (VMap.find v x.vmap))
+            x.graph
+            v;
+          if LSet.cardinal set_lv + LSet.cardinal !set_pred >= 2
+          then
+            Format.fprintf fmt "{%a%a} are aliased@."
+              (fun fmt s ->
+                 LSet.iter
+                   (fun lv -> Format.fprintf fmt "%a; " Lval.pretty lv)
+                   s
+              )
+              set_lv
+              (fun fmt s ->
+                 LSet.iter
+                   (fun lv -> Format.fprintf fmt "*%a; " Lval.pretty lv)
+                   s
+              )
+              !set_pred
+        end
+      | _ -> failwith "this should not happen"
+  in
   Format.fprintf fmt "@[<hov 2><list of may-alias>@.";
-  VMap.iter  (fun _ set_lv -> if LSet.cardinal set_lv >= 2 then Format.fprintf fmt "%a are aliased@." LSet.pretty set_lv) x.vmap;
+  VMap.iter iter_vmap x.vmap;
   Format.fprintf fmt "<end of list>@]@."
 
 let pretty ?(debug=false) =
@@ -263,28 +292,38 @@ let remove_lval (x:t)  (lv:lval) :t =
   in
   assert_invariants new_x; new_x
 
-(* let lset_to_string s =
- *   let buffer = Buffer.create 16 in
- *   let fmt = Format.formatter_of_buffer buffer in
- *   Format.fprintf fmt "%a" LSet.pretty s ;
- *   Buffer.contents buffer
- *
- * module Dot = Graphviz.Dot(struct
- *     include G
- *     let edge_attributes _ = []
- *     let default_edge_attributes _ = []
- *     let get_subgraph _ = None
- *     let vertex_attributes _ = [`Shape `Box]
- *     let vertex_name (v:V.t) = lset_to_string ()
- *     let default_vertex_attributes _ = []
- *     let graph_attributes _ = []
- *   end) *)
 
-let print_dot _ = (* filename (graph:t) = *)
-  failwith "print_dot not implemented"
-(* let file = open_out filename in
- * Dot.output_graph file graph;
- * close_out file *)
+
+let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
+
+
+let lset_to_string (s: LSet.t) : string =
+  let fmt = Format.str_formatter in
+  Format.fprintf fmt "\"%a\"" LSet.pretty s;
+  Format.flush_str_formatter ()
+
+module Dot = Graphviz.Dot(struct
+    include G
+    let edge_attributes _ = []
+    let default_edge_attributes _ = []
+    let get_subgraph _ = None
+    let vertex_attributes _ = [`Shape `Box]
+    let vertex_name (v:V.t) =
+      let lset = !find_vertex_name_ref v in
+      let v_name = lset_to_string lset in
+      Format.printf "Vertex %d set %s@." v v_name;
+      v_name
+    let default_vertex_attributes _ = []
+    let graph_attributes _ = []
+  end)
+
+let print_dot filename (a:t) =
+  let file = open_out filename in
+  find_vertex_name_ref :=
+    (fun v -> find_lset v a
+    );
+  Dot.output_graph file a.graph;
+  close_out file
 
 (* merge of two vertices; the first vertex carries both sets, the second is removed from the graph and from lmap and vmap; however, pending is NOT updated  *)
 let merge x v1 v2 =
@@ -490,24 +529,40 @@ let assignment_ptr_x_cst (a:t) (x:lval) : t =
 (* we don't need to iterate on loops *)
 let equal (_:t) (_:t) = true
 
-(* exception Not_equal
- *
- *
- *
- * let equal (a1:t) (a2:t) =
- *   (\* a1 and a2 are equal iff there is an isomorphism between the two
- *      graphs and their associated maps *\)
- *   (\* we don't need to check a1.vmap and a2.vmap since they are inverse
- *      maps of a1.lmap and a2.lmap. However, shall we also check pending
- *      ? *\)
+exception Not_included
+
+let is_included (a1:t) (a2:t) =
+  (* tests if a1 is included in a2, at least as the nodes with lval *)
+  assert_invariants a1;
+  assert_invariants a2;
+  (* Format.printf "DEBUG testing equal @.%a@. AND à.%a@. END DEBUG@." (pretty ~debug:true) a1 (pretty ~debug:true) a2; *)
+  try
+    let iter_lmap (lv:lval) (v1:V.t): unit =
+      let v2 : V.t = try LMap.find lv a2.lmap with Not_found -> raise Not_included in
+      match G.succ a1.graph v1, G.succ a2.graph v2 with
+        [], _ -> ()
+      | [_], [] -> raise Not_included
+      | [v1p], [v2p] ->
+        if LSet.subset (VMap.find v1p a1.vmap) (VMap.find v2p a2.vmap)
+        then
+          ()
+        else
+          raise Not_included
+      | _ -> failwith "this should not hapen (invariant broken)"
+    in
+    LMap.iter iter_lmap a1.lmap; true
+  with
+    Not_included -> false
+
+(* let equal (a1:t) (a2:t) =
  *   assert_invariants a1;
  *   assert_invariants a2;
- *   Format.printf "DEBUG testing equality @.%a@. AND à.%a@. END DEBUG@." (pretty ~debug:true) a1 (pretty ~debug:true) a2;
+ *   Format.printf "DEBUG testing equal @.%a@. AND à.%a@. END DEBUG@." (pretty ~debug:true) a1 (pretty ~debug:true) a2;
  *   try
  *     let card = LMap.cardinal a1.lmap in
  *     if (card = LMap.cardinal a2.lmap)
  *     && G.nb_vertex a1.graph = G.nb_vertex a2.graph
- *     && G.nb_edges a1.graph = G.nb_vertex a2.graph
+ *     && G.nb_edges a1.graph = G.nb_edges a2.graph
  *     (\* the invariants assure that if the nb of vertex is equal, then
  *        the size of pending and vmap are also equal. nb counters may be
  *        different, it doesn't matter *\)

@@ -1,35 +1,13 @@
 [kernel] Parsing function5.c (with preprocessing)
 [alias] Parsing done
-[alias] Skiping goto return_label; (doStmt not implemented)
-[alias] Skiping goto return_label; (doStmt not implemented)
-[alias] Skiping goto return_label; (doStmt not implemented)
-[alias] Skiping goto return_label; (doStmt not implemented)
-[alias] Skiping goto return_label; (doStmt not implemented)
-[alias] Skiping goto return_label; (doStmt not implemented)
 [alias] May-aliases at the end of function main:
   <list of may-alias>
-  { a; b; c } are aliased
+  {a; b; c; } are aliased
   <end of list>
 [alias] Functions done
 Before statement goto return_label; :
  <list of may-alias>
-{ x; y; __retres } are aliased
-<end of list>
-
-Before statement goto return_label; :
- <list of may-alias>
-{ x; y; __retres } are aliased
-<end of list>
-
-Before statement goto return_label; :
- <list of may-alias>
-{ x; __retres } are aliased
-<end of list>
-
-Before statement __retres = y;
-                 goto return_label; :
- <list of may-alias>
-{ x; y; __retres } are aliased
+{x; __retres; } are aliased
 <end of list>
 
 Before statement __retres = y;
@@ -43,22 +21,12 @@ Before statement int c = 0; :
 
 Before statement goto return_label; :
  <list of may-alias>
-{ x; y; __retres } are aliased
-<end of list>
-
-Before statement goto return_label; :
- <list of may-alias>
-{ x; y; __retres } are aliased
-<end of list>
-
-Before statement goto return_label; :
- <list of may-alias>
-{ y; __retres } are aliased
+{y; __retres; } are aliased
 <end of list>
 
 Before statement return_label: return __retres; :
  <list of may-alias>
-{ x; y; __retres } are aliased
+{x; y; __retres; } are aliased
 <end of list>
 
 Before statement if (c) {
@@ -74,31 +42,11 @@ Before statement if (c) {
 
 Before statement return __retres; :
  <list of may-alias>
-{ a; b; c } are aliased
+{a; b; c; } are aliased
 <end of list>
 
 Before statement __retres = x; :
  <list of may-alias>
-{ x; y; __retres } are aliased
-<end of list>
-
-Before statement __retres = x; :
- <list of may-alias>
-{ x; y; __retres } are aliased
-<end of list>
-
-Before statement __retres = x; :
- <list of may-alias>
-<end of list>
-
-Before statement __retres = y; :
- <list of may-alias>
-{ x; y; __retres } are aliased
-<end of list>
-
-Before statement __retres = y; :
- <list of may-alias>
-{ x; y; __retres } are aliased
 <end of list>
 
 Before statement __retres = y; :
@@ -123,13 +71,7 @@ Before statement c = choice(a,b); :
 
 Before statement __retres = 0; :
  <list of may-alias>
-{ a; b; c } are aliased
-<end of list>
-
-Before statement __retres = x;
-                 goto return_label; :
- <list of may-alias>
-{ x; y; __retres } are aliased
+{a; b; c; } are aliased
 <end of list>
 
 Before statement __retres = x;

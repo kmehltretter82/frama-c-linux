@@ -1,5 +1,7 @@
 // function with multiple returns
 // { a; b; c } are aliased
+// { *a; *b; *c } are aliased
+
 
 int * choice(int* x, int* y)
 {
