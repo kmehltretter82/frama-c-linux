@@ -1112,11 +1112,11 @@ module OutputDir =
                 Defaults to some temporary directory."
   end)
 
-  module CounterExample =
+module CounterExample =
   False
     (struct
-      let option_name = "-wp-counter-example"
-      let help = "Print the counter-example"
+      let option_name = "-wp-counterexample"
+      let help = "Print the counterexample"
     end)
 
 
