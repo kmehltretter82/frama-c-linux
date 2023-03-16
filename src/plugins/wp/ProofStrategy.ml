@@ -25,6 +25,7 @@ open Cil_datatype
 open Logic_typing
 open Logic_ptree
 open Pattern
+module D = Datatype
 
 (* -------------------------------------------------------------------------- *)
 (* --- Proof Strategy Engine                                              --- *)
@@ -40,7 +41,7 @@ type strategy = {
 
 and alternative =
   | Strategy of string loc
-  | Provers of string loc list * int option (* timeout *)
+  | Provers of string loc list * float option (* timeout *)
   | Tactic of {
       tactic : string loc ;
       select : value list ;
@@ -67,9 +68,9 @@ let fresh () = let id = succ @@ Kid.get () in Kid.set id ; id
 (* --- Proof Strategy Registry                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-module S = Datatype.Make
+module S = D.Make
     (struct
-      include Datatype.Undefined
+      include D.Undefined
       type t = strategy
       let reprs = [{
           name = { loc = Location.unknown ; value = "" };
@@ -77,11 +78,11 @@ module S = Datatype.Make
         }]
       let name = "Wp.ProofStrategy.S"
       let structural_descr = Structural_descr.t_abstract
-      let rehash = Datatype.identity
-      let mem_project = Datatype.never_any_project
+      let rehash = D.identity
+      let mem_project = D.never_any_project
     end)
 
-module Strategies = State_builder.Hashtbl(Datatype.String.Hashtbl)(S)
+module Strategies = State_builder.Hashtbl(D.String.Hashtbl)(S)
     (struct
       let size = 0
       let name = "Wp.ProofStrategy.Registry"
@@ -91,6 +92,9 @@ module Strategies = State_builder.Hashtbl(Datatype.String.Hashtbl)(S)
 (* -------------------------------------------------------------------------- *)
 (* --- Alternative Parser                                                 --- *)
 (* -------------------------------------------------------------------------- *)
+
+let debug fmt p =
+  Format.fprintf fmt "@[<hov 2>at: %a@]" Logic_print.print_lexpr p
 
 let rec parse_provers ctxt provers timeout = function
   | [] -> List.rev provers,timeout
@@ -102,19 +106,27 @@ let rec parse_provers ctxt provers timeout = function
         ctxt.error loc "Invalid timeout" in
       if time < 0 then ctxt.error loc "Invalid timeout" ;
       if timeout <> None then ctxt.error loc "Duplicate timeout" ;
+      parse_provers ctxt provers (Some (float time)) ps
+    | PLconstant (FloatConstant t) ->
+      let time = try float_of_string t with Invalid_argument _ ->
+        ctxt.error loc "Invalid timeout" in
+      if time < 0.0 then ctxt.error loc "Invalid timeout" ;
+      if timeout <> None then ctxt.error loc "Duplicate timeout" ;
       parse_provers ctxt provers (Some time) ps
     | PLconstant (StringConstant value) ->
       parse_provers ctxt ( { loc ; value } :: provers ) timeout ps
-    | _ -> ctxt.error loc "Invalid prover specification"
+    | _ -> ctxt.error loc "Invalid prover specification (%a)" debug p
 
-let parse_name ctxt ~kind p =
+let parse_name ctxt ~kind ?check p =
   let loc = p.lexpr_loc in
   match p.lexpr_node with
   | PLvar value
   | PLapp(value,[],[])
   | PLconstant(StringConstant value)
-    -> { loc ; value }
-  | _ -> ctxt.error loc "%s name expected" kind
+    ->
+    Option.iter (fun f -> f loc value) check ;
+    { loc ; value }
+  | _ -> ctxt.error loc "%s name expected (%a)" kind debug p
 
 let parse_lookup penv ?(goal=false) ?(hyps=false) p =
   match p.lexpr_node with
@@ -123,7 +135,8 @@ let parse_lookup penv ?(goal=false) ?(hyps=false) p =
   | _ ->
     { goal ; hyps ; head = true ; pattern = Pattern.pa_pattern penv p }
 
-let rec parse_tactic ctxt penv ~tactic ~select ~lookup ~params ~children ~default ps =
+let rec parse_tactic_params ctxt penv
+    ~tactic ~select ~lookup ~params ~children ~default ps =
   match ps with
   | [] -> Tactic {
       tactic ;
@@ -135,7 +148,7 @@ let rec parse_tactic ctxt penv ~tactic ~select ~lookup ~params ~children ~defaul
     }
   | p::ps ->
     let loc = p.lexpr_loc in
-    let cc = parse_tactic ctxt penv ~tactic in
+    let cc = parse_tactic_params ctxt penv ~tactic in
     match p.lexpr_node with
     | PLapp("\\when",[],qs) ->
       let qs = List.map (parse_lookup ~hyps:true penv) qs in
@@ -145,7 +158,7 @@ let rec parse_tactic ctxt penv ~tactic ~select ~lookup ~params ~children ~defaul
       let qs = List.map (parse_lookup ~goal:true penv) qs in
       let lookup = List.rev_append qs lookup in
       cc ~select ~lookup ~params ~children ~default ps
-    | PLapp("\\lookup",[],qs) ->
+    | PLapp("\\pattern",[],qs) ->
       let qs = List.map (parse_lookup ~goal:true ~hyps:true penv) qs in
       let lookup = List.rev_append qs lookup in
       cc ~select ~lookup ~params ~children ~default ps
@@ -159,15 +172,15 @@ let rec parse_tactic ctxt penv ~tactic ~select ~lookup ~params ~children ~defaul
       let params = (param,value)::params in
       cc ~select ~lookup ~params ~children ~default ps
     | PLapp("\\child",[],[prefix;strategy]) ->
-      let prefix = parse_name ctxt ~kind:"Child" prefix in
+      let subgoal = parse_name ctxt ~kind:"Subgoal" prefix in
       let strategy = parse_name ctxt ~kind:"Strategy" strategy in
-      let children = (prefix,strategy)::children in
+      let children = (subgoal,strategy)::children in
       cc ~select ~lookup ~params ~children ~default ps
     | PLapp("\\children",[],[strategy]) ->
       if default <> None then ctxt.error loc "Duplicate \\children parameter" ;
       let default = Some (parse_name ctxt ~kind:"Strategy" strategy) in
       cc ~select ~lookup ~params ~children ~default ps
-    | _ -> ctxt.error loc "Tactic parameter expected"
+    | _ -> ctxt.error loc "Tactic parameter expected (%a)" debug p
 
 let parse_alternative ctxt p =
   let loc = p.lexpr_loc in
@@ -176,10 +189,11 @@ let parse_alternative ctxt p =
   | PLapp("\\prover",[],ps) ->
     let prvs,timeout = parse_provers ctxt [] None ps in
     Provers(prvs,timeout)
-  | PLapp("\\tactic",[value],ps) ->
-    parse_tactic ctxt (Pattern.context ctxt) ~tactic:{ loc ; value }
+  | PLapp("\\tactic",[],p::ps) ->
+    let tactic = parse_name ctxt ~kind:"tactic" p in
+    parse_tactic_params ctxt (Pattern.context ctxt) ~tactic
       ~select:[] ~lookup:[] ~params:[] ~children:[] ~default:None ps
-  | _ -> ctxt.error loc "Strategy definition expected"
+  | _ -> ctxt.error loc "Strategy definition expected (%a)" debug p
 
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy Parser                                                    --- *)
@@ -190,7 +204,7 @@ let parse_strategy_name ctxt loc = function
   | p::ps ->
     match p.lexpr_node with
     | PLnamed(value,p) -> { loc ; value }, p::ps
-    | _ -> ctxt.error loc "Missing strategy name (strategy A: ...)"
+    | _ -> ctxt.error loc "Missing strategy name (%a)" debug p
 
 let parse_strategy ctxt loc ps =
   let name,ps = parse_strategy_name ctxt loc ps in
@@ -210,132 +224,39 @@ let () = Acsl_extension.register_global "strategy" parse_strategy false
 (* --- Proof Parser                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-module LemmaProofs =
-  State_builder.Hashtbl(Datatype.String.Hashtbl)(Datatype.String)
+module Hints = State_builder.List_ref
+    (D.Pair(D.String)(D.List(D.String)))
     (struct
-      let size = 0
-      let name = "Wp.ProofStrategy.LemmaProofs"
-      let dependencies = [Ast.self;Kid.self]
+      let name = "Wp.ProofStrategy.Hints"
+      let dependencies = [Ast.self]
     end)
 
-module FunctionProofs =
-  State_builder.Hashtbl(Datatype.String.Hashtbl)(Datatype.String)
-    (struct
-      let size = 0
-      let name = "Wp.ProofStrategy.FunctionProofs"
-      let dependencies = [Ast.self;Kid.self]
-    end)
-
-module PropertyProofs =
-  State_builder.Hashtbl(Datatype.String.Hashtbl)(Datatype.String)
-    (struct
-      let size = 0
-      let name = "Wp.ProofStrategy.PropertyProofs"
-      let dependencies = [Ast.self;Kid.self]
-    end)
-
-let rec parse_hints ctxt names p =
+let parse_hints ctxt p =
   let loc = p.lexpr_loc in
   match p.lexpr_node with
-  | PLnamed(value,p) -> parse_hints ctxt ({ loc ; value } :: names) p
-  | PLvar value | PLapp(value,[],[]) -> names, { loc ; value }
-  | _ -> ctxt.error loc "Invalid proof specification"
+  | PLvar x -> [x]
+  | PLconstant(StringConstant x) -> String.split_on_char ',' x
+  | _ -> ctxt.error loc "Proof hint expected (see -wp-proop) (%a)" debug p
 
-let parse_proofs ~kind ~mem ~add ?check ctxt _loc ps =
-  List.iter
-    (fun p ->
-       let names, st = parse_hints ctxt [] p in
-       List.iter
-         (fun name ->
-            Option.iter
-              begin fun f ->
-                if not (f name.value) then
-                  ctxt.error name.loc
-                    "Invalid %s name '%s'" kind name.value
-              end check ;
-            if mem name.value then
-              ctxt.error name.loc
-                "Duplicate proof for %s '%s'" kind name.value ;
-            if not (Strategies.mem st.value) then
-              ctxt.error st.loc "Unknown proof strategy %S" st.value ;
-            add name.value st.value
-         ) names
-    ) ps ;
+let parse_proofs ctxt loc ps =
+  let name , ps = parse_strategy_name ctxt loc ps in
+  let strategy = name.value in
+  if not (Strategies.mem strategy) then
+    ctxt.error name.loc "Unknown strategy '%s'" strategy ;
+  let props = List.concat @@ List.map (parse_hints ctxt) ps in
+  Hints.set (Hints.get () @ [ strategy , props ]) ;
   Ext_id 0
 
-let () = Acsl_extension.register_global "prove_lemma" (
-    parse_proofs
-      ~kind:"lemma"
-      ~mem:LemmaProofs.mem
-      ~add:LemmaProofs.add
-  ) false
-
-let () = Acsl_extension.register_global "prove_function" (
-    parse_proofs
-      ~kind:"function"
-      ~check:Globals.Functions.mem_name
-      ~mem:FunctionProofs.mem
-      ~add:FunctionProofs.add
-  ) false
-
-let () = Acsl_extension.register_global "prove_property" (
-    parse_proofs
-      ~kind:"property"
-      ~mem:PropertyProofs.mem
-      ~add:PropertyProofs.add
-  ) false
+let () = Acsl_extension.register_global "prove" parse_proofs false
 
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy Resolution                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let strategies ?kf ?lemma ?pred () =
-  let collect find name = try [find name] with Not_found -> [] in
-  let list find xs = List.concat (List.map (collect find) xs) in
-  let option find = function None -> [] | Some a -> find a in
-  option (fun p -> list PropertyProofs.find p.pred_name) pred @
-  option (collect LemmaProofs.find) lemma @
-  option (fun kf ->
-      collect FunctionProofs.find (Kernel_function.get_name kf)) kf
-
-let lookup (target : Property.t) : strategy list =
-  List.map Strategies.find @@
-  let rec forip (ip : Property.t) =
-    match ip with
-    | IPBehavior p ->
-      strategies ~kf:p.ib_kf ()
-    | IPLemma p ->
-      strategies ~lemma:p.il_name ~pred:p.il_pred.tp_statement ()
-    | IPCodeAnnot p ->
-      let kf = p.ica_kf in
-      begin
-        match p.ica_ca.annot_content with
-        | AInvariant(_,_,tp)
-        | AAssert(_,tp)
-          -> strategies ~kf ~pred:tp.tp_statement ()
-        | AAssigns _ | AVariant _ | AAllocation _  | APragma _
-        | AStmtSpec _ | AExtended _ ->
-          strategies ~kf ()
-      end
-    | IPPredicate p ->
-      strategies ~kf:p.ip_kf ~pred:p.ip_pred.ip_content.tp_statement ()
-    | IPComplete p | IPDisjoint p -> strategies ~kf:p.ic_kf ()
-    | IPFrom p -> strategies ~kf:p.if_kf ()
-    | IPAssigns p -> strategies ~kf:p.ias_kf ()
-    | IPAllocation p -> strategies ~kf:p.ial_kf ()
-    | IPDecrease p -> strategies ~kf:p.id_kf ()
-    | IPReachable p -> strategies ?kf:p.ir_kf ()
-    | IPPropertyInstance { ii_kf = kf ; ii_pred = Some p } ->
-      strategies ~kf ~pred:p.ip_content.tp_statement ()
-    | IPPropertyInstance { ii_ip } -> forip ii_ip
-    | IPTypeInvariant p -> strategies ~pred:p.iti_pred ()
-    | IPGlobalInvariant p -> strategies ~pred:p.igi_pred ()
-    | IPOther { io_loc = (OLContract kf | OLStmt(kf,_)) } ->
-      strategies ~kf ()
-    | IPOther { io_loc = OLGlob _ }
-    | IPExtended _
-    | IPAxiomatic _
-      -> []
-  in forip target
+let lookup pid =
+  List.map (fun (name,_) -> Strategies.find name) @@
+  List.filter (fun (_,ps) ->
+      WpPropId.select_by_name ps pid
+    ) (Hints.get ())
 
 (* -------------------------------------------------------------------------- *)

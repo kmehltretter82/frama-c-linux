@@ -27,6 +27,6 @@
 
 type strategy
 
-val lookup : Property.t -> strategy list
+val lookup : WpPropId.prop_id -> strategy list
 
 (* -------------------------------------------------------------------------- *)
