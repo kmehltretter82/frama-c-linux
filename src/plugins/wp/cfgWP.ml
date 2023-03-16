@@ -307,7 +307,11 @@ struct
       }
 
   let add_ce_terms ce_terms vc =
-    { vc with ce_terms = Bag.concat vc.ce_terms ce_terms }
+    let vars =
+      Bag.fold_left (fun s t -> Vars.union s (Lang.F.vars t)) vc.vars ce_terms
+    in
+    let ce_terms = Bag.concat vc.ce_terms ce_terms in
+    { vc with ce_terms ; vars }
 
   (* -------------------------------------------------------------------------- *)
   (* --- Branching                                                          --- *)
