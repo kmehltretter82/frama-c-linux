@@ -22,7 +22,7 @@
 
 open Cil_types
 open Cil_datatype
-open Utils
+open Simplified
 
 module Dataflow = Dataflow2
 
@@ -81,9 +81,7 @@ end
 
 let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
   (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)
-  let arg =
-    try convert_blval (find_basic_lval exp) with
-    Double_lval(_,_,t) when is_scalar_type t -> BNone
+  let arg = Simplified_lval.from_exp exp
   in
   match (a,lv, arg) with
     (Some a, (Var v1, o1), BLval (Var v2, o2)) ->

@@ -23,8 +23,7 @@
 (** External API of the plugin Alias *)
 
 open Cil_types
-open Cil_datatype
-(* NB : do the analysis BEFORE using any of those functions *)
+(** NB : do the analysis BEFORE using any of those functions *)
 
 (* previously get_class_before_statement *)
 (** [fold_aliases_stmt f acc kf s lv] folds [f acc] over all the aliases of the
@@ -59,12 +58,12 @@ val are_aliased: kernel_function -> stmt -> lval -> lval -> bool
     [setv] is the set of lvals that are pointed to by [v] before
     statement [s] in function [kf]. *)
 val fold_points_to:
-  ('a ->  Lval.Set.t -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
+  ('a -> lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
 
 (** [fold_points_to_closure f acc kf s v] is the transitive closure of function
     [fold_points_to]. *)
 val fold_points_to_closure:
-  ('a ->  Lval.Set.t -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
+  ('a ->  lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
 
 
 (** direct access to the abstract state. See Abstract_state.mli *)

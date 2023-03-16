@@ -24,13 +24,13 @@
 
 open Cil_types
 
-module VSet = Datatype.Int.Set
-module VMap = Datatype.Int.Map
+(* module VSet = Datatype.Int.Set
+ * module VMap = Datatype.Int.Map *)
 
 (** NB : type Lval.t is not the same as type lval !! *)
-module Lval = Simplified.Simplified_lval
+(* module Lval = Simplified.Simplified_lval *)
 module LSet = Simplified.Simplified_lset
-module LMap = Simplified.Simplified_lmap
+(* module LMap = Simplified.Simplified_lmap *)
 
 (** Points-to graphs datastructure. *)
 module G: Graph.Sig.G

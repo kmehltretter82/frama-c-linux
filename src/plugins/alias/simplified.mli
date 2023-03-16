@@ -64,10 +64,12 @@ sig
   val pretty: Format.formatter -> t -> unit
     
   val pp_debug : Format.formatter -> t -> unit
+
+  (* sepcial fold *)
+  val fold_lval : (lval -> 'a -> 'a) -> t -> 'a -> 'a
     
 end
-
-
+  
 val  decompose_lval : Simplified_lval.t -> (Simplified_lval.t*offset) list
 
 (** clear the two caches *)

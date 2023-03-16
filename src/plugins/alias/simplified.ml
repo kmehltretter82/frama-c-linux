@@ -189,6 +189,15 @@ struct
   let pretty fmt s = print Simplified_lval.pretty fmt s
 
   let pp_debug fmt s = print Simplified_lval.pp_debug fmt s
+
+  let fold_lval f s init =
+    let f_fold lv acc =
+      match lv with
+        BNone -> acc
+      | BLval lv -> f lv acc
+      | BAddrOf lv -> f lv acc
+    in
+    fold f_fold s init 
 end
 
 
@@ -215,3 +224,4 @@ let decompose_lval (lv1: Simplified_lval.t) : (Simplified_lval.t*offset) list =
   List.map
     (fun (o1,o2) -> (Simplified_lval.addOffsetLval o1 lv,o2))
     (list_of_offset off)
+

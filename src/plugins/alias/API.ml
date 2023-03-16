@@ -22,8 +22,6 @@
 
 open Cil_types
 
-open Cil_datatype
-
 module LSet = Simplified.Simplified_lset
 
 module Abstract_state = Abstract_state
@@ -40,7 +38,7 @@ let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function
     None -> acc
   | Some state ->
     let set_aliases = Abstract_state.find_aliases lv state in
-    LSet.fold (fun e a -> f_fold a e) set_aliases acc
+    LSet.fold_lval (fun e a -> f_fold a e) set_aliases acc
 
 let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =
   check_computed ();
@@ -49,7 +47,7 @@ let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_functi
   | Some state ->
     let new_state = Analysis.do_stmt state s in
     let set_aliases = Abstract_state.find_aliases lv new_state in
-    LSet.fold (fun e a -> f_fold a e) set_aliases acc
+    LSet.fold_lval (fun e a -> f_fold a e) set_aliases acc
 
 let fold_aliases_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
   check_computed ();
@@ -86,24 +84,24 @@ let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
     None -> false
   | Some state ->
     let setv1 = Abstract_state.find_aliases lv1 state in
-    LSet.mem lv2 setv1
+    LSet.mem (BLval lv2) setv1
 
-let fold_points_to   (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+let fold_points_to   (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
   match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
     let set_aliases = Abstract_state.find_aliases lv state in
-    f_fold acc set_aliases
+    LSet.fold_lval (fun lv a-> f_fold a lv) set_aliases acc
 
-let fold_points_to_closure  (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+let fold_points_to_closure  (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
   match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
     let list_closure = Abstract_state.find_transitive_closure lv state in
     List.fold_left
-      f_fold
+      (fun acc s -> LSet.fold_lval (fun lv a -> f_fold a lv) s acc)
       acc
       list_closure
 
