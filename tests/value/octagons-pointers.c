@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +" -eva-domains equality,octagon -eva-octagon-through-calls -eva-msg-key=d-octagon,-d-cvalue -eva-oracle-depth 10"
+   STDOPT: +"-deterministic -eva-domains equality,octagon -eva-octagon-through-calls -eva-msg-key=d-octagon,-d-cvalue -eva-oracle-depth 10"
 */
 
 #include <stdint.h>
@@ -30,7 +30,7 @@ void cmdRead (unsigned char const *cmd) {
     return;
   Frama_C_dump_each();
   uint8_t c = *code;
-  uint32_t e1 = *elt1; 
+  uint32_t e1 = *elt1;
   uint16_t e2 = *elt2;
   uint16_t e3 = *elt3;
 }

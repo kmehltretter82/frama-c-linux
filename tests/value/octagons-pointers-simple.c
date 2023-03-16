@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +" -eva-domains equality,octagon -eva-octagon-through-calls -eva-msg-key=d-octagon,-d-cvalue -eva-oracle-depth 10"
+   STDOPT: +"-deterministic -eva-domains equality,octagon -eva-octagon-through-calls -eva-msg-key=d-octagon,-d-cvalue -eva-oracle-depth 10"
 */
 
 #include <stdint.h>

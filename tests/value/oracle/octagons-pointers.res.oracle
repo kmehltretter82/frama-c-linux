@@ -31,8 +31,8 @@
      index + cmd->cmdLen ∈ [--..434]
      buffer - cmd ∈ {-3}
      cmd - cmd ∈ {0}
-     len - cmd ∈ {0}
-     code - len ∈ {2}
+     cmd - len ∈ {0}
+     len - code ∈ {-2}
      elt1 - code ∈ {1}
      elt2 - elt1 ∈ {4}
      elt3 - elt2 ∈ {2}

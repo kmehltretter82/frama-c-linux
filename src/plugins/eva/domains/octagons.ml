@@ -90,6 +90,9 @@ module Variable : Variable = struct
     | StartOf of varinfo
     | Lval of HCE.t
 
+  (* The use of [HCE.id] makes this id non-deterministic. This can have an
+     impact when printing the domain state, as the order between variables
+     depends on this id. Option -deterministic circumvents this issue. *)
   let id = function
     | Var vi -> 4 * vi.vid
     | Int vi -> 4 * vi.vid + 1
