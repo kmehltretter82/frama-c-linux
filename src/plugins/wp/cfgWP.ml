@@ -170,6 +170,7 @@ struct
     warn : W.t ;
     deps : D.t ;
     path : S.t ;
+    ce_terms : Lang.F.term Bag.t ;
   }
 
   (* -------------------------------------------------------------------------- *)
@@ -244,6 +245,7 @@ struct
     warn = W.empty ;
     deps = D.empty ;
     path = S.empty ;
+    ce_terms = Bag.empty ;
   }
 
   let sigma_opt = function None -> Sigma.create () | Some s -> s
@@ -301,6 +303,7 @@ struct
         warn = wrns ;
         deps = dset ;
         path = path ;
+        ce_terms = vc.ce_terms ;
       }
 
   (* -------------------------------------------------------------------------- *)
@@ -329,6 +332,7 @@ struct
       deps = D.union vc1.deps vc2.deps ;
       warn = W.union vc1.warn vc2.warn ;
       path = S.union vc1.path vc2.path ;
+      ce_terms = Bag.concat vc1.ce_terms vc2.ce_terms ;
     }
 
   (* -------------------------------------------------------------------------- *)
@@ -354,6 +358,7 @@ struct
       deps = D.union vc1.deps vc2.deps ;
       warn = W.union vc1.warn vc2.warn ;
       path = S.union vc1.path vc2.path ;
+      ce_terms = Bag.concat vc1.ce_terms vc2.ce_terms ;
     }
 
   let merge_vcs = function
@@ -371,7 +376,10 @@ struct
         vars = vars ;
         deps = deps ;
         warn = warn ;
-        path = path }
+        path = path ;
+        ce_terms =
+          List.fold_left (fun ts vc -> Bag.concat ts vc.ce_terms) Bag.empty vcs
+      }
 
   (* -------------------------------------------------------------------------- *)
   (* --- Merging and Branching with Splitters                               --- *)
@@ -1526,6 +1534,7 @@ struct
       VC_Annot.deps = vc.deps ;
       VC_Annot.path = vc.path ;
       VC_Annot.warn = W.elements vc.warn ;
+      VC_Annot.ce_terms = vc.ce_terms ;
     } in
     let hyps = Conditions.bundle vc.hyps in
     let goal g = { vcq with VC_Annot.goal = GOAL.make (hyps,g) } in
@@ -1542,6 +1551,7 @@ struct
       VC_Annot.deps = vc.deps ;
       VC_Annot.path = vc.path ;
       VC_Annot.warn = W.elements vc.warn ;
+      VC_Annot.ce_terms = vc.ce_terms
     }
 
   let make_oblig index pid vcq =
@@ -1632,6 +1642,7 @@ struct
         Wpo.VC_Lemma.depends = l.lem_depends ;
         Wpo.VC_Lemma.lemma = def ;
         Wpo.VC_Lemma.sequent = None ;
+        Wpo.VC_Lemma.ce_terms = Bag.empty ;
       } in
       let index = match LogicUsage.section_of_lemma l.lem_name with
         | LogicUsage.Toplevel _ -> Wpo.Axiomatic None

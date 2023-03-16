@@ -262,6 +262,7 @@ struct
     lemma : Definitions.dlemma ;
     depends : logic_lemma list ;
     mutable sequent : Conditions.sequent option ;
+    ce_terms : Lang.F.term Bag.t ;
   }
 
   let is_trivial vc = vc.lemma.l_lemma == F.p_true
@@ -311,6 +312,7 @@ struct
     deps : Property.Set.t ;
     path : Stmt.Set.t ;
     source : (stmt * Mcfg.goal_source) option ;
+    ce_terms : Lang.F.term Bag.t ;
   }
 
   let repr = {
@@ -321,6 +323,7 @@ struct
     deps = Property.Set.empty ;
     path = Stmt.Set.empty ;
     source = None ;
+    ce_terms = Bag.empty ;
   }
 
   let resolve ~pid vcq = GOAL.compute_proof ~pid vcq.goal == Lang.F.p_true

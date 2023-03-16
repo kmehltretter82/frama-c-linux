@@ -68,6 +68,7 @@ sig
     lemma : Definitions.dlemma ;
     depends : logic_lemma list ;
     mutable sequent : Conditions.sequent option ;
+    ce_terms : Lang.F.term Bag.t ;
   }
 
   val is_trivial : t -> bool
@@ -86,6 +87,7 @@ sig
     deps : Property.Set.t ;
     path : Stmt.Set.t ;
     source : (stmt * Mcfg.goal_source) option ;
+    ce_terms : Lang.F.term Bag.t ;
   }
 
   val is_trivial : t -> bool
