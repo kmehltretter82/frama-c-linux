@@ -335,7 +335,7 @@ let assert_invariants (x:t) : unit =
     assert (G.mem_vertex x.graph v1);
     assert (G.mem_vertex x.graph v2)
   in
-  G.iter_edges assert_edge x.graph;
+  G.iter_edges assert_edge x.graph;          
   let assert_lmap (lv:Lval.t) (v:V.t) =
     assert (G.mem_vertex x.graph v);
     assert (LSet.mem lv (VMap.find v x.vmap))
@@ -707,7 +707,8 @@ let addr_of (lv:Lval.t) (x:t) : V.t list * t =
   let (v,x) = find_or_create_vertex lv x in
   G.pred x.graph v, x
 
-let remove_cst_vertex (v:V.t) (x:t) : t =
+let _remove_cst_vertex (v:V.t) (x:t) : t =
+  Format.printf "Removing vertex %d@." v;
   assert (LSet.is_empty (VMap.find v x.vmap));
   {
     graph = G.remove_vertex x.graph v;
@@ -1218,6 +1219,11 @@ let union  (a1:t) (a2:t) :t =
   *)
   assert_invariants a1;
   assert_invariants a2;
+
+  Format.printf "BEGIN DEBUG UNION@.";
+  Format.printf "First graph:@.%a@." print_debug a1;
+   Format.printf "Second graph:@.%a@." print_debug a2;
+  Format.printf "END DEBUG UNION@.";
   let f_v2 x = x + a1.cmpt in
   (* we build the new graph, starting from a1.graph *)
   let g = a1.graph in
@@ -1250,12 +1256,23 @@ let union  (a1:t) (a2:t) :t =
   (* let new_collapsed =
    *   VSet.union a1.collapsed a2.collapsed
    * in *)
+  let rec find_all_successors (set_res: V2Set.t) (v1: V.t) (v2:V.t) (g:G.t) =
+    (* NB this function assumes there is no strongly connected components in the graph !!! *)
+    match (G.succ g v1, G.succ g v2) with
+      ([],_) | (_,[]) -> set_res
+    | ([succ_v1], [succ_v2]) -> find_all_successors (V2Set.add (v1,(f_v2 v2)) set_res) succ_v1 succ_v2 g
+    | _ -> Options.fatal "Broken invariant: at most 1 successor"
+      
+  in
   (* s_acc = set of couples that should be merged in step 3 *)
   let set_to_be_merged, new_lmap =
     LLMap.fold
       (fun lv v2 (s_acc, m_acc) ->
          (* if lv has an entry in a1.lmap, then add the two vertex to be merged *)
-         try let v1 = LLMap.find lv a1.lmap  in (V2Set.add (v1,(f_v2 v2)) s_acc, m_acc)
+         try
+           let v1 = LLMap.find lv a1.lmap in
+           let set_with_successors = find_all_successors (V2Set.add (v1,(f_v2 v2)) s_acc) v1 (f_v2 v2) new_graph in
+           (set_with_successors, m_acc)
          (* WARNING : potential bug here: the invariant of lmap is broken
             since lv shall be mapped to both v1 and (f_v2 v2); the merge
             that are done in step 3 shall restore the invariant*)
@@ -1271,11 +1288,12 @@ let union  (a1:t) (a2:t) :t =
   (* step 3 *)
   let new_a =
     V2Set.fold
-      (fun (v1,v2) a ->
+      (fun (v1, v2) a ->
          let new_a = merge a v1 v2 in
          let new_vset  =
-           try VSet.union (VMap.find v1 new_a.pending) (VMap.find v2 new_a.pending)
-           with Not_found -> failwith "bug here"
+           let p1=  try  (VMap.find v1 new_a.pending) with Not_found -> VSet.empty in
+           let p2=  try  (VMap.find v2 new_a.pending) with Not_found -> VSet.empty in
+           VSet.union p1 p2
          in
          (* warning: exploits the fact that v1 is preserved in the merge operation *)
          let new_pending = VMap.add v1 new_vset (VMap.remove v2 new_a.pending) in
@@ -1284,34 +1302,34 @@ let union  (a1:t) (a2:t) :t =
       set_to_be_merged
       new_a
   in
-  (* there may be some inconsistancies with constant nodes, so we clean up *)
-  let clean_up_constant_successors (v:V.t) (res_a:t) : t =
-    let l_succ = G.succ new_a.graph v in
-    if l_succ = []
-    then res_a (* nothing to do *)
-    else
-      (* find the only successor that is not a constant node *)
-      let true_succ =
-        List.fold_left
-          (fun res v ->
-             if LSet.is_empty (VMap.find v res_a.vmap)
-             then res
-             else v)
-          (List.hd l_succ)
-          l_succ
-      in
-      (* eliminate all nodes that is not the true successor *)
-      List.fold_left
-        (fun res_a v -> if V.equal v true_succ then res_a else remove_cst_vertex v res_a)
-        res_a
-        l_succ
-  in
-  let new_a =
-    G.fold_vertex
-      clean_up_constant_successors
-      new_a.graph
-      new_a
-  in
+  (* (\* there may be some inconsistancies with constant nodes, so we clean up *\)
+   * let clean_up_constant_successors (v:V.t) (res_a:t) : t =
+   *   let l_succ = G.succ new_a.graph v in
+   *   if l_succ = []
+   *   then res_a (\* nothing to do *\)
+   *   else
+   *     (\* find the only successor that is not a constant node *\)
+   *     let true_succ =
+   *       List.fold_left
+   *         (fun res v ->
+   *            if LSet.is_empty (VMap.find v res_a.vmap)
+   *            then res
+   *            else v)
+   *         (List.hd l_succ)
+   *         l_succ
+   *     in
+   *     (\* eliminate all nodes that is not the true successor *\)
+   *     List.fold_left
+   *       (fun res_a v -> if V.equal v true_succ then res_a else remove_cst_vertex v res_a)
+   *       res_a
+   *       l_succ
+   * in
+   * let new_a =
+   *   G.fold_vertex
+   *     clean_up_constant_successors
+   *     new_a.graph
+   *     new_a
+   * in *)
   let new_a =
     (* if new_a.cmpt > 2 * (G.nb_vertex new_a.graph)
      * then *)
