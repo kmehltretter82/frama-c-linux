@@ -302,7 +302,7 @@ let print_aliases fmt (x:t) =
               )
               !set_pred
         end
-      | _ -> failwith "this should not happen"
+      | _ -> Options.fatal "this should not happen"
   in
   Format.fprintf fmt "@[<hov 2><list of may-alias>@.";
   VMap.iter iter_vmap x.vmap;
@@ -375,7 +375,7 @@ let rec closure_find_lset (v:V.t) (x:t) =
   match G.succ x.graph v with
     [] -> [find_lset v x]
   | [v_next] -> (find_lset v x)::(closure_find_lset v_next x)
-  | _ -> failwith ("this shall not happen (invariant broken)")
+  | _ -> Options.fatal ("this shall not happen (invariant broken)")
 
 let find_transitive_closure  (lv:lval) (x:t) =
   let lv: Lval.t = Lval.from_lval lv in
@@ -615,7 +615,7 @@ let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
    in the graph. If it is present, there will be bugs *)
 let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
   match blv with
-    BNone -> failwith "this should not happen"
+    BNone -> Options.fatal "this should not happen"
   | BLval lv ->
     begin
       match lv with 
@@ -624,7 +624,7 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
         begin
           (* first find the vertex corresponding to e *)
           match Lval.from_exp e with
-            BNone -> failwith "This should not happen "
+            BNone -> Options.fatal "This should not happen "
           | BLval lv1 ->
             (* find the vertex *)
             let v1, x = find_or_create_vertex (BLval lv1) x in
@@ -634,7 +634,7 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
             let new_graph = G.add_edge x.graph v1 v2 in
             v2, {x with graph = new_graph }
            
-          | BAddrOf _ -> failwith "*(&x) not allowed"
+          | BAddrOf _ -> Options.fatal "*(&x) not allowed"
         end
       | _ -> create_vertex_simple blv x
     end
@@ -840,7 +840,7 @@ module Dot = Graphviz.Dot(struct
     let vertex_name (v:V.t) =
       let lset = !find_vertex_name_ref v in
       let v_name = lset_to_string lset in
-      Format.printf "Vertex %d set %s@." v v_name;
+      (* Format.printf "Vertex %d set %s@." v v_name; *)
       v_name
     let default_vertex_attributes _ = []
     let graph_attributes _ = []
@@ -946,7 +946,7 @@ let set_type (x:t) (v1:V.t) (v2:V.t) : t =
       if LSet.is_empty (VMap.find v2 x.vmap)
       then G.remove_vertex x.graph v2
       else G.remove_edge x.graph v1 v2
-    | _ -> failwith "two many outgoing edges in set_type"
+    | _ -> Options.fatal "two many outgoing edges in set_type"
   in
   let new_g = G.add_edge g v1 v2 in
   VSet.fold (fun vx x -> join x v1 vx) (try VMap.find v1 x.pending with Not_found -> VSet.empty) {x with graph = new_g}
@@ -995,7 +995,7 @@ let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
     match list_v2 with
       [] -> let v2,a = find_or_create_vertex y a in set_type a v2 v1
     | [v2] -> cjoin a v1 v2
-    | _ ->  failwith "assignment_x_ptr_y not implemented"
+    | _ ->  Options.fatal "assignment_x_ptr_y not implemented"
   in
   assert_invariants new_a ; new_a
 
@@ -1019,7 +1019,7 @@ let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
     match list_v1 with
       [] ->  let v1,a = find_or_create_vertex x a in set_type a v1 v2
     |  [v1] -> cjoin a v1 v2
-    | _ ->  failwith "assignment_ptr_x_y not implemented"
+    | _ ->  Options.fatal "assignment_ptr_x_y not implemented"
   in
   assert_invariants new_a ; new_a
 
@@ -1062,7 +1062,7 @@ let is_included (a1:t) (a2:t) =
           ()
         else
           raise Not_included
-      | _ -> failwith "this should not hapen (invariant broken)"
+      | _ -> Options.fatal "this should not hapen (invariant broken)"
     in
     LLMap.iter iter_lmap a1.lmap; true
   with
@@ -1102,7 +1102,7 @@ let is_included (a1:t) (a2:t) =
  *                 try
  *                   Hashtbl.find iso v1
  *                 with
- *                   Not_found -> failwith "this should not happen (broken invariant or hashtable iso)"
+ *                   Not_found -> Options.fatal "this should not happen (broken invariant or hashtable iso)"
  *               in
  *               begin
  *                 (\* we only need to check the successors; the predecessor will be checked because we iterate on all vertex *\)
@@ -1123,12 +1123,12 @@ let is_included (a1:t) (a2:t) =
  *                         try
  *                           Hashtbl.find iso succ_v1
  *                         with
- *                           Not_found -> failwith "this should not happen (broken invariant or hashtable iso)"
+ *                           Not_found -> Options.fatal "this should not happen (broken invariant or hashtable iso)"
  *                       in
  *                       (\* simply check for an edge between v2 and succ v_2 *\)
  *                       if not (G.mem_edge a2.graph v2 succ_v2) then raise Not_equal
  *                   end
- *                 | _ -> failwith "this should not happen (broken invariant)"
+ *                 | _ -> Options.fatal "this should not happen (broken invariant)"
  *               end
  *             else (\* if it is a constant node, nothing to do *\)
  *               ()
@@ -1377,7 +1377,7 @@ let make_summary (s: t option) (kf: kernel_function) =
       let return_stmt = Kernel_function.find_return kf in
       match return_stmt.skind with
         Return (e, _) -> e
-      | _ -> failwith "this should not happen"
+      | _ -> Options.fatal "this should not happen"
     else
       None
   in
@@ -1408,7 +1408,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   let formals = summary.formals in
   let sum_state =
     match summary.state with
-      None -> failwith "BUG this should not happen"
+      None -> Options.fatal "BUG this should not happen"
     | Some s -> s
   in
   assert (List.length args = List.length formals);

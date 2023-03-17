@@ -98,7 +98,7 @@ let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_sta
     begin
       match e2.enode with
         Lval lv2 -> Some (Abstract_state.assignment_x_ptr_y a (Var v1, o1) lv2)
-      |  _ -> failwith " do_assignment not implemented 1"
+      |  _ -> Options.fatal " do_assignment not implemented 1"
     end
   | (Some a, (Mem e1, o1), BLval lv2) ->
     (* case *x = y *)
@@ -229,7 +229,7 @@ let do_stmt (a: Abstract_state.t) (s:stmt) :  Abstract_state.t =
     Instr i ->
     begin
       match do_instr s i (Some a) with
-        None -> failwith "problem here"
+        None -> Options.fatal "problem here"
       | Some a -> a
     end
   | _ -> a
@@ -307,7 +307,7 @@ let make_summary (state:Abstract_state.t) (kf:kernel_function) =
     begin
       match Function_table.find kf with
         Some s -> (state, s)
-      | None -> failwith "not implemented"
+      | None -> Options.fatal "not implemented"
     end
   with
     Not_found ->
@@ -315,7 +315,7 @@ let make_summary (state:Abstract_state.t) (kf:kernel_function) =
       doFunction kf;
       match Function_table.find kf with
         Some s -> (state, s)
-      | None -> failwith "not implemented"
+      | None -> Options.fatal "not implemented"
     end
 
 let computed_flag = ref false
