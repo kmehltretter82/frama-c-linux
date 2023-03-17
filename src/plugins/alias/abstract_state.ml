@@ -303,12 +303,13 @@ let print_aliases fmt (x:t) =
         end
       | _ -> Options.fatal "this should not happen"
   in
-  Format.fprintf fmt "@[<hov 2><list of may-alias>@.";
+  Format.fprintf fmt "@[<hov 2>";
   VMap.iter iter_vmap x.vmap;
-  Format.fprintf fmt "<end of list>@]@."(* ;
+  Format.fprintf fmt "@]@."(* ;
                                          * let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
                                          * if not (LSet.is_empty collapsed_lval) then
                                          *   Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval *)
+
 
 let pretty ?(debug=false) =
   if debug then
