@@ -39,7 +39,7 @@ const EvaReady: React.FC = ({children}) => {
         <div className="eva-status eva-status-not-computed">
           <span>No Eva analysis has been run yet.</span>
           <svg viewBox={icon.viewBox} className="eva-status-icon">
-            <path d={icon.path} fill='#e0e0e0' />
+            <path d={icon.path} />
           </svg>
         </div>
       );
@@ -52,7 +52,7 @@ const EvaReady: React.FC = ({children}) => {
           <img src={gearsIcon} className="eva-status-icon" />
         </div>
       );
-    
+
     case 'computed':
       return <>{children}</>;
   }
