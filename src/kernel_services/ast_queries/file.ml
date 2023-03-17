@@ -338,10 +338,10 @@ let yaml_dict_to_list = function
       Result.(
         bind acc
           (fun l ->
-            match Yaml.Util.to_string v with
-              | Ok s -> Ok((k,s) :: l)
-              | Error (`Msg s) ->
-                  Error (`Msg ("Unexpected value for key " ^ k ^ ": " ^ s))))
+             match Yaml.Util.to_string v with
+             | Ok s -> Ok((k,s) :: l)
+             | Error (`Msg s) ->
+               Error (`Msg ("Unexpected value for key " ^ k ^ ": " ^ s))))
     in
     List.fold_left make_one (Ok []) l
   | _ -> Error (`Msg "Unexpected YAML value instead of dictionary of strings")
@@ -434,9 +434,9 @@ let get_machdep () =
 
 let print_machdep_header () =
   if Kernel.PrintMachdepHeader.get () then begin
-      Machdep.gen_all_defines Format.std_formatter (get_machdep());
-      raise Cmdline.Exit
-    end else Cmdline.nop
+    Machdep.gen_all_defines Format.std_formatter (get_machdep());
+    raise Cmdline.Exit
+  end else Cmdline.nop
 
 let () = Cmdline.run_after_exiting_stage print_machdep_header
 

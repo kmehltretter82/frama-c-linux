@@ -86,18 +86,19 @@ parser.add_argument(
 parser.add_argument(
     "--check",
     action="store_true",
-    help="checks that the generated machdep is conforming to the schema"
+    help="checks that the generated machdep is conforming to the schema",
 )
 parser.add_argument(
     "--check-only",
     action="store_true",
-    help="must be used in conjunction with --from-file to check that the provided input file is conforming to the schema"
+    help="must be used in conjunction with --from-file to check that the provided input file is conforming to the schema",
 )
 
 args, other_args = parser.parse_known_args()
 
 if not args.compiler_flags:
     args.compiler_flags = ["-c"]
+
 
 def make_schema():
     schema_filename = my_path.parent / "machdep-schema.yaml"
@@ -124,6 +125,7 @@ def check_machdep(machdep):
         warnings.warn("machdep object is not conforming to machdep schema")
         return False
 
+
 if args.from_file:
     orig_file = open(args.from_file, "r")
     orig_machdep = yaml.safe_load(orig_file)
@@ -141,6 +143,7 @@ if args.from_file:
     else:  # old version of the schema used a single string
         args.cpp_arch_flags = orig_machdep["cpp_arch_flags"].split()
 
+
 def print_machdep(machdep):
     if args.from_file and args.in_place:
         args.dest_file = open(args.from_file, "w")
@@ -148,11 +151,13 @@ def print_machdep(machdep):
         args.dest_file = sys.stdout
     yaml.dump(machdep, args.dest_file, indent=4, sort_keys=True)
 
+
 def make_machdep():
     machdep = {}
     for key in schema.keys():
         machdep[key] = None
     return machdep
+
 
 machdep = make_machdep()
 
@@ -256,10 +261,10 @@ def cleanup_cpp(output):
     return " ".join(macro)
 
 
-def find_macros_value(output,is_list=False,entry=None):
+def find_macros_value(output, is_list=False, entry=None):
     msg = re.compile("(\w+)_is = ([^;]+);")
     if is_list:
-        assert(entry)
+        assert entry
         machdep[entry] = {}
     for res in re.finditer(msg, output):
         name = res.group(1)
@@ -275,6 +280,7 @@ def find_macros_value(output,is_list=False,entry=None):
                 warnings.warn(f"unexpected symbol '{name}', ignoring")
     if args.verbose:
         print(f"compiler output is:{output}")
+
 
 for (f, typ) in source_files:
     p = my_path / f
@@ -307,7 +313,7 @@ for (f, typ) in source_files:
             if name in machdep:
                 machdep[name] = {}
             continue
-        find_macros_value(cleanup_cpp(proc.stdout.decode()),is_list=True,entry=name)
+        find_macros_value(cleanup_cpp(proc.stdout.decode()), is_list=True, entry=name)
         continue
     if typ == "has__builtin_va_list":
         # Special case: compilation success determines presence or absence

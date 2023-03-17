@@ -19,6 +19,7 @@
 #  for more details (enclosed in the file licenses/LGPLv2.1).            #
 #                                                                        #
 ##########################################################################
+
 MANUAL_MACHDEPS=machdep_gcc_x86_16.yaml machdep_msvc_x86_64.yaml
 
 update-all: machdep_*.yaml $(MANUAL_MACHDEPS:%=.%.validated)
