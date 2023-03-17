@@ -65,15 +65,15 @@ struct
 
   module Fields =
   struct
-    let backward = Record.field sign
+    let backward = Record.option sign
         ~name:"backward"
         ~descr:(Markdown.plain "range for the write dependencies")
-        (module Joption (Jint))
+        (module (Jint))
 
-    let forward = Record.field sign
+    let forward = Record.option sign
         ~name:"forward"
         ~descr:(Markdown.plain "range for the read dependencies")
-        (module Joption (Jint))
+        (module (Jint))
   end
 
   module Record = (val Record.publish ~package ~name ~descr sign)

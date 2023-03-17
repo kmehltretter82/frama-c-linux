@@ -20,7 +20,7 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useImperativeHandle, useRef } from 'react';
 import _ from 'lodash';
 import { renderToString } from 'react-dom/server';
 import * as Dome from 'dome';
@@ -46,9 +46,9 @@ import { Space } from 'dome/frame/toolbars';
 
 import '@fortawesome/fontawesome-free/js/all';
 
+import EvaReady from 'frama-c/plugins/eva/EvaReady';
 import style from './style.json';
 import layouts from './layouts.json';
-
 
 const Debug = new Dome.Debug('dive');
 
@@ -389,6 +389,8 @@ class Dive {
   }
 
   set layout(layout: string) {
+    if (layout === this._layout)
+      return;
     let extendedOptions = {};
     if (layout in layouts)
       extendedOptions = (layouts as { [key: string]: object })[layout];
@@ -558,24 +560,38 @@ class Dive {
   }
 }
 
-function GraphView(): JSX.Element {
 
-  // Hooks
+type GraphViewProps = {
+  lock: boolean;
+  layout: string;
+  selectionMode: string;
+}
+
+type GraphViewRef = {
+  clear: () => void;
+}
+
+const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
+  (props: GraphViewProps, ref) => {
+  const {lock, layout, selectionMode} = props;
+
   const [dive, setDive] = useState(() => new Dive());
   const [selection, updateSelection] = States.useSelection();
-  const [lock, flipLock] =
-    Dome.useFlipSettings('dive.lock');
-  const [selectionMode, setSelectionMode] =
-    Dome.useStringSettings('dive.selectionMode', 'follow');
 
   function setCy(cy: Cytoscape.Core): void {
     if (cy !== dive.cy)
       setDive(new Dive(cy));
   }
 
+  useImperativeHandle(ref, () => ({ clear: () => dive.clear() }));
+
   useEffect(() => {
     setDive(new Dive(dive.cy));
   }, [Dive]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    dive.layout = layout;
+  }, [dive, layout]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Follow mode
   useEffect(() => {
@@ -597,19 +613,25 @@ function GraphView(): JSX.Element {
     dive.selectLocation(selection?.current, !lock);
   }, [dive, lock, selection, updateSelection]);
 
-  // Layout selection
-  const selectLayout = (layout?: string): void => {
-    if (layout) {
-      dive.layout = layout;
-    }
-  };
-  const layoutsNames = ['cose-bilkent', 'dagre', 'cola', 'klay'];
-  const layoutItem = (id: string): Dome.PopupMenuItem => (
-    { id, label: id, checked: (id === dive.layout) }
-  );
-  const layoutMenu = (): void => {
-    Dome.popupMenu(layoutsNames.map(layoutItem), selectLayout);
-  };
+  return (
+    <CytoscapeComponent
+      stylesheet={style}
+      cy={setCy}
+      style={{ width: '100%', height: '100%' }}
+    />);
+});
+
+GraphView.displayName = "GraphView";
+
+
+function DiveView(): JSX.Element {
+  const graph = useRef<GraphViewRef>();
+  const [lock, flipLock] =
+    Dome.useFlipSettings('dive.lock');
+  const [selectionMode, setSelectionMode] =
+    Dome.useStringSettings('dive.selectionMode', 'follow');
+  const [layout, setLayout] =
+    Dome.useStringSettings('dive.layout', 'dagre');
 
   // Selection mode
   const selectMode = (id?: string) => void (id && setSelectionMode(id));
@@ -624,6 +646,14 @@ function GraphView(): JSX.Element {
   const modeMenu = (): void => {
     Dome.popupMenu(modes.map(checkMode), selectMode);
   };
+
+  // Layout selection
+  const selectLayout = (layout?: string) => void (layout && setLayout(layout));
+  const layoutsNames = ['cose-bilkent', 'dagre', 'cola', 'klay'];
+  const layoutItem = (id: string): Dome.PopupMenuItem =>
+    ({ id, label: id, checked: (id === layout) });
+  const layoutMenu = () =>
+    void Dome.popupMenu(layoutsNames.map(layoutItem), selectLayout);
 
   // Component
   return (
@@ -650,15 +680,17 @@ function GraphView(): JSX.Element {
         <Space />
         <IconButton
           icon="TRASH"
-          onClick={() => dive.clear()}
+          onClick={() => graph.current?.clear()}
           title="Clear the graph"
         />
       </Ivette.TitleBar>
-      <CytoscapeComponent
-        stylesheet={style}
-        cy={setCy}
-        style={{ width: '100%', height: '100%' }}
-      />
+      <EvaReady>
+        <GraphView
+          lock={lock}
+          layout={layout}
+          selectionMode={selectionMode}
+          ref={graph}/>
+      </EvaReady>
     </>
   );
 
@@ -676,7 +708,7 @@ Ivette.registerComponent({
   title:
     'Data dependency graph according to an Eva analysis.\nNodes color ' +
     'represents the precision of the values inferred by Eva.',
-  children: <GraphView />,
+  children: <DiveView />,
 });
 
 Ivette.registerView({
