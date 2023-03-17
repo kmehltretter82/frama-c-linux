@@ -1,0 +1,77 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of the Frama-C plug-in 'Alias' (alias).             *)
+(*                                                                        *)
+(*  Copyright (C) 2022-2023                                               *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file LICENSE)                       *)
+(*                                                                        *)
+(**************************************************************************)
+
+open Cil_types
+
+type simplified_lval =
+    BNone (* anything that is not an adress or a lval *)
+  | BLval of lval (* lval *)
+  | BAddrOf of lval (* address *)
+
+module Simplified_lval:
+sig
+  type t = simplified_lval
+
+  val compare: t -> t -> int
+
+  (* result stored in cache *)
+  val from_lval: lval -> t
+
+  (* result stored in cache *)
+  val from_exp: exp -> t
+
+  val pretty: Format.formatter -> t -> unit
+
+  val pp_debug : Format.formatter -> t -> unit
+
+  val removeOffsetLval : t -> t * offset
+
+  val addOffsetLval : offset -> t -> t
+end
+
+module Simplified_lmap:
+sig
+  include Map.S with type key = Simplified_lval.t
+
+  val pretty: (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
+
+  val pp_debug : (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
+end
+
+module Simplified_lset:
+sig
+  include Set.S with type elt = Simplified_lval.t
+
+  val pretty: Format.formatter -> t -> unit
+
+  val pp_debug : Format.formatter -> t -> unit
+
+  (* special fold *)
+  val fold_lval : (lval -> 'a -> 'a) -> t -> 'a -> 'a
+
+end
+
+val  decompose_lval : Simplified_lval.t -> (Simplified_lval.t*offset) list
+
+(** clear the two caches *)
+val clear_cache : unit -> unit
+
