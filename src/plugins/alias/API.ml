@@ -34,7 +34,7 @@ let check_computed () =
 
 let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
-  match Analysis.get_abstract_state kf s with
+  match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
     let _set_aliases = Abstract_state.find_aliases lv state in  
@@ -42,7 +42,7 @@ let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function
 
 let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =
   check_computed ();
-  match Analysis.get_abstract_state kf s with
+  match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
     let new_state = Analysis.do_stmt state s in
@@ -80,7 +80,7 @@ let fold_fundec_stmts (f_fold: 'a -> stmt -> lval -> 'a) (acc: 'a) (kf:kernel_fu
 
 let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
   check_computed ();
-  match Analysis.get_abstract_state kf s with
+  match Analysis.get_state_before_stmt kf s with
     None -> false
   | Some state ->
     let _setv1 = Abstract_state.find_aliases lv1 state in
@@ -88,7 +88,7 @@ let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
 
 let fold_points_to   (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
-  match Analysis.get_abstract_state kf s with
+  match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
     let _set_aliases = Abstract_state.find_aliases lv state in
@@ -96,7 +96,7 @@ let fold_points_to   (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_fun
 
 let fold_points_to_closure  (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
-  match Analysis.get_abstract_state kf s with
+  match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
     let _list_closure = Abstract_state.find_transitive_closure lv state in
