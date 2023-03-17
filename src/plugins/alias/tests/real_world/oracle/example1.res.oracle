@@ -29,8 +29,34 @@
 [alias] Ingnoring assignment *(odata + idx) = 0.5 * tmp_1 (do_assignment  not implemented 3)
 [alias] Ingnoring assignment *(odata + idx) = 0.5 * tmp_1 (do_assignment  not implemented 3)
 [alias] Skiping break; (doStmt not implemented)
+[alias] Skiping tmp_1 = sin(*(idata + idx));
+          *(odata + idx) = 0.5 * tmp_1; (doStmt not implemented)
+[alias] Skiping break; (doStmt not implemented)
+[alias] Skiping tmp_1 = sin(*(idata + idx));
+          *(odata + idx) = 0.5 * tmp_1; (doStmt not implemented)
+[alias] Skiping tmp_1 = sin(*(idata + idx));
+          *(odata + idx) = 0.5 * tmp_1; (doStmt not implemented)
+[alias] Warning: a function with no return is employed in an assignment
+[alias] Warning: a function with no return is employed in an assignment
+[alias] Skiping break; (doStmt not implemented)
 [alias] DEBUG: call function - formal variable not as we expected
 [alias] DEBUG: call function - formal variable not as we expected
+[alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
+[alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
+[alias] Skiping break; (doStmt not implemented)
+[alias] Skiping tmp_1 = sin(*(idata + idx));
+          *(odata + idx) = 0.5 * tmp_1; (doStmt not implemented)
+[alias] DEBUG: call function - formal variable not as we expected
+[alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
+[alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
+[alias] Skiping break; (doStmt not implemented)
+[alias] Skiping tmp_1 = sin(*(idata + idx));
+          *(odata + idx) = 0.5 * tmp_1; (doStmt not implemented)
+[alias] DEBUG: call function - formal variable not as we expected
+[alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
+[alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
+[alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
+[alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
 [alias] Warning: DEBUG return stmt of f1 not in table
 [alias] Warning: Analysis is continuing but will not be sound
 [alias] Skipping assignment idata = tmp->t1[*(tmp->n1)] (not implemented)
@@ -151,6 +177,56 @@ Before statement while (1) {
 { x; tmp } are aliased
 <end of list>
 
+Before statement while (1) {
+                   idata = tmp->t2[*(tmp->n2)];
+                   odata = tmp->t1[*(tmp->n1)];
+                   idx = 0;
+                   while (idx < 10) {
+                     {
+                       double tmp_1;
+                       tmp_1 = sin(*(idata + idx));
+                       *(odata + idx) = 0.5 * tmp_1;
+                     }
+                     idx ++;
+                   }
+                   swap(tmp->n1);
+                 } :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement idata = tmp->t2[*(tmp->n2)];
+                 odata = tmp->t1[*(tmp->n1)];
+                 idx = 0;
+                 while (idx < 10) {
+                   {
+                     double tmp_1;
+                     tmp_1 = sin(*(idata + idx));
+                     *(odata + idx) = 0.5 * tmp_1;
+                   }
+                   idx ++;
+                 }
+                 swap(tmp->n1); :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement idata = tmp->t2[*(tmp->n2)];
+                 odata = tmp->t1[*(tmp->n1)];
+                 idx = 0;
+                 while (idx < 10) {
+                   {
+                     double tmp_1;
+                     tmp_1 = sin(*(idata + idx));
+                     *(odata + idx) = 0.5 * tmp_1;
+                   }
+                   idx ++;
+                 }
+                 swap(tmp->n1); :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
 Before statement idata = tmp->t2[*(tmp->n2)];
                  odata = tmp->t1[*(tmp->n1)];
                  idx = 0;
@@ -198,6 +274,36 @@ Before statement idata = tmp->t2[*(tmp->n2)]; :
 { x; tmp } are aliased
 <end of list>
 
+Before statement idata = tmp->t2[*(tmp->n2)]; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement idata = tmp->t2[*(tmp->n2)]; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement idata = tmp->t2[*(tmp->n2)]; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement odata = tmp->t1[*(tmp->n1)]; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement odata = tmp->t1[*(tmp->n1)]; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement odata = tmp->t1[*(tmp->n1)]; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
 Before statement odata = tmp->t1[*(tmp->n1)]; :
  <list of may-alias>
 { x; tmp } are aliased
@@ -224,6 +330,57 @@ Before statement idx = 0; :
 <end of list>
 
 Before statement idx = 0; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement idx = 0; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement idx = 0; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement idx = 0; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement while (idx < 10) {
+                   {
+                     double tmp_1;
+                     tmp_1 = sin(*(idata + idx));
+                     *(odata + idx) = 0.5 * tmp_1;
+                   }
+                   idx ++;
+                 } :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement while (idx < 10) {
+                   {
+                     double tmp_1;
+                     tmp_1 = sin(*(idata + idx));
+                     *(odata + idx) = 0.5 * tmp_1;
+                   }
+                   idx ++;
+                 } :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement while (idx < 10) {
+                   {
+                     double tmp_1;
+                     tmp_1 = sin(*(idata + idx));
+                     *(odata + idx) = 0.5 * tmp_1;
+                   }
+                   idx ++;
+                 } :
  <list of may-alias>
 { x; tmp } are aliased
 <end of list>
@@ -284,6 +441,46 @@ Before statement if (! (idx < 10)) break; :
 { x; tmp } are aliased
 <end of list>
 
+Before statement if (! (idx < 10)) break; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement if (! (idx < 10)) break; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement if (! (idx < 10)) break; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement if (! (idx < 10)) break; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
 Before statement break; :
  <list of may-alias>
 { x; tmp } are aliased
@@ -341,6 +538,72 @@ Before statement {
                    tmp_1 = sin(*(idata + idx));
                    *(odata + idx) = 0.5 * tmp_1;
                  } :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement {
+                   double tmp_1;
+                   tmp_1 = sin(*(idata + idx));
+                   *(odata + idx) = 0.5 * tmp_1;
+                 } :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement {
+                   double tmp_1;
+                   tmp_1 = sin(*(idata + idx));
+                   *(odata + idx) = 0.5 * tmp_1;
+                 } :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement {
+                   double tmp_1;
+                   tmp_1 = sin(*(idata + idx));
+                   *(odata + idx) = 0.5 * tmp_1;
+                 } :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement {
+                   double tmp_1;
+                   tmp_1 = sin(*(idata + idx));
+                   *(odata + idx) = 0.5 * tmp_1;
+                 } :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement tmp_1 = sin(*(idata + idx));
+                 *(odata + idx) = 0.5 * tmp_1; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement tmp_1 = sin(*(idata + idx));
+                 *(odata + idx) = 0.5 * tmp_1; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement tmp_1 = sin(*(idata + idx));
+                 *(odata + idx) = 0.5 * tmp_1; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement tmp_1 = sin(*(idata + idx));
+                 *(odata + idx) = 0.5 * tmp_1; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement tmp_1 = sin(*(idata + idx));
+                 *(odata + idx) = 0.5 * tmp_1; :
  <list of may-alias>
 { x; tmp } are aliased
 <end of list>
@@ -380,6 +643,11 @@ Before statement tmp_1 = sin(*(idata + idx)); :
 { x; tmp } are aliased
 <end of list>
 
+Before statement tmp_1 = sin(*(idata + idx)); :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
 Before statement *(odata + idx) = 0.5 * tmp_1; :
  <list of may-alias>
 { x; tmp } are aliased
@@ -401,6 +669,31 @@ Before statement idx ++; :
 <end of list>
 
 Before statement idx ++; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement idx ++; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement idx ++; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement idx ++; :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement swap(tmp->n1); :
+ <list of may-alias>
+{ x; tmp } are aliased
+<end of list>
+
+Before statement swap(tmp->n1); :
  <list of may-alias>
 { x; tmp } are aliased
 <end of list>

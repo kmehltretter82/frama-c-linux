@@ -14,8 +14,17 @@
 [alias] Skiping tmp = malloc(idx);
           s = (int *)tmp; (doStmt not implemented)
 [alias] Skiping break; (doStmt not implemented)
+[alias] Skiping tmp = malloc(idx);
+          s = (int *)tmp; (doStmt not implemented)
+[alias] Skiping break; (doStmt not implemented)
+[alias] Skiping tmp = malloc(idx);
+          s = (int *)tmp; (doStmt not implemented)
+[alias] Skiping tmp = malloc(idx);
+          s = (int *)tmp; (doStmt not implemented)
+[alias] Skiping break; (doStmt not implemented)
 [alias] May-aliases at the end of function main:
   <list of may-alias>
+  { s; tmp } are aliased
   <end of list>
 [alias] Functions done
 Before statement int *s = (int *)0; :
@@ -53,6 +62,18 @@ Before statement while (idx < 10) {
                    idx ++;
                  } :
  <list of may-alias>
+{ s; tmp } are aliased
+<end of list>
+
+Before statement while (idx < 10) {
+                   {
+                     int tmp;
+                     tmp = malloc(idx);
+                     s = (int *)tmp;
+                   }
+                   idx ++;
+                 } :
+ <list of may-alias>
 <end of list>
 
 Before statement while (idx < 10) {
@@ -68,6 +89,12 @@ Before statement while (idx < 10) {
 
 Before statement if (! (idx < 10)) break; :
  <list of may-alias>
+{ s; tmp } are aliased
+<end of list>
+
+Before statement if (! (idx < 10)) break; :
+ <list of may-alias>
+{ s; tmp } are aliased
 <end of list>
 
 Before statement if (! (idx < 10)) break; :
@@ -78,8 +105,23 @@ Before statement if (! (idx < 10)) break; :
  <list of may-alias>
 <end of list>
 
+Before statement if (! (idx < 10)) break; :
+ <list of may-alias>
+<end of list>
+
 Before statement break; :
  <list of may-alias>
+{ s; tmp } are aliased
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+{ s; tmp } are aliased
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+{ s; tmp } are aliased
 <end of list>
 
 Before statement break; :
@@ -92,6 +134,24 @@ Before statement break; :
 
 Before statement break; :
  <list of may-alias>
+<end of list>
+
+Before statement {
+                   int tmp;
+                   tmp = malloc(idx);
+                   s = (int *)tmp;
+                 } :
+ <list of may-alias>
+{ s; tmp } are aliased
+<end of list>
+
+Before statement {
+                   int tmp;
+                   tmp = malloc(idx);
+                   s = (int *)tmp;
+                 } :
+ <list of may-alias>
+{ s; tmp } are aliased
 <end of list>
 
 Before statement {
@@ -116,6 +176,24 @@ Before statement {
                    s = (int *)tmp;
                  } :
  <list of may-alias>
+<end of list>
+
+Before statement tmp = malloc(idx);
+                 s = (int *)tmp; :
+ <list of may-alias>
+{ s; tmp } are aliased
+<end of list>
+
+Before statement tmp = malloc(idx);
+                 s = (int *)tmp; :
+ <list of may-alias>
+{ s; tmp } are aliased
+<end of list>
+
+Before statement tmp = malloc(idx);
+                 s = (int *)tmp; :
+ <list of may-alias>
+{ s; tmp } are aliased
 <end of list>
 
 Before statement tmp = malloc(idx);
@@ -140,10 +218,25 @@ Before statement tmp = malloc(idx);
 
 Before statement tmp = malloc(idx); :
  <list of may-alias>
+{ s; tmp } are aliased
+<end of list>
+
+Before statement tmp = malloc(idx); :
+ <list of may-alias>
 <end of list>
 
 Before statement s = (int *)tmp; :
  <list of may-alias>
+{ s; tmp } are aliased
+<end of list>
+
+Before statement s = (int *)tmp; :
+ <list of may-alias>
+<end of list>
+
+Before statement idx ++; :
+ <list of may-alias>
+{ s; tmp } are aliased
 <end of list>
 
 Before statement idx ++; :
@@ -161,10 +254,12 @@ Before statement idx ++; :
 
 Before statement __retres = 0; :
  <list of may-alias>
+{ s; tmp } are aliased
 <end of list>
 
 Before statement return __retres; :
  <list of may-alias>
+{ s; tmp } are aliased
 <end of list>
 
 [alias] Analysis complete
