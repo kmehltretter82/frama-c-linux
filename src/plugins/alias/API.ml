@@ -32,9 +32,11 @@ module LSet = Lval.Set
 module Abstract_state = Abstract_state
 
 let check_computed () =
-  if not (Analysis.is_computed ())
+  (* for MERCE release's D1.2 *)
+  ignore (Options.abort "Function not yet provided in this release.")
+(*  if not (Analysis.is_computed ())
   then
-    Options.abort "Static analysis must be called before any function of the API can be called"
+    Options.abort "Static analysis must be called before any function of the API can be called"*)
 
 
 let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
