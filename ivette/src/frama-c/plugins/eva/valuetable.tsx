@@ -30,6 +30,7 @@ import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Values from 'frama-c/plugins/eva/api/values';
+import EvaReady from './EvaReady';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 
 import { classes } from 'dome/misc/utils';
@@ -1129,12 +1130,14 @@ function EvaTable(): JSX.Element {
   return (
     <>
       <Ivette.TitleBar />
-      <div className='eva-functions-section'>
-        {React.Children.toArray(functions)}
-      </div>
-      <Vfill/>
-      {alarmsInfos}
-      {stackInfos}
+      <EvaReady>
+        <div className='eva-functions-section'>
+          {React.Children.toArray(functions)}
+        </div>
+        <Vfill/>
+        {alarmsInfos}
+        {stackInfos}
+      </EvaReady>
     </>
   );
 
