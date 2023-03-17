@@ -274,6 +274,18 @@ let print_debug fmt (x:t) =
  * Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval *)
 
 let print_aliases fmt (x:t) =
+  let print_set ?(first = true) pretty fmt s =
+    let first = ref first in
+    let print_element e =
+      if !first then first := false else Format.fprintf fmt "%s" "; ";
+      Format.fprintf fmt "%a" pretty e in
+    LSet.iter print_element s
+  in
+  let print_lv_and_pred lv pred =
+    Format.fprintf fmt "{%a%a} are aliased@."
+      (print_set Lval.pretty) lv
+      (print_set ~first:false (fun fmt -> Format.fprintf fmt "*%a" Lval.pretty)) pred
+  in
   let iter_vmap v set_lv =
     if G.mem_vertex x.graph v then
       match G.succ x.graph v with
@@ -287,19 +299,7 @@ let print_aliases fmt (x:t) =
             v;
           if LSet.cardinal set_lv + LSet.cardinal !set_pred >= 2
           then
-            Format.fprintf fmt "{%a%a} are aliased@."
-              (fun fmt s ->
-                 LSet.iter
-                   (fun lv -> Format.fprintf fmt "%a; " Lval.pretty lv)
-                   s
-              )
-              set_lv
-              (fun fmt s ->
-                 LSet.iter
-                   (fun lv -> Format.fprintf fmt "*%a; " Lval.pretty lv)
-                   s
-              )
-              !set_pred
+            print_lv_and_pred set_lv !set_pred
         end
       | _ -> Options.fatal "this should not happen"
   in
