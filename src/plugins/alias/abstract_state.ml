@@ -167,22 +167,22 @@ let print_aliases fmt (x:t) =
         [] -> ()
       | [_] ->
         begin
-          let set_pred = ref LSet.empty in
+          let set_pred = ref LLSet.empty in
           G.iter_pred
-            (fun v -> set_pred := LSet.union !set_pred (VMap.find v x.vmap))
+            (fun v -> set_pred := LLSet.union !set_pred (VMap.find v x.vmap))
             x.graph
             v;
-          if LSet.cardinal set_lv + LSet.cardinal !set_pred >= 2
+          if LLSet.cardinal set_lv + LLSet.cardinal !set_pred >= 2
           then
             Format.fprintf fmt "{%a%a} are aliased@."
               (fun fmt s ->
-                 LSet.iter
+                 LLSet.iter
                    (fun lv -> Format.fprintf fmt "%a; " Lval.pretty lv)
                    s
               )
               set_lv
               (fun fmt s ->
-                 LSet.iter
+                 LLSet.iter
                    (fun lv -> Format.fprintf fmt "*%a; " Lval.pretty lv)
                    s
               )
@@ -374,13 +374,14 @@ module Dot = Graphviz.Dot(struct
     let graph_attributes _ = []
   end)
 
-let print_dot filename (a:t) =
-  let file = open_out filename in
-  find_vertex_name_ref :=
-    (fun v -> find_lset v a
-    );
-  Dot.output_graph file a.graph;
-  close_out file
+let print_dot _filename (_a:t) =
+  Options.fatal "not implemented"
+(* let file = open_out filename in
+ * find_vertex_name_ref :=
+ *   (fun v -> find_lset v a
+ *   );
+ * Dot.output_graph file a.graph;
+ * close_out file *)
 
 (* merge of two vertices; the first vertex carries both sets, the second is removed from the graph and from lmap and vmap; however, pending is NOT updated  *)
 let merge x v1 v2 =
@@ -607,32 +608,6 @@ let is_included (a1:t) (a2:t) =
         else
           raise Not_included
       | _ -> Options.fatal "this should not hapen (invariant broken)"
-    in
-    LMap.iter iter_lmap a1.lmap; true
-  with
-    Not_included -> false
-
-
-exception Not_included
-
-let is_included (a1:t) (a2:t) =
-  (* tests if a1 is included in a2, at least as the nodes with lval *)
-  assert_invariants a1;
-  assert_invariants a2;
-  (* Format.printf "DEBUG testing equal @.%a@. AND à.%a@. END DEBUG@." (pretty ~debug:true) a1 (pretty ~debug:true) a2; *)
-  try
-    let iter_lmap (lv:lval) (v1:V.t): unit =
-      let v2 : V.t = try LMap.find lv a2.lmap with Not_found -> raise Not_included in
-      match G.succ a1.graph v1, G.succ a2.graph v2 with
-        [], _ -> ()
-      | [_], [] -> raise Not_included
-      | [v1p], [v2p] ->
-        if LSet.subset (VMap.find v1p a1.vmap) (VMap.find v2p a2.vmap)
-        then
-          ()
-        else
-          raise Not_included
-      | _ -> failwith "this should not hapen (invariant broken)"
     in
     LMap.iter iter_lmap a1.lmap; true
   with
