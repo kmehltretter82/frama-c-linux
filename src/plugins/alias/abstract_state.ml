@@ -839,6 +839,24 @@ let empty :t =
   {graph = G.empty; pending = VMap.empty ; lmap = LMap.empty; vmap = VMap.empty; cmpt = 0}
 
 
+(* let make_top (x:t) : t =
+ *   if x.graph = G.empty
+ *   then x
+ *   else
+ *     let g = G.add_edge (G.add_vertex G.empty 0) 0 0 in
+ *     (\* collect all lval of the initial set *\)
+ *     let set_lv = ref LLSet.empty in
+ *     let lmap =
+ *       LMap.mapi
+ *         (fun lv _ -> set_lv := LLSet.add lv !set_lv ; 0)
+ *         x.lmap
+ *     in
+ *     let vmap =
+ *       VMap.add 0 !set_lv VMap.empty
+ *     in
+ *     let p = VMap.add 0 VSet.empty VMap.empty in
+ *     {graph = g ; pending = p ; lmap = lmap ; vmap = vmap ; cmpt = 1} *)
+
 (** a type for summaries of functions *)
 type summary =
   {

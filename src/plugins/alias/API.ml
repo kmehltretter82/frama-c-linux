@@ -24,7 +24,12 @@ open Cil_types
 
 open Cil_datatype
 
+(** Points-to graphs datastructure. *)
+module G=Graph.Persistent.Digraph.Concrete(Datatype.Int)
+
 module LSet = Lval.Set
+
+module Abstract_state = Abstract_state
 
 let check_computed () =
   if not (Analysis.is_computed ())
@@ -86,21 +91,31 @@ let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
     let _setv1 = Abstract_state.find_aliases lv1 state in
     LSet.mem lv2 LSet.empty (* setv1 *)
 
-let fold_points_to   (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+let fold_points_to   (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
   match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
     let _set_aliases = Abstract_state.find_aliases lv state in
-    f_fold acc LSet.empty (*set_aliases*)
+    LSet.fold
+      (fun lv acc -> f_fold acc 0 lv)
+      LSet.empty (*set_aliases*)
+      acc
 
-let fold_points_to_closure  (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+let fold_points_to_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
   match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
     let _list_closure = Abstract_state.find_transitive_closure lv state in
     List.fold_left
-      f_fold
+      (fun acc s -> f_fold acc 0 s)
       acc
       [] (* list_closure *)
+
+let get_state_before_stmt = Analysis.get_state_before_stmt
+
+let call_function a f res args =
+  match Analysis.get_summary f with
+    None -> None
+  | Some su -> Some(Abstract_state.call a res args su)

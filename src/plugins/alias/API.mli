@@ -23,8 +23,11 @@
 (** External API of the plugin Alias *)
 
 open Cil_types
-open Cil_datatype
-(* NB : do the analysis BEFORE using any of those functions *)
+
+(** Points-to graphs datastructure. *)
+module G: Graph.Sig.G
+            
+(** NB : do the analysis BEFORE using any of those functions *)
 
 (* previously get_class_before_statement *)
 (** [fold_aliases_stmt f acc kf s lv] folds [f acc] over all the aliases of the
@@ -55,13 +58,31 @@ val fold_fundec_stmts:
     [kf]. *)
 val are_aliased: kernel_function -> stmt -> lval -> lval -> bool
 
-(** [fold_points_to f acc kf s v] folds [f acc setv] where
-    [setv] is the set of lvals that are pointed to by [v] before
-    statement [s] in function [kf]. *)
+(** [fold_points_to f acc kf s v] folds [f acc i setv] where [setv] is
+   the set of lvals that are pointed to by [v] (in vertex [i]) before
+   statement [s] in function [kf]. *)
 val fold_points_to:
-  ('a ->  Lval.Set.t -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
+  ('a -> G.V.t -> lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
 
 (** [fold_points_to_closure f acc kf s v] is the transitive closure of function
     [fold_points_to]. *)
 val fold_points_to_closure:
-  ('a ->  Lval.Set.t -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
+  ('a -> G.V.t -> lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
+
+
+(** direct access to the abstract state. See Abstract_state.mli *)
+
+module Abstract_state : Abstract_state.S
+
+(** [get_state_before_stmt f s] gets the abstract state computed after
+    statement [s] in function [f]. Returns [None] if
+    the abstract state is bottom or not computed. *)
+val get_state_before_stmt :  kernel_function -> stmt -> Abstract_state.t option
+
+
+(** [call_function a f Some(res) args] computes the abstract state
+    after the instruction res=f(args) where res is a lval. [a] is the
+    abstract state before the call. If function [f] returns no value,
+    use [call_function a f None args] instead. Returns [None] if
+    the abstract state [a] is bottom or not computed. *)
+val call_function: Abstract_state.t -> kernel_function -> lval option -> exp list -> Abstract_state.t option

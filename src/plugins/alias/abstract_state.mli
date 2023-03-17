@@ -24,16 +24,17 @@
 
 open Cil_types
 
+(** Points-to graphs datastructure. *)
+module G: Graph.Sig.G
+            
 (** NB : type Lval.t is not the same as type lval !! *)
 module LSet = Simplified.Simplified_lset
 
-(** Points-to graphs datastructure. *)
-module G: Graph.Sig.G
 
 (** external signature *)
 module type S =
 sig
-
+    
   (** Type denothing an abstract state of the analysis. It is a graph containing
       all aliases and points-to information. *)
   type t
