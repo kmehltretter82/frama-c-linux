@@ -26,7 +26,7 @@ open Cil_types
 
 (** Points-to graphs datastructure. *)
 module G: Graph.Sig.G
-            
+
 (** NB : do the analysis BEFORE using any of those functions *)
 
 (* previously get_class_before_statement *)
@@ -59,8 +59,8 @@ val fold_fundec_stmts:
 val are_aliased: kernel_function -> stmt -> lval -> lval -> bool
 
 (** [fold_points_to f acc kf s v] folds [f acc i setv] where [setv] is
-   the set of lvals that are pointed to by [v] (in vertex [i]) before
-   statement [s] in function [kf]. *)
+    the set of lvals that are pointed to by [v] (in vertex [i]) before
+    statement [s] in function [kf]. *)
 val fold_points_to:
   ('a -> G.V.t -> lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
 

@@ -42,7 +42,7 @@ let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function
   match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
-    let _set_aliases = Abstract_state.find_aliases lv state in  
+    let _set_aliases = Abstract_state.find_aliases lv state in
     LSet.fold (fun e a -> f_fold a e)  LSet.empty (* set_aliases *) acc
 
 let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =
