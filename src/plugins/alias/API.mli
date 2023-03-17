@@ -77,8 +77,8 @@ val get_state_before_stmt :  kernel_function -> stmt -> Abstract_state.t option
 
 
 (** [call_function a f Some(res) args] computes the abstract state
-   after the instruction res=f(args) where res is a lval. [a] is the
-   abstract state before the call. If function [f] returns no value,
-   use [call_function a f None args] instead. Returns [None] if
+    after the instruction res=f(args) where res is a lval. [a] is the
+    abstract state before the call. If function [f] returns no value,
+    use [call_function a f None args] instead. Returns [None] if
     the abstract state [a] is bottom or not computed. *)
 val call_function: Abstract_state.t -> kernel_function -> lval option -> exp list -> Abstract_state.t option

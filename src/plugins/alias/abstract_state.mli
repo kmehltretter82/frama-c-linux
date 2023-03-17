@@ -24,13 +24,8 @@
 
 open Cil_types
 
-(* module VSet = Datatype.Int.Set
- * module VMap = Datatype.Int.Map *)
-
 (** NB : type Lval.t is not the same as type lval !! *)
-(* module Lval = Simplified.Simplified_lval *)
 module LSet = Simplified.Simplified_lset
-(* module LMap = Simplified.Simplified_lmap *)
 
 (** Points-to graphs datastructure. *)
 module G: Graph.Sig.G
@@ -81,9 +76,9 @@ end
 
 include S
 
-  (** check all the invariants that must be true on an abstract value
+(** check all the invariants that must be true on an abstract value
       before and after each function call or transformation of the graph)  *)
-  val assert_invariants : t -> unit
+val assert_invariants : t -> unit
 
 (** Functions for Steensgaard's algorithm, see the paper *)
 val join : t -> G.V.t -> G.V.t -> t
@@ -105,35 +100,25 @@ val assignment_ptr_x_y : t -> lval -> lval -> t
 
 val assignment_ptr_x_cst : t -> lval -> t
 
-(** equality test; currently, always returns true (to be fixed later) *)
-val equal : t -> t -> bool
 
+(** union of two abstract values ; ensures that if 2 lval are
+    aliased in one of the two input graph (or in a points-to
+    relationship), then they will also be aliased/points-to in the
+    result *)
+val union : t -> t -> t
 
+(** empty graph *)
+val empty : t
 
-(** make_top merge all nodes of the graph; the resulting graph has
-    only 1 vertex, 1 edge (loop); every lval of the origial graph are
-    associated to this vertex *)
-val make_top : t -> t
+(** Type denoting summaries of functions *)
+type summary
 
+(** creates a summary from a state and a function *)
+val make_summary : t option -> kernel_function -> summary
 
-  (** union of two abstract values ; ensures that if 2 lval are
-      aliased in one of the two input graph (or in a points-to
-      relationship), then they will also be aliased/points-to in the
-      result *)
-  val union : t -> t -> t
+(** pretty printer *)
+val pretty_summary :  ?debug:bool -> ?function_name:string -> Format.formatter -> summary -> unit
 
-  (** empty graph *)
-  val initial_value : t
-
-  (** Type denoting summaries of functions *)
-  type summary
-
-  (** creates a summary from a state and a function *)
-  val make_summary : t option -> kernel_function -> summary
-
-  (** pretty printer *)
-  val pretty_summary :  ?debug:bool -> ?function_name:string -> Format.formatter -> summary -> unit
-
-  (** [call a res args s] computes the abstract state after the
-      instruction res=f(args), with f summarized by [s]. [a] is the abstract state before the call *)
-  val call: t -> lval option -> exp list -> summary -> t
+(** [call a res args s] computes the abstract state after the
+    instruction res=f(args), with f summarized by [s]. [a] is the abstract state before the call *)
+val call: t -> lval option -> exp list -> summary -> t

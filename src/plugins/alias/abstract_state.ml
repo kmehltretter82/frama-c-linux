@@ -129,7 +129,7 @@ struct
       )
       m
 
-  let mapi (f_mapi: Lval.t -> V.t -> V.t ) (m:t) : 'a =
+  let _mapi (f_mapi: Lval.t -> V.t -> V.t ) (m:t) : 'a =
     LMap.mapi
       (fun lv mo ->
          OMap.mapi
@@ -140,7 +140,6 @@ struct
            mo
       )
       m
-
 
   let pretty fmt (m:t) =
     LMap.iter
@@ -257,7 +256,7 @@ let get_lval_set = find_lset
 
 let print_debug fmt (x:t) =
   Format.fprintf fmt "@[<hov 2>List of vertices: @.";
-  G.iter_vertex (fun v -> Format.fprintf fmt "(id=%d LSet= %a)@." v LSet.pretty (find_lset v x)) x.graph;
+  G.iter_vertex (fun v -> Format.fprintf fmt "(id=%d LSet= %a)@." v LSet.pp_debug (find_lset v x)) x.graph;
   Format.fprintf fmt "@]@.@[<hov 2>List of edges: @.";
   G.iter_edges (fun v1 v2 -> Format.fprintf fmt "(%d -> %d)@." v1 v2) x.graph;
   Format.fprintf fmt "@]@.";
@@ -268,11 +267,11 @@ let print_debug fmt (x:t) =
   LLMap.pretty fmt x.lmap;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "@[<hov 2>VMap: @.";
-  VMap.iter (fun v ls -> Format.fprintf fmt "(id = %d -> lset= %a)@." v LSet.pretty ls) x.vmap;
+  VMap.iter (fun v ls -> Format.fprintf fmt "(id = %d -> lset= %a)@." v LSet.pp_debug ls) x.vmap;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "cmpt: %d@." x.cmpt
-  (* let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
-   * Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval *)
+(* let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
+ * Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval *)
 
 let print_aliases fmt (x:t) =
   let iter_vmap v set_lv =
@@ -307,9 +306,9 @@ let print_aliases fmt (x:t) =
   Format.fprintf fmt "@[<hov 2><list of may-alias>@.";
   VMap.iter iter_vmap x.vmap;
   Format.fprintf fmt "<end of list>@]@."(* ;
-   * let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
-   * if not (LSet.is_empty collapsed_lval) then
-   *   Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval *)
+                                         * let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
+                                         * if not (LSet.is_empty collapsed_lval) then
+                                         *   Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval *)
 
 let pretty ?(debug=false) =
   if debug then
@@ -335,7 +334,7 @@ let assert_invariants (x:t) : unit =
     assert (G.mem_vertex x.graph v1);
     assert (G.mem_vertex x.graph v2)
   in
-  G.iter_edges assert_edge x.graph;          
+  G.iter_edges assert_edge x.graph;
   let assert_lmap (lv:Lval.t) (v:V.t) =
     assert (G.mem_vertex x.graph v);
     assert (LSet.mem lv (VMap.find v x.vmap))
@@ -345,23 +344,23 @@ let assert_invariants (x:t) : unit =
     assert (LSet.fold (fun lv acc -> acc && LLMap.mem lv x.lmap) ls true)
   in
   VMap.iter assert_vmap x.vmap(* ;
-   * let assert_collapsed (v:V.t) =
-   *   assert (G.mem_vertex x.graph v);
-   *   match G.succ x.graph v with
-   *     [v'] ->
-   *     begin
-   *       let set_v = find_lset v x in
-   *       let set_v' = find_lset v' x in
-   *       (\* check that for each lvl lv of v, lv[0] belongs to succ(v) *\)
-   *       LSet.iter
-   *         (fun lv ->
-   *            assert (LSet.mem (first_index lv) set_v')
-   *         )
-   *         set_v
-   *     end
-   *   | _ -> assert false
-   * in
-   * VSet.iter assert_collapsed x.collapsed *)
+                               * let assert_collapsed (v:V.t) =
+                               *   assert (G.mem_vertex x.graph v);
+                               *   match G.succ x.graph v with
+                               *     [v'] ->
+                               *     begin
+                               *       let set_v = find_lset v x in
+                               *       let set_v' = find_lset v' x in
+                               *       (\* check that for each lvl lv of v, lv[0] belongs to succ(v) *\)
+                               *       LSet.iter
+                               *         (fun lv ->
+                               *            assert (LSet.mem (first_index lv) set_v')
+                               *         )
+                               *         set_v
+                               *     end
+                               *   | _ -> assert false
+                               * in
+                               * VSet.iter assert_collapsed x.collapsed *)
 
 (* for debuging, remove this function before last deliverable *)
 let assert_invariants x =
@@ -427,7 +426,7 @@ let create_cst_vertex (x:t) : V.t * t =
     lmap = new_lmap ;
     vmap = new_vmap ;
     cmpt = x.cmpt+1(*  ;
-     * collapsed = x.collapsed *)
+                    * collapsed = x.collapsed *)
   }
 
 
@@ -483,7 +482,7 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
       lmap = new_lmap ;
       vmap = new_vmap ;
       cmpt = x.cmpt+1 (* ;
-       * collapsed = x.collapsed *)
+                       * collapsed = x.collapsed *)
     }
   in
   assert_invariants new_x;
@@ -609,7 +608,7 @@ let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
   in
   assert (LLMap.is_sub_offset o1 o2);
   f_diff_offset o1 o2
- 
+
 (* create_vertex_lval shall only be called by find_or_create_vertex *)
 (* creates a new vertex for a lval, assuming it is not already present
    in the graph. If it is present, there will be bugs *)
@@ -618,7 +617,7 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
     BNone -> Options.fatal "this should not happen"
   | BLval lv ->
     begin
-      match lv with 
+      match lv with
         (Mem e, NoOffset) ->
         (* special case, when we also add another vertex and a points-to edge*)
         begin
@@ -633,7 +632,7 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
             (* finally add a points-to edge between v1 and v2 *)
             let new_graph = G.add_edge x.graph v1 v2 in
             v2, {x with graph = new_graph }
-           
+
           | BAddrOf _ -> Options.fatal "*(&x) not allowed"
         end
       | _ -> create_vertex_simple blv x
@@ -641,7 +640,7 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
   | BAddrOf lv ->
     let v1, x = find_or_create_vertex (BLval lv) x in
     create_vertex_addr lv v1 x
-    
+
 (* find the vertex of an lval *)
 and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
   try  (LLMap.find lv x.lmap, x)
@@ -716,7 +715,7 @@ let _remove_cst_vertex (v:V.t) (x:t) : t =
     lmap = x.lmap;
     vmap = VMap.remove v x.vmap;
     cmpt = x.cmpt(* ;
-     * collapsed = x.collapsed *)
+                  * collapsed = x.collapsed *)
   }
 
 (* remove a lval from a graph*)
@@ -1039,10 +1038,6 @@ let assignment_ptr_x_cst (a:t) (x:lval) : t =
   in
   assert_invariants new_a ; new_a
 
-
-(* we don't need to iterate on loops *)
-let equal (_:t) (_:t) = true
-
 exception Not_included
 
 let is_included (a1:t) (a2:t) =
@@ -1222,7 +1217,7 @@ let union  (a1:t) (a2:t) :t =
 
   Format.printf "BEGIN DEBUG UNION@.";
   Format.printf "First graph:@.%a@." print_debug a1;
-   Format.printf "Second graph:@.%a@." print_debug a2;
+  Format.printf "Second graph:@.%a@." print_debug a2;
   Format.printf "END DEBUG UNION@.";
   let f_v2 x = x + a1.cmpt in
   (* we build the new graph, starting from a1.graph *)
@@ -1262,7 +1257,7 @@ let union  (a1:t) (a2:t) :t =
       ([],_) | (_,[]) -> set_res
     | ([succ_v1], [succ_v2]) -> find_all_successors (V2Set.add (v1,(f_v2 v2)) set_res) succ_v1 succ_v2 g
     | _ -> Options.fatal "Broken invariant: at most 1 successor"
-      
+
   in
   (* s_acc = set of couples that should be merged in step 3 *)
   let set_to_be_merged, new_lmap =
@@ -1340,27 +1335,27 @@ let union  (a1:t) (a2:t) :t =
   assert_invariants new_a;
   new_a
 
-let initial_value :t =
+let empty :t =
   {graph = G.empty; pending = VMap.empty ; lmap = LLMap.empty; vmap = VMap.empty; cmpt = 0(* ; collapsed = VSet.empty *)}
 
 
-let make_top (x:t) : t =
-  if x.graph = G.empty
-  then x
-  else
-    let g = G.add_edge (G.add_vertex G.empty 0) 0 0 in
-    (* collect all lval of the initial set *)
-    let set_lv = ref LSet.empty in
-    let lmap =
-      LLMap.mapi
-        (fun lv _ -> set_lv := LSet.add lv !set_lv ; 0)
-        x.lmap
-    in
-    let vmap =
-      VMap.add 0 !set_lv VMap.empty
-    in
-    let p = VMap.add 0 VSet.empty VMap.empty in
-    {graph = g ; pending = p ; lmap = lmap ; vmap = vmap ; cmpt = 1(* ; collapsed = x.collapsed *)}
+(* let _make_top (x:t) : t =
+ *   if x.graph = G.empty
+ *   then x
+ *   else
+ *     let g = G.add_edge (G.add_vertex G.empty 0) 0 0 in
+ *     (\* collect all lval of the initial set *\)
+ *     let set_lv = ref LSet.empty in
+ *     let lmap =
+ *       LLMap.mapi
+ *         (fun lv _ -> set_lv := LSet.add lv !set_lv ; 0)
+ *         x.lmap
+ *     in
+ *     let vmap =
+ *       VMap.add 0 !set_lv VMap.empty
+ *     in
+ *     let p = VMap.add 0 VSet.empty VMap.empty in
+ *     {graph = g ; pending = p ; lmap = lmap ; vmap = vmap ; cmpt = 1(\* ; collapsed = x.collapsed *\)} *)
 
 (** a type for summaries of functions *)
 type summary =

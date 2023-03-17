@@ -36,13 +36,13 @@ module HE = Exp.Hashtbl
 let cached_lval = HL.create 23
 
 let cached_exp = HE.create 37
-    
+
 let clear_cache () =
   HL.clear cached_lval;
   HE.clear cached_exp
 
 exception IsExp of exp
-  
+
 let rec simplify_lval (h,o) =
   try HL.find cached_lval (h,o) with
     Not_found ->
@@ -50,12 +50,12 @@ let rec simplify_lval (h,o) =
     in
     HL.add cached_lval (h,o) res;
     res
-  
+
 and simplify_host h =
   match h with
     Var _ -> h
   | Mem e -> Mem (simplify_exp e)
-               
+
 and simplify_offset o =
   match o with
     NoOffset -> NoOffset
@@ -80,24 +80,24 @@ and simplify_exp e =
               | _ -> Options.fatal "simplify_exp not implemented"
             end
           | CastE(_,e) -> raise (IsExp (simplify_exp e))
-          | _ -> raise (IsExp nul_exp)                            
+          | _ -> raise (IsExp nul_exp)
         in
         {e with enode=simplified_enode}
       with
         IsExp e -> e
     in
     HE.add cached_exp e res;
-    res 
+    res
 
 
 type simplified_lval =
-     BNone 
-    | BLval of lval
-    | BAddrOf of lval
+    BNone
+  | BLval of lval
+  | BAddrOf of lval
 
 module Simplified_lval =
 struct
-  type t = simplified_lval 
+  type t = simplified_lval
 
   let from_lval lv =
     BLval (simplify_lval lv)
@@ -135,13 +135,13 @@ struct
     | BLval lv -> let lv,o = Cil.removeOffsetLval lv in BLval lv, o
     | BAddrOf lv -> let lv,o = Cil.removeOffsetLval lv in BAddrOf lv, o
 
-    let addOffsetLval o x =
+  let addOffsetLval o x =
     match x with
       BNone -> BNone
     | BLval lv -> let lv = Cil.addOffsetLval o lv in BLval lv
     | BAddrOf lv -> let lv = Cil.addOffsetLval o lv in BAddrOf lv
 end
-  
+
 
 module Simplified_lmap =
 struct
@@ -164,10 +164,10 @@ struct
   let pretty f fmt m = print Simplified_lval.pretty f fmt m
 
   let pp_debug f fmt m = print Simplified_lval.pp_debug f fmt m
-      
-  
+
+
 end
-  
+
 module Simplified_lset =
 struct
   include Set.Make (Simplified_lval)
@@ -197,7 +197,7 @@ struct
       | BLval lv -> f lv acc
       | BAddrOf lv -> f lv acc
     in
-    fold f_fold s init 
+    fold f_fold s init
 end
 
 

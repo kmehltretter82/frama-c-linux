@@ -23,14 +23,14 @@
 open Cil_types
 
 type simplified_lval =
-      BNone (* anything that is not an adress or a lval *)
-    | BLval of lval (* lval *)
-    | BAddrOf of lval (* address *)
+    BNone (* anything that is not an adress or a lval *)
+  | BLval of lval (* lval *)
+  | BAddrOf of lval (* address *)
 
 module Simplified_lval:
 sig
   type t = simplified_lval
-            
+
   val compare: t -> t -> int
 
   (* result stored in cache *)
@@ -51,10 +51,10 @@ end
 module Simplified_lmap:
 sig
   include Map.S with type key = Simplified_lval.t
-                                  
+
   val pretty: (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
-    
-  val pp_debug : (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit                              
+
+  val pp_debug : (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
 end
 
 module Simplified_lset:
@@ -62,14 +62,14 @@ sig
   include Set.S with type elt = Simplified_lval.t
 
   val pretty: Format.formatter -> t -> unit
-    
+
   val pp_debug : Format.formatter -> t -> unit
 
-  (* sepcial fold *)
+  (* special fold *)
   val fold_lval : (lval -> 'a -> 'a) -> t -> 'a -> 'a
-    
+
 end
-  
+
 val  decompose_lval : Simplified_lval.t -> (Simplified_lval.t*offset) list
 
 (** clear the two caches *)

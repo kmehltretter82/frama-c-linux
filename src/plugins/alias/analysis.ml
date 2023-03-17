@@ -249,7 +249,7 @@ let doFunction (kf:kernel_function) =
         try [Kernel_function.find_first_stmt kf]
         with Kernel_function.No_Statement -> []
       in
-      List.iter (fun stmt -> T.StmtStartData.add stmt (Some Abstract_state.initial_value)) first_stmts;
+      List.iter (fun stmt -> T.StmtStartData.add stmt (Some Abstract_state.empty)) first_stmts;
       F.compute first_stmts;
       let return_stmt = Kernel_function.find_return kf in
       let final_state : Abstract_state.t option =
@@ -265,7 +265,7 @@ let doFunction (kf:kernel_function) =
              *   )
              *   f_dec.sallstmts; *)
             Options.warning "Analysis is continuing but will not be sound";
-            Some (Abstract_state.initial_value)
+            Some (Abstract_state.empty)
           end
       in
       if not (Kernel_function.is_main kf) then
@@ -295,7 +295,7 @@ let doFunction (kf:kernel_function) =
       (* Options.warning "Function %a has no definition (summary empty)"
        *   Kernel_function.pretty kf; *)
       let summary: Abstract_state.summary =
-        Abstract_state.make_summary (Some Abstract_state.initial_value) kf
+        Abstract_state.make_summary (Some Abstract_state.empty) kf
       in
       Function_table.add kf (Some summary)
     end
