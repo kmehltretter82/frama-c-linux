@@ -45,6 +45,7 @@
 
 \definecolor{frama-c-orange}{HTML}{F36521}
 \definecolor{frama-c-dark-orange}{HTML}{D04604}
+\definecolor{frama-c-dark-red}{HTML}{D00404}
 \definecolor{frama-c-bronze}{HTML}{F39D21}
 \definecolor{frama-c-green}{HTML}{16A371}
 \definecolor{frama-c-dark-green}{HTML}{0E6647}
@@ -589,6 +590,9 @@
 \lstdefinelanguage{frama-c-commands}[]{}{%
   mathescape=false,%
   alsoletter=-.,%
+  keywordstyle=\color{frama-c-green}\bfseries,%
+  keywordstyle=[2]\color{frama-c-dark-red}\bfseries,%
+  classoffset=0,%
   keywords={e-acsl-gcc.sh,frama-c,frama-c-gui,frama-c-script},%
   classoffset=1,%
   morekeywords={-load,-then,-then-last,-then-on,-then-replace,-save},%
