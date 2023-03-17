@@ -268,10 +268,11 @@ of it, several possibilities exist.
 content of the file to \texttt{\~{}/.bash\_completion}
 \item You can \texttt{source} the file, e.g. from your \texttt{.bashrc} with
 the following command:
+\end{itemize}
 \begin{verbatim}
 source $(frama-c-config -print-share-path)/autocomplete_frama-c || true
 \end{verbatim}
-\end{itemize}
+
 
 There is also an autocompletion script for zsh, \texttt{\_frama-c}, also
 in the shared resources directory. Look inside for installation instructions.
@@ -292,9 +293,9 @@ next occurrence of \texttt{-then}) and runs its actions according to the read
 options. Note that this second run starts with the results of the first one.
 
 Consider for instance the following command.
-\begin{shell}
+\begin{frama-c-commands}
 \$ frama-c -eva -ulevel 4 file.c -then -ulevel 5
-\end{shell}
+\end{frama-c-commands}
 It first runs the value analysis plug-in (option
 \optionuse{-}{eva},~\cite{value}) with an unrolling level of 4 (option
 \optionuse{-}{ulevel}, Section~\ref{sec:normalize}). Then it re-runs the value
@@ -304,34 +305,34 @@ level of 5.
 It is also possible to specify a project (see Section~\ref{sec:project}) on
 which the actions are applied thanks to the option \optiondef{-}{then-on}.
 Consider for instance the following command.
-\begin{shell}
+\begin{frama-c-commands}
 \$ frama-c -semantic-const-fold main file.c -then-on propagated -eva
-\end{shell}
+\end{frama-c-commands}
 It first propagates constants in function \texttt{main} of \texttt{file.c}
 (option \optionuse{-}{semantic-const-fold}) which generates a new project
 called \texttt{propagated}. Then it runs the value analysis plug-in on this new
 project. Finally it restores the initial default project, except if the option
-\optiondef{-}{set-project-as-default} is used as follow:
-\begin{shell}
+\optiondef{-}{set-project-as-default} is used as follows:
+\begin{frama-c-commands}
 \$ frama-c -semantic-const-fold main file.c \
           -then-on propagated -eva -set-project-as-default
-\end{shell}
+\end{frama-c-commands}
 
 Another possibility is the option \optiondef{-}{then-last} which applies the
 next actions on the last project created by a program transformer. For
 instance, the following command is equivalent to the previous one.
-\begin{shell}
+\begin{frama-c-commands}
 \$ frama-c -semantic-const-fold main file.c -then-last -eva
-\end{shell}
+\end{frama-c-commands}
 
 The last option is \optiondef{-}{then-replace} which behaves like
 \optionuse{-}{then-last} but also definitively destroys the previous current
 project. It might be useful to prevent a prohibitive memory consumption. For
 instance, the following command is equivalent to the previous one, but also
 destroys the initial default project.
-\begin{shell}
+\begin{frama-c-commands}
 \$ frama-c -semantic-const-fold main file.c -then-replace -eva
-\end{shell}
+\end{frama-c-commands}
 
 \subsection{Verbosity and Debugging Levels}
 

@@ -7,6 +7,7 @@
 \usepackage{wasysym}
 \usepackage{stmaryrd}
 \usepackage{listings}
+\usepackage{makeidx}
 
 \usepackage[french]{varioref}
 
@@ -40,8 +41,8 @@
 
 \newcommand{\camlListingInput}[1]{
   \begin{footnotesize}
-  \lstinputlisting[language=caml,
-                  style=clststyle,
+  \lstinputlisting[language=Ocaml,
+                  style=ocaml-basic,
                   inputencoding=utf8,
                   extendedchars=true,
                   literate={ç}{{\c{c}}}1
@@ -96,9 +97,6 @@
 \newcommand{\verbtt}[1]{{\small{\tt{#1}}}}
 %------------------------------------------------------------------------------
 % Légende des figures :
-\usepackage[hang,small]{caption}
-\renewcommand{\captionfont}{\it}
-\renewcommand{\captionlabelfont}{\it \bf \small}
 %\renewcommand{\captionlabeldelim}{ : }
 %-----------------------------------------------
 % prend le nom du fichier

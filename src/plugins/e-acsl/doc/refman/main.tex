@@ -1,10 +1,9 @@
 %; whizzy section -pdf -initex "pdflatex -ini"
-\documentclass[web]{frama-c-book}
+\documentclass{frama-c-book}
 %\usepackage{hevea}
 \usepackage{ifthen}
 
 \input{./macros_modern}
-\input{./frama-c-affiliation.tex}
 \input{eacslversion.tex}
 %Do not touch the following line. It is used in a Makefile hack to
 %produce the ACSL documents for the ACSL working group.
@@ -32,36 +31,43 @@
 \renewcommand{\topfraction}{0.99}
 \renewcommand{\bottomfraction}{0.99}
 
-\begin{document}
-\sloppy
-\hbadness=10000
+\title{
+  \huge % We are forced to reduce the size so that the second line fits into the page
+  E-ACSL \\
+  \medskip
+  Executable ANSI/ISO C Specification Language
+}
 
 \ifthenelse{\boolean{PrintImplementationRq}}%
-  {\coverpage{\vbox{\mbox{E-ACSL Version \eacsllangversion}\\[5mm]
-\mbox{\huge{Implementation in Frama-C plug-in E-ACSL}}\\[2mm]
-\mbox{\huge{version \eacslpluginversion{}}}}}}%
-  {\coverpage{\vbox{\mbox{E-ACSL}\\[2mm]\vbox{\mbox{\huge{Executable ANSI/ISO C
-          Specification Language}}}\\[2mm]
-        \mbox{Version \version}}}}
-
-\begin{titlepage}
-\includegraphics[height=14mm]{cealistlogo.jpg}
-\vfill
-\title{E-ACSL\\[5mm]\huge{Executable ANSI/ISO C Specification Language}}%
-{Version \version{}\ifthenelse{\boolean{PrintImplementationRq}}%
-{~--~Frama-C plug-in E-ACSL version \eacslpluginversion}{}}
+{\subtitle{Version \eacsllangversion \space --
+ Implementation in \framac \eacsl version \eacslpluginversion}}
+{\subtitle{Version \eacsllangversion}}
 
 \author{Julien Signoles}
 
-\fcaffiliationen
-\vfill
-\begin{flushleft}
-  \textcopyright 2011-2022 CEA LIST
+\acknowledge{Patrick Baudin}
+\acknowledge{Bernard Botella}
+\acknowledge{Thibaut Benjamin}
+\acknowledge{Lo\"ic Correnson}
+\acknowledge{Pascal Cuoq}
+\acknowledge{Basile Desloges}
+\acknowledge{Johannes Kanig}
+\acknowledge{Andr\'e Maroneze}
+\acknowledge{Fonenantsoa Maurica}
+\acknowledge{David Mentr\'e}
+\acknowledge{Benjamin Monate}
+\acknowledge{Yannick Moy}
+\acknowledge{Virgile Prevosto}
 
-  This work has been initially supported by the `Hi-Lite' FUI project (FUI AAP
-  9).
-\end{flushleft}
-\end{titlepage}
+\cclicence{by-sa}
+\copyrightstarts{2011}
+
+\begin{document}
+\sloppy
+\emergencystretch 3em
+\hbadness=10000
+
+\maketitle
 
 %%Contents should open on right
 \cleardoublepage
@@ -80,20 +86,13 @@ These features are marked with \experimental.
 
 \section*{Acknowledgements}
 
-We gratefully thank all the people who contributed to this document:
-Patrick Baudin,
-Bernard Botella,
-Thibaut Benjamin,
-Lo\"ic Correnson,
-Pascal Cuoq,
-Basile Desloges,
-Johannes Kanig,
-Andr\'e Maroneze,
-Fonenantsoa Maurica,
-David Mentr\'e,
-Benjamin Monate,
-Yannick Moy and
-Virgile Prevosto.
+\insertpeople
+
+\medskip
+
+This work has been initially supported by the ‘Hi-Lite’ FUI project (FUI AAP 9).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \include{intro_modern}
 
@@ -108,7 +107,7 @@ Virgile Prevosto.
 \chapter{Appendices}
 \label{chap:appendix}
 
-\include{changes_modern}
+\input{changes_modern}
 
 \cleardoublepage
 \addcontentsline{toc}{chapter}{\bibname}

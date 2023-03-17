@@ -42,6 +42,7 @@ rule main = parse
   | "\\@" {
       print_string "@";
       main lexbuf }
+  | "\n" { print_char '\n'; main lexbuf }
   | _ {
       print_char (lexeme_char lexbuf 0); main lexbuf }
   | eof {
@@ -102,6 +103,7 @@ and syntax = parse
   | "}" { print_string "\\end{notimplementedenv}"; syntax lexbuf }
   | "[" { print_string "\\begin{markdiffenv}"; syntax lexbuf }
   | "]" { print_string "\\end{markdiffenv}"; syntax lexbuf }
+  | "\n" { print_char '\n'; syntax lexbuf }
   | _ {
       print_char (lexeme_char lexbuf 0);
       syntax lexbuf }

@@ -288,9 +288,3 @@ evolve in the future and/or not work as expected.}}
 \newcommand{\B}[1]{\textbf{#1}}
 
 \definecolor{gris}{gray}{0.85}
-\makeatletter
-\newenvironment{important}%
-{\hspace{5pt plus \linewidth minus \marginparsep}%
- \begin{lrbox}{\@tempboxa}%
-   \begin{minipage}{\linewidth - 2\fboxsep}}
-{\end{minipage}\end{lrbox}\colorbox{gris}{\usebox{\@tempboxa}}}

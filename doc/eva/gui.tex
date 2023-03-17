@@ -51,9 +51,9 @@ As a general recommendation,
 After running the value analysis and saving your results,
 it is a good time to check what the result looks like, using the GUI:
 
-\begin{verbatim}
+\begin{frama-c-commands}
 frama-c-gui -load value.sav
-\end{verbatim}
+\end{frama-c-commands}
 
 In the screenshot of Figure~\ref{fig:gui-eva},
 we indicate some parts of the GUI that are
@@ -285,10 +285,10 @@ behaviors so severe that the analysis cannot proceed afterwards.
 This is the case in the code fragment below: no state remains to be
 propagated after the addition, because the uninitialized access is guaranteed.
 
-\begin{lstlisting}
+\begin{listing-nonumber}
 int x;
 int y = x + 1;
-\end{lstlisting}
+\end{listing-nonumber}
 
 This example is marked as non-terminating, both in the textual log and in
 the GUI.
@@ -297,7 +297,7 @@ However, things are not always as clear-cut. Replace \lstinline+x+ by
 a pointer access, and imagine that only in \emph{some} contexts the memory
 location is uninitialized.
 
-\begin{lstlisting}
+\begin{listing-nonumber}
 void f(int *p) {
   if (rand ()) {
     int y = *p + 1;
@@ -309,7 +309,7 @@ void main() {
   f(&x);
   f(&y);
 }
-\end{lstlisting}
+\end{listing-nonumber}
 In this example, all intructions ``terminate'' in the sense of
 Section~\ref{sec:non-termination-gui}. Yet, one branch is cut abruptly
 in the analysis of \lstinline+f+.
@@ -319,7 +319,7 @@ iterations. In the example below, accessing \lstinline|t[i]| with
 \lstinline|i==10| is always invalid, but this is neither reflected
 in the Properties panel nor in the Values panel.
 
-\begin{lstlisting}
+\begin{listing-nonumber}
 void main() {
   int i, t[10];
   for (i=0; i<10; i++) {
@@ -331,7 +331,7 @@ void main() {
     if (rand ()) break;
   }
 }
-\end{lstlisting}
+\end{listing-nonumber}
 
 The {\em Red alarms} panel (Figure~\ref{fig:red-alarms-panel}) can be used to
 detect such kinds of severe alarms.

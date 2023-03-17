@@ -1,9 +1,9 @@
 ##########################################################################
 #                                                                        #
-#  This file is part of WP plug-in of Frama-C.                           #
+#  This file is part of Frama-C.                                         #
 #                                                                        #
 #  Copyright (C) 2007-2023                                               #
-#    CEA (Commissariat a l'energie atomique et aux energies              #
+#    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
 #  you can redistribute it and/or modify it under the terms of the GNU   #
@@ -20,37 +20,36 @@
 #                                                                        #
 ##########################################################################
 
-# --------------------------------------------------------------------------
-# ---  WP User & Reference Manual                                        ---
-# --------------------------------------------------------------------------
+.PHONY: all clean
 
-.PHONY: all clean lib
+all: main.pdf
 
-all: wpcoq.pdf 
+GENERATED=
+GENERATED+=frama-c-book.cls frama-c-cover.pdf frama-c-left.pdf frama-c-right.pdf
+FRAMAC_DOC_ROOT_DIR=../..
+include $(FRAMAC_DOC_ROOT_DIR)/MakeLaTeXModern
 
-include ../MakeDoc
+DWNLDDIR=$(FRAMAC_DOC_ROOT_DIR)/manuals
+DOCNAME=slicing-user-manual-fr.pdf
 
-SHARE=../../share
-COQL=Qedlib Cint Bits Cbits Cfloat Cmath Vset Memory
-COQSRC=$(addprefix $(SHARE)/,$(addsuffix .v,$(COQL)))
-COQSTY=$(SHARE)/doc/coq2latex.sty
-COQTEX=$(SHARE)/doc/coq2latex
-TEX= wpcoq.tex qed_generated.tex typed_generated.tex
+main.pdf: $(FRAMAC_MODERN) \
+	main.tex slicing.tex
 
-lib: .lib
-.lib: $(COQSRC) $(COQTEX)
-	@echo "Importing $(COQL)"
-	@$(COQTEX) -o "./%.tex" $(COQSRC)
-	@touch .lib
+###############################################################################
 
-$(COQTEX): $(COQTEX).mll
-	make -C $(SHARE) doc/coq2latex
+%.pdf: %.tex
+	pdflatex $*
+	pdflatex $*
 
-coq2latex.sty: $(COQSTY)
-	cp -f $< .
+install: main.pdf
+	@echo "copying main.pdf    in $(DWNLDDIR)/$(DOCNAME)"
+	@rm -f "$(DWNLDDIR)/$(DOCNAME)"
+	@cp main.pdf "$(DWNLDDIR)/$(DOCNAME)"
 
-wpcoq.pdf: $(FRAMAC_DOC) $(TEX) .lib coq2latex.sty
-	rubber -d wpcoq
+clean:
+	rm -rf *~ *.aux *.log *.nav *.out *.snm *.toc *.lof *.pp *.bnf \
+		*.haux  *.hbbl *.htoc \
+                *.cb *.cb2 *.cm? *.bbl *.blg *.idx *.ind *.ilg \
+		$(GENERATED)
 
-clean::
-	rm -f .lib $(addsuffix .tex,$(COQL))
+###############################################################################

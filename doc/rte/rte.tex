@@ -204,11 +204,12 @@ complement, the interval of representable values also corresponds to $[-2^{n-1},
 included, but not the padding bits if there are any).  The size in bits of a
 type is obtained through \lstinline|Cil.bitsSizeOf: typ -> int|, which bases
 itself on the machine dependency option of Frama-C. For instance by using
-\lstinline|-machdep x86_32|, we have the following:
+\lstinline|-machdep x86_32|, we have the following (the size is expressed in
+bits):
 \begin{center}
 \begin{tabular}{|l|c|l|}
 \hline
-type & size in bits & representable interval \\
+type & size & representable interval \\
 \hline
 \lstinline|signed char| & 8 & \lstinline|[-128,127]|  \\
 \lstinline|signed short| & 16 & \lstinline|[-32768,32767]| \\
@@ -219,7 +220,6 @@ type & size in bits & representable interval \\
 \end{tabular}
 %%\caption{Signed integer types: bit sizes and interval of values}
 \end{center}
-
 
 \medskip
 Frama-C annotations added by plug-ins such as \rte{} may not contain macros
@@ -830,7 +830,53 @@ of Frama-C. The plug-in then selects every C function which is in the set
 defined by the \lstinline|-rte-select|: if no explicit set of functions is
 provided by the user, all C functions defined in the program are selected.
 Selecting the kind of annotations which will be generated is performed by using
-other \rte{} options (see fig.~\ref{kernel} and~\ref{options} for a summary).
+other \rte{} options:
+\begin{description}
+\item[{\tt -rte} (boolean, defaults to false)] \ \smallskip \\
+     Enable \rte{} plug-in
+\item[{\tt -rte-div} (boolean, defaults to true)] \ \smallskip \\
+     Generate annotations for division by zero
+\item[{\tt -rte-float-to-int} (boolean (defaults to true))] \ \smallskip \\
+     Generate annotations for casts from floating-point to integer
+\item[{\tt -rte-initialized} (set of function (defaults to none))] \ \smallskip \\
+     Generate annotations for initialization for the given set of functions
+\item[{\tt -rte-mem} (boolean (defaults to true))] \ \smallskip \\
+     Generate annotations for validity of left-values access
+\item[{\tt -rte-pointer-call} (boolean (defaults to true))] \ \smallskip \\
+     Generate annotations for validity of calls via function pointers
+\item[{\tt -rte-shift} (boolean (defaults to true))] \ \smallskip \\
+     Generate annotations for left and right shift value out of bounds
+\item[{\tt -rte-select} (set of function (defaults to all))] \ \smallskip \\
+     Run plug-in on a subset of C functions
+\item[{\tt -rte-trivial-annotations} (boolean (defaults to false))] \ \smallskip \\
+     Generate all annotations even when they trivially hold
+\item[{\tt -rte-warn} (boolean (defaults to true))] \ \smallskip \\
+     Emit warning on broken annotations
+\end{description}
+Combined with the following Kernel options:
+\begin{description}
+\item[{\tt -warn-unsigned-overflow} (boolean, defaults to false)] \ \smallskip \\
+     Generate annotations for unsigned overflows
+\item[{\tt -warn-unsigned-downcast} (boolean, defaults to false)] \ \smallskip \\
+     Generate annotations for unsigned integer downcast
+\item[{\tt -warn-signed-overflow} (boolean, defaults to true)] \ \smallskip \\
+     Generate annotations for signed overflows
+\item[{\tt -warn-signed-downcast} (boolean, defaults to false)] \ \smallskip \\
+     Generate annotations for signed integer downcast
+\item[{\tt -warn-pointer-downcast} (boolean, defaults to true)] \ \smallskip \\
+     Generate annotations for downcast of pointer values
+\item[{\tt -warn-left-shift-negative} (boolean, defaults to true)] \ \smallskip \\
+     Generate annotations for left shift on negative values
+\item[{\tt -warn-right-shift-negative} (boolean, defaults to false)] \ \smallskip \\
+     Generate annotations for right shift on negative values
+\item[{\tt -warn-invalid-bool} (boolean, defaults to true)] \ \smallskip \\
+     Generate annotations for \lstinline|_Bool| trap representations
+\item[{\tt -warn-special-float} (string: {\tt non-finite} (default), {\tt nan} or {\tt none})] \ \smallskip \\
+     Generate annotations when special floats are produced: infinite floats or
+     NaN (by default), only on NaN or never.
+\item[{\tt -warn-invalid-pointer} (boolean, defaults to false)] \ \smallskip \\
+     Generate annotations for invalid pointer arithmetic
+\end{description}
 
 Pretty-printing the output of \rte{} and relaunching the plug-in on the
 resulting file will generate duplicated annotations, since the plug-in does not
@@ -838,89 +884,11 @@ check existing annotations before generation. This behaviour does not happen if
 \rte{} is used in the context of a Frama-C project~\cite{framacdev}: the
 annotations are not generated twice.
 
-\begin{table}
-\begin{center}
-\begin{tabular}{|l|l|p{4.5cm}|}
-\hline
-{\bf Option} & {\bf Type (Default)} & {\bf Description} \\
-\hline
-\lstinline|-warn-unsigned-overflow| & boolean (false) & Generate annotations for
-unsigned overflows\\
-\hline
-\lstinline|-warn-unsigned-downcast| & boolean (false) & Generate annotations for
-unsigned integer downcast\\
-\hline
-\lstinline|-warn-signed-overflow| & boolean (true) & Generate annotations for
-signed overflows \\
-\hline
-\lstinline|-warn-signed-downcast| & boolean (false) & Generate annotations for
-signed integer downcast \\
-\hline
-\lstinline|-warn-pointer-downcast| & boolean (true) & Generate annotations for
-downcast of pointer values \\
-\hline
-\lstinline|-warn-left-shift-negative| & boolean (true) & Generate annotations for
-left shift on negative values \\
-\hline
-\lstinline|-warn-right-shift-negative| & boolean (false) & Generate annotations for
-right shift on negative values \\
-\hline
-\lstinline|-warn-invalid-bool| & boolean (true) & Generate annotations for
-\lstinline|_Bool| trap representations \\
-\hline
-\lstinline|-warn-special-float| &  string: (\lstinline|non-finite|), \lstinline|nan| or \lstinline|none|  & generate annotations when
-special floats are produced: infinite floats or NaN (by default), only on NaN or never. \\
-\hline
-\lstinline|-warn-invalid-pointer| & boolean (false) & Generate annotations for
-invalid pointer arithmetic \\
-\hline
-\end{tabular}
-\caption{\framac kernel options, impacting \rte{}} \label{kernel}
-\end{center}
-\end{table}
 
-\begin{table}
-\begin{center}
-\begin{tabular}{|l|l|p{7cm}|}
-\hline
-{\bf Option} & {\bf Type (Default)} & {\bf Description} \\
-\hline
-\lstinline|-rte| & boolean (false) & Enable \rte{} plug-in \\
-\hline
-\lstinline|-rte-div| & boolean (true) & Generate annotations for division by
-zero \\
-\hline
-\lstinline |-rte-float-to-int| & boolean (true) & Generate annotations for
-casts from floating-point to integer \\
-\hline
-\lstinline |-rte-initialized| & set of function (none) & Generate annotations
-for initialization for the given set of functions \\
-\hline
-\lstinline |-rte-mem| & boolean (true) & Generate annotations for validity of
-left-values access \\
-\hline
-\lstinline |-rte-pointer-call| & boolean (true) & Generate annotations for
-validity of calls via function pointers \\
-\hline
-\lstinline|-rte-shift| & boolean (true) & Generate annotations for left and
-right shift value out of bounds \\
-\hline
-\lstinline |-rte-select| & set of function (all) & Run plug-in on a subset of C
-functions \\
-\hline
-\lstinline |-rte-trivial-annotations| & boolean (false) & Generate all
-annotations even when they trivially hold \\
-\hline
-\lstinline |-rte-warn| & boolean (true) & Emit warning on broken annotations \\
-\hline
-\end{tabular}
-\caption{\rte{} options} \label{options}
-\end{center}
-\end{table}
+
 
 \cleardoublepage
 \phantomsection
 \addcontentsline{toc}{chapter}{\bibname}
 \bibliographystyle{plain}
 \bibliography{./biblio}
-

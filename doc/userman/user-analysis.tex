@@ -56,12 +56,12 @@ All \FramaC plug-ins define the following set of common options.
   \optionidxdef{-}{<plug-in>-msg-key}
   \optionidxdef{-}{kernel-msg-key}
   sets the categories of
-  messages that must be output for the plugin. \texttt{keys} is a 
-  comma-separated list of names. The list of available categories can be 
+  messages that must be output for the plugin. \texttt{keys} is a
+  comma-separated list of names. The list of available categories can be
   obtained with \texttt{-<plug-in shortname>-msg-key help}. To enable all
   categories, use the wildcard \texttt{'*'}%
   \footnote{Be sure to enclose it in single quotes or your shell might
-    expand it, leading to unexpected results.}. Categories can have 
+    expand it, leading to unexpected results.}. Categories can have
   subcategories, defined by a colon in their names. For instance, \texttt{a:b:c}
   is a subcategory \texttt{c} of \texttt{a:b}, itself a
   subcategory of \texttt{a}. Enabling a category will also enable all its
@@ -216,13 +216,13 @@ short truncate(int n) {
 }
 \end{ccode}
 If \texttt{-warn-signed-downcast} is set, analyzers report an error on
-{\lstset{language=C,style=framac-code-style} \lstinline|(short) n|}
+{\lstset{language=C,style=frama-c-style} \lstinline|(short) n|}
 which downcasts a signed integer to a signed
 short. Without it, no error is reported.
 
 \item \optiondef{-}{warn-unsigned-downcast} is the same as
   \texttt{-warn-signed-downcast} for downcasts to unsigned integers. This option
-  is also \emph{not} set by default. 
+  is also \emph{not} set by default.
 
 \item \optiondef{-}{warn-signed-overflow} may be used to check that the
   analyzed code does not overflow on integer operations. If the opposite option
@@ -240,7 +240,7 @@ int abs(int x) {
 By default, analyzers detect an error on
 \lstinline|-x| since this operation overflows when \lstinline|MININT| is the
 argument of the function. But, with the \texttt{-no-warn-signed-overflow}
-option, no error is detected.  
+option, no error is detected.
 
 \item \optiondef{-}{warn-unsigned-overflow} is the same as
   \texttt{-warn-signed-overflow} for operations over unsigned integers. This
@@ -280,4 +280,4 @@ option, no error is detected.
 % TeX-master: "userman.tex"
 % ispell-local-dictionary: "english"
 % compile-command: "make"
-% End: 
+% End:

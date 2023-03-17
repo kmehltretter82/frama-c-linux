@@ -7,12 +7,9 @@ void main_1(void) {
   n=100;
   i=0;
   y=0;
-  do 
-    {
+  do {
       i++;
-      if (c(i)) 
-	f(2*i);
-    } 
-  while (i<n);
-
+      if (c(i))
+        f(2*i);
+  } while (i<n);
 }

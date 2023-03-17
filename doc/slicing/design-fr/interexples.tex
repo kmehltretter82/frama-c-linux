@@ -3,7 +3,7 @@
 
 Cette partie présente comment les actions élémentaires précédemment présentées
 peuvent être utilisées pour répondre à des requêtes utilisateur de plus haut
-niveau. 
+niveau.
 
 
 \section{Présentation de l'exemple}
@@ -19,10 +19,10 @@ comme on ne s'intéresse ici qu'à la propagation interprocédurale,
 on n'utilise qu'une marque élémentaire $m$ quelconque qui rend un élément
 visible et la marque \spare{} déjà mentionnée.
 
-\noindent\begin{tabular}{p{4cm}p{4.5cm}p{5cm}}
+\noindent\begin{tabular}{p{4.4cm}p{4.5cm}p{5.3cm}}
 \begin{verbatim}
 int X, Y;
-int g (int u, int v, 
+int g (int u, int v,
        int w) {
   lg1: X = u;
   lg2: Y = u + v;
@@ -32,23 +32,23 @@ int g (int u, int v,
 &
 \begin{verbatim}
 int Z;
-int f (int a, int b, 
-       int c, int d, 
+int f (int a, int b,
+       int c, int d,
        int e) {
   int r;
-  lf1: r = g (a, b, c);
-  lf2: Z = g (r, d, e);
+  lf1: r = g (a,b,c);
+  lf2: Z = g (r,d,e);
   return X;
-  }
+}
 \end{verbatim}
 &
 \begin{verbatim}
 int I, J, K, L, M, N;
 int main () {
   lm1: /* ... */
-  lm2: N = f (I, J, K, L, M);
+  lm2: N = f (I,J,K,L,M);
   lm3: /* ... */
-  }
+}
 \end{verbatim}
 \end{tabular}
 
@@ -79,7 +79,7 @@ Puis, la seconde action
 génère $\actChooseCall(c_1, f_1)$ et $\actChooseCall(c_2, f_1)$.
 
 A l'application de la première de ces nouvelles actions,
-comme il n'y a pas encore de spécialisation pour $g$, 
+comme il n'y a pas encore de spécialisation pour $g$,
 on génère~:
 
 \begin{itemize}
@@ -102,9 +102,9 @@ L'application de $\actChooseCall(c_2, f_1)$ produit~:
   \item et $\actChangeCall(c_2, f_1, g_1)$.
 \end{itemize}
 
-Comme $g_1$ est appelée en $c_1$, 
+Comme $g_1$ est appelée en $c_1$,
 la modification de son marquage conduit à générer $\actMissingInputs(c_1, f_1)$,
-qui, vues les options, est directement traduit par 
+qui, vues les options, est directement traduit par
 $\actModifCallInputs(c_1, f_1)$.
 
 Puis, le $\actChangeCall{}$ va déclencher $\actModifCallInputs(c_2, f_1)$
@@ -201,6 +201,3 @@ $m_1$ aux entrées $b$ et $d$ de $f_1$, puis aux entrées $J$ et $L$ de ${\mathi
 main}_1$.
 
 \bb{\centerline{\uneimage{exple2v4-2}}}\bb
-
-
-

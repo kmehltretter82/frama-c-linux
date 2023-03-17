@@ -173,9 +173,10 @@ precise configuration:
   \item \verb+docker build . -t framac/frama-c:dev --target frama-c-gui-slim \+\\
         \verb+  -f Dockerfile.dev --build-arg=from_archive=frama-c-<VERSION>.tar.gz+
 \end{itemize}
-For the GUI: you might want to install the
-\href{https://github.com/mviereck/x11docker}{\texttt{x11docker}} script, in
-order to be able to launch \verb+x11docker framac/frama-c:dev frama-c-gui+
+For the GUI: in order to be able to launch
+\verb+x11docker framac/frama-c:dev frama-c-gui+,
+you might want to install the
+\href{https://github.com/mviereck/x11docker}{\texttt{x11docker}} script.
 
 \section{Validate release}
 
