@@ -52,6 +52,7 @@ module ShowStmtTable = False
       let help = "Displays the table [stmt -> abstract state] at the end of the analysis"
     end)
 
+
 module Dot_output =
   Empty_string
     (struct
@@ -59,4 +60,3 @@ module Dot_output =
       let arg_name = "f"
       let help = "Displays the final abstract state in Dot File <f>"
     end)
-

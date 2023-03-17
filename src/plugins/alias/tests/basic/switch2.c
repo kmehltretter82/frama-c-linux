@@ -1,18 +1,19 @@
 // control structure and arrays
-// { a; b; c } are aliased
+// { a; b; c; d } are aliased
+// { *a; *b; *c; *d } are aliased
 
 int main ()
 {
   int *a=0, *b=0, *c=0, *d=0, e=0;
   switch (e) {
   case 1:
-    *a=e;
+    a=d;
     break;
   case 2:
-    *b=e;
+    b=d;
     break;
   default:
-    *c=e;
+    c=d;
   }
     
   return 0;

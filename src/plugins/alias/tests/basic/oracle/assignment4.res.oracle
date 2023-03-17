@@ -1,8 +1,7 @@
-[kernel] Parsing assignment2.c (with preprocessing)
+[kernel] Parsing assignment4.c (with preprocessing)
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
   <list of may-alias>
-  {a; c; } are aliased
   {b; d; *a; *c; } are aliased
   <end of list>
 [alias] Functions done
@@ -31,7 +30,7 @@ Before statement *c = d; :
 {b; *a; } are aliased
 <end of list>
 
-Before statement a = c; :
+Before statement b = d; :
  <list of may-alias>
 {b; *a; } are aliased
 {d; *c; } are aliased
@@ -39,13 +38,11 @@ Before statement a = c; :
 
 Before statement __retres = 0; :
  <list of may-alias>
-{a; c; } are aliased
 {b; d; *a; *c; } are aliased
 <end of list>
 
 Before statement return __retres; :
  <list of may-alias>
-{a; c; } are aliased
 {b; d; *a; *c; } are aliased
 <end of list>
 
