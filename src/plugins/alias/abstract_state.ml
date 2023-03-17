@@ -26,7 +26,7 @@ open Cil_types
 
 open Cil_datatype
 
-open Utils
+open Simplified
 
 (* (\** module for vertices *\)
  * module V = struct
@@ -834,7 +834,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
     List.fold_left2
       (fun acc param formal ->
          begin
-           match  formal, find_basic_lval param with
+           match  formal, Simplified_lval.from_exp param with
              ((Var v1, NoOffset), BLval (Var v2,NoOffset)) ->
              (* case x = y *)
              assignment_x_y acc (Var v1, NoOffset) (Var v2, NoOffset)
@@ -864,7 +864,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
     | (Some res, Some exp_res) ->
       begin
         let v_res,new_state  = find_or_create_vertex res new_state in
-        match find_basic_lval exp_res with
+        match Simplified_lval.from_exp exp_res with
           BLval lval_exp_res ->
           begin
             try

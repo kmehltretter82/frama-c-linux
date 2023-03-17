@@ -22,7 +22,7 @@
 
 open Cil_types
 open Cil_datatype
-open Utils
+open Simplified
 
 module Dataflow = Dataflow2
 
@@ -73,7 +73,7 @@ module D = Dataflow.StartData(A)
 
 let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
   (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)
-  match (a,lv, find_basic_lval exp) with
+  match (a,lv, Simplified_lval.from_exp exp) with
     (Some a, (Var v1, NoOffset), BLval (Var v2,NoOffset)) ->
     (* case x = y *)
     Some (Abstract_state.assignment_x_y a (Var v1, NoOffset) (Var v2, NoOffset))
