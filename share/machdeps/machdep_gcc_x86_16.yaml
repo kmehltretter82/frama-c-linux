@@ -13,6 +13,7 @@ char_is_unsigned: false
 compiler: gcc
 cpp_arch_flags:
 - -m16
+custom_defs: ''
 errno:
     e2big: '7'
     eacces: '13'

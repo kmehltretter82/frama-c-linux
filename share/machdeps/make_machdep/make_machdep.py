@@ -328,6 +328,7 @@ version = version_output.stdout.splitlines()[0]
 machdep["compiler"] = args.compiler
 machdep["cpp_arch_flags"] = args.cpp_arch_flags
 machdep["version"] = version
+machdep["custom_defs"] = ""
 if args.from_file and args.in_place:
     machdep["machdep_name"] = Path(args.from_file).stem
 elif args.dest_file:

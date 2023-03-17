@@ -76,7 +76,8 @@ let max_val bitsize is_signed kind =
   v ^ suff
 
 let min_val bitsize kind =
-  "-" ^ (max_val bitsize true kind) ^ " - 1"
+  let suff = List.assoc kind suff_of_kind in
+  "(-" ^ (max_val bitsize true kind) ^ " - 1" ^ suff ^")"
 
 let gen_define_stype fmt name kind =
   gen_define_string fmt ("__INT" ^ name ^ "_T") ("signed " ^ kind)
@@ -281,6 +282,8 @@ let gen_all_defines fmt mach =
   (* NB: should we use Cil.gccMode() here? *)
   if mach.compiler = "gcc" then
     gen_include fmt "__fc_gcc_builtins.h";
+
+  Format.fprintf fmt "%s@\n" mach.custom_defs;
 
   Format.fprintf fmt "#endif // __FC_MACHDEP@\n"
 

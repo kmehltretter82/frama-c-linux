@@ -77,7 +77,6 @@
 #   define ULLONG_MAX	__FC_ULLONG_MAX
 
 // POSIX-specific definitions
-#ifdef __FC_POSIX_VERSION
 
 /*** Most restrictive values for the constants below, as mandated by POSIX */
 
@@ -200,7 +199,7 @@
    "... the total space used to store the environment and the arguments to the
     process is limited to {ARG_MAX} bytes."
  */
-#ifdef __FC_ARG_NAME_MAX
+#ifdef __FC_ARG_MAX
 #  if __FC_ARG_MAX >= 0
      _Static_assert(__FC_ARG_MAX >=_POSIX_ARG_MAX, "__FC_ARG_MAX is too small (" expand(__FC_ARG_MAX) "): minimal value is " expand(__POSIX_ARG_MAX));
 #    define ARG_MAX __FC_ARG_MAX
@@ -224,5 +223,4 @@
 #  define IOV_MAX 255
 #endif
 
-#endif // __FC_POSIX_VERSION
 #endif

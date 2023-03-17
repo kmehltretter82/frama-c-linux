@@ -53,7 +53,7 @@ let mach =
     eof = "(-1)";
     fopen_max = "128";
     filename_max = "1023";
-    path_max = "255";
+    path_max = "256";
     tty_name_max = "255";
     host_name_max = "255";
     l_tmpnam = "255";
@@ -81,6 +81,7 @@ let mach =
       "enotsup", "48";
     ];
     machdep_name = "custom_machdep";
+    custom_defs = "#define CUSTOM_MACHDEP 1\n";
   }
 
 let mach2 = { mach with compiler = "baz" }

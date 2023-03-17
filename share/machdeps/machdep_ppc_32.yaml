@@ -16,6 +16,7 @@ cpp_arch_flags:
 - -target
 - powerpc-apple-linux
 - -mcpu=603
+custom_defs: ''
 eof: (-1)
 errno:
     e2big: '7'

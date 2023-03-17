@@ -96,6 +96,12 @@ cpp_arch_flags:
 
     - type: string
 
+custom_defs:
+  description: |
+    arbitrary text that will be reproduced verbatim in the generated
+    header
+  type: string
+
 eof:
 
   description: value of 'EOF' macro

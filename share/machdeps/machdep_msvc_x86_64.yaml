@@ -13,6 +13,36 @@ char_is_unsigned: false
 compiler: msvc
 cpp_arch_flags:
 - -m64
+custom_defs: |
+  #define _MSC_FULL_VER 160040219
+  #define _MSC_VER 1600
+  #undef __ptr64
+  #define __ptr64
+  #undef __ptr32
+  #define __ptr32
+  #undef __unaligned
+  #define __unaligned
+  #undef __cdecl
+  #define __cdecl
+  #undef __possibly_notnullterminated
+  #define __possibly_notnullterminated
+  #ifndef errno_t
+  # define errno_t int
+  # define _ERRNO_T_DEFINED
+  #endif
+  #ifndef _WIN64
+  # define _WIN64 1
+  #endif
+  #ifndef _AMD64_
+  # define _AMD64_ 1
+  #endif
+  #ifndef _M_AMD64
+  # define _M_AMD64 1
+  #endif
+  #ifndef _M_X64
+  # define _M_X64 1
+  #endif
+
 errno:
     eperm: '1'
     enoent: '2'
@@ -133,7 +163,7 @@ posix_version: ''
 # taken from gnu
 bufsiz: '8192'
 eof: '(-1)'
-fopen_max: '16'
+fopen_max: '20'
 host_name_max: '255'
 path_max: '256'
 tty_name_max: '32'

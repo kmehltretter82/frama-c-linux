@@ -2694,6 +2694,7 @@ let dummy_machdep =
       "erange", "34";
     ];
     machdep_name = "dummy";
+    custom_defs = "";
   }
 
 module Machdep = Datatype.Make_with_collections(struct

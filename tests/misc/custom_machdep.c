@@ -25,4 +25,4 @@
 #include <time.h>
 #include <wchar.h>
 
-int main() { return INT_MAX; }
+int main() { return INT_MAX - CUSTOM_MACHDEP; }

@@ -18,7 +18,7 @@
 int main(void)
 {
   int __retres;
-  __retres = 8388607;
+  __retres = 8388607 - 1;
   return __retres;
 }
 

@@ -1162,7 +1162,7 @@ extern unsigned long long strtoull(char const * restrict nptr,
 
 /*@ ghost extern int __fc_random_counter __attribute__((__unused__)); */
 
-unsigned long const __fc_rand_max = (unsigned long)32767;
+unsigned long const __fc_rand_max = (unsigned long)2147483647;
 /*@ ensures result_range: 0 ≤ \result ≤ __fc_rand_max;
     assigns \result, __fc_random_counter;
     assigns \result \from __fc_random_counter;
@@ -4068,7 +4068,7 @@ extern int volatile __fc_fds[1024];
           0 ≤ i < iovcnt ⇒
           \valid((char *)(&(iov + i)->iov_base) +
                  (0 .. (iov + i)->iov_len - 1));
-    requires bounded_iovcnt: 0 ≤ iovcnt ≤ 1024;
+    requires bounded_iovcnt: 0 ≤ iovcnt ≤ 255;
     ensures
       result_error_or_read_bytes:
         \result ≡ -1 ∨
@@ -4101,7 +4101,7 @@ extern ssize_t readv(int fd, struct iovec const *iov, int iovcnt);
           0 ≤ i < iovcnt ⇒
           \valid_read((char *)(iov + i)->iov_base +
                       (0 .. (iov + i)->iov_len - 1));
-    requires bounded_iovcnt: 0 ≤ iovcnt ≤ 1024;
+    requires bounded_iovcnt: 0 ≤ iovcnt ≤ 255;
     requires
       bounded_lengths:
         \sum(0, iovcnt - 1, \lambda ℤ k; (iov + k)->iov_len) ≤ 2147483647;
@@ -4559,7 +4559,7 @@ int getaddrinfo(char const * restrict nodename,
         while (i < 14) {
           {
             int tmp_4;
-            tmp_4 = Frama_C_interval(-128,127);
+            tmp_4 = Frama_C_interval(-127 - 1,127);
             sa->sa_data[i] = (char)tmp_4;
           }
           i ++;
@@ -4595,7 +4595,7 @@ static int res_search(char const *dname, int rec_class, int type,
   {
     int i = 0;
     while (i < anslen - 1) {
-      *(answer + i) = Frama_C_char_interval((char)(-128),(char)127);
+      *(answer + i) = Frama_C_char_interval((char)(-127 - 1),(char)127);
       i ++;
     }
   }
@@ -6063,18 +6063,18 @@ FILE * const __fc_p_fopen = __fc_fopen;
  */
 extern FILE *tmpfile(void);
 
-char __fc_tmpnam[2048];
+char __fc_tmpnam[20];
 char * const __fc_p_tmpnam = __fc_tmpnam;
-/*@ requires valid_s_or_null: s ≡ \null ∨ \valid(s + (0 .. 2048));
+/*@ requires valid_s_or_null: s ≡ \null ∨ \valid(s + (0 .. 20));
     ensures
       result_string_or_null:
         \result ≡ \null ∨ \result ≡ \old(s) ∨
         \result ≡ __fc_p_tmpnam;
-    assigns *(__fc_p_tmpnam + (0 .. 2048)), *(s + (0 .. 2048)), \result;
-    assigns *(__fc_p_tmpnam + (0 .. 2048))
-      \from *(__fc_p_tmpnam + (0 .. 2048)), (indirect: s);
-    assigns *(s + (0 .. 2048))
-      \from (indirect: s), *(__fc_p_tmpnam + (0 .. 2048));
+    assigns *(__fc_p_tmpnam + (0 .. 20)), *(s + (0 .. 20)), \result;
+    assigns *(__fc_p_tmpnam + (0 .. 20))
+      \from *(__fc_p_tmpnam + (0 .. 20)), (indirect: s);
+    assigns *(s + (0 .. 20))
+      \from (indirect: s), *(__fc_p_tmpnam + (0 .. 20));
     assigns \result \from s, __fc_p_tmpnam;
  */
 extern char *tmpnam(char *s);
@@ -6727,7 +6727,7 @@ char *fgets(char * restrict s, int size, FILE * restrict stream)
         __retres = s;
         goto return_label;
       }
-      tmp_2 = Frama_C_interval(-128,127);
+      tmp_2 = Frama_C_interval(-127 - 1,127);
       char c = (char)tmp_2;
       *(s + i) = c;
       if ((int)c == '\n') {
@@ -6744,7 +6744,7 @@ char *fgets(char * restrict s, int size, FILE * restrict stream)
 }
 
 /*@ requires valid_stream: \valid(stream);
-    ensures result_uchar_or_eof: (0 ≤ \result ≤ 255) ∨ \result ≡ -1;
+    ensures result_uchar_or_eof: (0 ≤ \result ≤ 255U) ∨ \result ≡ -1;
     assigns *stream, \result;
     assigns *stream \from *stream;
     assigns \result \from (indirect: *stream);
@@ -6772,7 +6772,7 @@ int fgetc(FILE * restrict stream)
   else {
     unsigned char tmp_1;
     tmp_1 = Frama_C_unsigned_char_interval((unsigned char)0,
-                                           (unsigned char)255);
+                                           (unsigned char)255U);
     __retres = (int)tmp_1;
     goto return_label;
   }
@@ -7225,9 +7225,9 @@ char *realpath(char const * restrict file_name, char * restrict resolved_name)
     goto return_label;
     default: break;
   }
-  int realpath_len = Frama_C_interval(1,256);
+  int realpath_len = Frama_C_interval(1,4096);
   if (! resolved_name) {
-    resolved_name = (char *)malloc((size_t)256);
+    resolved_name = (char *)malloc((size_t)4096);
     if (! resolved_name) {
       __fc_errno = 12;
       __retres = (char *)0;
@@ -8607,7 +8607,8 @@ int getopt(int argc, char * const *argv, char const *optstring)
   optarg = (char *)Frama_C_nondet_ptr((void *)0,
                                       (void *)(*(argv + nondet_ind) + nondet_indlen));
   optind = Frama_C_interval(1,argc + 1);
-  tmp_2 = Frama_C_unsigned_char_interval((unsigned char)0,(unsigned char)255);
+  tmp_2 = Frama_C_unsigned_char_interval((unsigned char)0,
+                                         (unsigned char)255U);
   tmp_3 = Frama_C_nondet(-1,(int)tmp_2);
   __retres = tmp_3;
   return_label: return __retres;
@@ -10210,7 +10211,7 @@ extern int iconv_close(iconv_t __x0);
  */
 extern iconv_t iconv_open(char const *tocode, char const *fromcode);
 
-extern char __fc_basename[256];
+extern char __fc_basename[4096];
 
 char *__fc_p_basename = __fc_basename;
 /*@ requires
@@ -10225,7 +10226,7 @@ char *__fc_p_basename = __fc_basename;
  */
 extern char *basename(char *path);
 
-extern char __fc_dirname[256];
+extern char __fc_dirname[4096];
 
 char *__fc_p_dirname = __fc_dirname;
 /*@ requires

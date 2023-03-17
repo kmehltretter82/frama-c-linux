@@ -32,7 +32,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   size_max ∈ {65535}
-  ssize_max ∈ {2147483647}
+  ssize_max ∈ {32767}
   intptr_max ∈ {2147483647}
   intptr_min ∈ {-2147483648}
   uintptr_max ∈ {4294967295}

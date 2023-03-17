@@ -44,8 +44,6 @@
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_inet.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_integer.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_libc.h (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/libc/__fc_machdep.h (with preprocessing)
-skipping FRAMAC_SHARE/libc/__fc_machdep_linux_shared.h
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_select.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_string_axiomatic.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/aio.h (with preprocessing)

@@ -66,6 +66,7 @@ let md = {
     "erange", "34";
   ];
   machdep_name = "machdep_char_unsigned";
+  custom_defs = "";
 }
 
 let () =

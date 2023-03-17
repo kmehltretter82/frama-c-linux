@@ -51,7 +51,7 @@ l_tmpnam: '255'
 tmp_max: '255'
 tty_name_max: '255'
 host_name_max: '255'
-path_max: '255'
+path_max: '256'
 rand_max: '0xFFFFFE'
 mb_cur_max: '16'
 sig_atomic_t: int
@@ -76,3 +76,5 @@ errno:
   enomem: "47"
   enotsup: "48"
 machdep_name: custom_machdep
+custom_defs: |
+  #define CUSTOM_MACHDEP 1

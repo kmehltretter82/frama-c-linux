@@ -408,6 +408,7 @@ type mach = Cil_types.mach = {
   nsig: string;
   errno: (string * string) list [@of_yaml yaml_dict_to_list];
   machdep_name: string;
+  custom_defs: string;
 }
 [@@deriving yaml]
 
