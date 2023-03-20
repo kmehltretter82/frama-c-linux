@@ -616,6 +616,7 @@ let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
 (* creates a new vertex for a lval, assuming it is not already present
    in the graph. If it is present, there will be bugs *)
 let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
+  assert (not (LLMap.mem blv x.lmap));
   match blv with
     BNone -> Options.fatal "this should not happen"
   | BLval lv ->
@@ -655,6 +656,7 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
       (* for any predecessor, find all its aliases and then look for potential existing vertex *)
       let f_fold_lmap lvx vx acc =
         let set_aliases = VMap.find vx x.vmap in
+        Format.printf "DEBUG: looking for aliases of %a in set %a@." Lval.pp_debug lv LSet.pp_debug set_aliases;
         if LSet.cardinal set_aliases > 1
         then
           let off = diff_offset lvx lv in
@@ -672,6 +674,7 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
         else
           acc
       in
+      (* set of all existing aliases *)
       let vset_res =
         LMap.fold
           f_fold_lmap
