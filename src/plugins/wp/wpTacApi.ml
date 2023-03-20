@@ -320,8 +320,9 @@ class configurator (tactic : Tactical.tactical) =
     val mutable title = tactic#title
     val mutable descr = tactic#descr
     val mutable error = None
-    val mutable isgui = false
     val mutable status = Tactical.Not_applicable
+    val mutable anchor : ProofEngine.node option = None
+    val mutable target = Tactical.Empty
 
     (* Basics *)
 
@@ -331,7 +332,8 @@ class configurator (tactic : Tactical.tactical) =
         title <- tactic#title ;
         descr <- tactic#descr ;
         error <- None ;
-        isgui <- false ;
+        anchor <- None ;
+        target <- Tactical.Empty ;
         List.iter (fun p -> p#reset) parameters ;
       end
 
@@ -342,9 +344,7 @@ class configurator (tactic : Tactical.tactical) =
     (* Feedback Interface *)
 
     method pool = Option.get local
-
-    method interactive = isgui
-
+    method interactive = true
     method has_error = error <> None
     method get_title = title
     method get_descr = descr
@@ -375,28 +375,51 @@ class configurator (tactic : Tactical.tactical) =
     (* Processing *)
 
     method status = status
-    method private select ~interactive pool selection =
+
+    method private select node pool selection =
       try
         local <- Some pool ;
         error <- None ;
         title <- tactic#title ;
         descr <- tactic#descr ;
-        isgui <- interactive ;
+        anchor <- Some node ;
+        target <- selection ;
         status <- tactic#select (self :> Tactical.feedback) selection ;
         local <- None ;
-        isgui <- false ;
       with exn ->
         local <- None ;
-        isgui <- false ;
         status <- Not_applicable ;
+        anchor <- None ;
+        target <- Tactical.Empty ;
         error <- Some (Printf.sprintf "Error (%s)" (Printexc.to_string exn));
-        raise exn
+        if not @@ Cmdline.catch_at_toplevel exn then raise exn
 
-    method configure ~interactive node selection =
+    method configure node selection =
       let tree = ProofEngine.tree node in
       let pool = ProofEngine.pool tree in
       let ctxt = ProofEngine.tree_context tree in
-      WpContext.on_context ctxt (self#select ~interactive pool) selection
+      WpContext.on_context ctxt (self#select node pool) selection
+
+    method private commit tree node process =
+      try
+        let jtactic = ProofScript.jtactic ~title tactic target in
+        let fork = ProofEngine.fork tree ~anchor:node jtactic process in
+        let children = snd @@ ProofEngine.commit fork in
+        List.map snd children
+      with exn ->
+        local <- None ;
+        anchor <- None ;
+        target <- Tactical.Empty ;
+        error <- Some (Printf.sprintf "Error (%s)" (Printexc.to_string exn));
+        if not @@ Cmdline.catch_at_toplevel exn then raise exn ; []
+
+    method apply =
+      match anchor, status with
+      | Some node, Applicable process ->
+        let tree = ProofEngine.tree node in
+        let ctxt = ProofEngine.tree_context tree in
+        WpContext.on_context ctxt (self#commit tree node) process
+      | _ -> []
 
   end
 
@@ -453,11 +476,8 @@ let () =
     configureTactics
     begin fun rq () ->
       let node = get_node rq in
-      (*TODO: use current selection or known script to configure *)
       let selection = WpTipApi.selection node in
-      iter (fun cfg ->
-          cfg#configure ~interactive:true node selection
-        ) ;
+      iter (fun cfg -> cfg#configure node selection) ;
       S.reload tactics ;
     end
 
@@ -487,8 +507,25 @@ let () =
       let prm = cfg#lookup ~pid in
       let selection = WpTipApi.selection node in
       prm#import (get_value rq) ;
-      cfg#configure ~interactive:true node selection ;
+      cfg#configure node selection ;
       S.update tactics cfg ;
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Applying Tactic                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () = R.register
+    ~package ~kind:`EXEC
+    ~name:"applyTactic"
+    ~descr:(Md.plain "Applies the (configured) tactic")
+    ~input:(module Jtactic)
+    ~output:(module D.Jlist(WpTipApi.Node))
+    begin fun tactic ->
+      let cfg = configurator tactic in
+      let children = cfg#apply in
+      S.update tactics cfg ;
+      children
     end
 
 (* -------------------------------------------------------------------------- *)

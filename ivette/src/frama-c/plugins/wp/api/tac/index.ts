@@ -295,4 +295,20 @@ export const setParameter: Server.ExecRequest<
   null
   >= setParameter_internal;
 
+const applyTactic_internal: Server.ExecRequest<
+  Json.key<'#tactic'>,
+  Json.index<'#node'>[]
+  > = {
+  kind: Server.RqKind.EXEC,
+  name:   'plugins.wp.tac.applyTactic',
+  input:  Json.jKey<'#tactic'>('#tactic'),
+  output: Json.jArray(Json.jIndex<'#node'>('#node')),
+  signals: [],
+};
+/** Applies the (configured) tactic */
+export const applyTactic: Server.ExecRequest<
+  Json.key<'#tactic'>,
+  Json.index<'#node'>[]
+  >= applyTactic_internal;
+
 /* ------------------------------------- */
