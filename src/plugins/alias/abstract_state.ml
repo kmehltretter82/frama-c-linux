@@ -1226,8 +1226,6 @@ let shift (a : t) (offset : int) : t =
   assert_state_transformation a @@ fun a ->
   (* maybe if offset < #vertices there will be a problem? *)
   let offset = max offset @@ G.nb_vertex a.graph in
-  Format.printf "BEGIN DEBUG shift@.";
-  Format.printf "Input:@.%a@." print_debug a;
   let shift x = x + offset in
   let shift_vmap shift_elem vmap =
     VMap.of_seq @@ Stdlib.Seq.map shift_elem @@ VMap.to_seq vmap
@@ -1237,16 +1235,11 @@ let shift (a : t) (offset : int) : t =
     let shift_elem (key, set) = (shift key, VSet.map shift set) in
     shift_vmap shift_elem pending
   in
-  let result =
-    {graph = G.map_vertex shift graph;
-     pending = pending';
-     lmap = LLMap.map shift lmap;
-     vmap = shift_vmap (fun (key, l) -> (shift key, l)) vmap;
-     cmpt = shift cmpt}
-  in
-  Format.printf "Output:@.%a@." print_debug result;
-  Format.printf "END DEBUG shift@.";
-  result
+  {graph = G.map_vertex shift graph;
+   pending = pending';
+   lmap = LLMap.map shift lmap;
+   vmap = shift_vmap (fun (key, l) -> (shift key, l)) vmap;
+   cmpt = shift cmpt}
 
 let union  (a1:t) (a2:t) :t =
   (* naive algorithm :
