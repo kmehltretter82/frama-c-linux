@@ -38,54 +38,66 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
+import { byFct } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { fct } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { fctDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { jFct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { marker } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { markerDefault } from 'frama-c/kernel/api/ast';
 
 /** Statements that read or write a location. */
 export interface effects {
   /** List of statements with direct effect. */
-  direct: [ Json.key<'#fct'>, marker ][];
+  direct: [ fct, marker ][];
   /** List of statements with indirect effect. */
-  indirect: [ Json.key<'#fct'>, marker ][];
+  indirect: [ fct, marker ][];
 }
 
 /** Decoder for `effects` */
 export const jEffects: Json.Decoder<effects> =
   Json.jObject({
-    direct: Json.jArray(Json.jPair( Json.jKey<'#fct'>('#fct'), jMarker,)),
-    indirect: Json.jArray(Json.jPair( Json.jKey<'#fct'>('#fct'), jMarker,)),
+    direct: Json.jArray(Json.jPair( jFct, jMarker,)),
+    indirect: Json.jArray(Json.jPair( jFct, jMarker,)),
   });
 
 /** Natural order for `effects` */
 export const byEffects: Compare.Order<effects> =
   Compare.byFields
-    <{ direct: [ Json.key<'#fct'>, marker ][],
-       indirect: [ Json.key<'#fct'>, marker ][] }>({
-    direct: Compare.array(Compare.pair(Compare.string,byMarker,)),
-    indirect: Compare.array(Compare.pair(Compare.string,byMarker,)),
+    <{ direct: [ fct, marker ][], indirect: [ fct, marker ][] }>({
+    direct: Compare.array(Compare.pair(byFct,byMarker,)),
+    indirect: Compare.array(Compare.pair(byFct,byMarker,)),
   });
 
-const getReadsLval_internal: Server.GetRequest<Json.key<'#lval'>,effects> = {
+/** Default value for `effects` */
+export const effectsDefault: effects = { direct: [], indirect: [] };
+
+const getReadsLval_internal: Server.GetRequest<marker,effects> = {
   kind: Server.RqKind.GET,
   name:   'plugins.studia.studia.getReadsLval',
-  input:  Json.jKey<'#lval'>('#lval'),
+  input:  jMarker,
   output: jEffects,
   signals: [],
 };
 /** Get the list of statements that read a lval. */
-export const getReadsLval: Server.GetRequest<Json.key<'#lval'>,effects>= getReadsLval_internal;
+export const getReadsLval: Server.GetRequest<marker,effects>= getReadsLval_internal;
 
-const getWritesLval_internal: Server.GetRequest<Json.key<'#lval'>,effects> = {
+const getWritesLval_internal: Server.GetRequest<marker,effects> = {
   kind: Server.RqKind.GET,
   name:   'plugins.studia.studia.getWritesLval',
-  input:  Json.jKey<'#lval'>('#lval'),
+  input:  jMarker,
   output: jEffects,
   signals: [],
 };
 /** Get the list of statements that write a lval. */
-export const getWritesLval: Server.GetRequest<Json.key<'#lval'>,effects>= getWritesLval_internal;
+export const getWritesLval: Server.GetRequest<marker,effects>= getWritesLval_internal;
 
 /* ------------------------------------- */

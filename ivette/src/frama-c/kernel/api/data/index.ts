@@ -47,6 +47,9 @@ export const jMarkdown: Json.Decoder<markdown> = Json.jString;
 /** Natural order for `markdown` */
 export const byMarkdown: Compare.Order<markdown> = Compare.string;
 
+/** Default value for `markdown` */
+export const markdownDefault: markdown = '';
+
 /** Rich text format uses `[tag; …text ]` to apply the tag `tag` to the enclosed text. Empty tag `""` can also used to simply group text together. */
 export type text = null | string | text[];
 
@@ -61,6 +64,9 @@ export const jText: Json.Decoder<text> =
 /** Natural order for `text` */
 export const byText: Compare.Order<text> =
   (_x: any, _y: any) => Compare.structural(_x,_y);
+
+/** Default value for `text` */
+export const textDefault: text = null;
 
 /** Enum Tag Description */
 export type tag = { name: string, label: markdown, descr: markdown };
@@ -77,5 +83,9 @@ export const byTag: Compare.Order<tag> =
     label: byMarkdown,
     descr: byMarkdown,
   });
+
+/** Default value for `tag` */
+export const tagDefault: tag =
+  { name: '', label: markdownDefault, descr: markdownDefault };
 
 /* ------------------------------------- */

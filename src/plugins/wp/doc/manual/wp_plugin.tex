@@ -129,8 +129,8 @@ The general structure of the panel is illustrated figure~\ref{wp-tip-run}. The c
 \verb+Have:+& formula from an assertion or an instruction in the code;\\
 \verb+When:+& condition from a simplification performed by \textsf{Qed};\\
 \verb+If:+& structured hypothesis from a conditional statement;\\
-\verb+Either:+& structured disjunction from a switch statement.\\
-\verb+Stmt:+& labels and C-like instructions representing the memory updates during code execution;\\
+\verb+Either:+& structured disjunction from a switch statement;\\
+\verb+Stmt:+& labels and C-like instructions representing memory updates in executions.\\
 \end{tabular}
 \end{quote}
 
@@ -718,7 +718,8 @@ access to the API. A custom strategy must be an instance of class-type \lstinlin
 
 The actual heuristic code takes place in method \lstinline$#search$ which has the following type (consult the html API for details):
 \begin{lstlisting}[language=ocaml]
-    method search : (Strategy.strategy -> unit) -> Conditions.sequent -> unit
+method search :
+  (Strategy.strategy -> unit) -> Conditions.sequent -> unit
 \end{lstlisting}
 
 This method takes two parameters: a strategy registration callback and the sequent to prove. Each heuristic
@@ -732,8 +733,9 @@ we decide to register a split tactic, thanks to the helper function \lstinline$A
 
 \paragraph{Using Selections.} Tactics always need a \lstinline$selection$ target. Moreover, some tactics require additional parameters, also to be provided as \lstinline$selection$ values. Typically, consider the \lstinline$Auto.range$ tactic:
 
-\begin{lstlisting}{language=ocaml}
-   val Auto.range : ?priority:float -> selection -> vmin:int -> vmax:int -> strategy
+\begin{lstlisting}[language=ocaml]
+val Auto.range :
+  ?priority:float -> selection -> vmin:int -> vmax:int -> strategy
 \end{lstlisting}
 
 Here the selection argument shall targets the expression to be enumerated in range \lstinline$vmin..vmax$.
@@ -744,10 +746,14 @@ how to rebuild this term from the sequent. Hence, if the \textsf{C}-code or the 
 Selections are easy to build. There are five basic forms, as described below:
 \begin{lstlisting}[language=ocaml]
    type Tactical.selection =
-     | Empty (** no selection *)
-     | Clause of clause (** selects a full hypothesis or the full goal *)
-     | Inside of clause * Lang.F.term (** selects a sub-term of a hypothesis or goal *)
-     | Compose of compose (** a calculus from several sub-selections *)
+     | Empty
+       (** no selection *)
+     | Clause of clause
+       (** selects a full hypothesis or the full goal *)
+     | Inside of clause * Lang.F.term
+       (** selects a sub-term of a hypothesis or goal *)
+     | Compose of compose
+       (** a calculus from several sub-selections *)
    and Tactical.clause =
      | Goal of Lang.F.pred
      | Step of Conditions.step
@@ -755,16 +761,22 @@ Selections are easy to build. There are five basic forms, as described below:
 
 It is also possible to build selections from sequent by explicit lookup:
 \begin{lstlisting}[language=ocaml]
-   val Strategy.select_e : Conditions.sequent -> Lang.F.term -> Tactical.selection
-   val Strategy.select_p : Conditions.sequent -> Lang.F.pred -> Tactical.selection
+   val Strategy.select_e :
+     Conditions.sequent -> Lang.F.term -> Tactical.selection
+   val Strategy.select_p :
+     Conditions.sequent -> Lang.F.pred -> Tactical.selection
 \end{lstlisting}
 
 Composition allows you to build new terms from existing ones, like when using the term composer from the graphical user interface. You access composers by their name, like in the term composer. The API for building new terms is as follows:
 \begin{lstlisting}[language=ocaml]
-   val Tactical.int : int -> Tactical.selection
-   val Tactical.cint : Integer.t -> Tactical.selection
-   val Tactical.range : int -> int -> Tactical.selection
-   val Tactical.compose : string -> Tactical.selection list -> Tactical.selection
+   val Tactical.int :
+     int -> Tactical.selection
+   val Tactical.cint :
+     Integer.t -> Tactical.selection
+   val Tactical.range :
+     int -> int -> Tactical.selection
+   val Tactical.compose :
+     string -> Tactical.selection list -> Tactical.selection
 \end{lstlisting}
 
 For instance, provided you have two selected terms \lstinline$a$ and \lstinline$b$, you can build their sum using
@@ -780,13 +792,13 @@ sequence of hypothesis, and a goal to prove. Each hypothesis is represented by a
    and  sequence = .... step list ... (* private type *)
    and  step = { condition : condition ; ... }
    and  condition =
-           | Have of Lang.F.pred (** hypothesis *)
-           | Init of Lang.F.pred (** C-initializer initialization clause *)
-           | Type of Lang.F.pred (** C/ACSL type constraints *)
-           | Core of Lang.F.pred (** Common hypothesis factorization from WP *)
-           | When of Lang.F.pred (** hypothesis from tactical or simplification *)
-           | Branch of Lang.F.pred * sequence * sequence (** If-Then-Else *)
-           | Either of sequence list (** Disjunction of Cases *)
+     | Have of Lang.F.pred (** Hypothesis *)
+     | Init of Lang.F.pred (** C-initializer initialization clause *)
+     | Type of Lang.F.pred (** C/ACSL type constraints *)
+     | Core of Lang.F.pred (** Common hypothesis factorization from WP *)
+     | When of Lang.F.pred (** Hypothesis (tactical or simplification) *)
+     | Branch of Lang.F.pred * sequence * sequence (** If-Then-Else *)
+     | Either of sequence list (** Disjunction of Cases *)
    val iter : (step -> unit) -> sequence -> unit
 \end{lstlisting}
 
@@ -1051,7 +1063,7 @@ each provided function.
 
 For example:
 
-\begin{lstlisting}[language=c, alsolanguage=acsl]
+\begin{lstlisting}[style=c]
 /*@ ensures \result == x ; */
 int f1(int x);
 /*@ ensures \result == x+1 ; */
@@ -1075,7 +1087,7 @@ site: one must prove that \verb+fp+ is either \verb+f1+ or \verb+f2+.
 In ACSL, a function can be specified to terminate when some condition \verb+P+ holds
 in pre-condition.
 
-\begin{lstlisting}[language=c, alsolanguage=acsl]
+\begin{lstlisting}[style=c]
 /*@ terminates P ; */
 void function(void){
   ...
@@ -1090,7 +1102,7 @@ is generated for termination. However, if \verb+-wp-variant-with-terminates+ is
 active, the variant is verified only when \verb+P+ holds in pre-condition.
 Intuitively, this option means that variant has to decrease only if the function has to terminate. For example:
 
-\begin{lstlisting}[language=c, alsolanguage=acsl]
+\begin{lstlisting}[style=c]
 //@ terminates i >= 0 ;
 void positive(int i){
   /*@ loop invariant \at(i, Pre) >= 0 ==> 0 <= i <= \at(i, Pre) ;
@@ -1108,7 +1120,7 @@ When a loop does not have a variant, WP checks that the loop is unreachable
 when \verb+P+ holds in precondition, which means that a loop is allowed to not
 terminate when the function does not have to terminate. For example:
 
-\begin{lstlisting}[language=c, alsolanguage=acsl]
+\begin{lstlisting}[style=c]
 //@ terminates i >= 0 ;
 void function(int i){
   if(i < 0){
@@ -1125,7 +1137,7 @@ prove that \verb+P@pre ==> Q@call-point+. Indeed, for \verb+f+ to terminates whi
 means that if the function under verification shall terminate, any call to a
 non-terminating function shall be unreachable. For example:
 
-\begin{lstlisting}[language=c, alsolanguage=acsl]
+\begin{lstlisting}[style=c]
 //@ terminates i <= 0 ;
 void f(int i) ;
 
@@ -1352,7 +1364,7 @@ See \texttt{-wp-interactive <mode>} option for details.
   session directory.
 \item[\tt -wp-finalize-scripts] remove untracked scripts according to the
   tracking directory if it does exist (does not remove anything otherwise).
-\item[]\tt -wp-dry-finalize-scripts] scripts that might be removed by
+\item[\tt -wp-dry-finalize-scripts] scripts that might be removed by
   \verb+-wp-finalize-scripts+ are kept, a message is printed instead for each
   file. The marks directory is kept.
 \end{description}

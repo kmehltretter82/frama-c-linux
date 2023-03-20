@@ -31,7 +31,7 @@ module CSet = CS.Set
 module CSmap = CS.Hashtbl
 
 module Md = Markdown
-module Jkf = Kernel_ast.Kf
+module Jfct = Kernel_ast.Function
 module Jstmt = Kernel_ast.Stmt
 module Jmarker = Kernel_ast.Marker
 
@@ -208,8 +208,8 @@ module Jcalls : Request.Output with type t = callstack = struct
   type t = callstack
 
   let jtype = Package.(Jarray (Jrecord [
-      "callee" , Jkf.jtype ;
-      "caller" , Joption Jkf.jtype ;
+      "callee" , Jfct.jtype ;
+      "caller" , Joption Jfct.jtype ;
       "stmt" , Joption Jstmt.jtype ;
       "rank" , Joption Jnumber ;
     ]))
@@ -218,7 +218,7 @@ module Jcalls : Request.Output with type t = callstack = struct
     match ki , cs with
     | Kglobal , _ | _ , [] -> [ `Assoc [ "callee", jcallee ] ]
     | Kstmt stmt , (called,ki) :: cs ->
-      let jcaller = Jkf.to_json called in
+      let jcaller = Jfct.to_json called in
       let callsite = `Assoc [
           "callee", jcallee ;
           "caller", jcaller ;
@@ -230,7 +230,7 @@ module Jcalls : Request.Output with type t = callstack = struct
 
   let to_json = function
     | [] -> `List []
-    | (callee,ki)::cs -> `List (jcallstack (Jkf.to_json callee) ki cs)
+    | (callee,ki)::cs -> `List (jcallstack (Jfct.to_json callee) ki cs)
 
 end
 
@@ -511,7 +511,7 @@ let () =
   let getStmtInfo = Request.signature ~input:(module Jstmt) () in
   let set_fct = Request.result getStmtInfo ~name:"fct"
       ~descr:(Md.plain "Englobing function")
-      (module Jkf)
+      (module Jfct)
   and set_rank = Request.result getStmtInfo ~name:"rank"
       ~descr:(Md.plain "Global stmt order")
       (module Jint)

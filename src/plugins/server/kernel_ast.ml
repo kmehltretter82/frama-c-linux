@@ -93,92 +93,41 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
-(* ---  Printers                                                          --- *)
+(* --- Functions                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-(* The kind of a marker. *)
-module MarkerKind = struct
+let jFunction = Data.declare ~package ~name:"fct"
+    ~descr:(Md.plain "Function names")
+    (Pkg.Jkey "fct")
 
-  let kinds = Enum.dictionary ()
-
-  let kind name =
-    Enum.tag
-      ~name
-      ~descr:(Md.plain (String.capitalize_ascii name))
-      kinds
-
-  let expr = kind "expression"
-  let lval = kind "lvalue"
-  let decl = kind "declaration"
-  let stmt = kind "statement"
-  let glob = kind "global"
-  let term = kind "term"
-  let prop = kind "property"
-  let typ = kind "type"
-
-  let () =
-    Enum.set_lookup
-      kinds
-      (fun localizable ->
-         let open Printer_tag in
-         match localizable with
-         | PStmt _ -> stmt
-         | PStmtStart _ -> stmt
-         | PVDecl _ -> decl
-         | PLval _ -> lval
-         | PExp _ -> expr
-         | PTermLval _ -> term
-         | PGlobal _ -> glob
-         | PIP _ -> prop
-         | PType _ -> typ)
-
-  let data =
-    Request.dictionary
-      ~package
-      ~name:"markerKind"
-      ~descr:(Md.plain "Marker kind")
-      kinds
-
-  include (val data : S with type t = Printer_tag.localizable)
+module Function =
+struct
+  type t = kernel_function
+  let jtype = jFunction
+  let to_json kf =
+    `String (Kernel_function.get_name kf)
+  let of_json js =
+    let fn = Js.to_string js in
+    try Globals.Functions.find_by_name fn
+    with Not_found -> Data.failure "Undefined function '%s'" fn
 end
 
-module MarkerVar = struct
-
-  let vars = Enum.dictionary ()
-
-  let kind name =
-    Enum.tag
-      ~name
-      ~descr:(Md.plain (String.capitalize_ascii name))
-      vars
-
-  let none = kind "none"
-  let var = kind "variable"
-  let fct = kind "function"
-
-  let () =
-    Enum.set_lookup
-      vars
-      (fun localizable ->
-         let open Printer_tag in
-         match localizable with
-         | PLval (_, _, (Var vi, NoOffset))
-         | PVDecl (_, _, vi)
-         | PGlobal (GVar (vi, _, _)  | GVarDecl (vi, _)) ->
-           if Cil.isFunctionType vi.vtype then fct else var
-         | PGlobal (GFun _ | GFunDecl _) -> fct
-         | PLval _ | PStmt _ | PStmtStart _
-         | PExp _ | PTermLval _ | PGlobal _ | PIP _ | PType _ -> none)
-
-  let data =
-    Request.dictionary
-      ~package
-      ~name:"markerVar"
-      ~descr:(Md.plain "Marker variable")
-      vars
-
-  include (val data : S with type t = Printer_tag.localizable)
+module Fundec =
+struct
+  type t = fundec
+  let jtype = jFunction
+  let to_json fundec =
+    `String fundec.svar.vname
+  let of_json js =
+    let fn = Js.to_string js in
+    try Kernel_function.get_definition (Globals.Functions.find_by_name fn)
+    with Not_found | Kernel_function.No_Definition ->
+      Data.failure "Undefined function definition '%s'" fn
 end
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Printers                                                          --- *)
+(* -------------------------------------------------------------------------- *)
 
 module Marker =
 struct
@@ -217,66 +166,6 @@ struct
   let iter f =
     Localizable.Hashtbl.iter (fun key str -> f (key, str)) (STATE.get ()).tags
 
-  let array =
-    let model = States.model () in
-    let () =
-      States.column
-        ~name:"kind"
-        ~descr:(Md.plain "Marker kind")
-        ~data:(module MarkerKind)
-        ~get:fst
-        model
-    in
-    let () =
-      States.column
-        ~name:"var"
-        ~descr:(Md.plain "Marker variable")
-        ~data:(module MarkerVar)
-        ~get:fst
-        model
-    in
-    let () =
-      States.column
-        ~name:"name"
-        ~descr:(Md.plain "Marker short name")
-        ~data:(module Jalpha)
-        ~get:(fun (tag, _) -> Printer_tag.label tag)
-        model
-    in
-    let () =
-      States.column
-        ~name:"descr"
-        ~descr:(Md.plain "Marker declaration or description")
-        ~data:(module Jstring)
-        ~get:(fun (tag, _) -> Rich_text.to_string Printer_tag.pretty tag)
-        model
-    in
-    let () =
-      States.option
-        ~name:"scope"
-        ~descr:(Md.plain "Function scope of the marker, if applicable")
-        ~data:(module Jstring)
-        ~get:(fun (tag, _) ->
-            Option.map Kernel_function.get_name @@
-            Printer_tag.kf_of_localizable tag)
-        model
-    in
-    let () =
-      States.column
-        ~name:"sloc"
-        ~descr:(Md.plain "Source location")
-        ~data:(module Position)
-        ~get:(fun (tag, _) -> fst (Printer_tag.loc_of_localizable tag))
-        model
-    in
-    States.register_array
-      ~package
-      ~name:"markerInfo"
-      ~descr:(Md.plain "Marker information")
-      ~key:snd ~keyType:Jstring
-      ~iter ~add_reload_hook:ast_update_hook
-      model
-
   let create_tag = function
     | PStmt(_,s) -> Printf.sprintf "#s%d" s.sid
     | PStmtStart(_,s) -> Printf.sprintf "#k%d" s.sid
@@ -288,40 +177,29 @@ struct
     | PIP _ -> Printf.sprintf "#p%d" (incr kid ; !kid)
     | PType _ -> Printf.sprintf "#y%d" (incr kid ; !kid)
 
-  let create loc =
+  let hooks = ref []
+  let hook f = hooks := !hooks @ [f]
+
+  let tag loc =
     let { tags ; locs } = STATE.get () in
     try Localizable.Hashtbl.find tags loc
     with Not_found ->
       let tag = create_tag loc in
       Localizable.Hashtbl.add tags loc tag ;
       Hashtbl.add locs tag loc ;
-      States.update array (loc, tag);
-      tag
+      List.iter (fun fn -> fn (loc,tag)) !hooks ; tag
 
-  let lookup tag = Hashtbl.find (STATE.get()).locs tag
+  let find tag = Hashtbl.find (STATE.get()).locs tag
 
   type t = localizable
 
-  let markers = ref []
-  let jmarker kd =
-    let jt = Pkg.Jkey kd in markers := jt :: !markers ; jt
-
-  let jstmt = jmarker "stmt"
-  let jdecl = jmarker "decl"
-  let jlval = jmarker "lval"
-  let jexpr = jmarker "expr"
-  let jterm = jmarker "term"
-  let jglobal = jmarker "global"
-  let jproperty = jmarker "property"
-  let jtyp = jmarker "type"
-
   let jtype = Data.declare ~package ~name:"marker"
       ~descr:(Md.plain "Localizable AST markers")
-      Pkg.(Junion (List.rev !markers))
+      (Pkg.Jkey "marker")
 
-  let to_json loc = `String (create loc)
+  let to_json loc = `String (tag loc)
   let of_json js =
-    try lookup (Js.to_string js)
+    try find (Js.to_string js)
     with Not_found -> Data.failure "not a localizable marker"
 
 end
@@ -334,30 +212,39 @@ module Printer = Printer_tag.Make(Marker)
 
 module Lval =
 struct
+  open Printer_tag
+
   type t = kinstr * lval
-  let jtype = Marker.jlval
+  let jtype = Marker.jtype
+
   let to_json (kinstr, lval) =
     let kf = match kinstr with
       | Kglobal -> None
       | Kstmt stmt -> Some (Kernel_function.find_englobing_kf stmt)
     in
     Marker.to_json (PLval (kf, kinstr, lval))
-  let of_json js =
-    let open Printer_tag in
-    match Marker.of_json js with
+
+  let find = function
     | PLval (_, kinstr, lval) -> kinstr, lval
     | PVDecl (_, kinstr, vi) -> kinstr, Cil.var vi
     | PGlobal (GVar (vi, _, _) | GVarDecl (vi, _)) -> Kglobal, Cil.var vi
-    | _ -> Data.failure "not a lval marker"
+    | _ -> raise Not_found
+
+  let mem tag = try let _ = find tag in true with Not_found -> false
+
+  let of_json js =
+    try find (Marker.of_json js)
+    with Not_found -> Data.failure "not a lval marker"
+
 end
 
 module Stmt =
 struct
   type t = stmt
-  let jtype = Marker.jstmt
+  let jtype = Marker.jtype
   let to_json st =
     let kf = Kernel_function.find_englobing_kf st in
-    Marker.to_json (PStmt(kf,st))
+    Marker.to_json (PStmtStart(kf,st))
   let of_json js =
     let open Printer_tag in
     match Marker.of_json js with
@@ -365,10 +252,10 @@ struct
     | _ -> Data.failure "not a stmt marker"
 end
 
-module Ki =
+module Kinstr =
 struct
   type t = kinstr
-  let jtype = Pkg.Joption Marker.jstmt
+  let jtype = Pkg.Joption Marker.jtype
   let to_json = function
     | Kglobal -> `Null
     | Kstmt st -> Stmt.to_json st
@@ -377,57 +264,156 @@ struct
     | js -> Kstmt (Stmt.of_json js)
 end
 
-module Kf =
+(* -------------------------------------------------------------------------- *)
+(* --- Record for (Kf * Marker)                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Location =
 struct
-  type t = kernel_function
-  let jtype = Pkg.Jkey "fct"
-  let to_json kf =
-    `String (Kernel_function.get_name kf)
+  type t = Function.t * Marker.t
+  let jtype = Data.declare
+      ~package ~name:"location"
+      ~descr:(Md.plain "Location: function and marker")
+      (Jrecord ["fct", Function.jtype; "marker", Marker.jtype])
+  let to_json (kf, loc) = `Assoc [
+      "fct", Function.to_json kf ;
+      "marker", Marker.to_json loc ;
+    ]
   let of_json js =
-    let key = Js.to_string js in
-    try Globals.Functions.find_by_name key
-    with Not_found -> Data.failure "Undefined function '%s'" key
+    Json.field "fct" js |> Function.of_json,
+    Json.field "marker" js |> Marker.of_json
 end
 
-module Fundec =
+(* -------------------------------------------------------------------------- *)
+(* --- Marker Attributes                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Attributes =
 struct
-  type t = fundec
-  let jtype = Pkg.Jkey "fundec"
-  let to_json fundec =
-    `String fundec.svar.vname
-  let of_json js =
-    let key = Js.to_string js in
-    try Kernel_function.get_definition (Globals.Functions.find_by_name key)
-    with Not_found | Kernel_function.No_Definition ->
-      Data.failure "Undefined function definition '%s'" key
-end
+  open Printer_tag
 
-module KfMarker = struct
-  type record
-  let record : record Record.signature = Record.signature ()
+  let descr ~short m =
+    match varinfo_of_localizable m with
+    | Some vi ->
+      if Globals.Functions.mem vi then "Function" else
+      if vi.vglob then
+        if short then "Global" else "Global Variable"
+      else if vi.vformal then
+        if short then "Formal" else "Formal Parameter"
+      else if vi.vtemp then
+        if short then "Temp" else "Temporary Variable (generated)"
+      else
+      if short then "Local" else "Local Variable"
+    | None ->
+      match m with
+      | PStmt _ | PStmtStart _ -> if short then "Stmt" else "Statement"
+      | PLval _ -> if short then "Lval" else "L-value"
+      | PTermLval _ -> if short then "Lval" else "ACSL L-value"
+      | PVDecl _ -> assert false
+      | PExp _ -> if short then "Expr" else "Expression"
+      | PIP _ -> if short then "Prop" else "Property"
+      | PGlobal _ -> if short then "Decl" else "Declaration"
+      | PType _ -> "Type"
 
-  let fct = Record.field record ~name:"fct"
-      ~descr:(Md.plain "Function") (module Kf)
-  let marker = Record.field record ~name:"marker"
-      ~descr:(Md.plain "Marker") (module Marker)
+  let is_function tag =
+    match varinfo_of_localizable tag with
+    | Some vi -> Globals.Functions.mem vi
+    | None -> false
 
-  let data =
-    Record.publish ~package ~name:"location"
-      ~descr:(Md.plain "Location: function and marker") record
+  let is_fundecl = function
+    | PVDecl(Some _,Kglobal,vi) -> vi.vglob && Globals.Functions.mem vi
+    | _ -> false
 
-  module R : Record.S with type r = record = (val data)
-  type t = kernel_function * Printer_tag.localizable
-  let jtype = R.jtype
+  let scope tag =
+    Option.map Kernel_function.get_name @@ Printer_tag.kf_of_localizable tag
 
-  let to_json (kf, loc) =
-    R.default |>
-    R.set fct kf |>
-    R.set marker loc |>
-    R.to_json
+  let model = States.model ()
 
-  let of_json json =
-    let r = R.of_json json in
-    R.get fct r, R.get marker r
+  let () =
+    States.column
+      ~name:"labelKind"
+      ~descr:(Md.plain "Marker kind (short)")
+      ~data:(module Jalpha)
+      ~get:(fun (tag,_) -> descr ~short:true tag)
+      model
+
+  let () =
+    States.column
+      ~name:"titleKind"
+      ~descr:(Md.plain "Marker kind (long)")
+      ~data:(module Jalpha)
+      ~get:(fun (tag,_) -> descr ~short:false tag)
+      model
+
+  let () =
+    States.column
+      ~name:"name"
+      ~descr:(Md.plain "Marker short name  or identifier when relevant.")
+      ~data:(module Jalpha)
+      ~get:(fun (tag, _) -> Printer_tag.label tag)
+      model
+
+  let () =
+    States.column
+      ~name:"descr"
+      ~descr:(Md.plain "Marker declaration or description")
+      ~data:(module Jstring)
+      ~get:(fun (tag, _) -> Rich_text.to_string Printer_tag.pretty tag)
+      model
+
+  let () =
+    States.column
+      ~name:"isLval"
+      ~descr:(Md.plain "Whether it is an l-value")
+      ~data:(module Jbool)
+      ~get:(fun (tag, _) -> Lval.mem tag)
+      model
+
+  let () =
+    States.column
+      ~name:"isFunction"
+      ~descr:(Md.plain "Whether it is a function symbol")
+      ~data:(module Jbool)
+      ~get:(fun (tag, _) -> is_function tag)
+      model
+
+  let () =
+    States.column
+      ~name:"isFunDecl"
+      ~descr:(Md.plain "Whether it is a function declaration")
+      ~data:(module Jbool)
+      ~get:(fun (tag, _) -> is_fundecl tag)
+      model
+
+  let () =
+    States.option
+      ~name:"scope"
+      ~descr:(Md.plain "Function scope of the marker, if applicable")
+      ~data:(module Jstring)
+      ~get:(fun (tag, _) -> scope tag)
+      model
+
+  let () =
+    States.column
+      ~name:"sloc"
+      ~descr:(Md.plain "Source location")
+      ~data:(module Position)
+      ~get:(fun (tag, _) -> fst (Printer_tag.loc_of_localizable tag))
+      model
+
+  let array = States.register_array
+      ~package
+      ~name:"markerAttributes"
+      ~descr:(Md.plain "Marker attributes")
+      ~key:snd
+      ~keyName:"marker"
+      ~keyType:Marker.jtype
+      ~iter:Marker.iter
+      ~add_reload_hook:ast_update_hook
+      model
+
+  let () = Marker.hook (States.update array)
+
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -437,7 +423,7 @@ end
 let () = Request.register ~package
     ~kind:`GET ~name:"getMainFunction"
     ~descr:(Md.plain "Get the current 'main' function.")
-    ~input:(module Junit) ~output:(module Joption (Kf))
+    ~input:(module Junit) ~output:(module Joption(Function))
     begin fun () ->
       try Some (fst (Globals.entry_point ()))
       with Globals.No_such_entry_point _ -> None
@@ -446,7 +432,7 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`GET ~name:"getFunctions"
     ~descr:(Md.plain "Collect all functions in the AST")
-    ~input:(module Junit) ~output:(module Jlist(Kf))
+    ~input:(module Junit) ~output:(module Jlist(Function))
     begin fun () ->
       let pool = ref [] in
       Globals.Functions.iter (fun kf -> pool := kf :: !pool) ;
@@ -456,7 +442,7 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`GET ~name:"printFunction"
     ~descr:(Md.plain "Print the AST of a function")
-    ~input:(module Kf) ~output:(module Jtext)
+    ~input:(module Function) ~output:(module Jtext)
     begin fun kf ->
       let libc = Kernel.PrintLibc.get () in
       try
@@ -783,7 +769,7 @@ let () =
   Request.register
     ~package ~descr ~kind:`GET ~name:"getMarkerAt"
     ~input:(module Jtriple (Jstring) (Jint) (Jint))
-    ~output:(module Jpair (Joption (Kf)) (Joption (Marker)))
+    ~output:(module Jpair (Joption (Function)) (Joption (Marker)))
     get_kf_marker
 
 (* -------------------------------------------------------------------------- *)
@@ -818,68 +804,43 @@ let () =
     set_files
 
 (* -------------------------------------------------------------------------- *)
-(* ----- Build a marker from an ACSL term ----------------------------------- *)
+(* --- Build a marker from an ACSL term                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-type marker_term_input = { atStmt : stmt ; term : string }
-
-module MarkerTermInput = struct
-  type record
-  let record : record Record.signature = Record.signature ()
-
-  let atStmt =
-    let descr = "The statement at which we will build the marker." in
-    Record.field record ~name:"atStmt" ~descr:(Markdown.plain descr)
-      (module Marker)
-
-  let term =
-    let descr = "The ACSL term." in
-    Record.field record ~name:"term" ~descr:(Markdown.plain descr)
-      (module Data.Jstring)
-
-  let data =
-    Record.publish record ~package ~name:"markerFromTermInput"
-      ~descr:(Markdown.plain "<markerFromTerm> input")
-
-  module R : Record.S with type r = record = (val data)
-  type t = marker_term_input option
-  let jtype = R.jtype
-
-  let of_json js =
-    let record = R.of_json js in
-    match R.get atStmt record with
-    | PStmt (_, s) | PStmtStart (_, s)
-    | PLval (_, Kstmt s, _) | PExp (_, Kstmt s, _)
-    | PTermLval (_, Kstmt s, _, _)
-    | PVDecl (_, Kstmt s, _) ->
-      let term = R.get term record in
-      Some { atStmt = s ; term }
-    | _ -> None
-
-end
-
-module MarkerTermOutput = Data.Joption (Marker)
-
-let build_marker input =
+let build_marker ~stmt ~term =
   let env =
     let open Logic_typing in
     Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
   in
   try
-    let kf = Kernel_function.find_englobing_kf input.atStmt in
-    let term = Logic_parse_string.term ~env kf input.term in
+    let kf = Kernel_function.find_englobing_kf stmt in
+    let term = Logic_parse_string.term ~env kf term in
     let exp = Logic_to_c.term_to_exp term in
-    Some (Printer_tag.PExp (Some kf, Kstmt input.atStmt, exp))
+    Some (Printer_tag.PExp (Some kf, Kstmt stmt, exp))
   with Not_found
      | Logic_parse_string.Error _
      | Logic_parse_string.Unbound _
      | Logic_to_c.No_conversion -> None (* TODO: return an error message. *)
 
-let descr = "Build a marker from an ACSL term."
+let () =
+  let module Md = Markdown in
+  let s = Request.signature ~output:(module Marker) () in
+  let get_marker = Request.param s ~name:"stmt"
+      ~descr:(Md.plain "Marker position from where to localize the term")
+      (module Marker) in
+  let get_term = Request.param s ~name:"term"
+      ~descr:(Md.plain "ACSL term to parse")
+      (module Data.Jstring) in
+  Request.register_sig ~package s
+    ~kind:`GET ~name:"parseExpr"
+    ~descr:(Md.plain "Parse a C expression and returns the associated marker")
+    begin fun rq () ->
+      match Printer_tag.ki_of_localizable @@ get_marker rq with
+      | Kglobal -> Data.failure "No statement at selection point"
+      | Kstmt stmt ->
+        match build_marker ~stmt ~term:(get_term rq) with
+        | None -> Data.failure "Invalid expression"
+        | Some tag -> tag
+    end
 
-let () = Request.register ~package
-    ~kind:`GET ~name:"markerFromTerm" ~descr:(Markdown.plain descr)
-    ~input:(module MarkerTermInput) ~output:(module MarkerTermOutput)
-    (fun input -> Option.bind input build_marker)
-
-(**************************************************************************)
+(* -------------------------------------------------------------------------- *)

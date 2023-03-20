@@ -38,17 +38,37 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
+import { byFct } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { byMarker } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { bySource } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { fct } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { fctDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { jFct } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jSource } from 'frama-c/kernel/api/ast';
 //@ts-ignore
+import { marker } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { markerDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { source } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { sourceDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { jTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { tag } from 'frama-c/kernel/api/data';
+//@ts-ignore
+import { tagDefault } from 'frama-c/kernel/api/data';
 
 /** Property Kinds */
 export enum propKind {
@@ -128,6 +148,9 @@ export const jPropKind: Json.Decoder<propKind> = Json.jEnum(propKind);
 /** Natural order for `propKind` */
 export const byPropKind: Compare.Order<propKind> = Compare.byEnum(propKind);
 
+/** Default value for `propKind` */
+export const propKindDefault: propKind = propKind.behavior;
+
 const propKindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.properties.propKindTags',
@@ -170,6 +193,9 @@ export const jPropStatus: Json.Decoder<propStatus> = Json.jEnum(propStatus);
 /** Natural order for `propStatus` */
 export const byPropStatus: Compare.Order<propStatus> =
   Compare.byEnum(propStatus);
+
+/** Default value for `propStatus` */
+export const propStatusDefault: propStatus = propStatus.unknown;
 
 const propStatusTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
@@ -225,6 +251,9 @@ export const jAlarms: Json.Decoder<alarms> = Json.jEnum(alarms);
 /** Natural order for `alarms` */
 export const byAlarms: Compare.Order<alarms> = Compare.byEnum(alarms);
 
+/** Default value for `alarms` */
+export const alarmsDefault: alarms = alarms.division_by_zero;
+
 const alarmsTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.properties.alarmsTags',
@@ -238,7 +267,7 @@ export const alarmsTags: Server.GetRequest<null,tag[]>= alarmsTags_internal;
 /** Data for array rows [`status`](#status)  */
 export interface statusData {
   /** Entry identifier. */
-  key: Json.key<'#property'>;
+  key: marker;
   /** Full description */
   descr: string;
   /** Kind */
@@ -248,9 +277,9 @@ export interface statusData {
   /** Status */
   status: propStatus;
   /** Function */
-  fct?: Json.key<'#fct'>;
+  fct?: fct;
   /** Instruction */
-  kinstr?: Json.key<'#stmt'>;
+  kinstr?: marker;
   /** Position */
   source: source;
   /** Alarm name (if the property is an alarm) */
@@ -264,13 +293,13 @@ export interface statusData {
 /** Decoder for `statusData` */
 export const jStatusData: Json.Decoder<statusData> =
   Json.jObject({
-    key: Json.jKey<'#property'>('#property'),
+    key: jMarker,
     descr: Json.jString,
     kind: jPropKind,
     names: Json.jArray(Json.jString),
     status: jPropStatus,
-    fct: Json.jOption(Json.jKey<'#fct'>('#fct')),
-    kinstr: Json.jOption(Json.jKey<'#stmt'>('#stmt')),
+    fct: Json.jOption(jFct),
+    kinstr: Json.jOption(jMarker),
     source: jSource,
     alarm: Json.jOption(Json.jString),
     alarm_descr: Json.jOption(Json.jString),
@@ -280,17 +309,16 @@ export const jStatusData: Json.Decoder<statusData> =
 /** Natural order for `statusData` */
 export const byStatusData: Compare.Order<statusData> =
   Compare.byFields
-    <{ key: Json.key<'#property'>, descr: string, kind: propKind,
-       names: string[], status: propStatus, fct?: Json.key<'#fct'>,
-       kinstr?: Json.key<'#stmt'>, source: source, alarm?: string,
-       alarm_descr?: string, predicate?: string }>({
-    key: Compare.string,
+    <{ key: marker, descr: string, kind: propKind, names: string[],
+       status: propStatus, fct?: fct, kinstr?: marker, source: source,
+       alarm?: string, alarm_descr?: string, predicate?: string }>({
+    key: byMarker,
     descr: Compare.string,
     kind: byPropKind,
     names: Compare.array(Compare.string),
     status: byPropStatus,
-    fct: Compare.defined(Compare.string),
-    kinstr: Compare.defined(Compare.string),
+    fct: Compare.defined(byFct),
+    kinstr: Compare.defined(byMarker),
     source: bySource,
     alarm: Compare.defined(Compare.string),
     alarm_descr: Compare.defined(Compare.string),
@@ -314,7 +342,7 @@ export const reloadStatus: Server.GetRequest<null,null>= reloadStatus_internal;
 
 const fetchStatus_internal: Server.GetRequest<
   number,
-  { reload: boolean, removed: Json.key<'#property'>[], updated: statusData[],
+  { reload: boolean, removed: marker[], updated: statusData[],
     pending: number }
   > = {
   kind: Server.RqKind.GET,
@@ -322,7 +350,7 @@ const fetchStatus_internal: Server.GetRequest<
   input:  Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
-            removed: Json.jArray(Json.jKey<'#property'>('#property')),
+            removed: Json.jArray(jMarker),
             updated: Json.jArray(jStatusData),
             pending: Json.jNumber,
           }),
@@ -331,11 +359,11 @@ const fetchStatus_internal: Server.GetRequest<
 /** Data fetcher for array [`status`](#status)  */
 export const fetchStatus: Server.GetRequest<
   number,
-  { reload: boolean, removed: Json.key<'#property'>[], updated: statusData[],
+  { reload: boolean, removed: marker[], updated: statusData[],
     pending: number }
   >= fetchStatus_internal;
 
-const status_internal: State.Array<Json.key<'#property'>,statusData> = {
+const status_internal: State.Array<marker,statusData> = {
   name: 'kernel.properties.status',
   getkey: ((d:statusData) => d.key),
   signal: signalStatus,
@@ -344,6 +372,13 @@ const status_internal: State.Array<Json.key<'#property'>,statusData> = {
   order: byStatusData,
 };
 /** Status of Registered Properties */
-export const status: State.Array<Json.key<'#property'>,statusData> = status_internal;
+export const status: State.Array<marker,statusData> = status_internal;
+
+/** Default value for `statusData` */
+export const statusDataDefault: statusData =
+  { key: markerDefault, descr: '', kind: propKindDefault, names: [],
+    status: propStatusDefault, fct: undefined, kinstr: undefined,
+    source: sourceDefault, alarm: undefined, alarm_descr: undefined,
+    predicate: undefined };
 
 /* ------------------------------------- */

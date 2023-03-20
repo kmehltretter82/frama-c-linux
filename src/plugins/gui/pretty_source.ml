@@ -203,12 +203,12 @@ struct
     | PIP _ -> 'i'
     | PType _ -> 'y'
 
-  let create loc =
+  let tag loc =
     incr current ;
     let tag = Printf.sprintf "guitag:%c%x" (charcode loc) !current in
     Hashtbl.replace hashtbl tag loc ; tag
 
-  let get = Hashtbl.find hashtbl
+  let find = Hashtbl.find hashtbl
 
 end
 
@@ -261,7 +261,7 @@ let buffer_formatter state source =
     let s = Extlib.format_string_of_stag s in
     (* Ignore tags that are not ours *)
     if Extlib.string_prefix "guitag:" s then
-      Stack.push (source#end_iter#offset, Tag.get s) starts ;
+      Stack.push (source#end_iter#offset, Tag.find s) starts ;
     ""
   in
   let emit_close_tag s =

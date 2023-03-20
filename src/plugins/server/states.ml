@@ -292,6 +292,7 @@ let fetch array n =
 let rec is_keyType = function
   | Package.Junion js -> List.for_all is_keyType js
   | Jstring | Jalpha | Jkey _ | Jtag _ -> true
+  | Jdata(_,def) -> is_keyType def
   | _ -> false
 
 let register_array ~package ~name ~descr ~key
@@ -313,7 +314,8 @@ let register_array ~package ~name ~descr ~key
         ));
     if not (is_keyType keyType) then
       raise (Invalid_argument (
-          Printf.sprintf "States.array(%S): invalid key type" name
+          Format.asprintf "States.array(%S): invalid key type (%a)"
+            name Package.pp_jtype keyType
         ));
   end ;
   let fields = Package.{
@@ -321,8 +323,9 @@ let register_array ~package ~name ~descr ~key
       fd_type = keyType ;
       fd_descr = plain "Entry identifier." ;
     } :: List.map fst columns in
-  let id = Package.declare_id ~package:package ~name:name ~descr
-      (D_array { arr_key = keyName ; arr_kind = keyType }) in
+  let id = Package.declare_id ~package ~name ~descr
+      (D_array { arr_key = keyName ; arr_kind = keyType ; arr_rows = Jany })
+  in
   let signal = Request.signal
       ~package ~name:(Package.Derived.signal id).name
       ~descr:(plain "Signal for array" @ href) in
@@ -330,8 +333,10 @@ let register_array ~package ~name ~descr ~key
       ~package ~name:(Package.Derived.data id).name
       ~descr:(plain "Data for array rows" @ href)
       (D_record fields) in
-  let fs = List.map Package.field fields in
-  Data.derived ~package ~id:row (Jrecord fs) ;
+  let jrow = Data.derived ~package ~id:row
+      (Jrecord (List.map Package.field fields)) in
+  Package.update ~package ~name
+    (D_array { arr_key = keyName ; arr_kind = keyType ; arr_rows = jrow }) ;
   let getter =
     List.map Package.(fun (fd,to_js) -> fd.fd_name , to_js) !model in
   let array = {
@@ -345,7 +350,7 @@ let register_array ~package ~name ~descr ~key
     end) in
   let module Jrows = Jlist (struct
       include Jany
-      let jtype = Package.Jdata row
+      let jtype = jrow
     end) in
   let set_reload = Request.result signature
       ~name:"reload" ~descr:(plain "array fully reloaded")

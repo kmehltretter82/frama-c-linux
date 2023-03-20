@@ -3,27 +3,20 @@
 \usepackage{amsmath}
 \newcommand{\framacversion}%
            {\input{../../VERSION} (\input{../../VERSION_CODENAME}\unskip)}
-\input{./frama-c-affiliation.tex}
+
+\title{The Metrics plug-in}
+\author{Richard Bonichon \& Boris Yakobowski}
+
+\fcversion{\framacversion}
+
+\cclicence{by-sa}
+\copyrightstarts{2011}
 
 \begin{document}
-\coverpage{Metrics}
+\sloppy
+\emergencystretch 3em
 
-\begin{titlepage}
-\begin{flushleft}
-\includegraphics[height=14mm]{img/cealistlogo.jpg}
-\end{flushleft}
-\vfill
-\title{Frama-C's metrics plug-in}{\framacversion}
-\author{Richard Bonichon \& Boris Yakobowski}
-\begin{tabular}{l}
-  \fcaffiliationen
-\end{tabular}
-\vfill
-\begin{flushleft}
-  \textcopyright 2011--\the\year{} CEA LIST
-\end{flushleft}
-\end{titlepage}
-
+\maketitle
 \tableofcontents
 
 \chapter{Quick overview}
@@ -121,7 +114,7 @@ this purpose. }.
 \end{shell}
 \begin{figure}
   \centering
-  \lstinputlisting[language={[ANSI]C},alsolanguage=ACSL,style=framac-code-style,
+  \lstinputlisting[language={[ANSI]C},alsolanguage=ACSL,style=frama-c-style,
   basicstyle=\lp@basic,firstline=5]
   {../../tests/metrics/\pgname}
   \caption{Source code for \pgname}

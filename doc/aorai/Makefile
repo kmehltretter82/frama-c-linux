@@ -32,11 +32,14 @@ EXAMPLES=example.c example.ya \
          example_loop.c example_loop.ya \
          README.md
 
-BNF=ya_file.bnf basic_ya.bnf extended_ya.bnf ya_variables.bnf
-
 all: main.pdf $(ARCHIVENAME).tar.gz
 
+include ../MakeLaTeXModern
+
+BNF=ya_file.bnf basic_ya.bnf extended_ya.bnf ya_variables.bnf
+
 main.pdf: main.tex $(BNF:.bnf=.tex) macros.tex
+	$(MAKE) $(FRAMAC_MODERN)
 	touch main.aux #work around latexmk bug
 	latexmk -pdf main.tex
 

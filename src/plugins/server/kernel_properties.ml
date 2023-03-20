@@ -288,11 +288,11 @@ let () = States.column model ~name:"status"
 
 let () = States.column model ~name:"fct"
     ~descr:(Md.plain "Function")
-    ~data:(module Joption(Kf)) ~get:Property.get_kf
+    ~data:(module Joption(Function)) ~get:Property.get_kf
 
 let () = States.column model ~name:"kinstr"
     ~descr:(Md.plain "Instruction")
-    ~data:(module Ki) ~get:Property.get_kinstr
+    ~data:(module Kinstr) ~get:Property.get_kinstr
 
 let () = States.column model ~name:"source"
     ~descr:(Md.plain "Position")
@@ -343,8 +343,8 @@ let array =
     ~package
     ~name:"status"
     ~descr:(Md.plain "Status of Registered Properties")
-    ~key:(fun ip -> Kernel_ast.Marker.create (PIP ip))
-    ~keyType:Kernel_ast.Marker.jproperty
+    ~key:(fun ip -> Kernel_ast.Marker.tag (PIP ip))
+    ~keyType:Kernel_ast.Marker.jtype
     ~iter
     ~add_reload_hook
     ~add_remove_hook

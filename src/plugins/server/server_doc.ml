@@ -142,7 +142,7 @@ let kind_of_decl = function
   | D_request { rq_kind=`GET } -> "GET"
   | D_request { rq_kind=`SET } -> "SET"
   | D_request { rq_kind=`EXEC } -> "EXEC"
-  | D_decoder _ | D_order _ -> assert false
+  | D_decoder _ | D_order _ | D_default _ -> assert false
 
 let pp_for ?decl names =
   let self =
@@ -173,7 +173,7 @@ let md_signals signals =
 
 let descr_of_decl names decl =
   match decl.d_kind with
-  | D_decoder _ | D_order _ -> assert false
+  | D_decoder _ | D_order _ | D_default _ -> assert false
   | D_signal -> []
   | D_state _ -> [] (* TBC *)
   | D_value _ -> [] (* TBC *)
@@ -199,12 +199,11 @@ let descr_of_decl names decl =
 
 let declaration page names decl =
   match decl.d_kind with
-  | D_decoder _ | D_order _ -> ()
+  | D_decoder _ | D_order _ | D_default _ -> ()
   | _ ->
     let name = decl.d_ident.name in
     let fullname = name_of_ident decl.d_ident in
     let kind = kind_of_decl decl.d_kind in
-    (* let title = Printf.sprintf "`%s` %s" kind fullname in *)
     let title = Printf.sprintf "%s (`%s`)" fullname kind in
     let index = [ title ] in
     let contents = Markdown.par decl.d_descr in

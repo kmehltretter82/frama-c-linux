@@ -55,6 +55,9 @@ export const jKind: Json.Decoder<kind> =
 /** Natural order for `kind` */
 export const byKind: Compare.Order<kind> = Compare.structural;
 
+/** Default value for `kind` */
+export const kindDefault: kind = "checkbox";
+
 /** Tactical status */
 export type status = "NotApplicable" | "NotConfigured" | "Applicable";
 
@@ -68,6 +71,9 @@ export const jStatus: Json.Decoder<status> =
 
 /** Natural order for `status` */
 export const byStatus: Compare.Order<status> = Compare.structural;
+
+/** Default value for `status` */
+export const statusDefault: status = "NotApplicable";
 
 /** Parameter option value */
 export type value = { id: Json.key<'#value'>, label: string, title: string };
@@ -88,6 +94,10 @@ export const byValue: Compare.Order<value> =
     label: Compare.string,
     title: Compare.string,
   });
+
+/** Default value for `value` */
+export const valueDefault: value =
+  { id: Json.jKey<'#value'>('#value')(''), label: '', title: '' };
 
 /** Parameter configuration */
 export interface parameter {
@@ -145,6 +155,12 @@ export const byParameter: Compare.Order<parameter> =
     vstep: Compare.defined(Compare.number),
     vlist: Compare.defined(Compare.array(byValue)),
   });
+
+/** Default value for `parameter` */
+export const parameterDefault: parameter =
+  { id: Json.jKey<'#param'>('#param')(''), kind: kindDefault, label: '',
+    title: '', enabled: false, value: null, vmin: undefined, vmax: undefined,
+    vstep: undefined, vlist: undefined };
 
 /** Data for array rows [`tactical`](#tactical)  */
 export interface tacticalData {
@@ -234,6 +250,11 @@ const tactical_internal: State.Array<Json.key<'#tactic'>,tacticalData> = {
 };
 /** Tactical Configurations */
 export const tactical: State.Array<Json.key<'#tactic'>,tacticalData> = tactical_internal;
+
+/** Default value for `tacticalData` */
+export const tacticalDataDefault: tacticalData =
+  { id: Json.jKey<'#tactic'>('#tactic')(''), label: '', title: '',
+    error: undefined, status: statusDefault, params: [] };
 
 const configureTactics_internal: Server.ExecRequest<
   { node: Json.index<'#node'> },

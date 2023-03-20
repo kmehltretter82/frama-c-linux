@@ -79,7 +79,7 @@ val loc_to_localizable: ?precise_col:bool -> Filepath.position -> localizable op
 
 module type Tag =
 sig
-  val create : localizable -> string
+  val tag : localizable -> string
 end
 
 module type S_pp =

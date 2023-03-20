@@ -7,8 +7,8 @@ module P =
     end)
 
 (* A callstack is a list of a pair (kf * stmt) where [kf] is the kernel
-   function called at statement [stmt]. Building the datatype also creates the
-   corresponding type value [ty]. *)
+   function called at statement [stmt]. Building the datatype also
+   creates the corresponding type value [ty]. *)
 type callstack = (Kernel_function.t * Cil_datatype.Stmt.t) list
 
 (* Implementation *)

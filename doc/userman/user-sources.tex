@@ -76,13 +76,13 @@ the following placeholders:
 \end{tabular}
 
 Here are some examples for using this option.
-\begin{shell}
+\begin{frama-c-commands}
 \$ frama-c -cpp-command 'gcc -C -E -I. -x c' file1.src file2.i
 \$ frama-c -cpp-command 'gcc -C -E -I. %args -o %o %i' file1.c file2.i
 \$ frama-c -cpp-command 'cp %i %o'  file1.c file2.i
 \$ frama-c -cpp-command 'cat %i > %o' file1.c file2.i
 \$ frama-c -cpp-command 'CL.exe /C /E %args %i > %o' file1.c file2.i
-\end{shell}
+\end{frama-c-commands}
 
 When using \optionuse{-}{cpp-command}, you may add \optiondef{-}{cpp-frama-c-compliant}
 to indicate that the custom preprocessor accepts the same set of options as GNU
@@ -233,9 +233,9 @@ should be used for a given enumerated type. Namely, the C standard allows the us
 of any integral type in which all the corresponding tags can be represented.
 Default is \texttt{gcc-enums}. A list of supported
 options can be obtained by typing:
-\begin{shell}
+\begin{frama-c-commands}
 \$ frama-c -enums help
-\end{shell}
+\end{frama-c-commands}
 This includes:
 \begin{itemize}
 \item \texttt{int}: treat everything as \texttt{int} (including enumerated types
@@ -292,9 +292,9 @@ a negative value, and choose the smallest rank possible starting from
   automatically, but otherwise option \optionuse{-}{cpp-command} can be used.
 
 The list of supported platforms can be obtained by typing:
-\begin{shell}
+\begin{frama-c-commands}
 \$ frama-c -machdep help
-\end{shell}
+\end{frama-c-commands}
 
 The process for adding a new platform is described in the Plug-in
 Development Guide~\cite{plugin-dev-guide}.
@@ -345,9 +345,9 @@ used by plug-ins which support it. Note however that since \verb|-load| implies 
 files given on the command line are ignored, \verb|-load| and \verb|-ast-diff| with
 the list of C files to consider must be properly sequenced through the use of
 \verb|-then| or one of its variants (Section~\ref{sec:then}), as in:
-\begin{lstlisting}[language=shell]
-frama-c -load previous.sav -then -ast-diff file1.c file2.c [...]
-\end{lstlisting}
+\begin{frama-c-commands}
+\$ frama-c -load previous.sav -then -ast-diff file1.c file2.c [...]
+\end{frama-c-commands}
 
 {\em Note: currently, parsing and type-checking are systematically performed
   even with this option, and \verb|-ast-diff| compares the normalized ASTs.
@@ -518,16 +518,16 @@ emitted by \FramaC during the normalization phase.
 If the steps up to normalization succeed, the project is then ready for
 analysis by any \FramaC plug-in. It is possible to test that the source code
 preparation itself succeeds, by running \FramaC without any option.
-\begin{shell}
+\begin{frama-c-commands}
 \$ frama-c <input files>
-\end{shell}
+\end{frama-c-commands}
 
 If you need to use other options for preprocessing or normalizing the source
 code, you can use the option \optiondef{-}{typecheck} for
 the same purpose. For instance:
-\begin{shell}
-frama-c -cpp-command 'gcc -C -E -I. -x c' -typecheck file1.src file2.i
-\end{shell}
+\begin{frama-c-commands}
+\$ frama-c -cpp-command 'gcc -C -E -I. -x c' -typecheck file1.src file2.i
+\end{frama-c-commands}
 
 
 % Local variables:

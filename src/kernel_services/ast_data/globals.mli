@@ -96,6 +96,9 @@ module Functions: sig
 
   (** {2 Getters} *)
 
+  val mem: varinfo -> bool
+  (** Returns [true] is this variable is associated to some kernel function *)
+
   val get: varinfo -> kernel_function
   (** @raise Not_found if the given varinfo has no associated kernel function
       and is not a built-in.

@@ -26,12 +26,14 @@
 
 import React from 'react';
 import * as Dome from 'dome';
+import * as Json from 'dome/data/json';
 import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
 import { Section, Item } from 'dome/frame/sidebars';
 import { Button } from 'dome/controls/buttons';
 import * as Toolbars from 'dome/frame/toolbars';
-import * as ArrayUtils from 'dome/data/arrays';
+import * as Models from 'dome/table/models';
+import * as Arrays from 'dome/table/arrays';
 
 import * as States from 'frama-c/states';
 import * as Kernel from 'frama-c/kernel/api/ast';
@@ -99,17 +101,36 @@ function FctItem(props: FctItemProps): JSX.Element {
 // --------------------------------------------------------------------------
 
 type functionsData =
-  Kernel.functionsData | (Kernel.functionsData & Eva.functionsData)
+  Kernel.functionsData | (Kernel.functionsData & Eva.functionsData);
+
+type FctKey = Json.key<'#functions'>;
+
+function computeFcts(
+  ker: Arrays.CompactModel<FctKey,Kernel.functionsData>,
+  eva: Arrays.CompactModel<FctKey,Eva.functionsData>,
+  _kstamp: number,
+  _estamp: number,
+): functionsData[] {
+  const arr: functionsData[] = [];
+  ker.forEach((kf) => {
+    const ef = eva.getData(kf.key);
+    arr.push({...ef,...kf});
+  });
+  return arr.sort((f, g) => alpha(f.name, g.name));
+}
 
 export default function Globals(): JSX.Element {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
-  const kernelFcts = States.useSyncArray(Kernel.functions).getArray().sort(
-    (f, g) => alpha(f.name, g.name),
+  const kerFcts = States.useSyncArray(Kernel.functions);
+  const evaFcts = States.useSyncArray(Eva.functions);
+  const kerStamp = Models.useModel(kerFcts);
+  const evaStamp = Models.useModel(evaFcts);
+  const fcts = React.useMemo(
+    () => computeFcts(kerFcts,evaFcts,kerStamp,evaStamp),
+    [kerFcts,evaFcts,kerStamp,evaStamp]
   );
-  const evaFcts = States.useSyncArray(Eva.functions).getArray();
-  const fcts = ArrayUtils.mergeArraysByKey(kernelFcts, evaFcts);
   const { useFlipSettings } = Dome;
   const [stdlib, flipStdlib] =
     useFlipSettings('ivette.globals.stdlib', false);

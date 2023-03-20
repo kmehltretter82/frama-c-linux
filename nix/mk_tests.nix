@@ -26,6 +26,7 @@
 , time
 , unixtools
 , which
+, wp-cache
 } :
 
 { tests-name
@@ -61,11 +62,7 @@ stdenvNoCC.mkDerivation {
 
   wp_cache =
     if has-wp-proofs
-    then fetchGit {
-           url = "git@git.frama-c.com:frama-c/wp-cache.git" ;
-           ref = "master" ;
-           shallow = true ;
-         }
+    then wp-cache.src
     else "" ;
 
   preBuild =

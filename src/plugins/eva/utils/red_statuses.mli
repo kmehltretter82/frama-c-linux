@@ -50,3 +50,6 @@ val get_all: unit -> (kinstr * alarm_or_property * int) list
 (* If option -eva-report-red-statuses has been set, reports red statuses in
    a csv file. *)
 val report: unit -> unit
+
+(* Register a hook that is called each time a red status is set *)
+val register_hook: (alarm_or_property -> unit) -> unit

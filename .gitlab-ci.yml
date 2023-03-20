@@ -30,6 +30,11 @@ variables:
 ################################################################################
 ### PREPARE
 
+check-makefile:
+  stage: prepare
+  script:
+    - ./nix/shell-checkers.sh "make --warn-undefined-variables help > /dev/null 2> errors && [[ "$(cat errors)" == "" ]]"
+
 check-no-old-frama-c:
   stage: prepare
   script:
@@ -84,6 +89,14 @@ prepare-shell-checkers:
   stage: prepare
   script:
     - ./nix/shell-checkers.sh "true"
+
+prepare-wp-cache:
+  stage: prepare
+  script:
+    - ./nix/wp-cache.nix.sh
+  artifacts:
+    paths:
+      - ./nix/wp-cache.nix
 
 ################################################################################
 ### BUILD
@@ -243,8 +256,6 @@ build-distrib-tarball:
 
 header-check:
   stage: distrib
-  variables:
-    FRAMAC_HDRCK: ""
   script:
     - ./nix/shell-checkers.sh "make -f share/Makefile.headers check-headers"
 
@@ -252,8 +263,6 @@ header-check:
 
 lint:
   stage: distrib
-  variables:
-    LINT_MAKEFILE: "share/Makefile.linting"
   script:
     - ./nix/shell-checkers.sh "make -f share/Makefile.linting check-lint"
 

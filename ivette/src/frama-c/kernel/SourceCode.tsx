@@ -143,7 +143,7 @@ function createSyncOnUserSelection(): Editor.Extension {
         const [fct, marker] = await Server.send(Ast.getMarkerAt, cursor);
         if (fct || marker) {
           // The forced reload should NOT be necessary but... It is...
-          await Server.send(Ast.reloadMarkerInfo, null);
+          await Server.send(Ast.reloadMarkerAttributes, null);
           const location = { fct, marker };
           update({ location });
           Locations.set(view, { cursor: location, ivette: location });
@@ -211,15 +211,15 @@ function useFctSource(file: string): string {
 
 // Build a callback that retrieves a location's source information.
 function useSourceGetter(): GetSource {
-  const markersInfo = States.useSyncArray(Ast.markerInfo);
+  const attributes = States.useSyncArray(Ast.markerAttributes);
   const functionsData = States.useSyncArray(Ast.functions).getArray();
   return React.useCallback(({ fct, marker }) => {
     const markerSloc = (marker !== undefined && marker !== '') ?
-      markersInfo.getData(marker)?.sloc : undefined;
+      attributes.getData(marker)?.sloc : undefined;
     const fctSloc = (fct !== undefined && fct !== '') ?
       functionsData.find((e) => e.name === fct)?.sloc : undefined;
     return markerSloc ?? fctSloc;
-  }, [markersInfo, functionsData]);
+  }, [attributes, functionsData]);
 }
 
 // -----------------------------------------------------------------------------

@@ -55,13 +55,13 @@ actually undefined because the assertion reads the uninitialized variable
 \lstinline|x|. You should be caught by the \eacsl plug-in, but that is not
 the case yet.
 
-\begin{shell}
+\begin{logs}
 \$ e-acsl-gcc.sh uninitialized.i -c -Omonitored_uninitialized
 monitored_uninitialized.i: In function 'main':
 monitored_uninitialized.i:44:16: warning: 'x' is used uninitialized in this function
 [-Wuninitialized]
 \$ ./monitored_uninitialized.e-acsl
-\end{shell}
+\end{logs}
 
 This is more a design choice than a limitation: should the \eacsl plug-in
 generate additional instrumentation to prevent such values from being evaluated,
@@ -98,7 +98,7 @@ Consider the following example.
 \cinput{examples/valid_no_main.c}
 
 You can generate the instrumented program as follows.
-\begin{shell}
+\begin{logs}
 \$ e-acsl-gcc.sh -M -omonitored_valid_no_main.i valid_no_main.c
 [kernel] Parsing valid_no_main.c (with preprocessing)
 [e-acsl] beginning translation.
@@ -107,7 +107,7 @@ You can generate the instrumented program as follows.
   you must call functions `__e_acsl_globals_init', `__e_acsl_globals_clean',
   `__e_acsl_memory_init' and `__e_acsl_memory_clean' by yourself.
 [e-acsl] translation done in project "e-acsl".
-\end{shell}
+\end{logs}
 
 The last warning states an important point: if this program is linked against
 another file containing \texttt{main} function, then this main function must
@@ -129,7 +129,7 @@ While it is possible to add such intrumentation manually we recommend using
 
 Then just compile and run it as explained in Section~\ref{sec:memory}.
 
-\begin{shell}
+\begin{logs}
 \$ e-acsl-gcc.sh -M -omonitored_modified_main.i modified_main.c
 \$ e-acsl-gcc.sh -C -Ovalid_no_main monitored_modified_main.i monitored_valid_no_main.i
 \$ ./valid_no_main.e-acsl
@@ -137,7 +137,7 @@ Assertion failed at line 11 in function f.
 The failing predicate is:
 freed: \valid(x).
 Aborted
-\end{shell}
+\end{logs}
 
 Also, if the unprovided main initializes some variables, running the
 instrumented code (linked against this main) could print some warnings from the

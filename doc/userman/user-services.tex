@@ -66,9 +66,9 @@ When loading, the following actions are done in sequence:
 \end{enumerate}
 
 Consider for instance the following command.
-\begin{shell}
+\begin{frama-c-commands}
 \$ frama-c -load foo.sav -eva
-\end{shell}
+\end{frama-c-commands}
 It loads all projects saved in the file \texttt{foo.sav}. Then, it runs the
 value analysis in the new current project if and only if it was not already
 computed at save time.
@@ -103,10 +103,10 @@ analysis when one of the analysis parameters changes.
 Consider the two following
 commands.\optionidx{-}{save}\optionidx{-}{load}\optionidx{-}{absolute-valid-range}%
 \optionidx{-}{ulevel}
-\begin{shell}
+\begin{frama-c-commands}
 \$ frama-c -save foo.sav -ulevel 5 -absolute-valid-range 0-0x1000 -eva foo.c
 \$ frama-c -load foo.sav
-\end{shell}
+\end{frama-c-commands}
 \FramaC runs the value analysis plug-in on the file \texttt{foo.c} where loops
 are unrolled $5$ times (option \texttt{-ulevel}, see
 Section~\ref{sec:normalize}). To compute its result, the value analysis
@@ -121,10 +121,10 @@ analysis since the parameters have not been changed.
 Consider now the two following commands.
 \optionidx{-}{save}\optionidx{-}{load}\optionidx{-}{absolute-valid-range}%
 \optionidx{-}{ulevel}
-\begin{shell}
+\begin{frama-c-commands}
 \$ frama-c -save foo.sav -ulevel 5 -absolute-valid-range 0-0x1000 -eva foo.c
 \$ frama-c -load foo.sav -absolute-valid-range 0-0x2000
-\end{shell}
+\end{frama-c-commands}
 The first command produces the very same result than above. However, in the
 second (load) command, \FramaC knows that one parameter has changed. Thus it
 discards the saved results of the value analysis and recomputes it on the same

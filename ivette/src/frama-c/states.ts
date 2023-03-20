@@ -733,6 +733,25 @@ export async function resetSelection(): Promise<void> {
   }
 }
 
+// --------------------------------------------------------------------------
+// --- Markers
+// --------------------------------------------------------------------------
+
+export type attributes = Ast.markerAttributesData;
+
+/** Access the marker attributes from AST. */
+export function useMarker(marker: Ast.marker | undefined): attributes {
+  const marks = useSyncArray(Ast.markerAttributes);
+  if (marker === undefined) return Ast.markerAttributesDataDefault;
+  const attrs = marks.getData(marker);
+  if (attrs === undefined) return Ast.markerAttributesDataDefault;
+  return attrs;
+}
+
+// --------------------------------------------------------------------------
+// --- General Synchro
+// --------------------------------------------------------------------------
+
 Server.onReady(() => {
   if (GlobalSelection.getValue() === emptySelection)
     resetSelection();

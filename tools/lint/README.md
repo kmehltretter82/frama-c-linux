@@ -79,5 +79,5 @@ That means there is an implicit overloadable JSON description:
 
 The option  `-c <json-confi g-file>` allows to extend and/or overload the default configuration.
 
-When the `available_cmd` field is set to an empty string, that disable the check/update with the related tool.
 An empty string can also be set to the field `check_cmd` (resp. `update_cmd`) when the related tool does not offer check (resp. update) command.
+When the `available_cmd` is set to and empty string, the tool is considered available except if the fields `check_cmd` `update_cmd` are both set to an empty string.

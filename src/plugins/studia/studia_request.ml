@@ -36,7 +36,7 @@ module Effects = struct
   type record
   let record: record Record.signature = Record.signature ()
 
-  module Location = Data.Jpair (Kernel_ast.Kf) (Kernel_ast.Marker)
+  module Location = Data.Jpair (Kernel_ast.Function) (Kernel_ast.Marker)
 
   let direct = Record.field record ~name:"direct"
       ~descr:(Markdown.plain "List of statements with direct effect.")

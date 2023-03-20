@@ -38,17 +38,13 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byTag } from 'frama-c/kernel/api/data';
-//@ts-ignore
 import { byText } from 'frama-c/kernel/api/data';
-//@ts-ignore
-import { jTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { jText } from 'frama-c/kernel/api/data';
 //@ts-ignore
-import { tag } from 'frama-c/kernel/api/data';
-//@ts-ignore
 import { text } from 'frama-c/kernel/api/data';
+//@ts-ignore
+import { textDefault } from 'frama-c/kernel/api/data';
 
 const compute_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
@@ -88,244 +84,194 @@ export const bySource: Compare.Order<source> =
     line: Compare.number,
   });
 
-/** Marker kind */
-export enum markerKind {
-  /** Expression */
-  expression = 'expression',
-  /** Lvalue */
-  lvalue = 'lvalue',
-  /** Declaration */
-  declaration = 'declaration',
-  /** Statement */
-  statement = 'statement',
-  /** Global */
-  global = 'global',
-  /** Term */
-  term = 'term',
-  /** Property */
-  property = 'property',
-  /** Type */
-  type = 'type',
-}
+/** Default value for `source` */
+export const sourceDefault: source =
+  { dir: '', base: '', file: '', line: 0 };
 
-/** Decoder for `markerKind` */
-export const jMarkerKind: Json.Decoder<markerKind> = Json.jEnum(markerKind);
+/** Function names */
+export type fct = Json.key<'#fct'>;
 
-/** Natural order for `markerKind` */
-export const byMarkerKind: Compare.Order<markerKind> =
-  Compare.byEnum(markerKind);
+/** Decoder for `fct` */
+export const jFct: Json.Decoder<fct> = Json.jKey<'#fct'>('#fct');
 
-const markerKindTags_internal: Server.GetRequest<null,tag[]> = {
-  kind: Server.RqKind.GET,
-  name:   'kernel.ast.markerKindTags',
-  input:  Json.jNull,
-  output: Json.jArray(jTag),
-  signals: [],
-};
-/** Registered tags for the above type. */
-export const markerKindTags: Server.GetRequest<null,tag[]>= markerKindTags_internal;
+/** Natural order for `fct` */
+export const byFct: Compare.Order<fct> = Compare.string;
 
-/** Marker variable */
-export enum markerVar {
-  /** None */
-  none = 'none',
-  /** Variable */
-  variable = 'variable',
-  /** Function */
-  function = 'function',
-}
+/** Default value for `fct` */
+export const fctDefault: fct = Json.jKey<'#fct'>('#fct')('');
 
-/** Decoder for `markerVar` */
-export const jMarkerVar: Json.Decoder<markerVar> = Json.jEnum(markerVar);
+/** Localizable AST markers */
+export type marker = Json.key<'#marker'>;
 
-/** Natural order for `markerVar` */
-export const byMarkerVar: Compare.Order<markerVar> =
-  Compare.byEnum(markerVar);
+/** Decoder for `marker` */
+export const jMarker: Json.Decoder<marker> = Json.jKey<'#marker'>('#marker');
 
-const markerVarTags_internal: Server.GetRequest<null,tag[]> = {
-  kind: Server.RqKind.GET,
-  name:   'kernel.ast.markerVarTags',
-  input:  Json.jNull,
-  output: Json.jArray(jTag),
-  signals: [],
-};
-/** Registered tags for the above type. */
-export const markerVarTags: Server.GetRequest<null,tag[]>= markerVarTags_internal;
+/** Natural order for `marker` */
+export const byMarker: Compare.Order<marker> = Compare.string;
 
-/** Data for array rows [`markerInfo`](#markerinfo)  */
-export interface markerInfoData {
+/** Default value for `marker` */
+export const markerDefault: marker = Json.jKey<'#marker'>('#marker')('');
+
+/** Location: function and marker */
+export type location = { fct: fct, marker: marker };
+
+/** Decoder for `location` */
+export const jLocation: Json.Decoder<location> =
+  Json.jObject({ fct: jFct, marker: jMarker,});
+
+/** Natural order for `location` */
+export const byLocation: Compare.Order<location> =
+  Compare.byFields
+    <{ fct: fct, marker: marker }>({
+    fct: byFct,
+    marker: byMarker,
+  });
+
+/** Default value for `location` */
+export const locationDefault: location =
+  { fct: fctDefault, marker: markerDefault };
+
+/** Data for array rows [`markerAttributes`](#markerattributes)  */
+export interface markerAttributesData {
   /** Entry identifier. */
-  key: string;
-  /** Marker kind */
-  kind: markerKind;
-  /** Marker variable */
-  var: markerVar;
-  /** Marker short name */
+  marker: marker;
+  /** Marker kind (short) */
+  labelKind: string;
+  /** Marker kind (long) */
+  titleKind: string;
+  /** Marker short name  or identifier when relevant. */
   name: string;
   /** Marker declaration or description */
   descr: string;
+  /** Whether it is an l-value */
+  isLval: boolean;
+  /** Whether it is a function symbol */
+  isFunction: boolean;
+  /** Whether it is a function declaration */
+  isFunDecl: boolean;
   /** Function scope of the marker, if applicable */
   scope?: string;
   /** Source location */
   sloc: source;
 }
 
-/** Decoder for `markerInfoData` */
-export const jMarkerInfoData: Json.Decoder<markerInfoData> =
+/** Decoder for `markerAttributesData` */
+export const jMarkerAttributesData: Json.Decoder<markerAttributesData> =
   Json.jObject({
-    key: Json.jString,
-    kind: jMarkerKind,
-    var: jMarkerVar,
+    marker: jMarker,
+    labelKind: Json.jString,
+    titleKind: Json.jString,
     name: Json.jString,
     descr: Json.jString,
+    isLval: Json.jBoolean,
+    isFunction: Json.jBoolean,
+    isFunDecl: Json.jBoolean,
     scope: Json.jOption(Json.jString),
     sloc: jSource,
   });
 
-/** Natural order for `markerInfoData` */
-export const byMarkerInfoData: Compare.Order<markerInfoData> =
+/** Natural order for `markerAttributesData` */
+export const byMarkerAttributesData: Compare.Order<markerAttributesData> =
   Compare.byFields
-    <{ key: string, kind: markerKind, var: markerVar, name: string,
-       descr: string, scope?: string, sloc: source }>({
-    key: Compare.string,
-    kind: byMarkerKind,
-    var: byMarkerVar,
+    <{ marker: marker, labelKind: string, titleKind: string, name: string,
+       descr: string, isLval: boolean, isFunction: boolean,
+       isFunDecl: boolean, scope?: string, sloc: source }>({
+    marker: byMarker,
+    labelKind: Compare.alpha,
+    titleKind: Compare.alpha,
     name: Compare.alpha,
     descr: Compare.string,
+    isLval: Compare.boolean,
+    isFunction: Compare.boolean,
+    isFunDecl: Compare.boolean,
     scope: Compare.defined(Compare.string),
     sloc: bySource,
   });
 
-/** Signal for array [`markerInfo`](#markerinfo)  */
-export const signalMarkerInfo: Server.Signal = {
-  name: 'kernel.ast.signalMarkerInfo',
+/** Signal for array [`markerAttributes`](#markerattributes)  */
+export const signalMarkerAttributes: Server.Signal = {
+  name: 'kernel.ast.signalMarkerAttributes',
 };
 
-const reloadMarkerInfo_internal: Server.GetRequest<null,null> = {
+const reloadMarkerAttributes_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.reloadMarkerInfo',
+  name:   'kernel.ast.reloadMarkerAttributes',
   input:  Json.jNull,
   output: Json.jNull,
   signals: [],
 };
-/** Force full reload for array [`markerInfo`](#markerinfo)  */
-export const reloadMarkerInfo: Server.GetRequest<null,null>= reloadMarkerInfo_internal;
+/** Force full reload for array [`markerAttributes`](#markerattributes)  */
+export const reloadMarkerAttributes: Server.GetRequest<null,null>= reloadMarkerAttributes_internal;
 
-const fetchMarkerInfo_internal: Server.GetRequest<
+const fetchMarkerAttributes_internal: Server.GetRequest<
   number,
-  { reload: boolean, removed: string[], updated: markerInfoData[],
+  { reload: boolean, removed: marker[], updated: markerAttributesData[],
     pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.fetchMarkerInfo',
+  name:   'kernel.ast.fetchMarkerAttributes',
   input:  Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
-            removed: Json.jArray(Json.jString),
-            updated: Json.jArray(jMarkerInfoData),
+            removed: Json.jArray(jMarker),
+            updated: Json.jArray(jMarkerAttributesData),
             pending: Json.jNumber,
           }),
   signals: [],
 };
-/** Data fetcher for array [`markerInfo`](#markerinfo)  */
-export const fetchMarkerInfo: Server.GetRequest<
+/** Data fetcher for array [`markerAttributes`](#markerattributes)  */
+export const fetchMarkerAttributes: Server.GetRequest<
   number,
-  { reload: boolean, removed: string[], updated: markerInfoData[],
+  { reload: boolean, removed: marker[], updated: markerAttributesData[],
     pending: number }
-  >= fetchMarkerInfo_internal;
+  >= fetchMarkerAttributes_internal;
 
-const markerInfo_internal: State.Array<string,markerInfoData> = {
-  name: 'kernel.ast.markerInfo',
-  getkey: ((d:markerInfoData) => d.key),
-  signal: signalMarkerInfo,
-  fetch: fetchMarkerInfo,
-  reload: reloadMarkerInfo,
-  order: byMarkerInfoData,
+const markerAttributes_internal: State.Array<marker,markerAttributesData> = {
+  name: 'kernel.ast.markerAttributes',
+  getkey: ((d:markerAttributesData) => d.marker),
+  signal: signalMarkerAttributes,
+  fetch: fetchMarkerAttributes,
+  reload: reloadMarkerAttributes,
+  order: byMarkerAttributesData,
 };
-/** Marker information */
-export const markerInfo: State.Array<string,markerInfoData> = markerInfo_internal;
+/** Marker attributes */
+export const markerAttributes: State.Array<marker,markerAttributesData> = markerAttributes_internal;
 
-/** Localizable AST markers */
-export type marker =
-  Json.key<'#stmt'> | Json.key<'#decl'> | Json.key<'#lval'> |
-  Json.key<'#expr'> | Json.key<'#term'> | Json.key<'#global'> |
-  Json.key<'#property'> | Json.key<'#type'>;
+/** Default value for `markerAttributesData` */
+export const markerAttributesDataDefault: markerAttributesData =
+  { marker: markerDefault, labelKind: '', titleKind: '', name: '', descr: '',
+    isLval: false, isFunction: false, isFunDecl: false, scope: undefined,
+    sloc: sourceDefault };
 
-/** Decoder for `marker` */
-export const jMarker: Json.Decoder<marker> =
-  Json.jUnion<Json.key<'#stmt'> | Json.key<'#decl'> | Json.key<'#lval'> |
-              Json.key<'#expr'> | Json.key<'#term'> | Json.key<'#global'> |
-              Json.key<'#property'> | Json.key<'#type'>>(
-    Json.jKey<'#stmt'>('#stmt'),
-    Json.jKey<'#decl'>('#decl'),
-    Json.jKey<'#lval'>('#lval'),
-    Json.jKey<'#expr'>('#expr'),
-    Json.jKey<'#term'>('#term'),
-    Json.jKey<'#global'>('#global'),
-    Json.jKey<'#property'>('#property'),
-    Json.jKey<'#type'>('#type'),
-  );
-
-/** Natural order for `marker` */
-export const byMarker: Compare.Order<marker> = Compare.structural;
-
-/** Location: function and marker */
-export interface location {
-  /** Function */
-  fct: Json.key<'#fct'>;
-  /** Marker */
-  marker: marker;
-}
-
-/** Decoder for `location` */
-export const jLocation: Json.Decoder<location> =
-  Json.jObject({ fct: Json.jKey<'#fct'>('#fct'), marker: jMarker,});
-
-/** Natural order for `location` */
-export const byLocation: Compare.Order<location> =
-  Compare.byFields
-    <{ fct: Json.key<'#fct'>, marker: marker }>({
-    fct: Compare.string,
-    marker: byMarker,
-  });
-
-const getMainFunction_internal: Server.GetRequest<
-  null,
-  Json.key<'#fct'> |
-  undefined
-  > = {
+const getMainFunction_internal: Server.GetRequest<null,fct | undefined> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getMainFunction',
   input:  Json.jNull,
-  output: Json.jOption(Json.jKey<'#fct'>('#fct')),
+  output: Json.jOption(jFct),
   signals: [],
 };
 /** Get the current 'main' function. */
-export const getMainFunction: Server.GetRequest<
-  null,
-  Json.key<'#fct'> |
-  undefined
-  >= getMainFunction_internal;
+export const getMainFunction: Server.GetRequest<null,fct | undefined>= getMainFunction_internal;
 
-const getFunctions_internal: Server.GetRequest<null,Json.key<'#fct'>[]> = {
+const getFunctions_internal: Server.GetRequest<null,fct[]> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getFunctions',
   input:  Json.jNull,
-  output: Json.jArray(Json.jKey<'#fct'>('#fct')),
+  output: Json.jArray(jFct),
   signals: [],
 };
 /** Collect all functions in the AST */
-export const getFunctions: Server.GetRequest<null,Json.key<'#fct'>[]>= getFunctions_internal;
+export const getFunctions: Server.GetRequest<null,fct[]>= getFunctions_internal;
 
-const printFunction_internal: Server.GetRequest<Json.key<'#fct'>,text> = {
+const printFunction_internal: Server.GetRequest<fct,text> = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.printFunction',
-  input:  Json.jKey<'#fct'>('#fct'),
+  input:  jFct,
   output: jText,
   signals: [],
 };
 /** Print the AST of a function */
-export const printFunction: Server.GetRequest<Json.key<'#fct'>,text>= printFunction_internal;
+export const printFunction: Server.GetRequest<fct,text>= printFunction_internal;
 
 /** Data for array rows [`functions`](#functions)  */
 export interface functionsData {
@@ -425,6 +371,12 @@ const functions_internal: State.Array<Json.key<'#functions'>,functionsData> = {
 /** AST Functions */
 export const functions: State.Array<Json.key<'#functions'>,functionsData> = functions_internal;
 
+/** Default value for `functionsData` */
+export const functionsDataDefault: functionsData =
+  { key: Json.jKey<'#functions'>('#functions')(''), name: '', signature: '',
+    main: undefined, defined: undefined, stdlib: undefined,
+    builtin: undefined, sloc: sourceDefault };
+
 /** Updated AST information */
 export const getInformationUpdate: Server.Signal = {
   name: 'kernel.ast.getInformationUpdate',
@@ -457,21 +409,18 @@ export const getInformation: Server.GetRequest<
 
 const getMarkerAt_internal: Server.GetRequest<
   [ string, number, number ],
-  [ Json.key<'#fct'> | undefined, marker | undefined ]
+  [ fct | undefined, marker | undefined ]
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getMarkerAt',
   input:  Json.jTriple( Json.jString, Json.jNumber, Json.jNumber,),
-  output: Json.jPair(
-            Json.jOption(Json.jKey<'#fct'>('#fct')),
-            Json.jOption(jMarker),
-          ),
+  output: Json.jPair( Json.jOption(jFct), Json.jOption(jMarker),),
   signals: [],
 };
 /** Returns the marker and function at a source file position, if any. Input: file path, line and column. */
 export const getMarkerAt: Server.GetRequest<
   [ string, number, number ],
-  [ Json.key<'#fct'> | undefined, marker | undefined ]
+  [ fct | undefined, marker | undefined ]
   >= getMarkerAt_internal;
 
 const getFiles_internal: Server.GetRequest<null,string[]> = {
@@ -494,42 +443,20 @@ const setFiles_internal: Server.SetRequest<string[],null> = {
 /** Set the source file names to analyze. */
 export const setFiles: Server.SetRequest<string[],null>= setFiles_internal;
 
-/** <markerFromTerm> input */
-export interface markerFromTermInput {
-  /** The statement at which we will build the marker. */
-  atStmt: marker;
-  /** The ACSL term. */
-  term: string;
-}
-
-/** Decoder for `markerFromTermInput` */
-export const jMarkerFromTermInput: Json.Decoder<markerFromTermInput> =
-  Json.jObject({ atStmt: jMarker, term: Json.jString,});
-
-/** Natural order for `markerFromTermInput` */
-export const byMarkerFromTermInput: Compare.Order<markerFromTermInput> =
-  Compare.byFields
-    <{ atStmt: marker, term: string }>({
-    atStmt: byMarker,
-    term: Compare.string,
-  });
-
-const markerFromTerm_internal: Server.GetRequest<
-  markerFromTermInput,
-  marker |
-  undefined
+const parseExpr_internal: Server.GetRequest<
+  { stmt: marker, term: string },
+  marker
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.markerFromTerm',
-  input:  jMarkerFromTermInput,
-  output: Json.jOption(jMarker),
+  name:   'kernel.ast.parseExpr',
+  input:  Json.jObject({ stmt: jMarker, term: Json.jString,}),
+  output: jMarker,
   signals: [],
 };
-/** Build a marker from an ACSL term. */
-export const markerFromTerm: Server.GetRequest<
-  markerFromTermInput,
-  marker |
-  undefined
-  >= markerFromTerm_internal;
+/** Parse a C expression and returns the associated marker */
+export const parseExpr: Server.GetRequest<
+  { stmt: marker, term: string },
+  marker
+  >= parseExpr_internal;
 
 /* ------------------------------------- */

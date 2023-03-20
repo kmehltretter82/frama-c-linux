@@ -44,6 +44,8 @@ import { jText } from 'frama-c/kernel/api/data';
 //@ts-ignore
 import { text } from 'frama-c/kernel/api/data';
 //@ts-ignore
+import { textDefault } from 'frama-c/kernel/api/data';
+//@ts-ignore
 import { byGoal } from 'frama-c/plugins/wp/api';
 //@ts-ignore
 import { byProver } from 'frama-c/plugins/wp/api';
@@ -51,6 +53,8 @@ import { byProver } from 'frama-c/plugins/wp/api';
 import { byResult } from 'frama-c/plugins/wp/api';
 //@ts-ignore
 import { goal } from 'frama-c/plugins/wp/api';
+//@ts-ignore
+import { goalDefault } from 'frama-c/plugins/wp/api';
 //@ts-ignore
 import { jGoal } from 'frama-c/plugins/wp/api';
 //@ts-ignore
@@ -60,7 +64,11 @@ import { jResult } from 'frama-c/plugins/wp/api';
 //@ts-ignore
 import { prover } from 'frama-c/plugins/wp/api';
 //@ts-ignore
+import { proverDefault } from 'frama-c/plugins/wp/api';
+//@ts-ignore
 import { result } from 'frama-c/plugins/wp/api';
+//@ts-ignore
+import { resultDefault } from 'frama-c/plugins/wp/api';
 
 /** Proof Status has changed */
 export const proofStatus: Server.Signal = {
@@ -192,6 +200,9 @@ export const jIformat: Json.Decoder<iformat> =
 /** Natural order for `iformat` */
 export const byIformat: Compare.Order<iformat> = Compare.structural;
 
+/** Default value for `iformat` */
+export const iformatDefault: iformat = "dec";
+
 /** Real constants format */
 export type rformat = "ratio" | "float" | "double";
 
@@ -205,6 +216,9 @@ export const jRformat: Json.Decoder<rformat> =
 
 /** Natural order for `rformat` */
 export const byRformat: Compare.Order<rformat> = Compare.structural;
+
+/** Default value for `rformat` */
+export const rformatDefault: rformat = "ratio";
 
 const printSequent_internal: Server.ExecRequest<
   { node: Json.index<'#node'>, indent?: number, margin?: number,

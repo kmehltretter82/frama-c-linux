@@ -303,6 +303,11 @@ module Functions = struct
     in
     State.memo add vi
 
+  let mem vi =
+    vi.vglob &&
+    try let _ = get vi in true
+    with Not_found -> false
+
   let get_params kf =
     match kf.fundec with
     | Definition(f,_loc) -> f.sformals

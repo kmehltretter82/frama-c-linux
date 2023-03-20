@@ -202,10 +202,11 @@ dans le nouveau~:
 En effet, lors du calcul de la fonction spécialisée, on ne savait
 pas supprimer l'argument correspondant,
 mais on propageait tout de même la valeur pour supprimer les éventuelles
-branchesmortes. 
+branchesmortes.
 \begin{exemple}
 Dans l'exemple précédent,
 on peut spécialiser \verbtt{f} en \verbtt{f\_1} car on sait que $x=-1$.
+
 \begin{tabular}{ccl}
 Mais on aimerait aussi transformer &:& \verb! void f_1 (int x) { ... }!\\
 en &:& \verb! void f_1 (void) { int x = -1; ... }!
@@ -226,8 +227,8 @@ il n'y avait pas de point de programme correspondant à la branche
 Comme on l'a vu, la propagation de constante peut permettre de
 spécialiser les fonctions et de couper des branches de programme.
 
-Ce type calcul s'effectue a priori par propagation avant. 
-Pour faire de la propagation arrière, 
+Ce type calcul s'effectue a priori par propagation avant.
+Pour faire de la propagation arrière,
 nous aimerions utiliser un calcul de WP.
 
 Le principe d'utilisation serait le suivant~:

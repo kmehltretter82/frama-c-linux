@@ -48,7 +48,11 @@ import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { location } from 'frama-c/kernel/api/ast';
 //@ts-ignore
+import { locationDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { marker } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { markerDefault } from 'frama-c/kernel/api/ast';
 
 /** Parametrization of the exploration range. */
 export interface range {
@@ -73,6 +77,10 @@ export const byRange: Compare.Order<range> =
     forward: Compare.defined(Compare.number),
   });
 
+/** Default value for `range` */
+export const rangeDefault: range =
+  { backward: undefined, forward: undefined };
+
 /** Global parametrization of the exploration. */
 export interface explorationWindow {
   /** how far dive will explore from root nodes ; must be a finite range */
@@ -93,6 +101,10 @@ export const byExplorationWindow: Compare.Order<explorationWindow> =
     horizon: byRange,
   });
 
+/** Default value for `explorationWindow` */
+export const explorationWindowDefault: explorationWindow =
+  { perception: rangeDefault, horizon: rangeDefault };
+
 /** A node identifier in the graph */
 export type nodeId = number;
 
@@ -101,6 +113,9 @@ export const jNodeId: Json.Decoder<nodeId> = Json.jNumber;
 
 /** Natural order for `nodeId` */
 export const byNodeId: Compare.Order<nodeId> = Compare.number;
+
+/** Default value for `nodeId` */
+export const nodeIdDefault: nodeId = 0;
 
 /** A callsite */
 export type callsite = { fun: string, instr: number | string };
@@ -120,6 +135,9 @@ export const byCallsite: Compare.Order<callsite> =
     instr: Compare.structural,
   });
 
+/** Default value for `callsite` */
+export const callsiteDefault: callsite = { fun: '', instr: 0 };
+
 /** The callstack context for a node */
 export type callstack = callsite[];
 
@@ -129,6 +147,9 @@ export const jCallstack: Json.Decoder<callstack> = Json.jArray(jCallsite);
 /** Natural order for `callstack` */
 export const byCallstack: Compare.Order<callstack> =
   Compare.array(byCallsite);
+
+/** Default value for `callstack` */
+export const callstackDefault: callstack = [];
 
 /** The description of a node locality */
 export type nodeLocality = { file: string, callstack?: callstack };
@@ -144,6 +165,10 @@ export const byNodeLocality: Compare.Order<nodeLocality> =
     file: Compare.string,
     callstack: Compare.defined(byCallstack),
   });
+
+/** Default value for `nodeLocality` */
+export const nodeLocalityDefault: nodeLocality =
+  { file: '', callstack: undefined };
 
 /** A graph node */
 export type node =
@@ -195,6 +220,12 @@ export const byNode: Compare.Order<node> =
     taint: Compare.defined(Compare.structural),
   });
 
+/** Default value for `node` */
+export const nodeDefault: node =
+  { id: nodeIdDefault, label: '', kind: '', locality: nodeLocalityDefault,
+    is_root: false, backward_explored: '', forward_explored: '', writes: [],
+    values: undefined, range: 0, type: undefined, taint: undefined };
+
 /** The dependency between two nodes */
 export type dependency =
   { id: number, src: nodeId, dst: nodeId, kind: string, origins: location[] };
@@ -221,6 +252,10 @@ export const byDependency: Compare.Order<dependency> =
     origins: Compare.array(byLocation),
   });
 
+/** Default value for `dependency` */
+export const dependencyDefault: dependency =
+  { id: 0, src: nodeIdDefault, dst: nodeIdDefault, kind: '', origins: [] };
+
 /** The whole graph being built */
 export type graphData = { nodes: node[], deps: dependency[] };
 
@@ -235,6 +270,9 @@ export const byGraphData: Compare.Order<graphData> =
     nodes: Compare.array(byNode),
     deps: Compare.array(byDependency),
   });
+
+/** Default value for `graphData` */
+export const graphDataDefault: graphData = { nodes: [], deps: [] };
 
 /** Graph differences from the last action. */
 export type diffData =
@@ -265,6 +303,10 @@ export const byDiffData: Compare.Order<diffData> =
          }),
     sub: Compare.array(byNodeId),
   });
+
+/** Default value for `diffData` */
+export const diffDataDefault: diffData =
+  { root: undefined, add: { nodes: [], deps: [] }, sub: [] };
 
 const window_internal: Server.SetRequest<explorationWindow,null> = {
   kind: Server.RqKind.SET,

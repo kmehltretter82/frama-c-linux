@@ -46,6 +46,7 @@
 , python3
 , swiProlog
 , time
+, wp-cache
 }:
 
 # We do not use buildDunePackage because Frama-C still uses a Makefile to build
@@ -120,11 +121,7 @@ stdenvNoCC.mkDerivation rec {
     make tools/ptests/wtests.exe
   '';
 
-  wp_cache = fetchGit {
-           url = "git@git.frama-c.com:frama-c/wp-cache.git" ;
-           ref = "master" ;
-           shallow = true ;
-         };
+  wp_cache = wp-cache.src ;
 
   doCheck = true;
   preCheck = ''

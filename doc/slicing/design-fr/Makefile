@@ -26,9 +26,10 @@ all: main.pdf
 
 GENERATED=biblio.bib
 GENERATED+=frama-c-book.cls frama-c-cover.pdf frama-c-left.pdf frama-c-right.pdf
-include ../MakeLaTeXModern
+FRAMAC_DOC_ROOT_DIR=../..
+include $(FRAMAC_DOC_ROOT_DIR)/MakeLaTeXModern
 
-DWNLDDIR=../manuals
+DWNLDDIR=$(FRAMAC_DOC_ROOT_DIR)/manuals
 DOCNAME=slicing-documentation-fr.pdf
 
 BIB_FILE = bib-slicing.bib

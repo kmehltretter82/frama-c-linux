@@ -1,0 +1,22 @@
+.eva-status {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  margin:auto;
+}
+
+.eva-status-icon {
+  max-width: 90%;
+  max-height: 200px;
+  fill: var(--info-text-discrete);
+}
+
+.eva-status span {
+  font-size: 16px;
+  text-align: center;
+}
+
+.eva-status-computing {
+  font-weight: bold;
+}

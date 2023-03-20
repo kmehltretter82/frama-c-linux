@@ -176,7 +176,7 @@ let () = S.column gmodel ~name:"name"
 
 let () = S.column gmodel ~name:"fct"
     ~descr:(Md.plain "Associated function, if any")
-    ~data:(module D.Joption(AST.Kf)) ~get:get_kf
+    ~data:(module D.Joption(AST.Function)) ~get:get_kf
 
 let () = S.option gmodel ~name:"bhv"
     ~descr:(Md.plain "Associated behavior, if any")

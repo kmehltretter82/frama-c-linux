@@ -5,3 +5,8 @@
 /*.log-file
 /wp.fls
 /wp.fdb_latexmk
+/logos
+/macros.tex
+/anr-logo.png
+/fc-macros.tex
+/frama-c-guy.png

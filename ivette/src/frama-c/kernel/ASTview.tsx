@@ -104,6 +104,9 @@ function textToTree(t: text): Tree | undefined {
   return res;
 }
 
+// Convert an Ivette text to defined Tree.
+function rootText(t: text): Tree { return textToTree(t) ?? empty; }
+
 // Convert an Ivette text into a string to be displayed.
 function textToString(text: text): string {
   if (Array.isArray(text)) return text.slice(1).map(textToString).join('');
@@ -156,7 +159,7 @@ const Text = Editor.createTextField<text>(null, textToString);
 
 // This aspect computes the tree representing the currently displayed function's
 // code, represented by the <Text> field.
-const Tree = Editor.createAspect({ t: Text }, ({t}) => textToTree(t) ?? empty);
+const Tree = Editor.createAspect({ t: Text }, ({t}) => rootText(t));
 
 // This aspect computes the markers ranges of the currently displayed function's
 // tree, represented by the <Tree> aspect.
@@ -438,7 +441,7 @@ type access = 'Reads' | 'Writes';
 
 interface StudiaProps {
   marker: string,
-  info: Ast.markerInfoData,
+  attrs: Ast.markerAttributesData,
   kind: access,
 }
 
@@ -450,11 +453,11 @@ interface StudiaInfos {
 }
 
 async function studia(props: StudiaProps): Promise<StudiaInfos> {
-  const { marker, info, kind } = props;
+  const { marker, attrs, kind } = props;
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
   const data = await Server.send(request, marker);
   const locations = data.direct.map(([f, m]) => ({ fct: f, marker: m }));
-  const lval = info.name;
+  const lval = attrs.name;
   if (locations.length > 0) {
     const name = `${kind} of ${lval}`;
     const acc = (kind === 'Reads') ? 'accessing' : 'modifying';
@@ -478,7 +481,7 @@ async function studia(props: StudiaProps): Promise<StudiaInfos> {
 const Callers = Editor.createField<Eva.CallSite[]>([]);
 
 // This field contains information on markers.
-type GetMarkerData = (key: string) => Ast.markerInfoData | undefined;
+type GetMarkerData = (key: string) => Ast.markerAttributesData | undefined;
 const GetMarkerData = Editor.createField<GetMarkerData>(() => undefined);
 
 const ContextMenuHandler = createContextMenuHandler();
@@ -493,34 +496,33 @@ function createContextMenuHandler(): Editor.Extension {
       const node = coveringNode(tree, position);
       if (!node || !node.id) return;
       const items: Dome.PopupMenuItem[] = [];
-      const info = getData(node.id);
-      if (info?.var === 'function') {
-        if (info.kind === 'declaration') {
-          const groupedCallers = Lodash.groupBy(callers, e => e.kf);
-          const locations = callers.map((l) => ({ fct: l.kf, marker: l.stmt }));
-          Lodash.forEach(groupedCallers, (e) => {
-            const callerName = e[0].kf;
-            const callSites = e.length > 1 ? `(${e.length} call sites)` : '';
-            items.push({
-              label: `Go to caller ${callerName} ` + callSites,
-              onClick: () => update({
-                name: `Call sites of function ${info.name}`,
-                locations: locations,
-                index: locations.findIndex(l => l.fct === callerName)
-              })
-            });
+      const attrs = getData(node.id);
+      if (attrs?.isFunDecl) {
+        const groupedCallers = Lodash.groupBy(callers, (cs) => cs.kf);
+        const locations =
+          callers.map(({ kf, stmt }) => ({ fct: kf, marker: stmt }));
+        Lodash.forEach(groupedCallers, (e) => {
+          const callerName = e[0].kf;
+          const callSites = e.length > 1 ? `(${e.length} call sites)` : '';
+          items.push({
+            label: `Go to caller ${callerName} ` + callSites,
+            onClick: () => update({
+              name: `Call sites of function ${attrs.name}`,
+              locations: locations,
+              index: locations.findIndex(l => l.fct === callerName)
+            })
           });
-        } else {
-          const location = { fct: info.name };
-          const onClick = (): void => update({ location });
-          const label = `Go to definition of ${info.name}`;
-          items.push({ label, onClick });
-        }
+        });
+      } else if (attrs?.isFunction) {
+        const location = { fct: attrs.name };
+        const onClick = (): void => update({ location });
+        const label = `Go to definition of ${attrs.name}`;
+        items.push({ label, onClick });
       }
-      const enabled = info?.kind === 'lvalue' || info?.var === 'variable';
+      const enabled = attrs?.isLval;
       const onClick = (kind: access): void => {
-        if (info && node.id)
-          studia({ marker: node.id, info, kind }).then(update);
+        if (attrs && node.id)
+          studia({ marker: node.id, attrs, kind }).then(update);
       };
       const reads = 'Studia: select reads';
       const writes = 'Studia: select writes';
@@ -675,7 +677,7 @@ export default function ASTview(): JSX.Element {
   React.useEffect(() => Tags.set(view, tags), [view, tags]);
 
   // Updating CodeMirror when the <markersInfo> synchronized array is changed.
-  const info = States.useSyncArray(Ast.markerInfo);
+  const info = States.useSyncArray(Ast.markerAttributes);
   const getData = React.useCallback((key) => info.getData(key), [info]);
   React.useEffect(() => GetMarkerData.set(view, getData), [view, getData]);
 
