@@ -877,7 +877,7 @@ let print_dot filename (a:t) =
 
 
 (* functions join and unify-pointer of steensgaard's paper *)
-let rec join (x:t) (v1:V.t) (v2:V.t) : t =
+let rec join_without_check (x:t) (v1:V.t) (v2:V.t) : t =
   if (V.equal v1 v2) || not (G.mem_vertex x.graph v1 && G.mem_vertex x.graph v2)
   then
     x
@@ -896,7 +896,7 @@ let rec join (x:t) (v1:V.t) (v2:V.t) : t =
       (* join pending v1 *)
       let x =
         VSet.fold
-          (fun v x -> join x v v1)
+          (fun v x -> join_without_check x v v1)
           (try VMap.find v1 x.pending with Not_found -> VSet.empty )
           x
           (* update pending *)
@@ -906,7 +906,7 @@ let rec join (x:t) (v1:V.t) (v2:V.t) : t =
       (* join pending v2 *)
       let x =
         VSet.fold
-          (fun v x -> join x v v1)
+          (fun v x -> join_without_check x v v1)
           (try VMap.find v2 x.pending with Not_found -> VSet.empty )
           x
       in let new_pending = VMap.add v1 VSet.empty (VMap.remove v2 x.pending) in
@@ -930,14 +930,14 @@ and unify2 (x:t) (v1:V.t) (l2:V.t list) =
   match l2 with
     [] -> x
   | v2::qq ->
-    let x = join x v1 v2 in
+    let x = join_without_check x v1 v2 in
     unify2 x v1 qq
 
 (* since the recursive version of join, unify, unify2 and merge may break the invariants *)
 let join (x:t) (v1:V.t) (v2:V.t) : t =
   (* Options.feedback ~level:2 "GRAPH BEFORE JOIN(v_%d,v_%d) @.%a@." v1 v2 (pretty ~debug:true) x; *)
   assert_invariants x;
-  let res = join x v1 v2 in
+  let res = join_without_check x v1 v2 in
   assert_invariants res; res
 
 let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
@@ -1166,61 +1166,6 @@ end
 
 module V2Set = Set.Make(VPairs)
 
-
-
-(* rename all vertex re-enumerate all vertex of [x] from 0 to nb_vertex -1 *)
-let rename_all_vertex (x:t) : t =
-  assert_invariants x;
-  let new_cmpt = ref 0 in
-  let tbl_rename = Hashtbl.create (G.nb_vertex x.graph) in
-  (* fill the table *)
-  G.iter_vertex  (fun v -> Hashtbl.add tbl_rename v !new_cmpt ; incr new_cmpt) x.graph;
-  let r v =
-    try
-      Hashtbl.find tbl_rename v
-    with
-      Not_found -> Format.printf "DEBUG FAILED RENAME (%d not found) @.%a@." v (pretty ~debug:true) x; raise Not_found
-  in
-  let renamed_graph =
-    (* rename the graph and write the table *)
-    G.map_vertex
-      r
-      x.graph
-  in
-
-  let renamed_pending =
-    VMap.fold
-      (fun v vs acc ->
-         if G.mem_vertex x.graph v
-         then VMap.add (r v) vs acc
-         (* if it is not a vertex, then it is an aritfact of the map *)
-         else acc
-      )
-      x.pending
-      VMap.empty
-  in
-  let renamed_lmap =
-    LLMap.map
-      r
-      x.lmap
-  in
-  let renamed_vmap =
-    VMap.fold
-      (fun v ls acc ->
-         if G.mem_vertex x.graph v
-         then
-           VMap.add (r v) ls acc
-         else
-           acc
-      )
-      x.vmap
-      VMap.empty
-  in
-  let new_x =
-    {graph = renamed_graph; pending = renamed_pending ; lmap = renamed_lmap ; vmap = renamed_vmap ; cmpt = !new_cmpt (* ; collapsed = x.collapsed *)}
-  in
-  assert_invariants new_x; new_x
-
 (* add an int to all vertex values *)
 let shift (a : t) (offset : int) : t =
   assert_state_transformation a @@ fun a ->
@@ -1241,6 +1186,12 @@ let shift (a : t) (offset : int) : t =
    vmap = shift_vmap (fun (key, l) -> (shift key, l)) vmap;
    cmpt = shift cmpt}
 
+let lmap_intersect l r =
+  let find_in_l lval vr acc =
+    try (LLMap.find lval l, vr) :: acc with Not_found -> acc
+  in
+  LLMap.fold find_in_l r []
+
 let union  (a1:t) (a2:t) :t =
   (* naive algorithm :
      1 rename any vertex in a2 (by adding a1.cmpt) to avoid any confusion between vertex of the tw graphs
@@ -1258,115 +1209,31 @@ let union  (a1:t) (a2:t) :t =
   Format.printf "Second graph:@.%a@." print_debug a2;
   (* ensure that a1 and a2 no longer share any vertex indices *)
   let a2 = shift a2 a1.cmpt in
-  (* we build the new graph, starting from a1.graph *)
-  let g = a1.graph in
-  (* add all vertex of a2 in g *)
-  (* add all edges of a2 in g *)
   let new_graph =
     G.fold_edges
       (fun v2a v2b g -> G.add_edge g v2a v2b)
       a2.graph
-      g
+      a1.graph
   in
-  let new_pending =
-    VMap.fold
-      (fun v2 p2 m -> VMap.add v2 p2 m)
-      a2.pending
-      a1.pending
-  in
+  let new_pending = VMap.fold VMap.add a2.pending a1.pending in
   let new_vmap =
     VMap.fold
       (fun v2 lset2 m -> VMap.add v2 lset2 m)
       a2.vmap
       a1.vmap
   in
-  (* let new_collapsed =
-   *   VSet.union a1.collapsed a2.collapsed
-   * in *)
-  let rec find_all_successors (set_res: V2Set.t) (v1: V.t) (v2:V.t) (g:G.t) =
-    (* NB this function assumes there is no strongly connected components in the graph !!! *)
-    match (G.succ g v1, G.succ g v2) with
-      ([],_) | (_,[]) -> set_res
-    | ([succ_v1], [succ_v2]) -> find_all_successors (V2Set.add (v1, v2) set_res) succ_v1 succ_v2 g
-    | _ -> Options.fatal "Broken invariant: at most 1 successor"
-
-  in
-  (* s_acc = set of couples that should be merged in step 3 *)
-  let set_to_be_merged, new_lmap =
+  let new_lmap =
     LLMap.fold
-      (fun lv v2 (s_acc, m_acc) ->
-         (* if lv has an entry in a1.lmap, then add the two vertex to be merged *)
-         try
-           let v1 = LLMap.find lv a1.lmap in
-           let set_with_successors = find_all_successors (V2Set.add (v1, v2) s_acc) v1 v2 new_graph in
-           (set_with_successors, m_acc)
-         (* WARNING : potential bug here: the invariant of lmap is broken
-            since lv shall be mapped to both v1 and v2; the merge
-            that are done in step 3 shall restore the invariant*)
-         with
-         (* if not, simply add the lval -> v2 in m_acc *)
-           Not_found -> (s_acc, LLMap.add lv v2 m_acc)
-      )
+      (fun lv v2 m_acc -> LLMap.add lv v2 m_acc)
       a2.lmap
-      (V2Set.empty, a1.lmap)
+      a1.lmap
   in
-  let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = a1.cmpt + a2.cmpt (* ; collapsed = new_collapsed  *)} in
-
-  (* step 3 *)
-  let new_a =
-    V2Set.fold
-      (fun (v1, v2) a ->
-         let new_a = merge a v1 v2 in
-         let new_vset  =
-           let p1=  try  (VMap.find v1 new_a.pending) with Not_found -> VSet.empty in
-           let p2=  try  (VMap.find v2 new_a.pending) with Not_found -> VSet.empty in
-           VSet.union p1 p2
-         in
-         (* warning: exploits the fact that v1 is preserved in the merge operation *)
-         let new_pending = VMap.add v1 new_vset (VMap.remove v2 new_a.pending) in
-         { new_a with pending = new_pending }
-      )
-      set_to_be_merged
-      new_a
-  in
-  (* (\* there may be some inconsistancies with constant nodes, so we clean up *\)
-   * let clean_up_constant_successors (v:V.t) (res_a:t) : t =
-   *   let l_succ = G.succ new_a.graph v in
-   *   if l_succ = []
-   *   then res_a (\* nothing to do *\)
-   *   else
-   *     (\* find the only successor that is not a constant node *\)
-   *     let true_succ =
-   *       List.fold_left
-   *         (fun res v ->
-   *            if LSet.is_empty (VMap.find v res_a.vmap)
-   *            then res
-   *            else v)
-   *         (List.hd l_succ)
-   *         l_succ
-   *     in
-   *     (\* eliminate all nodes that is not the true successor *\)
-   *     List.fold_left
-   *       (fun res_a v -> if V.equal v true_succ then res_a else remove_cst_vertex v res_a)
-   *       res_a
-   *       l_succ
-   * in
-   * let new_a =
-   *   G.fold_vertex
-   *     clean_up_constant_successors
-   *     new_a.graph
-   *     new_a
-   * in *)
-  let new_a =
-    (* if new_a.cmpt > 2 * (G.nb_vertex new_a.graph)
-     * then *)
-    rename_all_vertex new_a
-    (* else
-     *   new_a *)
-  in
-  assert_invariants new_a;
+  let to_be_joined = lmap_intersect a1.lmap a2.lmap in
+  let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = max a1.cmpt a2.cmpt} in
+  let new_a = List.fold_left (fun s (l,r) -> join_without_check s l r) new_a to_be_joined in
   Format.printf "Result graph:@.%a@." print_debug new_a;
   Format.printf "END DEBUG UNION@.";
+  assert_invariants new_a;
   new_a
 
 let empty :t =
