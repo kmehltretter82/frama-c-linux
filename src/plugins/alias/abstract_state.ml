@@ -256,18 +256,18 @@ let get_lval_set = find_lset
 
 let print_debug fmt (x:t) =
   Format.fprintf fmt "@[<hov 2>List of vertices: @.";
-  G.iter_vertex (fun v -> Format.fprintf fmt "(id=%d LSet= %a)@." v LSet.pp_debug (find_lset v x)) x.graph;
+  G.iter_vertex (fun v -> Format.fprintf fmt "id=%d LSet=%a@." v LSet.pp_debug (find_lset v x)) x.graph;
   Format.fprintf fmt "@]@.@[<hov 2>List of edges: @.";
-  G.iter_edges (fun v1 v2 -> Format.fprintf fmt "(%d -> %d)@." v1 v2) x.graph;
+  G.iter_edges (fun v1 v2 -> Format.fprintf fmt "%d → %d@." v1 v2) x.graph;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "@[<hov 2>Pending: @.";
-  VMap.iter (fun v vs -> Format.fprintf fmt "(id=%d pending= %a)@." v VSet.pretty vs) x.pending;
+  VMap.iter (fun v vs -> Format.fprintf fmt "id=%d pending=%a@." v VSet.pretty vs) x.pending;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "@[<hov 2>LMap: @.";
   LLMap.pretty fmt x.lmap;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "@[<hov 2>VMap: @.";
-  VMap.iter (fun v ls -> Format.fprintf fmt "(id = %d -> lset= %a)@." v LSet.pp_debug ls) x.vmap;
+  VMap.iter (fun v ls -> Format.fprintf fmt "id=%d → lset=%a@." v LSet.pp_debug ls) x.vmap;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "cmpt: %d@." x.cmpt
 (* let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
