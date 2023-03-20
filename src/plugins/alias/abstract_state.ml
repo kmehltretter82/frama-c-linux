@@ -372,6 +372,11 @@ let assert_invariants x =
   with
     Assert_failure f ->  (Format.printf "DEBUG FAILED INVARIANTS@.%a@." (pretty ~debug:true) x; raise (Assert_failure f))
 
+let assert_state_transformation (x:t) (f: t -> t) : t =
+  assert_invariants x;
+  let result = f x in
+  assert_invariants result;
+  result
 
 (* find functions, part 2 *)
 let rec closure_find_lset (v:V.t) (x:t) =
