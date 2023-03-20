@@ -1251,7 +1251,7 @@ let union  (a1:t) (a2:t) :t =
   in
   let new_pending =
     VMap.fold
-      (fun v2 p2 m -> VMap.add (f_v2 v2) p2 m)
+      (fun v2 p2 m -> VMap.add (f_v2 v2) (VSet.map f_v2 p2) m)
       a2.pending
       a1.pending
   in
