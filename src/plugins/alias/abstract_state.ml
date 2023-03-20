@@ -256,24 +256,36 @@ let get_lval_set = find_lset
 
 let print_debug fmt (x:t) =
   Format.fprintf fmt "@[<hov 2>List of vertices: @.";
-  G.iter_vertex (fun v -> Format.fprintf fmt "(id=%d LSet= %a)@." v LSet.pp_debug (find_lset v x)) x.graph;
+  G.iter_vertex (fun v -> Format.fprintf fmt "id=%d LSet=%a@." v LSet.pp_debug (find_lset v x)) x.graph;
   Format.fprintf fmt "@]@.@[<hov 2>List of edges: @.";
-  G.iter_edges (fun v1 v2 -> Format.fprintf fmt "(%d -> %d)@." v1 v2) x.graph;
+  G.iter_edges (fun v1 v2 -> Format.fprintf fmt "%d → %d@." v1 v2) x.graph;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "@[<hov 2>Pending: @.";
-  VMap.iter (fun v vs -> Format.fprintf fmt "(id=%d pending= %a)@." v VSet.pretty vs) x.pending;
+  VMap.iter (fun v vs -> Format.fprintf fmt "id=%d pending=%a@." v VSet.pretty vs) x.pending;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "@[<hov 2>LMap: @.";
   LLMap.pretty fmt x.lmap;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "@[<hov 2>VMap: @.";
-  VMap.iter (fun v ls -> Format.fprintf fmt "(id = %d -> lset= %a)@." v LSet.pp_debug ls) x.vmap;
+  VMap.iter (fun v ls -> Format.fprintf fmt "id=%d → lset=%a@." v LSet.pp_debug ls) x.vmap;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "cmpt: %d@." x.cmpt
 (* let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
  * Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval *)
 
 let print_aliases fmt (x:t) =
+  let print_set ?(first = true) pretty fmt s =
+    let first = ref first in
+    let print_element e =
+      if !first then first := false else Format.fprintf fmt "%s" "; ";
+      Format.fprintf fmt "%a" pretty e in
+    LSet.iter print_element s
+  in
+  let print_lv_and_pred lv pred =
+    Format.fprintf fmt "{%a%a} are aliased@."
+      (print_set Lval.pretty) lv
+      (print_set ~first:false (fun fmt -> Format.fprintf fmt "*%a" Lval.pretty)) pred
+  in
   let iter_vmap v set_lv =
     if G.mem_vertex x.graph v then
       match G.succ x.graph v with
@@ -287,28 +299,17 @@ let print_aliases fmt (x:t) =
             v;
           if LSet.cardinal set_lv + LSet.cardinal !set_pred >= 2
           then
-            Format.fprintf fmt "{%a%a} are aliased@."
-              (fun fmt s ->
-                 LSet.iter
-                   (fun lv -> Format.fprintf fmt "%a; " Lval.pretty lv)
-                   s
-              )
-              set_lv
-              (fun fmt s ->
-                 LSet.iter
-                   (fun lv -> Format.fprintf fmt "*%a; " Lval.pretty lv)
-                   s
-              )
-              !set_pred
+            print_lv_and_pred set_lv !set_pred
         end
       | _ -> Options.fatal "this should not happen"
   in
-  Format.fprintf fmt "@[<hov 2><list of may-alias>@.";
+  Format.fprintf fmt "@[<hov 2>";
   VMap.iter iter_vmap x.vmap;
-  Format.fprintf fmt "<end of list>@]@."(* ;
+  Format.fprintf fmt "@]@."(* ;
                                          * let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
                                          * if not (LSet.is_empty collapsed_lval) then
                                          *   Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval *)
+
 
 let pretty ?(debug=false) =
   if debug then
@@ -371,6 +372,11 @@ let assert_invariants x =
   with
     Assert_failure f ->  (Format.printf "DEBUG FAILED INVARIANTS@.%a@." (pretty ~debug:true) x; raise (Assert_failure f))
 
+let assert_state_transformation (x:t) (f: t -> t) : t =
+  assert_invariants x;
+  let result = f x in
+  assert_invariants result;
+  result
 
 (* find functions, part 2 *)
 let rec closure_find_lset (v:V.t) (x:t) =
@@ -1215,6 +1221,33 @@ let rename_all_vertex (x:t) : t =
   in
   assert_invariants new_x; new_x
 
+(* add an int to all vertex values *)
+let shift (a : t) (offset : int) : t =
+  assert_state_transformation a @@ fun a ->
+  (* maybe if offset < #vertices there will be a problem? *)
+  let offset = max offset @@ G.nb_vertex a.graph in
+  Format.printf "BEGIN DEBUG shift@.";
+  Format.printf "Input:@.%a@." print_debug a;
+  let shift x = x + offset in
+  let shift_vmap shift_elem vmap =
+    VMap.of_seq @@ Stdlib.Seq.map shift_elem @@ VMap.to_seq vmap
+  in
+  let {graph; pending; lmap; vmap; cmpt} = a in
+  let pending' =
+    let shift_elem (key, set) = (shift key, VSet.map shift set) in
+    shift_vmap shift_elem pending
+  in
+  let result =
+    {graph = G.map_vertex shift graph;
+     pending = pending';
+     lmap = LLMap.map shift lmap;
+     vmap = shift_vmap (fun (key, l) -> (shift key, l)) vmap;
+     cmpt = shift cmpt}
+  in
+  Format.printf "Output:@.%a@." print_debug result;
+  Format.printf "END DEBUG shift@.";
+  result
+
 let union  (a1:t) (a2:t) :t =
   (* naive algorithm :
      1 rename any vertex in a2 (by adding a1.cmpt) to avoid any confusion between vertex of the tw graphs
@@ -1230,33 +1263,27 @@ let union  (a1:t) (a2:t) :t =
   Format.printf "BEGIN DEBUG UNION@.";
   Format.printf "First graph:@.%a@." print_debug a1;
   Format.printf "Second graph:@.%a@." print_debug a2;
-  Format.printf "END DEBUG UNION@.";
-  let f_v2 x = x + a1.cmpt in
+  (* ensure that a1 and a2 no longer share any vertex indices *)
+  let a2 = shift a2 a1.cmpt in
   (* we build the new graph, starting from a1.graph *)
   let g = a1.graph in
   (* add all vertex of a2 in g *)
-  let g =
-    G.fold_vertex
-      (fun v2 g -> G.add_vertex g (f_v2 v2))
-      a2.graph
-      g
-  in
   (* add all edges of a2 in g *)
   let new_graph =
     G.fold_edges
-      (fun v2a v2b g -> G.add_edge g (f_v2 v2a) (f_v2 v2b))
+      (fun v2a v2b g -> G.add_edge g v2a v2b)
       a2.graph
       g
   in
   let new_pending =
     VMap.fold
-      (fun v2 p2 m -> VMap.add (f_v2 v2) p2 m)
+      (fun v2 p2 m -> VMap.add v2 p2 m)
       a2.pending
       a1.pending
   in
   let new_vmap =
     VMap.fold
-      (fun v2 lset2 m -> VMap.add (f_v2 v2) lset2 m)
+      (fun v2 lset2 m -> VMap.add v2 lset2 m)
       a2.vmap
       a1.vmap
   in
@@ -1267,7 +1294,7 @@ let union  (a1:t) (a2:t) :t =
     (* NB this function assumes there is no strongly connected components in the graph !!! *)
     match (G.succ g v1, G.succ g v2) with
       ([],_) | (_,[]) -> set_res
-    | ([succ_v1], [succ_v2]) -> find_all_successors (V2Set.add (v1,(f_v2 v2)) set_res) succ_v1 succ_v2 g
+    | ([succ_v1], [succ_v2]) -> find_all_successors (V2Set.add (v1, v2) set_res) succ_v1 succ_v2 g
     | _ -> Options.fatal "Broken invariant: at most 1 successor"
 
   in
@@ -1278,14 +1305,14 @@ let union  (a1:t) (a2:t) :t =
          (* if lv has an entry in a1.lmap, then add the two vertex to be merged *)
          try
            let v1 = LLMap.find lv a1.lmap in
-           let set_with_successors = find_all_successors (V2Set.add (v1,(f_v2 v2)) s_acc) v1 (f_v2 v2) new_graph in
+           let set_with_successors = find_all_successors (V2Set.add (v1, v2) s_acc) v1 v2 new_graph in
            (set_with_successors, m_acc)
          (* WARNING : potential bug here: the invariant of lmap is broken
-            since lv shall be mapped to both v1 and (f_v2 v2); the merge
+            since lv shall be mapped to both v1 and v2; the merge
             that are done in step 3 shall restore the invariant*)
          with
-         (* if not, simply add the lval -> f_v2 v2 in m_acc *)
-           Not_found -> (s_acc, LLMap.add lv (f_v2 v2) m_acc)
+         (* if not, simply add the lval -> v2 in m_acc *)
+           Not_found -> (s_acc, LLMap.add lv v2 m_acc)
       )
       a2.lmap
       (V2Set.empty, a1.lmap)
@@ -1345,6 +1372,8 @@ let union  (a1:t) (a2:t) :t =
      *   new_a *)
   in
   assert_invariants new_a;
+  Format.printf "Result graph:@.%a@." print_debug new_a;
+  Format.printf "END DEBUG UNION@.";
   new_a
 
 let empty :t =

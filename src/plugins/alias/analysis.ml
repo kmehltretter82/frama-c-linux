@@ -245,12 +245,12 @@ let doFunction (kf:kernel_function) =
         | None -> Format.fprintf fmt "<Bot>"
         | Some a -> Abstract_state.pretty ~debug fmt a
       in
-      let first_stmts =
-        try [Kernel_function.find_first_stmt kf]
-        with Kernel_function.No_Statement -> []
+      let first_stmt =
+        try Kernel_function.find_first_stmt kf
+        with Kernel_function.No_Statement -> assert false
       in
-      List.iter (fun stmt -> T.StmtStartData.add stmt (Some Abstract_state.empty)) first_stmts;
-      F.compute first_stmts;
+      T.StmtStartData.add first_stmt (Some Abstract_state.empty);
+      F.compute [first_stmt];
       let return_stmt = Kernel_function.find_return kf in
       let final_state : Abstract_state.t option =
         try Stmt_table.find return_stmt

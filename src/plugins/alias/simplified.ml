@@ -176,15 +176,15 @@ struct
     let is_first = ref true in
     Format.fprintf fmt "{@[<hov 2>";
     iter (fun e ->
-        if not !is_first
+        if !is_first
         then
-          Format.fprintf fmt ",@,"
+          is_first := false
         else
-          is_first := false;
-        Format.fprintf fmt " %a" f_elt e
+          Format.fprintf fmt ",@ ";
+        Format.fprintf fmt "%a" f_elt e
       )
       m;
-    Format.fprintf fmt " @]}@."
+    Format.fprintf fmt "@]}@?"
 
   let pretty fmt s = print Simplified_lval.pretty fmt s
 
