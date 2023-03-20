@@ -22,22 +22,56 @@
 
 open Cil_types
 
-(* type of the return of the following function *)
-type basic_lval =  BNone | BLval of lval | BAddrOf of lval
+type simplified_lval =
+    BNone (* anything that is not an adress or a lval *)
+  | BLval of lval (* lval *)
+  | BAddrOf of lval (* address *)
 
-(* finds, in an expression, the "basic" lval (eg a variable, a pointer or an array name). *)
-let rec find_basic_lval (exp:exp) : basic_lval =
-  match exp.enode with
-    Lval lv -> BLval lv
-  | AddrOf lv -> BAddrOf lv
-  | CastE (_,exp) -> find_basic_lval exp
-  | UnOp (_,exp,_) -> find_basic_lval exp
-  | BinOp (_,exp1,exp2,_) ->
-    begin
-      match (find_basic_lval exp1, find_basic_lval exp2) with
-        (BNone,BNone) -> BNone
-      | (BNone, res2) -> res2
-      | (res1, BNone) -> res1
-      | _ -> failwith "find_basic_lval: 2 basic lval in a BinOp"
-    end
-  | _ -> BNone
+module Simplified_lval:
+sig
+  type t = simplified_lval
+
+  val compare: t -> t -> int
+
+  (* result stored in cache *)
+  val from_lval: lval -> t
+
+  (* result stored in cache *)
+  val from_exp: exp -> t
+
+  val pretty: Format.formatter -> t -> unit
+
+  val pp_debug : Format.formatter -> t -> unit
+
+  val removeOffsetLval : t -> t * offset
+
+  val addOffsetLval : offset -> t -> t
+end
+
+module Simplified_lmap:
+sig
+  include Map.S with type key = Simplified_lval.t
+
+  val pretty: (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
+
+  val pp_debug : (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
+end
+
+module Simplified_lset:
+sig
+  include Set.S with type elt = Simplified_lval.t
+
+  val pretty: Format.formatter -> t -> unit
+
+  val pp_debug : Format.formatter -> t -> unit
+
+  (* special fold *)
+  val fold_lval : (lval -> 'a -> 'a) -> t -> 'a -> 'a
+
+end
+
+val  decompose_lval : Simplified_lval.t -> (Simplified_lval.t*offset) list
+
+(** clear the two caches *)
+val clear_cache : unit -> unit
+

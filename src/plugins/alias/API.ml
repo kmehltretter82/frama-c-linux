@@ -24,30 +24,37 @@ open Cil_types
 
 open Cil_datatype
 
+(** Points-to graphs datastructure. *)
+module G=Graph.Persistent.Digraph.Concrete(Datatype.Int)
+
 module LSet = Lval.Set
 
+module Abstract_state = Abstract_state
+
 let check_computed () =
-  if not (Analysis.is_computed ())
-  then
-    Options.abort "Static analysis must be called before any function of the API can be called"
+  (* for MERCE release's D1.2 *)
+  ignore (Options.abort "Function not yet provided in this release.")
+(*  if not (Analysis.is_computed ())
+    then
+    Options.abort "Static analysis must be called before any function of the API can be called"*)
 
 
 let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
-  match Analysis.get_abstract_state kf s with
+  match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
-    let set_aliases = Abstract_state.find_aliases lv state in
-    LSet.fold (fun e a -> f_fold a e) set_aliases acc
+    let _set_aliases = Abstract_state.find_aliases lv state in
+    LSet.fold (fun e a -> f_fold a e)  LSet.empty (* set_aliases *) acc
 
 let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =
   check_computed ();
-  match Analysis.get_abstract_state kf s with
+  match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
     let new_state = Analysis.do_stmt state s in
-    let set_aliases = Abstract_state.find_aliases lv new_state in
-    LSet.fold (fun e a -> f_fold a e) set_aliases acc
+    let _set_aliases = Abstract_state.find_aliases lv new_state in
+    LSet.fold (fun e a -> f_fold a e) LSet.empty (*set_aliases*) acc
 
 let fold_aliases_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
   check_computed ();
@@ -80,27 +87,37 @@ let fold_fundec_stmts (f_fold: 'a -> stmt -> lval -> 'a) (acc: 'a) (kf:kernel_fu
 
 let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
   check_computed ();
-  match Analysis.get_abstract_state kf s with
+  match Analysis.get_state_before_stmt kf s with
     None -> false
   | Some state ->
-    let setv1 = Abstract_state.find_aliases lv1 state in
-    LSet.mem lv2 setv1
+    let _setv1 = Abstract_state.find_aliases lv1 state in
+    LSet.mem lv2 LSet.empty (* setv1 *)
 
-let fold_points_to   (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+let fold_points_to   (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
-  match Analysis.get_abstract_state kf s with
+  match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
-    let set_aliases = Abstract_state.find_aliases lv state in
-    f_fold acc set_aliases
-
-let fold_points_to_closure  (f_fold : 'a -> Lval.Set.t -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
-  check_computed ();
-  match Analysis.get_abstract_state kf s with
-    None -> acc
-  | Some state ->
-    let list_closure = Abstract_state.find_transitive_closure lv state in
-    List.fold_left
-      f_fold
+    let _set_aliases = Abstract_state.find_aliases lv state in
+    LSet.fold
+      (fun lv acc -> f_fold acc 0 lv)
+      LSet.empty (*set_aliases*)
       acc
-      list_closure
+
+let fold_points_to_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+  check_computed ();
+  match Analysis.get_state_before_stmt kf s with
+    None -> acc
+  | Some state ->
+    let _list_closure = Abstract_state.find_transitive_closure lv state in
+    List.fold_left
+      (fun acc s -> f_fold acc 0 s)
+      acc
+      [] (* list_closure *)
+
+let get_state_before_stmt = Analysis.get_state_before_stmt
+
+let call_function a f res args =
+  match Analysis.get_summary f with
+    None -> None
+  | Some su -> Some(Abstract_state.call a res args su)

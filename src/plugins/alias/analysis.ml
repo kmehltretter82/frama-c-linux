@@ -22,7 +22,7 @@
 
 open Cil_types
 open Cil_datatype
-open Utils
+open Simplified
 
 module Dataflow = Dataflow2
 
@@ -81,7 +81,7 @@ end
 
 let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
   (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)
-  match (a,lv, find_basic_lval exp) with
+  match (a,lv, Simplified_lval.from_exp exp) with
     (Some a, (Var v1, NoOffset), BLval (Var v2,NoOffset)) ->
     (* case x = y *)
     Some (Abstract_state.assignment_x_y a (Var v1, NoOffset) (Var v2, NoOffset))
@@ -243,7 +243,7 @@ let doFunction (kf:kernel_function) =
         try [Kernel_function.find_first_stmt kf]
         with Kernel_function.No_Statement -> []
       in
-      List.iter (fun stmt -> T.StmtStartData.add stmt (Some Abstract_state.initial_value)) first_stmts;
+      List.iter (fun stmt -> T.StmtStartData.add stmt (Some Abstract_state.empty)) first_stmts;
       F.compute first_stmts;
       let return_stmt = Kernel_function.find_return kf in
       let final_state : Abstract_state.t option =
@@ -259,7 +259,7 @@ let doFunction (kf:kernel_function) =
              *   )
              *   f_dec.sallstmts; *)
             Options.warning "Analysis is continuing but will not be sound";
-            Some (Abstract_state.initial_value)
+            Some (Abstract_state.empty)
           end
       in
       if not (Kernel_function.is_main kf) then
@@ -289,7 +289,7 @@ let doFunction (kf:kernel_function) =
       (* Options.warning "Function %a has no definition (summary empty)"
        *   Kernel_function.pretty kf; *)
       let summary: Abstract_state.summary =
-        Abstract_state.make_summary (Some Abstract_state.initial_value) kf
+        Abstract_state.make_summary (Some Abstract_state.empty) kf
       in
       Function_table.add kf (Some summary)
     end
@@ -351,7 +351,7 @@ let clear () =
   computed_flag := false;
   (*Stmt_table*)Stmt_table.clear()
 
-let get_abstract_state _ stmt =
+let get_state_before_stmt _ stmt =
   if is_computed ()
   then
     try Stmt_table.find stmt with
@@ -359,3 +359,10 @@ let get_abstract_state _ stmt =
   else
     None
 
+let get_summary kf =
+  if is_computed ()
+  then
+    try Function_table.find kf with
+      Not_found -> None
+  else
+    None
