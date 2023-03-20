@@ -57,6 +57,7 @@ val get_int : selection -> int option
 val destruct : selection -> selection list
 
 val head : clause -> pred
+val equal : selection -> selection -> bool
 val is_empty : selection -> bool
 val selected : selection -> term
 val subclause : clause -> pred -> bool
