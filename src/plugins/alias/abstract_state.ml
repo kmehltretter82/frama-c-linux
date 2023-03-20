@@ -340,10 +340,13 @@ let assert_invariants (x:t) : unit =
     assert (LSet.mem lv (VMap.find v x.vmap))
   in
   LLMap.iter assert_lmap x.lmap;
-  let assert_vmap (_:V.t) (ls:LSet.t) =
-    assert (LSet.fold (fun lv acc -> acc && LLMap.mem lv x.lmap) ls true)
+  let assert_vmap (v:V.t) (ls:LSet.t) =
+    assert (LSet.fold (fun lv acc -> acc && V.equal (LLMap.find lv x.lmap) v) ls true)
   in
-  VMap.iter assert_vmap x.vmap(* ;
+  VMap.iter assert_vmap x.vmap
+
+
+(* ;
                                * let assert_collapsed (v:V.t) =
                                *   assert (G.mem_vertex x.graph v);
                                *   match G.succ x.graph v with
@@ -469,7 +472,7 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   (* add all these aliases *)
   let new_lmap =
     LSet.fold
-      (fun lv acc -> LLMap.add lv new_v acc)
+      (fun lv acc -> assert (not (LLMap.mem lv x.lmap)); LLMap.add lv new_v acc)
       set_of_aliases
       x.lmap
   in
