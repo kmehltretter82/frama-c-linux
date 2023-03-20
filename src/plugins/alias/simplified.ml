@@ -204,23 +204,26 @@ end
 let decompose_lval (lv1: Simplified_lval.t) : (Simplified_lval.t*offset) list =
   let rec list_of_offset (o: offset) : (offset*offset) list =
     match o with
-      NoOffset -> [NoOffset,NoOffset]
+      NoOffset -> [NoOffset,o]
     | Index(e,ofs) ->
       let li =
         List.map
           (fun (o1,o2) -> (Index(e,o1),o2))
           (list_of_offset ofs)
       in
-      (NoOffset,ofs)::li
+      (NoOffset,o)::li
     | Field(f, ofs) ->
       let li =
         List.map
           (fun (o1,o2) -> (Field(f,o1),o2))
           (list_of_offset ofs)
       in
-      (NoOffset,ofs)::li
+      (NoOffset,o)::li
   in
   let lv, off = Simplified_lval.removeOffsetLval lv1 in
+  (*   Format.printf "DEBUG: list of offsets: [@[<hov 2>";
+   * List.iter (fun (o1,o2) -> Format.printf " <%a,%a> " Offset.pretty o1 Offset.pretty o2) (list_of_offset off);
+   * Format.printf"@]]@."; *)
   List.map
     (fun (o1,o2) -> (Simplified_lval.addOffsetLval o1 lv,o2))
     (list_of_offset off)

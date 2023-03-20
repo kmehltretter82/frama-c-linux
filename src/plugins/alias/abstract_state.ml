@@ -445,6 +445,9 @@ let find_all_aliases (lv1: Lval.t) (x: t) : LSet.t =
     with
       Not_found -> (LSet.empty,o)
   in
+  (* Format.printf "DEBUG: decompose_lval %a : [@[<hov 2>" Lval.pp_debug lv1;
+   * List.iter (fun (x, o) -> Format.printf " (%a,%a) " Lval.pp_debug x Offset.pretty o) list_of_lval_to_be_searched;
+   * Format.printf "@]]@."; *)
   let list_of_aliases : (LSet.t*offset) list =
     List.map f_map list_of_lval_to_be_searched
   in
@@ -468,8 +471,9 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   let new_g = G.add_vertex x.graph new_v in
   let new_pending = VMap.add new_v VSet.empty x.pending in
   (* find all the alias of lv (because of offset) *)
-  let set_of_aliases = find_all_aliases lv x in
+  let set_of_aliases : LSet.t = find_all_aliases lv x in
   (* add all these aliases *)
+  Format.printf "DEBUG: all_aliases of %a : %a @." Lval.pp_debug lv LSet.pp_debug set_of_aliases;
   let new_lmap =
     LSet.fold
       (fun lv acc -> assert (not (LLMap.mem lv x.lmap)); LLMap.add lv new_v acc)
@@ -617,6 +621,7 @@ let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
    in the graph. If it is present, there will be bugs *)
 let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
   assert (not (LLMap.mem blv x.lmap));
+  Format.printf "creating a vertex for %a@." Lval.pp_debug blv;
   match blv with
     BNone -> Options.fatal "this should not happen"
   | BLval lv ->
@@ -681,6 +686,7 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
           map_predecessors
           VSet.empty
       in
+      Format.printf "DEBUG: found aliases of %a : %a@." Lval.pp_debug lv VSet.pretty vset_res;
       if VSet.is_empty vset_res
       then create_vertex_lval lv x
       else
@@ -1039,8 +1045,8 @@ let assignment_ptr_x_cst (a:t) (x:lval) : t =
   let new_a =
     match list_v1 with
       [] ->  let v1,a = find_or_create_vertex x a in set_type a v1 v2
-    | _ -> let f_fold (acc:t) (v1:V.t) : t = cjoin acc v1 v2
-      in List.fold_left f_fold a list_v1
+    | [v1] ->  cjoin a v1 v2
+    | _ -> Options.fatal "invariant broken "
   in
   assert_invariants new_a ; new_a
 
