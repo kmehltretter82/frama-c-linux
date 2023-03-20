@@ -19,7 +19,7 @@ buildDunePackage rec {
     sha256 = "19g26jv6cjinpl5pcjif1ldyaagxlandp3qjajsy8srqg4a5rg0d";
   };
 
-  buildInputs = [ gmp mpfr ];
+  propagatedBuildInputs = [ gmp mpfr ];
 
   meta = {
     description = "The package provides bindings for MPFR";
