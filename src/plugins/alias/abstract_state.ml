@@ -1231,7 +1231,6 @@ let union  (a1:t) (a2:t) :t =
   Format.printf "BEGIN DEBUG UNION@.";
   Format.printf "First graph:@.%a@." print_debug a1;
   Format.printf "Second graph:@.%a@." print_debug a2;
-  Format.printf "END DEBUG UNION@.";
   let f_v2 x = x + a1.cmpt in
   (* we build the new graph, starting from a1.graph *)
   let g = a1.graph in
@@ -1346,6 +1345,8 @@ let union  (a1:t) (a2:t) :t =
      *   new_a *)
   in
   assert_invariants new_a;
+  Format.printf "Result graph:@.%a@." print_debug new_a;
+  Format.printf "END DEBUG UNION@.";
   new_a
 
 let empty :t =
