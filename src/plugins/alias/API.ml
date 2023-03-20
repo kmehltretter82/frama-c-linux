@@ -35,7 +35,7 @@ let check_computed () =
   (* for MERCE release's D1.2 *)
   ignore (Options.abort "Function not yet provided in this release.")
 (*  if not (Analysis.is_computed ())
-  then
+    then
     Options.abort "Static analysis must be called before any function of the API can be called"*)
 
 
