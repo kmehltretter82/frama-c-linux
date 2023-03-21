@@ -232,7 +232,6 @@ type t = {
   lmap : LLMap.t ; (* lmap(lv) is a table [offset->v] where the vertex v corresponding to lval (lv+offset), in other words (lv+offset) is in label(v) *)
   vmap : LSet.t VMap.t ;(* reverse of lmap *)
   cmpt : Int.t ; (* counter to create new vertex *)
-  (* collapsed : VSet.t (\* arrays that are collapsed because of non-constant accesses. All aliased arrays are collapsed *\) *)
 }
 
 
@@ -270,8 +269,15 @@ let print_debug fmt (x:t) =
   VMap.iter (fun v ls -> Format.fprintf fmt "id=%d → lset=%a@." v LSet.pp_debug ls) x.vmap;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "cmpt: %d@." x.cmpt
-(* let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
- * Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval *)
+
+let print_graph fmt (x:t) =
+  let print_edge v1 v2 =
+    LSet.pretty fmt @@ VMap.find v1 x.vmap;
+    Format.fprintf fmt " → ";
+    LSet.pretty fmt @@ VMap.find v2 x.vmap;
+    Format.fprintf fmt "@.";
+  in
+  G.iter_edges print_edge x.graph
 
 let print_aliases fmt (x:t) =
   let print_set ?(first = true) pretty fmt s =
@@ -305,18 +311,7 @@ let print_aliases fmt (x:t) =
   in
   Format.fprintf fmt "@[<hov 2>";
   VMap.iter iter_vmap x.vmap;
-  Format.fprintf fmt "@]@."(* ;
-                                         * let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
-                                         * if not (LSet.is_empty collapsed_lval) then
-                                         *   Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval *)
-
-
-let pretty ?(debug=false) =
-  if debug then
-    print_debug
-  else
-    print_aliases
-
+  Format.fprintf fmt "@]@."
 
 (** invariants of type t must be true before and after each functon call *)
 let assert_invariants (x:t) : unit =
@@ -346,31 +341,20 @@ let assert_invariants (x:t) : unit =
   in
   VMap.iter assert_vmap x.vmap
 
-
-(* ;
-                               * let assert_collapsed (v:V.t) =
-                               *   assert (G.mem_vertex x.graph v);
-                               *   match G.succ x.graph v with
-                               *     [v'] ->
-                               *     begin
-                               *       let set_v = find_lset v x in
-                               *       let set_v' = find_lset v' x in
-                               *       (\* check that for each lvl lv of v, lv[0] belongs to succ(v) *\)
-                               *       LSet.iter
-                               *         (fun lv ->
-                               *            assert (LSet.mem (first_index lv) set_v')
-                               *         )
-                               *         set_v
-                               *     end
-                               *   | _ -> assert false
-                               * in
-                               * VSet.iter assert_collapsed x.collapsed *)
-
 (* for debuging, remove this function before last deliverable *)
 let assert_invariants x =
   try assert_invariants x
   with
-    Assert_failure f ->  (Format.printf "DEBUG FAILED INVARIANTS@.%a@." (pretty ~debug:true) x; raise (Assert_failure f))
+    Assert_failure f ->  (Format.printf "DEBUG FAILED INVARIANTS@.%a@." print_debug x; raise (Assert_failure f))
+
+let pretty ?(debug=false) fmt (x:t) =
+  if debug then
+    try
+      assert_invariants x;
+      print_graph fmt x
+    with Assert_failure _ -> print_debug fmt x
+  else
+    print_aliases fmt x
 
 let assert_state_transformation (x:t) (f: t -> t) : t =
   assert_invariants x;
@@ -434,8 +418,7 @@ let create_cst_vertex (x:t) : V.t * t =
     pending = new_pending ;
     lmap = new_lmap ;
     vmap = new_vmap ;
-    cmpt = x.cmpt+1(*  ;
-                    * collapsed = x.collapsed *)
+    cmpt = x.cmpt+1
   }
 
 
@@ -479,7 +462,6 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   (* find all the alias of lv (because of offset) *)
   let set_of_aliases : LSet.t = find_all_aliases lv x in
   (* add all these aliases *)
-  Format.printf "DEBUG: all_aliases of %a : %a @." Lval.pp_debug lv LSet.pp_debug set_of_aliases;
   let new_lmap =
     LSet.fold
       (fun lv acc -> assert (not (LLMap.mem lv x.lmap)); LLMap.add lv new_v acc)
@@ -494,8 +476,7 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
       pending = new_pending ;
       lmap = new_lmap ;
       vmap = new_vmap ;
-      cmpt = x.cmpt+1 (* ;
-                       * collapsed = x.collapsed *)
+      cmpt = x.cmpt+1
     }
   in
   assert_invariants new_x;
@@ -518,95 +499,6 @@ let create_vertex_addr (lv:lval) (v:V.t) (x:t) : V.t *t =
   let va, x = create_vertex_simple (BAddrOf lv) x in
   let new_g =  G.add_edge x.graph va v in
   va, { x with graph=new_g}
-
-
-(* (\* Replace all trailing array subscripts of an lval with zero indices. *\)
- * let rec shift_offsets lv loc =
- *   let lv, off = Lval.removeOffsetLval lv in
- *   match off with
- *   | Index _ ->
- *     let lv = shift_offsets lv loc in
- *     (\* since the offset has been removed at the start of the function, add a new
- *        0 offset to preserve the type of the lvalue. *\)
- *     Lval.addOffsetLval (Index (Cil.zero ~loc, NoOffset)) lv
- *   | NoOffset | Field _ -> Lval.addOffsetLval off lv
- *
- * let rec ptr_base ~loc exp =
- *   match exp.enode with
- *   | BinOp(op, lhs, _, _) ->
- *     (match op with
- *      (\* Pointer arithmetic: split pointer and integer parts *\)
- *      | MinusPI | PlusPI -> ptr_base ~loc lhs
- *      (\* Other arithmetic: treat the whole expression as pointer address *\)
- *      | MinusPP | PlusA | MinusA | Mult | Div | Mod
- *      | BAnd | BXor | BOr | Shiftlt | Shiftrt
- *      | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr -> exp)
- *   (\* AddressOf: if it is an addressof array then replace all trailing offsets
- *      with zero offsets to get the base. *\)
- *   | AddrOf lv -> Cil.mkAddrOf ~loc (shift_offsets lv loc)
- *   (\* StartOf already points to the start of an array, return exp directly *\)
- *   | StartOf _ -> exp
- *   (\* Cast: strip cast and continue, then recast to original type. *\)
- *   | CastE _ ->
- *     let exp, casts = strip_casts exp in
- *     let base = ptr_base ~loc exp in
- *     add_casts casts base
- *   | Const _ | Lval _ | UnOp _ -> exp
- *   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
- *     -> assert false
- *
- * let ptr_base_and_base_addr ~loc e =
- *   let rec ptr_base_addr ~loc base =
- *     match base.enode with
- *     | AddrOf _ | StartOf _ | Const _ -> Cil.zero ~loc
- *     | Lval lv -> Cil.mkAddrOrStartOf ~loc lv
- *     | CastE _ -> ptr_base_addr ~loc (Cil.stripCasts base)
- *     | _ -> assert false
- *   in
- *   let base = ptr_base ~loc e in
- *   let base_addr  = ptr_base_addr ~loc base in
- *   base, base_addr *)
-
-(* let list_arrays_to_be_collapsed = ref [] *)
-
-(* let is_collapsed (lv:Lval.t) (x:t) =
- *   try
- *     let v = LLMap.find lv x.lmap in
- *     VSet.mem v x.collapsed
- *   with Not_found -> false *)
-
-(* (\* warning, this function has a side effect on list_arrays_to_be_collapsed *\)
- * let normalize_lval (x:t) (lv1:Lval.t) : lval =
- *   let lv, off = Lval.removeOffsetLval lv1 in
- *   list_arrays_to_be_collapsed := [];
- *   let loc = Location.unknown in
- *   let rec normalize_offset (lvx:Lval.t) (o:offset) : offset =
- *     match o with
- *       NoOffset -> NoOffset
- *     | Field (f, ofs) ->
- *       let lvx = Lval.addOffsetLval (Field(f,NoOffset)) lvx in
- *       Field (f,normalize_offset lvx ofs)
- *     | Index (e, ofs) ->
- *       if is_collapsed lvx x
- *       then
- *         let lvx = first_index lvx in
- *         Index(Cil.zero ~loc, normalize_offset lvx ofs)
- *       else
- *         let e, b = normalize_index e in
- *         if not b
- *         then (\* then we need to collapse lvx *\)
- *           begin
- *             list_arrays_to_be_collapsed := lvx::!list_arrays_to_be_collapsed;
- *             let lvx = first_index lvx in
- *             Index(Cil.zero ~loc, normalize_offset lvx ofs)
- *           end
- *         else
- *           let lvx = Lval.addOffsetLval (Index(e,NoOffset)) lvx in
- *           Index(e, normalize_offset lvx ofs)
- *   in
- *   let off = normalize_offset lv off in
- *   Lval.addOffsetLval off lv *)
-
 
 let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
   let rec f_diff_offset o1 o2 =
@@ -676,7 +568,6 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
       (* for any predecessor, find all its aliases and then look for potential existing vertex *)
       let f_fold_lmap lvx vx acc =
         let set_aliases = VMap.find vx x.vmap in
-        Format.printf "DEBUG: looking for aliases of %a in set %a@." Lval.pp_debug lv LSet.pp_debug set_aliases;
         if LSet.cardinal set_aliases > 1
         then
           let off = diff_offset lvx lv in
@@ -701,7 +592,6 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
           map_predecessors
           VSet.empty
       in
-      Format.printf "DEBUG: found aliases of %a : %a@." Lval.pp_debug lv VSet.pretty vset_res;
       if VSet.is_empty vset_res
       then create_vertex_lval lv x
       else
@@ -741,8 +631,7 @@ let _remove_cst_vertex (v:V.t) (x:t) : t =
     pending = VMap.remove v x.pending;
     lmap = x.lmap;
     vmap = VMap.remove v x.vmap;
-    cmpt = x.cmpt(* ;
-                  * collapsed = x.collapsed *)
+    cmpt = x.cmpt
   }
 
 (* remove a lval from a graph*)
@@ -776,14 +665,6 @@ let merge x v1 v2 =
     let new_lmap = LSet.fold (fun lv2 m -> LLMap.add lv2 v1 m) set2 x.lmap in
     (* update vmap *)
     let new_vmap = VMap.add v1 new_set (VMap.remove v2 x.vmap) in
-    (* update collapse *)
-    (* let new_collapsed =
-     *   if VSet.mem v2 x.collapsed
-     *   then
-     *     VSet.add v1 (VSet.remove v2 x.collapsed)
-     *   else
-     *     x.collapsed
-     * in *)
     (* update the graph *)
     let f_fold_succ v_succ (g:G.t) : G.t =
       G.add_edge g v1 v_succ
@@ -796,56 +677,7 @@ let merge x v1 v2 =
     let g = G.fold_pred f_fold_pred g v2 g in
     (* remove v2 *)
     let g =  G.remove_vertex g v2 in
-    {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt (* ; collapsed = new_collapsed *)}
-
-
-(* (\* merge all nodes of an array a to a[0] *\)
- * let collapse (lv:Lval.t) (x:t) : t =
- *   let v, x = find_or_create_vertex lv x in
- *   let lv0 = first_index lv in
- *   let v0, x = find_or_create_vertex lv0 x in
- *   let map_to_be_collapsed = LLMap.find_indexed_offsets lv x.lmap in
- *   (\* merge all nodes that are indexed with v0 *\)
- *   let f_fold _lvx vx acc =
- *     let acc = merge acc v0 vx in
- *     let p = VMap.add v0 (VSet.union (VMap.find v0 acc.pending) (VMap.find vx acc.pending)) acc.pending in
- *     let new_pending = VMap.remove vx p in
- *     {acc with pending = new_pending }
- *   in
- *   LMap.fold f_fold map_to_be_collapsed {x with collapsed = VSet.add v x.collapsed } *)
-
-
-(* let collapse_node (v:V.t) (x:t) : t =
- *   let ls = try VMap.find v x.vmap with Not_found -> LSet.empty in
- *   LSet.fold
- *     (fun lv acc -> collapse lv acc)
- *     ls
- *     x *)
-
-(* (\* has a side effect on list_arrays_to_be_collapsed *\)
- * let collapse_graph (x:t) : t =
- *   let res =
- *     List.fold_left
- *       (fun acc lv ->
- *          let v,acc = find_or_create_vertex lv acc in
- *          collapse_node v acc)
- *       x
- *       !list_arrays_to_be_collapsed
- *   in
- *   list_arrays_to_be_collapsed := []; res *)
-
-
-
-(* let normalize_lval (lv:Lval.t) (x:t) : lval * t =
- *   let new_lv = normalize_lval x lv in
- *   let new_x =
- *     if !list_arrays_to_be_collapsed != []
- *     then
- *       collapse_graph x
- *     else
- *       x
- *   in (\* now, list_arrays_to_be_collapsed = [] *\)
- *   new_lv, new_x *)
+    {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt}
 
 let normalize_lval lv x = (Lval.from_lval lv,x)
 
@@ -1054,7 +886,6 @@ let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
 let assignment_ptr_x_cst (a:t) (x:lval) : t =
   assert_invariants a;
   let x,a = normalize_lval x a in
-  (* Format.printf "DEBUG (assignment_ptr_x_cst) on lval %a and state:@. %a @." Lval.pretty x print_debug a; *)
   let v2, a = create_cst_vertex a in
   let (list_v1, a) : V.t list * t = points_to x a in
   let new_a =
@@ -1214,8 +1045,8 @@ let union  (a1:t) (a2:t) :t =
   assert_invariants a2;
 
   Format.printf "BEGIN DEBUG UNION@.";
-  Format.printf "First graph:@.%a@." print_debug a1;
-  Format.printf "Second graph:@.%a@." print_debug a2;
+  Format.printf "First graph:@.%a@." print_graph a1;
+  Format.printf "Second graph:@.%a@." print_graph a2;
   (* ensure that a1 and a2 no longer share any vertex indices *)
   let a2 = shift a2 a1.cmpt in
   let new_graph =
@@ -1246,32 +1077,13 @@ let union  (a1:t) (a2:t) :t =
   let to_be_joined = lmap_intersect a1.lmap a2.lmap in
   let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = max a1.cmpt a2.cmpt} in
   let new_a = List.fold_left (fun s (l,r) -> join_without_check s l r) new_a to_be_joined in
-  Format.printf "Result graph:@.%a@." print_debug new_a;
+  Format.printf "Result graph:@.%a@." print_graph new_a;
   Format.printf "END DEBUG UNION@.";
   assert_invariants new_a;
   new_a
 
 let empty :t =
-  {graph = G.empty; pending = VMap.empty ; lmap = LLMap.empty; vmap = VMap.empty; cmpt = 0(* ; collapsed = VSet.empty *)}
-
-
-(* let _make_top (x:t) : t =
- *   if x.graph = G.empty
- *   then x
- *   else
- *     let g = G.add_edge (G.add_vertex G.empty 0) 0 0 in
- *     (\* collect all lval of the initial set *\)
- *     let set_lv = ref LSet.empty in
- *     let lmap =
- *       LLMap.mapi
- *         (fun lv _ -> set_lv := LSet.add lv !set_lv ; 0)
- *         x.lmap
- *     in
- *     let vmap =
- *       VMap.add 0 !set_lv VMap.empty
- *     in
- *     let p = VMap.add 0 VSet.empty VMap.empty in
- *     {graph = g ; pending = p ; lmap = lmap ; vmap = vmap ; cmpt = 1(\* ; collapsed = x.collapsed *\)} *)
+  {graph = G.empty; pending = VMap.empty ; lmap = LLMap.empty; vmap = VMap.empty; cmpt = 0}
 
 (** a type for summaries of functions *)
 type summary =
