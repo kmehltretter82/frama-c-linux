@@ -641,7 +641,7 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
             BNone -> Options.fatal "This should not happen "
           | BLval lv1 ->
             (* find the vertex *)
-            let v1, x = find_or_create_vertex (BLval lv1) x in            
+            let v1, x = find_or_create_vertex (BLval lv1) x in
             (* then creates a vertex for bvl ONLY IF there is no successor *)
             begin
               match G.succ x.graph v1 with
@@ -654,7 +654,7 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
                 (* if there is a successor, update lmap and vmap to add blv to that successor's set *)
                 let new_lmap = LLMap.add blv succ_v1 x.lmap in
                 let new_vmap = VMap.add succ_v1 (LSet.add blv (VMap.find succ_v1 x.vmap)) x.vmap in
-                  succ_v1, {x with lmap = new_lmap ; vmap = new_vmap }
+                succ_v1, {x with lmap = new_lmap ; vmap = new_vmap }
               | _ -> Options.fatal " Invariant violated : more than 1 successor"
             end
           | BAddrOf _ -> Options.fatal "*(&x) not allowed"
