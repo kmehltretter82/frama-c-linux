@@ -273,6 +273,15 @@ let print_debug fmt (x:t) =
 (* let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
  * Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval *)
 
+let print_graph fmt (x:t) =
+  let print_edge v1 v2 =
+    LSet.pretty fmt @@ VMap.find v1 x.vmap;
+    Format.fprintf fmt " → ";
+    LSet.pretty fmt @@ VMap.find v2 x.vmap;
+    Format.fprintf fmt "@.";
+  in
+  G.iter_edges print_edge x.graph
+
 let print_aliases fmt (x:t) =
   let print_set ?(first = true) pretty fmt s =
     let first = ref first in
@@ -309,14 +318,6 @@ let print_aliases fmt (x:t) =
                                          * let collapsed_lval : LSet.t = VSet.fold (fun v acc  -> LSet.union acc (try VMap.find v x.vmap with Not_found -> LSet.empty))  x.collapsed LSet.empty in
                                          * if not (LSet.is_empty collapsed_lval) then
                                          *   Format.fprintf fmt "collapsed arrays: %a@." LSet.pretty collapsed_lval *)
-
-
-let pretty ?(debug=false) =
-  if debug then
-    print_debug
-  else
-    print_aliases
-
 
 (** invariants of type t must be true before and after each functon call *)
 let assert_invariants (x:t) : unit =
@@ -370,7 +371,16 @@ let assert_invariants (x:t) : unit =
 let assert_invariants x =
   try assert_invariants x
   with
-    Assert_failure f ->  (Format.printf "DEBUG FAILED INVARIANTS@.%a@." (pretty ~debug:true) x; raise (Assert_failure f))
+    Assert_failure f ->  (Format.printf "DEBUG FAILED INVARIANTS@.%a@." print_debug x; raise (Assert_failure f))
+
+let pretty ?(debug=false) fmt (x:t) =
+  if debug then
+    try
+      assert_invariants x;
+      print_graph fmt x
+    with Assert_failure _ -> print_debug fmt x
+  else
+    print_aliases fmt x
 
 let assert_state_transformation (x:t) (f: t -> t) : t =
   assert_invariants x;
@@ -1214,8 +1224,8 @@ let union  (a1:t) (a2:t) :t =
   assert_invariants a2;
 
   Format.printf "BEGIN DEBUG UNION@.";
-  Format.printf "First graph:@.%a@." print_debug a1;
-  Format.printf "Second graph:@.%a@." print_debug a2;
+  Format.printf "First graph:@.%a@." print_graph a1;
+  Format.printf "Second graph:@.%a@." print_graph a2;
   (* ensure that a1 and a2 no longer share any vertex indices *)
   let a2 = shift a2 a1.cmpt in
   let new_graph =
@@ -1246,7 +1256,7 @@ let union  (a1:t) (a2:t) :t =
   let to_be_joined = lmap_intersect a1.lmap a2.lmap in
   let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = max a1.cmpt a2.cmpt} in
   let new_a = List.fold_left (fun s (l,r) -> join_without_check s l r) new_a to_be_joined in
-  Format.printf "Result graph:@.%a@." print_debug new_a;
+  Format.printf "Result graph:@.%a@." print_graph new_a;
   Format.printf "END DEBUG UNION@.";
   assert_invariants new_a;
   new_a
