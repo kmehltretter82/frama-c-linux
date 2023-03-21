@@ -202,8 +202,8 @@ end
    interval
    -[replace_args_ival] performs this operation for a given list of arguments
    corresponding to a particular call
-   - [replace_all_args_ival] performs this operation for all arguments that have
-     been called by this function during the same recursive calls. *)
+ - [replace_all_args_ival] performs this operation for all arguments that have
+   been called by this function during the same recursive calls. *)
 
 let replace_args_ival ~logic_env li args args_ival =
   let profile = Logic_env.get_profile logic_env in
@@ -459,14 +459,21 @@ let rec infer ~force ~logic_env t =
                (replace_args_ival ~logic_env li args known_profile;
                 ival)
              else
-               begin
-                 let
-                   ext_profile =
-                   Widening.widen_profile li known_profile call_profile
-                 in
-                 initiate_fixpoint ~logic_env li ext_profile args
-               end
-           with Not_found -> initiate_fixpoint ~logic_env li call_profile args
+               let
+                 ext_profile =
+                 Widening.widen_profile li known_profile call_profile
+               in
+               initiate_fixpoint ~logic_env li ext_profile args
+           with Not_found ->
+             let known_profile = Profile.make
+                 li.l_profile
+                 (List.init (List.length li.l_profile) (fun _ -> bottom))
+             in
+             let
+               ext_profile =
+               Widening.widen_profile li known_profile call_profile
+             in
+             initiate_fixpoint ~logic_env li ext_profile args
          else
            let logic_env = Logic_env.make call_profile in
            (match li.l_body with
