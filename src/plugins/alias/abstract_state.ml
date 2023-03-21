@@ -519,7 +519,7 @@ let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
    in the graph. If it is present, there will be bugs *)
 let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
   assert (not (LLMap.mem blv x.lmap));
-  Format.printf "creating a vertex for %a@." Lval.pp_debug blv;
+  Options.debug "creating a vertex for %a@." Lval.pp_debug blv;
   match blv with
     BNone -> Options.fatal "this should not happen"
   | BLval lv ->
@@ -804,7 +804,7 @@ let set_type (x:t) (v1:V.t) (v2:V.t) : t =
       if LSet.is_empty (VMap.find v2 x.vmap)
       then G.remove_vertex x.graph v2
       else G.remove_edge x.graph v1 v2
-    | _ -> Options.fatal "two many outgoing edges in set_type"
+    | _ -> Options.fatal "too many outgoing edges in set_type"
   in
   let new_g = G.add_edge g v1 v2 in
   VSet.fold (fun vx x -> join x v1 vx) (try VMap.find v1 x.pending with Not_found -> VSet.empty) {x with graph = new_g}
@@ -1044,9 +1044,9 @@ let union  (a1:t) (a2:t) :t =
   assert_invariants a1;
   assert_invariants a2;
 
-  Format.printf "BEGIN DEBUG UNION@.";
-  Format.printf "First graph:@.%a@." print_graph a1;
-  Format.printf "Second graph:@.%a@." print_graph a2;
+  Options.debug "BEGIN DEBUG UNION@.";
+  Options.debug "First graph:@.%a@." print_graph a1;
+  Options.debug "Second graph:@.%a@." print_graph a2;
   (* ensure that a1 and a2 no longer share any vertex indices *)
   let a2 = shift a2 a1.cmpt in
   let new_graph =
@@ -1077,8 +1077,8 @@ let union  (a1:t) (a2:t) :t =
   let to_be_joined = lmap_intersect a1.lmap a2.lmap in
   let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = max a1.cmpt a2.cmpt} in
   let new_a = List.fold_left (fun s (l,r) -> join_without_check s l r) new_a to_be_joined in
-  Format.printf "Result graph:@.%a@." print_graph new_a;
-  Format.printf "END DEBUG UNION@.";
+  Options.debug "Result graph:@.%a@." print_graph new_a;
+  Options.debug "END DEBUG UNION@.";
   assert_invariants new_a;
   new_a
 
