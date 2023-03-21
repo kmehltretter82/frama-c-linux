@@ -51,9 +51,6 @@ get_matching_branch () {
   fi
 }
 
-#         fc-dir     nix-dir
-fc_dir="$(dirname "$(dirname "$(readlink -f "$0")")")"
-
 git_current_branch="$(git branch --show-current)"
 : "${git_current_branch:=${CI_COMMIT_BRANCH:-}}"
 echo "currently on branch $git_current_branch"
@@ -62,17 +59,18 @@ temporary="$(mktemp -d)"
 callsite="$(pwd)"
 
 cleanup () {
-  cd $callsite
+  cd "$callsite"
   if [[ -n $temporary ]];
-  then rm -rf $temporary
+  then rm -rf "$temporary"
   fi
   git worktree prune
 }
 
 trap cleanup EXIT
 
-git worktree add $temporary $(git rev-parse HEAD)
-cd $temporary
+git worktree add "$temporary" "$(git rev-parse HEAD)"
+cd "$temporary"
+./nix/wp-cache.nix.sh
 
 declare -A plugins=( )
 
