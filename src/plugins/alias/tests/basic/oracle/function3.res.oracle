@@ -1,91 +1,73 @@
 [kernel] Parsing function3.c (with preprocessing)
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
-  <list of may-alias>
-  {a; b; } are aliased
-  {c; d; } are aliased
-  <end of list>
+  {a; b} are aliased
+  {c; d} are aliased
 [alias] Functions done
 Before statement return __retres; :
- <list of may-alias>
-{x; y; tmp; } are aliased
-<end of list>
+ {x; y; tmp} are aliased
+
 
 Before statement int *tmp = x; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement while (1) {
                    x = y;
                    y = tmp;
                    break;
                  } :
- <list of may-alias>
-{x; tmp; } are aliased
-<end of list>
+ {x; tmp} are aliased
+
 
 Before statement return __retres; :
- <list of may-alias>
-{a; b; } are aliased
-{c; d; } are aliased
-<end of list>
+ {a; b} are aliased
+{c; d} are aliased
+
 
 Before statement x = y;
                  y = tmp;
                  break; :
- <list of may-alias>
-{x; tmp; } are aliased
-<end of list>
+ {x; tmp} are aliased
+
 
 Before statement x = y; :
- <list of may-alias>
-{x; tmp; } are aliased
-<end of list>
+ {x; tmp} are aliased
+
 
 Before statement y = tmp; :
- <list of may-alias>
-{x; y; tmp; } are aliased
-<end of list>
+ {x; y; tmp} are aliased
+
 
 Before statement break; :
- <list of may-alias>
-{x; y; tmp; } are aliased
-<end of list>
+ {x; y; tmp} are aliased
+
 
 Before statement __retres = (void *)0; :
- <list of may-alias>
-{x; y; tmp; } are aliased
-<end of list>
+ {x; y; tmp} are aliased
+
 
 Before statement int *a = (int *)0; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement int *b = (int *)0; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement int *c = (int *)0; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement int *d = (int *)0; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement f1(a,b); :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement f1(c,d); :
- <list of may-alias>
-{a; b; } are aliased
-<end of list>
+ {a; b} are aliased
+
 
 Before statement __retres = 0; :
- <list of may-alias>
-{a; b; } are aliased
-{c; d; } are aliased
-<end of list>
+ {a; b} are aliased
+{c; d} are aliased
+
 
 [alias] Analysis complete

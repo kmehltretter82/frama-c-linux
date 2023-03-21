@@ -1,29 +1,22 @@
 [kernel] Parsing switch1.c (with preprocessing)
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
-  <list of may-alias>
-  {a; b; d; } are aliased
-  <end of list>
+  {a; b; d} are aliased
 [alias] Functions done
 Before statement int *a = (int *)0; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement int *b = (int *)0; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement int *c = (int *)0; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement int *d = (int *)0; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement int e = 0; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement switch (e) {
                    case 1: a = d;
@@ -31,35 +24,28 @@ Before statement switch (e) {
                    case 2: b = d;
                    break;
                  } :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement case 1: a = d; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement break; :
- <list of may-alias>
-{a; d; } are aliased
-<end of list>
+ {a; d} are aliased
+
 
 Before statement case 2: b = d; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement break; :
- <list of may-alias>
-{b; d; } are aliased
-<end of list>
+ {b; d} are aliased
+
 
 Before statement __retres = 0; :
- <list of may-alias>
-{a; b; d; } are aliased
-<end of list>
+ {a; b; d} are aliased
+
 
 Before statement return __retres; :
- <list of may-alias>
-{a; b; d; } are aliased
-<end of list>
+ {a; b; d} are aliased
+
 
 [alias] Analysis complete

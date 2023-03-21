@@ -1,52 +1,41 @@
 [kernel] Parsing assignment5.c (with preprocessing)
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
-  <list of may-alias>
-  {b; *a; } are aliased
-  {c; d; *b; } are aliased
-  <end of list>
+  {*a; b; *a} are aliased
+  {c; d; **a; *b} are aliased
 [alias] Functions done
 Before statement int ***a = (int ***)0; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement int **b = (int **)0; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement int *c = (int *)0; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement int *d = (int *)0; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement *a = b; :
- <list of may-alias>
-<end of list>
+ 
 
 Before statement *b = c; :
- <list of may-alias>
-{b; *a; } are aliased
-<end of list>
+ {b; *a} are aliased
+
 
 Before statement d = *(*a); :
- <list of may-alias>
-{c; *b; } are aliased
-{b; *a; } are aliased
-<end of list>
+ {c; *b} are aliased
+{b; *a} are aliased
+
 
 Before statement __retres = 0; :
- <list of may-alias>
-{b; *a; } are aliased
-{c; d; *b; } are aliased
-<end of list>
+ {*a; b; *a} are aliased
+{c; d; **a; *b} are aliased
+
 
 Before statement return __retres; :
- <list of may-alias>
-{b; *a; } are aliased
-{c; d; *b; } are aliased
-<end of list>
+ {*a; b; *a} are aliased
+{c; d; **a; *b} are aliased
+
 
 [alias] Analysis complete
