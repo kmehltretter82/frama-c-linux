@@ -53,20 +53,11 @@ val new_file_type:
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
 
-val new_machdep: string -> Cil_types.mach -> unit
-(** [new_machdep name module] registers a new machdep name as recognized by
-    Frama-C through The usual uses is
-    [Cmdline.run_after_loading_stage
-      (fun () -> File.new_machdep "my_machdep" my_machdep_implem)]
-    @since Nitrogen-20111001
-    @raise Invalid_argument if the given name already exists
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-
 val list_available_machdeps: unit -> string list
 (** [list_available_machdeps ()] gives the list of the names of available
-    machdeps, starting with the ones added with new_machdep and ending with
-    the list of default machdeps.
-    @since 22.0-Titanium *)
+    machdeps in Frama-C's share path
+    @since 22.0-Titanium
+*)
 
 type code_transformation_category
 (** type of registered code transformations

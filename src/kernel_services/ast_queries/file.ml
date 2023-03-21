@@ -270,14 +270,6 @@ let print_machdep fmt (m : Cil_types.mach) =
       (if m.has__builtin_va_list then "has" else "has not") ;
   end
 
-module CustomMachdeps =
-  State_builder.Hashtbl(Datatype.String.Hashtbl)(Cil_datatype.Machdep)
-    (struct
-      let name = " File.CustomMachdeps"
-      let size = 5
-      let dependencies = []
-    end)
-
 let machdep_dir () = Kernel.Share.get_dir ~mode:`Must_exist "machdeps"
 
 let regexp_machdep = Str.regexp "^machdep_\\([^.]*\\).yaml$"
@@ -289,16 +281,7 @@ let default_machdep_file machdep =
 let is_default_machdep machdep =
   Filepath.Normalized.is_file (default_machdep_file machdep)
 
-let mem_machdep s =
-  CustomMachdeps.mem s || is_default_machdep s || Sys.file_exists s
-
-let new_machdep s m =
-  try
-    let cm = CustomMachdeps.find s in
-    if not (cm = m) then
-      Kernel.abort "trying to register incompatible machdeps under name `%s'" s
-  with Not_found ->
-    CustomMachdeps.add s m
+let mem_machdep s = is_default_machdep s || Sys.file_exists s
 
 let default_machdeps () =
   Array.fold_right
@@ -310,7 +293,6 @@ let default_machdeps () =
     []
 
 let pretty_machdeps fmt =
-  CustomMachdeps.iter (fun x _ -> Format.fprintf fmt "@ %s" x);
   List.iter (fun s -> Format.fprintf fmt "@ %s" s) (default_machdeps())
 
 let machdep_help () =
@@ -415,22 +397,19 @@ type mach = Cil_types.mach = {
 (* Local to this module. Use Cil.theMachine.theMachine outside *)
 let get_machdep () =
   let m = Kernel.Machdep.get () in
-  try
-    CustomMachdeps.find m
-  with Not_found ->
-    let file =
-      if is_default_machdep m then default_machdep_file m
-      else Filepath.Normalized.of_string ~existence:Must_exist m
-    in
-    let res =
-      Result.bind
-        (Yaml_unix.of_file (Fpath.v (file:>string)))
-        mach_of_yaml
-    in
-    match res with
+  let file =
+    if is_default_machdep m then default_machdep_file m
+    else Filepath.Normalized.of_string ~existence:Must_exist m
+  in
+  let res =
+    Result.bind
+      (Yaml_unix.of_file (Fpath.v (file:>string)))
+      mach_of_yaml
+  in
+  match res with
     | Ok machdep -> machdep
     | Error (`Msg s) ->
-      Kernel.fatal "Error during machdep parsing: %s" s
+        Kernel.fatal "Error during machdep parsing: %s" s
 
 let print_machdep_header () =
   if Kernel.PrintMachdepHeader.get () then begin
@@ -440,8 +419,7 @@ let print_machdep_header () =
 
 let () = Cmdline.run_after_exiting_stage print_machdep_header
 
-let list_available_machdeps () =
-  CustomMachdeps.fold (fun m _ acc -> m :: acc) (default_machdeps ())
+let list_available_machdeps = default_machdeps
 
 let pretty_machdep ?fmt ?machdep () =
   let machine = match machdep with None -> get_machdep () | Some m -> m in
