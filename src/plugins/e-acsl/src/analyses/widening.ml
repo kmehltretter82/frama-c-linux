@@ -66,15 +66,18 @@ let chose_widen n i1 i2 =
       n
 
 let widen_ival ~arg name i1 i2 =
-  let n =
-    if arg
-    then
-      try Options.Widening_arguments.find name
-      with Not_found -> Options.Widening_arguments_base.get ()
-    else
-      try Options.Widening_output.find name
-      with Not_found -> Options.Widening_output_base.get ()
-  in chose_widen n i1 i2
+  if Options.Gmp_only.get ()
+  then top_ival
+  else
+    let n =
+      if arg
+      then
+        try Options.Widening_arguments.find name
+        with Not_found -> Options.Widening_arguments_base.get ()
+      else
+        try Options.Widening_output.find name
+        with Not_found -> Options.Widening_output_base.get ()
+    in chose_widen n i1 i2
 
 let widen ?(arg = false) li i1 i2 =
   match i1, i2 with

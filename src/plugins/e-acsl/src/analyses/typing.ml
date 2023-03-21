@@ -474,8 +474,12 @@ let rec type_term
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t3);
       ctx
 
-    | Tat (t, _)
-    | TLogic_coerce (_, t) ->
+    | TLogic_coerce (_, t') ->
+      let i = Interval.get_from_profile ~profile t in
+      ignore (type_term ~use_gmp_opt ~arith_operand ?ctx ~profile t');
+      ty_of_interv ~use_gmp_opt i
+
+    | Tat (t, _) ->
       (type_term ~use_gmp_opt ~arith_operand ?ctx ~profile t).ty
 
     | TAddrOf tlv
