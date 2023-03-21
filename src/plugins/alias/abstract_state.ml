@@ -1210,10 +1210,16 @@ let union  (a1:t) (a2:t) :t =
   (* ensure that a1 and a2 no longer share any vertex indices *)
   let a2 = shift a2 a1.cmpt in
   let new_graph =
+    G.fold_vertex
+      (fun v2 g -> G.add_vertex g v2)
+      a2.graph
+      a1.graph
+  in
+  let new_graph =
     G.fold_edges
       (fun v2a v2b g -> G.add_edge g v2a v2b)
       a2.graph
-      a1.graph
+      new_graph
   in
   let new_pending = VMap.fold VMap.add a2.pending a1.pending in
   let new_vmap =
