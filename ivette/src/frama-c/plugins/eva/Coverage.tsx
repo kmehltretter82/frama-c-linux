@@ -22,14 +22,12 @@
 
 import React from 'react';
 import { Table, Column } from 'dome/table/views';
-import { CompactModel } from 'dome/table/arrays';
 import * as Arrays from 'dome/table/arrays';
 import * as Compare from 'dome/data/compare';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
-
-import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
+
 import CoverageMeter, { percent } from './CoverageMeter';
 
 type stats = Eva.functionStatsData;
@@ -70,21 +68,15 @@ const ordering: Arrays.ByColumns<stats> = {
   ),
 };
 
-class Model extends CompactModel<Ast.fct, stats> {
-  constructor() {
-    super(Eva.functionStats.getkey);
-    this.setColumnOrder(ordering);
-    this.setSorting({ sortBy: 'coverage', sortDirection: 'ASC' });
-  }
-}
-
 export function CoverageTable(): JSX.Element {
-  const data = States.useSyncArray(Eva.functionStats).getArray();
+
+  const model = States.useSyncArrayModel(Eva.functionStats);
+  React.useEffect(() => {
+    model.setColumnOrder(ordering);
+    model.setSorting({ sortBy: 'coverage', sortDirection: 'ASC' });
+  }, [model]);
+
   const [selection, updateSelection] = States.useSelection();
-
-  const model = React.useMemo(() => new Model(), []);
-  React.useEffect(() => model.replaceAllDataWith(data), [model, data]);
-
   const onSelection = ({ key }: stats): void => {
     updateSelection({ location: { fct: key } });
   };

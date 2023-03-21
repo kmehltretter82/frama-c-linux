@@ -725,7 +725,7 @@ export default function ASTview(): JSX.Element {
   React.useEffect(() => Hovered.set(view, hov?.marker ?? ''), [view, hov]);
 
   // Updating CodeMirror when the <properties> synchronized array is changed.
-  const props = States.useSyncArray(Properties.status).getArray();
+  const props = States.useSyncArrayData(Properties.status);
   React.useEffect(() => PropertiesStatuses.set(view, props), [view, props]);
 
   // Updating CodeMirror when the <propStatusTags> map is changed.
@@ -733,7 +733,7 @@ export default function ASTview(): JSX.Element {
   React.useEffect(() => Tags.set(view, tags), [view, tags]);
 
   // Updating CodeMirror when the <markersInfo> synchronized array is changed.
-  const info = States.useSyncArray(Ast.markerAttributes);
+  const info = States.useSyncArrayModel(Ast.markerAttributes);
   const getData = React.useCallback((key) => info.getData(key), [info]);
   React.useEffect(() => GetMarkerData.set(view, getData), [view, getData]);
 

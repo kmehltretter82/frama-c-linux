@@ -401,25 +401,93 @@ export function reloadArray<K, A>(arr: Array<K, A>): void {
   currentSyncArray(arr).reload();
 }
 
-/**
-   Use Synchronized Array (Custom React Hook).
+/** Access to Synchronized Array elements. */
+export interface ArrayProxy<K,A> {
+  length: number;
+  getData(elt: K | undefined): (A | undefined);
+  forEach(fn: (row: A, elt: K) => void): void;
+}
 
-   Unless specified, the hook makes the component re-render on every
-   update. Disabling this automatic re-rendering can be an option when
-   using the model to make a table view, which automatically synchronizes on
-   model updates.
-   @param sync Whether the component re-renders on updates (default is `true`).
+// --- Utility functions
+
+function arrayGet<K,A>(
+  model: CompactModel<K,A>,
+  elt: K | undefined,
+  _stamp: number,
+): A | undefined {
+  return elt ? model.getData(elt) : undefined;
+}
+
+function arrayProxy<K,A>(
+  model: CompactModel<K,A>,
+  _stamp: number,
+): ArrayProxy<K,A> {
+  return {
+    length: model.length(),
+    getData: (elt) => elt ? model.getData(elt) : undefined,
+    forEach: (fn) => model.forEach((r) => fn(r,model.getkey(r))),
+  };
+}
+
+// ---- Hooks
+
+/**
+   Use Synchronized Array as a low level, ready to use, Table Compact Model.
+
+   Warning: to be in sync with the array, one shall subscribe to model events,
+   eg. by using `useModel()` hook, like `<Table/>` element does.
  */
-export function useSyncArray<K, A>(
-  arr: Array<K, A>,
-  sync = true,
+export function useSyncArrayModel<K, A>(
+  arr: Array<K, A>
 ): CompactModel<K, A> {
   Server.useStatus();
   const st = currentSyncArray(arr);
   Server.useSignal(arr.signal, st.fetch);
   st.online();
-  useModel(st.model, sync);
   return st.model;
+}
+
+/** Use Synchronized Array as a data array. */
+export function useSyncArrayData<K, A>(arr: Array<K, A>): A[]
+{
+  return useSyncArrayModel(arr).getArray();
+}
+
+/** Use Synchronized Array element. */
+export function useSyncArrayElt<K, A>(
+  arr: Array<K, A>,
+  elt: K | undefined,
+): A | undefined {
+  const model = useSyncArrayModel(arr);
+  const stamp = useModel(model);
+  return React.useMemo(
+    () => arrayGet(model, elt, stamp),
+    [model, elt, stamp]
+  );
+}
+
+/** Use Synchronized Array as an element data getter. */
+export function useSyncArrayGetter<K, A>(
+  arr: Array<K, A>
+): (elt: K | undefined) => (A | undefined) {
+  const model = useSyncArrayModel(arr);
+  const stamp = useModel(model);
+  return React.useCallback(
+    (elt) => arrayGet(model, elt, stamp),
+    [model, stamp]
+  );
+}
+
+/** Use Synchronized Array as an array proxy. */
+export function useSyncArrayProxy<K, A>(
+  arr: Array<K, A>
+): ArrayProxy<K,A> {
+  const model = useSyncArrayModel<K, A>(arr);
+  const stamp = useModel(model);
+  return React.useMemo(
+    () => arrayProxy(model, stamp),
+    [model, stamp]
+  );
 }
 
 /**
@@ -749,11 +817,8 @@ export type attributes = Ast.markerAttributesData;
 
 /** Access the marker attributes from AST. */
 export function useMarker(marker: Ast.marker | undefined): attributes {
-  const marks = useSyncArray(Ast.markerAttributes);
-  if (marker === undefined) return Ast.markerAttributesDataDefault;
-  const attrs = marks.getData(marker);
-  if (attrs === undefined) return Ast.markerAttributesDataDefault;
-  return attrs;
+  const marks = useSyncArrayElt(Ast.markerAttributes, marker);
+  return marks ?? Ast.markerAttributesDataDefault;
 }
 
 // --------------------------------------------------------------------------
