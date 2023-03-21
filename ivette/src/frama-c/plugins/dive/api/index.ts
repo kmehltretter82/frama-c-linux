@@ -183,7 +183,7 @@ export const nodeLocalityDefault: nodeLocality =
 export enum nodeKind {
   /** a numeric constant literal */
   const = 'const',
-  /** a placeholder node when an error prevented the generationprocess */
+  /** a placeholder node when an error prevented the generation process */
   error = 'error',
   /** a string literal */
   string = 'string',
@@ -253,7 +253,7 @@ export const taintTags: Server.GetRequest<null,tag[]>= taintTags_internal;
 export enum exploration {
   /** all dependencies have been computed */
   yes = 'yes',
-  /** some dependencies have been exploreread/tainted by control */
+  /** some dependencies have been explored */
   partial = 'partial',
   /** dependencies have not been computed */
   no = 'no',

@@ -168,7 +168,7 @@ module NodeKind = struct
     tag "alarm" "an alarm emitted by Frama-C";
     tag "absolute" "a memory location designated by a range of adresses";
     tag "string" "a string literal";
-    tag "error" "a placeholder node when an error prevented the generation\
+    tag "error" "a placeholder node when an error prevented the generation \
                  process";
     tag "const" "a numeric constant literal";
   ]
@@ -199,7 +199,7 @@ module Computation = struct
 
   let _tags = [
     tag "no" "dependencies have not been computed";
-    tag "partial" "some dependencies have been exploreread/tainted by control";
+    tag "partial" "some dependencies have been explored";
     tag "yes" "all dependencies have been computed";
   ]
 
