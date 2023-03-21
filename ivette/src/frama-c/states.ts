@@ -293,12 +293,14 @@ class SyncArray<K, A> {
   handler: Array<K, A>;
   upToDate: boolean;
   fetching: boolean;
+  signaled: boolean; // during fetching or offline
   model: CompactModel<K, A>;
 
   constructor(h: Array<K, A>) {
     this.handler = h;
     this.fetching = false;
     this.upToDate = false;
+    this.signaled = false;
     this.model = new CompactModel(h.getkey);
     this.model.setNaturalOrder(h.order);
     this.fetch = this.fetch.bind(this);
@@ -316,12 +318,16 @@ class SyncArray<K, A> {
   }
 
   async fetch(): Promise<void> {
-    if (this.fetching || !Server.isRunning()) return;
+    if (this.fetching || !Server.isRunning()) {
+      this.signaled = true;
+      return;
+    }
     try {
       this.fetching = true;
       let pending;
       /* eslint-disable no-await-in-loop */
       do {
+        this.signaled = false;
         const data = await Server.send(this.handler.fetch, 20000);
         const { reload = false, removed = [], updated = [] } = data;
         const { model } = this;
@@ -331,7 +337,7 @@ class SyncArray<K, A> {
         if (reload || updated.length > 0 || removed.length > 0)
           model.reload();
         pending = data.pending ?? 0;
-      } while (pending > 0);
+      } while (this.signaled || pending > 0);
       /* eslint-enable no-await-in-loop */
     } catch (error) {
       D.error(
@@ -339,6 +345,7 @@ class SyncArray<K, A> {
         error,
       );
     } finally {
+      this.signaled = false;
       this.fetching = false;
       this.upToDate = true;
     }
@@ -348,6 +355,7 @@ class SyncArray<K, A> {
     try {
       this.model.clear();
       this.upToDate = false;
+      this.signaled = false;
       if (Server.isRunning()) {
         await Server.send(this.handler.reload, null);
         this.fetch();
