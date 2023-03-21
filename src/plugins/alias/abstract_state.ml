@@ -641,13 +641,22 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
             BNone -> Options.fatal "This should not happen "
           | BLval lv1 ->
             (* find the vertex *)
-            let v1, x = find_or_create_vertex (BLval lv1) x in
-            (* then creates a vertex for bvl *)
-            let v2, x = create_vertex_simple blv x in
-            (* finally add a points-to edge between v1 and v2 *)
-            let new_graph = G.add_edge x.graph v1 v2 in
-            v2, {x with graph = new_graph }
-
+            let v1, x = find_or_create_vertex (BLval lv1) x in            
+            (* then creates a vertex for bvl ONLY IF there is no successor *)
+            begin
+              match G.succ x.graph v1 with
+                [] ->
+                let v2, x = create_vertex_simple blv x in
+                (* finally add a points-to edge between v1 and v2 *)
+                let new_graph = G.add_edge x.graph v1 v2 in
+                v2, {x with graph = new_graph }
+              | [succ_v1] ->
+                (* if there is a successor, update lmap and vmap to add blv to that successor's set *)
+                let new_lmap = LLMap.add blv succ_v1 x.lmap in
+                let new_vmap = VMap.add succ_v1 (LSet.add blv (VMap.find succ_v1 x.vmap)) x.vmap in
+                  succ_v1, {x with lmap = new_lmap ; vmap = new_vmap }
+              | _ -> Options.fatal " Invariant violated : more than 1 successor"
+            end
           | BAddrOf _ -> Options.fatal "*(&x) not allowed"
         end
       | _ -> create_vertex_simple blv x
