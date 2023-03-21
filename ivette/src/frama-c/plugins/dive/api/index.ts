@@ -125,7 +125,7 @@ export const byNodeId: Compare.Order<nodeId> = Compare.number;
 /** Default value for `nodeId` */
 export const nodeIdDefault: nodeId = 0;
 
-/** A callsite */
+/** callsite */
 export type callsite = { fun: string, instr: number | "global" };
 
 /** Decoder for `callsite` */
@@ -161,7 +161,12 @@ export const byCallstack: Compare.Order<callstack> =
 export const callstackDefault: callstack = [];
 
 /** The description of a node locality */
-export type nodeLocality = { file: string, callstack?: callstack };
+export interface nodeLocality {
+  /** file */
+  file: string;
+  /** callstack */
+  callstack?: callstack;
+}
 
 /** Decoder for `nodeLocality` */
 export const jNodeLocality: Json.Decoder<nodeLocality> =
@@ -179,26 +184,26 @@ export const byNodeLocality: Compare.Order<nodeLocality> =
 export const nodeLocalityDefault: nodeLocality =
   { file: '', callstack: undefined };
 
-/** The nature of a node. */
+/** The nature of a node */
 export enum nodeKind {
-  /** a numeric constant literal */
-  const = 'const',
-  /** a placeholder node when an error prevented the generation process */
-  error = 'error',
-  /** a string literal */
-  string = 'string',
-  /** a memory location designated by a range of adresses */
-  absolute = 'absolute',
-  /** an alarm emitted by Frama-C */
-  alarm = 'alarm',
-  /** an unresolved memory location */
-  unknown = 'unknown',
-  /** a set of memory locations designated by an lvalue */
-  scattered = 'scattered',
-  /** a memory bloc containing cells */
-  composite = 'composite',
   /** a single memory cell */
   scalar = 'scalar',
+  /** a memory bloc containing cells */
+  composite = 'composite',
+  /** a set of memory locations designated by an lvalue */
+  scattered = 'scattered',
+  /** an unresolved memory location */
+  unknown = 'unknown',
+  /** an alarm emitted by Frama-C */
+  alarm = 'alarm',
+  /** a memory location designated by a range of adresses */
+  absolute = 'absolute',
+  /** a string literal */
+  string = 'string',
+  /** a placeholder node when an error prevented the generation process */
+  error = 'error',
+  /** a numeric constant literal */
+  const = 'const',
 }
 
 /** Decoder for `nodeKind` */
@@ -208,7 +213,7 @@ export const jNodeKind: Json.Decoder<nodeKind> = Json.jEnum(nodeKind);
 export const byNodeKind: Compare.Order<nodeKind> = Compare.byEnum(nodeKind);
 
 /** Default value for `nodeKind` */
-export const nodeKindDefault: nodeKind = nodeKind.const;
+export const nodeKindDefault: nodeKind = nodeKind.scalar;
 
 const nodeKindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
@@ -220,7 +225,7 @@ const nodeKindTags_internal: Server.GetRequest<null,tag[]> = {
 /** Registered tags for the above type. */
 export const nodeKindTags: Server.GetRequest<null,tag[]>= nodeKindTags_internal;
 
-/** Taint of a memory location. */
+/** Taint of a memory location */
 export enum taint {
   /** not tainted by anything */
   untainted = 'untainted',
@@ -249,7 +254,7 @@ const taintTags_internal: Server.GetRequest<null,tag[]> = {
 /** Registered tags for the above type. */
 export const taintTags: Server.GetRequest<null,tag[]>= taintTags_internal;
 
-/** The computation state of a node read or write dependencies. */
+/** The computation state of a node read or write dependencies */
 export enum exploration {
   /** all dependencies have been computed */
   yes = 'yes',
@@ -281,41 +286,44 @@ const explorationTags_internal: Server.GetRequest<null,tag[]> = {
 export const explorationTags: Server.GetRequest<null,tag[]>= explorationTags_internal;
 
 /** A qualitative description of the range of values that this node can take. */
-export enum nodeRange {
-  /** this node can take almost all values of its type */
-  wide = 'wide',
-  /** this node can only have one value */
-  singleton = 'singleton',
-  /** no value ever computed for this node */
-  empty = 'empty',
-}
+export type nodeRange = number | string;
 
 /** Decoder for `nodeRange` */
-export const jNodeRange: Json.Decoder<nodeRange> = Json.jEnum(nodeRange);
+export const jNodeRange: Json.Decoder<nodeRange> =
+  Json.jUnion<number | string>( Json.jNumber, Json.jString,);
 
 /** Natural order for `nodeRange` */
-export const byNodeRange: Compare.Order<nodeRange> =
-  Compare.byEnum(nodeRange);
+export const byNodeRange: Compare.Order<nodeRange> = Compare.structural;
 
 /** Default value for `nodeRange` */
-export const nodeRangeDefault: nodeRange = nodeRange.wide;
+export const nodeRangeDefault: nodeRange = 0;
 
-const nodeRangeTags_internal: Server.GetRequest<null,tag[]> = {
-  kind: Server.RqKind.GET,
-  name:   'plugins.dive.nodeRangeTags',
-  input:  Json.jNull,
-  output: Json.jArray(jTag),
-  signals: [],
-};
-/** Registered tags for the above type. */
-export const nodeRangeTags: Server.GetRequest<null,tag[]>= nodeRangeTags_internal;
-
-/** A graph node */
-export type node =
-  { id: nodeId, label: string, nkind: nodeKind, locality: nodeLocality,
-    is_root: boolean, backward_explored: exploration,
-    forward_explored: exploration, writes: location[], values?: string,
-    range: number | nodeRange, type?: string, taint?: taint };
+export interface node {
+  /** id */
+  id: nodeId;
+  /** label */
+  label: string;
+  /** nkind */
+  nkind: nodeKind;
+  /** locality */
+  locality: nodeLocality;
+  /** is_root */
+  is_root: boolean;
+  /** backward_explored */
+  backward_explored: exploration;
+  /** forward_explored */
+  forward_explored: exploration;
+  /** writes */
+  writes: location[];
+  /** values */
+  values?: string;
+  /** range */
+  range: nodeRange;
+  /** type */
+  type?: string;
+  /** taint */
+  taint?: taint;
+}
 
 /** Decoder for `node` */
 export const jNode: Json.Decoder<node> =
@@ -329,7 +337,7 @@ export const jNode: Json.Decoder<node> =
     forward_explored: jExploration,
     writes: Json.jArray(jLocation),
     values: Json.jOption(Json.jString),
-    range: Json.jUnion<number | nodeRange>( Json.jNumber, jNodeRange,),
+    range: jNodeRange,
     type: Json.jOption(Json.jString),
     taint: Json.jOption(jTaint),
   });
@@ -340,7 +348,7 @@ export const byNode: Compare.Order<node> =
     <{ id: nodeId, label: string, nkind: nodeKind, locality: nodeLocality,
        is_root: boolean, backward_explored: exploration,
        forward_explored: exploration, writes: location[], values?: string,
-       range: number | nodeRange, type?: string, taint?: taint }>({
+       range: nodeRange, type?: string, taint?: taint }>({
     id: byNodeId,
     label: Compare.string,
     nkind: byNodeKind,
@@ -350,7 +358,7 @@ export const byNode: Compare.Order<node> =
     forward_explored: byExploration,
     writes: Compare.array(byLocation),
     values: Compare.defined(Compare.string),
-    range: Compare.structural,
+    range: byNodeRange,
     type: Compare.defined(Compare.string),
     taint: Compare.defined(byTaint),
   });
@@ -361,12 +369,21 @@ export const nodeDefault: node =
     locality: nodeLocalityDefault, is_root: false,
     backward_explored: explorationDefault,
     forward_explored: explorationDefault, writes: [], values: undefined,
-    range: 0, type: undefined, taint: undefined };
+    range: nodeRangeDefault, type: undefined, taint: undefined };
 
 /** The dependency between two nodes */
-export type dependency =
-  { id: number, src: nodeId, dst: nodeId, dkind: string, origins: location[]
-    };
+export interface dependency {
+  /** id */
+  id: number;
+  /** src */
+  src: nodeId;
+  /** dst */
+  dst: nodeId;
+  /** dkind */
+  dkind: string;
+  /** origins */
+  origins: location[];
+}
 
 /** Decoder for `dependency` */
 export const jDependency: Json.Decoder<dependency> =

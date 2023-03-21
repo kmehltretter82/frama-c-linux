@@ -53,12 +53,3 @@ val bfs : ?iter_succ:((node -> unit) -> t -> node -> unit) -> ?limit:int ->
   t -> node list -> node list
 
 val output_to_dot : out_channel -> t -> unit
-val output_to_json : out_channel -> t -> unit
-
-module JsonPrinter :
-sig
-  val output_node : node ->  Json.t
-  val output_dep : edge -> Json.t
-  val output_graph : t -> Json.t
-  val output_diff : t -> graph_diff -> Json.t
-end
