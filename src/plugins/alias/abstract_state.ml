@@ -462,7 +462,6 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   (* find all the alias of lv (because of offset) *)
   let set_of_aliases : LSet.t = find_all_aliases lv x in
   (* add all these aliases *)
-  Format.printf "DEBUG: all_aliases of %a : %a @." Lval.pp_debug lv LSet.pp_debug set_of_aliases;
   let new_lmap =
     LSet.fold
       (fun lv acc -> assert (not (LLMap.mem lv x.lmap)); LLMap.add lv new_v acc)
@@ -569,7 +568,6 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
       (* for any predecessor, find all its aliases and then look for potential existing vertex *)
       let f_fold_lmap lvx vx acc =
         let set_aliases = VMap.find vx x.vmap in
-        Format.printf "DEBUG: looking for aliases of %a in set %a@." Lval.pp_debug lv LSet.pp_debug set_aliases;
         if LSet.cardinal set_aliases > 1
         then
           let off = diff_offset lvx lv in
@@ -594,7 +592,6 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
           map_predecessors
           VSet.empty
       in
-      Format.printf "DEBUG: found aliases of %a : %a@." Lval.pp_debug lv VSet.pretty vset_res;
       if VSet.is_empty vset_res
       then create_vertex_lval lv x
       else
@@ -889,7 +886,6 @@ let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
 let assignment_ptr_x_cst (a:t) (x:lval) : t =
   assert_invariants a;
   let x,a = normalize_lval x a in
-  (* Format.printf "DEBUG (assignment_ptr_x_cst) on lval %a and state:@. %a @." Lval.pretty x print_debug a; *)
   let v2, a = create_cst_vertex a in
   let (list_v1, a) : V.t list * t = points_to x a in
   let new_a =
