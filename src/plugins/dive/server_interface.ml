@@ -26,30 +26,13 @@ open Dive_types
 
 let package = Package.package ~plugin:"dive" ~title:"Dive Services" ()
 
-
-(* -------------------------------------------------------------------------- *)
-(* --- State handling                                                     --- *)
-(* -------------------------------------------------------------------------- *)
-
-(* TODO: project state *)
-let get_context =
-  let context = ref None in
-  fun () ->
-    match !context with
-    | Some c -> c
-    | None ->
-      if Eva.Analysis.is_computed () then
-        let c = Context.create () in
-        context := Some c;
-        c
-      else
-        Server.Data.failure "Eva analysis not computed"
-
-
-let global_window = ref {
-    perception = { backward = Some 2 ; forward = Some 1 };
-    horizon = { backward = None ; forward = None };
-  }
+module Enum () =
+struct
+  include Enum
+  let dictionary = Enum.dictionary ()
+  let tag name descr =
+    Enum.tag ~name ~descr:(Markdown.plain descr) dictionary
+end
 
 
 (* -------------------------------------------------------------------------- *)
@@ -143,15 +126,8 @@ struct
 
   let jtype = Data.declare ~package ~name ~descr Data.Jint.jtype
 
-  let _to_json node =
+  let to_json node =
     `Int node.node_key
-
-  let of_json json =
-    let node_key = Data.Jint.of_json json in
-    try
-      Context.find_node (get_context ()) node_key
-    with Not_found ->
-      Data.failure "no node '%d' in the current graph" node_key
 end
 
 module Callsite =
@@ -160,7 +136,7 @@ struct
   let descr = Markdown.plain "A callsite"
   let jtype = Data.declare ~package ~name ~descr (Jrecord [
       "fun", Jstring;
-      "instr", Junion [ Jnumber ; Jstring ];
+      "instr", Junion [ Jnumber ; Jtag "global" ];
     ])
 end
 
@@ -181,6 +157,77 @@ struct
     ])
 end
 
+module NodeKind = struct
+  include Enum ()
+
+  let _tags = [
+    tag "scalar" "a single memory cell";
+    tag "composite" "a memory bloc containing cells";
+    tag "scattered" "a set of memory locations designated by an lvalue";
+    tag "unknown" "an unresolved memory location";
+    tag "alarm" "an alarm emitted by Frama-C";
+    tag "absolute" "a memory location designated by a range of adresses";
+    tag "string" "a string literal";
+    tag "error" "a placeholder node when an error prevented the generation \
+                 process";
+    tag "const" "a numeric constant literal";
+  ]
+
+  let data = Request.dictionary ~package ~name:"nodeKind"
+      ~descr:(Markdown.plain "The nature of a node.") dictionary
+
+  include (val data : Data.S with type t = unit)
+end
+
+module Taint = struct
+  include Enum ()
+
+  let _tags = [
+    tag "direct" "tainted by data";
+    tag "indirect" "tainted by control";
+    tag "untainted" "not tainted by anything";
+  ]
+
+  let data = Request.dictionary ~package ~name:"taint"
+      ~descr:(Markdown.plain "Taint of a memory location.") dictionary
+
+  include (val data : Data.S with type t = unit)
+end
+
+module Computation = struct
+  include Enum ()
+
+  let _tags = [
+    tag "no" "dependencies have not been computed";
+    tag "partial" "some dependencies have been explored";
+    tag "yes" "all dependencies have been computed";
+  ]
+
+  let data = Request.dictionary ~package ~name:"exploration"
+      ~descr:(Markdown.plain
+                "The computation state of a node read or write dependencies.")
+      dictionary
+
+  include (val data : Data.S with type t = unit)
+end
+
+module NodeRange = struct
+  include Enum ()
+
+  let _tags = [
+    tag "empty" "no value ever computed for this node";
+    tag "singleton" "this node can only have one value";
+    tag "wide" "this node can take almost all values of its type";
+  ]
+
+  let data = Request.dictionary ~package ~name:"nodeRange"
+      ~descr:(Markdown.plain "A qualitative description of the range of values \
+                              that this node can take.")
+      dictionary
+
+  include (val data : Data.S with type t = unit)
+end
+
 module Node =
 struct
   let name = "node"
@@ -188,17 +235,16 @@ struct
   let jtype = Data.declare ~package ~name ~descr (Jrecord [
       "id", NodeId.jtype;
       "label", Jstring;
-      "kind", Jstring;
+      "nkind", NodeKind.jtype;
       "locality", NodeLocality.jtype;
       "is_root", Jboolean;
-      "backward_explored", Jstring;
-      "forward_explored", Jstring;
+      "backward_explored", Computation.jtype;
+      "forward_explored", Computation.jtype;
       "writes", Jarray Kernel_ast.Location.jtype;
       "values", Joption Jstring;
-      "range", Junion [ Jnumber ; Jstring ];
+      "range", Junion [ Jnumber ; NodeRange.jtype ];
       "type", Joption Jstring;
-      "taint", Joption (Junion [
-          Jtag "direct"; Jtag "indirect"; Jtag "untainted"])
+      "taint", Joption Taint.jtype;
     ])
 end
 
@@ -210,40 +256,88 @@ struct
       "id", Jnumber ;
       "src", NodeId.jtype ;
       "dst", NodeId.jtype ;
-      "kind", Jstring ;
+      "dkind", Jstring ;
       "origins", Jarray Kernel_ast.Location.jtype
     ])
 end
 
-module Graph =
+module Element =
 struct
-  type t = Dive_graph.t
-  let name = "graphData"
-  let descr = Markdown.plain "The whole graph being built"
-  let jtype = Data.declare ~package ~name ~descr (Jrecord [
-      "nodes", Jarray Node.jtype;
-      "deps", Jarray Dependency.jtype
-    ])
+  type t = Context.element = Node of node | Edge of (node * dependency * node)
+  let name = "element"
+  let descr = Markdown.plain "A graph element, either a node or a dependency"
+  let jtype = Data.declare ~package ~name ~descr
+      (Junion [Node.jtype ; Dependency.jtype])
 
-  let to_json = Dive_graph.to_json
+  let to_json = function
+    | Context.Node v -> Dive_graph.JsonPrinter.output_node v
+    | Edge edge -> Dive_graph.JsonPrinter.output_dep edge
 end
 
 
-module GraphDiff =
-struct
-  type t = Dive_graph.t * graph_diff
-  let name = "diffData"
-  let descr = Markdown.plain "Graph differences from the last action."
-  let jtype = Data.declare ~package ~name ~descr (Jrecord [
-      "root", Joption NodeId.jtype;
-      "add", Jrecord [
-        "nodes", Jarray Node.jtype;
-        "deps", Jarray Dependency.jtype
-      ];
-      "sub", Jarray NodeId.jtype
-    ])
 
-  let to_json = fun (g,d) -> Dive_graph.diff_to_json g d
+(* -------------------------------------------------------------------------- *)
+(* --- State handling                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+let global_window = ref {
+    perception = { backward = Some 2 ; forward = Some 1 };
+    horizon = { backward = None ; forward = None };
+  }
+
+let get_context = (* TODO: projectify ? *)
+  let context = Context.create () in
+  fun () ->
+    if Eva.Analysis.is_computed () then
+      context
+    else
+      Server.Data.failure "Eva analysis not computed"
+
+
+module Graph =
+struct
+  let name = "graph"
+  let model = States.model ()
+  let descr = Markdown.plain "The graph being built as a set of vertices and \
+                              edges"
+
+  let key = function
+    | Element.Node v -> Format.sprintf "n%d" v.node_key
+    | Edge (_,dep,_) -> Format.sprintf "d%d" dep.dependency_key
+
+  let () = States.column model ~name:"element"
+      ~descr:(Markdown.plain "a graph element")
+      ~data:(module Element)
+      ~get:(fun el -> el)
+
+  let iter f =
+    let context = get_context () in
+    let graph = Context.get_graph context in
+    Dive_graph.output_to_json stdout graph;
+    Dive_graph.iter_vertex (fun v -> f (Element.Node v)) graph;
+    Dive_graph.iter_edges_e (fun e -> f (Element.Edge e)) graph
+
+  let _array =
+    let hook f =
+      fun g -> f (get_context ()) g
+    in
+    States.register_array ~package ~name ~descr ~key ~iter model
+      ~add_update_hook:(hook Context.set_update_hook)
+      ~add_remove_hook:(hook Context.set_remove_hook)
+      ~add_reload_hook:(hook Context.set_clear_hook)
+end
+
+
+module NodeId' =
+struct
+  include NodeId
+
+  let of_json json =
+    let node_key = Data.Jint.of_json json in
+    try
+      Context.find_node (get_context ()) node_key
+    with Not_found ->
+      Data.failure "no node '%d' in the current graph" node_key
 end
 
 
@@ -251,26 +345,19 @@ end
 (* --- Actions                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let result context last_root =
-  let diff = Context.take_last_diff context in
-  Context.get_graph context, { diff with last_root }
-
-let finalize' context node_opt =
-  begin match node_opt with
-    | None -> ()
-    | Some node ->
-      let may_explore f =
-        Option.iter (fun depth -> f ~depth context node)
-      in
-      may_explore Build.explore_backward !global_window.perception.backward;
-      may_explore Build.explore_forward !global_window.perception.forward;
-      let horizon = !global_window.horizon in
-      if Option.is_some horizon.forward ||
-         Option.is_some horizon.backward
-      then
-        Build.reduce_to_horizon context horizon node
-  end;
-  result context node_opt
+let finalize' context = function
+  | None -> ()
+  | Some node ->
+    let may_explore f =
+      Option.iter (fun depth -> f ~depth context node)
+    in
+    may_explore Build.explore_backward !global_window.perception.backward;
+    may_explore Build.explore_forward !global_window.perception.forward;
+    let horizon = !global_window.horizon in
+    if Option.is_some horizon.forward ||
+       Option.is_some horizon.backward
+    then
+      Build.reduce_to_horizon context horizon node
 
 let finalize context node =
   finalize' context (Some node)
@@ -282,12 +369,6 @@ let () = Request.register ~package
     (fun window -> global_window := window)
 
 let () = Request.register ~package
-    ~kind:`GET ~name:"graph"
-    ~descr:(Markdown.plain "Retrieve the whole graph")
-    ~input:(module Data.Junit) ~output:(module Graph)
-    (fun () -> Context.get_graph (get_context ()))
-
-let () = Request.register ~package
     ~kind:`EXEC ~name:"clear"
     ~descr:(Markdown.plain "Erase the graph and start over with an empty one")
     ~input:(module Data.Junit) ~output:(module Data.Junit)
@@ -296,16 +377,18 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`EXEC ~name:"add"
     ~descr:(Markdown.plain "Add a node to the graph")
-    ~input:(module Kernel_ast.Marker) ~output:(module GraphDiff)
+    ~input:(module Kernel_ast.Marker) ~output:(module Joption (NodeId'))
     begin fun loc ->
       let context = get_context () in
-      finalize' context (Build.add_localizable context loc)
+      let node = Build.add_localizable context loc in
+      finalize' context node;
+      node
     end
 
 let () = Request.register ~package
     ~kind:`EXEC ~name:"explore"
     ~descr:(Markdown.plain "Explore the graph starting from an existing vertex")
-    ~input:(module NodeId) ~output:(module GraphDiff)
+    ~input:(module NodeId') ~output:(module Data.Junit)
     begin fun node ->
       let context = get_context () in
       Build.show context node;
@@ -315,7 +398,7 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`EXEC ~name:"show"
     ~descr:(Markdown.plain "Show the dependencies of an existing vertex")
-    ~input:(module NodeId) ~output:(module GraphDiff)
+    ~input:(module NodeId') ~output:(module Data.Junit)
     begin fun node ->
       let context = get_context () in
       Build.show context node;
@@ -326,7 +409,7 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`EXEC ~name:"hide"
     ~descr:(Markdown.plain "Hide the dependencies of an existing vertex")
-    ~input:(module NodeId) ~output:(module GraphDiff)
+    ~input:(module NodeId') ~output:(module Data.Junit)
     begin fun node ->
       let context = get_context () in
       Build.hide context node;

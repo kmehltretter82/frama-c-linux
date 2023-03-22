@@ -102,14 +102,15 @@ let create_dependency g kinstr v1 dependency_kind v2 =
       e
   in
   (* Add origins *)
-  match kinstr with
-  | Cil_types.Kglobal -> ()
-  | Kstmt stmt ->
-    let add_uniq l x =
-      List.sort_uniq Cil_datatype.Stmt.compare (x :: l)
-    in
-    e.dependency_origins <- add_uniq e.dependency_origins stmt
-
+  begin match kinstr with
+    | Cil_types.Kglobal -> ()
+    | Kstmt stmt ->
+      let add_uniq l x =
+        List.sort_uniq Cil_datatype.Stmt.compare (x :: l)
+      in
+      e.dependency_origins <- add_uniq e.dependency_origins stmt
+  end;
+  (v1,e,v2)
 
 let remove_dependency g edge =
   remove_edge_e g edge
@@ -178,7 +179,7 @@ let bfs ?(iter_succ=iter_succ) ?(limit=max_int) g roots =
   Table.fold (fun n _ l -> n :: l) explored []
 
 
-let ouptput_to_dot out_channel g =
+let output_to_dot out_channel g =
   let open Graph.Graphviz.DotAttributes in
   (* let g = add_dummy_nodes g in *)
 
@@ -347,7 +348,7 @@ struct
     `Assoc ([
         ("id", `Int node.node_key) ;
         ("label", `String label) ;
-        ("kind", output_node_kind node.node_kind) ;
+        ("nkind", output_node_kind node.node_kind) ;
         ("locality", output_node_locality node.node_locality) ;
         ("is_root", `Bool node.node_is_root) ;
         ("backward_explored", output_computation node.node_writes_computation) ;
@@ -373,7 +374,7 @@ struct
       ("id", `Int dep.dependency_key) ;
       ("src", `Int n1.node_key) ;
       ("dst", `Int n2.node_key) ;
-      ("kind", output_dep_kind dep.dependency_kind) ;
+      ("dkind", output_dep_kind dep.dependency_kind) ;
       ("origins", `List (List.map output_stmt dep.dependency_origins)) ;
     ]
 
@@ -413,12 +414,6 @@ struct
       ("sub", `List removed_nodes)]
 end
 
-let ouptput_to_json out_channel g =
+let output_to_json out_channel g =
   let json = JsonPrinter.output_graph g in
   Yojson.Basic.to_channel out_channel json
-
-let to_json g =
-  JsonPrinter.output_graph g
-
-let diff_to_json g diff =
-  JsonPrinter.output_diff g diff
