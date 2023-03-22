@@ -1,7 +1,7 @@
 [kernel] Parsing assignment3.c (with preprocessing)
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
-  {a; c} are aliased
+  {a; c; &b} are aliased
 [alias] Functions done
 Before statement int *a = (int *)0; :
  
@@ -16,14 +16,15 @@ Before statement a = & b; :
  
 
 Before statement c = & b; :
- 
+ {a; &b} are aliased
+
 
 Before statement __retres = 0; :
- {a; c} are aliased
+ {a; c; &b} are aliased
 
 
 Before statement return __retres; :
- {a; c} are aliased
+ {a; c; &b} are aliased
 
 
 [alias] Analysis complete

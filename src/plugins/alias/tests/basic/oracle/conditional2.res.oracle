@@ -1,47 +1,52 @@
 [kernel] Parsing conditional2.c (with preprocessing)
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
-  {d; *c} are aliased
-  {a; b} are aliased
-  {c; *a; *b} are aliased
+  {d; &e; *c; *&d} are aliased
+  {a; b; &c} are aliased
+  {c; &d; *a; *b; *&c} are aliased
 [alias] Functions done
 Before statement b = & c; :
  
 
 Before statement c = & d; :
- {c; *b} are aliased
+ {b; &c} are aliased
+{c; *b; *&c} are aliased
 
 
 Before statement d = & e; :
- {c; *b} are aliased
-{d; *c} are aliased
+ {b; &c} are aliased
+{c; &d; *b; *&c} are aliased
+{d; *c; *&d} are aliased
 
 
 Before statement if (a) a = b; else a = & c; :
- {c; *b} are aliased
-{d; *c} are aliased
+ {b; &c} are aliased
+{c; &d; *b; *&c} are aliased
+{d; &e; *c; *&d} are aliased
 
 
 Before statement a = b; :
- {c; *b} are aliased
-{d; *c} are aliased
+ {b; &c} are aliased
+{c; &d; *b; *&c} are aliased
+{d; &e; *c; *&d} are aliased
 
 
 Before statement a = & c; :
- {c; *b} are aliased
-{d; *c} are aliased
+ {b; &c} are aliased
+{c; &d; *b; *&c} are aliased
+{d; &e; *c; *&d} are aliased
 
 
 Before statement __retres = 0; :
- {d; *c} are aliased
-{a; b} are aliased
-{c; *a; *b} are aliased
+ {d; &e; *c; *&d} are aliased
+{a; b; &c} are aliased
+{c; &d; *a; *b; *&c} are aliased
 
 
 Before statement return __retres; :
- {d; *c} are aliased
-{a; b} are aliased
-{c; *a; *b} are aliased
+ {d; &e; *c; *&d} are aliased
+{a; b; &c} are aliased
+{c; &d; *a; *b; *&c} are aliased
 
 
 [alias] Analysis complete

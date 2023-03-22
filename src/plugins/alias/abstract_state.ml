@@ -615,11 +615,11 @@ let find_vertex lv x =
   then v
   else raise Not_found
 
-let points_to (lv:Lval.t) (x:t): V.t list * t =
+let _points_to (lv:Lval.t) (x:t): V.t list * t =
   let (v,x) = find_or_create_vertex lv x in
   G.succ x.graph v, x
 
-let addr_of (lv:Lval.t) (x:t) : V.t list * t =
+let _addr_of (lv:Lval.t) (x:t) : V.t list * t =
   let (v,x) = find_or_create_vertex lv x in
   G.pred x.graph v, x
 
@@ -635,8 +635,9 @@ let _remove_cst_vertex (v:V.t) (x:t) : t =
   }
 
 (* remove a lval from a graph*)
-let remove_lval (x:t)  (lv:Lval.t) :t =
+let remove_lval (x:t)  (lv:lval) :t =
   assert_invariants x;
+  let lv = Lval.from_lval lv in
   let new_x =
     try
       let v = LLMap.find lv x.lmap in
@@ -679,7 +680,7 @@ let merge x v1 v2 =
     let g =  G.remove_vertex g v2 in
     {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt}
 
-let normalize_lval lv x = (Lval.from_lval lv,x)
+
 
 (** .dot printing functions*)
 let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
@@ -810,91 +811,106 @@ let set_type (x:t) (v1:V.t) (v2:V.t) : t =
   VSet.fold (fun vx x -> join x v1 vx) (try VMap.find v1 x.pending with Not_found -> VSet.empty) {x with graph = new_g}
 
 
-(* assignment x = y *)
-let assignment_x_y (a:t) (x:lval) (y:lval) : t =
+let assignment (a:t) (lv:lval) (e:exp) : t =
   assert_invariants a;
-  let x,a = normalize_lval x a in
-  let y,a = normalize_lval y a in
-  let (v1,a) = find_or_create_vertex x a in
-  let (v2,a) = find_or_create_vertex y a in
-  let new_a = cjoin a v1 v2 in
-  assert_invariants new_a ; new_a
+  let x = Lval.from_lval lv in
+  let y = Lval.from_exp e in
+  match x,y with
+    BNone, _ | _, BNone -> a
+  | _ ->
+    begin
+      let (v1,a) = find_or_create_vertex x a in
+      let (v2,a) = find_or_create_vertex y a in
+      let new_a = cjoin a v1 v2 in
+      assert_invariants new_a ;
+      new_a
+    end
 
-
-(* assignment x = &y *)
-let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t =
-  assert_invariants a;
-  let x,a = normalize_lval x a in
-  let y,a = normalize_lval y a in
-  let v1, a = find_or_create_vertex x a in
-  let list_v2, a = addr_of y a in
-  let new_a =
-    if list_v2 = []
-    then
-      let v2, a = find_or_create_vertex y a in
-      set_type a v1 v2
-    else
-      List.fold_left
-        (fun a_acc v2 -> join a_acc v1 v2)
-        a
-        list_v2
-  in
-  assert_invariants new_a ; new_a
-
-
-(* assignment x = *y *)
-let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
-  assert_invariants a;
-  let x,a = normalize_lval x a in
-  let y,a = normalize_lval y a in
-  let v1, a = find_or_create_vertex x a in
-  let list_v2, a = points_to y a in
-  let new_a =
-    match list_v2 with
-      [] -> let v2,a = find_or_create_vertex y a in set_type a v2 v1
-    | [v2] -> cjoin a v1 v2
-    | _ ->  Options.fatal "assignment_x_ptr_y not implemented"
-  in
-  assert_invariants new_a ; new_a
+(* (\* assignment x = y *\)
+ * let assignment_x_y (a:t) (x:lval) (y:lval) : t =
+ *   assert_invariants a;
+ *   let x,a = normalize_lval x a in
+ *   let y,a = normalize_lval y a in
+ *   let (v1,a) = find_or_create_vertex x a in
+ *   let (v2,a) = find_or_create_vertex y a in
+ *   let new_a = cjoin a v1 v2 in
+ *   assert_invariants new_a ; new_a
+ *
+ *
+ * (\* assignment x = &y *\)
+ * let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t =
+ *   assert_invariants a;
+ *   let x,a = normalize_lval x a in
+ *   let y,a = normalize_lval y a in
+ *   let v1, a = find_or_create_vertex x a in
+ *   let list_v2, a = addr_of y a in
+ *   let new_a =
+ *     if list_v2 = []
+ *     then
+ *       let v2, a = find_or_create_vertex y a in
+ *       set_type a v1 v2
+ *     else
+ *       List.fold_left
+ *         (fun a_acc v2 -> join a_acc v1 v2)
+ *         a
+ *         list_v2
+ *   in
+ *   assert_invariants new_a ; new_a
+ *
+ *
+ * (\* assignment x = *y *\)
+ * let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
+ *   assert_invariants a;
+ *   let x,a = normalize_lval x a in
+ *   let y,a = normalize_lval y a in
+ *   let v1, a = find_or_create_vertex x a in
+ *   let list_v2, a = points_to y a in
+ *   let new_a =
+ *     match list_v2 with
+ *       [] -> let v2,a = find_or_create_vertex y a in set_type a v2 v1
+ *     | [v2] -> cjoin a v1 v2
+ *     | _ ->  Options.fatal "assignment_x_ptr_y not implemented"
+ *   in
+ *   assert_invariants new_a ; new_a *)
 
 (* assignment x = allocate(y) *)
-let assignment_x_allocate_y (a:t) (x:lval) : t =
+let assignment_x_allocate_y (a:t) (lv:lval) : t =
   assert_invariants a;
-  let x,a = normalize_lval x a in
+  let x = Lval.from_lval lv in
   let (v1,a) = find_or_create_vertex x a in
   let (v2,a) = create_cst_vertex a in
-  let new_a = set_type a v1 v2 in
+  let new_a : t = set_type a v1 v2 in
   assert_invariants new_a ; new_a
 
-(* assignment *x = y *)
-let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
-  assert_invariants a;
-  let x,a = normalize_lval x a in
-  let y,a = normalize_lval y a in
-  let v2, a = find_or_create_vertex y a in
-  let list_v1, a = points_to x a in
-  let new_a =
-    match list_v1 with
-      [] ->  let v1,a = find_or_create_vertex x a in set_type a v1 v2
-    |  [v1] -> cjoin a v1 v2
-    | _ ->  Options.fatal "assignment_ptr_x_y not implemented"
-  in
-  assert_invariants new_a ; new_a
-
-
-(* assignment *x = cst *)
-let assignment_ptr_x_cst (a:t) (x:lval) : t =
-  assert_invariants a;
-  let x,a = normalize_lval x a in
-  let v2, a = create_cst_vertex a in
-  let (list_v1, a) : V.t list * t = points_to x a in
-  let new_a =
-    match list_v1 with
-      [] ->  let v1,a = find_or_create_vertex x a in set_type a v1 v2
-    | [v1] ->  cjoin a v1 v2
-    | _ -> Options.fatal "invariant broken "
-  in
-  assert_invariants new_a ; new_a
+(* * assignment *x = y *\)
+ * let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
+ *   assert_invariants a;
+ *   let x,a = normalize_lval x a in
+ *   let y,a = normalize_lval y a in
+ *   let v2, a = find_or_create_vertex y a in
+ *   let list_v1, a = points_to x a in
+ *   let new_a =
+ *     match list_v1 with
+ *       [] ->  let v1,a = find_or_create_vertex x a in set_type a v1 v2
+ *     |  [v1] -> cjoin a v1 v2
+ *     | _ ->  Options.fatal "assignment_ptr_x_y not implemented"
+ *   in
+ *   assert_invariants new_a ; new_a
+ *
+ *
+ * (\* assignment *x = cst *\)
+ * let assignment_ptr_x_cst (a:t) (x:lval) : t =
+ *   assert_invariants a;
+ *   let x,a = normalize_lval x a in
+ *   let v2, a = create_cst_vertex a in
+ *   let (list_v1, a) : V.t list * t = points_to x a in
+ *   let new_a =
+ *     match list_v1 with
+ *       [] ->  let v1,a = find_or_create_vertex x a in set_type a v1 v2
+ *     | [v1] ->  cjoin a v1 v2
+ *     | _ -> Options.fatal "invariant broken "
+ *   in
+ *   assert_invariants new_a ; new_a *)
 
 exception Not_included
 
@@ -1089,8 +1105,8 @@ let empty :t =
 type summary =
   {
     state : t option;
-    formals: Lval.t list;
-    locals: Lval.t list;
+    formals: lval list;
+    locals: lval list;
     return : exp option
   }
 
@@ -1106,15 +1122,15 @@ let make_summary (s: t option) (kf: kernel_function) =
   in
   {
     state = s;
-    formals = List.map (fun v -> BLval (Var v,NoOffset)) (Kernel_function.get_formals kf);
-    locals = List.map (fun v -> BLval (Var v,NoOffset))  (Kernel_function.get_locals kf);
+    formals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_formals kf);
+    locals = List.map (fun v -> (Var v,NoOffset))  (Kernel_function.get_locals kf);
     return = exp_return
   }
 
 
 let pretty_summary ?(debug=false) ?(function_name="") fmt s =
-  let print_list_lval fmt (l: Lval.t list) =
-    List.iter (fun x -> Format.fprintf fmt "%a " Lval.pretty x) l
+  let print_list_lval fmt (l: lval list) =
+    List.iter (fun x -> Format.fprintf fmt "%a " Cil_datatype.Lval.pretty x) l
   in
   let print_option pp fmt x =
     match x with
@@ -1137,7 +1153,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   assert (List.length args = List.length formals);
   (* check that formal variables do no appear in state *)
   List.iter
-    (fun lv -> assert (not (LLMap.mem lv state.lmap)))
+    (fun lv -> assert (not (LLMap.mem (BLval lv) state.lmap)))
     formals;
   (* union of the two graphs *)
   let new_state = union state sum_state in
@@ -1145,26 +1161,28 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   let new_state =
     List.fold_left2
       (fun acc param formal ->
-         begin
-           let arg = Lval.from_exp param in
-           match  formal, arg  with
-             ( BLval(Var v1, o1), BLval (Var v2,o2)) ->
-             (* case x = y *)
-             assignment_x_y acc (Var v1, o1) (Var v2, o2)
-           | ( BLval(Var _, _), BNone) -> acc
-           (* constant assignments : do nothing, but maybe check the type of the assigned variable ? *)
-           | ( BLval(Var v1, o1), BAddrOf lv2) ->
-             (* case x = &y *)
-             assignment_x_addr_y acc (Var v1, o1) lv2
-           | ( BLval(Var v1, o1), BLval (Mem e2, _)) ->
-             (* case x  = *y *)
-             begin
-               match e2.enode with
-                 Lval lv2 -> assignment_x_ptr_y acc (Var v1, o1) lv2
-               |  _ -> (Options.feedback "In a function call, parameter (@[%a@] <- @[%a@]) is ignored)" Lval.pretty formal Exp.pretty param; acc)
-             end
-           | _ -> (Options.feedback "DEBUG: call function - formal variable not as we expected@."; acc)
-         end
+         assignment acc formal param
+         (* begin
+          *
+          *   let arg = Lval.from_exp param in
+          *   match  formal, arg  with
+          *     ( BLval(Var v1, o1), BLval (Var v2,o2)) ->
+          *     (\* case x = y *\)
+          *     assignment_x_y acc (Var v1, o1) (Var v2, o2)
+          *   | ( BLval(Var _, _), BNone) -> acc
+          *   (\* constant assignments : do nothing, but maybe check the type of the assigned variable ? *\)
+          *   | ( BLval(Var v1, o1), BAddrOf lv2) ->
+          *     (\* case x = &y *\)
+          *     assignment_x_addr_y acc (Var v1, o1) lv2
+          *   | ( BLval(Var v1, o1), BLval (Mem e2, _)) ->
+          *     (\* case x  = *y *\)
+          *     begin
+          *       match e2.enode with
+          *         Lval lv2 -> assignment_x_ptr_y acc (Var v1, o1) lv2
+          *       |  _ -> (Options.feedback "In a function call, parameter (@[%a@] <- @[%a@]) is ignored)" Lval.pretty formal Exp.pretty param; acc)
+          *     end
+          *   | _ -> (Options.feedback "DEBUG: call function - formal variable not as we expected@."; acc)
+          * end *)
       )
       new_state
       args

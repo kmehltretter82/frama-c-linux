@@ -1,17 +1,10 @@
 [kernel] Parsing example1.c (with preprocessing)
 [alias] Parsing done
-[alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
-[alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
 [alias] Warning: a function with no return is employed in an assignment
-[alias] Ignoring assignment *(odata + idx) = 0.5 * tmp_1 (do_assignment  not implemented 3)
 [alias] Warning: a function with no return is employed in an assignment
-[alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
-[alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
+[alias] Warning: a function with no return is employed in an assignment
 [alias] Warning: DEBUG return stmt of f1 not in table
 [alias] Warning: Analysis is continuing but will not be sound
-[alias] Skipping assignment idata = tmp->t1[*(tmp->n1)] (not implemented)
-[alias] Skipping assignment odata = tmp->t2[*(tmp->n2)] (not implemented)
-[alias] Ignoring assignment *(odata + idx) = (double)3 * *(idata + idx) + (double)1 (do_assignment  not implemented 3)
 [alias] Warning: DEBUG return stmt of f2 not in table
 [alias] Warning: Analysis is continuing but will not be sound
 [alias] May-aliases at the end of function main:
