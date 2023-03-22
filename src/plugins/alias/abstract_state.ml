@@ -74,26 +74,6 @@ struct
     else
       LMap.add lv res m
 
-  let _from_lmap (lm: V.t LMap.t) : t =
-    LMap.fold
-      (fun lv v acc -> add lv v acc)
-      lm
-      LMap.empty
-
-  let _to_lmap (m:t) : V.t LMap.t =
-    LMap.fold
-      (fun lv mo acc ->
-         OMap.fold
-           (fun o v acc ->
-              let lv = Lval.addOffsetLval o lv in
-              LMap.add lv v acc
-           )
-           mo
-           acc
-      )
-      m
-      LMap.empty
-
   let iter (f_iter: Lval.t -> V.t -> unit) (m:t) : unit =
     LMap.iter
       (fun lv mo ->
@@ -129,18 +109,6 @@ struct
       )
       m
 
-  let _mapi (f_mapi: Lval.t -> V.t -> V.t ) (m:t) : 'a =
-    LMap.mapi
-      (fun lv mo ->
-         OMap.mapi
-           (fun o v ->
-              let lv = Lval.addOffsetLval o lv in
-              f_mapi lv v
-           )
-           mo
-      )
-      m
-
   let pretty fmt (m:t) =
     LMap.iter
       (fun lv mo ->
@@ -159,17 +127,6 @@ struct
     | Field (f1,o1), Field(f2,o2) when Fieldinfo.equal f1 f2 ->  is_sub_offset o1 o2
     | _ -> false
 
-  (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 = lv+o1 *)
-  let _find_lower_offsets (lv:Lval.t) (m:t) : V.t LMap.t =
-    let lv, off = Lval.removeOffsetLval lv in
-    let mo = try LMap.find lv m with Not_found -> OMap.empty in
-    let f_filter o _v = is_sub_offset off o in
-    let mo = OMap.filter f_filter mo in
-    OMap.fold
-      (fun o v acc -> let lv = Lval.addOffsetLval o lv in LMap.add lv v acc)
-      mo
-      LMap.empty
-
   (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 + o1 = lv *)
   let find_upper_offsets (lv:Lval.t) (m:t) : V.t LMap.t =
     let lv, off = Lval.removeOffsetLval lv in
@@ -180,25 +137,6 @@ struct
       (fun o v acc -> let lv = Lval.addOffsetLval o lv in LMap.add lv v acc)
       mo
       LMap.empty
-
-  let rec is_indexed_offset o1 o2 =
-    match (o1,o2) with
-      NoOffset, Index(_,NoOffset) -> true
-    | Index (e1,o1), Index(e2,o2) when Exp.equal e1 e2 -> is_indexed_offset o1 o2
-    | Field (f1,o1), Field(f2,o2) when Fieldinfo.equal f1 f2 ->  is_indexed_offset o1 o2
-    | _ -> false
-
-  (* finds all the lval lv1 apearing in [m] such as there exists an index c  such as lv1 = lv[c] *)
-  let _find_indexed_offsets (lv:Lval.t) (m:t) : V.t LMap.t =
-    let lv, off = Lval.removeOffsetLval lv in
-    let mo = try LMap.find lv m with Not_found -> OMap.empty in
-    let f_filter o _v = is_indexed_offset off o in
-    let mo = OMap.filter f_filter mo in
-    OMap.fold
-      (fun o v acc -> let lv = Lval.addOffsetLval o lv in LMap.add lv v acc)
-      mo
-      LMap.empty
-
 
 end
 
@@ -345,7 +283,9 @@ let assert_invariants (x:t) : unit =
 let assert_invariants x =
   try assert_invariants x
   with
-    Assert_failure f ->  (Format.printf "DEBUG FAILED INVARIANTS@.%a@." print_debug x; raise (Assert_failure f))
+    Assert_failure f ->
+    Options.error "failed invariants@.%a@." print_debug x;
+    raise (Assert_failure f)
 
 let pretty ?(debug=false) fmt (x:t) =
   if debug then
@@ -378,27 +318,6 @@ let find_transitive_closure  (lv:lval) (x:t) =
   with
     Not_found -> []
 (* TODO : what about offsets ? *)
-
-
-(* find the vertex corresponding to lv+o in x, where lv is in v *)
-let _redirect_offset (v:V.t) (o:offset) (x:t) : V.t option =
-  let setv = find_lset v x in
-  let res = ref None in
-  LSet.iter
-    (fun lv ->
-       let lv = Lval.addOffsetLval o lv in
-       try
-         begin
-           let v1 = LLMap.find lv x.lmap in
-           match !res with
-             Some v2 -> assert (V.equal v1 v2)
-           | None -> res := Some v1
-         end
-       with
-         Not_found -> ()
-    )
-    setv;
-  !res
 
 
 (* NOTE on "constant vertex": a constant vertex represents an unamed
@@ -434,9 +353,9 @@ let find_all_aliases (lv1: Lval.t) (x: t) : LSet.t =
     with
       Not_found -> (LSet.empty,o)
   in
-  (* Format.printf "DEBUG: decompose_lval %a : [@[<hov 2>" Lval.pp_debug lv1;
-   * List.iter (fun (x, o) -> Format.printf " (%a,%a) " Lval.pp_debug x Offset.pretty o) list_of_lval_to_be_searched;
-   * Format.printf "@]]@."; *)
+  Options.debug "decompose_lval %a : [@[<hov 2>" Lval.pp_debug lv1;
+  List.iter (fun (x, o) -> Options.debug " (%a,%a) " Lval.pp_debug x Offset.pretty o) list_of_lval_to_be_searched;
+  Options.debug "@]]@.";
   let list_of_aliases : (LSet.t*offset) list =
     List.map f_map list_of_lval_to_be_searched
   in
@@ -462,6 +381,7 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   (* find all the alias of lv (because of offset) *)
   let set_of_aliases : LSet.t = find_all_aliases lv x in
   (* add all these aliases *)
+  Options.debug "all_aliases of %a : %a @." Lval.pp_debug lv LSet.pp_debug set_of_aliases;
   let new_lmap =
     LSet.fold
       (fun lv acc -> assert (not (LLMap.mem lv x.lmap)); LLMap.add lv new_v acc)
@@ -568,6 +488,7 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
       (* for any predecessor, find all its aliases and then look for potential existing vertex *)
       let f_fold_lmap lvx vx acc =
         let set_aliases = VMap.find vx x.vmap in
+        Options.debug "looking for aliases of %a in set %a@." Lval.pp_debug lv LSet.pp_debug set_aliases;
         if LSet.cardinal set_aliases > 1
         then
           let off = diff_offset lvx lv in
@@ -592,6 +513,7 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
           map_predecessors
           VSet.empty
       in
+      Options.debug "found aliases of %a : %a@." Lval.pp_debug lv VSet.pretty vset_res;
       if VSet.is_empty vset_res
       then create_vertex_lval lv x
       else
@@ -622,17 +544,6 @@ let _points_to (lv:Lval.t) (x:t): V.t list * t =
 let _addr_of (lv:Lval.t) (x:t) : V.t list * t =
   let (v,x) = find_or_create_vertex lv x in
   G.pred x.graph v, x
-
-let _remove_cst_vertex (v:V.t) (x:t) : t =
-  Format.printf "Removing vertex %d@." v;
-  assert (LSet.is_empty (VMap.find v x.vmap));
-  {
-    graph = G.remove_vertex x.graph v;
-    pending = VMap.remove v x.pending;
-    lmap = x.lmap;
-    vmap = VMap.remove v x.vmap;
-    cmpt = x.cmpt
-  }
 
 (* remove a lval from a graph*)
 let remove_lval (x:t)  (lv:lval) :t =
@@ -777,7 +688,7 @@ and unify2 (x:t) (v1:V.t) (l2:V.t list) =
 
 (* since the recursive version of join, unify, unify2 and merge may break the invariants *)
 let join (x:t) (v1:V.t) (v2:V.t) : t =
-  (* Options.feedback ~level:2 "GRAPH BEFORE JOIN(v_%d,v_%d) @.%a@." v1 v2 (pretty ~debug:true) x; *)
+  Options.debug ~level:2 "GRAPH BEFORE JOIN(v_%d,v_%d) @.%a@." v1 v2 (pretty ~debug:true) x;
   assert_invariants x;
   let res = join_without_check x v1 v2 in
   assert_invariants res; res
@@ -918,7 +829,7 @@ let is_included (a1:t) (a2:t) =
   (* tests if a1 is included in a2, at least as the nodes with lval *)
   assert_invariants a1;
   assert_invariants a2;
-  (* Format.printf "DEBUG testing equal @.%a@. AND à.%a@. END DEBUG@." (pretty ~debug:true) a1 (pretty ~debug:true) a2; *)
+  Options.debug "testing equal @.%a@. AND à.%a@." (pretty ~debug:true) a1 (pretty ~debug:true) a2;
   try
     let iter_lmap (lv:Lval.t) (v1:V.t): unit =
       let v2 : V.t = try LLMap.find lv a2.lmap with Not_found -> raise Not_included in
@@ -936,80 +847,6 @@ let is_included (a1:t) (a2:t) =
     LLMap.iter iter_lmap a1.lmap; true
   with
     Not_included -> false
-
-(* let equal (a1:t) (a2:t) =
- *   assert_invariants a1;
- *   assert_invariants a2;
- *   Format.printf "DEBUG testing equal @.%a@. AND à.%a@. END DEBUG@." (pretty ~debug:true) a1 (pretty ~debug:true) a2;
- *   try
- *     let card = LLMap.cardinal a1.lmap in
- *     if (card = LLMap.cardinal a2.lmap)
- *     && G.nb_vertex a1.graph = G.nb_vertex a2.graph
- *     && G.nb_edges a1.graph = G.nb_edges a2.graph
- *     (\* the invariants assure that if the nb of vertex is equal, then
- *        the size of pending and vmap are also equal. nb counters may be
- *        different, it doesn't matter *\)
- *     then
- *       begin
- *         (\* builds the isomorphism between vertex numbers as an
- *              Hastable Int.t -> Int.t *\)
- *           let iso : (V.t, V.t) Hashtbl.t = Hashtbl.create card in
- *           LLMap.iter
- *             (fun lv v1 ->
- *                let v2 : V.t = try LLMap.find lv a2.lmap with Not_found -> raise Not_equal in
- *                try if not (V.equal (Hashtbl.find iso v1) v2) then raise Not_equal
- *                with Not_found ->
- *                  Hashtbl.add iso v1 v2
- *             )
- *             a1.lmap;
- *           (\* now, iso is the isomorphism between vertex numbers. NB constant vertices are NOT in the map *\)
- *           (\* we check, for every vertex of a1.graph, that its successors and predecessors are isomorphic *\)
- *           let check_vertex (v1:V.t) : unit =
- *             if not (LSet.is_empty (VMap.find v1 a1.vmap))
- *             then (\* v1 is not a constant node, so it is an entry in iso *\)
- *               let v2 =
- *                 try
- *                   Hashtbl.find iso v1
- *                 with
- *                   Not_found -> Options.fatal "this should not happen (broken invariant or hashtable iso)"
- *               in
- *               begin
- *                 (\* we only need to check the successors; the predecessor will be checked because we iterate on all vertex *\)
- *                 match G.succ a1.graph v1 with
- *                   [] -> (\* if v1 has no successor, then so must have v2 *\)
- *                   if List.length (G.succ a2.graph v2) > 0 then raise Not_equal
- *
- *                 | [succ_v1] ->
- *                   begin
- *                     if LSet.is_empty (VMap.find succ_v1 a1.vmap)
- *                     then
- *                       (\* veryfy that v2 has a successor that is also a constant vertex*\)
- *                       match G.succ a2.graph v2 with
- *                         [succ_v2] when LSet.is_empty (VMap.find succ_v2 a2.vmap) -> ()
- *                       | _ -> raise Not_equal
- *                     else
- *                       let succ_v2 : V.t =
- *                         try
- *                           Hashtbl.find iso succ_v1
- *                         with
- *                           Not_found -> Options.fatal "this should not happen (broken invariant or hashtable iso)"
- *                       in
- *                       (\* simply check for an edge between v2 and succ v_2 *\)
- *                       if not (G.mem_edge a2.graph v2 succ_v2) then raise Not_equal
- *                   end
- *                 | _ -> Options.fatal "this should not happen (broken invariant)"
- *               end
- *             else (\* if it is a constant node, nothing to do *\)
- *               ()
- *           in
- *           G.iter_vertex check_vertex a1.graph; true
- *         end
- *     else
- *       (\* if the cardinal is different, there cannot be an isomorphism *\)
- *       false
- *   with
- *     Not_equal -> false *)
-
 
 module VPairs =
 struct
@@ -1060,9 +897,8 @@ let union  (a1:t) (a2:t) :t =
   assert_invariants a1;
   assert_invariants a2;
 
-  Options.debug "BEGIN DEBUG UNION@.";
-  Options.debug "First graph:@.%a@." print_graph a1;
-  Options.debug "Second graph:@.%a@." print_graph a2;
+  Options.debug "Union: First graph:@.%a@." print_graph a1;
+  Options.debug "Union: Second graph:@.%a@." print_graph a2;
   (* ensure that a1 and a2 no longer share any vertex indices *)
   let a2 = shift a2 a1.cmpt in
   let new_graph =
@@ -1093,8 +929,7 @@ let union  (a1:t) (a2:t) :t =
   let to_be_joined = lmap_intersect a1.lmap a2.lmap in
   let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = max a1.cmpt a2.cmpt} in
   let new_a = List.fold_left (fun s (l,r) -> join_without_check s l r) new_a to_be_joined in
-  Options.debug "Result graph:@.%a@." print_graph new_a;
-  Options.debug "END DEBUG UNION@.";
+  Options.debug "Union: Result graph:@.%a@." print_graph new_a;
   assert_invariants new_a;
   new_a
 
