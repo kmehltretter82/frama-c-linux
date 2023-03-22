@@ -74,26 +74,6 @@ struct
     else
       LMap.add lv res m
 
-  let _from_lmap (lm: V.t LMap.t) : t =
-    LMap.fold
-      (fun lv v acc -> add lv v acc)
-      lm
-      LMap.empty
-
-  let _to_lmap (m:t) : V.t LMap.t =
-    LMap.fold
-      (fun lv mo acc ->
-         OMap.fold
-           (fun o v acc ->
-              let lv = Lval.addOffsetLval o lv in
-              LMap.add lv v acc
-           )
-           mo
-           acc
-      )
-      m
-      LMap.empty
-
   let iter (f_iter: Lval.t -> V.t -> unit) (m:t) : unit =
     LMap.iter
       (fun lv mo ->
@@ -129,18 +109,6 @@ struct
       )
       m
 
-  let _mapi (f_mapi: Lval.t -> V.t -> V.t ) (m:t) : 'a =
-    LMap.mapi
-      (fun lv mo ->
-         OMap.mapi
-           (fun o v ->
-              let lv = Lval.addOffsetLval o lv in
-              f_mapi lv v
-           )
-           mo
-      )
-      m
-
   let pretty fmt (m:t) =
     LMap.iter
       (fun lv mo ->
@@ -159,17 +127,6 @@ struct
     | Field (f1,o1), Field(f2,o2) when Fieldinfo.equal f1 f2 ->  is_sub_offset o1 o2
     | _ -> false
 
-  (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 = lv+o1 *)
-  let _find_lower_offsets (lv:Lval.t) (m:t) : V.t LMap.t =
-    let lv, off = Lval.removeOffsetLval lv in
-    let mo = try LMap.find lv m with Not_found -> OMap.empty in
-    let f_filter o _v = is_sub_offset off o in
-    let mo = OMap.filter f_filter mo in
-    OMap.fold
-      (fun o v acc -> let lv = Lval.addOffsetLval o lv in LMap.add lv v acc)
-      mo
-      LMap.empty
-
   (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 + o1 = lv *)
   let find_upper_offsets (lv:Lval.t) (m:t) : V.t LMap.t =
     let lv, off = Lval.removeOffsetLval lv in
@@ -180,25 +137,6 @@ struct
       (fun o v acc -> let lv = Lval.addOffsetLval o lv in LMap.add lv v acc)
       mo
       LMap.empty
-
-  let rec is_indexed_offset o1 o2 =
-    match (o1,o2) with
-      NoOffset, Index(_,NoOffset) -> true
-    | Index (e1,o1), Index(e2,o2) when Exp.equal e1 e2 -> is_indexed_offset o1 o2
-    | Field (f1,o1), Field(f2,o2) when Fieldinfo.equal f1 f2 ->  is_indexed_offset o1 o2
-    | _ -> false
-
-  (* finds all the lval lv1 apearing in [m] such as there exists an index c  such as lv1 = lv[c] *)
-  let _find_indexed_offsets (lv:Lval.t) (m:t) : V.t LMap.t =
-    let lv, off = Lval.removeOffsetLval lv in
-    let mo = try LMap.find lv m with Not_found -> OMap.empty in
-    let f_filter o _v = is_indexed_offset off o in
-    let mo = OMap.filter f_filter mo in
-    OMap.fold
-      (fun o v acc -> let lv = Lval.addOffsetLval o lv in LMap.add lv v acc)
-      mo
-      LMap.empty
-
 
 end
 
@@ -380,27 +318,6 @@ let find_transitive_closure  (lv:lval) (x:t) =
   with
     Not_found -> []
 (* TODO : what about offsets ? *)
-
-
-(* find the vertex corresponding to lv+o in x, where lv is in v *)
-let _redirect_offset (v:V.t) (o:offset) (x:t) : V.t option =
-  let setv = find_lset v x in
-  let res = ref None in
-  LSet.iter
-    (fun lv ->
-       let lv = Lval.addOffsetLval o lv in
-       try
-         begin
-           let v1 = LLMap.find lv x.lmap in
-           match !res with
-             Some v2 -> assert (V.equal v1 v2)
-           | None -> res := Some v1
-         end
-       with
-         Not_found -> ()
-    )
-    setv;
-  !res
 
 
 (* NOTE on "constant vertex": a constant vertex represents an unamed
@@ -627,17 +544,6 @@ let points_to (lv:Lval.t) (x:t): V.t list * t =
 let addr_of (lv:Lval.t) (x:t) : V.t list * t =
   let (v,x) = find_or_create_vertex lv x in
   G.pred x.graph v, x
-
-let _remove_cst_vertex (v:V.t) (x:t) : t =
-  Options.debug "Removing vertex %d@." v;
-  assert (LSet.is_empty (VMap.find v x.vmap));
-  {
-    graph = G.remove_vertex x.graph v;
-    pending = VMap.remove v x.pending;
-    lmap = x.lmap;
-    vmap = VMap.remove v x.vmap;
-    cmpt = x.cmpt
-  }
 
 (* remove a lval from a graph*)
 let remove_lval (x:t)  (lv:Lval.t) :t =

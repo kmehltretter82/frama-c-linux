@@ -61,14 +61,6 @@ module Function_table = Make_table(Kernel_function.Hashtbl)(R)
 let function_compute_ref = Extlib.mk_fun "function_compute"
 
 
-(* (\* functions from abtract_state, exended to options *\)
- * let _union a1 a2 =
- *   match a1,a2 with
- *     None, None -> None
- *   | None, _ -> a2
- *   | _, None -> a1
- *   | Some a1, Some a2 -> Some (Abstract_state.union a1 a2) *)
-
 module D = Dataflow.StartData(A)
 
 module Stmt_table = struct
@@ -192,11 +184,6 @@ struct
     match a with
       None -> Format.fprintf fmt "<No abstract state>"
     | Some a -> Abstract_state.pretty fmt a
-
-  (* let pretty_debug fmt state =
-   *   match state with
-   *   | None -> Format.fprintf fmt "None"
-   *   | Some s -> Format.fprintf fmt "%a" (Abstract_state.pretty ~debug:true) s *)
 
   let  computeFirstPredecessor _ a = a
 
@@ -340,7 +327,7 @@ let compute () =
 
 let clear () =
   computed_flag := false;
-  (*Stmt_table*)Stmt_table.clear()
+  Stmt_table.clear()
 
 let get_state_before_stmt _kf stmt =
   if is_computed ()
