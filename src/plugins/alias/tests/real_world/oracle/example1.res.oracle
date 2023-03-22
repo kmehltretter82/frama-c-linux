@@ -3,9 +3,7 @@
 [alias] Warning: a function with no return is employed in an assignment
 [alias] Warning: a function with no return is employed in an assignment
 [alias] Warning: a function with no return is employed in an assignment
-[alias] Warning: DEBUG return stmt of f1 not in table
 [alias] Warning: Analysis is continuing but will not be sound
-[alias] Warning: DEBUG return stmt of f2 not in table
 [alias] Warning: Analysis is continuing but will not be sound
 [alias] May-aliases at the end of function main:
 [alias] Functions done
