@@ -36,22 +36,19 @@ let is_higher u1 u2 =
   | Some u1, Some u2 -> Integer.compare u1 u2 >= 0
   | Some _, None -> false
 
-let widen_ival_naive i1 i2 =
-  if Ival.is_bottom i1 then Ival i2 else top_ival
+let widen_ival_naive _ _ =
+  top_ival
 
 let widen_ival_default i1 i2 =
-  if Ival.is_bottom i1
-  then Ival i2
-  else
-    (try
-       let kind = ikind_of_ival (Ival.join i1 i2) in
-       let i = ival_of_ikind kind in
-       let l1,u1 = Ival.min_and_max i1 in
-       let l2,u2 = Ival.min_and_max i2 in
-       let lmask = if is_lower l1 l2 then l1 else None in
-       let umask = if is_higher u1 u2  then u1 else None in
-       Ival (Ival.meet i (Ival.inject_range lmask umask))
-     with Cil.Not_representable -> top_ival)
+  try
+    let kind = ikind_of_ival (Ival.join i1 i2) in
+    let i = ival_of_ikind kind in
+    let l1,u1 = Ival.min_and_max i1 in
+    let l2,u2 = Ival.min_and_max i2 in
+    let lmask = if is_lower l1 l2 then l1 else None in
+    let umask = if is_higher u1 u2  then u1 else None in
+    Ival (Ival.meet i (Ival.inject_range lmask umask))
+  with Cil.Not_representable -> top_ival
 
 let widen_ival_precise i1 i2 =
   let i = Ival.join i1 i2 in
@@ -81,6 +78,7 @@ let widen_ival ~arg name i1 i2 =
 
 let widen ?(arg = false) li i1 i2 =
   match i1, i2 with
+  | Ival i1, i2 when Ival.is_bottom i1 -> i2
   | Ival i1, Ival i2 -> widen_ival ~arg li.l_var_info.lv_name i1 i2
   | Float _, Float _ | Rational, Rational | Real, Real | Nan, Nan ->
     join i1 i2
