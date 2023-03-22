@@ -151,9 +151,8 @@ let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t 
     begin
       match (a,res) with
         (None, _) -> None
-      | (Some a,None) -> (Options.feedback "Warning : malloc not stored (ignored)"; Some a)
-      | (Some a, Some  (Var v1, NoOffset)) -> Some (Abstract_state.assignment_x_allocate_y a  (Var v1, NoOffset))
-      | (Some a, Some lv) -> (Options.feedback "Skipping assignment @[%a@] = malloc() (not implemented)" Lval.pretty lv; Some a)
+      | (Some a, None) -> (Options.feedback "Warning : malloc not stored (ignored)"; Some a)
+      | (Some a, Some lv) -> Some (Abstract_state.assignment_x_allocate_y a lv)
     end
   (* general case for calls *)
   | Call(res,ef,es,(loc,_)) -> (* !function_compute_ref ef *)

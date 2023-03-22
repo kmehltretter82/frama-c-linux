@@ -14,10 +14,6 @@
 [alias] Ignoring assignment *(odata + idx) = (double)3 * *(idata + idx) + (double)1 (do_assignment  not implemented 3)
 [alias] Warning: DEBUG return stmt of f2 not in table
 [alias] Warning: Analysis is continuing but will not be sound
-[alias] Skipping assignment a->t1[i] = malloc() (not implemented)
-[alias] Skipping assignment a->t2[i] = malloc() (not implemented)
-[alias] Skipping assignment a->n1 = malloc() (not implemented)
-[alias] Skipping assignment a->n2 = malloc() (not implemented)
 [alias] May-aliases at the end of function main:
 [alias] Functions done
 Before statement b->t1[i] = a->t1[i]; :
