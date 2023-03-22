@@ -1,8 +1,8 @@
 [kernel] Parsing nested2.c (with preprocessing)
 [alias] Parsing done
-[alias] Skiping st_2_t *z1 = malloc(sizeof(st_2_t)); (doInstr not implemented)
-[alias] Skiping st_3_t *t = malloc(sizeof(st_3_t)); (doInstr not implemented)
-[alias] Skiping int *a = malloc(sizeof(int)); (doInstr not implemented)
+[alias] Skipping st_2_t *z1 = malloc(sizeof(st_2_t)); (doInstr not implemented)
+[alias] Skipping st_3_t *t = malloc(sizeof(st_3_t)); (doInstr not implemented)
+[alias] Skipping int *a = malloc(sizeof(int)); (doInstr not implemented)
 [alias] Skipping assignment z1->s[0] = (struct struct_1_t *)(& x1) (not implemented)
 [alias] Skipping assignment z1->s[1] = (struct struct_1_t *)(& x2) (not implemented)
 [alias] May-aliases at the end of function main:
