@@ -135,8 +135,9 @@ module Instrument =
     end)
 
 module Widening_arguments_base =
-  Zero
+  Int
     (struct
+      let default = 1
       let option_name = "-e-acsl-widening-arguments-base"
       let arg_name = "n"
       let help = "widening strategy for arguments of recursive functions."
