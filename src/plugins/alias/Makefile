@@ -20,7 +20,7 @@
 #                                                                        #
 ##########################################################################
 
-.PHONY: all build clean
+.PHONY: all build-profiling build clean
 
 FRAMAC_SHARE:=$(shell frama-c -print-share-path)
 
@@ -37,6 +37,9 @@ frama-c-alias.opam: frama-c-alias.opam.template dune-project
 
 build::
 	dune build @install
+
+build-profiling::
+	dune build --instrument-with landmarks @install
 
 clean:: purge-tests
 	dune clean
