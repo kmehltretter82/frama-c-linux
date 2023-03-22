@@ -10,8 +10,8 @@
     --code-hover: lightgreen;
     --code-select: #ffda95;
     --code-select-hover: orange;
-    --dead-code: #bbb;
-    --non-terminating: #bbb;
+    --dead-code: #999;
+    --non-terminating: #fb4e4a;
     --highlighted-marker: #ffff66;
     --code-bullet: #ddd;
 
