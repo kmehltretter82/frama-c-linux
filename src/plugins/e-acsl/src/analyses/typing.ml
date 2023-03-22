@@ -253,7 +253,10 @@ let coerce ~arith_operand ~ctx ty =
        operation to be of the expected type. *)
   if (ctx = Gmpz && ty <> Gmpz) || arith_operand
   then { ty; cast = Some ctx }
-  else { ty; cast = None }
+  else
+  if ctx = Rational && ty <> Rational
+  then {ty; cast = Some ctx}
+  else {ty; cast = None}
 
 let number_ty_of_typ ~post ty =
   (* Consider GMP types only in a post typing phase *)
