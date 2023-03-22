@@ -61,14 +61,6 @@ module Function_table = Make_table(Kernel_function.Hashtbl)(R)
 let function_compute_ref = Extlib.mk_fun "function_compute"
 
 
-(* (\* functions from abtract_state, exended to options *\)
- * let _union a1 a2 =
- *   match a1,a2 with
- *     None, None -> None
- *   | None, _ -> a2
- *   | _, None -> a1
- *   | Some a1, Some a2 -> Some (Abstract_state.union a1 a2) *)
-
 module D = Dataflow.StartData(A)
 
 module Stmt_table = struct
@@ -80,9 +72,7 @@ end
 
 
 let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
-  (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)
-  let arg = Simplified_lval.from_exp exp
-  in
+  let arg = Simplified_lval.from_exp exp in
   match (a,lv, arg) with
     (Some a, (Var v1, o1), BLval (Var v2, o2)) ->
     (* case x = y *)
@@ -132,11 +122,11 @@ let feedback_only_once s =
   if not (List.mem s !list_instr_warnings) then
     begin
       list_instr_warnings := s::!list_instr_warnings;
-      Options.feedback "Skiping @[%a@] (summary not found)" Stmt.pretty s
+      Options.feedback "Skipping @[%a@] (summary not found)" Stmt.pretty s
     end
 
 let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
-  (* Options.feedback "ANALYSING %a" Printer.pp_stmt s; *)
+  Options.feedback ~level:3 "analysing instruction: %a" Printer.pp_stmt s;
   match i with
     Set(lv,exp,_) ->
     let new_a = do_assignment a lv exp in
@@ -171,7 +161,7 @@ let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t 
         Some new_a
       | (Some a, None) -> (feedback_only_once s; Some a)
     end
-  | Asm _ | Local_init _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
+  | Asm _ | Local_init _ -> (Options.feedback "Skipping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
 
 
 
@@ -194,11 +184,6 @@ struct
     match a with
       None -> Format.fprintf fmt "<No abstract state>"
     | Some a -> Abstract_state.pretty fmt a
-
-  (* let pretty_debug fmt state =
-   *   match state with
-   *   | None -> Format.fprintf fmt "None"
-   *   | Some s -> Format.fprintf fmt "%a" (Abstract_state.pretty ~debug:true) s *)
 
   let  computeFirstPredecessor _ a = a
 
@@ -235,11 +220,9 @@ let do_stmt (a: Abstract_state.t) (s:stmt) :  Abstract_state.t =
   | _ -> a
 
 let doFunction (kf:kernel_function) =
-  Options.feedback ~level:2 "entering in function %a."
-    Kernel_function.pretty kf;
+  Options.feedback ~level:2 "analysing function: %a" Kernel_function.pretty kf;
   if Kernel_function.has_definition kf then
     begin
-      (* let print_key = Stmt.pretty in *)
       let print_value ?(debug=false) fmt v =
         match v with
         | None -> Format.fprintf fmt "<Bot>"
@@ -257,13 +240,7 @@ let doFunction (kf:kernel_function) =
         with
           Not_found ->
           begin
-            (* let f_dec = Kernel_function.get_definition kf in *)
-            Options.warning "DEBUG return stmt of %a not in table" Kernel_function.pretty kf;
-            (* List.iter
-             *   (fun k -> let v = try (*Stmt_table*)Stmt_table.find k with Not_found -> (Format.printf "%a is missing" print_key k ; None) in
-             *       Options.feedback "Before statement %a :@.@[<hov 2> %a@]@." print_key k print_value v
-             *   )
-             *   f_dec.sallstmts; *)
+            Options.debug "return stmt of %a not in table" Kernel_function.pretty kf;
             Options.warning "Analysis is continuing but will not be sound";
             Some (Abstract_state.empty)
           end
@@ -290,15 +267,10 @@ let doFunction (kf:kernel_function) =
             end
     end
   else
-    begin
-      (* summary by default *)
-      (* Options.warning "Function %a has no definition (summary empty)"
-       *   Kernel_function.pretty kf; *)
-      let summary: Abstract_state.summary =
-        Abstract_state.make_summary (Some Abstract_state.empty) kf
-      in
-      Function_table.add kf (Some summary)
-    end
+    let summary: Abstract_state.summary =
+      Abstract_state.make_summary (Some Abstract_state.empty) kf
+    in
+    Function_table.add kf (Some summary)
 
 let () = function_compute_ref := doFunction
 
@@ -342,7 +314,7 @@ let compute () =
       Kernel_function.get_name kf
     in
     match s with
-      None -> Format.printf "DEBUG: function %s -> None@." function_name
+      None -> Options.debug "function %s -> None@." function_name
     | Some s -> Abstract_state.pretty_summary ~function_name fmt s
   in
   if Options.ShowStmtTable.get() then
@@ -355,7 +327,7 @@ let compute () =
 
 let clear () =
   computed_flag := false;
-  (*Stmt_table*)Stmt_table.clear()
+  Stmt_table.clear()
 
 let get_state_before_stmt _kf stmt =
   if is_computed ()
