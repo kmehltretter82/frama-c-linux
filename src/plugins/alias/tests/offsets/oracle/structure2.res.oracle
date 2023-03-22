@@ -1,0 +1,23 @@
+[kernel] Parsing structure2.c (with preprocessing)
+[alias] Parsing done
+[alias] May-aliases at the end of function main:
+[alias] Functions done
+Before statement st_1_t x1 = {.a = 0, .b = 1}; :
+ 
+
+Before statement st_1_t x2 = {.a = 1, .b = 2}; :
+ 
+
+Before statement st_2_t y = {.s = (struct struct_1_t *)(& x1), .c = 4}; :
+ 
+
+Before statement y.s = (struct struct_1_t *)(& x2); :
+ 
+
+Before statement __retres = 0; :
+ 
+
+Before statement return __retres; :
+ 
+
+[alias] Analysis complete

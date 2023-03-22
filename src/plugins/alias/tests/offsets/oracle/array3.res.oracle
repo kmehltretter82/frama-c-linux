@@ -1,0 +1,40 @@
+[kernel] Parsing array3.c (with preprocessing)
+[kernel:typing:implicit-function-declaration] array3.c:6: Warning: 
+  Calling undeclared function malloc. Old style K&R code?
+[alias] Parsing done
+[alias] May-aliases at the end of function main:
+  {x; tmp; y; tmp_0} are aliased
+[alias] Functions done
+Before statement tmp = malloc((unsigned long)4 * sizeof(int)); :
+ 
+
+Before statement int *x = (int *)tmp; :
+ 
+
+Before statement tmp_0 = malloc((unsigned long)4 * sizeof(int)); :
+ {x; tmp} are aliased
+
+
+Before statement int *y = (int *)tmp_0; :
+ {x; tmp} are aliased
+
+
+Before statement x = mat[0]; :
+ {x; tmp} are aliased
+{y; tmp_0} are aliased
+
+
+Before statement y = mat[1]; :
+ {x; tmp} are aliased
+{y; tmp_0} are aliased
+
+
+Before statement __retres = 0; :
+ {x; tmp; y; tmp_0} are aliased
+
+
+Before statement return __retres; :
+ {x; tmp; y; tmp_0} are aliased
+
+
+[alias] Analysis complete

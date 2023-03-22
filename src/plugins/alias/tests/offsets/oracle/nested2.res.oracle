@@ -1,0 +1,58 @@
+[kernel] Parsing nested2.c (with preprocessing)
+[alias] Parsing done
+[alias] Skiping st_2_t *z1 = malloc(sizeof(st_2_t)); (doInstr not implemented)
+[alias] Skiping st_3_t *t = malloc(sizeof(st_3_t)); (doInstr not implemented)
+[alias] Skiping int *a = malloc(sizeof(int)); (doInstr not implemented)
+[alias] Skipping assignment z1->s[0] = (struct struct_1_t *)(& x1) (not implemented)
+[alias] Skipping assignment z1->s[1] = (struct struct_1_t *)(& x2) (not implemented)
+[alias] May-aliases at the end of function main:
+  {a; *z1.c; *t.d} are aliased
+  {z1; *t.t} are aliased
+[alias] Functions done
+Before statement st_1_t x1 = {.a = 0, .b = 1}; :
+ 
+
+Before statement st_1_t x2 = {.a = 2, .b = 3}; :
+ 
+
+Before statement st_2_t *z1 = malloc(sizeof(st_2_t)); :
+ 
+
+Before statement st_3_t *t = malloc(sizeof(st_3_t)); :
+ 
+
+Before statement int *a = malloc(sizeof(int)); :
+ 
+
+Before statement *a = 0; :
+ 
+
+Before statement z1->s[0] = (struct struct_1_t *)(& x1); :
+ 
+
+Before statement z1->s[1] = (struct struct_1_t *)(& x2); :
+ 
+
+Before statement z1->c = a; :
+ 
+
+Before statement t->t = (struct struct_2_t *)z1; :
+ {a; *z1.c} are aliased
+
+
+Before statement t->d = a; :
+ {a; *z1.c} are aliased
+{z1; *t.t} are aliased
+
+
+Before statement __retres = 0; :
+ {a; *z1.c; *t.d} are aliased
+{z1; *t.t} are aliased
+
+
+Before statement return __retres; :
+ {a; *z1.c; *t.d} are aliased
+{z1; *t.t} are aliased
+
+
+[alias] Analysis complete
