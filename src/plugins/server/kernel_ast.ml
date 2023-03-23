@@ -474,9 +474,9 @@ struct
   let is_builtin kf =
     Cil_builtins.is_builtin (Kernel_function.get_vi kf)
 
-  let is_stdlib kf =
+  let is_extern kf =
     let vi = Kernel_function.get_vi kf in
-    Cil.is_in_libc vi.vattr
+    vi.vstorage = Extern
 
   let iter f =
     Globals.Functions.iter
@@ -514,13 +514,19 @@ struct
         ~descr:(Md.plain "Is the function from the Frama-C stdlib?")
         ~data:(module Data.Jbool)
         ~default:false
-        ~get:is_stdlib;
+        ~get:Kernel_function.is_in_libc;
       States.column model
         ~name:"builtin"
         ~descr:(Md.plain "Is the function a Frama-C builtin?")
         ~data:(module Data.Jbool)
         ~default:false
         ~get:is_builtin;
+      States.column model
+        ~name:"extern"
+        ~descr:(Md.plain "Is the function extern?")
+        ~data:(module Data.Jbool)
+        ~default:false
+        ~get:is_extern;
       States.column model
         ~name:"sloc"
         ~descr:(Md.plain "Source location")
