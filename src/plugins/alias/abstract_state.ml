@@ -910,30 +910,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   (* union of formal parameters *)
   let new_state =
     List.fold_left2
-      (fun acc param formal ->
-         assignment acc formal param
-         (* begin
-          *
-          *   let arg = Lval.from_exp param in
-          *   match  formal, arg  with
-          *     ( BLval(Var v1, o1), BLval (Var v2,o2)) ->
-          *     (\* case x = y *\)
-          *     assignment_x_y acc (Var v1, o1) (Var v2, o2)
-          *   | ( BLval(Var _, _), BNone) -> acc
-          *   (\* constant assignments : do nothing, but maybe check the type of the assigned variable ? *\)
-          *   | ( BLval(Var v1, o1), BAddrOf lv2) ->
-          *     (\* case x = &y *\)
-          *     assignment_x_addr_y acc (Var v1, o1) lv2
-          *   | ( BLval(Var v1, o1), BLval (Mem e2, _)) ->
-          *     (\* case x  = *y *\)
-          *     begin
-          *       match e2.enode with
-          *         Lval lv2 -> assignment_x_ptr_y acc (Var v1, o1) lv2
-          *       |  _ -> (Options.feedback "In a function call, parameter (@[%a@] <- @[%a@]) is ignored)" Lval.pretty formal Exp.pretty param; acc)
-          *     end
-          *   | _ -> (Options.feedback "DEBUG: call function - formal variable not as we expected@."; acc)
-          * end *)
-      )
+      (fun acc param formal -> assignment acc formal param)
       new_state
       args
       formals
