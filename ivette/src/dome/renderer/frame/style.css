@@ -90,8 +90,7 @@
     padding: 0px ;
 }
 
-.dome-xSideBar.dome-color-frame,
-.dome-xSideBarSection-title.dome-color-frame
+.dome-xSideBar.dome-color-frame
 {
     background: var(--background-sidebar) ;
 }
@@ -116,6 +115,7 @@
     display: flex ;
     flex-flow: row nowrap ;
     align-items: center ;
+    background: var(--background-sidebar) ;
 }
 
 .dome-xSideBarSection-title > .dome-xLabel {

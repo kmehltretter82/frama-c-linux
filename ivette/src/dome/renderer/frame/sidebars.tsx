@@ -145,9 +145,8 @@ export function Section(props: SectionProps): JSX.Element | null {
 
   return (
     <div className={`dome-xSideBarSection ${props.className}`}>
-      <Hbox>
+      <Hbox className='dome-xSideBarSection-title' >
         <Label
-          className='dome-xSideBarSection-title dome-color-frame'
           title={props.title}
           label={props.label}
           icon={icon}
