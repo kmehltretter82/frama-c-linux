@@ -136,12 +136,20 @@ export default function Globals(): JSX.Element {
     useFlipSettings('ivette.globals.stdlib', false);
   const [builtin, flipBuiltin] =
     useFlipSettings('ivette.globals.builtin', false);
+  const [def, flipDef] =
+    useFlipSettings('ivette.globals.def', true);
   const [undef, flipUndef] =
     useFlipSettings('ivette.globals.undef', true);
-  const [selected, flipSelected] =
-    useFlipSettings('ivette.globals.selected', false);
-  const [evaOnly, flipEvaOnly] =
-    useFlipSettings('ivette.globals.evaonly', false);
+  const [intern, flipIntern] =
+    useFlipSettings('ivette.globals.intern', true);
+  const [extern, flipExtern] =
+    useFlipSettings('ivette.globals.extern', true);
+  const [evaAnalyzed, flipEvaAnalyzed] =
+    useFlipSettings('ivette.globals.eva-analyzed', true);
+  const [evaUnreached, flipEvaUnreached] =
+    useFlipSettings('ivette.globals.eva-unreached', true);
+    const [selected, flipSelected] =
+      useFlipSettings('ivette.globals.selected', false);
   const multipleSelection = selection?.multiple;
   const multipleSelectionActive = multipleSelection?.allSelections.length > 0;
   const evaComputed = States.useSyncValue(computationState) === 'computed';
@@ -159,11 +167,16 @@ export default function Globals(): JSX.Element {
     const visible =
       (stdlib || !fct.stdlib)
       && (builtin || !fct.builtin)
+      && (def || !fct.defined)
       && (undef || fct.defined)
-      && (!evaOnly || !evaComputed ||
+      && (intern || fct.extern)
+      && (extern || !fct.extern)
+      && (evaAnalyzed || !evaComputed ||
+        !('eva_analyzed' in fct && fct.eva_analyzed === true))
+      && (evaUnreached || !evaComputed ||
         ('eva_analyzed' in fct && fct.eva_analyzed === true))
       && (!selected || !multipleSelectionActive || isSelected(fct));
-    return visible || (!!current && fct.name === current);
+    return !!visible;
   }
 
   function onSelection(name: string): void {
@@ -182,6 +195,12 @@ export default function Globals(): JSX.Element {
         checked: stdlib,
         onClick: flipStdlib,
       },
+      'separator',
+      {
+        label: 'Show defined functions',
+        checked: def,
+        onClick: flipDef,
+      },
       {
         label: 'Show undefined functions',
         checked: undef,
@@ -189,16 +208,34 @@ export default function Globals(): JSX.Element {
       },
       'separator',
       {
+        label: 'Show intern functions',
+        checked: intern,
+        onClick: flipIntern,
+      },
+      {
+        label: 'Show extern functions',
+        checked: extern,
+        onClick: flipExtern,
+      },
+      'separator',
+      {
+        label: 'Show functions analyzed by Eva',
+        enabled: evaComputed,
+        checked: evaAnalyzed,
+        onClick: flipEvaAnalyzed,
+      },
+      {
+        label: 'Show functions unreached by Eva',
+        enabled: evaComputed,
+        checked: evaUnreached,
+        onClick: flipEvaUnreached,
+      },
+      'separator',
+      {
         label: 'Selected only',
         enabled: multipleSelectionActive,
         checked: selected,
         onClick: flipSelected,
-      },
-      {
-        label: 'Analyzed by Eva only',
-        enabled: evaComputed,
-        checked: evaOnly,
-        onClick: flipEvaOnly,
       },
     ];
     Dome.popupMenu(items);
