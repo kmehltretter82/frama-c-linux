@@ -1,0 +1,40 @@
+[kernel] Parsing collapse1.c (with preprocessing)
+[alias] Parsing done
+[alias] May-aliases at the end of function main:
+[alias] Functions done
+Before statement tab[0] = 0; :
+ 
+Before statement tab[1] = 1; :
+ 
+Before statement tab[2] = tab[1] + 1; :
+ 
+Before statement int x = 0; :
+ 
+Before statement {
+                   int i = 0;
+                   while (i < 2) {
+                     x = tab[i];
+                     i ++;
+                   }
+                 } :
+ 
+Before statement int i = 0; :
+ 
+Before statement while (i < 2) {
+                   x = tab[i];
+                   i ++;
+                 } :
+ 
+Before statement if (! (i < 2)) break; :
+ 
+Before statement break; :
+ 
+Before statement x = tab[i]; :
+ 
+Before statement i ++; :
+ 
+Before statement __retres = 0; :
+ 
+Before statement return __retres; :
+ 
+[alias] Analysis complete

@@ -1,0 +1,53 @@
+[kernel] Parsing structure5.c (with preprocessing)
+[alias] Parsing done
+[alias] Skipping st_1_t *y1 = malloc(sizeof(st_1_t)); (doInstr not implemented)
+[alias] Skipping st_2_t *z = malloc(sizeof(st_2_t)); (doInstr not implemented)
+[alias] Skipping st_3_t *t = malloc(sizeof(st_3_t)); (doInstr not implemented)
+[alias] Skipping int *a = malloc(sizeof(int)); (doInstr not implemented)
+[alias] May-aliases at the end of function main:
+  {z->s, y1, &x1} are aliased
+  {t->t, z} are aliased
+  {z->c, t->d, a} are aliased
+[alias] Functions done
+Before statement st_1_t x1 = {.a = 0, .b = 1}; :
+ 
+Before statement st_1_t x2 = {.a = 1, .b = 2}; :
+ 
+Before statement st_1_t *y1 = malloc(sizeof(st_1_t)); :
+ 
+Before statement st_2_t *z = malloc(sizeof(st_2_t)); :
+ 
+Before statement st_3_t *t = malloc(sizeof(st_3_t)); :
+ 
+Before statement int *a = malloc(sizeof(int)); :
+ 
+Before statement *a = 0; :
+ 
+Before statement y1 = & x1; :
+ 
+Before statement z->s = (struct struct_1_t *)y1; :
+ {y1, &x1} are aliased
+
+Before statement z->c = a; :
+ {z->s, y1, &x1} are aliased
+
+Before statement t->t = (struct struct_2_t *)z; :
+ {z->s, y1, &x1} are aliased
+{z->c, a} are aliased
+
+Before statement t->d = a; :
+ {z->s, y1, &x1} are aliased
+{z->c, a} are aliased
+{t->t, z} are aliased
+
+Before statement __retres = 0; :
+ {z->s, y1, &x1} are aliased
+{t->t, z} are aliased
+{z->c, t->d, a} are aliased
+
+Before statement return __retres; :
+ {z->s, y1, &x1} are aliased
+{t->t, z} are aliased
+{z->c, t->d, a} are aliased
+
+[alias] Analysis complete

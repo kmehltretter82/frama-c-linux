@@ -176,15 +176,15 @@ struct
     let is_first = ref true in
     Format.fprintf fmt "{@[<hov 2>";
     iter (fun e ->
-        if not !is_first
+        if !is_first
         then
-          Format.fprintf fmt ",@,"
+          is_first := false
         else
-          is_first := false;
-        Format.fprintf fmt " %a" f_elt e
+          Format.fprintf fmt ",@ ";
+        Format.fprintf fmt "%a" f_elt e
       )
       m;
-    Format.fprintf fmt " @]}@."
+    Format.fprintf fmt "@]}@?"
 
   let pretty fmt s = print Simplified_lval.pretty fmt s
 
@@ -204,25 +204,24 @@ end
 let decompose_lval (lv1: Simplified_lval.t) : (Simplified_lval.t*offset) list =
   let rec list_of_offset (o: offset) : (offset*offset) list =
     match o with
-      NoOffset -> [NoOffset,NoOffset]
+      NoOffset -> [NoOffset,o]
     | Index(e,ofs) ->
       let li =
         List.map
           (fun (o1,o2) -> (Index(e,o1),o2))
           (list_of_offset ofs)
       in
-      (NoOffset,ofs)::li
+      (NoOffset,o)::li
     | Field(f, ofs) ->
       let li =
         List.map
           (fun (o1,o2) -> (Field(f,o1),o2))
           (list_of_offset ofs)
       in
-      (NoOffset,ofs)::li
+      (NoOffset,o)::li
   in
   let lv, off = Simplified_lval.removeOffsetLval lv1 in
   List.map
     (fun (o1,o2) -> (Simplified_lval.addOffsetLval o1 lv,o2))
     (list_of_offset off)
-
 

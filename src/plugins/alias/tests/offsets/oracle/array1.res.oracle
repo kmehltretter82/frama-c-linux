@@ -1,0 +1,26 @@
+[kernel] Parsing array1.c (with preprocessing)
+[alias] Parsing done
+[alias] May-aliases at the end of function main:
+  {x, y, &tab[0]} are aliased
+[alias] Functions done
+Before statement tab[0] = 0; :
+ 
+Before statement tab[1] = 1; :
+ 
+Before statement tab[2] = tab[1] + 1; :
+ 
+Before statement int *x = & tab[1]; :
+ 
+Before statement int *y = & tab[2]; :
+ {x, &tab[0]} are aliased
+
+Before statement tab[3] = *x + *y; :
+ {x, y, &tab[0]} are aliased
+
+Before statement __retres = 0; :
+ {x, y, &tab[0]} are aliased
+
+Before statement return __retres; :
+ {x, y, &tab[0]} are aliased
+
+[alias] Analysis complete

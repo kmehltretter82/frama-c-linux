@@ -1,72 +1,46 @@
 [kernel] Parsing while_for2.c (with preprocessing)
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
-  <list of may-alias>
-  {a; b; } are aliased
-  <end of list>
+  {a, b} are aliased
 [alias] Functions done
 Before statement return __retres; :
- <list of may-alias>
-{a; b; } are aliased
-<end of list>
+ {a, b} are aliased
 
 Before statement int *a = (int *)0; :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement int *b = (int *)0; :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement int *c = (int *)0; :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement while (1) {
                    a = b;
                    break;
                  } :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement a = b;
                  break; :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement a = b; :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement break; :
- <list of may-alias>
-{a; b; } are aliased
-<end of list>
+ {a, b} are aliased
 
 Before statement while (1) {
                    break;
                    a = c;
                    break;
                  } :
- <list of may-alias>
-{a; b; } are aliased
-<end of list>
+ {a, b} are aliased
 
 Before statement break;
                  a = c;
                  break; :
- <list of may-alias>
-{a; b; } are aliased
-<end of list>
+ {a, b} are aliased
 
 Before statement break; :
- <list of may-alias>
-{a; b; } are aliased
-<end of list>
+ {a, b} are aliased
 
 Before statement __retres = 0; :
- <list of may-alias>
-{a; b; } are aliased
-<end of list>
+ {a, b} are aliased
 
 [alias] Analysis complete

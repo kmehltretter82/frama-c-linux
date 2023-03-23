@@ -22,13 +22,13 @@
 
 open Cil_types
 
-open Cil_datatype
-
+open Simplified
+    
 (** Points-to graphs datastructure. *)
 module G=Graph.Persistent.Digraph.Concrete(Datatype.Int)
 
-module LSet = Lval.Set
-
+module LSet = Simplified_lset
+                
 module Abstract_state = Abstract_state
 
 let check_computed () =
@@ -44,8 +44,8 @@ let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function
   match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
-    let _set_aliases = Abstract_state.find_aliases lv state in
-    LSet.fold (fun e a -> f_fold a e)  LSet.empty (* set_aliases *) acc
+let set_aliases = Abstract_state.find_aliases lv state in
+    LSet.fold_lval (fun e a -> f_fold a e) set_aliases acc
 
 let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =
   check_computed ();
@@ -53,8 +53,8 @@ let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_functi
     None -> acc
   | Some state ->
     let new_state = Analysis.do_stmt state s in
-    let _set_aliases = Abstract_state.find_aliases lv new_state in
-    LSet.fold (fun e a -> f_fold a e) LSet.empty (*set_aliases*) acc
+    let set_aliases = Abstract_state.find_aliases lv new_state in
+    LSet.fold_lval (fun e a -> f_fold a e) set_aliases acc
 
 let fold_aliases_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
   check_computed ();
@@ -90,30 +90,27 @@ let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
   match Analysis.get_state_before_stmt kf s with
     None -> false
   | Some state ->
-    let _setv1 = Abstract_state.find_aliases lv1 state in
-    LSet.mem lv2 LSet.empty (* setv1 *)
+    let setv1 = Abstract_state.find_aliases lv1 state in
+    LSet.mem (BLval lv2) setv1
 
 let fold_points_to   (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
   match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
-    let _set_aliases = Abstract_state.find_aliases lv state in
-    LSet.fold
-      (fun lv acc -> f_fold acc 0 lv)
-      LSet.empty (*set_aliases*)
-      acc
+    let set_aliases = Abstract_state.find_aliases lv state in
+    LSet.fold_lval (fun lv a-> f_fold a 0 lv) set_aliases acc
 
 let fold_points_to_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
   match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
-    let _list_closure = Abstract_state.find_transitive_closure lv state in
+    let list_closure = Abstract_state.find_transitive_closure lv state in
     List.fold_left
-      (fun acc s -> f_fold acc 0 s)
+      (fun acc s -> LSet.fold_lval (fun lv a -> f_fold a 0 lv) s acc)
       acc
-      [] (* list_closure *)
+      list_closure
 
 let get_state_before_stmt = Analysis.get_state_before_stmt
 
@@ -121,3 +118,4 @@ let call_function a f res args =
   match Analysis.get_summary f with
     None -> None
   | Some su -> Some(Abstract_state.call a res args su)
+

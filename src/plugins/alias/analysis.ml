@@ -22,7 +22,6 @@
 
 open Cil_types
 open Cil_datatype
-open Simplified
 
 module Dataflow = Dataflow2
 
@@ -60,15 +59,6 @@ module Function_table = Make_table(Kernel_function.Hashtbl)(R)
 
 let function_compute_ref = Extlib.mk_fun "function_compute"
 
-
-(* (\* functions from abtract_state, exended to options *\)
- * let _union a1 a2 =
- *   match a1,a2 with
- *     None, None -> None
- *   | None, _ -> a2
- *   | _, None -> a1
- *   | Some a1, Some a2 -> Some (Abstract_state.union a1 a2) *)
-
 module D = Dataflow.StartData(A)
 
 module Stmt_table = struct
@@ -80,40 +70,9 @@ end
 
 
 let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
-  (* Format.printf "State before do_assignment %a = %a : @[%a@]@." Lval.pretty lv Exp.pretty exp pretty_debug a; *)
-  match (a,lv, Simplified_lval.from_exp exp) with
-    (Some a, (Var v1, NoOffset), BLval (Var v2,NoOffset)) ->
-    (* case x = y *)
-    Some (Abstract_state.assignment_x_y a (Var v1, NoOffset) (Var v2, NoOffset))
-  (* constant assignments : do nothing, but maybe check the type of the assigned variable ? *)
-  | (_, (Var _, NoOffset), BNone) -> a
-  (* arithmetic operations: either do nothing (normal arithmetic) or returns top (pointer arithmetic) *)
-  | (Some a, (Var v1, NoOffset), BAddrOf lv2) ->
-    (* case x = &y *)
-    Some (Abstract_state.assignment_x_addr_y a (Var v1, NoOffset) lv2)
-  | (Some a, (Var v1, NoOffset), BLval (Mem e2, NoOffset)) ->
-    (* case x  = *y *)
-    begin
-      match e2.enode with
-        Lval lv2 -> Some (Abstract_state.assignment_x_ptr_y a (Var v1, NoOffset) lv2)
-      |  _ -> failwith " do_assignment not implemented 1"
-    end
-  | (Some a, (Mem e1, NoOffset), BLval lv2) ->
-    (* case *x = y *)
-    begin
-      match e1.enode with
-        Lval lv1 -> Some (Abstract_state.assignment_ptr_x_y a lv1 lv2)
-      |  _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (BUG do_assignment 2)" Lval.pretty lv Exp.pretty exp; Some a)
-    end
-  (* cases *x = cst *)
-  | (Some a, (Mem e1, NoOffset), BNone) ->
-    begin
-      match e1.enode with
-        Lval lv1 -> Some (Abstract_state.assignment_ptr_x_cst a lv1)
-      |  _ -> Options.feedback "Ingnoring assignment %a = %a (do_assignment  not implemented 3)@." Lval.pretty lv Exp.pretty exp; Some a
-    end
-  | (None, _, _) -> None
-  | _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (not implemented)" Lval.pretty lv Exp.pretty exp; a)
+  match a with
+    None -> None
+  | Some a -> Some (Abstract_state.assignment a lv exp)
 
 let rec do_init vi init state = match init with
   | SingleInit e -> do_assignment state (Var vi, NoOffset) e
@@ -126,11 +85,11 @@ let feedback_only_once s =
   if not (List.mem s !list_instr_warnings) then
     begin
       list_instr_warnings := s::!list_instr_warnings;
-      Options.feedback "Skiping @[%a@] (summary not found)" Stmt.pretty s
+      Options.feedback "Skipping @[%a@] (summary not found)" Stmt.pretty s
     end
 
 let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
-  (* Options.feedback "ANALYSING %a" Printer.pp_stmt s; *)
+  Options.feedback ~level:3 "analysing instruction: %a" Printer.pp_stmt s;
   match i with
     Set(lv,exp,_) ->
     let new_a = do_assignment a lv exp in
@@ -145,9 +104,8 @@ let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t 
     begin
       match (a,res) with
         (None, _) -> None
-      | (Some a,None) -> (Options.feedback "Warning : malloc not stored (ignored)"; Some a)
-      | (Some a, Some  (Var v1, NoOffset)) -> Some (Abstract_state.assignment_x_allocate_y a  (Var v1, NoOffset))
-      | (Some a, Some lv) -> (Options.feedback "Skipping assignment @[%a@] = malloc() (not implemented)" Lval.pretty lv; Some a)
+      | (Some a, None) -> (Options.feedback "Warning : malloc not stored (ignored)"; Some a)
+      | (Some a, Some lv) -> Some (Abstract_state.assignment_x_allocate_y a lv)
     end
   (* general case for calls *)
   | Call(res,ef,es,(loc,_)) -> (* !function_compute_ref ef *)
@@ -165,7 +123,7 @@ let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t 
         Some new_a
       | (Some a, None) -> (feedback_only_once s; Some a)
     end
-  | Asm _ | Local_init _ -> (Options.feedback "Skiping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
+  | Asm _ | Local_init _ -> (Options.feedback "Skipping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
 
 
 
@@ -183,16 +141,10 @@ struct
 
   let copy x = x (* we only have persistant data *)
 
-
   let pretty fmt a =
     match a with
       None -> Format.fprintf fmt "<No abstract state>"
     | Some a -> Abstract_state.pretty fmt a
-
-  (* let pretty_debug fmt state =
-   *   match state with
-   *   | None -> Format.fprintf fmt "None"
-   *   | Some s -> Format.fprintf fmt "%a" (Abstract_state.pretty ~debug:true) s *)
 
   let  computeFirstPredecessor _ a = a
 
@@ -223,41 +175,33 @@ let do_stmt (a: Abstract_state.t) (s:stmt) :  Abstract_state.t =
     Instr i ->
     begin
       match do_instr s i (Some a) with
-        None -> failwith "problem here"
+        None -> Options.fatal "problem here"
       | Some a -> a
     end
   | _ -> a
 
 let doFunction (kf:kernel_function) =
-  Options.feedback ~level:2 "entering in function %a."
-    Kernel_function.pretty kf;
+  Options.feedback ~level:2 "analysing function: %a" Kernel_function.pretty kf;
   if Kernel_function.has_definition kf then
     begin
-      (* let print_key = Stmt.pretty in *)
       let print_value ?(debug=false) fmt v =
         match v with
         | None -> Format.fprintf fmt "<Bot>"
         | Some a -> Abstract_state.pretty ~debug fmt a
       in
-      let first_stmts =
-        try [Kernel_function.find_first_stmt kf]
-        with Kernel_function.No_Statement -> []
+      let first_stmt =
+        try Kernel_function.find_first_stmt kf
+        with Kernel_function.No_Statement -> assert false
       in
-      List.iter (fun stmt -> T.StmtStartData.add stmt (Some Abstract_state.empty)) first_stmts;
-      F.compute first_stmts;
+      T.StmtStartData.add first_stmt (Some Abstract_state.empty);
+      F.compute [first_stmt];
       let return_stmt = Kernel_function.find_return kf in
       let final_state : Abstract_state.t option =
         try Stmt_table.find return_stmt
         with
           Not_found ->
           begin
-            (* let f_dec = Kernel_function.get_definition kf in *)
-            Options.warning "DEBUG return stmt of %a not in table" Kernel_function.pretty kf;
-            (* List.iter
-             *   (fun k -> let v = try (*Stmt_table*)Stmt_table.find k with Not_found -> (Format.printf "%a is missing" print_key k ; None) in
-             *       Options.feedback "Before statement %a :@.@[<hov 2> %a@]@." print_key k print_value v
-             *   )
-             *   f_dec.sallstmts; *)
+            Options.debug "return stmt of %a not in table" Kernel_function.pretty kf;
             Options.warning "Analysis is continuing but will not be sound";
             Some (Abstract_state.empty)
           end
@@ -284,15 +228,10 @@ let doFunction (kf:kernel_function) =
             end
     end
   else
-    begin
-      (* summary by default *)
-      (* Options.warning "Function %a has no definition (summary empty)"
-       *   Kernel_function.pretty kf; *)
-      let summary: Abstract_state.summary =
-        Abstract_state.make_summary (Some Abstract_state.empty) kf
-      in
-      Function_table.add kf (Some summary)
-    end
+    let summary: Abstract_state.summary =
+      Abstract_state.make_summary (Some Abstract_state.empty) kf
+    in
+    Function_table.add kf (Some summary)
 
 let () = function_compute_ref := doFunction
 
@@ -301,7 +240,7 @@ let make_summary (state:Abstract_state.t) (kf:kernel_function) =
     begin
       match Function_table.find kf with
         Some s -> (state, s)
-      | None -> failwith "not implemented"
+      | None -> Options.fatal "not implemented"
     end
   with
     Not_found ->
@@ -309,7 +248,7 @@ let make_summary (state:Abstract_state.t) (kf:kernel_function) =
       doFunction kf;
       match Function_table.find kf with
         Some s -> (state, s)
-      | None -> failwith "not implemented"
+      | None -> Options.fatal "not implemented"
     end
 
 let computed_flag = ref false
@@ -336,7 +275,7 @@ let compute () =
       Kernel_function.get_name kf
     in
     match s with
-      None -> Format.printf "DEBUG: function %s -> None@." function_name
+      None -> Options.debug "function %s -> None@." function_name
     | Some s -> Abstract_state.pretty_summary ~function_name fmt s
   in
   if Options.ShowStmtTable.get() then
@@ -351,7 +290,7 @@ let clear () =
   computed_flag := false;
   (*Stmt_table*)Stmt_table.clear()
 
-let get_state_before_stmt _ stmt =
+let get_state_before_stmt _kf stmt =
   if is_computed ()
   then
     try Stmt_table.find stmt with

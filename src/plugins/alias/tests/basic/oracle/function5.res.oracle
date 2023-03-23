@@ -1,33 +1,21 @@
 [kernel] Parsing function5.c (with preprocessing)
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
-  <list of may-alias>
-  {a; b; c; } are aliased
-  <end of list>
+  {a, b, c} are aliased
 [alias] Functions done
 Before statement goto return_label; :
- <list of may-alias>
-{x; __retres; } are aliased
-<end of list>
+ {x, __retres} are aliased
 
 Before statement __retres = y;
                  goto return_label; :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement int c = 0; :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement goto return_label; :
- <list of may-alias>
-{y; __retres; } are aliased
-<end of list>
+ {y, __retres} are aliased
 
 Before statement return_label: return __retres; :
- <list of may-alias>
-{x; y; __retres; } are aliased
-<end of list>
+ {x, y, __retres} are aliased
 
 Before statement if (c) {
                    __retres = x;
@@ -37,46 +25,26 @@ Before statement if (c) {
                    __retres = y;
                    goto return_label;
                  } :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement return __retres; :
- <list of may-alias>
-{a; b; c; } are aliased
-<end of list>
+ {a, b, c} are aliased
 
 Before statement __retres = x; :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement __retres = y; :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement int *a = (int *)0; :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement int *b = (int *)0; :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement int *c = (int *)0; :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement c = choice(a,b); :
- <list of may-alias>
-<end of list>
-
+ 
 Before statement __retres = 0; :
- <list of may-alias>
-{a; b; c; } are aliased
-<end of list>
+ {a, b, c} are aliased
 
 Before statement __retres = x;
                  goto return_label; :
- <list of may-alias>
-<end of list>
-
+ 
 [alias] Analysis complete

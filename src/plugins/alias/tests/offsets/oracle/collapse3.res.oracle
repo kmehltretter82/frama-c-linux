@@ -1,0 +1,21 @@
+[kernel] Parsing collapse3.c (with preprocessing)
+[alias] Parsing done
+[alias] May-aliases at the end of function main:
+[alias] Functions done
+Before statement mat[0][0] = 0; :
+ 
+Before statement mat[0][1] = 1; :
+ 
+Before statement int i = 2; :
+ 
+Before statement mat[i][1] = i; :
+ 
+Before statement i ++; :
+ 
+Before statement mat[i][1] = 2; :
+ 
+Before statement __retres = 0; :
+ 
+Before statement return __retres; :
+ 
+[alias] Analysis complete

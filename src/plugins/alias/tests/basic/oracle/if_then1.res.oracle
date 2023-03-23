@@ -1,0 +1,40 @@
+[kernel] Parsing if_then1.c (with preprocessing)
+[alias] Parsing done
+[alias] May-aliases at the end of function main:
+  {x, z} are aliased
+  {b, c, &y} are aliased
+  {a, y, &x, &z} are aliased
+[alias] Functions done
+Before statement a = & x; :
+ 
+Before statement b = & y; :
+ {a, &x} are aliased
+
+Before statement if (p) y = & z; else y = & x; :
+ {a, &x} are aliased
+{b, &y} are aliased
+
+Before statement y = & z; :
+ {a, &x} are aliased
+{b, &y} are aliased
+
+Before statement y = & x; :
+ {a, &x} are aliased
+{b, &y} are aliased
+
+Before statement c = & y; :
+ {a, y, &x, &z} are aliased
+{x, z} are aliased
+{b, &y} are aliased
+
+Before statement __retres = 0; :
+ {x, z} are aliased
+{b, c, &y} are aliased
+{a, y, &x, &z} are aliased
+
+Before statement return __retres; :
+ {x, z} are aliased
+{b, c, &y} are aliased
+{a, y, &x, &z} are aliased
+
+[alias] Analysis complete
