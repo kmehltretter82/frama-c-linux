@@ -2,7 +2,7 @@
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
   {a; c} are aliased
-  {b; d; *a; *c} are aliased
+  {*a; *c; b; d; *a; *c} are aliased
 [alias] Functions done
 Before statement int **a = (int **)0; :
  
@@ -20,22 +20,22 @@ Before statement *a = b; :
  
 
 Before statement *c = d; :
- {b; *a} are aliased
+ {*a; b; *a} are aliased
 
 
 Before statement a = c; :
- {b; *a} are aliased
-{d; *c} are aliased
+ {*a; b; *a} are aliased
+{*c; d; *c} are aliased
 
 
 Before statement __retres = 0; :
  {a; c} are aliased
-{b; d; *a; *c} are aliased
+{*a; *c; b; d; *a; *c} are aliased
 
 
 Before statement return __retres; :
  {a; c} are aliased
-{b; d; *a; *c} are aliased
+{*a; *c; b; d; *a; *c} are aliased
 
 
 [alias] Analysis complete

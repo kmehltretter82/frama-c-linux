@@ -6,32 +6,32 @@
 [alias] Skipping int *a = malloc(sizeof(int)); (doInstr not implemented)
 [alias] Skipping int *b = malloc(sizeof(int)); (doInstr not implemented)
 [alias] May-aliases at the end of function main:
-  {tab_y[0]; *z1.s; *z2.s} are aliased
-  {a; *z1.c; *t.d} are aliased
-  {b; *z2.c} are aliased
-  {z1; *t.t} are aliased
+  {z1->s; z2->s; tab_y[0]; &x1; &x2} are aliased
+  {z2->c; b} are aliased
+  {t->t; z1} are aliased
+  {z1->c; t->d; a} are aliased
 [alias] Functions done
 Before statement t->t = (struct struct_2_t *)z1; :
- {tab_y[0]; *z1.s; *z2.s} are aliased
-{a; *z1.c} are aliased
-{b; *z2.c} are aliased
+ {z1->s; z2->s; tab_y[0]; &x1; &x2} are aliased
+{z1->c; a} are aliased
+{z2->c; b} are aliased
 
 
 Before statement t->d = a; :
- {tab_y[0]; *z1.s; *z2.s} are aliased
-{a; *z1.c} are aliased
-{b; *z2.c} are aliased
-{z1; *t.t} are aliased
+ {z1->s; z2->s; tab_y[0]; &x1; &x2} are aliased
+{z1->c; a} are aliased
+{z2->c; b} are aliased
+{t->t; z1} are aliased
 
 
 Before statement st_1_t x1 = {.a = 0, .b = 1}; :
  
 
 Before statement __retres = 0; :
- {tab_y[0]; *z1.s; *z2.s} are aliased
-{a; *z1.c; *t.d} are aliased
-{b; *z2.c} are aliased
-{z1; *t.t} are aliased
+ {z1->s; z2->s; tab_y[0]; &x1; &x2} are aliased
+{z2->c; b} are aliased
+{t->t; z1} are aliased
+{z1->c; t->d; a} are aliased
 
 
 Before statement st_1_t x2 = {.a = 1, .b = 2}; :
@@ -41,50 +41,59 @@ Before statement tab_y[0] = & x1; :
  
 
 Before statement return __retres; :
- {tab_y[0]; *z1.s; *z2.s} are aliased
-{a; *z1.c; *t.d} are aliased
-{b; *z2.c} are aliased
-{z1; *t.t} are aliased
+ {z1->s; z2->s; tab_y[0]; &x1; &x2} are aliased
+{z2->c; b} are aliased
+{t->t; z1} are aliased
+{z1->c; t->d; a} are aliased
 
 
 Before statement tab_y[1] = & x2; :
- 
+ {tab_y[0]; &x1} are aliased
+
 
 Before statement st_2_t *z1 = malloc(sizeof(st_2_t)); :
- 
+ {tab_y[0]; &x1; &x2} are aliased
+
 
 Before statement st_2_t *z2 = malloc(sizeof(st_2_t)); :
- 
+ {tab_y[0]; &x1; &x2} are aliased
+
 
 Before statement st_3_t *t = malloc(sizeof(st_3_t)); :
- 
+ {tab_y[0]; &x1; &x2} are aliased
+
 
 Before statement int *a = malloc(sizeof(int)); :
- 
+ {tab_y[0]; &x1; &x2} are aliased
+
 
 Before statement int *b = malloc(sizeof(int)); :
- 
+ {tab_y[0]; &x1; &x2} are aliased
+
 
 Before statement *a = 0; :
- 
+ {tab_y[0]; &x1; &x2} are aliased
+
 
 Before statement *b = 5; :
- 
+ {tab_y[0]; &x1; &x2} are aliased
+
 
 Before statement z1->s = (struct struct_1_t *)tab_y[0]; :
- 
+ {tab_y[0]; &x1; &x2} are aliased
+
 
 Before statement z2->s = (struct struct_1_t *)tab_y[1]; :
- {tab_y[0]; *z1.s} are aliased
+ {z1->s; tab_y[0]; &x1; &x2} are aliased
 
 
 Before statement z1->c = a; :
- {tab_y[0]; *z1.s; *z2.s} are aliased
+ {z1->s; z2->s; tab_y[0]; &x1; &x2} are aliased
 
 
 Before statement z2->c = b; :
- {tab_y[0]; *z1.s; *z2.s} are aliased
-{a; *z1.c} are aliased
+ {z1->s; z2->s; tab_y[0]; &x1; &x2} are aliased
+{z1->c; a} are aliased
 
 
 [alias] Analysis complete

@@ -3,11 +3,11 @@
 [alias] Skipping st_2_t *z1 = malloc(sizeof(st_2_t)); (doInstr not implemented)
 [alias] Skipping st_3_t *t = malloc(sizeof(st_3_t)); (doInstr not implemented)
 [alias] Skipping int *a = malloc(sizeof(int)); (doInstr not implemented)
-[alias] Skipping assignment z1->s[0] = (struct struct_1_t *)(& x1) (not implemented)
-[alias] Skipping assignment z1->s[1] = (struct struct_1_t *)(& x2) (not implemented)
 [alias] May-aliases at the end of function main:
-  {a; *z1.c; *t.d} are aliased
-  {z1; *t.t} are aliased
+  {z1->s[0]; &x1} are aliased
+  {z1->s[0]; &x2} are aliased
+  {t->t; z1} are aliased
+  {z1->c; t->d; a} are aliased
 [alias] Functions done
 Before statement st_1_t x1 = {.a = 0, .b = 1}; :
  
@@ -31,28 +31,39 @@ Before statement z1->s[0] = (struct struct_1_t *)(& x1); :
  
 
 Before statement z1->s[1] = (struct struct_1_t *)(& x2); :
- 
+ {z1->s[0]; &x1} are aliased
+
 
 Before statement z1->c = a; :
- 
+ {z1->s[0]; &x1} are aliased
+{z1->s[0]; &x2} are aliased
+
 
 Before statement t->t = (struct struct_2_t *)z1; :
- {a; *z1.c} are aliased
+ {z1->s[0]; &x1} are aliased
+{z1->s[0]; &x2} are aliased
+{z1->c; a} are aliased
 
 
 Before statement t->d = a; :
- {a; *z1.c} are aliased
-{z1; *t.t} are aliased
+ {z1->s[0]; &x1} are aliased
+{z1->s[0]; &x2} are aliased
+{z1->c; a} are aliased
+{t->t; z1} are aliased
 
 
 Before statement __retres = 0; :
- {a; *z1.c; *t.d} are aliased
-{z1; *t.t} are aliased
+ {z1->s[0]; &x1} are aliased
+{z1->s[0]; &x2} are aliased
+{t->t; z1} are aliased
+{z1->c; t->d; a} are aliased
 
 
 Before statement return __retres; :
- {a; *z1.c; *t.d} are aliased
-{z1; *t.t} are aliased
+ {z1->s[0]; &x1} are aliased
+{z1->s[0]; &x2} are aliased
+{t->t; z1} are aliased
+{z1->c; t->d; a} are aliased
 
 
 [alias] Analysis complete

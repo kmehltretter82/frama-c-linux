@@ -22,7 +22,6 @@
 
 open Cil_types
 open Cil_datatype
-open Simplified
 
 module Dataflow = Dataflow2
 
@@ -72,44 +71,11 @@ end
 
 
 let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
-  let arg = Simplified_lval.from_exp exp in
-  match (a,lv, arg) with
-    (Some a, (Var v1, o1), BLval (Var v2, o2)) ->
-    (* case x = y *)
-    Some (Abstract_state.assignment_x_y a (Var v1, o1) (Var v2, o2))
-  (* constant assignments : do nothing, but maybe check the type of the assigned variable ? *)
-  | (_, (Var _, _), BNone) -> a
-  (* arithmetic operations: either do nothing (normal arithmetic) or returns top (pointer arithmetic) *)
-  | (Some a, (Var v1, o1), BAddrOf lv2) ->
-    (* case x = &y *)
-    Some (Abstract_state.assignment_x_addr_y a (Var v1, o1) lv2)
-  | (Some a, (Var v1, o1), BLval (Mem e2, NoOffset)) ->
-    (* case x  = *y *)
-    begin
-      match e2.enode with
-        Lval lv2 -> Some (Abstract_state.assignment_x_ptr_y a (Var v1, o1) lv2)
-      |  _ -> Options.fatal " do_assignment not implemented 1"
-    end
-  | (Some a, (Mem e1, o1), BLval lv2) ->
-    (* case *x = y *)
-    begin
-      match e1.enode with
-        Lval lv1 ->
-        let lv1 = Cil.addOffsetLval o1 lv1 in
-        Some (Abstract_state.assignment_ptr_x_y a lv1 lv2)
-      |  _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (BUG do_assignment 2)" Lval.pretty lv Exp.pretty exp; Some a)
-    end
-  (* cases *x = cst *)
-  | (Some a, (Mem e1, o1), BNone) ->
-    begin
-      match e1.enode with
-        Lval lv1 ->
-        let lv1 = Cil.addOffsetLval o1 lv1 in
-        Some (Abstract_state.assignment_ptr_x_cst a lv1)
-      |  _ -> Options.feedback "Ignoring assignment %a = %a (do_assignment  not implemented 3)@." Lval.pretty lv Exp.pretty exp; Some a
-    end
-  | (None, _, _) -> None
-  | _ -> (Options.feedback "Skipping assignment @[%a@] = @[%a@] (not implemented)" Lval.pretty lv Exp.pretty exp; a)
+  match a with
+    None -> None
+  | Some a -> Some (Abstract_state.assignment a lv exp)
+
+
 
 let rec do_init vi init state = match init with
   | SingleInit e -> do_assignment state (Var vi, NoOffset) e
@@ -141,9 +107,8 @@ let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t 
     begin
       match (a,res) with
         (None, _) -> None
-      | (Some a,None) -> (Options.feedback "Warning : malloc not stored (ignored)"; Some a)
-      | (Some a, Some  (Var v1, NoOffset)) -> Some (Abstract_state.assignment_x_allocate_y a  (Var v1, NoOffset))
-      | (Some a, Some lv) -> (Options.feedback "Skipping assignment @[%a@] = malloc() (not implemented)" Lval.pretty lv; Some a)
+      | (Some a, None) -> (Options.feedback "Warning : malloc not stored (ignored)"; Some a)
+      | (Some a, Some lv) -> Some (Abstract_state.assignment_x_allocate_y a lv)
     end
   (* general case for calls *)
   | Call(res,ef,es,(loc,_)) -> (* !function_compute_ref ef *)

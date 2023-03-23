@@ -3,7 +3,7 @@
 [alias] Skipping st_1_t *y1 = malloc(sizeof(st_1_t)); (doInstr not implemented)
 [alias] Skipping st_2_t *z = malloc(sizeof(st_2_t)); (doInstr not implemented)
 [alias] May-aliases at the end of function main:
-  {y1; *z.s} are aliased
+  {z->s; y1; &x1} are aliased
 [alias] Functions done
 Before statement st_1_t x1 = {.a = 0, .b = 1}; :
  
@@ -21,18 +21,19 @@ Before statement y1 = & x1; :
  
 
 Before statement z->s = (struct struct_1_t *)y1; :
- 
+ {y1; &x1} are aliased
+
 
 Before statement z->c = 6; :
- {y1; *z.s} are aliased
+ {z->s; y1; &x1} are aliased
 
 
 Before statement __retres = 0; :
- {y1; *z.s} are aliased
+ {z->s; y1; &x1} are aliased
 
 
 Before statement return __retres; :
- {y1; *z.s} are aliased
+ {z->s; y1; &x1} are aliased
 
 
 [alias] Analysis complete

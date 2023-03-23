@@ -3,7 +3,7 @@
   Calling undeclared function malloc. Old style K&R code?
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
-  {x; tmp; y; tmp_0} are aliased
+  {x; tmp; y; tmp_0; &mat[0]} are aliased
 [alias] Functions done
 Before statement tmp = malloc((unsigned long)4 * sizeof(int)); :
  
@@ -25,16 +25,16 @@ Before statement x = mat[0]; :
 
 
 Before statement y = mat[1]; :
- {x; tmp} are aliased
+ {x; tmp; &mat[0]} are aliased
 {y; tmp_0} are aliased
 
 
 Before statement __retres = 0; :
- {x; tmp; y; tmp_0} are aliased
+ {x; tmp; y; tmp_0; &mat[0]} are aliased
 
 
 Before statement return __retres; :
- {x; tmp; y; tmp_0} are aliased
+ {x; tmp; y; tmp_0; &mat[0]} are aliased
 
 
 [alias] Analysis complete

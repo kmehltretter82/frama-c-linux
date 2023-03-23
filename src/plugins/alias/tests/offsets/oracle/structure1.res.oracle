@@ -1,7 +1,7 @@
 [kernel] Parsing structure1.c (with preprocessing)
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
-  {p_x; p_y} are aliased
+  {p_x; p_y; &x; &y} are aliased
 [alias] Functions done
 Before statement st_1_t x = {.a = 0, .b = 1}; :
  
@@ -13,20 +13,25 @@ Before statement st_1_t *p_x = & x; :
  
 
 Before statement st_2_t *p_y = & y; :
- 
+ {p_x; &x} are aliased
+
 
 Before statement p_x->a = 3; :
- 
+ {p_x; &x} are aliased
+{p_y; &y} are aliased
+
 
 Before statement p_x = (st_1_t *)p_y; :
- 
+ {p_x; &x} are aliased
+{p_y; &y} are aliased
+
 
 Before statement __retres = 0; :
- {p_x; p_y} are aliased
+ {p_x; p_y; &x; &y} are aliased
 
 
 Before statement return __retres; :
- {p_x; p_y} are aliased
+ {p_x; p_y; &x; &y} are aliased
 
 
 [alias] Analysis complete
