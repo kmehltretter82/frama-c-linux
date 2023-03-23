@@ -693,13 +693,21 @@ let join (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants res; res
 
 
+exception Found_vertex of V.t
+                            
 let _join_set (x:t) (vs:VSet.t) : t =
-  let v0 = VSet.choose (VSet.filter (fun v -> G.mem_vertex x.graph v) vs) in
+  let v0 =
+    (* finds a valid vertex of x.graph *)
+    try
+      VSet.iter (fun v -> if G.mem_vertex x.graph v then raise (Found_vertex v)) vs;
+      Options.fatal "no valid vertex found in set %a" VSet.pretty vs
+    with
+    Found_vertex v -> v
+  in
   VSet.fold
     (fun v acc -> join acc v0 v)
     vs
     x
-
   
 let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants x;
