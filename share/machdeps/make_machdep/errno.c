@@ -20,6 +20,7 @@
 /*                                                                        */
 /**************************************************************************/
 
+#include <asm-generic/errno.h>
 #include <errno.h>
 
 /* Mandatory */
@@ -280,6 +281,9 @@ int enotdir_is = ENOTDIR;
 #ifdef ENOTEMPTY
 int enotempty_is = ENOTEMPTY;
 #endif
+#ifdef ENOTRECOVERABLE
+int enotrecoverable_is = ENOTRECOVERABLE;
+#endif
 #ifdef ENOTSOCK
 int enotsock_is = ENOTSOCK;
 #endif
@@ -300,6 +304,9 @@ int eopnotsupp_is = EOPNOTSUPP;
 #endif
 #ifdef EOVERFLOW
 int eoverflow_is = EOVERFLOW;
+#endif
+#ifdef EOWNERDEAD
+int eownerdead_is = EOWNERDEAD;
 #endif
 #ifdef EPERM
 int eperm_is = EPERM;
