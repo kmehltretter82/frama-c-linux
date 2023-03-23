@@ -686,29 +686,30 @@ and unify2 (x:t) (v1:V.t) (l2:V.t list) =
     unify2 x v1 qq
 
 (* since the recursive version of join, unify, unify2 and merge may break the invariants *)
-let join (x:t) (v1:V.t) (v2:V.t) : t =
-  Options.debug ~level:2 "GRAPH BEFORE JOIN(v_%d,v_%d) @.%a@." v1 v2 (pretty ~debug:true) x;
-  assert_invariants x;
+let join ?(without_check = false) (x:t) (v1:V.t) (v2:V.t) : t =
+  Options.debug ~level:3 "graph before join(%d,%d) @.%a@." v1 v2 print_debug x;
+  if not without_check then assert_invariants x;
   let res = join_without_check x v1 v2 in
-  assert_invariants res; res
+  if not without_check then assert_invariants x;
+  res
 
 
 exception Found_vertex of V.t
-                            
-let _join_set (x:t) (vs:VSet.t) : t =
+
+let join_set ?without_check (x:t) (vs:VSet.t) : t =
   let v0 =
     (* finds a valid vertex of x.graph *)
     try
       VSet.iter (fun v -> if G.mem_vertex x.graph v then raise (Found_vertex v)) vs;
       Options.fatal "no valid vertex found in set %a" VSet.pretty vs
     with
-    Found_vertex v -> v
+      Found_vertex v -> v
   in
   VSet.fold
-    (fun v acc -> join acc v0 v)
+    (fun v acc -> join ?without_check acc v0 v)
     vs
     x
-  
+
 let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants x;
   let pt2 =  G.succ x.graph v2 in
@@ -899,10 +900,12 @@ let union  (a1:t) (a2:t) :t =
   assert_invariants a1;
   assert_invariants a2;
 
-  Options.debug "Union: First graph:@.%a@." print_graph a1;
-  Options.debug "Union: Second graph:@.%a@." print_graph a2;
+  Options.debug ~level:2 "Union: First graph:@.%a@." print_graph a1;
+  Options.debug ~level:3 "Union: First graph:@.%a@." print_debug a1;
   (* ensure that a1 and a2 no longer share any vertex indices *)
   let a2 = shift a2 a1.cmpt in
+  Options.debug ~level:2 "Union: Second graph:@.%a@." print_graph a2;
+  Options.debug ~level:3 "Union: Second graph:@.%a@." print_debug a2;
   let new_graph =
     G.fold_vertex
       (fun v2 g -> G.add_vertex g v2)
@@ -925,13 +928,28 @@ let union  (a1:t) (a2:t) :t =
   let new_lmap =
     LLMap.fold
       (fun lv v2 m_acc -> LLMap.add lv v2 m_acc)
-      a2.lmap
       a1.lmap
+      a2.lmap
   in
-  let to_be_joined = lmap_intersect a1.lmap a2.lmap in
+  let sets_to_be_joined =
+    let rec add_pair sets (v1,v2) = match sets with
+      | [] -> [VSet.of_list [v1;v2]]
+      | set::sets ->
+        if VSet.mem v1 set || VSet.mem v2 set
+        then VSet.add v1 (VSet.add v2 set) :: sets
+        else set :: add_pair sets (v1,v2)
+    in
+    List.fold_left add_pair [] (lmap_intersect a1.lmap a2.lmap)
+  in
+  Options.debug ~level:3 "Union: sets to be joined:@[";
+  List.iter (fun set -> Options.debug ~level:3 "%a" VSet.pretty set) sets_to_be_joined;
+  Options.debug ~level:3 "@]@.";
   let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = max a1.cmpt a2.cmpt} in
-  let new_a = List.fold_left (fun s (l,r) -> join_without_check s l r) new_a to_be_joined in
-  Options.debug "Union: Result graph:@.%a@." print_graph new_a;
+  let new_a =
+    List.fold_left (join_set ~without_check:true) new_a sets_to_be_joined
+  in
+  Options.debug ~level:2 "Union: Result graph:@.%a@." print_graph new_a;
+  Options.debug ~level:3 "Union: Result graph:@.%a@." print_debug new_a;
   assert_invariants new_a;
   new_a
 
