@@ -694,7 +694,7 @@ let join (x:t) (v1:V.t) (v2:V.t) : t =
 
 
 let _join_set (x:t) (vs:VSet.t) : t =
-  let v0 = VSet.choose vs in
+  let v0 = VSet.choose (VSet.filter (fun v -> G.mem_vertex x.graph v) vs) in
   VSet.fold
     (fun v acc -> join acc v0 v)
     vs
