@@ -157,7 +157,7 @@
    null character. (Minimum is 256.) */
 #ifdef __FC_PATH_MAX
 #  if __FC_PATH_MAX >= 0
-      _Static_assert(__FC_PATH_MAX >=_POSIX_PATH_MAX, "__FC_PATH_MAX is too small (" expand(__FC_PATH_MAX) "): minimal value is "expand( _POSIX_PATH_MAX));
+      _Static_assert(__FC_PATH_MAX >=_POSIX_PATH_MAX, "__FC_PATH_MAX is too small (" expand(__FC_PATH_MAX) "): minimal value is " expand( _POSIX_PATH_MAX));
 #      define PATH_MAX __FC_PATH_MAX
 #  else
 #    undef PATH_MAX
