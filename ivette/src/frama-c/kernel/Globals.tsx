@@ -176,7 +176,7 @@ export default function Globals(): JSX.Element {
       && (evaUnreached || !evaComputed ||
         ('eva_analyzed' in fct && fct.eva_analyzed === true))
       && (!selected || !multipleSelectionActive || isSelected(fct));
-    return visible || (!!current && fct.name === current);
+    return !!visible;
   }
 
   function onSelection(name: string): void {
