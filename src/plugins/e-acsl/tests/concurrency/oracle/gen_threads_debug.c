@@ -432,7 +432,7 @@ int __gen_e_acsl_usleep(useconds_t usec)
     __gen_e_acsl_assert_data.pred_txt = "\\result == 0 || \\result == -1";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/unistd.h";
     __gen_e_acsl_assert_data.fct = "usleep";
-    __gen_e_acsl_assert_data.line = 1145;
+    __gen_e_acsl_assert_data.line = 1152;
     __gen_e_acsl_assert_data.name = "result_ok_or_error";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -1399,7 +1399,7 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& perror));
     __e_acsl_store_block((void *)(& __fc_p_tmpnam),8UL);
     __e_acsl_full_init((void *)(& __fc_p_tmpnam));
-    __e_acsl_store_block((void *)(__fc_tmpnam),2048UL);
+    __e_acsl_store_block((void *)(__fc_tmpnam),20UL);
     __e_acsl_full_init((void *)(& __fc_tmpnam));
     __e_acsl_store_block((void *)(& __fc_p_fopen),8UL);
     __e_acsl_full_init((void *)(& __fc_p_fopen));

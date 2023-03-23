@@ -14,7 +14,7 @@
 [e-acsl] Warning: annotating undefined function `fork':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/unistd.h:843: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/unistd.h:850: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:82: Warning: 
@@ -42,10 +42,10 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] FRAMAC_SHARE/libc/unistd.h:846: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:853: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/unistd.h:847: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:854: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
 [kernel:annot:missing-spec] fprintf.c:22: Warning: 
