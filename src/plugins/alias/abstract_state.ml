@@ -686,26 +686,27 @@ and unify2 (x:t) (v1:V.t) (l2:V.t list) =
     unify2 x v1 qq
 
 (* since the recursive version of join, unify, unify2 and merge may break the invariants *)
-let join (x:t) (v1:V.t) (v2:V.t) : t =
-  Options.debug ~level:2 "GRAPH BEFORE JOIN(v_%d,v_%d) @.%a@." v1 v2 (pretty ~debug:true) x;
-  assert_invariants x;
+let join ?(without_check = false) (x:t) (v1:V.t) (v2:V.t) : t =
+  Options.debug ~level:3 "graph before join(%d,%d) @.%a@." v1 v2 print_debug x;
+  if not without_check then assert_invariants x;
   let res = join_without_check x v1 v2 in
-  assert_invariants res; res
+  if not without_check then assert_invariants x;
+  res
 
 
 exception Found_vertex of V.t
 
-let join_set_without_check (x:t) (vs:VSet.t) : t =
+let join_set ?without_check (x:t) (vs:VSet.t) : t =
   let v0 =
     (* finds a valid vertex of x.graph *)
     try
       VSet.iter (fun v -> if G.mem_vertex x.graph v then raise (Found_vertex v)) vs;
       Options.fatal "no valid vertex found in set %a" VSet.pretty vs
     with
-    Found_vertex v -> v
+      Found_vertex v -> v
   in
   VSet.fold
-    (fun v acc -> join_without_check acc v0 v)
+    (fun v acc -> join ?without_check acc v0 v)
     vs
     x
 
@@ -945,7 +946,7 @@ let union  (a1:t) (a2:t) :t =
   Options.debug ~level:3 "@]@.";
   let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = max a1.cmpt a2.cmpt} in
   let new_a =
-    List.fold_left join_set_without_check new_a sets_to_be_joined
+    List.fold_left (join_set ~without_check:true) new_a sets_to_be_joined
   in
   Options.debug ~level:2 "Union: Result graph:@.%a@." print_graph new_a;
   Options.debug ~level:3 "Union: Result graph:@.%a@." print_debug new_a;
