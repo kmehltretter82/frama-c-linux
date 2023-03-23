@@ -218,38 +218,11 @@ let print_graph fmt (x:t) =
   G.iter_edges print_edge x.graph
 
 let print_aliases fmt (x:t) =
-  let print_set ?(first = true) pretty fmt s =
-    let first = ref first in
-    let print_element e =
-      if !first then first := false else Format.fprintf fmt "%s" "; ";
-      Format.fprintf fmt "%a" pretty e in
-    LSet.iter print_element s
+  let iter_vmap _ set_lv =
+    if LSet.cardinal set_lv >=2 then
+      Format.fprintf fmt "@[<hov 2>%a@] are aliased@." LSet.pretty set_lv
   in
-  let print_lv_and_pred lv pred =
-    Format.fprintf fmt "{%a%a} are aliased@."
-      (print_set Lval.pretty) lv
-      (print_set ~first:false (fun fmt -> Format.fprintf fmt "*%a" Lval.pretty)) pred
-  in
-  let iter_vmap v set_lv =
-    if G.mem_vertex x.graph v then
-      match G.succ x.graph v with
-        [] -> ()
-      | [_] ->
-        begin
-          let set_pred = ref LSet.empty in
-          G.iter_pred
-            (fun v -> set_pred := LSet.union !set_pred (VMap.find v x.vmap))
-            x.graph
-            v;
-          if LSet.cardinal set_lv + LSet.cardinal !set_pred >= 2
-          then
-            print_lv_and_pred set_lv !set_pred
-        end
-      | _ -> Options.fatal "this should not happen"
-  in
-  Format.fprintf fmt "@[<hov 2>";
-  VMap.iter iter_vmap x.vmap;
-  Format.fprintf fmt "@]@."
+  VMap.iter iter_vmap x.vmap
 
 (** invariants of type t must be true before and after each functon call *)
 let assert_invariants (x:t) : unit =
