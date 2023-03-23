@@ -692,6 +692,15 @@ let join (x:t) (v1:V.t) (v2:V.t) : t =
   let res = join_without_check x v1 v2 in
   assert_invariants res; res
 
+
+let _join_set (x:t) (vs:VSet.t) : t =
+  let v0 = VSet.choose vs in
+  VSet.fold
+    (fun v acc -> join acc v0 v)
+    vs
+    x
+
+  
 let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants x;
   let pt2 =  G.succ x.graph v2 in
