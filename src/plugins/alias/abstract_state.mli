@@ -90,18 +90,9 @@ val set_type : t -> G.V.t -> G.V.t -> t
 (** transfert functions for different kinds of assignments *)
 val assignment : t -> lval -> exp -> t
 
-(* val assignment_x_y : t -> lval -> lval -> t
- *
- * val assignment_x_addr_y : t -> lval -> lval -> t
- *
- * val assignment_x_ptr_y : t -> lval -> lval -> t *)
+(** transfert function for malloc calls *)
 
 val assignment_x_allocate_y : t -> lval -> t
-
-(* val assignment_ptr_x_y : t -> lval -> lval -> t
- *
- * val assignment_ptr_x_cst : t -> lval -> t *)
-
 
 (** union of two abstract values ; ensures that if 2 lval are
     aliased in one of the two input graph (or in a points-to

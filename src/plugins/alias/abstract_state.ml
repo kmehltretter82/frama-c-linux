@@ -537,14 +537,6 @@ let find_vertex lv x =
   then v
   else raise Not_found
 
-let _points_to (lv:Lval.t) (x:t): V.t list * t =
-  let (v,x) = find_or_create_vertex lv x in
-  G.succ x.graph v, x
-
-let _addr_of (lv:Lval.t) (x:t) : V.t list * t =
-  let (v,x) = find_or_create_vertex lv x in
-  G.pred x.graph v, x
-
 (* remove a lval from a graph*)
 let remove_lval (x:t)  (lv:lval) :t =
   assert_invariants x;
@@ -737,53 +729,6 @@ let assignment (a:t) (lv:lval) (e:exp) : t =
       new_a
     end
 
-(* (\* assignment x = y *\)
- * let assignment_x_y (a:t) (x:lval) (y:lval) : t =
- *   assert_invariants a;
- *   let x,a = normalize_lval x a in
- *   let y,a = normalize_lval y a in
- *   let (v1,a) = find_or_create_vertex x a in
- *   let (v2,a) = find_or_create_vertex y a in
- *   let new_a = cjoin a v1 v2 in
- *   assert_invariants new_a ; new_a
- *
- *
- * (\* assignment x = &y *\)
- * let assignment_x_addr_y (a:t) (x:lval) (y:lval) : t =
- *   assert_invariants a;
- *   let x,a = normalize_lval x a in
- *   let y,a = normalize_lval y a in
- *   let v1, a = find_or_create_vertex x a in
- *   let list_v2, a = addr_of y a in
- *   let new_a =
- *     if list_v2 = []
- *     then
- *       let v2, a = find_or_create_vertex y a in
- *       set_type a v1 v2
- *     else
- *       List.fold_left
- *         (fun a_acc v2 -> join a_acc v1 v2)
- *         a
- *         list_v2
- *   in
- *   assert_invariants new_a ; new_a
- *
- *
- * (\* assignment x = *y *\)
- * let assignment_x_ptr_y (a:t) (x:lval) (y:lval) : t =
- *   assert_invariants a;
- *   let x,a = normalize_lval x a in
- *   let y,a = normalize_lval y a in
- *   let v1, a = find_or_create_vertex x a in
- *   let list_v2, a = points_to y a in
- *   let new_a =
- *     match list_v2 with
- *       [] -> let v2,a = find_or_create_vertex y a in set_type a v2 v1
- *     | [v2] -> cjoin a v1 v2
- *     | _ ->  Options.fatal "assignment_x_ptr_y not implemented"
- *   in
- *   assert_invariants new_a ; new_a *)
-
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y (a:t) (lv:lval) : t =
   assert_invariants a;
@@ -792,36 +737,6 @@ let assignment_x_allocate_y (a:t) (lv:lval) : t =
   let (v2,a) = create_cst_vertex a in
   let new_a : t = set_type a v1 v2 in
   assert_invariants new_a ; new_a
-
-(* * assignment *x = y *\)
- * let assignment_ptr_x_y (a:t) (x:lval) (y:lval) : t =
- *   assert_invariants a;
- *   let x,a = normalize_lval x a in
- *   let y,a = normalize_lval y a in
- *   let v2, a = find_or_create_vertex y a in
- *   let list_v1, a = points_to x a in
- *   let new_a =
- *     match list_v1 with
- *       [] ->  let v1,a = find_or_create_vertex x a in set_type a v1 v2
- *     |  [v1] -> cjoin a v1 v2
- *     | _ ->  Options.fatal "assignment_ptr_x_y not implemented"
- *   in
- *   assert_invariants new_a ; new_a
- *
- *
- * (\* assignment *x = cst *\)
- * let assignment_ptr_x_cst (a:t) (x:lval) : t =
- *   assert_invariants a;
- *   let x,a = normalize_lval x a in
- *   let v2, a = create_cst_vertex a in
- *   let (list_v1, a) : V.t list * t = points_to x a in
- *   let new_a =
- *     match list_v1 with
- *       [] ->  let v1,a = find_or_create_vertex x a in set_type a v1 v2
- *     | [v1] ->  cjoin a v1 v2
- *     | _ -> Options.fatal "invariant broken "
- *   in
- *   assert_invariants new_a ; new_a *)
 
 exception Not_included
 
