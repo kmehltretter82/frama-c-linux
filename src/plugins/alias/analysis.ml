@@ -74,10 +74,16 @@ let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_sta
     None -> None
   | Some a -> Some (Abstract_state.assignment a lv exp)
 
-let rec do_init vi init state = match init with
-  | SingleInit e -> do_assignment state (Var vi, NoOffset) e
+let rec do_init (lv:lval) (init:init) state =
+  match init with
+  | SingleInit e -> do_assignment state lv e
   | CompoundInit(_, l) ->
-    List.fold_left (fun state (_, init) -> do_init vi init state) state l
+    List.fold_left (fun state (o, init) -> do_init (Cil.addOffsetLval o lv) init state) state l
+
+let do_cons_init (_lv:lval) _f _arg t _state =
+  match t with
+    Plain_func -> failwith "WIP"
+  | Constructor -> failwith "WIP"
 
 let list_instr_warnings : stmt list ref = ref []
 
@@ -95,8 +101,11 @@ let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t 
     let new_a = do_assignment a lv exp in
     new_a
   | Local_init(v,AssignInit i,_) ->
-    let new_a = do_init v i a in
+    let new_a = do_init (Var v, NoOffset) i a in
     new_a
+  | Local_init(v,ConsInit (f,arg,t),_) ->
+    let new_a = do_cons_init (Var v, NoOffset) f arg t a in
+    new_a   
   | Code_annot _ -> a
   | Skip _ -> a
   (* special case for malloc *)
@@ -123,7 +132,7 @@ let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t 
         Some new_a
       | (Some a, None) -> (feedback_only_once s; Some a)
     end
-  | Asm _ | Local_init _ -> (Options.feedback "Skipping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
+  | Asm _ -> (Options.feedback "Skipping @[%a@] (doInstr not implemented tatata)" Printer.pp_stmt s; a)
 
 
 
