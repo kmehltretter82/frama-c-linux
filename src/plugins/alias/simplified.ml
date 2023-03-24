@@ -114,10 +114,10 @@ struct
       (BNone, BNone) -> 0
     | (BNone, _ ) -> -1
     | (_,BNone) -> 1
-    | (BLval lv1, BLval lv2) -> Lval.compare lv1 lv2
+    | (BLval lv1, BLval lv2) -> Cil_datatype.LvalStructEq.compare lv1 lv2
     | (BLval _, _) -> -1
     | (_, BLval _) -> 1
-    | (BAddrOf lv1, BAddrOf lv2) -> Lval.compare lv1 lv2
+    | (BAddrOf lv1, BAddrOf lv2) -> Cil_datatype.LvalStructEq.compare lv1 lv2
 
   let print f fmt x =
     match x with

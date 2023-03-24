@@ -123,7 +123,7 @@ struct
   let rec is_sub_offset o1 o2 =
     match (o1,o2) with
       NoOffset, _ -> true
-    | Index (e1,o1), Index(e2,o2) when Exp.equal e1 e2 -> is_sub_offset o1 o2
+    | Index (e1,o1), Index(e2,o2) when Cil_datatype.ExpStructEq.equal e1 e2 -> is_sub_offset o1 o2
     | Field (f1,o1), Field(f2,o2) when Fieldinfo.equal f1 f2 ->  is_sub_offset o1 o2
     | _ -> false
 
