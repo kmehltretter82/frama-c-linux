@@ -407,9 +407,9 @@ let get_machdep () =
       mach_of_yaml
   in
   match res with
-    | Ok machdep -> machdep
-    | Error (`Msg s) ->
-        Kernel.fatal "Error during machdep parsing: %s" s
+  | Ok machdep -> machdep
+  | Error (`Msg s) ->
+    Kernel.fatal "Error during machdep parsing: %s" s
 
 let print_machdep_header () =
   if Kernel.PrintMachdepHeader.get () then begin
