@@ -24,6 +24,7 @@ MANUAL_MACHDEPS=machdep_gcc_x86_16.yaml machdep_msvc_x86_64.yaml
 
 update-all: machdep_*.yaml $(MANUAL_MACHDEPS:%=.%.validated)
 
+machdep_avr_8.yaml \
 machdep_avr_16.yaml \
 machdep_gcc_x86_32.yaml \
 machdep_gcc_x86_64.yaml \

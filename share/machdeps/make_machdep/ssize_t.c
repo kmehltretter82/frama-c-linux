@@ -25,6 +25,8 @@
 
 #define TEST_TYPE ssize_t
 
+TEST_TYPE_IS(char)
+TEST_TYPE_IS(short)
 TEST_TYPE_IS(int)
 TEST_TYPE_IS(long)
 TEST_TYPE_IS(long long)

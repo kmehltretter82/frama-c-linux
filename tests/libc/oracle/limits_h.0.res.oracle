@@ -4,9 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] limits_h.c:16: assertion got status valid.
 [eva] limits_h.c:18: assertion got status valid.
-[eva] limits_h.c:19: assertion got status valid.
 [eva] limits_h.c:20: assertion got status valid.
 [eva] limits_h.c:21: assertion got status valid.
 [eva] limits_h.c:22: assertion got status valid.
@@ -26,6 +24,8 @@
 [eva] limits_h.c:36: assertion got status valid.
 [eva] limits_h.c:37: assertion got status valid.
 [eva] limits_h.c:38: assertion got status valid.
+[eva] limits_h.c:39: assertion got status valid.
+[eva] limits_h.c:40: assertion got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [scope:rm_asserts] removing 6 assertion(s)

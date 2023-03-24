@@ -184,15 +184,19 @@ let gen_sizeof_std fmt mach =
   gen_sizeof fmt "LONGLONG" mach.sizeof_longlong
 
 let gen_intlike_min fmt name repr mach =
-  let macro = name ^ "_MIN" in
-  let repr_name, is_signed = List.assoc repr (std_type_name mach) in
-  if is_signed then gen_define_string fmt macro ("__FC_" ^ repr_name ^ "_MIN")
-  else gen_define_int fmt macro 0
+  if repr <> "" then begin
+    let macro = name ^ "_MIN" in
+    let repr_name, is_signed = List.assoc repr (std_type_name mach) in
+    if is_signed then gen_define_string fmt macro ("__FC_" ^ repr_name ^ "_MIN")
+    else gen_define_int fmt macro 0
+  end
 
 let gen_intlike_max fmt name repr mach =
-  let macro = name ^ "_MAX" in
-  let repr_name, _ = List.assoc repr (std_type_name mach) in
-  gen_define_string fmt macro ("__FC_" ^ repr_name ^ "_MAX")
+  if repr <> "" then begin
+    let macro = name ^ "_MAX" in
+    let repr_name, _ = List.assoc repr (std_type_name mach) in
+    gen_define_string fmt macro ("__FC_" ^ repr_name ^ "_MAX")
+  end
 
 let gen_fast_int fmt bitsize signed repr mach =
   let name = Format.sprintf "_FAST%d" bitsize in

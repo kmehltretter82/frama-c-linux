@@ -330,6 +330,7 @@
  (package frama-c)
  (section share)
  (files
+  (machdeps/machdep_avr_8.yaml as share/machdeps/machdep_avr_8.yaml)
   (machdeps/machdep_avr_16.yaml as share/machdeps/machdep_avr_16.yaml)
   (machdeps/machdep_x86_16.yaml as share/machdeps/machdep_x86_16.yaml)
   (machdeps/machdep_x86_32.yaml as share/machdeps/machdep_x86_32.yaml)

@@ -7,6 +7,8 @@
   STDOPT: +"-machdep gcc_x86_64"
   STDOPT: +"-machdep ppc_32"
   STDOPT: +"-machdep msvc_x86_64"
+  STDOPT: +"-machdep avr_8"
+  STDOPT: +"-machdep avr_16"
 */
 #include <sys/types.h>
 #include <stdint.h>

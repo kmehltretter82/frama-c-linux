@@ -15,7 +15,6 @@ compiler: clang
 cpp_arch_flags:
 - -target
 - avr
-- -m16
 custom_defs: |
     #undef AVR
     #define AVR 1
@@ -781,7 +780,7 @@ int_fast8_t: signed char
 intptr_t: int
 l_tmpnam: L_tmpnam
 little_endian: true
-machdep_name: machdep_avr_16
+machdep_name: machdep_avr_8
 mb_cur_max: ((size_t)16)
 nsig: ''
 path_max: '4096'

@@ -222,11 +222,15 @@ def find_value(name, typ, output):
         def conversion(x):
             return x == "True"
 
+        default = False
+
     elif typ == "number":
         expected = "([0-9]+)"
 
         def conversion(x):
             return int(x)
+
+        default = -1
 
     elif typ == "type":
         expected = "`([^`]+)`"
@@ -234,23 +238,26 @@ def find_value(name, typ, output):
         def conversion(x):
             return x
 
+        default = ''
+
     else:
         warnings.warn(f"unexpected type '{typ}' for field '{name}', skipping")
         return
-    msg = re.compile(name + " is " + expected)
-    res = re.search(msg, output)
-    if res:
-        if name in machdep:
+    if name in machdep:
+        msg = re.compile(name + " is " + expected)
+        res = re.search(msg, output)
+        if res:
             value = conversion(res.group(1))
             if args.verbose:
                 print(f"[INFO] setting {name} to {value}")
             machdep[name] = value
         else:
-            warnings.warn(f"unexpected symbol '{name}', ignoring")
+            warnings.warn(f"cannot find value of field '{name}', using default value: '{default}'")
+            machdep[name] = default
+            if args.verbose:
+                print(f"compiler output is:{output}")
     else:
-        warnings.warn(f"cannot find value of field '{name}', skipping")
-        if args.verbose:
-            print(f"compiler output is:{output}")
+        warnings.warn(f"unexpected symbol '{name}', ignoring")
 
 
 def cleanup_cpp(output):
