@@ -211,19 +211,22 @@ function useProbeCache(): Request<Location, Probe> {
 /* -------------------------------------------------------------------------- */
 
 interface StmtProps {
+  fct?: string;
   stmt?: Ast.marker;
   marker?: Ast.marker;
   short?: boolean;
 }
 
 function Stmt(props: StmtProps): JSX.Element | null {
-  const { stmt, marker, short } = props;
-  const { descr, sloc } = States.useMarker(marker);
-  if (!stmt || !marker) return null;
+  const { fct, stmt, marker, short } = props;
+  const { descr } = States.useMarker(stmt);
+  const { sloc } = States.useMarker(marker);
+  if (!marker || !fct) return null;
   // Location sloc should always be defined for statements.
   const label = short ? `@L${sloc?.line}` : `@${sloc?.base}:${sloc?.line}`;
+  const title = stmt ? descr : "Start of function " + fct;
   const className = 'dome-text-cell eva-stmt';
-  return <span className={className} title={descr}>{label}</span>;
+  return <span className={className} title={title}>{label}</span>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -290,7 +293,7 @@ async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
         onDoubleClick={onDoubleClick}
       >
         {caller}
-        <Stmt stmt={stmt} marker={stmt} />
+        <Stmt fct={caller} stmt={stmt} marker={stmt} />
       </Cell>
     );
   };
@@ -386,7 +389,7 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
         <div className='eva-header-text-overflow'>
           <span className='dome-text-cell' title={code}>{code}</span>
         </div>
-        <Stmt stmt={stmt} marker={target} short={true}/>
+        <Stmt fct={fct} stmt={stmt} marker={target} short={true}/>
       </TableCell>
     </th>
   );
@@ -412,17 +415,22 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
   const valuesClass = classes('eva-table-values', 'eva-table-values-center');
   const tableClass = classes('eva-table-descrs', 'eva-table-descr-sticky');
   const cls = classes(valuesClass, tableClass);
-  const title = (s: string): string => `Values ${s} the statement evaluation`;
   const elements: JSX.Element[] = [];
   function push(title: string, children: JSX.Element | string): void {
     elements.push(<td className={cls} title={title}>{children}</td>);
   }
-  if (!probe.effects && !probe.condition)
-    push('Values at the statement', '-');
+  if (!probe.effects && !probe.condition) {
+    if (probe.stmt)
+      push('Values at the statement', '-');
+    else if (probe.fct)
+      push('Values at the start of function ' + probe.fct, '-');
+    else
+      push('Values at the start of the analysis', '-');
+  }
   if (probe.effects || probe.condition)
-    push(title('before'), 'Before');
+    push('Values just before the statement', 'Before');
   if (probe.effects)
-    push(title('after'), 'After');
+    push('Values just after the statement', 'After');
   if (probe.condition) {
     const pushCondition = (s: string): void => {
       const t = `Values after the condition, in the ${s.toLowerCase()} branch`;
