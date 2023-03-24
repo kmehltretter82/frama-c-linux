@@ -394,11 +394,15 @@ struct
       model
 
   let () =
-    States.column
+    let get (tag, _) =
+      let pos = fst (Printer_tag.loc_of_localizable tag) in
+      if Cil_datatype.Position.(equal unknown pos) then None else Some pos
+    in
+    States.option
       ~name:"sloc"
       ~descr:(Md.plain "Source location")
       ~data:(module Position)
-      ~get:(fun (tag, _) -> fst (Printer_tag.loc_of_localizable tag))
+      ~get
       model
 
   let array = States.register_array

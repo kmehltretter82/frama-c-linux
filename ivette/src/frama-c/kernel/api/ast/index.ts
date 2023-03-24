@@ -152,7 +152,7 @@ export interface markerAttributesData {
   /** Function scope of the marker, if applicable */
   scope?: string;
   /** Source location */
-  sloc: source;
+  sloc?: source;
 }
 
 /** Decoder for `markerAttributesData` */
@@ -167,7 +167,7 @@ export const jMarkerAttributesData: Json.Decoder<markerAttributesData> =
     isFunction: Json.jBoolean,
     isFunDecl: Json.jBoolean,
     scope: Json.jOption(Json.jString),
-    sloc: jSource,
+    sloc: Json.jOption(jSource),
   });
 
 /** Natural order for `markerAttributesData` */
@@ -175,7 +175,7 @@ export const byMarkerAttributesData: Compare.Order<markerAttributesData> =
   Compare.byFields
     <{ marker: marker, labelKind: string, titleKind: string, name: string,
        descr: string, isLval: boolean, isFunction: boolean,
-       isFunDecl: boolean, scope?: string, sloc: source }>({
+       isFunDecl: boolean, scope?: string, sloc?: source }>({
     marker: byMarker,
     labelKind: Compare.alpha,
     titleKind: Compare.alpha,
@@ -185,7 +185,7 @@ export const byMarkerAttributesData: Compare.Order<markerAttributesData> =
     isFunction: Compare.boolean,
     isFunDecl: Compare.boolean,
     scope: Compare.defined(Compare.string),
-    sloc: bySource,
+    sloc: Compare.defined(bySource),
   });
 
 /** Signal for array [`markerAttributes`](#markerattributes)  */
@@ -241,7 +241,7 @@ export const markerAttributes: State.Array<marker,markerAttributesData> = marker
 export const markerAttributesDataDefault: markerAttributesData =
   { marker: markerDefault, labelKind: '', titleKind: '', name: '', descr: '',
     isLval: false, isFunction: false, isFunDecl: false, scope: undefined,
-    sloc: sourceDefault };
+    sloc: undefined };
 
 const getMainFunction_internal: Server.GetRequest<null,fct | undefined> = {
   kind: Server.RqKind.GET,
