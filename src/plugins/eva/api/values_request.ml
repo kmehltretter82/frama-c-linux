@@ -42,9 +42,8 @@ let package =
     ~title:"Eva Values"
     ()
 
-type probe =
-  | Pexpr of exp * stmt
-  | Plval of lval * stmt
+type term = Pexpr of exp | Plval of lval
+type probe = term * kernel_function option * kinstr
 
 type callstack = Value_types.callstack
 type truth = Abstract_interp.truth
@@ -81,31 +80,36 @@ let () = Analysis.register_computation_hook ~on:Computed
 (* --- Marker Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let next_steps s =
-  match s.skind with
-  | If (cond, _, _, _) -> [ `Then cond ; `Else cond ]
-  | Instr (Set _ | Call _ | Local_init _) -> [ `After ]
-  | Instr (Asm _ | Code_annot _)
-  | Switch _ | Loop _ | Block _ | UnspecifiedSequence _
-  | TryCatch _ | TryFinally _ | TryExcept _
-  | Instr (Skip _) | Return _ | Break _ | Continue _ | Goto _ | Throw _ -> []
+let next_steps = function
+  | Kglobal -> []
+  | Kstmt stmt ->
+    match stmt.skind with
+    | If (cond, _, _, _) -> [ `Then cond ; `Else cond ]
+    | Instr (Set _ | Call _ | Local_init _) -> [ `After ]
+    | Instr (Asm _ | Code_annot _)
+    | Switch _ | Loop _ | Block _ | UnspecifiedSequence _
+    | TryCatch _ | TryFinally _ | TryExcept _
+    | Instr (Skip _) | Return _ | Break _ | Continue _ | Goto _ | Throw _ -> []
 
-let probe_stmt s =
-  match s.skind with
-  | Instr (Set(lv,_,_)) -> Some (Plval (lv,s))
-  | Instr (Call(Some lr,_,_,_)) -> Some (Plval (lr,s))
-  | Instr (Local_init(v,_,_)) -> Some (Plval ((Var v,NoOffset), s))
-  | Return (Some e,_) | If(e,_,_,_) | Switch(e,_,_,_) -> Some (Pexpr (e,s))
-  | _ -> None
+let probe_stmt kf stmt =
+  let term =
+    match stmt.skind with
+    | Instr (Set (lv,_,_)) -> Some (Plval lv)
+    | Instr (Call (Some lr,_,_,_)) -> Some (Plval lr)
+    | Instr (Local_init (v,_,_)) -> Some (Plval (Var v,NoOffset))
+    | Return (Some e,_) | If (e,_,_,_) | Switch (e,_,_,_) -> Some (Pexpr e)
+    | _ -> None
+  in
+  Option.map (fun t -> (t, Some kf, Kstmt stmt)) term
 
 let probe marker =
   let open Printer_tag in
   match marker with
   | PLval (_, _, (Var vi, NoOffset)) when Cil.isFunctionType vi.vtype -> None
-  | PLval(_,Kstmt s,l) -> Some (Plval (l,s))
-  | PExp(_,Kstmt s,e) -> Some (Pexpr (e,s))
-  | PStmt(_,s) | PStmtStart(_,s) -> probe_stmt s
-  | PVDecl(_,Kstmt s,v) -> Some (Plval ((Var v,NoOffset),s))
+  | PLval (kf, kinstr, l) -> Some (Plval l, kf, kinstr)
+  | PExp (kf, kinstr, e) -> Some (Pexpr e, kf, kinstr)
+  | PStmt (kf, s) | PStmtStart (kf, s) -> probe_stmt kf s
+  | PVDecl (kf, kinstr, v) -> Some (Plval (Var v, NoOffset), kf, kinstr)
   | _ -> None
 
 (* -------------------------------------------------------------------------- *)
@@ -329,7 +333,8 @@ let filter_variables bases =
 (* -------------------------------------------------------------------------- *)
 
 module type EvaProxy = sig
-  val callstacks : stmt -> callstack list
+  val kf_callstacks : kernel_function -> callstack list
+  val stmt_callstacks : stmt -> callstack list
   val evaluate : probe -> callstack option -> evaluations
 end
 
@@ -346,19 +351,34 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
     let default = fun _ -> Cvalue.V.top in
     Option.value ~default (A.Val.get Main_values.CVal.key)
 
-  let callstacks stmt =
-    match A.get_stmt_state_by_callstack ~after:false stmt with
+  let callstacks get_state_by_callstack elt =
+    match get_state_by_callstack elt with
     | `Top | `Bottom -> []
-    | `Value states -> CSmap.fold_sorted (fun cs _ wcs -> cs :: wcs) states []
+    | `Value states -> CSmap.fold (fun cs _ acc -> cs :: acc) states []
 
-  let dstate ~after stmt = function
-    | None -> (A.get_stmt_state ~after stmt :> dstate)
+  let kf_callstacks = callstacks A.get_initial_state_by_callstack
+  let stmt_callstacks = callstacks (A.get_stmt_state_by_callstack ~after:false)
+
+  let get_state get_consolidated get_by_callstack arg = function
+    | None -> get_consolidated arg
     | Some cs ->
-      match A.get_stmt_state_by_callstack ~selection:[cs] ~after stmt with
+      match get_by_callstack ?selection:(Some [cs]) arg with
       | (`Top | `Bottom) as res -> res
       | `Value cmap ->
         try `Value (CSmap.find cmap cs)
         with Not_found -> `Bottom
+
+  let get_stmt_state ~after =
+    get_state (A.get_stmt_state ~after) (A.get_stmt_state_by_callstack ~after)
+
+  let get_initial_state =
+    get_state A.get_initial_state A.get_initial_state_by_callstack
+
+  let get_state kf kinstr callstack =
+    match kf, kinstr with
+    | Some _, Kstmt stmt -> get_stmt_state ~after:false stmt callstack
+    | Some kf, Kglobal -> get_initial_state kf callstack
+    | None, _ -> A.get_global_state ()
 
   (* --- Converts an evaluation [result] into an exported [value]. ---------- *)
 
@@ -376,28 +396,24 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
     | Value v -> get_bases (get_cvalue v)
     | Offsetmap offsm -> get_pointed_bases offsm
 
-  let get_pointed_markers stmt result =
+  let get_pointed_markers kf kinstr result =
     let bases = get_pointed_bases result in
     let vars = filter_variables bases in
-    let kf =
-      try Some (Kernel_function.find_englobing_kf stmt)
-      with Not_found -> None
-    in
     let to_marker vi =
       let text = Pretty_utils.to_string Printer.pp_varinfo vi in
-      let marker = Printer_tag.PLval (kf, Kstmt stmt, Cil.var vi) in
+      let marker = Printer_tag.PLval (kf, kinstr, Cil.var vi) in
       text, marker
     in
     List.map to_marker vars
 
   (* Creates an exported [value] from an evaluation result. *)
-  let make_value typ stmt (result, alarms) =
+  let make_value typ kf kinstr (result, alarms) =
     let descr = Format.asprintf "@[<hov 2>%a@]" Alarms.pretty in
     let f alarm status acc = (status, descr alarm) :: acc in
     let alarms = Alarmset.fold f [] alarms |> List.rev in
     let pretty_eval = Bottom.pretty (pp_result typ) in
     let value = Pretty_utils.to_string pretty_eval result in
-    let pointed_markers = get_pointed_markers stmt in
+    let pointed_markers = get_pointed_markers kf kinstr in
     let pointed_vars = Bottom.fold ~bottom:[] pointed_markers result in
     { value; alarms; pointed_vars }
 
@@ -434,32 +450,32 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
       let else_state = (A.assume_cond stmt state cond false :> dstate) in
       Cond (eval then_state, eval else_state)
     | Instr (Set _ | Call _ | Local_init _) ->
-      let after_state = dstate ~after:true stmt callstack in
+      let after_state = get_stmt_state ~after:true stmt callstack in
       After (eval after_state)
     | _ -> Nothing
 
-  let eval_steps typ eval stmt callstack =
+  let eval_steps typ eval kf kinstr callstack =
     let default value = { value; alarms = []; pointed_vars = []; } in
     let eval = function
       | `Bottom -> default "Unreachable"
       | `Top -> default "No information"
-      | `Value state -> make_value typ stmt (eval state)
+      | `Value state -> make_value typ kf kinstr (eval state)
     in
-    let before = dstate ~after:false stmt callstack in
+    let before = get_state kf kinstr callstack in
     let here = eval before in
     let next =
-      match before with
-      | `Bottom | `Top -> Nothing
-      | `Value state -> do_next eval state stmt callstack
+      match before, kinstr with
+      | (`Bottom | `Top), _ | _, Kglobal -> Nothing
+      | `Value state, Kstmt stmt -> do_next eval state stmt callstack
     in
     { here; next; }
 
-  let evaluate p callstack =
-    match p with
-    | Plval (lval, stmt) ->
-      eval_steps (Cil.typeOfLval lval) (eval_lval lval) stmt callstack
-    | Pexpr (expr, stmt) ->
-      eval_steps (Cil.typeOf expr) (eval_expr expr) stmt callstack
+  let evaluate (term, kf, kinstr) callstack =
+    match term with
+    | Plval lval ->
+      eval_steps (Cil.typeOfLval lval) (eval_lval lval) kf kinstr callstack
+    | Pexpr expr ->
+      eval_steps (Cil.typeOf expr) (eval_expr expr) kf kinstr callstack
 end
 
 let proxy =
@@ -481,11 +497,14 @@ let () =
     ~output:(module Jlist(Jcallstack))
     begin fun markers ->
       let module A : EvaProxy = (val proxy ()) in
-      let add stmt = List.fold_right CSet.add (A.callstacks stmt) in
       let gather_callstacks cset marker =
-        match probe marker with
-        | Some (Pexpr (_, stmt) | Plval (_, stmt)) -> add stmt cset
-        | None -> cset
+        let list =
+          match probe marker with
+          | Some (_, _, Kstmt stmt) -> A.stmt_callstacks stmt
+          | Some (_, Some kf, Kglobal) -> A.kf_callstacks kf
+          | Some (_, _, Kglobal) | None -> []
+        in
+        List.fold_left (fun set elt -> CSet.add elt set) cset list
       in
       let cset = List.fold_left gather_callstacks CSet.empty markers in
       Ranking.sort (CSet.elements cset)
@@ -528,6 +547,12 @@ let () =
 (* --- Request getProbeInfo                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
+let is_reachable kf kinstr =
+  match kf, kinstr with
+  | _, Kstmt stmt -> Results.is_reachable stmt
+  | Some kf, Kglobal -> Results.is_called kf
+  | None, Kglobal -> Results.is_reachable_kinstr Kglobal
+
 let () =
   let getProbeInfo = Request.signature ~input:(module Jmarker) () in
   let set_evaluable = Request.result getProbeInfo
@@ -539,9 +564,6 @@ let () =
   and set_stmt = Request.result_opt getProbeInfo
       ~name:"stmt" ~descr:(Md.plain "Probe statement")
       (module Jstmt)
-  and set_rank = Request.result getProbeInfo
-      ~name:"rank" ~descr:(Md.plain "Probe statement rank")
-      ~default:0 (module Jint)
   and set_effects = Request.result getProbeInfo
       ~name:"effects" ~descr:(Md.plain "Effectfull statement")
       ~default:false (module Jbool)
@@ -549,26 +571,26 @@ let () =
       ~name:"condition" ~descr:(Md.plain "Conditional statement")
       ~default:false (module Jbool)
   in
-  let set_probe rq pp p s =
+  let set_probe rq pp p kf kinstr =
     let computed = Analysis.is_computed () in
-    let reachable = Results.is_reachable s in
+    let reachable = is_reachable kf kinstr in
     set_evaluable rq (computed && reachable);
     set_code rq (Some (Pretty_utils.to_string pp p)) ;
-    set_stmt rq (Some s) ;
-    set_rank rq (Ranking.stmt s) ;
+    set_stmt rq (match kinstr with Kglobal -> None | Kstmt s -> Some s) ;
     let on_steps = function
       | `Here -> ()
       | `Then _ | `Else _ -> set_condition rq true
       | `After -> set_effects rq true
-    in List.iter on_steps (next_steps s)
+    in
+    List.iter on_steps (next_steps kinstr)
   in
   Request.register_sig ~package getProbeInfo
     ~kind:`GET ~name:"getProbeInfo"
     ~descr:(Md.plain "Probe informations")
     begin fun rq marker ->
       match probe marker with
-      | Some (Plval (l, s)) -> set_probe rq Printer.pp_lval l s
-      | Some (Pexpr (e, s)) -> set_probe rq Printer.pp_exp  e s
+      | Some (Plval l, kf, kinstr) -> set_probe rq Printer.pp_lval l kf kinstr
+      | Some (Pexpr e, kf, kinstr) -> set_probe rq Printer.pp_exp e kf kinstr
       | None -> set_evaluable rq false
     end
 
