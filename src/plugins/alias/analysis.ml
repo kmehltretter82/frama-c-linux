@@ -86,7 +86,6 @@ let feedback_only_once s =
     end
 
 let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
-  Options.feedback ~level:3 "analysing instruction: %a" Printer.pp_stmt s;
   match i with
     Set(lv,exp,_) ->
     let new_a = do_assignment a lv exp in
@@ -122,7 +121,17 @@ let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t 
     end
   | Asm _ | Local_init _ -> (Options.feedback "Skipping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
 
+let pp_abstract_state_opt ?(debug=false) fmt v =
+  match v with
+  | None -> Format.fprintf fmt "<Bot>"
+  | Some a -> Abstract_state.pretty ~debug fmt a
 
+let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
+  Options.feedback ~level:3 "analysing instruction: %a" Printer.pp_stmt s;
+  let result = do_instr s i a in
+  Options.feedback ~level:3 "May-aliases at the end of instruction:@.%a@." (pp_abstract_state_opt ~debug:false) result;
+  Options.debug ~level:3 "May-alias graph at the end of instruction:@.%a@." (pp_abstract_state_opt ~debug:true) result;
+  result
 
 
 module T =
@@ -202,15 +211,10 @@ let analyse_function (kf:kernel_function) =
 
 let doFunction (kf:kernel_function) =
   let final_state = analyse_function kf in
-  let print_value ?(debug=false) fmt v =
-    match v with
-    | None -> Format.fprintf fmt "<Bot>"
-    | Some a -> Abstract_state.pretty ~debug fmt a
-  in
   if Kernel_function.is_main kf then begin
     (* if main, print the last abstract state *)
-    Options.feedback "May-aliases at the end of function main:@.%a@." (print_value ~debug:false) final_state;
-    Options.debug "May-alias graph at the end of function main:@.%a@." (print_value ~debug:true) final_state;
+    Options.feedback "May-aliases at the end of function main:@.%a@." (pp_abstract_state_opt ~debug:false) final_state;
+    Options.debug "May-alias graph at the end of function main:@.%a@." (pp_abstract_state_opt ~debug:true) final_state;
     let f_name = Options.Dot_output.get () in
     match f_name, final_state with
     | "", _ -> ()
