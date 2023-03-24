@@ -3269,13 +3269,12 @@ We present below a thorough description of each field.
     compiler-specific extensions.
   \end{itemize}
   Note that some compiler extensions, such as attributes, are always enabled.
-\item[\texttt{cpp\_arch\_flags}]: list of arguments to be added to the
-  command-line when invoking the C preprocessor. Typically used to ensure that
-  multiarch compilers apply the appropriate predefined macros\footnote{Note that
-    the sizes of standard integer types are already defined in the machdep,
-    so they do not depend on these flags.}.
-  E.g. use \verb+["-m32"]+ for a 32-bit machdep when preprocessing with a
-  64-bit multiarch GCC.
+\item[\texttt{cpp\_arch\_flags}]: list of arguments used by the compiler to
+  select the corresponding architecture, e.g. \verb+["-m32"]+ for a 32-bit
+  machdep. Older versions (up to 26.x - Iron) of \framac did pass these flags to the pre-processor,
+  in order for it to define a set of built-in macros related to said architecture.
+  Current versions do not use this field, and rely on \texttt{\texttt{custom\_defs}}
+  containing the appropriate definitions.
   Note that, in practice, very few programs rely on such predefined macros,
   such as \verb+__x86_64+ and \verb+__i386+.
 \end{description}

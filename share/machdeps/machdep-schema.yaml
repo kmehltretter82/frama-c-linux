@@ -87,8 +87,8 @@ compiler:
 cpp_arch_flags:
 
   description: |
-    arguments to be given to the compiler when this machdep is selected
-    (e.g. '-m32')
+    arguments to be given to the compiler to select the corresponding
+    architecture (e.g. '-m32')
 
   type: list
 
