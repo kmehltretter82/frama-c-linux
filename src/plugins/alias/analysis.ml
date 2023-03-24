@@ -180,15 +180,10 @@ let do_stmt (a: Abstract_state.t) (s:stmt) :  Abstract_state.t =
     end
   | _ -> a
 
-let doFunction (kf:kernel_function) =
+let analyse_function (kf:kernel_function) =
   Options.feedback ~level:2 "analysing function: %a" Kernel_function.pretty kf;
   if Kernel_function.has_definition kf then
     begin
-      let print_value ?(debug=false) fmt v =
-        match v with
-        | None -> Format.fprintf fmt "<Bot>"
-        | Some a -> Abstract_state.pretty ~debug fmt a
-      in
       let first_stmt =
         try Kernel_function.find_first_stmt kf
         with Kernel_function.No_Statement -> assert false
@@ -196,15 +191,26 @@ let doFunction (kf:kernel_function) =
       T.StmtStartData.add first_stmt (Some Abstract_state.empty);
       F.compute [first_stmt];
       let return_stmt = Kernel_function.find_return kf in
-      let final_state : Abstract_state.t option =
-        try Stmt_table.find return_stmt
-        with
-          Not_found ->
-          begin
-            Options.debug "return stmt of %a not in table" Kernel_function.pretty kf;
-            Options.warning "Analysis is continuing but will not be sound";
-            Some (Abstract_state.empty)
-          end
+      try Stmt_table.find return_stmt
+      with
+        Not_found ->
+        begin
+          Options.debug "return stmt of %a not in table" Kernel_function.pretty kf;
+          Options.warning "Analysis is continuing but will not be sound";
+          Some (Abstract_state.empty)
+        end
+    end
+  else
+    Some Abstract_state.empty
+
+let doFunction (kf:kernel_function) =
+  let final_state = analyse_function kf in
+  if Kernel_function.has_definition kf then
+    begin
+      let print_value ?(debug=false) fmt v =
+        match v with
+        | None -> Format.fprintf fmt "<Bot>"
+        | Some a -> Abstract_state.pretty ~debug fmt a
       in
       if not (Kernel_function.is_main kf) then
         (* if main, do nothing *)
