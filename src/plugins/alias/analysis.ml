@@ -212,13 +212,7 @@ let doFunction (kf:kernel_function) =
         | None -> Format.fprintf fmt "<Bot>"
         | Some a -> Abstract_state.pretty ~debug fmt a
       in
-      if not (Kernel_function.is_main kf) then
-        (* if main, do nothing *)
-        let summary: Abstract_state.summary =
-          Abstract_state.make_summary final_state kf
-        in
-        Function_table.add kf (Some summary)
-      else
+      if Kernel_function.is_main kf then
         (* if main, print the last abstract state *)
         let f_name = Options.Dot_output.get () in
         if f_name = ""
@@ -226,12 +220,18 @@ let doFunction (kf:kernel_function) =
           Options.feedback "May-aliases at the end of function main:@.%a@." (print_value ~debug:false) final_state
         else
           match final_state with
-            None  ->  Options.feedback "Abstract_state at the end of function main: <Bot>@."
+          | None  ->  Options.feedback "Abstract_state at the end of function main: <Bot>@."
           | Some final_state ->
             begin
               Abstract_state.print_dot f_name final_state;
               Options.feedback "Abstract_state at the end of function main:@.%a@." (print_value ~debug:true) (Some final_state)
             end
+      else
+        (* if not main, do nothing *)
+        let summary: Abstract_state.summary =
+          Abstract_state.make_summary final_state kf
+        in
+        Function_table.add kf (Some summary)
     end
   else
     let summary: Abstract_state.summary =
