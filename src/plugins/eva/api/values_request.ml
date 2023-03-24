@@ -42,7 +42,7 @@ let package =
     ~title:"Eva Values"
     ()
 
-type term = Pexpr of exp | Plval of lval
+type term = Pexpr of exp | Plval of lval | Ppred of predicate
 type probe = term * kernel_function option * kinstr
 
 type callstack = Value_types.callstack
@@ -102,6 +102,19 @@ let probe_stmt kf stmt =
   in
   Option.map (fun t -> (t, Some kf, Kstmt stmt)) term
 
+let probe_code_annot kf stmt = function
+  | AAssert (_, p) | AInvariant (_, true, p) ->
+    Some (Ppred p.tp_statement, Some kf, Kstmt stmt)
+  | _ -> None
+
+let probe_property = function
+  | Property.IPCodeAnnot ica ->
+    probe_code_annot ica.ica_kf ica.ica_stmt ica.ica_ca.annot_content
+  | IPPropertyInstance { ii_kf; ii_stmt; ii_pred=Some pred;} ->
+    let pred = Logic_const.pred_of_id_pred pred in
+    Some (Ppred pred, Some ii_kf, Kstmt ii_stmt)
+  | _ -> None
+
 let probe marker =
   let open Printer_tag in
   match marker with
@@ -110,6 +123,7 @@ let probe marker =
   | PExp (kf, kinstr, e) -> Some (Pexpr e, kf, kinstr)
   | PStmt (kf, s) | PStmtStart (kf, s) -> probe_stmt kf s
   | PVDecl (kf, kinstr, v) -> Some (Plval (Var v, NoOffset), kf, kinstr)
+  | PIP property -> probe_property property
   | _ -> None
 
 (* -------------------------------------------------------------------------- *)
@@ -387,14 +401,17 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   type result =
     | Value of A.Val.t
     | Offsetmap of offsetmap
+    | Status of truth
 
   let pp_result typ fmt = function
     | Value v -> A.Val.pretty fmt v
     | Offsetmap offsm -> pp_offsetmap typ fmt offsm
+    | Status truth -> Alarmset.Status.pretty fmt truth
 
   let get_pointed_bases = function
     | Value v -> get_bases (get_cvalue v)
     | Offsetmap offsm -> get_pointed_bases offsm
+    | Status _ -> Base.Hptset.empty
 
   let get_pointed_markers kf kinstr result =
     let bases = get_pointed_bases result in
@@ -441,6 +458,13 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   let eval_expr expr state =
     A.eval_expr state expr >>=: fun value -> Value value
 
+  let eval_pred predicate state =
+    let env =
+      Abstract_domain.{ states = (function _ -> A.Dom.top) ; result = None }
+    in
+    let truth = A.Dom.evaluate_predicate env state predicate in
+    `Value (Status truth), Alarmset.none
+
   (* --- Evaluates all steps (before/after the statement). ------------------ *)
 
   let do_next eval state stmt callstack =
@@ -476,6 +500,8 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
       eval_steps (Cil.typeOfLval lval) (eval_lval lval) kf kinstr callstack
     | Pexpr expr ->
       eval_steps (Cil.typeOf expr) (eval_expr expr) kf kinstr callstack
+    | Ppred pred ->
+      eval_steps Cil.intType (eval_pred pred) kf kinstr callstack
 end
 
 let proxy =
@@ -589,9 +615,12 @@ let () =
     ~descr:(Md.plain "Probe informations")
     begin fun rq marker ->
       match probe marker with
-      | Some (Plval l, kf, kinstr) -> set_probe rq Printer.pp_lval l kf kinstr
-      | Some (Pexpr e, kf, kinstr) -> set_probe rq Printer.pp_exp e kf kinstr
       | None -> set_evaluable rq false
+      | Some (term, kf, kinstr) ->
+        match term with
+        | Plval l -> set_probe rq Printer.pp_lval l kf kinstr
+        | Pexpr e -> set_probe rq Printer.pp_exp e kf kinstr
+        | Ppred p -> set_probe rq Printer.pp_predicate p kf kinstr
     end
 
 (* -------------------------------------------------------------------------- *)
