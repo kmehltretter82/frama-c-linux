@@ -189,22 +189,30 @@ let term_lval_to_lval tlval =
 
 let print_value fmt loc =
   let is_scalar = Cil.isScalarType in
-  let kinstr, eval =
+  let kf, kinstr, eval =
     match loc with
-    | Printer_tag.PLval (_kf, ki, lval) when is_scalar (Cil.typeOfLval lval) ->
-      ki, Results.eval_lval lval
-    | Printer_tag.PExp (_kf, ki, expr) when is_scalar (Cil.typeOf expr) ->
-      ki, Results.eval_exp expr
-    | PVDecl (_kf, ki, vi) when is_scalar vi.vtype ->
-      ki, Results.eval_var vi
-    | PTermLval (_kf, ki, _ip, tlval) ->
+    | Printer_tag.PLval (kf, ki, lval) when is_scalar (Cil.typeOfLval lval) ->
+      kf, ki, Results.eval_lval lval
+    | Printer_tag.PExp (kf, ki, expr) when is_scalar (Cil.typeOf expr) ->
+      kf, ki, Results.eval_exp expr
+    | PVDecl (kf, ki, vi) when is_scalar vi.vtype ->
+      kf, ki, Results.eval_var vi
+    | PTermLval (kf, ki, _ip, tlval) ->
       let lval = term_lval_to_lval tlval in
-      ki, Results.eval_lval lval
+      if is_scalar (Cil.typeOfLval lval)
+      then kf, ki, Results.eval_lval lval
+      else raise Not_found
     | _ -> raise Not_found
   in
   let pretty = Cvalue.V_Or_Uninitialized.pretty in
   let eval_cvalue at = Results.(eval at |> as_cvalue_or_uninitialized) in
-  let before = eval_cvalue (Results.before_kinstr kinstr) in
+  let request =
+    match kf, kinstr with
+    | _, Kstmt stmt -> Results.before stmt
+    | Some kf, Kglobal -> Results.at_start_of kf
+    | None, Kglobal -> Results.at_start
+  in
+  let before = eval_cvalue request in
   match kinstr with
   | Kglobal -> pretty fmt before
   | Kstmt stmt ->
