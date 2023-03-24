@@ -516,24 +516,6 @@ let build_cpp_cmd = function
       else []
     in
     let fc_define_args = ["__FRAMAC__"] in
-    (* Hypothesis: the preprocessor does support the arch-related
-       options tested when 'configure' was run. *)
-    let required_cpp_arch_args = (get_machdep ()).cpp_arch_flags in
-    let supported_cpp_arch_args, unsupported_cpp_arch_args =
-      List.partition (fun arg ->
-          List.mem arg Fc_config.preprocessor_supported_arch_options)
-        required_cpp_arch_args
-    in
-    if is_gnu_like = Unknown && not (Kernel.CppCommand.is_set ())
-       && unsupported_cpp_arch_args <> [] then
-      Kernel.warning ~once:true
-        "your preprocessor is not known to handle option(s) `%s', \
-         considered necessary for machdep `%s'. To ensure compatibility \
-         between your preprocessor and the machdep, consider using \
-         -cpp-command with the appropriate flags. \
-         Your preprocessor is known to support these flags: %s"
-        (concat_strs unsupported_cpp_arch_args) (Kernel.Machdep.get ())
-        (concat_strs Fc_config.preprocessor_supported_arch_options);
     let nostdinc_arg =
       if Kernel.FramaCStdLib.get() then add_if_gnu "-nostdinc"
       else []
@@ -555,7 +537,7 @@ let build_cpp_cmd = function
     in
     let supp_args =
       string_of_supp_args
-        (gnu_implicit_args @ supported_cpp_arch_args @
+        (gnu_implicit_args @
          extra_for_this_file @ (Kernel.CppExtraArgs.get ()))
         fc_include_args fc_define_args
     in
@@ -568,7 +550,7 @@ let build_cpp_cmd = function
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
       cpp_command_with_chdir;
-    Some (cpp_command_with_chdir, ppf, supported_cpp_arch_args)
+    Some (cpp_command_with_chdir, ppf)
 
 let abort_with_detailed_pp_message f cpp_command =
   let possible_cause =
@@ -606,7 +588,7 @@ let parse_cabs cpp_command = function
       Datatype.Filepath.pretty f;
     Frontc.parse f ()
   | NeedCPP (f, cmdl, _extra_for_this_file, is_gnu_like) ->
-    let cpp_command, ppf, logic_pp_args = Option.get cpp_command in
+    let cpp_command, ppf = Option.get cpp_command in
     Kernel.feedback "Parsing %a (with preprocessing)"
       Datatype.Filepath.pretty f;
     if Sys.command cpp_command <> 0 then begin
@@ -626,12 +608,9 @@ let parse_cabs cpp_command = function
                   "trying to preprocess annotation with an unknown \
                    preprocessor."; true))
       then begin
-        let supp_args =
-          Format.asprintf "%s" (concat_strs ~pre:" " ~sep:" " logic_pp_args)
-        in
         let ppf' =
           try Logic_preprocess.file ".c"
-                (replace_in_cpp_cmd cmdl supp_args)
+                (replace_in_cpp_cmd cmdl "")
                 (ppf : Filepath.Normalized.t :> string)
           with Sys_error _ as e ->
             safe_remove_file ppf;
@@ -1727,7 +1706,7 @@ let compute_sources_table cpp_commands =
     add_source_if_new all_sources_tbl (get_filepath file);
     match cmd_opt with
     | None -> ()
-    | Some (cpp_cmd, _ppf, _sl) ->
+    | Some (cpp_cmd, _ppf) ->
       let tmp_file = create_temp_file "audit_produce_sources" ".txt" in
       let tmp_file = (tmp_file :> string) in
       let cmd_for_sources = cpp_cmd ^ " -H -MM >/dev/null 2>" ^ tmp_file in
@@ -1800,7 +1779,7 @@ let check_source_hashes expected actual_table =
   end
 
 let print_and_exit cpp_commands =
-  let print_cpp_cmd (cpp_cmd, _ppf, _) =
+  let print_cpp_cmd (cpp_cmd, _ppf) =
     Kernel.result "Preprocessing command:@.%s" cpp_cmd
   in
   List.iter (fun (_f, ocmd) -> Option.iter print_cpp_cmd ocmd) cpp_commands;
