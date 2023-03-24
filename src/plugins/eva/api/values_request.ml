@@ -115,6 +115,13 @@ let probe_property = function
     Some (Ppred pred, Some ii_kf, Kstmt ii_stmt)
   | _ -> None
 
+let probe_term_lval kf kinstr tlval =
+  try
+    let result = Option.bind kf Library_functions.get_retres_vi in
+    let lval = Logic_to_c.term_lval_to_lval ?result tlval in
+    Some (Plval lval, kf, kinstr)
+  with Logic_to_c.No_conversion -> None
+
 let probe marker =
   let open Printer_tag in
   match marker with
@@ -123,6 +130,7 @@ let probe marker =
   | PExp (kf, kinstr, e) -> Some (Pexpr e, kf, kinstr)
   | PStmt (kf, s) | PStmtStart (kf, s) -> probe_stmt kf s
   | PVDecl (kf, kinstr, v) -> Some (Plval (Var v, NoOffset), kf, kinstr)
+  | PTermLval (kf, kinstr, _, tlval) -> probe_term_lval kf kinstr tlval
   | PIP property -> probe_property property
   | _ -> None
 
