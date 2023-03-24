@@ -36,7 +36,6 @@ module type InternalTable  = sig
   include Table
   val add : key -> value -> unit
   val iter : (key -> value -> unit) -> unit
-  (*  val clear : unit -> unit*)
 end
 
 
@@ -48,13 +47,11 @@ module Make_table(H: Hashtbl.S)(V: sig type t val size :int end) : InternalTable
   let find = H.find tbl
   let iter f =
     H.iter f tbl
-    (* let clear () = H.clear tbl*)
 end
 
 module A = struct type t = Abstract_state.t option let size = 7 end
 module R = struct type t = Abstract_state.summary option let size = 7 end
 
-(*module Stmt_table = Make_table(Cil_datatype.Stmt.Hashtbl)(A)*)
 module Function_table = Make_table(Kernel_function.Hashtbl)(R)
 
 let function_compute_ref = Extlib.mk_fun "function_compute"
@@ -108,7 +105,7 @@ let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t 
       | (Some a, Some lv) -> Some (Abstract_state.assignment_x_allocate_y a lv)
     end
   (* general case for calls *)
-  | Call(res,ef,es,(loc,_)) -> (* !function_compute_ref ef *)
+  | Call(res,ef,es,(loc,_)) ->
     begin
       let summary = match Kernel_function.get_called ef with
         | Some kf -> (try Function_table.find kf
@@ -278,7 +275,7 @@ let compute () =
 
 let clear () =
   computed_flag := false;
-  (*Stmt_table*)Stmt_table.clear()
+  Stmt_table.clear()
 
 let get_state_before_stmt _kf stmt =
   if is_computed ()
