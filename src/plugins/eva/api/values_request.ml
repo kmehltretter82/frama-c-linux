@@ -42,7 +42,13 @@ let package =
     ~title:"Eva Values"
     ()
 
+(* Term to evaluate. *)
 type term = Pexpr of exp | Plval of lval | Ppred of predicate
+
+(* A term and the program point where it should be evaluated:
+   - at a statement of a function: Some kf, Kstmt stmt.
+   - at the start of a function: Some kf, Kglobal.
+   - at the start of the analysis: None, Kglobal. *)
 type probe = term * kernel_function option * kinstr
 
 type callstack = Value_types.callstack
