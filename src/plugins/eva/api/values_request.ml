@@ -131,7 +131,8 @@ let probe_term_lval kf kinstr tlval =
 let probe marker =
   let open Printer_tag in
   match marker with
-  | PLval (_, _, (Var vi, NoOffset)) when Cil.isFunctionType vi.vtype -> None
+  | PLval (_, _, (Var vi, NoOffset))
+  | PVDecl (_, _, vi) when Cil.isFunctionType vi.vtype -> None
   | PLval (kf, kinstr, l) -> Some (Plval l, kf, kinstr)
   | PExp (kf, kinstr, e) -> Some (Pexpr e, kf, kinstr)
   | PStmt (kf, s) | PStmtStart (kf, s) -> probe_stmt kf s
