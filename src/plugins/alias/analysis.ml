@@ -210,20 +210,19 @@ let doFunction (kf:kernel_function) =
     | None -> Format.fprintf fmt "<Bot>"
     | Some a -> Abstract_state.pretty ~debug fmt a
   in
-  if Kernel_function.is_main kf then
+  if Kernel_function.is_main kf then begin
     (* if main, print the last abstract state *)
+    Options.feedback "May-aliases at the end of function main:@.%a@." (print_value ~debug:false) final_state;
+    Options.debug "May-alias graph at the end of function main:@.%a@." (print_value ~debug:true) final_state;
     let f_name = Options.Dot_output.get () in
-    if f_name = ""
+
+    if f_name <> ""
     then
-      Options.feedback "May-aliases at the end of function main:@.%a@." (print_value ~debug:false) final_state
-    else
-      Options.feedback "Abstract_state at the end of function main:@.%a@." (print_value ~debug:true) final_state;
       match final_state with
       | None  -> ()
       | Some final_state ->
-        begin
           Abstract_state.print_dot f_name final_state
-        end
+  end
   else
     (* if not main, do nothing *)
     let summary: Abstract_state.summary =
