@@ -325,9 +325,9 @@ let find_all_aliases (lv1: Lval.t) (x: t) : LSet.t =
     with
       Not_found -> (LSet.empty,o)
   in
-  Options.debug "decompose_lval %a : [@[<hov 2>" Lval.pp_debug lv1;
-  List.iter (fun (x, o) -> Options.debug " (%a,%a) " Lval.pp_debug x Offset.pretty o) list_of_lval_to_be_searched;
-  Options.debug "@]]@.";
+  Options.debug ~level:5 "decompose_lval %a : [@[<hov 2>" Lval.pp_debug lv1;
+  List.iter (fun (x, o) -> Options.debug ~level:5 " (%a,%a) " Lval.pp_debug x Offset.pretty o) list_of_lval_to_be_searched;
+  Options.debug ~level:5 "@]]@.";
   let list_of_aliases : (LSet.t*offset) list =
     List.map f_map list_of_lval_to_be_searched
   in
@@ -353,7 +353,7 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   (* find all the alias of lv (because of offset) *)
   let set_of_aliases : LSet.t = find_all_aliases lv x in
   (* add all these aliases *)
-  Options.debug "all_aliases of %a : %a @." Lval.pp_debug lv LSet.pp_debug set_of_aliases;
+  Options.debug ~level:5 "all_aliases of %a : %a @." Lval.pp_debug lv LSet.pp_debug set_of_aliases;
   let new_lmap =
     LSet.fold
       (fun lv acc -> assert (not (LLMap.mem lv x.lmap)); LLMap.add lv new_v acc)
@@ -411,7 +411,7 @@ let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
    in the graph. If it is present, there will be bugs *)
 let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
   assert (not (LLMap.mem blv x.lmap));
-  Options.debug "creating a vertex for %a@." Lval.pp_debug blv;
+  Options.debug ~level:4 "creating a vertex for %a@." Lval.pp_debug blv;
   match blv with
     BNone -> Options.fatal "this should not happen"
   | BLval lv ->
@@ -485,7 +485,7 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
           map_predecessors
           VSet.empty
       in
-      Options.debug "found aliases of %a : %a@." Lval.pp_debug lv VSet.pretty vset_res;
+      Options.debug ~level:5 "found aliases of %a : %a@." Lval.pp_debug lv VSet.pretty vset_res;
       if VSet.is_empty vset_res
       then create_vertex_lval lv x
       else

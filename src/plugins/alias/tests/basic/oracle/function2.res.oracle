@@ -1,7 +1,5 @@
 [kernel] Parsing function2.c (with preprocessing)
-[alias] Parsing done
 [alias] May-aliases at the end of function main:
-[alias] Functions done
 Before statement int *res = (int *)0; :
  
 Before statement int *res = (int *)0; :
@@ -22,4 +20,3 @@ Before statement __retres = 0; :
  
 Before statement return __retres; :
  
-[alias] Analysis complete

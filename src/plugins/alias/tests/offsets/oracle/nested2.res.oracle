@@ -1,5 +1,4 @@
 [kernel] Parsing nested2.c (with preprocessing)
-[alias] Parsing done
 [alias] Skipping st_2_t *z1 = malloc(sizeof(st_2_t)); (doInstr not implemented)
 [alias] Skipping st_3_t *t = malloc(sizeof(st_3_t)); (doInstr not implemented)
 [alias] Skipping int *a = malloc(sizeof(int)); (doInstr not implemented)
@@ -8,7 +7,6 @@
   {z1->s[0], &x2} are aliased
   {t->t, z1} are aliased
   {z1->c, t->d, a} are aliased
-[alias] Functions done
 Before statement st_1_t x1 = {.a = 0, .b = 1}; :
  
 Before statement st_1_t x2 = {.a = 2, .b = 3}; :
@@ -53,4 +51,3 @@ Before statement return __retres; :
 {t->t, z1} are aliased
 {z1->c, t->d, a} are aliased
 
-[alias] Analysis complete

@@ -257,9 +257,9 @@ let is_computed () = !computed_flag
 
 let compute () =
   Ast.compute();
-  Options.feedback "Parsing done";
+  Options.debug "Parsing done";
   Globals.Functions.iter doFunction;
-  Options.feedback "Functions done";
+  Options.debug "Functions done";
   computed_flag := true;
   let print_stmt_table_elt fmt k v :unit =
     let print_key = Stmt.pretty in
