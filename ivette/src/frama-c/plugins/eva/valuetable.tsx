@@ -218,9 +218,10 @@ interface StmtProps {
 
 function Stmt(props: StmtProps): JSX.Element | null {
   const { stmt, marker, short } = props;
-  const { descr, sloc: { base, line } } = States.useMarker(marker);
+  const { descr, sloc } = States.useMarker(marker);
   if (!stmt || !marker) return null;
-  const label = short ? `@L${line}` : `@${base}:${line}`;
+  // Location sloc should always be defined for statements.
+  const label = short ? `@L${sloc?.line}` : `@${sloc?.base}:${sloc?.line}`;
   const className = 'dome-text-cell eva-stmt';
   return <span className={className} title={descr}>{label}</span>;
 }
