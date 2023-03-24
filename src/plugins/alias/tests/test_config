@@ -1,2 +1,2 @@
 PLUGIN: alias
-OPT: -alias -alias-show-stmt-table
+OPT: -alias -alias-verbose 3
