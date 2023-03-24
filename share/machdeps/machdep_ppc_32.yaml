@@ -16,7 +16,1027 @@ cpp_arch_flags:
 - -target
 - powerpc-apple-linux
 - -mcpu=603
-custom_defs: ''
+custom_defs: |
+    #undef _ARCH_603
+    #define _ARCH_603 1
+    #undef _ARCH_PPC
+    #define _ARCH_PPC 1
+    #undef _ARCH_PPCGR
+    #define _ARCH_PPCGR 1
+    #undef _BIG_ENDIAN
+    #define _BIG_ENDIAN 1
+    #undef _ILP32
+    #define _ILP32 1
+    #undef __ATOMIC_ACQUIRE
+    #define __ATOMIC_ACQUIRE 2
+    #undef __ATOMIC_ACQ_REL
+    #define __ATOMIC_ACQ_REL 4
+    #undef __ATOMIC_CONSUME
+    #define __ATOMIC_CONSUME 1
+    #undef __ATOMIC_RELAXED
+    #define __ATOMIC_RELAXED 0
+    #undef __ATOMIC_RELEASE
+    #define __ATOMIC_RELEASE 3
+    #undef __ATOMIC_SEQ_CST
+    #define __ATOMIC_SEQ_CST 5
+    #undef __BIGGEST_ALIGNMENT__
+    #define __BIGGEST_ALIGNMENT__ 16
+    #undef __BIG_ENDIAN__
+    #define __BIG_ENDIAN__ 1
+    #undef __BITINT_MAXWIDTH__
+    #define __BITINT_MAXWIDTH__ 128
+    #undef __BOOL_WIDTH__
+    #define __BOOL_WIDTH__ 8
+    #undef __BYTE_ORDER__
+    #define __BYTE_ORDER__ __ORDER_BIG_ENDIAN__
+    #undef __CHAR16_TYPE__
+    #define __CHAR16_TYPE__ unsigned short
+    #undef __CHAR32_TYPE__
+    #define __CHAR32_TYPE__ unsigned int
+    #undef __CHAR_BIT__
+    #define __CHAR_BIT__ 8
+    #undef __CHAR_UNSIGNED__
+    #define __CHAR_UNSIGNED__ 1
+    #undef __CLANG_ATOMIC_BOOL_LOCK_FREE
+    #define __CLANG_ATOMIC_BOOL_LOCK_FREE 2
+    #undef __CLANG_ATOMIC_CHAR16_T_LOCK_FREE
+    #define __CLANG_ATOMIC_CHAR16_T_LOCK_FREE 2
+    #undef __CLANG_ATOMIC_CHAR32_T_LOCK_FREE
+    #define __CLANG_ATOMIC_CHAR32_T_LOCK_FREE 2
+    #undef __CLANG_ATOMIC_CHAR_LOCK_FREE
+    #define __CLANG_ATOMIC_CHAR_LOCK_FREE 2
+    #undef __CLANG_ATOMIC_INT_LOCK_FREE
+    #define __CLANG_ATOMIC_INT_LOCK_FREE 2
+    #undef __CLANG_ATOMIC_LLONG_LOCK_FREE
+    #define __CLANG_ATOMIC_LLONG_LOCK_FREE 1
+    #undef __CLANG_ATOMIC_LONG_LOCK_FREE
+    #define __CLANG_ATOMIC_LONG_LOCK_FREE 2
+    #undef __CLANG_ATOMIC_POINTER_LOCK_FREE
+    #define __CLANG_ATOMIC_POINTER_LOCK_FREE 2
+    #undef __CLANG_ATOMIC_SHORT_LOCK_FREE
+    #define __CLANG_ATOMIC_SHORT_LOCK_FREE 2
+    #undef __CLANG_ATOMIC_WCHAR_T_LOCK_FREE
+    #define __CLANG_ATOMIC_WCHAR_T_LOCK_FREE 2
+    #undef __CONSTANT_CFSTRINGS__
+    #define __CONSTANT_CFSTRINGS__ 1
+    #undef __DBL_DECIMAL_DIG__
+    #define __DBL_DECIMAL_DIG__ 17
+    #undef __DBL_DENORM_MIN__
+    #define __DBL_DENORM_MIN__ 4.9406564584124654e-324
+    #undef __DBL_DIG__
+    #define __DBL_DIG__ 15
+    #undef __DBL_EPSILON__
+    #define __DBL_EPSILON__ 2.2204460492503131e-16
+    #undef __DBL_HAS_DENORM__
+    #define __DBL_HAS_DENORM__ 1
+    #undef __DBL_HAS_INFINITY__
+    #define __DBL_HAS_INFINITY__ 1
+    #undef __DBL_HAS_QUIET_NAN__
+    #define __DBL_HAS_QUIET_NAN__ 1
+    #undef __DBL_MANT_DIG__
+    #define __DBL_MANT_DIG__ 53
+    #undef __DBL_MAX_10_EXP__
+    #define __DBL_MAX_10_EXP__ 308
+    #undef __DBL_MAX_EXP__
+    #define __DBL_MAX_EXP__ 1024
+    #undef __DBL_MAX__
+    #define __DBL_MAX__ 1.7976931348623157e+308
+    #undef __DBL_MIN_10_EXP__
+    #define __DBL_MIN_10_EXP__ (-307)
+    #undef __DBL_MIN_EXP__
+    #define __DBL_MIN_EXP__ (-1021)
+    #undef __DBL_MIN__
+    #define __DBL_MIN__ 2.2250738585072014e-308
+    #undef __DECIMAL_DIG__
+    #define __DECIMAL_DIG__ __LDBL_DECIMAL_DIG__
+    #undef __ELF__
+    #define __ELF__ 1
+    #undef __FINITE_MATH_ONLY__
+    #define __FINITE_MATH_ONLY__ 0
+    #undef __FLT_DECIMAL_DIG__
+    #define __FLT_DECIMAL_DIG__ 9
+    #undef __FLT_DENORM_MIN__
+    #define __FLT_DENORM_MIN__ 1.40129846e-45F
+    #undef __FLT_DIG__
+    #define __FLT_DIG__ 6
+    #undef __FLT_EPSILON__
+    #define __FLT_EPSILON__ 1.19209290e-7F
+    #undef __FLT_HAS_DENORM__
+    #define __FLT_HAS_DENORM__ 1
+    #undef __FLT_HAS_INFINITY__
+    #define __FLT_HAS_INFINITY__ 1
+    #undef __FLT_HAS_QUIET_NAN__
+    #define __FLT_HAS_QUIET_NAN__ 1
+    #undef __FLT_MANT_DIG__
+    #define __FLT_MANT_DIG__ 24
+    #undef __FLT_MAX_10_EXP__
+    #define __FLT_MAX_10_EXP__ 38
+    #undef __FLT_MAX_EXP__
+    #define __FLT_MAX_EXP__ 128
+    #undef __FLT_MAX__
+    #define __FLT_MAX__ 3.40282347e+38F
+    #undef __FLT_MIN_10_EXP__
+    #define __FLT_MIN_10_EXP__ (-37)
+    #undef __FLT_MIN_EXP__
+    #define __FLT_MIN_EXP__ (-125)
+    #undef __FLT_MIN__
+    #define __FLT_MIN__ 1.17549435e-38F
+    #undef __FLT_RADIX__
+    #define __FLT_RADIX__ 2
+    #undef __GCC_ATOMIC_BOOL_LOCK_FREE
+    #define __GCC_ATOMIC_BOOL_LOCK_FREE 2
+    #undef __GCC_ATOMIC_CHAR16_T_LOCK_FREE
+    #define __GCC_ATOMIC_CHAR16_T_LOCK_FREE 2
+    #undef __GCC_ATOMIC_CHAR32_T_LOCK_FREE
+    #define __GCC_ATOMIC_CHAR32_T_LOCK_FREE 2
+    #undef __GCC_ATOMIC_CHAR_LOCK_FREE
+    #define __GCC_ATOMIC_CHAR_LOCK_FREE 2
+    #undef __GCC_ATOMIC_INT_LOCK_FREE
+    #define __GCC_ATOMIC_INT_LOCK_FREE 2
+    #undef __GCC_ATOMIC_LLONG_LOCK_FREE
+    #define __GCC_ATOMIC_LLONG_LOCK_FREE 1
+    #undef __GCC_ATOMIC_LONG_LOCK_FREE
+    #define __GCC_ATOMIC_LONG_LOCK_FREE 2
+    #undef __GCC_ATOMIC_POINTER_LOCK_FREE
+    #define __GCC_ATOMIC_POINTER_LOCK_FREE 2
+    #undef __GCC_ATOMIC_SHORT_LOCK_FREE
+    #define __GCC_ATOMIC_SHORT_LOCK_FREE 2
+    #undef __GCC_ATOMIC_TEST_AND_SET_TRUEVAL
+    #define __GCC_ATOMIC_TEST_AND_SET_TRUEVAL 1
+    #undef __GCC_ATOMIC_WCHAR_T_LOCK_FREE
+    #define __GCC_ATOMIC_WCHAR_T_LOCK_FREE 2
+    #undef __GCC_HAVE_DWARF2_CFI_ASM
+    #define __GCC_HAVE_DWARF2_CFI_ASM 1
+    #undef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_1
+    #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_1 1
+    #undef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2
+    #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2 1
+    #undef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
+    #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4 1
+    #undef __GNUC_MINOR__
+    #define __GNUC_MINOR__ 2
+    #undef __GNUC_PATCHLEVEL__
+    #define __GNUC_PATCHLEVEL__ 1
+    #undef __GNUC_STDC_INLINE__
+    #define __GNUC_STDC_INLINE__ 1
+    #undef __GNUC__
+    #define __GNUC__ 4
+    #undef __GXX_ABI_VERSION
+    #define __GXX_ABI_VERSION 1002
+    #undef __HAVE_BSWAP__
+    #define __HAVE_BSWAP__ 1
+    #undef __ILP32__
+    #define __ILP32__ 1
+    #undef __INT16_C_SUFFIX__
+    #define __INT16_C_SUFFIX__
+    #undef __INT16_FMTd__
+    #define __INT16_FMTd__ "hd"
+    #undef __INT16_FMTi__
+    #define __INT16_FMTi__ "hi"
+    #undef __INT16_MAX__
+    #define __INT16_MAX__ 32767
+    #undef __INT16_TYPE__
+    #define __INT16_TYPE__ short
+    #undef __INT32_C_SUFFIX__
+    #define __INT32_C_SUFFIX__
+    #undef __INT32_FMTd__
+    #define __INT32_FMTd__ "d"
+    #undef __INT32_FMTi__
+    #define __INT32_FMTi__ "i"
+    #undef __INT32_MAX__
+    #define __INT32_MAX__ 2147483647
+    #undef __INT32_TYPE__
+    #define __INT32_TYPE__ int
+    #undef __INT64_C_SUFFIX__
+    #define __INT64_C_SUFFIX__ LL
+    #undef __INT64_FMTd__
+    #define __INT64_FMTd__ "lld"
+    #undef __INT64_FMTi__
+    #define __INT64_FMTi__ "lli"
+    #undef __INT64_MAX__
+    #define __INT64_MAX__ 9223372036854775807LL
+    #undef __INT64_TYPE__
+    #define __INT64_TYPE__ long long int
+    #undef __INT8_C_SUFFIX__
+    #define __INT8_C_SUFFIX__
+    #undef __INT8_FMTd__
+    #define __INT8_FMTd__ "hhd"
+    #undef __INT8_FMTi__
+    #define __INT8_FMTi__ "hhi"
+    #undef __INT8_MAX__
+    #define __INT8_MAX__ 127
+    #undef __INT8_TYPE__
+    #define __INT8_TYPE__ signed char
+    #undef __INTMAX_C_SUFFIX__
+    #define __INTMAX_C_SUFFIX__ LL
+    #undef __INTMAX_FMTd__
+    #define __INTMAX_FMTd__ "lld"
+    #undef __INTMAX_FMTi__
+    #define __INTMAX_FMTi__ "lli"
+    #undef __INTMAX_MAX__
+    #define __INTMAX_MAX__ 9223372036854775807LL
+    #undef __INTMAX_TYPE__
+    #define __INTMAX_TYPE__ long long int
+    #undef __INTMAX_WIDTH__
+    #define __INTMAX_WIDTH__ 64
+    #undef __INTPTR_FMTd__
+    #define __INTPTR_FMTd__ "d"
+    #undef __INTPTR_FMTi__
+    #define __INTPTR_FMTi__ "i"
+    #undef __INTPTR_MAX__
+    #define __INTPTR_MAX__ 2147483647
+    #undef __INTPTR_TYPE__
+    #define __INTPTR_TYPE__ int
+    #undef __INTPTR_WIDTH__
+    #define __INTPTR_WIDTH__ 32
+    #undef __INT_FAST16_FMTd__
+    #define __INT_FAST16_FMTd__ "hd"
+    #undef __INT_FAST16_FMTi__
+    #define __INT_FAST16_FMTi__ "hi"
+    #undef __INT_FAST16_MAX__
+    #define __INT_FAST16_MAX__ 32767
+    #undef __INT_FAST16_TYPE__
+    #define __INT_FAST16_TYPE__ short
+    #undef __INT_FAST16_WIDTH__
+    #define __INT_FAST16_WIDTH__ 16
+    #undef __INT_FAST32_FMTd__
+    #define __INT_FAST32_FMTd__ "d"
+    #undef __INT_FAST32_FMTi__
+    #define __INT_FAST32_FMTi__ "i"
+    #undef __INT_FAST32_MAX__
+    #define __INT_FAST32_MAX__ 2147483647
+    #undef __INT_FAST32_TYPE__
+    #define __INT_FAST32_TYPE__ int
+    #undef __INT_FAST32_WIDTH__
+    #define __INT_FAST32_WIDTH__ 32
+    #undef __INT_FAST64_FMTd__
+    #define __INT_FAST64_FMTd__ "lld"
+    #undef __INT_FAST64_FMTi__
+    #define __INT_FAST64_FMTi__ "lli"
+    #undef __INT_FAST64_MAX__
+    #define __INT_FAST64_MAX__ 9223372036854775807LL
+    #undef __INT_FAST64_TYPE__
+    #define __INT_FAST64_TYPE__ long long int
+    #undef __INT_FAST64_WIDTH__
+    #define __INT_FAST64_WIDTH__ 64
+    #undef __INT_FAST8_FMTd__
+    #define __INT_FAST8_FMTd__ "hhd"
+    #undef __INT_FAST8_FMTi__
+    #define __INT_FAST8_FMTi__ "hhi"
+    #undef __INT_FAST8_MAX__
+    #define __INT_FAST8_MAX__ 127
+    #undef __INT_FAST8_TYPE__
+    #define __INT_FAST8_TYPE__ signed char
+    #undef __INT_FAST8_WIDTH__
+    #define __INT_FAST8_WIDTH__ 8
+    #undef __INT_LEAST16_FMTd__
+    #define __INT_LEAST16_FMTd__ "hd"
+    #undef __INT_LEAST16_FMTi__
+    #define __INT_LEAST16_FMTi__ "hi"
+    #undef __INT_LEAST16_MAX__
+    #define __INT_LEAST16_MAX__ 32767
+    #undef __INT_LEAST16_TYPE__
+    #define __INT_LEAST16_TYPE__ short
+    #undef __INT_LEAST16_WIDTH__
+    #define __INT_LEAST16_WIDTH__ 16
+    #undef __INT_LEAST32_FMTd__
+    #define __INT_LEAST32_FMTd__ "d"
+    #undef __INT_LEAST32_FMTi__
+    #define __INT_LEAST32_FMTi__ "i"
+    #undef __INT_LEAST32_MAX__
+    #define __INT_LEAST32_MAX__ 2147483647
+    #undef __INT_LEAST32_TYPE__
+    #define __INT_LEAST32_TYPE__ int
+    #undef __INT_LEAST32_WIDTH__
+    #define __INT_LEAST32_WIDTH__ 32
+    #undef __INT_LEAST64_FMTd__
+    #define __INT_LEAST64_FMTd__ "lld"
+    #undef __INT_LEAST64_FMTi__
+    #define __INT_LEAST64_FMTi__ "lli"
+    #undef __INT_LEAST64_MAX__
+    #define __INT_LEAST64_MAX__ 9223372036854775807LL
+    #undef __INT_LEAST64_TYPE__
+    #define __INT_LEAST64_TYPE__ long long int
+    #undef __INT_LEAST64_WIDTH__
+    #define __INT_LEAST64_WIDTH__ 64
+    #undef __INT_LEAST8_FMTd__
+    #define __INT_LEAST8_FMTd__ "hhd"
+    #undef __INT_LEAST8_FMTi__
+    #define __INT_LEAST8_FMTi__ "hhi"
+    #undef __INT_LEAST8_MAX__
+    #define __INT_LEAST8_MAX__ 127
+    #undef __INT_LEAST8_TYPE__
+    #define __INT_LEAST8_TYPE__ signed char
+    #undef __INT_LEAST8_WIDTH__
+    #define __INT_LEAST8_WIDTH__ 8
+    #undef __INT_MAX__
+    #define __INT_MAX__ 2147483647
+    #undef __INT_WIDTH__
+    #define __INT_WIDTH__ 32
+    #undef __LDBL_DECIMAL_DIG__
+    #define __LDBL_DECIMAL_DIG__ 33
+    #undef __LDBL_DENORM_MIN__
+    #define __LDBL_DENORM_MIN__ 4.94065645841246544176568792868221e-324L
+    #undef __LDBL_DIG__
+    #define __LDBL_DIG__ 31
+    #undef __LDBL_EPSILON__
+    #define __LDBL_EPSILON__ 4.94065645841246544176568792868221e-324L
+    #undef __LDBL_HAS_DENORM__
+    #define __LDBL_HAS_DENORM__ 1
+    #undef __LDBL_HAS_INFINITY__
+    #define __LDBL_HAS_INFINITY__ 1
+    #undef __LDBL_HAS_QUIET_NAN__
+    #define __LDBL_HAS_QUIET_NAN__ 1
+    #undef __LDBL_MANT_DIG__
+    #define __LDBL_MANT_DIG__ 106
+    #undef __LDBL_MAX_10_EXP__
+    #define __LDBL_MAX_10_EXP__ 308
+    #undef __LDBL_MAX_EXP__
+    #define __LDBL_MAX_EXP__ 1024
+    #undef __LDBL_MAX__
+    #define __LDBL_MAX__ 1.79769313486231580793728971405301e+308L
+    #undef __LDBL_MIN_10_EXP__
+    #define __LDBL_MIN_10_EXP__ (-291)
+    #undef __LDBL_MIN_EXP__
+    #define __LDBL_MIN_EXP__ (-968)
+    #undef __LDBL_MIN__
+    #define __LDBL_MIN__ 2.00416836000897277799610805135016e-292L
+    #undef __LLONG_WIDTH__
+    #define __LLONG_WIDTH__ 64
+    #undef __LONGDOUBLE128
+    #define __LONGDOUBLE128 1
+    #undef __LONG_DOUBLE_128__
+    #define __LONG_DOUBLE_128__ 1
+    #undef __LONG_DOUBLE_IBM128__
+    #define __LONG_DOUBLE_IBM128__ 1
+    #undef __LONG_LONG_MAX__
+    #define __LONG_LONG_MAX__ 9223372036854775807LL
+    #undef __LONG_MAX__
+    #define __LONG_MAX__ 2147483647L
+    #undef __LONG_WIDTH__
+    #define __LONG_WIDTH__ 32
+    #undef __NATURAL_ALIGNMENT__
+    #define __NATURAL_ALIGNMENT__ 1
+    #undef __NO_INLINE__
+    #define __NO_INLINE__ 1
+    #undef __OBJC_BOOL_IS_BOOL
+    #define __OBJC_BOOL_IS_BOOL 0
+    #undef __OPENCL_MEMORY_SCOPE_ALL_SVM_DEVICES
+    #define __OPENCL_MEMORY_SCOPE_ALL_SVM_DEVICES 3
+    #undef __OPENCL_MEMORY_SCOPE_DEVICE
+    #define __OPENCL_MEMORY_SCOPE_DEVICE 2
+    #undef __OPENCL_MEMORY_SCOPE_SUB_GROUP
+    #define __OPENCL_MEMORY_SCOPE_SUB_GROUP 4
+    #undef __OPENCL_MEMORY_SCOPE_WORK_GROUP
+    #define __OPENCL_MEMORY_SCOPE_WORK_GROUP 1
+    #undef __OPENCL_MEMORY_SCOPE_WORK_ITEM
+    #define __OPENCL_MEMORY_SCOPE_WORK_ITEM 0
+    #undef __ORDER_BIG_ENDIAN__
+    #define __ORDER_BIG_ENDIAN__ 4321
+    #undef __ORDER_LITTLE_ENDIAN__
+    #define __ORDER_LITTLE_ENDIAN__ 1234
+    #undef __ORDER_PDP_ENDIAN__
+    #define __ORDER_PDP_ENDIAN__ 3412
+    #undef __PIC__
+    #define __PIC__ 2
+    #undef __PIE__
+    #define __PIE__ 2
+    #undef __POINTER_WIDTH__
+    #define __POINTER_WIDTH__ 32
+    #undef __POWERPC__
+    #define __POWERPC__ 1
+    #undef __PPC__
+    #define __PPC__ 1
+    #undef __PRAGMA_REDEFINE_EXTNAME
+    #define __PRAGMA_REDEFINE_EXTNAME 1
+    #undef __PTRDIFF_FMTd__
+    #define __PTRDIFF_FMTd__ "d"
+    #undef __PTRDIFF_FMTi__
+    #define __PTRDIFF_FMTi__ "i"
+    #undef __PTRDIFF_MAX__
+    #define __PTRDIFF_MAX__ 2147483647
+    #undef __PTRDIFF_TYPE__
+    #define __PTRDIFF_TYPE__ int
+    #undef __PTRDIFF_WIDTH__
+    #define __PTRDIFF_WIDTH__ 32
+    #undef __REGISTER_PREFIX__
+    #define __REGISTER_PREFIX__
+    #undef __SCHAR_MAX__
+    #define __SCHAR_MAX__ 127
+    #undef __SHRT_MAX__
+    #define __SHRT_MAX__ 32767
+    #undef __SHRT_WIDTH__
+    #define __SHRT_WIDTH__ 16
+    #undef __SIG_ATOMIC_MAX__
+    #define __SIG_ATOMIC_MAX__ 2147483647
+    #undef __SIG_ATOMIC_WIDTH__
+    #define __SIG_ATOMIC_WIDTH__ 32
+    #undef __SIZEOF_DOUBLE__
+    #define __SIZEOF_DOUBLE__ 8
+    #undef __SIZEOF_FLOAT__
+    #define __SIZEOF_FLOAT__ 4
+    #undef __SIZEOF_INT__
+    #define __SIZEOF_INT__ 4
+    #undef __SIZEOF_LONG_DOUBLE__
+    #define __SIZEOF_LONG_DOUBLE__ 16
+    #undef __SIZEOF_LONG_LONG__
+    #define __SIZEOF_LONG_LONG__ 8
+    #undef __SIZEOF_LONG__
+    #define __SIZEOF_LONG__ 4
+    #undef __SIZEOF_POINTER__
+    #define __SIZEOF_POINTER__ 4
+    #undef __SIZEOF_PTRDIFF_T__
+    #define __SIZEOF_PTRDIFF_T__ 4
+    #undef __SIZEOF_SHORT__
+    #define __SIZEOF_SHORT__ 2
+    #undef __SIZEOF_SIZE_T__
+    #define __SIZEOF_SIZE_T__ 4
+    #undef __SIZEOF_WCHAR_T__
+    #define __SIZEOF_WCHAR_T__ 4
+    #undef __SIZEOF_WINT_T__
+    #define __SIZEOF_WINT_T__ 4
+    #undef __SIZE_FMTX__
+    #define __SIZE_FMTX__ "X"
+    #undef __SIZE_FMTo__
+    #define __SIZE_FMTo__ "o"
+    #undef __SIZE_FMTu__
+    #define __SIZE_FMTu__ "u"
+    #undef __SIZE_FMTx__
+    #define __SIZE_FMTx__ "x"
+    #undef __SIZE_MAX__
+    #define __SIZE_MAX__ 4294967295U
+    #undef __SIZE_TYPE__
+    #define __SIZE_TYPE__ unsigned int
+    #undef __SIZE_WIDTH__
+    #define __SIZE_WIDTH__ 32
+    #undef __SSP_STRONG__
+    #define __SSP_STRONG__ 2
+    #undef __UINT16_C_SUFFIX__
+    #define __UINT16_C_SUFFIX__
+    #undef __UINT16_FMTX__
+    #define __UINT16_FMTX__ "hX"
+    #undef __UINT16_FMTo__
+    #define __UINT16_FMTo__ "ho"
+    #undef __UINT16_FMTu__
+    #define __UINT16_FMTu__ "hu"
+    #undef __UINT16_FMTx__
+    #define __UINT16_FMTx__ "hx"
+    #undef __UINT16_MAX__
+    #define __UINT16_MAX__ 65535
+    #undef __UINT16_TYPE__
+    #define __UINT16_TYPE__ unsigned short
+    #undef __UINT32_C_SUFFIX__
+    #define __UINT32_C_SUFFIX__ U
+    #undef __UINT32_FMTX__
+    #define __UINT32_FMTX__ "X"
+    #undef __UINT32_FMTo__
+    #define __UINT32_FMTo__ "o"
+    #undef __UINT32_FMTu__
+    #define __UINT32_FMTu__ "u"
+    #undef __UINT32_FMTx__
+    #define __UINT32_FMTx__ "x"
+    #undef __UINT32_MAX__
+    #define __UINT32_MAX__ 4294967295U
+    #undef __UINT32_TYPE__
+    #define __UINT32_TYPE__ unsigned int
+    #undef __UINT64_C_SUFFIX__
+    #define __UINT64_C_SUFFIX__ ULL
+    #undef __UINT64_FMTX__
+    #define __UINT64_FMTX__ "llX"
+    #undef __UINT64_FMTo__
+    #define __UINT64_FMTo__ "llo"
+    #undef __UINT64_FMTu__
+    #define __UINT64_FMTu__ "llu"
+    #undef __UINT64_FMTx__
+    #define __UINT64_FMTx__ "llx"
+    #undef __UINT64_MAX__
+    #define __UINT64_MAX__ 18446744073709551615ULL
+    #undef __UINT64_TYPE__
+    #define __UINT64_TYPE__ long long unsigned int
+    #undef __UINT8_C_SUFFIX__
+    #define __UINT8_C_SUFFIX__
+    #undef __UINT8_FMTX__
+    #define __UINT8_FMTX__ "hhX"
+    #undef __UINT8_FMTo__
+    #define __UINT8_FMTo__ "hho"
+    #undef __UINT8_FMTu__
+    #define __UINT8_FMTu__ "hhu"
+    #undef __UINT8_FMTx__
+    #define __UINT8_FMTx__ "hhx"
+    #undef __UINT8_MAX__
+    #define __UINT8_MAX__ 255
+    #undef __UINT8_TYPE__
+    #define __UINT8_TYPE__ unsigned char
+    #undef __UINTMAX_C_SUFFIX__
+    #define __UINTMAX_C_SUFFIX__ ULL
+    #undef __UINTMAX_FMTX__
+    #define __UINTMAX_FMTX__ "llX"
+    #undef __UINTMAX_FMTo__
+    #define __UINTMAX_FMTo__ "llo"
+    #undef __UINTMAX_FMTu__
+    #define __UINTMAX_FMTu__ "llu"
+    #undef __UINTMAX_FMTx__
+    #define __UINTMAX_FMTx__ "llx"
+    #undef __UINTMAX_MAX__
+    #define __UINTMAX_MAX__ 18446744073709551615ULL
+    #undef __UINTMAX_TYPE__
+    #define __UINTMAX_TYPE__ long long unsigned int
+    #undef __UINTMAX_WIDTH__
+    #define __UINTMAX_WIDTH__ 64
+    #undef __UINTPTR_FMTX__
+    #define __UINTPTR_FMTX__ "X"
+    #undef __UINTPTR_FMTo__
+    #define __UINTPTR_FMTo__ "o"
+    #undef __UINTPTR_FMTu__
+    #define __UINTPTR_FMTu__ "u"
+    #undef __UINTPTR_FMTx__
+    #define __UINTPTR_FMTx__ "x"
+    #undef __UINTPTR_MAX__
+    #define __UINTPTR_MAX__ 4294967295U
+    #undef __UINTPTR_TYPE__
+    #define __UINTPTR_TYPE__ unsigned int
+    #undef __UINTPTR_WIDTH__
+    #define __UINTPTR_WIDTH__ 32
+    #undef __UINT_FAST16_FMTX__
+    #define __UINT_FAST16_FMTX__ "hX"
+    #undef __UINT_FAST16_FMTo__
+    #define __UINT_FAST16_FMTo__ "ho"
+    #undef __UINT_FAST16_FMTu__
+    #define __UINT_FAST16_FMTu__ "hu"
+    #undef __UINT_FAST16_FMTx__
+    #define __UINT_FAST16_FMTx__ "hx"
+    #undef __UINT_FAST16_MAX__
+    #define __UINT_FAST16_MAX__ 65535
+    #undef __UINT_FAST16_TYPE__
+    #define __UINT_FAST16_TYPE__ unsigned short
+    #undef __UINT_FAST32_FMTX__
+    #define __UINT_FAST32_FMTX__ "X"
+    #undef __UINT_FAST32_FMTo__
+    #define __UINT_FAST32_FMTo__ "o"
+    #undef __UINT_FAST32_FMTu__
+    #define __UINT_FAST32_FMTu__ "u"
+    #undef __UINT_FAST32_FMTx__
+    #define __UINT_FAST32_FMTx__ "x"
+    #undef __UINT_FAST32_MAX__
+    #define __UINT_FAST32_MAX__ 4294967295U
+    #undef __UINT_FAST32_TYPE__
+    #define __UINT_FAST32_TYPE__ unsigned int
+    #undef __UINT_FAST64_FMTX__
+    #define __UINT_FAST64_FMTX__ "llX"
+    #undef __UINT_FAST64_FMTo__
+    #define __UINT_FAST64_FMTo__ "llo"
+    #undef __UINT_FAST64_FMTu__
+    #define __UINT_FAST64_FMTu__ "llu"
+    #undef __UINT_FAST64_FMTx__
+    #define __UINT_FAST64_FMTx__ "llx"
+    #undef __UINT_FAST64_MAX__
+    #define __UINT_FAST64_MAX__ 18446744073709551615ULL
+    #undef __UINT_FAST64_TYPE__
+    #define __UINT_FAST64_TYPE__ long long unsigned int
+    #undef __UINT_FAST8_FMTX__
+    #define __UINT_FAST8_FMTX__ "hhX"
+    #undef __UINT_FAST8_FMTo__
+    #define __UINT_FAST8_FMTo__ "hho"
+    #undef __UINT_FAST8_FMTu__
+    #define __UINT_FAST8_FMTu__ "hhu"
+    #undef __UINT_FAST8_FMTx__
+    #define __UINT_FAST8_FMTx__ "hhx"
+    #undef __UINT_FAST8_MAX__
+    #define __UINT_FAST8_MAX__ 255
+    #undef __UINT_FAST8_TYPE__
+    #define __UINT_FAST8_TYPE__ unsigned char
+    #undef __UINT_LEAST16_FMTX__
+    #define __UINT_LEAST16_FMTX__ "hX"
+    #undef __UINT_LEAST16_FMTo__
+    #define __UINT_LEAST16_FMTo__ "ho"
+    #undef __UINT_LEAST16_FMTu__
+    #define __UINT_LEAST16_FMTu__ "hu"
+    #undef __UINT_LEAST16_FMTx__
+    #define __UINT_LEAST16_FMTx__ "hx"
+    #undef __UINT_LEAST16_MAX__
+    #define __UINT_LEAST16_MAX__ 65535
+    #undef __UINT_LEAST16_TYPE__
+    #define __UINT_LEAST16_TYPE__ unsigned short
+    #undef __UINT_LEAST32_FMTX__
+    #define __UINT_LEAST32_FMTX__ "X"
+    #undef __UINT_LEAST32_FMTo__
+    #define __UINT_LEAST32_FMTo__ "o"
+    #undef __UINT_LEAST32_FMTu__
+    #define __UINT_LEAST32_FMTu__ "u"
+    #undef __UINT_LEAST32_FMTx__
+    #define __UINT_LEAST32_FMTx__ "x"
+    #undef __UINT_LEAST32_MAX__
+    #define __UINT_LEAST32_MAX__ 4294967295U
+    #undef __UINT_LEAST32_TYPE__
+    #define __UINT_LEAST32_TYPE__ unsigned int
+    #undef __UINT_LEAST64_FMTX__
+    #define __UINT_LEAST64_FMTX__ "llX"
+    #undef __UINT_LEAST64_FMTo__
+    #define __UINT_LEAST64_FMTo__ "llo"
+    #undef __UINT_LEAST64_FMTu__
+    #define __UINT_LEAST64_FMTu__ "llu"
+    #undef __UINT_LEAST64_FMTx__
+    #define __UINT_LEAST64_FMTx__ "llx"
+    #undef __UINT_LEAST64_MAX__
+    #define __UINT_LEAST64_MAX__ 18446744073709551615ULL
+    #undef __UINT_LEAST64_TYPE__
+    #define __UINT_LEAST64_TYPE__ long long unsigned int
+    #undef __UINT_LEAST8_FMTX__
+    #define __UINT_LEAST8_FMTX__ "hhX"
+    #undef __UINT_LEAST8_FMTo__
+    #define __UINT_LEAST8_FMTo__ "hho"
+    #undef __UINT_LEAST8_FMTu__
+    #define __UINT_LEAST8_FMTu__ "hhu"
+    #undef __UINT_LEAST8_FMTx__
+    #define __UINT_LEAST8_FMTx__ "hhx"
+    #undef __UINT_LEAST8_MAX__
+    #define __UINT_LEAST8_MAX__ 255
+    #undef __UINT_LEAST8_TYPE__
+    #define __UINT_LEAST8_TYPE__ unsigned char
+    #undef __USER_LABEL_PREFIX__
+    #define __USER_LABEL_PREFIX__
+    #undef __VERSION__
+    #define __VERSION__ "Clang 15.0.7"
+    #undef __WCHAR_MAX__
+    #define __WCHAR_MAX__ 2147483647
+    #undef __WCHAR_TYPE__
+    #define __WCHAR_TYPE__ int
+    #undef __WCHAR_WIDTH__
+    #define __WCHAR_WIDTH__ 32
+    #undef __WINT_MAX__
+    #define __WINT_MAX__ 4294967295U
+    #undef __WINT_TYPE__
+    #define __WINT_TYPE__ unsigned int
+    #undef __WINT_UNSIGNED__
+    #define __WINT_UNSIGNED__ 1
+    #undef __WINT_WIDTH__
+    #define __WINT_WIDTH__ 32
+    #undef __abs
+    #define __abs __builtin_abs
+    #undef __addex
+    #define __addex __builtin_ppc_addex
+    #undef __alignx
+    #define __alignx __builtin_ppc_alignx
+    #undef __alloca
+    #define __alloca __builtin_alloca
+    #undef __bcopy
+    #define __bcopy bcopy
+    #undef __bpermd
+    #define __bpermd __builtin_bpermd
+    #undef __builtin_maxfe
+    #define __builtin_maxfe __builtin_ppc_maxfe
+    #undef __builtin_maxfl
+    #define __builtin_maxfl __builtin_ppc_maxfl
+    #undef __builtin_maxfs
+    #define __builtin_maxfs __builtin_ppc_maxfs
+    #undef __builtin_minfe
+    #define __builtin_minfe __builtin_ppc_minfe
+    #undef __builtin_minfl
+    #define __builtin_minfl __builtin_ppc_minfl
+    #undef __builtin_minfs
+    #define __builtin_minfs __builtin_ppc_minfs
+    #undef __clang__
+    #define __clang__ 1
+    #undef __clang_literal_encoding__
+    #define __clang_literal_encoding__ "UTF-8"
+    #undef __clang_major__
+    #define __clang_major__ 15
+    #undef __clang_minor__
+    #define __clang_minor__ 0
+    #undef __clang_patchlevel__
+    #define __clang_patchlevel__ 7
+    #undef __clang_version__
+    #define __clang_version__ "15.0.7 "
+    #undef __clang_wide_literal_encoding__
+    #define __clang_wide_literal_encoding__ "UTF-32"
+    #undef __cmpb
+    #define __cmpb __builtin_ppc_cmpb
+    #undef __cmpeqb
+    #define __cmpeqb __builtin_ppc_cmpeqb
+    #undef __cmplx
+    #define __cmplx __builtin_complex
+    #undef __cmplxf
+    #define __cmplxf __builtin_complex
+    #undef __cmplxl
+    #define __cmplxl __builtin_complex
+    #undef __cmprb
+    #define __cmprb __builtin_ppc_cmprb
+    #undef __cntlz4
+    #define __cntlz4 __builtin_clz
+    #undef __cntlz8
+    #define __cntlz8 __builtin_clzll
+    #undef __cnttz4
+    #define __cnttz4 __builtin_ctz
+    #undef __cnttz8
+    #define __cnttz8 __builtin_ctzll
+    #undef __compare_and_swap
+    #define __compare_and_swap __builtin_ppc_compare_and_swap
+    #undef __compare_and_swaplp
+    #define __compare_and_swaplp __builtin_ppc_compare_and_swaplp
+    #undef __compare_exp_eq
+    #define __compare_exp_eq __builtin_ppc_compare_exp_eq
+    #undef __compare_exp_gt
+    #define __compare_exp_gt __builtin_ppc_compare_exp_gt
+    #undef __compare_exp_lt
+    #define __compare_exp_lt __builtin_ppc_compare_exp_lt
+    #undef __compare_exp_uo
+    #define __compare_exp_uo __builtin_ppc_compare_exp_uo
+    #undef __darn
+    #define __darn __builtin_darn
+    #undef __darn_32
+    #define __darn_32 __builtin_darn_32
+    #undef __darn_raw
+    #define __darn_raw __builtin_darn_raw
+    #undef __dcbf
+    #define __dcbf __builtin_dcbf
+    #undef __dcbfl
+    #define __dcbfl __builtin_ppc_dcbfl
+    #undef __dcbflp
+    #define __dcbflp __builtin_ppc_dcbflp
+    #undef __dcbst
+    #define __dcbst __builtin_ppc_dcbst
+    #undef __dcbt
+    #define __dcbt __builtin_ppc_dcbt
+    #undef __dcbtst
+    #define __dcbtst __builtin_ppc_dcbtst
+    #undef __dcbtstt
+    #define __dcbtstt __builtin_ppc_dcbtstt
+    #undef __dcbtt
+    #define __dcbtt __builtin_ppc_dcbtt
+    #undef __dcbz
+    #define __dcbz __builtin_ppc_dcbz
+    #undef __divde
+    #define __divde __builtin_divde
+    #undef __divdeu
+    #define __divdeu __builtin_divdeu
+    #undef __divwe
+    #define __divwe __builtin_divwe
+    #undef __divweu
+    #define __divweu __builtin_divweu
+    #undef __eieio
+    #define __eieio __builtin_ppc_eieio
+    #undef __extract_exp
+    #define __extract_exp __builtin_ppc_extract_exp
+    #undef __extract_sig
+    #define __extract_sig __builtin_ppc_extract_sig
+    #undef __fcfid
+    #define __fcfid __builtin_ppc_fcfid
+    #undef __fcfud
+    #define __fcfud __builtin_ppc_fcfud
+    #undef __fctid
+    #define __fctid __builtin_ppc_fctid
+    #undef __fctidz
+    #define __fctidz __builtin_ppc_fctidz
+    #undef __fctiw
+    #define __fctiw __builtin_ppc_fctiw
+    #undef __fctiwz
+    #define __fctiwz __builtin_ppc_fctiwz
+    #undef __fctudz
+    #define __fctudz __builtin_ppc_fctudz
+    #undef __fctuwz
+    #define __fctuwz __builtin_ppc_fctuwz
+    #undef __fetch_and_add
+    #define __fetch_and_add __builtin_ppc_fetch_and_add
+    #undef __fetch_and_addlp
+    #define __fetch_and_addlp __builtin_ppc_fetch_and_addlp
+    #undef __fetch_and_and
+    #define __fetch_and_and __builtin_ppc_fetch_and_and
+    #undef __fetch_and_andlp
+    #define __fetch_and_andlp __builtin_ppc_fetch_and_andlp
+    #undef __fetch_and_or
+    #define __fetch_and_or __builtin_ppc_fetch_and_or
+    #undef __fetch_and_orlp
+    #define __fetch_and_orlp __builtin_ppc_fetch_and_orlp
+    #undef __fetch_and_swap
+    #define __fetch_and_swap __builtin_ppc_fetch_and_swap
+    #undef __fetch_and_swaplp
+    #define __fetch_and_swaplp __builtin_ppc_fetch_and_swaplp
+    #undef __fmadd
+    #define __fmadd __builtin_fma
+    #undef __fmadds
+    #define __fmadds __builtin_fmaf
+    #undef __fmsub
+    #define __fmsub __builtin_ppc_fmsub
+    #undef __fmsubs
+    #define __fmsubs __builtin_ppc_fmsubs
+    #undef __fnabs
+    #define __fnabs __builtin_ppc_fnabs
+    #undef __fnabss
+    #define __fnabss __builtin_ppc_fnabss
+    #undef __fnmadd
+    #define __fnmadd __builtin_ppc_fnmadd
+    #undef __fnmadds
+    #define __fnmadds __builtin_ppc_fnmadds
+    #undef __fnmsub
+    #define __fnmsub __builtin_ppc_fnmsub
+    #undef __fnmsubs
+    #define __fnmsubs __builtin_ppc_fnmsubs
+    #undef __fre
+    #define __fre __builtin_ppc_fre
+    #undef __fres
+    #define __fres __builtin_ppc_fres
+    #undef __fric
+    #define __fric __builtin_ppc_fric
+    #undef __frim
+    #define __frim __builtin_ppc_frim
+    #undef __frims
+    #define __frims __builtin_ppc_frims
+    #undef __frin
+    #define __frin __builtin_ppc_frin
+    #undef __frins
+    #define __frins __builtin_ppc_frins
+    #undef __frip
+    #define __frip __builtin_ppc_frip
+    #undef __frips
+    #define __frips __builtin_ppc_frips
+    #undef __friz
+    #define __friz __builtin_ppc_friz
+    #undef __frizs
+    #define __frizs __builtin_ppc_frizs
+    #undef __frsqrte
+    #define __frsqrte __builtin_ppc_frsqrte
+    #undef __frsqrtes
+    #define __frsqrtes __builtin_ppc_frsqrtes
+    #undef __fsel
+    #define __fsel __builtin_ppc_fsel
+    #undef __fsels
+    #define __fsels __builtin_ppc_fsels
+    #undef __fsqrt
+    #define __fsqrt __builtin_ppc_fsqrt
+    #undef __fsqrts
+    #define __fsqrts __builtin_ppc_fsqrts
+    #undef __gnu_linux__
+    #define __gnu_linux__ 1
+    #undef __icbt
+    #define __icbt __builtin_ppc_icbt
+    #undef __insert_exp
+    #define __insert_exp __builtin_ppc_insert_exp
+    #undef __iospace_eieio
+    #define __iospace_eieio __builtin_ppc_iospace_eieio
+    #undef __iospace_lwsync
+    #define __iospace_lwsync __builtin_ppc_iospace_lwsync
+    #undef __iospace_sync
+    #define __iospace_sync __builtin_ppc_iospace_sync
+    #undef __isync
+    #define __isync __builtin_ppc_isync
+    #undef __labs
+    #define __labs __builtin_labs
+    #undef __lbarx
+    #define __lbarx __builtin_ppc_lbarx
+    #undef __ldarx
+    #define __ldarx __builtin_ppc_ldarx
+    #undef __lharx
+    #define __lharx __builtin_ppc_lharx
+    #undef __linux
+    #define __linux 1
+    #undef __linux__
+    #define __linux__ 1
+    #undef __llabs
+    #define __llabs __builtin_llabs
+    #undef __llvm__
+    #define __llvm__ 1
+    #undef __load2r
+    #define __load2r __builtin_ppc_load2r
+    #undef __load4r
+    #define __load4r __builtin_ppc_load4r
+    #undef __load8r
+    #define __load8r __builtin_ppc_load8r
+    #undef __lwarx
+    #define __lwarx __builtin_ppc_lwarx
+    #undef __lwsync
+    #define __lwsync __builtin_ppc_lwsync
+    #undef __maddhd
+    #define __maddhd __builtin_ppc_maddhd
+    #undef __maddhdu
+    #define __maddhdu __builtin_ppc_maddhdu
+    #undef __maddld
+    #define __maddld __builtin_ppc_maddld
+    #undef __mfmsr
+    #define __mfmsr __builtin_ppc_mfmsr
+    #undef __mfspr
+    #define __mfspr __builtin_ppc_mfspr
+    #undef __mftbu
+    #define __mftbu __builtin_ppc_mftbu
+    #undef __mtfsb0
+    #define __mtfsb0 __builtin_ppc_mtfsb0
+    #undef __mtfsb1
+    #define __mtfsb1 __builtin_ppc_mtfsb1
+    #undef __mtfsf
+    #define __mtfsf __builtin_ppc_mtfsf
+    #undef __mtfsfi
+    #define __mtfsfi __builtin_ppc_mtfsfi
+    #undef __mtmsr
+    #define __mtmsr __builtin_ppc_mtmsr
+    #undef __mtspr
+    #define __mtspr __builtin_ppc_mtspr
+    #undef __mulhd
+    #define __mulhd __builtin_ppc_mulhd
+    #undef __mulhdu
+    #define __mulhdu __builtin_ppc_mulhdu
+    #undef __mulhw
+    #define __mulhw __builtin_ppc_mulhw
+    #undef __mulhwu
+    #define __mulhwu __builtin_ppc_mulhwu
+    #undef __pic__
+    #define __pic__ 2
+    #undef __pie__
+    #define __pie__ 2
+    #undef __popcnt4
+    #define __popcnt4 __builtin_popcount
+    #undef __popcnt8
+    #define __popcnt8 __builtin_popcountll
+    #undef __popcntb
+    #define __popcntb __builtin_ppc_popcntb
+    #undef __poppar4
+    #define __poppar4 __builtin_ppc_poppar4
+    #undef __poppar8
+    #define __poppar8 __builtin_ppc_poppar8
+    #undef __powerpc__
+    #define __powerpc__ 1
+    #undef __ppc__
+    #define __ppc__ 1
+    #undef __rdlam
+    #define __rdlam __builtin_ppc_rdlam
+    #undef __readflm
+    #define __readflm __builtin_readflm
+    #undef __rldimi
+    #define __rldimi __builtin_ppc_rldimi
+    #undef __rlwimi
+    #define __rlwimi __builtin_ppc_rlwimi
+    #undef __rlwnm
+    #define __rlwnm __builtin_ppc_rlwnm
+    #undef __rotatel4
+    #define __rotatel4 __builtin_rotateleft32
+    #undef __rotatel8
+    #define __rotatel8 __builtin_rotateleft64
+    #undef __setb
+    #define __setb __builtin_ppc_setb
+    #undef __setflm
+    #define __setflm __builtin_setflm
+    #undef __setrnd
+    #define __setrnd __builtin_setrnd
+    #undef __stbcx
+    #define __stbcx __builtin_ppc_stbcx
+    #undef __stdcx
+    #define __stdcx __builtin_ppc_stdcx
+    #undef __stfiw
+    #define __stfiw __builtin_ppc_stfiw
+    #undef __sthcx
+    #define __sthcx __builtin_ppc_sthcx
+    #undef __store2r
+    #define __store2r __builtin_ppc_store2r
+    #undef __store4r
+    #define __store4r __builtin_ppc_store4r
+    #undef __store8r
+    #define __store8r __builtin_ppc_store8r
+    #undef __stwcx
+    #define __stwcx __builtin_ppc_stwcx
+    #undef __swdiv
+    #define __swdiv __builtin_ppc_swdiv
+    #undef __swdiv_nochk
+    #define __swdiv_nochk __builtin_ppc_swdiv_nochk
+    #undef __swdivs
+    #define __swdivs __builtin_ppc_swdivs
+    #undef __swdivs_nochk
+    #define __swdivs_nochk __builtin_ppc_swdivs_nochk
+    #undef __sync
+    #define __sync __builtin_ppc_sync
+    #undef __tdw
+    #define __tdw __builtin_ppc_tdw
+    #undef __test_data_class
+    #define __test_data_class __builtin_ppc_test_data_class
+    #undef __trap
+    #define __trap __builtin_ppc_trap
+    #undef __trapd
+    #define __trapd __builtin_ppc_trapd
+    #undef __tw
+    #define __tw __builtin_ppc_tw
+    #undef __unix
+    #define __unix 1
+    #undef __unix__
+    #define __unix__ 1
+    #undef __vcipher
+    #define __vcipher __builtin_altivec_crypto_vcipher
+    #undef __vcipherlast
+    #define __vcipherlast __builtin_altivec_crypto_vcipherlast
+    #undef __vncipher
+    #define __vncipher __builtin_altivec_crypto_vncipher
+    #undef __vncipherlast
+    #define __vncipherlast __builtin_altivec_crypto_vncipherlast
+    #undef __vpermxor
+    #define __vpermxor __builtin_altivec_crypto_vpermxor
+    #undef __vpmsumb
+    #define __vpmsumb __builtin_altivec_crypto_vpmsumb
+    #undef __vpmsumd
+    #define __vpmsumd __builtin_altivec_crypto_vpmsumd
+    #undef __vpmsumh
+    #define __vpmsumh __builtin_altivec_crypto_vpmsumh
+    #undef __vpmsumw
+    #define __vpmsumw __builtin_altivec_crypto_vpmsumw
+    #undef linux
+    #define linux 1
+    #undef unix
+    #define unix 1
 eof: (-1)
 errno:
     e2big: '7'

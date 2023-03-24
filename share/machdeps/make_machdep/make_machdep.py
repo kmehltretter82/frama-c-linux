@@ -151,7 +151,6 @@ def print_machdep(machdep):
         args.dest_file = sys.stdout
     yaml.dump(machdep, args.dest_file, indent=4, sort_keys=True)
 
-
 def make_machdep():
     machdep = {}
     for key in schema.keys():
@@ -334,7 +333,52 @@ version = version_output.stdout.splitlines()[0]
 machdep["compiler"] = args.compiler
 machdep["cpp_arch_flags"] = args.cpp_arch_flags
 machdep["version"] = version
+
 machdep["custom_defs"] = ""
+
+# Extract predefined macros; we're assuming a gcc-like compiler here.
+# Leave custom_defs empty if this fails.
+
+# in case we have all the predefined macros, custom_defs will be very long.
+# we thus want to output it as a literal block, not a simple string.
+# For that, use a custom object and tell PyYaml to output it in a particular way
+# Based on SO's answer: 
+
+class custom_defs(str): pass
+
+def change_style(style, representer):
+    def new_representer(dumper, data):
+        scalar = representer(dumper, data)
+        scalar.style = style
+        return scalar
+    return new_representer
+
+from yaml.representer import Representer
+
+custom_defs_representer = change_style('|', Representer.represent_str)
+
+yaml.add_representer(custom_defs,custom_defs_representer)
+
+cmd = compilation_command + ["-dM", "-E", "-"]
+if args.verbose:
+    print(f"[INFO] running command: {' '.join(cmd)}")
+proc = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, text=True)
+if proc.returncode == 0:
+    lines = ""
+    for line in proc.stdout.splitlines():
+        # Preprocessor emits a warning if we're trying to #undef
+        # standard macros. Leave them alone.
+        if re.match(r"#define *__STDC", line): continue
+        macro=re.match(r"#define *(\w+)", line)
+        if macro:
+            lines+=f"#undef {macro.group(1)}\n"
+        lines+=f"{line.strip()}\n"
+    machdep["custom_defs"] = custom_defs(lines)
+else:
+    warnings.warn(f"could not determine predefined macros")
+    if args.verbose:
+        print(f"compiler output is:{proc.stderr}")
+
 if args.from_file and args.in_place:
     machdep["machdep_name"] = Path(args.from_file).stem
 elif args.dest_file:
