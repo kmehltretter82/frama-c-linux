@@ -208,7 +208,7 @@ export default function Globals(): JSX.Element {
       },
       'separator',
       {
-        label: 'Show intern functions',
+        label: 'Show non-extern functions',
         checked: intern,
         onClick: flipIntern,
       },
