@@ -23,12 +23,12 @@
 open Cil_types
 
 open Simplified
-    
+
 (** Points-to graphs datastructure. *)
 module G=Graph.Persistent.Digraph.Concrete(Datatype.Int)
 
 module LSet = Simplified_lset
-                
+
 module Abstract_state = Abstract_state
 
 let check_computed () =
@@ -44,7 +44,7 @@ let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function
   match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
-let set_aliases = Abstract_state.find_aliases lv state in
+    let set_aliases = Abstract_state.find_aliases lv state in
     LSet.fold_lval (fun e a -> f_fold a e) set_aliases acc
 
 let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =

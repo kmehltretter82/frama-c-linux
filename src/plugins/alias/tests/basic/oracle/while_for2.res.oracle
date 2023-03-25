@@ -1,8 +1,6 @@
 [kernel] Parsing while_for2.c (with preprocessing)
-[alias] Parsing done
 [alias] May-aliases at the end of function main:
   {a, b} are aliased
-[alias] Functions done
 Before statement return __retres; :
  {a, b} are aliased
 
@@ -43,4 +41,3 @@ Before statement break; :
 Before statement __retres = 0; :
  {a, b} are aliased
 
-[alias] Analysis complete

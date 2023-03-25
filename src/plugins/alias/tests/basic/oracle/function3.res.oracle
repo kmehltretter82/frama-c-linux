@@ -1,9 +1,7 @@
 [kernel] Parsing function3.c (with preprocessing)
-[alias] Parsing done
 [alias] May-aliases at the end of function main:
   {a, b} are aliased
   {c, d} are aliased
-[alias] Functions done
 Before statement return __retres; :
  {x, y, tmp} are aliased
 
@@ -54,4 +52,3 @@ Before statement __retres = 0; :
  {a, b} are aliased
 {c, d} are aliased
 
-[alias] Analysis complete

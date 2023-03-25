@@ -37,3 +37,7 @@ module ShowStmtTable : Parameter_sig.Bool
 
 (** Displays the final abstract state in Dot File <f> *)
 module Dot_output : Parameter_sig.String
+
+module DebugKeys : sig
+  val lvals : category
+end

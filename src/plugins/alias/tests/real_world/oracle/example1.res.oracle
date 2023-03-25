@@ -1,12 +1,10 @@
 [kernel] Parsing example1.c (with preprocessing)
-[alias] Parsing done
 [alias] Warning: a function with no return is employed in an assignment
 [alias] Warning: a function with no return is employed in an assignment
 [alias] Warning: a function with no return is employed in an assignment
 [alias] Warning: Analysis is continuing but will not be sound
 [alias] Warning: Analysis is continuing but will not be sound
 [alias] May-aliases at the end of function main:
-[alias] Functions done
 Before statement b->t1[i] = a->t1[i]; :
  
 Before statement idx = 0; :
@@ -226,4 +224,3 @@ Before statement b->t1[i] = a->t1[i];
 Before statement odata = tmp->t2[*(tmp->n2)]; :
  {x, tmp} are aliased
 
-[alias] Analysis complete

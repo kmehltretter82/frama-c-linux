@@ -1,10 +1,8 @@
 [kernel] Parsing structure4.c (with preprocessing)
-[alias] Parsing done
 [alias] Skipping st_1_t *y1 = malloc(sizeof(st_1_t)); (doInstr not implemented)
 [alias] Skipping st_2_t *z = malloc(sizeof(st_2_t)); (doInstr not implemented)
 [alias] May-aliases at the end of function main:
   {z->s, y1, &x1} are aliased
-[alias] Functions done
 Before statement st_1_t x1 = {.a = 0, .b = 1}; :
  
 Before statement st_1_t x2 = {.a = 1, .b = 2}; :
@@ -27,4 +25,3 @@ Before statement __retres = 0; :
 Before statement return __retres; :
  {z->s, y1, &x1} are aliased
 
-[alias] Analysis complete

@@ -1,10 +1,8 @@
 [kernel] Parsing conditional2.c (with preprocessing)
-[alias] Parsing done
 [alias] May-aliases at the end of function main:
   {d, &e} are aliased
   {a, b, &c} are aliased
   {c, &d} are aliased
-[alias] Functions done
 Before statement b = & c; :
  
 Before statement c = & d; :
@@ -39,4 +37,3 @@ Before statement return __retres; :
 {a, b, &c} are aliased
 {c, &d} are aliased
 
-[alias] Analysis complete
