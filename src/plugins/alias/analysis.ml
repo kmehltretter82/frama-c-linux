@@ -36,7 +36,6 @@ module type InternalTable  = sig
   include Table
   val add : key -> value -> unit
   val iter : (key -> value -> unit) -> unit
-  (*  val clear : unit -> unit*)
 end
 
 
@@ -48,13 +47,11 @@ module Make_table(H: Hashtbl.S)(V: sig type t val size :int end) : InternalTable
   let find = H.find tbl
   let iter f =
     H.iter f tbl
-    (* let clear () = H.clear tbl*)
 end
 
 module A = struct type t = Abstract_state.t option let size = 7 end
 module R = struct type t = Abstract_state.summary option let size = 7 end
 
-(*module Stmt_table = Make_table(Cil_datatype.Stmt.Hashtbl)(A)*)
 module Function_table = Make_table(Kernel_function.Hashtbl)(R)
 
 let function_compute_ref = Extlib.mk_fun "function_compute"
@@ -144,7 +141,17 @@ let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t 
     do_function_call s a res ef es loc
   | Asm _ -> (Options.feedback "Skipping @[%a@] (Asm not implemented)" Printer.pp_stmt s; a)
 
+let pp_abstract_state_opt ?(debug=false) fmt v =
+  match v with
+  | None -> Format.fprintf fmt "<Bot>"
+  | Some a -> Abstract_state.pretty ~debug fmt a
 
+let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
+  Options.feedback ~level:3 "analysing instruction: %a" Printer.pp_stmt s;
+  let result = do_instr s i a in
+  Options.feedback ~level:3 "May-aliases at the end of instruction:@.%a@." (pp_abstract_state_opt ~debug:false) result;
+  Options.debug ~level:3 "May-alias graph at the end of instruction:@.%a@." (pp_abstract_state_opt ~debug:true) result;
+  result
 
 
 module T =
@@ -199,15 +206,10 @@ let do_stmt (a: Abstract_state.t) (s:stmt) :  Abstract_state.t =
     end
   | _ -> a
 
-let doFunction (kf:kernel_function) =
+let analyse_function (kf:kernel_function) =
   Options.feedback ~level:2 "analysing function: %a" Kernel_function.pretty kf;
   if Kernel_function.has_definition kf then
     begin
-      let print_value ?(debug=false) fmt v =
-        match v with
-        | None -> Format.fprintf fmt "<Bot>"
-        | Some a -> Abstract_state.pretty ~debug fmt a
-      in
       let first_stmt =
         try Kernel_function.find_first_stmt kf
         with Kernel_function.No_Statement -> assert false
@@ -215,42 +217,32 @@ let doFunction (kf:kernel_function) =
       T.StmtStartData.add first_stmt (Some Abstract_state.empty);
       F.compute [first_stmt];
       let return_stmt = Kernel_function.find_return kf in
-      let final_state : Abstract_state.t option =
-        try Stmt_table.find return_stmt
-        with
-          Not_found ->
-          begin
-            Options.debug "return stmt of %a not in table" Kernel_function.pretty kf;
-            Options.warning "Analysis is continuing but will not be sound";
-            Some (Abstract_state.empty)
-          end
-      in
-      if not (Kernel_function.is_main kf) then
-        (* if main, do nothing *)
-        let summary: Abstract_state.summary =
-          Abstract_state.make_summary final_state kf
-        in
-        Function_table.add kf (Some summary)
-      else
-        (* if main, print the last abstract state *)
-        let f_name = Options.Dot_output.get () in
-        if f_name = ""
-        then
-          Options.feedback "May-aliases at the end of function main:@.%a@." (print_value ~debug:false) final_state
-        else
-          match final_state with
-            None  ->  Options.feedback "Abstract_state at the end of function main: <Bot>@."
-          | Some final_state ->
-            begin
-              Abstract_state.print_dot f_name final_state;
-              Options.feedback "Abstract_state at the end of function main:@.%a@." (print_value ~debug:true) (Some final_state)
-            end
+      try Stmt_table.find return_stmt
+      with
+        Not_found ->
+        begin
+          Options.debug "return stmt of %a not in table" Kernel_function.pretty kf;
+          Options.warning "Analysis is continuing but will not be sound";
+          Some (Abstract_state.empty)
+        end
     end
   else
-    let summary: Abstract_state.summary =
-      Abstract_state.make_summary (Some Abstract_state.empty) kf
-    in
-    Function_table.add kf (Some summary)
+    Some Abstract_state.empty
+
+let doFunction (kf:kernel_function) =
+  let final_state = analyse_function kf in
+  if Kernel_function.is_main kf then begin
+    (* if main, print the last abstract state *)
+    Options.feedback "May-aliases at the end of function main:@.%a@." (pp_abstract_state_opt ~debug:false) final_state;
+    Options.debug "May-alias graph at the end of function main:@.%a@." (pp_abstract_state_opt ~debug:true) final_state;
+    let f_name = Options.Dot_output.get () in
+    match f_name, final_state with
+    | "", _ -> ()
+    | _, None -> ()
+    | _, Some final_state -> Abstract_state.print_dot f_name final_state
+  end
+  else
+    Function_table.add kf @@ Some (Abstract_state.make_summary final_state kf)
 
 let () = function_compute_ref := doFunction
 
@@ -276,9 +268,9 @@ let is_computed () = !computed_flag
 
 let compute () =
   Ast.compute();
-  Options.feedback "Parsing done";
+  Options.debug "Parsing done";
   Globals.Functions.iter doFunction;
-  Options.feedback "Functions done";
+  Options.debug "Functions done";
   computed_flag := true;
   let print_stmt_table_elt fmt k v :unit =
     let print_key = Stmt.pretty in
@@ -307,7 +299,7 @@ let compute () =
 
 let clear () =
   computed_flag := false;
-  (*Stmt_table*)Stmt_table.clear()
+  Stmt_table.clear()
 
 let get_state_before_stmt _kf stmt =
   if is_computed ()

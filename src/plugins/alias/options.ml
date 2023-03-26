@@ -60,3 +60,7 @@ module Dot_output =
       let arg_name = "f"
       let help = "Displays the final abstract state in Dot File <f>"
     end)
+
+module DebugKeys = struct
+  let lvals = register_category "lvals"
+end

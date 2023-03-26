@@ -29,7 +29,7 @@ let main () =
   if Options.Enabled.get() then
     begin
       Analysis.compute ();
-      Options.feedback "Analysis complete";
+      Options.debug "Analysis complete";
     end
 
 let () =

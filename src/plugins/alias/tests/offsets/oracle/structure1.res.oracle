@@ -1,9 +1,7 @@
 [kernel] Parsing structure1.c (with preprocessing)
-[alias] Parsing done
 [alias] May-aliases at the end of function main:
   {p_x, p_y, &x, &y} are aliased
   {x, y} are aliased
-[alias] Functions done
 Before statement st_1_t x = {.a = 0, .b = 1}; :
  
 Before statement st_2_t y = {.a = 3, .c = 4}; :
@@ -29,4 +27,3 @@ Before statement return __retres; :
  {p_x, p_y, &x, &y} are aliased
 {x, y} are aliased
 
-[alias] Analysis complete

@@ -192,7 +192,7 @@ let get_lval_set = find_lset
 
 let print_debug fmt (x:t) =
   Format.fprintf fmt "@[<hov 2>List of vertices: @.";
-  G.iter_vertex (fun v -> Format.fprintf fmt "id=%d LSet=%a@." v LSet.pp_debug (find_lset v x)) x.graph;
+  G.iter_vertex (fun v -> Format.fprintf fmt "id=%d LSet=%a@." v LSet.pretty (find_lset v x)) x.graph;
   Format.fprintf fmt "@]@.@[<hov 2>List of edges: @.";
   G.iter_edges (fun v1 v2 -> Format.fprintf fmt "%d → %d@." v1 v2) x.graph;
   Format.fprintf fmt "@]@.";
@@ -203,7 +203,7 @@ let print_debug fmt (x:t) =
   LLMap.pretty fmt x.lmap;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "@[<hov 2>VMap: @.";
-  VMap.iter (fun v ls -> Format.fprintf fmt "id=%d → lset=%a@." v LSet.pp_debug ls) x.vmap;
+  VMap.iter (fun v ls -> Format.fprintf fmt "id=%d → lset=%a@." v LSet.pretty ls) x.vmap;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "cmpt: %d@." x.cmpt
 
@@ -325,9 +325,9 @@ let find_all_aliases (lv1: Lval.t) (x: t) : LSet.t =
     with
       Not_found -> (LSet.empty,o)
   in
-  Options.debug "decompose_lval %a : [@[<hov 2>" Lval.pp_debug lv1;
-  List.iter (fun (x, o) -> Options.debug " (%a,%a) " Lval.pp_debug x Offset.pretty o) list_of_lval_to_be_searched;
-  Options.debug "@]]@.";
+  Options.debug ~level:5 "decompose_lval %a : [@[<hov 2>" Lval.pretty lv1;
+  List.iter (fun (x, o) -> Options.debug ~level:5 " (%a,%a) " Lval.pretty x Offset.pretty o) list_of_lval_to_be_searched;
+  Options.debug ~level:5 "@]]@.";
   let list_of_aliases : (LSet.t*offset) list =
     List.map f_map list_of_lval_to_be_searched
   in
@@ -353,7 +353,7 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   (* find all the alias of lv (because of offset) *)
   let set_of_aliases : LSet.t = find_all_aliases lv x in
   (* add all these aliases *)
-  Options.debug "all_aliases of %a : %a @." Lval.pp_debug lv LSet.pp_debug set_of_aliases;
+  Options.debug ~level:5 "all_aliases of %a : %a @." Lval.pretty lv LSet.pretty set_of_aliases;
   let new_lmap =
     LSet.fold
       (fun lv acc -> assert (not (LLMap.mem lv x.lmap)); LLMap.add lv new_v acc)
@@ -411,7 +411,7 @@ let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
    in the graph. If it is present, there will be bugs *)
 let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
   assert (not (LLMap.mem blv x.lmap));
-  Options.debug "creating a vertex for %a@." Lval.pp_debug blv;
+  Options.debug ~level:4 "creating a vertex for %a@." Lval.pretty blv;
   match blv with
     BNone -> Options.fatal "this should not happen"
   | BLval lv ->
@@ -460,7 +460,7 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
       (* for any predecessor, find all its aliases and then look for potential existing vertex *)
       let f_fold_lmap lvx vx acc =
         let set_aliases = VMap.find vx x.vmap in
-        Options.debug "looking for aliases of %a in set %a@." Lval.pp_debug lv LSet.pp_debug set_aliases;
+        Options.debug "looking for aliases of %a in set %a@." Lval.pretty lv LSet.pretty set_aliases;
         if LSet.cardinal set_aliases > 1
         then
           let off = diff_offset lvx lv in
@@ -485,7 +485,7 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
           map_predecessors
           VSet.empty
       in
-      Options.debug "found aliases of %a : %a@." Lval.pp_debug lv VSet.pretty vset_res;
+      Options.debug ~level:5 "found aliases of %a : %a@." Lval.pretty lv VSet.pretty vset_res;
       if VSet.is_empty vset_res
       then create_vertex_lval lv x
       else
@@ -650,7 +650,7 @@ and unify2 (x:t) (v1:V.t) (l2:V.t list) =
 
 (* since the recursive version of join, unify, unify2 and merge may break the invariants *)
 let join ?(without_check = false) (x:t) (v1:V.t) (v2:V.t) : t =
-  Options.debug ~level:3 "graph before join(%d,%d) @.%a@." v1 v2 print_debug x;
+  Options.debug ~level:5 "graph before join(%d,%d) @.%a@." v1 v2 print_debug x;
   if not without_check then assert_invariants x;
   let res = join_without_check x v1 v2 in
   if not without_check then assert_invariants x;
@@ -733,7 +733,7 @@ let is_included (a1:t) (a2:t) =
   (* tests if a1 is included in a2, at least as the nodes with lval *)
   assert_invariants a1;
   assert_invariants a2;
-  Options.debug "testing equal @.%a@. AND à.%a@." (pretty ~debug:true) a1 (pretty ~debug:true) a2;
+  Options.debug ~level:8 "testing equal @.%a@. AND à.%a@." (pretty ~debug:true) a1 (pretty ~debug:true) a2;
   try
     let iter_lmap (lv:Lval.t) (v1:V.t): unit =
       let v2 : V.t = try LLMap.find lv a2.lmap with Not_found -> raise Not_included in
@@ -801,12 +801,12 @@ let union  (a1:t) (a2:t) :t =
   assert_invariants a1;
   assert_invariants a2;
 
-  Options.debug ~level:2 "Union: First graph:@.%a@." print_graph a1;
-  Options.debug ~level:3 "Union: First graph:@.%a@." print_debug a1;
+  Options.debug ~level:4 "Union: First graph:@.%a@." print_graph a1;
+  Options.debug ~level:5 "Union: First graph:@.%a@." print_debug a1;
   (* ensure that a1 and a2 no longer share any vertex indices *)
   let a2 = shift a2 a1.cmpt in
-  Options.debug ~level:2 "Union: Second graph:@.%a@." print_graph a2;
-  Options.debug ~level:3 "Union: Second graph:@.%a@." print_debug a2;
+  Options.debug ~level:4 "Union: Second graph:@.%a@." print_graph a2;
+  Options.debug ~level:5 "Union: Second graph:@.%a@." print_debug a2;
   let new_graph =
     G.fold_vertex
       (fun v2 g -> G.add_vertex g v2)
@@ -842,15 +842,15 @@ let union  (a1:t) (a2:t) :t =
     in
     List.fold_left add_pair [] (lmap_intersect a1.lmap a2.lmap)
   in
-  Options.debug ~level:3 "Union: sets to be joined:@[";
-  List.iter (fun set -> Options.debug ~level:3 "%a" VSet.pretty set) sets_to_be_joined;
-  Options.debug ~level:3 "@]@.";
+  Options.debug ~level:7 "Union: sets to be joined:@[";
+  List.iter (fun set -> Options.debug ~level:7 "%a" VSet.pretty set) sets_to_be_joined;
+  Options.debug ~level:7 "@]@.";
   let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = max a1.cmpt a2.cmpt} in
   let new_a =
     List.fold_left (join_set ~without_check:true) new_a sets_to_be_joined
   in
-  Options.debug ~level:2 "Union: Result graph:@.%a@." print_graph new_a;
-  Options.debug ~level:3 "Union: Result graph:@.%a@." print_debug new_a;
+  Options.debug ~level:3 "Union: Result graph:@.%a@." print_graph new_a;
+  Options.debug ~level:5 "Union: Result graph:@.%a@." print_debug new_a;
   assert_invariants new_a;
   new_a
 

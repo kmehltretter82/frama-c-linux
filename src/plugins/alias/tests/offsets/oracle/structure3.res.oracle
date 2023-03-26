@@ -1,5 +1,4 @@
 [kernel] Parsing structure3.c (with preprocessing)
-[alias] Parsing done
 [alias] May-aliases at the end of function main:
   {y1.s, &x1} are aliased
   {y2.s, &x2} are aliased
@@ -45,4 +44,3 @@ Before statement return __retres; :
 {y1, y2} are aliased
 {y1.c, y2.c} are aliased
 
-[alias] Analysis complete

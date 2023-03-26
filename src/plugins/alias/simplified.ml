@@ -125,9 +125,10 @@ struct
     | BLval lv -> f fmt lv
     | BAddrOf lv -> Format.fprintf fmt "&%a" f lv
 
-  let pretty = print Lval.pretty
-
-  let pp_debug = print Printer.pp_lval
+  let pretty l =
+    if Options.is_debug_key_enabled Options.DebugKeys.lvals
+    then print Cil_types_debug.pp_lval l
+    else print Printer.pp_lval l
 
   let removeOffsetLval x =
     match x with
@@ -162,10 +163,6 @@ struct
     Format.fprintf fmt " @]}@."
 
   let pretty f fmt m = print Simplified_lval.pretty f fmt m
-
-  let pp_debug f fmt m = print Simplified_lval.pp_debug f fmt m
-
-
 end
 
 module Simplified_lset =
@@ -187,8 +184,6 @@ struct
     Format.fprintf fmt "@]}@?"
 
   let pretty fmt s = print Simplified_lval.pretty fmt s
-
-  let pp_debug fmt s = print Simplified_lval.pp_debug fmt s
 
   let fold_lval f s init =
     let f_fold lv acc =

@@ -6,7 +6,6 @@
   {z2->c, b} are aliased
   {t->t, z1} are aliased
   {z1->c, t->d, a} are aliased
-[alias] Functions done
 Before statement t->t = (struct struct_2_t *)z1; :
  {x1, x2} are aliased
 {z1->s, z2->s, tab_y[0], &x1, &x2} are aliased
@@ -88,4 +87,3 @@ Before statement z2->c = b; :
 {z1->s, z2->s, tab_y[0], &x1, &x2} are aliased
 {z1->c, a} are aliased
 
-[alias] Analysis complete

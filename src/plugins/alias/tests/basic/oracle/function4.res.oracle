@@ -1,8 +1,6 @@
 [kernel] Parsing function4.c (with preprocessing)
-[alias] Parsing done
 [alias] May-aliases at the end of function main:
   {a, b, &c} are aliased
-[alias] Functions done
 Before statement return x; :
  
 Before statement int *a = (int *)0; :
@@ -22,4 +20,3 @@ Before statement __retres = 0; :
 Before statement return __retres; :
  {a, b, &c} are aliased
 
-[alias] Analysis complete

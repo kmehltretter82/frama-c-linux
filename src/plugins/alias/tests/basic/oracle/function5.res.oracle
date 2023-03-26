@@ -1,8 +1,6 @@
 [kernel] Parsing function5.c (with preprocessing)
-[alias] Parsing done
 [alias] May-aliases at the end of function main:
   {a, b, c} are aliased
-[alias] Functions done
 Before statement goto return_label; :
  {x, __retres} are aliased
 
@@ -47,4 +45,3 @@ Before statement __retres = 0; :
 Before statement __retres = x;
                  goto return_label; :
  
-[alias] Analysis complete

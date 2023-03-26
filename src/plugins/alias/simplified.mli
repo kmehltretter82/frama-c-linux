@@ -41,8 +41,6 @@ sig
 
   val pretty: Format.formatter -> t -> unit
 
-  val pp_debug : Format.formatter -> t -> unit
-
   val removeOffsetLval : t -> t * offset
 
   val addOffsetLval : offset -> t -> t
@@ -53,8 +51,6 @@ sig
   include Map.S with type key = Simplified_lval.t
 
   val pretty: (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
-
-  val pp_debug : (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
 end
 
 module Simplified_lset:
@@ -62,8 +58,6 @@ sig
   include Set.S with type elt = Simplified_lval.t
 
   val pretty: Format.formatter -> t -> unit
-
-  val pp_debug : Format.formatter -> t -> unit
 
   (* special fold *)
   val fold_lval : (lval -> 'a -> 'a) -> t -> 'a -> 'a

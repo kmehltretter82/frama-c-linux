@@ -1,9 +1,7 @@
 [kernel] Parsing assignment5.c (with preprocessing)
-[alias] Parsing done
 [alias] May-aliases at the end of function main:
   {*a, *a, b} are aliased
   {*b, *(*a), c, d} are aliased
-[alias] Functions done
 Before statement int ***a = (int ***)0; :
  
 Before statement int **b = (int **)0; :
@@ -29,4 +27,3 @@ Before statement return __retres; :
  {*a, *a, b} are aliased
 {*b, *(*a), c, d} are aliased
 
-[alias] Analysis complete
