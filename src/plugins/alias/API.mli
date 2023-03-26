@@ -23,7 +23,7 @@
 (** External API of the plugin Alias *)
 
 open Cil_types
-    
+
 (** Points-to graphs datastructure. *)
 module G: Graph.Sig.G
 

@@ -1,12 +1,11 @@
 [kernel] Parsing structure3.c (with preprocessing)
 [alias] Parsing done
 [alias] May-aliases at the end of function main:
-  {y1, &x1} are aliased
-  {y2, &x2} are aliased
-  {z, &y1} are aliased
-  {z.t, &y1.t, &y2} are aliased
-  {y1.c, &x1.c} are aliased
-  {z.d, &y1.d} are aliased
+  {y1.s, &x1} are aliased
+  {y2.s, &x2} are aliased
+  {z.t, &y1, &y2} are aliased
+  {y1, y2} are aliased
+  {y1.c, y2.c} are aliased
 [alias] Functions done
 Before statement st_1_t x1 = {.a = 0, .b = 1}; :
  
@@ -15,37 +14,35 @@ Before statement st_1_t x2 = {.a = 1, .b = 2}; :
 Before statement st_2_t y1 = {.s = (struct struct_1_t *)(& x1), .c = 3}; :
  
 Before statement st_2_t y2 = {.s = (struct struct_1_t *)(& x2), .c = 4}; :
- {y1, &x1} are aliased
+ {y1.s, &x1} are aliased
 
 Before statement st_3_t z = {.t = (struct struct_2_t *)(& y1), .d = 5}; :
- {y1, &x1} are aliased
-{y2, &x2} are aliased
+ {y1.s, &x1} are aliased
+{y2.s, &x2} are aliased
 
 Before statement z.t = (struct struct_2_t *)(& y2); :
- {y1, &x1} are aliased
-{y2, &x2} are aliased
-{z, &y1} are aliased
+ {y1.s, &x1} are aliased
+{y2.s, &x2} are aliased
+{z.t, &y1} are aliased
 
 Before statement y1.c = z.d; :
- {y1, &x1} are aliased
-{y2, &x2} are aliased
-{z, &y1} are aliased
-{z.t, &y1.t, &y2} are aliased
+ {y1.s, &x1} are aliased
+{y2.s, &x2} are aliased
+{z.t, &y1, &y2} are aliased
+{y1, y2} are aliased
 
 Before statement __retres = 0; :
- {y1, &x1} are aliased
-{y2, &x2} are aliased
-{z, &y1} are aliased
-{z.t, &y1.t, &y2} are aliased
-{y1.c, &x1.c} are aliased
-{z.d, &y1.d} are aliased
+ {y1.s, &x1} are aliased
+{y2.s, &x2} are aliased
+{z.t, &y1, &y2} are aliased
+{y1, y2} are aliased
+{y1.c, y2.c} are aliased
 
 Before statement return __retres; :
- {y1, &x1} are aliased
-{y2, &x2} are aliased
-{z, &y1} are aliased
-{z.t, &y1.t, &y2} are aliased
-{y1.c, &x1.c} are aliased
-{z.d, &y1.d} are aliased
+ {y1.s, &x1} are aliased
+{y2.s, &x2} are aliased
+{z.t, &y1, &y2} are aliased
+{y1, y2} are aliased
+{y1.c, y2.c} are aliased
 
 [alias] Analysis complete
