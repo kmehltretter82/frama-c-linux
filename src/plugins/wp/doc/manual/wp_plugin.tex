@@ -1686,6 +1686,7 @@ Strategy consists of list of alternatives with the following syntax:
     \textit{alternative} $::=$ \\
     \quad$|$\quad\verb+\prover+(\verb+"p"+\pdots\verb+"p"+, \textit{timeout}) \\
     \quad$|$\quad\verb+\tactic+(\verb+"id"+, \textit{param}\pdots\textit{param}) \\
+    \quad$|$\quad\verb+\auto+(\verb+"id"+,\pdots\verb+"id"+) \\
     \quad$|$\quad\verb+\default+ \\
     \quad$|$\quad\textit{strategy}
   \end{tabular}
@@ -1702,6 +1703,8 @@ Each form \emph{alternative} consists of one possible solution to discharge a pr
 \item \verb+\tactic(id,prm...)+ will try to apply the specified tactic with the
   associated parameters. Tactic parameters allows to select the target of the tactic,
   and the strategy to be used on generated sub-goals.
+\item \verb+\auto(id,...)+ will try to apply the (deprecated) auto-strategies
+  available in \textsf{WP} versions prior to Cobalt.
 \item \textit{name} or \verb$\default$ tries the specified strategy.
 \end{itemize}
 

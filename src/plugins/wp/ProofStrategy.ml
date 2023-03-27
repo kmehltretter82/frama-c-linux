@@ -42,6 +42,7 @@ type strategy = {
 and alternative =
   | Strategy of string loc
   | Provers of string loc list * float option (* timeout *)
+  | Auto of string loc list (* deprecated -wp-auto *)
   | Tactic of {
       tactic : string loc ;
       select : value list ;
@@ -193,6 +194,9 @@ let parse_alternative ctxt p =
     let tactic = parse_name ctxt ~kind:"tactic" p in
     parse_tactic_params ctxt (Pattern.context ctxt) ~tactic
       ~select:[] ~lookup:[] ~params:[] ~children:[] ~default:None ps
+  | PLapp("\\auto",[],ps) ->
+    let strategies = List.map (parse_name ctxt ~kind:"auto") ps in
+    Auto strategies
   | _ -> ctxt.error loc "Strategy definition expected (%a)" debug p
 
 (* -------------------------------------------------------------------------- *)
