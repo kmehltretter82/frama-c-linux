@@ -58,18 +58,17 @@
 [alias] May-aliases at the end of instruction:
 [alias] analysing instruction: y1 = & x1;
 [alias] May-aliases at the end of instruction:
-  {y1, &x1} are aliased
 [alias] analysing instruction: z->s = (struct struct_1_t *)y1;
 [alias] May-aliases at the end of instruction:
-  {z->s, y1, &x1} are aliased
+  {z->s, y1} are aliased
 [alias] analysing instruction: z->c = 6;
 [alias] May-aliases at the end of instruction:
-  {z->s, y1, &x1} are aliased
+  {z->s, y1} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction:
-  {z->s, y1, &x1} are aliased
+  {z->s, y1} are aliased
 [alias] May-aliases at the end of function main:
-  {z->s, y1, &x1} are aliased
+  {z->s, y1} are aliased
 [alias] analysing function: malloc
 [alias] May-aliases at the end of function malloc:
 [alias] analysing function: mblen

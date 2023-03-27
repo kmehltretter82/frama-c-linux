@@ -6,15 +6,11 @@
 [alias] May-aliases at the end of instruction:
 [alias] analysing instruction: st_2_t y = {.s = (struct struct_1_t *)(& x1), .c = 4};
 [alias] May-aliases at the end of instruction:
-  {y.s, &x1} are aliased
 [alias] analysing instruction: y.s = (struct struct_1_t *)(& x2);
 [alias] May-aliases at the end of instruction:
-  {y.s, &x1, &x2} are aliased
   {x1, x2} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction:
-  {y.s, &x1, &x2} are aliased
   {x1, x2} are aliased
 [alias] May-aliases at the end of function main:
-  {y.s, &x1, &x2} are aliased
   {x1, x2} are aliased
