@@ -464,7 +464,7 @@ module CodeAssertions = WpContext.StaticGenerator(CodeKey)
 
 let get_code_assertions ?(smoking=false) kf stmt =
   let ca = CodeAssertions.get (kf,stmt) in
-  (* Make sur that smoke tests are in the end so that it can see surely false
+  (* Make sure that smoke tests are in the end so that it can see surely false
      assertions associated to this statement, in particular RTE assertions.   *)
   List.rev @@
   if smoking then
@@ -607,20 +607,22 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
     end)
 
 let get_loop_contract ?(smoking=false) ?terminates kf stmt =
+  (* Loop Contract *)
   let lc = LoopContract.get (kf,stmt) in
-  let lc_smoke = if smoking && not (WpReached.is_dead_code stmt) then
+  (* Loop Smoking *)
+  let lc =
+    if smoking && not (WpReached.is_dead_code stmt) then
       let g = smoke kf ~id:"dead_loop" ~unreachable:stmt () in
       { lc with loop_smoke = g :: lc.loop_smoke }
     else lc
   in
-  match lc_smoke.loop_terminates, terminates with
-  | None, _ ->
-    lc_smoke
-  | Some _, None ->
-    { lc_smoke with loop_terminates = None }
+  (* Loop Termination *)
+  match lc.loop_terminates, terminates with
+  | None, _ -> lc
+  | Some _, None -> { lc with loop_terminates = None }
   | Some loop_terminates, Some terminates ->
     let prop = Logic_const.pimplies(terminates, loop_terminates) in
-    { lc_smoke with loop_terminates = Some prop }
+    { lc with loop_terminates = Some prop }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Clear Tablesnts                                                    --- *)

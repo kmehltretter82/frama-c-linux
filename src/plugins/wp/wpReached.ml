@@ -211,9 +211,9 @@ let rec protected node =
 
 and protected_by prev =
   match prev.flow with
-  | F_dead | F_entry | F_effect -> true
+  | F_return | F_dead | F_entry | F_effect -> true
   | F_goto -> protected prev
-  | F_call | F_branch | F_return -> unreachable prev
+  | F_call | F_branch -> unreachable prev
 
 let smoking_node n =
   match n.flow with

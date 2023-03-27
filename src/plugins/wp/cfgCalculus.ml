@@ -219,8 +219,7 @@ struct
     let kl = Cil.CurrentLoc.get () in
     try
       Cil.CurrentLoc.set (Stmt.loc s) ;
-      let smoking =
-        is_default_bhv env.mode && env.dead s in
+      let smoking = is_default_bhv env.mode && env.dead s in
       let cas = CfgAnnot.get_code_assertions ~smoking env.mode.kf s in
       let opt_fold f = Option.fold ~none:Fun.id ~some:f in
       let do_assert env CfgAnnot.{ code_admitted ; code_verified } w =
