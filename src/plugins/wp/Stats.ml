@@ -89,6 +89,7 @@ let ptime t valid =
 let pqed r = if VCS.is_valid r then ptime r.solver_time true else pzero
 let presult r = if VCS.is_valid r then ptime r.prover_time true else pzero
 let psolver r = ptime r.solver_time false
+let psmoked = { pzero with success = 1.0 }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Global Stats                                                       --- *)
@@ -181,9 +182,7 @@ let results ~smoke prs =
       let cached = List.fold_left
           (fun c (_,r) -> if r.VCS.cached then succ c else c)
           0 passed in
-      let stucked = List.map
-          (fun (p,r) -> p, ptime r.prover_time true)
-          passed in
+      let stucked = List.map (fun (p,_) -> p,psmoked) passed in
       let solver = List.fold_left
           (fun t (_,r) -> t +. r.solver_time)
           0.0 passed in
