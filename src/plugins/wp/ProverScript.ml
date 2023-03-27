@@ -116,7 +116,7 @@ struct
     success : Wpo.t -> VCS.prover option -> unit ;
     depth : int ;
     width : int ;
-    auto : Strategy.heuristic list ;
+    auto : Strategy.heuristic list ; (* DEPRECATED *)
     mutable signaled : bool ;
     backtrack : int ;
     mutable backtracking : backtracking option ;
@@ -276,7 +276,7 @@ let prove_node env node prv =
   else Task.return false
 
 (* -------------------------------------------------------------------------- *)
-(* --- Auto & Seach Mode                                                  --- *)
+(* --- Auto & Seach Mode (DEPRECATED)                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
 let rec auto env ?(depth=0) node : bool Task.task =

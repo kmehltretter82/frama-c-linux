@@ -42,7 +42,7 @@ type strategy = {
 and alternative =
   | Strategy of string loc
   | Provers of string loc list * float option (* timeout *)
-  | Auto of string loc list (* deprecated -wp-auto *)
+  | Auto of string loc (* deprecated -wp-auto *)
   | Tactic of {
       tactic : string loc ;
       select : value list ;
@@ -183,20 +183,19 @@ let rec parse_tactic_params ctxt penv
       cc ~select ~lookup ~params ~children ~default ps
     | _ -> ctxt.error loc "Tactic parameter expected (%a)" debug p
 
-let parse_alternative ctxt p =
+let parse_alternatives ctxt p =
   let loc = p.lexpr_loc in
   match p.lexpr_node with
-  | PLvar value | PLapp(value,[],[]) -> Strategy { loc ; value }
+  | PLvar value | PLapp(value,[],[]) -> [ Strategy { loc ; value } ]
   | PLapp("\\prover",[],ps) ->
     let prvs,timeout = parse_provers ctxt [] None ps in
-    Provers(prvs,timeout)
+    [ Provers(prvs,timeout) ]
   | PLapp("\\tactic",[],p::ps) ->
     let tactic = parse_name ctxt ~kind:"tactic" p in
-    parse_tactic_params ctxt (Pattern.context ctxt) ~tactic
-      ~select:[] ~lookup:[] ~params:[] ~children:[] ~default:None ps
+    [ parse_tactic_params ctxt (Pattern.context ctxt) ~tactic
+        ~select:[] ~lookup:[] ~params:[] ~children:[] ~default:None ps ]
   | PLapp("\\auto",[],ps) ->
-    let strategies = List.map (parse_name ctxt ~kind:"auto") ps in
-    Auto strategies
+    List.map (fun p -> Auto (parse_name ctxt ~kind:"auto" p)) ps
   | _ -> ctxt.error loc "Strategy definition expected (%a)" debug p
 
 (* -------------------------------------------------------------------------- *)
@@ -217,7 +216,7 @@ let parse_strategy ctxt loc ps =
     ctxt.error loc "Duplicate strategy definition ('%s', at %a)"
       name.value Location.pretty old.name.loc
   with Not_found ->
-    let alternatives = List.map (parse_alternative ctxt) ps in
+    let alternatives = List.concat @@ List.map (parse_alternatives ctxt) ps in
     let id = fresh () in
     Strategies.add name.value { name ; alternatives } ;
     Ext_id id
@@ -257,10 +256,48 @@ let () = Acsl_extension.register_global "prove" parse_proofs false
 (* --- Strategy Resolution                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let lookup pid =
+let wkey = Wp_parameters.register_warn_category "strategy"
+
+let resolve name =
+  try Some (Strategies.find name.value)
+  with Not_found ->
+    Wp_parameters.warning ~source:(fst name.loc)
+      "Strategy '%s' undefined" name.value ;
+    None
+
+(* -------------------------------------------------------------------------- *)
+(* --- Strategy Hints                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+let hints pid =
   List.map (fun (name,_) -> Strategies.find name) @@
   List.filter (fun (_,ps) ->
       WpPropId.select_by_name ps pid
     ) (Hints.get ())
+
+(* -------------------------------------------------------------------------- *)
+(* --- Strategy Forward Step                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
+let alternatives s = s.alternatives
+
+let provers = function
+  | Provers(ps,tm) ->
+    List.fold_right
+      (fun p ps ->
+         match VCS.parse_prover p.value with
+         | Some p -> p::ps
+         | None ->
+           Wp_parameters.warning ~wkey ~once:true ~source:(fst p.loc)
+             "Prover '%s' not-found" p.value ; ps
+      ) ps [],
+    Option.fold tm
+      ~none:(Wp_parameters.Timeout.get ())
+      ~some:(fun t -> max (int_of_float (t +. 0.5)) 1)
+  | _ -> [],0
+
+let fallback = function
+  | Strategy s -> resolve s
+  | _ -> None
 
 (* -------------------------------------------------------------------------- *)

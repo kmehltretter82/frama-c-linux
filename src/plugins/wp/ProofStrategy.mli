@@ -20,13 +20,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
 (* -------------------------------------------------------------------------- *)
 (* --- Proof Strategy Engine                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
 type strategy
+type alternative
 
-val lookup : WpPropId.prop_id -> strategy list
+val hints : WpPropId.prop_id -> strategy list
+
+val alternatives : strategy -> alternative list
+val provers : alternative -> VCS.prover list * int
+val fallback : alternative -> strategy option
 
 (* -------------------------------------------------------------------------- *)
