@@ -52,10 +52,11 @@ let calls infos = infos.calls
 let annots infos = infos.annots
 let doomed infos = infos.doomed
 
-let wpreached s = function
+let wp_reached_smoking s = function
   | None -> false
   | Some reachability -> WpReached.smoking reachability s
-let smoking infos s = wpreached s infos.reachability
+
+let smoking infos s = wp_reached_smoking s infos.reachability
 
 let unreachable infos v =
   match infos.body, infos.checkpath with
@@ -457,7 +458,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
            let loop_pids = loop_contract_pids kf stmt in
            if dead then
              begin
-               if wpreached stmt reachability then
+               if wp_reached_smoking stmt reachability then
                  (let p = CfgAnnot.get_unreachable kf stmt in
                   infos.doomed <- Bag.append infos.doomed p) ;
                infos.doomed <- Bag.concat infos.doomed (Bag.list ca_pids) ;
