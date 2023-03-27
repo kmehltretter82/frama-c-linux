@@ -27,6 +27,8 @@
 type strategy
 type alternative
 
+val name : strategy -> string
+val find : string -> strategy option
 val hints : WpPropId.prop_id -> strategy list
 
 val alternatives : strategy -> alternative list

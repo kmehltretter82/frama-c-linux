@@ -256,6 +256,8 @@ let () = Acsl_extension.register_global "prove" parse_proofs false
 (* --- Strategy Resolution                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
+let name s = s.name.value
+let find a = try Some (Strategies.find a) with Not_found -> None
 let resolve name =
   try Some (Strategies.find name.value)
   with Not_found ->
