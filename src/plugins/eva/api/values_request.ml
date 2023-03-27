@@ -109,7 +109,8 @@ let probe_code_annot = function
 
 let probe_property = function
   | Property.IPCodeAnnot ica -> probe_code_annot ica.ica_ca.annot_content
-  | IPPropertyInstance { ii_pred = Some pred } ->
+  | IPPropertyInstance { ii_pred = Some pred }
+  | IPPredicate {ip_pred = pred} ->
     Ppred (Logic_const.pred_of_id_pred pred)
   | _ -> raise Not_found
 
