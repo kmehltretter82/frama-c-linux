@@ -226,8 +226,10 @@ let marker_evaluation_point = function
   | PTermLval (_, _, prop, _) | PIP prop -> property_evaluation_point prop
   | PType _ -> raise Not_found
 
-let term_lval_to_lval tlval =
-  try Logic_to_c.term_lval_to_lval tlval
+let term_lval_to_lval kf tlval =
+  try
+    let result = Option.bind kf Eva_utils.find_return_var in
+    Logic_to_c.term_lval_to_lval ?result tlval
   with Logic_to_c.No_conversion -> raise Not_found
 
 let print_value fmt loc =
@@ -242,8 +244,8 @@ let print_value fmt loc =
       Results.eval_exp expr
     | PVDecl (_, _, vi) when is_scalar vi.vtype ->
       Results.eval_var vi
-    | PTermLval (_, _, _ip, tlval) ->
-      let lval = term_lval_to_lval tlval in
+    | PTermLval (kf, _, _ip, tlval) ->
+      let lval = term_lval_to_lval kf tlval in
       if is_scalar (Cil.typeOfLval lval)
       then Results.eval_lval lval
       else raise Not_found
@@ -288,8 +290,8 @@ module EvaTaints = struct
       | PLval (_, Kstmt stmt, lval) -> Some (expr_of_lval lval, stmt)
       | PExp (_, Kstmt stmt, expr) -> Some (expr, stmt)
       | PVDecl (_, Kstmt stmt, vi) -> Some (expr_of_lval (Var vi, NoOffset), stmt)
-      | PTermLval (_, Kstmt stmt, _, tlval) ->
-        Some (term_lval_to_lval tlval |> expr_of_lval, stmt)
+      | PTermLval (kf, Kstmt stmt, _, tlval) ->
+        Some (term_lval_to_lval kf tlval |> expr_of_lval, stmt)
       | _ -> None
 
   let of_marker marker =

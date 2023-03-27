@@ -114,12 +114,6 @@ let probe_property = function
     Ppred (Logic_const.pred_of_id_pred pred)
   | _ -> raise Not_found
 
-let probe_term_lval kf tlval =
-  try
-    let result = Option.bind kf Library_functions.get_retres_vi in
-    Plval (Logic_to_c.term_lval_to_lval ?result tlval)
-  with Logic_to_c.No_conversion -> raise Not_found
-
 let probe_marker = function
   | Printer_tag.PLval (_, _, (Var vi, NoOffset))
   | PVDecl (_, _, vi) when Cil.isFunctionType vi.vtype -> raise Not_found
@@ -127,7 +121,8 @@ let probe_marker = function
   | PExp (_, _, e) -> Pexpr e
   | PStmt (_, s) | PStmtStart (_, s) -> probe_stmt s
   | PVDecl (_, _, v) -> Plval (Var v, NoOffset)
-  | PTermLval (kf, _, _, tlval) -> probe_term_lval kf tlval
+  | PTermLval (kf, _, _, tlval) ->
+    Plval (General_requests.term_lval_to_lval kf tlval)
   | PIP property -> probe_property property
   | _ -> raise Not_found
 
@@ -475,9 +470,16 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   let eval_expr expr state =
     A.eval_expr state expr >>=: fun value -> Value value
 
-  let eval_pred predicate state =
+  let eval_pred eval_point predicate state =
+    let result =
+      match eval_point with
+      | Initial | Pre _ -> None
+      | Stmt stmt ->
+        let kf = Kernel_function.find_englobing_kf stmt in
+        Eva_utils.find_return_var kf
+    in
     let env =
-      Abstract_domain.{ states = (function _ -> A.Dom.top) ; result = None }
+      Abstract_domain.{ states = (function _ -> A.Dom.top) ; result }
     in
     let truth = A.Dom.evaluate_predicate env state predicate in
     `Value (Status truth), Alarmset.none
@@ -518,7 +520,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
     | Pexpr expr ->
       eval_steps (Cil.typeOf expr) (eval_expr expr) eval_point callstack
     | Ppred pred ->
-      eval_steps Cil.intType (eval_pred pred) eval_point callstack
+      eval_steps Cil.intType (eval_pred eval_point pred) eval_point callstack
 end
 
 let proxy =

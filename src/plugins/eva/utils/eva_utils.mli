@@ -72,6 +72,10 @@ val is_const_write_invalid: typ -> bool
 (** Detect that the type is const, and that option [-global-const] is set. In
     this case, we forbid writing in a l-value that has this type. *)
 
+val find_return_var: kernel_function -> varinfo option
+(** Returns the varinfo returned by the given function.
+    Returns None if the function returns void or has no return statement. *)
+
 val postconditions_mention_result: Cil_types.funspec -> bool
 (** Does the post-conditions of this specification mention [\result]? *)
 
