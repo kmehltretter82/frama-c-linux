@@ -86,8 +86,8 @@ let ptime t valid =
   { tmin = t ; tval = t ; tmax = t ; time = t ; tnbr = 1.0 ;
     success = if valid then 1.0 else 0.0 }
 
-let pqed r = ptime r.solver_time (VCS.is_valid r)
-let presult r = ptime r.prover_time (VCS.is_valid r)
+let pqed r = if VCS.is_valid r then ptime r.solver_time true else pzero
+let presult r = if VCS.is_valid r then ptime r.prover_time true else pzero
 let psolver r = ptime r.solver_time false
 
 (* -------------------------------------------------------------------------- *)
