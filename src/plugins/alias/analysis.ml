@@ -71,10 +71,12 @@ let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_sta
     None -> None
   | Some a -> Some (Abstract_state.assignment a lv exp)
 
-let rec do_init vi init state = match init with
-  | SingleInit e -> do_assignment state (Var vi, NoOffset) e
+let rec do_init (lv:lval) (init:init) state =
+  match init with
+  | SingleInit e -> do_assignment state lv e
   | CompoundInit(_, l) ->
-    List.fold_left (fun state (_, init) -> do_init vi init state) state l
+    List.fold_left (fun state (o, init) -> do_init (Cil.addOffsetLval o lv) init state) state l
+
 
 let list_instr_warnings : stmt list ref = ref []
 
@@ -85,41 +87,59 @@ let feedback_only_once s =
       Options.feedback "Skipping @[%a@] (summary not found)" Stmt.pretty s
     end
 
+let do_function_call (s:stmt) state (res : lval option) (ef : exp) (args: exp list) loc =
+  let is_malloc (s:string) : bool =
+    (s = "malloc") || (s = "calloc") (* todo : add all function names *)
+  in
+  match ef with
+  | {enode=Lval (Var v, _);_}  when is_malloc v.vname ->
+    begin
+      (* special case for malloc *)
+      match (state,res) with
+        (None, _) -> None
+      | (Some a, None) -> (Options.warning "Memory allocation not stored (ignored)"; Some a)
+      | (Some a, Some lv) -> Some (Abstract_state.assignment_x_allocate_y a lv)
+    end
+  | _ ->
+    begin
+      (* general case *)
+      let summary =
+        match Kernel_function.get_called ef with
+        | Some kf -> (try Function_table.find kf
+                      with Not_found -> !function_compute_ref kf ; Function_table.find kf)
+        | None -> Options.abort ~source:(fst loc)
+                    "Unsupported function pointer (skipped)"
+      in
+      match (state, summary) with
+        (None, _) -> None
+      | (Some a, Some summary) ->
+        let new_a = Abstract_state.call a res args summary in
+        Some new_a
+      | (Some a, None) -> (feedback_only_once s; Some a)
+    end
+
+
+let do_cons_init (s:stmt) (v:varinfo) f arg t  loc state =
+  Cil.treat_constructor_as_func (do_function_call s state) v f arg t loc
+
+
 let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
+  Options.feedback ~level:3 "analysing instruction: %a" Printer.pp_stmt s;
   match i with
     Set(lv,exp,_) ->
     let new_a = do_assignment a lv exp in
     new_a
   | Local_init(v,AssignInit i,_) ->
-    let new_a = do_init v i a in
+    let new_a = do_init (Var v, NoOffset) i a in
+    new_a
+  | Local_init(v,ConsInit (f,arg,t),loc) ->
+    let new_a = do_cons_init s v f arg t loc a in
     new_a
   | Code_annot _ -> a
   | Skip _ -> a
-  (* special case for malloc *)
-  | Call(res,{enode=Lval (Var info, _);_},_,_) when info.vname = "malloc"  ->
-    begin
-      match (a,res) with
-        (None, _) -> None
-      | (Some a, None) -> (Options.feedback "Warning : malloc not stored (ignored)"; Some a)
-      | (Some a, Some lv) -> Some (Abstract_state.assignment_x_allocate_y a lv)
-    end
-  (* general case for calls *)
-  | Call(res,ef,es,(loc,_)) ->
-    begin
-      let summary = match Kernel_function.get_called ef with
-        | Some kf -> (try Function_table.find kf
-                      with Not_found -> !function_compute_ref kf ; Function_table.find kf)
-        | None -> Options.abort ~source:loc
-                    "Unsupported function pointer (skipped)"
-      in
-      match (a, summary) with
-        (None, _) -> None
-      | (Some a, Some summary) ->
-        let new_a = Abstract_state.call a res es summary in
-        Some new_a
-      | (Some a, None) -> (feedback_only_once s; Some a)
-    end
-  | Asm _ | Local_init _ -> (Options.feedback "Skipping @[%a@] (doInstr not implemented)" Stmt.pretty s; a)
+  | Call(res,ef,es,loc) -> (* !function_compute_ref ef *)
+    do_function_call s a res ef es loc
+  | Asm _ -> (Options.feedback "Skipping @[%a@] (Asm not implemented)" Printer.pp_stmt s; a)
 
 let pp_abstract_state_opt ?(debug=false) fmt v =
   match v with

@@ -1,7 +1,4 @@
 [kernel] Parsing nested2.c (with preprocessing)
-[alias] Skipping st_2_t *z1 = malloc(sizeof(st_2_t)); (doInstr not implemented)
-[alias] Skipping st_3_t *t = malloc(sizeof(st_3_t)); (doInstr not implemented)
-[alias] Skipping int *a = malloc(sizeof(int)); (doInstr not implemented)
 [alias] May-aliases at the end of function main:
   {z1->s[0], &x1, &x2} are aliased
   {x1, x2} are aliased
