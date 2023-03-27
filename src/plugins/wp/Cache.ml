@@ -145,16 +145,16 @@ let is_updating = function
   | Update | Rebuild | Cleanup -> true
 
 let time_fits time = function
-  | None | Some 0 -> true
-  | Some limit -> time <= float limit
+  | None | Some 0.0 -> true
+  | Some limit -> time <= limit
 
 let steps_fits steps = function
   | None | Some 0 -> true
   | Some limit -> steps <= limit
 
 let time_seized time = function
-  | None | Some 0 -> false
-  | Some limit -> float limit <= time
+  | None | Some 0.0 -> false
+  | Some limit -> limit <= time
 
 let steps_seized steps steplimit =
   steps <> 0 &&
@@ -257,7 +257,7 @@ type 'a digest =
   Why3Provers.t -> 'a -> string
 
 type 'a runner =
-  timeout:int option -> steplimit:int option -> Why3Provers.t -> 'a ->
+  timeout:float option -> steplimit:int option -> Why3Provers.t -> 'a ->
   VCS.result Task.task
 
 let get_result ~digest ~runner ~timeout ~steplimit prover goal =

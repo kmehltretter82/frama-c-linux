@@ -77,7 +77,7 @@ class virtual command : string ->
     method add_float : name:string -> value:float -> unit
     method add_parameter : name:string -> (unit -> bool) -> unit
     method add_list : name:string -> string list -> unit
-    method timeout : int -> unit
+    method timeout : float -> unit
     method validate_time : (float -> unit) -> unit
     method validate_pattern : ?logs:logs -> ?repeat:bool ->
       Str.regexp -> (pattern -> unit) -> unit

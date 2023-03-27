@@ -62,7 +62,7 @@ val cmp_prover : prover -> prover -> int
 
 type config = {
   valid : bool ;
-  timeout : int option ;
+  timeout : float option ;
   stepout : int option ;
 }
 
@@ -70,8 +70,8 @@ val current : unit -> config (** Current parameters *)
 
 val default : config (** all None *)
 
-val get_timeout : ?kf:Kernel_function.t -> smoke:bool -> config -> int
-(** 0 means no-timeout *)
+val get_timeout : ?kf:Kernel_function.t -> smoke:bool -> config -> float
+(** 0.0 means no-timeout *)
 
 val get_stepout : config -> int (** 0 means no-stepout *)
 
@@ -102,7 +102,7 @@ val valid : result
 val invalid : result
 val unknown : result
 val stepout : int -> result
-val timeout : int -> result
+val timeout : float -> result
 val computing : (unit -> unit) -> result
 val failed : ?pos:Lexing.position -> string -> result
 val kfailed : ?pos:Lexing.position -> ('a,Format.formatter,unit,result) format4 -> 'a

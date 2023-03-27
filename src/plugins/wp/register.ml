@@ -771,8 +771,9 @@ let pp_wp_parameters fmt =
     if spec <> [] && spec <> ["Typed"] then
       ( let descr = Factory.descr (Factory.parse spec) in
         Format.fprintf fmt " -wp-model '%s'" descr ) ;
+    let dt = Wp_parameters.Timeout.get_default () in
     let tm = Wp_parameters.Timeout.get () in
-    if tm <> 10 then Format.fprintf fmt " -wp-timeout %d" tm ;
+    if tm <> dt then Format.fprintf fmt " -wp-timeout %d" tm ;
     let st = Wp_parameters.Steps.get () in
     if st > 0 then Format.fprintf fmt " -wp-steps %d" st ;
     if not (Kernel.SignedOverflow.get ()) then

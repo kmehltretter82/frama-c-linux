@@ -29,7 +29,7 @@
 
 type 'a task
 type 'a status =
-  | Timeout of int
+  | Timeout of float
   | Canceled
   | Result of 'a
   | Failed of exn
@@ -134,7 +134,7 @@ val sync : mutex -> (unit -> 'a task) -> 'a task
 (* ************************************************************************* *)
 
 val command :
-  ?timeout:int ->
+  ?timeout:float ->
   ?time:float ref ->
   ?stdout:Buffer.t ->
   ?stderr:Buffer.t ->

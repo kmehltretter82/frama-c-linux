@@ -841,7 +841,7 @@ let () = Parameter_customize.set_group wp_prover
 module Timeout =
   Int(struct
     let option_name = "-wp-timeout"
-    let default = 10
+    let default = 2
     let arg_name = "n"
     let help =
       Printf.sprintf
