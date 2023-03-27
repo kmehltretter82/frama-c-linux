@@ -294,7 +294,6 @@
 %token PI
 
 %right prec_named
-%nonassoc TYPENAME
 %nonassoc prec_forall prec_exists prec_lambda LET
 %right QUESTION prec_question
 %left IFF
@@ -309,7 +308,6 @@
 %left STARHAT
 %left AMP
 %nonassoc IN
-%left LT
 %left LTLT GTGT
 %left PLUS MINUS
 %left STAR SLASH PERCENT
@@ -761,8 +759,8 @@ logic_rt_type:
 ;
 
 abs_spec_option:
-| /* empty */ %prec TYPENAME  { fun t -> t }
-| abs_spec { $1 }
+| /* empty */ { fun t -> t }
+| abs_spec    { $1 }
 ;
 
 abs_spec_cv_option:
@@ -772,12 +770,12 @@ abs_spec_cv_option:
 
 abs_spec:
 |                    tabs { $1 }
-| stars                   %prec TYPENAME { $1 }
-| stars              tabs                { fun t -> $2 ($1 t) }
-| stars abs_spec_bis      %prec TYPENAME { fun t -> $2 ($1 t) }
-| stars abs_spec_bis tabs                { fun t -> $2 ($3 ($1 t)) }
-|       abs_spec_bis tabs                { fun t -> $1 ($2 t) }
-|       abs_spec_bis      %prec TYPENAME { $1 }
+| stars                   { $1 }
+| stars              tabs { fun t -> $2 ($1 t) }
+| stars abs_spec_bis      { fun t -> $2 ($1 t) }
+| stars abs_spec_bis tabs { fun t -> $2 ($3 ($1 t)) }
+|       abs_spec_bis tabs { fun t -> $1 ($2 t) }
+|       abs_spec_bis      { $1 }
 ;
 
 abs_spec_cv:
@@ -813,7 +811,7 @@ stars_cv:
 ;
 
 tabs:
-| LSQUARE array_size RSQUARE %prec TYPENAME
+| LSQUARE array_size RSQUARE
     {
       fun t -> LTarray (t,$2)
     }
