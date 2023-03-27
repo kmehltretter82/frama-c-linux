@@ -849,7 +849,7 @@ let union  (a1:t) (a2:t) :t =
   let new_a =
     List.fold_left (join_set ~without_check:true) new_a sets_to_be_joined
   in
-  Options.debug ~level:3 "Union: Result graph:@.%a@." print_graph new_a;
+  Options.debug ~level:4 "Union: Result graph:@.%a@." print_graph new_a;
   Options.debug ~level:5 "Union: Result graph:@.%a@." print_debug new_a;
   assert_invariants new_a;
   new_a
