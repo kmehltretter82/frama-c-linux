@@ -124,7 +124,6 @@ let do_cons_init (s:stmt) (v:varinfo) f arg t  loc state =
 
 
 let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
-  Options.feedback ~level:3 "analysing instruction: %a" Printer.pp_stmt s;
   match i with
     Set(lv,exp,_) ->
     let new_a = do_assignment a lv exp in

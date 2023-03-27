@@ -1,47 +1,27 @@
 [kernel] Parsing function5.c (with preprocessing)
+[alias] analysing function: choice
+[alias] analysing instruction: int c = 0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: __retres = x;
+[alias] May-aliases at the end of instruction:
+  {x, __retres} are aliased
+[alias] analysing instruction: __retres = y;
+[alias] May-aliases at the end of instruction:
+  {y, __retres} are aliased
+[alias] May-aliases at the end of function choice:
+  {x, y, __retres} are aliased
+[alias] analysing function: main
+[alias] analysing instruction: int *a = (int *)0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: int *b = (int *)0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: int *c = (int *)0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: c = choice(a,b);
+[alias] May-aliases at the end of instruction:
+  {a, b, c} are aliased
+[alias] analysing instruction: __retres = 0;
+[alias] May-aliases at the end of instruction:
+  {a, b, c} are aliased
 [alias] May-aliases at the end of function main:
   {a, b, c} are aliased
-Before statement goto return_label; :
- {x, __retres} are aliased
-
-Before statement __retres = y;
-                 goto return_label; :
- 
-Before statement int c = 0; :
- 
-Before statement goto return_label; :
- {y, __retres} are aliased
-
-Before statement return_label: return __retres; :
- {x, y, __retres} are aliased
-
-Before statement if (c) {
-                   __retres = x;
-                   goto return_label;
-                 }
-                 else {
-                   __retres = y;
-                   goto return_label;
-                 } :
- 
-Before statement return __retres; :
- {a, b, c} are aliased
-
-Before statement __retres = x; :
- 
-Before statement __retres = y; :
- 
-Before statement int *a = (int *)0; :
- 
-Before statement int *b = (int *)0; :
- 
-Before statement int *c = (int *)0; :
- 
-Before statement c = choice(a,b); :
- 
-Before statement __retres = 0; :
- {a, b, c} are aliased
-
-Before statement __retres = x;
-                 goto return_label; :
- 

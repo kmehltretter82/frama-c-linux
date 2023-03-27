@@ -1,20 +1,19 @@
 [kernel] Parsing assignment3.c (with preprocessing)
+[alias] analysing function: main
+[alias] analysing instruction: int *a = (int *)0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: int b = 0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: int *c = (int *)0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: a = & b;
+[alias] May-aliases at the end of instruction:
+  {a, &b} are aliased
+[alias] analysing instruction: c = & b;
+[alias] May-aliases at the end of instruction:
+  {a, c, &b} are aliased
+[alias] analysing instruction: __retres = 0;
+[alias] May-aliases at the end of instruction:
+  {a, c, &b} are aliased
 [alias] May-aliases at the end of function main:
   {a, c, &b} are aliased
-Before statement int *a = (int *)0; :
- 
-Before statement int b = 0; :
- 
-Before statement int *c = (int *)0; :
- 
-Before statement a = & b; :
- 
-Before statement c = & b; :
- {a, &b} are aliased
-
-Before statement __retres = 0; :
- {a, c, &b} are aliased
-
-Before statement return __retres; :
- {a, c, &b} are aliased
-

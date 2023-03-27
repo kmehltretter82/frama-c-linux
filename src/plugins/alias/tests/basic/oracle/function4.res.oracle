@@ -1,22 +1,21 @@
 [kernel] Parsing function4.c (with preprocessing)
+[alias] analysing function: addr
+[alias] May-aliases at the end of function addr:
+[alias] analysing function: main
+[alias] analysing instruction: int *a = (int *)0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: int *b = (int *)0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: int c = 0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: a = addr(& c);
+[alias] May-aliases at the end of instruction:
+  {a, &c} are aliased
+[alias] analysing instruction: b = & c;
+[alias] May-aliases at the end of instruction:
+  {a, b, &c} are aliased
+[alias] analysing instruction: __retres = 0;
+[alias] May-aliases at the end of instruction:
+  {a, b, &c} are aliased
 [alias] May-aliases at the end of function main:
   {a, b, &c} are aliased
-Before statement return x; :
- 
-Before statement int *a = (int *)0; :
- 
-Before statement int *b = (int *)0; :
- 
-Before statement int c = 0; :
- 
-Before statement a = addr(& c); :
- 
-Before statement b = & c; :
- {a, &c} are aliased
-
-Before statement __retres = 0; :
- {a, b, &c} are aliased
-
-Before statement return __retres; :
- {a, b, &c} are aliased
-

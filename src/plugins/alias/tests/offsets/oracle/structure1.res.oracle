@@ -1,29 +1,28 @@
 [kernel] Parsing structure1.c (with preprocessing)
+[alias] analysing function: main
+[alias] analysing instruction: st_1_t x = {.a = 0, .b = 1};
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: st_2_t y = {.a = 3, .c = 4};
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: st_1_t *p_x = & x;
+[alias] May-aliases at the end of instruction:
+  {p_x, &x} are aliased
+[alias] analysing instruction: st_2_t *p_y = & y;
+[alias] May-aliases at the end of instruction:
+  {p_x, &x} are aliased
+  {p_y, &y} are aliased
+[alias] analysing instruction: p_x->a = 3;
+[alias] May-aliases at the end of instruction:
+  {p_x, &x} are aliased
+  {p_y, &y} are aliased
+[alias] analysing instruction: p_x = (st_1_t *)p_y;
+[alias] May-aliases at the end of instruction:
+  {p_x, p_y, &x, &y} are aliased
+  {x, y} are aliased
+[alias] analysing instruction: __retres = 0;
+[alias] May-aliases at the end of instruction:
+  {p_x, p_y, &x, &y} are aliased
+  {x, y} are aliased
 [alias] May-aliases at the end of function main:
   {p_x, p_y, &x, &y} are aliased
   {x, y} are aliased
-Before statement st_1_t x = {.a = 0, .b = 1}; :
- 
-Before statement st_2_t y = {.a = 3, .c = 4}; :
- 
-Before statement st_1_t *p_x = & x; :
- 
-Before statement st_2_t *p_y = & y; :
- {p_x, &x} are aliased
-
-Before statement p_x->a = 3; :
- {p_x, &x} are aliased
-{p_y, &y} are aliased
-
-Before statement p_x = (st_1_t *)p_y; :
- {p_x, &x} are aliased
-{p_y, &y} are aliased
-
-Before statement __retres = 0; :
- {p_x, p_y, &x, &y} are aliased
-{x, y} are aliased
-
-Before statement return __retres; :
- {p_x, p_y, &x, &y} are aliased
-{x, y} are aliased
-
