@@ -10,12 +10,8 @@
 [alias] May-aliases at the end of instruction:
 [alias] analysing instruction: a = addr(& c);
 [alias] May-aliases at the end of instruction:
-  {a, &c} are aliased
 [alias] analysing instruction: b = & c;
 [alias] May-aliases at the end of instruction:
-  {a, b, &c} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction:
-  {a, b, &c} are aliased
 [alias] May-aliases at the end of function main:
-  {a, b, &c} are aliased

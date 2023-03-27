@@ -2,31 +2,17 @@
 [alias] analysing function: main
 [alias] analysing instruction: a = & x;
 [alias] May-aliases at the end of instruction:
-  {a, &x} are aliased
 [alias] analysing instruction: b = & y;
 [alias] May-aliases at the end of instruction:
-  {a, &x} are aliased
-  {b, &y} are aliased
 [alias] analysing instruction: y = & z;
 [alias] May-aliases at the end of instruction:
-  {a, &x} are aliased
-  {b, &y} are aliased
-  {y, &z} are aliased
 [alias] analysing instruction: y = & x;
 [alias] May-aliases at the end of instruction:
-  {b, &y} are aliased
-  {a, y, &x} are aliased
 [alias] analysing instruction: c = & y;
 [alias] May-aliases at the end of instruction:
   {x, z} are aliased
-  {b, c, &y} are aliased
-  {a, y, &x, &z} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction:
   {x, z} are aliased
-  {b, c, &y} are aliased
-  {a, y, &x, &z} are aliased
 [alias] May-aliases at the end of function main:
   {x, z} are aliased
-  {b, c, &y} are aliased
-  {a, y, &x, &z} are aliased

@@ -8,12 +8,8 @@
 [alias] May-aliases at the end of instruction:
 [alias] analysing instruction: a = & b;
 [alias] May-aliases at the end of instruction:
-  {a, &b} are aliased
 [alias] analysing instruction: c = & b;
 [alias] May-aliases at the end of instruction:
-  {a, c, &b} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction:
-  {a, c, &b} are aliased
 [alias] May-aliases at the end of function main:
-  {a, c, &b} are aliased
