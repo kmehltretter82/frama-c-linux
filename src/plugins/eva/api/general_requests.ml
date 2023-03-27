@@ -183,39 +183,78 @@ let () = Request.register ~package
 
 (* ----- Register Eva values information ------------------------------------ *)
 
+type evaluation_point =
+  | Initial
+  | Pre of kernel_function
+  | Stmt of stmt
+
+let post kf =
+  if Analysis.use_spec_instead_of_definition kf
+  then raise Not_found
+  else
+    try Stmt (Kernel_function.find_return kf)
+    with Kernel_function.No_Statement -> raise Not_found
+
+let request_at = function
+  | Initial -> Results.at_start
+  | Stmt stmt -> Results.before stmt
+  | Pre kf -> Results.at_start_of kf
+
+let property_evaluation_point = function
+  | Property.IPCodeAnnot { ica_stmt = stmt }
+  | IPPropertyInstance { ii_stmt = stmt } -> Stmt stmt
+  | IPPredicate {ip_kf; ip_kind = PKEnsures (_, Normal)} -> post ip_kf
+  | IPPredicate { ip_kf = kf;
+                  ip_kind = PKRequires _ | PKAssumes _ | PKTerminates }
+  | IPAssigns {ias_kf = kf} | IPFrom {if_kf = kf} ->
+    Pre kf
+  | IPPredicate _ | IPComplete _ | IPDisjoint _ | IPDecrease _
+  | IPAxiomatic _ | IPLemma _ | IPTypeInvariant _ | IPGlobalInvariant _
+  | IPOther _ | IPAllocation _ | IPReachable _ | IPExtended _ | IPBehavior _ ->
+    raise Not_found
+
+let marker_evaluation_point = function
+  | Printer_tag.PGlobal _ -> Initial
+  | PStmt (_, stmt) | PStmtStart (_, stmt) -> Stmt stmt
+  | PLval (kf, ki, _) | PExp (kf, ki, _) | PVDecl (kf, ki, _) ->
+    begin
+      match kf, ki with
+      | _, Kstmt stmt -> Stmt stmt
+      | Some kf, Kglobal -> Pre kf
+      | None, Kglobal -> Initial
+    end
+  | PTermLval (_, _, prop, _) | PIP prop -> property_evaluation_point prop
+  | PType _ -> raise Not_found
+
 let term_lval_to_lval tlval =
   try Logic_to_c.term_lval_to_lval tlval
   with Logic_to_c.No_conversion -> raise Not_found
 
 let print_value fmt loc =
   let is_scalar = Cil.isScalarType in
-  let kf, kinstr, eval =
+  let evaluation_point = marker_evaluation_point loc in
+  let request = request_at evaluation_point in
+  let eval =
     match loc with
-    | Printer_tag.PLval (kf, ki, lval) when is_scalar (Cil.typeOfLval lval) ->
-      kf, ki, Results.eval_lval lval
-    | Printer_tag.PExp (kf, ki, expr) when is_scalar (Cil.typeOf expr) ->
-      kf, ki, Results.eval_exp expr
-    | PVDecl (kf, ki, vi) when is_scalar vi.vtype ->
-      kf, ki, Results.eval_var vi
-    | PTermLval (kf, ki, _ip, tlval) ->
+    | Printer_tag.PLval (_, _, lval) when is_scalar (Cil.typeOfLval lval) ->
+      Results.eval_lval lval
+    | Printer_tag.PExp (_, _, expr) when is_scalar (Cil.typeOf expr) ->
+      Results.eval_exp expr
+    | PVDecl (_, _, vi) when is_scalar vi.vtype ->
+      Results.eval_var vi
+    | PTermLval (_, _, _ip, tlval) ->
       let lval = term_lval_to_lval tlval in
       if is_scalar (Cil.typeOfLval lval)
-      then kf, ki, Results.eval_lval lval
+      then Results.eval_lval lval
       else raise Not_found
     | _ -> raise Not_found
   in
   let pretty = Cvalue.V_Or_Uninitialized.pretty in
   let eval_cvalue at = Results.(eval at |> as_cvalue_or_uninitialized) in
-  let request =
-    match kf, kinstr with
-    | _, Kstmt stmt -> Results.before stmt
-    | Some kf, Kglobal -> Results.at_start_of kf
-    | None, Kglobal -> Results.at_start
-  in
   let before = eval_cvalue request in
-  match kinstr with
-  | Kglobal -> pretty fmt before
-  | Kstmt stmt ->
+  match evaluation_point with
+  | Initial | Pre _ -> pretty fmt before
+  | Stmt stmt ->
     let after = eval_cvalue (Results.after stmt) in
     if Cvalue.V_Or_Uninitialized.equal before after
     then pretty fmt before

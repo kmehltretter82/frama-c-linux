@@ -21,3 +21,14 @@
 (**************************************************************************)
 
 (** General Eva requests registered in the server. *)
+
+open Cil_types
+
+type evaluation_point =
+  | Initial
+  | Pre of kernel_function
+  | Stmt of stmt
+
+(* Returns the evaluation point of a marker.
+   @raises Not_found if the marker cannot be evaluated. *)
+val marker_evaluation_point: Printer_tag.localizable -> evaluation_point
