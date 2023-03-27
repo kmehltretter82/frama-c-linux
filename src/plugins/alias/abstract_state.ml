@@ -510,9 +510,8 @@ let find_vertex lv x =
   else raise Not_found
 
 (* remove a lval from a graph*)
-let remove_lval (x:t)  (lv:lval) :t =
+let remove_lval (x:t)  (lv:Lval.t) :t =
   assert_invariants x;
-  let lv = Lval.from_lval lv in
   let new_x =
     try
       let v = LLMap.find lv x.lmap in
@@ -708,6 +707,15 @@ let assignment (a:t) (lv:lval) (e:exp) : t =
   let y = Lval.from_exp e in
   match x,y with
     BNone, _ | _, BNone -> a
+  | _, BAddrOf blv ->
+    begin
+      let (v1,a) = find_or_create_vertex x a in
+      let (v2,a) = find_or_create_vertex y a in
+      let new_a = cjoin a v1 v2 in
+      let new_a = remove_lval new_a (BAddrOf blv) in
+      assert_invariants new_a ;
+      new_a
+    end
   | _ ->
     begin
       let (v1,a) = find_or_create_vertex x a in
@@ -946,7 +954,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
     List.fold_left
       remove_lval
       new_state
-      (summary.formals@summary.locals)
+      (List.map (fun x -> Lval.from_lval x ) (summary.formals@summary.locals))
   in
   assert_invariants new_state;
   new_state
