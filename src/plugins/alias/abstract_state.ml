@@ -166,7 +166,6 @@ end
 
 type t = {
   graph : G.t;
-  pending : VSet.t VMap.t ; (* pending(v) is the set of vertices v' that could be aliased to v if v becomes/ is detected as a pointer *)
   lmap : LLMap.t ; (* lmap(lv) is a table [offset->v] where the vertex v corresponding to lval (lv+offset), in other words (lv+offset) is in label(v) *)
   vmap : LSet.t VMap.t ;(* reverse of lmap *)
   cmpt : Int.t ; (* counter to create new vertex *)
@@ -196,9 +195,6 @@ let print_debug fmt (x:t) =
   Format.fprintf fmt "@]@.@[<hov 2>List of edges: @.";
   G.iter_edges (fun v1 v2 -> Format.fprintf fmt "%d → %d@." v1 v2) x.graph;
   Format.fprintf fmt "@]@.";
-  Format.fprintf fmt "@[<hov 2>Pending: @.";
-  VMap.iter (fun v vs -> Format.fprintf fmt "id=%d pending=%a@." v VSet.pretty vs) x.pending;
-  Format.fprintf fmt "@]@.";
   Format.fprintf fmt "@[<hov 2>LMap: @.";
   LLMap.pretty fmt x.lmap;
   Format.fprintf fmt "@]@.";
@@ -225,13 +221,11 @@ let print_aliases fmt (x:t) =
 
 (** invariants of type t must be true before and after each functon call *)
 let assert_invariants (x:t) : unit =
-  (* check that all vertex of the graph have entries in pending and
-     vmap, and are integer between 0 and cmpt, and have at most 1
-     successor *)
+  (* check that all vertex of the graph have entries in vmap,
+     and are integer between 0 and cmpt, and have at most 1 successor *)
   let assert_vertex (v:V.t) =
     assert (v >= 0);
     assert (v < x.cmpt);
-    assert (VMap.mem v x.pending);
     assert (VMap.mem v x.vmap);
     assert (List.length (G.succ x.graph v) <= 1)
   in
@@ -300,13 +294,11 @@ let find_transitive_closure  (lv:lval) (x:t) =
 let create_cst_vertex (x:t) : V.t * t =
   let new_v = x.cmpt in
   let new_g = G.add_vertex x.graph new_v in
-  let new_pending = VMap.add new_v VSet.empty x.pending in
   let new_lmap = x.lmap in
   let new_vmap = VMap.add new_v LSet.empty x.vmap in
   new_v ,
   {
     graph = new_g ;
-    pending = new_pending ;
     lmap = new_lmap ;
     vmap = new_vmap ;
     cmpt = x.cmpt+1
@@ -349,7 +341,6 @@ let find_all_aliases (lv1: Lval.t) (x: t) : LSet.t =
 let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   let new_v = x.cmpt in
   let new_g = G.add_vertex x.graph new_v in
-  let new_pending = VMap.add new_v VSet.empty x.pending in
   (* find all the alias of lv (because of offset) *)
   let set_of_aliases : LSet.t = find_all_aliases lv x in
   (* add all these aliases *)
@@ -365,7 +356,6 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   let new_x =
     {
       graph = new_g ;
-      pending = new_pending ;
       lmap = new_lmap ;
       vmap = new_vmap ;
       cmpt = x.cmpt+1
@@ -524,7 +514,7 @@ let remove_lval (x:t)  (lv:Lval.t) :t =
   in
   assert_invariants new_x; new_x
 
-(* merge of two vertices; the first vertex carries both sets, the second is removed from the graph and from lmap and vmap; however, pending is NOT updated  *)
+(* merge of two vertices; the first vertex carries both sets, the second is removed from the graph and from lmap and vmap *)
 let merge x v1 v2 =
   if (V.equal v1 v2) || not (G.mem_vertex x.graph v1) || not (G.mem_vertex x.graph v2)
   then x
@@ -550,7 +540,7 @@ let merge x v1 v2 =
     let g = G.fold_pred f_fold_pred g v2 g in
     (* remove v2 *)
     let g =  G.remove_vertex g v2 in
-    {graph = g; pending = x.pending; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt}
+    {graph = g; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt}
 
 
 
@@ -601,35 +591,11 @@ let rec join_without_check (x:t) (v1:V.t) (v2:V.t) : t =
     let x = merge x v1 v2 in
     assert (not (G.mem_vertex x.graph v2));
     match (pt1, pt2) with
-      [],[] ->
-      (* update pending *)
-      let p = VMap.add v1 (VSet.union (VMap.find v1 x.pending) (VMap.find v2 x.pending)) x.pending in
-      let new_pending = VMap.remove v2 p in
-      {x with pending = new_pending }
-    | [], _ ->
-      (* join pending v1 *)
-      let x =
-        VSet.fold
-          (fun v x -> join_without_check x v v1)
-          (try VMap.find v1 x.pending with Not_found -> VSet.empty )
-          x
-          (* update pending *)
-      in let new_pending = VMap.add v1 VSet.empty (VMap.remove v2 x.pending) in
-      {x with pending = new_pending }
-    | _, [] ->
-      (* join pending v2 *)
-      let x =
-        VSet.fold
-          (fun v x -> join_without_check x v v1)
-          (try VMap.find v2 x.pending with Not_found -> VSet.empty )
-          x
-      in let new_pending = VMap.add v1 VSet.empty (VMap.remove v2 x.pending) in
-      {x with pending = new_pending }
+    | [], _ -> x
+    | _, [] -> x
     | _, _ ->
-      (* assert pending(v1) = empty and assert pending (v2) =empty *)
-      let new_pending = (VMap.remove v2 x.pending) in
       (* join the succesors *)
-      unify {x with pending=new_pending} pt1 pt2
+      unify x pt1 pt2
 
 (* [unify x l1 l2] folds [join x v1 v2] for all [v1] in [l1] and all [v2] in [l2] *)
 and unify (x:t) (l1:V.t list) (l2:V.t list) =
@@ -677,9 +643,7 @@ let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
   let pt2 =  G.succ x.graph v2 in
   if pt2 = []
   then
-    let old_set = try VMap.find v1 x.pending with Not_found -> VSet.empty in
-    let new_pending = VMap.add v1 (VSet.add v2 old_set) x.pending in
-    {x with pending=new_pending}
+    x
   else
     join x v1 v2
 
@@ -698,7 +662,7 @@ let set_type (x:t) (v1:V.t) (v2:V.t) : t =
     | _ -> Options.fatal "too many outgoing edges in set_type"
   in
   let new_g = G.add_edge g v1 v2 in
-  VSet.fold (fun vx x -> join x v1 vx) (try VMap.find v1 x.pending with Not_found -> VSet.empty) {x with graph = new_g}
+  {x with graph = new_g}
 
 
 let assignment (a:t) (lv:lval) (e:exp) : t =
@@ -780,13 +744,8 @@ let shift (a : t) (offset : int) : t =
   let shift_vmap shift_elem vmap =
     VMap.of_seq @@ Stdlib.Seq.map shift_elem @@ VMap.to_seq vmap
   in
-  let {graph; pending; lmap; vmap; cmpt} = a in
-  let pending' =
-    let shift_elem (key, set) = (shift key, VSet.map shift set) in
-    shift_vmap shift_elem pending
-  in
+  let {graph; lmap; vmap; cmpt} = a in
   {graph = G.map_vertex shift graph;
-   pending = pending';
    lmap = LLMap.map shift lmap;
    vmap = shift_vmap (fun (key, l) -> (shift key, l)) vmap;
    cmpt = shift cmpt}
@@ -800,7 +759,7 @@ let lmap_intersect l r =
 let union  (a1:t) (a2:t) :t =
   (* naive algorithm :
      1 rename any vertex in a2 (by adding a1.cmpt) to avoid any confusion between vertex of the tw graphs
-     2 merge the graph and the vmap and pending (by doing union of sets)
+     2 merge the graph and the vmap (by doing union of sets)
      3 for any lval [lv] that are has an entry in both a1.lmap and a2.lmap, merge the two vertex a1.lmap[lv]
        and a2.lmap[lv]
 
@@ -827,7 +786,6 @@ let union  (a1:t) (a2:t) :t =
       a2.graph
       new_graph
   in
-  let new_pending = VMap.fold VMap.add a2.pending a1.pending in
   let new_vmap =
     VMap.fold
       (fun v2 lset2 m -> VMap.add v2 lset2 m)
@@ -853,7 +811,7 @@ let union  (a1:t) (a2:t) :t =
   Options.debug ~level:7 "Union: sets to be joined:@[";
   List.iter (fun set -> Options.debug ~level:7 "%a" VSet.pretty set) sets_to_be_joined;
   Options.debug ~level:7 "@]@.";
-  let new_a = { graph = new_graph ; pending = new_pending ; lmap = new_lmap ; vmap = new_vmap ; cmpt = max a1.cmpt a2.cmpt} in
+  let new_a = {graph = new_graph; lmap = new_lmap; vmap = new_vmap; cmpt = max a1.cmpt a2.cmpt} in
   let new_a =
     List.fold_left (join_set ~without_check:true) new_a sets_to_be_joined
   in
@@ -863,7 +821,7 @@ let union  (a1:t) (a2:t) :t =
   new_a
 
 let empty :t =
-  {graph = G.empty; pending = VMap.empty ; lmap = LLMap.empty; vmap = VMap.empty; cmpt = 0}
+  {graph = G.empty; lmap = LLMap.empty; vmap = VMap.empty; cmpt = 0}
 
 (** a type for summaries of functions *)
 type summary =
