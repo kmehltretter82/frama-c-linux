@@ -1,24 +1,22 @@
 [kernel] Parsing conditional1.c (with preprocessing)
+[alias] analysing function: main
+[alias] analysing instruction: int *a = (int *)0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: int *b = (int *)0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: int *c = (int *)0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: a = b;
+[alias] May-aliases at the end of instruction:
+  {a, b} are aliased
+[alias] analysing instruction: a = c;
+[alias] May-aliases at the end of instruction:
+  {a, c} are aliased
+[alias] analysing instruction: *a = 4;
+[alias] May-aliases at the end of instruction:
+  {a, b, c} are aliased
+[alias] analysing instruction: __retres = 0;
+[alias] May-aliases at the end of instruction:
+  {a, b, c} are aliased
 [alias] May-aliases at the end of function main:
   {a, b, c} are aliased
-Before statement int *a = (int *)0; :
- 
-Before statement int *b = (int *)0; :
- 
-Before statement int *c = (int *)0; :
- 
-Before statement if (a) a = b; else a = c; :
- 
-Before statement a = b; :
- 
-Before statement a = c; :
- 
-Before statement *a = 4; :
- {a, b, c} are aliased
-
-Before statement __retres = 0; :
- {a, b, c} are aliased
-
-Before statement return __retres; :
- {a, b, c} are aliased
-

@@ -1,43 +1,16 @@
 [kernel] Parsing while_for2.c (with preprocessing)
+[alias] analysing function: main
+[alias] analysing instruction: int *a = (int *)0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: int *b = (int *)0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: int *c = (int *)0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: a = b;
+[alias] May-aliases at the end of instruction:
+  {a, b} are aliased
+[alias] analysing instruction: __retres = 0;
+[alias] May-aliases at the end of instruction:
+  {a, b} are aliased
 [alias] May-aliases at the end of function main:
   {a, b} are aliased
-Before statement return __retres; :
- {a, b} are aliased
-
-Before statement int *a = (int *)0; :
- 
-Before statement int *b = (int *)0; :
- 
-Before statement int *c = (int *)0; :
- 
-Before statement while (1) {
-                   a = b;
-                   break;
-                 } :
- 
-Before statement a = b;
-                 break; :
- 
-Before statement a = b; :
- 
-Before statement break; :
- {a, b} are aliased
-
-Before statement while (1) {
-                   break;
-                   a = c;
-                   break;
-                 } :
- {a, b} are aliased
-
-Before statement break;
-                 a = c;
-                 break; :
- {a, b} are aliased
-
-Before statement break; :
- {a, b} are aliased
-
-Before statement __retres = 0; :
- {a, b} are aliased
-

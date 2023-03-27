@@ -1,18 +1,17 @@
 [kernel] Parsing collapse2.c (with preprocessing)
+[alias] analysing function: main
+[alias] analysing instruction: mat[0][0] = 0;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: mat[0][1] = 1;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: int i = 2;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: mat[1][i] = i;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: i ++;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: mat[1][i] = 2;
+[alias] May-aliases at the end of instruction:
+[alias] analysing instruction: __retres = 0;
+[alias] May-aliases at the end of instruction:
 [alias] May-aliases at the end of function main:
-Before statement mat[0][0] = 0; :
- 
-Before statement mat[0][1] = 1; :
- 
-Before statement int i = 2; :
- 
-Before statement mat[1][i] = i; :
- 
-Before statement i ++; :
- 
-Before statement mat[1][i] = 2; :
- 
-Before statement __retres = 0; :
- 
-Before statement return __retres; :
- 
