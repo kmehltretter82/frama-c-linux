@@ -1,7 +1,7 @@
 [kernel] Parsing assignment5.c (with preprocessing)
 [alias] May-aliases at the end of function main:
-  {*a, *a, b} are aliased
-  {*b, *(*a), c, d} are aliased
+  {*a, b} are aliased
+  {*(*a), *b, c, d} are aliased
 Before statement int ***a = (int ***)0; :
  
 Before statement int **b = (int **)0; :
@@ -20,10 +20,10 @@ Before statement d = *(*a); :
 {*b, c} are aliased
 
 Before statement __retres = 0; :
- {*a, *a, b} are aliased
-{*b, *(*a), c, d} are aliased
+ {*a, b} are aliased
+{*(*a), *b, c, d} are aliased
 
 Before statement return __retres; :
- {*a, *a, b} are aliased
-{*b, *(*a), c, d} are aliased
+ {*a, b} are aliased
+{*(*a), *b, c, d} are aliased
 
