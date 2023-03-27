@@ -231,16 +231,19 @@ let analyse_function (kf:kernel_function) =
 
 let doFunction (kf:kernel_function) =
   let final_state = analyse_function kf in
-  if Kernel_function.is_main kf then begin
-    (* if main, print the last abstract state *)
-    Options.feedback "May-aliases at the end of function main:@.%a@." (pp_abstract_state_opt ~debug:false) final_state;
-    Options.debug "May-alias graph at the end of function main:@.%a@." (pp_abstract_state_opt ~debug:true) final_state;
+  let level = if Kernel_function.is_main kf then 1 else 2 in
+  Options.feedback ~level "May-aliases at the end of function %a:@.%a@."
+    Kernel_function.pretty kf
+    (pp_abstract_state_opt ~debug:false) final_state;
+  Options.debug ~level "May-alias graph at the end of function %a:@.%a@."
+    Kernel_function.pretty kf
+    (pp_abstract_state_opt ~debug:true) final_state;
+  if Kernel_function.is_main kf then
     let f_name = Options.Dot_output.get () in
     match f_name, final_state with
     | "", _ -> ()
     | _, None -> ()
     | _, Some final_state -> Abstract_state.print_dot f_name final_state
-  end
   else
     Function_table.add kf @@ Some (Abstract_state.make_summary final_state kf)
 

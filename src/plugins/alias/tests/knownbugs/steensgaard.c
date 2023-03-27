@@ -1,0 +1,12 @@
+int main () {
+  int *a, **b, **c, *y, x, z, p;
+  a = &x;
+  b = &y;
+  if (p)
+    y = &z;
+  else
+    y = &x;
+  c = &y;
+
+  return 0;
+}
