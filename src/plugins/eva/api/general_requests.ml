@@ -186,23 +186,23 @@ let () = Request.register ~package
 type evaluation_point =
   | Initial
   | Pre of kernel_function
-  | Stmt of stmt
+  | Stmt of kernel_function * stmt
 
 let post kf =
   if Analysis.use_spec_instead_of_definition kf
   then raise Not_found
   else
-    try Stmt (Kernel_function.find_return kf)
+    try Stmt (kf, Kernel_function.find_return kf)
     with Kernel_function.No_Statement -> raise Not_found
 
 let request_at = function
   | Initial -> Results.at_start
-  | Stmt stmt -> Results.before stmt
+  | Stmt (_, stmt) -> Results.before stmt
   | Pre kf -> Results.at_start_of kf
 
 let property_evaluation_point = function
-  | Property.IPCodeAnnot { ica_stmt = stmt }
-  | IPPropertyInstance { ii_stmt = stmt } -> Stmt stmt
+  | Property.IPCodeAnnot { ica_kf = kf; ica_stmt = stmt }
+  | IPPropertyInstance { ii_kf = kf; ii_stmt = stmt } -> Stmt (kf, stmt)
   | IPPredicate {ip_kf; ip_kind = PKEnsures (_, Normal)} -> post ip_kf
   | IPPredicate { ip_kf = kf;
                   ip_kind = PKRequires _ | PKAssumes _ | PKTerminates }
@@ -215,13 +215,14 @@ let property_evaluation_point = function
 
 let marker_evaluation_point = function
   | Printer_tag.PGlobal _ -> Initial
-  | PStmt (_, stmt) | PStmtStart (_, stmt) -> Stmt stmt
+  | PStmt (kf, stmt) | PStmtStart (kf, stmt) -> Stmt (kf, stmt)
   | PLval (kf, ki, _) | PExp (kf, ki, _) | PVDecl (kf, ki, _) ->
     begin
       match kf, ki with
-      | _, Kstmt stmt -> Stmt stmt
+      | Some kf, Kstmt stmt -> Stmt (kf, stmt)
       | Some kf, Kglobal -> Pre kf
       | None, Kglobal -> Initial
+      | None, Kstmt _ -> assert false
     end
   | PTermLval (_, _, prop, _) | PIP prop -> property_evaluation_point prop
   | PType _ -> raise Not_found
@@ -256,7 +257,7 @@ let print_value fmt loc =
   let before = eval_cvalue request in
   match evaluation_point with
   | Initial | Pre _ -> pretty fmt before
-  | Stmt stmt ->
+  | Stmt (_, stmt) ->
     let after = eval_cvalue (Results.after stmt) in
     if Cvalue.V_Or_Uninitialized.equal before after
     then pretty fmt before

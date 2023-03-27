@@ -44,7 +44,7 @@ let package =
 
 type term = Pexpr of exp | Plval of lval | Ppred of predicate
 type evaluation_point = General_requests.evaluation_point =
-    Initial | Pre of kernel_function | Stmt of stmt
+    Initial | Pre of kernel_function | Stmt of kernel_function * stmt
 
 (* A term and the program point where it should be evaluated. *)
 type probe = term * evaluation_point
@@ -86,7 +86,7 @@ let () = Analysis.register_computation_hook ~on:Computed
 
 let next_steps = function
   | Initial | Pre _ -> []
-  | Stmt stmt ->
+  | Stmt (_, stmt) ->
     match stmt.skind with
     | If (cond, _, _, _) -> [ `Then cond ; `Else cond ]
     | Instr (Set _ | Call _ | Local_init _) -> [ `After ]
@@ -396,7 +396,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   let domain_state callstack = function
     | Initial -> A.get_global_state ()
     | Pre kf -> get_initial_state kf callstack
-    | Stmt stmt -> get_stmt_state ~after:false stmt callstack
+    | Stmt (_, stmt) -> get_stmt_state ~after:false stmt callstack
 
   (* --- Converts an evaluation [result] into an exported [value]. ---------- *)
 
@@ -424,9 +424,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
       match eval_point with
       | Initial -> None, Kglobal
       | Pre kf -> Some kf, Kglobal
-      | Stmt stmt ->
-        let kf = Kernel_function.find_englobing_kf stmt in
-        Some kf, Kstmt stmt
+      | Stmt (kf, stmt) -> Some kf, Kstmt stmt
     in
     let to_marker vi =
       let text = Pretty_utils.to_string Printer.pp_varinfo vi in
@@ -474,9 +472,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
     let result =
       match eval_point with
       | Initial | Pre _ -> None
-      | Stmt stmt ->
-        let kf = Kernel_function.find_englobing_kf stmt in
-        Eva_utils.find_return_var kf
+      | Stmt (kf, _) -> Eva_utils.find_return_var kf
     in
     let env =
       Abstract_domain.{ states = (function _ -> A.Dom.top) ; result }
@@ -508,7 +504,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
     let here = eval before in
     let next =
       match before, eval_point with
-      | `Value state, Stmt stmt -> do_next eval state stmt callstack
+      | `Value state, Stmt (_, stmt) -> do_next eval state stmt callstack
       | _ -> Nothing
     in
     { here; next; }
@@ -545,7 +541,7 @@ let () =
       let gather_callstacks cset marker =
         let list =
           match probe marker with
-          | Some (_, Stmt stmt) -> A.stmt_callstacks stmt
+          | Some (_, Stmt (_, stmt)) -> A.stmt_callstacks stmt
           | Some (_, Pre kf) -> A.kf_callstacks kf
           | Some (_, Initial) | None -> []
         in
@@ -593,7 +589,7 @@ let () =
 (* -------------------------------------------------------------------------- *)
 
 let is_reachable = function
-  | Stmt stmt -> Results.is_reachable stmt
+  | Stmt (_, stmt) -> Results.is_reachable stmt
   | Pre kf -> Results.is_called kf
   | Initial -> Results.is_reachable_kinstr Kglobal
 
@@ -619,8 +615,8 @@ let () =
     let computed = Analysis.is_computed () in
     let reachable = is_reachable eval_point in
     set_evaluable rq (computed && reachable);
-    set_code rq (Some (Pretty_utils.to_string pp p)) ;
-    set_stmt rq (match eval_point with Stmt s -> Some s | _ -> None) ;
+    set_code rq (Some (Pretty_utils.to_string pp p));
+    set_stmt rq (match eval_point with Stmt (_, s) -> Some s | _ -> None);
     let on_steps = function
       | `Here -> ()
       | `Then _ | `Else _ -> set_condition rq true

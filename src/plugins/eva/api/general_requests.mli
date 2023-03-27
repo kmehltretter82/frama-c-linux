@@ -27,7 +27,7 @@ open Cil_types
 type evaluation_point =
   | Initial
   | Pre of kernel_function
-  | Stmt of stmt
+  | Stmt of kernel_function * stmt
 
 (* Returns the evaluation point of a marker.
    @raises Not_found if the marker cannot be evaluated. *)
