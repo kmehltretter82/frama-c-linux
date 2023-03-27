@@ -158,17 +158,6 @@ let impact_highlighter buffer loc ~start ~stop =
     in
     apply_on_stmt hilight loc
 
-let reason_graph_window parent ?in_kf reason =
-  try
-    let mk_dot_file = Reason_graph.to_dot_formatter ?in_kf reason in
-    Dgraph_helper.graph_window_through_dot
-      ~parent ~title:"Impact graph" mk_dot_file
-  with
-  | Sys_error _ as exn ->
-    Options.error "issue when generating impact graph: %s"
-      (Printexc.to_string exn)
-
-
 let impact_statement restrict s =
   let kf = Kernel_function.find_englobing_kf s in
   let skip = Compute_impact.skip () in
@@ -215,12 +204,6 @@ let impact_statement_ui (main_ui:Design.main_window_extension_points) s =
     !update_column `Contents;
     main_ui#rehighlight ()
   )
-
-let impact_graph_of_function (main_ui:Design.main_window_extension_points) kf =
-  let g = ReasonGraph.get () in
-  let open Reason_graph in
-  if not (Reason.Set.is_empty g.reason_graph) then
-    reason_graph_window main_ui#main_window ~in_kf:kf g
 
 let pretty_info = ref true
 
@@ -297,14 +280,6 @@ let impact_selector
     if button = 3 || FollowFocus.get () then (
       let callback () = ignore (impact_statement_ui main_ui s) in
       ignore (popup_factory#add_item "_Impact analysis" ~callback);
-      if Options.Reason.get ()then begin
-        let g = ReasonGraph.get () in
-        if not Reason_graph.(Reason.Set.is_empty g.reason_graph) then begin
-          let callback () =
-            reason_graph_window main_ui#main_window ~in_kf:kf g in
-          ignore (popup_factory#add_item "Impact _graph" ~callback);
-        end;
-      end;
       if FollowFocus.get () then
         ignore (Glib.Idle.add (fun () -> callback (); false))
     );
@@ -328,14 +303,6 @@ let impact_selector
       let kf = Globals.Functions.get vi in
       pp_impact_on_inputs main_ui kf;
     end;
-    if button = 3 then begin
-      let g = ReasonGraph.get () in
-      let open Reason_graph in
-      if not (Reason.Set.is_empty g.reason_graph) then
-        let kf = Globals.Functions.get vi in
-        let callback () = impact_graph_of_function main_ui kf in
-        ignore (popup_factory#add_item "_Impact graph" ~callback);
-    end
   | _ -> ()
 
 let impact_panel main_ui =

@@ -32,8 +32,23 @@ let once = Wutil_once.once
 (* ---  Pango Properties                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-include Gtk_compat.Pango
+let small_font =
+  once (fun (f: GPango.font_description) ->
+      let f = f#copy in
+      let size = f#size - 2 in
+      f#modify ~size (); f)
 
+let bold_font =
+  once (fun (f: GPango.font_description) ->
+      let f = f#copy in
+      let weight = `BOLD in
+      f#modify ~weight (); f)
+
+let modify_font phi (widget: #GObj.widget) =
+  widget#misc#modify_font (phi widget#misc#pango_context#font_description)
+
+let set_small_font w = modify_font small_font w
+let set_bold_font w = modify_font bold_font w
 let set_font w name = w#misc#modify_font_by_name name
 let set_monospace w = set_font w "monospace"
 
