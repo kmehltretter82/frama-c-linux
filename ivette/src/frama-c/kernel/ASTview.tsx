@@ -578,6 +578,11 @@ function createContextMenuHandler(): Editor.Extension {
       const writes = 'Studia: select writes';
       items.push({ label: reads, enabled, onClick: () => onClick('Reads') });
       items.push({ label: writes, enabled, onClick: () => onClick('Writes') });
+      const copy = (): void => {
+        const text = view.state.sliceDoc(node.from, node.to);
+        if (text !== '') navigator.clipboard.writeText(text);
+      };
+      items.push({ label: 'Copy to clipboard', onClick: copy });
       if (items.length > 0) Dome.popupMenu(items);
       return;
     }
