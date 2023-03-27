@@ -5,13 +5,21 @@
 [alias] Warning: Analysis is continuing but will not be sound
 [alias] Warning: Analysis is continuing but will not be sound
 [alias] May-aliases at the end of function main:
+  {a->t1[0], b->t1[0]} are aliased
+  {a->t2[0], b->t2[0]} are aliased
+  {a->n1, b->n1} are aliased
+  {a->n2, b->n2} are aliased
 Before statement b->t1[i] = a->t1[i]; :
- 
+ {a->t1[0], b->t1[0]} are aliased
+{a->t2[0], b->t2[0]} are aliased
+
 Before statement idx = 0; :
  {x, tmp} are aliased
 
 Before statement b->t2[i] = a->t2[i]; :
- 
+ {a->t2[0], b->t2[0]} are aliased
+{a->t1[0], b->t1[0]} are aliased
+
 Before statement while (idx < 10) {
                    *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
                    idx ++;
@@ -21,35 +29,54 @@ Before statement while (idx < 10) {
 Before statement if (*n == 1) *n = 0; else (*n) ++; :
  
 Before statement i ++; :
- 
+ {a->t1[0], b->t1[0]} are aliased
+{a->t2[0], b->t2[0]} are aliased
+
 Before statement if (*n == 1) *n = 0; else (*n) ++; :
  
 Before statement b->n1 = a->n1; :
- 
+ {a->t1[0], b->t1[0]} are aliased
+{a->t2[0], b->t2[0]} are aliased
+
 Before statement if (! (idx < 10)) break; :
  {x, tmp} are aliased
 
 Before statement *n = 0; :
  
 Before statement b->n2 = a->n2; :
- 
+ {a->t1[0], b->t1[0]} are aliased
+{a->t2[0], b->t2[0]} are aliased
+{a->n1, b->n1} are aliased
+
 Before statement break; :
  {x, tmp} are aliased
 
 Before statement (*n) ++; :
  
 Before statement f1(a); :
- 
+ {a->t1[0], b->t1[0]} are aliased
+{a->t2[0], b->t2[0]} are aliased
+{a->n1, b->n1} are aliased
+{a->n2, b->n2} are aliased
+
 Before statement *(odata + idx) = (double)3 * *(idata + idx) + (double)1; :
  {x, tmp} are aliased
 
 Before statement f2(b); :
- 
+ {a->t1[0], b->t1[0]} are aliased
+{a->t2[0], b->t2[0]} are aliased
+{a->n1, b->n1} are aliased
+{a->n2, b->n2} are aliased
+
 Before statement *(odata + idx) = (double)3 * *(idata + idx) + (double)1; :
  {x, tmp} are aliased
 
 Before statement __retres = 0; :
- 
+ {a->t1[0], b->t1[0]} are aliased
+{a->t2[0], b->t2[0]} are aliased
+{a->n1, b->n1} are aliased
+{a->n2, b->n2} are aliased
+
 Before statement idx ++; :
  {x, tmp} are aliased
 
@@ -125,7 +152,11 @@ Before statement while (idx < 10) {
  {x, tmp} are aliased
 
 Before statement return __retres; :
- 
+ {a->t1[0], b->t1[0]} are aliased
+{a->t2[0], b->t2[0]} are aliased
+{a->n1, b->n1} are aliased
+{a->n2, b->n2} are aliased
+
 Before statement if (! (i < 2)) break; :
  
 Before statement if (! (idx < 10)) break; :
@@ -185,7 +216,9 @@ Before statement while (i < 2) {
                    b->t2[i] = a->t2[i];
                    i ++;
                  } :
- 
+ {a->t1[0], b->t1[0]} are aliased
+{a->t2[0], b->t2[0]} are aliased
+
 Before statement idata = (double *)malloc((unsigned long)10 * sizeof(double)); :
  {x, tmp} are aliased
 
@@ -202,7 +235,9 @@ Before statement while (1) {
  {x, tmp} are aliased
 
 Before statement if (! (i < 2)) break; :
- 
+ {a->t1[0], b->t1[0]} are aliased
+{a->t2[0], b->t2[0]} are aliased
+
 Before statement idata = tmp->t1[*(tmp->n1)];
                  odata = tmp->t2[*(tmp->n2)];
                  idx = 0;
@@ -214,13 +249,17 @@ Before statement idata = tmp->t1[*(tmp->n1)];
  {x, tmp} are aliased
 
 Before statement break; :
- 
+ {a->t1[0], b->t1[0]} are aliased
+{a->t2[0], b->t2[0]} are aliased
+
 Before statement idata = tmp->t1[*(tmp->n1)]; :
  {x, tmp} are aliased
 
 Before statement b->t1[i] = a->t1[i];
                  b->t2[i] = a->t2[i]; :
- 
+ {a->t1[0], b->t1[0]} are aliased
+{a->t2[0], b->t2[0]} are aliased
+
 Before statement odata = tmp->t2[*(tmp->n2)]; :
  {x, tmp} are aliased
 
