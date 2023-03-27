@@ -2,7 +2,6 @@
 [alias] May-aliases at the end of function main:
   {y.s, &x1, &x2} are aliased
   {x1, x2} are aliased
-[alias] Functions done
 Before statement st_1_t x1 = {.a = 0, .b = 1}; :
  
 Before statement st_1_t x2 = {.a = 1, .b = 2}; :

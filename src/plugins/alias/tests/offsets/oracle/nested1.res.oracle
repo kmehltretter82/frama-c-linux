@@ -1,5 +1,4 @@
 [kernel] Parsing nested1.c (with preprocessing)
-[alias] Parsing done
 [alias] May-aliases at the end of function main:
   {x1, x2} are aliased
   {z1->s, z2->s, tab_y[0], &x1, &x2} are aliased

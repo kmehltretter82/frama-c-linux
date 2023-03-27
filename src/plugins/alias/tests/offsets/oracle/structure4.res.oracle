@@ -1,5 +1,4 @@
 [kernel] Parsing structure4.c (with preprocessing)
-[alias] Parsing done
 [alias] May-aliases at the end of function main:
   {z->s, y1, &x1} are aliased
 Before statement st_1_t x1 = {.a = 0, .b = 1}; :
