@@ -30,7 +30,7 @@ type alternative
 val hints : WpPropId.prop_id -> strategy list
 
 val alternatives : strategy -> alternative list
-val provers : alternative -> VCS.prover list * int
+val provers : alternative -> VCS.prover list * float
 val fallback : alternative -> strategy option
 
 (* -------------------------------------------------------------------------- *)

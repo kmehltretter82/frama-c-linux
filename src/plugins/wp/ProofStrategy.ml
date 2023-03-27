@@ -256,13 +256,11 @@ let () = Acsl_extension.register_global "prove" parse_proofs false
 (* --- Strategy Resolution                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let wkey = Wp_parameters.register_warn_category "strategy"
-
 let resolve name =
   try Some (Strategies.find name.value)
   with Not_found ->
-    Wp_parameters.warning ~source:(fst name.loc)
-      "Strategy '%s' undefined" name.value ;
+    Wp_parameters.error ~source:(fst name.loc) ~once:true
+      "Strategy '%s' undefined (skipped)." name.value ;
     None
 
 (* -------------------------------------------------------------------------- *)
@@ -288,13 +286,14 @@ let provers = function
          match VCS.parse_prover p.value with
          | Some p -> p::ps
          | None ->
-           Wp_parameters.warning ~wkey ~once:true ~source:(fst p.loc)
-             "Prover '%s' not-found" p.value ; ps
+           Wp_parameters.error ~source:(fst p.loc) ~once:true
+             "Prover '%s' not found (skipped)." p.value ; ps
       ) ps [],
-    Option.fold tm
-      ~none:(Wp_parameters.Timeout.get ())
-      ~some:(fun t -> max (int_of_float (t +. 0.5)) 1)
-  | _ -> [],0
+    begin match tm with
+      | Some tm -> tm
+      | None -> float @@ Wp_parameters.Timeout.get ()
+    end
+  | _ -> [],0.0
 
 let fallback = function
   | Strategy s -> resolve s
