@@ -1,3 +1,10 @@
+// nested structures and arrays
+//  {z1->s, z2->s, tab_y[0]} are aliased
+//  {t->t, z1} are aliased
+//  {z1->c, t->d, a} are aliased
+//  {z2->c, b} are aliased
+
+
 #include <stdlib.h>
 
 typedef struct
@@ -18,8 +25,6 @@ typedef struct
     struct struct_2_t*  t;
     int*   d;
 } st_3_t;
-
-
 
 
 

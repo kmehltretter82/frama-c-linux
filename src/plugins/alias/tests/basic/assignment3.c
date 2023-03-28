@@ -1,6 +1,5 @@
 // address assignment
-// { a; c } are aliased
-// { *a; *c } are aliased
+// {a, c} are aliased
 
 int main () {
 

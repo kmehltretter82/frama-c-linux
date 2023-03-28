@@ -1,8 +1,6 @@
 // function with a loop inside
-// { a; b } are aliased
-// { *a; *b } are aliased
-// { c; d } are aliased
-// { *c; *d } are aliased
+//  {a, b} are aliased
+//  {c, d} are aliased
 
 void *f1(int *x, int* y)
 {

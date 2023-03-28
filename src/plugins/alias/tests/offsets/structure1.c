@@ -1,4 +1,6 @@
-/* no alias */
+// simple structure
+//  {p_x, p_y} are aliased
+
 
 typedef struct
 {       

@@ -1,4 +1,5 @@
 // matrices
+//  no alias
 
 int main () {
   int mat[4][4];

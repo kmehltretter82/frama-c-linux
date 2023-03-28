@@ -1,8 +1,6 @@
 // homogeneous cast
-// { a; c; } are aliased
-// { *a; *c; } are aliased
-// { b; d; } are aliased
-// { *b; *d; } are aliased
+//  {a, c} are aliased
+//  {b, d} are aliased
 
 
 int main () {

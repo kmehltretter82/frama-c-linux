@@ -1,3 +1,6 @@
+// structure with malloc
+//  {z->s, y1} are aliased
+
 #include <stdlib.h>
 
 typedef struct

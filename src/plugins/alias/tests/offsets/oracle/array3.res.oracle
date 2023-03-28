@@ -1,144 +1,128 @@
 [kernel] Parsing array3.c (with preprocessing)
-[kernel:typing:implicit-function-declaration] array3.c:6: Warning: 
-  Calling undeclared function malloc. Old style K&R code?
-[alias] analysing function: asprintf
-[alias] May-aliases at the end of function asprintf:
-[alias] analysing function: clearerr
-[alias] May-aliases at the end of function clearerr:
-[alias] analysing function: clearerr_unlocked
-[alias] May-aliases at the end of function clearerr_unlocked:
-[alias] analysing function: fclose
-[alias] May-aliases at the end of function fclose:
-[alias] analysing function: fdopen
-[alias] May-aliases at the end of function fdopen:
-[alias] analysing function: feof
-[alias] May-aliases at the end of function feof:
-[alias] analysing function: feof_unlocked
-[alias] May-aliases at the end of function feof_unlocked:
-[alias] analysing function: ferror
-[alias] May-aliases at the end of function ferror:
-[alias] analysing function: ferror_unlocked
-[alias] May-aliases at the end of function ferror_unlocked:
-[alias] analysing function: fflush
-[alias] May-aliases at the end of function fflush:
-[alias] analysing function: fgetc
-[alias] May-aliases at the end of function fgetc:
-[alias] analysing function: fgetpos
-[alias] May-aliases at the end of function fgetpos:
-[alias] analysing function: fgets
-[alias] May-aliases at the end of function fgets:
-[alias] analysing function: fileno
-[alias] May-aliases at the end of function fileno:
-[alias] analysing function: fileno_unlocked
-[alias] May-aliases at the end of function fileno_unlocked:
-[alias] analysing function: flockfile
-[alias] May-aliases at the end of function flockfile:
-[alias] analysing function: fmemopen
-[alias] May-aliases at the end of function fmemopen:
-[alias] analysing function: fopen
-[alias] May-aliases at the end of function fopen:
-[alias] analysing function: fputc
-[alias] May-aliases at the end of function fputc:
-[alias] analysing function: fputs
-[alias] May-aliases at the end of function fputs:
-[alias] analysing function: fread
-[alias] May-aliases at the end of function fread:
-[alias] analysing function: freopen
-[alias] May-aliases at the end of function freopen:
-[alias] analysing function: fseek
-[alias] May-aliases at the end of function fseek:
-[alias] analysing function: fseeko
-[alias] May-aliases at the end of function fseeko:
-[alias] analysing function: fsetpos
-[alias] May-aliases at the end of function fsetpos:
-[alias] analysing function: ftell
-[alias] May-aliases at the end of function ftell:
-[alias] analysing function: ftello
-[alias] May-aliases at the end of function ftello:
-[alias] analysing function: ftrylockfile
-[alias] May-aliases at the end of function ftrylockfile:
-[alias] analysing function: funlockfile
-[alias] May-aliases at the end of function funlockfile:
-[alias] analysing function: fwrite
-[alias] May-aliases at the end of function fwrite:
-[alias] analysing function: getc
-[alias] May-aliases at the end of function getc:
-[alias] analysing function: getc_unlocked
-[alias] May-aliases at the end of function getc_unlocked:
-[alias] analysing function: getchar
-[alias] May-aliases at the end of function getchar:
-[alias] analysing function: getchar_unlocked
-[alias] May-aliases at the end of function getchar_unlocked:
-[alias] analysing function: gets
-[alias] May-aliases at the end of function gets:
+[alias] analysing function: _Exit
+[alias] May-aliases at the end of function _Exit:
+[alias] analysing function: abort
+[alias] May-aliases at the end of function abort:
+[alias] analysing function: abs
+[alias] May-aliases at the end of function abs:
+[alias] analysing function: at_quick_exit
+[alias] May-aliases at the end of function at_quick_exit:
+[alias] analysing function: atexit
+[alias] May-aliases at the end of function atexit:
+[alias] analysing function: atof
+[alias] May-aliases at the end of function atof:
+[alias] analysing function: atoi
+[alias] May-aliases at the end of function atoi:
+[alias] analysing function: atol
+[alias] May-aliases at the end of function atol:
+[alias] analysing function: atoll
+[alias] May-aliases at the end of function atoll:
+[alias] analysing function: bsearch
+[alias] May-aliases at the end of function bsearch:
+[alias] analysing function: calloc
+[alias] May-aliases at the end of function calloc:
+[alias] analysing function: div
+[alias] May-aliases at the end of function div:
+[alias] analysing function: drand48
+[alias] May-aliases at the end of function drand48:
+[alias] analysing function: erand48
+[alias] May-aliases at the end of function erand48:
+[alias] analysing function: exit
+[alias] May-aliases at the end of function exit:
+[alias] analysing function: free
+[alias] May-aliases at the end of function free:
+[alias] analysing function: getenv
+[alias] May-aliases at the end of function getenv:
+[alias] analysing function: jrand48
+[alias] May-aliases at the end of function jrand48:
+[alias] analysing function: labs
+[alias] May-aliases at the end of function labs:
+[alias] analysing function: lcong48
+[alias] May-aliases at the end of function lcong48:
+[alias] analysing function: ldiv
+[alias] May-aliases at the end of function ldiv:
+[alias] analysing function: llabs
+[alias] May-aliases at the end of function llabs:
+[alias] analysing function: lldiv
+[alias] May-aliases at the end of function lldiv:
+[alias] analysing function: lrand48
+[alias] May-aliases at the end of function lrand48:
 [alias] analysing function: main
-[alias] analysing instruction: tmp = malloc((unsigned long)4 * sizeof(int));
+[alias] analysing instruction: int *x = malloc((unsigned long)4 * sizeof(int));
 [alias] May-aliases at the end of instruction:
-[alias] analysing instruction: int *x = (int *)tmp;
+[alias] analysing instruction: int *y = malloc((unsigned long)4 * sizeof(int));
 [alias] May-aliases at the end of instruction:
-  {x, tmp} are aliased
-[alias] analysing instruction: tmp_0 = malloc((unsigned long)4 * sizeof(int));
-[alias] May-aliases at the end of instruction:
-  {x, tmp} are aliased
-[alias] analysing instruction: int *y = (int *)tmp_0;
-[alias] May-aliases at the end of instruction:
-  {x, tmp} are aliased
-  {y, tmp_0} are aliased
 [alias] analysing instruction: x = mat[0];
 [alias] May-aliases at the end of instruction:
-  {x, tmp} are aliased
-  {y, tmp_0} are aliased
 [alias] analysing instruction: y = mat[1];
 [alias] May-aliases at the end of instruction:
-  {x, tmp, y, tmp_0} are aliased
+  {x, y} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction:
-  {x, tmp, y, tmp_0} are aliased
+  {x, y} are aliased
 [alias] May-aliases at the end of function main:
-  {x, tmp, y, tmp_0} are aliased
+  {x, y} are aliased
 [alias] analysing function: malloc
 [alias] May-aliases at the end of function malloc:
-[alias] analysing function: pclose
-[alias] May-aliases at the end of function pclose:
-[alias] analysing function: perror
-[alias] May-aliases at the end of function perror:
-[alias] analysing function: popen
-[alias] May-aliases at the end of function popen:
-[alias] analysing function: putc
-[alias] May-aliases at the end of function putc:
-[alias] analysing function: putc_unlocked
-[alias] May-aliases at the end of function putc_unlocked:
-[alias] analysing function: putchar
-[alias] May-aliases at the end of function putchar:
-[alias] analysing function: putchar_unlocked
-[alias] May-aliases at the end of function putchar_unlocked:
-[alias] analysing function: puts
-[alias] May-aliases at the end of function puts:
-[alias] analysing function: remove
-[alias] May-aliases at the end of function remove:
-[alias] analysing function: rename
-[alias] May-aliases at the end of function rename:
-[alias] analysing function: rewind
-[alias] May-aliases at the end of function rewind:
-[alias] analysing function: setbuf
-[alias] May-aliases at the end of function setbuf:
-[alias] analysing function: setvbuf
-[alias] May-aliases at the end of function setvbuf:
-[alias] analysing function: tmpfile
-[alias] May-aliases at the end of function tmpfile:
-[alias] analysing function: tmpnam
-[alias] May-aliases at the end of function tmpnam:
-[alias] analysing function: ungetc
-[alias] May-aliases at the end of function ungetc:
-[alias] analysing function: vfprintf
-[alias] May-aliases at the end of function vfprintf:
-[alias] analysing function: vfscanf
-[alias] May-aliases at the end of function vfscanf:
-[alias] analysing function: vprintf
-[alias] May-aliases at the end of function vprintf:
-[alias] analysing function: vscanf
-[alias] May-aliases at the end of function vscanf:
-[alias] analysing function: vsnprintf
-[alias] May-aliases at the end of function vsnprintf:
-[alias] analysing function: vsprintf
-[alias] May-aliases at the end of function vsprintf:
+[alias] analysing function: mblen
+[alias] May-aliases at the end of function mblen:
+[alias] analysing function: mbstowcs
+[alias] May-aliases at the end of function mbstowcs:
+[alias] analysing function: mbtowc
+[alias] May-aliases at the end of function mbtowc:
+[alias] analysing function: mkstemp
+[alias] May-aliases at the end of function mkstemp:
+[alias] analysing function: mkstemps
+[alias] May-aliases at the end of function mkstemps:
+[alias] analysing function: mrand48
+[alias] May-aliases at the end of function mrand48:
+[alias] analysing function: nrand48
+[alias] May-aliases at the end of function nrand48:
+[alias] analysing function: posix_memalign
+[alias] May-aliases at the end of function posix_memalign:
+[alias] analysing function: putenv
+[alias] May-aliases at the end of function putenv:
+[alias] analysing function: qsort
+[alias] May-aliases at the end of function qsort:
+[alias] analysing function: quick_exit
+[alias] May-aliases at the end of function quick_exit:
+[alias] analysing function: rand
+[alias] May-aliases at the end of function rand:
+[alias] analysing function: random
+[alias] May-aliases at the end of function random:
+[alias] analysing function: realloc
+[alias] May-aliases at the end of function realloc:
+[alias] analysing function: reallocarray
+[alias] May-aliases at the end of function reallocarray:
+[alias] analysing function: seed48
+[alias] May-aliases at the end of function seed48:
+[alias] analysing function: setenv
+[alias] May-aliases at the end of function setenv:
+[alias] analysing function: srand
+[alias] May-aliases at the end of function srand:
+[alias] analysing function: srand48
+[alias] May-aliases at the end of function srand48:
+[alias] analysing function: srandom
+[alias] May-aliases at the end of function srandom:
+[alias] analysing function: strtod
+[alias] May-aliases at the end of function strtod:
+[alias] analysing function: strtof
+[alias] May-aliases at the end of function strtof:
+[alias] analysing function: strtol
+[alias] May-aliases at the end of function strtol:
+[alias] analysing function: strtold
+[alias] May-aliases at the end of function strtold:
+[alias] analysing function: strtoll
+[alias] May-aliases at the end of function strtoll:
+[alias] analysing function: strtoul
+[alias] May-aliases at the end of function strtoul:
+[alias] analysing function: strtoull
+[alias] May-aliases at the end of function strtoull:
+[alias] analysing function: system
+[alias] May-aliases at the end of function system:
+[alias] analysing function: unsetenv
+[alias] May-aliases at the end of function unsetenv:
+[alias] analysing function: wcstombs
+[alias] May-aliases at the end of function wcstombs:
+[alias] analysing function: wctomb
+[alias] May-aliases at the end of function wctomb:

@@ -1,4 +1,5 @@
-
+// double structure with initialisation and pointer
+//  no alias
 
 typedef struct
 {       

@@ -1,3 +1,10 @@
+// real world example
+//  {a->t1[0], b->t1[0]} are aliased
+//  {a->t2[0], b->t2[0]} are aliased
+//  {a->n1, b->n1} are aliased
+//  {a->n2, b->n2} are aliased
+
+
 #include <stdlib.h>
 #include <math.h>
 
