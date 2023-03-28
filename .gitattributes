@@ -214,6 +214,7 @@ README* header_spec=.ignore
 /doc/MakeLaTeXModern header_spec=.ignore
 /doc/acsl_tutorial_slides/script header_spec=.ignore
 /doc/developer/METADOC.txt header_spec=.ignore
+/doc/developer/dune-workspace.bench header_spec=.ignore
 /doc/developer/examples/**/* header_spec=.ignore
 /doc/developer/tutorial/**/* header_spec=.ignore
 /doc/qualification/testing header_spec=.ignore
