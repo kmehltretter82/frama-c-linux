@@ -230,17 +230,35 @@ module Computation = struct
   include (val publish lookup "exploration" descr)
 end
 
-module NodeRange = struct
-  type t = node_range
+module NodeSpecialRange = struct
+  include Enum (struct type t = node_range end)
+
+  let empty = tag "empty" "no value ever computed for this node"
+  let singleton = tag "singleton" "this node can only have one value"
+  let wide = tag "wide" "this node can take almost all values of its type"
+
+  let lookup = function
+    | Empty -> empty
+    | Singleton -> singleton
+    | Wide -> wide
+    | Normal _ -> raise Not_found
+
   let descr = "A qualitative description of the range of values \
                that this node can take."
-  let jtype = declare "nodeRange" ~descr (Junion [ Jnumber ; Jstring ])
+
+  include (val publish lookup "nodeSpecialRange" descr)
+end
+
+module NodeRange = struct
+  type t = node_range
+  let descr = "A qualitative or quantitative description of the range of \
+               values that this node can take."
+  let jtype = declare "nodeRange" ~descr
+      (Junion [ Jnumber ; NodeSpecialRange.jtype ])
 
   let to_json = function
-    | Empty -> `String "empty"
-    | Singleton -> `String "singleton"
     | Normal range_grade -> `Int range_grade
-    | Wide -> `String "wide"
+    | range -> NodeSpecialRange.to_json range
 
   let of_json _ = Data.failure "NodeRange.of_json not implemented"
 end

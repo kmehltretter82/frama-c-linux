@@ -286,11 +286,43 @@ const explorationTags_internal: Server.GetRequest<null,tag[]> = {
 export const explorationTags: Server.GetRequest<null,tag[]>= explorationTags_internal;
 
 /** A qualitative description of the range of values that this node can take. */
-export type nodeRange = number | string;
+export enum nodeSpecialRange {
+  /** no value ever computed for this node */
+  empty = 'empty',
+  /** this node can only have one value */
+  singleton = 'singleton',
+  /** this node can take almost all values of its type */
+  wide = 'wide',
+}
+
+/** Decoder for `nodeSpecialRange` */
+export const jNodeSpecialRange: Json.Decoder<nodeSpecialRange> =
+  Json.jEnum(nodeSpecialRange);
+
+/** Natural order for `nodeSpecialRange` */
+export const byNodeSpecialRange: Compare.Order<nodeSpecialRange> =
+  Compare.byEnum(nodeSpecialRange);
+
+/** Default value for `nodeSpecialRange` */
+export const nodeSpecialRangeDefault: nodeSpecialRange =
+  nodeSpecialRange.empty;
+
+const nodeSpecialRangeTags_internal: Server.GetRequest<null,tag[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.dive.nodeSpecialRangeTags',
+  input:  Json.jNull,
+  output: Json.jArray(jTag),
+  signals: [],
+};
+/** Registered tags for the above type. */
+export const nodeSpecialRangeTags: Server.GetRequest<null,tag[]>= nodeSpecialRangeTags_internal;
+
+/** A qualitative or quantitative description of the range of values that this node can take. */
+export type nodeRange = number | nodeSpecialRange;
 
 /** Decoder for `nodeRange` */
 export const jNodeRange: Json.Decoder<nodeRange> =
-  Json.jUnion<number | string>( Json.jNumber, Json.jString,);
+  Json.jUnion<number | nodeSpecialRange>( Json.jNumber, jNodeSpecialRange,);
 
 /** Natural order for `nodeRange` */
 export const byNodeRange: Compare.Order<nodeRange> = Compare.structural;
