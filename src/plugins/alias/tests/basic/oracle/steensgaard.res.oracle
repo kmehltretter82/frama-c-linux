@@ -1,18 +1,24 @@
-[kernel] Parsing if_then1.c (with preprocessing)
+[kernel] Parsing steensgaard.c (with preprocessing)
 [alias] analysing function: main
 [alias] analysing instruction: a = & x;
 [alias] May-aliases at the end of instruction:
 [alias] analysing instruction: b = & y;
 [alias] May-aliases at the end of instruction:
+  {*b, y} are aliased
 [alias] analysing instruction: y = & z;
 [alias] May-aliases at the end of instruction:
+  {*b, y} are aliased
 [alias] analysing instruction: y = & x;
 [alias] May-aliases at the end of instruction:
+  {*b, a, y} are aliased
 [alias] analysing instruction: c = & y;
 [alias] May-aliases at the end of instruction:
-  {x, z} are aliased
+  {*b, *c, a, y} are aliased
+  {b, c} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction:
-  {x, z} are aliased
+  {*b, *c, a, y} are aliased
+  {b, c} are aliased
 [alias] May-aliases at the end of function main:
-  {x, z} are aliased
+  {*b, *c, a, y} are aliased
+  {b, c} are aliased

@@ -12,6 +12,9 @@
 [alias] May-aliases at the end of instruction:
 [alias] analysing instruction: b = & c;
 [alias] May-aliases at the end of instruction:
+  {a, b} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction:
+  {a, b} are aliased
 [alias] May-aliases at the end of function main:
+  {a, b} are aliased

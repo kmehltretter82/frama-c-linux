@@ -1,3 +1,8 @@
+// nested structures and arrays
+//  {t->t, z1} are aliased
+//  {z1->c, t->d, a} are aliased
+
+
 #include <stdlib.h>
 
 typedef struct

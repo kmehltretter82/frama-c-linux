@@ -1,7 +1,7 @@
 // conditional cfg
-//  {d; *c; } are aliased
-//  {a; b; } are aliased
-//  {c; *a; *b; } are aliased
+//  {*a, *b, c} are aliased
+//  {*(*a), *(*b), *c, d} are aliased
+//  {a, b} are aliased
 
 
 int main () {

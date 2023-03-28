@@ -41,9 +41,14 @@ sig
 
   val pretty: Format.formatter -> t -> unit
 
+  (* maps !Cil.removeOffsetLval to simplified_lval *)
   val removeOffsetLval : t -> t * offset
 
+  (* maps !Cil.addOffsetLval to simplified_lval *)
   val addOffsetLval : offset -> t -> t
+
+  (* (points_to x) = *x and (points_to &x) = x. Shall not be applied to BNone *)
+  val points_to : t -> t
 end
 
 module Simplified_lmap:

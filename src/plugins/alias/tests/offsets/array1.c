@@ -1,4 +1,5 @@
-
+// simple array
+//  {x, y} are aliased
 
 int main () {
   int tab[4];

@@ -14,15 +14,8 @@
 [alias] May-aliases at the end of instruction:
 [alias] analysing instruction: z.t = (struct struct_2_t *)(& y2);
 [alias] May-aliases at the end of instruction:
-  {y1, y2} are aliased
 [alias] analysing instruction: y1.c = z.d;
 [alias] May-aliases at the end of instruction:
-  {y1, y2} are aliased
-  {y1.c, y2.c} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction:
-  {y1, y2} are aliased
-  {y1.c, y2.c} are aliased
 [alias] May-aliases at the end of function main:
-  {y1, y2} are aliased
-  {y1.c, y2.c} are aliased

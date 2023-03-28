@@ -1,7 +1,6 @@
 // double pointer assignment
-//  { *b; *d } are aliased
-//  { a; c } are aliased
-//  { b; d; *a; *d } are aliased
+//  {a, c} are aliased
+//  {*a, *c, b, d} are aliased
 
 
 int main () {

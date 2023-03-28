@@ -1,6 +1,5 @@
 // funxtion with address agument
-// { a; b } are aliased
-// { *a; *b } are aliased
+//  {a, b} are aliased
 
 int * addr(int* x)
 {

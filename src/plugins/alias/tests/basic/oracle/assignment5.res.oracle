@@ -14,7 +14,7 @@
 [alias] analysing instruction: *b = c;
 [alias] May-aliases at the end of instruction:
   {*a, b} are aliased
-  {*b, c} are aliased
+  {*(*a), *b, c} are aliased
 [alias] analysing instruction: d = *(*a);
 [alias] May-aliases at the end of instruction:
   {*a, b} are aliased

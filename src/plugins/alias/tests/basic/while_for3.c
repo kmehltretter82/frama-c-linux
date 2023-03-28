@@ -1,6 +1,5 @@
 // continue
-// { a; b } are aliased
-// { *a; *b } are aliased
+//  {a, b} are aliased
 
 int main ()
 {

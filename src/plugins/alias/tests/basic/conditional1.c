@@ -1,6 +1,5 @@
 // conditional cfg
-// { a; b; c } are aliased
-// { *a; *b; *c } are aliased
+//  {a, b, c} are aliased
 
 int main () {
 

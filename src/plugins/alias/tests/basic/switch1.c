@@ -1,6 +1,5 @@
-// control structure and arrays
-// { a; b; d } are aliased
-// { *a; *b; *d } are aliased
+// switch
+//  {a, b, d} are aliased
 
 int main ()
 {

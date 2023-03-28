@@ -1,7 +1,6 @@
 // triple pointer assignment with some tricky alias
-//  { *b; *d } are aliased
-//  { b; d; *a; *c } are aliased
-
+//   {*a, b} are aliased
+//   {*(*a), *b, c, d} are aliased
 
 int main () {
 

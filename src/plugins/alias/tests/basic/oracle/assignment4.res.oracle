@@ -17,9 +17,12 @@
   {*c, d} are aliased
 [alias] analysing instruction: b = d;
 [alias] May-aliases at the end of instruction:
+  {a, c} are aliased
   {*a, *c, b, d} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction:
+  {a, c} are aliased
   {*a, *c, b, d} are aliased
 [alias] May-aliases at the end of function main:
+  {a, c} are aliased
   {*a, *c, b, d} are aliased
