@@ -81,7 +81,7 @@ let fold_fundec_stmts (f_fold: 'a -> stmt -> lval -> 'a) (acc: 'a) (kf:kernel_fu
       acc
       list_stmt
   else
-    Options.abort "fold_dundec_stmts: function %a has no definition" Kernel_function.pretty kf
+    Options.abort "fold_fundec_stmts: function %a has no definition" Kernel_function.pretty kf
 
 let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
   check_computed ();
