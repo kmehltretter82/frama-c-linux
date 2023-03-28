@@ -25,7 +25,7 @@ type format = Dot | Json
 let output format context filename =
   let output_function = match format with
     | Dot -> Dive_graph.output_to_dot
-    | Json -> Dive_graph.output_to_json
+    | Json -> Server_interface.output_to_json
   in
   Self.result "output to %a" Filepath.Normalized.pretty filename;
   let out_channel = open_out (filename:>string) in
