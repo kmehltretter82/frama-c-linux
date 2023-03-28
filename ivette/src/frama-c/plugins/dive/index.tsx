@@ -582,7 +582,7 @@ const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
 
   const [dive, setDive] = useState(() => new Dive());
   const [selection, updateSelection] = States.useSelection();
-  const graph = States.useSyncArray(API.graph, true).getArray();
+  const graph = States.useSyncArrayData(API.graph);
 
   function setCy(cy: Cytoscape.Core): void {
     if (cy !== dive.cy)

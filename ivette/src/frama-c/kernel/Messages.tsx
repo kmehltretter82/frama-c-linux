@@ -426,7 +426,7 @@ export default function RenderMessages(): JSX.Element {
     return m;
   });
 
-  const data = States.useSyncArray(Kernel.message).getArray();
+  const data = States.useSyncArrayData(Kernel.message);
 
   React.useEffect(() => {
     model.removeAllData();

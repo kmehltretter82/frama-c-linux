@@ -49,7 +49,9 @@ import * as Preferences from 'ivette/prefs';
 
 // An alias type for functions and locations.
 type Fct = string | undefined;
-type Marker = string | undefined;
+type Marker = Ast.marker | undefined;
+
+const noMarker = Ast.jMarker('');
 
 // A range is just a pair of position in the code.
 type Range = Editor.Range;
@@ -74,12 +76,12 @@ function mapFilter<A, B>(xs: readonly A[], fn: (x: A) => B | undefined): B[] {
 // without information on the ranges of each element. It will be converted in a
 // good old tree that carry those information.
 interface Leaf extends Range { text: string }
-interface Node extends Range { id: string, children: Tree[] }
+interface Node extends Range { marker: Ast.marker, children: Tree[] }
 type Tree = Leaf | Node;
 
 // Utility functions on trees.
-function isLeaf (t: Tree): t is Leaf { return 'text' in t; }
-function isNode (t: Tree): t is Node { return 'id' in t && 'children' in t; }
+function isLeaf(t: Tree): t is Leaf { return 'text' in t; }
+function isNode(t: Tree): t is Node { return 'marker' in t && 'children' in t; }
 const empty: Tree = { text: '', from: 0, to: 0 };
 
 // Convert an Ivette text (i.e a function's code) into a Tree, adding range
@@ -98,7 +100,7 @@ function textToTree(t: text): Tree | undefined {
       if (node) children.push(node);
       acc = to;
     }
-    return [{ id: t[0], from, to: acc, children }, acc];
+    return [{ marker: Ast.jMarker(t[0]), from, to: acc, children }, acc];
   }
   const [res] = aux(t, 0);
   return res;
@@ -120,9 +122,9 @@ function markersRanges(tree: Tree): Map<string, Range[]>{
   const ranges: Map<string, Range[]> = new Map();
   const toRanges = (tree: Tree): void => {
     if (!isNode(tree)) return;
-    const trees = ranges.get(tree.id) ?? [];
+    const trees = ranges.get(tree.marker) ?? [];
     trees.push(tree);
-    ranges.set(tree.id, trees);
+    ranges.set(tree.marker, trees);
     for (const child of tree.children) toRanges(child);
   };
   toRanges(tree);
@@ -198,8 +200,8 @@ function createMarkerUpdater(): Editor.Extension {
   return Editor.createEventHandler(deps, {
     mouseup: ({ fct, tree, update }, view, event) => {
       const main = view.state.selection.main;
-      const id = coveringNode(tree, main.from)?.id;
-      const location = { fct, marker: Ast.jMarker(id) };
+      const marker = coveringNode(tree, main.from)?.marker;
+      const location = { fct, marker };
       update({ location });
       if (event.altKey) States.MetaSelection.emit(location);
     }
@@ -263,7 +265,7 @@ function createHoveredUpdater(): Editor.Extension {
       const horizontallyOk = left <= coords.x && coords.x <= right;
       const verticallyOk = top <= coords.y && coords.y <= bottom;
       if (!horizontallyOk || !verticallyOk) { reset(); return; }
-      const marker = Ast.jMarker(hov.id);
+      const marker = hov.marker;
       updateHovered(marker ? { fct, marker } : undefined);
     }
   });
@@ -407,7 +409,7 @@ function getPropertiesNodes(tree: Tree): Node[] {
   if (isLeaf(tree)) return [];
   /* Must be consistent with the id chosen by the Frama-C server for property
      markers. Ideally, this test should not depend on markers id syntax. */
-  if (tree.id.startsWith('#p')) return [tree];
+  if (tree.marker.startsWith('#p')) return [tree];
   return tree.children.map(getPropertiesNodes).flat();
 }
 
@@ -419,7 +421,7 @@ function createPropertiesNodes() : Editor.Aspect<Property[]> {
   return Editor.createAspect(deps, ({ tree, tags, statuses }) => {
     const nodes = getPropertiesNodes(tree);
     return mapFilter(nodes, (n) => {
-      const s = statuses.find((s) => s.key === n.id);
+      const s = statuses.find((s) => s.key === n.marker);
       if (!s) return undefined;
       const tag = tags.get(s.status);
       if (!tag) return undefined;
@@ -531,7 +533,7 @@ async function studia(props: StudiaProps): Promise<StudiaInfos> {
 const Callers = Editor.createField<Eva.CallSite[]>([]);
 
 // This field contains information on markers.
-type GetMarkerData = (key: string) => Ast.markerAttributesData | undefined;
+type GetMarkerData = (key: Ast.marker) => Ast.markerAttributesData | undefined;
 const GetMarkerData = Editor.createField<GetMarkerData>(() => undefined);
 
 const ContextMenuHandler = createContextMenuHandler();
@@ -544,9 +546,9 @@ function createContextMenuHandler(): Editor.Extension {
       const coords = { x: event.clientX, y: event.clientY };
       const position = view.posAtCoords(coords); if (!position) return;
       const node = coveringNode(tree, position);
-      if (!node || !node.id) return;
+      if (!node || !node.marker) return;
       const items: Dome.PopupMenuItem[] = [];
-      const attrs = getData(node.id);
+      const attrs = getData(node.marker);
       if (attrs?.isFunDecl) {
         const groupedCallers = Lodash.groupBy(callers, (cs) => cs.kf);
         const locations =
@@ -571,8 +573,8 @@ function createContextMenuHandler(): Editor.Extension {
       }
       const enabled = attrs?.isLval;
       const onClick = (kind: access): void => {
-        if (attrs && node.id)
-          studia({ marker: node.id, attrs, kind }).then(update);
+        if (attrs && node.marker)
+          studia({ marker: node.marker, attrs, kind }).then(update);
       };
       const reads = 'Studia: select reads';
       const writes = 'Studia: select writes';
@@ -721,11 +723,12 @@ export default function ASTview(): JSX.Element {
 
   // Updating CodeMirror when the <updateHovered> callback is changed.
   const [hov, setHov] = States.useHovered();
+  const hovered = hov?.marker ?? noMarker;
   React.useEffect(() => UpdateHovered.set(view, setHov), [view, setHov]);
-  React.useEffect(() => Hovered.set(view, hov?.marker ?? ''), [view, hov]);
+  React.useEffect(() => Hovered.set(view, hovered), [view, hovered]);
 
   // Updating CodeMirror when the <properties> synchronized array is changed.
-  const props = States.useSyncArray(Properties.status).getArray();
+  const props = States.useSyncArrayData(Properties.status);
   React.useEffect(() => PropertiesStatuses.set(view, props), [view, props]);
 
   // Updating CodeMirror when the <propStatusTags> map is changed.
@@ -733,8 +736,7 @@ export default function ASTview(): JSX.Element {
   React.useEffect(() => Tags.set(view, tags), [view, tags]);
 
   // Updating CodeMirror when the <markersInfo> synchronized array is changed.
-  const info = States.useSyncArray(Ast.markerAttributes);
-  const getData = React.useCallback((key) => info.getData(key), [info]);
+  const getData = States.useSyncArrayGetter(Ast.markerAttributes);
   React.useEffect(() => GetMarkerData.set(view, getData), [view, getData]);
 
   // Retrieving data on currently selected function and updating CodeMirror when

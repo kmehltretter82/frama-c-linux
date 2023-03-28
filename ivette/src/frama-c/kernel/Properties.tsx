@@ -597,8 +597,8 @@ function FilterRatio({ model }: { model: PropertyModel }): JSX.Element {
 // --- Properties Table
 // -------------------------------------------------------------------------
 
-type PropsModel = Arrays.CompactModel<PropKey,Properties.statusData>;
-type EvapsModel = Arrays.CompactModel<PropKey,Eva.propertiesData>;
+type PropsModel = States.ArrayProxy<PropKey,Properties.statusData>;
+type EvapsModel = States.ArrayProxy<PropKey,Eva.propertiesData>;
 
 function populateModel(
   model: PropertyModel,
@@ -618,13 +618,11 @@ export default function RenderProperties(): JSX.Element {
 
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
-  const props = States.useSyncArray(Properties.status);
-  const evaps = States.useSyncArray(Eva.properties);
-  const pstamp = Models.useModel(props);
-  const estamp = Models.useModel(evaps);
+  const props = States.useSyncArrayProxy(Properties.status);
+  const evaps = States.useSyncArrayProxy(Eva.properties);
   React.useEffect(() => {
     populateModel(model,props,evaps);
-  },[model,props,evaps,pstamp,estamp]);
+  },[model,props,evaps]);
 
   const [selection, updateSelection] = States.useSelection();
 
