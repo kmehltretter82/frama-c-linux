@@ -160,7 +160,7 @@ sig
 
   val find_all_aliases : lval -> t -> LSet.t
 
-  val find_transitive_closure : lval -> t -> LSet.t list
+  val find_transitive_closure : lval -> t -> (G.V.t * LSet.t) list
 
   val is_included : t -> t -> bool
 
@@ -322,13 +322,13 @@ let assert_state_transformation (x:t) (f: t -> t) : t =
   result
 
 (* find functions, part 2 *)
-let rec closure_find_lset (v:V.t) (x:t) =
+let rec closure_find_lset (v:V.t) (x:t) : (V.t * LSet.t) list =
   match G.succ x.graph v with
-    [] -> [find_lset v x]
-  | [v_next] -> (find_lset v x)::(closure_find_lset v_next x)
+    [] -> [v, find_lset v x]
+  | [v_next] -> (v, find_lset v x)::(closure_find_lset v_next x)
   | _ -> Options.fatal ("this shall not happen (invariant broken)")
 
-let find_transitive_closure  (lv:lval) (x:t) =
+let find_transitive_closure  (lv:lval) (x:t) : (G.V.t * LSet.t) list =
   let lv: Lval.t = Lval.from_lval lv in
   assert_invariants x;
   try

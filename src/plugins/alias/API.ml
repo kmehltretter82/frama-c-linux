@@ -25,18 +25,16 @@ open Cil_types
 open Simplified
 
 (** Points-to graphs datastructure. *)
-module G=Graph.Persistent.Digraph.Concrete(Datatype.Int)
+module G = Abstract_state.G
 
 module LSet = Simplified_lset
 
 module Abstract_state = Abstract_state
 
 let check_computed () =
-  (* for MERCE release's D1.2 *)
-  ignore (Options.abort "Function not yet provided in this release.")
-(*  if not (Analysis.is_computed ())
+ if not (Analysis.is_computed ())
     then
-    Options.abort "Static analysis must be called before any function of the API can be called"*)
+    Options.abort "Static analysis must be called before any function of the API can be called"
 
 
 let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
@@ -98,8 +96,9 @@ let fold_points_to   (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_
   match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
+    let v : G.V.t = Abstract_state.find_vertex lv state in
     let set_aliases = Abstract_state.find_aliases lv state in
-    LSet.fold_lval (fun lv a-> f_fold a 0 lv) set_aliases acc
+    LSet.fold_lval (fun lv a-> f_fold a v lv) set_aliases acc
 
 let fold_points_to_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
@@ -108,7 +107,7 @@ let fold_points_to_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: 
   | Some state ->
     let list_closure = Abstract_state.find_transitive_closure lv state in
     List.fold_left
-      (fun acc s -> LSet.fold_lval (fun lv a -> f_fold a 0 lv) s acc)
+      (fun acc (i,s) -> LSet.fold_lval (fun lv a -> f_fold a i lv) s acc)
       acc
       list_closure
 

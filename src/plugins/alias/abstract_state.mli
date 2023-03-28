@@ -67,9 +67,10 @@ sig
   val find_all_aliases : lval -> t -> LSet.t
 
   (** find_aliases, then recursively finds other sets of lvals. We
-      have the property (if lval [lv] is in abstract state [x]) :
-      List.hd (find_transitive_closure lv x) = find_aliases lv x *)
-  val find_transitive_closure : lval -> t -> LSet.t list
+     have the property (if lval [lv] is in abstract state [x]) :
+     List.hd (find_transitive_closure lv x) = (find_vertex lv x,
+     find_aliases lv x) *)
+  val find_transitive_closure : lval -> t -> (G.V.t * LSet.t) list
 
   (** inclusion test; [is_included a1 a2] tests if, for any lvl
       present in a1 (associated to a vertex v1), that it is also
