@@ -58,14 +58,14 @@ val fold_fundec_stmts:
     [kf]. *)
 val are_aliased: kernel_function -> stmt -> lval -> lval -> bool
 
-(** [fold_points_to f acc kf s v] folds [f acc i lv] to all [lv] in [i], where [i] is
-    the vertex that is pointed to by [v] before statement [s] in function [kf]. *)
-val fold_points_to:
+(** [fold_vertex f acc kf s v] folds [f acc i lv] to all [lv] in [i], where [i] is
+    the vertex that represents the equivalence class of [v] before statement [s] in function [kf]. *)
+val fold_vertex:
   ('a -> G.V.t -> lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
 
-(** [fold_points_to_closure f acc kf s v] is the transitive closure of function
-    [fold_points_to]. *)
-val fold_points_to_closure:
+(** [fold_vertex_closure f acc kf s v] is the transitive closure of function
+    [fold_vertex]. *)
+val fold_vertex_closure:
   ('a -> G.V.t -> lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
 
 

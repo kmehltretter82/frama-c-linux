@@ -91,7 +91,7 @@ let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
     let setv1 = Abstract_state.find_aliases lv1 state in
     LSet.mem (BLval lv2) setv1
 
-let fold_points_to   (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+let fold_vertex   (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
   match Analysis.get_state_before_stmt kf s with
     None -> acc
@@ -100,7 +100,7 @@ let fold_points_to   (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_
     let set_aliases = Abstract_state.find_aliases lv state in
     LSet.fold_lval (fun lv a-> f_fold a v lv) set_aliases acc
 
-let fold_points_to_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+let fold_vertex_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
   match Analysis.get_state_before_stmt kf s with
     None -> acc
