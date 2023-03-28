@@ -35,6 +35,7 @@ and jtactic = {
   tactic : string ;
   params : Json.t ;
   select : Json.t ;
+  strategy : string option ;
 }
 
 val is_prover : alternative -> bool
@@ -54,7 +55,7 @@ val has_proof : jscript -> bool
 val decode : Json.t -> jscript
 val encode : jscript -> Json.t
 
-val jtactic : tactical -> selection -> jtactic
+val jtactic : ?strategy:ProofStrategy.strategy -> tactical -> selection -> jtactic
 val configure : jtactic -> sequent -> (tactical * selection) option
 
 (** Json Codecs *)

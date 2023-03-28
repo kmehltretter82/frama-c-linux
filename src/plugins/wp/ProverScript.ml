@@ -340,13 +340,13 @@ let rec crawl env on_child node = function
     if ok then Env.validate env else Env.stuck env ;
     Task.return ()
 
-  | Error(msg,json) :: alternative ->
+  | Error(msg,json) :: alternatives ->
     Wp_parameters.warning "@[<hov 2>Script Error: on goal %a@\n%S: %a@]@."
       WpPropId.pretty (Env.goal env node).po_pid
       msg Json.pp json ;
-    crawl env on_child node alternative
+    crawl env on_child node alternatives
 
-  | Prover( prv , res ) :: alternative ->
+  | Prover( prv , res ) :: alternatives ->
     begin
       let task =
         if Env.play env prv res then
@@ -357,12 +357,12 @@ let rec crawl env on_child node = function
       let continue ok =
         if ok
         then (Env.validate env ; Task.return ())
-        else crawl env on_child node alternative
+        else crawl env on_child node alternatives
       in
       task >>= continue
     end
 
-  | Tactic( _ , jtactic , subscripts ) :: alternative ->
+  | Tactic( _ , jtactic , subscripts ) :: alternatives ->
     begin
       try
         let residual = apply env node jtactic subscripts in
@@ -383,7 +383,12 @@ let rec crawl env on_child node = function
           (Printexc.to_string exn)
           Json.pp jtactic.params
           Json.pp jtactic.select ;
-        crawl env on_child node alternative
+        match jtactic.strategy with
+        | None -> crawl env on_child node alternatives
+        | Some s ->
+          (*TODO TRY STRATEGY FIRST *)
+          ignore s ;
+          crawl env on_child node alternatives
     end
 
 (* -------------------------------------------------------------------------- *)

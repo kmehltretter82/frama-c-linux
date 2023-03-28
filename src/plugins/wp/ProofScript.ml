@@ -281,14 +281,16 @@ type jtactic = {
   tactic : string ;
   params : Json.t ;
   select : Json.t ;
+  strategy : string option ;
 }
 
-let jtactic (tac : tactical) (sel : selection) =
+let jtactic ?strategy (tac : tactical) (sel : selection) =
   {
     header = tac#title ;
     tactic = tac#id ;
     params = json_of_parameters tac ;
     select = json_of_selection sel ;
+    strategy = Option.map ProofStrategy.name strategy ;
   }
 
 let json_of_tactic t js =
@@ -314,8 +316,11 @@ let tactic_of_json js =
     let tactic = js >? "tactic" |> Json.string in
     let params = try js >? "params" with Not_found -> `Null in
     let select = try js >? "select" with Not_found -> `Null in
-    let children = try js >? "children" |> children_of_json with Not_found -> [] in
-    Some( { header ; tactic ; params ; select } , children )
+    let children =
+      try js >? "children" |> children_of_json with Not_found -> [] in
+    let strategy =
+      try Some (js >? "strategy" |> Json.string) with Not_found -> None in
+    Some( { header ; tactic ; params ; select ; strategy } , children )
   with _ -> None
 
 (* -------------------------------------------------------------------------- *)
