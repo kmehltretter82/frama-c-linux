@@ -4209,9 +4209,9 @@ For quick usage of the library:
 \item install the instrumented \framac: \texttt{make install DUNE\_WS=bench}.
 \item enable instrumentation {\em during execution} of \framac, using the
   \texttt{OCAML\_LANDMARKS} environment variable:
-\begin{lstlisting}
+\begin{logs}
 OCAML_LANDMARKS=<options> frama-c [files] [options]
-\end{lstlisting}
+\end{logs}
   The easiest setup is \texttt{OCAML\_LANDMARKS=auto}, which will instrument
   everything and output timing information to \texttt{stderr} after
   program termination.
@@ -4219,10 +4219,10 @@ OCAML_LANDMARKS=<options> frama-c [files] [options]
   output the timing information to file \texttt{landmarks.log}.
 \item you can also run the instrumented \framac without installing it, via
   \texttt{dune exec}:
-\begin{shell}
+\begin{logs}
 OCAML_LANDMARKS=auto dune exec --workspace dev/dune-workspace.bench \
   --context bench -- frama-c [files] [options]
-\end{shell}
+\end{logs}
   The \verb+--workspace dev/dune-workspace.bench+ argument tells Dune to use
   the workspace in which Landmarks is configured.
 
@@ -4238,9 +4238,9 @@ of the file.
 To instrument a single function: add \verb+[@landmark]+ after the \texttt{let},
 e.g.:
 
-\begin{lstlisting}
+\begin{ocamlcode}
   let[@landmark] add_visitor vis =
-\end{lstlisting}
+\end{ocamlcode}
 
 Check \url{https://github.com/LexiFi/landmarks} for its documentation.
 
@@ -4257,7 +4257,7 @@ To profile your own plug-in using Landmarks, do the following:
    (public_name frama-c-my-plug-in.core)
    ...
    (libraries frama-c.kernel)
-   (instrumentation (backend landmarks)) ;<<< ADD THIS LINE
+   (instrumentation (backend landmarks)) ; <<< ADD THIS LINE
  )
 \end{dunecode}
 \item Create a \verb|dune-workspace.bench| file in your plugin's top-level
@@ -4266,21 +4266,21 @@ To profile your own plug-in using Landmarks, do the following:
   \duneinput{dune-workspace.bench}
 \item Add \verb|--workspace=dune-workspace.bench| to the \verb|dune build|
   and \verb|dune install| commands that you run, e.g.:
-\begin{lstlisting}
+\begin{logs}
 dune build --workspace=dune-workspace.bench @install
 dune install --workspace=dune-workspace.bench
-\end{lstlisting}
+\end{logs}
 This will compile and install the plug-in with Landmarks instrumentation
 enabled. Then you just need to set \verb|OCAML_LANDMARKS| as described in the
 previous section, e.g.:
-\begin{lstlisting}
+\begin{logs}
 OCAML_LANDMARKS=auto frama-c [my-plugin-options]
-\end{lstlisting}
+\end{logs}
 \item For \verb|dune exec|, you need to add the \verb|--workspace| option
   as well as \verb|--context bench|. Combined with \verb|OCAML_LANDMARKS|,
   the command-line will resemble the following:
-\begin{lstlisting}
+\begin{logs}
 OCAML_LANDMARKS=auto dune exec --workspace dev/dune-workspace.bench \
   --context bench -- frama-c [files] [options]
-\end{lstlisting}
+\end{logs}
 \end{enumerate}
