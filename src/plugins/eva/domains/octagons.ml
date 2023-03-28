@@ -967,7 +967,7 @@ module BaseToVariables = struct
     replace (function
         | None -> None
         | Some (direct, indirect) ->
-          let direct = VSet.remove v direct in
+          let indirect = VSet.remove v indirect in
           if VSet.is_empty direct && VSet.is_empty indirect
           then None
           else Some (direct, indirect))
