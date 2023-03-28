@@ -57,8 +57,14 @@ sig
   val find_vertex : lval -> t -> G.V.t
 
   (** same as previous function, but return a set of lval. Cannot
-      raise an exception but may return an empty set *)
+     raise an exception but may return an empty set if the lval is not
+     in the graph *)
   val find_aliases : lval -> t -> LSet.t
+
+  (** similar to the previous functions, but does not only give the
+     equivalence class of lv, but also all lv that are aliases in
+     other vertex of the graph *)
+  val find_all_aliases : lval -> t -> LSet.t
 
   (** find_aliases, then recursively finds other sets of lvals. We
       have the property (if lval [lv] is in abstract state [x]) :

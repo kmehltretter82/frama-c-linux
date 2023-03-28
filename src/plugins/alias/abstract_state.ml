@@ -157,7 +157,9 @@ sig
   val find_vertex : lval -> t -> G.V.t
 
   val find_aliases : lval -> t -> LSet.t
-
+                                    
+  val find_all_aliases : lval -> t -> LSet.t
+  
   val find_transitive_closure : lval -> t -> LSet.t list
 
   val is_included : t -> t -> bool
@@ -172,14 +174,51 @@ type t = {
   cmpt : Int.t ; (* counter to create new vertex *)
 }
 
+
+
 (* find functions *)
-let find_lset (v:V.t) (x:t) =
+let find_lset (v:V.t) (x:t) : LSet.t =
   try VMap.find v x.vmap
   with Not_found -> LSet.empty
 
 let find_aliases (lv:lval) (x:t) =
   let lv : Lval.t = Lval.from_lval lv in
-  try find_lset (LLMap.find lv x.lmap) x
+  try
+    let v = LLMap.find lv x.lmap in
+    find_lset v x
+  with Not_found -> LSet.empty
+
+let rec get_points_to (v:V.t) (x:t) : LSet.t =
+  assert (G.mem_vertex x.graph v);
+  let set_predecessors =
+    List.fold_left
+      (fun acc v -> LSet.union acc (get_points_to v x))
+      LSet.empty
+      (G.pred x.graph v)
+  in
+  LSet.union
+    (find_lset v x)
+    (LSet.map Lval.points_to set_predecessors)
+
+
+let aliases_of_vertex (v:V.t) (x:t) : LSet.t =
+   let list_pred = G.pred x.graph v in
+   List.fold_left
+     (fun acc v -> LSet.union acc (get_points_to v x))
+     LSet.empty
+     list_pred
+
+let find_all_aliases (lv:lval) (x:t) : LSet.t =
+  let lv : Lval.t = Lval.from_lval lv in
+  try
+    begin
+      let v = LLMap.find lv x.lmap in
+      match G.succ x.graph v with
+        [] -> find_lset v x
+      | [succ_v] ->
+        aliases_of_vertex succ_v x
+      | _ -> Options.fatal "invariant violated (more than 1 successor)"
+    end
   with Not_found -> LSet.empty
 
 let get_graph (x:t) = x.graph
@@ -314,7 +353,7 @@ let create_cst_vertex (x:t) : V.t * t =
 
 
 (* find all the aliases of lv1 in x, for create_vertex *)
-let find_all_aliases (lv1: Lval.t) (x: t) : LSet.t =
+let find_all_aliases_of_offset (lv1: Lval.t) (x: t) : LSet.t =
 
   let list_of_lval_to_be_searched : (Lval.t*offset) list =
     decompose_lval lv1
@@ -351,7 +390,7 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   let new_g = G.add_vertex x.graph new_v in
   let new_pending = VMap.add new_v VSet.empty x.pending in
   (* find all the alias of lv (because of offset) *)
-  let set_of_aliases : LSet.t = find_all_aliases lv x in
+  let set_of_aliases : LSet.t = find_all_aliases_of_offset lv x in
   (* add all these aliases *)
   Options.debug ~level:5 "all_aliases of %a : %a @." Lval.pretty lv LSet.pretty set_of_aliases;
   let new_lmap =
