@@ -384,7 +384,6 @@ struct
   let iter f =
     let context = get_context () in
     let graph = Context.get_graph context in
-    output_to_json stdout graph;
     Dive_graph.iter_vertex (fun v -> f (Element.Node v)) graph;
     Dive_graph.iter_edges_e (fun e -> f (Element.Edge e)) graph
 
