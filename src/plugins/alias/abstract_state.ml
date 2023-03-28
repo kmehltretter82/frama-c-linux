@@ -170,10 +170,13 @@ type t = {
   graph : G.t;
   lmap : LLMap.t ; (* lmap(lv) is a table [offset->v] where the vertex v corresponding to lval (lv+offset), in other words (lv+offset) is in label(v) *)
   vmap : LSet.t VMap.t ;(* reverse of lmap *)
-  cmpt : Int.t ; (* counter to create new vertex *)
 }
 
-
+let node_counter = ref 0
+let fresh_node_id () =
+  let id = !node_counter in
+  node_counter := !node_counter + 1;
+  id
 
 (* find functions *)
 let find_lset (v:V.t) (x:t) : LSet.t =
@@ -266,10 +269,11 @@ let print_aliases fmt (x:t) =
 (** invariants of type t must be true before and after each functon call *)
 let assert_invariants (x:t) : unit =
   (* check that all vertex of the graph have entries in vmap,
-     and are integer between 0 and cmpt, and have at most 1 successor *)
+     and are integer between 0 and node_counter, and have at most 1 successor *)
+  if !node_counter < 0 then Options.fatal "int overflow in Abstract_state.node_counter";
   let assert_vertex (v:V.t) =
     assert (v >= 0);
-    assert (v < x.cmpt);
+    assert (v < !node_counter);
     assert (VMap.mem v x.vmap);
     assert (List.length (G.succ x.graph v) <= 1)
   in
@@ -360,7 +364,7 @@ let find_transitive_closure  (lv:lval) (x:t) : (G.V.t * LSet.t) list =
    empty.  By definition, constant vertex cannot be associated to a
    lval in [lmap] *)
 let create_cst_vertex (x:t) : V.t * t =
-  let new_v = x.cmpt in
+  let new_v = fresh_node_id () in
   let new_g = G.add_vertex x.graph new_v in
   let new_lmap = x.lmap in
   let new_vmap = VMap.add new_v LSet.empty x.vmap in
@@ -369,7 +373,6 @@ let create_cst_vertex (x:t) : V.t * t =
     graph = new_g ;
     lmap = new_lmap ;
     vmap = new_vmap ;
-    cmpt = x.cmpt+1
   }
 
 
@@ -407,7 +410,7 @@ let find_all_aliases_of_offset (lv1: Lval.t) (x: t) : LSet.t =
 (* returns the new vertex and the new graph *)
 (* only for function find_or_create vertex *)
 let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
-  let new_v = x.cmpt in
+  let new_v = fresh_node_id () in
   let new_g = G.add_vertex x.graph new_v in
   (* find all the alias of lv (because of offset) *)
   let set_of_aliases : LSet.t = find_all_aliases_of_offset lv x in
@@ -426,7 +429,6 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
       graph = new_g ;
       lmap = new_lmap ;
       vmap = new_vmap ;
-      cmpt = x.cmpt+1
     }
   in
   assert_invariants new_x;
@@ -569,18 +571,15 @@ let find_vertex lv x =
 
 (* remove a lval from a graph*)
 let remove_lval (x:t)  (lv:Lval.t) :t =
-  assert_invariants x;
-  let new_x =
-    try
-      let v = LLMap.find lv x.lmap in
-      let setv= VMap.find v x.vmap in
-      let new_lmap = LLMap.remove lv x.lmap in
-      let new_vmap = VMap.add v (LSet.remove lv setv) x.vmap in
-      {x with lmap = new_lmap; vmap = new_vmap}
-    with
-      Not_found -> x
-  in
-  assert_invariants new_x; new_x
+  assert_state_transformation x @@ fun x ->
+  try
+    let v = LLMap.find lv x.lmap in
+    let setv= VMap.find v x.vmap in
+    let new_lmap = LLMap.remove lv x.lmap in
+    let new_vmap = VMap.add v (LSet.remove lv setv) x.vmap in
+    {x with lmap = new_lmap; vmap = new_vmap}
+  with
+    Not_found -> x
 
 (* merge of two vertices; the first vertex carries both sets, the second is removed from the graph and from lmap and vmap *)
 let merge x v1 v2 =
@@ -608,8 +607,7 @@ let merge x v1 v2 =
     let g = G.fold_pred f_fold_pred g v2 g in
     (* remove v2 *)
     let g =  G.remove_vertex g v2 in
-    {graph = g; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt}
-
+    {graph = g; lmap = new_lmap; vmap = new_vmap}
 
 
 
@@ -758,20 +756,34 @@ end
 
 module V2Set = Set.Make(VPairs)
 
+let empty :t =
+  {graph = G.empty; lmap = LLMap.empty; vmap = VMap.empty}
+
+let is_empty s =
+  compare s empty = 0
+
 (* add an int to all vertex values *)
-let shift (a : t) (offset : int) : t =
+let shift (a : t) : t =
   assert_state_transformation a @@ fun a ->
-  (* maybe if offset < #vertices there will be a problem? *)
-  let offset = max offset @@ G.nb_vertex a.graph in
-  let shift x = x + offset in
-  let shift_vmap shift_elem vmap =
-    VMap.of_seq @@ Stdlib.Seq.map shift_elem @@ VMap.to_seq vmap
-  in
-  let {graph; lmap; vmap; cmpt} = a in
-  {graph = G.map_vertex shift graph;
-   lmap = LLMap.map shift lmap;
-   vmap = shift_vmap (fun (key, l) -> (shift key, l)) vmap;
-   cmpt = shift cmpt}
+  if is_empty a then a else
+    let () = Options.debug ~level:8 "before shift: node_counter=%d@.%a@." !node_counter print_debug a in
+    let min_idx, _ = VMap.min_binding a.vmap in
+    let max_idx, _ = VMap.max_binding a.vmap in
+    let offset = !node_counter - min_idx in
+    let shift x = x + offset in
+    let shift_vmap shift_elem vmap =
+      VMap.of_seq @@ Stdlib.Seq.map shift_elem @@ VMap.to_seq vmap
+    in
+    let {graph; lmap; vmap} = a in
+    node_counter := max_idx + offset + 1;
+    let () = Options.feedback ~level:8 "node_counter after shift: %d@." !node_counter in
+    let result =
+      {graph = G.map_vertex shift graph;
+       lmap = LLMap.map shift lmap;
+       vmap = shift_vmap (fun (key, l) -> (shift key, l)) vmap}
+    in
+    let () = Options.debug ~level:8 "after shift: node_counter=%d@.%a@." !node_counter print_debug result in
+    result
 
 let lmap_intersect l r =
   let find_in_l lval vr acc =
@@ -781,8 +793,8 @@ let lmap_intersect l r =
 
 let union  (a1:t) (a2:t) :t =
   (* naive algorithm :
-     1 rename any vertex in a2 (by adding a1.cmpt) to avoid any confusion between vertex of the tw graphs
-     2 merge the graph and the vmap (by doing union of sets)
+     1 merge the graph and the vmap (by doing union of sets)
+     2 for any node present in both a1.graph and a2.graph, merge/join them
      3 for any lval [lv] that are has an entry in both a1.lmap and a2.lmap, merge the two vertex a1.lmap[lv]
        and a2.lmap[lv]
 
@@ -793,8 +805,6 @@ let union  (a1:t) (a2:t) :t =
 
   Options.debug ~level:4 "Union: First graph:@.%a@." print_graph a1;
   Options.debug ~level:5 "Union: First graph:@.%a@." print_debug a1;
-  (* ensure that a1 and a2 no longer share any vertex indices *)
-  let a2 = shift a2 a1.cmpt in
   Options.debug ~level:4 "Union: Second graph:@.%a@." print_graph a2;
   Options.debug ~level:5 "Union: Second graph:@.%a@." print_debug a2;
   let new_graph =
@@ -833,7 +843,7 @@ let union  (a1:t) (a2:t) :t =
   Options.debug ~level:7 "Union: sets to be joined:@[";
   List.iter (fun set -> Options.debug ~level:7 "%a" VSet.pretty set) sets_to_be_joined;
   Options.debug ~level:7 "@]@.";
-  let new_a = {graph = new_graph; lmap = new_lmap; vmap = new_vmap; cmpt = max a1.cmpt a2.cmpt} in
+  let new_a = {graph = new_graph; lmap = new_lmap; vmap = new_vmap} in
   let merged_nodes, new_a =
     List.fold_left
       (fun (merged_nodes, x) set -> let v0, x = merge_set x set in (v0 :: merged_nodes), x)
@@ -845,12 +855,6 @@ let union  (a1:t) (a2:t) :t =
   Options.debug ~level:5 "Union: Result graph:@.%a@." print_debug new_a;
   assert_invariants new_a;
   new_a
-
-let empty :t =
-  {graph = G.empty; lmap = LLMap.empty; vmap = VMap.empty; cmpt = 0}
-
-let is_empty s =
-  compare s empty = 0
 
 (** a type for summaries of functions *)
 type summary =
@@ -907,6 +911,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
       None -> Options.fatal "BUG this should not happen"
     | Some s -> s
   in
+  let sum_state = shift sum_state in
   assert (List.length args = List.length formals);
   (* check that formal variables do no appear in state *)
   List.iter
