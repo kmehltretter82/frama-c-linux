@@ -190,9 +190,7 @@ let get_lval_set = find_lset
 (* printing functions *)
 
 let print_debug fmt (x:t) =
-  Format.fprintf fmt "@[<hov 2>List of vertices: @.";
-  G.iter_vertex (fun v -> Format.fprintf fmt "id=%d LSet=%a@." v LSet.pretty (find_lset v x)) x.graph;
-  Format.fprintf fmt "@]@.@[<hov 2>List of edges: @.";
+  Format.fprintf fmt "@[<hov 2>List of edges: @.";
   G.iter_edges (fun v1 v2 -> Format.fprintf fmt "%d → %d@." v1 v2) x.graph;
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "@[<hov 2>LMap: @.";
@@ -200,8 +198,7 @@ let print_debug fmt (x:t) =
   Format.fprintf fmt "@]@.";
   Format.fprintf fmt "@[<hov 2>VMap: @.";
   VMap.iter (fun v ls -> Format.fprintf fmt "id=%d → lset=%a@." v LSet.pretty ls) x.vmap;
-  Format.fprintf fmt "@]@.";
-  Format.fprintf fmt "cmpt: %d@." x.cmpt
+  Format.fprintf fmt "@]@."
 
 let print_graph fmt (x:t) =
   let print_edge v1 v2 =
@@ -317,9 +314,9 @@ let find_all_aliases (lv1: Lval.t) (x: t) : LSet.t =
     with
       Not_found -> (LSet.empty,o)
   in
-  Options.debug ~level:5 "decompose_lval %a : [@[<hov 2>" Lval.pretty lv1;
-  List.iter (fun (x, o) -> Options.debug ~level:5 " (%a,%a) " Lval.pretty x Offset.pretty o) list_of_lval_to_be_searched;
-  Options.debug ~level:5 "@]]@.";
+  Options.debug ~level:9 "decompose_lval %a : [@[<hov 2>" Lval.pretty lv1;
+  List.iter (fun (x, o) -> Options.debug ~level:9 " (%a,%a) " Lval.pretty x Offset.pretty o) list_of_lval_to_be_searched;
+  Options.debug ~level:9 "@]]@.";
   let list_of_aliases : (LSet.t*offset) list =
     List.map f_map list_of_lval_to_be_searched
   in
@@ -344,7 +341,7 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   (* find all the alias of lv (because of offset) *)
   let set_of_aliases : LSet.t = find_all_aliases lv x in
   (* add all these aliases *)
-  Options.debug ~level:5 "all_aliases of %a : %a @." Lval.pretty lv LSet.pretty set_of_aliases;
+  Options.debug ~level:9 "all_aliases of %a : %a @." Lval.pretty lv LSet.pretty set_of_aliases;
   let new_lmap =
     LSet.fold
       (fun lv acc -> assert (not (LLMap.mem lv x.lmap)); LLMap.add lv new_v acc)
@@ -401,7 +398,7 @@ let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
    in the graph. If it is present, there will be bugs *)
 let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
   assert (not (LLMap.mem blv x.lmap));
-  Options.debug ~level:4 "creating a vertex for %a@." Lval.pretty blv;
+  Options.debug ~level:9 "creating a vertex for %a@." Lval.pretty blv;
   match blv with
     BNone -> Options.fatal "this should not happen"
   | BLval lv ->
@@ -475,7 +472,7 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
           map_predecessors
           VSet.empty
       in
-      Options.debug ~level:5 "found aliases of %a : %a@." Lval.pretty lv VSet.pretty vset_res;
+      Options.debug ~level:9 "found aliases of %a : %a@." Lval.pretty lv VSet.pretty vset_res;
       if VSet.is_empty vset_res
       then create_vertex_lval lv x
       else
@@ -625,18 +622,22 @@ let join ?(without_check = false) (x:t) (v1:V.t) (v2:V.t) : t =
 exception Found_vertex of V.t
 
 let join_set ?without_check (x:t) (vs:VSet.t) : t =
-  let v0 =
-    (* finds a valid vertex of x.graph *)
+  Options.debug ~level:7 "graph before join(%a) @.%a@." VSet.pretty vs print_debug x;
+  let v0 = (* find valid vertex of x.graph *)
     try
       VSet.iter (fun v -> if G.mem_vertex x.graph v then raise (Found_vertex v)) vs;
       Options.fatal "no valid vertex found in set %a" VSet.pretty vs
     with
       Found_vertex v -> v
   in
-  VSet.fold
-    (fun v acc -> join ?without_check acc v0 v)
-    vs
-    x
+  let result =
+    VSet.fold
+      (fun v acc -> join ?without_check acc v0 v)
+      vs
+      x
+  in
+  Options.debug ~level:7 "graph after join(%a) @.%a@." VSet.pretty vs print_debug result;
+  result
 
 let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants x;
