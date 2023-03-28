@@ -42,7 +42,7 @@ let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function
   match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
-    let set_aliases = Abstract_state.find_aliases lv state in
+    let set_aliases = Abstract_state.find_all_aliases lv state in
     LSet.fold_lval (fun e a -> f_fold a e) set_aliases acc
 
 let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =
@@ -51,7 +51,7 @@ let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_functi
     None -> acc
   | Some state ->
     let new_state = Analysis.do_stmt state s in
-    let set_aliases = Abstract_state.find_aliases lv new_state in
+    let set_aliases = Abstract_state.find_all_aliases lv new_state in
     LSet.fold_lval (fun e a -> f_fold a e) set_aliases acc
 
 let fold_aliases_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
@@ -88,7 +88,7 @@ let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
   match Analysis.get_state_before_stmt kf s with
     None -> false
   | Some state ->
-    let setv1 = Abstract_state.find_aliases lv1 state in
+    let setv1 = Abstract_state.find_all_aliases lv1 state in
     LSet.mem (BLval lv2) setv1
 
 let fold_vertex   (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
