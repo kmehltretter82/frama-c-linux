@@ -1,4 +1,4 @@
-[kernel] Parsing if_then1.c (with preprocessing)
+[kernel] Parsing steensgaard.c (with preprocessing)
 [alias] analysing function: main
 [alias] analysing instruction: a = & x;
 [alias] May-aliases at the end of instruction:
