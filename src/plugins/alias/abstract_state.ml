@@ -835,8 +835,7 @@ let union  (a1:t) (a2:t) :t =
       new_graph
   in
   let new_vmap =
-    VMap.fold
-      (fun v2 lset2 m -> VMap.add v2 lset2 m)
+    VMap.union (fun _ lset1 lset2 -> Option.some @@ LSet.union lset1 lset2)
       a2.vmap
       a1.vmap
   in
