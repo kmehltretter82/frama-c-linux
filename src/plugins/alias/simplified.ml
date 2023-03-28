@@ -141,6 +141,13 @@ struct
       BNone -> BNone
     | BLval lv -> let lv = Cil.addOffsetLval o lv in BLval lv
     | BAddrOf lv -> let lv = Cil.addOffsetLval o lv in BAddrOf lv
+
+  let points_to x =
+    match x with
+      BNone -> Options.fatal "Error when applying points_to (Not a pointer)"
+    | BAddrOf lv -> BLval lv
+    | BLval lv ->
+      BLval (Mem (Cil.dummy_exp (Lval lv)), NoOffset)
 end
 
 
