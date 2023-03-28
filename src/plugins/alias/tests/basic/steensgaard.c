@@ -1,4 +1,4 @@
-// another test for conditional
+// from steensgaard's paper
 //  {*b, *c, a, y} are aliased
 //  {b, c} are aliased
 
