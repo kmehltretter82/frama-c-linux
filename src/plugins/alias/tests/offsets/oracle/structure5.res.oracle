@@ -74,8 +74,8 @@
 [alias] analysing instruction: t->t = (struct struct_2_t *)z;
 [alias] May-aliases at the end of instruction:
   {z->s, y1} are aliased
-  {z->c, a} are aliased
   {t->t, z} are aliased
+  {z->c, a} are aliased
 [alias] analysing instruction: t->d = a;
 [alias] May-aliases at the end of instruction:
   {z->s, y1} are aliased

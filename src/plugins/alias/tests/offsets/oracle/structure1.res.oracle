@@ -13,11 +13,8 @@
 [alias] analysing instruction: p_x = (st_1_t *)p_y;
 [alias] May-aliases at the end of instruction:
   {p_x, p_y} are aliased
-  {x, y} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction:
   {p_x, p_y} are aliased
-  {x, y} are aliased
 [alias] May-aliases at the end of function main:
   {p_x, p_y} are aliased
-  {x, y} are aliased

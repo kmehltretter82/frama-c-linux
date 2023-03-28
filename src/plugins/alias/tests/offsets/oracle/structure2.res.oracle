@@ -8,9 +8,6 @@
 [alias] May-aliases at the end of instruction:
 [alias] analysing instruction: y.s = (struct struct_1_t *)(& x2);
 [alias] May-aliases at the end of instruction:
-  {x1, x2} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction:
-  {x1, x2} are aliased
 [alias] May-aliases at the end of function main:
-  {x1, x2} are aliased

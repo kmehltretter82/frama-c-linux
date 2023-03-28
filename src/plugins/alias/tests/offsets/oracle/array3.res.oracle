@@ -90,15 +90,12 @@
   {y, tmp_0} are aliased
 [alias] analysing instruction: y = mat[1];
 [alias] May-aliases at the end of instruction:
-  {x, tmp} are aliased
-  {y, tmp_0} are aliased
+  {x, tmp, y, tmp_0} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction:
-  {x, tmp} are aliased
-  {y, tmp_0} are aliased
+  {x, tmp, y, tmp_0} are aliased
 [alias] May-aliases at the end of function main:
-  {x, tmp} are aliased
-  {y, tmp_0} are aliased
+  {x, tmp, y, tmp_0} are aliased
 [alias] analysing function: malloc
 [alias] May-aliases at the end of function malloc:
 [alias] analysing function: pclose

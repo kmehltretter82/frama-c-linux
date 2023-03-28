@@ -303,8 +303,8 @@
   {a->t2[0], b->t2[0]} are aliased
 [alias] analysing instruction: b->t2[i] = a->t2[i];
 [alias] May-aliases at the end of instruction:
-  {a->t2[0], b->t2[0]} are aliased
   {a->t1[0], b->t1[0]} are aliased
+  {a->t2[0], b->t2[0]} are aliased
 [alias] analysing instruction: b->n1 = a->n1;
 [alias] May-aliases at the end of instruction:
   {a->t1[0], b->t1[0]} are aliased

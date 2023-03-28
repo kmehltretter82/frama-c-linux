@@ -157,9 +157,9 @@ sig
   val find_vertex : lval -> t -> G.V.t
 
   val find_aliases : lval -> t -> LSet.t
-                                    
+
   val find_all_aliases : lval -> t -> LSet.t
-  
+
   val find_transitive_closure : lval -> t -> LSet.t list
 
   val is_included : t -> t -> bool
@@ -202,11 +202,12 @@ let rec get_points_to (v:V.t) (x:t) : LSet.t =
 
 
 let aliases_of_vertex (v:V.t) (x:t) : LSet.t =
-   let list_pred = G.pred x.graph v in
-   List.fold_left
-     (fun acc v -> LSet.union acc (get_points_to v x))
-     LSet.empty
-     list_pred
+  assert (G.mem_vertex x.graph v);
+  let list_pred = G.pred x.graph v in
+  List.fold_left
+    (fun acc v -> LSet.union acc (get_points_to v x))
+    LSet.empty
+    list_pred
 
 let find_all_aliases (lv:lval) (x:t) : LSet.t =
   let lv : Lval.t = Lval.from_lval lv in
@@ -256,9 +257,16 @@ let print_graph fmt (x:t) =
   G.iter_edges print_edge x.graph
 
 let print_aliases fmt (x:t) =
-  let iter_vmap _ set_lv =
-    if LSet.cardinal set_lv >=2 then
-      Format.fprintf fmt "@[<hov 2>%a@] are aliased@." LSet.pretty set_lv
+  let iter_vmap v _set_lv0 =
+    if G.mem_vertex x.graph v
+    then
+      let set_lv = aliases_of_vertex v x in
+      (* TODO comment next line (it's temporary there to be sure we do not regress) *)
+      (* let set_lv = LSet.union set_lv _set_lv0 in *)
+      if LSet.cardinal set_lv >=2 then
+        Format.fprintf fmt "@[<hov 2>%a@] are aliased@." LSet.pretty set_lv
+        (* else
+         *   Options.warning "Vertex %d not found while printing aliases" v *)
   in
   VMap.iter iter_vmap x.vmap
 
