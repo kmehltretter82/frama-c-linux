@@ -1084,7 +1084,8 @@ module State = struct
             [| Octagons.packed_descr;
                Intervals.packed_descr;
                Relations.packed_descr;
-               Zone.packed_descr |]
+               Zone.packed_descr;
+               Deps.packed_descr |]
         let reprs =
           [ { octagons = Octagons.top;
               intervals = Intervals.empty;
