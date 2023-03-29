@@ -3,7 +3,7 @@
    OPT: -wp-no-split-switch
 */
 
-/* run.config_config
+/* run.config_qualif
    DONTRUN:
 */
 
