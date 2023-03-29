@@ -32,8 +32,8 @@ module LSet = Simplified_lset
 module Abstract_state = Abstract_state
 
 let check_computed () =
- if not (Analysis.is_computed ())
-    then
+  if not (Analysis.is_computed ())
+  then
     Options.abort "Static analysis must be called before any function of the API can be called"
 
 
