@@ -907,9 +907,19 @@ end
 
 module BaseToVariables = struct
   module VSet = Variable.Set
+
+  (* [BaseToVariables] modulesrepresents a maps from bases to each variable that
+     depends on this base. These variables are split into two (non necessary
+     disjoint) sets:
+     - the variables that depends directly on this base --- the variable may be
+       hosted in this base;
+     - the variables that depends indirectly on this base --- the variable
+       location may change if the base changes *)
   module VSetPair =
   struct
-    include Datatype.Pair (VSet) (VSet)
+    include Datatype.Pair
+      (VSet) (* Directly dependent variables *)
+      (VSet) (* Indirectly dependent variables *)
     let pretty_debug = pretty
     let is_empty (s,t) = VSet.is_empty s && VSet.is_empty t
     let inter (s1,t1) (s2,t2) = VSet.inter s1 s2, VSet.inter t1 t2
