@@ -112,11 +112,9 @@ let fold_vertex_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: ker
       list_closure
 
 let get_state_before_stmt =
-  check_computed ();
   Analysis.get_state_before_stmt
 
 let call_function a f res args =
-  check_computed ();
   match Analysis.get_summary f with
     None -> None
   | Some su -> Some(Abstract_state.call a res args su)
