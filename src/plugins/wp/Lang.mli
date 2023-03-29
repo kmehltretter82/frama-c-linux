@@ -158,7 +158,7 @@ val extern_t:
 val tau_of_object : c_object -> tau
 val tau_of_ctype : typ -> tau
 val tau_of_ltype : logic_type -> tau
-val tau_of_return : logic_info -> tau
+val tau_of_li_type : logic_type option -> tau
 val tau_of_lfun : lfun -> tau option list -> tau
 val tau_of_field : field -> tau
 val tau_of_record : field -> tau
