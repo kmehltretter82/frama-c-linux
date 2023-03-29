@@ -432,6 +432,18 @@ export function unfoldAll(view: View): void {
   if (view !== null) Language.unfoldAll(view);
 }
 
+function isVisible(view: View, line: number): boolean {
+  if (!view || view.state.doc.lines < line) return false;
+  const doc = view.state.doc;
+  const top = view.documentTop;
+  const rect = view.dom.getBoundingClientRect();
+  const topVisibleBlock = view.lineBlockAtHeight(rect.top - top);
+  const topVisibleLine = doc.lineAt(topVisibleBlock.to).number;
+  const bottomVisibleBlock = view.lineBlockAtHeight(rect.bottom - top);
+  const bottomVisibleLine = doc.lineAt(bottomVisibleBlock.from).number;
+  return (topVisibleLine < line && line < bottomVisibleLine);
+}
+
 // Move to the given line. The indexation starts at 1.
 export function selectLine(view: View, line: number, atTop: boolean): void {
   if (!view || view.state.doc.lines < line) return;
@@ -439,9 +451,10 @@ export function selectLine(view: View, line: number, atTop: boolean): void {
   const { from: here } = doc.lineAt(view.state.selection.main.from);
   const { from: goto } = doc.line(Math.max(line, 1));
   if (here === goto) return;
-  view.dispatch({ selection: { anchor: goto }, scrollIntoView: true });
-  if (!atTop) return;
-  const effects = EditorView.scrollIntoView(goto, { y: 'start', yMargin: 0 });
+  view.dispatch({ selection: { anchor: goto } });
+  if (isVisible(view, line)) return;
+  const verticalScroll = atTop ? 'start' : 'center';
+  const effects = EditorView.scrollIntoView(goto, { y: verticalScroll });
   view.dispatch({ effects });
 }
 
