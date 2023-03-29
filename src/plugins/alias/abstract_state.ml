@@ -652,8 +652,8 @@ let join ?(without_check = false) (x:t) (v1:V.t) (v2:V.t) : t =
 
 exception Found_vertex of V.t
 
-let join_set ?without_check (x:t) (vs:VSet.t) : t =
-  Options.debug ~level:7 "graph before join(%a) @.%a@." VSet.pretty vs print_debug x;
+let merge_set (x:t) (vs:VSet.t) : t =
+  Options.debug ~level:7 "graph before merge_set (%a) @.%a@." VSet.pretty vs print_debug x;
   let v0 = (* find valid vertex of x.graph *)
     try
       VSet.iter (fun v -> if G.mem_vertex x.graph v then raise (Found_vertex v)) vs;
@@ -663,7 +663,7 @@ let join_set ?without_check (x:t) (vs:VSet.t) : t =
   in
   let result =
     VSet.fold
-      (fun v acc -> join ?without_check acc v0 v)
+      (fun v acc -> merge acc v0 v)
       vs
       x
   in
@@ -844,7 +844,7 @@ let union  (a1:t) (a2:t) :t =
   Options.debug ~level:7 "@]@.";
   let new_a = {graph = new_graph; lmap = new_lmap; vmap = new_vmap; cmpt = max a1.cmpt a2.cmpt} in
   let new_a =
-    List.fold_left (join_set ~without_check:true) new_a sets_to_be_joined
+    List.fold_left merge_set new_a sets_to_be_joined
   in
   Options.debug ~level:4 "Union: Result graph:@.%a@." print_graph new_a;
   Options.debug ~level:5 "Union: Result graph:@.%a@." print_debug new_a;
