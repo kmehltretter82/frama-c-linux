@@ -771,11 +771,6 @@ let pp_wp_parameters fmt =
     if spec <> [] && spec <> ["Typed"] then
       ( let descr = Factory.descr (Factory.parse spec) in
         Format.fprintf fmt " -wp-model '%s'" descr ) ;
-    if not (Wp_parameters.Let.get ()) then Format.pp_print_string fmt
-        " -wp-no-let" ;
-    if Wp_parameters.Let.get () && not (Wp_parameters.Prune.get ())
-    then Format.pp_print_string fmt " -wp-no-prune" ;
-    if Wp_parameters.Split.get () then Format.pp_print_string fmt " -wp-split" ;
     let tm = Wp_parameters.Timeout.get () in
     if tm <> 10 then Format.fprintf fmt " -wp-timeout %d" tm ;
     let st = Wp_parameters.Steps.get () in
