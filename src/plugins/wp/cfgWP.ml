@@ -918,7 +918,7 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let rec cc_case_values ks vs sigma = function
-    | [] -> ks , vs
+    | [] -> List.rev ks , List.rev vs
     | e::es ->
       match Ctypes.get_int64 e with
       | Some k ->
