@@ -636,25 +636,10 @@ let rec join_without_check (x:t) (v1:V.t) (v2:V.t) : t =
     match (pt1, pt2) with
     | [], _ -> x
     | _, [] -> x
+    | [succ_v1],[succ_v2] ->
+      join_without_check x succ_v1 succ_v2
     | _, _ ->
-      (* join the succesors *)
-      unify x pt1 pt2
-
-(* [unify x l1 l2] folds [join x v1 v2] for all [v1] in [l1] and all [v2] in [l2] *)
-and unify (x:t) (l1:V.t list) (l2:V.t list) =
-  match l1 with
-    [] -> x
-  | v1::qq ->
-    let x = unify2 x v1 l2 in
-    unify x qq l2
-
-(* [unify2 x v1 l2] folds [join x v1 v2] for all [v2] in [l2] *)
-and unify2 (x:t) (v1:V.t) (l2:V.t list) =
-  match l2 with
-    [] -> x
-  | v2::qq ->
-    let x = join_without_check x v1 v2 in
-    unify2 x v1 qq
+      Options.fatal "invariant broken"
 
 (* since the recursive version of join, unify, unify2 and merge may break the invariants *)
 let join ?(without_check = false) (x:t) (v1:V.t) (v2:V.t) : t =
