@@ -371,7 +371,7 @@ let e_dnf = cnf_dnf ~pol:false
 
 (* feature at Conditions.closure and also for debugging purposes *)
 let () = Conditions.at_closure (fun ((step,goal) as sequent) ->
-    match Wp_parameters.SplitDepth.get () with
+    match Wp_parameters.SplitCNF.get () with
     | 0 ->  sequent
     | depth when depth < -1  ->
       (* Unspecified debug mode checking the correctness of CNF algo:

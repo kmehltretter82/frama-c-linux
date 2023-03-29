@@ -92,9 +92,11 @@ module Ground: Parameter_sig.Bool
 module Reduce: Parameter_sig.Bool
 module ExtEqual : Parameter_sig.Bool
 module UnfoldAssigns : Parameter_sig.Int
-module Split: Parameter_sig.Bool
+module SplitBranch: Parameter_sig.Bool
+module SplitSwitch: Parameter_sig.Bool
 module SplitMax: Parameter_sig.Int
-module SplitDepth: Parameter_sig.Int
+module SplitConj: Parameter_sig.Bool
+module SplitCNF: Parameter_sig.Int
 module DynCall : Parameter_sig.Bool
 module SimplifyIsCint : Parameter_sig.Bool
 module SimplifyLandMask : Parameter_sig.Bool

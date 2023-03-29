@@ -44,7 +44,7 @@ type 'a t
 
 val empty : 'a t
 val singleton : 'a -> 'a t
-val group : tag -> ('a list -> 'a) -> 'a t -> 'a t
+val apply : tag -> ('a list -> 'a) -> 'a t -> 'a t
 
 val union : ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
 val merge :
