@@ -312,6 +312,37 @@ let assert_state_transformation (x:t) (f: t -> t) : t =
   assert_invariants result;
   result
 
+(** .dot printing functions*)
+let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
+
+let lset_to_string (s: LSet.t) : string =
+  let fmt = Format.str_formatter in
+  Format.fprintf fmt "\"%a\"" LSet.pretty s;
+  Format.flush_str_formatter ()
+
+module Dot = Graphviz.Dot(struct
+    include G
+    let edge_attributes _ = []
+    let default_edge_attributes _ = []
+    let get_subgraph _ = None
+    let vertex_attributes _ = [`Shape `Box]
+    let vertex_name (v:V.t) =
+      let lset = !find_vertex_name_ref v in
+      let v_name = lset_to_string lset in
+      (* Format.printf "Vertex %d set %s@." v v_name; *)
+      v_name
+    let default_vertex_attributes _ = []
+    let graph_attributes _ = []
+  end)
+
+let print_dot filename (a:t) =
+  let file = open_out filename in
+  find_vertex_name_ref :=
+    (fun v -> find_lset v a
+    );
+  Dot.output_graph file a.graph;
+  close_out file
+
 (* find functions, part 2 *)
 let rec closure_find_lset (v:V.t) (x:t) =
   match G.succ x.graph v with
@@ -586,38 +617,6 @@ let merge x v1 v2 =
     let g =  G.remove_vertex g v2 in
     {graph = g; lmap = new_lmap ; vmap = new_vmap ; cmpt = x.cmpt}
 
-
-
-(** .dot printing functions*)
-let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
-
-let lset_to_string (s: LSet.t) : string =
-  let fmt = Format.str_formatter in
-  Format.fprintf fmt "\"%a\"" LSet.pretty s;
-  Format.flush_str_formatter ()
-
-module Dot = Graphviz.Dot(struct
-    include G
-    let edge_attributes _ = []
-    let default_edge_attributes _ = []
-    let get_subgraph _ = None
-    let vertex_attributes _ = [`Shape `Box]
-    let vertex_name (v:V.t) =
-      let lset = !find_vertex_name_ref v in
-      let v_name = lset_to_string lset in
-      (* Format.printf "Vertex %d set %s@." v v_name; *)
-      v_name
-    let default_vertex_attributes _ = []
-    let graph_attributes _ = []
-  end)
-
-let print_dot filename (a:t) =
-  let file = open_out filename in
-  find_vertex_name_ref :=
-    (fun v -> find_lset v a
-    );
-  Dot.output_graph file a.graph;
-  close_out file
 
 
 
