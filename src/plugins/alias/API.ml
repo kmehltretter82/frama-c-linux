@@ -105,7 +105,7 @@ let fold_vertex_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: ker
   match Analysis.get_state_before_stmt kf s with
     None -> acc
   | Some state ->
-    let list_closure = Abstract_state.find_transitive_closure lv state in
+    let list_closure : (G.V.t * LSet.t) list = Abstract_state.find_transitive_closure lv state in
     List.fold_left
       (fun acc (i,s) -> LSet.fold_lval (fun lv a -> f_fold a i lv) s acc)
       acc
@@ -119,3 +119,8 @@ let call_function a f res args =
     None -> None
   | Some su -> Some(Abstract_state.call a res args su)
 
+
+let simplify_lval (lv:lval) : lval =
+  match Simplified.Simplified_lval.from_lval lv with
+    BLval lv -> lv
+  | _ -> Options.fatal "This should not happen"

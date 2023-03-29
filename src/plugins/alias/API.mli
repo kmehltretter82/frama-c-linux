@@ -85,3 +85,9 @@ val get_state_before_stmt :  kernel_function -> stmt -> Abstract_state.t option
     use [call_function a f None args] instead. Returns [None] if
     the abstract state [a] is bottom or not computed. *)
 val call_function: Abstract_state.t -> kernel_function -> lval option -> exp list -> Abstract_state.t option
+
+
+(** [simplify_lval lv] returns a lval where every index of an array is
+   replaced by 0, evey pointer arithmetic is simplified to an access
+   to an array *)
+val simplify_lval: lval -> lval
