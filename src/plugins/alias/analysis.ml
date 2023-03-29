@@ -43,9 +43,8 @@ module Make_table(H: Hashtbl.S)(V: sig type t val size :int end) : InternalTable
   type key = H.key
   type value = V.t
   let tbl = H.create V.size
-  let add = H.add tbl
+  let add = H.replace tbl
   let find = H.find tbl
-  let mem = H.mem
   let iter f =
     H.iter f tbl
 end
@@ -117,7 +116,7 @@ let do_function_call (s:stmt) state (res : lval option) (ef : exp) (args: exp li
       match (state, summary) with
         (None, _) -> None
       | (Some a, Some summary) ->
-        Some(Abstract_state.call a res args summary) 
+        Some(Abstract_state.call a res args summary)
       | (Some a, None) -> (feedback_only_once s; Some a)
     end
 
@@ -248,22 +247,13 @@ let doFunction (kf:kernel_function) =
     | _, Some final_state -> Abstract_state.print_dot f_name final_state
   else
     begin
-        (* use None to encode functions that have no definition *)
-      begin
-        try
-          match Function_table.find kf with
-            None -> ()
-          | Some _ ->
-            Options.warning "redefinition of function %a" Kernel_function.pretty k
-        with
-          Not_found -> ()
-      end;
+      (* use None to encode functions that have no definition *)
       if Kernel_function.has_definition kf
       then
         Function_table.add kf @@ Some (Abstract_state.make_summary final_state kf)
       else
         Function_table.add kf @@ None
-        
+
     end
 
 let () = function_compute_ref := doFunction
