@@ -976,7 +976,7 @@ struct
          let vcs_cases = List.map (cc_case stmt warn sigma value) cases in
          let neq = List.map (fun (vs,_) -> p_all (p_neq value) vs) vcs_cases in
          let vcs_default = cc_default stmt sigma neq default in
-         let vcs = merge_all_vcs ( vcs_default :: List.map snd vcs_cases ) in
+         let vcs = merge_all_vcs ( vcs_default :: List.rev_map snd vcs_cases ) in
          let effects = List.fold_left
              (fun es (_,wp) -> Eset.union es wp.effects)
              default.effects cases in
