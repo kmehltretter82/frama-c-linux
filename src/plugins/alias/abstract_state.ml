@@ -870,6 +870,9 @@ let union  (a1:t) (a2:t) :t =
 let empty :t =
   {graph = G.empty; lmap = LLMap.empty; vmap = VMap.empty; cmpt = 0}
 
+let is_empty s =
+  compare s empty = 0
+
 (** a type for summaries of functions *)
 type summary =
   {
@@ -906,10 +909,16 @@ let pretty_summary ?(debug=false) ?(function_name="") fmt s =
     | Some x -> pp fmt x
     | None -> Format.fprintf fmt "<None>"
   in
-  Format.fprintf fmt "@[<hov 2>Summary of function %s: @." function_name;
-  Format.fprintf fmt "formals: %a locals : %a return expression: %a @.State: @[<hov 2>%a@] " print_list_lval s.formals print_list_lval s.locals (print_option Exp.pretty) s.return (print_option (pretty ~debug)) s.state;
-  Format.fprintf fmt "@]@."
-
+  match s.state with
+    None -> if debug then Format.fprintf fmt  "@Summary of function %s is empty @." function_name
+  | Some s when is_empty s -> if debug then Format.fprintf fmt "@Summary of function %s is empty @." function_name
+  | _ ->
+    begin
+      Format.fprintf fmt "@[<hov 2>Summary of function %s: @." function_name;
+      (* Format.fprintf fmt "state not empty"; *)
+      Format.fprintf fmt "formals: %a locals : %a return expression: %a @.State: @[<hov 2>%a@] " print_list_lval s.formals print_list_lval s.locals (print_option Exp.pretty) s.return (print_option (pretty ~debug)) s.state;
+      Format.fprintf fmt "@]@."
+    end
 
 let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   assert_invariants state;
