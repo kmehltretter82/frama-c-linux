@@ -1657,10 +1657,11 @@ logic_def:
       exit_type_variables_scope ();
       LDpredicate_def (id, labels, tvars, $3, $5) }
 /* inductive predicate definition */
-| INDUCTIVE poly_id parameters LBRACE indcases RBRACE
-    { let (id,labels,tvars) = $2 in
-      exit_type_variables_scope ();
-      LDinductive_def(id, labels, tvars, $3, $5) }
+| INDUCTIVE pred = poly_id params = parameters
+    midrule({exit_type_variables_scope()})
+    LBRACE cases = indcases RBRACE
+    { let (id,labels,tvars) = pred in
+      LDinductive_def(id, labels, tvars, params, cases) }
 | LEMMA poly_id COLON lexpr SEMICOLON
     { let (id,labels,tvars) = $2 in
       exit_type_variables_scope ();
