@@ -910,7 +910,7 @@ let pretty_summary ?(debug=false) ?(function_name="") fmt s =
     | None -> Format.fprintf fmt "<None>"
   in
   match s.state with
-    None -> if debug then Format.fprintf fmt  "@Summary of function %s is empty @." function_name
+    None -> if debug then Format.fprintf fmt  "@Summary of function %s is not in the table @." function_name
   | Some s when is_empty s -> if debug then Format.fprintf fmt "@Summary of function %s is empty @." function_name
   | _ ->
     begin
