@@ -109,7 +109,7 @@ module Variable : Variable = struct
     let compare x y =
       match x, y with
       | Var x, Var y
-      | Int x, Int y -> Cil_datatype.Varinfo.compare x y
+      | Int x, Int y
       | StartOf x, StartOf y -> Cil_datatype.Varinfo.compare x y
       | Lval x, Lval y -> HCE.compare x y
       | Var _, _ -> -1
@@ -840,8 +840,8 @@ struct
 
   let cache_prefix = "Eva.Octagons.VariableToDeps"
 
-  include Hptmap.Make(Variable)(Deps)(Hptmap.Comp_unused)
-      (struct let v = [] end)(struct let l = [Ast.self] end)
+  include Hptmap.Make (Variable) (Deps) (Hptmap.Comp_unused)
+      (struct let v = [[]] end) (struct let l = [Ast.self] end)
 
   let is_included: t -> t -> bool =
     let cache_name = cache_prefix ^ ".is_included" in
@@ -917,7 +917,7 @@ module BaseToVariables = struct
   end
 
   include Hptmap.Make (Base.Base) (VSetPair) (Hptmap.Comp_unused)
-      (struct let v = [] end)(struct let l = [Ast.self] end)
+      (struct let v = [[]] end) (struct let l = [Ast.self] end)
 
   let cache_prefix = "Eva.Octagons.BaseToVariables"
 
@@ -1012,10 +1012,8 @@ module Deps = struct
     let m = VariableToDeps.add var deps m
     and i =
       i |>
-      Locations.Zone.fold_topset_ok
-        (fun b _ -> BaseToVariables.add_direct var b) deps.data |>
-      Locations.Zone.fold_topset_ok
-        (fun b _ -> BaseToVariables.add_indirect var b) deps.indirect
+      Locations.Zone.fold_bases (BaseToVariables.add_direct var) deps.data |>
+      Locations.Zone.fold_bases (BaseToVariables.add_indirect var) deps.indirect
     in (m,i)
 
   let remove (var: Variable.t) ((m, i) as d: t): t =
