@@ -440,7 +440,7 @@ struct
     let frame = logic_frame name types in
     in_frame frame
       begin fun () ->
-        let tres = Lang.tau_of_li_type tres in
+        let tres = Lang.tau_of_return tres in
         let env,domain,sigv = profile_env Logic_var.Map.empty [] [] profile in
         let env = default_label env labels in
         let result = cc env data in
@@ -563,7 +563,7 @@ struct
     in_frame frame
       begin fun () ->
         let lfun = ACSL l in
-        let tau = Lang.tau_of_li_type l.l_type in
+        let tau = Lang.tau_of_return l.l_type in
         let parp,sigp = Lang.local profile_sig l.l_profile in
         let ldef = {
           d_lfun = lfun ;
@@ -586,7 +586,7 @@ struct
     in_frame frame
       begin fun () ->
         let lfun = ACSL l in
-        let tau = Lang.tau_of_li_type l.l_type in
+        let tau = Lang.tau_of_return l.l_type in
         let parm,sigm = Lang.local (profile_mem l) vars in
         let ldef = {
           d_lfun = lfun ;

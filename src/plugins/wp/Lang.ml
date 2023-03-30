@@ -225,10 +225,7 @@ let rec tau_of_ltype t =
   | Ltype _ as b when Logic_const.is_boolean_type b -> Logic.Bool
   | Ltype(lt,lts) -> atype lt (List.map tau_of_ltype lts)
 
-let tau_of_li_type ltype =
-  match ltype with
-  | None -> Logic.Prop
-  | Some t -> tau_of_ltype t
+let tau_of_return = function None -> Logic.Prop | Some t -> tau_of_ltype t
 
 (* -------------------------------------------------------------------------- *)
 (* --- Datatypes                                                          --- *)
@@ -420,7 +417,7 @@ and source =
 
 let tau_of_lfun phi ts =
   match phi with
-  | ACSL f -> tau_of_li_type f.l_type
+  | ACSL f -> tau_of_return f.l_type
   | CTOR c ->
     if c.ctor_type.lt_params = [] then Logic.Data(Atype c.ctor_type,[])
     else raise Not_found
