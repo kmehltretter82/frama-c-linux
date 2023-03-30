@@ -43,21 +43,24 @@ module Make_table(H: Hashtbl.S)(V: sig type t val size :int end) : InternalTable
   type key = H.key
   type value = V.t
   let tbl = H.create V.size
-  let add = H.add tbl
+  let add = H.replace tbl
   let find = H.find tbl
   let iter f =
     H.iter f tbl
 end
 
+
 module A = struct type t = Abstract_state.t option let size = 7 end
 module R = struct type t = Abstract_state.summary option let size = 7 end
 
+(* In Function_table, value None means the function has no definition *)
 module Function_table = Make_table(Kernel_function.Hashtbl)(R)
 
 let function_compute_ref = Extlib.mk_fun "function_compute"
 
 module D = Dataflow.StartData(A)
 
+(* In Stmt_table, value None means abstract state = Bottom *)
 module Stmt_table = struct
   include D
   type key = stmt
@@ -84,7 +87,7 @@ let feedback_only_once s =
   if not (List.mem s !list_instr_warnings) then
     begin
       list_instr_warnings := s::!list_instr_warnings;
-      Options.feedback "Skipping @[%a@] (summary not found)" Stmt.pretty s
+      Options.warning "In statement @[%a@], the function has no definition (abstract state is unchanged)" Stmt.pretty s
     end
 
 let do_function_call (s:stmt) state (res : lval option) (ef : exp) (args: exp list) loc =
@@ -113,8 +116,7 @@ let do_function_call (s:stmt) state (res : lval option) (ef : exp) (args: exp li
       match (state, summary) with
         (None, _) -> None
       | (Some a, Some summary) ->
-        let new_a = Abstract_state.call a res args summary in
-        Some new_a
+        Some(Abstract_state.call a res args summary)
       | (Some a, None) -> (feedback_only_once s; Some a)
     end
 
@@ -244,7 +246,15 @@ let doFunction (kf:kernel_function) =
     | _, None -> ()
     | _, Some final_state -> Abstract_state.print_dot f_name final_state
   else
-    Function_table.add kf @@ Some (Abstract_state.make_summary final_state kf)
+    begin
+      (* use None to encode functions that have no definition *)
+      if Kernel_function.has_definition kf
+      then
+        Function_table.add kf @@ Some (Abstract_state.make_summary final_state kf)
+      else
+        Function_table.add kf @@ None
+
+    end
 
 let () = function_compute_ref := doFunction
 
@@ -295,6 +305,7 @@ let compute () =
     Stmt_table.iter (print_stmt_table_elt Format.std_formatter);
   if Options.ShowFunctionTable.get() then
     begin
+      Function_table.iter (fun x _ -> Format.printf "entry of function %a @." Kernel_function.pretty x);
       Function_table.iter (print_function_table_elt Format.std_formatter)
     end
 

@@ -106,17 +106,13 @@
 [alias] analysing instruction: tmp_1 = sin(*(idata + idx));
 [alias] analysing function: sin
 [alias] May-aliases at the end of function sin:
-[alias] Warning: a function with no return is employed in an assignment
+[alias] Warning: In statement tmp_1 = sin(*(idata + idx));, the function has no definition (abstract state is unchanged)
 [alias] May-aliases at the end of instruction:
   {x, tmp} are aliased
 [alias] analysing instruction: *(odata + idx) = 0.5 * tmp_1;
 [alias] May-aliases at the end of instruction:
   {x, tmp} are aliased
 [alias] analysing instruction: idx ++;
-[alias] May-aliases at the end of instruction:
-  {x, tmp} are aliased
-[alias] analysing instruction: tmp_1 = sin(*(idata + idx));
-[alias] Warning: a function with no return is employed in an assignment
 [alias] May-aliases at the end of instruction:
   {x, tmp} are aliased
 [alias] analysing instruction: swap(tmp->n1);
@@ -138,7 +134,6 @@
 [alias] May-aliases at the end of instruction:
   {x, tmp} are aliased
 [alias] analysing instruction: tmp_1 = sin(*(idata + idx));
-[alias] Warning: a function with no return is employed in an assignment
 [alias] May-aliases at the end of instruction:
   {x, tmp} are aliased
 [alias] analysing instruction: *(odata + idx) = 0.5 * tmp_1;
