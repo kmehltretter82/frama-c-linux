@@ -705,7 +705,7 @@ let mk_gvar ?init ~ty name =
   let vi =
     try
       let ty' = typeAddAttributes [Attr ("ghost", [])] ty in
-      let vi = Globals.Vars.find_from_astinfo name VGlobal in
+      let vi = Globals.Vars.find_from_astinfo name Global in
       if not (Cil_datatype.Typ.equal vi.vtype ty') then
         Aorai_option.abort "Global %s is declared with type %a instead of %a"
           name Cil_printer.pp_typ vi.vtype Cil_printer.pp_typ ty';

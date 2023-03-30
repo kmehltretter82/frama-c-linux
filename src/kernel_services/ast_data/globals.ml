@@ -73,21 +73,40 @@ module Vars = struct
 
   let add_decl vi = add vi { init = None }
 
-  let get_astinfo_ref : (Cil_types.varinfo -> string * localisation) ref =
+  let get_astinfo_ref : (Cil_types.varinfo -> string * syntactic_scope) ref =
     Extlib.mk_fun "get_astinfo_ref"
 
   exception Found of varinfo
-  let find_from_astinfo name = function
-    | VGlobal ->
-      (try
-         iter (fun v _ -> if v.vname = name then raise (Found v));
-         raise Not_found
-       with Found v ->
-         v)
-    | VLocal kf ->
+  let find_from_astinfo name scope =
+    let iter_glob cond =
+      try
+        iter (fun v _ -> if cond v then raise (Found v));
+        raise Not_found
+      with Found v -> v
+    in
+    match scope with
+    | Global -> iter_glob (fun v -> v.vname = name)
+    | Program ->
+      iter_glob (fun v -> v.vname = name && not (v.vstorage = Static))
+    | Translation_unit file ->
+      iter_glob
+        (fun v ->
+           v.vname = name &&
+           Filepath.Normalized.equal file (fst v.vdecl).pos_path)
+    | Whole_function kf ->
       List.find (fun v -> v.vname = name) (get_locals kf)
-    | VFormal kf ->
+    | Formal kf ->
       List.find (fun v -> v.vname = name) (get_formals kf)
+    | Block_scope stmt ->
+      let blocks = !find_all_enclosing_blocks stmt in
+      (try
+         List.iter
+           (fun b ->
+              (List.iter (fun v -> if v.vname = name then raise (Found v))
+                 (b.blocals @ b.bstatics)))
+           blocks;
+         raise Not_found
+       with Found v -> v)
 
   let get_astinfo vi = !get_astinfo_ref vi
 
@@ -394,7 +413,12 @@ module Functions = struct
   exception Found of kernel_function
   let get_astinfo vi =
     vi.vname,
-    if vi.vglob then VGlobal
+    if vi.vglob then begin
+      if vi.vstorage = Static then
+        Translation_unit (fst vi.vdecl).pos_path
+      else
+        Program
+    end
     else begin
       if vi.vformal then begin
         try
@@ -404,7 +428,7 @@ module Functions = struct
                then raise (Found kf));
           assert false
         with Found kf ->
-          VFormal kf
+          Formal kf
       end else begin
         try
           iter
@@ -413,7 +437,8 @@ module Functions = struct
                then raise (Found kf));
           assert false
         with Found kf ->
-          VLocal kf
+          (* TODO: find the block where the varinfo is defined. *)
+          Whole_function kf
       end
     end
 
@@ -647,6 +672,11 @@ module Syntactic_search = struct
     in
     let module M = struct exception Found of varinfo end in
     match scope with
+    | Global ->
+      (try
+         Vars.iter (fun v _ -> if has_name v then raise (M.Found v));
+         None
+       with M.Found v -> Some v)
     | Program ->
       (try
          Vars.iter (fun v _ -> if global_has_name v then raise (M.Found v));
@@ -656,6 +686,8 @@ module Syntactic_search = struct
       let symbols = FileIndex.get_globals file in
       (try Some (fst (List.find (fun x -> (global_has_name (fst x))) symbols))
        with Not_found -> find_in_scope x Program)
+    | Formal kf -> List.find_opt has_name (get_formals kf)
+    | Whole_function kf -> List.find_opt has_name (get_locals kf)
     | Block_scope stmt ->
       let blocks = !find_all_enclosing_blocks stmt in
       let find_in_block b =

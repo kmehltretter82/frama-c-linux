@@ -102,8 +102,6 @@ module Location: sig
   val equal_start_semantic : location -> location -> bool
 end
 
-module Localisation: Datatype.S with type t = localisation
-
 module Syntactic_scope:
   Datatype.S_with_collections with type t = syntactic_scope
 

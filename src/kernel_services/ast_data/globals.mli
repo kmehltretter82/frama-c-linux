@@ -35,7 +35,7 @@ module Vars: sig
 
   val find: varinfo -> initinfo
 
-  val find_from_astinfo: string -> localisation -> varinfo
+  val find_from_astinfo: string -> syntactic_scope -> varinfo
   (** Finds a variable from its [vname] according to its localisation (which
       might be a local). If you wish to search for a symbol according to its
       original name in the source code and the syntactic scope in which
@@ -43,7 +43,7 @@ module Vars: sig
       @raise Not_found if no such variable exists.
   *)
 
-  val get_astinfo: varinfo -> string * localisation
+  val get_astinfo: varinfo -> string * syntactic_scope
   (** Linear in the number of locals and formals of the program. *)
 
   (** {2 Iterators} *)

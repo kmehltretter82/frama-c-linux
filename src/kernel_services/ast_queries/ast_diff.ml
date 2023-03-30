@@ -1388,7 +1388,7 @@ and enumitem_correspondence ?loc ei env =
 
 and gvar_correspondence ?loc vi env =
   let add vi =
-    match find_candidate_varinfo ?loc vi Cil_types.VGlobal with
+    match find_candidate_varinfo ?loc vi Cil_types.Global with
     | None when Cil.isFunctionType vi.vtype ->
       begin
         match gfun_correspondence ?loc vi env with

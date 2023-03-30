@@ -10,9 +10,9 @@ class visit prj =
     method! vbehavior b =
       let kf = Option.get self#current_kf in
       if Kernel_function.get_name kf = "main" then begin
-        let x = Globals.Vars.find_from_astinfo "X" VGlobal in
+        let x = Globals.Vars.find_from_astinfo "X" Global in
         let x = Cil.cvar_to_lvar x in
-        let c = Globals.Vars.find_from_astinfo "c" (VFormal kf) in
+        let c = Globals.Vars.find_from_astinfo "c" (Formal kf) in
         let c = Cil.cvar_to_lvar c in
         b.b_assigns <-
           Writes
