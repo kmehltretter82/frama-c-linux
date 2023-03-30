@@ -140,7 +140,7 @@ let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t 
   | Skip _ -> a
   | Call(res,ef,es,loc) -> (* !function_compute_ref ef *)
     do_function_call s a res ef es loc
-  | Asm _ -> (Options.feedback "Skipping @[%a@] (Asm not implemented)" Printer.pp_stmt s; a)
+  | Asm _ -> (Options.warning "skipping @[%a@] (Asm not implemented)" Printer.pp_stmt s; a)
 
 let pp_abstract_state_opt ?(debug=false) fmt v =
   match v with
