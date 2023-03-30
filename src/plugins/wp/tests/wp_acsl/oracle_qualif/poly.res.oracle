@@ -11,8 +11,8 @@
 [wp] [Valid] typed_check_lemma_testp2_ok (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_check_lemma_testp_ko (Alt-Ergo) (Cached)
 [wp] [Valid] typed_check_lemma_testp_ok (Alt-Ergo) (Cached)
-[wp] [Unsuccess] typed_main_assert (Alt-Ergo) (Cached)
-[wp] [Valid] typed_main_assert_2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_main_check_NotP_ok (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_main_check_Y_ko (Alt-Ergo) (Cached)
 [wp] Proved goals:    5 / 10
   Alt-Ergo:        5
   Unsuccess:       5

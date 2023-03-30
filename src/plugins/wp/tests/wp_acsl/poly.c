@@ -54,6 +54,6 @@
 */
 
 int main(void){
-  //@ assert P(1, [| 1 |]) ;
-  //@ assert Y(1, [| 1 |]) ;
+  //@ check NotP_ok: !P(1, [| 1 |]) ;
+  //@ check Y_ko: Y(1, [| 1 |]) ;
 }

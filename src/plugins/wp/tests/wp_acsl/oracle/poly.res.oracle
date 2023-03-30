@@ -49,13 +49,12 @@ Prove: (L_foo a_0 s_0)=(concat (elt a_0) s_0)
   Function main
 ------------------------------------------------------------
 
-Goal Assertion (file poly.c, line 57):
-Prove: P_P(1, [ 1 ]).
+Goal Check 'NotP_ok' (file poly.c, line 57):
+Prove: !P_P(1, [ 1 ]).
 
 ------------------------------------------------------------
 
-Goal Assertion (file poly.c, line 58):
-Assume { (* Assertion *) Have: P_P(1, [ 1 ]). }
+Goal Check 'Y_ko' (file poly.c, line 58):
 Prove: P_Y(1, [ 1 ]).
 
 ------------------------------------------------------------
