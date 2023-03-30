@@ -428,6 +428,7 @@ struct
   let occurs_ps x ps = List.exists (F.occursp x) ps
 
   let compile_step
+      (tres: logic_type option)
       (name:string)
       (types:string list)
       (profile:logic_var list)
@@ -435,10 +436,11 @@ struct
       (cc : env -> 'a -> 'b)
       (filter : 'b -> var -> bool)
       (data : 'a)
-    : var list * trigger list * pred list * 'b * sig_param list =
+    : tau * var list * trigger list * pred list * 'b * sig_param list =
     let frame = logic_frame name types in
     in_frame frame
       begin fun () ->
+        let tres = Lang.tau_of_return tres in
         let env,domain,sigv = profile_env Logic_var.Map.empty [] [] profile in
         let env = default_label env labels in
         let result = cc env data in
@@ -464,7 +466,7 @@ struct
                  (Sigma.domain sigma) acc)
             frame.labels (parp,sigp)
         in
-        parm , frame.triggers , domain , result , sigm
+        tres, parm , frame.triggers , domain , result , sigm
       end ()
 
   let cc_term : (env -> Cil_types.term -> term) ref
@@ -505,9 +507,9 @@ struct
 
   let compile_lemma cluster name ~kind types labels lemma =
     let qs,prop = strip_forall [] lemma in
-    let xs,tgs,domain,prop,_ =
+    let _,xs,tgs,domain,prop,_ =
       let cc_pred = pred `Positive in
-      compile_step name types qs labels cc_pred in_pred prop in
+      compile_step None name types qs labels cc_pred in_pred prop in
     let weak = Wp_parameters.WeakIntModel.get () in
     let lemma = if weak then prop else F.p_hyps domain prop in
     {
@@ -557,37 +559,45 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let compile_lbpure cluster l =
-    let lfun = ACSL l in
-    let tau = Lang.tau_of_return l in
-    let parp,sigp = Lang.local profile_sig l.l_profile in
-    let ldef = {
-      d_lfun = lfun ;
-      d_types = List.length l.l_tparams ;
-      d_params = parp ;
-      d_cluster = cluster ;
-      d_definition = Logic tau ;
-    } in
-    Definitions.update_symbol ldef ;
-    Signature.update l (SIG sigp) ;
-    parp,sigp
+    let frame = logic_frame l.l_var_info.lv_name l.l_tparams in
+    in_frame frame
+      begin fun () ->
+        let lfun = ACSL l in
+        let tau = Lang.tau_of_return l.l_type in
+        let parp,sigp = Lang.local profile_sig l.l_profile in
+        let ldef = {
+          d_lfun = lfun ;
+          d_types = List.length l.l_tparams ;
+          d_params = parp ;
+          d_cluster = cluster ;
+          d_definition = Logic tau ;
+        } in
+        Definitions.update_symbol ldef ;
+        Signature.update l (SIG sigp) ;
+        parp,sigp
+      end ()
 
   (* -------------------------------------------------------------------------- *)
   (* --- Compiling Abstract Logic Function (in axiomatic with no reads)     --- *)
   (* -------------------------------------------------------------------------- *)
 
   let compile_lbnone cluster l vars =
-    let lfun = ACSL l in
-    let tau = Lang.tau_of_return l in
-    let parm,sigm = Lang.local (profile_mem l) vars in
-    let ldef = {
-      d_lfun = lfun ;
-      d_types = List.length l.l_tparams ;
-      d_params = parm ;
-      d_cluster = cluster ;
-      d_definition = Logic tau ;
-    } in
-    Definitions.define_symbol ldef ;
-    type_for_signature l ldef sigm ; SIG sigm
+    let frame = logic_frame l.l_var_info.lv_name l.l_tparams in
+    in_frame frame
+      begin fun () ->
+        let lfun = ACSL l in
+        let tau = Lang.tau_of_return l.l_type in
+        let parm,sigm = Lang.local (profile_mem l) vars in
+        let ldef = {
+          d_lfun = lfun ;
+          d_types = List.length l.l_tparams ;
+          d_params = parm ;
+          d_cluster = cluster ;
+          d_definition = Logic tau ;
+        } in
+        Definitions.define_symbol ldef ;
+        type_for_signature l ldef sigm ; SIG sigm
+      end ()
 
   (* -------------------------------------------------------------------------- *)
   (* --- Compiling Logic Function with Reads                                --- *)
@@ -596,9 +606,8 @@ struct
   let compile_lbreads cluster l ts =
     let lfun = ACSL l in
     let name = l.l_var_info.lv_name in
-    let tau = Lang.tau_of_return l in
-    let xs,_,_,(),s =
-      compile_step name l.l_tparams l.l_profile l.l_labels
+    let tau,xs,_,_,(),s =
+      compile_step l.l_type name l.l_tparams l.l_profile l.l_labels
         reads in_reads ts
     in
     let ldef = {
@@ -616,15 +625,16 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let compile_rec name l cc filter data =
+    let tau = l.l_type in
     let types = l.l_tparams in
     let profile = l.l_profile in
     let labels = l.l_labels in
-    let result = compile_step name types profile labels cc filter data in
+    let result = compile_step tau name types profile labels cc filter data in
     if LogicUsage.is_recursive l then
       begin
-        let (_,_,_,_,s) = result in
+        let (_,_,_,_,_,s) = result in
         Signature.update l (SIG s) ;
-        compile_step name types profile labels cc filter data
+        compile_step tau name types profile labels cc filter data
       end
     else result
 
@@ -634,8 +644,7 @@ struct
 
   let compile_lbterm cluster l t =
     let name = l.l_var_info.lv_name in
-    let tau = Lang.tau_of_return l in
-    let xs,_,_,r,s = compile_rec name l term in_term t in
+    let tau,xs,_,_,r,s = compile_rec name l term in_term t in
     match F.repr r with
     | Qed.Logic.Kint c -> CST c
     | _ ->
@@ -657,7 +666,7 @@ struct
     let lfun = ACSL l in
     let name = l.l_var_info.lv_name in
     let cc_pred = pred `Positive in
-    let xs,_,_,r,s = compile_rec name l cc_pred in_pred p in
+    let _,xs,_,_,r,s = compile_rec name l cc_pred in_pred p in
     let ldef = {
       d_lfun = lfun ;
       d_types = List.length l.l_tparams ;
@@ -690,9 +699,9 @@ struct
     (* Compile cases with default definition and collect used chunks *)
     let support = List.fold_left
         (fun support (case,labels,types,lemma) ->
-           let _,_,_,_,s =
+           let _,_,_,_,_,s =
              let cc_pred = pred `Positive in
-             compile_step case types [] labels cc_pred in_pred lemma in
+             compile_step l.l_type case types [] labels cc_pred in_pred lemma in
            let labels_used = LogicUsage.get_induction_labels l case in
            List.fold_left (heap_case labels_used) support s)
         Heap.Map.empty cases in
