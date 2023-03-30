@@ -289,14 +289,6 @@ let assert_invariants (x:t) : unit =
   in
   VMap.iter assert_vmap x.vmap
 
-(* for debuging, remove this function before last deliverable *)
-let assert_invariants x =
-  try assert_invariants x
-  with
-    Assert_failure f ->
-    Options.error "failed invariants@.%a@." print_debug x;
-    raise (Assert_failure f)
-
 let pretty ?(debug=false) fmt (x:t) =
   if debug then
     try
