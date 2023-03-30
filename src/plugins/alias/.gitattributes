@@ -31,6 +31,7 @@ Changelog merge=union
 
 dune-project header_spec=LICENSE.Alias
 dune header_spec=LICENSE.Alias
+dune-workspace header_spec=LICENSE.Alias
 
 Make* header_spec=LICENSE.Alias
 
