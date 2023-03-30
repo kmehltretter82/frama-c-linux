@@ -77,7 +77,7 @@ and simplify_exp e =
               match (simplify_exp e1).enode with
                 Lval (h,o) -> Lval (h,Index(nul_exp,o))
               | AddrOf lv -> Lval lv
-              | _ -> Options.fatal "simplify_exp not implemented"
+              | _ -> Options.fatal "simplify_exp not implemented for: %a" Exp.pretty (simplify_exp e1)
             end
           | CastE(_,e) -> raise (IsExp (simplify_exp e))
           | _ -> raise (IsExp nul_exp)
