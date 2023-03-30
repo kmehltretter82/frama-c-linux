@@ -46,24 +46,7 @@ Change version and codename in the following files:
   \end{itemize}
 \end{itemize}
 
-Also check the headers in Changelogs :
-\begin{itemize}
-  \item \texttt{Changelog}
-  \item \texttt{src/plugins/wp/Changelog}
-  \item \texttt{src/plugins/e-acsl/doc/Changelog}
-\end{itemize}
-
 \subsection{Versions in source: API documentation}
-
-To update the \textsf{API} documentation, you must update the \texttt{@since}
-tags. This involves the following script (\texttt{sed -i} must work for this
-purpose):
-\begin{shell}
-./dev/update_api_doc.sh <NEXT>
-\end{shell}
-\verb+<NEXT>+ is the long name of the final release, i.e.
-\verb+`cat VERSION`-`VERSION_CODENAME`+
-(without the \verb+beta+ suffix, if any).
 
 Check that no \verb|+dev| suffix remains inside comments:
 
