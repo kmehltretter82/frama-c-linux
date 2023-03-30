@@ -239,6 +239,11 @@ let doFunction (kf:kernel_function) =
   Options.debug ~level "May-alias graph at the end of function %a:@.%a@."
     Kernel_function.pretty kf
     (pp_abstract_state_opt ~debug:true) final_state;
+  let summary = Abstract_state.make_summary final_state kf in
+  let function_name = Kernel_function.get_name kf in
+  Options.debug ~level:2 "Summary of function %a:@.%a@."
+    Kernel_function.pretty kf
+    (Abstract_state.pretty_summary ~debug:false ~function_name) summary;
   if Kernel_function.is_main kf then
     let f_name = Options.Dot_output.get () in
     match f_name, final_state with
@@ -249,11 +254,8 @@ let doFunction (kf:kernel_function) =
     begin
       (* use None to encode functions that have no definition *)
       if Kernel_function.has_definition kf
-      then
-        Function_table.add kf @@ Some (Abstract_state.make_summary final_state kf)
-      else
-        Function_table.add kf @@ None
-
+      then Function_table.add kf @@ Some summary
+      else Function_table.add kf None
     end
 
 let () = function_compute_ref := doFunction

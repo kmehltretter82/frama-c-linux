@@ -113,7 +113,7 @@ struct
     LMap.iter
       (fun lv mo ->
          OMap.iter
-           (fun o v -> let lv =  Lval.addOffsetLval o lv in Format.fprintf fmt "(lval=%a -> id= %d)@." Lval.pretty lv v)
+           (fun o v -> let lv =  Lval.addOffsetLval o lv in Format.fprintf fmt "(lval=%a -> id=%d)@." Lval.pretty lv v)
            mo
       )
       m
@@ -288,14 +288,6 @@ let assert_invariants (x:t) : unit =
     assert (LSet.fold (fun lv acc -> acc && V.equal (LLMap.find lv x.lmap) v) ls true)
   in
   VMap.iter assert_vmap x.vmap
-
-(* for debuging, remove this function before last deliverable *)
-let assert_invariants x =
-  try assert_invariants x
-  with
-    Assert_failure f ->
-    Options.error "failed invariants@.%a@." print_debug x;
-    raise (Assert_failure f)
 
 let pretty ?(debug=false) fmt (x:t) =
   if debug then
@@ -643,10 +635,11 @@ let rec join_without_check (x:t) (v1:V.t) (v2:V.t) : t =
 
 (* since the recursive version of join, unify, unify2 and merge may break the invariants *)
 let join ?(without_check = false) (x:t) (v1:V.t) (v2:V.t) : t =
-  Options.debug ~level:5 "graph before join(%d,%d) @.%a@." v1 v2 print_debug x;
+  Options.debug ~level:7 "graph before join(%d,%d) @.%a@." v1 v2 print_debug x;
   if not without_check then assert_invariants x;
   let res = join_without_check x v1 v2 in
   if not without_check then assert_invariants x;
+  Options.debug ~level:7 "graph after join(%d,%d) @.%a@." v1 v2 print_debug res;
   res
 
 let merge_set (x:t) (vs:VSet.t) : V.t * t =
