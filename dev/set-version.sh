@@ -34,13 +34,25 @@ if test -z "$NEXT"; then
   exit 2
 fi
 
-NEXT_MAJOR=$(echo "$NEXT" | sed -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
-NEXT_MINOR=$(echo "$NEXT" | sed -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
+# For macOS: use gsed if available, otherwise test if sed is BSD
+if command -v gsed &> /dev/null; then
+  SED=gsed
+else
+  if sed --version 2>/dev/null | grep -q GNU; then
+    SED=sed
+  else
+    echo "GNU sed required"
+    exit 1
+  fi
+fi
+
+NEXT_MAJOR=$(echo "$NEXT" | $SED -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
+NEXT_MINOR=$(echo "$NEXT" | $SED -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
 NEXT_CODENAME=$(grep "$NEXT_MAJOR " ./doc/release/periodic-elements.txt | cut -d " " -f2)
 
 CURRENT=$(cat VERSION)
-CURRENT_MAJOR=$(echo "$CURRENT" | sed -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
-CURRENT_MINOR=$(echo "$CURRENT" | sed -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
+CURRENT_MAJOR=$(echo "$CURRENT" | $SED -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
+CURRENT_MINOR=$(echo "$CURRENT" | $SED -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
 CURRENT_CODENAME=$(grep "$CURRENT_MAJOR " ./doc/release/periodic-elements.txt | cut -d " " -f2)
 
 echo "NEXT VERSION is:"
@@ -62,8 +74,8 @@ echo "$NEXT" > VERSION
 echo "$NEXT_CODENAME" > VERSION_CODENAME
 
 # Opam file
-sed -i "s/^version: .*/version: \"$NEXT_MAJOR.$NEXT_MINOR\"/g" opam
-sed -i "s/\(.*\)$CURRENT_MAJOR.$CURRENT_MINOR-$CURRENT_CODENAME\(.*\)/\1$NEXT_MAJOR.$NEXT_MINOR-$NEXT_CODENAME\2/g" opam
+$SED -i "s/^version: .*/version: \"$NEXT_MAJOR.$NEXT_MINOR\"/g" opam
+$SED -i "s/\(.*\)$CURRENT_MAJOR.$CURRENT_MINOR-$CURRENT_CODENAME\(.*\)/\1$NEXT_MAJOR.$NEXT_MINOR-$NEXT_CODENAME\2/g" opam
 
 # Changelogs
 
@@ -71,27 +83,27 @@ FC_CL_MSG_FUTURE="Open Source Release <next-release>"
 FC_CL_MSG_NEXT="Open Source Release $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)"
 FC_CL_LIN="###############################################################################"
 
-sed -i "s/\($FC_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$FC_CL_MSG_NEXT/g" Changelog
+$SED -i "s/\($FC_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$FC_CL_MSG_NEXT/g" Changelog
 
 EA_CL_MSG_FUTURE="Plugin E-ACSL <next-release>"
 EA_CL_MSG_NEXT="Plugin E-ACSL $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)"
 
-sed -i "s/\($EA_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$EA_CL_MSG_NEXT/g" src/plugins/e-acsl/doc/Changelog
+$SED -i "s/\($EA_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$EA_CL_MSG_NEXT/g" src/plugins/e-acsl/doc/Changelog
 
 WP_CL_MSG_FUTURE="Plugin WP <next-release>"
 WP_CL_MSG_NEXT="Plugin WP $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)"
 
-sed -i "s/\($WP_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$WP_CL_MSG_NEXT/g" src/plugins/wp/Changelog
+$SED -i "s/\($WP_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$WP_CL_MSG_NEXT/g" src/plugins/wp/Changelog
 
 # API doc
-find src -name '*.ml*' -exec sed -i -e "s/Frama-C+dev/${NEXT}-${NEXT_CODENAME}/gI" '{}' ';'
+find src -name '*.ml*' -exec $SED -i -e "s/Frama-C+dev/${NEXT}-${NEXT_CODENAME}/gI" '{}' ';'
 
 # Manuals changes
-sed -i "s/\(^\\\\section\*{Frama-C+dev}\)/%\1\n\n\\\\section\*{$NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
+$SED -i "s/\(^\\\\section\*{Frama-C+dev}\)/%\1\n\n\\\\section\*{$NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
   doc/userman/user-changes.tex
-sed -i "s/\(^\\\\section\*{Frama-C+dev}\)/%\1\n\n\\\\section\*{$NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
+$SED -i "s/\(^\\\\section\*{Frama-C+dev}\)/%\1\n\n\\\\section\*{$NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
   doc/developer/changes.tex
-sed -i "s/\(^\\\\subsection{Frama-C+dev}\)/%\1\n\n\\\\subsection{Frama-C $NEXT_CODENAME}/g" \
+$SED -i "s/\(^\\\\subsection{Frama-C+dev}\)/%\1\n\n\\\\subsection{Frama-C $NEXT_CODENAME}/g" \
   doc/aorai/main.tex
-sed -i "s/\(^\\\\section\*{E-ACSL \\\\eacslpluginversion \\\\eacslplugincodename}\)/%\1\n\n\\\\section\*{E-ACSL $NEXT_MAJOR.$NEXT_MINOR $NEXT_CODENAME}/g" \
+$SED -i "s/\(^\\\\section\*{E-ACSL \\\\eacslpluginversion \\\\eacslplugincodename}\)/%\1\n\n\\\\section\*{E-ACSL $NEXT_MAJOR.$NEXT_MINOR $NEXT_CODENAME}/g" \
   src/plugins/e-acsl/doc/userman/changes.tex
