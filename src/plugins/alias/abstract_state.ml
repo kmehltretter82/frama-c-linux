@@ -649,26 +649,22 @@ let join ?(without_check = false) (x:t) (v1:V.t) (v2:V.t) : t =
   if not without_check then assert_invariants x;
   res
 
+let merge_set (x:t) (vs:VSet.t) : V.t * t =
+  Options.debug ~level:7 "graph before merge_set %a @.%a@." VSet.pretty vs print_debug x;
+  let v0 = VSet.choose vs in
+  assert (G.mem_vertex x.graph v0);
+  let result = VSet.fold (fun v acc -> merge acc v0 v) vs x in
+  Options.debug ~level:7 "graph after merge_set %a @.%a@." VSet.pretty vs print_debug result;
+  v0, result
 
-exception Found_vertex of V.t
-
-let join_set ?without_check (x:t) (vs:VSet.t) : t =
-  Options.debug ~level:7 "graph before join(%a) @.%a@." VSet.pretty vs print_debug x;
-  let v0 = (* find valid vertex of x.graph *)
-    try
-      VSet.iter (fun v -> if G.mem_vertex x.graph v then raise (Found_vertex v)) vs;
-      Options.fatal "no valid vertex found in set %a" VSet.pretty vs
-    with
-      Found_vertex v -> v
-  in
-  let result =
-    VSet.fold
-      (fun v acc -> join ?without_check acc v0 v)
-      vs
-      x
-  in
-  Options.debug ~level:7 "graph after join(%a) @.%a@." VSet.pretty vs print_debug result;
-  result
+let rec join_succs (x:t) v =
+  Options.debug ~level:8 "joining successors of %d@." v;
+  if not @@ G.mem_vertex x.graph v then x else
+    match G.succ x.graph v with
+    | [] | [_] -> x
+    | succs ->
+      let v0, x = merge_set x @@ VSet.of_list succs in
+      join_succs x v0
 
 let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants x;
@@ -843,9 +839,13 @@ let union  (a1:t) (a2:t) :t =
   List.iter (fun set -> Options.debug ~level:7 "%a" VSet.pretty set) sets_to_be_joined;
   Options.debug ~level:7 "@]@.";
   let new_a = {graph = new_graph; lmap = new_lmap; vmap = new_vmap; cmpt = max a1.cmpt a2.cmpt} in
-  let new_a =
-    List.fold_left (join_set ~without_check:true) new_a sets_to_be_joined
+  let merged_nodes, new_a =
+    List.fold_left
+      (fun (merged_nodes, x) set -> let v0, x = merge_set x set in (v0 :: merged_nodes), x)
+      ([], new_a)
+      sets_to_be_joined
   in
+  let new_a = List.fold_left join_succs new_a merged_nodes in
   Options.debug ~level:4 "Union: Result graph:@.%a@." print_graph new_a;
   Options.debug ~level:5 "Union: Result graph:@.%a@." print_debug new_a;
   assert_invariants new_a;
