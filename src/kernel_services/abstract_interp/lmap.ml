@@ -394,7 +394,7 @@ struct
       in
       let aux =
         generic_join ~cache:Hptmap_sig.NoCache
-          ~idempotent:true ~symmetric:true ~decide
+          ~idempotent:true ~symmetric:false ~decide
       in
       Format.fprintf fmt "@[<v>";
       ignore (aux m1 m2);
