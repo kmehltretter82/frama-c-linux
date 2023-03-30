@@ -12,5 +12,8 @@ int main () {
   else
     y = &x;
   c = &y;
+  *y = 4;
   return 0;
 }
+
+

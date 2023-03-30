@@ -15,6 +15,10 @@
 [alias] May-aliases at the end of instruction:
   {*b, *c, a, y} are aliased
   {b, c} are aliased
+[alias] analysing instruction: *y = 4;
+[alias] May-aliases at the end of instruction:
+  {*b, *c, a, y} are aliased
+  {b, c} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction:
   {*b, *c, a, y} are aliased
