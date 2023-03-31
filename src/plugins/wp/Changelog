@@ -24,6 +24,10 @@
 Plugin WP <next-release>
 ###############################################################################
 
+- WP          [2023-03-29] fix option -wp-split to only split conditions
+- WP          [2023-03-29] new option -wp-split-switch to split switches
+- WP          [2023-03-29] new option -wp-split-conj to split conjunctive goals
+- WP          [2023-03-29] renamed option -wp-split-depth into -wp-split-cnf
 - WP          [2023-03-14] Upgrade to Why3 1.6.0
 - WP          [2023-02-03] new option -wp-why3-extra-config for providing
                            additional Why3 configuration files

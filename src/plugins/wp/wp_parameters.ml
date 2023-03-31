@@ -440,10 +440,43 @@ module SmokeDeadloop =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
-module Split =
+module SplitBranch =
   False(struct
     let option_name = "-wp-split"
-    let help = "Split conjunctions into sub-goals."
+    let help = "Split if-then-else into sub-goals (see also -wp-max-split)"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module SplitSwitch =
+  True(struct
+    let option_name = "-wp-split-switch"
+    let help = "Split switch-cases into sub-goals (see also -wp-max-split)."
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module SplitConj =
+  False(struct
+    let option_name = "-wp-split-conj"
+    let help = "Split conjunctive goals into sub-goals"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module SplitCNF =
+  Int(struct
+    let option_name = "-wp-split-cnf"
+    let default = 0
+    let arg_name = "N"
+    let help =
+      "Apply CNF transformation on goals at depth N (default 0, -1 unlimited)"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
+module SplitMax =
+  Int(struct
+    let option_name = "-wp-max-split"
+    let default = 1000
+    let arg_name = "n"
+    let help = "Set maximum number of splitted sub-goals (default 1000)"
   end)
 
 let () = Parameter_customize.set_group wp_strategy
@@ -454,25 +487,6 @@ module UnfoldAssigns =
     let arg_name = "n"
     let help = "Unfold up to <n> levels of aggregates and arrays in assigns.\n\
                 Value -1 means unlimited depth (default 0)"
-  end)
-
-let () = Parameter_customize.set_group wp_strategy
-module SplitDepth =
-  Int(struct
-    let option_name = "-wp-split-depth"
-    let default = 0
-    let arg_name = "p"
-    let help = "Set depth for splitting conjunctions into sub-goals.\n\
-                Value -1 means unlimited depth (default 0)"
-  end)
-
-let () = Parameter_customize.set_group wp_strategy
-module SplitMax =
-  Int(struct
-    let option_name = "-wp-max-split"
-    let default = 1000
-    let arg_name = "n"
-    let help = "Set maximum number of splitted sub-goals (default 1000)"
   end)
 
 let () = Parameter_customize.set_group wp_strategy

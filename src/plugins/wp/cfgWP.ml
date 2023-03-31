@@ -859,9 +859,9 @@ struct
   let condition ~descr ?stmt ?warn pa h vc =
     passify_vc pa (assume_vc ?stmt ?warn ~descr h vc)
 
-  let mark ?(smoke=false) m = function
+  let split_branch ~smoke tag = function
     | None -> Splitter.empty
-    | Some s -> if smoke then s else Splitter.group m merge_vcs s
+    | Some s -> if smoke then s else Splitter.apply tag merge_vcs s
 
   let random () =
     let v = Lang.freshvar ~basename:"cond" Logic.Bool in
@@ -883,7 +883,7 @@ struct
          in
          let effects = Eset.union wp1.effects wp2.effects in
          let dosplit =
-           Wp_parameters.Split.get () &&
+           Wp_parameters.SplitBranch.get () &&
            let n1 = weight wp1.vcs in
            let n2 = weight wp2.vcs in
            let nm = Wp_parameters.SplitMax.get () in
@@ -898,8 +898,8 @@ struct
              Gmap.merge
                (fun g w1 w2 ->
                   let smoke = TARGET.is_smoke_test g in
-                  let s1 = mark ~smoke (Splitter.if_then stmt) w1 in
-                  let s2 = mark ~smoke (Splitter.if_else stmt) w2 in
+                  let s1 = split_branch ~smoke (Splitter.if_then stmt) w1 in
+                  let s2 = split_branch ~smoke (Splitter.if_else stmt) w2 in
                   Some (Splitter.union (merge_vc) s1 s2)
                ) vcs1 vcs2
            else
@@ -918,7 +918,7 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let rec cc_case_values ks vs sigma = function
-    | [] -> ks , vs
+    | [] -> List.rev ks , List.rev vs
     | e::es ->
       match Ctypes.get_int64 e with
       | Some k ->
@@ -927,11 +927,16 @@ struct
         cc_case_values ks (C.val_of_exp sigma e::vs) sigma es
 
   let cc_group_case stmt warn descr tag pa cond vcs : vc Splitter.t Gmap.t =
-    Gmap.map
-      (fun s ->
+    let split =
+      Wp_parameters.SplitSwitch.get () &&
+      weight vcs < Wp_parameters.SplitMax.get ()
+    in
+    Gmap.mapi
+      (fun g s ->
+         let smoke = TARGET.is_smoke_test g in
          Splitter.map
            (condition ~descr ~warn ~stmt pa cond)
-           (Splitter.group tag merge_vcs s)
+           (if smoke || not split then s else Splitter.apply tag merge_vcs s)
       ) vcs
 
   let cc_case stmt warn sigma v (es,wp) =
@@ -971,7 +976,7 @@ struct
          let vcs_cases = List.map (cc_case stmt warn sigma value) cases in
          let neq = List.map (fun (vs,_) -> p_all (p_neq value) vs) vcs_cases in
          let vcs_default = cc_default stmt sigma neq default in
-         let vcs = merge_all_vcs ( vcs_default :: List.map snd vcs_cases ) in
+         let vcs = merge_all_vcs ( vcs_default :: List.rev_map snd vcs_cases ) in
          let effects = List.fold_left
              (fun es (_,wp) -> Eset.union es wp.effects)
              default.effects cases in
@@ -1041,7 +1046,7 @@ struct
       (fun s ->
          Splitter.map
            (fun vc -> passify_vc pa (instance_of vc))
-           (Splitter.group tag merge_vcs s)
+           (Splitter.apply tag merge_vcs s)
       ) wp.vcs
 
   let call_dynamic wenv stmt gpid fct calls = L.in_frame wenv.frame
@@ -1525,7 +1530,7 @@ struct
     let hyps = Conditions.bundle vc.hyps in
     let goal g = { vcq with VC_Annot.goal = GOAL.make (hyps,g) } in
     match F.p_expr vc.goal with
-    | Logic.And gs when Wp_parameters.Split.get () -> Bag.list (List.map goal gs)
+    | Logic.And gs when Wp_parameters.SplitConj.get () -> Bag.list (List.map goal gs)
     | _ -> Bag.elt (goal vc.goal)
 
   let make_trivial vc =
