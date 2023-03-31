@@ -2,7 +2,7 @@
 opam-version: "2.0"
 depends: [
   "dune" {>= "3.2"}
-  "frama-c" {>= "25.0" & < "26.0"}
+  "frama-c" {>= "25.0" & < "27.0"}
   "odoc" {with-doc}
 ]
 build: [
