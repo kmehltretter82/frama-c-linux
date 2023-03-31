@@ -285,6 +285,7 @@ let assert_invariants (x:t) : unit =
   in
   LLMap.iter assert_lmap x.lmap;
   let assert_vmap (v:V.t) (ls:LSet.t) =
+    assert (G.mem_vertex x.graph v);
     assert (LSet.fold (fun lv acc -> acc && V.equal (LLMap.find lv x.lmap) v) ls true)
   in
   VMap.iter assert_vmap x.vmap
@@ -672,18 +673,19 @@ let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
 let set_type (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants x;
   (* if v1 points to another node, suppress current outgoing edge (and the node if it is a constant node) *)
-  let g =
+  let g, new_vmap =
     match G.succ x.graph v1 with
-      [] -> x.graph
+      [] -> x.graph, x.vmap
     | [v2] ->
       (* if v2 is a constant node supress it directly *)
       if LSet.is_empty (VMap.find v2 x.vmap)
-      then G.remove_vertex x.graph v2
-      else G.remove_edge x.graph v1 v2
+      then (G.remove_vertex x.graph v2, VMap.remove v2 x.vmap)
+      else (G.remove_edge x.graph v1 v2, x.vmap)
     | _ -> Options.fatal "too many outgoing edges in set_type"
   in
   let new_g = G.add_edge g v1 v2 in
-  {x with graph = new_g}
+  let new_x = {x with graph = new_g ; vmap = new_vmap} in
+  assert_invariants new_x ; new_x
 
 
 let assignment (a:t) (lv:lval) (e:exp) : t =
