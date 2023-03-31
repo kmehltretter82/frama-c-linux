@@ -106,7 +106,7 @@ let do_function_call (_:stmt) state (res : lval option) (ef : exp) (args: exp li
             with Not_found -> doFunction kf; Function_table.find kf
           end
         | None ->
-          Options.warning ~wkey:Options.DebugKeys.unsupported ~source:(fst loc)
+          Options.warning ~wkey:Options.Warn.unsupported_function ~source:(fst loc)
             "calls to function pointer unsupported: %a" Exp.pretty ef;
           None
       in
@@ -115,7 +115,7 @@ let do_function_call (_:stmt) state (res : lval option) (ef : exp) (args: exp li
       | (Some a, Some summary) ->
         Some(Abstract_state.call a res args summary)
       | (Some a, None) ->
-        Options.warning ~wkey:Options.DebugKeys.undefined ~once:true ~source:(fst loc)
+        Options.warning ~wkey:Options.Warn.undefined_function ~once:true ~source:(fst loc)
           "function %a has no definition" Exp.pretty ef;
         Some a
     end

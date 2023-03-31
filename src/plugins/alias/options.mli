@@ -38,8 +38,11 @@ module ShowStmtTable : Parameter_sig.Bool
 (** Displays the final abstract state in Dot File <f> *)
 module Dot_output : Parameter_sig.String
 
+module Warn : sig
+  val unsupported_function : warn_category
+  val undefined_function : warn_category
+end
+
 module DebugKeys : sig
-  val unsupported : warn_category
-  val undefined : warn_category
   val lvals : category
 end
