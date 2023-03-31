@@ -263,6 +263,11 @@ let _pretty_octagon fmt octagon =
     Variable.pretty x op Variable.pretty y
     (Unicode.inset_string ()) Ival.pretty octagon.value
 
+(* An environment associates a term v ± c, where v is a variable and
+   c an integer limited to an interval, to some well chosen expressions. A
+   request to the environment may return a new or an existing variable.
+   The abstract domain chooses which expressions are worth being represented
+   by a variable; the environment may return [None] otherwise. *)
 type environment = Cil_types.exp -> (Variable.t * Ival.t) option
 
 (* Transforms Cil expressions into mathematical octagons.
