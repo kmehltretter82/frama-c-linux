@@ -1746,8 +1746,7 @@ module Domain = struct
     then `Value (kill post.modified pre)
     else
       let modified = Locations.Zone.join post.modified pre.modified in
-      let deps = Deps.narrow post.deps pre.deps in
-      `Value { post with deps; modified }
+      `Value { post with modified }
 
   let logic_assign _logic_assign location state =
     let loc = Precise_locs.imprecise_location location in
