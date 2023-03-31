@@ -81,6 +81,7 @@ const kindFilter: KindFilter = {
    messages. They are all shown by default. */
 const pluginFilter: PluginFilter = {
   'aorai': true,
+  'cg': true,
   'dive': true,
   'e-acsl': true,
   'eva': true,
