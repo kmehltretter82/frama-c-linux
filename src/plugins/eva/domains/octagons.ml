@@ -1090,6 +1090,23 @@ module Deps = struct
   let is_included (m1, _: t) (m2, _: t) =
     VariableToDeps.is_included m1 m2
 
+  (* Check inverse dependencies. *)
+  let check (abort: ('a, Format.formatter, unit) format -> 'a) (m, i: t) =
+    let check_inverse var deps =
+      let check_base fst_or_snd base =
+        if not (VSet.mem var (fst_or_snd (BaseToVariables.find base i)))
+        then
+          abort "Missing inverse dependency %a of variable %a@"
+            Base.pretty base Variable.pretty var
+      in
+      let check_zone fst_or_snd zone =
+        let bases = Locations.Zone.get_bases zone in
+        Base.SetLattice.iter (check_base fst_or_snd) bases
+      in
+      check_zone fst deps.data;
+      check_zone snd deps.indirect;
+    in
+    VariableToDeps.iter check_inverse m
 end
 
 
@@ -1164,23 +1181,44 @@ module State = struct
   let check =
     if not debug
     then fun _ t -> t
-    else fun msg t ->
+    else fun name t ->
+      let abort format =
+        Format.kasprintf
+          (fun s ->
+             Self.fatal
+               "Incorrect octagon computed by function %s: %s@\n  State: %a"
+               name s pretty_debug t)
+          format
+      in
       (* Checks that an octagon is properly registered in [t.relations]. This is
          mandatory for the soundness of the domain. On the other hand, two
          variables can be related in [t.relations] without an actual octagon
          between them. *)
-      let check_octagon pair _ =
-        let x, y = Pair.get pair in
+      let check_relation x y =
         try Variable.Set.mem x (Relations.find y t.relations)
             && Variable.Set.mem y (Relations.find x t.relations)
         with Not_found -> false
       in
-      if Octagons.for_all check_octagon t.octagons
-      then t
-      else
-        Self.abort
-          "Incorrect octagon state computed by function %s:@ %a"
-          msg pretty_debug t
+      let check_relation x y =
+        if not (check_relation x y)
+        then
+          abort "missing relations between %a and %a"
+            Variable.pretty x Variable.pretty y
+      in
+      (* Checks that dependencies of [var] are correctly registered. *)
+      let check_deps var =
+        if not (VariableToDeps.mem var (fst t.deps))
+        then abort "missing dependencies of variable %a" Variable.pretty var
+      in
+      let check_octagon pair _ =
+        let x, y = Pair.get pair in
+        check_relation x y; check_deps x; check_deps y
+      in
+      Octagons.iter check_octagon t.octagons;
+      Intervals.iter (fun var _ -> check_deps var) t.intervals;
+      (* Check consistency of the dependency maps. *)
+      Deps.check abort t.deps;
+      t
 
   (* Is an octagon no more precise than the intervals inferred for the related
      variables? If so, do not save the octagon in the domain. *)
