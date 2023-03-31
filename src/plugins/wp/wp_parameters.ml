@@ -443,14 +443,14 @@ let () = Parameter_customize.set_group wp_strategy
 module SplitBranch =
   False(struct
     let option_name = "-wp-split"
-    let help = "Split if-then-else into sub-goals (up to -wp-max-split N)"
+    let help = "Split if-then-else into sub-goals (see also -wp-max-split)"
   end)
 
 let () = Parameter_customize.set_group wp_strategy
 module SplitSwitch =
   True(struct
     let option_name = "-wp-split-switch"
-    let help = "Split switch-cases into sub-goals (up to -wp-max-split N)."
+    let help = "Split switch-cases into sub-goals (see also -wp-max-split)."
   end)
 
 let () = Parameter_customize.set_group wp_strategy
