@@ -36,7 +36,7 @@ import 'cytoscape-panzoom/cytoscape.js-panzoom.css';
 import style from './graph-style.json';
 
 import { useGlobalState } from 'dome/data/states';
-import { useRequest, useSyncValue } from 'frama-c/states';
+import { useRequest, useSelection, useSyncValue } from 'frama-c/states';
 
 import gearsIcon from 'frama-c/plugins/eva/images/gears.svg';
 import { CallstackState } from 'frama-c/plugins/eva/valuetable';
@@ -101,6 +101,14 @@ type callstack = {
   rank?: number
 }[]
 
+function selectFct(cy: Cy.Core, fct: string | undefined): void {
+  const className = 'marker-selected';
+  cy.$(`.${className}`).removeClass(className);
+  if (fct) {
+    cy.$(`node[id='${fct}']`).addClass(className);
+  }
+}
+
 function selectCallstack(cy: Cy.Core, callstack: callstack | undefined): void {
   const className = 'callstack-selected';
   cy.$(`.${className}`).removeClass(className);
@@ -118,13 +126,43 @@ function Callgraph() : JSX.Element {
   const graph = useSyncValue(CgAPI.callgraph);
   const [cy, setCy] = useState<Cy.Core>();
   const [cs] = useGlobalState(CallstackState);
+  const [selection, setSelection] = useSelection();
   const callstack = useRequest(ValuesAPI.getCallstackInfo, cs);
 
   const layout = {name: 'cola', nodeSpacing: 32};
+  const computedStyle = getComputedStyle(document.documentElement);
+  const styleVariables =
+    { ['code-select']: computedStyle.getPropertyValue("--code-select") };
 
+  const completeStyle = [
+    ...style,
+    {
+      "selector": ".marker-selected",
+      "style": {"background-color": styleVariables['code-select']}
+    }
+  ];
+
+  // Marker selection
+  useEffect(() => {
+    cy && selectFct(cy, selection.current?.fct);
+  }, [cy, selection]);
+
+  // Callstack selection
   useEffect(() => {
     cy && selectCallstack(cy, callstack);
   }, [cy, callstack]);
+
+  // Click on graph
+  useEffect(() => {
+    if (cy) {
+      cy.off('click');
+      cy.on('click', 'node', (event) => {
+        const fct = event.target.id() as string;
+        setSelection({location: {fct}});
+      });
+    }
+  }, [cy, setSelection]);
+
 
   if (isComputed === false) {
     Server.send(CgAPI.compute, null);
@@ -134,7 +172,7 @@ function Callgraph() : JSX.Element {
     return (
       <CytoscapeComponent
         elements={convertGraph(graph)}
-        stylesheet={style}
+        stylesheet={completeStyle}
         cy={setCy}
         layout={layout}
         style={{width: '100%', height: '100%'}}
