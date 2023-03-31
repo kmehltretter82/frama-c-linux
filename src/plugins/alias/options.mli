@@ -40,5 +40,6 @@ module Dot_output : Parameter_sig.String
 
 module DebugKeys : sig
   val unsupported : warn_category
+  val undefined : warn_category
   val lvals : category
 end

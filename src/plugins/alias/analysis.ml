@@ -80,19 +80,9 @@ let rec do_init (lv:lval) (init:init) state =
   | CompoundInit(_, l) ->
     List.fold_left (fun state (o, init) -> do_init (Cil.addOffsetLval o lv) init state) state l
 
-
-let list_instr_warnings : stmt list ref = ref []
-
-let feedback_only_once s =
-  if not (List.mem s !list_instr_warnings) then
-    begin
-      list_instr_warnings := s::!list_instr_warnings;
-      Options.warning "In statement @[%a@], the function has no definition (abstract state is unchanged)" Stmt.pretty s
-    end
-
 let doFunction f = !function_compute_ref f
 
-let do_function_call (s:stmt) state (res : lval option) (ef : exp) (args: exp list) loc =
+let do_function_call (_:stmt) state (res : lval option) (ef : exp) (args: exp list) loc =
   let is_malloc (s:string) : bool =
     (s = "malloc") || (s = "calloc") (* todo : add all function names *)
   in
@@ -124,9 +114,11 @@ let do_function_call (s:stmt) state (res : lval option) (ef : exp) (args: exp li
         (None, _) -> None
       | (Some a, Some summary) ->
         Some(Abstract_state.call a res args summary)
-      | (Some a, None) -> (feedback_only_once s; Some a)
+      | (Some a, None) ->
+        Options.warning ~wkey:Options.DebugKeys.undefined ~once:true ~source:(fst loc)
+          "function %a has no definition" Exp.pretty ef;
+        Some a
     end
-
 
 let do_cons_init (s:stmt) (v:varinfo) f arg t  loc state =
   Cil.treat_constructor_as_func (do_function_call s state) v f arg t loc

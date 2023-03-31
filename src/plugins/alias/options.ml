@@ -64,4 +64,5 @@ module Dot_output =
 module DebugKeys = struct
   let lvals = register_category "lvals"
   let unsupported = register_warn_category "unsupported"
+  let undefined = register_warn_category "undefined"
 end
