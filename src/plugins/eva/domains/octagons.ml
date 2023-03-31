@@ -1215,7 +1215,9 @@ module State = struct
         Some (Variable.make vi, Ival.zero)
 
       | Lval lval
-        when not (Eval_typ.lval_contains_volatile lval) ->
+        when Cil.isIntegralOrPointerType (Cil.typeOfLval lval)
+          && not (Eval_typ.lval_contains_volatile lval)
+          && not (is_singleton (eval exp)) ->
         Some (Variable.make_lval lval, Ival.zero)
 
       | CastE (typ, { enode = Lval (Var vi, NoOffset) })

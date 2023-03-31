@@ -240,8 +240,6 @@
      b + neg_b ∈ {0}
      p - a ∈ {0}
      *p - a1 ∈ {0}
-     s.i - b1 ∈ {0}
-     s.c - c1 ∈ {0}
       ]}
   ==END OF DUMP==
 [eva] Recording results for test_non_integer_args

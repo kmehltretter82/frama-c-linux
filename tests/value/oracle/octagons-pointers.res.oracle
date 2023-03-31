@@ -15,9 +15,6 @@
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ {-3}
-     size - index ∈ [3..--]
-     size - cmd->cmdLen ∈ [5..--]
-     index + cmd->cmdLen ∈ [--..434]
       ]}
   ==END OF DUMP==
 [eva] computing for function cmdRead <- main.
@@ -26,16 +23,8 @@
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ {-3}
-     size - index ∈ [3..--]
-     size - cmd->cmdLen ∈ [5..--]
-     index + cmd->cmdLen ∈ [--..434]
      buffer - cmd ∈ {-3}
      cmd - cmd ∈ {0}
-     cmd - len ∈ {0}
-     len - code ∈ {-2}
-     elt1 - code ∈ {1}
-     elt2 - elt1 ∈ {4}
-     elt3 - elt2 ∈ {2}
       ]}
   ==END OF DUMP==
 [eva] Recording results for cmdRead
@@ -44,9 +33,6 @@
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ [-436..-6]
-     size - index ∈ [0..--]
-     size - cmd->cmdLen ∈ [8..--]
-     size - index ∈ [3..--]
      cmd->cmdLen + index ∈ [--..434]
       ]}
   ==END OF DUMP==
@@ -56,11 +42,8 @@
   Frama_C_dump_each:
   # octagon:
   {[ buffer - cmd ∈ [-436..-6]
-     size - index ∈ [0..--]
-     size - cmd->cmdLen ∈ [8..--]
      buffer - cmd ∈ [-433..-6]
      cmd - cmd ∈ [-430..427]
-     size - index ∈ [3..--]
      cmd->cmdLen + index ∈ [--..434]
      cmd - len ∈ {0}
      len - cmd ∈ [-430..427]
@@ -98,56 +81,6 @@
 [eva] Recording results for cmdRead
 [eva] Done for function cmdRead
 [eva:loop-unroll:partial] octagons-pointers.c:49: loop not completely unrolled
-[eva] octagons-pointers.c:43: starting to merge loop iterations
-[eva] octagons-pointers.c:46: 
-  Frama_C_dump_each:
-  # octagon:
-  {[ buffer - cmd ∈ [-436..-6]
-     size - cmd->cmdLen ∈ [8..--]
-     size - index ∈ [3..--]
-     cmd->cmdLen + index ∈ [--..434]
-      ]}
-  ==END OF DUMP==
-[eva] computing for function cmdRead <- main.
-  Called from octagons-pointers.c:47.
-[eva] octagons-pointers.c:31: 
-  Frama_C_dump_each:
-  # octagon:
-  {[ buffer - cmd ∈ [-436..-6]
-     size - cmd->cmdLen ∈ [8..--]
-     buffer - cmd ∈ [-433..-6]
-     cmd - cmd ∈ [-430..427]
-     size - index ∈ [3..--]
-     cmd->cmdLen + index ∈ [--..434]
-     cmd - len ∈ {0}
-     len - cmd ∈ [-430..427]
-     buffer - len ∈ [-433..-6]
-     len - code ∈ {-2}
-     cmd - code ∈ {-2}
-     code - cmd ∈ [-428..429]
-     buffer - code ∈ [-435..-8]
-     code - elt1 ∈ {-1}
-     cmd - elt1 ∈ {-3}
-     len - elt1 ∈ {-3}
-     elt1 - cmd ∈ [-427..430]
-     buffer - elt1 ∈ [-436..-9]
-     elt1 - elt2 ∈ {-4}
-     cmd - elt2 ∈ {-7}
-     len - elt2 ∈ {-7}
-     code - elt2 ∈ {-5}
-     elt2 - cmd ∈ [-423..434]
-     buffer - elt2 ∈ [-440..-13]
-     elt2 - elt3 ∈ {-2}
-     cmd - elt3 ∈ {-9}
-     len - elt3 ∈ {-9}
-     code - elt3 ∈ {-7}
-     elt1 - elt3 ∈ {-6}
-     elt3 - cmd ∈ [-421..436]
-     buffer - elt3 ∈ [-442..-15]
-      ]}
-  ==END OF DUMP==
-[eva] Recording results for cmdRead
-[eva] Done for function cmdRead
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
