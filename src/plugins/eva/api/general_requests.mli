@@ -30,9 +30,9 @@ type evaluation_point =
   | Stmt of kernel_function * stmt
 
 (* Returns the evaluation point of a marker.
-   @raises Not_found if the marker cannot be evaluated. *)
+   @raise Not_found if the marker cannot be evaluated. *)
 val marker_evaluation_point: Printer_tag.localizable -> evaluation_point
 
 (* Converts an ACSL lval into a C lval.
-   @raises Not_found if the conversion fails. *)
+   @raise Not_found if the conversion fails. *)
 val term_lval_to_lval: kernel_function option -> term_lval -> lval
