@@ -2,8 +2,8 @@
 [kernel] Parsing nth.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] 26 goals scheduled
-[wp] [Unsuccess] typed_lemma_access_16_16_ok (Alt-Ergo) (Cached)
 [wp] [Valid] typed_lemma_access_4_4_ok (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_lemma_access_8_8_ko (Alt-Ergo) (Cached)
 [wp] [Valid] typed_lemma_access_repeat_concat_3_ok_lack (Alt-Ergo) (Cached)
 [wp] [Valid] typed_check_lemma_constructor_elt_ok (Qed)
 [wp] [Valid] typed_lemma_eq_repeat_concat_3_ok (Qed)
