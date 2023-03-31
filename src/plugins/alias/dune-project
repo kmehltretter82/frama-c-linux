@@ -29,6 +29,6 @@
 
 (package (name frama-c-alias)
  (depends
-  ("frama-c" (and (>= 25.0) (< 26.0)))
+  ("frama-c" (and (>= 25.0) (< 27.0)))
  )
 )
