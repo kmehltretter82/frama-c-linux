@@ -43,6 +43,7 @@ let show main_ui =
     "Philippe Herrmann";
     "Maxime Jacquemin";
     "Florent Kirchner";
+    "Alexander Kogtenkov";
     "Tristan Le Gall";
     "Jean-Christophe Léchenet";
     "Matthieu Lemerre";
