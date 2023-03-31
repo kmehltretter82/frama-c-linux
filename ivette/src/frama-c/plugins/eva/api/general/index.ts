@@ -135,6 +135,16 @@ const getCallers_internal: Server.GetRequest<fct,CallSite[]> = {
 /** Get the list of call site of a function */
 export const getCallers: Server.GetRequest<fct,CallSite[]>= getCallers_internal;
 
+const getCallees_internal: Server.GetRequest<marker,fct[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.getCallees',
+  input:  jMarker,
+  output: Json.jArray(jFct),
+  signals: [],
+};
+/** Return the functions pointed to by a function pointer */
+export const getCallees: Server.GetRequest<marker,fct[]>= getCallees_internal;
+
 /** Data for array rows [`functions`](#functions)  */
 export interface functionsData {
   /** Entry identifier. */
