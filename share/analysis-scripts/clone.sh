@@ -94,10 +94,8 @@ if [ ! -e "$target_path/build/bin/frama-c" ]
 then
     (
         cd "$target_path";
-        autoconf -f --warnings=none;
-        ./configure --quiet --prefix=$(pwd)/build > /dev/null;
-        make -j > /dev/null;
-        make install > /dev/null;
+        make -j --quiet > /dev/null;
+        make install PREFIX=$(pwd)/build > /dev/null;
     )
 fi
 
