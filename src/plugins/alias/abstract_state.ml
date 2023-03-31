@@ -285,6 +285,7 @@ let assert_invariants (x:t) : unit =
   in
   LLMap.iter assert_lmap x.lmap;
   let assert_vmap (v:V.t) (ls:LSet.t) =
+     assert (G.mem_vertex x.graph v);
     assert (LSet.fold (fun lv acc -> acc && V.equal (LLMap.find lv x.lmap) v) ls true)
   in
   VMap.iter assert_vmap x.vmap
