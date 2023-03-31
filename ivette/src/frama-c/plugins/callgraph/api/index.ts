@@ -55,34 +55,38 @@ import { tag } from 'frama-c/kernel/api/data';
 import { tagDefault } from 'frama-c/kernel/api/data';
 
 export interface vertex {
-  /** kf */
+  /** The function represented by the node */
   kf: fct;
-  /** is_root */
+  /** whether this node is the root of a service */
   is_root: boolean;
+  /** the root of this node's service */
+  root: fct;
 }
 
 /** Decoder for `vertex` */
 export const jVertex: Json.Decoder<vertex> =
-  Json.jObject({ kf: jFct, is_root: Json.jBoolean,});
+  Json.jObject({ kf: jFct, is_root: Json.jBoolean, root: jFct,});
 
 /** Natural order for `vertex` */
 export const byVertex: Compare.Order<vertex> =
   Compare.byFields
-    <{ kf: fct, is_root: boolean }>({
+    <{ kf: fct, is_root: boolean, root: fct }>({
     kf: byFct,
     is_root: Compare.boolean,
+    root: byFct,
   });
 
 /** Default value for `vertex` */
-export const vertexDefault: vertex = { kf: fctDefault, is_root: false };
+export const vertexDefault: vertex =
+  { kf: fctDefault, is_root: false, root: fctDefault };
 
-/** Whether The nature of a node */
+/** Whether the call goes through services or not */
 export enum edgeKind {
-  /**  */
+  /** a call between two services */
   inter_services = 'inter_services',
-  /**  */
+  /** a call inside a service */
   inter_functions = 'inter_functions',
-  /**  */
+  /** both cases above */
   both = 'both',
 }
 
@@ -137,30 +141,22 @@ export interface graph {
   vertices: vertex[];
   /** edges */
   edges: edge[];
-  /** entry_point */
-  entry_point?: fct;
 }
 
 /** Decoder for `graph` */
 export const jGraph: Json.Decoder<graph> =
-  Json.jObject({
-    vertices: Json.jArray(jVertex),
-    edges: Json.jArray(jEdge),
-    entry_point: Json.jOption(jFct),
-  });
+  Json.jObject({ vertices: Json.jArray(jVertex), edges: Json.jArray(jEdge),});
 
 /** Natural order for `graph` */
 export const byGraph: Compare.Order<graph> =
   Compare.byFields
-    <{ vertices: vertex[], edges: edge[], entry_point?: fct }>({
+    <{ vertices: vertex[], edges: edge[] }>({
     vertices: Compare.array(byVertex),
     edges: Compare.array(byEdge),
-    entry_point: Compare.defined(byFct),
   });
 
 /** Default value for `graph` */
-export const graphDefault: graph =
-  { vertices: [], edges: [], entry_point: undefined };
+export const graphDefault: graph = { vertices: [], edges: [] };
 
 /** Signal for state [`callgraph`](#callgraph)  */
 export const signalCallgraph: Server.Signal = {

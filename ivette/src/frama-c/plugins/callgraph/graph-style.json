@@ -30,5 +30,13 @@
       "target-arrow-color": "#888",
       "arrow-scale": 2.0
     }
+  },
+  {
+    "selector": ".callstack-selected",
+    "style": {
+      "overlay-color": "#8bf",
+      "overlay-padding": "8px",
+      "overlay-opacity": 0.4
+    }
   }
 ]

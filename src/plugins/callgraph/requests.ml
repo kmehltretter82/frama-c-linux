@@ -22,7 +22,14 @@
 
 open Server
 
+module G = Services.G
+
+(* --- Package declaration --- *)
+
 let package = Package.package ~plugin:"callgraph" ~title:"Callgraph" ()
+
+
+(* --- Helper modules --- *)
 
 module Record () =
 struct
@@ -31,13 +38,10 @@ struct
   let record : record Record.signature = Record.signature ()
   let field name ?(descr = name) =
     Record.field record ~name ~descr:(Markdown.plain descr)
-  let option name ?(descr = name) =
-    Record.option record ~name ~descr:(Markdown.plain descr)
   let publish ?descr name =
     let descr = Option.map Markdown.plain descr in
     Record.publish record ~package ~name ?descr
 end
-
 
 module Enum (X: sig type t end) =
 struct
@@ -49,12 +53,19 @@ struct
     Request.dictionary ~package ~name ~descr:(Markdown.plain descr) dictionary
 end
 
+
+(* --- Types --- *)
+
 module Vertex =
 struct
   include Record ()
 
   let kf = field "kf" (module Kernel_ast.Function)
+      ~descr: "The function represented by the node"
   let is_root = field "is_root" Data.jbool
+      ~descr: "whether this node is the root of a service"
+  let root = field "root" (module Kernel_ast.Function)
+      ~descr: "the root of this node's service"
 
   include (val publish "vertex")
   type t = Cil_types.kernel_function Service_graph.vertex
@@ -63,6 +74,7 @@ struct
     default |>
     set kf v.node |>
     set is_root v.is_root |>
+    set root v.root.node |>
     to_json
 
   let of_json _js = Data.failure "Vertex.of_json not implemented"
@@ -72,16 +84,17 @@ module EdgeKind =
 struct
   include Enum (struct type t = Service_graph.edge end)
 
-  let inter_services =  tag "inter_services" ""
-  let inter_functions = tag "inter_functions" ""
-  let both =            tag "both" ""
+  let inter_services =  tag "inter_services" "a call between two services"
+  let inter_functions = tag "inter_functions" "a call inside a service"
+  let both =            tag "both" "both cases above"
 
   let lookup = function
     | Service_graph.Inter_services -> inter_services
     | Inter_functions -> inter_functions
     | Both -> both
 
-  include (val publish lookup "edgeKind" "Whether The nature of a node")
+  include (val publish lookup
+              "edgeKind" "Whether the call goes through services or not")
 end
 
 module Edge =
@@ -93,13 +106,13 @@ struct
   let kind = field "kind" (module EdgeKind)
 
   include (val publish "edge")
-  type t = Services.G.E.t
+  type t = G.E.t
 
   let to_json (e : t) =
     default |>
-    set src (Services.G.E.src e).node |>
-    set dst (Services.G.E.dst e).node |>
-    set kind (Services.G.E.label e) |>
+    set src (G.E.src e).node |>
+    set dst (G.E.dst e).node |>
+    set kind (G.E.label e) |>
     to_json
 
   let of_json _js = Data.failure "Edge.of_json not implemented"
@@ -111,30 +124,27 @@ struct
 
   let vertices = field "vertices" (module Data.Jlist (Vertex))
   let edges = field "edges" (module Data.Jlist (Edge))
-  let entry_point = option "entry_point" (module Kernel_ast.Function)
 
   include (val publish "graph" ~descr:"The callgraph of the current project")
-  type t = Services.G.t
+  type t = G.t
 
   let get_vertices (g : t) =
-    Services.G.fold_vertex (fun v acc -> v :: acc ) g []
+    G.fold_vertex (fun v acc -> v :: acc ) g []
 
   let get_edges (g : t) =
-    Services.G.fold_edges_e (fun v acc -> v :: acc ) g []
-
-  let get_entry_point () =
-    Services.entry_point () |>
-    Option.map (fun v -> v.Service_graph.node)
+    G.fold_edges_e (fun v acc -> v :: acc ) g []
 
   let to_json (g : t) =
     default |>
     set vertices (get_vertices g) |>
     set edges (get_edges g) |>
-    set entry_point (get_entry_point ()) |>
     to_json
 
   let of_json _js = Data.failure "Graph.of_json not implemented"
 end
+
+
+(* --- Requests --- *)
 
 let _signal =
   States.register_value

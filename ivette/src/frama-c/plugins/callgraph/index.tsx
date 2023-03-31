@@ -20,22 +20,27 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 
-import * as API from './api';
+import * as AstAPI from 'frama-c/kernel/api/ast';
+import * as CgAPI from './api';
+import * as ValuesAPI from 'frama-c/plugins/eva/api/values';
 
-import Cytoscape from 'cytoscape';
+import Cy from 'cytoscape';
 import CytoscapeComponent from 'react-cytoscapejs';
 import 'frama-c/plugins/dive/cytoscape_libs';
 import 'cytoscape-panzoom/cytoscape.js-panzoom.css';
-
 import style from './graph-style.json';
-import { useSyncValue } from 'frama-c/states';
+
+import { useGlobalState } from 'dome/data/states';
+import { useRequest, useSyncValue } from 'frama-c/states';
 
 import gearsIcon from 'frama-c/plugins/eva/images/gears.svg';
+import { CallstackState } from 'frama-c/plugins/eva/valuetable';
+
 import './callgraph.css';
 
 
@@ -73,27 +78,56 @@ function getWidth(node: any): string {
 // --- Graph
 // --------------------------------------------------------------------------
 
-function convertGraph(graph: API.graph): object[] {
+function edgeId(source: AstAPI.fct, target: AstAPI.fct): string {
+  return `${source}-${target}`;
+}
+
+function convertGraph(graph: CgAPI.graph): object[] {
   const elements = [];
   for (const v of graph.vertices) {
-    elements.push({data: {...v, id:v.kf}});
+    elements.push({data: {...v, id: v.kf}});
   }
   for (const e of graph.edges) {
-    elements.push({data: {source: e.src, target: e.dst}});
+    const id = edgeId(e.src, e.dst);
+    elements.push({data: {...e, id, source: e.src, target: e.dst}});
   }
-  console.log(elements);
   return elements;
 }
 
+type callstack = {
+  callee: AstAPI.fct,
+  caller?: AstAPI.fct,
+  stmt?: AstAPI.marker,
+  rank?: number
+}[]
+
+function selectCallstack(cy: Cy.Core, callstack: callstack | undefined): void {
+  const className = 'callstack-selected';
+  cy.$(`.${className}`).removeClass(className);
+  callstack?.forEach((call) => {
+    cy.$(`node[id='${call.callee}']`).addClass(className);
+    if (call.caller) {
+      const id = edgeId(call.caller, call.callee);
+      cy.$(`edge[id='${id}']`).addClass(className);
+    }
+  });
+}
 
 function Callgraph() : JSX.Element { 
-  const isComputed = useSyncValue(API.isComputed);
-  const graph = useSyncValue(API.callgraph);
-  const [cy, setCy] = useState<Cytoscape.Core>();
+  const isComputed = useSyncValue(CgAPI.isComputed);
+  const graph = useSyncValue(CgAPI.callgraph);
+  const [cy, setCy] = useState<Cy.Core>();
+  const [cs] = useGlobalState(CallstackState);
+  const callstack = useRequest(ValuesAPI.getCallstackInfo, cs);
+
   const layout = {name: 'cola', nodeSpacing: 32};
 
+  useEffect(() => {
+    cy && selectCallstack(cy, callstack);
+  }, [cy, callstack]);
+
   if (isComputed === false) {
-    Server.send(API.compute, null);
+    Server.send(CgAPI.compute, null);
     return (<img src={gearsIcon} className="callgraph-computing" />);
   }
   else if (graph !== undefined) {

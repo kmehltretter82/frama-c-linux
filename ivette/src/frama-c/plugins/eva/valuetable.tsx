@@ -972,7 +972,7 @@ function useEvaluationMode(props: EvaluationModeProps): void {
 /* -------------------------------------------------------------------------- */
 
 /* Table's state. It is global for when the user changes the view. */
-const CallstackState = new GlobalState<callstack>('Summary');
+export const CallstackState = new GlobalState<callstack>('Summary');
 const FunctionsManagerState = new GlobalState(new FunctionsManager());
 const FocusState = new GlobalState<Probe | undefined>(undefined);
 
