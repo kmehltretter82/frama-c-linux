@@ -77,9 +77,12 @@ module State =
       let dependencies = [ Cg.self; Kernel.MainFunction.self ]
     end)
 
+module StateHook = Hook.Build (S.Service_graph.Datatype)
+
 (* eta-expansion required to mask optional argument [?project] *)
 let is_computed () = State.is_computed ()
 let self = State.self
+let add_hook = StateHook.extend
 
 let compute () =
   let cg = Cg.get () in
@@ -92,6 +95,7 @@ let compute () =
   in
   let sg = S.compute cg isr_names in
   State.mark_as_computed ();
+  StateHook.apply sg;
   sg
 
 let get () = State.memo compute
