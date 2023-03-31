@@ -921,7 +921,6 @@ module BaseToVariables = struct
       (VSet) (* Directly dependent variables *)
       (VSet) (* Indirectly dependent variables *)
     let pretty_debug = pretty
-    let is_empty (s,t) = VSet.is_empty s && VSet.is_empty t
     let inter (s1,t1) (s2,t2) = VSet.inter s1 s2, VSet.inter t1 t2
     let union (s1,t1) (s2,t2) = VSet.union s1 s2, VSet.union t1 t2
   end
@@ -932,18 +931,17 @@ module BaseToVariables = struct
   let cache_prefix = "Eva.Octagons.BaseToVariables"
 
   let narrow =
-    let cache_name = cache_prefix ^ ".inter" in
+    let cache_name = cache_prefix ^ ".narrow" in
     let cache = Hptmap_sig.PersistentCache cache_name in
     let symmetric = true in
     let idempotent = true in
-    let decide _ v1 v2 =
-      let v = VSetPair.inter v1 v2 in
-      if VSetPair.is_empty v then None else Some v
-    in
-    inter ~cache ~symmetric ~idempotent ~decide
+    let decide _ v1 v2 = VSetPair.inter v1 v2 in (* The intersection may be empty *)
+    (* join maps to keep dependencies even for variables that are present 
+       only in one of the two abstract values *)
+    join ~cache ~symmetric ~idempotent ~decide
 
   let join =
-    let cache_name = cache_prefix ^ ".union" in
+    let cache_name = cache_prefix ^ ".join" in
     let cache = Hptmap_sig.PersistentCache cache_name in
     let symmetric = true in
     let idempotent = true in
