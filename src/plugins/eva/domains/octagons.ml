@@ -1152,7 +1152,7 @@ module State = struct
   (* Is an octagon no more precise than the intervals inferred for the related
      variables? If so, do not save the octagon in the domain. *)
   let is_redundant intervals { variables; operation; value; } =
-    if infer_intervals && false
+    if infer_intervals
     then
       try
         let v1, v2 = Pair.get variables in
