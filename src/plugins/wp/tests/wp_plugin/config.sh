@@ -1,7 +1,7 @@
 #!/bin/sh
 
-ERGO=`alt-ergo -version`
-WHY3=`why3 --version`
+ERGO=$(alt-ergo --version)
+WHY3=$(why3 --version)
 
 echo "----------------------------------------------------------"
 echo "WP Requirements for Qualif Tests"
