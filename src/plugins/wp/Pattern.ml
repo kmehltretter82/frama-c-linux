@@ -170,4 +170,55 @@ type lookup = {
   pattern: pattern ;
 }
 
+type sigma = Tactical.selection Vmap.t
+
+(* -------------------------------------------------------------------------- *)
+(* --- Value Extracting                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+let error ~loc msg =
+  Wp_parameters.logwith (fun _evt -> raise Not_found) ~source:(fst loc) msg
+
+let getvar env (x : string loc) : Tactical.selection =
+  try Vmap.find x.value env
+  with Not_found ->
+    error ~loc:x.loc "Pattern variable '%s' not bound" x.value
+
+let rec select (env : sigma) (a : value) =
+  let loc = a.loc in
+  let cc = select env in
+  match a.value with
+  | Any ->  error ~loc "Pattern _ is not a value"
+  | Pvar x -> getvar env x
+  | Named (_,v) -> cc v
+  | Range(a,b) -> Tactical.range a b
+  | Int n -> Tactical.cint n
+  | Bool b -> Tactical.compose (if b then "wp:true" else "wp:false") []
+  | Assoc(op,vs) ->
+    let op = match op with
+      | `Add -> "wp:add"
+      | `Mul -> "wp:mul"
+    in Tactical.compose op (List.map (cc) vs)
+  | Binop(a,op,b) ->
+    let op = match op with
+      | `Div -> "wp:div"
+      | `Mod -> "wp:mod"
+      | `Eq -> "wp:eq"
+      | `Ne -> "wp:neq"
+      | `Lt -> "wp:lt"
+      | `Le -> "wp:leq"
+      | `Repeat -> "wp:repeat"
+    in compose env ~loc op [a;b]
+  | Times(k,v) -> Tactical.compose "wp:mul" [Tactical.cint k;cc v]
+  | Get(a,k) -> Tactical.compose "wp:get" [cc a;cc k]
+  | Set(a,k,v) -> Tactical.compose "wp:set" [cc a;cc k;cc v]
+  | List vs -> Tactical.compose "wp:list" (List.map cc vs)
+  | Field(v,id) -> compose env ~loc ("fd:" ^ id) [v]
+  | Call(id,vs) -> compose env ~loc ("lf:" ^ id) vs
+
+and compose env ~loc id vs =
+  match Tactical.compose id (List.map (select env) vs) with
+  | Tactical.Empty -> error ~loc "Computer %S not found" id
+  | result -> result
+
 (* -------------------------------------------------------------------------- *)

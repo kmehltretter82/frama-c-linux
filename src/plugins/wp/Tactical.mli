@@ -257,5 +257,7 @@ val export : #tactical -> tactical
 val lookup : id:string -> tactical
 val iter : (tactical -> unit) -> unit
 
+type computer = term list -> term
+val add_computer : string -> computer -> unit
 val add_composer : #composer -> unit
 val iter_composer : (composer -> unit) -> unit

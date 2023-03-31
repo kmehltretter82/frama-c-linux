@@ -47,4 +47,11 @@ val pa_pattern : context -> lexpr -> pattern
 (** Parse value according to the environement *)
 val pa_value : context -> lexpr -> value
 
+
+(** Matching result *)
+type sigma
+
+(** Composing values *)
+val select : sigma -> value -> Tactical.selection
+
 (* -------------------------------------------------------------------------- *)

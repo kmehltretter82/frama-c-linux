@@ -149,6 +149,14 @@ let v_concat es tau = F.e_fun f_concat es ~result:tau
 let v_length l = F.e_fun f_length [l]
 let v_repeat s n tau = F.e_fun f_repeat [s;n] ~result:tau
 
+let concat vs =
+  let tl = Lang.F.typeof (List.hd vs) in
+  v_concat vs tl
+
+let list es = concat (List.map v_elt es)
+
+let repeat s n = v_repeat s n (Lang.F.typeof s)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Rewriters                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -545,10 +553,10 @@ let rec collect xs = function
       | _ -> List.rev xs , w
     end
 
-let list engine fmt xs = Qed.Plib.pp_listsep ~sep:"," engine#pp_flow fmt xs
+let elist engine fmt xs = Qed.Plib.pp_listsep ~sep:"," engine#pp_flow fmt xs
 
 let elements (engine : #engine) fmt xs =
-  Format.fprintf fmt "@[<hov 2>[ %a ]@]" (list engine) xs
+  Format.fprintf fmt "@[<hov 2>[ %a ]@]" (elist engine) xs
 
 let rec pp_concat (engine : #engine) fmt es =
   let xs , es = collect [] es in
@@ -569,7 +577,7 @@ let pretty (engine : #engine) fmt es =
 
 let pprepeat (engine : #engine) fmt = function
   | [l;n] -> Format.fprintf fmt "@[<hov 2>(%a *^@ %a)@]" engine#pp_flow l engine#pp_flow n
-  | es -> Format.fprintf fmt "@[<hov 2>repeat(%a)@]" (list engine) es
+  | es -> Format.fprintf fmt "@[<hov 2>repeat(%a)@]" (elist engine) es
 
 let shareable e =
   match F.repr e with
