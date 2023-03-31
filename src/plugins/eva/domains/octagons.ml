@@ -918,8 +918,8 @@ module BaseToVariables = struct
   module VSetPair =
   struct
     include Datatype.Pair
-      (VSet) (* Directly dependent variables *)
-      (VSet) (* Indirectly dependent variables *)
+        (VSet) (* Directly dependent variables *)
+        (VSet) (* Indirectly dependent variables *)
     let pretty_debug = pretty
     let inter (s1,t1) (s2,t2) = VSet.inter s1 s2, VSet.inter t1 t2
     let union (s1,t1) (s2,t2) = VSet.union s1 s2, VSet.union t1 t2
@@ -936,7 +936,7 @@ module BaseToVariables = struct
     let symmetric = true in
     let idempotent = true in
     let decide _ v1 v2 = VSetPair.inter v1 v2 in (* The intersection may be empty *)
-    (* join maps to keep dependencies even for variables that are present 
+    (* join maps to keep dependencies even for variables that are present
        only in one of the two abstract values *)
     join ~cache ~symmetric ~idempotent ~decide
 
@@ -1173,9 +1173,13 @@ module State = struct
     match offset with
     | Cil_types.NoOffset -> `Value (Ival.zero)
     | Field (fi, sub) ->
-      let+ sub_coeff = offset_to_coeff eval fi.ftype sub in
-      let byte_offset = Integer.of_int (fst (Cil.fieldBitsOffset fi) / 8) in
-      Ival.add_singleton_int byte_offset sub_coeff
+      let* sub_coeff = offset_to_coeff eval fi.ftype sub in
+      begin try
+          let byte_offset = Integer.of_int (fst (Cil.fieldBitsOffset fi) / 8) in
+          let coeff = Ival.add_singleton_int byte_offset sub_coeff in
+          `Value coeff
+        with Cil.SizeOfError _ -> `Top
+      end
     | Index (exp, sub) ->
       let elem_type = Cil.typeOf_array_elem base_type in
       let* cvalue = eval exp in
