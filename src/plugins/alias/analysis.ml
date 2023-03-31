@@ -115,8 +115,10 @@ let do_function_call (s:stmt) state (res : lval option) (ef : exp) (args: exp li
             try Function_table.find kf
             with Not_found -> doFunction kf; Function_table.find kf
           end
-        | None -> Options.abort ~source:(fst loc)
-                    "Unsupported function pointer (skipped)"
+        | None ->
+          Options.warning ~wkey:Options.DebugKeys.unsupported ~source:(fst loc)
+            "calls to function pointer unsupported: %a" Exp.pretty ef;
+          None
       in
       match (state, summary) with
         (None, _) -> None
