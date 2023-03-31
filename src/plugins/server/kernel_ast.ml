@@ -320,6 +320,13 @@ struct
     | Some vi -> Globals.Functions.mem vi
     | None -> false
 
+  let is_function_pointer = function
+    | PLval (_, _, (Mem _, NoOffset as lval))
+      when Cil.(isFunctionType (typeOfLval lval)) -> true
+    | PLval (_, _, lval)
+      when Cil.(isFunPtrType (Cil.typeOfLval lval)) -> true
+    | _ -> false
+
   let is_fundecl = function
     | PVDecl(Some _,Kglobal,vi) -> vi.vglob && Globals.Functions.mem vi
     | _ -> false
@@ -375,6 +382,14 @@ struct
       ~descr:(Md.plain "Whether it is a function symbol")
       ~data:(module Jbool)
       ~get:(fun (tag, _) -> is_function tag)
+      model
+
+  let () =
+    States.column
+      ~name:"isFunctionPointer"
+      ~descr:(Md.plain "Whether it is a function pointer")
+      ~data:(module Jbool)
+      ~get:(fun (tag, _) -> is_function_pointer tag)
       model
 
   let () =
