@@ -90,6 +90,8 @@ let feedback_only_once s =
       Options.warning "In statement @[%a@], the function has no definition (abstract state is unchanged)" Stmt.pretty s
     end
 
+let doFunction f = !function_compute_ref f
+
 let do_function_call (s:stmt) state (res : lval option) (ef : exp) (args: exp list) loc =
   let is_malloc (s:string) : bool =
     (s = "malloc") || (s = "calloc") (* todo : add all function names *)
@@ -108,8 +110,11 @@ let do_function_call (s:stmt) state (res : lval option) (ef : exp) (args: exp li
       (* general case *)
       let summary =
         match Kernel_function.get_called ef with
-        | Some kf -> (try Function_table.find kf
-                      with Not_found -> !function_compute_ref kf ; Function_table.find kf)
+        | Some kf when Kernel_function.is_main kf -> None
+        | Some kf -> begin
+            try Function_table.find kf
+            with Not_found -> doFunction kf; Function_table.find kf
+          end
         | None -> Options.abort ~source:(fst loc)
                     "Unsupported function pointer (skipped)"
       in
