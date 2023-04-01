@@ -106,7 +106,7 @@
 [alias] analysing instruction: tmp_1 = sin(*(idata + idx));
 [alias] analysing function: sin
 [alias] May-aliases at the end of function sin:
-[alias] Warning: In statement tmp_1 = sin(*(idata + idx));, the function has no definition (abstract state is unchanged)
+[alias:undefined:fn] example1.c:45: Warning: function sin has no definition
 [alias] May-aliases at the end of instruction:
   {x, tmp} are aliased
 [alias] analysing instruction: *(odata + idx) = 0.5 * tmp_1;
@@ -145,7 +145,8 @@
 [alias] analysing instruction: swap(tmp->n1);
 [alias] May-aliases at the end of instruction:
   {x, tmp} are aliased
-[alias] Warning: Analysis is continuing but will not be sound
+[alias:no-return] example1.c:29: Warning: 
+  function f1 does not return; analysis is continuing but is not be sound
 [alias] May-aliases at the end of function f1:
 [alias] analysing function: f2
 [alias] analysing instruction: ty *tmp = x;
@@ -190,7 +191,8 @@
 [alias] analysing instruction: swap(tmp->n2);
 [alias] May-aliases at the end of instruction:
   {x, tmp} are aliased
-[alias] Warning: Analysis is continuing but will not be sound
+[alias:no-return] example1.c:53: Warning: 
+  function f2 does not return; analysis is continuing but is not be sound
 [alias] May-aliases at the end of function f2:
 [alias] analysing function: fabs
 [alias] May-aliases at the end of function fabs:

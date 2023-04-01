@@ -61,6 +61,12 @@ module Dot_output =
       let help = "Displays the final abstract state in Dot File <f>"
     end)
 
+module Warn = struct
+  let unsupported_function = register_warn_category "unsupported:fn"
+  let undefined_function = register_warn_category "undefined:fn"
+  let no_return_stmt = register_warn_category "no-return"
+end
+
 module DebugKeys = struct
   let lvals = register_category "lvals"
 end

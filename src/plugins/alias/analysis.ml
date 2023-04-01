@@ -80,17 +80,9 @@ let rec do_init (lv:lval) (init:init) state =
   | CompoundInit(_, l) ->
     List.fold_left (fun state (o, init) -> do_init (Cil.addOffsetLval o lv) init state) state l
 
+let doFunction f = !function_compute_ref f
 
-let list_instr_warnings : stmt list ref = ref []
-
-let feedback_only_once s =
-  if not (List.mem s !list_instr_warnings) then
-    begin
-      list_instr_warnings := s::!list_instr_warnings;
-      Options.warning "In statement @[%a@], the function has no definition (abstract state is unchanged)" Stmt.pretty s
-    end
-
-let do_function_call (s:stmt) state (res : lval option) (ef : exp) (args: exp list) loc =
+let do_function_call (_:stmt) state (res : lval option) (ef : exp) (args: exp list) loc =
   let is_malloc (s:string) : bool =
     (s = "malloc") || (s = "calloc") (* todo : add all function names *)
   in
@@ -108,18 +100,25 @@ let do_function_call (s:stmt) state (res : lval option) (ef : exp) (args: exp li
       (* general case *)
       let summary =
         match Kernel_function.get_called ef with
-        | Some kf -> (try Function_table.find kf
-                      with Not_found -> !function_compute_ref kf ; Function_table.find kf)
-        | None -> Options.abort ~source:(fst loc)
-                    "Unsupported function pointer (skipped)"
+        | Some kf when Kernel_function.is_main kf -> None
+        | Some kf -> begin
+            try Function_table.find kf
+            with Not_found -> doFunction kf; Function_table.find kf
+          end
+        | None ->
+          Options.warning ~wkey:Options.Warn.unsupported_function ~source:(fst loc)
+            "calls to function pointer unsupported: %a" Exp.pretty ef;
+          None
       in
       match (state, summary) with
         (None, _) -> None
       | (Some a, Some summary) ->
         Some(Abstract_state.call a res args summary)
-      | (Some a, None) -> (feedback_only_once s; Some a)
+      | (Some a, None) ->
+        Options.warning ~wkey:Options.Warn.undefined_function ~once:true ~source:(fst loc)
+          "function %a has no definition" Exp.pretty ef;
+        Some a
     end
-
 
 let do_cons_init (s:stmt) (v:varinfo) f arg t  loc state =
   Cil.treat_constructor_as_func (do_function_call s state) v f arg t loc
@@ -219,11 +218,12 @@ let analyse_function (kf:kernel_function) =
       F.compute [first_stmt];
       let return_stmt = Kernel_function.find_return kf in
       try Stmt_table.find return_stmt
-      with
-        Not_found ->
+      with Not_found ->
         begin
-          Options.debug "return stmt of %a not in table" Kernel_function.pretty kf;
-          Options.warning "Analysis is continuing but will not be sound";
+          let source, _ = Kernel_function.get_location kf in
+          Options.warning ~source ~wkey:Options.Warn.no_return_stmt
+            "function %a does not return; analysis is continuing but is not be sound"
+            Kernel_function.pretty kf;
           Some (Abstract_state.empty)
         end
     end
