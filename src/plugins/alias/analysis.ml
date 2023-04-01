@@ -218,11 +218,12 @@ let analyse_function (kf:kernel_function) =
       F.compute [first_stmt];
       let return_stmt = Kernel_function.find_return kf in
       try Stmt_table.find return_stmt
-      with
-        Not_found ->
+      with Not_found ->
         begin
-          Options.debug "return stmt of %a not in table" Kernel_function.pretty kf;
-          Options.warning "Analysis is continuing but will not be sound";
+          let source, _ = Kernel_function.get_location kf in
+          Options.warning ~source ~wkey:Options.Warn.no_return_stmt
+            "function %a does not return; analysis is continuing but is not be sound"
+            Kernel_function.pretty kf;
           Some (Abstract_state.empty)
         end
     end

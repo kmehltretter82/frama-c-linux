@@ -41,6 +41,7 @@ module Dot_output : Parameter_sig.String
 module Warn : sig
   val unsupported_function : warn_category
   val undefined_function : warn_category
+  val no_return_stmt : warn_category
 end
 
 module DebugKeys : sig
