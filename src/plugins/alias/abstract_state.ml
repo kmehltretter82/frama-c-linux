@@ -480,7 +480,7 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
         begin
           (* first find the vertex corresponding to e *)
           match Lval.from_exp e with
-            BNone -> Options.fatal "This should not happen "
+          | BNone -> Options.fatal "unexpected result: Lval.from (%a) = BNone" Exp.pretty e
           | BLval lv1 ->
             (* find the vertex *)
             let v1, x = find_or_create_vertex (BLval lv1) x in
