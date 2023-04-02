@@ -452,7 +452,7 @@ let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
       NoOffset, _ -> o2
     | Field (_,o1), Field(_,o2) -> f_diff_offset o1 o2
     | Index (_,o1), Index(_,o2) -> f_diff_offset o1 o2
-    | _ -> assert false
+    | _ -> Options.fatal "%s: unexpected case" __LOC__
   in
   let _, o1 = Lval.removeOffsetLval lv1
   and _, o2 = Lval.removeOffsetLval lv2
