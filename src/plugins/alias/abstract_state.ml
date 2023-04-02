@@ -303,12 +303,6 @@ let pretty ?(debug=false) fmt (x:t) =
   else
     print_aliases fmt x
 
-let assert_state_transformation (x:t) (f: t -> t) : t =
-  assert_invariants x;
-  let result = f x in
-  assert_invariants result;
-  result
-
 (** .dot printing functions*)
 let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
 
@@ -571,13 +565,15 @@ let find_vertex lv x =
 
 (* remove a lval from a graph*)
 let remove_lval (x:t)  (lv:Lval.t) :t =
-  assert_state_transformation x @@ fun x ->
+  assert_invariants x;
   try
     let v = LLMap.find lv x.lmap in
     let setv= VMap.find v x.vmap in
     let new_lmap = LLMap.remove lv x.lmap in
     let new_vmap = VMap.add v (LSet.remove lv setv) x.vmap in
-    {x with lmap = new_lmap; vmap = new_vmap}
+    let result = {x with lmap = new_lmap; vmap = new_vmap} in
+    assert_invariants result;
+    result
   with
     Not_found -> x
 
@@ -764,7 +760,7 @@ let is_empty s =
 
 (* add an int to all vertex values *)
 let shift (a : t) : t =
-  assert_state_transformation a @@ fun a ->
+  assert_invariants a;
   if is_empty a then a else
     let () = Options.debug ~level:8 "before shift: node_counter=%d@.%a@." !node_counter print_debug a in
     let min_idx, _ = VMap.min_binding a.vmap in
@@ -783,6 +779,7 @@ let shift (a : t) : t =
        vmap = shift_vmap (fun (key, l) -> (shift key, l)) vmap}
     in
     let () = Options.debug ~level:8 "after shift: node_counter=%d@.%a@." !node_counter print_debug result in
+    assert_invariants result;
     result
 
 let lmap_intersect l r =
