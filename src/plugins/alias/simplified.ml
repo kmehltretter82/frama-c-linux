@@ -28,6 +28,8 @@ let nul_exp=
   let loc = Location.unknown in
   Cil.zero ~loc
 
+let is_nul_exp e =
+   (Cil_datatype.ExpStructEq.compare e nul_exp) = 0
 
 module HL = Lval.Hashtbl
 
@@ -42,6 +44,8 @@ let clear_cache () =
   HE.clear cached_exp
 
 exception IsExp of exp
+    
+exception Direct_pointer_address of location
 
 let rec simplify_lval (h,o) =
   try HL.find cached_lval (h,o) with
@@ -54,8 +58,12 @@ let rec simplify_lval (h,o) =
 and simplify_host h =
   match h with
     Var _ -> h
-  | Mem e -> Mem (simplify_exp e)
-
+  | Mem e ->
+    let simp_e = simplify_exp e in
+    if is_nul_exp simp_e
+    then raise  (Direct_pointer_address e.eloc)
+    else Mem simp_e
+    
 and simplify_offset o =
   match o with
     NoOffset -> NoOffset
@@ -77,7 +85,7 @@ and simplify_exp e =
               match (simplify_exp e1).enode with
                 Lval (h,o) -> Lval (h,Index(nul_exp,o))
               | AddrOf lv -> Lval lv
-              | _ -> Options.fatal "simplify_exp not implemented for: %a" Exp.pretty (simplify_exp e1)
+              | _ -> raise (Direct_pointer_address e1.eloc)
             end
           | CastE(_,e) -> raise (IsExp (simplify_exp e))
           | _ -> raise (IsExp nul_exp)
@@ -144,7 +152,7 @@ struct
 
   let points_to x =
     match x with
-      BNone -> Options.fatal "Error when applying points_to (Not a pointer)"
+      BNone -> raise (Direct_pointer_address Location.unknown) 
     | BAddrOf lv -> BLval lv
     | BLval lv ->
       BLval (Mem (Cil.dummy_exp (Lval lv)), NoOffset)
