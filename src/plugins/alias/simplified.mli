@@ -28,7 +28,7 @@ type simplified_lval =
   | BAddrOf of lval (* address *)
 
 (* exception raised when the program tries to access a memory location directly. *)
-exception Direct_pointer_address of location
+exception Explicit_pointer_address of location
 
 module Simplified_lval:
 sig
@@ -36,10 +36,10 @@ sig
 
   val compare: t -> t -> int
 
-  (* result stored in cache. May raise Direct_pointer_address *)
+  (* result stored in cache. May raise Explicit_pointer_address *)
   val from_lval: lval -> t
 
-  (* result stored in cache. May raise Direct_pointer_address *)
+  (* result stored in cache. May raise Explicit_pointer_address *)
   val from_exp: exp -> t
 
   val pretty: Format.formatter -> t -> unit
@@ -51,7 +51,7 @@ sig
   val addOffsetLval : offset -> t -> t
 
   (* (points_to x) = *x and (points_to &x) = x. Raise
-     Direct_pointer_address when applied to BNone *)
+     Explicit_pointer_address when applied to BNone *)
   val points_to : t -> t
 end
 
