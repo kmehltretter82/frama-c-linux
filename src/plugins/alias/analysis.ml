@@ -124,7 +124,7 @@ let do_cons_init (s:stmt) (v:varinfo) f arg t  loc state =
   Cil.treat_constructor_as_func (do_function_call s state) v f arg t loc
 
 
-let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
+let analyse_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   match i with
     Set(lv,exp,_) ->
     let new_a = do_assignment a lv exp in
@@ -148,7 +148,7 @@ let pp_abstract_state_opt ?(debug=false) fmt v =
 
 let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   Options.feedback ~level:3 "analysing instruction: %a" Printer.pp_stmt s;
-  let result = do_instr s i a in
+  let result = analyse_instr s i a in
   Options.feedback ~level:3 "May-aliases at the end of instruction:@.%a@." (pp_abstract_state_opt ~debug:false) result;
   Options.debug ~level:3 "May-alias graph at the end of instruction:@.%a@." (pp_abstract_state_opt ~debug:true) result;
   result
