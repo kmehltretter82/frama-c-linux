@@ -86,20 +86,6 @@ struct
       )
       m
 
-  let fold (f_fold: Lval.t -> V.t -> 'a -> 'a ) (m:t) (init:'a) : 'a =
-    LMap.fold
-      (fun lv mo acc ->
-         OMap.fold
-           (fun o v acc ->
-              let lv = Lval.addOffsetLval o lv in
-              f_fold lv v acc
-           )
-           mo
-           acc
-      )
-      m
-      init
-
   let map (f_map: V.t -> V.t ) (m:t) : 'a =
     LMap.map
       (fun mo ->
@@ -118,6 +104,23 @@ struct
       )
       m
 
+  (* left-biased *)
+  let union = LMap.union @@ fun _ l r -> Some (OMap.union (fun _ l _r -> Some l) l r)
+
+  let intersect =
+    let intersect_omap l r = match l, r with
+      | Some l, Some r -> Some (l,r)
+      | _ -> None
+    in
+    let intersect_lmap l r = match l, r with
+      | Some l, Some r ->
+        let omap = OMap.merge (fun _ -> intersect_omap) l r in
+        if OMap.is_empty omap then None else Some omap
+      | _ -> None
+    in
+    LMap.merge @@ fun _ -> intersect_lmap
+
+  let to_seq m = LMap.fold (fun lv omap s -> OMap.fold (fun o v s -> Seq.cons (lv,o,v) s) omap s) m Seq.empty
 
   (* specialized functions *)
   let rec is_sub_offset o1 o2 =
@@ -785,12 +788,6 @@ let shift (a : t) : t =
     assert_invariants result;
     result
 
-let lmap_intersect l r =
-  let find_in_l lval vr acc =
-    try (LLMap.find lval l, vr) :: acc with Not_found -> acc
-  in
-  LLMap.fold find_in_l r []
-
 let union  (a1:t) (a2:t) :t =
   (* naive algorithm :
      1 merge the graph and the vmap (by doing union of sets)
@@ -824,21 +821,16 @@ let union  (a1:t) (a2:t) :t =
       a2.vmap
       a1.vmap
   in
-  let new_lmap =
-    LLMap.fold
-      (fun lv v2 m_acc -> LLMap.add lv v2 m_acc)
-      a1.lmap
-      a2.lmap
-  in
-  let sets_to_be_joined =
-    let rec add_pair sets (v1,v2) = match sets with
+  let new_lmap = LLMap.union a1.lmap a2.lmap in
+  let sets_to_be_joined = (* TODO: optimise using union-find *)
+    let rec add_pair sets (a,b,(v1,v2)) = match sets with
       | [] -> [VSet.of_list [v1;v2]]
       | set::sets ->
         if VSet.mem v1 set || VSet.mem v2 set
         then VSet.add v1 (VSet.add v2 set) :: sets
-        else set :: add_pair sets (v1,v2)
+        else set :: add_pair sets (a,b,(v1,v2))
     in
-    List.fold_left add_pair [] (lmap_intersect a1.lmap a2.lmap)
+    Seq.fold_left add_pair [] @@ LLMap.to_seq @@ LLMap.intersect a1.lmap a2.lmap
   in
   Options.debug ~level:7 "Union: sets to be joined:@[";
   List.iter (fun set -> Options.debug ~level:7 "%a" VSet.pretty set) sets_to_be_joined;

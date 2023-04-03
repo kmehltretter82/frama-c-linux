@@ -103,7 +103,7 @@ let do_function_call (_:stmt) state (res : lval option) (ef : exp) (args: exp li
         | Some kf when Kernel_function.is_main kf -> None
         | Some kf -> begin
             try Function_table.find kf
-            with Not_found -> doFunction kf; Function_table.find kf
+            with Not_found -> doFunction kf
           end
         | None ->
           Options.warning ~wkey:Options.Warn.unsupported_function ~source:(fst loc)
@@ -124,7 +124,7 @@ let do_cons_init (s:stmt) (v:varinfo) f arg t  loc state =
   Cil.treat_constructor_as_func (do_function_call s state) v f arg t loc
 
 
-let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
+let analyse_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   match i with
     Set(lv,exp,_) ->
     let new_a = do_assignment a lv exp in
@@ -148,7 +148,7 @@ let pp_abstract_state_opt ?(debug=false) fmt v =
 
 let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   Options.feedback ~level:3 "analysing instruction: %a" Printer.pp_stmt s;
-  let result = do_instr s i a in
+  let result = analyse_instr s i a in
   Options.feedback ~level:3 "May-aliases at the end of instruction:@.%a@." (pp_abstract_state_opt ~debug:false) result;
   Options.debug ~level:3 "May-alias graph at the end of instruction:@.%a@." (pp_abstract_state_opt ~debug:true) result;
   result
@@ -244,19 +244,21 @@ let doFunction (kf:kernel_function) =
   Options.debug ~level:2 "Summary of function %a:@.%a@."
     Kernel_function.pretty kf
     (Abstract_state.pretty_summary ~debug:false ~function_name) summary;
+  let result =
+    if Kernel_function.has_definition kf
+    then Some summary
+    else None
+  in
   if Kernel_function.is_main kf then
     let f_name = Options.Dot_output.get () in
-    match f_name, final_state with
-    | "", _ -> ()
-    | _, None -> ()
-    | _, Some final_state -> Abstract_state.print_dot f_name final_state
+    begin match f_name, final_state with
+      | "", _ -> ()
+      | _, None -> ()
+      | _, Some final_state -> Abstract_state.print_dot f_name final_state
+    end;
+    None
   else
-    begin
-      (* use None to encode functions that have no definition *)
-      if Kernel_function.has_definition kf
-      then Function_table.add kf @@ Some summary
-      else Function_table.add kf None
-    end
+    (Function_table.add kf result; result)
 
 let () = function_compute_ref := doFunction
 
@@ -270,8 +272,7 @@ let make_summary (state:Abstract_state.t) (kf:kernel_function) =
   with
     Not_found ->
     begin
-      doFunction kf;
-      match Function_table.find kf with
+      match doFunction kf with
         Some s -> (state, s)
       | None -> Options.fatal "not implemented"
     end
@@ -283,7 +284,7 @@ let is_computed () = !computed_flag
 let compute () =
   Ast.compute();
   Options.debug "Parsing done";
-  Globals.Functions.iter doFunction;
+  Globals.Functions.iter (fun kf -> ignore @@ doFunction kf);
   Options.debug "Functions done";
   computed_flag := true;
   let print_stmt_table_elt fmt k v :unit =
