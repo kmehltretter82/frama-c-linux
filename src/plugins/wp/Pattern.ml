@@ -222,8 +222,10 @@ let pp_pattern = pp
 (* -------------------------------------------------------------------------- *)
 
 type sigma = Tactical.selection Vmap.t
+
 type env = {
   mutable sigma : sigma ;
+  mutable marked : Lang.F.Tset.t ;
   select : Lang.F.term -> Tactical.selection ;
 }
 
@@ -348,7 +350,21 @@ and pargs env ps es =
   | p::ps , e::es -> pmatch env p e ; pargs env ps es
   | _ -> raise Not_found
 
-let () = ignore pmatch
+(* Deep matching with marking *)
+let rec pchildren env p e =
+  match Lang.F.repr e with
+  | Bind _ -> false
+  | _ ->
+    let rs = ref [] in
+    Lang.F.lc_iter (fun e -> rs := e :: !rs) e ;
+    List.exists (pchild env p) (List.rev !rs)
+
+and pchild env p e =
+  not (Lang.F.Tset.mem e env.marked) &&
+  begin
+    env.marked <- Lang.F.Tset.add e env.marked ;
+    ptry env p e || pchildren env p e
+  end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Pattern Lookup                                                     --- *)
@@ -360,6 +376,82 @@ type lookup = {
   hyps: bool ;
   pattern: pattern ;
 }
+
+let pterm { head ; pattern } clause sigma term =
+  let select t =
+    if t == term then Tactical.Clause clause else Tactical.Inside(clause,t) in
+  let env = { sigma ; select ; marked = Lang.F.Tset.empty } in
+  if ptry env pattern term || (not head && pchildren env pattern term)
+  then Some env.sigma
+  else None
+
+(* --- Step Ordering --- *)
+
+let queue = Queue.create ()
+
+let order (s : Conditions.step) : int =
+  match s.condition with
+  | Have _ -> 0
+  | When _ -> 1
+  | Branch _ -> 2
+  | Core _ -> 3
+  | Init _ -> 4
+  | Type _ -> 5
+  | Either _ -> 6
+  | State _ -> 7
+
+let priority sa sb = order sa - order sb
+
+let push (step : Conditions.step) =
+  match step.condition with
+  | Have _ | When _ | Core _ | Init _ | Type _ | State _ -> ()
+  | Branch(_,sa,sb) -> Queue.push sa queue ; Queue.push sb queue
+  | Either cs -> List.iter (fun s -> Queue.push s queue) cs
+
+(* --- Step Matching --- *)
+
+let pstep ctxt sigma (step : Conditions.step) =
+  let term = Lang.F.e_prop @@ Conditions.head step in
+  let clause = Tactical.Step step in
+  pterm ctxt clause sigma term
+
+(* --- Sequence Matching --- *)
+
+let rec plist f =
+  function [] -> None | x::xs ->
+  match f x with
+  | Some _ as result -> result
+  | None -> plist f xs
+
+let rec psequence ctxt sigma (seq : Conditions.sequence) =
+  let steps = List.sort priority (Conditions.list seq) in
+  match plist (pstep ctxt sigma) steps with
+  | Some _ as result ->
+    Queue.clear queue ; result
+  | None ->
+    List.iter push steps ;
+    if Queue.is_empty queue then None else
+      psequence ctxt sigma (Queue.pop queue)
+
+(* --- Hypotheses Matching --- *)
+
+let phyps ctxt sigma (seq : Conditions.sequent) =
+  if not ctxt.hyps then None else
+    psequence ctxt sigma (fst seq)
+
+let pgoal ctxt sigma (seq : Conditions.sequent) =
+  if not ctxt.goal then None else
+    let goal = snd seq in
+    let term = Lang.F.e_prop goal in
+    let clause = Tactical.Goal goal in
+    pterm ctxt clause sigma term
+
+let empty = Vmap.empty
+
+let psequent ctxt sigma (seq : Conditions.sequent) =
+  match pgoal ctxt sigma seq with
+  | Some _ as result -> result
+  | None -> phyps ctxt sigma seq
 
 (* -------------------------------------------------------------------------- *)
 (* --- Composing Values                                                   --- *)

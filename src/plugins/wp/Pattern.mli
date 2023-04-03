@@ -31,13 +31,6 @@ type context
 type pattern
 type value
 
-type lookup = {
-  head: bool ;
-  goal: bool ;
-  hyps: bool ;
-  pattern: pattern ;
-}
-
 (** Creates an empty environment *)
 val context : typing_context -> context
 
@@ -53,10 +46,24 @@ val pp_pattern : Format.formatter -> pattern -> unit
 (** Value printer *)
 val pp_value : Format.formatter -> value -> unit
 
+(** Matching lookup *)
+type lookup = {
+  head: bool ;
+  goal: bool ;
+  hyps: bool ;
+  pattern: pattern ;
+}
+
 (** Matching result *)
 type sigma
 
-(** Composing values *)
+(** Empty results *)
+val empty : sigma
+
+(** Matching sequent *)
+val psequent : lookup -> sigma -> Conditions.sequent -> sigma option
+
+(** Composing values from matching results *)
 val select : sigma -> value -> Tactical.selection
 
 (* -------------------------------------------------------------------------- *)
