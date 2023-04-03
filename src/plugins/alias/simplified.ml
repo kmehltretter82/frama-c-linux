@@ -29,7 +29,7 @@ let nul_exp=
   Cil.zero ~loc
 
 let is_nul_exp e =
-   (Cil_datatype.ExpStructEq.compare e nul_exp) = 0
+  (Cil_datatype.ExpStructEq.compare e nul_exp) = 0
 
 module HL = Lval.Hashtbl
 
@@ -44,7 +44,7 @@ let clear_cache () =
   HE.clear cached_exp
 
 exception IsExp of exp
-    
+
 exception Direct_pointer_address of location
 
 let rec simplify_lval (h,o) =
@@ -63,7 +63,7 @@ and simplify_host h =
     if is_nul_exp simp_e
     then raise  (Direct_pointer_address e.eloc)
     else Mem simp_e
-    
+
 and simplify_offset o =
   match o with
     NoOffset -> NoOffset
@@ -152,7 +152,7 @@ struct
 
   let points_to x =
     match x with
-      BNone -> raise (Direct_pointer_address Location.unknown) 
+      BNone -> raise (Direct_pointer_address Location.unknown)
     | BAddrOf lv -> BLval lv
     | BLval lv ->
       BLval (Mem (Cil.dummy_exp (Lval lv)), NoOffset)
