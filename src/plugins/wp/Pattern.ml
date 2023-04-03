@@ -38,6 +38,7 @@ and node =
   | Range of int * int
   | Int of Integer.t
   | Bool of bool
+  | String of string
   | Assoc of assoc * ast list
   | Binop of ast * binop * ast
   | Call of string * ast list
@@ -115,6 +116,8 @@ let rec parse ctxt p =
   | PLfalse -> { loc ; value = Bool false }
   | PLconstant (IntConstant n) ->
     { loc ; value = Int (pinteger ctxt ~loc n) }
+  | PLconstant (StringConstant s) ->
+    { loc ; value = String s }
   | PLrange(Some a,Some b) when ctxt.value ->
     { loc ; value = Range(pbound ctxt a,pbound ctxt b) }
   | PLapp("\\concat",[],[]) -> { loc ; value = List [] }
@@ -181,6 +184,7 @@ let rec pp fmt (a : ast) =
   | Range(a,b) -> Format.fprintf fmt "(%d..%d)" a b
   | Int n -> Integer.pretty fmt n
   | Bool b -> Format.pp_print_string fmt (if b then "\\true" else "\\false")
+  | String s -> Format.fprintf fmt "%S" s
   | Assoc(`Add,[]) -> Format.pp_print_string fmt "0"
   | Assoc(`Mul,[]) -> Format.pp_print_string fmt "1"
   | Assoc(`Concat,[]) -> Format.pp_print_string fmt "[| |]"
@@ -482,6 +486,7 @@ let rec select (env : sigma) (a : value) =
   let cc = select env in
   match a.value with
   | Any ->  error ~loc "Pattern _ is not a value"
+  | String s -> error ~loc "String %S is not a value" s
   | Pvar x -> getvar env x
   | Named (_,v) -> cc v
   | Range(a,b) -> Tactical.range a b
@@ -514,5 +519,15 @@ and compose env ~loc id vs =
   match Tactical.compose id (List.map (select env) vs) with
   | Tactical.Empty -> error ~loc "Computer %S not found" id
   | result -> result
+
+let bool (a : value) =
+  match a.value with
+  | Bool b -> b
+  | _ -> error ~loc:a.loc "Not a boolean value (%a)" pp a
+
+let string (a : value) =
+  match a.value with
+  | String s -> s
+  | _ -> error ~loc:a.loc "Not a string value (%a)" pp a
 
 (* -------------------------------------------------------------------------- *)

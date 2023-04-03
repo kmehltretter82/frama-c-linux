@@ -125,7 +125,15 @@ let get_int = function
   | Compose(Cint a) -> get_int_z a
   | s ->
     match Lang.F.repr (selected s) with
-    | Qed.Logic.Kint z -> get_int_z z
+    | Kint z -> get_int_z z
+    | _ -> None
+
+let get_bool = function
+  | Empty -> None
+  | s ->
+    match Lang.F.repr (selected s) with
+    | True -> Some true
+    | False -> Some false
     | _ -> None
 
 let subclause clause p =
@@ -325,6 +333,13 @@ let composer ~id ~title ~descr ?(default=Empty) ?(filter=accept) () =
 let search ~id ~title ~descr ~browse ~find () =
   let fd = field ~id ~title ~descr ~default:None in
   fd , Search(fd,browse,find)
+
+let pident = function
+  | Checkbox fd -> ident fd
+  | Spinner(fd,_) -> ident fd
+  | Composer(fd,_) -> ident fd
+  | Selector(fd,_,_) -> ident fd
+  | Search(fd,_,_) -> ident fd
 
 (* -------------------------------------------------------------------------- *)
 (* --- Feedback                                                           --- *)

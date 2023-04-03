@@ -295,10 +295,104 @@ let provers = function
       | Some tm -> tm
       | None -> float @@ Wp_parameters.Timeout.get ()
     end
-  | _ -> [],0.0
+  | Strategy _ | Tactic _ | Auto _ -> [],0.0
 
 let fallback = function
   | Strategy s -> resolve s
-  | _ -> None
+  | Tactic _ | Auto _ | Provers _ -> None
+
+(* -------------------------------------------------------------------------- *)
+(* --- Strategy Tactical Step                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let tactical a =
+  try Tactical.lookup ~id:a.value with Not_found ->
+    Wp_parameters.error ~source:(fst a.loc) ~once:true
+      "Tactical '%s' not found (skipped alternative)." a.value ;
+    raise Not_found
+
+let parameter (t : Tactical.tactical) a =
+  try List.find (fun p -> Tactical.pident p = a.value) t#params
+  with Not_found ->
+    Wp_parameters.error ~source:(fst a.loc) ~once:true
+      "Parameter '%s' not found (skipped alternative)." a.value ;
+    raise Not_found
+
+let configure tactic sigma (a,v) =
+  match parameter tactic a with
+  | Checkbox fd ->
+    begin
+      try tactic#set_field fd (Pattern.bool v)
+      with Not_found ->
+        Wp_parameters.error ~source:(fst a.loc)
+          "Expected boolean for parameter '%s' (%a)" a.value
+          Pattern.pp_value v ;
+        raise Not_found
+    end
+  | Spinner(fd,_) ->
+    begin
+      let value = Pattern.select sigma v in
+      match Tactical.get_int value with
+      | Some v -> tactic#set_field fd v
+      | None ->
+        Wp_parameters.error ~source:(fst a.loc)
+          "Expected integer for parameter '%s' (%a)" a.value
+          Tactical.pp_selection value ;
+        raise Not_found
+    end
+  | Composer(fd,_) -> tactic#set_field fd (Pattern.select sigma v)
+  | Selector(fd,vs,_) ->
+    begin
+      try
+        let id = Pattern.string v in
+        let v = List.find (fun v -> v.Tactical.vid = id) vs in
+        tactic#set_field fd v.value
+      with Not_found ->
+        Wp_parameters.error ~source:(fst a.loc)
+          "Expected string for parameter '%s' (%a)" a.value
+          Pattern.pp_value v ;
+        raise Not_found
+    end
+  | Search(_,_,lookup) ->
+    begin
+      try
+        let id = Pattern.string v in
+        let _v = lookup id in
+        (*TODO: tactic#set_field fd v *)
+        assert false
+      with Not_found ->
+        Wp_parameters.error ~source:(fst a.loc)
+          "Expected string for parameter '%s' (%a)" a.value
+          Pattern.pp_value v ;
+        raise Not_found
+    end
+
+let rec bind sigma sequent = function
+  | [] -> sigma
+  | lookup::binders ->
+    match Pattern.psequent lookup sigma sequent with
+    | None -> raise Not_found
+    | Some sigma -> bind sigma sequent binders
+
+let tactic tree node = function
+  | Strategy _ | Auto _ | Provers _ -> None
+  | Tactic t ->
+    try
+      let tactic = tactical t.tactic in
+      let pool = ProofEngine.pool tree in
+      let title = tactic#title in
+      let ctxt = ProofEngine.node_context node in
+      let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
+      let console = new ProofScript.console ~pool ~title in
+      WpContext.on_context ctxt
+        begin fun () ->
+          let sigma = bind Pattern.empty sequent t.lookup in
+          List.iter (configure tactic sigma) t.params ;
+          ignore console ;
+          None
+        end ()
+    with Not_found -> None
+
+let () = ignore tactic
 
 (* -------------------------------------------------------------------------- *)

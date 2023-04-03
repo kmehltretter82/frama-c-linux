@@ -54,6 +54,7 @@ val range : int -> int -> selection
 val compose : string -> selection list -> selection
 val multi : selection list -> selection
 val get_int : selection -> int option
+val get_bool : selection -> bool option
 val destruct : selection -> selection list
 
 val head : clause -> pred
@@ -99,6 +100,7 @@ type parameter =
 val ident : 'a field -> string
 val default : 'a field -> 'a
 val signature : 'a field -> 'a named
+val pident : parameter -> string
 
 val checkbox :
   id:string -> title:string -> descr:string ->

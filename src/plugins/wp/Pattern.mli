@@ -66,4 +66,10 @@ val psequent : lookup -> sigma -> Conditions.sequent -> sigma option
 (** Composing values from matching results *)
 val select : sigma -> value -> Tactical.selection
 
+(** Composing a boolean *)
+val bool : value -> bool
+
+(** Composing a string *)
+val string : value -> string
+
 (* -------------------------------------------------------------------------- *)

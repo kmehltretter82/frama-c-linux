@@ -290,7 +290,7 @@ let jtactic ?strategy (tac : tactical) (sel : selection) =
     tactic = tac#id ;
     params = json_of_parameters tac ;
     select = json_of_selection sel ;
-    strategy = Option.map ProofStrategy.name strategy ;
+    strategy ;
   }
 
 let json_of_tactic t js =
