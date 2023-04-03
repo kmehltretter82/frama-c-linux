@@ -629,11 +629,11 @@ let rec join_without_check (x:t) (v1:V.t) (v2:V.t) : t =
       Options.fatal "invariant broken"
 
 (* since the recursive version of join, unify, unify2 and merge may break the invariants *)
-let join ?(without_check = false) (x:t) (v1:V.t) (v2:V.t) : t =
+let join (x:t) (v1:V.t) (v2:V.t) : t =
   Options.debug ~level:7 "graph before join(%d,%d) @.%a@." v1 v2 print_debug x;
-  if not without_check then assert_invariants x;
+  assert_invariants x;
   let res = join_without_check x v1 v2 in
-  if not without_check then assert_invariants x;
+  assert_invariants res;
   Options.debug ~level:7 "graph after join(%d,%d) @.%a@." v1 v2 print_debug res;
   res
 
