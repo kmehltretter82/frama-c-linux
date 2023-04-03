@@ -270,7 +270,7 @@ let print_aliases fmt (x:t) =
 let assert_invariants (x:t) : unit =
   (* check that all vertex of the graph have entries in vmap,
      and are integer between 0 and node_counter, and have at most 1 successor *)
-  if !node_counter < 0 then Options.fatal "int overflow in Abstract_state.node_counter";
+  assert (!node_counter >= 0);
   let assert_vertex (v:V.t) =
     assert (v >= 0);
     assert (v < !node_counter);
@@ -293,6 +293,9 @@ let assert_invariants (x:t) : unit =
     assert (LSet.fold (fun lv acc -> acc && V.equal (LLMap.find lv x.lmap) v) ls true)
   in
   VMap.iter assert_vmap x.vmap
+
+(* Ensure that assert_invariants is not executed if the -noassert flag is supplied. *)
+let assert_invariants x = assert (assert_invariants x; true)
 
 let pretty ?(debug=false) fmt (x:t) =
   if debug then
