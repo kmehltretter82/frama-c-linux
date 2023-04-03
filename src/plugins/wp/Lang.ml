@@ -308,13 +308,18 @@ let datatype ~library name =
   let m = new_extern ~link:name ~library ~debug:name in
   Mtype m
 
+
+let field_observers = ref []
+let field_observe fd = List.iter (fun k -> k fd) !field_observers ; fd
+let on_field f = field_observers := f :: !field_observers
+
+let cfield ?(kind=KValue) fd = field_observe @@ Cfield(fd,kind)
+
 let record ~link ~library fts =
   let m = new_extern ~link ~library ~debug:link in
   let r = { fields = [] } in
-  let fs = List.map (fun (f,t) -> Mfield(m,r,f,t)) fts in
+  let fs = List.map (fun (f,t) -> field_observe @@ Mfield(m,r,f,t)) fts in
   r.fields <- fs ; Mrecord(m,r)
-
-let cfield ?(kind=KValue) fd = Cfield(fd,kind)
 
 let field t f =
   match t with

@@ -55,9 +55,7 @@ let rec insert_group cc = function
       group :: insert_group cc others
 
 let add_computer id cc =
-  if Tmap.mem id !composers || Tmap.mem id !computers then
-    Wp_parameters.failure "Computer #%s already registered (skipped)" id
-  else
+  if not (Tmap.mem id !computers) then
     computers := Tmap.add id cc !computers
 
 let add_composer (c : #composer) =

@@ -173,8 +173,20 @@ type lookup = {
 type sigma = Tactical.selection Vmap.t
 
 (* -------------------------------------------------------------------------- *)
-(* --- Value Extracting                                                   --- *)
+(* --- Composing Values                                                   --- *)
 (* -------------------------------------------------------------------------- *)
+
+let () = Lang.on_lfun
+    begin fun lf ->
+      let id = "lf:" ^ Lang.name_of_lfun lf in
+      Tactical.add_computer id (Lang.F.e_fun lf)
+    end
+
+let () = Lang.on_field
+    begin fun fd ->
+      let id = "fd:" ^ Lang.name_of_field fd in
+      Tactical.add_computer id (fun es -> Lang.F.e_getfield (List.hd es) fd)
+    end
 
 let error ~loc msg =
   Wp_parameters.logwith (fun _evt -> raise Not_found) ~source:(fst loc) msg

@@ -110,6 +110,7 @@ val adt : logic_type_info -> adt (** Must not be a builtin *)
 type balance = Nary | Left | Right
 
 val on_lfun : (lfun -> unit) -> unit
+val on_field : (field -> unit) -> unit
 
 val acsl : logic_info -> lfun
 val ctor : logic_ctor_info -> lfun
