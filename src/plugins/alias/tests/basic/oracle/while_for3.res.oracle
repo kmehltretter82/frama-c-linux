@@ -1,24 +1,24 @@
 [kernel] Parsing while_for3.c (with preprocessing)
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *a = (int *)0;
 [alias] analysing instruction: int *b = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *b = (int *)0;
 [alias] analysing instruction: int *c = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *c = (int *)0;
 [alias] analysing instruction: int i = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int i = 0;
 [alias] analysing instruction: a = b;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: a = b;
   {a, b} are aliased
 [alias] analysing instruction: __Cont: i ++;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __Cont: i ++;
   {a, b} are aliased
 [alias] analysing instruction: a = b;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: a = b;
   {a, b} are aliased
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __retres = 0;
   {a, b} are aliased
 [alias] May-aliases at the end of function main:
   {a, b} are aliased

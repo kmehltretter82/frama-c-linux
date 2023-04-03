@@ -1,21 +1,21 @@
 [kernel] Parsing array1.c (with preprocessing)
 [alias] analysing function: main
 [alias] analysing instruction: tab[0] = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: tab[0] = 0;
 [alias] analysing instruction: tab[1] = 1;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: tab[1] = 1;
 [alias] analysing instruction: tab[2] = tab[1] + 1;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: tab[2] = tab[1] + 1;
 [alias] analysing instruction: int *x = & tab[1];
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *x = & tab[1];
 [alias] analysing instruction: int *y = & tab[2];
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *y = & tab[2];
   {x, y} are aliased
 [alias] analysing instruction: tab[3] = *x + *y;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: tab[3] = *x + *y;
   {x, y} are aliased
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __retres = 0;
   {x, y} are aliased
 [alias] May-aliases at the end of function main:
   {x, y} are aliased

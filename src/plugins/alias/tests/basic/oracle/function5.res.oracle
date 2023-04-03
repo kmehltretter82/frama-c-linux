@@ -1,27 +1,27 @@
 [kernel] Parsing function5.c (with preprocessing)
 [alias] analysing function: choice
 [alias] analysing instruction: int c = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int c = 0;
 [alias] analysing instruction: __retres = x;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __retres = x;
   {x, __retres} are aliased
 [alias] analysing instruction: __retres = y;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __retres = y;
   {y, __retres} are aliased
 [alias] May-aliases at the end of function choice:
   {x, y, __retres} are aliased
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *a = (int *)0;
 [alias] analysing instruction: int *b = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *b = (int *)0;
 [alias] analysing instruction: int *c = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *c = (int *)0;
 [alias] analysing instruction: c = choice(a,b);
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: c = choice(a,b);
   {a, b, c} are aliased
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __retres = 0;
   {a, b, c} are aliased
 [alias] May-aliases at the end of function main:
   {a, b, c} are aliased

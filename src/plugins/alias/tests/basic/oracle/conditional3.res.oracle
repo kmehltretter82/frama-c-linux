@@ -1,49 +1,49 @@
 [kernel] Parsing conditional3.c (with preprocessing)
 [alias] analysing function: main
 [alias] analysing instruction: a = b;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: a = b;
   {a, b} are aliased
 [alias] analysing instruction: b = & i;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: b = & i;
   {a, b} are aliased
   {*a, *b, i} are aliased
 [alias] analysing instruction: i = & x;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: i = & x;
   {a, b} are aliased
   {*a, *b, i} are aliased
   {*(*a), *(*b), *i, x} are aliased
 [alias] analysing instruction: x = & t;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: x = & t;
   {a, b} are aliased
   {*a, *b, i} are aliased
   {*(*a), *(*b), *i, x} are aliased
   {*(*(*a)), *(*(*b)), *(*i), *x, t} are aliased
 [alias] analysing instruction: a = c;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: a = c;
   {a, c} are aliased
 [alias] analysing instruction: c = & j;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: c = & j;
   {a, c} are aliased
   {*a, *c, j} are aliased
 [alias] analysing instruction: j = & y;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: j = & y;
   {a, c} are aliased
   {*a, *c, j} are aliased
   {*(*a), *(*c), *j, y} are aliased
 [alias] analysing instruction: y = & u;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: y = & u;
   {a, c} are aliased
   {*a, *c, j} are aliased
   {*(*a), *(*c), *j, y} are aliased
   {*(*(*a)), *(*(*c)), *(*j), *y, u} are aliased
 [alias] analysing instruction: p = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: p = 0;
   {a, b, c} are aliased
   {*a, *b, *c, i, j} are aliased
   {*(*a), *(*b), *(*c), *i, *j, x, y} are aliased
   {*(*(*a)), *(*(*b)), *(*(*c)), *(*i), *(*j), *x, *y, t, u} are aliased
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __retres = 0;
   {a, b, c} are aliased
   {*a, *b, *c, i, j} are aliased
   {*(*a), *(*b), *(*c), *i, *j, x, y} are aliased

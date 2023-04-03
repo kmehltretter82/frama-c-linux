@@ -49,17 +49,17 @@
 [alias] May-aliases at the end of function lrand48:
 [alias] analysing function: main
 [alias] analysing instruction: int *s = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *s = (int *)0;
 [alias] analysing instruction: int idx = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int idx = 0;
 [alias] analysing instruction: s = (int *)malloc((size_t)idx);
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: s = (int *)malloc((size_t)idx);
 [alias] analysing instruction: idx ++;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: idx ++;
 [alias] analysing instruction: s = (int *)malloc((size_t)idx);
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: s = (int *)malloc((size_t)idx);
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __retres = 0;
 [alias] May-aliases at the end of function main:
 [alias] analysing function: malloc
 [alias] May-aliases at the end of function malloc:

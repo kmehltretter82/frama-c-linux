@@ -1,28 +1,28 @@
 [kernel] Parsing conditional2.c (with preprocessing)
 [alias] analysing function: main
 [alias] analysing instruction: b = & c;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: b = & c;
   {*b, c} are aliased
 [alias] analysing instruction: c = & d;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: c = & d;
   {*b, c} are aliased
   {*(*b), *c, d} are aliased
 [alias] analysing instruction: d = & e;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: d = & e;
   {*b, c} are aliased
   {*(*b), *c, d} are aliased
 [alias] analysing instruction: a = b;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: a = b;
   {*a, *b, c} are aliased
   {*(*a), *(*b), *c, d} are aliased
   {a, b} are aliased
 [alias] analysing instruction: a = & c;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: a = & c;
   {*a, *b, c} are aliased
   {*(*a), *(*b), *c, d} are aliased
   {a, b} are aliased
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __retres = 0;
   {*a, *b, c} are aliased
   {*(*a), *(*b), *c, d} are aliased
   {a, b} are aliased

@@ -149,8 +149,10 @@ let pp_abstract_state_opt ?(debug=false) fmt v =
 let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   Options.feedback ~level:3 "analysing instruction: %a" Printer.pp_stmt s;
   let result = analyse_instr s i a in
-  Options.feedback ~level:3 "May-aliases at the end of instruction:@.%a@." (pp_abstract_state_opt ~debug:false) result;
-  Options.debug ~level:3 "May-alias graph at the end of instruction:@.%a@." (pp_abstract_state_opt ~debug:true) result;
+  Options.feedback ~level:3 "May-aliases at the end of instruction: %a@.%a@."
+    Printer.pp_stmt s (pp_abstract_state_opt ~debug:false) result;
+  Options.debug ~level:3 "May-alias graph at the end of instruction: %a@.%a@."
+    Printer.pp_stmt s (pp_abstract_state_opt ~debug:true) result;
   result
 
 
