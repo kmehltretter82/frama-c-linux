@@ -353,13 +353,12 @@ let configure tactic sigma (a,v) =
           Pattern.pp_value v ;
         raise Not_found
     end
-  | Search(_,_,lookup) ->
+  | Search(fd,_,lookup) ->
     begin
       try
         let id = Pattern.string v in
-        let _v = lookup id in
-        (*TODO: tactic#set_field fd v *)
-        assert false
+        let v = lookup id in
+        tactic#set_field fd (Some v)
       with Not_found ->
         Wp_parameters.error ~source:(fst a.loc)
           "Expected string for parameter '%s' (%a)" a.value

@@ -211,10 +211,7 @@ let json_of_named = function
 let named_of_json find js =
   try
     let vid = js >? "id" |> Json.string in
-    let title = js >? "title" |> Json.string in
-    let descr = js >? "descr" |> Json.string in
-    let value = find vid in
-    Some Tactical.{ vid ; title ; descr ; value }
+    Some (find vid)
   with Not_found | Invalid_argument _ -> None
 
 (* -------------------------------------------------------------------------- *)

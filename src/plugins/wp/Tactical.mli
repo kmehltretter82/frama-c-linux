@@ -89,13 +89,14 @@ end
 type 'a named = { title : string ; descr : string ; vid : string ; value : 'a }
 type 'a range = { vmin : 'a option ; vmax : 'a option ; vstep : 'a }
 type 'a browser = ('a named -> unit) -> selection -> unit
+type 'a finder = string -> 'a named
 
 type parameter =
   | Checkbox of bool field
   | Spinner  of int field * int range
   | Composer of selection field * (Lang.F.term -> bool)
   | Selector : 'a field * 'a named list * ('a -> 'a -> bool) -> parameter
-  | Search : 'a named option field * 'a browser * (string -> 'a) -> parameter
+  | Search : 'a named option field * 'a browser * 'a finder -> parameter
 
 val ident : 'a field -> string
 val default : 'a field -> 'a
@@ -136,7 +137,7 @@ val composer :
 val search :
   id:string -> title:string -> descr:string ->
   browse:('a browser) ->
-  find:(string -> 'a) ->
+  find:('a finder) ->
   unit -> 'a named option field * parameter
 (** Search field.
     - [browse s n] is the lookup function, used in the GUI only.
