@@ -270,7 +270,7 @@ let print_aliases fmt (x:t) =
 let assert_invariants (x:t) : unit =
   (* check that all vertex of the graph have entries in vmap,
      and are integer between 0 and node_counter, and have at most 1 successor *)
-  if !node_counter < 0 then Options.fatal "int overflow in Abstract_state.node_counter";
+  assert (!node_counter >= 0);
   let assert_vertex (v:V.t) =
     assert (v >= 0);
     assert (v < !node_counter);
@@ -294,6 +294,9 @@ let assert_invariants (x:t) : unit =
   in
   VMap.iter assert_vmap x.vmap
 
+(* Ensure that assert_invariants is not executed if the -noassert flag is supplied. *)
+let assert_invariants x = assert (assert_invariants x; true)
+
 let pretty ?(debug=false) fmt (x:t) =
   if debug then
     try
@@ -302,12 +305,6 @@ let pretty ?(debug=false) fmt (x:t) =
     with Assert_failure _ -> print_debug fmt x
   else
     print_aliases fmt x
-
-let assert_state_transformation (x:t) (f: t -> t) : t =
-  assert_invariants x;
-  let result = f x in
-  assert_invariants result;
-  result
 
 (** .dot printing functions*)
 let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
@@ -458,7 +455,7 @@ let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
       NoOffset, _ -> o2
     | Field (_,o1), Field(_,o2) -> f_diff_offset o1 o2
     | Index (_,o1), Index(_,o2) -> f_diff_offset o1 o2
-    | _ -> assert false
+    | _ -> Options.fatal "%s: unexpected case" __LOC__
   in
   let _, o1 = Lval.removeOffsetLval lv1
   and _, o2 = Lval.removeOffsetLval lv2
@@ -571,13 +568,15 @@ let find_vertex lv x =
 
 (* remove a lval from a graph*)
 let remove_lval (x:t)  (lv:Lval.t) :t =
-  assert_state_transformation x @@ fun x ->
+  assert_invariants x;
   try
     let v = LLMap.find lv x.lmap in
     let setv= VMap.find v x.vmap in
     let new_lmap = LLMap.remove lv x.lmap in
     let new_vmap = VMap.add v (LSet.remove lv setv) x.vmap in
-    {x with lmap = new_lmap; vmap = new_vmap}
+    let result = {x with lmap = new_lmap; vmap = new_vmap} in
+    assert_invariants result;
+    result
   with
     Not_found -> x
 
@@ -633,11 +632,11 @@ let rec join_without_check (x:t) (v1:V.t) (v2:V.t) : t =
       Options.fatal "invariant broken"
 
 (* since the recursive version of join, unify, unify2 and merge may break the invariants *)
-let join ?(without_check = false) (x:t) (v1:V.t) (v2:V.t) : t =
+let join (x:t) (v1:V.t) (v2:V.t) : t =
   Options.debug ~level:7 "graph before join(%d,%d) @.%a@." v1 v2 print_debug x;
-  if not without_check then assert_invariants x;
+  assert_invariants x;
   let res = join_without_check x v1 v2 in
-  if not without_check then assert_invariants x;
+  assert_invariants res;
   Options.debug ~level:7 "graph after join(%d,%d) @.%a@." v1 v2 print_debug res;
   res
 
@@ -764,7 +763,7 @@ let is_empty s =
 
 (* add an int to all vertex values *)
 let shift (a : t) : t =
-  assert_state_transformation a @@ fun a ->
+  assert_invariants a;
   if is_empty a then a else
     let () = Options.debug ~level:8 "before shift: node_counter=%d@.%a@." !node_counter print_debug a in
     let min_idx, _ = VMap.min_binding a.vmap in
@@ -783,6 +782,7 @@ let shift (a : t) : t =
        vmap = shift_vmap (fun (key, l) -> (shift key, l)) vmap}
     in
     let () = Options.debug ~level:8 "after shift: node_counter=%d@.%a@." !node_counter print_debug result in
+    assert_invariants result;
     result
 
 let lmap_intersect l r =

@@ -88,7 +88,7 @@ include S
 val assert_invariants : t -> unit
 
 (** Functions for Steensgaard's algorithm, see the paper *)
-val join : ?without_check:bool -> t -> G.V.t -> G.V.t -> t
+val join : t -> G.V.t -> G.V.t -> t
 
 val cjoin : t -> G.V.t -> G.V.t -> t
 

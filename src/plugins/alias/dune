@@ -30,6 +30,13 @@
   )
 )
 
+( env
+  (release
+   (ocamlc_flags -noassert)
+   (ocamlopt_flags -noassert)
+  )
+)
+
 ( library
   (name Alias)
   (public_name frama-c-alias.core)
