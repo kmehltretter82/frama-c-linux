@@ -46,15 +46,22 @@ and node =
   | Field of ast * string
   | Get of ast * ast
   | Set of ast * ast * ast
-and assoc = [ `Add | `Mul ]
+and assoc = [ `Add | `Mul | `Concat ]
 and binop = [ `Div | `Mod | `Repeat | `Eq | `Lt | `Le | `Ne ]
 
+let unroll op = function
+  | { value = Assoc(f,xs) } when f = op -> xs
+  | e -> [e]
+
 let assoc op a b =
-  let unroll = function Assoc(f,xs) when f = op -> xs | _ -> [a]
-  in {
+  {
     loc = fst a.loc, snd b.loc ;
-    value = Assoc(op,unroll a.value @ unroll b.value) ;
+    value = Assoc(op,unroll op a @ unroll op b) ;
   }
+
+let concat ~loc es =
+  let es = List.map (unroll `Concat) es in
+  { loc ; value = Assoc(`Concat, List.concat es) }
 
 module Vmap = Map.Make(String)
 
@@ -110,6 +117,9 @@ let rec parse ctxt p =
     { loc ; value = Int (pinteger ctxt ~loc n) }
   | PLrange(Some a,Some b) when ctxt.value ->
     { loc ; value = Range(pbound ctxt a,pbound ctxt b) }
+  | PLapp("\\concat",[],[]) -> { loc ; value = List [] }
+  | PLapp("\\concat",[],ps) -> concat ~loc @@ List.map (parse ctxt) ps
+  | PLapp("\\repeat",[],[p;q]) -> parse_binop ctxt ~loc `Repeat p q
   | PLapp(lf,[],ps) ->
     { loc ; value = Call(lf,List.map (parse ctxt) ps) }
   | PLunop(Uminus,a) ->
@@ -173,8 +183,9 @@ let rec pp fmt (a : ast) =
   | Bool b -> Format.pp_print_string fmt (if b then "\\true" else "\\false")
   | Assoc(`Add,[]) -> Format.pp_print_string fmt "0"
   | Assoc(`Mul,[]) -> Format.pp_print_string fmt "1"
+  | Assoc(`Concat,[]) -> Format.pp_print_string fmt "[| |]"
   | Assoc(op,v::vs) ->
-    let op = match op with `Add -> '+' | `Mul -> '*' in
+    let op = match op with `Add -> '+' | `Mul -> '*' | `Concat -> '^' in
     Format.fprintf fmt "@[<hov 2>(%a" pp v ;
     List.iter (Format.fprintf fmt "@ %c %a" op pp) vs ;
     Format.fprintf fmt ")@]"
@@ -186,7 +197,7 @@ let rec pp fmt (a : ast) =
       | `Ne -> "!="
       | `Lt -> "<"
       | `Le -> "<="
-      | `Repeat -> "@^"
+      | `Repeat -> "*^"
     in Format.fprintf fmt "@[<hov 2>(%a@ %s %a)@]" pp a op pp b
   | Times(k,v) -> Format.fprintf fmt "%a*%a" Integer.pretty k pp v
   | Get(a,k) -> Format.fprintf fmt "@[<hov 2>%a[@,%a]@]" pp a pp k
@@ -207,6 +218,139 @@ let pp_value = pp
 let pp_pattern = pp
 
 (* -------------------------------------------------------------------------- *)
+(* --- Pattern Matching                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+type sigma = Tactical.selection Vmap.t
+type env = {
+  mutable sigma : sigma ;
+  select : Lang.F.term -> Tactical.selection ;
+}
+
+let merge env (x : pvar) e =
+  try
+    let s = Vmap.find x.value env.sigma in
+    let v = Tactical.selected s in
+    if not (Lang.F.equal v e) then
+      raise Not_found
+  with Not_found ->
+    env.sigma <- Vmap.add x.value (env.select e) env.sigma
+
+let rec is_any (p : pattern) =
+  match p.value with
+  | Any | Pvar _ -> true
+  | Named(_,q) -> is_any q
+  | _ -> false
+
+let rec pmatch env (p : pattern) e =
+  match p.value , Lang.F.repr e with
+  | Any , _ -> ()
+  | Pvar x , _ -> merge env x e
+  | Named(x,p) , _ -> merge env x e ; pmatch env p e
+  | Range(a,b) , Kint n ->
+    begin
+      match Integer.to_int_opt n with
+      | Some v when a <= v && v <= b -> ()
+      | _ -> raise Not_found
+    end
+  | Bool true , True -> ()
+  | Bool false , False -> ()
+  | Assoc(`Add,ps) , Add es -> pac env Lang.F.e_sum [] ps es
+  | Assoc(`Mul,ps) , Mul es -> pac env Lang.F.e_prod [] ps es
+  | Binop(p,`Div,q) , Div(a,b) -> pbinop env p q a b
+  | Binop(p,`Eq,q) , Div(a,b) -> pbinop env p q a b
+  | Binop(p,`Ne,q) , Div(a,b) -> pbinop env p q a b
+  | Binop(p,`Lt,q) , Div(a,b) -> pbinop env p q a b
+  | Binop(p,`Le,q) , Div(a,b) -> pbinop env p q a b
+  | Times(b,p) , Times(a,e) ->
+    let q,r = Integer.c_div_rem a b in
+    if Integer.is_zero r then pmatch env p (Lang.F.e_times q e)
+    else raise Not_found
+  | Get(pa,pk) , Aget(a,k) ->
+    pmatch env pa a ; pmatch env pk k
+  | Set(pa,pk,pv) , Aset(a,k,v) ->
+    pmatch env pa a ; pmatch env pk k ; pmatch env pv v
+  | Field(pv,fid) , Rget(v,fd) when Lang.name_of_field fd = fid ->
+    pmatch env pv v
+  | Call(fid,ps) , Fun(lf,es) when Lang.name_of_lfun lf = fid ->
+    begin
+      match Lang.Fun.category lf with
+      | Operator op ->
+        if op.associative then
+          if op.commutative then
+            pac env (Lang.F.e_fun lf) ps [] es
+          else
+            passoc env (Lang.F.e_fun lf) [] ps [] es
+        else
+          pargs env ps es
+      | _ -> pargs env ps es
+    end
+  | Binop(pl,`Repeat,pn) , Fun(lf,[l;n]) when lf == Vlist.f_repeat ->
+    pmatch env pl l ; pmatch env pn n
+  | List _vs , _ -> ()
+  | _ -> raise Not_found
+
+and pbinop env p q a b = pmatch env p a ; pmatch env q b
+
+(* Associative matching :
+   - rps are (reversed) any-patterns to be matched with (reversed) rvs values
+   - invariant is (rev rps @ ps) being matched with (rev rvs @ vs) *)
+and passoc env op rps ps rvs vs =
+  match ps with
+  | [] -> pany env op (List.rev rps) (List.rev_append rvs vs)
+  | p::ps ->
+    if is_any p then passoc env op (p::rps) ps rvs vs
+    else
+      match vs with
+      | [] -> raise Not_found
+      | v::vs ->
+        if ptry env p v then
+          begin
+            pany env op (List.rev rps) (List.rev rvs) ;
+            passoc env op [] ps [] vs
+          end
+        else
+          passoc env op rps ps (v::rvs) vs
+
+(* AC matching:
+   - rps are (reversed) any-patterns
+   - invariant is (rev rs @ ps) being matched with es *)
+and pac env op rs ps es =
+  match ps with
+  | p::ps ->
+    if is_any p then pac env op (p::rs) ps es
+    else
+      let ep = List.find (ptry env p) es in
+      let es = List.filter (fun e -> not @@ Lang.F.equal ep e) es in
+      pac env op rs ps es
+  | [] -> pany env op (List.rev rs) es
+
+(* Match with backtracking *)
+and ptry env p e =
+  let s0 = env.sigma in
+  try pmatch env p e ; true
+  with Not_found -> env.sigma <- s0 ; false
+
+(* Matching any-patterns rs with es *)
+and pany env op rs es =
+  match rs , es with
+  | [] , [] -> ()
+  | rs , [] ->
+    let e = op [] in
+    List.iter (fun r -> pmatch env r e) rs
+  | r::rs , e::es -> pmatch env r e ; pany env op rs es
+  | [] , _::_ -> raise Not_found
+
+(* Pairwise matching *)
+and pargs env ps es =
+  match ps , es with
+  | [] , [] -> ()
+  | p::ps , e::es -> pmatch env p e ; pargs env ps es
+  | _ -> raise Not_found
+
+let () = ignore pmatch
+
+(* -------------------------------------------------------------------------- *)
 (* --- Pattern Lookup                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -216,8 +360,6 @@ type lookup = {
   hyps: bool ;
   pattern: pattern ;
 }
-
-type sigma = Tactical.selection Vmap.t
 
 (* -------------------------------------------------------------------------- *)
 (* --- Composing Values                                                   --- *)
@@ -257,6 +399,7 @@ let rec select (env : sigma) (a : value) =
     let op = match op with
       | `Add -> "wp:add"
       | `Mul -> "wp:mul"
+      | `Concat -> "wp:concat"
     in Tactical.compose op (List.map (cc) vs)
   | Binop(a,op,b) ->
     let op = match op with
