@@ -714,7 +714,7 @@ let assignment (a:t) (lv:lval) (e:exp) : t =
     end
   with
     Direct_pointer_address l ->
-    Options.warning "%a Unsupported feature: direct pointer address. The assignment is ignored (analysis continues but may be unsound)" Location.pretty l;
+    Options.warning ~source:(fst l) ~wkey:Options.Warn.unsupported_address "Unsupported feature: explicit pointer address. The assignment is ignored (analysis continues but may be unsound)";
     a
 
 (* assignment x = allocate(y) *)
@@ -728,7 +728,7 @@ let assignment_x_allocate_y (a:t) (lv:lval) : t =
     assert_invariants new_a ; new_a
   with
     Direct_pointer_address l ->
-    Options.warning "%a Unsupported feature: direct pointer address. The assignment is ignored (analysis continues but may be unsound)" Location.pretty l;
+    Options.warning ~source:(fst l) ~wkey:Options.Warn.unsupported_address "Unsupported feature: explicit pointer address. The assignment is ignored (analysis continues but may be unsound)";
     a
 
 exception Not_included

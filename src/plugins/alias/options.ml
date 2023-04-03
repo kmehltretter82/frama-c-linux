@@ -65,6 +65,7 @@ module Warn = struct
   let unsupported_function = register_warn_category "unsupported:fn"
   let undefined_function = register_warn_category "undefined:fn"
   let no_return_stmt = register_warn_category "no-return"
+  let unsupported_address = register_warn_category "unsupported:addr" 
 end
 
 module DebugKeys = struct
