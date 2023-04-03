@@ -318,6 +318,18 @@ let parameter (t : Tactical.tactical) a =
       "Parameter '%s' not found (skipped alternative)." a.value ;
     raise Not_found
 
+let rec bind sigma sequent = function
+  | [] -> sigma
+  | lookup::binders ->
+    match Pattern.psequent lookup sigma sequent with
+    | None -> raise Not_found
+    | Some sigma -> bind sigma sequent binders
+
+let select sigma = function
+  | [] -> Tactical.Empty
+  | [v] -> Pattern.select sigma v
+  | vs -> Tactical.Multi (List.map (Pattern.select sigma) vs)
+
 let configure tactic sigma (a,v) =
   match parameter tactic a with
   | Checkbox fd ->
@@ -336,7 +348,7 @@ let configure tactic sigma (a,v) =
       | Some v -> tactic#set_field fd v
       | None ->
         Wp_parameters.error ~source:(fst a.loc)
-          "Expected integer for parameter '%s' (%a)" a.value
+          "Expected integer for parameter '%s'@ (%a)" a.value
           Tactical.pp_selection value ;
         raise Not_found
     end
@@ -349,7 +361,7 @@ let configure tactic sigma (a,v) =
         tactic#set_field fd v.value
       with Not_found ->
         Wp_parameters.error ~source:(fst a.loc)
-          "Expected string for parameter '%s' (%a)" a.value
+          "Expected string for parameter '%s'@ (%a)" a.value
           Pattern.pp_value v ;
         raise Not_found
     end
@@ -361,17 +373,10 @@ let configure tactic sigma (a,v) =
         tactic#set_field fd (Some v)
       with Not_found ->
         Wp_parameters.error ~source:(fst a.loc)
-          "Expected string for parameter '%s' (%a)" a.value
+          "Expected string for parameter '%s'@ (%a)" a.value
           Pattern.pp_value v ;
         raise Not_found
     end
-
-let rec bind sigma sequent = function
-  | [] -> sigma
-  | lookup::binders ->
-    match Pattern.psequent lookup sigma sequent with
-    | None -> raise Not_found
-    | Some sigma -> bind sigma sequent binders
 
 let tactic tree node = function
   | Strategy _ | Auto _ | Provers _ -> None
@@ -383,13 +388,28 @@ let tactic tree node = function
       let ctxt = ProofEngine.node_context node in
       let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
       let console = new ProofScript.console ~pool ~title in
-      WpContext.on_context ctxt
-        begin fun () ->
-          let sigma = bind Pattern.empty sequent t.lookup in
-          List.iter (configure tactic sigma) t.params ;
-          ignore console ;
-          None
-        end ()
+      let children = WpContext.on_context ctxt
+          begin fun () ->
+            let sigma = bind Pattern.empty sequent t.lookup in
+            List.iter (configure tactic sigma) t.params ;
+            let selection = select sigma t.select in
+            match tactic#select console selection with
+            | exception _ | Not_applicable ->
+              Wp_parameters.error ~source:(fst t.tactic.loc)
+                "Tactical '%s' not applicable on selection@ (%a)"
+                t.tactic.value Tactical.pp_selection selection ;
+              raise Not_found
+            | Not_configured ->
+              Wp_parameters.error ~source:(fst t.tactic.loc)
+                "Tactical '%s' configuration error"
+                t.tactic.value ;
+              raise Not_found
+            | Applicable process ->
+              let script = ProofScript.jtactic tactic selection in
+              let fork = ProofEngine.fork tree ~anchor:node script process in
+              snd @@ ProofEngine.commit fork
+          end ()
+      in Some children
     with Not_found -> None
 
 let () = ignore tactic
