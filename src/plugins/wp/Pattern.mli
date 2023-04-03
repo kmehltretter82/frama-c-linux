@@ -47,6 +47,11 @@ val pa_pattern : context -> lexpr -> pattern
 (** Parse value according to the environement *)
 val pa_value : context -> lexpr -> value
 
+(** Pattern printer *)
+val pp_pattern : Format.formatter -> pattern -> unit
+
+(** Value printer *)
+val pp_value : Format.formatter -> value -> unit
 
 (** Matching result *)
 type sigma

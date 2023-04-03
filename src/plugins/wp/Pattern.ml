@@ -160,6 +160,53 @@ let pa_pattern ctxt p = ctxt.value <- false ; parse ctxt p
 let pa_value ctxt p = ctxt.value <- true ; parse ctxt p
 
 (* -------------------------------------------------------------------------- *)
+(* --- Pretty                                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let rec pp fmt (a : ast) =
+  match a.value with
+  | Any ->  Format.pp_print_string fmt "_"
+  | Pvar x -> Format.pp_print_string fmt x.value
+  | Named (x,v) -> Format.fprintf fmt "%s:%a" x.value pp v
+  | Range(a,b) -> Format.fprintf fmt "(%d..%d)" a b
+  | Int n -> Integer.pretty fmt n
+  | Bool b -> Format.pp_print_string fmt (if b then "\\true" else "\\false")
+  | Assoc(`Add,[]) -> Format.pp_print_string fmt "0"
+  | Assoc(`Mul,[]) -> Format.pp_print_string fmt "1"
+  | Assoc(op,v::vs) ->
+    let op = match op with `Add -> '+' | `Mul -> '*' in
+    Format.fprintf fmt "@[<hov 2>(%a" pp v ;
+    List.iter (Format.fprintf fmt "@ %c %a" op pp) vs ;
+    Format.fprintf fmt ")@]"
+  | Binop(a,op,b) ->
+    let op = match op with
+      | `Div -> "/"
+      | `Mod -> "%"
+      | `Eq -> "=="
+      | `Ne -> "!="
+      | `Lt -> "<"
+      | `Le -> "<="
+      | `Repeat -> "@^"
+    in Format.fprintf fmt "@[<hov 2>(%a@ %s %a)@]" pp a op pp b
+  | Times(k,v) -> Format.fprintf fmt "%a*%a" Integer.pretty k pp v
+  | Get(a,k) -> Format.fprintf fmt "@[<hov 2>%a[@,%a]@]" pp a pp k
+  | Set(a,k,v) -> Format.fprintf fmt "@[<hov 2>%a[@,%a@ -> %a]@]" pp a pp k pp v
+  | List [] -> Format.pp_print_string fmt "[| |]"
+  | List (v::vs) ->
+    Format.fprintf fmt "@[<hov 2>[| %a" pp v ;
+    List.iter (Format.fprintf fmt " ;@ %a" pp) vs ;
+    Format.fprintf fmt " |]@]"
+  | Field(v,id) -> Format.fprintf fmt "%a.%s" pp v id
+  | Call(id,[]) -> Format.fprintf fmt "%s()" id
+  | Call(id,v::vs) ->
+    Format.fprintf fmt "@[<hov 2>%s(%a" id pp v ;
+    List.iter (Format.fprintf fmt ",@ %a" pp) vs ;
+    Format.fprintf fmt ")@]"
+
+let pp_value = pp
+let pp_pattern = pp
+
+(* -------------------------------------------------------------------------- *)
 (* --- Pattern Lookup                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
