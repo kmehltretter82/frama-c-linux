@@ -314,6 +314,8 @@ let record ~link ~library fts =
   let fs = List.map (fun (f,t) -> Mfield(m,r,f,t)) fts in
   r.fields <- fs ; Mrecord(m,r)
 
+let cfield ?(kind=KValue) fd = Cfield(fd,kind)
+
 let field t f =
   match t with
   | Mrecord(_,r) ->

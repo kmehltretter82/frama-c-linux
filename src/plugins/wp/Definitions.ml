@@ -340,7 +340,7 @@ class virtual visitor main =
                   (List.map
                      (fun f ->
                         let t = Lang.tau_of_ctype f.ftype in
-                        self#vtau t ; Cfield (f, KValue) , t
+                        self#vtau t ; cfield f , t
                      ))
                   r.cfields
               in self#on_comp r fts ;
@@ -358,7 +358,7 @@ class virtual visitor main =
                   (List.map
                      (fun f ->
                         let t = Lang.init_of_ctype f.ftype in
-                        self#vtau t ; Cfield (f, KInit) , t
+                        self#vtau t ; cfield ~kind:KInit f , t
                      ))
                   r.cfields
               in self#on_icomp r fts ;

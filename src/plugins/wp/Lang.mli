@@ -63,7 +63,7 @@ and 'a extern = {
   ext_debug  : string; (** just for printing during debugging *)
 }
 and fields = { mutable fields : field list }
-and field =
+and field = private
   | Mfield of mdt * fields * string * tau
   | Cfield of fieldinfo * datakind
 and tau = (field,adt) Logic.datatype
@@ -99,6 +99,7 @@ val record :
   link:string -> library:string -> (string * tau) list -> adt
 val comp : compinfo -> adt
 val comp_init : compinfo -> adt
+val cfield : ?kind:datakind -> fieldinfo -> field
 val field : adt -> string -> field
 val fields_of_adt : adt -> field list
 val fields_of_tau : tau -> field list

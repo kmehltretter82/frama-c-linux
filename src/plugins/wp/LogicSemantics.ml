@@ -130,7 +130,7 @@ struct
     | TNoOffset -> v
     | TModel _ -> Wp_parameters.not_yet_implemented "Model field"
     | TField(f,offset) ->
-      let v_f = L.map (fun r -> e_getfield r (Cfield (f, KValue))) v in
+      let v_f = L.map (fun r -> e_getfield r (cfield f)) v in
       access_offset env v_f offset
     | TIndex(k,offset) ->
       let rk = C.logic env k in
@@ -145,9 +145,10 @@ struct
     | TNoOffset -> v
     | TModel _ -> Wp_parameters.not_yet_implemented "Model field"
     | TField(f,offset) ->
-      let r_f = e_getfield r (Cfield (f, KValue)) in
+      let fd = cfield f in
+      let r_f = e_getfield r fd in
       let r_fv = update_offset env r_f offset v in
-      e_setfield r (Cfield (f, KValue)) r_fv
+      e_setfield r fd r_fv
     | TIndex(k,offset) ->
       let k = val_of_term env k in
       let r_kv = update_offset env (e_get r k) offset v in
