@@ -118,6 +118,8 @@ struct
       )
       m
 
+  (* left-biased *)
+  let union = LMap.union @@ fun _ l r -> Some (OMap.union (fun _ l _r -> Some l) l r)
 
   (* specialized functions *)
   let rec is_sub_offset o1 o2 =
@@ -824,12 +826,7 @@ let union  (a1:t) (a2:t) :t =
       a2.vmap
       a1.vmap
   in
-  let new_lmap =
-    LLMap.fold
-      (fun lv v2 m_acc -> LLMap.add lv v2 m_acc)
-      a1.lmap
-      a2.lmap
-  in
+  let new_lmap = LLMap.union a1.lmap a2.lmap in
   let sets_to_be_joined =
     let rec add_pair sets (v1,v2) = match sets with
       | [] -> [VSet.of_list [v1;v2]]
