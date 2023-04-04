@@ -232,7 +232,7 @@ let analyse_function (kf:kernel_function) =
         begin
           let source, _ = Kernel_function.get_location kf in
           Options.warning ~source ~wkey:Options.Warn.no_return_stmt
-            "function %a does not return; analysis is continuing but is not be sound"
+            "function %a does not return; analysis is continuing but will not be sound"
             Kernel_function.pretty kf;
           Some (Abstract_state.empty)
         end

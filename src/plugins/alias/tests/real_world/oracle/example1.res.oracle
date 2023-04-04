@@ -146,7 +146,7 @@
 [alias] May-aliases at the end of instruction: swap(tmp->n1);
   {x, tmp} are aliased
 [alias:no-return] example1.c:29: Warning: 
-  function f1 does not return; analysis is continuing but is not be sound
+  function f1 does not return; analysis is continuing but will not be sound
 [alias] May-aliases at the end of function f1:
 [alias] analysing function: f2
 [alias] analysing instruction: ty *tmp = x;
@@ -194,7 +194,7 @@
 [alias] May-aliases at the end of instruction: swap(tmp->n2);
   {x, tmp} are aliased
 [alias:no-return] example1.c:53: Warning: 
-  function f2 does not return; analysis is continuing but is not be sound
+  function f2 does not return; analysis is continuing but will not be sound
 [alias] May-aliases at the end of function f2:
 [alias] analysing function: fabs
 [alias] May-aliases at the end of function fabs:
