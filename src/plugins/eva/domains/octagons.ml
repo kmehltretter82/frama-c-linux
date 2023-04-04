@@ -991,6 +991,14 @@ module Deps = struct
 
   include Datatype.Pair (VariableToDeps) (BaseToVariables)
 
+  (* [hash] and [compare] do not need to consider the [BaseToVariables] part as
+     it can be fully deduced from VariableToDeps's one *)
+  let hash (m, _i: t) =
+    VariableToDeps.hash m
+
+  let compare (m1, _i1: t) (m2, _i2: t) =
+    VariableToDeps.compare m1 m2
+
   let empty = VariableToDeps.empty, BaseToVariables.empty
 
   let intersects_base (_m, i: t) base =
@@ -1105,18 +1113,21 @@ module State = struct
               deps = Deps.empty; } ]
 
         let compare s1 s2 =
-          let c = Octagons.compare s1.octagons s2.octagons in
-          if c <> 0 then c else
-            let c = Intervals.compare s1.intervals s2.intervals in
-            if c <> 0 then c else
-              Zone.compare s1.modified s2.modified
+          let (<?>) c lcmp =
+            if c <> 0 then c else Lazy.force lcmp
+          in
+          Octagons.compare s1.octagons s2.octagons <?>
+          lazy (Intervals.compare s1.intervals s2.intervals) <?>
+          lazy (Zone.compare s1.modified s2.modified) <?>
+          lazy (Deps.compare s1.deps s2.deps)
 
         let equal = Datatype.from_compare
 
         let hash t =
           Hashtbl.hash (Octagons.hash t.octagons,
                         Intervals.hash t.intervals,
-                        Zone.hash t.modified)
+                        Zone.hash t.modified,
+                        Deps.hash t.deps)
 
         let pretty fmt { octagons } =
           Format.fprintf fmt "@[%a@]" Octagons.pretty octagons
