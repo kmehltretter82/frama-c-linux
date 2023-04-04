@@ -945,9 +945,11 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
             with
               Not_found ->
               Options.warning
-                "result expression %a does not appear in the summary of the called function (result not assigned)"
+                "result expression %a does not appear in the summary of the called function (result not assigned): %a"
                 Lval.pretty
-                (BLval lval_exp_res);
+                (BLval lval_exp_res)
+                (pretty_summary ~debug:false ?function_name:None)
+                summary;
               new_state
           end
         | _ -> new_state
