@@ -327,7 +327,6 @@ module Dot = Graphviz.Dot(struct
     let vertex_name (v:V.t) =
       let lset = !find_vertex_name_ref v in
       let v_name = lset_to_string lset in
-      (* Format.printf "Vertex %d set %s@." v v_name; *)
       v_name
     let default_vertex_attributes _ = []
     let graph_attributes _ = []
@@ -790,7 +789,7 @@ let shift (a : t) : t =
     in
     let {graph; lmap; vmap} = a in
     node_counter := max_idx + offset + 1;
-    let () = Options.feedback ~level:8 "node_counter after shift: %d@." !node_counter in
+    let () = Options.debug ~level:8 "node_counter after shift: %d@." !node_counter in
     let result =
       {graph = G.map_vertex shift graph;
        lmap = LLMap.map shift lmap;
@@ -946,8 +945,8 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
               join new_state v_res v_exp_res
             with
               Not_found ->
-              Options.feedback ~level:2
-                "result expression %a does not appear in the summary of the called function (ressult not assigned)"
+              Options.warning
+                "result expression %a does not appear in the summary of the called function (result not assigned)"
                 Lval.pretty
                 (BLval lval_exp_res);
               new_state

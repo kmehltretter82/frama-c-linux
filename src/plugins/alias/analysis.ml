@@ -139,7 +139,8 @@ let analyse_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_sta
   | Skip _ -> a
   | Call(res,ef,es,loc) -> (* !function_compute_ref ef *)
     do_function_call s a res ef es loc
-  | Asm _ -> (Options.warning "skipping @[%a@] (Asm not implemented)" Printer.pp_stmt s; a)
+  | Asm (_,_,_,loc) ->
+    (Options.warning ~source:(fst loc) "skipping assembler code"; a)
 
 let pp_abstract_state_opt ?(debug=false) fmt v =
   match v with
@@ -309,10 +310,7 @@ let compute () =
   if Options.ShowStmtTable.get() then
     Stmt_table.iter (print_stmt_table_elt Format.std_formatter);
   if Options.ShowFunctionTable.get() then
-    begin
-      Function_table.iter (fun x _ -> Format.printf "entry of function %a @." Kernel_function.pretty x);
-      Function_table.iter (print_function_table_elt Format.std_formatter)
-    end
+    Function_table.iter (print_function_table_elt Format.std_formatter)
 
 
 let clear () =
