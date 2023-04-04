@@ -945,8 +945,8 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
               join new_state v_res v_exp_res
             with
               Not_found ->
-              Options.feedback ~level:2
-                "result expression %a does not appear in the summary of the called function (ressult not assigned)"
+              Options.warning
+                "result expression %a does not appear in the summary of the called function (result not assigned)"
                 Lval.pretty
                 (BLval lval_exp_res);
               new_state
