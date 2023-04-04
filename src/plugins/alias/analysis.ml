@@ -72,7 +72,13 @@ end
 let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
   match a with
     None -> None
-  | Some a -> Some (Abstract_state.assignment a lv exp)
+  | Some a -> begin
+      try Some (Abstract_state.assignment a lv exp)
+      with
+        Simplified.Explicit_pointer_address l ->
+        Options.warning ~source:(fst l) ~wkey:Options.Warn.unsupported_address "Unsupported feature: explicit pointer address. The assignment is ignored (analysis continues but may be unsound)";
+        Some a
+    end
 
 let rec do_init (lv:lval) (init:init) state =
   match init with
@@ -93,7 +99,12 @@ let do_function_call (_:stmt) state (res : lval option) (ef : exp) (args: exp li
       match (state,res) with
         (None, _) -> None
       | (Some a, None) -> (Options.warning "Memory allocation not stored (ignored)"; Some a)
-      | (Some a, Some lv) -> Some (Abstract_state.assignment_x_allocate_y a lv)
+      | (Some a, Some lv) ->
+        try Some (Abstract_state.assignment_x_allocate_y a lv)
+        with
+          Simplified.Explicit_pointer_address l ->
+          Options.warning ~source:(fst l) ~wkey:Options.Warn.unsupported_address "Unsupported feature: explicit pointer address. The assignment is ignored (analysis continues but may be unsound)";
+          Some a
     end
   | _ ->
     begin
