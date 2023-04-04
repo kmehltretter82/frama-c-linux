@@ -789,7 +789,7 @@ let shift (a : t) : t =
     in
     let {graph; lmap; vmap} = a in
     node_counter := max_idx + offset + 1;
-    let () = Options.feedback ~level:8 "node_counter after shift: %d@." !node_counter in
+    let () = Options.debug ~level:8 "node_counter after shift: %d@." !node_counter in
     let result =
       {graph = G.map_vertex shift graph;
        lmap = LLMap.map shift lmap;
