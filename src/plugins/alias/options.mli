@@ -35,6 +35,9 @@ module ShowFunctionTable : Parameter_sig.Bool
 (** Displays the table [statement -> state] at the end of the analysis *)
 module ShowStmtTable : Parameter_sig.Bool
 
+(** Switch to debug mode when displaying tables *)
+module DebugTable : Parameter_sig.Bool
+
 (** Displays the final abstract state in Dot File <f> *)
 module Dot_output : Parameter_sig.String
 

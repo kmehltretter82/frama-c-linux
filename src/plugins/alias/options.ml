@@ -53,6 +53,13 @@ module ShowStmtTable = False
     end)
 
 
+module DebugTable = False
+    (struct
+      let option_name = "-alias-debug-table"
+      let help = "switch to debug mode when printing Statement or Function Tables (with options -alias-show-stmt-table and -alias-show-function-table)"
+    end)
+
+
 module Dot_output =
   Empty_string
     (struct

@@ -295,7 +295,7 @@ let compute () =
     let print_value fmt v =
       match v with
       | None -> Format.fprintf fmt "<Bot>"
-      | Some a -> Abstract_state.pretty fmt a
+      | Some a -> Abstract_state.pretty ~debug:(Options.DebugTable.get()) fmt a
     in
     Format.fprintf fmt "Before statement %a :@.@[<hov 2> %a@]@." print_key k print_value v
   in
@@ -305,7 +305,7 @@ let compute () =
     in
     match s with
       None -> Options.debug "function %s -> None@." function_name
-    | Some s -> Abstract_state.pretty_summary ~function_name fmt s
+    | Some s -> Abstract_state.pretty_summary ~debug:(Options.DebugTable.get()) ~function_name fmt s
   in
   if Options.ShowStmtTable.get() then
     Stmt_table.iter (print_stmt_table_elt Format.std_formatter);
