@@ -412,7 +412,7 @@ module Polymorphic3
        val mk_hash:
          ('a -> int) -> ('b -> int) -> ('c -> int) -> ('a, 'b, 'c) t -> int
        val map:
-         ('a -> 'a) -> ('b -> 'b) -> ('c -> 'c) -> ('a, 'b, 'c) t -> ('a, 'b, 'c) t
+         ('a -> 'b) -> ('c -> 'd) -> ('e -> 'f) -> ('a, 'c, 'e) t -> ('b, 'd, 'f) t
        val mk_pretty:
          (Format.formatter -> 'a -> unit) ->
          (Format.formatter -> 'b -> unit) ->
@@ -537,8 +537,8 @@ module Polymorphic4
          ('a -> int) -> ('b -> int) -> ('c -> int) -> ('d -> int) ->
          ('a, 'b, 'c, 'd) t -> int
        val map:
-         ('a -> 'a) -> ('b -> 'b) -> ('c -> 'c) -> ('d -> 'd) ->
-         ('a, 'b, 'c, 'd) t -> ('a, 'b, 'c, 'd) t
+         ('a -> 'b) -> ('c -> 'd) -> ('e -> 'f) -> ('g -> 'h) ->
+         ('a, 'c, 'e, 'g) t -> ('b, 'd, 'f, 'h) t
        val mk_pretty:
          (Format.formatter -> 'a -> unit) ->
          (Format.formatter -> 'b -> unit) ->
@@ -775,7 +775,7 @@ module type Polymorphic_input = sig
   val mk_equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
   val mk_compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
   val mk_hash: ('a -> int) -> 'a t -> int
-  val map: ('a -> 'a) -> 'a t -> 'a t
+  val map: ('a -> 'b) -> 'a t -> 'b t
   val mk_pretty:
     (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
   val mk_mem_project:
