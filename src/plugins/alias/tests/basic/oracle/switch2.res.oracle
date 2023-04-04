@@ -1,26 +1,26 @@
 [kernel] Parsing switch2.c (with preprocessing)
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *a = (int *)0;
 [alias] analysing instruction: int *b = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *b = (int *)0;
 [alias] analysing instruction: int *c = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *c = (int *)0;
 [alias] analysing instruction: int *d = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *d = (int *)0;
 [alias] analysing instruction: int e = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int e = 0;
 [alias] analysing instruction: case 1: a = d;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: case 1: a = d;
   {a, d} are aliased
 [alias] analysing instruction: case 2: b = d;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: case 2: b = d;
   {b, d} are aliased
 [alias] analysing instruction: default: c = d;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: default: c = d;
   {c, d} are aliased
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __retres = 0;
   {a, b, c, d} are aliased
 [alias] May-aliases at the end of function main:
   {a, b, c, d} are aliased

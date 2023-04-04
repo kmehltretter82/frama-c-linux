@@ -282,6 +282,7 @@ let assert_invariants (x:t) : unit =
   in
   G.iter_vertex assert_vertex x.graph;
   let assert_edge v1 v2 =
+    assert (v1 <> v2);
     assert (G.mem_vertex x.graph v1);
     assert (G.mem_vertex x.graph v2)
   in

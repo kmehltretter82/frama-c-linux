@@ -49,21 +49,21 @@
 [alias] May-aliases at the end of function lrand48:
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *a = (int *)0;
 [alias] analysing instruction: int *b = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *b = (int *)0;
 [alias] analysing instruction: a = my_malloc(2);
 [alias] analysing function: my_malloc
 [alias] analysing instruction: int *res = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *res = (int *)0;
 [alias] analysing instruction: res = (int *)malloc((size_t)size);
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: res = (int *)malloc((size_t)size);
 [alias] May-aliases at the end of function my_malloc:
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: a = my_malloc(2);
 [alias] analysing instruction: b = my_malloc(3);
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: b = my_malloc(3);
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __retres = 0;
 [alias] May-aliases at the end of function main:
 [alias] analysing function: malloc
 [alias] May-aliases at the end of function malloc:
@@ -81,7 +81,7 @@
 [alias] May-aliases at the end of function mrand48:
 [alias] analysing function: my_malloc
 [alias] analysing instruction: int *res = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *res = (int *)0;
 [alias] May-aliases at the end of function my_malloc:
 [alias] analysing function: nrand48
 [alias] May-aliases at the end of function nrand48:
