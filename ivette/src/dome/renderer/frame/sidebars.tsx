@@ -34,7 +34,7 @@ import { useFlipSettings } from 'dome';
 import { Badge } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
-import { Hbox, Hfill } from 'dome/layout/boxes';
+import { Hbox } from 'dome/layout/boxes';
 import { IconButton, IconButtonProps } from 'dome/controls/buttons';
 
 import './style.css';
@@ -152,7 +152,6 @@ export function Section(props: SectionProps): JSX.Element | null {
           icon={icon}
           onClick={flipState}
         />
-        <Hfill />
         {visible ? rightButton : makeBadge(props.summary)}
       </Hbox>
       <div className='dome-xSideBarSection-content' style={{ maxHeight }}>
