@@ -310,10 +310,7 @@ let compute () =
   if Options.ShowStmtTable.get() then
     Stmt_table.iter (print_stmt_table_elt Format.std_formatter);
   if Options.ShowFunctionTable.get() then
-    begin
-      Function_table.iter (fun x _ -> Format.printf "entry of function %a @." Kernel_function.pretty x);
-      Function_table.iter (print_function_table_elt Format.std_formatter)
-    end
+    Function_table.iter (print_function_table_elt Format.std_formatter)
 
 
 let clear () =

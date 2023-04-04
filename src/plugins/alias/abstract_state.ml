@@ -327,7 +327,6 @@ module Dot = Graphviz.Dot(struct
     let vertex_name (v:V.t) =
       let lset = !find_vertex_name_ref v in
       let v_name = lset_to_string lset in
-      (* Format.printf "Vertex %d set %s@." v v_name; *)
       v_name
     let default_vertex_attributes _ = []
     let graph_attributes _ = []
