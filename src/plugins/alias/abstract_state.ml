@@ -263,8 +263,6 @@ let print_aliases fmt (x:t) =
       (* let set_lv = LSet.union set_lv _set_lv0 in *)
       if LSet.cardinal set_lv >=2 then
         Format.fprintf fmt "@[<hov 2>%a@] are aliased@." LSet.pretty set_lv
-        (* else
-         *   Options.warning "Vertex %d not found while printing aliases" v *)
   in
   VMap.iter iter_vmap x.vmap
 
