@@ -1,20 +1,20 @@
 [kernel] Parsing structure1.c (with preprocessing)
 [alias] analysing function: main
 [alias] analysing instruction: st_1_t x = {.a = 0, .b = 1};
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: st_1_t x = {.a = 0, .b = 1};
 [alias] analysing instruction: st_2_t y = {.a = 3, .c = 4};
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: st_2_t y = {.a = 3, .c = 4};
 [alias] analysing instruction: st_1_t *p_x = & x;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: st_1_t *p_x = & x;
 [alias] analysing instruction: st_2_t *p_y = & y;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: st_2_t *p_y = & y;
 [alias] analysing instruction: p_x->a = 3;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: p_x->a = 3;
 [alias] analysing instruction: p_x = (st_1_t *)p_y;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: p_x = (st_1_t *)p_y;
   {p_x, p_y} are aliased
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __retres = 0;
   {p_x, p_y} are aliased
 [alias] May-aliases at the end of function main:
   {p_x, p_y} are aliased

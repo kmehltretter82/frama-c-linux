@@ -3,18 +3,18 @@
 [alias] May-aliases at the end of function addr:
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *a = (int *)0;
 [alias] analysing instruction: int *b = (int *)0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *b = (int *)0;
 [alias] analysing instruction: int c = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int c = 0;
 [alias] analysing instruction: a = addr(& c);
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: a = addr(& c);
 [alias] analysing instruction: b = & c;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: b = & c;
   {a, b} are aliased
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __retres = 0;
   {a, b} are aliased
 [alias] May-aliases at the end of function main:
   {a, b} are aliased

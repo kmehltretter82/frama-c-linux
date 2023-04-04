@@ -49,56 +49,56 @@
 [alias] May-aliases at the end of function lrand48:
 [alias] analysing function: main
 [alias] analysing instruction: st_1_t x1 = {.a = 0, .b = 1};
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: st_1_t x1 = {.a = 0, .b = 1};
 [alias] analysing instruction: st_1_t x2 = {.a = 1, .b = 2};
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: st_1_t x2 = {.a = 1, .b = 2};
 [alias] analysing instruction: tab_y[0] = & x1;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: tab_y[0] = & x1;
 [alias] analysing instruction: tab_y[1] = & x2;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: tab_y[1] = & x2;
 [alias] analysing instruction: st_2_t *z1 = malloc(sizeof(st_2_t));
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: st_2_t *z1 = malloc(sizeof(st_2_t));
 [alias] analysing instruction: st_2_t *z2 = malloc(sizeof(st_2_t));
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: st_2_t *z2 = malloc(sizeof(st_2_t));
 [alias] analysing instruction: st_3_t *t = malloc(sizeof(st_3_t));
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: st_3_t *t = malloc(sizeof(st_3_t));
 [alias] analysing instruction: int *a = malloc(sizeof(int));
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *a = malloc(sizeof(int));
 [alias] analysing instruction: int *b = malloc(sizeof(int));
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *b = malloc(sizeof(int));
 [alias] analysing instruction: *a = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: *a = 0;
 [alias] analysing instruction: *b = 5;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: *b = 5;
 [alias] analysing instruction: z1->s = (struct struct_1_t *)tab_y[0];
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: z1->s = (struct struct_1_t *)tab_y[0];
   {z1->s, tab_y[0]} are aliased
 [alias] analysing instruction: z2->s = (struct struct_1_t *)tab_y[1];
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: z2->s = (struct struct_1_t *)tab_y[1];
   {z1->s, z2->s, tab_y[0]} are aliased
 [alias] analysing instruction: z1->c = a;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: z1->c = a;
   {z1->s, z2->s, tab_y[0]} are aliased
   {z1->c, a} are aliased
 [alias] analysing instruction: z2->c = b;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: z2->c = b;
   {z1->s, z2->s, tab_y[0]} are aliased
   {z1->c, a} are aliased
   {z2->c, b} are aliased
 [alias] analysing instruction: t->t = (struct struct_2_t *)z1;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: t->t = (struct struct_2_t *)z1;
   {z1->s, z2->s, tab_y[0]} are aliased
   {t->t, z1} are aliased
   {z1->c, a} are aliased
   {z2->c, b} are aliased
 [alias] analysing instruction: t->d = a;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: t->d = a;
   {z1->s, z2->s, tab_y[0]} are aliased
   {t->t, z1} are aliased
   {z1->c, t->d, a} are aliased
   {z2->c, b} are aliased
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __retres = 0;
   {z1->s, z2->s, tab_y[0]} are aliased
   {t->t, z1} are aliased
   {z1->c, t->d, a} are aliased

@@ -45,6 +45,7 @@ module Warn : sig
   val unsupported_function : warn_category
   val undefined_function : warn_category
   val no_return_stmt : warn_category
+  val unsupported_address : warn_category
 end
 
 module DebugKeys : sig

@@ -282,6 +282,7 @@ let assert_invariants (x:t) : unit =
   in
   G.iter_vertex assert_vertex x.graph;
   let assert_edge v1 v2 =
+    assert (v1 <> v2);
     assert (G.mem_vertex x.graph v1);
     assert (G.mem_vertex x.graph v2)
   in
@@ -326,7 +327,6 @@ module Dot = Graphviz.Dot(struct
     let vertex_name (v:V.t) =
       let lset = !find_vertex_name_ref v in
       let v_name = lset_to_string lset in
-      (* Format.printf "Vertex %d set %s@." v v_name; *)
       v_name
     let default_vertex_attributes _ = []
     let graph_attributes _ = []
@@ -690,37 +690,48 @@ let set_type (x:t) (v1:V.t) (v2:V.t) : t =
 
 let assignment (a:t) (lv:lval) (e:exp) : t =
   assert_invariants a;
-  let x = Lval.from_lval lv in
-  let y = Lval.from_exp e in
-  match x,y with
-    BNone, _ | _, BNone -> a
-  | _, BAddrOf blv ->
+  try
     begin
-      let (v1,a) = find_or_create_vertex x a in
-      let (v2,a) = find_or_create_vertex y a in
-      let new_a = cjoin a v1 v2 in
-      let new_a = remove_lval new_a (BAddrOf blv) in
-      assert_invariants new_a ;
-      new_a
+      let x = Lval.from_lval lv in
+      let y = Lval.from_exp e in
+      match x,y with
+        BNone, _ | _, BNone -> a
+      | _, BAddrOf blv ->
+        begin
+          let (v1,a) = find_or_create_vertex x a in
+          let (v2,a) = find_or_create_vertex y a in
+          let new_a = cjoin a v1 v2 in
+          let new_a = remove_lval new_a (BAddrOf blv) in
+          assert_invariants new_a ;
+          new_a
+        end
+      | _ ->
+        begin
+          let (v1,a) = find_or_create_vertex x a in
+          let (v2,a) = find_or_create_vertex y a in
+          let new_a = cjoin a v1 v2 in
+          assert_invariants new_a ;
+          new_a
+        end
     end
-  | _ ->
-    begin
-      let (v1,a) = find_or_create_vertex x a in
-      let (v2,a) = find_or_create_vertex y a in
-      let new_a = cjoin a v1 v2 in
-      assert_invariants new_a ;
-      new_a
-    end
+  with
+    Explicit_pointer_address l ->
+    Options.warning ~source:(fst l) ~wkey:Options.Warn.unsupported_address "Unsupported feature: explicit pointer address. The assignment is ignored (analysis continues but may be unsound)";
+    a
 
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y (a:t) (lv:lval) : t =
   assert_invariants a;
-  let x = Lval.from_lval lv in
-  let (v1,a) = find_or_create_vertex x a in
-  let (v2,a) = create_cst_vertex a in
-  let new_a : t = set_type a v1 v2 in
-  assert_invariants new_a ; new_a
-
+  try
+    let x = Lval.from_lval lv in
+    let (v1,a) = find_or_create_vertex x a in
+    let (v2,a) = create_cst_vertex a in
+    let new_a : t = set_type a v1 v2 in
+    assert_invariants new_a ; new_a
+  with
+    Explicit_pointer_address l ->
+    Options.warning ~source:(fst l) ~wkey:Options.Warn.unsupported_address "Unsupported feature: explicit pointer address. The assignment is ignored (analysis continues but may be unsound)";
+    a
 
 exception Not_included
 
@@ -778,7 +789,7 @@ let shift (a : t) : t =
     in
     let {graph; lmap; vmap} = a in
     node_counter := max_idx + offset + 1;
-    let () = Options.feedback ~level:8 "node_counter after shift: %d@." !node_counter in
+    let () = Options.debug ~level:8 "node_counter after shift: %d@." !node_counter in
     let result =
       {graph = G.map_vertex shift graph;
        lmap = LLMap.map shift lmap;
@@ -934,8 +945,8 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
               join new_state v_res v_exp_res
             with
               Not_found ->
-              Options.feedback ~level:2
-                "result expression %a does not appear in the summary of the called function (ressult not assigned)"
+              Options.warning
+                "result expression %a does not appear in the summary of the called function (result not assigned)"
                 Lval.pretty
                 (BLval lval_exp_res);
               new_state
