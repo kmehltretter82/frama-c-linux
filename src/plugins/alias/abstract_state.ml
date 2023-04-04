@@ -924,14 +924,9 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
             try
               let v_exp_res =  LLMap.find (BLval lval_exp_res) new_state.lmap in
               join new_state v_res v_exp_res
-            with
-              Not_found ->
-              Options.warning
-                "result expression %a does not appear in the summary of the called function (result not assigned): %a"
-                Lval.pretty
-                (BLval lval_exp_res)
-                (pretty_summary ~debug:false ?function_name:None)
-                summary;
+            with Not_found ->
+              (* Happens when called function does not terminate. *)
+              (* In that case the return is never analysed. *)
               new_state
           end
         | _ -> new_state
