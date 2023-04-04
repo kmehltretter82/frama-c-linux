@@ -147,7 +147,10 @@ let analyse_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_sta
   | Call(res,ef,es,loc) -> (* !function_compute_ref ef *)
     do_function_call s a res ef es loc
   | Asm (_,_,_,loc) ->
-    (Options.warning ~source:(fst loc) "skipping assembler code"; a)
+    Options.warning
+      ~source:(fst loc) ~wkey:Options.Warn.unsupported_asm
+      "Unsupported feature: assembler code; skipping";
+    a
 
 let pp_abstract_state_opt ?(debug=false) fmt v =
   match v with
