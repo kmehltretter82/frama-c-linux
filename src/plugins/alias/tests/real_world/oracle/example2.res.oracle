@@ -181,21 +181,6 @@
 [alias] analysing instruction: odata = tmp->t1[*(tmp->n1)];
 [alias] May-aliases at the end of instruction: odata = tmp->t1[*(tmp->n1)];
   {x, tmp} are aliased
-[alias] analysing instruction: idx = 0;
-[alias] May-aliases at the end of instruction: idx = 0;
-  {x, tmp} are aliased
-[alias] analysing instruction: tmp_1 = sin(*(idata + idx));
-[alias] May-aliases at the end of instruction: tmp_1 = sin(*(idata + idx));
-  {x, tmp} are aliased
-[alias] analysing instruction: *(odata + idx) = 0.5 * tmp_1;
-[alias] May-aliases at the end of instruction: *(odata + idx) = 0.5 * tmp_1;
-  {x, tmp} are aliased
-[alias] analysing instruction: idx ++;
-[alias] May-aliases at the end of instruction: idx ++;
-  {x, tmp} are aliased
-[alias] analysing instruction: swap(tmp->n1);
-[alias] May-aliases at the end of instruction: swap(tmp->n1);
-  {x, tmp} are aliased
 [alias] analysing instruction: __retres = (void *)0;
 [alias:unsafe-cast] example2.c:49: Warning: unsafe cast from int to void *
 [alias] May-aliases at the end of instruction: __retres = (void *)0;
@@ -239,19 +224,6 @@
   {x, tmp} are aliased
 [alias] analysing instruction: odata = tmp->t2[*(tmp->n2)];
 [alias] May-aliases at the end of instruction: odata = tmp->t2[*(tmp->n2)];
-  {x, tmp} are aliased
-[alias] analysing instruction: idx = 0;
-[alias] May-aliases at the end of instruction: idx = 0;
-  {x, tmp} are aliased
-[alias] analysing instruction: *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
-[alias] May-aliases at the end of instruction: *(odata + idx) = (double)3 * *(
-                                                          idata + idx) + (double)1;
-  {x, tmp} are aliased
-[alias] analysing instruction: idx ++;
-[alias] May-aliases at the end of instruction: idx ++;
-  {x, tmp} are aliased
-[alias] analysing instruction: swap(tmp->n2);
-[alias] May-aliases at the end of instruction: swap(tmp->n2);
   {x, tmp} are aliased
 [alias] analysing instruction: __retres = (void *)0;
 [alias:unsafe-cast] example2.c:74: Warning: unsafe cast from int to void *

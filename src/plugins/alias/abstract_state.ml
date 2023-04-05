@@ -956,9 +956,11 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
       match lv1 with
       | BNone -> None
       | lv1 -> begin
-          let v1, new_state = find_or_create_vertex lv1 !state in
-          state := new_state;
-          try Some (v1, LLMap.find lv2 sum_state.lmap)
+          try
+            let v2 = LLMap.find lv2 sum_state.lmap in
+            let v1, new_state = find_or_create_vertex lv1 !state in
+            state := new_state;
+            Some (v1, v2)
           with Not_found -> None
         end
     in
