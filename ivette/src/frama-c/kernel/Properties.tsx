@@ -142,7 +142,9 @@ function filterSummary(prefix: string) : string {
       if (filter(key)) enabled++;
     }
   }
-  return `${enabled} / ${total}`;
+  if (enabled == 0) return '(none)';
+  if (enabled == total) return '(all)';
+  return `(${enabled}/${total})`;
 }
 
 function filterStatus(
@@ -416,7 +418,7 @@ async function onContextMenu(prefix:string): Promise<void> {
 
 function FilterSection(props: SectionProps): JSX.Element {
   const settings = `properties-section-${props.label}`;
-  const { prefix } = props;
+  const { label, prefix } = props;
   const filterButtonProps =
     prefix ? {
       icon: 'TUNINGS',
@@ -425,14 +427,13 @@ function FilterSection(props: SectionProps): JSX.Element {
     } : undefined;
   const update = Dome.useForceUpdate();
   Settings.useWindowSettingsEvent(update);
-  const summary = prefix ? filterSummary(prefix) : undefined;
+  const theLabel = prefix ? `${label} ${filterSummary(prefix)}` : label;
   return (
     <Section
-      label={props.label}
+      label={theLabel}
       settings={settings}
       defaultUnfold={props.unfold}
       rightButtonProps={filterButtonProps}
-      summary={summary}
     >
       {props.children}
     </Section>
