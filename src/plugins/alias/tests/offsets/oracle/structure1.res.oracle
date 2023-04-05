@@ -11,6 +11,8 @@
 [alias] analysing instruction: p_x->a = 3;
 [alias] May-aliases at the end of instruction: p_x->a = 3;
 [alias] analysing instruction: p_x = (st_1_t *)p_y;
+[alias:unsafe-cast] structure1.c:28: Warning: 
+  unsafe cast from st_2_t * to st_1_t *
 [alias] May-aliases at the end of instruction: p_x = (st_1_t *)p_y;
   {p_x, p_y} are aliased
 [alias] analysing instruction: __retres = 0;

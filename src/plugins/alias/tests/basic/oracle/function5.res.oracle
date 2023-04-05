@@ -12,10 +12,13 @@
   {x, y, __retres} are aliased
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
+[alias:unsafe-cast] function5.c:16: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *a = (int *)0;
 [alias] analysing instruction: int *b = (int *)0;
+[alias:unsafe-cast] function5.c:16: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *b = (int *)0;
 [alias] analysing instruction: int *c = (int *)0;
+[alias:unsafe-cast] function5.c:16: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *c = (int *)0;
 [alias] analysing instruction: c = choice(a,b);
 [alias] May-aliases at the end of instruction: c = choice(a,b);

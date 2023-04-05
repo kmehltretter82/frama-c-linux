@@ -74,6 +74,7 @@ module Warn = struct
   let unsupported_address = register_warn_category "unsupported:addr"
   let unsupported_asm = register_warn_category "unsupported:asm"
   let unsupported_function = register_warn_category "unsupported:fn"
+  let unsafe_cast = register_warn_category "unsafe-cast"
 end
 
 module DebugKeys = struct

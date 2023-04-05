@@ -5,10 +5,14 @@
 [alias] analysing instruction: st_1_t x2 = {.a = 1, .b = 2};
 [alias] May-aliases at the end of instruction: st_1_t x2 = {.a = 1, .b = 2};
 [alias] analysing instruction: st_2_t y = {.s = (struct struct_1_t *)(& x1), .c = 4};
+[alias:unsafe-cast] structure2.c:21: Warning: 
+  unsafe cast from st_1_t * to struct struct_1_t *
 [alias] May-aliases at the end of instruction: st_2_t y =
                                            {.s = (struct struct_1_t *)(& x1),
                                             .c = 4};
 [alias] analysing instruction: y.s = (struct struct_1_t *)(& x2);
+[alias:unsafe-cast] structure2.c:23: Warning: 
+  unsafe cast from st_1_t * to struct struct_1_t *
 [alias] May-aliases at the end of instruction: y.s = (struct struct_1_t *)(& x2);
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction: __retres = 0;

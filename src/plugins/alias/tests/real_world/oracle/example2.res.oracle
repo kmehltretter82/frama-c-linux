@@ -152,6 +152,7 @@
 [alias] May-aliases at the end of instruction: swap(tmp->n1);
   {x, tmp} are aliased
 [alias] analysing instruction: __retres = (void *)0;
+[alias:unsafe-cast] example2.c:49: Warning: unsafe cast from int to void *
 [alias] May-aliases at the end of instruction: __retres = (void *)0;
   {x, tmp} are aliased
 [alias] May-aliases at the end of function f1:
@@ -208,6 +209,7 @@
 [alias] May-aliases at the end of instruction: swap(tmp->n2);
   {x, tmp} are aliased
 [alias] analysing instruction: __retres = (void *)0;
+[alias:unsafe-cast] example2.c:74: Warning: unsafe cast from int to void *
 [alias] May-aliases at the end of instruction: __retres = (void *)0;
   {x, tmp} are aliased
 [alias] May-aliases at the end of function f2:

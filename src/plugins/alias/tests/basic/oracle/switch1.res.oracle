@@ -1,12 +1,16 @@
 [kernel] Parsing switch1.c (with preprocessing)
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
+[alias:unsafe-cast] switch1.c:6: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *a = (int *)0;
 [alias] analysing instruction: int *b = (int *)0;
+[alias:unsafe-cast] switch1.c:6: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *b = (int *)0;
 [alias] analysing instruction: int *c = (int *)0;
+[alias:unsafe-cast] switch1.c:6: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *c = (int *)0;
 [alias] analysing instruction: int *d = (int *)0;
+[alias:unsafe-cast] switch1.c:6: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *d = (int *)0;
 [alias] analysing instruction: int e = 0;
 [alias] May-aliases at the end of instruction: int e = 0;

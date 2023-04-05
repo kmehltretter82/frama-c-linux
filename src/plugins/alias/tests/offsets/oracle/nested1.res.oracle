@@ -71,9 +71,13 @@
 [alias] analysing instruction: *b = 5;
 [alias] May-aliases at the end of instruction: *b = 5;
 [alias] analysing instruction: z1->s = (struct struct_1_t *)tab_y[0];
+[alias:unsafe-cast] nested1.c:47: Warning: 
+  unsafe cast from st_1_t * to struct struct_1_t *
 [alias] May-aliases at the end of instruction: z1->s = (struct struct_1_t *)tab_y[0];
   {z1->s, tab_y[0]} are aliased
 [alias] analysing instruction: z2->s = (struct struct_1_t *)tab_y[1];
+[alias:unsafe-cast] nested1.c:48: Warning: 
+  unsafe cast from st_1_t * to struct struct_1_t *
 [alias] May-aliases at the end of instruction: z2->s = (struct struct_1_t *)tab_y[1];
   {z1->s, z2->s, tab_y[0]} are aliased
 [alias] analysing instruction: z1->c = a;
@@ -86,6 +90,8 @@
   {z1->c, a} are aliased
   {z2->c, b} are aliased
 [alias] analysing instruction: t->t = (struct struct_2_t *)z1;
+[alias:unsafe-cast] nested1.c:51: Warning: 
+  unsafe cast from st_2_t * to struct struct_2_t *
 [alias] May-aliases at the end of instruction: t->t = (struct struct_2_t *)z1;
   {z1->s, z2->s, tab_y[0]} are aliased
   {t->t, z1} are aliased
