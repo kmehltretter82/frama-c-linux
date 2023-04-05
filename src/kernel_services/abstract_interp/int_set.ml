@@ -119,12 +119,12 @@ type set_or_itv =
 (* Converts a set into an ordered list of sets and intervals, fusing adjacent
    integers into intervals. *)
 let fuse_intervals s =
-  (* Add interval [b..e] to the list [acc]. The interval can be a singleton. *)
+  (* Add interval [b..e[ to the list [acc]. The interval can be a singleton. *)
   let add_itv acc (b, e) =
-    let nb = Int.to_int_exn (Int.sub e b) + 1 in
+    let nb = Int.to_int_exn (Int.sub e b) in
     (* If the interval is too small, uses a Set instead of Itv. *)
     if nb > 3
-    then Itv (b, e) :: acc
+    then Itv (b, Int.pred e) :: acc
     else
       let a = Array.init nb (fun i -> Int.add b (Int.of_int i)) in
       (* If the last element of [acc] is a Set, adds [a] at its end. *)
@@ -132,17 +132,13 @@ let fuse_intervals s =
       | Set a' :: tl -> Set (Array.append a' a) :: tl
       | _ -> Set a :: acc
   in
-  (* [start..prev] is the current interval being built. *)
+  (* [start..prev[ is the current interval being built. *)
   let f (acc, start, prev) curr =
-    if Int.equal prev (Int.pred curr)
-    then (acc, start, curr)
-    else (add_itv acc (start, prev), curr, curr)
+    if Int.equal prev curr
+    then (acc, start, Int.succ curr)
+    else (add_itv acc (start, prev), curr, Int.succ curr)
   in
-  let r = ref ([], s.(0), s.(0)) in
-  for i = 1 to Array.length s - 1 do
-    r := f !r s.(i)
-  done;
-  let list, start, curr = !r in
+  let list, start, curr = Array.fold_left f ([], s.(0), s.(0)) s in
   List.rev (add_itv list (start, curr))
 
 let pretty_array =
