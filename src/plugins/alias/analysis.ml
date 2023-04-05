@@ -67,12 +67,19 @@ module Stmt_table = struct
   type value = data
 end
 
-
+let try_warn_unsupported_explicit_pointer a pp_obj obj f =
+  try f ()
+  with
+    Simplified.Explicit_pointer_address l ->
+    Options.warning ~source:(fst l) ~wkey:Options.Warn.unsupported_address
+      "unsupported feature: explicit pointer address: %a; analysis may be unsound" pp_obj obj;
+    a
 
 let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
   match a with
-    None -> None
-  | Some a -> Some (Abstract_state.assignment a lv exp)
+  | None -> None
+  | Some a -> Some (try_warn_unsupported_explicit_pointer a Printer.pp_exp exp @@
+                    fun () -> Abstract_state.assignment a lv exp)
 
 let rec do_init (lv:lval) (init:init) state =
   match init with
@@ -82,7 +89,7 @@ let rec do_init (lv:lval) (init:init) state =
 
 let doFunction f = !function_compute_ref f
 
-let do_function_call (_:stmt) state (res : lval option) (ef : exp) (args: exp list) loc =
+let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp list) loc =
   let is_malloc (s:string) : bool =
     (s = "malloc") || (s = "calloc") (* todo : add all function names *)
   in
@@ -93,7 +100,8 @@ let do_function_call (_:stmt) state (res : lval option) (ef : exp) (args: exp li
       match (state,res) with
         (None, _) -> None
       | (Some a, None) -> (Options.warning "Memory allocation not stored (ignored)"; Some a)
-      | (Some a, Some lv) -> Some (Abstract_state.assignment_x_allocate_y a lv)
+      | (Some a, Some lv) -> Some (try_warn_unsupported_explicit_pointer a Printer.pp_stmt stmt @@
+                                   fun () -> Abstract_state.assignment_x_allocate_y a lv)
     end
   | _ ->
     begin
@@ -107,7 +115,7 @@ let do_function_call (_:stmt) state (res : lval option) (ef : exp) (args: exp li
           end
         | None ->
           Options.warning ~wkey:Options.Warn.unsupported_function ~source:(fst loc)
-            "calls to function pointer unsupported: %a" Exp.pretty ef;
+            "unsupported feature: call to function pointer: %a" Exp.pretty ef;
           None
       in
       match (state, summary) with
@@ -140,7 +148,10 @@ let analyse_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_sta
   | Call(res,ef,es,loc) -> (* !function_compute_ref ef *)
     do_function_call s a res ef es loc
   | Asm (_,_,_,loc) ->
-    (Options.warning ~source:(fst loc) "skipping assembler code"; a)
+    Options.warning
+      ~source:(fst loc) ~wkey:Options.Warn.unsupported_asm
+      "unsupported feature: assembler code; skipping";
+    a
 
 let pp_abstract_state_opt ?(debug=false) fmt v =
   match v with
@@ -225,7 +236,7 @@ let analyse_function (kf:kernel_function) =
         begin
           let source, _ = Kernel_function.get_location kf in
           Options.warning ~source ~wkey:Options.Warn.no_return_stmt
-            "function %a does not return; analysis is continuing but is not be sound"
+            "function %a does not return; analysis may be unsound"
             Kernel_function.pretty kf;
           Some (Abstract_state.empty)
         end

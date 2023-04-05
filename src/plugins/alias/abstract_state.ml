@@ -248,10 +248,9 @@ let print_debug fmt (x:t) =
 
 let print_graph fmt (x:t) =
   let print_edge v1 v2 =
-    LSet.pretty fmt @@ VMap.find v1 x.vmap;
-    Format.fprintf fmt " → ";
-    LSet.pretty fmt @@ VMap.find v2 x.vmap;
-    Format.fprintf fmt "@.";
+    Format.fprintf fmt "%d:%a -> %d:%a@."
+      v1 LSet.pretty (VMap.find v1 x.vmap)
+      v2 LSet.pretty (VMap.find v2 x.vmap)
   in
   G.iter_edges print_edge x.graph
 
@@ -264,8 +263,6 @@ let print_aliases fmt (x:t) =
       (* let set_lv = LSet.union set_lv _set_lv0 in *)
       if LSet.cardinal set_lv >=2 then
         Format.fprintf fmt "@[<hov 2>%a@] are aliased@." LSet.pretty set_lv
-        (* else
-         *   Options.warning "Vertex %d not found while printing aliases" v *)
   in
   VMap.iter iter_vmap x.vmap
 
@@ -690,48 +687,32 @@ let set_type (x:t) (v1:V.t) (v2:V.t) : t =
 
 let assignment (a:t) (lv:lval) (e:exp) : t =
   assert_invariants a;
-  try
-    begin
-      let x = Lval.from_lval lv in
-      let y = Lval.from_exp e in
-      match x,y with
-        BNone, _ | _, BNone -> a
-      | _, BAddrOf blv ->
-        begin
-          let (v1,a) = find_or_create_vertex x a in
-          let (v2,a) = find_or_create_vertex y a in
-          let new_a = cjoin a v1 v2 in
-          let new_a = remove_lval new_a (BAddrOf blv) in
-          assert_invariants new_a ;
-          new_a
-        end
-      | _ ->
-        begin
-          let (v1,a) = find_or_create_vertex x a in
-          let (v2,a) = find_or_create_vertex y a in
-          let new_a = cjoin a v1 v2 in
-          assert_invariants new_a ;
-          new_a
-        end
-    end
-  with
-    Explicit_pointer_address l ->
-    Options.warning ~source:(fst l) ~wkey:Options.Warn.unsupported_address "Unsupported feature: explicit pointer address. The assignment is ignored (analysis continues but may be unsound)";
-    a
+  let x = Lval.from_lval lv in
+  let y = Lval.from_exp e in
+  match x,y with
+    BNone, _ | _, BNone -> a
+  | _, BAddrOf blv ->
+    let (v1,a) = find_or_create_vertex x a in
+    let (v2,a) = find_or_create_vertex y a in
+    let new_a = cjoin a v1 v2 in
+    let new_a = remove_lval new_a (BAddrOf blv) in
+    assert_invariants new_a ;
+    new_a
+  | _ ->
+    let (v1,a) = find_or_create_vertex x a in
+    let (v2,a) = find_or_create_vertex y a in
+    let new_a = cjoin a v1 v2 in
+    assert_invariants new_a ;
+    new_a
 
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y (a:t) (lv:lval) : t =
   assert_invariants a;
-  try
-    let x = Lval.from_lval lv in
-    let (v1,a) = find_or_create_vertex x a in
-    let (v2,a) = create_cst_vertex a in
-    let new_a : t = set_type a v1 v2 in
-    assert_invariants new_a ; new_a
-  with
-    Explicit_pointer_address l ->
-    Options.warning ~source:(fst l) ~wkey:Options.Warn.unsupported_address "Unsupported feature: explicit pointer address. The assignment is ignored (analysis continues but may be unsound)";
-    a
+  let x = Lval.from_lval lv in
+  let (v1,a) = find_or_create_vertex x a in
+  let (v2,a) = create_cst_vertex a in
+  let new_a : t = set_type a v1 v2 in
+  assert_invariants new_a ; new_a
 
 exception Not_included
 
@@ -943,17 +924,17 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
             try
               let v_exp_res =  LLMap.find (BLval lval_exp_res) new_state.lmap in
               join new_state v_res v_exp_res
-            with
-              Not_found ->
-              Options.warning
-                "result expression %a does not appear in the summary of the called function (result not assigned)"
-                Lval.pretty
-                (BLval lval_exp_res);
+            with Not_found ->
+              (* Happens when called function does not terminate. *)
+              (* In that case the return is never analysed. *)
               new_state
           end
         | _ -> new_state
       end
-    | (Some _, None) -> (Options.warning "a function with no return is employed in an assignment" ; new_state)
+    | (Some _, None) ->
+      (* seems to never happen *)
+      Options.warning "a function with no return is employed in an assignment";
+      new_state
   in
   (* erase all formals and all locals from the tables/graphs *)
   let new_state =

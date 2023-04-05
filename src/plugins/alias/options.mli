@@ -42,10 +42,11 @@ module DebugTable : Parameter_sig.Bool
 module Dot_output : Parameter_sig.String
 
 module Warn : sig
-  val unsupported_function : warn_category
-  val undefined_function : warn_category
   val no_return_stmt : warn_category
+  val undefined_function : warn_category
   val unsupported_address : warn_category
+  val unsupported_asm : warn_category
+  val unsupported_function : warn_category
 end
 
 module DebugKeys : sig

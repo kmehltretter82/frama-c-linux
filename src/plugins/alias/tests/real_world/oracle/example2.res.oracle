@@ -1,4 +1,4 @@
-[kernel] Parsing example1.c (with preprocessing)
+[kernel] Parsing example2.c (with preprocessing)
 [alias] analysing function: _Exit
 [alias] May-aliases at the end of function _Exit:
 [alias] analysing function: __fc_fpclassify
@@ -94,6 +94,9 @@
 [alias] analysing instruction: idata = (double *)malloc((unsigned long)10 * sizeof(double));
 [alias] May-aliases at the end of instruction: idata = (double *)malloc((unsigned long)10 * sizeof(double));
   {x, tmp} are aliased
+[alias] analysing instruction: int i = 0;
+[alias] May-aliases at the end of instruction: int i = 0;
+  {x, tmp} are aliased
 [alias] analysing instruction: idata = tmp->t2[*(tmp->n2)];
 [alias] May-aliases at the end of instruction: idata = tmp->t2[*(tmp->n2)];
   {x, tmp} are aliased
@@ -106,7 +109,7 @@
 [alias] analysing instruction: tmp_1 = sin(*(idata + idx));
 [alias] analysing function: sin
 [alias] May-aliases at the end of function sin:
-[alias:undefined:fn] example1.c:45: Warning: function sin has no definition
+[alias:undefined:fn] example2.c:45: Warning: function sin has no definition
 [alias] May-aliases at the end of instruction: tmp_1 = sin(*(idata + idx));
   {x, tmp} are aliased
 [alias] analysing instruction: *(odata + idx) = 0.5 * tmp_1;
@@ -124,6 +127,9 @@
 [alias] May-aliases at the end of function swap:
 [alias] May-aliases at the end of instruction: swap(tmp->n1);
   {x, tmp} are aliased
+[alias] analysing instruction: i ++;
+[alias] May-aliases at the end of instruction: i ++;
+  {x, tmp} are aliased
 [alias] analysing instruction: idata = tmp->t2[*(tmp->n2)];
 [alias] May-aliases at the end of instruction: idata = tmp->t2[*(tmp->n2)];
   {x, tmp} are aliased
@@ -145,9 +151,11 @@
 [alias] analysing instruction: swap(tmp->n1);
 [alias] May-aliases at the end of instruction: swap(tmp->n1);
   {x, tmp} are aliased
-[alias:no-return] example1.c:29: Warning: 
-  function f1 does not return; analysis may be unsound
+[alias] analysing instruction: __retres = (void *)0;
+[alias] May-aliases at the end of instruction: __retres = (void *)0;
+  {x, tmp} are aliased
 [alias] May-aliases at the end of function f1:
+  {x, tmp} are aliased
 [alias] analysing function: f2
 [alias] analysing instruction: ty *tmp = x;
 [alias] May-aliases at the end of instruction: ty *tmp = x;
@@ -155,24 +163,8 @@
 [alias] analysing instruction: idata = (double *)malloc((unsigned long)10 * sizeof(double));
 [alias] May-aliases at the end of instruction: idata = (double *)malloc((unsigned long)10 * sizeof(double));
   {x, tmp} are aliased
-[alias] analysing instruction: idata = tmp->t1[*(tmp->n1)];
-[alias] May-aliases at the end of instruction: idata = tmp->t1[*(tmp->n1)];
-  {x, tmp} are aliased
-[alias] analysing instruction: odata = tmp->t2[*(tmp->n2)];
-[alias] May-aliases at the end of instruction: odata = tmp->t2[*(tmp->n2)];
-  {x, tmp} are aliased
-[alias] analysing instruction: idx = 0;
-[alias] May-aliases at the end of instruction: idx = 0;
-  {x, tmp} are aliased
-[alias] analysing instruction: *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
-[alias] May-aliases at the end of instruction: *(odata + idx) = (double)3 * *(
-                                                          idata + idx) + (double)1;
-  {x, tmp} are aliased
-[alias] analysing instruction: idx ++;
-[alias] May-aliases at the end of instruction: idx ++;
-  {x, tmp} are aliased
-[alias] analysing instruction: swap(tmp->n2);
-[alias] May-aliases at the end of instruction: swap(tmp->n2);
+[alias] analysing instruction: int i = 0;
+[alias] May-aliases at the end of instruction: int i = 0;
   {x, tmp} are aliased
 [alias] analysing instruction: idata = tmp->t1[*(tmp->n1)];
 [alias] May-aliases at the end of instruction: idata = tmp->t1[*(tmp->n1)];
@@ -193,9 +185,33 @@
 [alias] analysing instruction: swap(tmp->n2);
 [alias] May-aliases at the end of instruction: swap(tmp->n2);
   {x, tmp} are aliased
-[alias:no-return] example1.c:53: Warning: 
-  function f2 does not return; analysis may be unsound
+[alias] analysing instruction: i ++;
+[alias] May-aliases at the end of instruction: i ++;
+  {x, tmp} are aliased
+[alias] analysing instruction: idata = tmp->t1[*(tmp->n1)];
+[alias] May-aliases at the end of instruction: idata = tmp->t1[*(tmp->n1)];
+  {x, tmp} are aliased
+[alias] analysing instruction: odata = tmp->t2[*(tmp->n2)];
+[alias] May-aliases at the end of instruction: odata = tmp->t2[*(tmp->n2)];
+  {x, tmp} are aliased
+[alias] analysing instruction: idx = 0;
+[alias] May-aliases at the end of instruction: idx = 0;
+  {x, tmp} are aliased
+[alias] analysing instruction: *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
+[alias] May-aliases at the end of instruction: *(odata + idx) = (double)3 * *(
+                                                          idata + idx) + (double)1;
+  {x, tmp} are aliased
+[alias] analysing instruction: idx ++;
+[alias] May-aliases at the end of instruction: idx ++;
+  {x, tmp} are aliased
+[alias] analysing instruction: swap(tmp->n2);
+[alias] May-aliases at the end of instruction: swap(tmp->n2);
+  {x, tmp} are aliased
+[alias] analysing instruction: __retres = (void *)0;
+[alias] May-aliases at the end of instruction: __retres = (void *)0;
+  {x, tmp} are aliased
 [alias] May-aliases at the end of function f2:
+  {x, tmp} are aliased
 [alias] analysing function: fabs
 [alias] May-aliases at the end of function fabs:
 [alias] analysing function: fabsf
