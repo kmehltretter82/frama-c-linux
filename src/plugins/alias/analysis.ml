@@ -238,11 +238,11 @@ let analyse_function (kf:kernel_function) =
           Options.warning ~source ~wkey:Options.Warn.no_return_stmt
             "function %a does not return; analysis may be unsound"
             Kernel_function.pretty kf;
-          Some (Abstract_state.empty)
+          Some Abstract_state.empty
         end
     end
   else
-    Some Abstract_state.empty
+    None
 
 let doFunction (kf:kernel_function) =
   let final_state = analyse_function kf in
@@ -253,15 +253,19 @@ let doFunction (kf:kernel_function) =
   Options.debug ~level "May-alias graph at the end of function %a:@.%a@."
     Kernel_function.pretty kf
     (pp_abstract_state_opt ~debug:true) final_state;
-  let summary = Abstract_state.make_summary final_state kf in
-  let function_name = Kernel_function.get_name kf in
-  Options.debug ~level:2 "Summary of function %a:@.%a@."
-    Kernel_function.pretty kf
-    (Abstract_state.pretty_summary ~debug:false ~function_name) summary;
   let result =
-    if Kernel_function.has_definition kf
-    then Some summary
-    else None
+    match final_state with
+    (* final state is None if kf has no definition *)
+      None -> None
+    | _ ->
+      begin
+        let summary = Abstract_state.make_summary final_state kf in
+        let function_name = Kernel_function.get_name kf in
+        Options.debug ~level:2 "Summary of function %a:@.%a@."
+          Kernel_function.pretty kf
+          (Abstract_state.pretty_summary ~debug:false ~function_name) summary;
+        Some summary
+      end
   in
   if Kernel_function.is_main kf then
     let f_name = Options.Dot_output.get () in
