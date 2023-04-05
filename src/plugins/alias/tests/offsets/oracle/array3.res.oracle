@@ -1,52 +1,76 @@
 [kernel] Parsing array3.c (with preprocessing)
 [alias] analysing function: _Exit
 [alias] May-aliases at the end of function _Exit:
+  <Bot>
 [alias] analysing function: abort
 [alias] May-aliases at the end of function abort:
+  <Bot>
 [alias] analysing function: abs
 [alias] May-aliases at the end of function abs:
+  <Bot>
 [alias] analysing function: at_quick_exit
 [alias] May-aliases at the end of function at_quick_exit:
+  <Bot>
 [alias] analysing function: atexit
 [alias] May-aliases at the end of function atexit:
+  <Bot>
 [alias] analysing function: atof
 [alias] May-aliases at the end of function atof:
+  <Bot>
 [alias] analysing function: atoi
 [alias] May-aliases at the end of function atoi:
+  <Bot>
 [alias] analysing function: atol
 [alias] May-aliases at the end of function atol:
+  <Bot>
 [alias] analysing function: atoll
 [alias] May-aliases at the end of function atoll:
+  <Bot>
 [alias] analysing function: bsearch
 [alias] May-aliases at the end of function bsearch:
+  <Bot>
 [alias] analysing function: calloc
 [alias] May-aliases at the end of function calloc:
+  <Bot>
 [alias] analysing function: div
 [alias] May-aliases at the end of function div:
+  <Bot>
 [alias] analysing function: drand48
 [alias] May-aliases at the end of function drand48:
+  <Bot>
 [alias] analysing function: erand48
 [alias] May-aliases at the end of function erand48:
+  <Bot>
 [alias] analysing function: exit
 [alias] May-aliases at the end of function exit:
+  <Bot>
 [alias] analysing function: free
 [alias] May-aliases at the end of function free:
+  <Bot>
 [alias] analysing function: getenv
 [alias] May-aliases at the end of function getenv:
+  <Bot>
 [alias] analysing function: jrand48
 [alias] May-aliases at the end of function jrand48:
+  <Bot>
 [alias] analysing function: labs
 [alias] May-aliases at the end of function labs:
+  <Bot>
 [alias] analysing function: lcong48
 [alias] May-aliases at the end of function lcong48:
+  <Bot>
 [alias] analysing function: ldiv
 [alias] May-aliases at the end of function ldiv:
+  <Bot>
 [alias] analysing function: llabs
 [alias] May-aliases at the end of function llabs:
+  <Bot>
 [alias] analysing function: lldiv
 [alias] May-aliases at the end of function lldiv:
+  <Bot>
 [alias] analysing function: lrand48
 [alias] May-aliases at the end of function lrand48:
+  <Bot>
 [alias] analysing function: main
 [alias] analysing instruction: int *x = malloc((unsigned long)4 * sizeof(int));
 [alias] May-aliases at the end of instruction: int *x =
@@ -66,65 +90,97 @@
   {x, y} are aliased
 [alias] analysing function: malloc
 [alias] May-aliases at the end of function malloc:
+  <Bot>
 [alias] analysing function: mblen
 [alias] May-aliases at the end of function mblen:
+  <Bot>
 [alias] analysing function: mbstowcs
 [alias] May-aliases at the end of function mbstowcs:
+  <Bot>
 [alias] analysing function: mbtowc
 [alias] May-aliases at the end of function mbtowc:
+  <Bot>
 [alias] analysing function: mkstemp
 [alias] May-aliases at the end of function mkstemp:
+  <Bot>
 [alias] analysing function: mkstemps
 [alias] May-aliases at the end of function mkstemps:
+  <Bot>
 [alias] analysing function: mrand48
 [alias] May-aliases at the end of function mrand48:
+  <Bot>
 [alias] analysing function: nrand48
 [alias] May-aliases at the end of function nrand48:
+  <Bot>
 [alias] analysing function: posix_memalign
 [alias] May-aliases at the end of function posix_memalign:
+  <Bot>
 [alias] analysing function: putenv
 [alias] May-aliases at the end of function putenv:
+  <Bot>
 [alias] analysing function: qsort
 [alias] May-aliases at the end of function qsort:
+  <Bot>
 [alias] analysing function: quick_exit
 [alias] May-aliases at the end of function quick_exit:
+  <Bot>
 [alias] analysing function: rand
 [alias] May-aliases at the end of function rand:
+  <Bot>
 [alias] analysing function: random
 [alias] May-aliases at the end of function random:
+  <Bot>
 [alias] analysing function: realloc
 [alias] May-aliases at the end of function realloc:
+  <Bot>
 [alias] analysing function: reallocarray
 [alias] May-aliases at the end of function reallocarray:
+  <Bot>
 [alias] analysing function: seed48
 [alias] May-aliases at the end of function seed48:
+  <Bot>
 [alias] analysing function: setenv
 [alias] May-aliases at the end of function setenv:
+  <Bot>
 [alias] analysing function: srand
 [alias] May-aliases at the end of function srand:
+  <Bot>
 [alias] analysing function: srand48
 [alias] May-aliases at the end of function srand48:
+  <Bot>
 [alias] analysing function: srandom
 [alias] May-aliases at the end of function srandom:
+  <Bot>
 [alias] analysing function: strtod
 [alias] May-aliases at the end of function strtod:
+  <Bot>
 [alias] analysing function: strtof
 [alias] May-aliases at the end of function strtof:
+  <Bot>
 [alias] analysing function: strtol
 [alias] May-aliases at the end of function strtol:
+  <Bot>
 [alias] analysing function: strtold
 [alias] May-aliases at the end of function strtold:
+  <Bot>
 [alias] analysing function: strtoll
 [alias] May-aliases at the end of function strtoll:
+  <Bot>
 [alias] analysing function: strtoul
 [alias] May-aliases at the end of function strtoul:
+  <Bot>
 [alias] analysing function: strtoull
 [alias] May-aliases at the end of function strtoull:
+  <Bot>
 [alias] analysing function: system
 [alias] May-aliases at the end of function system:
+  <Bot>
 [alias] analysing function: unsetenv
 [alias] May-aliases at the end of function unsetenv:
+  <Bot>
 [alias] analysing function: wcstombs
 [alias] May-aliases at the end of function wcstombs:
+  <Bot>
 [alias] analysing function: wctomb
 [alias] May-aliases at the end of function wctomb:
+  <Bot>
