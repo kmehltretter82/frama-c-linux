@@ -248,10 +248,9 @@ let print_debug fmt (x:t) =
 
 let print_graph fmt (x:t) =
   let print_edge v1 v2 =
-    LSet.pretty fmt @@ VMap.find v1 x.vmap;
-    Format.fprintf fmt " → ";
-    LSet.pretty fmt @@ VMap.find v2 x.vmap;
-    Format.fprintf fmt "@.";
+    Format.fprintf fmt "%d:%a -> %d:%a@."
+      v1 LSet.pretty (VMap.find v1 x.vmap)
+      v2 LSet.pretty (VMap.find v2 x.vmap)
   in
   G.iter_edges print_edge x.graph
 
