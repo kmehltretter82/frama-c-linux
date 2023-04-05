@@ -95,8 +95,8 @@ and simplify_exp e =
               | _ -> raise (Explicit_pointer_address e1.eloc)
             end
           | CastE (typ, e) ->
-              let () = check_cast_compatibility e typ in
-              raise (IsExp (simplify_exp e))
+            let () = check_cast_compatibility e typ in
+            raise (IsExp (simplify_exp e))
           | _ -> raise (IsExp nul_exp)
         in
         {e with enode=simplified_enode}
