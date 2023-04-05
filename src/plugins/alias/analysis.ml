@@ -71,7 +71,8 @@ let try_warn_unsupported_explicit_pointer a f =
   try f ()
   with
     Simplified.Explicit_pointer_address l ->
-    Options.warning ~source:(fst l) ~wkey:Options.Warn.unsupported_address "Unsupported feature: explicit pointer address. The assignment is ignored (analysis continues but may be unsound)";
+    Options.warning ~source:(fst l) ~wkey:Options.Warn.unsupported_address
+      "unsupported feature: explicit pointer address; analysis may be unsound";
     a
 
 let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
@@ -114,7 +115,7 @@ let do_function_call (_:stmt) state (res : lval option) (ef : exp) (args: exp li
           end
         | None ->
           Options.warning ~wkey:Options.Warn.unsupported_function ~source:(fst loc)
-            "calls to function pointer unsupported: %a" Exp.pretty ef;
+            "unsupported feature: call to function pointer: %a" Exp.pretty ef;
           None
       in
       match (state, summary) with
@@ -149,7 +150,7 @@ let analyse_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_sta
   | Asm (_,_,_,loc) ->
     Options.warning
       ~source:(fst loc) ~wkey:Options.Warn.unsupported_asm
-      "Unsupported feature: assembler code; skipping";
+      "unsupported feature: assembler code; skipping";
     a
 
 let pp_abstract_state_opt ?(debug=false) fmt v =
@@ -235,7 +236,7 @@ let analyse_function (kf:kernel_function) =
         begin
           let source, _ = Kernel_function.get_location kf in
           Options.warning ~source ~wkey:Options.Warn.no_return_stmt
-            "function %a does not return; analysis is continuing but will not be sound"
+            "function %a does not return; analysis may be unsound"
             Kernel_function.pretty kf;
           Some (Abstract_state.empty)
         end
