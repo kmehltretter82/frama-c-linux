@@ -423,6 +423,8 @@ function FilterSection(props: SectionProps): JSX.Element {
       title: `Configure filters`,
       onClick: () => onContextMenu(prefix),
     } : undefined;
+  const update = Dome.useForceUpdate();
+  Settings.useWindowSettingsEvent(update);
   const summary = prefix ? filterSummary(prefix) : undefined;
   return (
     <Section
