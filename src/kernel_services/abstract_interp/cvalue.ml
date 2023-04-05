@@ -232,7 +232,7 @@ module V = struct
     in
     let pretty_item fmt i =
       match S.find_opt i lookup_map with
-      | Some ei -> Format.fprintf fmt "%s" ei.eiorig_name
+      | Some ei -> Printer.pp_varname fmt ei.eiorig_name
       | None -> Format.fprintf fmt "%a" Integer.pretty i
     in
     Pretty_utils.pp_iter ~pre:"@[<hov 1>{" ~suf:"}@]" ~sep:";@ "
