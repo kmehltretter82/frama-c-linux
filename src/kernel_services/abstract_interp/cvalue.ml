@@ -224,24 +224,19 @@ module V = struct
       (fun fmt (k, v) -> pp_base fmt k v)
       fmt m
 
-  let pretty_enumitem_set enuminfo fmt ival =
-    match Ival.project_small_set ival with
-    | None -> Ival.pretty fmt ival
-    | Some l ->
-      let module S = Datatype.Integer.Map in
-      let assoc ei =
-        Cil.constFoldToInt ei.eival |> Option.map (fun i -> i, ei)
-      in
-      let lookup_map =
-        List.to_seq enuminfo.eitems |> Seq.filter_map assoc |> S.of_seq
-      in
-      let pretty_item fmt i =
-        match S.find_opt i lookup_map with
-        | Some ei -> Format.fprintf fmt "%s" ei.eiorig_name
-        | None -> Format.fprintf fmt "%a" Integer.pretty i
-      in
-      Pretty_utils.pp_iter ~pre:"@[<hov 1>{" ~suf:"}@]" ~sep:";@ "
-        List.iter pretty_item fmt l
+  let pretty_enumitem_set enuminfo fmt l =
+    let module S = Datatype.Integer.Map in
+    let assoc ei = Cil.constFoldToInt ei.eival |> Option.map (fun i -> i, ei) in
+    let lookup_map =
+      List.to_seq enuminfo.eitems |> Seq.filter_map assoc |> S.of_seq
+    in
+    let pretty_item fmt i =
+      match S.find_opt i lookup_map with
+      | Some ei -> Format.fprintf fmt "%s" ei.eiorig_name
+      | None -> Format.fprintf fmt "%a" Integer.pretty i
+    in
+    Pretty_utils.pp_iter ~pre:"@[<hov 1>{" ~suf:"}@]" ~sep:";@ "
+      List.iter pretty_item fmt l
 
   let pretty_typ typ fmt v =
     let pretty_org fmt org =
@@ -259,8 +254,8 @@ module V = struct
     | Map m ->
       try
         let ival = project_ival v in
-        match Option.map Cil.unrollType typ with
-        | Some (TEnum (ei, _)) -> pretty_enumitem_set ei fmt ival
+        match Ival.project_small_set ival, Option.map Cil.unrollType typ with
+        | Some list, Some (TEnum (ei, _)) -> pretty_enumitem_set ei fmt list
         | _ -> Ival.pretty fmt ival
       with
       | Not_based_on_null ->
