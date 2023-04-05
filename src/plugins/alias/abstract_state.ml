@@ -470,7 +470,8 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
   assert (not (LLMap.mem blv x.lmap));
   Options.debug ~level:9 "creating a vertex for %a@." Lval.pretty blv;
   match blv with
-    BNone -> Options.fatal "this should not happen"
+  | BNone ->
+    Options.fatal "Should not happen: create_vertex_lval %a" Lval.pretty blv
   | BLval lv ->
     begin
       match lv with
@@ -770,8 +771,8 @@ let shift (a : t) : t =
   assert_invariants a;
   if is_empty a then a else
     let () = Options.debug ~level:8 "before shift: node_counter=%d@.%a@." !node_counter print_debug a in
-    let min_idx, _ = VMap.min_binding a.vmap in
-    let max_idx, _ = VMap.max_binding a.vmap in
+    let max_idx = G.fold_vertex max a.graph 0 in
+    let min_idx = G.fold_vertex min a.graph max_idx in
     let offset = !node_counter - min_idx in
     let shift x = x + offset in
     let shift_vmap shift_elem vmap =
@@ -921,61 +922,71 @@ let pretty_summary ?(debug=false) ?(function_name="") fmt s =
       Format.fprintf fmt "@]@."
     end
 
+(* the algorithm:
+   - unify the two graphs dropping all the variables from the summary
+   - pair arguments with formals assigning the formal's successor as the argument's successor
+*)
 let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   assert_invariants state;
   let formals = summary.formals in
-  let sum_state =
-    match summary.state with
-      None -> Options.fatal "BUG this should not happen"
-    | Some s -> s
-  in
-  let sum_state = shift sum_state in
+  let sum_state = Option.get summary.state in
   assert (List.length args = List.length formals);
-  (* check that formal variables do no appear in state *)
-  List.iter
-    (fun lv -> assert (not (LLMap.mem (BLval lv) state.lmap)))
-    formals;
-  (* union of the two graphs *)
-  let new_state = union state sum_state in
-  (* union of formal parameters *)
-  let new_state =
-    List.fold_left2
-      (fun acc param formal -> assignment acc formal param)
-      new_state
-      args
-      formals
+  let sum_state = shift sum_state in
+
+  let arg_formal_pairs = (* also includes the result/return pair *)
+    let xs =
+      List.combine
+        (List.map Lval.from_exp args)
+        (List.map Simplified_lval.from_lval formals)
+    in
+    let res_ret = match res, summary.return with
+      | None, None -> []
+      | Some res, Some ret ->
+        [Simplified_lval.from_lval res, Simplified_lval.from_exp ret]
+      | None, Some _ -> []
+      | Some _, None -> (* Shouldn't happen: Frama-C adds missing returns *)
+        Options.fatal "unexpected case: result without return"
+    in
+    res_ret @ xs
   in
-  (* set the result *)
-  let new_state =
-    match (res, summary.return) with
-      None, _  -> new_state
-    | (Some res, Some exp_res) ->
-      begin
-        let v_res,new_state  = find_or_create_vertex (Lval.from_lval res) new_state in
-        match Lval.from_exp exp_res with
-          BLval lval_exp_res ->
-          begin
-            try
-              let v_exp_res =  LLMap.find (BLval lval_exp_res) new_state.lmap in
-              join new_state v_res v_exp_res
-            with Not_found ->
-              (* Happens when called function does not terminate. *)
-              (* In that case the return is never analysed. *)
-              new_state
-          end
-        | _ -> new_state
-      end
-    | (Some _, None) ->
-      (* seems to never happen *)
-      Options.warning "a function with no return is employed in an assignment";
-      new_state
+
+  let state, vertex_pairs =
+    let state = ref state in
+    let find_vertex (lv1, lv2) =
+      match lv1 with
+      | BNone -> None
+      | lv1 -> begin
+          let v1, new_state = find_or_create_vertex lv1 !state in
+          state := new_state;
+          try Some (v1, LLMap.find lv2 sum_state.lmap)
+          with Not_found -> None
+        end
+    in
+    !state, List.filter_map find_vertex arg_formal_pairs
   in
-  (* erase all formals and all locals from the tables/graphs *)
-  let new_state =
-    List.fold_left
-      remove_lval
-      new_state
-      (List.map (fun x -> Lval.from_lval x ) (summary.formals@summary.locals))
+
+  (* TODO: optimise: do not include the formals' vertexes in the graph *)
+  let new_graph =
+    let transfer_succs (g : G.t) (v1,v2) =
+      let v2_succs = G.succ sum_state.graph v2 in
+      assert (List.length v2_succs < 2);
+      List.fold_left (fun g succ -> G.add_edge g v1 succ) g v2_succs
+    in
+    let g = state.graph in
+    let g = G.fold_vertex (fun i g -> G.add_vertex g i) sum_state.graph g in
+    let g = G.fold_edges (fun i j g -> G.add_edge g i j) sum_state.graph g in
+    List.fold_left transfer_succs g vertex_pairs
   in
+
+  let new_state = {
+    graph = new_graph;
+    lmap = state.lmap;
+    vmap =
+      let left_bias _ l _ = Some l in
+      let to_empty _ = LSet.empty in
+      VMap.union left_bias state.vmap (VMap.map to_empty sum_state.vmap)
+  } in
+
+  let new_state = List.fold_left join_succs new_state (List.map fst vertex_pairs) in
   assert_invariants new_state;
   new_state

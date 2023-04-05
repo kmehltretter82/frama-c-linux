@@ -16,9 +16,6 @@
 [alias] May-aliases at the end of instruction: f(a);
 [alias] analysing instruction: f(b);
 [alias] May-aliases at the end of instruction: f(b);
-  {a, b} are aliased
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction: __retres = 0;
-  {a, b} are aliased
 [alias] May-aliases at the end of function main:
-  {a, b} are aliased
