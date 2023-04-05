@@ -142,9 +142,9 @@ function filterSummary(prefix: string) : string {
       if (filter(key)) enabled++;
     }
   }
-  if (enabled == 0) return '(none)';
-  if (enabled == total) return '(all)';
-  return `(${enabled}/${total})`;
+  if (enabled === 0) return 'none';
+  if (enabled === total) return 'all';
+  return `${enabled} / ${total}`;
 }
 
 function filterStatus(
@@ -427,12 +427,13 @@ function FilterSection(props: SectionProps): JSX.Element {
     } : undefined;
   const update = Dome.useForceUpdate();
   Settings.useWindowSettingsEvent(update);
-  const theLabel = prefix ? `${label} ${filterSummary(prefix)}` : label;
+  const summary = prefix ? filterSummary(prefix) : undefined ;
   return (
     <Section
-      label={theLabel}
+      label={label}
       settings={settings}
       defaultUnfold={props.unfold}
+      infos={summary}
       rightButtonProps={filterButtonProps}
     >
       {props.children}

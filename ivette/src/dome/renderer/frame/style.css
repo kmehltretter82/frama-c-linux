@@ -129,6 +129,14 @@
     flex: 0 0 ;
 }
 
+.dome-xSideBarSection-infos {
+    font-size: smaller;
+    color: var(--info-text-discrete);
+    padding-left: 4px;
+    padding-right: 4px;
+    display: block;
+}
+
 .dome-xSideBarSection-filterButton {
   margin: 0px;
   padding: 0px;
@@ -160,14 +168,6 @@
   color: var(--info-text);
   fill: var(--info-text);
   display: flex;
-}
-
-.dome-xSideBarSection-info {
-  color: var(--info-text-discrete);
-  font-style: italic;
-  padding-left: 20px;
-  padding-right: 10px;
-  display: block;
 }
 
 /* -------------------------------------------------------------------------- */
