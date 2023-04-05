@@ -931,7 +931,10 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
           end
         | _ -> new_state
       end
-    | (Some _, None) -> (Options.warning "a function with no return is employed in an assignment" ; new_state)
+    | (Some _, None) ->
+      (* seems to never happen *)
+      Options.warning "a function with no return is employed in an assignment";
+      new_state
   in
   (* erase all formals and all locals from the tables/graphs *)
   let new_state =
