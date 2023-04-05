@@ -49,16 +49,18 @@
 [alias] May-aliases at the end of function lrand48:
 [alias] analysing function: main
 [alias] analysing instruction: int *x = malloc((unsigned long)4 * sizeof(int));
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *x =
+                                           malloc((unsigned long)4 * sizeof(int));
 [alias] analysing instruction: int *y = malloc((unsigned long)4 * sizeof(int));
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: int *y =
+                                           malloc((unsigned long)4 * sizeof(int));
 [alias] analysing instruction: x = mat[0];
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: x = mat[0];
 [alias] analysing instruction: y = mat[1];
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: y = mat[1];
   {x, y} are aliased
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases at the end of instruction:
+[alias] May-aliases at the end of instruction: __retres = 0;
   {x, y} are aliased
 [alias] May-aliases at the end of function main:
   {x, y} are aliased
