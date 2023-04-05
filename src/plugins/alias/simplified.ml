@@ -47,6 +47,13 @@ exception IsExp of exp
 
 exception Explicit_pointer_address of location
 
+let check_cast_compatibility e typ =
+  let type_of_e = Cil.typeOf e in
+  if Cil.need_cast typ type_of_e then
+    Options.warning ~once:true ~source:(fst @@ e.eloc) ~wkey:Options.Warn.unsafe_cast
+      "unsafe cast from %a to %a"
+      Printer.pp_typ type_of_e Printer.pp_typ typ
+
 let rec simplify_lval (h,o) =
   try HL.find cached_lval (h,o) with
     Not_found ->
@@ -87,7 +94,9 @@ and simplify_exp e =
               | AddrOf lv -> Lval lv
               | _ -> raise (Explicit_pointer_address e1.eloc)
             end
-          | CastE(_,e) -> raise (IsExp (simplify_exp e))
+          | CastE (typ, e) ->
+            let () = check_cast_compatibility e typ in
+            raise (IsExp (simplify_exp e))
           | _ -> raise (IsExp nul_exp)
         in
         {e with enode=simplified_enode}

@@ -47,6 +47,7 @@ module Warn : sig
   val unsupported_address : warn_category
   val unsupported_asm : warn_category
   val unsupported_function : warn_category
+  val unsafe_cast : warn_category
 end
 
 module DebugKeys : sig

@@ -59,6 +59,8 @@
 [alias] analysing instruction: y1 = & x1;
 [alias] May-aliases at the end of instruction: y1 = & x1;
 [alias] analysing instruction: z->s = (struct struct_1_t *)y1;
+[alias:unsafe-cast] structure4.c:37: Warning: 
+  unsafe cast from st_1_t * to struct struct_1_t *
 [alias] May-aliases at the end of instruction: z->s = (struct struct_1_t *)y1;
   {z->s, y1} are aliased
 [alias] analysing instruction: z->c = 6;
