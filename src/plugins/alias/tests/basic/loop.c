@@ -1,4 +1,5 @@
-// leads to a loop in the graph
+// used to lead to a loop in the graph - fixed
+// no alias since there is an infinite loop
 
 int main()
 {

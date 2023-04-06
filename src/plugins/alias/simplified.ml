@@ -90,8 +90,8 @@ and simplify_exp e =
           | BinOp(PlusPI,e1,_,_) | BinOp(MinusPI,e1,_,_) ->
             begin
               match (simplify_exp e1).enode with
-                Lval (h,o) -> Lval (h,Index(nul_exp,o))
-              | AddrOf lv -> Lval lv
+                Lval lv -> Lval lv
+              | AddrOf lv -> AddrOf lv
               | _ -> raise (Explicit_pointer_address e1.eloc)
             end
           | CastE (typ, e) ->
