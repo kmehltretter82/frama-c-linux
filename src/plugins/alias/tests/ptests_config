@@ -1,1 +1,1 @@
-DEFAULT_SUITES=basic real_world offsets
+DEFAULT_SUITES=basic real_world offsets fixed_bugs

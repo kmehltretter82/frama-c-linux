@@ -1,3 +1,5 @@
+// from open-source-case-studies/chrony
+
 char* CPS_SplitWord(char *line)
 {
   return line;
