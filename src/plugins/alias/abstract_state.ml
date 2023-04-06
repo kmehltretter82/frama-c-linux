@@ -35,7 +35,7 @@ module Lval = Simplified.Simplified_lval
 module LSet = Simplified.Simplified_lset
 module LMap = Simplified.Simplified_lmap
 
-module G = Persistent.Digraph.Concrete(Datatype.Int)
+module G = Persistent.Digraph.ConcreteBidirectional(Datatype.Int)
 
 module V = G.V
 
