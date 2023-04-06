@@ -1,8 +1,9 @@
-// leads to a loop in the graph
+// used to lead to a loop in the graph - fixed
+// no alias since there is an infinite loop
 
 int main()
 {
-  for (int i = 0; i < 1; i++) {
+  while (1) {
     int l[1] = {0};
     int *n_0 = & l[1];
     n_0 = & l[1] + 0;
