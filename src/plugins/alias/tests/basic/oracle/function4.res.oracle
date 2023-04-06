@@ -1,15 +1,19 @@
 [kernel] Parsing function4.c (with preprocessing)
 [alias] analysing function: addr
 [alias] May-aliases at the end of function addr:
+  <none>
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
 [alias:unsafe-cast] function4.c:11: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *a = (int *)0;
+  <none>
 [alias] analysing instruction: int *b = (int *)0;
 [alias:unsafe-cast] function4.c:11: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *b = (int *)0;
+  <none>
 [alias] analysing instruction: int c = 0;
 [alias] May-aliases at the end of instruction: int c = 0;
+  <none>
 [alias] analysing instruction: a = addr(& c);
 [alias] May-aliases at the end of instruction: a = addr(& c);
   {a, &c} are aliased

@@ -2,6 +2,7 @@
 [alias] analysing function: choice
 [alias] analysing instruction: int c = 0;
 [alias] May-aliases at the end of instruction: int c = 0;
+  <none>
 [alias] analysing instruction: __retres = x;
 [alias] May-aliases at the end of instruction: __retres = x;
   {x, __retres} are aliased
@@ -14,12 +15,15 @@
 [alias] analysing instruction: int *a = (int *)0;
 [alias:unsafe-cast] function5.c:16: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *a = (int *)0;
+  <none>
 [alias] analysing instruction: int *b = (int *)0;
 [alias:unsafe-cast] function5.c:16: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *b = (int *)0;
+  <none>
 [alias] analysing instruction: int *c = (int *)0;
 [alias:unsafe-cast] function5.c:16: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *c = (int *)0;
+  <none>
 [alias] analysing instruction: c = choice(a,b);
 [alias] May-aliases at the end of instruction: c = choice(a,b);
   {a, b, c} are aliased

@@ -2,12 +2,18 @@
 [alias] analysing function: main
 [alias] analysing instruction: mat[0][0] = 0;
 [alias] May-aliases at the end of instruction: mat[0][0] = 0;
+  <none>
 [alias] analysing instruction: mat[0][1] = 1;
 [alias] May-aliases at the end of instruction: mat[0][1] = 1;
+  <none>
 [alias] analysing instruction: *x = mat[1];
 [alias] May-aliases at the end of instruction: *x = mat[1];
+  <none>
 [alias] analysing instruction: *y = *(*(x + 0));
 [alias] May-aliases at the end of instruction: *y = *(*(x + 0));
+  <none>
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction: __retres = 0;
+  <none>
 [alias] May-aliases at the end of function main:
+  <none>

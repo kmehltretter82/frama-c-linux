@@ -2,20 +2,29 @@
 [alias] analysing function: f
 [alias] analysing instruction: int y = 0;
 [alias] May-aliases at the end of instruction: int y = 0;
+  <none>
 [alias] analysing instruction: *x = y;
 [alias] May-aliases at the end of instruction: *x = y;
+  <none>
 [alias] May-aliases at the end of function f:
+  <none>
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
 [alias:unsafe-cast] globctr.c:8: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *a = (int *)0;
+  <none>
 [alias] analysing instruction: int *b = (int *)0;
 [alias:unsafe-cast] globctr.c:8: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *b = (int *)0;
+  <none>
 [alias] analysing instruction: f(a);
 [alias] May-aliases at the end of instruction: f(a);
+  <none>
 [alias] analysing instruction: f(b);
 [alias] May-aliases at the end of instruction: f(b);
+  <none>
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction: __retres = 0;
+  <none>
 [alias] May-aliases at the end of function main:
+  <none>

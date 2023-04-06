@@ -167,9 +167,12 @@
 [alias] analysing function: swap
 [alias] analysing instruction: *n = 0;
 [alias] May-aliases at the end of instruction: *n = 0;
+  <none>
 [alias] analysing instruction: (*n) ++;
 [alias] May-aliases at the end of instruction: (*n) ++;
+  <none>
 [alias] May-aliases at the end of function swap:
+  <none>
 [alias] May-aliases at the end of instruction: swap(tmp->n1);
   {x, tmp} are aliased
 [alias] analysing instruction: i ++;
@@ -327,30 +330,43 @@
 [alias] analysing function: main
 [alias] analysing instruction: a = (ty *)malloc(sizeof(ty));
 [alias] May-aliases at the end of instruction: a = (ty *)malloc(sizeof(ty));
+  <none>
 [alias] analysing instruction: b = (ty *)malloc(sizeof(ty));
 [alias] May-aliases at the end of instruction: b = (ty *)malloc(sizeof(ty));
+  <none>
 [alias] analysing instruction: i = 0;
 [alias] May-aliases at the end of instruction: i = 0;
+  <none>
 [alias] analysing instruction: a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
 [alias] May-aliases at the end of instruction: a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
+  <none>
 [alias] analysing instruction: a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double));
 [alias] May-aliases at the end of instruction: a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double));
+  <none>
 [alias] analysing instruction: i ++;
 [alias] May-aliases at the end of instruction: i ++;
+  <none>
 [alias] analysing instruction: a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
 [alias] May-aliases at the end of instruction: a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
+  <none>
 [alias] analysing instruction: a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double));
 [alias] May-aliases at the end of instruction: a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double));
+  <none>
 [alias] analysing instruction: a->n1 = (int *)malloc(sizeof(int));
 [alias] May-aliases at the end of instruction: a->n1 = (int *)malloc(sizeof(int));
+  <none>
 [alias] analysing instruction: a->n2 = (int *)malloc(sizeof(int));
 [alias] May-aliases at the end of instruction: a->n2 = (int *)malloc(sizeof(int));
+  <none>
 [alias] analysing instruction: *(a->n1) = 1;
 [alias] May-aliases at the end of instruction: *(a->n1) = 1;
+  <none>
 [alias] analysing instruction: *(a->n2) = 1;
 [alias] May-aliases at the end of instruction: *(a->n2) = 1;
+  <none>
 [alias] analysing instruction: i = 0;
 [alias] May-aliases at the end of instruction: i = 0;
+  <none>
 [alias] analysing instruction: b->t1[i] = a->t1[i];
 [alias] May-aliases at the end of instruction: b->t1[i] = a->t1[i];
   {a->t1[0], b->t1[0]} are aliased
@@ -532,6 +548,7 @@
   <Bot>
 [alias] analysing function: swap
 [alias] May-aliases at the end of function swap:
+  <none>
 [alias] analysing function: system
 [alias] May-aliases at the end of function system:
   <Bot>

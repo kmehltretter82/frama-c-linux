@@ -3,13 +3,17 @@
 [alias] analysing instruction: int *a = (int *)0;
 [alias:unsafe-cast] assignment3.c:6: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *a = (int *)0;
+  <none>
 [alias] analysing instruction: int b = 0;
 [alias] May-aliases at the end of instruction: int b = 0;
+  <none>
 [alias] analysing instruction: int *c = (int *)0;
 [alias:unsafe-cast] assignment3.c:6: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *c = (int *)0;
+  <none>
 [alias] analysing instruction: a = & b;
 [alias] May-aliases at the end of instruction: a = & b;
+  <none>
 [alias] analysing instruction: c = & b;
 [alias] May-aliases at the end of instruction: c = & b;
   {a, c} are aliased

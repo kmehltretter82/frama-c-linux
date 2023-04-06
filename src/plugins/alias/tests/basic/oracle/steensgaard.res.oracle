@@ -2,6 +2,7 @@
 [alias] analysing function: main
 [alias] analysing instruction: a = & x;
 [alias] May-aliases at the end of instruction: a = & x;
+  <none>
 [alias] analysing instruction: b = & y;
 [alias] May-aliases at the end of instruction: b = & y;
   {*b, y} are aliased

@@ -2,18 +2,26 @@
 [alias] analysing function: main
 [alias] analysing instruction: int l[1] = {0};
 [alias] May-aliases at the end of instruction: int l[1] = {0};
+  <none>
 [alias] analysing instruction: int *n_0 = & l[1];
 [alias] May-aliases at the end of instruction: int *n_0 = & l[1];
+  <none>
 [alias] analysing instruction: n_0 = & l[1] + 0;
 [alias] May-aliases at the end of instruction: n_0 = & l[1] + 0;
+  <none>
 [alias] analysing instruction: int w = 0;
 [alias] May-aliases at the end of instruction: int w = 0;
+  <none>
 [alias] analysing instruction: l[0] = *(& l[1] + 0);
 [alias] May-aliases at the end of instruction: l[0] = *(& l[1] + 0);
+  <none>
 [alias] analysing instruction: int l[1] = {0};
 [alias] May-aliases at the end of instruction: int l[1] = {0};
+  <none>
 [alias] analysing instruction: int *n_0 = & l[1];
 [alias] May-aliases at the end of instruction: int *n_0 = & l[1];
+  <none>
 [alias:no-return] loop.c:4: Warning: 
   function main does not return; analysis may be unsound
 [alias] May-aliases at the end of function main:
+  <none>

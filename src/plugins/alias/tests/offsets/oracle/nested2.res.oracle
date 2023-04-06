@@ -74,24 +74,32 @@
 [alias] analysing function: main
 [alias] analysing instruction: st_1_t x1 = {.a = 0, .b = 1};
 [alias] May-aliases at the end of instruction: st_1_t x1 = {.a = 0, .b = 1};
+  <none>
 [alias] analysing instruction: st_1_t x2 = {.a = 2, .b = 3};
 [alias] May-aliases at the end of instruction: st_1_t x2 = {.a = 2, .b = 3};
+  <none>
 [alias] analysing instruction: st_2_t *z1 = malloc(sizeof(st_2_t));
 [alias] May-aliases at the end of instruction: st_2_t *z1 = malloc(sizeof(st_2_t));
+  <none>
 [alias] analysing instruction: st_3_t *t = malloc(sizeof(st_3_t));
 [alias] May-aliases at the end of instruction: st_3_t *t = malloc(sizeof(st_3_t));
+  <none>
 [alias] analysing instruction: int *a = malloc(sizeof(int));
 [alias] May-aliases at the end of instruction: int *a = malloc(sizeof(int));
+  <none>
 [alias] analysing instruction: *a = 0;
 [alias] May-aliases at the end of instruction: *a = 0;
+  <none>
 [alias] analysing instruction: z1->s[0] = (struct struct_1_t *)(& x1);
 [alias:unsafe-cast] nested2.c:42: Warning: 
   unsafe cast from st_1_t * to struct struct_1_t *
 [alias] May-aliases at the end of instruction: z1->s[0] = (struct struct_1_t *)(& x1);
+  <none>
 [alias] analysing instruction: z1->s[1] = (struct struct_1_t *)(& x2);
 [alias:unsafe-cast] nested2.c:43: Warning: 
   unsafe cast from st_1_t * to struct struct_1_t *
 [alias] May-aliases at the end of instruction: z1->s[1] = (struct struct_1_t *)(& x2);
+  <none>
 [alias] analysing instruction: z1->c = a;
 [alias] May-aliases at the end of instruction: z1->c = a;
   {z1->c, a} are aliased

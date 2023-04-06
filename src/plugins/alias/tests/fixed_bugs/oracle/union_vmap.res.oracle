@@ -3,13 +3,16 @@
 [alias] analysing instruction: char *s2 = CPS_SplitWord((char *)"a");
 [alias] analysing function: CPS_SplitWord
 [alias] May-aliases at the end of function CPS_SplitWord:
+  <none>
 [alias:unsafe-cast] union_vmap.c:11: Warning: 
   unsafe cast from char const * to char *
 [alias] May-aliases at the end of instruction: char *s2 = CPS_SplitWord((char *)"a");
+  <none>
 [alias] analysing instruction: char *s3 = CPS_SplitWord((char *)"b");
 [alias:unsafe-cast] union_vmap.c:12: Warning: 
   unsafe cast from char const * to char *
 [alias] May-aliases at the end of instruction: char *s3 = CPS_SplitWord((char *)"b");
+  <none>
 [alias] analysing instruction: *key = s3;
 [alias] May-aliases at the end of instruction: *key = s3;
   {*key, s3} are aliased
@@ -20,3 +23,4 @@
   {*key, s2, s3} are aliased
 [alias] analysing function: CPS_SplitWord
 [alias] May-aliases at the end of function CPS_SplitWord:
+  <none>

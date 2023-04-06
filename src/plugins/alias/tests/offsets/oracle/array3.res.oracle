@@ -75,11 +75,14 @@
 [alias] analysing instruction: int *x = malloc((unsigned long)4 * sizeof(int));
 [alias] May-aliases at the end of instruction: int *x =
                                            malloc((unsigned long)4 * sizeof(int));
+  <none>
 [alias] analysing instruction: int *y = malloc((unsigned long)4 * sizeof(int));
 [alias] May-aliases at the end of instruction: int *y =
                                            malloc((unsigned long)4 * sizeof(int));
+  <none>
 [alias] analysing instruction: x = mat[0];
 [alias] May-aliases at the end of instruction: x = mat[0];
+  <none>
 [alias] analysing instruction: y = mat[1];
 [alias] May-aliases at the end of instruction: y = mat[1];
   {x, y} are aliased

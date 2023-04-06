@@ -263,7 +263,9 @@ let print_aliases fmt (x:t) =
     if LSet.cardinal aliases >= 2 then Some aliases else None
   in
   let alias_sets = VMap.filter_map alias_set_of_vertex x.vmap in
-  VMap.iter print_alias_set alias_sets
+  if VMap.is_empty alias_sets
+  then Format.fprintf fmt "<none>"
+  else VMap.iter print_alias_set alias_sets
 
 (** invariants of type t must be true before and after each functon call *)
 let assert_invariants (x:t) : unit =

@@ -75,17 +75,24 @@
 [alias] analysing instruction: int *s = (int *)0;
 [alias:unsafe-cast] while_for1.c:8: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *s = (int *)0;
+  <none>
 [alias] analysing instruction: int idx = 0;
 [alias] May-aliases at the end of instruction: int idx = 0;
+  <none>
 [alias] analysing instruction: s = (int *)malloc((size_t)idx);
 [alias] May-aliases at the end of instruction: s = (int *)malloc((size_t)idx);
+  <none>
 [alias] analysing instruction: idx ++;
 [alias] May-aliases at the end of instruction: idx ++;
+  <none>
 [alias] analysing instruction: s = (int *)malloc((size_t)idx);
 [alias] May-aliases at the end of instruction: s = (int *)malloc((size_t)idx);
+  <none>
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases at the end of instruction: __retres = 0;
+  <none>
 [alias] May-aliases at the end of function main:
+  <none>
 [alias] analysing function: malloc
 [alias] May-aliases at the end of function malloc:
   <Bot>

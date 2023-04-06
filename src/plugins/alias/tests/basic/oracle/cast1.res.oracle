@@ -3,15 +3,19 @@
 [alias] analysing instruction: int *a = (int *)0;
 [alias:unsafe-cast] cast1.c:8: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *a = (int *)0;
+  <none>
 [alias] analysing instruction: int *b = (int *)0;
 [alias:unsafe-cast] cast1.c:8: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *b = (int *)0;
+  <none>
 [alias] analysing instruction: float *c = (float *)0;
 [alias:unsafe-cast] cast1.c:9: Warning: unsafe cast from int to float *
 [alias] May-aliases at the end of instruction: float *c = (float *)0;
+  <none>
 [alias] analysing instruction: float *d = (float *)0;
 [alias:unsafe-cast] cast1.c:9: Warning: unsafe cast from int to float *
 [alias] May-aliases at the end of instruction: float *d = (float *)0;
+  <none>
 [alias] analysing instruction: a = (int *)c;
 [alias:unsafe-cast] cast1.c:10: Warning: unsafe cast from float * to int *
 [alias] May-aliases at the end of instruction: a = (int *)c;

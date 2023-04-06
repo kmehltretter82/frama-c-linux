@@ -2,14 +2,19 @@
 [alias] analysing function: main
 [alias] analysing instruction: st_1_t x = {.a = 0, .b = 1};
 [alias] May-aliases at the end of instruction: st_1_t x = {.a = 0, .b = 1};
+  <none>
 [alias] analysing instruction: st_2_t y = {.a = 3, .c = 4};
 [alias] May-aliases at the end of instruction: st_2_t y = {.a = 3, .c = 4};
+  <none>
 [alias] analysing instruction: st_1_t *p_x = & x;
 [alias] May-aliases at the end of instruction: st_1_t *p_x = & x;
+  <none>
 [alias] analysing instruction: st_2_t *p_y = & y;
 [alias] May-aliases at the end of instruction: st_2_t *p_y = & y;
+  <none>
 [alias] analysing instruction: p_x->a = 3;
 [alias] May-aliases at the end of instruction: p_x->a = 3;
+  <none>
 [alias] analysing instruction: p_x = (st_1_t *)p_y;
 [alias:unsafe-cast] structure1.c:28: Warning: 
   unsafe cast from st_2_t * to st_1_t *

@@ -3,17 +3,22 @@
 [alias] analysing instruction: int *a = (int *)0;
 [alias:unsafe-cast] switch2.c:6: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *a = (int *)0;
+  <none>
 [alias] analysing instruction: int *b = (int *)0;
 [alias:unsafe-cast] switch2.c:6: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *b = (int *)0;
+  <none>
 [alias] analysing instruction: int *c = (int *)0;
 [alias:unsafe-cast] switch2.c:6: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *c = (int *)0;
+  <none>
 [alias] analysing instruction: int *d = (int *)0;
 [alias:unsafe-cast] switch2.c:6: Warning: unsafe cast from int to int *
 [alias] May-aliases at the end of instruction: int *d = (int *)0;
+  <none>
 [alias] analysing instruction: int e = 0;
 [alias] May-aliases at the end of instruction: int e = 0;
+  <none>
 [alias] analysing instruction: case 1: a = d;
 [alias] May-aliases at the end of instruction: case 1: a = d;
   {a, d} are aliased
