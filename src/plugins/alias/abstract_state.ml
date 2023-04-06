@@ -517,7 +517,7 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
       (* for any predecessor, find all its aliases and then look for potential existing vertex *)
       let f_fold_lmap lvx vx acc =
         let set_aliases = VMap.find vx x.vmap in
-        Options.debug "looking for aliases of %a in set %a@." Lval.pretty lv LSet.pretty set_aliases;
+        Options.debug ~level:9 "looking for aliases of %a in set %a@." Lval.pretty lv LSet.pretty set_aliases;
         if LSet.cardinal set_aliases > 1
         then
           let off = diff_offset lvx lv in
@@ -627,6 +627,8 @@ let rec join_without_check (x:t) (v1:V.t) (v2:V.t) : t =
     | [], _ -> x
     | _, [] -> x
     | [succ_v1],[succ_v2] ->
+      assert (succ_v1 <> v2);
+      assert (succ_v2 <> v1);
       join_without_check x succ_v1 succ_v2
     | _, _ ->
       Options.fatal "invariant broken"
@@ -636,8 +638,15 @@ let join (x:t) (v1:V.t) (v2:V.t) : t =
   Options.debug ~level:7 "graph before join(%d,%d) @.%a@." v1 v2 print_debug x;
   assert_invariants x;
   let res = join_without_check x v1 v2 in
-  assert_invariants res;
   Options.debug ~level:7 "graph after join(%d,%d) @.%a@." v1 v2 print_debug res;
+  begin
+    try assert_invariants res
+    with Assert_failure _ ->
+      Options.debug "join(%d,%d) failed" v1 v2;
+      Options.debug "graph before join(%d,%d) @.%a@." v1 v2 print_debug x;
+      Options.debug "graph after join(%d,%d) @.%a@." v1 v2 print_debug res;
+      assert_invariants res
+  end;
   res
 
 let merge_set (x:t) (vs:VSet.t) : V.t * t =
@@ -780,7 +789,7 @@ let shift (a : t) : t =
     assert_invariants result;
     result
 
-let union  (a1:t) (a2:t) :t =
+let union (a1:t) (a2:t) :t =
   (* naive algorithm :
      1 merge the graph and the vmap (by doing union of sets)
      2 for any node present in both a1.graph and a2.graph, merge/join them
@@ -837,7 +846,18 @@ let union  (a1:t) (a2:t) :t =
   let new_a = List.fold_left join_succs new_a merged_nodes in
   Options.debug ~level:4 "Union: Result graph:@.%a@." print_graph new_a;
   Options.debug ~level:5 "Union: Result graph:@.%a@." print_debug new_a;
-  assert_invariants new_a;
+  begin
+    try assert_invariants new_a
+    with Assert_failure _ ->
+      Options.debug "union failed";
+      Options.debug "Union: First graph:@.%a@." print_graph a1;
+      Options.debug "Union: First graph:@.%a@." print_debug a1;
+      Options.debug "Union: Second graph:@.%a@." print_graph a2;
+      Options.debug "Union: Second graph:@.%a@." print_debug a2;
+      Options.debug "Union: Result graph:@.%a@." print_graph new_a;
+      Options.debug "Union: Result graph:@.%a@." print_debug new_a;
+      assert_invariants new_a
+  end;
   new_a
 
 (** a type for summaries of functions *)
