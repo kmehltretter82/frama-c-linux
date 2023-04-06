@@ -255,13 +255,15 @@ let print_graph fmt (x:t) =
   G.iter_edges print_edge x.graph
 
 let print_aliases fmt (x:t) =
-  let iter_vmap v _set_lv0 =
-    assert (G.mem_vertex x.graph v);
-    let set_lv = aliases_of_vertex v x in
-    if LSet.cardinal set_lv >=2 then
-      Format.fprintf fmt "@[<hov 2>%a@] are aliased@." LSet.pretty set_lv
+  let print_alias_set _ set_lv =
+    Format.fprintf fmt "@[<hov 2>%a@] are aliased@." LSet.pretty set_lv
   in
-  VMap.iter iter_vmap x.vmap
+  let alias_set_of_vertex i _ =
+    let aliases = aliases_of_vertex i x in
+    if LSet.cardinal aliases >= 2 then Some aliases else None
+  in
+  let alias_sets = VMap.filter_map alias_set_of_vertex x.vmap in
+  VMap.iter print_alias_set alias_sets
 
 (** invariants of type t must be true before and after each functon call *)
 let assert_invariants (x:t) : unit =
