@@ -499,7 +499,7 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
                 succ_v1, {x with lmap = new_lmap ; vmap = new_vmap }
               | _ -> Options.fatal " Invariant violated : more than 1 successor"
             end
-          | BAddrOf _ -> Options.fatal "*(&x) not allowed"
+          | BAddrOf lv -> find_or_create_vertex (BLval lv) x
         end
       | _ -> create_vertex_simple blv x
     end
