@@ -96,10 +96,13 @@ struct
       m
 
   let pretty fmt (m:t) =
+    let is_first = ref true in
     LMap.iter
       (fun lv mo ->
          OMap.iter
-           (fun o v -> let lv =  Lval.addOffsetLval o lv in Format.fprintf fmt "(lval=%a -> id=%d)@." Lval.pretty lv v)
+           (fun o v -> let lv =  Lval.addOffsetLval o lv in
+             if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
+             Format.fprintf fmt "@ @[%a:%d@]" Lval.pretty lv v)
            mo
       )
       m
@@ -236,27 +239,36 @@ let get_lval_set = find_lset
 (* printing functions *)
 
 let print_debug fmt (x:t) =
-  Format.fprintf fmt "@[<hov 2>List of edges: @.";
-  G.iter_edges (fun v1 v2 -> Format.fprintf fmt "%d → %d@." v1 v2) x.graph;
-  Format.fprintf fmt "@]@.";
-  Format.fprintf fmt "@[<hov 2>LMap: @.";
+  Format.fprintf fmt "@[<v>";
+  Format.fprintf fmt "@[Edges:";
+  G.iter_edges (fun v1 v2 -> Format.fprintf fmt "@;<3 2>@[%d → %d@]" v1 v2) x.graph;
+  Format.fprintf fmt "@]@;<6>";
+  Format.fprintf fmt "@[LMap:@;<3 2>";
   LLMap.pretty fmt x.lmap;
-  Format.fprintf fmt "@]@.";
-  Format.fprintf fmt "@[<hov 2>VMap: @.";
-  VMap.iter (fun v ls -> Format.fprintf fmt "id=%d → lset=%a@." v LSet.pretty ls) x.vmap;
-  Format.fprintf fmt "@]@."
+  Format.fprintf fmt "@]@;<6>";
+  Format.fprintf fmt "@[VMap:@;<2>";
+  VMap.iter (fun v ls -> Format.fprintf fmt "@;<2 2>@[%d:%a@]" v LSet.pretty ls) x.vmap;
+  Format.fprintf fmt "@]";
+  Format.fprintf fmt "@]"
 
 let print_graph fmt (x:t) =
+  let is_first = ref true in
   let print_edge v1 v2 =
-    Format.fprintf fmt "%d:%a -> %d:%a@."
-      v1 LSet.pretty (VMap.find v1 x.vmap)
-      v2 LSet.pretty (VMap.find v2 x.vmap)
+    if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
+    let print_node v fmt lset = Format.fprintf fmt "%d:%a" v LSet.pretty lset in
+    Format.fprintf fmt "@[%a@] → @[%a@]"
+      (print_node v1) (VMap.find v1 x.vmap)
+      (print_node v2) (VMap.find v2 x.vmap)
   in
-  G.iter_edges print_edge x.graph
+  if G.nb_edges x.graph = 0
+  then Format.fprintf fmt "<empty>"
+  else G.iter_edges print_edge x.graph
 
 let print_aliases fmt (x:t) =
+  let is_first = ref true in
   let print_alias_set _ set_lv =
-    Format.fprintf fmt "@[<hov 2>%a@] are aliased@." LSet.pretty set_lv
+    if !is_first then is_first := false else Format.fprintf fmt "@;<2>";
+    LSet.pretty fmt set_lv
   in
   let alias_set_of_vertex i _ =
     let aliases = aliases_of_vertex i x in
@@ -388,7 +400,7 @@ let find_all_aliases_of_offset (lv1: Lval.t) (x: t) : LSet.t =
   in
   Options.debug ~level:9 "decompose_lval %a : [@[<hov 2>" Lval.pretty lv1;
   List.iter (fun (x, o) -> Options.debug ~level:9 " (%a,%a) " Lval.pretty x Offset.pretty o) list_of_lval_to_be_searched;
-  Options.debug ~level:9 "@]]@.";
+  Options.debug ~level:9 "@]]";
   let list_of_aliases : (LSet.t*offset) list =
     List.map f_map list_of_lval_to_be_searched
   in
@@ -413,7 +425,7 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   (* find all the alias of lv (because of offset) *)
   let set_of_aliases : LSet.t = find_all_aliases_of_offset lv x in
   (* add all these aliases *)
-  Options.debug ~level:9 "all_aliases of %a : %a @." Lval.pretty lv LSet.pretty set_of_aliases;
+  Options.debug ~level:9 "all_aliases of %a : %a " Lval.pretty lv LSet.pretty set_of_aliases;
   let new_lmap =
     LSet.fold
       (fun lv acc -> assert (not (LLMap.mem lv x.lmap)); LLMap.add lv new_v acc)
@@ -469,7 +481,7 @@ let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
    in the graph. If it is present, there will be bugs *)
 let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
   assert (not (LLMap.mem blv x.lmap));
-  Options.debug ~level:9 "creating a vertex for %a@." Lval.pretty blv;
+  Options.debug ~level:9 "creating a vertex for %a" Lval.pretty blv;
   match blv with
   | BNone ->
     Options.fatal "Should not happen: create_vertex_lval %a" Lval.pretty blv
@@ -519,7 +531,7 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
       (* for any predecessor, find all its aliases and then look for potential existing vertex *)
       let f_fold_lmap lvx vx acc =
         let set_aliases = VMap.find vx x.vmap in
-        Options.debug ~level:9 "looking for aliases of %a in set %a@." Lval.pretty lv LSet.pretty set_aliases;
+        Options.debug ~level:9 "looking for aliases of %a in set %a" Lval.pretty lv LSet.pretty set_aliases;
         if LSet.cardinal set_aliases > 1
         then
           let off = diff_offset lvx lv in
@@ -544,7 +556,7 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
           map_predecessors
           VSet.empty
       in
-      Options.debug ~level:9 "found aliases of %a : %a@." Lval.pretty lv VSet.pretty vset_res;
+      Options.debug ~level:9 "found aliases of %a : %a" Lval.pretty lv VSet.pretty vset_res;
       if VSet.is_empty vset_res
       then create_vertex_lval lv x
       else
@@ -637,16 +649,16 @@ let rec join_without_check (x:t) (v1:V.t) (v2:V.t) : t =
 
 (* since the recursive version of join, unify, unify2 and merge may break the invariants *)
 let join (x:t) (v1:V.t) (v2:V.t) : t =
-  Options.debug ~level:7 "graph before join(%d,%d) @.%a@." v1 v2 print_debug x;
+  Options.debug ~level:7 "graph before join(%d,%d):@;<2>@[%a@]" v1 v2 print_debug x;
   assert_invariants x;
   let res = join_without_check x v1 v2 in
-  Options.debug ~level:7 "graph after join(%d,%d) @.%a@." v1 v2 print_debug res;
+  Options.debug ~level:7 "graph after join(%d,%d):@;<2>@[%a@]" v1 v2 print_debug res;
   begin
     try assert_invariants res
     with Assert_failure _ ->
       Options.debug "join(%d,%d) failed" v1 v2;
-      Options.debug "graph before join(%d,%d) @.%a@." v1 v2 print_debug x;
-      Options.debug "graph after join(%d,%d) @.%a@." v1 v2 print_debug res;
+      Options.debug "graph before join(%d,%d):@;<2>@[%a@]" v1 v2 print_debug x;
+      Options.debug "graph after join(%d,%d):@;<2>@[ %a@]" v1 v2 print_debug res;
       assert_invariants res
   end;
   res
@@ -654,15 +666,15 @@ let join (x:t) (v1:V.t) (v2:V.t) : t =
 let merge_set (x:t) (vs:VSet.t) : V.t * t =
   let v0 = VSet.choose vs in
   if VSet.cardinal vs < 2 then v0, x else begin
-    Options.debug ~level:7 "graph before merge_set %a @.%a@." VSet.pretty vs print_debug x;
+    Options.debug ~level:7 "graph before merge_set %a:@;<2>@[%a@]" VSet.pretty vs print_debug x;
     assert (G.mem_vertex x.graph v0);
     let result = VSet.fold (fun v acc -> merge acc v0 v) vs x in
-    Options.debug ~level:7 "graph after merge_set %a @.%a@." VSet.pretty vs print_debug result;
+    Options.debug ~level:7 "graph after merge_set %a:@;<2>@[%a@]" VSet.pretty vs print_debug result;
     v0, result
   end
 
 let rec join_succs (x:t) v =
-  Options.debug ~level:8 "joining successors of %d@." v;
+  Options.debug ~level:8 "joining successors of %d" v;
   if not @@ G.mem_vertex x.graph v then x else
     match G.succ x.graph v with
     | [] | [_] -> x
@@ -733,7 +745,7 @@ let is_included (a1:t) (a2:t) =
   (* tests if a1 is included in a2, at least as the nodes with lval *)
   assert_invariants a1;
   assert_invariants a2;
-  Options.debug ~level:8 "testing equal @.%a@. AND à.%a@." (pretty ~debug:true) a1 (pretty ~debug:true) a2;
+  Options.debug ~level:8 "testing equal %a AND à.%a" (pretty ~debug:true) a1 (pretty ~debug:true) a2;
   try
     let iter_lmap (lv:Lval.t) (v1:V.t): unit =
       let v2 : V.t = try LLMap.find lv a2.lmap with Not_found -> raise Not_included in
@@ -773,7 +785,7 @@ let is_empty s =
 let shift (a : t) : t =
   assert_invariants a;
   if is_empty a then a else
-    let () = Options.debug ~level:8 "before shift: node_counter=%d@.%a@." !node_counter print_debug a in
+    let () = Options.debug ~level:8 "before shift: node_counter=%d@.%a" !node_counter print_debug a in
     let max_idx = G.fold_vertex max a.graph 0 in
     let min_idx = G.fold_vertex min a.graph max_idx in
     let offset = !node_counter - min_idx in
@@ -783,13 +795,12 @@ let shift (a : t) : t =
     in
     let {graph; lmap; vmap} = a in
     node_counter := max_idx + offset + 1;
-    let () = Options.debug ~level:8 "node_counter after shift: %d@." !node_counter in
     let result =
       {graph = G.map_vertex shift graph;
        lmap = LLMap.map shift lmap;
        vmap = shift_vmap (fun (key, l) -> (shift key, l)) vmap}
     in
-    let () = Options.debug ~level:8 "after shift: node_counter=%d@.%a@." !node_counter print_debug result in
+    let () = Options.debug ~level:8 "after shift: node_counter=%d@.%a" !node_counter print_debug result in
     assert_invariants result;
     result
 
@@ -828,10 +839,10 @@ let union (a1:t) (a2:t) :t =
   assert_invariants a1;
   assert_invariants a2;
 
-  Options.debug ~level:4 "Union: First graph:@.%a@." print_graph a1;
-  Options.debug ~level:5 "Union: First graph:@.%a@." print_debug a1;
-  Options.debug ~level:4 "Union: Second graph:@.%a@." print_graph a2;
-  Options.debug ~level:5 "Union: Second graph:@.%a@." print_debug a2;
+  Options.debug ~level:4 "Union: First graph:%a" print_graph a1;
+  Options.debug ~level:5 "Union: First graph:%a" print_debug a1;
+  Options.debug ~level:4 "Union: Second graph:%a" print_graph a2;
+  Options.debug ~level:5 "Union: Second graph:%a" print_debug a2;
   let new_graph =
     G.fold_vertex
       (fun v2 g -> G.add_vertex g v2)
@@ -856,7 +867,7 @@ let union (a1:t) (a2:t) :t =
   let new_lmap = LLMap.union a1.lmap a2.lmap in
   Options.debug ~level:7 "Union: sets to be joined:@[";
   VMap.iter (fun _ set -> Options.debug ~level:7 "%a" VSet.pretty set) sets_to_be_joined;
-  Options.debug ~level:7 "@]@.";
+  Options.debug ~level:7 "@]";
   let new_a = {graph = new_graph; lmap = new_lmap; vmap = new_vmap} in
   let merged_nodes, new_a =
     VMap.fold
@@ -865,18 +876,18 @@ let union (a1:t) (a2:t) :t =
       ([], new_a)
   in
   let new_a = List.fold_left join_succs new_a merged_nodes in
-  Options.debug ~level:4 "Union: Result graph:@.%a@." print_graph new_a;
-  Options.debug ~level:5 "Union: Result graph:@.%a@." print_debug new_a;
+  Options.debug ~level:4 "Union: Result graph:%a" print_graph new_a;
+  Options.debug ~level:5 "Union: Result graph:%a" print_debug new_a;
   begin
     try assert_invariants new_a
     with Assert_failure _ ->
       Options.debug "union failed";
-      Options.debug "Union: First graph:@.%a@." print_graph a1;
-      Options.debug "Union: First graph:@.%a@." print_debug a1;
-      Options.debug "Union: Second graph:@.%a@." print_graph a2;
-      Options.debug "Union: Second graph:@.%a@." print_debug a2;
-      Options.debug "Union: Result graph:@.%a@." print_graph new_a;
-      Options.debug "Union: Result graph:@.%a@." print_debug new_a;
+      Options.debug "Union: First graph:%a" print_graph a1;
+      Options.debug "Union: First graph:%a" print_debug a1;
+      Options.debug "Union: Second graph:%a" print_graph a2;
+      Options.debug "Union: Second graph:%a" print_debug a2;
+      Options.debug "Union: Result graph:%a" print_graph new_a;
+      Options.debug "Union: Result graph:%a" print_debug new_a;
       assert_invariants new_a
   end;
   new_a
@@ -909,8 +920,8 @@ let make_summary (s: t option) (kf: kernel_function) =
           None, _ |  _, BNone -> s
         | Some s, lv ->
           let _, new_s = find_or_create_vertex lv s in
-          (* Format.printf "DEBUG: new state BEFORE finding %a:@.%a@." Lval.pretty lv (pretty ~debug:true) s; *)
-          (* Format.printf "DEBUG: new state AFTER finding %a:@.%a@." Lval.pretty lv (pretty ~debug:true) new_s; *)
+          (* Format.printf "DEBUG: new state BEFORE finding %a:%a" Lval.pretty lv (pretty ~debug:true) s; *)
+          (* Format.printf "DEBUG: new state AFTER finding %a:%a" Lval.pretty lv (pretty ~debug:true) new_s; *)
           Some new_s
       end
   in
@@ -922,24 +933,26 @@ let make_summary (s: t option) (kf: kernel_function) =
   }
 
 
-let pretty_summary ?(debug=false) ?(function_name="") fmt s =
+let pretty_summary ?(debug=false) fmt s =
   let print_list_lval fmt (l: lval list) =
     List.iter (fun x -> Format.fprintf fmt "%a " Cil_datatype.Lval.pretty x) l
   in
   let print_option pp fmt x =
     match x with
     | Some x -> pp fmt x
-    | None -> Format.fprintf fmt "<None>"
+    | None -> Format.fprintf fmt "<none>"
   in
   match s.state with
-    None -> if debug then Format.fprintf fmt  "@Summary of function %s is not in the table @." function_name
-  | Some s when is_empty s -> if debug then Format.fprintf fmt "@Summary of function %s is empty @." function_name
+  | None -> if debug then Format.fprintf fmt "not found"
+  | Some s when is_empty s -> if debug then Format.fprintf fmt "empty"
   | _ ->
     begin
-      Format.fprintf fmt "@[<hov 2>Summary of function %s: @." function_name;
       (* Format.fprintf fmt "state not empty"; *)
-      Format.fprintf fmt "formals: %a locals : %a return expression: %a @.State: @[<hov 2>%a@] " print_list_lval s.formals print_list_lval s.locals (print_option Exp.pretty) s.return (print_option (pretty ~debug)) s.state;
-      Format.fprintf fmt "@]@."
+      Format.fprintf fmt "@[formals: @[%a@]@;<3>locals: @[%a@]@;<3>returns: @[%a@]@;<3>state: @[%a@] "
+        print_list_lval s.formals
+        print_list_lval s.locals
+        (print_option Exp.pretty) s.return
+        (print_option @@ pretty ~debug) s.state;
     end
 
 (* the algorithm:

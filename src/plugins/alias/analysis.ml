@@ -155,15 +155,15 @@ let analyse_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_sta
 
 let pp_abstract_state_opt ?(debug=false) fmt v =
   match v with
-  | None -> Format.fprintf fmt "<Bot>"
+  | None -> Format.fprintf fmt "⊥"
   | Some a -> Abstract_state.pretty ~debug fmt a
 
 let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
-  Options.feedback ~level:3 "analysing instruction: %a" Printer.pp_stmt s;
+  Options.feedback ~level:3 "@[analysing instruction:@ %a@]" Printer.pp_stmt s;
   let result = analyse_instr s i a in
-  Options.feedback ~level:3 "May-aliases at the end of instruction: %a@.%a@."
+  Options.feedback ~level:3 "@[May-aliases after instruction@;<2>@[%a@]@;<2>are@;<2>@[%a@]@]"
     Printer.pp_stmt s (pp_abstract_state_opt ~debug:false) result;
-  Options.debug ~level:3 "May-alias graph at the end of instruction: %a@.%a@."
+  Options.debug ~level:3 "@[May-alias graph after instruction@;<2>@[%a@]@;<2>is@;<4>@[%a@]@]"
     Printer.pp_stmt s (pp_abstract_state_opt ~debug:true) result;
   result
 
@@ -247,10 +247,10 @@ let analyse_function (kf:kernel_function) =
 let doFunction (kf:kernel_function) =
   let final_state = analyse_function kf in
   let level = if Kernel_function.is_main kf then 1 else 2 in
-  Options.feedback ~level "May-aliases at the end of function %a:@.%a@."
+  Options.feedback ~level "@[May-aliases at the end of function %a:@ @[%a@]"
     Kernel_function.pretty kf
     (pp_abstract_state_opt ~debug:false) final_state;
-  Options.debug ~level "May-alias graph at the end of function %a:@.%a@."
+  Options.debug ~level "May-alias graph at the end of function %a:@;<4>@[%a@]"
     Kernel_function.pretty kf
     (pp_abstract_state_opt ~debug:true) final_state;
   let result =
@@ -260,10 +260,9 @@ let doFunction (kf:kernel_function) =
     | _ ->
       begin
         let summary = Abstract_state.make_summary final_state kf in
-        let function_name = Kernel_function.get_name kf in
-        Options.debug ~level:2 "Summary of function %a:@.%a@."
+        Options.debug ~level:2 "Summary of function %a:@ @[%a@]"
           Kernel_function.pretty kf
-          (Abstract_state.pretty_summary ~debug:false ~function_name) summary;
+          (Abstract_state.pretty_summary ~debug:false) summary;
         Some summary
       end
   in
@@ -312,15 +311,16 @@ let compute () =
       | None -> Format.fprintf fmt "<Bot>"
       | Some a -> Abstract_state.pretty ~debug:(Options.DebugTable.get()) fmt a
     in
-    Format.fprintf fmt "Before statement %a :@.@[<hov 2> %a@]@." print_key k print_value v
+    Format.fprintf fmt "Before statement %a :@[<hov 2> %a@]" print_key k print_value v
   in
-  let print_function_table_elt fmt kf s :unit =
-    let function_name =
-      Kernel_function.get_name kf
-    in
+  let print_function_table_elt fmt kf s : unit =
+    let function_name = Kernel_function.get_name kf in
     match s with
-      None -> Options.debug "function %s -> None@." function_name
-    | Some s -> Abstract_state.pretty_summary ~debug:(Options.DebugTable.get()) ~function_name fmt s
+    | None -> Options.debug "function %s -> None" function_name
+    | Some s ->
+      Format.fprintf fmt "Summary of function %s:@;<5 2>@[%a@]@."
+        function_name
+        (Abstract_state.pretty_summary ~debug:(Options.DebugTable.get())) s
   in
   if Options.ShowStmtTable.get() then
     Stmt_table.iter (print_stmt_table_elt Format.std_formatter);

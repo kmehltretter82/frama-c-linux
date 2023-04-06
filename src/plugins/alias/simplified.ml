@@ -184,7 +184,7 @@ struct
         Format.fprintf fmt " %a -> %a" f_key k f_val v
       )
       m;
-    Format.fprintf fmt " @]}@."
+    Format.fprintf fmt " @]}"
 
   let pretty f fmt m = print Simplified_lval.pretty f fmt m
 end
@@ -195,7 +195,7 @@ struct
 
   let print (f_elt: Format.formatter -> elt -> unit) fmt (m: t) =
     let is_first = ref true in
-    Format.fprintf fmt "{@[<hov 2>";
+    Format.fprintf fmt "{@[";
     iter (fun e ->
         if !is_first
         then
@@ -205,7 +205,7 @@ struct
         Format.fprintf fmt "%a" f_elt e
       )
       m;
-    Format.fprintf fmt "@]}@?"
+    Format.fprintf fmt "@]}"
 
   let pretty fmt s = print Simplified_lval.pretty fmt s
 
