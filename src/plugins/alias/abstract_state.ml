@@ -792,6 +792,29 @@ let shift (a : t) : t =
     assert_invariants result;
     result
 
+let union_find vmap intersections =
+  let module Store : UnionFind.STORE = UnionFind.StoreMap.Make (VMap) in
+  let module UF = UnionFind.Make (Store) in
+  let uf = UF.new_store () in
+  let refs = VMap.mapi (fun i _ -> UF.make uf i) vmap in
+  let put_into_uf (v1,v2) =
+    let r1 = VMap.find v1 refs in
+    let r2 = VMap.find v2 refs in
+    ignore @@ UF.union uf r1 r2
+  in
+  let _vs = Seq.iter put_into_uf intersections in
+  let sets_to_be_joined =
+    let add_to_map i r sets =
+      let repr = UF.find uf r in
+      let add_to_set = function
+        | None -> Some (VSet.singleton i)
+        | Some set -> Some (VSet.add i set)
+      in
+      VMap.update (UF.get uf repr) add_to_set sets
+    in
+    VMap.fold add_to_map refs VMap.empty in
+  sets_to_be_joined
+
 let union (a1:t) (a2:t) :t =
   (* naive algorithm :
      1 merge the graph and the vmap (by doing union of sets)
@@ -825,26 +848,20 @@ let union (a1:t) (a2:t) :t =
       a2.vmap
       a1.vmap
   in
-  let new_lmap = LLMap.union a1.lmap a2.lmap in
-  let sets_to_be_joined = (* TODO: optimise using union-find *)
-    let rec add_pair sets (a,b,(v1,v2)) = match sets with
-      | [] -> [VSet.of_list [v1;v2]]
-      | set::sets ->
-        if VSet.mem v1 set || VSet.mem v2 set
-        then VSet.add v1 (VSet.add v2 set) :: sets
-        else set :: add_pair sets (a,b,(v1,v2))
-    in
-    Seq.fold_left add_pair [] @@ LLMap.to_seq @@ LLMap.intersect a1.lmap a2.lmap
+  let sets_to_be_joined =
+    let intersections = LLMap.to_seq @@ LLMap.intersect a1.lmap a2.lmap in
+    union_find new_vmap @@ Seq.map (fun (_,_,x) -> x) intersections
   in
+  let new_lmap = LLMap.union a1.lmap a2.lmap in
   Options.debug ~level:7 "Union: sets to be joined:@[";
-  List.iter (fun set -> Options.debug ~level:7 "%a" VSet.pretty set) sets_to_be_joined;
+  VMap.iter (fun _ set -> Options.debug ~level:7 "%a" VSet.pretty set) sets_to_be_joined;
   Options.debug ~level:7 "@]@.";
   let new_a = {graph = new_graph; lmap = new_lmap; vmap = new_vmap} in
   let merged_nodes, new_a =
-    List.fold_left
-      (fun (merged_nodes, x) set -> let v0, x = merge_set x set in (v0 :: merged_nodes), x)
-      ([], new_a)
+    VMap.fold
+      (fun _ set (merged_nodes, x) -> let v0, x = merge_set x set in (v0 :: merged_nodes), x)
       sets_to_be_joined
+      ([], new_a)
   in
   let new_a = List.fold_left join_succs new_a merged_nodes in
   Options.debug ~level:4 "Union: Result graph:@.%a@." print_graph new_a;
