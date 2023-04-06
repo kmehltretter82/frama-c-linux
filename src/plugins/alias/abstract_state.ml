@@ -651,12 +651,14 @@ let join (x:t) (v1:V.t) (v2:V.t) : t =
   res
 
 let merge_set (x:t) (vs:VSet.t) : V.t * t =
-  Options.debug ~level:7 "graph before merge_set %a @.%a@." VSet.pretty vs print_debug x;
   let v0 = VSet.choose vs in
-  assert (G.mem_vertex x.graph v0);
-  let result = VSet.fold (fun v acc -> merge acc v0 v) vs x in
-  Options.debug ~level:7 "graph after merge_set %a @.%a@." VSet.pretty vs print_debug result;
-  v0, result
+  if VSet.cardinal vs < 2 then v0, x else begin
+    Options.debug ~level:7 "graph before merge_set %a @.%a@." VSet.pretty vs print_debug x;
+    assert (G.mem_vertex x.graph v0);
+    let result = VSet.fold (fun v acc -> merge acc v0 v) vs x in
+    Options.debug ~level:7 "graph after merge_set %a @.%a@." VSet.pretty vs print_debug result;
+    v0, result
+  end
 
 let rec join_succs (x:t) v =
   Options.debug ~level:8 "joining successors of %d@." v;
