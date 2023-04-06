@@ -2,7 +2,7 @@
 
 int main()
 {
-  while (1) {
+  for (int i = 0; i < 1; i++) {
     int l[1] = {0};
     int *n_0 = & l[1];
     n_0 = & l[1] + 0;
