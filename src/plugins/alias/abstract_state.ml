@@ -256,13 +256,10 @@ let print_graph fmt (x:t) =
 
 let print_aliases fmt (x:t) =
   let iter_vmap v _set_lv0 =
-    if G.mem_vertex x.graph v
-    then
-      let set_lv = aliases_of_vertex v x in
-      (* TODO comment next line (it's temporary there to be sure we do not regress) *)
-      (* let set_lv = LSet.union set_lv _set_lv0 in *)
-      if LSet.cardinal set_lv >=2 then
-        Format.fprintf fmt "@[<hov 2>%a@] are aliased@." LSet.pretty set_lv
+    assert (G.mem_vertex x.graph v);
+    let set_lv = aliases_of_vertex v x in
+    if LSet.cardinal set_lv >=2 then
+      Format.fprintf fmt "@[<hov 2>%a@] are aliased@." LSet.pretty set_lv
   in
   VMap.iter iter_vmap x.vmap
 
