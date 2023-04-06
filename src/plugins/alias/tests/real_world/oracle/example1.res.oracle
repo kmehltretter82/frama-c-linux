@@ -1,92 +1,136 @@
 [kernel] Parsing example1.c (with preprocessing)
 [alias] analysing function: _Exit
 [alias] May-aliases at the end of function _Exit:
+  <Bot>
 [alias] analysing function: __fc_fpclassify
 [alias] May-aliases at the end of function __fc_fpclassify:
+  <Bot>
 [alias] analysing function: __fc_fpclassifyf
 [alias] May-aliases at the end of function __fc_fpclassifyf:
+  <Bot>
 [alias] analysing function: __fc_infinity
 [alias] May-aliases at the end of function __fc_infinity:
+  <Bot>
 [alias] analysing function: __fc_nan
 [alias] May-aliases at the end of function __fc_nan:
+  <Bot>
 [alias] analysing function: __finite
 [alias] May-aliases at the end of function __finite:
+  <Bot>
 [alias] analysing function: __finitef
 [alias] May-aliases at the end of function __finitef:
+  <Bot>
 [alias] analysing function: abort
 [alias] May-aliases at the end of function abort:
+  <Bot>
 [alias] analysing function: abs
 [alias] May-aliases at the end of function abs:
+  <Bot>
 [alias] analysing function: acos
 [alias] May-aliases at the end of function acos:
+  <Bot>
 [alias] analysing function: acosf
 [alias] May-aliases at the end of function acosf:
+  <Bot>
 [alias] analysing function: acosh
 [alias] May-aliases at the end of function acosh:
+  <Bot>
 [alias] analysing function: acoshf
 [alias] May-aliases at the end of function acoshf:
+  <Bot>
 [alias] analysing function: acoshl
 [alias] May-aliases at the end of function acoshl:
+  <Bot>
 [alias] analysing function: acosl
 [alias] May-aliases at the end of function acosl:
+  <Bot>
 [alias] analysing function: asin
 [alias] May-aliases at the end of function asin:
+  <Bot>
 [alias] analysing function: asinf
 [alias] May-aliases at the end of function asinf:
+  <Bot>
 [alias] analysing function: asinl
 [alias] May-aliases at the end of function asinl:
+  <Bot>
 [alias] analysing function: at_quick_exit
 [alias] May-aliases at the end of function at_quick_exit:
+  <Bot>
 [alias] analysing function: atan
 [alias] May-aliases at the end of function atan:
+  <Bot>
 [alias] analysing function: atan2
 [alias] May-aliases at the end of function atan2:
+  <Bot>
 [alias] analysing function: atan2f
 [alias] May-aliases at the end of function atan2f:
+  <Bot>
 [alias] analysing function: atan2l
 [alias] May-aliases at the end of function atan2l:
+  <Bot>
 [alias] analysing function: atanf
 [alias] May-aliases at the end of function atanf:
+  <Bot>
 [alias] analysing function: atanl
 [alias] May-aliases at the end of function atanl:
+  <Bot>
 [alias] analysing function: atexit
 [alias] May-aliases at the end of function atexit:
+  <Bot>
 [alias] analysing function: atof
 [alias] May-aliases at the end of function atof:
+  <Bot>
 [alias] analysing function: atoi
 [alias] May-aliases at the end of function atoi:
+  <Bot>
 [alias] analysing function: atol
 [alias] May-aliases at the end of function atol:
+  <Bot>
 [alias] analysing function: atoll
 [alias] May-aliases at the end of function atoll:
+  <Bot>
 [alias] analysing function: bsearch
 [alias] May-aliases at the end of function bsearch:
+  <Bot>
 [alias] analysing function: calloc
 [alias] May-aliases at the end of function calloc:
+  <Bot>
 [alias] analysing function: ceil
 [alias] May-aliases at the end of function ceil:
+  <Bot>
 [alias] analysing function: ceilf
 [alias] May-aliases at the end of function ceilf:
+  <Bot>
 [alias] analysing function: ceill
 [alias] May-aliases at the end of function ceill:
+  <Bot>
 [alias] analysing function: cos
 [alias] May-aliases at the end of function cos:
+  <Bot>
 [alias] analysing function: cosf
 [alias] May-aliases at the end of function cosf:
+  <Bot>
 [alias] analysing function: cosl
 [alias] May-aliases at the end of function cosl:
+  <Bot>
 [alias] analysing function: div
 [alias] May-aliases at the end of function div:
+  <Bot>
 [alias] analysing function: drand48
 [alias] May-aliases at the end of function drand48:
+  <Bot>
 [alias] analysing function: erand48
 [alias] May-aliases at the end of function erand48:
+  <Bot>
 [alias] analysing function: exit
 [alias] May-aliases at the end of function exit:
+  <Bot>
 [alias] analysing function: exp
 [alias] May-aliases at the end of function exp:
+  <Bot>
 [alias] analysing function: expf
 [alias] May-aliases at the end of function expf:
+  <Bot>
 [alias] analysing function: f1
 [alias] analysing instruction: ty *tmp = x;
 [alias] May-aliases at the end of instruction: ty *tmp = x;
@@ -106,6 +150,7 @@
 [alias] analysing instruction: tmp_1 = sin(*(idata + idx));
 [alias] analysing function: sin
 [alias] May-aliases at the end of function sin:
+  <Bot>
 [alias:undefined:fn] example1.c:45: Warning: function sin has no definition
 [alias] May-aliases at the end of instruction: tmp_1 = sin(*(idata + idx));
   {x, tmp} are aliased
@@ -198,66 +243,97 @@
 [alias] May-aliases at the end of function f2:
 [alias] analysing function: fabs
 [alias] May-aliases at the end of function fabs:
+  <Bot>
 [alias] analysing function: fabsf
 [alias] May-aliases at the end of function fabsf:
+  <Bot>
 [alias] analysing function: fabsl
 [alias] May-aliases at the end of function fabsl:
+  <Bot>
 [alias] analysing function: floor
 [alias] May-aliases at the end of function floor:
+  <Bot>
 [alias] analysing function: floorf
 [alias] May-aliases at the end of function floorf:
+  <Bot>
 [alias] analysing function: floorl
 [alias] May-aliases at the end of function floorl:
+  <Bot>
 [alias] analysing function: fmod
 [alias] May-aliases at the end of function fmod:
+  <Bot>
 [alias] analysing function: fmodf
 [alias] May-aliases at the end of function fmodf:
+  <Bot>
 [alias] analysing function: free
 [alias] May-aliases at the end of function free:
+  <Bot>
 [alias] analysing function: frexp
 [alias] May-aliases at the end of function frexp:
+  <Bot>
 [alias] analysing function: frexpf
 [alias] May-aliases at the end of function frexpf:
+  <Bot>
 [alias] analysing function: frexpl
 [alias] May-aliases at the end of function frexpl:
+  <Bot>
 [alias] analysing function: getenv
 [alias] May-aliases at the end of function getenv:
+  <Bot>
 [alias] analysing function: jrand48
 [alias] May-aliases at the end of function jrand48:
+  <Bot>
 [alias] analysing function: labs
 [alias] May-aliases at the end of function labs:
+  <Bot>
 [alias] analysing function: lcong48
 [alias] May-aliases at the end of function lcong48:
+  <Bot>
 [alias] analysing function: ldexp
 [alias] May-aliases at the end of function ldexp:
+  <Bot>
 [alias] analysing function: ldexpf
 [alias] May-aliases at the end of function ldexpf:
+  <Bot>
 [alias] analysing function: ldiv
 [alias] May-aliases at the end of function ldiv:
+  <Bot>
 [alias] analysing function: llabs
 [alias] May-aliases at the end of function llabs:
+  <Bot>
 [alias] analysing function: lldiv
 [alias] May-aliases at the end of function lldiv:
+  <Bot>
 [alias] analysing function: log
 [alias] May-aliases at the end of function log:
+  <Bot>
 [alias] analysing function: log10
 [alias] May-aliases at the end of function log10:
+  <Bot>
 [alias] analysing function: log10f
 [alias] May-aliases at the end of function log10f:
+  <Bot>
 [alias] analysing function: log10l
 [alias] May-aliases at the end of function log10l:
+  <Bot>
 [alias] analysing function: log2
 [alias] May-aliases at the end of function log2:
+  <Bot>
 [alias] analysing function: log2f
 [alias] May-aliases at the end of function log2f:
+  <Bot>
 [alias] analysing function: log2l
 [alias] May-aliases at the end of function log2l:
+  <Bot>
 [alias] analysing function: logf
 [alias] May-aliases at the end of function logf:
+  <Bot>
 [alias] analysing function: logl
 [alias] May-aliases at the end of function logl:
+  <Bot>
 [alias] analysing function: lrand48
 [alias] May-aliases at the end of function lrand48:
+  <Bot>
 [alias] analysing function: main
 [alias] analysing instruction: a = (ty *)malloc(sizeof(ty));
 [alias] May-aliases at the end of instruction: a = (ty *)malloc(sizeof(ty));
@@ -340,107 +416,159 @@
   {a->n2, b->n2} are aliased
 [alias] analysing function: malloc
 [alias] May-aliases at the end of function malloc:
+  <Bot>
 [alias] analysing function: mblen
 [alias] May-aliases at the end of function mblen:
+  <Bot>
 [alias] analysing function: mbstowcs
 [alias] May-aliases at the end of function mbstowcs:
+  <Bot>
 [alias] analysing function: mbtowc
 [alias] May-aliases at the end of function mbtowc:
+  <Bot>
 [alias] analysing function: mkstemp
 [alias] May-aliases at the end of function mkstemp:
+  <Bot>
 [alias] analysing function: mkstemps
 [alias] May-aliases at the end of function mkstemps:
+  <Bot>
 [alias] analysing function: mrand48
 [alias] May-aliases at the end of function mrand48:
+  <Bot>
 [alias] analysing function: nan
 [alias] May-aliases at the end of function nan:
+  <Bot>
 [alias] analysing function: nanf
 [alias] May-aliases at the end of function nanf:
+  <Bot>
 [alias] analysing function: nanl
 [alias] May-aliases at the end of function nanl:
+  <Bot>
 [alias] analysing function: nrand48
 [alias] May-aliases at the end of function nrand48:
+  <Bot>
 [alias] analysing function: posix_memalign
 [alias] May-aliases at the end of function posix_memalign:
+  <Bot>
 [alias] analysing function: pow
 [alias] May-aliases at the end of function pow:
+  <Bot>
 [alias] analysing function: powf
 [alias] May-aliases at the end of function powf:
+  <Bot>
 [alias] analysing function: putenv
 [alias] May-aliases at the end of function putenv:
+  <Bot>
 [alias] analysing function: qsort
 [alias] May-aliases at the end of function qsort:
+  <Bot>
 [alias] analysing function: quick_exit
 [alias] May-aliases at the end of function quick_exit:
+  <Bot>
 [alias] analysing function: rand
 [alias] May-aliases at the end of function rand:
+  <Bot>
 [alias] analysing function: random
 [alias] May-aliases at the end of function random:
+  <Bot>
 [alias] analysing function: realloc
 [alias] May-aliases at the end of function realloc:
+  <Bot>
 [alias] analysing function: reallocarray
 [alias] May-aliases at the end of function reallocarray:
+  <Bot>
 [alias] analysing function: round
 [alias] May-aliases at the end of function round:
+  <Bot>
 [alias] analysing function: roundf
 [alias] May-aliases at the end of function roundf:
+  <Bot>
 [alias] analysing function: roundl
 [alias] May-aliases at the end of function roundl:
+  <Bot>
 [alias] analysing function: seed48
 [alias] May-aliases at the end of function seed48:
+  <Bot>
 [alias] analysing function: setenv
 [alias] May-aliases at the end of function setenv:
+  <Bot>
 [alias] analysing function: sin
 [alias] May-aliases at the end of function sin:
+  <Bot>
 [alias] analysing function: sinf
 [alias] May-aliases at the end of function sinf:
+  <Bot>
 [alias] analysing function: sinl
 [alias] May-aliases at the end of function sinl:
+  <Bot>
 [alias] analysing function: sqrt
 [alias] May-aliases at the end of function sqrt:
+  <Bot>
 [alias] analysing function: sqrtf
 [alias] May-aliases at the end of function sqrtf:
+  <Bot>
 [alias] analysing function: sqrtl
 [alias] May-aliases at the end of function sqrtl:
+  <Bot>
 [alias] analysing function: srand
 [alias] May-aliases at the end of function srand:
+  <Bot>
 [alias] analysing function: srand48
 [alias] May-aliases at the end of function srand48:
+  <Bot>
 [alias] analysing function: srandom
 [alias] May-aliases at the end of function srandom:
+  <Bot>
 [alias] analysing function: strtod
 [alias] May-aliases at the end of function strtod:
+  <Bot>
 [alias] analysing function: strtof
 [alias] May-aliases at the end of function strtof:
+  <Bot>
 [alias] analysing function: strtol
 [alias] May-aliases at the end of function strtol:
+  <Bot>
 [alias] analysing function: strtold
 [alias] May-aliases at the end of function strtold:
+  <Bot>
 [alias] analysing function: strtoll
 [alias] May-aliases at the end of function strtoll:
+  <Bot>
 [alias] analysing function: strtoul
 [alias] May-aliases at the end of function strtoul:
+  <Bot>
 [alias] analysing function: strtoull
 [alias] May-aliases at the end of function strtoull:
+  <Bot>
 [alias] analysing function: swap
 [alias] May-aliases at the end of function swap:
 [alias] analysing function: system
 [alias] May-aliases at the end of function system:
+  <Bot>
 [alias] analysing function: tan
 [alias] May-aliases at the end of function tan:
+  <Bot>
 [alias] analysing function: tanf
 [alias] May-aliases at the end of function tanf:
+  <Bot>
 [alias] analysing function: tanl
 [alias] May-aliases at the end of function tanl:
+  <Bot>
 [alias] analysing function: trunc
 [alias] May-aliases at the end of function trunc:
+  <Bot>
 [alias] analysing function: truncf
 [alias] May-aliases at the end of function truncf:
+  <Bot>
 [alias] analysing function: truncl
 [alias] May-aliases at the end of function truncl:
+  <Bot>
 [alias] analysing function: unsetenv
 [alias] May-aliases at the end of function unsetenv:
+  <Bot>
 [alias] analysing function: wcstombs
 [alias] May-aliases at the end of function wcstombs:
+  <Bot>
 [alias] analysing function: wctomb
 [alias] May-aliases at the end of function wctomb:
+  <Bot>

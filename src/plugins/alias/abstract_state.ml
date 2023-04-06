@@ -859,6 +859,20 @@ let make_summary (s: t option) (kf: kernel_function) =
     else
       None
   in
+  let s =
+    match exp_return with
+      None -> s
+    | Some e ->
+      begin
+        match s, Lval.from_exp e with
+          None, _ |  _, BNone -> s
+        | Some s, lv ->
+          let _, new_s = find_or_create_vertex lv s in
+          (* Format.printf "DEBUG: new state BEFORE finding %a:@.%a@." Lval.pretty lv (pretty ~debug:true) s; *)
+          (* Format.printf "DEBUG: new state AFTER finding %a:@.%a@." Lval.pretty lv (pretty ~debug:true) new_s; *)
+          Some new_s
+      end
+  in
   {
     state = s;
     formals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_formals kf);
