@@ -88,7 +88,12 @@ and simplify_exp e =
           | Lval lv -> Lval (simplify_lval lv)
           | AddrOf lv | StartOf lv -> AddrOf (simplify_lval lv)
           | BinOp(PlusPI,e1,_,_) | BinOp(MinusPI,e1,_,_) ->
-            (simplify_exp e1).enode
+            begin
+              match (simplify_exp e1).enode with
+                Lval lv -> Lval lv
+              | AddrOf lv -> AddrOf lv
+              | _ -> raise (Explicit_pointer_address e1.eloc)
+            end
           | CastE (typ, e) ->
             let () = check_cast_compatibility e typ in
             raise (IsExp (simplify_exp e))
