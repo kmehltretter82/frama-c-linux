@@ -39,8 +39,8 @@ COPYRIGHT=CEA LIST / LSL
 
 all: pkg lint app
 
-app: dome-app
-dev: dome-dev
+app: api dome-app
+dev: api dome-dev
 
 lint: dome-pkg dome-templ checkcase
 	@echo "[Ivette] running typechecker & linter"

@@ -144,6 +144,7 @@ let COMMAND_WDIR = '.';
 let COMMAND_ARGV: string[] = [];
 
 function setCommandLine(argv: string[], wdir: string): void {
+  process.chdir(wdir);
   COMMAND_ARGV = argv;
   COMMAND_WDIR = wdir;
 }
