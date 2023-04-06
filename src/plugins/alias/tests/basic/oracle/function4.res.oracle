@@ -12,6 +12,7 @@
 [alias] May-aliases at the end of instruction: int c = 0;
 [alias] analysing instruction: a = addr(& c);
 [alias] May-aliases at the end of instruction: a = addr(& c);
+  {a, &c} are aliased
 [alias] analysing instruction: b = & c;
 [alias] May-aliases at the end of instruction: b = & c;
   {a, b} are aliased
