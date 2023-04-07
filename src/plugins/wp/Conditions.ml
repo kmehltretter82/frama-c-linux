@@ -535,7 +535,7 @@ let intros ps hs =
 let state ?descr ?stmt state hs =
   Bundle.add (step ?descr ?stmt (State state)) hs
 
-let probes ?descr ts =
+let probe ?descr ts =
   Bundle.add (step ?descr (Probes (Bag.list ts)))
 
 let assume ?descr ?stmt ?deps ?warn ?(init=false) ?(domain=false) p hs =
@@ -1739,6 +1739,21 @@ let close sequent =
 
 let list seq = seq.seq_list
 let iter f seq = List.iter f seq.seq_list
+
+(* -------------------------------------------------------------------------- *)
+(* --- Probes                                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let probes seq =
+  let pool = ref Bag.empty in
+  let rec collect_step s =
+    match s.condition with
+    | Probes ts -> pool := Bag.concat !pool ts
+    | Branch(_,a,b) -> collect_seq a ; collect_seq b
+    | Either cs -> List.iter collect_seq cs
+    | _ -> ()
+  and collect_seq s = List.iter collect_step s.seq_list
+  in collect_seq seq ; !pool
 
 (* -------------------------------------------------------------------------- *)
 (* --- Index                                                              --- *)

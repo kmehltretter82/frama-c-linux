@@ -1152,7 +1152,7 @@ let task_of_wpo wpo =
     let pid = wpo.Wpo.po_pid in
     let axioms = v.Wpo.VC_Annot.axioms in
     let prop = Wpo.GOAL.compute_proof ~pid v.Wpo.VC_Annot.goal in
-    let probes = Wpo.GOAL.compute_probs ~pid v.Wpo.VC_Annot.goal in
+    let probes = Wpo.GOAL.compute_probes ~pid v.Wpo.VC_Annot.goal in
     prove_prop ~pid ?axioms ~probes prop
   | Wpo.GoalLemma v ->
     let lemma = v.Wpo.VC_Lemma.lemma in

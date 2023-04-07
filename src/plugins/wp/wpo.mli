@@ -56,8 +56,8 @@ sig
   val make : Conditions.sequent -> t
   val compute : pid:WpPropId.prop_id -> t -> unit
   val compute_proof : pid:WpPropId.prop_id -> t -> F.pred
-  val compute_probs : pid:WpPropId.prop_id -> t -> F.term Bag.t
   val compute_descr : pid:WpPropId.prop_id -> t -> Conditions.sequent
+  val compute_probes : pid:WpPropId.prop_id -> t -> F.term Bag.t
   val get_descr : t -> Conditions.sequent
   val qed_time : t -> float
 end

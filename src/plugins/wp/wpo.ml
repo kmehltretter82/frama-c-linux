@@ -159,6 +159,7 @@ struct
     mutable simplified : bool ;
     mutable sequent : Conditions.sequent ;
     mutable obligation : F.pred ;
+    mutable probes : F.term Bag.t ;
   }
 
   let empty = Conditions.empty
@@ -168,6 +169,7 @@ struct
     simplified = false ;
     sequent = empty , F.p_false ;
     obligation = F.p_false ;
+    probes = Bag.empty ;
   }
 
   let trivial = {
@@ -175,6 +177,7 @@ struct
     simplified = true ;
     sequent = empty , F.p_true ;
     obligation = F.p_true ;
+    probes = Bag.empty ;
   }
 
   let make sequent = {
@@ -182,6 +185,7 @@ struct
     simplified = false ;
     sequent = sequent ;
     obligation = F.p_false ;
+    probes = Bag.empty ;
   }
 
   let is_trivial g = Conditions.is_trivial g.sequent
@@ -239,6 +243,7 @@ struct
       Wp_parameters.debug ~dkey "Simplification time: %a"
         Rformat.pp_time !timer ;
       g.time <- !timer ;
+      g.probes <- Conditions.probes @@ fst g.sequent ;
     end
 
   let compute ~pid g =
@@ -247,7 +252,7 @@ struct
         (safecompute ~pid) g
 
   let compute_proof ~pid g = compute ~pid g ; g.obligation
-  let compute_probs ~pid:_ _g = Bag.empty (* TODO *)
+  let compute_probes ~pid g = compute ~pid g ; g.probes
   let compute_descr ~pid g = compute ~pid g ; g.sequent
   let get_descr g = g.sequent
   let qed_time g = g.time

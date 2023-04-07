@@ -143,6 +143,9 @@ val step_at : sequence -> int -> step
 val is_trivial : sequent -> bool
 (** Goal is true or hypotheses contains false. *)
 
+val probes : sequence -> term Bag.t
+(** Collect all probes in the sequence *)
+
 (** {2 Transformations} *)
 
 val map_condition : (pred -> pred) -> condition -> condition
@@ -236,7 +239,7 @@ val merge : bundle list -> bundle
     over the list. *)
 
 (** Inserts probes to a sequent. *)
-val probes : ?descr:string -> F.term list -> bundle -> bundle
+val probe : ?descr:string -> F.term list -> bundle -> bundle
 
 (** Assumes a list of predicates in a [Type] section on top of the bundle. *)
 val domain : F.pred list -> bundle -> bundle

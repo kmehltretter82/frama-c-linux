@@ -303,11 +303,11 @@ struct
         path = path ;
       }
 
-  let probes ?descr terms vc =
+  let probe ?descr terms vc =
     if terms = [] then vc else
       let vars =
         List.fold_left (fun xs t -> Vars.union xs (F.vars t)) vc.vars terms in
-      let hyps = Conditions.probes ?descr terms vc.hyps in
+      let hyps = Conditions.probe ?descr terms vc.hyps in
       { hyps = hyps ;
         vars = vars ;
         goal = vc.goal ;
@@ -1453,7 +1453,7 @@ struct
     in
     let pxs = if scope = Enter then List.map val_of xs else [] in
     let vcs = gmap (assume_vc ~descr hs) wp.vcs in
-    let vcs = gmap (probes pxs) vcs in
+    let vcs = gmap (probe pxs) vcs in
     { wp with sigma = Some pre ; vcs = vcs }
 
   let scope wenv xs sc wp = in_wenv wenv wp
