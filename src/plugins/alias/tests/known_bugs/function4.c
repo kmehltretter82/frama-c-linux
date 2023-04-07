@@ -7,5 +7,7 @@ int * addr(int* x)
 
 int main(void)
 {
+  int* x = 0;
+  int* y = addr(x);
   return 0;
 }
