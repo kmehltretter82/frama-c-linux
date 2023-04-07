@@ -2,47 +2,35 @@
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
 [alias:unsafe-cast] function1.c:16: Warning: unsafe cast from int to int *
-[alias] May-aliases at the end of instruction: int *a = (int *)0;
+[alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
 [alias] analysing instruction: int *b = (int *)0;
 [alias:unsafe-cast] function1.c:16: Warning: unsafe cast from int to int *
-[alias] May-aliases at the end of instruction: int *b = (int *)0;
+[alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
 [alias] analysing instruction: int *c = (int *)0;
 [alias:unsafe-cast] function1.c:16: Warning: unsafe cast from int to int *
-[alias] May-aliases at the end of instruction: int *c = (int *)0;
+[alias] May-aliases after instruction  int *c = (int *)0;  are  <none>
 [alias] analysing instruction: int *d = (int *)0;
 [alias:unsafe-cast] function1.c:16: Warning: unsafe cast from int to int *
-[alias] May-aliases at the end of instruction: int *d = (int *)0;
+[alias] May-aliases after instruction  int *d = (int *)0;  are  <none>
 [alias] analysing instruction: swap(a,b);
 [alias] analysing function: swap
 [alias] analysing instruction: int *z = (int *)0;
 [alias:unsafe-cast] function1.c:7: Warning: unsafe cast from int to int *
-[alias] May-aliases at the end of instruction: int *z = (int *)0;
+[alias] May-aliases after instruction  int *z = (int *)0;  are  <none>
 [alias] analysing instruction: z = x;
-[alias] May-aliases at the end of instruction: z = x;
-  {x, z} are aliased
+[alias] May-aliases after instruction  z = x;  are  {x, z}
 [alias] analysing instruction: x = y;
-[alias] May-aliases at the end of instruction: x = y;
-  {x, y, z} are aliased
+[alias] May-aliases after instruction  x = y;  are  {x, y, z}
 [alias] analysing instruction: y = z;
-[alias] May-aliases at the end of instruction: y = z;
-  {x, y, z} are aliased
-[alias] May-aliases at the end of function swap:
-  {x, y, z} are aliased
-[alias] May-aliases at the end of instruction: swap(a,b);
-  {a, b} are aliased
+[alias] May-aliases after instruction  y = z;  are  {x, y, z}
+[alias] May-aliases at the end of function swap: {x, y, z}
+[alias] May-aliases after instruction  swap(a,b);  are  {a, b}
 [alias] analysing instruction: swap(c,d);
-[alias] May-aliases at the end of instruction: swap(c,d);
-  {a, b} are aliased
-  {c, d} are aliased
+[alias] May-aliases after instruction  swap(c,d);  are  {a, b}  {c, d}
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases at the end of instruction: __retres = 0;
-  {a, b} are aliased
-  {c, d} are aliased
-[alias] May-aliases at the end of function main:
-  {a, b} are aliased
-  {c, d} are aliased
+[alias] May-aliases after instruction  __retres = 0;  are  {a, b}  {c, d}
+[alias] May-aliases at the end of function main: {a, b}  {c, d}
 [alias] analysing function: swap
 [alias] analysing instruction: int *z = (int *)0;
-[alias] May-aliases at the end of instruction: int *z = (int *)0;
-[alias] May-aliases at the end of function swap:
-  {x, y, z} are aliased
+[alias] May-aliases after instruction  int *z = (int *)0;  are  <none>
+[alias] May-aliases at the end of function swap: {x, y, z}
