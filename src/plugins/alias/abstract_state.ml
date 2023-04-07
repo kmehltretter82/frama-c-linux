@@ -962,7 +962,12 @@ let make_summary (s: t option) (kf: kernel_function) =
 
 let pretty_summary ?(debug=false) fmt s =
   let print_list_lval fmt (l: lval list) =
-    List.iter (fun x -> Format.fprintf fmt "%a " Cil_datatype.Lval.pretty x) l
+    let is_first = ref true in
+    let print_elem x =
+      if !is_first then is_first := false else Format.fprintf fmt "@ ";
+      Format.fprintf fmt "%a" Cil_datatype.Lval.pretty x
+    in
+    List.iter print_elem l
   in
   let print_option pp fmt x =
     match x with
