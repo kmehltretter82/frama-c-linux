@@ -1087,6 +1087,24 @@ let add_model_trace ce_terms cnv t =
     in
     Bag.fold_left fold t ce_terms
 
+let convert_freevariables ~ce_terms ~cnv t =
+  let freevars = (Lang.F.varsp t) in
+  let freevars = 
+    if Wp_parameters.CounterExample.get ()
+    then
+      Bag.fold_left (fun vars t -> Lang.F.Vars.union vars (Lang.F.vars t))
+        freevars ce_terms
+    else freevars in
+  let cnv,lss =
+    Lang.F.Vars.fold (fun (v:Lang.F.Var.t) (cnv,lss) ->
+        let ty = of_tau ~cnv @@ Lang.F.tau_of_var v in
+        let x = Why3.Ident.id_fresh (Lang.F.Var.basename v) in
+        let ls = Why3.Term.create_lsymbol x [] ty in
+        let cnv = {cnv with subst = Lang.F.Tmap.add (Lang.F.e_var v) (Why3.Term.t_app ls [] ty) cnv.subst } in
+        (cnv,ls::lss)) freevars (cnv,[])
+  in
+  cnv,lss
+
 let prove_goal ~id ~title ~name ?axioms ?(ce_terms=Bag.empty) t =
   (* Format.printf "why3_of_qed start@."; *)
   let goal = Definitions.cluster ~id ~title () in
@@ -1102,8 +1120,9 @@ let prove_goal ~id ~title ~name ?axioms ?(ce_terms=Bag.empty) t =
   v#add_builtin_lib;
   v#vgoal axioms t;
   let cnv = empty_cnv ~polarity:`Positive ctx in
-  let t = convert cnv Prop (Lang.F.e_prop t) in
-  let decl = Why3.Decl.create_prop_decl Pgoal goal_id t in
+  let cnv,lss = convert_freevariables ~ce_terms ~cnv t in
+  let goal = convert cnv Prop (Lang.F.e_prop t) in
+  let decl = Why3.Decl.create_prop_decl Pgoal goal_id goal in
   let th = Why3.Theory.close_theory ctx.th in
   if Wp_parameters.has_print_generated () then begin
     let th_uc_tmp = Why3.Theory.add_decl ~warn:false ctx.th decl in
@@ -1113,6 +1132,7 @@ let prove_goal ~id ~title ~name ?axioms ?(ce_terms=Bag.empty) t =
   end;
   let t = None in
   let t = Why3.Task.use_export t th in
+  let t = List.fold_left Why3.Task.add_param_decl t lss in
   let t =
     if Wp_parameters.CounterExample.get ()
     then add_model_trace ce_terms cnv t 
