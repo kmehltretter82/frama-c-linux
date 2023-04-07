@@ -222,7 +222,7 @@ class engine (lang : #Plang.engine) =
     method pp_probe fmt p =
       begin
         Format.fprintf fmt "@[<hov 4>%a %s = %a.@]"
-          self#pp_clause "Prove" p.probe_name lang#pp_term p.probe_term
+          self#pp_clause "Keep:" p.probe_name lang#pp_term p.probe_term
       end
 
     (* -------------------------------------------------------------------------- *)

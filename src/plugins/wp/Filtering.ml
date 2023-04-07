@@ -277,6 +277,10 @@ struct
     if not (Domain.separated dp env.target)
     then env.target <- Domain.join dp env.target
 
+  let collect_probe env t =
+    let dp = Value.domain env.usage t in
+    env.target <- Domain.join dp env.target
+
   let rec collect_hyp env p =
     match F.p_expr p with
     | And ps | Or ps -> List.iter (collect_hyp env) ps
@@ -290,7 +294,7 @@ struct
     let open Conditions in
     match s.condition with
     | Type _ | State _ -> ()
-    | Probe p -> collect_term env p.probe_term
+    | Probe p -> collect_probe env p.probe_term
     | Core p | Have p | When p | Init p -> collect_hyp env p
     | Either cs -> List.iter (collect_seq env) cs
     | Branch(p,a,b) ->
