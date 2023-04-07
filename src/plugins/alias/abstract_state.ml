@@ -999,11 +999,12 @@ let pretty_summary ?(debug=false) fmt s =
 let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   assert_invariants state;
   let formals = summary.formals in
-  let sum_state = Option.get summary.state in
   assert (List.length args = List.length formals);
-  let sum_state = shift sum_state in
+  let sum_state = shift @@ Option.get summary.state in
 
-  let arg_formal_pairs = (* also includes the result/return pair *)
+  (* pair up formals and their corresponding arguments,
+     as well as the bound result with the returned value *)
+  let arg_formal_pairs =
     let res_ret = match res, summary.return with
       | None, None -> []
       | Some res, Some ret ->
@@ -1023,6 +1024,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
     res_ret @ List.filter_map simplify_both @@ List.combine args formals
   in
 
+  (* for each pair (lv1,lv2) find (or create) the corresponding vertices *)
   let state, vertex_pairs =
     let state = ref state in
     let find_vertex (lv1, lv2) =
@@ -1040,8 +1042,9 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
     !state, List.filter_map find_vertex arg_formal_pairs
   in
 
-  (* TODO: optimise: do not include the formals' vertexes in the graph *)
-  let new_graph =
+  (* merge the function graph;
+     for every arg/formal vertex pair (v1,v2) and every edge v2→v create edge v1→v. *)
+  let g =
     let transfer_succs (g : G.t) (v1,v2) =
       let v2_succs = G.succ sum_state.graph v2 in
       assert (List.length v2_succs < 2);
@@ -1053,15 +1056,26 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
     List.fold_left transfer_succs g vertex_pairs
   in
 
-  let new_state = {
-    graph = new_graph;
+  (* garbage collect: remove leaf vertices from g that originate from sum_state *)
+  let vertices_to_add_to_g, g =
+    let g = ref g in
+    let remove_if_leaf v _ =
+      if G.in_degree sum_state.graph v = 0
+      then let () = g := G.remove_vertex !g v in None
+      else Some LSet.empty
+    in
+    let remaining_vertices = VMap.filter_map remove_if_leaf sum_state.vmap in
+    remaining_vertices, !g
+  in
+
+  let state = {
+    graph = g;
     lmap = state.lmap;
     vmap =
       let left_bias _ l _ = Some l in
-      let to_empty _ = LSet.empty in
-      VMap.union left_bias state.vmap (VMap.map to_empty sum_state.vmap)
-  } in
+      VMap.union left_bias state.vmap vertices_to_add_to_g}
+  in
 
-  let new_state = List.fold_left join_succs new_state (List.map fst vertex_pairs) in
-  assert_invariants new_state;
-  new_state
+  let state = List.fold_left join_succs state (List.map fst vertex_pairs) in
+  assert_invariants state;
+  state
