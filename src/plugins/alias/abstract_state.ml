@@ -733,20 +733,25 @@ let assignment (a:t) (lv:lval) (e:exp) : t =
     let x = Lval.from_lval lv in
     let y = Lval.from_exp e in
     match x,y with
-      BNone, _ | _, BNone -> a
-    | _, BAddrOf blv ->
+    | BNone, _ | _, BNone -> a
+    | _, y ->
       let (v1,a) = find_or_create_vertex x a in
       let (v2,a) = find_or_create_vertex y a in
-      let new_a = join a v1 v2 in
-      let new_a = remove_lval new_a (BAddrOf blv) in
-      assert_invariants new_a ;
-      new_a
-    | _ ->
-      let (v1,a) = find_or_create_vertex x a in
-      let (v2,a) = find_or_create_vertex y a in
-      let new_a = join a v1 v2 in
-      assert_invariants new_a ;
-      new_a
+      if List.mem v2 (G.succ a.graph v1) || List.mem v1 (G.succ a.graph v2)
+      then
+        let () =
+          Options.warning ~source:(fst e.eloc)
+            "ignoring assignment of the form: %a = %a"
+            Printer.pp_lval lv Printer.pp_exp e;
+        in a
+      else
+        let a = join a v1 v2 in
+        let a = match y with
+          | BAddrOf blv -> remove_lval a (BAddrOf blv)
+          | _ -> a
+        in
+        let () = assert_invariants a in
+        a
   else
     a
 
@@ -962,7 +967,12 @@ let make_summary (s: t option) (kf: kernel_function) =
 
 let pretty_summary ?(debug=false) fmt s =
   let print_list_lval fmt (l: lval list) =
-    List.iter (fun x -> Format.fprintf fmt "%a " Cil_datatype.Lval.pretty x) l
+    let is_first = ref true in
+    let print_elem x =
+      if !is_first then is_first := false else Format.fprintf fmt "@ ";
+      Format.fprintf fmt "%a" Cil_datatype.Lval.pretty x
+    in
+    List.iter print_elem l
   in
   let print_option pp fmt x =
     match x with
