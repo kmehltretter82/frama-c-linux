@@ -751,9 +751,16 @@ let assignment_x_allocate_y (a:t) (lv:lval) : t =
   assert_invariants a;
   let x = Lval.from_lval lv in
   let (v1,a) = find_or_create_vertex x a in
-  let (v2,a) = create_cst_vertex a in
-  let new_a : t = set_type a v1 v2 in
-  assert_invariants new_a ; new_a
+  match G.succ a.graph v1 with
+    [] ->
+    begin
+      let (v2,a) = create_cst_vertex a in
+      let new_a : t = set_type a v1 v2 in
+      assert_invariants new_a ; new_a
+     end
+  | [_v2] -> a    
+  | _ -> Options.fatal "this should not hapen (invariant broken)"
+ 
 
 exception Not_included
 
