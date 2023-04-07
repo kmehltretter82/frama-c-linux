@@ -501,8 +501,13 @@ function createBrowserWindow(
 // --- Application Window(s) & Command Line
 // --------------------------------------------------------------------------
 
-function stripElectronArgv(argv: string[]): string[] {
-  return argv.slice(DEVEL ? 3 : (LOCAL ? 2 : 1)).filter((p) => !!p);
+interface Cmd { wdir: string; argv: string[] }
+
+function stripElectronArgv(cmd: Cmd): Cmd
+{
+  const wdir = DEVEL ? cmd.argv[3] : cmd.wdir ;
+  const argv = cmd.argv.slice(DEVEL ? 4 : (LOCAL ? 2 : 1)).filter((p) => !!p);
+  return { wdir, argv };
 }
 
 function createPrimaryWindow(): void {
@@ -516,14 +521,14 @@ function createPrimaryWindow(): void {
     });
   const cwd = process.cwd();
   const wdir = cwd === '/' ? app.getPath('home') : cwd;
-  const argv = stripElectronArgv(process.argv);
+  const cmd = stripElectronArgv({ wdir, argv: process.argv });
 
   // Initialize Theme
   const globals = obtainGlobalSettings();
   applyThemeSettings(globals);
 
   // Create Window
-  createBrowserWindow(true, { title: appName }, argv, wdir);
+  createBrowserWindow(true, { title: appName }, cmd.argv, cmd.wdir);
 }
 
 let appCount = 1;
@@ -538,9 +543,9 @@ function createSecondaryWindow(
   if (argString) {
     argString = argString.substring(argStart.length);
     const electronArgv = JSON.parse(argString);
-    const argv = stripElectronArgv(electronArgv);
+    const cmd = stripElectronArgv({ wdir, argv: electronArgv });
     const title = `${appName} #${++appCount}`;
-    createBrowserWindow(false, { title }, argv, wdir);
+    createBrowserWindow(false, { title }, cmd.argv, cmd.wdir);
   }
 }
 

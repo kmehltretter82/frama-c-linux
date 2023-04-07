@@ -87,15 +87,15 @@ fi
 echo "[2/3] Compiling Ivette"
 # --------------------------------------------------------------------------
 
-TMPDIR=`mktemp -d`
-cd $TMPDIR
+IVETTE_TMP_DIR=`mktemp -d`
+cd $IVETTE_TMP_DIR
 tar zxf $PREFIX/lib/frama-c/ivette.tgz
 cd ivette
 make dist
 if [ "$?" != "0" ]
 then
     echo "Compilation Failed"
-    rm -fr $TMPDIR
+    rm -fr $IVETTE_TMP_DIR
     exit 2
 fi
 
@@ -107,11 +107,11 @@ make PREFIX=$PREFIX install
 if [ "$?" != "0" ]
 then
     echo "Installation Failed"
-    rm -fr $TMPDIR
+    rm -fr $IVETTE_TMP_DIR
     exit 3
 fi
 cd $USERCWD
-rm -fr $TMPDIR
+rm -fr $IVETTE_TMP_DIR
 rm -f $PREFIX/lib/frama-c/ivette.tgz
 
 # --------------------------------------------------------------------------

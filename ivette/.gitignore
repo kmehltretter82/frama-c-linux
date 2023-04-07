@@ -9,7 +9,6 @@
 .eslint-cache
 node_modules
 yarn-error.log
-/bin
 /dist
 /doc/html
 /src/renderer/loader.ts

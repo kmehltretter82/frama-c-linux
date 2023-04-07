@@ -54,6 +54,7 @@ _build
 /dev/fc-time
 /dev/fc-memuse
 /bin/ocamldep_transitive_closure
+/bin/ivette
 
 #share
 /share/Makefile.config
