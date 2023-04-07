@@ -369,7 +369,7 @@ let is_pointer_vertex (v: V.t) (a:t) =
   assert_invariants a;
   let ls : LSet.t = VMap.find v a.vmap in
   if LSet.is_empty ls
-  then not (G.succ a.graph v = [])  
+  then not (G.succ a.graph v = [])
   else
     let x = LSet.choose ls in
     let is_ptr_x = Lval.is_pointer x in
