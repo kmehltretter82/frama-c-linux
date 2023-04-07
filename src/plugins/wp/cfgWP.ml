@@ -312,15 +312,6 @@ struct
       warn = vc.warn ;
       deps = vc.deps ;
       path = vc.path }
-  [@@ warning "-32"]
-
-  (* TODO: used for computing the probe of a variable
-     let val_of vi =
-      match M.load post (Ctypes.object_of vi.vtype) @@ M.cvar vi with
-      | Loc l -> M.pointer_val l
-      | Val t -> t
-     in
-  *)
 
   (* -------------------------------------------------------------------------- *)
   (* --- Branching                                                          --- *)
@@ -1449,11 +1440,21 @@ struct
   (* --- WP RULE : scope                                                    --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let wp_scope env wp ~descr scope xs =
-    let post = L.current env in
-    let pre = M.alloc post xs in
-    let hs = M.scope { pre ; post } scope xs in
+  let wp_formal sigma v =
+    v.vname,
+    C.cval @@ M.load sigma (Ctypes.object_of v.vtype) @@ M.cvar v
+
+  let wp_scope env wp ~descr ?(probes=false) scope xs =
+    let cur = L.current env in
+    let pre = M.alloc cur xs in
+    let hs = M.scope { pre ; post = cur } scope xs in
     let vcs = gmap (assume_vc ~descr hs) wp.vcs in
+    let vcs =
+      if probes then
+        let pxs = List.map (wp_formal cur) xs in
+        gmap (List.fold_right (fun (a,t) vc -> probe ~name:a t vc) pxs) vcs
+      else vcs
+    in
     { wp with sigma = Some pre ; vcs = vcs }
 
   let scope wenv xs sc wp = in_wenv wenv wp
@@ -1464,7 +1465,8 @@ struct
           let vcs = gmap (assume_vc ~descr:"Heap" ~domain:true hs) wp.vcs in
           { wp with vcs }
         | Mcfg.SC_Frame_in ->
-          wp_scope env wp ~descr:"Frame In" Enter xs
+          let probes = Wp_parameters.CounterExample.get () in
+          wp_scope env wp ~probes ~descr:"Frame In" Enter xs
         | Mcfg.SC_Frame_out ->
           wp_scope env wp ~descr:"Frame Out" Leave xs
         | Mcfg.SC_Block_in ->
