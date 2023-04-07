@@ -115,7 +115,8 @@ let probe_property = function
   | _ -> raise Not_found
 
 let probe_marker = function
-  | Printer_tag.PLval (_, _, (Var vi, NoOffset))
+  | Printer_tag.PLval (_, _, lval)
+    when Cil.(isFunctionType (typeOfLval lval)) -> raise Not_found
   | PVDecl (_, _, vi) when Cil.isFunctionType vi.vtype -> raise Not_found
   | PLval (_, _, l) -> Plval l
   | PExp (_, _, e) -> Pexpr e

@@ -147,6 +147,8 @@ export interface markerAttributesData {
   isLval: boolean;
   /** Whether it is a function symbol */
   isFunction: boolean;
+  /** Whether it is a function pointer */
+  isFunctionPointer: boolean;
   /** Whether it is a function declaration */
   isFunDecl: boolean;
   /** Function scope of the marker, if applicable */
@@ -165,6 +167,7 @@ export const jMarkerAttributesData: Json.Decoder<markerAttributesData> =
     descr: Json.jString,
     isLval: Json.jBoolean,
     isFunction: Json.jBoolean,
+    isFunctionPointer: Json.jBoolean,
     isFunDecl: Json.jBoolean,
     scope: Json.jOption(Json.jString),
     sloc: Json.jOption(jSource),
@@ -175,7 +178,8 @@ export const byMarkerAttributesData: Compare.Order<markerAttributesData> =
   Compare.byFields
     <{ marker: marker, labelKind: string, titleKind: string, name: string,
        descr: string, isLval: boolean, isFunction: boolean,
-       isFunDecl: boolean, scope?: string, sloc?: source }>({
+       isFunctionPointer: boolean, isFunDecl: boolean, scope?: string,
+       sloc?: source }>({
     marker: byMarker,
     labelKind: Compare.alpha,
     titleKind: Compare.alpha,
@@ -183,6 +187,7 @@ export const byMarkerAttributesData: Compare.Order<markerAttributesData> =
     descr: Compare.string,
     isLval: Compare.boolean,
     isFunction: Compare.boolean,
+    isFunctionPointer: Compare.boolean,
     isFunDecl: Compare.boolean,
     scope: Compare.defined(Compare.string),
     sloc: Compare.defined(bySource),
@@ -240,8 +245,8 @@ export const markerAttributes: State.Array<marker,markerAttributesData> = marker
 /** Default value for `markerAttributesData` */
 export const markerAttributesDataDefault: markerAttributesData =
   { marker: markerDefault, labelKind: '', titleKind: '', name: '', descr: '',
-    isLval: false, isFunction: false, isFunDecl: false, scope: undefined,
-    sloc: undefined };
+    isLval: false, isFunction: false, isFunctionPointer: false,
+    isFunDecl: false, scope: undefined, sloc: undefined };
 
 const getMainFunction_internal: Server.GetRequest<null,fct | undefined> = {
   kind: Server.RqKind.GET,

@@ -86,6 +86,27 @@ let () = Request.register ~package
     ~input:(module Kernel_ast.Function) ~output:(module Data.Jlist (CallSite))
     callers
 
+let eval_callee stmt lval =
+  let expr = Eva_utils.lval_to_exp lval in
+  Results.(before stmt |> eval_callee expr |> default [])
+
+let callees = function
+  | Printer_tag.PLval (_kf, Kstmt stmt, (Mem _, NoOffset as lval))
+    when Cil.(isFunctionType (typeOfLval lval)) ->
+    eval_callee stmt lval
+  | Printer_tag.PLval (_kf, Kstmt stmt, lval)
+    when Cil.(isFunPtrType (Cil.typeOfLval lval)) ->
+    eval_callee stmt (Mem (Eva_utils.lval_to_exp lval), NoOffset)
+  | _ -> []
+
+let () = Request.register ~package
+    ~kind:`GET ~name:"getCallees"
+    ~descr:(Markdown.plain
+              "Return the functions pointed to by a function pointer")
+    ~input:(module Kernel_ast.Marker)
+    ~output:(module Data.Jlist (Kernel_ast.Function))
+    callees
+
 (* ----- Functions ---------------------------------------------------------- *)
 
 module Functions =

@@ -533,17 +533,21 @@ async function studia(props: StudiaProps): Promise<StudiaInfos> {
 // This field contains all the current function's callers, as inferred by Eva.
 const Callers = Editor.createField<Eva.CallSite[]>([]);
 
+// This field contains the function pointed to by the current hovered marker,
+// as inferred by Eva.
+const Callees = Editor.createField<Fct[]>([]);
+
 // This field contains information on markers.
 type GetMarkerData = (key: Ast.marker) => Ast.markerAttributesData | undefined;
 const GetMarkerData = Editor.createField<GetMarkerData>(() => undefined);
 
 const ContextMenuHandler = createContextMenuHandler();
 function createContextMenuHandler(): Editor.Extension {
-  const data = { tree: Tree, callers: Callers };
+  const data = { tree: Tree, callers: Callers, callees: Callees };
   const deps = { ...data, update: UpdateSelection, getData: GetMarkerData };
   return Editor.createEventHandler(deps, {
     contextmenu: (inputs, view, event) => {
-      const { tree, callers, update, getData } = inputs;
+      const { tree, callers, callees, update, getData } = inputs;
       const coords = { x: event.clientX, y: event.clientY };
       const position = view.posAtCoords(coords); if (!position) return;
       const node = coveringNode(tree, position);
@@ -571,6 +575,13 @@ function createContextMenuHandler(): Editor.Extension {
         const onClick = (): void => update({ location });
         const label = `Go to definition of ${attrs.name}`;
         items.push({ label, onClick });
+      }
+      else if (attrs?.isFunctionPointer) {
+        Lodash.forEach(callees, (fct) => {
+          const onClick = (): void => update({ location: { fct } });
+          const label = `Go to definition of ${fct} (indirect)`;
+          items.push({ label, onClick });
+        });
       }
       const enabled = attrs?.isLval;
       const onClick = (kind: access): void => {
@@ -675,6 +686,11 @@ function useFctCallers(fct: Fct): Eva.CallSite[] {
   return States.useRequest(Eva.getCallers, fct) ?? [];
 }
 
+// Server request handler returning the given function's callers.
+function useCallees(marker: Marker): Fct[] {
+  return States.useRequest(Eva.getCallees, marker) ?? [];
+}
+
 // Server request handler returning the tainted lvalues.
 function useFctTaints(fct: Fct): Eva.LvalueTaints[] {
   return States.useRequest(Eva.taintedLvalues, fct, { onError: [] }) ?? [];
@@ -750,6 +766,10 @@ export default function ASTview(): JSX.Element {
   React.useEffect(() => Callers.set(view, callers), [view, callers]);
   const taints = useFctTaints(fct);
   React.useEffect(() => TaintedLvalues.set(view, taints), [view, taints]);
+
+  // Retrieving data on currently hovered marker.
+  const callees = useCallees(hovered);
+  React.useEffect(() => Callees.set(view, callees), [view, callees]);
 
   return (
     <>
