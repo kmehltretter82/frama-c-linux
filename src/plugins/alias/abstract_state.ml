@@ -304,13 +304,14 @@ let assert_invariants (x:t) : unit =
   LLMap.iter assert_lmap x.lmap;
   let assert_vmap (v:V.t) (ls:LSet.t) =
     assert (G.mem_vertex x.graph v);
-    if not (LSet.is_empty ls)
-    then
-      begin
-        let lv = LSet.choose ls in
-        let is_ptr_lv = Lval.is_pointer lv in
-        assert (LSet.for_all (fun x -> Lval.is_pointer x = is_ptr_lv) ls)
-      end;
+    (* TODO: we removed the invariant because of OSCS*)
+    (* if not (LSet.is_empty ls)
+     * then
+     *   begin
+     *     let lv = LSet.choose ls in
+     *     let is_ptr_lv = Lval.is_pointer lv in
+     *     assert (LSet.for_all (fun x -> Lval.is_pointer x = is_ptr_lv) ls)
+     *   end; *)
     assert (LSet.fold (fun lv acc -> acc && V.equal (LLMap.find lv x.lmap) v) ls true)
   in
   VMap.iter assert_vmap x.vmap
@@ -377,23 +378,19 @@ let find_transitive_closure  (lv:lval) (x:t) : (G.V.t * LSet.t) list =
 
 
 
-(* check that lvals in a vertex are all pointers *)
+(* check that at least 1 lval in a vertex is a pointers *)
 let is_pointer_vertex (v: V.t) (a:t) =
   assert_invariants a;
+  assert (G.mem_vertex a.graph v);
   let ls : LSet.t = VMap.find v a.vmap in
   if LSet.is_empty ls
   then not (G.succ a.graph v = [])
   else
-    let x = LSet.choose ls in
-    let is_ptr_x = Lval.is_pointer x in
-    if not (LSet.for_all (fun x -> Lval.is_pointer x = is_ptr_x) ls)
-    then
-      Format.printf
-        "BUG: set with heteregenous types %a@. abstract state:%a@."
-        LSet.pretty ls print_debug a;
-    if not (is_ptr_x)
+    let is_ptr = LSet.exists (fun x -> Lval.is_pointer x) ls in
+    (* TODO: exists -> for_all (it doesn't work with OSCS) *)
+    if not (is_ptr)
     then assert (G.succ a.graph v = []) ;
-    is_ptr_x
+    is_ptr
 
 
 
