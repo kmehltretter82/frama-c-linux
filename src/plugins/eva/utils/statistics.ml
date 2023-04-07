@@ -161,6 +161,9 @@ let incr (type a) (stat : a t) (x : a) =
 let grow (type a) (stat : a t) (x : a) value =
   update stat x (fun v -> max v value)
 
+let reset_all () =
+  State.clear ()
+
 
 (* -- Export --- *)
 

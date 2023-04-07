@@ -36,5 +36,8 @@ val incr : 'a t -> 'a -> unit
 (* Set the stat to the maximum between the current value and the given value *)
 val grow : 'a t -> 'a -> int -> unit
 
+(* Reset all statistics to zero *)
+val reset_all: unit -> unit
+
 (* Export the computed statistics as CSV *)
 val export_as_csv : ?filename:Filepath.Normalized.t -> unit -> unit
