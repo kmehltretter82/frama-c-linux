@@ -733,20 +733,17 @@ let assignment (a:t) (lv:lval) (e:exp) : t =
     let x = Lval.from_lval lv in
     let y = Lval.from_exp e in
     match x,y with
-      BNone, _ | _, BNone -> a
-    | _, BAddrOf blv ->
+    | BNone, _ | _, BNone -> a
+    | _, y ->
       let (v1,a) = find_or_create_vertex x a in
       let (v2,a) = find_or_create_vertex y a in
-      let new_a = join a v1 v2 in
-      let new_a = remove_lval new_a (BAddrOf blv) in
-      assert_invariants new_a ;
-      new_a
-    | _ ->
-      let (v1,a) = find_or_create_vertex x a in
-      let (v2,a) = find_or_create_vertex y a in
-      let new_a = join a v1 v2 in
-      assert_invariants new_a ;
-      new_a
+      let a = join a v1 v2 in
+      let a = match y with
+        | BAddrOf blv -> remove_lval a (BAddrOf blv)
+        | _ -> a
+      in
+      assert_invariants a;
+      a
   else
     a
 
