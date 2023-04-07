@@ -70,7 +70,7 @@ class absurd =
               let seq = Conditions.replace ~at:s.id emp seq in
               [ "Absurd" , (fst seq , F.p_not p) ]
             in Applicable absurd
-          | Branch _ | Either _ | State _ | Probes _ ->
+          | Branch _ | Either _ | State _ | Probe _ ->
             Not_applicable
         end
   end
@@ -98,7 +98,7 @@ class contrapose =
               let hs = Conditions.replace ~at:s.id goal (hs , F.p_false) in
               [ "Contrapose" , (fst hs , F.p_not p) ]
             in Applicable contrapose
-          | Branch _ | Either _ | State _ | Probes _ ->
+          | Branch _ | Either _ | State _ | Probe _ ->
             Not_applicable
         end
 

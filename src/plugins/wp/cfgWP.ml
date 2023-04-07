@@ -303,17 +303,24 @@ struct
         path = path ;
       }
 
-  let probe ?descr terms vc =
-    if terms = [] then vc else
-      let vars =
-        List.fold_left (fun xs t -> Vars.union xs (F.vars t)) vc.vars terms in
-      let hyps = Conditions.probe ?descr terms vc.hyps in
-      { hyps = hyps ;
-        vars = vars ;
-        goal = vc.goal ;
-        warn = vc.warn ;
-        deps = vc.deps ;
-        path = vc.path }
+  let probe ?descr ?stmt ~name term vc =
+    let vars = F.vars term in
+    let hyps = Conditions.probe ?descr ?stmt ~name term vc.hyps in
+    { hyps = hyps ;
+      vars = vars ;
+      goal = vc.goal ;
+      warn = vc.warn ;
+      deps = vc.deps ;
+      path = vc.path }
+  [@@ warning "-32"]
+
+  (* TODO: used for computing the probe of a variable
+     let val_of vi =
+      match M.load post (Ctypes.object_of vi.vtype) @@ M.cvar vi with
+      | Loc l -> M.pointer_val l
+      | Val t -> t
+     in
+  *)
 
   (* -------------------------------------------------------------------------- *)
   (* --- Branching                                                          --- *)
@@ -1446,14 +1453,7 @@ struct
     let post = L.current env in
     let pre = M.alloc post xs in
     let hs = M.scope { pre ; post } scope xs in
-    let val_of vi =
-      match M.load post (Ctypes.object_of vi.vtype) @@ M.cvar vi with
-      | Loc l -> M.pointer_val l
-      | Val t -> t
-    in
-    let pxs = if scope = Enter then List.map val_of xs else [] in
     let vcs = gmap (assume_vc ~descr hs) wp.vcs in
-    let vcs = gmap (probe pxs) vcs in
     { wp with sigma = Some pre ; vcs = vcs }
 
   let scope wenv xs sc wp = in_wenv wenv wp

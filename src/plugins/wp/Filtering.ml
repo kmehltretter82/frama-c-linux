@@ -290,7 +290,7 @@ struct
     let open Conditions in
     match s.condition with
     | Type _ | State _ -> ()
-    | Probes ts -> Bag.iter (collect_term env) ts
+    | Probe p -> collect_term env p.probe_term
     | Core p | Have p | When p | Init p -> collect_hyp env p
     | Either cs -> List.iter (collect_seq env) cs
     | Branch(p,a,b) ->

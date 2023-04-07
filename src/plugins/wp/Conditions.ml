@@ -85,6 +85,7 @@ and sequence = {
   seq_catg : category ;
   seq_list : step list ; (* forall i . 0 <= i < n ==> Step_i *)
 }
+
 and condition =
   | Type of pred (* related to Type *)
   | Have of pred
@@ -94,7 +95,13 @@ and condition =
   | Branch of pred * sequence * sequence (* if Pred then Seq_1 else Seq_2 *)
   | Either of sequence list (* exist i . 0 <= i < n && Sequence_i *)
   | State of Mstate.state
-  | Probes of term Bag.t
+  | Probe of probe
+
+and probe = {
+  probe_stmt : stmt option ;
+  probe_name : string ;
+  probe_term : term ;
+}
 
 (* -------------------------------------------------------------------------- *)
 (* --- Variable Utilities                                                 --- *)
@@ -108,9 +115,9 @@ let vars_cond = function
   | Branch(p,sa,sb) -> Vars.union (F.varsp p) (Vars.union sa.seq_vars sb.seq_vars)
   | Either cases -> vars_seqs cases
   | State _ -> Vars.empty
-  | Probes ts -> Bag.fold_left (fun xs t -> Vars.union xs (F.vars t)) Vars.empty ts
+  | Probe p -> F.vars p.probe_term
 let size_cond = function
-  | Type _ | When _ | Have _ | Core _ | Init _ | State _ | Probes _ -> 1
+  | Type _ | When _ | Have _ | Core _ | Init _ | State _ | Probe _ -> 1
   | Branch(_,sa,sb) -> 1 + sa.seq_size + sb.seq_size
   | Either cases -> List.fold_left (fun n s -> n + s.seq_size) 1 cases
 let vars_hyp hs = hs.seq_vars
@@ -130,7 +137,7 @@ let rec add_core s p = match F.p_expr p with
   | _ -> if is_core p then Pset.add p s else s
 
 let core_cond = function
-  | Type _ | State _ | Probes _ -> Pset.empty
+  | Type _ | State _ | Probe _ -> Pset.empty
   | Have p | When p | Core p | Init p -> add_core Pset.empty p
   | Branch(_,sa,sb) -> Pset.inter sa.seq_core sb.seq_core
   | Either [] -> Pset.empty
@@ -147,7 +154,7 @@ let core_list s = List.fold_left add_core_step Pset.empty s
 
 let catg_seq s = s.seq_catg
 let catg_cond = function
-  | State _ | Probes _ -> TRUE
+  | State _ | Probe _ -> TRUE
   | Have p | Type p | When p | Core p | Init p ->
     begin
       match F.is_ptrue p with
@@ -179,7 +186,7 @@ let sequence l = {
 (* Only used for stability after a turn of simpliciations *)
 let rec equal_cond ca cb =
   match ca,cb with
-  | Probes _ , Probes _ -> true
+  | Probe _ , Probe _ -> true
   | State _ , State _ -> true
   | Type p , Type q
   | Have p , Have q
@@ -191,7 +198,7 @@ let rec equal_cond ca cb =
     p == q && equal_seq a a' && equal_seq b b'
   | Either u, Either v ->
     Qed.Hcons.equal_list equal_seq u v
-  | Probes _ , _ | _ , Probes _
+  | Probe _ , _ | _ , Probe _
   | State _ , _ | _ , State _
   | Type _ , _ | _ , Type _
   | Have _ , _ | _ , Have _
@@ -226,7 +233,7 @@ struct
     | Have p -> Have (fpred core p)
     | When p -> When (fpred core p)
     | Init p -> Init (fpred core p)
-    | (Type _ | Branch _ | Either _ | State _ | Probes _) as cond -> cond
+    | (Type _ | Branch _ | Either _ | State _ | Probe _) as cond -> cond
 
   let fstep core step =
     let condition = fcond core step.condition in
@@ -326,13 +333,13 @@ let is_empty = function { seq_catg = EMPTY } -> true | _ -> false
 let is_false = function { seq_catg = FALSE } -> true | _ -> false
 
 let is_absurd_h h = match h.condition with
-  | State _ | Probes _ -> false
+  | State _ | Probe _ -> false
   | (Type p | Core p | When p | Have p | Init p) -> p == F.p_false
   | Branch(_,p,q) -> is_false p && is_false q
   | Either w -> List.for_all is_false w (* note: an empty w is an absurd hyp *)
 
 let is_trivial_h h = match h.condition with
-  | State _ | Probes _ -> false
+  | State _ | Probe _ -> false
   | (Type p | Core p | When p | Have p | Init p) -> p == F.p_true
   | Branch(_,a,b) -> is_true a && is_true b
   | Either [] -> false
@@ -347,7 +354,7 @@ let is_trivial (s:sequent) = is_trivial_hs_p (fst s).seq_list (snd s)
 (* -------------------------------------------------------------------------- *)
 
 let rec pred_cond = function
-  | State _ | Probes _ -> F.p_true
+  | State _ | Probe _ -> F.p_true
   | When p | Type p | Have p | Core p | Init p -> p
   | Branch(p,a,b) -> F.p_if p (pred_seq a) (pred_seq b)
   | Either cases -> F.p_any pred_seq cases
@@ -535,8 +542,12 @@ let intros ps hs =
 let state ?descr ?stmt state hs =
   Bundle.add (step ?descr ?stmt (State state)) hs
 
-let probe ?descr ts hs =
-  Bundle.add (step ?descr (Probes (Bag.list ts))) hs
+let probe ?descr ?stmt ~name term hs =
+  Bundle.add (step ?descr ?stmt (Probe {
+      probe_stmt = stmt ;
+      probe_name = name ;
+      probe_term = term ;
+    })) hs
 
 let assume ?descr ?stmt ?deps ?warn ?(init=false) ?(domain=false) p hs =
   match F.is_ptrue p with
@@ -647,13 +658,7 @@ let rec flatten_sequence m = function
   | [] -> []
   | step :: seq ->
     match step.condition with
-    | State _ -> flat_cons step (flatten_sequence m seq)
-    | Probes ts ->
-      let ts = Bag.filter (fun t -> not @@ F.is_atomic t) ts in
-      if Bag.is_empty ts then
-        ( m := true ; flatten_sequence m seq )
-      else
-        flat_cons step (flatten_sequence m seq)
+    | State _ | Probe _ -> flat_cons step (flatten_sequence m seq)
     | Have p | Type p | When p | Core p | Init p ->
       begin
         match F.is_ptrue p with
@@ -706,8 +711,10 @@ let rec flatten_sequence m = function
 (* --- Mapping                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
+let map_probe f p = { p with probe_term = f p.probe_term }
+
 let rec map_condition f = function
-  | Probes ts -> Probes (Bag.map (F.p_lift f) ts)
+  | Probe ts -> Probe (map_probe (F.p_lift f) ts)
   | State s -> State (Mstate.apply (F.p_lift f) s)
   | Have p -> Have (f p)
   | Type p -> Type (f p)
@@ -740,8 +747,7 @@ module Ground = Letify.Ground
 
 let rec ground_flow ~fwd env h =
   match h.condition with
-  | Probes ts ->
-    update_cond h (Probes (Bag.map (Ground.e_apply env) ts))
+  | Probe t -> update_cond h (Probe (map_probe (Ground.e_apply env) t))
   | State s ->
     let s = Mstate.apply (Ground.e_apply env) s in
     update_cond h (State s)
@@ -809,14 +815,14 @@ let dseq_of_step sigma step =
   let defs =
     match step.condition with
     | Init p | Have p | When p | Core p -> Defs.extract (Sigma.p_apply sigma p)
-    | Type _ | Branch _ | Either _ | State _ | Probes _ -> Defs.empty
+    | Type _ | Branch _ | Either _ | State _ | Probe _ -> Defs.empty
   in defs , step
 
 let letify_assume sref (_,step) =
   let current = !sref in
   begin
     match step.condition with
-    | Type _ | Branch _ | Either _ | State _ | Probes _ -> ()
+    | Type _ | Branch _ | Either _ | State _ | Probe _ -> ()
     | Init p | Have p | When p | Core p ->
       if Wp_parameters.Simpl.get () then
         sref := Sigma.assume current p
@@ -853,7 +859,7 @@ let rec letify_seq sigma0 ~target ~export (seq : step list) =
 and letify_step dseq dsigma ~required ~target ~used i (d,s) =
   let sigma = dsigma.(i) in
   let cond = match s.condition with
-    | Probes ts -> Probes (Bag.map (Sigma.e_apply sigma) ts)
+    | Probe s -> Probe (map_probe (Sigma.e_apply sigma) s)
     | State s -> State (Mstate.apply (Sigma.e_apply sigma) s)
     | Init p ->
       let p = Sigma.p_apply sigma p in
@@ -935,7 +941,7 @@ let apply_hyp modified solvers h =
     | _ -> weaken_and_then_assume p
   in
   match h.condition with
-  | Probes ts -> update_cond h (Probes (Bag.map (equivalent_exp solvers) ts))
+  | Probe s -> update_cond h (Probe (map_probe (equivalent_exp solvers) s))
   | State s -> update_cond h (State (Mstate.apply (equivalent_exp solvers) s))
   | Init p -> update_cond h (Init (weaken p))
   | Type p -> update_cond h (Type (weaken p))
@@ -1103,7 +1109,7 @@ struct
 
   let collect s = function
     | Have p | When p | Core p | Init p -> collect_set_def s (F.e_prop p)
-    | Type _ | Branch _ | Either _ | State _ | Probes _ -> ()
+    | Type _ | Branch _ | Either _ | State _ | Probe _ -> ()
 
   let subst s =
     match s.cache with
@@ -1117,7 +1123,7 @@ struct
   let p_apply s p = F.p_subst (subst s) p
 
   let rec c_apply s = function
-    | Probes ts -> Probes (Bag.map (e_apply s) ts)
+    | Probe m -> Probe (map_probe (e_apply s) m)
     | State m -> State (Mstate.apply (e_apply s) m)
     | Type p -> Type (p_apply s p)
     | Init p -> Init (p_apply s p)
@@ -1228,7 +1234,7 @@ let rec test_cases (s : hsp) = function
     | Some _ , Some _ -> test_cases s tail
 
 let rec collect_cond m = function
-  | When _ | Have _ | Type _ | Init _ | Core _ | State _ | Probes _ -> ()
+  | When _ | Have _ | Type _ | Init _ | Core _ | State _ | Probe _ -> ()
   | Branch(p,a,b) -> Letify.Split.add m p ; collect_seq m a ; collect_seq m b
   | Either cs -> List.iter (collect_seq m) cs
 
@@ -1261,7 +1267,7 @@ let pruning ?(solvers=[]) seq =
 
 let rec collect_cond u = function
   | State _ -> ()
-  | Probes ts -> Bag.iter (Cleaning.as_term u) ts
+  | Probe p -> Cleaning.as_term u p.probe_term
   | When p -> Cleaning.as_have u p
   | Have p -> Cleaning.as_have u p
   | Core p -> Cleaning.as_have u p
@@ -1274,7 +1280,7 @@ and collect_steps u steps =
   List.iter (fun s -> collect_cond u s.condition) steps
 
 let rec clean_cond u = function
-  | State _ | Probes _ as cond -> cond
+  | State _ | Probe _ as cond -> cond
   | When p -> When (Cleaning.filter_pred u p)
   | Have p -> Have (Cleaning.filter_pred u p)
   | Core p -> Core (Cleaning.filter_pred u p)
@@ -1444,7 +1450,7 @@ struct
     end
 
   let rec collect_condition m = function
-    | Probes ts -> Bag.iter (collect_term m) ts
+    | Probe p -> collect_term m p.probe_term
     | Have p | When p | Core p -> collect_have m p
     | Type _ | Init _ | State _ -> ()
     | Branch(p,sa,sb) -> collect_have m p ; collect_seq m sa ; collect_seq m sb
@@ -1471,7 +1477,7 @@ struct
     | [] -> []
     | s :: w ->
       match s.condition with
-      | State _ | Probes _ | Have _ | When _ | Core _ | Branch _ | Either _ ->
+      | State _ | Probe _ | Have _ | When _ | Core _ | Branch _ | Either _ ->
         s :: filter_steplist m w
       | Type p ->
         let p = filter_pred m p in
@@ -1624,7 +1630,7 @@ struct
   let rec collect_step w s =
     match s.condition with
     | Type _ | State _ -> w
-    | Probes ts -> Bag.fold_left usage w ts
+    | Probe p -> usage w p.probe_term
     | Have p | Core p | Init p | When p -> usage w (F.e_prop p)
     | Branch(p,a,b) ->
       let wa = collect_seq w a in
@@ -1662,7 +1668,7 @@ struct
   let rec collect_step filter s =
     match s.condition with
     | State s -> add_state filter s
-    | Have _ | Core _ | Init _ | When _ | Type _ | Probes _ -> filter
+    | Have _ | Core _ | Init _ | When _ | Type _ | Probe _ -> filter
     | Branch(_p,a,b) -> collect_seq (collect_seq filter a) b
     | Either ws -> List.fold_left collect_seq filter ws
 
@@ -1723,11 +1729,11 @@ let hyps s = List.map (fun s -> close_cond s.condition) s.seq_list
 let head s =
   match s.condition with
   | Have p | When p | Core p | Init p | Type p | Branch(p,_,_) -> p
-  | Either _ | State _ | Probes _ -> p_true
+  | Either _ | State _ | Probe _ -> p_true
 let have s =
   match s.condition with
   | Have p | When p | Core p | Init p | Type p -> p
-  | Branch _ | Either _ | State _ | Probes _ -> p_true
+  | Branch _ | Either _ | State _ | Probe _ -> p_true
 
 let condition s = F.p_conj (hyps s)
 let close sequent =
@@ -1746,15 +1752,15 @@ let iter f seq = List.iter f seq.seq_list
 (* -------------------------------------------------------------------------- *)
 
 let probes seq =
-  let pool = ref Bag.empty in
+  let pool = ref [] in
   let rec collect_step s =
     match s.condition with
-    | Probes ts -> pool := Bag.concat !pool ts
+    | Probe p -> pool := p :: !pool
     | Branch(_,a,b) -> collect_seq a ; collect_seq b
     | Either cs -> List.iter collect_seq cs
     | _ -> ()
   and collect_seq s = List.iter collect_step s.seq_list
-  in collect_seq seq ; !pool
+  in collect_seq seq ; List.rev !pool
 
 (* -------------------------------------------------------------------------- *)
 (* --- Index                                                              --- *)
@@ -1767,7 +1773,7 @@ let rec index_list k = function
 and index_step k s =
   s.id <- k ; let k = succ k in
   match s.condition with
-  | Have _ | When _ | Type _ | Core _ | Init _ | State _ | Probes _ -> k
+  | Have _ | When _ | Type _ | Core _ | Init _ | State _ | Probe _ -> k
   | Branch(_,a,b) -> index_list (index_list k a.seq_list) b.seq_list
   | Either cs -> index_case k cs
 
@@ -1791,7 +1797,7 @@ let rec at_list k = function
       if k < n then at_step (k-1) s.condition else at_list (k - n) w
 
 and at_step k = function
-  | Have _ | When _ | Type _ | Core _ | Init _ | State _ | Probes _ ->
+  | Have _ | When _ | Type _ | Core _ | Init _ | State _ | Probe _ ->
     assert false
   | Branch(_,a,b) ->
     let n = a.seq_size in
@@ -1836,7 +1842,7 @@ let in_sequence_add_list ~replace =
         else s :: in_list (k-n) h w
 
   and in_step k h = function
-    | Have _ | When _ | Type _ | Core _ | Init _ | State _ | Probes _ ->
+    | Have _ | When _ | Type _ | Core _ | Init _ | State _ | Probe _ ->
       assert false
     | Branch(p,a,b) ->
       let n = a.seq_size in

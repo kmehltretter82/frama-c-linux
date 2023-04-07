@@ -62,9 +62,15 @@ and condition =
   | Branch of pred * sequence * sequence (** If-Then-Else *)
   | Either of sequence list (** Disjunction *)
   | State of Mstate.state (** Memory Model snapshot *)
-  | Probes of term Bag.t
+  | Probe of probe (** Named probes *)
 
 and sequence (** List of steps *)
+
+and probe = {
+  probe_stmt : stmt option ;
+  probe_name : string ;
+  probe_term : term ;
+}
 
 type sequent = sequence * F.pred
 
@@ -143,10 +149,13 @@ val step_at : sequence -> int -> step
 val is_trivial : sequent -> bool
 (** Goal is true or hypotheses contains false. *)
 
-val probes : sequence -> term Bag.t
+val probes : sequence -> probe list
 (** Collect all probes in the sequence *)
 
 (** {2 Transformations} *)
+
+val map_probe : (term -> term) -> probe -> probe
+(** Rewrite probe *)
 
 val map_condition : (pred -> pred) -> condition -> condition
 (** Rewrite all root predicates in condition *)
@@ -239,7 +248,7 @@ val merge : bundle list -> bundle
     over the list. *)
 
 (** Inserts probes to a sequent. *)
-val probe : ?descr:string -> F.term list -> bundle -> bundle
+val probe : ?descr:string -> ?stmt:stmt -> name:string -> term -> bundle -> bundle
 
 (** Assumes a list of predicates in a [Type] section on top of the bundle. *)
 val domain : F.pred list -> bundle -> bundle

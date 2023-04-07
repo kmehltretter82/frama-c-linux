@@ -37,7 +37,7 @@ let rec alloc_hyp pool f seq =
       (fun step ->
          if not (Vars.subset step.vars (Plang.alloc_domain pool)) then
            match step.condition with
-           | State _ | Probes _ ->
+           | State _ | Probe _ ->
              Plang.alloc_xs pool f step.vars
            | Have p | When p | Type p | Init p | Core p ->
              Plang.alloc_p pool f p
@@ -180,7 +180,7 @@ let mark_step m step =
   (* sub-sequences are marked recursively marked later *)
   match step.condition with
   | When p | Type p | Have p | Init p | Core p | Branch(p,_,_) -> F.mark_p m p
-  | Probes ts -> Bag.iter (F.mark_e m) ts
+  | Probe p -> F.mark_e m p.probe_term
   | Either _ | State _ -> ()
 
 let spaced pp fmt a = Format.pp_print_space fmt () ; pp fmt a
@@ -219,18 +219,10 @@ class engine (lang : #Plang.engine) =
       Format.fprintf fmt "@[<hov 4>%a %a%s@]"
         self#pp_clause clause lang#pp_pred p dot
 
-    method pp_probes fmt ts =
+    method pp_probe fmt p =
       begin
-        Format.fprintf fmt "@[<hov 4>Probes" ;
-        ignore @@ Bag.fold_left
-          (fun first t ->
-             if first
-             then Format.fprintf fmt " "
-             else Format.fprintf fmt ",@ " ;
-             lang#pp_term fmt t ;
-             false
-          ) true ts ;
-        Format.fprintf fmt ".@]" ;
+        Format.fprintf fmt "@[<hov 4>%a %s = %a.@]"
+          self#pp_clause "Prove" p.probe_name lang#pp_term p.probe_term
       end
 
     (* -------------------------------------------------------------------------- *)
@@ -240,7 +232,7 @@ class engine (lang : #Plang.engine) =
     method pp_condition fmt step =
       match step.condition with
       | State _ -> ()
-      | Probes ts -> self#pp_probes fmt ts
+      | Probe p -> self#pp_probe fmt p
       | Core p -> self#pp_intro ~clause:"Core:" fmt p
       | Type p -> self#pp_intro ~clause:"Type:" fmt p
       | Init p -> self#pp_intro ~clause:"Init:" fmt p

@@ -49,7 +49,7 @@ let s_kind s = match s.condition with
   | Type _ -> "type"
   | Init _ -> "init"
   | Branch _ -> "branch"
-  | Probes _ -> "probes"
+  | Probe _ -> "probe"
   | Either _ -> "either"
   | State _ -> "state"
 

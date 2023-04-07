@@ -159,7 +159,7 @@ struct
     mutable simplified : bool ;
     mutable sequent : Conditions.sequent ;
     mutable obligation : F.pred ;
-    mutable probes : F.term Bag.t ;
+    mutable probes : Conditions.probe list ;
   }
 
   let empty = Conditions.empty
@@ -169,7 +169,7 @@ struct
     simplified = false ;
     sequent = empty , F.p_false ;
     obligation = F.p_false ;
-    probes = Bag.empty ;
+    probes = [] ;
   }
 
   let trivial = {
@@ -177,7 +177,7 @@ struct
     simplified = true ;
     sequent = empty , F.p_true ;
     obligation = F.p_true ;
-    probes = Bag.empty ;
+    probes = [] ;
   }
 
   let make sequent = {
@@ -185,7 +185,7 @@ struct
     simplified = false ;
     sequent = sequent ;
     obligation = F.p_false ;
-    probes = Bag.empty ;
+    probes = [] ;
   }
 
   let is_trivial g = Conditions.is_trivial g.sequent

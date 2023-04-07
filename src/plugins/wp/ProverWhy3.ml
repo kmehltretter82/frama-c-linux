@@ -1067,7 +1067,7 @@ let goal_id = (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "wp_goal"))
 
 let add_model_trace probes cnv t =
   let open Why3 in
-  if Bag.is_empty probes then t else
+  if probes = [] then t else
     let t = Task.add_meta t Driver.meta_get_counterexmp [Theory.MAstr ""] in
     let id = ref (-1) in
     let create_id ty =
@@ -1085,14 +1085,14 @@ let add_model_trace probes cnv t =
       let t = Task.add_decl t decl in
       t
     in
-    Bag.fold_left fold t probes
+    List.fold_left fold t probes
 
 let convert_freevariables ~probes ~cnv t =
   let freevars = (Lang.F.varsp t) in
   let freevars =
     if Wp_parameters.CounterExample.get ()
     then
-      Bag.fold_left (fun vars t -> Lang.F.Vars.union vars (Lang.F.vars t))
+      List.fold_left (fun vars t -> Lang.F.Vars.union vars (Lang.F.vars t))
         freevars probes
     else freevars in
   let cnv,lss =
@@ -1105,7 +1105,7 @@ let convert_freevariables ~probes ~cnv t =
   in
   cnv,lss
 
-let prove_goal ~id ~title ~name ?axioms ?(probes=Bag.empty) t =
+let prove_goal ~id ~title ~name ?axioms ?(probes=[]) t =
   (* Format.printf "why3_of_qed start@."; *)
   let goal = Definitions.cluster ~id ~title () in
   let ctx = empty_context name in
@@ -1153,6 +1153,7 @@ let task_of_wpo wpo =
     let axioms = v.Wpo.VC_Annot.axioms in
     let prop = Wpo.GOAL.compute_proof ~pid v.Wpo.VC_Annot.goal in
     let probes = Wpo.GOAL.compute_probes ~pid v.Wpo.VC_Annot.goal in
+    let probes = List.map (fun p -> p.Conditions.probe_term) probes in
     prove_prop ~pid ?axioms ~probes prop
   | Wpo.GoalLemma v ->
     let lemma = v.Wpo.VC_Lemma.lemma in
