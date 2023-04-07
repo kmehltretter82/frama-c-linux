@@ -2,27 +2,22 @@
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
 [alias:unsafe-cast] assignment1.c:6: Warning: unsafe cast from int to int *
-[alias] May-aliases at the end of instruction: int *a = (int *)0;
+[alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
 [alias] analysing instruction: int *b = (int *)0;
 [alias:unsafe-cast] assignment1.c:6: Warning: unsafe cast from int to int *
-[alias] May-aliases at the end of instruction: int *b = (int *)0;
+[alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
 [alias] analysing instruction: int *c = (int *)0;
 [alias:unsafe-cast] assignment1.c:6: Warning: unsafe cast from int to int *
-[alias] May-aliases at the end of instruction: int *c = (int *)0;
+[alias] May-aliases after instruction  int *c = (int *)0;  are  <none>
 [alias] analysing instruction: int *d = (int *)0;
 [alias:unsafe-cast] assignment1.c:6: Warning: unsafe cast from int to int *
-[alias] May-aliases at the end of instruction: int *d = (int *)0;
+[alias] May-aliases after instruction  int *d = (int *)0;  are  <none>
 [alias] analysing instruction: a = b;
-[alias] May-aliases at the end of instruction: a = b;
-  {a, b} are aliased
+[alias] May-aliases after instruction  a = b;  are  {a, b}
 [alias] analysing instruction: b = c;
-[alias] May-aliases at the end of instruction: b = c;
-  {a, b, c} are aliased
+[alias] May-aliases after instruction  b = c;  are  {a, b, c}
 [alias] analysing instruction: a = d;
-[alias] May-aliases at the end of instruction: a = d;
-  {a, b, c, d} are aliased
+[alias] May-aliases after instruction  a = d;  are  {a, b, c, d}
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases at the end of instruction: __retres = 0;
-  {a, b, c, d} are aliased
-[alias] May-aliases at the end of function main:
-  {a, b, c, d} are aliased
+[alias] May-aliases after instruction  __retres = 0;  are  {a, b, c, d}
+[alias] May-aliases at the end of function main: {a, b, c, d}
