@@ -79,8 +79,9 @@ class engine : #Plang.engine ->
     (** Default: [plang#pp_sort] *)
 
     method pp_definition : Format.formatter -> string -> term -> unit
-    method pp_intro : step:step -> clause:string -> ?dot:string -> pred printer
-    method pp_condition : step:step -> condition printer
+    method pp_intro : clause:string -> ?dot:string -> pred printer
+    method pp_probes : term Bag.t printer
+    method pp_condition : step printer
     method pp_block : clause:string -> sequence printer
     method pp_goal : pred printer
 

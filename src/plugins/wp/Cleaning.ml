@@ -50,7 +50,8 @@ let cup_false = function
   | FALSE -> FALSE
   | _ -> TOP
 
-let set_top m p = Vars.fold (fun x m -> Vmap.add x TOP m) (F.varsp p) m
+let add_term m t = Vars.fold (fun x m -> Vmap.add x TOP m) (F.vars t) m
+let add_prop m p = add_term m (F.e_prop p)
 let add eq x d m = Vmap.add x (try cup eq (Vmap.find x m) d with Not_found -> EQ d) m
 let add_true m x = Vmap.add x (try cup_true (Vmap.find x m) with Not_found -> TRUE) m
 let add_false m x = Vmap.add x (try cup_false (Vmap.find x m) with Not_found -> FALSE) m
@@ -64,21 +65,21 @@ let add_fun = add Fun.equal
 let rec add_pred m p =
   match F.p_expr p with
   | And ps -> List.fold_left add_pred m ps
-  | If(e,a,b) -> add_pred (add_pred (set_top m e) a) b
+  | If(e,a,b) -> add_pred (add_pred (add_prop m e) a) b
   | Eq(a,b) ->
     begin
       match F.p_expr a , F.p_expr b with
       | Fvar x , Fvar y -> add_var x y (add_var y x m)
-      | _ -> set_top m p
+      | _ -> add_prop m p
     end
   | Fvar x -> add_true m x
   | Not p ->
     begin
       match F.p_expr p with
       | Fvar x -> add_false m x
-      | _ -> set_top m p
+      | _ -> add_prop m p
     end
-  | _ -> set_top m p
+  | _ -> add_prop m p
 
 let rec add_type m p =
   match F.p_expr p with
@@ -87,9 +88,9 @@ let rec add_type m p =
     begin
       match F.e_expr e with
       | Fvar x -> add_fun x f m
-      | _ -> set_top m p
+      | _ -> add_prop m p
     end
-  | _ -> set_top m p
+  | _ -> add_prop m p
 
 (* -------------------------------------------------------------------------- *)
 (* --- Usage                                                              --- *)
@@ -101,7 +102,8 @@ type usage = {
 }
 
 let create () = { eq_var = Vmap.empty ; eq_fun = Vmap.empty }
-let as_atom m p = m.eq_var <- set_top m.eq_var p
+let as_term m t = m.eq_var <- add_term m.eq_var t
+let as_atom m p = m.eq_var <- add_prop m.eq_var p
 let as_have m p = m.eq_var <- add_pred m.eq_var p
 let as_init m p = m.eq_fun <- add_type m.eq_fun p
 let as_type m p = m.eq_fun <- add_type m.eq_fun p

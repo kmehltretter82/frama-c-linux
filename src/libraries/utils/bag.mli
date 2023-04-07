@@ -42,6 +42,13 @@ val iter : ('a -> unit) -> 'a t -> unit
 val fold_left : ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b
 val fold_right : ('a -> 'b -> 'b) -> 'a t -> 'b -> 'b
 
+val find : ('a -> bool) -> 'a t -> 'a
+val find_opt : ('a -> bool) -> 'a t -> 'a option
+val find_map : ('a -> 'b option) -> 'a t -> 'b option
+
+val exists : ('a -> bool) -> 'a t -> bool
+val for_all : ('a -> bool) -> 'a t -> bool
+
 val filter : ('a -> bool) -> 'a t -> 'a t
 val partition : ('a -> bool) -> 'a t -> 'a t * 'a t
 

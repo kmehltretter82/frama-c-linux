@@ -144,7 +144,7 @@ and ctrl env prev steps next = match steps with
   | s :: others ->
     let open Conditions in
     match s.condition with
-    | Type _ | Have _ | When _ | Core _ | Init _ ->
+    | Type _ | Have _ | When _ | Core _ | Init _ | Probes _ ->
       (* Sequence of Labels on Hyp *)
       ctrl env prev others next
     | Branch(_,cthen,celse) ->
@@ -187,7 +187,7 @@ let register seq =
          | { id ; stmt ; descr ; condition = State m } ->
            let label = label env ~id ?stmt ?descr m in
            let r = pool descr in r := label :: !r
-         | { condition = Type _ | Have _ | When _ | Core _ | Init _ } -> ()
+         | { condition = Type _ | Have _ | When _ | Core _ | Init _ | Probes _ } -> ()
          | { condition = Branch(_,cthen,celse) } -> push cthen ; push celse
          | { condition = Either cases } -> List.iter push cases
       ) seq ;

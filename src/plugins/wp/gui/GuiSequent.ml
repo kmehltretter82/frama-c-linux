@@ -152,6 +152,7 @@ class autofocus =
           match step.condition with
           | When _ -> true
           | State s -> self#occurs_state s
+          | Probes ts -> Bag.exists self#occurs_term ts
           | Init p | Have p | Type p | Core p ->
             self#occurs_term (F.e_prop p)
           | Branch(p,sa,sb) ->
@@ -247,20 +248,23 @@ class autofocus =
         then Tactical.(Inside(Goal goal,a))
         else
           let pool = ref Tactical.Empty in
+          let lookup_term step a t =
+            if F.is_subterm a t then
+              ( pool := Tactical.(Inside(Step step,a)) ; raise Exit ) in
+          let lookup_pred step a p = lookup_term step a (F.e_prop p) in
           let rec lookup_sequence a hs =
             Conditions.iter
               (fun step ->
                  match step.condition with
-                 | (Have p | When p | Branch(p,_,_))
-                   when F.is_subterm a (F.e_prop p) ->
-                   pool := Tactical.(Inside(Step step,a)) ;
-                   raise Exit
-                 | Branch(_,sa,sb) ->
+                 | Probes ts -> Bag.iter (lookup_term step a) ts
+                 | Have p | When p -> lookup_pred step a p
+                 | Branch(p,sa,sb) ->
+                   lookup_pred step a p ;
                    lookup_sequence a sa ;
                    lookup_sequence a sb ;
+                 | State _ | Type _ | Init _ | Core _ -> ()
                  | Either cs ->
                    List.iter (lookup_sequence a) cs
-                 | State _ | Type _ | Init _ | Have _ | When _ | Core _ -> ()
               ) hs in
           (try lookup_sequence a hs with Exit -> ()) ;
           !pool
@@ -379,8 +383,8 @@ class pcond
              begin
                match step.condition with
                | State _ -> ()
-               | Have p | Init p | Core p | When p | Type p ->
-                 domain <- Vars.union (F.varsp p) domain
+               | Probes _ | Have _ | Init _ | Core _ | When _ | Type _ ->
+                 domain <- Vars.union domain step.vars
                | Branch(p,a,b) ->
                  domain <- Vars.union (F.varsp p) domain ;
                  self#domain a ; self#domain b

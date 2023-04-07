@@ -62,6 +62,7 @@ and condition =
   | Branch of pred * sequence * sequence (** If-Then-Else *)
   | Either of sequence list (** Disjunction *)
   | State of Mstate.state (** Memory Model snapshot *)
+  | Probes of term Bag.t
 
 and sequence (** List of steps *)
 
