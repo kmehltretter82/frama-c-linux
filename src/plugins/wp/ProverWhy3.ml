@@ -1065,9 +1065,9 @@ class visitor (ctx:context) c =
 
 let goal_id = (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "wp_goal"))
 
-let add_model_trace ce_terms cnv t =
+let add_model_trace probes cnv t =
   let open Why3 in
-  if Bag.is_empty ce_terms then t else
+  if Bag.is_empty probes then t else
     let t = Task.add_meta t Driver.meta_get_counterexmp [Theory.MAstr ""] in
     let id = ref (-1) in
     let create_id ty =
@@ -1085,15 +1085,15 @@ let add_model_trace ce_terms cnv t =
       let t = Task.add_decl t decl in
       t
     in
-    Bag.fold_left fold t ce_terms
+    Bag.fold_left fold t probes
 
-let convert_freevariables ~ce_terms ~cnv t =
+let convert_freevariables ~probes ~cnv t =
   let freevars = (Lang.F.varsp t) in
-  let freevars = 
+  let freevars =
     if Wp_parameters.CounterExample.get ()
     then
       Bag.fold_left (fun vars t -> Lang.F.Vars.union vars (Lang.F.vars t))
-        freevars ce_terms
+        freevars probes
     else freevars in
   let cnv,lss =
     Lang.F.Vars.fold (fun (v:Lang.F.Var.t) (cnv,lss) ->
@@ -1105,7 +1105,7 @@ let convert_freevariables ~ce_terms ~cnv t =
   in
   cnv,lss
 
-let prove_goal ~id ~title ~name ?axioms ?(ce_terms=Bag.empty) t =
+let prove_goal ~id ~title ~name ?axioms ?(probes=Bag.empty) t =
   (* Format.printf "why3_of_qed start@."; *)
   let goal = Definitions.cluster ~id ~title () in
   let ctx = empty_context name in
@@ -1120,7 +1120,7 @@ let prove_goal ~id ~title ~name ?axioms ?(ce_terms=Bag.empty) t =
   v#add_builtin_lib;
   v#vgoal axioms t;
   let cnv = empty_cnv ~polarity:`Positive ctx in
-  let cnv,lss = convert_freevariables ~ce_terms ~cnv t in
+  let cnv,lss = convert_freevariables ~probes ~cnv t in
   let goal = convert cnv Prop (Lang.F.e_prop t) in
   let decl = Why3.Decl.create_prop_decl Pgoal goal_id goal in
   let th = Why3.Theory.close_theory ctx.th in
@@ -1135,15 +1135,15 @@ let prove_goal ~id ~title ~name ?axioms ?(ce_terms=Bag.empty) t =
   let t = List.fold_left Why3.Task.add_param_decl t lss in
   let t =
     if Wp_parameters.CounterExample.get ()
-    then add_model_trace ce_terms cnv t 
+    then add_model_trace probes cnv t
     else t in
   Why3.Task.add_decl t decl
 
-let prove_prop ?ce_terms ?axioms ~pid prop =
+let prove_prop ?probes ?axioms ~pid prop =
   let id = WpPropId.get_propid pid in
   let title = Pretty_utils.to_string WpPropId.pretty pid in
   let name = "WP" in
-  prove_goal ?axioms ?ce_terms ~id ~title ~name prop
+  prove_goal ?axioms ?probes ~id ~title ~name prop
 
 let task_of_wpo wpo =
   let pid = wpo.Wpo.po_pid in
@@ -1152,15 +1152,14 @@ let task_of_wpo wpo =
     let pid = wpo.Wpo.po_pid in
     let axioms = v.Wpo.VC_Annot.axioms in
     let prop = Wpo.GOAL.compute_proof ~pid v.Wpo.VC_Annot.goal in
-    let ce_terms = Wpo.GOAL.compute_probs ~pid v.Wpo.VC_Annot.goal in
-    (* Format.printf "Goal: %a@." Lang.F.pp_pred prop; *)
-    prove_prop ~pid prop ?axioms ~ce_terms
+    let probes = Wpo.GOAL.compute_probs ~pid v.Wpo.VC_Annot.goal in
+    prove_prop ~pid ?axioms ~probes prop
   | Wpo.GoalLemma v ->
     let lemma = v.Wpo.VC_Lemma.lemma in
     let depends = v.Wpo.VC_Lemma.depends in
     let prop = Lang.F.p_forall lemma.l_forall lemma.l_lemma in
     let axioms = Some(lemma.l_cluster,depends) in
-    prove_prop ~pid prop ?axioms ~ce_terms:v.ce_terms
+    prove_prop ~pid ?axioms prop
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Task                                                        --- *)

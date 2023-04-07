@@ -235,6 +235,9 @@ val merge : bundle list -> bundle
     Linear complexity is achieved by assuming bundle ordering is consistent
     over the list. *)
 
+(** Inserts probes to a sequent. *)
+val probes : ?descr:string -> F.term list -> bundle -> bundle
+
 (** Assumes a list of predicates in a [Type] section on top of the bundle. *)
 val domain : F.pred list -> bundle -> bundle
 

@@ -293,13 +293,12 @@ let mk_annot axioms goal vc =
   let open Wpo.VC_Annot in
   match vc with
   | Wpo.GoalAnnot annot -> { annot with goal ; axioms }
-  | Wpo.GoalLemma lemma -> {
+  | Wpo.GoalLemma _ -> {
       axioms ; goal ;
       tags = [] ; warn = [] ;
       deps = Property.Set.empty ;
       path = Cil_datatype.Stmt.Set.empty ;
       source = None ;
-      ce_terms = lemma.ce_terms ;
     }
 
 let mk_formula ~main axioms sequent =

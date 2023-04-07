@@ -170,7 +170,6 @@ struct
     warn : W.t ;
     deps : D.t ;
     path : S.t ;
-    ce_terms : Lang.F.term Bag.t ;
   }
 
   (* -------------------------------------------------------------------------- *)
@@ -245,7 +244,6 @@ struct
     warn = W.empty ;
     deps = D.empty ;
     path = S.empty ;
-    ce_terms = Bag.empty ;
   }
 
   let sigma_opt = function None -> Sigma.create () | Some s -> s
@@ -303,15 +301,19 @@ struct
         warn = wrns ;
         deps = dset ;
         path = path ;
-        ce_terms = vc.ce_terms ;
       }
 
-  let add_ce_terms ce_terms vc =
-    let vars =
-      Bag.fold_left (fun s t -> Vars.union s (Lang.F.vars t)) vc.vars ce_terms
-    in
-    let ce_terms = Bag.concat vc.ce_terms ce_terms in
-    { vc with ce_terms ; vars }
+  let probes ?descr terms vc =
+    if terms = [] then vc else
+      let vars =
+        List.fold_left (fun xs t -> Vars.union xs (F.vars t)) vc.vars terms in
+      let hyps = Conditions.probes ?descr terms vc.hyps in
+      { hyps = hyps ;
+        vars = vars ;
+        goal = vc.goal ;
+        warn = vc.warn ;
+        deps = vc.deps ;
+        path = vc.path }
 
   (* -------------------------------------------------------------------------- *)
   (* --- Branching                                                          --- *)
@@ -339,7 +341,6 @@ struct
       deps = D.union vc1.deps vc2.deps ;
       warn = W.union vc1.warn vc2.warn ;
       path = S.union vc1.path vc2.path ;
-      ce_terms = Bag.concat vc1.ce_terms vc2.ce_terms ;
     }
 
   (* -------------------------------------------------------------------------- *)
@@ -365,7 +366,6 @@ struct
       deps = D.union vc1.deps vc2.deps ;
       warn = W.union vc1.warn vc2.warn ;
       path = S.union vc1.path vc2.path ;
-      ce_terms = Bag.concat vc1.ce_terms vc2.ce_terms ;
     }
 
   let merge_vcs = function
@@ -378,15 +378,7 @@ struct
       let deps = List.fold_left (fun d vc -> D.union d vc.deps) D.empty vcs in
       let warn = List.fold_left (fun d vc -> W.union d vc.warn) W.empty vcs in
       let path = List.fold_left (fun d vc -> S.union d vc.path) S.empty vcs in
-      { hyps = hyps ;
-        goal = goal ;
-        vars = vars ;
-        deps = deps ;
-        warn = warn ;
-        path = path ;
-        ce_terms =
-          List.fold_left (fun ts vc -> Bag.concat ts vc.ce_terms) Bag.empty vcs
-      }
+      { hyps ; goal ; vars ; deps ; warn ; path }
 
   (* -------------------------------------------------------------------------- *)
   (* --- Merging and Branching with Splitters                               --- *)
@@ -1459,13 +1451,9 @@ struct
       | Loc l -> M.pointer_val l
       | Val t -> t
     in
-    let ce_terms = if scope = Enter then
-        Bag.list @@ List.map val_of xs
-      else
-        Bag.empty
-    in
+    let pxs = if scope = Enter then List.map val_of xs else [] in
     let vcs = gmap (assume_vc ~descr hs) wp.vcs in
-    let vcs = gmap (add_ce_terms ce_terms) vcs in
+    let vcs = gmap (probes pxs) vcs in
     { wp with sigma = Some pre ; vcs = vcs }
 
   let scope wenv xs sc wp = in_wenv wenv wp
@@ -1552,7 +1540,6 @@ struct
       VC_Annot.deps = vc.deps ;
       VC_Annot.path = vc.path ;
       VC_Annot.warn = W.elements vc.warn ;
-      VC_Annot.ce_terms = vc.ce_terms ;
     } in
     let hyps = Conditions.bundle vc.hyps in
     let goal g = { vcq with VC_Annot.goal = GOAL.make (hyps,g) } in
@@ -1569,7 +1556,6 @@ struct
       VC_Annot.deps = vc.deps ;
       VC_Annot.path = vc.path ;
       VC_Annot.warn = W.elements vc.warn ;
-      VC_Annot.ce_terms = vc.ce_terms
     }
 
   let make_oblig index pid vcq =
@@ -1660,7 +1646,6 @@ struct
         Wpo.VC_Lemma.depends = l.lem_depends ;
         Wpo.VC_Lemma.lemma = def ;
         Wpo.VC_Lemma.sequent = None ;
-        Wpo.VC_Lemma.ce_terms = Bag.empty ;
       } in
       let index = match LogicUsage.section_of_lemma l.lem_name with
         | LogicUsage.Toplevel _ -> Wpo.Axiomatic None

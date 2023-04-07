@@ -533,9 +533,10 @@ let intros ps hs =
     Bundle.add (step ~descr:"Goal" (When p)) hs
 
 let state ?descr ?stmt state hs =
-  let cond = State state in
-  let s = step ?descr ?stmt cond in
-  Bundle.add s hs
+  Bundle.add (step ?descr ?stmt (State state)) hs
+
+let probes ?descr ts =
+  Bundle.add (step ?descr (Probes (Bag.list ts)))
 
 let assume ?descr ?stmt ?deps ?warn ?(init=false) ?(domain=false) p hs =
   match F.is_ptrue p with
