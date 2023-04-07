@@ -535,8 +535,8 @@ let intros ps hs =
 let state ?descr ?stmt state hs =
   Bundle.add (step ?descr ?stmt (State state)) hs
 
-let probe ?descr ts =
-  Bundle.add (step ?descr (Probes (Bag.list ts)))
+let probe ?descr ts hs =
+  Bundle.add (step ?descr (Probes (Bag.list ts))) hs
 
 let assume ?descr ?stmt ?deps ?warn ?(init=false) ?(domain=false) p hs =
   match F.is_ptrue p with
@@ -649,6 +649,7 @@ let rec flatten_sequence m = function
     match step.condition with
     | State _ -> flat_cons step (flatten_sequence m seq)
     | Probes ts ->
+      let ts = Bag.filter (fun t -> not @@ F.is_atomic t) ts in
       if Bag.is_empty ts then
         ( m := true ; flatten_sequence m seq )
       else

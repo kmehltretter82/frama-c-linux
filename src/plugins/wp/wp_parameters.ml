@@ -1115,8 +1115,8 @@ module OutputDir =
 module CounterExample =
   False
     (struct
-      let option_name = "-wp-counterexample"
-      let help = "Print the counterexample"
+      let option_name = "-wp-counter-examples"
+      let help = "Print the counter examples"
     end)
 
 
