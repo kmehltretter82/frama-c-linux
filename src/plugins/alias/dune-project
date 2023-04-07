@@ -30,5 +30,6 @@
 (package (name frama-c-alias)
  (depends
   ("frama-c" (and (>= 25.0) (< 27.0)))
+  ("unionFind" (= 20220122))
  )
 )
