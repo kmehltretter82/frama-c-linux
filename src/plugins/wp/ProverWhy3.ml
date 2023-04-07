@@ -1132,8 +1132,9 @@ let task_of_wpo wpo =
     let pid = wpo.Wpo.po_pid in
     let axioms = v.Wpo.VC_Annot.axioms in
     let prop = Wpo.GOAL.compute_proof ~pid v.Wpo.VC_Annot.goal in
+    let ce_terms = Wpo.GOAL.compute_probs ~pid v.Wpo.VC_Annot.goal in
     (* Format.printf "Goal: %a@." Lang.F.pp_pred prop; *)
-    prove_prop ~pid prop ?axioms ~ce_terms:v.ce_terms
+    prove_prop ~pid prop ?axioms ~ce_terms
   | Wpo.GoalLemma v ->
     let lemma = v.Wpo.VC_Lemma.lemma in
     let depends = v.Wpo.VC_Lemma.depends in

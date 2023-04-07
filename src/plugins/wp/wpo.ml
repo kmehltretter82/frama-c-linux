@@ -247,6 +247,7 @@ struct
         (safecompute ~pid) g
 
   let compute_proof ~pid g = compute ~pid g ; g.obligation
+  let compute_probs ~pid:_ _g = Bag.empty (* TODO *)
   let compute_descr ~pid g = compute ~pid g ; g.sequent
   let get_descr g = g.sequent
   let qed_time g = g.time
