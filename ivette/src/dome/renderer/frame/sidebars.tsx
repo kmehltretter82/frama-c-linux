@@ -34,7 +34,7 @@ import { useFlipSettings } from 'dome';
 import { Badge } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
-import { Hbox, Hfill } from 'dome/layout/boxes';
+import { Hbox } from 'dome/layout/boxes';
 import { IconButton, IconButtonProps } from 'dome/controls/buttons';
 
 import './style.css';
@@ -110,6 +110,8 @@ export interface SectionProps {
   disabled?: boolean;
   /** Badge summary (only visible when folded). */
   summary?: Badges;
+  /** Additional label, right-aligned. */
+  infos?: string;
   /** Additional controls, (only visible when unfolded). */
   rightButtonProps?: IconButtonProps;
   /** Section contents. */
@@ -129,7 +131,7 @@ export interface SectionProps {
    Sections with no items are not displayed.
 */
 export function Section(props: SectionProps): JSX.Element | null {
-  const { settings, defaultUnfold, unfold } = props;
+  const { settings, defaultUnfold, infos, unfold } = props;
   const [state, flipState] = useFlipSettings(settings, defaultUnfold);
   const icon = state ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT';
 
@@ -152,7 +154,7 @@ export function Section(props: SectionProps): JSX.Element | null {
           icon={icon}
           onClick={flipState}
         />
-        <Hfill />
+        {infos && <div className='dome-xSideBarSection-infos'>{infos}</div>}
         {visible ? rightButton : makeBadge(props.summary)}
       </Hbox>
       <div className='dome-xSideBarSection-content' style={{ maxHeight }}>

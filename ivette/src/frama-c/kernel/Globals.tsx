@@ -257,15 +257,15 @@ export default function Globals(): JSX.Element {
 
   const noFunction =
     <div className='dome-xSideBarSection-content'>
-      <label className='dome-xSideBarSection-info'>
-        {'There is no function to display.'}
+      <label className='globals-info'>
+        There is no function to display.
       </label>
     </div>;
 
   const allFiltered =
     <div className='dome-xSideBarSection-content'>
-      <label className='dome-xSideBarSection-info'>
-        {'All functions are filtered. Try adjusting function filters.'}
+      <label className='globals-info'>
+        All functions are filtered. Try adjusting function filters.
       </label>
       <Button {...filterButtonProps} label='Functions filters' />
     </div>;
