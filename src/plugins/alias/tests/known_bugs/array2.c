@@ -1,4 +1,4 @@
-// matrices
+// matrices (this example may be not a valid c program)
 //  no alias
 
 int main () {

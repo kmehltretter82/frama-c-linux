@@ -364,7 +364,7 @@ let find_transitive_closure  (lv:lval) (x:t) : (G.V.t * LSet.t) list =
 
 
 
-(* check that lval in a lset are either all pointers or all non-pointers*)
+(* check that lvals in a vertex are all pointers *)
 let is_pointer_vertex (v: V.t) (a:t) =
   assert_invariants a;
   let ls : LSet.t = VMap.find v a.vmap in
