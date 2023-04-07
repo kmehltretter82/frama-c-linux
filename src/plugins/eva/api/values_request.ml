@@ -403,17 +403,17 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   (* Result of an evaluation: a generic value for scalar types, or an offsetmap
      for struct and arrays. *)
   type result =
-    | Value of A.Val.t
+    | Value of A.Val.t Eval.flagged_value
     | Offsetmap of offsetmap
     | Status of truth
 
   let pp_result typ fmt = function
-    | Value v -> A.Val.pretty fmt v
+    | Value v -> (Eval.Flagged_Value.pretty (A.Val.pretty_typ (Some typ))) fmt v
     | Offsetmap offsm -> pp_offsetmap typ fmt offsm
     | Status truth -> Alarmset.Status.pretty fmt truth
 
   let get_pointed_bases = function
-    | Value v -> get_bases (get_cvalue v)
+    | Value v -> get_bases (Bottom.fold ~bottom:Cvalue.V.bottom get_cvalue v.v)
     | Offsetmap offsm -> get_pointed_bases offsm
     | Status _ -> Base.Hptset.empty
 
@@ -460,13 +460,13 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   let eval_lval lval state =
     match Cil.(unrollType (typeOfLval lval)) with
     | TInt _ | TEnum _ | TPtr _ | TFloat _ ->
-      A.copy_lvalue state lval >>=. fun value ->
-      value.v >>-: fun v -> Value v
+      A.copy_lvalue state lval >>=: fun value -> Value value
     | _ ->
       lval_to_offsetmap lval state >>=: fun offsm -> Offsetmap offsm
 
   let eval_expr expr state =
-    A.eval_expr state expr >>=: fun value -> Value value
+    A.eval_expr state expr >>=: fun value ->
+    Value { v = `Value value; initialized = true; escaping = false }
 
   let eval_pred eval_point predicate state =
     let result =

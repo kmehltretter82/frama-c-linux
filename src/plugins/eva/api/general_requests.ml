@@ -216,6 +216,13 @@ let property_evaluation_point = function
 let marker_evaluation_point = function
   | Printer_tag.PGlobal _ -> Initial
   | PStmt (kf, stmt) | PStmtStart (kf, stmt) -> Stmt (kf, stmt)
+  | PVDecl (kf, kinstr, v) when not (v.vformal || v.vglob) ->
+    begin
+      (* Only evaluate declaration of local variable if it is initialized. *)
+      match kf, kinstr with
+      | Some kf, Kstmt ({skind = Instr (Local_init _)} as s) -> Stmt (kf, s)
+      | _ -> raise Not_found
+    end
   | PLval (kf, ki, _) | PExp (kf, ki, _) | PVDecl (kf, ki, _) ->
     begin
       match kf, ki with
