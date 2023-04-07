@@ -100,12 +100,7 @@ module Key = Datatype.Make_with_collections (
     let rehash (Key (s, x)) =
       (Key (register s.name s.kind, x))
     let reprs = [Key ({ id = 0; name="dummy"; kind=Global }, ())]
-    let equal (Key (s1,x1)) (Key (s2,x2)) =
-      match s1.kind, s2.kind with
-      | Global, Global -> true
-      | Function, Function -> Kernel_function.equal x1 x2
-      | Statement, Statement -> Cil_datatype.Stmt.equal x1 x2
-      | _, _ -> false
+    let equal = Datatype.from_compare
     let compare (Key (s1,x1)) (Key (s2,x2)) =
       let c = s1.id - s2.id in
       if c <> 0 then c else
