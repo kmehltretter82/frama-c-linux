@@ -14,8 +14,6 @@
 [alias] May-aliases after instruction  x = tab[i];  are  <none>
 [alias] analysing instruction: i ++;
 [alias] May-aliases after instruction  i ++;  are  <none>
-[alias] analysing instruction: x = tab[i];
-[alias] May-aliases after instruction  x = tab[i];  are  <none>
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  <none>
 [alias] May-aliases at the end of function main: <none>

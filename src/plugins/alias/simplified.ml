@@ -165,6 +165,17 @@ struct
     | BAddrOf lv -> BLval lv
     | BLval lv ->
       BLval (Mem (Cil.dummy_exp (Lval lv)), NoOffset)
+
+
+  let is_pointer x =
+    match x with
+      BNone -> false
+    | BAddrOf _ -> true
+    | BLval lv ->
+      let t = Cil.typeOfLval lv in
+      match Cil.unrollType t with
+        TPtr _ | TArray _ -> true
+      | _ -> false
 end
 
 

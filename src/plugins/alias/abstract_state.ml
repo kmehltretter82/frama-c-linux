@@ -304,6 +304,14 @@ let assert_invariants (x:t) : unit =
   LLMap.iter assert_lmap x.lmap;
   let assert_vmap (v:V.t) (ls:LSet.t) =
     assert (G.mem_vertex x.graph v);
+    (* TODO: we removed the invariant because of OSCS*)
+    (* if not (LSet.is_empty ls)
+     * then
+     *   begin
+     *     let lv = LSet.choose ls in
+     *     let is_ptr_lv = Lval.is_pointer lv in
+     *     assert (LSet.for_all (fun x -> Lval.is_pointer x = is_ptr_lv) ls)
+     *   end; *)
     assert (LSet.fold (fun lv acc -> acc && V.equal (LLMap.find lv x.lmap) v) ls true)
   in
   VMap.iter assert_vmap x.vmap
@@ -366,6 +374,23 @@ let find_transitive_closure  (lv:lval) (x:t) : (G.V.t * LSet.t) list =
   with
     Not_found -> []
 (* TODO : what about offsets ? *)
+
+
+
+(* NB keep this just if we need it for later *)
+(* (\* check that at least 1 lval in a vertex is a pointers *\)
+ * let is_pointer_vertex (v: V.t) (a:t) =
+ *   assert_invariants a;
+ *   assert (G.mem_vertex a.graph v);
+ *   let ls : LSet.t = VMap.find v a.vmap in
+ *   if LSet.is_empty ls
+ *   then not (G.succ a.graph v = [])
+ *   else
+ *     let is_ptr = LSet.exists (fun x -> Lval.is_pointer x) ls in
+ *     (\* TODO: exists -> for_all (it doesn't work with OSCS) *\)
+ *     if not (is_ptr)
+ *     then assert (G.succ a.graph v = []) ;
+ *     is_ptr *)
 
 
 (* NOTE on "constant vertex": a constant vertex represents an unamed
@@ -682,15 +707,6 @@ let rec join_succs (x:t) v =
       let v0, x = merge_set x @@ VSet.of_list succs in
       join_succs x v0
 
-let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
-  assert_invariants x;
-  let pt2 =  G.succ x.graph v2 in
-  if pt2 = []
-  then
-    x
-  else
-    join x v1 v2
-
 (* in Steensgard's paper, this is written settype(v1,ref(v2,bot)) *)
 let set_type (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants x;
@@ -712,32 +728,43 @@ let set_type (x:t) (v1:V.t) (v2:V.t) : t =
 
 let assignment (a:t) (lv:lval) (e:exp) : t =
   assert_invariants a;
-  let x = Lval.from_lval lv in
-  let y = Lval.from_exp e in
-  match x,y with
-    BNone, _ | _, BNone -> a
-  | _, BAddrOf blv ->
-    let (v1,a) = find_or_create_vertex x a in
-    let (v2,a) = find_or_create_vertex y a in
-    let new_a = cjoin a v1 v2 in
-    let new_a = remove_lval new_a (BAddrOf blv) in
-    assert_invariants new_a ;
-    new_a
-  | _ ->
-    let (v1,a) = find_or_create_vertex x a in
-    let (v2,a) = find_or_create_vertex y a in
-    let new_a = cjoin a v1 v2 in
-    assert_invariants new_a ;
-    new_a
+  if Cil.isPointerType (Cil.typeOf e)
+  then
+    let x = Lval.from_lval lv in
+    let y = Lval.from_exp e in
+    match x,y with
+      BNone, _ | _, BNone -> a
+    | _, BAddrOf blv ->
+      let (v1,a) = find_or_create_vertex x a in
+      let (v2,a) = find_or_create_vertex y a in
+      let new_a = join a v1 v2 in
+      let new_a = remove_lval new_a (BAddrOf blv) in
+      assert_invariants new_a ;
+      new_a
+    | _ ->
+      let (v1,a) = find_or_create_vertex x a in
+      let (v2,a) = find_or_create_vertex y a in
+      let new_a = join a v1 v2 in
+      assert_invariants new_a ;
+      new_a
+  else
+    a
 
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y (a:t) (lv:lval) : t =
   assert_invariants a;
   let x = Lval.from_lval lv in
   let (v1,a) = find_or_create_vertex x a in
-  let (v2,a) = create_cst_vertex a in
-  let new_a : t = set_type a v1 v2 in
-  assert_invariants new_a ; new_a
+  match G.succ a.graph v1 with
+    [] ->
+    begin
+      let (v2,a) = create_cst_vertex a in
+      let new_a : t = set_type a v1 v2 in
+      assert_invariants new_a ; new_a
+    end
+  | [_v2] -> a
+  | _ -> Options.fatal "this should not hapen (invariant broken)"
+
 
 exception Not_included
 
