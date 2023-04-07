@@ -291,6 +291,13 @@ let assert_invariants (x:t) : unit =
   LLMap.iter assert_lmap x.lmap;
   let assert_vmap (v:V.t) (ls:LSet.t) =
     assert (G.mem_vertex x.graph v);
+    if not (LSet.is_empty ls)
+    then
+      begin
+        let lv = LSet.choose ls in
+        let is_ptr_lv = Lval.is_pointer lv in
+        assert (LSet.for_all (fun x -> Lval.is_pointer x = is_ptr_lv) ls)
+      end;
     assert (LSet.fold (fun lv acc -> acc && V.equal (LLMap.find lv x.lmap) v) ls true)
   in
   VMap.iter assert_vmap x.vmap
@@ -368,7 +375,9 @@ let is_pointer_vertex (v: V.t) (a:t) =
     let is_ptr_x = Lval.is_pointer x in
     if not (LSet.for_all (fun x -> Lval.is_pointer x = is_ptr_x) ls)
     then
-    Format.printf "BUG: set with heteregenous types %a@." LSet.pretty ls;
+      Format.printf
+        "BUG: set with heteregenous types %a@. abstract state:%a@."
+        LSet.pretty ls print_debug a;
     if not (is_ptr_x)
     then assert (G.succ a.graph v = []) ;
     is_ptr_x
