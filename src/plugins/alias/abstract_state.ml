@@ -355,6 +355,27 @@ let find_transitive_closure  (lv:lval) (x:t) : (G.V.t * LSet.t) list =
 (* TODO : what about offsets ? *)
 
 
+
+
+(* check that lval in a lset are either all pointers or all non-pointers*)
+let is_pointer_vertex (v: V.t) (a:t) =
+  assert_invariants a;
+  let ls : LSet.t = VMap.find v a.vmap in
+  if LSet.is_empty ls
+  then not (G.succ a.graph v = [])  
+  else
+    let x = LSet.choose ls in
+    let is_ptr_x = Lval.is_pointer x in
+    if not (LSet.for_all (fun x -> Lval.is_pointer x = is_ptr_x) ls)
+    then
+    Format.printf "BUG: set with heteregenous types %a@." LSet.pretty ls;
+    if not (is_ptr_x)
+    then assert (G.succ a.graph v = []) ;
+    is_ptr_x
+
+
+
+
 (* NOTE on "constant vertex": a constant vertex represents an unamed
    scalar value (type bottom in steensgaard's paper), or the address
    of a variable. It means that in [vmap], its associated LSet is
@@ -671,8 +692,7 @@ let rec join_succs (x:t) v =
 
 let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants x;
-  let pt2 =  G.succ x.graph v2 in
-  if pt2 = []
+  if not (is_pointer_vertex v2 x)
   then
     x
   else

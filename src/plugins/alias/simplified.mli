@@ -53,6 +53,10 @@ sig
   (* (points_to x) = *x and (points_to &x) = x. Raise
      Explicit_pointer_address when applied to BNone *)
   val points_to : t -> t
+
+  (* true if x is assimilable to a pointer type (explicit pointer or
+     memory adress or array *)
+  val is_pointer : t -> bool
 end
 
 module Simplified_lmap:
