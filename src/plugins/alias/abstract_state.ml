@@ -377,22 +377,20 @@ let find_transitive_closure  (lv:lval) (x:t) : (G.V.t * LSet.t) list =
 
 
 
-
-(* check that at least 1 lval in a vertex is a pointers *)
-let is_pointer_vertex (v: V.t) (a:t) =
-  assert_invariants a;
-  assert (G.mem_vertex a.graph v);
-  let ls : LSet.t = VMap.find v a.vmap in
-  if LSet.is_empty ls
-  then not (G.succ a.graph v = [])
-  else
-    let is_ptr = LSet.exists (fun x -> Lval.is_pointer x) ls in
-    (* TODO: exists -> for_all (it doesn't work with OSCS) *)
-    if not (is_ptr)
-    then assert (G.succ a.graph v = []) ;
-    is_ptr
-
-
+(* NB keep this just if we need it for later *)
+(* (\* check that at least 1 lval in a vertex is a pointers *\)
+ * let is_pointer_vertex (v: V.t) (a:t) =
+ *   assert_invariants a;
+ *   assert (G.mem_vertex a.graph v);
+ *   let ls : LSet.t = VMap.find v a.vmap in
+ *   if LSet.is_empty ls
+ *   then not (G.succ a.graph v = [])
+ *   else
+ *     let is_ptr = LSet.exists (fun x -> Lval.is_pointer x) ls in
+ *     (\* TODO: exists -> for_all (it doesn't work with OSCS) *\)
+ *     if not (is_ptr)
+ *     then assert (G.succ a.graph v = []) ;
+ *     is_ptr *)
 
 
 (* NOTE on "constant vertex": a constant vertex represents an unamed
@@ -709,14 +707,6 @@ let rec join_succs (x:t) v =
       let v0, x = merge_set x @@ VSet.of_list succs in
       join_succs x v0
 
-let cjoin  (x:t) (v1:V.t) (v2:V.t) : t =
-  assert_invariants x;
-  if not (is_pointer_vertex v2 x)
-  then
-    x
-  else
-    join x v1 v2
-
 (* in Steensgard's paper, this is written settype(v1,ref(v2,bot)) *)
 let set_type (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants x;
@@ -747,14 +737,14 @@ let assignment (a:t) (lv:lval) (e:exp) : t =
     | _, BAddrOf blv ->
       let (v1,a) = find_or_create_vertex x a in
       let (v2,a) = find_or_create_vertex y a in
-      let new_a = cjoin a v1 v2 in
+      let new_a = join a v1 v2 in
       let new_a = remove_lval new_a (BAddrOf blv) in
       assert_invariants new_a ;
       new_a
     | _ ->
       let (v1,a) = find_or_create_vertex x a in
       let (v2,a) = find_or_create_vertex y a in
-      let new_a = cjoin a v1 v2 in
+      let new_a = join a v1 v2 in
       assert_invariants new_a ;
       new_a
   else

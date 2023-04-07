@@ -90,8 +90,6 @@ val assert_invariants : t -> unit
 (** Functions for Steensgaard's algorithm, see the paper *)
 val join : t -> G.V.t -> G.V.t -> t
 
-val cjoin : t -> G.V.t -> G.V.t -> t
-
 (** transfert functions for different kinds of assignments *)
 val assignment : t -> lval -> exp -> t
 
