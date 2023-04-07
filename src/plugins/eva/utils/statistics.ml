@@ -20,12 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Statistics are stored in a dictonary, implemented as an hashtable from
+(* Statistics are stored in a dictionary, implemented as an hashtable from
    keys to integers.
 
-   [Key] is the representation of the dictionnary keys: a couple of a registered
-   statistic (type ['a t]) accompagnied by the function or the statement the stat
-   is about (type ['a])
+   [Key] is the representation of the dictionary keys: a couple of a registered
+   statistic (type ['a t]) accompanied by the function or the statement the stat
+   is about (type ['a]).
 
    Statistics must be registered before usage. The registry keeps track of the
    registered statistics and allow the reloading of projects by matching the

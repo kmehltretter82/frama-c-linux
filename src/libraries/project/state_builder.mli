@@ -352,9 +352,8 @@ module type Hashtbl = sig
       @raise Not_found if the key is not in the table. *)
 
   val find_opt: key -> data option
-  (** Return the current binding of the given key or None if no such binding
+  (** Return the current binding of the given key, or None if no such binding
       exists.
-
       @since Frama-C+dev *)
 
   val find_all: key -> data list
@@ -365,7 +364,6 @@ module type Hashtbl = sig
 
   val to_seq: unit -> (key * data) Seq.t
   (** Iterate on the whole table.
-
       @since Frama-C+dev *)
 end
 
