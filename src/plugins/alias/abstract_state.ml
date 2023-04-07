@@ -738,23 +738,27 @@ let set_type (x:t) (v1:V.t) (v2:V.t) : t =
 
 let assignment (a:t) (lv:lval) (e:exp) : t =
   assert_invariants a;
-  let x = Lval.from_lval lv in
-  let y = Lval.from_exp e in
-  match x,y with
-    BNone, _ | _, BNone -> a
-  | _, BAddrOf blv ->
-    let (v1,a) = find_or_create_vertex x a in
-    let (v2,a) = find_or_create_vertex y a in
-    let new_a = cjoin a v1 v2 in
-    let new_a = remove_lval new_a (BAddrOf blv) in
-    assert_invariants new_a ;
-    new_a
-  | _ ->
-    let (v1,a) = find_or_create_vertex x a in
-    let (v2,a) = find_or_create_vertex y a in
-    let new_a = cjoin a v1 v2 in
-    assert_invariants new_a ;
-    new_a
+  if Cil.isPointerType (Cil.typeOf e)
+  then
+    let x = Lval.from_lval lv in
+    let y = Lval.from_exp e in
+    match x,y with
+      BNone, _ | _, BNone -> a
+    | _, BAddrOf blv ->
+      let (v1,a) = find_or_create_vertex x a in
+      let (v2,a) = find_or_create_vertex y a in
+      let new_a = cjoin a v1 v2 in
+      let new_a = remove_lval new_a (BAddrOf blv) in
+      assert_invariants new_a ;
+      new_a
+    | _ ->
+      let (v1,a) = find_or_create_vertex x a in
+      let (v2,a) = find_or_create_vertex y a in
+      let new_a = cjoin a v1 v2 in
+      assert_invariants new_a ;
+      new_a
+  else
+    a
 
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y (a:t) (lv:lval) : t =
