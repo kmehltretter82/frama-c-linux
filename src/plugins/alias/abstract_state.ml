@@ -953,11 +953,6 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   let sum_state = shift sum_state in
 
   let arg_formal_pairs = (* also includes the result/return pair *)
-    let xs =
-      List.combine
-        (List.map Lval.from_exp args)
-        (List.map Simplified_lval.from_lval formals)
-    in
     let res_ret = match res, summary.return with
       | None, None -> []
       | Some res, Some ret ->
@@ -966,7 +961,15 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
       | Some _, None -> (* Shouldn't happen: Frama-C adds missing returns *)
         Options.fatal "unexpected case: result without return"
     in
-    res_ret @ xs
+    let simplify_both (arg, formal) =
+      try Some (Lval.from_exp arg, Simplified_lval.from_lval formal)
+      with Explicit_pointer_address loc ->
+        Options.warning ~source:(fst loc) ~wkey:Options.Warn.unsupported_address
+          "unsupported feature: explicit pointer address: %a; analysis may be unsound"
+          Printer.pp_exp arg;
+        None
+    in
+    res_ret @ List.filter_map simplify_both @@ List.combine args formals
   in
 
   let state, vertex_pairs =
