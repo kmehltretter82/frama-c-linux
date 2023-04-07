@@ -1,12 +1,10 @@
 [kernel] Parsing gzip124.c (with preprocessing)
 [alias] analysing function: main
 [alias] analysing instruction: short tmp_0 = (short)0;
-[alias:unsafe-cast] gzip124.c:6: Warning: unsafe cast from int to short
 [alias] May-aliases after instruction  short tmp_0 = (short)0;  are  <none>
 [alias] analysing instruction: *(& prev[1] + 0) = tmp_0;
 [alias] May-aliases after instruction  *(& prev[1] + 0) = tmp_0;  are  <none>
 [alias] analysing instruction: prev[0] = (short)0;
-[alias:unsafe-cast] gzip124.c:8: Warning: unsafe cast from int to short
 [alias] May-aliases after instruction  prev[0] = (short)0;  are  <none>
 [alias] analysing instruction: p = & prev[1] + (int)*p;
 [alias] May-aliases after instruction  p = & prev[1] + (int)*p;  are  <none>
