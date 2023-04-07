@@ -770,10 +770,10 @@ let assignment_x_allocate_y (a:t) (lv:lval) : t =
       let (v2,a) = create_cst_vertex a in
       let new_a : t = set_type a v1 v2 in
       assert_invariants new_a ; new_a
-     end
-  | [_v2] -> a    
+    end
+  | [_v2] -> a
   | _ -> Options.fatal "this should not hapen (invariant broken)"
- 
+
 
 exception Not_included
 
