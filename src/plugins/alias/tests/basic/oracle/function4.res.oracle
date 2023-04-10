@@ -3,10 +3,8 @@
 [alias] May-aliases at the end of function addr: <none>
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
-[alias:unsafe-cast] function4.c:11: Warning: unsafe cast from int to int *
 [alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
 [alias] analysing instruction: int *b = (int *)0;
-[alias:unsafe-cast] function4.c:11: Warning: unsafe cast from int to int *
 [alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
 [alias] analysing instruction: int c = 0;
 [alias] May-aliases after instruction  int c = 0;  are  <none>

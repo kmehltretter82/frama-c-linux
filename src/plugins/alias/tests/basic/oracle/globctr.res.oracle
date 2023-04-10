@@ -7,10 +7,8 @@
 [alias] May-aliases at the end of function f: <none>
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
-[alias:unsafe-cast] globctr.c:8: Warning: unsafe cast from int to int *
 [alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
 [alias] analysing instruction: int *b = (int *)0;
-[alias:unsafe-cast] globctr.c:8: Warning: unsafe cast from int to int *
 [alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
 [alias] analysing instruction: f(a);
 [alias] May-aliases after instruction  f(a);  are  <none>
