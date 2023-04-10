@@ -49,7 +49,8 @@ exception Explicit_pointer_address of location
 
 let check_cast_compatibility e typ =
   let type_of_e = Cil.typeOf e in
-  if Cil.need_cast typ type_of_e then
+  (* emit a warning for unsafe casts, but not for the NULL pointer *)
+  if Cil.need_cast typ type_of_e && not (Cil.isZero e) then
     Options.warning
       ~once:true
       ~source:(fst @@ e.eloc)

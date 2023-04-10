@@ -49,7 +49,6 @@
 [alias] May-aliases at the end of function lrand48: ⊥
 [alias] analysing function: main
 [alias] analysing instruction: int *s = (int *)0;
-[alias:unsafe-cast] while_for1.c:8: Warning: unsafe cast from int to int *
 [alias] May-aliases after instruction  int *s = (int *)0;  are  <none>
 [alias] analysing instruction: int idx = 0;
 [alias] May-aliases after instruction  int idx = 0;  are  <none>

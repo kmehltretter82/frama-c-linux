@@ -136,7 +136,6 @@
 [alias] May-aliases after instruction  odata = tmp->t1[*(tmp->n1)];  are
   {x, tmp}  {tmp->t2[0], idata}  {tmp->t1[0], odata}
 [alias] analysing instruction: __retres = (void *)0;
-[alias:unsafe-cast] example2.c:49: Warning: unsafe cast from int to void *
 [alias] May-aliases after instruction  __retres = (void *)0;  are
   {x, tmp}  {tmp->t2[0], idata}  {tmp->t1[0], odata}
 [alias] May-aliases at the end of function f1:
@@ -180,7 +179,6 @@
 [alias] May-aliases after instruction  odata = tmp->t2[*(tmp->n2)];  are
   {x, tmp}  {tmp->t1[0], idata}  {tmp->t2[0], odata}
 [alias] analysing instruction: __retres = (void *)0;
-[alias:unsafe-cast] example2.c:74: Warning: unsafe cast from int to void *
 [alias] May-aliases after instruction  __retres = (void *)0;  are
   {x, tmp}  {tmp->t1[0], idata}  {tmp->t2[0], odata}
 [alias] May-aliases at the end of function f2:

@@ -49,15 +49,12 @@
 [alias] May-aliases at the end of function lrand48: ⊥
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
-[alias:unsafe-cast] function2.c:14: Warning: unsafe cast from int to int *
 [alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
 [alias] analysing instruction: int *b = (int *)0;
-[alias:unsafe-cast] function2.c:14: Warning: unsafe cast from int to int *
 [alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
 [alias] analysing instruction: a = my_malloc(2);
 [alias] analysing function: my_malloc
 [alias] analysing instruction: int *res = (int *)0;
-[alias:unsafe-cast] function2.c:7: Warning: unsafe cast from int to int *
 [alias] May-aliases after instruction  int *res = (int *)0;  are  <none>
 [alias] analysing instruction: res = (int *)malloc((size_t)size);
 [alias] May-aliases after instruction  res = (int *)malloc((size_t)size);  are
