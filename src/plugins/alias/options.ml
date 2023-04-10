@@ -26,8 +26,8 @@
 
 include Plugin.Register
     (struct
-      let name = "Alias"
-      let help = "Light May-Alias Analyzer"
+      let name = "Alias Analysis"
+      let help = "Lightweight May-Alias Analysis"
       let shortname = "alias"
     end)
 
