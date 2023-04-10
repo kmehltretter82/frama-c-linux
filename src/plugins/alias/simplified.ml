@@ -50,13 +50,16 @@ exception Explicit_pointer_address of location
 let check_cast_compatibility e typ =
   let type_of_e = Cil.typeOf e in
   if Cil.need_cast typ type_of_e then
-    Options.warning ~once:true ~source:(fst @@ e.eloc) ~wkey:Options.Warn.unsafe_cast
+    Options.warning
+      ~once:true
+      ~source:(fst @@ e.eloc)
+      ~wkey:Options.Warn.unsafe_cast
       "unsafe cast from %a to %a"
       Printer.pp_typ type_of_e Printer.pp_typ typ
 
 let rec simplify_lval (h,o) =
-  try HL.find cached_lval (h,o) with
-    Not_found ->
+  try HL.find cached_lval (h,o)
+  with Not_found ->
     let res = (simplify_host h, simplify_offset o)
     in
     HL.add cached_lval (h,o) res;
@@ -64,7 +67,7 @@ let rec simplify_lval (h,o) =
 
 and simplify_host h =
   match h with
-    Var _ -> h
+  | Var _ -> h
   | Mem e ->
     let simp_e = simplify_exp e in
     if is_nul_exp simp_e
@@ -73,47 +76,45 @@ and simplify_host h =
 
 and simplify_offset o =
   match o with
-    NoOffset -> NoOffset
+  | NoOffset -> NoOffset
   | Field(f,o) -> Field(f, simplify_offset o)
   | Index(_e,o) -> Index(nul_exp, simplify_offset o)
 
 and simplify_exp e =
   try
-    HE.find cached_exp e with
-    Not_found ->
+    HE.find cached_exp e
+  with Not_found ->
     let res =
       try
         let simplified_enode =
           match e.enode with
           | Lval lv -> Lval (simplify_lval lv)
           | AddrOf lv | StartOf lv -> AddrOf (simplify_lval lv)
-          | BinOp(PlusPI,e1,_,_) | BinOp(MinusPI,e1,_,_) ->
+          | BinOp(PlusPI, e1, _, _) | BinOp(MinusPI, e1, _, _) ->
             begin
               match (simplify_exp e1).enode with
-                Lval lv -> Lval lv
-              | AddrOf lv -> AddrOf lv
+              | Lval _ | AddrOf _ as node -> node
               | _ -> raise (Explicit_pointer_address e1.eloc)
             end
           | CastE (typ, e) ->
-            let () = check_cast_compatibility e typ in
+            check_cast_compatibility e typ;
             raise (IsExp (simplify_exp e))
           | _ -> raise (IsExp nul_exp)
         in
-        {e with enode=simplified_enode}
-      with
-        IsExp e -> e
+        { e with enode = simplified_enode }
+      with IsExp e ->
+        e
     in
     HE.add cached_exp e res;
     res
-
 
 type simplified_lval =
     BNone
   | BLval of lval
   | BAddrOf of lval
 
-module Simplified_lval =
-struct
+module Simplified_lval = struct
+
   type t = simplified_lval
 
   let from_lval lv =
