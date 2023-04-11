@@ -984,6 +984,9 @@ module BaseToVariables = struct
           if VSet.is_empty direct && VSet.is_empty indirect
           then None
           else Some (direct, indirect))
+
+  let all_variables m =
+    fold (fun _b (dv, iv) acc -> VSet.(union (union dv iv) acc)) m VSet.empty
 end
 
 module Deps = struct
@@ -1049,6 +1052,11 @@ module Deps = struct
         Locations.Zone.fold_topset_ok
           (fun b _ -> BaseToVariables.remove_indirect var b) deps.indirect
       in (m, i)
+
+  let filter (bases: Base.Hptset.t) (m, i : t): VSet.t * t =
+    let i_inter, i_diff = BaseToVariables.partition_with_shape bases i in
+    let vars = BaseToVariables.all_variables i_diff in
+    vars, VSet.fold remove vars (m, i_inter)
 
   let get_var_deps (m, _: t) (var: Variable.t) =
     VariableToDeps.find var m
@@ -1798,10 +1806,8 @@ module Domain = struct
     if intraprocedural ()
     then state
     else
-      let mem_var var =
-        let bases' = Deps.get_var_bases state.deps var in
-        Base.Hptset.intersects bases' bases
-      in
+      let vars, deps = Deps.filter bases state.deps in
+      let mem_var v = Variable.Set.mem v vars in
       let mem_pair pair =
         let x, y = Pair.get pair in
         mem_var x && mem_var y
@@ -1809,7 +1815,7 @@ module Domain = struct
       let octagons = Octagons.filter mem_pair state.octagons in
       let intervals = Intervals.filter mem_var state.intervals in
       let relations = Relations.filter mem_var state.relations in
-      { state with octagons; intervals; relations; }
+      { state with octagons; intervals; relations; deps }
 
   let interprocedural_reuse =
     let cache = Hptmap_sig.PersistentCache "Octagons.reuse"
