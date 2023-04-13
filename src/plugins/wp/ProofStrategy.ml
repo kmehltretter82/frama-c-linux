@@ -301,6 +301,15 @@ let fallback = function
   | Strategy s -> resolve s
   | Tactic _ | Auto _ | Provers _ -> None
 
+let auto = function
+  | Strategy _  | Tactic _ | Provers _ -> None
+  | Auto s ->
+    match Strategy.lookup ~id:s.value with
+    | exception Not_found ->
+      Wp_parameters.error ~source:(fst s.loc) ~once:true
+        "Auto-Strategy '%s' not found (skipped)." s.value ; None
+    | h -> Some h
+
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy Tactical Step                                             --- *)
 (* -------------------------------------------------------------------------- *)

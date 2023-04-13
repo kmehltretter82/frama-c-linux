@@ -317,7 +317,87 @@ and autofork env ~depth fork =
 (* --- Proof Strategy Alternatives                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-(*TODO*)
+type solver = ProofEngine.node -> bool Task.task
+
+let success = Task.return true
+let failed = Task.return false
+let unknown : solver = fun _ -> failed
+
+let (+>>) (a : solver) (b : solver) : solver =
+  fun node -> a node >>= fun ok -> if ok then success else b node
+
+let rec sequence (f : 'a -> solver) = function
+  | [] -> unknown
+  | x::xs -> f x +>> sequence f xs
+
+let rec explore_strategie env p s : solver =
+  sequence
+    (explore_alternative env p s)
+    (ProofStrategy.alternatives s)
+
+and explore_alternative env p s a : solver =
+  explore_provers env a +>>
+  explore_tactic env p s a +>>
+  explore_auto env p a +>>
+  explore_fallback env p a
+
+and explore_provers env a : solver =
+  let provers,timeout = ProofStrategy.provers a in
+  sequence (explore_prover env timeout) provers
+
+and explore_prover env timeout prover node =
+  let wpo = ProofEngine.goal node in
+  let result = Wpo.get_result wpo prover in
+  if VCS.is_valid result then success else
+  if VCS.is_verdict result then failed else
+    let config = { VCS.default with timeout = Some timeout } in
+    Env.prove env wpo ~config prover
+
+and explore_tactic env process s a node =
+  match ProofStrategy.tactic env.tree node s a with
+  | None -> failed
+  | Some nodes -> List.iter process nodes ; success
+
+and explore_auto env process a node =
+  match ProofStrategy.auto a with
+  | None -> failed
+  | Some h ->
+    match ProverSearch.search env.tree ~anchor:node [h] with
+    | None -> failed
+    | Some fork ->
+      List.iter (fun (_,node) -> process node) @@
+      snd @@ ProofEngine.commit fork ; success
+
+and explore_fallback env process a node =
+  match ProofStrategy.fallback a with
+  | None -> failed
+  | Some s -> explore_strategie env process s node
+
+let explore_hint env process node =
+  match ProofEngine.get_hint node with
+  | None -> failed
+  | Some s ->
+    match ProofStrategy.find s with
+    | None -> failed
+    | Some s -> explore_strategie env process s node
+
+let explore_further env process strategy node =
+  let marked =
+    match ProofEngine.get_hint node with
+    | None -> false
+    | Some s -> ProofStrategy.name strategy = s
+  in if marked then failed else explore_strategie env process strategy node
+
+let explore_further_hints env process =
+  let wpo = ProofEngine.main env.Env.tree in
+  sequence (explore_further env process) (ProofStrategy.hints wpo.po_pid)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Automated Solving                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let automated env process : solver =
+  auto env +>> explore_hint env process +>> explore_further_hints env process
 
 (* -------------------------------------------------------------------------- *)
 (* --- Apply Script Tactic                                                --- *)
@@ -342,7 +422,7 @@ let rec crawl env on_child node = function
 
   | [] ->
     let node = ProofEngine.anchor (Env.tree env) ?node () in
-    auto env node >>= fun ok ->
+    automated env on_child node >>= fun ok ->
     if ok then Env.validate env else Env.stuck env ;
     Task.return ()
 

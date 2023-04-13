@@ -35,6 +35,7 @@ val hints : WpPropId.prop_id -> strategy list
 
 val alternatives : strategy -> alternative list
 val provers : alternative -> VCS.prover list * float
+val auto : alternative -> Strategy.heuristic option
 val fallback : alternative -> strategy option
 val tactic : tree -> node -> strategy -> alternative -> node list option
 
