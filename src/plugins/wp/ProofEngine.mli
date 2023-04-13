@@ -77,6 +77,9 @@ val children : node -> (string * node) list
 val tactical : node -> ProofScript.jtactic option
 val get_strategies : node -> int * Strategy.t array (* current index *)
 val set_strategies : node -> ?index:int -> Strategy.t array -> unit
+val get_hint : node -> string option
+val set_hint : node -> string -> unit
+
 val forward : tree -> unit
 val cancel : tree -> unit
 

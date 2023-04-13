@@ -378,7 +378,22 @@ let configure tactic sigma (a,v) =
         raise Not_found
     end
 
-let tactic tree node = function
+let subgoal (children : (string loc * string loc) list)
+    (default : string loc option) (goal,node) =
+  let hint = List.find_map (fun (g,s) ->
+      if String.starts_with ~prefix:g.value goal then Some s else None
+    ) children in
+  begin
+    match hint, default with
+    | None, None -> ()
+    | Some s , _ | None , Some s ->
+      if not @@ Strategies.mem s.value then
+        Wp_parameters.error ~source:(fst s.loc)
+          "Unknown strategy '%s' (skipped)" s.value
+      else ProofEngine.set_hint node s.value
+  end ; node
+
+let tactic tree node strategy = function
   | Strategy _ | Auto _ | Provers _ -> None
   | Tactic t ->
     try
@@ -388,16 +403,19 @@ let tactic tree node = function
       let ctxt = ProofEngine.node_context node in
       let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
       let console = new ProofScript.console ~pool ~title in
-      let children = WpContext.on_context ctxt
+      let subgoals = WpContext.on_context ctxt
           begin fun () ->
             let sigma = bind Pattern.empty sequent t.lookup in
             List.iter (configure tactic sigma) t.params ;
             let selection = select sigma t.select in
             match tactic#select console selection with
-            | exception _ | Not_applicable ->
-              Wp_parameters.error ~source:(fst t.tactic.loc)
-                "Tactical '%s' not applicable on selection@ (%a)"
-                t.tactic.value Tactical.pp_selection selection ;
+            | exception (Not_found | Exit) -> raise Not_found
+            | Not_applicable ->
+              raise Not_found
+            | exception exn when Wp_parameters.protect exn ->
+              Wp_parameters.warning ~source:(fst t.tactic.loc)
+                "Tactical '%s' configuration error (%s)"
+                t.tactic.value (Printexc.to_string exn) ;
               raise Not_found
             | Not_configured ->
               Wp_parameters.error ~source:(fst t.tactic.loc)
@@ -405,13 +423,12 @@ let tactic tree node = function
                 t.tactic.value ;
               raise Not_found
             | Applicable process ->
-              let script = ProofScript.jtactic tactic selection in
+              let strategy = strategy.name.value in
+              let script = ProofScript.jtactic ~strategy tactic selection in
               let fork = ProofEngine.fork tree ~anchor:node script process in
               snd @@ ProofEngine.commit fork
-          end ()
-      in Some children
+          end () in
+      Some (List.map (subgoal t.children t.default) subgoals)
     with Not_found -> None
-
-let () = ignore tactic
 
 (* -------------------------------------------------------------------------- *)
