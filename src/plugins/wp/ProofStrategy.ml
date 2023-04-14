@@ -390,7 +390,7 @@ let configure tactic sigma (a,v) =
 let subgoal (children : (string loc * string loc) list)
     (default : string loc option) (goal,node) =
   let hint = List.find_map (fun (g,s) ->
-      if String.starts_with ~prefix:g.value goal then Some s else None
+      if Extlib.string_prefix g.value goal then Some s else None
     ) children in
   begin
     match hint, default with
