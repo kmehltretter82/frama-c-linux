@@ -1,0 +1,17 @@
+32,34c32,43
+< [eva] statistics.i:13: Reusing old results for call to g
+< [eva] statistics.i:13: Reusing old results for call to g
+< [eva] statistics.i:13: Reusing old results for call to g
+---
+> [eva] computing for function g <- f <- main.
+>   Called from statistics.i:13.
+> [eva] Recording results for g
+> [eva] Done for function g
+> [eva] computing for function g <- f <- main.
+>   Called from statistics.i:13.
+> [eva] Recording results for g
+> [eva] Done for function g
+> [eva] computing for function g <- f <- main.
+>   Called from statistics.i:13.
+> [eva] Recording results for g
+> [eva] Done for function g

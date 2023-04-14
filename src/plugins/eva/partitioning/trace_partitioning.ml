@@ -23,6 +23,8 @@
 open Cil_types
 open Partition
 
+let stat_max_widenings = Statistics.register_statement_stat "max-widenings"
+
 module Make
     (Abstract: Abstractions.Eva)
     (Kf : sig val kf: kernel_function end) =
@@ -59,6 +61,7 @@ struct
     mutable widened_state : state option;
     mutable previous_state : state;
     mutable widening_counter : int;
+    mutable widening_steps : int; (* count the number of successive widenings *)
   }
 
   type widening = {
@@ -336,6 +339,8 @@ struct
           w.previous_state <- next;
           w.widened_state <- Some next;
           w.widening_counter <- widening_period - 1;
+          w.widening_steps <- w.widening_steps + 1;
+          Statistics.grow stat_max_widenings stmt w.widening_steps;
           Some next
         end
       with Not_found ->
@@ -345,7 +350,9 @@ struct
           let ws =
             { widened_state = None;
               previous_state = curr;
-              widening_counter = widening_delay - 1; }
+              widening_counter = widening_delay - 1;
+              widening_steps = 0
+            }
           in
           w.widening_partition <- Partition.replace key ws w.widening_partition
         end;
