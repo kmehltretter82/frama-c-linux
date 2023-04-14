@@ -3,5 +3,5 @@ memexec-misses:g	5
 memexec-misses:f	2
 memexec-misses:main	1
 partitioning-index-misses	57
-max-widenings:statistics.i:9	1
-iterations:statistics.i:9	8
+max-widenings:statistics.i:12	1
+iterations:statistics.i:12	8

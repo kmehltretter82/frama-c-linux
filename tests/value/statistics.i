@@ -1,7 +1,10 @@
-/* run.config*
+/* run.config
    LOG: @PTEST_NAME@.stats
    STDOPT: +" -eva-statistics-file ./@PTEST_NAME@.stats"
 */
+
+/* This test only dump statistics in the default configuration
+   to avoid oracle duplication. */
 
 void g(int i) {}
 

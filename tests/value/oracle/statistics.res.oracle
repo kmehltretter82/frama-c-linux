@@ -5,35 +5,35 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] computing for function f <- main.
-  Called from statistics.i:15.
+  Called from statistics.i:18.
 [eva] computing for function g <- f <- main.
-  Called from statistics.i:10.
+  Called from statistics.i:13.
 [eva] Recording results for g
 [eva] Done for function g
-[eva] statistics.i:9: starting to merge loop iterations
+[eva] statistics.i:12: starting to merge loop iterations
 [eva] computing for function g <- f <- main.
-  Called from statistics.i:10.
-[eva] Recording results for g
-[eva] Done for function g
-[eva] computing for function g <- f <- main.
-  Called from statistics.i:10.
+  Called from statistics.i:13.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] computing for function g <- f <- main.
-  Called from statistics.i:10.
+  Called from statistics.i:13.
+[eva] Recording results for g
+[eva] Done for function g
+[eva] computing for function g <- f <- main.
+  Called from statistics.i:13.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for f
 [eva] Done for function f
-[eva:alarm] statistics.i:16: Warning: 
+[eva:alarm] statistics.i:19: Warning: 
   signed overflow. assert -2147483648 ≤ n - 1;
 [eva] computing for function f <- main.
-  Called from statistics.i:16.
-[eva] statistics.i:10: Reusing old results for call to g
-[eva] statistics.i:10: Reusing old results for call to g
-[eva] statistics.i:10: Reusing old results for call to g
+  Called from statistics.i:19.
+[eva] statistics.i:13: Reusing old results for call to g
+[eva] statistics.i:13: Reusing old results for call to g
+[eva] statistics.i:13: Reusing old results for call to g
 [eva] computing for function g <- f <- main.
-  Called from statistics.i:10.
+  Called from statistics.i:13.
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for f
