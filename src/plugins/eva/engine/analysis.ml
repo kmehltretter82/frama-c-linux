@@ -214,7 +214,6 @@ let force_compute () =
     Eva_audit.check_configuration (Kernel.AuditCheck.get ());
   let kf, lib_entry = Globals.entry_point () in
   reset_analyzer ();
-  Statistics.reset_all ();
   (* The new analyzer can be accesed through hooks *)
   Self.set_computation_state Computing;
   let module Analyzer = (val snd !ref_analyzer) in
