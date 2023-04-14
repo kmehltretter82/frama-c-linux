@@ -91,46 +91,61 @@ let register_statement_stat name =
 
 type key = Key : 'a t * 'a -> key
 
-module Key = Datatype.Make_with_collections (
-  struct
-    include Datatype.Serializable_undefined
+module Key_Datatype = struct
+  include Datatype.Serializable_undefined
 
-    type t = key
-    let name = "Statistics.Key"
-    let rehash (Key (s, x)) =
-      (Key (register s.name s.kind, x))
-    let reprs = [Key ({ id = 0; name="dummy"; kind=Global }, ())]
-    let equal = Datatype.from_compare
-    let compare (Key (s1,x1)) (Key (s2,x2)) =
-      let c = s1.id - s2.id in
-      if c <> 0 then c else
-        match s1.kind, s2.kind with
-        | Global, Global -> 0
-        | Function, Function -> Kernel_function.compare x1 x2
-        | Statement, Statement -> Cil_datatype.Stmt.compare x1 x2
-        | Global, (Function | Statement) -> -1
-        | (Function | Statement), Global -> 1
-        | Function, Statement -> -1
-        | Statement, Function -> 1
-    let hash (Key (s,x)) =
-      let h = match s.kind with
-        | Global -> 0
-        | Function -> Kernel_function.hash x
-        | Statement -> Cil_datatype.Stmt.hash x
-      in
-      Hashtbl.hash (s.id, h)
-    let copy k = k
-    let pretty fmt (Key (s,x)) =
-      match s.kind with
-      | Global ->
-        Format.fprintf fmt "%s" s.name
-      | Function ->
-        Format.fprintf fmt "%s:%a" s.name Kernel_function.pretty x
-      | Statement ->
-        let loc = Cil_datatype.Stmt.loc x in
-        Format.fprintf fmt "%s:%a" s.name Cil_datatype.Location.pretty loc
-  end)
+  type t = key
+  let name = "Statistics.Key"
+  let rehash (Key (s, x)) =
+    (Key (register s.name s.kind, x))
+  let reprs = [Key ({ id = 0; name="dummy"; kind=Global }, ())]
+  let equal = Datatype.from_compare
+  let compare (Key (s1,x1)) (Key (s2,x2)) =
+    let c = s1.id - s2.id in
+    if c <> 0 then c else
+      match s1.kind, s2.kind with
+      | Global, Global -> 0
+      | Function, Function -> Kernel_function.compare x1 x2
+      | Statement, Statement -> Cil_datatype.Stmt.compare x1 x2
+      | Global, (Function | Statement) -> -1
+      | (Function | Statement), Global -> 1
+      | Function, Statement -> -1
+      | Statement, Function -> 1
+  let hash (Key (s,x)) =
+    let h = match s.kind with
+      | Global -> 0
+      | Function -> Kernel_function.hash x
+      | Statement -> Cil_datatype.Stmt.hash x
+    in
+    Hashtbl.hash (s.id, h)
+  let copy k = k
+  let pretty fmt (Key (s,x)) =
+    match s.kind with
+    | Global ->
+      Format.fprintf fmt "%s" s.name
+    | Function ->
+      Format.fprintf fmt "%s:%a" s.name Kernel_function.pretty x
+    | Statement ->
+      let loc = Cil_datatype.Stmt.loc x in
+      Format.fprintf fmt "%s:%a" s.name Cil_datatype.Location.pretty loc
+end
 
+module Key = struct
+  include Datatype.Make_with_collections (Key_Datatype)
+
+  let name (Key (s, _x)) = s.name
+
+  let pretty_kf fmt (Key (s, x)) =
+    match s.kind with
+    | Global -> ()
+    | Function -> Kernel_function.pretty fmt x
+    | Statement -> Kernel_function.(pretty fmt (find_englobing_kf x))
+
+  let pretty_stmt fmt (Key (s, x)) =
+    match s.kind with
+    | Global | Function -> ()
+    | Statement -> Cil_datatype.Location.pretty fmt (Cil_datatype.Stmt.loc x)
+end
 
 (* --- Projectified state --- *)
 
@@ -174,8 +189,12 @@ let export_as_list () =
 let export_as_csv_to_channel out_channel =
   let fmt = Format.formatter_of_out_channel out_channel in
   let l = export_as_list () in
-  let pp_stat fmt (k,v) =
-    Format.fprintf fmt "%a\t%d\n" Key.pretty k v
+  let pp_stat fmt (key, value) =
+    Format.fprintf fmt "%s\t%a\t%a\t%d\n"
+      (Key.name key)
+      Key.pretty_kf key
+      Key.pretty_stmt key
+      value
   in
   List.iter (pp_stat fmt) l
 
