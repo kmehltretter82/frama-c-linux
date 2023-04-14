@@ -1,6 +1,6 @@
 /* run.config
-   LOG: @PTEST_NAME@.stats
-   STDOPT: +" -eva-statistics-file ./@PTEST_NAME@.stats"
+   LOG: @PTEST_NAME@.csv
+   STDOPT: +" -eva-statistics-file ./@PTEST_NAME@.csv"
 */
 
 /* This test only dump statistics in the default configuration
