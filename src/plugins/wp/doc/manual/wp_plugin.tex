@@ -1716,9 +1716,11 @@ Tactic parameters are specified using the following syntax:
 \begin{center}
   \begin{tabular}{l}
     \textit{param} $::=$ \\
+    \quad$|$\quad\verb+\goal+(\textit{pattern},\ldots) \\
     \quad$|$\quad\verb+\when+(\textit{pattern},\ldots) \\
-    \quad$|$\quad\verb+\for+(\textit{pattern},\ldots) \\
-    \quad$|$\quad\verb+\lookup+(\textit{pattern},\ldots) \\
+    \quad$|$\quad\verb+\ingoal+(\textit{pattern},\ldots) \\
+    \quad$|$\quad\verb+\incontext+(\textit{pattern},\ldots) \\
+    \quad$|$\quad\verb+\pattern+(\textit{pattern},\ldots) \\
     \quad$|$\quad\verb+\select+(\textit{pattern},\ldots) \\
     \quad$|$\quad\verb+\param+(\textit{id},\textit{value}) \\
     \quad$|$\quad\verb+\child+(\textit{id},\textit{strategy}) \\
@@ -1728,16 +1730,19 @@ Tactic parameters are specified using the following syntax:
 
 Tactic parameters are interpreted as follows:
 \begin{itemize}
-\item \verb+\when(ps)+, \verb+\for(ps)+ and \verb+\pattern(ps)+ are used to
-  match patterns against the current proof node. The form \verb+\when(ps)+ looks
-  for top-level hypotheses patterns, \verb+\for(ps)+ for top-level goal patterns
-  and \verb+\pattern(ps)+ in the entire proof obligation formula. When several
-  patterns are given, all must apply and agree on common pattern variables.
+\item \verb+\goal(ps)+, \verb+\when(ps)+ and other patterns are used to
+  match parts of the current proof node. The form \verb+\when(ps)+ looks
+  for top-level hypotheses patterns, \verb+\goal(ps)+ for top-level goal patterns.
+  Form \verb+\ingoal(ps)+ and \verb+\incontext(ps)+ respectectively matches patterns
+  deeper inside the goal or the hypotheses, and finally
+  \verb+\pattern(ps)+ searches in the entire proof obligation.
+  When several patterns are given, all must apply and agree on common pattern variables.
   Pattern syntax are specified below.
 \item \verb+\select(v)+ defines the main target of the selected tactic. The
   value \verb+v+ uses the same syntax as patterns, with pattern variables
   replaced with their matched values. Some tactics support multiple selection,
-  in for which \verb+\select(vs)+ can be used.
+  in for which \verb+\select(vs)+ can be used. When no selection is specified,
+  the first specified pattern is used as an implicit target.
 \item \verb+\param(p,v)+ configures the parameter value \verb+p+ of the selected
   tactic with the associated value.
 \item \verb+\child(a,s)+ applies strategy \verb+s+ to proof the sub-goal named

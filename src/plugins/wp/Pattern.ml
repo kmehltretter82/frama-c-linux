@@ -50,6 +50,15 @@ and node =
 and assoc = [ `Add | `Mul | `Concat ]
 and binop = [ `Div | `Mod | `Repeat | `Eq | `Lt | `Le | `Ne ]
 
+let self p =
+  let pattern,self = match p.value with
+    | Named(x,_) | Pvar x -> p , x
+    | _ ->
+      let x = { loc = p.loc ; value= "#target" } in
+      { loc = p.loc ; value = Named(x,p) } , x
+  in
+  pattern , { loc = p.loc ; value = Pvar self }
+
 let unroll op = function
   | { value = Assoc(f,xs) } when f = op -> xs
   | e -> [e]
