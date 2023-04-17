@@ -669,6 +669,7 @@ let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
   let mode = VCS.parse_mode (Wp_parameters.Interactive.get ()) in
   compute_provers ~mode ~script ;
   compute_auto ~script ;
+  ProofStrategy.typecheck () ;
   begin match provers with None -> () | Some prvs ->
     script.provers <- List.map (fun dp -> VCS.Batch , VCS.Why3 dp) prvs
   end ;

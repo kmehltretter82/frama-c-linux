@@ -51,6 +51,8 @@ let l_repeat = E.(F_call "repeat")
 let () = LogicBuiltins.add_type t_list ~library ~link:l_list ()
 let a_list = Lang.get_builtin_type ~name:t_list
 
+let alist e = L.Data(a_list,[e])
+
 let vlist_get_tau = function
   | None -> invalid_arg "a list operator without result type"
   | Some t -> t
@@ -63,11 +65,11 @@ let ty_listelt = function
 
 let ty_cons = function
   | [ _ ; Some l ] -> l
-  | [ Some e ; _ ] -> L.Data(a_list,[e])
+  | [ Some e ; _ ] -> alist e
   | _ -> raise Not_found
 
 let ty_elt = function
-  | [ Some e ] -> L.Data(a_list,[e])
+  | [ Some e ] -> alist e
   | _ -> raise Not_found
 
 let ty_nth = function
@@ -488,6 +490,10 @@ let check_term e =
     | _ -> false
   with Not_found -> false
 
+let elist (t : tau) =
+  match t with
+  | L.Data(_,[e]) when check_tau t -> Some e
+  | _ -> None
 
 let f_vlist_eq = Lang.extern_f ~library ~sort:L.Sprop "vlist_eq"
 
@@ -553,10 +559,10 @@ let rec collect xs = function
       | _ -> List.rev xs , w
     end
 
-let elist engine fmt xs = Qed.Plib.pp_listsep ~sep:"," engine#pp_flow fmt xs
+let pplist engine fmt xs = Qed.Plib.pp_listsep ~sep:"," engine#pp_flow fmt xs
 
 let elements (engine : #engine) fmt xs =
-  Format.fprintf fmt "@[<hov 2>[ %a ]@]" (elist engine) xs
+  Format.fprintf fmt "@[<hov 2>[ %a ]@]" (pplist engine) xs
 
 let rec pp_concat (engine : #engine) fmt es =
   let xs , es = collect [] es in
@@ -577,7 +583,7 @@ let pretty (engine : #engine) fmt es =
 
 let pprepeat (engine : #engine) fmt = function
   | [l;n] -> Format.fprintf fmt "@[<hov 2>(%a *^@ %a)@]" engine#pp_flow l engine#pp_flow n
-  | es -> Format.fprintf fmt "@[<hov 2>repeat(%a)@]" (elist engine) es
+  | es -> Format.fprintf fmt "@[<hov 2>repeat(%a)@]" (pplist engine) es
 
 let shareable e =
   match F.repr e with

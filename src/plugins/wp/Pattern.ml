@@ -534,14 +534,166 @@ let string (a : value) =
 (* --- Typechecking                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-type env = Lang.F.tau Vmap.t ref
+type vtype =
+  | Tnone | Tany | Numerical | Boolean | String
+  | List of vtype
+  | Array of vtype * vtype
+  | Type of Lang.F.tau
+
+let vint = Type Qed.Logic.Int
+let vbool = Type Qed.Logic.Bool
+let vlist = List Tany
+
+let list = function
+  | Type t -> Type (Vlist.alist t)
+  | Tnone -> Tnone
+  | v -> List v
+
+let array vk ve =
+  match vk , ve with
+  | Type tk, Type te -> Type (Qed.Logic.Array(tk,te))
+  | Tnone , _ | _ , Tnone -> Tnone
+  | _ -> Array(vk,ve)
+
+let rec vmerge va vb =
+  if va == vb then vb else
+    match va, vb with
+    | Tany , v | v, Tany -> v
+    (* numerical *)
+    | Numerical, Numerical -> Numerical
+    | Numerical, Type (Int | Real) -> vb
+    | Type (Int | Real), Numerical -> va
+    | Type Int , Type Real -> vb
+    | Type Real , Type Int -> va
+    (* boolean *)
+    | Boolean, Boolean -> Boolean
+    | Boolean, Type (Bool | Prop) -> vb
+    | Type (Bool | Prop) , Boolean -> va
+    | Type Bool , Type Prop -> vb
+    | Type Prop , Type Bool -> va
+    (* list *)
+    | List u , List v -> list (vmerge u v)
+    | (List m, Type t) | (Type t , List m) ->
+      begin
+        match Vlist.elist t with
+        | None -> Tnone
+        | Some te -> list (vmerge m (Type te))
+      end
+    (* arrays *)
+    | Array(vk,ve) , Array(uk,ue) ->
+      array (vmerge vk uk) (vmerge ve ue)
+    | (Array(vk,ve) , Type(Array(tk,te)))
+    | (Type(Array(tk,te)) , Array(vk,ve)) ->
+      array (vmerge vk (Type tk)) (vmerge ve (Type te))
+    (* types *)
+    | Type ta , Type tb -> if Lang.F.Tau.equal ta tb then vb else Tnone
+    | _ -> Tnone
+
+let rec vpretty fmt = function
+  | Tnone -> Format.fprintf fmt "\\none"
+  | Tany -> Format.fprintf fmt "\\any"
+  | List v -> Format.fprintf fmt "\\list(%a)" vpretty v
+  | Array(vk,ve) -> Format.fprintf fmt "%a[%a]" vpretty vk vpretty ve
+  | String -> Format.fprintf fmt "string"
+  | Numerical -> Format.fprintf fmt "number"
+  | Boolean -> Format.fprintf fmt "boolean"
+  | Type t -> Lang.F.Tau.pretty fmt t
+
+type env = vtype Vmap.t ref
 let env () = ref Vmap.empty
 
-let typecheck env ?tau a = ignore (env,tau,a)
-let typecheck_value = typecheck
-let typecheck_pattern = typecheck
+let tc_merge ~loc va vb =
+  let v = vmerge va vb in
+  if v = Tnone then
+    Wp_parameters.error ~source:(fst loc) "Invalid type %a (expected %a)"
+      vpretty va vpretty vb ; v
+
+let tc_var env ~loc vt x =
+  let vx = try Vmap.find x !env with Not_found -> Tany in
+  let vy = tc_merge ~loc vt vx in
+  if vx != vy then env := Vmap.add x vy !env ; vy
+
+let rec typecheck env vt (a : ast) =
+  let loc = a.loc in
+  match a.value with
+  | Any -> vt
+  | Pvar x -> tc_var env ~loc vt x.value
+  | Named(x,v) -> tc_var env ~loc (typecheck env vt v) x.value
+  | Range(a,b) ->
+    if a > b then Wp_parameters.error ~source:(fst loc)
+        "Invalid range %d..%d" a b ;
+    tc_merge ~loc vt (Type Qed.Logic.Int)
+  | Int _ -> tc_merge ~loc vt vint
+  | Bool _ -> tc_merge ~loc vt vbool
+  | String _ -> tc_merge ~loc vt String
+  | Assoc((`Add|`Mul),vs) ->
+    List.fold_left (typecheck env) (tc_merge ~loc Numerical vt) vs
+  | Assoc(`Concat,vs) ->
+    List.fold_left (typecheck env) (tc_merge ~loc vlist vt) vs
+  | Binop(a,(`Eq | `Ne),b) ->
+    let va = typecheck env Tany a in
+    let vb = typecheck env Tany b in
+    ignore @@ tc_merge ~loc va vb ;
+    tc_merge ~loc vt Boolean
+  | Binop(a,(`Lt | `Le),b) ->
+    let va = typecheck env Numerical a in
+    let vb = typecheck env Numerical b in
+    ignore @@ tc_merge ~loc va vb ;
+    tc_merge ~loc vt Boolean
+  | Binop(a,`Div,b) ->
+    let vn = tc_merge ~loc Numerical vt in
+    let va = typecheck env vn a in
+    let vb = typecheck env vn b in
+    tc_merge ~loc va vb
+  | Binop(a,`Mod,b) ->
+    ignore @@ typecheck env vint a ;
+    ignore @@ typecheck env vint b ;
+    tc_merge ~loc vt vint
+  | Binop(a,`Repeat,b) ->
+    ignore @@ typecheck env vint b ;
+    typecheck env (tc_merge ~loc vlist vt) a
+  | Times(_,v) -> typecheck env (tc_merge ~loc Numerical vt) v
+  | List vs ->
+    let ve = List.fold_left (typecheck env) Tany vs in
+    tc_merge ~loc vt (List ve)
+  | Get(a,k) ->
+    let vk = typecheck env Tany k in
+    begin
+      match typecheck env (Array(vk,vt)) a with
+      | Array(_,ve) -> ve
+      | Type(Array(_,te)) -> Type te
+      | va -> Wp_parameters.error ~source:(fst a.loc)
+                "Not an array type (%a)" vpretty va ; vt
+    end
+  | Set(a,k,v) ->
+    let vk = typecheck env Tany k in
+    let ve = typecheck env vt v in
+    typecheck env (array vk ve) a
+  | Field(v,fid) ->
+    begin
+      match typecheck env Tany v with
+      | Type(Record fds) ->
+        begin
+          try
+            let (_,ft) =
+              List.find (fun (fd,_) -> Lang.name_of_field fd = fid) fds in
+            tc_merge ~loc vt (Type ft)
+          with Not_found -> vt
+        end
+      | Tany -> vt
+      | vr -> Wp_parameters.error ~source:(fst v.loc)
+                "Not a record type (%a)" vpretty vr ; vt
+    end
+  | Call(_f,vs) ->
+    List.iter (fun v -> ignore @@ typecheck env Tany v) vs ; vt
+
+let typecheck_vtau env ?tau v =
+  ignore @@ typecheck env (match tau with None -> Tany | Some t -> Type t) v
+
+let typecheck_value = typecheck_vtau
+let typecheck_pattern = typecheck_vtau
+
 let typecheck_lookup env p =
-  let tau = if p.head then Some Qed.Logic.Bool else None in
-  typecheck_pattern env ?tau p.pattern
+  ignore @@ typecheck env (if p.head then Boolean else Tany) p.pattern
 
 (* -------------------------------------------------------------------------- *)

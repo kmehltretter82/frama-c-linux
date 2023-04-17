@@ -28,6 +28,8 @@ open Lang
 
 val check_tau : tau -> bool
 val check_term : F.term -> bool
+val alist : tau -> tau (* element -> list of element *)
+val elist : tau -> tau option (* list -> element *)
 
 class type engine =
   object
