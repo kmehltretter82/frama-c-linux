@@ -32,6 +32,7 @@ SAVE=
 DUNE_ALIAS=
 DUNE_OPT=
 DUNE_LOG=./.test-errors.log
+ALIAS_NAME=ptests
 CACHEDIR=$(pwd -P)/.wp-cache
 FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
@@ -61,6 +62,7 @@ function Usage
     echo ""
     echo "OPTIONS"
     echo ""
+    echo "  -n|--name <alias>   set dune alias name (default to ptests)"
     echo "  -r|--clean          clean (remove all) test results (includes -p)"
     echo "  -p|--ptests         prepare (all) dune files"
     echo "  -w|--wp-cache       prepare (pull) WP-cache"
@@ -206,15 +208,15 @@ function TestDir
     CloneCache
     case "$CONFIG" in
         "<all>")
-            ALIAS=$1/ptests
+            ALIAS=$1/${ALIAS_NAME}
             CFG="(all configs)"
             ;;
         "<default>")
-            ALIAS=$1/ptests_config
+            ALIAS=$1/${ALIAS_NAME}_config
             CFG="(default config)"
             ;;
         *)
-            ALIAS=$1/ptests_config_$CONFIG
+            ALIAS=$1/${ALIAS_NAME}_config_$CONFIG
             CFG="(config $CONFIG)"
             ;;
     esac
@@ -353,6 +355,10 @@ do
             ;;
         "-c"|"--config")
             CONFIG=$2
+            shift
+            ;;
+        "-n"|"--name")
+            ALIAS_NAME=$2
             shift
             ;;
         "-a"|"--all")
