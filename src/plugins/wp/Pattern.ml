@@ -227,7 +227,7 @@ let pp_pattern = pp
 
 type sigma = Tactical.selection Vmap.t
 
-type env = {
+type penv = {
   mutable sigma : sigma ;
   mutable marked : Lang.F.Tset.t ;
   select : Lang.F.term -> Tactical.selection ;
@@ -529,5 +529,19 @@ let string (a : value) =
   match a.value with
   | String s -> s
   | _ -> error ~loc:a.loc "Not a string value (%a)" pp a
+
+(* -------------------------------------------------------------------------- *)
+(* --- Typechecking                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+type env = Lang.F.tau Vmap.t ref
+let env () = ref Vmap.empty
+
+let typecheck env ?tau a = ignore (env,tau,a)
+let typecheck_value = typecheck
+let typecheck_pattern = typecheck
+let typecheck_lookup env p =
+  let tau = if p.head then Some Qed.Logic.Bool else None in
+  typecheck_pattern env ?tau p.pattern
 
 (* -------------------------------------------------------------------------- *)

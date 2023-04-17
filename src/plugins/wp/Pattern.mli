@@ -72,4 +72,13 @@ val bool : value -> bool
 (** Composing a string *)
 val string : value -> string
 
+(** Typechecking *)
+
+type env
+
+val env : unit -> env
+val typecheck_value : env -> ?tau:Lang.F.tau -> value -> unit
+val typecheck_pattern : env -> ?tau:Lang.F.tau -> pattern -> unit
+val typecheck_lookup : env -> lookup -> unit
+
 (* -------------------------------------------------------------------------- *)

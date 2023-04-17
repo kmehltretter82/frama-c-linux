@@ -265,6 +265,64 @@ let resolve name =
       "Strategy '%s' undefined (skipped)." name.value ;
     None
 
+let resolve_auto name =
+  try Some (Strategy.lookup ~id:name.value)
+  with Not_found ->
+    Wp_parameters.error ~source:(fst name.loc) ~once:true
+      "Auto-Strategy '%s' not found (skipped)." name.value ;
+    None
+
+let resolve_prover name =
+  let result = VCS.parse_prover name.value in
+  if result = None then
+    Wp_parameters.error ~source:(fst name.loc) ~once:true
+      "Prover '%s' not found (skipped)." name.value ;
+  result
+
+let resolve_tactic name =
+  try Some (Tactical.lookup ~id:name.value)
+  with Not_found ->
+    Wp_parameters.error ~source:(fst name.loc) ~once:true
+      "Tactical '%s' not found (skipped alternative)." name.value ;
+    None
+
+(* -------------------------------------------------------------------------- *)
+(* --- Strategy Checking                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let check_prover p = ignore @@ resolve_prover p
+let check_strategy s = ignore @@ resolve s
+
+let check_parameter env (t : Tactical.tactical) (p,v) =
+  try
+    let prm = List.find (fun q -> Tactical.pident q = p.value) t#params in
+    match prm with
+    | Checkbox _ -> Pattern.typecheck_value env ~tau:Qed.Logic.Bool v
+    | _ -> ()
+  with Not_found ->
+    Wp_parameters.error ~source:(fst p.loc) ~once:true
+      "Parameter '%s' not found in tactic '%s'"
+      p.value t#id
+
+let check_alternative = function
+  | Strategy s -> ignore @@ resolve s
+  | Auto s -> ignore @@ resolve_auto s
+  | Provers(pvs,_) -> List.iter check_prover pvs
+  | Tactic { tactic ; lookup ; params ; children ; default } ->
+    begin
+      let env = Pattern.env () in
+      List.iter (Pattern.typecheck_lookup env) lookup ;
+      Option.iter
+        (fun tactical ->
+           List.iter (check_parameter env tactical) params ;
+        ) (resolve_tactic tactic) ;
+      List.iter (fun (_,s) -> check_strategy s) children ;
+      Option.iter check_strategy default ;
+    end
+
+let typecheck () =
+  Strategies.iter (fun _ s -> List.iter check_alternative s.alternatives)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy Hints                                                     --- *)
 (* -------------------------------------------------------------------------- *)
@@ -283,18 +341,11 @@ let alternatives s = s.alternatives
 
 let provers = function
   | Provers(ps,tm) ->
-    List.fold_right
-      (fun p ps ->
-         match VCS.parse_prover p.value with
-         | Some p -> p::ps
-         | None ->
-           Wp_parameters.error ~source:(fst p.loc) ~once:true
-             "Prover '%s' not found (skipped)." p.value ; ps
-      ) ps [],
-    begin match tm with
+    let ps = List.filter_map resolve_prover ps in
+    let tm = match tm with
       | Some tm -> tm
       | None -> float @@ Wp_parameters.Timeout.get ()
-    end
+    in ps,tm
   | Strategy _ | Tactic _ | Auto _ -> [],0.0
 
 let fallback = function
@@ -303,22 +354,14 @@ let fallback = function
 
 let auto = function
   | Strategy _  | Tactic _ | Provers _ -> None
-  | Auto s ->
-    match Strategy.lookup ~id:s.value with
-    | exception Not_found ->
-      Wp_parameters.error ~source:(fst s.loc) ~once:true
-        "Auto-Strategy '%s' not found (skipped)." s.value ; None
-    | h -> Some h
+  | Auto s -> resolve_auto s
 
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy Tactical Step                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
 let tactical a =
-  try Tactical.lookup ~id:a.value with Not_found ->
-    Wp_parameters.error ~source:(fst a.loc) ~once:true
-      "Tactical '%s' not found (skipped alternative)." a.value ;
-    raise Not_found
+  match resolve_tactic a with None -> raise Not_found | Some t -> t
 
 let parameter (t : Tactical.tactical) a =
   try List.find (fun p -> Tactical.pident p = a.value) t#params

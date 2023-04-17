@@ -29,6 +29,8 @@ open ProofEngine
 type strategy
 type alternative
 
+val typecheck : unit -> unit
+
 val name : strategy -> string
 val find : string -> strategy option
 val hints : WpPropId.prop_id -> strategy list
