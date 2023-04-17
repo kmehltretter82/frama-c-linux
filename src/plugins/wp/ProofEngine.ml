@@ -138,6 +138,11 @@ let iteri f tree =
     let k = ref 0 in
     walk (fun node -> f !k node ; incr k) r
 
+let rec depth node =
+  match node.parent with
+  | None -> 0
+  | Some p -> depth p
+
 (* -------------------------------------------------------------------------- *)
 (* --- Consolidating                                                      --- *)
 (* -------------------------------------------------------------------------- *)

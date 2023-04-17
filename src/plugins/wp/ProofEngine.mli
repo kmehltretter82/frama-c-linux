@@ -73,6 +73,7 @@ val proved : node -> bool
 val pending : node -> int
 val stats : node -> Stats.stats
 val parent : node -> node option
+val depth : node -> int
 val children : node -> (string * node) list
 val tactical : node -> ProofScript.jtactic option
 val get_strategies : node -> int * Strategy.t array (* current index *)

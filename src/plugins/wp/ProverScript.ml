@@ -374,12 +374,14 @@ and explore_fallback env process a node =
   | Some s -> explore_strategie env process s node
 
 let explore_hint env process node =
-  match ProofEngine.get_hint node with
-  | None -> failed
-  | Some s ->
-    match ProofStrategy.find s with
+  if ProofEngine.depth node > env.Env.depth then failed
+  else
+    match ProofEngine.get_hint node with
     | None -> failed
-    | Some s -> explore_strategie env process s node
+    | Some s ->
+      match ProofStrategy.find s with
+      | None -> failed
+      | Some s -> explore_strategie env process s node
 
 let explore_further env process strategy node =
   let marked =
