@@ -28,7 +28,7 @@ open Locations
 
 type t =
   | Direct of Cil_types.stmt
-  | Indirect of Cil_types.stmt (** Read inside the body of called function [f(...)]*)
+  | Indirect of Cil_types.stmt
 
 class find_read zlval = object
   inherit Visitor.frama_c_inplace
@@ -62,7 +62,7 @@ class find_read zlval = object
              let inputs = inout.Inout_type.over_inputs in *)
           if Zone.intersects inputs zlval then
             if Eva.Analysis.use_spec_instead_of_definition kf then
-              (* Direst, as there is no body for this funtion. *)
+              (* Direct, as there is no body for this function. *)
               (true, indirect)
             else
               (direct, true) (* Indirect effect *)

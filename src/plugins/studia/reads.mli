@@ -24,7 +24,9 @@
 
 type t =
   | Direct of Cil_types.stmt
-  | Indirect of Cil_types.stmt (** Read inside the body of called function [f(...)]*)
+  (** Direct read by a statement. *)
+  | Indirect of Cil_types.stmt
+  (** Indirect read through a function call. *)
 
 val compute: Locations.Zone.t -> t list
 (** [compute z] finds all the statements that read [z]. The [effects]

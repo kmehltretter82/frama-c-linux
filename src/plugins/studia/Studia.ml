@@ -29,14 +29,18 @@ include
    sig
      module Writes: sig
        type t =
-         | Assign of Cil_types.stmt (** Direct affectation [lv = ...] *)
-         | CallDirect of Cil_types.stmt (** Modification by a called leaf function *)
-         | CallIndirect of Cil_types.stmt (** Modification inside the body of called function [f(...)] *)
-         | GlobalInit of Cil_types.varinfo * Cil_types.initinfo (** Initialization of a global variable *)
+         | Assign of Cil_types.stmt
+         (** Direct assignment. *)
+         | CallDirect of Cil_types.stmt
+         (** Modification by a called leaf function. *)
+         | CallIndirect of Cil_types.stmt
+         (** Modification inside the body of a called function. *)
+         | GlobalInit of Cil_types.varinfo * Cil_types.initinfo
+         (** Initialization of a global variable. *)
          | FormalInit of
              Cil_types.varinfo *
              (Cil_types.kernel_function * Cil_types.stmt list) list
-         (** Initialization of a formal parameter, with a list of callsites *)
+         (** Initialization of a formal parameter, with a list of callsites. *)
 
        val compare: t -> t -> int
 
@@ -50,7 +54,9 @@ include
      module Reads: sig
        type t =
          | Direct of Cil_types.stmt
-         | Indirect of Cil_types.stmt (** Read inside the body of called function [f(...)]*)
+         (** Direct read by a statement. *)
+         | Indirect of Cil_types.stmt
+         (** Indirect read through a function call. *)
 
        val compute: Locations.Zone.t -> t list
        (** [compute z] finds all the statements that read [z]. The [effects]

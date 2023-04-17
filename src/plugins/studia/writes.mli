@@ -23,14 +23,18 @@
 (** Computations of the statements that write a given memory zone. *)
 
 type t =
-  | Assign of Cil_types.stmt (** Direct affectation [lv = ...] *)
-  | CallDirect of Cil_types.stmt (** Modification by a called leaf function *)
-  | CallIndirect of Cil_types.stmt (** Modification inside the body of called function [f(...)] *)
-  | GlobalInit of Cil_types.varinfo * Cil_types.initinfo (** Initialization of a global variable *)
+  | Assign of Cil_types.stmt
+  (** Direct assignment. *)
+  | CallDirect of Cil_types.stmt
+  (** Modification by a called leaf function. *)
+  | CallIndirect of Cil_types.stmt
+  (** Modification inside the body of a called function. *)
+  | GlobalInit of Cil_types.varinfo * Cil_types.initinfo
+  (** Initialization of a global variable. *)
   | FormalInit of
       Cil_types.varinfo *
       (Cil_types.kernel_function * Cil_types.stmt list) list
-  (** Initialization of a formal parameter, with a list of callsites *)
+  (** Initialization of a formal parameter, with a list of callsites. *)
 
 val compare: t -> t -> int
 

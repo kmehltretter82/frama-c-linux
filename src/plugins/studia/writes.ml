@@ -70,8 +70,7 @@ let effects_of_call stmt zlval effects  =
     let out = inout.Inout_type.over_outputs in
     if Zone.intersects out zlval then
       if Eva.Analysis.use_spec_instead_of_definition kf then
-        (true, indirect) (* Mark the effect as direct, there is
-                                          no body for this funtion. *)
+        (true, indirect) (* Direct effect: there is no body for this funtion. *)
       else
         (direct, true) (* Indirect effect *)
     else
