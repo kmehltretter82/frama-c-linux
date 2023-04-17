@@ -329,7 +329,8 @@ let compatible_writes callstack = function
   | FormalInit (vi, _callsites) as w ->
     match Callstack.pop callstack with
     | Some (kf,stmt,_callstack) ->
-      Some (Studia.Writes.FormalInit (vi, [(kf,[stmt])])) (* keep the only callsite compatible with the current callstack *)
+      (* keep the only callsite compatible with the current callstack *)
+      Some (Studia.Writes.FormalInit (vi, [(kf,[stmt])]))
     | None -> Some w
 
 (* returns true if the callsite (kf,stmt) *)
@@ -491,7 +492,7 @@ let build_node_writes context node =
   let callstack = node.node_locality.loc_callstack in
   match node.node_kind with
   | Scalar (vi, _typ, offset) ->
-    (* Offset should be constant and no evaluation should be reuired *)
+    (* Offset should be constant and no evaluation should be required *)
     let zone = Eval.to_zone (Global vi) (Cil_types.Var vi, offset) in
     build_write_deps ~callstack zone
   | Composite (vi) ->
@@ -610,7 +611,7 @@ let build_node_reads context node =
   let callstack = node.node_locality.loc_callstack in
   match node.node_kind with
   | Scalar (vi,_typ,offset) ->
-    (* Offset should be constant and no evaluation should be reuired *)
+    (* Offset should be constant and no evaluation should be required *)
     let zone = Eval.to_zone (Global vi) (Cil_types.Var vi, offset) in
     build_reads_deps callstack zone
   | Composite (vi) ->
