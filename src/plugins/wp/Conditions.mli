@@ -70,6 +70,7 @@ and probe = {
   probe_stmt : stmt option ;
   probe_name : string ;
   probe_term : term ;
+  probe_loc : location ;
 }
 
 type sequent = sequence * F.pred
@@ -248,7 +249,8 @@ val merge : bundle list -> bundle
     over the list. *)
 
 (** Inserts probes to a sequent. *)
-val probe : ?descr:string -> ?stmt:stmt -> name:string -> term -> bundle -> bundle
+val probe : loc:location -> ?descr:string -> ?stmt:stmt -> name:string ->
+  term -> bundle -> bundle
 
 (** Assumes a list of predicates in a [Type] section on top of the bundle. *)
 val domain : F.pred list -> bundle -> bundle

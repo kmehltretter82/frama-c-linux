@@ -303,9 +303,9 @@ struct
         path = path ;
       }
 
-  let probe ?descr ?stmt ~name term vc =
+  let probe ~loc ?descr ?stmt ~name term vc =
     let vars = F.vars term in
-    let hyps = Conditions.probe ?descr ?stmt ~name term vc.hyps in
+    let hyps = Conditions.probe ~loc ?descr ?stmt ~name term vc.hyps in
     { hyps = hyps ;
       vars = vars ;
       goal = vc.goal ;
@@ -1440,19 +1440,21 @@ struct
   (* --- WP RULE : scope                                                    --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let wp_formal sigma v =
-    v.vname,
-    C.cval @@ M.load sigma (Ctypes.object_of v.vtype) @@ M.cvar v
-
   let wp_scope env wp ~descr ?(probes=false) scope xs =
-    let cur = L.current env in
-    let pre = M.alloc cur xs in
-    let hs = M.scope { pre ; post = cur } scope xs in
+    let sigma = L.current env in
+    let pre = M.alloc sigma xs in
+    let hs = M.scope { pre ; post = sigma } scope xs in
     let vcs = gmap (assume_vc ~descr hs) wp.vcs in
+    let xps =
+      List.map
+        (fun x ->
+           let tau = Ctypes.object_of x.vtype in
+           x, C.cval @@ M.load sigma tau @@ M.cvar x) xs in
     let vcs =
       if probes then
-        let pxs = List.map (wp_formal cur) xs in
-        gmap (List.fold_right (fun (a,t) vc -> probe ~name:a t vc) pxs) vcs
+        gmap
+          (List.fold_right
+             (fun (x,v) vc -> probe ~loc:x.vdecl ~name:x.vname v vc) xps) vcs
       else vcs
     in
     { wp with sigma = Some pre ; vcs = vcs }

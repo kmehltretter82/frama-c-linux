@@ -101,6 +101,7 @@ and probe = {
   probe_stmt : stmt option ;
   probe_name : string ;
   probe_term : term ;
+  probe_loc : location ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -542,8 +543,9 @@ let intros ps hs =
 let state ?descr ?stmt state hs =
   Bundle.add (step ?descr ?stmt (State state)) hs
 
-let probe ?descr ?stmt ~name term hs =
+let probe ~loc ?descr ?stmt ~name term hs =
   Bundle.add (step ?descr ?stmt (Probe {
+      probe_loc = loc ;
       probe_stmt = stmt ;
       probe_name = name ;
       probe_term = term ;
