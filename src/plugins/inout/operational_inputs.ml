@@ -607,6 +607,17 @@ module Callwise = struct
         let name = "Operational_inputs.MemExec"
       end)
 
+  let import_memexec import_inout project =
+    let gather () = MemExec.fold (fun i inout acc -> (i, inout) :: acc) [] in
+    let list = Project.on project gather () in
+    List.iter (fun (i, inout) -> MemExec.replace i (import_inout inout)) list
+
+  let _import =
+    let inout = Inout_type.ty in
+    Dynamic.register
+      ~plugin:"inout" "import_memexec"
+      (Datatype.func2 (Datatype.func inout inout) Project.ty Datatype.unit)
+      import_memexec
 
   let compute_call_from_value_states kf call_stack states =
     let module Fenv = (val Dataflows.function_env kf: Dataflows.FUNCTION_ENV) in

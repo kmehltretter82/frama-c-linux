@@ -83,6 +83,16 @@ let import_deps deps =
   Deps.{ data = import_zone deps.data;
          indirect = import_zone deps.indirect; }
 
+let import_inout t =
+  Inout_type.{
+    over_inputs = import_zone t.over_inputs;
+    over_inputs_if_termination = import_zone t.over_inputs_if_termination;
+    over_logic_inputs = import_zone t.over_logic_inputs;
+    under_outputs_if_termination = import_zone t.under_outputs_if_termination;
+    over_outputs = import_zone t.over_outputs;
+    over_outputs_if_termination = import_zone t.over_outputs_if_termination;
+  }
+
 
 let change_to find x = Cil.ChangeTo (import find x)
 

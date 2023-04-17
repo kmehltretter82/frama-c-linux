@@ -358,7 +358,8 @@ module Make
     in
     let list, counter = Project.on project gather () in
     List.iter import_cache list;
-    SaveCounter.set counter
+    SaveCounter.set counter;
+    Eva_dynamic.Inout.import_memexec Eva_diff.import_inout project
 
 
   let check_saved_project filename project =

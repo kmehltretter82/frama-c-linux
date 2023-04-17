@@ -35,3 +35,5 @@ val import_offsetmap: Cvalue.V_Offsetmap.t -> Cvalue.V_Offsetmap.t
 
 val import_expr: exp -> exp
 val import_lval: lval -> lval
+
+val import_inout: Inout_type.t -> Inout_type.t

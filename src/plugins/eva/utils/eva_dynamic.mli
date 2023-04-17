@@ -38,6 +38,9 @@ module Inout: sig
   (** Returns the memory zone modified by the given statement.
       Returns Top if the inout plugin is missing. *)
   val stmt_outputs: Cil_types.stmt -> Locations.Zone.t
+
+  (** Imports the MemExec table of the inout plugin from the given project. *)
+  val import_memexec: (Inout_type.t -> Inout_type.t) -> Project.t -> unit
 end
 
 module Callgraph: sig

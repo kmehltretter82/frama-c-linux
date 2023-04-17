@@ -43,6 +43,12 @@ module Inout = struct
 
   let stmt_outputs stmt =
     get ~plugin "stmt_outputs" (typ Cil_datatype.Stmt.ty) ~fallback stmt
+
+  let import_memexec import_inout project =
+    let fallback _ _ = () in
+    let import_type = Datatype.func Inout_type.ty Inout_type.ty in
+    let typ = Datatype.func2 import_type Project.ty Datatype.unit in
+    get ~plugin "import_memexec" typ ~fallback import_inout project
 end
 
 module Callgraph = struct
