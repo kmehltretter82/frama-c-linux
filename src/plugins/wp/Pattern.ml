@@ -41,7 +41,7 @@ and node =
   | String of string
   | Assoc of assoc * ast list
   | Binop of ast * binop * ast
-  | Call of string * ast list
+  | Call of string * ast list * bool (* trailing .. *)
   | Times of Integer.t * ast
   | List of ast list
   | Field of ast * string
@@ -112,6 +112,11 @@ let pbound ctxt p =
   | PLconstant (IntConstant a) -> pint ctxt ~loc a
   | _ -> ctxt.typing.error loc "Invalid bound (int expected)"
 
+let rec ptrail rps = function
+  | [] -> List.rev rps,false
+  | [{ lexpr_node = PLrange(None,None) }] -> List.rev rps,true
+  | p::ps -> ptrail (p::rps) ps
+
 let rec parse ctxt p =
   let loc = p.lexpr_loc in
   match p.lexpr_node with
@@ -133,7 +138,8 @@ let rec parse ctxt p =
   | PLapp("\\concat",[],ps) -> concat ~loc @@ List.map (parse ctxt) ps
   | PLapp("\\repeat",[],[p;q]) -> parse_binop ctxt ~loc `Repeat p q
   | PLapp(lf,[],ps) ->
-    { loc ; value = Call(lf,List.map (parse ctxt) ps) }
+    let ps,trail = if ctxt.value then ps,false else ptrail [] ps in
+    { loc ; value = Call(lf,List.map (parse ctxt) ps,trail) }
   | PLunop(Uminus,a) ->
     let a = parse ctxt a in
     { loc = a.loc ; value = Times(Integer.minus_one,a) }
@@ -221,10 +227,12 @@ let rec pp fmt (a : ast) =
     List.iter (Format.fprintf fmt " ;@ %a" pp) vs ;
     Format.fprintf fmt " |]@]"
   | Field(v,id) -> Format.fprintf fmt "%a.%s" pp v id
-  | Call(id,[]) -> Format.fprintf fmt "%s()" id
-  | Call(id,v::vs) ->
+  | Call(id,[],true) -> Format.fprintf fmt "%s(..)" id
+  | Call(id,[],false) -> Format.fprintf fmt "%s()" id
+  | Call(id,v::vs,trail) ->
     Format.fprintf fmt "@[<hov 2>%s(%a" id pp v ;
     List.iter (Format.fprintf fmt ",@ %a" pp) vs ;
+    if trail then Format.fprintf fmt ",@ .." ;
     Format.fprintf fmt ")@]"
 
 let pp_value = pp
@@ -287,18 +295,19 @@ let rec pmatch env (p : pattern) e =
     pmatch env pa a ; pmatch env pk k ; pmatch env pv v
   | Field(pv,fid) , Rget(v,fd) when Lang.name_of_field fd = fid ->
     pmatch env pv v
-  | Call(fid,ps) , Fun(lf,es) when Lang.name_of_lfun lf = fid ->
+  | Call(fid,ps,trail) , Fun(lf,es) when Lang.name_of_lfun lf = fid ->
     begin
       match Lang.Fun.category lf with
       | Operator op ->
         if op.associative then
+          let rps = if trail then [{ loc = p.loc ; value = Any }] else [] in
           if op.commutative then
-            pac env (Lang.F.e_fun lf) ps [] es
+            pac env (Lang.F.e_fun lf) rps ps es
           else
-            passoc env (Lang.F.e_fun lf) [] ps [] es
+            passoc env (Lang.F.e_fun lf) rps ps [] es
         else
-          pargs env ps es
-      | _ -> pargs env ps es
+          pargs env ps trail es
+      | _ -> pargs env ps trail es
     end
   | Binop(pl,`Repeat,pn) , Fun(lf,[l;n]) when lf == Vlist.f_repeat ->
     pmatch env pl l ; pmatch env pn n
@@ -330,15 +339,15 @@ and passoc env op rps ps rvs vs =
 (* AC matching:
    - rps are (reversed) any-patterns
    - invariant is (rev rs @ ps) being matched with es *)
-and pac env op rs ps es =
+and pac env op rps ps es =
   match ps with
   | p::ps ->
-    if is_any p then pac env op (p::rs) ps es
+    if is_any p then pac env op (p::rps) ps es
     else
       let ep = List.find (ptry env p) es in
       let es = List.filter (fun e -> not @@ Lang.F.equal ep e) es in
-      pac env op rs ps es
-  | [] -> pany env op (List.rev rs) es
+      pac env op rps ps es
+  | [] -> pany env op (List.rev rps) es
 
 (* Match with backtracking *)
 and ptry env p e =
@@ -357,10 +366,11 @@ and pany env op rs es =
   | [] , _::_ -> raise Not_found
 
 (* Pairwise matching *)
-and pargs env ps es =
+and pargs env ps trail es =
   match ps , es with
   | [] , [] -> ()
-  | p::ps , e::es -> pmatch env p e ; pargs env ps es
+  | [] , _ when trail -> ()
+  | p::ps , e::es -> pmatch env p e ; pargs env ps trail es
   | _ -> raise Not_found
 
 (* Deep matching with marking *)
@@ -522,7 +532,7 @@ let rec select (env : sigma) (a : value) =
   | Set(a,k,v) -> Tactical.compose "wp:set" [cc a;cc k;cc v]
   | List vs -> Tactical.compose "wp:list" (List.map cc vs)
   | Field(v,id) -> compose env ~loc ("fd:" ^ id) [v]
-  | Call(id,vs) -> compose env ~loc ("lf:" ^ id) vs
+  | Call(id,vs,_) -> compose env ~loc ("lf:" ^ id) vs
 
 and compose env ~loc id vs =
   match Tactical.compose id (List.map (select env) vs) with
@@ -693,7 +703,7 @@ let rec typecheck env vt (a : ast) =
       | vr -> Wp_parameters.error ~source:(fst v.loc)
                 "Not a record type (%a)" vpretty vr ; vt
     end
-  | Call(_f,vs) ->
+  | Call(_f,vs,_) ->
     List.iter (fun v -> ignore @@ typecheck env Tany v) vs ; vt
 
 let typecheck_vtau env ?tau v =

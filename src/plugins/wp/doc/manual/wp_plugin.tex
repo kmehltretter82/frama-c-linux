@@ -1768,6 +1768,8 @@ following restrictions and meaning:
 \item patterns \verb+p[k]+ and \verb+p[k->v]+ matches array operations, e.g. for memory models;
 \item ACSL list operators \verb+[|...|]+, \verb+^+ and \verb+@^+ are also recognized;
 \item function calls must use their printed name, as they appear in proof nodes;
+\item for function patterns, trailing dots can be used to match any number of
+  arguments, like in \verb+f(x,y,..)+ for instance.
 \end{itemize}
 
 It is highly recommended using the graphical user interface or \verb+-wp-print+
