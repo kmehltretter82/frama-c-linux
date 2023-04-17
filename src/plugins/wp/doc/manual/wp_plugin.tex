@@ -1746,6 +1746,12 @@ Tactic parameters are interpreted as follows:
   tactic. If unspecified, the strategy used for the current node is applied.
 \end{itemize}
 
+Tactics identifiers and their parameters can be obtained from the command line:
+\begin{itemize}
+\item \verb|frama-c -wp-tactic ?| lists all the registered tactic identifiers;
+\item \verb|frama-c -wp-tactic id,...| prints detailed infos for the selected tactics.
+\end{itemize}
+
 Patterns and values are a closed to raw proof obligation formulae, with the
 following restrictions and meaning:
 \begin{itemize}

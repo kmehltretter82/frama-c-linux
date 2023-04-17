@@ -824,6 +824,71 @@ let do_prover_detect () =
         ) provers
 
 (* ------------------------------------------------------------------------ *)
+(* --- Tactic Searching                                                 --- *)
+(* ------------------------------------------------------------------------ *)
+
+let pp_field fmt pp (fd : 'a Tactical.field) =
+  let s = Tactical.signature fd in
+  Format.fprintf fmt "@\nParameter %S:" s.vid ;
+  if s.title <> "" then Format.fprintf fmt "@\n  Title: %s" s.title ;
+  if s.descr <> "" then Format.fprintf fmt "@\n  Descr: %s" s.descr ;
+  Format.fprintf fmt "@\n  Default: %a" pp (Tactical.default fd)
+
+let pp_parameter fmt (p : Tactical.parameter) =
+  match p with
+  | Checkbox fd ->
+    pp_field fmt Format.pp_print_bool fd
+  | Spinner(fd,rg) ->
+    pp_field fmt Format.pp_print_int fd ;
+    begin match rg.vmin , rg.vmax with
+      | None,None -> ()
+      | Some a,None -> Format.fprintf fmt "@\n  Range: %d.." a
+      | None,Some b -> Format.fprintf fmt "@\n  Range: ..%d" b
+      | Some a,Some b -> Format.fprintf fmt "@\n  Range: %d..%d" a b
+    end
+  | Composer(fd,_) ->
+    pp_field fmt Tactical.pp_selection fd
+  | Selector(fd,items,eq) ->
+    pp_field fmt
+      (fun fmt v ->
+         List.iter
+           (fun (item : _ Tactical.named) ->
+              if eq v item.value then Format.fprintf fmt "%S" item.vid
+           ) items
+      ) fd ;
+    List.iter
+      (fun (item : _ Tactical.named) ->
+         Format.fprintf fmt "@\n  Value %S: %s" item.vid item.title ;
+         if item.descr <> "" then Format.fprintf fmt " (%s)" item.descr ;
+      ) items
+  | Search(fd,_,_) ->
+    pp_field fmt
+      (fun fmt s ->
+         match s with
+         | None -> Format.pp_print_string fmt "-"
+         | Some v -> Format.fprintf fmt "%S" v.Tactical.title
+      ) fd
+
+let do_search_tactics () =
+  let ts = Wp_parameters.Tactics.get () in
+  if List.mem "?" ts then
+    Wp_parameters.result "@[<hov 2>Registered tactics:%t@]"
+      begin fun fmt ->
+        Tactical.iter (fun t -> Format.fprintf fmt "@ %s" t#id) ;
+      end ;
+  if ts <> [] then
+    Tactical.iter
+      begin fun t ->
+        if List.mem t#id ts then
+          Wp_parameters.result
+            "Tactic %S:@\n\
+             Title: @[<h>%s@]@\n\
+             Descr: @[<h>%s@]%t"
+            t#id t#title t#descr
+            (fun fmt -> List.iter (pp_parameter fmt) t#params)
+      end
+
+(* ------------------------------------------------------------------------ *)
 (* ---  Main Entry Points                                               --- *)
 (* ------------------------------------------------------------------------ *)
 
@@ -868,6 +933,7 @@ let tracelog () =
 let main = sequence [
     (fun () -> Wp_parameters.debug ~dkey:dkey_main "Start WP plugin...@.") ;
     do_prover_detect ;
+    do_search_tactics ;
     prepare_scripts ;
     cmdline_run ;
     tracelog ;

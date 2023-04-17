@@ -819,6 +819,14 @@ module Detect = Action
     end)
 let () = on_reset Detect.clear
 
+module Tactics = String_list
+    (struct
+      let option_name = "-wp-tactic"
+      let arg_name = "id,..."
+      let help = "Describe tactic. Use '?' for listing tactic names."
+    end)
+let () = on_reset Tactics.clear
+
 let () = Parameter_customize.set_group wp_prover
 module Drivers =
   String_list

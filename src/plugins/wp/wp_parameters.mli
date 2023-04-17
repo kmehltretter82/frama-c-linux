@@ -112,6 +112,7 @@ module TerminatesVariantHyp : Parameter_sig.Bool
 (** {2 Prover Interface} *)
 
 module Detect: Parameter_sig.Bool
+module Tactics: Parameter_sig.String_list
 module Generate:Parameter_sig.Bool
 module ScriptOnStdout: Parameter_sig.Bool
 module PrepareScripts: Parameter_sig.Bool

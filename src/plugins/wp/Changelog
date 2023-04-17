@@ -29,6 +29,10 @@ Plugin WP 27.0 (Cobalt)
 ###############################################################################
 
 - WP          [2023-05-03] new warning against unions (see -wp-warn-key "union")
+- WP          [2023-17-04] New option -wp-tactic to search for tactics
+- WP          [2023-17-04] New proof engine (selected by 'tip' and 'script' provers)
+- WP          [2023-17-04] ACSL extension 'strategy' for proof strategies
+- WP          [2023-17-04] ACSL extension 'proof' for proof resolution hints
 - WP          [2023-04-03] Default timeout set to 2s
 - WP          [2023-03-29] fix option -wp-split to only split conditions
 - WP          [2023-03-29] new option -wp-split-switch to split switches
