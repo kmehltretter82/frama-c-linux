@@ -5574,7 +5574,9 @@ allocation fails.
 \label{nondeterminism}
 
 The following functions, declared in \lstinline|share/libc/__fc_builtin.h|, allow to
-introduce some non-determinism in the analysis. The results given by
+introduce some non-determinism in the analysis.
+
+The results given by
 \Eva{} are
 valid \textbf{for all values proposed by the user}, as opposed
 to what a test-generation tool would typically do. A tool based
@@ -5582,6 +5584,10 @@ on testing techniques
 would indeed necessarily pick only a subset of the billions
  of possible entries
 to execute the application.
+
+Note that these functions are not specific to \Eva{}; their ACSL specifications
+(omitted here for brevity) allow them to be understood by any plug-in capable of
+interpreting them.
 
 \begin{listing-nonumber}
 int Frama_C_nondet(int a, int b);
@@ -5593,28 +5599,23 @@ void *Frama_C_nondet_ptr(void *a, void *b);
 int Frama_C_interval(int min, int max);
     /* returns any value in the interval from min to max inclusive */
 
-float Frama_C_float_interval(float min, float max);
-    /* returns any value in the interval from min to max inclusive */
+<type> Frama_C_<type>_interval(<type> min, <type> max);
+    /* a series of functions equivalent to Frama_C_interval, but defined
+       for other integer and floating-point types */
 
-double Frama_C_double_interval(double min, double max);
-    /* returns any value in the interval from min to max inclusive */
+double Frama_C_make_unknown(char *p, size_t l);
+    /* assigns an arbitrary value to each byte between *p and *(p+l-1) */
 \end{listing-nonumber}
-
-The implementation of these functions might change in future versions
-of Frama-C, but their types and their behavior will stay the same.
 
 Example of use of the functions introducing non-determinism:
 \csource{examples/nondet.c}
 
 With the command below, the obtained result for
-variable \lstinline|X| is \lstinline|[-45..150],0%3|.
+variable \lstinline|X| is \lstinline|[-45..150],0%3|, and for the
+array \lstinline|arr|, \lstinline|[0..19] ∈ [--..--]|.
 \begin{frama-c-commands}
-frama-c -eva ex_nondet.c .../share/libc/__fc_builtin.c
+frama-c -eva ex_nondet.c
 \end{frama-c-commands}
-The inclusion of \lstinline|.../share/libc/__fc_builtin.c| is only required
-when using the functions \lstinline|Frama_C_float_interval| and
-\lstinline|Frama_C_double_interval|. Otherwise, including the file
-\lstinline|__fc_builtin.h| is sufficient.
 
 Note that reads of volatile variables also return a non-deterministic
 value.
