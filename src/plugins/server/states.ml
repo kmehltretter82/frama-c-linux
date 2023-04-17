@@ -33,6 +33,7 @@ let install signal hook = function
         begin
           once := false ;
           add_hook hook ;
+          Request.emit signal ;
         end
     in Request.on_signal signal install
 
