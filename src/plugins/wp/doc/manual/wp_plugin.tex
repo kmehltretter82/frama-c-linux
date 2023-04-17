@@ -1694,7 +1694,7 @@ Strategy consists of list of alternatives with the following syntax:
 
 Each form \emph{alternative} consists of one possible solution to discharge a proof obligation:
 \begin{itemize}
-\item \verb+\provers(p,...,p,time)+ will try the specified provers in parallel
+\item \verb+\provers(p,...,p,time)+ will try the specified provers in sequence
   with a specified timeout. Provers and/or timeout can be omitted, in such a case the
   command-line options \verb+-wp-prover+ and \verb+-wp-timeout+ are used instead.
   Sub-second timeout can also be specified, eg. \verb+0.2+ for 200 milliseconds. Prover
