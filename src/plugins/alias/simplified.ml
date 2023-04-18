@@ -28,8 +28,7 @@ let nul_exp=
   let loc = Location.unknown in
   Cil.zero ~loc
 
-let is_nul_exp e =
-  (Cil_datatype.ExpStructEq.compare e nul_exp) = 0
+let is_nul_exp = Cil_datatype.ExpStructEq.equal nul_exp
 
 module HL = Lval.Hashtbl
 
@@ -59,8 +58,7 @@ let check_cast_compatibility e typ =
 let rec simplify_lval (h,o) =
   try HL.find cached_lval (h,o)
   with Not_found ->
-    let res = (simplify_host h, simplify_offset o)
-    in
+    let res = (simplify_host h, simplify_offset o) in
     HL.add cached_lval (h,o) res;
     res
 
@@ -70,7 +68,7 @@ and simplify_host h =
   | Mem e ->
     let simp_e = simplify_exp e in
     if is_nul_exp simp_e
-    then raise  (Explicit_pointer_address e.eloc)
+    then raise (Explicit_pointer_address e.eloc)
     else Mem simp_e
 
 and simplify_offset o =
@@ -152,7 +150,6 @@ module Simplified_lval = struct
     | BLval lv ->
       BLval (Mem (Cil.dummy_exp (Lval lv)), NoOffset)
 
-
   let is_pointer x =
     match x with
     | BAddrOf _ -> true
@@ -162,7 +159,6 @@ module Simplified_lval = struct
         TPtr _ | TArray _ -> true
       | _ -> false
 end
-
 
 module Simplified_lmap =
 struct
@@ -213,7 +209,6 @@ struct
     in
     fold f_fold s init
 end
-
 
 let decompose_lval (lv1: Simplified_lval.t) : (Simplified_lval.t*offset) list =
   let rec list_of_offset (o: offset) : (offset*offset) list =
