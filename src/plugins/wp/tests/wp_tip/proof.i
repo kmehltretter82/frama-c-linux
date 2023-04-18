@@ -1,4 +1,4 @@
-/* run.config_qualif
+/* run.config
    DONTRUN:
 */
 
