@@ -3220,25 +3220,25 @@ the width of standard integer types, endianness, signedness of the
 features, can be customized using a \texttt{machdep} configuration,
 defining a new machine model.
 
-Machine models are described as \texttt{YAML} files, following
+Machine models are described as \texttt{YAML} files, following the
 \texttt{machdeps/machdep-schema.yaml} schema in \texttt{FRAMAC\_SHARE}.
 Predefined machdeps are also located in the \texttt{machdeps} directory
 of \framac's \texttt{SHARE} directory and can be used as reference for
-defining new \texttt{machdep} by hand. It is also possible to automatically
-generate a \texttt{YAML} file with the \texttt{make\_machdep.py} script in
+defining new \texttt{machdep}s by hand. It is also possible to automatically
+generate an \texttt{YAML} file with the \texttt{make\_machdep.py} script in
 the \texttt{machdeps/make\_machdep} directory. This script requires a
 C11-compliant cross-compiler for the architecture you want to describe.
 Its main options are:
-\begin{itemize}
+\begin{description}
 \item \texttt{-compiler <c>}: the cross-compiler to be used for generating
-  the machdep
+  the machdep.
 \item \texttt{-cpp-arch-flags <flag>}: an option given to the compiler for
 selecting the desired architecture. Multiple occurrences of this option can
-occur if you want to pass several options
+occur if you want to pass several options.
 \item \texttt{-o <file>}: put the generated YAML into the given file (default
 is to use standard output).
-\item \texttt{--help}: outputs the list of all options of the script
-\end{itemize}
+\item \texttt{--help}: outputs the list of all options of the script.
+\end{description}
 
 In order to communicate machine-related information to the preprocessor (notably
 the value of standard macros), \framac generates a specific header,
@@ -3256,7 +3256,7 @@ We present below a thorough description of each field.
 \begin{description}
 \item[\texttt{version}]: human-readable textual description of the machdep.
 \item[\texttt{machdep\_name}]: name of the machdep, must only contain alphanumeric
-  characters. If it is e.g. \verb+custom_name+, the generated header will
+  characters or underscore (\verb+_+). If it is e.g. \verb+custom_name+, the generated header will
   define a macro of the form \verb+__FC_MACHDEP_CUSTOM_NAME+.
 \item[\texttt{compiler}]: defines whether special compiler-specific extensions
   will be enabled. It should be one of the strings below:
@@ -3291,7 +3291,7 @@ We present below a thorough description of each field.
   \item[\texttt{sizeof\_ptr}]: size (in bytes) of an object (non-function)
     pointer.
   \item[\texttt{sizeof\_float}]: size (in bytes) of a single-precision floating
-    point. In implementations compliant with ISO/IEC/IEEE 60559 -IEEE 754,
+    point. In implementations compliant with ISO/IEC/IEEE 60559 - IEEE 754,
     this is always 4.
   \item[\texttt{sizeof\_double}]: size (in bytes) of a double-precision floating
     point. In implementations compliant with ISO/IEC/IEEE 60559 - IEEE 754,
@@ -3344,16 +3344,16 @@ We present below a thorough description of each field.
 \item[\texttt{uint\_fast8\_t}]: a string containing the actual type that
   \verb+uint_fast8_t+ expands to. Usually \verb+unsigned char+.
 \item[\texttt{uint\_fast16\_t}]: a string containing the actual type that
-  \verb+uint_fast16_t+ expands to. Usually \verb+unsigned+ or \verb+unsigned long+.
+  \verb+uint_fast16_t+ expands to. Usually \verb+unsigned int+ or \verb+unsigned long+.
 \item[\texttt{uint\_fast32\_t}]: a string containing the actual type that
   \verb+uint_fast_32_t+ expands to. Usually \verb+unsigned int+ or \verb+unsigned long+.
 \item[\texttt{uint\_fast64\_t}]: a string containing the actual type that
   \verb+uint_fast64_t+ expands to. Usually \verb+unsigned long+ or
   \verb+unsigned long long+.
-\item[\texttt{int\_ptr\_t}]: a string containing the actual type that
-  \verb+int_ptr_t+ expands to, e.g. \verb+long+
-\item[\texttt{uint\_ptr\_t}]: a string containing the actual type that
-  \verb+uint_ptr_t+ expands to, e.g. \verb+unsigned long+
+\item[\texttt{intptr\_t}]: a string containing the actual type that
+  \verb+intptr_t+ expands to, e.g. \verb+long+
+\item[\texttt{uintptr\_t}]: a string containing the actual type that
+  \verb+uintptr_t+ expands to, e.g. \verb+unsigned long+
 \item[\texttt{size\_t}]: a string containing the actual type that
   \verb+size_t+ expands to, e.g. \verb+unsigned long+.
 \item[\texttt{ssize\_t}]: a string containing the actual type that
@@ -3383,7 +3383,7 @@ should be enclosed in parentheses, in order to ensure safe macro expansions).
 
 \begin{description}
   \item[\texttt{bufsiz}]: value of the \texttt{BUFSIZ} macro, i.e. the size
-    of buffers used by I/O functions in \texttt{stdio.h}
+    of buffers used by I/O functions in \texttt{stdio.h}.
   \item[\texttt{eof}]: value of the \texttt{EOF} macro, the value returned by input
     functions in \texttt{stdio.h} to indicate the end of the stream.
   \item[\texttt{errno}]: list of possible errors with their numeric value. In order
@@ -3406,16 +3406,16 @@ should be enclosed in parentheses, in order to ensure safe macro expansions).
     the maximum size of a temporary filename as returned by \texttt{tmpnam}.
   \item[\texttt{mb\_cur\_max}]: value of the \texttt{MB\_CUR\_MAX} macro, which denotes
     the maximum number of bytes for a character in the current locale (usually
-    \texttt{'1'})
+    \texttt{'1'}).
   \item[\texttt{nsig}]: number of possible signals (non-standard macro, can be left
-    empty if undefined for the current machdep)
+    empty if undefined for the current machdep).
   \item[\texttt{path\_max}]: value of the \texttt{PATH\_MAX} macro, which denotes
     the maximum size (including terminating null) that can be stored in a buffer
-    when returning a pathname
+    when returning a pathname.
   \item[\texttt{posix\_version}]: value of the \texttt{\_POSIX\_VERSION} macro.
     Leave empty on non-POSIX machdeps.
   \item[\texttt{rand\_max}]: value of the \texttt{RAND\_MAX} macro, which denotes
-    the maximum value returned by \texttt{rand}
+    the maximum value returned by \texttt{rand}.
   \item[\texttt{tmp\_max}]: value of the \texttt{TMP\_MAX} macro, which denotes
     the minimum number of temporary filenames returned by \texttt{tmpnam} that
     are guaranteed to be distinct.
@@ -3431,7 +3431,7 @@ should be enclosed in parentheses, in order to ensure safe macro expansions).
 \begin{description}
   \item[\texttt{char\_is\_unsigned}]: whether type \verb+char+ is unsigned.
   \item[\texttt{little\_endian}]: whether the machine is little endian or big
-    endian\footnote{More exotic endianness such as mixed-endian are currently unsupported}
+    endian\footnote{More exotic endianness such as mixed-endian are currently unsupported.}.
   \item[\texttt{has\_\_builtin\_va\_list}]: whether \verb+__builtin_va_list+
     is a (built-in) type known by the preprocessor.
   \item[\texttt{\_\_thread\_is\_keyword}]: whether \verb+__thread+ is a
