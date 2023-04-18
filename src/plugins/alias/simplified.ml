@@ -110,7 +110,6 @@ and simplify_exp e =
     res
 
 type simplified_lval =
-    BNone
   | BLval of lval
   | BAddrOf of lval
 
@@ -124,15 +123,12 @@ module Simplified_lval = struct
   let from_exp e =
     let e = simplify_exp e in
     match e.enode with
-      Lval lv -> BLval lv
-    | AddrOf lv -> BAddrOf lv
-    | _ -> BNone
+      Lval lv -> Some (BLval lv)
+    | AddrOf lv -> Some (BAddrOf lv)
+    | _ -> None
 
   let compare x1 x2 =
     match (x1,x2) with
-      (BNone, BNone) -> 0
-    | (BNone, _ ) -> -1
-    | (_,BNone) -> 1
     | (BLval lv1, BLval lv2) -> Cil_datatype.LvalStructEq.compare lv1 lv2
     | (BLval _, _) -> -1
     | (_, BLval _) -> 1
@@ -140,7 +136,6 @@ module Simplified_lval = struct
 
   let print f fmt x =
     match x with
-      BNone -> ()
     | BLval lv -> f fmt lv
     | BAddrOf lv -> Format.fprintf fmt "&%a" f lv
 
@@ -151,19 +146,16 @@ module Simplified_lval = struct
 
   let removeOffsetLval x =
     match x with
-      BNone -> BNone, NoOffset
     | BLval lv -> let lv,o = Cil.removeOffsetLval lv in BLval lv, o
     | BAddrOf lv -> let lv,o = Cil.removeOffsetLval lv in BAddrOf lv, o
 
   let addOffsetLval o x =
     match x with
-      BNone -> BNone
     | BLval lv -> let lv = Cil.addOffsetLval o lv in BLval lv
     | BAddrOf lv -> let lv = Cil.addOffsetLval o lv in BAddrOf lv
 
   let points_to x =
     match x with
-      BNone -> raise (Explicit_pointer_address Location.unknown)
     | BAddrOf lv -> BLval lv
     | BLval lv ->
       BLval (Mem (Cil.dummy_exp (Lval lv)), NoOffset)
@@ -171,7 +163,6 @@ module Simplified_lval = struct
 
   let is_pointer x =
     match x with
-      BNone -> false
     | BAddrOf _ -> true
     | BLval lv ->
       let t = Cil.typeOfLval lv in
@@ -225,7 +216,6 @@ struct
   let fold_lval f s init =
     let f_fold lv acc =
       match lv with
-        BNone -> acc
       | BLval lv -> f lv acc
       | BAddrOf lv -> f lv acc
     in

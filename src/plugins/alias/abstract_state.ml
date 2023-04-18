@@ -508,8 +508,6 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
   assert (not (LLMap.mem blv x.lmap));
   Options.debug ~level:9 "creating a vertex for %a" Lval.pretty blv;
   match blv with
-  | BNone ->
-    Options.fatal "Should not happen: create_vertex_lval %a" Lval.pretty blv
   | BLval lv ->
     begin
       match lv with
@@ -518,8 +516,8 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
         begin
           (* first find the vertex corresponding to e *)
           match Lval.from_exp e with
-          | BNone -> Options.fatal "unexpected result: Lval.from (%a) = BNone" Exp.pretty e
-          | BLval lv1 ->
+          | None -> Options.fatal "unexpected result: Lval.from (%a) = None" Exp.pretty e
+          | Some (BLval lv1) ->
             (* find the vertex *)
             let v1, x = find_or_create_vertex (BLval lv1) x in
             (* then creates a vertex for bvl ONLY IF there is no successor *)
@@ -537,7 +535,7 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
                 succ_v1, {x with lmap = new_lmap ; vmap = new_vmap }
               | _ -> Options.fatal " Invariant violated : more than 1 successor"
             end
-          | BAddrOf lv -> find_or_create_vertex (BLval lv) x
+          | Some (BAddrOf lv) -> find_or_create_vertex (BLval lv) x
         end
       | _ -> create_vertex_simple blv x
     end
@@ -731,10 +729,9 @@ let assignment (a:t) (lv:lval) (e:exp) : t =
   if Cil.isPointerType (Cil.typeOf e)
   then
     let x = Lval.from_lval lv in
-    let y = Lval.from_exp e in
-    match x,y with
-    | BNone, _ | _, BNone -> a
-    | _, y ->
+    match Lval.from_exp e with
+    | None -> a
+    | Some y ->
       let (v1,a) = find_or_create_vertex x a in
       let (v2,a) = find_or_create_vertex y a in
       if List.mem v2 (G.succ a.graph v1) || List.mem v1 (G.succ a.graph v2)
@@ -949,8 +946,8 @@ let make_summary (s: t option) (kf: kernel_function) =
     | Some e ->
       begin
         match s, Lval.from_exp e with
-          None, _ |  _, BNone -> s
-        | Some s, lv ->
+          None, _ |  _, None -> s
+        | Some s, Some lv ->
           let _, new_s = find_or_create_vertex lv s in
           (* Format.printf "DEBUG: new state BEFORE finding %a:%a" Lval.pretty lv (pretty ~debug:true) s; *)
           (* Format.printf "DEBUG: new state AFTER finding %a:%a" Lval.pretty lv (pretty ~debug:true) new_s; *)
@@ -1008,13 +1005,16 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
     let res_ret = match res, summary.return with
       | None, None -> []
       | Some res, Some ret ->
-        [Simplified_lval.from_lval res, Simplified_lval.from_exp ret]
+        [Simplified_lval.from_lval res, Option.get @@ Simplified_lval.from_exp ret]
       | None, Some _ -> []
       | Some _, None -> (* Shouldn't happen: Frama-C adds missing returns *)
         Options.fatal "unexpected case: result without return"
     in
     let simplify_both (arg, formal) =
-      try Some (Lval.from_exp arg, Simplified_lval.from_lval formal)
+      try
+        match Lval.from_exp arg with
+        | None -> None
+        | Some lv -> Some (lv, Simplified_lval.from_lval formal)
       with Explicit_pointer_address loc ->
         Options.warning ~source:(fst loc) ~wkey:Options.Warn.unsupported_address
           "unsupported feature: explicit pointer address: %a; analysis may be unsound"
@@ -1028,16 +1028,12 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   let state, vertex_pairs =
     let state = ref state in
     let find_vertex (lv1, lv2) =
-      match lv1 with
-      | BNone -> None
-      | lv1 -> begin
-          try
-            let v2 = LLMap.find lv2 sum_state.lmap in
-            let v1, new_state = find_or_create_vertex lv1 !state in
-            state := new_state;
-            Some (v1, v2)
-          with Not_found -> None
-        end
+      try
+        let v2 = LLMap.find lv2 sum_state.lmap in
+        let v1, new_state = find_or_create_vertex lv1 !state in
+        state := new_state;
+        Some (v1, v2)
+      with Not_found -> None
     in
     !state, List.filter_map find_vertex arg_formal_pairs
   in

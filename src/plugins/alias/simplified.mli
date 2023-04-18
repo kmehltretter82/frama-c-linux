@@ -23,7 +23,6 @@
 open Cil_types
 
 type simplified_lval =
-    BNone (* anything that is not an adress or a lval *)
   | BLval of lval (* lval *)
   | BAddrOf of lval (* address *)
 
@@ -40,7 +39,7 @@ sig
   val from_lval: lval -> t
 
   (* result stored in cache. May raise Explicit_pointer_address *)
-  val from_exp: exp -> t
+  val from_exp: exp -> t option
 
   val pretty: Format.formatter -> t -> unit
 
