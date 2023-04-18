@@ -74,7 +74,11 @@ struct
   let empty_store ~(stmt : stmt option) : store =
     let limit, merge, flow_actions = match stmt with
       | None -> max_int, false, []
-      | Some stmt -> slevel stmt, merge stmt, flow_actions stmt
+      | Some stmt ->
+        let actions = flow_actions stmt in
+        if Cil.is_skip stmt.skind && actions <> []
+        then max_int, false, actions
+        else slevel stmt, merge stmt, actions
     in
     let rationing = Partition.new_rationing ~limit ~merge in
     {
