@@ -493,7 +493,6 @@ let build_node_writes context node =
   let callstack = node.node_locality.loc_callstack in
   match node.node_kind with
   | Scalar (vi, _typ, offset) ->
-    (* Offset should be constant and no evaluation should be required *)
     let zone = Eval.to_zone (Global vi) (Cil_types.Var vi, offset) in
     build_write_deps ~callstack zone
   | Composite (vi) ->
