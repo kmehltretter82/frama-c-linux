@@ -70,18 +70,15 @@ let warn_unsupported_explicit_pointer pp_obj obj loc =
   Options.warning ~source:(fst loc) ~wkey:Options.Warn.unsupported_address
     "unsupported feature: explicit pointer address: %a; analysis may be unsound" pp_obj obj
 
-let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option =
-  match a with
-  | None -> None
-  | Some a ->
-    try Some (Abstract_state.assignment a lv exp)
-    with Simplified.Explicit_pointer_address loc ->
-      warn_unsupported_explicit_pointer  Printer.pp_exp exp loc;
-      Some a
+let do_assignment (lv:lval) (exp:exp) (a:Abstract_state.t) : Abstract_state.t =
+  try Abstract_state.assignment a lv exp
+  with Simplified.Explicit_pointer_address loc ->
+    warn_unsupported_explicit_pointer  Printer.pp_exp exp loc;
+    a
 
 let rec do_init (lv:lval) (init:init) state =
   match init with
-  | SingleInit e -> do_assignment state lv e
+  | SingleInit e -> Option.map (do_assignment lv e) state
   | CompoundInit (_, l) ->
     List.fold_left (fun state (o, init) -> do_init (Cil.addOffsetLval o lv) init state) state l
 
@@ -135,7 +132,7 @@ let do_cons_init (s:stmt) (v:varinfo) f arg t loc state =
 let analyse_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   match i with
     Set (lv,exp,_) ->
-    let new_a = do_assignment a lv exp in
+    let new_a = Option.map (do_assignment lv exp) a in
     new_a
   | Local_init (v,AssignInit i,_) ->
     let new_a = do_init (Var v, NoOffset) i a in
