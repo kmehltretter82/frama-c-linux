@@ -386,19 +386,19 @@ and pargs env ps trail es =
 
 (* Deep matching with marking *)
 let rec pchildren env p e =
-  match Lang.F.repr e with
-  | Bind _ -> false
-  | _ ->
-    let rs = ref [] in
-    Lang.F.lc_iter (fun e -> rs := e :: !rs) e ;
-    List.exists (pchild env p) (List.rev !rs)
+  let rs = ref [] in
+  Lang.F.lc_iter (fun e -> rs := e :: !rs) e ;
+  List.exists (pchild env p) (List.rev !rs)
 
 and pchild env p e =
-  not (Lang.F.Tset.mem e env.marked) &&
-  begin
-    env.marked <- Lang.F.Tset.add e env.marked ;
-    ptry env p e || pchildren env p e
-  end
+  if Lang.F.lc_closed e then
+    not (Lang.F.Tset.mem e env.marked) &&
+    begin
+      env.marked <- Lang.F.Tset.add e env.marked ;
+      ptry env p e || pchildren env p e
+    end
+  else
+    pchildren env p e
 
 (* -------------------------------------------------------------------------- *)
 (* --- Pattern Lookup                                                     --- *)
