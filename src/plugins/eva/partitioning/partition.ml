@@ -655,8 +655,8 @@ struct
     in
     List.fold_left transfer [] p
 
-  let iter (f : state -> unit) (p : t) : unit =
-    List.iter (fun (_k,x) -> f x) p
+  let iter (f : key -> state -> unit) (p : t) : unit =
+    List.iter (fun (k, x) -> f k x) p
 
   let join_duplicate_keys (p : t) : t =
     let cmp (k, _) (k', _) = Key.compare k k' in
