@@ -251,14 +251,12 @@ let doFunction (kf:kernel_function) =
     match final_state with
     (* final state is None if kf has no definition *)
       None -> None
-    | _ ->
-      begin
-        let summary = Abstract_state.make_summary final_state kf in
-        Options.debug ~level:2 "Summary of function %a:@ @[%a@]"
-          Kernel_function.pretty kf
-          (Abstract_state.pretty_summary ~debug:false) summary;
-        Some summary
-      end
+    | Some fs ->
+      let summary = Abstract_state.make_summary fs kf in
+      Options.debug ~level:2 "Summary of function %a:@ @[%a@]"
+        Kernel_function.pretty kf
+        (Abstract_state.pretty_summary ~debug:false) summary;
+      Some summary
   in
   if Kernel_function.is_main kf then
     let f_name = Options.Dot_output.get () in

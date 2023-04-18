@@ -889,7 +889,7 @@ type summary =
     return : exp option
   }
 
-let make_summary (s : t option) (kf : kernel_function) =
+let make_summary (s : t) (kf : kernel_function) =
   let exp_return : exp option =
     if Kernel_function.has_definition kf then
       let return_stmt = Kernel_function.find_return kf in
@@ -905,16 +905,14 @@ let make_summary (s : t option) (kf : kernel_function) =
     | Some e ->
       begin
         match s, Lval.from_exp e with
-          None, _ |  _, None -> s
-        | Some s, Some lv ->
+          _, None -> s
+        | s, Some lv ->
           let _, new_s = find_or_create_vertex lv s in
-          (* Format.printf "DEBUG: new state BEFORE finding %a:%a" Lval.pretty lv (pretty ~debug:true) s; *)
-          (* Format.printf "DEBUG: new state AFTER finding %a:%a" Lval.pretty lv (pretty ~debug:true) new_s; *)
-          Some new_s
+          new_s
       end
   in
   {
-    state = s;
+    state = Some s;
     formals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_formals kf);
     locals = List.map (fun v -> (Var v,NoOffset))  (Kernel_function.get_locals kf);
     return = exp_return

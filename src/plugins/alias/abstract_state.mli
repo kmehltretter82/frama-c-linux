@@ -116,7 +116,7 @@ val empty : t
 type summary
 
 (** creates a summary from a state and a function *)
-val make_summary : t option -> kernel_function -> summary
+val make_summary : t -> kernel_function -> summary
 
 (** pretty printer *)
 val pretty_summary :  ?debug:bool -> Format.formatter -> summary -> unit
