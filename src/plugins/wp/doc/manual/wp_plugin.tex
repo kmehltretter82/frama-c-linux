@@ -307,8 +307,12 @@ The name of registered strategies is printed on console by using \texttt{-wp-aut
 
 \subsection{General Tactics}
 
-\paragraph{Absurd} Contradict a Hypothesis\\
-The user can select a hypothesis $H$, and change the goal to $\neg H$:
+\paragraph{Absurd} Contradict the Goal or an Hypothesis\\
+The user can prove the goal by contradiction:
+
+$$ \TACTIC{\Delta\models\,G}{\Delta,\neg G\models\,\mathtt{false}} $$
+
+Or the user can select a hypothesis $H$, and change the goal to $\neg H$:
 
 $$ \TACTIC{\Delta,H\models\,G}{\Delta\models\,\neg H} $$
 

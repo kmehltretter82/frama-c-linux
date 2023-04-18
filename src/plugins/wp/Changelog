@@ -29,6 +29,7 @@ Plugin WP 27.0 (Cobalt)
 ###############################################################################
 
 - WP          [2023-05-03] new warning against unions (see -wp-warn-key "union")
+- WP          [2023-18-04] Tactic Absurd now also applies to goal
 - WP          [2023-18-04] New option -wp-status to print unproved goals
 - WP          [2023-17-04] New option -wp-tactic to search for tactics
 - WP          [2023-17-04] New proof engine (selected by 'tip' and 'script' provers)
