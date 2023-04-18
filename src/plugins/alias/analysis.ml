@@ -66,19 +66,18 @@ module Stmt_table = struct
   type value = data
 end
 
-let try_warn_unsupported_explicit_pointer a pp_obj obj f =
-  try f ()
-  with
-    Simplified.Explicit_pointer_address l ->
-    Options.warning ~source:(fst l) ~wkey:Options.Warn.unsupported_address
-      "unsupported feature: explicit pointer address: %a; analysis may be unsound" pp_obj obj;
-    a
+let warn_unsupported_explicit_pointer pp_obj obj loc =
+  Options.warning ~source:(fst loc) ~wkey:Options.Warn.unsupported_address
+    "unsupported feature: explicit pointer address: %a; analysis may be unsound" pp_obj obj
 
 let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option =
   match a with
   | None -> None
-  | Some a -> Some (try_warn_unsupported_explicit_pointer a Printer.pp_exp exp @@
-                    fun () -> Abstract_state.assignment a lv exp)
+  | Some a ->
+    try Some (Abstract_state.assignment a lv exp)
+    with Simplified.Explicit_pointer_address loc ->
+      warn_unsupported_explicit_pointer  Printer.pp_exp exp loc;
+      Some a
 
 let rec do_init (lv:lval) (init:init) state =
   match init with
@@ -99,8 +98,11 @@ let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp
       match (state,res) with
         (None, _) -> None
       | (Some a, None) -> (Options.warning "Memory allocation not stored (ignored)"; Some a)
-      | (Some a, Some lv) -> Some (try_warn_unsupported_explicit_pointer a Printer.pp_stmt stmt @@
-                                   fun () -> Abstract_state.assignment_x_allocate_y a lv)
+      | (Some a, Some lv) ->
+        try Some (Abstract_state.assignment_x_allocate_y a lv)
+        with Simplified.Explicit_pointer_address loc ->
+          warn_unsupported_explicit_pointer Printer.pp_stmt stmt loc;
+          Some a
     end
   | _ ->
     begin
