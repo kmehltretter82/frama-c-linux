@@ -43,8 +43,6 @@ let clear_cache () =
   HL.clear cached_lval;
   HE.clear cached_exp
 
-exception IsExp of exp
-
 exception Explicit_pointer_address of location
 
 let check_cast_compatibility e typ =
@@ -86,25 +84,19 @@ and simplify_exp e =
     HE.find cached_exp e
   with Not_found ->
     let res =
-      try
-        let simplified_enode =
-          match e.enode with
-          | Lval lv -> Lval (simplify_lval lv)
-          | AddrOf lv | StartOf lv -> AddrOf (simplify_lval lv)
-          | BinOp(PlusPI, e1, _, _) | BinOp(MinusPI, e1, _, _) ->
-            begin
-              match (simplify_exp e1).enode with
-              | Lval _ | AddrOf _ as node -> node
-              | _ -> raise (Explicit_pointer_address e1.eloc)
-            end
-          | CastE (typ, e) ->
-            check_cast_compatibility e typ;
-            raise (IsExp (simplify_exp e))
-          | _ -> raise (IsExp nul_exp)
-        in
-        { e with enode = simplified_enode }
-      with IsExp e ->
-        e
+      match e.enode with
+      | CastE (typ, e) ->
+        check_cast_compatibility e typ;
+        simplify_exp e
+      | Lval lv -> {e with enode = Lval (simplify_lval lv)}
+      | AddrOf lv | StartOf lv -> {e with enode = AddrOf (simplify_lval lv)}
+      | BinOp(PlusPI, e1, _, _) | BinOp(MinusPI, e1, _, _) ->
+        begin
+          match (simplify_exp e1).enode with
+          | Lval _ | AddrOf _ as node -> {e with enode = node}
+          | _ -> raise (Explicit_pointer_address e1.eloc)
+        end
+      | _ -> e
     in
     HE.add cached_exp e res;
     res
