@@ -131,15 +131,9 @@ let do_cons_init (s:stmt) (v:varinfo) f arg t loc state =
 
 let analyse_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   match i with
-    Set (lv,exp,_) ->
-    let new_a = Option.map (do_assignment lv exp) a in
-    new_a
-  | Local_init (v,AssignInit i,_) ->
-    let new_a = do_init (Var v, NoOffset) i a in
-    new_a
-  | Local_init (v,ConsInit (f,arg,t),loc) ->
-    let new_a = do_cons_init s v f arg t loc a in
-    new_a
+    Set (lv,exp,_) -> Option.map (do_assignment lv exp) a
+  | Local_init (v,AssignInit i,_) -> do_init (Var v, NoOffset) i a
+  | Local_init (v,ConsInit (f,arg,t),loc) -> do_cons_init s v f arg t loc a
   | Code_annot _ -> a
   | Skip _ -> a
   | Call (res,ef,es,loc) -> (* !function_compute_ref ef *)
