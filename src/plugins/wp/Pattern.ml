@@ -33,6 +33,7 @@ type pvar = string loc
 type ast = node loc
 and node =
   | Any
+  | Pany of ast list
   | Pvar of pvar
   | Named of pvar * ast
   | Range of int * int
@@ -54,7 +55,7 @@ let self p =
   let pattern,self = match p.value with
     | Named(x,_) | Pvar x -> p , x
     | _ ->
-      let x = { loc = p.loc ; value= "#target" } in
+      let x = { loc = p.loc ; value= "\\target" } in
       { loc = p.loc ; value = Named(x,p) } , x
   in
   pattern , { loc = p.loc ; value = Pvar self }
@@ -120,7 +121,7 @@ let rec ptrail rps = function
 let rec parse ctxt p =
   let loc = p.lexpr_loc in
   match p.lexpr_node with
-  | PLvar "_" when ctxt.value -> { loc ; value = Any }
+  | PLvar "_" when not ctxt.value -> { loc ; value = Any }
   | PLvar x -> { loc ; value = Pvar (pvar ctxt ~loc x) }
   | PLnamed(x,p) ->
     let pv = pvar ctxt ~loc x in
@@ -132,8 +133,10 @@ let rec parse ctxt p =
     { loc ; value = Int (pinteger ctxt ~loc n) }
   | PLconstant (StringConstant s) ->
     { loc ; value = String s }
-  | PLrange(Some a,Some b) when ctxt.value ->
+  | PLrange(Some a,Some b) when not ctxt.value ->
     { loc ; value = Range(pbound ctxt a,pbound ctxt b) }
+  | PLapp("\\any",[],ps) when not ctxt.value ->
+    { loc ; value = Pany (List.map (parse ctxt) ps) }
   | PLapp("\\concat",[],[]) -> { loc ; value = List [] }
   | PLapp("\\concat",[],ps) -> concat ~loc @@ List.map (parse ctxt) ps
   | PLapp("\\repeat",[],[p;q]) -> parse_binop ctxt ~loc `Repeat p q
@@ -234,6 +237,11 @@ let rec pp fmt (a : ast) =
     List.iter (Format.fprintf fmt ",@ %a" pp) vs ;
     if trail then Format.fprintf fmt ",@ .." ;
     Format.fprintf fmt ")@]"
+  | Pany [] -> Format.pp_print_string fmt "\\never"
+  | Pany (v::vs) ->
+    Format.fprintf fmt "@[<hov 2>\\any(%a" pp v ;
+    List.iter (Format.fprintf fmt ",@ %a" pp) vs ;
+    Format.fprintf fmt ")@]"
 
 let pp_value = pp
 let pp_pattern = pp
@@ -312,6 +320,9 @@ let rec pmatch env (p : pattern) e =
   | Binop(pl,`Repeat,pn) , Fun(lf,[l;n]) when lf == Vlist.f_repeat ->
     pmatch env pl l ; pmatch env pn n
   | List _vs , _ -> ()
+  | Pany ps , _ ->
+    let ok = List.exists (fun p -> ptry env p e) ps in
+    if not ok then raise Not_found
   | _ -> raise Not_found
 
 and pbinop env p q a b = pmatch env p a ; pmatch env q b
@@ -505,6 +516,7 @@ let rec select (env : sigma) (a : value) =
   let cc = select env in
   match a.value with
   | Any ->  error ~loc "Pattern _ is not a value"
+  | Pany _ ->  error ~loc "Pattern \\any(..) is not a value"
   | String s -> error ~loc "String %S is not a value" s
   | Pvar x -> getvar env x
   | Named (_,v) -> cc v
@@ -636,6 +648,7 @@ let rec typecheck env vt (a : ast) =
   let loc = a.loc in
   match a.value with
   | Any -> vt
+  | Pany ps -> List.fold_left (typecheck env) vt ps
   | Pvar x -> tc_var env ~loc vt x.value
   | Named(x,v) -> tc_var env ~loc (typecheck env vt v) x.value
   | Range(a,b) ->

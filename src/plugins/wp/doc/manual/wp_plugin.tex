@@ -1764,8 +1764,9 @@ following restrictions and meaning:
 \item pattern \verb+_+ matches any value;
 \item pattern \verb+x:p+ matches pattern \verb+p+ and bind its value to variable \verb+x+;
 \item pattern \verb+a..b+ matches integer constants in the specified range;
-\item arithmetic operators have their usual meaning;
+\item pattern \verb+\any(p,...)+ matches any of the specified patterns.
 \item patterns \verb+p[k]+ and \verb+p[k->v]+ matches array operations, e.g. for memory models;
+\item ACSL operators have their usual meaning;
 \item ACSL list operators \verb+[|...|]+, \verb+^+ and \verb+@^+ are also recognized;
 \item function calls must use their printed name, as they appear in proof nodes;
 \item for function patterns, trailing dots can be used to match any number of
