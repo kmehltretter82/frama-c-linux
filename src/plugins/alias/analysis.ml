@@ -48,19 +48,20 @@ module Make_table (H: Hashtbl.S) (V: sig type t val size : int end)
   let iter f = H.iter f tbl
 end
 
-module A = struct type t = Abstract_state.t option let size = 7 end
-module R = struct type t = Abstract_state.summary option let size = 7 end
-
 (* In Function_table, value None means the function has no definition *)
-module Function_table = Make_table (Kernel_function.Hashtbl) (R)
+module Function_table = Make_table (Kernel_function.Hashtbl) (struct
+    type t = Abstract_state.summary option
+    let size = 7
+  end)
 
 let function_compute_ref = Extlib.mk_fun "function_compute"
 
-module D = Dataflow.StartData (A)
-
 (* In Stmt_table, value None means abstract state = Bottom *)
 module Stmt_table = struct
-  include D
+  include Dataflow.StartData (struct
+      type t = Abstract_state.t option
+      let size = 7
+    end)
   type key = stmt
   type value = data
 end
@@ -292,30 +293,28 @@ let computed_flag = ref false
 
 let is_computed () = !computed_flag
 
+let print_stmt_table_elt fmt k v :unit =
+  let print_key = Stmt.pretty in
+  let print_value fmt v =
+    match v with
+    | None -> Format.fprintf fmt "<Bot>"
+    | Some a -> Abstract_state.pretty ~debug:(Options.DebugTable.get ()) fmt a
+  in
+  Format.fprintf fmt "Before statement %a :@[<hov 2> %a@]" print_key k print_value v
+
+let print_function_table_elt fmt kf s : unit =
+  let function_name = Kernel_function.get_name kf in
+  match s with
+  | None -> Options.debug "function %s -> None" function_name
+  | Some s ->
+    Format.fprintf fmt "Summary of function %s:@;<5 2>@[%a@]@."
+      function_name
+      (Abstract_state.pretty_summary ~debug:(Options.DebugTable.get ())) s
+
 let compute () =
   Ast.compute ();
-  Options.debug "Parsing done";
   Globals.Functions.iter (fun kf -> ignore @@ doFunction kf);
-  Options.debug "Functions done";
   computed_flag := true;
-  let print_stmt_table_elt fmt k v :unit =
-    let print_key = Stmt.pretty in
-    let print_value fmt v =
-      match v with
-      | None -> Format.fprintf fmt "<Bot>"
-      | Some a -> Abstract_state.pretty ~debug:(Options.DebugTable.get ()) fmt a
-    in
-    Format.fprintf fmt "Before statement %a :@[<hov 2> %a@]" print_key k print_value v
-  in
-  let print_function_table_elt fmt kf s : unit =
-    let function_name = Kernel_function.get_name kf in
-    match s with
-    | None -> Options.debug "function %s -> None" function_name
-    | Some s ->
-      Format.fprintf fmt "Summary of function %s:@;<5 2>@[%a@]@."
-        function_name
-        (Abstract_state.pretty_summary ~debug:(Options.DebugTable.get ())) s
-  in
   if Options.ShowStmtTable.get () then
     Stmt_table.iter (print_stmt_table_elt Format.std_formatter);
   if Options.ShowFunctionTable.get () then
