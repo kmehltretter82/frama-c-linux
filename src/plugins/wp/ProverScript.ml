@@ -72,7 +72,8 @@ let jconfigure (console : #Tactical.feedback) jtactic goal =
     begin
       match verdict with
       | Applicable process when not console#has_error ->
-        let script = ProofScript.jtactic tactical selection in
+        let strategy = jtactic.strategy in
+        let script = ProofScript.jtactic ?strategy tactical selection in
         Some (script , process)
       | _ -> None
     end
@@ -83,6 +84,7 @@ let jfork tree ?node jtactic =
     ~title:jtactic.header in
   try
     let anchor = ProofEngine.anchor tree ?node () in
+    Option.iter (ProofEngine.set_hint anchor) jtactic.strategy ;
     let goal = ProofEngine.goal anchor in
     let ctxt = ProofEngine.node_context anchor in
     match WpContext.on_context ctxt (jconfigure console jtactic) goal with
@@ -470,12 +472,7 @@ let rec crawl env on_child node = function
           (Printexc.to_string exn)
           Json.pp jtactic.params
           Json.pp jtactic.select ;
-        match jtactic.strategy with
-        | None -> crawl env on_child node alternatives
-        | Some s ->
-          (*TODO TRY STRATEGY FIRST *)
-          ignore s ;
-          crawl env on_child node alternatives
+        crawl env on_child node alternatives
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -597,11 +594,6 @@ let has_proof wpo =
         with _ -> false in
       (Hashtbl.add proofs wid ok ; ok)
     else false
-
-let save ~stdout wpo =
-  let script = ProofEngine.script (ProofEngine.proof ~main:wpo) in
-  Hashtbl.remove proofs wpo.Wpo.po_gid ;
-  ProofSession.save ~stdout wpo (ProofScript.encode script)
 
 let get wpo =
   match ProofEngine.get wpo with

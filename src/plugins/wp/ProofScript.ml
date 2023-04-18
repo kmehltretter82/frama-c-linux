@@ -291,13 +291,19 @@ let jtactic ?strategy (tac : tactical) (sel : selection) =
   }
 
 let json_of_tactic t js =
-  `Assoc [
+  let strategy =
+    match t.strategy with
+    | None -> []
+    | Some s -> [ "strategy" , `String s ]
+  in
+  let tactical = [
     "header" , `String t.header ;
     "tactic" , `String t.tactic ;
     "params" , t.params ;
     "select" , t.select ;
     "children" , `Assoc js ;
-  ]
+  ] in
+  `Assoc (strategy @ tactical)
 
 let children_of_json = function
   | `List js ->

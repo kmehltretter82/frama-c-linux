@@ -629,17 +629,15 @@ let do_collect_session goals =
               | ProofScript.Prover(p,r) -> VCS.is_auto p && VCS.is_valid r
               | ProofScript.Tactic(n,_,_) -> n=0
               | ProofScript.Error _ -> false in
-            let strategy = List.filter keep scripts in
-            if strategy <> [] then
+            let winning = List.filter keep scripts in
+            let file = file goal in
+            if winning <> [] then
               begin
-                let file = file goal in
-                let json = ProofScript.encode strategy in
+                let json = ProofScript.encode winning in
                 updated := (goal, file, json) :: !updated
               end
             else
-            if not (ProofSession.exists goal) then
               begin
-                let file = file goal in
                 let json = ProofScript.encode scripts in
                 incomplete := (goal, file, json) :: !incomplete
               end
