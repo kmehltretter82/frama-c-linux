@@ -345,11 +345,14 @@ let typecheck () =
 (* --- Strategy Hints                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-let hints pid =
+let hints goal =
+  let pid = goal.Wpo.po_pid in
   List.map (fun (name,_) -> Strategies.find name) @@
-  List.filter (fun (_,ps) ->
-      WpPropId.select_by_name ps pid
-    ) (Hints.get ())
+  List.filter (fun (_,ps) -> WpPropId.select_by_name ps pid) @@ Hints.get ()
+
+let has_hint goal =
+  let pid = goal.Wpo.po_pid in
+  List.exists (fun (_,ps) -> WpPropId.select_by_name ps pid) @@ Hints.get ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy Forward Step                                              --- *)
@@ -478,7 +481,7 @@ let tactic tree node strategy = function
             let sigma = bind Pattern.empty sequent t.lookup in
             List.iter (configure tactic sigma) t.params ;
             let selection = select sigma t.select in
-            match tactic#select console selection with
+            match Lang.local ~pool (tactic#select console) selection with
             | exception (Not_found | Exit) -> raise Not_found
             | Not_applicable ->
               raise Not_found

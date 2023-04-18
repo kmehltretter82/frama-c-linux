@@ -33,7 +33,8 @@ val typecheck : unit -> unit
 
 val name : strategy -> string
 val find : string -> strategy option
-val hints : WpPropId.prop_id -> strategy list
+val hints : Wpo.t -> strategy list
+val has_hint : Wpo.t -> bool
 
 val alternatives : strategy -> alternative list
 val provers : alternative -> VCS.prover list * float

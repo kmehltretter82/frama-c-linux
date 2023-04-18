@@ -23,8 +23,7 @@
 open Tactical
 open ProofScript
 
-let dkey_pp_allgoals =
-  Wp_parameters.register_category "script:allgoals"
+let dkey_pp_allgoals = Wp_parameters.register_category "script:allgoals"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Alternatives Ordering                                              --- *)
@@ -330,7 +329,7 @@ let rec sequence (f : 'a -> solver) = function
   | [] -> unknown
   | x::xs -> f x +>> sequence f xs
 
-let rec explore_strategie env p s : solver =
+let rec explore_strategy env p s : solver =
   sequence
     (explore_alternative env p s)
     (ProofStrategy.alternatives s)
@@ -371,7 +370,7 @@ and explore_auto env process a node =
 and explore_fallback env process a node =
   match ProofStrategy.fallback a with
   | None -> failed
-  | Some s -> explore_strategie env process s node
+  | Some s -> explore_strategy env process s node
 
 let explore_hint env process node =
   if ProofEngine.depth node > env.Env.depth then failed
@@ -381,18 +380,18 @@ let explore_hint env process node =
     | Some s ->
       match ProofStrategy.find s with
       | None -> failed
-      | Some s -> explore_strategie env process s node
+      | Some s -> explore_strategy env process s node
 
 let explore_further env process strategy node =
   let marked =
     match ProofEngine.get_hint node with
     | None -> false
     | Some s -> ProofStrategy.name strategy = s
-  in if marked then failed else explore_strategie env process strategy node
+  in if marked then failed else explore_strategy env process strategy node
 
 let explore_further_hints env process =
   let wpo = ProofEngine.main env.Env.tree in
-  sequence (explore_further env process) (ProofStrategy.hints wpo.po_pid)
+  sequence (explore_further env process) (ProofStrategy.hints wpo)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Automated Solving                                                  --- *)

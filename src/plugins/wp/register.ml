@@ -66,35 +66,50 @@ let do_print_index fmt = function
   | Wpo.Axiomatic ax -> Wpo.pp_axiomatics fmt ax
   | Wpo.Function(kf,bhv) -> Wpo.pp_function fmt kf bhv
 
+let rec do_print_parents fmt (node : ProofEngine.node) =
+  Option.iter (do_print_parents fmt) (ProofEngine.parent node) ;
+  Format.fprintf fmt " - %s@\n" (ProofEngine.title node)
+
+let do_print_current fmt tree =
+  match ProofEngine.current tree with
+  | `Main -> ()
+  | `Internal node | `Leaf(_,node) -> do_print_parents fmt node
+
 let do_print_goal_status fmt (g : Wpo.t) =
   if not (Wpo.is_valid g || Wpo.is_smoke_test g) then
     begin
       do_print_index fmt g.po_idx ;
       if ProofSession.exists g then
-        Format.printf "Script %a@\n" ProofSession.pp_file
+        Format.fprintf fmt "Script %a@\n" ProofSession.pp_file
           (ProofSession.filename ~force:false g) ;
-      match ProofEngine.get g with
-      | `None | `Script ->
-        Wpo.pp_goal fmt g
-      | `Proof | `Saved ->
-        let tree = ProofEngine.proof ~main:g in
-        match ProofEngine.status tree with
-        | `Unproved | `Invalid | `Proved | `Passed ->
+      begin
+        match ProofEngine.get g with
+        | `None | `Script ->
           Wpo.pp_goal fmt g
-        | `Pending n | `StillResist n ->
-          for i = 0 to n-1 do
-            Format.fprintf fmt "Subgoal %d/%d:@\n" (succ i) n ;
-            ProofEngine.goto tree (`Leaf i) ;
-            let g = ProofEngine.head tree in
+        | `Proof | `Saved ->
+          let tree = ProofEngine.proof ~main:g in
+          match ProofEngine.status tree with
+          | `Unproved | `Invalid | `Proved | `Passed ->
             Wpo.pp_goal fmt g
-          done
+          | `Pending n | `StillResist n ->
+            for i = 0 to n-1 do
+              Format.fprintf fmt "Subgoal %d/%d:@\n" (succ i) n ;
+              ProofEngine.goto tree (`Leaf i) ;
+              do_print_current fmt tree ;
+              let g = ProofEngine.head tree in
+              Wpo.pp_goal fmt g
+            done
+      end ;
+      Format.pp_print_newline fmt () ;
     end
 
 let do_wp_print_status () =
-  Log.print_on_output
-    (fun fmt ->
-       Wpo.iter
-         ~on_goal:(do_print_goal_status fmt) ())
+  begin
+    Log.print_on_output
+      (fun fmt ->
+         Wpo.iter
+           ~on_goal:(do_print_goal_status fmt) ()) ;
+  end
 
 let do_wp_print () =
   (* Printing *)
@@ -487,7 +502,9 @@ let spawn_wp_proofs ~script goals =
         (fun goal ->
            if  script.tactical
             && not (Wpo.is_trivial goal)
-            && (script.auto <> [] || ProofSession.exists goal)
+            && (script.auto <> [] ||
+                ProofSession.exists goal ||
+                ProofStrategy.has_hint goal)
            then
              ProverScript.spawn
                ~failed:false
