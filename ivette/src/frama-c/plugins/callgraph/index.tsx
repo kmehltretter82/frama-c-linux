@@ -67,6 +67,7 @@ function getWidth(node: any): string {
   }
   return `${min}px`;
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 (style as unknown[]).push({
     selector: 'node',
@@ -192,7 +193,6 @@ function CallgraphComponent(): JSX.Element {
   // Component
   return (
     <>
-      <Ivette.TitleBar />
       <Callgraph />
     </>
   );
