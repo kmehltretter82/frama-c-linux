@@ -69,6 +69,7 @@ README* header_spec=.ignore
 # OCaml
 
 /*.opam* header_spec=.ignore
+/.ocp-indent header_spec=.ignore
 
 #Tests
 
