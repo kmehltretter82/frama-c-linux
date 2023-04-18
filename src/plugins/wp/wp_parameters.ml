@@ -1046,6 +1046,15 @@ let () = on_reset Print.clear
 
 let () = Parameter_customize.set_group wp_po
 let () = Parameter_customize.do_not_save ()
+module Status =
+  Action(struct
+    let option_name = "-wp-status"
+    let help = "Pretty-prints pending proof obligations on standard output."
+  end)
+let () = on_reset Print.clear
+
+let () = Parameter_customize.set_group wp_po
+let () = Parameter_customize.do_not_save ()
 module Report =
   String_list
     (struct

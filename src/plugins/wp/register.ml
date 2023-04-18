@@ -62,8 +62,45 @@ let wp_insert_memory_context model =
 (* ---  Printing informations                                           --- *)
 (* ------------------------------------------------------------------------ *)
 
+let do_print_index fmt = function
+  | Wpo.Axiomatic ax -> Wpo.pp_axiomatics fmt ax
+  | Wpo.Function(kf,bhv) -> Wpo.pp_function fmt kf bhv
+
+let do_print_goal_status fmt (g : Wpo.t) =
+  if not (Wpo.is_valid g || Wpo.is_smoke_test g) then
+    begin
+      do_print_index fmt g.po_idx ;
+      if ProofSession.exists g then
+        Format.printf "Script %a@\n" ProofSession.pp_file
+          (ProofSession.filename ~force:false g) ;
+      match ProofEngine.get g with
+      | `None | `Script ->
+        Wpo.pp_goal fmt g
+      | `Proof | `Saved ->
+        let tree = ProofEngine.proof ~main:g in
+        match ProofEngine.status tree with
+        | `Unproved | `Invalid | `Proved | `Passed ->
+          Wpo.pp_goal fmt g
+        | `Pending n | `StillResist n ->
+          for i = 0 to n-1 do
+            Format.fprintf fmt "Subgoal %d/%d:@\n" (succ i) n ;
+            ProofEngine.goto tree (`Leaf i) ;
+            let g = ProofEngine.head tree in
+            Wpo.pp_goal fmt g
+          done
+    end
+
+let do_wp_print_status () =
+  Log.print_on_output
+    (fun fmt ->
+       Wpo.iter
+         ~on_goal:(do_print_goal_status fmt) ())
+
 let do_wp_print () =
   (* Printing *)
+  if Wp_parameters.Status.get () then
+    do_wp_print_status ()
+  else
   if Wp_parameters.Print.get () then
     try
       Wpo.iter ~on_goal:(fun _ -> raise Exit) () ;
@@ -77,6 +114,9 @@ let do_wp_print () =
              ~on_goal:(Wpo.pp_goal_flow fmt) ())
 
 let do_wp_print_for goals =
+  if Wp_parameters.Status.get () then
+    do_wp_print_status ()
+  else
   if Wp_parameters.Print.get () then
     if Bag.is_empty goals
     then Wp_parameters.result "No proof obligations"
@@ -689,7 +729,9 @@ let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
         do_list_scheduled_result () ;
         do_session ~script goals ;
       end
-    else if not (Wp_parameters.Print.get ()) then
+    else
+    if not (Wp_parameters.Print.get () || Wp_parameters.Status.get ())
+    then
       Bag.iter do_wpo_display goals
   end
 
