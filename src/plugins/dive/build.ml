@@ -208,7 +208,8 @@ let enumerate_cells ~is_folded_base gstmt lval =
   with Abstract_interp.Error_Top ->
   match gstmt with
   | Local (stmt,_) -> Seq.return (Unknown (lval, stmt))
-  | Global _vi -> Seq.return (Error "Global initialization address cannot be resolved")
+  | Global _vi ->
+    Seq.return (Error "Global initialization address cannot be resolved")
 
 let build_node_kind ~is_folded_base gstmt lval =
   match lval with
@@ -221,8 +222,8 @@ let build_node_kind ~is_folded_base gstmt lval =
     | Seq.Cons (node_kind, seq) when Seq.is_empty seq -> node_kind
     | _ ->
       match gstmt with
-      | Global _ -> assert false (* global initializations can always be resolved to one cell  *)
       | Local (stmt ,_) -> Scattered (lval, stmt)
+      | Global _vi -> Error "Global initialization address cannot be resolved"
 
 
 let build_node_locality gstmt node_kind =
