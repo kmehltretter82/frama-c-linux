@@ -763,17 +763,6 @@ let is_included (a1:t) (a2:t) =
   with
     Not_included -> false
 
-module VPairs =
-struct
-  type t = V.t * V.t
-  let compare (x0,y0) (x1,y1) =
-    match V.compare x0 x1 with
-      0 -> V.compare y0 y1
-    | c -> c
-end
-
-module V2Set = Set.Make(VPairs)
-
 let empty :t =
   {graph = G.empty; lmap = LLMap.empty; vmap = VMap.empty}
 
