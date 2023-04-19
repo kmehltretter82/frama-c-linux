@@ -4553,7 +4553,7 @@ int getaddrinfo(char const * restrict nodename,
       }
       tmp_3 = Frama_C_interval(0,43);
       sa->sa_family = (sa_family_t)tmp_3;
-      /*@ slevel 15; */
+      /*@ slevel 15; */ ;
       {
         int i = 0;
         while (i < 14) {
@@ -4565,7 +4565,7 @@ int getaddrinfo(char const * restrict nodename,
           i ++;
         }
       }
-      /*@ slevel default; */
+      /*@ slevel default; */ ;
       ai->ai_flags = 0;
       ai->ai_family = (int)sa->sa_family;
       ai->ai_socktype = Frama_C_interval(0,5);

@@ -50,6 +50,7 @@ int myAge = 0;
     int S1_tmp;
     int main_0_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_increment;
     S1_tmp = S1;
@@ -96,6 +97,7 @@ int myAge = 0;
     int S1_tmp;
     int main_0_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_increment;
     S1_tmp = S1;
@@ -159,6 +161,7 @@ void increment(void)
     int S1_tmp;
     int main_0_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     S1_tmp = S1;
@@ -205,6 +208,7 @@ void increment(void)
     int S1_tmp;
     int main_0_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     S1_tmp = S1;

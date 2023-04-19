@@ -69,6 +69,7 @@ check lemma Init_deterministic_trans{L}:
   void f_pre_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
     if ((unsigned int)2 == aorai_CurStates) aorai_CurStates = aorai_reject;
@@ -109,6 +110,7 @@ check lemma Init_deterministic_trans{L}:
   void f_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
     if ((unsigned int)2 == aorai_CurStates) aorai_CurStates = aorai_reject;
@@ -160,6 +162,7 @@ void f(void)
   void main_pre_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     aorai_CurStates = aorai_reject;
@@ -192,6 +195,7 @@ void f(void)
   void main_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     aorai_CurStates = aorai_reject;
