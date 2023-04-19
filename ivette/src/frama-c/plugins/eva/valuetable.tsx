@@ -347,7 +347,7 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
 
   const isPinned = isPinnedMarker(status);
   const pinText = isPinned ? 'Unpin' : 'Pin';
-  const loc: States.SelectionActions = { location: { fct, marker: target} };
+  const loc: States.SelectionActions = { location: { fct, marker: target } };
   const onClick = (): void => { setSelection(loc); selectProbe(); };
   const onDoubleClick = (): void => pinProbe(!isPinned);
   const onContextMenu = (): void => {
@@ -1041,7 +1041,7 @@ function EvaTable(): JSX.Element {
   /* On meta-selection, pin the selected location. */
   React.useEffect(() => {
     const pin = (loc: States.Location): void => {
-      const {marker, fct} = loc;
+      const { marker, fct } = loc;
       if (marker && fct) setLocPin({ target: marker, fct }, true);
     };
     States.MetaSelection.on(pin);

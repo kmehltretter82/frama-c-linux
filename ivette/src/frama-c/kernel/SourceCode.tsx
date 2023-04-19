@@ -276,7 +276,7 @@ export default function SourceCode(): JSX.Element {
 
   async function displayShortcuts(): Promise<void> {
     await Dialogs.showMessageBox({
-      buttons: [{label: "Ok"}],
+      buttons: [{ label: "Ok" }],
       details: shortcuts,
       message: 'Useful shortcuts'
     });

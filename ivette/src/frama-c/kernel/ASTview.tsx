@@ -161,7 +161,7 @@ const Text = Editor.createTextField<text>(null, textToString);
 
 // This aspect computes the tree representing the currently displayed function's
 // code, represented by the <Text> field.
-const Tree = Editor.createAspect({ t: Text }, ({t}) => rootText(t));
+const Tree = Editor.createAspect({ t: Text }, ({ t }) => rootText(t));
 
 // This aspect computes the markers ranges of the currently displayed function's
 // tree, represented by the <Tree> aspect.
@@ -791,7 +791,7 @@ export default function ASTview(): JSX.Element {
         />
         <Inset />
       </TitleBar>
-      <Component style={{ fontSize: `${fontSize}px`}} />
+      <Component style={{ fontSize: `${fontSize}px` }} />
     </>
   );
 }

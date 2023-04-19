@@ -110,7 +110,7 @@ function computeFcts(
   const arr: functionsData[] = [];
   ker.forEach((kf) => {
     const ef = eva.getData(kf.key);
-    arr.push({...ef, ...kf});
+    arr.push({ ...ef, ...kf });
   });
   return arr.sort((f, g) => alpha(f.name, g.name));
 }

@@ -72,6 +72,8 @@ module.exports = {
     "key-spacing": "error",
     // Disallow trailing whitespace at the end of lines
     "no-trailing-spaces": "error",
+    // Enforce consistent spacing inside braces
+    "object-curly-spacing": ["error", "always"],
     // Enforce consistent spacing before and after semicolons
     "semi-spacing": "error",
     // Enforce location of semicolons
