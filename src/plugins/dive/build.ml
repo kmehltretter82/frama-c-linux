@@ -695,14 +695,9 @@ let add_var context vi =
   let node = build_var ~context gstmt vi in
   complete context node
 
-let add_lval context kinstr lval =
-  let gstmt = match kinstr with
-    | Kglobal ->
-      Global (Cil_datatype.Varinfo.dummy) (* TODO: localize correctly *)
-    | Kstmt stmt ->
-      let callstack = Callstack.init (Kernel_function.find_englobing_kf stmt) in
-      Local (stmt, callstack)
-  in
+let add_lval context stmt lval =
+  let callstack = Callstack.init (Kernel_function.find_englobing_kf stmt) in
+  let gstmt = Local (stmt, callstack) in
   let node = build_lval ~context gstmt lval in
   complete context node
 
@@ -717,7 +712,7 @@ let add_annotation context stmt annot =
 
 let add_instr context stmt = function
   | Set (lval, _, _)
-  | Call (Some lval, _, _, _) -> Some (add_lval context (Kstmt stmt) lval)
+  | Call (Some lval, _, _, _) -> Some (add_lval context stmt lval)
   | Local_init (vi, _, _) -> Some (add_var context vi)
   | Code_annot (annot, _) -> add_annotation context stmt annot
   | _ -> None (* Do nothing for any other instruction *)
@@ -733,9 +728,9 @@ let add_property context = function
   | _ -> None (* Do nothing fo any other property *)
 
 let add_localizable context = function
-  | Printer_tag.PLval (_kf, kinstr, lval) -> Some (add_lval context kinstr lval)
+  | Printer_tag.PIP prop -> add_property context prop
+  | PLval (_kf, Kstmt stmt, lval) -> Some (add_lval context stmt lval)
   | PVDecl (_kf, _kinstr, varinfo) -> Some (add_var context varinfo)
-  | PIP (prop) -> add_property context prop
   | PStmt (_kf, stmt) | PStmtStart (_kf, stmt) -> add_stmt context stmt
   | _ -> None (* Do nothing for any other localizable *)
 
