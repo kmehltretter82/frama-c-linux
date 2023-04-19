@@ -248,16 +248,19 @@ dome-app: dome-pkg dome-templ
 # ---  Application Packaging
 # --------------------------------------------------------------------------
 
-.PHONY: dome-dist
+.PHONY: dome-dist dome-binary dome-appimage
 
-dome-dist: dome-app
+# TODO: choose what the default is
+dome-dist: dome-binary
+
+dome-binary: dome-app
 	@echo "[Dome] packaging application (production)"
 	DOME=$(DOME) yarn run electron-builder --dir -c.compression=store -c.mac.identity=null
 	@echo "[Dome] application packaged in ./dist"
 
 dome-appimage: dome-app
 	@echo "[Dome] packaging application (AppImage)"
-	DOME=$(DOME) yarn run electron-builder --linux
+	DOME=$(DOME) yarn run electron-builder --linux -c.compression=store -c.mac.identity=null
 	@echo "[Dome] application packaged in ./dist"
 
 # --------------------------------------------------------------------------
