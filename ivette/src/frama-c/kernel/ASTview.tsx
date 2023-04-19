@@ -376,15 +376,15 @@ function createDeadCodeGutter(): Editor.Extension {
   return Editor.createGutter(deps, cls, (props, block, view) => {
     const doc = view.state.doc;
     const line = doc.lineAt(block.from);
-    const unreachable = props.unreach.
-      filter(r => r.from <= doc.length).
-      map(r => ({ from: doc.lineAt(r.from).from, to: doc.lineAt(r.to).to })).
-      find(r => r.from <= line.from && line.to <= r.to);
+    const unreachable = props.unreach
+      .filter(r => r.from <= doc.length)
+      .map(r => ({ from: doc.lineAt(r.from).from, to: doc.lineAt(r.to).to }))
+      .find(r => r.from <= line.from && line.to <= r.to);
     if (unreachable) return new DeadCodeGutterMarker('unreachable');
-    const nonTerm = props.nonTerm.
-      filter(r => r.from <= doc.length).
-      map(r => ({ from: doc.lineAt(r.from).from, to: doc.lineAt(r.to).to })).
-      find(r => r.from <= line.from && line.to <= r.to);
+    const nonTerm = props.nonTerm
+      .filter(r => r.from <= doc.length)
+      .map(r => ({ from: doc.lineAt(r.from).from, to: doc.lineAt(r.to).to }))
+      .find(r => r.from <= line.from && line.to <= r.to);
     if (nonTerm) return new DeadCodeGutterMarker('non terminating');
     return null;
   });

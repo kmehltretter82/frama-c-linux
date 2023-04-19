@@ -135,9 +135,9 @@ function useHistory(): [string[], ((hs: string[]) => void)] {
 function insertConfig(hs: string[], cfg: Server.Configuration): string[] {
   const cmd = dumpServerConfig(cfg).trim();
   const newhs =
-    hs.map((h) => h.trim()).
-      filter((h: string) => h !== cmd && h !== '').
-      slice(0, 50);
+    hs.map((h) => h.trim())
+      .filter((h: string) => h !== cmd && h !== '')
+      .slice(0, 50);
   newhs.unshift(cmd);
   return newhs;
 }

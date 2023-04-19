@@ -143,9 +143,9 @@ export class DnD {
 
   handleEvent(e: DraggableEvent): void {
     if (this.dragging && e instanceof MouseEvent) {
-      const element = document.
-        elementsFromPoint(e.clientX, e.clientY).
-        find((elt) => elt !== this.dragging && this.registry.get(elt.id));
+      const element = document
+        .elementsFromPoint(e.clientX, e.clientY)
+        .find((elt) => elt !== this.dragging && this.registry.get(elt.id));
       const hover = element ? this.registry.get(element.id) : undefined;
       const curr = this.hovering;
       if (hover !== curr) {

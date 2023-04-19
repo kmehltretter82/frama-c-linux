@@ -62,7 +62,7 @@ module.exports = {
     // Enforce consistent spacing before and after commas
     "comma-spacing": "error",
     // Enforce consistent newlines before and after dots
-    "dot-location": "error",
+    "dot-location": ["error", "property"],
     // Require newline at the end of files
     "eol-last": "error",
     // Disallow spacing between function identifiers and their invocations
