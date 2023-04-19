@@ -28,8 +28,7 @@ let nul_exp=
   let loc = Location.unknown in
   Cil.zero ~loc
 
-let is_nul_exp e =
-  (Cil_datatype.ExpStructEq.compare e nul_exp) = 0
+let is_nul_exp = Cil_datatype.ExpStructEq.equal nul_exp
 
 module HL = Lval.Hashtbl
 
@@ -42,8 +41,6 @@ let cached_exp = HE.create 37
 let clear_cache () =
   HL.clear cached_lval;
   HE.clear cached_exp
-
-exception IsExp of exp
 
 exception Explicit_pointer_address of location
 
@@ -61,8 +58,7 @@ let check_cast_compatibility e typ =
 let rec simplify_lval (h,o) =
   try HL.find cached_lval (h,o)
   with Not_found ->
-    let res = (simplify_host h, simplify_offset o)
-    in
+    let res = (simplify_host h, simplify_offset o) in
     HL.add cached_lval (h,o) res;
     res
 
@@ -72,7 +68,7 @@ and simplify_host h =
   | Mem e ->
     let simp_e = simplify_exp e in
     if is_nul_exp simp_e
-    then raise  (Explicit_pointer_address e.eloc)
+    then raise (Explicit_pointer_address e.eloc)
     else Mem simp_e
 
 and simplify_offset o =
@@ -86,31 +82,24 @@ and simplify_exp e =
     HE.find cached_exp e
   with Not_found ->
     let res =
-      try
-        let simplified_enode =
-          match e.enode with
-          | Lval lv -> Lval (simplify_lval lv)
-          | AddrOf lv | StartOf lv -> AddrOf (simplify_lval lv)
-          | BinOp(PlusPI, e1, _, _) | BinOp(MinusPI, e1, _, _) ->
-            begin
-              match (simplify_exp e1).enode with
-              | Lval _ | AddrOf _ as node -> node
-              | _ -> raise (Explicit_pointer_address e1.eloc)
-            end
-          | CastE (typ, e) ->
-            check_cast_compatibility e typ;
-            raise (IsExp (simplify_exp e))
-          | _ -> raise (IsExp nul_exp)
-        in
-        { e with enode = simplified_enode }
-      with IsExp e ->
-        e
+      match e.enode with
+      | CastE (typ, e) ->
+        check_cast_compatibility e typ;
+        simplify_exp e
+      | Lval lv -> {e with enode = Lval (simplify_lval lv)}
+      | AddrOf lv | StartOf lv -> {e with enode = AddrOf (simplify_lval lv)}
+      | BinOp(PlusPI, e1, _, _) | BinOp(MinusPI, e1, _, _) ->
+        begin
+          match (simplify_exp e1).enode with
+          | Lval _ | AddrOf _ as node -> {e with enode = node}
+          | _ -> raise (Explicit_pointer_address e1.eloc)
+        end
+      | _ -> e
     in
     HE.add cached_exp e res;
     res
 
 type simplified_lval =
-    BNone
   | BLval of lval
   | BAddrOf of lval
 
@@ -124,15 +113,12 @@ module Simplified_lval = struct
   let from_exp e =
     let e = simplify_exp e in
     match e.enode with
-      Lval lv -> BLval lv
-    | AddrOf lv -> BAddrOf lv
-    | _ -> BNone
+      Lval lv -> Some (BLval lv)
+    | AddrOf lv -> Some (BAddrOf lv)
+    | _ -> None
 
   let compare x1 x2 =
     match (x1,x2) with
-      (BNone, BNone) -> 0
-    | (BNone, _ ) -> -1
-    | (_,BNone) -> 1
     | (BLval lv1, BLval lv2) -> Cil_datatype.LvalStructEq.compare lv1 lv2
     | (BLval _, _) -> -1
     | (_, BLval _) -> 1
@@ -140,7 +126,6 @@ module Simplified_lval = struct
 
   let print f fmt x =
     match x with
-      BNone -> ()
     | BLval lv -> f fmt lv
     | BAddrOf lv -> Format.fprintf fmt "&%a" f lv
 
@@ -151,27 +136,22 @@ module Simplified_lval = struct
 
   let removeOffsetLval x =
     match x with
-      BNone -> BNone, NoOffset
     | BLval lv -> let lv,o = Cil.removeOffsetLval lv in BLval lv, o
     | BAddrOf lv -> let lv,o = Cil.removeOffsetLval lv in BAddrOf lv, o
 
   let addOffsetLval o x =
     match x with
-      BNone -> BNone
     | BLval lv -> let lv = Cil.addOffsetLval o lv in BLval lv
     | BAddrOf lv -> let lv = Cil.addOffsetLval o lv in BAddrOf lv
 
   let points_to x =
     match x with
-      BNone -> raise (Explicit_pointer_address Location.unknown)
     | BAddrOf lv -> BLval lv
     | BLval lv ->
       BLval (Mem (Cil.dummy_exp (Lval lv)), NoOffset)
 
-
   let is_pointer x =
     match x with
-      BNone -> false
     | BAddrOf _ -> true
     | BLval lv ->
       let t = Cil.typeOfLval lv in
@@ -179,7 +159,6 @@ module Simplified_lval = struct
         TPtr _ | TArray _ -> true
       | _ -> false
 end
-
 
 module Simplified_lmap =
 struct
@@ -225,13 +204,11 @@ struct
   let fold_lval f s init =
     let f_fold lv acc =
       match lv with
-        BNone -> acc
       | BLval lv -> f lv acc
       | BAddrOf lv -> f lv acc
     in
     fold f_fold s init
 end
-
 
 let decompose_lval (lv1: Simplified_lval.t) : (Simplified_lval.t*offset) list =
   let rec list_of_offset (o: offset) : (offset*offset) list =

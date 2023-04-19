@@ -129,8 +129,8 @@ struct
   let rec is_sub_offset o1 o2 =
     match (o1,o2) with
       NoOffset, _ -> true
-    | Index (e1,o1), Index(e2,o2) when Cil_datatype.ExpStructEq.equal e1 e2 -> is_sub_offset o1 o2
-    | Field (f1,o1), Field(f2,o2) when Fieldinfo.equal f1 f2 ->  is_sub_offset o1 o2
+    | Index (e1,o1), Index (e2,o2) when Cil_datatype.ExpStructEq.equal e1 e2 -> is_sub_offset o1 o2
+    | Field (f1,o1), Field (f2,o2) when Fieldinfo.equal f1 f2 ->  is_sub_offset o1 o2
     | _ -> false
 
   (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 + o1 = lv *)
@@ -207,7 +207,6 @@ let rec get_points_to (v:V.t) (x:t) : LSet.t =
   LSet.union
     (find_lset v x)
     (LSet.map Lval.points_to set_predecessors)
-
 
 let aliases_of_vertex (v:V.t) (x:t) : LSet.t =
   assert (G.mem_vertex x.graph v);
@@ -319,7 +318,7 @@ let assert_invariants (x:t) : unit =
 (* Ensure that assert_invariants is not executed if the -noassert flag is supplied. *)
 let assert_invariants x = assert (assert_invariants x; true)
 
-let pretty ?(debug=false) fmt (x:t) =
+let pretty ?(debug = false) fmt (x:t) =
   if debug then
     try
       assert_invariants x;
@@ -336,7 +335,7 @@ let lset_to_string (s: LSet.t) : string =
   Format.fprintf fmt "\"%a\"" LSet.pretty s;
   Format.flush_str_formatter ()
 
-module Dot = Graphviz.Dot(struct
+module Dot = Graphviz.Dot (struct
     include G
     let edge_attributes _ = []
     let default_edge_attributes _ = []
@@ -344,8 +343,7 @@ module Dot = Graphviz.Dot(struct
     let vertex_attributes _ = [`Shape `Box]
     let vertex_name (v:V.t) =
       let lset = !find_vertex_name_ref v in
-      let v_name = lset_to_string lset in
-      v_name
+      lset_to_string lset
     let default_vertex_attributes _ = []
     let graph_attributes _ = []
   end)
@@ -375,24 +373,6 @@ let find_transitive_closure  (lv:lval) (x:t) : (G.V.t * LSet.t) list =
     Not_found -> []
 (* TODO : what about offsets ? *)
 
-
-
-(* NB keep this just if we need it for later *)
-(* (\* check that at least 1 lval in a vertex is a pointers *\)
- * let is_pointer_vertex (v: V.t) (a:t) =
- *   assert_invariants a;
- *   assert (G.mem_vertex a.graph v);
- *   let ls : LSet.t = VMap.find v a.vmap in
- *   if LSet.is_empty ls
- *   then not (G.succ a.graph v = [])
- *   else
- *     let is_ptr = LSet.exists (fun x -> Lval.is_pointer x) ls in
- *     (\* TODO: exists -> for_all (it doesn't work with OSCS) *\)
- *     if not (is_ptr)
- *     then assert (G.succ a.graph v = []) ;
- *     is_ptr *)
-
-
 (* NOTE on "constant vertex": a constant vertex represents an unamed
    scalar value (type bottom in steensgaard's paper), or the address
    of a variable. It means that in [vmap], its associated LSet is
@@ -409,7 +389,6 @@ let create_cst_vertex (x:t) : V.t * t =
     lmap = new_lmap ;
     vmap = new_vmap ;
   }
-
 
 (* find all the aliases of lv1 in x, for create_vertex *)
 let find_all_aliases_of_offset (lv1: Lval.t) (x: t) : LSet.t =
@@ -440,7 +419,6 @@ let find_all_aliases_of_offset (lv1: Lval.t) (x: t) : LSet.t =
     f_fold_left
     (LSet.singleton lv1)
     list_of_aliases
-
 
 (* returns the new vertex and the new graph *)
 (* only for function find_or_create vertex *)
@@ -475,7 +453,7 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
         (* then add a constant vertex *)
         let another_v, new_x = create_cst_vertex new_x in
         let new_g = G.add_edge new_x.graph new_v another_v in
-        new_v, {new_x with graph= new_g}
+        new_v, {new_x with graph = new_g}
       | _ ->   new_v ,new_x
     end
   | _ ->
@@ -485,14 +463,14 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
 let create_vertex_addr (lv:lval) (v:V.t) (x:t) : V.t *t =
   let va, x = create_vertex_simple (BAddrOf lv) x in
   let new_g =  G.add_edge x.graph va v in
-  va, { x with graph=new_g}
+  va, { x with graph = new_g}
 
 let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
   let rec f_diff_offset o1 o2 =
     match o1, o2 with
       NoOffset, _ -> o2
-    | Field (_,o1), Field(_,o2) -> f_diff_offset o1 o2
-    | Index (_,o1), Index(_,o2) -> f_diff_offset o1 o2
+    | Field (_,o1), Field (_,o2) -> f_diff_offset o1 o2
+    | Index (_,o1), Index (_,o2) -> f_diff_offset o1 o2
     | _ -> Options.fatal "%s: unexpected case" __LOC__
   in
   let _, o1 = Lval.removeOffsetLval lv1
@@ -508,8 +486,6 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
   assert (not (LLMap.mem blv x.lmap));
   Options.debug ~level:9 "creating a vertex for %a" Lval.pretty blv;
   match blv with
-  | BNone ->
-    Options.fatal "Should not happen: create_vertex_lval %a" Lval.pretty blv
   | BLval lv ->
     begin
       match lv with
@@ -518,8 +494,8 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
         begin
           (* first find the vertex corresponding to e *)
           match Lval.from_exp e with
-          | BNone -> Options.fatal "unexpected result: Lval.from (%a) = BNone" Exp.pretty e
-          | BLval lv1 ->
+          | None -> Options.fatal "unexpected result: Lval.from (%a) = None" Exp.pretty e
+          | Some (BLval lv1) ->
             (* find the vertex *)
             let v1, x = find_or_create_vertex (BLval lv1) x in
             (* then creates a vertex for bvl ONLY IF there is no successor *)
@@ -537,7 +513,7 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
                 succ_v1, {x with lmap = new_lmap ; vmap = new_vmap }
               | _ -> Options.fatal " Invariant violated : more than 1 successor"
             end
-          | BAddrOf lv -> find_or_create_vertex (BLval lv) x
+          | Some (BAddrOf lv) -> find_or_create_vertex (BLval lv) x
         end
       | _ -> create_vertex_simple blv x
     end
@@ -595,7 +571,6 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
         end
     end
 
-
 (* TODO is there a better way to do it ? *)
 let find_vertex lv x =
   let lv = Lval.from_lval lv in
@@ -610,7 +585,7 @@ let remove_lval (x:t)  (lv:Lval.t) :t =
   assert_invariants x;
   try
     let v = LLMap.find lv x.lmap in
-    let setv= VMap.find v x.vmap in
+    let setv = VMap.find v x.vmap in
     let new_lmap = LLMap.remove lv x.lmap in
     let new_vmap = VMap.add v (LSet.remove lv setv) x.vmap in
     let result = {x with lmap = new_lmap; vmap = new_vmap} in
@@ -646,11 +621,6 @@ let merge x v1 v2 =
     (* remove v2 *)
     let g =  G.remove_vertex g v2 in
     {graph = g; lmap = new_lmap; vmap = new_vmap}
-
-
-
-(** functions for steensgard's algorithm *)
-
 
 (* functions join and unify-pointer of steensgaard's paper *)
 let rec join_without_check (x:t) (v1:V.t) (v2:V.t) : t =
@@ -725,16 +695,14 @@ let set_type (x:t) (v1:V.t) (v2:V.t) : t =
   let new_x = {x with graph = new_g ; vmap = new_vmap} in
   assert_invariants new_x ; new_x
 
-
 let assignment (a:t) (lv:lval) (e:exp) : t =
   assert_invariants a;
   if Cil.isPointerType (Cil.typeOf e)
   then
     let x = Lval.from_lval lv in
-    let y = Lval.from_exp e in
-    match x,y with
-    | BNone, _ | _, BNone -> a
-    | _, y ->
+    match Lval.from_exp e with
+    | None -> a
+    | Some y ->
       let (v1,a) = find_or_create_vertex x a in
       let (v2,a) = find_or_create_vertex y a in
       if List.mem v2 (G.succ a.graph v1) || List.mem v1 (G.succ a.graph v2)
@@ -770,14 +738,12 @@ let assignment_x_allocate_y (a:t) (lv:lval) : t =
   | [_v2] -> a
   | _ -> Options.fatal "this should not hapen (invariant broken)"
 
-
-exception Not_included
-
 let is_included (a1:t) (a2:t) =
   (* tests if a1 is included in a2, at least as the nodes with lval *)
   assert_invariants a1;
   assert_invariants a2;
   Options.debug ~level:8 "testing equal %a AND à.%a" (pretty ~debug:true) a1 (pretty ~debug:true) a2;
+  let exception Not_included in
   try
     let iter_lmap (lv:Lval.t) (v1:V.t): unit =
       let v2 : V.t = try LLMap.find lv a2.lmap with Not_found -> raise Not_included in
@@ -795,17 +761,6 @@ let is_included (a1:t) (a2:t) =
     LLMap.iter iter_lmap a1.lmap; true
   with
     Not_included -> false
-
-module VPairs =
-struct
-  type t = V.t * V.t
-  let compare (x0,y0) (x1,y1) =
-    match V.compare x0 x1 with
-      0 -> V.compare y0 y1
-    | c -> c
-end
-
-module V2Set = Set.Make(VPairs)
 
 let empty :t =
   {graph = G.empty; lmap = LLMap.empty; vmap = VMap.empty}
@@ -933,7 +888,7 @@ type summary =
     return : exp option
   }
 
-let make_summary (s: t option) (kf: kernel_function) =
+let make_summary (s : t) (kf : kernel_function) =
   let exp_return : exp option =
     if Kernel_function.has_definition kf then
       let return_stmt = Kernel_function.find_return kf in
@@ -949,21 +904,18 @@ let make_summary (s: t option) (kf: kernel_function) =
     | Some e ->
       begin
         match s, Lval.from_exp e with
-          None, _ |  _, BNone -> s
-        | Some s, lv ->
+          _, None -> s
+        | s, Some lv ->
           let _, new_s = find_or_create_vertex lv s in
-          (* Format.printf "DEBUG: new state BEFORE finding %a:%a" Lval.pretty lv (pretty ~debug:true) s; *)
-          (* Format.printf "DEBUG: new state AFTER finding %a:%a" Lval.pretty lv (pretty ~debug:true) new_s; *)
-          Some new_s
+          new_s
       end
   in
   {
-    state = s;
+    state = Some s;
     formals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_formals kf);
     locals = List.map (fun v -> (Var v,NoOffset))  (Kernel_function.get_locals kf);
     return = exp_return
   }
-
 
 let pretty_summary ?(debug=false) fmt s =
   let print_list_lval fmt (l: lval list) =
@@ -984,7 +936,6 @@ let pretty_summary ?(debug=false) fmt s =
   | Some s when is_empty s -> if debug then Format.fprintf fmt "empty"
   | _ ->
     begin
-      (* Format.fprintf fmt "state not empty"; *)
       Format.fprintf fmt "@[formals: @[%a@]@;<3>locals: @[%a@]@;<3>returns: @[%a@]@;<3>state: @[%a@] "
         print_list_lval s.formals
         print_list_lval s.locals
@@ -1008,13 +959,16 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
     let res_ret = match res, summary.return with
       | None, None -> []
       | Some res, Some ret ->
-        [Simplified_lval.from_lval res, Simplified_lval.from_exp ret]
+        [Simplified_lval.from_lval res, Option.get @@ Simplified_lval.from_exp ret]
       | None, Some _ -> []
       | Some _, None -> (* Shouldn't happen: Frama-C adds missing returns *)
         Options.fatal "unexpected case: result without return"
     in
     let simplify_both (arg, formal) =
-      try Some (Lval.from_exp arg, Simplified_lval.from_lval formal)
+      try
+        match Lval.from_exp arg with
+        | None -> None
+        | Some lv -> Some (lv, Simplified_lval.from_lval formal)
       with Explicit_pointer_address loc ->
         Options.warning ~source:(fst loc) ~wkey:Options.Warn.unsupported_address
           "unsupported feature: explicit pointer address: %a; analysis may be unsound"
@@ -1028,16 +982,12 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   let state, vertex_pairs =
     let state = ref state in
     let find_vertex (lv1, lv2) =
-      match lv1 with
-      | BNone -> None
-      | lv1 -> begin
-          try
-            let v2 = LLMap.find lv2 sum_state.lmap in
-            let v1, new_state = find_or_create_vertex lv1 !state in
-            state := new_state;
-            Some (v1, v2)
-          with Not_found -> None
-        end
+      try
+        let v2 = LLMap.find lv2 sum_state.lmap in
+        let v1, new_state = find_or_create_vertex lv1 !state in
+        state := new_state;
+        Some (v1, v2)
+      with Not_found -> None
     in
     !state, List.filter_map find_vertex arg_formal_pairs
   in

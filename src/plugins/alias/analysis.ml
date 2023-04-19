@@ -32,59 +32,54 @@ module type Table = sig
   (** @raise Not_found if the key is not in the table. *)
 end
 
-module type InternalTable  = sig
+module type InternalTable = sig
   include Table
   val add : key -> value -> unit
   val iter : (key -> value -> unit) -> unit
 end
 
-
-module Make_table(H: Hashtbl.S)(V: sig type t val size :int end) : InternalTable with type key = H.key and type value = V.t = struct
+module Make_table (H: Hashtbl.S) (V: sig type t val size : int end)
+  : InternalTable with type key = H.key and type value = V.t = struct
   type key = H.key
   type value = V.t
   let tbl = H.create V.size
   let add = H.replace tbl
   let find = H.find tbl
-  let iter f =
-    H.iter f tbl
+  let iter f = H.iter f tbl
 end
 
-
-module A = struct type t = Abstract_state.t option let size = 7 end
-module R = struct type t = Abstract_state.summary option let size = 7 end
-
 (* In Function_table, value None means the function has no definition *)
-module Function_table = Make_table(Kernel_function.Hashtbl)(R)
+module Function_table = Make_table (Kernel_function.Hashtbl) (struct
+    type t = Abstract_state.summary option
+    let size = 7
+  end)
 
 let function_compute_ref = Extlib.mk_fun "function_compute"
 
-module D = Dataflow.StartData(A)
-
 (* In Stmt_table, value None means abstract state = Bottom *)
 module Stmt_table = struct
-  include D
+  include Dataflow.StartData (struct
+      type t = Abstract_state.t option
+      let size = 7
+    end)
   type key = stmt
   type value = data
 end
 
-let try_warn_unsupported_explicit_pointer a pp_obj obj f =
-  try f ()
-  with
-    Simplified.Explicit_pointer_address l ->
-    Options.warning ~source:(fst l) ~wkey:Options.Warn.unsupported_address
-      "unsupported feature: explicit pointer address: %a; analysis may be unsound" pp_obj obj;
-    a
+let warn_unsupported_explicit_pointer pp_obj obj loc =
+  Options.warning ~source:(fst loc) ~wkey:Options.Warn.unsupported_address
+    "unsupported feature: explicit pointer address: %a; analysis may be unsound" pp_obj obj
 
-let do_assignment (a:Abstract_state.t option) (lv:lval) (exp:exp) : Abstract_state.t option=
-  match a with
-  | None -> None
-  | Some a -> Some (try_warn_unsupported_explicit_pointer a Printer.pp_exp exp @@
-                    fun () -> Abstract_state.assignment a lv exp)
+let do_assignment (lv:lval) (exp:exp) (a:Abstract_state.t) : Abstract_state.t =
+  try Abstract_state.assignment a lv exp
+  with Simplified.Explicit_pointer_address loc ->
+    warn_unsupported_explicit_pointer  Printer.pp_exp exp loc;
+    a
 
 let rec do_init (lv:lval) (init:init) state =
   match init with
-  | SingleInit e -> do_assignment state lv e
-  | CompoundInit(_, l) ->
+  | SingleInit e -> Option.map (do_assignment lv e) state
+  | CompoundInit (_, l) ->
     List.fold_left (fun state (o, init) -> do_init (Cil.addOffsetLval o lv) init state) state l
 
 let doFunction f = !function_compute_ref f
@@ -100,8 +95,11 @@ let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp
       match (state,res) with
         (None, _) -> None
       | (Some a, None) -> (Options.warning "Memory allocation not stored (ignored)"; Some a)
-      | (Some a, Some lv) -> Some (try_warn_unsupported_explicit_pointer a Printer.pp_stmt stmt @@
-                                   fun () -> Abstract_state.assignment_x_allocate_y a lv)
+      | (Some a, Some lv) ->
+        try Some (Abstract_state.assignment_x_allocate_y a lv)
+        with Simplified.Explicit_pointer_address loc ->
+          warn_unsupported_explicit_pointer Printer.pp_stmt stmt loc;
+          Some a
     end
   | _ ->
     begin
@@ -121,31 +119,24 @@ let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp
       match (state, summary) with
         (None, _) -> None
       | (Some a, Some summary) ->
-        Some(Abstract_state.call a res args summary)
+        Some (Abstract_state.call a res args summary)
       | (Some a, None) ->
         Options.warning ~wkey:Options.Warn.undefined_function ~once:true ~source:(fst loc)
           "function %a has no definition" Exp.pretty ef;
         Some a
     end
 
-let do_cons_init (s:stmt) (v:varinfo) f arg t  loc state =
+let do_cons_init (s:stmt) (v:varinfo) f arg t loc state =
   Cil.treat_constructor_as_func (do_function_call s state) v f arg t loc
-
 
 let analyse_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   match i with
-    Set(lv,exp,_) ->
-    let new_a = do_assignment a lv exp in
-    new_a
-  | Local_init(v,AssignInit i,_) ->
-    let new_a = do_init (Var v, NoOffset) i a in
-    new_a
-  | Local_init(v,ConsInit (f,arg,t),loc) ->
-    let new_a = do_cons_init s v f arg t loc a in
-    new_a
+    Set (lv,exp,_) -> Option.map (do_assignment lv exp) a
+  | Local_init (v,AssignInit i,_) -> do_init (Var v, NoOffset) i a
+  | Local_init (v,ConsInit (f,arg,t),loc) -> do_cons_init s v f arg t loc a
   | Code_annot _ -> a
   | Skip _ -> a
-  | Call(res,ef,es,loc) -> (* !function_compute_ref ef *)
+  | Call (res,ef,es,loc) -> (* !function_compute_ref ef *)
     do_function_call s a res ef es loc
   | Asm (_,_,_,loc) ->
     Options.warning
@@ -167,10 +158,7 @@ let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t 
     Printer.pp_stmt s (pp_abstract_state_opt ~debug:true) result;
   result
 
-
-module T =
-struct
-
+module T = struct
   let name = "alias"
 
   let debug = true (* TODO see options *)
@@ -186,7 +174,7 @@ struct
       None -> Format.fprintf fmt "<No abstract state>"
     | Some a -> Abstract_state.pretty fmt a
 
-  let  computeFirstPredecessor _ a = a
+  let computeFirstPredecessor _ a = a
 
   let combinePredecessors _stmt ~old state =
     match old, state with
@@ -208,7 +196,7 @@ struct
   let doEdge _ _ a = a
 end
 
-module  F = Dataflow.Forwards(T)
+module F = Dataflow.Forwards (T)
 
 let do_stmt (a: Abstract_state.t) (s:stmt) :  Abstract_state.t =
   match s.skind with
@@ -257,14 +245,12 @@ let doFunction (kf:kernel_function) =
     match final_state with
     (* final state is None if kf has no definition *)
       None -> None
-    | _ ->
-      begin
-        let summary = Abstract_state.make_summary final_state kf in
-        Options.debug ~level:2 "Summary of function %a:@ @[%a@]"
-          Kernel_function.pretty kf
-          (Abstract_state.pretty_summary ~debug:false) summary;
-        Some summary
-      end
+    | Some fs ->
+      let summary = Abstract_state.make_summary fs kf in
+      Options.debug ~level:2 "Summary of function %a:@ @[%a@]"
+        Kernel_function.pretty kf
+        (Abstract_state.pretty_summary ~debug:false) summary;
+      Some summary
   in
   if Kernel_function.is_main kf then
     let f_name = Options.Dot_output.get () in
@@ -298,39 +284,36 @@ let computed_flag = ref false
 
 let is_computed () = !computed_flag
 
-let compute () =
-  Ast.compute();
-  Options.debug "Parsing done";
-  Globals.Functions.iter (fun kf -> ignore @@ doFunction kf);
-  Options.debug "Functions done";
-  computed_flag := true;
-  let print_stmt_table_elt fmt k v :unit =
-    let print_key = Stmt.pretty in
-    let print_value fmt v =
-      match v with
-      | None -> Format.fprintf fmt "<Bot>"
-      | Some a -> Abstract_state.pretty ~debug:(Options.DebugTable.get()) fmt a
-    in
-    Format.fprintf fmt "Before statement %a :@[<hov 2> %a@]" print_key k print_value v
+let print_stmt_table_elt fmt k v :unit =
+  let print_key = Stmt.pretty in
+  let print_value fmt v =
+    match v with
+    | None -> Format.fprintf fmt "<Bot>"
+    | Some a -> Abstract_state.pretty ~debug:(Options.DebugTable.get ()) fmt a
   in
-  let print_function_table_elt fmt kf s : unit =
-    let function_name = Kernel_function.get_name kf in
-    match s with
-    | None -> Options.debug "function %s -> None" function_name
-    | Some s ->
-      Format.fprintf fmt "Summary of function %s:@;<5 2>@[%a@]@."
-        function_name
-        (Abstract_state.pretty_summary ~debug:(Options.DebugTable.get())) s
-  in
-  if Options.ShowStmtTable.get() then
-    Stmt_table.iter (print_stmt_table_elt Format.std_formatter);
-  if Options.ShowFunctionTable.get() then
-    Function_table.iter (print_function_table_elt Format.std_formatter)
+  Format.fprintf fmt "Before statement %a :@[<hov 2> %a@]" print_key k print_value v
 
+let print_function_table_elt fmt kf s : unit =
+  let function_name = Kernel_function.get_name kf in
+  match s with
+  | None -> Options.debug "function %s -> None" function_name
+  | Some s ->
+    Format.fprintf fmt "Summary of function %s:@;<5 2>@[%a@]@."
+      function_name
+      (Abstract_state.pretty_summary ~debug:(Options.DebugTable.get ())) s
+
+let compute () =
+  Ast.compute ();
+  Globals.Functions.iter (fun kf -> ignore @@ doFunction kf);
+  computed_flag := true;
+  if Options.ShowStmtTable.get () then
+    Stmt_table.iter (print_stmt_table_elt Format.std_formatter);
+  if Options.ShowFunctionTable.get () then
+    Function_table.iter (print_function_table_elt Format.std_formatter)
 
 let clear () =
   computed_flag := false;
-  Stmt_table.clear()
+  Stmt_table.clear ()
 
 let get_state_before_stmt _kf stmt =
   if is_computed ()
