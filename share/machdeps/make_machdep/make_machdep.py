@@ -40,7 +40,6 @@ by hand afterwards.
 
 import argparse
 import yaml
-import json
 from pathlib import Path
 import re
 import subprocess
@@ -120,9 +119,6 @@ def check_machdep(machdep):
         return True
     except ImportError:
         warnings.warn("jsonschema is not available: no validation will be performed")
-        return True
-    except OSError:
-        warnings.warn(f"error opening {schema_filename}: no validation will be performed")
         return True
     except ValidationError:
         warnings.warn("machdep object is not conforming to machdep schema")
@@ -392,7 +388,7 @@ if proc.returncode == 0:
         lines += f"{line.strip()}\n"
     machdep["custom_defs"] = custom_defs(lines)
 else:
-    warnings.warn(f"could not determine predefined macros")
+    warnings.warn("could not determine predefined macros")
     if args.verbose:
         print(f"compiler output is:{proc.stderr}")
 
