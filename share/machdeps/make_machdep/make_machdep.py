@@ -99,6 +99,9 @@ args, other_args = parser.parse_known_args()
 if not args.compiler_flags:
     args.compiler_flags = ["-c"]
 
+if not args.cpp_arch_flags:
+    args.cpp_arch_flags = []
+
 
 def make_schema():
     schema_filename = my_path.parent / "machdep-schema.yaml"
