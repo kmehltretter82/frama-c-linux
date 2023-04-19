@@ -5575,6 +5575,8 @@ allocation fails.
 
 The following functions, declared in \lstinline|share/libc/__fc_builtin.h|, allow to
 introduce some non-determinism in the analysis.
+These functions are not specific to \Eva{}; their ACSL specifications
+(omitted here for brevity) can be understood by other \FramaC plug-ins.
 
 The results given by
 \Eva{} are
@@ -5585,10 +5587,6 @@ would indeed necessarily pick only a subset of the billions
  of possible entries
 to execute the application.
 
-Note that these functions are not specific to \Eva{}; their ACSL specifications
-(omitted here for brevity) allow them to be understood by any plug-in capable of
-interpreting them.
-
 \begin{listing-nonumber}
 int Frama_C_nondet(int a, int b);
     /* returns either a or b */
@@ -5596,16 +5594,45 @@ int Frama_C_nondet(int a, int b);
 void *Frama_C_nondet_ptr(void *a, void *b);
     /* returns either a or b */
 
-int Frama_C_interval(int min, int max);
-    /* returns any value in the interval from min to max inclusive */
-
-<type> Frama_C_<type>_interval(<type> min, <type> max);
-    /* a series of functions equivalent to Frama_C_interval, but defined
-       for other integer and floating-point types */
-
-double Frama_C_make_unknown(char *p, size_t l);
+void Frama_C_make_unknown(char *p, size_t l);
     /* assigns an arbitrary value to each byte between *p and *(p+l-1) */
+
+int Frama_C_interval(int min, int max);
+    /* returns any int value in the interval from min to max inclusive */
+
+float Frama_C_float_interval(float min, float max);
+    /* returns any float value in the interval from min to max inclusive */
+
+double Frama_C_double_interval(double min, double max);
+    /* returns any double value in the interval from min to max inclusive */
 \end{listing-nonumber}
+
+A series of functions equivalent to \lstinline|Frama_C_interval|
+is defined for other integer and floating-point types:
+they generate ranges containing all values between their two arguments
+(\texttt{min} and \texttt{max}, inclusive) for the given type.
+Here is a complete list of these functions:
+
+\begin{table}[!ht]
+  \centering
+  \begin{tabular}{ll}
+    \lstinline|Frama_C_unsigned_char_interval| &
+    \lstinline|Frama_C_char_interval| \\
+    \lstinline|Frama_C_unsigned_short_interval| &
+    \lstinline|Frama_C_short_interval| \\
+    \lstinline|Frama_C_unsigned_int_interval| &
+    \lstinline|Frama_C_int_interval| \\
+    \lstinline|Frama_C_unsigned_long_interval| &
+    \lstinline|Frama_C_long_interval| \\
+    \lstinline|Frama_C_unsigned_long_long_interval| &
+    \lstinline|Frama_C_long_long_interval| \\
+    \lstinline|Frama_C_interval| (synonym of \lstinline|Frama_C_int_interval|) &
+    \lstinline|Frama_C_size_t_interval| \\
+    \lstinline|Frama_C_float_interval| &
+    \lstinline|Frama_C_double_interval| \\
+    \lstinline|Frama_C_real_interval_as_double|
+  \end{tabular}
+\end{table}
 
 Example of use of the functions introducing non-determinism:
 \csource{examples/nondet.c}
