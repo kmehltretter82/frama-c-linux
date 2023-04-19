@@ -200,7 +200,7 @@ export const jInt: Decoder<number> = (js: json) => {
     return js;
   }
   else {
-    throw new JsonTypeError("integer", js); 
+    throw new JsonTypeError("integer", js);
   }
 };
 
@@ -215,7 +215,7 @@ export const jBoolean: Decoder<boolean> = (js: json) => {
     return js;
   }
   else {
-    throw new JsonTypeError("boolean", js); 
+    throw new JsonTypeError("boolean", js);
   }
 };
 
@@ -235,10 +235,10 @@ export const jString: Decoder<string> = (js: json) => {
       return js;
     }
     else {
-      throw new JsonTypeError("string", js); 
+      throw new JsonTypeError("string", js);
     }
   };
-  
+
 
 /** JSON constant.
     Capture the tag or throw JsonError.
@@ -251,7 +251,7 @@ export function jTag<A>(tg: A): Decoder<A> {
       return tg;
     }
     else {
-      throw new JsonTypeError(`"${tg}"`, js); 
+      throw new JsonTypeError(`"${tg}"`, js);
     }
   };
 }
@@ -589,7 +589,7 @@ export function jKey<K>(kd: K): Decoder<key<K>> {
       return forge(kd, js);
     }
     else {
-      throw new JsonTypeError(`key<${kd}>`, js); 
+      throw new JsonTypeError(`key<${kd}>`, js);
     }
   };
 }
@@ -601,7 +601,7 @@ export function jIndex<K>(kd: K): Decoder<index<K>> {
       return forge(kd, js);
     }
     else {
-      throw new JsonTypeError(`index<${kd}>`, js); 
+      throw new JsonTypeError(`index<${kd}>`, js);
     }
   };
 }

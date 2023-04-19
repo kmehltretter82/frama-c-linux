@@ -86,9 +86,9 @@ function PivotTableBuild(): JSX.Element {
   async function compute(): Promise<void> {
     setComputing(true);
     setError('');
-    Server.send(PivotState.compute, [])
-      .then(() => setComputing(false))
-      .catch((err) => { setComputing(false); handleError(err); });
+    Server.send(PivotState.compute, []).
+      then(() => setComputing(false)).
+      catch((err) => { setComputing(false); handleError(err); });
   }
   if (rawData && rawData.length > 0) {
     return (PivotTable(rawData));

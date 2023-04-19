@@ -66,11 +66,11 @@ function setError(text: string): void {
 // Function launching the external editor at the currently selected position.
 async function edit(file: string, pos: Position, cmd: string): Promise<void> {
   if (file === '') return;
-  const args = cmd
-    .replace('%s', file)
-    .replace('%n', pos.line.toString())
-    .replace('%c', pos.column.toString())
-    .split(' ');
+  const args = cmd.
+    replace('%s', file).
+    replace('%n', pos.line.toString()).
+    replace('%c', pos.column.toString()).
+    split(' ');
   const prog = args.shift(); if (!prog) return;
   const text = `An error has occured when opening the external editor ${prog}`;
   System.spawn(prog, args).catch(() => setError(text));
@@ -276,7 +276,7 @@ export default function SourceCode(): JSX.Element {
 
   async function displayShortcuts(): Promise<void> {
     await Dialogs.showMessageBox({
-      buttons: [{label:"Ok"}],
+      buttons: [{label: "Ok"}],
       details: shortcuts,
       message: 'Useful shortcuts'
     });

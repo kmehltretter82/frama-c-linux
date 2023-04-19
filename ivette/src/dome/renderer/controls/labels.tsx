@@ -63,8 +63,7 @@ export interface LabelProps {
 }
 
 const makeLabel = (className: string) =>
-  function Label
-    (
+  function Label(
       props: LabelProps,
       ref: LegacyRef<HTMLLabelElement> | undefined
     ): JSX.Element {

@@ -118,7 +118,7 @@ function textToString(text: text): string {
 
 // Computes, for each markers of a tree, its range. Returns the map containing
 // all those bindings.
-function markersRanges(tree: Tree): Map<string, Range[]>{
+function markersRanges(tree: Tree): Map<string, Range[]> {
   const ranges: Map<string, Range[]> = new Map();
   const toRanges = (tree: Tree): void => {
     if (!isNode(tree)) return;
@@ -238,7 +238,7 @@ const Hovered = Editor.createField<Marker>(undefined);
 // The Ivette hovered element must be updated by CodeMirror plugins. This
 // field add the callback in the CodeMirror internal state.
 type UpdateHovered = (h: States.Hovered) => void;
-const UpdateHovered = Editor.createField<UpdateHovered>(() => { return ; });
+const UpdateHovered = Editor.createField<UpdateHovered>(() => { return; });
 
 // The Hovered field is updated each time the mouse moves through the CodeMirror
 // document. The handlers updates the Ivette hovered information, which is then
@@ -376,15 +376,15 @@ function createDeadCodeGutter(): Editor.Extension {
   return Editor.createGutter(deps, cls, (props, block, view) => {
     const doc = view.state.doc;
     const line = doc.lineAt(block.from);
-    const unreachable = props.unreach
-      .filter(r => r.from <= doc.length)
-      .map(r => ({ from: doc.lineAt(r.from).from, to: doc.lineAt(r.to).to }))
-      .find(r => r.from <= line.from && line.to <= r.to);
+    const unreachable = props.unreach.
+      filter(r => r.from <= doc.length).
+      map(r => ({ from: doc.lineAt(r.from).from, to: doc.lineAt(r.to).to })).
+      find(r => r.from <= line.from && line.to <= r.to);
     if (unreachable) return new DeadCodeGutterMarker('unreachable');
-    const nonTerm = props.nonTerm
-      .filter(r => r.from <= doc.length)
-      .map(r => ({ from: doc.lineAt(r.from).from, to: doc.lineAt(r.to).to }))
-      .find(r => r.from <= line.from && line.to <= r.to);
+    const nonTerm = props.nonTerm.
+      filter(r => r.from <= doc.length).
+      map(r => ({ from: doc.lineAt(r.from).from, to: doc.lineAt(r.to).to })).
+      find(r => r.from <= line.from && line.to <= r.to);
     if (nonTerm) return new DeadCodeGutterMarker('non terminating');
     return null;
   });

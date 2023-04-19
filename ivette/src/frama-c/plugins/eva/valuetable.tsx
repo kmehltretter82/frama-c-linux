@@ -59,7 +59,7 @@ function getAlarmStatus(alarms: Alarm[] | undefined): string {
 }
 
 type MarkerTracked = [ 'Tracked', boolean ]
-type MarkerPinned  = [ 'Pinned' , boolean ]
+type MarkerPinned  = [ 'Pinned', boolean ]
 type MarkerStatus  = MarkerTracked | MarkerPinned | 'JustFocused'
 
 function MarkerStatusClass(status: MarkerStatus): string {

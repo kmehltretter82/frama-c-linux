@@ -603,7 +603,7 @@ export function usePromise<A>(job: Promise<A>): PromiseHook<A> {
     let c = false;
     const set = (x?: A, e?: Error): void => { setResult(x); setError(e); };
     const doCancel = (): boolean => { if (!c) setLoading(false); return c; };
-    const onResult = (x: A): void => { if (!doCancel()) set(x, undefined);};
+    const onResult = (x: A): void => { if (!doCancel()) set(x, undefined); };
     const onError = (e: Error): void => { if (!doCancel()) set(undefined, e); };
     job.then(onResult, onError);
     return () => { c = true; };

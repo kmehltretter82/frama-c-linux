@@ -310,7 +310,7 @@ const Highlight = Language.syntaxHighlighting(Language.HighlightStyle.define([
   { tag: tags.typeName, class: 'cm-type' },
   { tag: tags.number, class: 'cm-number' },
   { tag: tags.controlKeyword, class: 'cm-keyword' },
-  { tag: tags.definition(tags.variableName) , class: 'cm-def' },
+  { tag: tags.definition(tags.variableName), class: 'cm-def' },
 ]));
 
 // A language provider based on the [Lezer C++ parser], extended with
