@@ -1800,7 +1800,8 @@ Tactic parameters are interpreted as follows:
   value \verb+v+ uses the same syntax as patterns, with pattern variables
   replaced with their matched values. Some tactics support multiple selection,
   in for which \verb+\select(vs)+ can be used. When no selection is specified,
-  the first specified pattern is used as an implicit target.
+  the first specified pattern is used as an implicit target. When no
+  selection nor pattern is selected, the default selection is the proof goal.
 \item \verb+\param(p,v)+ configures the parameter value \verb+p+ of the selected
   tactic with the associated value.
 \item \verb+\child(a,s)+ applies strategy \verb+s+ to proof the sub-goal named

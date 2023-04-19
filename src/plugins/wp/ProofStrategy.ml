@@ -132,12 +132,8 @@ let parse_name ctxt ~kind ?check p =
 let parse_lookup penv ?(head=true) ?(goal=false) ?(hyps=false) p =
   { goal ; hyps ; head ; pattern = Pattern.pa_pattern penv p }
 
-let autoselect tactic select lookup =
+let autoselect select lookup =
   match select , lookup with
-  | [] , [] ->
-    Wp_parameters.error ~source:(fst tactic.loc)
-      "No selection nor pattern for tactic '%s' (unapplicable)" tactic.value ;
-    select, lookup
   | [] , p::ps ->
     let q,v = Pattern.self p.pattern in
     [v] , { p with pattern = q }::ps
@@ -149,7 +145,7 @@ let rec parse_tactic_params ctxt penv
   | [] ->
     let select = List.rev select in
     let lookup = List.rev lookup in
-    let select,lookup = autoselect tactic select lookup in
+    let select,lookup = autoselect select lookup in
     Tactic {
       tactic ; select ; lookup ;
       params = List.rev params ;
@@ -397,8 +393,13 @@ let rec bind sigma sequent = function
     | None -> raise Not_found
     | Some sigma -> bind sigma sequent binders
 
-let select sigma = function
-  | [] -> Tactical.Empty
+let select sigma ?goal = function
+  | [] ->
+    begin
+      match goal with
+      | None -> Tactical.Empty
+      | Some p -> Tactical.(Clause (Goal p))
+    end
   | [v] -> Pattern.select sigma v
   | vs -> Tactical.Multi (List.map (Pattern.select sigma) vs)
 
@@ -478,8 +479,9 @@ let tactic tree node strategy = function
       let subgoals = WpContext.on_context ctxt
           begin fun () ->
             let sigma = bind Pattern.empty sequent t.lookup in
+            let goal = if t.lookup = [] then Some (snd sequent) else None in
+            let selection = select sigma ?goal t.select in
             List.iter (configure tactic sigma) t.params ;
-            let selection = select sigma t.select in
             match Lang.local ~pool (tactic#select console) selection with
             | exception (Not_found | Exit) -> raise Not_found
             | Not_applicable ->
