@@ -28,18 +28,23 @@ include
   end :
    sig
      module Writes: sig
+       type t =
+         | Assign of Cil_types.stmt
+         (** Direct assignment. *)
+         | CallDirect of Cil_types.stmt
+         (** Modification by a called leaf function. *)
+         | CallIndirect of Cil_types.stmt
+         (** Modification inside the body of a called function. *)
+         | GlobalInit of Cil_types.varinfo * Cil_types.initinfo
+         (** Initialization of a global variable. *)
+         | FormalInit of
+             Cil_types.varinfo *
+             (Cil_types.kernel_function * Cil_types.stmt list) list
+         (** Initialization of a formal parameter, with a list of callsites. *)
 
-       (** Given an effect [e], something is directly modified by [e] (through an
-           affectation, or through a call to a leaf function) if [direct] holds, and
-           indirectly (through the effects of a call) otherwise.  *)
-       type effects = {
-         direct: bool (** Direct affectation [lv = ...], or modification through
-                          a call to a leaf function. *);
-         indirect: bool (** Modification inside the body of called function
-                            [f(...)]*);
-       }
+       val compare: t -> t -> int
 
-       val compute: Locations.Zone.t -> (Cil_types.stmt * effects) list
+       val compute: Locations.Zone.t -> t list
        (** [compute z] finds all the statements that modifies [z], and for each
            statement, indicates whether the modification is direct or indirect. *)
 
@@ -47,8 +52,13 @@ include
 
      (** Computations of the statements that read a given memory zone. *)
      module Reads: sig
+       type t =
+         | Direct of Cil_types.stmt
+         (** Direct read by a statement. *)
+         | Indirect of Cil_types.stmt
+         (** Indirect read through a function call. *)
 
-       val compute: Locations.Zone.t -> (Cil_types.stmt * Writes.effects) list
+       val compute: Locations.Zone.t -> t list
        (** [compute z] finds all the statements that read [z]. The [effects]
            information indicates whether the read occur on the given statement,
            or through an inner call for [Call] instructions. *)

@@ -80,7 +80,6 @@ module Kfs_containing_highlighted_stmt =
     end)
 
 let default_icon_name = "gtk-apply"
-let default_icon = Datatype.String.Set.singleton default_icon_name
 
 
 module Make_StmtMapState (Info:sig val name: string end) =
@@ -140,29 +139,44 @@ struct
                     ^"highlight the statements that reads the location pointed to \
                       by D at L")
 
-  let indirect_icon = Datatype.String.Set.singleton "gtk-jump-to"
+  let indirect_icon_name = "gtk-jump-to"
 
-  let conv l =
-    let aux acc (stmt, effects) =
-      let empty = Datatype.String.Set.empty in
-      let direct = if effects.Writes.direct then default_icon else empty in
-      let indirect = if effects.Writes.indirect then indirect_icon else empty in
-      let s = Datatype.String.Set.union direct indirect in
-      if Datatype.String.Set.is_empty s then acc else Stmt.Map.add stmt s acc
+  let add_icon map stmt icon =
+    let update_icons pre =
+      Some(Datatype.String.Set.(add icon (Option.value ~default:empty pre)))
     in
-    List.fold_left aux Stmt.Map.empty l
+    Stmt.Map.update stmt update_icons map
+
+  let add_read map = function
+    | Reads.Direct stmt -> add_icon map stmt default_icon_name
+    | Indirect stmt -> add_icon map stmt indirect_icon_name
+
+  let add_write map = function
+    | Writes.Assign stmt
+    | CallDirect stmt -> add_icon map stmt default_icon_name
+    | CallIndirect stmt -> add_icon map stmt indirect_icon_name
+    | GlobalInit _ -> map
+    | FormalInit (_, callsites) ->
+      let calls = List.flatten (List.map snd callsites) in
+      List.fold_left
+        (fun map stmt -> add_icon map stmt default_icon_name)
+        map
+        calls
 
   let compute op _kf stmt tlv =
     let t = Logic_const.term (TLval tlv) (Cil.typeOfTermLval tlv) in
     let z = eval_tlval stmt t in
     let r, s = match op with
-      | `Reads -> Reads.compute z, "Reads"
-      | `Writes -> Writes.compute z, "Writes"
+      | `Reads ->
+        List.fold_left add_read Stmt.Map.empty (Reads.compute z), "Reads"
+      | `Writes ->
+        List.fold_left add_write Stmt.Map.empty (Writes.compute z), "Writes"
     in
+    State.set r;
     Options.feedback "%s computed" s;
-    match r with
-    | [] -> clear (); s ^ " computed; no statement found."
-    | defs -> State.set (conv defs); s ^ " computed"
+    if Stmt.Map.is_empty r
+    then s ^ " computed; no statement found."
+    else s ^ " computed"
 
   let tag_stmt stmt =
     try

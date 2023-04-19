@@ -183,8 +183,8 @@ let remove_node context node =
   NodeTable.remove context.node_table node_ref;
   context.remove_hook (Node node)
 
-let add_dep context ki src kind dest =
-  let edge = Graph.create_dependency context.graph ki src kind dest in
+let add_dep context ~origin ~kind src dest =
+  let edge = Graph.create_dependency context.graph ~origin ~kind src dest in
   context.update_hook (Edge edge)
 
 let remove_dep context edge =
@@ -199,6 +199,5 @@ let update_node_values context node ~typ ~cvalue ~taint =
   notify_node_update context node
 
 let set_node_writes context node writes =
-  let compare = Cil_datatype.Stmt_Id.compare in
-  node.node_writes_stmts <- List.sort_uniq compare writes;
+  node.node_writes <- List.sort_uniq Studia.Writes.compare writes;
   notify_node_update context node

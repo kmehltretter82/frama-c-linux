@@ -57,6 +57,19 @@ end
 (* --- Data types                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
+let stmt_to_location stmt =
+  let kf = Kernel_function.find_englobing_kf stmt in
+  (kf, Printer_tag.PStmtStart (kf, stmt))
+
+let origin_to_locations = function
+  | Studia.Writes.Assign s
+  | CallDirect s -> [stmt_to_location s]
+  | CallIndirect _s -> []
+  | GlobalInit (_vi, _init) -> []
+  | FormalInit (_vi, callsites) ->
+    List.concat_map (fun (_,l) -> List.map stmt_to_location l) callsites
+
+
 module Range : Data.S with type t = int option range =
 struct
   include Record ()
@@ -282,10 +295,6 @@ struct
 
   include (val publish "node")
 
-  let stmt_to_location stmt =
-    let kf = Kernel_function.find_englobing_kf stmt in
-    (kf, Printer_tag.PStmtStart (kf, stmt))
-
   let node_type node =
     match Node_kind.to_lval node.node_kind with
     | None -> None
@@ -302,7 +311,7 @@ struct
     set is_root node.node_is_root |>
     set backward_explored node.node_writes_computation |>
     set forward_explored node.node_reads_computation |>
-    set writes (List.map stmt_to_location node.node_writes_stmts) |>
+    set writes (List.concat_map origin_to_locations node.node_writes) |>
     set values
       (Option.map (Pretty_utils.to_string Cvalue.V.pretty) node.node_values) |>
     set range node.node_range |>
@@ -336,7 +345,7 @@ struct
     set src n1.node_key |>
     set dst n2.node_key |>
     set dkind  (dep_kind dep.dependency_kind) |>
-    set origins (List.map Node.stmt_to_location dep.dependency_origins) |>
+    set origins (List.concat_map origin_to_locations dep.dependency_origins) |>
     to_json
 end
 
