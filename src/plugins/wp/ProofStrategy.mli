@@ -37,7 +37,7 @@ val hints : Wpo.t -> strategy list
 val has_hint : Wpo.t -> bool
 
 val alternatives : strategy -> alternative list
-val provers : alternative -> VCS.prover list * float
+val provers : ?default:VCS.prover list -> alternative -> VCS.prover list * float
 val auto : alternative -> Strategy.heuristic option
 val fallback : alternative -> strategy option
 val tactic : tree -> node -> strategy -> alternative -> node list option

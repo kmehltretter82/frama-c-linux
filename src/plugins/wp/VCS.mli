@@ -41,6 +41,9 @@ type mode =
 module Pset : Set.S with type elt = prover
 module Pmap : Map.S with type key = prover
 
+(** Mainstream installed provers *)
+val provers : unit -> prover list
+
 val name_of_prover : prover -> string
 val title_of_prover : ?version:bool -> prover -> string
 val filename_for_prover : prover -> string

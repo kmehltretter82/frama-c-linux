@@ -360,13 +360,12 @@ let has_hint goal =
 
 let alternatives s = s.alternatives
 
-let provers = function
-  | Provers(ps,tm) ->
-    let ps = List.filter_map resolve_prover ps in
-    let tm = match tm with
-      | Some tm -> tm
-      | None -> float @@ Wp_parameters.Timeout.get ()
-    in ps,tm
+let timeout = function
+  | Some tm -> tm | None -> float @@ Wp_parameters.Timeout.get ()
+
+let provers ?(default=[]) = function
+  | Provers([],tm) -> default, timeout tm
+  | Provers(ps,tm) -> List.filter_map resolve_prover ps, timeout tm
   | Strategy _ | Tactic _ | Auto _ -> [],0.0
 
 let fallback = function

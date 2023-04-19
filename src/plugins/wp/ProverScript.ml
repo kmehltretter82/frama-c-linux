@@ -343,7 +343,7 @@ and explore_alternative env p s a : solver =
   explore_fallback env p a
 
 and explore_provers env a : solver =
-  let provers,timeout = ProofStrategy.provers a in
+  let provers,timeout = ProofStrategy.provers ~default:env.Env.provers a in
   sequence (explore_prover env timeout) provers
 
 and explore_prover env timeout prover node =
