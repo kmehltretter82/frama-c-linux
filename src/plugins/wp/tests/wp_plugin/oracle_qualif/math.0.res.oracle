@@ -1,4 +1,4 @@
-# frama-c -wp -wp-timeout 100 -wp-steps 1500 [...]
+# frama-c -wp [...]
 [kernel] Parsing math.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
@@ -21,11 +21,11 @@
 [wp] [Valid] typed_lemma_sinh_opp (Alt-Ergo) (Cached)
 [wp] [Valid] typed_lemma_sqrt_mono (Alt-Ergo) (Cached)
 [wp] [Valid] typed_lemma_sqrt_pos (Alt-Ergo) (Cached)
-[wp] [Unsuccess] typed_lemma_tanh_opp (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lemma_tanh_opp (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ok_ensures_sin_asin (Alt-Ergo) (Cached)
-[wp] [Unsuccess] typed_ok_ensures_sin_asin_in_range (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ok_ensures_sin_asin_in_range (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ok_ensures_cos_acos (Alt-Ergo) (Cached)
-[wp] [Unsuccess] typed_ok_ensures_cos_acos_in_range (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ok_ensures_cos_acos_in_range (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ok_ensures_tan_atan (Qed)
 [wp] [Valid] typed_ok_ensures_log_pow (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ok_ensures_log_exp (Qed)
@@ -33,14 +33,13 @@
 [wp] [Valid] typed_ok_ensures_min_plus_distrib (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ok_ensures_sqrt_pos (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ok_ensures_sqrt_pos0 (Alt-Ergo) (Cached)
-[wp] Proved goals:   27 / 30
+[wp] Proved goals:   30 / 30
   Qed:             5
-  Alt-Ergo:       22
-  Unsuccess:       3
+  Alt-Ergo:       25
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
-  Lemma                     3       15       19      94.7%
+  Lemma                     3       16       19       100%
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  ok                        2        7       11      81.8%
+  ok                        2        9       11       100%
 ------------------------------------------------------------
