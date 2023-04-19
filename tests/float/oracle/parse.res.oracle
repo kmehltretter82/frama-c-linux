@@ -18,7 +18,7 @@
 [eva] parse.i:36: Warning: 
   cannot parse floating-point constant, returning imprecise result
 [eva:alarm] parse.i:36: Warning: 
-  non-finite long double value. assert \is_finite((long double)0x1p32767L);
+  non-finite long double value. assert \is_finite(0x1p32767L);
 [eva:alarm] parse.i:37: Warning: 
   non-finite long double value. assert \is_finite(l);
 [eva:alarm] parse.i:37: Warning: 

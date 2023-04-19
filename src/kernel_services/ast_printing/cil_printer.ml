@@ -2530,14 +2530,14 @@ class cil_printer () = object (self)
       fprintf fmt "@[%a@]" self#tand_list (get_tand_list l [r])
     | TBinOp (op,l,r) ->
       fprintf fmt "@[%a@ %a@ %a@]" term l self#term_binop op term r
-    | TCastE (ty,e) ->
+    | TCastE (ty,t) ->
       begin match ty, t.term_node with
         | TFloat(fk,_) , TConst(LReal r as cst) when
             not Kernel.(is_debug_key_enabled dkey_print_logic_coercions) &&
             Floating_point.has_suffix fk r.r_literal ->
           self#logic_constant fmt cst
         | _ ->
-          fprintf fmt "(%a)%a" (self#typ None) ty term e
+          fprintf fmt "(%a)%a" (self#typ None) ty term t
       end
     | TAddrOf lv ->
       fprintf fmt "&%a" (self#term_lval_prec Precedence.addrOfLevel) lv
