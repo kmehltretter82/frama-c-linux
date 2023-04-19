@@ -632,6 +632,9 @@ sig
     (term_offset * Cil_types.logic_type)
   val mk_cast:
     ?explicit:bool -> Cil_types.term -> Cil_types.logic_type -> Cil_types.term
+  val conditional_conversion:
+    Cil_types.location -> Logic_ptree.relation option ->
+    Cil_types.term -> Cil_types.term -> Cil_types.logic_type
   val term : Lenv.t -> Logic_ptree.lexpr -> term
   val predicate : Lenv.t -> Logic_ptree.lexpr -> predicate
   val code_annot :
@@ -1786,23 +1789,15 @@ struct
       in
       mk_mem b TNoOffset
 
+  let string_of_rel = function
+    | Eq -> "eq"
+    | Neq -> "ne"
+    | Le -> "le"
+    | Lt -> "lt"
+    | Ge -> "ge"
+    | Gt -> "gt"
 
-
-  let conditional_conversion loc env rel t1 t2 =
-    let is_rel = Option.is_some rel in
-    (* a comparison is mainly a function of type 'a -> 'a -> Bool/Prop.
-       performs the needed unifications on both sides.*)
-    let var = fresh_type_var "cmp" in
-    let env,_,_ =
-      partial_unif ~overloaded:false loc t1 t1.term_type var env in
-    let env,ty2,_ =
-      partial_unif ~overloaded:false loc t2 t2.term_type var env in
-    (* in case first partial unification did not instantiate all variables
-       we do another pass on t1 with information from t2.
-    *)
-    let env,ty1,_ =
-      partial_unif ~overloaded:false loc t1 t1.term_type var env
-    in
+  let conditional_conversion loc rel t1 t2 =
     let rec aux lty1 lty2 =
       match (unroll_type lty1), (unroll_type lty2) with
       | Ctype ty1, Ctype ty2 ->
@@ -1820,25 +1815,30 @@ struct
           else if is_enum_cst t1 lty2 then lty2
           else if is_enum_cst t2 lty1 then lty1
           else Ctype (C.conditionalConversion ty1 ty2)
-        else if isArithmeticType ty1 && isArithmeticType ty2 then begin
-          if is_same_type lty1 lty2 then begin
-            if is_rel then begin
-              let rel = Option.get rel in
-              let kind =
-                match Cil.unrollType ty1 with
-                | TFloat (FFloat,_) -> "float"
-                | TFloat (FDouble,_) -> "double"
-                | TFloat (FLongDouble,_) -> "long double"
-                | _ -> Kernel.fatal "floating point type expected"
-              in
-              let source = fst loc in
-              Kernel.warning ~source ~wkey:Kernel.wkey_acsl_float_compare
-                "comparing two %s values as real values. You might \
-                 want to use \\%s_%s instead" kind rel kind;
-              Lreal
-            end else lty1
-          end else Lreal
-        end else if is_same_ptr_type ty1 ty2 || is_same_array_type ty1 ty2 then
+        else if isArithmeticType ty1 && isArithmeticType ty2 then
+          begin
+            if is_same_type lty1 lty2 then
+              begin
+                match rel with
+                | None -> lty1
+                | Some rel ->
+                  let kind =
+                    match Cil.unrollType ty1 with
+                    | TFloat (FFloat,_) -> "float"
+                    | TFloat (FDouble,_) -> "double"
+                    | TFloat (FLongDouble,_) -> "long double"
+                    | _ -> Kernel.fatal "floating point type expected"
+                  in
+                  let source = fst loc in
+                  Kernel.warning ~source
+                    ~wkey:Kernel.wkey_acsl_float_compare
+                    "comparing two %s values as real values. You might \
+                     want to use \\%s_%s instead" kind
+                    (string_of_rel rel) kind;
+                  Lreal
+              end else Lreal
+          end else
+        if is_same_ptr_type ty1 ty2 || is_same_array_type ty1 ty2 then
           Ctype (C.conditionalConversion ty1 ty2)
         else if
           (isPointerType ty1 || isArrayType ty1) &&
@@ -1860,25 +1860,43 @@ struct
         when is_integral_type t && name = Utf8_logic.boolean ->
         Ltype(C.find_logic_type Utf8_logic.boolean,[])
       | Lreal, Ctype ty | Ctype ty, Lreal when isArithmeticType ty -> Lreal
-      | Ltype (s1,l1), Ltype (s2,l2)  when s1.lt_name = s2.lt_name &&
-                                           List.for_all2 is_same_type l1 l2 -> lty1
+      | Ltype (s1,l1), Ltype (s2,l2)
+        when s1.lt_name = s2.lt_name && List.for_all2 is_same_type l1 l2 ->
+        lty1
       | Lvar s1, Lvar s2 when s1 = s2 -> lty1
       | Linteger, Linteger -> Linteger
       | (Lreal | Linteger) , (Lreal | Linteger) -> Lreal
-      | Ltype ({lt_name = "\\list"} as lt,[t1]),
-        Ltype({lt_name="\\list"},[t2]) ->
-        Ltype(lt,[aux t1 t2])
-      | Ltype ({lt_name = "set"} as lt,[t1]), Ltype({lt_name="set"},[t2]) ->
-        Ltype(lt,[aux t1 t2])
+      | Ltype ({lt_name = "\\list"} as lt,[ty1]),
+        Ltype({lt_name="\\list"},[ty2]) ->
+        Ltype(lt,[aux ty1 ty2])
+      | Ltype ({lt_name = "set"} as lt,[ty1]), Ltype({lt_name="set"},[ty2]) ->
+        Ltype(lt,[aux ty1 ty2])
       (* implicit conversion to set *)
-      | Ltype ({lt_name = "set"} as lt,[t1]), t2
-      | t1, Ltype({lt_name="set"} as lt,[t2]) -> Ltype(lt,[aux t1 t2])
+      | Ltype ({lt_name = "set"} as lt,[ty1]), ty2
+      | ty1, Ltype({lt_name="set"} as lt,[ty2]) ->
+        Ltype(lt,[aux ty1 ty2])
       | t1, t2 when is_same_type t1 t2 -> t1
       | _ ->
         C.error loc "types %a and %a are not convertible"
           Cil_printer.pp_logic_type lty1 Cil_printer.pp_logic_type lty2
     in
-    let rt = aux ty1 ty2 in
+    aux t1.term_type t2.term_type
+
+  let conditional_common_type loc env rel t1 t2 =
+    (* a comparison is mainly a function of type 'a -> 'a -> Bool/Prop.
+       performs the needed unifications on both sides.*)
+    let var = fresh_type_var "cmp" in
+    let env,_,_ =
+      partial_unif ~overloaded:false loc t1 t1.term_type var env in
+    let env,ty2,_ =
+      partial_unif ~overloaded:false loc t2 t2.term_type var env in
+    (* in case first partial unification did not instantiate all variables
+       we do another pass on t1 with information from t2.
+    *)
+    let env,ty1,_ =
+      partial_unif ~overloaded:false loc t1 t1.term_type var env
+    in
+    let rt = conditional_conversion loc rel t1 t2 in
     env,rt,ty1,ty2
 
   type conversion = NoConv | ArithConv | IntegralConv | PointerConv
@@ -2847,7 +2865,7 @@ struct
       let t2 = term env t2 in
       let t3 = term env t3 in
       let env,ty,ty2,ty3 =
-        conditional_conversion loc env None t2 t3 in
+        conditional_common_type loc env None t2 t3 in
       let t2 = { t2 with term_type = instantiate env t2.term_type } in
       let _,t2 =
         implicit_conversion
@@ -3044,17 +3062,9 @@ struct
     let ty1 = t1.term_type in
     let t2 = ctxt.type_term ctxt env t2 in
     let ty2 = t2.term_type in
-    let rel = match op with
-      | Eq -> "eq"
-      | Neq -> "ne"
-      | Le -> "le"
-      | Lt -> "lt"
-      | Ge -> "ge"
-      | Gt -> "gt"
-    in
     let conditional_conversion t1 t2 =
       let env,t,ty1,ty2 =
-        conditional_conversion loc env (Some rel) t1 t2
+        conditional_common_type loc env (Some op) t1 t2
       in
       let t1 = { t1 with term_type = instantiate env t1.term_type } in
       let _,t1 =
