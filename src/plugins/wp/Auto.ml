@@ -109,6 +109,7 @@ let intuition = TacNormalForm.strategy
 let range = TacRange.strategy
 let split = TacSplit.strategy
 let definition = TacUnfold.strategy
+let compute = TacCompute.strategy
 let instance = TacInstance.strategy
 let lemma = TacLemma.strategy
 

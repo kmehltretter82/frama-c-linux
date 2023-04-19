@@ -20,13 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Built-in Unfold Tactical (auto-registered) *)
+(** Built-in Compute Tactical (auto-registered) *)
 
 open Tactical
 open Strategy
-
-(** @raises Not_found *)
-val unfold : Lang.lfun -> Lang.F.term list -> Lang.F.term
 
 val tactical : tactical
 val strategy : ?priority:float -> selection -> strategy

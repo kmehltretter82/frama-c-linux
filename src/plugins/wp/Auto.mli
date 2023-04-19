@@ -43,6 +43,7 @@ val intuition : ?priority:float -> selection -> strategy
 val range : ?priority:float -> selection -> vmin:int -> vmax:int -> strategy
 val split : ?priority:float -> selection -> strategy
 val definition : ?priority:float -> selection -> strategy
+val compute : ?priority:float -> selection -> strategy
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Registered Heuristics} *)

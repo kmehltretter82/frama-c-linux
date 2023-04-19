@@ -217,6 +217,7 @@ module TacSequence = TacSequence
 module TacShift = TacShift
 module TacSplit = TacSplit
 module TacUnfold = TacUnfold
+module TacCompute = TacCompute
 
 (** {2 Error Management} *)
 

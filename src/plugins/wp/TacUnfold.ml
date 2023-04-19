@@ -49,6 +49,9 @@ let range f es =
       (F.p_leq e (F.e_zint b)) in
   F.e_prop (F.p_all range es)
 
+let unfold f es =
+  try definition f es with Not_found -> range f es
+
 (* Used only for non Multi selection *)
 
 let rec applicable ?at e f es = function
