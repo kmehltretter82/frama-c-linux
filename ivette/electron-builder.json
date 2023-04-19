@@ -4,6 +4,6 @@
   "linux": {
     "icon": "icon.png",
     "target": "appImage",
-    "description": "This is a test"
+    "category": "Developpement"
   }
 }

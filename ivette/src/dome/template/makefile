@@ -253,6 +253,10 @@ dome-app: dome-pkg dome-templ
 dome-dist: dome-app
 	@echo "[Dome] packaging application (production)"
 	DOME=$(DOME) yarn run electron-builder --dir -c.compression=store -c.mac.identity=null
+	@echo "[Dome] application packaged in ./dist"
+
+dome-appimage: dome-app
+	@echo "[Dome] packaging application (AppImage)"
 	DOME=$(DOME) yarn run electron-builder --linux
 	@echo "[Dome] application packaged in ./dist"
 

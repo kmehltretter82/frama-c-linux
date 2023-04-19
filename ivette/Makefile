@@ -82,6 +82,7 @@ dist-dir:
 	@rm -fr dist
 
 dist: dist-dir dome-dist
+appimage: dist-dir dome-appimage
 
 # --------------------------------------------------------------------------
 # --- Ivette Package Loader
@@ -99,6 +100,7 @@ dome-pkg: pkg
 dome-app: pkg
 dome-dev: pkg
 dome-dist: pkg
+dome-appimage: pkg
 
 pkg: $(LOADER) $(SANDBOX)
 
