@@ -85,11 +85,3 @@
   ----------------------------------------------------------------------------
 [kernel] Parsing TMPDIR/aorai_floats_0_prove.i (no preprocessing)
 [wp] Warning: Missing RTE guards
-[aorai-test] Warning: Could not prove ensures
-  aorai_CurStates ≡ B in automaton function square_root_aux_pre_func
-[aorai-test] Warning: Could not prove ensures
-  aorai_CurStates ≡ B in automaton function square_root_aux_pre_func
-[aorai-test] Warning: Could not prove ensures
-  aorai_CurStates ≢ aorai_reject in automaton function square_root_aux_pre_func
-[aorai-test] Warning: Could not prove ensures
-  aorai_CurStates ≢ aorai_reject in automaton function square_root_aux_pre_func

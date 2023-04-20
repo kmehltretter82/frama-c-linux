@@ -176,7 +176,7 @@ check lemma B_deterministic_trans{L}:
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_square_root_aux;
     if ((unsigned int)1 == aorai_CurStates) 
-      if (x >= 1.f) 
+      if (x >= 1.0f) 
         if (x <= n) aorai_CurStates = B; else aorai_CurStates = aorai_reject;
       else aorai_CurStates = aorai_reject;
     else aorai_CurStates = aorai_reject;

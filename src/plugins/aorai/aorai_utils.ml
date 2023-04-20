@@ -399,8 +399,14 @@ let rec term_to_exp t res =
   | TConst (LWStr l) -> new_exp ~loc (Const (CWStr l))
   | TConst (LChr c) -> new_exp ~loc (Const (CChr c))
   | TConst (LReal l_real) ->
-    (* r_nearest is by definition in double precision. *)
-    new_exp ~loc (Const (CReal (l_real.r_nearest, FDouble, None)))
+    let fk,_ = Floating_point.parse l_real.r_literal in
+    let cst =
+      if Cil.isExactFloat fk l_real then
+        (CReal (l_real.r_nearest, fk, Some l_real.r_literal))
+      else (* fallback to double, r_nearest being in that format anyways *)
+        (CReal (l_real.r_nearest, FDouble, None))
+    in
+    new_exp ~loc (Const cst)
   | TConst (LEnum e) -> new_exp ~loc (Const (CEnum e))
   | TLval tlval -> new_exp ~loc (Lval (tlval_to_lval tlval res))
   | TSizeOf ty -> new_exp ~loc (SizeOf ty)
@@ -413,6 +419,15 @@ let rec term_to_exp t res =
   | TBinOp (binop, t1, t2)->
     new_exp ~loc
       (BinOp(binop, term_to_exp t1 res, term_to_exp t2 res, Cil.intType))
+  | TCastE(ty, { term_node = TConst(LReal lreal) })
+    when Cil.isArithmeticType ty && not (Cil.isIntegralType ty) ->
+    (match Cil.unrollType ty with
+     | TFloat(fk,_) ->
+       new_exp ~loc
+         (Const (CReal (lreal.r_nearest,fk,Some lreal.r_literal)))
+     | _ ->
+       Aorai_option.fatal
+         "A floating-point type was expected, got %a." Printer.pp_typ ty)
   | TCastE (ty, t) -> new_exp ~loc (CastE (ty, term_to_exp t res))
   | TAddrOf tlval -> new_exp ~loc (AddrOf (tlval_to_lval tlval res))
   | TStartOf tlval -> new_exp ~loc (StartOf (tlval_to_lval tlval res))
