@@ -1,0 +1,7 @@
+# frama-c -wp -wp-timeout 1 -wp-steps 10 [...]
+[kernel] Parsing no_step_limit.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] 1 goal scheduled
+[wp] [Failure] typed_lemma_truc (no-steps)
+[wp] Proved goals:    0 / 1
+  Failed:          1
