@@ -2,7 +2,7 @@
 [kernel] Parsing binary-multiplication.c (with preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function BinaryMultiplication
-[wp] Goal typed_lemma_ax1_lack : not tried
+[wp] Goal typed_lemma_ax1_ok : not tried
 [wp] Goal typed_lemma_ax2_lack : not tried
 [wp] Goal typed_lemma_ax3_lack : not tried
 [wp] Goal typed_lemma_ax4_ok : not tried
@@ -19,7 +19,7 @@
 [wp] Goal typed_BinaryMultiplication_assert_a3_ok : not tried
 [wp] Goal typed_BinaryMultiplication_assert_a4_ok : not tried
 [wp] Goal typed_BinaryMultiplication_assert_a5_ok : not tried
-[wp] Goal typed_BinaryMultiplication_assert_a6_lack_ok_z3 : not tried
+[wp] Goal typed_BinaryMultiplication_assert_a6_ok : not tried
 [wp] Goal typed_BinaryMultiplication_loop_assigns : trivial
 [wp] Goal typed_BinaryMultiplication_loop_variant_decrease : not tried
 [wp] Goal typed_BinaryMultiplication_loop_variant_positive : not tried

@@ -1265,7 +1265,11 @@ let run_batch pconf driver ~config ?script ~timeout ~steplimit prover task =
   let with_steps = match steps, pconf.Why3.Whyconf.command_steps with
     | None, _ -> false
     | Some _, Some _ -> true
-    | Some _, None -> false
+    | Some _, None ->
+      Wp_parameters.warning ~once:true ~current:false
+        "%a does not support steps limit (ignored option)"
+        Why3.Whyconf.print_prover prover ;
+      false
   in
   let steps = if with_steps then steps else None in
   let command = Why3.Whyconf.get_complete_command pconf ~with_steps in

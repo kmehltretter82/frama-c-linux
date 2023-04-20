@@ -7,7 +7,7 @@
   OPT: -wp -wp-prover no-steps -wp-steps 10 -wp-timeout 1 -wp-cache none -wp-no-cache-env -wp-msg-key shell
 */
 
-// cache is locally deactivated to see the option
+// cache is locally deactivated to be sure that we call the prover
 
 /*@
   lemma truc: \false ;
