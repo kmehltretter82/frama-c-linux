@@ -1896,7 +1896,11 @@ struct
     let env,ty1,_ =
       partial_unif ~overloaded:false loc t1 t1.term_type var env
     in
-    let rt = conditional_conversion loc rel t1 t2 in
+    let rt =
+      conditional_conversion loc rel
+        { t1 with term_type = ty1 }
+        { t2 with term_type = ty2 }
+    in
     env,rt,ty1,ty2
 
   type conversion = NoConv | ArithConv | IntegralConv | PointerConv
