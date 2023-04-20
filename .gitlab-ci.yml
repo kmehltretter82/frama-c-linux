@@ -139,6 +139,12 @@ e-acsl-tests:
   script:
     - ./nix/build-proxy.sh e-acsl-tests
 
+e-acsl-dev-tests:
+  stage: tests
+  script:
+    - ./nix/build-proxy.sh e-acsl-dev-tests
+  allow_failure: true
+
 .build_template: &eva_template
   stage: tests
   script:
