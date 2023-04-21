@@ -82,7 +82,6 @@ dist-dir:
 	@rm -fr dist
 
 dist: dist-dir dome-dist
-binary: dist-dir dome-binary
 appimage: dist-dir dome-appimage
 
 # --------------------------------------------------------------------------
