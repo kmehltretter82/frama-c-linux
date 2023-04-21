@@ -30,6 +30,10 @@ open Cil_types
 (** {2 Getting annotations} *)
 (**************************************************************************)
 
+val add_hook_on_change: (unit -> unit) -> unit
+(** Emitted whenever anhy of the annotation tables are modified.
+    @since Frama-C+dev *)
+
 (**************************************************************************)
 (** {3 Code annotations} *)
 (**************************************************************************)

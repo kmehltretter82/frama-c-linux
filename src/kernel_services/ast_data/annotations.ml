@@ -155,6 +155,19 @@ let () =
        let kf = find_englobing_kf stmt in
        List.iter (fun a -> clear_linked_to_annot kf stmt e a) !l)
 
+let add_hook_on_change f =
+  begin
+    let notify _ _ _ = f () in
+    Globals.add_hook_on_update notify ;
+    Globals.add_hook_on_remove notify ;
+    Model_fields.add_hook_on_update notify ;
+    Model_fields.add_hook_on_remove notify ;
+    Funspecs.add_hook_on_update notify ;
+    Funspecs.add_hook_on_remove notify ;
+    Code_annots.add_hook_on_update notify ;
+    Code_annots.add_hook_on_remove notify ;
+  end
+
 (**************************************************************************)
 (** {2 Getting annotations} *)
 (**************************************************************************)
