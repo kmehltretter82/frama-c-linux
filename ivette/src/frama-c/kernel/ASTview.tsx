@@ -118,7 +118,7 @@ function textToString(text: text): string {
 
 // Computes, for each markers of a tree, its range. Returns the map containing
 // all those bindings.
-function markersRanges(tree: Tree): Map<string, Range[]>{
+function markersRanges(tree: Tree): Map<string, Range[]> {
   const ranges: Map<string, Range[]> = new Map();
   const toRanges = (tree: Tree): void => {
     if (!isNode(tree)) return;
@@ -161,7 +161,7 @@ const Text = Editor.createTextField<text>(null, textToString);
 
 // This aspect computes the tree representing the currently displayed function's
 // code, represented by the <Text> field.
-const Tree = Editor.createAspect({ t: Text }, ({t}) => rootText(t));
+const Tree = Editor.createAspect({ t: Text }, ({ t }) => rootText(t));
 
 // This aspect computes the markers ranges of the currently displayed function's
 // tree, represented by the <Tree> aspect.
@@ -238,7 +238,7 @@ const Hovered = Editor.createField<Marker>(undefined);
 // The Ivette hovered element must be updated by CodeMirror plugins. This
 // field add the callback in the CodeMirror internal state.
 type UpdateHovered = (h: States.Hovered) => void;
-const UpdateHovered = Editor.createField<UpdateHovered>(() => { return ; });
+const UpdateHovered = Editor.createField<UpdateHovered>(() => { return; });
 
 // The Hovered field is updated each time the mouse moves through the CodeMirror
 // document. The handlers updates the Ivette hovered information, which is then
@@ -791,7 +791,7 @@ export default function ASTview(): JSX.Element {
         />
         <Inset />
       </TitleBar>
-      <Component style={{ fontSize: `${fontSize}px`}} />
+      <Component style={{ fontSize: `${fontSize}px` }} />
     </>
   );
 }

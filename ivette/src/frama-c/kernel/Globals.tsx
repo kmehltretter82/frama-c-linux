@@ -104,13 +104,13 @@ type functionsData =
 type FctKey = Json.key<'#functions'>;
 
 function computeFcts(
-  ker: States.ArrayProxy<FctKey,Kernel.functionsData>,
-  eva: States.ArrayProxy<FctKey,Eva.functionsData>,
+  ker: States.ArrayProxy<FctKey, Kernel.functionsData>,
+  eva: States.ArrayProxy<FctKey, Eva.functionsData>,
 ): functionsData[] {
   const arr: functionsData[] = [];
   ker.forEach((kf) => {
     const ef = eva.getData(kf.key);
-    arr.push({...ef,...kf});
+    arr.push({ ...ef, ...kf });
   });
   return arr.sort((f, g) => alpha(f.name, g.name));
 }
@@ -121,7 +121,7 @@ export default function Globals(): JSX.Element {
   const [selection, updateSelection] = States.useSelection();
   const ker = States.useSyncArrayProxy(Kernel.functions);
   const eva = States.useSyncArrayProxy(Eva.functions);
-  const fcts = React.useMemo(() => computeFcts(ker,eva), [ker,eva]);
+  const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
   const { useFlipSettings } = Dome;
   const [stdlib, flipStdlib] =
     useFlipSettings('ivette.globals.stdlib', false);

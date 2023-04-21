@@ -39,7 +39,7 @@ import * as Json from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { ChildProcess } from 'child_process';
 import { client } from './client_socket';
-//import { client } from './client_zmq';
+// import { client } from './client_zmq';
 
 // --------------------------------------------------------------------------
 // --- Server Status

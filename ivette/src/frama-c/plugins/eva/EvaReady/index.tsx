@@ -28,7 +28,7 @@ import Gallery from 'dome/controls/gallery.json';
 import gearsIcon from '../images/gears.svg';
 import './style.css';
 
-const EvaReady: React.FC = ({children}) => {
+const EvaReady: React.FC = ({ children }) => {
   const state = States.useSyncValue(Eva.computationState);
 
   switch (state) {
