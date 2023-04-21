@@ -205,7 +205,8 @@ struct
   let to_json loc = `String (tag loc)
   let of_json js =
     try find (Js.to_string js)
-    with Not_found -> Data.failure "not a localizable marker"
+    with Not_found ->
+      Data.failure "invalid marker (%a)" Json.pp_dump js
 
 end
 
@@ -466,6 +467,7 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`GET ~name:"printFunction"
     ~descr:(Md.plain "Print the AST of a function")
+    ~signals:[changed_signal]
     ~input:(module Function) ~output:(module Jtext)
     begin fun kf ->
       let libc = Kernel.PrintLibc.get () in

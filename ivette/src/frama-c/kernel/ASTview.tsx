@@ -688,7 +688,7 @@ function useFctCallers(fct: Fct): Eva.CallSite[] {
 
 // Server request handler returning the given function's callers.
 function useCallees(marker: Marker): Fct[] {
-  return States.useRequest(Eva.getCallees, marker) ?? [];
+  return States.useRequest(Eva.getCallees, marker || undefined) ?? [];
 }
 
 // Server request handler returning the tainted lvalues.
