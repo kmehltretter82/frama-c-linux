@@ -117,6 +117,11 @@ module type Ref = sig
 
   val clear: unit -> unit
   (** Reset the reference to its default value. *)
+
+  val add_hook_on_change: (data -> unit) -> unit
+  (** Add an hook which applied each time (just after) the value of the state
+      changes inside the current project.
+      @since Frama-C+dev *)
 end
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
@@ -314,6 +319,15 @@ module Hashconsing_tbl: Hashconsing_tbl
     custom [rehash] function (see {!Project.DATATYPE_OUTPUT.rehash}) *)
 (* ************************************************************************* *)
 
+(** Events emitted when an [Hashtbl] state changes. *)
+type ('k,'v) hashtbl_event =
+  | Update of ('k * 'v)
+  (** A bidning in the hashtable has been added or modified *)
+  | Remove of 'k
+  (** A biding in the hashtable has been removed *)
+  | Clear
+  (** The hashtabl has been cleared *)
+
 (** Output signature of builders of hashtables. *)
 module type Hashtbl = sig
   include S
@@ -365,6 +379,11 @@ module type Hashtbl = sig
   val to_seq: unit -> (key * data) Seq.t
   (** Iterate on the whole table.
       @since 27.0-Cobalt *)
+
+  val add_hook_on_change: ((key, data) hashtbl_event -> unit) -> unit
+  (** Add an hook which applied each time (just after) a (key,value) pair in
+      the hashtable changes inside the current project.
+      @since Frama-C+dev *)
 end
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
