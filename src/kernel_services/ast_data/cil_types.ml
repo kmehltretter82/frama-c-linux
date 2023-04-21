@@ -1854,7 +1854,7 @@ type syntactic_scope =
       @since Frama-C+dev
   *)
   | Block_scope of stmt
-  (** globals + all locals of the blocks to which the given statement
+  (** locals (including static locals) of the block to which the given statement
       belongs. *)
   | Whole_function of kernel_function
   (** same as above, but any local variable of the given function, regardless of

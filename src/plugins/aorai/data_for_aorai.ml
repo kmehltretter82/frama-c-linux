@@ -580,7 +580,7 @@ let memo_aux_variable tr counter used_prms vi =
 let check_one top info counter s =
   match info with
   | ECall (kf,used_prms,tr) ->
-    Globals.Syntactic_search.find_in_scope s (Formal kf) |>
+    Globals.Syntactic_search.find_in_scope ~strict:true s (Formal kf) |>
     (Fun.flip Option.bind
        (fun vi ->
           if top then Some (Logic_const.tvar (Cil.cvar_to_lvar vi))
@@ -669,7 +669,9 @@ let find_prm_in_env env ?tr counter f x =
               (TCall (kf,None))
         in
         let vi =
-          match  Globals.Syntactic_search.find_in_scope x (Formal kf) with
+          match
+            Globals.Syntactic_search.find_in_scope ~strict:true x (Formal kf)
+          with
           | Some vi -> vi
           | None -> Aorai_option.abort "Function %s has no parameter %s" f x
         in

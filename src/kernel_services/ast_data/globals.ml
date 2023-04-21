@@ -43,6 +43,8 @@ let get_locals f = match f.fundec with
 let get_location kf = match kf.fundec with
   | Definition (_, loc) | Declaration (_,_,_, loc) -> loc
 
+let get_statics = Extlib.mk_fun "Globals.get_statics"
+
 let find_first_stmt = Extlib.mk_fun "Globals.find_first_stmt"
 
 let find_enclosing_block = Extlib.mk_fun "Globals.find_enclosing_block"
@@ -94,7 +96,7 @@ module Vars = struct
            v.vname = name &&
            Filepath.Normalized.equal file (fst v.vdecl).pos_path)
     | Whole_function kf ->
-      List.find (fun v -> v.vname = name) (get_locals kf)
+      List.find (fun v -> v.vname = name) (get_locals kf @ !get_statics kf)
     | Formal kf ->
       List.find (fun v -> v.vname = name) (get_formals kf)
     | Block_scope stmt ->
@@ -647,8 +649,8 @@ end
 module Syntactic_search = struct
 
   module Key =
-    Datatype.Pair_with_collections
-      (Datatype.String)(Cil_datatype.Syntactic_scope)
+    Datatype.Triple_with_collections
+      (Datatype.String)(Cil_datatype.Syntactic_scope)(Datatype.Bool)
       (struct let module_name = "Globals.Datatype.Key" end)
 
   module Scope_info =
@@ -664,11 +666,17 @@ module Syntactic_search = struct
 
   let () = Ast.add_monotonic_state self
 
-  let rec find_var (x,scope) =
+  let rec find_var (x,scope,strict) =
     let has_name v = v.vorig_name = x in
     let global_has_name v =
       has_name v && v.vglob
       && not (Cil.hasAttribute Cabs2cil.fc_local_static v.vattr)
+    in
+    let lookup next_scope candidate =
+      match candidate with
+      | Some _ -> candidate
+      | None when strict -> candidate
+      | None -> find_in_scope x next_scope
     in
     let module M = struct exception Found of varinfo end in
     match scope with
@@ -683,11 +691,15 @@ module Syntactic_search = struct
          None
        with M.Found v -> Some v)
     | Translation_unit file ->
-      let symbols = FileIndex.get_globals file in
-      (try Some (fst (List.find (fun x -> (global_has_name (fst x))) symbols))
-       with Not_found -> find_in_scope x Program)
-    | Formal kf -> List.find_opt has_name (get_formals kf)
-    | Whole_function kf -> List.find_opt has_name (get_locals kf)
+      let symbols,_ = List.split (FileIndex.get_globals file) in
+      List.find_opt global_has_name symbols |> lookup Program
+    | Formal kf ->
+      let file = (fst (get_location kf)).Filepath.pos_path in
+      List.find_opt has_name (get_formals kf) |>
+      lookup (Translation_unit file)
+    | Whole_function kf ->
+      List.find_opt has_name (get_locals kf @ !get_statics kf) |>
+      lookup (Formal kf)
     | Block_scope stmt ->
       let blocks = !find_all_enclosing_blocks stmt in
       let find_in_block b =
@@ -697,17 +709,19 @@ module Syntactic_search = struct
           raise (M.Found (List.find has_name b.bstatics))
       in
       try
-        List.iter find_in_block blocks;
-        let kf = !find_englobing_kf stmt in
-        let filename = (fst ( get_location kf)).Filepath.pos_path in
-        let formals = get_formals kf in
-        if List.exists has_name formals then
-          Some (List.find has_name formals)
+        (* blocks can't be empty, we have at least the body of the function. *)
+        find_in_block (List.hd blocks);
+        if strict then None
         else
-          find_in_scope x (Translation_unit filename)
+          begin
+            List.iter find_in_block (List.tl blocks);
+            let kf = !find_englobing_kf stmt in
+            if strict then None else find_in_scope x (Formal kf)
+          end
       with M.Found v -> Some v
 
-  and find_in_scope x scope = Scope_info.memo find_var (x,scope)
+  and find_in_scope ?(strict=false) x scope =
+    Scope_info.memo find_var (x,scope,strict)
 
 end
 
