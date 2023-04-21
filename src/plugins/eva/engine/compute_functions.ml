@@ -361,7 +361,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       Eva_utils.clear_call_stack ();
       Self.feedback "done for function %a" Kernel_function.pretty kf;
       Abstract.Dom.Store.mark_as_computed ();
-      Self.(set_computation_state Computed);
+      Self.(ComputationState.set Computed);
       post_analysis ();
       Abstract.Dom.post_analysis final_state;
       Summary.print_summary ();
@@ -370,7 +370,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     in
     let cleanup () =
       Abstract.Dom.Store.mark_as_computed ();
-      Self.(set_computation_state Aborted);
+      Self.(ComputationState.set Aborted);
       post_analysis_cleanup ~aborted:true
     in
     Eva_utils.protect compute ~cleanup
@@ -388,7 +388,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     match initial_state with
     | `Bottom ->
       Abstract.Dom.Store.mark_as_computed ();
-      Self.(set_computation_state Aborted);
+      Self.(ComputationState.set Aborted);
       Self.result "Eva not started because globals \
                    initialization is not computable.";
       Eval_annots.mark_invalid_initializers ()

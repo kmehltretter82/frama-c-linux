@@ -65,17 +65,21 @@ type program_stats =
     preconds_statuses: statuses; }
 
 module FunctionStats : sig
+  type key = Cil_types.fundec
+  type data = fun_stats
+
   (** Get the current analysis statistics for a function *)
-  val get: Cil_types.fundec -> fun_stats option
+  val get: key -> data option
 
   (** Iterate on every function statistics *)
-  val iter: (Cil_types.fundec -> fun_stats -> unit) -> unit
+  val iter: (key -> data -> unit) -> unit
 
   (** Trigger the recomputation of function stats *)
-  val recompute: Cil_types.fundec -> unit
+  val recompute: key -> unit
 
   (** Set a hook on function statistics computation *)
-  val register_hook: (Cil_types.fundec * fun_stats -> unit) -> unit
+  val add_hook_on_change:
+    ((key, data) State_builder.hashtbl_event -> unit) -> unit
 end
 
 (** Compute analysis statistics. *)

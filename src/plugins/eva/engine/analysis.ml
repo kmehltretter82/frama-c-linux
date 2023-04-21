@@ -25,8 +25,14 @@ open Eval
 
 type computation_state = Self.computation_state =
   | NotComputed | Computing | Computed | Aborted
-let current_computation_state = Self.current_computation_state
-let register_computation_hook = Self.register_computation_hook
+let current_computation_state = Self.ComputationState.get
+let register_computation_hook ?on f =
+  let f' = match on with
+    | None -> f
+    | Some s -> fun s' -> if s = s' then f s
+  in
+  Self.ComputationState.add_hook_on_change f'
+
 let is_computed = Self.is_computed
 let self = Self.state
 let emitter = Eva_utils.emitter
@@ -210,7 +216,7 @@ let force_compute () =
   let kf, lib_entry = Globals.entry_point () in
   reset_analyzer ();
   (* The new analyzer can be accesed through hooks *)
-  Self.set_computation_state Computing;
+  Self.ComputationState.set Computing;
   let module Analyzer = (val snd !ref_analyzer) in
   Analyzer.compute_from_entry_point ~lib_entry kf
 

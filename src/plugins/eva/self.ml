@@ -69,29 +69,13 @@ struct
   end
 
   module Datatype' = Datatype.Make (Prototype)
-  module Hook = Hook.Build (Prototype)
   include (State_builder.Ref (Datatype') (Prototype))
-
-  let set s = set s; Hook.apply s
-  let () = add_hook_on_update (fun r -> Hook.apply !r)
 end
 
 let is_computed () =
   match ComputationState.get () with
   | Computed | Aborted -> true
   | NotComputed | Computing -> false
-
-let current_computation_state = ComputationState.get
-let set_computation_state = ComputationState.set
-
-(* Register a hook on current computation state *)
-let register_computation_hook ?on f =
-  let f' = match on with
-    | None -> f
-    | Some s -> fun s' -> if s = s' then f s
-  in
-  ComputationState.Hook.extend f'
-
 
 (* Debug categories. *)
 let dkey_initial_state = register_category "initial-state"

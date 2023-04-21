@@ -171,7 +171,7 @@ let set_results results =
   let b = Parameters.ResultsAll.get () in
   Cvalue_domain.State.Store.register_global_state b
     (`Value Cvalue_domain.State.top);
-  Self.set_computation_state Computed;
+  Self.ComputationState.set Computed;
   Db.Value.mark_as_computed ();
 ;;
 
