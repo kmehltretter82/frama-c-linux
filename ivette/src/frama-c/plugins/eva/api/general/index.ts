@@ -132,7 +132,7 @@ const getCallers_internal: Server.GetRequest<fct,CallSite[]> = {
   name:   'plugins.eva.general.getCallers',
   input:  jFct,
   output: Json.jArray(jCallSite),
-  signals: [],
+  signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the list of call site of a function */
 export const getCallers: Server.GetRequest<fct,CallSite[]>= getCallers_internal;
@@ -142,7 +142,7 @@ const getCallees_internal: Server.GetRequest<marker,fct[]> = {
   name:   'plugins.eva.general.getCallees',
   input:  jMarker,
   output: Json.jArray(jFct),
-  signals: [],
+  signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Return the functions pointed to by a function pointer */
 export const getCallees: Server.GetRequest<marker,fct[]>= getCallees_internal;
@@ -330,7 +330,7 @@ const taintedLvalues_internal: Server.GetRequest<fct,LvalueTaints[]> = {
   name:   'plugins.eva.general.taintedLvalues',
   input:  jFct,
   output: Json.jArray(jLvalueTaints),
-  signals: [],
+  signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the tainted lvalues of a given function */
 export const taintedLvalues: Server.GetRequest<fct,LvalueTaints[]>= taintedLvalues_internal;
@@ -702,7 +702,7 @@ const getStates_internal: Server.GetRequest<
   input:  Json.jPair( jMarker, Json.jBoolean,),
   output: Json.jArray(
             Json.jTriple( Json.jString, Json.jString, Json.jString,)),
-  signals: [],
+  signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the domain states about the given marker */
 export const getStates: Server.GetRequest<
