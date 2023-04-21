@@ -508,9 +508,8 @@ module Make_table
     (Info: sig include State_builder.Info_with_size val kinds: kind list end) =
 struct
 
+  module Update_hooks = Hook.Build(struct type t = E.t * H.key * D.t end)
   module Remove_hooks = Hook.Build(struct type t = E.t * H.key * D.t end)
-  let add_hook_on_remove f = Remove_hooks.extend (fun (e, k, d) -> f e k d)
-  let apply_hooks_on_remove e k d = Remove_hooks.apply (e, k, d)
 
   (* this list is computed after defining [self] *)
   let static_dependencies = ref []
@@ -566,7 +565,7 @@ struct
             H.iter
               (fun k h ->
                  if not (Remove_hooks.is_empty ()) then
-                   E.Hashtbl.iter (fun e x -> apply_hooks_on_remove e k x) h;
+                   E.Hashtbl.iter (fun e x -> Remove_hooks.apply (e,k,x)) h;
                  E.local_clear k h)
               tbl;
           end else begin
@@ -596,7 +595,7 @@ struct
                      Info.name
                      Project.pretty (Project.current ());
                    E.Hashtbl.remove h e;
-                   apply_hooks_on_remove e k x
+                   Remove_hooks.apply (e,k,x);
                  with Not_found ->
                    assert false)
               !to_be_removed
@@ -610,6 +609,17 @@ struct
         let unique_name = name
         let dependencies = self :: dependencies
       end)
+
+  let add_hook_on_update f = Update_hooks.extend (fun (e, k, d) -> f e k d)
+  let add_hook_on_remove f = Remove_hooks.extend (fun (e, k, d) -> f e k d)
+  let apply_hooks_on_update e k d = Update_hooks.apply (e, k, d)
+  let apply_hooks_on_remove e k d = Remove_hooks.apply (e, k, d)
+
+  let notify f k =
+    try
+      let tbl = H.find !state k in
+      E.Hashtbl.iter (fun e v -> f e k v) tbl;
+    with Not_found -> ()
 
   let add_kind k =
     try
@@ -631,7 +641,6 @@ struct
     Cmdline.run_after_early_stage
       (fun () -> static_dependencies := get_dependencies ())
 
-  let add key v = H.add !state key v
   let find key = H.find !state key
   let mem key = H.mem !state key
   let iter f = H.iter f !state
@@ -639,15 +648,12 @@ struct
   let to_seq () = H.to_seq !state
   let iter_sorted ~cmp f = H.iter_sorted ~cmp f !state
   let fold_sorted ~cmp f acc = H.fold_sorted ~cmp f !state acc
+  let add key v =
+    H.add !state key v ;
+    if not (Update_hooks.is_empty ()) then notify apply_hooks_on_update key
   let remove key =
-    if not (Remove_hooks.is_empty ()) then begin
-      try
-        let tbl = find key in
-        E.Hashtbl.iter (fun e v -> apply_hooks_on_remove e key v) tbl;
-      with Not_found ->
-        ()
-    end;
-    H.remove !state key;
+    if not (Remove_hooks.is_empty ()) then notify apply_hooks_on_remove key ;
+    H.remove !state key
 
 end
 
