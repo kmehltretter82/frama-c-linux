@@ -1,5 +1,9 @@
 {
   "productName": "Ivette",
   "mac": { "icon": "icon.icns" },
-  "linux": { "icon": "icon.png" }
+  "linux": {
+    "icon": "icon.png",
+    "target": "appImage",
+    "category": "Developpement"
+  }
 }
