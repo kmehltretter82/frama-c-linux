@@ -419,8 +419,7 @@ let rec term_to_exp t res =
   | TBinOp (binop, t1, t2)->
     new_exp ~loc
       (BinOp(binop, term_to_exp t1 res, term_to_exp t2 res, Cil.intType))
-  | TCastE(ty, { term_node = TConst(LReal lreal) })
-    when Cil.isArithmeticType ty && not (Cil.isIntegralType ty) ->
+  | TCastE(ty, {term_node = TConst(LReal lreal)}) when Cil.isFloatingType ty ->
     (match Cil.unrollType ty with
      | TFloat(fk,_) ->
        new_exp ~loc
