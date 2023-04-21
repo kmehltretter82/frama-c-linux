@@ -65,6 +65,20 @@ let register_value (type a) ~package ~name ~descr
   Option.iter (register_hook signal) add_hook ;
   signal
 
+module type Value = sig
+  type data
+  val get: unit -> data
+  val add_hook_on_change: (data -> unit) -> unit
+end
+
+let register_framac_value (type a) ~package ~name ~descr
+    ~(output : a Request.output)
+    (state : (module Value with type data = a)) =
+  let module State = (val state) in
+  register_value ~package ~name ~descr ~output
+    ~get:State.get
+    ~add_hook:State.add_hook_on_change ()
+
 (* -------------------------------------------------------------------------- *)
 (* --- States                                                             --- *)
 (* -------------------------------------------------------------------------- *)
@@ -90,6 +104,21 @@ let register_state (type a) ~package ~name ~descr
       ~kind:`SET ~input:(module D) ~output:(module Junit) set in
   Option.iter (register_hook signal) add_hook ;
   signal
+
+module type State = sig
+  type data
+  val set: data -> unit
+  val get: unit -> data
+  val add_hook_on_change: (data -> unit) -> unit
+end
+
+let register_framac_state (type a) ~package ~name ~descr
+    ~(data : a data)
+    (state : (module State with type data = a)) =
+  let module State = (val state) in
+  register_state ~package ~name ~descr ~data
+    ~get:State.get ~set:State.set
+    ~add_hook:State.add_hook_on_change ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Model Signature                                                    --- *)
@@ -215,11 +244,14 @@ let update array k =
     m.updates <- Kmap.add (array.key k) (Add k) m.updates ;
   Request.emit array.signal
 
-let remove array k =
+let remove_key array k =
   let m = content array in
   if not m.cleared then
-    m.updates <- Kmap.add (array.key k) Remove m.updates ;
+    m.updates <- Kmap.add k Remove m.updates ;
   Request.emit array.signal
+
+let remove array k =
+  remove_key array (array.key k)
 
 let signal array = array.signal
 
@@ -387,6 +419,32 @@ let register_array ~package ~name ~descr ~key
   Option.iter (install_hook signal (update array)) add_update_hook ;
   Option.iter (install_hook signal (remove array)) add_remove_hook ;
   Option.iter (install_hook signal (fun () -> reload array)) add_reload_hook ;
+  array
+
+module type HashtblState = sig
+  type key
+  type data
+  val iter: (key -> data -> unit) -> unit
+  val add_hook_on_change:
+    ((key, data) State_builder.hashtbl_event -> unit) -> unit
+end
+
+let register_framac_array (type key) (type data) ~package ~name ~descr ~key
+    ?keyName ?keyType
+    (model : (key * data) model)
+    (table : (module HashtblState with type key = key and type data = data)) =
+  let module Table = (val table) in
+  let array = register_array ~package ~name ~descr ?keyName ?keyType
+      ~key:(fun (k,_d) -> key k)
+      ~iter:(fun f -> Table.iter (fun k d -> f (k,d)))
+      model
+  in
+  let handle_event = function
+    | State_builder.Update (k,d) -> update array (k,d)
+    | Remove k -> remove_key array (key k)
+    | Clear -> reload array
+  in
+  install_hook array.signal handle_event (Table.add_hook_on_change);
   array
 
 (* -------------------------------------------------------------------------- *)
