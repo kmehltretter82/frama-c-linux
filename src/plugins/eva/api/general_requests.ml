@@ -48,7 +48,7 @@ module ComputationState = struct
     | Aborted -> `String "aborted"
 end
 
-let _computation_signal =
+let computation_signal =
   States.register_value ~package
     ~name:"computationState"
     ~descr:(Markdown.plain "The current computation state of the analysis.")
@@ -199,6 +199,7 @@ let () = Request.register ~package
                             statements in a function")
     ~input:(module Kernel_ast.Function)
     ~output:(module DeadCode)
+    ~signals:[computation_signal]
     dead_code
 
 

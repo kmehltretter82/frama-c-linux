@@ -255,7 +255,7 @@ const getDeadCode_internal: Server.GetRequest<fct,deadCode> = {
   name:   'plugins.eva.general.getDeadCode',
   input:  jFct,
   output: jDeadCode,
-  signals: [],
+  signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the lists of unreachable and of non terminating statements in a function */
 export const getDeadCode: Server.GetRequest<fct,deadCode>= getDeadCode_internal;
