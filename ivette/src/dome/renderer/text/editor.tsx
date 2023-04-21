@@ -310,13 +310,13 @@ const Highlight = Language.syntaxHighlighting(Language.HighlightStyle.define([
   { tag: tags.typeName, class: 'cm-type' },
   { tag: tags.number, class: 'cm-number' },
   { tag: tags.controlKeyword, class: 'cm-keyword' },
-  { tag: tags.definition(tags.variableName) , class: 'cm-def' },
+  { tag: tags.definition(tags.variableName), class: 'cm-def' },
 ]));
 
 // A language provider based on the [Lezer C++ parser], extended with
 // highlighting and folding information. Only comments can be folded.
 // (Source: https://github.com/lezer-parser/cpp)
-const comment = (t: SyntaxNode): Range => ({ from: t.from + 2, to: t.to - 2});
+const comment = (t: SyntaxNode): Range => ({ from: t.from + 2, to: t.to - 2 });
 const folder = Language.foldNodeProp.add({ BlockComment: comment });
 const stringPrefixes = [ "L", "u", "U", "u8", "LR", "UR", "uR", "u8R", "R" ];
 const cppLanguage = Language.LRLanguage.define({

@@ -38,6 +38,7 @@ import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from './server';
+import * as Status from 'frama-c/kernel/Status';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -402,7 +403,7 @@ export function reloadArray<K, A>(arr: Array<K, A>): void {
 }
 
 /** Access to Synchronized Array elements. */
-export interface ArrayProxy<K,A> {
+export interface ArrayProxy<K, A> {
   length: number;
   getData(elt: K | undefined): (A | undefined);
   forEach(fn: (row: A, elt: K) => void): void;
@@ -410,22 +411,22 @@ export interface ArrayProxy<K,A> {
 
 // --- Utility functions
 
-function arrayGet<K,A>(
-  model: CompactModel<K,A>,
+function arrayGet<K, A>(
+  model: CompactModel<K, A>,
   elt: K | undefined,
   _stamp: number,
 ): A | undefined {
   return elt ? model.getData(elt) : undefined;
 }
 
-function arrayProxy<K,A>(
-  model: CompactModel<K,A>,
+function arrayProxy<K, A>(
+  model: CompactModel<K, A>,
   _stamp: number,
-): ArrayProxy<K,A> {
+): ArrayProxy<K, A> {
   return {
     length: model.length(),
     getData: (elt) => elt ? model.getData(elt) : undefined,
-    forEach: (fn) => model.forEach((r) => fn(r,model.getkey(r))),
+    forEach: (fn) => model.forEach((r) => fn(r, model.getkey(r))),
   };
 }
 
@@ -481,7 +482,7 @@ export function useSyncArrayGetter<K, A>(
 /** Use Synchronized Array as an array proxy. */
 export function useSyncArrayProxy<K, A>(
   arr: Array<K, A>
-): ArrayProxy<K,A> {
+): ArrayProxy<K, A> {
   const model = useSyncArrayModel<K, A>(arr);
   const stamp = useModel(model);
   return React.useMemo(
@@ -789,6 +790,14 @@ export function useSelection(): [Selection, (a: SelectionActions) => void] {
   const [current, setCurrent] = useGlobalState(GlobalSelection);
   const callback = React.useCallback((action) => {
     setCurrent(reducer(current, action));
+    if (isMultipleSelect(action)) {
+      const l = action.locations.length;
+      const markers =
+        (l > 1) ? `${l} markers selected, listed in the 'Locations' panel` :
+          (l === 1) ? `1 marker selected` : `no markers selected`;
+      const text = `${action.name}: ${markers}`;
+      Status.setMessage({ text, title: action.title, kind: 'success' });
+    }
   }, [current, setCurrent]);
   return [current, callback];
 }

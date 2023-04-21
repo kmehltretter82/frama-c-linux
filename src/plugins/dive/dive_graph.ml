@@ -40,7 +40,7 @@ let new_node
   node_taint = None;
   node_writes_computation = NotDone;
   node_reads_computation = NotDone;
-  node_writes_stmts = [];
+  node_writes = [];
 }
 
 module Node = Datatype.Make_with_collections
@@ -80,9 +80,9 @@ let create_node ~node_kind ~node_locality g =
 
 let remove_node = remove_vertex
 
-let create_dependency g kinstr v1 dependency_kind v2 =
+let create_dependency g ~origin ~kind v1  v2 =
   let same_kind (_,e,_) =
-    e.dependency_kind = dependency_kind
+    e.dependency_kind = kind
   in
   let matching_edge =
     try
@@ -94,23 +94,20 @@ let create_dependency g kinstr v1 dependency_kind v2 =
     | None ->
       let e = {
         dependency_key = fresh_key ();
-        dependency_kind;
+        dependency_kind = kind;
         dependency_origins = []
       }
       in
       add_edge_e g (v1,e,v2);
       e
   in
-  (* Add origins *)
-  begin match kinstr with
-    | Cil_types.Kglobal -> ()
-    | Kstmt stmt ->
-      let add_uniq l x =
-        List.sort_uniq Cil_datatype.Stmt.compare (x :: l)
-      in
-      e.dependency_origins <- add_uniq e.dependency_origins stmt
-  end;
+  (* Add origin *)
+  let add_uniq l x =
+    List.sort_uniq Studia.Writes.compare (x :: l)
+  in
+  e.dependency_origins <- add_uniq e.dependency_origins origin;
   (v1,e,v2)
+
 
 let remove_dependency g edge =
   remove_edge_e g edge

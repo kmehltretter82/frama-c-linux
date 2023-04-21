@@ -307,7 +307,7 @@ class Dive {
       timeout = setTimeout(() => {
         tips?.forEach((tip) => tip.hide());
         tips = null; // Force rebuilding tips in case they changed
-      }, 1000);
+      }, 0);
     });
   }
 
@@ -578,7 +578,7 @@ type GraphViewRef = {
 
 const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
   (props: GraphViewProps, ref) => {
-  const {lock, layout, selectionMode} = props;
+  const { lock, layout, selectionMode } = props;
 
   const [dive, setDive] = useState(() => new Dive());
   const [selection, updateSelection] = States.useSelection();

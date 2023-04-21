@@ -75,15 +75,14 @@
 [wp] [Valid] typed_complex_struct_check_qed_ok_16 (Qed)
 [wp] [Valid] typed_complex_struct_check_qed_ok_17 (Qed)
 [wp] [Valid] typed_complex_struct_check_qed_ok_18 (Qed)
-[wp] [Valid] typed_complex_struct_check_provable (Tactic) (Qed 2/2)
+[wp] [Valid] typed_complex_struct_check_provable (Alt-Ergo) (Cached)
 [wp] Proved goals:   62 / 73
   Qed:            52
-  Script:          1 (Tactic) (Qed 2/2)
-  Alt-Ergo:        9
+  Alt-Ergo:       10
   Unsuccess:      11
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   globals                  13        7       31      64.5%
   locals                   21        2       23       100%
-  complex_struct           18        -       19       100%
+  complex_struct           18        1       19       100%
 ------------------------------------------------------------

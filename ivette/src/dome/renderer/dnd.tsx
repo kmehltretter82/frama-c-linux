@@ -352,14 +352,14 @@ export interface DragSourceProps extends DragHandler, DropHandler {
    as a Drop Target into the DnD controller.
  */
 export function DragSource(props: DragSourceProps): JSX.Element {
-  //--- Props
+  // --- Props
   const { dnd, disabled = false, handle, children } = props;
   const { onStart, onDrag, onStop } = props;
-  //--- Dragging State
+  // --- Dragging State
   const [dragging, setDragging] = React.useState<Dragging | undefined>();
-  //--- Dropping Ref
+  // --- Dropping Ref
   const nodeRef = useDropTarget(dnd, disabled ? undefined : props);
-  //--- onStart
+  // --- onStart
   const handleStart: DraggableEventHandler = React.useCallback(
     (_, { x, y, node }) => {
       if (dnd && nodeRef.current)
@@ -371,7 +371,7 @@ export function DragSource(props: DragSourceProps): JSX.Element {
       });
       if (onStart) onStart();
     }, [dnd, nodeRef, onStart]);
-  //--- onDrag
+  // --- onDrag
   const handleDrag: DraggableEventHandler = React.useCallback(
     (e, { x, y }) => {
       if (e && dnd) dnd.handleEvent(e);
@@ -381,14 +381,14 @@ export function DragSource(props: DragSourceProps): JSX.Element {
         if (onDrag) onDrag(newDragging);
       }
     }, [dnd, dragging, onDrag]);
-  //--- onStop
+  // --- onStop
   const handleStop: DraggableEventHandler = React.useCallback(
     () => {
       if (dnd) dnd.handleDrop();
       setDragging(undefined);
       if (onStop) onStop();
     }, [dnd, onStop]);
-  //--- Renderer
+  // --- Renderer
   const render = RenderOverlay(props, dragging);
   return (
     <DraggableCore
@@ -447,25 +447,25 @@ export interface ItemProps {
    item contents is rendered inside a `<DragSource/>` component automatically
    connected to the englobing `<List/>` DnD controller.  */
 export function Item(props: ItemProps): JSX.Element {
-  //--- Ordering
+  // --- Ordering
   const { dnd, items, setSource, setTarget, onStop } =
     React.useContext(CurrentList);
   const { id, className, children } = props;
   const order = getItem(items, id);
-  //--- D&D Events
+  // --- D&D Events
   const onStart = React.useCallback(() => {
     if (setSource) setSource(id);
   }, [setSource, id]);
   const onDropIn = React.useCallback(() => {
     if (setTarget) setTarget(id);
   }, [setTarget, id]);
-  //--- Styling
+  // --- Styling
   const style = styles(
     props.style,
     order < 0 && { display: 'none' },
     0 <= order && { order },
   );
-  //--- Rendering
+  // --- Rendering
   return (
     <DragSource
       className={className}

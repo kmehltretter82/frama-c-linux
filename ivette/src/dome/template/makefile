@@ -248,7 +248,7 @@ dome-app: dome-pkg dome-templ
 # ---  Application Packaging
 # --------------------------------------------------------------------------
 
-.PHONY: dome-dist dome-binary dome-appimage
+.PHONY: dome-dist dome-appimage
 
 # Compatible with all OS for installation from source
 dome-dist: dome-app

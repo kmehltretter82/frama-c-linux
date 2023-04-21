@@ -427,7 +427,7 @@ function FilterSection(props: SectionProps): JSX.Element {
     } : undefined;
   const update = Dome.useForceUpdate();
   Settings.useWindowSettingsEvent(update);
-  const summary = prefix ? filterSummary(prefix) : undefined ;
+  const summary = prefix ? filterSummary(prefix) : undefined;
   return (
     <Section
       label={label}
@@ -654,8 +654,8 @@ function FilterRatio({ model }: { model: PropertyModel }): JSX.Element {
 // --- Properties Table
 // -------------------------------------------------------------------------
 
-type PropsModel = States.ArrayProxy<PropKey,Properties.statusData>;
-type EvapsModel = States.ArrayProxy<PropKey,Eva.propertiesData>;
+type PropsModel = States.ArrayProxy<PropKey, Properties.statusData>;
+type EvapsModel = States.ArrayProxy<PropKey, Eva.propertiesData>;
 
 function populateModel(
   model: PropertyModel,
@@ -666,7 +666,7 @@ function populateModel(
   props.forEach((prop) => {
     const { key } = prop;
     const eva = evaps.getData(key);
-    model.setData(key,{ ...eva, ...prop });
+    model.setData(key, { ...eva, ...prop });
   });
   model.reload();
 }
@@ -678,8 +678,8 @@ export default function RenderProperties(): JSX.Element {
   const props = States.useSyncArrayProxy(Properties.status);
   const evaps = States.useSyncArrayProxy(Eva.properties);
   React.useEffect(() => {
-    populateModel(model,props,evaps);
-  },[model,props,evaps]);
+    populateModel(model, props, evaps);
+  }, [model, props, evaps]);
 
   const [selection, updateSelection] = States.useSelection();
 

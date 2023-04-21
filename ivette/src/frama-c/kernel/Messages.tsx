@@ -455,7 +455,7 @@ export default function RenderMessages(): JSX.Element {
       selectMsg(msg);
       setText(msg.message);
       if (msg.fct && msg.marker) {
-        const location = { fct:msg.fct, marker:msg.marker };
+        const location = { fct: msg.fct, marker: msg.marker };
         updateSelection({ location });
       }
     }, [updateSelection],
