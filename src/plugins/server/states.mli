@@ -26,6 +26,10 @@ open Package
 
 type 'a callback = ('a -> unit) -> unit
 
+(** Connect a hook registry to a signal. As soon as the signal is being
+    traced, a hook to emit the signal is registered. *)
+val register_hook : Request.signal -> 'a callback -> unit
+
 (** Register a (projectified) value and generates the associated signal and
     request:
     - Signal [<name>.sig] is emitted on value updates;

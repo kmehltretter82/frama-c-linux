@@ -22,23 +22,25 @@
 
 open Data
 
+(* -------------------------------------------------------------------------- *)
+(* --- Hooks                                                              --- *)
+(* -------------------------------------------------------------------------- *)
+
 type 'a callback = ('a -> unit) -> unit
 
-let install signal hook = function
-  | None -> ()
-  | Some add_hook ->
-    let once = ref true in
-    let install ok =
-      if ok && !once then
-        begin
-          once := false ;
-          add_hook hook ;
-          Request.emit signal ;
-        end
-    in Request.on_signal signal install
+let install_hook signal hook add_hook =
+  let once = ref true in
+  let install ok =
+    if ok && !once then
+      begin
+        once := false ;
+        add_hook hook ;
+        Request.emit signal ;
+      end
+  in Request.on_signal signal install
 
-let install_emit signal add_hook =
-  install signal (fun _ -> Request.emit signal) add_hook
+let register_hook signal add_hook =
+  install_hook signal (fun () -> Request.emit signal) add_hook
 
 (* -------------------------------------------------------------------------- *)
 (* --- Values                                                             --- *)
@@ -60,7 +62,7 @@ let register_value (type a) ~package ~name ~descr
       ~package ~name:(Package.Derived.getter id).name
       ~descr:(plain "Getter for state" @ href)
       ~kind:`GET ~input:(module Junit) ~output get in
-  install_emit signal add_hook ;
+  Option.iter (register_hook signal) add_hook ;
   signal
 
 (* -------------------------------------------------------------------------- *)
@@ -86,7 +88,7 @@ let register_state (type a) ~package ~name ~descr
       ~package ~name:(Package.Derived.setter id).name
       ~descr:(plain "Setter for state" @ href)
       ~kind:`SET ~input:(module D) ~output:(module Junit) set in
-  install_emit signal add_hook ;
+  Option.iter (register_hook signal) add_hook ;
   signal
 
 (* -------------------------------------------------------------------------- *)
@@ -382,9 +384,9 @@ let register_array ~package ~name ~descr ~key
     ~kind:`GET ~input:(module Junit) ~output:(module Junit)
     (fun () -> reload array) ;
   synchronize array ;
-  install signal (update array) add_update_hook ;
-  install signal (remove array) add_remove_hook ;
-  install signal (fun () -> reload array) add_reload_hook ;
+  Option.iter (install_hook signal (update array)) add_update_hook ;
+  Option.iter (install_hook signal (remove array)) add_remove_hook ;
+  Option.iter (install_hook signal (fun () -> reload array)) add_reload_hook ;
   array
 
 (* -------------------------------------------------------------------------- *)
