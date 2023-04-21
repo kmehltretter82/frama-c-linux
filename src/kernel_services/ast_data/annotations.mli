@@ -31,7 +31,7 @@ open Cil_types
 (**************************************************************************)
 
 val add_hook_on_change: (unit -> unit) -> unit
-(** Emitted whenever anhy of the annotation tables are modified.
+(** Emitted whenever any of the annotation tables is modified.
     @since Frama-C+dev *)
 
 (**************************************************************************)
