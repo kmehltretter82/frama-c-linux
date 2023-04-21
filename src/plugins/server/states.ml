@@ -40,7 +40,7 @@ let install_hook signal hook add_hook =
   in Request.on_signal signal install
 
 let register_hook signal add_hook =
-  install_hook signal (fun () -> Request.emit signal) add_hook
+  install_hook signal (fun _ -> Request.emit signal) add_hook
 
 (* -------------------------------------------------------------------------- *)
 (* --- Values                                                             --- *)
