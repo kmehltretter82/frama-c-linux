@@ -40,11 +40,16 @@ let () = Request.register ~package
 let changed_signal = Request.signal ~package ~name:"changed"
     ~descr:(Md.plain "Emitted when the AST has been changed")
 
-let ast_update_hook f =
-  Ast.add_hook_on_update f;
-  Ast.apply_after_computed (fun _ -> f ())
+let ast_changed () = Request.emit changed_signal
 
-let () = ast_update_hook (fun _ -> Request.emit changed_signal)
+let ast_update_hook f =
+  begin
+    Ast.add_hook_on_update f;
+    Ast.apply_after_computed (fun _ -> f ());
+  end
+
+let () = ast_update_hook ast_changed
+let () = Annotations.add_hook_on_change ast_changed
 
 (* -------------------------------------------------------------------------- *)
 (* --- File Positions                                                     --- *)
