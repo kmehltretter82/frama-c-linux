@@ -148,6 +148,11 @@ module type Option_ref = sig
   val may: (data -> unit) -> unit
   val get_option : unit -> data option
   (** @since Beryllium-20090901 *)
+
+  val add_hook_on_change: (data option -> unit) -> unit
+  (** Add an hook which applied each time (just after) the value of the state
+      changes inside the current project.
+      @since Frama-C+dev *)
 end
 
 (** Build a reference on an option. *)

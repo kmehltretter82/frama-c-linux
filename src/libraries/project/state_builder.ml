@@ -358,7 +358,7 @@ struct
   let add_hook_on_change = Change_hook.extend
   let set v = !state := v; Change_hook.apply v
   let get () = !(!state)
-  let clear () = !state := Info.default ()
+  let clear () = let v = Info.default () in set v
 
 end
 
@@ -368,6 +368,7 @@ module type Option_ref = sig
   val map: (data -> data) -> data option
   val may: (data -> unit) -> unit
   val get_option : unit -> data option
+  val add_hook_on_change: (data option -> unit) -> unit
 end
 
 module Option_ref(Data:Datatype.S)(Info: Info) = struct
@@ -378,6 +379,7 @@ module Option_ref(Data:Datatype.S)(Info: Info) = struct
   let state = ref (create ())
 
   module D = Datatype.Ref(Datatype.Option(Data))
+  module Change_hook = Hook.Build(Datatype.Option(Data))
 
   include Register
       (D)
@@ -392,12 +394,12 @@ module Option_ref(Data:Datatype.S)(Info: Info) = struct
       end)
       (struct include Info let unique_name = name end)
 
-  module Change_hook = Hook.Build(Data)
   let add_hook_on_change = Change_hook.extend
-  let set v = !state := Some v; Change_hook.apply v
+  let change opt_v = !state := opt_v; Change_hook.apply opt_v
+  let set v = change (Some v)
   let get () = match !(!state) with None -> raise Not_found | Some v -> v
   let get_option () = !(!state)
-  let clear () = !state := None
+  let clear () = change None
 
   let memo ?change f =
     try
