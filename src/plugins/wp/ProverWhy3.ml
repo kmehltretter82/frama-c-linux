@@ -22,6 +22,7 @@
 
 let dkey = Wp_parameters.register_category "prover"
 let dkey_api = Wp_parameters.register_category "why3_api"
+let dkey_model = Wp_parameters.register_category "why3_model"
 
 let option_file = LogicBuiltins.create_option
     ~sanitizer:(fun ~driver_dir x -> Filename.concat driver_dir x)
@@ -1065,19 +1066,28 @@ class visitor (ctx:context) c =
 
 let goal_id = (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "wp_goal"))
 
-let add_model_trace probes cnv t =
+let add_model_trace (probes:Conditions.probe list) cnv t =
   let open Why3 in
   if probes = [] then t else
     let t = Task.add_meta t Driver.meta_get_counterexmp [Theory.MAstr ""] in
     let id = ref (-1) in
-    let create_id ty =
-      let attr = Ident.create_model_trace_attr (Printf.sprintf "ce%i" !id) in
+    let create_id (p:Conditions.probe) ty =
+      incr id; 
+      let attr = Ident.create_model_trace_attr
+          (Format.asprintf "%s%a-%i" p.probe_name
+             (Pretty_utils.pp_opt ~pre:"-" Cil_printer.pp_stmt)
+             p.probe_stmt !id) in
       let attrs = Ident.Sattr.singleton attr in
-      Term.create_lsymbol (Ident.id_fresh ~attrs "A") [] ty
+      let ({Filepath.pos_path;pos_lnum=l1;pos_cnum=c1},
+           {Filepath.pos_lnum=l2;pos_cnum=c2})= p.probe_loc in
+      let loc = Why3.Loc.user_position
+          (Filepath.Normalized.to_pretty_string pos_path) l1 c1 l2 c2 in
+      Term.create_lsymbol
+        (Ident.id_fresh ~loc ~attrs p.probe_name) [] ty
     in
-    let fold t term =
-      let term' = of_term' cnv term in
-      let id = create_id term'.t_ty in
+    let fold t (p:Conditions.probe) =
+      let term' = of_term' cnv p.probe_term in
+      let id = create_id p term'.t_ty in
       let t = Task.add_param_decl t id in
       let eq_id = Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "ce_eq") in
       let eq = Term.t_equ (Term.t_app id [] term'.t_ty) term' in
@@ -1092,7 +1102,8 @@ let convert_freevariables ~probes ~cnv t =
   let freevars =
     if Wp_parameters.CounterExample.get ()
     then
-      List.fold_left (fun vars t -> Lang.F.Vars.union vars (Lang.F.vars t))
+      List.fold_left (fun vars p ->
+          Lang.F.Vars.union vars (Lang.F.vars p.Conditions.probe_term))
         freevars probes
     else freevars in
   let cnv,lss =
@@ -1153,7 +1164,6 @@ let task_of_wpo wpo =
     let axioms = v.Wpo.VC_Annot.axioms in
     let prop = Wpo.GOAL.compute_proof ~pid v.Wpo.VC_Annot.goal in
     let probes = Wpo.GOAL.compute_probes ~pid v.Wpo.VC_Annot.goal in
-    let probes = List.map (fun p -> p.Conditions.probe_term) probes in
     prove_prop ~pid ?axioms ~probes prop
   | Wpo.GoalLemma v ->
     let lemma = v.Wpo.VC_Lemma.lemma in
@@ -1204,13 +1214,37 @@ type prover_call = {
   mutable killed : bool ;
 }
 
+let has_model_attr attrs =
+  Why3.Ident.Sattr.fold_left (fun acc (e:Why3.Ident.attribute) ->
+      match Extlib.string_del_prefix "model_trace:" e.attr_string with
+      | None -> acc
+      | Some _ as a -> a
+    ) None attrs
+
 let print_model (res:Why3.Call_provers.prover_result) =
-  if Wp_parameters.CounterExample.get () then
-    List.iter (fun (res,model) ->
-        Format.printf "model %a: %a@." Why3.Call_provers.print_prover_answer
-          res (Why3.Model_parser.print_model ~filter_similar:false ~print_attrs:true) model
-      )
-      res.pr_models
+  if Wp_parameters.CounterExample.get () then (
+    Wp_parameters.debug ~dkey:dkey_model "%a" (fun fmt ->
+        List.iter (fun (res,model) ->
+            Format.fprintf fmt "@[<hov 2>model %a: %a@]@\n" Why3.Call_provers.print_prover_answer
+              res (Why3.Model_parser.print_model_human ~filter_similar:false ~print_attrs:true) model
+          ))
+      res.pr_models;
+    (* Wp_parameters.feedback ~dkey:dkey_model "%a" *)
+    Format.eprintf "@[<v 1>@[models:@]@,%a@]@."
+      (fun fmt ->
+         List.iter (fun (_,model) ->
+             Format.fprintf fmt "@[<hov 1>@[model:@]@,";
+             let l = Why3.Model_parser.get_model_elements model in
+             List.iter (fun (e:Why3.Model_parser.model_element) ->
+                 match has_model_attr e.me_attrs with
+                 | None -> ()
+                 | Some id ->
+                   Format.fprintf fmt "%s:%a,@," id
+                     Why3.Model_parser.print_concrete_term e.me_concrete_value) l;
+             Format.fprintf fmt "@]@,"
+           ))
+      res.pr_models;
+  )
 
 let ping_prover_call ~config p =
   match Why3.Call_provers.query_call p.call with
