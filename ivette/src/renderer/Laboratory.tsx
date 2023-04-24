@@ -379,12 +379,16 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
       setLocal({ current: newCurrent, shapes });
     };
 
+    const onView = (action: string) =>
+      isCurrent ? `${action} View` : `${action} View (${view.label})`;
+    const hasRename = !edited && isCustom;
+
     Dome.popupMenu([
-      { label: 'Rename View', display: (!edited && isCustom), onClick: RENAME },
+      { label: onView('Rename'), display: hasRename, onClick: RENAME },
       { label: 'Restore Default', display: isCurrent, onClick: DEFAULT },
-      { label: 'Duplicate View', onClick: DUPLICATE },
+      { label: onView('Duplicate'), onClick: DUPLICATE },
       'separator',
-      { label: 'Remove View', display: isCustom, onClick: REMOVE },
+      { label: onView('Remove'), display: isCustom, onClick: REMOVE },
     ]);
   };
 
