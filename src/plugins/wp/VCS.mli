@@ -95,6 +95,7 @@ type result = {
   prover_steps : int ;
   prover_errpos : Lexing.position option ;
   prover_errmsg : string ;
+  prover_model : Why3Provers.model;
 }
 
 val no_result : result
@@ -108,7 +109,8 @@ val failed : ?pos:Lexing.position -> string -> result
 val kfailed : ?pos:Lexing.position -> ('a,Format.formatter,unit,result) format4 -> 'a
 val cached : result -> result (** only for true verdicts *)
 
-val result : ?cached:bool -> ?solver:float -> ?time:float -> ?steps:int -> verdict -> result
+val result : ?model:Why3Provers.model -> ?cached:bool ->
+     ?solver:float -> ?time:float -> ?steps:int -> verdict -> result
 
 val is_auto : prover -> bool
 val is_result : verdict -> bool

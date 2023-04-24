@@ -1070,13 +1070,8 @@ let add_model_trace (probes:Conditions.probe list) cnv t =
   let open Why3 in
   if probes = [] then t else
     let t = Task.add_meta t Driver.meta_get_counterexmp [Theory.MAstr ""] in
-    let id = ref (-1) in
     let create_id (p:Conditions.probe) ty =
-      incr id; 
-      let attr = Ident.create_model_trace_attr
-          (Format.asprintf "%s%a-%i" p.probe_name
-             (Pretty_utils.pp_opt ~pre:"-" Cil_printer.pp_stmt)
-             p.probe_stmt !id) in
+      let attr = Ident.create_model_trace_attr (string_of_int p.probe_id) in
       let attrs = Ident.Sattr.singleton attr in
       let ({Filepath.pos_path;pos_lnum=l1;pos_cnum=c1},
            {Filepath.pos_lnum=l2;pos_cnum=c2})= p.probe_loc in
@@ -1164,13 +1159,13 @@ let task_of_wpo wpo =
     let axioms = v.Wpo.VC_Annot.axioms in
     let prop = Wpo.GOAL.compute_proof ~pid v.Wpo.VC_Annot.goal in
     let probes = Wpo.GOAL.compute_probes ~pid v.Wpo.VC_Annot.goal in
-    prove_prop ~pid ?axioms ~probes prop
+    prove_prop ~pid ?axioms ~probes prop, probes
   | Wpo.GoalLemma v ->
     let lemma = v.Wpo.VC_Lemma.lemma in
     let depends = v.Wpo.VC_Lemma.depends in
     let prop = Lang.F.p_forall lemma.l_forall lemma.l_lemma in
     let axioms = Some(lemma.l_cluster,depends) in
-    prove_prop ~pid ?axioms prop
+    prove_prop ~pid ?axioms prop,[]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Task                                                        --- *)
@@ -1229,24 +1224,33 @@ let print_model (res:Why3.Call_provers.prover_result) =
               res (Why3.Model_parser.print_model_human ~filter_similar:false ~print_attrs:true) model
           ))
       res.pr_models;
-    (* Wp_parameters.feedback ~dkey:dkey_model "%a" *)
-    Format.eprintf "@[<v 1>@[models:@]@,%a@]@."
-      (fun fmt ->
-         List.iter (fun (_,model) ->
-             Format.fprintf fmt "@[<hov 1>@[model:@]@,";
-             let l = Why3.Model_parser.get_model_elements model in
-             List.iter (fun (e:Why3.Model_parser.model_element) ->
-                 match has_model_attr e.me_attrs with
-                 | None -> ()
-                 | Some id ->
-                   Format.fprintf fmt "%s:%a,@," id
-                     Why3.Model_parser.print_concrete_term e.me_concrete_value) l;
-             Format.fprintf fmt "@]@,"
-           ))
-      res.pr_models;
   )
 
-let ping_prover_call ~config p =
+let get_model probes (res:Why3.Call_provers.prover_result) =
+  print_model (res:Why3.Call_provers.prover_result);
+  (* we take the second model because it should be the most precise?? *)
+  match res.pr_models with
+  | [] -> Why3Provers.empty_model
+  | _ ->
+    let r =     let h_probes = Datatype.Int.Hashtbl.create 10 in
+      List.iter (fun x -> Datatype.Int.Hashtbl.add h_probes
+                    x.Conditions.probe_id x) probes;
+      let _,model = Extlib.last res.pr_models in
+      let l = Why3.Model_parser.get_model_elements model in
+      List.fold_left (fun acc (e:Why3.Model_parser.model_element) ->
+          match has_model_attr e.me_attrs with
+          | None -> acc
+          | Some id ->
+            let id = int_of_string id in
+            let p = Datatype.Int.Hashtbl.find h_probes id in
+            Conditions.Probe.Map.add p e.me_concrete_value acc)
+        Why3Provers.empty_model l
+    in
+    Format.eprintf "@[model:%a@]@." Why3Provers.print_model r;
+    r
+
+
+let ping_prover_call ~config probes p =
   match Why3.Call_provers.query_call p.call with
   | NoUpdates
   | ProverStarted ->
@@ -1277,10 +1281,12 @@ let ping_prover_call ~config p =
       match pr.pr_answer with
       | Timeout -> VCS.timeout pr.pr_time
       | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
-      | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Invalid
+      | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps
+                     ~model:(get_model probes pr) VCS.Invalid
       | OutOfMemory -> VCS.failed "out of memory"
       | StepLimitExceeded -> VCS.result ?steps:p.steps VCS.Stepout
-      | Unknown _ -> print_model pr; VCS.unknown
+      | Unknown _ -> print_model pr;
+        VCS.result ~model:(get_model probes pr) VCS.Unknown
       | _ when p.interrupted -> VCS.timeout p.timeout
       | Failure s -> VCS.failed s
       | HighFailure ->
@@ -1298,7 +1304,7 @@ let ping_prover_call ~config p =
       VCS.pp_result r;
     Task.Return (Task.Result r)
 
-let call_prover_task ~timeout ~steps ~config prover call =
+let call_prover_task ~timeout ~steps ~config probes prover call =
   Wp_parameters.debug ~dkey "Why3 run prover %a with timeout %f, steps %d@."
     Why3.Whyconf.print_prover prover
     (Why3.Opt.get_def (0.0) timeout)
@@ -1315,7 +1321,7 @@ let call_prover_task ~timeout ~steps ~config prover call =
       pcall.killed <- true ;
       Why3.Call_provers.interrupt_call ~config call ;
       Task.Yield
-    | Task.Coin -> ping_prover_call ~config pcall
+    | Task.Coin -> ping_prover_call ~config probes pcall
   in
   Task.async ping
 
@@ -1340,7 +1346,7 @@ let digest_task wpo drv ?script prover task =
     Digest.file file |> Digest.to_hex
   end
 
-let run_batch pconf driver ~config ?script ~timeout ~steplimit prover task =
+let run_batch pconf driver ~config ?script ~probes ~timeout ~steplimit prover task =
   let steps = match steplimit with Some 0 -> None | _ -> steplimit in
   let limit =
     let config = Why3.Whyconf.get_main @@ Why3Provers.config () in
@@ -1365,7 +1371,7 @@ let run_batch pconf driver ~config ?script ~timeout ~steplimit prover task =
   let inplace = if script <> None then Some true else None in
   let call = Why3.Driver.prove_task_prepared ?old:script ?inplace
       ~command ~limit ~config driver task in
-  call_prover_task ~config ~timeout ~steps prover call
+  call_prover_task ~config ~timeout ~steps probes prover call
 
 (* -------------------------------------------------------------------------- *)
 (* --- Interactive Prover (Coq)                                           --- *)
@@ -1409,12 +1415,12 @@ let editor ~script ~merge ~config pconf driver task =
         Why3.Call_provers.call_editor
           ~command ~config script
       in
-      call_prover_task ~config ~timeout:None ~steps:None pconf.prover call
+      call_prover_task ~config ~timeout:None ~steps:None [] pconf.prover call
     end
 
-let compile ~script ~timeout ~config wpo pconf driver prover task =
+let compile ~script ~timeout ~config ~probes wpo pconf driver prover task =
   let digest = digest_task wpo driver ~script in
-  let runner = run_batch ~config pconf driver ~script in
+  let runner = run_batch ~probes ~config pconf driver ~script in
   Cache.get_result ~digest ~runner ~timeout ~steplimit:None prover task
 
 let prepare ~mode wpo driver task =
@@ -1432,7 +1438,7 @@ let prepare ~mode wpo driver task =
     end
   else None
 
-let interactive ~mode wpo pconf ~config driver prover task =
+let interactive ~mode ~probes wpo pconf ~config driver prover task =
   let time = Wp_parameters.InteractiveTimeout.get () in
   let timeout = if time <= 0 then None else Some (float time) in
   match prepare ~mode wpo driver task with
@@ -1448,28 +1454,28 @@ let interactive ~mode wpo pconf ~config driver prover task =
       Why3.Whyconf.print_prover prover script ;
     match mode with
     | VCS.Batch ->
-      compile ~script ~timeout ~config wpo pconf driver prover task
+      compile ~probes ~script ~timeout ~config wpo pconf driver prover task
     | VCS.Update ->
       if merge then updatescript ~script driver task ;
-      compile ~script ~timeout ~config wpo pconf driver prover task
+      compile ~probes ~script ~timeout ~config wpo pconf driver prover task
     | VCS.Edit ->
       let open Task in
       editor ~script ~merge ~config pconf driver task >>= fun _ ->
-      compile ~script ~timeout ~config wpo pconf driver prover task
+      compile ~probes:[] ~script ~timeout ~config wpo pconf driver prover task
     | VCS.Fix ->
       let open Task in
-      compile ~script ~timeout ~config wpo pconf driver prover task >>= fun r ->
+      compile ~probes:[] ~script ~timeout ~config wpo pconf driver prover task >>= fun r ->
       if VCS.is_valid r then return r else
         editor ~script ~merge ~config pconf driver task >>= fun _ ->
-        compile ~script ~timeout ~config wpo pconf driver prover task
+        compile ~probes:[] ~script ~timeout ~config wpo pconf driver prover task
     | VCS.FixUpdate ->
       let open Task in
       if merge then updatescript ~script driver task ;
-      compile ~script ~timeout ~config wpo pconf driver prover task >>= fun r ->
+      compile ~probes:[] ~script ~timeout ~config wpo pconf driver prover task >>= fun r ->
       if VCS.is_valid r then return r else
         let merge = false in
         editor ~script ~merge ~config pconf driver task >>= fun _ ->
-        compile ~script ~timeout ~config wpo pconf driver prover task
+        compile ~probes:[] ~script ~timeout ~config wpo pconf driver prover task
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prove WPO                                                          --- *)
@@ -1483,7 +1489,7 @@ let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ~prover wpo () =
   try
     (* Always generate common task *)
     let context = Wpo.get_context wpo in
-    let task = WpContext.on_context context task_of_wpo wpo in
+    let task,probes = WpContext.on_context context task_of_wpo wpo in
     if Wp_parameters.Generate.get ()
     then Task.return VCS.no_result (* Only generate *)
     else
@@ -1493,11 +1499,11 @@ let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ~prover wpo () =
         Task.return VCS.valid
       else
       if pconf.interactive then
-        interactive ~mode wpo pconf ~config drv prover task
+        interactive ~mode wpo pconf ~config ~probes drv prover task
       else
         Cache.get_result
           ~digest:(digest_task wpo drv)
-          ~runner:(run_batch ~config pconf drv ?script:None)
+          ~runner:(run_batch ~config ~probes pconf drv ?script:None)
           ~timeout ~steplimit prover task
   with exn ->
     if Wp_parameters.has_dkey dkey_api then

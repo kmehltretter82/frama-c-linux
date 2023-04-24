@@ -203,6 +203,7 @@ type result = {
   prover_steps : int ;
   prover_errpos : Lexing.position option ;
   prover_errmsg : string ;
+  prover_model : Why3Provers.model;
 }
 
 let is_result = function
@@ -262,7 +263,7 @@ let autofit r =
   time_fits r.prover_time &&
   step_fits r.prover_steps
 
-let result ?(cached=false) ?(solver=0.0) ?(time=0.0) ?(steps=0) verdict =
+let result ?(model=Why3Provers.empty_model) ?(cached=false) ?(solver=0.0) ?(time=0.0) ?(steps=0) verdict =
   {
     verdict ;
     cached = cached ;
@@ -271,6 +272,7 @@ let result ?(cached=false) ?(solver=0.0) ?(time=0.0) ?(steps=0) verdict =
     prover_steps = steps ;
     prover_errpos = None ;
     prover_errmsg = "" ;
+    prover_model = model;
   }
 
 let no_result = result NoResult
@@ -288,6 +290,7 @@ let failed ?pos msg = {
   prover_steps = 0 ;
   prover_errpos = pos ;
   prover_errmsg = msg ;
+  prover_model = Why3Provers.empty_model
 }
 
 let cached r = if is_verdict r then { r with cached=true } else r
@@ -398,6 +401,8 @@ let merge r1 r2 =
     prover_steps = max r1.prover_steps r2.prover_steps ;
     prover_errpos = err.prover_errpos ;
     prover_errmsg = err.prover_errmsg ;
+    prover_model = Conditions.Probe.Map.union (fun _ v _ -> Some v)
+        r1.prover_model r2.prover_model
   }
 
 let leq r1 r2 =

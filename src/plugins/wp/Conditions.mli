@@ -66,12 +66,15 @@ and condition =
 
 and sequence (** List of steps *)
 
-and probe = {
+and probe = private {
   probe_stmt : stmt option ;
   probe_name : string ;
   probe_term : term ;
   probe_loc : location ;
+  probe_id : int ;
 }
+
+module Probe: Datatype.S_with_collections with type t = probe
 
 type sequent = sequence * F.pred
 

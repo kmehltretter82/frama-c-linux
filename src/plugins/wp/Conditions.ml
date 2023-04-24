@@ -102,6 +102,7 @@ and probe = {
   probe_name : string ;
   probe_term : term ;
   probe_loc : location ;
+  probe_id : int;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -543,13 +544,32 @@ let intros ps hs =
 let state ?descr ?stmt state hs =
   Bundle.add (step ?descr ?stmt (State state)) hs
 
-let probe ~loc ?descr ?stmt ~name term hs =
-  Bundle.add (step ?descr ?stmt (Probe {
-      probe_loc = loc ;
-      probe_stmt = stmt ;
-      probe_name = name ;
-      probe_term = term ;
-    })) hs
+let probe =
+  let id = ref (-1) in
+  fun ~loc ?descr ?stmt ~name term hs ->
+    incr id;
+    Bundle.add (step ?descr ?stmt (Probe {
+        probe_loc = loc ;
+        probe_stmt = stmt ;
+        probe_name = name ;
+        probe_term = term ;
+        probe_id = !id
+      })) hs
+
+module Probe = struct
+  module T = struct
+    include Datatype.Undefined
+    let name = "WP.Conditions.Probe.t"
+    let reprs = [{probe_loc=List.hd Cil_datatype.Location.reprs;
+                  probe_stmt = None; probe_name ="";probe_term = Lang.F.e_true; probe_id=1 }]
+    type t = probe
+    let hash x = x.probe_id
+    let equal x y = Int.equal x.probe_id y.probe_id
+    let compare x y = Int.compare x.probe_id y.probe_id
+    let pretty fmt p = Format.fprintf fmt "%s~%i" p.probe_name p.probe_id
+  end
+  include Datatype.Make_with_collections(T)
+end
 
 let assume ?descr ?stmt ?deps ?warn ?(init=false) ?(domain=false) p hs =
   match F.is_ptrue p with
