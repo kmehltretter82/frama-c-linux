@@ -71,7 +71,7 @@ function getWidth(node: any): string {
 
 (style as unknown[]).push({
     selector: 'node',
-    style: {width: getWidth}
+    style: { width: getWidth }
   });
 
 
@@ -86,11 +86,11 @@ function edgeId(source: AstAPI.fct, target: AstAPI.fct): string {
 function convertGraph(graph: CgAPI.graph): object[] {
   const elements = [];
   for (const v of graph.vertices) {
-    elements.push({data: {...v, id: v.kf}});
+    elements.push({ data: { ...v, id: v.kf } });
   }
   for (const e of graph.edges) {
     const id = edgeId(e.src, e.dst);
-    elements.push({data: {...e, id, source: e.src, target: e.dst}});
+    elements.push({ data: { ...e, id, source: e.src, target: e.dst } });
   }
   return elements;
 }
@@ -122,7 +122,7 @@ function selectCallstack(cy: Cy.Core, callstack: callstack | undefined): void {
   });
 }
 
-function Callgraph() : JSX.Element { 
+function Callgraph() : JSX.Element {
   const isComputed = useSyncValue(CgAPI.isComputed);
   const graph = useSyncValue(CgAPI.callgraph);
   const [cy, setCy] = useState<Cy.Core>();
@@ -130,7 +130,7 @@ function Callgraph() : JSX.Element {
   const [selection, setSelection] = useSelection();
   const callstack = useRequest(ValuesAPI.getCallstackInfo, cs);
 
-  const layout = {name: 'cola', nodeSpacing: 32};
+  const layout = { name: 'cola', nodeSpacing: 32 };
   const computedStyle = getComputedStyle(document.documentElement);
   const styleVariables =
     { ['code-select']: computedStyle.getPropertyValue("--code-select") };
@@ -139,7 +139,7 @@ function Callgraph() : JSX.Element {
     ...style,
     {
       "selector": ".marker-selected",
-      "style": {"background-color": styleVariables['code-select']}
+      "style": { "background-color": styleVariables['code-select'] }
     }
   ];
 
@@ -159,7 +159,7 @@ function Callgraph() : JSX.Element {
       cy.off('click');
       cy.on('click', 'node', (event) => {
         const fct = event.target.id() as string;
-        setSelection({location: {fct}});
+        setSelection({ location: { fct } });
       });
     }
   }, [cy, setSelection]);
@@ -176,8 +176,8 @@ function Callgraph() : JSX.Element {
         stylesheet={completeStyle}
         cy={setCy}
         layout={layout}
-        style={{width: '100%', height: '100%'}}
-      />);  
+        style={{ width: '100%', height: '100%' }}
+      />);
   }
   else {
     return (<></>);
