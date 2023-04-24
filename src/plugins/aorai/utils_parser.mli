@@ -39,3 +39,6 @@ val unknown_token: Lexing.lexbuf -> 'a
 
 (** initiate a new line in the lexbuf *)
 val newline: Lexing.lexbuf -> unit
+
+(** aborts in case of an unterminated comment *)
+val unterminated_comment: Lexing.lexbuf -> 'a

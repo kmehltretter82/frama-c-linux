@@ -32,7 +32,7 @@ enum aorai_OpStatusList {
 int X;
 /*@ ghost enum aorai_ListOper aorai_CurOperation; */
 /*@ ghost enum aorai_OpStatusList aorai_CurOpStatus; */
-/*@ ghost int aorai_CurStates = S1; */
+/*@ ghost enum aorai_States aorai_CurStates = S1; */
 /*@ ghost
   /@ requires aorai_CurStates ≡ Sf;
      ensures aorai_CurOpStatus ≡ aorai_Called;
@@ -73,7 +73,7 @@ int X;
     /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
-    if (3 == aorai_CurStates) aorai_CurStates = S_in_f;
+    if ((unsigned int)3 == aorai_CurStates) aorai_CurStates = S_in_f;
     else aorai_CurStates = aorai_reject;
     return;
   }
@@ -120,7 +120,7 @@ int X;
     /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
-    if (2 == aorai_CurStates) aorai_CurStates = in_main;
+    if ((unsigned int)2 == aorai_CurStates) aorai_CurStates = in_main;
     else aorai_CurStates = aorai_reject;
     return;
   }
@@ -180,7 +180,7 @@ void f(void)
     /@ slevel full; @/
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
-    if (0 == aorai_CurStates) aorai_CurStates = Sf;
+    if ((unsigned int)0 == aorai_CurStates) aorai_CurStates = Sf;
     else aorai_CurStates = aorai_reject;
     return;
   }
@@ -227,7 +227,7 @@ void f(void)
     /@ slevel full; @/
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
-    if (5 == aorai_CurStates) aorai_CurStates = S2;
+    if ((unsigned int)5 == aorai_CurStates) aorai_CurStates = S2;
     else aorai_CurStates = aorai_reject;
     return;
   }

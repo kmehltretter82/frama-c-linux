@@ -3523,8 +3523,7 @@ extern float frexpf(float x, int *exp);
 extern long double frexpl(long double x, int *exp);
 
 /*@ requires
-      finite_logic_res:
-        \is_finite((double)(x * pow((double)2.0d, (double)exp)));
+      finite_logic_res: \is_finite((double)(x * pow(2.0d, (double)exp)));
     ensures finite_result: \is_finite(\result);
     ensures
       __fc_errno: __fc_errno ≡ 34 ∨ __fc_errno ≡ \old(__fc_errno);
@@ -3536,8 +3535,7 @@ extern double ldexp(double x, int exp);
 
 /*@ requires
       finite_logic_res:
-        \is_finite((float)(x *
-                           pow((double)((float)2.0f), (double)((float)exp))));
+        \is_finite((float)(x * pow((double)(2.0f), (double)((float)exp))));
     ensures finite_result: \is_finite(\result);
     ensures
       __fc_errno: __fc_errno ≡ 34 ∨ __fc_errno ≡ \old(__fc_errno);

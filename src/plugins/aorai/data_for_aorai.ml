@@ -908,11 +908,15 @@ let type_expr metaenv env ?tr ?current e =
 
 let type_cond needs_pebble metaenv env tr cond =
   let current = if needs_pebble then Some tr.stop else None in
+  let loc = Cil_datatype.Location.unknown in
   let rec aux pos env =
     function
     | PRel(rel,e1,e2) ->
       let env, e1, c1 = type_expr metaenv env ~tr ?current e1 in
       let env, e2, c2 = type_expr metaenv env ~tr ?current e2 in
+      let rt = LTyping.conditional_conversion loc (Some rel) e1 e2 in
+      let e1 = LTyping.mk_cast e1 rt in
+      let e2 = LTyping.mk_cast e2 rt in
       let call_cond = if pos then tand c1 c2 else tor (tnot c1) (tnot c2) in
       let rel = TRel(Logic_typing.type_rel rel,e1,e2) in
       let cond = if pos then tand call_cond rel else tor call_cond rel in

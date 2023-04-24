@@ -12,7 +12,7 @@
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  SharedData.FunctionCode ∈ {0}
+  SharedData.FunctionCode ∈ {BDP_BITE_NORMAL}
             .MachineNumber ∈ {1456}
             .[bits 48 to 63] ∈ UNINITIALIZED
             .Line ∈ {25}
