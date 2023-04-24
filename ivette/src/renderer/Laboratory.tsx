@@ -358,8 +358,10 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
         builtin: false,
       };
       setCustoms(customs);
-      if (current) shapes[current] = shape;
+      const newShape = isCurrent ? shape : shapes[id];
+      shapes[newId] = newShape;
       setLocal({ current: newId, shapes });
+      setShape(newShape);
       setEdited(newId);
     };
 
