@@ -17,6 +17,10 @@
   text-align: center;
 }
 
+.eva-status button {
+  margin: auto;
+}
+
 .eva-status-computing {
   font-weight: bold;
 }
