@@ -1,23 +1,15 @@
-18c18
-<      size - index ∈ [3..--]
----
->      size - index ∈ {433}
-19a20
->      size + cmdLen ∈ [--..867]
-21a23
->      index - cmdLen ∈ [-428..--]
-33a36
->      size + index ∈ [442..872]
-35a39
->      size + cmdLen ∈ [--..864]
-36a41,42
->      index + cmdLen ∈ [--..864]
->      index - cmdLen ∈ [-422..--]
-38c44
-<      size - index ∈ [3..--]
----
->      size - index ∈ [3..430]
-39a46,48
->      index - cmdLen ∈ [-422..--]
->      index + index ∈ [12..869]
->      index - index ∈ [--..430]
+39a40,53
+> [eva] octagons-pointers-simple.c:43: starting to merge loop iterations
+> [eva] octagons-pointers-simple.c:46: 
+>   Frama_C_dump_each:
+>   # octagon:
+>   {[ buffer - cmd ∈ [-436..-6]
+>      cmd->cmdLen - cmdLen ∈ {0}
+>      index + cmdLen ∈ [--..434]
+>      cmd->cmdLen + index ∈ [--..434]
+>       ]}
+>   ==END OF DUMP==
+> [eva] computing for function cmdRead <- main.
+>   Called from octagons-pointers-simple.c:47.
+> [eva] Recording results for cmdRead
+> [eva] Done for function cmdRead

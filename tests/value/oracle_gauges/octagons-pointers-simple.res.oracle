@@ -1,33 +1,32 @@
-65a66,97
+39a40,70
+> [eva] octagons-pointers-simple.c:43: starting to merge loop iterations
 > [eva] octagons-pointers-simple.c:46: 
 >   Frama_C_dump_each:
 >   # octagon:
 >   {[ buffer - cmd ∈ [-436..-6]
 >      cmd->cmdLen - cmdLen ∈ {0}
->      size - cmdLen ∈ [8..--]
->      size - cmd->cmdLen ∈ [8..--]
->      size - index ∈ [3..--]
 >      index + cmdLen ∈ [--..434]
 >      cmd->cmdLen + index ∈ [--..434]
 >       ]}
 >   ==END OF DUMP==
-> [eva] computing for function cmdRead <- main.
->   Called from octagons-pointers-simple.c:47.
-> [eva] Recording results for cmdRead
-> [eva] Done for function cmdRead
+> [eva] octagons-pointers-simple.c:47: Reusing old results for call to cmdRead
 > [eva] octagons-pointers-simple.c:46: 
 >   Frama_C_dump_each:
 >   # octagon:
 >   {[ buffer - cmd ∈ [-436..-6]
 >      cmd->cmdLen - cmdLen ∈ {0}
->      size - cmdLen ∈ [8..--]
->      size - cmd->cmdLen ∈ [8..--]
->      size - index ∈ [3..--]
 >      index + cmdLen ∈ [--..434]
 >      cmd->cmdLen + index ∈ [--..434]
 >       ]}
 >   ==END OF DUMP==
-> [eva] computing for function cmdRead <- main.
->   Called from octagons-pointers-simple.c:47.
-> [eva] Recording results for cmdRead
-> [eva] Done for function cmdRead
+> [eva] octagons-pointers-simple.c:47: Reusing old results for call to cmdRead
+> [eva] octagons-pointers-simple.c:46: 
+>   Frama_C_dump_each:
+>   # octagon:
+>   {[ buffer - cmd ∈ [-436..-6]
+>      cmd->cmdLen - cmdLen ∈ {0}
+>      index + cmdLen ∈ [--..434]
+>      cmd->cmdLen + index ∈ [--..434]
+>       ]}
+>   ==END OF DUMP==
+> [eva] octagons-pointers-simple.c:47: Reusing old results for call to cmdRead

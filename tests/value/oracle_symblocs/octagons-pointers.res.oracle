@@ -1,6 +1,0 @@
-34,35c34,35
-<      cmd - len ∈ {0}
-<      len - code ∈ {-2}
----
->      len - cmd ∈ {0}
->      code - len ∈ {2}
