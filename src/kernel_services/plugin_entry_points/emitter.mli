@@ -143,26 +143,14 @@ sig
     cmp: (H.key -> H.key -> int) ->
     (H.key -> internal_tbl -> 'a -> 'a) -> 'a -> 'a
   val remove: H.key -> unit
-
-  val add_hook_on_update: (E.t -> H.key -> D.t -> unit) -> unit
-  (** Register a hook to be applied whenever a binding is added or updated
-      into the table.
-      @since Frama-C+dev *)
-
   val add_hook_on_remove: (E.t -> H.key -> D.t -> unit) -> unit
   (** Register a hook to be applied whenever a binding is removed from the table.
       @since Fluorine-20130401 *)
-
-  val apply_hooks_on_update: E.t -> H.key -> D.t -> unit
-  (** This function must be called on each binding which is updated in the
-      table without directly calling the function {!remove}.
-      @since Frama-C+dev *)
 
   val apply_hooks_on_remove: E.t -> H.key -> D.t -> unit
   (** This function must be called on each binding which is removed from the
       table without directly calling the function {!remove}.
       @since Fluorine-20130401 *)
-
 end
 
 (*
