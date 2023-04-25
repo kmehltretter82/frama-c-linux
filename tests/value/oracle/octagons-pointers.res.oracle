@@ -81,6 +81,15 @@
 [eva] Recording results for cmdRead
 [eva] Done for function cmdRead
 [eva:loop-unroll:partial] octagons-pointers.c:49: loop not completely unrolled
+[eva] octagons-pointers.c:43: starting to merge loop iterations
+[eva] octagons-pointers.c:46: 
+  Frama_C_dump_each:
+  # octagon:
+  {[ buffer - cmd ∈ [-436..-6]
+     cmd->cmdLen + index ∈ [--..434]
+      ]}
+  ==END OF DUMP==
+[eva] octagons-pointers.c:47: Reusing old results for call to cmdRead
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

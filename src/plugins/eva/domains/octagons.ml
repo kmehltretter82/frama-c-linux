@@ -66,12 +66,10 @@ type evaluator = Cil_types.exp -> Cvalue.V.t or_top
 (* Abstract interface for the variables used by the octagons. *)
 module type Variable = sig
   include Datatype.S_with_collections
-  (* Creates a variable from a varinfo. Should be extended to support more
-     lvalues. *)
-  val make: varinfo -> t
+  (* Creates a variable from a lvalue. *)
+  val make_lval: lval -> t
   val make_int: varinfo -> t
   val make_startof: varinfo -> t
-  val make_lval: lval -> t
   val kind: t -> kind (* The kind of the variable: integer or float. *)
   val lval: t -> lval option (* The CIL lval corresponding to the variable. *)
   val id: t -> int (* Unique id, needed to use variables as hptmap keys. *)
@@ -132,10 +130,13 @@ module Variable : Variable = struct
   end
 
   include Datatype.Make_with_collections (Datatype_Input)
-  let make vi = Var vi
+
+  let make_lval = function
+    | Cil_types.Var vi, NoOffset -> Var vi
+    | lval -> Lval (HCE.of_lval lval)
+
   let make_int vi = Int vi
   let make_startof vi = StartOf vi
-  let make_lval lval = Lval (HCE.of_lval lval)
 
   let kind = function
     | Var vi -> typ_kind vi.vtype
@@ -1227,12 +1228,6 @@ module State = struct
     in
     fun exp ->
       match exp.enode with
-      | Lval (Var vi, NoOffset)
-        when Cil.isIntegralOrPointerType vi.vtype
-          && not (Cil.typeHasQualifier "volatile" vi.vtype)
-          && not (is_singleton (eval exp)) ->
-        Some (Variable.make vi, Ival.zero)
-
       | Lval lval
         when Cil.isIntegralOrPointerType (Cil.typeOfLval lval)
           && not (Eval_typ.lval_contains_volatile lval)
@@ -1584,11 +1579,11 @@ module Domain = struct
 
   let reduce_further state expr value =
     match expr.enode with
-    | Lval (Var x, NoOffset) when Cil.isIntegralOrPointerType x.vtype ->
+    | Lval lval when Cil.(isIntegralOrPointerType (typeOfLval lval)) ->
       begin
         try
           let x_ival = Cvalue.V.project_ival value in
-          let var = Variable.make x in
+          let var = Variable.make_lval lval in
           let kind = Variable.kind var in
           let octagons = State.related_octagons state var in
           let reduce acc (y, octagons) =
@@ -1640,19 +1635,20 @@ module Domain = struct
     in
     List.fold_left add_octagon state octagons
 
-  let infer_interval expr ival state =
+  let infer_interval eval_deps expr ival state =
     if not infer_intervals
     then state
     else
       match expr.enode with
-      | Lval (Var varinfo, NoOffset)
-        when Cil.isIntegralType varinfo.vtype ->
-        let var = Variable.make varinfo in
+      | Lval lval when Cil.(isIntegralType (typeOfLval lval)) ->
+        let var = Variable.make_lval lval in
+        let deps = Deps.add var (eval_deps var) state.deps in
         let intervals = Intervals.add var ival state.intervals in
-        { state with intervals }
+        { state with intervals; deps }
       | _ -> state
 
   let update valuation state =
+    let _eval_exp, eval_deps = evaluator_from_valuation valuation in
     let aux expr record state =
       let value = record.Eval.value in
       match record.reductness, value.v, value.initialized, value.escaping with
@@ -1661,7 +1657,7 @@ module Domain = struct
           try
             let ival = Cvalue.V.project_ival cvalue in
             let state = infer_octagons valuation expr ival state in
-            infer_interval expr ival state
+            infer_interval eval_deps expr ival state
           with Cvalue.V.Not_based_on_null -> state
         end
       | _ -> state
@@ -1669,7 +1665,7 @@ module Domain = struct
     try `Value (check "update" (valuation.Abstract_domain.fold aux state))
     with EBottom -> `Bottom
 
-  let assign_interval variable assigned state =
+  let assign_interval eval_deps variable assigned state =
     if not infer_intervals
     then state
     else
@@ -1680,17 +1676,19 @@ module Domain = struct
           try
             let ival = Cvalue.V.project_ival v in
             let intervals = Intervals.add variable ival state.intervals in
-            { state with intervals }
+            let deps = Deps.add variable (eval_deps variable) state.deps in
+            { state with intervals; deps }
           with Cvalue.V.Not_based_on_null -> state
         end
       | _ -> state
 
   (* Assigns integer [varinfo] to [expr]. *)
-  let assign_variable varinfo expr assigned valuation state =
+  let assign_variable lvalue expr assigned valuation state =
     let eval_exp, eval_deps = evaluator_from_valuation valuation in
-    let variable = Variable.make varinfo in
+    let variable = Variable.make_lval lvalue in
     (* Remove lvals refering to the variable *)
-    let vars = Deps.intersects_var state.deps varinfo in
+    let lvalue_zone = (eval_deps variable).data in
+    let vars = Deps.intersects_zone state.deps lvalue_zone in
     let vars = List.filter (Fun.negate (Variable.equal variable)) vars in
     let state = List.fold_left State.remove state vars in
     (* Interpret inversible assignment if possible *)
@@ -1705,8 +1703,8 @@ module Domain = struct
         State.sub_delta ~inverse state variable var.Rewriting.coeff
       with Not_found -> State.remove state variable
     in
-    let state = assign_interval variable assigned state in
-    let enode = Lval (Var varinfo, NoOffset) in
+    let state = assign_interval eval_deps variable assigned state in
+    let enode = Lval lvalue in
     let left_expr = Cil.new_exp ~loc:expr.eloc enode in
     (* On the assignment X = E; if X-E can be rewritten as ±(X±Y-v),
        then the octagonal constraint [X±Y ∈ v] holds. *)
@@ -1721,10 +1719,9 @@ module Domain = struct
 
   let assign _kinstr left_value expr assigned valuation state =
     update valuation state >>- fun state ->
-    match left_value.lval with
-    | Var varinfo, NoOffset when Cil.isIntegralOrPointerType varinfo.vtype ->
-      assign_variable varinfo expr assigned valuation state
-    | _ ->
+    if Cil.isIntegralOrPointerType left_value.ltyp
+    then assign_variable left_value.lval expr assigned valuation state
+    else
       let written_loc = Precise_locs.imprecise_location left_value.lloc in
       let written_zone =
         Locations.(enumerate_valid_bits Write written_loc)
@@ -1754,8 +1751,9 @@ module Domain = struct
         `Value (start_recursive_call recursion state)
       | None ->
         let assign_formal state { formal; concrete; avalue } =
+          let lval = (Var formal, NoOffset) in
           if Cil.isIntegralOrPointerType formal.vtype
-          then state >>- assign_variable formal concrete avalue valuation
+          then state >>- assign_variable lval concrete avalue valuation
           else state
         in
         List.fold_left assign_formal (`Value state) call.arguments
