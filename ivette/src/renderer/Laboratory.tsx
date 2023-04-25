@@ -259,19 +259,21 @@ interface CustomViewsProps {
   views: React.PropsWithChildren<View>[]
 }
 
-interface CustomViewsSettings {
-  current?: string;
-  shapes?: { [k: string]: Shape };
-}
-
+type CustomShapes = { [id: string]: Shape };
 type CustomViews = { [id: string]: View };
 
 function CustomViews(props: CustomViewsProps): JSX.Element {
   const { settings, shape, setShape, views: libViews } = props;
-  const [local, setLocal] = Settings.useWindowSettingsData<CustomViewsSettings>(
-    settings,
-    Json.identity as Json.Decoder<CustomViewsSettings>,
-    Json.identity as Json.Encoder<CustomViewsSettings>,
+  const [current, setCurrent] = Settings.useWindowSettingsData<string>(
+    `${settings}.current`,
+    Json.jString,
+    Json.identity,
+    ''
+  );
+  const [shapes, setShapes] = Settings.useWindowSettingsData<CustomShapes>(
+    `${settings}.shapes`,
+    Json.identity as Json.Decoder<CustomShapes>,
+    Json.identity as Json.Encoder<CustomShapes>,
     // Clearly abusive conversion, real encoder/decoder are needed
     {},
   );
@@ -284,8 +286,7 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
   );
   const [edited, setEdited] = React.useState<string>();
   const triggerDefault = React.useRef<View>();
-  const { current, shapes = {} } = local;
-  const theViews: { [id: string]: View } = {};
+  const theViews: CustomViews = {};
 
   _.forEach(libViews, (view) => {
     const {
@@ -321,9 +322,12 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
 
   const SELECT = (id: string): void => {
     if (id && current !== id) {
-      if (current) shapes[current] = shape;
-      setLocal({ current: id, shapes });
+      if (current) {
+        const newShapes = { ...shapes, [current]: shape };
+        setShapes(newShapes);
+      }
       setShape(shapes[id] || getDefaultShape(theViews[id]));
+      setCurrent(id);
     }
   };
 
@@ -334,8 +338,9 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
     const isCustom = !view.builtin;
 
     const DEFAULT = (): void => {
-      shapes[id] = undefined;
-      setLocal({ current: id, shapes });
+      const newShapes = { ...shapes };
+      delete newShapes[id];
+      setShapes(newShapes);
       setShape(getDefaultShape(view));
     };
 
@@ -365,21 +370,34 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
       setCustoms({ ...customs, [newId]: customView });
       const newShape =
         isCurrent ? shape : (shapes[id] ?? getDefaultShape(view));
-      const newShapes = { ...shapes, [newId]: newShape } ;
-      setLocal({ current: newId, shapes: newShapes });
+      const newShapes = { ...shapes, [newId]: newShape };
+      setShapes(newShapes);
       setShape(newShape);
+      setCurrent(newId);
       setEdited(newId);
     };
 
     const REMOVE = (): void => {
-      delete customs[id];
-      delete shapes[id];
-      setCustoms({ ...customs });
-      const newCurrent = current === id ? undefined : current;
-      setLocal({ current: newCurrent, shapes });
+      const newCustoms = { ... customs };
+      const newShapes = { ... shapes };
+      delete newCustoms[id];
+      delete newShapes[id];
+      setCustoms(newCustoms);
+      setShapes(newShapes);
+      if (isCurrent) {
+        const newView =
+          (view.origin && theViews[view.origin]) ||
+          _.find(theViews, (v: View) => !!v.defaultView) ||
+          _.find(theViews, (v: View) => v.id !== current) ||
+          theViews[0];
+        const newId = newView.id;
+        const newShape = shapes[newId] || getDefaultShape(newView);
+        setCurrent(newId);
+        setShape(newShape);
+      }
     };
 
-    const onView = (action: string) =>
+    const onView = (action: string): string =>
       isCurrent ? `${action} View` : `${action} View (${view.label})`;
     const hasRename = !edited && isCustom;
 
