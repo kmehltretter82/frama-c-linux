@@ -968,6 +968,10 @@ module BaseToVariables = struct
         | None -> Some (VSet.empty, VSet.singleton v)
         | Some (direct, indirect) -> Some (direct, VSet.add v indirect))
 
+  let add_deps var deps map =
+    Locations.Zone.fold_bases (add_direct var) deps.data map |>
+    Locations.Zone.fold_bases (add_indirect var) deps.indirect
+
   let remove_direct v =
     replace (function
         | None -> None
@@ -985,6 +989,10 @@ module BaseToVariables = struct
           if VSet.is_empty direct && VSet.is_empty indirect
           then None
           else Some (direct, indirect))
+
+  let remove_deps var deps map =
+    Locations.Zone.fold_bases (remove_direct var) deps.data map |>
+    Locations.Zone.fold_bases (remove_indirect var) deps.indirect
 
   let all_variables m =
     fold (fun _b (dv, iv) acc -> VSet.(union (union dv iv) acc)) m VSet.empty
@@ -1033,26 +1041,34 @@ module Deps = struct
     in
     VSet.union data indirect |> VSet.elements
 
+  (* Does [deps] contains at least the bases from [previous_deps]? *)
+  let are_bases_increasing previous_deps deps =
+    let get_bases = Locations.Zone.get_bases in
+    let is_increasing previous_zone zone =
+      Base.SetLattice.is_included (get_bases previous_zone) (get_bases zone)
+    in
+    is_increasing previous_deps.data deps.data &&
+    is_increasing previous_deps.indirect deps.indirect
+
   let add var deps (m, i: t): t =
-    let m = VariableToDeps.add var deps m
-    and i =
-      i |>
-      Locations.Zone.fold_bases (BaseToVariables.add_direct var) deps.data |>
-      Locations.Zone.fold_bases (BaseToVariables.add_indirect var) deps.indirect
-    in (m,i)
+    (* If [var] already exists in the state and had bigger dependencies (in rare
+       cases, a dependency can disappear by reduction), remove the previous deps
+       from the inverse map to ensure consistency between both maps. *)
+    let i =
+      match VariableToDeps.find_opt var m with
+      | Some previous_deps when not (are_bases_increasing previous_deps deps) ->
+        BaseToVariables.remove_deps var previous_deps i
+      | _ -> i
+    in
+    VariableToDeps.add var deps m,
+    BaseToVariables.add_deps var deps i
 
   let remove (var: Variable.t) ((m, i) as d: t): t =
     match VariableToDeps.find_opt var m with
     | None -> d (* The variable was not registered *)
     | Some deps ->
-      let m = VariableToDeps.remove var m
-      and i =
-        i |>
-        Locations.Zone.fold_topset_ok
-          (fun b _ -> BaseToVariables.remove_direct var b) deps.data |>
-        Locations.Zone.fold_topset_ok
-          (fun b _ -> BaseToVariables.remove_indirect var b) deps.indirect
-      in (m, i)
+      VariableToDeps.remove var m,
+      BaseToVariables.remove_deps var deps i
 
   let filter (bases: Base.Hptset.t) (m, i : t): VSet.t * t =
     let i_inter, i_diff = BaseToVariables.partition_with_shape bases i in
@@ -1682,7 +1698,7 @@ module Domain = struct
         end
       | _ -> state
 
-  (* Assigns integer [varinfo] to [expr]. *)
+  (* Assigns [lvalue] to [expr]. *)
   let assign_variable lvalue expr assigned valuation state =
     let eval_exp, eval_deps = evaluator_from_valuation valuation in
     let variable = Variable.make_lval lvalue in
