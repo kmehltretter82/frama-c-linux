@@ -21,6 +21,8 @@ frama_c_journal.ml
 /.merlin
 /headers/hdrck
 /headers/hdrck.exe
+/bin/ivette
+.ivette
 
 #build
 /_opam/
@@ -54,7 +56,6 @@ _build
 /dev/fc-time
 /dev/fc-memuse
 /bin/ocamldep_transitive_closure
-/bin/ivette
 
 #share
 /share/Makefile.config
