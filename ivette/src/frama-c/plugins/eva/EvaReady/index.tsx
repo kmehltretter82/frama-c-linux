@@ -20,7 +20,7 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 import * as States from 'frama-c/states';
 import { Button } from 'dome/controls/buttons';
@@ -29,12 +29,31 @@ import Gallery from 'dome/controls/gallery.json';
 
 import gearsIcon from '../images/gears.svg';
 import './style.css';
+import { onSignal } from 'frama-c/server';
 
-const ackAbortedState = new GlobalState(false);
+class AckAbortedState extends GlobalState<boolean> {
+  #signalHookSet = false;
+
+  constructor(initValue: boolean) {
+    super(initValue);
+  }
+
+  setupSignalHooks(): void {
+    if (!this.#signalHookSet) {
+      onSignal(Eva.signalComputationState,
+        () => ackAbortedState.setValue(false));
+      this.#signalHookSet = true;
+    }
+  }
+}
+
+const ackAbortedState = new AckAbortedState(false);
 
 const EvaReady: React.FC = ({ children }) => {
   const state = States.useSyncValue(Eva.computationState);
   const [ackAborted, setAckAborted] = useGlobalState(ackAbortedState);
+
+  useEffect(() => ackAbortedState.setupSignalHooks());
 
   switch (state) {
     case undefined:
