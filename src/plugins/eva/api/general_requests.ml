@@ -39,7 +39,8 @@ module ComputationState = struct
       Package.(Junion [
           Jtag "not_computed" ;
           Jtag "computing" ;
-          Jtag "computed"])
+          Jtag "computed" ;
+          Jtag "aborted" ])
   let to_json = function
     | Analysis.NotComputed -> `String "not_computed"
     | Computing -> `String "computing"

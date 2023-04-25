@@ -21,15 +21,20 @@
 /* ************************************************************************ */
 
 import React from 'react';
+import { GlobalState, useGlobalState } from 'dome/data/states';
 import * as States from 'frama-c/states';
+import { Button } from 'dome/controls/buttons';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import Gallery from 'dome/controls/gallery.json';
 
 import gearsIcon from '../images/gears.svg';
 import './style.css';
 
+const ackAbortedState = new GlobalState(false);
+
 const EvaReady: React.FC = ({ children }) => {
   const state = States.useSyncValue(Eva.computationState);
+  const [ackAborted, setAckAborted] = useGlobalState(ackAbortedState);
 
   switch (state) {
     case undefined:
@@ -55,6 +60,27 @@ const EvaReady: React.FC = ({ children }) => {
 
     case 'computed':
       return <>{children}</>;
+
+    case 'aborted':
+      if (ackAborted) {
+        return <>{children}</>;
+      }
+      else {
+        return (
+          <div className="eva-status">
+            <span>
+              The Eva analysis has been prematurely aborted by an internal error
+              or a user interruption:
+              the displayed results will be incomplete.
+            </span>
+            <Button
+              label="Ok"
+              style={{ width: "2cm" }}
+              onClick={() => setAckAborted(true)}
+            />
+          </div>
+        );
+      }
   }
 };
 
