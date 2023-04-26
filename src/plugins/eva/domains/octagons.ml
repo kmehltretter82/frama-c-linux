@@ -878,37 +878,16 @@ struct
   let find_opt (v: Variable.t) (m: t) =
     try Some (find v m) with Not_found -> None
 
-  module Tree =
-  struct
-    type 'a tree = Empty | Leaf of 'a | Node of 'a tree * 'a tree
-
-    let rec fold f t acc =
-      match t with
-      | Empty -> acc
-      | Leaf v -> f v acc
-      | Node (t1, t2) -> fold f t2 (fold f t1 acc)
-  end
-
-  let keys =
-    let open Tree in
-    let cache_name = cache_prefix ^ ".keys" in
-    let temporary = false in
-    let f k _ = Leaf k in
-    let joiner t1 t2 = Node (t1, t2) in
-    let empty = Empty in
-    cached_fold ~cache_name ~temporary ~f ~joiner ~empty
-
-  let diff_keys =
-    let open Tree in
-    let cache_name = cache_prefix ^ ".diff_keys" in
+  (* Return the subtrees of the left map whose keys are not in the right map. *)
+  let only_in_left =
+    let cache_name = cache_prefix ^ ".only_in_left" in
     let cache = Hptmap_sig.PersistentCache cache_name in
-    let empty_left _ = Empty in
-    let empty_right t = keys t in
-    let both _ _ _ = Empty in
-    let join t1 t2 = Node (t1, t2) in
-    let empty = Empty in
-    fold2_join_heterogeneous
-      ~cache ~empty_left ~empty_right ~both ~join ~empty
+    let symmetric = false in
+    let idempotent = false in
+    let decide_both _ _ _ = None in
+    let decide_left = Neutral in
+    let decide_right = Absorbing in
+    merge ~cache ~symmetric ~idempotent ~decide_both ~decide_left ~decide_right
 end
 
 module BaseToVariables = struct
@@ -1081,13 +1060,11 @@ module Deps = struct
     Locations.Zone.get_bases |>
     Base.SetLattice.project
 
-  let diff_keys (m1, _: t) (m2, _: t) =
-    VariableToDeps.diff_keys m1 m2
-
-  let join (d1: t) (d2: t) =
-    let fold = VariableToDeps.Tree.fold in
-    let (m1, i1) = fold remove (diff_keys d1 d2) d1
-    and (m2, i2) = fold remove (diff_keys d2 d1) d2 in
+  let join (m1, i1: t) (m2, i2: t) =
+    let m1_only = VariableToDeps.only_in_left m1 m2
+    and m2_only = VariableToDeps.only_in_left m2 m1 in
+    let i1 = VariableToDeps.fold BaseToVariables.remove_deps m1_only i1
+    and i2 = VariableToDeps.fold BaseToVariables.remove_deps m2_only i2 in
     VariableToDeps.join m1 m2, BaseToVariables.join i1 i2
 
   let narrow (m1, i1: t) (m2, i2: t) =
