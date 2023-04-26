@@ -914,13 +914,11 @@ end
 module BaseToVariables = struct
   module VSet = Variable.Set
 
-  (* [BaseToVariables] modulesrepresents a maps from bases to each variable that
-     depends on this base. These variables are split into two (non necessary
-     disjoint) sets:
-     - the variables that depends directly on this base --- the variable may be
-       hosted in this base;
-     - the variables that depends indirectly on this base --- the variable
-       location may change if the base changes *)
+  (* [BaseToVariables] represents a map from bases to each symbolic variable
+     used in the domain state that depends on this base.
+     These variables are split into two (non necessary disjoint) sets:
+     - direct dependency: variables whose value depends on the base;
+     - indirect dependency: variables whose location depends on the base. *)
   module VSetPair =
   struct
     include Datatype.Pair
