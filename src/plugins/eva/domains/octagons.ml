@@ -888,6 +888,13 @@ struct
     let decide_left = Neutral in
     let decide_right = Absorbing in
     merge ~cache ~symmetric ~idempotent ~decide_both ~decide_left ~decide_right
+
+  let all_but_diff =
+    let cache_name = cache_prefix ^ ".all_but_diff" in
+    let cache = Hptmap_sig.PersistentCache cache_name in
+    let decide_both _ d1 d2 = if Deps.equal d1 d2 then Some d1 else None in
+    merge ~cache ~symmetric:true ~idempotent:true
+      ~decide_left:Neutral ~decide_right:Neutral ~decide_both
 end
 
 module BaseToVariables = struct
@@ -906,6 +913,7 @@ module BaseToVariables = struct
     let pretty_debug = pretty
     let inter (s1,t1) (s2,t2) = VSet.inter s1 s2, VSet.inter t1 t2
     let union (s1,t1) (s2,t2) = VSet.union s1 s2, VSet.union t1 t2
+    let is_empty (s, t) = VSet.is_empty s && VSet.is_empty t
   end
 
   include Hptmap.Make (Base.Base) (VSetPair) (Hptmap.Comp_unused)
@@ -913,15 +921,16 @@ module BaseToVariables = struct
 
   let cache_prefix = "Eva.Octagons.BaseToVariables"
 
-  let narrow =
+  let _narrow =
     let cache_name = cache_prefix ^ ".narrow" in
     let cache = Hptmap_sig.PersistentCache cache_name in
     let symmetric = true in
     let idempotent = true in
-    let decide _ v1 v2 = VSetPair.inter v1 v2 in (* The intersection may be empty *)
-    (* join maps to keep dependencies even for variables that are present
-       only in one of the two abstract values *)
-    join ~cache ~symmetric ~idempotent ~decide
+    let decide _ v1 v2 =
+      let inter = VSetPair.inter v1 v2 in
+      if VSetPair.is_empty inter then None else Some inter
+    in
+    inter ~cache ~symmetric ~idempotent ~decide
 
   let join =
     let cache_name = cache_prefix ^ ".join" in
@@ -1068,7 +1077,16 @@ module Deps = struct
     VariableToDeps.join m1 m2, BaseToVariables.join i1 i2
 
   let narrow (m1, i1: t) (m2, i2: t) =
-    VariableToDeps.narrow m1 m2, BaseToVariables.narrow i1 i2
+    let all_but_diff = VariableToDeps.all_but_diff m1 m2 in
+    let m1 = VariableToDeps.only_in_left m1 all_but_diff
+    and m2 = VariableToDeps.only_in_left m2 all_but_diff in
+    let m_narrow = VariableToDeps.narrow m1 m2
+    and m_join = VariableToDeps.join m1 m2 in
+    let m = VariableToDeps.narrow m_narrow all_but_diff in
+    let i = BaseToVariables.join i1 i2 in
+    let i = VariableToDeps.fold BaseToVariables.remove_deps m_join i in
+    let i = VariableToDeps.fold BaseToVariables.add_deps m_narrow i in
+    m, i
 
   let is_included (m1, _: t) (m2, _: t) =
     VariableToDeps.is_included m1 m2
