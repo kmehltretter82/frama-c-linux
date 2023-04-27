@@ -477,10 +477,22 @@ function createBrowserWindow(
   });
 
   // Emitted when the window want's to close.
-  theWindow.on('close', () => {
+  const closeHandler = function (event: Event): void {
+    // Do not call this handler in a cycle; the next close event will forcibly
+    // close the window
+    theWindow.off('close', closeHandler);
+    // Do not close the window yet
+    event.preventDefault();
+
     handle.frame = theWindow.getBounds();
     handle.devtools = webContents.isDevToolsOpened();
     webContents.send('dome.ipc.closing');
+  };
+
+  theWindow.on('close', closeHandler);
+
+  ipcMain.on('dome-ipc.done-closing', () => {
+    theWindow.close();
   });
 
   // Keep track of frame positions (in DEVEL)
