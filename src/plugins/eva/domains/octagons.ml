@@ -1061,13 +1061,12 @@ module Deps = struct
     let vars = BaseToVariables.all_variables i_diff in
     vars, VSet.fold remove vars (m, i_inter)
 
-  let get_var_deps (m, _: t) (var: Variable.t) =
-    VariableToDeps.find var m
-
-  let get_var_bases (d: t) (var: Variable.t) =
-    (get_var_deps d var).data |>
-    Locations.Zone.get_bases |>
-    Base.SetLattice.project
+  let get_var_bases (m, _: t) (var: Variable.t) =
+    try
+      let deps = VariableToDeps.find var m in
+      let zone = Locations.Zone.join deps.data deps.indirect in
+      Locations.Zone.get_bases zone
+    with Not_found -> Base.SetLattice.empty
 
   let join (m1, i1: t) (m2, i2: t) =
     let m1_only = VariableToDeps.only_in_left m1 m2
@@ -1795,19 +1794,18 @@ module Domain = struct
     then Base.SetLattice.empty
     else
       let add_related_bases acc var =
-        let related = Relations.find var state.relations in
-        Variable.Set.to_seq related |>
-        Seq.map (Deps.get_var_bases state.deps) |>
-        Seq.fold_left Base.Hptset.union acc
+        try
+          let related = Relations.find var state.relations in
+          Variable.Set.to_seq related |>
+          Seq.map (Deps.get_var_bases state.deps) |>
+          Seq.fold_left Base.SetLattice.join acc
+        with Not_found -> acc
       in
       let aux base acc =
-        try
-          let variables = Deps.intersects_base state.deps base in
-          List.fold_left add_related_bases acc variables
-        with Base.Not_a_C_variable | Not_found -> acc
+        let variables = Deps.intersects_base state.deps base in
+        List.fold_left add_related_bases acc variables
       in
-      let hptset = Base.Hptset.fold aux bases Base.Hptset.empty in
-      Base.SetLattice.inject hptset
+      Base.Hptset.fold aux bases Base.SetLattice.empty
 
   let filter _kind bases state =
     if intraprocedural ()
