@@ -114,7 +114,7 @@ emitter.setMaxListeners(250);
 // --- At Exit
 // --------------------------------------------------------------------------
 
-export type Callback = () => (void | Promise<void>);
+export type Callback = () => void;
 
 const exitJobs: Callback[] = [];
 
@@ -128,14 +128,11 @@ export function atExit(callback: Callback): void {
 }
 
 /** Execute all pending exit jobs (and flush the list). */
-export async function doExit(): Promise<void> {
-  await Promise.all(exitJobs.map(async (fn) => {
-    try {
-      const promise = fn();
-      promise && await promise;
-    }
+export function doExit(): void {
+  exitJobs.forEach((fn) => {
+    try { fn(); }
     catch (err) { D.error('atExit:', err); }
-  }));
+  });
   exitJobs.length = 0;
 }
 
@@ -468,16 +465,13 @@ export function rename(oldPath: string, newPath: string): Promise<void> {
 
 const childprocess = new Map<number, Exec.ChildProcess>();
 
-atExit(async () => {
-  await Promise.all(Array.from(childprocess.values()).map(async (process) => {
-    try {
-      process.kill();
-      await new Promise(resolve => process.on('exit', resolve));
-    }
+atExit(() => {
+  childprocess.forEach((process, pid) => {
+    try { process.kill(); }
     catch (err) {
-      D.warn('killing process', process.pid, err);
+      D.warn('killing process', pid, err);
     }
-  }));
+  });
 });
 
 export type StdPipe = { path?: string | undefined; mode?: number; pipe?: boolean };
