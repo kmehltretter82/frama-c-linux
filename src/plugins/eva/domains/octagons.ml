@@ -1811,8 +1811,8 @@ module Domain = struct
     if intraprocedural ()
     then state
     else
-      let vars, deps = Deps.filter bases state.deps in
-      let mem_var v = Variable.Set.mem v vars in
+      let removed_vars, deps = Deps.filter bases state.deps in
+      let mem_var v = not (Variable.Set.mem v removed_vars) in
       let mem_pair pair =
         let x, y = Pair.get pair in
         mem_var x && mem_var y
