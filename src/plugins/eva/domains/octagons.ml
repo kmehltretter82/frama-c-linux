@@ -1420,6 +1420,7 @@ module State = struct
       Variable.Set.fold aux y_related (`Value state)
     with Not_found -> `Value state
 
+  (* Adds dependencies to the state only if [eval_deps] is not None. *)
   let add_octagon eval_deps state octagon =
     if Ival.(equal top octagon.value) || is_redundant state.intervals octagon
     then `Value state
@@ -1441,10 +1442,15 @@ module State = struct
       Octagons.add_octagon octagon state.octagons >>-: fun octagons ->
       let relations = Relations.relate octagon.variables state.relations in
       let variable_list = Pair.variable_list octagon.variables in
-      let add_var_deps deps v =
-        Deps.add v (eval_deps v) deps
+      let deps =
+        match eval_deps with
+        | None -> state.deps
+        | Some eval_deps ->
+          let add_var_deps deps v =
+            Deps.add v (eval_deps v) deps
+          in
+          List.fold_left add_var_deps state.deps variable_list
       in
-      let deps = List.fold_left add_var_deps state.deps variable_list in
       { state with octagons; relations; deps }
 
   let add_diamond eval_deps state variables diamond =
@@ -1637,7 +1643,7 @@ module Domain = struct
     let env = mk_variable_builder eval_exp state in
     let octagons = Rewriting.make_octagons eval_exp env expr ival in
     let add_octagon state octagon =
-      match State.add_octagon eval_deps state octagon with
+      match State.add_octagon (Some eval_deps) state octagon with
       | `Bottom -> raise EBottom
       | `Value state -> state
     in
@@ -1720,7 +1726,8 @@ module Domain = struct
     let state =
       List.fold_left
         (fun acc (_sign, octagon) ->
-           acc >>- fun state -> State.add_octagon eval_deps state octagon)
+           acc >>- fun state ->
+           State.add_octagon (Some eval_deps) state octagon)
         (`Value state) octagons
     in
     state >>-: check "precise assign"
@@ -1829,10 +1836,11 @@ module Domain = struct
     and decide _key left _right = left in
     let join_oct = Octagons.internal_join ~cache ~symmetric ~idempotent ~decide
     and join_itv = Intervals.internal_join ~cache ~symmetric ~idempotent ~decide
-    and join_rel = Relations.union
-    and join_deps = Deps.join in
+    and join_rel = Relations.union in
     fun kf ~current_input ~previous_output ->
       let current_input = kill previous_output.modified current_input in
+      let intervals = join_itv previous_output.intervals current_input.intervals
+      and deps = Deps.narrow previous_output.deps current_input.deps in
       (* We use [add_diamond] to add each relation from the previous output
          into the current input, in order to benefit from the (partial)
          saturation of octagons performed by this function. For a maximum
@@ -1841,13 +1849,9 @@ module Domain = struct
          of the maps from the previous output and the current input. *)
       if saturate_octagons
       then
-        let intervals =
-          join_itv previous_output.intervals current_input.intervals
-        in
-        let state = { current_input with intervals } in
-        let eval_deps = Deps.get_var_deps state.deps in
+        let state = { current_input with intervals; deps } in
         let add_diamond variables diamond acc =
-          match add_diamond eval_deps acc variables diamond with
+          match add_diamond None acc variables diamond with
           | `Value state -> state
           | `Bottom ->
             Self.failure ~current:true ~once:true
@@ -1860,10 +1864,9 @@ module Domain = struct
         Octagons.fold add_diamond previous_output.octagons state
       else
         { octagons = join_oct previous_output.octagons current_input.octagons;
-          intervals = join_itv previous_output.intervals current_input.intervals;
           relations = join_rel previous_output.relations current_input.relations;
           modified = current_input.modified;
-          deps = join_deps previous_output.deps current_input.deps; }
+          intervals; deps; }
 
   let reuse kf _bases ~current_input ~previous_output =
     if intraprocedural ()
