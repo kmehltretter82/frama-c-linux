@@ -1013,7 +1013,8 @@ module Deps = struct
         let v_zone = if direct then deps.data else deps.indirect in
         Locations.Zone.intersects v_zone zone
       with Not_found ->
-        Self.abort "can not find %a for intersection with %a in@.%a"
+        Self.fatal
+          "Octagon domain: cannot find %a for intersection with %a in@.%a"
           Variable.pretty v Locations.Zone.pretty zone pretty (m,i)
     in
     let get_at_base b intervals (data_acc, indirect_acc) =
