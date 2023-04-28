@@ -1752,6 +1752,8 @@ module Domain = struct
     let variable = Variable.make_lval lvalue in
     (* Remove lvals refering to the variable *)
     let lvalue_zone = (eval_deps variable).data in
+    let modified = Locations.Zone.join state.modified lvalue_zone in
+    let state = { state with modified } in
     let vars = Deps.intersects_zone state.deps lvalue_zone in
     let vars = List.filter (Fun.negate (Variable.equal variable)) vars in
     let state = List.fold_left State.remove state vars in
