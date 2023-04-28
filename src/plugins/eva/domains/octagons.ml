@@ -1065,8 +1065,13 @@ module Deps = struct
 
   let filter (bases: Base.Hptset.t) (m, i : t): VSet.t * t =
     let i_inter, i_diff = BaseToVariables.partition_with_shape bases i in
-    let vars = BaseToVariables.all_variables i_diff in
-    vars, VSet.fold remove vars (m, i_inter)
+    let removed_vars = BaseToVariables.all_variables i_diff in
+    let m = VariableToDeps.diff_with_shape removed_vars m in
+    let filter (s1, s2) =
+      VSet.diff s1 removed_vars, VSet.diff s2 removed_vars
+    in
+    let i = BaseToVariables.map filter i_inter in
+    removed_vars, (m, i)
 
   let get_var_bases (m, _: t) (var: Variable.t) =
     try
@@ -1870,8 +1875,8 @@ module Domain = struct
         mem_var x && mem_var y
       in
       let octagons = Octagons.filter mem_pair state.octagons in
-      let intervals = Intervals.filter mem_var state.intervals in
-      let relations = Relations.filter mem_var state.relations in
+      let intervals = Intervals.diff_with_shape removed_vars state.intervals in
+      let relations = Relations.diff_with_shape removed_vars state.relations in
       { state with octagons; intervals; relations; deps }
 
   let interprocedural_reuse =
