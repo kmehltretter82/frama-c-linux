@@ -160,6 +160,12 @@ module Variable : Variable = struct
       Eva_utils.deps_of_lval eval_loc (Option.get (HCE.to_lval lval))
 end
 
+module VarSet =
+  Hptset.Make
+    (Variable)
+    (struct let v = [ [ ] ] end)
+    (struct let l = [ Ast.self ] end)
+
 (* Pairs of related variables in an octagon.
    This module imposes an order between the two variables X and Y in a pair
    to avoid creating octagons about X±Y *and* about Y±X. *)
@@ -742,29 +748,29 @@ module Relations = struct
   module Dependencies = struct let l = [ Ast.self ] end
 
   include Hptmap.Make (Variable)
-      (struct include Variable.Set let pretty_debug = pretty end)
+      (struct include VarSet let pretty_debug = pretty end)
       (Hptmap.Comp_unused) (Initial_Values) (Dependencies)
 
   let inter =
     let cache = Hptmap_sig.PersistentCache "Octagons.Relations.inter" in
     let decide _pair x y =
-      let r = Variable.Set.inter x y in
-      if Variable.Set.is_empty r then None else Some r
+      let r = VarSet.inter x y in
+      if VarSet.is_empty r then None else Some r
     in
     inter ~cache ~symmetric:true ~idempotent:true ~decide
 
   let union =
     let cache = Hptmap_sig.PersistentCache "Octagons.Relations.union" in
-    let decide _pair x y = Variable.Set.union x y in
+    let decide _pair x y = VarSet.union x y in
     join ~cache ~symmetric:true ~idempotent:true ~decide
 
   (* Marks y as related to x. *)
   let relate_aux x y t =
     let related =
       try find x t
-      with Not_found -> Variable.Set.empty
+      with Not_found -> VarSet.empty
     in
-    let updated = Variable.Set.add y related in
+    let updated = VarSet.add y related in
     add x updated t
 
   (* Marks x and y as mutually related. *)
@@ -773,7 +779,7 @@ module Relations = struct
     relate_aux y x (relate_aux x y t)
 
   let add variable set t =
-    if Variable.Set.is_empty set
+    if VarSet.is_empty set
     then remove variable t
     else add variable set t
 end
@@ -898,7 +904,7 @@ struct
 end
 
 module BaseToVariables = struct
-  module VSet = Variable.Set
+  module VSet = VarSet
 
   (* [BaseToVariables] represents a map from bases to each symbolic variable
      used in the domain state that depends on this base.
@@ -985,7 +991,7 @@ module BaseToVariables = struct
 end
 
 module Deps = struct
-  module VSet = Variable.Set
+  module VSet = VarSet
 
   include Datatype.Pair (VariableToDeps) (BaseToVariables)
 
@@ -1196,8 +1202,8 @@ module State = struct
          variables can be related in [t.relations] without an actual octagon
          between them. *)
       let check_relation x y =
-        try Variable.Set.mem x (Relations.find y t.relations)
-            && Variable.Set.mem y (Relations.find x t.relations)
+        try VarSet.mem x (Relations.find y t.relations)
+            && VarSet.mem y (Relations.find x t.relations)
         with Not_found -> false
       in
       let check_relation x y =
@@ -1444,7 +1450,7 @@ module State = struct
   let saturate state x y rel1 =
     try
       let y_related = Relations.find y state.relations in
-      let y_related = Variable.Set.remove x y_related in
+      let y_related = VarSet.remove x y_related in
       let aux z state =
         state >>- fun state ->
         try
@@ -1456,7 +1462,7 @@ module State = struct
           add_diamond state pair diamond
         with Not_found -> `Value state
       in
-      Variable.Set.fold aux y_related (`Value state)
+      VarSet.fold aux y_related (`Value state)
     with Not_found -> `Value state
 
   (* Adds dependencies to the state only if [eval_deps] is not None. *)
@@ -1505,14 +1511,14 @@ module State = struct
       let remove_one y state =
         try
           let yrelations = Relations.find y state.relations in
-          let yrelations = Variable.Set.remove x yrelations in
+          let yrelations = VarSet.remove x yrelations in
           let relations = Relations.add y yrelations state.relations in
           let pair, _ = Pair.make x y in
           let octagons = Octagons.remove pair state.octagons in
           { state with octagons; relations }
         with Not_found -> state
       in
-      let state = Variable.Set.fold remove_one relations state in
+      let state = VarSet.fold remove_one relations state in
       let relations = Relations.remove x state.relations in
       let deps = Deps.remove x state.deps in
       { state with relations; deps }
@@ -1529,7 +1535,7 @@ module State = struct
           (y, diamond) :: acc
         with Not_found -> acc
       in
-      Variable.Set.fold aux related []
+      VarSet.fold aux related []
     with Not_found -> []
 
   (* x' = ±x - delta *)
@@ -1565,7 +1571,7 @@ module State = struct
         { state with octagons }
       with Not_found -> state
     in
-    Variable.Set.fold aux x_related state
+    VarSet.fold aux x_related state
 end
 
 
@@ -1842,9 +1848,9 @@ module Domain = struct
       let add_related_bases acc var =
         try
           let related = Relations.find var state.relations in
-          Variable.Set.to_seq related |>
-          Seq.map (Deps.get_var_bases state.deps) |>
-          Seq.fold_left Base.SetLattice.join acc
+          VarSet.elements related |>
+          List.map (Deps.get_var_bases state.deps) |>
+          List.fold_left Base.SetLattice.join acc
         with Not_found -> acc
       in
       let aux base acc =
@@ -1858,7 +1864,7 @@ module Domain = struct
     then state
     else
       let removed_vars, deps = Deps.filter bases state.deps in
-      let mem_var v = not (Variable.Set.mem v removed_vars) in
+      let mem_var v = not (VarSet.mem v removed_vars) in
       let mem_pair pair =
         let x, y = Pair.get pair in
         mem_var x && mem_var y
