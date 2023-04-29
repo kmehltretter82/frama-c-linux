@@ -1044,17 +1044,19 @@ module Deps = struct
     is_increasing previous_deps.indirect deps.indirect
 
   let add var deps (m, i: t): t =
-    (* If [var] already exists in the state and had bigger dependencies (in rare
-       cases, a dependency can disappear by reduction), remove the previous deps
-       from the inverse map to ensure consistency between both maps. *)
-    let i =
-      match VariableToDeps.find_opt var m with
-      | Some previous_deps when not (are_bases_increasing previous_deps deps) ->
-        BaseToVariables.remove_deps var previous_deps i
-      | _ -> i
+    let add_to (m, i) =
+      VariableToDeps.add var deps m,
+      BaseToVariables.add_deps var deps i
     in
-    VariableToDeps.add var deps m,
-    BaseToVariables.add_deps var deps i
+    match VariableToDeps.find_opt var m with
+    | Some previous_deps when Function_Froms.Deps.equal previous_deps deps ->
+      m, i
+    | Some previous_deps when not (are_bases_increasing previous_deps deps) ->
+      (* If [var] already exists in the state and had bigger dependencies (a
+         dependency can disappear by reduction), remove the previous deps
+         from the inverse map to ensure consistency between both maps. *)
+      add_to (m, BaseToVariables.remove_deps var previous_deps i)
+    | _ -> add_to (m, i)
 
   let remove (var: Variable.t) ((m, i): t): t option =
     match VariableToDeps.find_opt var m with
