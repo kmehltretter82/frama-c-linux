@@ -1056,12 +1056,12 @@ module Deps = struct
     VariableToDeps.add var deps m,
     BaseToVariables.add_deps var deps i
 
-  let remove (var: Variable.t) ((m, i) as d: t): t =
+  let remove (var: Variable.t) ((m, i): t): t option =
     match VariableToDeps.find_opt var m with
-    | None -> d (* The variable was not registered *)
+    | None -> None (* The variable was not registered *)
     | Some deps ->
-      VariableToDeps.remove var m,
-      BaseToVariables.remove_deps var deps i
+      Some (VariableToDeps.remove var m,
+            BaseToVariables.remove_deps var deps i)
 
   let filter (bases: Base.Hptset.t) (m, i : t): VSet.t * t =
     let i_inter, i_diff = BaseToVariables.partition_with_shape bases i in
@@ -1509,25 +1509,27 @@ module State = struct
     add_octagon eval_deps state { variables; operation = Sub; value = diamond.sub }
 
   let remove state x =
-    let intervals = Intervals.remove x state.intervals in
-    let state = { state with intervals } in
-    try
-      let relations = Relations.find x state.relations in
-      let remove_one y state =
-        try
-          let yrelations = Relations.find y state.relations in
-          let yrelations = VarSet.remove x yrelations in
-          let relations = Relations.add y yrelations state.relations in
-          let pair, _ = Pair.make x y in
-          let octagons = Octagons.remove pair state.octagons in
-          { state with octagons; relations }
-        with Not_found -> state
-      in
-      let state = VarSet.fold remove_one relations state in
-      let relations = Relations.remove x state.relations in
-      let deps = Deps.remove x state.deps in
-      { state with relations; deps }
-    with Not_found -> state
+    match Deps.remove x state.deps with
+    | None -> state
+    | Some deps ->
+      let intervals = Intervals.remove x state.intervals in
+      let state = { state with intervals; deps } in
+      try
+        let relations = Relations.find x state.relations in
+        let remove_one y state =
+          try
+            let yrelations = Relations.find y state.relations in
+            let yrelations = VarSet.remove x yrelations in
+            let relations = Relations.add y yrelations state.relations in
+            let pair, _ = Pair.make x y in
+            let octagons = Octagons.remove pair state.octagons in
+            { state with octagons; relations }
+          with Not_found -> state
+        in
+        let state = VarSet.fold remove_one relations state in
+        let relations = Relations.remove x state.relations in
+        { state with relations }
+      with Not_found -> state
 
   let related_octagons state x =
     try
