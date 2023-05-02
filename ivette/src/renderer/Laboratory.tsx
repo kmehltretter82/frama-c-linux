@@ -253,7 +253,7 @@ const makeGridItem = (customize: unknown, onClose: (id: string) => void) =>
 type Shape = Json.json // Until Grids has a type Shape, use this one instead
 
 interface CustomViewsProps {
-  settings?: string,
+  settings: string,
   shape: Shape,
   setShape: (shape: Shape) => void,
   views: React.PropsWithChildren<View>[]
@@ -537,7 +537,7 @@ function CustomGroup({
 
 interface CustomPanelProps {
   dnd?: DnD;
-  settings?: string;
+  settings: string;
   shape?: Shape;
   setShape: (shape: Shape) => void;
   setDragging: (id?: string) => void;
@@ -599,7 +599,7 @@ export interface LabViewProps {
   /** Show component panels. */
   customize?: boolean;
   /** Base settings identifier. */
-  settings?: string;
+  settings: string;
 }
 
 /**
