@@ -2579,16 +2579,6 @@ module Lexpr = Make
 (** {3 Other types} *)
 (**************************************************************************)
 
-module Localisation =
-  Datatype.Make
-    (struct
-      include Datatype.Serializable_undefined
-      type t = localisation
-      let name = "Localisation"
-      let reprs = [ VGlobal ]
-      let mem_project = Datatype.never_any_project
-    end)
-
 module Syntactic_scope =
   Datatype.Make_with_collections
     (struct
@@ -2598,6 +2588,9 @@ module Syntactic_scope =
       let reprs = [ Program ]
       let compare s1 s2 =
         match s1, s2 with
+        | Global, Global -> 0
+        | Global, _ -> 1
+        | _, Global -> -1
         | Program, Program -> 0
         | Program, _ -> 1
         | _, Program -> -1
@@ -2605,17 +2598,30 @@ module Syntactic_scope =
           Datatype.Filepath.compare s1 s2
         | Translation_unit _, _ -> 1
         | _, Translation_unit _ -> -1
+        | Formal kf1, Formal kf2 -> Kf.compare kf1 kf2
+        | Formal _, _ -> 1
+        | _, Formal _ -> -1
+        | Whole_function kf1, Whole_function kf2 -> Kf.compare kf1 kf2
+        | Whole_function _, _ -> 1
+        | _, Whole_function _ -> -1
         | Block_scope s1, Block_scope s2 -> Stmt_Id.compare s1 s2
       let equal = Datatype.from_compare
       let hash s =
         match s with
+        | Global -> 3
         | Program -> 5
         | Translation_unit s -> 7 * Datatype.Filepath.hash s + 11
         | Block_scope s -> 13 * Stmt_Id.hash s  + 17
+        | Whole_function kf -> 19 * Kf.hash kf + 23
+        | Formal kf -> 29 * Kf.hash kf + 31
       let pretty fmt = function
-        | Program -> Format.pp_print_string fmt "<Whole Program>"
+        | Global | Program -> Format.pp_print_string fmt "<Whole Program>"
         | Translation_unit s ->
           Format.fprintf fmt "File %a" Datatype.Filepath.pretty s
+        | Formal kf ->
+          Format.fprintf fmt "Parameter of %a" Kf.pretty kf
+        | Whole_function kf ->
+          Format.fprintf fmt "Local variable of %a" Kf.pretty kf
         | Block_scope s ->
           Format.fprintf fmt "Statement at %a:@\n@[%a@]"
             Location.pretty (Stmt.loc s) Stmt.pretty s

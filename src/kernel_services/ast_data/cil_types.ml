@@ -1836,27 +1836,31 @@ type kernel_function = {
   mutable spec : funspec;
 }
 
-(* [VP] TODO: VLocal should be attached to a particular block, not a whole
-   function. It might be worth it to unify this type with the newer
-   syntactic_scope below.
-*)
-type localisation =
-  | VGlobal
-  | VLocal of kernel_function
-  | VFormal of kernel_function
-
 (** Various syntactic scopes through which an identifier might be searched.
     Note that for this purpose static variables are still tied to the block
     where they were declared in the original source (see {!Cil_types.block}).
     @since Chlorine-20180501
 *)
 type syntactic_scope =
+  | Global
+  (** Any global symbol, whether static or not.
+      @since Frama-C+dev
+  *)
   | Program (** Only non-static global symbols. *)
   | Translation_unit of Filepath.Normalized.t
   (** Any global visible within the given C source file. *)
+  | Formal of kernel_function
+  (** formal parameter of the given function.
+      @since Frama-C+dev
+  *)
   | Block_scope of stmt
-  (** same as above + all locals of the blocks to which the given statement
+  (** locals (including static locals) of the block to which the given statement
       belongs. *)
+  | Whole_function of kernel_function
+  (** same as above, but any local variable of the given function, regardless of
+      the block to which it is tied, will be considered.
+      @since Frama-C+dev
+  *)
 
 (** Definition of a machine model (architecture + compiler).
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)

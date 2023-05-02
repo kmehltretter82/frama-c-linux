@@ -29,7 +29,7 @@ let axiomatics = Table.create 13
 let get_variable name make =
   if Table.mem varinfos name then Table.find varinfos name
   else begin
-    try Globals.Vars.find_from_astinfo name VGlobal
+    try Globals.Vars.find_from_astinfo name Global
     with Not_found ->
       let vi = make () in
       Table.add varinfos name vi ;

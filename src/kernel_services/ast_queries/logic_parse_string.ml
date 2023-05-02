@@ -30,40 +30,32 @@ exception Unbound of string
 let find_var kf kinstr ?label var =
   let vi =
     try
-      let vi = Globals.Vars.find_from_astinfo var (VLocal kf) in
-      (match kinstr with
-       | Kglobal -> vi (* don't refine search: the Kglobal here
-                          does not indicate the function contract, but merely
-                          the fact that we do not have any information about
-                          the targeted program point. Hence, no scope check
-                          can be performed or we might reject many legitimate
-                          terms and predicates.
-                       *)
-       | Kstmt stmt ->
-         let scope =
-           match label with
-           | None | Some "Here" | Some "Post" | Some "Old" -> stmt
+      let scope =
+        match kinstr with
+        | Kglobal -> Whole_function kf
+        | Kstmt stmt ->
+          (match label with
+           | None | Some "Here" | Some "Post" | Some "Old" -> Block_scope stmt
            | Some "Pre" -> raise Not_found (* no local variable in scope. *)
            | Some "Init" -> raise Not_found (* no local variable in scope. *)
            | Some "LoopEntry" | Some "LoopCurrent" ->
              if not (Kernel_function.stmt_in_loop kf stmt) then
                Kernel.fatal
                  "Use of LoopEntry or LoopCurrent outside of a loop";
-             Kernel_function.find_enclosing_loop kf stmt
+             Block_scope (Kernel_function.find_enclosing_loop kf stmt)
            | Some l ->
-             (try let s = Kernel_function.find_label kf l in !s
+             (try let s = Kernel_function.find_label kf l in Block_scope !s
               with Not_found ->
                 Kernel.fatal
                   "Use of label %s that does not exist in function %a"
-                  l Kernel_function.pretty kf)
-         in
-         if Kernel_function.var_is_in_scope scope vi then vi
-         else raise Not_found)
+                  l Kernel_function.pretty kf))
+      in
+      Globals.Vars.find_from_astinfo var scope
     with Not_found ->
     try
-      Globals.Vars.find_from_astinfo var (VFormal kf)
+      Globals.Vars.find_from_astinfo var (Formal kf)
     with Not_found ->
-      Globals.Vars.find_from_astinfo var VGlobal
+      Globals.Vars.find_from_astinfo var Global
   in
   cvar_to_lvar vi
 

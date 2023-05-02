@@ -1035,10 +1035,15 @@ let pp_kernel_function fmt kernel_function =
     pp_cil_function kernel_function.fundec
     pp_funspec kernel_function.spec
 
-let pp_localisation fmt = function
-  | VGlobal -> Format.fprintf fmt "VGlobal"
-  | VLocal(kernel_function) -> Format.fprintf fmt "VLocal(%a)"  pp_kernel_function kernel_function
-  | VFormal(kernel_function) -> Format.fprintf fmt "VFormal(%a)"  pp_kernel_function kernel_function
+let pp_syntactic_scope fmt = function
+  | Global -> pp_string fmt "Global"
+  | Program -> pp_string fmt "Program"
+  | Translation_unit file ->
+    Format.fprintf fmt "Translation_unit %S" (file:>string)
+  | Formal kf -> Format.fprintf fmt "Formal %a" pp_kernel_function kf
+  | Block_scope stmt -> Format.fprintf fmt "Local %a" pp_stmt stmt
+  | Whole_function kf ->
+    Format.fprintf fmt "Whole_function %a" pp_kernel_function kf
 
 let pp_mach fmt mach =
   Format.fprintf fmt

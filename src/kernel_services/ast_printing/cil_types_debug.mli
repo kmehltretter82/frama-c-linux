@@ -157,5 +157,5 @@ val pp_global_annotation : Cil_types.global_annotation Pretty_utils.formatter
 val pp_kinstr : Format.formatter -> Cil_types.kinstr -> unit
 val pp_cil_function : Format.formatter -> Cil_types.cil_function -> unit
 val pp_kernel_function : Format.formatter -> Cil_types.kernel_function -> unit
-val pp_localisation : Format.formatter -> Cil_types.localisation -> unit
+val pp_syntactic_scope: Format.formatter -> Cil_types.syntactic_scope -> unit
 val pp_mach : Format.formatter -> Cil_types.mach -> unit
