@@ -477,10 +477,22 @@ function createBrowserWindow(
   });
 
   // Emitted when the window want's to close.
-  theWindow.on('close', () => {
+  const closeHandler = function (event: Event): void {
+    // Do not call this handler in a cycle; the next close event will forcibly
+    // close the window
+    theWindow.off('close', closeHandler);
+    // Do not close the window yet
+    event.preventDefault();
+
     handle.frame = theWindow.getBounds();
     handle.devtools = webContents.isDevToolsOpened();
     webContents.send('dome.ipc.closing');
+  };
+
+  theWindow.on('close', closeHandler);
+
+  ipcMain.on('dome.ipc.closing.done', () => {
+    theWindow.close();
   });
 
   // Keep track of frame positions (in DEVEL)
@@ -631,6 +643,8 @@ ipcMain.on('dome.app.paths', (event) => {
 // --- Main Application Starter
 // --------------------------------------------------------------------------
 
+let isQuitting = false;
+
 /** Starts the main process. */
 export function start(): void {
 
@@ -650,6 +664,11 @@ export function start(): void {
   app.on('activate', activateWindows); // Mac OSX response to dock
   app.on('second-instance', createSecondaryWindow);
 
+  // Configuring macOS for exiting
+  app.on('before-quit', () => {
+    isQuitting = true;
+  });
+
   // At-exit callbacks
   app.on('will-quit', () => {
     saveGlobalSettings();
@@ -661,7 +680,7 @@ export function start(): void {
   // Warning: when no event handler is registered, the app automatically
   // quit when all windows are closed.
   app.on('window-all-closed', () => {
-    if (System.platform !== 'macos') app.quit();
+    if (isQuitting || System.platform !== 'macos') app.quit();
   });
 
 }
