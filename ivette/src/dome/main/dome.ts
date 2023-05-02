@@ -506,7 +506,9 @@ interface Cmd { wdir: string; argv: string[] }
 function stripElectronArgv(cmd: Cmd): Cmd
 {
   const wdir = DEVEL ? cmd.argv[3] : cmd.wdir;
-  const argv = cmd.argv.slice(DEVEL ? 4 : (LOCAL ? 2 : 1)).filter((p) => !!p);
+  const argv = cmd.argv
+      .slice(DEVEL ? 4 : (LOCAL ? 2 : 1))
+      .filter((p) => !!p && p !== "--no-sandbox");
   return { wdir, argv };
 }
 
