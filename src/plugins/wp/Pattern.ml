@@ -146,6 +146,9 @@ let rec parse ctxt p =
   | PLunop(Uminus,a) ->
     let a = parse ctxt a in
     { loc = a.loc ; value = Times(Integer.minus_one,a) }
+  | PLunop(Ubw_not,a) ->
+    let a = parse ctxt a in
+    { loc = a.loc ; value = Call("lf:lnot",[a],false) }
   | PLbinop(a,Bmul,b) ->
     let a = parse ctxt a in
     let b = parse ctxt b in
