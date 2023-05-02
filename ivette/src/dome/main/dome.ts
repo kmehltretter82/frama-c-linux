@@ -643,6 +643,8 @@ ipcMain.on('dome.app.paths', (event) => {
 // --- Main Application Starter
 // --------------------------------------------------------------------------
 
+let isQuitting = false;
+
 /** Starts the main process. */
 export function start(): void {
 
@@ -662,6 +664,11 @@ export function start(): void {
   app.on('activate', activateWindows); // Mac OSX response to dock
   app.on('second-instance', createSecondaryWindow);
 
+  // Configuring macOS for exiting
+  app.on('before-quit', () => {
+    isQuitting = true;
+  });
+
   // At-exit callbacks
   app.on('will-quit', () => {
     saveGlobalSettings();
@@ -673,7 +680,7 @@ export function start(): void {
   // Warning: when no event handler is registered, the app automatically
   // quit when all windows are closed.
   app.on('window-all-closed', () => {
-    if (System.platform !== 'macos') app.quit();
+    if (isQuitting || System.platform !== 'macos') app.quit();
   });
 
 }
