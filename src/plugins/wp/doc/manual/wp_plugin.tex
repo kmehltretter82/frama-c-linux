@@ -1804,7 +1804,7 @@ Tactic parameters are interpreted as follows:
 \item \verb+\select(v)+ defines the main target of the selected tactic. The
   value \verb+v+ uses the same syntax as patterns, with pattern variables
   replaced with their matched values. Some tactics support multiple selection,
-  in for which \verb+\select(vs)+ can be used. When no selection is specified,
+  in for which the form \verb+\select(v,...)+ can be used. When no selection is specified,
   the first specified pattern is used as an implicit target. When no
   selection nor pattern is selected, the default selection is the proof goal.
 \item \verb+\param(p,v)+ configures the parameter value \verb+p+ of the selected
@@ -1827,14 +1827,14 @@ following restrictions and meaning:
 \item variables are pattern variables;
 \item pattern \verb+_+ matches any value;
 \item pattern \verb+x:p+ matches pattern \verb+p+ and bind its value to variable \verb+x+;
-\item pattern \verb+a..b+ matches integer constants in the specified range;
+\item pattern \verb+a..b+ matches integer constants in the specified (constant) range.
 \item pattern \verb+\any(p,...)+ matches any of the specified patterns.
 \item patterns \verb+p[k]+ and \verb+p[k->v]+ matches array operations, e.g. for memory models;
 \item ACSL operators have their usual meaning;
-\item ACSL list operators \verb+[|...|]+, \verb+^+ and \verb+@^+ are also recognized;
+\item ACSL list operators \verb+[|...|]+, \verb+^+ and \verb+*^+ are also recognized;
 \item function calls must use their printed name, as they appear in proof nodes;
 \item for function patterns, trailing dots can be used to match any number of
-  arguments, like in \verb+f(x,y,..)+ for instance.
+  arguments, like in \verb+f(x,y,(..))+ for instance.
 \end{itemize}
 
 It is highly recommended using the graphical user interface or \verb+-wp-print+
