@@ -48,7 +48,7 @@ and node =
   | Field of ast * string
   | Get of ast * ast
   | Set of ast * ast * ast
-and assoc = [ `Add | `Mul | `Concat ]
+and assoc = [ `Add | `Mul | `Concat | `Land | `Lor | `Lxor ]
 and binop = [ `Div | `Mod | `Repeat | `Eq | `Lt | `Le | `Ne ]
 
 let self p =
@@ -160,6 +160,9 @@ let rec parse ctxt p =
     let b = { loc = b.loc ; value = Times(Integer.minus_one,b) } in
     assoc `Add a b
   | PLbinop(a,Badd,b) -> assoc `Add (parse ctxt a) (parse ctxt b)
+  | PLbinop(a,Bbw_or,b) -> assoc `Lor (parse ctxt a) (parse ctxt b)
+  | PLbinop(a,Bbw_and,b) -> assoc `Land (parse ctxt a) (parse ctxt b)
+  | PLbinop(a,Bbw_xor,b) -> assoc `Lxor (parse ctxt a) (parse ctxt b)
   | PLbinop(a,Bdiv,b) -> parse_binop ctxt ~loc `Div a b
   | PLbinop(a,Bmod,b) -> parse_binop ctxt ~loc `Mod a b
   | PLrel(a,Lt,b) -> parse_binop ctxt ~loc `Lt a b
@@ -203,11 +206,18 @@ let rec pp fmt (a : ast) =
   | Int n -> Integer.pretty fmt n
   | Bool b -> Format.pp_print_string fmt (if b then "\\true" else "\\false")
   | String s -> Format.fprintf fmt "%S" s
-  | Assoc(`Add,[]) -> Format.pp_print_string fmt "0"
+  | Assoc(`Land,[]) -> Format.pp_print_string fmt "-1"
   | Assoc(`Mul,[]) -> Format.pp_print_string fmt "1"
+  | Assoc((`Add|`Lor|`Lxor),[]) -> Format.pp_print_string fmt "0"
   | Assoc(`Concat,[]) -> Format.pp_print_string fmt "[| |]"
   | Assoc(op,v::vs) ->
-    let op = match op with `Add -> '+' | `Mul -> '*' | `Concat -> '^' in
+    let op = match op with
+      | `Add -> '+'
+      | `Mul -> '*'
+      | `Concat | `Lxor -> '^'
+      | `Land -> '&'
+      | `Lor -> '|'
+    in
     Format.fprintf fmt "@[<hov 2>(%a" pp v ;
     List.iter (Format.fprintf fmt "@ %c %a" op pp) vs ;
     Format.fprintf fmt ")@]"
@@ -288,6 +298,12 @@ let rec pmatch env (p : pattern) e =
   | Bool false , False -> ()
   | Assoc(`Add,ps) , Add es -> pac env Lang.F.e_sum [] ps es
   | Assoc(`Mul,ps) , Mul es -> pac env Lang.F.e_prod [] ps es
+  | Assoc(`Lor,ps) , Fun(lf,es) when lf == Cint.f_lor ->
+    pac env (Lang.F.e_fun lf) [] ps es
+  | Assoc(`Land,ps) , Fun(lf,es) when lf == Cint.f_land ->
+    pac env (Lang.F.e_fun lf) [] ps es
+  | Assoc(`Lxor,ps) , Fun(lf,es) when lf == Cint.f_lxor ->
+    pac env (Lang.F.e_fun lf) [] ps es
   | Binop(p,`Div,q) , Div(a,b) -> pbinop env p q a b
   | Binop(p,`Eq,q) , Div(a,b) -> pbinop env p q a b
   | Binop(p,`Ne,q) , Div(a,b) -> pbinop env p q a b
@@ -532,6 +548,9 @@ let rec select (env : sigma) (a : value) =
       | `Add -> "wp:add"
       | `Mul -> "wp:mul"
       | `Concat -> "wp:concat"
+      | `Lor -> "lf:lor"
+      | `Land -> "lf:land"
+      | `Lxor -> "lf:lxor"
     in Tactical.compose op (List.map (cc) vs)
   | Binop(a,op,b) ->
     let op = match op with
@@ -662,6 +681,8 @@ let rec typecheck env vt (a : ast) =
   | Int _ -> tc_merge ~loc vt vint
   | Bool _ -> tc_merge ~loc vt vbool
   | String _ -> tc_merge ~loc vt String
+  | Assoc((`Lor|`Land|`Lxor),vs) ->
+    List.fold_left (typecheck env) (tc_merge ~loc vint vt) vs
   | Assoc((`Add|`Mul),vs) ->
     List.fold_left (typecheck env) (tc_merge ~loc Numerical vt) vs
   | Assoc(`Concat,vs) ->
