@@ -6,13 +6,13 @@
   nondet ∈ [--..--]
   k ∈ {0}
 [eva] computing for function test_slevel <- main.
-  Called from partitioning-annots.c:223.
-[eva] partitioning-annots.c:188: starting to merge loop iterations
-[eva] partitioning-annots.c:193: starting to merge loop iterations
+  Called from partitioning-annots.c:278.
+[eva] partitioning-annots.c:243: starting to merge loop iterations
+[eva] partitioning-annots.c:248: starting to merge loop iterations
 [eva] Recording results for test_slevel
 [eva] Done for function test_slevel
 [eva] computing for function test_unroll <- main.
-  Called from partitioning-annots.c:224.
+  Called from partitioning-annots.c:279.
 [eva:loop-unroll:partial] partitioning-annots.c:26: loop not completely unrolled
 [eva] partitioning-annots.c:26: starting to merge loop iterations
 [eva:loop-unroll:partial] partitioning-annots.c:34: loop not completely unrolled
@@ -25,7 +25,7 @@
 [eva] Recording results for test_unroll
 [eva] Done for function test_unroll
 [eva] computing for function test_split <- main.
-  Called from partitioning-annots.c:225.
+  Called from partitioning-annots.c:280.
 [eva] computing for function Frama_C_interval <- test_split <- main.
   Called from partitioning-annots.c:73.
 [eva] using specification for function Frama_C_interval
@@ -65,7 +65,7 @@
 [eva] Recording results for test_split
 [eva] Done for function test_split
 [eva] computing for function test_dynamic_split <- main.
-  Called from partitioning-annots.c:226.
+  Called from partitioning-annots.c:281.
 [eva] partitioning-annots.c:95: Warning: 
   this partitioning parameter cannot be evaluated safely on all states
 [eva] computing for function Frama_C_interval <- test_dynamic_split <- main.
@@ -90,13 +90,44 @@
 [eva] Recording results for test_dynamic_split
 [eva] Done for function test_dynamic_split
 [eva] computing for function test_dynamic_split_predicate <- main.
-  Called from partitioning-annots.c:227.
+  Called from partitioning-annots.c:282.
 [eva] partitioning-annots.c:124: starting to merge loop iterations
 [eva] Recording results for test_dynamic_split_predicate
 [eva] Done for function test_dynamic_split_predicate
+[eva] computing for function test_splits_post_call <- main.
+  Called from partitioning-annots.c:283.
+[eva] computing for function Frama_C_interval <- test_splits_post_call <- main.
+  Called from partitioning-annots.c:205.
+[eva] partitioning-annots.c:205: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function spec <- test_splits_post_call <- main.
+  Called from partitioning-annots.c:206.
+[eva] using specification for function spec
+[eva] Done for function spec
+[eva] partitioning-annots.c:211: Frama_C_show_each_spec: [-2147483648..-10], ⊥
+[eva] partitioning-annots.c:211: Frama_C_show_each_spec: [10..2147483647], ⊥
+[eva] partitioning-annots.c:211: Frama_C_show_each_spec: {-1}, [-1000..1000]
+[eva] computing for function body <- test_splits_post_call <- main.
+  Called from partitioning-annots.c:212.
+[eva] Recording results for body
+[eva] Done for function body
+[eva] partitioning-annots.c:212: Reusing old results for call to body
+[eva] partitioning-annots.c:212: Reusing old results for call to body
+[eva] partitioning-annots.c:217: Frama_C_show_each_body: [-510..-10], ⊥
+[eva] partitioning-annots.c:217: Frama_C_show_each_body: [10..510], ⊥
+[eva] partitioning-annots.c:217: Frama_C_show_each_body: {-1}, [-1000..1000]
+[eva] Recording results for test_splits_post_call
+[eva] Done for function test_splits_post_call
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function body:
+  i2 ∈ [-500..500]
+  absolute ∈ [0..500]
+  state ∈ {-1; 0; 1}
+  y ∈ [-1000..1000] or UNINITIALIZED
+  __retres ∈ [-510..510]
 [eva:final-states] Values at end of function test_dynamic_split:
   Frama_C_entropy_source ∈ [--..--]
   a ∈ {0}
@@ -117,6 +148,13 @@
   k ∈ {0; 1}
   i ∈ {0; 1}
   j ∈ {0; 1; 2}
+[eva:final-states] Values at end of function test_splits_post_call:
+  Frama_C_entropy_source ∈ [--..--]
+  x ∈ [-1000..1000] or UNINITIALIZED
+  y ∈ [-1000..1000] or UNINITIALIZED
+  error ∈ [-1000..1000] or UNINITIALIZED
+  i ∈ [-1000..1000]
+  r ∈ [-510..510]
 [eva:final-states] Values at end of function test_unroll:
   a[0..9] ∈ {42}
   b[0..9] ∈ {42}
@@ -145,6 +183,8 @@
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
   k ∈ {0; 1}
+[from] Computing for function body
+[from] Done for function body
 [from] Computing for function test_dynamic_split
 [from] Computing for function Frama_C_interval <-test_dynamic_split
 [from] Done for function Frama_C_interval
@@ -155,6 +195,10 @@
 [from] Done for function test_slevel
 [from] Computing for function test_split
 [from] Done for function test_split
+[from] Computing for function test_splits_post_call
+[from] Computing for function spec <-test_splits_post_call
+[from] Done for function spec
+[from] Done for function test_splits_post_call
 [from] Computing for function test_unroll
 [from] Done for function test_unroll
 [from] Computing for function main
@@ -164,6 +208,12 @@
 [from] Function Frama_C_interval:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
   \result FROM Frama_C_entropy_source; min; max
+[from] Function body:
+  y FROM nondet; i; p (and SELF)
+  \result FROM nondet; i
+[from] Function spec:
+  x FROM i
+  \result FROM i
 [from] Function test_dynamic_split:
   Frama_C_entropy_source FROM Frama_C_entropy_source; nondet (and SELF)
 [from] Function test_dynamic_split_predicate:
@@ -173,12 +223,18 @@
 [from] Function test_split:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
   k FROM Frama_C_entropy_source
+[from] Function test_splits_post_call:
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function test_unroll:
   NO EFFECTS
 [from] Function main:
   Frama_C_entropy_source FROM Frama_C_entropy_source; nondet (and SELF)
   k FROM Frama_C_entropy_source
 [from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function body:
+    i2; absolute; tmp; state; y; __retres
+[inout] Inputs for function body:
+    nondet
 [inout] Out (internal) for function test_dynamic_split:
     Frama_C_entropy_source; a; b
 [inout] Inputs for function test_dynamic_split:
@@ -195,6 +251,10 @@
     Frama_C_entropy_source; k; i; j
 [inout] Inputs for function test_split:
     Frama_C_entropy_source; k
+[inout] Out (internal) for function test_splits_post_call:
+    Frama_C_entropy_source; x; y; error; i; r
+[inout] Inputs for function test_splits_post_call:
+    Frama_C_entropy_source; nondet
 [inout] Out (internal) for function test_unroll:
     a[0..9]; b[0..9]; c[0..19]; d[0..19]; e[0..9]; i; j; i_0; j_0; i_1; 
     i_2; i_3; j_1

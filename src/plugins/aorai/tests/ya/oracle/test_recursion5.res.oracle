@@ -71,6 +71,7 @@ enum aorai_OpStatusList {
     int IgnoreFoo_tmp;
     int WillDoFoo_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_isPresentRec;
     End_tmp = End;
@@ -154,6 +155,7 @@ enum aorai_OpStatusList {
     int IgnoreFoo_tmp;
     int WillDoFoo_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_isPresentRec;
     End_tmp = End;
@@ -285,6 +287,7 @@ int isPresentRec(int *t, int i, int max, int val)
     int IgnoreFoo_tmp;
     int WillDoFoo_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_isPresent;
     End_tmp = End;
@@ -361,6 +364,7 @@ int isPresentRec(int *t, int i, int max, int val)
     int IgnoreFoo_tmp;
     int WillDoFoo_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_isPresent;
     End_tmp = End;
@@ -463,6 +467,7 @@ int isPresent(int *t, int max, int val)
     int IgnoreFoo_tmp;
     int WillDoFoo_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_foo;
     End_tmp = End;
@@ -532,6 +537,7 @@ int isPresent(int *t, int max, int val)
     int IgnoreFoo_tmp;
     int WillDoFoo_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_foo;
     End_tmp = End;
@@ -615,6 +621,7 @@ void foo(void)
     int IgnoreFoo_tmp;
     int WillDoFoo_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     End_tmp = End;
@@ -684,6 +691,7 @@ void foo(void)
     int IgnoreFoo_tmp;
     int WillDoFoo_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     End_tmp = End;

@@ -464,7 +464,7 @@ module Make_Dataflow
     end;
     (* Get vertex store *)
     let store = get_vertex_store v in
-    (* Join incoming s tates *)
+    (* Join incoming states *)
     let flow = Partitioning.join sources store in
     let flow =
       match v.vertex_start_of with

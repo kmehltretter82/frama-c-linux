@@ -20,28 +20,24 @@
 [eva] using specification for function Frama_C_interval
 [eva] serial.c:58: starting to merge loop iterations
 [eva] serial.c:63: Trace partitioning superposing up to 100 states
-[eva] serial.c:63: Trace partitioning superposing up to 300 states
+[eva] serial.c:63: Trace partitioning superposing up to 200 states
 [eva:alarm] serial.c:33: Warning: 
   assertion 'Aorai,aorai_smoke_test' got status invalid (stopping propagation).
 [aorai] serial.c:92: Wait1 <- Wait1 <- Complete
-[aorai] serial.c:92: n in {5},x in [0..16383],y in [8192..16383]
-[aorai] serial.c:92: Wait1 <- Wait1 <- Complete
-[aorai] serial.c:92: n in {5},x in [0..16383],y in [0..8191]
-[eva] serial.c:63: Trace partitioning superposing up to 500 states
-[eva] serial.c:63: Trace partitioning superposing up to 700 states
+[aorai] serial.c:92: n in {5},x in [0..16383],y in [0..16383]
+[eva] serial.c:63: Trace partitioning superposing up to 400 states
+[eva] serial.c:63: Trace partitioning superposing up to 600 states
+[eva] serial.c:63: Trace partitioning superposing up to 800 states
 [eva] serial.c:63: Trace partitioning superposing up to 900 states
-[eva] serial.c:63: Trace partitioning superposing up to 1200 states
-[eva] serial.c:63: Trace partitioning superposing up to 1400 states
-[eva] serial.c:63: Trace partitioning superposing up to 1500 states
-[eva] serial.c:63: Trace partitioning superposing up to 1600 states
-[eva] serial.c:63: Trace partitioning superposing up to 1700 states
+[eva] serial.c:63: Trace partitioning superposing up to 1000 states
+[eva] serial.c:63: Trace partitioning superposing up to 1100 states
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function input_data_post_func:
   aorai_x1 ∈ [0..127]
   aorai_x2 ∈ [0..127]
   aorai_y1 ∈ [0..127]
-  aorai_y2 ∈ [0..2147483647]
+  aorai_y2 ∈ [0..127]
   aorai_CurOperation ∈ {op_input_data}
   aorai_CurOpStatus ∈ {aorai_Terminated}
   aorai_CurStates ∈ {Complete; Wait1; Wait2; Wait3; Wait4; Wait5}
@@ -59,7 +55,7 @@
   aorai_x1 ∈ [0..127]
   aorai_x2 ∈ [0..127]
   aorai_y1 ∈ [0..127]
-  aorai_y2 ∈ [0..2147483647]
+  aorai_y2 ∈ [0..127]
   aorai_CurOperation ∈ {op_input_data}
   aorai_CurOpStatus ∈ {aorai_Terminated}
   aorai_CurStates ∈ {Complete; Wait1; Wait2; Wait3; Wait4; Wait5}
@@ -115,7 +111,7 @@
   aorai_x1 ∈ [0..127]
   aorai_x2 ∈ [0..127]
   aorai_y1 ∈ [0..127]
-  aorai_y2 ∈ [0..2147483647]
+  aorai_y2 ∈ [0..127]
   aorai_CurOperation ∈ {op_input_status; op_input_data}
   aorai_CurOpStatus ∈ {aorai_Terminated}
   aorai_CurStates ∈ {Complete; Wait1; Wait2; Wait3; Wait4; Wait5}
@@ -124,13 +120,12 @@
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
   buffer[0] ∈ {0} ∪ [128..255]
-        [1..2] ∈ [0..127]
-        [3..4] ∈ [0..2147483647]
+        [1..4] ∈ [0..127]
   n ∈ {0; 1; 2; 3; 4}
   aorai_x1 ∈ [0..127]
   aorai_x2 ∈ [0..127]
   aorai_y1 ∈ [0..127]
-  aorai_y2 ∈ [0..2147483647]
+  aorai_y2 ∈ [0..127]
   aorai_CurOperation ∈ {op_output; op_input_status; op_input_data}
   aorai_CurOpStatus ∈ {aorai_Called; aorai_Terminated}
   aorai_CurStates ∈ {Complete; Wait1; Wait2; Wait3; Wait4; Wait5}
@@ -218,6 +213,7 @@ int n = 0;
   void input_status_pre_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_input_status;
     aorai_StatesHistory_2 = aorai_StatesHistory_1;
@@ -257,6 +253,7 @@ int n = 0;
   void input_status_post_func(int res)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_input_status;
     aorai_StatesHistory_2 = aorai_StatesHistory_1;
@@ -403,6 +400,7 @@ int input_status(void)
   void input_data_pre_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_input_data;
     aorai_StatesHistory_2 = aorai_StatesHistory_1;
@@ -440,6 +438,7 @@ int input_status(void)
   void input_data_post_func(int res)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_input_data;
     aorai_StatesHistory_2 = aorai_StatesHistory_1;
@@ -584,6 +583,7 @@ int input_data(void)
   void output_pre_func(int x, int y)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_output;
     aorai_StatesHistory_2 = aorai_StatesHistory_1;
@@ -636,6 +636,7 @@ int input_data(void)
   void output_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_output;
     aorai_StatesHistory_2 = aorai_StatesHistory_1;
@@ -690,11 +691,10 @@ void main(void)
           n = 0;
           continue;
         }
-      }
-      else {
         /*@ split data & 0x40; */ ;
-        if (n == 0) continue;
       }
+      else 
+        if (n == 0) continue;
       tmp_0 = n;
       n ++;
       buffer[tmp_0] = data;

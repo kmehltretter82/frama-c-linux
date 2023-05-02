@@ -97,6 +97,7 @@ check lemma emptying_stack_deterministic_trans{L}:
   void push_pre_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_push;
     if ((unsigned int)4 == aorai_CurStates) aorai_CurStates = filling_stack;
@@ -155,6 +156,7 @@ check lemma emptying_stack_deterministic_trans{L}:
   void push_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_push;
     if ((unsigned int)5 == aorai_CurStates) {
@@ -235,6 +237,7 @@ void push(void)
   void pop_pre_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_pop;
     if ((unsigned int)4 == aorai_CurStates) 
@@ -301,6 +304,7 @@ void push(void)
   void pop_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_pop;
     if ((unsigned int)3 == aorai_CurStates) {
@@ -398,6 +402,7 @@ void pop(void)
   void main_pre_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     if ((unsigned int)6 == aorai_CurStates) {
@@ -451,6 +456,7 @@ void pop(void)
   void main_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     if ((unsigned int)2 == aorai_CurStates) aorai_CurStates = accept;

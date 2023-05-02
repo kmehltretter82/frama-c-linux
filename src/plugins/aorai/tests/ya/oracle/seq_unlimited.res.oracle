@@ -93,6 +93,7 @@ check lemma aorai_intermediate_state_0_deterministic_trans{L}:
   void init_pre_func(int *a, int n)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_init;
     if ((unsigned int)4 == aorai_CurStates) aorai_CurStates = aorai_intermediate_state;
@@ -146,6 +147,7 @@ check lemma aorai_intermediate_state_0_deterministic_trans{L}:
   void init_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_init;
     if ((unsigned int)0 == aorai_CurStates) aorai_CurStates = c;
@@ -235,6 +237,7 @@ void init(int *a, int n)
   void find_pre_func(int *a, int n, int k)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_find;
     if ((unsigned int)5 == aorai_CurStates) aorai_CurStates = aorai_intermediate_state_1;
@@ -290,6 +293,7 @@ void init(int *a, int n)
   void find_post_func(int res)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_find;
     if ((unsigned int)2 == aorai_CurStates) aorai_CurStates = aorai_intermediate_state_0;
@@ -394,6 +398,7 @@ int find(int *a, int n, int k)
   void main_pre_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     if ((unsigned int)6 == aorai_CurStates) aorai_CurStates = b;
@@ -447,6 +452,7 @@ int find(int *a, int n, int k)
   void main_post_func(int res)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     if ((unsigned int)1 == aorai_CurStates) aorai_CurStates = ok;

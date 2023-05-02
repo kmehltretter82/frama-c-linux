@@ -42,8 +42,8 @@ struct
   type state = Domain.t
 
   type store = {
-    rationing: Partition.rationing; (* slevel rationing at this point *)
     flow_actions : action list; (* partitioning actions to be applied *)
+    rationing: bool; (* Is there a slevel rationing in above actions? *)
     store_stmt : stmt option;
     store_index : Index.t; (* Index of all states stored: used to quickly remove
                               new states that have already been propagated. *)
@@ -72,13 +72,27 @@ struct
   (* Constructors *)
 
   let empty_store ~(stmt : stmt option) : store =
-    let limit, merge, flow_actions = match stmt with
-      | None -> max_int, false, []
-      | Some stmt -> slevel stmt, merge stmt, flow_actions stmt
+    let rationing_parameters, flow_actions = match stmt with
+      | None -> None, []
+      | Some stmt ->
+        let flow_actions = flow_actions stmt in
+        (* A skip statement is created on each split annotation: do not ration
+           states on them to avoid meddling in successive split directives. *)
+        if Cil.is_skip stmt.skind && flow_actions <> []
+        then None, flow_actions
+        else Some (slevel stmt, merge stmt), flow_actions
     in
-    let rationing = Partition.new_rationing ~limit ~merge in
+    let rationing =
+      match rationing_parameters with
+      | None -> Partition.new_rationing ~limit:max_int ~merge:false
+      | Some (limit, merge) -> Partition.new_rationing ~limit ~merge
+    in
+    let flow_actions =
+      (Ration rationing) :: Update_dynamic_splits :: flow_actions
+    in
     {
-      rationing; flow_actions;
+      flow_actions;
+      rationing = rationing_parameters <> None;
       store_stmt = stmt;
       store_index = Index.empty ();
       store_partition = Partition.empty;
@@ -109,7 +123,7 @@ struct
     Partition.iter (fun _key state -> Domain.pretty fmt state) s.store_partition
 
   let pretty_flow (fmt : Format.formatter) (flow : flow) =
-    Flow.iter (Domain.pretty fmt) flow
+    Flow.iter (fun _ -> Domain.pretty fmt) flow
 
 
   (* Accessors *)
@@ -261,50 +275,49 @@ struct
     let flow_states =
       List.fold_left Flow.union Flow.empty sources_states
     in
-    (* Handle ration stamps *)
-    dest.incoming_states <- dest.incoming_states + Flow.size flow_states;
-    let rationing_action = Ration dest.rationing in
-    (* Handle Split / Merge operations *)
-    let flow_actions = Update_dynamic_splits :: dest.flow_actions in
     (* Execute actions *)
-    let actions = rationing_action :: flow_actions in
     let flow_states =
-      List.fold_left Flow.transfer_keys flow_states actions
+      List.fold_left Flow.transfer_keys flow_states dest.flow_actions
     in
-    (* Add states to the store but filter out already propagated states *)
-    let update key current_state =
-      (* Inclusion test *)
-      let state =
-        try
-          let previous_state = Partition.find key dest.store_partition in
-          if Domain.is_included current_state previous_state then
-            (* The current state is included in the previous; stop *)
-            None
-          else begin
-            (* Propagate the join of the two states *)
-            if is_loop_head then
-              Self.feedback ~level:1 ~once:true ~current:true
-                "starting to merge loop iterations";
-            Some (Domain.join previous_state current_state)
-          end
-        with
-        (* There is no previous state, propagate normally *)
-          Not_found -> Some current_state
-      in
-      (* Add the propagated state to the store *)
-      let add s =
-        dest.store_partition <- Partition.replace key s dest.store_partition;
-      in
-      Option.iter add state;
-      (* Filter out already propagated states (only at statements). *)
-      if dest.store_stmt = None
-      then state
-      else Extlib.opt_filter (fun s -> Index.add s dest.store_index) state
+    (* Add the propagated state to the store *)
+    let add_state key s =
+      dest.store_partition <- Partition.replace key s dest.store_partition;
     in
-    let flow = Flow.join_duplicate_keys flow_states in
-    let flow = Flow.filter_map update flow in
-    Option.iter (partitioning_feedback dest flow) dest.store_stmt;
-    flow
+    if not (dest.rationing) then begin
+      Flow.iter add_state flow_states;
+      flow_states
+    end else begin
+      (* Handle ration stamps *)
+      dest.incoming_states <- dest.incoming_states + Flow.size flow_states;
+      (* Add states to the store but filter out already propagated states *)
+      let update key current_state =
+        (* Inclusion test *)
+        let state =
+          try
+            let previous_state = Partition.find key dest.store_partition in
+            if Domain.is_included current_state previous_state then
+              (* The current state is included in the previous; stop *)
+              None
+            else begin
+              (* Propagate the join of the two states *)
+              if is_loop_head then
+                Self.feedback ~level:1 ~once:true ~current:true
+                  "starting to merge loop iterations";
+              Some (Domain.join previous_state current_state)
+            end
+          with
+          (* There is no previous state, propagate normally *)
+            Not_found -> Some current_state
+        in
+        Option.iter (add_state key) state;
+        (* Filter out already propagated states. *)
+        Extlib.opt_filter (fun s -> Index.add s dest.store_index) state
+      in
+      let flow = Flow.join_duplicate_keys flow_states in
+      let flow = Flow.filter_map update flow in
+      Option.iter (partitioning_feedback dest flow) dest.store_stmt;
+      flow
+    end
 
   let widen (w : widening) (flow : flow) : flow =
     let stmt = w.widening_stmt in

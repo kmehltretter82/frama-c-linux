@@ -36,6 +36,7 @@ enum aorai_OpStatusList {
   {
     int I_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
     I_tmp = I;
@@ -77,6 +78,7 @@ enum aorai_OpStatusList {
   {
     int I_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
     I_tmp = I;
@@ -124,6 +126,7 @@ void f(int x)
   {
     int I_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     I_tmp = I;
@@ -157,6 +160,7 @@ void f(int x)
   {
     int I_tmp;
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     I_tmp = I;

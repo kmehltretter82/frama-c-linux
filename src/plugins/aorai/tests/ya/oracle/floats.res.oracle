@@ -173,6 +173,7 @@ check lemma B_deterministic_trans{L}:
   void square_root_aux_pre_func(float x, float n)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_square_root_aux;
     if ((unsigned int)1 == aorai_CurStates) 
@@ -223,6 +224,7 @@ check lemma B_deterministic_trans{L}:
   void square_root_aux_post_func(float res)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_square_root_aux;
     if ((unsigned int)1 == aorai_CurStates) aorai_CurStates = B;
@@ -301,6 +303,7 @@ float square_root_aux(float x, float n)
   void square_root_pre_func(float n)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_square_root;
     if ((unsigned int)0 == aorai_CurStates) aorai_CurStates = B;
@@ -348,6 +351,7 @@ float square_root_aux(float x, float n)
   void square_root_post_func(float res)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_square_root;
     if ((unsigned int)1 == aorai_CurStates) aorai_CurStates = C;
@@ -409,6 +413,7 @@ float square_root(float n)
   void main_pre_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
     if ((unsigned int)4 == aorai_CurStates) aorai_CurStates = A;
@@ -456,6 +461,7 @@ float square_root(float n)
   void main_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
     if ((unsigned int)2 == aorai_CurStates) aorai_CurStates = E;

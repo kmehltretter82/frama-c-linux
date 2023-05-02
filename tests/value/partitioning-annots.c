@@ -162,6 +162,61 @@ void test_loop_split()
   }
 }
 
+/*@
+   assigns \result, *p \from i;
+   behavior error:
+     assumes nondet == 0;
+     assigns \result, *p \from i;
+     ensures \result == -1;
+     ensures \initialized(p) && *p == \old(i);
+   behavior positive:
+     assumes nondet > 0;
+     assigns \result \from i;
+     ensures \result >= 10;
+   behavior negative:
+     assumes nondet < 0;
+     assigns \result \from i;
+     ensures \result <= -10;
+   disjoint behaviors;
+   complete behaviors;
+*/
+int spec(int i, int* p);
+
+int body(int i, int *p) {
+  int i2 = i / 2;
+  int absolute = i2 < 0 ? -i2 : i2;
+  int state = nondet % 2;
+  //@ split state;
+  if (state < 0)
+    return - 10 - absolute;
+  if (state > 0)
+    return 10 + absolute;
+  *p = i;
+  return -1;
+}
+
+/* Tests the application of multiple splits according to the return value of a
+   call, to keep in the caller some state partitioning from the callee.
+   The splits must be defined after the call, so the state partitioning from the
+   callee must be kept until all splits are performed.
+   Tests this whether the function body or a specification is used. */
+void test_splits_post_call (void) {
+  int x, y, error;
+  int i = Frama_C_interval(-1000, 1000);
+  int r = spec(i, &x);
+  //@ split r < -1;
+  //@ split r > -1;
+  if (r == -1)
+    error = x; // There should be no alarm.
+  Frama_C_show_each_spec(r, x); // There should be three states.
+  r = body(i, &y);
+  //@ split r < -1;
+  //@ split r > -1;
+  if (r == -1)
+    error = y; // There should be no alarm.
+  Frama_C_show_each_body(r, y); // There should be three states.
+}
+
 void test_history()
 {
   int i = Frama_C_interval(0,1);
@@ -225,4 +280,5 @@ void main(void)
   test_split();
   test_dynamic_split();
   test_dynamic_split_predicate();
+  test_splits_post_call();
 }

@@ -195,7 +195,7 @@ sig
   val transfer : ((key * state) -> (key * state) list) -> t -> t
   val transfer_keys : t -> action -> t
 
-  val iter : (state -> unit) -> t -> unit
+  val iter : (key -> state -> unit) -> t -> unit
   val filter_map: (key -> state -> state option) -> t -> t
 
   val join_duplicate_keys: t -> t
