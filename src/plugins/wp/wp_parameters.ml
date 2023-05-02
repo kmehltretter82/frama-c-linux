@@ -716,6 +716,16 @@ module Interactive = String
     end)
 
 let () = Parameter_customize.set_group wp_prover
+module Strategies = String_list
+    (struct
+      let option_name = "-wp-strategy"
+      let arg_name = "s"
+      let help =
+        "Activate the proof-strategy engine, using the\n\
+         specified strategies as default."
+    end)
+
+let () = Parameter_customize.set_group wp_prover
 module RunAllProvers =
   False(struct
     let option_name = "-wp-run-all-provers"

@@ -504,7 +504,7 @@ let spawn_wp_proofs ~script goals =
             && not (Wpo.is_trivial goal)
             && (script.auto <> [] ||
                 ProofSession.exists goal ||
-                ProofStrategy.has_hint goal)
+                Wp_parameters.Strategies.get () <> [])
            then
              ProverScript.spawn
                ~failed:false

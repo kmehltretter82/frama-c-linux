@@ -33,7 +33,8 @@ Plugin WP 27.0 (Cobalt)
 - WP          [2023-18-04] Tactic Absurd now also applies to goal
 - WP          [2023-18-04] New option -wp-status to print unproved goals
 - WP          [2023-17-04] New option -wp-tactic to search for tactics
-- WP          [2023-17-04] New proof engine (selected by 'tip' and 'script' provers)
+- WP          [2023-02-05] New option -wp-strategy to activate proof strategies
+- WP          [2023-17-04] New proof strategy engine
 - WP          [2023-17-04] ACSL extension 'strategy' for proof strategies
 - WP          [2023-17-04] ACSL extension 'proof' for proof resolution hints
 - WP          [2023-04-03] Default timeout set to 2s

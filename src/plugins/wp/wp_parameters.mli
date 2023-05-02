@@ -120,6 +120,7 @@ module FinalizeScripts: Parameter_sig.Bool
 module DryFinalizeScripts: Parameter_sig.Bool
 module Provers: Parameter_sig.String_list
 module Interactive: Parameter_sig.String
+module Strategies: Parameter_sig.String_list
 module RunAllProvers: Parameter_sig.Bool
 module Cache: Parameter_sig.String
 module CacheEnv: Parameter_sig.Bool

@@ -235,8 +235,6 @@ let parse_strategy ctxt loc ps =
     Strategies.add name.value { name ; alternatives } ;
     Ext_id id
 
-let () = Acsl_extension.register_global "strategy" parse_strategy false
-
 (* -------------------------------------------------------------------------- *)
 (* --- Proof Parser                                                       --- *)
 (* -------------------------------------------------------------------------- *)
@@ -264,7 +262,18 @@ let parse_proofs ctxt loc ps =
   Hints.set (Hints.get () @ [ strategy , props ]) ;
   Ext_id 0
 
-let () = Acsl_extension.register_global "prove" parse_proofs false
+(* -------------------------------------------------------------------------- *)
+(* --- Strategy ACSL Extensions                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+let register () =
+  if Wp_parameters.Strategies.get () <> [] then
+    begin
+      Acsl_extension.register_global "strategy" parse_strategy false ;
+      Acsl_extension.register_global "prove" parse_proofs false ;
+    end
+
+let () = Cmdline.run_after_configuring_stage register
 
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy Resolution                                                --- *)
@@ -341,10 +350,23 @@ let typecheck () =
 (* --- Strategy Hints                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
+let default () =
+  List.filter_map
+    (fun s ->
+       try Some (Strategies.find s)
+       with Not_found ->
+         Wp_parameters.warning ~current:false ~once:true
+           "Invalid -wp-strategy '%s' (undefined strategy name)" s ;
+         None
+    ) @@
+  Wp_parameters.Strategies.get ()
+
 let hints goal =
-  let pid = goal.Wpo.po_pid in
-  List.map (fun (name,_) -> Strategies.find name) @@
-  List.filter (fun (_,ps) -> WpPropId.select_by_name ps pid) @@ Hints.get ()
+  begin
+    let pid = goal.Wpo.po_pid in
+    List.map (fun (name,_) -> Strategies.find name) @@
+    List.filter (fun (_,ps) -> WpPropId.select_by_name ps pid) @@ Hints.get ()
+  end @ default ()
 
 let has_hint goal =
   let pid = goal.Wpo.po_pid in
