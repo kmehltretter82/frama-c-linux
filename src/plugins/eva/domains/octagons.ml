@@ -1811,7 +1811,6 @@ module Domain = struct
     state >>-: check "precise assign"
 
   let assign kinstr left_value expr assigned valuation state =
-    update valuation state >>- fun state ->
     if kinstr <> Kglobal
     && Cil.isIntegralOrPointerType left_value.ltyp
     && not (Eval_typ.lval_contains_volatile left_value.lval)
