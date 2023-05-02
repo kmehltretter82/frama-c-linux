@@ -49,7 +49,7 @@ and node =
   | Get of ast * ast
   | Set of ast * ast * ast
 and assoc = [ `Add | `Mul | `Concat | `Land | `Lor | `Lxor ]
-and binop = [ `Div | `Mod | `Repeat | `Eq | `Lt | `Le | `Ne ]
+and binop = [ `Div | `Mod | `Repeat | `Eq | `Lt | `Le | `Ne | `Lsl | `Lsr ]
 
 let self p =
   let pattern,self = match p.value with
@@ -165,6 +165,8 @@ let rec parse ctxt p =
   | PLbinop(a,Bbw_xor,b) -> assoc `Lxor (parse ctxt a) (parse ctxt b)
   | PLbinop(a,Bdiv,b) -> parse_binop ctxt ~loc `Div a b
   | PLbinop(a,Bmod,b) -> parse_binop ctxt ~loc `Mod a b
+  | PLbinop(a,Blshift,b) -> parse_binop ctxt ~loc `Lsl a b
+  | PLbinop(a,Brshift,b) -> parse_binop ctxt ~loc `Lsr a b
   | PLrel(a,Lt,b) -> parse_binop ctxt ~loc `Lt a b
   | PLrel(a,Le,b) -> parse_binop ctxt ~loc `Le a b
   | PLrel(a,Gt,b) -> parse_binop ctxt ~loc `Lt b a
@@ -230,6 +232,8 @@ let rec pp fmt (a : ast) =
       | `Lt -> "<"
       | `Le -> "<="
       | `Repeat -> "*^"
+      | `Lsl -> "<<"
+      | `Lsr -> ">>"
     in Format.fprintf fmt "@[<hov 2>(%a@ %s %a)@]" pp a op pp b
   | Times(k,v) -> Format.fprintf fmt "%a*%a" Integer.pretty k pp v
   | Get(a,k) -> Format.fprintf fmt "@[<hov 2>%a[@,%a]@]" pp a pp k
@@ -309,6 +313,8 @@ let rec pmatch env (p : pattern) e =
   | Binop(p,`Ne,q) , Div(a,b) -> pbinop env p q a b
   | Binop(p,`Lt,q) , Div(a,b) -> pbinop env p q a b
   | Binop(p,`Le,q) , Div(a,b) -> pbinop env p q a b
+  | Binop(p,`Lsl,q) , Fun(lf,[a;b]) when lf == Cint.f_lsl -> pbinop env p q a b
+  | Binop(p,`Lsr,q) , Fun(lf,[a;b]) when lf == Cint.f_lsr -> pbinop env p q a b
   | Times(b,p) , Times(a,e) ->
     let q,r = Integer.c_div_rem a b in
     if Integer.is_zero r then pmatch env p (Lang.F.e_times q e)
@@ -561,6 +567,8 @@ let rec select (env : sigma) (a : value) =
       | `Lt -> "wp:lt"
       | `Le -> "wp:leq"
       | `Repeat -> "wp:repeat"
+      | `Lsl -> "lf:lsl"
+      | `Lsr -> "lf:lsr"
     in compose env ~loc op [a;b]
   | Times(k,v) -> Tactical.compose "wp:mul" [Tactical.cint k;cc v]
   | Get(a,k) -> Tactical.compose "wp:get" [cc a;cc k]
@@ -702,7 +710,7 @@ let rec typecheck env vt (a : ast) =
     let va = typecheck env vn a in
     let vb = typecheck env vn b in
     tc_merge ~loc va vb
-  | Binop(a,`Mod,b) ->
+  | Binop(a,(`Mod|`Lsl|`Lsr),b) ->
     ignore @@ typecheck env vint a ;
     ignore @@ typecheck env vint b ;
     tc_merge ~loc vt vint
