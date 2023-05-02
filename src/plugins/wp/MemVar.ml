@@ -546,6 +546,9 @@ struct
     | CARR of MemoryContext.validity (* In-context array *)
     | HEAP (* In-heap variable *)
 
+  let is_heap_allocated = function
+    | CREF | CVAL -> false | HEAP | CTXT _ | CARR _ -> true
+
   type loc =
     | Ref of varinfo
     | Val of mem * varinfo * ofs list (* The varinfo has {i not} been contextualized yet *)
@@ -713,10 +716,16 @@ struct
   let pointer_loc p = Loc (M.pointer_loc p)
   let pointer_val l = M.pointer_val (mloc_of_loc l)
 
-  let field l f = match l with
+  let field l f =
+    match l with
     | Loc l -> Loc (M.field l f)
     | Ref x -> noref ~op:"field access to" x
-    | Val(m,x,ofs) -> Val(m,x,ofs @ [Field f])
+    | Val(m,x,ofs) ->
+      if not (f.fcomp.cstruct || is_heap_allocated m) then
+        Wp_parameters.warning ~once:true
+          "Accessing union fields with WP might be unsound.@\n\
+           Please refer to WP manual." ;
+      Val(m,x,ofs @ [Field f])
 
   let rec ofs_shift obj k = function
     | [] -> [Shift(obj,k)]
@@ -900,9 +909,6 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   exception ShiftMismatch
-
-  let is_heap_allocated = function
-    | CREF | CVAL -> false | HEAP | CTXT _ | CARR _ -> true
 
   let shift_mismatch l =
     Wp_parameters.fatal "Invalid shift : %a" pretty l

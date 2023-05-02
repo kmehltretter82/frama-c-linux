@@ -425,7 +425,13 @@ module Shift = WpContext.Generator(Cobj)
         dfun.d_lfun
     end)
 
-let field l f = e_fun (ShiftField.get f) [l]
+let field l f =
+  if not f.fcomp.cstruct then
+    Wp_parameters.warning ~once:true
+      "Accessing union fields with WP might be unsound.@\n\
+       Please refer to WP manual." ;
+  e_fun (ShiftField.get f) [l]
+
 let shift l obj k = e_fun (Shift.get obj) [l;k]
 
 module LITERAL =
