@@ -491,7 +491,7 @@ function createBrowserWindow(
 
   theWindow.on('close', closeHandler);
 
-  ipcMain.on('dome-ipc.done-closing', () => {
+  ipcMain.on('dome.ipc.closing.done', () => {
     theWindow.close();
   });
 
