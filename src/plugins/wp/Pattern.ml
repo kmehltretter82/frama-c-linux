@@ -400,6 +400,12 @@ and pchild env p e =
   else
     pchildren env p e
 
+let rec plist f =
+  function [] -> None | x::xs ->
+  match f x with
+  | Some _ as result -> result
+  | None -> plist f xs
+
 (* -------------------------------------------------------------------------- *)
 (* --- Pattern Lookup                                                     --- *)
 (* -------------------------------------------------------------------------- *)
@@ -411,13 +417,18 @@ type lookup = {
   pattern: pattern ;
 }
 
-let pterm { head ; pattern } clause sigma term =
+let pclause { head ; pattern } clause sigma prop =
+  let tprop = Lang.F.e_prop prop in
   let select t =
-    if t == term then Tactical.Clause clause else Tactical.Inside(clause,t) in
+    if t == tprop then Tactical.Clause clause else Tactical.Inside(clause,t) in
   let env = { sigma ; select ; marked = Lang.F.Tset.empty } in
-  if ptry env pattern term || (not head && pchildren env pattern term)
-  then Some env.sigma
-  else None
+  let pcond t =
+    if ptry env pattern t || (not head && pchildren env pattern t)
+    then Some env.sigma else None
+  in
+  match Lang.F.repr tprop with
+  | And ts -> plist pcond ts
+  | _ -> pcond tprop
 
 (* --- Step Ordering --- *)
 
@@ -445,17 +456,11 @@ let push (step : Conditions.step) =
 (* --- Step Matching --- *)
 
 let pstep ctxt sigma (step : Conditions.step) =
-  let term = Lang.F.e_prop @@ Conditions.head step in
+  let term = Conditions.head step in
   let clause = Tactical.Step step in
-  pterm ctxt clause sigma term
+  pclause ctxt clause sigma term
 
 (* --- Sequence Matching --- *)
-
-let rec plist f =
-  function [] -> None | x::xs ->
-  match f x with
-  | Some _ as result -> result
-  | None -> plist f xs
 
 let rec psequence ctxt sigma (seq : Conditions.sequence) =
   let steps = List.sort priority (Conditions.list seq) in
@@ -476,9 +481,8 @@ let phyps ctxt sigma (seq : Conditions.sequent) =
 let pgoal ctxt sigma (seq : Conditions.sequent) =
   if not ctxt.goal then None else
     let goal = snd seq in
-    let term = Lang.F.e_prop goal in
     let clause = Tactical.Goal goal in
-    pterm ctxt clause sigma term
+    pclause ctxt clause sigma goal
 
 let empty = Vmap.empty
 
