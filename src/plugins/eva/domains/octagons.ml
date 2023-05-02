@@ -1627,7 +1627,6 @@ module Domain = struct
     in
     eval_exp, eval_deps
 
-
   (* Domain functions *)
 
   let extract_expr ~oracle _context state expr =
@@ -1708,7 +1707,8 @@ module Domain = struct
     then state
     else
       match expr.enode with
-      | Lval lval when Cil.(isIntegralType (typeOfLval lval)) ->
+      | Lval lval when Cil.(isIntegralType (typeOfLval lval))
+                    && not (Eval_typ.lval_contains_volatile lval) ->
         let var = Variable.make_lval lval in
         let deps = Deps.add var (eval_deps var) state.deps in
         let intervals = Intervals.add var ival state.intervals in
@@ -1788,9 +1788,11 @@ module Domain = struct
     in
     state >>-: check "precise assign"
 
-  let assign _kinstr left_value expr assigned valuation state =
+  let assign kinstr left_value expr assigned valuation state =
     update valuation state >>- fun state ->
-    if Cil.isIntegralOrPointerType left_value.ltyp
+    if kinstr <> Kglobal
+    && Cil.isIntegralOrPointerType left_value.ltyp
+    && not (Eval_typ.lval_contains_volatile left_value.lval)
     then assign_variable left_value.lval expr assigned valuation state
     else
       let written_loc = Precise_locs.imprecise_location left_value.lloc in
