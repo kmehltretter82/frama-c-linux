@@ -1018,10 +1018,7 @@ module Deps = struct
         let deps = VariableToDeps.find v m in
         let v_zone = if direct then deps.data else deps.indirect in
         Locations.Zone.intersects v_zone zone
-      with Not_found ->
-        Self.fatal
-          "Octagon domain: cannot find %a for intersection with %a in@.%a"
-          Variable.pretty v Locations.Zone.pretty zone pretty (m,i)
+      with Not_found -> false
     in
     let get_at_base b intervals (data_acc, indirect_acc) =
       let data, indirect = BaseToVariables.find b i in
@@ -1043,7 +1040,9 @@ module Deps = struct
     is_increasing previous_deps.data deps.data &&
     is_increasing previous_deps.indirect deps.indirect
 
-  let add var deps (m, i: t): t =
+  (* Exact but slower [add]: in the resulting maps (m, i), [i] is exactly the
+     inverse of the map [m]. *)
+  let _exact_add var deps (m, i: t): t =
     let add_to (m, i) =
       VariableToDeps.add var deps m,
       BaseToVariables.add_deps var deps i
@@ -1057,6 +1056,15 @@ module Deps = struct
          from the inverse map to ensure consistency between both maps. *)
       add_to (m, BaseToVariables.remove_deps var previous_deps i)
     | _ -> add_to (m, i)
+
+  (* Faster but approximating [add]: in the resulting maps (m, i), [i] may
+     contain variables that do not appear in [m]. *)
+  let add var deps (m, i: t): t =
+    match VariableToDeps.find_opt var m with
+    | Some d when Function_Froms.Deps.equal d deps -> m, i
+    | _ ->
+      VariableToDeps.add var deps m,
+      BaseToVariables.add_deps var deps i
 
   let remove (var: Variable.t) ((m, i): t): t option =
     match VariableToDeps.find_opt var m with
@@ -1082,14 +1090,18 @@ module Deps = struct
       Locations.Zone.get_bases zone
     with Not_found -> Base.SetLattice.empty
 
-  let join (m1, i1: t) (m2, i2: t) =
+  (* Exact but slower [join]: in the resulting maps (m, i), [i] is exactly the
+     inverse of the map [m]. *)
+  let _exact_join (m1, i1: t) (m2, i2: t) =
     let m1_only = VariableToDeps.only_in_left m1 m2
     and m2_only = VariableToDeps.only_in_left m2 m1 in
     let i1 = VariableToDeps.fold BaseToVariables.remove_deps m1_only i1
     and i2 = VariableToDeps.fold BaseToVariables.remove_deps m2_only i2 in
     VariableToDeps.join m1 m2, BaseToVariables.join i1 i2
 
-  let narrow (m1, i1: t) (m2, i2: t) =
+  (* Exact but slower [narrow]: in the resulting maps (m, i), [i] is exactly the
+     inverse of the map [m]. *)
+  let _exact_narrow (m1, i1: t) (m2, i2: t) =
     let all_but_diff = VariableToDeps.all_but_diff m1 m2 in
     let m1 = VariableToDeps.only_in_left m1 all_but_diff
     and m2 = VariableToDeps.only_in_left m2 all_but_diff in
@@ -1100,6 +1112,16 @@ module Deps = struct
     let i = VariableToDeps.fold BaseToVariables.remove_deps m_join i in
     let i = VariableToDeps.fold BaseToVariables.add_deps m_narrow i in
     m, i
+
+  (* Faster but approximating [join]: in the resulting maps (m, i), [i] may
+     contain variables that do not appear in [m]. *)
+  let join (m1, i1: t) (m2, i2: t) =
+    VariableToDeps.join m1 m2, BaseToVariables.join i1 i2
+
+  (* Faster but approximating [narrow]: in the resulting maps (m, i), [i] may
+     contain variables that do not appear in [m]. *)
+  let narrow (m1, i1: t) (m2, i2: t) =
+    VariableToDeps.narrow m1 m2, BaseToVariables.join i1 i2
 
   let is_included (m1, _: t) (m2, _: t) =
     VariableToDeps.is_included m1 m2
