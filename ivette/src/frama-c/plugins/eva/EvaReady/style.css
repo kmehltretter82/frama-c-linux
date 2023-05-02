@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 20px;
   align-items: center;
-  margin:auto;
+  margin:10%;
 }
 
 .eva-status-icon {
@@ -15,6 +15,10 @@
 .eva-status span {
   font-size: 16px;
   text-align: center;
+}
+
+.eva-status button {
+  margin: auto;
 }
 
 .eva-status-computing {

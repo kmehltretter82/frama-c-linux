@@ -63,14 +63,16 @@ import { tag } from 'frama-c/kernel/api/data';
 import { tagDefault } from 'frama-c/kernel/api/data';
 
 /** State of the computation of Eva Analysis. */
-export type computationStateType = "not_computed" | "computing" | "computed";
+export type computationStateType =
+  "not_computed" | "computing" | "computed" | "aborted";
 
 /** Decoder for `computationStateType` */
 export const jComputationStateType: Json.Decoder<computationStateType> =
-  Json.jUnion<"not_computed" | "computing" | "computed">(
+  Json.jUnion<"not_computed" | "computing" | "computed" | "aborted">(
     Json.jTag("not_computed"),
     Json.jTag("computing"),
     Json.jTag("computed"),
+    Json.jTag("aborted"),
   );
 
 /** Natural order for `computationStateType` */
