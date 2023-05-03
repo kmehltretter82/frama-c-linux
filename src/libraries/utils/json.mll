@@ -334,7 +334,6 @@ let rec merge_assoc_lists la lb =
   List.rev r
 
 let merge_object path json_root_obj =
-  let open Yojson.Basic.Util in
   let existing_root_obj =
     try
       match Hashtbl.find json_tbl path with
@@ -343,14 +342,13 @@ let merge_object path json_root_obj =
     with Not_found ->
       `Assoc []
   in
-  let existing_assoc = existing_root_obj |> to_assoc in
-  let new_assoc = json_root_obj |> to_assoc in
+  let existing_assoc = existing_root_obj |> Yojson.Basic.Util.to_assoc in
+  let new_assoc = json_root_obj |> Yojson.Basic.Util.to_assoc in
   let merged = merge_assoc_lists existing_assoc new_assoc in
   let merged_obj = `Assoc merged in
   Hashtbl.replace json_tbl path merged_obj
 
 let merge_array path json_root_array =
-  let open Yojson.Basic.Util in
   let existing_root_array =
     try
       match Hashtbl.find json_tbl path with
@@ -359,8 +357,8 @@ let merge_array path json_root_array =
     with Not_found ->
       `List []
   in
-  let existing_list = existing_root_array |> to_list in
-  let new_list = json_root_array |> to_list in
+  let existing_list = existing_root_array |> Yojson.Basic.Util.to_list in
+  let new_list = json_root_array |> Yojson.Basic.Util.to_list in
   let merged_list = `List (existing_list @ new_list) in
   Hashtbl.replace json_tbl path merged_list
 
