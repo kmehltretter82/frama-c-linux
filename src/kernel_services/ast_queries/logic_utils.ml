@@ -2362,7 +2362,7 @@ class complete_types =
 
 let complete_types f = Cil.visitCilFile (new complete_types) f
 
-let pointer_comparable ?loc t1 t2 =
+let pointer_comparable ?loc ?(label=Logic_const.here_label) t1 t2 =
   let preds = Logic_env.find_all_logic_functions "\\pointer_comparable" in
   let cfct_ptr = TPtr (TFun(Cil.voidType,None,false,[]),[]) in
   let fct_ptr = Ctype cfct_ptr in
@@ -2404,7 +2404,7 @@ let pointer_comparable ?loc t1 t2 =
     with Not_found ->
       Kernel.fatal "built-in predicate \\pointer_comparable not found"
   in
-  Logic_const.unamed ?loc (Papp (pi, [], [t1;t2]))
+  Logic_const.unamed ?loc (Papp (pi, [label], [t1;t2]))
 
 let is_min_max_function name li =
   li.l_var_info.lv_name = name &&

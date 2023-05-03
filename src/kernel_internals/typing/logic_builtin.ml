@@ -118,6 +118,7 @@ let init =
           (fun c -> Logic_env.add_builtin_logic_ctor c.ctor_name c) ctors ;
         list.lt_def <- Some (LTsum ctors);
         let _list_of_integer = Ltype (list, [Linteger]) in
+        let l_label = FormalLabel "L" in
         (* predicates *)
         List.iter
           (fun (f,tparams,labels,params)  ->
@@ -154,14 +155,14 @@ let init =
             "\\no_overflow_double", [], [], ["m", rounding_mode; "x", Lreal] ;
             "\\subset", [a_name], [], ["s1", set_of_a_type;
                                        "s2", set_of_a_type];
-            "\\pointer_comparable", [], [], [("p1", object_ptr);
-                                             ("p2", object_ptr)];
-            "\\pointer_comparable", [], [], [("p1", fun_ptr);
-                                             ("p2", fun_ptr)];
-            "\\pointer_comparable", [], [], [("p1", fun_ptr);
-                                             ("p2", object_ptr)];
-            "\\pointer_comparable", [], [], [("p1", object_ptr);
-                                             ("p2", fun_ptr)];
+            "\\pointer_comparable", [], [l_label], [("p1", object_ptr);
+                                                    ("p2", object_ptr)];
+            "\\pointer_comparable", [], [l_label], [("p1", fun_ptr);
+                                                    ("p2", fun_ptr)];
+            "\\pointer_comparable", [], [l_label], [("p1", fun_ptr);
+                                                    ("p2", object_ptr)];
+            "\\pointer_comparable", [], [l_label], [("p1", object_ptr);
+                                                    ("p2", fun_ptr)];
           ];
         (* functions *)
         List.iter
