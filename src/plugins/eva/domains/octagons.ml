@@ -88,41 +88,33 @@ module Variable : Variable = struct
     | StartOf of varinfo
     | Lval of HCE.t
 
+  type tt = var * int
+
   (* The use of [HCE.id] makes this id non-deterministic. This can have an
      impact when printing the domain state, as the order between variables
      depends on this id. Option -deterministic circumvents this issue. *)
-  let id = function
+  let make_id = function
     | Var vi -> 4 * vi.vid
     | Int vi -> 4 * vi.vid + 1
     | StartOf vi -> 4 * vi.vid + 2
     | Lval lval -> 4 * HCE.id lval + 3
 
+  let id (_var, id) = id
+
   module Datatype_Input = struct
     include Datatype.Undefined
-    type t = var
+    type t = tt
     let name = "Eva.Octagons.Variable"
     let structural_descr = Structural_descr.t_abstract
-    let reprs = [ Var (List.hd Cil_datatype.Varinfo.reprs) ]
+    let reprs = [ Var (List.hd Cil_datatype.Varinfo.reprs), 0 ]
 
-    let compare x y =
-      match x, y with
-      | Var x, Var y
-      | Int x, Int y
-      | StartOf x, StartOf y -> Cil_datatype.Varinfo.compare x y
-      | Lval x, Lval y -> HCE.compare x y
-      | Var _, _ -> -1
-      |  _, Var _ -> 1
-      | Int _, _ -> -1
-      |  _, Int _ -> 1
-      | Lval _, _ -> -1
-      |  _, Lval _ -> 1
-
-    let equal x y = compare x y = 0
-
+    let compare x y = id y - id x
+    let equal = Datatype.from_compare
     let hash = id
     let rehash = Datatype.identity
 
-    let pretty fmt = function
+    let pretty fmt (var, _id) =
+      match var with
       | Var vi | StartOf vi -> Printer.pp_varinfo fmt vi
       | Int vi -> Format.fprintf fmt "(integer)%a" Printer.pp_varinfo vi
       | Lval lval -> HCE.pretty fmt lval
@@ -131,24 +123,29 @@ module Variable : Variable = struct
 
   include Datatype.Make_with_collections (Datatype_Input)
 
+  let make var = var, make_id var
+
   let make_lval = function
-    | Cil_types.Var vi, NoOffset -> Var vi
-    | lval -> Lval (HCE.of_lval lval)
+    | Cil_types.Var vi, NoOffset -> make (Var vi)
+    | lval -> make (Lval (HCE.of_lval lval))
 
-  let make_int vi = Int vi
-  let make_startof vi = StartOf vi
+  let make_int vi = make (Int vi)
+  let make_startof vi = make (StartOf vi)
 
-  let kind = function
+  let kind (var, _) =
+    match var with
     | Var vi -> typ_kind vi.vtype
     | Int _ | StartOf _ -> Integer
     | Lval lval -> typ_kind (HCE.type_of lval)
 
-  let lval = function
+  let lval (var, _) =
+    match var with
     | Var vi -> Some (Cil_types.Var vi, NoOffset)
     | Lval lval -> HCE.to_lval lval
     | Int _ | StartOf _ -> None
 
-  let deps ~eval_loc = function
+  let deps ~eval_loc (var, _) =
+    match var with
     | Var vi | Int vi ->
       {
         data = Locations.zone_of_varinfo vi;
