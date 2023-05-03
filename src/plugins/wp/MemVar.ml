@@ -721,10 +721,7 @@ struct
     | Loc l -> Loc (M.field l f)
     | Ref x -> noref ~op:"field access to" x
     | Val(m,x,ofs) ->
-      if not (f.fcomp.cstruct || is_heap_allocated m) then
-        Wp_parameters.warning ~once:true
-          "Accessing union fields with WP might be unsound.@\n\
-           Please refer to WP manual." ;
+      if not @@ is_heap_allocated m then MemMemory.unsupported_union f ;
       Val(m,x,ofs @ [Field f])
 
   let rec ofs_shift obj k = function

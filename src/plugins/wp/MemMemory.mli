@@ -134,4 +134,8 @@ val included :
   sizeof:(Ctypes.c_object -> term) ->
   'a Sigs.rloc -> 'a Sigs.rloc -> pred
 
+(** {2 Unsupported Union Fields} *)
+
+val unsupported_union : Cil_types.fieldinfo -> unit
+
 (* -------------------------------------------------------------------------- *)

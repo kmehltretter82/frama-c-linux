@@ -462,3 +462,15 @@ let separated ~shift ~addrof ~sizeof s1 s2 =
   r_disjoint (range s1) (range s2)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Unsupported Unions                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let wkey = Wp_parameters.register_warn_category "union"
+
+let unsupported_union (fd : Cil_types.fieldinfo) =
+  if not fd.fcomp.cstruct then
+    Wp_parameters.warning ~once:true ~wkey
+      "Accessing union fields with WP might be unsound.@\n\
+       Please refer to WP manual."
+
+(* -------------------------------------------------------------------------- *)
