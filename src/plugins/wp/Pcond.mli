@@ -80,7 +80,7 @@ class engine : #Plang.engine ->
 
     method pp_definition : Format.formatter -> string -> term -> unit
     method pp_intro : clause:string -> ?dot:string -> pred printer
-    method pp_probe : probe printer
+    method pp_probe : Format.formatter -> Probe.t -> term -> unit
     method pp_condition : step printer
     method pp_block : clause:string -> sequence printer
     method pp_goal : pred printer

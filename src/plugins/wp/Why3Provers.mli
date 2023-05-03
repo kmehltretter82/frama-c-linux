@@ -43,7 +43,7 @@ val is_available : t -> bool
 val is_mainstream : t -> bool
 val has_shortcut : t -> string -> bool
 
-type model = Why3.Model_parser.concrete_syntax_term Conditions.Probe.Map.t
+type model = Why3.Model_parser.concrete_syntax_term Probe.Map.t
 val empty_model : model
 
 val print_model : model Pretty_utils.formatter

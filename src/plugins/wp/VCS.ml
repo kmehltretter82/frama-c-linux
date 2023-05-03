@@ -401,7 +401,7 @@ let merge r1 r2 =
     prover_steps = max r1.prover_steps r2.prover_steps ;
     prover_errpos = err.prover_errpos ;
     prover_errmsg = err.prover_errmsg ;
-    prover_model = Conditions.Probe.Map.union (fun _ v _ -> Some v)
+    prover_model = Probe.Map.union (fun _ v _ -> Some v)
         r1.prover_model r2.prover_model
   }
 

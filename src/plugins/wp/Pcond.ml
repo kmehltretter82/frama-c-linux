@@ -180,7 +180,7 @@ let mark_step m step =
   (* sub-sequences are marked recursively marked later *)
   match step.condition with
   | When p | Type p | Have p | Init p | Core p | Branch(p,_,_) -> F.mark_p m p
-  | Probe p -> F.mark_e m p.probe_term
+  | Probe(_,t) -> F.mark_e m t
   | Either _ | State _ -> ()
 
 let spaced pp fmt a = Format.pp_print_space fmt () ; pp fmt a
@@ -219,10 +219,10 @@ class engine (lang : #Plang.engine) =
       Format.fprintf fmt "@[<hov 4>%a %a%s@]"
         self#pp_clause clause lang#pp_pred p dot
 
-    method pp_probe fmt p =
+    method pp_probe fmt p t =
       begin
         Format.fprintf fmt "@[<hov 4>%a %s = %a.@]"
-          self#pp_clause "Keep:" p.probe_name lang#pp_term p.probe_term
+          self#pp_clause "Probe" p.Probe.name lang#pp_term t
       end
 
     (* -------------------------------------------------------------------------- *)
@@ -232,7 +232,7 @@ class engine (lang : #Plang.engine) =
     method pp_condition fmt step =
       match step.condition with
       | State _ -> ()
-      | Probe p -> self#pp_probe fmt p
+      | Probe(p,t) -> self#pp_probe fmt p t
       | Core p -> self#pp_intro ~clause:"Core:" fmt p
       | Type p -> self#pp_intro ~clause:"Type:" fmt p
       | Init p -> self#pp_intro ~clause:"Init:" fmt p

@@ -110,7 +110,7 @@ val kfailed : ?pos:Lexing.position -> ('a,Format.formatter,unit,result) format4 
 val cached : result -> result (** only for true verdicts *)
 
 val result : ?model:Why3Provers.model -> ?cached:bool ->
-     ?solver:float -> ?time:float -> ?steps:int -> verdict -> result
+  ?solver:float -> ?time:float -> ?steps:int -> verdict -> result
 
 val is_auto : prover -> bool
 val is_result : verdict -> bool

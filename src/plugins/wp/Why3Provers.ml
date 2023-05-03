@@ -120,7 +120,11 @@ let has_shortcut p s =
   | Some p' -> Why3.Whyconf.Prover.equal p p'
 
 (** model *)
-type model = Why3.Model_parser.concrete_syntax_term Conditions.Probe.Map.t
-let empty_model = Conditions.Probe.Map.empty
-let print_model fmt m = Pretty_utils.pp_iter2 Conditions.Probe.Map.iter Conditions.Probe.pretty Why3.Model_parser.print_concrete_term fmt m
+type model = Why3.Model_parser.concrete_syntax_term Probe.Map.t
+let empty_model = Probe.Map.empty
+let print_model fmt m =
+  Pretty_utils.pp_iter2 Probe.Map.iter
+    Probe.pretty Why3.Model_parser.print_concrete_term
+    fmt m
+
 (* -------------------------------------------------------------------------- *)

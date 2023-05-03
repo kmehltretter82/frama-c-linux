@@ -1066,40 +1066,38 @@ class visitor (ctx:context) c =
 
 let goal_id = (Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "wp_goal"))
 
-let add_model_trace (probes:Conditions.probe list) cnv t =
+let add_model_trace (probes: Lang.F.term Probe.Map.t) cnv t =
   let open Why3 in
-  if probes = [] then t else
-    let t = Task.add_meta t Driver.meta_get_counterexmp [Theory.MAstr ""] in
-    let create_id (p:Conditions.probe) ty =
-      let attr = Ident.create_model_trace_attr (string_of_int p.probe_id) in
+  if Probe.Map.is_empty probes then t else
+    let task = Task.add_meta t Driver.meta_get_counterexmp [Theory.MAstr ""] in
+    let create_id (p:Probe.t) ty =
+      let attr = Ident.create_model_trace_attr (string_of_int p.id) in
       let attrs = Ident.Sattr.singleton attr in
       let ({Filepath.pos_path;pos_lnum=l1;pos_cnum=c1},
-           {Filepath.pos_lnum=l2;pos_cnum=c2})= p.probe_loc in
+           {Filepath.pos_lnum=l2;pos_cnum=c2})= p.loc in
       let loc = Why3.Loc.user_position
           (Filepath.Normalized.to_pretty_string pos_path) l1 c1 l2 c2 in
       Term.create_lsymbol
-        (Ident.id_fresh ~loc ~attrs p.probe_name) [] ty
+        (Ident.id_fresh ~loc ~attrs p.name) [] ty
     in
-    let fold t (p:Conditions.probe) =
-      let term' = of_term' cnv p.probe_term in
+    let fold (p:Probe.t) (term:Lang.F.term) task =
+      let term' = of_term' cnv term in
       let id = create_id p term'.t_ty in
-      let t = Task.add_param_decl t id in
+      let task = Task.add_param_decl task id in
       let eq_id = Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "ce_eq") in
       let eq = Term.t_equ (Term.t_app id [] term'.t_ty) term' in
       let decl = Why3.Decl.create_prop_decl Paxiom eq_id eq in
-      let t = Task.add_decl t decl in
-      t
+      Task.add_decl task decl
     in
-    List.fold_left fold t probes
+    Probe.Map.fold fold probes task
 
 let convert_freevariables ~probes ~cnv t =
   let freevars = (Lang.F.varsp t) in
   let freevars =
     if Wp_parameters.CounterExample.get ()
-    then
-      List.fold_left (fun vars p ->
-          Lang.F.Vars.union vars (Lang.F.vars p.Conditions.probe_term))
-        freevars probes
+    then Probe.Map.fold
+        (fun _ t vars -> Lang.F.Vars.union vars (Lang.F.vars t))
+        probes freevars
     else freevars in
   let cnv,lss =
     Lang.F.Vars.fold (fun (v:Lang.F.Var.t) (cnv,lss) ->
@@ -1111,7 +1109,7 @@ let convert_freevariables ~probes ~cnv t =
   in
   cnv,lss
 
-let prove_goal ~id ~title ~name ?axioms ?(probes=[]) t =
+let prove_goal ~id ~title ~name ?axioms ?(probes=Probe.Map.empty) t =
   (* Format.printf "why3_of_qed start@."; *)
   let goal = Definitions.cluster ~id ~title () in
   let ctx = empty_context name in
@@ -1165,7 +1163,7 @@ let task_of_wpo wpo =
     let depends = v.Wpo.VC_Lemma.depends in
     let prop = Lang.F.p_forall lemma.l_forall lemma.l_lemma in
     let axioms = Some(lemma.l_cluster,depends) in
-    prove_prop ~pid ?axioms prop,[]
+    prove_prop ~pid ?axioms prop,Probe.Map.empty
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Task                                                        --- *)
@@ -1230,21 +1228,24 @@ let get_model probes (res:Why3.Call_provers.prover_result) =
   print_model (res:Why3.Call_provers.prover_result);
   (* we take the second model because it should be the most precise?? *)
   match res.pr_models with
-  | [] -> Why3Provers.empty_model
+  | [] -> Probe.Map.empty
   | _ ->
-    let r =     let h_probes = Datatype.Int.Hashtbl.create 10 in
-      List.iter (fun x -> Datatype.Int.Hashtbl.add h_probes
-                    x.Conditions.probe_id x) probes;
+    let r =
+      let index = Hashtbl.create 0 in
       let _,model = Extlib.last res.pr_models in
-      let l = Why3.Model_parser.get_model_elements model in
-      List.fold_left (fun acc (e:Why3.Model_parser.model_element) ->
-          match has_model_attr e.me_attrs with
-          | None -> acc
-          | Some id ->
-            let id = int_of_string id in
-            let p = Datatype.Int.Hashtbl.find h_probes id in
-            Conditions.Probe.Map.add p e.me_concrete_value acc)
-        Why3Provers.empty_model l
+      let elements = Why3.Model_parser.get_model_elements model in
+      List.iter
+        (fun (e:Why3.Model_parser.model_element) ->
+           match has_model_attr e.me_attrs with
+           | None -> ()
+           | Some id -> Hashtbl.add index id e.me_concrete_value)
+        elements ;
+      Probe.Map.filter_map
+        (fun (p:Probe.t) _ ->
+           let id = string_of_int p.id in
+           try Some (Hashtbl.find index id)
+           with Not_found -> None
+        ) probes
     in
     Format.eprintf "@[model:%a@]@." Why3Provers.print_model r;
     r
@@ -1415,10 +1416,12 @@ let editor ~script ~merge ~config pconf driver task =
         Why3.Call_provers.call_editor
           ~command ~config script
       in
-      call_prover_task ~config ~timeout:None ~steps:None [] pconf.prover call
+      call_prover_task ~config ~timeout:None ~steps:None
+        Probe.Map.empty pconf.prover call
     end
 
-let compile ~script ~timeout ~config ~probes wpo pconf driver prover task =
+let compile ~script ~timeout ~config ?(probes=Probe.Map.empty)
+    wpo pconf driver prover task =
   let digest = digest_task wpo driver ~script in
   let runner = run_batch ~probes ~config pconf driver ~script in
   Cache.get_result ~digest ~runner ~timeout ~steplimit:None prover task
@@ -1461,21 +1464,21 @@ let interactive ~mode ~probes wpo pconf ~config driver prover task =
     | VCS.Edit ->
       let open Task in
       editor ~script ~merge ~config pconf driver task >>= fun _ ->
-      compile ~probes:[] ~script ~timeout ~config wpo pconf driver prover task
+      compile ~script ~timeout ~config wpo pconf driver prover task
     | VCS.Fix ->
       let open Task in
-      compile ~probes:[] ~script ~timeout ~config wpo pconf driver prover task >>= fun r ->
+      compile ~script ~timeout ~config wpo pconf driver prover task >>= fun r ->
       if VCS.is_valid r then return r else
         editor ~script ~merge ~config pconf driver task >>= fun _ ->
-        compile ~probes:[] ~script ~timeout ~config wpo pconf driver prover task
+        compile ~script ~timeout ~config wpo pconf driver prover task
     | VCS.FixUpdate ->
       let open Task in
       if merge then updatescript ~script driver task ;
-      compile ~probes:[] ~script ~timeout ~config wpo pconf driver prover task >>= fun r ->
+      compile ~script ~timeout ~config wpo pconf driver prover task >>= fun r ->
       if VCS.is_valid r then return r else
         let merge = false in
         editor ~script ~merge ~config pconf driver task >>= fun _ ->
-        compile ~probes:[] ~script ~timeout ~config wpo pconf driver prover task
+        compile ~script ~timeout ~config wpo pconf driver prover task
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prove WPO                                                          --- *)

@@ -152,7 +152,7 @@ class autofocus =
           match step.condition with
           | When _ -> true
           | State s -> self#occurs_state s
-          | Probe p -> self#occurs_term p.probe_term
+          | Probe(_,t) -> self#occurs_term t
           | Init p | Have p | Type p | Core p ->
             self#occurs_term (F.e_prop p)
           | Branch(p,sa,sb) ->
@@ -256,7 +256,7 @@ class autofocus =
             Conditions.iter
               (fun step ->
                  match step.condition with
-                 | Probe p -> lookup_term step a p.probe_term
+                 | Probe(_,t) -> lookup_term step a t
                  | Have p | When p -> lookup_pred step a p
                  | Branch(p,sa,sb) ->
                    lookup_pred step a p ;
