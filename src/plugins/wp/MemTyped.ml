@@ -425,7 +425,10 @@ module Shift = WpContext.Generator(Cobj)
         dfun.d_lfun
     end)
 
-let field l f = e_fun (ShiftField.get f) [l]
+let field l f =
+  MemMemory.unsupported_union f ;
+  e_fun (ShiftField.get f) [l]
+
 let shift l obj k = e_fun (Shift.get obj) [l;k]
 
 module LITERAL =
