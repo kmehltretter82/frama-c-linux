@@ -1667,7 +1667,7 @@ options, the user should be aware of the following precisions:
 \begin{description}
 \item[\tt -wp, -wp-prop, -wp-fct, -wp-bhv.] These options make the
   \textsf{WP} plug-in generate proof-obligations for the selected
-  properties. The values of theses options are never saved and they are
+  properties. The values of these options are never saved and they are
   cleared by \texttt{-then}. Hence, running \texttt{-wp-prop A}
   \texttt{-then} \texttt{-wp-fct F} does what you expect:
   properties tagged by \texttt{A} are proved only once.
@@ -1698,7 +1698,7 @@ scripts through the \textsf{TIP} user interface. Here are some benefits of using
 proof strategies:
 \begin{itemize}
 \item Proof strategies are automatic: there is no need for entering GUI session.
-\item Proof strategies can be associated to individual functions, lemma or properties,
+\item Proof strategies can be associated to individual functions, lemmas or properties,
   or tried globally.
 \item Tactics are applied following patterns: depending on your case study, you can
   define fine-tuned strategies to solve your common issues.
@@ -1800,16 +1800,16 @@ Tactic parameters are interpreted as follows:
   deeper inside the goal or the hypotheses, and finally
   \verb+\pattern(ps)+ searches in the entire proof obligation.
   When several patterns are given, all must apply and agree on common pattern variables.
-  Pattern syntax are specified below.
+  Pattern syntax is specified below.
 \item \verb+\select(v)+ defines the main target of the selected tactic. The
   value \verb+v+ uses the same syntax as patterns, with pattern variables
   replaced with their matched values. Some tactics support multiple selection,
-  in for which the form \verb+\select(v,...)+ can be used. When no selection is specified,
+  for which the form \verb+\select(v,...)+ can be used. When no selection is specified,
   the first specified pattern is used as an implicit target. When no
   selection nor pattern is selected, the default selection is the proof goal.
 \item \verb+\param(p,v)+ configures the parameter value \verb+p+ of the selected
   tactic with the associated value.
-\item \verb+\child(a,s)+ applies strategy \verb+s+ to proof the sub-goal named
+\item \verb+\child(a,s)+ applies strategy \verb+s+ to prove the sub-goal named
   \verb+a+ of the tactic.
 \item \verb+\children(s)+ applies strategy \verb+s+ on (other) sub-goals of the
   tactic. If unspecified, the strategy used for the current node is applied.
@@ -1856,7 +1856,7 @@ The proof scripts for goal named \texttt{<goal>} is stored in a single file \tex
 format of the \texttt{<goal>} name is identical to the one used by the \textsf{Frama-C/Report} plug-in
 for its \textsf{JSON} output.
 
-The content of each script file is an array ofs alternatives, each alternative being a record with
+The content of each script file is an array of alternatives, each alternative being a record with
 two possible structures, that might represent a \textit{prover} attempt or the application of a
 \textit{tactic}:
 
@@ -1893,7 +1893,7 @@ Each attempt is represented by a \textsf{JSON} record with the following fields:
 \end{align*}
 
 Remark that, since the proof scripts do not record the proof obligation that was exercised, there is no
-guarantee that replying the script on a (potentially new) proof obligation would issue the same result.
+guarantee that replaying the script on a (potentially new) proof obligation would issue the same result.
 Hence, prover attempts \emph{must} not be used as a cache, but can serve as a hint for choosing among
 several alternatives.
 
@@ -1993,7 +1993,7 @@ in case of there is many of them inside the selected goal or hypothesis; \textit
 order of the selected hypothesis inside the proof obligation (the pattern is searched around this value),
 and \textit{wp.kind} its kind.
 
-The \textit{wp.pattern} is an simple string that encodes the head of the structure of the
+The \textit{wp.pattern} is a simple string that encodes the head of the structure of the
 selected term or formulæ inside the designated goal or hypothesis. It is the concatenation of
 the first 32 head nodes of width-first traversal of the selected term, each node being represented by
 the following string:
