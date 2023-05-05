@@ -59,8 +59,7 @@ type behavior = {
 
 let normalize_assumes h =
   let module L = NormAtLabels in
-  let labels = L.labels_fct_pre in
-  L.preproc_annot labels h
+  L.preproc_annot L.labels_fct_pre h
 
 let implies ?assumes p =
   match assumes with None -> p | Some h -> Logic_const.pimplies (h,p)
@@ -77,7 +76,8 @@ let normalize_pre ~goal kf bhv ?assumes ip =
     let id = WpPropId.mk_pre_id kf Kglobal bhv ip in
     let pre = ip.ip_content.tp_statement in
     let assumes = Option.map normalize_assumes assumes in
-    Some (id, L.preproc_annot labels @@ implies ?assumes pre)
+    let precond = L.preproc_annot labels pre in
+    Some (id, implies ?assumes precond)
   else None
 
 let normalize_post ~goal kf bhv tk ?assumes (itk,ip) =
@@ -87,8 +87,8 @@ let normalize_post ~goal kf bhv tk ?assumes (itk,ip) =
     let assumes = Option.map (fun p -> normalize_assumes @@ at_pre p) assumes in
     let labels = L.labels_fct_post ~exit:(tk=Exits) in
     let id = WpPropId.mk_post_id kf Kglobal bhv (tk,ip) in
-    let p = L.preproc_annot labels ip.ip_content.tp_statement in
-    Some (id , implies ?assumes p)
+    let post = L.preproc_annot labels ip.ip_content.tp_statement in
+    Some (id , implies ?assumes post)
   else None
 
 let normalize_decreases (d, li) =
