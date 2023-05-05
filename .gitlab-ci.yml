@@ -222,6 +222,7 @@ external-plugins:
           "meta",
           "minimal",
           "mthread",
+          "pathcrawler",
           "security",
           "volatile"
         ]
