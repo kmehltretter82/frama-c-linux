@@ -18,9 +18,38 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Eva       [2023-05-04] The octagon domain can now infer relations between
+              any lvalues of integer or pointer types.
+-*  Ivette    [2023-05-02] Ends properly frama-c process when Ivette is closed.
+-*  Ivette    [2023-05-02] Custom views are correctly saved and reloaded.
+-*  Eva       [2023-05-02] Fixes interpretation of Eva annotations at the end of
+              a block, and of multiple split annotations after a function call.
+-   Eva       [2023-04-24] When possible, Eva shows the name of enumeration tags
+              instead of their integer values, in the log and the GUI.
+-   Aorai     [2023-04-24] Allows comments in .ya automata files.
+-   Aorai     [2023-04-24] Supports specification about floating-point variables.
+-   Ivette    [2023-04-24] New callgraph component.
+-   Ivette    [2023-04-07] The values table shows the status of uninitialized
+              and escaping variables.
+-   Eva       [2023-04-05] Better display of large integer sets for high values
+              of the -eva-ilevel parameter.
+-   Ivette    [2023-03-31] The values table shows values of function parameters.
+-   Ivette    [2023-03-31] The values table can show the logical status of ACSL
+              predicates, and the values of C lvalues in these predicates.
 o!  GUI       [2023-03-27] Remove GTK2 bindings. Only support GTK3 as of now.
+-   Ivette    [2023-03-23] Improves function filtering in the left sidebar.
+-   Ivette    [2023-03-23] Better display of dead and non-terminating statements.
+-*  Eva       [2023-03-13] Fixes a soundness bug of the equality domain when
+              the same equality holds in two programs paths, but involving a
+              pointer pointing to different variables in the two paths.
 -   Kernel    [2023-03-03] Deprecate option -c11 (now enabled by default).
+-   Ivette    [2023-02-15] Shows information about C types in the Inspector.
+-   Eva       [2023-02-06] Fixes performance issues on programs with too many
+              function calls (more than 20000 callsites).
 -!  Kernel    [2023-01-25] Add support for C11's _Generic. Modifies Cabs AST.
+-*  Eva       [2023-01-16] Fixes unsoundness of the bitwise domain on shifts
+              and casts on big-endian architectures.
+-   Eva       [2023-01-12] Better partitioning splits on ACSL predicates.
 
 ###############################################################################
 Open Source Release 26.1 (Iron)
