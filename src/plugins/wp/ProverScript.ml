@@ -331,19 +331,20 @@ let rec sequence (f : 'a -> solver) = function
   | [] -> unknown
   | x::xs -> f x +>> sequence f xs
 
-let rec explore_strategy env p s : solver =
+let rec explore_strategy env process strategy : solver =
   sequence
-    (explore_alternative env p s)
-    (ProofStrategy.alternatives s)
+    (explore_alternative env process strategy)
+    (ProofStrategy.alternatives strategy)
 
-and explore_alternative env p s a : solver =
-  explore_provers env a +>>
-  explore_tactic env p s a +>>
-  explore_auto env p a +>>
-  explore_fallback env p a
+and explore_alternative env process strategy alternative : solver =
+  explore_provers env alternative +>>
+  explore_tactic env process strategy alternative +>>
+  explore_auto env process alternative +>>
+  explore_fallback env process alternative
 
-and explore_provers env a : solver =
-  let provers,timeout = ProofStrategy.provers ~default:env.Env.provers a in
+and explore_provers env alternative : solver =
+  let provers,timeout =
+    ProofStrategy.provers ~default:env.Env.provers alternative in
   sequence (explore_prover env timeout) provers
 
 and explore_prover env timeout prover node =
@@ -354,13 +355,13 @@ and explore_prover env timeout prover node =
     let config = { VCS.default with timeout = Some timeout } in
     Env.prove env wpo ~config prover
 
-and explore_tactic env process s a node =
-  match ProofStrategy.tactic env.tree node s a with
+and explore_tactic env process strategy alternative node =
+  match ProofStrategy.tactic env.tree node strategy alternative with
   | None -> failed
   | Some nodes -> List.iter process nodes ; success
 
-and explore_auto env process a node =
-  match ProofStrategy.auto a with
+and explore_auto env process alternative node =
+  match ProofStrategy.auto alternative with
   | None -> failed
   | Some h ->
     match ProverSearch.search env.tree ~anchor:node [h] with
@@ -369,10 +370,10 @@ and explore_auto env process a node =
       List.iter (fun (_,node) -> process node) @@
       snd @@ ProofEngine.commit fork ; success
 
-and explore_fallback env process a node =
-  match ProofStrategy.fallback a with
+and explore_fallback env process alternative node =
+  match ProofStrategy.fallback alternative with
   | None -> failed
-  | Some s -> explore_strategy env process s node
+  | Some strategy -> explore_strategy env process strategy node
 
 let explore_hint env process node =
   if ProofEngine.depth node > env.Env.depth then failed

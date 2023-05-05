@@ -141,7 +141,7 @@ let iteri f tree =
 let rec depth node =
   match node.parent with
   | None -> 0
-  | Some p -> depth p
+  | Some p -> succ @@ depth p
 
 (* -------------------------------------------------------------------------- *)
 (* --- Consolidating                                                      --- *)
