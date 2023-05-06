@@ -58,22 +58,22 @@ let translate_constant = function
   | Cil_types.CEnum enum -> CEnum enum
 
 
-let rec translate_expr e =
+let rec translate_exp e =
   let node = match e.Cil_types.enode with
     | Cil_types.Const (Cil_types.CStr _ | Cil_types.CWStr _) ->
       Const (CString (Base.of_string_exp e))
     | Cil_types.Const cst -> Const (translate_constant cst)
     | Cil_types.Lval lval -> Lval (translate_lval lval)
     | Cil_types.SizeOf typ -> SizeOf typ
-    | Cil_types.SizeOfE expr -> SizeOfE (translate_expr expr)
+    | Cil_types.SizeOfE expr -> SizeOfE (translate_exp expr)
     | Cil_types.SizeOfStr str -> SizeOfStr str
     | Cil_types.AlignOf typ -> AlignOf typ
-    | Cil_types.AlignOfE expr -> AlignOfE (translate_expr expr)
+    | Cil_types.AlignOfE expr -> AlignOfE (translate_exp expr)
     | Cil_types.UnOp (unop, expr, typ) ->
-      UnOp (translate_unop unop, translate_expr expr, typ)
+      UnOp (translate_unop unop, translate_exp expr, typ)
     | Cil_types.BinOp (binop, e1, e2, typ) ->
-      BinOp (translate_binop binop, translate_expr e1, translate_expr e2, typ)
-    | Cil_types.CastE (typ, expr) -> CastE (typ, translate_expr expr)
+      BinOp (translate_binop binop, translate_exp e1, translate_exp e2, typ)
+    | Cil_types.CastE (typ, expr) -> CastE (typ, translate_exp expr)
     | Cil_types.AddrOf lval -> AddrOf (translate_lval lval)
     | Cil_types.StartOf lval -> StartOf (translate_lval lval)
   in
@@ -81,12 +81,12 @@ let rec translate_expr e =
 
 and translate_host = function
   | Cil_types.Var vi -> Var vi
-  | Cil_types.Mem e -> Mem (translate_expr e)
+  | Cil_types.Mem e -> Mem (translate_exp e)
 
 and translate_offset = function
   | Cil_types.NoOffset -> NoOffset
   | Cil_types.Index (expr, offset) ->
-    Index (translate_expr expr, translate_offset offset)
+    Index (translate_exp expr, translate_offset offset)
   | Cil_types.Field (fieldinfo, offset) ->
     Field (fieldinfo, translate_offset offset)
 

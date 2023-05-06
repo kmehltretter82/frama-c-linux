@@ -150,7 +150,7 @@ let const_fold exp =
     match exp.origin with
     | Exp e ->
       let e' = Cil.constFold true e in
-      Evast_builder.translate_expr e'
+      Evast_builder.translate_exp e'
     | _ ->
       descend exp
   in

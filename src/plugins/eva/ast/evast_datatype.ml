@@ -231,7 +231,7 @@ module Exp = Datatype.Make_with_collections (struct
 
     let name = "Eva.Evast_datatype.Exp"
     let reprs =
-      List.map (fun e -> Evast_builder.translate_expr e) Cil_datatype.Exp.reprs
+      List.map (fun e -> Evast_builder.translate_exp e) Cil_datatype.Exp.reprs
     let pretty = Evast_printer.pp_exp
     let equal = Datatype.from_compare
   end)
