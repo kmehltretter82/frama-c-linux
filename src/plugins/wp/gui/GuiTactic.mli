@@ -82,3 +82,18 @@ class auto : unit ->
   end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Strategies Dongle                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+
+type callback = (depth:int -> ProofStrategy.strategy option -> unit)
+
+class strategies : unit ->
+  object
+    inherit Wpalette.tool
+    method register : ProofStrategy.strategy -> unit
+    method hints : ProofStrategy.strategy list -> unit
+    method connect : callback option -> unit
+  end
+
+(* -------------------------------------------------------------------------- *)

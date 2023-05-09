@@ -385,7 +385,7 @@ class pane (gprovers : GuiConfig.provers) =
       | Some(tree,sequent,sel) ->
         on_proof_context tree
           begin fun () ->
-            autosearch#connect (Some (self#strategies sequent)) ;
+            autosearch#connect (Some (self#autosearch sequent)) ;
             let select (tactic : GuiTactic.tactic) =
               let process = self#apply in
               let composer = self#compose in
@@ -660,7 +660,7 @@ class pane (gprovers : GuiConfig.provers) =
       | None -> text#printf "No tactic found.@\n"
       | Some fork -> self#fork proof fork
 
-    method private strategies sequent ~depth ~width auto =
+    method private autosearch sequent ~depth ~width auto =
       match state with
       | Empty | Forking _ | Composer _ | Browser _ -> ()
       | Proof proof ->
