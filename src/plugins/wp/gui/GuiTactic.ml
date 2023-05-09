@@ -496,7 +496,7 @@ type hform = {
   widget : Widget.checkbox ;
 }
 
-let compare f g = String.compare f.search#title g.search#title
+let hcompare f g = String.compare f.search#title g.search#title
 
 let spinner ~(form:Wpane.form) ~default ~label ~tooltip =
   let config = "wp.strategies." ^ label in
@@ -506,9 +506,9 @@ let spinner ~(form:Wpane.form) ~default ~label ~tooltip =
   form#add_field ~label spinner#coerce ;
   spinner
 
-type callback = depth:int -> width:int -> Strategy.heuristic list -> unit
+type auto_callback = depth:int -> width:int -> Strategy.heuristic list -> unit
 
-class strategies () =
+class auto () =
   let form = new Wpane.form () in
   let depth = spinner ~form ~default:1 ~label:"Depth"
       ~tooltip:"Limit the number of nested strategies" in
@@ -517,10 +517,10 @@ class strategies () =
   object(self)
     inherit Wpalette.tool
         ~content:form#widget
-        ~label:"Strategies"
-        ~tooltip:"Apply Custom Strategies" ()
+        ~label:"Auto"
+        ~tooltip:"Automated proof search (-wp-auto)" ()
     val mutable hforms : hform list = []
-    val mutable demon : callback option = None
+    val mutable demon : auto_callback option = None
 
     method register (search : Strategy.heuristic) =
       begin
@@ -533,7 +533,7 @@ class strategies () =
         widget#on_event self#update ;
         form#add_row widget#coerce ;
         let hform = { search ; widget } in
-        hforms <- List.merge compare [hform] hforms
+        hforms <- List.merge hcompare [hform] hforms
       end
 
     method private update () =

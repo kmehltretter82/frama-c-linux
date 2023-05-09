@@ -68,11 +68,17 @@ class tactic : Tactical.t -> (Format.formatter -> Tactical.selection -> unit) ->
       selection -> unit
   end
 
-type callback = depth:int -> width:int -> Strategy.heuristic list -> unit
+(* -------------------------------------------------------------------------- *)
+(* --- Auto Dongle                                                        --- *)
+(* -------------------------------------------------------------------------- *)
 
-class strategies : unit ->
+type auto_callback = depth:int -> width:int -> Strategy.heuristic list -> unit
+
+class auto : unit ->
   object
     inherit Wpalette.tool
     method register : Strategy.heuristic -> unit
-    method connect : callback option -> unit
+    method connect : auto_callback option -> unit
   end
+
+(* -------------------------------------------------------------------------- *)

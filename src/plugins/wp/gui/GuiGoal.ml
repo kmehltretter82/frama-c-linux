@@ -117,7 +117,7 @@ class pane (gprovers : GuiConfig.provers) =
   let autofocus = new autofocus in
   let iformat = new iformat in
   let rformat = new rformat in
-  let strategies = new GuiTactic.strategies () in
+  let autosearch = new GuiTactic.auto () in
   object(self)
 
     val mutable state : state = Empty
@@ -145,8 +145,8 @@ class pane (gprovers : GuiConfig.provers) =
             (Why3.Whyconf.Sprover.elements gprovers#get) in
         provers <- why3_provers ;
         List.iter (fun p -> palette#add_tool p#tool) provers ;
-        palette#add_tool strategies#tool ;
-        Strategy.iter strategies#register ;
+        palette#add_tool autosearch#tool ;
+        Strategy.iter autosearch#register ;
         Tactical.iter
           (fun tac ->
              let gtac = new GuiTactic.tactic tac printer#pp_selection in
@@ -380,12 +380,12 @@ class pane (gprovers : GuiConfig.provers) =
     method private update_tactics = function
       | None ->
         printer#set_target Tactical.Empty ;
-        strategies#connect None ;
+        autosearch#connect None ;
         List.iter (fun tactic -> tactic#clear) tactics
       | Some(tree,sequent,sel) ->
         on_proof_context tree
           begin fun () ->
-            strategies#connect (Some (self#strategies sequent)) ;
+            autosearch#connect (Some (self#strategies sequent)) ;
             let select (tactic : GuiTactic.tactic) =
               let process = self#apply in
               let composer = self#compose in
