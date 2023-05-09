@@ -354,6 +354,8 @@ let typecheck () =
 (* --- Strategy Hints                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
+let iter f = Strategies.iter_sorted ~cmp:String.compare (fun _ s -> f s)
+
 let default () =
   List.filter_map
     (fun s ->

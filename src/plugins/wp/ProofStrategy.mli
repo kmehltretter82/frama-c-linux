@@ -37,6 +37,7 @@ val find : string -> strategy option
 val hints : Wpo.t -> strategy list
 val has_hint : Wpo.t -> bool
 
+val iter : (strategy -> unit) -> unit
 val default : unit -> strategy list
 val alternatives : strategy -> alternative list
 val provers : ?default:VCS.prover list -> alternative -> VCS.prover list * float
