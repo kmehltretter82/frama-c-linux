@@ -32,6 +32,7 @@ type alternative
 val typecheck : unit -> unit
 
 val name : strategy -> string
+val loc : strategy -> Cil_types.location
 val find : string -> strategy option
 val hints : Wpo.t -> strategy list
 val has_hint : Wpo.t -> bool

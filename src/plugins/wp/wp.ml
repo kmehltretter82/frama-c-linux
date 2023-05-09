@@ -190,6 +190,7 @@ module ProofScript = ProofScript
 module ProverScript = ProverScript
 module ProverSearch = ProverSearch
 module ProofSession = ProofSession
+module ProofStrategy = ProofStrategy
 
 (** {2 Tactics} *)
 

@@ -282,6 +282,7 @@ let () = Cmdline.run_after_configuring_stage register
 (* -------------------------------------------------------------------------- *)
 
 let name s = s.name.value
+let loc s = s.name.loc
 let find a = try Some (Strategies.find a) with Not_found -> None
 let resolve name =
   try Some (Strategies.find name.value)
