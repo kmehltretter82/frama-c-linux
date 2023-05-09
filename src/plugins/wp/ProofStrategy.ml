@@ -40,6 +40,7 @@ type strategy = {
 }
 
 and alternative =
+  | Default
   | Strategy of string loc
   | Provers of string loc list * float option (* timeout *)
   | Auto of string loc (* deprecated -wp-auto *)
@@ -200,7 +201,7 @@ let rec parse_tactic_params ctxt penv
 let parse_alternatives ctxt p =
   let loc = p.lexpr_loc in
   match p.lexpr_node with
-  | PLvar value | PLapp(value,[],[]) -> [ Strategy { loc ; value } ]
+  | PLvar("\\default") -> [ Default ]
   | PLapp("\\prover",[],ps) ->
     let prvs,timeout = parse_provers ctxt [] None ps in
     [ Provers(prvs,timeout) ]
@@ -210,6 +211,7 @@ let parse_alternatives ctxt p =
         ~select:[] ~lookup:[] ~params:[] ~children:[] ~default:None ps ]
   | PLapp("\\auto",[],ps) ->
     List.map (fun p -> Auto (parse_name ctxt ~kind:"auto" p)) ps
+  | PLvar value | PLapp(value,[],[]) -> [ Strategy { loc ; value } ]
   | _ -> ctxt.error loc "Strategy definition expected (%a)" debug p
 
 (* -------------------------------------------------------------------------- *)
@@ -328,6 +330,7 @@ let check_parameter env (t : Tactical.tactical) (p,v) =
       p.value t#id
 
 let check_alternative = function
+  | Default -> ()
   | Strategy s -> ignore @@ resolve s
   | Auto s -> ignore @@ resolve_auto s
   | Provers(pvs,_) -> List.iter check_prover pvs
@@ -384,14 +387,18 @@ let timeout = function
 let provers ?(default=[]) = function
   | Provers([],tm) -> default, timeout tm
   | Provers(ps,tm) -> List.filter_map resolve_prover ps, timeout tm
-  | Strategy _ | Tactic _ | Auto _ -> [],0.0
+  | Default | Strategy _ | Tactic _ | Auto _ -> [],0.0
 
 let fallback = function
   | Strategy s -> resolve s
   | Tactic _ | Auto _ | Provers _ -> None
+  | Default -> Some {
+      name = { value = "\\default" ; loc = Position.(unknown,unknown) } ;
+      alternatives = List.map (fun s -> Strategy s.name) @@ default () ;
+    }
 
 let auto = function
-  | Strategy _  | Tactic _ | Provers _ -> None
+  | Default | Strategy _  | Tactic _ | Provers _ -> None
   | Auto s -> resolve_auto s
 
 (* -------------------------------------------------------------------------- *)
@@ -489,7 +496,7 @@ let subgoal (children : (string loc * string loc) list)
   end ; node
 
 let tactic tree node strategy = function
-  | Strategy _ | Auto _ | Provers _ -> None
+  | Default | Strategy _ | Auto _ | Provers _ -> None
   | Tactic t ->
     try
       let tactic = tactical t.tactic in
