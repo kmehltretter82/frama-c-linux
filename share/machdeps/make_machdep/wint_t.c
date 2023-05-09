@@ -24,6 +24,8 @@
 #include <wchar.h>
 #define TEST_TYPE wint_t
 
+TEST_TYPE_IS(unsigned short);
+TEST_TYPE_IS(short);
 TEST_TYPE_IS(unsigned int);
 TEST_TYPE_IS(int);
 TEST_TYPE_IS(unsigned long);
