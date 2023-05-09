@@ -60,4 +60,14 @@ val search :
   ProofEngine.node ->
   unit
 
+val explore :
+  ?depth:int ->
+  ?strategy:ProofStrategy.strategy ->
+  ?progress:(Wpo.t -> string -> unit) ->
+  ?result:(Wpo.t -> prover -> result -> unit) ->
+  ?success:(Wpo.t -> prover option -> unit) ->
+  ProofEngine.tree ->
+  ProofEngine.node ->
+  unit
+
 val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]

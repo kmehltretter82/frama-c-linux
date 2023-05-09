@@ -375,7 +375,7 @@ and explore_fallback env process alternative node =
   | None -> failed
   | Some strategy -> explore_strategy env process strategy node
 
-let explore_hint env process node =
+let explore_local_hint env process node =
   if ProofEngine.depth node > env.Env.depth then failed
   else
     match ProofEngine.get_hint node with
@@ -396,12 +396,15 @@ let explore_further_hints env process =
   let wpo = ProofEngine.main env.Env.tree in
   sequence (explore_further env process) (ProofStrategy.hints wpo)
 
+let explore_hints env process =
+  explore_local_hint env process +>> explore_further_hints env process
+
 (* -------------------------------------------------------------------------- *)
 (* --- Automated Solving                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
 let automated env process : solver =
-  auto env +>> explore_hint env process +>> explore_further_hints env process
+  auto env +>> explore_hints env process
 
 (* -------------------------------------------------------------------------- *)
 (* --- Apply Script Tactic                                                --- *)
@@ -572,6 +575,27 @@ let search
       begin fun () ->
         autosearch env ~depth:0 node >>=
         fun ok ->
+        if ok then Env.validate ~finalize:true env else Env.stuck env ;
+        Task.return ()
+      end
+  end
+
+let explore ?(depth=0) ?(strategy)
+    ?(progress = skip2) ?(result=skip3) ?(success = skip2)
+    tree node =
+  begin
+    let depth = ProofEngine.depth node + depth in
+    let env : Env.t =
+      Env.make tree ~valid:false ~failed:false
+        ~provers:[] ~depth ~width:0 ~backtrack:0 ~auto:[]
+        ~progress ~result ~success in
+    schedule
+      begin fun () ->
+        let solver =
+          match strategy with
+          | None -> explore_hints env (process env)
+          | Some s -> explore_strategy env (fun _ -> ()) s
+        in solver node >>= fun ok ->
         if ok then Env.validate ~finalize:true env else Env.stuck env ;
         Task.return ()
       end
