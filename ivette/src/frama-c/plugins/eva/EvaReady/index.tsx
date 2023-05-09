@@ -41,7 +41,7 @@ class AckAbortedState extends GlobalState<boolean> {
   setupSignalHooks(): void {
     if (!this.#signalHookSet) {
       onSignal(Eva.signalComputationState,
-        () => ackAbortedState.setValue(false));
+        () => this.setValue(false));
       this.#signalHookSet = true;
     }
   }
