@@ -264,7 +264,7 @@ let gen_all_defines fmt mach =
      same rank when it comes to define PRI.?PTR macros. *)
   gen_define_literal_string fmt "__PRIPTR_PREFIX"
     (List.assoc (no_signedness mach.intptr_t) pp_of_kind);
-  gen_define_macro fmt "__FC_WORDSIZE" mach.wordsize;
+  gen_define_macro fmt "__WORDSIZE" mach.wordsize;
   gen_define_macro fmt "__FC_POSIX_VERSION" mach.posix_version;
   gen_define_string fmt "__FC_SIG_ATOMIC_T" mach.sig_atomic_t;
   gen_intlike_min fmt "__FC_SIG_ATOMIC_MIN" mach.sig_atomic_t mach;
