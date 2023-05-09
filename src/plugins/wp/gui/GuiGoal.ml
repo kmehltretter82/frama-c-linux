@@ -117,7 +117,8 @@ class pane (gprovers : GuiConfig.provers) =
   let autofocus = new autofocus in
   let iformat = new iformat in
   let rformat = new rformat in
-  let autosearch = new GuiTactic.auto () in
+  let autosearch = new GuiTactic.autosearch () in
+  let strategies = new GuiTactic.strategies () in
   object(self)
 
     val mutable state : state = Empty
@@ -146,7 +147,9 @@ class pane (gprovers : GuiConfig.provers) =
         provers <- why3_provers ;
         List.iter (fun p -> palette#add_tool p#tool) provers ;
         palette#add_tool autosearch#tool ;
+        palette#add_tool strategies#tool ;
         Strategy.iter autosearch#register ;
+        ProofStrategy.iter strategies#register ;
         Tactical.iter
           (fun tac ->
              let gtac = new GuiTactic.tactic tac printer#pp_selection in
@@ -381,22 +384,26 @@ class pane (gprovers : GuiConfig.provers) =
       | None ->
         printer#set_target Tactical.Empty ;
         autosearch#connect None ;
+        strategies#connect None ;
         List.iter (fun tactic -> tactic#clear) tactics
-      | Some(tree,sequent,sel) ->
+      | Some(tree,wpo,sequent,sel) ->
         on_proof_context tree
           begin fun () ->
-            autosearch#connect (Some (self#autosearch sequent)) ;
-            let select (tactic : GuiTactic.tactic) =
-              let process = self#apply in
-              let composer = self#compose in
-              let browser = self#browse in
-              tactic#select ~process ~composer ~browser ~tree sel
-            in
-            List.iter select tactics ;
-            let tgt =
-              if List.exists (fun tactics -> tactics#targeted) tactics
-              then sel else Tactical.Empty in
-            printer#set_target tgt
+            (* configure strategies *)
+            let hints = ProofStrategy.hints wpo in
+            autosearch#connect (Some (self#autosearch sequent));
+            strategies#connect ~hints (Some self#strategies);
+            (* configure tactics *)
+            List.iter (fun (tactic : GuiTactic.tactic) ->
+                let process = self#apply in
+                let composer = self#compose in
+                let browser = self#browse in
+                tactic#select ~process ~composer ~browser ~tree sel
+              ) tactics ;
+            (* target selection feedback *)
+            printer#set_target
+              (if List.exists (fun tactics -> tactics#targeted) tactics
+               then sel else Tactical.Empty)
           end ()
 
     method private update_scriptbar =
@@ -513,7 +520,7 @@ class pane (gprovers : GuiConfig.provers) =
           self#update_provers (Some wpo) ;
           let sequent = printer#sequent in
           let select = printer#selection in
-          self#update_tactics (Some(proof,sequent,select)) ;
+          self#update_tactics (Some(proof,wpo,sequent,select)) ;
         end
       | Composer _ | Browser _ -> ()
 
@@ -690,6 +697,30 @@ class pane (gprovers : GuiConfig.provers) =
                 let server = ProverTask.server () in
                 Task.launch server
               end
+          end
+
+    method private strategies ~depth strategy =
+      match state with
+      | Empty | Forking _ | Composer _ | Browser _ -> ()
+      | Proof proof ->
+        Wutil.later
+          begin fun () ->
+            ProverScript.explore
+              ~depth ?strategy
+              ~result:
+                (fun wpo prv res ->
+                   text#printf "[%a] %a : %a@."
+                     VCS.pp_prover prv
+                     Wpo.pp_title wpo
+                     VCS.pp_result res)
+              ~success:
+                (fun _ _ ->
+                   ProofEngine.forward proof ;
+                   self#update ;
+                   text#printf "Strategie(s) Explored." )
+              proof (ProofEngine.anchor proof ()) ;
+            let server = ProverTask.server () in
+            Task.launch server
           end
 
     method private backtrack node =

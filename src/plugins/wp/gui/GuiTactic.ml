@@ -517,7 +517,7 @@ let checkbox ~(form:Wpane.form) ~default ~label ~tooltip =
 
 type auto_callback = depth:int -> width:int -> Strategy.heuristic list -> unit
 
-class auto () =
+class autosearch () =
   let form = new Wpane.form () in
   let depth = spinner ~form ~default:1 ~label:"Depth"
       ~tooltip:"Limit the number of nested strategies" in
@@ -616,11 +616,10 @@ class strategies () =
         button#connect (self#strategy s) ;
       end
 
-    method hints (hs: ProofStrategy.strategy list) =
-        filter <- hs ; self#update
-
-    method connect (cb : callback option) =
-      callback <- cb ; self#update
+    method connect ?(hints=[]) (cb : callback option) =
+      callback <- cb ;
+      filter <- hints ;
+      self#update
 
     method private strategy (s : ProofStrategy.strategy) () =
       Option.iter (fun fn -> fn ~depth:depth#get (Some s)) callback
