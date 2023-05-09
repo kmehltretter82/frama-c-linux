@@ -162,7 +162,7 @@ let steps_seized steps steplimit =
   | None | Some 0 -> false
   | Some limit -> limit <= steps
 
-let promote ~timeout ~steplimit (res : VCS.result) =
+let promote ?timeout ?steplimit (res : VCS.result) =
   match res.verdict with
   | VCS.NoResult | VCS.Computing _ -> VCS.no_result
   | VCS.Failed -> res
@@ -273,7 +273,7 @@ let get_result ~digest ~runner ~timeout ~steplimit prover goal =
     let hash = lazy (digest prover goal) in
     let result =
       get_cache_result ~mode hash
-      |> promote ~timeout ~steplimit |> VCS.cached in
+      |> promote ?timeout ?steplimit |> VCS.cached in
     if VCS.is_verdict result
     then
       begin

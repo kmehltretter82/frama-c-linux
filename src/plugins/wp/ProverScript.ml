@@ -349,7 +349,7 @@ and explore_provers env alternative : solver =
 
 and explore_prover env timeout prover node =
   let wpo = ProofEngine.goal node in
-  let result = Wpo.get_result wpo prover in
+  let result = Cache.promote ~timeout @@ Wpo.get_result wpo prover in
   if VCS.is_valid result then success else
   if VCS.is_verdict result then failed else
     let config = { VCS.default with timeout = Some timeout } in
