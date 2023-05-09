@@ -39,12 +39,13 @@ by hand afterwards.
 """
 
 import argparse
-import yaml
 from pathlib import Path
 import re
 import subprocess
 import sys
 import warnings
+import yaml
+from yaml.representer import Representer
 
 my_path = Path(sys.argv[0]).parent
 
@@ -131,9 +132,9 @@ if args.from_file:
     orig_file.close()
     if args.check_only:
         if check_machdep(orig_machdep):
-            exit(0)
+            sys.exit(0)
         else:
-            exit(1)
+            sys.exit(1)
     if not "compiler" in orig_machdep or not "cpp_arch_flags" in orig_machdep:
         raise Exception("Missing fields in yaml file")
     args.compiler = orig_machdep["compiler"]
@@ -268,7 +269,7 @@ def cleanup_cpp(output):
 
 
 def find_macros_value(output, is_list=False, entry=None):
-    msg = re.compile("(\w+)_is = ([^;]+);")
+    msg = re.compile(r"(\w+)_is = ([^;]+);")
     if is_list:
         assert entry
         machdep[entry] = {}
@@ -278,7 +279,7 @@ def find_macros_value(output, is_list=False, entry=None):
         if is_list:
             machdep[entry][name] = value
         else:
-            if name in machdep.keys():
+            if name in machdep:
                 if args.verbose:
                     print(f"[INFO] setting {name} to {value}")
                 machdep[name] = value
@@ -291,7 +292,7 @@ def find_macros_value(output, is_list=False, entry=None):
 for (f, typ) in source_files:
     p = my_path / f
     cmd = compilation_command + [str(p)]
-    if typ == "macro" or typ == "macrolist":
+    if typ in ("macro", "macrolist"):
         # We're just interested in expanding a macro,
         # treatment is a bit different than the rest.
         cmd = cmd + ["-E"]
@@ -364,8 +365,6 @@ def change_style(style, representer):
 
     return new_representer
 
-
-from yaml.representer import Representer
 
 custom_defs_representer = change_style("|", Representer.represent_str)
 
