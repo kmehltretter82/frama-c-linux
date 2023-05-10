@@ -43,11 +43,13 @@ from pathlib import Path
 import re
 import subprocess
 import sys
-import warnings
+import logging
 import yaml
 from yaml.representer import Representer
 
 my_path = Path(sys.argv[0]).parent
+
+logging.basicConfig(format='%(levelname)s: %(message)s')
 
 parser = argparse.ArgumentParser(prog="make_machdep")
 parser.add_argument("-v", "--verbose", action="store_true")
@@ -119,10 +121,10 @@ def check_machdep(machdep):
         validate(machdep, schema)
         return True
     except ImportError:
-        warnings.warn("jsonschema is not available: no validation will be performed")
+        logging.warning("jsonschema is not available: no validation will be performed")
         return True
     except ValidationError:
-        warnings.warn("machdep object is not conforming to machdep schema")
+        logging.warning("machdep object is not conforming to machdep schema")
         return False
 
 
@@ -242,7 +244,7 @@ def find_value(name, typ, output):
         default = ""
 
     else:
-        warnings.warn(f"unexpected type '{typ}' for field '{name}', skipping")
+        logging.warning(f"unexpected type '{typ}' for field '{name}', skipping")
         return
     if name in machdep:
         msg = re.compile(name + " is " + expected)
@@ -253,12 +255,12 @@ def find_value(name, typ, output):
                 print(f"[INFO] setting {name} to {value}")
             machdep[name] = value
         else:
-            warnings.warn(f"cannot find value of field '{name}', using default value: '{default}'")
+            logging.warning(f"cannot find value of field '{name}', using default value: '{default}'",stacklevel=-1)
             machdep[name] = default
             if args.verbose:
                 print(f"compiler output is:{output}")
     else:
-        warnings.warn(f"unexpected symbol '{name}', ignoring")
+        logging.warning(f"unexpected symbol '{name}', ignoring")
 
 
 def cleanup_cpp(output):
@@ -284,7 +286,7 @@ def find_macros_value(output, is_list=False, entry=None):
                     print(f"[INFO] setting {name} to {value}")
                 machdep[name] = value
             else:
-                warnings.warn(f"unexpected symbol '{name}', ignoring")
+                logging.warning(f"unexpected symbol '{name}', ignoring")
     if args.verbose:
         print(f"compiler output is:{output}")
 
@@ -302,7 +304,7 @@ for (f, typ) in source_files:
     Path(f).with_suffix(".o").unlink(missing_ok=True)
     if typ == "macro":
         if proc.returncode != 0:
-            warnings.warn(f"error in preprocessing value '{p}', some values won't be filled")
+            logging.warning(f"error in preprocessing value '{p}', some values won't be filled")
             if args.verbose:
                 print(f"compiler output is:{proc.stderr.decode()}")
             name = p.stem
@@ -314,7 +316,7 @@ for (f, typ) in source_files:
     if typ == "macrolist":
         name = p.stem
         if proc.returncode != 0:
-            warnings.warn(f"error in preprocessing value '{p}', some value might not be filled")
+            logging.warning(f"error in preprocessing value '{p}', some value might not be filled")
             if args.verbose:
                 print(f"compiler output is:{proc.stderr.decode()}")
             if name in machdep:
@@ -329,7 +331,7 @@ for (f, typ) in source_files:
     if proc.returncode == 0:
         # all tests should fail on an appropriate _Static_assert
         # if compilation succeeds, we have a problem
-        warnings.warn(f"WARNING: could not identify value of '{p.stem}', skipping")
+        logging.warning(f"WARNING: could not identify value of '{p.stem}', skipping")
         continue
     find_value(p.stem, typ, proc.stderr.decode())
 
@@ -387,7 +389,7 @@ if proc.returncode == 0:
         lines += f"{line.strip()}\n"
     machdep["custom_defs"] = custom_defs(lines)
 else:
-    warnings.warn("could not determine predefined macros")
+    logging.warning("could not determine predefined macros")
     if args.verbose:
         print(f"compiler output is:{proc.stderr}")
 
