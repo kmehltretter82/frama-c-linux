@@ -154,10 +154,22 @@ def print_machdep(machdep):
     yaml.dump(machdep, args.dest_file, indent=4, sort_keys=True)
 
 
+def default_value(typ):
+    if typ == "integer":
+        return -1
+    if typ == "boolean":
+        return False
+    if typ == "string":
+        return ""
+    if typ == "list":
+        return {}
+    logging.warning(f"Unexpected type {typ} in YAML schema")
+    return None
+
 def make_machdep():
     machdep = {}
-    for key in schema.keys():
-        machdep[key] = None
+    for key,value in schema.items():
+        machdep[key] = default_value(value['type'])
     return machdep
 
 
@@ -219,6 +231,7 @@ source_files = [
 
 
 def find_value(name, typ, output):
+
     if typ == "bool":
         expected = "(True|False)"
 

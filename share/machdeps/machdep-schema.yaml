@@ -220,6 +220,8 @@ posix_version:
     value of the macro '_POSIX_VERSION'
     leave empty for non-POSIX systems
 
+  type: string
+
 ptrdiff_t:
 
   description:  definition of 'ptrdiff_t'
