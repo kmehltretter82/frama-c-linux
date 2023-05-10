@@ -46,50 +46,96 @@ and alternative =
   | Auto of string loc (* deprecated -wp-auto *)
   | Tactic of {
       tactic : string loc ;
-      select : value list ;
       lookup : lookup list ;
+      select : value list ;
       params : (string loc * value) list ;
       children : (string loc * string loc) list ; (* name prefix and strategy *)
       default: string loc option; (* None is default *)
     }
 
-(* -------------------------------------------------------------------------- *)
-(* --- Unique Identifiers                                                 --- *)
-(* -------------------------------------------------------------------------- *)
-
-module Kid = State_builder.Int_ref
-    (struct
-      let default () = 0
-      let name = "Wp.ProofStrategy.Kid"
-      let dependencies = [Ast.self]
-    end)
-
-let fresh () = let id = succ @@ Kid.get () in Kid.set id ; id
+type hint = string * string list (* strategy name, targets *)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Proof Strategy Registry                                            --- *)
+(* --- Registry                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-module S = D.Make
-    (struct
-      include D.Undefined
-      type t = strategy
-      let reprs = [{
-          name = { loc = Location.unknown ; value = "" };
-          alternatives = [];
-        }]
-      let name = "Wp.ProofStrategy.S"
-      let structural_descr = Structural_descr.t_abstract
-      let rehash = D.identity
-      let mem_project = D.never_any_project
-    end)
+(* Strategies applies to all projects *)
 
-module Strategies = State_builder.Hashtbl(D.String.Hashtbl)(S)
-    (struct
-      let size = 0
-      let name = "Wp.ProofStrategy.Registry"
-      let dependencies = [Ast.self;Kid.self]
-    end)
+let kid = ref 0
+let hid : (int,hint) Hashtbl.t = Hashtbl.create 0
+let sid : (int,strategy) Hashtbl.t = Hashtbl.create 0
+let strategies : (string,strategy) Hashtbl.t = Hashtbl.create 0
+let revhints : hint list ref = ref []
+
+(* -------------------------------------------------------------------------- *)
+(* --- Printers                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+let pp_name fmt { value = s } = Format.pp_print_string fmt s
+let pp_quoted fmt { value = s } = Format.fprintf fmt "%S" s
+
+let pp_lookup fmt = function
+  | { head = true ; goal = true ; hyps = false ; pattern } ->
+    Format.fprintf fmt "\\goal(%a)" Pattern.pp_pattern pattern
+  | { head = true ; goal = false ; pattern } ->
+    Format.fprintf fmt "\\when(%a)" Pattern.pp_pattern pattern
+  | { head = false ; goal = true ; hyps = false ; pattern } ->
+    Format.fprintf fmt "\\ingoal(%a)" Pattern.pp_pattern pattern
+  | { head = false ; goal = false ; pattern } ->
+    Format.fprintf fmt "\\incontext(%a)" Pattern.pp_pattern pattern
+  | { goal = true ; hyps = true ; pattern } ->
+    Format.fprintf fmt "\\pattern(%a)" Pattern.pp_pattern pattern
+
+let pp_select fmt s =
+  Format.fprintf fmt "\\select(%a)" Pattern.pp_value s
+
+let pp_param fmt (p,v) =
+  Format.fprintf fmt "\\param(%a,%a)" pp_quoted p Pattern.pp_value v
+
+let pp_children fmt (p,s) =
+  Format.fprintf fmt "\\child(%a,%a)" pp_quoted p pp_name s
+
+let pp_default fmt s =
+  Format.fprintf fmt "\\default(%a)" pp_name s
+
+let pp_alternative fmt = function
+  | Default -> Format.fprintf fmt "\\default"
+  | Strategy s -> pp_name fmt s
+  | Auto { value = s } -> Format.fprintf fmt "\\auto(%S)" s
+  | Provers([],None) -> Format.fprintf fmt "\\provers()"
+  | Provers([],Some tm) -> Format.fprintf fmt "\\provers(%.1f)" tm
+  | Provers(p::ps,None) ->
+    Format.fprintf fmt "@[<hov 2>\\provers(%a" pp_quoted p ;
+    List.iter (Format.fprintf fmt ",@,%a" pp_quoted) ps ;
+    Format.fprintf fmt ")@]" ;
+  | Provers(ps,Some tm) ->
+    Format.fprintf fmt "@[<hov 2>\\provers(" ;
+    List.iter (Format.fprintf fmt "%a,@," pp_quoted) ps ;
+    Format.fprintf fmt "%.1f)@]" tm ;
+  | Tactic { tactic ; lookup ; select ; params ; children ; default } ->
+    Format.fprintf fmt "@[<hv 2>\\tactic(%a" pp_quoted tactic ;
+    List.iter (Format.fprintf fmt ",@ %a" pp_lookup) lookup ;
+    List.iter (Format.fprintf fmt ",@ %a" pp_select) select ;
+    List.iter (Format.fprintf fmt ",@ %a" pp_param) params ;
+    List.iter (Format.fprintf fmt ",@ %a" pp_children) children ;
+    Option.iter (Format.fprintf fmt ",@ %a" pp_default) default ;
+    Format.fprintf fmt "@,)@]"
+
+let pp_strategy fmt s =
+  Format.fprintf fmt "%s:@ " s.name.value ;
+  Pretty_utils.pp_list ~sep:",@ " pp_alternative fmt s.alternatives
+
+let re_ident = Str.regexp "[_a-zA-Z][_a-zA-Z0-9]*$"
+
+let pp_option fmt s =
+  if Str.string_match re_ident s 0 then
+    Format.pp_print_string fmt s
+  else
+    Format.fprintf fmt "%S" s
+
+let pp_hint fmt ((s,ps): hint) =
+  Format.fprintf fmt "%s:@ " s ;
+  Pretty_utils.pp_list ~sep:",@ " pp_option fmt ps
 
 (* -------------------------------------------------------------------------- *)
 (* --- Alternative Parser                                                 --- *)
@@ -228,25 +274,19 @@ let parse_strategy_name ctxt loc = function
 let parse_strategy ctxt loc ps =
   let name,ps = parse_strategy_name ctxt loc ps in
   try
-    let old = Strategies.find name.value in
+    let old = Hashtbl.find strategies name.value in
     ctxt.error loc "Duplicate strategy definition ('%s', at %a)"
       name.value Location.pretty old.name.loc
   with Not_found ->
     let alternatives = List.concat @@ List.map (parse_alternatives ctxt) ps in
-    let id = fresh () in
-    Strategies.add name.value { name ; alternatives } ;
-    Ext_id id
+    let strategy = { name ; alternatives } in
+    let id = incr kid ; !kid in
+    Hashtbl.add strategies name.value strategy ;
+    Hashtbl.add sid id strategy ; Ext_id id
 
 (* -------------------------------------------------------------------------- *)
 (* --- Proof Parser                                                       --- *)
 (* -------------------------------------------------------------------------- *)
-
-module Hints = State_builder.List_ref
-    (D.Pair(D.String)(D.List(D.String)))
-    (struct
-      let name = "Wp.ProofStrategy.Hints"
-      let dependencies = [Ast.self]
-    end)
 
 let parse_hints ctxt p =
   let loc = p.lexpr_loc in
@@ -258,21 +298,28 @@ let parse_hints ctxt p =
 let parse_proofs ctxt loc ps =
   let name , ps = parse_strategy_name ctxt loc ps in
   let strategy = name.value in
-  if not (Strategies.mem strategy) then
+  if not (Hashtbl.mem strategies strategy) then
     ctxt.error name.loc "Unknown strategy '%s'" strategy ;
   let props = List.concat @@ List.map (parse_hints ctxt) ps in
-  Hints.set (Hints.get () @ [ strategy , props ]) ;
-  Ext_id 0
+  let hint = (strategy, props) in
+  revhints := hint :: !revhints ;
+  let id = incr kid ; !kid in
+  Hashtbl.add hid id hint ; Ext_id id
 
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy ACSL Extensions                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
 let register () =
-  if Wp_parameters.Strategies.get () <> [] then
+  if Wp_parameters.StrategyEngine.get () then
     begin
-      Acsl_extension.register_global "strategy" parse_strategy false ;
-      Acsl_extension.register_global "prove" parse_proofs false ;
+      let printer hmap pp _ fmt = function
+        | Ext_id id -> Option.iter (pp fmt) (Hashtbl.find_opt hmap id)
+        | _ -> () in
+      Acsl_extension.register_global "strategy"
+        ~printer:(printer sid pp_strategy) parse_strategy false ;
+      Acsl_extension.register_global "proof"
+        ~printer:(printer hid pp_hint) parse_proofs false ;
     end
 
 let () = Cmdline.run_after_configuring_stage register
@@ -283,9 +330,9 @@ let () = Cmdline.run_after_configuring_stage register
 
 let name s = s.name.value
 let loc s = s.name.loc
-let find a = try Some (Strategies.find a) with Not_found -> None
+let find = Hashtbl.find_opt strategies
 let resolve name =
-  try Some (Strategies.find name.value)
+  try Some (Hashtbl.find strategies name.value)
   with Not_found ->
     Wp_parameters.error ~source:(fst name.loc) ~once:true
       "Strategy '%s' undefined (skipped)." name.value ;
@@ -348,35 +395,40 @@ let check_alternative = function
     end
 
 let typecheck () =
-  Strategies.iter (fun _ s -> List.iter check_alternative s.alternatives)
+  Hashtbl.iter
+    (fun _ s -> List.iter check_alternative s.alternatives) strategies
 
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy Hints                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-let iter f = Strategies.iter_sorted ~cmp:String.compare (fun _ s -> f s)
+let iter f =
+  let module M = Map.Make(String) in
+  let pool = ref M.empty in
+  Hashtbl.iter (fun a s -> pool := M.add a s !pool) strategies ;
+  M.iter (fun _ s -> f s) !pool
 
 let default () =
   List.filter_map
     (fun s ->
-       try Some (Strategies.find s)
+       try Some (Hashtbl.find strategies s)
        with Not_found ->
          Wp_parameters.warning ~current:false ~once:true
            "Invalid -wp-strategy '%s' (undefined strategy name)" s ;
          None
     ) @@
-  Wp_parameters.Strategies.get ()
+  Wp_parameters.DefaultStrategies.get ()
 
 let hints goal =
-  begin
+  let hs =
     let pid = goal.Wpo.po_pid in
-    List.map (fun (name,_) -> Strategies.find name) @@
-    List.filter (fun (_,ps) -> WpPropId.select_by_name ps pid) @@ Hints.get ()
-  end @ default ()
+    List.filter_map (fun (name,_) -> Hashtbl.find_opt strategies name) @@
+    List.filter (fun (_,ps) -> WpPropId.select_by_name ps pid) !revhints
+  in List.rev_append hs (default ())
 
 let has_hint goal =
   let pid = goal.Wpo.po_pid in
-  List.exists (fun (_,ps) -> WpPropId.select_by_name ps pid) @@ Hints.get ()
+  List.exists (fun (_,ps) -> WpPropId.select_by_name ps pid) !revhints
 
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy Forward Step                                              --- *)
@@ -492,7 +544,7 @@ let subgoal (children : (string loc * string loc) list)
     match hint, default with
     | None, None -> ()
     | Some s , _ | None , Some s ->
-      if not @@ Strategies.mem s.value then
+      if not @@ Hashtbl.mem strategies s.value then
         Wp_parameters.error ~source:(fst s.loc)
           "Unknown strategy '%s' (skipped)" s.value
       else ProofEngine.set_hint node s.value
