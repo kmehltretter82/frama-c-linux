@@ -21,4 +21,7 @@
 /**************************************************************************/
 
 #include <features.h>
+
+#if defined(__WORDSIZE)
 const int wordsize_is = __WORDSIZE;
+#endif

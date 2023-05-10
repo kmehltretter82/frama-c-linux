@@ -23,9 +23,15 @@
 #include <errno.h>
 
 /* Mandatory */
+#ifdef EDOM
 int edom_is = EDOM;
+#endif
+#ifdef EILSEQ
 int eilseq_is = EILSEQ;
+#endif
+#ifdef ERANGE
 int erange_is = ERANGE;
+#endif
 
 /* Implementation defined by POSIX and GNU Linux */
 #ifdef E2BIG

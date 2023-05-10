@@ -22,4 +22,6 @@
 
 #include <wchar.h>
 
+#if defined(WEOF)
 const wint_t weof_is = WEOF;
+#endif
