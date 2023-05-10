@@ -655,32 +655,19 @@ errno:
     eafnosupport: ((int)(66072050 & 0xffff))
     eagain: ((int)(66072050 & 0xffff))
     ealready: ((int)(66072050 & 0xffff))
-    ebade: '52'
     ebadf: ((int)(66072050 & 0xffff))
-    ebadfd: '77'
-    ebadmsg: '74'
-    ebadr: '53'
-    ebadrqc: '56'
-    ebadslt: '57'
     ebusy: ((int)(66072050 & 0xffff))
-    ecanceled: '125'
     echild: ((int)(66072050 & 0xffff))
-    echrng: '44'
-    ecomm: '70'
     econnaborted: ((int)(66072050 & 0xffff))
     econnrefused: ((int)(66072050 & 0xffff))
     econnreset: ((int)(66072050 & 0xffff))
     edeadlk: ((int)(66072050 & 0xffff))
-    edeadlock: ((int)(66072050 & 0xffff))
     edestaddrreq: ((int)(66072050 & 0xffff))
     edom: '33'
-    edquot: '122'
     eexist: ((int)(66072050 & 0xffff))
     efault: ((int)(66072050 & 0xffff))
     efbig: ((int)(66072050 & 0xffff))
-    ehostdown: '112'
     ehostunreach: ((int)(66072050 & 0xffff))
-    eidrm: '43'
     eilseq: ((int)(66072050 & 0xffff))
     einprogress: ((int)(66072050 & 0xffff))
     eintr: ((int)(2453066 & 0x7fff))
@@ -688,87 +675,43 @@ errno:
     eio: ((int)(66072050 & 0xffff))
     eisconn: ((int)(66072050 & 0xffff))
     eisdir: ((int)(66072050 & 0xffff))
-    eisnam: '120'
-    ekeyexpired: '127'
-    ekeyrejected: '129'
-    ekeyrevoked: '128'
-    el2hlt: '51'
-    el2nsync: '45'
-    el3hlt: '46'
-    el3rst: '47'
-    elibacc: '79'
-    elibbad: '80'
-    elibexec: '83'
-    elibmax: '82'
-    elibscn: '81'
     eloop: ((int)(66072050 & 0xffff))
-    emediumtype: '124'
     emfile: ((int)(66072050 & 0xffff))
     emlink: ((int)(66072050 & 0xffff))
     emsgsize: ((int)(66072050 & 0xffff))
-    emultihop: '72'
     enametoolong: ((int)(66072050 & 0xffff))
     enetdown: ((int)(66072050 & 0xffff))
     enetreset: ((int)(66072050 & 0xffff))
     enetunreach: ((int)(66072050 & 0xffff))
     enfile: ((int)(66072050 & 0xffff))
     enobufs: ((int)(66072050 & 0xffff))
-    enodata: '61'
     enodev: ((int)(66072050 & 0xffff))
     enoent: ((int)(66072050 & 0xffff))
     enoexec: ((int)(66072050 & 0xffff))
-    enokey: '126'
     enolck: ((int)(66072050 & 0xffff))
-    enolink: '67'
-    enomedium: '123'
     enomem: ((int)(66072050 & 0xffff))
     enomsg: ((int)(66072050 & 0xffff))
-    enonet: '64'
-    enopkg: '65'
     enoprotoopt: ((int)(66072050 & 0xffff))
     enospc: ((int)(66072050 & 0xffff))
-    enosr: '63'
-    enostr: '60'
     enosys: ((int)(66081697 & 0x7fff))
-    enotblk: '15'
     enotconn: ((int)(66072050 & 0xffff))
     enotdir: ((int)(66072050 & 0xffff))
     enotempty: ((int)(66072050 & 0xffff))
-    enotrecoverable: '131'
     enotsock: ((int)(66072050 & 0xffff))
     enotty: ((int)(66072050 & 0xffff))
-    enotuniq: '76'
     enxio: ((int)(66072050 & 0xffff))
     eopnotsupp: ((int)(66072050 & 0xffff))
-    eoverflow: '75'
-    eownerdead: '130'
     eperm: ((int)(66072050 & 0xffff))
-    epfnosupport: '96'
     epipe: ((int)(66072050 & 0xffff))
-    eproto: '71'
     eprotonosupport: ((int)(66072050 & 0xffff))
     eprototype: ((int)(66072050 & 0xffff))
     erange: '34'
-    eremchg: '78'
-    eremote: '66'
-    eremoteio: '121'
-    erestart: '85'
     erofs: ((int)(66072050 & 0xffff))
-    eshutdown: '108'
-    esocktnosupport: '94'
     espipe: ((int)(66072050 & 0xffff))
     esrch: ((int)(66072050 & 0xffff))
-    estale: '116'
-    estrpipe: '86'
-    etime: '62'
     etimedout: ((int)(66072050 & 0xffff))
-    etxtbsy: '26'
-    euclean: '117'
-    eunatch: '49'
-    eusers: '87'
     ewouldblock: ((int)(66072050 & 0xffff))
     exdev: ((int)(66072050 & 0xffff))
-    exfull: '54'
 filename_max: FILENAME_MAX
 fopen_max: FOPEN_MAX
 has__builtin_va_list: true
