@@ -253,7 +253,7 @@ let parse_hints ctxt p =
   match p.lexpr_node with
   | PLvar x -> [x]
   | PLconstant(StringConstant x) -> String.split_on_char ',' x
-  | _ -> ctxt.error loc "Proof hint expected (see -wp-proop) (%a)" debug p
+  | _ -> ctxt.error loc "Proof hint expected (see -wp-prop) (%a)" debug p
 
 let parse_proofs ctxt loc ps =
   let name , ps = parse_strategy_name ctxt loc ps in
