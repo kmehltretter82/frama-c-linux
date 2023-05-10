@@ -30,8 +30,6 @@ custom_defs: |
     #define __FLT128_MAX_10_EXP__ 4932
     #undef __FLT_MIN__
     #define __FLT_MIN__ 1.17549435082228750796873653722224568e-38F
-    #undef __GCC_IEC_559_COMPLEX
-    #define __GCC_IEC_559_COMPLEX 2
     #undef __UINT_LEAST8_TYPE__
     #define __UINT_LEAST8_TYPE__ unsigned char
     #undef __SIZEOF_FLOAT80__
@@ -54,24 +52,12 @@ custom_defs: |
     #define __SIZE_MAX__ 0xffffffffU
     #undef __WCHAR_MAX__
     #define __WCHAR_MAX__ 0x7fffffffL
-    #undef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2
-    #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2 1
-    #undef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
-    #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4 1
-    #undef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8
-    #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_8 1
-    #undef __GCC_ATOMIC_CHAR_LOCK_FREE
-    #define __GCC_ATOMIC_CHAR_LOCK_FREE 2
-    #undef __GCC_IEC_559
-    #define __GCC_IEC_559 2
     #undef __FLT32X_DECIMAL_DIG__
     #define __FLT32X_DECIMAL_DIG__ 17
     #undef __FLT_EVAL_METHOD__
     #define __FLT_EVAL_METHOD__ 2
     #undef __FLT64_DECIMAL_DIG__
     #define __FLT64_DECIMAL_DIG__ 17
-    #undef __GCC_ATOMIC_CHAR32_T_LOCK_FREE
-    #define __GCC_ATOMIC_CHAR32_T_LOCK_FREE 2
     #undef __UINT_FAST64_MAX__
     #define __UINT_FAST64_MAX__ 0xffffffffffffffffULL
     #undef __SIG_ATOMIC_TYPE__
@@ -82,8 +68,6 @@ custom_defs: |
     #define __FINITE_MATH_ONLY__ 0
     #undef __FLT32X_MAX_EXP__
     #define __FLT32X_MAX_EXP__ 1024
-    #undef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_1
-    #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_1 1
     #undef __FLT32_HAS_DENORM__
     #define __FLT32_HAS_DENORM__ 1
     #undef __UINT_FAST8_MAX__
@@ -110,8 +94,6 @@ custom_defs: |
     #define __FLT64X_HAS_QUIET_NAN__ 1
     #undef __UINT_LEAST8_MAX__
     #define __UINT_LEAST8_MAX__ 0xff
-    #undef __GCC_ATOMIC_BOOL_LOCK_FREE
-    #define __GCC_ATOMIC_BOOL_LOCK_FREE 2
     #undef __LAHF_SAHF__
     #define __LAHF_SAHF__ 1
     #undef __FLT128_DENORM_MIN__
@@ -148,8 +130,6 @@ custom_defs: |
     #define __WCHAR_MIN__ (-__WCHAR_MAX__ - 1)
     #undef __INT64_C
     #define __INT64_C(c) c ## LL
-    #undef __GCC_ATOMIC_POINTER_LOCK_FREE
-    #define __GCC_ATOMIC_POINTER_LOCK_FREE 2
     #undef __FLT32X_MANT_DIG__
     #define __FLT32X_MANT_DIG__ 53
     #undef __FLT64X_EPSILON__
@@ -284,8 +264,6 @@ custom_defs: |
     #define __GXX_ABI_VERSION 1017
     #undef __FLT_MIN_EXP__
     #define __FLT_MIN_EXP__ (-125)
-    #undef __GCC_HAVE_DWARF2_CFI_ASM
-    #define __GCC_HAVE_DWARF2_CFI_ASM 1
     #undef __INT16_MAX__
     #define __INT16_MAX__ 0x7fff
     #undef __INT_FAST64_TYPE__
@@ -352,8 +330,6 @@ custom_defs: |
     #define _STDC_PREDEF_H 1
     #undef __INT_LEAST32_MAX__
     #define __INT_LEAST32_MAX__ 0x7fffffff
-    #undef __GCC_ATOMIC_INT_LOCK_FREE
-    #define __GCC_ATOMIC_INT_LOCK_FREE 2
     #undef __FLT128_MAX_EXP__
     #define __FLT128_MAX_EXP__ 16384
     #undef __FLT32_MANT_DIG__
@@ -402,8 +378,6 @@ custom_defs: |
     #define __INT8_TYPE__ signed char
     #undef __ELF__
     #define __ELF__ 1
-    #undef __GCC_ASM_FLAG_OUTPUTS__
-    #define __GCC_ASM_FLAG_OUTPUTS__ 1
     #undef __UINT32_TYPE__
     #define __UINT32_TYPE__ unsigned long
     #undef __FLT_RADIX__
@@ -420,8 +394,6 @@ custom_defs: |
     #define __FLT32X_MIN__ 2.22507385850720138309023271733240406e-308F32x
     #undef __SIG_ATOMIC_MAX__
     #define __SIG_ATOMIC_MAX__ 0x7fffffff
-    #undef __GCC_ATOMIC_WCHAR_T_LOCK_FREE
-    #define __GCC_ATOMIC_WCHAR_T_LOCK_FREE 2
     #undef __USER_LABEL_PREFIX__
     #define __USER_LABEL_PREFIX__
     #undef __SIZEOF_PTRDIFF_T__
@@ -438,8 +410,6 @@ custom_defs: |
     #define __DEC32_SUBNORMAL_MIN__ 0.000001E-95DF
     #undef __INT_FAST16_MAX__
     #define __INT_FAST16_MAX__ 0x7fffffff
-    #undef __GCC_CONSTRUCTIVE_SIZE
-    #define __GCC_CONSTRUCTIVE_SIZE 64
     #undef __FLT64_DIG__
     #define __FLT64_DIG__ 15
     #undef __UINT_FAST32_MAX__
@@ -530,8 +500,6 @@ custom_defs: |
     #define __FLT16_HAS_INFINITY__ 1
     #undef __SIG_ATOMIC_MIN__
     #define __SIG_ATOMIC_MIN__ (-__SIG_ATOMIC_MAX__ - 1)
-    #undef __GCC_ATOMIC_LONG_LOCK_FREE
-    #define __GCC_ATOMIC_LONG_LOCK_FREE 2
     #undef __DEC32_MANT_DIG__
     #define __DEC32_MANT_DIG__ 7
     #undef __FLT16_MANT_DIG__
@@ -552,8 +520,6 @@ custom_defs: |
     #define __INT_FAST64_WIDTH__ 64
     #undef __INT_FAST64_MAX__
     #define __INT_FAST64_MAX__ 0x7fffffffffffffffLL
-    #undef __GCC_ATOMIC_TEST_AND_SET_TRUEVAL
-    #define __GCC_ATOMIC_TEST_AND_SET_TRUEVAL 1
     #undef __FLT_NORM_MAX__
     #define __FLT_NORM_MAX__ 3.40282346638528859811704183484516925e+38F
     #undef __FLT32_HAS_INFINITY__
@@ -576,8 +542,6 @@ custom_defs: |
     #define __SIZEOF_FLOAT128__ 16
     #undef __INT_LEAST64_MAX__
     #define __INT_LEAST64_MAX__ 0x7fffffffffffffffLL
-    #undef __GCC_ATOMIC_CHAR16_T_LOCK_FREE
-    #define __GCC_ATOMIC_CHAR16_T_LOCK_FREE 2
     #undef __DEC64_MIN__
     #define __DEC64_MIN__ 1E-383DD
     #undef __WINT_TYPE__
@@ -660,8 +624,6 @@ custom_defs: |
     #define __DBL_NORM_MAX__ ((double)1.79769313486231570814527423731704357e+308L)
     #undef __BYTE_ORDER__
     #define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
-    #undef __GCC_DESTRUCTIVE_SIZE
-    #define __GCC_DESTRUCTIVE_SIZE 64
     #undef __INTMAX_WIDTH__
     #define __INTMAX_WIDTH__ 64
     #undef __ORDER_BIG_ENDIAN__
@@ -738,8 +700,6 @@ custom_defs: |
     #define __SIZEOF_LONG_LONG__ 8
     #undef __FLT128_DECIMAL_DIG__
     #define __FLT128_DECIMAL_DIG__ 36
-    #undef __GCC_ATOMIC_LLONG_LOCK_FREE
-    #define __GCC_ATOMIC_LLONG_LOCK_FREE 2
     #undef __FLT32_HAS_QUIET_NAN__
     #define __FLT32_HAS_QUIET_NAN__ 1
     #undef __FLT_DECIMAL_DIG__
@@ -748,8 +708,6 @@ custom_defs: |
     #define __UINT_FAST16_MAX__ 0xffffU
     #undef __LDBL_NORM_MAX__
     #define __LDBL_NORM_MAX__ 1.18973149535723176502126385303097021e+4932L
-    #undef __GCC_ATOMIC_SHORT_LOCK_FREE
-    #define __GCC_ATOMIC_SHORT_LOCK_FREE 2
     #undef __UINT_FAST8_TYPE__
     #define __UINT_FAST8_TYPE__ unsigned char
     #undef __ATOMIC_ACQ_REL
