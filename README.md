@@ -12,7 +12,6 @@ called **plug-ins**. Plug-ins can build upon results computed by other
 plug-ins in the platform.
 
 Thanks to this approach, Frama-C provides sophisticated tools, including:
-
 - an analyzer based on abstract interpretation, aimed at verifying
   the absence of run-time errors (**Eva**);
 - a program proof framework based on weakest precondition calculus (**WP**);
