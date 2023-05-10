@@ -27,7 +27,7 @@
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   1 function analyzed (out of 1): 100% coverage.
-  In this function, 9 statements reached (out of 9): 100% coverage.
+  In this function, 10 statements reached (out of 10): 100% coverage.
   ----------------------------------------------------------------------------
   No errors or warnings raised during the analysis.
   ----------------------------------------------------------------------------
