@@ -217,10 +217,19 @@ let gen_char_bit fmt _mach =
 let gen_define_errno_macro fmt (name, v) =
   gen_define_string fmt ("__FC_" ^ (String.uppercase_ascii name)) v
 
+let machdep_macro_name s =
+  let tr = function
+    | c when 'a' <= c && c <= 'z' -> Char.uppercase_ascii c
+    | c when 'A' <= c && c <= 'Z' -> c
+    | c when '0' <= c && c <= '9' -> c
+    | _ -> '_'
+  in
+  String.map tr s
+
 let gen_all_defines fmt mach =
   Format.fprintf fmt "/* Machdep-specific info for Frama-C's libc */@\n";
   Format.fprintf fmt "#ifndef __FC_MACHDEP@\n#define __FC_MACHDEP@\n";
-  gen_define_int fmt ("__FC_" ^ (String.uppercase_ascii mach.machdep_name)) 1;
+  gen_define_int fmt ("__FC_" ^ (machdep_macro_name mach.machdep_name)) 1;
   gen_byte_order fmt mach;
   gen_fixed_size_family fmt 8 mach;
   gen_fixed_size_family fmt 16 mach;
