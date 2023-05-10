@@ -409,7 +409,7 @@ let get_machdep () =
   match res with
   | Ok machdep -> machdep
   | Error (`Msg s) ->
-    Kernel.fatal "Error during machdep parsing: %s" s
+    Kernel.abort "Error during machdep parsing: %s" s
 
 let print_machdep_header () =
   if Kernel.PrintMachdepHeader.get () then begin
