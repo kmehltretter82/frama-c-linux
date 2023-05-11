@@ -872,12 +872,16 @@ interface of the programmatic API.
     \texttt{@decreases},
     \texttt{\mbox{@complete\_behaviors}}, \texttt{\mbox{@disjoint\_behaviors}}.
     \\
-    Properties can be prefixed with a minus sign to \emph{skip} the associated annotations.
+    Tags and categories can be prefixed with a minus sign to \emph{skip}
+    the associated annotations.
     For example \texttt{-wp-prop="-@assigns"} removes all \texttt{assigns}
     and \texttt{loop assigns} properties from the selection.
     \\
-    \textbf{Remark:} properties with name \verb+no_wp:+ are always and automatically
-    filtered and never proved by \textsf{WP}.
+    Tag names also include the name of the function or
+    lemma associated with the property.
+    \\
+    \textbf{Remark:} properties with tag name \verb+no_wp:+ are always and automatically
+    filtered out and never proved by \textsf{WP}.
 \item [\tt -wp-(no)-status-all] includes in the goal selection all properties
   regardless of their current status (default is: \texttt{no}).
 \item [\tt -wp-(no)-status-valid] includes in the goal selection those properties
