@@ -310,9 +310,11 @@ let parse_proofs ctxt loc ps =
 (* --- Strategy ACSL Extensions                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
+let registered = ref false
 let register () =
-  if Wp_parameters.StrategyEngine.get () then
+  if not !registered && Wp_parameters.StrategyEngine.get () then
     begin
+      registered := true ;
       let printer hmap pp _ fmt = function
         | Ext_id id -> Option.iter (pp fmt) (Hashtbl.find_opt hmap id)
         | _ -> () in
