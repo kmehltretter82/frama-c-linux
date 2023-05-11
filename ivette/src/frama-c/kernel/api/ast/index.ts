@@ -273,7 +273,7 @@ const printFunction_internal: Server.GetRequest<fct,text> = {
   name:   'kernel.ast.printFunction',
   input:  jFct,
   output: jText,
-  signals: [],
+  signals: [ { name: 'kernel.ast.changed' } ],
 };
 /** Print the AST of a function */
 export const printFunction: Server.GetRequest<fct,text>= printFunction_internal;

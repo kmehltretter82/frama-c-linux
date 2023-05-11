@@ -40,11 +40,16 @@ let () = Request.register ~package
 let changed_signal = Request.signal ~package ~name:"changed"
     ~descr:(Md.plain "Emitted when the AST has been changed")
 
-let ast_update_hook f =
-  Ast.add_hook_on_update f;
-  Ast.apply_after_computed (fun _ -> f ())
+let ast_changed () = Request.emit changed_signal
 
-let () = ast_update_hook (fun _ -> Request.emit changed_signal)
+let ast_update_hook f =
+  begin
+    Ast.add_hook_on_update f;
+    Ast.apply_after_computed (fun _ -> f ());
+  end
+
+let () = ast_update_hook ast_changed
+let () = Annotations.add_hook_on_change ast_changed
 
 (* -------------------------------------------------------------------------- *)
 (* --- File Positions                                                     --- *)
@@ -200,7 +205,8 @@ struct
   let to_json loc = `String (tag loc)
   let of_json js =
     try find (Js.to_string js)
-    with Not_found -> Data.failure "not a localizable marker"
+    with Not_found ->
+      Data.failure "invalid marker (%a)" Json.pp_dump js
 
 end
 
@@ -461,6 +467,7 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`GET ~name:"printFunction"
     ~descr:(Md.plain "Print the AST of a function")
+    ~signals:[changed_signal]
     ~input:(module Function) ~output:(module Jtext)
     begin fun kf ->
       let libc = Kernel.PrintLibc.get () in

@@ -48,7 +48,7 @@ module ComputationState = struct
     | Aborted -> `String "aborted"
 end
 
-let _computation_signal =
+let computation_signal =
   States.register_value ~package
     ~name:"computationState"
     ~descr:(Markdown.plain "The current computation state of the analysis.")
@@ -85,6 +85,7 @@ let () = Request.register ~package
     ~kind:`GET ~name:"getCallers"
     ~descr:(Markdown.plain "Get the list of call site of a function")
     ~input:(module Kernel_ast.Function) ~output:(module Data.Jlist (CallSite))
+    ~signals:[computation_signal]
     callers
 
 let eval_callee stmt lval =
@@ -106,6 +107,7 @@ let () = Request.register ~package
               "Return the functions pointed to by a function pointer")
     ~input:(module Kernel_ast.Marker)
     ~output:(module Data.Jlist (Kernel_ast.Function))
+    ~signals:[computation_signal]
     callees
 
 (* ----- Functions ---------------------------------------------------------- *)
@@ -199,6 +201,7 @@ let () = Request.register ~package
                             statements in a function")
     ~input:(module Kernel_ast.Function)
     ~output:(module DeadCode)
+    ~signals:[computation_signal]
     dead_code
 
 
@@ -473,6 +476,7 @@ module LvalueTaints = struct
       ~descr:(Markdown.plain "Get the tainted lvalues of a given function")
       ~input:(module (Kernel_ast.Fundec))
       ~output:(module (Data.Jlist (Status)))
+      ~signals:[computation_signal]
       get_tainted_lvals
 end
 
@@ -828,4 +832,7 @@ let () = Request.register ~package
     ~input:(module Data.Jpair (Kernel_ast.Marker) (Data.Jbool))
     ~output:(module Data.Jlist
           (Data.Jtriple (Data.Jstring) (Data.Jstring) (Data.Jstring)))
+    ~signals:[computation_signal]
     get_states
+
+(* -------------------------------------------------------------------------- *)
