@@ -1433,9 +1433,12 @@ removed when \textsf{Frama-C} exits.
 Other options controlling the output of generated proof
 obligations are:
 \begin{description}
-\item[\tt -wp-(no)-print] pretty-prints the generated proof obligations on
+\item[\tt -wp-print] pretty-prints the generated proof obligations on
   the standard output. Results obtained by provers are reported as
-  well (default is: \texttt{no}).
+  well.
+\item[\tt -wp-status] pretty-prints only proof obligations that are not (yet)
+  proved on the standard output. In case of script, prints all the non-proved
+  sub-goals of the script.
 \item[\tt -wp-out <dir>] sets the user directory where proof
   obligations are saved. The directory is created if it does not exist
   yet. Its content is not cleaned up automatically.
@@ -1675,7 +1678,8 @@ options, the user should be aware of the following precisions:
   cleared by \texttt{-then}. Hence, running \texttt{-wp-prop A}
   \texttt{-then} \texttt{-wp-fct F} does what you expect:
   properties tagged by \texttt{A} are proved only once.
-\item[\tt -wp-print, -wp-prover, -wp-gen, -wp-detect.] These options do not
+\item[\tt -wp-print, -wp-status, -wp-prover, -wp-gen, -wp-detect.]
+  These options do not
   generate new proof-obligations, but run other actions on all
   previously generated ones. For the same reasons, they are not saved
   and cleared by \texttt{-then}.
