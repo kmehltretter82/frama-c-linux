@@ -49,7 +49,7 @@ from yaml.representer import Representer
 
 my_path = Path(sys.argv[0]).parent
 
-logging.basicConfig(format='%(levelname)s: %(message)s')
+logging.basicConfig(format="%(levelname)s: %(message)s")
 
 parser = argparse.ArgumentParser(prog="make_machdep")
 parser.add_argument("-v", "--verbose", action="store_true")
@@ -166,10 +166,11 @@ def default_value(typ):
     logging.warning(f"Unexpected type {typ} in YAML schema")
     return None
 
+
 def make_machdep():
     machdep = {}
-    for key,value in schema.items():
-        machdep[key] = default_value(value['type'])
+    for key, value in schema.items():
+        machdep[key] = default_value(value["type"])
     return machdep
 
 
@@ -231,7 +232,6 @@ source_files = [
 
 
 def find_value(name, typ, output):
-
     if typ == "bool":
         expected = "(True|False)"
 
@@ -268,7 +268,10 @@ def find_value(name, typ, output):
                 print(f"[INFO] setting {name} to {value}")
             machdep[name] = value
         else:
-            logging.warning(f"cannot find value of field '{name}', using default value: '{default}'",stacklevel=-1)
+            logging.warning(
+                f"cannot find value of field '{name}', using default value: '{default}'",
+                stacklevel=-1,
+            )
             machdep[name] = default
             if args.verbose:
                 print(f"compiler output is:{output}")
@@ -304,7 +307,7 @@ def find_macros_value(output, is_list=False, entry=None):
         print(f"compiler output is:{output}")
 
 
-for (f, typ) in source_files:
+for f, typ in source_files:
     p = my_path / f
     cmd = compilation_command + [str(p)]
     if typ in ("macro", "macrolist"):
