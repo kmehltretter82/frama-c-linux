@@ -180,7 +180,7 @@ let sequence l = {
 (* Only used for stability after a turn of simpliciations *)
 let rec equal_cond ca cb =
   match ca,cb with
-  | Probe _ , Probe _ -> true
+  | Probe(p,a) , Probe(q,b) -> Probe.equal p q && a == b
   | State _ , State _ -> true
   | Type p , Type q
   | Have p , Have q
