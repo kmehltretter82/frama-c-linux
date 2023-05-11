@@ -38,11 +38,13 @@ Plugin WP 27.0 (Cobalt)
 - WP          [2023-17-04] ACSL extension 'strategy' for proof strategies
 - WP          [2023-17-04] ACSL extension 'proof' for proof resolution hints
 - WP          [2023-05-11] Extends -wp-prop to lemma and function names
+- WP          [2023-05-10] New option -wp-no-strategy-engine to deactivate strategies
+- TIP         [2023-05-10] Select and apply proof strategies on goal
 - WP          [2023-04-19] New tactic Compute
 - WP          [2023-04-18] Tactic Absurd now also applies to goal
 - WP          [2023-04-18] New option -wp-status to print unproved goals
 - WP          [2023-04-17] New option -wp-tactic to search for tactics
-- WP          [2023-05-02] New option -wp-strategy to activate proof strategies
+- WP          [2023-05-02] New option -wp-strategy s,... for default strategies
 - WP          [2023-04-17] New proof strategy engine
 - WP          [2023-04-17] ACSL extension 'strategy' for proof strategies
 - WP          [2023-04-17] ACSL extension 'proof' for proof resolution hints
