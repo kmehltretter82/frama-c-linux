@@ -8,8 +8,8 @@ uint32 s[2];
 /*@
 predicate equal_t_s{L}(ℤ i) =
   \at(t[i] ≡
-      (unsigned long const)((uint16)(*((uint8 *)((uint32 *)s) + i) ≡
-                                     *(((uint8 *)((uint32 *)s) + i) + 1))),
+      (unsigned long)((uint16)(*((uint8 *)((uint32 *)s) + i) ≡
+                               *(((uint8 *)((uint32 *)s) + i) + 1))),
       L);
  */
 uint8 Array[10];
@@ -21,10 +21,9 @@ predicate mypredl{L}=
   ∀ ℤ MyNum;
     0 ≤ MyNum < FCG_Number ⇒
     FCG_Var2[MyNum] ≡
-    (unsigned long \ghost)((uint16)(*((uint8 *)(&Array[FCG_Var1[MyNum]] + 1))
-                                    * 256 +
-                                    *((uint8 *)((&Array[FCG_Var1[MyNum]] +
-                                                 (1 + 2))
-                                                + 1))));
+    (unsigned long)((uint16)(*((uint8 *)(&Array[FCG_Var1[MyNum]] + 1)) * 256
+                             +
+                             *((uint8 *)((&Array[FCG_Var1[MyNum]] + (1 + 2))
+                                         + 1))));
  */
 

@@ -123,6 +123,16 @@ let plain_array_to_ptr ty =
 
 let array_to_ptr = plain_or_set plain_array_to_ptr
 
+let logic_type_remove_qualifiers =
+  let plain typ =
+    match unroll_type typ with
+    | Ctype t ->
+      let t' = Cil.type_remove_qualifier_attributes t in
+      if Cil_datatype.Typ.equal t t' then typ else Ctype t'
+    | _ -> typ
+  in
+  Logic_const.transform_element plain
+
 let coerce_type typ =
   let ty = Cil.unrollType typ in
   if Cil.isIntegralType ty then Linteger

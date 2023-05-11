@@ -78,6 +78,9 @@ val logicCType : logic_type -> typ
 (** transforms an array into pointer. *)
 val array_to_ptr : logic_type -> logic_type
 
+(** removes qualifiers if logic_type is a C type, identity otherwise. *)
+val logic_type_remove_qualifiers: logic_type -> logic_type
+
 (** C type to logic type, with implicit conversion for arithmetic types.
     @since 21.0-Scandium
 *)
