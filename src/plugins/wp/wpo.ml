@@ -296,7 +296,9 @@ struct
         (fun (prover,result) ->
            if result.verdict <> NoResult then
              Format.fprintf fmt "Prover %a returns %t@\n"
-               pp_prover prover (pp_result_qualif prover result)
+               pp_prover prover (pp_result_qualif prover result) ;
+           if Wp_parameters.CounterExample.get () then
+             VCS.pp_model fmt result.prover_model
         ) results ;
     end
 
@@ -377,7 +379,9 @@ struct
            if result.verdict <> NoResult then
              Format.fprintf fmt "Prover %a returns %t@\n"
                pp_prover prover
-               (pp_result_qualif prover result)
+               (pp_result_qualif prover result) ;
+           if Wp_parameters.CounterExample.get () then
+             pp_model fmt result.prover_model
         ) results ;
     end
 

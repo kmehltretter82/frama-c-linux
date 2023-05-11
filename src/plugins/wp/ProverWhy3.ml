@@ -1214,42 +1214,42 @@ let has_model_attr attrs =
       | Some _ as a -> a
     ) None attrs
 
-let print_model (res:Why3.Call_provers.prover_result) =
-  if Wp_parameters.CounterExample.get () then (
-    Wp_parameters.debug ~dkey:dkey_model "%a" (fun fmt ->
-        List.iter (fun (res,model) ->
-            Format.fprintf fmt "@[<hov 2>model %a: %a@]@\n" Why3.Call_provers.print_prover_answer
-              res (Why3.Model_parser.print_model_human ~filter_similar:false ~print_attrs:true) model
-          ))
-      res.pr_models;
-  )
+let debug_model (res:Why3.Call_provers.prover_result) =
+  if Wp_parameters.CounterExample.get () then
+    Wp_parameters.debug ~dkey:dkey_model "%t"
+      begin fun fmt ->
+        List.iter
+          begin fun (res,model) ->
+            Format.fprintf fmt "@[<hov 2>model %a: %a@]@\n"
+              Why3.Call_provers.print_prover_answer res
+              (Why3.Model_parser.print_model_human
+                 ~filter_similar:false
+                 ~print_attrs:true) model
+          end
+          res.pr_models
+      end
 
 let get_model probes (res:Why3.Call_provers.prover_result) =
-  print_model (res:Why3.Call_provers.prover_result);
+  debug_model (res:Why3.Call_provers.prover_result);
   (* we take the second model because it should be the most precise?? *)
   match res.pr_models with
   | [] -> Probe.Map.empty
   | _ ->
-    let r =
-      let index = Hashtbl.create 0 in
-      let _,model = Extlib.last res.pr_models in
-      let elements = Why3.Model_parser.get_model_elements model in
-      List.iter
-        (fun (e:Why3.Model_parser.model_element) ->
-           match has_model_attr e.me_attrs with
-           | None -> ()
-           | Some id -> Hashtbl.add index id e.me_concrete_value)
-        elements ;
-      Probe.Map.filter_map
-        (fun (p:Probe.t) _ ->
-           let id = string_of_int p.id in
-           try Some (Hashtbl.find index id)
-           with Not_found -> None
-        ) probes
-    in
-    Format.eprintf "@[model:%a@]@." Why3Provers.print_model r;
-    r
-
+    let index = Hashtbl.create 0 in
+    let _,model = Extlib.last res.pr_models in
+    let elements = Why3.Model_parser.get_model_elements model in
+    List.iter
+      (fun (e:Why3.Model_parser.model_element) ->
+         match has_model_attr e.me_attrs with
+         | None -> ()
+         | Some id -> Hashtbl.add index id e.me_concrete_value)
+      elements ;
+    Probe.Map.filter_map
+      (fun (p:Probe.t) _ ->
+         let id = string_of_int p.id in
+         try Some (Hashtbl.find index id)
+         with Not_found -> None
+      ) probes
 
 let ping_prover_call ~config probes p =
   match Why3.Call_provers.query_call p.call with
@@ -1282,11 +1282,14 @@ let ping_prover_call ~config probes p =
       match pr.pr_answer with
       | Timeout -> VCS.timeout pr.pr_time
       | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
-      | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps
-                     ~model:(get_model probes pr) VCS.Invalid
       | OutOfMemory -> VCS.failed "out of memory"
       | StepLimitExceeded -> VCS.result ?steps:p.steps VCS.Stepout
-      | Unknown _ -> print_model pr;
+      | Invalid ->
+        debug_model pr;
+        VCS.result ~time:pr.pr_time ~steps:pr.pr_steps
+          ~model:(get_model probes pr) VCS.Invalid
+      | Unknown _ ->
+        debug_model pr;
         VCS.result ~model:(get_model probes pr) VCS.Unknown
       | _ when p.interrupted -> VCS.timeout p.timeout
       | Failure s -> VCS.failed s

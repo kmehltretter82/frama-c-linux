@@ -78,7 +78,9 @@ class prover ~(console:Wtext.text) ~prover =
         let lerr = Sys.file_exists ferr in
         if lout || lerr then console#hrule ;
         console#scroll () ;
-        console#printf "[%a] %a@." VCS.pp_prover prover VCS.pp_result res ;
+        console#printf "[%a] %a@.%a" VCS.pp_prover prover
+          VCS.pp_result res
+          VCS.pp_model res.prover_model ;
         if lout then Command.pp_from_file console#fmt fout ;
         if lerr then Command.pp_from_file console#fmt ferr ;
         if lout || lerr then console#hrule ;

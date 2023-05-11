@@ -43,8 +43,7 @@ val is_available : t -> bool
 val is_mainstream : t -> bool
 val has_shortcut : t -> string -> bool
 
-type model = Why3.Model_parser.concrete_syntax_term Probe.Map.t
-val empty_model : model
+type model = Why3.Model_parser.concrete_syntax_term
+val pp_model : model Pretty_utils.formatter
 
-val print_model : model Pretty_utils.formatter
 (**************************************************************************)

@@ -87,6 +87,8 @@ type verdict =
   | Valid
   | Failed
 
+type model = Why3Provers.model Probe.Map.t
+
 type result = {
   verdict : verdict ;
   cached : bool ;
@@ -95,7 +97,7 @@ type result = {
   prover_steps : int ;
   prover_errpos : Lexing.position option ;
   prover_errmsg : string ;
-  prover_model : Why3Provers.model;
+  prover_model : model ;
 }
 
 val no_result : result
@@ -109,7 +111,7 @@ val failed : ?pos:Lexing.position -> string -> result
 val kfailed : ?pos:Lexing.position -> ('a,Format.formatter,unit,result) format4 -> 'a
 val cached : result -> result (** only for true verdicts *)
 
-val result : ?model:Why3Provers.model -> ?cached:bool ->
+val result : ?model:model -> ?cached:bool ->
   ?solver:float -> ?time:float -> ?steps:int -> verdict -> result
 
 val is_auto : prover -> bool
@@ -130,6 +132,7 @@ val autofit : result -> bool (** Result that fits the default configuration *)
 val name_of_verdict : verdict -> string
 
 val pp_result : Format.formatter -> result -> unit
+val pp_model : Format.formatter -> model -> unit
 val pp_result_qualif : ?updating:bool -> prover -> result ->
   Format.formatter -> unit
 

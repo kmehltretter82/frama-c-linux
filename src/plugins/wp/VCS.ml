@@ -195,6 +195,8 @@ type verdict =
   | Valid
   | Failed
 
+type model = Why3Provers.model Probe.Map.t
+
 type result = {
   verdict : verdict ;
   cached : bool ;
@@ -203,7 +205,7 @@ type result = {
   prover_steps : int ;
   prover_errpos : Lexing.position option ;
   prover_errmsg : string ;
-  prover_model : Why3Provers.model;
+  prover_model : model ;
 }
 
 let is_result = function
@@ -263,7 +265,7 @@ let autofit r =
   time_fits r.prover_time &&
   step_fits r.prover_steps
 
-let result ?(model=Why3Provers.empty_model) ?(cached=false) ?(solver=0.0) ?(time=0.0) ?(steps=0) verdict =
+let result ?(model=Probe.Map.empty) ?(cached=false) ?(solver=0.0) ?(time=0.0) ?(steps=0) verdict =
   {
     verdict ;
     cached = cached ;
@@ -290,7 +292,7 @@ let failed ?pos msg = {
   prover_steps = 0 ;
   prover_errpos = pos ;
   prover_errmsg = msg ;
-  prover_model = Why3Provers.empty_model
+  prover_model = Probe.Map.empty ;
 }
 
 let cached r = if is_verdict r then { r with cached=true } else r
@@ -325,14 +327,18 @@ let name_of_verdict = function
   | Stepout -> "stepout"
   | Timeout -> "timeout"
 
+let pp_hasmodel fmt (r : result) =
+  if not @@ Probe.Map.is_empty r.prover_model then
+    Format.fprintf fmt " (Model)"
+
 let pp_result fmt r =
   match r.verdict with
   | NoResult -> Format.pp_print_string fmt "No Result"
   | Computing _ -> Format.pp_print_string fmt "Computing"
-  | Invalid -> Format.pp_print_string fmt "Invalid"
   | Failed -> Format.fprintf fmt "Failed@ %s" r.prover_errmsg
   | Valid -> Format.fprintf fmt "Valid%a" pp_perf_shell r
-  | Unknown -> Format.fprintf fmt "Unknown%a" pp_perf_shell r
+  | Invalid -> Format.fprintf fmt "Invalid%a" pp_hasmodel r
+  | Unknown -> Format.fprintf fmt "Unknown%a%a" pp_hasmodel r pp_perf_shell r
   | Stepout -> Format.fprintf fmt "Step limit%a" pp_perf_shell r
   | Timeout -> Format.fprintf fmt "Timeout%a" pp_perf_shell r
 
@@ -348,22 +354,31 @@ let pp_cache_miss fmt st updating prover result =
   then
     Format.fprintf fmt "%s%a (missing cache)" st pp_perf_forced result
   else
-    Format.pp_print_string fmt @@
-    if is_valid result then "Valid" else "Unsuccess"
+  if is_valid result then
+    Format.pp_print_string fmt "Valid"
+  else
+    Format.fprintf fmt "Unsuccess%a" pp_hasmodel result
 
 let pp_result_qualif ?(updating=true) prover result fmt =
   if Wp_parameters.has_dkey dkey_shell then
     match result.verdict with
     | NoResult -> Format.pp_print_string fmt "No Result"
     | Computing _ -> Format.pp_print_string fmt "Computing"
-    | Invalid -> Format.pp_print_string fmt "Invalid"
     | Failed -> Format.fprintf fmt "Failed@ %s" result.prover_errmsg
     | Valid -> pp_cache_miss fmt "Valid" updating prover result
+    | Invalid -> pp_cache_miss fmt "Invalid" updating prover result
     | Unknown -> pp_cache_miss fmt "Unsuccess" updating prover result
     | Timeout -> pp_cache_miss fmt "Timeout" updating prover result
     | Stepout -> pp_cache_miss fmt "Stepout" updating prover result
   else
     pp_result fmt result
+
+let pp_model fmt model =
+  Probe.Map.iter
+    (fun probe model ->
+       Format.fprintf fmt "@[<hov 2>Model %a = %a@]@\n"
+         Probe.pretty probe Why3Provers.pp_model model
+    ) model
 
 let vrank = function
   | NoResult | Computing _ -> 0
