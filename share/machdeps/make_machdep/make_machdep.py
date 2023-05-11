@@ -176,9 +176,15 @@ def make_machdep():
 
 machdep = make_machdep()
 
-compilation_command = [args.compiler] + args.cpp_arch_flags + args.compiler_flags
+compilation_command = [args.compiler]
+
+for flag in args.cpp_arch_flags + args.compiler_flags:
+    compilation_command = compilation_command + flag.split(" ")
 
 source_files = [
+    # sanity_check is juste here to ensure that the given compiler
+    # and flags are coherent. It must be kept at the top of the list.
+    ("sanity_check.c", "none"),
     ("sizeof_short.c", "number"),
     ("sizeof_int.c", "number"),
     ("sizeof_long.c", "number"),
@@ -317,6 +323,12 @@ for f, typ in source_files:
         print(f"[INFO] running command: {' '.join(cmd)}")
     proc = subprocess.run(cmd, capture_output=True)
     Path(f).with_suffix(".o").unlink(missing_ok=True)
+    if typ == "none":
+        if proc.returncode != 0:
+            logging.critical("cannot compile sample C file with provided compiler and flags.")
+            logging.info(f"compiler output is:{proc.stderr.decode()}")
+            sys.exit(1)
+        continue
     if typ == "macro":
         if proc.returncode != 0:
             logging.warning(f"error in preprocessing value '{p}', some values won't be filled")
