@@ -24,6 +24,4 @@
 
 #if defined(_POSIX_VERSION)
 long posix_version_is = _POSIX_VERSION;
-#else
-#error "not a posix arch"
 #endif

@@ -169,8 +169,8 @@ def default_value(typ):
 
 def make_machdep():
     machdep = {}
-    for key, value in schema.items():
-        machdep[key] = default_value(value["type"])
+    for key in schema:
+        machdep[key] = None
     return machdep
 
 
@@ -269,8 +269,7 @@ def find_value(name, typ, output):
             machdep[name] = value
         else:
             logging.warning(
-                f"cannot find value of field '{name}', using default value: '{default}'",
-                stacklevel=-1,
+                f"cannot find value of field '{name}', using default value: '{default}'"
             )
             machdep[name] = default
             if args.verbose:
@@ -419,7 +418,9 @@ else:
 missing_fields = [f for [f, v] in machdep.items() if v is None]
 
 if missing_fields:
-    print("WARNING: the following fields are missing from the machdep definition:")
-    print(", ".join(missing_fields))
+    msg = ", ".join(missing_fields)
+    logging.warning(f"the following fields are missing from the machdep definition: {msg}")
+    for field in missing_fields:
+        machdep[field] = default_value(schema[field]["type"])
 
 print_machdep(machdep)

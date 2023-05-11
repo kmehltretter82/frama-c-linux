@@ -3240,11 +3240,20 @@ is to use standard output).
 \item \texttt{--help}: outputs the list of all options of the script.
 \end{description}
 
+Note that for some compiler setups, notably for non-POSIX compilation targets,
+the script may fail to find an appropriate value for some fields and will
+instead put some default value. In that case, warnings will give the names of
+the problematic fields. Since the issue likely stems from the fact that the
+corresponding C feature is not supported on the compilation target in the first
+place, in practice, such feature is not expected to be found in code written for
+such target. However, users are invited to review the generated YAML and
+provide more appropriate values for these fields if needed.
+
 In order to communicate machine-related information to the preprocessor (notably
 the value of standard macros), \framac generates a specific header,
 \verb+__fc_machdep.h+, that is automatically included by the standard headers from
 \framac's standard C library. Field \verb+custom_defs+ of the YAML file allows
-customizing this header (see next section for more information)
+customizing this header (see next section for more information).
 
 \subsection{Machdep record fields}\label{sec:machdep-fields}
 
