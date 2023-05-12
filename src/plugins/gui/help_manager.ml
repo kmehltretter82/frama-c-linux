@@ -64,6 +64,7 @@ let show main_ui =
     "Armand Puccetti";
     "Félix Ridoux";
     "Virgile Robles";
+    "Jan Rochel";
     "Muriel Roger";
     "Julien Signoles";
     "Nicolas Stouls";
