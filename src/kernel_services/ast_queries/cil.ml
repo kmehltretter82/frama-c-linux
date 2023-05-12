@@ -234,6 +234,12 @@ let pp_lval_ref = Extlib.mk_fun "Cil.pp_lval_ref"
 let pp_ikind_ref = Extlib.mk_fun "Cil.pp_ikind_ref"
 let pp_attribute_ref = Extlib.mk_fun "Cil.pp_attribute_ref"
 let pp_attributes_ref = Extlib.mk_fun "Cil.pp_attributes_ref"
+let pp_term_ref = Extlib.mk_fun "Cil.pp_term_ref"
+let pp_logic_type_ref = Extlib.mk_fun "Cil.pp_logic_type_ref"
+let pp_identified_term_ref = Extlib.mk_fun "Cil.pp_identified_term_ref"
+let pp_location_ref = Extlib.mk_fun "Cil.pp_location_ref"
+let pp_from_ref = Extlib.mk_fun "Cil.pp_from_ref"
+let pp_behavior_ref = Extlib.mk_fun "Cil.pp_behavior_ref"
 
 let default_behavior_name = "default!"
 let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes =[]

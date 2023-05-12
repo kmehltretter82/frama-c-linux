@@ -2362,6 +2362,12 @@ val pp_lval_ref: (Format.formatter -> lval -> unit) ref
 val pp_ikind_ref: (Format.formatter -> ikind -> unit) ref
 val pp_attribute_ref: (Format.formatter -> attribute -> unit) ref
 val pp_attributes_ref: (Format.formatter -> attribute list -> unit) ref
+val pp_term_ref: (Format.formatter -> term -> unit) ref
+val pp_logic_type_ref: (Format.formatter -> logic_type -> unit) ref
+val pp_identified_term_ref: (Format.formatter -> identified_term -> unit) ref
+val pp_location_ref: (Format.formatter -> location -> unit) ref
+val pp_from_ref: (Format.formatter -> from -> unit) ref
+val pp_behavior_ref: (Format.formatter -> behavior -> unit) ref
 
 val set_extension_handler:
   visit:(string -> cilVisitor -> acsl_extension_kind ->
