@@ -708,10 +708,10 @@ module Interactive = String
       let help =
         "WP mode for interactive Why-3 provers (eg: Coq):\n\
          - 'batch': check current proof (default)\n\
-         - 'update': update and check proof\n\
-         - 'edit': edit proof before check\n\
-         - 'fix': check and edit proof if necessary\n\
-         - 'fixup': update proof and fix\n\
+         - 'update': check updated proof\n\
+         - 'edit': edit current proof\n\
+         - 'fix': check current proof and edit if needed\n\
+         - 'fixup': update proof, check it and edit if needed\n\
         "
     end)
 
