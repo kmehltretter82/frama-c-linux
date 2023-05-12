@@ -79,13 +79,13 @@ let do_print_goal_status fmt (g : Wpo.t) =
   if not (Wpo.is_valid g || Wpo.is_smoke_test g) then
     begin
       do_print_index fmt g.po_idx ;
+      Wpo.pp_goal fmt g ;
       if ProofSession.exists g then
         Format.fprintf fmt "Script %a@\n" ProofSession.pp_file
           (ProofSession.filename ~force:false g) ;
       begin
         match ProofEngine.get g with
-        | `None | `Script ->
-          Wpo.pp_goal fmt g
+        | `None | `Script -> ()
         | `Proof | `Saved ->
           let tree = ProofEngine.proof ~main:g in
           match ProofEngine.status tree with
@@ -93,14 +93,14 @@ let do_print_goal_status fmt (g : Wpo.t) =
             Wpo.pp_goal fmt g
           | `Pending n | `StillResist n ->
             for i = 0 to n-1 do
-              Format.fprintf fmt "Subgoal %d/%d:@\n" (succ i) n ;
+              Format.fprintf fmt "%tSubgoal %d/%d:@\n" Wpo.pp_flow (succ i) n ;
               ProofEngine.goto tree (`Leaf i) ;
               do_print_current fmt tree ;
               let g = ProofEngine.head tree in
               Wpo.pp_goal fmt g
             done
       end ;
-      Format.pp_print_newline fmt () ;
+      Wpo.pp_flow fmt ;
     end
 
 let do_wp_print_status () =
@@ -504,7 +504,8 @@ let spawn_wp_proofs ~script goals =
             && not (Wpo.is_trivial goal)
             && (script.auto <> [] ||
                 ProofSession.exists goal ||
-                Wp_parameters.DefaultStrategies.get () <> [])
+                Wp_parameters.DefaultStrategies.get () <> [] ||
+                ProofStrategy.hints goal <> [])
            then
              ProverScript.spawn
                ~failed:false
