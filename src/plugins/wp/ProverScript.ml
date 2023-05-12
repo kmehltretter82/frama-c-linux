@@ -504,7 +504,7 @@ let rec process env node =
 
 let task
     ~valid ~failed ~provers
-    ~depth ~width ~backtrack ~auto
+    ~depth ~width ~backtrack ~auto ~scratch
     ~start ~progress ~result ~success wpo =
   begin fun () ->
     Wp_parameters.debug ~dkey:dkey_pp_allgoals "%a" Wpo.pp_goal_flow wpo ;
@@ -513,8 +513,10 @@ let task
     then
       ( success wpo (Some VCS.Qed) ; Task.return ())
     else
-      let json = ProofSession.load wpo in
-      let script = Priority.sort (ProofScript.decode json) in
+      let script =
+        if scratch then [] else
+          Priority.sort @@ ProofScript.decode @@ ProofSession.load wpo
+      in
       let tree = ProofEngine.proof ~main:wpo in
       let env = Env.make tree
           ~valid ~failed ~provers
@@ -529,7 +531,7 @@ let task
 (* -------------------------------------------------------------------------- *)
 
 type 'a process =
-  ?valid:bool -> ?failed:bool -> ?provers:VCS.prover list ->
+  ?valid:bool -> ?failed:bool -> ?scratch:bool -> ?provers:VCS.prover list ->
   ?depth:int -> ?width:int -> ?backtrack:int ->
   ?auto:Strategy.heuristic list ->
   ?start:(Wpo.t -> unit) ->
@@ -543,23 +545,23 @@ let skip2 _ _ = ()
 let skip3 _ _ _ = ()
 
 let prove
-    ?(valid = true) ?(failed = true) ?(provers = [])
+    ?(valid = true) ?(failed = true) ?(scratch = false) ?(provers = [])
     ?(depth = 0) ?(width = 0) ?(backtrack = 0) ?(auto = [])
     ?(start = skip1) ?(progress = skip2) ?(result = skip3) ?(success = skip2)
     wpo =
   Task.todo (task
                ~valid ~failed ~provers
-               ~depth ~width ~backtrack ~auto
+               ~depth ~width ~backtrack ~auto ~scratch
                ~start ~progress ~result ~success wpo)
 
 let spawn
-    ?(valid = true) ?(failed = true) ?(provers = [])
+    ?(valid = true) ?(failed = true) ?(scratch = false) ?(provers = [])
     ?(depth = 0) ?(width = 0) ?(backtrack = 0) ?(auto = [])
     ?(start = skip1) ?(progress = skip2) ?(result = skip3) ?(success = skip2)
     wpo =
   schedule (task
               ~valid ~failed ~provers
-              ~depth ~width ~backtrack ~auto
+              ~depth ~width ~backtrack ~auto ~scratch
               ~start ~progress ~result ~success wpo)
 
 let search

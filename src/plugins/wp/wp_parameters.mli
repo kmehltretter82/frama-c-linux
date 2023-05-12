@@ -121,6 +121,7 @@ module DryFinalizeScripts: Parameter_sig.Bool
 module Provers: Parameter_sig.String_list
 module Interactive: Parameter_sig.String
 module StrategyEngine: Parameter_sig.Bool
+module ScriptMode: Parameter_sig.String
 module DefaultStrategies: Parameter_sig.String_list
 module RunAllProvers: Parameter_sig.Bool
 module Cache: Parameter_sig.String

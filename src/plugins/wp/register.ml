@@ -482,8 +482,9 @@ let do_list_scheduled_result () =
 
 type script = {
   mutable tactical : bool ;
+  mutable scratch : bool ;
   mutable update : bool ;
-  mutable on_stdout : bool ;
+  mutable stdout : bool ;
   mutable depth : int ;
   mutable width : int ;
   mutable backtrack : int ;
@@ -509,6 +510,7 @@ let spawn_wp_proofs ~script goals =
            then
              ProverScript.spawn
                ~failed:false
+               ~scratch:script.scratch
                ~auto:script.auto
                ~depth:script.depth
                ~width:script.width
@@ -566,7 +568,8 @@ let dump_strategies =
                )))
 
 let default_script_mode () = {
-  tactical = false ; update=false ; on_stdout = false ; provers = [] ;
+  provers = [] ;
+  tactical = false ; update = false ; scratch = false ; stdout = false ;
   depth=0 ; width = 0 ; auto=[] ; backtrack = 0 ;
 }
 
@@ -649,7 +652,7 @@ let do_collect_session goals =
     removed = !removed ; }
 
 let do_update_session script session =
-  let stdout = script.on_stdout in
+  let stdout = script.stdout in
   List.iter
     begin fun (g, _, s) ->
       (* we always mark existing scripts *)
@@ -733,8 +736,16 @@ let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
     script.tactical <- tip ;
     script.update <- tip ;
   end ;
+  begin match Wp_parameters.ScriptMode.get () with
+    | "default" -> ()
+    | "batch" -> script.update <- false
+    | "update" -> script.update <- true
+    | "init" -> script.scratch <- true
+    | "dry" -> script.scratch <- true ; script.update <- false
+    | opt -> Wp_parameters.error "Invalid -wp-script '%s' option" opt
+  end ;
   begin
-    script.on_stdout <- Wp_parameters.ScriptOnStdout.get ();
+    script.stdout <- Wp_parameters.ScriptOnStdout.get ();
   end ;
   let spawned = script.tactical || script.provers <> [] in
   begin

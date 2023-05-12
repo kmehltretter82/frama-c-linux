@@ -716,6 +716,21 @@ module Interactive = String
     end)
 
 let () = Parameter_customize.set_group wp_prover
+module ScriptMode = String
+    (struct
+      let option_name = "-wp-script"
+      let arg_name = "mode"
+      let default = "default"
+      let help =
+        "WP mode for managing scripts and proof strategies:\n\
+         - 'batch': replay from existing scripts (default for script prover)\n\
+         - 'update': replay and update scripts (default for tip prover)\n\
+         - 'init': replay from scratch and save scripts\n\
+         - 'dry': replay from scratch, no script update\n\
+        "
+    end)
+
+let () = Parameter_customize.set_group wp_prover
 module StrategyEngine = True
     (struct
       let option_name = "-wp-strategy-engine"
