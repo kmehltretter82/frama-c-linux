@@ -30,11 +30,6 @@
   )
 )
 
-( env
-  (release (flags -noassert))
-  (_ (flags (:standard -w @a-4)))
-)
-
 ( library
   (name Alias)
   (public_name frama-c-alias.core)

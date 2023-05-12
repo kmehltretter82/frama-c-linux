@@ -21,15 +21,5 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-(using dune_site 0.1)
-(generate_opam_files true)
-
 (name frama-c-alias)
-
-(package (name frama-c-alias)
- (depends
-  ("frama-c" (and (>= 25.0) (< 27.0)))
-  ("unionFind" (= 20220122))
- )
-)
+(using dune_site 0.1)
