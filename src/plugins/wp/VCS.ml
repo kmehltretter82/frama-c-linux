@@ -388,14 +388,22 @@ let vrank = function
   | Valid -> 4
   | Invalid -> 5
 
+let msize m = Probe.Map.fold (fun _ _ n -> succ n) m 0
+
 let compare p q =
-  let r = vrank q.verdict - vrank p.verdict in
-  if r <> 0 then r else
-    let s = Stdlib.compare p.prover_steps q.prover_steps in
+  match is_valid p , is_valid q with
+  | true , false -> (-1)
+  | false , true -> (+1)
+  | _ ->
+    let s = msize q.prover_model - msize p.prover_model in
     if s <> 0 then s else
-      let t = Stdlib.compare p.prover_time q.prover_time in
-      if t <> 0 then t else
-        Stdlib.compare p.solver_time q.solver_time
+      let r = vrank q.verdict - vrank p.verdict in
+      if r <> 0 then r else
+        let s = Stdlib.compare p.prover_steps q.prover_steps in
+        if s <> 0 then s else
+          let t = Stdlib.compare p.prover_time q.prover_time in
+          if t <> 0 then t else
+            Stdlib.compare p.solver_time q.solver_time
 
 let combine v1 v2 =
   match v1 , v2 with
@@ -420,11 +428,7 @@ let merge r1 r2 =
         r1.prover_model r2.prover_model
   }
 
-let leq r1 r2 =
-  match is_valid r1 , is_valid r2 with
-  | true , false -> true
-  | false , true -> false
-  | _ -> compare r1 r2 <= 0
+let leq r1 r2 = compare r1 r2 <= 0
 
 let choose r1 r2 = if leq r1 r2 then r1 else r2
 let best = List.fold_left choose no_result
