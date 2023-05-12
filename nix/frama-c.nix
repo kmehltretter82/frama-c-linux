@@ -33,6 +33,7 @@
 , ppx_deriving_yaml
 , ppx_deriving_yojson
 , ppx_import
+, unionFind
 , yojson
 , which
 , why3
@@ -91,6 +92,7 @@ stdenvNoCC.mkDerivation rec {
     ppx_deriving_yaml
     ppx_deriving_yojson
     ppx_import
+    unionFind
     yojson
     which
     why3
