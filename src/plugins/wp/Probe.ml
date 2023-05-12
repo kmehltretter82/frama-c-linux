@@ -46,7 +46,7 @@ struct
   let hash x = x.id
   let equal x y = Int.equal x.id y.id
   let compare x y = Int.compare x.id y.id
-  let pretty fmt p = Format.fprintf fmt "%s~%i" p.name p.id
+  let pretty fmt p = Format.fprintf fmt "#%d(%s)" p.id p.name
 end
 
 include Datatype.Make_with_collections(S)

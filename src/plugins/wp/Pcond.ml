@@ -221,8 +221,8 @@ class engine (lang : #Plang.engine) =
 
     method pp_probe fmt p t =
       begin
-        Format.fprintf fmt "@[<hov 4>%a %s = %a.@]"
-          self#pp_clause "Probe" p.Probe.name lang#pp_term t
+        Format.fprintf fmt "@[<hov 4>%a %a = %a.@]"
+          self#pp_clause "Probe" Probe.pretty p lang#pp_term t
       end
 
     (* -------------------------------------------------------------------------- *)
