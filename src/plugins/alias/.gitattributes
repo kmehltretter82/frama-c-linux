@@ -4,27 +4,6 @@
 
 Changelog merge=union
 
-##################################################
-# BINARY/CHECK-SYNTAX/INDENT/EOL-EOF: set/-unset #
-##################################################
-
-# note: "binary" is a built-in macro that also
-#       unsets the "text" and "diff" attributes
-
-# note: set "check-eoleof" and "check-utf8" by default to all files
-* check-eoleof check-utf8
-
-# note: unset "-check-eoleof" and "-check-utf8" for "binary"
-*.jpg binary -check-eoleof -check-utf8
-*.pdf binary -check-eoleof -check-utf8
-
-###########################################
-# CHECK-SYNTAX/INDENT/EOL-EOF: set/-unset #
-###########################################
-
-*.ml  check-syntax check-indent -check-eoleof
-*.mli check-syntax check-indent -check-eoleof
-
 ################################
 # HEADER_SPEC: LICENSE.Alias #
 ################################
@@ -69,7 +48,6 @@ README* header_spec=.ignore
 # OCaml
 
 /*.opam* header_spec=.ignore
-/.ocp-indent header_spec=.ignore
 
 #Tests
 
