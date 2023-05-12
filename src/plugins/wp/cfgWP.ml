@@ -1445,13 +1445,13 @@ struct
     let pre = M.alloc sigma xs in
     let hs = M.scope { pre ; post = sigma } scope xs in
     let vcs = gmap (assume_vc ~descr hs) wp.vcs in
-    let xps =
-      List.map
-        (fun x ->
-           let tau = Ctypes.object_of x.vtype in
-           x, C.cval @@ M.load sigma tau @@ M.cvar x) xs in
     let vcs =
       if probes then
+        let xps =
+          List.map
+            (fun x ->
+               let tau = Ctypes.object_of x.vtype in
+               x, C.cval @@ M.load sigma tau @@ M.cvar x) xs in
         gmap
           (List.fold_right
              (fun (x,v) vc -> probe ~loc:x.vdecl ~name:x.vname v vc) xps) vcs
