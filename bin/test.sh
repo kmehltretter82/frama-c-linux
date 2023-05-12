@@ -26,6 +26,7 @@ CONFIG="<all>"
 VERBOSE=
 UPDATE=
 LOGS=
+COMMIT=
 TESTS=
 SAVE=
 
@@ -66,8 +67,9 @@ function Usage
     echo "  -r|--clean          clean (remove all) test results (includes -p)"
     echo "  -p|--ptests         prepare (all) dune files"
     echo "  -w|--wp-cache       prepare (pull) WP-cache"
-    echo "  -u|--update         run tests and update (local) WP-cache"
+    echo "  -u|--wp-update      update (pull+add) WP-cache"
     echo "  -l|--logs           print output of tests (single file, no diff)"
+    echo "  -k|--commit         commit results as oracles (single file, no diff)"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
     echo "  -h|--help           print this help"
@@ -249,6 +251,9 @@ function TestFile
     else
         ALIAS=$DIR/$RESULT/${FILE%.*}.diff
     fi
+    if [ "$COMMIT" = "yes" ]; then
+        COMMITS="${COMMITS} $DIR/$RESULT/${FILE%.*}"
+    fi
     Head "Register test on file $1 $CFG"
     DUNE_ALIAS="${DUNE_ALIAS} @$ALIAS"
 }
@@ -271,6 +276,27 @@ function Register
                 *) ErrorUsage "ERROR: don't known what to do with '$1'";;
             esac
         fi
+        shift
+    done
+}
+
+# --------------------------------------------------------------------------
+# ---  Tests Commits
+# --------------------------------------------------------------------------
+
+function Commits
+{
+    while [ "$1" != "" ]
+    do
+        cd _build/default
+        for log in $1*.res.log
+        do
+            echo "Commit $log"
+            dest="${log//result/oracle}"
+            dest="${dest//res.log/res.oracle}"
+            cp -f $log "../../$dest"
+        done
+        cd ../..
         shift
     done
 }
@@ -305,8 +331,9 @@ function Status
 
     #-- Check wp-cache status
     if [ "$UPDATE" = "yes" ]; then
-        Head "Check $FRAMAC_WP_CACHEDIR status"
+        Head "Update $FRAMAC_WP_CACHEDIR and check status"
         RequiredTools git
+        Run git -C $FRAMAC_WP_CACHEDIR add -A
         Run git -C $FRAMAC_WP_CACHEDIR status -s
     fi
 }
@@ -336,7 +363,8 @@ do
         "-w"|"--wp-cache")
             PullCache
             ;;
-        "-u"|"--update")
+        "-u"|"--wp-update")
+            PullCache
             FRAMAC_WP_CACHE=update
             UPDATE=yes
             ;;
@@ -347,8 +375,11 @@ do
         "-l"|"--logs")
             LOGS=yes
             ;;
+        "-k"|"--commit")
+            COMMIT=yes
+            ;;
         "-s"|"--save" )
-             SAVE=yes
+            SAVE=yes
             ;;
         "-d"|"--default")
             CONFIG="<default>"
@@ -377,4 +408,5 @@ do
 done
 Register $TESTS
 RunAlias ${DUNE_ALIAS}
+Commits ${COMMITS}
 Status $DUNE_LOG
