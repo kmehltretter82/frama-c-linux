@@ -1,0 +1,48 @@
+##########################################################################
+#                                                                        #
+#  This file is part of the Frama-C plug-in 'Alias' (alias).             #
+#                                                                        #
+#  Copyright (C) 2022-2023                                               #
+#    CEA (Commissariat à l'énergie atomique et aux énergies              #
+#         alternatives)                                                  #
+#                                                                        #
+#  you can redistribute it and/or modify it under the terms of the GNU   #
+#  Lesser General Public License as published by the Free Software       #
+#  Foundation, version 2.1.                                              #
+#                                                                        #
+#  It is distributed in the hope that it will be useful,                 #
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         #
+#  GNU Lesser General Public License for more details.                   #
+#                                                                        #
+#  See the GNU Lesser General Public License version 2.1                 #
+#  for more details (enclosed in the file LICENSE)                       #
+#                                                                        #
+##########################################################################
+
+YEAR:=$(shell date +%Y)
+
+ifeq (${HEADER_OPEN_SOURCE},yes)
+DEFAULT_HEADER_DIR:=headers/open-source
+else
+DEFAULT_HEADER_DIR:=headers/close-source
+endif
+
+headers/%/LICENSE.${PLUGIN_NAME}: headers/%/LICENSE.template FORCE_LICENSES
+	@sed -e "s/@SHORT_NAME@/${SHORT_NAME}/" \
+			 -e "s/@LONG_NAME@/${LONG_NAME}/" \
+			 -e "s/@FROM_YEAR@/${FROM_YEAR}/" \
+			 -e "s/@YEAR@/${YEAR}/" \
+			 $< > $@
+
+LICENSE.${PLUGIN_NAME}: ${DEFAULT_HEADER_DIR}/LICENSE.${PLUGIN_NAME} FORCE_LICENSES
+	cp $< $@
+
+.PHONY: FORCE_LICENSES
+FORCE_LICENSES:
+
+# Extend headers rule dependencies, make sure to update all license files
+headers: \
+	headers/open-source/LICENSE.${PLUGIN_NAME} \
+	headers/close-source/LICENSE.${PLUGIN_NAME} \
+	LICENSE.${PLUGIN_NAME}

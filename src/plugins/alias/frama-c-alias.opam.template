@@ -1,0 +1,14 @@
+name: "frama-c-alias"
+version: "26"
+synopsis: "A Frama-C plug-in for Alias Analysis"
+description: """
+  A Frama-C plug-in for Alias Analysis
+"""
+maintainer: "https://git.frama-c.com/pub/frama-c"
+authors: [
+  "Tristan Le Gall"
+  "Jan Rochel"
+]
+license: "Copyright (C) 2022-2022 CEA LIST, All rights reserved. Contact CEA LIST for licensing."
+homepage: "http://frama-c.com/"
+bug-reports: "https://git.frama-c.com/pub/frama-c"

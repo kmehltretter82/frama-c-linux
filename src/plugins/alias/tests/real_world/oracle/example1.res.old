@@ -1,0 +1,403 @@
+[kernel] Parsing example1.c (with preprocessing)
+[alias] Parsing done
+[alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
+[alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
+[alias] In a function call, parameter (x <- *(idata + idx)) is ignored)
+[alias] Warning: a function with no return is employed in an assignment
+[alias] Skipping assignment *(odata + idx) = 0.5 * tmp_1 (BUG do_assignment 2)
+[alias] In a function call, parameter (x <- *(idata + idx)) is ignored)
+[alias] Warning: a function with no return is employed in an assignment
+[alias] Skipping assignment *(odata + idx) = 0.5 * tmp_1 (BUG do_assignment 2)
+[alias] Skipping assignment idata = tmp->t2[*(tmp->n2)] (not implemented)
+[alias] Skipping assignment odata = tmp->t1[*(tmp->n1)] (not implemented)
+[alias] Warning: DEBUG return stmt of f1 not in table
+[alias] Warning: Analysis is continuing but will not be sound
+[alias] Skipping assignment idata = tmp->t1[*(tmp->n1)] (not implemented)
+[alias] Skipping assignment odata = tmp->t2[*(tmp->n2)] (not implemented)
+[alias] Skipping assignment *(odata + idx) = (double)3 * *(idata + idx) + (double)1 (BUG do_assignment 2)
+[alias] Skipping assignment *(odata + idx) = (double)3 * *(idata + idx) + (double)1 (BUG do_assignment 2)
+[alias] Skipping assignment idata = tmp->t1[*(tmp->n1)] (not implemented)
+[alias] Skipping assignment odata = tmp->t2[*(tmp->n2)] (not implemented)
+[alias] Warning: DEBUG return stmt of f2 not in table
+[alias] Warning: Analysis is continuing but will not be sound
+[alias] Skipping assignment a->t1[i] = malloc() (not implemented)
+[alias] Skipping assignment a->t2[i] = malloc() (not implemented)
+[alias] Skipping assignment a->t1[i] = malloc() (not implemented)
+[alias] Skipping assignment a->t2[i] = malloc() (not implemented)
+[alias] Skipping assignment a->n1 = malloc() (not implemented)
+[alias] Skipping assignment a->n2 = malloc() (not implemented)
+[alias] May-aliases at the end of function main:
+  <list of may-alias>
+  {b.n1; b; } are aliased
+  {b.n1; b.n2; b; } are aliased
+  {*a; *b.t1[i]; *b.t2[i]; *b.n1; *b.n2; *b; } are aliased
+  <end of list>
+[alias] Functions done
+Before statement b->t1[i] = a->t1[i]; :
+ <list of may-alias>
+{*a; *b.t1[i]; *b.t2[i]; } are aliased
+<end of list>
+
+Before statement idx = 0; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement b->t2[i] = a->t2[i]; :
+ <list of may-alias>
+{*a; *b.t1[i]; *b.t2[i]; } are aliased
+<end of list>
+
+Before statement while (idx < 10) {
+                   *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
+                   idx ++;
+                 } :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement if (*n == 1) *n = 0; else (*n) ++; :
+ <list of may-alias>
+<end of list>
+
+Before statement i ++; :
+ <list of may-alias>
+{*a; *b.t1[i]; *b.t2[i]; } are aliased
+<end of list>
+
+Before statement if (*n == 1) *n = 0; else (*n) ++; :
+ <list of may-alias>
+<end of list>
+
+Before statement b->n1 = a->n1; :
+ <list of may-alias>
+{*a; *b.t1[i]; *b.t2[i]; } are aliased
+<end of list>
+
+Before statement if (! (idx < 10)) break; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement *n = 0; :
+ <list of may-alias>
+<end of list>
+
+Before statement b->n2 = a->n2; :
+ <list of may-alias>
+{*a; *b.t1[i]; *b.t2[i]; *b.n1; *b; } are aliased
+{b.n1; b; } are aliased
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement (*n) ++; :
+ <list of may-alias>
+<end of list>
+
+Before statement f1(a); :
+ <list of may-alias>
+{*a; *b.t1[i]; *b.t2[i]; *b.n1; *b.n2; *b; } are aliased
+{b.n1; b; } are aliased
+{b.n1; b.n2; b; } are aliased
+<end of list>
+
+Before statement *(odata + idx) = (double)3 * *(idata + idx) + (double)1; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement f2(b); :
+ <list of may-alias>
+{b.n1; b; } are aliased
+{b.n1; b.n2; b; } are aliased
+{*a; *b.t1[i]; *b.t2[i]; *b.n1; *b.n2; *b; } are aliased
+<end of list>
+
+Before statement *(odata + idx) = (double)3 * *(idata + idx) + (double)1; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement __retres = 0; :
+ <list of may-alias>
+{b.n1; b; } are aliased
+{b.n1; b.n2; b; } are aliased
+{*a; *b.t1[i]; *b.t2[i]; *b.n1; *b.n2; *b; } are aliased
+<end of list>
+
+Before statement idx ++; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement ty *tmp = x; :
+ <list of may-alias>
+<end of list>
+
+Before statement swap(tmp->n2); :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement idata = (double *)malloc((unsigned long)10 * sizeof(double)); :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement return; :
+ <list of may-alias>
+<end of list>
+
+Before statement while (1) {
+                   idata = tmp->t2[*(tmp->n2)];
+                   odata = tmp->t1[*(tmp->n1)];
+                   idx = 0;
+                   while (idx < 10) {
+                     {
+                       double tmp_1;
+                       tmp_1 = sin(*(idata + idx));
+                       *(odata + idx) = 0.5 * tmp_1;
+                     }
+                     idx ++;
+                   }
+                   swap(tmp->n1);
+                 } :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement idata = tmp->t2[*(tmp->n2)];
+                 odata = tmp->t1[*(tmp->n1)];
+                 idx = 0;
+                 while (idx < 10) {
+                   {
+                     double tmp_1;
+                     tmp_1 = sin(*(idata + idx));
+                     *(odata + idx) = 0.5 * tmp_1;
+                   }
+                   idx ++;
+                 }
+                 swap(tmp->n1); :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement a = (ty *)malloc(sizeof(ty)); :
+ <list of may-alias>
+<end of list>
+
+Before statement idata = tmp->t2[*(tmp->n2)]; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement b = (ty *)malloc(sizeof(ty)); :
+ <list of may-alias>
+<end of list>
+
+Before statement odata = tmp->t1[*(tmp->n1)]; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement i = 0; :
+ <list of may-alias>
+<end of list>
+
+Before statement idx = 0; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement while (i < 2) {
+                   a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
+                   a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double));
+                   i ++;
+                 } :
+ <list of may-alias>
+<end of list>
+
+Before statement while (idx < 10) {
+                   {
+                     double tmp_1;
+                     tmp_1 = sin(*(idata + idx));
+                     *(odata + idx) = 0.5 * tmp_1;
+                   }
+                   idx ++;
+                 } :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement return __retres; :
+ <list of may-alias>
+{b.n1; b; } are aliased
+{b.n1; b.n2; b; } are aliased
+{*a; *b.t1[i]; *b.t2[i]; *b.n1; *b.n2; *b; } are aliased
+<end of list>
+
+Before statement if (! (i < 2)) break; :
+ <list of may-alias>
+<end of list>
+
+Before statement if (! (idx < 10)) break; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
+                 a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double)); :
+ <list of may-alias>
+<end of list>
+
+Before statement {
+                   double tmp_1;
+                   tmp_1 = sin(*(idata + idx));
+                   *(odata + idx) = 0.5 * tmp_1;
+                 } :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double)); :
+ <list of may-alias>
+<end of list>
+
+Before statement tmp_1 = sin(*(idata + idx));
+                 *(odata + idx) = 0.5 * tmp_1; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double)); :
+ <list of may-alias>
+<end of list>
+
+Before statement tmp_1 = sin(*(idata + idx)); :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement i ++; :
+ <list of may-alias>
+<end of list>
+
+Before statement *(odata + idx) = 0.5 * tmp_1; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement a->n1 = (int *)malloc(sizeof(int)); :
+ <list of may-alias>
+<end of list>
+
+Before statement idx ++; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement a->n2 = (int *)malloc(sizeof(int)); :
+ <list of may-alias>
+<end of list>
+
+Before statement swap(tmp->n1); :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement *(a->n1) = 1; :
+ <list of may-alias>
+<end of list>
+
+Before statement *(a->n2) = 1; :
+ <list of may-alias>
+<end of list>
+
+Before statement i = 0; :
+ <list of may-alias>
+<end of list>
+
+Before statement ty *tmp = x; :
+ <list of may-alias>
+<end of list>
+
+Before statement while (i < 2) {
+                   b->t1[i] = a->t1[i];
+                   b->t2[i] = a->t2[i];
+                   i ++;
+                 } :
+ <list of may-alias>
+{*a; *b.t1[i]; *b.t2[i]; } are aliased
+<end of list>
+
+Before statement idata = (double *)malloc((unsigned long)10 * sizeof(double)); :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement while (1) {
+                   idata = tmp->t1[*(tmp->n1)];
+                   odata = tmp->t2[*(tmp->n2)];
+                   idx = 0;
+                   while (idx < 10) {
+                     *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
+                     idx ++;
+                   }
+                   swap(tmp->n2);
+                 } :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement if (! (i < 2)) break; :
+ <list of may-alias>
+{*a; *b.t1[i]; *b.t2[i]; } are aliased
+<end of list>
+
+Before statement idata = tmp->t1[*(tmp->n1)];
+                 odata = tmp->t2[*(tmp->n2)];
+                 idx = 0;
+                 while (idx < 10) {
+                   *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
+                   idx ++;
+                 }
+                 swap(tmp->n2); :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement break; :
+ <list of may-alias>
+{*a; *b.t1[i]; *b.t2[i]; } are aliased
+<end of list>
+
+Before statement idata = tmp->t1[*(tmp->n1)]; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+Before statement b->t1[i] = a->t1[i];
+                 b->t2[i] = a->t2[i]; :
+ <list of may-alias>
+{*a; *b.t1[i]; *b.t2[i]; } are aliased
+<end of list>
+
+Before statement odata = tmp->t2[*(tmp->n2)]; :
+ <list of may-alias>
+{x; tmp; } are aliased
+<end of list>
+
+[alias] Analysis complete

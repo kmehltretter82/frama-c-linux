@@ -1,0 +1,12 @@
+[kernel] Parsing semver.c (with preprocessing)
+[alias] analysing function: f
+[alias] May-aliases at the end of function f: <none>
+[alias] analysing function: main
+[alias] analysing instruction: f((int *)*("1" + 2));
+[alias:unsafe-cast] semver.c:6: Warning: unsafe cast from char to int *
+[alias:unsupported:addr] semver.c:6: Warning: 
+  unsupported feature: explicit pointer address: (int *)*("1" + 2); analysis may be unsound
+[alias] May-aliases after instruction  f((int *)*("1" + 2));  are  <none>
+[alias] analysing instruction: __retres = 0;
+[alias] May-aliases after instruction  __retres = 0;  are  <none>
+[alias] May-aliases at the end of function main: <none>
