@@ -14,6 +14,7 @@ compiling Frama-C+dev.
 - ocamlfind.1.9.5
 - ocamlgraph.2.0.0
 - ocp-indent.1.8.1 (for linting, optional)
+- ppx_deriving_yaml.0.2.1
 - ppx_deriving_yojson.3.7.0
 - ppx_import.1.10.0
 - why3.1.6.0
