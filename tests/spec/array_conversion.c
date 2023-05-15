@@ -36,3 +36,7 @@ void ftest(void) {
 
 
 //@ lemma array_not_null: a != \null; 
+
+int const ca[1] = { 0 };
+
+//@ lemma const_array_init: \initialized(&ca[0]);

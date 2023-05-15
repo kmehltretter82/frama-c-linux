@@ -108,7 +108,7 @@ let plain_array_to_ptr ty =
               Kernel.fatal
                 "Inconsistent information: I know the length of \
                  array type %a, but not of its elements."
-                Cil_printer.pp_typ tarr
+                !Cil.pp_typ_ref tarr
           in
           (* Normally, overflow is checked in bitsSizeOf itself *)
           let la = AInt (Integer.of_int len) in
@@ -122,6 +122,16 @@ let plain_array_to_ptr ty =
   | ty -> ty
 
 let array_to_ptr = plain_or_set plain_array_to_ptr
+
+let logic_type_remove_qualifiers =
+  let plain typ =
+    match unroll_type typ with
+    | Ctype t ->
+      let t' = Cil.type_remove_qualifier_attributes t in
+      if Cil_datatype.Typ.equal t t' then typ else Ctype t'
+    | _ -> typ
+  in
+  Logic_const.transform_element plain
 
 let coerce_type typ =
   let ty = Cil.unrollType typ in
@@ -217,7 +227,7 @@ let mk_logic_pointer_or_StartOf t =
     if is_C_array t then mk_logic_StartOf t else t
   else
     Kernel.fatal ~source:(fst t.term_loc)
-      "%a is neither a pointer nor a C array" Cil_printer.pp_term t
+      "%a is neither a pointer nor a C array" !Cil.pp_term_ref t
 
 let equal_ltype = Cil_datatype.Logic_type.equal
 
@@ -398,7 +408,7 @@ let scalar_term_conversion conversion t =
   | Ctype (TVoid _ | TNamed _ | TComp _ | TBuiltin_va_list _)
     -> Kernel.fatal
          "Cannot convert a term of type %a"
-         Cil_printer.pp_logic_type t.term_type
+         !Cil.pp_logic_type_ref t.term_type
 
 let scalar_term_to_predicate =
   let conversion ~loc is_eq t1 t2 =
@@ -572,7 +582,7 @@ and expr_to_boolean e =
     else
       Kernel.fatal
         "Cannot convert into predicate the C expression %a"
-        Cil_printer.pp_exp e
+        !Cil.pp_exp_ref e
 
 and expr_to_predicate e =
   let open Cil_types in
@@ -618,7 +628,7 @@ and expr_to_predicate e =
     else
       Kernel.fatal
         "Cannot convert into predicate the C expression %a"
-        Cil_printer.pp_exp e
+        !Cil.pp_exp_ref e
 
 and expr_to_ipredicate e =
   Logic_const.new_predicate (expr_to_predicate e)
@@ -2066,7 +2076,7 @@ let merge_assigns_list l1 l2 =
           let loc = asgn1.it_content.term_loc in
           Kernel.warning ~once:true ~source:(fst loc)
             "location %a is not present in all assigns clauses"
-            Cil_printer.pp_identified_term asgn1;
+            !Cil.pp_identified_term_ref asgn1;
         end;
         (asgn1, from1) :: aux q1 l2
       | Some (asgn2, from2 as cl2), q2 ->
@@ -2081,8 +2091,8 @@ let merge_assigns_list l1 l2 =
           Kernel.warning ~once:true ~source:(fst loc1)
             "@[incompatible@ from@ clauses (%a:'%a'@ and@ %a:'%a').@ \
              Keeping@ only@ the first@ one.@]"
-            Cil_printer.pp_location loc1 Cil_printer.pp_from cl1
-            Cil_printer.pp_location loc2 Cil_printer.pp_from cl2;
+            !Cil.pp_location_ref loc1 !Cil.pp_from_ref cl1
+            !Cil.pp_location_ref loc2 !Cil.pp_from_ref cl2;
           cl1 :: aux q1 q2
         end
   in
@@ -2140,7 +2150,7 @@ let merge_behaviors ?(oldloc=Cil_datatype.Location.unknown) ~silent old_behavior
                 (fun fmt ->
                    if Kernel.debug_atleast 1 then
                      Format.fprintf fmt ":@ @[%a@] vs. @[%a@]"
-                       Cil_printer.pp_behavior b Cil_printer.pp_behavior old_b)
+                       !Cil.pp_behavior_ref b !Cil.pp_behavior_ref old_b)
             ;
             old_b.b_assumes <- merge_ip_list old_b.b_assumes b.b_assumes;
             old_b.b_requires <- merge_ip_list old_b.b_requires b.b_requires;

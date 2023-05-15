@@ -318,6 +318,11 @@ module Lenv = struct
     (* to determine in which post-state we should go in case of nested
        \at(\at(...,Post),Pre)
     *)
+    keep_qualifiers: bool;
+    (* indicates whether we should keep qualifiers in term's type.
+       Almost always false, except as head nodes of specific
+       clauses such as assigns or volatile.
+    *)
   }
 
   let string_of_current_label env =
@@ -411,7 +416,8 @@ module Lenv = struct
       current_logic_label = None;
       is_post_state = None;
       enclosing_post_state=None;
-      is_funspec=false
+      is_funspec=false;
+      keep_qualifiers=false;
     }
 
   let funspec () =
@@ -461,6 +467,9 @@ let post_state_env kind typ =
   let env = add_exit_status env in
   let env = enter_post_state env kind in
   env
+
+let keep_qualifiers env = { env with Lenv.keep_qualifiers = true }
+let drop_qualifiers env = { env with Lenv.keep_qualifiers = false }
 
 type type_namespace = Typedef | Struct | Union | Enum
 
@@ -2537,7 +2546,7 @@ struct
       | Some t -> Tapp(info, label_assoc, tl), t
   and term_node ctxt env loc pl =
     let term = ctxt.type_term ctxt in
-    let term_ptr pl =
+    let term_ptr env pl =
       let t = term env pl in
       check_logic_pointer ~check_non_void:false loc t;
       t
@@ -2549,13 +2558,16 @@ struct
     | PLinitField _ ->
       ctxt.error loc "unsupported aggregated field construct"
     | PLupdate (t, toff, PLupdateCont cont) ->
+      let env = drop_qualifiers env in
       let t = term env t in
       normalize_update_cont ctxt env loc t (cont, toff)
     | PLupdate (t, toff, PLupdateTerm v) ->
+      let env = drop_qualifiers env in
       let t = term env t in
       normalize_update_term ctxt env loc t v toff
 
     | PLsizeof typ ->
+      let env = drop_qualifiers env in
       (match Logic_const.unroll_ltdef (logic_type ctxt loc env typ)
        with
          Ctype t -> TSizeOf t,Linteger
@@ -2567,7 +2579,7 @@ struct
         { lexpr_node = PLconstant (StringConstant s | WStringConstant s) } ->
       TSizeOfStr s, Linteger
     | PLsizeofE lexpr ->
-      let t = term env lexpr in
+      let t = term (drop_qualifiers env) lexpr in
       (match Logic_const.unroll_ltdef t.term_type with
        | Ctype _ -> TSizeOfE t, Linteger
        | _ -> if ctxt.silent then raise Backtrack;
@@ -2590,6 +2602,11 @@ struct
       Ctype (TPtr(Cil.theMachine.wcharType,[]))
     | PLvar x ->
       let old_val info =
+        let typ =
+          if env.Lenv.keep_qualifiers then info.lv_type
+          else
+            Logic_utils.logic_type_remove_qualifiers info.lv_type
+        in
         let term =  TLval (TVar info, TNoOffset) in
         if env.Lenv.is_funspec then begin
           let term =
@@ -2601,8 +2618,8 @@ struct
                  Tat(Logic_const.term ~loc term info.lv_type,
                      find_logic_label loc env "Old")
                | Some _ | None -> term)
-          in term, info.lv_type
-        end else term, info.lv_type
+          in term, typ
+        end else term, typ
       in
       begin
         try
@@ -2706,6 +2723,7 @@ struct
                   %s as constant" x)
       end
     | PLapp (f, labels, tl) ->
+      let env = drop_qualifiers env in
       let f = try (match (ctxt.find_macro f).lexpr_node with
           | PLvar (x) -> x
           | _ -> ctxt.error loc "invalid definition for macro %s" f)
@@ -2714,10 +2732,10 @@ struct
       fresh_type#reset ();
       lfun_app ctxt env loc f labels ttl
     | PLunop (Ubw_not, t) ->
-      let t = type_int_term ctxt env t in
+      let t = type_int_term ctxt (drop_qualifiers env) t in
       TUnOp (BNot, t), logic_arithmetic_promotion t.term_type
     | PLunop (Uminus, t) ->
-      let t = type_num_term ctxt env t in
+      let t = type_num_term ctxt (drop_qualifiers env) t in
       let ty = logic_arithmetic_promotion t.term_type in
       TUnOp (Neg, mk_cast t ty), ty
     | PLunop (Ustar, t) ->
@@ -2728,7 +2746,11 @@ struct
         let t = mk_logic_pointer_or_StartOf t in
         check_non_void_ptr loc t.term_type;
         let t = mk_mem t TNoOffset in
-        t.term_node, t.term_type
+        let typ =
+          if env.Lenv.keep_qualifiers then t.term_type
+          else Logic_utils.logic_type_remove_qualifiers t.term_type
+        in
+        t.term_node, typ
       end else begin
         ctxt.error loc "invalid type %a for `unary *'"
           Cil_printer.pp_logic_type t.term_type
@@ -2744,6 +2766,7 @@ struct
       t.term_node, t.term_type
     | PLbinop (t1, (Badd | Bsub | Bmul | Bdiv | Bmod
                    | Bbw_and | Bbw_or | Bbw_xor | Blshift | Brshift as op), t2) ->
+      let env = drop_qualifiers env in
       let t1 = term env t1 in
       let ty1 = t1.term_type in
       let t2 = term env t2 in
@@ -2810,6 +2833,10 @@ struct
     | PLdot (t, f) ->
       let t = term env t in
       let f_ofs, f_type = type_of_field loc f t.term_type in
+      let f_type =
+        if env.Lenv.keep_qualifiers then f_type
+        else Logic_utils.logic_type_remove_qualifiers f_type
+      in
       let t = lift_set (mk_dot env loc f_ofs f_type) t in
       t.term_node, t.term_type
 
@@ -2822,11 +2849,15 @@ struct
       let t = mk_logic_pointer_or_StartOf t in
       let struct_type = type_of_pointed t.term_type in
       let f_ofs, f_type = type_of_field loc f struct_type in
+      let f_type =
+        if env.Lenv.keep_qualifiers then f_type
+        else Logic_utils.logic_type_remove_qualifiers f_type
+      in
       (mk_mem ~loc t f_ofs).term_node, f_type
 
     | PLarrget (t1, t2) ->
       let t1 = term env t1 in
-      let t2 = term env t2 in
+      let t2 = term (drop_qualifiers env) t2 in
       (* access to a C value (either array or pointer) *)
       let t'1, t'2, tres =
         if isLogicPointer t1 && is_integral_type t2.term_type then
@@ -2835,8 +2866,12 @@ struct
             (* memory access need a current label to have some semantics *)
             let t1 = mk_logic_pointer_or_StartOf t1 in
             check_non_void_ptr t1.term_loc t1.term_type;
-            (t1, t2,
-             set_conversion (type_of_pointed t1.term_type) t2.term_type)
+            let typ = type_of_pointed t1.term_type in
+            let typ =
+              if env.Lenv.keep_qualifiers then typ
+              else Logic_utils.logic_type_remove_qualifiers typ
+            in
+            (t1, t2, set_conversion typ t2.term_type)
           end
         else if is_integral_type t1.term_type && isLogicPointer t2
         then begin
@@ -2844,8 +2879,12 @@ struct
           (* memory access need a current label to have some semantics *)
           let t2 = mk_logic_pointer_or_StartOf t2 in
           check_non_void_ptr t2.term_loc t2.term_type;
-          (t2, t1,
-           set_conversion (type_of_pointed t2.term_type) t1.term_type)
+          let typ = type_of_pointed t2.term_type in
+          let typ =
+            if env.Lenv.keep_qualifiers then typ
+            else Logic_utils.logic_type_remove_qualifiers typ
+          in
+          (t2, t1, set_conversion typ t1.term_type)
         end
         else if (* purely logical array access. *)
           isLogicArrayType t1.term_type && is_integral_type t2.term_type
@@ -2865,7 +2904,7 @@ struct
       t.term_node, t.term_type
 
     | PLif (t1, t2, t3) ->
-      let t1 = type_bool_term ctxt env t1 in
+      let t1 = type_bool_term ctxt (drop_qualifiers env) t1 in
       let t2 = term env t2 in
       let t3 = term env t3 in
       let env,ty,ty2,ty3 =
@@ -2895,7 +2934,7 @@ struct
     | PLbase_addr (l, t) ->
       (* base_addr need a current label to have some semantics *)
       let l = find_current_logic_label loc env l in
-      let t = term_ptr t in
+      let t = term_ptr (drop_qualifiers env) t in
       let t =
         lift_set
           (fun t -> Logic_const.term (Tbase_addr (l,t))
@@ -2904,14 +2943,14 @@ struct
     | PLoffset (l, t) ->
       (* offset need a current label to have some semantics *)
       let l = find_current_logic_label loc env l in
-      let t = term_ptr t in
+      let t = term_ptr (drop_qualifiers env) t in
       let t =
         lift_set (fun t -> Logic_const.term (Toffset (l,t)) Linteger) t
       in t.term_node, t.term_type
     | PLblock_length (l, t) ->
       (* block_length need a current label to have some semantics *)
       let l = find_current_logic_label loc env l in
-      let t = term_ptr t in
+      let t = term_ptr (drop_qualifiers env) t in
       let t =
         lift_set
           (fun t -> Logic_const.term (Tblock_length (l,t)) Linteger)
@@ -2919,6 +2958,7 @@ struct
       in t.term_node, t.term_type
     | PLresult ->
       (try let t = Lenv.find_var "\\result" env in
+         (* by construction, return type is a C type without qualifiers. *)
          match t.lv_type with
            Ctype ty ->
            TLval(TResult ty,TNoOffset), t.lv_type
@@ -2933,8 +2973,13 @@ struct
       (* no casts of tsets in grammar *)
       let ct = Logic_const.unroll_ltdef (logic_type ctxt loc env ty) in
       let { term_node; term_type } = mk_cast ~explicit:true t ct in
-      (term_node, term_type)
+      let typ =
+        if env.Lenv.keep_qualifiers then term_type
+        else Logic_utils.logic_type_remove_qualifiers term_type
+      in
+      (term_node, typ)
     | PLrel (t1, (Eq | Neq | Lt | Le | Gt | Ge as op), t2) ->
+      let env = drop_qualifiers env in
       let f _ op t1 t2 =
         (TBinOp(binop_of_rel op, t1, t2),
          Ltype(ctxt.find_logic_type Utf8_logic.boolean,[]))
@@ -2947,21 +2992,26 @@ struct
       let cfalse = ctxt.find_logic_ctor "\\false" in
       TDataCons(cfalse,[]), Ltype(cfalse.ctor_type,[])
     | PLlambda(prms,e) ->
+      let env = drop_qualifiers env in
       let (prms, env) = add_quantifiers ctxt loc ~kind:LVFormal prms env in
       let e = term env e in
       Tlambda(prms,e),Larrow(List.map (fun x -> x.lv_type) prms,e.term_type)
     | PLnot t ->
+      let env = drop_qualifiers env in
       let t = type_bool_term ctxt env t in
       TUnOp(LNot,t), Ltype (ctxt.find_logic_type Utf8_logic.boolean,[])
     | PLand (t1,t2) ->
+      let env = drop_qualifiers env in
       let t1 = type_bool_term ctxt env t1 in
       let t2 = type_bool_term ctxt env t2 in
       TBinOp(LAnd,t1,t2), Ltype (ctxt.find_logic_type Utf8_logic.boolean,[])
     | PLor (t1,t2) ->
+      let env = drop_qualifiers env in
       let t1 = type_bool_term ctxt env t1 in
       let t2 = type_bool_term ctxt env t2 in
       TBinOp(LOr,t1,t2), Ltype (ctxt.find_logic_type Utf8_logic.boolean,[])
     | PLtypeof t1 ->
+      let env = drop_qualifiers env in
       let t1 = term env t1 in
       Ttypeof t1, Ltype (ctxt.find_logic_type "typetag",[])
     | PLtype ty ->
@@ -2971,7 +3021,7 @@ struct
           ctxt.error loc "cannot take type tag of logic type"
       end
     | PLlet (ident, def, body) ->
-      let tdef = term env def in
+      let tdef = term (drop_qualifiers env) def in
       (* At least for now, the type is supposed to be fully instantiated.
          No generalization is needed. *)
       let var = Cil_const.make_logic_info_local ident in
@@ -2987,7 +3037,11 @@ struct
       var.l_body <- LBterm tdef;
       let env = Lenv.add_logic_info ident var env in
       let tbody = term env body in
-      Tlet(var,tbody), tbody.term_type
+      let typ =
+        if env.Lenv.keep_qualifiers then tbody.term_type
+        else Logic_utils.logic_type_remove_qualifiers tbody.term_type
+      in
+      Tlet(var,tbody), typ
     | PLcomprehension(t,quants,pred) ->
       let quants, env = add_quantifiers ctxt loc ~kind:LVQuant quants env in
       let t = term env t in
@@ -2995,7 +3049,11 @@ struct
         ctxt.error loc "sets of sets are not supported yet"
       end else begin
         let pred = Option.map (predicate env) pred in
-        Tcomprehension(t,quants,pred), (make_set_type t.term_type)
+        let typ =
+          if env.Lenv.keep_qualifiers then t.term_type
+          else Logic_utils.logic_type_remove_qualifiers t.term_type
+        in
+        Tcomprehension(t,quants,pred), (make_set_type typ)
       end
     | PLempty
     | PLset [] ->
@@ -3019,6 +3077,7 @@ struct
       Tinter locs, typ
     | PLlist l ->
       fresh_type#reset();
+      let env = drop_qualifiers env in
       let empty_list,typ_items =
         let empty_list,typ = lfun_app ctxt env loc "\\Nil" [] [] in
         empty_list,(type_of_list_elem typ)
@@ -3039,12 +3098,14 @@ struct
       in
       List.fold_left add_ahead (empty_list, (make_type_list_of typ_items)) l
     | PLrepeat (t1,t2) ->
+      let env = drop_qualifiers env in
       let t1 = term env t1 in
       let t2 = term env t2 in
       fresh_type#reset ();
       lfun_app ctxt env loc "\\repeat" [] [t1; t2]
     | PLrange (t1,t2) ->
       (* we allow range of floats/real.  *)
+      let env = drop_qualifiers env in
       let t1,ty1 = type_num_term_option ctxt env t1 in
       let t2,ty2 = type_num_term_option ctxt env t2 in
       (Trange(t1,t2),
@@ -3536,6 +3597,7 @@ struct
       (tl, Cil_types.From tf)
 
   let type_assign ctxt ~accept_formal env a =
+    let env = keep_qualifiers env in
     let module [@warning "-60"] C = struct end in
     match a with
       WritesAny -> Cil_types.WritesAny
@@ -4230,7 +4292,7 @@ struct
     | LDmodel_annot l ->
       Dmodel_annot (model_annot loc l,loc);
     | LDvolatile (tsets, (rd_opt, wr_opt)) ->
-      let env = Lenv.empty () in
+      let env = keep_qualifiers (Lenv.empty ()) in
       let ctxt = base_ctxt env in
       let tsets =
         let accept_formal = false in
