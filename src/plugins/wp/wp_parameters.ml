@@ -720,14 +720,14 @@ module ScriptMode = String
     (struct
       let option_name = "-wp-script"
       let arg_name = "mode"
-      let default = "default"
+      let default = ""
       let help =
         "WP mode for managing scripts and proof strategies:\n\
-         - 'batch': replay from existing scripts (default for script prover)\n\
-         - 'update': replay and update scripts (default for tip prover)\n\
-         - 'init': replay from scratch and save scripts\n\
-         - 'dry': replay from scratch, no script update\n\
-        "
+         - 'batch': proof scripts are reused but not updated (default for script prover)\n\
+         - 'update': proof scripts are reused and updated (default for tip prover)\n\
+         - 'init': proof scripts are generated from scratch and saved\n\
+         - 'dry': proof scripts are explored from scratch and not saved\n\
+         See also option -wp-cache-env."
     end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -767,18 +767,7 @@ module Cache = String
          - 'replay': update mode with no cache update\n\
          - 'rebuild': always run provers and update cache\n\
          - 'offline': use cache but never run provers\n\
-         You can also use the environment variable FRAMAC_WP_CACHE instead."
-    end)
-
-let () = Parameter_customize.set_group wp_prover
-module CacheEnv = False
-    (struct
-      let option_name = "-wp-cache-env"
-      let help = "Gives environment variables precedence over command line\n\
-                  for cache management:\n\
-                  - FRAMAC_WP_CACHE overrides -wp-cache\n\
-                  - FRAMAC_WP_CACHEDIR overrides -wp-cache-dir\n\
-                  Disabled by default."
+         See also option -wp-cache-env."
     end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -790,7 +779,19 @@ module CacheDir = String
       let help =
         "Specify global cache directory (no cleanup mode).\n\
          By default, cache entries are stored in the WP session directory.\n\
-         You can also use the environment variable FRAMAC_WP_CACHEDIR instead."
+         See also option -wp-cache-env."
+    end)
+
+let () = Parameter_customize.set_group wp_prover
+module CacheEnv = False
+    (struct
+      let option_name = "-wp-cache-env"
+      let help = "Gives environment variables precedence over command line\n\
+                  for cache management:\n\
+                  - FRAMAC_WP_SCRIPT overrides -wp-script\n\
+                  - FRAMAC_WP_CACHE overrides -wp-cache\n\
+                  - FRAMAC_WP_CACHEDIR overrides -wp-cache-dir\n\
+                  Disabled by default."
     end)
 
 let () = Parameter_customize.set_group wp_prover

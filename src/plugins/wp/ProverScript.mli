@@ -40,6 +40,7 @@ type 'a process =
   ?width:int ->
   ?backtrack:int ->
   ?auto:Strategy.heuristic list ->
+  ?strategies:bool ->
   ?start:(Wpo.t -> unit) ->
   ?progress:(Wpo.t -> string -> unit) ->
   ?result:(Wpo.t -> prover -> result -> unit) ->

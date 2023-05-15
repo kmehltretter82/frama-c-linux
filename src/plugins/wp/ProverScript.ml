@@ -118,6 +118,7 @@ struct
     depth : int ;
     width : int ;
     auto : Strategy.heuristic list ; (* DEPRECATED *)
+    strategies : bool ;
     mutable signaled : bool ;
     backtrack : int ;
     mutable backtracking : backtracking option ;
@@ -219,11 +220,11 @@ struct
   let provers env = env.provers
 
   let make tree
-      ~valid ~failed ~provers
+      ~valid ~failed ~provers ~strategies
       ~depth ~width ~backtrack ~auto
       ~progress ~result ~success =
     { tree ; valid ; failed ; provers ;
-      depth ; width ; backtrack ; auto ;
+      depth ; width ; backtrack ; auto ; strategies ;
       progress ; result ; success ;
       backtracking = None ;
       signaled = false }
@@ -404,7 +405,7 @@ let explore_hints env process =
 (* -------------------------------------------------------------------------- *)
 
 let automated env process : solver =
-  auto env +>> explore_hints env process
+  auto env +>> if env.Env.strategies then explore_hints env process else unknown
 
 (* -------------------------------------------------------------------------- *)
 (* --- Apply Script Tactic                                                --- *)
@@ -504,7 +505,7 @@ let rec process env node =
 
 let task
     ~valid ~failed ~provers
-    ~depth ~width ~backtrack ~auto ~scratch
+    ~depth ~width ~backtrack ~auto ~scratch ~strategies
     ~start ~progress ~result ~success wpo =
   begin fun () ->
     Wp_parameters.debug ~dkey:dkey_pp_allgoals "%a" Wpo.pp_goal_flow wpo ;
@@ -520,7 +521,7 @@ let task
       let tree = ProofEngine.proof ~main:wpo in
       let env = Env.make tree
           ~valid ~failed ~provers
-          ~depth ~width ~backtrack ~auto
+          ~depth ~width ~backtrack ~auto ~strategies
           ~progress ~result ~success in
       crawl env (process env) None script >>?
       (fun _ -> ProofEngine.forward tree) ;
@@ -534,6 +535,7 @@ type 'a process =
   ?valid:bool -> ?failed:bool -> ?scratch:bool -> ?provers:VCS.prover list ->
   ?depth:int -> ?width:int -> ?backtrack:int ->
   ?auto:Strategy.heuristic list ->
+  ?strategies:bool ->
   ?start:(Wpo.t -> unit) ->
   ?progress:(Wpo.t -> string -> unit) ->
   ?result:(Wpo.t -> VCS.prover -> VCS.result -> unit) ->
@@ -547,21 +549,23 @@ let skip3 _ _ _ = ()
 let prove
     ?(valid = true) ?(failed = true) ?(scratch = false) ?(provers = [])
     ?(depth = 0) ?(width = 0) ?(backtrack = 0) ?(auto = [])
+    ?(strategies = false)
     ?(start = skip1) ?(progress = skip2) ?(result = skip3) ?(success = skip2)
     wpo =
   Task.todo (task
                ~valid ~failed ~provers
-               ~depth ~width ~backtrack ~auto ~scratch
+               ~depth ~width ~backtrack ~auto ~scratch ~strategies
                ~start ~progress ~result ~success wpo)
 
 let spawn
     ?(valid = true) ?(failed = true) ?(scratch = false) ?(provers = [])
     ?(depth = 0) ?(width = 0) ?(backtrack = 0) ?(auto = [])
+    ?(strategies = false)
     ?(start = skip1) ?(progress = skip2) ?(result = skip3) ?(success = skip2)
     wpo =
   schedule (task
               ~valid ~failed ~provers
-              ~depth ~width ~backtrack ~auto ~scratch
+              ~depth ~width ~backtrack ~auto ~scratch ~strategies
               ~start ~progress ~result ~success wpo)
 
 let search
@@ -571,7 +575,7 @@ let search
   begin
     let env = Env.make tree
         ~valid:false ~failed:false ~provers
-        ~depth ~width ~backtrack ~auto
+        ~depth ~width ~backtrack ~auto ~strategies:false
         ~progress ~result ~success in
     schedule
       begin fun () ->
@@ -589,6 +593,7 @@ let explore ?(depth=0) ?(strategy)
     let depth = ProofEngine.depth node + depth in
     let env : Env.t =
       Env.make tree ~valid:false ~failed:false
+        ~strategies:(strategy <> None)
         ~provers:[] ~depth ~width:0 ~backtrack:0 ~auto:[]
         ~progress ~result ~success in
     schedule

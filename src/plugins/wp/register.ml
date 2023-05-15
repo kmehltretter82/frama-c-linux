@@ -481,7 +481,8 @@ let do_list_scheduled_result () =
 (* ------------------------------------------------------------------------ *)
 
 type script = {
-  mutable tactical : bool ;
+  mutable proverscript : bool ;
+  mutable strategies : bool ;
   mutable scratch : bool ;
   mutable update : bool ;
   mutable stdout : bool ;
@@ -493,7 +494,7 @@ type script = {
 }
 
 let spawn_wp_proofs ~script goals =
-  if script.tactical || script.provers<>[] then
+  if script.proverscript || script.provers<>[] then
     begin
       let server = ProverTask.server () in
       ignore (Wp_parameters.Share.get_dir "."); (* To prevent further errors *)
@@ -501,9 +502,10 @@ let spawn_wp_proofs ~script goals =
       let cache = Cache.get_mode () in
       Bag.iter
         (fun goal ->
-           if  script.tactical
+           if  script.proverscript
             && not (Wpo.is_trivial goal)
             && (script.auto <> [] ||
+                script.strategies ||
                 ProofSession.exists goal ||
                 Wp_parameters.DefaultStrategies.get () <> [] ||
                 ProofStrategy.hints goal <> [])
@@ -511,6 +513,7 @@ let spawn_wp_proofs ~script goals =
              ProverScript.spawn
                ~failed:false
                ~scratch:script.scratch
+               ~strategies:script.strategies
                ~auto:script.auto
                ~depth:script.depth
                ~width:script.width
@@ -535,11 +538,8 @@ let spawn_wp_proofs ~script goals =
     end
 
 let get_prover_names () =
-  match Wp_parameters.Provers.get () with [] -> [ "alt-ergo" ] | pnames -> pnames
-
-let env_script_update () =
-  try Sys.getenv "FRAMAC_WP_SCRIPT" = "update"
-  with Not_found -> false
+  match Wp_parameters.Provers.get () with
+  | [] -> [ "alt-ergo" ] | pnames -> pnames
 
 let compute_provers ~mode ~script =
   script.provers <- List.fold_right
@@ -547,9 +547,8 @@ let compute_provers ~mode ~script =
         match VCS.parse_prover pname with
         | None -> prvs
         | Some VCS.Tactical ->
-          script.tactical <- true ;
-          if pname = "tip" || env_script_update () then
-            script.update <- true ;
+          script.proverscript <- true ;
+          if pname = "tip" then script.strategies <- true ;
           prvs
         | Some prover ->
           let pmode = if VCS.is_auto prover then VCS.Batch else mode in
@@ -569,8 +568,12 @@ let dump_strategies =
 
 let default_script_mode () = {
   provers = [] ;
-  tactical = false ; update = false ; scratch = false ; stdout = false ;
-  depth=0 ; width = 0 ; auto=[] ; backtrack = 0 ;
+  proverscript = false ;
+  strategies = false ;
+  update = ProofSession.saving_mode () ;
+  scratch = ProofSession.scratch_mode () ;
+  stdout = Wp_parameters.ScriptOnStdout.get ();
+  depth=0 ; width = 0 ; backtrack = 0 ; auto=[] ;
 }
 
 let compute_auto ~script =
@@ -595,7 +598,7 @@ let compute_auto ~script =
                  "Strategy -wp-auto '%s' unknown (ignored)." id
         ) auto ;
       script.auto <- List.rev script.auto ;
-      if script.auto <> [] then script.tactical <- true ;
+      if script.auto <> [] then script.proverscript <- true ;
     end
 
 type session_scripts = {
@@ -732,22 +735,11 @@ let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
   begin match provers with None -> () | Some prvs ->
     script.provers <- List.map (fun dp -> VCS.Batch , VCS.Why3 dp) prvs
   end ;
-  begin match tip with None -> () | Some tip ->
-    script.tactical <- tip ;
-    script.update <- tip ;
+  begin match tip with None -> () | Some strategies ->
+    script.proverscript <- true ;
+    script.strategies <- strategies ;
   end ;
-  begin match Wp_parameters.ScriptMode.get () with
-    | "default" -> ()
-    | "batch" -> script.update <- false
-    | "update" -> script.update <- true
-    | "init" -> script.scratch <- true
-    | "dry" -> script.scratch <- true ; script.update <- false
-    | opt -> Wp_parameters.error "Invalid -wp-script '%s' option" opt
-  end ;
-  begin
-    script.stdout <- Wp_parameters.ScriptOnStdout.get ();
-  end ;
-  let spawned = script.tactical || script.provers <> [] in
+  let spawned = script.proverscript || script.provers <> [] in
   begin
     if spawned then do_list_scheduled goals ;
     spawn_wp_proofs ~script goals ;

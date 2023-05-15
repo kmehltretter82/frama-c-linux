@@ -1314,6 +1314,21 @@ See \texttt{-wp-interactive <mode>} option for details.
   It is possible to ask for several decision procedures to be tried.
   For each goal, the first decision procedure that succeeds cancels the
   other attempts.
+
+  You may also select provers \verb|"tip"| to use proof strategies and \verb|"script"| to use
+  proof scripts (without applying new proof strategies),
+  see option \verb|"-wp-script"| below for more details.
+\item[\tt -wp-script <mode>] selects how to manage proof strategies and proof
+  scripts session. Several modes are available:
+  \begin{itemize}
+  \item \texttt{"batch"} use existing scripts, but do not store new scripts.
+    This is the default mode for prover \verb|"script"|.
+  \item \texttt{"update"} use existing scripts and store new or updated scripts in proof session.
+    This is the default mode for prover \verb|tip|.
+  \item \texttt{"init"} don't use existing scripts and store the newly generated
+    scripts in proof session.
+  \item \texttt{"dry"} don't use existing script and don't store any new scripts in proof session.
+  \end{itemize}
 \item[\tt -wp-interactive <mode>] selects the interaction mode with
   interactive provers such as Coq (while it could work for other interactive
   provers, it has not been tested so far). Five modes are available:
@@ -1334,7 +1349,7 @@ See \texttt{-wp-interactive <mode>} option for details.
 \item[\tt -wp-(no)-run-all-provers] Run all specified provers on each goal not
   proved by Qed. When a prover succeeds in proving the goal, the others are not
   stopped. (default is: no).
-\item[\tt -wp-strategy s,...] acticate proof strategies and specifies the default
+\item[\tt -wp-strategy s,...] specifies the default
   ones to be used, see Section~\ref{wp-proof-strategies} for details.
 \item[\tt -wp-gen] only generates proof obligations, does not run provers.
   See option \texttt{-wp-out} to obtain the generated proof obligations.

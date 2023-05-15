@@ -163,10 +163,11 @@ module type Generator =
 sig
   type key
   type data
-  val get : key -> data
   val mem : key -> bool
-  val clear : unit -> unit
+  val get : key -> data
+  val set : key -> data -> unit
   val remove : key -> unit
+  val clear : unit -> unit
 end
 
 (** projectified, depend on the model, not serialized *)
