@@ -1844,14 +1844,14 @@ type kernel_function = {
 type syntactic_scope =
   | Global
   (** Any global symbol, whether static or not.
-      @since Frama-C+dev
+      @since 27.0-Cobalt
   *)
   | Program (** Only non-static global symbols. *)
   | Translation_unit of Filepath.Normalized.t
   (** Any global visible within the given C source file. *)
   | Formal of kernel_function
   (** formal parameter of the given function.
-      @since Frama-C+dev
+      @since 27.0-Cobalt
   *)
   | Block_scope of stmt
   (** locals (including static locals) of the block to which the given statement
@@ -1859,7 +1859,7 @@ type syntactic_scope =
   | Whole_function of kernel_function
   (** same as above, but any local variable of the given function, regardless of
       the block to which it is tied, will be considered.
-      @since Frama-C+dev
+      @since 27.0-Cobalt
   *)
 
 (** Definition of a machine model (architecture + compiler).

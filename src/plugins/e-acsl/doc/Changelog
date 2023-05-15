@@ -25,6 +25,10 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
+###############################################################################
+Plugin E-ACSL 27.0 (Cobalt)
+###############################################################################
+
 -! e-acsl-gcc   [2023-02-08] arguments to options -e/--cpp-flags now overload
 	        the default values set by e-acsl-gcc instead of being ignored.
 

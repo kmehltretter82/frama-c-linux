@@ -237,7 +237,7 @@ module Syntactic_search: sig
       @return [Some vi] otherwise, with [vi] the [varinfo] associated to
         [orig_name] in [scope] (or an enclosing scope when [strict] is false).
       @since Chlorine-20180501
-      @before Frama-C+dev [strict] parameter did not exist, symbol was always
+      @before 27.0-Cobalt [strict] parameter did not exist, symbol was always
         searched according to C lookup rules.
   *)
 end

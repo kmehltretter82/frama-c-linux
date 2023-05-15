@@ -174,7 +174,7 @@ sig
       @param t1 first term
       @param t2 second term
 
-      @since Frama-C+dev
+      @since 27.0-Cobalt
   *)
   val conditional_conversion:
     Cil_types.location -> Logic_ptree.relation option ->

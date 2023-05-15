@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ###############################################################################
 
+###############################################################################
+Open Source Release 27.0 (Cobalt)
+###############################################################################
+
 -   Eva       [2023-05-04] The octagon domain can now infer relations between
               any lvalues of integer or pointer types.
 -*  Ivette    [2023-05-02] Ends properly frama-c process when Ivette is closed.
