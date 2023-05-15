@@ -21,7 +21,7 @@ default:
 ### VARIABLES
 
 variables:
-  DEFAULT: "stable/cobalt"
+  DEFAULT: "master"
   OCAML: "4.11"
   PUBLISH: "no"
   RELEASE: "no"
