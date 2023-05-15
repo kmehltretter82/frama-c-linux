@@ -68,11 +68,6 @@ let max_delta (min1, _) (_, max2) = match min1, max2 with
   | Some m1, Some m2 -> Some (length m2 m1)
   | _, None | None, _ -> None
 
-
-let interv_of_unknown_block =
-  (* since we have no idea of the size of this block, we take the largest
-     possible one which is unfortunately quite large *)
-  lazy (ival Integer.zero (Bit_utils.max_byte_address ()))
 (* Compute the smallest type (bigger than [int]) which can contain the whole
    interval. It is the \theta operator of the JFLA's paper. *)
 let ty_of_interv ?ctx ?(use_gmp_opt = false) = function
@@ -100,6 +95,8 @@ let ty_of_interv ?ctx ?(use_gmp_opt = false) = function
     | None | Some(C_integer _ | Gmpz | Nan) -> Gmpz
     | Some (C_float _ | Rational) -> Rational
     | Some Real -> Real
+
+let is_included_in_typ i typ = is_included i (interv_of_typ typ)
 
 (* ********************************************************************* *)
 (* main algorithm *)
@@ -235,9 +232,6 @@ end = struct
     Options.feedback ~level:4 "clearing the typing tables";
     LFProf.Hashtbl.clear ext_profile_tbl
 end
-
-let plus_one i =
-  lift_arith_binop Ival.add_int i (singleton Integer.one)
 
 (* ********************************************************************* *)
 (* Main functions *)
@@ -907,7 +901,26 @@ let get_from_profile ~profile t =
 let get ~logic_env =
   get_from_profile ~profile:(Logic_env.get_profile logic_env)
 
-let get_widened_profile = Ext_profile.get
+let get_ext_profile = Ext_profile.get
+
+let rec joins ~logic_env = function
+  | [] -> bottom
+  | [ t ] -> get ~logic_env t
+  | t :: terms -> join (get ~logic_env t) (joins ~logic_env terms)
+
+let rec joins_from_profile ~profile = function
+  | [] -> bottom
+  | [ t ] -> get_from_profile ~profile t
+  | t :: terms ->
+    join (get_from_profile ~profile t) (joins_from_profile ~profile terms)
+
+let join_plus_one ~profile t1 t2 =
+  let plus_one i = lift_arith_binop Ival.add_int i (singleton Integer.one)
+  in
+  join (plus_one (get_from_profile ~profile t1)) (get_from_profile ~profile t2)
+
+let get_ival ~logic_env t =
+  extract_ival (get ~logic_env t)
 
 let clear () =
   Memo.clear();

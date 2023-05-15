@@ -56,11 +56,9 @@ open Analyses_datatype
 (* ************************************************************************** *)
 type t = ival
 
-val plus_one : ival -> ival
-(** @return the result of adding one to an interval. This is because when we
-      have a condition [x<t], we need to generate [t+1] *)
-
 val ty_of_interv: ?ctx:number_ty -> ?use_gmp_opt:bool -> t -> number_ty
+
+val is_included_in_typ: ival -> typ -> bool
 
 (* ************************************************************************** *)
 (** {3 Inference system} *)
@@ -78,6 +76,12 @@ val get: logic_env:Logic_env.t -> term -> t
 (** @return the value computed by the interval inference phase, same as
       [get_from_profile] but with a full-fledged logic environment instead of a
       function profile *)
+
+val joins_from_profile: profile:Profile.t -> term list -> t
+val joins: logic_env:Logic_env.t -> term list -> t
+val join_plus_one: profile:Profile.t -> term -> term -> t
+
+val get_ival: logic_env:Logic_env.t -> term -> Ival.t
 
 
 (*****************************************************************************)
@@ -99,7 +103,7 @@ val preprocess_code_annot :
 val preprocess_term :
   logic_env:Logic_env.t -> term -> unit
 
-val get_widened_profile : Profile.t -> logic_info -> Profile.t
+val get_ext_profile : Profile.t -> logic_info -> Profile.t
 
 val clear : unit -> unit
 
