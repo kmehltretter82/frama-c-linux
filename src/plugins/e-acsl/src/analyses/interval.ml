@@ -903,16 +903,11 @@ let get ~logic_env =
 
 let get_ext_profile = Ext_profile.get
 
-let rec joins ~logic_env = function
-  | [] -> bottom
-  | [ t ] -> get ~logic_env t
-  | t :: terms -> join (get ~logic_env t) (joins ~logic_env terms)
+let joins ~logic_env terms =
+  List.fold_right (fun t acc -> join (get ~logic_env t) acc) terms bottom
 
-let rec joins_from_profile ~profile = function
-  | [] -> bottom
-  | [ t ] -> get_from_profile ~profile t
-  | t :: terms ->
-    join (get_from_profile ~profile t) (joins_from_profile ~profile terms)
+let joins_from_profile ~profile terms =
+  List.fold_right (fun t acc -> join (get_from_profile ~profile t) acc) terms bottom
 
 let join_plus_one ~profile t1 t2 =
   let plus_one i = lift_arith_binop Ival.add_int i (singleton Integer.one)
