@@ -372,7 +372,7 @@ module Lexpr: S with type t = Logic_ptree.lexpr
 (**************************************************************************)
 
 module Machdep: S_with_collections with type t = mach
-(** since Frama-C+dev *)
+(** since 27.0-Cobalt *)
 
 (**/**)
 (* ****************************************************************************)

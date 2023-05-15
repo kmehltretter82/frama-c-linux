@@ -432,7 +432,7 @@ val isCompleteType: ?allowZeroSizeArrays:bool -> typ -> bool
 (** Performs lvalue-conversion on the type and returns the converted type,
     or Error if the type is incomplete and not an array type.
 
-    @since Frama-C+dev
+    @since 27.0-Cobalt
 *)
 val lvalue_conversion: typ -> (typ, string) result
 

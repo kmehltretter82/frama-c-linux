@@ -32,7 +32,7 @@ open Cil_types
 
 val add_hook_on_change: (unit -> unit) -> unit
 (** Emitted whenever any of the annotation tables is modified.
-    @since Frama-C+dev *)
+    @since 27.0-Cobalt *)
 
 (**************************************************************************)
 (** {3 Code annotations} *)

@@ -322,7 +322,7 @@ module PrintMachdep : Parameter_sig.Bool
 
 module PrintMachdepHeader : Parameter_sig.Bool
 (** Behavior of option "-print-machdep-header"
-    @since Frama-C+dev *)
+    @since 27.0-Cobalt *)
 
 module PrintLibc: Parameter_sig.Bool
 (** Behavior of option "-print-libc"
