@@ -332,7 +332,7 @@ let pp_result fmt r =
 let is_qualified prover result =
   match prover with
   | Qed | Tactical -> true
-  | Why3 _ -> result.cached || result.prover_time < Rformat.epsilon
+  | Why3 _ -> result.cached || result.prover_time <= Rformat.epsilon
 
 let pp_cache_miss fmt st updating prover result =
   if not updating

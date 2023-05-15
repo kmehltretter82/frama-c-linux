@@ -1185,9 +1185,10 @@ let ping_prover_call ~config p =
   | ProverFinished _ when p.killed -> Task.(Return Canceled)
   | ProverFinished pr ->
     let r =
+      let time = max Rformat.epsilon pr.pr_time in
       match pr.pr_answer with
-      | Timeout -> VCS.timeout pr.pr_time
-      | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
+      | Timeout -> VCS.timeout time
+      | Valid -> VCS.result ~time ~steps:pr.pr_steps VCS.Valid
       | OutOfMemory -> VCS.failed "out of memory"
       | StepLimitExceeded -> VCS.result ?steps:p.steps VCS.Stepout
       | Unknown _ | Invalid -> VCS.unknown
