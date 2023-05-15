@@ -53,6 +53,7 @@ let nan = Nan
 (******************************************************************************)
 (** Basic operations *)
 (******************************************************************************)
+let ty_of_interv = Interval.ty_of_interv
 
 let join_cty ty1 ty2 =
   let ty = Cil.arithmeticConversion ty1 ty2 in
@@ -237,34 +238,6 @@ let assert_nan = function
   | Rational
   | Real ->
     Options.abort ~current:true "got a number type where NaN was expected"
-
-(* Compute the smallest type (bigger than [int]) which can contain the whole
-   interval. It is the \theta operator of the JFLA's paper. *)
-let ty_of_interv ?ctx ?(use_gmp_opt = false) = function
-  | Float(fk, _) -> C_float fk
-  | Rational -> Rational
-  | Real -> Real
-  | Nan -> Nan
-  | Ival iv ->
-    try
-      let kind = Interval_utils.ikind_of_ival iv in
-      (match ctx with
-       | None
-       | Some Nan ->
-         C_integer kind
-       | Some Gmpz ->
-         if use_gmp_opt then Gmpz else C_integer kind
-       | Some (C_integer ik as ctx) ->
-         (* return [ctx] type for types smaller than int to prevent superfluous
-            casts in the generated code *)
-         if Cil.intTypeIncluded kind ik then ctx else C_integer kind
-       | Some (C_float _ | Rational | Real as ty) ->
-         ty)
-    with Interval_utils.Not_representable_ival ->
-    match ctx with
-    | None | Some(C_integer _ | Gmpz | Nan) -> Gmpz
-    | Some (C_float _ | Rational) -> Rational
-    | Some Real -> Real
 
 (* compute a new {!computed_info} by coercing the given type [ty] to the given
    context [ctx]. [op] is the type for the operator. *)

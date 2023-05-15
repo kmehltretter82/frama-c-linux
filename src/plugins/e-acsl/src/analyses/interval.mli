@@ -60,6 +60,8 @@ val plus_one : ival -> ival
 (** @return the result of adding one to an interval. This is because when we
       have a condition [x<t], we need to generate [t+1] *)
 
+val ty_of_interv: ?ctx:number_ty -> ?use_gmp_opt:bool -> t -> number_ty
+
 (* ************************************************************************** *)
 (** {3 Inference system} *)
 (* ************************************************************************** *)

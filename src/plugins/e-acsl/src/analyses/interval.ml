@@ -73,6 +73,33 @@ let interv_of_unknown_block =
   (* since we have no idea of the size of this block, we take the largest
      possible one which is unfortunately quite large *)
   lazy (ival Integer.zero (Bit_utils.max_byte_address ()))
+(* Compute the smallest type (bigger than [int]) which can contain the whole
+   interval. It is the \theta operator of the JFLA's paper. *)
+let ty_of_interv ?ctx ?(use_gmp_opt = false) = function
+  | Float(fk, _) -> C_float fk
+  | Rational -> Rational
+  | Real -> Real
+  | Nan -> Nan
+  | Ival iv ->
+    try
+      let kind = ikind_of_ival iv in
+      (match ctx with
+       | None
+       | Some Nan ->
+         C_integer kind
+       | Some Gmpz ->
+         if use_gmp_opt then Gmpz else C_integer kind
+       | Some (C_integer ik as ctx) ->
+         (* return [ctx] type for types smaller than int to prevent superfluous
+            casts in the generated code *)
+         if Cil.intTypeIncluded kind ik then ctx else C_integer kind
+       | Some (C_float _ | Rational | Real as ty) ->
+         ty)
+    with Cil.Not_representable ->
+    match ctx with
+    | None | Some(C_integer _ | Gmpz | Nan) -> Gmpz
+    | Some (C_float _ | Rational) -> Rational
+    | Some Real -> Real
 
 (* ********************************************************************* *)
 (* main algorithm *)
