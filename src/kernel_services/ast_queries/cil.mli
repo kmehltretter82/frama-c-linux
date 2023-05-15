@@ -70,10 +70,6 @@ type theMachine = private
     mutable lowerConstants: bool; (** Do lower constants (default true) *)
     mutable insertImplicitCasts: bool;
     (** Do insert implicit casts (default true) *)
-    mutable underscore_name: bool;
-    (** Whether the compiler generates assembly labels by prepending "_" to
-        the identifier. That is, will function foo() have the label "foo", or
-        "_foo"? *)
     mutable stringLiteralType: typ;
     mutable upointKind: ikind
   (** An unsigned integer type that fits pointers. *);

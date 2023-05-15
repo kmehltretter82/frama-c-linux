@@ -509,7 +509,7 @@ int printf_va_21(char const * restrict format, unsigned long param0);
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..))),
             param0;
  */
-int printf_va_22(char const * restrict format, int param0);
+int printf_va_22(char const * restrict format, long param0);
 
 /*@ requires valid_read_string(format);
     assigns \result, __fc_stdout->__fc_FILE_data;
@@ -617,8 +617,8 @@ int main(void)
   size_t z;
   ptrdiff_t t;
   char *string = (char *)"Hello world !\n";
-  wchar_t *wstring = L"H" "e" "l" "l" "o" " " "w" "o" "r" "l" "d" " " "!"
-    "\\n" ;
+  wchar_t *wstring = (wchar_t *)L"H" "e" "l" "l" "o" " " "w" "o" "r" "l" "d"
+    " " "!" "\\n" ;
   char c = (char)'4';
   unsigned char uhh = (unsigned char)42;
   unsigned short uh = (unsigned short)42;
@@ -631,7 +631,7 @@ int main(void)
   uint64_t u64 = 42ul;
   int8_t i8 = (int8_t)42;
   uint_least64_t uleast64 = (uint_least64_t)42u;
-  int_fast32_t ifast32 = 42;
+  int_fast32_t ifast32 = (int_fast32_t)42;
   printf("Hello world !\n"); /* printf_va_1 */
   printf("%s%n",string,& i); /* printf_va_2 */
   printf("%ls",wstring); /* printf_va_3 */
@@ -653,7 +653,7 @@ int main(void)
   printf("%lu",u64); /* printf_va_19 */
   printf("%hhi",(int)i8); /* printf_va_20 */
   printf("%lx",uleast64); /* printf_va_21 */
-  printf("%d",ifast32); /* printf_va_22 */
+  printf("%ld",ifast32); /* printf_va_22 */
   printf("%f %Le\n",f,L); /* printf_va_23 */
   printf("%c\n",(int)c); /* printf_va_24 */
   printf("%p ",(void *)string); /* printf_va_25 */

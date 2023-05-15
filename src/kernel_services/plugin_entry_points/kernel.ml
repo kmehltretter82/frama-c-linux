@@ -430,6 +430,18 @@ module PrintMachdep =
     end)
 
 let () = Parameter_customize.set_group help
+let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
+let () = Parameter_customize.set_negative_option_name ""
+module PrintMachdepHeader =
+  False
+    (struct
+      let module_name = "PrintMachdepHeader"
+      let option_name = "-print-machdep-header"
+      let help =
+        "print on standard output the content of the generated __fc_machdep.h"
+    end)
+
+let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_negative_option_name ""
 module DumpDependencies =
   P.Empty_string

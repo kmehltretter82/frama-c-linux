@@ -86,7 +86,7 @@ File modified by CEA LIST for inclusion in Frama-C test suite
 #endif
 
 #ifndef add_mssaaaa
-#error "This test must run with machdep equals to x86_32, x86_64 or ppc_32"
+#error "This test must run with machdep equals to gcc_x86_32, gcc_x86_64, or ppc_32"
 #endif
 
 #define umul_ppmm(ph, pl, m0, m1) \

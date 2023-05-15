@@ -53,6 +53,8 @@ _build
 /tests/crowbar/test_ghost_cfg
 /tests/*/*.opt
 
+/.test-errors.log
+
 /dev/fc-time
 /dev/fc-memuse
 /bin/ocamldep_transitive_closure

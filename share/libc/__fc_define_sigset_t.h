@@ -32,4 +32,3 @@ typedef unsigned long sigset_t;
 __END_DECLS
 __POP_FC_STDLIB
 #endif
-

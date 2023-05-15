@@ -39,15 +39,15 @@ __PUSH_FC_STDLIB
 # define PRId32		__PRI32_PREFIX "d"
 # define PRId64		__PRI64_PREFIX "d"
 
-# define PRIdLEAST8	__PRI8_PREFIX "d"
-# define PRIdLEAST16	__PRI16_PREFIX "d"
-# define PRIdLEAST32	__PRI32_PREFIX "d"
-# define PRIdLEAST64	__PRI64_PREFIX "d"
+# define PRIdLEAST8	__PRI_LEAST8_PREFIX "d"
+# define PRIdLEAST16	__PRI_LEAST16_PREFIX "d"
+# define PRIdLEAST32	__PRI_LEAST32_PREFIX "d"
+# define PRIdLEAST64	__PRI_LEAST64_PREFIX "d"
 
-# define PRIdFAST8	__PRI8_PREFIX "d"
-# define PRIdFAST16	__PRIFAST16_PREFIX "d"
-# define PRIdFAST32	__PRI32_PREFIX "d"
-# define PRIdFAST64	__PRI64_PREFIX "d"
+# define PRIdFAST8	__PRI_FAST8_PREFIX "d"
+# define PRIdFAST16	__PRI_FAST16_PREFIX "d"
+# define PRIdFAST32	__PRI_FAST32_PREFIX "d"
+# define PRIdFAST64	__PRI_FAST64_PREFIX "d"
 
 
 # define PRIi8		__PRI8_PREFIX "i"
@@ -55,15 +55,15 @@ __PUSH_FC_STDLIB
 # define PRIi32		__PRI32_PREFIX "i"
 # define PRIi64		__PRI64_PREFIX "i"
 
-# define PRIiLEAST8	__PRI8_PREFIX "i"
-# define PRIiLEAST16	__PRI16_PREFIX "i"
-# define PRIiLEAST32	__PRI32_PREFIX "i"
-# define PRIiLEAST64	__PRI64_PREFIX "i"
+# define PRIiLEAST8	__PRI_LEAST8_PREFIX "i"
+# define PRIiLEAST16	__PRI_LEAST16_PREFIX "i"
+# define PRIiLEAST32	__PRI_LEAST32_PREFIX "i"
+# define PRIiLEAST64	__PRI_LEAST64_PREFIX "i"
 
-# define PRIiFAST8	__PRI8_PREFIX "i"
-# define PRIiFAST16	__PRIFAST16_PREFIX "i"
-# define PRIiFAST32	__PRI32_PREFIX "i"
-# define PRIiFAST64	__PRI64_PREFIX "i"
+# define PRIiFAST8	__PRI_FAST8_PREFIX "i"
+# define PRIiFAST16	__PRI_FAST16_PREFIX "i"
+# define PRIiFAST32	__PRI_FAST32_PREFIX "i"
+# define PRIiFAST64	__PRI_FAST64_PREFIX "i"
 
 /* Octal notation.  */
 # define PRIo8		__PRI8_PREFIX "o"
@@ -71,15 +71,15 @@ __PUSH_FC_STDLIB
 # define PRIo32		__PRI32_PREFIX "o"
 # define PRIo64		__PRI64_PREFIX "o"
 
-# define PRIoLEAST8	__PRI8_PREFIX "o"
-# define PRIoLEAST16	__PRI16_PREFIX "o"
-# define PRIoLEAST32	__PRI32_PREFIX "o"
-# define PRIoLEAST64	__PRI64_PREFIX "o"
+# define PRIoLEAST8	__PRI_LEAST8_PREFIX "o"
+# define PRIoLEAST16	__PRI_LEAST16_PREFIX "o"
+# define PRIoLEAST32	__PRI_LEAST32_PREFIX "o"
+# define PRIoLEAST64	__PRI_LEAST64_PREFIX "o"
 
-# define PRIoFAST8	__PRI8_PREFIX "o"
-# define PRIoFAST16	__PRIFAST16_PREFIX "o"
-# define PRIoFAST32	__PRI32_PREFIX "o"
- # define PRIoFAST64	__PRI64_PREFIX "o"
+# define PRIoFAST8	__PRI_FAST8_PREFIX "o"
+# define PRIoFAST16	__PRI_FAST16_PREFIX "o"
+# define PRIoFAST32	__PRI_FAST32_PREFIX "o"
+ # define PRIoFAST64	__PRI_FAST64_PREFIX "o"
 
 /* Unsigned integers.  */
 # define PRIu8		__PRI8_PREFIX "u"
@@ -87,15 +87,15 @@ __PUSH_FC_STDLIB
 # define PRIu32		__PRI32_PREFIX "u"
 # define PRIu64		__PRI64_PREFIX "u"
 
-# define PRIuLEAST8	__PRI8_PREFIX "u"
-# define PRIuLEAST16	__PRI16_PREFIX "u"
-# define PRIuLEAST32	__PRI32_PREFIX "u"
-# define PRIuLEAST64	__PRI64_PREFIX "u"
+# define PRIuLEAST8	__PRI_LEAST8_PREFIX "u"
+# define PRIuLEAST16	__PRI_LEAST16_PREFIX "u"
+# define PRIuLEAST32	__PRI_LEAST32_PREFIX "u"
+# define PRIuLEAST64	__PRI_LEAST64_PREFIX "u"
 
-# define PRIuFAST8	__PRI8_PREFIX "u"
-# define PRIuFAST16	__PRIFAST16_PREFIX "u"
-# define PRIuFAST32	__PRI32_PREFIX "u"
-# define PRIuFAST64	__PRI64_PREFIX "u"
+# define PRIuFAST8	__PRI_FAST8_PREFIX "u"
+# define PRIuFAST16	__PRI_FAST16_PREFIX "u"
+# define PRIuFAST32	__PRI_FAST32_PREFIX "u"
+# define PRIuFAST64	__PRI_FAST64_PREFIX "u"
 
 /* lowercase hexadecimal notation.  */
 # define PRIx8		__PRI8_PREFIX "x"
@@ -103,15 +103,15 @@ __PUSH_FC_STDLIB
 # define PRIx32		__PRI32_PREFIX "x"
 # define PRIx64		__PRI64_PREFIX "x"
 
-# define PRIxLEAST8	__PRI8_PREFIX "x"
-# define PRIxLEAST16	__PRI16_PREFIX "x"
-# define PRIxLEAST32	__PRI32_PREFIX "x"
-# define PRIxLEAST64	__PRI64_PREFIX "x"
+# define PRIxLEAST8	__PRI_LEAST8_PREFIX "x"
+# define PRIxLEAST16	__PRI_LEAST16_PREFIX "x"
+# define PRIxLEAST32	__PRI_LEAST32_PREFIX "x"
+# define PRIxLEAST64	__PRI_LEAST64_PREFIX "x"
 
-# define PRIxFAST8	__PRI8_PREFIX "x"
-# define PRIxFAST16	__PRIFAST16_PREFIX "x"
-# define PRIxFAST32	__PRI32_PREFIX "x"
-# define PRIxFAST64	__PRI64_PREFIX "x"
+# define PRIxFAST8	__PRI_FAST8_PREFIX "x"
+# define PRIxFAST16	__PRI_FAST16_PREFIX "x"
+# define PRIxFAST32	__PRI_FAST32_PREFIX "x"
+# define PRIxFAST64	__PRI_FAST64_PREFIX "x"
 
 /* UPPERCASE hexadecimal notation.  */
 # define PRIX8		__PRI8_PREFIX "X"
@@ -119,15 +119,15 @@ __PUSH_FC_STDLIB
 # define PRIX32		__PRI32_PREFIX "X"
 # define PRIX64		__PRI64_PREFIX "X"
 
-# define PRIXLEAST8	__PRI8_PREFIX "X"
-# define PRIXLEAST16	__PRI16_PREFIX "X"
-# define PRIXLEAST32	__PRI32_PREFIX "X"
-# define PRIXLEAST64	__PRI64_PREFIX "X"
+# define PRIXLEAST8	__PRI_LEAST8_PREFIX "X"
+# define PRIXLEAST16	__PRI_LEAST16_PREFIX "X"
+# define PRIXLEAST32	__PRI_LEAST32_PREFIX "X"
+# define PRIXLEAST64	__PRI_LEAST64_PREFIX "X"
 
-# define PRIXFAST8	__PRI8_PREFIX "X"
-# define PRIXFAST16	__PRIFAST16_PREFIX "X"
-# define PRIXFAST32	__PRI32_PREFIX "X"
-# define PRIXFAST64	__PRI64_PREFIX "X"
+# define PRIXFAST8	__PRI_FAST8_PREFIX "X"
+# define PRIXFAST16	__PRI_FAST16_PREFIX "X"
+# define PRIXFAST32	__PRI_FAST32_PREFIX "X"
+# define PRIXFAST64	__PRI_FAST64_PREFIX "X"
 
 
 /* Macros for printing `intmax_t' and `uintmax_t'.  */
@@ -155,15 +155,15 @@ __PUSH_FC_STDLIB
 # define SCNd32		__PRI32_PREFIX "d"
 # define SCNd64		__PRI64_PREFIX "d"
 
-# define SCNdLEAST8	__PRI8_PREFIX "d"
-# define SCNdLEAST16	__PRI16_PREFIX "d"
-# define SCNdLEAST32	__PRI32_PREFIX "d"
-# define SCNdLEAST64	__PRI64_PREFIX "d"
+# define SCNdLEAST8	__PRI_LEAST8_PREFIX "d"
+# define SCNdLEAST16	__PRI_LEAST16_PREFIX "d"
+# define SCNdLEAST32	__PRI_LEAST32_PREFIX "d"
+# define SCNdLEAST64	__PRI_LEAST64_PREFIX "d"
 
-# define SCNdFAST8	__PRI8_PREFIX "d"
-# define SCNdFAST16	__PRIFAST16_PREFIX "d"
-# define SCNdFAST32	__PRI32_PREFIX "d"
-# define SCNdFAST64	__PRI64_PREFIX "d"
+# define SCNdFAST8	__PRI_FAST8_PREFIX "d"
+# define SCNdFAST16	__PRI_FAST16_PREFIX "d"
+# define SCNdFAST32	__PRI_FAST32_PREFIX "d"
+# define SCNdFAST64	__PRI_FAST64_PREFIX "d"
 
 /* Signed decimal notation.  */
 # define SCNi8		__PRI8_PREFIX "i"
@@ -171,15 +171,15 @@ __PUSH_FC_STDLIB
 # define SCNi32		__PRI32_PREFIX "i"
 # define SCNi64		__PRI64_PREFIX "i"
 
-# define SCNiLEAST8	__PRI8_PREFIX "i"
-# define SCNiLEAST16	__PRI16_PREFIX "i"
-# define SCNiLEAST32	__PRI32_PREFIX "i"
-# define SCNiLEAST64	__PRI64_PREFIX "i"
+# define SCNiLEAST8	__PRI_LEAST8_PREFIX "i"
+# define SCNiLEAST16	__PRI_LEAST16_PREFIX "i"
+# define SCNiLEAST32	__PRI_LEAST32_PREFIX "i"
+# define SCNiLEAST64	__PRI_LEAST64_PREFIX "i"
 
-# define SCNiFAST8	__PRI8_PREFIX "i"
-# define SCNiFAST16	__PRIFAST16_PREFIX "i"
-# define SCNiFAST32	__PRI32_PREFIX "i"
-# define SCNiFAST64	__PRI64_PREFIX "i"
+# define SCNiFAST8	__PRI_FAST8_PREFIX "i"
+# define SCNiFAST16	__PRI_FAST16_PREFIX "i"
+# define SCNiFAST32	__PRI_FAST32_PREFIX "i"
+# define SCNiFAST64	__PRI_FAST64_PREFIX "i"
 
 /* Unsigned decimal notation.  */
 # define SCNu8		__PRI8_PREFIX "u"
@@ -187,15 +187,15 @@ __PUSH_FC_STDLIB
 # define SCNu32		__PRI32_PREFIX "u"
 # define SCNu64		__PRI64_PREFIX "u"
 
-# define SCNuLEAST8	__PRI8_PREFIX "u"
-# define SCNuLEAST16	__PRI16_PREFIX "u"
-# define SCNuLEAST32	__PRI32_PREFIX "u"
-# define SCNuLEAST64	__PRI64_PREFIX "u"
+# define SCNuLEAST8	__PRI_LEAST8_PREFIX "u"
+# define SCNuLEAST16	__PRI_LEAST16_PREFIX "u"
+# define SCNuLEAST32	__PRI_LEAST32_PREFIX "u"
+# define SCNuLEAST64	__PRI_LEAST64_PREFIX "u"
 
-# define SCNuFAST8	__PRI8_PREFIX "u"
-# define SCNuFAST16	__PRIFAST16_PREFIX "u"
-# define SCNuFAST32	__PRI32_PREFIX "u"
-# define SCNuFAST64	__PRI64_PREFIX "u"
+# define SCNuFAST8	__PRI_FAST8_PREFIX "u"
+# define SCNuFAST16	__PRI_FAST16_PREFIX "u"
+# define SCNuFAST32	__PRI_FAST32_PREFIX "u"
+# define SCNuFAST64	__PRI_FAST64_PREFIX "u"
 
 /* Octal notation.  */
 # define SCNo8		__PRI8_PREFIX "o"
@@ -203,15 +203,15 @@ __PUSH_FC_STDLIB
 # define SCNo32		__PRI32_PREFIX "o"
 # define SCNo64		__PRI64_PREFIX "o"
 
-# define SCNoLEAST8	__PRI8_PREFIX "o"
-# define SCNoLEAST16	__PRI16_PREFIX "o"
-# define SCNoLEAST32	__PRI32_PREFIX "o"
-# define SCNoLEAST64	__PRI64_PREFIX "o"
+# define SCNoLEAST8	__PRI_LEAST8_PREFIX "o"
+# define SCNoLEAST16	__PRI_LEAST16_PREFIX "o"
+# define SCNoLEAST32	__PRI_LEAST32_PREFIX "o"
+# define SCNoLEAST64	__PRI_LEAST64_PREFIX "o"
 
-# define SCNoFAST8	__PRI8_PREFIX "o"
-# define SCNoFAST16	__PRIFAST16_PREFIX "o"
-# define SCNoFAST32	__PRI32_PREFIX "o"
-# define SCNoFAST64	__PRI64_PREFIX "o"
+# define SCNoFAST8	__PRI_FAST8_PREFIX "o"
+# define SCNoFAST16	__PRI_FAST16_PREFIX "o"
+# define SCNoFAST32	__PRI_FAST32_PREFIX "o"
+# define SCNoFAST64	__PRI_FAST64_PREFIX "o"
 
 /* Hexadecimal notation.  */
 # define SCNx8		__PRI8_PREFIX "x"
@@ -219,15 +219,15 @@ __PUSH_FC_STDLIB
 # define SCNx32		__PRI32_PREFIX "x"
 # define SCNx64		__PRI64_PREFIX "x"
 
-# define SCNxLEAST8	__PRI8_PREFIX "x"
-# define SCNxLEAST16	__PRI16_PREFIX "x"
-# define SCNxLEAST32	__PRI32_PREFIX "x"
-# define SCNxLEAST64	__PRI64_PREFIX "x"
+# define SCNxLEAST8	__PRI_LEAST8_PREFIX "x"
+# define SCNxLEAST16	__PRI_LEAST16_PREFIX "x"
+# define SCNxLEAST32	__PRI_LEAST32_PREFIX "x"
+# define SCNxLEAST64	__PRI_LEAST64_PREFIX "x"
 
-# define SCNxFAST8	__PRI8_PREFIX "x"
-# define SCNxFAST16	__PRIFAST16_PREFIX "x"
-# define SCNxFAST32	__PRI32_PREFIX "x"
-# define SCNxFAST64	__PRI64_PREFIX "x"
+# define SCNxFAST8	__PRI_FAST8_PREFIX "x"
+# define SCNxFAST16	__PRI_FAST16_PREFIX "x"
+# define SCNxFAST32	__PRI_FAST32_PREFIX "x"
+# define SCNxFAST64	__PRI_FAST64_PREFIX "x"
 
 
 /* Macros for scanning `intmax_t' and `uintmax_t'.  */
@@ -289,4 +289,3 @@ __END_DECLS
 
 __POP_FC_STDLIB
 #endif
-

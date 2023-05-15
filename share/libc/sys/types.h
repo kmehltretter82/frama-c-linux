@@ -26,7 +26,7 @@
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
-#include "../__fc_machdep.h"
+#include "__fc_machdep.h"
 #include "../__fc_define_id_t.h"
 #include "../__fc_define_pid_t.h"
 #include "../__fc_define_size_t.h"

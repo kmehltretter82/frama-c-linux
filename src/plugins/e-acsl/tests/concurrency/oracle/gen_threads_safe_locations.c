@@ -492,7 +492,7 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& thread_start));
     __e_acsl_store_block((void *)(& __fc_p_tmpnam),8UL);
     __e_acsl_full_init((void *)(& __fc_p_tmpnam));
-    __e_acsl_store_block((void *)(__fc_tmpnam),2048UL);
+    __e_acsl_store_block((void *)(__fc_tmpnam),20UL);
     __e_acsl_full_init((void *)(& __fc_tmpnam));
     __e_acsl_store_block((void *)(& __fc_p_fopen),8UL);
     __e_acsl_full_init((void *)(& __fc_p_fopen));

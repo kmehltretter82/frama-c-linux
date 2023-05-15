@@ -73,6 +73,7 @@
 [eva] fc_builtin_c.c:35: assertion 'bounds' got status valid.
 [eva:alarm] fc_builtin_c.c:36: Warning: 
   assertion 'sampling,unknown' got status unknown.
+[eva] fc_builtin_c.c:43: assertion '__WORDSIZE_is_defined' got status valid.
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -111,4 +112,5 @@
   d ∈ [12345678901.2 .. 12345678901.2]
   l ∈ {-3}
   ul ∈ {2147483647}
+  w ∈ {32}
   __retres ∈ {0}

@@ -367,6 +367,13 @@ module PredicateStructEq: S_with_collections_pretty with type t = predicate
 module Lexpr: S with type t = Logic_ptree.lexpr
 (** Beware: no pretty-printer is available. *)
 
+(**************************************************************************)
+(** {3 Machdep}                                                           *)
+(**************************************************************************)
+
+module Machdep: S_with_collections with type t = mach
+(** since Frama-C+dev *)
+
 (**/**)
 (* ****************************************************************************)
 (** {2 Internal API} *)

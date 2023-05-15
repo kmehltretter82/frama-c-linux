@@ -3213,114 +3213,60 @@ type-checked. Transformation hooks are registered through
   None.
 \end{prereq}
 
+\subsection{Generating a custom model}\label{sec:gener-cust-model}
 Several aspects of the C standard that are implementation-defined, such as
 the width of standard integer types, endianness, signedness of the
 \texttt{char} type, etc., as well as a few compiler and architecture specific
 features, can be customized using a \texttt{machdep} configuration,
 defining a new machine model.
 
-To create a new machine model, define an instance of \verb+Cil_types.mach+%
-\scodeidxdef{Cil\_types}{mach}. You can base it on the examples available in
-\verb+tests/misc/custom_machdep/custom_machdep.ml+ and
-\verb+src/kernel_internals/runtime/machdeps.ml+.
-The new definition can be added to \framac's database using
-\verb+File.new_machdep+\scodeidxdef{File}{new\_machdep}.
+Machine models are described as \texttt{YAML} files, following the
+\texttt{machdeps/machdep-schema.yaml} schema in \texttt{FRAMAC\_SHARE}.
+Predefined machdeps are also located in the \texttt{machdeps} directory
+of \framac's \texttt{SHARE} directory and can be used as reference for
+defining new \texttt{machdep}s by hand. It is also possible to automatically
+generate an \texttt{YAML} file with the \texttt{make\_machdep.py} script in
+the \texttt{machdeps/make\_machdep} directory. This script requires a
+C11-compliant cross-compiler for the architecture you want to describe.
+Its main options are:
+\begin{description}
+\item \texttt{-compiler <c>}: the cross-compiler to be used for generating
+  the machdep.
+\item \texttt{-cpp-arch-flags <flag>}: an option given to the compiler for
+selecting the desired architecture. Multiple occurrences of this option can
+occur if you want to pass several options.
+\item \texttt{-o <file>}: put the generated YAML into the given file (default
+is to use standard output).
+\item \texttt{--help}: outputs the list of all options of the script.
+\end{description}
 
-\begin{example}
-  A custom machine description may be implemented as follows
-  (the meaning of each field is presented later in this section):
-\begin{ocamlcode}
-let my_machine =
-{
-  version          = "generic C compiler for my machine";
-  compiler         = "generic";
-  cpp_arch_flags   = [];
-  sizeof_short     = 2;
-  sizeof_int       = 4;
-  sizeof_long      = 4;
-  sizeof_longlong  = 8;
-  sizeof_ptr       = 4;
-  sizeof_float     = 4;
-  sizeof_double    = 8;
-  sizeof_longdouble  = 12;
-  sizeof_void      = 1;
-  sizeof_fun       = 1;
-  size_t = "unsigned long";
-  wchar_t = "int";
-  ptrdiff_t = "int";
-  alignof_short = 2;
-  alignof_int = 4;
-  alignof_long = 4;
-  alignof_longlong = 4;
-  alignof_ptr = 4;
-  alignof_float = 4;
-  alignof_double = 4;
-  alignof_longdouble = 4;
-  alignof_str = 1;
-  alignof_fun = 1;
-  alignof_aligned = 16;
-  char_is_unsigned = false;
-  const_string_literals = true;
-  little_endian = true;
-  underscore_name = false ;
-  has__builtin_va_list = true;
-}
+Note that for some compiler setups, notably for non-POSIX compilation targets,
+the script may fail to find an appropriate value for some fields and will
+instead put some default value. In that case, warnings will give the names of
+the problematic fields. Since the issue likely stems from the fact that the
+corresponding C feature is not supported on the compilation target in the first
+place, in practice, such feature is not expected to be found in code written for
+such target. However, users are invited to review the generated YAML and
+provide more appropriate values for these fields if needed.
 
-let () = File.new_machdep "my_machine" my_machine
-\end{ocamlcode}
-\end{example}
+In order to communicate machine-related information to the preprocessor (notably
+the value of standard macros), \framac generates a specific header,
+\verb+__fc_machdep.h+, that is automatically included by the standard headers from
+\framac's standard C library. Field \verb+custom_defs+ of the YAML file allows
+customizing this header (see next section for more information).
 
-\index{Command Line!-machdep@\texttt{-machdep}}%
-After this code is loaded, \framac can be instructed to use the new machine
-model using the \texttt{-machdep} command line option.
+\subsection{Machdep record fields}\label{sec:machdep-fields}
 
-If you intend to use \framac's standard library headers, you must also do the
-following:
+Each field of the machdep is succintly described in the
+\verb+machdep-schema.yaml+ file.
+We present below a thorough description of each field.
 
-\begin{itemize}
-\item define constant \verb+__FC_MACHDEP_<CUSTOM>+, replacing \verb+<CUSTOM>+
-  with the name (in uppercase letters) of your created machdep;
-  this can be done via \verb+-cpp-extra-args="-D__FC_MACHDEP_<CUSTOM>"+;
-\item provide a header file with macro definitions corresponding to your \caml
-  definitions. For the most part, these are macros prefixed by \verb+__FC_+,
-  corresponding to standard C macro definitions, {\it e.g.},
-  \verb+__FC_UCHAR_MAX+. These definitions are used by \framac's
-  \verb+<limits.h>+ and other headers to provide the standard C definitions.
-  The test file \verb+tests/misc/custom_machdep/__fc_machdep_custom.h+
-  (reproduced below)
-  contains a complete example of the required definitions. Other examples can
-  be found in \verb+share/libc/__fc_machdep.h+.
-\end{itemize}
-Make sure that your custom header defines the \verb+__FC_MACHDEP+
-include guard, and that the program you are analyzing includes this header
-before all other headers. One way to ensure this without having to modify any
-source files is to use an option such as \verb+-include+ in GCC.
-
-\begin{example}
-  Contents of \verb+tests/misc/custom_machdep/__fc_machdep_custom.h+, used as
-  example for creating custom machdeps. Notice the unusual size for \verb+int+
-  (3 bytes), selected for testing purposes only, and inconsistent with the
-  chosen values for \verb+INT_MIN+ and \verb+INT_MAX+, which do not fit
-  in 3 bytes.
-\lstinputlisting{../../tests/misc/custom_machdep/__fc_machdep_custom.h}
-\end{example}
-
-An example of the complete command-line is presented below, for a custom
-machdep called \texttt{myarch}, defined in file \verb+my_machdep.ml+ and
-with stdlib constants defined in \verb+machdep_myarch.h+:
-
-\begin{listing-nonumber}
-  frama-c -load-script my_machdep.ml -machdep myarch \
-    -cpp-extra-args="-D__FC_MACHDEP_MYARCH -include machdep_myarch.h"
-\end{listing-nonumber}
-
-\section{Machdep record fields}\label{sec:machdep-fields}
-
-Each field in the machdep record is succintly described in the \verb+Cil_types+
-module. We present below a thorough description of each field.
-
+\paragraph{Meta-data}
 \begin{description}
 \item[\texttt{version}]: human-readable textual description of the machdep.
+\item[\texttt{machdep\_name}]: name of the machdep, must only contain alphanumeric
+  characters or underscore (\verb+_+). If it is e.g. \verb+custom_name+, the generated header will
+  define a macro of the form \verb+__FC_MACHDEP_CUSTOM_NAME+.
 \item[\texttt{compiler}]: defines whether special compiler-specific extensions
   will be enabled. It should be one of the strings below:
   \begin{itemize}
@@ -3332,15 +3278,17 @@ module. We present below a thorough description of each field.
     compiler-specific extensions.
   \end{itemize}
   Note that some compiler extensions, such as attributes, are always enabled.
-\item[\texttt{cpp\_arch\_flags}]: list of arguments to be added to the
-  command-line when invoking the C preprocessor. Typically used to ensure that
-  multiarch compilers apply the appropriate predefined macros\footnote{Note that
-    the sizes of standard integer types are already defined in the machdep,
-    so they do not depend on these flags.}.
-  E.g. use \verb+["-m32"]+ for a 32-bit machdep when preprocessing with a
-  64-bit multiarch GCC.
+\item[\texttt{cpp\_arch\_flags}]: list of arguments used by the compiler to
+  select the corresponding architecture, e.g. \verb+["-m32"]+ for a 32-bit
+  machdep. Older versions (up to 26.x - Iron) of \framac did pass these flags to the pre-processor,
+  in order for it to define a set of built-in macros related to said architecture.
+  Current versions do not use this field, and rely on \texttt{\texttt{custom\_defs}}
+  containing the appropriate definitions.
   Note that, in practice, very few programs rely on such predefined macros,
   such as \verb+__x86_64+ and \verb+__i386+.
+\end{description}
+\paragraph{Standard sizes and alignment constraints}
+\begin{description}
   \item[\texttt{sizeof\_short}]: size (in bytes) of the \verb+short+ type.
   \item[\texttt{sizeof\_int}]: size (in bytes) of the \verb+int+ type.
   \item[\texttt{sizeof\_long}]: size (in bytes) of the \verb+long+ type.
@@ -3352,7 +3300,7 @@ module. We present below a thorough description of each field.
   \item[\texttt{sizeof\_ptr}]: size (in bytes) of an object (non-function)
     pointer.
   \item[\texttt{sizeof\_float}]: size (in bytes) of a single-precision floating
-    point. In implementations compliant with ISO/IEC/IEEE 60559 -IEEE 754,
+    point. In implementations compliant with ISO/IEC/IEEE 60559 - IEEE 754,
     this is always 4.
   \item[\texttt{sizeof\_double}]: size (in bytes) of a double-precision floating
     point. In implementations compliant with ISO/IEC/IEEE 60559 - IEEE 754,
@@ -3363,16 +3311,10 @@ module. We present below a thorough description of each field.
     \framac plugins,  but this field exists for future expansion, and
     to compute \verb+sizeof+ of aggregates properly.
   \item[\texttt{sizeof\_void}]: the result of evaluating \verb+sizeof(void)+
-    by the compiler (or 0 if unsupported).
+    by the compiler (or negative if unsupported).
   \item[\texttt{sizeof\_fun}]: the result of evaluating \verb+sizeof(f)+, where
     \verb+f+ is a function ({\em not} a function pointer) by the compiler
     (or negative if unsupported).
-  \item[\texttt{size\_t}]: a string containing the actual type that
-    \verb+size_t+ expands to, e.g. \verb+"unsigned long"+.
-  \item[\texttt{wchar\_t}]: a string containing the actual type that
-    \verb+wchar_t+ expands to. If unsupported, you can use \verb+int+.
-  \item[\texttt{ptrdiff\_t}]: a string containing the actual type that
-    \verb+ptrdiff_t+ expands to. If unsupported, you can use \verb+int+.
   \item[\texttt{alignof\_short}]: the result of evaluating
     \verb+_Alignof(short)+.
   \item[\texttt{alignof\_int}]: the result of evaluating \verb+_Alignof(int)+.
@@ -3395,30 +3337,119 @@ module. We present below a thorough description of each field.
     \verb+aligned+ attribute (or 1 if unsupported). This corresponds to the
     default alignment when using \verb+#pragma packed()+ without a numeric
     argument.
+\end{description}
+
+\paragraph{Standard types}
+
+\begin{description}
+\item[\texttt{int\_fast8\_t}]: a string containing the actual type that
+  \verb+int_fast8_t+ expands to. Usually \verb+signed char+.
+\item[\texttt{int\_fast16\_t}]: a string containing the actual type that
+  \verb+int_fast16_t+ expands to. Usually \verb+int+ or \verb+long+.
+\item[\texttt{int\_fast32\_t}]: a string containing the actual type that
+  \verb+int_fast_32_t+ expands to. Usually \verb+int+ or \verb+long+.
+\item[\texttt{int\_fast64\_t}]: a string containing the actual type that
+  \verb+int_fast64_t+ expands to. Usually \verb+long+ or \verb+long long+.
+\item[\texttt{uint\_fast8\_t}]: a string containing the actual type that
+  \verb+uint_fast8_t+ expands to. Usually \verb+unsigned char+.
+\item[\texttt{uint\_fast16\_t}]: a string containing the actual type that
+  \verb+uint_fast16_t+ expands to. Usually \verb+unsigned int+ or \verb+unsigned long+.
+\item[\texttt{uint\_fast32\_t}]: a string containing the actual type that
+  \verb+uint_fast_32_t+ expands to. Usually \verb+unsigned int+ or \verb+unsigned long+.
+\item[\texttt{uint\_fast64\_t}]: a string containing the actual type that
+  \verb+uint_fast64_t+ expands to. Usually \verb+unsigned long+ or
+  \verb+unsigned long long+.
+\item[\texttt{intptr\_t}]: a string containing the actual type that
+  \verb+intptr_t+ expands to, e.g. \verb+long+
+\item[\texttt{uintptr\_t}]: a string containing the actual type that
+  \verb+uintptr_t+ expands to, e.g. \verb+unsigned long+
+\item[\texttt{size\_t}]: a string containing the actual type that
+  \verb+size_t+ expands to, e.g. \verb+unsigned long+.
+\item[\texttt{ssize\_t}]: a string containing the actual type that
+  \verb+ssize_t+ expands to, e.g. \verb+long+
+\item[\texttt{wchar\_t}]: a string containing the actual type that
+  \verb+wchar_t+ expands to. If unsupported, you can use \verb+int+.
+\item[\texttt{ptrdiff\_t}]: a string containing the actual type that
+  \verb+ptrdiff_t+ expands to. If unsupported, you can use \verb+int+.
+\item[\texttt{sig\_atomic\_t}]: a string containing the actual type that
+  \verb+sig_atomic_t+ expands to (i.e. an integer type that can be
+  accessed atomically even in presence of interrupts).
+\item[\texttt{time\_t}]: a string containing the actual type that
+  \verb+time_t+ expands to (i.e. an integer type that can hold time
+  values in seconds).
+\item[\texttt{wint\_t}]: a string containing the actual type that
+  \verb+wint_t+ expands to (i.e. an integer type capable of holding any
+  \verb+wchar_t+ and \verb+WEOF+)
+\end{description}
+
+\paragraph{Standard macros}
+
+Note that all fields described in this paragraph have \texttt{string} values,
+even if they denote numeric constants. In order to avoid errors when loading the
+YAML file, you can force them to be considered as strings by enclosing them between
+single or double quotes, as in \verb+eof: '(-1)'+ (as a sidenote, negative values
+should be enclosed in parentheses, in order to ensure safe macro expansions).
+
+\begin{description}
+  \item[\texttt{bufsiz}]: value of the \texttt{BUFSIZ} macro, i.e. the size
+    of buffers used by I/O functions in \texttt{stdio.h}.
+  \item[\texttt{eof}]: value of the \texttt{EOF} macro, the value returned by input
+    functions in \texttt{stdio.h} to indicate the end of the stream.
+  \item[\texttt{errno}]: list of possible errors with their numeric value. In order
+    to be easier to read, the content of this field is in fact written itself as an
+    object whose fields are the name of the errors. For instance, for a machdep defining
+    only the three errors mandated by the C standard, we would have:
+    \begin{verbatim}
+    errno:
+        edom: 1
+        eilseq: 2
+        erange: 3
+    \end{verbatim}
+  \item[\texttt{filename\_max}]: value of the \texttt{FILENAME\_MAX} macro, which
+    denotes the longest name that is guaranteed to be accepted by \texttt{fopen}.
+  \item[\texttt{fopen\_max}]: value of the \texttt{FOPEN\_MAX} macro, which denotes the
+    greatest number of streams that can be simultaneously opened by the program.
+  \item[\texttt{host\_name\_max}]: value of the \texttt{HOST\_NAME\_MAX} macro, which
+    denotes the maximum length of a hostname (without terminating null byte).
+  \item[\texttt{l\_tmpnam}]: value of the \texttt{L\_tmpnam} macro, which denotes
+    the maximum size of a temporary filename as returned by \texttt{tmpnam}.
+  \item[\texttt{mb\_cur\_max}]: value of the \texttt{MB\_CUR\_MAX} macro, which denotes
+    the maximum number of bytes for a character in the current locale (usually
+    \texttt{'1'}).
+  \item[\texttt{nsig}]: number of possible signals (non-standard macro, can be left
+    empty if undefined for the current machdep).
+  \item[\texttt{path\_max}]: value of the \texttt{PATH\_MAX} macro, which denotes
+    the maximum size (including terminating null) that can be stored in a buffer
+    when returning a pathname.
+  \item[\texttt{posix\_version}]: value of the \texttt{\_POSIX\_VERSION} macro.
+    Leave empty on non-POSIX machdeps.
+  \item[\texttt{rand\_max}]: value of the \texttt{RAND\_MAX} macro, which denotes
+    the maximum value returned by \texttt{rand}.
+  \item[\texttt{tmp\_max}]: value of the \texttt{TMP\_MAX} macro, which denotes
+    the minimum number of temporary filenames returned by \texttt{tmpnam} that
+    are guaranteed to be distinct.
+  \item[\texttt{tty\_name\_max}]: value of the \texttt{TTY\_NAME\_MAX} macro, which
+    denotes the maximum length of a terminal device name (including terminating null byte).
+  \item[\texttt{weof}]: value of the \texttt{WEOF} macro, similar to \texttt{EOF},
+    but for wide chars.
+  \item[\texttt{wordsize}]: value of the \texttt{\_\_WORDSIZE} macro, which denotes
+    the length of a word on the current architecture.
+\end{description}
+
+\paragraph{Other features}
+\begin{description}
   \item[\texttt{char\_is\_unsigned}]: whether type \verb+char+ is unsigned.
-  \item[\texttt{const\_string\_literals}]: whether string literals have const
-    chars, or are writable. If \verb+true+, the following code has undefined
-    behavior, otherwise it is defined: \verb+char *s = "no"; s[0] = 'g';+.
-  \item[\texttt{little\_endian}]: whether the machine is little endian.
-  \item[\texttt{underscore\_name}]: whether the compiler generates assembly
-    labels by prepending \verb+_+ to the identifier. That is, will function
-    \verb+foo()+ have the label \verb+foo+, or \verb+_foo+?
+  \item[\texttt{little\_endian}]: whether the machine is little endian or big
+    endian\footnote{More exotic endianness such as mixed-endian are currently unsupported.}.
   \item[\texttt{has\_\_builtin\_va\_list}]: whether \verb+__builtin_va_list+
     is a (built-in) type known by the preprocessor.
   \item[\texttt{\_\_thread\_is\_keyword}]: whether \verb+__thread+ is a
     keyword (otherwise, it can be used as a standard identifier).
+  \item[\texttt{custom\_defs}]: arbitrary text that will be appended
+    verbatim at the
+    end of the generated header file (this is empty in machdeps that are
+    generated by the \texttt{make\_machdep.py} script).
 \end{description}
-
-\paragraph{Writing a new machdep}
-
-Writing a machdep for a new architecture is not trivial, due to the fact
-that some steps are hard to automate. If you have a working compiler for the
-target architecture, you can use it to produce an executable that will print
-the contents of expressions such as \verb+sizeof(long)+, \verb+_Alignof(int)+,
-etc. You can also use the compiler to test for unsupported features.
-In case \verb+printf+ is not available, you can use the exit code of the
-program (return code of \verb+main+). In case you can only preprocess, but not
-compile and run the program, the assembly code may provide some useful data.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

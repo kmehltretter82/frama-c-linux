@@ -296,8 +296,11 @@ The list of supported platforms can be obtained by typing:
 \$ frama-c -machdep help
 \end{frama-c-commands}
 
-The process for adding a new platform is described in the Plug-in
-Development Guide~\cite{plugin-dev-guide}.
+Apart from these default platforms, it is possible to give as argument
+to \texttt{-machdep} option the path of a YAML file containing the information
+needed by \FramaC. The Plug-in Development Guide~\cite{plugin-dev-guide} describes
+this format in more detail, as well as the use of the \texttt{make\_machdep.py}
+script to automatically generate it.
 
 \item \optiondef{-}{simplify-cfg} allows \FramaC to remove break, continue and
   switch statements. This option is automatically set by some plug-ins that

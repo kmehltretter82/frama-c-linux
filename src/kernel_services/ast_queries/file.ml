@@ -23,7 +23,6 @@
 open Cil_types
 open Cil
 open Visitor
-open Cil_datatype
 
 type cpp_opt_kind = Gnu | Not_gnu | Unknown
 
@@ -267,81 +266,34 @@ let print_machdep fmt (m : Cil_types.mach) =
       (if m.char_is_unsigned then "unsigned" else "signed");
     Format.fprintf fmt "   machine is %s endian@\n"
       (if m.little_endian then "little" else "big") ;
-    Format.fprintf fmt "   strings are %s chars@\n"
-      (if m.const_string_literals then "const" else "writable") ;
-    Format.fprintf fmt "   assembly names %s leading '_'@\n"
-      (if m.underscore_name then "have" else "have no") ;
     Format.fprintf fmt "   compiler %s builtin __va_list@\n"
       (if m.has__builtin_va_list then "has" else "has not") ;
   end
 
-module DatatypeMachdep = Datatype.Make_with_collections(struct
-    include Datatype.Serializable_undefined
-    let reprs = [Machdeps.x86_32]
-    let name = "File.Machdep"
-    type t = Cil_types.mach
-    let compare : t -> t -> int = Stdlib.compare
-    let equal : t -> t -> bool = (=)
-    let hash : t -> int = Hashtbl.hash
-    let copy = Datatype.identity
-  end)
+let machdep_dir () = Kernel.Share.get_dir ~mode:`Must_exist "machdeps"
 
-let default_machdeps =
-  [ "x86_16", Machdeps.x86_16;
-    "x86_32", Machdeps.x86_32;
-    "x86_64", Machdeps.x86_64;
-    "gcc_x86_16", Machdeps.gcc_x86_16;
-    "gcc_x86_32", Machdeps.gcc_x86_32;
-    "gcc_x86_64", Machdeps.gcc_x86_64;
-    "ppc_32", Machdeps.ppc_32;
-    "msvc_x86_64", Machdeps.msvc_x86_64;
-  ]
+let regexp_machdep = Str.regexp "^machdep_\\([^.]*\\).yaml$"
 
-let regexp_existing_machdep_macro = Str.regexp "-D[ ]*__FC_MACHDEP_"
+let default_machdep_file machdep =
+  let filename = "machdep_" ^ machdep ^ ".yaml" in
+  Filepath.Normalized.concat (machdep_dir()) filename
 
-let existing_machdep_macro () =
-  let extra = String.concat " " (Kernel.CppExtraArgs.get ()) in
-  try
-    ignore (Str.search_forward regexp_existing_machdep_macro extra 0);
-    true
-  with Not_found -> false
+let is_default_machdep machdep =
+  Filepath.Normalized.is_file (default_machdep_file machdep)
 
-let machdep_macro = function
-  | "x86_16"                -> "__FC_MACHDEP_X86_16"
-  | "gcc_x86_16"            -> "__FC_MACHDEP_GCC_X86_16"
-  | "x86_32"                -> "__FC_MACHDEP_X86_32"
-  | "gcc_x86_32"            -> "__FC_MACHDEP_GCC_X86_32"
-  | "x86_64"                -> "__FC_MACHDEP_X86_64"
-  | "gcc_x86_64"            -> "__FC_MACHDEP_GCC_X86_64"
-  | "ppc_32"                -> "__FC_MACHDEP_PPC_32"
-  | "msvc_x86_64"           -> "__FC_MACHDEP_MSVC_X86_64"
-  | s ->
-    let res = "__FC_MACHDEP_" ^ (String.uppercase_ascii s) in
-    Kernel.warning ~once:true
-      "machdep %s has no registered macro. Using %s for pre-processing" s res;
-    res
+let mem_machdep s = is_default_machdep s || Sys.file_exists s
 
-module Machdeps =
-  State_builder.Hashtbl(Datatype.String.Hashtbl)(DatatypeMachdep)
-    (struct
-      let name = " File.Machdeps"
-      let size = 5
-      let dependencies = []
-    end)
-
-let mem_machdep s = Machdeps.mem s || List.mem_assoc s default_machdeps
-
-let new_machdep s m =
-  try
-    let cm = Machdeps.find s in
-    if not (cm = m) then
-      Kernel.abort "trying to register incompatible machdeps under name `%s'" s
-  with Not_found ->
-    Machdeps.add s m
+let default_machdeps () =
+  Array.fold_right
+    (fun s acc ->
+       if Str.string_match regexp_machdep s 0 then
+         Str.matched_group 1 s :: acc
+       else acc)
+    (Sys.readdir (machdep_dir() :> string))
+    []
 
 let pretty_machdeps fmt =
-  Machdeps.iter (fun x _ -> Format.fprintf fmt "@ %s" x);
-  List.iter (fun (x, _) -> Format.fprintf fmt "@ %s" x) default_machdeps
+  List.iter (fun s -> Format.fprintf fmt "@ %s" s) (default_machdeps())
 
 let machdep_help () =
   let m = Kernel.Machdep.get () in
@@ -358,23 +310,116 @@ let () = Cmdline.run_after_exiting_stage machdep_help
 let set_machdep () =
   let m = Kernel.Machdep.get () in
   if not (mem_machdep m) then
-    Kernel.abort "@[unsupported machine %s.@ Try one of%t.@]" m pretty_machdeps
+    Kernel.abort "@[unsupported machine '%s'.@ Either use a predefined name among %t,@ or an YAML machdep file.@]" m pretty_machdeps
 
 let () = Cmdline.run_after_configuring_stage set_machdep
+
+let yaml_dict_to_list = function
+  | `O l ->
+    let make_one acc (k,v) =
+      Result.(
+        bind acc
+          (fun l ->
+             match Yaml.Util.to_string v with
+             | Ok s -> Ok((k,s) :: l)
+             | Error (`Msg s) ->
+               Error (`Msg ("Unexpected value for key " ^ k ^ ": " ^ s))))
+    in
+    List.fold_left make_one (Ok []) l
+  | _ -> Error (`Msg "Unexpected YAML value instead of dictionary of strings")
+
+type mach = Cil_types.mach = {
+  sizeof_short: int;
+  sizeof_int: int;
+  sizeof_long: int ;
+  sizeof_longlong: int;
+  sizeof_ptr: int;
+  sizeof_float: int;
+  sizeof_double: int;
+  sizeof_longdouble: int;
+  sizeof_void: int;
+  sizeof_fun: int;
+  size_t: string;
+  ssize_t: string;
+  wchar_t: string;
+  ptrdiff_t: string;
+  intptr_t: string;
+  uintptr_t: string;
+  int_fast8_t: string;
+  int_fast16_t: string;
+  int_fast32_t: string;
+  int_fast64_t: string;
+  uint_fast8_t: string;
+  uint_fast16_t: string;
+  uint_fast32_t: string;
+  uint_fast64_t: string;
+  wint_t: string;
+  sig_atomic_t: string;
+  time_t: string;
+  alignof_short: int;
+  alignof_int: int;
+  alignof_long: int;
+  alignof_longlong: int;
+  alignof_ptr: int;
+  alignof_float: int;
+  alignof_double: int;
+  alignof_longdouble: int;
+  alignof_str: int;
+  alignof_fun: int;
+  char_is_unsigned: bool;
+  little_endian: bool;
+  alignof_aligned: int;
+  has__builtin_va_list: bool;
+  compiler: string;
+  cpp_arch_flags: string list;
+  version: string;
+  weof: string;
+  wordsize: string;
+  posix_version: string;
+  bufsiz: string;
+  eof: string;
+  fopen_max: string;
+  filename_max: string;
+  host_name_max: string;
+  tty_name_max: string;
+  l_tmpnam: string;
+  path_max: string;
+  tmp_max: string;
+  rand_max: string;
+  mb_cur_max: string;
+  nsig: string;
+  errno: (string * string) list [@of_yaml yaml_dict_to_list];
+  machdep_name: string;
+  custom_defs: string;
+}
+[@@deriving yaml]
 
 (* Local to this module. Use Cil.theMachine.theMachine outside *)
 let get_machdep () =
   let m = Kernel.Machdep.get () in
-  try
-    Machdeps.find m
-  with Not_found ->
-  try
-    List.assoc m default_machdeps
-  with Not_found -> (* Should not happen given the checks above *)
-    Kernel.fatal "Machdep %s not registered" m
+  let file =
+    if is_default_machdep m then default_machdep_file m
+    else Filepath.Normalized.of_string ~existence:Must_exist m
+  in
+  let res =
+    Result.bind
+      (Yaml_unix.of_file (Fpath.v (file:>string)))
+      mach_of_yaml
+  in
+  match res with
+  | Ok machdep -> machdep
+  | Error (`Msg s) ->
+    Kernel.abort "Error during machdep parsing: %s" s
 
-let list_available_machdeps () =
-  Machdeps.fold (fun m _ acc -> m :: acc) (List.map fst default_machdeps)
+let print_machdep_header () =
+  if Kernel.PrintMachdepHeader.get () then begin
+    Machdep.gen_all_defines Format.std_formatter (get_machdep());
+    raise Cmdline.Exit
+  end else Cmdline.nop
+
+let () = Cmdline.run_after_exiting_stage print_machdep_header
+
+let list_available_machdeps = default_machdeps
 
 let pretty_machdep ?fmt ?machdep () =
   let machine = match machdep with None -> get_machdep () | Some m -> m in
@@ -463,33 +508,14 @@ let build_cpp_cmd = function
     (* Hypothesis: the preprocessor is POSIX compliant,
        hence understands -I and -D. *)
     let fc_include_args =
-      if Kernel.FramaCStdLib.get () then [(Fc_config.framac_libc:>string)]
+      if Kernel.FramaCStdLib.get () then
+        begin
+          let machdep_dir = Machdep.generate_machdep_header (get_machdep()) in
+          [(machdep_dir:>string); (Fc_config.framac_libc:>string)]
+        end
       else []
     in
-    let fc_define_args =
-      if not (existing_machdep_macro ())
-      then [machdep_macro (Kernel.Machdep.get ())]
-      else []
-    in
-    let fc_define_args = "__FRAMAC__" :: fc_define_args in
-    (* Hypothesis: the preprocessor does support the arch-related
-       options tested when 'configure' was run. *)
-    let required_cpp_arch_args = (get_machdep ()).cpp_arch_flags in
-    let supported_cpp_arch_args, unsupported_cpp_arch_args =
-      List.partition (fun arg ->
-          List.mem arg Fc_config.preprocessor_supported_arch_options)
-        required_cpp_arch_args
-    in
-    if is_gnu_like = Unknown && not (Kernel.CppCommand.is_set ())
-       && unsupported_cpp_arch_args <> [] then
-      Kernel.warning ~once:true
-        "your preprocessor is not known to handle option(s) `%s', \
-         considered necessary for machdep `%s'. To ensure compatibility \
-         between your preprocessor and the machdep, consider using \
-         -cpp-command with the appropriate flags. \
-         Your preprocessor is known to support these flags: %s"
-        (concat_strs unsupported_cpp_arch_args) (Kernel.Machdep.get ())
-        (concat_strs Fc_config.preprocessor_supported_arch_options);
+    let fc_define_args = ["__FRAMAC__"] in
     let nostdinc_arg =
       if Kernel.FramaCStdLib.get() then add_if_gnu "-nostdinc"
       else []
@@ -511,7 +537,7 @@ let build_cpp_cmd = function
     in
     let supp_args =
       string_of_supp_args
-        (gnu_implicit_args @ supported_cpp_arch_args @
+        (gnu_implicit_args @
          extra_for_this_file @ (Kernel.CppExtraArgs.get ()))
         fc_include_args fc_define_args
     in
@@ -524,7 +550,7 @@ let build_cpp_cmd = function
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
       cpp_command_with_chdir;
-    Some (cpp_command_with_chdir, ppf, supported_cpp_arch_args)
+    Some (cpp_command_with_chdir, ppf)
 
 let abort_with_detailed_pp_message f cpp_command =
   let possible_cause =
@@ -562,7 +588,7 @@ let parse_cabs cpp_command = function
       Datatype.Filepath.pretty f;
     Frontc.parse f ()
   | NeedCPP (f, cmdl, _extra_for_this_file, is_gnu_like) ->
-    let cpp_command, ppf, logic_pp_args = Option.get cpp_command in
+    let cpp_command, ppf = Option.get cpp_command in
     Kernel.feedback "Parsing %a (with preprocessing)"
       Datatype.Filepath.pretty f;
     if Sys.command cpp_command <> 0 then begin
@@ -582,12 +608,9 @@ let parse_cabs cpp_command = function
                   "trying to preprocess annotation with an unknown \
                    preprocessor."; true))
       then begin
-        let supp_args =
-          Format.asprintf "%s" (concat_strs ~pre:" " ~sep:" " logic_pp_args)
-        in
         let ppf' =
           try Logic_preprocess.file ".c"
-                (replace_in_cpp_cmd cmdl supp_args)
+                (replace_in_cpp_cmd cmdl "")
                 (ppf : Filepath.Normalized.t :> string)
           with Sys_error _ as e ->
             safe_remove_file ppf;
@@ -913,7 +936,7 @@ let cleanup file =
   let visitor = object(self)
     inherit Visitor.frama_c_inplace
 
-    val mutable keep_stmt = Stmt.Set.empty
+    val mutable keep_stmt = Cil_datatype.Stmt.Set.empty
 
     val mutable changed = false
 
@@ -927,9 +950,9 @@ let cleanup file =
 
     method! vstmt_aux st =
       self#remove_lexical_annotations st;
-      let loc = Stmt.loc st in
+      let loc = Cil_datatype.Stmt.loc st in
       if Annotations.has_code_annot st || st.labels <> [] || st.sattr <> [] then
-        keep_stmt <- Stmt.Set.add st keep_stmt;
+        keep_stmt <- Cil_datatype.Stmt.Set.add st keep_stmt;
       match st.skind with
       | Block b ->
         (* queue is flushed afterwards*)
@@ -945,8 +968,9 @@ let cleanup file =
         b.bstmts <-
           List.filter
             (fun x ->
-               not (Cil.is_skip x.skind) || Stmt.Set.mem x keep_stmt ||
-               ( changed <- true; false) (* don't try this at home, kids...*)
+               not (Cil.is_skip x.skind)
+               || Cil_datatype.Stmt.Set.mem x keep_stmt
+               || (changed <- true; false)
             )
             b.bstmts;
         (* Now that annotations are in the table, we do not need to
@@ -1262,7 +1286,7 @@ let find_logic_info_decl li =
          | GAnnot (ga,_) ->
            if
              List.exists
-               (fun li' -> Logic_info.equal li li')
+               (fun li' -> Cil_datatype.Logic_info.equal li li')
                (extract_logic_infos ga)
            then raise (F.Found g)
          | _ -> ())
@@ -1284,12 +1308,12 @@ class reorder_ast: Visitor.frama_c_visitor =
   in
   object(self)
     inherit Visitor.frama_c_inplace
-    val mutable known_enuminfo = Enuminfo.Set.empty
-    val mutable known_compinfo = Compinfo.Set.empty
-    val mutable known_typeinfo = Typeinfo.Set.empty
-    val mutable known_var = Varinfo.Set.empty
-    val mutable known_logic_info = Logic_info.Set.empty
-    val mutable local_logic_info = Logic_info.Set.empty
+    val mutable known_enuminfo = Cil_datatype.Enuminfo.Set.empty
+    val mutable known_compinfo = Cil_datatype.Compinfo.Set.empty
+    val mutable known_typeinfo = Cil_datatype.Typeinfo.Set.empty
+    val mutable known_var = Cil_datatype.Varinfo.Set.empty
+    val mutable known_logic_info = Cil_datatype.Logic_info.Set.empty
+    val mutable local_logic_info = Cil_datatype.Logic_info.Set.empty
 
     (* globals that have to be declared before current declaration. *)
     val mutable needed_decls = []
@@ -1306,19 +1330,19 @@ class reorder_ast: Visitor.frama_c_visitor =
     val logic_info_deps = Global_annotation_graph.create ()
 
     method private add_known_enuminfo ei =
-      known_enuminfo <- Enuminfo.Set.add ei known_enuminfo
+      known_enuminfo <- Cil_datatype.Enuminfo.Set.add ei known_enuminfo
 
     method private add_known_compinfo ci =
-      known_compinfo <- Compinfo.Set.add ci known_compinfo
+      known_compinfo <- Cil_datatype.Compinfo.Set.add ci known_compinfo
 
     method private add_known_type ty =
-      known_typeinfo <- Typeinfo.Set.add ty known_typeinfo
+      known_typeinfo <- Cil_datatype.Typeinfo.Set.add ty known_typeinfo
 
     method private add_known_var vi =
-      known_var <- Varinfo.Set.add vi known_var
+      known_var <- Cil_datatype.Varinfo.Set.add vi known_var
 
     method private add_known_logic_info li =
-      known_logic_info <- Logic_info.Set.add li known_logic_info
+      known_logic_info <- Cil_datatype.Logic_info.Set.add li known_logic_info
 
     method private add_needed_decl g =
       needed_decls <- g :: needed_decls
@@ -1396,8 +1420,8 @@ class reorder_ast: Visitor.frama_c_visitor =
                   (Daxiomatic
                      (unique_name_recursive_axiomatic (),
                       entries, attr,
-                      Location.unknown),
-                   Location.unknown))::res)
+                      Cil_datatype.Location.unknown),
+                   Cil_datatype.Location.unknown))::res)
             entries []
         end else begin
           Global_annotation_graph.fold
@@ -1422,7 +1446,7 @@ class reorder_ast: Visitor.frama_c_visitor =
 
        | TNamed (ty,_) ->
          let g = find_typeinfo ty in
-         if not (Typeinfo.Set.mem ty known_typeinfo) then begin
+         if not (Cil_datatype.Typeinfo.Set.mem ty known_typeinfo) then begin
            self#add_needed_decl g;
            Stack.push g typedefs;
            Stack.push true subvisit;
@@ -1440,19 +1464,19 @@ class reorder_ast: Visitor.frama_c_visitor =
                    ty.tname)
              typedefs
        | TComp(ci,_) ->
-         if not (Compinfo.Set.mem ci known_compinfo) then begin
-           self#add_needed_decl (GCompTagDecl (ci,Location.unknown));
+         if not (Cil_datatype.Compinfo.Set.mem ci known_compinfo) then begin
+           self#add_needed_decl(GCompTagDecl(ci,Cil_datatype.Location.unknown));
            self#add_known_compinfo ci
          end
        | TEnum(ei,_) ->
-         if not (Enuminfo.Set.mem ei known_enuminfo) then begin
-           self#add_needed_decl (GEnumTagDecl (ei, Location.unknown));
+         if not (Cil_datatype.Enuminfo.Set.mem ei known_enuminfo) then begin
+           self#add_needed_decl(GEnumTagDecl(ei,Cil_datatype.Location.unknown));
            self#add_known_enuminfo ei
          end);
       DoChildren
 
     method! vvrbl vi =
-      if vi.vglob && not (Varinfo.Set.mem vi known_var) then begin
+      if vi.vglob && not (Cil_datatype.Varinfo.Set.mem vi known_var) then begin
         if Cil.isFunctionType vi.vtype then
           self#add_needed_decl (GFunDecl (Cil.empty_funspec(),vi,vi.vdecl))
         else
@@ -1465,7 +1489,7 @@ class reorder_ast: Visitor.frama_c_visitor =
       if not (Logic_env.is_builtin_logic_function lv.l_var_info.lv_name) then
         begin
           let g = find_logic_info_decl lv in
-          if not (Logic_info.Set.mem lv known_logic_info) then begin
+          if not(Cil_datatype.Logic_info.Set.mem lv known_logic_info) then begin
             self#add_annot_depend g;
             Stack.push true subvisit;
             (* visit will also push g in needed_annot. *)
@@ -1477,13 +1501,13 @@ class reorder_ast: Visitor.frama_c_visitor =
         end
 
     method private add_local_logic_info li =
-      local_logic_info <- Logic_info.Set.add li local_logic_info
+      local_logic_info <- Cil_datatype.Logic_info.Set.add li local_logic_info
 
     method private remove_local_logic_info li =
-      local_logic_info <- Logic_info.Set.remove li local_logic_info
+      local_logic_info <- Cil_datatype.Logic_info.Set.remove li local_logic_info
 
     method private is_local_logic_info li =
-      Logic_info.Set.mem li local_logic_info
+      Cil_datatype.Logic_info.Set.mem li local_logic_info
 
     method! vlogic_var_use lv =
       let logic_infos = Annotations.logic_info_of_global lv.lv_name in
@@ -1541,48 +1565,53 @@ class reorder_ast: Visitor.frama_c_visitor =
 
 module Remove_spurious = struct
   type env =
-    { typeinfos: Typeinfo.Set.t;
-      compinfos: Compinfo.Set.t;
-      enuminfos: Enuminfo.Set.t;
-      varinfos: Varinfo.Set.t;
-      logic_infos: Logic_info.Set.t;
+    { typeinfos: Cil_datatype.Typeinfo.Set.t;
+      compinfos: Cil_datatype.Compinfo.Set.t;
+      enuminfos: Cil_datatype.Enuminfo.Set.t;
+      varinfos: Cil_datatype.Varinfo.Set.t;
+      logic_infos: Cil_datatype.Logic_info.Set.t;
       kept: global list;
     }
 
   let treat_one_global acc g =
     match g with
-    | GType (ty,_) when Typeinfo.Set.mem ty acc.typeinfos -> acc
+    | GType (ty,_) when Cil_datatype.Typeinfo.Set.mem ty acc.typeinfos -> acc
     | GType (ty,_) ->
       { acc with
-        typeinfos = Typeinfo.Set.add ty acc.typeinfos;
+        typeinfos = Cil_datatype.Typeinfo.Set.add ty acc.typeinfos;
         kept = g :: acc.kept }
     | GCompTag _ -> { acc with kept = g :: acc.kept }
-    | GCompTagDecl(ci,_) when Compinfo.Set.mem ci acc.compinfos -> acc
+    | GCompTagDecl(ci,_)
+      when Cil_datatype.Compinfo.Set.mem ci acc.compinfos -> acc
     | GCompTagDecl(ci,_) ->
       { acc with
-        compinfos = Compinfo.Set.add ci acc.compinfos;
+        compinfos = Cil_datatype.Compinfo.Set.add ci acc.compinfos;
         kept = g :: acc.kept }
     | GEnumTag _ -> { acc with kept = g :: acc.kept }
-    | GEnumTagDecl(ei,_) when Enuminfo.Set.mem ei acc.enuminfos -> acc
+    | GEnumTagDecl(ei,_)
+      when Cil_datatype.Enuminfo.Set.mem ei acc.enuminfos -> acc
     | GEnumTagDecl(ei,_) ->
       { acc with
-        enuminfos = Enuminfo.Set.add ei acc.enuminfos;
+        enuminfos = Cil_datatype.Enuminfo.Set.add ei acc.enuminfos;
         kept = g :: acc.kept }
     | GVarDecl(vi,_) | GFunDecl (_, vi, _)
-      when Varinfo.Set.mem vi acc.varinfos -> acc
+      when Cil_datatype.Varinfo.Set.mem vi acc.varinfos -> acc
     | GVarDecl(vi,_) ->
       { acc with
-        varinfos = Varinfo.Set.add vi acc.varinfos;
+        varinfos = Cil_datatype.Varinfo.Set.add vi acc.varinfos;
         kept = g :: acc.kept }
     | GVar _ | GFun _ | GFunDecl _ -> { acc with kept = g :: acc.kept }
     | GAsm _ | GPragma _ | GText _ -> { acc with kept = g :: acc.kept }
     | GAnnot (a,_) ->
       let lis = extract_logic_infos a in
-      if List.exists (fun x -> Logic_info.Set.mem x acc.logic_infos) lis
+      if List.exists
+          (fun x -> Cil_datatype.Logic_info.Set.mem x acc.logic_infos)
+          lis
       then acc
       else begin
         let known_li =
-          List.fold_left (Fun.flip Logic_info.Set.add) acc.logic_infos lis
+          List.fold_left
+            (Fun.flip Cil_datatype.Logic_info.Set.add) acc.logic_infos lis
         in
         { acc with
           kept = g::acc.kept;
@@ -1591,11 +1620,11 @@ module Remove_spurious = struct
       end
 
   let empty =
-    { typeinfos = Typeinfo.Set.empty;
-      compinfos = Compinfo.Set.empty;
-      enuminfos = Enuminfo.Set.empty;
-      varinfos = Varinfo.Set.empty;
-      logic_infos = Logic_info.Set.empty;
+    { typeinfos = Cil_datatype.Typeinfo.Set.empty;
+      compinfos = Cil_datatype.Compinfo.Set.empty;
+      enuminfos = Cil_datatype.Enuminfo.Set.empty;
+      varinfos = Cil_datatype.Varinfo.Set.empty;
+      logic_infos = Cil_datatype.Logic_info.Set.empty;
       kept = [];
     }
 
@@ -1677,7 +1706,7 @@ let compute_sources_table cpp_commands =
     add_source_if_new all_sources_tbl (get_filepath file);
     match cmd_opt with
     | None -> ()
-    | Some (cpp_cmd, _ppf, _sl) ->
+    | Some (cpp_cmd, _ppf) ->
       let tmp_file = create_temp_file "audit_produce_sources" ".txt" in
       let tmp_file = (tmp_file :> string) in
       let cmd_for_sources = cpp_cmd ^ " -H -MM >/dev/null 2>" ^ tmp_file in
@@ -1750,7 +1779,7 @@ let check_source_hashes expected actual_table =
   end
 
 let print_and_exit cpp_commands =
-  let print_cpp_cmd (cpp_cmd, _ppf, _) =
+  let print_cpp_cmd (cpp_cmd, _ppf) =
     Kernel.result "Preprocessing command:@.%s" cpp_cmd
   in
   List.iter (fun (_f, ocmd) -> Option.iter print_cpp_cmd ocmd) cpp_commands;

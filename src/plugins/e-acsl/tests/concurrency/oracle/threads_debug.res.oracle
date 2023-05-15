@@ -35,7 +35,7 @@
 [e-acsl] Warning: annotating undefined function `usleep':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/unistd.h:1142: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/unistd.h:1149: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:505: Warning: 
@@ -169,6 +169,6 @@
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:316: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/unistd.h:1145: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:1152: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.

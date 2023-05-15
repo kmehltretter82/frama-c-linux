@@ -4494,9 +4494,9 @@ let checkTypedefSize name typ =
          (not exact && size < intended_size)
       then
         Kernel.warning ~current:true
-          "bad type '%a' (%d bits) for typedef '%s';@ \
+          "bad type '%a' (%d bits) for typedef '%s' using machdep %s;@ \
            check for mismatch between -machdep flag and headers used"
-          Typ.pretty typ size name
+          Typ.pretty typ size name Cil.theMachine.theMachine.machdep_name
     with
     (* Not a standard integer type, ignore it. *)
       Not_found -> ()

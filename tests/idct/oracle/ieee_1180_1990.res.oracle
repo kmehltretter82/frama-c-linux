@@ -1136,16 +1136,15 @@
               \result ≡ __fc_p_tmpnam
             Unverifiable but considered Valid.
 [ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 109)
-            assigns *(__fc_p_tmpnam + (0 .. 2048)), *(s + (0 .. 2048)),
-                    \result;
+            assigns *(__fc_p_tmpnam + (0 .. 20)), *(s + (0 .. 20)), \result;
             Unverifiable but considered Valid.
 [ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 109)
-            assigns *(__fc_p_tmpnam + (0 .. 2048))
-              \from *(__fc_p_tmpnam + (0 .. 2048)), (indirect: s);
+            assigns *(__fc_p_tmpnam + (0 .. 20))
+              \from *(__fc_p_tmpnam + (0 .. 20)), (indirect: s);
             Unverifiable but considered Valid.
 [ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 111)
-            assigns *(s + (0 .. 2048))
-              \from (indirect: s), *(__fc_p_tmpnam + (0 .. 2048));
+            assigns *(s + (0 .. 20))
+              \from (indirect: s), *(__fc_p_tmpnam + (0 .. 20));
             Unverifiable but considered Valid.
 [ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 112)
             assigns \result \from s, __fc_p_tmpnam;
@@ -1426,7 +1425,7 @@
 
 [ Extern  ] Post-condition 'result_uchar_or_eof'
             ensures
-            result_uchar_or_eof: (0 ≤ \result ≤ 255) ∨ \result ≡ -1
+            result_uchar_or_eof: (0 ≤ \result ≤ 255U) ∨ \result ≡ -1
             Unverifiable but considered Valid.
 [ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 261)
             assigns *stream, \result;

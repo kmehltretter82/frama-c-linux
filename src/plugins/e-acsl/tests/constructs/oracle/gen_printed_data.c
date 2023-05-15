@@ -21,16 +21,16 @@ enum EBool {
     EBOOL_MAX = (_Bool)1
 };
 enum EChar {
-    ECHAR_MIN = (char)(-128),
+    ECHAR_MIN = (char)(-127 - 1),
     ECHAR_MAX = (char)127
 };
 enum ESChar {
-    ESCHAR_MIN = (signed char)(-128),
+    ESCHAR_MIN = (signed char)(-127 - 1),
     ESCHAR_MAX = (signed char)127
 };
 enum EUChar {
     EUCHAR_MIN = (unsigned char)0,
-    EUCHAR_MAX = (unsigned char)255
+    EUCHAR_MAX = (unsigned char)255U
 };
 enum EInt {
     EINT_MIN = -2147483647 - 1,
@@ -41,12 +41,12 @@ enum EUInt {
     EUINT_MAX = 4294967295U
 };
 enum EShort {
-    ESHORT_MIN = (short)(-32768),
+    ESHORT_MIN = (short)(-32767 - 1),
     ESHORT_MAX = (short)32767
 };
 enum EUShort {
     EUSHORT_MIN = (unsigned short)0,
-    EUSHORT_MAX = (unsigned short)65535
+    EUSHORT_MAX = (unsigned short)65535U
 };
 enum ELong {
     ELONG_MIN = -9223372036854775807L - 1L,
@@ -164,7 +164,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \let x = int_schar; \true; */ ;
-  unsigned char int_uchar = (unsigned char)255;
+  unsigned char int_uchar = (unsigned char)255U;
   __e_acsl_store_block((void *)(& int_uchar),1UL);
   __e_acsl_full_init((void *)(& int_uchar));
   {
@@ -244,7 +244,7 @@ int main(void)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_7);
   }
   /*@ assert \let x = int_short; \true; */ ;
-  unsigned short int_ushort = (unsigned short)65535;
+  unsigned short int_ushort = (unsigned short)65535U;
   __e_acsl_store_block((void *)(& int_ushort),2UL);
   __e_acsl_full_init((void *)(& int_ushort));
   {
