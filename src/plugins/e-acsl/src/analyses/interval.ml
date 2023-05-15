@@ -78,20 +78,6 @@ let interv_of_unknown_block =
 (* main algorithm *)
 (* ********************************************************************* *)
 
-
-let interv_of_typ_containing_interv = function
-  | Float _ | Rational | Real | Nan as x ->
-    x
-  | Ival i ->
-    try
-      let kind = ikind_of_ival i in
-      interv_of_typ (TInt(kind, []))
-    with Not_representable_ival ->
-      top_ival
-
-let widen_profile =
-  Cil_datatype.Logic_var.Map.map interv_of_typ_containing_interv
-
 let rec fixpoint ~(infer : force:bool ->
                    logic_env:Logic_env.t ->
                    term ->
@@ -114,7 +100,7 @@ let rec fixpoint ~(infer : force:bool ->
     then
       ival
     else
-      let assumed_ival = interv_of_typ_containing_interv inferred_ival in
+      let assumed_ival = Widening.interv_of_typ_containing_interv inferred_ival in
       fixpoint ~infer li args_ival t' assumed_ival
 
 (* Memoization module which retrieves the computed info of some terms *)
@@ -200,27 +186,27 @@ end = struct
     Id_term_in_profile.Hashtbl.clear dep_tbl
 end
 
-(* For recursive functions, it is necessary to use a widened profile to query
+(* For recursive functions, it is necessary to use an extented profile to query
    the table (because of the fixpoint algorithm). This module associates to a
    term in a profile, the profile that should be used to query the table *)
-module Widened_profile: sig
+module Ext_profile: sig
   val get: Profile.t -> logic_info -> Profile.t
   val add: Profile.t -> logic_info -> Profile.t -> unit
   val clear: unit -> unit
 end = struct
 
-  let widened_profile_tbl : Profile.t LFProf.Hashtbl.t
+  let ext_profile_tbl : Profile.t LFProf.Hashtbl.t
     = LFProf.Hashtbl.create 97
 
   let get profile li =
-    LFProf.Hashtbl.find_def widened_profile_tbl (li, profile) profile
+    LFProf.Hashtbl.find_def ext_profile_tbl (li, profile) profile
 
   let add profile i args_ival =
-    LFProf.Hashtbl.add widened_profile_tbl (i, profile) args_ival
+    LFProf.Hashtbl.add ext_profile_tbl (i, profile) args_ival
 
   let clear () =
     Options.feedback ~level:4 "clearing the typing tables";
-    LFProf.Hashtbl.clear widened_profile_tbl
+    LFProf.Hashtbl.clear ext_profile_tbl
 end
 
 let plus_one i =
@@ -477,19 +463,19 @@ let rec infer ~force ~logic_env t =
                 args)
          in
          if LF_env.is_rec li then
-           let widened_profile = widen_profile profile in
-           Widened_profile.add profile li widened_profile;
-           try LF_env.find li widened_profile
+           let ext_profile = Widening.ext_profile profile in
+           Ext_profile.add profile li ext_profile;
+           try LF_env.find li ext_profile
            with
            | Not_found ->
              (match li.l_body with
               | LBpred p ->
-                LF_env.add_pred li widened_profile;
+                LF_env.add_pred li ext_profile;
                 infer_predicate
-                  ~logic_env:(Logic_env.make widened_profile) p;
+                  ~logic_env:(Logic_env.make ext_profile) p;
                 Ival Ival.zero_or_one
               | LBterm t' ->
-                fixpoint ~infer li widened_profile t' (Ival Ival.bottom)
+                fixpoint ~infer li ext_profile t' (Ival Ival.bottom)
               | _ -> assert false)
          else
            let logic_env = Logic_env.make profile in
@@ -693,7 +679,7 @@ and compute_logic_env_if_branches logic_env t =
     end
   | _ -> t_branch, f_branch
 
-(* [type_bound_variables] infers an interval associated with each of
+(* [infer_bound_variables] infers an interval associated with each of
    the provided bounds of a quantified variable, and provides a term
    accordingly. It could happen that the bounds provided for a quantifier
    [lv] are bigger than its type. [type_bound_variables] handles such cases
@@ -766,12 +752,12 @@ and infer_predicate ~logic_env p =
     in
     (match li.l_body with
      | LBpred p when LF_env.is_rec li ->
-       let widened_profile = widen_profile profile in
-       Widened_profile.add profile li widened_profile;
-       (try ignore (LF_env.find li widened_profile)
+       let ext_profile = Widening.ext_profile profile in
+       Ext_profile.add profile li ext_profile;
+       (try ignore (LF_env.find li ext_profile)
         with Not_found ->
-          LF_env.add_pred li widened_profile;
-          infer_predicate ~logic_env:(Logic_env.make widened_profile) p)
+          LF_env.add_pred li ext_profile;
+          infer_predicate ~logic_env:(Logic_env.make ext_profile) p)
      | LBpred p ->
        let logic_env = Logic_env.make profile in
        ignore (infer_predicate ~logic_env p)
@@ -894,11 +880,11 @@ let get_from_profile ~profile t =
 let get ~logic_env =
   get_from_profile ~profile:(Logic_env.get_profile logic_env)
 
-let get_widened_profile = Widened_profile.get
+let get_widened_profile = Ext_profile.get
 
 let clear () =
   Memo.clear();
-  Widened_profile.clear();
+  Ext_profile.clear();
   LF_env.clear()
 
 (*
