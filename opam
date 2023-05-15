@@ -129,7 +129,7 @@ depends: [
   # PPXs
   "ppx_deriving"
   "ppx_deriving_yojson"
-  "ppx_deriving_yaml"
+  "ppx_deriving_yaml" { >= "0.2.0" }
   "ppx_import"
 
   # GTK3 for non-macos only
