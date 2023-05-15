@@ -247,7 +247,7 @@ let ty_of_interv ?ctx ?(use_gmp_opt = false) = function
   | Nan -> Nan
   | Ival iv ->
     try
-      let kind = Interval.ikind_of_ival iv in
+      let kind = Interval_utils.ikind_of_ival iv in
       (match ctx with
        | None
        | Some Nan ->
@@ -260,7 +260,7 @@ let ty_of_interv ?ctx ?(use_gmp_opt = false) = function
          if Cil.intTypeIncluded kind ik then ctx else C_integer kind
        | Some (C_float _ | Rational | Real as ty) ->
          ty)
-    with Interval.Not_representable_ival ->
+    with Interval_utils.Not_representable_ival ->
     match ctx with
     | None | Some(C_integer _ | Gmpz | Nan) -> Gmpz
     | Some (C_float _ | Rational) -> Rational
@@ -333,7 +333,7 @@ let c_type_or_int_in_ival_of t i =
   | Ctype typ ->
     (match Cil.unrollType typ with
      | TInt (ik, _) | TEnum({ ekind = ik }, _) when
-         Interval.is_included i (Interval.interv_of_typ typ)
+         Interval_utils.is_included i (Interval_utils.interv_of_typ typ)
        ->
        if Cil.intTypeIncluded ik IInt
        then Some (C_integer IInt)
@@ -421,7 +421,7 @@ let rec type_term
         try
           let i = Interval.get_from_profile ~profile t in
           let i' = Interval.get_from_profile ~profile t' in
-          Some (mk_ctx ~use_gmp_opt:true (ty_of_interv (Interval.join i i')))
+          Some (mk_ctx ~use_gmp_opt:true (ty_of_interv (Interval_utils.join i i')))
         (* during the typing phase, we catch the Not_yet exception so that [t']
            gets typed even if [t] is not. This prevents exceptions during the
            translation phase *)
@@ -434,7 +434,7 @@ let rec type_term
     | TUnOp ((Neg | BNot), t') ->
       let i = Interval.get_from_profile ~profile t in
       let i' = Interval.get_from_profile ~profile t' in
-      let ctx_res, ctx = compute_ctx ?ctx (Interval.join i i') in
+      let ctx_res, ctx = compute_ctx ?ctx (Interval_utils.join i i') in
       ignore (type_term ~use_gmp_opt:true ~arith_operand:true ~ctx ~profile t');
       ctx_res
 
@@ -446,7 +446,7 @@ let rec type_term
       let i1 = Interval.get_from_profile ~profile t1 in
       let i2 = Interval.get_from_profile ~profile t2 in
       let ctx_res, ctx =
-        compute_ctx ?ctx (Interval.join i (Interval.join i1 i2))
+        compute_ctx ?ctx (Interval_utils.join i (Interval_utils.join i1 i2))
       in
       (* it is enough to explicitly coerce when required one operand to [ctx]
          (through [arith_operand]) in order to force the type of the
@@ -477,7 +477,7 @@ let rec type_term
     | TBinOp ((LAnd | LOr), t1, t2) ->
       let i1 = Interval.get_from_profile ~profile t1 in
       let i2 = Interval.get_from_profile ~profile t2 in
-      let ty = ty_of_interv ?ctx (Interval.join i1 i2) in
+      let ty = ty_of_interv ?ctx (Interval_utils.join i1 i2) in
       (* both operands fit in an int. *)
       ignore (type_term ~use_gmp_opt:true ~ctx:c_int ~profile t1);
       ignore (type_term ~use_gmp_opt:true ~ctx:c_int ~profile t2);
@@ -500,7 +500,7 @@ let rec type_term
       let i = Interval.get_from_profile ~profile t in
       let i2 = Interval.get_from_profile ~profile t2 in
       let i3 = Interval.get_from_profile ~profile t3 in
-      let ctx = ty_of_interv ?ctx (Interval.join i (Interval.join i2 i3)) in
+      let ctx = ty_of_interv ?ctx (Interval_utils.join i (Interval_utils.join i2 i3)) in
       let ctx = mk_ctx ~use_gmp_opt:true ctx in
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t2);
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t3);
@@ -654,7 +654,7 @@ let rec type_term
           (match args with
            | [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ] ->
              let range = Interval.(plus_one (get_from_profile ~profile t2)) in
-             let range = Interval.(join range (get_from_profile ~profile t1)) in
+             let range = Interval_utils.join range (Interval.get_from_profile ~profile t1) in
              let ty_range = ty_of_interv range in
              ignore
                (type_term
@@ -756,7 +756,7 @@ and type_term_offset ~profile t = match t with
 and number_ty_bound_variable ~profile (t1, lv, t2) =
   let i1 = Interval.get_from_profile ~profile t1 in
   let i2 = Interval.get_from_profile ~profile t2 in
-  let i = Interval.(widen (join i1 i2)) in
+  let i = Interval_utils.(unify (join i1 i2)) in
   match lv.lv_type with
   | Linteger ->
     let ty =
@@ -885,7 +885,7 @@ and type_predicate ~profile p =
 and ctx_relation ~profile t1 t2 =
   let i1 = Interval.get_from_profile ~profile t1 in
   let i2 = Interval.get_from_profile ~profile t2 in
-  let i = Interval.join i1 i2 in
+  let i = Interval_utils.join i1 i2 in
   let ty =
     match c_type_or_int_in_ival_of t1 i, c_type_or_int_in_ival_of t2 i with
     | Some ty, _

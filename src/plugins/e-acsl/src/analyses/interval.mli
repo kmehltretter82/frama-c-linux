@@ -56,39 +56,6 @@ open Analyses_datatype
 (* ************************************************************************** *)
 type t = ival
 
-val is_included: t -> t -> bool
-val join: t -> t -> t
-val meet: t -> t -> t
-
-val widen: t -> t
-(** @return the smallest interval containing a disjoint union of intervals *)
-
-val is_singleton_int: t -> bool
-
-(** assume [Ival _] as argument *)
-val extract_ival: t -> Ival.t
-
-exception Not_representable_ival
-(** raised by {!ikind_of_ival].
-    @since Frama-C+dev
-*)
-
-val ikind_of_ival: Ival.t -> Cil_types.ikind
-(** @return the smallest ikind that contains the given interval.
-    @raise Not_representable_ival if the given interval does not fit into any C
-    integral type. *)
-
-val interv_of_typ: Cil_types.typ -> t
-(** @return the smallest interval which contains the given C type.
-    @raise Is_a_real if the given type is a float type.
-    @raise Not_a_number if the given type does not represent any number. *)
-
-val extended_interv_of_typ: Cil_types.typ -> t
-(** @return the interval [n..m+1] when interv_of_typ returns [n..m].
-    It is in particular useful for computing bounds of quantified variables.
-    @raise Is_a_real if the given type is a float type.
-    @raise Not_a_number if the given type does not represent any number. *)
-
 val plus_one : ival -> ival
 (** @return the result of adding one to an interval. This is because when we
       have a condition [x<t], we need to generate [t+1] *)
@@ -130,7 +97,7 @@ val preprocess_code_annot :
 val preprocess_term :
   logic_env:Logic_env.t -> term -> unit
 
-val get_ext_profile : Profile.t -> logic_info -> Profile.t
+val get_widened_profile : Profile.t -> logic_info -> Profile.t
 
 val clear : unit -> unit
 

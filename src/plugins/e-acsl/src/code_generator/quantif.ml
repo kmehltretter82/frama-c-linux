@@ -48,8 +48,8 @@ let rec has_empty_quantif_with_false_negative ~logic_env = function
     (* case 2 *)
     false
   | (t1, _, t2) :: guards ->
-    let iv1 = Interval.(extract_ival (get ~logic_env t1)) in
-    let iv2 = Interval.(extract_ival (get ~logic_env t2)) in
+    let iv1 = Interval_utils.extract_ival (Interval.get ~logic_env t1) in
+    let iv2 = Interval_utils.extract_ival (Interval.get ~logic_env t2) in
     let lower_bound, _ = Ival.min_and_max iv1 in
     let _, upper_bound = Ival.min_and_max iv2 in
     begin
@@ -105,7 +105,7 @@ let convert kf env loc ~is_forall quantif =
              let lvs = Lvs_quantif (t1, Rle, lv, Rlt, t2) in
              let env = Env.Logic_scope.extend env lvs in
              let logic_env = Env.Logic_env.get env in
-             let i = Interval.(join (get ~logic_env t1) (get ~logic_env t2)) in
+             let i = Interval_utils.join (Interval.get ~logic_env t1) (Interval.get ~logic_env t2) in
              let env = Env.Logic_env.add env lv i in
              lvs :: lvs_guards, env)
           ([], env)
