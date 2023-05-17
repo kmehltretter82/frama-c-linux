@@ -274,7 +274,19 @@ OPAM_FC_DIR="$OPAM_DIR/packages/frama-c/frama-c.$VERSION"
 mkdir -p $OPAM_DIR
 mkdir -p $OPAM_FC_DIR
 
-cat opam | grep -v "^version\:" | grep -v "^name\:" > $OPAM_FC_DIR/opam
+OPAM_VERSION="opam-version: \"2.0\""
+if [ "$FINAL_RELEASE" = "yes" ]; then
+  OPAM_VERSION_FIX="$OPAM_VERSION"
+else
+  OPAM_VERSION_FIX="$OPAM_VERSION\navailable: opam-version >= \"2.1.0\"\nflags: avoid-version"
+fi
+
+cat opam \
+  | grep -v "^version\:" \
+  | grep -v "^name\:" \
+  | sed -e "s/$OPAM_VERSION/$OPAM_VERSION_FIX/" \
+  > $OPAM_FC_DIR/opam
+
 cat >>$OPAM_FC_DIR/opam << EOL
 
 url {
