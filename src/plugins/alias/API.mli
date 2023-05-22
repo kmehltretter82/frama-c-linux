@@ -29,19 +29,16 @@ module G: Graph.Sig.G
 
 (** NB : do the analysis BEFORE using any of those functions *)
 
-(* previously get_class_before_statement *)
 (** [fold_aliases_stmt f acc kf s lv] folds [f acc] over all the aliases of the
     given lval [lv] right before stmt [s] in function [kf]. *)
 val fold_aliases_stmt:
   ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a
 
-(* previously get_class_after_statment *)
 (** [fold_new_aliases_stmt f acc kf s lv] folds [f acc] over all the aliases of
     the given lval [lv] created by stmt [s] in function [kf]. *)
 val fold_new_aliases_stmt:
   ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a
 
-(* previously get_class_fundec *)
 (** [fold_aliases_kf f acc kf lv] folds [f acc] over all the aliases of lval
     [lv] at the end of function [kf]. *)
 val fold_aliases_kf:
