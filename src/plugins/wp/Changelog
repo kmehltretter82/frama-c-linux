@@ -24,7 +24,8 @@
 Plugin WP <next-release>
 ###############################################################################
 
-- WP          [2023-05-03] new warning against unions (see -wp-warn-key "union")
+- WP          [2020-05-15] New option -wp-script=mode (see also -wp-cache-env)
+- WP          [2023-05-03] New warning against unions (see -wp-warn-key "union")
 - WP          [2023-19-04] New tactic Compute
 - WP          [2023-18-04] Tactic Absurd now also applies to goal
 - WP          [2023-18-04] New option -wp-status to print unproved goals
