@@ -120,7 +120,6 @@ depends: [
   "conf-time" { with-test }
   "menhir" { >= "20181006" & build }
   "ocaml" { >= "4.11.1" }
-  "ocamlfind" # needed beyond build stage, used by -load-module
   "ocamlgraph" { >= "1.8.8" }
   "why3" { >= "1.6.0" }
   "yaml" { >= "3.0.0" }
