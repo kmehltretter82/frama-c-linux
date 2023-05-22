@@ -31,32 +31,29 @@ include Plugin.Register
       let shortname = "alias"
     end)
 
-
 module Enabled = False
     (struct
       let option_name = "-alias"
-      let help = "Allows May-Alias Analyzer"
+      let help = "Enable May-Alias Analyzer"
     end)
-
 
 module ShowFunctionTable = False
     (struct
       let option_name = "-alias-show-function-table"
-      let help = "Displays the table [function -> summary] at the end of the analysis"
+      let help = "display summary for each function at the end of the analysis"
     end)
-
 
 module ShowStmtTable = False
     (struct
       let option_name = "-alias-show-stmt-table"
-      let help = "Displays the table [stmt -> abstract state] at the end of the analysis"
+      let help = "display abstract state for each function at the end of the analysis"
     end)
 
 
 module DebugTable = False
     (struct
       let option_name = "-alias-debug-table"
-      let help = "switch to debug mode when printing Statement or Function Tables (with options -alias-show-stmt-table and -alias-show-function-table)"
+      let help = "switch to debug mode when printing statement or function tables (with options -alias-show-stmt-table and -alias-show-function-table)"
     end)
 
 
@@ -65,7 +62,7 @@ module Dot_output =
     (struct
       let option_name = "-alias-dot-output"
       let arg_name = "f"
-      let help = "Displays the final abstract state in Dot File <f>"
+      let help = "output final abstract state as dot file <f>"
     end)
 
 module Warn = struct
