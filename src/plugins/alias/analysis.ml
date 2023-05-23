@@ -252,16 +252,14 @@ let doFunction (kf:kernel_function) =
         (Abstract_state.pretty_summary ~debug:false) summary;
       Some summary
   in
-  if Kernel_function.is_main kf then
-    let f_name = Options.Dot_output.get () in
-    begin match f_name, final_state with
-      | "", _ -> ()
-      | _, None -> ()
-      | _, Some final_state -> Abstract_state.print_dot f_name final_state
-    end;
-    None
-  else
-    (Function_table.add kf result; result)
+  if Kernel_function.is_main kf then begin
+    match Options.Dot_output.get (), final_state with
+    | "", _ -> ()
+    | _, None -> ()
+    | fname, Some final_state -> Abstract_state.print_dot fname final_state
+  end;
+  Function_table.add kf result;
+  result
 
 let () = function_compute_ref := doFunction
 
