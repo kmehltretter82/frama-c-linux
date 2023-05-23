@@ -1,0 +1,168 @@
+[kernel] Parsing nested1.c (with preprocessing)
+[alias] analysing function: _Exit
+[alias] May-aliases at the end of function _Exit: ⊥
+[alias] analysing function: abort
+[alias] May-aliases at the end of function abort: ⊥
+[alias] analysing function: abs
+[alias] May-aliases at the end of function abs: ⊥
+[alias] analysing function: at_quick_exit
+[alias] May-aliases at the end of function at_quick_exit: ⊥
+[alias] analysing function: atexit
+[alias] May-aliases at the end of function atexit: ⊥
+[alias] analysing function: atof
+[alias] May-aliases at the end of function atof: ⊥
+[alias] analysing function: atoi
+[alias] May-aliases at the end of function atoi: ⊥
+[alias] analysing function: atol
+[alias] May-aliases at the end of function atol: ⊥
+[alias] analysing function: atoll
+[alias] May-aliases at the end of function atoll: ⊥
+[alias] analysing function: bsearch
+[alias] May-aliases at the end of function bsearch: ⊥
+[alias] analysing function: calloc
+[alias] May-aliases at the end of function calloc: ⊥
+[alias] analysing function: div
+[alias] May-aliases at the end of function div: ⊥
+[alias] analysing function: drand48
+[alias] May-aliases at the end of function drand48: ⊥
+[alias] analysing function: erand48
+[alias] May-aliases at the end of function erand48: ⊥
+[alias] analysing function: exit
+[alias] May-aliases at the end of function exit: ⊥
+[alias] analysing function: free
+[alias] May-aliases at the end of function free: ⊥
+[alias] analysing function: getenv
+[alias] May-aliases at the end of function getenv: ⊥
+[alias] analysing function: jrand48
+[alias] May-aliases at the end of function jrand48: ⊥
+[alias] analysing function: labs
+[alias] May-aliases at the end of function labs: ⊥
+[alias] analysing function: lcong48
+[alias] May-aliases at the end of function lcong48: ⊥
+[alias] analysing function: ldiv
+[alias] May-aliases at the end of function ldiv: ⊥
+[alias] analysing function: llabs
+[alias] May-aliases at the end of function llabs: ⊥
+[alias] analysing function: lldiv
+[alias] May-aliases at the end of function lldiv: ⊥
+[alias] analysing function: lrand48
+[alias] May-aliases at the end of function lrand48: ⊥
+[alias] analysing function: main
+[alias] analysing instruction: st_1_t x1 = {.a = 0, .b = 1};
+[alias] May-aliases after instruction  st_1_t x1 = {.a = 0, .b = 1};  are  <none>
+[alias] analysing instruction: st_1_t x2 = {.a = 1, .b = 2};
+[alias] May-aliases after instruction  st_1_t x2 = {.a = 1, .b = 2};  are  <none>
+[alias] analysing instruction: tab_y[0] = & x1;
+[alias] May-aliases after instruction  tab_y[0] = & x1;  are  <none>
+[alias] analysing instruction: tab_y[1] = & x2;
+[alias] May-aliases after instruction  tab_y[1] = & x2;  are  <none>
+[alias] analysing instruction: st_2_t *z1 = malloc(sizeof(st_2_t));
+[alias] May-aliases after instruction  st_2_t *z1 = malloc(sizeof(st_2_t));  are
+  <none>
+[alias] analysing instruction: st_2_t *z2 = malloc(sizeof(st_2_t));
+[alias] May-aliases after instruction  st_2_t *z2 = malloc(sizeof(st_2_t));  are
+  <none>
+[alias] analysing instruction: st_3_t *t = malloc(sizeof(st_3_t));
+[alias] May-aliases after instruction  st_3_t *t = malloc(sizeof(st_3_t));  are
+  <none>
+[alias] analysing instruction: int *a = malloc(sizeof(int));
+[alias] May-aliases after instruction  int *a = malloc(sizeof(int));  are  <none>
+[alias] analysing instruction: int *b = malloc(sizeof(int));
+[alias] May-aliases after instruction  int *b = malloc(sizeof(int));  are  <none>
+[alias] analysing instruction: *a = 0;
+[alias] May-aliases after instruction  *a = 0;  are  <none>
+[alias] analysing instruction: *b = 5;
+[alias] May-aliases after instruction  *b = 5;  are  <none>
+[alias] analysing instruction: z1->s = (struct struct_1_t *)tab_y[0];
+[alias:unsafe-cast] nested1.c:47: Warning: 
+  unsafe cast from st_1_t * to struct struct_1_t *
+[alias] May-aliases after instruction  z1->s = (struct struct_1_t *)tab_y[0];  are
+  {z1->s, tab_y[0]}
+[alias] analysing instruction: z2->s = (struct struct_1_t *)tab_y[1];
+[alias:unsafe-cast] nested1.c:48: Warning: 
+  unsafe cast from st_1_t * to struct struct_1_t *
+[alias] May-aliases after instruction  z2->s = (struct struct_1_t *)tab_y[1];  are
+  {z1->s, z2->s, tab_y[0]}
+[alias] analysing instruction: z1->c = a;
+[alias] May-aliases after instruction  z1->c = a;  are
+  {z1->s, z2->s, tab_y[0]}  {z1->c, a}
+[alias] analysing instruction: z2->c = b;
+[alias] May-aliases after instruction  z2->c = b;  are
+  {z1->s, z2->s, tab_y[0]}  {z1->c, a}  {z2->c, b}
+[alias] analysing instruction: t->t = (struct struct_2_t *)z1;
+[alias:unsafe-cast] nested1.c:51: Warning: 
+  unsafe cast from st_2_t * to struct struct_2_t *
+[alias] May-aliases after instruction  t->t = (struct struct_2_t *)z1;  are
+  {z1->s, z2->s, tab_y[0]}  {t->t, z1}  {z1->c, a}  {z2->c, b}
+[alias] analysing instruction: t->d = a;
+[alias] May-aliases after instruction  t->d = a;  are
+  {z1->s, z2->s, tab_y[0]}  {t->t, z1}  {z1->c, t->d, a}  {z2->c, b}
+[alias] analysing instruction: __retres = 0;
+[alias] May-aliases after instruction  __retres = 0;  are
+  {z1->s, z2->s, tab_y[0]}  {t->t, z1}  {z1->c, t->d, a}  {z2->c, b}
+[alias] May-aliases at the end of function main:
+  {z1->s, z2->s, tab_y[0]}  {t->t, z1}  {z1->c, t->d, a}  {z2->c, b}
+[alias] analysing function: malloc
+[alias] May-aliases at the end of function malloc: ⊥
+[alias] analysing function: mblen
+[alias] May-aliases at the end of function mblen: ⊥
+[alias] analysing function: mbstowcs
+[alias] May-aliases at the end of function mbstowcs: ⊥
+[alias] analysing function: mbtowc
+[alias] May-aliases at the end of function mbtowc: ⊥
+[alias] analysing function: mkstemp
+[alias] May-aliases at the end of function mkstemp: ⊥
+[alias] analysing function: mkstemps
+[alias] May-aliases at the end of function mkstemps: ⊥
+[alias] analysing function: mrand48
+[alias] May-aliases at the end of function mrand48: ⊥
+[alias] analysing function: nrand48
+[alias] May-aliases at the end of function nrand48: ⊥
+[alias] analysing function: posix_memalign
+[alias] May-aliases at the end of function posix_memalign: ⊥
+[alias] analysing function: putenv
+[alias] May-aliases at the end of function putenv: ⊥
+[alias] analysing function: qsort
+[alias] May-aliases at the end of function qsort: ⊥
+[alias] analysing function: quick_exit
+[alias] May-aliases at the end of function quick_exit: ⊥
+[alias] analysing function: rand
+[alias] May-aliases at the end of function rand: ⊥
+[alias] analysing function: random
+[alias] May-aliases at the end of function random: ⊥
+[alias] analysing function: realloc
+[alias] May-aliases at the end of function realloc: ⊥
+[alias] analysing function: reallocarray
+[alias] May-aliases at the end of function reallocarray: ⊥
+[alias] analysing function: seed48
+[alias] May-aliases at the end of function seed48: ⊥
+[alias] analysing function: setenv
+[alias] May-aliases at the end of function setenv: ⊥
+[alias] analysing function: srand
+[alias] May-aliases at the end of function srand: ⊥
+[alias] analysing function: srand48
+[alias] May-aliases at the end of function srand48: ⊥
+[alias] analysing function: srandom
+[alias] May-aliases at the end of function srandom: ⊥
+[alias] analysing function: strtod
+[alias] May-aliases at the end of function strtod: ⊥
+[alias] analysing function: strtof
+[alias] May-aliases at the end of function strtof: ⊥
+[alias] analysing function: strtol
+[alias] May-aliases at the end of function strtol: ⊥
+[alias] analysing function: strtold
+[alias] May-aliases at the end of function strtold: ⊥
+[alias] analysing function: strtoll
+[alias] May-aliases at the end of function strtoll: ⊥
+[alias] analysing function: strtoul
+[alias] May-aliases at the end of function strtoul: ⊥
+[alias] analysing function: strtoull
+[alias] May-aliases at the end of function strtoull: ⊥
+[alias] analysing function: system
+[alias] May-aliases at the end of function system: ⊥
+[alias] analysing function: unsetenv
+[alias] May-aliases at the end of function unsetenv: ⊥
+[alias] analysing function: wcstombs
+[alias] May-aliases at the end of function wcstombs: ⊥
+[alias] analysing function: wctomb
+[alias] May-aliases at the end of function wctomb: ⊥

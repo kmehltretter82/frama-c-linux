@@ -17,6 +17,7 @@ mk_tests {
       @tests/scope/ptests \
       @tests/sparecode/ptests \
       @src/plugins/aorai/tests/ptests \
+      @src/plugins/alias/tests/ptests \
       @src/plugins/dive/tests/ptests \
       @src/plugins/instantiate/tests/ptests \
       @src/plugins/loop_analysis/tests/ptests \
