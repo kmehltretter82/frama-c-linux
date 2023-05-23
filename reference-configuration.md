@@ -17,6 +17,7 @@ compiling Frama-C+dev.
 - ppx_deriving_yaml.0.2.1
 - ppx_deriving_yojson.3.7.0
 - ppx_import.1.10.0
+- unionFind.20220122
 - why3.1.6.0
 - yojson.2.0.2
 - zarith.1.12
