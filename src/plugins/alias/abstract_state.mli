@@ -66,6 +66,9 @@ sig
       other vertex of the graph *)
   val find_all_aliases : lval -> t -> LSet.t
 
+  (** the set of all lvars to which the given variable may point. *)
+  val points_to_set : lval -> t -> LSet.t
+
   (** find_aliases, then recursively finds other sets of lvals. We
       have the property (if lval [lv] is in abstract state [x]) :
       List.hd (find_transitive_closure lv x) = (find_vertex lv x,

@@ -37,22 +37,45 @@ let check_computed () =
     Options.abort "Static analysis must be called before any function of the API can be called"
 
 
-let fold_aliases_stmt (f_fold : 'a -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+let fold_lset
+    (get_set : Abstract_state.t -> LSet.t)
+    (f_fold : 'a -> lval -> 'a)
+    (acc : 'a) (kf : kernel_function) (s : stmt) : 'a =
   check_computed ();
   match Analysis.get_state_before_stmt kf s with
-    None -> acc
+  | None -> acc
   | Some state ->
-    let set_aliases = Abstract_state.find_all_aliases lv state in
-    LSet.fold_lval (fun e a -> f_fold a e) set_aliases acc
+    let set = get_set state in
+    LSet.fold_lval (fun e a -> f_fold a e) set acc
 
-let fold_new_aliases_stmt (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (s:stmt) (lv:lval) : 'a =
-  check_computed ();
-  match Analysis.get_state_before_stmt kf s with
-    None -> acc
-  | Some state ->
+let fold_points_to_set f_fold acc kf s lv =
+  fold_lset (Abstract_state.points_to_set lv) f_fold acc kf s
+
+let fold_new_points_to_set_stmt f_fold acc kf s lv =
+  let get_set state =
     let new_state = Analysis.do_stmt state s in
-    let set_aliases = Abstract_state.find_all_aliases lv new_state in
-    LSet.fold_lval (fun e a -> f_fold a e) set_aliases acc
+    Abstract_state.points_to_set lv new_state
+  in
+  fold_lset get_set f_fold acc kf s
+
+let fold_aliases_stmt f_fold acc kf s lv =
+  fold_lset (Abstract_state.find_all_aliases lv) f_fold acc kf s
+
+let fold_new_aliases_stmt f_fold acc kf s lv =
+  let get_set state =
+    let new_state = Analysis.do_stmt state s in
+    Abstract_state.find_all_aliases lv new_state
+  in
+  fold_lset get_set f_fold acc kf s
+
+let fold_points_to_set_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
+  check_computed ();
+  if Kernel_function.has_definition kf
+  then
+    let s = Kernel_function.find_return kf in
+    fold_new_points_to_set_stmt f_fold acc kf s lv
+  else
+    Options.abort "fold_points_to_set_kf: function %a has no definition" Kernel_function.pretty kf
 
 let fold_aliases_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
   check_computed ();
@@ -91,7 +114,7 @@ let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
     let setv1 = Abstract_state.find_all_aliases lv1 state in
     LSet.mem (BLval lv2) setv1
 
-let fold_vertex   (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+let fold_vertex (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function) (s:stmt) (lv: lval) : 'a =
   check_computed ();
   match Analysis.get_state_before_stmt kf s with
     None -> acc

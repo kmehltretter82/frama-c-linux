@@ -148,28 +148,18 @@ end
 
 module type S =
 sig
-
-  (* see .mli for coments *)
+  (* see abstract_state.mli for coments *)
   type t
-
   val get_graph: t -> G.t
-
   val get_lval_set : G.V.t -> t -> LSet.t
-
   val pretty : ?debug:bool -> Format.formatter -> t -> unit
-
   val print_dot : string -> t -> unit
-
   val find_vertex : lval -> t -> G.V.t
-
   val find_aliases : lval -> t -> LSet.t
-
   val find_all_aliases : lval -> t -> LSet.t
-
+  val points_to_set : lval -> t -> LSet.t
   val find_transitive_closure : lval -> t -> (G.V.t * LSet.t) list
-
   val is_included : t -> t -> bool
-
 end
 
 type t = {
@@ -216,18 +206,25 @@ let aliases_of_vertex (v:V.t) (x:t) : LSet.t =
     LSet.empty
     list_pred
 
-let find_all_aliases (lv:lval) (x:t) : LSet.t =
+let succ_of_lval (lv:lval) (x:t) : int option =
   let lv : Lval.t = Lval.from_lval lv in
-  try
-    begin
-      let v = LLMap.find lv x.lmap in
-      match G.succ x.graph v with
-        [] -> find_lset v x
-      | [succ_v] ->
-        aliases_of_vertex succ_v x
-      | _ -> Options.fatal "invariant violated (more than 1 successor)"
-    end
-  with Not_found -> LSet.empty
+  try begin
+    let v = LLMap.find lv x.lmap in
+    match G.succ x.graph v with
+    | [] -> None
+    | [succ_v] -> Some succ_v
+    | _ -> Options.fatal "invariant violated (more than 1 successor)"
+  end with Not_found -> None
+
+let find_all_aliases (lv:lval) (x:t) : LSet.t =
+  match succ_of_lval lv x with
+  | None -> LSet.empty
+  | Some succ_v -> aliases_of_vertex succ_v x
+
+let points_to_set (lv:lval) (x:t) : LSet.t =
+  match succ_of_lval lv x with
+  | None -> LSet.empty
+  | Some succ_v -> find_lset succ_v x
 
 let get_graph (x:t) = x.graph
 
@@ -918,11 +915,15 @@ let make_summary (s : t) (kf : kernel_function) =
   }
 
 let pretty_summary ?(debug=false) fmt s =
-  let print_list_lval fmt (l: lval list) =
+  let print_list_lval ~state fmt (l: lval list) =
     let is_first = ref true in
     let print_elem x =
-      if !is_first then is_first := false else Format.fprintf fmt "@ ";
-      Format.fprintf fmt "%a" Cil_datatype.Lval.pretty x
+      if !is_first then is_first := false else Format.fprintf fmt "@  ";
+      Format.fprintf fmt "@[%a" Cil_datatype.Lval.pretty x;
+      let pointees = points_to_set x state in
+      if not @@ LSet.is_empty pointees then
+        Format.fprintf fmt "→%a" LSet.pretty pointees;
+      Format.fprintf fmt "@]";
     in
     List.iter print_elem l
   in
@@ -934,11 +935,11 @@ let pretty_summary ?(debug=false) fmt s =
   match s.state with
   | None -> if debug then Format.fprintf fmt "not found"
   | Some s when is_empty s -> if debug then Format.fprintf fmt "empty"
-  | _ ->
+  | Some state ->
     begin
-      Format.fprintf fmt "@[formals: @[%a@]@;<3>locals: @[%a@]@;<3>returns: @[%a@]@;<3>state: @[%a@] "
-        print_list_lval s.formals
-        print_list_lval s.locals
+      Format.fprintf fmt "@[formals: @[%a@]@;<4>locals: @[%a@]@;<4>returns: @[%a@]@;<4>state: @[%a@] "
+        (print_list_lval ~state) s.formals
+        (print_list_lval ~state) s.locals
         (print_option Exp.pretty) s.return
         (print_option @@ pretty ~debug) s.state;
     end

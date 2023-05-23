@@ -29,6 +29,12 @@ module G: Graph.Sig.G
 
 (** NB : do the analysis BEFORE using any of those functions *)
 
+(** [fold_points_to_set f acc kf s lv] folds [f acc] over all the lvals in the
+    points-to set of the given lval [lv] right before stmt [s] in function
+    [kf]. *)
+val fold_points_to_set:
+  ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a
+
 (** [fold_aliases_stmt f acc kf s lv] folds [f acc] over all the aliases of the
     given lval [lv] right before stmt [s] in function [kf]. *)
 val fold_aliases_stmt:
@@ -38,6 +44,11 @@ val fold_aliases_stmt:
     the given lval [lv] created by stmt [s] in function [kf]. *)
 val fold_new_aliases_stmt:
   ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a
+
+(** [fold_points_to_set_kf f acc kf lv] folds [f acc] over the points-to set of lval
+    [lv] at the end of function [kf]. *)
+val fold_points_to_set_kf :
+  ('a -> lval -> 'a) -> 'a -> kernel_function -> lval -> 'a
 
 (** [fold_aliases_kf f acc kf lv] folds [f acc] over all the aliases of lval
     [lv] at the end of function [kf]. *)
