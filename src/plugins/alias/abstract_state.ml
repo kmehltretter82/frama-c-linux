@@ -1028,5 +1028,15 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   in
 
   let state = List.fold_left join_succs state (List.map fst vertex_pairs) in
+
+  (* remove all BAddrOf which are only temporarily needed *)
+  let state =
+    let remove_addr_of state (arg,_) = match arg with
+      | BAddrOf _ -> remove_lval state arg
+      | _ -> state
+    in
+    List.fold_left remove_addr_of state arg_formal_pairs
+  in
+
   assert_invariants state;
   state

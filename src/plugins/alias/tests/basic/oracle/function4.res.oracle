@@ -9,7 +9,7 @@
 [alias] analysing instruction: int c = 0;
 [alias] May-aliases after instruction  int c = 0;  are  <none>
 [alias] analysing instruction: a = addr(& c);
-[alias] May-aliases after instruction  a = addr(& c);  are  {a, &c}
+[alias] May-aliases after instruction  a = addr(& c);  are  <none>
 [alias] analysing instruction: b = & c;
 [alias] May-aliases after instruction  b = & c;  are  {a, b}
 [alias] analysing instruction: __retres = 0;

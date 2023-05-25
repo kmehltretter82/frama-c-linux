@@ -205,7 +205,7 @@ struct
     let f_fold lv acc =
       match lv with
       | BLval lv -> f lv acc
-      | BAddrOf lv -> f lv acc
+      | BAddrOf _ -> Options.fatal "There should be no occurrences of BAddrOf!"
     in
     fold f_fold s init
 end
