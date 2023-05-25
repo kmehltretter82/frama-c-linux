@@ -377,14 +377,11 @@ let find_transitive_closure  (lv:lval) (x:t) : (G.V.t * LSet.t) list =
    lval in [lmap] *)
 let create_cst_vertex (x:t) : V.t * t =
   let new_v = fresh_node_id () in
-  let new_g = G.add_vertex x.graph new_v in
-  let new_lmap = x.lmap in
-  let new_vmap = VMap.add new_v LSet.empty x.vmap in
-  new_v ,
+  new_v,
   {
-    graph = new_g ;
-    lmap = new_lmap ;
-    vmap = new_vmap ;
+    graph = G.add_vertex x.graph new_v;
+    lmap = x.lmap ;
+    vmap = VMap.add new_v LSet.empty x.vmap
   }
 
 (* find all the aliases of lv1 in x, for create_vertex *)
@@ -456,12 +453,6 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   | _ ->
     new_v , new_x
 
-(* only for function find_or_create_vertex *)
-let create_vertex_addr (lv:lval) (v:V.t) (x:t) : V.t *t =
-  let va, x = create_vertex_simple (BAddrOf lv) x in
-  let new_g =  G.add_edge x.graph va v in
-  va, { x with graph = new_g}
-
 let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
   let rec f_diff_offset o1 o2 =
     match o1, o2 with
@@ -516,7 +507,8 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
     end
   | BAddrOf lv ->
     let v1, x = find_or_create_vertex (BLval lv) x in
-    create_vertex_addr lv v1 x
+    let va, x = create_vertex_simple (BAddrOf lv) x in
+    va, {x with graph = G.add_edge x.graph va v1}
 
 (* find the vertex of an lval *)
 and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
