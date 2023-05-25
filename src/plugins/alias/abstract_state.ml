@@ -507,7 +507,7 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
     end
   | BAddrOf lv ->
     let v1, x = find_or_create_vertex (BLval lv) x in
-    let va, x = create_vertex_simple (BAddrOf lv) x in
+    let va, x = create_cst_vertex x in
     va, {x with graph = G.add_edge x.graph va v1}
 
 (* find the vertex of an lval *)
