@@ -31,13 +31,20 @@ open Simplified
 module VSet = Datatype.Int.Set
 module VMap = Datatype.Int.Map
 
-module Lval = Simplified.Simplified_lval
+module Lval = Simplified.Lval
+
 module LSet = Simplified.Simplified_lset
 module LMap = Simplified.Simplified_lmap
 
 module G = Persistent.Digraph.ConcreteBidirectional(Datatype.Int)
 
 module V = G.V
+
+type slval = Simplified.simplified_lval
+
+let blval = function
+  | BAddrOf _ -> Options.fatal "unexpected"
+  | BLval lval -> lval
 
 (* like LMap, but organized with offset and specialized functions *)
 module LLMap =
@@ -48,28 +55,28 @@ struct
 
   let empty : t = LMap.empty
 
-  let mem (lv:Lval.t) (m:t) =
-    let lv, off = Lval.removeOffsetLval lv in
+  let mem (lv : lval) (m:t) =
+    let lv, off = Cil.removeOffsetLval lv in
     try
       OMap.mem off (LMap.find lv m)
     with
       Not_found -> false
 
-  let find (lv:Lval.t) (m:t) : V.t =
-    let lv, off = Lval.removeOffsetLval lv in
+  let find (lv : lval) (m:t) : V.t =
+    let lv, off = Cil.removeOffsetLval lv in
     OMap.find off (LMap.find lv m)
 
-  let add (lv:Lval.t) (v:V.t) (m:t) :t  =
-    let lv, off = Lval.removeOffsetLval lv in
+  let add (lv : lval) (v:V.t) (m:t) :t  =
+    let lv, off = Cil.removeOffsetLval lv in
     let mo = try LMap.find lv m with Not_found -> OMap.empty in
     LMap.add lv (OMap.add off v mo) m
 
-  let iter (f_iter: Lval.t -> V.t -> unit) (m:t) : unit =
+  let iter (f_iter: lval -> V.t -> unit) (m:t) : unit =
     LMap.iter
       (fun lv mo ->
          OMap.iter
            (fun o v ->
-              let lv = Lval.addOffsetLval o lv in
+              let lv = Cil.addOffsetLval o lv in
               f_iter lv v
            )
            mo
@@ -90,7 +97,7 @@ struct
     LMap.iter
       (fun lv mo ->
          OMap.iter
-           (fun o v -> let lv =  Lval.addOffsetLval o lv in
+           (fun o v -> let lv =  Cil.addOffsetLval o lv in
              if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
              Format.fprintf fmt "@ @[%a:%d@]" Lval.pretty lv v)
            mo
@@ -124,13 +131,13 @@ struct
     | _ -> false
 
   (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 + o1 = lv *)
-  let find_upper_offsets (lv:Lval.t) (m:t) : V.t LMap.t =
-    let lv, off = Lval.removeOffsetLval lv in
+  let find_upper_offsets (lv : lval) (m:t) : V.t LMap.t =
+    let lv, off = Cil.removeOffsetLval lv in
     let mo = try LMap.find lv m with Not_found -> OMap.empty in
     let f_filter o _v = is_sub_offset o off in
     let mo = OMap.filter f_filter mo in
     OMap.fold
-      (fun o v acc -> let lv = Lval.addOffsetLval o lv in LMap.add lv v acc)
+      (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
       mo
       LMap.empty
 
@@ -170,7 +177,7 @@ let find_lset (v:V.t) (x:t) : LSet.t =
   with Not_found -> LSet.empty
 
 let find_aliases (lv:lval) (x:t) =
-  let lv : Lval.t = Lval.from_lval lv in
+  let lv = Lval.simplify lv in
   try
     let v = LLMap.find lv x.lmap in
     find_lset v x
@@ -197,7 +204,7 @@ let aliases_of_vertex (v:V.t) (x:t) : LSet.t =
     list_pred
 
 let succ_of_lval (lv:lval) (x:t) : int option =
-  let lv : Lval.t = Lval.from_lval lv in
+  let lv = Lval.simplify lv in
   try begin
     let v = LLMap.find lv x.lmap in
     match G.succ x.graph v with
@@ -283,7 +290,7 @@ let assert_invariants (x:t) : unit =
     assert (G.mem_vertex x.graph v2)
   in
   G.iter_edges assert_edge x.graph;
-  let assert_lmap (lv:Lval.t) (v:V.t) =
+  let assert_lmap (lv : lval) (v:V.t) =
     assert (G.mem_vertex x.graph v);
     assert (LSet.mem lv (VMap.find v x.vmap))
   in
@@ -351,7 +358,7 @@ let rec closure_find_lset (v:V.t) (x:t) : (V.t * LSet.t) list =
   | _ -> Options.fatal ("this shall not happen (invariant broken)")
 
 let find_transitive_closure  (lv:lval) (x:t) : (G.V.t * LSet.t) list =
-  let lv: Lval.t = Lval.from_lval lv in
+  let lv = Lval.simplify lv in
   assert_invariants x;
   try
     let v = (LLMap.find lv x.lmap) in
@@ -375,19 +382,19 @@ let create_cst_vertex (x:t) : V.t * t =
   }
 
 (* find all the aliases of lv1 in x, for create_vertex *)
-let find_all_aliases_of_offset (lv1: Lval.t) (x: t) : LSet.t =
+let find_all_aliases_of_offset (lv1: slval) (x: t) : LSet.t =
 
-  let list_of_lval_to_be_searched : (Lval.t*offset) list =
+  let list_of_lval_to_be_searched : (slval*offset) list =
     decompose_lval lv1
   in
   (* for each lval, find the set of aliases *)
   let f_map (lv,o) =
-    try (VMap.find (LLMap.find lv x.lmap) x.vmap, o)
+    try (VMap.find (LLMap.find (blval lv) x.lmap) x.vmap, o)
     with
       Not_found -> (LSet.empty,o)
   in
-  Options.debug ~level:9 "decompose_lval %a : [@[<hov 2>" Lval.pretty lv1;
-  List.iter (fun (x, o) -> Options.debug ~level:9 " (%a,%a) " Lval.pretty x Offset.pretty o) list_of_lval_to_be_searched;
+  Options.debug ~level:9 "decompose_lval %a : [@[<hov 2>" Simplified.pretty lv1;
+  List.iter (fun (x, o) -> Options.debug ~level:9 " (%a,%a) " Simplified.pretty x Offset.pretty o) list_of_lval_to_be_searched;
   Options.debug ~level:9 "@]]";
   let list_of_aliases : (LSet.t*offset) list =
     List.map f_map list_of_lval_to_be_searched
@@ -395,24 +402,24 @@ let find_all_aliases_of_offset (lv1: Lval.t) (x: t) : LSet.t =
   (*  for each lval of the Lset, add the offset and add it to the resulting set *)
   let f_fold_left (acc:LSet.t) (ls,o) =
     LSet.fold
-      (fun lv acc -> let lv = Lval.addOffsetLval o lv in LSet.add lv acc)
+      (fun lv acc -> let lv = Cil.addOffsetLval o lv in LSet.add lv acc)
       ls
       acc
   in
   List.fold_left
     f_fold_left
-    (LSet.singleton lv1)
+    (LSet.singleton (blval lv1))
     list_of_aliases
 
 (* returns the new vertex and the new graph *)
 (* only for function find_or_create vertex *)
-let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
+let create_vertex_simple (lv:slval) (x:t) : V.t * t =
   let new_v = fresh_node_id () in
   let new_g = G.add_vertex x.graph new_v in
   (* find all the alias of lv (because of offset) *)
   let set_of_aliases : LSet.t = find_all_aliases_of_offset lv x in
   (* add all these aliases *)
-  Options.debug ~level:9 "all_aliases of %a : %a " Lval.pretty lv LSet.pretty set_of_aliases;
+  Options.debug ~level:9 "all_aliases of %a : %a " Simplified.pretty lv LSet.pretty set_of_aliases;
   let new_lmap =
     LSet.fold
       (fun lv acc -> assert (not (LLMap.mem lv x.lmap)); LLMap.add lv new_v acc)
@@ -443,7 +450,7 @@ let create_vertex_simple (lv:Lval.t) (x:t) : V.t * t =
   | _ ->
     new_v , new_x
 
-let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
+let diff_offset (lv1 : lval) (lv2 : lval) =
   let rec f_diff_offset o1 o2 =
     match o1, o2 with
       NoOffset, _ -> o2
@@ -451,8 +458,8 @@ let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
     | Index (_,o1), Index (_,o2) -> f_diff_offset o1 o2
     | _ -> Options.fatal "%s: unexpected case" __LOC__
   in
-  let _, o1 = Lval.removeOffsetLval lv1
-  and _, o2 = Lval.removeOffsetLval lv2
+  let _, o1 = Cil.removeOffsetLval lv1
+  and _, o2 = Cil.removeOffsetLval lv2
   in
   assert (LLMap.is_sub_offset o1 o2);
   f_diff_offset o1 o2
@@ -460,11 +467,11 @@ let diff_offset (lv1:Lval.t) (lv2:Lval.t) =
 (* create_vertex_lval shall only be called by find_or_create_vertex *)
 (* creates a new vertex for a lval, assuming it is not already present
    in the graph. If it is present, there will be bugs *)
-let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
-  assert (not (LLMap.mem blv x.lmap));
-  Options.debug ~level:9 "creating a vertex for %a" Lval.pretty blv;
+let rec create_vertex_lval (blv:slval) (x:t) : V.t * t =
+  Options.debug ~level:9 "creating a vertex for %a" Simplified.pretty blv;
   match blv with
   | BLval lv ->
+    assert (not (LLMap.mem (blval blv) x.lmap));
     begin
       match lv with
         (Mem e, NoOffset) ->
@@ -486,12 +493,12 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
                 v2, {x with graph = new_graph }
               | [succ_v1] ->
                 (* if there is a successor, update lmap and vmap to add blv to that successor's set *)
-                let new_lmap = LLMap.add blv succ_v1 x.lmap in
-                let new_vmap = VMap.add succ_v1 (LSet.add blv (VMap.find succ_v1 x.vmap)) x.vmap in
+                let new_lmap = LLMap.add (blval blv) succ_v1 x.lmap in
+                let new_vmap = VMap.add succ_v1 (LSet.add (blval blv) (VMap.find succ_v1 x.vmap)) x.vmap in
                 succ_v1, {x with lmap = new_lmap ; vmap = new_vmap }
               | _ -> Options.fatal " Invariant violated : more than 1 successor"
             end
-          | Some (BAddrOf lv) -> find_or_create_vertex (BLval lv) x
+          | Some (BAddrOf _) -> Options.fatal "unexpected: *(&x)"
         end
       | _ -> create_vertex_simple blv x
     end
@@ -501,23 +508,31 @@ let rec create_vertex_lval (blv:Lval.t) (x:t) : V.t * t =
     va, {x with graph = G.add_edge x.graph va v1}
 
 (* find the vertex of an lval *)
-and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
-  try  (LLMap.find lv x.lmap, x)
-  with
-    Not_found ->
-    begin
+and find_or_create_vertex (lv:slval) (x:t) : V.t * t =
+  let res_o = match lv with
+    | BAddrOf _ -> None
+    | BLval lv -> try (Some (LLMap.find lv x.lmap, x))
+      with Not_found -> None
+  in
+  match res_o with
+  | Some res -> res
+  | None -> begin
       (* try to find if an alias already exists in x *)
-      let map_predecessors :V.t LMap.t =  LLMap.find_upper_offsets lv x.lmap in
+      let map_predecessors : V.t LMap.t = match lv with
+        | BLval lv ->
+          LLMap.find_upper_offsets lv x.lmap
+        | BAddrOf _ -> LMap.empty
+      in
       (* for any predecessor, find all its aliases and then look for potential existing vertex *)
       let f_fold_lmap lvx vx acc =
         let set_aliases = VMap.find vx x.vmap in
-        Options.debug ~level:9 "looking for aliases of %a in set %a" Lval.pretty lv LSet.pretty set_aliases;
+        Options.debug ~level:9 "looking for aliases of %a in set %a" Lval.pretty (blval lv) LSet.pretty set_aliases;
         if LSet.cardinal set_aliases > 1
         then
-          let off = diff_offset lvx lv in
+          let off = diff_offset lvx (blval lv) in
           let f_fold_lset lvs acc =
             try
-              let lvs = Lval.addOffsetLval off lvs in
+              let lvs = Cil.addOffsetLval off lvs in
               VSet.add (LLMap.find lvs x.lmap) acc
             with
               Not_found -> acc
@@ -536,7 +551,7 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
           map_predecessors
           VSet.empty
       in
-      Options.debug ~level:9 "found aliases of %a : %a" Lval.pretty lv VSet.pretty vset_res;
+      Options.debug ~level:9 "found aliases of %a : %a" Simplified.pretty lv VSet.pretty vset_res;
       if VSet.is_empty vset_res
       then create_vertex_lval lv x
       else
@@ -544,16 +559,16 @@ and find_or_create_vertex (lv:Lval.t) (x:t) : V.t * t =
           assert (VSet.cardinal vset_res = 1);
           let v_res = VSet.choose vset_res in
           (* vertex found, update the tables *)
-          let new_lmap = LLMap.add lv v_res x.lmap in
-          let new_vmap = VMap.add v_res (LSet.add lv (VMap.find v_res x.vmap)) x.vmap in
+          let new_lmap = LLMap.add (blval lv) v_res x.lmap in
+          let new_vmap = VMap.add v_res (LSet.add (blval lv) (VMap.find v_res x.vmap)) x.vmap in
           v_res, {x with lmap = new_lmap; vmap = new_vmap}
         end
     end
 
 (* TODO is there a better way to do it ? *)
 let find_vertex lv x =
-  let lv = Lval.from_lval lv in
-  let v,x1 = find_or_create_vertex lv x in
+  let lv = Lval.simplify lv in
+  let v,x1 = find_or_create_vertex (BLval lv) x in
   if x == x1
   (* if x has not been modified, then the vertex was found, not created *)
   then v
@@ -664,11 +679,11 @@ let assignment (a:t) (lv:lval) (e:exp) : t =
   assert_invariants a;
   if Cil.isPointerType (Cil.typeOf e)
   then
-    let x = Lval.from_lval lv in
+    let x = Lval.simplify lv in
     match Lval.from_exp e with
     | None -> a
     | Some y ->
-      let (v1,a) = find_or_create_vertex x a in
+      let (v1,a) = find_or_create_vertex (BLval x) a in
       let (v2,a) = find_or_create_vertex y a in
       if List.mem v2 (G.succ a.graph v1) || List.mem v1 (G.succ a.graph v2)
       then
@@ -687,8 +702,8 @@ let assignment (a:t) (lv:lval) (e:exp) : t =
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y (a:t) (lv:lval) : t =
   assert_invariants a;
-  let x = Lval.from_lval lv in
-  let (v1,a) = find_or_create_vertex x a in
+  let x = Lval.simplify lv in
+  let (v1,a) = find_or_create_vertex (BLval x) a in
   match G.succ a.graph v1 with
     [] ->
     begin
@@ -706,7 +721,7 @@ let is_included (a1:t) (a2:t) =
   Options.debug ~level:8 "testing equal %a AND à.%a" (pretty ~debug:true) a1 (pretty ~debug:true) a2;
   let exception Not_included in
   try
-    let iter_lmap (lv:Lval.t) (v1:V.t): unit =
+    let iter_lmap (lv : lval) (v1:V.t): unit =
       let v2 : V.t = try LLMap.find lv a2.lmap with Not_found -> raise Not_included in
       match G.succ a1.graph v1, G.succ a2.graph v2 with
         [], _ -> ()
@@ -924,7 +939,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
     let res_ret = match res, summary.return with
       | None, None -> []
       | Some res, Some ret ->
-        [Simplified_lval.from_lval res, Option.get @@ Simplified_lval.from_exp ret]
+        [BLval (Lval.simplify res), blval @@ Option.get @@ Lval.from_exp ret]
       | None, Some _ -> []
       | Some _, None -> (* Shouldn't happen: Frama-C adds missing returns *)
         Options.fatal "unexpected case: result without return"
@@ -933,7 +948,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
       try
         match Lval.from_exp arg with
         | None -> None
-        | Some lv -> Some (lv, Simplified_lval.from_lval formal)
+        | Some lv -> Some (lv, Lval.simplify formal)
       with Explicit_pointer_address loc ->
         Options.warning ~source:(fst loc) ~wkey:Options.Warn.unsupported_address
           "unsupported feature: explicit pointer address: %a; analysis may be unsound"

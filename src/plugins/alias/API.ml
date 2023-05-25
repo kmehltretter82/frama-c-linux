@@ -46,7 +46,7 @@ let fold_lset
   | None -> acc
   | Some state ->
     let set = get_set state in
-    LSet.fold_lval (fun e a -> f_fold a e) set acc
+    LSet.fold (fun e a -> f_fold a e) set acc
 
 let fold_points_to_set f_fold acc kf s lv =
   fold_lset (Abstract_state.points_to_set lv) f_fold acc kf s
@@ -112,7 +112,7 @@ let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
     None -> false
   | Some state ->
     let setv1 = Abstract_state.find_all_aliases lv1 state in
-    LSet.mem (BLval lv2) setv1
+    LSet.mem lv2 setv1
 
 let fold_vertex (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function) (s:stmt) (lv: lval) : 'a =
   check_computed ();
@@ -121,7 +121,7 @@ let fold_vertex (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_funct
   | Some state ->
     let v : G.V.t = Abstract_state.find_vertex lv state in
     let set_aliases = Abstract_state.find_aliases lv state in
-    LSet.fold_lval (fun lv a-> f_fold a v lv) set_aliases acc
+    LSet.fold (fun lv a-> f_fold a v lv) set_aliases acc
 
 let fold_vertex_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
@@ -130,7 +130,7 @@ let fold_vertex_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: ker
   | Some state ->
     let list_closure : (G.V.t * LSet.t) list = Abstract_state.find_transitive_closure lv state in
     List.fold_left
-      (fun acc (i,s) -> LSet.fold_lval (fun lv a -> f_fold a i lv) s acc)
+      (fun acc (i,s) -> LSet.fold (fun lv a -> f_fold a i lv) s acc)
       acc
       list_closure
 
@@ -142,8 +142,4 @@ let call_function a f res args =
     None -> None
   | Some su -> Some(Abstract_state.call a res args su)
 
-
-let simplify_lval (lv:lval) : lval =
-  match Simplified.Simplified_lval.from_lval lv with
-    BLval lv -> lv
-  | _ -> Options.fatal "This should not happen"
+let simplify_lval = Simplified.Lval.simplify

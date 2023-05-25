@@ -26,58 +26,51 @@ type simplified_lval =
   | BLval of lval (* lval *)
   | BAddrOf of lval (* address *)
 
+val pretty : Format.formatter -> simplified_lval -> unit
+
 (* exception raised when the program tries to access a memory location directly. *)
 exception Explicit_pointer_address of location
 
-module Simplified_lval:
-sig
-  type t = simplified_lval
+module Lval : sig
+  type t = lval
 
   val compare: t -> t -> int
 
   (* result stored in cache. May raise Explicit_pointer_address *)
-  val from_lval: lval -> t
+  val simplify : lval -> lval
 
   (* result stored in cache. May raise Explicit_pointer_address *)
-  val from_exp: exp -> t option
+  val from_exp: exp -> simplified_lval option
 
   val pretty: Format.formatter -> t -> unit
 
-  (* maps !Cil.removeOffsetLval to simplified_lval *)
-  val removeOffsetLval : t -> t * offset
-
-  (* maps !Cil.addOffsetLval to simplified_lval *)
-  val addOffsetLval : offset -> t -> t
-
   (* (points_to x) = *x and (points_to &x) = x. Raise
      Explicit_pointer_address when applied to BNone *)
-  val points_to : t -> t
+  val points_to : lval -> lval
 
   (* true if x is assimilable to a pointer type (explicit pointer or
      memory adress or array *)
-  val is_pointer : t -> bool
+  val is_pointer : simplified_lval -> bool
 end
 
 module Simplified_lmap:
 sig
-  include Map.S with type key = Simplified_lval.t
+  include Map.S with type key = lval
 
   val pretty: (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
 end
 
 module Simplified_lset:
 sig
-  include Set.S with type elt = Simplified_lval.t
+  include Set.S with type elt = lval
 
   val pretty: Format.formatter -> t -> unit
 
   (* special fold *)
   val fold_lval : (lval -> 'a -> 'a) -> t -> 'a -> 'a
-
 end
 
-val  decompose_lval : Simplified_lval.t -> (Simplified_lval.t*offset) list
+val decompose_lval : simplified_lval -> (simplified_lval * offset) list
 
 (** clear the two caches *)
 val clear_cache : unit -> unit
-

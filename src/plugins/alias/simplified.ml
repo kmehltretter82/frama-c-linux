@@ -103,12 +103,20 @@ type simplified_lval =
   | BLval of lval
   | BAddrOf of lval
 
-module Simplified_lval = struct
+let pretty l =
+  let print f fmt x =
+    match x with
+    | BLval lv -> f fmt lv
+    | BAddrOf lv -> Format.fprintf fmt "&%a" f lv
+  in
+  if Options.is_debug_key_enabled Options.DebugKeys.lvals
+  then print Cil_types_debug.pp_lval l
+  else print Printer.pp_lval l
 
-  type t = simplified_lval
+module Lval = struct
+  type t = lval
 
-  let from_lval lv =
-    BLval (simplify_lval lv)
+  let simplify x = simplify_lval x
 
   let from_exp e =
     let e = simplify_exp e in
@@ -117,38 +125,14 @@ module Simplified_lval = struct
     | AddrOf lv -> Some (BAddrOf lv)
     | _ -> None
 
-  let compare x1 x2 =
-    match (x1,x2) with
-    | (BLval lv1, BLval lv2) -> Cil_datatype.LvalStructEq.compare lv1 lv2
-    | (BLval _, _) -> -1
-    | (_, BLval _) -> 1
-    | (BAddrOf lv1, BAddrOf lv2) -> Cil_datatype.LvalStructEq.compare lv1 lv2
-
-  let print f fmt x =
-    match x with
-    | BLval lv -> f fmt lv
-    | BAddrOf lv -> Format.fprintf fmt "&%a" f lv
+  let compare = Cil_datatype.LvalStructEq.compare
 
   let pretty l =
     if Options.is_debug_key_enabled Options.DebugKeys.lvals
-    then print Cil_types_debug.pp_lval l
-    else print Printer.pp_lval l
+    then Cil_types_debug.pp_lval l
+    else Printer.pp_lval l
 
-  let removeOffsetLval x =
-    match x with
-    | BLval lv -> let lv,o = Cil.removeOffsetLval lv in BLval lv, o
-    | BAddrOf lv -> let lv,o = Cil.removeOffsetLval lv in BAddrOf lv, o
-
-  let addOffsetLval o x =
-    match x with
-    | BLval lv -> let lv = Cil.addOffsetLval o lv in BLval lv
-    | BAddrOf lv -> let lv = Cil.addOffsetLval o lv in BAddrOf lv
-
-  let points_to x =
-    match x with
-    | BAddrOf lv -> BLval lv
-    | BLval lv ->
-      BLval (Mem (Cil.dummy_exp (Lval lv)), NoOffset)
+  let points_to lv = Mem (Cil.dummy_exp (Lval lv)), NoOffset
 
   let is_pointer x =
     match x with
@@ -160,57 +144,53 @@ module Simplified_lval = struct
       | _ -> false
 end
 
-module Simplified_lmap =
-struct
-  include Map.Make (Simplified_lval)
+module Simplified_lmap = struct
+  include Map.Make (Lval)
 
-  let print (f_key: Format.formatter -> key -> unit) (f_val : Format.formatter -> 'a -> unit) fmt (m: 'a t) =
+  let pretty f fmt m =
     let is_first = ref true in
     Format.fprintf fmt "{@[<hov 2>";
     iter (fun k v ->
         if not !is_first
-        then
-          Format.fprintf fmt ",@,"
-        else
-          is_first := false;
-        Format.fprintf fmt " %a -> %a" f_key k f_val v
+        then Format.fprintf fmt ",@,"
+        else is_first := false;
+        Format.fprintf fmt " %a -> %a" Lval.pretty k f v
       )
       m;
     Format.fprintf fmt " @]}"
-
-  let pretty f fmt m = print Simplified_lval.pretty f fmt m
 end
 
-module Simplified_lset =
-struct
-  include Set.Make (Simplified_lval)
+module Simplified_lset = struct
+  include Set.Make (Lval)
 
-  let print (f_elt: Format.formatter -> elt -> unit) fmt (m: t) =
-    let is_first = ref true in
+  let pretty fmt s =
     Format.fprintf fmt "{@[";
+    let is_first = ref true in
     iter (fun e ->
         if !is_first
-        then
-          is_first := false
-        else
-          Format.fprintf fmt ",@ ";
-        Format.fprintf fmt "%a" f_elt e
+        then is_first := false
+        else Format.fprintf fmt ",@ ";
+        Format.fprintf fmt "%a" Lval.pretty e
       )
-      m;
+      s;
     Format.fprintf fmt "@]}"
 
-  let pretty fmt s = print Simplified_lval.pretty fmt s
-
   let fold_lval f s init =
-    let f_fold lv acc =
-      match lv with
-      | BLval lv -> f lv acc
-      | BAddrOf _ -> Options.fatal "There should be no occurrences of BAddrOf!"
-    in
+    let f_fold lv acc = f lv acc in
     fold f_fold s init
 end
 
-let decompose_lval (lv1: Simplified_lval.t) : (Simplified_lval.t*offset) list =
+let removeOffsetLval x =
+  match x with
+  | BLval lv -> let lv,o = Cil.removeOffsetLval lv in BLval lv, o
+  | BAddrOf lv -> let lv,o = Cil.removeOffsetLval lv in BAddrOf lv, o
+
+let addOffsetLval o x =
+  match x with
+  | BLval lv -> let lv = Cil.addOffsetLval o lv in BLval lv
+  | BAddrOf lv -> let lv = Cil.addOffsetLval o lv in BAddrOf lv
+
+let decompose_lval (lv1: simplified_lval) : (simplified_lval*offset) list =
   let rec list_of_offset (o: offset) : (offset*offset) list =
     match o with
       NoOffset -> [NoOffset,o]
@@ -229,8 +209,7 @@ let decompose_lval (lv1: Simplified_lval.t) : (Simplified_lval.t*offset) list =
       in
       (NoOffset,o)::li
   in
-  let lv, off = Simplified_lval.removeOffsetLval lv1 in
+  let lv, off = removeOffsetLval lv1 in
   List.map
-    (fun (o1,o2) -> (Simplified_lval.addOffsetLval o1 lv,o2))
+    (fun (o1,o2) -> addOffsetLval o1 lv, o2)
     (list_of_offset off)
-
