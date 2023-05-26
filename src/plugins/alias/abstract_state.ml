@@ -530,7 +530,7 @@ and find_or_create_vertex (lv:slval) (x:t) : V.t * t =
 (* TODO is there a better way to do it ? *)
 let find_vertex lv x =
   let lv = Lval.simplify lv in
-  let v,x1 = find_or_create_vertex (BLval lv) x in
+  let v,x1 = find_or_create_lval_vertex lv x in
   if x == x1
   (* if x has not been modified, then the vertex was found, not created *)
   then v
@@ -639,13 +639,12 @@ let set_type (x:t) (v1:V.t) (v2:V.t) : t =
 
 let assignment (a:t) (lv:lval) (e:exp) : t =
   assert_invariants a;
-  if Cil.isPointerType (Cil.typeOf e)
-  then
+  if not @@ Cil.isPointerType (Cil.typeOf e) then a else
     let x = Lval.simplify lv in
     match Lval.from_exp e with
     | None -> a
     | Some y ->
-      let (v1,a) = find_or_create_vertex (BLval x) a in
+      let (v1,a) = find_or_create_lval_vertex x a in
       let (v2,a) = find_or_create_vertex y a in
       if List.mem v2 (G.succ a.graph v1) || List.mem v1 (G.succ a.graph v2)
       then
@@ -658,21 +657,17 @@ let assignment (a:t) (lv:lval) (e:exp) : t =
         let a = join a v1 v2 in
         let () = assert_invariants a in
         a
-  else
-    a
 
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y (a:t) (lv:lval) : t =
   assert_invariants a;
   let x = Lval.simplify lv in
-  let (v1,a) = find_or_create_vertex (BLval x) a in
+  let (v1,a) = find_or_create_lval_vertex x a in
   match G.succ a.graph v1 with
-    [] ->
-    begin
-      let (v2,a) = create_cst_vertex a in
-      let new_a : t = set_type a v1 v2 in
-      assert_invariants new_a ; new_a
-    end
+  | [] ->
+    let (v2,a) = create_cst_vertex a in
+    let new_a : t = set_type a v1 v2 in
+    let () = assert_invariants new_a in new_a
   | [_v2] -> a
   | _ -> Options.fatal "this should not hapen (invariant broken)"
 
