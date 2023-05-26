@@ -174,10 +174,6 @@ module Simplified_lset = struct
       )
       s;
     Format.fprintf fmt "@]}"
-
-  let fold_lval f s init =
-    let f_fold lv acc = f lv acc in
-    fold f_fold s init
 end
 
 let removeOffsetLval x =

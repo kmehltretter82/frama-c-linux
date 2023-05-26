@@ -65,9 +65,6 @@ sig
   include Set.S with type elt = lval
 
   val pretty: Format.formatter -> t -> unit
-
-  (* special fold *)
-  val fold_lval : (lval -> 'a -> 'a) -> t -> 'a -> 'a
 end
 
 val decompose_lval : simplified_lval -> (simplified_lval * offset) list
