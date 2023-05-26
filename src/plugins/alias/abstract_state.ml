@@ -64,16 +64,6 @@ struct
     let mo = try LMap.find lv m with Not_found -> OMap.empty in
     LMap.add lv (OMap.add off v mo) m
 
-  let remove (lv:Lval.t) (m:t) :t =
-    let lv, off = Lval.removeOffsetLval lv in
-    let mo = try LMap.find lv m with Not_found -> OMap.empty in
-    let res = OMap.remove off mo in
-    if OMap.is_empty res
-    then
-      LMap.remove lv m
-    else
-      LMap.add lv res m
-
   let iter (f_iter: Lval.t -> V.t -> unit) (m:t) : unit =
     LMap.iter
       (fun lv mo ->
@@ -569,20 +559,6 @@ let find_vertex lv x =
   then v
   else raise Not_found
 
-(* remove a lval from a graph*)
-let remove_lval (x:t)  (lv:Lval.t) :t =
-  assert_invariants x;
-  try
-    let v = LLMap.find lv x.lmap in
-    let setv = VMap.find v x.vmap in
-    let new_lmap = LLMap.remove lv x.lmap in
-    let new_vmap = VMap.add v (LSet.remove lv setv) x.vmap in
-    let result = {x with lmap = new_lmap; vmap = new_vmap} in
-    assert_invariants result;
-    result
-  with
-    Not_found -> x
-
 (* merge of two vertices; the first vertex carries both sets, the second is removed from the graph and from lmap and vmap *)
 let merge x v1 v2 =
   if (V.equal v1 v2) || not (G.mem_vertex x.graph v1) || not (G.mem_vertex x.graph v2)
@@ -703,10 +679,6 @@ let assignment (a:t) (lv:lval) (e:exp) : t =
         in a
       else
         let a = join a v1 v2 in
-        let a = match y with
-          | BAddrOf blv -> remove_lval a (BAddrOf blv)
-          | _ -> a
-        in
         let () = assert_invariants a in
         a
   else
@@ -1020,15 +992,6 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   in
 
   let state = List.fold_left join_succs state (List.map fst vertex_pairs) in
-
-  (* remove all BAddrOf which are only temporarily needed *)
-  let state =
-    let remove_addr_of state (arg,_) = match arg with
-      | BAddrOf _ -> remove_lval state arg
-      | _ -> state
-    in
-    List.fold_left remove_addr_of state arg_formal_pairs
-  in
 
   assert_invariants state;
   state
