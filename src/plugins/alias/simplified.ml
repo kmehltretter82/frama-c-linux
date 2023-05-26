@@ -21,21 +21,15 @@
 (**************************************************************************)
 
 open Cil_types
-
 open Cil_datatype
 
-let nul_exp=
-  let loc = Location.unknown in
-  Cil.zero ~loc
-
+let nul_exp= Cil.zero ~loc:Location.unknown
 let is_nul_exp = Cil_datatype.ExpStructEq.equal nul_exp
 
 module HL = Lval.Hashtbl
-
 module HE = Exp.Hashtbl
 
 let cached_lval = HL.create 23
-
 let cached_exp = HE.create 37
 
 let clear_cache () =
@@ -55,6 +49,12 @@ let check_cast_compatibility e typ =
       "unsafe cast from %a to %a"
       Printer.pp_typ type_of_e Printer.pp_typ typ
 
+let rec simplify_offset o =
+  match o with
+  | NoOffset -> NoOffset
+  | Field(f,o) -> Field(f, simplify_offset o)
+  | Index(_e,o) -> Index(nul_exp, simplify_offset o)
+
 let rec simplify_lval (h,o) =
   try HL.find cached_lval (h,o)
   with Not_found ->
@@ -70,12 +70,6 @@ and simplify_host h =
     if is_nul_exp simp_e
     then raise (Explicit_pointer_address e.eloc)
     else Mem simp_e
-
-and simplify_offset o =
-  match o with
-  | NoOffset -> NoOffset
-  | Field(f,o) -> Field(f, simplify_offset o)
-  | Index(_e,o) -> Index(nul_exp, simplify_offset o)
 
 and simplify_exp e =
   try

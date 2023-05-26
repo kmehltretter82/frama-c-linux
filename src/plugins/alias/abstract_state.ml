@@ -71,38 +71,17 @@ struct
     let mo = try LMap.find lv m with Not_found -> OMap.empty in
     LMap.add lv (OMap.add off v mo) m
 
-  let iter (f_iter: lval -> V.t -> unit) (m:t) : unit =
-    LMap.iter
-      (fun lv mo ->
-         OMap.iter
-           (fun o v ->
-              let lv = Cil.addOffsetLval o lv in
-              f_iter lv v
-           )
-           mo
-      )
-      m
+  let iter f = LMap.iter @@ fun lv -> OMap.iter @@ fun o -> f @@ Cil.addOffsetLval o lv
 
-  let map (f_map: V.t -> V.t ) (m:t) : 'a =
-    LMap.map
-      (fun mo ->
-         OMap.map
-           f_map
-           mo
-      )
-      m
+  let map f = LMap.map @@ OMap.map f
 
-  let pretty fmt (m:t) =
+  let pretty fmt =
     let is_first = ref true in
-    LMap.iter
-      (fun lv mo ->
-         OMap.iter
-           (fun o v -> let lv =  Cil.addOffsetLval o lv in
-             if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
-             Format.fprintf fmt "@ @[%a:%d@]" Lval.pretty lv v)
-           mo
-      )
-      m
+    LMap.iter (fun lv ->
+        OMap.iter
+          (fun o v -> let lv =  Cil.addOffsetLval o lv in
+            if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
+            Format.fprintf fmt "@ @[%a:%d@]" Lval.pretty lv v))
 
   (* left-biased *)
   let union = LMap.union @@ fun _ l r -> Some (OMap.union (fun _ l _r -> Some l) l r)
@@ -120,7 +99,7 @@ struct
     in
     LMap.merge @@ fun _ -> intersect_lmap
 
-  let to_seq m = LMap.fold (fun lv omap s -> OMap.fold (fun o v s -> Seq.cons (lv,o,v) s) omap s) m Seq.empty
+  let to_seq m = LMap.fold (fun lv omap -> OMap.fold (fun o v s -> Seq.cons (lv,o,v) s) omap) m Seq.empty
 
   (* specialized functions *)
   let rec is_sub_offset o1 o2 =
@@ -137,7 +116,7 @@ struct
     let f_filter o _v = is_sub_offset o off in
     let mo = OMap.filter f_filter mo in
     OMap.fold
-      (fun o v acc -> let lv = Cil.addOffsetLval o lv in LMap.add lv v acc)
+      (fun o -> let lv = Cil.addOffsetLval o lv in LMap.add lv)
       mo
       LMap.empty
 
