@@ -486,57 +486,46 @@ let rec create_vertex_lval (blv:slval) (x:t) : V.t * t =
     let va, x = create_cst_vertex x in
     va, {x with graph = G.add_edge x.graph va v1}
 
+and find_or_create_lval_vertex (lv:lval) (x:t) : V.t * t =
+  try LLMap.find lv x.lmap, x
+  with Not_found ->
+    (* try to find if an alias already exists in x *)
+    let map_predecessors : V.t LMap.t =
+      LLMap.find_upper_offsets lv x.lmap
+    in
+    (* for any predecessor, find all its aliases and then look for potential existing vertex *)
+    let f_fold_lmap lvx vx acc =
+      let set_aliases = VMap.find vx x.vmap in
+      Options.debug ~level:9 "looking for aliases of %a in set %a" Lval.pretty lv LSet.pretty set_aliases;
+      if LSet.cardinal set_aliases <= 1 then acc else
+        let off = diff_offset lvx lv in
+        let f_fold_lset lvs acc =
+          try
+            let lvs = Cil.addOffsetLval off lvs in
+            VSet.add (LLMap.find lvs x.lmap) acc
+          with
+            Not_found -> acc
+        in
+        LSet.fold f_fold_lset set_aliases acc
+    in
+    (* set of all existing aliases *)
+    let vset_res = LMap.fold f_fold_lmap map_predecessors VSet.empty in
+    Options.debug ~level:9 "found aliases of %a : %a" Lval.pretty lv VSet.pretty vset_res;
+    if VSet.is_empty vset_res
+    then create_vertex_lval (BLval lv) x
+    else
+      let () = assert (VSet.cardinal vset_res = 1) in
+      let v_res = VSet.choose vset_res in
+      (* vertex found, update the tables *)
+      let new_lmap = LLMap.add lv v_res x.lmap in
+      let new_vmap = VMap.add v_res (LSet.add lv (VMap.find v_res x.vmap)) x.vmap in
+      v_res, {x with lmap = new_lmap; vmap = new_vmap}
+
 (* find the vertex of an lval *)
 and find_or_create_vertex (lv:slval) (x:t) : V.t * t =
   match lv with
   | BAddrOf _ -> create_vertex_lval lv x
-  | BLval lv ->
-    try LLMap.find lv x.lmap, x
-    with Not_found ->
-      (* try to find if an alias already exists in x *)
-      let map_predecessors : V.t LMap.t =
-        LLMap.find_upper_offsets lv x.lmap
-      in
-      (* for any predecessor, find all its aliases and then look for potential existing vertex *)
-      let f_fold_lmap lvx vx acc =
-        let set_aliases = VMap.find vx x.vmap in
-        Options.debug ~level:9 "looking for aliases of %a in set %a" Lval.pretty lv LSet.pretty set_aliases;
-        if LSet.cardinal set_aliases > 1
-        then
-          let off = diff_offset lvx lv in
-          let f_fold_lset lvs acc =
-            try
-              let lvs = Cil.addOffsetLval off lvs in
-              VSet.add (LLMap.find lvs x.lmap) acc
-            with
-              Not_found -> acc
-          in
-          LSet.fold
-            f_fold_lset
-            set_aliases
-            acc
-        else
-          acc
-      in
-      (* set of all existing aliases *)
-      let vset_res =
-        LMap.fold
-          f_fold_lmap
-          map_predecessors
-          VSet.empty
-      in
-      Options.debug ~level:9 "found aliases of %a : %a" Lval.pretty lv VSet.pretty vset_res;
-      if VSet.is_empty vset_res
-      then create_vertex_lval (BLval lv) x
-      else
-        begin
-          assert (VSet.cardinal vset_res = 1);
-          let v_res = VSet.choose vset_res in
-          (* vertex found, update the tables *)
-          let new_lmap = LLMap.add lv v_res x.lmap in
-          let new_vmap = VMap.add v_res (LSet.add lv (VMap.find v_res x.vmap)) x.vmap in
-          v_res, {x with lmap = new_lmap; vmap = new_vmap}
-        end
+  | BLval lv -> find_or_create_lval_vertex lv x 
 
 (* TODO is there a better way to do it ? *)
 let find_vertex lv x =
