@@ -443,48 +443,39 @@ let diff_offset (lv1 : lval) (lv2 : lval) =
   assert (LLMap.is_sub_offset o1 o2);
   f_diff_offset o1 o2
 
-(* create_vertex_lval shall only be called by find_or_create_vertex *)
-(* creates a new vertex for a lval, assuming it is not already present
-   in the graph. If it is present, there will be bugs *)
-let rec create_vertex_lval (blv:slval) (x:t) : V.t * t =
-  Options.debug ~level:9 "creating a vertex for %a" Simplified.pretty blv;
-  match blv with
-  | BLval lv ->
-    assert (not (LLMap.mem (blval blv) x.lmap));
-    begin
-      match lv with
-        (Mem e, NoOffset) ->
-        (* special case, when we also add another vertex and a points-to edge*)
-        begin
-          (* first find the vertex corresponding to e *)
-          match Lval.from_exp e with
-          | None -> Options.fatal "unexpected result: Lval.from (%a) = None" Exp.pretty e
-          | Some (BLval lv1) ->
-            (* find the vertex *)
-            let v1, x = find_or_create_vertex (BLval lv1) x in
-            (* then creates a vertex for bvl ONLY IF there is no successor *)
-            begin
-              match G.succ x.graph v1 with
-                [] ->
-                let v2, x = create_vertex_simple blv x in
-                (* finally add a points-to edge between v1 and v2 *)
-                let new_graph = G.add_edge x.graph v1 v2 in
-                v2, {x with graph = new_graph }
-              | [succ_v1] ->
-                (* if there is a successor, update lmap and vmap to add blv to that successor's set *)
-                let new_lmap = LLMap.add (blval blv) succ_v1 x.lmap in
-                let new_vmap = VMap.add succ_v1 (LSet.add (blval blv) (VMap.find succ_v1 x.vmap)) x.vmap in
-                succ_v1, {x with lmap = new_lmap ; vmap = new_vmap }
-              | _ -> Options.fatal " Invariant violated : more than 1 successor"
-            end
-          | Some (BAddrOf _) -> Options.fatal "unexpected: *(&x)"
-        end
-      | _ -> create_vertex_simple blv x
-    end
-  | BAddrOf lv ->
-    let v1, x = find_or_create_vertex (BLval lv) x in
-    let va, x = create_cst_vertex x in
-    va, {x with graph = G.add_edge x.graph va v1}
+let rec create_vertex lv x =
+  Options.debug ~level:9 "creating a vertex for %a" Lval.pretty lv;
+  assert (not (LLMap.mem lv x.lmap));
+  begin
+    match lv with
+      (Mem e, NoOffset) ->
+      (* special case, when we also add another vertex and a points-to edge*)
+      begin
+        (* first find the vertex corresponding to e *)
+        match Lval.from_exp e with
+        | None -> Options.fatal "unexpected result: Lval.from (%a) = None" Exp.pretty e
+        | Some (BAddrOf _) -> Options.fatal "unexpected: *(&x)"
+        | Some (BLval lv1) ->
+          (* find the vertex *)
+          let v1, x = find_or_create_vertex (BLval lv1) x in
+          (* then creates a vertex for bvl ONLY IF there is no successor *)
+          begin
+            match G.succ x.graph v1 with
+              [] ->
+              let v2, x = create_vertex_simple (BLval lv) x in
+              (* finally add a points-to edge between v1 and v2 *)
+              let new_graph = G.add_edge x.graph v1 v2 in
+              v2, {x with graph = new_graph }
+            | [succ_v1] ->
+              (* if there is a successor, update lmap and vmap to add blv to that successor's set *)
+              let new_lmap = LLMap.add lv succ_v1 x.lmap in
+              let new_vmap = VMap.add succ_v1 (LSet.add lv (VMap.find succ_v1 x.vmap)) x.vmap in
+              succ_v1, {x with lmap = new_lmap ; vmap = new_vmap }
+            | _ -> Options.fatal " Invariant violated : more than 1 successor"
+          end
+      end
+    | _ -> create_vertex_simple (BLval lv) x
+  end
 
 and find_or_create_lval_vertex (lv:lval) (x:t) : V.t * t =
   try LLMap.find lv x.lmap, x
@@ -512,7 +503,7 @@ and find_or_create_lval_vertex (lv:lval) (x:t) : V.t * t =
     let vset_res = LMap.fold f_fold_lmap map_predecessors VSet.empty in
     Options.debug ~level:9 "found aliases of %a : %a" Lval.pretty lv VSet.pretty vset_res;
     if VSet.is_empty vset_res
-    then create_vertex_lval (BLval lv) x
+    then create_vertex lv x
     else
       let () = assert (VSet.cardinal vset_res = 1) in
       let v_res = VSet.choose vset_res in
@@ -524,8 +515,12 @@ and find_or_create_lval_vertex (lv:lval) (x:t) : V.t * t =
 (* find the vertex of an lval *)
 and find_or_create_vertex (lv:slval) (x:t) : V.t * t =
   match lv with
-  | BAddrOf _ -> create_vertex_lval lv x
   | BLval lv -> find_or_create_lval_vertex lv x 
+  | BAddrOf lv ->
+    Options.debug ~level:9 "creating a vertex for %a" Simplified.pretty (BAddrOf lv);
+    let v1, x = find_or_create_lval_vertex lv x in
+    let va, x = create_cst_vertex x in
+    va, {x with graph = G.add_edge x.graph va v1}
 
 (* TODO is there a better way to do it ? *)
 let find_vertex lv x =
