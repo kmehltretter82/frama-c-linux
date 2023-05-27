@@ -361,19 +361,19 @@ let create_cst_vertex (x:t) : V.t * t =
   }
 
 (* find all the aliases of lv1 in x, for create_vertex *)
-let find_all_aliases_of_offset (lv1: slval) (x: t) : LSet.t =
+let find_all_aliases_of_offset (lv1 : lval) (x: t) : LSet.t =
 
-  let list_of_lval_to_be_searched : (slval*offset) list =
+  let list_of_lval_to_be_searched : (lval * offset) list =
     decompose_lval lv1
   in
   (* for each lval, find the set of aliases *)
   let f_map (lv,o) =
-    try (VMap.find (LLMap.find (blval lv) x.lmap) x.vmap, o)
+    try (VMap.find (LLMap.find lv x.lmap) x.vmap, o)
     with
       Not_found -> (LSet.empty,o)
   in
-  Options.debug ~level:9 "decompose_lval %a : [@[<hov 2>" Simplified.pretty lv1;
-  List.iter (fun (x, o) -> Options.debug ~level:9 " (%a,%a) " Simplified.pretty x Offset.pretty o) list_of_lval_to_be_searched;
+  Options.debug ~level:9 "decompose_lval %a : [@[<hov 2>" Lval.pretty lv1;
+  List.iter (fun (x, o) -> Options.debug ~level:9 " (%a,%a) " Lval.pretty x Offset.pretty o) list_of_lval_to_be_searched;
   Options.debug ~level:9 "@]]";
   let list_of_aliases : (LSet.t*offset) list =
     List.map f_map list_of_lval_to_be_searched
@@ -381,14 +381,11 @@ let find_all_aliases_of_offset (lv1: slval) (x: t) : LSet.t =
   (*  for each lval of the Lset, add the offset and add it to the resulting set *)
   let f_fold_left (acc:LSet.t) (ls,o) =
     LSet.fold
-      (fun lv acc -> let lv = Cil.addOffsetLval o lv in LSet.add lv acc)
+      (fun lv -> let lv = Cil.addOffsetLval o lv in LSet.add lv)
       ls
       acc
   in
-  List.fold_left
-    f_fold_left
-    (LSet.singleton (blval lv1))
-    list_of_aliases
+  List.fold_left f_fold_left (LSet.singleton lv1) list_of_aliases
 
 (* returns the new vertex and the new graph *)
 (* only for function find_or_create vertex *)
@@ -396,7 +393,7 @@ let create_vertex_simple (lv:lval) (x:t) : V.t * t =
   let new_v = fresh_node_id () in
   let new_g = G.add_vertex x.graph new_v in
   (* find all the alias of lv (because of offset) *)
-  let set_of_aliases : LSet.t = find_all_aliases_of_offset (BLval lv) x in
+  let set_of_aliases : LSet.t = find_all_aliases_of_offset lv x in
   (* add all these aliases *)
   Options.debug ~level:9 "all_aliases of %a : %a " Lval.pretty lv LSet.pretty set_of_aliases;
   let new_lmap =

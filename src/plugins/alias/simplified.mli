@@ -67,7 +67,7 @@ sig
   val pretty: Format.formatter -> t -> unit
 end
 
-val decompose_lval : simplified_lval -> (simplified_lval * offset) list
+val decompose_lval : lval -> (lval * offset) list
 
 (** clear the two caches *)
 val clear_cache : unit -> unit

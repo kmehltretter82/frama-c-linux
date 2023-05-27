@@ -170,17 +170,7 @@ module Simplified_lset = struct
     Format.fprintf fmt "@]}"
 end
 
-let removeOffsetLval x =
-  match x with
-  | BLval lv -> let lv,o = Cil.removeOffsetLval lv in BLval lv, o
-  | BAddrOf lv -> let lv,o = Cil.removeOffsetLval lv in BAddrOf lv, o
-
-let addOffsetLval o x =
-  match x with
-  | BLval lv -> let lv = Cil.addOffsetLval o lv in BLval lv
-  | BAddrOf lv -> let lv = Cil.addOffsetLval o lv in BAddrOf lv
-
-let decompose_lval (lv1: simplified_lval) : (simplified_lval*offset) list =
+let decompose_lval lv1 : (lval * offset) list =
   let rec list_of_offset (o: offset) : (offset*offset) list =
     match o with
       NoOffset -> [NoOffset,o]
@@ -199,7 +189,7 @@ let decompose_lval (lv1: simplified_lval) : (simplified_lval*offset) list =
       in
       (NoOffset,o)::li
   in
-  let lv, off = removeOffsetLval lv1 in
+  let lv, off = Cil.removeOffsetLval lv1 in
   List.map
-    (fun (o1,o2) -> addOffsetLval o1 lv, o2)
+    (fun (o1,o2) -> Cil.addOffsetLval o1 lv, o2)
     (list_of_offset off)
