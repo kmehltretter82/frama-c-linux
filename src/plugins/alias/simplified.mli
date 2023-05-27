@@ -22,11 +22,17 @@
 
 open Cil_types
 
-type simplified_lval =
-  | BLval of lval (* lval *)
-  | BAddrOf of lval (* address *)
+module LvalOrRef : sig
+  type t = Lval of lval | Ref of lval
+  val pretty : Format.formatter -> t -> unit
 
-val pretty : Format.formatter -> simplified_lval -> unit
+  (* result stored in cache. May raise Explicit_pointer_address *)
+  val from_exp : exp -> t option
+
+  (* true if x is assimilable to a pointer type (explicit pointer or
+     memory adress or array *)
+  val is_pointer : t -> bool
+end
 
 (* exception raised when the program tries to access a memory location directly. *)
 exception Explicit_pointer_address of location
@@ -39,18 +45,11 @@ module Lval : sig
   (* result stored in cache. May raise Explicit_pointer_address *)
   val simplify : lval -> lval
 
-  (* result stored in cache. May raise Explicit_pointer_address *)
-  val from_exp: exp -> simplified_lval option
-
   val pretty: Format.formatter -> t -> unit
 
   (* (points_to x) = *x and (points_to &x) = x. Raise
      Explicit_pointer_address when applied to BNone *)
   val points_to : lval -> lval
-
-  (* true if x is assimilable to a pointer type (explicit pointer or
-     memory adress or array *)
-  val is_pointer : simplified_lval -> bool
 end
 
 module Simplified_lmap:

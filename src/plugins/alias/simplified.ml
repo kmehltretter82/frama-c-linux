@@ -93,31 +93,40 @@ and simplify_exp e =
     HE.add cached_exp e res;
     res
 
-type simplified_lval =
-  | BLval of lval
-  | BAddrOf of lval
+module LvalOrRef = struct
+  type t = Lval of lval | Ref of lval
 
-let pretty l =
-  let print f fmt x =
+  let pretty l =
+    let print f fmt x =
+      match x with
+      | Lval lv -> f fmt lv
+      | Ref lv -> Format.fprintf fmt "&%a" f lv
+    in
+    if Options.is_debug_key_enabled Options.DebugKeys.lvals
+    then print Cil_types_debug.pp_lval l
+    else print Printer.pp_lval l
+
+  let from_exp e =
+    let e = simplify_exp e in
+    match e.enode with
+      Lval lv -> Some (Lval lv)
+    | AddrOf lv -> Some (Ref lv)
+    | _ -> None
+
+  let is_pointer x =
     match x with
-    | BLval lv -> f fmt lv
-    | BAddrOf lv -> Format.fprintf fmt "&%a" f lv
-  in
-  if Options.is_debug_key_enabled Options.DebugKeys.lvals
-  then print Cil_types_debug.pp_lval l
-  else print Printer.pp_lval l
+    | Ref _ -> true
+    | Lval lv ->
+      let t = Cil.typeOfLval lv in
+      match Cil.unrollType t with
+        TPtr _ | TArray _ -> true
+      | _ -> false
+end
 
 module Lval = struct
   type t = lval
 
   let simplify x = simplify_lval x
-
-  let from_exp e =
-    let e = simplify_exp e in
-    match e.enode with
-      Lval lv -> Some (BLval lv)
-    | AddrOf lv -> Some (BAddrOf lv)
-    | _ -> None
 
   let compare = Cil_datatype.LvalStructEq.compare
 
@@ -127,15 +136,6 @@ module Lval = struct
     else Printer.pp_lval l
 
   let points_to lv = Mem (Cil.dummy_exp (Lval lv)), NoOffset
-
-  let is_pointer x =
-    match x with
-    | BAddrOf _ -> true
-    | BLval lv ->
-      let t = Cil.typeOfLval lv in
-      match Cil.unrollType t with
-        TPtr _ | TArray _ -> true
-      | _ -> false
 end
 
 module Simplified_lmap = struct

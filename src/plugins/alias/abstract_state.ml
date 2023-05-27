@@ -40,12 +40,6 @@ module G = Persistent.Digraph.ConcreteBidirectional(Datatype.Int)
 
 module V = G.V
 
-type slval = Simplified.simplified_lval
-
-let blval = function
-  | BAddrOf _ -> Options.fatal "unexpected"
-  | BLval lval -> lval
-
 (* like LMap, but organized with offset and specialized functions *)
 module LLMap =
 struct
@@ -432,12 +426,12 @@ let rec create_vertex lv x =
       (* special case, when we also add another vertex and a points-to edge*)
       begin
         (* first find the vertex corresponding to e *)
-        match Lval.from_exp e with
+        match LvalOrRef.from_exp e with
         | None -> Options.fatal "unexpected result: Lval.from (%a) = None" Exp.pretty e
-        | Some (BAddrOf _) -> Options.fatal "unexpected: *(&x)"
-        | Some (BLval lv1) ->
+        | Some (LvalOrRef.Ref _) -> Options.fatal "unexpected: *(&x)"
+        | Some (LvalOrRef.Lval lv1) ->
           (* find the vertex *)
-          let v1, x = find_or_create_vertex (BLval lv1) x in
+          let v1, x = find_or_create_vertex (LvalOrRef.Lval lv1) x in
           (* then creates a vertex for bvl ONLY IF there is no successor *)
           begin
             match G.succ x.graph v1 with
@@ -493,11 +487,11 @@ and find_or_create_lval_vertex (lv:lval) (x:t) : V.t * t =
       v_res, {x with lmap = new_lmap; vmap = new_vmap}
 
 (* find the vertex of an lval *)
-and find_or_create_vertex (lv:slval) (x:t) : V.t * t =
+and find_or_create_vertex (lv : LvalOrRef.t) (x:t) : V.t * t =
   match lv with
-  | BLval lv -> find_or_create_lval_vertex lv x 
-  | BAddrOf lv ->
-    Options.debug ~level:9 "creating a vertex for %a" Simplified.pretty (BAddrOf lv);
+  | LvalOrRef.Lval lv -> find_or_create_lval_vertex lv x
+  | LvalOrRef.Ref lv ->
+    Options.debug ~level:9 "creating a vertex for %a" LvalOrRef.pretty (LvalOrRef.Ref lv);
     let v1, x = find_or_create_lval_vertex lv x in
     let va, x = create_cst_vertex x in
     va, {x with graph = G.add_edge x.graph va v1}
@@ -616,7 +610,7 @@ let assignment (a:t) (lv:lval) (e:exp) : t =
   assert_invariants a;
   if not @@ Cil.isPointerType (Cil.typeOf e) then a else
     let x = Lval.simplify lv in
-    match Lval.from_exp e with
+    match LvalOrRef.from_exp e with
     | None -> a
     | Some y ->
       let (v1,a) = find_or_create_lval_vertex x a in
@@ -811,7 +805,7 @@ let make_summary (s : t) (kf : kernel_function) =
       None -> s
     | Some e ->
       begin
-        match s, Lval.from_exp e with
+        match s, LvalOrRef.from_exp e with
           _, None -> s
         | s, Some lv ->
           let _, new_s = find_or_create_vertex lv s in
@@ -871,14 +865,18 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
     let res_ret = match res, summary.return with
       | None, None -> []
       | Some res, Some ret ->
-        [BLval (Lval.simplify res), blval @@ Option.get @@ Lval.from_exp ret]
+        let simplify_ret x = match LvalOrRef.from_exp x with
+          | Some (LvalOrRef.Lval lval) -> lval
+          | _ -> Options.fatal "unexpected form of return statement"
+        in
+        [LvalOrRef.Lval (Lval.simplify res), simplify_ret ret]
       | None, Some _ -> []
       | Some _, None -> (* Shouldn't happen: Frama-C adds missing returns *)
         Options.fatal "unexpected case: result without return"
     in
     let simplify_both (arg, formal) =
       try
-        match Lval.from_exp arg with
+        match LvalOrRef.from_exp arg with
         | None -> None
         | Some lv -> Some (lv, Lval.simplify formal)
       with Explicit_pointer_address loc ->
