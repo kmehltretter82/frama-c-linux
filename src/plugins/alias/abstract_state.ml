@@ -303,11 +303,6 @@ let pretty ?(debug = false) fmt (x:t) =
 (** .dot printing functions*)
 let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
 
-let lset_to_string (s: LSet.t) : string =
-  let fmt = Format.str_formatter in
-  Format.fprintf fmt "\"%a\"" LSet.pretty s;
-  Format.flush_str_formatter ()
-
 module Dot = Graphviz.Dot (struct
     include G
     let edge_attributes _ = []
@@ -316,7 +311,9 @@ module Dot = Graphviz.Dot (struct
     let vertex_attributes _ = [`Shape `Box]
     let vertex_name (v:V.t) =
       let lset = !find_vertex_name_ref v in
-      lset_to_string lset
+      let fmt = Format.str_formatter in
+      Format.fprintf fmt "\"%a\"" LSet.pretty lset;
+      Format.flush_str_formatter ()
     let default_vertex_attributes _ = []
     let graph_attributes _ = []
   end)
@@ -339,11 +336,7 @@ let rec closure_find_lset (v:V.t) (x:t) : (V.t * LSet.t) list =
 let find_transitive_closure  (lv:lval) (x:t) : (G.V.t * LSet.t) list =
   let lv = Lval.simplify lv in
   assert_invariants x;
-  try
-    let v = (LLMap.find lv x.lmap) in
-    closure_find_lset v x
-  with
-    Not_found -> []
+  try closure_find_lset (LLMap.find lv x.lmap) x with Not_found -> []
 (* TODO : what about offsets ? *)
 
 (* NOTE on "constant vertex": a constant vertex represents an unamed
@@ -362,30 +355,21 @@ let create_cst_vertex (x:t) : V.t * t =
 
 (* find all the aliases of lv1 in x, for create_vertex *)
 let find_all_aliases_of_offset (lv1 : lval) (x: t) : LSet.t =
-
-  let list_of_lval_to_be_searched : (lval * offset) list =
-    decompose_lval lv1
-  in
+  let lvals_to_be_searched = decompose_lval lv1 in
   (* for each lval, find the set of aliases *)
   let f_map (lv,o) =
-    try (VMap.find (LLMap.find lv x.lmap) x.vmap, o)
-    with
-      Not_found -> (LSet.empty,o)
+    try VMap.find (LLMap.find lv x.lmap) x.vmap, o
+    with Not_found -> LSet.empty, o
   in
   Options.debug ~level:9 "decompose_lval %a : [@[<hov 2>" Lval.pretty lv1;
-  List.iter (fun (x, o) -> Options.debug ~level:9 " (%a,%a) " Lval.pretty x Offset.pretty o) list_of_lval_to_be_searched;
+  List.iter (fun (x, o) -> Options.debug ~level:9 " (%a,%a) " Lval.pretty x Offset.pretty o) lvals_to_be_searched;
   Options.debug ~level:9 "@]]";
-  let list_of_aliases : (LSet.t*offset) list =
-    List.map f_map list_of_lval_to_be_searched
-  in
+  let aliases = List.map f_map lvals_to_be_searched in
   (*  for each lval of the Lset, add the offset and add it to the resulting set *)
-  let f_fold_left (acc:LSet.t) (ls,o) =
-    LSet.fold
-      (fun lv -> let lv = Cil.addOffsetLval o lv in LSet.add lv)
-      ls
-      acc
+  let f_fold_left (acc : LSet.t) (ls,o) =
+    LSet.fold (fun lv -> LSet.add @@ Cil.addOffsetLval o lv) ls acc
   in
-  List.fold_left f_fold_left (LSet.singleton lv1) list_of_aliases
+  List.fold_left f_fold_left (LSet.singleton lv1) aliases
 
 (* returns the new vertex and the new graph *)
 (* only for function find_or_create vertex *)
