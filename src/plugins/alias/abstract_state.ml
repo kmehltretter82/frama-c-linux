@@ -392,13 +392,13 @@ let find_all_aliases_of_offset (lv1: slval) (x: t) : LSet.t =
 
 (* returns the new vertex and the new graph *)
 (* only for function find_or_create vertex *)
-let create_vertex_simple (lv:slval) (x:t) : V.t * t =
+let create_vertex_simple (lv:lval) (x:t) : V.t * t =
   let new_v = fresh_node_id () in
   let new_g = G.add_vertex x.graph new_v in
   (* find all the alias of lv (because of offset) *)
-  let set_of_aliases : LSet.t = find_all_aliases_of_offset lv x in
+  let set_of_aliases : LSet.t = find_all_aliases_of_offset (BLval lv) x in
   (* add all these aliases *)
-  Options.debug ~level:9 "all_aliases of %a : %a " Simplified.pretty lv LSet.pretty set_of_aliases;
+  Options.debug ~level:9 "all_aliases of %a : %a " Lval.pretty lv LSet.pretty set_of_aliases;
   let new_lmap =
     LSet.fold
       (fun lv acc -> assert (not (LLMap.mem lv x.lmap)); LLMap.add lv new_v acc)
@@ -416,7 +416,7 @@ let create_vertex_simple (lv:slval) (x:t) : V.t * t =
   in
   assert_invariants new_x;
   match lv with
-  | BLval (Var v, NoOffset) ->
+  | Var v, NoOffset ->
     begin
       match v.vtype with
         TPtr _ ->
@@ -424,10 +424,9 @@ let create_vertex_simple (lv:slval) (x:t) : V.t * t =
         let another_v, new_x = create_cst_vertex new_x in
         let new_g = G.add_edge new_x.graph new_v another_v in
         new_v, {new_x with graph = new_g}
-      | _ ->   new_v ,new_x
+      | _ -> new_v, new_x
     end
-  | _ ->
-    new_v , new_x
+  | _ -> new_v , new_x
 
 let diff_offset (lv1 : lval) (lv2 : lval) =
   let rec f_diff_offset o1 o2 =
@@ -462,7 +461,7 @@ let rec create_vertex lv x =
           begin
             match G.succ x.graph v1 with
               [] ->
-              let v2, x = create_vertex_simple (BLval lv) x in
+              let v2, x = create_vertex_simple lv x in
               (* finally add a points-to edge between v1 and v2 *)
               let new_graph = G.add_edge x.graph v1 v2 in
               v2, {x with graph = new_graph }
@@ -474,7 +473,7 @@ let rec create_vertex lv x =
             | _ -> Options.fatal " Invariant violated : more than 1 successor"
           end
       end
-    | _ -> create_vertex_simple (BLval lv) x
+    | _ -> create_vertex_simple lv x
   end
 
 and find_or_create_lval_vertex (lv:lval) (x:t) : V.t * t =
