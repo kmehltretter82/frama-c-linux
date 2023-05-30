@@ -92,24 +92,24 @@ let pp_select fmt s =
 let pp_param fmt (p,v) =
   Format.fprintf fmt "\\param(%a,%a)" pp_quoted p Pattern.pp_value v
 
-let pp_children fmt (p,s) =
+let pp_child fmt (p,s) =
   Format.fprintf fmt "\\child(%a,%a)" pp_quoted p pp_name s
 
-let pp_default fmt s =
-  Format.fprintf fmt "\\default(%a)" pp_name s
+let pp_children fmt s =
+  Format.fprintf fmt "\\children(%a)" pp_name s
 
 let pp_alternative fmt = function
   | Default -> Format.fprintf fmt "\\default"
   | Strategy s -> pp_name fmt s
   | Auto { value = s } -> Format.fprintf fmt "\\auto(%S)" s
-  | Provers([],None) -> Format.fprintf fmt "\\provers()"
-  | Provers([],Some tm) -> Format.fprintf fmt "\\provers(%.1f)" tm
+  | Provers([],None) -> Format.fprintf fmt "\\prover()"
+  | Provers([],Some tm) -> Format.fprintf fmt "\\prover(%.1f)" tm
   | Provers(p::ps,None) ->
-    Format.fprintf fmt "@[<hov 2>\\provers(%a" pp_quoted p ;
+    Format.fprintf fmt "@[<hov 2>\\prover(%a" pp_quoted p ;
     List.iter (Format.fprintf fmt ",@,%a" pp_quoted) ps ;
     Format.fprintf fmt ")@]" ;
   | Provers(ps,Some tm) ->
-    Format.fprintf fmt "@[<hov 2>\\provers(" ;
+    Format.fprintf fmt "@[<hov 2>\\prover(" ;
     List.iter (Format.fprintf fmt "%a,@," pp_quoted) ps ;
     Format.fprintf fmt "%.1f)@]" tm ;
   | Tactic { tactic ; lookup ; select ; params ; children ; default } ->
@@ -117,8 +117,8 @@ let pp_alternative fmt = function
     List.iter (Format.fprintf fmt ",@ %a" pp_lookup) lookup ;
     List.iter (Format.fprintf fmt ",@ %a" pp_select) select ;
     List.iter (Format.fprintf fmt ",@ %a" pp_param) params ;
-    List.iter (Format.fprintf fmt ",@ %a" pp_children) children ;
-    Option.iter (Format.fprintf fmt ",@ %a" pp_default) default ;
+    List.iter (Format.fprintf fmt ",@ %a" pp_child) children ;
+    Option.iter (Format.fprintf fmt ",@ %a" pp_children) default ;
     Format.fprintf fmt "@,)@]"
 
 let pp_strategy fmt s =
