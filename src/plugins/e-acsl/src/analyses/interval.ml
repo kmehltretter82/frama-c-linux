@@ -202,8 +202,8 @@ end
    interval
    -[replace_args_ival] performs this operation for a given list of arguments
    corresponding to a particular call
- - [replace_all_args_ival] performs this operation for all arguments that have
-   been called by this function during the same recursive calls. *)
+   - [replace_all_args_ival] performs this operation for all arguments that have
+     been called by this function during the same recursive calls. *)
 
 let replace_args_ival ~logic_env li args args_ival =
   let profile = Logic_env.get_profile logic_env in
