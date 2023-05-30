@@ -27,7 +27,27 @@ open Cil_types
 (** Points-to graphs datastructure. *)
 module G: Graph.Sig.G
 
+(** Set of [lval]s. Differs from Cil_datatype.Lval.Set in that is uses a
+    different comparison function ([Cil_datatype.LvalStructEq.compare]). *)
+module LSet : sig
+  include Set.S with type elt = lval
+
+  val pretty: Format.formatter -> t -> unit
+end
+
 (** NB : do the analysis BEFORE using any of those functions *)
+
+
+(** points-to set of lval [lv] at the end of function [kf]. *)
+val points_to_set_kf : kernel_function -> lval -> LSet.t
+
+(** aliases of lval [lv] at the end of function [kf]. *)
+val aliases_kf : kernel_function -> lval -> LSet.t
+
+(** list of pairs [s, e] where [e] is the set of lval aliased to [v] after
+    statement [s] in function [kf]. *)
+val fundec_stmts : kernel_function -> lval -> (stmt * LSet.t) list
+
 
 (** [fold_points_to_set f acc kf s lv] folds [f acc] over all the lvals in the
     points-to set of the given lval [lv] right before stmt [s] in function

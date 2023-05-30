@@ -35,74 +35,84 @@ let check_computed () =
     Options.abort "Static analysis must be called before any function of the API can be called"
 
 
-let fold_lset
+let lset
     (get_set : Abstract_state.t -> LSet.t)
-    (f_fold : 'a -> lval -> 'a)
-    (acc : 'a) (kf : kernel_function) (s : stmt) : 'a =
+    (kf : kernel_function) (s : stmt) =
   check_computed ();
   match Analysis.get_state_before_stmt kf s with
-  | None -> acc
-  | Some state ->
-    let set = get_set state in
-    LSet.fold (fun e a -> f_fold a e) set acc
+  | None -> LSet.empty
+  | Some state -> get_set state
 
-let fold_points_to_set f_fold acc kf s lv =
-  fold_lset (Abstract_state.points_to_set lv) f_fold acc kf s
+let points_to_set kf s lv = lset (Abstract_state.points_to_set lv) kf s
 
-let fold_new_points_to_set_stmt f_fold acc kf s lv =
+let new_points_to_set_stmt kf s lv =
   let get_set state =
     let new_state = Analysis.do_stmt state s in
     Abstract_state.points_to_set lv new_state
   in
-  fold_lset get_set f_fold acc kf s
+  lset get_set kf s
 
-let fold_aliases_stmt f_fold acc kf s lv =
-  fold_lset (Abstract_state.find_all_aliases lv) f_fold acc kf s
+let aliases_stmt kf s lv =
+  lset (Abstract_state.find_all_aliases lv) kf s
 
-let fold_new_aliases_stmt f_fold acc kf s lv =
+let new_aliases_stmt kf s lv =
   let get_set state =
     let new_state = Analysis.do_stmt state s in
     Abstract_state.find_all_aliases lv new_state
   in
-  fold_lset get_set f_fold acc kf s
+  lset get_set kf s
+
+let points_to_set_kf (kf : kernel_function) (lv : lval) =
+  check_computed ();
+  if Kernel_function.has_definition kf
+  then
+    let s = Kernel_function.find_return kf in
+    new_points_to_set_stmt kf s lv
+  else
+    Options.abort "points_to_set_kf: function %a has no definition" Kernel_function.pretty kf
+
+let aliases_kf (kf : kernel_function) (lv : lval) =
+  check_computed ();
+  if Kernel_function.has_definition kf
+  then
+    let s = Kernel_function.find_return kf in
+    new_aliases_stmt kf s lv
+  else
+    Options.abort "aliases_kf: function %a has no definition" Kernel_function.pretty kf
+
+let fundec_stmts (kf : kernel_function) (lv : lval) =
+  check_computed ();
+  if Kernel_function.has_definition kf
+  then
+    List.map
+      (fun s -> s, new_aliases_stmt kf s lv)
+      (Kernel_function.get_definition kf).sallstmts
+  else
+    Options.abort "fundec_stmts: function %a has no definition" Kernel_function.pretty kf
+
+
+let fold_points_to_set f_fold acc kf s lv =
+  LSet.fold (fun e a -> f_fold a e) (points_to_set kf s lv) acc
+
+let fold_aliases_stmt f_fold acc kf s lv =
+  LSet.fold (fun e a -> f_fold a e) (aliases_stmt kf s lv) acc
+
+let fold_new_aliases_stmt f_fold acc kf s lv =
+  LSet.fold (fun e a -> f_fold a e) (new_aliases_stmt kf s lv) acc
 
 let fold_points_to_set_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
-  check_computed ();
-  if Kernel_function.has_definition kf
-  then
-    let s = Kernel_function.find_return kf in
-    fold_new_points_to_set_stmt f_fold acc kf s lv
-  else
-    Options.abort "fold_points_to_set_kf: function %a has no definition" Kernel_function.pretty kf
+  LSet.fold (fun e a -> f_fold a e) (points_to_set_kf kf lv) acc
 
-let fold_aliases_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
-  check_computed ();
-  if Kernel_function.has_definition kf
-  then
-    let s = Kernel_function.find_return kf in
-    fold_new_aliases_stmt f_fold acc kf s lv
-  else
-    Options.abort "fold_aliases_kf: function %a has no definition" Kernel_function.pretty kf
+let fold_aliases_kf (f_fold : 'a -> lval -> 'a) (acc : 'a) (kf : kernel_function) (lv : lval) : 'a =
+  LSet.fold (fun e a -> f_fold a e) (aliases_kf kf lv) acc
 
 let fold_fundec_stmts (f_fold: 'a -> stmt -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
-  check_computed ();
-  if Kernel_function.has_definition kf
-  then
-    let f_dec = Kernel_function.get_definition kf in
-    let list_stmt = f_dec.sallstmts in
-    List.fold_left
-      (fun acc s ->
-         fold_new_aliases_stmt
-           (fun a lv -> f_fold a s lv)
-           acc
-           kf
-           s
-           lv
-      )
-      acc
-      list_stmt
-  else
-    Options.abort "fold_fundec_stmts: function %a has no definition" Kernel_function.pretty kf
+  List.fold_left
+    (fun acc (s, set) ->
+       LSet.fold (fun lv a -> f_fold a s lv) set acc
+    )
+    acc
+    (fundec_stmts kf lv)
 
 let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
   check_computed ();
