@@ -1633,7 +1633,7 @@ The main option to control cache usage is \verb+-wp-cache+, documented below:
 \item[\tt -wp-cache-env] makes environment variables
   \verb|FRAMAC_WP_CACHE|, \verb|FRAMAC_WP_CACHEDIR| and \verb|FRAMAC_WP_SCRIPT|
   override command line options \verb|-wp-cache|, \verb|-wp-cachedir| and \verb|-wp-script|, respectively.
-\item{description
+\end{description}
 
 The available cache modes are described below:
 \begin{description}
@@ -1807,7 +1807,7 @@ Tactic parameters are specified using the following syntax:
     \quad$|$\quad\verb+\ingoal+(\textit{pattern},\ldots) \\
     \quad$|$\quad\verb+\incontext+(\textit{pattern},\ldots) \\
     \quad$|$\quad\verb+\pattern+(\textit{pattern},\ldots) \\
-    \quad$|$\quad\verb+\select+(\textit{pattern},\ldots) \\
+    \quad$|$\quad\verb+\select+(\textit{pattern}) \\
     \quad$|$\quad\verb+\param+(\textit{id},\textit{value}) \\
     \quad$|$\quad\verb+\child+(\textit{id},\textit{strategy}) \\
     \quad$|$\quad\verb+\children+(\textit{strategy}) \\
@@ -1826,10 +1826,11 @@ Tactic parameters are interpreted as follows:
   Pattern syntax is specified below.
 \item \verb+\select(v)+ defines the main target of the selected tactic. The
   value \verb+v+ uses the same syntax as patterns, with pattern variables
-  replaced with their matched values. Some tactics support multiple selection,
-  for which the form \verb+\select(v,...)+ can be used. When no selection is specified,
-  the first specified pattern is used as an implicit target. When no
-  selection nor pattern is selected, the default selection is the proof goal.
+  replaced with their matched values. Few tactics support multiple selection,
+  in which case, multiple values can be provided.
+  When no selection is specified, the first
+  specified pattern is used as an implicit target. When no selection nor pattern
+  is selected, the default selection is the proof goal.
 \item \verb+\param(p,v)+ configures the parameter value \verb+p+ of the selected
   tactic with the associated value.
 \item \verb+\child(a,s)+ applies strategy \verb+s+ to prove the sub-goal named
