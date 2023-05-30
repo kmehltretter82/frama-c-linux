@@ -1,14 +1,17 @@
 # May-Alias Analysis plugin
 
-Alias is a Frama-C plugin that implements a may-alias analysis, i.e. an
-over-approximation of the possible aliases between variables (and, more
-generally, memory regions) of the program.
+Alias is a Frama-C plugin that implements:
+- a points-to analysis, i.e. an over-approximation of the possible values a
+  pointer may point to at run-time.
+- a may-alias analysis, i.e. an over-approximation of the possible aliases
+  between pointer variables (and, more generally, memory regions) of the
+  program.
 
-Two pointers are called aliases of each other if they
-point at runtime to the same memory location. In that case changing the value
-of one pointer also changes the value of the other pointer and vice versa.
+Two pointers are called aliases of each other if they point at runtime to the
+same memory location. In that case changing the value of one pointer also
+changes the value of the other pointer and vice versa.
 
-The algorithm is a variant of « Steensgaard's algorithm ».
+The plugin implements a variant of « Steensgaard's algorithm ».
 
 ## Usage
 
@@ -45,12 +48,12 @@ Therefore the analysis is efficient, whereas the results are not very precise.
   program, whichever the execution path is.
 
 ### Imprecisely-supported constructs
-- Non-complex instruction goto
-- Homogeneous casts
-- Recursive datatype, e.g., multiple levels of pointer dereferencing
-- Pointer arithmetic, and array and structure accesses
-- Variable-length arrays
-- Volatile attributes
+- non-complex instruction goto
+- homogeneous casts
+- recursive datatype, e.g., multiple levels of pointer dereferencing
+- pointer arithmetic, and array and structure accesses
+- variable-length arrays
+- volatile attributes
 
 ## Building and Installation
 

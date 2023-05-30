@@ -61,12 +61,12 @@
 [alias] analysing instruction: *b = 42;
 [alias] May-aliases after instruction  *b = 42;  are  <none>
 [alias] analysing instruction: alias(& a,& b);
-[alias] May-aliases after instruction  alias(& a,& b);  are  {&a, &b}  {a, b}
+[alias] May-aliases after instruction  alias(& a,& b);  are  {a, b}
 [alias] analysing instruction: *a = 7;
-[alias] May-aliases after instruction  *a = 7;  are  {&a, &b}  {a, b}
+[alias] May-aliases after instruction  *a = 7;  are  {a, b}
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are  {&a, &b}  {a, b}
-[alias] May-aliases at the end of function main: {&a, &b}  {a, b}
+[alias] May-aliases after instruction  __retres = 0;  are  {a, b}
+[alias] May-aliases at the end of function main: {a, b}
 [alias] analysing function: malloc
 [alias] May-aliases at the end of function malloc: ⊥
 [alias] analysing function: mblen

@@ -27,9 +27,21 @@ open Cil_types
 (** Points-to graphs datastructure. *)
 module G: Graph.Sig.G
 
-(** NB : type Lval.t is not the same as type lval !! *)
-module LSet = Simplified.Simplified_lset
+(** Set of [lval]s. Differs from Cil_datatype.Lval.Set in that is uses a
+    different comparison function ([Cil_datatype.LvalStructEq.compare]). *)
+module LSet : sig
+  include Set.S with type elt = lval
 
+  val pretty: Format.formatter -> t -> unit
+end
+
+(** map of [lval]s. Differs from Cil_datatype.Lval.Met in that is uses a
+    different comparison function ([Cil_datatype.LvalStructEq.compare]). *)
+module LMap : sig
+  include Map.S with type key = lval
+
+  val pretty: (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
+end
 
 (** external signature *)
 module type S =
@@ -65,6 +77,9 @@ sig
       equivalence class of lv, but also all lv that are aliases in
       other vertex of the graph *)
   val find_all_aliases : lval -> t -> LSet.t
+
+  (** the set of all lvars to which the given variable may point. *)
+  val points_to_set : lval -> t -> LSet.t
 
   (** find_aliases, then recursively finds other sets of lvals. We
       have the property (if lval [lv] is in abstract state [x]) :
