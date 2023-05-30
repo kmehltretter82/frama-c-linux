@@ -509,7 +509,7 @@ struct
   type key = D.key
   type data = D.data
   let get = G.memoize D.compile
-  let set = G.define
+  let set = G.update
   let mem = G.mem
   let clear = G.clear
   let remove = G.remove
@@ -527,7 +527,7 @@ struct
   type key = D.key
   type data = D.data
   let get = G.memoize D.compile
-  let set = G.define
+  let set = G.update
   let mem = G.mem
   let clear = G.clear
   let remove = G.remove
@@ -545,7 +545,7 @@ struct
   type key = D.key
   type data = D.data
   let get = G.memoize (fun k -> D.compile k (G.id ~basename:(D.basename k) k))
-  let set = G.define
+  let set = G.update
   let mem = G.mem
   let clear = G.clear
   let remove = G.remove
@@ -563,7 +563,7 @@ struct
   type key = D.key
   type data = D.data
   let get = G.memoize (fun k -> D.compile k (G.id ~basename:(D.basename k) k))
-  let set = G.define
+  let set = G.update
   let mem = G.mem
   let clear = G.clear
   let remove = G.remove

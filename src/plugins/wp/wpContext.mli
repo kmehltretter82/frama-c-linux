@@ -112,7 +112,7 @@ sig
   val clear : unit -> unit
   val remove : key -> unit
   val define : key -> data -> unit
-  (** no redefinition ; circularity protected *)
+  (** no redefinition unless forced ; circularity protected *)
 
   val update : key -> data -> unit
   (** set current value, with no protection *)
