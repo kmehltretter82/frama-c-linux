@@ -591,7 +591,7 @@ class strategies () =
   let depth = spinner ~form ~default:1 ~label:"Auto depth"
       ~tooltip:"Depth of exploration" in
   let hints = checkbox ~form ~default:true ~label:"Hints only"
-      ~tooltip:"Display hints for current goal" in
+      ~tooltip:"Display hints for the current goal" in
   object(self)
     inherit Wpalette.tool
         ~content:form#widget
@@ -599,7 +599,7 @@ class strategies () =
         ~tooltip:"Run the full Proof Strategy Engine (-wp-strategy)" ()
 
     val mutable registered = false
-    val mutable filter : ProofStrategy.strategy list = []
+    val mutable proofhints : ProofStrategy.strategy list = []
     val mutable strategies : strategy list = []
     val mutable callback : callback option = None
 
@@ -618,7 +618,7 @@ class strategies () =
 
     method connect ?(hints=[]) (cb : callback option) =
       callback <- cb ;
-      filter <- hints ;
+      proofhints <- hints ;
       self#update
 
     method private strategy (s : ProofStrategy.strategy) () =
@@ -626,6 +626,28 @@ class strategies () =
 
     method private explore () =
       Option.iter (fun fn -> fn ~depth:depth#get None) callback
+
+    method private setvisible ?(filter=false) ?(rank=0) (s: strategy) =
+      let show = not filter || rank > 0 in
+      s.button#set_visible show ;
+      if show then
+        let name = ProofStrategy.name s.strategy in
+        if rank = 0 then
+          s.button#set_label name
+        else
+          Pretty_utils.ksfprintf s.button#set_label "%s (#%d)" name rank
+
+    method private setrank (s: strategy) =
+      let filter = hints#get in
+      let rec apply (s:strategy) rank = function
+        | [] -> self#setvisible s ~filter
+        | h::hs ->
+          if s.strategy == h then
+            self#setvisible s ~rank
+          else
+            self#setvisible s ~filter ;
+          apply s (succ rank) hs
+      in apply s 1 proofhints
 
     method private update =
       if callback = None || not registered then
@@ -635,11 +657,7 @@ class strategies () =
           self#set_visible true ;
           self#set_status `APPLY ;
           self#set_action ~callback:self#explore () ;
-          let h = hints#get in
-          List.iter
-            (fun s ->
-               s.button#set_visible (not h || List.memq s.strategy filter)
-            ) strategies ;
+          List.iter self#setrank strategies
         end
 
   end
