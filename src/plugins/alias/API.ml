@@ -22,12 +22,10 @@
 
 open Cil_types
 
-open Simplified
-
 (** Points-to graphs datastructure. *)
 module G = Abstract_state.G
 
-module LSet = Simplified_lset
+module LSet = Abstract_state.LSet
 
 module Abstract_state = Abstract_state
 

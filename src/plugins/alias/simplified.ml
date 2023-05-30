@@ -138,38 +138,6 @@ module Lval = struct
   let points_to lv = Mem (Cil.dummy_exp (Lval lv)), NoOffset
 end
 
-module Simplified_lmap = struct
-  include Map.Make (Lval)
-
-  let pretty f fmt m =
-    let is_first = ref true in
-    Format.fprintf fmt "{@[<hov 2>";
-    iter (fun k v ->
-        if not !is_first
-        then Format.fprintf fmt ",@,"
-        else is_first := false;
-        Format.fprintf fmt " %a -> %a" Lval.pretty k f v
-      )
-      m;
-    Format.fprintf fmt " @]}"
-end
-
-module Simplified_lset = struct
-  include Set.Make (Lval)
-
-  let pretty fmt s =
-    Format.fprintf fmt "{@[";
-    let is_first = ref true in
-    iter (fun e ->
-        if !is_first
-        then is_first := false
-        else Format.fprintf fmt ",@ ";
-        Format.fprintf fmt "%a" Lval.pretty e
-      )
-      s;
-    Format.fprintf fmt "@]}"
-end
-
 let decompose_lval lv1 : (lval * offset) list =
   let rec list_of_offset (o: offset) : (offset*offset) list =
     match o with

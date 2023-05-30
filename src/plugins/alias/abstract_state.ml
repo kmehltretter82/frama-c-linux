@@ -33,8 +33,37 @@ module VMap = Datatype.Int.Map
 
 module Lval = Simplified.Lval
 
-module LSet = Simplified.Simplified_lset
-module LMap = Simplified.Simplified_lmap
+module LSet = struct
+  include Set.Make (Lval)
+
+  let pretty fmt s =
+    Format.fprintf fmt "{@[";
+    let is_first = ref true in
+    iter (fun e ->
+        if !is_first
+        then is_first := false
+        else Format.fprintf fmt ",@ ";
+        Format.fprintf fmt "%a" Lval.pretty e
+      )
+      s;
+    Format.fprintf fmt "@]}"
+end
+
+module LMap = struct
+  include Map.Make (Lval)
+
+  let pretty f fmt m =
+    let is_first = ref true in
+    Format.fprintf fmt "{@[<hov 2>";
+    iter (fun k v ->
+        if not !is_first
+        then Format.fprintf fmt ",@,"
+        else is_first := false;
+        Format.fprintf fmt " %a -> %a" Lval.pretty k f v
+      )
+      m;
+    Format.fprintf fmt " @]}"
+end
 
 module G = Persistent.Digraph.ConcreteBidirectional(Datatype.Int)
 

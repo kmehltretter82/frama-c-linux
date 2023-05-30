@@ -52,20 +52,6 @@ module Lval : sig
   val points_to : lval -> lval
 end
 
-module Simplified_lmap:
-sig
-  include Map.S with type key = lval
-
-  val pretty: (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
-end
-
-module Simplified_lset:
-sig
-  include Set.S with type elt = lval
-
-  val pretty: Format.formatter -> t -> unit
-end
-
 val decompose_lval : lval -> (lval * offset) list
 
 (** clear the two caches *)
