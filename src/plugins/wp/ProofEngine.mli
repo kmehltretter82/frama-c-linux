@@ -63,8 +63,9 @@ val current : tree -> current
 val goto : tree -> position -> unit
 
 val main : tree -> Wpo.t
-val head : tree -> Wpo.t
 val goal : node -> Wpo.t
+val head : tree -> node option
+val head_goal : tree -> Wpo.t
 val tree_context : tree -> WpContext.t
 val node_context : node -> WpContext.t
 

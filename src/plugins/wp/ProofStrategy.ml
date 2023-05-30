@@ -421,12 +421,18 @@ let default () =
     ) @@
   Wp_parameters.DefaultStrategies.get ()
 
-let hints goal =
-  let hs =
-    let pid = goal.Wpo.po_pid in
-    List.filter_map (fun (name,_) -> Hashtbl.find_opt strategies name) @@
-    List.filter (fun (_,ps) -> WpPropId.select_by_name ps pid) !revhints
-  in List.rev_append hs (default ())
+let hints ?node goal =
+  let pool = ref [] in
+  let add s = if not @@ List.memq s !pool then pool := s :: !pool in
+  let addname name = Option.iter add @@ Hashtbl.find_opt strategies name in
+  Option.iter addname (Option.bind node ProofEngine.get_hint) ;
+  let pid = goal.Wpo.po_pid in
+  List.iter
+    (fun (name,ps) ->
+       if WpPropId.select_by_name ps pid then addname name
+    ) !revhints ;
+  List.iter add @@ List.rev @@ default () ;
+  List.rev !pool
 
 let has_hint goal =
   let pid = goal.Wpo.po_pid in

@@ -190,7 +190,8 @@ let consolidated wpo =
 (* -------------------------------------------------------------------------- *)
 
 let main t = t.main
-let head t = match t.head with
+let head t = t.head
+let head_goal t = match t.head with
   | None -> t.main
   | Some n -> n.goal
 let goal n = n.goal

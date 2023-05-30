@@ -386,11 +386,13 @@ class pane (gprovers : GuiConfig.provers) =
         autosearch#connect None ;
         strategies#connect None ;
         List.iter (fun tactic -> tactic#clear) tactics
-      | Some(tree,wpo,sequent,sel) ->
+      | Some(tree,sequent,sel) ->
         on_proof_context tree
           begin fun () ->
             (* configure strategies *)
-            let hints = ProofStrategy.hints wpo in
+            let node = ProofEngine.head tree in
+            let wpo = ProofEngine.head_goal tree in
+            let hints = ProofStrategy.hints ?node wpo in
             autosearch#connect (Some (self#autosearch sequent));
             strategies#connect ~hints (Some self#strategies);
             (* configure tactics *)
@@ -515,12 +517,11 @@ class pane (gprovers : GuiConfig.provers) =
         self#update_provers None ;
         self#update_tactics None ;
       | Proof proof ->
-        let wpo = ProofEngine.head proof in
         begin
-          self#update_provers (Some wpo) ;
+          self#update_provers (Some (ProofEngine.head_goal proof)) ;
           let sequent = printer#sequent in
           let select = printer#selection in
-          self#update_tactics (Some(proof,wpo,sequent,select)) ;
+          self#update_tactics (Some(proof,sequent,select)) ;
         end
       | Composer _ | Browser _ -> ()
 
@@ -560,7 +561,7 @@ class pane (gprovers : GuiConfig.provers) =
             text#hrule ;
             scripter#tree proof ;
             text#hrule ;
-            text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
+            text#printf "%t@." (printer#goal (ProofEngine.head_goal proof)) ;
             text#printf "@{<bf>Goal id:@}  %s@." main.po_gid ;
             text#printf "@{<bf>Short id:@} %s@." main.po_sid ;
             text#hrule ;
@@ -576,7 +577,7 @@ class pane (gprovers : GuiConfig.provers) =
               self#update in
             text#printf "%t@." (composer#print cc ~quit) ;
             text#hrule ;
-            text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
+            text#printf "%t@." (printer#goal (ProofEngine.head_goal proof)) ;
           end ()
       | Browser(proof,cc,tgt) ->
         on_proof_context proof
@@ -588,7 +589,7 @@ class pane (gprovers : GuiConfig.provers) =
               self#update in
             text#printf "%t@." (browser#print cc ~quit) ;
             text#hrule ;
-            text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
+            text#printf "%t@." (printer#goal (ProofEngine.head_goal proof)) ;
           end ()
       | Forking _ -> ()
 

@@ -96,8 +96,7 @@ let do_print_goal_status fmt (g : Wpo.t) =
               Format.fprintf fmt "%tSubgoal %d/%d:@\n" Wpo.pp_flow (succ i) n ;
               ProofEngine.goto tree (`Leaf i) ;
               do_print_current fmt tree ;
-              let g = ProofEngine.head tree in
-              Wpo.pp_goal fmt g
+              Wpo.pp_goal fmt @@ ProofEngine.head_goal tree
             done
       end ;
       Wpo.pp_flow fmt ;
