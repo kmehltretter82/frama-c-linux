@@ -1467,7 +1467,7 @@ struct
           let vcs = gmap (assume_vc ~descr:"Heap" ~domain:true hs) wp.vcs in
           { wp with vcs }
         | Mcfg.SC_Frame_in ->
-          let probes = Wp_parameters.CounterExample.get () in
+          let probes = Wp_parameters.CounterExamples.get () in
           wp_scope env wp ~probes ~descr:"Frame In" Enter xs
         | Mcfg.SC_Frame_out ->
           wp_scope env wp ~descr:"Frame Out" Leave xs

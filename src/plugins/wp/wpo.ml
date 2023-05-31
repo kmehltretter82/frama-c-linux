@@ -297,7 +297,7 @@ struct
            if result.verdict <> NoResult then
              Format.fprintf fmt "Prover %a returns %t@\n"
                pp_prover prover (pp_result_qualif prover result) ;
-           if Wp_parameters.CounterExample.get () then
+           if Wp_parameters.CounterExamples.get () then
              VCS.pp_model fmt result.prover_model
         ) results ;
     end
@@ -380,7 +380,7 @@ struct
              Format.fprintf fmt "Prover %a returns %t@\n"
                pp_prover prover
                (pp_result_qualif prover result) ;
-           if Wp_parameters.CounterExample.get () then
+           if Wp_parameters.CounterExamples.get () then
              pp_model fmt result.prover_model
         ) results ;
     end

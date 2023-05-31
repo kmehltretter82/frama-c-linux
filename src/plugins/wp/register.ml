@@ -335,7 +335,7 @@ let do_wpo_result goal prover res =
     do_progress goal "Qed"
 
 let pp_hasmodel fmt goal =
-  if Wp_parameters.CounterExample.get () then
+  if Wp_parameters.CounterExamples.get () then
     let rs = Wpo.get_results goal in
     if List.exists
         (fun (_,r) -> not @@ Probe.Map.is_empty r.VCS.prover_model) rs

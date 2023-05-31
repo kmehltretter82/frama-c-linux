@@ -1092,13 +1092,9 @@ let add_model_trace (probes: Lang.F.term Probe.Map.t) cnv t =
     Probe.Map.fold fold probes task
 
 let convert_freevariables ~probes ~cnv t =
-  let freevars = (Lang.F.varsp t) in
-  let freevars =
-    if Wp_parameters.CounterExample.get ()
-    then Probe.Map.fold
-        (fun _ t vars -> Lang.F.Vars.union vars (Lang.F.vars t))
-        probes freevars
-    else freevars in
+  let freevars = Probe.Map.fold
+      (fun _ t vars -> Lang.F.Vars.union vars (Lang.F.vars t))
+      probes (Lang.F.varsp t) in
   let cnv,lss =
     Lang.F.Vars.fold (fun (v:Lang.F.Var.t) (cnv,lss) ->
         let ty = of_tau ~cnv @@ Lang.F.tau_of_var v in
@@ -1137,10 +1133,7 @@ let prove_goal ~id ~title ~name ?axioms ?(probes=Probe.Map.empty) t =
   let t = None in
   let t = Why3.Task.use_export t th in
   let t = List.fold_left Why3.Task.add_param_decl t lss in
-  let t =
-    if Wp_parameters.CounterExample.get ()
-    then add_model_trace probes cnv t
-    else t in
+  let t = add_model_trace probes cnv t in
   Why3.Task.add_decl t decl
 
 let prove_prop ?probes ?axioms ~pid prop =
@@ -1149,14 +1142,17 @@ let prove_prop ?probes ?axioms ~pid prop =
   let name = "WP" in
   prove_goal ?axioms ?probes ~id ~title ~name prop
 
-let task_of_wpo wpo =
+let task_of_wpo ~ce wpo =
   let pid = wpo.Wpo.po_pid in
   match wpo.Wpo.po_formula with
   | Wpo.GoalAnnot v ->
     let pid = wpo.Wpo.po_pid in
     let axioms = v.Wpo.VC_Annot.axioms in
     let prop = Wpo.GOAL.compute_proof ~pid v.Wpo.VC_Annot.goal in
-    let probes = Wpo.GOAL.compute_probes ~pid v.Wpo.VC_Annot.goal in
+    let probes =
+      if ce then
+        Wpo.GOAL.compute_probes ~pid v.Wpo.VC_Annot.goal
+      else Probe.Map.empty in
     prove_prop ~pid ?axioms ~probes prop, probes
   | Wpo.GoalLemma v ->
     let lemma = v.Wpo.VC_Lemma.lemma in
@@ -1215,22 +1211,22 @@ let has_model_attr attrs =
     ) None attrs
 
 let debug_model (res:Why3.Call_provers.prover_result) =
-  if Wp_parameters.CounterExample.get () then
-    Wp_parameters.debug ~dkey:dkey_model "%t"
-      begin fun fmt ->
-        List.iter
-          begin fun (res,model) ->
-            Format.fprintf fmt "@[<hov 2>model %a: %a@]@\n"
-              Why3.Call_provers.print_prover_answer res
-              (Why3.Model_parser.print_model_human
-                 ~filter_similar:false
-                 ~print_attrs:true) model
-          end
-          res.pr_models
-      end
+  Wp_parameters.debug ~dkey:dkey_model "%t"
+    begin fun fmt ->
+      List.iter
+        begin fun (res,model) ->
+          Format.fprintf fmt "@[<hov 2>model %a: %a@]@\n"
+            Why3.Call_provers.print_prover_answer res
+            (Why3.Model_parser.print_model_human
+               ~filter_similar:false
+               ~print_attrs:true) model
+        end
+        res.pr_models
+    end
 
 let get_model probes (res:Why3.Call_provers.prover_result) =
-  debug_model (res:Why3.Call_provers.prover_result);
+  if Wp_parameters.has_dkey dkey_model && not @@ Probe.Map.is_empty probes then
+    debug_model (res:Why3.Call_provers.prover_result);
   (* we take the second model because it should be the most precise?? *)
   match res.pr_models with
   | [] -> Probe.Map.empty
@@ -1495,7 +1491,10 @@ let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ~prover wpo () =
   try
     (* Always generate common task *)
     let context = Wpo.get_context wpo in
-    let task,probes = WpContext.on_context context task_of_wpo wpo in
+    let ce =
+      Wp_parameters.CounterExamples.get () &&
+      Why3Provers.has_counter_examples prover in
+    let task,probes = WpContext.on_context context (task_of_wpo ~ce) wpo in
     if Wp_parameters.Generate.get ()
     then Task.return VCS.no_result (* Only generate *)
     else

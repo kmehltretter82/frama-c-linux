@@ -103,6 +103,9 @@ let title ?(version=true) p =
   else p.Why3.Whyconf.prover_name
 let compare = Why3.Whyconf.Prover.compare
 let is_mainstream p = p.Why3.Whyconf.prover_altern = ""
+let has_counter_examples p =
+  List.mem "counterexamples" @@
+  String.split_on_char '+' p.Why3.Whyconf.prover_altern
 
 let provers () =
   Why3.Whyconf.Mprover.keys (Why3.Whyconf.get_provers (config ()))
