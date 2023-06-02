@@ -170,7 +170,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     let ty_op = Typing.get_typ ~logic_env t in
     let ty_k = match Typing.get_cast ~logic_env t_min with
       | Some e -> e
-      | _ -> Options.fatal ~dkey "unexpected error in \\sum translation"
+      | None -> ty_op
     in
     let e_min, adata, env = to_exp ~adata kf env t_min in
     let e_max, adata, env = to_exp ~adata kf env t_max in
