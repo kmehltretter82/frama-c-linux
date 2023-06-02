@@ -520,9 +520,16 @@ let build_cpp_cmd = function
       else []
     in
     let fc_define_args = ["__FRAMAC__"] in
+    let exe = cpp_name cmdl in
     let clang_no_warn =
-      if cpp_name cmdl = "clang" then
-        ["-Wno-builtin-macro-redefined"]
+      if exe = "clang" || exe = "gcc" then
+        (* NB: For gcc only old versions (still found in Ubuntu 18.04,
+           supported until 2028, though) activate builtin-macro-redefined.
+           This is also the case for newer clangs, while older ones will
+           complain about the unknown warning (gcc does not seem to care,
+           so that it is safe to keep the unknown-warning-option in every
+           case. *)
+        ["-Wno-builtin-macro-redefined"; "-Wno-unknown-warning-option"]
       else
         []
     in
