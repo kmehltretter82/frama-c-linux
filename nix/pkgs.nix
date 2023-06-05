@@ -9,6 +9,7 @@ let
     why3 = oself.callPackage ./why3.nix {};
     yaml = oself.callPackage ./yaml.nix {};
     ppx_deriving_yaml = oself.callPackage ./ppx_deriving_yaml.nix {};
+
     # Helpers
     mk_tests = oself.callPackage ./mk_tests.nix {};
     mk_plugin = oself.callPackage ./mk_plugin.nix {};
@@ -25,7 +26,6 @@ let
     frama-c = oself.callPackage ./frama-c.nix {};
     frama-c-hdrck = oself.callPackage ./frama-c-hdrck.nix {};
     frama-c-lint = oself.callPackage ./frama-c-lint.nix {};
-    lint = oself.callPackage ./lint.nix {};
 
     # Tests
     default-config-tests = oself.callPackage ./default-config-tests.nix {};
