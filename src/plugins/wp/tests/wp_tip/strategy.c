@@ -27,7 +27,6 @@
   strategy Eager:
     \tactic("Wp.overflow"
       ,\pattern(\any(to_uint32(_),to_sint32(_)))
-      ,\children(Eager)
     ),
     Prover;
 

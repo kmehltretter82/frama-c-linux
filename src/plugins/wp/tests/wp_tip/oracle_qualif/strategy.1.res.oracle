@@ -12,7 +12,7 @@
   Function target
 ------------------------------------------------------------
 
-Goal Post-condition (file strategy.c, line 47) in 'target':
+Goal Post-condition (file strategy.c, line 46) in 'target':
 Assume {
   Type: is_uint32(t) /\ is_uint32(x) /\ is_uint32(y) /\ is_uint32(z).
   (* Pre-condition *)
