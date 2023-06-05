@@ -39,18 +39,26 @@ module Make
 
   let equal_loc (l, r) (l', r') =
     Left.equal_loc l l' && Right.equal_loc r r'
-  let pretty_loc fmt (l, r) =
-    Format.fprintf fmt "(%a, %a)" Left.pretty_loc l Right.pretty_loc r
+  let pretty_loc =
+    Pretty_utils.pp_pair Left.pretty_loc Right.pretty_loc
 
   let equal_offset (l, r) (l', r') =
     Left.equal_offset l l' && Right.equal_offset r r'
-  let pretty_offset fmt (l, r) =
-    Format.fprintf fmt "(%a, %a)" Left.pretty_offset l Right.pretty_offset r
+  let pretty_offset =
+    Pretty_utils.pp_pair Left.pretty_offset Right.pretty_offset
 
   (* TODO: don't know what to do, used max by default *)
   let size (l, r) =
-    let lsize = Left.size l and rsize = Right.size r in
-    if Int_Base.compare lsize rsize <= 0 then lsize else rsize
+    match Left.size l, Right.size r with
+    | Int_Base.Top, size
+    | size, Int_Base.Top -> size
+    | Int_Base.Value lsize as size, Int_Base.Value rsize ->
+      if Integer.equal lsize rsize then size else
+        Self.fatal
+          "Location product: inconsistent size of the same location \
+           represented by %a (size %a) and %a (size %a)."
+          Left.pretty_loc l Integer.pretty lsize
+          Right.pretty_loc r Integer.pretty rsize
 
   let replace_base subst (l, r) =
     Left.replace_base subst l, Right.replace_base subst r
@@ -67,24 +75,25 @@ module Make
 
   let no_offset = Left.no_offset, Right.no_offset
 
-  let forward_field typ info (l, r) =
-    Left.forward_field typ info l, Right.forward_field typ info r
+  let forward_field typ varinfo (l, r) =
+    Left.forward_field typ varinfo l, Right.forward_field typ varinfo r
 
   let forward_variable typ varinfo (l, r) =
     let* l = Left.forward_variable  typ varinfo l in
     let* r = Right.forward_variable typ varinfo r in
     `Value (l, r)
 
-  let eval_varinfo info = Left.eval_varinfo info, Right.eval_varinfo info
+  let eval_varinfo varinfo =
+    Left.eval_varinfo varinfo, Right.eval_varinfo varinfo
 
   let backward_variable varinfo (l, r) =
     let* l = Left.backward_variable  varinfo l in
     let* r = Right.backward_variable varinfo r in
     `Value (l, r)
 
-  let backward_field typ info (lo, ro) =
-    let* lo = Left.backward_field  typ info lo in
-    let* ro = Right.backward_field typ info ro in
+  let backward_field typ varinfo (lo, ro) =
+    let* lo = Left.backward_field  typ varinfo lo in
+    let* ro = Right.backward_field typ varinfo ro in
     `Value (lo, ro)
 
   (** Both value abstractions produce a sound value abstraction for the same
