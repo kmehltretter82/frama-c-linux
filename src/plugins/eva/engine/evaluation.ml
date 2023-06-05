@@ -1661,16 +1661,6 @@ module Make
     | _ -> assert false
 end
 
-module type Eva = sig
-  include Abstractions.S
-  module Eval : Evaluation_sig.S
-    with type state = Dom.t
-     and type value = Val.t
-     and type loc = Loc.location
-     and type origin = Dom.origin
-end
-
-
 (*
 Local Variables:
 compile-command: "make -C ../../../.."

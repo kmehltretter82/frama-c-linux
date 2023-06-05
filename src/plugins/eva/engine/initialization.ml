@@ -273,11 +273,10 @@ module Make
   (* Use the values supplied in [actuals] for the formals of [kf], and
      bind them in [state] *)
   let add_supplied_main_formals kf actuals state =
-    match Domain.get Cvalue_domain.State.key with
+    match get_cvalue with
     | None -> Self.abort "Function Db.Value.fun_set_args cannot be \
                           used without the Cvalue domain"
     | Some get_cvalue ->
-      let get_cvalue s = get_cvalue s |> fst in
       let formals = Kernel_function.get_formals kf in
       if (List.length formals) <> List.length actuals then
         raise Db.Value.Incorrect_number_of_arguments;
