@@ -55,34 +55,15 @@ module Make
   let replace_base subst (l, r) =
     Left.replace_base subst l, Right.replace_base subst r
 
-  (* Intersects the truth values [t1] and [t2] coming from [assume_] functions
-     from both abstract values. [v1] and [v2] are the initial values leading to
-     these truth values, that may be reduced by the assumption. [combine]
-     combines values from both abstract values into values of the product. *)
-  let narrow_any_truth combine (v1, t1) (v2, t2) = match t1, t2 with
-    | `Unreachable, _ | _, `Unreachable
-    | (`True | `TrueReduced _), `False
-    | `False, (`True | `TrueReduced _) -> `Unreachable
-    | `False, _ | _, `False -> `False
-    | `Unknown v1, `Unknown v2 -> `Unknown (combine v1 v2)
-    | (`Unknown v1 | `TrueReduced v1), `True -> `TrueReduced (combine v1 v2)
-    | `True, (`Unknown v2 | `TrueReduced v2) -> `TrueReduced (combine v1 v2)
-    | (`Unknown v1 | `TrueReduced v1),
-      (`Unknown v2 | `TrueReduced v2) -> `TrueReduced (combine v1 v2)
-    | `True, `True -> `True
-
-  let narrow_truth = narrow_any_truth (fun left right -> left, right)
-
   let assume_no_overlap ~partial (l1, r1) (l2, r2) =
     let l_truth = Left.assume_no_overlap  ~partial l1 l2 in
     let r_truth = Right.assume_no_overlap ~partial r1 r2 in
-    let combine (l1, l2) (r1, r2) = (l1, r1), (l2, r2) in
-    narrow_any_truth combine ((l1, l2), l_truth) ((r1, r2), r_truth)
+    Value_product.narrow_truth_pair ((l1, l2), l_truth) ((r1, r2), r_truth)
 
   let assume_valid_location ~for_writing ~bitfield (l, r) =
     let l_truth = Left.assume_valid_location  ~for_writing ~bitfield l in
     let r_truth = Right.assume_valid_location ~for_writing ~bitfield r in
-    narrow_truth (l, l_truth) (r, r_truth)
+    Value_product.narrow_truth (l, l_truth) (r, r_truth)
 
   let no_offset = Left.no_offset, Right.no_offset
 
