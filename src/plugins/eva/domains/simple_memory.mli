@@ -30,15 +30,10 @@ type 'value builtin = 'value list -> 'value Eval.or_bottom
 
 (** Abstraction of the values variables are mapped to. *)
 module type Value = sig
-  include Datatype.S
+  include Abstract_value.Leaf
 
-  (** Lattice structure. *)
-
-  val top : t
-  val join : t -> t -> t
+  (** Widening operation to ensure convergence. *)
   val widen : t -> t -> t
-  val narrow : t -> t -> t Eval.or_bottom
-  val is_included : t -> t -> bool
 
   (** This function must return [true] if the given variable should be
       tracked by the domain. All untracked variables are implicitely

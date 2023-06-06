@@ -1616,6 +1616,9 @@ module Domain = struct
   type location = Precise_locs.precise_location
   type origin
 
+  let value = Main_values.cval
+  let location = Main_locations.ploc
+
   let top_value = `Value (Cvalue.V.top, None), Alarmset.all
 
   (* Evaluator building. *)
@@ -1955,13 +1958,9 @@ end
 include Domain
 
 let registered =
-  let name = "octagon" and priority = 6 in
-  let descr =
+  let name = "octagon"
+  and descr =
     "Infers relations between scalar variables of the form b ≤ ±X ± Y ≤ e, \
      where X, Y are program variables and b, e are constants."
   in
-  Abstractions.Domain.register ~name ~priority ~descr @@ Domain
-    { key ; domain = (module Domain)
-    ; values = Last Main_values.CVal.registered
-    ; locations = Last Main_locations.PLoc.registered
-    }
+  Abstractions.Domain.register ~name ~descr ~priority:6 (module Domain)

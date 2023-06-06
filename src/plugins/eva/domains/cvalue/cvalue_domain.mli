@@ -27,7 +27,7 @@ module State : Abstract_domain.Leaf
    and type location = Main_locations.PLoc.location
    and type state = Cvalue.Model.t * Locals_scoping.clobbered_set
 
-val registered : Abstractions.Domain.registered
+val registered: Abstractions.Domain.registered
 
 (** Specific functions for partitioning optimizations.  *)
 

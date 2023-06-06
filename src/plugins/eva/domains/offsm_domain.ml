@@ -101,6 +101,9 @@ module D : Abstract_domain.Leaf
   type location = Precise_locs.precise_location
   type origin
 
+  let value = Abstract_value.Leaf (module Offsm_value.Offsm)
+  let location = Main_locations.ploc
+
   include (Memory: sig
              include Datatype.S_with_collections with type t = state
              include Abstract_domain.Lattice with type state := state
@@ -225,14 +228,9 @@ module D : Abstract_domain.Leaf
     kill loc state
 end
 
-
 let registered =
-  let name = "bitwise" and priority = 3 in
-  let descr =
+  let name = "bitwise"
+  and descr =
     "Infers bitwise information to interpret more precisely bitwise operators."
   in
-  Abstractions.Domain.register ~name ~priority ~descr @@ Domain
-    { key = D.key ; domain = (module D)
-    ; values = Last Offsm_value.Offsm.registered
-    ; locations = Last Main_locations.PLoc.registered
-    }
+  Abstractions.Domain.register ~name ~descr ~priority:3 (module D)

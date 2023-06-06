@@ -464,6 +464,9 @@ module D : Abstract_domain.Leaf
   type location = Precise_locs.precise_location
   type origin
 
+  let value = Main_values.cval
+  let location = Main_locations.ploc
+
   include (Memory: sig
              include Datatype.S_with_collections with type t = state
              include Abstract_domain.Lattice with type state := state
@@ -638,16 +641,10 @@ module D : Abstract_domain.Leaf
     Memory.kill loc state
 end
 
-
-
 let registered =
-  let name = "symbolic-locations" and priority = 7 in
-  let descr =
+  let name = "symbolic-locations"
+  and descr =
     "Infers values of symbolic locations represented by imprecise lvalues, \
      such as t[i] or *p when the possible values of [i] or [p] are imprecise."
   in
-  Abstractions.Domain.register ~name ~priority ~descr @@ Domain
-    { key = D.key ; domain = (module D)
-    ; values = Last Main_values.CVal.registered
-    ; locations = Last Main_locations.PLoc.registered
-    }
+  Abstractions.Domain.register ~name ~descr ~priority:7 (module D)

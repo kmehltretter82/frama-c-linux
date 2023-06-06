@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 include Abstract_value.Leaf
-val registered : t Abstractions.Value.registered
 
 val pretty_debug : t Pretty_utils.formatter
 

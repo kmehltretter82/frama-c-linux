@@ -1089,6 +1089,9 @@ module D = struct
   type location = Precise_locs.precise_location
   type origin
 
+  let value = Main_values.cval
+  let location = Main_locations.ploc
+
   include (Traces: sig
              include Datatype.S_with_collections with type t = state
              include Abstract_domain.Lattice with type state := state
@@ -1261,15 +1264,14 @@ module D = struct
 end
 
 let registered =
-  let name = "traces" and priority = 2 and experimental = true in
-  let descr =
+  let name = "traces"
+  and descr =
     "Builds an over-approximation of all the traces that lead to a statement."
   in
-  Abstractions.Domain.register ~name ~priority ~descr ~experimental @@ Domain
-    { key = D.key ; domain = (module D)
-    ; values = Last Main_values.CVal.registered
-    ; locations = Last Main_locations.PLoc.registered
-    }
+  Abstractions.Domain.register ~name ~descr ~priority:2 ~experimental:true
+    (module D)
+
+
 
 (*
 Local Variables:

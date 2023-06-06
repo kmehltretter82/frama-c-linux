@@ -26,8 +26,4 @@ val cast :
   old_size: Integer.t -> new_size: Integer.t -> signed: bool ->
   Cvalue.V_Offsetmap.t -> Cvalue.V_Offsetmap.t
 
-module Offsm : sig
-  include Abstract_value.S with type t = offsm_or_top
-  val key : t Abstract_value.key
-  val registered : t Abstractions.Value.registered
-end
+module Offsm : Abstract_value.Leaf with type t = offsm_or_top

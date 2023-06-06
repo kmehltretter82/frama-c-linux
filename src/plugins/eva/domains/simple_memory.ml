@@ -26,12 +26,8 @@ open Eval
 type 'value builtin = 'value list -> 'value or_bottom
 
 module type Value = sig
-  include Datatype.S
-  val top : t
-  val join : t -> t -> t
+  include Abstract_value.Leaf
   val widen : t -> t -> t
-  val narrow : t -> t -> t or_bottom
-  val is_included : t -> t -> bool
   val track_variable: Cil_types.varinfo -> bool
   val pretty_debug: t Pretty_utils.formatter
   val builtins: (string * t builtin) list
@@ -197,6 +193,9 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
   type value = Value.t
   type location = Precise_locs.precise_location
   type origin
+
+  let value = Abstract_value.Leaf (module Value)
+  let location = Main_locations.ploc
 
   let log_category = Self.register_category ("d-" ^ Info.name)
 

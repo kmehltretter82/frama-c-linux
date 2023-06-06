@@ -20,22 +20,20 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Main numeric values of Eva. *)
+(** Main numeric values of Eva that can be used by abstract domains. *)
 
-(** Abstract values built over Cvalue.V *)
-module CVal : sig
-  include Abstract_value.S with type t = Cvalue.V.t
-  val key : t Abstract_value.key
-  val registered : t Abstractions.Value.registered
-end
+(** Main abstract values built over Cvalue.V, used by most domains. *)
+module CVal: Abstract_value.Leaf with type t = Cvalue.V.t
+val cval: CVal.t Abstract_value.dependencies
 
-(** Dummy interval: no forward nor backward propagations.
-    [None] is top. *)
-module Interval : sig
-  include Abstract_value.S with type t = Ival.t option
-  val key : t Abstract_value.key
-  val registered : t Abstractions.Value.registered
-end
+(** Dummy intervals: no forward nor backward propagations,
+    only used as a reduced product with CVal above. [None] is top. *)
+module Interval: Abstract_value.Leaf with type t = Ival.t option
+val ival: Interval.t Abstract_value.dependencies
+
+(** Simple sign values, used by the sign domain. *)
+module Sign: Abstract_value.Leaf with type t = Sign_value.t
+val sign: Sign.t Abstract_value.dependencies
 
 (*
 Local Variables:

@@ -20,123 +20,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** {2 Registration of abstract domains.} *)
 
-
-(** Registration and building of the analysis abstractions. *)
-
-(** {2 Registration of abstractions.} *)
-
-(** Dynamic registration of the abstractions to be used in an Eva analysis:
-    - value abstractions, detailed in the {!Abstract_value} signature;
-    - location abstractions, detailed in the {!Abstract_location} signature;
-    - state abstractions, or abstract domains, detailed in {!Abstract_domain}.
-*)
-
-(** Value abstractions registration. *)
-module Value : sig
-  type 'v key = 'v Abstract.Value.key
-  type 'v value = (module Abstract_value.S with type t = 'v)
-
-  (** Registering a value abstraction requires a single module and a key. The
-      returned [`v registered] is a witness of the registration process and is
-      used by the location and domain abstractions registration to declare their
-      value dependencies. *)
-  type 'v register = { key : 'v key ; value : 'v value }
-  type 'v registered
-  val register : 'v register -> 'v registered
-
-  (** Other abstractions need to declare their value dependencies, i.e. the
-      value abstractions they rely on to perform their computations. Those
-      dependencies are declared as a heterogenous list containing at least one
-      element. *)
-  type 'v dependencies =
-    | Last : 'v registered -> 'v dependencies
-    | (::) : 'a registered * 'b dependencies -> ('a * 'b) dependencies
-end
-
-
-(** Location abstractions registration. *)
-module Location : sig
-  type 'l key = 'l Abstract.Location.key
-  type ('v, 'l) location =
-    (module Abstract_location.S with type value = 'v and type location = 'l)
-
-  (** Registering a location abstraction requires a single module, a key and the
-      registered value abstractions needed to perform the computations. The
-      returned [`l registered] is a witness of the registration process and is
-      used by the domain abstractions registration to declare their location
-      dependencies. *)
-  type ('v, 'l) register =
-    { key : 'l key
-    ; location : ('v, 'l) location
-    ; dependencies : 'v Value.dependencies
-    }
-  type 'l registered
-  val register : ('v, 'l) register -> 'l registered
-
-  (** Domain abstractions need to declare their location dependencies. As for
-      the value dependencies, they are declared as a heterogenous list. *)
-  type 'l dependencies =
-    | Last : 'l registered -> 'l dependencies
-    | (::) : 'a registered * 'b dependencies -> ('a * 'b) dependencies
-end
-
-
-(** Domain abstractions registration. *)
 module Domain : sig
-  type 's key = 's Abstract.Domain.key
 
-  (** Leaf domain abstraction, i.e. a simple domain with fixed values and
-      locations dependencies. The registration of such domains requires a
-      key, a single module and values and locations dependencies. *)
-  module Leaf : sig
-    type ('v, 'l, 's) domain =
-      (module Abstract_domain.S
-        with type value = 'v and type location = 'l and type state = 's)
-
-    type ('v, 'l, 's) register =
-      { key : 's key
-      ; domain : ('v, 'l, 's) domain
-      ; values : 'v Value.dependencies
-      ; locations : 'l Location.dependencies
-      }
-  end
-
-  (** Functor domain abstraction, i.e. a domain that can be built over any value
-      abstractions, but with fixed locations dependencies. The registraction of
-      such domains requires only the location dependencies, as the abstraction
-      produced by the functor cannot rely on any particular value and the key
-      can depend on the value abstractions used. *)
-  module Functor : sig
-    module type Domain = sig
-      type location
-      module Make (V : Abstract.Value.External) : sig
-        include Abstract_domain.S
-          with type value = V.t and type location = location
-        val key : state key
-      end
-    end
-    type 'l domain = (module Domain with type location = 'l)
-
-    type 'l register =
-      { domain : 'l domain
-      ; locations : 'l Location.dependencies
-      }
-  end
-
-  (** Registration of both kind of domain abstractions is done using the same
-      functions. The two kind of registration information are thus regrouped
-      under the same type. The returned [registered] is a witness of the
-      registration process and can be used to programmatically enable the
-      domain. *)
-  type register =
-    | Domain : ('v, 'l, 's) Leaf.register -> register
-    | Functor : 'l Functor.register -> register
+  (** Witness of the registration of an abstract domain, it can be used to
+      programmatically enable the domain. *)
   type registered
 
-  (** Registers an abstract domain. Returns a flag for the given domain.
-      - [name] must be unique. The domain is used if the -eva-domains option
-        has been set to [name].
+  (** Registers a leaf abstract domain.
+      - [name] must be unique. The domain is enabled by -eva-domains [name].
       - [descr] is a description printed in the help message of -eva-domains.
       - [experimental] is false by default. If set to true, a warning is emitted
         when the domain is enabled.
@@ -147,14 +40,32 @@ module Domain : sig
         Eva domains. The default priority is 0. *)
   val register :
     name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
-    register -> registered
+    (module Abstract_domain.Leaf) -> registered
 
-  (** Register a dynamic abstraction: the abstraction is built by applying
-      the last argument when starting an analysis, if the -eva-domains option
-      has been set to [name]. See function {!register} for more details. *)
+  (** Registers a dynamic domain, which is built at the start of an analysis
+      analysis using the function given as last argument.
+      See function {!register} for more details. *)
   val dynamic_register :
     name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
-    (unit -> register) -> unit
+    (unit -> (module Abstract_domain.Leaf)) -> unit
+
+  (** Functor domain which can be built over any value abstractions, but with
+      fixed locations dependencies. *)
+  module type Functor = sig
+    type location
+    val location: location Abstract_location.dependencies
+    module Make (V : Abstract.Value.External) : sig
+      include Abstract_domain.S
+        with type value = V.t and type location = location
+      val key : state Abstract_domain.key
+    end
+  end
+
+  (** Registers a functor domain. See function {!register} for more details. *)
+  val register_functor:
+    name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
+    (module Functor) -> registered
+
 end
 
 
@@ -163,7 +74,8 @@ end
     i.e. a function that perform the reduction. *)
 module Reducer : sig
   type ('a, 'b) reducer = 'a -> 'b -> 'a * 'b
-  val register : 'a Value.key -> 'b Value.key -> ('a, 'b) reducer -> unit
+  val register :
+    'a Abstract_value.key -> 'b Abstract_value.key -> ('a, 'b) reducer -> unit
 
   (** The value abstractions signature used in the engine. It is composed of the
       external signature of value abstractions, plus the reduction function of

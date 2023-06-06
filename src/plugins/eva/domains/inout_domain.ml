@@ -204,16 +204,15 @@ module Transfer = struct
 
 end
 
-module D
-  (*: Domain_builder.InputDomain
-    with type state = inout
-    and type value = Cvalue.V.t
-    and type location = Precise_locs.precise_location *)
-= struct
+module Domain = struct
+
   type state = inout
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
   type origin
+
+  let value = Main_values.cval
+  let location = Main_locations.ploc
 
   include (LatticeInout: sig
              include Datatype.S_with_collections with type t = state
@@ -267,15 +266,13 @@ module D
   let extract_lval ~oracle:_ _context _state _lv _typ _locs = top_query
 end
 
-let registered =
-  let name = "inout" and priority = 5 and experimental = true in
-  let descr = "Infers the inputs and outputs of each function." in
-  Abstractions.Domain.register ~name ~priority ~experimental ~descr @@ Domain
-    { key = D.key ; domain = (module D)
-    ; values = Last Main_values.CVal.registered
-    ; locations = Last Main_locations.PLoc.registered
-    }
+include Domain
 
+let registered =
+  let name = "inout"
+  and descr = "Infers the inputs and outputs of each function." in
+  Abstractions.Domain.register ~name ~descr ~priority:5 ~experimental:true
+    (module Domain)
 
 (*
 Local Variables:

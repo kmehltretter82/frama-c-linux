@@ -27,41 +27,26 @@
 module Value = struct
   type 'v structure = 'v Abstract.Value.structure
   type 'v key = 'v Abstract.Value.key
+  type 'v dependencies = 'v Abstract_value.dependencies
   let dec_eq = Abstract.Value.eq_structure
 
-  type 'v value = (module Abstract_value.S with type t = 'v)
-
-
-  (* Value registration *)
-  type 'v register = { key : 'v key ; value : 'v value }
-  type 'v registered = 'v key * 'v value
-  let register : type v. v register -> v registered =
-    fun { key ; value } -> (key, value)
-
-
-  (* When registering a location or a domain, the user has to declare its
-     values dependencies, i.e the values it uses during its computations. To
-     simplify the abstraction build and the dependencies declaration, they
-     are handled as a simple list. Arguably not so simple as it is
-     heterogenous, but it is still a list. *)
-  type 'v dependencies =
-    | Last : 'v registered -> 'v dependencies
-    | (::) : 'a registered * 'b dependencies -> ('a * 'b) dependencies
+  type 'v value = (module Abstract_value.Leaf with type t = 'v)
 
   (* When building the abstraction, we will need to compare the dependencies
      structure with the structured values. *)
   let rec outline : type v. v dependencies -> v structure = function
-    | Last (key, value) -> Abstract.Value.Leaf (key, value)
-    | (k, v) :: tl -> Abstract.Value.(Node (Leaf (k, v), outline tl))
+    | Leaf value ->
+      let module V = (val value) in
+      Abstract.Value.Leaf (V.key, (module V))
+    | Node (l, r) -> Abstract.Value.(Node (outline l, outline r))
 
   (* Folding over values dependencies *)
-  type 'a folder = { folder : 'v. 'v registered -> 'a -> 'a }
+  type 'a folder = { f : 'v. 'v value -> 'a -> 'a }
   let rec fold : type v. 'a folder -> v dependencies -> 'a -> 'a =
-    fun { folder } dependencies acc ->
+    fun folder dependencies acc ->
     match dependencies with
-    | Last registered -> folder registered acc
-    | hd :: tl -> fold { folder } tl (folder hd acc)
-
+    | Leaf leaf -> folder.f leaf acc
+    | Node (l, r) -> fold folder l (fold folder r acc)
 
   (* The value abstraction build consists of accumulating registered values
      into a structured value and then adding the needed operators, thus making
@@ -87,19 +72,19 @@ module Value = struct
      a product is needed (which comes down to checking if the registered
      value key we want to add is not in the structure), computing it, and
      updating the structure. *)
-  let add : type v. v registered -> structured -> structured =
-    fun (key, input) structured ->
-    let open Abstract.Value in
+  let add : type v. v value -> structured -> structured =
+    fun (module Val) structured ->
+    let leaf = Abstract.Value.Leaf (Val.key, (module Val)) in
     match make_interactive structured with
     | Unit ->
       Value (module struct
-        include (val input)
-        let structure = Leaf (key, input)
+        include Val
+        let structure = leaf
       end)
-    | Value (module Interactive) when not (Interactive.mem key) ->
+    | Value (module Interactive) when not (Interactive.mem Val.key) ->
       Value (module struct
-        include Value_product.Make (Interactive) (val input)
-        let structure = Node (Interactive.structure, Leaf (key, input))
+        include Value_product.Make (Interactive) (Val)
+        let structure = Abstract.Value.Node (Interactive.structure, leaf)
       end)
     | _ -> structured
 
@@ -154,71 +139,33 @@ end
 
 module Location = struct
   type 'l structure = 'l Abstract.Location.structure
-  type 'l key = 'l Abstract.Location.key
+  type 'l dependencies = 'l Abstract_location.dependencies
   let dec_eq = Abstract.Location.eq_structure
 
-  type ('v, 'l) location =
-    (module Abstract_location.S with type value = 'v and type location = 'l)
+  type 'l location = (module Abstract_location.Leaf with type location = 'l)
 
+  (* When building the abstraction, we will need to compare the dependencies
+     structure with the structured values. *)
+  let rec outline: type v. v dependencies -> v structure = function
+    | Leaf location ->
+      let module Loc = (val location) in
+      Abstract.Location.Leaf (Loc.key, (module Loc))
+    | Node (l, r) -> Abstract.Location.(Node (outline l, outline r))
 
-  (* When registering a location, we also need its key and its values
-     dependencies. *)
-  type ('v, 'l) register =
-    { key: 'l key
-    ; location : ('v, 'l) location
-    ; dependencies : 'v Value.dependencies
-    }
-
-  (* A registered location is simply a location with its key and its values
-     dependencies. *)
-  module type Registered = sig
-    include Abstract_location.S
-    val key : location key
-    val structure : location structure
-    val dependencies : value Value.dependencies
-  end
-  type 'l registered = (module Registered with type location = 'l)
-
-  (* Location registration. *)
-  let register : type v l. (v, l) register -> l registered =
-    fun { key ; location ; dependencies } ->
-    (module struct
-      module Location = (val location)
-      include Location
-      let key = key
-      let structure = Abstract.Location.Leaf (key, (module Location))
-      let dependencies = dependencies
-    end)
-
-
-  (* When registering a domain, the user has to declare its locations
-     dependencies, i.e the locations it uses during its computations. As
-     for the values, they are handled as a simple heterogenous list. *)
-  type 'l dependencies =
-    | Last : 'l registered -> 'l dependencies
-    | (::) : 'a registered * 'b dependencies -> ('a * 'b) dependencies
-
-  (* When building the abstraction, we will need to compare dependencies
-     with the structured locations. *)
-  let rec outline : type l. l dependencies -> l structure = function
-    | Last (module R) -> R.structure
-    | (module R) :: tl -> Abstract.Location.Node (R.structure, outline tl)
-
-  (* Folding over locations dependencies *)
-  type 'a folder = { folder : 'v. 'v registered -> 'a -> 'a }
+  (* Folding over values dependencies *)
+  type 'a folder = { f : 'l. 'l location -> 'a -> 'a }
   let rec fold : type v. 'a folder -> v dependencies -> 'a -> 'a =
-    fun { folder } dependencies acc ->
+    fun folder dependencies acc ->
     match dependencies with
-    | Last registered -> folder registered acc
-    | hd :: tl -> fold { folder } tl (folder hd acc)
+    | Leaf leaf -> folder.f leaf acc
+    | Node (l, r) -> fold folder l (fold folder r acc)
 
   (* Folding over the values dependencies of some locations dependencies. *)
   let rec fold_values : type v. 'a Value.folder -> v dependencies -> 'a -> 'a =
     fun folder dependencies acc ->
     match dependencies with
-    | Last (module R) -> Value.fold folder R.dependencies acc
-    | (module R) :: tl ->
-      fold_values folder tl (Value.fold folder R.dependencies acc)
+    | Leaf (module R) -> Value.fold folder R.value acc
+    | Node (l, r) -> fold_values folder l (fold_values folder r acc)
 
 
   (* As for the value abstraction, building the location abstraction consists
@@ -283,23 +230,26 @@ module Location = struct
         structured abstraction. It comes down to decide if a reduced product is
         needed.
      3. Rebuild a structured abstraction with the new location abstraction. *)
-  let add : type v l. l registered -> v structured -> v structured =
-    fun (module Registered) structured ->
-    let deps = Value.outline Registered.dependencies in
+  let add : type v l. l location -> v structured -> v structured =
+    fun (module Loc) structured ->
+    let deps = Value.outline Loc.value in
     let module To = (val get_value structured) in
-    let module From = struct include Registered let structure = deps end in
-    let module Converter = Value.Converter (From) (To) in
     let lifted : (module Abstract.Location.Internal with type value = v) =
       match Value.dec_eq deps To.structure with
-      | Some Eq -> (module Registered)
-      | None -> (module Location_lift.Make (Registered) (Converter))
+      | Some Eq ->
+        let leaf = Abstract.Location.Leaf (Loc.key, (module Loc)) in
+        (module struct include Loc let structure = leaf end)
+      | None ->
+        let module From = struct include Loc let structure = deps end in
+        let module Converter = Value.Converter (From) (To) in
+        (module Location_lift.Make (Loc) (Converter))
     in
     let combined : (module Abstract.Location.Internal with type value = v) =
       match make_interactive structured with
       | Unit _ -> lifted
-      | Location (module Loc) when Loc.mem Registered.key -> (module Loc)
-      | Location (module Loc) ->
-        (module Locations_product.Make (To) (val lifted) (Loc))
+      | Location (module L) when L.mem Loc.key -> (module L)
+      | Location (module L) ->
+        (module Locations_product.Make (To) (val lifted) (L))
     in
     Location (module struct
       type value = v
@@ -347,119 +297,26 @@ end
 (* --- Domains abstraction -------------------------------------------------- *)
 
 module Domain = struct
-  type 's structure = 's Abstract.Domain.structure
-  type 's key = 's Abstract.Domain.key
   module type S = Abstract_domain.S
 
-
-  (* Registration of leaf domains, i.e simple domain with a fixed value. *)
-  module Leaf = struct
-    type ('v, 'l, 's) domain =
-      (module S with type value = 'v and type location = 'l and type state = 's)
-
-    (* We need the values and locations dependendies to register a domain. *)
-    type ('v, 'l, 's) register =
-      { key : 's key
-      ; domain : ('v, 'l, 's) domain
-      ; values : 'v Value.dependencies
-      ; locations : 'l Location.dependencies
-      }
-
-    (* As for the locations, a registered domain is a simple module that
-       contains all the information given during the register along with
-       the domain structure (which is a leaf). *)
-    module type Registered = sig
+  (** Functor domain which can be built over any value abstractions, but with
+      fixed locations dependencies. *)
+  module type Functor = sig
+    type location
+    val location: location Abstract_location.dependencies
+    module Make (V : Abstract.Value.External) : sig
       include Abstract_domain.S
-      val key : state key
-      val structure : state structure
-      val values : value Value.dependencies
-      val locations : location Location.dependencies
+        with type value = V.t and type location = location
+      val key : state Abstract_domain.key
     end
-
-    (* Registration procedure. *)
-    type 's registered = (module Registered with type state = 's)
-    let register : type v l s. (v, l, s) register -> s registered =
-      fun { key ; domain ; values ; locations } ->
-      (module struct
-        module Domain = (val domain)
-        include Domain
-        let key = key
-        let structure = Abstract.Domain.Leaf (key, (module Domain))
-        let values = values
-        let locations = locations
-      end)
   end
-
-
-  (* Registration of a functor domain, i.e a domain that can be built on top of
-     any value. *)
-  module Functor = struct
-
-    (* A functor domain is declared as an existantiel. This module type has to
-       be read as: there exists a type <location> such as, given any Value, we
-       can build a domain using this Value and relying on a Location of type
-       <location>. *)
-    module type Domain = sig
-      type location
-      module Make (V : Value.Interactive) : sig
-        include Abstract_domain.S
-          with type value = V.t
-           and type location = location
-        val key : state key
-      end
-    end
-    type 'l domain = (module Domain with type location = 'l)
-
-    (* As a functor domain can be instanciated for any value, we only need
-       locations dependencies to register it. *)
-    type 'l register =
-      { domain : 'l domain
-      ; locations : 'l Location.dependencies
-      }
-
-    (* Once registered, a functor domain builds a domain along with its
-       structure and its key. *)
-    module type RegisteredLeaf = sig
-      include Abstract.Domain.Internal
-      val key : state key
-    end
-
-    (* A registered functor domain contains its locations dependencies and a
-       functor that builds a domain along its structure and its key. *)
-    module type Registered = sig
-      type location
-      val locations : location Location.dependencies
-      module Make (V : Value.Interactive) :
-        RegisteredLeaf with type value = V.t and type location = location
-    end
-
-    (* Registration procedure. *)
-    type registered = (module Registered)
-    let register : type l. l register -> registered =
-      fun { domain ; locations } ->
-      let module Domain = (val domain) in
-      (module struct
-        type location = Domain.location
-        let locations = locations
-        module Make (V : Value.Interactive) = struct
-          module Result = Domain.Make (V)
-          include Result
-          let structure = Abstract.Domain.Leaf (key, (module Result))
-        end
-      end)
-  end
-
 
   (* To simplify the domain registration procedure, we provide common types.
      However, the code above is still useful to prove some properties, mainly
      that we do not temper with the dependencies. *)
-  type register =
-    | Domain : ('v, 'l, 's) Leaf.register -> register
-    | Functor : 'l Functor.register -> register
-
   type registered =
-    | RegisteredDomain  : 's Leaf.registered -> registered
-    | RegisteredFunctor : Functor.registered -> registered
+    | Domain : (module Abstract_domain.Leaf) -> registered
+    | Functor : (module Functor) -> registered
 
   (* Registered domain are saved in mutable lists along with there information,
      i.e. there name, there experimental and there priority flags. *)
@@ -484,16 +341,10 @@ module Domain = struct
     let descr = if experimental then "Experimental. " ^ descr else descr in
     Parameters.register_domain ~name ~descr
 
-  (* Helper function used to dispatch the registration process to the good
-     registration process depending of the domain kind. *)
-  let register_abstraction = function
-    | Domain register -> RegisteredDomain (Leaf.register register)
-    | Functor register -> RegisteredFunctor (Functor.register register)
-
-  (* Registration of a static domain. *)
-  let register ~name ~descr ?(experimental=false) ?(priority=0) register =
+  (* Registration of a static leaf domain. *)
+  let register ~name ~descr ?(experimental=false) ?(priority=0) domain =
     register_domain_option ~name ~descr ~experimental ;
-    let abstraction = register_abstraction register in
+    let abstraction = Domain domain in
     let registered = { name ; experimental ; priority ; abstraction } in
     static_domains := registered :: !static_domains ;
     abstraction
@@ -501,9 +352,17 @@ module Domain = struct
   (* Registration of a dynamic domain. *)
   let dynamic_register ~name ~descr ?(experimental=false) ?(priority=0) make =
     register_domain_option ~name ~descr ~experimental ;
-    let make () = make () |> register_abstraction in
+    let make () = Domain (make ()) in
     let make () = { name ; experimental ; priority ; abstraction = make () } in
     dynamic_domains := (name, make) :: !dynamic_domains
+
+  (* Registration of a functor domain. *)
+  let register_functor ~name ~descr ?(experimental=false) ?(priority=0) domain =
+    register_domain_option ~name ~descr ~experimental ;
+    let abstraction = Functor domain in
+    let registered = { name ; experimental ; priority ; abstraction } in
+    static_domains := registered :: !static_domains ;
+    abstraction
 
 
   (* Building the domain abstraction consists of structuring the requested
@@ -573,25 +432,33 @@ module Domain = struct
     let module Loc = (val location) in
     let lifted : (v, l) structured_domain =
       match registered.abstraction with
-      | RegisteredFunctor (module Functor) ->
-        let locs = Location.outline Functor.locations in
+      | Functor (module Functor) ->
+        let locs = Location.outline Functor.location in
         let eq_loc = Location.dec_eq locs Loc.structure in
         let module D = Functor.Make (Val) in
         begin match eq_loc with
-          | Some Eq -> (module D)
+          | Some Eq ->
+            (module struct
+              include D
+              let structure = Abstract.Domain.Leaf (D.key, (module D))
+            end)
           | None ->
             let module Val = (val conversion_id (module Val)) in
             let module From = struct include D let structure = locs end in
             let module Loc = Location.Converter (From) (Loc) in
             (module Domain_lift.Make (D) (Val) (Loc))
         end
-      | RegisteredDomain (module D) ->
-        let loc_deps = Location.outline D.locations in
-        let val_deps = Value.outline D.values in
+      | Domain (module D) ->
+        let loc_deps = Location.outline D.location in
+        let val_deps = Value.outline D.value in
         let eq_loc = Location.dec_eq loc_deps Loc.structure in
         let eq_val = Value.dec_eq val_deps Val.structure in
         begin match eq_val, eq_loc with
-          | Some Eq, Some Eq -> (module D)
+          | Some Eq, Some Eq ->
+            (module struct
+              include D
+              let structure = Abstract.Domain.Leaf (D.key, (module D))
+            end)
           | Some Eq, None ->
             let module Val = (val conversion_id (module Val)) in
             let module From = struct include D let structure = loc_deps end in
@@ -652,14 +519,14 @@ module Domain = struct
      value initial configuration. *)
   let build domains : (module Structured) =
     let values =
-      let add_value = Value.{ folder = add } in
+      let add_value = Value.{ f = add } in
       let add_values values (registered, _) =
         match registered.abstraction with
-        | RegisteredDomain (module Domain) ->
-          Value.fold add_value Domain.values values |>
-          Location.fold_values add_value Domain.locations
-        | RegisteredFunctor (module F) ->
-          Location.fold_values add_value F.locations values
+        | Domain (module Domain) ->
+          Value.fold add_value Domain.value values |>
+          Location.fold_values add_value Domain.location
+        | Functor (module F) ->
+          Location.fold_values add_value F.location values
       in
       List.fold_left add_values Value.init domains |>
       Value.make_interactive
@@ -667,11 +534,11 @@ module Domain = struct
     let module V = (val Value.assert_not_unit values) in
     let locations =
       let init : V.t Location.structured = Location.init (module V) in
-      let add_loc = Location.{ folder = add } in
+      let add_loc = Location.{ f = add } in
       let add_locations locs (registered, _) =
         match registered.abstraction with
-        | RegisteredDomain  (module D) -> Location.fold add_loc D.locations locs
-        | RegisteredFunctor (module D) -> Location.fold add_loc D.locations locs
+        | Domain  (module D) -> Location.fold add_loc D.location locs
+        | Functor (module D) -> Location.fold add_loc D.location locs
       in
       List.fold_left add_locations init domains |>
       Location.make_interactive

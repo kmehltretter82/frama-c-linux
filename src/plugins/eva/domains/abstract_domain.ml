@@ -502,13 +502,26 @@ end
 
 type 't key = 't Structure.Key_Domain.key
 
-(** Signature for a leaf module of a domain. *)
+(** Signature for a leaf abstract domain which can be registered
+    via {!Abstractions.Domain.register}. *)
 module type Leaf = sig
   include S
 
-  (** The key identifies the domain and the type [t] of its states. *)
+  (** The key identifies the domain and the type [t] of its states.
+      Automatically created by {!Domain_builder.Complete}. *)
   val key: t key
+
+  (** The abstract value used by the domain.
+      It carries the [value] type used by the domain.
+      See {!Main_values} for some abstract values available in Eva. *)
+  val value: value Abstract_value.dependencies
+
+  (** The abstract location used by the domain.
+      It carries the [location] type used by the domain.
+      See {!Main_locations} for the abstract location available in Eva. *)
+  val location: location Abstract_location.dependencies
 end
+
 
 
 (*
