@@ -562,7 +562,7 @@ struct
     let frame = logic_frame l.l_var_info.lv_name l.l_tparams in
     in_frame frame
       begin fun () ->
-        let lfun = ACSL l in
+        let lfun = Lang.acsl l in
         let tau = Lang.tau_of_return l.l_type in
         let parp,sigp = Lang.local profile_sig l.l_profile in
         let ldef = {
@@ -585,7 +585,7 @@ struct
     let frame = logic_frame l.l_var_info.lv_name l.l_tparams in
     in_frame frame
       begin fun () ->
-        let lfun = ACSL l in
+        let lfun = Lang.acsl l in
         let tau = Lang.tau_of_return l.l_type in
         let parm,sigm = Lang.local (profile_mem l) vars in
         let ldef = {
@@ -604,7 +604,7 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let compile_lbreads cluster l ts =
-    let lfun = ACSL l in
+    let lfun = Lang.acsl l in
     let name = l.l_var_info.lv_name in
     let tau,xs,_,_,(),s =
       compile_step l.l_type name l.l_tparams l.l_profile l.l_labels
@@ -649,7 +649,7 @@ struct
     | Qed.Logic.Kint c -> CST c
     | _ ->
       let ldef = {
-        d_lfun = ACSL l ;
+        d_lfun = Lang.acsl l ;
         d_types = List.length l.l_tparams ;
         d_params = xs ;
         d_cluster = cluster ;
@@ -663,7 +663,7 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let compile_lbpred cluster l p =
-    let lfun = ACSL l in
+    let lfun = Lang.acsl l in
     let name = l.l_var_info.lv_name in
     let cc_pred = pred `Positive in
     let _,xs,_,_,r,s = compile_rec name l cc_pred in_pred p in
@@ -722,7 +722,7 @@ struct
              support (parp,sigp)
         ) () in
     (* Set global Signature *)
-    let lfun = ACSL l in
+    let lfun = Lang.acsl l in
     let ldef = {
       d_lfun = lfun ;
       d_types = List.length l.l_tparams ;
@@ -779,7 +779,7 @@ struct
               | { ctor_name = l_name ; ctor_params = ts } as const ->
                 let vs, cs = List.split (List.map term_constraint ts) in
                 let ts = List.map Lang.F.e_var vs in
-                let const = F.e_fun ~result:tau_lt (CTOR const) ts in
+                let const = F.e_fun ~result:tau_lt (Lang.ctor const) ts in
                 let is_lt = F.p_call lfun [const] in
                 {
                   l_name ;
@@ -927,7 +927,7 @@ struct
     | CST c -> e_zint c
     | SIG sparam ->
       let es = call_params env phi labels sparam parameters in
-      F.e_fun ~result (ACSL phi) es
+      F.e_fun ~result (Lang.acsl phi) es
 
   let call_pred env
       (phi:logic_info)
@@ -937,7 +937,7 @@ struct
     | CST _ -> assert false
     | SIG sparam ->
       let es = call_params env phi labels sparam parameters in
-      F.p_call (ACSL phi) es
+      F.p_call (Lang.acsl phi) es
 
   (* -------------------------------------------------------------------------- *)
   (* --- Variable Bindings                                                  --- *)

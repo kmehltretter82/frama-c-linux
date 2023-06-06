@@ -27,7 +27,7 @@ open Strategy
 
 type lemma = Definitions.dlemma Tactical.named
 val named : Definitions.dlemma -> lemma
-val find : string -> lemma option
+val find : string -> lemma
 val search : lemma option Tactical.field
 val tactical : tactical
 val strategy :

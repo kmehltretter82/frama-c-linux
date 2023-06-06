@@ -20,57 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open VCS
+(** Built-in Compute Tactical (auto-registered) *)
 
-(** - [valid]: Play provers with valid result (default: true)
-    - [failed]: Play provers with invalid result (default: true)
-    - [scratch]: Discard existing script (default: false)
-    - [provers]: Additional list of provers to {i try} when stuck
-    - [depth]: Strategy search depth (default: 0)
-    - [width]: Strategy search width (default: 0)
-    - [backtrack]: Strategy backtracking (default: 0)
-    - [auto]: Strategies to try (default: none)
-*)
-type 'a process =
-  ?valid:bool ->
-  ?failed:bool ->
-  ?scratch:bool ->
-  ?provers:prover list ->
-  ?depth:int ->
-  ?width:int ->
-  ?backtrack:int ->
-  ?auto:Strategy.heuristic list ->
-  ?strategies:bool ->
-  ?start:(Wpo.t -> unit) ->
-  ?progress:(Wpo.t -> string -> unit) ->
-  ?result:(Wpo.t -> prover -> result -> unit) ->
-  ?success:(Wpo.t -> prover option -> unit) ->
-  Wpo.t -> 'a
+open Tactical
+open Strategy
 
-val prove : unit Task.task process
-val spawn : unit process
+val tactical : tactical
+val strategy : ?priority:float -> selection -> strategy
 
-val search :
-  ?depth:int ->
-  ?width:int ->
-  ?backtrack:int ->
-  ?auto:Strategy.heuristic list ->
-  ?provers:prover list ->
-  ?progress:(Wpo.t -> string -> unit) ->
-  ?result:(Wpo.t -> prover -> result -> unit) ->
-  ?success:(Wpo.t -> prover option -> unit) ->
-  ProofEngine.tree ->
-  ProofEngine.node ->
-  unit
-
-val explore :
-  ?depth:int ->
-  ?strategy:ProofStrategy.strategy ->
-  ?progress:(Wpo.t -> string -> unit) ->
-  ?result:(Wpo.t -> prover -> result -> unit) ->
-  ?success:(Wpo.t -> prover option -> unit) ->
-  ProofEngine.tree ->
-  ProofEngine.node ->
-  unit
-
-val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
+(**************************************************************************)

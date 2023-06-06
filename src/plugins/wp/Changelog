@@ -24,6 +24,18 @@
 Plugin WP <next-release>
 ###############################################################################
 
+- WP          [2023-06-05] Tactic Compute (new, generalize Definition and Split)
+- WP          [2023-06-05] Tactic Absurd now also applies to proof goal
+- WP          [2023-06-05] Option -wp-prop extended to lemma and function names
+- TIP         [2023-06-05] Activation of Strategies
+- WP          [2023-06-05] New option -wp-no-strategy-engine to deactivate strategies
+- WP          [2023-06-05] New option -wp-script=mode (see also -wp-cache-env)
+- WP          [2023-06-05] New option -wp-status to print unproved goals
+- WP          [2023-06-05] New option -wp-tactic to search for tactics
+- WP          [2023-06-05] New option -wp-strategy s,... for default strategies
+- WP          [2023-06-05] ACSL extension 'strategy' for proof strategies
+- WP          [2023-06-05] ACSL extension 'proof' for proof resolution hints
+
 ###############################################################################
 Plugin WP 27.0 (Cobalt)
 ###############################################################################

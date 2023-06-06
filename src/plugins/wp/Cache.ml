@@ -105,14 +105,6 @@ let parse_mode ~origin ~fallback = function
       "Unknown %s mode %S (use %s instead)" origin m fallback ;
     raise Not_found
 
-let mode_name = function
-  | NoCache -> "none"
-  | Update -> "update"
-  | Replay -> "replay"
-  | Rebuild -> "rebuild"
-  | Offline -> "offline"
-  | Cleanup -> "cleanup"
-
 module MODE = WpContext.StaticGenerator(Datatype.Unit)
     (struct
       type key = unit
@@ -134,7 +126,7 @@ module MODE = WpContext.StaticGenerator(Datatype.Unit)
     end)
 
 let get_mode = MODE.get
-let set_mode m = MODE.clear () ; Wp_parameters.Cache.set (mode_name m)
+let set_mode m = MODE.set () m
 
 let is_active = function
   | NoCache -> false
@@ -162,7 +154,7 @@ let steps_seized steps steplimit =
   | None | Some 0 -> false
   | Some limit -> limit <= steps
 
-let promote ~timeout ~steplimit (res : VCS.result) =
+let promote ?timeout ?steplimit (res : VCS.result) =
   match res.verdict with
   | VCS.NoResult | VCS.Computing _ -> VCS.no_result
   | VCS.Failed -> res
@@ -273,7 +265,7 @@ let get_result ~digest ~runner ~timeout ~steplimit prover goal =
     let hash = lazy (digest prover goal) in
     let result =
       get_cache_result ~mode hash
-      |> promote ~timeout ~steplimit |> VCS.cached in
+      |> promote ?timeout ?steplimit |> VCS.cached in
     if VCS.is_verdict result
     then
       begin

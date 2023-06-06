@@ -20,33 +20,67 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type mode = NoCache | Update | Replay | Rebuild | Offline | Cleanup
+open Logic_typing
+open Logic_ptree
 
-val get_dir : unit -> string
+(* -------------------------------------------------------------------------- *)
+(* --- Pattern Engine                                                     --- *)
+(* -------------------------------------------------------------------------- *)
 
-val set_mode : mode -> unit
-val get_mode : unit -> mode
-val get_hits : unit -> int
-val get_miss : unit -> int
-val get_removed : unit -> int
+type context
+type pattern
+type value
 
-val is_active : mode -> bool
-val is_updating : mode -> bool
+(** Creates an empty environment *)
+val context : typing_context -> context
 
-val cleanup_cache : unit -> unit
+(** Parse a pattern and enrich the environement with pattern variables *)
+val pa_pattern : context -> lexpr -> pattern
 
-type 'a digest = Why3Provers.t -> 'a -> string
+(** Parse value according to the environement *)
+val pa_value : context -> lexpr -> value
 
-type 'a runner =
-  timeout:float option -> steplimit:int option -> Why3Provers.t -> 'a ->
-  VCS.result Task.task
+(** Return a value that equals the pattern *)
+val self : pattern -> pattern * value
 
-val promote: ?timeout:float -> ?steplimit:int -> VCS.result -> VCS.result
-(** Converts some known results to the given limits.
-    In particular, if the result shall be discarded with respect to the limits,
-    the function returns [VCS.no_result]. *)
+(** Pattern printer *)
+val pp_pattern : Format.formatter -> pattern -> unit
 
-val get_result: digest:('a digest) -> runner:('a runner) -> 'a runner
-val clear_result: digest:('a digest) -> Why3Provers.t -> 'a -> unit
+(** Value printer *)
+val pp_value : Format.formatter -> value -> unit
 
-(**************************************************************************)
+(** Matching lookup *)
+type lookup = {
+  head: bool ;
+  goal: bool ;
+  hyps: bool ;
+  pattern: pattern ;
+}
+
+(** Matching result *)
+type sigma
+
+(** Empty results *)
+val empty : sigma
+
+(** Matching sequent *)
+val psequent : lookup -> sigma -> Conditions.sequent -> sigma option
+
+(** Composing values from matching results *)
+val select : sigma -> value -> Tactical.selection
+
+(** Composing a boolean *)
+val bool : value -> bool
+
+(** Composing a string *)
+val string : value -> string
+
+(** Typechecking *)
+
+type env
+val env : unit -> env
+val typecheck_value : env -> ?tau:Lang.F.tau -> value -> unit
+val typecheck_pattern : env -> ?tau:Lang.F.tau -> pattern -> unit
+val typecheck_lookup : env -> lookup -> unit
+
+(* -------------------------------------------------------------------------- *)

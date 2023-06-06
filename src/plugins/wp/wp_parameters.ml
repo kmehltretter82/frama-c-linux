@@ -708,11 +708,41 @@ module Interactive = String
       let help =
         "WP mode for interactive Why-3 provers (eg: Coq):\n\
          - 'batch': check current proof (default)\n\
-         - 'update': update and check proof\n\
-         - 'edit': edit proof before check\n\
-         - 'fix': check and edit proof if necessary\n\
-         - 'fixup': update proof and fix\n\
+         - 'update': check updated proof\n\
+         - 'edit': edit current proof\n\
+         - 'fix': check current proof and edit if needed\n\
+         - 'fixup': update proof, check it and edit if needed\n\
         "
+    end)
+
+let () = Parameter_customize.set_group wp_prover
+module ScriptMode = String
+    (struct
+      let option_name = "-wp-script"
+      let arg_name = "mode"
+      let default = ""
+      let help =
+        "WP mode for managing scripts and proof strategies:\n\
+         - 'batch': proof scripts are reused but not updated (default for script prover)\n\
+         - 'update': proof scripts are reused and updated (default for tip prover)\n\
+         - 'init': proof scripts are generated from scratch and saved\n\
+         - 'dry': proof scripts are explored from scratch and not saved\n\
+         See also option -wp-cache-env."
+    end)
+
+let () = Parameter_customize.set_group wp_prover
+module StrategyEngine = True
+    (struct
+      let option_name = "-wp-strategy-engine"
+      let help = "Activate @strategy and @proof annotations. (default: yes)"
+    end)
+
+let () = Parameter_customize.set_group wp_prover
+module DefaultStrategies = String_list
+    (struct
+      let option_name = "-wp-strategy"
+      let arg_name = "s,..."
+      let help = "Use the specified strategies as default."
     end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -737,18 +767,7 @@ module Cache = String
          - 'replay': update mode with no cache update\n\
          - 'rebuild': always run provers and update cache\n\
          - 'offline': use cache but never run provers\n\
-         You can also use the environment variable FRAMAC_WP_CACHE instead."
-    end)
-
-let () = Parameter_customize.set_group wp_prover
-module CacheEnv = False
-    (struct
-      let option_name = "-wp-cache-env"
-      let help = "Gives environment variables precedence over command line\n\
-                  for cache management:\n\
-                  - FRAMAC_WP_CACHE overrides -wp-cache\n\
-                  - FRAMAC_WP_CACHEDIR overrides -wp-cache-dir\n\
-                  Disabled by default."
+         See also option -wp-cache-env."
     end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -760,7 +779,19 @@ module CacheDir = String
       let help =
         "Specify global cache directory (no cleanup mode).\n\
          By default, cache entries are stored in the WP session directory.\n\
-         You can also use the environment variable FRAMAC_WP_CACHEDIR instead."
+         See also option -wp-cache-env."
+    end)
+
+let () = Parameter_customize.set_group wp_prover
+module CacheEnv = False
+    (struct
+      let option_name = "-wp-cache-env"
+      let help = "Gives environment variables precedence over command line\n\
+                  for cache management:\n\
+                  - FRAMAC_WP_SCRIPT overrides -wp-script\n\
+                  - FRAMAC_WP_CACHE overrides -wp-cache\n\
+                  - FRAMAC_WP_CACHEDIR overrides -wp-cache-dir\n\
+                  Disabled by default."
     end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -818,6 +849,14 @@ module Detect = Action
       let help = "List installed provers."
     end)
 let () = on_reset Detect.clear
+
+module Tactics = String_list
+    (struct
+      let option_name = "-wp-tactic"
+      let arg_name = "id,..."
+      let help = "Describe tactic. Use '?' for listing tactic names."
+    end)
+let () = on_reset Tactics.clear
 
 let () = Parameter_customize.set_group wp_prover
 module Drivers =
@@ -1033,6 +1072,15 @@ module Print =
   Action(struct
     let option_name = "-wp-print"
     let help = "Pretty-prints proof obligations on standard output."
+  end)
+let () = on_reset Print.clear
+
+let () = Parameter_customize.set_group wp_po
+let () = Parameter_customize.do_not_save ()
+module Status =
+  Action(struct
+    let option_name = "-wp-status"
+    let help = "Pretty-prints pending proof obligations on standard output."
   end)
 let () = on_reset Print.clear
 

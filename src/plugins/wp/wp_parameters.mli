@@ -112,6 +112,7 @@ module TerminatesVariantHyp : Parameter_sig.Bool
 (** {2 Prover Interface} *)
 
 module Detect: Parameter_sig.Bool
+module Tactics: Parameter_sig.String_list
 module Generate:Parameter_sig.Bool
 module ScriptOnStdout: Parameter_sig.Bool
 module PrepareScripts: Parameter_sig.Bool
@@ -119,6 +120,9 @@ module FinalizeScripts: Parameter_sig.Bool
 module DryFinalizeScripts: Parameter_sig.Bool
 module Provers: Parameter_sig.String_list
 module Interactive: Parameter_sig.String
+module StrategyEngine: Parameter_sig.Bool
+module ScriptMode: Parameter_sig.String
+module DefaultStrategies: Parameter_sig.String_list
 module RunAllProvers: Parameter_sig.Bool
 module Cache: Parameter_sig.String
 module CacheEnv: Parameter_sig.Bool
@@ -149,6 +153,7 @@ module BackTrack: Parameter_sig.Int
 
 module TruncPropIdFileName: Parameter_sig.Int
 module Print: Parameter_sig.Bool
+module Status: Parameter_sig.Bool
 module Report: Parameter_sig.String_list
 module ReportJson: Parameter_sig.String
 module OldReportJson: Parameter_sig.String

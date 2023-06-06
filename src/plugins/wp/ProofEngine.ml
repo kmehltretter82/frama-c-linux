@@ -30,6 +30,7 @@ type node = {
   parent : node option ;
   mutable script : script ;
   mutable stats : Stats.stats ;
+  mutable strategy : string option ; (* hint *)
   mutable search_index : int ;
   mutable search_space : Strategy.t array ; (* sorted by priority *)
 }
@@ -98,6 +99,7 @@ let proof ~main =
 let rec reset_node n =
   Wpo.clear_results n.goal ;
   if Wpo.is_tactic n.goal then Wpo.remove n.goal ;
+  n.strategy <- None ;
   match n.script with
   | Opened | Script _ -> ()
   | Tactic(_,children) -> iter_all reset_node children
@@ -135,6 +137,11 @@ let iteri f tree =
   | Some r ->
     let k = ref 0 in
     walk (fun node -> f !k node ; incr k) r
+
+let rec depth node =
+  match node.parent with
+  | None -> 0
+  | Some p -> succ @@ depth p
 
 (* -------------------------------------------------------------------------- *)
 (* --- Consolidating                                                      --- *)
@@ -183,7 +190,8 @@ let consolidated wpo =
 (* -------------------------------------------------------------------------- *)
 
 let main t = t.main
-let head t = match t.head with
+let head t = t.head
+let head_goal t = match t.head with
   | None -> t.main
   | Some n -> n.goal
 let goal n = n.goal
@@ -325,6 +333,7 @@ let mk_tree_node ~tree ~anchor goal = {
   stats = Stats.empty ;
   search_index = 0 ;
   search_space = [| |] ;
+  strategy = None ;
 }
 
 let mk_root_node goal = {
@@ -332,6 +341,7 @@ let mk_root_node goal = {
   parent = None ;
   script = Opened ;
   stats = Stats.empty ;
+  strategy = None ;
   search_index = 0 ;
   search_space = [| |] ;
 }
@@ -436,5 +446,8 @@ let bound node =
   match node.script with
   | Tactic _ | Opened -> []
   | Script s -> s
+
+let get_hint node = node.strategy
+let set_hint node strategy = node.strategy <- Some strategy
 
 (* -------------------------------------------------------------------------- *)

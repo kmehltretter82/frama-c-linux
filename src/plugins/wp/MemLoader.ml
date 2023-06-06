@@ -277,7 +277,7 @@ struct
             | Some fields ->
               let def = List.map
                   (fun f ->
-                     Cfield (f, Info.kind) ,
+                     cfield ~kind:Info.kind f,
                      Info.load sigma (object_of f.ftype) (M.field loc f)
                   ) fields
               in

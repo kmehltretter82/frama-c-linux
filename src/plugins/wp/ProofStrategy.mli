@@ -20,57 +20,29 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open VCS
+open ProofEngine
 
-(** - [valid]: Play provers with valid result (default: true)
-    - [failed]: Play provers with invalid result (default: true)
-    - [scratch]: Discard existing script (default: false)
-    - [provers]: Additional list of provers to {i try} when stuck
-    - [depth]: Strategy search depth (default: 0)
-    - [width]: Strategy search width (default: 0)
-    - [backtrack]: Strategy backtracking (default: 0)
-    - [auto]: Strategies to try (default: none)
-*)
-type 'a process =
-  ?valid:bool ->
-  ?failed:bool ->
-  ?scratch:bool ->
-  ?provers:prover list ->
-  ?depth:int ->
-  ?width:int ->
-  ?backtrack:int ->
-  ?auto:Strategy.heuristic list ->
-  ?strategies:bool ->
-  ?start:(Wpo.t -> unit) ->
-  ?progress:(Wpo.t -> string -> unit) ->
-  ?result:(Wpo.t -> prover -> result -> unit) ->
-  ?success:(Wpo.t -> prover option -> unit) ->
-  Wpo.t -> 'a
+(* -------------------------------------------------------------------------- *)
+(* --- Proof Strategy Engine                                              --- *)
+(* -------------------------------------------------------------------------- *)
 
-val prove : unit Task.task process
-val spawn : unit process
+type strategy
+type alternative
 
-val search :
-  ?depth:int ->
-  ?width:int ->
-  ?backtrack:int ->
-  ?auto:Strategy.heuristic list ->
-  ?provers:prover list ->
-  ?progress:(Wpo.t -> string -> unit) ->
-  ?result:(Wpo.t -> prover -> result -> unit) ->
-  ?success:(Wpo.t -> prover option -> unit) ->
-  ProofEngine.tree ->
-  ProofEngine.node ->
-  unit
+val typecheck : unit -> unit
 
-val explore :
-  ?depth:int ->
-  ?strategy:ProofStrategy.strategy ->
-  ?progress:(Wpo.t -> string -> unit) ->
-  ?result:(Wpo.t -> prover -> result -> unit) ->
-  ?success:(Wpo.t -> prover option -> unit) ->
-  ProofEngine.tree ->
-  ProofEngine.node ->
-  unit
+val name : strategy -> string
+val loc : strategy -> Cil_types.location
+val find : string -> strategy option
+val hints : ?node:ProofEngine.node -> Wpo.t -> strategy list
+val has_hint : Wpo.t -> bool
 
-val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
+val iter : (strategy -> unit) -> unit
+val default : unit -> strategy list
+val alternatives : strategy -> alternative list
+val provers : ?default:VCS.prover list -> alternative -> VCS.prover list * float
+val auto : alternative -> Strategy.heuristic option
+val fallback : alternative -> strategy option
+val tactic : tree -> node -> strategy -> alternative -> node list option
+
+(* -------------------------------------------------------------------------- *)

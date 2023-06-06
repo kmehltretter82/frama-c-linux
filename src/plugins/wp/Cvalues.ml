@@ -127,7 +127,7 @@ and init_comp_value value ci =
   match ci.cfields with
   | None -> initialized_value_opaque_comp value ci
   | Some fields ->
-    let make f = Cfield (f, KInit), init_value value (object_of f.ftype) in
+    let make f = cfield ~kind:KInit f, init_value value (object_of f.ftype) in
     Lang.F.e_record (List.map make fields)
 
 let initialized_obj = init_value e_true
@@ -249,7 +249,7 @@ struct
            match c.cfields with
            | None -> Logic Lang.t_prop
            | Some fields ->
-             let value f = e_getfield (e_var s) (Lang.Cfield (f, KValue)) in
+             let value f = e_getfield (e_var s) (Lang.cfield f) in
              let def = p_all (fun f -> is_typ f.ftype (value f)) fields in
              Predicate(Def,def)
          in {
@@ -443,7 +443,7 @@ module EQCOMP = WpContext.Generator(Cil_datatype.Compinfo)
           | Some fields ->
             let def = p_all
                 (fun f ->
-                   let fd = Cfield (f, KValue) in
+                   let fd = cfield f in
                    !equal_rec (Ctypes.object_of f.ftype)
                      (e_getfield ra fd) (e_getfield rb fd))
                 fields

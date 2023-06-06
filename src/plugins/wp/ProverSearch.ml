@@ -34,8 +34,7 @@ let configure (console : #Tactical.feedback) strategy =
   in
   match Lang.local ~pool:console#pool verdict () with
   | Applicable process when not console#has_error ->
-    let title = tactical#title in
-    let script = ProofScript.jtactic ~title tactical selection in
+    let script = ProofScript.jtactic tactical selection in
     Some (script , process)
   | _ -> None
 

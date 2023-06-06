@@ -771,7 +771,7 @@ struct
 
   let rec access_gen kind a = function
     | [] -> a
-    | Field f :: ofs -> access_gen kind (e_getfield a (Cfield (f, kind))) ofs
+    | Field f :: ofs -> access_gen kind (e_getfield a (cfield ~kind f)) ofs
     | Shift(_,k) :: ofs -> access_gen kind (e_get a k) ofs
 
   let access = access_gen KValue
@@ -780,7 +780,7 @@ struct
   let rec update_gen kind a ofs v = match ofs with
     | [] -> v
     | Field f :: ofs ->
-      let phi = Cfield (f, kind) in
+      let phi = cfield ~kind f in
       let a_f = F.e_getfield a phi in
       let a_f_v = update_gen kind a_f ofs v in
       F.e_setfield a phi a_f_v
@@ -1212,7 +1212,7 @@ struct
     | TComp({ cfields = Some fields },_) ->
       F.p_all
         (fun fd ->
-           forall_pointers phi (e_getfield v (Cfield (fd, KValue))) fd.ftype)
+           forall_pointers phi (e_getfield v (cfield fd)) fd.ftype)
         fields
     | TArray(elt,_,_) ->
       let k = Lang.freshvar Qed.Logic.Int in
@@ -1322,14 +1322,14 @@ struct
       (*TODO: optimized version for terminal [Field _] and [Index _] *)
 
       | Field f :: ofs ->
-        let cf = Cfield (f, kind) in
+        let cf = cfield ~kind f in
         let af = e_getfield a cf in
         let bf = e_getfield b cf in
         let hs = assigned_path kind hs xs ys af bf ofs in
         List.fold_left
           (fun hs g ->
              if Fieldinfo.equal f g then hs else
-               let cg = Cfield (g, kind) in
+               let cg = cfield ~kind g in
                let ag = e_getfield a cg in
                let bg = e_getfield b cg in
                let eqg = p_forall ys (p_equal ag bg) in

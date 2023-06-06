@@ -27,6 +27,58 @@ type script =
   | Script of string
   | Deprecated of string
 
+type mode =
+  | Batch
+  | Update
+  | Dry
+  | Init
+
+let parse_mode ~origin ~fallback = function
+  | "batch" -> Batch
+  | "update" -> Update
+  | "dry" -> Dry
+  | "init" -> Init
+  | "" -> raise Not_found
+  | m ->
+    Wp_parameters.warning ~current:false
+      "Unknown %s mode %S (use %s instead)" origin m fallback ;
+    raise Not_found
+
+module MODE = WpContext.StaticGenerator(Datatype.Unit)
+    (struct
+      type key = unit
+      type data = mode
+      let name = "Wp.Script.mode"
+      let compile () =
+        try
+          if not (Wp_parameters.CacheEnv.get()) then
+            raise Not_found ;
+          let origin = "FRAMAC_WP_SCRIPT" in
+          parse_mode ~origin ~fallback:"-wp-script" (Sys.getenv origin)
+        with Not_found ->
+        try
+          let mode = Wp_parameters.ScriptMode.get() in
+          parse_mode ~origin:"-wp-script" ~fallback:"batch" mode
+        with Not_found ->
+          let provers = Wp_parameters.Provers.get () in
+          if List.mem "tip" provers then Update else
+          if List.mem "script" provers then Batch else
+            Dry
+    end)
+
+let get_mode = MODE.get
+let set_mode m = MODE.set () m
+
+let scratch_mode () =
+  match MODE.get () with
+  | Batch | Update -> false
+  | Dry | Init -> true
+
+let saving_mode () =
+  match MODE.get () with
+  | Update | Init -> true
+  | Batch | Dry -> false
+
 let files : (string,script) Hashtbl.t = Hashtbl.create 32
 
 let jsonfile (dir:Datatype.Filepath.t) =

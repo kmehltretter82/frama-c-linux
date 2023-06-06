@@ -211,10 +211,7 @@ let json_of_named = function
 let named_of_json find js =
   try
     let vid = js >? "id" |> Json.string in
-    let title = js >? "title" |> Json.string in
-    let descr = js >? "descr" |> Json.string in
-    let value = find vid in
-    Some Tactical.{ vid ; title ; descr ; value }
+    Some (find vid)
   with Not_found | Invalid_argument _ -> None
 
 (* -------------------------------------------------------------------------- *)
@@ -281,24 +278,32 @@ type jtactic = {
   tactic : string ;
   params : Json.t ;
   select : Json.t ;
+  strategy : string option ;
 }
 
-let jtactic ~title (tac : tactical) (sel : selection) =
+let jtactic ?strategy (tac : tactical) (sel : selection) =
   {
-    header = title ;
+    header = tac#title ;
     tactic = tac#id ;
     params = json_of_parameters tac ;
     select = json_of_selection sel ;
+    strategy ;
   }
 
 let json_of_tactic t js =
-  `Assoc [
+  let strategy =
+    match t.strategy with
+    | None -> []
+    | Some s -> [ "strategy" , `String s ]
+  in
+  let tactical = [
     "header" , `String t.header ;
     "tactic" , `String t.tactic ;
     "params" , t.params ;
     "select" , t.select ;
     "children" , `Assoc js ;
-  ]
+  ] in
+  `Assoc (strategy @ tactical)
 
 let children_of_json = function
   | `List js ->
@@ -314,8 +319,11 @@ let tactic_of_json js =
     let tactic = js >? "tactic" |> Json.string in
     let params = try js >? "params" with Not_found -> `Null in
     let select = try js >? "select" with Not_found -> `Null in
-    let children = try js >? "children" |> children_of_json with Not_found -> [] in
-    Some( { header ; tactic ; params ; select } , children )
+    let children =
+      try js >? "children" |> children_of_json with Not_found -> [] in
+    let strategy =
+      try Some (js >? "strategy" |> Json.string) with Not_found -> None in
+    Some( { header ; tactic ; params ; select ; strategy } , children )
   with _ -> None
 
 (* -------------------------------------------------------------------------- *)

@@ -140,6 +140,11 @@ let cmp_prover p q =
 let pp_prover fmt p = Format.pp_print_string fmt (title_of_prover p)
 let pp_mode fmt m = Format.pp_print_string fmt (title_of_mode m)
 
+let provers () =
+  List.map (fun p -> Why3 p) @@
+  List.filter Why3Provers.is_mainstream @@
+  Why3Provers.provers ()
+
 module P = struct type t = prover let compare = cmp_prover end
 module Pset = Set.Make(P)
 module Pmap = Map.Make(P)

@@ -246,6 +246,7 @@ val pp_logfile : Format.formatter -> t -> prover -> unit
 val pp_axiomatics : Format.formatter -> string option -> unit
 val pp_function : Format.formatter -> Kernel_function.t -> string option -> unit
 val pp_goal_flow : Format.formatter -> t -> unit
+val pp_flow : Format.formatter -> unit
 
 (** Dynamically exported. *)
 val prover_of_name : string -> prover option

@@ -496,7 +496,7 @@ type hform = {
   widget : Widget.checkbox ;
 }
 
-let compare f g = String.compare f.search#title g.search#title
+let hcompare f g = String.compare f.search#title g.search#title
 
 let spinner ~(form:Wpane.form) ~default ~label ~tooltip =
   let config = "wp.strategies." ^ label in
@@ -506,9 +506,18 @@ let spinner ~(form:Wpane.form) ~default ~label ~tooltip =
   form#add_field ~label spinner#coerce ;
   spinner
 
-type callback = depth:int -> width:int -> Strategy.heuristic list -> unit
+let checkbox ~(form:Wpane.form) ~default ~label ~tooltip =
+  let config = "wp.strategies." ^ label in
+  let value = User.find_bool ~default config in
+  let checkbox = new Widget.checkbox ~label ~tooltip () in
+  checkbox#set value ;
+  checkbox#connect (User.set_bool config) ;
+  form#add_field ~label checkbox#coerce ;
+  checkbox
 
-class strategies () =
+type auto_callback = depth:int -> width:int -> Strategy.heuristic list -> unit
+
+class autosearch () =
   let form = new Wpane.form () in
   let depth = spinner ~form ~default:1 ~label:"Depth"
       ~tooltip:"Limit the number of nested strategies" in
@@ -517,10 +526,10 @@ class strategies () =
   object(self)
     inherit Wpalette.tool
         ~content:form#widget
-        ~label:"Strategies"
-        ~tooltip:"Apply Custom Strategies" ()
+        ~label:"Auto"
+        ~tooltip:"Automated proof search (-wp-auto)" ()
     val mutable hforms : hform list = []
-    val mutable demon : callback option = None
+    val mutable demon : auto_callback option = None
 
     method register (search : Strategy.heuristic) =
       begin
@@ -533,7 +542,7 @@ class strategies () =
         widget#on_event self#update ;
         form#add_row widget#coerce ;
         let hform = { search ; widget } in
-        hforms <- List.merge compare [hform] hforms
+        hforms <- List.merge hcompare [hform] hforms
       end
 
     method private update () =
@@ -564,6 +573,93 @@ class strategies () =
       | None -> ()
 
     method connect f = demon <- f ; self#update ()
+  end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Proof Strategies                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+type callback = (depth:int -> ProofStrategy.strategy option -> unit)
+
+type strategy = {
+  strategy : ProofStrategy.strategy ;
+  button : Widget.button ;
+}
+
+class strategies () =
+  let form = new Wpane.form () in
+  let depth = spinner ~form ~default:1 ~label:"Auto depth"
+      ~tooltip:"Depth of exploration" in
+  let hints = checkbox ~form ~default:true ~label:"Hints only"
+      ~tooltip:"Display hints for the current goal" in
+  object(self)
+    inherit Wpalette.tool
+        ~content:form#widget
+        ~label:"Strategies"
+        ~tooltip:"Run the full Proof Strategy Engine (-wp-strategy)" ()
+
+    val mutable registered = false
+    val mutable proofhints : ProofStrategy.strategy list = []
+    val mutable strategies : strategy list = []
+    val mutable callback : callback option = None
+
+    initializer hints#connect (fun _ -> self#update)
+
+    method register (s : ProofStrategy.strategy) =
+      begin
+        registered <- true ;
+        let label = ProofStrategy.name s in
+        let tooltip = Format.asprintf "%a: strategy %s (single step)"
+            Filepath.pp_pos (fst @@ ProofStrategy.loc s) label in
+        let button = new Widget.button ~icon:`MEDIA_PLAY ~label ~tooltip () in
+        button#set_visible false ;
+        button#connect (self#strategy s) ;
+      end
+
+    method connect ?(hints=[]) (cb : callback option) =
+      callback <- cb ;
+      proofhints <- hints ;
+      self#update
+
+    method private strategy (s : ProofStrategy.strategy) () =
+      Option.iter (fun fn -> fn ~depth:depth#get (Some s)) callback
+
+    method private explore () =
+      Option.iter (fun fn -> fn ~depth:depth#get None) callback
+
+    method private setvisible ?(filter=false) ?(rank=0) (s: strategy) =
+      let show = not filter || rank > 0 in
+      s.button#set_visible show ;
+      if show then
+        let name = ProofStrategy.name s.strategy in
+        if rank = 0 then
+          s.button#set_label name
+        else
+          Pretty_utils.ksfprintf s.button#set_label "%s (#%d)" name rank
+
+    method private setrank (s: strategy) =
+      let filter = hints#get in
+      let rec apply (s:strategy) rank = function
+        | [] -> self#setvisible s ~filter
+        | h::hs ->
+          if s.strategy == h then
+            self#setvisible s ~rank
+          else
+            self#setvisible s ~filter ;
+          apply s (succ rank) hs
+      in apply s 1 proofhints
+
+    method private update =
+      if callback = None || not registered then
+        self#set_visible false
+      else
+        begin
+          self#set_visible true ;
+          self#set_status `APPLY ;
+          self#set_action ~callback:self#explore () ;
+          List.iter self#setrank strategies
+        end
+
   end
 
 (* -------------------------------------------------------------------------- *)
