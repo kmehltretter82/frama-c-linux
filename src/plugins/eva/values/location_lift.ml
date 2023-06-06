@@ -46,7 +46,7 @@ module Make
 
   (* Now lift the functions that contain {!value} in their type. *)
 
-  let to_value loc = Convert.extend (Loc.to_value loc)
+  let to_value loc = Loc.to_value loc >>-: Convert.extend
 
   let forward_index typ value offset =
     Loc.forward_index typ (Convert.restrict value) offset

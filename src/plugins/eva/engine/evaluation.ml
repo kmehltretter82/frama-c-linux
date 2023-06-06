@@ -865,7 +865,7 @@ module Make
     | AddrOf v | StartOf v ->
       lval_to_loc context ~for_writing:false ~reduction:false v
       >>= fun (loc, _, _) ->
-      let value = Loc.to_value loc in
+      (Loc.to_value loc, Alarmset.none) >>= fun value ->
       let v = assume_pointer expr value in
       compute_reduction v false
 
@@ -1364,7 +1364,7 @@ module Make
     | Mem expr, offset ->
       match offset with
       | NoOffset ->
-        let loc_value = Loc.to_value location in
+        Loc.to_value location >>- fun loc_value ->
         backward_eval fuel state expr (Some loc_value) >>-: fun _ -> ()
       | _ ->
         let reduce_valid_index = true in

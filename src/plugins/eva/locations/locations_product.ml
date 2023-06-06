@@ -87,8 +87,12 @@ module Make
     let* ro = Right.backward_field typ info ro in
     `Value (lo, ro)
 
-  (* TODO: ??? *)
-  let to_value (l, r) = Value.join (Left.to_value l) (Right.to_value r)
+  (** Both value abstractions produce a sound value abstraction for the same
+      location, so we can narrow their results. *)
+  let to_value (l, r) =
+    let* vleft = Left.to_value l
+    and* vright = Right.to_value r in
+    Value.narrow vleft vright
 
   let forward_index typ v (l, r) =
     Left.forward_index typ v l, Right.forward_index typ v r
