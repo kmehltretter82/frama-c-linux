@@ -105,7 +105,7 @@
   Prove: P_S(42).
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_clear_in_step_check (Tactics 3)
+[wp] [Unsuccess] typed_clear_in_step_check (Tactics 3) (Cached)
 [wp:script:allgoals] 
   typed_clear_ensures subgoal:
   
@@ -143,6 +143,6 @@
   Prove: P_S(a + b).
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_clear_ensures (Tactics 7)
+[wp] [Unsuccess] typed_clear_ensures (Tactics 7) (Cached)
 [wp] Proved goals:    0 / 2
   Unsuccess:       2

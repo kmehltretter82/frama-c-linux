@@ -153,13 +153,20 @@ let pending n =
   let k = ref 0 in
   walk (fun _ -> incr k) n ; !k
 
+let is_prover_result (p,_) = p <> VCS.Tactical
+
+let prover_stats goal =
+  Stats.results ~smoke:(Wpo.is_smoke_test goal) @@
+  List.filter is_prover_result @@
+  Wpo.get_results goal
+
 let rec consolidate n =
   let s =
     if Wpo.is_valid n.goal then
-      Stats.results ~smoke:false (Wpo.get_results n.goal)
+      prover_stats n.goal
     else
       match n.script with
-      | Opened | Script _ -> Stats.empty
+      | Opened | Script _ -> prover_stats n.goal
       | Tactic(_,children) ->
         let qed = Wpo.qed_time n.goal in
         let results = List.map (fun (_,n) -> consolidate n) children in
@@ -175,15 +182,12 @@ let validate tree =
       Wpo.set_result tree.main Tactical (Stats.script stats)
 
 let consolidated wpo =
-  let smoke = Wpo.is_smoke_test wpo in
-  let prs = Wpo.get_results wpo in
   try
     if Wpo.is_smoke_test wpo || not (PROOFS.mem wpo) then raise Not_found ;
     match PROOFS.get wpo with
     | { root = Some { stats ; script = Tactic _ } } -> stats
     | _ -> raise Not_found
-  with Not_found ->
-    Stats.results ~smoke prs
+  with Not_found -> prover_stats wpo
 
 (* -------------------------------------------------------------------------- *)
 (* --- Accessors                                                          --- *)

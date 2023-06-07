@@ -133,7 +133,7 @@ let consolidated = function
       cs_trivial = 0 ;
       cs_cached = 0 ;
       cs_provers = [] }
-  | u::w as results ->
+  | (u::w) as results ->
     let (p,r) as pr = List.fold_left choose_best u w in
     let trivial = is_trivial pr in
     let cached = not trivial && List.for_all is_cached results in

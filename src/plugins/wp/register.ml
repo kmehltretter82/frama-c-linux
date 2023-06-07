@@ -353,7 +353,7 @@ let do_report_stats ~shell ~cache ~smoke goal (stats : Stats.stats) =
     if smoke then
       match stats.verdict with
       | Valid -> "[Failed] (Doomed)"
-      | Failed ->  "[Unknown] (Failure)"
+      | Failed ->  "[Failure] (Solver Error)"
       | NoResult | Computing _ -> "[Unknown] (Incomplete)"
       | (Unknown | Timeout | Stepout) when shell -> "[Passed] (Unsuccess)"
       | Unknown -> "[Passed] (Unknown)"
