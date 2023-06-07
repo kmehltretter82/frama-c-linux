@@ -23,8 +23,8 @@
 type gui_callstack =
   | GC_Filtered
   | GC_Consolidated
-  | GC_Single of Value_types.callstack
-  | GC_Callstack of Value_types.callstack
+  | GC_Single of Eva_types.Callstack.t
+  | GC_Callstack of Eva_types.Callstack.t
 
 val hash_gui_callstack : gui_callstack -> int
 val compare_gui_callstack : gui_callstack -> gui_callstack -> int
@@ -69,9 +69,9 @@ val gui_loc_loc : gui_loc -> Cil_types.location
 val kf_of_gui_loc : gui_loc -> Cil_types.kernel_function
 
 val pretty_callstack :
-  Format.formatter -> Value_types.callstack -> unit
+  Format.formatter -> Eva.Callstack.t -> unit
 val pretty_callstack_short :
-  Format.formatter -> Value_types.callstack -> unit
+  Format.formatter -> Eva.Callstack.t -> unit
 
 type 'a gui_res =
   | GR_Empty

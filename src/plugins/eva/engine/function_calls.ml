@@ -49,12 +49,13 @@ module Callers = Kernel_function.Map.Make (StmtSet)
 module CallersTable = Kernel_function.Make_Table (Callers) (val info "Callers")
 
 let register_call kinstr kf =
-  match kinstr, Eva_utils.call_stack () with
+  match kinstr, Callstack.pop (Eva_utils.current_call_stack ()) with
   | Kglobal, _ -> CallersTable.add kf Kernel_function.Map.empty
-  | Kstmt _, ([] | [_]) -> assert false
-  | Kstmt stmt, (kf', kinstr') :: (caller, _) :: _ ->
+  | Kstmt _, None -> assert false
+  | Kstmt stmt, Some (kf', stmt', cs) ->
     assert (Kernel_function.equal kf kf');
-    assert (Cil_datatype.Kinstr.equal kinstr kinstr');
+    assert (Cil_datatype.Kinstr.equal kinstr (Kstmt stmt'));
+    let caller = Callstack.top_kf cs in
     let callsite = StmtSet.singleton stmt in
     let change calls =
       let prev_stmts = Kernel_function.Map.find_opt caller calls in

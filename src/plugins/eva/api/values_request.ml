@@ -26,9 +26,8 @@ open Cil_types
 
 module Kmap = Kernel_function.Hashtbl
 module Smap = Cil_datatype.Stmt.Hashtbl
-module CS = Value_types.Callstack
-module CSet = CS.Set
-module CSmap = CS.Hashtbl
+module CSet = Callstack.Set
+module CSmap = Callstack.Hashtbl
 
 module Md = Markdown
 module Jfct = Kernel_ast.Function
@@ -49,7 +48,7 @@ type evaluation_point = General_requests.evaluation_point =
 (* A term and the program point where it should be evaluated. *)
 type probe = term * evaluation_point
 
-type callstack = Value_types.callstack
+type callstack = Callstack.t
 type truth = Abstract_interp.truth
 
 (* The result of an evaluation:
@@ -198,18 +197,15 @@ module Ranking : Ranking_sig = struct
 
   let stmt = let rk = new ranker in rk#rank
 
-  let rec ranks (rks : int list) (cs : callstack) : int list =
-    match cs with
-    | [] -> rks
-    | (_,Kglobal)::wcs -> ranks rks wcs
-    | (_,Kstmt s)::wcs -> ranks (stmt s :: rks) wcs
+  let ranks (cs : callstack) : int list =
+    List.map stmt (Callstack.to_stmt_list cs)
 
   let order : int list -> int list -> int = Stdlib.compare
 
   let sort (wcs : callstack list) : callstack list =
     List.map fst @@
     List.sort (fun (_,rp) (_,rq) -> order rp rq) @@
-    List.map (fun cs -> cs , ranks [] cs) wcs
+    List.map (fun cs -> cs , ranks cs) wcs
 
 end
 
@@ -219,7 +215,7 @@ end
 
 module Jcallstack : S with type t = callstack = struct
   module I = Data.Index
-      (Value_types.Callstack.Map)
+      (Callstack.Map)
       (struct let name = "eva-callstack-id" end)
   let jtype = Data.declare ~package ~name:"callstack" I.jtype
   type t = I.t
@@ -238,24 +234,25 @@ module Jcalls : Request.Output with type t = callstack = struct
       "rank" , Joption Jnumber ;
     ]))
 
-  let rec jcallstack jcallee ki cs : json list =
-    match ki , cs with
-    | Kglobal , _ | _ , [] -> [ `Assoc [ "callee", jcallee ] ]
-    | Kstmt stmt , (called,ki) :: cs ->
-      let jcaller = Jfct.to_json called in
-      let callsite = `Assoc [
-          "callee", jcallee ;
-          "caller", jcaller ;
-          "stmt", Jstmt.to_json stmt ;
-          "rank", Jint.to_json (Ranking.stmt stmt) ;
-        ]
-      in
-      callsite :: jcallstack jcaller ki cs
+  let jcallsite jcaller jcallee stmt =
+    `Assoc [
+      "callee", jcallee ;
+      "caller", jcaller ;
+      "stmt", Jstmt.to_json stmt ;
+      "rank", Jint.to_json (Ranking.stmt stmt) ;
+    ]
 
-  let to_json = function
-    | [] -> `List []
-    | (callee,ki)::cs -> `List (jcallstack (Jfct.to_json callee) ki cs)
-
+  let to_json (cs : t) =
+    let aux (acc, jcaller) (callee, stmt) =
+      let jcallee = Jfct.to_json callee in
+      jcallsite jcaller jcallee stmt :: acc, jcallee
+    in
+    let entry_point = Jfct.to_json cs.entry_point in
+    let l, _last_callee = List.fold_left aux
+        ([`Assoc [ "callee", entry_point ]], entry_point)
+        cs.stack
+    in
+    `List (List.rev l)
 end
 
 module Jtruth : Data.S with type t = truth = struct

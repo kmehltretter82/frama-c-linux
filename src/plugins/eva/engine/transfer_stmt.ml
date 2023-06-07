@@ -313,7 +313,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   (* Returns the result of a call, and a boolean that indicates whether a
      builtin has been used to interpret the call. *)
   let process_call stmt call recursion valuation state =
-    Eva_utils.push_call_stack call.kf (Kstmt stmt);
+    Eva_utils.push_call_stack call.kf stmt;
     let cleanup () =
       Eva_utils.pop_call_stack ();
       (* Changed by compute_call_ref, called from process_call *)
@@ -325,7 +325,8 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         (* Process the call according to the domain decision. *)
         match Domain.start_call stmt call recursion domain_valuation state with
         | `Value state ->
-          Domain.Store.register_initial_state (Eva_utils.call_stack ()) state;
+          let callstack = Eva_utils.current_call_stack () in
+          Domain.Store.register_initial_state callstack state;
           !compute_call_ref stmt call recursion state
         | `Bottom ->
           { states = []; cacheable = Cacheable; builtin=false }
@@ -534,7 +535,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   (* Create an Eval.call *)
   let create_call stmt kf args =
     let return = Library_functions.get_retres_vi kf in
-    let callstack = (kf, Kstmt stmt) :: Eva_utils.call_stack () in
+    let callstack = Callstack.push kf stmt (Eva_utils.current_call_stack ()) in
     let arguments, rest =
       let formals = Kernel_function.get_formals kf in
       let rec format_arguments acc args formals = match args, formals with
@@ -728,8 +729,9 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   (* Legacy callbacks for the cvalue domain, usually called by
      {Cvalue_transfer.start_call}. *)
-  let apply_cvalue_callback kf ki_call state =
-    let stack_with_call = (kf, ki_call) :: Eva_utils.call_stack () in
+  let apply_cvalue_callback kf stmt state =
+    let call_stack = Eva_utils.current_call_stack () in
+    let stack_with_call = Callstack.push kf stmt call_stack in
     let cvalue_state = get_cvalue_or_top state in
     Db.Value.Call_Value_Callbacks.apply (cvalue_state, stack_with_call);
     let kind = `Builtin None in
@@ -752,7 +754,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         (* The special Frama_C_ functions to print states are handled here. *)
         if apply_special_directives ~subdivnb kf args state
         then
-          let () = apply_cvalue_callback kf ki_call state in
+          let () = apply_cvalue_callback kf stmt state in
           [(Partition.Key.empty, state)]
         else
           (* Create the call. *)

@@ -57,7 +57,7 @@ let () = Ast.add_monotonic_state Dynamic_Alloc_Bases.self
 (* -------------------------- Auxiliary functions  -------------------------- *)
 
 let current_call_site () =
-  match Eva_utils.call_stack () with
+  match Eva_utils.legacy_call_stack () with
   | (_kf, Kstmt stmt) :: _ -> stmt
   | _ -> Cil.dummyStmt
 
@@ -67,7 +67,7 @@ let current_call_site () =
      these call site correspond to a different use of a malloc function,
      so it is interesting to keep their bases separated. *)
 let call_stack_no_wrappers () =
-  let stack = Eva_utils.call_stack () in
+  let stack = Eva_utils.legacy_call_stack () in
   assert (stack != []);
   let wrappers = Parameters.AllocFunctions.get() in
   let rec bottom_filter = function

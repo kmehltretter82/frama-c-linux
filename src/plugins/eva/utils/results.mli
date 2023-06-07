@@ -63,7 +63,7 @@
       all requests in the function will lead to a Top error. *)
 val are_available : Cil_types.kernel_function -> bool
 
-type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
+type callstack = Callstack.t
 
 type request
 

@@ -226,13 +226,9 @@ type ('loc, 'value) argument = {
 (** A call_stack is a list, telling which function was called at which
     site. The head of the list tells about the latest call. *)
 
-(** A call site: the function called, and the call statement
-    (or [Kglobal] for the main function. *)
-type call_site = kernel_function * kinstr
-
 (* A call stack is a list of call sites. The head is the latest call.
    The last element is the main function. *)
-type callstack = call_site list
+type callstack = Callstack.t
 
 (** A function call. *)
 type ('loc, 'value) call = {

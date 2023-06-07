@@ -116,6 +116,7 @@ module Analysis: sig
 end
 
 module Callstack: sig
+  [@@@ alert "-db_deprecated"]
   (* A call is identified by the function called and the call statement *)
   type call = Cil_types.kernel_function * Cil_types.stmt
 
@@ -128,13 +129,15 @@ module Callstack: sig
       This type is very likely to change in the future. Never use this type
       directly, prefer the use of the following functions when possible. *)
 
-  type callstack = private {
+  type callstack = Eva_types.Callstack.callstack = private {
     thread: int; (* An identifier of the thread's callstack *)
     entry_point: Cil_types.kernel_function; (* The first function in the callstack *)
     stack: call list;
   }
 
-  include Datatype.S_with_collections with type t = callstack
+  include Datatype.S_with_collections
+    with type t = callstack
+     and module Hashtbl = Eva_types.Callstack.Hashtbl
 
   (* Constructor *)
   val init : ?thread:int -> Cil_types.kernel_function -> t
@@ -145,6 +148,7 @@ module Callstack: sig
   val top : t -> (Cil_types.kernel_function * Cil_types.stmt) option
   val top_kf : t -> Cil_types.kernel_function
   val top_callsite : t -> Cil_types.stmt option
+  val top_call : t -> Cil_types.kernel_function * Cil_types.kinstr
 
   (* Conversion *)
 
@@ -659,7 +663,7 @@ module Cvalue_callbacks: sig
       in a future version. Please contact us if you need to register callbacks
       to be executed during an Eva analysis. *)
 
-  type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
+  type callstack = Callstack.t
   type state = Cvalue.Model.t
 
   type analysis_kind =
@@ -776,7 +780,7 @@ module Eva_results: sig
       For technical reasons, the top of the callstack must currently
       be preserved. *)
   val change_callstacks:
-    (Value_types.callstack -> Value_types.callstack) -> results -> results
+    (Callstack.t -> Callstack.t) -> results -> results
 
   val eval_tlval_as_location :
     ?result:Cil_types.varinfo ->

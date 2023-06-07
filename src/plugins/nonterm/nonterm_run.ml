@@ -91,17 +91,16 @@ let pretty_stmt_kind fmt stmt =
 let pp_numbered_stacks fmt callstacks =
   if List.length callstacks < 2 then
     Format.fprintf fmt "stack: %a"
-      (Pretty_utils.pp_list ~sep:": " Value_types.Callstack.pretty) callstacks
+      (Pretty_utils.pp_list ~sep:": " Eva.Callstack.pretty) callstacks
   else
     (* number callstacks *)
     let numbered_callstacks =
-      let count = ref 0 in
-      List.map (fun cs -> incr count; (!count, cs)) callstacks
+      List.mapi (fun i cs -> (i+1, cs)) callstacks
     in
     Format.fprintf fmt "%a"
       (Pretty_utils.pp_list ~sep:"@\n"
          (Pretty_utils.pp_pair ~pre:"stack " ~sep:": "
-            Format.pp_print_int Value_types.Callstack.pretty))
+            Format.pp_print_int Eva.Callstack.pretty))
       numbered_callstacks
 
 let wkey_stmt = Self.register_warn_category "stmt"
@@ -306,21 +305,6 @@ let collect_nonterminating_statements fd nonterm_stacks =
     ) vis#get_instr_stmts;
   !new_nonterm_stmts
 
-let rec cmp_callstacks_aux cs1 cs2 =
-  match cs1, cs2 with
-  | [], [] -> 0
-  | [], _ -> -1
-  | _, [] -> 1
-  | (kf1, ki1) :: r1, (kf2, ki2) :: r2 ->
-    let c = Cil_datatype.Kinstr.compare ki1 ki2 in
-    if c <> 0 then c else
-      let c = Kernel_function.compare kf1 kf2 in
-      if c <> 0 then c else
-        cmp_callstacks_aux r1 r2
-
-let cmp_callstacks cs1 cs2 =
-  if cs1 == cs2 then 0 else cmp_callstacks_aux (List.rev cs1) (List.rev cs2)
-
 let run () =
   if not (Ast.is_computed ()) then
     Self.abort "nonterm requires a computed AST";
@@ -344,7 +328,7 @@ let run () =
           let warned_kfs =
             Stmt.Hptset.fold (fun stmt acc ->
                 let cs = Hashtbl.find nonterm_stacks stmt in
-                let cs = List.sort cmp_callstacks cs in
+                let cs = List.sort Eva.Callstack.compare cs in
                 warn_nonterminating_statement stmt cs;
                 Kernel_function.Set.add (Kernel_function.find_englobing_kf stmt) acc
               ) new_nonterm_stmts Kernel_function.Set.empty

@@ -275,6 +275,7 @@ let find_compatible_callstacks stmt callstack =
     let callstacks = Eval.to_callstacks stmt in
     (* TODO: missing callstacks filtered by memexec *)
     let make_compatible cs =
+      let cs = Eva.Callstack.to_legacy cs in
       Callstack.truncate_to_sub cs callstack |>
       Option.value ~default:(Callstack.init kf)
     in

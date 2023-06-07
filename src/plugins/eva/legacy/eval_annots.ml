@@ -117,7 +117,7 @@ let c_labels kf cs =
       if stmt.labels != [] then
         try
           let hstate = Db.Value.Table_By_Callstack.find stmt in
-          let state = Value_types.Callstack.Hashtbl.find hstate cs in
+          let state = Callstack.Hashtbl.find hstate cs in
           Cil_datatype.Logic_label.Map.add (StmtLabel (ref stmt)) state acc
         with Not_found -> acc
       else acc
@@ -143,7 +143,7 @@ let eval_by_callstack kf stmt p =
     Unknown
   | Some states ->
     try
-      match Value_types.Callstack.Hashtbl.fold aux_callstack states `Bottom with
+      match Callstack.Hashtbl.fold aux_callstack states `Bottom with
       | `Bottom -> Eval_terms.Unknown (* probably never reached *)
       | `Value status -> status
     with Exit -> Eval_terms.Unknown

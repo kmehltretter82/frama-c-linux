@@ -302,7 +302,6 @@ module Make
     Right.reuse kf bases ~current_input:right_input ~previous_output:right_output
 
   let merge_tbl left_tbl right_tbl =
-    let open Value_types in
     let tbl = Callstack.Hashtbl.create 7 in
     let merge callstack left =
       try
@@ -315,7 +314,6 @@ module Make
     if Callstack.Hashtbl.length tbl > 0 then `Value tbl else `Bottom
 
   let lift_tbl f tbl =
-    let open Value_types in
     let new_tbl = Callstack.Hashtbl.create 7 in
     let lift cs t = Callstack.Hashtbl.replace new_tbl cs (f t) in
     Callstack.Hashtbl.iter lift tbl;

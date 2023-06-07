@@ -32,22 +32,22 @@ end
 module type S = sig
   type t
   val register_global_state: bool -> t or_bottom -> unit
-  val register_initial_state: Value_types.callstack -> t -> unit
-  val register_state_before_stmt: Value_types.callstack -> stmt -> t -> unit
-  val register_state_after_stmt: Value_types.callstack -> stmt -> t -> unit
+  val register_initial_state: Callstack.t -> t -> unit
+  val register_state_before_stmt: Callstack.t -> stmt -> t -> unit
+  val register_state_after_stmt: Callstack.t -> stmt -> t -> unit
 
   (** Allows accessing the states inferred by an Eva analysis after it has
       been computed with the domain enabled. *)
   val get_global_state: unit -> t or_bottom
   val get_initial_state: kernel_function -> t or_bottom
   val get_initial_state_by_callstack:
-    ?selection:callstack list ->
-    kernel_function -> t Value_types.Callstack.Hashtbl.t or_top_bottom
+    ?selection:Callstack.t list ->
+    kernel_function -> t Callstack.Hashtbl.t or_top_bottom
 
   val get_stmt_state: after:bool -> stmt -> t or_bottom
   val get_stmt_state_by_callstack:
-    ?selection:callstack list ->
-    after:bool -> stmt -> t Value_types.Callstack.Hashtbl.t or_top_bottom
+    ?selection:Callstack.t list ->
+    after:bool -> stmt -> t Callstack.Hashtbl.t or_top_bottom
 
   val mark_as_computed: unit -> unit
   val is_computed: unit -> bool
@@ -105,7 +105,7 @@ module Make (Domain: InputDomain) = struct
       end)
 
   module States_by_callstack =
-    Value_types.Callstack.Hashtbl.Make (Domain)
+    Callstack.Hashtbl.Make (Domain)
 
   module Table_By_Callstack =
     Cil_state_builder.Stmt_hashtbl(States_by_callstack)
@@ -158,7 +158,6 @@ module Make (Domain: InputDomain) = struct
       end)
 
   let update_callstack_table ~after stmt callstack v =
-    let open Value_types in
     let find,add =
       if after
       then AfterTable_By_Callstack.find, AfterTable_By_Callstack.add
@@ -186,8 +185,7 @@ module Make (Domain: InputDomain) = struct
 
   let register_initial_state callstack state =
     if Storage.get () then
-      let open Value_types in
-      let kf = match callstack with (kf, _) :: _ -> kf | _ -> assert false in
+      let kf = Callstack.top_kf callstack in
       let by_callstack =
         try Called_Functions_By_Callstack.find kf
         with Not_found ->
@@ -217,7 +215,7 @@ module Make (Domain: InputDomain) = struct
       try
         let by_callstack = Called_Functions_By_Callstack.find kf in
         let state =
-          Value_types.Callstack.Hashtbl.fold
+          Callstack.Hashtbl.fold
             (fun _cs state acc -> Bottom.join Domain.join acc (`Value state))
             by_callstack `Bottom
         in
@@ -229,10 +227,10 @@ module Make (Domain: InputDomain) = struct
     match selection with
     | None -> tbl
     | Some list ->
-      let new_tbl = Value_types.Callstack.Hashtbl.create (List.length list) in
+      let new_tbl = Callstack.Hashtbl.create (List.length list) in
       let add cs =
-        let state_opt = Value_types.Callstack.Hashtbl.find_opt tbl cs in
-        Option.iter (Value_types.Callstack.Hashtbl.replace new_tbl cs) state_opt
+        let state_opt = Callstack.Hashtbl.find_opt tbl cs in
+        Option.iter (Callstack.Hashtbl.replace new_tbl cs) state_opt
       in
       List.iter add list;
       new_tbl
@@ -263,7 +261,7 @@ module Make (Domain: InputDomain) = struct
           match ho with
           | None -> `Bottom
           | Some h ->
-            Value_types.Callstack.Hashtbl.fold
+            Callstack.Hashtbl.fold
               (fun _cs state acc -> Bottom.join Domain.join acc (`Value state))
               h `Bottom
         in

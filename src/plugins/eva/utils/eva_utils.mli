@@ -26,12 +26,14 @@ open Cil_types
 
 (** Functions dealing with call stacks. *)
 val clear_call_stack : unit -> unit
+val set_call_stack : Callstack.t -> unit
+val push_call_stack : kernel_function -> stmt -> unit
 val pop_call_stack : unit -> unit
-val push_call_stack : kernel_function -> kinstr -> unit
 
 (** The current function is the one on top of the call stack. *)
 val current_kf : unit -> kernel_function
-val call_stack : unit -> Value_types.callstack
+val current_call_stack : unit -> Callstack.t
+val legacy_call_stack : unit -> Value_types.callstack
 
 (** Prints the current callstack. *)
 val pp_callstack : Format.formatter -> unit

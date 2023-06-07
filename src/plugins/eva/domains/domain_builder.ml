@@ -628,7 +628,7 @@ module Restrict
       | `Top -> `Top
       | `Bottom -> `Bottom
       | `Value t ->
-        let module Hashtbl = Value_types.Callstack.Hashtbl in
+        let module Hashtbl = Callstack.Hashtbl in
         let table = Hashtbl.create (Hashtbl.length t) in
         Hashtbl.iter (fun key s -> Hashtbl.add table key (inject s)) t;
         `Value table

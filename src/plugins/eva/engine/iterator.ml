@@ -450,7 +450,7 @@ module Make_Dataflow
     (* TODO: apply on all domains. *)
     let states = Partitioning.contents f in
     let cvalue_states = gather_cvalues states in
-    let callstack = Eva_utils.call_stack () in
+    let callstack = Eva_utils.current_call_stack () in
     Cvalue_callbacks.apply_statement_hooks callstack stmt cvalue_states
 
   let update_vertex ?(widening : bool = false) (v : vertex)
@@ -702,7 +702,7 @@ module Make_Dataflow
     in
     let merged_pre_cvalues = lazy (lift_to_cvalues merged_pre_states)
     and merged_post_cvalues = lazy (lift_to_cvalues merged_post_states) in
-    let callstack = Eva_utils.call_stack () in
+    let callstack = Eva_utils.current_call_stack () in
     if save_results then begin
       let register_pre = Domain.Store.register_state_before_stmt callstack
       and register_post = Domain.Store.register_state_after_stmt callstack in

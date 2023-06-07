@@ -240,8 +240,7 @@ type ('loc, 'value) argument = {
 }
 
 
-type call_site = kernel_function * kinstr
-type callstack = call_site list
+type callstack = Callstack.t
 
 type ('loc, 'value) call = {
   kf: kernel_function;

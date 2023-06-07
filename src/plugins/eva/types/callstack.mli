@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 [@@@ api_start]
+[@@@ alert "-db_deprecated"]
 (* A call is identified by the function called and the call statement *)
 type call = Cil_types.kernel_function * Cil_types.stmt
 
@@ -33,18 +34,18 @@ module Call : Datatype.S with type t = call
     This type is very likely to change in the future. Never use this type
     directly, prefer the use of the following functions when possible. *)
 
-type callstack = private {
+type callstack = Eva_types.Callstack.callstack = private {
   thread: int; (* An identifier of the thread's callstack *)
   entry_point: Cil_types.kernel_function; (* The first function in the callstack *)
   stack: call list;
 }
 
-include Datatype.S with type t = callstack
+include Datatype.S_with_collections
+  with type t = callstack
+   and module Hashtbl = Eva_types.Callstack.Hashtbl
 
-
-(* Constructors *)
+(* Constructor *)
 val init : ?thread:int -> Cil_types.kernel_function -> t
-val of_legacy : Value_types.callstack -> t
 
 (* Stack manipulation *)
 val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t
@@ -52,6 +53,7 @@ val pop : t -> (Cil_types.kernel_function * Cil_types.stmt * t) option
 val top : t -> (Cil_types.kernel_function * Cil_types.stmt) option
 val top_kf : t -> Cil_types.kernel_function
 val top_callsite : t -> Cil_types.stmt option
+val top_call : t -> Cil_types.kernel_function * Cil_types.kinstr
 
 (* Conversion *)
 

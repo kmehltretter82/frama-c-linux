@@ -240,7 +240,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     if pp then
       Self.feedback
         "@[computing for function %a.@\nCalled from %a.@]"
-        Value_types.Callstack.pretty_short call.callstack
+        Value_types.Callstack.pretty_short (Callstack.to_legacy call.callstack)
         Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc kinstr);
     let cvalue_state = get_cvalue_or_top state in
     let compute, kind =
@@ -344,17 +344,17 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   (* ----- Main call -------------------------------------------------------- *)
 
-  let store_initial_state kf init_state =
-    Abstract.Dom.Store.register_initial_state (Eva_utils.call_stack ()) init_state;
+  let store_initial_state callstack init_state =
+    Abstract.Dom.Store.register_initial_state callstack init_state;
     let cvalue_state = get_cvalue_or_top init_state in
-    Db.Value.Call_Value_Callbacks.apply (cvalue_state, [kf, Kglobal])
+    Db.Value.Call_Value_Callbacks.apply (cvalue_state, callstack)
 
   let compute kf init_state =
     let restore_signals = register_signal_handler () in
     let compute () =
-      Eva_utils.push_call_stack kf Kglobal;
-      store_initial_state kf init_state;
-      let callstack = [kf, Kglobal] in
+      let callstack = Callstack.init kf in
+      Eva_utils.set_call_stack callstack;
+      store_initial_state callstack init_state;
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in
       let final_result = compute_call Kglobal call None init_state in
       let final_states = List.map snd (final_result.Transfer.states) in

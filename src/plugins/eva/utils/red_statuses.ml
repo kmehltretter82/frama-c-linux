@@ -51,7 +51,7 @@ module AlarmOrProp = Datatype.Make_with_collections(struct
       | Prop p -> 175 + Property.hash p
   end)
 
-module Callstacks = Value_types.Callstack.Set
+module Callstacks = Callstack.Set
 
 (* For each alarm or predicate, stores the set of callstacks for which it was
    evaluated to False. *)
@@ -81,7 +81,8 @@ let add_red_ap kinstr ap =
     try AlarmOrProp.Map.find ap current_map
     with Not_found -> Callstacks.empty
   in
-  let new_callstacks = Callstacks.add (Eva_utils.call_stack ()) callstacks in
+  let new_callstacks =
+    Callstacks.add (Eva_utils.current_call_stack ()) callstacks in
   let new_map = AlarmOrProp.Map.add ap new_callstacks current_map in
   RedStatusesTable.replace kinstr new_map;
   Hook.apply ap

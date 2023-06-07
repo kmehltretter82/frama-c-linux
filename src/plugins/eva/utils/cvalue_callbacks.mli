@@ -28,7 +28,7 @@
     in a future version. Please contact us if you need to register callbacks
     to be executed during an Eva analysis. *)
 
-type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
+type callstack = Callstack.t
 type state = Cvalue.Model.t
 
 type analysis_kind =

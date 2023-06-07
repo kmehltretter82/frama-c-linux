@@ -24,7 +24,7 @@ open Cil_types
 
 let dkey = Self.dkey_callbacks
 
-type callstack = (kernel_function * kinstr) list
+type callstack = Callstack.t
 type state = Cvalue.Model.t
 
 type analysis_kind =

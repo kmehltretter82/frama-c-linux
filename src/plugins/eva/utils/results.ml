@@ -28,8 +28,6 @@ let are_available kf =
   | Analyzed (Complete | Partial) -> true
   | SpecUsed | Builtin _ | Unreachable | Analyzed NoResults -> false
 
-module Callstack = Value_types.Callstack
-
 type callstack = Callstack.t
 type 'a by_callstack = (callstack * 'a) list
 
@@ -133,7 +131,7 @@ struct
     | `Value state -> ByCallstack [cs,state]
 
   let by_callstack : context ->
-    [< `Bottom | `Top | `Value of 'a Value_types.Callstack.Hashtbl.t ] ->
+    [< `Bottom | `Top | `Value of 'a Callstack.Hashtbl.t ] ->
     ('a, restricted_to_callstack) t =
     fun req -> function
       | `Top -> Top
@@ -245,7 +243,8 @@ struct
       A.get_stmt_state_by_callstack ?selection ~after:true stmt
       |> by_callstack ctx
     | Initial ->
-      A.get_global_state () |> singleton []
+      let cs = Callstack.init (fst (Globals.entry_point ())) in
+      A.get_global_state () |> singleton cs
     | Start kf ->
       A.get_initial_state_by_callstack ?selection kf |> by_callstack ctx
 

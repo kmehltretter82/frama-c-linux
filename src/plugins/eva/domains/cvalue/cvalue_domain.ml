@@ -473,7 +473,6 @@ module State = struct
       else `Value (state, Locals_scoping.top ())
 
     let lift_tbl tbl =
-      let open Value_types in
       let h = Callstack.Hashtbl.create 7 in
       let process callstack state =
         Callstack.Hashtbl.replace h callstack (state, Locals_scoping.top ())
@@ -485,10 +484,10 @@ module State = struct
       match selection with
       | None -> tbl
       | Some list ->
-        let new_tbl = Value_types.Callstack.Hashtbl.create (List.length list) in
+        let new_tbl = Callstack.Hashtbl.create (List.length list) in
         let add cs =
-          let s = Value_types.Callstack.Hashtbl.find_opt tbl cs in
-          Option.iter (Value_types.Callstack.Hashtbl.replace new_tbl cs) s
+          let s = Callstack.Hashtbl.find_opt tbl cs in
+          Option.iter (Callstack.Hashtbl.replace new_tbl cs) s
         in
         List.iter add list;
         new_tbl
