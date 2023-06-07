@@ -441,6 +441,10 @@ let safe_remove_file (f : Datatype.Filepath.t) =
   if not (Kernel.is_debug_key_enabled Kernel.dkey_parser) then
     Extlib.safe_remove (f :> string)
 
+let cpp_name cmd =
+  let cmd = List.hd (String.split_on_char ' ' cmd) in
+  Filename.basename cmd
+
 let replace_in_cpp_cmd cmdl supp_args in_file out_file =
   (* using Filename.quote for filenames which contain space or shell
      metacharacters *)
@@ -516,6 +520,19 @@ let build_cpp_cmd = function
       else []
     in
     let fc_define_args = ["__FRAMAC__"] in
+    let exe = cpp_name cmdl in
+    let clang_no_warn =
+      if exe = "clang" || exe = "gcc" then
+        (* NB: For gcc, only old versions (still found in Ubuntu 18.04,
+           supported until 2028, though) activate builtin-macro-redefined.
+           This is also the case for newer clangs, while older ones will
+           complain about the unknown warning (gcc does not seem to care,
+           so that it is safe to keep the unknown-warning-option in every
+           case). *)
+        ["-Wno-builtin-macro-redefined"; "-Wno-unknown-warning-option"]
+      else
+        []
+    in
     let nostdinc_arg =
       if Kernel.FramaCStdLib.get() then add_if_gnu "-nostdinc"
       else []
@@ -537,7 +554,7 @@ let build_cpp_cmd = function
     in
     let supp_args =
       string_of_supp_args
-        (gnu_implicit_args @
+        (gnu_implicit_args @ clang_no_warn @
          extra_for_this_file @ (Kernel.CppExtraArgs.get ()))
         fc_include_args fc_define_args
     in
