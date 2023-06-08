@@ -115,6 +115,49 @@ module Analysis: sig
   val save_results: Cil_types.kernel_function -> bool
 end
 
+module Callstack: sig
+  (* A call is identified by the function called and the call statement *)
+  type call = Cil_types.kernel_function * Cil_types.stmt
+
+  module Call : Datatype.S with type t = call
+
+  (** [callstack] is used to describe the analysis context when analysing a
+      function. It contains the thread, the entry point and the list of
+      calls from the entry point.
+
+      This type is very likely to change in the future. Never use this type
+      directly, prefer the use of the following functions when possible. *)
+
+  type callstack = private {
+    thread: int; (* An identifier of the thread's callstack *)
+    entry_point: Cil_types.kernel_function; (* The first function in the callstack *)
+    stack: call list;
+  }
+
+  include Datatype.S_with_collections with type t = callstack
+
+  (* Constructor *)
+  val init : ?thread:int -> Cil_types.kernel_function -> t
+
+  (* Stack manipulation *)
+  val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t
+  val pop : t -> (Cil_types.kernel_function * Cil_types.stmt * t) option
+  val top : t -> (Cil_types.kernel_function * Cil_types.stmt) option
+  val top_kf : t -> Cil_types.kernel_function
+  val top_callsite : t -> Cil_types.stmt option
+
+  (* Conversion *)
+
+  (** This function is likely to be removed in future versions*)
+  val to_legacy : t -> Value_types.callstack
+
+  (** Gives the list of kf in the callstack from the entry point to the top of the callstack (i.e. reverse order of the call stack). *)
+  val to_kf_list : t -> Cil_types.kernel_function list
+
+  (** Gives the list of call statements from the bottom to the top of the callstack (i.e. reverse order of the call stack). *)
+  val to_stmt_list : t -> Cil_types.stmt list
+end
+
 module Results: sig
 
   (** Eva's result API is a new interface to access the results of an analysis,
@@ -158,7 +201,7 @@ module Results: sig
         all requests in the function will lead to a Top error. *)
   val are_available : Cil_types.kernel_function -> bool
 
-  type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
+  type callstack = Callstack.t
 
   type request
 

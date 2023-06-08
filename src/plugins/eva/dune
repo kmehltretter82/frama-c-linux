@@ -105,7 +105,7 @@
  (mode (promote (only Eva.mli)))
  (deps
   gen-api.sh Eva.header
-  engine/analysis.mli utils/results.mli parameters.mli
+  engine/analysis.mli types/callstack.mli utils/results.mli parameters.mli
   utils/eva_annotations.mli eval.mli domains/cvalue/builtins.mli
   utils/cvalue_callbacks.mli legacy/logic_inout.mli utils/eva_results.mli
   utils/unit_tests.mli)
