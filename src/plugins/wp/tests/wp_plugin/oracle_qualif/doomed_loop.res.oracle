@@ -15,8 +15,10 @@
 [wp] [Unsuccess] typed_foo_loop_invariant_B_established (Alt-Ergo) (Cached)
 [wp] [Valid] typed_foo_loop_assigns (Qed)
 [wp] Proved goals:    3 / 8
-  Qed:             6
+  Qed:             3
+  Failed:          3
   Unsuccess:       2
+  Smoke Tests:     0 / 3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   foo                       3        -        8      37.5%

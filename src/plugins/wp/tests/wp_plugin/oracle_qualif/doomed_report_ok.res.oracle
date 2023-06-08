@@ -16,6 +16,7 @@
 [wp] Proved goals:   10 / 10
   Qed:             1
   Alt-Ergo:        9
+  Smoke Tests:     3 / 3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   foo                       1        9       10       100%

@@ -22,6 +22,7 @@
 [wp] Proved goals:   16 / 16
   Qed:             7
   Alt-Ergo:        9
+  Smoke Tests:     5 / 5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   euclid_gcd                7        9       16       100%

@@ -187,16 +187,19 @@ module GOALS = Wpo.S.Set
 let scheduled = ref 0
 let exercised = ref 0
 let session = ref GOALS.empty
-let global_stats = ref Stats.empty
-let script_stats = ref Stats.empty
+let prover_stats = ref Stats.empty
+let tactic_stats = ref Stats.empty
+let smoked_passed = ref 0
+let smoked_failed = ref 0
+let add_stats r s = r := Stats.add !r s
 
 let clear_scheduled () =
   begin
     scheduled := 0 ;
     exercised := 0 ;
     session := GOALS.empty ;
-    global_stats := Stats.empty ;
-    script_stats := Stats.empty ;
+    prover_stats := Stats.empty ;
+    tactic_stats := Stats.empty ;
     CfgInfos.trivial_terminates := 0 ;
     WpReached.unreachable_proved := 0 ;
     WpReached.unreachable_failed := 0 ;
@@ -304,8 +307,8 @@ let stats_to_json g (s : Stats.stats) : Json.t =
         "function", `String (Kernel_function.get_name kf);
         "behavior", `String bhv ;
       ] in
-  let proofs = Stats.proofs s in
-  let subgoals = if proofs > 1 then ["subgoals", `Int proofs] else [] in
+  let subgoals = Stats.subgoals s in
+  let subgoals = if subgoals > 1 then ["subgoals", `Int subgoals] else [] in
   `Assoc
     ([
       "goal", `String g.po_gid ;
@@ -315,7 +318,7 @@ let stats_to_json g (s : Stats.stats) : Json.t =
     ] @ index @ [
         "smoke", `Bool smoke ;
         "passed", `Bool (Wpo.is_passed g) ;
-        "verdict", `String (VCS.name_of_verdict s.verdict) ;
+        "verdict", `String (VCS.name_of_verdict s.best) ;
       ] @ script @ [
         "provers", `List (List.map pstats_to_json s.provers) ;
       ] @ subgoals @
@@ -351,7 +354,7 @@ let do_wpo_result goal prover res =
 let do_report_stats ~shell ~cache ~smoke goal (stats : Stats.stats) =
   let status =
     if smoke then
-      match stats.verdict with
+      match stats.best with
       | Valid -> "[Failed] (Doomed)"
       | Failed ->  "[Failure] (Solver Error)"
       | NoResult | Computing _ -> "[Unknown] (Incomplete)"
@@ -359,13 +362,11 @@ let do_report_stats ~shell ~cache ~smoke goal (stats : Stats.stats) =
       | Unknown -> "[Passed] (Unknown)"
       | Timeout -> "[Passed] (Timeout)"
       | Stepout -> "[Passed] (Stepout)"
-      | Invalid -> "[Passed] (Invalid)"
     else
-      match stats.verdict with
+      match stats.best with
       | NoResult when shell -> "[CacheMiss]"
       | NoResult | Computing _ -> ""
       | Valid -> "[Valid]"
-      | Invalid -> "[Invalid]"
       | Failed ->  "[Failure]"
       | (Unknown | Timeout | Stepout) when shell -> "[Unsuccess]"
       | Unknown -> "[Unknown]"
@@ -386,13 +387,16 @@ let do_wpo_success ~shell ~cache goal success =
   else
     let gui = Frama_c_very_first.Gui_init.is_gui in
     let smoke = Wpo.is_smoke_test goal in
-    let gstats = Stats.results ~smoke @@ Wpo.get_results goal in
+    let pstats = Stats.results ~smoke @@ Wpo.get_results goal in
     let cstats = ProofEngine.consolidated goal in
     let success = Wpo.is_passed goal in
     begin
-      global_stats := Stats.add !global_stats gstats ;
-      if cstats.tactics > 0 then
-        script_stats := Stats.add !script_stats cstats ;
+      add_stats prover_stats pstats ;
+      if smoke then
+        (if Wpo.is_passed goal
+         then incr smoked_passed
+         else incr smoked_failed) ;
+      if cstats.tactics > 0 then add_stats tactic_stats cstats ;
       if gui || shell || not success then
         do_report_stats ~shell ~cache goal ~smoke cstats ;
       if smoke then
@@ -416,7 +420,7 @@ let do_report_scheduled () =
       !CfgInfos.trivial_terminates in
     if total > 0 then
       begin
-        let gstats = !global_stats in
+        let proofs = !prover_stats in
         let unreachable = !WpReached.unreachable_proved in
         let terminating = !CfgInfos.trivial_terminates in
         let passed = GOALS.fold
@@ -439,22 +443,28 @@ let do_report_scheduled () =
              if success > 0 || (not shell && p = Qed) then
                add_line name success (fun fmt ->
                    if p = Tactical then
-                     Stats.pp_stats ~shell ~cache fmt !script_stats
+                     Stats.pp_stats ~shell ~cache fmt !tactic_stats
                    else
                    if not shell then Stats.pp_pstats fmt s
                  )
-          ) gstats.provers ;
-        if gstats.failed > 0 then add_line "Failed" gstats.failed none ;
+          ) proofs.provers ;
+        let failed = proofs.failed in
+        if failed > 0 then add_line "Failed" failed none ;
         if shell then
           begin
-            let n = gstats.timeout + gstats.unknown in
+            let n = Stats.subgoals proofs - proofs.proved - proofs.failed in
             if n > 0 then add_line "Unsuccess" n none
           end
         else
           begin
-            if gstats.timeout > 0 then add_line "Timeout" gstats.timeout none ;
-            if gstats.unknown > 0 then add_line "Unknown" gstats.unknown none ;
+            if proofs.timeout > 0 then add_line "Timeout" proofs.timeout none ;
+            if proofs.unknown > 0 then add_line "Unknown" proofs.unknown none ;
           end ;
+        let smoked = !smoked_failed + !smoked_passed in
+        if smoked > 0 then
+          add_line "Smoke Tests" !smoked_passed
+            (fun fmt -> Format.fprintf fmt " / %d" smoked) ;
+        if proofs.noresult > 0 then add_line "Missing" proofs.noresult none ;
         let iter f = List.iter f (List.rev !lines) in
         let title (p,_,_) = p in
         let pp_title fmt p = Format.fprintf fmt "%s:" p in

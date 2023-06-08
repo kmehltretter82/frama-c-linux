@@ -114,7 +114,7 @@
   Prove: ([ 1 ] *^ n) = a_1.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_function_loop_invariant_X_preserved (Tactic) (Cached)
+[wp] [Unsuccess] typed_function_loop_invariant_X_preserved (Tactic) (Qed)
 [wp] Proved goals:    1 / 2
   Qed:             1
   Unsuccess:       1

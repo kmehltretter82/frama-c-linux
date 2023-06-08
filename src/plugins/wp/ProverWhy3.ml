@@ -1188,10 +1188,9 @@ let ping_prover_call ~config p =
       match pr.pr_answer with
       | Timeout -> VCS.timeout pr.pr_time
       | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
-      | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Invalid
       | OutOfMemory -> VCS.failed "out of memory"
       | StepLimitExceeded -> VCS.result ?steps:p.steps VCS.Stepout
-      | Unknown _ -> VCS.unknown
+      | Unknown _ | Invalid -> VCS.unknown
       | _ when p.interrupted -> VCS.timeout p.timeout
       | Failure s -> VCS.failed s
       | HighFailure ->

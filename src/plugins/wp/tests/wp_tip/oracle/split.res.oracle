@@ -215,7 +215,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_branch_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_step_branch_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_or_ensures subgoal:
   
@@ -240,7 +240,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_or_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_step_or_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_and_ensures subgoal:
   
@@ -256,7 +256,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_and_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_step_and_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_peq_ensures subgoal:
   
@@ -273,7 +273,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_peq_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_step_peq_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_pneq_ensures subgoal:
   
@@ -290,7 +290,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_pneq_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_step_pneq_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_neq_ensures subgoal:
   
@@ -315,7 +315,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_neq_ensures (Tactic) (Qed 1/3) (Cached)
+[wp] [Unsuccess] typed_test_step_neq_ensures (Tactic) (Qed 1/3)
 [wp:script:allgoals] 
   typed_test_step_leq_ensures subgoal:
   
@@ -339,7 +339,7 @@
   Prover Qed returns Valid
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_leq_ensures (Tactic) (Qed 1/3) (Cached)
+[wp] [Unsuccess] typed_test_step_leq_ensures (Tactic) (Qed 1/3)
 [wp:script:allgoals] 
   typed_test_step_lt_ensures subgoal:
   
@@ -369,7 +369,7 @@
   Prover Qed returns Valid
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_lt_ensures (Tactic) (Qed 1/3) (Cached)
+[wp] [Unsuccess] typed_test_step_lt_ensures (Tactic) (Qed 1/3)
 [wp:script:allgoals] 
   typed_test_step_if_ensures subgoal:
   
@@ -391,7 +391,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_if_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_step_if_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_fa_if_ensures subgoal:
   
@@ -418,7 +418,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_fa_if_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_step_fa_if_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_fa_or_ensures subgoal:
   
@@ -435,7 +435,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_fa_or_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_step_fa_or_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_fa_and_ensures subgoal:
   
@@ -448,7 +448,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_fa_and_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_step_fa_and_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_inside_leq_ensures subgoal:
   
@@ -479,7 +479,7 @@
   Prover Qed returns Valid
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_inside_leq_ensures (Tactic) (Qed 1/3) (Cached)
+[wp] [Unsuccess] typed_test_inside_leq_ensures (Tactic) (Qed 1/3)
 [wp:script:allgoals] 
   typed_test_inside_lt_ensures subgoal:
   
@@ -510,7 +510,7 @@
   Prover Qed returns Valid
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_inside_lt_ensures (Tactic) (Qed 1/3) (Cached)
+[wp] [Unsuccess] typed_test_inside_lt_ensures (Tactic) (Qed 1/3)
 [wp:script:allgoals] 
   typed_test_inside_neq_ensures subgoal:
   
@@ -547,7 +547,7 @@
   Prove: P_Q.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_inside_neq_ensures (Tactic) (Qed 1/3) (Cached)
+[wp] [Unsuccess] typed_test_inside_neq_ensures (Tactic) (Qed 1/3)
 [wp:script:allgoals] 
   typed_test_goal_and_ensures subgoal:
   
@@ -572,7 +572,7 @@
   Prove: P_R.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_and_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_goal_and_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_goal_eq_ensures subgoal:
   
@@ -589,7 +589,7 @@
   Prove: (L_LQ=true).
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_eq_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_goal_eq_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_goal_neq_ensures subgoal:
   
@@ -606,7 +606,7 @@
   Prove: (L_LQ=false).
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_neq_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_goal_neq_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_goal_if_ensures subgoal:
   
@@ -633,7 +633,7 @@
   Prove: P_Q.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_if_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_goal_if_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_goal_ex_and_ensures subgoal:
   
@@ -650,7 +650,7 @@
   Prove: P_P /\ P_Q.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_ex_and_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_goal_ex_and_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_goal_ex_or_ensures subgoal:
   
@@ -659,7 +659,7 @@
   Prove: P_P \/ P_Q \/ (exists i : Z. P_Pi(i)) \/ (exists i : Z. P_Qi(i)).
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_ex_or_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_goal_ex_or_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_goal_ex_if_ensures subgoal:
   
@@ -688,7 +688,7 @@
   Prove: P_P /\ P_Q.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_ex_if_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_goal_ex_if_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_goal_ex_imply_ensures subgoal:
   
@@ -702,6 +702,6 @@
   Prove: exists i : Z. P_Qi(i).
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_ex_imply_ensures (Tactic) (Cached)
+[wp] [Unsuccess] typed_test_goal_ex_imply_ensures (Tactic) (Qed)
 [wp] Proved goals:    0 / 23
   Unsuccess:      23
