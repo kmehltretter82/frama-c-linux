@@ -202,7 +202,6 @@ let example_msg =
      STDOPT: #<extra>    @[<v 0># Defines a sub-test and prepend the extra to the current option.@]@  \
      PLUGIN: <plugin>... @[<v 0># Adds a dependency and set the macro @@PTEST_PLUGIN@@ defining the '-load-plugins' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
      LIBRARY: <pkg.lib>... @[<v 0># Adds a dependency and set the macro @@PTEST_LIBRARY@@ defining the '-load-library' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
-     CMXS: <module>...   @[<v 0># Defines dune targets without dependency to tests so use '-load-module %%{dep:<module>.cmxs}' into the test options.@]@  \
      MODULE: <module>... @[<v 0># Adds a dependency and adds the corresponding '-load-module' option into the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
      SCRIPT: <module>... @[alias 'MODULE' directive.@]@  \
      LIBS: <module>...   @[<v 0># Like 'MODULE' directive but for modules that can be shared between several test files.@]@  \
