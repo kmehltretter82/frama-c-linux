@@ -24,6 +24,9 @@
 THIS_SCRIPT="$0"
 CONFIG="<all>"
 VERBOSE=
+CLEAN=
+PREPARE=
+PULLCACHE=
 UPDATE=
 LOGS=
 COMMIT=
@@ -131,6 +134,70 @@ function RequiredTools
 }
 
 # --------------------------------------------------------------------------
+# ---  Command Line Processing
+# --------------------------------------------------------------------------
+
+while [ "$1" != "" ]
+do
+    case "$1" in
+        "-h"|"-help"|"--help")
+            Usage
+            exit 0
+            ;;
+        "-r"|"--clean")
+            CLEAN=yes
+            PREPARE=yes
+            ;;
+        "-p"|"--ptests")
+            PREPARE=yes
+            ;;
+        "-w"|"--wp-cache")
+            PULLCACHE=yes
+            ;;
+        "-u"|"--update")
+            DUNE_OPT+="--auto-promote"
+            UPDATE=yes
+            ;;
+        "-v"|"--verbose")
+            DUNE_OPT+="--display=short"
+            VERBOSE=yes
+            ;;
+        "-l"|"--logs")
+            LOGS=yes
+            ;;
+        "-k"|"--commit")
+            COMMIT=yes
+            ;;
+        "-s"|"--save" )
+            SAVE=yes
+            ;;
+        "-d"|"--default")
+            CONFIG="<default>"
+            ;;
+        "-c"|"--config")
+            CONFIG=$2
+            shift
+            ;;
+        "-n"|"--name")
+            ALIAS_NAME=$2
+            shift
+            ;;
+        "-a"|"--all")
+            TESTS=""
+            for dir in $TEST_DIRS ; do
+                if [ -d "$dir" ]; then
+                    TESTS="$TESTS $dir"
+                fi
+            done
+            ;;
+       *)
+            TESTS+=" $1"
+            ;;
+    esac
+    shift
+done
+
+# --------------------------------------------------------------------------
 # ---  WP Cache Environment
 # --------------------------------------------------------------------------
 
@@ -138,19 +205,25 @@ function SetEnv
 {
     if [ "$FRAMAC_WP_CACHE" = "" ]; then
         if [ "$UPDATE" = "yes" ]; then
+            Head "FRAMAC_WP_CACHE=update"
             export FRAMAC_WP_CACHE=update
         else
             export FRAMAC_WP_CACHE=offline
         fi
-        Echo "Set FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
+    else
+        if [ "$UPDATE" = "yes" ]; then
+            Head "FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE (overrides -u)"
+        else
+            Head "FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
+        fi
     fi
 
     if [ "$FRAMAC_WP_QUALIF" != "" ]; then
         export FRAMAC_WP_CACHEDIR="$FRAMAC_WP_QUALIF"
-        Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
+        Echo "# FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
     elif [ "$FRAMAC_WP_CACHEDIR" = "" ]; then
         export FRAMAC_WP_CACHEDIR="$LOCAL_WP_CACHE"
-        Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
+        Echo "# FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
     fi
 
     [ ! -f "$FRAMAC_WP_CACHEDIR" ] || [ -d "$FRAMAC_WP_CACHEDIR" ] \
@@ -160,7 +233,6 @@ function SetEnv
         /*);;
         *) Error "Requires an absolute path to $FRAMAC_WP_CACHEDIR";;
     esac
-
 }
 
 function CloneCache
@@ -174,10 +246,31 @@ function CloneCache
 
 function PullCache
 {
-    CloneCache
-    Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
-    RequiredTools git
-    Run git -C $FRAMAC_WP_CACHEDIR pull --rebase
+    if [ "$PULLCACHE" = "yes" ]
+    then
+        CloneCache
+        Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
+        RequiredTools git
+        Run git -C $FRAMAC_WP_CACHEDIR pull --rebase
+    fi
+}
+
+# --------------------------------------------------------------------------
+# ---  Test Suite Preparation
+# --------------------------------------------------------------------------
+
+function PrepareTests
+{
+    if [ "$CLEAN" = "yes" ]
+    then
+        Head "Cleaning all tests..."
+        Cmd make clean-tests
+    fi
+    if [ "$PREPARE" = "yes" ]
+    then
+        Head "Generating dune files..."
+        Cmd make run-ptests
+    fi
 }
 
 # --------------------------------------------------------------------------
@@ -338,73 +431,15 @@ function Status
 }
 
 # --------------------------------------------------------------------------
-# ---  Command Line Processing
+# ---  Main Program
 # --------------------------------------------------------------------------
 
 SetEnv
-while [ "$1" != "" ]
-do
-    case "$1" in
-        "-h"|"-help"|"--help")
-            Usage
-            exit 0
-            ;;
-        "-r"|"--clean")
-            Head "Cleaning all tests..."
-            Cmd make clean-tests
-            Head "Generating dune files..."
-            Cmd make run-ptests
-            ;;
-        "-p"|"--ptests")
-            Head "Generating dune files..."
-            Cmd make run-ptests
-            ;;
-        "-w"|"--wp-cache")
-            PullCache
-            ;;
-        "-u"|"--update")
-            DUNE_OPT+="--auto-promote"
-            UPDATE=yes
-            ;;
-        "-v"|"--verbose")
-            DUNE_OPT+="--display=short"
-            VERBOSE=yes
-            ;;
-        "-l"|"--logs")
-            LOGS=yes
-            ;;
-        "-k"|"--commit")
-            COMMIT=yes
-            ;;
-        "-s"|"--save" )
-            SAVE=yes
-            ;;
-        "-d"|"--default")
-            CONFIG="<default>"
-            ;;
-        "-c"|"--config")
-            CONFIG=$2
-            shift
-            ;;
-        "-n"|"--name")
-            ALIAS_NAME=$2
-            shift
-            ;;
-        "-a"|"--all")
-            TESTS=""
-            for dir in $TEST_DIRS ; do
-                if [ -d "$dir" ]; then
-                    TESTS="$TESTS $dir"
-                fi
-            done
-            ;;
-       *)
-            TESTS+=" $1"
-            ;;
-    esac
-    shift
-done
+PullCache
+PrepareTests
 Register $TESTS
 RunAlias ${DUNE_ALIAS}
 Commits ${COMMITS}
 Status $DUNE_LOG
+
+# --------------------------------------------------------------------------
