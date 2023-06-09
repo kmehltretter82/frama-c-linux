@@ -53,6 +53,14 @@ import { locationDefault } from 'frama-c/kernel/api/ast';
 import { marker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { markerDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { byTag } from 'frama-c/kernel/api/data';
+//@ts-ignore
+import { jTag } from 'frama-c/kernel/api/data';
+//@ts-ignore
+import { tag } from 'frama-c/kernel/api/data';
+//@ts-ignore
+import { tagDefault } from 'frama-c/kernel/api/data';
 
 /** Parametrization of the exploration range. */
 export interface range {
@@ -117,20 +125,21 @@ export const byNodeId: Compare.Order<nodeId> = Compare.number;
 /** Default value for `nodeId` */
 export const nodeIdDefault: nodeId = 0;
 
-/** A callsite */
-export type callsite = { fun: string, instr: number | string };
+/** callsite */
+export type callsite = { fun: string, instr: number | "global" };
 
 /** Decoder for `callsite` */
 export const jCallsite: Json.Decoder<callsite> =
   Json.jObject({
     fun: Json.jString,
-    instr: Json.jUnion<number | string>( Json.jNumber, Json.jString,),
+    instr: Json.jUnion<number | "global">( Json.jNumber, Json.jTag("global"),
+           ),
   });
 
 /** Natural order for `callsite` */
 export const byCallsite: Compare.Order<callsite> =
   Compare.byFields
-    <{ fun: string, instr: number | string }>({
+    <{ fun: string, instr: number | "global" }>({
     fun: Compare.string,
     instr: Compare.structural,
   });
@@ -152,7 +161,12 @@ export const byCallstack: Compare.Order<callstack> =
 export const callstackDefault: callstack = [];
 
 /** The description of a node locality */
-export type nodeLocality = { file: string, callstack?: callstack };
+export interface nodeLocality {
+  /** file */
+  file: string;
+  /** callstack */
+  callstack?: callstack;
+}
 
 /** Decoder for `nodeLocality` */
 export const jNodeLocality: Json.Decoder<nodeLocality> =
@@ -170,65 +184,238 @@ export const byNodeLocality: Compare.Order<nodeLocality> =
 export const nodeLocalityDefault: nodeLocality =
   { file: '', callstack: undefined };
 
-/** A graph node */
-export type node =
-  { id: nodeId, label: string, kind: string, locality: nodeLocality,
-    is_root: boolean, backward_explored: string, forward_explored: string,
-    writes: location[], values?: string, range: number | string,
-    type?: string, taint?: "direct" | "indirect" | "untainted" };
+/** The nature of a node */
+export enum nodeKind {
+  /** a single memory cell */
+  scalar = 'scalar',
+  /** a memory bloc containing cells */
+  composite = 'composite',
+  /** a set of memory locations designated by an lvalue */
+  scattered = 'scattered',
+  /** an unresolved memory location */
+  unknown = 'unknown',
+  /** an alarm emitted by Frama-C */
+  alarm = 'alarm',
+  /** a memory location designated by a range of adresses */
+  absolute = 'absolute',
+  /** a string literal */
+  string = 'string',
+  /** a placeholder node when an error prevented the generation process */
+  error = 'error',
+  /** a numeric constant literal */
+  const = 'const',
+}
+
+/** Decoder for `nodeKind` */
+export const jNodeKind: Json.Decoder<nodeKind> = Json.jEnum(nodeKind);
+
+/** Natural order for `nodeKind` */
+export const byNodeKind: Compare.Order<nodeKind> = Compare.byEnum(nodeKind);
+
+/** Default value for `nodeKind` */
+export const nodeKindDefault: nodeKind = nodeKind.scalar;
+
+const nodeKindTags_internal: Server.GetRequest<null,tag[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.dive.nodeKindTags',
+  input:  Json.jNull,
+  output: Json.jArray(jTag),
+  signals: [],
+};
+/** Registered tags for the above type. */
+export const nodeKindTags: Server.GetRequest<null,tag[]>= nodeKindTags_internal;
+
+/** Taint of a memory location */
+export enum taint {
+  /** not tainted by anything */
+  untainted = 'untainted',
+  /** tainted by control */
+  indirect = 'indirect',
+  /** tainted by data */
+  direct = 'direct',
+}
+
+/** Decoder for `taint` */
+export const jTaint: Json.Decoder<taint> = Json.jEnum(taint);
+
+/** Natural order for `taint` */
+export const byTaint: Compare.Order<taint> = Compare.byEnum(taint);
+
+/** Default value for `taint` */
+export const taintDefault: taint = taint.untainted;
+
+const taintTags_internal: Server.GetRequest<null,tag[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.dive.taintTags',
+  input:  Json.jNull,
+  output: Json.jArray(jTag),
+  signals: [],
+};
+/** Registered tags for the above type. */
+export const taintTags: Server.GetRequest<null,tag[]>= taintTags_internal;
+
+/** The computation state of a node read or write dependencies */
+export enum exploration {
+  /** all dependencies have been computed */
+  yes = 'yes',
+  /** some dependencies have been explored */
+  partial = 'partial',
+  /** dependencies have not been computed */
+  no = 'no',
+}
+
+/** Decoder for `exploration` */
+export const jExploration: Json.Decoder<exploration> =
+  Json.jEnum(exploration);
+
+/** Natural order for `exploration` */
+export const byExploration: Compare.Order<exploration> =
+  Compare.byEnum(exploration);
+
+/** Default value for `exploration` */
+export const explorationDefault: exploration = exploration.yes;
+
+const explorationTags_internal: Server.GetRequest<null,tag[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.dive.explorationTags',
+  input:  Json.jNull,
+  output: Json.jArray(jTag),
+  signals: [],
+};
+/** Registered tags for the above type. */
+export const explorationTags: Server.GetRequest<null,tag[]>= explorationTags_internal;
+
+/** A qualitative description of the range of values that this node can take. */
+export enum nodeSpecialRange {
+  /** no value ever computed for this node */
+  empty = 'empty',
+  /** this node can only have one value */
+  singleton = 'singleton',
+  /** this node can take almost all values of its type */
+  wide = 'wide',
+}
+
+/** Decoder for `nodeSpecialRange` */
+export const jNodeSpecialRange: Json.Decoder<nodeSpecialRange> =
+  Json.jEnum(nodeSpecialRange);
+
+/** Natural order for `nodeSpecialRange` */
+export const byNodeSpecialRange: Compare.Order<nodeSpecialRange> =
+  Compare.byEnum(nodeSpecialRange);
+
+/** Default value for `nodeSpecialRange` */
+export const nodeSpecialRangeDefault: nodeSpecialRange =
+  nodeSpecialRange.empty;
+
+const nodeSpecialRangeTags_internal: Server.GetRequest<null,tag[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.dive.nodeSpecialRangeTags',
+  input:  Json.jNull,
+  output: Json.jArray(jTag),
+  signals: [],
+};
+/** Registered tags for the above type. */
+export const nodeSpecialRangeTags: Server.GetRequest<null,tag[]>= nodeSpecialRangeTags_internal;
+
+/** A qualitative or quantitative description of the range of values that this node can take. */
+export type nodeRange = number | nodeSpecialRange;
+
+/** Decoder for `nodeRange` */
+export const jNodeRange: Json.Decoder<nodeRange> =
+  Json.jUnion<number | nodeSpecialRange>( Json.jNumber, jNodeSpecialRange,);
+
+/** Natural order for `nodeRange` */
+export const byNodeRange: Compare.Order<nodeRange> = Compare.structural;
+
+/** Default value for `nodeRange` */
+export const nodeRangeDefault: nodeRange = 0;
+
+export interface node {
+  /** id */
+  id: nodeId;
+  /** label */
+  label: string;
+  /** nkind */
+  nkind: nodeKind;
+  /** locality */
+  locality: nodeLocality;
+  /** is_root */
+  is_root: boolean;
+  /** backward_explored */
+  backward_explored: exploration;
+  /** forward_explored */
+  forward_explored: exploration;
+  /** writes */
+  writes: location[];
+  /** values */
+  values?: string;
+  /** range */
+  range: nodeRange;
+  /** type */
+  type?: string;
+  /** taint */
+  taint?: taint;
+}
 
 /** Decoder for `node` */
 export const jNode: Json.Decoder<node> =
   Json.jObject({
     id: jNodeId,
     label: Json.jString,
-    kind: Json.jString,
+    nkind: jNodeKind,
     locality: jNodeLocality,
     is_root: Json.jBoolean,
-    backward_explored: Json.jString,
-    forward_explored: Json.jString,
+    backward_explored: jExploration,
+    forward_explored: jExploration,
     writes: Json.jArray(jLocation),
     values: Json.jOption(Json.jString),
-    range: Json.jUnion<number | string>( Json.jNumber, Json.jString,),
+    range: jNodeRange,
     type: Json.jOption(Json.jString),
-    taint: Json.jOption(
-             Json.jUnion<"direct" | "indirect" | "untainted">(
-               Json.jTag("direct"),
-               Json.jTag("indirect"),
-               Json.jTag("untainted"),
-             )),
+    taint: Json.jOption(jTaint),
   });
 
 /** Natural order for `node` */
 export const byNode: Compare.Order<node> =
   Compare.byFields
-    <{ id: nodeId, label: string, kind: string, locality: nodeLocality,
-       is_root: boolean, backward_explored: string, forward_explored: string,
-       writes: location[], values?: string, range: number | string,
-       type?: string, taint?: "direct" | "indirect" | "untainted" }>({
+    <{ id: nodeId, label: string, nkind: nodeKind, locality: nodeLocality,
+       is_root: boolean, backward_explored: exploration,
+       forward_explored: exploration, writes: location[], values?: string,
+       range: nodeRange, type?: string, taint?: taint }>({
     id: byNodeId,
     label: Compare.string,
-    kind: Compare.string,
+    nkind: byNodeKind,
     locality: byNodeLocality,
     is_root: Compare.boolean,
-    backward_explored: Compare.string,
-    forward_explored: Compare.string,
+    backward_explored: byExploration,
+    forward_explored: byExploration,
     writes: Compare.array(byLocation),
     values: Compare.defined(Compare.string),
-    range: Compare.structural,
+    range: byNodeRange,
     type: Compare.defined(Compare.string),
-    taint: Compare.defined(Compare.structural),
+    taint: Compare.defined(byTaint),
   });
 
 /** Default value for `node` */
 export const nodeDefault: node =
-  { id: nodeIdDefault, label: '', kind: '', locality: nodeLocalityDefault,
-    is_root: false, backward_explored: '', forward_explored: '', writes: [],
-    values: undefined, range: 0, type: undefined, taint: undefined };
+  { id: nodeIdDefault, label: '', nkind: nodeKindDefault,
+    locality: nodeLocalityDefault, is_root: false,
+    backward_explored: explorationDefault,
+    forward_explored: explorationDefault, writes: [], values: undefined,
+    range: nodeRangeDefault, type: undefined, taint: undefined };
 
 /** The dependency between two nodes */
-export type dependency =
-  { id: number, src: nodeId, dst: nodeId, kind: string, origins: location[] };
+export interface dependency {
+  /** id */
+  id: number;
+  /** src */
+  src: nodeId;
+  /** dst */
+  dst: nodeId;
+  /** dkind */
+  dkind: string;
+  /** origins */
+  origins: location[];
+}
 
 /** Decoder for `dependency` */
 export const jDependency: Json.Decoder<dependency> =
@@ -236,77 +423,111 @@ export const jDependency: Json.Decoder<dependency> =
     id: Json.jNumber,
     src: jNodeId,
     dst: jNodeId,
-    kind: Json.jString,
+    dkind: Json.jString,
     origins: Json.jArray(jLocation),
   });
 
 /** Natural order for `dependency` */
 export const byDependency: Compare.Order<dependency> =
   Compare.byFields
-    <{ id: number, src: nodeId, dst: nodeId, kind: string,
+    <{ id: number, src: nodeId, dst: nodeId, dkind: string,
        origins: location[] }>({
     id: Compare.number,
     src: byNodeId,
     dst: byNodeId,
-    kind: Compare.string,
+    dkind: Compare.string,
     origins: Compare.array(byLocation),
   });
 
 /** Default value for `dependency` */
 export const dependencyDefault: dependency =
-  { id: 0, src: nodeIdDefault, dst: nodeIdDefault, kind: '', origins: [] };
+  { id: 0, src: nodeIdDefault, dst: nodeIdDefault, dkind: '', origins: [] };
 
-/** The whole graph being built */
-export type graphData = { nodes: node[], deps: dependency[] };
+/** A graph element, either a node or a dependency */
+export type element = node | dependency;
+
+/** Decoder for `element` */
+export const jElement: Json.Decoder<element> =
+  Json.jUnion<node | dependency>( jNode, jDependency,);
+
+/** Natural order for `element` */
+export const byElement: Compare.Order<element> = Compare.structural;
+
+/** Default value for `element` */
+export const elementDefault: element = nodeDefault;
+
+/** Data for array rows [`graph`](#graph)  */
+export interface graphData {
+  /** Entry identifier. */
+  key: Json.key<'#graph'>;
+  /** a graph element */
+  element: element;
+}
 
 /** Decoder for `graphData` */
 export const jGraphData: Json.Decoder<graphData> =
-  Json.jObject({ nodes: Json.jArray(jNode), deps: Json.jArray(jDependency),});
+  Json.jObject({ key: Json.jKey<'#graph'>('#graph'), element: jElement,});
 
 /** Natural order for `graphData` */
 export const byGraphData: Compare.Order<graphData> =
   Compare.byFields
-    <{ nodes: node[], deps: dependency[] }>({
-    nodes: Compare.array(byNode),
-    deps: Compare.array(byDependency),
+    <{ key: Json.key<'#graph'>, element: element }>({
+    key: Compare.string,
+    element: byElement,
   });
+
+/** Signal for array [`graph`](#graph)  */
+export const signalGraph: Server.Signal = {
+  name: 'plugins.dive.signalGraph',
+};
+
+const reloadGraph_internal: Server.GetRequest<null,null> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.dive.reloadGraph',
+  input:  Json.jNull,
+  output: Json.jNull,
+  signals: [],
+};
+/** Force full reload for array [`graph`](#graph)  */
+export const reloadGraph: Server.GetRequest<null,null>= reloadGraph_internal;
+
+const fetchGraph_internal: Server.GetRequest<
+  number,
+  { reload: boolean, removed: Json.key<'#graph'>[], updated: graphData[],
+    pending: number }
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.dive.fetchGraph',
+  input:  Json.jNumber,
+  output: Json.jObject({
+            reload: Json.jBoolean,
+            removed: Json.jArray(Json.jKey<'#graph'>('#graph')),
+            updated: Json.jArray(jGraphData),
+            pending: Json.jNumber,
+          }),
+  signals: [],
+};
+/** Data fetcher for array [`graph`](#graph)  */
+export const fetchGraph: Server.GetRequest<
+  number,
+  { reload: boolean, removed: Json.key<'#graph'>[], updated: graphData[],
+    pending: number }
+  >= fetchGraph_internal;
+
+const graph_internal: State.Array<Json.key<'#graph'>,graphData> = {
+  name: 'plugins.dive.graph',
+  getkey: ((d:graphData) => d.key),
+  signal: signalGraph,
+  fetch: fetchGraph,
+  reload: reloadGraph,
+  order: byGraphData,
+};
+/** The graph being built as a set of vertices and edges */
+export const graph: State.Array<Json.key<'#graph'>,graphData> = graph_internal;
 
 /** Default value for `graphData` */
-export const graphDataDefault: graphData = { nodes: [], deps: [] };
-
-/** Graph differences from the last action. */
-export type diffData =
-  { root?: nodeId, add: { nodes: node[], deps: dependency[] }, sub: nodeId[]
-    };
-
-/** Decoder for `diffData` */
-export const jDiffData: Json.Decoder<diffData> =
-  Json.jObject({
-    root: Json.jOption(jNodeId),
-    add: Json.jObject({
-           nodes: Json.jArray(jNode),
-           deps: Json.jArray(jDependency),
-         }),
-    sub: Json.jArray(jNodeId),
-  });
-
-/** Natural order for `diffData` */
-export const byDiffData: Compare.Order<diffData> =
-  Compare.byFields
-    <{ root?: nodeId, add: { nodes: node[], deps: dependency[] },
-       sub: nodeId[] }>({
-    root: Compare.defined(byNodeId),
-    add: Compare.byFields
-           <{ nodes: node[], deps: dependency[] }>({
-           nodes: Compare.array(byNode),
-           deps: Compare.array(byDependency),
-         }),
-    sub: Compare.array(byNodeId),
-  });
-
-/** Default value for `diffData` */
-export const diffDataDefault: diffData =
-  { root: undefined, add: { nodes: [], deps: [] }, sub: [] };
+export const graphDataDefault: graphData =
+  { key: Json.jKey<'#graph'>('#graph')(''), element: elementDefault };
 
 const window_internal: Server.SetRequest<explorationWindow,null> = {
   kind: Server.RqKind.SET,
@@ -318,16 +539,6 @@ const window_internal: Server.SetRequest<explorationWindow,null> = {
 /** Set the exploration window */
 export const window: Server.SetRequest<explorationWindow,null>= window_internal;
 
-const graph_internal: Server.GetRequest<null,graphData> = {
-  kind: Server.RqKind.GET,
-  name:   'plugins.dive.graph',
-  input:  Json.jNull,
-  output: jGraphData,
-  signals: [],
-};
-/** Retrieve the whole graph */
-export const graph: Server.GetRequest<null,graphData>= graph_internal;
-
 const clear_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
   name:   'plugins.dive.clear',
@@ -338,44 +549,44 @@ const clear_internal: Server.ExecRequest<null,null> = {
 /** Erase the graph and start over with an empty one */
 export const clear: Server.ExecRequest<null,null>= clear_internal;
 
-const add_internal: Server.ExecRequest<marker,diffData> = {
+const add_internal: Server.ExecRequest<marker,nodeId | undefined> = {
   kind: Server.RqKind.EXEC,
   name:   'plugins.dive.add',
   input:  jMarker,
-  output: jDiffData,
+  output: Json.jOption(jNodeId),
   signals: [],
 };
 /** Add a node to the graph */
-export const add: Server.ExecRequest<marker,diffData>= add_internal;
+export const add: Server.ExecRequest<marker,nodeId | undefined>= add_internal;
 
-const explore_internal: Server.ExecRequest<nodeId,diffData> = {
+const explore_internal: Server.ExecRequest<nodeId,null> = {
   kind: Server.RqKind.EXEC,
   name:   'plugins.dive.explore',
   input:  jNodeId,
-  output: jDiffData,
+  output: Json.jNull,
   signals: [],
 };
 /** Explore the graph starting from an existing vertex */
-export const explore: Server.ExecRequest<nodeId,diffData>= explore_internal;
+export const explore: Server.ExecRequest<nodeId,null>= explore_internal;
 
-const show_internal: Server.ExecRequest<nodeId,diffData> = {
+const show_internal: Server.ExecRequest<nodeId,null> = {
   kind: Server.RqKind.EXEC,
   name:   'plugins.dive.show',
   input:  jNodeId,
-  output: jDiffData,
+  output: Json.jNull,
   signals: [],
 };
 /** Show the dependencies of an existing vertex */
-export const show: Server.ExecRequest<nodeId,diffData>= show_internal;
+export const show: Server.ExecRequest<nodeId,null>= show_internal;
 
-const hide_internal: Server.ExecRequest<nodeId,diffData> = {
+const hide_internal: Server.ExecRequest<nodeId,null> = {
   kind: Server.RqKind.EXEC,
   name:   'plugins.dive.hide',
   input:  jNodeId,
-  output: jDiffData,
+  output: Json.jNull,
   signals: [],
 };
 /** Hide the dependencies of an existing vertex */
-export const hide: Server.ExecRequest<nodeId,diffData>= hide_internal;
+export const hide: Server.ExecRequest<nodeId,null>= hide_internal;
 
 /* ------------------------------------- */

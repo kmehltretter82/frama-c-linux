@@ -711,7 +711,7 @@ let skip () =
       (fun name l ->
          let vi =
            try
-             Base.of_varinfo (Globals.Vars.find_from_astinfo name VGlobal)
+             Base.of_varinfo (Globals.Vars.find_from_astinfo name Global)
            with Not_found ->
              if name = "NULL" then Base.null
              else

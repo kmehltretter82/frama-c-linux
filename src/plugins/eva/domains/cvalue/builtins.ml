@@ -165,9 +165,10 @@ let prepare_builtin kf (name, builtin, cacheable, expected_typ) =
     Self.warning ~source ~once:true
       ~wkey:Self.wkey_builtins_override
       "The builtin %s will not be used for function %a of incompatible type.@ \
-       (got: %a)."
+       (got: %a. Machdep is %s)."
       name Kernel_function.pretty kf
       Printer.pp_typ (Kernel_function.get_type kf)
+      Cil.theMachine.theMachine.machdep_name
   else
     match find_builtin_specification kf with
     | None ->

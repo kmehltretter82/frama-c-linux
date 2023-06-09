@@ -109,7 +109,7 @@ struct
   let universal_splits =
     let add name l =
       try
-        let vi = Globals.Vars.find_from_astinfo name VGlobal in
+        let vi = Globals.Vars.find_from_astinfo name Global in
         let monitor = Partition.new_monitor ~split_limit in
         let expr = Partition.Expression (Cil.evar vi) in
         Partition.Split (expr, Partition.Dynamic, monitor) :: l

@@ -1836,27 +1836,31 @@ type kernel_function = {
   mutable spec : funspec;
 }
 
-(* [VP] TODO: VLocal should be attached to a particular block, not a whole
-   function. It might be worth it to unify this type with the newer
-   syntactic_scope below.
-*)
-type localisation =
-  | VGlobal
-  | VLocal of kernel_function
-  | VFormal of kernel_function
-
 (** Various syntactic scopes through which an identifier might be searched.
     Note that for this purpose static variables are still tied to the block
     where they were declared in the original source (see {!Cil_types.block}).
     @since Chlorine-20180501
 *)
 type syntactic_scope =
+  | Global
+  (** Any global symbol, whether static or not.
+      @since 27.0-Cobalt
+  *)
   | Program (** Only non-static global symbols. *)
   | Translation_unit of Filepath.Normalized.t
   (** Any global visible within the given C source file. *)
+  | Formal of kernel_function
+  (** formal parameter of the given function.
+      @since 27.0-Cobalt
+  *)
   | Block_scope of stmt
-  (** same as above + all locals of the blocks to which the given statement
+  (** locals (including static locals) of the block to which the given statement
       belongs. *)
+  | Whole_function of kernel_function
+  (** same as above, but any local variable of the given function, regardless of
+      the block to which it is tied, will be considered.
+      @since 27.0-Cobalt
+  *)
 
 (** Definition of a machine model (architecture + compiler).
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
@@ -1872,8 +1876,22 @@ type mach = {
   sizeof_void: int;       (* Size of "void" *)
   sizeof_fun: int;        (* Size of function. Negative if unsupported. *)
   size_t: string;         (* Type of "sizeof(T)" *)
+  ssize_t: string;        (* representation of ssize_t *)
   wchar_t: string;        (* Type of "wchar_t" *)
   ptrdiff_t: string;      (* Type of "ptrdiff_t" *)
+  intptr_t: string;       (* Type of "intptr_t" *)
+  uintptr_t: string;      (* Type of "uintptr_t" *)
+  int_fast8_t: string;     (* Type of "int_fast8_t" *)
+  int_fast16_t: string;     (* Type of "int_fast16_t" *)
+  int_fast32_t: string;     (* Type of "int_fast32_t" *)
+  int_fast64_t: string;     (* Type of "int_fast64_t" *)
+  uint_fast8_t: string;     (* Type of "uint_fast8_t" *)
+  uint_fast16_t: string;     (* Type of "uint_fast16_t" *)
+  uint_fast32_t: string;     (* Type of "uint_fast32_t" *)
+  uint_fast64_t: string;     (* Type of "uint_fast64_t" *)
+  wint_t: string;          (* Type of "wint_t" *)
+  sig_atomic_t: string;   (* Type of "sig_atomic_t" *)
+  time_t: string;          (* Type of "time_t" *)
   alignof_short: int;     (* Alignment of "short" *)
   alignof_int: int;       (* Alignment of "int" *)
   alignof_long: int;      (* Alignment of "long" *)
@@ -1885,8 +1903,6 @@ type mach = {
   alignof_str: int;       (* Alignment of strings *)
   alignof_fun: int;       (* Alignment of function. Negative if unsupported. *)
   char_is_unsigned: bool; (* Whether "char" is unsigned *)
-  underscore_name: bool;  (* If assembly names have leading underscore *)
-  const_string_literals: bool; (* Whether string literals have const chars *)
   little_endian: bool; (* whether the machine is little endian *)
   alignof_aligned: int (* Alignment of a type with aligned attribute *);
   has__builtin_va_list: bool (* Whether [__builtin_va_list] is a known type *);
@@ -1895,6 +1911,24 @@ type mach = {
   cpp_arch_flags: string list;  (* Architecture-specific flags to be given to
                                    the preprocessor (if supported) *)
   version: string;        (* Information on this machdep *)
+  weof: string; (* expansion of WEOF macro, empty if undefined *)
+  wordsize: string; (* expansion of __WORDSIZE macro, empty if undefined *)
+  posix_version: string; (* expansion of _POSIX_VERSION macro, empty if undefined *)
+  bufsiz: string; (* expansion of BUFSIZ macro *)
+  eof: string; (* expansion of EOF macro *)
+  fopen_max: string; (* expansion of FOPEN_MAX macro *)
+  filename_max: string; (* expansion of FILENAME_MAX macro *)
+  host_name_max: string; (* expansion of HOST_NAME_MAX macro *)
+  tty_name_max: string; (* expansion of TTY_NAME_MAX macro *)
+  l_tmpnam: string; (* expansion of L_tmpnam macro *)
+  path_max: string; (* expansion of PATH_MAX macro *)
+  tmp_max: string; (* expansion of TMP_MAX macro *)
+  rand_max: string; (* expansion of RAND_MAX macro *)
+  mb_cur_max: string; (* expansion of MB_CUR_MAX macro *)
+  nsig: string; (* expansion of non-standard NSIG macro, empty if undefined *)
+  errno: (string * string) list; (* list of macros defining errors in errno.h*)
+  machdep_name: string; (* name of the machdep *)
+  custom_defs: string; (* arbitrary text to be written in the header *)
 }
 
 (*

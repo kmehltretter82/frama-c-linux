@@ -42,9 +42,12 @@ let package =
     ~title:"Eva Values"
     ()
 
-type probe =
-  | Pexpr of exp * stmt
-  | Plval of lval * stmt
+type term = Pexpr of exp | Plval of lval | Ppred of predicate
+type evaluation_point = General_requests.evaluation_point =
+    Initial | Pre of kernel_function | Stmt of kernel_function * stmt
+
+(* A term and the program point where it should be evaluated. *)
+type probe = term * evaluation_point
 
 type callstack = Value_types.callstack
 type truth = Abstract_interp.truth
@@ -81,32 +84,53 @@ let () = Analysis.register_computation_hook ~on:Computed
 (* --- Marker Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let next_steps s =
-  match s.skind with
-  | If (cond, _, _, _) -> [ `Then cond ; `Else cond ]
-  | Instr (Set _ | Call _ | Local_init _) -> [ `After ]
-  | Instr (Asm _ | Code_annot _)
-  | Switch _ | Loop _ | Block _ | UnspecifiedSequence _
-  | TryCatch _ | TryFinally _ | TryExcept _
-  | Instr (Skip _) | Return _ | Break _ | Continue _ | Goto _ | Throw _ -> []
+let next_steps = function
+  | Initial | Pre _ -> []
+  | Stmt (_, stmt) ->
+    match stmt.skind with
+    | If (cond, _, _, _) -> [ `Then cond ; `Else cond ]
+    | Instr (Set _ | Call _ | Local_init _) -> [ `After ]
+    | Instr (Asm _ | Code_annot _)
+    | Switch _ | Loop _ | Block _ | UnspecifiedSequence _
+    | TryCatch _ | TryFinally _ | TryExcept _
+    | Instr (Skip _) | Return _ | Break _ | Continue _ | Goto _ | Throw _ -> []
 
-let probe_stmt s =
-  match s.skind with
-  | Instr (Set(lv,_,_)) -> Some (Plval (lv,s))
-  | Instr (Call(Some lr,_,_,_)) -> Some (Plval (lr,s))
-  | Instr (Local_init(v,_,_)) -> Some (Plval ((Var v,NoOffset), s))
-  | Return (Some e,_) | If(e,_,_,_) | Switch(e,_,_,_) -> Some (Pexpr (e,s))
-  | _ -> None
+let probe_stmt stmt =
+  match stmt.skind with
+  | Instr (Set (lv, _, _))
+  | Instr (Call (Some lv, _, _, _)) -> Plval lv
+  | Instr (Local_init (v, _, _)) -> Plval (Var v, NoOffset)
+  | Return (Some e, _) | If (e, _, _, _) | Switch (e, _, _, _) -> Pexpr e
+  | _ -> raise Not_found
+
+let probe_code_annot = function
+  | AAssert (_, p) | AInvariant (_, true, p) -> Ppred p.tp_statement
+  | _ -> raise Not_found
+
+let probe_property = function
+  | Property.IPCodeAnnot ica -> probe_code_annot ica.ica_ca.annot_content
+  | IPPropertyInstance { ii_pred = Some pred }
+  | IPPredicate {ip_pred = pred} ->
+    Ppred (Logic_const.pred_of_id_pred pred)
+  | _ -> raise Not_found
+
+let probe_marker = function
+  | Printer_tag.PLval (_, _, lval)
+    when Cil.(isFunctionType (typeOfLval lval)) -> raise Not_found
+  | PVDecl (_, _, vi) when Cil.isFunctionType vi.vtype -> raise Not_found
+  | PLval (_, _, l) -> Plval l
+  | PExp (_, _, e) -> Pexpr e
+  | PStmt (_, s) | PStmtStart (_, s) -> probe_stmt s
+  | PVDecl (_, _, v) -> Plval (Var v, NoOffset)
+  | PTermLval (kf, _, _, tlval) ->
+    Plval (General_requests.term_lval_to_lval kf tlval)
+  | PIP property -> probe_property property
+  | _ -> raise Not_found
 
 let probe marker =
-  let open Printer_tag in
-  match marker with
-  | PLval (_, _, (Var vi, NoOffset)) when Cil.isFunctionType vi.vtype -> None
-  | PLval(_,Kstmt s,l) -> Some (Plval (l,s))
-  | PExp(_,Kstmt s,e) -> Some (Pexpr (e,s))
-  | PStmt(_,s) | PStmtStart(_,s) -> probe_stmt s
-  | PVDecl(_,Kstmt s,v) -> Some (Plval ((Var v,NoOffset),s))
-  | _ -> None
+  try Some (probe_marker marker,
+            General_requests.marker_evaluation_point marker)
+  with Not_found -> None
 
 (* -------------------------------------------------------------------------- *)
 (* --- Stmt Ranking                                                       --- *)
@@ -329,7 +353,8 @@ let filter_variables bases =
 (* -------------------------------------------------------------------------- *)
 
 module type EvaProxy = sig
-  val callstacks : stmt -> callstack list
+  val kf_callstacks : kernel_function -> callstack list
+  val stmt_callstacks : stmt -> callstack list
   val evaluate : probe -> callstack option -> evaluations
 end
 
@@ -346,58 +371,77 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
     let default = fun _ -> Cvalue.V.top in
     Option.value ~default (A.Val.get Main_values.CVal.key)
 
-  let callstacks stmt =
-    match A.get_stmt_state_by_callstack ~after:false stmt with
+  let callstacks get_state_by_callstack elt =
+    match get_state_by_callstack elt with
     | `Top | `Bottom -> []
-    | `Value states -> CSmap.fold_sorted (fun cs _ wcs -> cs :: wcs) states []
+    | `Value states -> CSmap.fold (fun cs _ acc -> cs :: acc) states []
 
-  let dstate ~after stmt = function
-    | None -> (A.get_stmt_state ~after stmt :> dstate)
+  let kf_callstacks = callstacks A.get_initial_state_by_callstack
+  let stmt_callstacks = callstacks (A.get_stmt_state_by_callstack ~after:false)
+
+  let get_state get_consolidated get_by_callstack arg = function
+    | None -> get_consolidated arg
     | Some cs ->
-      match A.get_stmt_state_by_callstack ~selection:[cs] ~after stmt with
+      match get_by_callstack ?selection:(Some [cs]) arg with
       | (`Top | `Bottom) as res -> res
       | `Value cmap ->
         try `Value (CSmap.find cmap cs)
         with Not_found -> `Bottom
+
+  let get_stmt_state ~after =
+    get_state (A.get_stmt_state ~after) (A.get_stmt_state_by_callstack ~after)
+
+  let get_initial_state =
+    get_state A.get_initial_state A.get_initial_state_by_callstack
+
+  let domain_state callstack = function
+    | Initial -> A.get_global_state ()
+    | Pre kf -> get_initial_state kf callstack
+    | Stmt (_, stmt) -> get_stmt_state ~after:false stmt callstack
 
   (* --- Converts an evaluation [result] into an exported [value]. ---------- *)
 
   (* Result of an evaluation: a generic value for scalar types, or an offsetmap
      for struct and arrays. *)
   type result =
-    | Value of A.Val.t
+    | Value of A.Val.t Eval.flagged_value
     | Offsetmap of offsetmap
+    | Status of truth
 
   let pp_result typ fmt = function
-    | Value v -> A.Val.pretty fmt v
+    | Value v -> (Eval.Flagged_Value.pretty (A.Val.pretty_typ (Some typ))) fmt v
     | Offsetmap offsm -> pp_offsetmap typ fmt offsm
+    | Status truth -> Alarmset.Status.pretty fmt truth
 
   let get_pointed_bases = function
-    | Value v -> get_bases (get_cvalue v)
+    | Value v -> get_bases (Bottom.fold ~bottom:Cvalue.V.bottom get_cvalue v.v)
     | Offsetmap offsm -> get_pointed_bases offsm
+    | Status _ -> Base.Hptset.empty
 
-  let get_pointed_markers stmt result =
+  let get_pointed_markers eval_point result =
     let bases = get_pointed_bases result in
     let vars = filter_variables bases in
-    let kf =
-      try Some (Kernel_function.find_englobing_kf stmt)
-      with Not_found -> None
+    let kf, kinstr =
+      match eval_point with
+      | Initial -> None, Kglobal
+      | Pre kf -> Some kf, Kglobal
+      | Stmt (kf, stmt) -> Some kf, Kstmt stmt
     in
     let to_marker vi =
       let text = Pretty_utils.to_string Printer.pp_varinfo vi in
-      let marker = Printer_tag.PLval (kf, Kstmt stmt, Cil.var vi) in
+      let marker = Printer_tag.PLval (kf, kinstr, Cil.var vi) in
       text, marker
     in
     List.map to_marker vars
 
   (* Creates an exported [value] from an evaluation result. *)
-  let make_value typ stmt (result, alarms) =
+  let make_value typ eval_point (result, alarms) =
     let descr = Format.asprintf "@[<hov 2>%a@]" Alarms.pretty in
     let f alarm status acc = (status, descr alarm) :: acc in
     let alarms = Alarmset.fold f [] alarms |> List.rev in
     let pretty_eval = Bottom.pretty (pp_result typ) in
     let value = Pretty_utils.to_string pretty_eval result in
-    let pointed_markers = get_pointed_markers stmt in
+    let pointed_markers = get_pointed_markers eval_point in
     let pointed_vars = Bottom.fold ~bottom:[] pointed_markers result in
     { value; alarms; pointed_vars }
 
@@ -417,13 +461,25 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   let eval_lval lval state =
     match Cil.(unrollType (typeOfLval lval)) with
     | TInt _ | TEnum _ | TPtr _ | TFloat _ ->
-      A.copy_lvalue state lval >>=. fun value ->
-      value.v >>-: fun v -> Value v
+      A.copy_lvalue state lval >>=: fun value -> Value value
     | _ ->
       lval_to_offsetmap lval state >>=: fun offsm -> Offsetmap offsm
 
   let eval_expr expr state =
-    A.eval_expr state expr >>=: fun value -> Value value
+    A.eval_expr state expr >>=: fun value ->
+    Value { v = `Value value; initialized = true; escaping = false }
+
+  let eval_pred eval_point predicate state =
+    let result =
+      match eval_point with
+      | Initial | Pre _ -> None
+      | Stmt (kf, _) -> Eva_utils.find_return_var kf
+    in
+    let env =
+      Abstract_domain.{ states = (function _ -> A.Dom.top) ; result }
+    in
+    let truth = A.Dom.evaluate_predicate env state predicate in
+    `Value (Status truth), Alarmset.none
 
   (* --- Evaluates all steps (before/after the statement). ------------------ *)
 
@@ -434,32 +490,34 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
       let else_state = (A.assume_cond stmt state cond false :> dstate) in
       Cond (eval then_state, eval else_state)
     | Instr (Set _ | Call _ | Local_init _) ->
-      let after_state = dstate ~after:true stmt callstack in
+      let after_state = get_stmt_state ~after:true stmt callstack in
       After (eval after_state)
     | _ -> Nothing
 
-  let eval_steps typ eval stmt callstack =
+  let eval_steps typ eval eval_point callstack =
     let default value = { value; alarms = []; pointed_vars = []; } in
     let eval = function
       | `Bottom -> default "Unreachable"
       | `Top -> default "No information"
-      | `Value state -> make_value typ stmt (eval state)
+      | `Value state -> make_value typ eval_point (eval state)
     in
-    let before = dstate ~after:false stmt callstack in
+    let before = domain_state callstack eval_point in
     let here = eval before in
     let next =
-      match before with
-      | `Bottom | `Top -> Nothing
-      | `Value state -> do_next eval state stmt callstack
+      match before, eval_point with
+      | `Value state, Stmt (_, stmt) -> do_next eval state stmt callstack
+      | _ -> Nothing
     in
     { here; next; }
 
-  let evaluate p callstack =
-    match p with
-    | Plval (lval, stmt) ->
-      eval_steps (Cil.typeOfLval lval) (eval_lval lval) stmt callstack
-    | Pexpr (expr, stmt) ->
-      eval_steps (Cil.typeOf expr) (eval_expr expr) stmt callstack
+  let evaluate (term, eval_point) callstack =
+    match term with
+    | Plval lval ->
+      eval_steps (Cil.typeOfLval lval) (eval_lval lval) eval_point callstack
+    | Pexpr expr ->
+      eval_steps (Cil.typeOf expr) (eval_expr expr) eval_point callstack
+    | Ppred pred ->
+      eval_steps Cil.intType (eval_pred eval_point pred) eval_point callstack
 end
 
 let proxy =
@@ -481,11 +539,14 @@ let () =
     ~output:(module Jlist(Jcallstack))
     begin fun markers ->
       let module A : EvaProxy = (val proxy ()) in
-      let add stmt = List.fold_right CSet.add (A.callstacks stmt) in
       let gather_callstacks cset marker =
-        match probe marker with
-        | Some (Pexpr (_, stmt) | Plval (_, stmt)) -> add stmt cset
-        | None -> cset
+        let list =
+          match probe marker with
+          | Some (_, Stmt (_, stmt)) -> A.stmt_callstacks stmt
+          | Some (_, Pre kf) -> A.kf_callstacks kf
+          | Some (_, Initial) | None -> []
+        in
+        List.fold_left (fun set elt -> CSet.add elt set) cset list
       in
       let cset = List.fold_left gather_callstacks CSet.empty markers in
       Ranking.sort (CSet.elements cset)
@@ -528,6 +589,11 @@ let () =
 (* --- Request getProbeInfo                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
+let is_reachable = function
+  | Stmt (_, stmt) -> Results.is_reachable stmt
+  | Pre kf -> Results.is_called kf
+  | Initial -> Results.is_reachable_kinstr Kglobal
+
 let () =
   let getProbeInfo = Request.signature ~input:(module Jmarker) () in
   let set_evaluable = Request.result getProbeInfo
@@ -539,9 +605,6 @@ let () =
   and set_stmt = Request.result_opt getProbeInfo
       ~name:"stmt" ~descr:(Md.plain "Probe statement")
       (module Jstmt)
-  and set_rank = Request.result getProbeInfo
-      ~name:"rank" ~descr:(Md.plain "Probe statement rank")
-      ~default:0 (module Jint)
   and set_effects = Request.result getProbeInfo
       ~name:"effects" ~descr:(Md.plain "Effectfull statement")
       ~default:false (module Jbool)
@@ -549,27 +612,30 @@ let () =
       ~name:"condition" ~descr:(Md.plain "Conditional statement")
       ~default:false (module Jbool)
   in
-  let set_probe rq pp p s =
+  let set_probe rq pp p eval_point =
     let computed = Analysis.is_computed () in
-    let reachable = Results.is_reachable s in
+    let reachable = is_reachable eval_point in
     set_evaluable rq (computed && reachable);
-    set_code rq (Some (Pretty_utils.to_string pp p)) ;
-    set_stmt rq (Some s) ;
-    set_rank rq (Ranking.stmt s) ;
+    set_code rq (Some (Pretty_utils.to_string pp p));
+    set_stmt rq (match eval_point with Stmt (_, s) -> Some s | _ -> None);
     let on_steps = function
       | `Here -> ()
       | `Then _ | `Else _ -> set_condition rq true
       | `After -> set_effects rq true
-    in List.iter on_steps (next_steps s)
+    in
+    List.iter on_steps (next_steps eval_point)
   in
   Request.register_sig ~package getProbeInfo
     ~kind:`GET ~name:"getProbeInfo"
     ~descr:(Md.plain "Probe informations")
     begin fun rq marker ->
       match probe marker with
-      | Some (Plval (l, s)) -> set_probe rq Printer.pp_lval l s
-      | Some (Pexpr (e, s)) -> set_probe rq Printer.pp_exp  e s
       | None -> set_evaluable rq false
+      | Some (term, eval_point) ->
+        match term with
+        | Plval l -> set_probe rq Printer.pp_lval l eval_point
+        | Pexpr e -> set_probe rq Printer.pp_exp e eval_point
+        | Ppred p -> set_probe rq Printer.pp_predicate p eval_point
     end
 
 (* -------------------------------------------------------------------------- *)

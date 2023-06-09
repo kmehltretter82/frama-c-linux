@@ -14,23 +14,60 @@
 # '#?nnn'  : OLD-BTS entry #nnn                                               #
 ###############################################################################
 
-##################################
+###############################################################################
 Open Source Release <next-release>
-##################################
+###############################################################################
 
+###############################################################################
+Open Source Release 27.0 (Cobalt)
+###############################################################################
+
+-!  Kernel    [2023-05-15] New machdep mechanism, based on YAML files. A new
+              make_machdep.py script allows automatic machdep creation from a
+              C11-compatible (cross-)compiler.
+-   Eva       [2023-05-04] The octagon domain can now infer relations between
+              any lvalues of integer or pointer types.
+-*  Ivette    [2023-05-02] Ends properly frama-c process when Ivette is closed.
+-*  Ivette    [2023-05-02] Custom views are correctly saved and reloaded.
+-*  Eva       [2023-05-02] Fixes interpretation of Eva annotations at the end of
+              a block, and of multiple split annotations after a function call.
+-   Eva       [2023-04-24] When possible, Eva shows the name of enumeration tags
+              instead of their integer values, in the log and the GUI.
+-   Aorai     [2023-04-24] Allows comments in .ya automata files.
+-   Aorai     [2023-04-24] Supports specification about floating-point variables.
+-   Ivette    [2023-04-24] New callgraph component.
+-   Ivette    [2023-04-07] The values table shows the status of uninitialized
+              and escaping variables.
+-   Eva       [2023-04-05] Better display of large integer sets for high values
+              of the -eva-ilevel parameter.
+-   Ivette    [2023-03-31] The values table shows values of function parameters.
+-   Ivette    [2023-03-31] The values table can show the logical status of ACSL
+              predicates, and the values of C lvalues in these predicates.
+o!  GUI       [2023-03-27] Remove GTK2 bindings. Only support GTK3 as of now.
+-   Ivette    [2023-03-23] Improves function filtering in the left sidebar.
+-   Ivette    [2023-03-23] Better display of dead and non-terminating statements.
+-*  Eva       [2023-03-13] Fixes a soundness bug of the equality domain when
+              the same equality holds in two programs paths, but involving a
+              pointer pointing to different variables in the two paths.
 -   Kernel    [2023-03-03] Deprecate option -c11 (now enabled by default).
+-   Ivette    [2023-02-15] Shows information about C types in the Inspector.
+-   Eva       [2023-02-06] Fixes performance issues on programs with too many
+              function calls (more than 20000 callsites).
 -!  Kernel    [2023-01-25] Add support for C11's _Generic. Modifies Cabs AST.
+-*  Eva       [2023-01-16] Fixes unsoundness of the bitwise domain on shifts
+              and casts on big-endian architectures.
+-   Eva       [2023-01-12] Better partitioning splits on ACSL predicates.
 
-###############################
+###############################################################################
 Open Source Release 26.1 (Iron)
-###############################
+###############################################################################
 
 -   Logic     [2023-01-16] Accept \ghost attribute in logic annotations (##2638)
 -   Logic     [2023-01-10] Fix issue in pretty-printing ranges (##2639)
 
-###############################
+###############################################################################
 Open Source Release 26.0 (Iron)
-###############################
+###############################################################################
 
 -   Ivette    [2022-10-26] After an Eva analysis with taint, the taint status of
               lvalues is shown in the Inspector component and in Dive graphs.
@@ -68,9 +105,9 @@ o!  Pdg       [2022-07-01] Removed from Db. Use proper Pdg API instead.
 -   Eva       [2022-05-11] Avoid false alarms of partially overlapping lvalue
               assignments when writing a struct array from itself.
 
-####################################
+###############################################################################
 Open Source Release 25.0 (Manganese)
-####################################
+###############################################################################
 
 o   Kernel    [2022-05-03] Prototype of AST comparison between two versions
               of the same program, via the new option -ast-diff.
@@ -108,9 +145,9 @@ o!  Kernel    [2021-11-29] Integer.pretty does not have the optional argument
               hexa anymore. Use Integer.pretty_hex or Integer.pp_hex if you
               want to print integers in hexadecimal format.
 
-###################################
+###############################################################################
 Open Source Release 24.0 (Chromium)
-###################################
+###############################################################################
 
 -*  Eva       [2022-01-19] Always emits alarms about initialization, escaping
               pointers and special floating-point values for the arguments of
@@ -173,13 +210,13 @@ o   Ptests    [2021-06-03] Add new PLUGIN directive and new predefined macros.
               Tainted properties can then be seen in the future GUI Ivette.
 -   Eva       [2021-05-11] Support for ACSL predicate \is_infinite.
 
-###################################
+###############################################################################
 Open Source Release 23.1 (Vanadium)
-###################################
+###############################################################################
 
-###################################
+###############################################################################
 Open Source Release 23.0 (Vanadium)
-###################################
+###############################################################################
 
 -*  Kernel    [2021-04-26] Do not crash on _Alignof(void): accept or properly
               reject, depending on machdep. Fixes pub/frama-c#2551
@@ -253,9 +290,9 @@ o   Kernel    [2020-11-27] Extract builtin-related functions from module Cil
               Frama_C_dump_each in ghost code.
 -   Metrics   [2020-10-27] Add json output in addition to text and html.
 
-###################################
+###############################################################################
 Open Source Release 22.0 (Titanium)
-###################################
+###############################################################################
 
 -   MdR       [2020-10-19] Update Sarif output to 2.1.0 + prettier URI
 -   Dev       [2020-10-20] Support for OCamlGraph 2.0.0
@@ -302,13 +339,13 @@ Open Source Release 22.0 (Titanium)
 -   Eva       [2020-05-20] Supports the ACSL mathematical operator \abs
 -   Kernel    [2020-05-18] Support for C11's _Noreturn function specifier
 
-###################################
+###############################################################################
 Open Source Release 21.1 (Scandium)
-###################################
+###############################################################################
 
-###################################
+###############################################################################
 Open Source Release 21.0 (Scandium)
-###################################
+###############################################################################
 
 -*  Doc       [2020-05-07] Fixes internal refs in generated pdfs (fixes #2505)
 -*  Kernel    [2020-05-04] Accept UCN-encoded unicode char in ACSL (fixes #@849)
@@ -388,9 +425,9 @@ o!  Kernel    [2020-02-04] Removed FCBuffer, FCMap and FCSet. Use directly
                 overrides the global option for the given functions;
               - via /*@ subdivide N; */ annotations on specific statements.
 
-##################################
+###############################################################################
 Open Source Release 20.0 (Calcium)
-##################################
+###############################################################################
 
 -   Eva       [2019-11-25] In the summary, fixes the number of alarms by
               category when the RTE plugin is used, and do not count logical
@@ -447,9 +484,9 @@ o!  Kernel    [2019-06-28] removes AST constructors TCoerce, TCoerceE,
               PLCoercion, PLCoercionE, Psubtype and PLsubtype
 -*  Kernel    [2019-06-20] fixes dangling ref when removing unused static local
 
-####################################
+###############################################################################
 Open Source Release 19.0 (Potassium)
-####################################
+###############################################################################
 
 -*  RTE       [2019-05-24] fixes a crash when visiting variable declarations
 -   Eva       [2019-04-19] The new annotation /*@ split exp; */ enumerates the
@@ -516,9 +553,9 @@ o   Kernel    [2018-12-11] New functions for retrieving major and minor version
 -*  Kernel    [2018-12-04] Fixes AST integrity check wrt volatile accesses
 -*  Kernel    [2018-11-21] Fixes #@553 - pretty-printing of basic asm template
 
-################################
+###############################################################################
 Open Source Release 18.0 (Argon)
-################################
+###############################################################################
 
 -!  Kernel    [2018-10-24] Log.error and Log.failure will eventually make
               Frama-C exit with a non-zero status. Fixes #@552
@@ -627,15 +664,15 @@ o*  Ptests    [2018-07-02] Do not keep oracles for empty stderr. Fixes #@402
               specific code annotations /*@ loop unroll N; */. The new strategy
               may affect analyses even without loop unrolling.
 
-############################################
+###############################################################################
 Open Source Release 17.1 (Chlorine-20180502)
-############################################
+###############################################################################
 
 -  Libc       [2018-07-05] Fix C++ compatibility for Frama-Clang plug-in
 
-############################################
+###############################################################################
 Open Source Release 17.0 (Chlorine-20180501)
-############################################
+###############################################################################
 
 -  Eva        [2018-04-25] Added scripts and templates to help automate case
               studies (in $FRAMAC_SHARE/analysis-scripts)
@@ -767,9 +804,9 @@ o! Eva        [2017-11-09] The Fval module now supports NaN and infinite values.
 -* Eva        [2017-10-27] Fix bug in the handling of non-explicitly volatile
               fields inside volatile structs or unions
 
-##########################################
+###############################################################################
 Open Source Release 16.0 (Sulfur-20171101)
-##########################################
+###############################################################################
 
 -* Eva        [2017-10-27] Fix bugs when evaluating \ìnitialized, \dangling
               and \separated on addresses of bitfields
@@ -900,9 +937,9 @@ o! Kernel     [2017-04-27] Completely separate types between Cil_types and
 -  Eva        [2017-04-06] More precise evaluation of \initialized and
               \dangling predicates.
 
-##############################################
+###############################################################################
 Open Source Release 15.0 (Phosphorus-20170501)
-##############################################
+###############################################################################
 
 -* Eva        [2017-05-08] Fix widening in the gauges domain, in particular with
               nested loops and pointers that change base address through
@@ -987,9 +1024,9 @@ o! Gui        [2017-03-10] Signature change for constructor
 o* Eva        [2016-10-22] Functions Db.Value.fun_set_args and
               Db.Value.globals_set_initial_state are now compatible with Eva.
 
-###########################################
+###############################################################################
 Open Source Release 14.0 (Silicon-20161101)
-###########################################
+###############################################################################
 
 -*! Eva       [2016-10-29] Fix soundness bug on statements with RTE or
               programmatically-added user assertions (bts #2258). This
@@ -1136,9 +1173,9 @@ o  Makefile   [2016-03-31] Warnings and warn-error are activated only if a file
 o! Kernel     [2016-03-29] Functions Integer.pgcd and Integer.ppcm are now
               guaranteed to return a positive result.
 
-#############################################
+###############################################################################
 Open Source Release 13.0 (Aluminium-20160502)
-#############################################
+###############################################################################
 
 -  Value      [2016-04-19] Support for evaluation of predicate
               \valid_read_string on constant strings.
@@ -1311,9 +1348,9 @@ o  Ptests     [2015-07-29] New EXEC: directive.
 -  Kernel     [2015-07-01] New option -remove-projects.
 -  Kernel     [2015-06-30] New option -set-project-as-default.
 
-#############################################
+###############################################################################
 Open Source Release 12.0 (Magnesium-20151002)
-#############################################
+###############################################################################
 
 o! Kernel     [2016-01-03] Modules Dataflow is deprecated, and will be removed
               in Aluminium. Module Dataflow2 offers a very similar but simpler
@@ -1535,9 +1572,9 @@ o! Kernel     [2015-30-01] Fixed bug #!2012 about combining
               subdividing may avoid the emission of an alarm.
 -  Value      [2015-01-21] Support for \subset predicate.
 
-##########################################
+###############################################################################
 Open Source Release 11.0 (Sodium-20150201)
-##########################################
+###############################################################################
 
 -  Kernel     [2015-02-01] Tests are added to the distrib (make tests).
 -* Logic      [2015-02-09] The ACSL parser accepts qualifiers in logic C types.
@@ -1755,9 +1792,9 @@ o  Logic      [2014-03-04] Annotations.{iter,fold}_all_code_annot are now
 -* Configure   [2014-03-10] fix for autoconf < 2.67 when checking ability
                of default pre-processor to keep comments
 
-########################################
+###############################################################################
 Open Source Release 10.0 (Neon-20140301)
-########################################
+###############################################################################
 
 -* Value      [2014-03-04] Fix bug when writing imprecisely in a struct
               containing a 1-bit wide bitfield (bug #!1671)
@@ -2126,15 +2163,15 @@ o! Value      [2013-05-03] Remove functions Cvalue.Model.pretty_without_null and
               reference to the real function. Removed last argument of
               Cvalue.Model.pretty_filter.
 
-###########################################
+###############################################################################
 Open Source Release 9.2 (Fluorine-20130601)
-###########################################
+###############################################################################
 
 -* Value      [2013-06-11] Add missing C library files.
 
-###########################################
+###############################################################################
 Open Source Release 9.1 (Fluorine-20130501)
-###########################################
+###############################################################################
 
 -  Value      [2013-05-22] Better precision for ^ (bitwise xor) operator
               when applied on intervals of positive integers
@@ -2147,9 +2184,9 @@ o* Kernel     [2013-05-06] Fixed Type.pp_ml_name for polymorphic types
 -* Makefile   [2013-05-06] Fixed installation directory of the doc in
               plug-in's Makefile (bug #1278).
 
-###########################################
+###############################################################################
 Open Source Release 9.0 (Fluorine-20130401)
-###########################################
+###############################################################################
 
 o! Cil        [2013-04-11] Remove Cil pretty-printer. Use module Printer
               instead. The script bin/oxygen2fluorine.sh may be used to
@@ -2405,9 +2442,9 @@ o  Kernel     [2012-09-20] Provide Datatype.triple and Datatype.quadruple
 o* Kernel     [2012-09-20] Fixed consistency check of descriptor when
               building polymorphic datatypes (fixed bts #1277).
 
-#########################################
+###############################################################################
 Open Source Release 8.0 (Oxygen-20120901)
-#########################################
+###############################################################################
 
 -! Kernel     [2012-09-17] Remove useless negative options -no-help,
               -no-version, -no-print-share-path, -no-print-lib-path and
@@ -2786,9 +2823,9 @@ o! Kernel     [2011-10-18] Logic_preprocess.file takes an additional parameter,
               completely invalid. Soundness was not affected (the
               alarm for whatever made e invalid was present).
 
-###########################################
+###############################################################################
 Open Source Release 7.0 (Nitrogen-20111001)
-###########################################
+###############################################################################
 
 -  Rte        [2011-10-07] No longer position 'Don't know' statuses
 -  Value      [2011-10-07] New alarm for left shift of negative values.
@@ -3240,9 +3277,9 @@ o  Cil/Logic  [2011-02-16] New functions Clexer.is_c_keyword and
 -* Value      [2011-02-09] Changes related to 0., +0., -0., sort of thing.
               Unwarranted loss of precision fixed.
 
-#########################################
+###############################################################################
 Open Source Release 6.2 (Carbon-20110201)
-#########################################
+###############################################################################
 
 -  WP         [2011-02-07] Plug-in WP removed from kernel-releases (now an
               independent plug-in).
@@ -3353,17 +3390,17 @@ o* Cil        [2010-12-20] Fixed bug #645. Ast_info.constant_expr,
               ~loc:Cil_datatype.Location.unknown which is most of the time
               not accurate.
 
-#########################################
+###############################################################################
 Open Source Release 6.1 (Carbon-20101202)
-#########################################
+###############################################################################
 
 -* WP         [2010-12-16] Fixed bug #639: no more Coq compilation to shared
               directory.
 - WP          [2010-12-16] Accessibility of all provers from gui.
 
-#########################################
+###############################################################################
 Open Source Release 6.0 (Carbon-20101201)
-#########################################
+###############################################################################
 
 -! Kernel     [2010-12-13] Fixed bug #548: limit.h now syntactically correct.
               Architectures other than x86_32 still unsupported.
@@ -3564,9 +3601,9 @@ o! Kernel     [2010-04-22] Ptmap (resp. Ptset) is renamed into Hptmap (Hptset)
 +  Logic      [2010-04-13] #!346 Formals have an \old label when used in post
               conditions
 
-########################################
+###############################################################################
 Open Source Release 5.0 (Boron-20100401)
-########################################
+###############################################################################
 
 -  Kernel     [2010-04-12] Preliminary standard C library in $FRAMAC_SHARE/libc
 o* Cil        [2010-04-12] New hook after Cabs elaboration (fix bug #!446)
@@ -3735,9 +3772,9 @@ o! Cil        [2009-09-28] pAssigns now prints directly a whole list of assigns
 -  Value      [2009-09-25] Improved treatment of "assigns p[..]" clauses
               in -input
 
-############################################
+###############################################################################
 Open Source Release 4.2 (Beryllium-20090902)
-############################################
+###############################################################################
 
 -* Obfuscator [2009-09-23] obfuscator does not lose links between logic
               and C variables anymore (bts #250).
@@ -3787,9 +3824,9 @@ o* Makefile   [2009-09-18] Fixed bugs with the use of PLUGIN_EXTRA_BYTE
               which does not support native dynlink and with ocaml >= 3.11
               (bts #224).
 
-############################################
+###############################################################################
 Open Source Release 4.1 (Beryllium-20090901)
-############################################
+###############################################################################
 
 -! Syntactic_callgraph [2009-08-27] New design of the callgraph in the GUI.
               Frama-C now requires ocamlgraph 1.2.
@@ -3832,9 +3869,9 @@ o! Cil        [2009-06-24] Added 2 components to Cil_types.typ to optimize
 -* Kernel     [2009-06-24] Restore compatibility with ocaml 3.10.2
 -* Configure  [2009-06-24] Fixed bug with --disable-gui in configure.in
 
-############################################
+###############################################################################
 Open Source Release 4.0 (Beryllium-20090601)
-############################################
+###############################################################################
 
 o  Value      [2009-06-23] New constructor Signed_overflow_alarm for type
               Alarms.t
@@ -4024,9 +4061,9 @@ o! Kernel     [2009-01-05] Some changes in API of module Type
 -  Value      [2008-12-18] Improved support for state reduction on a
               memory read.
 
-##########################################
+###############################################################################
 Open Source Release 3.1 (Lithium-20081201)
-##########################################
+###############################################################################
 
 -! GUI        [2008-12-09] Improved consistency of some information messages.
 -  Value      [2008-12-09] Abstract structs are now supported in
@@ -4071,9 +4108,9 @@ o  Cil        [2008-11-17] New methods for visiting compinfo, enuminfo,
 o  Makefile   [2008-11-03] Support for native compilation in Makefile.template
               (require ocaml >= 3.11).
 
-##########################################
+###############################################################################
 Open Source Release 3.0 (Lithium-20081002)
-##########################################
+###############################################################################
 
 -! Value      [2008-10-23] Changed behavior of option
               -context-valid-pointers to make it more like the
@@ -4133,9 +4170,9 @@ o! Kernel     [2008-09-11] Refined UnspecifiedSequence information.
 o! Cil        [2008-07-17] AST changes for unspecified sequences (experimental).
 -* Jessie     [2008-07-16] Fixed path problems with binary distributions.
 
-#########################################
+###############################################################################
 Open Source Release 2.0 (Helium-20080701)
-#########################################
+###############################################################################
 
 -  Occurrence [2008-07-11] Occurrences of a variable can be computed from
               any occurrence of the program (not only from its declaration).
@@ -4204,17 +4241,17 @@ o! Logic      [2008-06-24] AST changes for invariants.
 -* Kernel     [2008-06-03] Correct promotion rules from bitfields to integers.
 -* Kernel     [2008-06-02] -machdep was ignored (bts #?309).
 
-###########################################
+###############################################################################
 Open Source Release 1.2 (Hydrogen-20080502)
-###########################################
+###############################################################################
 
 o* Makefile   [2008-05-21] Fixed bug in "make clean-doc" (and "make distclean").
 -  GUI        [2008-05-19] All internal options are available in the GUI
               preferences pannel.
 
-###########################################
+###############################################################################
 Open Source Release 1.1 (Hydrogen-20080501)
-###########################################
+###############################################################################
 
 -! Value      [2008-04-24] Display a warning whenever an uninitialized value
               causes the death of a branch.
@@ -4240,9 +4277,9 @@ o  GUI        [2008-04-07] Project management redesigned for older Gtk and
 -* Kernel     [2008-04-01] Various Win32 path fixes.
 -  Kernel     [2008-04-01] Option -no-unicode : do not print Unicode chars.
 
-######################################
+###############################################################################
 Binary Release 1.0 (Hydrogen-20080302)
-######################################
+###############################################################################
 
 -  Occurrence [2008-03-17] New option -occurrence.
 -  Occurrence [2008-03-17] First release of the plug-in.
@@ -4252,9 +4289,9 @@ Binary Release 1.0 (Hydrogen-20080302)
 -* Project    [2008-03-14] Fixed bug with checksum computation during save/load.
 -* Slicing    [2008-02-25] Fixed bug in interprocedural slicing (bts #?201).
 
-###########################################
+###############################################################################
 Open Source Release 1.0 (Hydrogen-20080301)
-###########################################
+###############################################################################
 
 -  Kernel     [2008-03-01] First release.
 

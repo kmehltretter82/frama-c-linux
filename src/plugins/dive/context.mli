@@ -22,20 +22,13 @@
 
 open Dive_types
 
-(*
-module NodeRef : Datatype.S with type t = node_kind * callstack
-module Index : Datatype.Hashtbl with type key = int
-module NodeTable : Datatype.Hashtbl with type key = NodeRef.t
-module NodeSet : Datatype.Set with type elt = node
-module BaseSet : Datatype.Set with type elt = Cil_types.varinfo
-module FunctionMap : Datatype.Map with type key = Cil_types.kernel_function
-*)
-
 type t
+
+type element = Node of node | Edge of (node * dependency * node)
 
 val create : unit -> t
 val clear : t -> unit (* reset to almost an empty context,
-                         but keeps folded and hidden bases *)
+                         but keeps folded and hidden bases, and hooks *)
 
 val get_graph : t -> Dive_graph.t
 val find_node : t -> int -> node
@@ -56,6 +49,16 @@ val show : t -> Cil_types.varinfo -> unit
 
 val add_node : t -> node_kind:node_kind -> node_locality:node_locality -> node
 val remove_node : t -> node -> unit
+val add_dep : t -> origin:origin -> kind:dependency_kind ->
+  node -> node -> unit
+val remove_node_deps : t -> node -> unit
 
-val update_diff : t -> node -> unit
-val take_last_diff : t -> graph_diff
+val update_node_values : t -> node ->
+  typ:Cil_types.typ ->
+  cvalue:Locations.Location_Bytes.t -> taint:Eva.Results.taint option -> unit
+val set_node_writes : t -> node -> origin list -> unit
+
+val set_update_hook : t -> (element -> unit) -> unit
+val set_remove_hook : t -> (element -> unit) -> unit
+val set_clear_hook : t -> (unit -> unit) -> unit
+

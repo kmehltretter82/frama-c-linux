@@ -1035,10 +1035,15 @@ let pp_kernel_function fmt kernel_function =
     pp_cil_function kernel_function.fundec
     pp_funspec kernel_function.spec
 
-let pp_localisation fmt = function
-  | VGlobal -> Format.fprintf fmt "VGlobal"
-  | VLocal(kernel_function) -> Format.fprintf fmt "VLocal(%a)"  pp_kernel_function kernel_function
-  | VFormal(kernel_function) -> Format.fprintf fmt "VFormal(%a)"  pp_kernel_function kernel_function
+let pp_syntactic_scope fmt = function
+  | Global -> pp_string fmt "Global"
+  | Program -> pp_string fmt "Program"
+  | Translation_unit file ->
+    Format.fprintf fmt "Translation_unit %S" (file:>string)
+  | Formal kf -> Format.fprintf fmt "Formal %a" pp_kernel_function kf
+  | Block_scope stmt -> Format.fprintf fmt "Local %a" pp_stmt stmt
+  | Whole_function kf ->
+    Format.fprintf fmt "Whole_function %a" pp_kernel_function kf
 
 let pp_mach fmt mach =
   Format.fprintf fmt
@@ -1047,8 +1052,8 @@ let pp_mach fmt mach =
      sizeof_void=%a;sizeof_fun=%a;size_t=%a;wchar_t=%a;ptrdiff_t=%a;\
      alignof_short=%a;alignof_int=%a;alignof_long=%a;alignof_longlong=%a;\
      alignof_ptr=%a;alignof_float=%a;alignof_double=%a;alignof_longdouble=%a;\
-     alignof_str=%a;alignof_fun=%a;char_is_unsigned=%a;underscore_name=%a;\
-     const_string_literals=%a;little_endian=%a;alignof_aligned=%a;\
+     alignof_str=%a;alignof_fun=%a;char_is_unsigned=%a;\
+     little_endian=%a;alignof_aligned=%a;\
      has__builtin_va_list=%a;compiler=%a;\
      cpp_arch_flags=%a;version=%a}"
     pp_int mach.sizeof_short
@@ -1075,8 +1080,6 @@ let pp_mach fmt mach =
     pp_int mach.alignof_str
     pp_int mach.alignof_fun
     pp_bool mach.char_is_unsigned
-    pp_bool mach.underscore_name
-    pp_bool mach.const_string_literals
     pp_bool mach.little_endian
     pp_int mach.alignof_aligned
     pp_bool mach.has__builtin_va_list

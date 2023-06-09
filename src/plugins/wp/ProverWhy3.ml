@@ -144,9 +144,8 @@ let lfun_name (lfun:Lang.lfun) =
   match lfun with
   | ACSL f -> Qed.Engine.F_call (Lang.logic_id f)
   | CTOR c -> Qed.Engine.F_call (Lang.ctor_id c)
-  | Model({m_source=Generated(_,n)}) -> Qed.Engine.F_call n
-  | Model({m_source=Extern e}) -> e.Lang.ext_link
-
+  | FUN({m_source=Generated(_,n)}) -> Qed.Engine.F_call n
+  | FUN({m_source=Extern e}) -> e.Lang.ext_link
 
 let coerce ~cnv sort expected r =
   match sort, expected with
@@ -1152,7 +1151,7 @@ type prover_call = {
   prover : Why3Provers.t ;
   call : Why3.Call_provers.prover_call ;
   steps : int option ;
-  timeout : int ;
+  timeout : float ;
   mutable timeover : float option ;
   mutable interrupted : bool ;
   mutable killed : bool ;
@@ -1163,11 +1162,11 @@ let ping_prover_call ~config p =
   | NoUpdates
   | ProverStarted ->
     let () =
-      if p.timeout > 0 then
+      if p.timeout > 0.0 then
         match p.timeover with
         | None ->
           let started = Unix.time () in
-          p.timeover <- Some (started +. 2.0 +. float p.timeout)
+          p.timeover <- Some (started +. 2.0 +. p.timeout)
         | Some timeout ->
           let time = Unix.time () in
           if time > timeout then
@@ -1187,7 +1186,7 @@ let ping_prover_call ~config p =
   | ProverFinished pr ->
     let r =
       match pr.pr_answer with
-      | Timeout -> VCS.timeout (int_of_float pr.pr_time)
+      | Timeout -> VCS.timeout pr.pr_time
       | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
       | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Invalid
       | OutOfMemory -> VCS.failed "out of memory"
@@ -1211,11 +1210,11 @@ let ping_prover_call ~config p =
     Task.Return (Task.Result r)
 
 let call_prover_task ~timeout ~steps ~config prover call =
-  Wp_parameters.debug ~dkey "Why3 run prover %a with timeout %d, steps %d@."
+  Wp_parameters.debug ~dkey "Why3 run prover %a with timeout %f, steps %d@."
     Why3.Whyconf.print_prover prover
-    (Why3.Opt.get_def (-1) timeout)
-    (Why3.Opt.get_def (-1) steps) ;
-  let timeout = match timeout with None -> 0 | Some tlimit -> tlimit in
+    (Why3.Opt.get_def (0.0) timeout)
+    (Why3.Opt.get_def 0 steps) ;
+  let timeout = match timeout with None -> 0.0 | Some tlimit -> tlimit in
   let pcall = {
     call ; prover ;
     killed = false ;
@@ -1256,7 +1255,6 @@ let run_batch pconf driver ~config ?script ~timeout ~steplimit prover task =
   let steps = match steplimit with Some 0 -> None | _ -> steplimit in
   let limit =
     let config = Why3.Whyconf.get_main @@ Why3Provers.config () in
-    let timeout = Option.map float_of_int timeout in
     let memlimit = Why3.Whyconf.memlimit config in
     let def = Why3.Call_provers.empty_limit in
     { Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
@@ -1266,7 +1264,11 @@ let run_batch pconf driver ~config ?script ~timeout ~steplimit prover task =
   let with_steps = match steps, pconf.Why3.Whyconf.command_steps with
     | None, _ -> false
     | Some _, Some _ -> true
-    | Some _, None -> false
+    | Some _, None ->
+      Wp_parameters.warning ~once:true ~current:false
+        "%a does not support steps limit (ignored option)"
+        Why3.Whyconf.print_prover prover ;
+      false
   in
   let steps = if with_steps then steps else None in
   let command = Why3.Whyconf.get_complete_command pconf ~with_steps in
@@ -1343,7 +1345,7 @@ let prepare ~mode wpo driver task =
 
 let interactive ~mode wpo pconf ~config driver prover task =
   let time = Wp_parameters.InteractiveTimeout.get () in
-  let timeout = if time <= 0 then None else Some time in
+  let timeout = if time <= 0 then None else Some (float time) in
   match prepare ~mode wpo driver task with
   | None ->
     Wp_parameters.warning ~once:true ~current:false

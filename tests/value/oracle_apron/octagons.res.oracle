@@ -1,16 +1,4 @@
-221c221,224
-< [eva] octagons.c:197: Reusing old results for call to neg
----
-> [eva] computing for function neg <- interprocedural <- main.
->   Called from octagons.c:197.
-> [eva] Recording results for neg
-> [eva] Done for function neg
-237a241,244
->      a - b ∈ [-16..16]
->      b + neg_a ∈ [-16..16]
->      a + neg_b ∈ [-16..16]
->      neg_a - neg_b ∈ [-16..16]
-366,369c373,376
+371,374c371,374
 <   a ∈ [-1024..2147483647]
 <   b ∈ [-1023..2147483647]
 <   c ∈ [-1023..2147483647]

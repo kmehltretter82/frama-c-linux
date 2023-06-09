@@ -90,8 +90,7 @@
     padding: 0px ;
 }
 
-.dome-xSideBar.dome-color-frame,
-.dome-xSideBarSection-title.dome-color-frame
+.dome-xSideBar.dome-color-frame
 {
     background: var(--background-sidebar) ;
 }
@@ -116,6 +115,7 @@
     display: flex ;
     flex-flow: row nowrap ;
     align-items: center ;
+    background: var(--background-sidebar) ;
 }
 
 .dome-xSideBarSection-title > .dome-xLabel {
@@ -129,9 +129,17 @@
     flex: 0 0 ;
 }
 
+.dome-xSideBarSection-infos {
+    font-size: smaller;
+    color: var(--info-text-discrete);
+    padding-left: 4px;
+    padding-right: 4px;
+    display: block;
+}
+
 .dome-xSideBarSection-filterButton {
   margin: 0px;
-  padding: 0px;
+  padding: 3px;
 }
 
 .dome-xSideBarSection-hideshow {
@@ -160,14 +168,6 @@
   color: var(--info-text);
   fill: var(--info-text);
   display: flex;
-}
-
-.dome-xSideBarSection-info {
-  color: var(--info-text-discrete);
-  font-style: italic;
-  padding-left: 20px;
-  padding-right: 10px;
-  display: block;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -443,14 +443,10 @@
   padding: 0;
   overflow: hidden;
   font-size: 13px;
-  width: 28px;
+  width: 228px;
   border-radius: 12px;
   transition: width 0.4s ease-in-out;
   z-Index: +1;
-}
-
-.dome-xToolBar-actionField:hover {
-  width: 228px;
 }
 
 .dome-xToolBar-actionField:focus-within {

@@ -402,7 +402,7 @@ class configurator (tactic : Tactical.tactical) =
 
     method private commit tree node process =
       try
-        let jtactic = ProofScript.jtactic ~title tactic target in
+        let jtactic = ProofScript.jtactic tactic target in
         let fork = ProofEngine.fork tree ~anchor:node jtactic process in
         let children = snd @@ ProofEngine.commit fork in
         List.map snd children

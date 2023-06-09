@@ -32,6 +32,16 @@ end
 
 let dkey = Self.register_category "build"
 
+type locstack = Cil_types.stmt * Callstack.t
+
+(* Generalized statements *)
+
+(* used to *localize* (defines in which functions/file rectangles the node must
+   be placed) nodes *)
+type gstmt =
+  | Local of locstack (* Function statement in a specific callstack *)
+  | Global of Cil_types.varinfo (* Initialization of a global variable *)
+
 
 (* --- Lval enumeration --- *)
 
@@ -89,9 +99,12 @@ struct
 
   let at_start_of = at_start_of
   let after = after
-  let after_kinstr = function
-    | Kglobal -> at_start (* After global initialization *)
-    | Kstmt stmt -> after stmt
+  let before_gstmt = function
+    | Global _ -> at_start
+    | Local (stmt,_) -> before stmt
+  let after_gstmt = function
+    | Global _ -> at_start (* After global initialization *)
+    | Local (stmt,_) -> after stmt
 
   let to_kf_list kinstr callee =
     before_kinstr kinstr |> eval_callee callee |>
@@ -100,11 +113,11 @@ struct
   let to_cvalue request lval =
     eval_lval lval request |> as_cvalue
 
-  let to_location kinstr lval =
-    before_kinstr kinstr |> eval_address lval |> as_location
+  let to_location gstmt lval =
+    before_gstmt gstmt |> eval_address lval |> as_location
 
-  let to_zone kinstr lval =
-    before_kinstr kinstr |> eval_address lval |> as_zone
+  let to_zone gstmt lval =
+    before_gstmt gstmt |> eval_address lval |> as_zone
 
   let to_callstacks stmt =
     before stmt |> callstacks
@@ -113,28 +126,20 @@ struct
     let zone = eval_address lval request |> as_zone in
     is_tainted zone request |> Result.to_option
 
-  let studia_direct_effect = function
-    | e, { Studia.Writes.direct = true } -> Some e
-    | _ -> None
-
-  let writes kinstr lval =
-    let zone = to_zone kinstr lval in
-    Self.debug ~dkey "computing writes for %a" Cil_printer.pp_lval lval;
-    let result = Studia.Writes.compute zone in
-    let writes = List.filter_map studia_direct_effect result in
+  let writes zone =
+    Self.debug ~dkey "computing writes for %a" Locations.Zone.pretty zone;
+    let writes = Studia.Writes.compute zone in
     Self.debug ~dkey "%d found" (List.length writes);
     writes
 
-  let reads kinstr lval =
-    let zone = to_zone kinstr lval in
-    Self.debug ~dkey "computing reads for %a" Cil_printer.pp_lval lval;
-    let result = Studia.Reads.compute zone in
-    let reads = List.filter_map studia_direct_effect result in
+  let reads zone =
+    Self.debug ~dkey "computing reads for %a" Locations.Zone.pretty zone;
+    let reads = Studia.Reads.compute zone in
     Self.debug ~dkey "%d found" (List.length reads);
     reads
 
   let does_lval_read_zone zone stmt lval =
-    let zone' = to_zone (Kstmt stmt) lval in
+    let zone' = to_zone (Local (stmt,[])) lval in
     Locations.Zone.intersects zone' zone
 
   let does_exp_read_zone zone stmt exp =
@@ -148,14 +153,14 @@ end
 (* --- Precision evaluation --- *)
 
 (* For folded bases, lval may be strictly included in the node zone *)
-let update_node_values node ?(lval=Node_kind.to_lval node.node_kind) rq =
+let update_node_values context node ?(lval=Node_kind.to_lval node.node_kind) rq =
   match lval with
   | None -> () (* can't evaluate node *)
   | Some lval ->
     let typ = Cil.typeOfLval lval
     and cvalue = Eval.to_cvalue rq lval
     and taint = Eval.is_tainted rq lval in
-    Graph.update_node_values node ~typ ~cvalue ~taint
+    Context.update_node_values context node ~typ ~cvalue ~taint
 
 
 (* --- Locations handling --- *)
@@ -171,10 +176,10 @@ let is_foldable_type typ =
   | TNamed _ -> assert false (* the type have been unrolled *)
 
 
-let enumerate_cells ~is_folded_base lval kinstr =
+let enumerate_cells ~is_folded_base gstmt lval =
   (* If possible, refine the lval to a non-symbolic one *)
   let typ = Cil.typeOfLval lval in
-  let location = Eval.to_location kinstr lval in
+  let location = Eval.to_location gstmt lval in
   let open Locations in
   let map_base (base,ival) =
     match base with
@@ -201,43 +206,58 @@ let enumerate_cells ~is_folded_base lval kinstr =
   try
     Location_Bits.to_seq_i location.loc |> Seq.flat_map map_base
   with Abstract_interp.Error_Top ->
-    Seq.return (Unknown (lval, kinstr))
+  match gstmt with
+  | Local (stmt,_) -> Seq.return (Unknown (lval, stmt))
+  | Global _vi ->
+    Seq.return (Error "Global initialization address cannot be resolved")
 
-let build_node_kind ~is_folded_base lval kinstr =
+let build_node_kind ~is_folded_base gstmt lval =
   match lval with
   | Var vi, offset ->
     (* Build a scalar node even if kinstr is dead *)
     Scalar (vi, Cil.typeOfLval lval, offset)
   | Mem _, _ ->
-    let cells_seq = enumerate_cells ~is_folded_base lval kinstr in
+    let cells_seq = enumerate_cells ~is_folded_base gstmt lval in
     match cells_seq () with
     | Seq.Cons (node_kind, seq) when Seq.is_empty seq -> node_kind
-    | _ -> Scattered (lval, kinstr)
+    | _ ->
+      match gstmt with
+      | Local (stmt ,_) -> Scattered (lval, stmt)
+      | Global _vi -> Error "Global initialization address cannot be resolved"
 
-let default_node_locality callstack =
-  match callstack with
-  | [] ->
-    (* The empty callstack can be used for global lvalues *)
-    { loc_file="" ; loc_callstack=[] }
-  | (kf,_kinstr) :: _ ->
-    let loc_file = get_loc_filename (Kernel_function.get_location kf) in
-    { loc_file ; loc_callstack=callstack }
 
-let build_node_locality callstack node_kind =
-  match Node_kind.get_base node_kind with
-  | None -> default_node_locality callstack
-  | Some vi ->
-    match Kernel_function.find_defining_kf vi with
-    | Some kf ->
-      let callstack =
-        try
-          Callstack.pop_downto kf callstack
-        with Failure _ ->
-          Callstack.init kf (* TODO: complete callstack *)
-      in
-      default_node_locality callstack
-    | None ->
-      { loc_file = get_loc_filename vi.vdecl ; loc_callstack = [] }
+let build_node_locality gstmt node_kind =
+  let make_local callstack =
+    match callstack with
+    | [] -> assert false
+    | (kf,_kinstr) :: _ ->
+      let loc_file = get_loc_filename (Kernel_function.get_location kf) in
+      { loc_file ; loc_callstack=callstack }
+  in
+  let make_global vi =
+    { loc_file=get_loc_filename vi.vdecl; loc_callstack=[] }
+  in
+  match gstmt with
+  | Local (_, callstack) ->
+    begin match node_kind with
+      | Scalar (vi,_,_) | Composite (vi) ->
+        begin match Kernel_function.find_defining_kf vi with
+          | Some kf ->
+            let callstack =
+              try
+                Callstack.pop_downto kf callstack
+              with Failure _ ->
+                Callstack.init kf (* TODO: complete callstack *)
+            in
+            make_local callstack
+          | None -> make_global vi
+        end
+      | Scattered _ | Unknown _ | Alarm _ | AbsoluteMemory | String _ | Const _
+      | Error _ ->
+        make_local callstack
+    end
+  | Global vi ->
+    make_global vi
 
 let find_compatible_callstacks stmt callstack =
   let kf = Kernel_function.find_englobing_kf stmt in
@@ -264,196 +284,242 @@ let find_compatible_callstacks stmt callstack =
 
 (* --- Graph building --- *)
 
-let add_or_update_node context callstack node_kind =
-  let node_locality = build_node_locality callstack node_kind in
-  Context.add_node context ~node_kind ~node_locality
-
-let build_node context callstack lval kinstr =
-  let is_folded_base = Context.is_folded context in
-  let node_kind = build_node_kind ~is_folded_base lval kinstr in
-  add_or_update_node context callstack node_kind
-
-let build_var context callstack varinfo =
-  let lval = Var varinfo, NoOffset in
-  build_node context callstack lval Kglobal
-
-let build_lval context callstack kinstr lval =
-  let node = build_node context callstack lval kinstr in
-  update_node_values ~lval:(Some lval) node (Eval.after_kinstr kinstr);
+let add_or_update_node ~context gstmt node_kind =
+  let node_locality = build_node_locality gstmt node_kind in
+  let node = Context.add_node context ~node_kind ~node_locality in
+  begin match node_kind with (* Some nodes don't have read or write deps *)
+    | Alarm _ ->
+      node.node_reads_computation <- Done
+    | Unknown _ | Const _ | String _ ->
+      node.node_writes_computation <- Done
+    | Error _ ->
+      node.node_reads_computation <- Done;
+      node.node_writes_computation <- Done
+    | _ -> ()
+  end;
   node
 
-let build_const context callstack exp =
-  add_or_update_node context callstack (Const exp)
+let build_node ~context gstmt lval =
+  let is_folded_base = Context.is_folded context in
+  let node_kind = build_node_kind ~is_folded_base gstmt lval in
+  add_or_update_node ~context gstmt node_kind
 
-let build_alarm context callstack stmt alarm =
+let build_var ~context gstmt varinfo =
+  let lval = Var varinfo, NoOffset in
+  build_node ~context gstmt lval
+
+let build_lval ~context gstmt lval =
+  let node = build_node ~context gstmt lval in
+  update_node_values context ~lval:(Some lval) node (Eval.after_gstmt gstmt);
+  node
+
+let build_const ~context gstmt exp =
+  add_or_update_node ~context gstmt (Const exp)
+
+let build_alarm ~context (stmt,_ as locstack) alarm =
   let node_kind = Alarm (stmt,alarm) in
-  let node_locality = build_node_locality callstack node_kind in
+  let node_locality = build_node_locality (Local locstack) node_kind in
   Context.add_node context ~node_kind ~node_locality
 
 
 (* --- Writes --- *)
 
+let compatible_writes callstack = function
+  | Studia.Writes.CallIndirect _ -> None (* Ignore indirect writes *)
+  | Assign _ | CallDirect _ | GlobalInit _ as w -> Some w
+  | FormalInit (vi, _callsites) as w ->
+    match Callstack.pop callstack with
+    | Some (kf,stmt,_callstack) ->
+      (* keep the only callsite compatible with the current callstack *)
+      Some (Studia.Writes.FormalInit (vi, [(kf,[stmt])]))
+    | None -> Some w
+
+(* returns true if the callsite (kf,stmt) *)
+
 type deps_builder = unit Seq.t
 
 let build_node_writes context node =
-  let graph = Context.get_graph context
-  and is_folded_base = Context.is_folded context in
+  let is_folded_base = Context.is_folded context in
 
-  let rec build_write_deps callstack kinstr lval : deps_builder =
-    let add_deps = function
-      | { skind=Instr instr } as stmt ->
+  let rec build_write_deps ~callstack zone : deps_builder =
+    let add_deps origin =
+      match origin with
+      | Studia.Writes.CallIndirect _ ->
+        Seq.empty (* Ignore indirect writes *)
+
+      | Assign stmt | CallDirect stmt ->
+        let instr = match stmt.skind with
+          | Instr instr -> instr
+          | _ -> assert false (* Studia invariant *)
+        in
         (* Update the values at the light of new discovered write *)
-        update_node_values node (Eval.after stmt);
+        update_node_values context node (Eval.after stmt);
         (* Add dependencies for each callstack *)
         List.to_seq (find_compatible_callstacks stmt callstack) |>
-        Seq.flat_map (fun cs -> build_instr_deps cs stmt instr)
-      | _ -> assert false (* Studia invariant *)
+        Seq.flat_map
+          (fun cs -> build_instr_deps ~callstack:cs ~origin stmt instr)
+
+      | GlobalInit (vi, initinfo) as origin ->
+        let init = match initinfo.init with
+          | None -> SingleInit (Cil.zero ~loc:vi.vdecl)
+          | Some init -> init
+        in
+        build_init_deps ~origin (Global vi) vi init
+
+      | FormalInit (vi, callsites) as origin ->
+        let kf = Option.get (Kernel_function.find_defining_kf vi) in
+        let pos = Kernel_function.get_formal_position vi kf in
+        let add_deps stmt =
+          match stmt.skind with
+          | Instr
+              (Call (_,_,args,_) |
+               (Local_init (_, ConsInit (_, args, _), _))) ->
+            let exp = List.nth args pos in
+            let callstack =
+              match Callstack.pop callstack with
+              | Some (_kf,_stmt,callstack') -> callstack'
+              | None -> Callstack.init kf
+            in
+            build_exp_deps ~origin (Local (stmt, callstack)) Data exp
+          | _ ->
+            assert false (* Callsites can only be Call or ConsInit *)
+        in
+        (* Evaluate the parameter values at the start of its defining function *)
+        update_node_values context node (Eval.at_start_of kf);
+        let callsites = List.concat_map snd callsites in
+        Seq.flat_map add_deps (List.to_seq callsites)
     in
-    let writes = Eval.writes kinstr lval in
-    let args_seq, call_stmts = build_arg_deps callstack in
-    let compare = Cil_datatype.Stmt_Id.compare in
-    node.node_writes_stmts <- List.sort_uniq compare (writes @ call_stmts);
-    Seq.append args_seq (Seq.flat_map add_deps (List.to_seq writes))
+    let writes = Eval.writes zone in
+    let writes = List.filter_map (compatible_writes callstack) writes in
+    Context.set_node_writes context node writes;
+    Seq.flat_map add_deps (List.to_seq writes)
 
-  and build_alarm_deps callstack stmt alarm : deps_builder =
-    build_lvals_deps callstack stmt Data (EnumLvals.in_alarm alarm)
+  and build_alarm_deps ~callstack stmt alarm : deps_builder =
+    let lvals = EnumLvals.in_alarm alarm in
+    let origin = Studia.Writes.Assign stmt in
+    let gstmt = Local (stmt, callstack) in
+    build_lvals_deps ~origin gstmt Data lvals
 
-  and build_instr_deps callstack stmt instr : deps_builder =
+  and build_instr_deps ~origin ~callstack stmt instr : deps_builder =
+    let gstmt = Local (stmt, callstack) in
     (* Add dependencies found in the instruction *)
     match instr with
     | Set (_, exp, _) ->
-      build_exp_deps callstack stmt Data exp
+      build_exp_deps ~origin gstmt Data exp
     | Call (_, callee, args, _) ->
-      build_call_deps callstack stmt callee args
+      build_call_deps ~callstack ~origin stmt callee args
     | Local_init (dest, ConsInit (f, args, k), loc) ->
       let as_func _dest callee args _loc =
-        build_call_deps callstack stmt callee args
+        build_call_deps ~callstack ~origin stmt callee args
       in
       Cil.treat_constructor_as_func as_func dest f args k loc
     | Local_init (vi, AssignInit init, _)  ->
-      let lvals = EnumLvals.in_init vi init in
-      let exp =
-        match init with
-        | CompoundInit _ -> None (* Do not generate nodes for Compounds for now *)
-        | SingleInit exp -> Some exp
-      in
-      build_lvals_deps callstack stmt Data ?exp lvals
+      build_init_deps ~origin gstmt vi init
     | Asm _ | Skip _ | Code_annot _ -> Seq.empty (* Cases not returned by Studia *)
 
-  and build_arg_deps callstack : deps_builder * stmt list =
-    match Node_kind.get_base node.node_kind with
-    (* TODO refine formal dependency computation for non-scalar formals *)
-    | Some vi when vi.vformal ->
-      let kf = Option.get (Kernel_function.find_defining_kf vi) in
-      let pos = Kernel_function.get_formal_position vi kf in
-      let callsites =
-        match Callstack.pop callstack with
-        | Some (kf',stmt,callstack) ->
-          assert (Kernel_function.equal kf' kf);
-          [(stmt,callstack)]
-        | None ->
-          let callsites = Kernel_function.find_syntactic_callsites kf in
-          List.map (fun (kf,stmt) -> (stmt,Callstack.init kf)) callsites
-      and add_deps (stmt,callstack) : unit Seq.t =
-        match stmt.skind with
-        | Instr
-            (Call (_,_,args,_) |
-             (Local_init (_, ConsInit (_, args, _), _))) ->
-          let exp = List.nth args pos in
-          build_exp_deps callstack stmt Data exp
-        | _ ->
-          assert false (* Callsites can only be Call or ConsInit *)
-      in
-      (* Evaluate the parameter values at the start of its defining function *)
-      update_node_values node (Eval.at_start_of kf);
-      Seq.flat_map add_deps (List.to_seq callsites), List.map fst callsites
-    | _ -> Seq.empty, []
-
-  and build_return_deps callstack stmt args kf : deps_builder =
+  and build_return_deps ~callstack call_stmt args kf : deps_builder =
     match Kernel_function.find_return kf with
     | {skind = Return (Some {enode = Lval lval_res},_)} as return_stmt ->
-      let callstack = Callstack.push (kf,stmt) callstack in
-      build_lval_deps callstack return_stmt Data lval_res
+      let callstack = Callstack.push (kf,call_stmt) callstack in
+      let origin = Studia.Writes.Assign return_stmt in
+      let gstmt = Local (return_stmt, callstack) in
+      build_lval_deps ~origin gstmt Data lval_res
     | {skind = Return (None, _)} -> Seq.empty (* return void *)
     | _ -> assert false (* Cil invariant *)
     | exception Kernel_function.No_Statement ->
       (* the function is only a prototype *)
       (* TODO: read assigns instead *)
+      let origin = Studia.Writes.Assign call_stmt in
+      let gstmt = Local (call_stmt, callstack) in
       List.to_seq args |>
-      Seq.flat_map (build_exp_deps callstack stmt Data)
+      Seq.flat_map (build_exp_deps ~origin gstmt Data)
 
-  and build_call_deps callstack stmt callee args : deps_builder =
+  and build_call_deps ~origin ~callstack stmt callee args : deps_builder =
+    let gstmt = Local (stmt, callstack) in
     let callee_deps = match callee.enode with
       | Lval (Var _vi, _offset) -> Seq.empty
       | Lval (Mem exp, _offset) ->
-        build_exp_deps callstack stmt Callee exp
+        build_exp_deps ~origin gstmt Callee exp
       | _ ->
         Self.warning "Cannot compute all callee dependencies for %a"
           Cil_printer.pp_stmt stmt;
         Seq.empty
     and return_deps =
       List.to_seq (Eval.to_kf_list (Kstmt stmt) callee) |>
-      Seq.flat_map (build_return_deps callstack stmt args)
+      Seq.flat_map (build_return_deps ~callstack stmt args)
     in
     Seq.append callee_deps return_deps
 
-  and build_exp_deps callstack stmt kind exp : deps_builder =
-    let lvals = EnumLvals.in_exp exp in
-    build_lvals_deps callstack stmt kind ~exp lvals
+  and build_init_deps ~origin gstmt vi init : deps_builder =
+    let lvals = EnumLvals.in_init vi init in
+    let exp =
+      match init with
+      | CompoundInit _ -> None (* Do not generate nodes for Compounds for now *)
+      | SingleInit exp -> Some exp
+    in
+    build_lvals_deps ~origin gstmt Data ?exp lvals
 
-  and build_lvals_deps callstack stmt kind ?exp lvals : deps_builder =
+  and build_exp_deps ~origin gstmt kind exp : deps_builder =
+    let lvals = EnumLvals.in_exp exp in
+    build_lvals_deps ~origin gstmt kind ~exp lvals
+
+  and build_lvals_deps ~origin gstmt kind ?exp lvals : deps_builder =
     if lvals <> [] then
       List.to_seq lvals |>
-      Seq.flat_map (build_lval_deps callstack stmt kind)
+      Seq.flat_map (build_lval_deps ~origin gstmt kind)
     else
-      Option.fold exp ~none:Seq.empty
-        ~some:(build_const_deps callstack stmt kind)
+      Option.to_seq exp |>
+      Seq.flat_map (build_const_deps ~origin gstmt kind)
 
-  and build_lval_deps callstack stmt kind lval : deps_builder =
-    let kinstr = Kstmt stmt in
-    let dst = build_lval context callstack kinstr lval in
-    Seq.return (Graph.create_dependency graph kinstr dst kind node)
+  and build_lval_deps ~origin gstmt kind lval : deps_builder =
+    let dst = build_lval ~context gstmt lval in
+    Seq.return (Context.add_dep context ~origin ~kind dst node)
 
-  and build_const_deps callstack stmt kind exp : deps_builder =
-    let kinstr = Kstmt stmt in
-    let dst = build_const context callstack exp in
-    Seq.return (Graph.create_dependency graph kinstr dst kind node)
+  and build_const_deps ~origin gstmt kind exp : deps_builder =
+    let dst = build_const ~context gstmt exp in
+    Seq.return (Context.add_dep context ~origin ~kind dst node)
 
-  and build_scattered_deps callstack kinstr lval : deps_builder =
+  and build_scattered_deps ~callstack stmt lval : deps_builder =
+    let gstmt = Local (stmt,callstack) in
     let add_cell node_kind =
-      let node' = add_or_update_node context callstack node_kind in
-      update_node_values node (Eval.after_kinstr kinstr);
-      Graph.create_dependency graph kinstr node' Composition node
+      let dst = add_or_update_node ~context gstmt node_kind in
+      update_node_values context node (Eval.after stmt);
+      let origin = Studia.Writes.Assign stmt in
+      Context.add_dep context ~origin ~kind:Composition dst node
     in
-    enumerate_cells ~is_folded_base lval kinstr |> Seq.map add_cell
+    enumerate_cells ~is_folded_base gstmt lval |> Seq.map add_cell
   in
 
   let callstack = node.node_locality.loc_callstack in
   match node.node_kind with
-  | Scalar (vi,_typ,offset) ->
-    build_write_deps callstack Kglobal (Cil_types.Var vi, offset)
+  | Scalar (vi, _typ, offset) ->
+    let zone = Eval.to_zone (Global vi) (Cil_types.Var vi, offset) in
+    build_write_deps ~callstack zone
   | Composite (vi) ->
-    build_write_deps callstack Kglobal (Cil_types.Var vi, Cil_types.NoOffset)
-  | Scattered (lval,kinstr) ->
-    build_scattered_deps callstack kinstr lval
-  | Alarm (stmt,alarm) ->
-    build_alarm_deps callstack stmt alarm
+    let zone = Locations. zone_of_varinfo vi in
+    build_write_deps ~callstack zone
+  | Scattered (lval, stmt) ->
+    build_scattered_deps ~callstack stmt lval
+  | Alarm (stmt, alarm) ->
+    build_alarm_deps ~callstack stmt alarm
   | Unknown _ | AbsoluteMemory | String _ | Const _ | Error _ ->
     Seq.empty
 
 
 (* --- Reads --- *)
 
-let build_node_reads context node =
-  let graph = Context.get_graph context in
+let compatible_reads = function
+  | Studia.Reads.Indirect _ -> None
+  | Direct stmt -> Some stmt
 
-  let rec build_reads_deps callstack kinstr lval : deps_builder =
+let build_node_reads context node =
+  let rec build_reads_deps callstack zone : deps_builder =
     let add_deps stmt =
-      let zone = Some (Eval.to_zone kinstr lval) in
       List.to_seq (find_compatible_callstacks stmt callstack) |>
-      Seq.flat_map (fun cs -> build_stmt_deps cs zone stmt)
+      Seq.flat_map (fun cs -> build_stmt_deps ~callstack:cs (Some zone) stmt)
     in
-    List.to_seq (Eval.reads kinstr lval) |>
+    Eval.reads zone |> List.to_seq |>
+    Seq.filter_map compatible_reads |>
     Seq.flat_map add_deps
 
   and exp_contains_read zone stmt exp =
@@ -468,11 +534,7 @@ let build_node_reads context node =
     | Some zone' ->
       Eval.does_init_read_zone zone' stmt vi init
 
-  and build_kinstr_deps callstack zone = function
-    | Kglobal -> Seq.empty (* Do nothing *)
-    | Kstmt stmt -> build_stmt_deps callstack zone stmt
-
-  and build_stmt_deps callstack zone stmt =
+  and build_stmt_deps ~callstack zone stmt =
     match stmt.skind with
     | Instr instr -> build_instr_deps callstack zone stmt instr
     | Return (Some exp,_)
@@ -483,7 +545,7 @@ let build_node_reads context node =
   and build_instr_deps callstack zone stmt = function
     | Set (lval, exp, _)
       when exp_contains_read zone stmt exp ->
-      build_lval_deps callstack stmt lval
+      build_lval_deps ~callstack stmt lval
     | Local_init (dest, ConsInit (f, args, k), loc) ->
       let as_func _dest callee args _loc =
         build_call_deps callstack zone stmt callee args
@@ -491,7 +553,7 @@ let build_node_reads context node =
       Cil.treat_constructor_as_func as_func dest f args k loc
     | Local_init (vi, AssignInit init, _)
       when init_contains_read zone stmt vi init ->
-      build_var_deps callstack stmt vi
+      build_var_deps ~callstack stmt vi
     | Call (_, callee, args, _) ->
       build_call_deps callstack zone stmt callee args
     | _ -> Seq.empty
@@ -510,9 +572,9 @@ let build_node_reads context node =
       match stmt.skind with
       | Instr (Call (None,_,_,_)) -> Seq.empty
       | Instr (Call (Some lval,_,_,_)) ->
-        build_lval_deps callstack stmt lval
+        build_lval_deps ~callstack stmt lval
       | Instr (Local_init (vi,_,_)) ->
-        build_var_deps callstack stmt vi
+        build_var_deps ~callstack stmt vi
       | _ ->
         assert false (* Callsites can only be Call or ConsInit *)
     in
@@ -533,26 +595,30 @@ let build_node_reads context node =
 
   and build_arg_dep callstack stmt zone (arg,formal) =
     if exp_contains_read zone stmt arg
-    then build_var_deps callstack stmt formal
+    then build_var_deps ~callstack stmt formal
     else Seq.empty
 
-  and build_lval_deps callstack stmt lval =
-    let kinstr = Kstmt stmt in
-    let src = build_lval context callstack kinstr lval in
-    Seq.return (Graph.create_dependency graph kinstr node Data src)
+  and build_lval_deps ~callstack stmt lval =
+    let gstmt = Local (stmt, callstack) in
+    let src = build_lval ~context gstmt lval in
+    let origin = Studia.Writes.Assign stmt in
+    Seq.return (Context.add_dep context ~origin ~kind:Data node src)
 
-  and build_var_deps callstack stmt vi =
-    build_lval_deps callstack stmt (Cil.var vi)
+  and build_var_deps ~callstack stmt vi =
+    build_lval_deps ~callstack stmt (Cil.var vi)
 
   in
   let callstack = node.node_locality.loc_callstack in
   match node.node_kind with
   | Scalar (vi,_typ,offset) ->
-    build_reads_deps callstack Kglobal (Cil_types.Var vi, offset)
+    (* Offset should be constant and no evaluation should be required *)
+    let zone = Eval.to_zone (Global vi) (Cil_types.Var vi, offset) in
+    build_reads_deps callstack zone
   | Composite (vi) ->
-    build_reads_deps callstack Kglobal (Cil_types.Var vi, Cil_types.NoOffset)
-  | Scattered (_lval,kinstr) ->
-    build_kinstr_deps callstack None kinstr
+    let zone = Locations. zone_of_varinfo vi in
+    build_reads_deps callstack zone
+  | Scattered (_lval,stmt) ->
+    build_stmt_deps ~callstack None stmt
   | Alarm _ | Unknown _ | AbsoluteMemory | Const _ | String _ | Error _ ->
     Seq.empty
 
@@ -594,8 +660,7 @@ let explore_backward ~depth context root =
         | Partial builder -> builder
         | NotDone -> build_node_writes context n
       in
-      n.node_writes_computation <- advance_computation context deps_builder;
-      Context.update_diff context n
+      n.node_writes_computation <- advance_computation context deps_builder
     end
   in
   bfs ~depth ~iter_succ explore_node root
@@ -610,8 +675,7 @@ let explore_forward ~depth context root =
         | Partial builder -> builder
         | NotDone -> build_node_reads context n
       in
-      n.node_reads_computation <- advance_computation context deps_builder;
-      Context.update_diff context n
+      n.node_reads_computation <- advance_computation context deps_builder
     end
   in
   bfs ~depth ~iter_succ explore_node root
@@ -623,22 +687,23 @@ let complete context root =
   Context.add_root context root;
   root
 
-let add_var context varinfo =
-  let callstack = [] in
-  let node = build_var context callstack varinfo in
+let add_var context vi =
+  let gstmt = match Kernel_function.find_defining_kf vi with
+    | Some kf -> Local (Kernel_function.find_first_stmt kf , Callstack.init kf)
+    | None -> Global vi
+  in
+  let node = build_var ~context gstmt vi in
   complete context node
 
-let add_lval context kinstr lval =
-  let callstack = match kinstr with
-    | Kglobal -> []
-    | Kstmt stmt -> Callstack.init (Kernel_function.find_englobing_kf stmt)
-  in
-  let node = build_lval context callstack kinstr lval in
+let add_lval context stmt lval =
+  let callstack = Callstack.init (Kernel_function.find_englobing_kf stmt) in
+  let gstmt = Local (stmt, callstack) in
+  let node = build_lval ~context gstmt lval in
   complete context node
 
 let add_alarm context stmt alarm =
   let callstack = Callstack.init (Kernel_function.find_englobing_kf stmt) in
-  let node = build_alarm context callstack stmt alarm in
+  let node = build_alarm ~context (stmt, callstack) alarm in
   complete context node
 
 let add_annotation context stmt annot =
@@ -647,7 +712,7 @@ let add_annotation context stmt annot =
 
 let add_instr context stmt = function
   | Set (lval, _, _)
-  | Call (Some lval, _, _, _) -> Some (add_lval context (Kstmt stmt) lval)
+  | Call (Some lval, _, _, _) -> Some (add_lval context stmt lval)
   | Local_init (vi, _, _) -> Some (add_var context vi)
   | Code_annot (annot, _) -> add_annotation context stmt annot
   | _ -> None (* Do nothing for any other instruction *)
@@ -663,9 +728,9 @@ let add_property context = function
   | _ -> None (* Do nothing fo any other property *)
 
 let add_localizable context = function
-  | Printer_tag.PLval (_kf, kinstr, lval) -> Some (add_lval context kinstr lval)
+  | Printer_tag.PIP prop -> add_property context prop
+  | PLval (_kf, Kstmt stmt, lval) -> Some (add_lval context stmt lval)
   | PVDecl (_kf, _kinstr, varinfo) -> Some (add_var context varinfo)
-  | PIP (prop) -> add_property context prop
   | PStmt (_kf, stmt) | PStmtStart (_kf, stmt) -> add_stmt context stmt
   | _ -> None (* Do nothing for any other localizable *)
 
@@ -674,12 +739,10 @@ let add_localizable context = function
 
 let remove_dependencies context node =
   (* Remove incomming edges *)
-  Graph.remove_dependencies (Context.get_graph context) node;
-  (* Dependencies are not there anymore *)
+  Context.remove_node_deps context node;
+  (* Reset the writes computation status *)
   node.node_writes_computation <- NotDone;
-  node.node_writes_stmts <- [];
-  (* Notify node update *)
-  Context.update_diff context node
+  Context.set_node_writes context node []
 
 let remove_disconnected context =
   let roots = Context.get_roots context in

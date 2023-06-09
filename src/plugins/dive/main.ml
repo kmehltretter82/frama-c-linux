@@ -24,8 +24,8 @@ type format = Dot | Json
 
 let output format context filename =
   let output_function = match format with
-    | Dot -> Dive_graph.ouptput_to_dot
-    | Json -> Dive_graph.ouptput_to_json
+    | Dot -> Dive_graph.output_to_dot
+    | Json -> Server_interface.output_to_json
   in
   Self.result "output to %a" Filepath.Normalized.pretty filename;
   let out_channel = open_out (filename:>string) in
@@ -35,6 +35,8 @@ let output format context filename =
 let main () =
   if not (Self.FromBases.is_empty () &&
           Self.FromFunctionAlarms.is_empty ()) then begin
+    (* Make sure Eva is computed *)
+    Eva.Analysis.compute ();
     (* Create the initial graph  *)
     let context = Context.create () in
     (* Handle parameters *)

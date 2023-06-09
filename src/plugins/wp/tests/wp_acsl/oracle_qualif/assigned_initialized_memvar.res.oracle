@@ -23,16 +23,16 @@
 [wp] [Valid] typed_descr_loop_invariant_CHECK_established (Alt-Ergo) (Cached)
 [wp] [Valid] typed_descr_check_CHECK (Qed)
 [wp] [Valid] typed_descr_loop_assigns_part1 (Qed)
-[wp] [Valid] typed_descr_loop_assigns_part2 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_descr_loop_assigns_part2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_descr_loop_assigns_part3 (Qed)
 [wp] [Valid] typed_descr_loop_assigns_part4 (Qed)
 [wp] [Valid] typed_descr_loop_assigns_part5 (Qed)
 [wp] [Unsuccess] typed_comp_check_FAILS (Alt-Ergo) (Cached)
 [wp] [Valid] typed_comp_loop_assigns (Qed)
-[wp] Proved goals:   22 / 26
+[wp] Proved goals:   21 / 26
   Qed:            15
-  Alt-Ergo:        7
-  Unsuccess:       4
+  Alt-Ergo:        6
+  Unsuccess:       5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   initialize                2        2        4       100%
@@ -40,6 +40,6 @@
   field                     1        -        2      50.0%
   array                     1        -        2      50.0%
   index                     2        -        3      66.7%
-  descr                     5        3        8       100%
+  descr                     5        2        8      87.5%
   comp                      1        -        2      50.0%
 ------------------------------------------------------------

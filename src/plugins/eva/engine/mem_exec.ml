@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let stat_hits = Statistics.register_function_stat "memexec-hits"
+let stat_misses = Statistics.register_function_stat "memexec-misses"
 
 module SaveCounter =
   State_builder.SharedCounter(struct let name = "Mem_exec.save_counter" end)
@@ -263,10 +265,14 @@ module Make
       let args = List.map (function `Bottom -> None | `Value v -> Some v) args in
       let previous = ActualArgs.Map.find args previous_kf in
       find_match_in_previous kf previous state;
+      Statistics.incr stat_misses kf;
       None
     with
-    | Not_found -> None
+    | Not_found ->
+      Statistics.incr stat_misses kf;
+      None
     | Result_found (outputs, i) ->
+      Statistics.incr stat_hits kf;
       let call_result = outputs in
       Some (call_result, i)
 

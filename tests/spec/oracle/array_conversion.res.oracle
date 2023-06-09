@@ -45,6 +45,9 @@ void ftest(void)
 }
 
 /*@ lemma array_not_null{L}: (int *)a ≢ \null;
+ */
+int const ca[1] = {0};
+/*@ lemma const_array_init{L}: \initialized((int const *)ca);
 
 */
 

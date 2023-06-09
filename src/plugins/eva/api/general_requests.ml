@@ -39,7 +39,8 @@ module ComputationState = struct
       Package.(Junion [
           Jtag "not_computed" ;
           Jtag "computing" ;
-          Jtag "computed"])
+          Jtag "computed" ;
+          Jtag "aborted" ])
   let to_json = function
     | Analysis.NotComputed -> `String "not_computed"
     | Computing -> `String "computing"
@@ -47,7 +48,7 @@ module ComputationState = struct
     | Aborted -> `String "aborted"
 end
 
-let _computation_signal =
+let computation_signal =
   States.register_value ~package
     ~name:"computationState"
     ~descr:(Markdown.plain "The current computation state of the analysis.")
@@ -84,7 +85,30 @@ let () = Request.register ~package
     ~kind:`GET ~name:"getCallers"
     ~descr:(Markdown.plain "Get the list of call site of a function")
     ~input:(module Kernel_ast.Function) ~output:(module Data.Jlist (CallSite))
+    ~signals:[computation_signal]
     callers
+
+let eval_callee stmt lval =
+  let expr = Eva_utils.lval_to_exp lval in
+  Results.(before stmt |> eval_callee expr |> default [])
+
+let callees = function
+  | Printer_tag.PLval (_kf, Kstmt stmt, (Mem _, NoOffset as lval))
+    when Cil.(isFunctionType (typeOfLval lval)) ->
+    eval_callee stmt lval
+  | Printer_tag.PLval (_kf, Kstmt stmt, lval)
+    when Cil.(isFunPtrType (Cil.typeOfLval lval)) ->
+    eval_callee stmt (Mem (Eva_utils.lval_to_exp lval), NoOffset)
+  | _ -> []
+
+let () = Request.register ~package
+    ~kind:`GET ~name:"getCallees"
+    ~descr:(Markdown.plain
+              "Return the functions pointed to by a function pointer")
+    ~input:(module Kernel_ast.Marker)
+    ~output:(module Data.Jlist (Kernel_ast.Function))
+    ~signals:[computation_signal]
+    callees
 
 (* ----- Functions ---------------------------------------------------------- *)
 
@@ -177,37 +201,95 @@ let () = Request.register ~package
                             statements in a function")
     ~input:(module Kernel_ast.Function)
     ~output:(module DeadCode)
+    ~signals:[computation_signal]
     dead_code
 
 
 
 (* ----- Register Eva values information ------------------------------------ *)
 
-let term_lval_to_lval tlval =
-  try Logic_to_c.term_lval_to_lval tlval
+type evaluation_point =
+  | Initial
+  | Pre of kernel_function
+  | Stmt of kernel_function * stmt
+
+let post kf =
+  if Analysis.use_spec_instead_of_definition kf
+  then raise Not_found
+  else
+    try Stmt (kf, Kernel_function.find_return kf)
+    with Kernel_function.No_Statement -> raise Not_found
+
+let request_at = function
+  | Initial -> Results.at_start
+  | Stmt (_, stmt) -> Results.before stmt
+  | Pre kf -> Results.at_start_of kf
+
+let property_evaluation_point = function
+  | Property.IPCodeAnnot { ica_kf = kf; ica_stmt = stmt }
+  | IPPropertyInstance { ii_kf = kf; ii_stmt = stmt } -> Stmt (kf, stmt)
+  | IPPredicate {ip_kf; ip_kind = PKEnsures (_, Normal)} -> post ip_kf
+  | IPPredicate { ip_kf = kf;
+                  ip_kind = PKRequires _ | PKAssumes _ | PKTerminates }
+  | IPAssigns {ias_kf = kf} | IPFrom {if_kf = kf} ->
+    Pre kf
+  | IPPredicate _ | IPComplete _ | IPDisjoint _ | IPDecrease _
+  | IPAxiomatic _ | IPLemma _ | IPTypeInvariant _ | IPGlobalInvariant _
+  | IPOther _ | IPAllocation _ | IPReachable _ | IPExtended _ | IPBehavior _ ->
+    raise Not_found
+
+let marker_evaluation_point = function
+  | Printer_tag.PGlobal _ -> Initial
+  | PStmt (kf, stmt) | PStmtStart (kf, stmt) -> Stmt (kf, stmt)
+  | PVDecl (kf, kinstr, v) when not (v.vformal || v.vglob) ->
+    begin
+      (* Only evaluate declaration of local variable if it is initialized. *)
+      match kf, kinstr with
+      | Some kf, Kstmt ({skind = Instr (Local_init _)} as s) -> Stmt (kf, s)
+      | _ -> raise Not_found
+    end
+  | PLval (kf, ki, _) | PExp (kf, ki, _) | PVDecl (kf, ki, _) ->
+    begin
+      match kf, ki with
+      | Some kf, Kstmt stmt -> Stmt (kf, stmt)
+      | Some kf, Kglobal -> Pre kf
+      | None, Kglobal -> Initial
+      | None, Kstmt _ -> assert false
+    end
+  | PTermLval (_, _, prop, _) | PIP prop -> property_evaluation_point prop
+  | PType _ -> raise Not_found
+
+let term_lval_to_lval kf tlval =
+  try
+    let result = Option.bind kf Eva_utils.find_return_var in
+    Logic_to_c.term_lval_to_lval ?result tlval
   with Logic_to_c.No_conversion -> raise Not_found
 
 let print_value fmt loc =
   let is_scalar = Cil.isScalarType in
-  let kinstr, eval =
+  let evaluation_point = marker_evaluation_point loc in
+  let request = request_at evaluation_point in
+  let eval =
     match loc with
-    | Printer_tag.PLval (_kf, ki, lval) when is_scalar (Cil.typeOfLval lval) ->
-      ki, Results.eval_lval lval
-    | Printer_tag.PExp (_kf, ki, expr) when is_scalar (Cil.typeOf expr) ->
-      ki, Results.eval_exp expr
-    | PVDecl (_kf, ki, vi) when is_scalar vi.vtype ->
-      ki, Results.eval_var vi
-    | PTermLval (_kf, ki, _ip, tlval) ->
-      let lval = term_lval_to_lval tlval in
-      ki, Results.eval_lval lval
+    | Printer_tag.PLval (_, _, lval) when is_scalar (Cil.typeOfLval lval) ->
+      Results.eval_lval lval
+    | Printer_tag.PExp (_, _, expr) when is_scalar (Cil.typeOf expr) ->
+      Results.eval_exp expr
+    | PVDecl (_, _, vi) when is_scalar vi.vtype ->
+      Results.eval_var vi
+    | PTermLval (kf, _, _ip, tlval) ->
+      let lval = term_lval_to_lval kf tlval in
+      if is_scalar (Cil.typeOfLval lval)
+      then Results.eval_lval lval
+      else raise Not_found
     | _ -> raise Not_found
   in
   let pretty = Cvalue.V_Or_Uninitialized.pretty in
   let eval_cvalue at = Results.(eval at |> as_cvalue_or_uninitialized) in
-  let before = eval_cvalue (Results.before_kinstr kinstr) in
-  match kinstr with
-  | Kglobal -> pretty fmt before
-  | Kstmt stmt ->
+  let before = eval_cvalue request in
+  match evaluation_point with
+  | Initial | Pre _ -> pretty fmt before
+  | Stmt (_, stmt) ->
     let after = eval_cvalue (Results.after stmt) in
     if Cvalue.V_Or_Uninitialized.equal before after
     then pretty fmt before
@@ -241,8 +323,8 @@ module EvaTaints = struct
       | PLval (_, Kstmt stmt, lval) -> Some (expr_of_lval lval, stmt)
       | PExp (_, Kstmt stmt, expr) -> Some (expr, stmt)
       | PVDecl (_, Kstmt stmt, vi) -> Some (expr_of_lval (Var vi, NoOffset), stmt)
-      | PTermLval (_, Kstmt stmt, _, tlval) ->
-        Some (term_lval_to_lval tlval |> expr_of_lval, stmt)
+      | PTermLval (kf, Kstmt stmt, _, tlval) ->
+        Some (term_lval_to_lval kf tlval |> expr_of_lval, stmt)
       | _ -> None
 
   let of_marker marker =
@@ -394,6 +476,7 @@ module LvalueTaints = struct
       ~descr:(Markdown.plain "Get the tainted lvalues of a given function")
       ~input:(module (Kernel_ast.Fundec))
       ~output:(module (Data.Jlist (Status)))
+      ~signals:[computation_signal]
       get_tainted_lvals
 end
 
@@ -749,4 +832,7 @@ let () = Request.register ~package
     ~input:(module Data.Jpair (Kernel_ast.Marker) (Data.Jbool))
     ~output:(module Data.Jlist
           (Data.Jtriple (Data.Jstring) (Data.Jstring) (Data.Jstring)))
+    ~signals:[computation_signal]
     get_states
+
+(* -------------------------------------------------------------------------- *)

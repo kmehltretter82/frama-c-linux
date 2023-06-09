@@ -23,9 +23,9 @@
 # --------------------------------------------------------------------------
 APP=Ivette
 DOME=./src/dome
-DOME_ARGS=--command $$(dirname $$0)/../../bin/frama-c
+DOME_ARGS=--command $$(dirname $$0)/frama-c
 DOME_DEV=-server-debug 1
-DOME_CLI=./bin/ivette
+DOME_CLI=../bin/ivette
 DOME_API=./src/frama-c
 DOME_CUSTOM_ENTRIES= yes
 COPYRIGHT=CEA LIST / LSL
@@ -35,21 +35,34 @@ COPYRIGHT=CEA LIST / LSL
 # --- Ivette Compilation
 # --------------------------------------------------------------------------
 
-.PHONY: all app dev lint checkcase tsc
+.PHONY: all app dev
 
-all: pkg lint app
+all: pkg check-lint app
 
-app: dome-app
-dev: dome-dev
+app: api dome-app
+dev: api dome-dev
 
-lint: dome-pkg dome-templ checkcase
+# --------------------------------------------------------------------------
+# --- Ivette Linting
+# --------------------------------------------------------------------------
+
+.PHONY: lint check-lint check-case
+
+# With autofix
+lint: dome-pkg dome-templ check-case
+	@echo "[Ivette] running typechecker & linter (with cache & fix mode)"
+	yarn run typecheck
+	yarn run lint --fix --cache --cache-location .eslint-cache
+
+# Without autofix
+check-lint: dome-pkg dome-templ check-case
 	@echo "[Ivette] running typechecker & linter"
 	yarn run typecheck
 	yarn run lint
 
 # In case-insensitive filesystems (macOS/Windows), import statements and
 # filenames can have issues due to case differences
-checkcase:
+check-case:
 	@echo "[Ivette] check case issues in imported filenames"
 	@err=0 ; for f in `find src | sed -E 's/(.ts|.tsx|.js|.jsx|.css|.json)$$//' | sort -f | uniq -di` ;\
 	 do \
@@ -57,11 +70,6 @@ checkcase:
 		echo " - ambiguous $$f.*"; \
 	 done ;\
 	 exit $$err
-
-tsc: dome-pkg dome-templ
-	@echo "[Ivette] running typechecker & linter (with cache & fix mode)"
-	yarn run typecheck
-	yarn run lint --fix --cache --cache-location .eslint-cache
 
 # --------------------------------------------------------------------------
 # --- Help
@@ -75,13 +83,14 @@ help::
 # --- Ivette Distribution
 # --------------------------------------------------------------------------
 
-.PHONY: dist dist-dir
+.PHONY: dist appimage dist-dir
+
+dist: dist-dir dome-dist
+appimage: dist-dir dome-appimage
 
 dist-dir:
 	@echo "Cleaning dist"
 	@rm -fr dist
-
-dist: dist-dir dome-dist
 
 # --------------------------------------------------------------------------
 # --- Ivette Package Loader
@@ -94,11 +103,11 @@ SANDBOX=src/renderer/sandbox.ts
 PACKAGES=$(shell find src -name "pkg.json")
 SANDBOXES=$(shell find src/sandbox -name "*.tsx")
 
-lint: pkg
 dome-pkg: pkg
 dome-app: pkg
 dome-dev: pkg
 dome-dist: pkg
+dome-appimage: pkg
 
 pkg: $(LOADER) $(SANDBOX)
 
@@ -118,7 +127,7 @@ $(SANDBOX): $(SANDBOXES) ./sandboxer.js ./Makefile
 # --- Frama-C API
 # --------------------------------------------------------------------------
 
-.PHONY: api
+.PHONY: api check-api
 
 api:
 	@echo "[Ivette] Generating TypeScript API"

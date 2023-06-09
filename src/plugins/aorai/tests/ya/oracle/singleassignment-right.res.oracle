@@ -24,7 +24,7 @@ enum aorai_OpStatusList {
  */
 /*@ ghost enum aorai_ListOper aorai_CurOperation; */
 /*@ ghost enum aorai_OpStatusList aorai_CurOpStatus; */
-/*@ ghost int aorai_CurStates = a; */
+/*@ ghost enum aorai_States aorai_CurStates = a; */
 /*@ ghost int aorai_x = 0; */
 /*@ ghost int aorai_y = 0; */
 /*@ ghost
@@ -70,9 +70,10 @@ enum aorai_OpStatusList {
   void main_pre_func(int *x, int *y)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
-    if (0 == aorai_CurStates) {
+    if ((unsigned int)0 == aorai_CurStates) {
       aorai_CurStates = b;
       aorai_x = *x;
       aorai_y = *y;
@@ -126,9 +127,10 @@ enum aorai_OpStatusList {
   void main_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
-    if (2 == aorai_CurStates) {
+    if ((unsigned int)2 == aorai_CurStates) {
       aorai_CurStates = c;
       aorai_x = aorai_y;
       aorai_y = aorai_x;

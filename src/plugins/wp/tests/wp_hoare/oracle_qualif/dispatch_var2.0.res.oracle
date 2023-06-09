@@ -1,4 +1,4 @@
-# frama-c -wp -wp-model 'Typed (Ref)' -wp-no-let [...]
+# frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing dispatch_var2.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards

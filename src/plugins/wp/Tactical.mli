@@ -54,6 +54,7 @@ val range : int -> int -> selection
 val compose : string -> selection list -> selection
 val multi : selection list -> selection
 val get_int : selection -> int option
+val get_bool : selection -> bool option
 val destruct : selection -> selection list
 
 val head : clause -> pred
@@ -101,7 +102,7 @@ type parameter =
 val ident : 'a field -> string
 val default : 'a field -> 'a
 val signature : 'a field -> 'a named
-val param : parameter -> string
+val pident : parameter -> string
 
 val checkbox :
   id:string -> title:string -> descr:string ->
@@ -261,5 +262,7 @@ val iter : (tactical -> unit) -> unit
 val lookup : id:string -> tactical
 val lookup_param : tactical -> id:string -> parameter
 
+type computer = term list -> term
+val add_computer : string -> computer -> unit
 val add_composer : #composer -> unit
 val iter_composer : (composer -> unit) -> unit

@@ -102,8 +102,6 @@ module Location: sig
   val equal_start_semantic : location -> location -> bool
 end
 
-module Localisation: Datatype.S with type t = localisation
-
 module Syntactic_scope:
   Datatype.S_with_collections with type t = syntactic_scope
 
@@ -368,6 +366,13 @@ module PredicateStructEq: S_with_collections_pretty with type t = predicate
 
 module Lexpr: S with type t = Logic_ptree.lexpr
 (** Beware: no pretty-printer is available. *)
+
+(**************************************************************************)
+(** {3 Machdep}                                                           *)
+(**************************************************************************)
+
+module Machdep: S_with_collections with type t = mach
+(** since 27.0-Cobalt *)
 
 (**/**)
 (* ****************************************************************************)

@@ -38,6 +38,7 @@ import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from './server';
+import * as Status from 'frama-c/kernel/Status';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -293,12 +294,14 @@ class SyncArray<K, A> {
   handler: Array<K, A>;
   upToDate: boolean;
   fetching: boolean;
+  signaled: boolean; // during fetching or offline
   model: CompactModel<K, A>;
 
   constructor(h: Array<K, A>) {
     this.handler = h;
     this.fetching = false;
     this.upToDate = false;
+    this.signaled = false;
     this.model = new CompactModel(h.getkey);
     this.model.setNaturalOrder(h.order);
     this.fetch = this.fetch.bind(this);
@@ -316,12 +319,16 @@ class SyncArray<K, A> {
   }
 
   async fetch(): Promise<void> {
-    if (this.fetching || !Server.isRunning()) return;
+    if (this.fetching || !Server.isRunning()) {
+      this.signaled = true;
+      return;
+    }
     try {
       this.fetching = true;
       let pending;
       /* eslint-disable no-await-in-loop */
       do {
+        this.signaled = false;
         const data = await Server.send(this.handler.fetch, 20000);
         const { reload = false, removed = [], updated = [] } = data;
         const { model } = this;
@@ -331,7 +338,7 @@ class SyncArray<K, A> {
         if (reload || updated.length > 0 || removed.length > 0)
           model.reload();
         pending = data.pending ?? 0;
-      } while (pending > 0);
+      } while (this.signaled || pending > 0);
       /* eslint-enable no-await-in-loop */
     } catch (error) {
       D.error(
@@ -339,6 +346,7 @@ class SyncArray<K, A> {
         error,
       );
     } finally {
+      this.signaled = false;
       this.fetching = false;
       this.upToDate = true;
     }
@@ -348,6 +356,7 @@ class SyncArray<K, A> {
     try {
       this.model.clear();
       this.upToDate = false;
+      this.signaled = false;
       if (Server.isRunning()) {
         await Server.send(this.handler.reload, null);
         this.fetch();
@@ -393,25 +402,93 @@ export function reloadArray<K, A>(arr: Array<K, A>): void {
   currentSyncArray(arr).reload();
 }
 
-/**
-   Use Synchronized Array (Custom React Hook).
+/** Access to Synchronized Array elements. */
+export interface ArrayProxy<K, A> {
+  length: number;
+  getData(elt: K | undefined): (A | undefined);
+  forEach(fn: (row: A, elt: K) => void): void;
+}
 
-   Unless specified, the hook makes the component re-render on every
-   update. Disabling this automatic re-rendering can be an option when
-   using the model to make a table view, which automatically synchronizes on
-   model updates.
-   @param sync Whether the component re-renders on updates (default is `true`).
+// --- Utility functions
+
+function arrayGet<K, A>(
+  model: CompactModel<K, A>,
+  elt: K | undefined,
+  _stamp: number,
+): A | undefined {
+  return elt ? model.getData(elt) : undefined;
+}
+
+function arrayProxy<K, A>(
+  model: CompactModel<K, A>,
+  _stamp: number,
+): ArrayProxy<K, A> {
+  return {
+    length: model.length(),
+    getData: (elt) => elt ? model.getData(elt) : undefined,
+    forEach: (fn) => model.forEach((r) => fn(r, model.getkey(r))),
+  };
+}
+
+// ---- Hooks
+
+/**
+   Use Synchronized Array as a low level, ready to use, Table Compact Model.
+
+   Warning: to be in sync with the array, one shall subscribe to model events,
+   eg. by using `useModel()` hook, like `<Table/>` element does.
  */
-export function useSyncArray<K, A>(
-  arr: Array<K, A>,
-  sync = true,
+export function useSyncArrayModel<K, A>(
+  arr: Array<K, A>
 ): CompactModel<K, A> {
   Server.useStatus();
   const st = currentSyncArray(arr);
   Server.useSignal(arr.signal, st.fetch);
   st.online();
-  useModel(st.model, sync);
   return st.model;
+}
+
+/** Use Synchronized Array as a data array. */
+export function useSyncArrayData<K, A>(arr: Array<K, A>): A[]
+{
+  return useSyncArrayModel(arr).getArray();
+}
+
+/** Use Synchronized Array element. */
+export function useSyncArrayElt<K, A>(
+  arr: Array<K, A>,
+  elt: K | undefined,
+): A | undefined {
+  const model = useSyncArrayModel(arr);
+  const stamp = useModel(model);
+  return React.useMemo(
+    () => arrayGet(model, elt, stamp),
+    [model, elt, stamp]
+  );
+}
+
+/** Use Synchronized Array as an element data getter. */
+export function useSyncArrayGetter<K, A>(
+  arr: Array<K, A>
+): (elt: K | undefined) => (A | undefined) {
+  const model = useSyncArrayModel(arr);
+  const stamp = useModel(model);
+  return React.useCallback(
+    (elt) => arrayGet(model, elt, stamp),
+    [model, stamp]
+  );
+}
+
+/** Use Synchronized Array as an array proxy. */
+export function useSyncArrayProxy<K, A>(
+  arr: Array<K, A>
+): ArrayProxy<K, A> {
+  const model = useSyncArrayModel<K, A>(arr);
+  const stamp = useModel(model);
+  return React.useMemo(
+    () => arrayProxy(model, stamp),
+    [model, stamp]
+  );
 }
 
 /**
@@ -713,6 +790,14 @@ export function useSelection(): [Selection, (a: SelectionActions) => void] {
   const [current, setCurrent] = useGlobalState(GlobalSelection);
   const callback = React.useCallback((action) => {
     setCurrent(reducer(current, action));
+    if (isMultipleSelect(action)) {
+      const l = action.locations.length;
+      const markers =
+        (l > 1) ? `${l} markers selected, listed in the 'Locations' panel` :
+          (l === 1) ? `1 marker selected` : `no markers selected`;
+      const text = `${action.name}: ${markers}`;
+      Status.setMessage({ text, title: action.title, kind: 'success' });
+    }
   }, [current, setCurrent]);
   return [current, callback];
 }
@@ -741,11 +826,8 @@ export type attributes = Ast.markerAttributesData;
 
 /** Access the marker attributes from AST. */
 export function useMarker(marker: Ast.marker | undefined): attributes {
-  const marks = useSyncArray(Ast.markerAttributes);
-  if (marker === undefined) return Ast.markerAttributesDataDefault;
-  const attrs = marks.getData(marker);
-  if (attrs === undefined) return Ast.markerAttributesDataDefault;
-  return attrs;
+  const marks = useSyncArrayElt(Ast.markerAttributes, marker);
+  return marks ?? Ast.markerAttributesDataDefault;
 }
 
 // --------------------------------------------------------------------------

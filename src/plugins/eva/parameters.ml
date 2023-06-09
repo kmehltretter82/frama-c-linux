@@ -1091,6 +1091,18 @@ module NumerorsLogFile =
                   function in the given file"
     end)
 
+let () = Parameter_customize.set_group messages
+module StatisticsFile =
+  Filepath
+    (struct
+      let option_name = "-eva-statistics-file"
+      let arg_name = "file.csv"
+      let file_kind = "CSV"
+      let existence = Fc_Filepath.Indifferent
+      let help = "Dump some internal statistics about the analysis"
+    end)
+
+
 (* ------------------------------------------------------------------------- *)
 (* --- Interpreter mode                                                  --- *)
 (* ------------------------------------------------------------------------- *)

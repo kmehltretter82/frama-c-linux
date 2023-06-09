@@ -59,7 +59,7 @@ function getAlarmStatus(alarms: Alarm[] | undefined): string {
 }
 
 type MarkerTracked = [ 'Tracked', boolean ]
-type MarkerPinned  = [ 'Pinned' , boolean ]
+type MarkerPinned  = [ 'Pinned', boolean ]
 type MarkerStatus  = MarkerTracked | MarkerPinned | 'JustFocused'
 
 function MarkerStatusClass(status: MarkerStatus): string {
@@ -211,18 +211,22 @@ function useProbeCache(): Request<Location, Probe> {
 /* -------------------------------------------------------------------------- */
 
 interface StmtProps {
+  fct?: string;
   stmt?: Ast.marker;
   marker?: Ast.marker;
   short?: boolean;
 }
 
 function Stmt(props: StmtProps): JSX.Element | null {
-  const { stmt, marker, short } = props;
-  const { descr, sloc: { base, line } } = States.useMarker(marker);
-  if (!stmt || !marker) return null;
-  const label = short ? `@L${line}` : `@${base}:${line}`;
+  const { fct, stmt, marker, short } = props;
+  const { descr } = States.useMarker(stmt);
+  const { sloc } = States.useMarker(marker);
+  if (!marker || !fct) return null;
+  // Location sloc should always be defined for statements.
+  const label = short ? `@L${sloc?.line}` : `@${sloc?.base}:${sloc?.line}`;
+  const title = stmt ? descr : "Start of function " + fct;
   const className = 'dome-text-cell eva-stmt';
-  return <span className={className} title={descr}>{label}</span>;
+  return <span className={className} title={title}>{label}</span>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -289,7 +293,7 @@ async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
         onDoubleClick={onDoubleClick}
       >
         {caller}
-        <Stmt stmt={stmt} marker={stmt} />
+        <Stmt fct={caller} stmt={stmt} marker={stmt} />
       </Cell>
     );
   };
@@ -343,7 +347,7 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
 
   const isPinned = isPinnedMarker(status);
   const pinText = isPinned ? 'Unpin' : 'Pin';
-  const loc: States.SelectionActions = { location: { fct, marker: target} };
+  const loc: States.SelectionActions = { location: { fct, marker: target } };
   const onClick = (): void => { setSelection(loc); selectProbe(); };
   const onDoubleClick = (): void => pinProbe(!isPinned);
   const onContextMenu = (): void => {
@@ -385,7 +389,7 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
         <div className='eva-header-text-overflow'>
           <span className='dome-text-cell' title={code}>{code}</span>
         </div>
-        <Stmt stmt={stmt} marker={target} short={true}/>
+        <Stmt fct={fct} stmt={stmt} marker={target} short={true}/>
       </TableCell>
     </th>
   );
@@ -411,17 +415,22 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
   const valuesClass = classes('eva-table-values', 'eva-table-values-center');
   const tableClass = classes('eva-table-descrs', 'eva-table-descr-sticky');
   const cls = classes(valuesClass, tableClass);
-  const title = (s: string): string => `Values ${s} the statement evaluation`;
   const elements: JSX.Element[] = [];
   function push(title: string, children: JSX.Element | string): void {
     elements.push(<td className={cls} title={title}>{children}</td>);
   }
-  if (!probe.effects && !probe.condition)
-    push('Values at the statement', '-');
+  if (!probe.effects && !probe.condition) {
+    if (probe.stmt)
+      push('Values at the statement', '-');
+    else if (probe.fct)
+      push('Values at the start of function ' + probe.fct, '-');
+    else
+      push('Values at the start of the analysis', '-');
+  }
   if (probe.effects || probe.condition)
-    push(title('before'), 'Before');
+    push('Values just before the statement', 'Before');
   if (probe.effects)
-    push(title('after'), 'After');
+    push('Values just after the statement', 'After');
   if (probe.condition) {
     const pushCondition = (s: string): void => {
       const t = `Values after the condition, in the ${s.toLowerCase()} branch`;
@@ -963,7 +972,7 @@ function useEvaluationMode(props: EvaluationModeProps): void {
 /* -------------------------------------------------------------------------- */
 
 /* Table's state. It is global for when the user changes the view. */
-const CallstackState = new GlobalState<callstack>('Summary');
+export const CallstackState = new GlobalState<callstack>('Summary');
 const FunctionsManagerState = new GlobalState(new FunctionsManager());
 const FocusState = new GlobalState<Probe | undefined>(undefined);
 
@@ -1032,7 +1041,7 @@ function EvaTable(): JSX.Element {
   /* On meta-selection, pin the selected location. */
   React.useEffect(() => {
     const pin = (loc: States.Location): void => {
-      const {marker, fct} = loc;
+      const { marker, fct } = loc;
       if (marker && fct) setLocPin({ target: marker, fct }, true);
     };
     States.MetaSelection.on(pin);

@@ -20,16 +20,40 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { GlobalState, useGlobalState } from 'dome/data/states';
 import * as States from 'frama-c/states';
+import { Button } from 'dome/controls/buttons';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import Gallery from 'dome/controls/gallery.json';
 
 import gearsIcon from '../images/gears.svg';
 import './style.css';
+import { onSignal } from 'frama-c/server';
 
-const EvaReady: React.FC = ({children}) => {
+class AckAbortedState extends GlobalState<boolean> {
+  #signalHookSet = false;
+
+  constructor(initValue: boolean) {
+    super(initValue);
+  }
+
+  setupSignalHooks(): void {
+    if (!this.#signalHookSet) {
+      onSignal(Eva.signalComputationState,
+        () => this.setValue(false));
+      this.#signalHookSet = true;
+    }
+  }
+}
+
+const ackAbortedState = new AckAbortedState(false);
+
+const EvaReady: React.FC = ({ children }) => {
   const state = States.useSyncValue(Eva.computationState);
+  const [ackAborted, setAckAborted] = useGlobalState(ackAbortedState);
+
+  useEffect(() => ackAbortedState.setupSignalHooks());
 
   switch (state) {
     case undefined:
@@ -55,6 +79,27 @@ const EvaReady: React.FC = ({children}) => {
 
     case 'computed':
       return <>{children}</>;
+
+    case 'aborted':
+      if (ackAborted) {
+        return <>{children}</>;
+      }
+      else {
+        return (
+          <div className="eva-status">
+            <span>
+              The Eva analysis has been prematurely aborted by an internal error
+              or a user interruption:
+              the displayed results will be incomplete.
+            </span>
+            <Button
+              label="Ok"
+              style={{ width: "2cm" }}
+              onClick={() => setAckAborted(true)}
+            />
+          </div>
+        );
+      }
   }
 };
 

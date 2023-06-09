@@ -26,7 +26,7 @@
 [eva:final-states] Values at end of function enum1_sgn1_inf_sgn0:
   res ∈ {0}
 [eva:final-states] Values at end of function f:
-  y ∈ {2557891634}
+  y ∈ {E1_SGN1}
 [eva:final-states] Values at end of function enum1_sgn1_positif:
   res ∈ {1}
 [eva:final-states] Values at end of function main:

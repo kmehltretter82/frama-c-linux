@@ -62,8 +62,59 @@ let wp_insert_memory_context model =
 (* ---  Printing informations                                           --- *)
 (* ------------------------------------------------------------------------ *)
 
+let do_print_index fmt = function
+  | Wpo.Axiomatic ax -> Wpo.pp_axiomatics fmt ax
+  | Wpo.Function(kf,bhv) -> Wpo.pp_function fmt kf bhv
+
+let rec do_print_parents fmt (node : ProofEngine.node) =
+  Option.iter (do_print_parents fmt) (ProofEngine.parent node) ;
+  Format.fprintf fmt " - %s@\n" (ProofEngine.title node)
+
+let do_print_current fmt tree =
+  match ProofEngine.current tree with
+  | `Main -> ()
+  | `Internal node | `Leaf(_,node) -> do_print_parents fmt node
+
+let do_print_goal_status fmt (g : Wpo.t) =
+  if not (Wpo.is_valid g || Wpo.is_smoke_test g) then
+    begin
+      do_print_index fmt g.po_idx ;
+      Wpo.pp_goal fmt g ;
+      if ProofSession.exists g then
+        Format.fprintf fmt "Script %a@\n" ProofSession.pp_file
+          (ProofSession.filename ~force:false g) ;
+      begin
+        match ProofEngine.get g with
+        | `None | `Script -> ()
+        | `Proof | `Saved ->
+          let tree = ProofEngine.proof ~main:g in
+          match ProofEngine.status tree with
+          | `Unproved | `Invalid | `Proved | `Passed ->
+            Wpo.pp_goal fmt g
+          | `Pending n | `StillResist n ->
+            for i = 0 to n-1 do
+              Format.fprintf fmt "%tSubgoal %d/%d:@\n" Wpo.pp_flow (succ i) n ;
+              ProofEngine.goto tree (`Leaf i) ;
+              do_print_current fmt tree ;
+              Wpo.pp_goal fmt @@ ProofEngine.head_goal tree
+            done
+      end ;
+      Wpo.pp_flow fmt ;
+    end
+
+let do_wp_print_status () =
+  begin
+    Log.print_on_output
+      (fun fmt ->
+         Wpo.iter
+           ~on_goal:(do_print_goal_status fmt) ()) ;
+  end
+
 let do_wp_print () =
   (* Printing *)
+  if Wp_parameters.Status.get () then
+    do_wp_print_status ()
+  else
   if Wp_parameters.Print.get () then
     try
       Wpo.iter ~on_goal:(fun _ -> raise Exit) () ;
@@ -77,6 +128,9 @@ let do_wp_print () =
              ~on_goal:(Wpo.pp_goal_flow fmt) ())
 
 let do_wp_print_for goals =
+  if Wp_parameters.Status.get () then
+    do_wp_print_status ()
+  else
   if Wp_parameters.Print.get () then
     if Bag.is_empty goals
     then Wp_parameters.result "No proof obligations"
@@ -426,9 +480,11 @@ let do_list_scheduled_result () =
 (* ------------------------------------------------------------------------ *)
 
 type script = {
-  mutable tactical : bool ;
+  mutable proverscript : bool ;
+  mutable strategies : bool ;
+  mutable scratch : bool ;
   mutable update : bool ;
-  mutable on_stdout : bool ;
+  mutable stdout : bool ;
   mutable depth : int ;
   mutable width : int ;
   mutable backtrack : int ;
@@ -437,7 +493,7 @@ type script = {
 }
 
 let spawn_wp_proofs ~script goals =
-  if script.tactical || script.provers<>[] then
+  if script.proverscript || script.provers<>[] then
     begin
       let server = ProverTask.server () in
       ignore (Wp_parameters.Share.get_dir "."); (* To prevent further errors *)
@@ -445,12 +501,18 @@ let spawn_wp_proofs ~script goals =
       let cache = Cache.get_mode () in
       Bag.iter
         (fun goal ->
-           if  script.tactical
+           if  script.proverscript
             && not (Wpo.is_trivial goal)
-            && (script.auto <> [] || ProofSession.exists goal)
+            && (script.auto <> [] ||
+                script.strategies ||
+                ProofSession.exists goal ||
+                Wp_parameters.DefaultStrategies.get () <> [] ||
+                ProofStrategy.hints goal <> [])
            then
              ProverScript.spawn
                ~failed:false
+               ~scratch:script.scratch
+               ~strategies:script.strategies
                ~auto:script.auto
                ~depth:script.depth
                ~width:script.width
@@ -475,11 +537,8 @@ let spawn_wp_proofs ~script goals =
     end
 
 let get_prover_names () =
-  match Wp_parameters.Provers.get () with [] -> [ "alt-ergo" ] | pnames -> pnames
-
-let env_script_update () =
-  try Sys.getenv "FRAMAC_WP_SCRIPT" = "update"
-  with Not_found -> false
+  match Wp_parameters.Provers.get () with
+  | [] -> [ "alt-ergo" ] | pnames -> pnames
 
 let compute_provers ~mode ~script =
   script.provers <- List.fold_right
@@ -487,9 +546,8 @@ let compute_provers ~mode ~script =
         match VCS.parse_prover pname with
         | None -> prvs
         | Some VCS.Tactical ->
-          script.tactical <- true ;
-          if pname = "tip" || env_script_update () then
-            script.update <- true ;
+          script.proverscript <- true ;
+          if pname = "tip" then script.strategies <- true ;
           prvs
         | Some prover ->
           let pmode = if VCS.is_auto prover then VCS.Batch else mode in
@@ -508,8 +566,13 @@ let dump_strategies =
                )))
 
 let default_script_mode () = {
-  tactical = false ; update=false ; on_stdout = false ; provers = [] ;
-  depth=0 ; width = 0 ; auto=[] ; backtrack = 0 ;
+  provers = [] ;
+  proverscript = false ;
+  strategies = false ;
+  update = ProofSession.saving_mode () ;
+  scratch = ProofSession.scratch_mode () ;
+  stdout = Wp_parameters.ScriptOnStdout.get ();
+  depth=0 ; width = 0 ; backtrack = 0 ; auto=[] ;
 }
 
 let compute_auto ~script =
@@ -534,7 +597,7 @@ let compute_auto ~script =
                  "Strategy -wp-auto '%s' unknown (ignored)." id
         ) auto ;
       script.auto <- List.rev script.auto ;
-      if script.auto <> [] then script.tactical <- true ;
+      if script.auto <> [] then script.proverscript <- true ;
     end
 
 type session_scripts = {
@@ -572,17 +635,15 @@ let do_collect_session goals =
               | ProofScript.Prover(p,r) -> VCS.is_auto p && VCS.is_valid r
               | ProofScript.Tactic(n,_,_) -> n=0
               | ProofScript.Error _ -> false in
-            let strategy = List.filter keep scripts in
-            if strategy <> [] then
+            let winning = List.filter keep scripts in
+            let file = file goal in
+            if winning <> [] then
               begin
-                let file = file goal in
-                let json = ProofScript.encode strategy in
+                let json = ProofScript.encode winning in
                 updated := (goal, file, json) :: !updated
               end
             else
-            if not (ProofSession.exists goal) then
               begin
-                let file = file goal in
                 let json = ProofScript.encode scripts in
                 incomplete := (goal, file, json) :: !incomplete
               end
@@ -593,7 +654,7 @@ let do_collect_session goals =
     removed = !removed ; }
 
 let do_update_session script session =
-  let stdout = script.on_stdout in
+  let stdout = script.stdout in
   List.iter
     begin fun (g, _, s) ->
       (* we always mark existing scripts *)
@@ -669,17 +730,15 @@ let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
   let mode = VCS.parse_mode (Wp_parameters.Interactive.get ()) in
   compute_provers ~mode ~script ;
   compute_auto ~script ;
+  ProofStrategy.typecheck () ;
   begin match provers with None -> () | Some prvs ->
     script.provers <- List.map (fun dp -> VCS.Batch , VCS.Why3 dp) prvs
   end ;
-  begin match tip with None -> () | Some tip ->
-    script.tactical <- tip ;
-    script.update <- tip ;
+  begin match tip with None -> () | Some strategies ->
+    script.proverscript <- true ;
+    script.strategies <- strategies ;
   end ;
-  begin
-    script.on_stdout <- Wp_parameters.ScriptOnStdout.get ();
-  end ;
-  let spawned = script.tactical || script.provers <> [] in
+  let spawned = script.proverscript || script.provers <> [] in
   begin
     if spawned then do_list_scheduled goals ;
     spawn_wp_proofs ~script goals ;
@@ -688,7 +747,9 @@ let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
         do_list_scheduled_result () ;
         do_session ~script goals ;
       end
-    else if not (Wp_parameters.Print.get ()) then
+    else
+    if not (Wp_parameters.Print.get () || Wp_parameters.Status.get ())
+    then
       Bag.iter do_wpo_display goals
   end
 
@@ -771,13 +832,9 @@ let pp_wp_parameters fmt =
     if spec <> [] && spec <> ["Typed"] then
       ( let descr = Factory.descr (Factory.parse spec) in
         Format.fprintf fmt " -wp-model '%s'" descr ) ;
-    if not (Wp_parameters.Let.get ()) then Format.pp_print_string fmt
-        " -wp-no-let" ;
-    if Wp_parameters.Let.get () && not (Wp_parameters.Prune.get ())
-    then Format.pp_print_string fmt " -wp-no-prune" ;
-    if Wp_parameters.Split.get () then Format.pp_print_string fmt " -wp-split" ;
+    let dt = Wp_parameters.Timeout.get_default () in
     let tm = Wp_parameters.Timeout.get () in
-    if tm <> 10 then Format.fprintf fmt " -wp-timeout %d" tm ;
+    if tm <> dt then Format.fprintf fmt " -wp-timeout %d" tm ;
     let st = Wp_parameters.Steps.get () in
     if st > 0 then Format.fprintf fmt " -wp-steps %d" st ;
     if not (Kernel.SignedOverflow.get ()) then
@@ -827,6 +884,71 @@ let do_prover_detect () =
         ) provers
 
 (* ------------------------------------------------------------------------ *)
+(* --- Tactic Searching                                                 --- *)
+(* ------------------------------------------------------------------------ *)
+
+let pp_field fmt pp (fd : 'a Tactical.field) =
+  let s = Tactical.signature fd in
+  Format.fprintf fmt "@\nParameter %S:" s.vid ;
+  if s.title <> "" then Format.fprintf fmt "@\n  Title: %s" s.title ;
+  if s.descr <> "" then Format.fprintf fmt "@\n  Descr: %s" s.descr ;
+  Format.fprintf fmt "@\n  Default: %a" pp (Tactical.default fd)
+
+let pp_parameter fmt (p : Tactical.parameter) =
+  match p with
+  | Checkbox fd ->
+    pp_field fmt Format.pp_print_bool fd
+  | Spinner(fd,rg) ->
+    pp_field fmt Format.pp_print_int fd ;
+    begin match rg.vmin , rg.vmax with
+      | None,None -> ()
+      | Some a,None -> Format.fprintf fmt "@\n  Range: %d.." a
+      | None,Some b -> Format.fprintf fmt "@\n  Range: ..%d" b
+      | Some a,Some b -> Format.fprintf fmt "@\n  Range: %d..%d" a b
+    end
+  | Composer(fd,_) ->
+    pp_field fmt Tactical.pp_selection fd
+  | Selector(fd,items,eq) ->
+    pp_field fmt
+      (fun fmt v ->
+         List.iter
+           (fun (item : _ Tactical.named) ->
+              if eq v item.value then Format.fprintf fmt "%S" item.vid
+           ) items
+      ) fd ;
+    List.iter
+      (fun (item : _ Tactical.named) ->
+         Format.fprintf fmt "@\n  Value %S: %s" item.vid item.title ;
+         if item.descr <> "" then Format.fprintf fmt " (%s)" item.descr ;
+      ) items
+  | Search(fd,_,_) ->
+    pp_field fmt
+      (fun fmt s ->
+         match s with
+         | None -> Format.pp_print_string fmt "-"
+         | Some v -> Format.fprintf fmt "%S" v.Tactical.title
+      ) fd
+
+let do_search_tactics () =
+  let ts = Wp_parameters.Tactics.get () in
+  if List.mem "?" ts then
+    Wp_parameters.result "@[<hov 2>Registered tactics:%t@]"
+      begin fun fmt ->
+        Tactical.iter (fun t -> Format.fprintf fmt "@ %s" t#id) ;
+      end ;
+  if ts <> [] then
+    Tactical.iter
+      begin fun t ->
+        if List.mem t#id ts then
+          Wp_parameters.result
+            "Tactic %S:@\n\
+             Title: @[<h>%s@]@\n\
+             Descr: @[<h>%s@]%t"
+            t#id t#title t#descr
+            (fun fmt -> List.iter (pp_parameter fmt) t#params)
+      end
+
+(* ------------------------------------------------------------------------ *)
 (* ---  Main Entry Points                                               --- *)
 (* ------------------------------------------------------------------------ *)
 
@@ -871,6 +993,7 @@ let tracelog () =
 let main = sequence [
     (fun () -> Wp_parameters.debug ~dkey:dkey_main "Start WP plugin...@.") ;
     do_prover_detect ;
+    do_search_tactics ;
     prepare_scripts ;
     cmdline_run ;
     tracelog ;

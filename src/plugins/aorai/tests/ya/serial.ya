@@ -9,6 +9,9 @@ $y2 : int;
 
 Error : { 0 == 1 } -> Error;
 
+/* In these states, the program is waiting for a status indicating that
+   data can be read */
+
 Wait1 :
   { CALL(input_status) } -> StatusReq1
 | { CALL(input_data) } -> Error
@@ -44,33 +47,35 @@ Wait5 :
 | other -> Wait5
 ;
 
+// The status have been requested, waiting for response
+
 StatusReq1 :
-  { input_status().\result & 1 == 0 } -> Wait1
-| { input_status().\result & 15 == 1 } -> StatusOk1
+  { input_status().\result & 0b0001 == 0 } -> Wait1
+| { input_status().\result & 0b1111 == 1 } -> StatusOk1
 | other -> StatusError
 ;
 
 StatusReq2 :
-  { input_status().\result & 1 == 0 } -> Wait2
-| { input_status().\result & 15 == 1 } -> StatusOk2
+  { input_status().\result & 0b0001 == 0 } -> Wait2
+| { input_status().\result & 0b1111 == 1 } -> StatusOk2
 | other -> StatusError
 ;
 
 StatusReq3 :
-  { input_status().\result & 1 == 0 } -> Wait3
-| { input_status().\result & 15 == 1 } -> StatusOk3
+  { input_status().\result & 0b0001 == 0 } -> Wait3
+| { input_status().\result & 0b1111 == 1 } -> StatusOk3
 | other -> StatusError
 ;
 
 StatusReq4 :
-  { input_status().\result & 1 == 0 } -> Wait4
-| { input_status().\result & 15 == 1 } -> StatusOk4
+  { input_status().\result & 0b0001 == 0 } -> Wait4
+| { input_status().\result & 0b1111 == 1 } -> StatusOk4
 | other -> StatusError
 ;
 
 StatusReq5 :
-  { input_status().\result & 1 == 0 } -> Wait5
-| { input_status().\result & 15 == 1 } -> StatusOk5
+  { input_status().\result & 0b0001 == 0 } -> Wait5
+| { input_status().\result & 0b1111 == 1 } -> StatusOk5
 | other -> StatusError
 ;
 
@@ -80,6 +85,8 @@ StatusError :
 | { CALL(output) } -> Error
 | other -> StatusError
 ;
+
+// Ok status have been received, data can be read
 
 StatusOk1 :
   { CALL(input_status) } -> StatusReq1
@@ -116,39 +123,43 @@ StatusOk5 :
 | other -> StatusOk5
 ;
 
+// Data have been requested
+
 DataReqE :
   { RETURN(input_data) } -> Wait1
 ;
 
 DataReq1 :
-  { input_data().\result & 192 == 128 } -> Wait2
-| { input_data().\result & 192 == 192 } -> Wait1
-| { input_data().\result & 128 == 0 } -> Wait1
+  { input_data().\result & 0b11000000 == 0b10000000 } -> Wait2
+| { input_data().\result & 0b11000000 == 0b11000000 } -> Wait1
+| { input_data().\result & 0b10000000 == 0b00000000 } -> Wait1
 ;
 
 DataReq2 :
-  { input_data().\result & 192 == 128 } -> Wait2
-| { input_data().\result & 192 == 192 } -> Wait1
-| { input_data().\result & 128 == 0 } $x1 := \result; -> Wait3
+  { input_data().\result & 0b11000000 == 0b10000000 } -> Wait2
+| { input_data().\result & 0b11000000 == 0b11000000 } -> Wait1
+| { input_data().\result & 0b10000000 == 0b00000000 } $x1 := \result; -> Wait3
 ;
 
 DataReq3 :
-  { input_data().\result & 192 == 128 } -> Wait2
-| { input_data().\result & 192 == 192 } -> Wait1
-| { input_data().\result & 128 == 0 } $x2 := \result; -> Wait4
+  { input_data().\result & 0b11000000 == 0b10000000 } -> Wait2
+| { input_data().\result & 0b11000000 == 0b11000000 } -> Wait1
+| { input_data().\result & 0b10000000 == 0b00000000 } $x2 := \result; -> Wait4
 ;
 
 DataReq4 :
-  { input_data().\result & 192 == 128 } -> Wait2
-| { input_data().\result & 192 == 192 } -> Wait1
-| { input_data().\result & 128 == 0 } $y1 := \result; -> Wait5
+  { input_data().\result & 0b11000000 == 0b10000000 } -> Wait2
+| { input_data().\result & 0b11000000 == 0b11000000 } -> Wait1
+| { input_data().\result & 0b10000000 == 0b00000000 } $y1 := \result; -> Wait5
 ;
 
 DataReq5 :
-  { input_data().\result & 192 == 128 } -> Wait2
-| { input_data().\result & 192 == 192 } -> Wait1
-| { input_data().\result & 128 == 0 } $y2 := \result; -> Complete
+  { input_data().\result & 0b11000000 == 0b10000000 } -> Wait2
+| { input_data().\result & 0b11000000 == 0b11000000 } -> Wait1
+| { input_data().\result & 0b10000000 == 0b00000000 } $y2 := \result; -> Complete
 ;
+
+/* The sequence of 5 bytes read is complete */
 
 Complete :
   { CALL(output) && output().x == $x1 + 128 * $x2 && output().y == $y1 + 128 * $y2 } -> Wait1

@@ -28,7 +28,7 @@ import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
-import * as API from 'frama-c/plugins/dive/api';
+import * as API from './api';
 
 import Cytoscape from 'cytoscape';
 import CytoscapeComponent from 'react-cytoscapejs';
@@ -62,6 +62,11 @@ interface CytoscapeExtended extends Cytoscape.Core {
   cxtmenu(options: unknown): void;
   panzoom(options: unknown): void;
 }
+
+type Identified = { id: string }
+type NodeData = Cytoscape.NodeDataDefinition & Identified
+type EdgeData = { id: string;[key: string]: unknown }
+type NodeOrId = string | Cytoscape.NodeSingular
 
 function callstackToString(callstack: API.callstack): string {
   return callstack.map((cs) => `${cs.fun}:${cs.instr}`).join('/');
@@ -167,20 +172,18 @@ class Dive {
         if (context) {
           (this.cy.style() as any).selector('node').style('width',
             (node: any) => {
-            const fStyle = node.pstyle('font-style').strValue;
-            const weight = node.pstyle('font-weight').strValue;
-            const size = node.pstyle('font-size').pfValue;
-            const family = node.pstyle('font-family').strValue;
-            context.font = `${fStyle} ${weight} ${size}px ${family}`;
-            const width = context.measureText(node.data('label')).width;
-            return `${Math.max(min, width + padding)}px`;
-          });
+              const fStyle = node.pstyle('font-style').strValue;
+              const weight = node.pstyle('font-weight').strValue;
+              const size = node.pstyle('font-size').pfValue;
+              const family = node.pstyle('font-family').strValue;
+              context.font = `${fStyle} ${weight} ${size}px ${family}`;
+              const width = context.measureText(node.data('label')).width;
+              return `${Math.max(min, width + padding)}px`;
+            });
         }
       }
     }
     /* eslint-enable @typescript-eslint/no-explicit-any */
-
-    this.refresh();
   }
 
   onCxtMenu(node: Cytoscape.NodeSingular): Cxtcommand[] {
@@ -189,7 +192,7 @@ class Dive {
     buildCxtMenu(commands,
       <><div className="fas fa-binoculars fa-2x" />Explore</>,
       () => { this.explore(node); });
-    if (data.kind === 'composite')
+    if (data.nkind === 'composite')
       buildCxtMenu(commands,
         <><div className="fa fa-expand-arrows-alt fa-2x" />Unfold</>);
     else
@@ -304,84 +307,100 @@ class Dive {
       timeout = setTimeout(() => {
         tips?.forEach((tip) => tip.hide());
         tips = null; // Force rebuilding tips in case they changed
-      }, 1000);
+      }, 0);
     });
   }
 
-  receiveGraph(data: API.graphData): Cytoscape.CollectionReturnValue {
-    let newNodes = this.cy.collection();
-
-    for (const node of data.nodes) {
-      const data : { [k: string]: unknown } = { ...node};
-      if (typeof node.range === 'number')
-        data.stops = `0% ${node.range}% ${node.range}% 100%`;
-
-      let ele = this.cy.$id(node.id.toString());
-      if (ele.nonempty()) {
-        ele.removeData();
-        ele.data(data);
-        ele.neighborhood('edge').remove();
-      }
-      else {
-        if (node.locality.callstack)
-          data.parent = this.referenceCallstack(node.locality.callstack)?.id();
-        else
-          data.parent = this.referenceFile(node.locality.file).id();
-
-        ele = this.cy.add({group: 'nodes', data, classes: 'new'});
-        this.addTips(ele);
-        newNodes = ele.union(newNodes);
-      }
-
-      // Add a node for the user to ask for more dependencies
-      const idmore = `${node.id}-more`;
-      this.cy.$id(idmore).remove();
-      if (node.backward_explored === 'partial') {
-        const elemore = this.cy.add({
-          group: 'nodes',
-          data: { id: idmore, parent: ele.data('parent') },
-          classes: 'new more',
-        });
-        newNodes = elemore.union(newNodes);
-        this.cy.add({
-          group: 'edges',
-          data: { source: idmore, target: node.id },
-          classes: 'new',
-        });
-      }
+  updateElement(group: Cytoscape.ElementGroup, data: NodeData | EdgeData):
+    Cytoscape.CollectionReturnValue {
+    let element = this.cy.$id(data.id);
+    if (element.nonempty()) {
+      element.removeData();
+      element.data(data);
     }
-
-    for (const dep of data.deps) {
-      const src = this.cy.$id(dep.src.toString());
-      const dst = this.cy.$id(dep.dst.toString());
-      this.cy.add({
-        data: {
-          ...(dep as { [k: string]: unknown }),
-          source: dep.src,
-          target: dep.dst
-        },
-        group: 'edges',
-        classes: src?.hasClass('new') || dst?.hasClass('new') ? 'new' : '',
-      });
+    else {
+      element = this.cy.add({ group, data });
+      element.addClass("new");
     }
-
-    return newNodes;
+    element.removeClass("stale");
+    return element;
   }
 
-  receiveData(data: API.diffData): Cytoscape.NodeSingular | undefined {
+  updateNode(data: NodeData):
+    Cytoscape.NodeSingular {
+      const element = this.updateElement("nodes", data);
+      element.addClass('node');
+      return element;
+  }
+
+  updateEdge(src: NodeOrId, dst: NodeOrId, data: EdgeData):
+    Cytoscape.EdgeSingular {
+    const source = typeof src === "string" ? src : src.id();
+    const target = typeof dst === "string" ? dst : dst.id();
+    data = { ...data, source, target };
+    const element = this.updateElement("edges", data);
+    element.addClass('dependency');
+    return element;
+  }
+
+  updateNodeData(node: API.node): void {
+    const data = { ...node, id: `${node.id}` } as NodeData;
+
+    // Interval range visualization (see cytoscape stops style property)
+    if (typeof node.range === 'number')
+      data.stops = `0% ${node.range}% ${node.range}% 100%`;
+
+    // Build clusters for this node if needed
+    if (node.locality.callstack)
+      data.parent = this.referenceCallstack(node.locality.callstack)?.id();
+    else
+      data.parent = this.referenceFile(node.locality.file).id();
+
+    // Add new node or update existing node
+    const ele = this.updateNode(data);
+    if (ele.hasClass("new"))
+      this.addTips(ele);
+
+    // Add a node for the user to ask for more dependencies
+    const idmore = `${node.id}-more`;
+    if (node.backward_explored === 'partial') {
+      const elemore = this.updateNode({ id: idmore, parent: data.parent });
+      elemore.addClass("more");
+      this.updateEdge(elemore, ele, { id: `e${node.id}-more` });
+    }
+    else {
+      this.cy.$id(idmore).remove();
+    }
+  }
+
+  updateEdgeData(edge: API.dependency): void {
+    const data = { ...edge, id: `e${edge.id}` } as EdgeData;
+    this.updateEdge(`${edge.src}`, `${edge.dst}`, data);
+  }
+
+  updateGraph(data: API.graphData[]): void {
     this.cy.startBatch();
+    this.cy.$('.node, .dependency').addClass('stale');
 
-    for (const id of data.sub)
-      this.remove(this.cy.$id(id.toString()));
+    // Update vertices
+    for (const d of data) {
+      if ('nkind' in d.element) // Node
+        this.updateNodeData(d.element);
+    }
 
-    const newNodes = this.receiveGraph(data.add);
+    // Edges must be updated after vertices since their sources and destination
+    // must have been created beforhand
+    for (const d of data) {
+      if ('dkind' in d.element) // Dependency
+        this.updateEdgeData(d.element);
+    }
+
+    // Remove nodes that are not present anymore
+    this.cy.$('.stale').forEach(n => this.remove(n));
 
     this.cy.endBatch();
 
-    this.recomputeLayout(newNodes);
-
-    const root = data.root;
-    return root ? this.cy.$id(root.toString()) : undefined;
+    this.recomputeLayout(this.cy.$('node.new'));
   }
 
   get layout(): string {
@@ -423,14 +442,15 @@ class Dive {
   }
 
   async exec<In>(
-    request: Server.ExecRequest<In, API.diffData | null>,
+    request: Server.ExecRequest<In, number | undefined | null>,
     param: In): Promise<Cytoscape.NodeSingular | undefined> {
     try {
       if (Server.isRunning()) {
         await this.setMode();
-        const data = await Server.send(request, param);
-        if (data)
-          return this.receiveData(data);
+        const r = await Server.send(request, param);
+        if (r) {
+          return undefined;
+        }
       }
     }
     catch (err) {
@@ -438,21 +458,6 @@ class Dive {
     }
 
     return undefined;
-  }
-
-  async refresh(): Promise<void> {
-    try {
-      if (Server.isRunning()) {
-        const data = await Server.send(API.graph, {});
-        this.cy.startBatch();
-        const newNodes = this.receiveGraph(data);
-        this.cy.endBatch();
-        this.recomputeLayout(newNodes);
-      }
-    }
-    catch (err) {
-      Debug.error(err);
-    }
   }
 
   static async setWindow(window: API.explorationWindow): Promise<void> {
@@ -573,10 +578,11 @@ type GraphViewRef = {
 
 const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
   (props: GraphViewProps, ref) => {
-  const {lock, layout, selectionMode} = props;
+  const { lock, layout, selectionMode } = props;
 
   const [dive, setDive] = useState(() => new Dive());
   const [selection, updateSelection] = States.useSelection();
+  const graph = States.useSyncArrayData(API.graph);
 
   function setCy(cy: Cytoscape.Core): void {
     if (cy !== dive.cy)
@@ -586,12 +592,16 @@ const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
   useImperativeHandle(ref, () => ({ clear: () => dive.clear() }));
 
   useEffect(() => {
-    setDive(new Dive(dive.cy));
+    setDive(new Dive(dive.cy)); // On hot reload, setup a new instance
   }, [Dive]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     dive.layout = layout;
-  }, [dive, layout]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [dive, layout]);
+
+  useEffect(() => {
+    dive.updateGraph(graph);
+  }, [dive, graph]);
 
   // Follow mode
   useEffect(() => {

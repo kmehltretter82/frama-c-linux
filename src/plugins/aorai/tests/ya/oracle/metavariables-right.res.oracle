@@ -49,7 +49,7 @@ check lemma b_deterministic_trans{L}:
      \at(aorai_CurOperation,L) ≡ op_f ∧
      \at(aorai_CurOpStatus,L) ≡ aorai_Called);
  */
-/*@ ghost int aorai_CurStates = a; */
+/*@ ghost enum aorai_States aorai_CurStates = a; */
 /*@ ghost int aorai_x = 0; */
 /*@
 check lemma e_deterministic_trans{L}:
@@ -120,9 +120,10 @@ check lemma e_deterministic_trans{L}:
   void f_pre_func(int x)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
-    if (2 == aorai_CurStates) {
+    if ((unsigned int)2 == aorai_CurStates) {
       aorai_CurStates = c;
       aorai_x = x;
       aorai_y = aorai_x;
@@ -183,9 +184,10 @@ check lemma e_deterministic_trans{L}:
   void f_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
-    if (3 == aorai_CurStates) aorai_CurStates = e;
+    if ((unsigned int)3 == aorai_CurStates) aorai_CurStates = e;
     else aorai_CurStates = aorai_reject;
     return;
   }
@@ -260,9 +262,10 @@ void f(int x)
   void g_pre_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_g;
-    if (2 == aorai_CurStates) aorai_CurStates = d;
+    if ((unsigned int)2 == aorai_CurStates) aorai_CurStates = d;
     else aorai_CurStates = aorai_reject;
     return;
   }
@@ -319,9 +322,10 @@ void f(int x)
   void g_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_g;
-    if (4 == aorai_CurStates) aorai_CurStates = g_0;
+    if ((unsigned int)4 == aorai_CurStates) aorai_CurStates = g_0;
     else aorai_CurStates = aorai_reject;
     return;
   }
@@ -391,9 +395,10 @@ void g(void)
   void h_pre_func(int x)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_h;
-    if (5 == aorai_CurStates) 
+    if ((unsigned int)5 == aorai_CurStates) 
       if (aorai_x > 0) aorai_CurStates = f_0;
       else aorai_CurStates = aorai_reject;
     else aorai_CurStates = aorai_reject;
@@ -452,9 +457,10 @@ void g(void)
   void h_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_h;
-    if (6 == aorai_CurStates) aorai_CurStates = g_0;
+    if ((unsigned int)6 == aorai_CurStates) aorai_CurStates = g_0;
     else aorai_CurStates = aorai_reject;
     return;
   }
@@ -524,9 +530,10 @@ void h(int x)
   void i_pre_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_i;
-    if (7 == aorai_CurStates) aorai_CurStates = h_0;
+    if ((unsigned int)7 == aorai_CurStates) aorai_CurStates = h_0;
     else aorai_CurStates = aorai_reject;
     return;
   }
@@ -594,9 +601,10 @@ void h(int x)
   void i_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_i;
-    if (8 == aorai_CurStates) {
+    if ((unsigned int)8 == aorai_CurStates) {
       aorai_CurStates = e;
       aorai_y = 0;
       aorai_x = 1;
@@ -675,9 +683,10 @@ void i(void)
   void main_pre_func(int t)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
-    if (0 == aorai_CurStates) aorai_CurStates = b;
+    if ((unsigned int)0 == aorai_CurStates) aorai_CurStates = b;
     else aorai_CurStates = aorai_reject;
     return;
   }
@@ -734,9 +743,10 @@ void i(void)
   void main_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
-    if (5 == aorai_CurStates) aorai_CurStates = i_0;
+    if ((unsigned int)5 == aorai_CurStates) aorai_CurStates = i_0;
     else aorai_CurStates = aorai_reject;
     return;
   }

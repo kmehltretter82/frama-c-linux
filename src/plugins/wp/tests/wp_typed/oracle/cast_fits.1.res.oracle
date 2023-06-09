@@ -5,9 +5,18 @@
 [wp] cast_fits.i:13: Warning: 
   Cast with incompatible pointers types (source: __anonstruct_L2_2*)
      (target: sint32*)
+[wp:union] cast_fits.i:45: Warning: 
+  Accessing union fields with WP might be unsound.
+  Please refer to WP manual.
+[wp:union] cast_fits.i:52: Warning: 
+  Accessing union fields with WP might be unsound.
+  Please refer to WP manual.
 [wp] cast_fits.i:54: Warning: 
   Cast with incompatible pointers types (source: __anonunion_L8_8*)
      (target: sint32*)
+[wp:union] cast_fits.i:61: Warning: 
+  Accessing union fields with WP might be unsound.
+  Please refer to WP manual.
 [wp] cast_fits.i:60: Warning: 
   Cast with incompatible pointers types (source: sint32*)
      (target: __anonunion_L8_8*)

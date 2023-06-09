@@ -58,6 +58,8 @@
 ########
 | "dune-project"  -> frame open:";;" line:";" close:";;"
 | ".*dune-project" -> skip match:"(lang.*"
+| "dune-workspace.*" -> frame open:";;" line:";" close:";;"
+| ".*dune-workspace.*" -> skip match:"(lang.*"
 | "dune"          -> frame open:";;" line:";" close:";;"
 
 ############

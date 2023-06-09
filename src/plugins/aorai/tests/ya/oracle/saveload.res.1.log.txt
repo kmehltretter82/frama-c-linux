@@ -4,37 +4,37 @@
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
-  aorai_CurOperation ∈ {0}
-  aorai_CurOpStatus ∈ {0}
-  aorai_CurStates ∈ {2}
+  aorai_CurOperation ∈ {op_main}
+  aorai_CurOpStatus ∈ {aorai_Called}
+  aorai_CurStates ∈ {init}
 [aorai] saveload.i:14: accept
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f_post_func:
-  aorai_CurOperation ∈ {1}
-  aorai_CurOpStatus ∈ {1}
-  aorai_CurStates ∈ {0}
+  aorai_CurOperation ∈ {op_f}
+  aorai_CurOpStatus ∈ {aorai_Terminated}
+  aorai_CurStates ∈ {accept}
 [eva:final-states] Values at end of function f_pre_func:
-  aorai_CurOperation ∈ {1}
-  aorai_CurOpStatus ∈ {0}
-  aorai_CurStates ∈ {0}
+  aorai_CurOperation ∈ {op_f}
+  aorai_CurOpStatus ∈ {aorai_Called}
+  aorai_CurStates ∈ {accept}
 [eva:final-states] Values at end of function f:
-  aorai_CurOperation ∈ {1}
-  aorai_CurOpStatus ∈ {1}
-  aorai_CurStates ∈ {0}
+  aorai_CurOperation ∈ {op_f}
+  aorai_CurOpStatus ∈ {aorai_Terminated}
+  aorai_CurStates ∈ {accept}
 [eva:final-states] Values at end of function main_post_func:
-  aorai_CurOperation ∈ {0}
-  aorai_CurOpStatus ∈ {1}
-  aorai_CurStates ∈ {0}
+  aorai_CurOperation ∈ {op_main}
+  aorai_CurOpStatus ∈ {aorai_Terminated}
+  aorai_CurStates ∈ {accept}
 [eva:final-states] Values at end of function main_pre_func:
-  aorai_CurOperation ∈ {0}
-  aorai_CurOpStatus ∈ {0}
-  aorai_CurStates ∈ {0}
+  aorai_CurOperation ∈ {op_main}
+  aorai_CurOpStatus ∈ {aorai_Called}
+  aorai_CurStates ∈ {accept}
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}
-  aorai_CurOperation ∈ {0}
-  aorai_CurOpStatus ∈ {1}
-  aorai_CurStates ∈ {0}
+  aorai_CurOperation ∈ {op_main}
+  aorai_CurOpStatus ∈ {aorai_Terminated}
+  aorai_CurStates ∈ {accept}
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   6 functions analyzed (out of 6): 100% coverage.

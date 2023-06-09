@@ -38,6 +38,13 @@ __PUSH_FC_STDLIB
 #include "__fc_define_intptr_t.h"
 #include "__fc_define_fds.h"
 #include "limits.h"
+
+#ifndef __FC_POSIX_VERSION
+#error "unistd.h should only be included with a POSIX machdep"
+#endif
+
+#define _POSIX_VERSION __FC_POSIX_VERSION
+
 __BEGIN_DECLS
 
 extern volatile int Frama_C_entropy_source;

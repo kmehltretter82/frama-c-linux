@@ -1,7 +1,13 @@
-# frama-c -wp -wp-no-let [...]
+# frama-c -wp [...]
 [kernel] Parsing init_value.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
+[wp:union] init_value.i:61: Warning: 
+  Accessing union fields with WP might be unsound.
+  Please refer to WP manual.
+[wp:union] init_value.i:40: Warning: 
+  Accessing union fields with WP might be unsound.
+  Please refer to WP manual.
 ------------------------------------------------------------
   Function fa1
 ------------------------------------------------------------

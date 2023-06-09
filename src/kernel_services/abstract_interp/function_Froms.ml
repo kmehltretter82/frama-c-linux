@@ -105,7 +105,7 @@ struct
       indirect = Zone.join fd1.indirect fd2.indirect
     }
 
-  let _narrow fd1 fd2 = {
+  let narrow fd1 fd2 = {
     data = Zone.narrow fd1.data fd2.data;
     indirect = Zone.narrow fd1.indirect fd2.indirect
   }

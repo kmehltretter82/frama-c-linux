@@ -34,4 +34,11 @@ int main() {
     Frama_C_unsigned_long_interval(LONG_MAX - 1UL, LONG_MAX + 1UL);
   //@ assert bounds: LONG_MAX - 1 <= ul <= LONG_MAX + 1;
   //@ assert sampling:unknown: ul == LONG_MAX;
+
+#ifdef __WORDSIZE
+  int w = __WORDSIZE;
+#else
+  int w = -1;
+#endif
+  //@ assert __WORDSIZE_is_defined: w > 0;
 }

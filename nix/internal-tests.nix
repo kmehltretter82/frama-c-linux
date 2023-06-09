@@ -30,11 +30,14 @@
 , ocamlgraph
 , ocp-indent
 , ppx_deriving
+, ppx_deriving_yaml
 , ppx_deriving_yojson
 , ppx_import
+, unionFind
 , yojson
 , which
 , why3
+, yaml
 , zarith
 , zmq
 # Frama-C tests
@@ -87,10 +90,13 @@ stdenvNoCC.mkDerivation rec {
     ocamlgraph
     ocp-indent
     ppx_deriving
+    ppx_deriving_yaml
     ppx_deriving_yojson
     ppx_import
+    unionFind
     yojson
     which
+    yaml
     why3
     zarith
     zmq

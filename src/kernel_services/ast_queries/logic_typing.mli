@@ -163,6 +163,23 @@ sig
   val mk_cast:
     ?explicit:bool -> Cil_types.term -> Cil_types.logic_type -> Cil_types.term
 
+  (** [conditional_conversion loc rel t1 t2]
+      tries to find a common type between two terms, either as part of
+      a comparison or a conditional.
+      comparisons can notably introduce logic coercions to Real, potentially
+      with a warning if [acsl-float-compare] is active.
+
+      @param loc the location of the comparison. Can be used in error/warning msg
+      @param rel the relation, or [None] for a conditional
+      @param t1 first term
+      @param t2 second term
+
+      @since 27.0-Cobalt
+  *)
+  val conditional_conversion:
+    Cil_types.location -> Logic_ptree.relation option ->
+    Cil_types.term -> Cil_types.term -> Cil_types.logic_type
+
   (** type-checks a term. *)
   val term : Lenv.t -> Logic_ptree.lexpr -> term
 

@@ -3,9 +3,9 @@
 */
 
 /* run.config_qualif
-   OPT: -wp -wp-split-depth -2 -wp-par 1 -wp-msg-key cnf -wp-debug 1
+   OPT: -wp -wp-split-cnf -2 -wp-par 1 -wp-msg-key cnf -wp-debug 1
 
-// -wp-split-depth -2 -> replace the Goal by Goal<==>CNF(Goal)
+// -wp-split-cnf -2 debug mode that replaces the Goal by Goal<==>CNF(Goal)
 */
 
 

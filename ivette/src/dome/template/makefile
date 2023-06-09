@@ -25,6 +25,7 @@
 # --------------------------------------------------------------------------
 
 # DOMEMK_ reserved for makefile derived variables
+# CURDIR is a Makefile builtin variable
 
 APP?=$(shell basename $(CURDIR))
 COPYRIGHT?=CEA Tech
@@ -220,10 +221,11 @@ dome-dev: dome-pkg dome-templ
 	@echo "#!/bin/sh" >> $(DOME_CLI)
 	@echo "export DOME='$(DOME)'" >> $(DOME_CLI)
 	@echo "export DOME_ENV='dev'" >> $(DOME_CLI)
-	@echo 'exec $(DOME_MK_BIN)/electron-webpack dev $(DOME_ARGS) $(DOME_DEV) "$$@"' >> $(DOME_CLI)
+	@echo 'WDIR=$$PWD' >> $(DOME_CLI)
+	@echo 'ARGV="$(DOME_ARGS) $(DOME_DEV) $$@"' >> $(DOME_CLI)
+	@echo "cd $(CURDIR)" >> $(DOME_CLI)
+	@echo 'exec $(DOME_MK_BIN)/electron-webpack dev $$WDIR $$ARGV' >> $(DOME_CLI)
 	@chmod 555 $(DOME_CLI)
-	@echo "[Dome] running application (development)"
-	@$(DOME_CLI)
 
 # --------------------------------------------------------------------------
 # ---  Application Building
@@ -246,11 +248,18 @@ dome-app: dome-pkg dome-templ
 # ---  Application Packaging
 # --------------------------------------------------------------------------
 
-.PHONY: dome-dist
+.PHONY: dome-dist dome-appimage
 
+# Compatible with all OS for installation from source
 dome-dist: dome-app
-	@echo "[Dome] packaging application (production)"
+	@echo "[Dome] packaging application (binary)"
 	DOME=$(DOME) yarn run electron-builder --dir -c.compression=store -c.mac.identity=null
+	@echo "[Dome] application packaged in ./dist"
+
+# Build Linux AppImage for binary distribution
+dome-appimage: dome-app
+	@echo "[Dome] packaging application (AppImage)"
+	DOME=$(DOME) yarn run electron-builder --linux -c.compression=store -c.mac.identity=null
 	@echo "[Dome] application packaged in ./dist"
 
 # --------------------------------------------------------------------------

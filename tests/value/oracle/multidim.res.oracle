@@ -186,7 +186,7 @@
   more than 1(1000) locations to update in array. Approximating.
 [eva] multidim.c:145: 
   Frama_C_domain_show_each:
-  t : # cvalue: [0].typ ∈ {1; 2} or UNINITIALIZED
+  t : # cvalue: [0].typ ∈ {INT; FLOAT} or UNINITIALIZED
                 {[0].val; [1..999]} ∈ [--..--] or UNINITIALIZED
       # multidim: [0 .. 999] = {
                     { .typ = {1}, .val.i = {42} } or 
@@ -250,7 +250,7 @@
   t[0..99] ∈ {0}
 [eva:final-states] Values at end of function main7:
   Frama_C_entropy_source ∈ [--..--]
-  t[0].typ ∈ {1; 2} or UNINITIALIZED
+  t[0].typ ∈ {INT; FLOAT} or UNINITIALIZED
    {[0].val; [1..999]} ∈ [--..--] or UNINITIALIZED
   j ∈ [0..999]
 [eva:final-states] Values at end of function main8:

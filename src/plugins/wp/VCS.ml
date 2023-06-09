@@ -140,6 +140,11 @@ let cmp_prover p q =
 let pp_prover fmt p = Format.pp_print_string fmt (title_of_prover p)
 let pp_mode fmt m = Format.pp_print_string fmt (title_of_mode m)
 
+let provers () =
+  List.map (fun p -> Why3 p) @@
+  List.filter Why3Provers.is_mainstream @@
+  Why3Provers.provers ()
+
 module P = struct type t = prover let compare = cmp_prover end
 module Pset = Set.Make(P)
 module Pmap = Map.Make(P)
@@ -150,28 +155,31 @@ module Pmap = Map.Make(P)
 
 type config = {
   valid : bool ;
-  timeout : int option ;
+  timeout : float option ;
   stepout : int option ;
 }
 
-let param f = let v = f() in if v>0 then Some v else None
-
-let current () = {
-  valid = false ;
-  timeout = param Wp_parameters.Timeout.get ;
-  stepout = param Wp_parameters.Steps.get ;
-}
+let current () =
+  let t = Wp_parameters.Timeout.get () in
+  let s = Wp_parameters.Steps.get () in
+  {
+    valid = false ;
+    timeout = if t > 0 then Some (float t) else None ;
+    stepout = if s > 0 then Some s else None ;
+  }
 
 let default = { valid = false ; timeout = None ; stepout = None }
 
 let get_timeout ?kf ~smoke = function
   | { timeout = None } ->
     if smoke
-    then Wp_parameters.SmokeTimeout.get ()
-    else begin match Option.map Wp_parameters.FctTimeout.find kf with
-      | exception Not_found | None -> Wp_parameters.Timeout.get ()
-      | Some timeout -> timeout
-    end
+    then float @@ Wp_parameters.SmokeTimeout.get ()
+    else
+      let t =
+        match Option.map Wp_parameters.FctTimeout.find kf with
+        | None | exception Not_found -> Wp_parameters.Timeout.get ()
+        | Some timeout -> timeout
+      in float t
   | { timeout = Some t } -> t
 
 let get_stepout = function
@@ -226,14 +234,14 @@ let configure r =
   let timeout =
     let t = r.prover_time in
     if t > 0.0 then
-      let timeout = Wp_parameters.Timeout.get() in
-      let margin = Wp_parameters.TimeExtra.get() + int_of_float (t +. 0.5) in
-      Some(max timeout margin)
+      let timeout = float @@ max 0 @@ Wp_parameters.Timeout.get() in
+      let margin = float @@ max 0 @@ Wp_parameters.TimeExtra.get () in
+      Some(timeout +. margin)
     else
       None in
   let stepout =
     if r.prover_steps > 0 && r.prover_time <= 0.0 then
-      let stepout = Wp_parameters.Steps.get () in
+      let stepout = max 0 @@ Wp_parameters.Steps.get () in
       let margin = 1000 in
       Some(max stepout margin)
     else None in
@@ -274,7 +282,7 @@ let no_result = result NoResult
 let valid = result Valid
 let invalid = result Invalid
 let unknown = result Unknown
-let timeout t = result ~time:(float t) Timeout
+let timeout t = result ~time:t Timeout
 let stepout n = result ~steps:n Stepout
 let computing kill = result (Computing kill)
 let failed ?pos msg = {

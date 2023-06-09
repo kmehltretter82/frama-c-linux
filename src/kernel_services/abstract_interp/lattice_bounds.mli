@@ -82,7 +82,8 @@ module Bottom : sig
 
   (* Iterators *)
   val iter: ('a -> unit) -> 'a t -> unit
-  val fold: bottom: 'b -> ('a -> 'b) -> 'a t -> 'b
+  val bind: ('a -> 'b t) -> 'a t -> 'b t
+  val fold: bottom:'b -> ('a -> 'b) -> 'a t -> 'b
   val map: ('a -> 'b) -> 'a t -> 'b t
 
   (* Combination *)
@@ -144,6 +145,12 @@ module Top : sig
   val join: ('a -> 'a -> 'a t) -> 'a t -> 'a t -> 'a t
   val narrow: ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
 
+  (* Iterators *)
+  val iter: ('a -> unit) -> 'a t -> unit
+  val bind: ('a -> 'b t) -> 'a t -> 'b t
+  val fold: top:'b -> ('a -> 'b) -> 'a t -> 'b
+  val map: ('a -> 'b) -> 'a t -> 'b t
+
   (** Combination *)
   val zip: 'a t -> 'b t -> ('a * 'b) t (* `Top if any is `Top *)
 
@@ -188,4 +195,10 @@ module TopBottom: sig
   (* Lattice operators *)
   val join: ('a -> 'a -> [< 'a t]) -> 'a t -> 'a t -> 'a t
   val narrow: ('a -> 'a -> [< 'a t]) -> 'a t -> 'a t -> 'a t
+
+  (* Iterators *)
+  val iter: ('a -> unit) -> 'a t -> unit
+  val bind: ('a -> 'b t) -> 'a t -> 'b t
+  val fold: top:'b -> bottom:'b -> ('a -> 'b) -> 'a t -> 'b
+  val map: ('a -> 'b) -> 'a t -> 'b t
 end

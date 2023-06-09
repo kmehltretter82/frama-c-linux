@@ -5,10 +5,10 @@ let
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
     camlp5 = oself.callPackage ./camlp5.nix {};
     headache = oself.callPackage ./headache.nix {};
-    menhirLib = oself.callPackage ./menhirLib.nix {};
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
-    psmt2-frontend = oself.callPackage ./psmt2-frontend.nix {};
     why3 = oself.callPackage ./why3.nix {};
+    yaml = oself.callPackage ./yaml.nix {};
+    ppx_deriving_yaml = oself.callPackage ./ppx_deriving_yaml.nix {};
 
     # Helpers
     mk_tests = oself.callPackage ./mk_tests.nix {};
@@ -26,11 +26,11 @@ let
     frama-c = oself.callPackage ./frama-c.nix {};
     frama-c-hdrck = oself.callPackage ./frama-c-hdrck.nix {};
     frama-c-lint = oself.callPackage ./frama-c-lint.nix {};
-    lint = oself.callPackage ./lint.nix {};
 
     # Tests
     default-config-tests = oself.callPackage ./default-config-tests.nix {};
-    e-acsl-tests = oself.callPackage ./e-acsl-tests.nix {};
+    e-acsl-tests = oself.callPackage ./e-acsl-tests.nix { config = ""; };
+    e-acsl-dev-tests = oself.callPackage ./e-acsl-tests.nix { config = "dev"; };
     eva-default-tests = oself.callPackage ./eva-tests.nix { config = ""; };
     eva-apron-tests = oself.callPackage ./eva-tests.nix { config = "apron" ; };
     eva-bitwise-tests = oself.callPackage ./eva-tests.nix { config = "bitwise" ; };

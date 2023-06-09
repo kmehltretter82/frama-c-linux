@@ -3,12 +3,12 @@
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
-  G2 ∈ {0}
+  G2 ∈ {E1}
   G3 ∈ {75}
   G4 ∈ {0}
   R ∈ {0}
   v ∈ [--..--]
-  G1 ∈ {0}
+  G1 ∈ {E1}
 [eva] Recording results for main
 [eva] done for function main
 [eva] ====== VALUES COMPUTED ======

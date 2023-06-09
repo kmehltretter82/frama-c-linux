@@ -139,7 +139,7 @@ int main(void)
   short tt;
   unsigned int ui = (unsigned int)42;
   char *string = (char *)"foo";
-  wchar_t *wstring = L"b" "a" "r" ;
+  wchar_t *wstring = (wchar_t *)L"b" "a" "r" ;
   int volatile nondet = 0;
   switch (nondet) {
     case 0: printf("%n",(int *)(& tt)); /* printf_va_1 */

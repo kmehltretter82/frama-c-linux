@@ -251,10 +251,13 @@ export const globalSettings = new Event(Settings.global);
 // --- Closing
 // --------------------------------------------------------------------------
 
-ipcRenderer.on('dome.ipc.closing', System.doExit);
+ipcRenderer.on('dome.ipc.closing', async () => {
+    await System.doExit();
+    ipcRenderer.send('dome.ipc.closing.done');
+  });
 
 /** Register a callback to be executed when the window is closing. */
-export function atExit(callback: () => void): void {
+export function atExit(callback: () => (void | Promise<void>)): void {
   System.atExit(callback);
 }
 
@@ -603,7 +606,7 @@ export function usePromise<A>(job: Promise<A>): PromiseHook<A> {
     let c = false;
     const set = (x?: A, e?: Error): void => { setResult(x); setError(e); };
     const doCancel = (): boolean => { if (!c) setLoading(false); return c; };
-    const onResult = (x: A): void => { if (!doCancel()) set(x, undefined);};
+    const onResult = (x: A): void => { if (!doCancel()) set(x, undefined); };
     const onError = (e: Error): void => { if (!doCancel()) set(undefined, e); };
     job.then(onResult, onError);
     return () => { c = true; };

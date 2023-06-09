@@ -24,7 +24,7 @@ open Cil_types
 open Dive_types
 open Context
 
-val add_lval : t -> kinstr -> lval -> node
+val add_lval : t -> stmt -> lval -> node
 val add_var : t -> varinfo -> node
 val add_alarm : t -> stmt -> Alarms.alarm -> node
 val add_annotation : t -> stmt -> code_annotation -> node option

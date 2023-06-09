@@ -40,7 +40,7 @@ let new_node
   node_taint = None;
   node_writes_computation = NotDone;
   node_reads_computation = NotDone;
-  node_writes_stmts = [];
+  node_writes = [];
 }
 
 module Node = Datatype.Make_with_collections
@@ -80,9 +80,9 @@ let create_node ~node_kind ~node_locality g =
 
 let remove_node = remove_vertex
 
-let create_dependency g kinstr v1 dependency_kind v2 =
+let create_dependency g ~origin ~kind v1  v2 =
   let same_kind (_,e,_) =
-    e.dependency_kind = dependency_kind
+    e.dependency_kind = kind
   in
   let matching_edge =
     try
@@ -94,21 +94,19 @@ let create_dependency g kinstr v1 dependency_kind v2 =
     | None ->
       let e = {
         dependency_key = fresh_key ();
-        dependency_kind;
+        dependency_kind = kind;
         dependency_origins = []
       }
       in
       add_edge_e g (v1,e,v2);
       e
   in
-  (* Add origins *)
-  match kinstr with
-  | Cil_types.Kglobal -> ()
-  | Kstmt stmt ->
-    let add_uniq l x =
-      List.sort_uniq Cil_datatype.Stmt.compare (x :: l)
-    in
-    e.dependency_origins <- add_uniq e.dependency_origins stmt
+  (* Add origin *)
+  let add_uniq l x =
+    List.sort_uniq Studia.Writes.compare (x :: l)
+  in
+  e.dependency_origins <- add_uniq e.dependency_origins origin;
+  (v1,e,v2)
 
 
 let remove_dependency g edge =
@@ -116,12 +114,6 @@ let remove_dependency g edge =
 
 let remove_dependencies g node =
   iter_pred_e (remove_dependency g) g node
-
-let vertices g =
-  fold_vertex (fun n acc -> n ::acc) g []
-
-let edges g =
-  fold_edges_e (fun d acc -> d ::acc) g []
 
 
 let update_node_values node ~typ ~cvalue ~taint =
@@ -178,7 +170,7 @@ let bfs ?(iter_succ=iter_succ) ?(limit=max_int) g roots =
   Table.fold (fun n _ l -> n :: l) explored []
 
 
-let ouptput_to_dot out_channel g =
+let output_to_dot out_channel g =
   let open Graph.Graphviz.DotAttributes in
   (* let g = add_dummy_nodes g in *)
 
@@ -267,158 +259,3 @@ let ouptput_to_dot out_channel g =
     end)
   in
   Dot.output_graph out_channel g
-
-module JsonPrinter =
-struct
-  let output_stmt stmt =
-    let kf = Kernel_function.find_englobing_kf stmt in
-    Server.Kernel_ast.Location.to_json (kf, PStmtStart (kf, stmt))
-
-  let output_kinstr = function
-    | Cil_types.Kglobal -> `String "global"
-    | Cil_types.Kstmt stmt -> `Int stmt.Cil_types.sid
-
-  let output_callsite (kf,kinstr) =
-    `Assoc [
-      ("fun", `String (Kernel_function.get_name kf)) ;
-      ("instr", output_kinstr kinstr) ;
-    ]
-
-  let output_callstack cs =
-    `List (List.map output_callsite cs)
-
-  let output_node_kind kind =
-    let s = match kind with
-      | Scalar _ -> "scalar"
-      | Composite _ -> "composite"
-      | Scattered _ -> "scattered"
-      | Unknown _ -> "unknown"
-      | Alarm _ -> "alarm"
-      | AbsoluteMemory -> "absolute"
-      | String _ -> "string"
-      | Const _ -> "const"
-      | Error _ -> "error"
-    in
-    `String s
-
-  let output_node_locality { loc_file ; loc_callstack } =
-    let f1 = ("file", `String loc_file) in
-    let fields = match loc_callstack with
-      | [] -> [f1]
-      | cs -> [f1 ; ("callstack", output_callstack cs)]
-    in
-    `Assoc fields
-
-  let output_range range =
-    match range with
-    | Empty -> `String "empty"
-    | Singleton -> `String "singleton"
-    | Normal range_grade -> `Int range_grade
-    | Wide -> `String "wide"
-
-  let output_dep_kind kind =
-    let s = match kind with
-      | Callee -> "callee"
-      | Data -> "data"
-      | Address -> "addr"
-      | Control -> "ctrl"
-      | Composition -> "comp"
-    in
-    `String s
-
-  let output_node_values values =
-    match values with
-    | None -> `Null
-    | Some cvalue when Cvalue.V.is_bottom cvalue -> `Null
-    | Some cvalue -> `String (Pretty_utils.to_string Cvalue.V.pretty cvalue)
-
-  let output_computation = function
-    | Done -> `String "yes"
-    | Partial _ -> `String "partial"
-    | NotDone -> `String "no"
-
-  let output_taint = function
-    | Eva.Results.Direct -> `String "direct"
-    | Indirect ->  `String "indirect"
-    | Untainted ->  `String "untainted"
-
-  let output_node node =
-    let label = Pretty_utils.to_string Node_kind.pretty node.node_kind in
-    `Assoc ([
-        ("id", `Int node.node_key) ;
-        ("label", `String label) ;
-        ("kind", output_node_kind node.node_kind) ;
-        ("locality", output_node_locality node.node_locality) ;
-        ("is_root", `Bool node.node_is_root) ;
-        ("backward_explored", output_computation node.node_writes_computation) ;
-        ("forward_explored", output_computation node.node_reads_computation) ;
-        ("writes", `List (List.map output_stmt node.node_writes_stmts)) ;
-        ("values",  output_node_values node.node_values) ;
-        ("range",  output_range node.node_range) ;
-      ] @
-        begin match Node_kind.to_lval node.node_kind with
-          | None -> []
-          | Some lval ->
-            let typ = Cil.typeOfLval lval in
-            let str = Pretty_utils.to_string Cil_printer.pp_typ typ in
-            [("type", `String str)]
-        end @
-        begin match node.node_taint with
-          | None -> []
-          | Some t -> [("taint", output_taint t)]
-        end)
-
-  let output_dep (n1,dep,n2) =
-    `Assoc [
-      ("id", `Int dep.dependency_key) ;
-      ("src", `Int n1.node_key) ;
-      ("dst", `Int n2.node_key) ;
-      ("kind", output_dep_kind dep.dependency_kind) ;
-      ("origins", `List (List.map output_stmt dep.dependency_origins)) ;
-    ]
-
-  let output_graph g =
-    `Assoc [
-      ("nodes", `List (List.map output_node (vertices g))) ;
-      ("deps", `List (List.map output_dep (edges g)))
-    ]
-
-  let output_diff g diff =
-    let root = match diff.last_root with
-      | None -> `Null
-      | Some root -> `Int root.node_key
-    and added_nodes = List.map output_node diff.added_nodes
-    and added_deps =
-      let module Set = Set.Make (struct
-          type t = edge
-          let compare (_,d1,_) (_,d2,_) = d1.dependency_key - d2.dependency_key
-        end)
-      in
-      let collect_deps set node =
-        let set = fold_pred_e Set.add g node set in
-        let set = fold_succ_e Set.add g node set in
-        set
-      in
-      let set = List.fold_left collect_deps Set.empty diff.added_nodes in
-      List.map output_dep (Set.elements set)
-    and removed_nodes =
-      List.map (fun node -> `Int node.node_key) diff.removed_nodes
-    in
-    `Assoc [
-      ("root", root) ;
-      ("add", `Assoc [
-          ("nodes", `List added_nodes) ;
-          ("deps", `List added_deps)
-        ]) ;
-      ("sub", `List removed_nodes)]
-end
-
-let ouptput_to_json out_channel g =
-  let json = JsonPrinter.output_graph g in
-  Yojson.Basic.to_channel out_channel json
-
-let to_json g =
-  JsonPrinter.output_graph g
-
-let diff_to_json g diff =
-  JsonPrinter.output_diff g diff

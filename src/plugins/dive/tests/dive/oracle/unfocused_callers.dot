@@ -12,11 +12,11 @@ digraph G {
   
   subgraph cluster_cs_1 { label=<g>; cp2;
      };
-  subgraph cluster_cs_2 { label=<f3>; cp3;
+  subgraph cluster_cs_2 { label=<f1>; cp3;
      };
   subgraph cluster_cs_3 { label=<f2>; cp5;
      };
-  subgraph cluster_cs_4 { label=<f1>; cp7;
+  subgraph cluster_cs_4 { label=<f3>; cp7;
      };
   subgraph cluster_cs_5 { label=<main>; cp9;
      };

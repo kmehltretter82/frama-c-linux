@@ -1,3 +1,0 @@
-(subdir
- result_qualif/binary-multiplication.0.session_qualif/script
- (copy_files ../../../binary-multiplication.0.session_qualif/script/*))

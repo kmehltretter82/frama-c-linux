@@ -49,7 +49,9 @@ import * as Preferences from 'ivette/prefs';
 
 // An alias type for functions and locations.
 type Fct = string | undefined;
-type Marker = string | undefined;
+type Marker = Ast.marker | undefined;
+
+const noMarker = Ast.jMarker('');
 
 // A range is just a pair of position in the code.
 type Range = Editor.Range;
@@ -74,12 +76,12 @@ function mapFilter<A, B>(xs: readonly A[], fn: (x: A) => B | undefined): B[] {
 // without information on the ranges of each element. It will be converted in a
 // good old tree that carry those information.
 interface Leaf extends Range { text: string }
-interface Node extends Range { id: string, children: Tree[] }
+interface Node extends Range { marker: Ast.marker, children: Tree[] }
 type Tree = Leaf | Node;
 
 // Utility functions on trees.
-function isLeaf (t: Tree): t is Leaf { return 'text' in t; }
-function isNode (t: Tree): t is Node { return 'id' in t && 'children' in t; }
+function isLeaf(t: Tree): t is Leaf { return 'text' in t; }
+function isNode(t: Tree): t is Node { return 'marker' in t && 'children' in t; }
 const empty: Tree = { text: '', from: 0, to: 0 };
 
 // Convert an Ivette text (i.e a function's code) into a Tree, adding range
@@ -98,7 +100,7 @@ function textToTree(t: text): Tree | undefined {
       if (node) children.push(node);
       acc = to;
     }
-    return [{ id: t[0], from, to: acc, children }, acc];
+    return [{ marker: Ast.jMarker(t[0]), from, to: acc, children }, acc];
   }
   const [res] = aux(t, 0);
   return res;
@@ -116,13 +118,13 @@ function textToString(text: text): string {
 
 // Computes, for each markers of a tree, its range. Returns the map containing
 // all those bindings.
-function markersRanges(tree: Tree): Map<string, Range[]>{
+function markersRanges(tree: Tree): Map<string, Range[]> {
   const ranges: Map<string, Range[]> = new Map();
   const toRanges = (tree: Tree): void => {
     if (!isNode(tree)) return;
-    const trees = ranges.get(tree.id) ?? [];
+    const trees = ranges.get(tree.marker) ?? [];
     trees.push(tree);
-    ranges.set(tree.id, trees);
+    ranges.set(tree.marker, trees);
     for (const child of tree.children) toRanges(child);
   };
   toRanges(tree);
@@ -159,7 +161,7 @@ const Text = Editor.createTextField<text>(null, textToString);
 
 // This aspect computes the tree representing the currently displayed function's
 // code, represented by the <Text> field.
-const Tree = Editor.createAspect({ t: Text }, ({t}) => rootText(t));
+const Tree = Editor.createAspect({ t: Text }, ({ t }) => rootText(t));
 
 // This aspect computes the markers ranges of the currently displayed function's
 // tree, represented by the <Tree> aspect.
@@ -198,8 +200,8 @@ function createMarkerUpdater(): Editor.Extension {
   return Editor.createEventHandler(deps, {
     mouseup: ({ fct, tree, update }, view, event) => {
       const main = view.state.selection.main;
-      const id = coveringNode(tree, main.from)?.id;
-      const location = { fct, marker: Ast.jMarker(id) };
+      const marker = coveringNode(tree, main.from)?.marker;
+      const location = { fct, marker };
       update({ location });
       if (event.altKey) States.MetaSelection.emit(location);
     }
@@ -217,7 +219,8 @@ function createMarkerScroller(): Editor.Extension {
     const markerRanges = ranges.get(marker) ?? [];
     if (markerRanges.length !== 1) return;
     const { from: anchor } = markerRanges[0];
-    view.dispatch({ selection: { anchor }, scrollIntoView: true });
+    const line = view.state.doc.lineAt(anchor).number;
+    Editor.selectLine(view, line, false);
   });
 }
 
@@ -235,7 +238,7 @@ const Hovered = Editor.createField<Marker>(undefined);
 // The Ivette hovered element must be updated by CodeMirror plugins. This
 // field add the callback in the CodeMirror internal state.
 type UpdateHovered = (h: States.Hovered) => void;
-const UpdateHovered = Editor.createField<UpdateHovered>(() => { return ; });
+const UpdateHovered = Editor.createField<UpdateHovered>(() => { return; });
 
 // The Hovered field is updated each time the mouse moves through the CodeMirror
 // document. The handlers updates the Ivette hovered information, which is then
@@ -263,7 +266,7 @@ function createHoveredUpdater(): Editor.Extension {
       const horizontallyOk = left <= coords.x && coords.x <= right;
       const verticallyOk = top <= coords.y && coords.y <= bottom;
       if (!horizontallyOk || !verticallyOk) { reset(); return; }
-      const marker = Ast.jMarker(hov.id);
+      const marker = hov.marker;
       updateHovered(marker ? { fct, marker } : undefined);
     }
   });
@@ -322,18 +325,68 @@ function createMultipleDecorator(): Editor.Extension {
 const emptyDeadCode = { unreachable: [], nonTerminating: [] };
 const Dead = Editor.createField<Eva.deadCode>(emptyDeadCode);
 
+const UnreachableRanges = createUnreachableRanges();
+function createUnreachableRanges(): Editor.Aspect<Editor.Range[]> {
+  const deps = { dead: Dead, ranges: Ranges };
+  return Editor.createAspect(deps, ({ dead, ranges }) => {
+    return mapFilter(dead.unreachable, m => ranges.get(m)).flat();
+  });
+}
+
+const NonTerminatingRanges = createNonTerminatingRanges();
+function createNonTerminatingRanges(): Editor.Aspect<Editor.Range[]> {
+  const deps = { dead: Dead, ranges: Ranges };
+  return Editor.createAspect(deps, ({ dead, ranges }) => {
+    return mapFilter(dead.nonTerminating, m => ranges.get(m)).flat();
+  });
+}
+
 const DeadCodeDecorator = createDeadCodeDecorator();
 function createDeadCodeDecorator(): Editor.Extension {
-  const uClass = Editor.Decoration.mark({ class: 'cm-dead-code' });
-  const tClass = Editor.Decoration.mark({ class: 'cm-non-term-code' });
-  const deps = { dead: Dead, ranges: Ranges };
-  return Editor.createDecorator(deps, ({ dead, ranges }) => {
-    const range = (m: string): Range[] | undefined => ranges.get(m);
-    const unreachableRanges = mapFilter(dead.unreachable, range).flat();
-    const unreachable = unreachableRanges.map(r => uClass.range(r.from, r.to));
-    const nonTermRanges = mapFilter(dead.nonTerminating, range).flat();
-    const nonTerm = nonTermRanges.map(r => tClass.range(r.from, r.to));
-    return Editor.RangeSet.of(unreachable.concat(nonTerm), true);
+  const uCls = Editor.Decoration.mark({ class: 'cm-dead-code' });
+  const tCls = Editor.Decoration.mark({ class: 'cm-non-term-code' });
+  const deps = { unreach: UnreachableRanges, nonTerm: NonTerminatingRanges };
+  return Editor.createDecorator(deps, ({ unreach, nonTerm }) => {
+    const unreachable = unreach.map(r => uCls.range(r.from, r.to));
+    const nonTerminating = nonTerm.map(r => tCls.range(r.from, r.to));
+    return Editor.RangeSet.of(unreachable.concat(nonTerminating), true);
+  });
+}
+
+type DeadCodeKind = 'unreachable' | 'non terminating';
+class DeadCodeGutterMarker extends Editor.GutterMarker {
+  readonly element: HTMLDivElement;
+  toDOM(): HTMLDivElement { return this.element; }
+  constructor(kind: DeadCodeKind) {
+    super();
+    const color = kind === 'unreachable' ? 'dead-code' : 'non-terminating';
+    this.element = document.createElement('div');
+    this.element.innerHTML = 'a';
+    this.element.title = `This code is ${kind}`;
+    this.element.style.width = '4px';
+    this.element.style.color = `var(--${color})`;
+    this.element.style.borderRight = `4px solid var(--${color})`;
+  }
+}
+
+const DeadCodeGutter = createDeadCodeGutter();
+function createDeadCodeGutter(): Editor.Extension {
+  const deps = { unreach: UnreachableRanges, nonTerm: NonTerminatingRanges };
+  const cls = 'cm-deadcode-gutter';
+  return Editor.createGutter(deps, cls, (props, block, view) => {
+    const doc = view.state.doc;
+    const line = doc.lineAt(block.from);
+    const unreachable = props.unreach
+      .filter(r => r.from <= doc.length)
+      .map(r => ({ from: doc.lineAt(r.from).from, to: doc.lineAt(r.to).to }))
+      .find(r => r.from <= line.from && line.to <= r.to);
+    if (unreachable) return new DeadCodeGutterMarker('unreachable');
+    const nonTerm = props.nonTerm
+      .filter(r => r.from <= doc.length)
+      .map(r => ({ from: doc.lineAt(r.from).from, to: doc.lineAt(r.to).to }))
+      .find(r => r.from <= line.from && line.to <= r.to);
+    if (nonTerm) return new DeadCodeGutterMarker('non terminating');
+    return null;
   });
 }
 
@@ -357,7 +410,7 @@ function getPropertiesNodes(tree: Tree): Node[] {
   if (isLeaf(tree)) return [];
   /* Must be consistent with the id chosen by the Frama-C server for property
      markers. Ideally, this test should not depend on markers id syntax. */
-  if (tree.id.startsWith('#p')) return [tree];
+  if (tree.marker.startsWith('#p')) return [tree];
   return tree.children.map(getPropertiesNodes).flat();
 }
 
@@ -369,7 +422,7 @@ function createPropertiesNodes() : Editor.Aspect<Property[]> {
   return Editor.createAspect(deps, ({ tree, tags, statuses }) => {
     const nodes = getPropertiesNodes(tree);
     return mapFilter(nodes, (n) => {
-      const s = statuses.find((s) => s.key === n.id);
+      const s = statuses.find((s) => s.key === n.marker);
       if (!s) return undefined;
       const tag = tags.get(s.status);
       if (!tag) return undefined;
@@ -480,23 +533,27 @@ async function studia(props: StudiaProps): Promise<StudiaInfos> {
 // This field contains all the current function's callers, as inferred by Eva.
 const Callers = Editor.createField<Eva.CallSite[]>([]);
 
+// This field contains the function pointed to by the current hovered marker,
+// as inferred by Eva.
+const Callees = Editor.createField<Fct[]>([]);
+
 // This field contains information on markers.
-type GetMarkerData = (key: string) => Ast.markerAttributesData | undefined;
+type GetMarkerData = (key: Ast.marker) => Ast.markerAttributesData | undefined;
 const GetMarkerData = Editor.createField<GetMarkerData>(() => undefined);
 
 const ContextMenuHandler = createContextMenuHandler();
 function createContextMenuHandler(): Editor.Extension {
-  const data = { tree: Tree, callers: Callers };
+  const data = { tree: Tree, callers: Callers, callees: Callees };
   const deps = { ...data, update: UpdateSelection, getData: GetMarkerData };
   return Editor.createEventHandler(deps, {
     contextmenu: (inputs, view, event) => {
-      const { tree, callers, update, getData } = inputs;
+      const { tree, callers, callees, update, getData } = inputs;
       const coords = { x: event.clientX, y: event.clientY };
       const position = view.posAtCoords(coords); if (!position) return;
       const node = coveringNode(tree, position);
-      if (!node || !node.id) return;
+      if (!node || !node.marker) return;
       const items: Dome.PopupMenuItem[] = [];
-      const attrs = getData(node.id);
+      const attrs = getData(node.marker);
       if (attrs?.isFunDecl) {
         const groupedCallers = Lodash.groupBy(callers, (cs) => cs.kf);
         const locations =
@@ -519,15 +576,27 @@ function createContextMenuHandler(): Editor.Extension {
         const label = `Go to definition of ${attrs.name}`;
         items.push({ label, onClick });
       }
+      else if (attrs?.isFunctionPointer) {
+        Lodash.forEach(callees, (fct) => {
+          const onClick = (): void => update({ location: { fct } });
+          const label = `Go to definition of ${fct} (indirect)`;
+          items.push({ label, onClick });
+        });
+      }
       const enabled = attrs?.isLval;
       const onClick = (kind: access): void => {
-        if (attrs && node.id)
-          studia({ marker: node.id, attrs, kind }).then(update);
+        if (attrs && node.marker)
+          studia({ marker: node.marker, attrs, kind }).then(update);
       };
       const reads = 'Studia: select reads';
       const writes = 'Studia: select writes';
       items.push({ label: reads, enabled, onClick: () => onClick('Reads') });
       items.push({ label: writes, enabled, onClick: () => onClick('Writes') });
+      const copy = (): void => {
+        const text = view.state.sliceDoc(node.from, node.to);
+        if (text !== '') navigator.clipboard.writeText(text);
+      };
+      items.push({ label: 'Copy to clipboard', onClick: copy });
       if (items.length > 0) Dome.popupMenu(items);
       return;
     }
@@ -617,6 +686,11 @@ function useFctCallers(fct: Fct): Eva.CallSite[] {
   return States.useRequest(Eva.getCallers, fct) ?? [];
 }
 
+// Server request handler returning the given function's callers.
+function useCallees(marker: Marker): Fct[] {
+  return States.useRequest(Eva.getCallees, marker || undefined) ?? [];
+}
+
 // Server request handler returning the tainted lvalues.
 function useFctTaints(fct: Fct): Eva.LvalueTaints[] {
   return States.useRequest(Eva.taintedLvalues, fct, { onError: [] }) ?? [];
@@ -641,6 +715,7 @@ const extensions: Editor.Extension[] = [
   DeadCodeDecorator,
   ContextMenuHandler,
   PropertiesGutter,
+  DeadCodeGutter,
   TaintedLvaluesDecorator,
   TaintTooltip,
   Editor.ReadOnly,
@@ -665,11 +740,12 @@ export default function ASTview(): JSX.Element {
 
   // Updating CodeMirror when the <updateHovered> callback is changed.
   const [hov, setHov] = States.useHovered();
+  const hovered = hov?.marker ?? noMarker;
   React.useEffect(() => UpdateHovered.set(view, setHov), [view, setHov]);
-  React.useEffect(() => Hovered.set(view, hov?.marker ?? ''), [view, hov]);
+  React.useEffect(() => Hovered.set(view, hovered), [view, hovered]);
 
   // Updating CodeMirror when the <properties> synchronized array is changed.
-  const props = States.useSyncArray(Properties.status).getArray();
+  const props = States.useSyncArrayData(Properties.status);
   React.useEffect(() => PropertiesStatuses.set(view, props), [view, props]);
 
   // Updating CodeMirror when the <propStatusTags> map is changed.
@@ -677,8 +753,7 @@ export default function ASTview(): JSX.Element {
   React.useEffect(() => Tags.set(view, tags), [view, tags]);
 
   // Updating CodeMirror when the <markersInfo> synchronized array is changed.
-  const info = States.useSyncArray(Ast.markerAttributes);
-  const getData = React.useCallback((key) => info.getData(key), [info]);
+  const getData = States.useSyncArrayGetter(Ast.markerAttributes);
   React.useEffect(() => GetMarkerData.set(view, getData), [view, getData]);
 
   // Retrieving data on currently selected function and updating CodeMirror when
@@ -691,6 +766,10 @@ export default function ASTview(): JSX.Element {
   React.useEffect(() => Callers.set(view, callers), [view, callers]);
   const taints = useFctTaints(fct);
   React.useEffect(() => TaintedLvalues.set(view, taints), [view, taints]);
+
+  // Retrieving data on currently hovered marker.
+  const callees = useCallees(hovered);
+  React.useEffect(() => Callees.set(view, callees), [view, callees]);
 
   return (
     <>
@@ -712,7 +791,7 @@ export default function ASTview(): JSX.Element {
         />
         <Inset />
       </TitleBar>
-      <Component style={{ fontSize: `${fontSize}px`}} />
+      <Component style={{ fontSize: `${fontSize}px` }} />
     </>
   );
 }

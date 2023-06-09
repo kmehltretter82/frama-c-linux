@@ -20,24 +20,46 @@
 #   <Prover>: prover
 ###############################################################################
 
-########################
+###############################################################################
 Plugin WP <next-release>
-########################
+###############################################################################
 
+- WP          [2023-06-05] Tactic Compute (new, generalize Definition and Split)
+- WP          [2023-06-05] Tactic Absurd now also applies to proof goal
+- WP          [2023-06-05] Option -wp-prop extended to lemma and function names
+- TIP         [2023-06-05] Activation of Strategies
+- WP          [2023-06-05] New option -wp-no-strategy-engine to deactivate strategies
+- WP          [2023-06-05] New option -wp-script=mode (see also -wp-cache-env)
+- WP          [2023-06-05] New option -wp-status to print unproved goals
+- WP          [2023-06-05] New option -wp-tactic to search for tactics
+- WP          [2023-06-05] New option -wp-strategy s,... for default strategies
+- WP          [2023-06-05] ACSL extension 'strategy' for proof strategies
+- WP          [2023-06-05] ACSL extension 'proof' for proof resolution hints
+
+###############################################################################
+Plugin WP 27.0 (Cobalt)
+###############################################################################
+
+- WP          [2023-05-03] new warning against unions (see -wp-warn-key "union")
+- WP          [2023-04-03] Default timeout set to 2s
+- WP          [2023-03-29] fix option -wp-split to only split conditions
+- WP          [2023-03-29] new option -wp-split-switch to split switches
+- WP          [2023-03-29] new option -wp-split-conj to split conjunctive goals
+- WP          [2023-03-29] renamed option -wp-split-depth into -wp-split-cnf
 - WP          [2023-03-14] Upgrade to Why3 1.6.0
 - WP          [2023-02-03] new option -wp-why3-extra-config for providing
                            additional Why3 configuration files
 
-#####################
+###############################################################################
 Plugin WP 26.1 (Iron)
-#####################
+###############################################################################
 
 - WP          [2022-12-02] Fixes 'terminates' goals generation when some
                            'terminates' or 'decreases' clauses are missing.
 
-#####################
+###############################################################################
 Plugin WP 26.0 (Iron)
-#####################
+###############################################################################
 
 - WP          [2022-10-14] 'calls' ACSL extension moved into the kernel;
                            option -wp-dynamic marked as obsolete
@@ -45,9 +67,9 @@ Plugin WP 26.0 (Iron)
 - Cmd         [2022-07-29] Improves the WP JSON report provided by
                            -wp-report-json
 
-##########################
+###############################################################################
 Plugin WP 25.0 (Manganese)
-##########################
+###############################################################################
 
 - WP          [2022-05-06] Upgrade to Why3 1.5
 - WP          [2022-02-28] New option -wp-fct-timeout, used to customize the
@@ -67,9 +89,9 @@ Plugin WP 25.0 (Manganese)
                            split conjunctions into multiple hypotheses.
 - WP          [2021-11-08] Removed legacy WP engine and option -wp-legacy
 
-#########################
+###############################################################################
 Plugin WP 24.0 (Chromium)
-#########################
+###############################################################################
 
 - WP          [2021-10-25] Removes -wp-overflows option (unsound)
 - WP          [2021-06-11] Adds an experimental support of "terminates" clauses.
@@ -85,15 +107,15 @@ Plugin WP 24.0 (Chromium)
                            option -wp-smoke-dead-assumes
 - TIP         [2021-05-31] Generalized Overflow tactic
 
-#########################
+###############################################################################
 Plugin WP 23.1 (Vanadium)
-#########################
+###############################################################################
 
 - WP          [2021-07-15] Fix a crash related to opaque structures memory typing
 
-#########################
+###############################################################################
 Plugin WP 23.0 (Vanadium)
-#########################
+###############################################################################
 
 - WP          [2021-03-01] Section « Limitation & Roadmap » added to the WP manual.
 - WP          [2021-03-01] New internal WP engine, fixing many issues related to
@@ -109,9 +131,9 @@ Plugin WP 23.0 (Vanadium)
 - TIP         [2020-11-05] New tactic: Induction
 - WP          [2020-11-04] Removed option -wp-bits (now always enabled)
 
-#########################
+###############################################################################
 Plugin WP 22.0 (Titanium)
-#########################
+###############################################################################
 
 - WP          [2020-10-14] New warning "pedantic-assigns". WP needs precise
                            'assigns ... \from ...' specification about out
@@ -132,16 +154,16 @@ Plugin WP 22.0 (Titanium)
 - WP          [2020-07-06] New option -wp-cache-print
 - WP          [2020-06-12] Supports the \initialized ACSL predicate
 
-#########################
+###############################################################################
 Plugin WP 21.1 (Scandium)
-#########################
+###############################################################################
 
 -*  WP        [2020-06-23] Fixes Coq region function
 -*  WP        [2020-06-23] Fixes MemTyped structure loader for wp-rte
 
-#########################
+###############################################################################
 Plugin WP 21.0 (Scandium)
-#########################
+###############################################################################
 
 - WP          [2020-04-10] Full support for Why3 IEEE float library
 - WP          [2020-04-10] Removed option -wp-check
@@ -171,9 +193,9 @@ Plugin WP 21.0 (Scandium)
 - TIP         [2018-02-20] Extends bitwise tactics to dis-equalities
 - WP          [2018-02-18] Additional lemmas about logical shift compositions
 
-##########################
+###############################################################################
 Plugin WP 20.0 (Calcium)
-##########################
+###############################################################################
 
 - TIP         [2019-09-17] Using all selected Why-3 provers for proof search
 - Gui         [2019-09-17] Updated panel for provers, models, cache, etc.
@@ -198,9 +220,9 @@ Plugin WP 20.0 (Calcium)
 o Qed         [2019-06-27] More secure API for quantifier management
 - Qed         [2019-05-09] Transform (some) boolean quantifications into variable assignments
 
-##########################
+###############################################################################
 Plugin WP 19.0 (Potassium)
-##########################
+###############################################################################
 
 - Wp          [2019-05-09] Fixes -wp-simplify-is-cint simplifier
 - Wp          [2019-04-26] Now requires -warn-invalid-bool
@@ -226,9 +248,9 @@ Plugin WP 19.0 (Potassium)
 - Qed         [2017-10-27] New simplifications for validity and ranges
 - TIP         [2017-10-27] New tacticals for validity and ranges
 
-######################
+###############################################################################
 Plugin WP 18.0 (Argon)
-######################
+###############################################################################
 
 -  Wp         [2018-10-25] Added support for ACSL \offset construct
 -  Wp         [2018-09-04] Option -wp-warn-separation changed into -wp-warn-memory-model
@@ -239,9 +261,9 @@ Plugin WP 18.0 (Argon)
 -  Qed        [2018-06-20] Added more simplifications for invertible functions
 -  TIP        [2018-06-07] Extends tactical 'Split' to distribution of qualitifiers
 
-##################################
+###############################################################################
 Plugin WP 17.0 (Chlorine-20180501)
-##################################
+###############################################################################
 
 -  WP         [2018-03-08] Add the missing ACSL math builtins (see manual)
 -  WP         [2018-02-12] Experimental support for _Bool range (-wp-bool-range)
@@ -266,9 +288,9 @@ Plugin WP 17.0 (Chlorine-20180501)
 -  Qed        [2017-10-27] New simplifications for validirt and ranges
 -  TIP        [2017-10-27] New tacticals for validity and ranges
 
-################################
+###############################################################################
 Plugin WP 16.0 (Sulfur-20171101)
-################################
+###############################################################################
 
 - WP          [2017-10-18] Support for LoopCurrent and LoopEntry
 - TIP         [2017-04-25] Options -wp-time-{extra|margin} for more stability
@@ -286,9 +308,9 @@ Plugin WP 16.0 (Sulfur-20171101)
 - WP          [2017-03-12] Reduction of equalities with logic functions
 - WP          [2017-03-12] More simplifications wrt integer domains
 
-####################################
+###############################################################################
 Plugin WP 15.0 (Phosphorus-20170501)
-####################################
+###############################################################################
 
 - Qed         [2017-12-13] Transforms some quantifications into let constructs
 -  WP         [2017-05-15] Extract inductive predicates as Inductive in Coq
@@ -314,9 +336,9 @@ Plugin WP 15.0 (Phosphorus-20170501)
 -  WP         [2016-11-17] Warn against access to volatile l-values
 -  WP         [2016-11-17] Fix volatile access (see -wp-no-volatile)
 
-#################################
+###############################################################################
 Plugin WP 14.0 (Silicon-20161101)
-#################################
+###############################################################################
 
 -  WP         [2016-04-08] Unified variable usage for all models
 -  WP         [2016-10-06] Simplification of arithmetics models
@@ -324,9 +346,9 @@ Plugin WP 14.0 (Silicon-20161101)
 -  WP         [2016-10-06] Use cint and cfloat models by default
 -  WP         [2016-10-06] Fix -wp-rte with respect to models and kernel options
 
-##################################
+###############################################################################
 Plugin WP 1.0 (Aluminium_20160502)
-##################################
+###############################################################################
 
 - Coq         [2016-03-30] Fixed bug #2214 (coq realbase)
 - WP	      [2016-03-29] Support for why3 0.87 (and ide)
@@ -344,9 +366,9 @@ Plugin WP 1.0 (Aluminium_20160502)
 - WP	      [2015-11-19] New options to set prover commands
 - Coq	      [2015-11-19] Support for Proof General 4.3
 
-##################################
+###############################################################################
 Plugin WP 0.9 (Magnesium_20151002)
-##################################
+###############################################################################
 
 - WP	      [2015-09-02] Added support for float-classification.
               (\is_NaN, \is_finite, \is_infinite, \is_plus_infinity, \is_minus_infinity).
@@ -393,9 +415,9 @@ Plugin WP 0.9 (Magnesium_20151002)
 - WP	      [2014-09-24] Now accept patterns in drivers.
 -* WP	      [2014-09-15] Fixed bug #1828 (separation of locals/formals/heap).
 
-###############################
+###############################################################################
 Plugin WP 0.8 (Sodium_20150201)
-###############################
+###############################################################################
 
 - WP          [2014-09-05] Drivers for min/max.
 - Typed       [2014-09-04] Simplification of assigns and separated.
@@ -407,9 +429,9 @@ Plugin WP 0.8 (Sodium_20150201)
 - Cmd         [2014-05-22] Added option -wp-filename-truncation to truncate
 	                   proof obligation filenames.
 
-#############################
+###############################################################################
 Plugin WP 0.8 (Neon_20140301)
-#############################
+###############################################################################
 
 - Gui	      [2014-01-30] Edition of current proof script (right-click).
 - Gui	      [2014-01-30] Consistent icons with status.
@@ -423,18 +445,18 @@ Plugin WP 0.8 (Neon_20140301)
 - WP          [2013-12-09] Clever assigns everything with formals and locals.
 - WP	      [2013-11-26] More type constraints in typed memory model.
 
-#################################
+###############################################################################
 Plugin WP 0.7 (Fluorine_20130501)
-#################################
+###############################################################################
 
 -* Typed      [2013-05-23] Better trigger generation for arrays with Alt-Ergo.
 -* Provers    [2013-05-23] Fixed various bugs with drivers and provers.
 -* WP         [2013-05-23] Fixed various bugs on floats.
 -* Typed      [2013-05-23] Fixed bug on address differences and offsets.
 
-#################################
+###############################################################################
 Plugin WP 0.7 (Fluorine_20130401)
-#################################
+###############################################################################
 
 -* Makefile   [2013-04-17] Fixed bug #1385 about ocamllex.opt.
 -! Cmd        [2013-04-15] Removed now useless options -wp-huge, -wp-dot,
@@ -456,9 +478,9 @@ Plugin WP 0.7 (Fluorine_20130401)
 -  WP         [2012-10-09] Drivers for linking ACSL symbols to external
 	      libs (-wp-driver).
 
-###############################
+###############################################################################
 Plugin WP 0.6 (Oxygen_20120901)
-###############################
+###############################################################################
 
 -  WP	      [2012-09-14] Experimental simplifier with new 'Typed' model
 	      (see manual).
@@ -479,9 +501,9 @@ o! WP	      [2012-09-05] Enhanced Ocaml API (see manual). Old bindings
 -  Cmd	      [2012-02-03] Extended support for external libraries:
 	      Options -wp-coq-lib, -wp-why-lib and now -wp-alt-ergo-lib.
 
-#################################
+###############################################################################
 Plugin WP 0.5 (Nitrogen_20111001)
-#################################
+###############################################################################
 
 +* Store      [2012-01-03] Adding guard for 'fresh' axiomatization in Store.
 +  WP	      [2011-12-23] Timing.
@@ -492,9 +514,9 @@ Plugin WP 0.5 (Nitrogen_20111001)
 	      See options -wp-include, -wp-tactic, -wp-coq-lib and -wp-why-lib.
 -  Cmd	      [2011-11-21] Adding support for multi-provers in command line.
 
-#################################
+###############################################################################
 Plugin WP 0.4 (Nitrogen_20111001)
-#################################
+###############################################################################
 
 -  WP         [2011-10-24] Further improvement for proof of assigns clauses.
 -  WP         [2011-10-14] A warning is now emitted for missing assigns clauses.
@@ -546,9 +568,9 @@ Plugin WP 0.4 (Nitrogen_20111001)
 -* Gui        [2011-04-15] Fixed bug on PO status (wrong PO identification).
 -* Gui        [2011-04-13] Fixed bug #711 (cyclic dependencies).
 
-###############################
+###############################################################################
 Plugin WP 0.3 (Carbon_20110201)
-###############################
+###############################################################################
 
 -* Coq        [2011-04-08] Fixed bug #740 for Coq on Windows.
 	      WP now uses directly coqtop -compile instead of coqc.
@@ -568,18 +590,18 @@ Plugin WP 0.3 (Carbon_20110201)
 -* Coq        [2011-01-04] Fixed bug #702 on Coq output with large integers.
 -* WP         [2011-03-10] Proof of requires of the main entry point (bug #675).
 
-###############################
+###############################################################################
 Plugin WP 0.2 (Carbon_20101202)
-###############################
+###############################################################################
 
 -* Coq        [2010-12-16] Fixed bug #639: no more compilation to shared
 	      directory.
 -  Gui        [2010-12-16] Accessibility of all provers from gui.
 
-###############################
+###############################################################################
 Plugin WP 0.1 (Carbon_20101201)
-###############################
+###############################################################################
 
 -  WP         [2010-12-06] New WP plugin.
 
-#############################
+###############################################################################

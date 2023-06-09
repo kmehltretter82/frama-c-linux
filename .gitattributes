@@ -109,6 +109,7 @@ src/plugins/e-acsl/examples/ensuresec/**/*.py -check-indent
 
 dune-project header_spec=CEA_LGPL
 dune header_spec=CEA_LGPL
+dune-workspace.* header_spec=CEA_LGPL
 
 config* header_spec=CEA_LGPL
 
@@ -198,8 +199,6 @@ README* header_spec=.ignore
 
 /bin/sed_get_* header_spec=.ignore
 
-/dev/dune-workspace.* header_spec=.ignore
-
 /dev/docker/*.sh header_spec=.ignore
 /dev/docker/Dockerfile header_spec=.ignore
 
@@ -215,6 +214,7 @@ README* header_spec=.ignore
 /doc/MakeLaTeXModern header_spec=.ignore
 /doc/acsl_tutorial_slides/script header_spec=.ignore
 /doc/developer/METADOC.txt header_spec=.ignore
+/doc/developer/dune-workspace.bench header_spec=.ignore
 /doc/developer/examples/**/* header_spec=.ignore
 /doc/developer/tutorial/**/* header_spec=.ignore
 /doc/qualification/testing header_spec=.ignore
@@ -266,7 +266,9 @@ README* header_spec=.ignore
 /share/win32_installer.iss header_spec=.ignore
 /share/win32_manual_installation_step.txt header_spec=.ignore
 /share/compliance/*.json header_spec=.ignore
-
+/share/machdeps/.machdep_*.validated header_spec=.ignore
+/share/machdeps/machdep-schema.yaml header_spec=.ignore
+/share/machdeps/machdep_*.yaml header_spec=.ignore
 /tests/**/* header_spec=.ignore
 
 #######################

@@ -157,12 +157,14 @@ and collect merge k vs = function
 
 let bytags (k,_) (k',_) = Tags.compare k k'
 
-let group tag merge m =
+let apply tag merge m =
+  (* compaction is only required when some split in m already has the tag *)
   let compaction = ref false in
   let m = List.sort bytags
       (List.map
          (fun (tgs,v) ->
-            if not !compaction && Tags.mem tag tgs then compaction := true ;
+            if not !compaction && Tags.mem tag tgs then
+              compaction := true ;
             Tags.add tag tgs , v) m)
   in if !compaction then compact merge m else m
 

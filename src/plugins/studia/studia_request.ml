@@ -63,22 +63,30 @@ module Effects = struct
     R.to_json
 end
 
-
-type kind = Reads | Writes
-
-let compute kind zone =
-  let stmts = match kind with
-    | Reads -> Reads.compute zone
-    | Writes -> Writes.compute zone
-  in
-  let add_if b stmt acc = if b then stmt :: acc else acc in
-  let add acc (stmt, e) =
-    let direct = add_if e.Writes.direct stmt acc.direct in
-    let indirect = add_if e.Writes.indirect stmt acc.indirect in
-    { direct; indirect }
+let compute_writes zone =
+  let reads = Writes.compute zone in
+  let add acc = function
+    | Writes.Assign stmt | CallDirect stmt ->
+      { acc with direct = stmt :: acc.direct }
+    | CallIndirect stmt ->
+      { acc with indirect = stmt :: acc.indirect }
+    | FormalInit (_vi, callsites) ->
+      let calls = List.flatten (List.map snd callsites) in
+      { acc with direct = calls @ acc.direct }
+    | GlobalInit (_vi, _initinfo) ->
+      acc (* for now ignore global initializations *)
   in
   let empty = { direct = []; indirect = []; } in
-  List.fold_left add empty stmts
+  List.fold_left add empty reads
+
+let compute_reads zone =
+  let reads = Reads.compute zone in
+  let add acc = function
+    | Reads.Direct stmt -> { acc with direct = stmt :: acc.direct }
+    | Indirect stmt -> { acc with indirect = stmt :: acc.indirect }
+  in
+  let empty = { direct = []; indirect = []; } in
+  List.fold_left add empty reads
 
 let lval_location kinstr lval =
   Eva.Results.(before_kinstr kinstr |> eval_address lval |> as_zone)
@@ -88,11 +96,11 @@ let () = Request.register ~package
     ~descr:(Markdown.plain "Get the list of statements that read a lval.")
     ~input:(module Kernel_ast.Lval)
     ~output:(module Effects)
-    (fun (kinstr, lval) -> compute Reads (lval_location kinstr lval))
+    (fun (kinstr, lval) -> compute_reads (lval_location kinstr lval))
 
 let () = Request.register ~package
     ~kind:`GET ~name:"getWritesLval"
     ~descr:(Markdown.plain "Get the list of statements that write a lval.")
     ~input:(module Kernel_ast.Lval)
     ~output:(module Effects)
-    (fun (kinstr, lval) -> compute Writes (lval_location kinstr lval))
+    (fun (kinstr, lval) -> compute_writes (lval_location kinstr lval))

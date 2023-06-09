@@ -190,6 +190,7 @@ module ProofScript = ProofScript
 module ProverScript = ProverScript
 module ProverSearch = ProverSearch
 module ProofSession = ProofSession
+module ProofStrategy = ProofStrategy
 
 (** {2 Tactics} *)
 
@@ -217,6 +218,7 @@ module TacSequence = TacSequence
 module TacShift = TacShift
 module TacSplit = TacSplit
 module TacUnfold = TacUnfold
+module TacCompute = TacCompute
 
 (** {2 Error Management} *)
 

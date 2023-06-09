@@ -43,6 +43,7 @@ let show main_ui =
     "Philippe Herrmann";
     "Maxime Jacquemin";
     "Florent Kirchner";
+    "Alexander Kogtenkov";
     "Tristan Le Gall";
     "Jean-Christophe Léchenet";
     "Matthieu Lemerre";
@@ -63,6 +64,7 @@ let show main_ui =
     "Armand Puccetti";
     "Félix Ridoux";
     "Virgile Robles";
+    "Jan Rochel";
     "Muriel Roger";
     "Julien Signoles";
     "Nicolas Stouls";

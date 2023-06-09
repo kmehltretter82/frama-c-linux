@@ -489,12 +489,18 @@ let specified =
       ignore (Str.search_forward re model 0) ; true
     with Not_found -> false
 
+let registered = ref false
 let register () =
-  if Wp.Region.get () || Wp.Region_annot.get () ||
-     List.exists specified (Wp.Model.get ())
+  if not !registered && (
+      Wp.Region.get () || Wp.Region_annot.get () ||
+      List.exists specified (Wp.Model.get ())
+    )
   then
-    Acsl_extension.register_behavior
-      "region" typecheck ~printer:pp_extension false
+    begin
+      registered := true ;
+      Acsl_extension.register_behavior "region"
+        typecheck ~printer:pp_extension false
+    end
 
 let () = Cmdline.run_after_configuring_stage register
 

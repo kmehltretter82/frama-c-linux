@@ -30,6 +30,10 @@ open Cil_types
 (** {2 Getting annotations} *)
 (**************************************************************************)
 
+val add_hook_on_change: (unit -> unit) -> unit
+(** Emitted whenever any of the annotation tables is modified.
+    @since 27.0-Cobalt *)
+
 (**************************************************************************)
 (** {3 Code annotations} *)
 (**************************************************************************)

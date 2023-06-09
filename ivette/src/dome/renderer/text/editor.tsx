@@ -310,13 +310,13 @@ const Highlight = Language.syntaxHighlighting(Language.HighlightStyle.define([
   { tag: tags.typeName, class: 'cm-type' },
   { tag: tags.number, class: 'cm-number' },
   { tag: tags.controlKeyword, class: 'cm-keyword' },
-  { tag: tags.definition(tags.variableName) , class: 'cm-def' },
+  { tag: tags.definition(tags.variableName), class: 'cm-def' },
 ]));
 
 // A language provider based on the [Lezer C++ parser], extended with
 // highlighting and folding information. Only comments can be folded.
 // (Source: https://github.com/lezer-parser/cpp)
-const comment = (t: SyntaxNode): Range => ({ from: t.from + 2, to: t.to - 2});
+const comment = (t: SyntaxNode): Range => ({ from: t.from + 2, to: t.to - 2 });
 const folder = Language.foldNodeProp.add({ BlockComment: comment });
 const stringPrefixes = [ "L", "u", "U", "u8", "LR", "UR", "uR", "u8R", "R" ];
 const cppLanguage = Language.LRLanguage.define({
@@ -432,6 +432,18 @@ export function unfoldAll(view: View): void {
   if (view !== null) Language.unfoldAll(view);
 }
 
+function isVisible(view: View, line: number): boolean {
+  if (!view || view.state.doc.lines < line) return false;
+  const doc = view.state.doc;
+  const top = view.documentTop;
+  const rect = view.dom.getBoundingClientRect();
+  const topVisibleBlock = view.lineBlockAtHeight(rect.top - top);
+  const topVisibleLine = doc.lineAt(topVisibleBlock.to).number;
+  const bottomVisibleBlock = view.lineBlockAtHeight(rect.bottom - top);
+  const bottomVisibleLine = doc.lineAt(bottomVisibleBlock.from).number;
+  return (topVisibleLine < line && line < bottomVisibleLine);
+}
+
 // Move to the given line. The indexation starts at 1.
 export function selectLine(view: View, line: number, atTop: boolean): void {
   if (!view || view.state.doc.lines < line) return;
@@ -439,9 +451,10 @@ export function selectLine(view: View, line: number, atTop: boolean): void {
   const { from: here } = doc.lineAt(view.state.selection.main.from);
   const { from: goto } = doc.line(Math.max(line, 1));
   if (here === goto) return;
-  view.dispatch({ selection: { anchor: goto }, scrollIntoView: true });
-  if (!atTop) return;
-  const effects = EditorView.scrollIntoView(goto, { y: 'start', yMargin: 0 });
+  view.dispatch({ selection: { anchor: goto } });
+  if (isVisible(view, line)) return;
+  const verticalScroll = atTop ? 'start' : 'center';
+  const effects = EditorView.scrollIntoView(goto, { y: verticalScroll });
   view.dispatch({ effects });
 }
 

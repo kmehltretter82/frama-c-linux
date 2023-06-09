@@ -3,7 +3,6 @@
 */
 
 /* run.config_qualif
-   DEPS: @PTEST_DEPS@ @WP_SESSION@/script/BinaryMultiplication_*.json
    OPT: -wp-rte -wp-prover=alt-ergo,script -wp-prop=-lack @USING_WP_SESSION@
 */
 
@@ -15,7 +14,7 @@ typedef unsigned long long uint64_t ;
 /*@ axiomatic mult {
   @ lemma sizeof_ok: ok: sizeof(uint64_t) == 2*sizeof(uint32_t);
 
-  @ lemma ax1: lack: \forall integer x, y; 0<x  && 0<y ==> 0 <= 2*x*(y/2) <= x*y;
+  @ lemma ax1:   ok: \forall integer x, y; 0<x  && 0<y ==> 0 <= 2*x*(y/2) <= x*y;
 
   @ lemma ax2: lack: \forall integer x, y; (uint64_t)(x * ((uint64_t)y)) == (uint64_t)(x*y) ;
   @ lemma ax3: lack: \forall integer x, y; (uint64_t)(x + ((uint64_t)y)) == (uint64_t)(x+y) ;
@@ -44,7 +43,7 @@ uint64_t BinaryMultiplication (uint32_t a, uint32_t b) {
       //@ assert a4: ok: ((b%2) != 0) ==> 2*x*(b/2) + x == x*b;
       //@ assert a5: ok: ((b%2) == 0) ==> 2*x*(b/2)     == x*b;
       if (b%2) r=r+x;
-      //@ assert a6: lack: ok_z3: r+2*x*(b/2) == \at(a*b, Pre);
+      //@ assert a6: ok: r+2*x*(b/2) == \at(a*b, Pre);
       b=b/2;
       if (b==0) break;
       x=x*2;

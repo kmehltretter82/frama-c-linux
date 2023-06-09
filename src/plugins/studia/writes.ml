@@ -28,32 +28,61 @@
 open Cil_types
 open Locations
 
-type effects = {
-  direct: bool;
-  indirect: bool;
-}
+type t =
+  | Assign of Cil_types.stmt
+  | CallDirect of Cil_types.stmt
+  | CallIndirect of Cil_types.stmt
+  | GlobalInit of Cil_types.varinfo * Cil_types.initinfo
+  | FormalInit of
+      Cil_types.varinfo *
+      (Cil_types.kernel_function * Cil_types.stmt list) list
+
+let (<?>) c lcmp =
+  if c <> 0 then c else Lazy.force lcmp
+
+let compare w1 w2 =
+  let open Cil_datatype in
+  let module List = Transitioning.List in
+  match w1, w2 with
+  | Assign s1, Assign s2
+  | CallDirect s1, CallDirect s2
+  | CallIndirect s1, CallIndirect s2 -> Stmt.compare s1 s2
+  | GlobalInit (v1, i1), GlobalInit (v2, i2) ->
+    Varinfo.compare v1 v2 <?> lazy (Initinfo.compare i1 i2)
+  | FormalInit (v1, cs1), FormalInit (v2, cs2) ->
+    let compare_callsites (kf1, stmts1) (kf2, stmts2) =
+      Kf.compare kf1 kf2 <?> lazy (List.compare Stmt.compare stmts1 stmts2)
+    in
+    Varinfo.compare v1 v2 <?> lazy (List.compare compare_callsites cs1 cs2)
+  | Assign _, _ -> 1
+  | _, Assign _ -> -1
+  | CallDirect _, _ -> 1
+  | _, CallDirect _ -> -1
+  | CallIndirect _, _ -> 1
+  | _, CallIndirect _ -> -1
+  | GlobalInit _, _ -> 1
+  | _, GlobalInit _ -> -1
 
 (** Does the functions called at [stmt] modify directly or indirectly [zlval] *)
 let effects_of_call stmt zlval effects  =
-  let aux_kf effects kf =
+  let aux_kf (direct, indirect) kf =
     let inout = !Db.Operational_inputs.get_internal_precise ~stmt kf in
     let out = inout.Inout_type.over_outputs in
     if Zone.intersects out zlval then
       if Eva.Analysis.use_spec_instead_of_definition kf then
-        { effects with direct = true } (* Mark the effect as direct, there is
-                                          no body for this funtion. *)
+        (true, indirect) (* Direct effect: there is no body for this funtion. *)
       else
-        { effects with indirect = true } (* Indirect effect *)
+        (direct, true) (* Indirect effect *)
     else
-      effects
+      (direct, indirect)
   in
   let kfs = Eva.Results.callee stmt in
   List.fold_left aux_kf effects kfs
 
-class find_write zlval = object (self)
+class find_write_insts zlval = object (self)
   inherit Visitor.frama_c_inplace
 
-  val mutable res = ([] : (stmt * effects) list)
+  val mutable res : t list = []
 
   method! vinst i =
     let stmt = Option.get self#current_stmt in
@@ -63,23 +92,24 @@ class find_write zlval = object (self)
            the call. *)
         let z = !Db.Outputs.statement stmt in
         if Zone.intersects z zlval then
-          let direct_write = match lvopt with
+          let direct = match lvopt with
             | None -> false
             | Some lv ->
               Eva.Results.(before stmt |> eval_address lv |> as_zone_result) |>
               Result.fold ~ok:(Zone.intersects zlval) ~error:(fun _ -> false)
           in
-          let effects =
-            effects_of_call stmt zlval {direct = direct_write; indirect =false}
-          in
-          res <- (stmt, effects) :: res
+          let direct, indirect = effects_of_call stmt zlval (direct, false) in
+          if direct then
+            res <- CallDirect stmt :: res;
+          if indirect then
+            res <- CallIndirect stmt :: res;
       in
       match i with
       | Set _ | Local_init(_, AssignInit _, _) ->
         (* Effect only throuh the written l-value *)
         let z = !Db.Outputs.statement stmt in
         if Zone.intersects z zlval then begin
-          res <- (stmt, {direct = true; indirect = false}) :: res
+          res <- Assign stmt :: res
         end
       | Call (lvopt, f, args, loc) -> aux_call lvopt f args loc
       | Local_init(v, ConsInit(f, args, k), l) ->
@@ -91,8 +121,8 @@ class find_write zlval = object (self)
   method result = res
 end
 
-let compute z =
-  let vis = new find_write z in
+let inst_writes z =
+  let vis = new find_write_insts z in
   let aux_kf_fundec kf =
     let all_out = !Db.Operational_inputs.get_internal_precise kf in
     let zout = all_out.Inout_type.over_outputs in
@@ -107,3 +137,18 @@ let compute z =
   in
   Globals.Functions.iter aux_kf;
   vis#result
+
+let base_inits base acc =
+  match Base.to_varinfo base with
+  | exception Base.Not_a_C_variable -> acc
+  | vi when vi.vglob ->
+    let initinfo = Globals.Vars.find vi in
+    GlobalInit (vi, initinfo) :: acc
+  | vi when vi.vformal ->
+    let kf = Option.get (Kernel_function.find_defining_kf vi) in
+    let callsites = Eva.Results.callsites kf in
+    FormalInit (vi, callsites) :: acc
+  | _ -> acc (* Local init will be found by [inst_writes] *)
+
+let compute z =
+  inst_writes z @ Zone.fold_bases base_inits z []

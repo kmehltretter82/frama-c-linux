@@ -135,6 +135,10 @@ module HCE = struct
     | E _ -> false
     | LV _ -> true
 
+  let type_of h = match get h with
+    | E e -> Cil.typeOf e
+    | LV lv -> Cil.typeOfLval lv
+
   let replace kind ~late ~heir h = match get h with
     | E e ->
       let e = E.replace kind ~late ~heir e in

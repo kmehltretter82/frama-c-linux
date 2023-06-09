@@ -89,7 +89,7 @@ class prover ~(console:Wtext.text) ~prover =
         let spinner = function None -> None | Some s -> Some s#get in
         let config = {
           VCS.valid = false ;
-          VCS.timeout = spinner timeout ;
+          VCS.timeout = Option.map float @@ spinner timeout ;
           VCS.stepout = spinner stepout ;
         } in
         let result wpo _prv _res = self#update wpo in

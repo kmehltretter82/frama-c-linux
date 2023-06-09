@@ -21,20 +21,24 @@
 #   configure   configure
 ###############################################################################
 
-############################
+###############################################################################
 Plugin E-ACSL <next-release>
-############################
+###############################################################################
+
+###############################################################################
+Plugin E-ACSL 27.0 (Cobalt)
+###############################################################################
 
 -! e-acsl-gcc   [2023-02-08] arguments to options -e/--cpp-flags now overload
 	        the default values set by e-acsl-gcc instead of being ignored.
 
-#########################
+###############################################################################
 Plugin E-ACSL 26.1 (Iron)
-#########################
+###############################################################################
 
-#########################
+###############################################################################
 Plugin E-ACSL 26.0 (Iron)
-#########################
+###############################################################################
 
 -* E-ACSL       [2022-11-08] Fix clashing name when a function with contract
 	        and a logic function have the same name (frama-c/eacsl#204).
@@ -48,9 +52,9 @@ Plugin E-ACSL 26.0 (Iron)
 -* E-ACSL       [2022-17-06] Fix wrong cast from pointer to integer
 	        (frama-c/frama-c#1119).
 
-##############################
+###############################################################################
 Plugin E-ACSL 25.0 (Manganese)
-##############################
+###############################################################################
 
 -* E-ACSL       [2022-23-05] Fix crash for quantifications over enum types
 	        (frama-c/e-acsl#199).
@@ -79,9 +83,9 @@ Plugin E-ACSL 25.0 (Manganese)
 -* E-ACSL       [2021-11-03] Now the same Frama-C options are used when parsing
                 the user sources and the E-ACSL's RTL.
 
-#############################
+###############################################################################
 Plugin E-ACSL 24.0 (Chromium)
-#############################
+###############################################################################
 
 -* E-ACSL       [2021-11-24] Fix code generation of properties proven invalid
                 with a previous analysis (frama-c/e-acsl#166).
@@ -116,9 +120,9 @@ Plugin E-ACSL 24.0 (Chromium)
                 range indices (frama-c/e-acsl#148).
 -* E-ACSL       [2021-06-04] Do not translate contracts of E-ACSL built-ins.
 
-#############################
+###############################################################################
 Plugin E-ACSL 23.1 (Vanadium)
-#############################
+###############################################################################
 
 -* E-ACSL       [2021-07-19] Fix crash occurring when two or more successive
                 logic coercions were done in a term (frama-c/e-acsl#172).
@@ -129,9 +133,9 @@ Plugin E-ACSL 23.1 (Vanadium)
 -* E-ACSL       [2021-07-13] Fix crash when encountering a GMP value in a loop
                 variant (frama-c/e-acsl#169).
 
-#############################
+###############################################################################
 Plugin E-ACSL 23.0 (Vanadium)
-#############################
+###############################################################################
 
 -* E-ACSL       [2021-05-25] Restore behavior of option -e-acsl-no-valid broken
                 since Titanium (included).
@@ -169,9 +173,9 @@ Plugin E-ACSL 23.0 (Vanadium)
 -  E-ACSL       [2020-11-17] Update e-acsl-gcc.sh so that the library dlmalloc
                 can be compiled and used from sources.
 
-#############################
+###############################################################################
 Plugin E-ACSL 22.0 (Titanium)
-#############################
+###############################################################################
 
 -* E-ACSL       [2020-11-16] Fix soundness bug when checking
                 initialization of a chunk of heap memory block.
@@ -208,9 +212,9 @@ Plugin E-ACSL 22.0 (Titanium)
 -* E-ACSL       [2020-06-18] Fix support of VLA memory tracking
                 (frama-c/e-acsl#119).
 
-#############################
+###############################################################################
 Plugin E-ACSL 21.0 (Scandium)
-#############################
+###############################################################################
 
 -* E-ACSL       [2020-06-10] Fix ##13: bug when mixing integers and floats in
                 annotations while -e-acsl-gmp-only is activated.
@@ -232,18 +236,18 @@ Plugin E-ACSL 21.0 (Scandium)
                 arrays that may lead to incorrect generated code.
 -* E-ACSL       [2019-12-04] Fix bug with compiler built-ins.
 
-############################
+###############################################################################
 Plugin E-ACSL 20.0 (Calcium)
-############################
+###############################################################################
 
 -  E-ACSL       [2019-08-28] Support of rational numbers and operations.
 -! E-ACSL       [2019-08-28] Deactivate the unsound support of real
                 numbers (that are not rationals). They were previously
                 unsoundly converted to floating point numbers.
 
-##############################
+###############################################################################
 Plugin E-ACSL 19.0 (Potassium)
-##############################
+###############################################################################
 
 -  E-ACSL       [2019-04-29] Support for logic functions and predicates
                 without labels.
@@ -263,9 +267,9 @@ Plugin E-ACSL 19.0 (Potassium)
 -  E-ACSL       [2018-11-15] Predicates with empty quantifications
                 directly generate \true or \false instead of nested loops.
 
-##########################
+###############################################################################
 Plugin E-ACSL 18.0 (Argon)
-##########################
+###############################################################################
 
 -* E-ACSL       [2018-11-13] Fix typing bug in quantifications when the
                 guards of the quantifier variable cannot be represented into
@@ -283,9 +287,9 @@ Plugin E-ACSL 18.0 (Argon)
 -  E-ACSL       [2018-09-18] Support for ranges in memory builtins
                 (\valid, \initialized, etc).
 
-######################################
+###############################################################################
 Plugin E-ACSL 17.0 (Chlorine-20180501)
-######################################
+###############################################################################
 
 -  E-ACSL       [2018-03-30] Support for let binding.
 -  E-ACSL       [2018-02-21] New option -e-acsl-replace-libc-functions to
@@ -312,9 +316,9 @@ Plugin E-ACSL 17.0 (Chlorine-20180501)
 -* E-ACSL       [2017-11-27] Restore behavior of option -e-acsl-valid broken
                 since Phosphorus (included).
 
-####################################
+###############################################################################
 Plugin E-ACSL 16.0 (Sulfur-20171101)
-####################################
+###############################################################################
 
 -* E-ACSL       [2017-10-25] Fix bug #2303 about unnamed formals in
                 annotated functions.
@@ -331,9 +335,9 @@ Plugin E-ACSL 16.0 (Sulfur-20171101)
                 e-acsl-gcc.sh allowing to change the default sizes of the
                 respective shadow spaces.
 
-########################################
+###############################################################################
 Plugin E-ACSL 15.0 (Phosphorus-20170501)
-########################################
+###############################################################################
 
 -  runtime      [2017-03-29] The (much more efficient) shadow memory model is
                 now used by default.
@@ -359,9 +363,9 @@ Plugin E-ACSL 15.0 (Phosphorus-20170501)
                 operations in a few cases: the generated code might have
                 overflowed.
 
-####################################
+###############################################################################
 Plugin E-ACSL 0.8 (Silicon-20161101)
-####################################
+###############################################################################
 
 -* e-acsl-gcc   [2016-11-07] Added --rte-select feature to e-acsl-gcc.sh.
 -* e-acsl-gcc   [2016-08-02] Added --rt-debug feature to e-acsl-gcc.sh.
@@ -397,9 +401,9 @@ Plugin E-ACSL 0.8 (Silicon-20161101)
                 initialization of tracked memory blocks in the E-ACSL
                 memory model library.
 
-######################################
+###############################################################################
 Plugin E-ACSL 0.6 (Magnesium_20151002)
-######################################
+###############################################################################
 
 -* e-acsl-gcc   [2016-01-22] Add an e-acsl-gcc.sh option allowing to skip
                 compilation of original sources.
@@ -413,9 +417,9 @@ Plugin E-ACSL 0.6 (Magnesium_20151002)
 -* runtime      [2015-11-06] Fix a crash occuring when using a recent libc
                 while GMP headers provided by E-ACSL are used.
 
-###################################
+###############################################################################
 Plugin E-ACSL 0.5 (Sodium_20150201)
-###################################
+###############################################################################
 
 -  E-ACSL       [2015-06-01] Support of \freeable. Thus illegal calls to
                 free (e.g. double free) are detected.
@@ -431,9 +435,9 @@ o  E-ACSL       [2014-12-17] Export a minimal API for other plug-ins.
 -* E-ACSL       [2014-10-27] Add a missing cast when translating an integral
                 type used in a floating point/real context in an annotation.
 
-###################################
+###############################################################################
 Plugin E-ACSL 0.4.1 (Neon_20140301)
-###################################
+###############################################################################
 
 -* E-ACSL       [2014-08-05] Fix bug #1838 about memset.
 -* E-ACSL       [2014-08-05] Fix bug #1818 about initialization of globals.
@@ -458,9 +462,9 @@ Plugin E-ACSL 0.4.1 (Neon_20140301)
                 generates incorrect code.
 -* E-ACSL       [2014-03-17] Fix bug #1700 about non-ISO empty struct.
 
-#################################
+###############################################################################
 Plugin E-ACSL 0.4 (Neon_20140301)
-#################################
+###############################################################################
 
 -* E-ACSL       [2014-01-28] Fix bug #1634 occuring in presence of static
                 addresses.
@@ -468,9 +472,9 @@ Plugin E-ACSL 0.4 (Neon_20140301)
                 of aliasing.
 -* E-ACSL       [2013-09-25] Some loop invariants were tagged as "assertions".
 
-#####################################
+###############################################################################
 Plugin E-ACSL 0.3 (Fluorine_20130601)
-#####################################
+###############################################################################
 
 -  E-ACSL       [2013-09-18] More precise message for unsupported contract
                 clauses.
@@ -488,9 +492,9 @@ Plugin E-ACSL 0.3 (Fluorine_20130601)
                 generated project.
 -* E-ACSL       [2013-05-30] Fix -e-acsl-debug n, with n >= 2.
 
-#####################################
+###############################################################################
 Plugin E-ACSL 0.2 (Fluorine_20130401)
-#####################################
+###############################################################################
 
 -  E-ACSL       [2013-01-09] New option -e-acsl-valid. By default, valid
                 annotation are not translated anymore.
@@ -527,10 +531,10 @@ Plugin E-ACSL 0.2 (Fluorine_20130401)
 -  E-ACSL       [2012-01-20] Use GMP arithmetics only when required
                 (i.e. mostly never in practice).
 
-#####################################
+###############################################################################
 Plugin E-ACSL 0.1 (Nitrogen_20111001)
-#####################################
+###############################################################################
 
 -  E-ACSL       [2012-01-06] First public release.
 
-###################################
+###############################################################################

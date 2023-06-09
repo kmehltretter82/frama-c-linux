@@ -42,8 +42,8 @@ val update_node_values : node ->
   typ:Cil_types.typ -> cvalue:Cvalue.V.t -> taint:Eva.Results.taint option ->
   unit
 
-val create_dependency : t -> Cil_types.kinstr ->
-  node -> dependency_kind -> node -> unit
+val create_dependency : t -> origin:origin -> kind:dependency_kind ->
+  node -> node -> node * dependency * node
 
 val remove_dependency : t -> node * dependency * node -> unit
 val remove_dependencies : t -> node -> unit
@@ -52,8 +52,4 @@ val find_independant_nodes : t -> node list -> node list
 val bfs : ?iter_succ:((node -> unit) -> t -> node -> unit) -> ?limit:int ->
   t -> node list -> node list
 
-val ouptput_to_dot : out_channel -> t -> unit
-val ouptput_to_json : out_channel -> t -> unit
-
-val to_json : t -> Json.t
-val diff_to_json : t -> graph_diff -> Json.t
+val output_to_dot : out_channel -> t -> unit

@@ -62,12 +62,18 @@ type allocation_kind = By_stack | Fresh | Fresh_weak | Imprecise
 
 exception Parse_error
 
+(* Where an Eva directive is applied. *)
+type kind =
+  | Here (* The directive is applied when encountered. *)
+  | Stmt (* The directive has effect on the next statement. *)
+  | Loop (* The directive concerns a loop. *)
+
 module type Annotation =
 sig
   type t
 
   val name : string
-  val is_loop_annot : bool
+  val kind : kind
   val parse : typing_context:Logic_typing.typing_context -> lexpr list -> t
   val export : t -> acsl_extension_kind
   val import : acsl_extension_kind -> t
@@ -87,16 +93,19 @@ struct
     print fmt (import lp)
 
   let () =
-    if is_loop_annot then
-      Acsl_extension.register_code_annot_next_loop name typer ~printer false
-    else
-      Acsl_extension.register_code_annot_next_stmt name typer ~printer false
+    let register =
+      match kind with
+      | Here -> Acsl_extension.register_code_annot
+      | Stmt -> Acsl_extension.register_code_annot_next_stmt
+      | Loop -> Acsl_extension.register_code_annot_next_loop
+    in
+    register name typer ~printer false
 
   let get stmt =
     let filter_add _emitter annot acc =
       match annot.annot_content with
-      | Cil_types.AExtended (_, is_loop_annot', {ext_name=name'; ext_kind})
-        when name' = name && is_loop_annot' = is_loop_annot ->
+      | Cil_types.AExtended (_, is_loop_annot, {ext_name=name'; ext_kind})
+        when name' = name && is_loop_annot = (kind = Loop) ->
         import ext_kind :: acc
       | _ -> acc
     in
@@ -106,7 +115,7 @@ struct
     let loc = Cil_datatype.Stmt.loc stmt in
     let param = M.export annot in
     let extension = Logic_const.new_acsl_extension name loc false param in
-    let annot_node = Cil_types.AExtended ([], is_loop_annot, extension) in
+    let annot_node = Cil_types.AExtended ([], kind = Loop, extension) in
     let code_annotation = Logic_const.new_code_annotation annot_node in
     Annotations.add_code_annot emitter stmt code_annotation
 end
@@ -116,7 +125,7 @@ module Slevel = Register (struct
     type t = slevel_annotation
 
     let name = "slevel"
-    let is_loop_annot = false
+    let kind = Here
 
     let parse ~typing_context:_ = function
       | [{lexpr_node = PLvar "default"}] -> SlevelDefault
@@ -161,7 +170,7 @@ module Unroll = Register (struct
     type t = unroll_annotation
 
     let name = "unroll"
-    let is_loop_annot = true
+    let kind = Loop
 
     let parse ~typing_context = function
       | [] -> UnrollFull
@@ -190,6 +199,8 @@ struct
   (* [split_term] plus the original term before conversion to a C expression,
      when possible, to avoid changes due to its reconversion to a C term. *)
   type t = split_term * Cil_types.term option
+
+  let kind = Here
 
   let term_to_exp = Logic_to_c.term_to_exp ?result:None
 
@@ -231,19 +242,16 @@ end
 module Split = Register (struct
     include SplitTermAnnotation
     let name = "split"
-    let is_loop_annot = false
   end)
 
 module Merge = Register (struct
     include SplitTermAnnotation
     let name = "merge"
-    let is_loop_annot = false
   end)
 
 module DynamicSplit = Register (struct
     include SplitTermAnnotation
     let name = "dynamic_split"
-    let is_loop_annot = false
   end)
 
 let get_slevel_annot stmt =
@@ -275,7 +283,7 @@ let add_flow_annot ~emitter stmt flow_annotation =
 module Subdivision = Register (struct
     type t = int
     let name = "subdivide"
-    let is_loop_annot = false
+    let kind = Stmt
 
     let parse ~typing_context:_ = function
       | [{lexpr_node = PLconstant (IntConstant i)}] ->
@@ -316,7 +324,7 @@ module Allocation = struct
   include Register (struct
       type t = allocation_kind
       let name = "eva_allocate"
-      let is_loop_annot = false
+      let kind = Stmt
 
       let parse ~typing_context:_ = function
         | [{lexpr_node = PLvar s}] -> Extlib.the ~exn:Parse_error (of_string s)
@@ -356,7 +364,7 @@ let get_allocation = Allocation.get
 module ArraySegmentation = Register (struct
     type t = Cil_types.varinfo * Cil_types.offset * Cil_types.exp list
     let name = "array_partition"
-    let is_loop_annot = false
+    let kind = Here
 
     let convert = function
       | {term_node =  TLval (TVar {lv_origin=Some vi}, toffset)} :: tbounds ->
@@ -402,7 +410,7 @@ let read_array_segmentation ext = ArraySegmentation.import ext.ext_kind
 module DomainScope = Register (struct
     type t = string * Cil_types.varinfo list
     let name = "eva_domain_scope"
-    let is_loop_annot = false
+    let kind = Here
 
     let parse ~typing_context:context =
       let parse_domain = function

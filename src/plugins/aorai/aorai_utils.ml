@@ -399,8 +399,14 @@ let rec term_to_exp t res =
   | TConst (LWStr l) -> new_exp ~loc (Const (CWStr l))
   | TConst (LChr c) -> new_exp ~loc (Const (CChr c))
   | TConst (LReal l_real) ->
-    (* r_nearest is by definition in double precision. *)
-    new_exp ~loc (Const (CReal (l_real.r_nearest, FDouble, None)))
+    let fk,_ = Floating_point.parse l_real.r_literal in
+    let cst =
+      if Cil.isExactFloat fk l_real then
+        (CReal (l_real.r_nearest, fk, Some l_real.r_literal))
+      else (* fallback to double, r_nearest being in that format anyways *)
+        (CReal (l_real.r_nearest, FDouble, None))
+    in
+    new_exp ~loc (Const cst)
   | TConst (LEnum e) -> new_exp ~loc (Const (CEnum e))
   | TLval tlval -> new_exp ~loc (Lval (tlval_to_lval tlval res))
   | TSizeOf ty -> new_exp ~loc (SizeOf ty)
@@ -413,6 +419,14 @@ let rec term_to_exp t res =
   | TBinOp (binop, t1, t2)->
     new_exp ~loc
       (BinOp(binop, term_to_exp t1 res, term_to_exp t2 res, Cil.intType))
+  | TCastE(ty, {term_node = TConst(LReal lreal)}) when Cil.isFloatingType ty ->
+    (match Cil.unrollType ty with
+     | TFloat(fk,_) ->
+       new_exp ~loc
+         (Const (CReal (lreal.r_nearest,fk,Some lreal.r_literal)))
+     | _ ->
+       Aorai_option.fatal
+         "A floating-point type was expected, got %a." Printer.pp_typ ty)
   | TCastE (ty, t) -> new_exp ~loc (CastE (ty, term_to_exp t res))
   | TAddrOf tlval -> new_exp ~loc (AddrOf (tlval_to_lval tlval res))
   | TStartOf tlval -> new_exp ~loc (StartOf (tlval_to_lval tlval res))
@@ -691,7 +705,7 @@ let mk_gvar ?init ~ty name =
   let vi =
     try
       let ty' = typeAddAttributes [Attr ("ghost", [])] ty in
-      let vi = Globals.Vars.find_from_astinfo name VGlobal in
+      let vi = Globals.Vars.find_from_astinfo name Global in
       if not (Cil_datatype.Typ.equal vi.vtype ty') then
         Aorai_option.abort "Global %s is declared with type %a instead of %a"
           name Cil_printer.pp_typ vi.vtype Cil_printer.pp_typ ty';
@@ -1092,7 +1106,8 @@ let make_enum_states () =
          (id, item))
       state_list
   in
-  set_enum mapping
+  set_enum mapping;
+  enum
 
 let getInitialState () =
   let loc = Cil_datatype.Location.unknown in
@@ -1107,7 +1122,11 @@ let initGlobals root complete =
   mk_global_comment "//* ";
   mk_global_comment "//* ";
   mk_global_comment "//* Some constants";
-  if Aorai_option.Deterministic.get () then make_enum_states ();
+  let states_typ =
+    if Aorai_option.Deterministic.get ()
+    then Some (TEnum (make_enum_states (), []))
+    else None
+  in
   (* non deterministic mode uses one variable for each possible state *)
   mk_global_c_enum_type
     listOp
@@ -1121,7 +1140,7 @@ let initGlobals root complete =
   mk_global_comment "//* ";
   mk_global_comment "//* States and Trans Variables";
   if Aorai_option.Deterministic.get () then begin
-    mk_gvar_scalar ~init:(getInitialState()) curState;
+    mk_gvar_scalar ?ty:states_typ ~init:(getInitialState()) curState;
     let init = getInitialState() (* TODO a distinct initial value for history *)
     and history = Data_for_aorai.whole_history () in
     List.iter (fun name -> mk_gvar_scalar ~init name) history

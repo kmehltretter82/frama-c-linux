@@ -133,8 +133,6 @@
 (libc/__fc_inet.h as libc/__fc_inet.h)
 (libc/__fc_integer.h as libc/__fc_integer.h)
 (libc/__fc_libc.h as libc/__fc_libc.h)
-(libc/__fc_machdep.h as libc/__fc_machdep.h)
-(libc/__fc_machdep_linux_shared.h as libc/__fc_machdep_linux_shared.h)
 (libc/__fc_runtime.c as libc/__fc_runtime.c)
 (libc/__fc_select.h as libc/__fc_select.h)
 (libc/__fc_string_axiomatic.h as libc/__fc_string_axiomatic.h)
@@ -325,4 +323,65 @@
 (analysis-scripts/README.md as lib/analysis-scripts/README.md)
 (analysis-scripts/template.mk as lib/analysis-scripts/template.mk)
 
+))
+
+; machdeps
+(install
+ (package frama-c)
+ (section share)
+ (files
+  (machdeps/machdep_avr_8.yaml as share/machdeps/machdep_avr_8.yaml)
+  (machdeps/machdep_avr_16.yaml as share/machdeps/machdep_avr_16.yaml)
+  (machdeps/machdep_x86_16.yaml as share/machdeps/machdep_x86_16.yaml)
+  (machdeps/machdep_x86_32.yaml as share/machdeps/machdep_x86_32.yaml)
+  (machdeps/machdep_x86_64.yaml as share/machdeps/machdep_x86_64.yaml)
+  (machdeps/machdep_gcc_x86_16.yaml as share/machdeps/machdep_gcc_x86_16.yaml)
+  (machdeps/machdep_gcc_x86_32.yaml as share/machdeps/machdep_gcc_x86_32.yaml)
+  (machdeps/machdep_gcc_x86_64.yaml as share/machdeps/machdep_gcc_x86_64.yaml)
+  (machdeps/machdep_msvc_x86_64.yaml as share/machdeps/machdep_msvc_x86_64.yaml)
+  (machdeps/machdep_ppc_32.yaml as share/machdeps/machdep_ppc_32.yaml))
+)
+
+; machdep generation script
+(install
+ (package frama-c)
+ (section libexec)
+ (files
+  (machdeps/make_machdep/make_machdep.py as lib/make_machdep/make_machdep.py))
+)
+
+; machdep generation auxiliary files
+(install
+ (package frama-c)
+ (section lib)
+ (files
+  (machdeps/make_machdep/alignof_aligned.c as lib/make_machdep/alignof_aligned.c)
+  (machdeps/make_machdep/alignof_double.c as lib/make_machdep/alignof_double.c)
+  (machdeps/make_machdep/alignof_float.c as lib/make_machdep/alignof_float.c)
+  (machdeps/make_machdep/alignof_fun.c as lib/make_machdep/alignof_fun.c)
+  (machdeps/make_machdep/alignof_int.c as lib/make_machdep/alignof_int.c)
+  (machdeps/make_machdep/alignof_long.c as lib/make_machdep/alignof_long.c)
+  (machdeps/make_machdep/alignof_longdouble.c as lib/make_machdep/alignof_longdouble.c)
+  (machdeps/make_machdep/alignof_longlong.c as lib/make_machdep/alignof_longlong.c)
+  (machdeps/make_machdep/alignof_ptr.c as lib/make_machdep/alignof_ptr.c)
+  (machdeps/make_machdep/alignof_short.c as lib/make_machdep/alignof_short.c)
+  (machdeps/make_machdep/alignof_str.c as lib/make_machdep/alignof_str.c)
+  (machdeps/make_machdep/char_is_unsigned.c as lib/make_machdep/char_is_unsigned.c)
+  (machdeps/make_machdep/const_string_literals.c as lib/make_machdep/const_string_literals.c)
+  (machdeps/make_machdep/has__builtin_va_list.c as lib/make_machdep/has__builtin_va_list.c)
+  (machdeps/make_machdep/little_endian.c as lib/make_machdep/little_endian.c)
+  (machdeps/make_machdep/ptrdiff_t.c as lib/make_machdep/ptrdiff_t.c)
+  (machdeps/make_machdep/sizeof_double.c as lib/make_machdep/sizeof_double.c)
+  (machdeps/make_machdep/sizeof_float.c as lib/make_machdep/sizeof_float.c)
+  (machdeps/make_machdep/sizeof_fun.c as lib/make_machdep/sizeof_fun.c)
+  (machdeps/make_machdep/sizeof_int.c as lib/make_machdep/sizeof_int.c)
+  (machdeps/make_machdep/sizeof_long.c as lib/make_machdep/sizeof_long.c)
+  (machdeps/make_machdep/sizeof_longdouble.c as lib/make_machdep/sizeof_longdouble.c)
+  (machdeps/make_machdep/sizeof_longlong.c as lib/make_machdep/sizeof_longlong.c)
+  (machdeps/make_machdep/sizeof_ptr.c as lib/make_machdep/sizeof_ptr.c)
+  (machdeps/make_machdep/sizeof_short.c as lib/make_machdep/sizeof_short.c)
+  (machdeps/make_machdep/sizeof_void.c as lib/make_machdep/sizeof_void.c)
+  (machdeps/make_machdep/size_t.c as lib/make_machdep/size_t.c)
+  (machdeps/make_machdep/wchar_t.c as lib/make_machdep/wchar_t.c)
+  (machdeps/make_machdep/make_machdep_common.h as lib/make_machdep/make_machdep_common.h)
 ))

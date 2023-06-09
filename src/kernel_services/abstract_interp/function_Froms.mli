@@ -31,7 +31,9 @@ module Deps : sig
 
   val bottom: deps
   val top: deps
+  val is_included: deps -> deps -> bool
   val join: deps -> deps -> deps
+  val narrow: deps -> deps -> deps
   val to_zone: deps -> Locations.Zone.t
 
   val add_data_dep: deps -> Locations.Zone.t -> deps

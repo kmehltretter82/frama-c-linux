@@ -43,3 +43,7 @@ let newline lexbuf =
   let pos = lexbuf.lex_curr_p in
   lexbuf.lex_curr_p <-
     { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
+
+let unterminated_comment lexbuf =
+  abort_current lexbuf
+    "Unterminated C comment"

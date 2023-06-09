@@ -66,8 +66,11 @@ module State =
       let dependencies = [ Eva.Analysis.self; Globals.Functions.self ]
     end)
 
+module StateHook = Hook.Build (D)
+
 let self = State.self
 let is_computed () = State.is_computed ()
+let add_hook = StateHook.extend
 
 (** @return the list of functions which address is taken.*)
 let get_pointed_kfs =
@@ -101,7 +104,6 @@ let get_pointed_kfs =
     match !res with
     | None ->
       let l = compute () in
-      State.mark_as_computed ();
       res := Some l;
       l
     | Some l -> l
@@ -232,6 +234,8 @@ let compute () =
     semantic_compute g
   end else
     (if Eva.Analysis.is_computed () then semantic_compute else syntactic_compute) g;
+  State.mark_as_computed ();
+  StateHook.apply g;
   g
 
 let get () = State.memo compute

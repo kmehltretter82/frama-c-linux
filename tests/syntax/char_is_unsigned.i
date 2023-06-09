@@ -1,7 +1,6 @@
 /* run.config
 PLUGIN: rtegen
- MODULE: machdep_char_unsigned
-   OPT: -print -machdep unsigned_char -then -constfold -rte
+   OPT: -print -machdep %{dep:@PTEST_DIR@/machdep_char_unsigned.yaml} -then -constfold -rte
 */
 char t[10];
 

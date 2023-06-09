@@ -105,7 +105,6 @@ type theMachine =
     mutable lowerConstants: bool; (** Do lower constants (default true) *)
     mutable insertImplicitCasts: bool; (** Do insert implicit casts
                                            (default true) *)
-    mutable underscore_name: bool;
     mutable stringLiteralType: typ;
     mutable upointKind: ikind;
     mutable upointType: typ;
@@ -120,11 +119,10 @@ type theMachine =
 
 let createMachine () = (* Contain dummy values *)
   { useLogicalOperators = false;
-    theMachine = Machdeps.x86_64;
+    theMachine = List.hd Cil_datatype.Machdep.reprs;
     lowerConstants = false(*true*);
     insertImplicitCasts = true;
-    underscore_name = true;
-    stringLiteralType = charPtrType;
+    stringLiteralType = charConstPtrType;
     upointKind = IChar;
     upointType = voidType;
     wcharKind = IChar;
@@ -140,7 +138,6 @@ let copyMachine src dst =
   dst.theMachine <- src.theMachine;
   dst.lowerConstants <- src.lowerConstants;
   dst.insertImplicitCasts <- src.insertImplicitCasts;
-  dst.underscore_name <- src.underscore_name;
   dst.stringLiteralType <- src.stringLiteralType;
   dst.upointKind <- src.upointKind;
   dst.upointType <- src.upointType;
@@ -234,6 +231,12 @@ let pp_lval_ref = Extlib.mk_fun "Cil.pp_lval_ref"
 let pp_ikind_ref = Extlib.mk_fun "Cil.pp_ikind_ref"
 let pp_attribute_ref = Extlib.mk_fun "Cil.pp_attribute_ref"
 let pp_attributes_ref = Extlib.mk_fun "Cil.pp_attributes_ref"
+let pp_term_ref = Extlib.mk_fun "Cil.pp_term_ref"
+let pp_logic_type_ref = Extlib.mk_fun "Cil.pp_logic_type_ref"
+let pp_identified_term_ref = Extlib.mk_fun "Cil.pp_identified_term_ref"
+let pp_location_ref = Extlib.mk_fun "Cil.pp_location_ref"
+let pp_from_ref = Extlib.mk_fun "Cil.pp_from_ref"
+let pp_behavior_ref = Extlib.mk_fun "Cil.pp_behavior_ref"
 
 let default_behavior_name = "default!"
 let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes =[]
@@ -3689,7 +3692,9 @@ let rec typeOf (e: exp) : typ =
    * have SizeOfStr for that *)
   | Const(CStr _s) -> theMachine.stringLiteralType
 
-  | Const(CWStr _s) -> TPtr(theMachine.wcharType,[])
+  | Const(CWStr _s) ->
+    let typ = typeAddAttributes [Attr("const",[])] theMachine.wcharType in
+    TPtr(typ,[])
 
   | Const(CReal (_, fk, _)) -> TFloat(fk, [])
 
@@ -6408,9 +6413,7 @@ let initCIL ~initLogicBuiltins machdep =
     (* Set the machine *)
     theMachine.theMachine <- machdep;
     (* Pick type for string literals *)
-    theMachine.stringLiteralType <-
-      if theMachine.theMachine.const_string_literals then charConstPtrType
-      else charPtrType;
+    theMachine.stringLiteralType <- charConstPtrType;
     (* Find the right ikind given the size *)
     let findIkindSz (unsigned: bool) (sz: int) : ikind =
       (* Test the most common sizes first *)
@@ -6453,8 +6456,6 @@ let initCIL ~initLogicBuiltins machdep =
     theMachine.wcharType <- TInt(theMachine.wcharKind, []);
     theMachine.ptrdiffKind <- findIkindName theMachine.theMachine.ptrdiff_t;
     theMachine.ptrdiffType <- TInt(theMachine.ptrdiffKind, []);
-    theMachine.underscore_name <-
-      theMachine.theMachine.Cil_types.underscore_name;
     theMachine.useLogicalOperators <- Kernel.LogicalOperators.get() (* do not use lazy LAND and LOR *);
     (*nextGlobalVID <- 1 ;
       nextCompinfoKey <- 1;*)

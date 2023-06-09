@@ -218,14 +218,14 @@
   remainder ∈ [--..--]
   sign ∈ {-1; 0; 1}
   errmsg[0..19] ∈ [--..--] or UNINITIALIZED
-  r1 ∈ {0}
-  r2 ∈ {0}
-  r3 ∈ {0}
-  r4 ∈ {1}
-  r5 ∈ {2}
-  r6 ∈ {2}
-  r7 ∈ {2}
-  r8 ∈ {0; 1}
+  r1 ∈ {OK}
+  r2 ∈ {OK}
+  r3 ∈ {OK}
+  r4 ∈ {DIVBYZERO}
+  r5 ∈ {INVALID_PARAMETER}
+  r6 ∈ {INVALID_PARAMETER}
+  r7 ∈ {INVALID_PARAMETER}
+  r8 ∈ {OK; DIVBYZERO}
 [eva:final-states] Values at end of function test2:
   a ∈ {1}
   b ∈ {2}

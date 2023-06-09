@@ -35,7 +35,7 @@ module Vars: sig
 
   val find: varinfo -> initinfo
 
-  val find_from_astinfo: string -> localisation -> varinfo
+  val find_from_astinfo: string -> syntactic_scope -> varinfo
   (** Finds a variable from its [vname] according to its localisation (which
       might be a local). If you wish to search for a symbol according to its
       original name in the source code and the syntactic scope in which
@@ -43,7 +43,7 @@ module Vars: sig
       @raise Not_found if no such variable exists.
   *)
 
-  val get_astinfo: varinfo -> string * localisation
+  val get_astinfo: varinfo -> string * syntactic_scope
   (** Linear in the number of locals and formals of the program. *)
 
   (** {2 Iterators} *)
@@ -221,13 +221,24 @@ end
 module Syntactic_search: sig
   val self: State.t
 
-  val find_in_scope: string -> syntactic_scope -> varinfo option
+  val find_in_scope: ?strict:bool -> string -> syntactic_scope -> varinfo option
   (** [find_in_scope orig_name scope] finds a variable from its [orig_name],
       according to the syntactic [scope] in which it should be searched.
+      @param strict indicates whether the symbol should be searched only in
+        the exact [scope] that it is given. It defaults to [false], meaning
+        that the search will look for enclosing scopes, according to C lookup
+        rules. More precisely, non-strict lookup will proceed according to the
+        following order: [Block_scope] will move across all enclosing blocks
+        up to the function body (or all locals will be searched directly in
+        case of [Whole_function]). Then, [Formal] will be considered, followed
+        by [Translation_unit] (for the file where the function is defined),
+        then [Program].
       @return [None] if there are no variables [orig_name] in [scope].
       @return [Some vi] otherwise, with [vi] the [varinfo] associated to
-      [orig_name] in [scope] according to C lookup rules.
+        [orig_name] in [scope] (or an enclosing scope when [strict] is false).
       @since Chlorine-20180501
+      @before 27.0-Cobalt [strict] parameter did not exist, symbol was always
+        searched according to C lookup rules.
   *)
 end
 
@@ -338,6 +349,7 @@ val get_comments_stmt: stmt -> string list
 (* Forward reference to functions defined in Kernel_function. Do not
    use outside of this module.
 *)
+val get_statics: (kernel_function -> varinfo list) ref
 val find_first_stmt: (kernel_function -> stmt) ref
 val find_enclosing_block: (stmt -> block) ref
 val find_all_enclosing_blocks: (stmt -> block list) ref

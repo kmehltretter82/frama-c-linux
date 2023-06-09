@@ -59,8 +59,7 @@ type behavior = {
 
 let normalize_assumes h =
   let module L = NormAtLabels in
-  let labels = L.labels_fct_pre in
-  L.preproc_annot labels h
+  L.preproc_annot L.labels_fct_pre h
 
 let implies ?assumes p =
   match assumes with None -> p | Some h -> Logic_const.pimplies (h,p)
@@ -77,7 +76,8 @@ let normalize_pre ~goal kf bhv ?assumes ip =
     let id = WpPropId.mk_pre_id kf Kglobal bhv ip in
     let pre = ip.ip_content.tp_statement in
     let assumes = Option.map normalize_assumes assumes in
-    Some (id, L.preproc_annot labels @@ implies ?assumes pre)
+    let precond = L.preproc_annot labels pre in
+    Some (id, implies ?assumes precond)
   else None
 
 let normalize_post ~goal kf bhv tk ?assumes (itk,ip) =
@@ -87,8 +87,8 @@ let normalize_post ~goal kf bhv tk ?assumes (itk,ip) =
     let assumes = Option.map (fun p -> normalize_assumes @@ at_pre p) assumes in
     let labels = L.labels_fct_post ~exit:(tk=Exits) in
     let id = WpPropId.mk_post_id kf Kglobal bhv (tk,ip) in
-    let p = L.preproc_annot labels ip.ip_content.tp_statement in
-    Some (id , implies ?assumes p)
+    let post = L.preproc_annot labels ip.ip_content.tp_statement in
+    Some (id , implies ?assumes post)
   else None
 
 let normalize_decreases (d, li) =
@@ -464,7 +464,7 @@ module CodeAssertions = WpContext.StaticGenerator(CodeKey)
 
 let get_code_assertions ?(smoking=false) kf stmt =
   let ca = CodeAssertions.get (kf,stmt) in
-  (* Make sur that smoke tests are in the end so that it can see surely false
+  (* Make sure that smoke tests are in the end so that it can see surely false
      assertions associated to this statement, in particular RTE assertions.   *)
   List.rev @@
   if smoking then
@@ -607,20 +607,22 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
     end)
 
 let get_loop_contract ?(smoking=false) ?terminates kf stmt =
+  (* Loop Contract *)
   let lc = LoopContract.get (kf,stmt) in
-  let lc_smoke = if smoking && not (WpReached.is_dead_code stmt) then
+  (* Loop Smoking *)
+  let lc =
+    if smoking && not (WpReached.is_dead_code stmt) then
       let g = smoke kf ~id:"dead_loop" ~unreachable:stmt () in
       { lc with loop_smoke = g :: lc.loop_smoke }
     else lc
   in
-  match lc_smoke.loop_terminates, terminates with
-  | None, _ ->
-    lc_smoke
-  | Some _, None ->
-    { lc_smoke with loop_terminates = None }
+  (* Loop Termination *)
+  match lc.loop_terminates, terminates with
+  | None, _ -> lc
+  | Some _, None -> { lc with loop_terminates = None }
   | Some loop_terminates, Some terminates ->
     let prop = Logic_const.pimplies(terminates, loop_terminates) in
-    { lc_smoke with loop_terminates = Some prop }
+    { lc with loop_terminates = Some prop }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Clear Tablesnts                                                    --- *)

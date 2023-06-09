@@ -2530,20 +2530,22 @@ class cil_printer () = object (self)
       fprintf fmt "@[%a@]" self#tand_list (get_tand_list l [r])
     | TBinOp (op,l,r) ->
       fprintf fmt "@[%a@ %a@ %a@]" term l self#term_binop op term r
-    | TCastE (ty,e) ->
+    | TCastE (ty,t) ->
       begin match ty, t.term_node with
         | TFloat(fk,_) , TConst(LReal r as cst) when
             not Kernel.(is_debug_key_enabled dkey_print_logic_coercions) &&
             Floating_point.has_suffix fk r.r_literal ->
           self#logic_constant fmt cst
         | _ ->
-          fprintf fmt "(%a)%a" (self#typ None) ty term e
+          fprintf fmt "(%a)%a" (self#typ None) ty term t
       end
     | TAddrOf lv ->
       fprintf fmt "&%a" (self#term_lval_prec Precedence.addrOfLevel) lv
-    | TStartOf lv -> fprintf fmt "(%a)%a"
-                       (self#logic_type None) t.term_type
-                       (self#term_lval_prec current_level) lv
+    | TStartOf lv ->
+      let typ = Logic_utils.array_to_ptr (Cil.typeOfTermLval lv) in
+      fprintf fmt "(%a)%a"
+        (self#logic_type None) typ
+        (self#term_lval_prec current_level) lv
     (* A few built-ins for lists have special syntax. Use it when we're not
        in print-as-is mode. *)
     | Tapp ({ l_var_info },[],[e1; e2])
@@ -3435,6 +3437,12 @@ let () = Cil.pp_lval_ref := pp_lval
 let () = Cil.pp_ikind_ref := pp_ikind
 let () = Cil.pp_attribute_ref := pp_attribute
 let () = Cil.pp_attributes_ref := pp_attributes
+let () = Cil.pp_term_ref := pp_term
+let () = Cil.pp_logic_type_ref := pp_logic_type
+let () = Cil.pp_identified_term_ref := pp_identified_term
+let () = Cil.pp_location_ref := pp_location
+let () = Cil.pp_from_ref := pp_from
+let () = Cil.pp_behavior_ref := pp_behavior
 
 (*
 Local Variables:

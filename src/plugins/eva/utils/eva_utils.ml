@@ -138,6 +138,11 @@ let create_new_var name typ =
 
 let is_const_write_invalid typ = Cil.typeHasQualifier "const" typ
 
+let find_return_var kf =
+  match (Kernel_function.find_return kf).skind with
+  | Return (Some ({enode = Lval ((Var vi, NoOffset))}), _) -> Some vi
+  | _ | exception Kernel_function.No_Statement -> None
+
 (* Find if a postcondition contains [\result] *)
 class postconditions_mention_result = object
   inherit Visitor.frama_c_inplace

@@ -555,10 +555,9 @@ export interface FieldProps {
    Text Field.
 */
 export const Field = (props: FieldProps): JSX.Element => {
-  const [current, setCurrent] = React.useState<string>();
   const { className = '', onChange, onEdited, value = '' } = props;
+  const [current, setCurrent] = React.useState<string>(value);
   const disabled = onChange ? DISABLED(props) : true;
-  const theValue = current ?? value;
   const ONCHANGE = (evt: React.ChangeEvent<HTMLInputElement>): void => {
     const text = evt.target.value || '';
     setCurrent(text);
@@ -567,11 +566,11 @@ export const Field = (props: FieldProps): JSX.Element => {
   const ONKEYPRESS = (evt: React.KeyboardEvent): void => {
     switch (evt.key) {
       case 'Enter':
-        setCurrent(undefined);
-        if (onChange && current) onChange(current);
+        if (onChange) onChange(current);
         break;
       case 'Escape':
-        setCurrent(undefined);
+        setCurrent(value);
+        if (onChange) onChange(value);
         break;
       default:
         break;
@@ -582,12 +581,12 @@ export const Field = (props: FieldProps): JSX.Element => {
       id={props.id}
       type="text"
       autoFocus={!disabled && props.autoFocus}
-      value={theValue}
+      value={current}
       className={`dome - xField ${className} `}
       style={props.style}
       disabled={disabled}
       placeholder={props.placeholder}
-      onKeyPress={ONKEYPRESS}
+      onKeyDown={ONKEYPRESS}
       onChange={ONCHANGE}
     />
   );

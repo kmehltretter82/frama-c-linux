@@ -76,30 +76,9 @@
 /* Maximum value an `unsigned long long int' can hold.  (Minimum is 0.)  */
 #   define ULLONG_MAX	__FC_ULLONG_MAX
 
-/* Maximum number of bytes in a pathname, including the terminating
-   null character. (Minimum is 256.) */
-#define PATH_MAX  __FC_PATH_MAX
+// POSIX-specific definitions
 
-/* Maximum length of a host name (not including the terminating null)
-   as returned from the gethostname() function.
-   Note: Mac OS does not define this constant. */
-#define HOST_NAME_MAX __FC_HOST_NAME_MAX
-
-/* Maximum length of a terminal device name. */
-#define TTY_NAME_MAX __FC_TTY_NAME_MAX
-
-/* Maximum length of argument to the exec functions including environment data.
-   Minimum Acceptable Value: {_POSIX_ARG_MAX} (4096 in POSIX.1-2008)
-   "... the total space used to store the environment and the arguments to the
-    process is limited to {ARG_MAX} bytes."
- */
-#define ARG_MAX 4096
-
-// POSIX; used by <sys/uio.h>.
-// Must be >= _XOPEN_IOV_MAX, which is 16.
-// 1024 is the value used by some Linux implementations.
-#define IOV_MAX 1024
-
+/*** Most restrictive values for the constants below, as mandated by POSIX */
 
 // Maximum Values
 
@@ -165,5 +144,83 @@
 #define NL_SETMAX 255
 #define NL_TEXTMAX _POSIX2_LINE_MAX
 #define NZERO 20
+
+/*** POSIX constants. Frama-C usually takes Linux' values by default, but
+     it can be overloaded by passing e.g. `-cpp-extra-args="-D__FC_XXXX=nnnn"`
+     on Frama-C's command line. A value of -1 will deactivate the macro (all of
+     them are optional).
+*/
+#define STR(S) # S
+#define expand(macro) STR(macro)
+
+/* Maximum number of bytes in a pathname, including the terminating
+   null character. (Minimum is 256.) */
+#ifdef __FC_PATH_MAX
+#  if __FC_PATH_MAX >= 0
+      _Static_assert(__FC_PATH_MAX >=_POSIX_PATH_MAX, "__FC_PATH_MAX is too small (" expand(__FC_PATH_MAX) "): minimal value is " expand( _POSIX_PATH_MAX));
+#      define PATH_MAX __FC_PATH_MAX
+#  else
+#    undef PATH_MAX
+#  endif
+#else
+#  define PATH_MAX  4096
+#endif
+
+/* Maximum length of a host name (not including the terminating null)
+   as returned from the gethostname() function.
+   Note: Mac OS does not define this constant, and Linux use a strictly smaller
+   one than what POSIX mandate
+*/
+#ifdef __FC_HOST_NAME_MAX
+#  if __FC_HOST_NAME_MAX >= 0
+     // _Static_assert(__FC_HOST_NAME_MAX >=_POSIX_HOST_NAME_MAX, "__FC_HOST_NAME_MAX is too small (" expand(__FC_HOST_NAME_MAX) "): minimal value is " expand(_POSIX_HOST_NAME_MAX));
+#    define HOST_NAME_MAX __FC_HOST_NAME_MAX
+#  else
+#    undef HOST_NAME_MAX
+#  endif
+#else
+#  define HOST_NAME_MAX 255
+#endif
+
+/* Maximum length of a terminal device name. */
+#ifdef __FC_TTY_NAME_MAX
+#  if __FC_TTY_NAME_MAX >= 0
+     _Static_assert(__FC_HOST_NAME_MAX >=_POSIX_TTY_NAME_MAX, "__FC_TTY_NAME_MAX is too small (" expand(__FC_TTY_NAME_MAX) "): minimal value is " expand(_POSIX_TTY_NAME_MAX));
+#    define TTY_NAME_MAX __FC_TTY_NAME_MAX
+#  else
+#    undef TTY_NAME_MAX
+#  endif
+#else
+#  define TTY_NAME_MAX 9
+#endif
+
+/* Maximum length of argument to the exec functions including environment data.
+   Minimum Acceptable Value: {_POSIX_ARG_MAX} (4096 in POSIX.1-2008)
+   "... the total space used to store the environment and the arguments to the
+    process is limited to {ARG_MAX} bytes."
+ */
+#ifdef __FC_ARG_MAX
+#  if __FC_ARG_MAX >= 0
+     _Static_assert(__FC_ARG_MAX >=_POSIX_ARG_MAX, "__FC_ARG_MAX is too small (" expand(__FC_ARG_MAX) "): minimal value is " expand(__POSIX_ARG_MAX));
+#    define ARG_MAX __FC_ARG_MAX
+#  else
+#    undef ARG_MAX
+#  endif
+#else
+#  define ARG_MAX 4096
+#endif
+
+// POSIX; used by <sys/uio.h>.
+// Must be >= _XOPEN_IOV_MAX, which is 16.
+#ifdef __FC_IOV_MAX
+#  if __FC_IOV_MAX >= 0
+     _Static_assert(__FC_IOV_MAX >=_XOPEN_IOV_MAX, "__FC_IOV_MAX is too small (" expand(__FC_IOV_MAX) "): minimal value is " expand(_XOPEN_IOV_MAX));
+#    define IOV_MAX __FC_IOV_MAX
+#  else
+#    undef IOV_MAX
+#  endif
+#else
+#  define IOV_MAX 255
+#endif
 
 #endif

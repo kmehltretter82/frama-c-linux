@@ -70,10 +70,6 @@ type theMachine = private
     mutable lowerConstants: bool; (** Do lower constants (default true) *)
     mutable insertImplicitCasts: bool;
     (** Do insert implicit casts (default true) *)
-    mutable underscore_name: bool;
-    (** Whether the compiler generates assembly labels by prepending "_" to
-        the identifier. That is, will function foo() have the label "foo", or
-        "_foo"? *)
     mutable stringLiteralType: typ;
     mutable upointKind: ikind
   (** An unsigned integer type that fits pointers. *);
@@ -436,7 +432,7 @@ val isCompleteType: ?allowZeroSizeArrays:bool -> typ -> bool
 (** Performs lvalue-conversion on the type and returns the converted type,
     or Error if the type is incomplete and not an array type.
 
-    @since Frama-C+dev
+    @since 27.0-Cobalt
 *)
 val lvalue_conversion: typ -> (typ, string) result
 
@@ -2362,6 +2358,12 @@ val pp_lval_ref: (Format.formatter -> lval -> unit) ref
 val pp_ikind_ref: (Format.formatter -> ikind -> unit) ref
 val pp_attribute_ref: (Format.formatter -> attribute -> unit) ref
 val pp_attributes_ref: (Format.formatter -> attribute list -> unit) ref
+val pp_term_ref: (Format.formatter -> term -> unit) ref
+val pp_logic_type_ref: (Format.formatter -> logic_type -> unit) ref
+val pp_identified_term_ref: (Format.formatter -> identified_term -> unit) ref
+val pp_location_ref: (Format.formatter -> location -> unit) ref
+val pp_from_ref: (Format.formatter -> from -> unit) ref
+val pp_behavior_ref: (Format.formatter -> behavior -> unit) ref
 
 val set_extension_handler:
   visit:(string -> cilVisitor -> acsl_extension_kind ->

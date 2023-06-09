@@ -886,6 +886,10 @@ let pp_goal_model fmt w =
 
 let pp_goal fmt w = WpContext.on_context (get_context w) (pp_goal_model fmt) w
 
+let pp_flow fmt =
+  Format.fprintf fmt "@\n%s@\n" bar ;
+  flow := false
+
 let pp_goal_flow fmt g =
   begin
     if not !flow then Format.pp_print_newline fmt () ;

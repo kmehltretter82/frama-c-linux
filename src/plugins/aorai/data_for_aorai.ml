@@ -258,7 +258,7 @@ let getNumberOfStates () =
 
 
 let is_c_global name =
-  try ignore (Globals.Vars.find_from_astinfo name VGlobal); true
+  try ignore (Globals.Vars.find_from_astinfo name Global); true
   with Not_found ->
   try ignore (Globals.Functions.find_by_name name); true
   with Not_found -> false
@@ -580,11 +580,11 @@ let memo_aux_variable tr counter used_prms vi =
 let check_one top info counter s =
   match info with
   | ECall (kf,used_prms,tr) ->
-    (try
-       let vi = Globals.Vars.find_from_astinfo s (VFormal kf) in
-       if top then Some (Logic_const.tvar (Cil.cvar_to_lvar vi))
-       else Some (memo_aux_variable tr counter used_prms vi)
-     with Not_found -> None)
+    Globals.Syntactic_search.find_in_scope ~strict:true s (Formal kf) |>
+    (Fun.flip Option.bind
+       (fun vi ->
+          if top then Some (Logic_const.tvar (Cil.cvar_to_lvar vi))
+          else Some (memo_aux_variable tr counter used_prms vi)))
   | EReturn kf when top && ( Datatype.String.equal s "return"
                              || Datatype.String.equal s "\\result") ->
     let rt = Kernel_function.get_return_type kf in
@@ -619,11 +619,11 @@ let find_in_env env counter s =
               None -> ()
             | Some lv -> raise (M.Found lv))
          stack;
-       let vi = Globals.Vars.find_from_astinfo s VGlobal in
-       Logic_const.tvar (Cil.cvar_to_lvar vi)
+       (match Globals.Syntactic_search.find_in_scope s Program with
+        | Some vi -> Logic_const.tvar (Cil.cvar_to_lvar vi)
+        | None -> Aorai_option.abort "Unknown variable %s" s)
      with
-       M.Found lv -> lv
-     | Not_found -> Aorai_option.abort "Unknown variable %s" s)
+       M.Found lv -> lv)
 
 let find_prm_in_env env ?tr counter f x =
   let kf =
@@ -669,9 +669,11 @@ let find_prm_in_env env ?tr counter f x =
               (TCall (kf,None))
         in
         let vi =
-          try Globals.Vars.find_from_astinfo x (VFormal kf)
-          with Not_found ->
-            Aorai_option.abort "Function %s has no parameter %s" f x
+          match
+            Globals.Syntactic_search.find_in_scope ~strict:true x (Formal kf)
+          with
+          | Some vi -> vi
+          | None -> Aorai_option.abort "Function %s has no parameter %s" f x
         in
         (* By definition, we are at the call event: no need to store
            it in an aux variable or array here.
@@ -908,11 +910,15 @@ let type_expr metaenv env ?tr ?current e =
 
 let type_cond needs_pebble metaenv env tr cond =
   let current = if needs_pebble then Some tr.stop else None in
+  let loc = Cil_datatype.Location.unknown in
   let rec aux pos env =
     function
     | PRel(rel,e1,e2) ->
       let env, e1, c1 = type_expr metaenv env ~tr ?current e1 in
       let env, e2, c2 = type_expr metaenv env ~tr ?current e2 in
+      let rt = LTyping.conditional_conversion loc (Some rel) e1 e2 in
+      let e1 = LTyping.mk_cast e1 rt in
+      let e2 = LTyping.mk_cast e2 rt in
       let call_cond = if pos then tand c1 c2 else tor (tnot c1) (tnot c2) in
       let rel = TRel(Logic_typing.type_rel rel,e1,e2) in
       let cond = if pos then tand call_cond rel else tor call_cond rel in

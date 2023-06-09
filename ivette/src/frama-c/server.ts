@@ -39,7 +39,7 @@ import * as Json from 'dome/data/json';
 import { RichTextBuffer } from 'dome/text/buffers';
 import { ChildProcess } from 'child_process';
 import { client } from './client_socket';
-//import { client } from './client_zmq';
+// import { client } from './client_zmq';
 
 // --------------------------------------------------------------------------
 // --- Server Status
@@ -284,6 +284,8 @@ export function stop(): void {
   }
 }
 
+Dome.atExit(stop);
+
 // --------------------------------------------------------------------------
 // --- Server Control (Kill)
 // --------------------------------------------------------------------------
@@ -474,6 +476,9 @@ async function _launch(): Promise<void> {
     env,
   };
   // Launch Process
+  System.atExit(() => {
+    sockaddr && System.remove(sockaddr);
+  });
   process = await System.spawn(command, params, options);
   const logger = (text: string | string[]): void => {
     buffer.append(text);

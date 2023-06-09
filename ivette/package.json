@@ -5,6 +5,7 @@
   "repository": "git@git.frama-c.com:frama-c/Ivette.git",
   "author": "Loïc Correnson <loic.correnson@cea.fr>",
   "license": "MIT",
+  "description": "Frama-C GUI",
   "scripts": {
     "lint": "eslint --ext .ts,.tsx --format=compact ./src",
     "typecheck": "tsc --noEmit",

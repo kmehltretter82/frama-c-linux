@@ -36,6 +36,7 @@ let check_signals, signal_abort =
 
 let dkey = Self.dkey_iterator
 let dkey_callbacks = Self.dkey_callbacks
+let stat_iterations = Statistics.register_statement_stat "iterations"
 
 let blocks_share_locals b1 b2 =
   match b1.blocals, b2.blocals with
@@ -463,7 +464,7 @@ module Make_Dataflow
     end;
     (* Get vertex store *)
     let store = get_vertex_store v in
-    (* Join incoming s tates *)
+    (* Join incoming states *)
     let flow = Partitioning.join sources store in
     let flow =
       match v.vertex_start_of with
@@ -562,6 +563,7 @@ module Make_Dataflow
         not (process_vertex ~widening:true v) || !iteration_count = 0
       do
         Self.debug ~dkey "iteration %d" !iteration_count;
+        Option.iter (Statistics.incr stat_iterations) v.vertex_start_of;
         iterate_list w;
         incr iteration_count;
       done;

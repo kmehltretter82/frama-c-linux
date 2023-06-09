@@ -122,7 +122,7 @@ ivette:
     - node --version
     - npm --version
     - yarn --version
-    - make -C ivette
+    - make -C ivette check-lint dome-app
   tags:
     - docker
 
@@ -138,6 +138,12 @@ e-acsl-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh e-acsl-tests
+
+e-acsl-dev-tests:
+  stage: tests
+  script:
+    - ./nix/build-proxy.sh e-acsl-dev-tests
+  allow_failure: true
 
 .build_template: &eva_template
   stage: tests
@@ -216,6 +222,7 @@ external-plugins:
           "meta",
           "minimal",
           "mthread",
+          "pathcrawler",
           "security",
           "volatile"
         ]

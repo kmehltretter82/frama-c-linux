@@ -111,12 +111,52 @@ let compare s1 s2 =
 
 let equal e1 e2 = compare e1 e2 = 0
 
+(* Used to print a compact representation of large integer sets. *)
+type set_or_itv =
+  | Set of Int.t array
+  | Itv of Int.t * Int.t
+
+(* Converts a set into an ordered list of sets and intervals, fusing adjacent
+   integers into intervals. *)
+let fuse_intervals s =
+  (* Add interval [b..e[ to the list [acc]. The interval can be a singleton. *)
+  let add_itv acc (b, e) =
+    let nb = Int.to_int_exn (Int.sub e b) in
+    (* If the interval is too small, uses a Set instead of Itv. *)
+    if nb > 3
+    then Itv (b, Int.pred e) :: acc
+    else
+      let a = Array.init nb (fun i -> Int.add b (Int.of_int i)) in
+      (* If the last element of [acc] is a Set, adds [a] at its end. *)
+      match acc with
+      | Set a' :: tl -> Set (Array.append a' a) :: tl
+      | _ -> Set a :: acc
+  in
+  (* [start..prev[ is the current interval being built. *)
+  let f (acc, start, prev) curr =
+    if Int.equal prev curr
+    then (acc, start, Int.succ curr)
+    else (add_itv acc (start, prev), curr, Int.succ curr)
+  in
+  let list, start, curr = Array.fold_left f ([], s.(0), s.(0)) s in
+  List.rev (add_itv list (start, curr))
+
+let pretty_array =
+  Pretty_utils.pp_iter ~pre:"@[<hov 1>{" ~suf:"}@]" ~sep:";@ "
+    Array.iter Int.pretty
+
+let pretty_set_or_itv fmt = function
+  | Set a -> pretty_array fmt a
+  | Itv (b, e) -> Format.fprintf fmt "[%a..%a]" Int.pretty b Int.pretty e
+
 let pretty fmt s =
-  Pretty_utils.pp_iter
-    ~pre:"@[<hov 1>{"
-    ~suf:"}@]"
-    ~sep:";@ "
-    Array.iter Int.pretty fmt s
+  if Array.length s < 10
+  then pretty_array fmt s
+  else
+    let union = Unicode.union_string () in
+    let sep = Scanf.format_from_string ("@ " ^ union ^ " ") "" in
+    Pretty_utils.pp_iter ~pre:"@[<hov 1>" ~suf:"@]" ~sep
+      List.iter pretty_set_or_itv fmt (fuse_intervals s)
 
 include Datatype.Make_with_collections
     (struct

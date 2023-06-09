@@ -67,6 +67,8 @@ let get_statics f = match f.fundec with
     !statics
   | Declaration (_, _, _, _) -> []
 
+let () = Globals.get_statics := get_statics
+
 exception No_Definition
 let get_definition kf = match kf.fundec with
   | Definition (f,_) -> f

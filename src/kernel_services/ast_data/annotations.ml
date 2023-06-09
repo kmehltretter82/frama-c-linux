@@ -67,6 +67,9 @@ let find_englobing_kf ?kf stmt =
 (** {2 Internal State} *)
 (**************************************************************************)
 
+module Changed = Hook.Make()
+let add_hook_on_change = Changed.extend
+
 module Usable_emitter = struct
   include Emitter.Usable_emitter
   let local_clear _ h = Hashtbl.clear h
@@ -435,7 +438,8 @@ let pre_register_funspec ?tbl ?(emitter=Emitter.end_user) ?(force=false) kf =
           tbl;
     *)
     List.iter Property_status.register
-      (Property.ip_of_spec kf Kglobal ~active:[] spec)
+      (Property.ip_of_spec kf Kglobal ~active:[] spec);
+    Changed.apply();
   end
 
 let register_funspec ?emitter ?force kf =
@@ -767,7 +771,7 @@ let remove_code_annot_internal e ?(remove_statuses=true) ?kf stmt ca =
 (**************************************************************************)
 
 (* If this function gets exported, please turn e into an Emitter.t *)
-let remove_model_field (e:Usable_emitter.t) m =
+let do_remove_model_field (e:Usable_emitter.t) m =
   try
     let ty = m.mi_base_type in
     let h = Model_fields.find ty in
@@ -789,7 +793,7 @@ let remove_global e a =
          if Emitter.Usable_emitter.equal e e' then begin
            Globals.remove a;
            (match a with
-            | Dmodel_annot (m,_) -> remove_model_field e m
+            | Dmodel_annot (m,_) -> do_remove_model_field e m
             | _ -> ());
            let file = Ast.get () in
            file.globals <-
@@ -797,12 +801,14 @@ let remove_global e a =
                (fun a' ->
                   not (Global.equal (GAnnot(a, Global_annotation.loc a)) a'))
                file.globals;
-           Globals.apply_hooks_on_remove e a ()
+           Globals.apply_hooks_on_remove e a ();
+           Changed.apply();
          end)
       h;
   with Not_found ->
     ()
 
+(* internal use only *)
 let remove_in_funspec e kf set_spec =
   try
     let tbl = Funspecs.find kf in
@@ -815,7 +821,8 @@ let remove_in_funspec e kf set_spec =
           Format.printf "For emitter %a: %a@."
             Emitter.Usable_emitter.pretty e
             Cil_printer.pp_funspec spec) tbl; *)
-      set_spec spec tbl
+      set_spec spec tbl;
+      Changed.apply()
     with Not_found -> ()
   with Not_found ->
     assert false
@@ -845,7 +852,8 @@ let remove_behavior ?(force=false) e kf bhv =
   in
   remove_in_funspec e kf set_spec
 
-let remove_decreases e kf =
+(* internal use only *)
+let do_remove_decreases e kf =
   let set_spec spec _tbl =
     match spec.spec_variant with
     | None -> ()
@@ -855,7 +863,12 @@ let remove_decreases e kf =
   in
   remove_in_funspec e kf set_spec
 
-let remove_terminates e kf =
+let remove_decreases e kf =
+  do_remove_decreases e kf;
+  Changed.apply()
+
+(* internal use only *)
+let do_remove_terminates e kf =
   let set_spec spec _tbl =
     match spec.spec_terminates with
     | None -> ()
@@ -865,21 +878,36 @@ let remove_terminates e kf =
   in
   remove_in_funspec e kf set_spec
 
-let remove_complete e kf l =
+let remove_terminates e kf =
+  do_remove_terminates e kf;
+  Changed.apply()
+
+(* internal use only *)
+let do_remove_complete e kf l =
   let set_spec spec _tbl =
     spec.spec_complete_behaviors <- filterq l spec.spec_complete_behaviors
   in
   remove_in_funspec e kf set_spec;
   Property_status.remove (Property.ip_of_complete kf Kglobal ~active:[] l)
 
-let remove_disjoint e kf l =
+let remove_complete e kf l =
+  do_remove_complete e kf l;
+  Changed.apply()
+
+(* internal use only *)
+let do_remove_disjoint e kf l =
   let set_spec spec _tbl =
     spec.spec_disjoint_behaviors <- filterq l spec.spec_disjoint_behaviors
   in
   remove_in_funspec e kf set_spec;
   Property_status.remove (Property.ip_of_disjoint kf Kglobal ~active:[] l)
 
-let remove_requires e kf p =
+let remove_disjoint e kf l =
+  do_remove_disjoint e kf l;
+  Changed.apply()
+
+(* internal use only *)
+let do_remove_requires e kf p =
   let set_spec spec _tbl =
     List.iter
       (fun b ->
@@ -891,7 +919,12 @@ let remove_requires e kf p =
   in
   remove_in_funspec e kf set_spec
 
-let remove_assumes e kf p =
+let remove_requires e kf p =
+  do_remove_requires e kf p;
+  Changed.apply()
+
+(* internal use only *)
+let do_remove_assumes e kf p =
   let set_spec spec _tbl =
     List.iter
       (fun b ->
@@ -903,7 +936,12 @@ let remove_assumes e kf p =
   in
   remove_in_funspec e kf set_spec
 
-let remove_ensures e kf p =
+let remove_assumes e kf p =
+  do_remove_assumes e kf p;
+  Changed.apply()
+
+(* internal use only *)
+let do_remove_ensures e kf p =
   let set_spec spec _tbl =
     List.iter
       (fun b ->
@@ -915,7 +953,12 @@ let remove_ensures e kf p =
   in
   remove_in_funspec e kf set_spec
 
-let remove_allocates e kf p =
+let remove_ensures e kf p =
+  do_remove_ensures e kf p;
+  Changed.apply()
+
+(* internal use only *)
+let do_remove_allocates e kf p =
   let set_spec spec _tbl =
     List.iter
       (fun b ->
@@ -929,7 +972,12 @@ let remove_allocates e kf p =
   in
   remove_in_funspec e kf set_spec
 
-let remove_extended e kf ext =
+let remove_allocates e kf p =
+  do_remove_allocates e kf p;
+  Changed.apply()
+
+(* internal use only *)
+let do_remove_extended e kf ext =
   let set_spec spec _tbl =
     List.iter
       (fun b ->
@@ -940,8 +988,12 @@ let remove_extended e kf ext =
   in
   remove_in_funspec e kf set_spec
 
+let remove_extended e kf ext =
+  do_remove_extended e kf ext;
+  Changed.apply()
 
-let remove_assigns e kf p =
+(* internal use only *)
+let do_remove_assigns e kf p =
   let set_spec spec _tbl =
     List.iter
       (fun b ->
@@ -963,12 +1015,17 @@ let remove_assigns e kf p =
   in
   remove_in_funspec e kf set_spec
 
+let remove_assigns e kf p =
+  do_remove_assigns e kf p;
+  Changed.apply()
+
 let remove_behavior_components e kf b =
-  List.iter (remove_requires e kf) b.b_requires;
-  List.iter (remove_assumes e kf) b.b_assumes;
-  List.iter (remove_ensures e kf) b.b_post_cond;
-  remove_assigns e kf b.b_assigns;
-  remove_allocates e kf b.b_allocation
+  List.iter (do_remove_requires e kf) b.b_requires;
+  List.iter (do_remove_assumes e kf) b.b_assumes;
+  List.iter (do_remove_ensures e kf) b.b_post_cond;
+  do_remove_assigns e kf b.b_assigns;
+  do_remove_allocates e kf b.b_allocation;
+  Changed.apply()
 
 (**************************************************************************)
 (** {2 Adding annotations} *)
@@ -1080,7 +1137,8 @@ let mk_spec bhv variant terminates complete disjoint =
     spec_complete_behaviors = complete;
     spec_disjoint_behaviors = disjoint; }
 
-let add_behaviors ?(register_children=true) e kf ?stmt ?active bhvs =
+(* internal use only *)
+let do_add_behaviors ?(register_children=true) e kf ?stmt ?active bhvs =
   let full_spec = get_spec_all kf ?stmt ?active () in
   let emit_spec = get_spec_e e kf ?stmt ?active () in
   let existing_behaviors = emit_spec.spec_behavior in
@@ -1147,10 +1205,15 @@ let add_behaviors ?(register_children=true) e kf ?stmt ?active bhvs =
       bhvs
   end
 
+let add_behaviors ?register_children e kf ?stmt ?active bhvs =
+  do_add_behaviors ?register_children e kf ?stmt ?active bhvs;
+  Changed.apply()
+
 exception AlreadySpecified of string list
 
-let add_decreases ?(force=false) e kf v =
-  if force then remove_decreases e kf ;
+(* internal use only *)
+let do_add_decreases ?(force=false) e kf v =
+  if force then do_remove_decreases e kf ;
   let full_spec = get_spec_all kf () in
   let emit_spec = get_spec_e e kf () in
   (match full_spec.spec_variant with
@@ -1159,8 +1222,14 @@ let add_decreases ?(force=false) e kf v =
    | _ -> emit_spec.spec_variant <- Some v);
   Property_status.register (Property.ip_of_decreases kf Kglobal v)
 
-let add_terminates ?(force=false) e kf ?stmt ?active t =
-  if force then remove_terminates e kf ;
+(* internal use only *)
+let add_decreases ?force e kf v =
+  do_add_decreases ?force e kf v;
+  Changed.apply()
+
+(* internal use only *)
+let do_add_terminates ?(force=false) e kf ?stmt ?active t =
+  if force then do_remove_terminates e kf ;
   let full_spec = get_spec_all kf ?stmt ?active () in
   let emit_spec = get_spec_e e kf ?stmt ?active () in
   (match full_spec.spec_terminates with
@@ -1168,6 +1237,10 @@ let add_terminates ?(force=false) e kf ?stmt ?active t =
      raise (AlreadySpecified ["terminates"])
    | _ -> emit_spec.spec_terminates <- Some t);
   Property_status.register (Property.ip_of_terminates kf (kinstr stmt) t)
+
+let add_terminates ?force e kf ?stmt ?active t =
+  do_add_terminates ?force e kf ?stmt ?active t;
+  Changed.apply()
 
 let check_bhv_name spec name =
   if name = Cil.default_behavior_name then begin
@@ -1182,7 +1255,8 @@ let check_bhv_name spec name =
       name
   end
 
-let add_complete e kf ?stmt ?active l =
+(* internal use only *)
+let do_add_complete e kf ?stmt ?active l =
   let full_spec = get_spec_all kf ?stmt ?active () in
   let emit_spec = get_spec_e e kf ?stmt ?active () in
   if List.mem l full_spec.spec_complete_behaviors then
@@ -1198,7 +1272,12 @@ let add_complete e kf ?stmt ?active l =
       (Property.ip_of_complete kf (kinstr stmt) ~active l)
   end
 
-let add_disjoint e kf ?stmt ?active l =
+let add_complete e kf ?stmt ?active l =
+  do_add_complete e kf ?stmt ?active l;
+  Changed.apply()
+
+(* internal use only *)
+let do_add_disjoint e kf ?stmt ?active l =
   let full_spec = get_spec_all kf ?stmt ?active () in
   let emit_spec = get_spec_e e kf ?stmt ?active () in
   if List.mem l full_spec.spec_disjoint_behaviors then
@@ -1212,6 +1291,10 @@ let add_disjoint e kf ?stmt ?active l =
     let active = match active with None -> [] | Some l -> l in
     Property_status.register (Property.ip_of_disjoint kf (kinstr stmt) ~active l)
   end
+
+let add_disjoint e kf ?stmt ?active l =
+  do_add_disjoint e kf ?stmt ?active l;
+  Changed.apply()
 
 let add_spec ?register_children ?(force=false) e kf ?stmt ?active spec =
   let full_spec = get_spec_all kf ?stmt ?active () in
@@ -1228,20 +1311,22 @@ let add_spec ?register_children ?(force=false) e kf ?stmt ?active spec =
      | _ -> [])
   in
   if not force && conflicts <> [] then raise (AlreadySpecified conflicts) ;
-  add_behaviors ?register_children e kf ?stmt ?active spec.spec_behavior;
+  do_add_behaviors ?register_children e kf ?stmt ?active spec.spec_behavior;
   Option.iter
-    (fun variant -> add_decreases ~force e kf variant)
+    (fun variant -> do_add_decreases ~force e kf variant)
     spec.spec_variant;
   Option.iter
-    (fun terminates -> add_terminates ~force e kf ?stmt ?active terminates)
+    (fun terminates -> do_add_terminates ~force e kf ?stmt ?active terminates)
     spec.spec_terminates;
   List.iter
-    (fun complete -> add_complete e kf ?stmt ?active complete)
+    (fun complete -> do_add_complete e kf ?stmt ?active complete)
     spec.spec_complete_behaviors;
   List.iter
-    (fun disjoint -> add_disjoint e kf ?stmt ?active disjoint)
-    spec.spec_disjoint_behaviors
+    (fun disjoint -> do_add_disjoint e kf ?stmt ?active disjoint)
+    spec.spec_disjoint_behaviors;
+  Changed.apply()
 
+(* internal use only *)
 let extend_behavior
     e kf ?stmt ?active ?(behavior=Cil.default_behavior_name) set_bhv =
   (* Kernel.feedback "Function %a, behavior %s" Kf.pretty kf bhv_name;*)
@@ -1263,7 +1348,8 @@ let extend_behavior
   Property_status.remove ip;
   set_bhv b b';
   let ip = Property.ip_of_behavior kf (kinstr stmt) ~active b in
-  Property_status.register ip
+  Property_status.register ip;
+  Changed.apply()
 
 let add_requires e kf ?stmt ?active ?behavior l =
   let set_bhv _ bhv =
@@ -1397,7 +1483,8 @@ let add_extended e kf ?stmt ?active ?behavior ext =
 
 (** {3 Adding code annotations} *)
 
-let add_code_annot ?(keep_empty=true) emitter ?kf stmt ca =
+(* internal use only *)
+let do_add_code_annot ~keep_empty emitter ?kf stmt ca =
   (*  Kernel.feedback "%a: adding code annot %a with stmt %a (%d)"
       Project.pretty (Project.current ())
       Code_annotation.pretty ca
@@ -1442,18 +1529,18 @@ let add_code_annot ?(keep_empty=true) emitter ?kf stmt ca =
      | [ { annot_content = AStmtSpec _ } ] ->
        let register_children = true in
        let active = bhvs in
-       add_behaviors
+       do_add_behaviors
          ~register_children emitter kf ~stmt ~active spec.spec_behavior;
        if spec.spec_variant <> None then
          Kernel.fatal
            "statement contract cannot have a decrease clause";
        Option.iter
-         (add_terminates emitter kf ~stmt ~active) spec.spec_terminates;
+         (do_add_terminates emitter kf ~stmt ~active) spec.spec_terminates;
        List.iter
-         (add_complete emitter kf ~stmt ~active)
+         (do_add_complete emitter kf ~stmt ~active)
          spec.spec_complete_behaviors;
        List.iter
-         (add_disjoint emitter kf ~stmt ~active)
+         (do_add_disjoint emitter kf ~stmt ~active)
          spec.spec_disjoint_behaviors;
        (* By construction, we have exactly one contract
           corresponding to our criterion and emitter. *)
@@ -1557,6 +1644,10 @@ let add_code_annot ?(keep_empty=true) emitter ?kf stmt ca =
   | APragma _ | AExtended _ ->
     fill_tables ca (Property.ip_of_code_annot kf stmt ca)
 
+let add_code_annot ?(keep_empty=true) emitter ?kf stmt ca =
+  do_add_code_annot ~keep_empty emitter ?kf stmt ca;
+  Changed.apply()
+
 let add_assert e ?kf stmt a =
   let a = Logic_const.toplevel_predicate ~kind:Assert a in
   let a = Logic_const.new_code_annotation (AAssert ([],a)) in
@@ -1654,7 +1745,8 @@ let add_model_field e m =
     try Emitter.Usable_emitter.Hashtbl.find h e
     with Not_found -> []
   in
-  Emitter.Usable_emitter.Hashtbl.replace h e (m::l)
+  Emitter.Usable_emitter.Hashtbl.replace h e (m::l);
+  Changed.apply()
 
 let unsafe_add_global e a =
   (*  Kernel.feedback "adding global %a in project %a"
@@ -1669,7 +1761,8 @@ let unsafe_add_global e a =
 
 let add_global e a =
   unsafe_add_global e a;
-  if Ast.is_computed() then insert_global_in_ast a
+  if Ast.is_computed() then insert_global_in_ast a;
+  Changed.apply()
 
 (**************************************************************************)
 (** {2 Other useful functions} *)
@@ -1766,7 +1859,9 @@ let code_annot_of_kf kf = match kf.fundec with
 
 (* don't export the possibility to removing an annotation without associated
    statuses. This is purely internal. *)
-let remove_code_annot e ?kf stmt ca = remove_code_annot_internal e ?kf stmt ca
+let remove_code_annot e ?kf stmt ca =
+  remove_code_annot_internal e ?kf stmt ca;
+  Changed.apply()
 
 (*
   Local Variables:

@@ -36,7 +36,7 @@ let error = function
 (* ------------------------------------------------------------------------ *)
 
 type 'a status =
-  | Timeout of int
+  | Timeout of float
   | Canceled
   | Result of 'a
   | Failed of exn
@@ -206,7 +206,7 @@ let sync m t = lock m >>= t >>? fun _ -> unlock m
 type cmd = {
   name : string ;
   timed : bool ;
-  timeout : int ;
+  timeout : float ;
   time_start : float ;
   time_stop : float ;
   mutable time_killed : bool ;
@@ -227,9 +227,9 @@ let start_command ~timeout ?time ?stdout ?stderr cmd args =
          Format.pp_print_string fmt cmd ;
          Array.iter
            (fun c -> Format.fprintf fmt "@ %s" c) args) ;
-    let timed = timeout > 0 || time <> None in
+    let timed = timeout > 0.0 || time <> None in
     let time_start = if timed then Unix.gettimeofday () else 0.0 in
-    let time_stop = if timeout > 0 then time_start +. float_of_int timeout else 0.0 in
+    let time_stop = if timeout > 0.0 then time_start +. timeout else 0.0 in
     let async = Command.command_async ?stdout ?stderr cmd args in
     {
       name = cmd ;
@@ -251,7 +251,7 @@ let ping_command cmd coin =
       if coin = Kill then (kill () ; Wait 100)
       else
         let time_now = if cmd.timed then Unix.gettimeofday () else 0.0 in
-        if cmd.timeout > 0 && time_now > cmd.time_stop then
+        if cmd.timeout > 0.0 && time_now > cmd.time_stop then
           begin
             set_time cmd (time_now -. cmd.time_start) ;
             Kernel.debug ~dkey:Kernel.dkey_task "timeout '%s'" cmd.name ;
@@ -282,7 +282,7 @@ let ping_command cmd coin =
       "failure '%s' [%s]" cmd.name (Printexc.to_string e) ;
     Return (Failed e)
 
-let command ?(timeout=0) ?time ?stdout ?stderr cmd args = todo
+let command ?(timeout=0.0) ?time ?stdout ?stderr cmd args = todo
     begin fun () ->
       let cmd = start_command ~timeout ?time ?stdout ?stderr cmd args in
       Monad.async (ping_command cmd)

@@ -143,7 +143,7 @@
     }
   },
   {
-    "selector": "node[kind='const']",
+    "selector": "node[nkind='const']",
     "style": {
       "shape": "ellipse",
       "background-color": "#bbb",
@@ -152,7 +152,7 @@
     }
   },
   {
-    "selector": "node[kind='alarm']",
+    "selector": "node[nkind='alarm']",
     "style": {
       "shape": "octagon",
       "background-color": "#f00",
@@ -160,13 +160,13 @@
     }
   },
   {
-    "selector": "node[kind='scattered']",
+    "selector": "node[nkind='scattered']",
     "style": {
       "shape": "rhomboid"
     }
   },
   {
-    "selector": "node[kind='composite']",
+    "selector": "node[nkind='composite']",
     "style": {
       "ghost": "yes",
       "ghost-offset-x": "6px",
@@ -191,7 +191,7 @@
     }
   },
   {
-    "selector": "edge[kind='callee']",
+    "selector": "edge[nkind='callee']",
     "style": {
       "line-color": "#8f8",
       "target-arrow-color": "#8f8"

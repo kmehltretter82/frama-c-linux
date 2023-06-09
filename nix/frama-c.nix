@@ -16,6 +16,7 @@
 , dune_3
 , dune-configurator
 , dune-site
+, fpath
 , gcc9
 , graphviz
 , lablgtk3
@@ -29,11 +30,14 @@
 , ocamlgraph_gtk
 , ocp-indent
 , ppx_deriving
+, ppx_deriving_yaml
 , ppx_deriving_yojson
 , ppx_import
+, unionFind
 , yojson
 , which
 , why3
+, yaml
 , zarith
 , zmq
 # Frama-C extra (other targets do not reconfigure)
@@ -71,6 +75,7 @@ stdenvNoCC.mkDerivation rec {
     dune-configurator
     dune-site
     findlib
+    fpath
     gcc9
     graphviz
     lablgtk3
@@ -84,11 +89,14 @@ stdenvNoCC.mkDerivation rec {
     ocamlgraph_gtk
     ocp-indent
     ppx_deriving
+    ppx_deriving_yaml
     ppx_deriving_yojson
     ppx_import
+    unionFind
     yojson
     which
     why3
+    yaml
     zarith
     zmq
     # For other CI targets

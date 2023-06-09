@@ -52,6 +52,41 @@ module.exports = {
     // Disallow the use of console.* to prevent the release of code producing
     // various debuging messages
     "no-console": "error",
+    // Enforce consistent spacing after the // or /* in a comment
+    "spaced-comment": ["error", "always"],
+    // Enforce consistent spacing before and after the arrow in arrow functions
+    "arrow-spacing": "error",
+    // Enforce spaces inside of blocks after opening block and
+    // before closing block
+    "block-spacing": "error",
+    // Enforce consistent spacing before and after commas
+    "comma-spacing": "error",
+    // Enforce consistent newlines before and after dots
+    "dot-location": ["error", "property"],
+    // Require newline at the end of files
+    "eol-last": "error",
+    // Disallow spacing between function identifiers and their invocations
+    "func-call-spacing": "error",
+    // Enforce consistent spacing between keys and values in object literal
+    // properties
+    "key-spacing": "error",
+    // Disallow trailing whitespace at the end of lines
+    "no-trailing-spaces": "error",
+    // Enforce consistent spacing inside braces
+    "object-curly-spacing": ["error", "always"],
+    // Enforce consistent spacing before and after semicolons
+    "semi-spacing": "error",
+    // Enforce location of semicolons
+    "semi-style": "error",
+    // Enforce spacing around colons of switch statements
+    "switch-colon-spacing": "error",
+    // Enforce consistent spacing before blocks
+    "space-before-blocks": "error",
+    // Enforce consistent spacing before function definition opening parenthesis
+    "space-before-function-paren": [
+      "error",
+      {"anonymous": "always", "named": "never", "asyncArrow": "always"}
+    ], 
 
     // --- Safety rules ---
 

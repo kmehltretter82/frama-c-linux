@@ -320,6 +320,10 @@ module PrintMachdep : Parameter_sig.Bool
 (** Behavior of option "-print-machdep"
     @since Phosphorus-20170501-beta1 *)
 
+module PrintMachdepHeader : Parameter_sig.Bool
+(** Behavior of option "-print-machdep-header"
+    @since 27.0-Cobalt *)
+
 module PrintLibc: Parameter_sig.Bool
 (** Behavior of option "-print-libc"
     @since Phosphorus-20170501-beta1 *)

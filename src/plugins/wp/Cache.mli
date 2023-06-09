@@ -38,8 +38,13 @@ val cleanup_cache : unit -> unit
 type 'a digest = Why3Provers.t -> 'a -> string
 
 type 'a runner =
-  timeout:int option -> steplimit:int option -> Why3Provers.t -> 'a ->
+  timeout:float option -> steplimit:int option -> Why3Provers.t -> 'a ->
   VCS.result Task.task
+
+val promote: ?timeout:float -> ?steplimit:int -> VCS.result -> VCS.result
+(** Converts some known results to the given limits.
+    In particular, if the result shall be discarded with respect to the limits,
+    the function returns [VCS.no_result]. *)
 
 val get_result: digest:('a digest) -> runner:('a runner) -> 'a runner
 val clear_result: digest:('a digest) -> Why3Provers.t -> 'a -> unit

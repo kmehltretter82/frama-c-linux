@@ -22,7 +22,13 @@
 
 (** Computations of the statements that read a given memory zone. *)
 
-val compute: Locations.Zone.t -> (Cil_types.stmt * Writes.effects) list
+type t =
+  | Direct of Cil_types.stmt
+  (** Direct read by a statement. *)
+  | Indirect of Cil_types.stmt
+  (** Indirect read through a function call. *)
+
+val compute: Locations.Zone.t -> t list
 (** [compute z] finds all the statements that read [z]. The [effects]
     information indicates whether the read occur on the given statement,
     or through an inner call for [Call] instructions. *)

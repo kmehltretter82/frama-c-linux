@@ -21,7 +21,7 @@
   cannot parse floating-point constant, returning imprecise result
 [eva:alarm] printed_data.c:101: Warning: 
   non-finite long double value.
-  assert \is_finite((long double)0x1.fffffffffffffffep+16383L);
+  assert \is_finite(0x1.fffffffffffffffep+16383L);
 [eva:alarm] printed_data.c:102: Warning: 
   non-finite long double value. assert \is_finite(real_ldouble);
 [eva:alarm] printed_data.c:102: Warning: 

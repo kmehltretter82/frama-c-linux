@@ -51,12 +51,12 @@ struct
     | Composite vi1, Composite vi2 -> Varinfo.compare vi1 vi2
     | Composite _, _ -> 1
     | _, Composite _ -> -1
-    | Scattered (lv1,ki1), Scattered (lv2,ki2) ->
-      LvalStructEq.compare lv1 lv2 <?> (Kinstr.compare, ki1, ki2)
+    | Scattered (lv1,stmt1), Scattered (lv2,stmt2) ->
+      LvalStructEq.compare lv1 lv2 <?> (Stmt.compare, stmt1, stmt2)
     | Scattered _, _ -> 1
     | _, Scattered _ -> -1
-    | Unknown (lv1,ki1), Unknown (lv2,ki2) ->
-      LvalStructEq.compare lv1 lv2 <?> (Kinstr.compare, ki1, ki2)
+    | Unknown (lv1,stmt1), Unknown (lv2,stmt2) ->
+      LvalStructEq.compare lv1 lv2 <?> (Stmt.compare, stmt1, stmt2)
     | Unknown _, _ -> 1
     | _, Unknown _ -> -1
     | Alarm (stmt1, alarm1), Alarm (stmt2, alarm2) ->
@@ -82,10 +82,10 @@ struct
     | Scalar (vi1, _, offset1), Scalar (vi2, _, offset2) ->
       Varinfo.equal vi1 vi2 && OffsetStructEq.equal offset1 offset2
     | Composite vi1, Composite vi2 -> Varinfo.equal vi1 vi2
-    | Scattered (lv1, ki1), Scattered (lv2, ki2) ->
-      LvalStructEq.equal lv1 lv2 && Kinstr.equal ki1 ki2
-    | Unknown (lv1, ki1), Unknown (lv2, ki2) ->
-      LvalStructEq.equal lv1 lv2 && Kinstr.equal ki1 ki2
+    | Scattered (lv1, stmt1), Scattered (lv2, stmt2) ->
+      LvalStructEq.equal lv1 lv2 && Stmt.equal stmt1 stmt2
+    | Unknown (lv1, stmt1), Unknown (lv2, stmt2) ->
+      LvalStructEq.equal lv1 lv2 && Stmt.equal stmt1 stmt2
     | Alarm (stmt1, alarm1), Alarm (stmt2, alarm2) ->
       Stmt.equal stmt1 stmt2 && Alarms.equal alarm1 alarm2
     | AbsoluteMemory, AbsoluteMemory -> true
@@ -99,10 +99,10 @@ struct
     | Scalar (vi, _, offset) ->
       Hashtbl.hash (1, Varinfo.hash vi, OffsetStructEq.hash offset)
     | Composite vi -> Hashtbl.hash (2, Varinfo.hash vi)
-    | Scattered (lv, ki) ->
-      Hashtbl.hash (3, LvalStructEq.hash lv, Kinstr.hash ki)
-    | Unknown (lv, ki) ->
-      Hashtbl.hash (4, LvalStructEq.hash lv, Kinstr.hash ki)
+    | Scattered (lv, stmt) ->
+      Hashtbl.hash (3, LvalStructEq.hash lv, Stmt.hash stmt)
+    | Unknown (lv, stmt) ->
+      Hashtbl.hash (4, LvalStructEq.hash lv, Stmt.hash stmt)
     | Alarm (stmt, alarm) ->
       Hashtbl.hash (5, Stmt.hash stmt, Alarms.hash alarm)
     | AbsoluteMemory -> 6

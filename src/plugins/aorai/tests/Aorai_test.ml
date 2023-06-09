@@ -121,8 +121,10 @@ let extend () =
         if InternalWpShare.is_set() then
           Wp.Wp_parameters.Share.set (InternalWpShare.get());
         Wp.Wp_parameters.Let.off();
-        Wp.Wp_parameters.Split.on();
+        Wp.Wp_parameters.SplitBranch.on();
+        Wp.Wp_parameters.SplitConj.on();
         Wp.Wp_parameters.SplitMax.set 32;
+        Wp.Wp_parameters.Model.As_string.set "+real";
         if not (Wp.Wp_parameters.Verbose.is_set()) then
           Wp.Wp_parameters.Verbose.set 0;
         Globals.Functions.iter check_auto_func;

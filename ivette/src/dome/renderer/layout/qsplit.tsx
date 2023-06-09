@@ -307,31 +307,31 @@ function QSplitEngine(props: QSplitEngineProps): JSX.Element {
   const BD = sameOf(B, D);
   const CD = sameOf(C, D);
   const ABCD = fullOf(A, B, C, D);
-  //----------------------------------------
+  // ----------------------------------------
   // [ A ]
-  //---------------------------------------
+  // ---------------------------------------
   if (ABCD) {
     DISPLAY(layout, ABCD, 0, width, 0, height);
   }
-  //----------------------------------------
+  // ----------------------------------------
   // [ A - C ]
-  //---------------------------------------
+  // ---------------------------------------
   else if (AB && CD) {
     vsplit = VSPLIT(0, Y, width);
     DISPLAY(layout, AB, 0, width, 0, Y);
     DISPLAY(layout, CD, 0, width, Y + 1, RY);
   }
-  //----------------------------------------
+  // ----------------------------------------
   // [ A | B ]
-  //---------------------------------------
+  // ---------------------------------------
   else if (AC && BD) {
     hsplit = HSPLIT(X, 0, height);
     DISPLAY(layout, AC, 0, X, 0, height);
     DISPLAY(layout, BD, X + 1, RX, 0, height);
   }
-  //----------------------------------------
+  // ----------------------------------------
   // [ A – C|D ]
-  //----------------------------------------
+  // ----------------------------------------
   else if (AB) {
     hsplit = HSPLIT(X, Y, RY);
     vsplit = VSPLIT(0, Y, width);
@@ -339,9 +339,9 @@ function QSplitEngine(props: QSplitEngineProps): JSX.Element {
     DISPLAY(layout, C, 0, X, Y + 1, RY);
     DISPLAY(layout, D, X + 1, RX, Y + 1, RY);
   }
-  //----------------------------------------
+  // ----------------------------------------
   // [ A | B-D ]
-  //----------------------------------------
+  // ----------------------------------------
   else if (AC) {
     hsplit = HSPLIT(X, 0, height);
     vsplit = VSPLIT(X, Y, RY);
@@ -349,9 +349,9 @@ function QSplitEngine(props: QSplitEngineProps): JSX.Element {
     DISPLAY(layout, B, X + 1, RX, 0, Y);
     DISPLAY(layout, D, X + 1, RX, Y + 1, RY);
   }
-  //----------------------------------------
+  // ----------------------------------------
   // [ A-C | B ]
-  //----------------------------------------
+  // ----------------------------------------
   else if (BD) {
     hsplit = HSPLIT(X, 0, height);
     vsplit = VSPLIT(0, Y, X);
@@ -359,9 +359,9 @@ function QSplitEngine(props: QSplitEngineProps): JSX.Element {
     DISPLAY(layout, BD, X + 1, RX, 0, height);
     DISPLAY(layout, C, 0, X, Y + 1, RY);
   }
-  //----------------------------------------
+  // ----------------------------------------
   // [ A|B - C ]
-  //----------------------------------------
+  // ----------------------------------------
   else if (CD) {
     hsplit = HSPLIT(X, 0, Y);
     vsplit = VSPLIT(0, Y, width);
@@ -369,9 +369,9 @@ function QSplitEngine(props: QSplitEngineProps): JSX.Element {
     DISPLAY(layout, B, X + 1, RX, 0, Y);
     DISPLAY(layout, CD, 0, width, Y + 1, RY);
   }
-  //----------------------------------------
+  // ----------------------------------------
   // [ A, B, C, D ]
-  //----------------------------------------
+  // ----------------------------------------
   else {
     hsplit = HSPLIT(X, 0, height);
     vsplit = VSPLIT(0, Y, width);
@@ -380,12 +380,12 @@ function QSplitEngine(props: QSplitEngineProps): JSX.Element {
     DISPLAY(layout, C, 0, X, Y + 1, RY);
     DISPLAY(layout, D, X + 1, RX, Y + 1, RY);
   }
-  //----------------------------------------
+  // ----------------------------------------
   if (hsplit !== NODISPLAY && vsplit !== NODISPLAY)
     hvsplit = { display: 'block', left: X, top: Y };
-  //----------------------------------------
+  // ----------------------------------------
   // Rendering
-  //----------------------------------------
+  // ----------------------------------------
   return (
     <QSplitContext.Provider value={layout}>
       <BSplitter

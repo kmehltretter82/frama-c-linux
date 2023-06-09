@@ -122,8 +122,8 @@ export const getStmtInfo: Server.GetRequest<
 
 const getProbeInfo_internal: Server.GetRequest<
   marker,
-  { evaluable: boolean, code?: string, stmt?: marker, rank: number,
-    effects: boolean, condition: boolean }
+  { evaluable: boolean, code?: string, stmt?: marker, effects: boolean,
+    condition: boolean }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.eva.values.getProbeInfo',
@@ -132,7 +132,6 @@ const getProbeInfo_internal: Server.GetRequest<
             evaluable: Json.jBoolean,
             code: Json.jOption(Json.jString),
             stmt: Json.jOption(jMarker),
-            rank: Json.jNumber,
             effects: Json.jBoolean,
             condition: Json.jBoolean,
           }),
@@ -141,8 +140,8 @@ const getProbeInfo_internal: Server.GetRequest<
 /** Probe informations */
 export const getProbeInfo: Server.GetRequest<
   marker,
-  { evaluable: boolean, code?: string, stmt?: marker, rank: number,
-    effects: boolean, condition: boolean }
+  { evaluable: boolean, code?: string, stmt?: marker, effects: boolean,
+    condition: boolean }
   >= getProbeInfo_internal;
 
 /** Evaluation of an expression or lvalue */

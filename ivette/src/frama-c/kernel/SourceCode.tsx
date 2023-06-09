@@ -211,15 +211,14 @@ function useFctSource(file: string): string {
 
 // Build a callback that retrieves a location's source information.
 function useSourceGetter(): GetSource {
-  const attributes = States.useSyncArray(Ast.markerAttributes);
-  const functionsData = States.useSyncArray(Ast.functions).getArray();
+  const getAttr = States.useSyncArrayGetter(Ast.markerAttributes);
+  const functionsData = States.useSyncArrayData(Ast.functions);
   return React.useCallback(({ fct, marker }) => {
-    const markerSloc = (marker !== undefined && marker !== '') ?
-      attributes.getData(marker)?.sloc : undefined;
+    const markerSloc = getAttr(marker)?.sloc;
     const fctSloc = (fct !== undefined && fct !== '') ?
       functionsData.find((e) => e.name === fct)?.sloc : undefined;
     return markerSloc ?? fctSloc;
-  }, [attributes, functionsData]);
+  }, [getAttr, functionsData]);
 }
 
 // -----------------------------------------------------------------------------
@@ -277,7 +276,7 @@ export default function SourceCode(): JSX.Element {
 
   async function displayShortcuts(): Promise<void> {
     await Dialogs.showMessageBox({
-      buttons: [{label:"Ok"}],
+      buttons: [{ label: "Ok" }],
       details: shortcuts,
       message: 'Useful shortcuts'
     });

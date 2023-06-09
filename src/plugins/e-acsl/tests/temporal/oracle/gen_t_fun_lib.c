@@ -31,7 +31,7 @@ int main(void)
   char *c = (char *)__gen_e_acsl_literal_string;
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
-  char *p = malloc((size_t)256);
+  char *p = malloc((size_t)4096);
   __e_acsl_temporal_store_nblock((void *)(& p),(void *)*(& p));
   __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
@@ -42,7 +42,7 @@ int main(void)
   __e_acsl_full_init((void *)(& q));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
-  q = (char *)malloc((size_t)256);
+  q = (char *)malloc((size_t)4096);
   __e_acsl_temporal_store_nblock((void *)(& q),(void *)*(& q));
   {
     int __gen_e_acsl_initialized;

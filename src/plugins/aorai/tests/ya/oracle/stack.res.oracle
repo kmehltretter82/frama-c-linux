@@ -37,7 +37,7 @@ check lemma empty_stack_deterministic_trans{L}:
      \at(aorai_CurOperation,L) ≡ op_main ∧
      \at(aorai_CurOpStatus,L) ≡ aorai_Terminated);
  */
-/*@ ghost int aorai_CurStates = init; */
+/*@ ghost enum aorai_States aorai_CurStates = init; */
 /*@ ghost int aorai_n = 0; */
 /*@
 check lemma filled_stack_deterministic_trans{L}:
@@ -97,11 +97,12 @@ check lemma emptying_stack_deterministic_trans{L}:
   void push_pre_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_push;
-    if (4 == aorai_CurStates) aorai_CurStates = filling_stack;
+    if ((unsigned int)4 == aorai_CurStates) aorai_CurStates = filling_stack;
     else 
-      if (2 == aorai_CurStates) aorai_CurStates = filling_stack;
+      if ((unsigned int)2 == aorai_CurStates) aorai_CurStates = filling_stack;
       else aorai_CurStates = aorai_reject;
     return;
   }
@@ -155,9 +156,10 @@ check lemma emptying_stack_deterministic_trans{L}:
   void push_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_push;
-    if (5 == aorai_CurStates) {
+    if ((unsigned int)5 == aorai_CurStates) {
       aorai_CurStates = filled_stack;
       aorai_n ++;
     }
@@ -235,9 +237,10 @@ void push(void)
   void pop_pre_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_pop;
-    if (4 == aorai_CurStates) 
+    if ((unsigned int)4 == aorai_CurStates) 
       if (aorai_n > 0) aorai_CurStates = emptying_stack;
       else aorai_CurStates = aorai_reject;
     else aorai_CurStates = aorai_reject;
@@ -301,9 +304,10 @@ void push(void)
   void pop_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_pop;
-    if (3 == aorai_CurStates) {
+    if ((unsigned int)3 == aorai_CurStates) {
       if (aorai_n == 1) {
         aorai_CurStates = empty_stack;
         aorai_n --;
@@ -312,7 +316,7 @@ void push(void)
     }
     else {
       __aorai_label: ;
-      if (3 == aorai_CurStates) 
+      if ((unsigned int)3 == aorai_CurStates) 
         if (aorai_n > 1) {
           aorai_CurStates = filled_stack;
           aorai_n --;
@@ -398,9 +402,10 @@ void pop(void)
   void main_pre_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
-    if (6 == aorai_CurStates) {
+    if ((unsigned int)6 == aorai_CurStates) {
       aorai_CurStates = empty_stack;
       aorai_n = 0;
     }
@@ -451,9 +456,10 @@ void pop(void)
   void main_post_func(void)
   {
     /@ slevel full; @/
+    ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
-    if (2 == aorai_CurStates) aorai_CurStates = accept;
+    if ((unsigned int)2 == aorai_CurStates) aorai_CurStates = accept;
     else aorai_CurStates = aorai_reject;
     return;
   }

@@ -72,9 +72,10 @@ val current : tree -> current
 val goto : tree -> position -> unit
 val root : tree -> node
 val main : tree -> Wpo.t
-val head : tree -> Wpo.t
-val tree : node -> tree
 val goal : node -> Wpo.t
+val tree : node -> tree
+val head : tree -> node option
+val head_goal : tree -> Wpo.t
 val tree_context : tree -> WpContext.t
 val node_context : node -> WpContext.t
 
@@ -83,10 +84,14 @@ val proved : node -> bool
 val pending : node -> int
 val stats : node -> Stats.stats
 val parent : node -> node option
+val depth : node -> int
 val children : node -> (string * node) list
 val tactical : node -> ProofScript.jtactic option
 val get_strategies : node -> int * Strategy.t array (* current index *)
 val set_strategies : node -> ?index:int -> Strategy.t array -> unit
+val get_hint : node -> string option
+val set_hint : node -> string -> unit
+
 val forward : tree -> unit
 val cancel : tree -> unit
 val remove : tree -> node -> unit

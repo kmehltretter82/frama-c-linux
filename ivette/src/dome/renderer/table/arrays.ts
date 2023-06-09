@@ -454,6 +454,11 @@ export class ArrayModel<Key, Row>
     this.index.forEach((p) => { fn(p.row); });
   }
 
+  /** Number of non-filtered entries. */
+  length(): number {
+    return this.index.size;
+  }
+
 }
 
 // --------------------------------------------------------------------------

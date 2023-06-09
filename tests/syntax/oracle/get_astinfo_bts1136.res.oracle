@@ -5,9 +5,9 @@ found variable vid:28 formal in h
 found variable vid:30 formal in i
 found variable vid:32 formal in j
 found variable vid:34 formal in k
-[do_v] vid:28 formal in h
-[do_v] vid:25 formal in g
-[do_v] vid:22 formal in f
-[do_v] vid:34 local in k
-[do_v] vid:32 local in j
-[do_v] vid:30 local in i
+[do_v] vid:28 Parameter of h
+[do_v] vid:25 Parameter of g
+[do_v] vid:22 Parameter of f
+[do_v] vid:34 Local variable of k
+[do_v] vid:32 Local variable of j
+[do_v] vid:30 Local variable of i

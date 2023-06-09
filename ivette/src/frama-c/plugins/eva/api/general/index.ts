@@ -63,14 +63,16 @@ import { tag } from 'frama-c/kernel/api/data';
 import { tagDefault } from 'frama-c/kernel/api/data';
 
 /** State of the computation of Eva Analysis. */
-export type computationStateType = "not_computed" | "computing" | "computed";
+export type computationStateType =
+  "not_computed" | "computing" | "computed" | "aborted";
 
 /** Decoder for `computationStateType` */
 export const jComputationStateType: Json.Decoder<computationStateType> =
-  Json.jUnion<"not_computed" | "computing" | "computed">(
+  Json.jUnion<"not_computed" | "computing" | "computed" | "aborted">(
     Json.jTag("not_computed"),
     Json.jTag("computing"),
     Json.jTag("computed"),
+    Json.jTag("aborted"),
   );
 
 /** Natural order for `computationStateType` */
@@ -130,10 +132,20 @@ const getCallers_internal: Server.GetRequest<fct,CallSite[]> = {
   name:   'plugins.eva.general.getCallers',
   input:  jFct,
   output: Json.jArray(jCallSite),
-  signals: [],
+  signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the list of call site of a function */
 export const getCallers: Server.GetRequest<fct,CallSite[]>= getCallers_internal;
+
+const getCallees_internal: Server.GetRequest<marker,fct[]> = {
+  kind: Server.RqKind.GET,
+  name:   'plugins.eva.general.getCallees',
+  input:  jMarker,
+  output: Json.jArray(jFct),
+  signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
+};
+/** Return the functions pointed to by a function pointer */
+export const getCallees: Server.GetRequest<marker,fct[]>= getCallees_internal;
 
 /** Data for array rows [`functions`](#functions)  */
 export interface functionsData {
@@ -243,7 +255,7 @@ const getDeadCode_internal: Server.GetRequest<fct,deadCode> = {
   name:   'plugins.eva.general.getDeadCode',
   input:  jFct,
   output: jDeadCode,
-  signals: [],
+  signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the lists of unreachable and of non terminating statements in a function */
 export const getDeadCode: Server.GetRequest<fct,deadCode>= getDeadCode_internal;
@@ -318,7 +330,7 @@ const taintedLvalues_internal: Server.GetRequest<fct,LvalueTaints[]> = {
   name:   'plugins.eva.general.taintedLvalues',
   input:  jFct,
   output: Json.jArray(jLvalueTaints),
-  signals: [],
+  signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the tainted lvalues of a given function */
 export const taintedLvalues: Server.GetRequest<fct,LvalueTaints[]>= taintedLvalues_internal;
@@ -690,7 +702,7 @@ const getStates_internal: Server.GetRequest<
   input:  Json.jPair( jMarker, Json.jBoolean,),
   output: Json.jArray(
             Json.jTriple( Json.jString, Json.jString, Json.jString,)),
-  signals: [],
+  signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the domain states about the given marker */
 export const getStates: Server.GetRequest<

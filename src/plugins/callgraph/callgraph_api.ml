@@ -43,6 +43,9 @@ module type Graph = sig
   val is_computed: unit -> bool
   (** Is the graph already built? *)
 
+  val add_hook: (G.t -> unit) -> unit
+  (** Call registered hook each time the graph is computed *)
+
   val self: State.t
 
 end
@@ -60,7 +63,6 @@ module type Services = sig
 
   val entry_point: unit -> G.V.t option
   val is_root: Kernel_function.t -> bool
-
 end
 
 (*

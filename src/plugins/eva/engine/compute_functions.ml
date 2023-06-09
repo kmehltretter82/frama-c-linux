@@ -85,6 +85,7 @@ let pre_analysis () =
   Widen.precompute_widen_hints ();
   Builtins.prepare_builtins ();
   Eva_perf.reset ();
+  Statistics.reset_all ();
   (* We may be resuming Value from a previously crashed analysis. Clear
      degeneration states *)
   Eva_utils.DegenerationPoints.clear ();
@@ -363,6 +364,7 @@ module Make (Abstract: Abstractions.Eva) = struct
       post_analysis ();
       Abstract.Dom.post_analysis final_state;
       Summary.print_summary ();
+      Statistics.export_as_csv ();
       restore_signals ()
     in
     let cleanup () =

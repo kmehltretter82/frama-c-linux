@@ -351,11 +351,20 @@ module type Hashtbl = sig
   (** Return the current binding of the given key.
       @raise Not_found if the key is not in the table. *)
 
+  val find_opt: key -> data option
+  (** Return the current binding of the given key, or None if no such binding
+      exists.
+      @since 27.0-Cobalt *)
+
   val find_all: key -> data list
   (** Return the list of all data associated with the given key. *)
 
   val mem: key -> bool
   val remove: key -> unit
+
+  val to_seq: unit -> (key * data) Seq.t
+  (** Iterate on the whole table.
+      @since 27.0-Cobalt *)
 end
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide

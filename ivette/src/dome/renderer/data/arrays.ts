@@ -59,7 +59,7 @@ export function merge<K, A extends K, B extends K>(
   f: (x : K) => unknown,
 ): (A & (object | B))[] {
   const dict = new Map(a2.map(x2 => [f(x2), x2])); // maps f(x2) to x2
-  return a1.map(x1 => ({...x1, ...(dict.get(f(x1)))}));
+  return a1.map(x1 => ({ ...x1, ...(dict.get(f(x1))) }));
 }
 
 /** Maps a function through an array and returns the first computed value that

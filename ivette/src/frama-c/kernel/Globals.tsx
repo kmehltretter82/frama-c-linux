@@ -32,8 +32,6 @@ import { alpha } from 'dome/data/compare';
 import { Section, Item } from 'dome/frame/sidebars';
 import { Button } from 'dome/controls/buttons';
 import * as Toolbars from 'dome/frame/toolbars';
-import * as Models from 'dome/table/models';
-import * as Arrays from 'dome/table/arrays';
 
 import * as States from 'frama-c/states';
 import * as Kernel from 'frama-c/kernel/api/ast';
@@ -106,15 +104,13 @@ type functionsData =
 type FctKey = Json.key<'#functions'>;
 
 function computeFcts(
-  ker: Arrays.CompactModel<FctKey,Kernel.functionsData>,
-  eva: Arrays.CompactModel<FctKey,Eva.functionsData>,
-  _kstamp: number,
-  _estamp: number,
+  ker: States.ArrayProxy<FctKey, Kernel.functionsData>,
+  eva: States.ArrayProxy<FctKey, Eva.functionsData>,
 ): functionsData[] {
   const arr: functionsData[] = [];
   ker.forEach((kf) => {
     const ef = eva.getData(kf.key);
-    arr.push({...ef,...kf});
+    arr.push({ ...ef, ...kf });
   });
   return arr.sort((f, g) => alpha(f.name, g.name));
 }
@@ -123,25 +119,28 @@ export default function Globals(): JSX.Element {
 
   // Hooks
   const [selection, updateSelection] = States.useSelection();
-  const kerFcts = States.useSyncArray(Kernel.functions);
-  const evaFcts = States.useSyncArray(Eva.functions);
-  const kerStamp = Models.useModel(kerFcts);
-  const evaStamp = Models.useModel(evaFcts);
-  const fcts = React.useMemo(
-    () => computeFcts(kerFcts,evaFcts,kerStamp,evaStamp),
-    [kerFcts,evaFcts,kerStamp,evaStamp]
-  );
+  const ker = States.useSyncArrayProxy(Kernel.functions);
+  const eva = States.useSyncArrayProxy(Eva.functions);
+  const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
   const { useFlipSettings } = Dome;
   const [stdlib, flipStdlib] =
     useFlipSettings('ivette.globals.stdlib', false);
   const [builtin, flipBuiltin] =
     useFlipSettings('ivette.globals.builtin', false);
+  const [def, flipDef] =
+    useFlipSettings('ivette.globals.def', true);
   const [undef, flipUndef] =
     useFlipSettings('ivette.globals.undef', true);
-  const [selected, flipSelected] =
-    useFlipSettings('ivette.globals.selected', false);
-  const [evaOnly, flipEvaOnly] =
-    useFlipSettings('ivette.globals.evaonly', false);
+  const [intern, flipIntern] =
+    useFlipSettings('ivette.globals.intern', true);
+  const [extern, flipExtern] =
+    useFlipSettings('ivette.globals.extern', true);
+  const [evaAnalyzed, flipEvaAnalyzed] =
+    useFlipSettings('ivette.globals.eva-analyzed', true);
+  const [evaUnreached, flipEvaUnreached] =
+    useFlipSettings('ivette.globals.eva-unreached', true);
+    const [selected, flipSelected] =
+      useFlipSettings('ivette.globals.selected', false);
   const multipleSelection = selection?.multiple;
   const multipleSelectionActive = multipleSelection?.allSelections.length > 0;
   const evaComputed = States.useSyncValue(computationState) === 'computed';
@@ -159,11 +158,16 @@ export default function Globals(): JSX.Element {
     const visible =
       (stdlib || !fct.stdlib)
       && (builtin || !fct.builtin)
+      && (def || !fct.defined)
       && (undef || fct.defined)
-      && (!evaOnly || !evaComputed ||
+      && (intern || fct.extern)
+      && (extern || !fct.extern)
+      && (evaAnalyzed || !evaComputed ||
+        !('eva_analyzed' in fct && fct.eva_analyzed === true))
+      && (evaUnreached || !evaComputed ||
         ('eva_analyzed' in fct && fct.eva_analyzed === true))
       && (!selected || !multipleSelectionActive || isSelected(fct));
-    return visible || (!!current && fct.name === current);
+    return !!visible;
   }
 
   function onSelection(name: string): void {
@@ -182,6 +186,12 @@ export default function Globals(): JSX.Element {
         checked: stdlib,
         onClick: flipStdlib,
       },
+      'separator',
+      {
+        label: 'Show defined functions',
+        checked: def,
+        onClick: flipDef,
+      },
       {
         label: 'Show undefined functions',
         checked: undef,
@@ -189,16 +199,34 @@ export default function Globals(): JSX.Element {
       },
       'separator',
       {
+        label: 'Show non-extern functions',
+        checked: intern,
+        onClick: flipIntern,
+      },
+      {
+        label: 'Show extern functions',
+        checked: extern,
+        onClick: flipExtern,
+      },
+      'separator',
+      {
+        label: 'Show functions analyzed by Eva',
+        enabled: evaComputed,
+        checked: evaAnalyzed,
+        onClick: flipEvaAnalyzed,
+      },
+      {
+        label: 'Show functions unreached by Eva',
+        enabled: evaComputed,
+        checked: evaUnreached,
+        onClick: flipEvaUnreached,
+      },
+      'separator',
+      {
         label: 'Selected only',
         enabled: multipleSelectionActive,
         checked: selected,
         onClick: flipSelected,
-      },
-      {
-        label: 'Analyzed by Eva only',
-        enabled: evaComputed,
-        checked: evaOnly,
-        onClick: flipEvaOnly,
       },
     ];
     Dome.popupMenu(items);
@@ -229,15 +257,15 @@ export default function Globals(): JSX.Element {
 
   const noFunction =
     <div className='dome-xSideBarSection-content'>
-      <label className='dome-xSideBarSection-info'>
-        {'There is no function to display.'}
+      <label className='globals-info'>
+        There is no function to display.
       </label>
     </div>;
 
   const allFiltered =
     <div className='dome-xSideBarSection-content'>
-      <label className='dome-xSideBarSection-info'>
-        {'All functions are filtered. Try adjusting function filters.'}
+      <label className='globals-info'>
+        All functions are filtered. Try adjusting function filters.
       </label>
       <Button {...filterButtonProps} label='Functions filters' />
     </div>;

@@ -4203,13 +4203,13 @@ Most domains are also presented in more details in the following subsections.
     \tabularnewline
     \midrule
     octagon & d-octagon & \ref{sec:octagons} &
-    Infers relations between scalar variables. \\
-    Efficient but limited.
+    Infers relations of the form $l \leq \pm X \pm Y \leq u$ between integer or
+    pointer lvalues. Efficient.
     \tabularnewline
     \midrule
     multidim & d-multidim & \ref{sec:multidim} &
     More precise representation of arrays of structures,
-    multidimensional arrays and arrays invariants. \\
+    multidimensional arrays and arrays invariants.
     Experimental.
     \tabularnewline
     \midrule
@@ -4435,7 +4435,8 @@ and \texttt{y} is not affine.
 
 Activating option \texttt{-eva-domains octagon} instructs Eva to infer relations
 between variables as numerical constraints of the form $l \leq \pm X \pm Y \leq
-u$, where $X$ and $Y$ are program variables, and $l$ and $u$ are constants.
+u$, where $X$ and $Y$ are program variables or lvalues,
+and $l$ and $u$ are constants.
 
 These relations are then used to evaluate more precisely the possible values
 of an expression involving $X$ and $Y$, or to deduce a reduction of
@@ -4455,16 +4456,23 @@ void main (int y) {
 \end{listing-nonumber}
 
 
-Currently, the octagon domain is fast but has two strong limitations:
+Currently, the octagon domain is fast but has some limitations:
 \begin{itemize}
 \item
-  The domain only infers relations between scalar variables of integer types.
-  It ignores pointers, arrays and structure fields.
+  The domain only infers relations between lvalues of integer or
+  pointer types.
+  It does not support relations between floating-point values.
 \item
   The domain only infers relations between pairs of variables occurring in the
   same instruction, as \lstinline|x = y + k;| or \lstinline|if (x < y + k)|.
   If an instruction involves 3 variables or more, relations are inferred for
   each pair of variables.
+\item
+  The domain has no involved memory model and can only infer and use relations
+  about the syntactic lvalues as they appear in the program.
+  For instance, if two pointers \lstinline|p| and \lstinline|q| point to the
+  same location, and a relation is inferred on \lstinline|*p|, the domain cannot
+  use it to improve the value of \lstinline|*q|.
 \end{itemize}
 
 The domain is intraprocedural by default: the inferred relations are local to
@@ -4474,8 +4482,9 @@ to its caller.
 The option \verb+-eva-octagon-through-calls+ makes the octagon domain
 interprocedural, which is a more precise but slower mode where
 the inferred relations are propagated through function calls.
-The analysis of a function can then use the relations inferred in the callers,
-and at the end, the inferred relations are propagated back to the caller.
+The analysis of a function can then use the relations previously inferred in the
+callers, and at the end, the inferred relations are propagated back to the
+caller.
 
 
 \subsection{Multidim}
@@ -5574,7 +5583,11 @@ allocation fails.
 \label{nondeterminism}
 
 The following functions, declared in \lstinline|share/libc/__fc_builtin.h|, allow to
-introduce some non-determinism in the analysis. The results given by
+introduce some non-determinism in the analysis.
+These functions are not specific to \Eva{}; their ACSL specifications
+(omitted here for brevity) can be understood by other \FramaC plug-ins.
+
+The results given by
 \Eva{} are
 valid \textbf{for all values proposed by the user}, as opposed
 to what a test-generation tool would typically do. A tool based
@@ -5590,31 +5603,55 @@ int Frama_C_nondet(int a, int b);
 void *Frama_C_nondet_ptr(void *a, void *b);
     /* returns either a or b */
 
+void Frama_C_make_unknown(char *p, size_t l);
+    /* assigns an arbitrary value to each byte between *p and *(p+l-1) */
+
 int Frama_C_interval(int min, int max);
-    /* returns any value in the interval from min to max inclusive */
+    /* returns any int value in the interval from min to max inclusive */
 
 float Frama_C_float_interval(float min, float max);
-    /* returns any value in the interval from min to max inclusive */
+    /* returns any float value in the interval from min to max inclusive */
 
 double Frama_C_double_interval(double min, double max);
-    /* returns any value in the interval from min to max inclusive */
+    /* returns any double value in the interval from min to max inclusive */
 \end{listing-nonumber}
 
-The implementation of these functions might change in future versions
-of Frama-C, but their types and their behavior will stay the same.
+A series of functions equivalent to \lstinline|Frama_C_interval|
+is defined for other integer and floating-point types:
+they generate ranges containing all values between their two arguments
+(\texttt{min} and \texttt{max}, inclusive) for the given type.
+Here is a complete list of these functions:
+
+\begin{table}[!ht]
+  \centering
+  \begin{tabular}{ll}
+    \lstinline|Frama_C_unsigned_char_interval| &
+    \lstinline|Frama_C_char_interval| \\
+    \lstinline|Frama_C_unsigned_short_interval| &
+    \lstinline|Frama_C_short_interval| \\
+    \lstinline|Frama_C_unsigned_int_interval| &
+    \lstinline|Frama_C_int_interval| \\
+    \lstinline|Frama_C_unsigned_long_interval| &
+    \lstinline|Frama_C_long_interval| \\
+    \lstinline|Frama_C_unsigned_long_long_interval| &
+    \lstinline|Frama_C_long_long_interval| \\
+    \lstinline|Frama_C_interval| (synonym of \lstinline|Frama_C_int_interval|) &
+    \lstinline|Frama_C_size_t_interval| \\
+    \lstinline|Frama_C_float_interval| &
+    \lstinline|Frama_C_double_interval| \\
+    \lstinline|Frama_C_real_interval_as_double|
+  \end{tabular}
+\end{table}
 
 Example of use of the functions introducing non-determinism:
 \csource{examples/nondet.c}
 
 With the command below, the obtained result for
-variable \lstinline|X| is \lstinline|[-45..150],0%3|.
+variable \lstinline|X| is \lstinline|[-45..150],0%3|, and for the
+array \lstinline|arr|, \lstinline|[0..19] ∈ [--..--]|.
 \begin{frama-c-commands}
-frama-c -eva ex_nondet.c .../share/libc/__fc_builtin.c
+frama-c -eva ex_nondet.c
 \end{frama-c-commands}
-The inclusion of \lstinline|.../share/libc/__fc_builtin.c| is only required
-when using the functions \lstinline|Frama_C_float_interval| and
-\lstinline|Frama_C_double_interval|. Otherwise, including the file
-\lstinline|__fc_builtin.h| is sufficient.
 
 Note that reads of volatile variables also return a non-deterministic
 value.

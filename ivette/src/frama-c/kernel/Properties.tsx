@@ -38,7 +38,8 @@ import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
 import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
 import { TitleBar } from 'ivette';
-import { Scroll, Folder } from 'dome/layout/boxes';
+import { Scroll } from 'dome/layout/boxes';
+import { Section } from 'dome/frame/sidebars';
 
 import { RSplit } from 'dome/layout/splitters';
 
@@ -81,8 +82,8 @@ const DEFAULTS: { [key: string]: boolean } = {
   'kind.axiomatic': true,
   'kind.pragma': true,
   'kind.others': true,
-  'alarms.alarms': true, // show properties that are alarms
-  'alarms.others': true, // show properties that are not alarms
+  'source.alarms': true, // show properties that are alarms
+  'source.others': true, // show properties that are not alarms
   'alarms.overflow': true,
   'alarms.division_by_zero': true,
   'alarms.mem_access': true,
@@ -119,6 +120,31 @@ function useFilter(path: string): [boolean, () => void] {
     `ivette.properties.filter.${path}`,
     defaultValue,
   );
+}
+
+function resetFilters(prefix: string, b?: boolean) : void {
+  for (const key in DEFAULTS) {
+    if (key.startsWith(prefix)) {
+      const target = b ?? DEFAULTS[key];
+      const path = `ivette.properties.filter.${key}`;
+      Settings.setWindowSettings(path, target);
+    }
+  }
+  Reload.emit();
+}
+
+function filterSummary(prefix: string) : string {
+  let total = 0;
+  let enabled = 0;
+  for (const key in DEFAULTS) {
+    if (key.startsWith(prefix)) {
+      total ++;
+      if (filter(key)) enabled++;
+    }
+  }
+  if (enabled === 0) return 'none';
+  if (enabled === total) return 'all';
+  return `${enabled} / ${total}`;
 }
 
 function filterStatus(
@@ -174,7 +200,7 @@ function filterKind(
 
 function filterAlarm(alarm: string | undefined): boolean {
   if (alarm) {
-    if (!filter('alarms.alarms')) return false;
+    if (!filter('source.alarms')) return false;
     switch (alarm) {
       case 'overflow': return filter('alarms.overflow');
       case 'division_by_zero': return filter('alarms.division_by_zero');
@@ -196,7 +222,7 @@ function filterAlarm(alarm: string | undefined): boolean {
       default: return false;
     }
   }
-  return filter('alarms.others');
+  return filter('source.others');
 }
 
 function filterEva(p: Property): boolean {
@@ -367,20 +393,51 @@ const Reload = new Dome.Event('ivette.properties.reload');
 
 interface SectionProps {
   label: string;
+  prefix?: string;
   unfold?: boolean;
   children: React.ReactNode;
 }
 
-function Section(props: SectionProps): JSX.Element {
+async function onContextMenu(prefix:string): Promise<void> {
+  const items: Dome.PopupMenuItem[] = [
+    {
+      label: 'Reset to default',
+      onClick: () => resetFilters(prefix),
+    },
+    {
+      label: 'Select all',
+      onClick: () => resetFilters(prefix, true),
+    },
+    {
+      label: 'Deselect all',
+      onClick: () => resetFilters(prefix, false),
+    },
+  ];
+  Dome.popupMenu(items);
+}
+
+function FilterSection(props: SectionProps): JSX.Element {
   const settings = `properties-section-${props.label}`;
+  const { label, prefix } = props;
+  const filterButtonProps =
+    prefix ? {
+      icon: 'TUNINGS',
+      title: `Configure filters`,
+      onClick: () => onContextMenu(prefix),
+    } : undefined;
+  const update = Dome.useForceUpdate();
+  Settings.useWindowSettingsEvent(update);
+  const summary = prefix ? filterSummary(prefix) : undefined;
   return (
-    <Folder
-      label={props.label}
+    <Section
+      label={label}
       settings={settings}
       defaultUnfold={props.unfold}
+      infos={summary}
+      rightButtonProps={filterButtonProps}
     >
       {props.children}
-    </Folder>
+    </Section>
   );
 }
 
@@ -414,7 +471,7 @@ function PropertyFilter(): JSX.Element {
   return (
     <Scroll>
       <CheckField label="Current function" path="currentFunction" />
-      <Section label="Status" unfold>
+      <FilterSection label="Status" prefix="status" unfold>
         <CheckField label="Valid" path="status.valid" />
         <CheckField label="Valid under hyp." path="status.valid_hyp" />
         <CheckField label="Unknown" path="status.unknown" />
@@ -424,8 +481,8 @@ function PropertyFilter(): JSX.Element {
         <CheckField label="Untried" path="status.untried" />
         <CheckField label="Dead" path="status.dead" />
         <CheckField label="Inconsistent" path="status.inconsistent" />
-      </Section>
-      <Section label="Property kind">
+      </FilterSection>
+      <FilterSection label="Property kind" prefix="kind">
         <CheckField label="Assertions" path="kind.assert" />
         <CheckField label="Invariants" path="kind.invariant" />
         <CheckField label="Variants" path="kind.variant" />
@@ -441,12 +498,12 @@ function PropertyFilter(): JSX.Element {
         <CheckField label="Pragma" path="kind.pragma" />
         <CheckField label="Assumes" path="kind.assumes" />
         <CheckField label="Others" path="kind.others" />
-      </Section>
-      <Section label="Alarms">
-        <CheckField label="Alarms" path="alarms.alarms" />
-        <CheckField label="Others" path="alarms.others" />
-      </Section>
-      <Section label="Alarms kind">
+      </FilterSection>
+      <FilterSection label="Source" prefix="source">
+        <CheckField label="Alarms" path="source.alarms" />
+        <CheckField label="Others" path="source.others" />
+      </FilterSection>
+      <FilterSection label="Alarms kind" prefix="alarms">
         <CheckField label="Overflows" path="alarms.overflow" />
         <CheckField label="Divisions by zero" path="alarms.division_by_zero" />
         <CheckField label="Shifts" path="alarms.shift" />
@@ -463,8 +520,8 @@ function PropertyFilter(): JSX.Element {
         <CheckField label="Differing blocks" path="alarms.differing_blocks" />
         <CheckField label="Separations" path="alarms.separation" />
         <CheckField label="Overlaps" path="alarms.overlap" />
-      </Section>
-      <Section label="Eva">
+      </FilterSection>
+      <FilterSection label="Eva">
         <CheckField
           label="High-priority only"
           path="eva.priority_only"
@@ -480,7 +537,7 @@ function PropertyFilter(): JSX.Element {
           path="eva.ctrl_tainted_only"
           title="Show only control-tainted properties according to the Eva taint domain"
         />
-      </Section>
+      </FilterSection>
     </Scroll>
   );
 }
@@ -597,8 +654,8 @@ function FilterRatio({ model }: { model: PropertyModel }): JSX.Element {
 // --- Properties Table
 // -------------------------------------------------------------------------
 
-type PropsModel = Arrays.CompactModel<PropKey,Properties.statusData>;
-type EvapsModel = Arrays.CompactModel<PropKey,Eva.propertiesData>;
+type PropsModel = States.ArrayProxy<PropKey, Properties.statusData>;
+type EvapsModel = States.ArrayProxy<PropKey, Eva.propertiesData>;
 
 function populateModel(
   model: PropertyModel,
@@ -609,7 +666,7 @@ function populateModel(
   props.forEach((prop) => {
     const { key } = prop;
     const eva = evaps.getData(key);
-    model.setData(key,{ ...eva, ...prop });
+    model.setData(key, { ...eva, ...prop });
   });
   model.reload();
 }
@@ -618,13 +675,11 @@ export default function RenderProperties(): JSX.Element {
 
   // Hooks
   const model = React.useMemo(() => new PropertyModel(), []);
-  const props = States.useSyncArray(Properties.status);
-  const evaps = States.useSyncArray(Eva.properties);
-  const pstamp = Models.useModel(props);
-  const estamp = Models.useModel(evaps);
+  const props = States.useSyncArrayProxy(Properties.status);
+  const evaps = States.useSyncArrayProxy(Eva.properties);
   React.useEffect(() => {
-    populateModel(model,props,evaps);
-  },[model,props,evaps,pstamp,estamp]);
+    populateModel(model, props, evaps);
+  }, [model, props, evaps]);
 
   const [selection, updateSelection] = States.useSelection();
 

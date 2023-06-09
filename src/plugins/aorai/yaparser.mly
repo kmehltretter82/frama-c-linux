@@ -154,6 +154,7 @@ type pre_cond = Behavior of string | Pre of Automaton_ast.condition
 %token <string> IDENTIFIER
 %token <string> METAVAR
 %token <string> INT
+%token <string> FLOAT
 %token AFF
 %token LCURLY RCURLY LPAREN RPAREN LSQUARE RSQUARE LBRACELBRACE RBRACERBRACE
 %token RARROW
@@ -388,7 +389,9 @@ arith_relation_bw
 /* returns a Lval exp or a Const exp*/
 access_or_const
   : INT { PCst (IntConstant $1) }
+  | FLOAT { PCst (FloatConstant $1) }
   | MINUS INT { PUnop (Uminus, PCst (IntConstant $2)) }
+  | MINUS FLOAT { PUnop (Uminus, PCst (FloatConstant $2)) }
   | access { $1 }
   ;
 

@@ -253,34 +253,40 @@ const makeGridItem = (customize: unknown, onClose: (id: string) => void) =>
 type Shape = Json.json // Until Grids has a type Shape, use this one instead
 
 interface CustomViewsProps {
-  settings?: string,
+  settings: string,
   shape: Shape,
   setShape: (shape: Shape) => void,
   views: React.PropsWithChildren<View>[]
 }
 
-interface CustomViewsSettings {
-  current?: string;
-  shapes?: { [k: string]: Shape };
-}
+type CustomShapes = { [id: string]: Shape };
+type CustomViews = { [id: string]: View };
 
 function CustomViews(props: CustomViewsProps): JSX.Element {
   const { settings, shape, setShape, views: libViews } = props;
-  const [local, setLocal] = Settings.useWindowSettings<CustomViewsSettings>(
-    settings,
-    Json.identity as Json.Decoder<CustomViewsSettings & Json.json>, // Clearly abusive conversion, a real decoder is needed
+  const [current, setCurrent] = Settings.useWindowSettingsData<string>(
+    `${settings}.current`,
+    Json.jString,
+    Json.identity,
+    ''
+  );
+  const [shapes, setShapes] = Settings.useWindowSettingsData<CustomShapes>(
+    `${settings}.shapes`,
+    Json.identity as Json.Decoder<CustomShapes>,
+    Json.identity as Json.Encoder<CustomShapes>,
+    // Clearly abusive conversion, real encoder/decoder are needed
     {},
   );
-  const [customs, setCustoms] =
-    Settings.useLocalStorage<{ [id: string]: View }>(
-      'frama-c.labview',
-      Json.identity as Json.Decoder<{ [id: string]: View } & Json.json>, // Clearly abusive conversion, a real decoder is needed
-      {},
-    );
+  const [customs, setCustoms] = Settings.useLocalStorageData<CustomViews>(
+    'frama-c.labview',
+    Json.identity as Json.Decoder<CustomViews>,
+    Json.identity as Json.Encoder<CustomViews>,
+    // Clearly abusive conversion, real encoder/decoder are needed
+    {},
+  );
   const [edited, setEdited] = React.useState<string>();
   const triggerDefault = React.useRef<View>();
-  const { current, shapes = {} } = local;
-  const theViews: { [id: string]: View } = {};
+  const theViews: CustomViews = {};
 
   _.forEach(libViews, (view) => {
     const {
@@ -316,9 +322,12 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
 
   const SELECT = (id: string): void => {
     if (id && current !== id) {
-      if (current) shapes[current] = shape;
-      setLocal({ current: id, shapes });
+      if (current) {
+        const newShapes = { ...shapes, [current]: shape };
+        setShapes(newShapes);
+      }
       setShape(shapes[id] || getDefaultShape(theViews[id]));
+      setCurrent(id);
     }
   };
 
@@ -329,8 +338,9 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
     const isCustom = !view.builtin;
 
     const DEFAULT = (): void => {
-      shapes[id] = undefined;
-      setLocal({ current: id, shapes });
+      const newShapes = { ...shapes };
+      delete newShapes[id];
+      setShapes(newShapes);
       setShape(getDefaultShape(view));
     };
 
@@ -340,7 +350,7 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
       const base = `custom.${view.origin}`;
       const stock = getStock(view.origin);
       let k = 1;
-      let newId = base;
+      let newId: string = base;
       while (theViews[newId]) {
         k += 1;
         newId = `${base}~${k}`;
@@ -349,7 +359,7 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
       if (newOrder && newOrder.concat) newOrder = newOrder.concat([k]);
       let newLabel = `Custom ${stock.label}`;
       if (k > 1) newLabel += `~${k}`;
-      customs[newId] = {
+      const customView = {
         id: newId,
         label: newLabel,
         order: newOrder,
@@ -357,26 +367,46 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
         origin: view.origin,
         builtin: false,
       };
-      setCustoms(customs);
-      if (current) shapes[current] = shape;
-      setLocal({ current: newId, shapes });
+      setCustoms({ ...customs, [newId]: customView });
+      const newShape =
+        isCurrent ? shape : (shapes[id] ?? getDefaultShape(view));
+      const newShapes = { ...shapes, [newId]: newShape };
+      setShapes(newShapes);
+      setShape(newShape);
+      setCurrent(newId);
       setEdited(newId);
     };
 
     const REMOVE = (): void => {
-      delete customs[id];
-      delete shapes[id];
-      setCustoms(customs);
-      const newCurrent = current === id ? undefined : current;
-      setLocal({ current: newCurrent, shapes });
+      const newCustoms = { ... customs };
+      const newShapes = { ... shapes };
+      delete newCustoms[id];
+      delete newShapes[id];
+      setCustoms(newCustoms);
+      setShapes(newShapes);
+      if (isCurrent) {
+        const newView =
+          (view.origin && theViews[view.origin]) ||
+          _.find(theViews, (v: View) => !!v.defaultView) ||
+          _.find(theViews, (v: View) => v.id !== current) ||
+          theViews[0];
+        const newId = newView.id;
+        const newShape = shapes[newId] || getDefaultShape(newView);
+        setCurrent(newId);
+        setShape(newShape);
+      }
     };
 
+    const onView = (action: string): string =>
+      isCurrent ? `${action} View` : `${action} View (${view.label})`;
+    const hasRename = !edited && isCustom;
+
     Dome.popupMenu([
-      { label: 'Rename View', display: (!edited && isCustom), onClick: RENAME },
+      { label: onView('Rename'), display: hasRename, onClick: RENAME },
       { label: 'Restore Default', display: isCurrent, onClick: DEFAULT },
-      { label: 'Duplicate View', onClick: DUPLICATE },
+      { label: onView('Duplicate'), onClick: DUPLICATE },
       'separator',
-      { label: 'Remove View', display: isCustom, onClick: REMOVE },
+      { label: onView('Remove'), display: isCustom, onClick: REMOVE },
     ]);
   };
 
@@ -384,9 +414,8 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
     if (edited === id) {
       const RENAMED = (newLabel: string): void => {
         if (newLabel) {
-          const custom = Json.jObj(customs[id] as Json.json) || {};
-          if (custom) custom.label = newLabel;
-          setCustoms(customs);
+          const customView : View = customs[id];
+          setCustoms({ ...customs, [id]: { ...customView, label: newLabel } });
         }
         setEdited(undefined);
       };
@@ -508,7 +537,7 @@ function CustomGroup({
 
 interface CustomPanelProps {
   dnd?: DnD;
-  settings?: string;
+  settings: string;
   shape?: Shape;
   setShape: (shape: Shape) => void;
   setDragging: (id?: string) => void;
@@ -570,7 +599,7 @@ export interface LabViewProps {
   /** Show component panels. */
   customize?: boolean;
   /** Base settings identifier. */
-  settings?: string;
+  settings: string;
 }
 
 /**

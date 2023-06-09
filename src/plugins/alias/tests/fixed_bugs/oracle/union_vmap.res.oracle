@@ -1,0 +1,21 @@
+[kernel] Parsing union_vmap.c (with preprocessing)
+[alias] analysing function: CPS_ParseKey
+[alias] analysing instruction: char *s2 = CPS_SplitWord((char *)"a");
+[alias] analysing function: CPS_SplitWord
+[alias] May-aliases at the end of function CPS_SplitWord: <none>
+[alias:unsafe-cast] union_vmap.c:11: Warning: 
+  unsafe cast from char const * to char *
+[alias] May-aliases after instruction  char *s2 = CPS_SplitWord((char *)"a");  are
+  <none>
+[alias] analysing instruction: char *s3 = CPS_SplitWord((char *)"b");
+[alias:unsafe-cast] union_vmap.c:12: Warning: 
+  unsafe cast from char const * to char *
+[alias] May-aliases after instruction  char *s3 = CPS_SplitWord((char *)"b");  are
+  <none>
+[alias] analysing instruction: *key = s3;
+[alias] May-aliases after instruction  *key = s3;  are  {*key, s3}
+[alias] analysing instruction: *key = s2;
+[alias] May-aliases after instruction  *key = s2;  are  {*key, s2}
+[alias] May-aliases at the end of function CPS_ParseKey: {*key, s2, s3}
+[alias] analysing function: CPS_SplitWord
+[alias] May-aliases at the end of function CPS_SplitWord: <none>

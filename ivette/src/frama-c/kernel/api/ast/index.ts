@@ -147,12 +147,14 @@ export interface markerAttributesData {
   isLval: boolean;
   /** Whether it is a function symbol */
   isFunction: boolean;
+  /** Whether it is a function pointer */
+  isFunctionPointer: boolean;
   /** Whether it is a function declaration */
   isFunDecl: boolean;
   /** Function scope of the marker, if applicable */
   scope?: string;
   /** Source location */
-  sloc: source;
+  sloc?: source;
 }
 
 /** Decoder for `markerAttributesData` */
@@ -165,9 +167,10 @@ export const jMarkerAttributesData: Json.Decoder<markerAttributesData> =
     descr: Json.jString,
     isLval: Json.jBoolean,
     isFunction: Json.jBoolean,
+    isFunctionPointer: Json.jBoolean,
     isFunDecl: Json.jBoolean,
     scope: Json.jOption(Json.jString),
-    sloc: jSource,
+    sloc: Json.jOption(jSource),
   });
 
 /** Natural order for `markerAttributesData` */
@@ -175,7 +178,8 @@ export const byMarkerAttributesData: Compare.Order<markerAttributesData> =
   Compare.byFields
     <{ marker: marker, labelKind: string, titleKind: string, name: string,
        descr: string, isLval: boolean, isFunction: boolean,
-       isFunDecl: boolean, scope?: string, sloc: source }>({
+       isFunctionPointer: boolean, isFunDecl: boolean, scope?: string,
+       sloc?: source }>({
     marker: byMarker,
     labelKind: Compare.alpha,
     titleKind: Compare.alpha,
@@ -183,9 +187,10 @@ export const byMarkerAttributesData: Compare.Order<markerAttributesData> =
     descr: Compare.string,
     isLval: Compare.boolean,
     isFunction: Compare.boolean,
+    isFunctionPointer: Compare.boolean,
     isFunDecl: Compare.boolean,
     scope: Compare.defined(Compare.string),
-    sloc: bySource,
+    sloc: Compare.defined(bySource),
   });
 
 /** Signal for array [`markerAttributes`](#markerattributes)  */
@@ -240,8 +245,8 @@ export const markerAttributes: State.Array<marker,markerAttributesData> = marker
 /** Default value for `markerAttributesData` */
 export const markerAttributesDataDefault: markerAttributesData =
   { marker: markerDefault, labelKind: '', titleKind: '', name: '', descr: '',
-    isLval: false, isFunction: false, isFunDecl: false, scope: undefined,
-    sloc: sourceDefault };
+    isLval: false, isFunction: false, isFunctionPointer: false,
+    isFunDecl: false, scope: undefined, sloc: undefined };
 
 const getMainFunction_internal: Server.GetRequest<null,fct | undefined> = {
   kind: Server.RqKind.GET,
@@ -268,7 +273,7 @@ const printFunction_internal: Server.GetRequest<fct,text> = {
   name:   'kernel.ast.printFunction',
   input:  jFct,
   output: jText,
-  signals: [],
+  signals: [ { name: 'kernel.ast.changed' } ],
 };
 /** Print the AST of a function */
 export const printFunction: Server.GetRequest<fct,text>= printFunction_internal;
@@ -289,6 +294,8 @@ export interface functionsData {
   stdlib?: boolean;
   /** Is the function a Frama-C builtin? */
   builtin?: boolean;
+  /** Is the function extern? */
+  extern?: boolean;
   /** Source location */
   sloc: source;
 }
@@ -303,6 +310,7 @@ export const jFunctionsData: Json.Decoder<functionsData> =
     defined: Json.jOption(Json.jBoolean),
     stdlib: Json.jOption(Json.jBoolean),
     builtin: Json.jOption(Json.jBoolean),
+    extern: Json.jOption(Json.jBoolean),
     sloc: jSource,
   });
 
@@ -311,7 +319,7 @@ export const byFunctionsData: Compare.Order<functionsData> =
   Compare.byFields
     <{ key: Json.key<'#functions'>, name: string, signature: string,
        main?: boolean, defined?: boolean, stdlib?: boolean,
-       builtin?: boolean, sloc: source }>({
+       builtin?: boolean, extern?: boolean, sloc: source }>({
     key: Compare.string,
     name: Compare.alpha,
     signature: Compare.string,
@@ -319,6 +327,7 @@ export const byFunctionsData: Compare.Order<functionsData> =
     defined: Compare.defined(Compare.boolean),
     stdlib: Compare.defined(Compare.boolean),
     builtin: Compare.defined(Compare.boolean),
+    extern: Compare.defined(Compare.boolean),
     sloc: bySource,
   });
 
@@ -375,7 +384,7 @@ export const functions: State.Array<Json.key<'#functions'>,functionsData> = func
 export const functionsDataDefault: functionsData =
   { key: Json.jKey<'#functions'>('#functions')(''), name: '', signature: '',
     main: undefined, defined: undefined, stdlib: undefined,
-    builtin: undefined, sloc: sourceDefault };
+    builtin: undefined, extern: undefined, sloc: sourceDefault };
 
 /** Updated AST information */
 export const getInformationUpdate: Server.Signal = {

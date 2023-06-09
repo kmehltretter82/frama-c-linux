@@ -25,12 +25,15 @@
 
 open Cil_types
 open Locations
-open Writes
+
+type t =
+  | Direct of Cil_types.stmt
+  | Indirect of Cil_types.stmt
 
 class find_read zlval = object
   inherit Visitor.frama_c_inplace
 
-  val mutable res = ([] : (stmt * effects) list)
+  val mutable res : t list = []
 
   method! vstmt_aux stmt =
     let aux_call lvopt _kf args _loc =
@@ -50,7 +53,7 @@ class find_read zlval = object
         let direct = Zone.intersects deps zlval in
         (* now determine if the functions called at [stmt] read directly or
              indirectly [zlval] *)
-        let aux_kf effects kf =
+        let aux_kf (direct, indirect) kf =
           let inputs = !Db.Inputs.get_internal kf in
           (* TODO: change to this once we can get "full" inputs through Inout.
              Currently, non operational inputs disappear, and this function
@@ -59,18 +62,19 @@ class find_read zlval = object
              let inputs = inout.Inout_type.over_inputs in *)
           if Zone.intersects inputs zlval then
             if Eva.Analysis.use_spec_instead_of_definition kf then
-              (* Direst, as there is no body for this funtion. *)
-              { effects with direct = true }
+              (* Direct, as there is no body for this function. *)
+              (true, indirect)
             else
-              { effects with indirect = true } (* Indirect effect *)
+              (direct, true) (* Indirect effect *)
           else
-            effects (* this function pointer does not read [zlval] *)
+            (direct, indirect) (* this function pointer does not read [zlval] *)
         in
         let kfs = Eva.Results.callee stmt in
-        let effects =
-          List.fold_left aux_kf {direct; indirect = false} kfs
-        in
-        res <- (stmt, effects) :: res
+        let direct, indirect = List.fold_left aux_kf (direct, false) kfs in
+        if direct then
+          res <- Direct stmt :: res;
+        if indirect then
+          res <- Indirect stmt :: res;
       end
     in
     match stmt.skind with
@@ -83,13 +87,13 @@ class find_read zlval = object
     | Instr _ ->
       let z = !Db.Inputs.statement stmt in
       if Zone.intersects z zlval then begin
-        res <- (stmt, {direct = true; indirect = false}) :: res
+        res <- Direct stmt :: res
       end;
       Cil.SkipChildren
     | If (e, _, _, _) | Switch (e, _, _, _) | Return (Some e, _) ->
       let z = !Db.Inputs.expr stmt e in
       if Zone.intersects z zlval then begin
-        res <- (stmt, {direct = true; indirect = false}) :: res
+        res <- Direct stmt :: res
       end;
       Cil.DoChildren
     | _ -> Cil.DoChildren

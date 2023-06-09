@@ -56,6 +56,14 @@
 /* --- Globals                                                            --- */
 /* -------------------------------------------------------------------------- */
 
+.globals-info {
+    color: var(--info-text-discrete);
+    font-style: italic;
+    padding-left: 20px;
+    padding-right: 10px;
+    display: block;
+}
+
 .globals-main label {
     text-decoration: underline;
 }

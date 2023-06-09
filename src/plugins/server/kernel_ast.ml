@@ -40,11 +40,16 @@ let () = Request.register ~package
 let changed_signal = Request.signal ~package ~name:"changed"
     ~descr:(Md.plain "Emitted when the AST has been changed")
 
-let ast_update_hook f =
-  Ast.add_hook_on_update f;
-  Ast.apply_after_computed (fun _ -> f ())
+let ast_changed () = Request.emit changed_signal
 
-let () = ast_update_hook (fun _ -> Request.emit changed_signal)
+let ast_update_hook f =
+  begin
+    Ast.add_hook_on_update f;
+    Ast.apply_after_computed (fun _ -> f ());
+  end
+
+let () = ast_update_hook ast_changed
+let () = Annotations.add_hook_on_change ast_changed
 
 (* -------------------------------------------------------------------------- *)
 (* --- File Positions                                                     --- *)
@@ -200,7 +205,8 @@ struct
   let to_json loc = `String (tag loc)
   let of_json js =
     try find (Js.to_string js)
-    with Not_found -> Data.failure "not a localizable marker"
+    with Not_found ->
+      Data.failure "invalid marker (%a)" Json.pp_dump js
 
 end
 
@@ -320,6 +326,13 @@ struct
     | Some vi -> Globals.Functions.mem vi
     | None -> false
 
+  let is_function_pointer = function
+    | PLval (_, _, (Mem _, NoOffset as lval))
+      when Cil.(isFunctionType (typeOfLval lval)) -> true
+    | PLval (_, _, lval)
+      when Cil.(isFunPtrType (Cil.typeOfLval lval)) -> true
+    | _ -> false
+
   let is_fundecl = function
     | PVDecl(Some _,Kglobal,vi) -> vi.vglob && Globals.Functions.mem vi
     | _ -> false
@@ -379,6 +392,14 @@ struct
 
   let () =
     States.column
+      ~name:"isFunctionPointer"
+      ~descr:(Md.plain "Whether it is a function pointer")
+      ~data:(module Jbool)
+      ~get:(fun (tag, _) -> is_function_pointer tag)
+      model
+
+  let () =
+    States.column
       ~name:"isFunDecl"
       ~descr:(Md.plain "Whether it is a function declaration")
       ~data:(module Jbool)
@@ -394,11 +415,15 @@ struct
       model
 
   let () =
-    States.column
+    let get (tag, _) =
+      let pos = fst (Printer_tag.loc_of_localizable tag) in
+      if Cil_datatype.Position.(equal unknown pos) then None else Some pos
+    in
+    States.option
       ~name:"sloc"
       ~descr:(Md.plain "Source location")
       ~data:(module Position)
-      ~get:(fun (tag, _) -> fst (Printer_tag.loc_of_localizable tag))
+      ~get
       model
 
   let array = States.register_array
@@ -442,6 +467,7 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`GET ~name:"printFunction"
     ~descr:(Md.plain "Print the AST of a function")
+    ~signals:[changed_signal]
     ~input:(module Function) ~output:(module Jtext)
     begin fun kf ->
       let libc = Kernel.PrintLibc.get () in
@@ -474,9 +500,9 @@ struct
   let is_builtin kf =
     Cil_builtins.is_builtin (Kernel_function.get_vi kf)
 
-  let is_stdlib kf =
+  let is_extern kf =
     let vi = Kernel_function.get_vi kf in
-    Cil.is_in_libc vi.vattr
+    vi.vstorage = Extern
 
   let iter f =
     Globals.Functions.iter
@@ -514,13 +540,19 @@ struct
         ~descr:(Md.plain "Is the function from the Frama-C stdlib?")
         ~data:(module Data.Jbool)
         ~default:false
-        ~get:is_stdlib;
+        ~get:Kernel_function.is_in_libc;
       States.column model
         ~name:"builtin"
         ~descr:(Md.plain "Is the function a Frama-C builtin?")
         ~data:(module Data.Jbool)
         ~default:false
         ~get:is_builtin;
+      States.column model
+        ~name:"extern"
+        ~descr:(Md.plain "Is the function extern?")
+        ~data:(module Data.Jbool)
+        ~default:false
+        ~get:is_extern;
       States.column model
         ~name:"sloc"
         ~descr:(Md.plain "Source location")

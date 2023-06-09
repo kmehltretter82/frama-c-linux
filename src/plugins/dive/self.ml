@@ -75,9 +75,9 @@ struct
         with Not_found ->
           raise (Cannot_build ("no function '" ^ function_name ^ "'"))
       in
-      try Globals.Vars.find_from_astinfo variable_name (VLocal kf)
+      try Globals.Vars.find_from_astinfo variable_name (Whole_function kf)
       with Not_found ->
-      try Globals.Vars.find_from_astinfo variable_name (VFormal kf)
+      try Globals.Vars.find_from_astinfo variable_name (Formal kf)
       with Not_found ->
         raise (Cannot_build ("no variable '" ^ variable_name ^ "' in function "
                              ^ function_name))

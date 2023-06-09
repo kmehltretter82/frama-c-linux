@@ -183,6 +183,12 @@
   background: var(--code-bullet);
 }
 
+.cm-deadcode-gutter {
+  width: 4px;
+  background: var(--code-bullet);
+  color: var(--dead-code);
+}
+
 .cm-hovered-code {
   background-color: var(--code-hover);
 }
@@ -199,14 +205,12 @@
   background-color: var(--highlighted-marker);
 }
 
-.cm-dead-code {
+:not(.cm-dead-code) > .cm-dead-code {
   font-style: italic;
-  filter: opacity(0.7);
+  filter: opacity(0.5);
 }
 
 .cm-non-term-code {
-  font-style: italic;
-  filter: opacity(0.7);
 }
 
 .cm-tainted {

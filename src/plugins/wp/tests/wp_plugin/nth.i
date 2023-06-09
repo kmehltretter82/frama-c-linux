@@ -83,14 +83,16 @@
   check lemma nth_repeat_3: ok: \nth ( ([| f(0), f(1), f(2), f(3) |] *^ 3) ^ [| f(12) |] , 12 ) ==  f(12);
   check lemma nth_repeat_4: ok: \nth ( ([| f(0), f(1), f(2), f(3) |] *^ 3) ^ [| f(12),f(13),f(14)|] ^ S, 13 ) ==  f(13);
 
-  lemma access_16_16: ok:
-  \forall integer k ; 0 <= k < 16 ==>
-    f(k)==\nth([| f(0), f(1), f(2),  f(3),  f(4),  f(5),  f(6),  f(7),
-                  f(8), f(9), f(10), f(11), f(12), f(13), f(14), f(15) |], k);
 
   lemma access_4_4: ok:
   \forall integer k ; 0 <= k < 4 ==>
-    f(k)==\nth([| f(0), f(1), f(2),  f(3) |], k);
+    f(k)==\nth([| f(0), f(1), f(2), f(3) |], k);
+
+  // Performance problem with Alt-Ergo, cvc4 & z3 are ok.
+  lemma access_8_8: ko:
+  \forall integer k ; 0 <= k < 6 ==>
+    f(k)==\nth([| f(0), f(1), f(2), f(3),
+                  f(4), f(5), f(6), f(7) |], k);
 
   lemma eq_repeat_concat_3: ok: (S *^ 3) == (S ^ S ^ S) ;
 

@@ -1,11 +1,6 @@
 /* run.config*
- EXIT: 1
- MODULE: @PTEST_NAME@.cmxs
- DEPS: @PTEST_NAME@/__fc_machdep_custom.h
-   OPT: -cpp-extra-args="-I./@PTEST_NAME@ -D__FC_MACHDEP_CUSTOM" -machdep custom -print -then -print
-  COMMENT: we need a -then to test double registering of a machdep
+ OPT: -machdep %{dep:@PTEST_DIR@/@PTEST_NAME@.yaml} -print
 */
-#include "__fc_machdep_custom.h"
 // most of the following includes are not directly used, but they test if
 // the custom machdep has defined the necessary constants
 #include <ctype.h>
@@ -22,4 +17,4 @@
 #include <time.h>
 #include <wchar.h>
 
-int main() { return INT_MAX; }
+int main() { return INT_MAX - CUSTOM_MACHDEP; }

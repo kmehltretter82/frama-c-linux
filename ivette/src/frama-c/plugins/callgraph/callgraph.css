@@ -1,0 +1,6 @@
+.callgraph-computing {
+  max-width: 90%;
+  max-height: 200px;
+  fill: var(--info-text-discrete);
+  margin: auto;
+}

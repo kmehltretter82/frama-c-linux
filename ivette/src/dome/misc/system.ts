@@ -114,7 +114,7 @@ emitter.setMaxListeners(250);
 // --- At Exit
 // --------------------------------------------------------------------------
 
-export type Callback = () => void;
+export type Callback = () => (void | Promise<void>);
 
 const exitJobs: Callback[] = [];
 
@@ -128,11 +128,14 @@ export function atExit(callback: Callback): void {
 }
 
 /** Execute all pending exit jobs (and flush the list). */
-export function doExit(): void {
-  exitJobs.forEach((fn) => {
-    try { fn(); }
+export async function doExit(): Promise<void> {
+  await Promise.all(exitJobs.map(async (fn) => {
+    try {
+      const promise = fn();
+      promise && await promise;
+    }
     catch (err) { D.error('atExit:', err); }
-  });
+  }));
   exitJobs.length = 0;
 }
 
@@ -144,6 +147,7 @@ let COMMAND_WDIR = '.';
 let COMMAND_ARGV: string[] = [];
 
 function setCommandLine(argv: string[], wdir: string): void {
+  process.chdir(wdir);
   COMMAND_ARGV = argv;
   COMMAND_WDIR = wdir;
 }
@@ -464,13 +468,16 @@ export function rename(oldPath: string, newPath: string): Promise<void> {
 
 const childprocess = new Map<number, Exec.ChildProcess>();
 
-atExit(() => {
-  childprocess.forEach((process, pid) => {
-    try { process.kill(); }
-    catch (err) {
-      D.warn('killing process', pid, err);
+atExit(async () => {
+  await Promise.all(Array.from(childprocess.values()).map(async (process) => {
+    try {
+      process.kill();
+      await new Promise(resolve => process.on('exit', resolve));
     }
-  });
+    catch (err) {
+      D.warn('killing process', process.pid, err);
+    }
+  }));
 });
 
 export type StdPipe = { path?: string | undefined; mode?: number; pipe?: boolean };

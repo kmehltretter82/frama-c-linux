@@ -81,6 +81,7 @@ const kindFilter: KindFilter = {
    messages. They are all shown by default. */
 const pluginFilter: PluginFilter = {
   'aorai': true,
+  'cg': true,
   'dive': true,
   'e-acsl': true,
   'eva': true,
@@ -426,7 +427,7 @@ export default function RenderMessages(): JSX.Element {
     return m;
   });
 
-  const data = States.useSyncArray(Kernel.message).getArray();
+  const data = States.useSyncArrayData(Kernel.message);
 
   React.useEffect(() => {
     model.removeAllData();
@@ -455,7 +456,7 @@ export default function RenderMessages(): JSX.Element {
       selectMsg(msg);
       setText(msg.message);
       if (msg.fct && msg.marker) {
-        const location = { fct:msg.fct, marker:msg.marker };
+        const location = { fct: msg.fct, marker: msg.marker };
         updateSelection({ location });
       }
     }, [updateSelection],

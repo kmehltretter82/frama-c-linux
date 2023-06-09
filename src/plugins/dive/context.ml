@@ -24,8 +24,6 @@ open Dive_types
 
 module Graph = Dive_graph
 
-let dkey = Self.register_category "context"
-
 
 module NodeRef = Datatype.Pair_with_collections
     (Node_kind) (Callstack)
@@ -36,6 +34,8 @@ module NodeTable = FCHashtbl.Make (NodeRef)
 module NodeSet = Graph.Node.Set
 module BaseSet = Cil_datatype.Varinfo.Set
 
+type element = Node of node | Edge of (node * dependency * node)
+
 type t = {
   mutable graph: Graph.t;
   mutable vertex_table: node Index.t; (* node_key -> node *)
@@ -44,14 +44,17 @@ type t = {
   mutable hidden_bases: BaseSet.t;
   mutable max_dep_fetch_count: int;
   mutable roots: NodeSet.t;
-  mutable graph_diff: graph_diff;
+  mutable update_hook : element -> unit;
+  mutable remove_hook : element -> unit;
+  mutable clear_hook : unit -> unit;
 }
 
 
 (* --- initialization --- *)
 
+let no_hook = fun _ -> ()
+
 let create () =
-  Eva.Analysis.compute ();
   {
     graph = Graph.create ();
     vertex_table = Index.create 13;
@@ -60,7 +63,9 @@ let create () =
     hidden_bases = BaseSet.empty;
     max_dep_fetch_count = 10;
     roots = NodeSet.empty;
-    graph_diff = { last_root = None ; added_nodes=[] ; removed_nodes=[] };
+    update_hook = no_hook;
+    remove_hook = no_hook;
+    clear_hook = no_hook;
   }
 
 let clear context =
@@ -69,7 +74,22 @@ let clear context =
   context.node_table <- NodeTable.create 13;
   context.max_dep_fetch_count <- 10;
   context.roots <- NodeSet.empty;
-  context.graph_diff <- { last_root = None ; added_nodes=[] ; removed_nodes=[] }
+  context.clear_hook ()
+
+
+(* Hooks *)
+
+let set_update_hook context f =
+  context.update_hook <- f
+
+let set_remove_hook context f =
+  context.remove_hook <- f
+
+let set_clear_hook context f =
+  context.clear_hook <- f
+
+let notify_node_update context node =
+  context.update_hook (Node node)
 
 
 (* --- Accessors --- *)
@@ -84,36 +104,6 @@ let get_max_dep_fetch_count context =
   context.max_dep_fetch_count
 
 
-(* --- State --- *)
-
-let is_node_updated context node =
-  let is_node n = Graph.Node.equal node n in
-  List.exists is_node context.graph_diff.removed_nodes ||
-  List.exists is_node context.graph_diff.added_nodes
-
-let update_diff context node =
-  if not (is_node_updated context node) then
-    context.graph_diff <- {
-      context.graph_diff with
-      added_nodes = node :: context.graph_diff.added_nodes;
-    }
-
-let take_last_diff context =
-  let pp_node fmt n = Format.pp_print_int fmt n.node_key in
-  let pp_node_list = Pretty_utils.pp_list ~sep:",@, " pp_node in
-  let diff = context.graph_diff in
-  Self.debug ~dkey "root: %a,@, added: %a,@, subbed: %a"
-    (Pretty_utils.pp_opt pp_node) diff.last_root
-    pp_node_list diff.added_nodes
-    pp_node_list diff.removed_nodes;
-  context.graph_diff <- {
-    last_root = None ;
-    added_nodes=[] ;
-    removed_nodes=[]
-  };
-  diff
-
-
 (* --- Roots --- *)
 
 let get_roots context =
@@ -123,15 +113,11 @@ let update_roots context new_roots =
   let old_roots = context.roots in
   context.roots <- new_roots;
   let unset n =
-    if not (NodeSet.mem n new_roots) then begin
-      n.node_is_root <- false;
-      update_diff context n
-    end
+    n.node_is_root <- false;
+    context.update_hook (Node n);
   and set n =
-    if not (NodeSet.mem n old_roots) then begin
-      n.node_is_root <- true;
-      update_diff context n
-    end
+    n.node_is_root <- true;
+    context.update_hook (Node n);
   in
   NodeSet.iter unset old_roots;
   NodeSet.iter set new_roots
@@ -180,7 +166,7 @@ let add_node context ~node_kind ~node_locality =
     let node = Graph.create_node context.graph ~node_kind ~node_locality in
     node.node_hidden <- is_hidden context node.node_kind;
     Index.add context.vertex_table node.node_key node;
-    update_diff context node;
+    context.update_hook (Node node);
     node
   in
   NodeTable.memo context.node_table node_ref add_new
@@ -190,12 +176,28 @@ let remove_node context node =
   let graph = context.graph in
   Graph.iter_succ (fun n -> n.node_writes_computation <- NotDone) graph node;
   Graph.iter_pred (fun n -> n.node_reads_computation <- NotDone) graph node;
+  Graph.iter_succ_e (fun e -> context.remove_hook (Edge e)) graph node;
+  Graph.iter_pred_e (fun e -> context.remove_hook (Edge e)) graph node;
   Graph.remove_node context.graph node;
   Index.remove context.vertex_table node.node_key;
   NodeTable.remove context.node_table node_ref;
-  let is_not_node n = not (Graph.Node.equal node n) in
-  context.graph_diff <- {
-    context.graph_diff with
-    added_nodes = List.filter is_not_node context.graph_diff.added_nodes;
-    removed_nodes = node :: context.graph_diff.removed_nodes;
-  }
+  context.remove_hook (Node node)
+
+let add_dep context ~origin ~kind src dest =
+  let edge = Graph.create_dependency context.graph ~origin ~kind src dest in
+  context.update_hook (Edge edge)
+
+let remove_dep context edge =
+  Graph.remove_dependency context.graph edge;
+  context.remove_hook (Edge edge)
+
+let remove_node_deps context node =
+  Graph.iter_pred_e (remove_dep context) context.graph node
+
+let update_node_values context node ~typ ~cvalue ~taint =
+  Graph.update_node_values node ~typ ~cvalue ~taint;
+  notify_node_update context node
+
+let set_node_writes context node writes =
+  node.node_writes <- List.sort_uniq Studia.Writes.compare writes;
+  notify_node_update context node

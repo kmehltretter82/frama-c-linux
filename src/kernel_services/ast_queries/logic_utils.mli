@@ -78,6 +78,11 @@ val logicCType : logic_type -> typ
 (** transforms an array into pointer. *)
 val array_to_ptr : logic_type -> logic_type
 
+(** removes qualifiers if logic_type is a C type, identity otherwise.
+    @since 27.0-Cobalt
+*)
+val logic_type_remove_qualifiers: logic_type -> logic_type
+
 (** C type to logic type, with implicit conversion for arithmetic types.
     @since 21.0-Scandium
 *)
@@ -146,9 +151,12 @@ val numeric_coerce: logic_type -> term -> term
 (** \valid_range *)
 (* val mk_pvalid_range: ?loc:location -> term * term * term -> predicate *)
 
-val pointer_comparable: ?loc:location -> term -> term -> predicate
-(** \pointer_comparable
-    @since Fluorine-20130401 *)
+val pointer_comparable:
+  ?loc:location -> ?label:logic_label -> term -> term -> predicate
+(** \pointer_comparable. [label] defaults to {!Logic_const.here_label}
+    @since Fluorine-20130401
+    @before 27.0-Cobalt no [label] argument, as the builtin did not take a label
+*)
 
 (** {2 Conversion from exp to term} *)
 

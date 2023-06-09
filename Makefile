@@ -74,6 +74,21 @@ endif
 	rm -rf _build .merlin
 
 ##############################################################################
+# IVETTE
+################################
+
+.PHONY: ivette ivette-dev
+
+ivette: all
+	@$(MAKE) -C ivette
+
+ivette-api: all
+	@$(MAKE) -C ivette api
+
+ivette-dev: all
+	@$(MAKE) -C ivette dev
+
+##############################################################################
 # HELP
 ################################
 

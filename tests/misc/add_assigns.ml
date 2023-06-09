@@ -11,7 +11,7 @@ let main () =
     computed := true;
     Ast.compute ();
     let kf = Globals.Functions.find_by_name "f" in
-    let y = Globals.Vars.find_from_astinfo "y" (VFormal kf) in
+    let y = Globals.Vars.find_from_astinfo "y" (Formal kf) in
     let mem =
       Logic_const.(
         new_identified_term
