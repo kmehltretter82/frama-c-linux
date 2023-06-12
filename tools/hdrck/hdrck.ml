@@ -142,11 +142,7 @@ let error ~exit_value =
    in the header_spec.txt files.
 *)
 let path_concat p1 p2 =
-  (* Note: use String.ends_with when minimum OCaml version is 4.13 *)
-  if String.length p1 > 0 && String.get p1 (String.length p1 - 1) = '/' then
-    p1 ^ p2
-  else
-    p1 ^ "/" ^ p2
+  if String.ends_with ~suffix:"/" p1 then p1 ^ p2 else p1 ^ "/" ^ p2
 
 (* Temporary directory management (cont.) *)
 let get_tmp_dirname () = match !tmp_dirname with

@@ -471,7 +471,7 @@ struct
       M.compare v1 v2 <?> lazy (B.compare u1 u2)
     in
     B.compare m1.start m2.start <?>
-    lazy (Transitioning.List.compare compare_segments m1.segments m2.segments) <?>
+    lazy (List.compare compare_segments m1.segments m2.segments) <?>
     lazy (Bit.compare m1.padding m2.padding)
 
   let equal (m1 : t) (m2 : t) : bool =
@@ -479,7 +479,7 @@ struct
       M.equal v1 v2 && B.equal u1 u2
     in
     B.equal m1.start m2.start &&
-    Transitioning.List.equal equal_segments m1.segments m2.segments &&
+    List.equal equal_segments m1.segments m2.segments &&
     Bit.equal m1.padding m2.padding
 
   let raw (m : t) : bit =
