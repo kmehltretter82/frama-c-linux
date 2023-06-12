@@ -333,7 +333,7 @@ let get_current_stdheader () =
   let rec aux = function
     | [] -> ""
     | [ s ] -> s
-    | s :: l when Extlib.string_prefix ~strict:true "__fc_" s -> aux l
+    | s :: l when String.starts_with ~prefix:"__fc_" s -> aux l
     | s :: _ -> s
   in
   aux !current_stdheader
@@ -9103,7 +9103,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     let full_name =
       (* Mangled symbols (that is, starting with '_Z') are unique by
          construction. No need to add current function name as prefix. *)
-      if Extlib.string_prefix ~strict:true "_Z" n
+      if String.starts_with ~prefix:"_Z" n && n <> "_Z"
       then n
       else !currentFunctionFDEC.svar.vname ^ "_" ^ n
     in

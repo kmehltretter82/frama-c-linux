@@ -450,22 +450,22 @@ let pointed_type ty =
 (* ************************************************************************** *)
 
 let can_be_cea_function name =
-  Extlib.string_prefix "Frama_" name
+  String.starts_with ~prefix:"Frama_" name
 
 let is_cea_function name =
-  Extlib.string_prefix "Frama_C_show_each" name
+  String.starts_with ~prefix:"Frama_C_show_each" name
 
 let is_cea_domain_function name =
-  Extlib.string_prefix "Frama_C_domain_show_each" name
+  String.starts_with ~prefix:"Frama_C_domain_show_each" name
 
 let is_cea_dump_function name =
-  Extlib.string_prefix "Frama_C_dump_each" name
+  String.starts_with ~prefix:"Frama_C_dump_each" name
 
 let is_cea_dump_file_function name =
-  Extlib.string_prefix "Frama_C_dump_each_file" name
+  String.starts_with ~prefix:"Frama_C_dump_each_file" name
 
 let is_cea_builtin name =
-  Extlib.string_prefix "Frama_C_builtin" name
+  String.starts_with ~prefix:"Frama_C_builtin" name
 
 let is_frama_c_builtin n =
   can_be_cea_function n &&

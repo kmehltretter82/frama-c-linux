@@ -226,7 +226,7 @@ let add_path path =
   | Some symb -> symb ^ Buffer.contents buf
 
 let rec skip_dot file_name =
-  if Extlib.string_prefix "./" file_name then
+  if String.starts_with ~prefix:"./" file_name then
     skip_dot (String.sub file_name 2 (String.length file_name - 2))
   else file_name
 
@@ -237,7 +237,8 @@ let pretty file_name =
     let path = insert cwd file_name in
     let file_name = path.path_name in
     let cwd_name = cwd.path_name in
-    if Extlib.string_prefix ~strict:true cwd_name file_name then
+    if String.starts_with ~prefix:cwd_name file_name && cwd_name <> file_name
+    then
       let n = 1 + String.length cwd_name in
       String.sub file_name n (String.length file_name - n)
     else
@@ -255,7 +256,7 @@ let relativize ?base_name file_name =
   in
   if base_name = file_name then "." else
     let base_name = base_name ^ Filename.dir_sep in
-    if Extlib.string_prefix base_name file_name then
+    if String.starts_with ~prefix:base_name file_name then
       let n = String.length base_name in
       let file_name = String.sub file_name n (String.length file_name - n) in
       if file_name = "" then "." else file_name
@@ -268,7 +269,7 @@ let is_relative ?base_name file_name =
     | Some b -> (insert cwd b).path_name
   in
   base_name = file_name
-  || Extlib.string_prefix (base_name ^ Filename.dir_sep) file_name
+  || String.starts_with ~prefix:(base_name ^ Filename.dir_sep) file_name
 
 (* -------------------------------------------------------------------------- *)
 (* --- Normalized Typed Module                                            --- *)

@@ -512,7 +512,7 @@ let pretty_used_files used_files =
   let used_included_c_files =
     Datatype.Filepath.Set.filter
       (fun f ->
-         Extlib.string_suffix ~strict:true ".c"
+         String.ends_with ~suffix:".c"
            (f : Filepath.Normalized.t :> string))
       used_included_files
   in
