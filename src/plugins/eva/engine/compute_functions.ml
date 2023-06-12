@@ -352,14 +352,14 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   let compute kf init_state =
     let restore_signals = register_signal_handler () in
     let compute () =
-      let callstack = Callstack.init kf in
+      let callstack = Callstack.init_local kf in
       Eva_utils.set_call_stack callstack;
       store_initial_state callstack init_state;
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in
       let final_result = compute_call Kglobal call None init_state in
       let final_states = List.map snd (final_result.Transfer.states) in
       let final_state = PowersetDomain.(final_states |> of_list |> join) in
-      Eva_utils.pop_call_stack ();
+      Eva_utils.clear_call_stack ();
       Self.feedback "done for function %a" Kernel_function.pretty kf;
       Abstract.Dom.Store.mark_as_computed ();
       Self.(set_computation_state Computed);
@@ -372,6 +372,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let cleanup () =
       Abstract.Dom.Store.mark_as_computed ();
       Self.(set_computation_state Aborted);
+      Eva_utils.clear_call_stack ();
       post_analysis_cleanup ~aborted:true
     in
     Eva_utils.protect compute ~cleanup

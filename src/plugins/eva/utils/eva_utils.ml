@@ -27,12 +27,18 @@ open Cil_types
 let current_callstack : Callstack.t option ref = ref None
 
 let clear_call_stack () =
-  current_callstack := None
+  match !current_callstack with
+  | None -> ()
+  | Some cs ->
+    if Callstack.is_local cs then
+      Eva_perf.stop_doing (Callstack.to_legacy cs);
+    current_callstack := None
 
 let set_call_stack cs =
   assert (!current_callstack = None);
   current_callstack := Some cs;
-  Eva_perf.start_doing (Callstack.to_legacy cs)
+  if Callstack.is_local cs then
+    Eva_perf.start_doing (Callstack.to_legacy cs)
 
 let current_call_stack () =
   match !current_callstack with
