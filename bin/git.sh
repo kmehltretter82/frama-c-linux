@@ -35,18 +35,26 @@ then
     echo "  git.sh -h|--help"
     echo "  git.sh clone <repo> <dir>"
     echo "  git.sh remove <dir>"
-    echo "  git.sh <command>"
+    echo "  git.sh exec <command...>"
+    echo "  git.sh cat <file> <command...>"
+    echo "  git.sh <command...>"
     echo ""
-    echo "The form 'git.sh clone <repo> <dir>' performs"
+    echo "Command 'git.sh clone <repo> <dir>' performs"
     echo "an inner clone of <repo> inside <dir> sub-directory"
     echo "and add <dir> to the excluded directories of the root."
     echo ""
-    echo "The form 'git.sh remove <dir>' removes the git"
+    echo "Command 'git.sh remove <dir>' removes the git"
     echo "clone at <dir>, if any."
+    echo ""
+    echo "Command 'git.sh exec <command>' executes the given command"
+    echo "in each git repository."
+    echo ""
+    echo "Command 'git.sh cat <file> <command>' executes the given command"
+    echo "in each git repository and concat their output to the given file."
     echo ""
     echo "Otherwize, 'git.sh <command>' broadcast the command"
     echo "to all '.git' repository accessible from the root."
-    echo "The default command is 'git.sh status -s -b'."
+    echo "The default command is 'status -s -b'."
     echo ""
     exit 0
 fi
@@ -94,6 +102,31 @@ then
     ACTION="status -s -b"
 fi
 
+if [ "$1" == "exec" ]
+then
+    shift
+    ROOT=`pwd`
+    COMMAND="$*"
+fi
+
+if [ "$1" == "cat" ]
+then
+    shift
+    ROOT=`pwd`
+    case $1 in
+        /*)
+            TARGET="$1"
+        ;;
+        *)
+            TARGET="$ROOT/$1"
+        ;;
+    esac
+    shift
+    COMMAND="$*"
+    rm -f $TARGET
+    touch $TARGET
+fi
+
 for pgit in `find . -type d -name .git`
 do
 
@@ -103,7 +136,21 @@ do
     echo "-- Repository $plugin"
     echo "--------------------------------------------------"
 
-    git -C $plugin $ACTION
+    if [ -f $TARGET ]
+    then
+        cd $plugin
+        if [ "$TARGET" != "" ]
+        then
+            echo "$ $COMMAND >> $TARGET"
+            $COMMAND >> $TARGET
+        else
+            echo "$ $COMMAND"
+            $COMMAND
+        fi
+        cd $ROOT
+    else
+        git -C $plugin $ACTION
+    fi
 
 done
 echo "--------------------------------------------------"
