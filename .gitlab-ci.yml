@@ -388,7 +388,7 @@ ocaml-versions-nightly:
     - sudo apt update
     - opam pin . -n
     - opam depext frama-c --with-test
-    - opam install --jobs 2 frama-c --with-test
+    - opam install --jobs 2 frama-c --with-test --with-doc
     - frama-c -version
   tags:
     - docker

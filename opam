@@ -90,13 +90,18 @@ tags: [
 
 build: [
   ["bash" "dev/disable-plugins.sh" "e-acsl"] { os-family = "windows" }
-  ["dune" "build" "-j%{jobs}%" "--release" "--promote-install-files=false" "@install"]
-  [make "-C" "doc" "download"] {with-doc}
+  ["dune" "build" "-j%{jobs}%" "--release" "--promote-install-files=false"
+   "@install"
+   "@doc" { with-doc }
+  ]
 ]
 
 install: [
-  [make "PREFIX=%{prefix}%" "MANDIR=%{mandir}%" "install"]
-  [make "PREFIX=%{prefix}%" "-C" "doc" "install"] {with-doc}
+  [make
+   "PREFIX=%{prefix}%" "MANDIR=%{man}%"
+   "DOCDIR=%{doc}%" { with-doc }
+   "install"
+  ]
 ]
 
 remove: [
@@ -122,6 +127,7 @@ depends: [
   "ocaml" { >= "4.11.1" }
   "ocamlfind" # needed beyond build stage, used by -load-module
   "ocamlgraph" { >= "1.8.8" }
+  "odoc" { with-doc }
   "why3" { >= "1.6.0" }
   "yaml" { >= "3.0.0" }
   "yojson" {>= "1.6.0" & (>= "2.0.1" | !with-test)}
