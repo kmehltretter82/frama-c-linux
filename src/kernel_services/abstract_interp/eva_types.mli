@@ -41,6 +41,8 @@ sig
 
   include Datatype.S_with_collections with type t = callstack
 
+  val compare_lex : t -> t -> int
+
   val init_global : Cil_types.varinfo -> t
   val init_local : ?thread:int -> Cil_types.kernel_function -> t
 

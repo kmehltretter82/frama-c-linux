@@ -63,6 +63,14 @@ struct
       List.iter (pp_call fmt) cs.stack;
       Format.fprintf fmt "%a@]" Kernel_function.pretty cs.entry_point
 
+    let compare_lex ls1 ls2 =
+      if ls1 == ls2 then 0 else
+        let c = Thread.compare ls1.thread ls2.thread in
+        if c <> 0 then c else
+          let c = Kernel_function.compare ls1.entry_point ls2.entry_point in
+          if c <> 0 then c else
+            Calls.compare (List.rev ls1.stack) (List.rev ls2.stack)
+
     let hash cs =
       Hashtbl.hash
         (cs.thread, Kernel_function.hash cs.entry_point, Calls.hash cs.stack)
@@ -105,6 +113,10 @@ struct
 
   include Datatype.Make_with_collections (Prototype)
 
+  let compare_lex cs1 cs2 =
+    match cs1, cs2 with
+    | Local ls1, Local ls2 -> LocalStack.compare_lex ls1 ls2
+    | cs1, cs2 -> compare cs1 cs2
 
   (* Constructor *)
 

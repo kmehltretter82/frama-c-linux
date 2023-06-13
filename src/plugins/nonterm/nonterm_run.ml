@@ -328,7 +328,7 @@ let run () =
           let warned_kfs =
             Stmt.Hptset.fold (fun stmt acc ->
                 let cs = Hashtbl.find nonterm_stacks stmt in
-                let cs = List.sort Eva.Callstack.compare cs in
+                let cs = List.sort Eva.Callstack.compare_lex cs in
                 warn_nonterminating_statement stmt cs;
                 Kernel_function.Set.add (Kernel_function.find_englobing_kf stmt) acc
               ) new_nonterm_stmts Kernel_function.Set.empty

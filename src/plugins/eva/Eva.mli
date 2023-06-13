@@ -143,6 +143,11 @@ module Callstack: sig
     with type t = callstack
      and module Hashtbl = Eva_types.Callstack.Hashtbl
 
+  (** [compare_lex] compares callstack lexicographically, slightly slower
+      than [compare] but in a more natural order, giving more importance
+      to the function at bottom of the callstack - the first functions called. *)
+  val compare_lex : t -> t -> int
+
   (* Constructor *)
   val init_global : Cil_types.varinfo -> t
   val init_local : ?thread:int -> Cil_types.kernel_function -> t
