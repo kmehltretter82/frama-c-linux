@@ -108,14 +108,7 @@
   Called from FRAMAC_SHARE/libc/stdio.c:82.
 [eva] Done for function feof
 [eva] FRAMAC_SHARE/libc/stdio.c:84: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:84: Reusing old results for call to fgetc
 [eva] FRAMAC_SHARE/libc/stdio.c:104: Call to builtin realloc
-[eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:82.
-[eva] Done for function ferror
-[eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:82.
-[eva] Done for function feof
 [eva:alarm] FRAMAC_SHARE/libc/stdio.c:93: Warning: 
   out of bounds write. assert \valid(*lineptr + cur);
 [eva] Recording results for getline
