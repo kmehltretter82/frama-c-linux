@@ -132,7 +132,7 @@ class prover ~(console:Wtext.text) ~prover =
           self#set_action ~tooltip:"Run Prover" ~icon:`MEDIA_PLAY ~callback () ;
           Pretty_utils.ksfprintf self#set_label "%a (%a)" VCS.pp_prover prover
             Rformat.pp_time res.VCS.prover_time ;
-        | VCS.Invalid | VCS.Unknown | VCS.Timeout | VCS.Stepout ->
+        | VCS.Unknown | VCS.Timeout | VCS.Stepout ->
           let callback () = self#run wpo in
           self#set_status ko_status ;
           self#set_action ~tooltip:"Run Prover" ~icon:`MEDIA_PLAY ~callback () ;

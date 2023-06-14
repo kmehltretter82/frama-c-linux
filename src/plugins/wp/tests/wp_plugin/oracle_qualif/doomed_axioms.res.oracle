@@ -18,7 +18,9 @@
 [wp] [Valid] typed_foo_loop_assigns (Qed)
 [wp] Proved goals:    7 / 10
   Qed:             1
-  Alt-Ergo:        9
+  Alt-Ergo:        6
+  Failed:          3
+  Smoke Tests:     0 / 3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   foo                       1        6       10      70.0%

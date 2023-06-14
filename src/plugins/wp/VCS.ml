@@ -192,7 +192,6 @@ let get_stepout = function
 
 type verdict =
   | NoResult
-  | Invalid
   | Unknown
   | Timeout
   | Stepout
@@ -211,7 +210,7 @@ type result = {
 }
 
 let is_result = function
-  | Valid | Unknown | Invalid | Timeout | Stepout | Failed -> true
+  | Valid | Unknown | Timeout | Stepout | Failed -> true
   | NoResult | Computing _ -> false
 
 let is_verdict r = is_result r.verdict
@@ -219,15 +218,10 @@ let is_valid = function { verdict = Valid } -> true | _ -> false
 let is_trivial r = is_valid r && r.prover_time = 0.0
 let is_not_valid r = is_verdict r && not (is_valid r)
 let is_computing = function { verdict=Computing _ } -> true | _ -> false
-
-let smoked = function
-  | (Failed | NoResult | Computing _) as r -> r
-  | Valid -> Invalid
-  | Invalid | Unknown | Timeout | Stepout -> Valid
-
-let verdict ~smoke r = if smoke then smoked r.verdict else r.verdict
-
-let is_proved ~smoke r = (verdict ~smoke r = Valid)
+let is_proved ~smoke = function
+  | NoResult | Computing _ | Failed -> false
+  | Valid -> not smoke
+  | Unknown | Timeout | Stepout -> smoke
 
 let configure r =
   let valid = (r.verdict = Valid) in
@@ -280,7 +274,6 @@ let result ?(cached=false) ?(solver=0.0) ?(time=0.0) ?(steps=0) verdict =
 
 let no_result = result NoResult
 let valid = result Valid
-let invalid = result Invalid
 let unknown = result Unknown
 let timeout t = result ~time:t Timeout
 let stepout n = result ~steps:n Stepout
@@ -320,7 +313,6 @@ let pp_perf_shell fmt r =
 
 let name_of_verdict = function
   | NoResult | Computing _ -> "none"
-  | Invalid -> "invalid"
   | Valid -> "valid"
   | Failed -> "failed"
   | Unknown -> "unknown"
@@ -331,7 +323,6 @@ let pp_result fmt r =
   match r.verdict with
   | NoResult -> Format.pp_print_string fmt "No Result"
   | Computing _ -> Format.pp_print_string fmt "Computing"
-  | Invalid -> Format.pp_print_string fmt "Invalid"
   | Failed -> Format.fprintf fmt "Failed@ %s" r.prover_errmsg
   | Valid -> Format.fprintf fmt "Valid%a" pp_perf_shell r
   | Unknown -> Format.fprintf fmt "Unknown%a" pp_perf_shell r
@@ -358,7 +349,6 @@ let pp_result_qualif ?(updating=true) prover result fmt =
     match result.verdict with
     | NoResult -> Format.pp_print_string fmt "No Result"
     | Computing _ -> Format.pp_print_string fmt "Computing"
-    | Invalid -> Format.pp_print_string fmt "Invalid"
     | Failed -> Format.fprintf fmt "Failed@ %s" result.prover_errmsg
     | Valid -> pp_cache_miss fmt "Valid" updating prover result
     | Unknown -> pp_cache_miss fmt "Unsuccess" updating prover result
@@ -367,13 +357,22 @@ let pp_result_qualif ?(updating=true) prover result fmt =
   else
     pp_result fmt result
 
+(* highest is best *)
 let vrank = function
-  | NoResult | Computing _ -> 0
-  | Failed -> 1
-  | Unknown -> 2
-  | Timeout | Stepout -> 3
-  | Valid -> 4
-  | Invalid -> 5
+  | Computing _ -> 0
+  | NoResult -> 1
+  | Failed -> 2
+  | Unknown -> 3
+  | Timeout -> 4
+  | Stepout -> 5
+  | Valid -> 6
+
+let conjunction a b =
+  match a,b with
+  | Valid,Valid -> Valid
+  | Valid, r -> r
+  | r , Valid -> r
+  | _ -> if vrank b > vrank a then b else a
 
 let compare p q =
   let r = vrank q.verdict - vrank p.verdict in
@@ -384,32 +383,5 @@ let compare p q =
       if t <> 0 then t else
         Stdlib.compare p.solver_time q.solver_time
 
-let combine v1 v2 =
-  match v1 , v2 with
-  | Valid , Valid -> Valid
-  | Failed , _ | _ , Failed -> Failed
-  | Invalid , _ | _ , Invalid -> Invalid
-  | Timeout , _ | _ , Timeout -> Timeout
-  | Stepout , _ | _ , Stepout -> Stepout
-  | _ -> Unknown
-
-let merge r1 r2 =
-  let err = if r1.prover_errmsg <> "" then r1 else r2 in
-  {
-    verdict = combine r1.verdict r2.verdict ;
-    cached = r1.cached && r2.cached ;
-    solver_time = max r1.solver_time r2.solver_time ;
-    prover_time = max r1.prover_time r2.prover_time ;
-    prover_steps = max r1.prover_steps r2.prover_steps ;
-    prover_errpos = err.prover_errpos ;
-    prover_errmsg = err.prover_errmsg ;
-  }
-
-let leq r1 r2 =
-  match is_valid r1 , is_valid r2 with
-  | true , false -> true
-  | false , true -> false
-  | _ -> compare r1 r2 <= 0
-
-let choose r1 r2 = if leq r1 r2 then r1 else r2
-let best = List.fold_left choose no_result
+let bestp pr1 pr2 = if compare (snd pr1) (snd pr2) <= 0 then pr1 else pr2
+let best = List.fold_left bestp (Qed,no_result)

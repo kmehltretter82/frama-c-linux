@@ -54,8 +54,10 @@
 [wp] [Valid] typed_f5_ko_assigns_part3 (Qed)
 [wp] [Valid] typed_f5_ko_assigns_part4 (Qed)
 [wp] Proved goals:   46 / 48
-  Qed:            27
+  Qed:            25
   Alt-Ergo:       21
+  Failed:          2
+  Smoke Tests:    21 / 23
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f1_ok                     3        3        6       100%

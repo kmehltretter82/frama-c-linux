@@ -24,8 +24,9 @@
 [wp] doomed_pre.i:56: Warning: Failed smoke-test
 [wp] [Failed] (Doomed) typed_reqs_massumes_wp_smoke_B2_assumes (Qed)
 [wp] Proved goals:    5 / 13
-  Qed:             8
   Alt-Ergo:        5
+  Failed:          8
+  Smoke Tests:     5 / 13
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   requires                  -        -        1       0.0%

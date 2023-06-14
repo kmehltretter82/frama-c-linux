@@ -336,7 +336,6 @@ let json_of_verdict = function
   | VCS.Unknown -> `String "unknown"
   | VCS.Timeout -> `String "timeout"
   | VCS.Stepout -> `String "stepout"
-  | VCS.Invalid -> `String "invalid"
   | VCS.Failed -> `String "failed"
 
 let verdict_of_json = function
@@ -344,7 +343,6 @@ let verdict_of_json = function
   | `String "unknown" -> VCS.Unknown
   | `String "timeout" -> VCS.Timeout
   | `String "stepout" -> VCS.Stepout
-  | `String "invalid" -> VCS.Invalid
   | `String "failed" -> VCS.Failed
   | _ -> VCS.NoResult
 

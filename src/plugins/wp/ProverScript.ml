@@ -119,6 +119,7 @@ struct
     width : int ;
     auto : Strategy.heuristic list ; (* DEPRECATED *)
     strategies : bool ;
+    mutable pending : int ; (* pending jobs *)
     mutable signaled : bool ;
     backtrack : int ;
     mutable backtracking : backtracking option ;
@@ -139,20 +140,12 @@ struct
 
   let progress env msg = env.progress (ProofEngine.main env.tree) msg
 
-  let stuck env =
-    if not env.signaled then
-      begin
-        ProofEngine.validate env.tree ;
-        env.success (ProofEngine.main env.tree) None ;
-        env.signaled <- true ;
-      end
-
-  let validate ?(finalize=false) env =
+  let validate env =
     ProofEngine.validate env.tree ;
     if not env.signaled then
       let wpo = ProofEngine.main env.tree in
-      let proved = Wpo.is_valid wpo in
-      if proved || finalize then
+      let proved = Wpo.is_passed wpo in
+      if proved || env.pending = 0 then
         begin
           env.signaled <- true ;
           List.iter
@@ -223,7 +216,7 @@ struct
       ~valid ~failed ~provers ~strategies
       ~depth ~width ~backtrack ~auto
       ~progress ~result ~success =
-    { tree ; valid ; failed ; provers ;
+    { tree ; valid ; failed ; provers ; pending = 0 ;
       depth ; width ; backtrack ; auto ; strategies ;
       progress ; result ; success ;
       backtracking = None ;
@@ -313,7 +306,7 @@ and autofork env ~depth fork =
       forall (auto env ~depth) (List.map snd children)
     end
   else
-    ( Env.validate env ; Task.return true )
+    Task.return true
 
 (* -------------------------------------------------------------------------- *)
 (* --- Proof Strategy Alternatives                                        --- *)
@@ -430,9 +423,7 @@ let rec crawl env on_child node = function
 
   | [] ->
     let node = ProofEngine.anchor (Env.tree env) ?node () in
-    automated env on_child node >>= fun ok ->
-    if ok then Env.validate env else Env.stuck env ;
-    Task.return ()
+    automated env on_child node
 
   | Error(msg,json) :: alternatives ->
     Wp_parameters.warning "@[<hov 2>Script Error: on goal %a@\n%S: %a@]@."
@@ -450,7 +441,7 @@ let rec crawl env on_child node = function
         else Task.return false in
       let continue ok =
         if ok
-        then (Env.validate env ; Task.return ())
+        then success
         else crawl env on_child node alternatives
       in
       task >>= continue
@@ -460,11 +451,8 @@ let rec crawl env on_child node = function
     begin
       try
         let residual = apply env node jtactic subscripts in
-        if residual = [] then
-          Env.validate env
-        else
-          List.iter (fun (_,n) -> on_child n) residual ;
-        Task.return ()
+        List.iter (fun (_,n) -> on_child n) residual ;
+        Task.return true
       with exn when Wp_parameters.protect exn ->
         Wp_parameters.warning
           "Script Error: on goal %a@\n\
@@ -493,14 +481,24 @@ let schedule job =
   Task.spawn (ProverTask.server ()) (Task.thread (Task.todo job))
 
 let rec process env node =
+  env.Env.pending <- succ env.Env.pending ;
   schedule
     begin fun () ->
       Wp_parameters.debug ~dkey:dkey_pp_allgoals "%a" (pp_subgoal env) node ;
       if ProofEngine.proved node then
-        ( Env.validate env ; Task.return () )
+        begin
+          env.pending <- pred env.pending ;
+          Env.validate env ;
+          Task.return () ;
+        end
       else
         let script = Priority.sort (ProofEngine.bound node) in
-        crawl env (process env) (Some node) script
+        crawl env (process env) (Some node) script >>=
+        begin fun _ ->
+          env.pending <- pred env.pending ;
+          Env.validate env ;
+          Task.return ()
+        end
     end
 
 let task
@@ -523,8 +521,10 @@ let task
           ~valid ~failed ~provers
           ~depth ~width ~backtrack ~auto ~strategies
           ~progress ~result ~success in
-      crawl env (process env) None script >>?
-      (fun _ -> ProofEngine.forward tree) ;
+      crawl env (process env) None script >>= fun _ ->
+      Env.validate env ;
+      ProofEngine.forward tree ;
+      Task.return ()
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -579,9 +579,8 @@ let search
         ~progress ~result ~success in
     schedule
       begin fun () ->
-        autosearch env ~depth:0 node >>=
-        fun ok ->
-        if ok then Env.validate ~finalize:true env else Env.stuck env ;
+        autosearch env ~depth:0 node >>= fun _ ->
+        Env.validate env ;
         Task.return ()
       end
   end
@@ -602,8 +601,8 @@ let explore ?(depth=0) ?(strategy)
           match strategy with
           | None -> explore_hints env (process env)
           | Some s -> explore_strategy env (fun _ -> ()) s
-        in solver node >>= fun ok ->
-        if ok then Env.validate ~finalize:true env else Env.stuck env ;
+        in solver node >>= fun _ ->
+        Env.validate env ;
         Task.return ()
       end
   end

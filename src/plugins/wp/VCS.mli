@@ -82,7 +82,6 @@ val get_stepout : config -> int (** 0 means no-stepout *)
 
 type verdict =
   | NoResult
-  | Invalid
   | Unknown
   | Timeout
   | Stepout
@@ -102,7 +101,6 @@ type result = {
 
 val no_result : result
 val valid : result
-val invalid : result
 val unknown : result
 val stepout : int -> result
 val timeout : float -> result
@@ -120,10 +118,7 @@ val is_valid: result -> bool
 val is_trivial: result -> bool
 val is_not_valid: result -> bool
 val is_computing: result -> bool
-val is_proved: smoke:bool -> result -> bool
-
-val smoked : verdict -> verdict
-val verdict: smoke:bool -> result -> verdict
+val is_proved: smoke:bool -> verdict -> bool
 
 val configure : result -> config
 val autofit : result -> bool (** Result that fits the default configuration *)
@@ -134,12 +129,8 @@ val pp_result : Format.formatter -> result -> unit
 val pp_result_qualif : ?updating:bool -> prover -> result ->
   Format.formatter -> unit
 
-val compare : result -> result -> int (* best is minimal *)
-
-val combine : verdict -> verdict -> verdict
-val merge : result -> result -> result
-val leq : result -> result -> bool
-val choose : result -> result -> result
-val best : result list -> result
+val conjunction : verdict -> verdict -> verdict (* for tactic children *)
+val compare : result -> result -> int (* minimal is best *)
+val best : (prover * result) list -> prover * result
 
 val dkey_shell: Wp_parameters.category

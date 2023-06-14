@@ -13,8 +13,10 @@
 [wp] doomed.i:41: Warning: Failed smoke-test
 [wp] [Valid] typed_buzz_ensures (Qed)
 [wp] Proved goals:    5 / 7
-  Qed:             4
+  Qed:             2
   Alt-Ergo:        3
+  Failed:          2
+  Smoke Tests:     3 / 5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   foo                       -        2        3      66.7%

@@ -34,6 +34,7 @@
 [wp] Proved goals:   28 / 28
   Qed:             8
   Alt-Ergo:       20
+  Smoke Tests:     7 / 7
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   binary_search             8       20       28       100%

@@ -495,7 +495,7 @@ module ResultType =
       let name = "Wpo.result"
       let reprs =
         List.map VCS.result
-          [ Valid ; Invalid ; Unknown ; Timeout ; Failed ]
+          [ Valid ; Unknown ; Timeout ; Failed ]
     end)
 (* to get a "reasonable" API doc *)
 let () = Type.set_ml_name ResultType.ty (Some "Wpo.result")
