@@ -33,6 +33,14 @@ doc:
 	@echo "Generated Documentation:"
 	@echo "   file:///$(PWD)/_build/default/_doc/_html/index.html"
 
+ifneq (${DOCDIR},)
+
+install:: doc
+	@mkdir -p ${DOCDIR}/frama-c
+	@cp -r _build/default/_doc/_html/* ${DOCDIR}/frama-c
+
+endif
+
 ##########################################################################
 #                                                                        #
 # Generate Documentation for Server Requests and Protocols.              #
@@ -41,7 +49,7 @@ doc:
 
 .PHONY: server-doc-md server-doc-html server-doc
 
-ifeq (NO_BUILD_FRAMAC,yes)
+ifeq (${NO_BUILD_FRAMAC},yes)
 # Make sure that Frama-C is not rebuilt essentially for CI purpose
 server-doc-md:
 else

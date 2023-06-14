@@ -91,13 +91,18 @@ tags: [
 
 build: [
   ["bash" "dev/disable-plugins.sh" "e-acsl"] { os-family = "windows" }
-  ["dune" "build" "-j%{jobs}%" "--release" "--promote-install-files=false" "@install"]
-  [make "-C" "doc" "download"] {with-doc}
+  ["dune" "build" "-j%{jobs}%" "--release" "--promote-install-files=false"
+   "@install"
+   "@doc" { with-doc }
+  ]
 ]
 
 install: [
-  [make "PREFIX=%{prefix}%" "MANDIR=%{mandir}%" "install"]
-  [make "PREFIX=%{prefix}%" "-C" "doc" "install"] {with-doc}
+  [make
+   "PREFIX=%{prefix}%" "MANDIR=%{man}%"
+   "DOCDIR=%{doc}%" { with-doc }
+   "install"
+  ]
 ]
 
 remove: [
@@ -122,6 +127,7 @@ depends: [
   "menhir" { >= "20181006" & build }
   "ocaml" { >= "4.11.1" }
   "ocamlgraph" { >= "1.8.8" }
+  "odoc" { with-doc }
   "unionFind" { >= "20220107" }
   "why3" { >= "1.6.0" }
   "yaml" { >= "3.0.0" }

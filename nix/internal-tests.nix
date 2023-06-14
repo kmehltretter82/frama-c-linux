@@ -15,6 +15,7 @@
 , apron
 , camlzip
 , camomile
+, clang
 , dune_3
 , dune-configurator
 , dune-site
@@ -74,6 +75,7 @@ stdenvNoCC.mkDerivation rec {
     alt-ergo
     camlzip
     camomile
+    clang
     dune_3
     dune-configurator
     dune-site
