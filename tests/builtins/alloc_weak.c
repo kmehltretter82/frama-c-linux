@@ -68,8 +68,30 @@ void main3() {
     eq = 0;
 }
 
+void convergence_issue(void) {
+  int size = 1;
+  int *p = calloc(size, sizeof(int));
+  while (size < 64000) {
+    /* The widened value of [size] is reduced at each loop iteration by the
+       previous allocation size of [p] through a memory access alarm.
+       [size] is then used as the next allocation size of [p], so the validity
+       of the allocated base is increased by 1 at each iteration, which
+       should not prevent convergence. */
+    int tmp = *(p+size-1);
+    size++;
+    p = calloc(size, sizeof(int));
+  }
+  int *q = p + 20000;
+  int r = *q;
+  if (v) {
+    q = p + 200000;
+    r = *q; // This dereference should always emit an alarm.
+  }
+}
+
 void main() {
   main1();
   main2();
   main3();
+  convergence_issue();
 }
