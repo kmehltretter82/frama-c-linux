@@ -356,7 +356,7 @@ cat >$JSON_DATA <<EOL
     ]
   },
 EOL
-echo "  \"description\": \"# Main changes since $PREVIOUS $PREVIOUS_NAME\n$(jq <"$CHANGES" --raw-input 'sub("^#";"##")' | jq --slurp 'join("\n")' | sed 's/^.//;s/.$//')" >> $JSON_DATA
+echo "  \"description\": \"# Main changes since $PREVIOUS $PREVIOUS_NAME\n$(jq <"$CHANGES" --raw-input 'sub("^#";"##")' | jq --slurp 'join("\n")' | sed 's/^.//;s/.$//')\"" >> $JSON_DATA
 echo "}" >> $JSON_DATA
 
 echo "Release data file built"
