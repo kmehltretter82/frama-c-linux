@@ -37,7 +37,6 @@ Change version and codename in the following files:
 \begin{itemize}
   \item \texttt{ALL\_VERSIONS} (non-beta only)
   \item \texttt{VERSION} (for beta releases, add suffix \texttt{\textasciitilde{}beta}, not \texttt{-beta})
-  \item \texttt{VERSION\_CODENAME}
   \item \texttt{opam}
   \begin{itemize}
      \item change version (for beta releases, add suffix \texttt{\textasciitilde{}beta}, not \texttt{-beta})
@@ -113,8 +112,9 @@ run of the following targets:
 \begin{itemize}
   \item manuals
   \item opam-pin
+  \item opam-pin-minimal
 \end{itemize}
-Both should succeed. Collect the artifacts of the following targets:
+They shall succeed. Collect the artifacts of the following targets:
 \begin{itemize}
   \item api-doc
   \item build-distrib-tarball
@@ -187,6 +187,10 @@ of the website and the wiki page.
 
 Create the version commit, tag it using \texttt{git tag \$(cat VERSION | sed -e "s/\textasciitilde /-/")}
 and push it (e.g. via \texttt{git push origin \$(cat VERSION | sed -e "s/\textasciitilde/-/")}).
+\textbf{
+  If the tagged commit itself has not been pushed, remember to push it, else,
+  the release pipeline will fail.
+}
 
 %%%Local Variables:
 %%%TeX-master: "release"
