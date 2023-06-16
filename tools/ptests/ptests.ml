@@ -761,7 +761,7 @@ end = struct
              aux { s with ex_cmd = cmd; ex_log = name :: s.ex_log })
       with Scanf.Scan_failure _ ->
       try
-        Scanf.sscanf s.ex_cmd "%_[ ]BIN%_[ ]%[A-Za-z0-9_.\\-@@]%_[ ]%s@\n"
+        Scanf.sscanf s.ex_cmd "%_[ ]BIN%_[ ]%[A-Za-z0-9_.\\\"-@@]%_[ ]%s@\n"
           (fun name cmd ->
              if name = "" then fail (file ^": EXEC"^ (if once then "NOW" else "") ^ " directive with an invalid BIN filename: " ^ s.ex_cmd);
              aux { s with ex_cmd = cmd; ex_bin = name :: s.ex_bin })

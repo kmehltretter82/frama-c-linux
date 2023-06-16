@@ -1,6 +1,6 @@
 #include "assert.h"
 
-int test = 1;
+extern int test; /* initialized into file foo.c */
 
 int main () {
   assert(test);
