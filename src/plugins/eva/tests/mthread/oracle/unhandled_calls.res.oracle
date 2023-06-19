@@ -20,8 +20,8 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  th1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  th2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
+  th1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  th2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] unhandled_calls.c:42: User Error: 

@@ -35,7 +35,7 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  lock: read by &job at FRAMAC_SHARE/mthread_pthread.c:43
+  lock: read by &job at FRAMAC_SHARE/mthread_pthread.c:56
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed

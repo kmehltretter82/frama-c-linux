@@ -22,12 +22,12 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  jobs5: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  jobs6: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
+  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs5: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs6: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed

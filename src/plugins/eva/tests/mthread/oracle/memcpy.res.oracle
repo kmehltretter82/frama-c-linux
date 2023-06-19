@@ -16,9 +16,9 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  tjob0: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  tjob1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  tjob2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
+  tjob0: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  tjob1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  tjob2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
   shared: write by _main_ at memcpy.c:40
   a: write by _main_ at memcpy.c:40
   b: write by _main_ at memcpy.c:40
@@ -92,9 +92,9 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  tjob0: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  tjob1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  tjob2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
+  tjob0: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  tjob1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  tjob2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
   shared: write by _main_ at memcpy.c:40
   a: write by _main_ at memcpy.c:40
   b: write by _main_ at memcpy.c:40

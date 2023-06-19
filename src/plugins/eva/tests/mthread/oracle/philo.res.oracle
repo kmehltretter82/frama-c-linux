@@ -28,7 +28,7 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  jobs[0..4]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
+  jobs[0..4]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
   queue: read by _main_ at philo.c:54
 [mt] * shared variables computed
 [mt] * Computing cfg
@@ -53,8 +53,8 @@
 [mt] Globals accessed by thread:
   end2: write by &jobs[0] at philo.c:24
   locks{[1]; [4]}:
-    read by &jobs[0] at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs[0] at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by &jobs[0] at philo.c:25
 [mt] * shared variables computed
 [mt] * Computing cfg
@@ -71,8 +71,8 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks{[0]; [2]}:
-    read by &jobs[1] at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs[1] at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -92,8 +92,8 @@
 [mt] Globals accessed by thread:
   end2: write by &jobs[2] at philo.c:24
   locks{[1]; [3]}:
-    read by &jobs[2] at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs[2] at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by &jobs[2] at philo.c:25
 [mt] * shared variables computed
 [mt] * Computing cfg
@@ -114,8 +114,8 @@
 [mt] Globals accessed by thread:
   end2: write by &jobs[3] at philo.c:24
   locks{[2]; [4]}:
-    read by &jobs[3] at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs[3] at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by &jobs[3] at philo.c:25
 [mt] * shared variables computed
 [mt] * Computing cfg
@@ -136,8 +136,8 @@
 [mt] Globals accessed by thread:
   end2: write by &jobs[4] at philo.c:24
   locks{[0]; [3]}:
-    read by &jobs[4] at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs[4] at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by &jobs[4] at philo.c:25
 [mt] * shared variables computed
 [mt] * Computing cfg
@@ -188,7 +188,7 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: read by _main_ at philo.c:53
-  jobs[0..4]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
+  jobs[0..4]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
   queue: read by _main_ at philo.c:54
 [mt] * shared variables computed
 [mt] * Computing cfg
@@ -243,7 +243,7 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: read by _main_ at philo.c:53
-  jobs[0..4]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
+  jobs[0..4]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
   queue: read by _main_ at philo.c:54
 [mt] * shared variables computed
 [mt] * Computing cfg
@@ -264,8 +264,8 @@
 [mt] Globals accessed by thread:
   end2: write by &jobs[0] at philo.c:24
   locks{[1]; [4]}:
-    read by &jobs[0] at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs[0] at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by &jobs[0] at philo.c:25
 [mt] * shared variables computed
 [mt] * Computing cfg
@@ -282,8 +282,8 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks{[0]; [2]}:
-    read by &jobs[1] at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs[1] at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -303,8 +303,8 @@
 [mt] Globals accessed by thread:
   end2: write by &jobs[2] at philo.c:24
   locks{[1]; [3]}:
-    read by &jobs[2] at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs[2] at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by &jobs[2] at philo.c:25
 [mt] * shared variables computed
 [mt] * Computing cfg
@@ -325,8 +325,8 @@
 [mt] Globals accessed by thread:
   end2: write by &jobs[3] at philo.c:24
   locks{[2]; [4]}:
-    read by &jobs[3] at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs[3] at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by &jobs[3] at philo.c:25
 [mt] * shared variables computed
 [mt] * Computing cfg
@@ -347,8 +347,8 @@
 [mt] Globals accessed by thread:
   end2: write by &jobs[4] at philo.c:24
   locks{[0]; [3]}:
-    read by &jobs[4] at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs[4] at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by &jobs[4] at philo.c:25
 [mt] * shared variables computed
 [mt] * Computing cfg
@@ -432,7 +432,7 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   end2: read by _main_ at philo.c:53
-  jobs[0..4]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
+  jobs[0..4]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
   queue: read by _main_ at philo.c:54
 [mt] * shared variables computed
 [mt] * Computing cfg
@@ -450,8 +450,8 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   locks{[0]; [2]}:
-    read by &jobs[1] at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs[1] at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -472,8 +472,8 @@
 [mt] Globals accessed by thread:
   end2: write by &jobs[2] at philo.c:24
   locks{[1]; [3]}:
-    read by &jobs[2] at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs[2] at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by &jobs[2] at philo.c:25
 [mt] * shared variables computed
 [mt] * Computing cfg
@@ -495,8 +495,8 @@
 [mt] Globals accessed by thread:
   end2: write by &jobs[3] at philo.c:24
   locks{[2]; [4]}:
-    read by &jobs[3] at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs[3] at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by &jobs[3] at philo.c:25
 [mt] * shared variables computed
 [mt] * Computing cfg
@@ -518,8 +518,8 @@
 [mt] Globals accessed by thread:
   end2: write by &jobs[4] at philo.c:24
   locks{[0]; [3]}:
-    read by &jobs[4] at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs[4] at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by &jobs[4] at philo.c:25
 [mt] * shared variables computed
 [mt] * Computing cfg

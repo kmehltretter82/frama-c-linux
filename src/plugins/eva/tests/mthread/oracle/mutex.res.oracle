@@ -20,10 +20,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
+  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -41,11 +41,11 @@
 [mt] Globals accessed by thread:
   s1: write by &jobs1 at mutex.c:25
   m1:
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
   m2:
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -61,8 +61,8 @@
   s1: read by &jobs2 at mutex.c:33
   s2: read by &jobs2 at mutex.c:34
   m1:
-    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -121,10 +121,10 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
-  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
+  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -141,11 +141,11 @@
 [mt] Globals accessed by thread:
   s1: write by &jobs1 at mutex.c:25
   m1:
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
   m2:
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -161,8 +161,8 @@
   s1: read by &jobs2 at mutex.c:33
   s2: read by &jobs2 at mutex.c:34
   m1:
-    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -222,8 +222,8 @@
   s1: read by &jobs2 at mutex.c:33
   s2: read by &jobs2 at mutex.c:34
   m1:
-    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:43
-    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:53
+    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
