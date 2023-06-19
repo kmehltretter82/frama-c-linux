@@ -53,6 +53,7 @@
  (site (frama-c plugins)))
 
 (include_subdirs unqualified)
+(subdir tests (include_subdirs no))
 
 (subdir gui (include_subdirs no))
 (subdir gui
@@ -68,6 +69,39 @@
  (name eva-gui)
  (optional)
  (libraries frama-c-eva.gui)
+ (site (frama-c plugins_gui)))
+
+(subdir mthread (include_subdirs no))
+(subdir mthread
+ (library
+  (name mthread)
+  (optional)
+  (public_name frama-c-eva.mthread.core)
+  (flags -open Frama_c_kernel -open Eva__Private :standard -w -9 -alert -db_deprecated)
+  (libraries eva frama-c.kernel)
+  (instrumentation (backend landmarks))
+  (instrumentation (backend bisect_ppx))))
+
+(plugin
+ (name eva.mthread)
+ (optional)
+ (libraries frama-c-eva.mthread.core)
+ (site (frama-c plugins)))
+
+(subdir mthread/gui (include_subdirs no))
+(subdir mthread/gui
+ (library
+  (name mthread_gui)
+  (optional)
+  (public_name frama-c-eva.mthread.gui)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Mthread :standard )
+  (libraries eva eva.mthread frama-c.kernel frama-c.gui)
+  (instrumentation (backend landmarks))))
+
+(plugin
+ (name eva.mthread-gui)
+ (optional)
+ (libraries frama-c-eva.mthread.gui)
  (site (frama-c plugins_gui)))
 
 (subdir domains/numerors (include_subdirs no))
@@ -125,3 +159,17 @@
   legacy/logic_inout.mli utils/eva_results.mli utils/unit_tests.mli
   utils/export.mli)
  (action (run ./gen_api/gen_api.exe %{deps})))
+
+(install
+ (package frama-c-eva)
+ (section (site (frama-c share)))
+ (files
+  (share/mthread/mthread.css as mt/mthread.css)
+  (share/mthread/mthread_interrupts.h as mt/mthread_interrupts.h)
+  (share/mthread/mthread.h as mt/mthread.h)
+  (share/mthread/mthread_queue.h as mt/mthread_queue.h)
+  (share/mthread/mthread_queue.c as mt/mthread_queue.c)
+  (share/mthread/mthread_pthread.h as mt/mthread_pthread.h)
+  (share/mthread/mthread_interrupts.c as mt/mthread_interrupts.c)
+  (share/mthread/mthread_pthread.c as mt/mthread_pthread.c)
+))
