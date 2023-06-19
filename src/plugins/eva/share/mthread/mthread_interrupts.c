@@ -31,14 +31,14 @@ void __mthread_init_mutex_interrupt() {
 int __FRAMAC_MTHREAD_LOCK_LEVEL = 0;
 
 void __mthread_lock_interrupts() {
-  if(__FRAMAC_MTHREAD_LOCK_LEVEL++)
+  if (__FRAMAC_MTHREAD_LOCK_LEVEL++)
     __FRAMAC_MTHREAD_SHOW("Overlock INTERRUPT");
   else
     __FRAMAC_MUTEX_LOCK(__mutex_interrupts);
 }
 
 void __mthread_unlock_interrupts() {
-  if(--__FRAMAC_MTHREAD_LOCK_LEVEL)
+  if (--__FRAMAC_MTHREAD_LOCK_LEVEL)
     __FRAMAC_MTHREAD_SHOW("Decreasing INTERRUPT level");
   else
     __FRAMAC_MUTEX_UNLOCK(__mutex_interrupts);

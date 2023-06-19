@@ -24,18 +24,18 @@
 #define __FRAMAC_MTHREAD
 
 #ifndef MTHREAD_NUMBER_IDS
-  #define MTHREAD_NUMBER_IDS 32
+#define MTHREAD_NUMBER_IDS 32
 #endif
 
 extern int __FRAMAC_MTHREAD_SHARED;
 
-int __FRAMAC_MTHREAD_THREADS_RUNNING=0;
+int __FRAMAC_MTHREAD_THREADS_RUNNING = 0;
 
 int __FRAMAC_MTHREAD_THREADS[MTHREAD_NUMBER_IDS];
 int __FRAMAC_MTHREAD_MUTEXES[MTHREAD_NUMBER_IDS];
 int __FRAMAC_MTHREAD_QUEUES[MTHREAD_NUMBER_IDS];
 
-typedef void* framac_mthread_name;
+typedef void *framac_mthread_name;
 
 typedef int framac_mthread_id;
 
@@ -67,22 +67,20 @@ int __FRAMAC_MUTEX_LOCK(framac_mthread_id);
 //@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
 int __FRAMAC_MUTEX_UNLOCK(framac_mthread_id);
 
-
 //@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
 framac_mthread_id __FRAMAC_QUEUE_INIT(framac_mthread_name, int);
 
 /*@ requires \valid_read(buf+(0..(size-1)));
   @ assigns __FRAMAC_MTHREAD_SHARED \from \nothing; */
-int __FRAMAC_MESSAGE_SEND(framac_mthread_id id, const char* buf, int size);
+int __FRAMAC_MESSAGE_SEND(framac_mthread_id id, const char *buf, int size);
 
 /*@ requires \valid(buf+(0..(size-1)));
   @ assigns *buf \from \empty;
   @ assigns __FRAMAC_MTHREAD_SHARED \from \nothing; */
-int __FRAMAC_MESSAGE_RECEIVE(framac_mthread_id, int size, char* buf);
-
+int __FRAMAC_MESSAGE_RECEIVE(framac_mthread_id, int size, char *buf);
 
 //@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-void __FRAMAC_MTHREAD_SHOW(char const*, ...);
+void __FRAMAC_MTHREAD_SHOW(char const *, ...);
 //@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
 void __FRAMAC_MTHREAD_NAME_THREAD(framac_mthread_id, framac_mthread_name);
 //@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
@@ -92,7 +90,6 @@ void __FRAMAC_MTHREAD_NAME_QUEUE(framac_mthread_id, framac_mthread_name);
 
 //@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
 void __FRAMAC_MTHREAD_SYNC(void);
-
 
 #define __MTHREAD_SYNC(v) (__FRAMAC_MTHREAD_SYNC(), (v))
 
