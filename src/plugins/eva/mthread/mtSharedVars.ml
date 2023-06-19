@@ -346,6 +346,26 @@ let stmt_is_multithreaded analysis sa =
 (* --- Computation of variables accessed concurrently by two threads      --- *)
 (* -------------------------------------------------------------------------- *)
 
+module type Computer =
+sig
+  module Access : Datatype.S
+  module Set: Lattice_type.Lattice_Set with type O.elt = Access.t
+  module ZoneMap: Lmap_bitwise.Location_map_bitwise with type v = Set.t
+
+  type list_accesses = (Locations.Zone.t * Set.t) list
+
+  val pretty_concurrent_accesses :
+    ?f:Access.t Pretty_utils.formatter ->
+    unit -> Format.formatter -> list_accesses -> unit
+
+  val all_zones_accessed : list_accesses -> Locations.Zone.t
+
+  val concurrent_accesses_all_threads :
+    MtThread.Thread.t list ->
+    (list_accesses * list_accesses) * ZoneMap.map
+end
+
+
 (* All our computations are parameterized by the structure on which we
    act: either the information is at the level of the statement (obtained
    by the class [do_it] above), or at the level of the cfg node. In the
@@ -367,6 +387,7 @@ module Aux(X:
              val running_concurrently: thp:thread -> ths:thread -> infop:info -> bool
            end) =
 struct
+  include X
 
   open Abstract_interp
 
