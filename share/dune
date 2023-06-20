@@ -339,7 +339,9 @@
   (machdeps/machdep_gcc_x86_32.yaml as share/machdeps/machdep_gcc_x86_32.yaml)
   (machdeps/machdep_gcc_x86_64.yaml as share/machdeps/machdep_gcc_x86_64.yaml)
   (machdeps/machdep_msvc_x86_64.yaml as share/machdeps/machdep_msvc_x86_64.yaml)
-  (machdeps/machdep_ppc_32.yaml as share/machdeps/machdep_ppc_32.yaml))
+  (machdeps/machdep_ppc_32.yaml as share/machdeps/machdep_ppc_32.yaml)
+  (machdeps/machdep-schema.yaml as share/machdeps/machdep-schema.yaml)
+ )
 )
 
 ; machdep generation script
