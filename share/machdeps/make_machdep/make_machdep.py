@@ -62,6 +62,12 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--machdep-schema",
+    default="machdep-schema.yaml",
+    help="location of the schema file describing a machdep; default is 'machdep-schema.yaml'",
+)
+
+parser.add_argument(
     "--from-file",
     help="reads compiler and arch flags from existing yaml file. Use -i to update it in place",
 )
@@ -106,8 +112,7 @@ if not args.cpp_arch_flags:
 
 
 def make_schema():
-    schema_filename = my_path.parent / "machdep-schema.yaml"
-    with open(schema_filename, "r") as schema:
+    with open(args.machdep_schema, "r") as schema:
         return yaml.safe_load(schema)
 
 
