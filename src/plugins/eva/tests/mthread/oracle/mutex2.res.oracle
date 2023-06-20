@@ -2,6 +2,7 @@
 [kernel] Parsing mutex2.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
+[mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: main, fun main

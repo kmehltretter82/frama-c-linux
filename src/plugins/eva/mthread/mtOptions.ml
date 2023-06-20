@@ -25,7 +25,7 @@ module MThread = Plugin.Register (
   struct
     let name = "mthread"
     let shortname = "mt"
-    let help = "tools for multi-threaded programs (experimental)"
+    let help = "Experimental tools for multi-threaded programs"
   end)
 ;;
 (* Including this module directly is a bad idea, as this hides the

@@ -96,6 +96,8 @@ let apply_analysis_hooks () =
 (* Perform an entire mthread execution, based on the ast and options of the
    given project *)
 let mthread_run project =
+  MtOptions.warning
+    "Mthread is an experimental plugin and is still in development.";
   let old_project = Project.current () in
   Project.set_current project;
   let hook_builtins = Lazy.force hook_builtins in
