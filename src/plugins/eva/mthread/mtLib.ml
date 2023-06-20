@@ -126,7 +126,7 @@ let escape_non_utf8 s =
 
 let clear_value_results () =
   Project.clear ~selection:(State_selection.with_dependencies
-                              Eva.Analysis.self) ();
+                              Analysis.self) ();
 ;;
 
 let mthread_h () =

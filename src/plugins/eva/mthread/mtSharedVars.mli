@@ -31,7 +31,7 @@ type collect_params = {
   stmt_multithread : Cil_types.stmt -> bool;
   thread_id : MtIds.id;
   mode : mode;
-  iter_requests: Cil_types.stmt -> (Eva.Results.request -> unit) -> unit;
+  iter_requests: Cil_types.stmt -> (Results.request -> unit) -> unit;
   watch_only : Locations.Zone.t;
 }
 class do_it :

@@ -70,7 +70,7 @@ module RawId = struct
     Format.fprintf fmt "%a_%d" IdType.pretty_lc idt offset
 end
 
-module MapCreation = Map.Make(Datatype.Pair(RawId)(Eva.Callstack))
+module MapCreation = Map.Make(Datatype.Pair(RawId)(Callstack))
 
 type id_name_hint =
   | Hint_pointer of pointer
@@ -252,7 +252,7 @@ let next_id_ok idt next =
 
 
 let register_new_id_aux known idt name stack thread iteration =
-  let ki = Eva.Callstack.top_callsite stack in
+  let ki = Callstack.top_callsite stack in
   (* Auxiliary function that allocate a new id *)
   let fresh fname =
     let next, known = match idt with

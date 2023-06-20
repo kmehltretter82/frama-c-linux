@@ -96,7 +96,7 @@ type thread = {
   th_id: MtIds.id;
   th_parent : thread option;
   th_fun : kernel_function;
-  th_stack : Eva.Callstack.t;
+  th_stack : Callstack.t;
   mutable th_init_state : Cvalue.Model.t;
   mutable th_params : Cvalue.V.t list;
   mutable th_amap : Trace.t;
@@ -106,7 +106,7 @@ type thread = {
   mutable th_read_written_cfg: AccessesByZoneNode.map;
   mutable th_values_written: MtMemory.Types.state;
   mutable th_projects: Project.t list;
-  mutable th_value_results: Eva.Eva_results.results option;
+  mutable th_value_results: Eva_results.results option;
   mutable th_priority: priority;
 }
 
@@ -220,7 +220,7 @@ type analysis_state = {
 (* Cache for the results obtained during the analysis of the current
    thread *);
 
-  mutable curr_stack: Eva.Callstack.t
+  mutable curr_stack: Callstack.t
 (* stack of a multithread event. Asynchronously set by a callback and used
    by another, because of a slightly too restricted signature in the
    value analysis. *);
@@ -270,8 +270,8 @@ let mutexes_ids analysis = MtIds.all_mutexes analysis.known_ids
 let queues_ids analysis = MtIds.all_queues analysis.known_ids
 
 
-let calling_ki analysis = Eva.Callstack.top_callsite analysis.curr_stack
-let current_fun analysis = Eva.Callstack.top_kf analysis.curr_stack
+let calling_ki analysis = Callstack.top_callsite analysis.curr_stack
+let current_fun analysis = Callstack.top_kf analysis.curr_stack
 
 let curr_events analysis =
   match analysis.curr_events_stack with
@@ -285,7 +285,7 @@ let on_current_trace analysis f =
     analysis.curr_events_stack <- f h q :: q
 
 (* Store a mthread event into the state of our analysis. *)
-let register_event analysis ?(top=Eva.Callstack.top_call analysis.curr_stack) evt =
+let register_event analysis ?(top=Callstack.top_call analysis.curr_stack) evt =
   on_current_trace analysis
     (fun cur _ -> Trace.add_event cur top evt)
 ;;
@@ -306,7 +306,7 @@ let push_function_call analysis =
   analysis.curr_events_stack <- Trace.empty :: analysis.curr_events_stack
 
 let pop_function_call analysis =
-  let top = Eva.Callstack.top_call analysis.curr_stack in
+  let top = Callstack.top_call analysis.curr_stack in
   match analysis.curr_stack.stack with
   | [] ->
     assert (List.length analysis.curr_events_stack = 1);

@@ -39,16 +39,16 @@ val mthread_builtins:
   (string *
    (analysis_state ->
     state ->
-    (Eva.Eva_ast.exp * value) list ->
+    (Eva_ast.exp * value) list ->
     state * value option)
   ) list
 
 
-(** Function to register with [Eva.Cvalue_callbacks.register_call_hooks]
+(** Function to register with [Cvalue_callbacks.register_call_hooks]
     (called before each function call processed in the analysis) *)
-val catch_functions_calls: analysis_state -> Eva.Cvalue_callbacks.call_hook
+val catch_functions_calls: analysis_state -> Cvalue_callbacks.call_hook
 
-(** Function to register with [Eva.Cvalue_callbacks.register_call_results_hook]
+(** Function to register with [Cvalue_callbacks.register_call_results_hook]
     (called after each function call processed by the analysis. *)
 val catch_functions_record:
-  analysis_state -> Eva.Cvalue_callbacks.call_results_hook
+  analysis_state -> Cvalue_callbacks.call_results_hook

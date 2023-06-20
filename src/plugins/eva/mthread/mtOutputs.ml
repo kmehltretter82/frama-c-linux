@@ -817,15 +817,15 @@ module Eva_results = struct
       | None -> acc (* Analysis skipped *)
       | Some results ->
         let thread = snd th.th_id.id_raw in
-        let change cs = Eva.Callstack.{ cs with thread } in
-        let results' = Eva.Eva_results.change_callstacks change results in
+        let change cs = Callstack.{ cs with thread } in
+        let results' = Eva_results.change_callstacks change results in
         results' :: acc
     in
     let all_results = MtIds.Id.Hashtbl.fold aux_th ths [] in
     match all_results with
     | [] -> MtOptions.error "No results recorded. Nothing to display"
     | r :: qr ->
-      let all = List.fold_left Eva.Eva_results.merge r qr in
-      Eva.Eva_results.set_results all
+      let all = List.fold_left Eva_results.merge r qr in
+      Eva_results.set_results all
 
 end

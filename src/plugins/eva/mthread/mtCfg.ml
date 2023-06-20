@@ -272,7 +272,7 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ ((f, _) as top, stack) =
             (fun callsite ->
                let kf = fst callsite in
                let subtrace = Trace.subtrace_at_call subtrace callsite in
-               if Eva.Analysis.use_spec_instead_of_definition kf then
+               if Analysis.use_spec_instead_of_definition kf then
                  let evts, access, stmts = all_events subtrace in
                  let node = CfgNode.new_node (callsite :: top :: stack)
                  and stmts = Cil_datatype.Stmt.Set.elements stmts in
@@ -335,8 +335,8 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ ((f, _) as top, stack) =
              condition, as we cannot just look at the liveness
              of the successors (which can be live for other
              reasons if there is no then/else block) *)
-          let request = Eva.Results.in_cvalue_state (get_state stmt) in
-          let c = Eva.Results.(eval_exp c request |> as_cvalue) in
+          let request = Results.in_cvalue_state (get_state stmt) in
+          let c = Results.(eval_exp c request |> as_cvalue) in
           let eval_then = Cvalue.V.contains_non_zero c
           and eval_else = Cvalue.V.contains_zero c
           in

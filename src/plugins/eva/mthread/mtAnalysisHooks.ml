@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Eva.Eva_ast
+open Eva_ast
 open MtLib
 open MtCil
 open MtMemory.Types
@@ -46,14 +46,14 @@ let log_poly ?(pop_stack=true) ?(kind=Log.Result) analysis =
   let stack =
     if not pop_stack || MtOptions.PopTopFunctionForCallbacks.get ()
     then stack
-    else Option.value (Eva.Callstack.pop stack) ~default:stack
+    else Option.value (Callstack.pop stack) ~default:stack
   in
-  let ki = Eva.Callstack.top_callsite stack in
+  let ki = Callstack.top_callsite stack in
   let source = kinstr_to_source ki in
   let pp_callstack =
     MtOptions.PrintCallstacks.get () || MtOptions.debug_level () > 1 in
   let append = (fun fmt -> if pp_callstack then
-                   Format.fprintf fmt "@.%a" Eva.Callstack.pretty stack)
+                   Format.fprintf fmt "@.%a" Callstack.pretty stack)
   in { ppp = fun fmt ->
       MtOptions.MThread.log ~kind ~once:true ?source ~append
         ("@[" ^^ fmt ^^ "@]")
@@ -326,7 +326,7 @@ let sync_values analysis state =
       written state
   in
   let v = MtSharedVars.var_thread_created () in
-  let value = Eva.Results.(in_cvalue_state state |> eval_var v |> as_cvalue) in
+  let value = Results.(in_cvalue_state state |> eval_var v |> as_cvalue) in
   match MtMemory.extract_int value with
   | `Success 0 ->
     (* As no thread is running, just skip the synchronization. *)
@@ -382,13 +382,13 @@ let spawn_thread analysis id stack func state params parent =
         Thread.pretty_parent_id parent Thread.pretty_parent_id th'.th_parent;
       hook_fail ())
 
-    else if Eva.Callstack.equal stack th'.th_stack = false then (
+    else if Callstack.equal stack th'.th_stack = false then (
       log ~kind:Log.Error analysis
         "Thread '%a' is launched in two different contexts:@.\
          Context 1:@.@[<hov 2>  %a@]@.Context 2:@.@[<hov 2>  %a@]@.Ignoring"
         Id.pretty id
-        Eva.Callstack.pretty stack
-        Eva.Callstack.pretty th'.th_stack;
+        Callstack.pretty stack
+        Callstack.pretty th'.th_stack;
       hook_fail ())
 
     else if Kernel_function.get_id func <> Kernel_function.get_id th'.th_fun
@@ -431,10 +431,10 @@ let main_thread k_main initial_state =
   | Definition (f_main,_) ->
     let formals = f_main.sformals in
     let eval_arg vi =
-      Eva.Results.(in_cvalue_state initial_state |> eval_var vi |> as_cvalue)
+      Results.(in_cvalue_state initial_state |> eval_var vi |> as_cvalue)
     in
     let args = List.map eval_arg formals in
-    let stack = Eva.Callstack.init k_main in
+    let stack = Callstack.init k_main in
     basic_thread id_main_thread stack k_main initial_state args None
 
 
@@ -857,7 +857,7 @@ let hook_name_object idt analysis state : hook_sig =
 
 (* All the Mthread builtin functions, together with their C name.
    The remainder of the conversion to the real type of the callback
-   {Eva.Builtins.register_builtin} occurs in [MtMain] *)
+   {Builtins.register_builtin} occurs in [MtMain] *)
 let mthread_builtins =
   [
     (* Threads *)
@@ -901,7 +901,7 @@ let catch_functions_calls analysis stack kf state kind =
   let f = Kernel_function.get_name kf in
   let built = is_mthread_builtin f in
   (if built <> `NotBuiltin then
-     match Eva.Callstack.pop analysis.curr_stack with
+     match Callstack.pop analysis.curr_stack with
      | None -> (* A thread function has been called as main, and we fail
                   immediately. In fact, this case should not happen,
                   because we reject calls to __FRAMA_C_* functions as
@@ -951,11 +951,11 @@ let catch_functions_calls analysis stack kf state kind =
     pop_function_call analysis;
   | `Body | `Reuse -> ()
 
-(* Function registered by [Eva.Cvalue_callbacks.register_call_results_hook].
+(* Function registered by [Cvalue_callbacks.register_call_results_hook].
    Given the end states of a function with a definition, records the variable
    accesses it did. *)
 let catch_functions_record analysis stack _kf _pre_state = function
-  | `Body (Eva.Cvalue_callbacks.{before_stmts; after_stmts}, i) ->
+  | `Body (Cvalue_callbacks.{before_stmts; after_stmts}, i) ->
     analysis.curr_stack <- stack;
     let hbefore = Lazy.force before_stmts in
     let hafter = Lazy.force after_stmts in

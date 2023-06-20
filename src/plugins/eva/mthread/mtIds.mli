@@ -37,7 +37,7 @@ module RawId :
   Datatype.S_with_collections
   with type t = IdType.t * Datatype.Int.t
 
-module MapCreation : Map.S with type key = RawId.t * Eva.Callstack.t
+module MapCreation : Map.S with type key = RawId.t * Callstack.t
 
 type id_name_hint =
     Hint_pointer of MtMemory.Types.pointer
@@ -93,7 +93,7 @@ val register_new_id_aux :
   known_ids ->
   IdType.t ->
   IdNameHint.Map.key ->
-  Eva.Callstack.t ->
+  Callstack.t ->
   Id.t ->
   int ->
   [> `Failure of Format.formatter -> unit
@@ -103,7 +103,7 @@ val register_new_id :
   known_ids ->
   IdType.t ->
   IdNameHint.Map.key ->
-  Eva.Callstack.t ->
+  Callstack.t ->
   Id.t ->
   int ->
   [> `Failure of Format.formatter -> unit

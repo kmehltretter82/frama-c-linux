@@ -54,12 +54,12 @@ module Types = struct
       try Cil_datatype.Stmt.Hashtbl.find h stmt
       with Not_found -> Cvalue.Model.bottom
     in
-    Eva.Results.in_cvalue_state state
+    Results.in_cvalue_state state
 
   let iter_requests = function
     | Global ->
       fun stmt f ->
-        let requests = Eva.Results.(before stmt |> by_callstack |> List.map snd) in
+        let requests = Results.(before stmt |> by_callstack |> List.map snd) in
         List.iter (fun request-> f request) requests
     | Local hs ->
       fun stmt f -> f (functions_states_to_request hs stmt)

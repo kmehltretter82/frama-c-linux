@@ -65,7 +65,7 @@ let record_end_of_thread_analysis analysis =
   MtOptions.feedback ~level:2
     "* Starting to save the state of the value analysis";
 
-  let results = Eva.Eva_results.get_results () in
+  let results = Eva_results.get_results () in
   th.th_value_results <- Some results;
 
   if MtOptions.ToDisk.get () then
@@ -142,10 +142,10 @@ let compute_thread analysis th =
 
   (* We set the parameters for the value analysis *)
   Globals.set_entry_point (Kernel_function.get_name th.th_fun) false;
-  Eva.Eva_results.set_initial_state th.th_init_state;
-  Eva.Eva_results.set_main_args th.th_params;
+  Eva_results.set_initial_state th.th_init_state;
+  Eva_results.set_main_args th.th_params;
 
-  Eva.Analysis.compute ();
+  Analysis.compute ();
 
   if MtOptions.ShowTime.get () then
     MtOptions.feedback ~level:2

@@ -75,7 +75,7 @@ type collect_params = {
   stmt_multithread: stmt -> bool;
   thread_id: id;
   mode: mode;
-  iter_requests: stmt -> (Eva.Results.request -> unit) -> unit;
+  iter_requests: stmt -> (Results.request -> unit) -> unit;
   watch_only: Locations.Zone.t;
 }
 
@@ -144,15 +144,15 @@ class do_it cp =
 
     method! vlval lv =
       cp.iter_requests self#cur_stmt
-        (fun req -> self#add_access Read Eva.Results.(lval_deps lv req));
+        (fun req -> self#add_access Read Results.(lval_deps lv req));
       Cil.SkipChildren
 
     method private do_assign lv =
       cp.iter_requests self#cur_stmt
         (fun request ->
-           let deps = Eva.Results.(address_deps lv request) in
+           let deps = Results.(address_deps lv request) in
            self#add_access Read deps;
-           let loc = Eva.Results.(eval_address lv request |> as_location) in
+           let loc = Results.(eval_address lv request |> as_location) in
            if Location_Bits.(equal loc.loc top) then
              MtOptions.warning ~current:true ~once:true
                "Problem with %a: its writing location is completely unknown."
@@ -176,20 +176,20 @@ class do_it cp =
     method private do_call exp =
       cp.iter_requests self#cur_stmt (fun request ->
           let deps = match exp.enode with
-            | Lval lv -> Eva.Results.address_deps lv request
+            | Lval lv -> Results.address_deps lv request
             | _ -> assert false
           in
           self#add_access Read deps;
           (* In global mode, we treat the recursive calls. In precise
              mode, they are done elsewhere in the construction of the cfg *)
           if cp.mode = VGlobal then
-            let callees = Eva.Results.(eval_callee exp request |> default []) in
+            let callees = Results.(eval_callee exp request |> default []) in
             List.iter self#rw_fun callees
         )
 
     method! vinst i =
       let visit_expr e = ignore (visitFramacExpr (self:>frama_c_visitor) e) in
-      if not (Eva.Results.is_reachable self#cur_stmt) then
+      if not (Results.is_reachable self#cur_stmt) then
         Cil.SkipChildren
       else
         match i with
@@ -212,7 +212,7 @@ class do_it cp =
       | AddrOf lv | StartOf lv ->
         cp.iter_requests self#cur_stmt
           (fun request ->
-             let deps = Eva.Results.address_deps lv request in
+             let deps = Results.address_deps lv request in
              self#add_access Read deps;
           );
         Cil.SkipChildren
@@ -235,8 +235,8 @@ class do_it cp =
 
     method private compute_for_funspec kf =
       let aux request =
-        let state = Eva.Results.get_cvalue_model request in
-        let behaviors = Eva.Logic_inout.valid_behaviors kf state in
+        let state = Results.get_cvalue_model request in
+        let behaviors = Logic_inout.valid_behaviors kf state in
         let assigns = Ast_info.merge_assigns behaviors in
         let assigns = self#assigns_not_mthread assigns in
         (* Compute the zones written by the assigns *)
@@ -248,7 +248,7 @@ class do_it cp =
          | Writes assigns' ->
            let aux l =
              try
-               let loc = Eva.Eva_results.eval_tlval_as_location state l in
+               let loc = Eva_results.eval_tlval_as_location state l in
                let loc = remove_uninteresting_variables_loc loc in
                let loc = Locations.(valid_part Write loc) in
                let z = Locations.(enumerate_valid_bits Write loc) in
@@ -264,13 +264,13 @@ class do_it cp =
              ) assigns'
         );
         (* Compute the zone read by the assigns *)
-        let read = Eva.Logic_inout.assigns_inputs_to_zone state assigns in
+        let read = Logic_inout.assigns_inputs_to_zone state assigns in
         self#add_access Read read
       in
       match cp.mode with
       | VGlobal ->
         let requests =
-          Eva.Results.(at_start_of kf |> by_callstack |> List.map snd)
+          Results.(at_start_of kf |> by_callstack |> List.map snd)
         in
         List.iter aux requests
       | VLocal ->
@@ -280,7 +280,7 @@ class do_it cp =
     method rw_fun kf =
       if not (self#already_visited kf) then (
         self#mark_visited kf;
-        match Eva.Analysis.use_spec_instead_of_definition kf, kf.fundec with
+        match Analysis.use_spec_instead_of_definition kf, kf.fundec with
         | false, Definition (f,_) ->
           ignore (visitFramacFunction (self:>frama_c_visitor) f)
 
@@ -331,7 +331,7 @@ let stmt_is_multithreaded analysis sa =
     (fun stmt ->
        try
          iter_requests stmt (fun request ->
-             let value = Eva.Results.(eval_var v request |> as_cvalue) in
+             let value = Results.(eval_var v request |> as_cvalue) in
              match MtMemory.extract_int value with
              | `Success 0 -> ()
              | _ -> raise Stmt_is_multithreaded

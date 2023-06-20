@@ -32,10 +32,10 @@ let no_hook = fun _ _ _ _ -> ()
 let ref_hook_call_function = ref no_hook
 let ref_hook_end_function = ref no_hook
 
-let () = Eva.Cvalue_callbacks.register_call_hook
+let () = Cvalue_callbacks.register_call_hook
     (fun args -> !ref_hook_call_function args)
 
-let () = Eva.Cvalue_callbacks.register_call_results_hook
+let () = Cvalue_callbacks.register_call_results_hook
     (fun args -> !ref_hook_end_function args)
 
 
@@ -52,14 +52,14 @@ let hook_builtins =
     List.iter (fun (r, (s, _)) ->
         (* Conversion from the simplified type of an mthread function
            into one suitable as a hook *)
-        Eva.Builtins.register_builtin s NoCacheCallers
+        Builtins.register_builtin s NoCacheCallers
           (fun st args ->
              let st, res =
                try !r st args
                with MtAnalysisHooks.Hook_failure res ->
                  st, Some (MtMemory.int_to_value res)
              in
-             Eva.Builtins.Full
+             Builtins.Full
                { c_values = [res, st];
                  c_clobbered = Base.SetLattice.bottom;
                  c_assigns = None;
@@ -130,7 +130,7 @@ let mthread_run project =
     main_thread = dummy_main_thread;
     curr_events_stack = [];
     memexec_cache = Datatype.Int.Hashtbl.create 16;
-    curr_stack = Eva.Callstack.init f_main;
+    curr_stack = Callstack.init f_main;
     concurrent_accesses = Locations.Zone.bottom;
     precise_concurrent_accesses = Locations.Zone.bottom;
     concurrent_accesses_by_nodes = [];
@@ -154,12 +154,12 @@ let mthread_run project =
     (* We analyse the main thread *)
     MtLib.clear_value_results ();
     MtOptions.feedback "*** Computing value analysis for main thread";
-    Eva.Analysis.compute ();
+    Analysis.compute ();
     MtOptions.feedback "*** First value analysis for main thread done." ;
 
     (* The hooks of the value analysis have now found the real main thread *)
     let main_th = analysis.curr_thread in
-    let results = Eva.Eva_results.get_results () in
+    let results = Eva_results.get_results () in
     main_th.th_value_results <- Some results;
 
     MtAnalysisFixpoint.record_end_of_thread_analysis analysis;

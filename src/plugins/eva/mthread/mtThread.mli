@@ -60,7 +60,7 @@ type thread = {
   th_parent : thread option (** Thread in which the thread is created. [None]
                                 for the root thread *);
   th_fun : kernel_function (** Function which the thread executes *);
-  th_stack : Eva.Callstack.t
+  th_stack : Callstack.t
 (** Call stack resulting in the creation of the thread *);
 
   mutable th_init_state : Cvalue.Model.t
@@ -91,7 +91,7 @@ type thread = {
   mutable th_projects: Project.t list
 (** Copies of the analyses of the thread, most recent first *);
 
-  mutable th_value_results: Eva.Eva_results.results option
+  mutable th_value_results: Eva_results.results option
 (** Result of the last Value analysis of this thread *);
 
   mutable th_priority: priority
@@ -151,7 +151,7 @@ type analysis_state = {
 (** Cache for the results obtained during the analysis of the current
     thread *);
 
-  mutable curr_stack: Eva.Callstack.t
+  mutable curr_stack: Callstack.t
 (** stack of a multithread event. Asynchronously set by a callback and used
     by another, because of a slightly too restricted signature in the
     value analysis. *);
