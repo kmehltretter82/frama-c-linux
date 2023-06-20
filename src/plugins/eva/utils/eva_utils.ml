@@ -289,7 +289,7 @@ let dump_garbled_mix () =
   let l = Cvalue.V.get_garbled_mix () in
   if l <> [] then
     let pp_one fmt v = Format.fprintf fmt "@[<hov 2>%a@]" Cvalue.V.pretty v in
-    Self.warning ~wkey:Self.wkey_garbled_mix
+    Self.warning ~wkey:Self.wkey_garbled_mix_summary
       "Garbled mix generated during analysis:@.\
        @[<v>%a@]"
       (Pretty_utils.pp_list ~pre:"" ~suf:"" ~sep:"@ " pp_one) l

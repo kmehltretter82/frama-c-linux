@@ -254,14 +254,14 @@
 [eva:alarm] nonlin.c:98: Warning: 
   non-finite float value.
   assert \is_finite((float)((int)(&x_0 + (int)(&x_0))));
-[eva] nonlin.c:98: 
+[eva:garbled-mix:write] nonlin.c:98: 
   Assigning imprecise value to a_0.
   The imprecision originates from Arithmetic {nonlin.c:98}
 [eva:alarm] nonlin.c:99: Warning: 
   non-finite float value. assert \is_finite(a_0);
 [eva:alarm] nonlin.c:99: Warning: 
   non-finite float value. assert \is_finite(\add_float(a_0, a_0));
-[eva] nonlin.c:99: 
+[eva:garbled-mix:write] nonlin.c:99: 
   Assigning imprecise value to f.
   The imprecision originates from Arithmetic
 [eva] Recording results for garbled

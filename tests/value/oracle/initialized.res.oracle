@@ -72,10 +72,10 @@
   signed overflow. assert -2147483648 ≤ (int)(&b4) + (int)(&b4);
 [eva:alarm] initialized.c:50: Warning: 
   signed overflow. assert (int)(&b4) + (int)(&b4) ≤ 2147483647;
-[eva] initialized.c:50: 
+[eva:garbled-mix:write] initialized.c:50: 
   Assigning imprecise value to t[6].
   The imprecision originates from Arithmetic {initialized.c:50}
-[eva] initialized.c:51: 
+[eva:garbled-mix:write] initialized.c:51: 
   Assigning imprecise value to t[7].
   The imprecision originates from Arithmetic {initialized.c:50}
 [eva] initialized.c:63: 

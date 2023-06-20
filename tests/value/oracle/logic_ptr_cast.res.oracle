@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   p ∈ {0}
   t[0..89] ∈ {0}
-[eva] logic_ptr_cast.i:8: 
+[eva:garbled-mix:write] logic_ptr_cast.i:8: 
   Assigning imprecise value to p.
   The imprecision originates from Arithmetic {logic_ptr_cast.i:8}
 [eva:alarm] logic_ptr_cast.i:9: Warning: assertion got status unknown.

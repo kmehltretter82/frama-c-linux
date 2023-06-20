@@ -306,19 +306,19 @@
   Called from behaviors1.i:473.
 [eva] using specification for function f
 [eva] Done for function f
-[eva] behaviors1.i:473: 
+[eva:garbled-mix:write] behaviors1.i:473: 
   Assigning imprecise value to tmp.
   The imprecision originates from Library function {behaviors1.i:473}
-[eva] behaviors1.i:473: 
+[eva:garbled-mix:write] behaviors1.i:473: 
   Assigning imprecise value to p1.
   The imprecision originates from Library function {behaviors1.i:473}
 [eva] computing for function f <- test_assigns <- main.
   Called from behaviors1.i:474.
 [eva] Done for function f
-[eva] behaviors1.i:474: 
+[eva:garbled-mix:write] behaviors1.i:474: 
   Assigning imprecise value to tmp_0.
   The imprecision originates from Library function {behaviors1.i:474}
-[eva] behaviors1.i:474: 
+[eva:garbled-mix:write] behaviors1.i:474: 
   Assigning imprecise value to p2.
   The imprecision originates from Library function {behaviors1.i:474}
 [eva] computing for function f <- test_assigns <- main.

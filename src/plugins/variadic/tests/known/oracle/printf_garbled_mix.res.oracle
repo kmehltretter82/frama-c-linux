@@ -19,7 +19,7 @@
 [variadic] printf_garbled_mix.c:7: 
   Translating call to printf to a call to the specialized version printf_va_1.
 [eva] Analyzing a complete application starting at main
-[eva] printf_garbled_mix.c:6: 
+[eva:garbled-mix:write] printf_garbled_mix.c:6: 
   Assigning imprecise value to b.
   The imprecision originates from Arithmetic {printf_garbled_mix.c:6}
 [eva:alarm] printf_garbled_mix.c:7: Warning: 

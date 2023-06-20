@@ -1,12 +1,12 @@
 [kernel] Parsing exceptional.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] exceptional.i:5: 
+[eva:garbled-mix:write] exceptional.i:5: 
   Assigning imprecise value to __retres.
   The imprecision originates from Arithmetic {exceptional.i:5}
-[eva] exceptional.i:5: 
+[eva:garbled-mix:write] exceptional.i:5: 
   Assigning imprecise value to \result<gm>.
   The imprecision originates from Arithmetic {exceptional.i:5}
-[eva] exceptional.i:16: 
+[eva:garbled-mix:write] exceptional.i:16: 
   Assigning imprecise value to p.
   The imprecision originates from Arithmetic {exceptional.i:5}
 [eva:alarm] exceptional.i:17: Warning: 

@@ -58,10 +58,10 @@
   Called from origin.i:124.
 [eva] using specification for function f
 [eva] Done for function f
-[eva] origin.i:126: 
+[eva:garbled-mix:write] origin.i:126: 
   Assigning imprecise value to r.p.
   The imprecision originates from Misaligned {origin.i:126}
-[eva] origin.i:129: 
+[eva:garbled-mix:write] origin.i:129: 
   Assigning imprecise value to r.t[0].
   The imprecision originates from Merge {origin.i:129}
 [eva:alarm] origin.i:130: Warning: 
@@ -70,10 +70,10 @@
   signed overflow. assert -2147483648 ≤ -((int)(&x));
 [eva:alarm] origin.i:130: Warning: 
   signed overflow. assert -((int)(&x)) ≤ 2147483647;
-[eva] origin.i:130: 
+[eva:garbled-mix:write] origin.i:130: 
   Assigning imprecise value to r.t[1].
   The imprecision originates from Arithmetic {origin.i:130}
-[eva] origin.i:131: 
+[eva:garbled-mix:write] origin.i:131: 
   Assigning imprecise value to \result<origin>.
   The imprecision originates from Misaligned {origin.i:126}
 [eva] Recording results for origin

@@ -30,7 +30,7 @@
 [eva] bitfield.i:117: Frama_C_show_each: {3}
 [eva:alarm] bitfield.i:123: Warning: 
   pointer downcast. assert (unsigned int)(&v) ≤ 2147483647;
-[eva] bitfield.i:123: 
+[eva:garbled-mix:write] bitfield.i:123: 
   Assigning imprecise value to v.c.
   The imprecision originates from Arithmetic {bitfield.i:123}
 [eva:alarm] bitfield.i:124: Warning: 
@@ -82,7 +82,7 @@
   signed overflow. assert foo + foo ≤ 2147483647;
 [eva:alarm] bitfield.i:130: Warning: 
   pointer downcast. assert (unsigned int)(&v + 1) ≤ 2147483647;
-[eva] bitfield.i:130: 
+[eva:garbled-mix:write] bitfield.i:130: 
   Assigning imprecise value to h.c.
   The imprecision originates from Arithmetic {bitfield.i:130}
 [eva] computing for function return_8 <- main_old <- main.
@@ -114,7 +114,7 @@
   .bitf ∈ {0}
   .[bits 65 to 95] ∈
   {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
-[eva] bitfield.i:74: 
+[eva:garbled-mix:write] bitfield.i:74: 
   Assigning imprecise value to c.
   The imprecision originates from Misaligned {bitfield.i:70}
 [eva] bitfield.i:69: starting to merge loop iterations
