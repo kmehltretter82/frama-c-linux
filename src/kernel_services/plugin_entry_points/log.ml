@@ -1133,7 +1133,13 @@ struct
       ?current ?source
       ?echo ?append text =
     let status = get_warn_status wkey in
-    if status <> Winactive then
+    let kind =
+      match status with
+      | Wfeedback | Wfeedback_once -> Feedback
+      | (Wactive | Werror | Wabort | Wonce | Werror_once | Winactive) ->
+        Warning
+    in
+    if status <> Winactive && (kind <> Feedback || verbose_atleast 1)  then
       begin
         let action, once_suffix =
           match status with
@@ -1156,12 +1162,6 @@ struct
           | None, None -> None
           | Some e, None | None, Some e -> Some e
           | Some e1, Some e2 -> Some (fun evt -> e1 evt; e2 evt)
-        in
-        let kind =
-          match status with
-          | Wfeedback | Wfeedback_once -> Feedback
-          | (Wactive | Werror | Wabort | Wonce | Werror_once | Winactive) ->
-            Warning
         in
         let category = if wkey = "" then None else Some wkey in
         let append_once_suffix = (fun fmt ->
