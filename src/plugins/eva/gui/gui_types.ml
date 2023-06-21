@@ -135,7 +135,7 @@ module type S = sig
   val equal_gui_after : value gui_after -> value gui_after -> bool
 end
 
-module Make (V: Abstractions.Value) = struct
+module Make (V: Abstract.Value.External) = struct
 
   let pretty_gui_res fmt = function
     | GR_Empty -> ()

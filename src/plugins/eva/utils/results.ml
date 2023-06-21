@@ -314,10 +314,11 @@ struct
       convert r
 
   let get_cvalue_model req =
-    match A.Dom.get_cvalue with
+    match A.Dom.get Cvalue_domain.State.key with
     | None ->
       Result.error DisabledDomain
     | Some extract ->
+      let extract s = extract s |> fst in
       convert (Response.map_join extract Cvalue.Model.join (get req))
 
   let get_state req key join =

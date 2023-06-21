@@ -856,8 +856,8 @@ module Make
     | Lval (host, off as lval) ->
       if Cil.typeHasQualifier "volatile" (Cil.typeOfLval lval) then `Value acc
       else
-        let loc = find_loc valuation lval in
-        if Cvalue.V.cardinal_zero_or_one (get_cval (Loc.to_value loc))
+        Loc.to_value (find_loc valuation lval) >>- fun value ->
+        if Cvalue.V.cardinal_zero_or_one (get_cval value)
         then
           (* no variable in the host or in the offset can be influential. Check
              the contents of the location, on which we might want to enumerate*)

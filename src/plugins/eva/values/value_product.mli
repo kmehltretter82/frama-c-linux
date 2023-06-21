@@ -22,6 +22,18 @@
 
 (** Cartesian product of two value abstractions. *)
 
+type 'v truth := 'v Abstract_value.truth
+
+(** [narrow_truth (v1, t1) (v2, t2)] intersects the truth values [t1] and [t2]
+    resulting from [assume_] functions for abstract values [v1] and [v2]
+    (that may be reduced by the assumption). *)
+val narrow_truth: 'a * 'a truth -> 'b * 'b truth -> ('a * 'b) truth
+
+(** Same as narrow_truth for truth values involving pairs of abstract values. *)
+val narrow_truth_pair:
+  ('a * 'a) * ('a * 'a) truth -> ('b * 'b) * ('b * 'b) truth ->
+  (('a * 'b)  * ('a * 'b)) truth
+
 module Make
     (Left: Abstract_value.S)
     (Right: Abstract_value.S)

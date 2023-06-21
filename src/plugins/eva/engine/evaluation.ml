@@ -183,36 +183,6 @@ let exp_alarm_signed_converted_downcast =
        let signed_exp = Cil.new_exp ~loc:exp.eloc (CastE (signed_typ, exp)) in
        signed_exp)
 
-module type S = sig
-  type state
-  type value
-  type origin
-  type loc
-  module Valuation : Valuation with type value = value
-                                and type origin = origin
-                                and type loc = loc
-  val to_domain_valuation:
-    Valuation.t -> (value, loc, origin) Abstract_domain.valuation
-  val evaluate :
-    ?valuation:Valuation.t -> ?reduction:bool -> ?subdivnb:int ->
-    state -> exp -> (Valuation.t * value) evaluated
-  val copy_lvalue :
-    ?valuation:Valuation.t -> ?subdivnb:int ->
-    state -> lval -> (Valuation.t * value flagged_value) evaluated
-  val lvaluate :
-    ?valuation:Valuation.t -> ?subdivnb:int -> for_writing:bool ->
-    state -> lval -> (Valuation.t * loc * typ) evaluated
-  val reduce:
-    ?valuation:Valuation.t -> state -> exp -> bool -> Valuation.t evaluated
-  val assume:
-    ?valuation:Valuation.t -> state -> exp -> value -> Valuation.t or_bottom
-  val eval_function_exp:
-    ?subdivnb:int -> exp -> ?args:exp list -> state ->
-    (Kernel_function.t * Valuation.t) list evaluated
-  val interpret_truth:
-    alarm:(unit -> Alarms.t) -> 'a -> 'a Abstract_value.truth -> 'a evaluated
-end
-
 let return t = `Value t, Alarmset.none
 
 (* Intersects [alarms] with the only possible alarms from the dereference of
@@ -895,7 +865,7 @@ module Make
     | AddrOf v | StartOf v ->
       lval_to_loc context ~for_writing:false ~reduction:false v
       >>= fun (loc, _, _) ->
-      let value = Loc.to_value loc in
+      (Loc.to_value loc, Alarmset.none) >>= fun value ->
       let v = assume_pointer expr value in
       compute_reduction v false
 
@@ -1394,7 +1364,7 @@ module Make
     | Mem expr, offset ->
       match offset with
       | NoOffset ->
-        let loc_value = Loc.to_value location in
+        Loc.to_value location >>- fun loc_value ->
         backward_eval fuel state expr (Some loc_value) >>-: fun _ -> ()
       | _ ->
         let reduce_valid_index = true in
@@ -1690,7 +1660,6 @@ module Make
       end
     | _ -> assert false
 end
-
 
 (*
 Local Variables:

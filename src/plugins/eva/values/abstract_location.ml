@@ -44,7 +44,7 @@ module type S = sig
   val pretty_loc: Format.formatter -> location -> unit
   val pretty_offset : Format.formatter -> offset -> unit
 
-  val to_value : location -> value
+  val to_value : location -> value or_bottom
   val size : location -> Int_Base.t
 
   (** [replace_base substitution location] replaces the variables represented

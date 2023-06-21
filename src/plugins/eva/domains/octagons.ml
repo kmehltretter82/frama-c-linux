@@ -1953,3 +1953,15 @@ module Domain = struct
 end
 
 include Domain
+
+let registered =
+  let name = "octagon" and priority = 6 in
+  let descr =
+    "Infers relations between scalar variables of the form b ≤ ±X ± Y ≤ e, \
+     where X, Y are program variables and b, e are constants."
+  in
+  Abstractions.Domain.register ~name ~priority ~descr @@ Domain
+    { key ; domain = (module Domain)
+    ; values = Last Main_values.CVal.registered
+    ; locations = Last Main_locations.PLoc.registered
+    }

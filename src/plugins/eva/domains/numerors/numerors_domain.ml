@@ -151,17 +151,19 @@ let reduce_cast (module Abstract: Abstractions.S) =
   end: Abstractions.S)
 
 (* Register the domain as an Eva abstractions. *)
+let registered =
+  let name = "numerors" and experimental = true in
+  let descr =
+    "Infers ranges for the absolute and relative errors \
+     in floating-point computations. No support of loops."
+  in
+  Abstractions.Domain.register ~name ~experimental ~descr @@ Domain
+    { key = Domain.key ; domain = (module Domain)
+    ; values = Last Numerors_Value.registered
+    ; locations = Last Main_locations.PLoc.registered
+    }
+
 let () =
   let open Abstractions in
-  let name = "numerors"
-  and descr = "Infers ranges for the absolute and relative errors \
-               in floating-point computations. No support of loops."
-  and experimental = true
-  and abstraction =
-    { values = Single (module Numerors_value);
-      domain = Domain (module Domain); }
-  in
-  let reduced_product = Main_values.CVal.key, Numerors_value.key, reduce_error in
-  ignore (register ~name ~descr ~experimental abstraction);
-  register_value_reduction reduced_product;
-  register_hook reduce_cast
+  Reducer.register Main_values.CVal.key Numerors_Value.key reduce_error ;
+  Hooks.register reduce_cast

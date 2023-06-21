@@ -322,7 +322,7 @@ exception InvalidAction
 
 (* --- Flows --- *)
 
-module MakeFlow (Abstract: Abstractions.Eva) =
+module MakeFlow (Abstract: Abstractions.S_with_evaluation) =
 struct
   type state = Abstract.Dom.t
   type t =  (key * state) list

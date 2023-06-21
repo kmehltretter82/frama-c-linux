@@ -24,13 +24,14 @@
 
 (** Abstract locations built over Precise_locs. *)
 module PLoc : sig
-
-  include Abstract_location.Leaf
+  include Abstract_location.S
     with type value = Cvalue.V.t
      and type location = Precise_locs.precise_location
 
   val make: Locations.location -> location
 
+  val key : location Abstract_location.key
+  val registered : location Abstractions.Location.registered
 end
 
 (*

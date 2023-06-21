@@ -360,6 +360,8 @@ end
 
 module Proxy(A : Analysis.S) : EvaProxy = struct
 
+  include Cvalue_domain.Getters (A.Dom)
+
   open Eval
   type dstate = A.Dom.state or_top_bottom
 
@@ -448,7 +450,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   (* --- Evaluates an expression or lvalue into an evaluation [result]. ----- *)
 
   let lval_to_offsetmap lval state =
-    let cvalue_state = A.Dom.get_cvalue_or_top state in
+    let cvalue_state = get_cvalue_or_top state in
     match lval with
     | Var vi, NoOffset ->
       let r = extract_single_var vi cvalue_state in

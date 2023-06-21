@@ -224,3 +224,15 @@ module D : Abstract_domain.Leaf
     let loc = Precise_locs.imprecise_location location in
     kill loc state
 end
+
+
+let registered =
+  let name = "bitwise" and priority = 3 in
+  let descr =
+    "Infers bitwise information to interpret more precisely bitwise operators."
+  in
+  Abstractions.Domain.register ~name ~priority ~descr @@ Domain
+    { key = D.key ; domain = (module D)
+    ; values = Last Offsm_value.Offsm.registered
+    ; locations = Last Main_locations.PLoc.registered
+    }

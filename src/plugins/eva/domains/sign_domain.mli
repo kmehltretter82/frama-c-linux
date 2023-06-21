@@ -24,3 +24,5 @@
 
 include Abstract_domain.Leaf with type value = Sign_value.t
                               and type location = Precise_locs.precise_location
+
+val registered : Abstractions.Domain.registered

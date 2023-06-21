@@ -20,11 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Domain that store information on non-precise l-values such as
-    [t[i]] or [*p] when [i] or [p] is not exact. *)
-
-module D: Abstract_domain.Leaf
-  with type value = Cvalue.V.t
-   and type location = Precise_locs.precise_location
-
-val registered : Abstractions.Domain.registered
+module Make
+    (Value: Abstract_value.S)
+    (Left: Abstract.Location.Internal with type value = Value.t)
+    (Right: Abstract.Location.Internal with type value = Value.t)
+  : Abstract.Location.Internal
+    with type value = Value.t
+     and type location = Left.location * Right.location
+     and type offset = Left.offset * Right.offset

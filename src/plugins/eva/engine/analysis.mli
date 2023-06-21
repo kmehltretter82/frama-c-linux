@@ -60,7 +60,7 @@ end
 
 
 module type S = sig
-  include Abstractions.Eva
+  include Abstractions.S_with_evaluation
   include Results with type state := Dom.state
                    and type value := Val.t
                    and type location := Loc.location

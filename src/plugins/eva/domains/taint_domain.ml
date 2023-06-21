@@ -582,17 +582,18 @@ let interpret_taint_logic
     end)
 
 (* Registers the domain. *)
-let flag =
+let registered =
   let name = "taint"
   and descr = "Taint analysis"
   and experimental = true
-  and abstraction =
-    Abstractions.{ values = Single (module Main_values.CVal);
-                   domain = Domain (module TaintDomain); }
   in
-  Abstractions.register ~name ~descr ~experimental abstraction
+  Abstractions.Domain.register ~name ~descr ~experimental @@ Domain
+    { key = TaintDomain.key ; domain = (module TaintDomain)
+    ; values = Last Main_values.CVal.registered
+    ; locations = Last Main_locations.PLoc.registered
+    }
 
-let () = Abstractions.register_hook interpret_taint_logic
+let () = Abstractions.Hooks.register interpret_taint_logic
 
 
 type taint = Direct | Indirect | Untainted
