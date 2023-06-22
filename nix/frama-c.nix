@@ -44,6 +44,7 @@
 , doxygen
 , python3
 , python3Packages
+, yq
 , release_mode ? false
 }:
 
@@ -103,6 +104,7 @@ stdenvNoCC.mkDerivation rec {
     doxygen
     python3
     python3Packages.pyaml
+    yq
   ];
 
   outputs = [ "out" "build_dir" ];
