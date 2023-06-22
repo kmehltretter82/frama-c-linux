@@ -9,11 +9,11 @@ alignof_longlong: 8
 alignof_ptr: 8
 alignof_short: 2
 alignof_str: 1
-bufsiz: ''
-char_is_unsigned: true
+bufsiz: '8192'
+char_is_unsigned: false
 compiler: clang
 cpp_arch_flags:
-- --target=riscv64
+- --target=x86_64
 custom_defs: |
     #undef _LP64
     #define _LP64 1
@@ -43,8 +43,6 @@ custom_defs: |
     #define __CHAR32_TYPE__ unsigned int
     #undef __CHAR_BIT__
     #define __CHAR_BIT__ 8
-    #undef __CHAR_UNSIGNED__
-    #define __CHAR_UNSIGNED__ 1
     #undef __CLANG_ATOMIC_BOOL_LOCK_FREE
     #define __CLANG_ATOMIC_BOOL_LOCK_FREE 2
     #undef __CLANG_ATOMIC_CHAR16_T_LOCK_FREE
@@ -97,8 +95,6 @@ custom_defs: |
     #define __DBL_MIN__ 2.2250738585072014e-308
     #undef __DECIMAL_DIG__
     #define __DECIMAL_DIG__ __LDBL_DECIMAL_DIG__
-    #undef __ELF__
-    #define __ELF__ 1
     #undef __FINITE_MATH_ONLY__
     #define __FINITE_MATH_ONLY__ 0
     #undef __FLT16_DECIMAL_DIG__
@@ -159,6 +155,10 @@ custom_defs: |
     #define __FLT_MIN__ 1.17549435e-38F
     #undef __FLT_RADIX__
     #define __FLT_RADIX__ 2
+    #undef __FXSR__
+    #define __FXSR__ 1
+    #undef __GCC_ASM_FLAG_OUTPUTS__
+    #define __GCC_ASM_FLAG_OUTPUTS__ 1
     #undef __GCC_ATOMIC_BOOL_LOCK_FREE
     #define __GCC_ATOMIC_BOOL_LOCK_FREE 2
     #undef __GCC_ATOMIC_CHAR16_T_LOCK_FREE
@@ -181,6 +181,8 @@ custom_defs: |
     #define __GCC_ATOMIC_TEST_AND_SET_TRUEVAL 1
     #undef __GCC_ATOMIC_WCHAR_T_LOCK_FREE
     #define __GCC_ATOMIC_WCHAR_T_LOCK_FREE 2
+    #undef __GCC_HAVE_DWARF2_CFI_ASM
+    #define __GCC_HAVE_DWARF2_CFI_ASM 1
     #undef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_1
     #define __GCC_HAVE_SYNC_COMPARE_AND_SWAP_1 1
     #undef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2
@@ -346,13 +348,13 @@ custom_defs: |
     #undef __INT_WIDTH__
     #define __INT_WIDTH__ 32
     #undef __LDBL_DECIMAL_DIG__
-    #define __LDBL_DECIMAL_DIG__ 36
+    #define __LDBL_DECIMAL_DIG__ 21
     #undef __LDBL_DENORM_MIN__
-    #define __LDBL_DENORM_MIN__ 6.47517511943802511092443895822764655e-4966L
+    #define __LDBL_DENORM_MIN__ 3.64519953188247460253e-4951L
     #undef __LDBL_DIG__
-    #define __LDBL_DIG__ 33
+    #define __LDBL_DIG__ 18
     #undef __LDBL_EPSILON__
-    #define __LDBL_EPSILON__ 1.92592994438723585305597794258492732e-34L
+    #define __LDBL_EPSILON__ 1.08420217248550443401e-19L
     #undef __LDBL_HAS_DENORM__
     #define __LDBL_HAS_DENORM__ 1
     #undef __LDBL_HAS_INFINITY__
@@ -360,19 +362,19 @@ custom_defs: |
     #undef __LDBL_HAS_QUIET_NAN__
     #define __LDBL_HAS_QUIET_NAN__ 1
     #undef __LDBL_MANT_DIG__
-    #define __LDBL_MANT_DIG__ 113
+    #define __LDBL_MANT_DIG__ 64
     #undef __LDBL_MAX_10_EXP__
     #define __LDBL_MAX_10_EXP__ 4932
     #undef __LDBL_MAX_EXP__
     #define __LDBL_MAX_EXP__ 16384
     #undef __LDBL_MAX__
-    #define __LDBL_MAX__ 1.18973149535723176508575932662800702e+4932L
+    #define __LDBL_MAX__ 1.18973149535723176502e+4932L
     #undef __LDBL_MIN_10_EXP__
     #define __LDBL_MIN_10_EXP__ (-4931)
     #undef __LDBL_MIN_EXP__
     #define __LDBL_MIN_EXP__ (-16381)
     #undef __LDBL_MIN__
-    #define __LDBL_MIN__ 3.36210314311209350626267781732175260e-4932L
+    #define __LDBL_MIN__ 3.36210314311209350626e-4932L
     #undef __LITTLE_ENDIAN__
     #define __LITTLE_ENDIAN__ 1
     #undef __LLONG_WIDTH__
@@ -385,8 +387,12 @@ custom_defs: |
     #define __LONG_WIDTH__ 64
     #undef __LP64__
     #define __LP64__ 1
+    #undef __MMX__
+    #define __MMX__ 1
     #undef __NO_INLINE__
     #define __NO_INLINE__ 1
+    #undef __NO_MATH_INLINES
+    #define __NO_MATH_INLINES 1
     #undef __OBJC_BOOL_IS_BOOL
     #define __OBJC_BOOL_IS_BOOL 0
     #undef __OPENCL_MEMORY_SCOPE_ALL_SVM_DEVICES
@@ -419,8 +425,14 @@ custom_defs: |
     #define __PTRDIFF_TYPE__ long int
     #undef __PTRDIFF_WIDTH__
     #define __PTRDIFF_WIDTH__ 64
+    #undef __REGISTER_PREFIX__
+    #define __REGISTER_PREFIX__
     #undef __SCHAR_MAX__
     #define __SCHAR_MAX__ 127
+    #undef __SEG_FS
+    #define __SEG_FS 1
+    #undef __SEG_GS
+    #define __SEG_GS 1
     #undef __SHRT_MAX__
     #define __SHRT_MAX__ 32767
     #undef __SHRT_WIDTH__
@@ -469,6 +481,14 @@ custom_defs: |
     #define __SIZE_TYPE__ long unsigned int
     #undef __SIZE_WIDTH__
     #define __SIZE_WIDTH__ 64
+    #undef __SSE2_MATH__
+    #define __SSE2_MATH__ 1
+    #undef __SSE2__
+    #define __SSE2__ 1
+    #undef __SSE_MATH__
+    #define __SSE_MATH__ 1
+    #undef __SSE__
+    #define __SSE__ 1
     #undef __UINT16_C_SUFFIX__
     #define __UINT16_C_SUFFIX__
     #undef __UINT16_FMTX__
@@ -662,13 +682,15 @@ custom_defs: |
     #undef __WCHAR_WIDTH__
     #define __WCHAR_WIDTH__ 32
     #undef __WINT_MAX__
-    #define __WINT_MAX__ 4294967295U
+    #define __WINT_MAX__ 2147483647
     #undef __WINT_TYPE__
-    #define __WINT_TYPE__ unsigned int
-    #undef __WINT_UNSIGNED__
-    #define __WINT_UNSIGNED__ 1
+    #define __WINT_TYPE__ int
     #undef __WINT_WIDTH__
     #define __WINT_WIDTH__ 32
+    #undef __amd64
+    #define __amd64 1
+    #undef __amd64__
+    #define __amd64__ 1
     #undef __clang__
     #define __clang__ 1
     #undef __clang_literal_encoding__
@@ -683,57 +705,167 @@ custom_defs: |
     #define __clang_version__ "15.0.7 "
     #undef __clang_wide_literal_encoding__
     #define __clang_wide_literal_encoding__ "UTF-32"
+    #undef __code_model_small__
+    #define __code_model_small__ 1
+    #undef __k8
+    #define __k8 1
+    #undef __k8__
+    #define __k8__ 1
     #undef __llvm__
     #define __llvm__ 1
-    #undef __riscv
-    #define __riscv 1
-    #undef __riscv_a
-    #define __riscv_a 2000000
-    #undef __riscv_arch_test
-    #define __riscv_arch_test 1
-    #undef __riscv_atomic
-    #define __riscv_atomic 1
-    #undef __riscv_c
-    #define __riscv_c 2000000
-    #undef __riscv_cmodel_medlow
-    #define __riscv_cmodel_medlow 1
-    #undef __riscv_compressed
-    #define __riscv_compressed 1
-    #undef __riscv_div
-    #define __riscv_div 1
-    #undef __riscv_float_abi_soft
-    #define __riscv_float_abi_soft 1
-    #undef __riscv_i
-    #define __riscv_i 2000000
-    #undef __riscv_m
-    #define __riscv_m 2000000
-    #undef __riscv_mul
-    #define __riscv_mul 1
-    #undef __riscv_muldiv
-    #define __riscv_muldiv 1
-    #undef __riscv_xlen
-    #define __riscv_xlen 64
-eof: ''
-errno: {}
-filename_max: ''
-fopen_max: ''
+    #undef __seg_fs
+    #define __seg_fs __attribute__((address_space(257)))
+    #undef __seg_gs
+    #define __seg_gs __attribute__((address_space(256)))
+    #undef __tune_k8__
+    #define __tune_k8__ 1
+    #undef __x86_64
+    #define __x86_64 1
+    #undef __x86_64__
+    #define __x86_64__ 1
+eof: (-1)
+errno:
+    e2big: '7'
+    eacces: '13'
+    eaddrinuse: '98'
+    eaddrnotavail: '99'
+    eafnosupport: '97'
+    eagain: '11'
+    ealready: '114'
+    ebade: '52'
+    ebadf: '9'
+    ebadfd: '77'
+    ebadmsg: '74'
+    ebadr: '53'
+    ebadrqc: '56'
+    ebadslt: '57'
+    ebusy: '16'
+    ecanceled: '125'
+    echild: '10'
+    echrng: '44'
+    ecomm: '70'
+    econnaborted: '103'
+    econnrefused: '111'
+    econnreset: '104'
+    edeadlk: '35'
+    edeadlock: '35'
+    edestaddrreq: '89'
+    edom: '33'
+    edquot: '122'
+    eexist: '17'
+    efault: '14'
+    efbig: '27'
+    ehostdown: '112'
+    ehostunreach: '113'
+    eidrm: '43'
+    eilseq: '84'
+    einprogress: '115'
+    eintr: '4'
+    einval: '22'
+    eio: '5'
+    eisconn: '106'
+    eisdir: '21'
+    eisnam: '120'
+    ekeyexpired: '127'
+    ekeyrejected: '129'
+    ekeyrevoked: '128'
+    el2hlt: '51'
+    el2nsync: '45'
+    el3hlt: '46'
+    el3rst: '47'
+    elibacc: '79'
+    elibbad: '80'
+    elibexec: '83'
+    elibmax: '82'
+    elibscn: '81'
+    eloop: '40'
+    emediumtype: '124'
+    emfile: '24'
+    emlink: '31'
+    emsgsize: '90'
+    emultihop: '72'
+    enametoolong: '36'
+    enetdown: '100'
+    enetreset: '102'
+    enetunreach: '101'
+    enfile: '23'
+    enobufs: '105'
+    enodata: '61'
+    enodev: '19'
+    enoent: '2'
+    enoexec: '8'
+    enokey: '126'
+    enolck: '37'
+    enolink: '67'
+    enomedium: '123'
+    enomem: '12'
+    enomsg: '42'
+    enonet: '64'
+    enopkg: '65'
+    enoprotoopt: '92'
+    enospc: '28'
+    enosr: '63'
+    enostr: '60'
+    enosys: '38'
+    enotblk: '15'
+    enotconn: '107'
+    enotdir: '20'
+    enotempty: '39'
+    enotrecoverable: '131'
+    enotsock: '88'
+    enotsup: '95'
+    enotty: '25'
+    enotuniq: '76'
+    enxio: '6'
+    eopnotsupp: '95'
+    eoverflow: '75'
+    eownerdead: '130'
+    eperm: '1'
+    epfnosupport: '96'
+    epipe: '32'
+    eproto: '71'
+    eprotonosupport: '93'
+    eprototype: '91'
+    erange: '34'
+    eremchg: '78'
+    eremote: '66'
+    eremoteio: '121'
+    erestart: '85'
+    erofs: '30'
+    eshutdown: '108'
+    esocktnosupport: '94'
+    espipe: '29'
+    esrch: '3'
+    estale: '116'
+    estrpipe: '86'
+    etime: '62'
+    etimedout: '110'
+    etxtbsy: '26'
+    euclean: '117'
+    eunatch: '49'
+    eusers: '87'
+    ewouldblock: '11'
+    exdev: '18'
+    exfull: '54'
+filename_max: '4096'
+fopen_max: '16'
 has__builtin_va_list: true
-host_name_max: ''
-int_fast16_t: short
-int_fast32_t: int
+host_name_max: '64'
+int_fast16_t: long
+int_fast32_t: long
 int_fast64_t: long
 int_fast8_t: signed char
 intptr_t: long
-l_tmpnam: ''
+l_tmpnam: '20'
 little_endian: true
 machdep_name: custom_machdep
-mb_cur_max: ''
-nsig: ''
-path_max: ''
-posix_version: ''
+mb_cur_max: ((size_t)16)
+nsig: (64 + 1)
+path_max: '4096'
+posix_version: 200809L
 ptrdiff_t: long
-rand_max: ''
-sig_atomic_t: ''
+rand_max: '2147483647'
+sig_atomic_t: int
 size_t: unsigned long
 sizeof_double: 8
 sizeof_float: 4
@@ -745,17 +877,17 @@ sizeof_longlong: 8
 sizeof_ptr: 8
 sizeof_short: 2
 sizeof_void: 1
-ssize_t: ''
-time_t: ''
-tmp_max: ''
-tty_name_max: ''
-uint_fast16_t: unsigned short
-uint_fast32_t: unsigned int
+ssize_t: long
+time_t: long
+tmp_max: '238328'
+tty_name_max: '32'
+uint_fast16_t: unsigned long
+uint_fast32_t: unsigned long
 uint_fast64_t: unsigned long
 uint_fast8_t: unsigned char
 uintptr_t: unsigned long
 version: clang version 15.0.7
 wchar_t: int
-weof: ''
-wint_t: ''
-wordsize: ''
+weof: (0xffffffffu)
+wint_t: int
+wordsize: '64'
