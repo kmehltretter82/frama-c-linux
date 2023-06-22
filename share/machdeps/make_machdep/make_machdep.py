@@ -280,11 +280,9 @@ def find_value(name, typ, output):
             machdep[name] = value
         else:
             logging.warning(
-                f"cannot find value of field '{name}', using default value: '{default}'"
+                f"cannot find value of field '{name}', using default value: '{default}'\ncompiler output is:\n{output}"
             )
             machdep[name] = default
-            if args.verbose:
-                print(f"compiler output is:{output}")
     else:
         logging.warning(f"unexpected symbol '{name}', ignoring")
 
@@ -336,9 +334,9 @@ for f, typ in source_files:
         continue
     if typ == "macro":
         if proc.returncode != 0:
-            logging.warning(f"error in preprocessing value '{p}', some values won't be filled")
-            if args.verbose:
-                print(f"compiler output is:{proc.stderr.decode()}")
+            logging.warning(
+                f"error in preprocessing value '{p}', some values won't be filled\ncompiler output is:\n{proc.stderr.decode()}"
+            )
             name = p.stem
             if name in machdep:
                 machdep[name] = ""
@@ -348,9 +346,9 @@ for f, typ in source_files:
     if typ == "macrolist":
         name = p.stem
         if proc.returncode != 0:
-            logging.warning(f"error in preprocessing value '{p}', some value might not be filled")
-            if args.verbose:
-                print(f"compiler output is:{proc.stderr.decode()}")
+            logging.warning(
+                f"error in preprocessing value '{p}', some value might not be filled\ncompiler output is:{proc.stderr.decode()}"
+            )
             if name in machdep:
                 machdep[name] = {}
             continue
@@ -421,9 +419,7 @@ if proc.returncode == 0:
         lines += f"{line.strip()}\n"
     machdep["custom_defs"] = custom_defs(lines)
 else:
-    logging.warning("could not determine predefined macros")
-    if args.verbose:
-        print(f"compiler output is:{proc.stderr}")
+    logging.warning("could not determine predefined macros. compiler output is:\n{proc.stderr}")
 
 if args.from_file and args.in_place:
     machdep["machdep_name"] = Path(args.from_file).stem
