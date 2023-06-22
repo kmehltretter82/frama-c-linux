@@ -43,6 +43,7 @@
 , dos2unix
 , doxygen
 , python3
+, python3Packages
 , release_mode ? false
 }:
 
@@ -101,6 +102,7 @@ stdenvNoCC.mkDerivation rec {
     dos2unix
     doxygen
     python3
+    python3Packages.pyaml
   ];
 
   outputs = [ "out" "build_dir" ];

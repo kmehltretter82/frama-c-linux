@@ -47,6 +47,7 @@
 , perl
 , pkgs
 , python3
+, python3Packages
 , swiProlog
 , time
 , wp-cache
@@ -107,6 +108,7 @@ stdenvNoCC.mkDerivation rec {
     perl
     pkgs.getopt
     python3
+    python3Packages.pyaml
     swiProlog
     time
   ];
