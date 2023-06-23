@@ -69,6 +69,8 @@ module Domain : sig
 end
 
 
+(** {2 Reduced product between value abstractions.} *)
+
 (** Value reduced product registration. Registering a value reduced product
     requires the keys of each value abstractions involved along with a reducer,
     i.e. a function that perform the reduction. *)
@@ -76,16 +78,7 @@ module Reducer : sig
   type ('a, 'b) reducer = 'a -> 'b -> 'a * 'b
   val register :
     'a Abstract_value.key -> 'b Abstract_value.key -> ('a, 'b) reducer -> unit
-
-  (** The value abstractions signature used in the engine. It is composed of the
-      external signature of value abstractions, plus the reduction function of
-      the reduced product. *)
-  module type Value = sig
-    include Abstract.Value.External
-    val reduce : t -> t
-  end
 end
-
 
 
 (** {2 Configuration of an analysis.} *)
@@ -105,9 +98,16 @@ end
 
 (** {2 Types and functions used in the engine.} *)
 
+(** The value abstractions signature used in the engine, with the reduction
+    function of the reduced product. *)
+module type Value = sig
+  include Abstract.Value.External
+  val reduce : t -> t
+end
+
 (** The three abstractions used in an Eva analysis. *)
 module type S = sig
-  module Val : Reducer.Value
+  module Val : Value
   module Loc : Abstract.Location.External with type value = Val.t
   module Dom : Abstract.Domain.External
     with type value = Val.t and type location = Loc.location

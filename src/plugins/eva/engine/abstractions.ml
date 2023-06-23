@@ -591,6 +591,11 @@ end
 
 (* --- Value reduced product ----------------------------------------------- *)
 
+module type Value = sig
+  include Abstract.Value.External
+  val reduce : t -> t
+end
+
 module Reducer = struct
   type 'a key = 'a Value.key
   type ('a, 'b) reducer = 'a -> 'b -> 'a * 'b
@@ -600,11 +605,6 @@ module Reducer = struct
 
   let register left right reducer =
     actions := (Action (left, right, reducer)) :: !actions
-
-  module type Value = sig
-    include Abstract.Value.External
-    val reduce : t -> t
-  end
 
   module Make (Value : Abstract.Value.External) = struct
     include Value
@@ -629,7 +629,7 @@ end
 (* --- Finalizing abstractions build ---------------------------------------- *)
 
 module type S = sig
-  module Val : Reducer.Value
+  module Val : Value
   module Loc : Abstract.Location.External with type value = Val.t
   module Dom : Abstract.Domain.External
     with type value = Val.t and type location = Loc.location
