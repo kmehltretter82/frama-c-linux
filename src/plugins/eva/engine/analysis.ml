@@ -150,7 +150,7 @@ end
 
 
 
-let default = Abstractions.Config.singleton "cvalue" Cvalue_domain.registered
+let default = Abstractions.Config.singleton (Cvalue_domain.registered, None)
 module Default : Analyzer = Make (val Abstractions.make default)
 
 

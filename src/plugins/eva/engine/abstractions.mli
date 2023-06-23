@@ -90,16 +90,14 @@ end
 
 (** {2 Configuration of an analysis.} *)
 
-(** Configuration defining the abstractions to be used in an analysis. A
-    configuration can either be built from a given domain along with its
-    name or can be built based on the command line parameters. The first
-    approach relies on the [singleton] function and is mainly used to
-    build a default abstraction during the engine initialization. The
-    second one relies on the [configure] function. *)
+(** Configuration defining the abstractions to be used in an analysis.
+    A configuration is a set of registered abstract domains. Each domain comes
+    with an optional analysis mode. None is the default mode: the domain is
+    enabled for the whole analysis. See {!Domain_mode} for more details. *)
 module Config : sig
-  type t
-  val equal : t -> t -> bool
-  val singleton : string -> Domain.registered -> t
+  include Set.S with type elt = Domain.registered * Domain_mode.t option
+
+  (** Creates the configuration according to the analysis parameters. *)
   val configure : unit -> t
 end
 

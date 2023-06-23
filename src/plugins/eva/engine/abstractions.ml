@@ -314,23 +314,22 @@ module Domain = struct
   (* To simplify the domain registration procedure, we provide common types.
      However, the code above is still useful to prove some properties, mainly
      that we do not temper with the dependencies. *)
-  type registered =
-    | Domain : (module Abstract_domain.Leaf) -> registered
-    | Functor : (module Functor) -> registered
+  type domain =
+    | Domain : (module Abstract_domain.Leaf) -> domain
+    | Functor : (module Functor) -> domain
 
-  (* Registered domain are saved in mutable lists along with there information,
-     i.e. there name, there experimental and there priority flags. *)
-  type 't with_info =
+  (* Registered domain are saved in mutable lists along with their information:
+     name, experimental status and priority. *)
+  type registered =
     { name : string
     ; experimental : bool
     ; priority : int
-    ; abstraction : 't
+    ; abstraction : domain
     }
 
-  (* The configuration of an analysis contains a set of domains along with their
-     mode. *)
-  type 't with_mode = 't * Domain_mode.t option
-
+  (* The configuration of an analysis contains a set of registered domains
+     along with their analysis mode. *)
+  type registered_with_mode = registered * Domain_mode.t option
 
   (* Mutable lists containing statically and dynamically registered domains. *)
   let static_domains = ref []
@@ -347,7 +346,7 @@ module Domain = struct
     let abstraction = Domain domain in
     let registered = { name ; experimental ; priority ; abstraction } in
     static_domains := registered :: !static_domains ;
-    abstraction
+    registered
 
   (* Registration of a dynamic domain. *)
   let dynamic_register ~name ~descr ?(experimental=false) ?(priority=0) make =
@@ -362,7 +361,7 @@ module Domain = struct
     let abstraction = Functor domain in
     let registered = { name ; experimental ; priority ; abstraction } in
     static_domains := registered :: !static_domains ;
-    abstraction
+    registered
 
 
   (* Building the domain abstraction consists of structuring the requested
@@ -421,7 +420,7 @@ module Domain = struct
   (* Adding a registered domain into a structured one consists of performing a
      lifting of the registered one if needed before performing the product,
      configuring the name and restricting the domain depending of the mode. *)
-  type add_input = registered with_info with_mode
+  type add_input = registered_with_mode
   let add : type v l. add_input -> (v, l) structured -> (v, l) structured =
     fun (registered, mode) structured ->
     let wkey = Self.wkey_experimental in
@@ -561,7 +560,7 @@ module Config = struct
 
   include Set.Make (struct
       open Domain
-      type t = registered with_info with_mode
+      type t = registered_with_mode
       let compare (d1, m1) (d2, m2) =
         let c = Datatype.Int.compare d1.priority d2.priority in
         if c = 0 then
@@ -569,11 +568,6 @@ module Config = struct
           if c = 0 then Mode.compare m1 m2 else c
         else c
     end)
-
-  let singleton name abstraction =
-    let experimental = false and priority = 9 in
-    let abstraction = Domain.{ name ; priority ; experimental ; abstraction } in
-    singleton (abstraction, None)
 
   let configure () =
     let find = Parameters.DomainsFunction.find in
