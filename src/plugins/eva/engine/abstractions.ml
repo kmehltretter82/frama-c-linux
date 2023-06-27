@@ -340,13 +340,21 @@ module Domain = struct
     let descr = if experimental then "Experimental. " ^ descr else descr in
     Parameters.register_domain ~name ~descr
 
-  (* Registration of a static leaf domain. *)
-  let register ~name ~descr ?(experimental=false) ?(priority=0) domain =
+  (* Registration of a leaf or functor domain. *)
+  let register_domain
+      ~name ~descr ?(experimental=false) ?(priority=0) abstraction =
     register_domain_option ~name ~descr ~experimental ;
-    let abstraction = Domain domain in
     let registered = { name ; experimental ; priority ; abstraction } in
     static_domains := registered :: !static_domains ;
     registered
+
+  (* Registration of a leaf domain. *)
+  let register ~name ~descr ?experimental ?priority domain =
+    register_domain ~name ~descr ?experimental ?priority (Domain domain)
+
+  (* Registration of a functor domain. *)
+  let register_functor ~name ~descr ?experimental ?priority domain =
+    register_domain ~name ~descr ?experimental ?priority (Functor domain)
 
   (* Registration of a dynamic domain. *)
   let dynamic_register ~name ~descr ?(experimental=false) ?(priority=0) make =
@@ -354,15 +362,6 @@ module Domain = struct
     let make () = Domain (make ()) in
     let make () = { name ; experimental ; priority ; abstraction = make () } in
     dynamic_domains := (name, make) :: !dynamic_domains
-
-  (* Registration of a functor domain. *)
-  let register_functor ~name ~descr ?(experimental=false) ?(priority=0) domain =
-    register_domain_option ~name ~descr ~experimental ;
-    let abstraction = Functor domain in
-    let registered = { name ; experimental ; priority ; abstraction } in
-    static_domains := registered :: !static_domains ;
-    registered
-
 
   (* Building the domain abstraction consists of structuring the requested
      registered domains. To do so, we need to keep track of the values and
