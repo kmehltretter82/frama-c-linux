@@ -28,6 +28,7 @@ module Abstractions = Abstractions
 module Active_behaviors = Active_behaviors
 module Alarmset = Alarmset
 module Analysis = Analysis
+module Callstack = Callstack
 module Cvalue_domain = Cvalue_domain
 module Domain_builder = Domain_builder
 module Eva_dynamic = Eva_dynamic

@@ -202,4 +202,13 @@ struct
     | Global _vi -> []
     | Local ls ->
       List.rev_map snd ls.stack
+
+  (* This function should not be used as callstack should be initialized
+     with their thread instead of fixing it afterwards. To be removed as soon
+     as this issue is fixed. *)
+  let change_thread cs thread =
+    match cs with
+    | Global _ -> cs
+    | Local ls ->
+      Local { ls with thread }
 end
