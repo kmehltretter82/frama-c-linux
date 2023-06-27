@@ -593,7 +593,7 @@ end
 
 (* --- Value reduced product ----------------------------------------------- *)
 
-module type Value = sig
+module type Value_with_reduction = sig
   include Abstract.Value.External
   val reduce : t -> t
 end
@@ -631,7 +631,7 @@ end
 (* --- Finalizing abstractions build ---------------------------------------- *)
 
 module type S = sig
-  module Val : Value
+  module Val : Value_with_reduction
   module Loc : Abstract.Location.External with type value = Val.t
   module Dom : Abstract.Domain.External
     with type value = Val.t and type location = Loc.location
