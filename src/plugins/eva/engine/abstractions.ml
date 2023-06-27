@@ -231,25 +231,28 @@ module Location = struct
         needed.
      3. Rebuild a structured abstraction with the new location abstraction. *)
   let add : type v l. l location -> v structured -> v structured =
-    fun (module Loc) structured ->
-    let deps = Value.outline Loc.value in
+    fun (module Leaf) structured ->
+    let leaf_value_structure = Value.outline Leaf.value in
     let module To = (val get_value structured) in
-    let lifted : (module Abstract.Location.Internal with type value = v) =
-      match Value.dec_eq deps To.structure with
+    let lifted_leaf : (module Abstract.Location.Internal with type value = v) =
+      match Value.dec_eq leaf_value_structure To.structure with
       | Some Eq ->
-        let leaf = Abstract.Location.Leaf (Loc.key, (module Loc)) in
-        (module struct include Loc let structure = leaf end)
+        let leaf = Abstract.Location.Leaf (Leaf.key, (module Leaf)) in
+        (module struct include Leaf let structure = leaf end)
       | None ->
-        let module From = struct include Loc let structure = deps end in
+        let module From = struct
+          type value = Leaf.value
+          let structure = leaf_value_structure
+        end in
         let module Converter = Value.Converter (From) (To) in
-        (module Location_lift.Make (Loc) (Converter))
+        (module Location_lift.Make (Leaf) (Converter))
     in
     let combined : (module Abstract.Location.Internal with type value = v) =
       match make_interactive structured with
-      | Unit _ -> lifted
-      | Location (module L) when L.mem Loc.key -> (module L)
-      | Location (module L) ->
-        (module Locations_product.Make (To) (val lifted) (L))
+      | Unit _ -> lifted_leaf
+      | Location (module Loc) when Loc.mem Leaf.key -> (module Loc)
+      | Location (module Loc) ->
+        (module Locations_product.Make (To) (val lifted_leaf) (Loc))
     in
     Location (module struct
       type value = v
