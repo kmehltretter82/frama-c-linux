@@ -88,10 +88,19 @@ end
     with an optional analysis mode. None is the default mode: the domain is
     enabled for the whole analysis. See {!Domain_mode} for more details. *)
 module Config : sig
-  include Set.S with type elt = Domain.registered * Domain_mode.t option
+  type t
 
   (** Creates the configuration according to the analysis parameters. *)
   val configure : unit -> t
+
+  (** Creates a custom configuration from a list of registered abstract domains,
+      associated with optional analysis modes. [None] is the default mode: the
+      domain is enabled for the whole analysis. See {!Domain_mode} for more
+      details. *)
+  val of_list : (Domain.registered * Domain_mode.t option) list -> t
+
+  (** Are two configurations identical? *)
+  val equal : t -> t -> bool
 end
 
 
