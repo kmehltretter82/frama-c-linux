@@ -41,11 +41,11 @@ module Value = struct
     | Node (l, r) -> Abstract.Value.(Node (outline l, outline r))
 
   (* Folding over values dependencies *)
-  type 'a folder = { f : 'v. 'v value -> 'a -> 'a }
+  type 'a folder = { folder : 'v. 'v value -> 'a -> 'a }
   let rec fold : type v. 'a folder -> v dependencies -> 'a -> 'a =
     fun folder dependencies acc ->
     match dependencies with
-    | Leaf leaf -> folder.f leaf acc
+    | Leaf leaf -> folder.folder leaf acc
     | Node (l, r) -> fold folder l (fold folder r acc)
 
   (* The value abstraction build consists of accumulating registered values
@@ -153,11 +153,11 @@ module Location = struct
     | Node (l, r) -> Abstract.Location.(Node (outline l, outline r))
 
   (* Folding over values dependencies *)
-  type 'a folder = { f : 'l. 'l location -> 'a -> 'a }
+  type 'a folder = { folder : 'l. 'l location -> 'a -> 'a }
   let rec fold : type v. 'a folder -> v dependencies -> 'a -> 'a =
     fun folder dependencies acc ->
     match dependencies with
-    | Leaf leaf -> folder.f leaf acc
+    | Leaf leaf -> folder.folder leaf acc
     | Node (l, r) -> fold folder l (fold folder r acc)
 
   (* Folding over the values dependencies of some locations dependencies. *)
@@ -517,7 +517,7 @@ module Domain = struct
      value initial configuration. *)
   let build domains : (module Structured) =
     let values =
-      let add_value = Value.{ f = add } in
+      let add_value = Value.{ folder = add } in
       let add_values values (registered, _) =
         match registered.abstraction with
         | Domain (module Domain) ->
@@ -532,7 +532,7 @@ module Domain = struct
     let module V = (val Value.assert_not_unit values) in
     let locations =
       let init : V.t Location.structured = Location.init (module V) in
-      let add_loc = Location.{ f = add } in
+      let add_loc = Location.{ folder = add } in
       let add_locations locs (registered, _) =
         match registered.abstraction with
         | Domain  (module D) -> Location.fold add_loc D.location locs
