@@ -76,8 +76,8 @@ module Make() = struct
 
 end
 
-module Z = Make(struct end)
-module Q = Make(struct end)
+module Z = Make()
+module Q = Make()
 
 let bitcnt_type_info_ref = mk_dummy_type_info_ref ()
 

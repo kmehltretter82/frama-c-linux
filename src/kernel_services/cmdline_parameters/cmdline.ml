@@ -158,7 +158,7 @@ let protect = function
 (** {2 Exiting Frama-C} *)
 (* ************************************************************************* *)
 
-module NormalExit = Hook.Make(struct end)
+module NormalExit = Hook.Make()
 let at_normal_exit = NormalExit.extend
 let run_normal_exit_hook = NormalExit.apply
 
@@ -617,7 +617,7 @@ struct
   let nb_actions = ref 0
   let is_going_to_run () = incr nb_actions
 
-  module H = Hook.Make(struct end)
+  module H = Hook.Make()
 
   let () = H.extend Log.treat_deferred_error
 
