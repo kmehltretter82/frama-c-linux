@@ -26,6 +26,8 @@ open Cil_types
 type name = Name.t
 type value = Value.t
 type thread
+type status = { running : Trilean.t ; canceled : Trilean.t }
+
 include Datatype.S_with_collections with type t = thread
 
 val dummy : thread
@@ -45,6 +47,7 @@ module Register : sig
   val is_included : t -> t -> bool
   val join : t -> t -> t
   val narrow : t -> t -> t
+  val find : thread -> t -> status option
 
   val register : thread -> t -> (t * value) Result.t
   val start    : thread -> t -> (t * value) Result.t

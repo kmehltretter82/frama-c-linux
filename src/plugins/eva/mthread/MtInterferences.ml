@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2025                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,40 +20,40 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Abstract_domain = Abstract_domain
-module Abstract_context = Abstract_context
-module Abstract_value = Abstract_value
-module Abstract_location = Abstract_location
-module Abstract = Abstract
-module Abstractions = Abstractions
-module Active_behaviors = Active_behaviors
-module Alarmset = Alarmset
-module Analysis = Analysis
-module Assigns = Assigns
-module Builtins = Builtins
-module Callstack = Callstack
-module Unit_context = Unit_context
-module Cvalue_callbacks = Cvalue_callbacks
-module Cvalue_domain = Cvalue_domain
-module Cvalue_results = Cvalue_results
-module Domain_builder = Domain_builder
-module Eva_dynamic = Eva_dynamic
-module Eva_results = Eva_results
-module Eva_utils = Eva_utils
-module Eval = Eval
-module Eval_annots = Eval_annots
-module Eval_op = Eval_op
-module Eval_terms = Eval_terms
-module Eval_typ = Eval_typ
-module Eva_ast = Eva_ast
-module Function_calls = Function_calls
-module Interferences = Interferences
-module Logic_inout = Logic_inout
-module Main_locations = Main_locations
-module Main_values = Main_values
-module Parameters = Parameters
-module Red_statuses = Red_statuses
-module Results = Results
-module Self = Self
-module Simple_memory = Simple_memory
-module Structure = Structure
+let concurrent_writes analysis_state =
+  let module ALSet = Interferences.AnalysisLocation.Set in
+  let open MtCfgTypes in
+  let is_write = function
+    | MtTypes.Read -> false
+    | Write _ -> true
+  in
+  let add_accesses (rw, node, _id) (acc : ALSet.t) =
+    if not (is_write rw)
+    then acc
+    else
+      let seq =
+        CfgNode.node_stmt node |>
+        List.to_seq |>
+        Seq.map (fun stmt -> node.cfgn_stack, stmt)
+      in
+      ALSet.add_seq seq acc
+  in
+  let add_zone_accesses acc (_zone, node_id_set) =
+    MtCfgTypes.SetNodeIdAccess.fold add_accesses node_id_set acc
+  in
+  analysis_state.MtThread.concurrent_accesses_by_nodes |>
+  List.fold_left add_zone_accesses ALSet.empty |>
+  ALSet.to_seq |>
+  List.of_seq
+
+let shared_bases analysis_state =
+  let shared_zones = analysis_state.MtThread.precise_concurrent_accesses in
+  match Locations.Zone.get_bases shared_zones with
+   | Top -> assert false 
+   | Set zones ->  zones
+
+let add_last_analysis analysis_state interferences =
+  let writes = concurrent_writes analysis_state in
+  let bases = shared_bases analysis_state in
+  let thread = analysis_state.curr_thread.th_eva_thread in
+  Interferences.add_last_analysis interferences thread writes bases

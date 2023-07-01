@@ -40,6 +40,7 @@ module Result : sig
   val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
   val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
   val log : error : 'a -> 'a t -> 'a
+  val value : 'a t -> 'a
 
   val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
   val ( let+ ) : 'a t -> ('a -> 'b) -> 'b t

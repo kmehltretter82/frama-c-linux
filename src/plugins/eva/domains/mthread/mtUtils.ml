@@ -84,6 +84,11 @@ module Result = struct
     | Ok v -> v
     | Warning (v, log) -> Self.warning "%a" pp_log log ; v
     | Error log -> Self.warning "%a" pp_log log ; error
+
+  let value = function
+    | Ok v -> v
+    | Warning (v, log) -> Self.warning "%a" pp_log log ; v
+    | Error log -> Self.fatal "%a" pp_log log
 end
 
 

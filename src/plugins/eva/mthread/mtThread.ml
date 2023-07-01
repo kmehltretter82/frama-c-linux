@@ -97,6 +97,7 @@ type thread = {
   th_parent : thread option;
   th_fun : kernel_function;
   th_stack : Callstack.t;
+  th_eva_thread : Interferences.Thread.t; (* Thread as represented in Eva's engine *)
   mutable th_init_state : Cvalue.Model.t;
   mutable th_params : Cvalue.V.t list;
   mutable th_amap : Trace.t;

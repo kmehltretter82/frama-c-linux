@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2025                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,40 +20,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Abstract_domain = Abstract_domain
-module Abstract_context = Abstract_context
-module Abstract_value = Abstract_value
-module Abstract_location = Abstract_location
-module Abstract = Abstract
-module Abstractions = Abstractions
-module Active_behaviors = Active_behaviors
-module Alarmset = Alarmset
-module Analysis = Analysis
-module Assigns = Assigns
-module Builtins = Builtins
-module Callstack = Callstack
-module Unit_context = Unit_context
-module Cvalue_callbacks = Cvalue_callbacks
-module Cvalue_domain = Cvalue_domain
-module Cvalue_results = Cvalue_results
-module Domain_builder = Domain_builder
-module Eva_dynamic = Eva_dynamic
-module Eva_results = Eva_results
-module Eva_utils = Eva_utils
-module Eval = Eval
-module Eval_annots = Eval_annots
-module Eval_op = Eval_op
-module Eval_terms = Eval_terms
-module Eval_typ = Eval_typ
-module Eva_ast = Eva_ast
-module Function_calls = Function_calls
-module Interferences = Interferences
-module Logic_inout = Logic_inout
-module Main_locations = Main_locations
-module Main_values = Main_values
-module Parameters = Parameters
-module Red_statuses = Red_statuses
-module Results = Results
-module Self = Self
-module Simple_memory = Simple_memory
-module Structure = Structure
+val add_last_analysis : MtThread.analysis_state -> Interferences.t -> unit

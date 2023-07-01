@@ -62,6 +62,7 @@ type thread = {
   th_fun : kernel_function (** Function which the thread executes *);
   th_stack : Callstack.t
 (** Call stack resulting in the creation of the thread *);
+  th_eva_thread : Interferences.Thread.t; (* Thread as represented in Eva's engine*)
 
   mutable th_init_state : Cvalue.Model.t
 (** Memory state at the moment the thread is created *);

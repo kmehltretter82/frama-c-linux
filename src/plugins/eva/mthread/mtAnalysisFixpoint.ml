@@ -58,7 +58,7 @@ let mark_new_messages_received analysis =
       );
 ;;
 
-let record_end_of_thread_analysis analysis =
+let record_end_of_thread_analysis analysis interferences =
   let th = analysis.curr_thread in
 
   (* We save the state of the analysis *)
@@ -105,6 +105,9 @@ let record_end_of_thread_analysis analysis =
     AccessesByZone.pretty_map read_written;
   MtOptions.feedback ~level:2 "* shared variables computed";
 
+  (* We compute interferences *)
+  MtInterferences.add_last_analysis analysis interferences;
+
   (* We update the multithread events of the thread for its next iteration *)
   th.th_amap <- curr_events analysis;
 
@@ -144,6 +147,7 @@ let compute_thread analysis th =
   Globals.set_entry_point (Kernel_function.get_name th.th_fun) false;
   Eva_results.set_initial_state th.th_init_state;
   Eva_results.set_main_args th.th_params;
+  Interferences.Thread.set_current th.th_eva_thread;
 
   Analysis.compute ();
 
@@ -308,7 +312,7 @@ let store_written_value analysis lw =
 (* Function that does one pass of value analysis on all the threads
    that are marked as needed to be recomputed. Returns the values
    written by each thread recomputed*)
-let one_iteration analysis =
+let one_iteration analysis interferences =
   iter_threads analysis
     (fun th ->
        if not (SetRecomputeReason.is_empty th.th_to_recompute) then (
@@ -324,7 +328,7 @@ let one_iteration analysis =
              compute_thread analysis th;
 
              (* We save all our results *)
-             record_end_of_thread_analysis analysis;
+             record_end_of_thread_analysis analysis interferences;
              MtOptions.feedback "*** Thread %a computed" Id.pretty th.th_id;
            ) else (
              MtOptions.feedback "@[<hov 2>*** Thread %a has been@ created but@ \
@@ -426,12 +430,12 @@ let mark_shared_nodes_kind analysis =
 
 
 (* Auxiliary function iterating the analysis until the fixpoint is reached *)
-let reach_fixpoint analysis =
+let reach_fixpoint analysis interferences =
   MtOptions.feedback "******* Starting to iterate";
   let rec aux i =
     MtOptions.feedback "***** Iteration %d" i;
     analysis.iteration <- i;
-    let continue = one_iteration analysis in
+    let continue = one_iteration analysis interferences in
     if continue && i < MtOptions.StopAfter.get () then aux (i+1)
     else (* Stop iteration *)
     if continue then

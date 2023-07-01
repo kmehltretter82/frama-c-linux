@@ -351,13 +351,14 @@ let hook_sync analysis state : hook_sig = function _ ->
 (* --- Creation of a thread                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let basic_thread id stack func state params parent = {
+let basic_thread id stack func state params parent eva_thread = {
   th_id = id;
   th_stack = stack;
   th_init_state = state;
   th_fun = func;
   th_params = params;
   th_parent = parent;
+  th_eva_thread = eva_thread;
   th_to_recompute = SetRecomputeReason.empty;
   th_read_written = AccessesByZone.empty_map;
   th_amap = Trace.empty;
@@ -369,7 +370,7 @@ let basic_thread id stack func state params parent = {
   th_priority= PDefault;
 }
 
-let spawn_thread analysis id stack func state params parent =
+let spawn_thread analysis id stack func state params parent eva_thread =
   try
     let th' = Id.Hashtbl.find analysis.all_threads id in
 
@@ -416,7 +417,7 @@ let spawn_thread analysis id stack func state params parent =
       th'
     )
   with Not_found ->
-    let th = basic_thread id stack func state params parent in
+    let th = basic_thread id stack func state params parent eva_thread in
     th.th_to_recompute <- SetRecomputeReason.singleton FirstIteration;
     Id.Hashtbl.add analysis.all_threads id th;
     log ~kind:Log.Result analysis "@[<hov>New thread: %a@]" Thread.pretty th;
@@ -435,7 +436,8 @@ let main_thread k_main initial_state =
     in
     let args = List.map eval_arg formals in
     let stack = Callstack.init k_main in
-    basic_thread id_main_thread stack k_main initial_state args None
+    let eva_thread = Interferences.Thread.main () in 
+    basic_thread id_main_thread stack k_main initial_state args None eva_thread
 
 
 (** Set the global variable that indicates that at least one thread is running
@@ -450,11 +452,11 @@ let hook_thread_creation analysis state : hook_sig = function
   | (_, name) :: (_, f) :: params ->
     let conv v = catch_conversion analysis "During@ thread@ creation" v in
     (* We clean the state that will be used by the created thread *)
-    let name = conv (MtIds.extract_name_hint name)
+    let name' = conv (MtIds.extract_name_hint name)
         ~msg:"invalid@ thread@ identifier" ()
     and kf = conv (MtMemory.extract_fun f)
         ~msg:"invalid@ thread@ function" () in
-    let id = register_id analysis (fun v () -> conv v ()) IdThread name in
+    let id = register_id analysis (fun v () -> conv v ()) IdThread name' in
     check_thread_not_already_created id (log_poly ~kind:Log.Error analysis)
       (Hook_failure default_err_code) (id, state);
     let formals = Kernel_function.get_formals kf in
@@ -478,8 +480,14 @@ let hook_thread_creation analysis state : hook_sig = function
         hook_fail ()
     in
     let params = List.map snd (trunc_params (formals, params)) in
+    let eva_thread =
+      match Callstack.top_callsite analysis.curr_stack with
+      | Kglobal -> assert false (* The current stack must contain the call to the builting creating the thread *)
+      | Kstmt stmt ->
+        Interferences.Thread.spawn name stmt kf params
+    in
     ignore (spawn_thread analysis id analysis.curr_stack kf
-              Cvalue.Model.bottom params (Some analysis.curr_thread));
+              Cvalue.Model.bottom params (Some analysis.curr_thread) eva_thread);
     register_event analysis (CreateThread id);
     (* Thread is started as suspended *)
     MtIds.write_id_state state id 2, wrap_res (id_offset id)
@@ -928,7 +936,8 @@ let catch_functions_calls analysis stack kf state kind =
       (* This call registers the main thread on the first run, and essentially
          does nothing afterwards *)
       let th = spawn_thread analysis id_main_thread
-          th.th_stack th.th_fun th.th_init_state th.th_params None in
+          th.th_stack th.th_fun th.th_init_state th.th_params None
+          th.th_eva_thread in
       if analysis.main_thread != th then begin
         (* On the first run, the record [th] is created. It is not contained
            anywhere else, so we update the fields below. *)
