@@ -365,8 +365,8 @@ struct
 
   let name = "multidim"
 
-  let value = Main_values.cval
-  let location = Main_locations.ploc
+  let value_dependencies = Main_values.cval
+  let location_dependencies = Main_locations.ploc
 
   type state = t
   type value = Value.t

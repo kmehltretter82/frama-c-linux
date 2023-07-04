@@ -306,7 +306,7 @@ module Domain = struct
       fixed locations dependencies. *)
   module type Functor = sig
     type location
-    val location: location Abstract_location.dependencies
+    val location_dependencies: location Abstract_location.dependencies
     module Make (V : Abstract.Value.External) : sig
       include Abstract_domain.S
         with type value = V.t and type location = location
@@ -434,7 +434,7 @@ module Domain = struct
     let lifted : (v, l) structured_domain =
       match registered.abstraction with
       | Functor (module Functor) ->
-        let locs = Location.outline Functor.location in
+        let locs = Location.outline Functor.location_dependencies in
         let eq_loc = Location.dec_eq locs Loc.structure in
         let module D = Functor.Make (Val) in
         begin match eq_loc with
@@ -450,8 +450,8 @@ module Domain = struct
             (module Domain_lift.Make (D) (Val) (Loc))
         end
       | Domain (module D) ->
-        let loc_deps = Location.outline D.location in
-        let val_deps = Value.outline D.value in
+        let loc_deps = Location.outline D.location_dependencies in
+        let val_deps = Value.outline D.value_dependencies in
         let eq_loc = Location.dec_eq loc_deps Loc.structure in
         let eq_val = Value.dec_eq val_deps Val.structure in
         begin match eq_val, eq_loc with
@@ -524,10 +524,10 @@ module Domain = struct
       let add_values values (registered, _) =
         match registered.abstraction with
         | Domain (module Domain) ->
-          Value.fold add_value Domain.value values |>
-          Location.fold_values add_value Domain.location
+          Value.fold add_value Domain.value_dependencies values |>
+          Location.fold_values add_value Domain.location_dependencies
         | Functor (module F) ->
-          Location.fold_values add_value F.location values
+          Location.fold_values add_value F.location_dependencies values
       in
       List.fold_left add_values Value.init domains |>
       Value.make_interactive
@@ -535,11 +535,11 @@ module Domain = struct
     let module V = (val Value.assert_not_unit values) in
     let locations =
       let init : V.t Location.structured = Location.init (module V) in
-      let add_loc = Location.{ folder = add } in
+      let add = Location.{ folder = add } in
       let add_locations locs (registered, _) =
         match registered.abstraction with
-        | Domain  (module D) -> Location.fold add_loc D.location locs
-        | Functor (module D) -> Location.fold add_loc D.location locs
+        | Domain  (module D) -> Location.fold add D.location_dependencies locs
+        | Functor (module D) -> Location.fold add D.location_dependencies locs
       in
       List.fold_left add_locations init domains |>
       Location.make_interactive

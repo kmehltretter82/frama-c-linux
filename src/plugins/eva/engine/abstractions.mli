@@ -53,7 +53,7 @@ module Domain : sig
       fixed locations dependencies. *)
   module type Functor = sig
     type location
-    val location: location Abstract_location.dependencies
+    val location_dependencies: location Abstract_location.dependencies
     module Make (V : Abstract.Value.External) : sig
       include Abstract_domain.S
         with type value = V.t and type location = location

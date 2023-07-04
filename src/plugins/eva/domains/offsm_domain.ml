@@ -101,8 +101,8 @@ module D : Abstract_domain.Leaf
   type location = Precise_locs.precise_location
   type origin
 
-  let value = Abstract_value.Leaf (module Offsm_value.Offsm)
-  let location = Main_locations.ploc
+  let value_dependencies = Abstract_value.Leaf (module Offsm_value.Offsm)
+  let location_dependencies = Main_locations.ploc
 
   include (Memory: sig
              include Datatype.S_with_collections with type t = state

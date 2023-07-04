@@ -115,8 +115,8 @@ module Make_Minimal
   type state = Domain.t
   type origin
 
-  let value = Abstract_value.Leaf (module Value)
-  let location = Abstract_location.Leaf (module Location)
+  let value_dependencies = Abstract_value.Leaf (module Value)
+  let location_dependencies = Abstract_location.Leaf (module Location)
 
   let narrow x _y = `Value x
 
@@ -229,8 +229,8 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
     type state = Domain.t
     type origin
 
-    let value = Abstract_value.Leaf (module Main_values.CVal)
-    let location = Abstract_location.Leaf (module Main_locations.PLoc)
+    let value_dependencies = Abstract_value.Leaf (module Main_values.CVal)
+    let location_dependencies = Abstract_location.Leaf (module Main_locations.PLoc)
 
     let narrow x _y = `Value x
 

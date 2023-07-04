@@ -194,8 +194,8 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
   type location = Precise_locs.precise_location
   type origin
 
-  let value = Abstract_value.Leaf (module Value)
-  let location = Main_locations.ploc
+  let value_dependencies = Abstract_value.Leaf (module Value)
+  let location_dependencies = Main_locations.ploc
 
   let log_category = Self.register_category ("d-" ^ Info.name)
 

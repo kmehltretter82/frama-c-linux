@@ -360,8 +360,8 @@ module Make (Man : Input) = struct
   type location = Precise_locs.precise_location
   type origin
 
-  let value = Main_values.ival
-  let location = Main_locations.ploc
+  let value_dependencies = Main_values.ival
+  let location_dependencies = Main_locations.ploc
 
   let man = Man.manager
   let log_category = dkey

@@ -533,7 +533,7 @@ end
 
 module Functor = struct
   type location = Precise_locs.precise_location
-  let location = Main_locations.ploc
+  let location_dependencies = Main_locations.ploc
   module Make (V : Abstract.Value.External) = Make (V)
 end
 

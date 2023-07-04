@@ -514,12 +514,12 @@ module type Leaf = sig
   (** The abstract value used by the domain.
       It carries the [value] type used by the domain.
       See {!Main_values} for some abstract values available in Eva. *)
-  val value: value Abstract_value.dependencies
+  val value_dependencies: value Abstract_value.dependencies
 
   (** The abstract location used by the domain.
       It carries the [location] type used by the domain.
       See {!Main_locations} for the abstract location available in Eva. *)
-  val location: location Abstract_location.dependencies
+  val location_dependencies: location Abstract_location.dependencies
 end
 
 

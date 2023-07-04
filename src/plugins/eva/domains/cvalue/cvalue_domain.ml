@@ -187,8 +187,8 @@ module State = struct
   type value = Model.value
   type location = Model.location
 
-  let value = Main_values.cval
-  let location = Main_locations.ploc
+  let value_dependencies = Main_values.cval
+  let location_dependencies = Main_locations.ploc
 
   let top = Model.top, Locals_scoping.bottom ()
   let is_included (a, _) (b, _) = Model.is_included a b
