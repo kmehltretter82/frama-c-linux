@@ -840,19 +840,25 @@ struct
         super#fkind c
 
     method! compname fmt comp =
-      Format.fprintf fmt "@{<%s>%a@}"
-        (Info.tag (PGlobal(Globals.Types.global Struct comp.cname)))
-        super#compname comp
+      try
+        Format.fprintf fmt "@{<%s>%a@}"
+          (Info.tag (PGlobal(Globals.Types.global Struct comp.cname)))
+          super#compname comp
+      with Not_found -> super#compname fmt comp
 
     method! enuminfo fmt enum =
-      Format.fprintf fmt "@{<%s>%a@}"
-        (Info.tag (PGlobal(Globals.Types.global Enum enum.ename)))
-        super#enuminfo enum
+      try
+        Format.fprintf fmt "@{<%s>%a@}"
+          (Info.tag (PGlobal(Globals.Types.global Enum enum.ename)))
+          super#enuminfo enum
+      with Not_found -> super#enuminfo fmt enum
 
     method! typeinfo fmt tinfo =
-      Format.fprintf fmt "@{<%s>%a@}"
-        (Info.tag (PGlobal(Globals.Types.global Typedef tinfo.tname)))
-        super#typeinfo tinfo
+      try
+        Format.fprintf fmt "@{<%s>%a@}"
+          (Info.tag (PGlobal(Globals.Types.global Typedef tinfo.tname)))
+          super#typeinfo tinfo
+      with Not_found -> super#typeinfo fmt tinfo
 
     initializer force_brace <- true
 
