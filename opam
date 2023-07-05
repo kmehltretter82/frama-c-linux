@@ -98,7 +98,7 @@ build: [
 
 install: [
   [make
-   "PREFIX=%{prefix}%" "MANDIR=%{man}%"
+   "RELEASE=yes" "PREFIX=%{prefix}%" "MANDIR=%{man}%"
    "DOCDIR=%{doc}%" { with-doc }
    "install"
   ]
