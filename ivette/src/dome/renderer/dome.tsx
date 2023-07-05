@@ -251,9 +251,9 @@ export const globalSettings = new Event(Settings.global);
 // --- Closing
 // --------------------------------------------------------------------------
 
-ipcRenderer.on('dome.ipc.closing', async () => {
+ipcRenderer.on('dome.ipc.closing', async (_event, wid: number) => {
     await System.doExit();
-    ipcRenderer.send('dome.ipc.closing.done');
+    ipcRenderer.send('dome.ipc.closing.done', wid);
   });
 
 /** Register a callback to be executed when the window is closing. */
