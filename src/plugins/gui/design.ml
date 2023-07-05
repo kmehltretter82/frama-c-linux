@@ -1891,27 +1891,26 @@ let toplevel play =
     let error_manager =
       new Gtk_helper.error_manager (splash_w:>GWindow.window_skel)
     in
-    let init_crashed = ref true in
+    let init_crash = ref None in
     error_manager#protect
       ~cancelable:true ~parent:(splash_w:>GWindow.window_skel)
       (fun () ->
-         (try
-            play ();
-            (* This is a good point to start using real asynchronous tasks
-               management: plug-ins launched from command line have finished
-               their asynchronous tasks thanks to the default Task.on_idle. *)
-            Task.on_idle :=
-              (fun f -> ignore (Glib.Timeout.add ~ms:50 ~callback:f));
-            let project_name = Gui_parameters.Project_name.get () in
-            if project_name = "" then
-              Project.set_current_as_last_created ()
-            else
-              Project.set_current (Project.from_unique_name project_name);
-            Ast.compute ()
-          with e -> (* An error occurred: we need to enforce the splash screen
-                       realization before we create the error dialog widget.*)
-            force_s (); raise e);
-         init_crashed := false);
+         try
+           play ();
+           (* This is a good point to start using real asynchronous tasks
+              management: plug-ins launched from command line have finished
+              their asynchronous tasks thanks to the default Task.on_idle. *)
+           Task.on_idle :=
+             (fun f -> ignore (Glib.Timeout.add ~ms:50 ~callback:f));
+           let project_name = Gui_parameters.Project_name.get () in
+           if project_name = "" then
+             Project.set_current_as_last_created ()
+           else
+             Project.set_current (Project.from_unique_name project_name);
+           Ast.compute ()
+         with e -> (* An error occurred: we need to enforce the splash screen
+                      realization before we create the error dialog widget.*)
+           force_s (); init_crash := Some e; raise e);
     if Ast.is_computed () then
       (* if the ast has parsed, but a plugin has crashed, we display the gui *)
       error_manager#protect ~cancelable:false
@@ -1921,18 +1920,18 @@ let toplevel play =
            Glib.Timeout.remove tid;
            reparent_console main_ui#lower_notebook;
            splash_w#destroy ();
-           (* Display the console if a crash has occurred. Otherwise, display
-              the information panel *)
-           if !init_crashed then
-             (main_ui#lower_notebook#goto_page 2;
-              (* BY TODO: this should scroll to the end of the console. It
-                 does not work at all after the reparent, and only partially
-                 before (scrollbar is wrong) *)
-              let end_console = splash_out#buffer#end_iter in
-              ignore (splash_out#scroll_to_iter ~yalign:0. end_console)
-             )
-           else
-             main_ui#lower_notebook#goto_page 0
+           (* Display the console and an error dialog if a crash has occurred.
+              Otherwise, display the information panel. *)
+           match !init_crash with
+           | None -> main_ui#lower_notebook#goto_page 0
+           | Some e ->
+             main_ui#lower_notebook#goto_page 2;
+             (* BY TODO: this should scroll to the end of the console. It
+                does not work at all after the reparent, and only partially
+                before (scrollbar is wrong) *)
+             let end_console = splash_out#buffer#end_iter in
+             ignore (splash_out#scroll_to_iter ~yalign:0. end_console);
+             error_manager#error ~reset:true "%s" (Cmdline.protect e);
         )
   in
   ignore (Glib.Idle.add (fun () -> in_idle (); false));
