@@ -134,7 +134,18 @@ module type Leaf = sig
 
   (** The key identifies the module and the type [t] of abstract locations. *)
   val key: location key
+
+  (** The abstract value on which this location depends. *)
+  val value: value Abstract_value.dependencies
 end
+
+(** Eva abstractions are divided between values, locations and domains.
+    Domains depend on locations, and use this type to declare such dependencies.
+    In the standard case, a domain depends on a single location module [Loc]
+    and uses [Leaf (module Loc)] to declare this dependency. *)
+type 'l dependencies =
+  | Leaf: (module Leaf with type location = 'l) -> 'l dependencies
+  | Node: 'l dependencies * 'r dependencies -> ('l * 'r) dependencies
 
 (*
 Local Variables:

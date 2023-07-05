@@ -360,6 +360,9 @@ module Make (Man : Input) = struct
   type location = Precise_locs.precise_location
   type origin
 
+  let value_dependencies = Main_values.ival
+  let location_dependencies = Main_locations.ploc
+
   let man = Man.manager
   let log_category = dkey
 
@@ -719,11 +722,8 @@ let make name (module Man: Input) =
     "Binding to the " ^ name ^ " domain of the Apron library. " ^
     "See http://apron.cri.ensmp.fr/library for more details."
   in
-  Abstractions.Domain.register ~name ~descr ~experimental ~priority @@ Domain
-    { key = Domain.key ; domain = (module Domain)
-    ; values = Last Main_values.Interval.registered
-    ; locations = Last Main_locations.PLoc.registered
-    }
+  Abstractions.Domain.register ~name ~descr ~experimental ~priority
+    (module Domain)
 
 let octagon = make "octagon" (module Apron_Octagon)
 let box = make "box" (module Apron_Box)

@@ -129,15 +129,9 @@ module Domain = Domain_builder.Complete_Simple_Cvalue (Simple)
 include Domain
 
 let registered =
-  let name = "printer" in
-  let priority = 2 in
-  let descr =
+  let name = "printer"
+  and descr =
     "Debug domain, only useful for developers. Prints the transfer functions \
      used during the analysis."
   in
-  Abstractions.Domain.register ~name ~descr ~priority @@ Domain
-    { key ; domain = (module Domain)
-    ; values = Last Main_values.CVal.registered
-    ; locations = Last Main_locations.PLoc.registered
-    }
-
+  Abstractions.Domain.register ~name ~descr ~priority:2 (module Domain)

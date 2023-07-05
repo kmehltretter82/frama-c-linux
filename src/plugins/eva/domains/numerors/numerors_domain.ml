@@ -78,6 +78,7 @@ module Numerors_Value = struct
     ; ("log", log) ; ("exp", exp) ; ("sqrt", sqrt)
     ; ("DPRINT", dprint)
     ]
+
 end
 
 (* The numerors domain: a simple memory over the numerors value. *)
@@ -157,11 +158,7 @@ let registered =
     "Infers ranges for the absolute and relative errors \
      in floating-point computations. No support of loops."
   in
-  Abstractions.Domain.register ~name ~experimental ~descr @@ Domain
-    { key = Domain.key ; domain = (module Domain)
-    ; values = Last Numerors_Value.registered
-    ; locations = Last Main_locations.PLoc.registered
-    }
+  Abstractions.Domain.register ~name ~experimental ~descr (module Domain)
 
 let () =
   let open Abstractions in

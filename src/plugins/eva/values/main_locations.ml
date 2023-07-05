@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Location = struct
+module PLoc = struct
 
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
@@ -233,17 +233,13 @@ module Location = struct
           `Value (index, rem)
     (* No reduction if the offsets are not arithmetics. *)
     with Cvalue.V.Not_based_on_null -> `Value (index, remaining)
-end
 
-
-module PLoc = struct
-  include Location
   let key = Structure.Key_Location.create_key "precise_locs"
-  let registered = Abstractions.Location.register
-      { key ; location = (module Location)
-      ; dependencies = Last Main_values.CVal.registered
-      }
+
+  let value = Abstract_value.Leaf (module Main_values.CVal)
 end
+
+let ploc = Abstract_location.Leaf (module PLoc)
 
 (*
 Local Variables:

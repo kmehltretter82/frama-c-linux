@@ -77,4 +77,4 @@ module D: Abstract_domain.Leaf
    and type location = Precise_locs.precise_location
    and type state = state
 
-val registered : Abstractions.Domain.registered
+val registered: Abstractions.Domain.registered

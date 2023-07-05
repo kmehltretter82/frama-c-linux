@@ -1122,6 +1122,9 @@ module D : Abstract_domain.Leaf
   type location = Precise_locs.precise_location
   type origin
 
+  let value_dependencies = Main_values.cval
+  let location_dependencies = Main_locations.ploc
+
   include G
   include Domain_builder.Complete (struct include G let top = empty end)
 
@@ -1290,13 +1293,9 @@ module D : Abstract_domain.Leaf
 end
 
 let registered =
-  let name = "gauges" and priority = 6 in
-  let descr =
+  let name = "gauges"
+  and descr =
     "Infers linear inequalities between the variables modified within a loop \
      and a special loop counter."
   in
-  Abstractions.Domain.register ~name ~priority ~descr @@ Domain
-    { key = D.key ; domain = (module D)
-    ; values = Last Main_values.CVal.registered
-    ; locations = Last Main_locations.PLoc.registered
-    }
+  Abstractions.Domain.register ~name ~descr ~priority:6 (module D)

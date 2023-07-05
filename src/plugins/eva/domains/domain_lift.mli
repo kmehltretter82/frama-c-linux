@@ -20,6 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module type Input_Domain = sig
+  include Abstract_domain.S
+  val key: t Structure.Key_Domain.key
+end
+
 module type Conversion = sig
   type extended
   type internal
@@ -28,7 +33,7 @@ module type Conversion = sig
 end
 
 module Make
-    (Domain: Abstract_domain.Leaf)
+    (Domain: Input_Domain)
     (Val: Conversion with type internal := Domain.value)
     (Loc: Conversion with type internal := Domain.location)
   : Abstract.Domain.Internal with type state = Domain.state

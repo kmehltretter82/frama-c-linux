@@ -187,6 +187,9 @@ module State = struct
   type value = Model.value
   type location = Model.location
 
+  let value_dependencies = Main_values.cval
+  let location_dependencies = Main_locations.ploc
+
   let top = Model.top, Locals_scoping.bottom ()
   let is_included (a, _) (b, _) = Model.is_included a b
   let join (a, clob) (b, _) = Model.join a b, clob
@@ -586,15 +589,11 @@ let () = Db.Value.display := (fun fmt kf -> State.display ~fmt kf)
 
 
 let registered =
-  let name = "cvalue" and priority = 9 in
-  let descr =
+  let name = "cvalue"
+  and descr =
     "Main analysis domain, enabled by default. Should not be disabled."
   in
-  Abstractions.Domain.register ~name ~priority ~descr @@ Domain
-    { key = State.key ; domain = (module State)
-    ; values = Last Main_values.CVal.registered
-    ; locations = Last Main_locations.PLoc.registered
-    }
+  Abstractions.Domain.register ~name ~descr ~priority:9 (module State)
 
 
 type prefix = Hptmap.prefix

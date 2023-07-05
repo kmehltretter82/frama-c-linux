@@ -26,6 +26,7 @@
 
 module Abstract_domain = Abstract_domain
 module Abstract_value = Abstract_value
+module Abstract_location = Abstract_location
 module Abstract = Abstract
 module Abstractions = Abstractions
 module Active_behaviors = Active_behaviors
