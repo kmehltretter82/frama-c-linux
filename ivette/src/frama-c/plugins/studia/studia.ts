@@ -20,11 +20,21 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+import React from 'react';
 import * as Dome from 'dome';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
+import * as Toolbars from 'dome/frame/toolbars';
+import * as Status from 'frama-c/kernel/Status';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
+import { ipcRenderer } from 'electron';
+import './style.css';
+
+const studiaWritesEvent = new Dome.Event('dome.studia.writes');
+const studiaReadsEvent = new Dome.Event('dome.studia.reads');
+ipcRenderer.on('dome.ipc.studia.writes', () => studiaWritesEvent.emit());
+ipcRenderer.on('dome.ipc.studia.reads', () => studiaReadsEvent.emit());
 
 type access = 'Reads' | 'Writes';
 
@@ -67,4 +77,47 @@ export function buildMenu(props: MenuProps) : void {
   const writes = 'Studia: select writes';
   menu.push({ label: reads, enabled, onClick: () => onClick('Reads') });
   menu.push({ label: writes, enabled, onClick: () => onClick('Writes') });
+}
+
+export function useStudiaMode(): void {
+  const [selection, setSelection] = States.useSelection();
+  async function handleError(err: string): Promise<void> {
+    const msg = `Studia failure: ${err}.`;
+    Status.setMessage({ text: msg, kind: 'error' });
+  }
+  async function onEnter(label: string, kind: access): Promise<void> {
+    const stmt = selection?.current?.marker;
+    const data = { stmt, term: label };
+    const marker = await Server.send(Ast.parseLval, data).catch(handleError);
+    if (!marker) return;
+    compute(marker, label, kind).then(setSelection).catch(handleError);
+  }
+  const shared = {
+    placeholder: "lvalue",
+    icon: 'EDIT',
+    className: 'studia-search-mode',
+    hints: () => { return Promise.resolve([]); },
+  };
+  const writesMode = {
+    ...shared,
+    label: 'Studia: select writes',
+    title: `Select all statements writing the given lvalue`,
+    onEnter: (pattern:string) => onEnter(pattern, "Writes"),
+    event: studiaWritesEvent,
+  };
+  const readsMode = {
+    ...shared,
+    label: 'Studia: select reads',
+    title: `Selects all statements reading the given lvalue`,
+    onEnter: (pattern:string) => onEnter(pattern, "Reads"),
+    event: studiaReadsEvent,
+  };
+  React.useEffect(() => {
+    Toolbars.RegisterMode.emit(writesMode);
+    Toolbars.RegisterMode.emit(readsMode);
+    return () => {
+      Toolbars.UnregisterMode.emit(writesMode);
+      Toolbars.UnregisterMode.emit(readsMode);
+    };
+  });
 }
