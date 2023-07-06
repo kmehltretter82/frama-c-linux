@@ -58,7 +58,7 @@ interface MenuProps {
   /** The marker on which the menu is applied. */
   marker: Ast.marker,
   /** Attributes of the marker. */
-  attrs?: Ast.markerAttributesData,
+  attrs: Ast.markerAttributesData,
   /** Function to update the selection. */
   update: (a: States.SelectionActions) => void,
   /** Array to which studia menu entries are added. */
@@ -68,20 +68,24 @@ interface MenuProps {
 /** Builds the Studia entries in the contextual menu about a given marker.  */
 export function buildMenu(props: MenuProps) : void {
   const { update, marker, attrs, menu } = props;
-  function onClick(kind: access): void {
-    if (marker && attrs)
-      compute(marker, attrs.name, kind).then(update);
-  }
-  if (attrs?.isLval && !attrs?.isFunction) {
+  if (attrs.isLval && !attrs.isFunction) {
+    const onClick = (kind: access): void => {
+      if (marker && attrs)
+        compute(marker, attrs.name, kind).then(update);
+    };
     const reads = 'Studia: select reads';
     const writes = 'Studia: select writes';
     menu.push({ label: reads, onClick: () => onClick('Reads') });
     menu.push({ label: writes, onClick: () => onClick('Writes') });
   } else {
+    const onClick = (event: Dome.Event): void => {
+      update({ location: { fct: attrs.scope, marker } });
+      event.emit();
+    };
     const reads = 'Studia: select reads…';
     const writes = 'Studia: select writes…';
-    menu.push({ label: reads, onClick: studiaReadsEvent.emit });
-    menu.push({ label: writes, onClick: studiaWritesEvent.emit });
+    menu.push({ label: reads, onClick: () => onClick(studiaReadsEvent) });
+    menu.push({ label: writes, onClick: () => onClick(studiaWritesEvent) });
   }
 }
 

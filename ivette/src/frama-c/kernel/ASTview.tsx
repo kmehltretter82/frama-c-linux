@@ -541,7 +541,8 @@ function createContextMenuHandler(): Editor.Extension {
           items.push({ label, onClick });
         });
       }
-      Studia.buildMenu({ marker: node.marker, attrs, update, menu: items });
+      if (attrs)
+        Studia.buildMenu({ marker: node.marker, attrs, update, menu: items });
       const copy = (): void => {
         const text = view.state.sliceDoc(node.from, node.to);
         if (text !== '') navigator.clipboard.writeText(text);
