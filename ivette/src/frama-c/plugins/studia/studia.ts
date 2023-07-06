@@ -68,15 +68,21 @@ interface MenuProps {
 /** Builds the Studia entries in the contextual menu about a given marker.  */
 export function buildMenu(props: MenuProps) : void {
   const { update, marker, attrs, menu } = props;
-  const enabled = attrs?.isLval;
-  function onClick(kind: access) : void {
+  function onClick(kind: access): void {
     if (marker && attrs)
       compute(marker, attrs.name, kind).then(update);
   }
-  const reads = 'Studia: select reads';
-  const writes = 'Studia: select writes';
-  menu.push({ label: reads, enabled, onClick: () => onClick('Reads') });
-  menu.push({ label: writes, enabled, onClick: () => onClick('Writes') });
+  if (attrs?.isLval) {
+    const reads = 'Studia: select reads';
+    const writes = 'Studia: select writes';
+    menu.push({ label: reads, onClick: () => onClick('Reads') });
+    menu.push({ label: writes, onClick: () => onClick('Writes') });
+  } else {
+    const reads = 'Studia: select reads…';
+    const writes = 'Studia: select writes…';
+    menu.push({ label: reads, onClick: studiaReadsEvent.emit });
+    menu.push({ label: writes, onClick: studiaWritesEvent.emit });
+  }
 }
 
 export function useStudiaMode(): void {
