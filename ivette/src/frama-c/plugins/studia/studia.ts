@@ -72,7 +72,7 @@ export function buildMenu(props: MenuProps) : void {
     if (marker && attrs)
       compute(marker, attrs.name, kind).then(update);
   }
-  if (attrs?.isLval) {
+  if (attrs?.isLval && !attrs?.isFunction) {
     const reads = 'Studia: select reads';
     const writes = 'Studia: select writes';
     menu.push({ label: reads, onClick: () => onClick('Reads') });
