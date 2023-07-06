@@ -468,4 +468,20 @@ export const parseExpr: Server.GetRequest<
   marker
   >= parseExpr_internal;
 
+const parseLval_internal: Server.GetRequest<
+  { term: string, stmt: marker },
+  marker
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.ast.parseLval',
+  input:  Json.jObject({ term: Json.jString, stmt: jMarker,}),
+  output: jMarker,
+  signals: [],
+};
+/** Parse a C lvalue and returns the associated marker */
+export const parseLval: Server.GetRequest<
+  { term: string, stmt: marker },
+  marker
+  >= parseLval_internal;
+
 /* ------------------------------------- */
