@@ -26,17 +26,15 @@ import Lodash from 'lodash';
 import * as Dome from 'dome';
 import * as Editor from 'dome/text/editor';
 import * as Utils from 'dome/data/arrays';
-import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
-import { key } from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import { IconButton } from 'dome/controls/buttons';
 import { Filler, Inset } from 'dome/frame/toolbars';
+import * as Studia from 'frama-c/plugins/studia/studia';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { text } from 'frama-c/kernel/api/data';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Properties from 'frama-c/kernel/api/properties';
-import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
 
 import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
@@ -487,46 +485,6 @@ function createPropertiesGutter(): Editor.Extension {
 
 
 // -----------------------------------------------------------------------------
-//  Studia access
-// -----------------------------------------------------------------------------
-
-type access = 'Reads' | 'Writes';
-
-interface StudiaProps {
-  marker: string,
-  attrs: Ast.markerAttributesData,
-  kind: access,
-}
-
-interface StudiaInfos {
-  name: string,
-  title: string,
-  locations: { fct: key<'#fct'>, marker: Ast.marker }[],
-  index: number,
-}
-
-async function studia(props: StudiaProps): Promise<StudiaInfos> {
-  const { marker, attrs, kind } = props;
-  const request = kind === 'Reads' ? getReadsLval : getWritesLval;
-  const data = await Server.send(request, marker);
-  const locations = data.direct.map(([f, m]) => ({ fct: f, marker: m }));
-  const lval = attrs.name;
-  if (locations.length > 0) {
-    const name = `${kind} of ${lval}`;
-    const acc = (kind === 'Reads') ? 'accessing' : 'modifying';
-    const title =
-      `List of statements ${acc} the memory location pointed by ${lval}.`;
-    return { name, title, locations, index: 0 };
-  }
-  const name = `No ${kind.toLowerCase()} of ${lval}`;
-  return { name, title: '', locations: [], index: 0 };
-}
-
-// -----------------------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------------------
 //  Context menu
 // -----------------------------------------------------------------------------
 
@@ -583,15 +541,7 @@ function createContextMenuHandler(): Editor.Extension {
           items.push({ label, onClick });
         });
       }
-      const enabled = attrs?.isLval;
-      const onClick = (kind: access): void => {
-        if (attrs && node.marker)
-          studia({ marker: node.marker, attrs, kind }).then(update);
-      };
-      const reads = 'Studia: select reads';
-      const writes = 'Studia: select writes';
-      items.push({ label: reads, enabled, onClick: () => onClick('Reads') });
-      items.push({ label: writes, enabled, onClick: () => onClick('Writes') });
+      Studia.buildMenu({ marker: node.marker, attrs, update, menu: items });
       const copy = (): void => {
         const text = view.state.sliceDoc(node.from, node.to);
         if (text !== '') navigator.clipboard.writeText(text);
