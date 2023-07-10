@@ -326,7 +326,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         match Domain.start_call stmt call recursion domain_valuation state with
         | `Value state ->
           let callstack = Eva_utils.current_call_stack () in
-          Domain.Store.register_initial_state callstack state;
+          Domain.Store.register_initial_state callstack call.kf state;
           !compute_call_ref stmt call recursion state
         | `Bottom ->
           { states = []; cacheable = Cacheable; builtin=false }

@@ -610,8 +610,8 @@ module Restrict
 
     let lift_register f state = f (get_state state)
 
-    let register_initial_state callstack =
-      lift_register (Domain.Store.register_initial_state callstack)
+    let register_initial_state callstack kf =
+      lift_register (Domain.Store.register_initial_state callstack kf)
     let register_state_before_stmt callstack stmt =
       lift_register (Domain.Store.register_state_before_stmt callstack stmt)
     let register_state_after_stmt callstack stmt =

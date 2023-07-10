@@ -498,7 +498,7 @@ module Value : sig
       (kernel_function -> call_kinstr:kinstr -> state ->  (exp*t) list
          -> Cvalue.V_Offsetmap.t option (** returned value of [kernel_function] *) * state) ref
   *)
-  val merge_initial_state : callstack -> state -> unit
+  val merge_initial_state : callstack -> kernel_function -> state -> unit
   (** Store an additional possible initial state for the given callstack as
       well as its values for actuals. *)
 

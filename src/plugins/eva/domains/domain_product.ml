@@ -331,9 +331,9 @@ module Make
     let register_global_state b state =
       Left.Store.register_global_state b (state >>-: fst);
       Right.Store.register_global_state b (state >>-: snd)
-    let register_initial_state callstack (left, right) =
-      Left.Store.register_initial_state callstack left;
-      Right.Store.register_initial_state callstack right
+    let register_initial_state callstack kf (left, right) =
+      Left.Store.register_initial_state callstack kf left;
+      Right.Store.register_initial_state callstack kf right
     let register_state_before_stmt callstack stmt (left, right) =
       Left.Store.register_state_before_stmt callstack stmt left;
       Right.Store.register_state_before_stmt callstack stmt right

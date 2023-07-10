@@ -460,8 +460,8 @@ module State = struct
         end)
 
     let register_global_state b _ = Storage.set b
-    let register_initial_state callstack (state, _clob) =
-      Db.Value.merge_initial_state callstack state
+    let register_initial_state callstack kf (state, _clob) =
+      Db.Value.merge_initial_state callstack kf state
     let register_state_before_stmt callstack stmt (state, _clob) =
       Db.Value.update_callstack_table ~after:false stmt callstack state
     let register_state_after_stmt callstack stmt (state, _clob) =

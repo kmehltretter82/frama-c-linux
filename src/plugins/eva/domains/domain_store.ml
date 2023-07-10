@@ -32,7 +32,7 @@ end
 module type S = sig
   type t
   val register_global_state: bool -> t or_bottom -> unit
-  val register_initial_state: Callstack.t -> t -> unit
+  val register_initial_state: Callstack.t -> kernel_function -> t -> unit
   val register_state_before_stmt: Callstack.t -> stmt -> t -> unit
   val register_state_after_stmt: Callstack.t -> stmt -> t -> unit
 
@@ -183,9 +183,8 @@ module Make (Domain: InputDomain) = struct
       | `Bottom -> ()
       | `Value state -> Global_State.set state
 
-  let register_initial_state callstack state =
+  let register_initial_state callstack kf state =
     if Storage.get () then
-      let kf = Callstack.top_kf callstack in
       let by_callstack =
         try Called_Functions_By_Callstack.find kf
         with Not_found ->

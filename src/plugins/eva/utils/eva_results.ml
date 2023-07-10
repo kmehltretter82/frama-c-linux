@@ -149,9 +149,9 @@ let set_results results =
   Stmt.Hashtbl.iter (aux_states ~after:false) results.before_states;
   Stmt.Hashtbl.iter (aux_states ~after:true) results.after_states;
   (* Kf initial state *)
-  let aux_initial_state _kf h =
+  let aux_initial_state kf h =
     let aux_callstack callstack state =
-      Db.Value.merge_initial_state callstack state
+      Db.Value.merge_initial_state callstack kf state
     in
     Callstack.Hashtbl.iter aux_callstack h
   in

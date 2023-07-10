@@ -439,9 +439,8 @@ module Value = struct
       Callstack.Hashtbl.add r callstack v;
       add stmt r
 
-  let merge_initial_state cs state =
+  let merge_initial_state cs kf state =
     let open Eva_types in
-    let kf = Callstack.top_kf cs in
     let by_callstack =
       try Called_Functions_By_Callstack.find kf
       with Not_found ->

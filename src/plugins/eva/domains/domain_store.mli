@@ -39,7 +39,7 @@ module type S = sig
       false, register functions do nothing, and get functions return Top. *)
   val register_global_state: bool -> t or_bottom -> unit
 
-  val register_initial_state: Callstack.t -> t -> unit
+  val register_initial_state: Callstack.t -> kernel_function -> t -> unit
   val register_state_before_stmt: Callstack.t -> stmt -> t -> unit
   val register_state_after_stmt: Callstack.t -> stmt -> t -> unit
 
