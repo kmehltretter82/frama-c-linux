@@ -38,7 +38,7 @@ let wkey_imprecise_alloc = Self.register_warn_category
 
 module Base_hptmap = Hptmap.Make
     (Base.Base)
-    (Value_types.Callstack)
+    (Callstack)
     (Hptmap.Comp_unused)
     (struct let v = [ [ ] ] end)
     (struct let l = [ Ast.self ] end)
@@ -57,9 +57,8 @@ let () = Ast.add_monotonic_state Dynamic_Alloc_Bases.self
 (* -------------------------- Auxiliary functions  -------------------------- *)
 
 let current_call_site () =
-  match Eva_utils.legacy_call_stack () with
-  | (_kf, Kstmt stmt) :: _ -> stmt
-  | _ -> Cil.dummyStmt
+  let callsite = Callstack.top_callsite (Eva_utils.current_call_stack ()) in
+  Option.value ~default:Cil.dummyStmt callsite
 
 (* Remove some parts of the callstack:
    - Remove the bottom of the call tree until we get to the call site
@@ -67,29 +66,26 @@ let current_call_site () =
      these call site correspond to a different use of a malloc function,
      so it is interesting to keep their bases separated. *)
 let call_stack_no_wrappers () =
-  let stack = Eva_utils.legacy_call_stack () in
-  assert (stack != []);
-  let wrappers = Parameters.AllocFunctions.get() in
+  let cs = Eva_utils.current_call_stack () in
+  let wrappers = Parameters.AllocFunctions.get () in
   let rec bottom_filter = function
-    | [] -> assert false
-    | [_] as stack -> stack (* Do not empty the stack completely *)
+    | [] | [_] as stack -> stack
     | (kf,_)::((kf', _):: _ as rest) as stack ->
-      if Datatype.String.Set.mem (Kernel_function.get_name kf) wrappers then
-        if Datatype.String.Set.mem (Kernel_function.get_name kf') wrappers then
-          bottom_filter rest
-        else
-          stack
-      else
-        stack
+      if Datatype.String.Set.mem (Kernel_function.get_name kf) wrappers
+      && Datatype.String.Set.mem (Kernel_function.get_name kf') wrappers
+      then bottom_filter rest
+      else stack
   in
-  bottom_filter stack
+  { cs with stack = bottom_filter cs.stack }
 
-let register_malloced_base ?(stack=call_stack_no_wrappers ()) b =
-  let stack_without_top = List.tl stack in
+let register_malloced_base ~stack b =
+  let stack_without_top =
+    Option.value ~default:stack (Callstack.pop stack)
+  in
   Dynamic_Alloc_Bases.set
     (Base_hptmap.add b stack_without_top (Dynamic_Alloc_Bases.get ()))
 
-let fold_dynamic_bases (f: Base.t -> Value_types.Callstack.t -> 'a -> 'a) init =
+let fold_dynamic_bases (f: Base.t -> Callstack.t -> 'a -> 'a) init =
   Base_hptmap.fold f (Dynamic_Alloc_Bases.get ()) init
 
 let is_automatically_deallocated base =
@@ -120,20 +116,17 @@ let extract_size sizev_bytes =
 
 (* Name of the base that will be given to a malloced variable, determined
    using the callstack. *)
-let base_name prefix stack =
+let base_name prefix cs =
   let stmt_line stmt = (fst (Cil_datatype.Stmt.loc stmt)).Filepath.pos_lnum in
-  match stack with
-  | [] -> assert false
-  | [kf, Kglobal] -> (* Degenerate case *)
-    Format.asprintf "__%s_%a" prefix Kernel_function.pretty kf
-  | (_, Kglobal) :: _ :: _ -> assert false
-  | (_, Kstmt callsite) :: qstack ->
+  match cs.Callstack.stack with
+  | [] ->
+    (* Degenerate case *)
+    Format.asprintf "__%s_%a" prefix Kernel_function.pretty cs.entry_point
+  | (_, callsite) :: qstack ->
     (* Use the whole call-stack to generate the name *)
     let rec loop_full = function
-      | [_, Kglobal] -> Format.sprintf "_%s" (Kernel.MainFunction.get ())
-      | (_, Kglobal) :: _ :: _ -> assert false
-      | [] -> assert false (* impossible, we should have seen a Kglobal *)
-      | (kf, Kstmt line)::b ->
+      | [] -> Format.sprintf "_%s" (Kernel_function.get_name cs.entry_point)
+      | (kf, line) :: b ->
         let line = stmt_line line in
         let node_str = Format.asprintf "_l%d__%a"
             line Kernel_function.pretty kf
@@ -141,14 +134,14 @@ let base_name prefix stack =
         (loop_full b) ^ node_str
     in
     (* Use only the name of the caller to malloc for the name *)
-    let caller = function
-      | [] -> assert false (* caught above *)
-      | (kf, _) :: _ -> Format.asprintf "_%a" Kernel_function.pretty kf
+    let caller =
+      let kf = Callstack.top_kf { cs with stack = qstack } in
+      Format.asprintf "_%a" Kernel_function.pretty kf
     in
     let full_name = false in
     Format.asprintf "__%s%s_l%d"
       prefix
-      (if full_name then loop_full qstack else caller qstack)
+      (if full_name then loop_full qstack else caller)
       (stmt_line callsite)
 
 type var = Weak | Strong
@@ -217,7 +210,7 @@ let guess_intended_malloc_type stack sizev constant_size =
     | _ -> raise Exit
   in
   try
-    match snd (List.hd stack) with
+    match snd (Callstack.top_call stack) with
     | Kstmt {skind = Instr (Call (Some lv, _, _, _))} ->
       mk_typed_size (Cil.typeOfLval lv)
     | Kstmt {skind = Instr(Local_init(vi, _, _))} -> mk_typed_size vi.vtype
@@ -380,7 +373,7 @@ let string_of_region = function
 
 (* Only called when the 'weakest base' needs to be allocated. *)
 let create_weakest_base region =
-  let stack = [ fst (Globals.entry_point ()), Kglobal ] in
+  let stack = { (Eva_utils.current_call_stack ()) with stack = [] } in
   let type_base =
     TArray (Cil.charType, None, [])
   in
@@ -413,8 +406,8 @@ let alloc_weakest_base region =
    stack. Currently, the callstacks are truncated according to
    [-eva-alloc-functions]. *)
 module MallocedByStack = (* varinfo list Callstack.hashtbl *)
-  State_builder.Hashtbl(Value_types.Callstack.Hashtbl)
-    (Datatype.List(Base))
+  State_builder.Hashtbl (Callstack.Hashtbl)
+    (Datatype.List (Base))
     (struct
       let name = "Value.Builtins_malloc.MallocedByStack"
       let size = 17
@@ -686,7 +679,7 @@ let free_automatic_bases stack state =
   let bases_to_free =
     Base_hptmap.fold (fun base stack' acc ->
         if is_automatically_deallocated base &&
-           Value_types.Callstack.equal stack stack'
+           Callstack.equal stack stack'
         then Base.Hptset.add base acc
         else acc
       ) (Dynamic_Alloc_Bases.get ()) Base.Hptset.empty
