@@ -234,7 +234,7 @@ module Jcalls : Request.Output with type t = callstack = struct
       "rank" , Joption Jnumber ;
     ]))
 
-  let jcallsite jcaller jcallee stmt =
+  let jcallsite ~jcaller ~jcallee stmt =
     `Assoc [
       "callee", jcallee ;
       "caller", jcaller ;
@@ -245,14 +245,15 @@ module Jcalls : Request.Output with type t = callstack = struct
   let to_json (cs : t) =
     let aux (acc, jcaller) (callee, stmt) =
       let jcallee = Jfct.to_json callee in
-      jcallsite jcaller jcallee stmt :: acc, jcallee
+      jcallsite ~jcaller ~jcallee stmt :: acc, jcallee
     in
     let entry_point = Jfct.to_json cs.entry_point in
     let l, _last_callee = List.fold_left aux
         ([`Assoc [ "callee", entry_point ]], entry_point)
-        cs.stack
+        (List.rev cs.stack)
     in
-    `List (List.rev l)
+    `List l
+
 end
 
 module Jtruth : Data.S with type t = truth = struct
