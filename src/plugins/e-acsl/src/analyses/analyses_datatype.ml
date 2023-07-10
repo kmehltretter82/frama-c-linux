@@ -337,6 +337,16 @@ struct
         let structural_descr = Structural_descr.t_abstract
         let rehash = Datatype.identity
         let name = "E-ACSL.Profile"
+        let pretty fmt m =
+          let first = ref true in
+          let pp_vi v i =
+            if !first
+            then first := false
+            else Format.fprintf fmt " ";
+            Format.fprintf fmt "%a:%a"
+              Logic_var.pretty v Analyses_types.pp_ival i
+          in
+          Logic_var.Map.iter pp_vi  m
       end)
 
   let is_empty = Logic_var.Map.is_empty
