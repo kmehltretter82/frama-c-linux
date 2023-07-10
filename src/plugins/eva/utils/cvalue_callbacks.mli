@@ -28,7 +28,6 @@
     in a future version. Please contact us if you need to register callbacks
     to be executed during an Eva analysis. *)
 
-type callstack = Callstack.t
 type state = Cvalue.Model.t
 
 type analysis_kind =
@@ -42,7 +41,7 @@ type analysis_kind =
     the function called, the kind of analysis performed by Eva for this call,
     and the cvalue state at the beginning of the call. *)
 val register_call_hook:
-  (callstack -> Cil_types.kernel_function -> analysis_kind -> state -> unit)
+  (Callstack.t -> Cil_types.kernel_function -> analysis_kind -> state -> unit)
   -> unit
 
 
@@ -62,17 +61,17 @@ type call_results =
     function call. Arguments of the callback are the callstack of the call,
     the function called and the cvalue states resulting from its analysis. *)
 val register_call_results_hook:
-  (callstack -> Cil_types.kernel_function -> call_results -> unit)
+  (Callstack.t -> Cil_types.kernel_function -> call_results -> unit)
   -> unit
 
 [@@@ api_end]
 
 val register_statement_hook:
-  (callstack -> Cil_types.stmt -> state list -> unit) -> unit
+  (Callstack.t -> Cil_types.stmt -> state list -> unit) -> unit
 
 val apply_call_hooks:
-  callstack -> Cil_types.kernel_function -> analysis_kind -> state -> unit
+  Callstack.t -> Cil_types.kernel_function -> analysis_kind -> state -> unit
 val apply_call_results_hooks:
-  callstack -> Cil_types.kernel_function -> call_results -> unit
+  Callstack.t -> Cil_types.kernel_function -> call_results -> unit
 val apply_statement_hooks:
-  callstack -> Cil_types.stmt -> state list -> unit
+  Callstack.t -> Cil_types.stmt -> state list -> unit

@@ -48,7 +48,6 @@ type evaluation_point = General_requests.evaluation_point =
 (* A term and the program point where it should be evaluated. *)
 type probe = term * evaluation_point
 
-type callstack = Callstack.t
 type truth = Abstract_interp.truth
 
 (* The result of an evaluation:
@@ -137,7 +136,7 @@ let probe marker =
 
 module type Ranking_sig = sig
   val stmt : stmt -> int
-  val sort : callstack list -> callstack list
+  val sort : Callstack.t list -> Callstack.t list
 end
 
 module Ranking : Ranking_sig = struct
@@ -197,12 +196,12 @@ module Ranking : Ranking_sig = struct
 
   let stmt = let rk = new ranker in rk#rank
 
-  let ranks (cs : callstack) : int list =
+  let ranks (cs : Callstack.t) : int list =
     List.map stmt (Callstack.to_stmt_list cs)
 
   let order : int list -> int list -> int = Stdlib.compare
 
-  let sort (wcs : callstack list) : callstack list =
+  let sort (wcs : Callstack.t list) : Callstack.t list =
     List.map fst @@
     List.sort (fun (_,rp) (_,rq) -> order rp rq) @@
     List.map (fun cs -> cs , ranks cs) wcs
@@ -213,7 +212,7 @@ end
 (* --- Domain Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Jcallstack : S with type t = callstack = struct
+module Jcallstack : S with type t = Callstack.t = struct
   module I = Data.Index
       (Callstack.Map)
       (struct let name = "eva-callstack-id" end)
@@ -223,9 +222,9 @@ module Jcallstack : S with type t = callstack = struct
   let of_json = I.of_json
 end
 
-module Jcalls : Request.Output with type t = callstack = struct
+module Jcalls : Request.Output with type t = Callstack.t = struct
 
-  type t = callstack
+  type t = Callstack.t
 
   let jtype = Package.(Jarray (Jrecord [
       "callee" , Jfct.jtype ;
@@ -351,9 +350,9 @@ let filter_variables bases =
 (* -------------------------------------------------------------------------- *)
 
 module type EvaProxy = sig
-  val kf_callstacks : kernel_function -> callstack list
-  val stmt_callstacks : stmt -> callstack list
-  val evaluate : probe -> callstack option -> evaluations
+  val kf_callstacks : kernel_function -> Callstack.t list
+  val stmt_callstacks : stmt -> Callstack.t list
+  val evaluate : probe -> Callstack.t option -> evaluations
 end
 
 module Proxy(A : Analysis.S) : EvaProxy = struct

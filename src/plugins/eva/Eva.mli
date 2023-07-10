@@ -213,8 +213,6 @@ module Results: sig
         all requests in the function will lead to a Top error. *)
   val are_available : Cil_types.kernel_function -> bool
 
-  type callstack = Callstack.t
-
   type request
 
   type value
@@ -277,16 +275,16 @@ module Results: sig
 
   (** Only consider the given callstack.
       Replaces previous calls to [in_callstack] or [in_callstacks]. *)
-  val in_callstack : callstack -> request -> request
+  val in_callstack : Callstack.t -> request -> request
 
   (** Only consider the callstacks from the given list.
       Replaces previous calls to [in_callstack] or [in_callstacks]. *)
-  val in_callstacks : callstack list -> request -> request
+  val in_callstacks : Callstack.t list -> request -> request
 
   (** Only consider callstacks satisfying the given predicate. Several filters
       can be added. If callstacks are also selected with [in_callstack] or
       [in_callstacks], only the selected callstacks will be filtered. *)
-  val filter_callstack : (callstack -> bool) -> request -> request
+  val filter_callstack : (Callstack.t -> bool) -> request -> request
 
 
   (** Working with callstacks *)
@@ -296,11 +294,11 @@ module Results: sig
       reached by the analysis, or if no information has been saved at this point
       (for instance with the -eva-no-results option).
       Use [is_empty request] to distinguish these two cases. *)
-  val callstacks : request -> callstack list
+  val callstacks : request -> Callstack.t list
 
   (** Returns a list of subrequests for each reachable callstack from
       the given request. *)
-  val by_callstack : request -> (callstack * request) list
+  val by_callstack : request -> (Callstack.t * request) list
 
 
   (** State requests *)
@@ -671,7 +669,6 @@ module Cvalue_callbacks: sig
       in a future version. Please contact us if you need to register callbacks
       to be executed during an Eva analysis. *)
 
-  type callstack = Callstack.t
   type state = Cvalue.Model.t
 
   type analysis_kind =
@@ -685,7 +682,7 @@ module Cvalue_callbacks: sig
       the function called, the kind of analysis performed by Eva for this call,
       and the cvalue state at the beginning of the call. *)
   val register_call_hook:
-    (callstack -> Cil_types.kernel_function -> analysis_kind -> state -> unit)
+    (Callstack.t -> Cil_types.kernel_function -> analysis_kind -> state -> unit)
     -> unit
 
 
@@ -705,7 +702,7 @@ module Cvalue_callbacks: sig
       function call. Arguments of the callback are the callstack of the call,
       the function called and the cvalue states resulting from its analysis. *)
   val register_call_results_hook:
-    (callstack -> Cil_types.kernel_function -> call_results -> unit)
+    (Callstack.t -> Cil_types.kernel_function -> call_results -> unit)
     -> unit
 
 end

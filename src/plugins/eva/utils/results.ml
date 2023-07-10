@@ -28,8 +28,7 @@ let are_available kf =
   | Analyzed (Complete | Partial) -> true
   | SpecUsed | Builtin _ | Unreachable | Analyzed NoResults -> false
 
-type callstack = Callstack.t
-type 'a by_callstack = (callstack * 'a) list
+type 'a by_callstack = (Callstack.t * 'a) list
 
 type control_point =
   | Initial
@@ -39,8 +38,8 @@ type control_point =
 
 type context = {
   control_point : control_point;
-  selector : callstack list option;
-  filter: (callstack -> bool) list;
+  selector : Callstack.t list option;
+  filter: (Callstack.t -> bool) list;
 }
 
 type request =
@@ -147,13 +146,13 @@ struct
 
   (* Accessors *)
 
-  let callstacks : ('a, restricted_to_callstack) t -> callstack list = function
+  let callstacks: ('a, restricted_to_callstack) t -> Callstack.t list = function
     | Top | Bottom -> [] (* What else to do when Top is given ? *)
     | ByCallstack l -> List.map fst l
 
   (* Fold *)
 
-  let fold (f  : callstack -> 'a -> 'b -> 'b) (acc : 'b) :
+  let fold (f  : Callstack.t -> 'a -> 'b -> 'b) (acc : 'b) :
     ('a, restricted_to_callstack) t -> 'b =
     function
     | Top | Bottom -> acc (* What else to do when Top is given ? *)

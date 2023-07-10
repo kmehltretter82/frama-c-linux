@@ -223,17 +223,10 @@ type ('loc, 'value) argument = {
   avalue: ('loc, 'value) assigned;  (** The value of the concrete argument. *)
 }
 
-(** A call_stack is a list, telling which function was called at which
-    site. The head of the list tells about the latest call. *)
-
-(* A call stack is a list of call sites. The head is the latest call.
-   The last element is the main function. *)
-type callstack = Callstack.t
-
 (** A function call. *)
 type ('loc, 'value) call = {
   kf: kernel_function;                        (** The called function. *)
-  callstack: callstack;                       (** The current callstack
+  callstack: Callstack.t;                     (** The current callstack
                                                   (with this call on top). *)
   arguments: ('loc, 'value) argument list;    (** The arguments of the call. *)
   rest: (exp * ('loc, 'value) assigned) list; (** Extra-arguments. *)

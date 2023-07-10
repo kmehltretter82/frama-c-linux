@@ -63,8 +63,6 @@
       all requests in the function will lead to a Top error. *)
 val are_available : Cil_types.kernel_function -> bool
 
-type callstack = Callstack.t
-
 type request
 
 type value
@@ -127,16 +125,16 @@ val in_cvalue_state : Cvalue.Model.t -> request
 
 (** Only consider the given callstack.
     Replaces previous calls to [in_callstack] or [in_callstacks]. *)
-val in_callstack : callstack -> request -> request
+val in_callstack : Callstack.t -> request -> request
 
 (** Only consider the callstacks from the given list.
     Replaces previous calls to [in_callstack] or [in_callstacks]. *)
-val in_callstacks : callstack list -> request -> request
+val in_callstacks : Callstack.t list -> request -> request
 
 (** Only consider callstacks satisfying the given predicate. Several filters
     can be added. If callstacks are also selected with [in_callstack] or
     [in_callstacks], only the selected callstacks will be filtered. *)
-val filter_callstack : (callstack -> bool) -> request -> request
+val filter_callstack : (Callstack.t -> bool) -> request -> request
 
 
 (** Working with callstacks *)
@@ -146,11 +144,11 @@ val filter_callstack : (callstack -> bool) -> request -> request
     reached by the analysis, or if no information has been saved at this point
     (for instance with the -eva-no-results option).
     Use [is_empty request] to distinguish these two cases. *)
-val callstacks : request -> callstack list
+val callstacks : request -> Callstack.t list
 
 (** Returns a list of subrequests for each reachable callstack from
     the given request. *)
-val by_callstack : request -> (callstack * request) list
+val by_callstack : request -> (Callstack.t * request) list
 
 
 (** State requests *)
