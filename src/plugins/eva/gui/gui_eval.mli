@@ -61,7 +61,7 @@ module type S = sig
   (** This is the record that encapsulates all evaluation functions *)
   type ('env, 'expr, 'v) evaluation_functions = {
     eval_and_warn: 'env -> 'expr -> 'v * bool (* alarm *) * bool (* red *);
-    env: Analysis.Dom.t -> Eva.Callstack.t -> 'env;
+    env: Analysis.Dom.t -> Callstack.t -> 'env;
     equal: 'v -> 'v -> bool;
     bottom: 'v;
     join: 'v -> 'v -> 'v;
@@ -108,7 +108,7 @@ module type S = sig
 
   val predicate_with_red:
     gui_loc ->
-    (Eval_terms.eval_env * (kinstr * Eva.Callstack.t),
+    (Eval_terms.eval_env * (kinstr * Callstack.t),
      Red_statuses.alarm_or_property * predicate,
      Eval_terms.predicate_status Lattice_bounds.or_bottom
     ) evaluation_functions

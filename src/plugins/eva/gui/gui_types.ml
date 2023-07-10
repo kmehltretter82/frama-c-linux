@@ -25,20 +25,20 @@ open Cil_types
 type gui_callstack =
   | GC_Filtered (* Some results have been hidden by a filter *)
   | GC_Consolidated (* Join of all possible callstacks *)
-  | GC_Single of Eva_types.Callstack.t (* Only one callstack possible here *)
-  | GC_Callstack of Eva_types.Callstack.t (* One of multiple callstacks *)
+  | GC_Single of Callstack.t (* Only one callstack possible here *)
+  | GC_Callstack of Callstack.t (* One of multiple callstacks *)
 
 let hash_gui_callstack = function
   | GC_Filtered -> 0
   | GC_Consolidated -> 1
-  | GC_Single cs -> 2 * Eva_types.Callstack.hash cs
-  | GC_Callstack cs -> 4 * Eva_types.Callstack.hash cs
+  | GC_Single cs -> 2 * Callstack.hash cs
+  | GC_Callstack cs -> 4 * Callstack.hash cs
 
 let compare_gui_callstack cs1 cs2 = match cs1, cs2 with
   | GC_Filtered, GC_Filtered -> 0
   | GC_Consolidated, GC_Consolidated -> 0
   | GC_Single cs1, GC_Single cs2 | GC_Callstack cs1, GC_Callstack cs2 ->
-    Eva_types.Callstack.compare cs1 cs2
+    Callstack.compare cs1 cs2
   | _, GC_Filtered -> 1
   | GC_Filtered, _ -> -1
   | _, GC_Consolidated -> 1
@@ -230,7 +230,7 @@ let kf_of_gui_loc = function
 (* This pretty-printer drops the toplevel kf, which is always the function
    in which we are pretty-printing the expression/term *)
 let pretty_callstack fmt cs =
-  let cs = Eva.Callstack.to_legacy cs in
+  let cs = Callstack.to_legacy cs in
   match cs with
   | [_, Kglobal] -> ()
   | (_kf_cur, Kstmt callsite) :: q -> begin
@@ -259,7 +259,7 @@ let pretty_callstack fmt cs =
 (* This pretty-printer prints only the lists of the functions, not
    the locations *)
 let pretty_callstack_short fmt cs =
-  let cs = Eva.Callstack.to_legacy cs in
+  let cs = Callstack.to_legacy cs in
   match cs with
   | [_, Kglobal] -> ()
   | (_kf_cur, Kstmt _callsite) :: q ->
