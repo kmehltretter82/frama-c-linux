@@ -62,11 +62,7 @@ let push_call_stack kf stmt =
 let pop_call_stack () =
   let cs = current_call_stack () in
   Eva_perf.stop_doing (Callstack.to_legacy cs);
-  match Callstack.pop cs with
-  | None ->
-    current_callstack := None
-  | Some (_kf,_stmt,tail) ->
-    current_callstack := Some tail
+  current_callstack := Callstack.pop cs
 
 let pp_callstack fmt =
   if Parameters.PrintCallstacks.get () then

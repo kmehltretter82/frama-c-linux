@@ -129,7 +129,7 @@ module Callstack: sig
       This type is very likely to change in the future. Never use this type
       directly, prefer the use of the following functions when possible. *)
 
-  type callstack = Eva_types.Callstack.callstack = private {
+  type callstack = Eva_types.Callstack.callstack = {
     thread: int; (* An identifier of the thread's callstack *)
     entry_point: Cil_types.kernel_function; (* The first function in the callstack *)
     stack: call list;
@@ -149,11 +149,13 @@ module Callstack: sig
 
   (* Stack manipulation *)
   val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t
-  val pop : t -> (Cil_types.kernel_function * Cil_types.stmt * t) option
+  val pop : t -> t option
   val top : t -> (Cil_types.kernel_function * Cil_types.stmt) option
   val top_kf : t -> Cil_types.kernel_function
   val top_callsite : t -> Cil_types.stmt option
   val top_call : t -> Cil_types.kernel_function * Cil_types.kinstr
+
+  val last_caller : t -> Cil_types.kernel_function option
 
   (* Conversion *)
 
@@ -166,7 +168,6 @@ module Callstack: sig
   (** Gives the list of call statements from the bottom to the top of the callstack (i.e. reverse order of the call stack). *)
   val to_stmt_list : t -> Cil_types.stmt list
 
-  val change_thread : t -> int -> t
 end
 
 module Results: sig

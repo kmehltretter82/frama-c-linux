@@ -76,6 +76,8 @@ struct
 
   include Datatype.Make_with_collections (Prototype)
 
+  let pretty_debug = pretty
+
   let compare_lex cs1 cs2 =
     if cs1 == cs2 then 0 else
       let c = Thread.compare cs1.thread cs2.thread in
@@ -94,7 +96,7 @@ struct
   let pop cs =
     match cs.stack with
     | [] -> None
-    | (kf,stmt) :: tail -> Some (kf, stmt, { cs with stack = tail })
+    | _ :: tail -> Some { cs with stack = tail }
 
   let top cs =
     match cs.stack with
@@ -116,6 +118,12 @@ struct
     | (kf, stmt) :: _ -> kf, Cil_types.Kstmt stmt
     | [] -> cs.entry_point, Cil_types.Kglobal
 
+  let last_caller cs =
+    match cs.stack with
+    | _ :: (kf, _) :: _ -> Some kf
+    | [_] -> Some cs.entry_point
+    | [] -> None
+
   (* Conversion *)
 
   let to_legacy cs =
@@ -127,9 +135,4 @@ struct
   let to_kf_list cs = cs.entry_point :: List.rev_map fst cs.stack
 
   let to_stmt_list cs = List.rev_map snd cs.stack
-
-  (* This function should not be used as callstack should be initialized
-     with their thread instead of fixing it afterwards. To be removed as soon
-     as this issue is fixed. *)
-  let change_thread cs thread = { cs with thread }
 end

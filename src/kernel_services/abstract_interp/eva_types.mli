@@ -29,7 +29,7 @@ sig
 
   module Call : Datatype.S with type t = call
 
-  type callstack = private {
+  type callstack = {
     thread: int;
     entry_point: Cil_types.kernel_function;
     stack: call list;
@@ -37,22 +37,23 @@ sig
 
   include Datatype.S_with_collections with type t = callstack
 
+  val pretty_debug : Format.formatter -> t -> unit
+
   val compare_lex : t -> t -> int
 
   val init : ?thread:int -> Cil_types.kernel_function -> t
 
   val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t
-  val pop : t -> (Cil_types.kernel_function * Cil_types.stmt * t) option
+  val pop : t -> t option
   val top : t -> (Cil_types.kernel_function * Cil_types.stmt) option
   val top_kf : t -> Cil_types.kernel_function
   val top_callsite : t -> Cil_types.stmt option
   val top_call : t -> Cil_types.kernel_function * Cil_types.kinstr
+  val last_caller : t -> Cil_types.kernel_function option
 
   val to_legacy : t -> Value_types.callstack
   val to_kf_list : t -> Cil_types.kernel_function list
   val to_stmt_list : t -> Cil_types.stmt list
-
-  val change_thread : t -> int -> t
 end
 [@@alert db_deprecated
     "Eva_types is only provided for compatibility reason and will be removed \
