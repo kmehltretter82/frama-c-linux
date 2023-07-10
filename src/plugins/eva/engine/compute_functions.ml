@@ -352,7 +352,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   let compute kf init_state =
     let restore_signals = register_signal_handler () in
     let compute () =
-      let callstack = Callstack.init_local kf in
+      let callstack = Callstack.init kf in
       Eva_utils.set_call_stack callstack;
       store_initial_state callstack kf init_state;
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in

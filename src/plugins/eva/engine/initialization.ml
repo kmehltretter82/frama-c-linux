@@ -308,7 +308,6 @@ module Make
 
   let initialize_global_variable ~lib_entry vi init state =
     Cil.CurrentLoc.set vi.vdecl;
-    Eva_utils.set_call_stack (Callstack.init_global vi);
     let state = Domain.enter_scope Abstract_domain.Global [vi] state in
     let state = if vi.vsource then
         let initialize =
@@ -319,7 +318,6 @@ module Make
         initialize Kglobal vi init.init state
       else state
     in
-    Eva_utils.clear_call_stack ();
     state
 
 

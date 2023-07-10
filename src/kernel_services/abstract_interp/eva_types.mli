@@ -29,24 +29,17 @@ sig
 
   module Call : Datatype.S with type t = call
 
-  type local_stack = private {
+  type callstack = private {
     thread: int;
     entry_point: Cil_types.kernel_function;
     stack: call list;
   }
 
-  type callstack = private
-    | Global of Cil_types.varinfo
-    | Local of local_stack
-
   include Datatype.S_with_collections with type t = callstack
 
   val compare_lex : t -> t -> int
 
-  val init_global : Cil_types.varinfo -> t
-  val init_local : ?thread:int -> Cil_types.kernel_function -> t
-
-  val is_local : t -> bool
+  val init : ?thread:int -> Cil_types.kernel_function -> t
 
   val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t
   val pop : t -> (Cil_types.kernel_function * Cil_types.stmt * t) option

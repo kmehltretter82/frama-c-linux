@@ -32,6 +32,7 @@ val pop_call_stack : unit -> unit
 
 (** The current function is the one on top of the call stack. *)
 val current_kf : unit -> kernel_function
+val current_call_stack_opt : unit -> Callstack.t option
 val current_call_stack : unit -> Callstack.t
 val legacy_call_stack : unit -> Value_types.callstack
 

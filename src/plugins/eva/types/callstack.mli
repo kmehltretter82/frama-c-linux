@@ -34,15 +34,11 @@ module Call : Datatype.S with type t = call
     This type is very likely to change in the future. Never use this type
     directly, prefer the use of the following functions when possible. *)
 
-type local_stack = Eva_types.Callstack.local_stack = private {
+type callstack = Eva_types.Callstack.callstack = private {
   thread: int; (* An identifier of the thread's callstack *)
   entry_point: Cil_types.kernel_function; (* The first function in the callstack *)
   stack: call list;
 }
-
-type callstack = Eva_types.Callstack.callstack = private
-  | Global of Cil_types.varinfo
-  | Local of local_stack
 
 include Datatype.S_with_collections
   with type t = callstack
@@ -54,11 +50,7 @@ include Datatype.S_with_collections
 val compare_lex : t -> t -> int
 
 (* Constructor *)
-val init_global : Cil_types.varinfo -> t
-val init_local : ?thread:int -> Cil_types.kernel_function -> t
-
-(* Query *)
-val is_local : t -> bool
+val init : ?thread:int -> Cil_types.kernel_function -> t
 
 (* Stack manipulation *)
 val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t

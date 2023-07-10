@@ -243,19 +243,16 @@ module Jcalls : Request.Output with type t = callstack = struct
     ]
 
   let to_json (cs : t) =
-    match cs with
-    | Global _vi -> `List []
-    | Local ls ->
-      let aux (acc, jcaller) (callee, stmt) =
-        let jcallee = Jfct.to_json callee in
-        jcallsite jcaller jcallee stmt :: acc, jcallee
-      in
-      let entry_point = Jfct.to_json ls.entry_point in
-      let l, _last_callee = List.fold_left aux
-          ([`Assoc [ "callee", entry_point ]], entry_point)
-          ls.stack
-      in
-      `List (List.rev l)
+    let aux (acc, jcaller) (callee, stmt) =
+      let jcallee = Jfct.to_json callee in
+      jcallsite jcaller jcallee stmt :: acc, jcallee
+    in
+    let entry_point = Jfct.to_json cs.entry_point in
+    let l, _last_callee = List.fold_left aux
+        ([`Assoc [ "callee", entry_point ]], entry_point)
+        cs.stack
+    in
+    `List (List.rev l)
 end
 
 module Jtruth : Data.S with type t = truth = struct

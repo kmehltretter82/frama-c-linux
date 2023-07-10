@@ -243,7 +243,7 @@ struct
       A.get_stmt_state_by_callstack ?selection ~after:true stmt
       |> by_callstack ctx
     | Initial ->
-      let cs = Callstack.init_local (fst (Globals.entry_point ())) in
+      let cs = Callstack.init (fst (Globals.entry_point ())) in
       A.get_global_state () |> singleton cs
     | Start kf ->
       A.get_initial_state_by_callstack ?selection kf |> by_callstack ctx

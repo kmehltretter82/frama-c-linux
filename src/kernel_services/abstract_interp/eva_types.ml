@@ -32,20 +32,24 @@ struct
 
   module Calls = Datatype.List (Call)
 
-  type local_stack = {
+  type callstack = {
     thread: int;
     entry_point: Kernel_function.t;
     stack: Call.t list;
   }
 
-  module LocalStack =
+  module Prototype =
   struct
-    type t = local_stack = {
+    include Datatype.Serializable_undefined
+
+    type t = callstack = {
       thread: int;
       entry_point: Kernel_function.t;
       stack: Call.t list;
     }
     [@@deriving eq, ord]
+
+    let name = "Eva.Callstack"
 
     let reprs =
       List.concat_map (fun stack ->
@@ -63,14 +67,6 @@ struct
       List.iter (pp_call fmt) cs.stack;
       Format.fprintf fmt "%a@]" Kernel_function.pretty cs.entry_point
 
-    let compare_lex ls1 ls2 =
-      if ls1 == ls2 then 0 else
-        let c = Thread.compare ls1.thread ls2.thread in
-        if c <> 0 then c else
-          let c = Kernel_function.compare ls1.entry_point ls2.entry_point in
-          if c <> 0 then c else
-            Calls.compare (List.rev ls1.stack) (List.rev ls2.stack)
-
     let hash cs =
       Hashtbl.hash
         (cs.thread, Kernel_function.hash cs.entry_point, Calls.hash cs.stack)
@@ -78,137 +74,62 @@ struct
 
   type call = Call.t
 
-  type callstack =
-    | Global of Cil_datatype.Varinfo.t
-    | Local of LocalStack.t
-
-  (* Datatype *)
-
-  module Prototype =
-  struct
-    open Cil_datatype
-    include Datatype.Serializable_undefined
-
-    type t = callstack =
-      | Global of Varinfo.t
-      | Local of LocalStack.t
-    [@@deriving eq, ord]
-
-    let name = "Eva.Callstack"
-
-    let reprs =
-      List.map (fun vi -> Global vi) Varinfo.reprs @
-      List.map (fun ls -> Local ls) LocalStack.reprs
-
-    let pretty fmt cs =
-      match cs with
-      | Global vi -> Format.fprintf fmt "init %a" Varinfo.pretty vi
-      | Local ls -> LocalStack.pretty fmt ls
-
-    let hash cs =
-      match cs with
-      | Global vi -> Hashtbl.hash (1, Varinfo.hash vi)
-      | Local ls -> Hashtbl.hash (2, LocalStack.hash ls)
-  end
-
   include Datatype.Make_with_collections (Prototype)
 
   let compare_lex cs1 cs2 =
-    match cs1, cs2 with
-    | Local ls1, Local ls2 -> LocalStack.compare_lex ls1 ls2
-    | cs1, cs2 -> compare cs1 cs2
-
-  (* Constructor *)
-
-  let init_global vi =
-    Global vi
-
-  let init_local ?(thread=0) kf =
-    Local { thread; entry_point=kf; stack = [] }
-
-  (* Query *)
-
-  let is_local = function
-    | Global _ -> false
-    | Local _ -> true
+    if cs1 == cs2 then 0 else
+      let c = Thread.compare cs1.thread cs2.thread in
+      if c <> 0 then c else
+        let c = Kernel_function.compare cs1.entry_point cs2.entry_point in
+        if c <> 0 then c else
+          Calls.compare (List.rev cs1.stack) (List.rev cs2.stack)
 
   (* Stack manipulation *)
 
-  let local = function
-    | Global _vi ->
-      invalid_arg "invalid stack manipulation on a global callstack"
-    | Local ls -> ls
+  let init ?(thread=0) kf = { thread; entry_point=kf; stack = [] }
 
   let push kf stmt cs =
-    let ls = local cs in
-    Local { ls with stack = (kf, stmt) :: ls.stack }
+    { cs with stack = (kf, stmt) :: cs.stack }
 
   let pop cs =
-    match cs with
-    | Global _vi -> None
-    | Local ls ->
-      match ls.stack with
-      | [] -> None
-      | (kf,stmt) :: tail -> Some (kf, stmt, Local { ls with stack = tail })
+    match cs.stack with
+    | [] -> None
+    | (kf,stmt) :: tail -> Some (kf, stmt, { cs with stack = tail })
 
   let top cs =
-    match cs with
-    | Global _vi -> None
-    | Local ls ->
-      match ls.stack with
-      | [] -> None
-      | (kf, stmt) :: _ -> Some (kf, stmt)
+    match cs.stack with
+    | [] -> None
+    | (kf, stmt) :: _ -> Some (kf, stmt)
 
   let top_kf cs =
-    let ls = local cs in
-    match ls.stack with
+    match cs.stack with
     | (kf, _stmt) :: _ -> kf
-    | [] -> ls.entry_point
+    | [] -> cs.entry_point
 
   let top_callsite cs =
-    match cs with
-    | Global _vi -> None
-    | Local ls ->
-      match ls.stack with
-      | [] -> None
-      | (_kf, stmt) :: _ -> Some (stmt)
+    match cs.stack with
+    | [] -> None
+    | (_kf, stmt) :: _ -> Some (stmt)
 
   let top_call cs =
-    let ls = local cs in
-    match ls.stack with
+    match cs.stack with
     | (kf, stmt) :: _ -> kf, Cil_types.Kstmt stmt
-    | [] -> ls.entry_point, Cil_types.Kglobal
-
+    | [] -> cs.entry_point, Cil_types.Kglobal
 
   (* Conversion *)
 
   let to_legacy cs =
-    match cs with
-    | Global _vi -> []
-    | Local ls ->
-      let l =
-        List.rev_map (fun (kf, stmt) -> (kf, Cil_types.Kstmt stmt)) ls.stack
-      in
-      List.rev ((ls.entry_point, Cil_types.Kglobal) :: l)
+    let l =
+      List.rev_map (fun (kf, stmt) -> (kf, Cil_types.Kstmt stmt)) cs.stack
+    in
+    List.rev ((cs.entry_point, Cil_types.Kglobal) :: l)
 
-  let to_kf_list cs =
-    match cs with
-    | Global _vi -> []
-    | Local ls ->
-      ls.entry_point :: List.rev_map fst ls.stack
+  let to_kf_list cs = cs.entry_point :: List.rev_map fst cs.stack
 
-  let to_stmt_list cs =
-    match cs with
-    | Global _vi -> []
-    | Local ls ->
-      List.rev_map snd ls.stack
+  let to_stmt_list cs = List.rev_map snd cs.stack
 
   (* This function should not be used as callstack should be initialized
      with their thread instead of fixing it afterwards. To be removed as soon
      as this issue is fixed. *)
-  let change_thread cs thread =
-    match cs with
-    | Global _ -> cs
-    | Local ls ->
-      Local { ls with thread }
+  let change_thread cs thread = { cs with thread }
 end
