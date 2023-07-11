@@ -355,11 +355,6 @@ module Value = struct
            Cvalue.Model.pretty v)
 *)
 
-  (* -remove-redundant-alarms feature, applied at the end of an Eva analysis,
-     fulfilled by the Scope plugin that also depends on Eva. We thus use a
-     reference here to avoid a cyclic dependency. *)
-  let rm_asserts = mk_fun "Value.rm_asserts"
-
   let no_results = mk_fun "Value.no_results"
 
   let update_callstack_table ~after stmt callstack v =

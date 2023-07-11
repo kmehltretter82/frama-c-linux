@@ -316,10 +316,6 @@ module Value : sig
       on [Record_Value_Callbacks] and [Record_Value_Callbacks_New]
       should not force their lazy argument *)
 
-  (* -remove-redundant-alarms feature, applied at the end of an Eva analysis,
-     fulfilled by the Scope plugin that also depends on Eva. We thus use a
-     reference here to avoid a cyclic dependency. *)
-  val rm_asserts: (unit -> unit) ref
 
   (**/**)
   (** {3 Internal use only} *)
