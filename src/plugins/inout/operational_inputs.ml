@@ -207,13 +207,16 @@ module Internals =
       let size = 17
     end)
 
-module CallsiteHash = Value_types.Callsite.Hashtbl
+module Callsite =
+  Datatype.Pair_with_collections (Kernel_function) (Cil_datatype.Kinstr)
+    (struct let module_name = "From.Callsite" end)
+module CallsiteHash = Callsite.Hashtbl
 
 (* Results of an an entire call, represented by a pair (stmt, kernel_function).
 *)
 module CallwiseResults =
   State_builder.Hashtbl
-    (Value_types.Callsite.Hashtbl)
+    (Callsite.Hashtbl)
     (Inout_type)
     (struct
       let size = 17
