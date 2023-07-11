@@ -584,8 +584,6 @@ module State = struct
     then Parameters.ForceValues.output display_results
 end
 
-let () = Db.Value.display := (fun fmt kf -> State.display ~fmt kf)
-
 
 let registered =
   let name = "cvalue"

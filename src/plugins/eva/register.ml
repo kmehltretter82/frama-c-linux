@@ -34,28 +34,9 @@ let main () =
 let () = Db.Main.extend main
 
 
-(* "access" functions before evaluation, registered in Db.Value *)
-let access_value_of_lval kinstr lv =
-  let state = Db.Value.get_state kinstr in
-  snd (!Db.Value.eval_lval None state lv)
-
-let access_value_of_expr kinstr e =
-  let state = Db.Value.get_state kinstr in
-  !Db.Value.eval_expr state e
-
-let access_value_of_location kinstr loc =
-  let state = Db.Value.get_state kinstr in
-  Db.Value.find state loc
-
 let () =
   Db.Value.is_called := Function_calls.is_called;
   Db.Value.callers := Function_calls.callsites;
-  Db.Value.use_spec_instead_of_definition :=
-    Function_calls.use_spec_instead_of_definition;
-  Db.Value.access := access_value_of_lval;
-  Db.Value.access_location := access_value_of_location;
-  Db.Value.access_expr := access_value_of_expr;
-  Db.Value.valid_behaviors := Logic_inout.valid_behaviors;
 
 
   (* -------------------------------------------------------------------------- *)
@@ -342,28 +323,6 @@ module Export (Eval : Eval) = struct
 
   let lval_to_offsetmap_state state lv =
     lval_to_offsetmap_aux state lv
-
-
-  let expr_to_kernel_function_state ?with_alarms state ~deps exp =
-    let r, deps = resolv_func_vinfo ?with_alarms deps state exp in
-    Option.value ~default:Locations.Zone.bottom deps, r
-
-  let expr_to_kernel_function kinstr ?with_alarms ~deps exp =
-    let state_to_joined_kernel_function state (z_acc, kf_acc) =
-      let z, kf =
-        expr_to_kernel_function_state ?with_alarms state ~deps exp
-      in
-      Locations.Zone.join z z_acc,
-      Kernel_function.Hptset.union kf kf_acc
-    in
-    Db.Value.fold_state_callstack
-      state_to_joined_kernel_function
-      ((match deps with None -> Locations.Zone.bottom | Some z -> z),
-       Kernel_function.Hptset.empty)
-      ~after:false kinstr
-
-  let expr_to_kernel_function_state =
-    expr_to_kernel_function_state ?with_alarms:None
 end
 
 
@@ -396,8 +355,6 @@ let register (module Eval: Eval) (module Export: Export) =
     lval_to_precise_loc_with_deps_state;
   Db.Value.lval_to_offsetmap := lval_to_offsetmap;
   Db.Value.lval_to_offsetmap_state := lval_to_offsetmap_state;
-  Db.Value.expr_to_kernel_function := expr_to_kernel_function;
-  Db.Value.expr_to_kernel_function_state := expr_to_kernel_function_state;
   ()
 
 

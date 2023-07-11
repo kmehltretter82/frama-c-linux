@@ -109,9 +109,6 @@ module Value : sig
   type t = Cvalue.V.t
   (** Internal representation of a value. *)
 
-  val emitter: Emitter.t ref
-  (** Emitter used by Value to emit statuses *)
-
   val proxy: State_builder.Proxy.t
 
   val self : State.t
@@ -151,22 +148,10 @@ module Value : sig
       of each reachable and evaluable statement. Filled only if
       [Value_parameters.ResultsAfter] is set. *)
 
-  val ignored_recursive_call: kernel_function -> bool
-  (** This functions returns true if the value analysis found and ignored
-      a recursive call to this function during the analysis. *)
-
   val condition_truth_value: stmt -> bool * bool
   (** Provided [stmt] is an 'if' construct, [fst (condition_truth_value stmt)]
       (resp. snd) is true if and only if the condition of the 'if' has been
       evaluated to true (resp. false) at least once during the analysis. *)
-
-  (** {3 Parameterization} *)
-
-  val use_spec_instead_of_definition: (kernel_function -> bool) ref
-  (** To be called by derived analyses to determine if they must use
-      the body of the function (if available), or only its spec. Used for
-      value builtins, and option -val-use-spec. *)
-
 
   (** {4 Arguments of the main function} *)
 
@@ -237,8 +222,6 @@ module Value : sig
   val fold_state_callstack :
     (state -> 'a -> 'a) -> 'a -> after:bool -> kinstr -> 'a
 
-  val find : state -> Locations.location ->  t
-
   (** {3 Evaluations} *)
 
   val eval_lval :
@@ -263,28 +246,6 @@ module Value : sig
   (** returns the list of all decompositions of [expr] into the sum an lvalue
       and an interval. *)
 
-  (** {3 Values and kernel functions} *)
-
-  val expr_to_kernel_function :
-    (kinstr
-     -> ?with_alarms:CilE.warn_mode
-     -> deps:Locations.Zone.t option
-     -> exp
-     -> Locations.Zone.t * Kernel_function.Hptset.t) ref
-
-  val expr_to_kernel_function_state :
-    (state
-     -> deps:Locations.Zone.t option
-     -> exp
-     -> Locations.Zone.t * Kernel_function.Hptset.t) ref
-
-  exception Not_a_call
-  val call_to_kernel_function : stmt -> Kernel_function.Hptset.t
-  (** Return the functions that can be called from this call.
-      @raise Not_a_call if the statement is not a call. *)
-
-  val valid_behaviors: (kernel_function -> state -> funbehavior list) ref
-
   (** {3 Reachability} *)
 
   val is_accessible : kinstr -> bool
@@ -295,22 +256,11 @@ module Value : sig
 
   (** {3 About kernel functions} *)
 
-  exception Void_Function
-  val find_return_loc : kernel_function -> Locations.location
-  (** Return the location of the returned lvalue of the given function.
-      @raise Void_Function if the function does not return any value. *)
-
   val is_called: (kernel_function -> bool) ref
 
   val callers: (kernel_function -> (kernel_function*stmt list) list) ref
   (** @return the list of callers with their call sites. Each function is
       present only once in the list. *)
-
-  (** {3 State before a kinstr} *)
-
-  val access : (kinstr -> lval ->  t) ref
-  val access_expr : (kinstr -> exp ->  t) ref
-  val access_location : (kinstr -> Locations.location ->  t) ref
 
 
   (** {3 Locations of left values} *)
@@ -380,23 +330,12 @@ module Value : sig
      reference here to avoid a cyclic dependency. *)
   val rm_asserts: (unit -> unit) ref
 
-
-  (** {3 Pretty printing} *)
-
-  val pretty : Format.formatter -> t -> unit
-  val pretty_state : Format.formatter -> state -> unit
-
-
-  val display : (Format.formatter -> kernel_function -> unit) ref
-
   (**/**)
   (** {3 Internal use only} *)
 
   val noassert_get_state : ?after:bool -> kinstr -> state
   (** To be used during the value analysis itself (instead of
       {!get_state}). [after] is false by default. *)
-
-  val recursive_call_occurred: kernel_function -> unit
 
   val merge_conditions: int Cil_datatype.Stmt.Hashtbl.t -> unit
   val mask_then: int
@@ -407,12 +346,6 @@ module Value : sig
   val update_callstack_table: after:bool -> stmt -> callstack -> state -> unit
   (* Merge a new state in the table indexed by callstacks. *)
 
-
-  val memoize : (kernel_function -> unit) ref
-  (*  val compute_call :
-      (kernel_function -> call_kinstr:kinstr -> state ->  (exp*t) list
-         -> Cvalue.V_Offsetmap.t option (** returned value of [kernel_function] *) * state) ref
-  *)
   val merge_initial_state : callstack -> kernel_function -> state -> unit
   (** Store an additional possible initial state for the given callstack as
       well as its values for actuals. *)

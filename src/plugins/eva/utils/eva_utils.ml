@@ -79,8 +79,6 @@ let emitter =
     ~correctness:Parameters.parameters_correctness
     ~tuning:Parameters.parameters_tuning
 
-let () = Db.Value.emitter := emitter
-
 let get_slevel kf =
   try Parameters.SlevelFunction.find kf
   with Not_found -> Parameters.SemanticUnrollingLevel.get ()

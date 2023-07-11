@@ -319,20 +319,6 @@ module Value = struct
       ((i land mask_then) <> 0, (i land mask_else) <> 0)
     with Not_found -> false, false
 
-  module RecursiveCallsFound =
-    State_builder.Set_ref
-      (Kernel_function.Set)
-      (struct
-        let name = "Db.Value.RecursiveCallsFound"
-        let dependencies = only_self
-      end)
-
-  let ignored_recursive_call kf =
-    RecursiveCallsFound.mem kf
-
-  let recursive_call_occurred kf =
-    RecursiveCallsFound.add kf
-
   module Called_Functions_By_Callstack =
     State_builder.Hashtbl(Kernel_function.Hashtbl)
       (States_by_callstack)
@@ -433,8 +419,6 @@ module Value = struct
     try Some (Called_Functions_By_Callstack.find kf)
     with Not_found -> None
 
-  let valid_behaviors = mk_fun "Value.get_valid_behaviors"
-
   let get_fundec_from_stmt stmt =
     let kf =
       try
@@ -530,16 +514,6 @@ module Value = struct
   let is_called = mk_fun "Value.is_called"
   let callers = mk_fun "Value.callers"
 
-  let access_location = mk_fun "Value.access_location"
-
-  let find state loc = Cvalue.Model.find state loc
-
-  let access =  mk_fun "Value.access"
-  let access_expr =  mk_fun "Value.access_expr"
-
-  let use_spec_instead_of_definition =
-    mk_fun "Value.use_spec_instead_of_definition"
-
   let eval_lval =
     ref (fun ?with_alarms:_ _ -> mk_labeled_fun "Value.eval_lval")
   let eval_expr =
@@ -552,28 +526,7 @@ module Value = struct
 
   let find_lv_plus = mk_fun "Value.find_lv_plus"
 
-  let pretty_state = Cvalue.Model.pretty
-
-  let pretty = Cvalue.V.pretty
-
   let compute = mk_fun "Value.compute"
-
-  let memoize = mk_fun "Value.memoize"
-  let expr_to_kernel_function = mk_fun "Value.expr_to_kernel_function"
-  let expr_to_kernel_function_state =
-    mk_fun "Value.expr_to_kernel_function_state"
-
-  exception Not_a_call
-
-  let call_to_kernel_function call_stmt = match call_stmt.skind with
-    | Instr (Call (_, fexp, _, _)) ->
-      let _, called_functions =
-        !expr_to_kernel_function ?with_alarms:None ~deps:None
-          (Kstmt call_stmt) fexp
-      in called_functions
-    | Instr(Local_init(_, ConsInit(f,_,_),_)) ->
-      Kernel_function.Hptset.singleton (Globals.Functions.get f)
-    | _ -> raise Not_a_call
 
 
   let lval_to_loc_with_deps = mk_fun "Value.lval_to_loc_with_deps"
@@ -589,31 +542,6 @@ module Value = struct
     ref (fun ?with_alarms:_ _ -> mk_labeled_fun "Value.lval_to_precise_loc")
   let lval_to_precise_loc_with_deps_state =
     mk_fun "Value.lval_to_precise_loc_with_deps_state"
-
-
-  exception Void_Function
-
-  let find_return_loc kf =
-    try
-      let ki = Kernel_function.find_return kf in
-      let lval = match ki with
-        | { skind = Return (Some ({enode = Lval ((_ , offset) as lval)}), _) }
-          ->
-          assert (offset = NoOffset) ;
-          lval
-        | { skind = Return (None, _) } -> raise Void_Function
-        | _ -> assert false
-      in
-      !lval_to_loc (Kstmt ki) ?with_alarms:None lval
-    with Kernel_function.No_Statement ->
-      (* [JS 2011/05/17] should be better to have another name for this
-         exception or another one since it is possible to have no return without
-         returning void (the case when the kf corresponds to a declaration *)
-      raise Void_Function
-
-  let display = mk_fun "Value.display"
-
-  let emitter = ref Emitter.dummy
 
 end
 
