@@ -22,32 +22,30 @@
 
 [@@@ api_start]
 [@@@ alert "-db_deprecated"]
-(* A call is identified by the function called and the call statement *)
+
+(** A call is identified by the function called and the call statement *)
 type call = Cil_types.kernel_function * Cil_types.stmt
 
 module Call : Datatype.S with type t = call
 
-(** [local_stack] is used to describe the analysis context when analysing a
-    function. It contains the thread, the entry point and the list of
-    calls from the entry point.
-
-    This type is very likely to change in the future. Never use this type
-    directly, prefer the use of the following functions when possible. *)
-
+(** Eva callstacks. *)
 type callstack = Eva_types.Callstack.callstack = {
-  thread: int; (* An identifier of the thread's callstack *)
-  entry_point: Cil_types.kernel_function; (* The first function in the callstack *)
+  thread: int;
+  (* An identifier of the thread's callstack. *)
+  entry_point: Cil_types.kernel_function;
+  (** The first function function of the callstack. *)
   stack: call list;
+  (** A call stack is a list of calls. The head is the latest call. *)
 }
 
 include Datatype.S_with_collections
   with type t = callstack
    and module Hashtbl = Eva_types.Callstack.Hashtbl
 
-(** Print a call stack without displaying call sites. *)
+(** Prints a callstack without displaying call sites. *)
 val pretty_short : Format.formatter -> t -> unit
 
-(** Print a hash of the callstack when '-kernel-msg-key callstack'
+(** Prints a hash of the callstack when '-kernel-msg-key callstack'
     is enabled (prints nothing otherwise). *)
 val pretty_hash : Format.formatter -> t -> unit
 
@@ -56,30 +54,40 @@ val pretty_hash : Format.formatter -> t -> unit
     to the function at bottom of the callstack - the first functions called. *)
 val compare_lex : t -> t -> int
 
-(* Constructor *)
+(*** {2 Stack manipulation} *)
+
+(*** Constructor *)
 val init : ?thread:int -> Cil_types.kernel_function -> t
 
-(* Stack manipulation *)
+(** Adds a new call to the top of the callstack. *)
 val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t
+
+(** Removes the topmost call from the callstack. *)
 val pop : t -> t option
+
 val top : t -> (Cil_types.kernel_function * Cil_types.stmt) option
 val top_kf : t -> Cil_types.kernel_function
 val top_callsite : t -> Cil_types.stmt option
 val top_call : t -> Cil_types.kernel_function * Cil_types.kinstr
 
+(** Returns the function that called the topmost function of the callstack. *)
 val last_caller : t -> Cil_types.kernel_function option
 
-(* Conversion *)
+(** {2 Conversion} *)
 
 (** This function is likely to be removed in future versions*)
 val to_legacy : t -> Value_types.callstack
 
-(** Gives the list of kf in the callstack from the entry point to the top of the callstack (i.e. reverse order of the call stack). *)
+(** Gives the list of kf in the callstack from the entry point to the top of the
+    callstack (i.e. reverse order of the call stack). *)
 val to_kf_list : t -> Cil_types.kernel_function list
 
-(** Gives the list of call statements from the bottom to the top of the callstack (i.e. reverse order of the call stack). *)
+(** Gives the list of call statements from the bottom to the top of the
+    callstack (i.e. reverse order of the call stack). *)
 val to_stmt_list : t -> Cil_types.stmt list
 
+(** Gives the list of call from the bottom to the top of the callstack
+    (i.e. reverse order of the call stack). *)
 val to_call_list : t -> (Cil_types.kernel_function * Cil_types.kinstr) list
 
 [@@@ api_end]
