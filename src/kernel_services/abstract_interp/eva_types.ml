@@ -139,8 +139,6 @@ struct
     in
     (cs.entry_point, Cil_types.Kglobal) :: l
 
-  let to_legacy cs = List.rev (to_call_list cs)
-
   (* Stable hash and pretty-printing *)
 
   let stmt_hash s =

@@ -75,9 +75,6 @@ val last_caller : t -> Cil_types.kernel_function option
 
 (** {2 Conversion} *)
 
-(** This function is likely to be removed in future versions*)
-val to_legacy : t -> Value_types.callstack
-
 (** Gives the list of kf in the callstack from the entry point to the top of the
     callstack (i.e. reverse order of the call stack). *)
 val to_kf_list : t -> Cil_types.kernel_function list
