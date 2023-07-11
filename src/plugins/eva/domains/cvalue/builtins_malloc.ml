@@ -57,8 +57,9 @@ let () = Ast.add_monotonic_state Dynamic_Alloc_Bases.self
 (* -------------------------- Auxiliary functions  -------------------------- *)
 
 let current_call_site () =
-  let callsite = Callstack.top_callsite (Eva_utils.current_call_stack ()) in
-  Option.value ~default:Cil.dummyStmt callsite
+  match Callstack.top_callsite (Eva_utils.current_call_stack ()) with
+  | Kglobal -> Cil.dummyStmt
+  | Kstmt stmt -> stmt
 
 (* Remove some parts of the callstack:
    - Remove the bottom of the call tree until we get to the call site
@@ -210,7 +211,7 @@ let guess_intended_malloc_type stack sizev constant_size =
     | _ -> raise Exit
   in
   try
-    match snd (Callstack.top_call stack) with
+    match Callstack.top_callsite stack with
     | Kstmt {skind = Instr (Call (Some lv, _, _, _))} ->
       mk_typed_size (Cil.typeOfLval lv)
     | Kstmt {skind = Instr(Local_init(vi, _, _))} -> mk_typed_size vi.vtype

@@ -162,7 +162,7 @@ module Callstack: sig
 
   val top : t -> (Cil_types.kernel_function * Cil_types.stmt) option
   val top_kf : t -> Cil_types.kernel_function
-  val top_callsite : t -> Cil_types.stmt option
+  val top_callsite : t -> Cil_types.kinstr
   val top_call : t -> Cil_types.kernel_function * Cil_types.kinstr
 
   (** Returns the function that called the topmost function of the callstack. *)

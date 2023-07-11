@@ -40,8 +40,8 @@ let specialize_state_on_call ?stmt kf =
   | None -> Eva.Results.(at_start_of kf |> get_cvalue_model)
   | Some stmt ->
     let filter = fun cs -> match Eva.Callstack.top_callsite cs with
-      | Some s -> Cil_datatype.Stmt.equal s stmt
-      | None -> false
+      | Kstmt s -> Cil_datatype.Stmt.equal s stmt
+      | Kglobal -> false
     in
     Eva.Results.(at_start_of kf |> filter_callstack filter |> get_cvalue_model)
 

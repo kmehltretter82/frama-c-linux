@@ -114,8 +114,8 @@ struct
 
   let top_callsite cs =
     match cs.stack with
-    | [] -> None
-    | (_kf, stmt) :: _ -> Some (stmt)
+    | [] -> Cil_types.Kglobal
+    | (_kf, stmt) :: _ -> Cil_types.Kstmt stmt
 
   let top_call cs =
     match cs.stack with
