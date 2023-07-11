@@ -435,8 +435,6 @@ module Value = struct
 
   let valid_behaviors = mk_fun "Value.get_valid_behaviors"
 
-  let add_formals_to_state = mk_fun "add_formals_to_state"
-
   let get_fundec_from_stmt stmt =
     let kf =
       try

@@ -285,11 +285,6 @@ module Value : sig
 
   val valid_behaviors: (kernel_function -> state -> funbehavior list) ref
 
-  val add_formals_to_state: (state -> kernel_function -> exp list -> state) ref
-  (** [add_formals_to_state state kf exps] evaluates [exps] in [state]
-      and binds them to the formal arguments of [kf] in the resulting
-      state *)
-
   (** {3 Reachability} *)
 
   val is_accessible : kinstr -> bool
