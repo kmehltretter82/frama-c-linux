@@ -5,4 +5,5 @@
    COMMENT: to keep the number of files inspected by fc-script identical.
    COMMENT: WARNING: be sure to keep the ENABLED_IF below in sync with test_machdep.i
    ENABLED_IF: (or (not %{bin-available:clang}) (not %{bin-available:yq}))
+   EXECNOW: LOG test.res touch test.res
 */
