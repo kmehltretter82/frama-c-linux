@@ -461,30 +461,6 @@ end
     "Db.Value is deprecated and will be removed in a future version \
      of Frama-C. Please use the Eva.mli public API instead."]
 
-(** Functional dependencies between function inputs and function outputs.
-    @see <../from/index.html> internal documentation. *)
-module From : sig
-
-  (** exception raised by [find_deps_no_transitivity_*] if the given expression
-      is not an lvalue.
-      @since Aluminium-20160501
-  *)
-  exception Not_lval
-
-  val find_deps_no_transitivity : (stmt -> exp -> Locations.Zone.t) ref
-
-  val find_deps_no_transitivity_state :
-    (Cvalue.Model.t -> exp -> Locations.Zone.t) ref
-
-  (** @raise Not_lval if the given expression is not a C lvalue. *)
-  val find_deps_term_no_transitivity_state :
-    (Cvalue.Model.t -> term -> Value_types.logic_dependencies) ref
-
-end
-[@@alert db_deprecated
-    "Db.From is deprecated and will be removed in a future version \
-     of Frama-C. Please use the From module or the Eva API instead."]
-
 (* ************************************************************************* *)
 (** {2 Plugins} *)
 (* ************************************************************************* *)

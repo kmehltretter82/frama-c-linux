@@ -47,19 +47,6 @@ let access_value_of_location kinstr loc =
   let state = Db.Value.get_state kinstr in
   Db.Value.find state loc
 
-let find_deps_term_no_transitivity_state state t =
-  try
-    let env = Eval_terms.env_only_here state in
-    let r = Eval_terms.eval_term ~alarm_mode:Eval_terms.Ignore env t in
-    r.Eval_terms.ldeps
-  with Eval_terms.LogicEvalError _ -> raise Db.From.Not_lval
-
-let find_deps_no_transitivity stmt expr =
-  Results.(before stmt |> expr_deps expr)
-
-let find_deps_no_transitivity_state state expr =
-  Results.(in_cvalue_state state |> expr_deps expr)
-
 let eval_predicate ~pre ~here p =
   let open Eval_terms in
   let env = env_annot ~pre ~here () in
@@ -81,10 +68,6 @@ let () =
   Db.Value.access_expr := access_value_of_expr;
   Db.Value.Logic.eval_predicate := eval_predicate;
   Db.Value.valid_behaviors := Logic_inout.valid_behaviors;
-  Db.From.find_deps_term_no_transitivity_state :=
-    find_deps_term_no_transitivity_state;
-  Db.From.find_deps_no_transitivity := find_deps_no_transitivity;
-  Db.From.find_deps_no_transitivity_state := find_deps_no_transitivity_state;
 
 
   (* -------------------------------------------------------------------------- *)

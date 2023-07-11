@@ -631,16 +631,6 @@ module Value = struct
 
 end
 
-module From = struct
-  exception Not_lval
-
-  let find_deps_no_transitivity = mk_fun "From.find_deps_no_transitivity"
-  let find_deps_no_transitivity_state =
-    mk_fun "From.find_deps_no_transitivity_state"
-  let find_deps_term_no_transitivity_state =
-    mk_fun "From.find_deps_term_no_transitivity_state"
-end
-
 (* ************************************************************************* *)
 (** {2 Others plugins} *)
 (* ************************************************************************* *)
