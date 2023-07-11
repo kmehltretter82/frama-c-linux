@@ -37,6 +37,8 @@ sig
 
   include Datatype.S_with_collections with type t = callstack
 
+  val pretty_hash : Format.formatter -> t -> unit
+  val pretty_short : Format.formatter -> t -> unit
   val pretty_debug : Format.formatter -> t -> unit
 
   val compare_lex : t -> t -> int

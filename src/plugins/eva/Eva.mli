@@ -139,6 +139,13 @@ module Callstack: sig
     with type t = callstack
      and module Hashtbl = Eva_types.Callstack.Hashtbl
 
+  (** Print a call stack without displaying call sites. *)
+  val pretty_short : Format.formatter -> t -> unit
+
+  (** Print a hash of the callstack when '-kernel-msg-key callstack'
+      is enabled (prints nothing otherwise). *)
+  val pretty_hash : Format.formatter -> t -> unit
+
   (** [compare_lex] compares callstack lexicographically, slightly slower
       than [compare] but in a more natural order, giving more importance
       to the function at bottom of the callstack - the first functions called. *)

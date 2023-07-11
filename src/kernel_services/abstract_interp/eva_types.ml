@@ -20,6 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let stable_hash x = Hashtbl.seeded_hash 0 x
+
+let dkey_callstack = Kernel.register_category "callstack"
+
 module Callstack =
 struct
   module Thread = Int (* Threads are identified by integers *)
@@ -136,4 +140,51 @@ struct
     (cs.entry_point, Cil_types.Kglobal) :: l
 
   let to_legacy cs = List.rev (to_call_list cs)
+
+  (* Stable hash and pretty-printing *)
+
+  let stmt_hash s =
+    let pos = fst (Cil_datatype.Stmt.loc s) in
+    stable_hash (pos.Filepath.pos_path, pos.Filepath.pos_lnum)
+
+  let kf_hash kf = stable_hash (Kernel_function.get_name kf)
+
+  let rec calls_hash = function
+    | [] -> 0
+    | (kf, stmt) :: tl -> stable_hash (kf_hash kf, stmt_hash stmt, calls_hash tl)
+
+  let stable_hash { thread; entry_point; stack } =
+    let p = stable_hash (thread, kf_hash entry_point, calls_hash stack) in
+    p mod 11_316_496 (* 58 ** 4 *)
+
+  let base58_map = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+
+  (* Converts [i] into a fixed-length, 4-wide string in base-58 *)
+  let base58_of_int n =
+    let buf = Bytes.create 4 in
+    Bytes.set buf 0 (String.get base58_map (n mod 58));
+    let n = n / 58 in
+    Bytes.set buf 1 (String.get base58_map (n mod 58));
+    let n = n / 58 in
+    Bytes.set buf 2 (String.get base58_map (n mod 58));
+    let n = n / 58 in
+    Bytes.set buf 3 (String.get base58_map (n mod 58));
+    Bytes.to_string buf
+
+  let pretty_hash fmt callstack =
+    if Kernel.is_debug_key_enabled dkey_callstack then
+      Format.fprintf fmt "<%s> " (base58_of_int (stable_hash callstack))
+    else Format.ifprintf fmt ""
+
+  let pretty_short fmt callstack =
+    Format.fprintf fmt "%a" pretty_hash callstack;
+    let list = List.rev (to_kf_list callstack) in
+    Pretty_utils.pp_flowlist ~left:"" ~sep:" <- " ~right:""
+      (fun fmt kf -> Kernel_function.pretty fmt kf)
+      fmt list
+
+  let pretty fmt callstack =
+    Format.fprintf fmt "@[<hv>%a" pretty_hash callstack;
+    pretty fmt callstack;
+    Format.fprintf fmt "@]"
 end
