@@ -499,7 +499,7 @@ module Parsed_Dynamic_Hints =
 let dynamic_bases_of_lval states e offset =
   let lv = (Mem e, offset) in
   List.fold_left (fun acc' state ->
-      let location = !Db.Value.lval_to_loc_state state lv in
+      let location = Cvalue_queries.lval_to_loc state lv in
       Locations.Location_Bits.fold_bases
         (fun base acc'' -> Base.Hptset.add base acc'')
         location.Locations.loc acc'
