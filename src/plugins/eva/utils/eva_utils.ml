@@ -30,13 +30,13 @@ let clear_call_stack () =
   match !current_callstack with
   | None -> ()
   | Some cs ->
-    Eva_perf.stop_doing (Callstack.to_legacy cs);
+    Eva_perf.stop_doing cs;
     current_callstack := None
 
 let set_call_stack cs =
   assert (!current_callstack = None);
   current_callstack := Some cs;
-  Eva_perf.start_doing (Callstack.to_legacy cs)
+  Eva_perf.start_doing cs
 
 let current_call_stack_opt () = !current_callstack
 
@@ -57,11 +57,11 @@ let legacy_call_stack () =
 let push_call_stack kf stmt =
   let cs = current_call_stack () in
   current_callstack := Some (Callstack.push kf stmt cs);
-  Eva_perf.start_doing (Callstack.to_legacy cs)
+  Eva_perf.start_doing cs
 
 let pop_call_stack () =
   let cs = current_call_stack () in
-  Eva_perf.stop_doing (Callstack.to_legacy cs);
+  Eva_perf.stop_doing cs;
   current_callstack := Callstack.pop cs
 
 let pp_callstack fmt =

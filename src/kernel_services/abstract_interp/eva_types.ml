@@ -126,13 +126,14 @@ struct
 
   (* Conversion *)
 
-  let to_legacy cs =
+  let to_kf_list cs = cs.entry_point :: List.rev_map fst cs.stack
+  let to_stmt_list cs = List.rev_map snd cs.stack
+
+  let to_call_list cs =
     let l =
       List.rev_map (fun (kf, stmt) -> (kf, Cil_types.Kstmt stmt)) cs.stack
     in
-    List.rev ((cs.entry_point, Cil_types.Kglobal) :: l)
+    (cs.entry_point, Cil_types.Kglobal) :: l
 
-  let to_kf_list cs = cs.entry_point :: List.rev_map fst cs.stack
-
-  let to_stmt_list cs = List.rev_map snd cs.stack
+  let to_legacy cs = List.rev (to_call_list cs)
 end

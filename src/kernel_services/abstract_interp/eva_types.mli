@@ -54,6 +54,7 @@ sig
   val to_legacy : t -> Value_types.callstack
   val to_kf_list : t -> Cil_types.kernel_function list
   val to_stmt_list : t -> Cil_types.stmt list
+  val to_call_list : t -> (Cil_types.kernel_function * Cil_types.kinstr) list
 end
 [@@alert db_deprecated
     "Eva_types is only provided for compatibility reason and will be removed \

@@ -73,6 +73,8 @@ val to_kf_list : t -> Cil_types.kernel_function list
 (** Gives the list of call statements from the bottom to the top of the callstack (i.e. reverse order of the call stack). *)
 val to_stmt_list : t -> Cil_types.stmt list
 
+val to_call_list : t -> (Cil_types.kernel_function * Cil_types.kinstr) list
+
 [@@@ api_end]
 
 val pretty_debug : Format.formatter -> t -> unit
