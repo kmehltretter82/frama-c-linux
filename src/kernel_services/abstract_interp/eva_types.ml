@@ -122,7 +122,7 @@ struct
     | (kf, stmt) :: _ -> kf, Cil_types.Kstmt stmt
     | [] -> cs.entry_point, Cil_types.Kglobal
 
-  let last_caller cs =
+  let top_caller cs =
     match cs.stack with
     | _ :: (kf, _) :: _ -> Some kf
     | [_] -> Some cs.entry_point

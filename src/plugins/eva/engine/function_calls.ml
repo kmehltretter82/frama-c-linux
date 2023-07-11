@@ -53,7 +53,7 @@ let register_call kinstr kf =
   let kf', kinstr' = Callstack.top_call callstack in
   assert (Kernel_function.equal kf kf');
   assert (Cil_datatype.Kinstr.equal kinstr kinstr');
-  match kinstr, Callstack.last_caller callstack with
+  match kinstr, Callstack.top_caller callstack with
   | Kglobal, _ -> CallersTable.add kf Kernel_function.Map.empty
   | Kstmt _, None -> assert false
   | Kstmt stmt, Some caller ->

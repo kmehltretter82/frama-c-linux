@@ -287,7 +287,7 @@ let display fmt =
 ;;
 
 let caller_callee_callinfo callstack =
-  match Callstack.last_caller callstack with
+  match Callstack.top_caller callstack with
   | Some caller_kf ->
     let callee_kf = Callstack.top_kf callstack in
     let caller_flat = Kernel_function.Hashtbl.find flat caller_kf in

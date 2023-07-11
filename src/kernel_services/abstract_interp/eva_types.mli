@@ -51,7 +51,7 @@ sig
   val top_kf : t -> Cil_types.kernel_function
   val top_callsite : t -> Cil_types.stmt option
   val top_call : t -> Cil_types.kernel_function * Cil_types.kinstr
-  val last_caller : t -> Cil_types.kernel_function option
+  val top_caller : t -> Cil_types.kernel_function option
 
   val to_kf_list : t -> Cil_types.kernel_function list
   val to_stmt_list : t -> Cil_types.stmt list

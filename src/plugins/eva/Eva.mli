@@ -166,7 +166,7 @@ module Callstack: sig
   val top_call : t -> Cil_types.kernel_function * Cil_types.kinstr
 
   (** Returns the function that called the topmost function of the callstack. *)
-  val last_caller : t -> Cil_types.kernel_function option
+  val top_caller : t -> Cil_types.kernel_function option
 
   (** {2 Conversion} *)
 
