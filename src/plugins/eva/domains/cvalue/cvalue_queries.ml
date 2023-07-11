@@ -155,3 +155,30 @@ module Queries = struct
 end
 
 include Queries
+
+(* -------------------------------------------------------------------------- *)
+(*                Evaluation engine for the cvalue domain                     *)
+(* -------------------------------------------------------------------------- *)
+
+module Value = struct
+  module Internal = struct
+    include Main_values.CVal
+    let structure = Abstract.Value.Leaf (key, (module Main_values.CVal))
+  end
+  include Internal
+  include Structure.Open (Abstract.Value) (Internal)
+  let reduce t = t
+end
+
+module Domain = struct
+  include Cvalue.Model
+  include Queries
+end
+
+include Evaluation.Make (Value) (Main_locations.PLoc) (Domain)
+
+let lval_to_loc state lval =
+  let eval, _alarms = lvaluate ~for_writing:false state lval in
+  match eval with
+  | `Bottom -> Locations.loc_bottom
+  | `Value (_valuation, ploc, _typ) -> Precise_locs.imprecise_location ploc
