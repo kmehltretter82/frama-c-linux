@@ -22,7 +22,7 @@
 
 open Cil_types
 
-type rcallstack = Value_types.callstack
+type rcallstack = (Cil_types.kernel_function * Cil_types.kinstr) list
 
 let empty = []
 
@@ -31,8 +31,10 @@ let from_callstack cs = Callstack.to_call_list cs
 let callstack_matches_callstack (rcs1:rcallstack) (rcs2:rcallstack) =
   let rec aux q1 q2 = match q1, q2 with
     | [], _ | _, [] -> true
-    | call1 :: q1, call2 :: q2 ->
-      Value_types.Callsite.equal call1 call2 && aux q1 q2
+    | (kf1, kinstr1) :: q1, (kf2, kinstr2) :: q2 ->
+      Kernel_function.equal kf1 kf2
+      && Cil_datatype.Kinstr.equal kinstr1 kinstr2
+      && aux q1 q2
   in
   aux rcs1 rcs2
 
