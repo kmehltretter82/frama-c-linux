@@ -43,6 +43,33 @@ let blocks_share_locals b1 b2 =
   | v1 :: _, v2 :: _ -> v1.vid = v2.vid
   | _, _ -> false
 
+
+module Conditions_table =
+  Cil_state_builder.Stmt_hashtbl
+    (Datatype.Pair (Datatype.Bool) (Datatype.Bool))
+    (struct
+      let name = "Eva.Iterator.Conditions_table"
+      let size = 101
+      let dependencies = [ Self.state ]
+    end)
+
+let condition_truth_value s =
+  try Conditions_table.find s
+  with Not_found -> false, false
+
+let record_fireable edge =
+  match edge.edge_transition with
+  | Guard (_exp, kind, stmt) ->
+    let b_then, b_else = condition_truth_value stmt in
+    let new_status =
+      match kind with
+      | Then -> true, b_else
+      | Else -> b_then, true
+    in
+    Conditions_table.replace stmt new_status
+  | _ -> ()
+
+
 module Make_Dataflow
     (Abstract : Abstractions.S_with_evaluation)
     (States : Powerset.S with type state = Abstract.Dom.t)
@@ -103,10 +130,6 @@ module Make_Dataflow
   type flow = Partitioning.flow
   type tank = Partitioning.tank
   type widening = Partitioning.widening
-
-  type edge_info = {
-    mutable fireable : bool (* Does any states survive the transition ? *)
-  }
 
 
   (* --- Interpreted automata --- *)
@@ -171,7 +194,7 @@ module Make_Dataflow
     VertexTable.create control_point_count
   let w_table : widening VertexTable.t =
     VertexTable.create 7
-  let e_table : (tank * edge_info) EdgeTable.t =
+  let e_table : tank EdgeTable.t =
     EdgeTable.create transition_count
 
   (* Default (Initial) stores on vertex and edges *)
@@ -179,18 +202,18 @@ module Make_Dataflow
     Partitioning.empty_store ~stmt:v.vertex_start_of
   let default_vertex_widening (v : vertex) () : widening =
     Partitioning.empty_widening ~stmt:v.vertex_start_of
-  let default_edge_tank () : tank * edge_info =
-    Partitioning.empty_tank (), { fireable = false }
+  let default_edge_tank () : tank =
+    Partitioning.empty_tank ()
 
   (* Get the stores associated to a control point or edge *)
   let get_vertex_store (v : vertex) : store =
     VertexTable.find_or_add v_table v ~default:(default_vertex_store v)
   let get_vertex_widening (v : vertex) : widening =
     VertexTable.find_or_add w_table v ~default:(default_vertex_widening v)
-  let get_edge_data (e : vertex edge) : tank * edge_info =
+  let get_edge_data (e : vertex edge) : tank =
     EdgeTable.find_or_add e_table e ~default:default_edge_tank
   let get_succ_tanks (v : vertex) : tank list =
-    List.map (fun (_,e,_) -> fst (get_edge_data e)) (G.succ_e graph v)
+    List.map (fun (_,e,_) -> get_edge_data e) (G.succ_e graph v)
 
   module StmtTable = struct
     include Cil_datatype.Stmt.Hashtbl
@@ -422,7 +445,7 @@ module Make_Dataflow
 
   let process_edge (v1,e,v2 : G.edge) : flow =
     let {edge_transition=transition; edge_kinstr=kinstr} = e in
-    let tank,edge_info = get_edge_data e in
+    let tank = get_edge_data e in
     let flow = Partitioning.drain tank in
     Db.yield ();
     check_signals ();
@@ -431,7 +454,7 @@ module Make_Dataflow
     let flow = Partitioning.transfer (transfer_transition transition) flow in
     let flow = process_partitioning_transitions v1 v2 transition flow in
     if not (Partitioning.is_empty_flow flow) then
-      edge_info.fireable <- true;
+      record_fireable e;
     flow
 
   let gather_cvalues states = match get_cvalue with
@@ -526,7 +549,7 @@ module Make_Dataflow
 
   let reset_component (vertex_list : vertex list) : unit =
     let reset_edge (_,e,_) =
-      let t,_ = get_edge_data e in
+      let t = get_edge_data e in
       Partitioning.reset_tank t
     in
     let reset_vertex v =
@@ -611,29 +634,6 @@ module Make_Dataflow
 
   (* --- Results conversion --- *)
 
-  let merge_conditions () =
-    let table = StmtTable.create 5 in
-    let fill (_,e,_) =
-      match e.edge_transition with
-      | Guard (_exp,kind,stmt) ->
-        let mask = match kind with
-          | Then -> Db.Value.mask_then
-          | Else -> Db.Value.mask_else
-        in
-        let edge_info = snd (get_edge_data e) in
-        let old_status =
-          try StmtTable.find table stmt
-          with Not_found -> 0
-        and status =
-          if edge_info.fireable then mask else 0
-        in
-        let new_status = old_status lor status in
-        StmtTable.replace table stmt new_status;
-      | _ -> ()
-    in
-    G.iter_edges_e fill graph;
-    Db.Value.merge_conditions table
-
   let is_instr s = match s.skind with Instr _ -> true | _ -> false
 
   let states_after_stmt states_before states_after =
@@ -693,7 +693,6 @@ module Make_Dataflow
       and register_post = Domain.Store.register_state_after_stmt callstack in
       StmtTable.iter register_pre (Lazy.force merged_pre_states);
       StmtTable.iter register_post (Lazy.force merged_post_states);
-      merge_conditions ();
     end;
     let states =
       Cvalue_callbacks.{ before_stmts = merged_pre_cvalues;

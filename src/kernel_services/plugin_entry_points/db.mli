@@ -124,10 +124,6 @@ module Value : sig
       an incorrect number of them is given.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
-  val condition_truth_value: stmt -> bool * bool
-  (** Provided [stmt] is an 'if' construct, [fst (condition_truth_value stmt)]
-      (resp. snd) is true if and only if the condition of the 'if' has been
-      evaluated to true (resp. false) at least once during the analysis. *)
 
   (** {4 Arguments of the main function} *)
 
@@ -178,9 +174,6 @@ module Value : sig
   (**/**)
   (** {3 Internal use only} *)
 
-  val merge_conditions: int Cil_datatype.Stmt.Hashtbl.t -> unit
-  val mask_then: int
-  val mask_else: int
 
   val initial_state_only_globals : (unit -> state) ref
 

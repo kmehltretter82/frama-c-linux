@@ -231,35 +231,6 @@ module Value = struct
   let dependencies = [ FunArgs.self; VGlobals.self ]
   let proxy = State_builder.Proxy.(create "eva_db" Forward dependencies)
   let self = State_builder.Proxy.get proxy
-  let only_self = [ self ]
-
-  module Conditions_table =
-    Cil_state_builder.Stmt_hashtbl
-      (Datatype.Int)
-      (struct
-        let name = "Db.Value.Conditions_table"
-        let size = 101
-        let dependencies = only_self
-      end)
-
-  let merge_conditions h =
-    Cil_datatype.Stmt.Hashtbl.iter
-      (fun stmt v ->
-         try
-           let old = Conditions_table.find stmt in
-           Conditions_table.replace stmt (old lor v)
-         with Not_found ->
-           Conditions_table.add stmt v)
-      h
-
-  let mask_then = 1
-  let mask_else = 2
-
-  let condition_truth_value s =
-    try
-      let i = Conditions_table.find s in
-      ((i land mask_then) <> 0, (i land mask_else) <> 0)
-    with Not_found -> false, false
 
   let compute = mk_fun "Value.compute"
 

@@ -25,6 +25,11 @@ open Cil_types
 (** Mark the analysis as aborted. It will be stopped at the next safe point *)
 val signal_abort: unit -> unit
 
+(** Provided [stmt] is an 'if' construct, [fst (condition_truth_value stmt)]
+    (resp. snd) is true if and only if the condition of the 'if' has been
+    evaluated to true (resp. false) at least once during the analysis. *)
+val condition_truth_value: stmt -> bool * bool
+
 module Computer
     (* Abstractions with the evaluator. *)
     (Abstract: Abstractions.S_with_evaluation)
