@@ -26,7 +26,7 @@ type rcallstack = Value_types.callstack
 
 let empty = []
 
-let from_callstack cs = List.rev (Callstack.to_legacy cs)
+let from_callstack cs = Callstack.to_call_list cs
 
 let callstack_matches_callstack (rcs1:rcallstack) (rcs2:rcallstack) =
   let rec aux q1 q2 = match q1, q2 with

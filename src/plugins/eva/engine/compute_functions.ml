@@ -240,7 +240,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     if pp then
       Self.feedback
         "@[computing for function %a.@\nCalled from %a.@]"
-        Value_types.Callstack.pretty_short (Callstack.to_legacy call.callstack)
+        Callstack.pretty_short call.callstack
         Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc kinstr);
     let cvalue_state = get_cvalue_or_top state in
     let compute, kind =
