@@ -25,16 +25,31 @@ open Cil_types
 (** {2 Callstacks related types and functions} *)
 
 (** Functions dealing with call stacks. *)
+
+(** Clears the current callstack: future accesses to the current callstack
+    will fail. *)
 val clear_call_stack : unit -> unit
-val set_call_stack : Callstack.t -> unit
+
+(** Initializes the current callstack with the main entry point. *)
+val init_call_stack : kernel_function -> Callstack.t
+
+(** Push a new call to the current callstack. *)
 val push_call_stack : kernel_function -> stmt -> unit
+
+(** Removes the topmost call from the current callstack. *)
 val pop_call_stack : unit -> unit
 
-(** The current function is the one on top of the call stack. *)
+(** Returns the current function, at the top of the current callstack.
+    Fails if no callstack has been initialized. This should only be called
+    during the analysis of a function. *)
 val current_kf : unit -> kernel_function
-val current_call_stack_opt : unit -> Callstack.t option
+
+(** Returns the current callstack; fails if it has not been initialized.
+    This should only be called during the analysis of a function. *)
 val current_call_stack : unit -> Callstack.t
-val legacy_call_stack : unit -> Value_types.callstack
+
+(** Returns the current callstack, or [None] if it has not been initialized. *)
+val current_call_stack_opt : unit -> Callstack.t option
 
 (** Prints the current callstack. *)
 val pp_callstack : Format.formatter -> unit

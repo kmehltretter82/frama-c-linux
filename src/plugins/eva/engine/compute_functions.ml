@@ -352,8 +352,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   let compute kf init_state =
     let restore_signals = register_signal_handler () in
     let compute () =
-      let callstack = Callstack.init kf in
-      Eva_utils.set_call_stack callstack;
+      let callstack = Eva_utils.init_call_stack kf in
       store_initial_state callstack kf init_state;
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in
       let final_result = compute_call Kglobal call None init_state in
@@ -372,7 +371,6 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let cleanup () =
       Abstract.Dom.Store.mark_as_computed ();
       Self.(set_computation_state Aborted);
-      Eva_utils.clear_call_stack ();
       post_analysis_cleanup ~aborted:true
     in
     Eva_utils.protect compute ~cleanup

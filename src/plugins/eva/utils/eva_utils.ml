@@ -33,31 +33,29 @@ let clear_call_stack () =
     Eva_perf.stop_doing cs;
     current_callstack := None
 
-let set_call_stack cs =
+let init_call_stack kf =
   assert (!current_callstack = None);
+  let cs = Callstack.init kf in
   current_callstack := Some cs;
-  Eva_perf.start_doing cs
+  Eva_perf.start_doing cs;
+  cs
 
 let current_call_stack_opt () = !current_callstack
 
 let current_call_stack () =
   match !current_callstack with
-  | None -> invalid_arg "callstack not initialized"
+  | None -> Self.fatal "Callstack not initialized"
   | Some cs -> cs
 
 let current_kf () =
   let cs = current_call_stack () in
   Callstack.top_kf cs
 
-let legacy_call_stack () =
-  match !current_callstack with
-  | None -> []
-  | Some cs -> Callstack.to_legacy cs
-
 let push_call_stack kf stmt =
   let cs = current_call_stack () in
-  current_callstack := Some (Callstack.push kf stmt cs);
-  Eva_perf.start_doing cs
+  let new_cs = Callstack.push kf stmt cs in
+  current_callstack := Some new_cs;
+  Eva_perf.start_doing new_cs
 
 let pop_call_stack () =
   let cs = current_call_stack () in
