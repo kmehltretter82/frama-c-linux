@@ -407,58 +407,11 @@ module Value : sig
           @since Neon-20140301 *)
   end
 
-
-  (** {3 Callbacks} *)
-
-  (** Actions to perform at end of each function analysis. Not compatible with
-      option [-memexec-all] *)
-
-  module Record_Value_Callbacks:
-    Hook.Iter_hook
-    with type param = callstack * (state Stmt.Hashtbl.t) Lazy.t
-
-  module Record_Value_Superposition_Callbacks:
-    Hook.Iter_hook
-    with type param = callstack * (state list Stmt.Hashtbl.t) Lazy.t
-
-  module Record_Value_After_Callbacks:
-    Hook.Iter_hook
-    with type param = callstack * (state Stmt.Hashtbl.t) Lazy.t
-
-  (**/**)
-  (* Temporary API, do not use *)
-  module Record_Value_Callbacks_New: Hook.Iter_hook
-    with type param =
-           callstack *
-           ((state Stmt.Hashtbl.t) Lazy.t  (* before states *) *
-            (state Stmt.Hashtbl.t) Lazy.t) (* after states *)
-             Value_types.callback_result
-  (**/**)
-
   val no_results: (fundec -> bool) ref
   (** Returns [true] if the user has requested that no results should
       be recorded for this function. If possible, hooks registered
       on [Record_Value_Callbacks] and [Record_Value_Callbacks_New]
       should not force their lazy argument *)
-
-  (** Actions to perform at each treatment of a "call"
-      statement. [state] is the state before the call.
-      @deprecated Use Call_Type_Value_Callbacks instead. *)
-  module Call_Value_Callbacks:
-    Hook.Iter_hook with type param = state * callstack
-
-  (** Actions to perform at each treatment of a "call"
-      statement. [state] is the state before the call.
-      @since Aluminium-20160501  *)
-  module Call_Type_Value_Callbacks:
-    Hook.Iter_hook with type param =
-                          [`Builtin | `Spec | `Body | `Reuse]
-                          * state * callstack
-
-
-  (** Actions to perform whenever a statement is handled. *)
-  module Compute_Statement_Callbacks:
-    Hook.Iter_hook with type param = stmt * callstack * state list
 
   (* -remove-redundant-alarms feature, applied at the end of an Eva analysis,
      fulfilled by the Scope plugin that also depends on Eva. We thus use a

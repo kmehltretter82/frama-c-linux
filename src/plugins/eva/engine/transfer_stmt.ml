@@ -733,7 +733,6 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let call_stack = Eva_utils.current_call_stack () in
     let stack_with_call = Callstack.push kf stmt call_stack in
     let cvalue_state = get_cvalue_or_top state in
-    Db.Value.Call_Value_Callbacks.apply (cvalue_state, stack_with_call);
     Cvalue_callbacks.apply_call_hooks stack_with_call kf cvalue_state `Builtin;
     Cvalue_callbacks.apply_call_results_hooks stack_with_call kf cvalue_state
       (`Builtin ([cvalue_state], None))

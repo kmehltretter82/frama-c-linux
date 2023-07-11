@@ -39,8 +39,7 @@ let register_call_hook f =
   Call.extend (fun (callstack, kf, kind, state) -> f callstack kf kind state)
 
 let apply_call_hooks callstack kf state kind =
-  Call.apply (callstack, kf, state, kind);
-  Db.Value.Call_Type_Value_Callbacks.apply (kind, state, callstack)
+  Call.apply (callstack, kf, state, kind)
 
 
 type state_by_stmt = (state Cil_datatype.Stmt.Hashtbl.t) Lazy.t
@@ -65,21 +64,9 @@ let register_call_results_hook f =
     (fun (callstack, kf, state, results) -> f callstack kf state results)
 
 let apply_call_results_hooks callstack kf state call_results =
-  if Parameters.ValShowProgress.get ()
-  && not (Call_Results.is_empty ()
-          && Db.Value.Record_Value_Callbacks_New.is_empty ())
+  if Parameters.ValShowProgress.get () && not (Call_Results.is_empty ())
   then Self.debug ~dkey "now calling Call_Results callbacks";
-  Call_Results.apply (callstack, kf, state, call_results);
-  let results =
-    match call_results with
-    | `Builtin _ | `Spec _ -> None
-    | `Reuse i -> Some (Value_types.Reuse i)
-    | `Body ({before_stmts; after_stmts}, i) ->
-      Some (Value_types.NormalStore ((before_stmts, after_stmts), i))
-  in
-  Option.iter
-    (fun r -> Db.Value.Record_Value_Callbacks_New.apply (callstack, r))
-    results
+  Call_Results.apply (callstack, kf, state, call_results)
 
 
 module Statement =
@@ -89,5 +76,4 @@ let register_statement_hook f =
   Statement.extend (fun (callstack, stmt, states) -> f callstack stmt states)
 
 let apply_statement_hooks callstack stmt states =
-  Statement.apply (callstack, stmt, states);
-  Db.Value.Compute_Statement_Callbacks.apply (stmt, callstack, states)
+  Statement.apply (callstack, stmt, states)

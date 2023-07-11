@@ -369,49 +369,6 @@ module Value = struct
            Cvalue.Model.pretty v)
 *)
 
-  module Record_Value_Callbacks =
-    Hook.Build
-      (struct
-        type t = callstack * (state Stmt.Hashtbl.t) Lazy.t
-      end)
-
-  module Record_Value_Callbacks_New =
-    Hook.Build
-      (struct
-        type t =
-          callstack *
-          ((state Stmt.Hashtbl.t) Lazy.t  * (state Stmt.Hashtbl.t) Lazy.t)
-            Value_types.callback_result
-      end)
-
-  module Record_Value_After_Callbacks =
-    Hook.Build
-      (struct
-        type t = callstack * (state Stmt.Hashtbl.t) Lazy.t
-      end)
-
-  module Record_Value_Superposition_Callbacks =
-    Hook.Build
-      (struct
-        type t = callstack * (state list Stmt.Hashtbl.t) Lazy.t
-      end)
-
-  module Call_Value_Callbacks =
-    Hook.Build
-      (struct type t = state * callstack end)
-
-  module Call_Type_Value_Callbacks =
-    Hook.Build(struct
-      type t = [`Builtin | `Spec
-               | `Body | `Reuse]
-               * state * callstack end)
-  ;;
-
-
-  module Compute_Statement_Callbacks =
-    Hook.Build
-      (struct type t = stmt * callstack * state list end)
-
   (* -remove-redundant-alarms feature, applied at the end of an Eva analysis,
      fulfilled by the Scope plugin that also depends on Eva. We thus use a
      reference here to avoid a cyclic dependency. *)
