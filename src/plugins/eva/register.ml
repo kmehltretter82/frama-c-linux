@@ -47,26 +47,14 @@ let access_value_of_location kinstr loc =
   let state = Db.Value.get_state kinstr in
   Db.Value.find state loc
 
-let eval_predicate ~pre ~here p =
-  let open Eval_terms in
-  let env = env_annot ~pre ~here () in
-  match eval_predicate env p with
-  | True -> Property_status.True
-  | False -> Property_status.False_if_reachable
-  | Unknown -> Property_status.Dont_know
-
 let () =
   Db.Value.is_called := Function_calls.is_called;
   Db.Value.callers := Function_calls.callsites;
   Db.Value.use_spec_instead_of_definition :=
     Function_calls.use_spec_instead_of_definition;
-  Db.Value.assigns_outputs_to_zone :=
-    (fun s ~result a -> Logic_inout.assigns_outputs_to_zone ~result s a);
-  Db.Value.assigns_inputs_to_zone := Logic_inout.assigns_inputs_to_zone;
   Db.Value.access := access_value_of_lval;
   Db.Value.access_location := access_value_of_location;
   Db.Value.access_expr := access_value_of_expr;
-  Db.Value.Logic.eval_predicate := eval_predicate;
   Db.Value.valid_behaviors := Logic_inout.valid_behaviors;
 
 
@@ -414,8 +402,6 @@ let register (module Eval: Eval) (module Export: Export) =
 
 
 let () = Db.Value.initial_state_only_globals := Analysis.cvalue_initial_state
-
-let () = Db.Value.verify_assigns_froms := Logic_inout.verify_assigns
 
 let () =
   let eval = (module Eval : Eval) in

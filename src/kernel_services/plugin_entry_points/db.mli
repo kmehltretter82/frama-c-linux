@@ -374,39 +374,6 @@ module Value : sig
      Locations.Zone.t * Precise_locs.precise_location) ref
 
 
-  (** Evaluation of the [\from] clause of an [assigns] clause.*)
-  val assigns_inputs_to_zone :
-    (state -> assigns -> Locations.Zone.t) ref
-
-  (** Evaluation of the left part of [assigns] clause (without [\from]).*)
-  val assigns_outputs_to_zone :
-    (state -> result:varinfo option -> assigns -> Locations.Zone.t) ref
-
-  (** Evaluation of the left part of [assigns] clause (without [\from]). Each
-      assigns term results in one location. *)
-  val assigns_outputs_to_locations :
-    (state -> result:varinfo option -> assigns -> Locations.location list) ref
-
-  (** For internal use only. Evaluate the [assigns] clause of the
-      given function in the given prestate, compare it with the
-      computed froms, return warning and set statuses. *)
-  val verify_assigns_froms :
-    (Kernel_function.t -> pre:state -> Function_Froms.t -> unit) ref
-
-
-  (** {3 Evaluation of logic terms and predicates} *)
-  module Logic : sig
-    (** The APIs of this module are not stabilized yet, and are subject
-        to change between Frama-C versions. *)
-
-    val eval_predicate:
-      (pre:state -> here:state -> predicate ->
-       Property_status.emitted_status) ref
-      (** Evaluate the given predicate in the given states for the Pre
-          and Here ACSL labels.
-          @since Neon-20140301 *)
-  end
-
   val no_results: (fundec -> bool) ref
   (** Returns [true] if the user has requested that no results should
       be recorded for this function. If possible, hooks registered

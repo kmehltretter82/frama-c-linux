@@ -591,19 +591,7 @@ module Value = struct
     ref (fun ?with_alarms:_ _ -> mk_labeled_fun "Value.lval_to_precise_loc")
   let lval_to_precise_loc_with_deps_state =
     mk_fun "Value.lval_to_precise_loc_with_deps_state"
-  let assigns_inputs_to_zone = mk_fun "Value.assigns_inputs_to_zone"
-  let assigns_outputs_to_zone = mk_fun "Value.assigns_outputs_to_zone"
-  let assigns_outputs_to_locations = mk_fun "Value.assigns_outputs_to_locations"
-  let verify_assigns_froms = mk_fun "Value.verify_assigns_froms"
 
-  module Logic = struct
-    let eval_predicate =
-      ref (fun ~pre:_ ~here:_ _ ->
-          raise
-            (Extlib.Unregistered_function
-               "Function 'Value.Logic.eval_predicate' not registered yet"))
-
-  end
 
   exception Void_Function
 
