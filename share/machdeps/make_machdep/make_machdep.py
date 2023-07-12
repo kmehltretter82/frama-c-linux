@@ -49,8 +49,6 @@ from yaml.representer import Representer
 
 my_path = Path(sys.argv[0]).parent
 
-logging.basicConfig(format="%(levelname)s: %(message)s")
-
 parser = argparse.ArgumentParser(prog="make_machdep")
 parser.add_argument("-v", "--verbose", action="store_true")
 parser.add_argument("-o", type=argparse.FileType("w"), dest="dest_file")
@@ -103,6 +101,11 @@ parser.add_argument(
 )
 
 args, other_args = parser.parse_known_args()
+
+if args.verbose:
+    logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
+else:
+    logging.basicConfig(format="%(levelname)s: %(message)s")
 
 if not args.compiler_flags:
     args.compiler_flags = ["-c"]
@@ -347,7 +350,7 @@ for f, typ in source_files:
         name = p.stem
         if proc.returncode != 0:
             logging.warning(
-                f"error in preprocessing value '{p}', some value might not be filled\ncompiler output is:{proc.stderr.decode()}"
+                f"error in preprocessing value '{p}', some values might not be filled\ncompiler output is:{proc.stderr.decode()}"
             )
             if name in machdep:
                 machdep[name] = {}
@@ -419,7 +422,7 @@ if proc.returncode == 0:
         lines += f"{line.strip()}\n"
     machdep["custom_defs"] = custom_defs(lines)
 else:
-    logging.warning("could not determine predefined macros. compiler output is:\n{proc.stderr}")
+    logging.warning(f"could not determine predefined macros. compiler output is:\n{proc.stderr}")
 
 if args.from_file and args.in_place:
     machdep["machdep_name"] = Path(args.from_file).stem
